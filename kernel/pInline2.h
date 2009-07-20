@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which are of constant time
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline2.h,v 1.16 2009-05-29 13:57:35 motsak Exp $
+ *  Version: $Id: pInline2.h,v 1.17 2009-07-20 12:00:51 motsak Exp $
  *******************************************************************/
 #ifndef PINLINE2_H
 #define PINLINE2_H
@@ -49,7 +49,7 @@ PINLINE2 Order_t p_GetOrder(poly p, ring r)
       case ro_wp_neg:
         return (((long)((p)->exp[r->pOrdIndex]))-POLY_NEGWEIGHT_OFFSET);
       case ro_syzcomp:
-      case ro_syz:
+      case ro_syz: case ro_isTemp:  case ro_is:
       case ro_cp:
         i++;
         break;
@@ -74,7 +74,7 @@ PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
       case ro_wp_neg:
         return (p)->exp[r->pOrdIndex]=o+POLY_NEGWEIGHT_OFFSET;
       case ro_syzcomp:
-      case ro_syz:
+      case ro_syz:  case ro_isTemp: case ro_is:
       case ro_cp:
         i++;
         break;
@@ -196,12 +196,12 @@ PINLINE2 unsigned long BitMask(unsigned long bitmask, int twobits)
   // 0 must give bitmask!
   // 1, 2, 3 - anything like 00011..11
   pAssume2((twobits >> 2) == 0);
-  const unsigned long _bitmasks[4] = {-1, 0x7fff, 0x7f, 0x3};
-  return bitmask & _bitmasks[twobits]; 
+  static const unsigned long _bitmasks[4] = {-1, 0x7fff, 0x7f, 0x3};
+  return bitmask & _bitmasks[twobits];
 }
 
 
-/// @Note: we may add some more info (6 ) into VarOffset and thus encode 
+/// @Note: we may add some more info (6 ) into VarOffset and thus encode
 PINLINE2 int p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
 {
   int pos  =(VarOffset & 0xffffff);

@@ -1,18 +1,33 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.55 2009-07-17 11:31:10 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.56 2009-07-20 12:00:50 motsak Exp $ */
 /*
 * ABSTRACT:
 */
 
-// define if buckets should be used
-#define MORA_USE_BUCKETS
+// TODO: why the following is here instead of mod2.h???
 
 // define if tailrings should be used
 #define HAVE_TAIL_RING
 
+// define if buckets should be used
+#define MORA_USE_BUCKETS
+
 #include "mod2.h"
+
+#ifndef NDEBUG
+# define MYTEST 0
+#else /* ifndef NDEBUG */
+# define MYTEST 0
+#endif /* ifndef NDEBUG */
+
+#if MYTEST 
+#ifdef HAVE_TAIL_RING
+#undef HAVE_TAIL_RING
+#endif /* ifdef HAVE_TAIL_RING */
+#endif /* if MYTEST */
+
 #include "structs.h"
 #include "omalloc.h"
 #include "kutil.h"
@@ -1682,6 +1697,9 @@ long kHomModDeg(poly p, ring r)
 ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
           int newIdeal, intvec *vw)
 {
+  if(idIs0(F))
+    return idInit(1,F->rank);
+
   ideal r;
   BOOLEAN b=pLexOrder,toReset=FALSE;
   BOOLEAN delete_w=(w==NULL);
@@ -1742,6 +1760,12 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   strat->homog=h;
 #ifdef KDEBUG
   idTest(F);
+  idTest(Q);
+
+#if MYTEST
+  PrintS("kSTD: currRing: "); rWrite(currRing);
+#endif
+
 #endif
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing))
@@ -1890,6 +1914,9 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
 ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
               int syzComp, int reduced)
 {
+  if(idIs0(F))
+    return idInit(1,F->rank);
+
   ideal r=NULL;
   int Kstd1_OldDeg = Kstd1_deg,i;
   intvec* temp_w=NULL;
@@ -2016,11 +2043,6 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
 {
   if (p==NULL)
      return NULL;
-  if ((idIs0(F))&&(Q==NULL))
-    return pCopy(p); /*F+Q=0*/
-  kStrategy strat=new skStrategy;
-  strat->syzComp = syzComp;
-  strat->ak = si_max(idRankFreeModule(F),pMaxComp(p));
 
   poly pp = p;
 
@@ -2035,6 +2057,22 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
       Q = SCAQuotient(currRing);
   }
 #endif
+
+  if ((idIs0(F))&&(Q==NULL))
+  {
+#ifdef HAVE_PLURAL
+    if(p != pp)
+      return pp;
+#endif
+    return pCopy(p); /*F+Q=0*/
+  }
+
+
+  kStrategy strat=new skStrategy;
+  strat->syzComp = syzComp;
+  strat->ak = si_max(idRankFreeModule(F),pMaxComp(p));
+
+
 
   poly res;
 
@@ -2061,12 +2099,6 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   }
   if (idIs0(p))
     return idInit(IDELEMS(p),si_max(p->rank,F->rank));
-  if ((idIs0(F))&&(Q==NULL))
-    return idCopy(p); /*F+Q=0*/
-
-  kStrategy strat=new skStrategy;
-  strat->syzComp = syzComp;
-  strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(p));
 
   ideal pp = p;
 #ifdef HAVE_PLURAL
@@ -2080,6 +2112,22 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
       Q = SCAQuotient(currRing);
   }
 #endif
+
+
+  if ((idIs0(F))&&(Q==NULL))
+  {
+#ifdef HAVE_PLURAL
+    if(p != pp)
+      return pp;
+#endif
+
+    return idCopy(p); /*F+Q=0*/
+  }
+
+  kStrategy strat=new skStrategy;
+  strat->syzComp = syzComp;
+  strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(p));
+
 
   if (pOrdSgn==-1)
     res=kNF1(F,Q,pp,strat,lazyReduce);

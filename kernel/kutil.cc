@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.147 2009-07-10 15:13:56 Singular Exp $ */
+/* $Id: kutil.cc,v 1.148 2009-07-20 12:00:51 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -12,6 +12,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mod2.h"
+
+#ifndef NDEBUG
+# define MYTEST 0
+#else /* ifndef NDEBUG */
+# define MYTEST 0
+#endif /* ifndef NDEBUG */
+
+
 #include <mylimits.h>
 #include "structs.h"
 #include "gring.h"
@@ -1392,7 +1400,6 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 #endif
   pSetm(Lp.lcm);
 
-#define MYTEST 0
 
   if (strat->sugarCrit && ALLOW_PROD_CRIT(strat))
   {
@@ -6238,6 +6245,8 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
 
 BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
 {
+  assume(strat->tailRing == currRing);
+
   if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
   if (expbound >= currRing->bitmask) return FALSE;
   strat->overflow=FALSE;
@@ -6247,10 +6256,11 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
 #ifdef HAVE_RINGS
                                   (strat->homog && pFDeg == pDeg && !(rField_is_Ring(currRing))), // TODO Oliver
 #else
-                                  (strat->homog && pFDeg == pDeg),
+                                  (strat->homog && pFDeg == pDeg), // omit_degree
 #endif
-                                  !strat->ak,
-                                  expbound);
+                                  (strat->ak==0), // omit_comp if the input is an ideal 
+                                  expbound); // exp_limit
+
   if (new_tailRing == currRing) return TRUE;
 
   strat->pOrigFDeg_TailRing = new_tailRing->pFDeg;
@@ -6340,7 +6350,7 @@ void kStratInitChangeTailRing(kStrategy strat)
   unsigned long l = 0;
   int i;
   Exponent_t e;
-  ring new_tailRing;
+//  ring new_tailRing; // What for???
 
   assume(strat->tailRing == currRing);
 

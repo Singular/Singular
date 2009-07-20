@@ -1,18 +1,35 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.98 2009-07-17 09:51:42 Singular Exp $ */
+/* $Id: kstd2.cc,v 1.99 2009-07-20 12:00:51 motsak Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
 
 // #define PDEBUG 2
+
+// TODO: why the following is here instead of mod2.h???
+
 // define to enable tailRings
 #define HAVE_TAIL_RING
+
+#include "mod2.h"
+
+#ifndef NDEBUG
+# define MYTEST 0
+#else /* ifndef NDEBUG */
+# define MYTEST 0
+#endif /* ifndef NDEBUG */
+
+#if MYTEST 
+# ifdef HAVE_TAIL_RING
+#  undef HAVE_TAIL_RING
+# endif // ifdef HAVE_TAIL_RING
+#endif
+
 // define if no buckets should be used
 // #define NO_BUCKETS
 
-#include "mod2.h"
 #ifdef HAVE_PLURAL
 #define PLURAL_INTERNAL_DECLARATIONS 1
 #endif
@@ -945,7 +962,7 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
 
 #ifdef KDEBUG
 static int bba_count = 0;
-#endif
+#endif /* KDEBUG */
 void kDebugPrint(kStrategy strat);
 
 ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
@@ -953,7 +970,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
   bba_count++;
   int loop_count = 0;
-#endif
+#endif /* KDEBUG */
   om_Opts.MinTrack = 5;
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
@@ -982,8 +999,23 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   // strat->posInT = posInT_pLength;
   kTest_TS(strat);
 
+#ifdef KDEBUG
+#if MYTEST
+  PrintS("bba start GB: currRing: ");
+  rWrite(currRing);PrintLn(); rDebugPrint(currRing);
+  PrintLn();
+
+  if(strat->tailRing != NULL && strat->tailRing != currRing)
+  {
+    PrintS("bba start GB: tailRing: ");
+    rWrite(strat->tailRing);PrintLn(); rDebugPrint(strat->tailRing);
+  }
+#endif /* MYTEST */
+#endif /* KDEBUG */
+
 #ifdef HAVE_TAIL_RING
-  kStratInitChangeTailRing(strat);
+  if(!idIs0(F))
+    kStratInitChangeTailRing(strat);
 #endif
   if (BVERBOSE(23))
   {
@@ -1092,6 +1124,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
       int pos=posInS(strat,strat->sl,strat->P.p,strat->P.ecart);
 
+#ifdef KDEBUG
+#if MYTEST
+      PrintS("New S: "); pDebugPrint(strat->P.p); PrintLn();
+#endif /* MYTEST */
+#endif /* KDEBUG */
+
       // reduce the tail and normalize poly
       // in the ring case we cannot expect LC(f) = 1,
       // therefore we call pContent instead of pNorm
@@ -1113,7 +1151,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
       if (TEST_OPT_DEBUG){PrintS("new s:");strat->P.wrp();PrintLn();}
-#endif
+#if MYTEST
+      PrintS("New (reduced) S: "); pDebugPrint(strat->P.p); PrintLn();
+#endif /* MYTEST */
+#endif /* KDEBUG */
 
       // min_std stuff
       if ((strat->P.p1==NULL) && (strat->minim>0))
@@ -1184,12 +1225,16 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
     memset(&(strat->P), 0, sizeof(strat->P));
-#endif
+#endif /* KDEBUG */
     kTest_TS(strat);
   }
 #ifdef KDEBUG
+#if MYTEST
+  PrintS("bba finish GB: currRing: "); rWrite(currRing);
+#endif /* MYTEST */
   if (TEST_OPT_DEBUG) messageSets(strat);
-#endif
+#endif /* KDEBUG */
+
   if (TEST_OPT_SB_1)
   {
     int k=1;
@@ -1239,13 +1284,21 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
   if (TEST_OPT_PROT) messageStat(srmax,lrmax,hilbcount,strat);
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+
+#ifdef KDEBUG
+#if MYTEST
+  PrintS("bba_end: currRing: "); rWrite(currRing);
+#endif /* MYTEST */
+#endif /* KDEBUG */
+  idTest(strat->Shdl);
+
   return (strat->Shdl);
 }
 
 poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
 {
   assume(q!=NULL);
-  assume(!(idIs0(F)&&(Q==NULL)));
+  assume(!(idIs0(F)&&(Q==NULL))); // NF(q, std(0) in polynomial ring?
 
 // lazy_reduce flags: can be combined by |
 //#define KSTD_NF_LAZY   1

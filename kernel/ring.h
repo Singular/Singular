@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.41 2009-05-06 12:53:49 Singular Exp $ */
+/* $Id: ring.h,v 1.42 2009-07-20 12:00:51 motsak Exp $ */
 
 /* includes */
 #include "structs.h"
@@ -27,12 +27,12 @@ void   rWrite(ring r);
 void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
-ring rCopy0(ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
+ring   rCopy0(const ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
 void   rNameCheck(ring R);
 ring   rOpposite(ring r);
 ring   rEnvelope(ring r);
 
-// we must always have this test!
+/// we must always have this test!
 inline bool rIsPluralRing(const ring r)
 {
 #ifdef HAVE_PLURAL
@@ -247,12 +247,12 @@ inline BOOLEAN rField_is_Extension(ring r=currRing)
 
 n_coeffType rFieldType(ring r);
 
-// this needs to be called whenever a new ring is created: new fields
-// in ring are created (like VarOffset), unless they already exist
-// with force == 1, new fields are _always_ created (overwritten),
-// even if they exist
+/// this needs to be called whenever a new ring is created: new fields
+/// in ring are created (like VarOffset), unless they already exist
+/// with force == 1, new fields are _always_ created (overwritten),
+/// even if they exist
 BOOLEAN rComplete(ring r, int force = 0);
-// use this to free fields created by rComplete
+// use this to free fields created by rComplete //?
 
 inline int rBlocks(ring r)
 {
@@ -275,17 +275,17 @@ inline BOOLEAN rShortOut(ring r)
   return (r->ShortOut);
 }
 
-// order stuff
+/// order stuff
 typedef enum rRingOrder_t
 {
   ringorder_no = 0,
   ringorder_a,
-  ringorder_a64, // for int64 weights
+  ringorder_a64, ///< for int64 weights
   ringorder_c,
   ringorder_C,
   ringorder_M,
-  ringorder_S,
-  ringorder_s,
+  ringorder_S, ///< S?
+  ringorder_s, ///< s?
   ringorder_lp,
   ringorder_dp,
   ringorder_rp,
@@ -299,32 +299,32 @@ typedef enum rRingOrder_t
   ringorder_Ws,
   ringorder_L,
   // the following are only used internally
-  ringorder_aa, // for idElimination, like a, except pFDeg, pWeigths ignore it
-  ringorder_rs,
+  ringorder_aa, ///< for idElimination, like a, except pFDeg, pWeigths ignore it
+  ringorder_rs, ///< ???
+  ringorder_IS, ///< Induced (Schreyer) ordering
   ringorder_unspec
 } rRingOrder_t;
 
 typedef enum rOrderType_t
 {
-  rOrderType_General = 0, // non-simple ordering as specified by currRing
-  rOrderType_CompExp,     // simple ordering, component has priority
-  rOrderType_ExpComp,     // simple ordering, exponent vector has priority
-                          // component not compatible with exp-vector order
-  rOrderType_Exp,         // simple ordering, exponent vector has priority
-                          // component is compatible with exp-vector order
-  rOrderType_Syz,         // syzygy ordering
-  rOrderType_Schreyer,    // Schreyer ordering
-  rOrderType_Syz2dpc,     // syzcomp2dpc
-  rOrderType_ExpNoComp    // simple ordering, differences in component are
-                          // not considered
+  rOrderType_General = 0, ///< non-simple ordering as specified by currRing
+  rOrderType_CompExp,     ///< simple ordering, component has priority
+  rOrderType_ExpComp,     ///< simple ordering, exponent vector has priority
+                          ///< component not compatible with exp-vector order
+  rOrderType_Exp,         ///< simple ordering, exponent vector has priority
+                          ///< component is compatible with exp-vector order
+  rOrderType_Syz,         ///< syzygy ordering
+  rOrderType_Schreyer,    ///< Schreyer ordering
+  rOrderType_Syz2dpc,     ///< syzcomp2dpc
+  rOrderType_ExpNoComp    ///< simple ordering, differences in component are
+                          ///< not considered
 } rOrderType_t;
 
-inline BOOLEAN rIsSyzIndexRing(ring r)
+inline BOOLEAN rIsSyzIndexRing(const ring r)
 { return r->order[0] == ringorder_s;}
 
-inline int rGetCurrSyzLimit(ring r = currRing)
-{ return (r->order[0] == ringorder_s ?
-          r->typ[0].data.syz.limit : 0);}
+inline int rGetCurrSyzLimit(const ring r = currRing)
+{ return (rIsSyzIndexRing(r)? r->typ[0].data.syz.limit : 0);}
 
 // Ring Manipulations
 ring   rAssure_HasComp(ring r);
@@ -333,19 +333,23 @@ void   rSetSyzComp(int k);
 ring   rCurrRingAssure_dp_S();
 ring   rCurrRingAssure_dp_C();
 ring   rCurrRingAssure_C_dp();
-// makes sure that c/C ordering is last ordering
+
+/// makes sure that c/C ordering is last ordering
 ring   rCurrRingAssure_CompLastBlock();
-// makes sure that c/C ordering is last ordering and SyzIndex is first
+
+/// makes sure that c/C ordering is last ordering and SyzIndex is first
 ring   rCurrRingAssure_SyzComp_CompLastBlock();
 ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos);
 
-// return the max-comonent wchich has syzIndex i
-// Assume: i<= syzIndex_limit
+/// return the max-comonent wchich has syzIndex i
+/// Assume: i<= syzIndex_limit
 int rGetMaxSyzComp(int i);
 
 BOOLEAN rHasSimpleOrder(const ring r);
-// returns TRUE, if simple lp or ls ordering
+
+/// returns TRUE, if simple lp or ls ordering
 BOOLEAN rHasSimpleLexOrder(const ring r);
+
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
 //inline BOOLEAN rHasGlobalOrdering(const ring r=currRing)
 //{ return (r->OrdSgn==1); }
@@ -356,10 +360,12 @@ BOOLEAN rHasSimpleLexOrder(const ring r);
 #define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)
 #define rHasLocalOrMixedOrdering_currRing() (pOrdSgn==-1)
 BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
-// return TRUE if p_SetComp requires p_Setm
+
+/// return TRUE if p_SetComp requires p_Setm
 BOOLEAN rOrd_SetCompRequiresSetm(ring r);
 rOrderType_t    rGetOrderType(ring r);
-/* returns TRUE if var(i) belongs to p-block */
+
+/// returns TRUE if var(i) belongs to p-block
 BOOLEAN rIsPolyVar(int i, ring r = currRing);
 
 inline BOOLEAN rOrd_is_Comp_dp(ring r)
@@ -379,7 +385,8 @@ extern BOOLEAN rDBTest(ring r, const char* fn, const int l);
 ring rModifyRing(ring r, BOOLEAN omit_degree,
                          BOOLEAN omit_comp,
                          unsigned long exp_limit);
-// construct Wp, C ring
+
+/// construct Wp, C ring
 ring rModifyRing_Wp(ring r, int* weights);
 void rModify_a_to_A(ring r);
 
@@ -390,9 +397,15 @@ void rKillModified_Wp_Ring(ring r);
 ring rModifyRing_Simple(ring r, BOOLEAN omit_degree, BOOLEAN omit_comp, unsigned long exp_limit, BOOLEAN &simple);
 void rKillModifiedRing_Simple(ring r);
 
+#ifdef RDEBUG
 void rDebugPrint(ring r);
 void pDebugPrint(poly p);
 void p_DebugPrint(poly p, const ring r);
+#endif
+
+/// debug-print at most nTerms (2 by default) terms from poly/vector p,
+/// assuming that lt(p) lives in lmRing and tail(p) lives in tailRing.
+void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const int nTerms = 2);
 
 int64 * rGetWeightVec(ring r);
 void rSetWeightVec(ring r, int64 *wv);

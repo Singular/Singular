@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.17 2009-06-10 15:34:50 Singular Exp $
+ *  Version: $Id: p_polys.cc,v 1.18 2009-07-20 12:00:51 motsak Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -170,6 +170,151 @@ void p_Setm_General(poly p, const ring r)
             assume(c == 0);
             p->exp[o->data.syz.place]= 0;
           }
+          break;
+        }
+        // Prefix for Induced Schreyer ordering
+        case ro_isTemp: // Do nothing?? (to be removed into suffix later on...?)
+        {
+          assume(p != NULL);
+
+#ifndef NDEBUG
+#if MYTEST
+          Print("isTemp ord in rSetm: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 0);
+#endif
+#endif
+          int c = p_GetComp(p, r);
+
+          assume( c >= 0 );
+          const int limit = o->data.is.limit;
+
+          assume( limit >= 0 );
+
+          // Let's simulate case ro_syz above....
+          // Should accumulate (by Suffix) and be a level indicator
+          const int* const pVarOffset = o->data.isTemp.pVarOffset;
+
+          assume( pVarOffset != NULL );
+
+          if( c > limit )
+            p->exp[o->data.isTemp.start] = 1;
+          else
+          {
+            p->exp[o->data.isTemp.start] = 0;
+          }
+
+          // TODO: Can this be done in the suffix???
+          for( int i = 1; i <= r->N; i++ ) // No v[0] here!!!
+          {
+            const int vo = pVarOffset[i];
+            if( vo != -1) // TODO: optimize: can be done once!
+            {
+              p_SetExp(p, p_GetExp(p, i, r), r, vo); // copy put them verbatim
+              assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
+            }
+          }
+
+        
+
+#ifndef NDEBUG
+          for( int i = 1; i <= r->N; i++ ) // No v[0] here!!!
+          {
+            const int vo = pVarOffset[i];
+            if( vo != -1) // TODO: optimize: can be done once!
+            {
+              assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
+            }
+          }
+
+#if MYTEST
+//          if( p->exp[o->data.isTemp.start] > 0 )
+//          {
+//            PrintS("Initial Value: "); p_DebugPrint(p, r, r, 1);
+//          }
+#endif
+#endif
+
+          break;
+        }
+
+        // Suffix for Induced Schreyer ordering
+        case ro_is:
+        {
+          assume(p != NULL);
+
+          int c = p_GetComp(p, r);
+
+          assume( c >= 0 );
+          const ideal F = o->data.is.F;
+          const int limit = o->data.is.limit;
+
+          if( F != NULL && c > limit )
+          {
+#ifndef NDEBUG
+#if MYTEST
+            Print("is ord in rSetm: pos: %d, c: %d, limit: %d\n", c, pos, limit); // p_DebugPrint(p, r, r, 1);
+#endif
+#endif
+
+            c -= limit;
+            assume( c > 0 );
+            c--;
+
+            assume( c < IDELEMS(F) ); // What about others???
+
+            const poly pp = F->m[c]; // get reference monomial!!!
+
+
+#ifndef NDEBUG
+#if MYTEST
+            Print("Respective F[c - %d: %d] pp: ", limit, c); 
+            p_DebugPrint(pp, r, r, 1);
+#endif
+#endif
+
+
+            if(pp == NULL) break;
+
+            const int start = o->data.is.start;
+            const int end = o->data.is.end;
+
+            assume(start <= end);
+            assume(pp != NULL);
+
+            for( int i = start; i <= end; i++) // v[0] may be here...
+              p->exp[i] += pp->exp[i]; // !!!!!!!! ADD corresponding LT(F)
+
+#ifndef NDEBUG
+            const int* const pVarOffset = o->data.is.pVarOffset;
+
+            assume( pVarOffset != NULL );
+
+            for( int i = 1; i <= r->N; i++ ) // No v[0] here!!!
+            {
+              const int vo = pVarOffset[i];
+              if( vo != -1) // TODO: optimize: can be done once!
+                assume( p_GetExp(p, r, vo) == (p_GetExp(p, i, r) + p_GetExp(pp, r, vo)) );
+            }
+            // TODO: how to check this for computed values???
+#endif
+#ifndef NDEBUG
+#if MYTEST
+            PrintS("IS::Suffix::Result: "); // p_Write(p, r, r);
+            p_DebugPrint(p, r, r, 1);
+#endif
+#endif
+
+          } else
+          {
+            const int* const pVarOffset = o->data.is.pVarOffset;
+
+            // What about v[0] - component: it will be added later by
+            // suffix!!!
+            // TODO: Test it!
+            const int vo = pVarOffset[0];
+            if( vo != -1 )
+              p->exp[vo] = c; // initial component v[0]!
+          }
+
           break;
         }
         default:
@@ -336,6 +481,7 @@ long pWTotaldegree(poly p, const ring r)
       case ringorder_C:
       case ringorder_S:
       case ringorder_s:
+      case ringorder_IS:
       case ringorder_aa:
         break;
       case ringorder_a:

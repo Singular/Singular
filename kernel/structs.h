@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.61 2009-05-29 16:21:04 Singular Exp $ */
+/* $Id: structs.h,v 1.62 2009-07-20 12:00:51 motsak Exp $ */
 /*
 * ABSTRACT
 */
@@ -355,8 +355,9 @@ typedef enum
   ro_wp_neg, // ordering is a weighted degree ordering
              // with possibly negative weights
   ro_cp,    // ordering duplicates variables
-  ro_syzcomp, // ordering indicates "subset" of component number
-  ro_syz, // ordering  with component number >syzcomp is lower
+  ro_syzcomp, // ordering indicates "subset" of component number (ringorder_S)
+  ro_syz, // ordering  with component number >syzcomp is lower (ringorder_s)
+  ro_isTemp, ro_is, // Induced Syzygy (Schreyer) ordering (and prefix data placeholder dummy) (ringorder_IS)
   ro_none
 }
 ro_typ;
@@ -421,6 +422,37 @@ struct sro_syz
 };
 
 typedef struct sro_syz sro_syz;
+// Induced Syzygy (Schreyer) ordering is built inductively as follows:
+// we look for changes made by ordering blocks which are between prefix/suffix markers:
+// that is: which variables where placed by them and where (judging by v)
+
+// due to prefix/suffix nature we need some placeholder:
+// prefix stores here initial state
+// suffix cleares this up
+struct sro_ISTemp
+{
+  short start; // 1st member SHOULD be short "place"
+  int   suffixpos;
+  int*  pVarOffset; // copy!
+};
+
+// So this is the actuall thing!
+// suffix uses last sro_ISTemp (cleares it up afterwards) and
+// creates this block
+struct sro_IS
+{
+  short start, end;  // which part of L we want to want to update...
+  int*  pVarOffset; // same as prefix!
+
+  int limit; // first referenced component
+
+  // reference poly set?? // Should it be owned by ring?!!!
+  ideal F; // reference leading (module)-monomials set. owned by ring...
+  const intvec* componentWeights; // component weights! owned by ring...
+};
+
+typedef struct sro_IS sro_IS;
+typedef struct sro_ISTemp sro_ISTemp;
 
 #ifndef OM_ALLOC_H
 struct omBin_s;
@@ -438,6 +470,8 @@ struct sro_ord
      sro_cp cp;
      sro_syzcomp syzcomp;
      sro_syz syz;
+     sro_IS is;
+     sro_ISTemp isTemp;
   } data;
 };
 
@@ -630,11 +664,10 @@ struct sip_sring
   BOOLEAN   VectorOut;
   BOOLEAN   ShortOut;
   BOOLEAN   CanShortOut;
-  BOOLEAN   LexOrder;
-  // TRUE if the monomial ordering has polynomial and power series blocks
-  BOOLEAN   MixedOrder;
-  // TRUE for global/local mixed orderings, FALSE otherwise
-  BOOLEAN   ComponentOrder;
+  BOOLEAN   LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
+  BOOLEAN   MixedOrder; // TRUE for global/local mixed orderings, FALSE otherwise
+
+  BOOLEAN   ComponentOrder; // ???
 
 
   // what follows below here should be set by rComplete, _only_

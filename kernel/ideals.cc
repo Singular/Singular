@@ -1,13 +1,20 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.74 2009-06-04 08:14:57 Singular Exp $ */
+/* $Id: ideals.cc,v 1.75 2009-07-20 12:00:50 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
 
 /* includes */
 #include "mod2.h"
+
+#ifndef NDEBUG
+# define MYTEST 0
+#else /* ifndef NDEBUG */
+# define MYTEST 0
+#endif /* ifndef NDEBUG */
+
 #include "structs.h"
 #include "omalloc.h"
 #include "febase.h"
@@ -25,7 +32,6 @@
 #include "prCopy.h"
 
 
-#define MYTEST 0
 
 
 /* #define WITH_OLD_MINOR */
@@ -65,20 +71,22 @@ ideal idInit(int idsize, int rank)
 
 //#ifndef __OPTIMIZE__
 // this is mainly for outputting an ideal within the debugger
-void idShow(ideal id)
+void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint)
 {
+  assume( debugPrint >= 0 );
+  
   if( id == NULL )
     Print("(NULL)");
   else
   {
     Print("Module of rank %ld,real rank %ld and %d generators.\n",
-           id->rank,idRankFreeModule(id),IDELEMS(id));
-    for (int i=0;i<id->ncols*id->nrows;i++)
+          id->rank,idRankFreeModule(id, lmRing, tailRing),IDELEMS(id));
+
+    int j = (id->ncols*id->nrows) - 1;
+    while ((j > 0) && (id->m[j]==NULL)) j--;
+    for (int i = 0; i <= j; i++)
     {
-      if (id->m[i]!=NULL)
-      {
-        Print("generator %d: ",i);pWrite(id->m[i]);
-      }
+      Print("generator %d: ",i); p_DebugPrint(id->m[i], lmRing, tailRing, debugPrint);
     }
   }
 }
@@ -1322,6 +1330,9 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 #ifdef RDEBUG
   Print("Prepare::h2: ");
   idPrint(h2);
+
+  for(j=0;j<IDELEMS(h2);j++) pTest(h2->m[j]);
+
 #endif
 #endif
 
@@ -1355,8 +1366,19 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
 
 #endif
 
+  idTest(h2);
 
   h3 = kStd(h2,currQuotient,hom,w,NULL,syzcomp);
+
+#if MYTEST
+#ifdef RDEBUG
+  Print("Prepare::Output: ");
+  idPrint(h3);
+  for(j=0;j<IDELEMS(h2);j++) pTest(h3->m[j]);
+#endif
+#endif
+
+
   idDelete(&h2);
   return h3;
 }
@@ -1375,6 +1397,8 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
   int   j, k, length=0,reg;
   BOOLEAN isMonomial=TRUE;
   int ii, idElemens_h1;
+
+  assume(h1 != NULL);
 
   idElemens_h1=IDELEMS(h1);
 #ifdef PDEBUG
@@ -1411,7 +1435,9 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     s_h1 = h1;
   }
 
-  ideal s_h3=idPrepare(s_h1,h,k,w);
+  idTest(s_h1);
+
+  ideal s_h3=idPrepare(s_h1,h,k,w); // main (syz) GB computation
 
   if (s_h3==NULL)
   {
@@ -1588,7 +1614,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 
 #if MYTEST
 #ifdef RDEBUG
-  Print("Input: ");
+  Print("idLiftStd Input: ");
   idPrint(s_h1);
 #endif
 #endif
@@ -1598,7 +1624,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 
 #if MYTEST
 #ifdef RDEBUG
-  Print("Prepare: ");
+  Print("idLiftStd Prepare: ");
   idPrint(s_h3);
 #endif
 #endif
@@ -1607,7 +1633,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 
 #if MYTEST
 #ifdef RDEBUG
-  Print("Temp: ");
+  Print("idLiftStd Temp: ");
   idPrint(s_h2);
 #endif
 #endif
@@ -1645,7 +1671,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 
 #if MYTEST
 #ifdef RDEBUG
-  Print("Input'': ");
+  Print("idLiftStd Input'': ");
   idPrint(s_h3);
 #endif
 #endif
@@ -1655,7 +1681,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 
 #if MYTEST
 #ifdef RDEBUG
-  Print("Temp Result: ");
+  Print("idLiftStd Temp Result: ");
   idPrint(s_h2);
 #endif
 #endif
@@ -1700,10 +1726,10 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
 
 #if MYTEST
 #ifdef RDEBUG
-  Print("Output STD Ideal: ");
+  Print("idLiftStd Output STD Ideal: ");
   idPrint(s_h3);
 
-  Print("Output Matrix: ");
+  Print("idLiftStd Output Matrix: ");
   iiWriteMatrix(*ma, "ma", 2, 4);
 #endif
 #endif

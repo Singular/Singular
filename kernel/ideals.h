@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.13 2009-02-12 16:19:23 motsak Exp $ */
+/* $Id: ideals.h,v 1.14 2009-07-20 12:00:50 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -21,7 +21,7 @@ ideal idInit (int size, int rank=1);
 void id_Delete (ideal* h, ring r);
 void id_ShallowDelete (ideal* h, ring r);
 /* Shows an ideal -- mainly for debugging */
-void idShow(ideal id);
+void idShow(const ideal id, const ring lmRing = currRing, const ring tailRing = currRing, const int debugPrint = 0);
   /*- initialise an ideal -*/
 ideal idMaxIdeal (int deg);
   /*- initialise the maximal ideal (at 0) -*/

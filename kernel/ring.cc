@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.122 2009-07-10 15:13:57 Singular Exp $ */
+/* $Id: ring.cc,v 1.123 2009-07-20 12:00:51 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -10,6 +10,13 @@
 /* includes */
 #include <math.h>
 #include "mod2.h"
+
+#ifndef NDEBUG
+# define MYTEST 0
+#else /* ifndef NDEBUG */
+# define MYTEST 0
+#endif /* ifndef NDEBUG */
+
 #include "structs.h"
 #include "omalloc.h"
 #include "polys.h"
@@ -37,29 +44,30 @@
 
 static const char * const ringorder_name[] =
 {
-  " ?", //ringorder_no = 0,
-  "a", //ringorder_a,
-  "A", //ringorder_a64,
-  "c", //ringorder_c,
-  "C", //ringorder_C,
-  "M", //ringorder_M,
-  "S", //ringorder_S,
-  "s", //ringorder_s,
-  "lp", //ringorder_lp,
-  "dp", //ringorder_dp,
-  "rp", //ringorder_rp,
-  "Dp", //ringorder_Dp,
-  "wp", //ringorder_wp,
-  "Wp", //ringorder_Wp,
-  "ls", //ringorder_ls,
-  "ds", //ringorder_ds,
-  "Ds", //ringorder_Ds,
-  "ws", //ringorder_ws,
-  "Ws", //ringorder_Ws,
-  "L", //ringorder_L,
-  "aa", //ringorder_aa
-  "rs", //ringorder_rs,
-  " _" //ringorder_unspec
+  " ?", ///< ringorder_no = 0,
+  "a", ///< ringorder_a,
+  "A", ///< ringorder_a64,
+  "c", ///< ringorder_c,
+  "C", ///< ringorder_C,
+  "M", ///< ringorder_M,
+  "S", ///< ringorder_S,
+  "s", ///< ringorder_s,
+  "lp", ///< ringorder_lp,
+  "dp", ///< ringorder_dp,
+  "rp", ///< ringorder_rp,
+  "Dp", ///< ringorder_Dp,
+  "wp", ///< ringorder_wp,
+  "Wp", ///< ringorder_Wp,
+  "ls", ///< ringorder_ls,
+  "ds", ///< ringorder_ds,
+  "Ds", ///< ringorder_Ds,
+  "ws", ///< ringorder_ws,
+  "Ws", ///< ringorder_Ws,
+  "L", ///< ringorder_L,
+  "aa", ///< ringorder_aa
+  "rs", ///< ringorder_rs,
+  "IS", ///<  ringorder_IS
+  " _" ///< ringorder_unspec
 };
 
 const char * rSimpleOrdStr(int ord)
@@ -67,13 +75,13 @@ const char * rSimpleOrdStr(int ord)
   return ringorder_name[ord];
 }
 
-// unconditionally deletes fields in r
+/// unconditionally deletes fields in r
 void rDelete(ring r);
-// set r->VarL_Size, r->VarL_Offset, r->VarL_LowIndex
+/// set r->VarL_Size, r->VarL_Offset, r->VarL_LowIndex
 static void rSetVarL(ring r);
-// get r->divmask depending on bits per exponent
+/// get r->divmask depending on bits per exponent
 static unsigned long rGetDivMask(int bits);
-// right-adjust r->VarOffset
+/// right-adjust r->VarOffset
 static void rRightAdjustVarOffset(ring r);
 static void rOptimizeLDeg(ring r);
 
@@ -87,8 +95,8 @@ static void rOptimizeLDeg(ring r);
 //  return FALSE;
 //}
 
-// internally changes the gloabl ring and resets the relevant
-// global variables:
+/// internally changes the gloabl ring and resets the relevant
+/// global variables:
 void rChangeCurrRing(ring r)
 {
  // if ((currRing!=NULL) && (currRing->minpoly!=NULL))
@@ -357,11 +365,31 @@ void rWrite(ring r)
 
     Print("ordering %s", rSimpleOrdStr(r->order[l]));
 
-    if ((r->order[l] >= ringorder_lp)
+
+    if (r->order[l] == ringorder_s)
+    {
+      assume( l == 0 );
+#ifndef NDEBUG
+      Print("  syzcomp at %d",r->typ[l].data.syz.limit);
+#endif
+      continue;
+    }
+    else if (r->order[l] == ringorder_IS)
+    {
+#ifndef NDEBUG
+      if(r->block0[l] == 0 )
+        Print("::prefix");
+      else
+        Print("::suffix (sign: %d)", r->block0[l]);
+#endif
+      continue;
+    } else
+    if (
+    (  (r->order[l] >= ringorder_lp)
     ||(r->order[l] == ringorder_M)
     ||(r->order[l] == ringorder_a)
     ||(r->order[l] == ringorder_a64)
-    ||(r->order[l] == ringorder_aa))
+    ||(r->order[l] == ringorder_aa) ) && (r->order[l] < ringorder_IS) )
     {
       PrintS("\n//                  : names   ");
       for (i = r->block0[l]-1; i<r->block1[l]; i++)
@@ -370,12 +398,6 @@ void rWrite(ring r)
         Print(" %s",r->names[i]);
       }
     }
-#ifndef NDEBUG
-    else if (r->order[l] == ringorder_s)
-    {
-      Print("  syzcomp at %d",r->typ[l].data.syz.limit);
-    }
-#endif
 
     if (r->wvhdl[l]!=NULL)
     {
@@ -390,7 +412,7 @@ void rWrite(ring r)
           {
 	    int64 *w=(int64 *)r->wvhdl[l];
 	    #if SIZEOF_LONG == 4
-            Print(" %*lld" ,nlen,w[i+j],i+j);
+                  Print("%*lld " ,nlen,w[i+j],i+j);
 	    #else
             Print(" %*ld"  ,nlen,w[i+j],i+j);
 	    #endif
@@ -1482,7 +1504,7 @@ int rSum(ring r1, ring r2, ring &sum)
  *        qring:        same nCopy, same idCopy as currRing)
  * DOES NOT CALL rComplete
  */
-ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
+ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 {
   if (r == NULL) return NULL;
   int i,j;
@@ -1622,7 +1644,7 @@ ring rCopy0(ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   }
   if (r->qideal!=NULL)
   {
-    if (copy_qideal) res->qideal= idrCopyR_NoSort(r->qideal, r);
+    if (copy_qideal) res->qideal= idrCopyR_NoSort(r->qideal, r, res);
     //memset: else res->qideal = NULL;
   }
   //memset: else res->qideal = NULL;
@@ -1927,7 +1949,7 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r)
     for (pos=0;pos<r->OrdSize;pos++)
     {
       sro_ord* o=&(r->typ[pos]);
-      if ((o->ord_typ == ro_syzcomp) || (o->ord_typ == ro_syz)) return TRUE;
+      if ((o->ord_typ == ro_syzcomp) || (o->ord_typ == ro_syz) || (o->ord_typ == ro_is) || (o->ord_typ == ro_isTemp)) return TRUE;
     }
   }
   return FALSE;
@@ -2036,21 +2058,51 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
   omcheckAddrSize(r->typ,r->OrdSize*sizeof(*(r->typ)));
   omCheckAddrSize(r->VarOffset,(r->N+1)*sizeof(*(r->VarOffset)));
   // test assumptions:
-  for(i=0;i<=r->N;i++)
+  for(i=0;i<=r->N;i++) // for all variables (i = 0..N)
   {
     if(r->typ!=NULL)
     {
-      for(j=0;j<r->OrdSize;j++)
+      for(j=0;j<r->OrdSize;j++) // for all ordering blocks (j =0..OrdSize-1)
       {
-        if (r->typ[j].ord_typ==ro_cp)
+        if(r->typ[j].ord_typ == ro_isTemp)
         {
-          if(((short)r->VarOffset[i]) == r->typ[j].data.cp.place)
-            dReportError("ordrec %d conflicts with var %d",j,i);
+          const int p = r->typ[j].data.isTemp.suffixpos;
+
+          if(p <= j)
+            dReportError("ordrec prefix %d is unmatched",j);
+
+          assume( p < r->OrdSize );
+
+          if(r->typ[p].ord_typ != ro_is)
+            dReportError("ordrec prefix %d is unmatched (suffix: %d is wrong!!!)",j, p);
+
+          // Skip all intermediate blocks for undone variables:
+          if(r->typ[j].data.isTemp.pVarOffset[i] != -1) // Check i^th variable
+          {
+            j = p - 1; // SKIP ALL INTERNAL BLOCKS...???
+            continue; // To make for check OrdSize bound...
+          }
+        } else
+        if (r->typ[j].ord_typ == ro_is)
+        {
+          // Skip all intermediate blocks for undone variables:
+          if(r->typ[j].data.is.pVarOffset[i] != -1)
+          {
+            // ???
+          }
+
+        } else
+        {
+          if (r->typ[j].ord_typ==ro_cp)
+          {
+            if(((short)r->VarOffset[i]) == r->typ[j].data.cp.place)
+              dReportError("ordrec %d conflicts with var %d",j,i);
+          }
+          else
+            if ((r->typ[j].ord_typ!=ro_syzcomp)
+            && (r->VarOffset[i] == r->typ[j].data.dp.place))
+              dReportError("ordrec %d conflicts with var %d",j,i);
         }
-        else
-          if ((r->typ[j].ord_typ!=ro_syzcomp)
-          && (r->VarOffset[i] == r->typ[j].data.dp.place))
-            dReportError("ordrec %d conflicts with var %d",j,i);
       }
     }
     int tmp;
@@ -2326,6 +2378,137 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
   place++;
 }
 
+
+static void rO_ISPrefix(int &place, int &bitplace, int &prev_ord,
+    long *o, int N, int *v, sro_ord &ord_struct)
+{
+  if ((prev_ord== 1) || (bitplace!=BITS_PER_LONG))
+    rO_Align(place,bitplace);
+  // since we add something afterwards - it's better to start with anew!?
+
+  ord_struct.ord_typ = ro_isTemp;
+  ord_struct.data.isTemp.start = place;
+  ord_struct.data.isTemp.pVarOffset = (int *)omMemDup(v);
+  ord_struct.data.isTemp.suffixpos = -1;
+
+  // We will act as rO_Syz on our own!!!
+  // Here we allocate an exponent as a level placeholder 
+  o[place]= -1;
+  prev_ord=-1;
+  place++;
+
+#if MYTEST
+  Print("rO_ISPrefix: place = %d, v: {", ord_struct.data.isTemp.start);
+
+  for( int i = 0; i <= N; i++ )
+    Print("v[%d]: %09x", i, ord_struct.data.isTemp.pVarOffset[i]);
+
+  PrintS("}!\n");
+#endif
+}
+static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
+  int N, int *v, sro_ord *tmp_typ, int &typ_i, int sgn)
+{
+#if MYTEST
+  Print("rO_ISSuffix: place = %d\n", place);
+#endif
+
+  // Let's find previous prefix:
+  int typ_j = typ_i - 1;
+  while(typ_j >= 0)
+  {
+    if( tmp_typ[typ_j].ord_typ == ro_isTemp)
+      break;
+    typ_j --;
+  }
+
+  assume( typ_j >= 0 );
+
+  if( typ_j < 0 ) // Found NO prefix!!! :(
+    return;
+
+  assume( tmp_typ[typ_j].ord_typ == ro_isTemp );
+
+  // Get saved state:
+  const int start = tmp_typ[typ_j].data.isTemp.start;
+  int *pVarOffset = tmp_typ[typ_j].data.isTemp.pVarOffset;
+
+/*
+  // shift up all blocks
+  while(typ_j < (typ_i-1))
+  {
+    tmp_typ[typ_j] = tmp_typ[typ_j+1];
+    typ_j++;
+  }
+  typ_j = typ_i - 1; // No increment for typ_i
+*/
+  tmp_typ[typ_j].data.isTemp.suffixpos = typ_i;
+
+  // Let's keep that dummy for now...
+  typ_j = typ_i; // the typ to change!
+  typ_i++; // Just for now...
+
+
+#if MYTEST
+  PrintS("Changes in v: {");
+#endif
+
+  for( int i = 0; i <= N; i++ ) // Note [0] == component !!! No Skip?
+  {
+    // Was i-th variable allocated inbetween?
+    if( v[i] != pVarOffset[i] )
+    {
+      pVarOffset[i] = v[i]; // Save for later...
+      v[i] = -1; // Undo!
+      assume( pVarOffset[i] != -1 );
+#if MYTEST
+      Print("v[%d]: %010x", i, pVarOffset[i]);
+#endif
+    } else
+      pVarOffset[i] = -1; // No change here...
+  }
+
+  if( pVarOffset[0] != -1 )
+    pVarOffset[0] &= 0x0fff;
+
+#if MYTEST
+  PrintS("}!\n");
+#endif
+  sro_ord &ord_struct = tmp_typ[typ_j];
+
+
+  ord_struct.ord_typ = ro_is;
+  ord_struct.data.is.start = start;
+  ord_struct.data.is.end   = place;
+  ord_struct.data.is.pVarOffset = pVarOffset;
+
+
+  // What about component???
+//   if( v[0] != -1 ) // There is a component already...???
+//     if( o[ v[0] & 0x0fff ] == sgn )
+//     {
+//       pVarOffset[0] = -1; // NEVER USED Afterwards...
+//       return;
+//     }
+
+  
+  // Moreover: we need to allocate the module component (v[0]) here!
+  if( v[0] == -1) // It's possible that there was module component v0 at the begining (before prefix)!
+  {
+    // Start with a whole long exponent
+    if( bitplace != BITS_PER_LONG )
+      rO_Align(place, bitplace);
+
+    assume( bitplace == BITS_PER_LONG );
+    bitplace -= BITS_PER_LONG;
+    assume(bitplace == 0);
+    v[0] = place | (bitplace << 24); // Never mind whether pVarOffset[0] > 0!!!
+    o[place] = sgn; // Singnum for component ordering
+    prev_ord = sgn;
+  }
+}
+
+
 static unsigned long rGetExpSize(unsigned long bitmask, int & bits)
 {
   if (bitmask == 0)
@@ -2447,6 +2630,10 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
   }
 }
 
+
+bool rSetISReference(const ideal F, const int i, const int p, const intvec * componentWeights, const ring r);
+
+
 /*2
  * create a copy of the ring r, which must be equivalent to currRing
  * used for std computations
@@ -2461,6 +2648,8 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   assume (exp_limit > 1);
   BOOLEAN need_other_ring;
   BOOLEAN omitted_degree = FALSE;
+
+  int iNeedInducedOrderingSetup = 0; ///< How many induced ordering block do we have?
   int bits;
 
   exp_limit=rGetExpSize(exp_limit, bits, r->N);
@@ -2474,10 +2663,11 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
 
   int i=0;
   int j=0; /*  i index in r, j index in res */
-  loop
+
+  for( int r_ord=r->order[i]; (r_ord != 0) && (i < nblocks); j++, r_ord=r->order[++i])
   {
     BOOLEAN copy_block_index=TRUE;
-    int r_ord=r->order[i];
+
     if (r->block0[i]==r->block1[i])
     {
       switch(r_ord)
@@ -2500,6 +2690,12 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     }
     switch(r_ord)
     {
+      case ringorder_S:
+      {
+        dReportError("Error: unhandled ordering in rModifyRing: ringorder_S = [%d]", r_ord);
+        order[j]=r_ord; /*r->order[i];*/
+        break;
+      }
       case ringorder_C:
       case ringorder_c:
         if (!omit_comp)
@@ -2546,6 +2742,28 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
           omitted_degree = TRUE;
         }
         break;
+      case ringorder_IS:
+      {
+        if (omit_comp)
+        {
+          dReportError("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d", i, r_ord);
+          omit_comp = FALSE;
+        }
+        order[j]=r_ord; /*r->order[i];*/
+        iNeedInducedOrderingSetup++;
+        break;
+      }
+      case ringorder_s:
+      {
+        assume((i == 0) && (j == 0));
+        if (omit_comp)
+        {
+          dReportError("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d", i, r_ord);
+          omit_comp = FALSE;
+        }
+        order[j]=r_ord; /*r->order[i];*/
+        break;
+      }
       default:
         order[j]=r_ord; /*r->order[i];*/
         break;
@@ -2556,9 +2774,8 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       block1[j]=r->block1[i];
       wvhdl[j]=r->wvhdl[i];
     }
-    i++;j++;
+
     // order[j]=ringorder_no; //  done by omAlloc0
-    if (i==nblocks) break;
   }
   if(!need_other_ring)
   {
@@ -2602,16 +2819,39 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   rOptimizeLDeg(res);
 
   // set syzcomp
-  if (res->typ != NULL && res->typ[0].ord_typ == ro_syz)
+  if (res->typ != NULL)
   {
-    res->typ[0] = r->typ[0];
-    if (r->typ[0].data.syz.limit > 0)
+    if( res->typ[0].ord_typ == ro_syz) // "s" Always on [0] place!
     {
-      res->typ[0].data.syz.syz_index
-        = (int*) omAlloc((r->typ[0].data.syz.limit +1)*sizeof(int));
-      memcpy(res->typ[0].data.syz.syz_index, r->typ[0].data.syz.syz_index,
-             (r->typ[0].data.syz.limit +1)*sizeof(int));
+      res->typ[0] = r->typ[0]; // Copy struct!? + setup the same limit!
+
+      if (r->typ[0].data.syz.limit > 0)
+      {
+        res->typ[0].data.syz.syz_index
+          = (int*) omAlloc((r->typ[0].data.syz.limit +1)*sizeof(int));
+        memcpy(res->typ[0].data.syz.syz_index, r->typ[0].data.syz.syz_index,
+              (r->typ[0].data.syz.limit +1)*sizeof(int));
+      }
     }
+
+    if( iNeedInducedOrderingSetup > 0 )
+    {
+      for(j = 0, i = 0; (i < nblocks) && (iNeedInducedOrderingSetup > 0); i++)
+        if( res->typ[i].ord_typ == ro_is ) // Search for suffixes!
+        {
+          ideal F = idrHeadR(r->typ[i].data.is.F, r, res); // Copy F from r into res!
+          assume(
+            rSetISReference(
+              F,  // WILL BE COPIED!
+              r->typ[i].data.is.limit,
+              j++,
+              r->typ[i].data.is.componentWeights, // WILL BE COPIED
+              res)
+            );
+          id_Delete(&F, res);
+          iNeedInducedOrderingSetup--;
+        }
+    } // Process all induced Ordering blocks! ...
   }
   // the special case: homog (omit_degree) and 1 block rs: that is global:
   // it comes from dp
@@ -2630,6 +2870,12 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
 //      return r;
 
       // just go on..
+    }
+
+    if( rIsSCA(r) )
+    {
+      if( !sca_Force(res, scaFirstAltVar(r), scaLastAltVar(r)) )
+      WarnS("error in sca_Force!");
     }
   }
 #endif
@@ -2685,7 +2931,7 @@ ring rModifyRing_Wp(ring r, int* weights)
   return res;
 }
 
-// construct lp ring with r->N variables, r->names vars....
+// construct lp, C ring with r->N variables, r->names vars....
 ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsigned long exp_limit, BOOLEAN &simple)
 {
   simple=TRUE;
@@ -2867,6 +3113,18 @@ static void rHighSet(ring r, int o_r, int o)
     case ringorder_M:
       r->MixedOrder=TRUE;
       break;
+    case ringorder_IS:
+    { // TODO: What is r->ComponentOrder???
+      r->MixedOrder=TRUE;
+/*
+      if( r->block0[o] != 0 ) // Suffix has the comonent
+        r->ComponentOrder = r->block0[o];
+      else // Prefix has level...
+        r->ComponentOrder=-1;
+*/
+      break;
+    }
+
     default:
       dReportError("wrong internal ordering:%d at %s, l:%d\n",o_r,__FILE__,__LINE__);
   }
@@ -2938,7 +3196,7 @@ static void rSetDegStuff(ring r)
   int* block1 = r->block1;
   int** wvhdl = r->wvhdl;
 
-  if (order[0]==ringorder_S ||order[0]==ringorder_s)
+  if (order[0]==ringorder_S ||order[0]==ringorder_s || order[0]==ringorder_IS)
   {
     order++;
     block0++;
@@ -2955,14 +3213,14 @@ static void rSetDegStuff(ring r)
   if ((order[0]==ringorder_unspec) || (order[1] == 0)
       ||(
     ((order[1]==ringorder_c)||(order[1]==ringorder_C)
-     ||(order[1]==ringorder_S)
+     ||(order[1]==ringorder_S) ||(order[1]==ringorder_IS)
      ||(order[1]==ringorder_s))
     && (order[0]!=ringorder_M)
     && (order[2]==0))
     )
   {
     if ((order[0]!=ringorder_unspec)
-    && ((order[1]==ringorder_C)||(order[1]==ringorder_S)||
+    && ((order[1]==ringorder_C)||(order[1]==ringorder_S)||(order[1]==ringorder_IS)||
         (order[1]==ringorder_s)))
       r->ComponentOrder=-1;
     if (r->OrdSgn == -1) r->pLDeg = pLDeg0c;
@@ -2987,12 +3245,12 @@ static void rSetDegStuff(ring r)
   /*======== ordering type is (c,_) =========================*/
   else if (((order[0]==ringorder_c)
             ||(order[0]==ringorder_C)
-            ||(order[0]==ringorder_S)
+            ||(order[0]==ringorder_S) ||(order[0]==ringorder_IS)
             ||(order[0]==ringorder_s))
   && (order[1]!=ringorder_M)
   &&  (order[2]==0))
   {
-    if ((order[0]==ringorder_C)||(order[0]==ringorder_S)||
+    if ((order[0]==ringorder_C)||(order[0]==ringorder_S)|| (order[0]==ringorder_IS) ||
         order[0]==ringorder_s)
       r->ComponentOrder=-1;
     if ((order[1] == ringorder_lp)
@@ -3016,7 +3274,7 @@ static void rSetDegStuff(ring r)
   /*------- more than one block ----------------------*/
   else
   {
-    if ((r->VectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S)||(order[0]==ringorder_s))
+    if ((r->VectorOut)||(order[0]==ringorder_C)||(order[0]==ringorder_S)||(order[0]==ringorder_s) ||(order[0]==ringorder_IS))
     {
       rSetFirstWv(r, 1, order, block1, wvhdl);
     }
@@ -3035,7 +3293,7 @@ static void rSetDegStuff(ring r)
 
     if ((order[0]!=ringorder_c)
         && (order[0]!=ringorder_C)
-        && (order[0]!=ringorder_S)
+        && (order[0]!=ringorder_S) && (order[0]!=ringorder_IS)
         && (order[0]!=ringorder_s))
     {
       r->pLDeg = pLDeg1c;
@@ -3140,7 +3398,9 @@ BOOLEAN rComplete(ring r, int force)
   // fill in v, tmp_typ, tmp_ordsgn, determine typ_i (== ordSize)
   int j=0;
   int j_bits=BITS_PER_LONG;
-  BOOLEAN need_to_add_comp=FALSE;
+
+  BOOLEAN need_to_add_comp=FALSE; // Only for ringorder_s and ringorder_S!
+
   for(i=0;i<n;i++)
   {
     tmp_typ[typ_i].order_index=i;
@@ -3340,17 +3600,36 @@ BOOLEAN rComplete(ring r, int force)
         break;
 
       case ringorder_S:
+        assume(typ_i == 0 && j == 0);
         rO_Syzcomp(j, j_bits,prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
         need_to_add_comp=TRUE;
         typ_i++;
         break;
 
       case ringorder_s:
-        rO_Syz(j, j_bits,prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
+        assume(typ_i == 0 && j == 0);
+        rO_Syz(j, j_bits, prev_ordsgn, tmp_ordsgn, tmp_typ[typ_i]);
         need_to_add_comp=TRUE;
         typ_i++;
         break;
 
+      case ringorder_IS:
+      {
+        const int s = r->block0[i];
+        assume( s >= -1 && s <= 1);
+
+        assume( r->block0[i] == r->block1[i] );
+
+        if(s == 0) // Prefix IS
+          rO_ISPrefix(j, j_bits, prev_ordsgn, tmp_ordsgn, r->N, v, tmp_typ[typ_i++]); // What about prev_ordsgn?
+        else // s = +1 or -1 // Note: typ_i might be incrimented here inside!
+        {
+          rO_ISSuffix(j, j_bits, prev_ordsgn, tmp_ordsgn, r->N, v, tmp_typ, typ_i, s); // Suffix.
+          need_to_add_comp=FALSE;
+        }
+
+        break;
+      }
       case ringorder_unspec:
       case ringorder_no:
       default:
@@ -3440,16 +3719,18 @@ BOOLEAN rComplete(ring r, int force)
   r->pCompIndex=(r->VarOffset[0] & 0xffff); //r->VarOffset[0];
   i=0; // position
   j=0; // index in r->typ
-  if (i==r->pCompIndex) i++;
+  if (i==r->pCompIndex) i++; // IS???
   while ((j < r->OrdSize)
          && ((r->typ[j].ord_typ==ro_syzcomp) ||
-             (r->typ[j].ord_typ==ro_syz) ||
+             (r->typ[j].ord_typ==ro_syz) || (r->typ[j].ord_typ==ro_isTemp) || (r->typ[j].ord_typ==ro_is) ||
              (r->order[r->typ[j].order_index] == ringorder_aa)))
   {
     i++; j++;
   }
+  // No use of j anymore!!!????
+
   if (i==r->pCompIndex) i++;
-  r->pOrdIndex=i;
+  r->pOrdIndex=i; // How came it is "i" here???!!!! exp[r->pOrdIndex] is order of a poly... This may be wrong!!! IS
 
   // ----------------------------
   rSetDegStuff(r);
@@ -3482,22 +3763,50 @@ void rUnComplete(ring r)
   if (r == NULL) return;
   if (r->VarOffset != NULL)
   {
+    if (r->OrdSize!=0 && r->typ != NULL)
+    {
+      for(int i = 0; i < r->OrdSize; i++)
+        if( r->typ[i].ord_typ == ro_is) // Search for suffixes! (prefix have the same VarOffset)
+        {
+          id_Delete(&r->typ[i].data.is.F, r);
+          r->typ[i].data.is.F = NULL; // ?
+
+          if( r->typ[i].data.is.componentWeights != NULL )
+          {
+            delete r->typ[i].data.is.componentWeights;
+            r->typ[i].data.is.componentWeights = NULL; // ?
+          }
+          
+
+          if( r->typ[i].data.is.pVarOffset != NULL )
+          {
+            omFreeSize((ADDRESS)r->typ[i].data.is.pVarOffset, (r->N +1)*sizeof(int));
+            r->typ[i].data.is.pVarOffset = NULL; // ?
+          }
+        }
+        else if (r->typ[i].ord_typ == ro_syz)
+        {
+          if(r->typ[i].data.syz.limit > 0)
+            omFreeSize(r->typ[i].data.syz.syz_index, ((r->typ[i].data.syz.limit) +1)*sizeof(int)); 
+          r->typ[i].data.syz.syz_index = NULL;
+        } else if (r->typ[i].ord_typ == ro_syzcomp)
+        {
+          Warn( "rUnComplete : ord_typ == ro_syzcomp was unhandled!!! Possibly memory leak!!!"  );
+        }
+
+      omFreeSize((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord)); r->typ = NULL;
+    }
+
+    if (r->order != NULL)
+    {
+      // delete r->order!!!???
+    }
+
     if (r->PolyBin != NULL)
       omUnGetSpecBin(&(r->PolyBin));
 
     omFreeSize((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
-    if (r->order != NULL)
-    {
-      if (r->order[0] == ringorder_s && r->typ[0].data.syz.limit > 0)
-      {
-        omFreeSize(r->typ[0].data.syz.syz_index,
-             (r->typ[0].data.syz.limit +1)*sizeof(int));
-      }
-    }
-    if (r->OrdSize!=0 && r->typ != NULL)
-    {
-      omFreeSize((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord));
-    }
+    
     if (r->ordsgn != NULL && r->CmpL_Size != 0)
       omFreeSize((ADDRESS)r->ordsgn,r->ExpL_Size*sizeof(long));
     if (r->p_Procs != NULL)
@@ -3617,7 +3926,7 @@ void rDebugPrint(ring r)
   }
   // corresponds to ro_typ from ring.h:
   const char *TYP[]={"ro_dp","ro_wp","ro_wp64","ro_wp_neg","ro_cp",
-                     "ro_syzcomp", "ro_syz", "ro_none"};
+                     "ro_syzcomp", "ro_syz", "ro_isTemp", "ro_is", "ro_none"};
   int i,j;
 
   Print("ExpL_Size:%d ",r->ExpL_Size);
@@ -3639,27 +3948,59 @@ void rDebugPrint(ring r)
   PrintS("ordrec:\n");
   for(j=0;j<r->OrdSize;j++)
   {
-    Print("  typ %s",TYP[r->typ[j].ord_typ]);
-    Print("  place %d",r->typ[j].data.dp.place);
-    if (r->typ[j].ord_typ!=ro_syzcomp)
+    Print("  typ %s", TYP[r->typ[j].ord_typ]);
+
+    if (r->typ[j].ord_typ==ro_isTemp)
     {
-      Print("  start %d",r->typ[j].data.dp.start);
-      Print("  end %d",r->typ[j].data.dp.end);
-      if ((r->typ[j].ord_typ==ro_wp)
-      || (r->typ[j].ord_typ==ro_wp_neg))
+      Print("  start (level) %d, suffixpos: %d, VO: ",r->typ[j].data.isTemp.start, r->typ[j].data.isTemp.suffixpos);
+
+#if MYTEST      
+      for( int k = 0; k <= r->N; k++)
+        if (r->typ[j].data.isTemp.pVarOffset[k] != -1)
+          Print("[%2d]: %09x; ", k, r->typ[j].data.isTemp.pVarOffset[k]);
+#endif
+    }
+    else
+    if (r->typ[j].ord_typ==ro_is)
+    {
+      Print("  start %d, end: %d: ",r->typ[j].data.is.start, r->typ[j].data.is.end);
+
+//      for( int k = 0; k <= r->N; k++) if (r->typ[j].data.is.pVarOffset[k] != -1) Print("[%2d]: %04x; ", k, r->typ[j].data.is.pVarOffset[k]);
+
+      Print("  limit %d\n  F: ",r->typ[j].data.is.limit); idShow(r->typ[j].data.is.F, r, r, 1);
+
+      PrintS("weights: ");
+      
+      if( r->typ[j].data.is.componentWeights == NULL )
+        PrintS("NULL == [0,...0]\n");
+      else
       {
-        PrintS(" w:");
-        int l;
-        for(l=r->typ[j].data.wp.start;l<=r->typ[j].data.wp.end;l++)
-          Print(" %d",r->typ[j].data.wp.weights[l-r->typ[j].data.wp.start]);
+        (r->typ[j].data.is.componentWeights)->show(); PrintLn();
       }
-      else if (r->typ[j].ord_typ==ro_wp64)
+      
+    } else
+    {
+      Print("  place %d",r->typ[j].data.dp.place);
+
+      if (r->typ[j].ord_typ!=ro_syzcomp  && r->typ[j].ord_typ!=ro_syz)
       {
-        PrintS(" w64:");
-        int l;
-        for(l=r->typ[j].data.wp64.start;l<=r->typ[j].data.wp64.end;l++)
-          Print(" %ld",(long)(((int64*)r->typ[j].data.wp64.weights64)+l-r->typ[j].data.wp64.start));
-      }
+        Print("  start %d",r->typ[j].data.dp.start);
+        Print("  end %d",r->typ[j].data.dp.end);
+        if ((r->typ[j].ord_typ==ro_wp)
+        || (r->typ[j].ord_typ==ro_wp_neg))
+        {
+          PrintS(" w:");
+          for(int l=r->typ[j].data.wp.start;l<=r->typ[j].data.wp.end;l++)
+            Print(" %d",r->typ[j].data.wp.weights[l-r->typ[j].data.wp.start]);
+        }
+        else if (r->typ[j].ord_typ==ro_wp64)
+        {
+          PrintS(" w64:");
+          int l;
+          for(l=r->typ[j].data.wp64.start;l<=r->typ[j].data.wp64.end;l++)
+            Print(" %ld",(long)(((int64*)r->typ[j].data.wp64.weights64)+l-r->typ[j].data.wp64.start));
+          }
+        }
     }
     PrintLn();
   }
@@ -3738,6 +4079,54 @@ void pDebugPrint(poly p)
 }
 #endif // RDEBUG
 
+/// debug-print monomial poly/vector p, assuming that it lives in the ring R
+inline void m_DebugPrint(const poly p, const ring R)
+{
+  Print("\nexp[0..%d]\n", R->ExpL_Size - 1);
+  for(int i = 0; i < R->ExpL_Size; i++)
+    Print("%09lx ", p->exp[i]);
+  PrintLn();
+  Print("v0:%9ld ", p_GetComp(p, R));
+  for(int i = 1; i <= R->N; i++) Print(" v%d:%5d",i, p_GetExp(p, i, R));
+  PrintLn();
+}
+
+
+/// debug-print at most nTerms (2 by default) terms from poly/vector p,
+/// assuming that lt(p) lives in lmRing and tail(p) lives in tailRing.
+void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const int nTerms)
+{
+  assume( nTerms >= 0 );
+  if( p != NULL )
+  {
+    assume( p != NULL );
+    
+    p_Write(p, lmRing, tailRing);
+
+    if( (p != NULL) && (nTerms > 0) )
+    {
+      assume( p != NULL );
+      assume( nTerms > 0 );
+
+      // debug pring leading term
+      m_DebugPrint(p, lmRing);
+
+      poly q = pNext(p); // q = tail(p)
+
+      // debug pring tail (at most nTerms-1 terms from it)
+      for(int j = nTerms - 1; (q !=NULL) && (j > 0); pIter(q), --j)
+        m_DebugPrint(q, tailRing);
+
+      if (q != NULL)
+        PrintS("...\n");    
+    }
+  }
+  else
+    PrintS("0\n");          
+}
+
+
+
 
 /*2
 * asssume that rComplete was called with r
@@ -3790,84 +4179,47 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 // if necessary
 
 // for the time being, this is still here
-static ring rAssure_SyzComp(ring r, BOOLEAN complete = TRUE);
-
-#define MYTEST 0
+static ring rAssure_SyzComp(const ring r, BOOLEAN complete = TRUE);
 
 ring rCurrRingAssure_SyzComp()
 {
-#ifdef HAVE_PLURAL
 #if MYTEST
   PrintS("rCurrRingAssure_SyzComp(), currRing:  \n");
   rWrite(currRing);
 #ifdef RDEBUG
   rDebugPrint(currRing);
 #endif
-#endif
+  PrintS("\n");
 #endif
 
-  ring r = rAssure_SyzComp(currRing);
+  ring r = rAssure_SyzComp(currRing, TRUE);
 
-  if (r != currRing)
+  if( r != currRing )
   {
-    ring old_ring = currRing;
     rChangeCurrRing(r);
     assume(currRing == r);
 
-#ifdef HAVE_PLURAL
-#if MYTEST
-    PrintS("rCurrRingAssure_SyzComp(): currRing': ");
-    rWrite(currRing);
-#ifdef RDEBUG
-    rDebugPrint(currRing);
-#endif
-#endif
-#endif
-
-
-    if (old_ring->qideal != NULL)
-    {
-      r->qideal = idrCopyR_NoSort(old_ring->qideal, old_ring);
-      assume(idRankFreeModule(r->qideal) == 0);
-      currQuotient = r->qideal;
-
-#ifdef HAVE_PLURAL
-      if( rIsPluralRing(r) )
-        if( nc_SetupQuotient(r, old_ring, true) )
-        {
-//          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
-        }
-#endif
-    }
-
-#ifdef HAVE_PLURAL
-    assume((r->qideal==NULL) == (old_ring->qideal==NULL));
-    assume(rIsPluralRing(r) == rIsPluralRing(old_ring));
-    assume(rIsSCA(r) == rIsSCA(old_ring));
-    assume(ncRingType(r) == ncRingType(old_ring));
-#endif
-
-  }
-
-  assume(currRing == r);
-
-
-#ifdef HAVE_PLURAL
 #if MYTEST
   PrintS("\nrCurrRingAssure_SyzComp(): new currRing: \n");
   rWrite(currRing);
 #ifdef RDEBUG
   rDebugPrint(currRing);
 #endif
+  PrintS("\n");
 #endif
-#endif
+  }
 
   return r;
 }
 
-static ring rAssure_SyzComp(ring r, BOOLEAN complete)
+static ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 {
-  if (r->order[0] == ringorder_s) return r;
+  if ( (r->order[0] == ringorder_s) ) return r;
+  if ( (r->order[0] == ringorder_IS) )
+  {
+    WarnS("rAssure_SyzComp in an IS ring!");
+//    return r;
+  }
   ring res=rCopy0(r, FALSE, FALSE);
   int i=rBlocks(r);
   int j;
@@ -3904,7 +4256,57 @@ static ring rAssure_SyzComp(ring r, BOOLEAN complete)
     }
     assume(rIsPluralRing(r) == rIsPluralRing(res));
 #endif
+
+
+#ifdef HAVE_PLURAL
+    ring old_ring = r;
+
+#if MYTEST
+    PrintS("rCurrRingAssure_SyzComp(): temp r': ");
+    rWrite(r);
+#ifdef RDEBUG
+    rDebugPrint(r);
+#endif
+    PrintS("\n");
+#endif
+#endif
+
+
+    if (r->qideal!=NULL)
+    {
+      res->qideal= idrCopyR_NoSort(r->qideal, r, res);
+
+      assume(idRankFreeModule(res->qideal, res) == 0);
+
+#ifdef HAVE_PLURAL
+      if( rIsPluralRing(res) )
+        if( nc_SetupQuotient(res, r, true) )
+        {
+//          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+        }
+
+#endif
+      assume(idRankFreeModule(res->qideal, res) == 0);
+    }
+
+#ifdef HAVE_PLURAL
+    assume((res->qideal==NULL) == (old_ring->qideal==NULL));
+    assume(rIsPluralRing(res) == rIsPluralRing(old_ring));
+    assume(rIsSCA(res) == rIsSCA(old_ring));
+    assume(ncRingType(res) == ncRingType(old_ring));
+#endif
+
+#if MYTEST
+    PrintS("rCurrRingAssure_SyzComp(): res: ");
+    rWrite(r);
+#ifdef RDEBUG
+    rDebugPrint(r);
+#endif
+    PrintS("\n");
+#endif
+
   }
+
   return res;
 }
 
@@ -3978,7 +4380,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
 #endif
   if (r->qideal!=NULL)
   {
-     res->qideal=idrCopyR_NoSort(r->qideal,r);
+     res->qideal=idrCopyR_NoSort(r->qideal,r, res);
 #ifdef HAVE_PLURAL
      if (rIsPluralRing(res))
      {
@@ -4119,22 +4521,27 @@ ring rCurrRingAssure_CompLastBlock()
         {
           WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
         }
-      assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
-      assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
-      assume(rIsSCA(new_r) == rIsSCA(old_r));
-      assume(ncRingType(new_r) == ncRingType(old_r));
 #endif
     }
+
+#ifdef HAVE_PLURAL
+    assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
+    assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
+    assume(rIsSCA(new_r) == rIsSCA(old_r));
+    assume(ncRingType(new_r) == ncRingType(old_r));
+#endif
+
     rTest(new_r);
     rTest(old_r);
   }
   return new_r;
 }
 
+// Moves _c or _C ordering to the last place AND adds _s on the 1st place
 ring rCurrRingAssure_SyzComp_CompLastBlock()
 {
-  ring new_r_1 = rAssure_CompLastBlock(currRing, FALSE);
-  ring new_r = rAssure_SyzComp(new_r_1, FALSE);
+  ring new_r_1 = rAssure_CompLastBlock(currRing, FALSE); // due to this FALSE - no completion!
+  ring new_r = rAssure_SyzComp(new_r_1, FALSE); // new_r_1 is used only here!!!
 
   if (new_r != currRing)
   {
@@ -4163,12 +4570,16 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
         {
           WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
         }
-      assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
-      assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
-      assume(rIsSCA(new_r) == rIsSCA(old_r));
-      assume(ncRingType(new_r) == ncRingType(old_r));
 #endif
     }
+
+#ifdef HAVE_PLURAL
+    assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
+    assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
+    assume(rIsSCA(new_r) == rIsSCA(old_r));
+    assume(ncRingType(new_r) == ncRingType(old_r));
+#endif
+
     rTest(new_r);
     rTest(old_r);
   }
@@ -4214,6 +4625,140 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
 }
 
 
+ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int sgn = 1)
+{ // TODO: ???? Add leading Syz-comp ordering here...????
+
+#if MYTEST
+    Print("rAssure_InducedSchreyerOrdering(r, complete = %d, sgn = %d): r: \n", complete, sgn);
+    rWrite(r);
+#ifdef RDEBUG
+    rDebugPrint(r);
+#endif
+    PrintS("\n");
+#endif
+
+
+  ring res=rCopy0(r, FALSE, FALSE); // No qideal & ordering copy.
+
+  int n = rBlocks(r); // Including trailing zero!
+
+  // Create 2 more blocks for prefix/suffix:
+  res->order=(int *)omAlloc0((n+2)*sizeof(int)); // 0  ..  n+1
+  res->block0=(int *)omAlloc0((n+2)*sizeof(int));
+  res->block1=(int *)omAlloc0((n+2)*sizeof(int));
+  int ** wvhdl =(int **)omAlloc0((n+2)*sizeof(int**));
+
+  // Encapsulate all existing blocks between induced Schreyer ordering markers: prefix and suffix!
+  // Note that prefix and suffix have the same ringorder marker and only differ in block[] parameters!
+
+  // new 1st block
+  int j = 0;
+  res->order[j] = ringorder_IS; // Prefix
+  // res->block0[j] = res->block1[j] = 0;
+  // wvhdl[j] = NULL;
+  j++;
+
+  for(int i = 0; (i <= n) && (r->order[i] != 0); i++, j++) // i = [0 .. n-1] <- non-zero old blocks
+  {
+    res->order [j] = r->order [i];
+    res->block0[j] = r->block0[i];
+    res->block1[j] = r->block1[i];
+
+    if (r->wvhdl[i] != NULL)
+    {
+      wvhdl[j] = (int*) omMemDup(r->wvhdl[i]);
+    } // else wvhdl[j] = NULL;
+  }
+
+  // new last block
+  res->order [j] = ringorder_IS; // Suffix
+  res->block0[j] = res->block1[j] = sgn; // Sign of v[o]: 1 for C, -1 for c
+  // wvhdl[j] = NULL;
+  j++;
+
+  // res->order [j] = 0; // The End!
+  res->wvhdl = wvhdl;
+
+  // j == the last zero block now!
+  assume(j == (n+1));
+  assume(res->order[0]==ringorder_IS);
+  assume(res->order[j-1]==ringorder_IS);
+  assume(res->order[j]==0);
+
+
+  if (complete)
+  {
+    rComplete(res, 1);
+
+#if MYTEST
+    PrintS("rAssure_InducedSchreyerOrdering(): temp res: ");
+    rWrite(res);
+#ifdef RDEBUG
+    rDebugPrint(res);
+#endif
+    PrintS("\n");
+#endif
+
+
+
+#ifdef HAVE_PLURAL
+    if (rIsPluralRing(r))
+    {
+      if ( nc_rComplete(r, res, false) ) // no qideal!
+      {
+        WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
+      }
+    }
+    assume(rIsPluralRing(r) == rIsPluralRing(res));
+#endif
+
+
+#ifdef HAVE_PLURAL
+    ring old_ring = r;
+
+#if MYTEST
+    PrintS("rAssure_InducedSchreyerOrdering(): temp nc res: ");
+    rWrite(res);
+#ifdef RDEBUG
+    rDebugPrint(res);
+#endif
+    PrintS("\n");
+#endif
+#endif
+
+
+    if (r->qideal!=NULL)
+    {
+      res->qideal= idrCopyR_NoSort(r->qideal, r, res);
+
+      assume(idRankFreeModule(res->qideal, res) == 0);
+
+#ifdef HAVE_PLURAL
+      if( rIsPluralRing(res) )
+        if( nc_SetupQuotient(res, r, true) )
+        {
+//          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+        }
+
+#endif
+      assume(idRankFreeModule(res->qideal, res) == 0);
+    }
+
+#ifdef HAVE_PLURAL
+    assume((res->qideal==NULL) == (old_ring->qideal==NULL));
+    assume(rIsPluralRing(res) == rIsPluralRing(old_ring));
+    assume(rIsSCA(res) == rIsSCA(old_ring));
+    assume(ncRingType(res) == ncRingType(old_ring));
+#endif
+  }
+
+  return res;
+}
+
+
+
+
+
 ring rCurrRingAssure_dp_S()
 {
   return rCurrRingAssure_Global(ringorder_dp, ringorder_S);
@@ -4227,6 +4772,94 @@ ring rCurrRingAssure_dp_C()
 ring rCurrRingAssure_C_dp()
 {
   return rCurrRingAssure_Global(ringorder_C, ringorder_dp);
+}
+
+/// Changes r by setting induced ordering parameters: limit and reference leading terms
+/// F belong to r, we will DO a copy! (same to componentWeights)
+/// We will use it AS IS!
+/// returns true is everything was allright!
+bool rSetISReference(const ideal F, const int i = 0, const int p = 0, const intvec * componentWeights = NULL, const ring r = currRing)
+{
+  // Put the reference set F into the ring -ordering -recor
+#if MYTEST
+  Print("rSetISReference(F, i: %d, p: %d, w)\nF:", i, p);
+  idShow(F, r, r, 1); // currRing!
+  PrintLn();
+  PrintS("w: ");
+  if(componentWeights == NULL)
+    PrintS("NULL\n");
+  else
+    componentWeights->show();
+#endif
+
+  // TEST THAT THERE ARE DEGs!!!
+  // assume( componentWeights == NULL  ); // ???
+  if( componentWeights != NULL )
+  {
+//    assure that the ring r has degrees!!!
+//    Add weights to degrees of F[i]
+  }
+
+  if (r->typ==NULL)
+  {
+    dReportError("Error: WRONG USE of rSetISReference: wrong ring! (typ == NULL)");
+    return false;
+  }
+
+  int j = p; // Which IS record to use...
+  for( int pos = 0; pos < r->OrdSize; pos++ )
+    if( r->typ[pos].ord_typ == ro_is)
+      if( j-- == 0 )
+      {
+#if MYTEST
+        Print("Changing record on pos: %d\nOld limit: %d --->> New Limit: %d\n", pos, r->typ[pos].data.is.limit, i);
+#endif
+
+        const ideal FF = idrHeadR(F, r, r);
+
+
+        if( r->typ[pos].data.is.F != NULL)
+        {
+#if MYTEST
+          PrintS("Deleting old reference set F... \n");        // idShow(r->typ[pos].data.is.F, r);         PrintLn();
+#endif
+          id_Delete(&r->typ[pos].data.is.F, r);
+          r->typ[pos].data.is.F = NULL;
+        }
+
+        assume(r->typ[pos].data.is.F == NULL);
+
+        
+        r->typ[pos].data.is.F = FF; // F is owened by ring now! TODO: delete at the end!
+
+        if(r->typ[pos].data.is.componentWeights != NULL)
+        {
+#if MYTEST
+          PrintS("Deleting old componentWeights: "); r->typ[pos].data.is.componentWeights->show(); PrintLn();
+#endif
+          delete r->typ[pos].data.is.componentWeights;
+          r->typ[pos].data.is.componentWeights = NULL;
+        }
+
+
+        assume(r->typ[pos].data.is.componentWeights == NULL);
+
+        if( componentWeights != NULL )
+          componentWeights = ivCopy(componentWeights); // componentWeights is owened by ring now! TODO: delete at the end!
+
+        r->typ[pos].data.is.componentWeights = componentWeights;
+
+        r->typ[pos].data.is.limit = i; // First induced component
+
+#if MYTEST
+        PrintS("New reference set FF : \n");        idShow(FF, r, r, 1);         PrintLn();
+#endif
+
+        return true;
+      }
+
+  dReportError("Error: WRONG USE of rSetISReference: specified ordering block was not found!!!" );
+  return false;
 }
 
 
@@ -4257,8 +4890,16 @@ void rSetSyzComp(int k)
     }
     currRing->typ[0].data.syz.limit = k;
     currRing->typ[0].data.syz.curr_index++;
-  }
-  else if ((currRing->order[0]!=ringorder_c) && (k!=0))
+      
+  } else if(
+            (currRing->typ!=NULL) && 
+            (currRing->typ[0].ord_typ==ro_isTemp)
+           )
+  {
+//      (currRing->typ[currRing->typ[0].data.isTemp.suffixpos].data.is.limit == k)
+    Warn("rSetSyzComp(%d) in an IS ring! Be careful!", k);
+  } else
+  if ((currRing->order[0]!=ringorder_c) && (k!=0)) // ???
   {
     dReportError("syzcomp in incompatible ring");
   }
@@ -4612,6 +5253,7 @@ ring rOpposite(ring src)
       case ringorder_Ws:
       // should not occur:
       case ringorder_S:
+      case ringorder_IS:
       case ringorder_s:
       case ringorder_aa:
       case ringorder_L:
@@ -4690,7 +5332,7 @@ ring rOpposite(ring src)
   /* now oppose the qideal for qrings */
   if (src->qideal != NULL)
   {
-    idDelete(&(r->qideal));
+    id_Delete(&(r->qideal), r);
 
 #ifdef HAVE_PLURAL
     r->qideal = idOppose(src, src->qideal); // into the currRing: r
