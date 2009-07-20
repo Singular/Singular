@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-15 09:49:09 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.77 2009-07-15 09:49:09 monerjan Exp $
-$Id: gfan.cc,v 1.77 2009-07-15 09:49:09 monerjan Exp $
+$Date: 2009-07-20 12:39:26 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.78 2009-07-20 12:39:26 monerjan Exp $
+$Id: gfan.cc,v 1.78 2009-07-20 12:39:26 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -53,7 +53,7 @@ $Id: gfan.cc,v 1.77 2009-07-15 09:49:09 monerjan Exp $
 #endif
 
 #ifndef gfan_DEBUG
-#define gfan_DEBUG
+//#define gfan_DEBUG
 #endif
 
 //#include gcone.h
@@ -501,7 +501,10 @@ class gcone
 				fNormal=fAct->getFacetNormal();
 				cout << "(";
 				fNormal->show(1,0);
-				cout << ") ";
+				if(fAct->isFlippable==TRUE)
+					cout << ") ";
+				else
+					cout << ")* ";
 				codim2Act = fAct->codim2Ptr;
 				cout << " Codim2: ";
 				while(codim2Act!=NULL)
@@ -631,8 +634,8 @@ class gcone
 			//Maybe add another row to contain the constraints of the standard simplex?
 
 #ifdef gfan_DEBUG
-  			cout << "The inequality matrix is" << endl;
-  			dd_WriteMatrix(stdout, ddineq);
+//   			cout << "The inequality matrix is" << endl;
+//   			dd_WriteMatrix(stdout, ddineq);
 #endif
 
 			// The inequalities are now stored in ddineq
@@ -641,12 +644,14 @@ class gcone
 			if (dderr!=dd_NoError)			// did an error occur?
 			{
 				dd_WriteErrorMessages(stderr,dderr);	//if so tell us
-			} else
+			} 
+#ifdef gfan_DEBUG
+			else
 			{
 				cout << "Redundant rows: ";
 				set_fwrite(stdout, ddredrows);		//otherwise print the redundant rows
 			}//if dd_Error
-		
+#endif
 			//Remove reduntant rows here!
 			dd_MatrixCanonicalize(&ddineq, &ddlinset, &ddredrows, &ddnewpos, &dderr);
 			ddrows = ddineq->rowsize;	//Size of the matrix with redundancies removed
@@ -899,13 +904,14 @@ class gcone
 #ifdef gfan_DEBUG
 			//std::cout << "===" << std::endl;
 			std::cout << "running gcone::flip" << std::endl;
-			std::cout << "flipping" << endl;
+			std::cout << "flipping UCN " << this->getUCN() << endl;
 			for(int ii=0;ii<IDELEMS(gb);ii++)
 			{
 				pWrite((poly)gb->m[ii]);
 			}
-			cout << "over facet ";
+			cout << "over facet (";
  			fNormal->show(1,0);
+			cout << ") with UCN " << f->getUCN();
  			std::cout << std::endl;
 #endif				
 			/*1st step: Compute the initial ideal*/
@@ -947,9 +953,9 @@ class gcone
 					}						
 				}//while
 #ifdef gfan_DEBUG
-// 				cout << "Initial Form=";				
-// 				pWrite(initialFormElement[ii]);
-// 				cout << "---" << endl;
+ 				cout << "Initial Form=";				
+ 				pWrite(initialFormElement[ii]);
+ 				cout << "---" << endl;
 #endif
 				/*Now initialFormElement must be added to (ideal)initialForm */
 				initialForm->m[ii]=initialFormElement[ii];
@@ -1183,10 +1189,11 @@ class gcone
 			
 			f->setFlipGB(dstRing_I);//store the flipped GB
 			f->flipRing=rCopy(dstRing);	//store the ring on the other side
-#ifdef gfan_DEBUG
+//#ifdef gfan_DEBUG
 			cout << "Flipped GB is: " << endl;
 			f->printFlipGB();
-#endif			
+			cout << endl;
+//#endif			
 			rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
 		}//void flip(ideal gb, facet *f)
 				
@@ -1313,7 +1320,7 @@ class gcone
 			//{			
 				//(res)[ii] = (*res[ii])*(int)(-1);
 			//}
-			res->show(1,0);			
+			//res->show(1,0);			
 			return res;
 		}
 
@@ -1804,14 +1811,19 @@ class gcone
 					rComplete(rTmp);
  					rChangeCurrRing(rTmp);
  					gcone *gcTmp = new gcone::gcone(*gcAct,*fAct);
- 					gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);
- 					gcTmp->getCodim2Normals(*gcTmp);
+ 					gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);					
+ 					gcTmp->getCodim2Normals(*gcTmp);					
 					gcTmp->normalize();
+#ifdef gfan_DEBUG
+					gcTmp->showFacets(1);
+#endif
 					//gcTmp->writeConeToFile(*gcTmp);
 					/*add facets to SLA here*/
 					SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
+#ifdef gfan_DEBUG
 					if(SearchListRoot!=NULL)
 						gcTmp->showSLA(*SearchListRoot);
+#endif
  					rChangeCurrRing(gcAct->baseRing);
  					gcPtr->next=gcTmp;
  					gcPtr=gcPtr->next;
@@ -1826,7 +1838,8 @@ class gcone
 				gcNext = gcHead;
 				while(gcNext!=NULL)
 				{
-					if( gcNext->getUCN() == UCNcounter+1 )
+					//if( gcNext->getUCN() == UCNcounter+1 )
+					if( gcNext->getUCN() == SearchListRoot->getUCN() )
 					{
 						gcAct = gcNext;
 						rAct=rCopy(gcAct->baseRing);
@@ -1999,6 +2012,7 @@ class gcone
 			sl2Act = f.codim2Ptr;
 			
 			bool doNotAdd=FALSE;
+			bool removalOccured=FALSE;
 			int ctr=0;	//encountered qualities in SLA
 			int notParallelCtr=0;
 			int lengthOfSearchList=1;
@@ -2015,7 +2029,7 @@ class gcone
 			intvec *sl2Normal=NULL; //= new intvec(this->numVars);
 			
 			while(fAct!=NULL)
-			{
+			{				
 				if(fAct->isFlippable==TRUE)
 				{
 					doNotAdd=TRUE;
@@ -2023,7 +2037,9 @@ class gcone
 					slAct = slHead;
 					notParallelCtr=0;
 					while(slAct!=NULL)
+					//while(slAct!=slEndStatic->next)
 					{
+						removalOccured=FALSE;
 						slNormal = slAct->getFacetNormal();
 #ifdef gfan_DEBUG
 						cout << "Checking facet (";
@@ -2063,8 +2079,10 @@ class gcone
 								fAct->fDebugPrint();
 								slAct->fDebugPrint();
 #endif
+								removalOccured=TRUE;
+								slAct->isFlippable=FALSE;
 								if(slAct==slHead)	//We want to delete the first element of SearchList
-								{
+								{								
 									slHead = slAct->next;
 									if(slHead!=NULL)
 										slHead->prev = NULL;
@@ -2076,21 +2094,22 @@ class gcone
 										{
 											slEndStatic = slEndStatic->prev;
 											slEndStatic->next = NULL;
+											slEnd = slEndStatic;
 										}
 										else	//we already added a facet after slEndStatic
 										{
 											slEndStatic->prev->next = slEndStatic->next;
 											slEndStatic = slEndStatic->prev;
-											slEnd = slEndStatic;
+											//slEnd = slEndStatic;
 										}
-									}
+									} 								
 								else
 								{
 									slAct->prev->next = slAct->next;
 								}
-								//update lengthOfSearchList
-								lengthOfSearchList--;
-								break;
+								//update lengthOfSearchList					
+ 								lengthOfSearchList--;
+ 								break;
 							}//if(ctr==fAct->numCodim2Facets)
 							else	//facets are NOT equal
 							{
@@ -2100,62 +2119,98 @@ class gcone
 						}//if(!isParallel(fNormal, slNormal))
 						slAct = slAct->next;
 						//if slAct was marked as to be deleted, delete it here!
-					}//while(slAct!=NULL)				
-				if( (notParallelCtr==lengthOfSearchList) || (doNotAdd==FALSE) )
-				{
-#ifdef gfan_DEBUG
-					cout << "Adding facet (";
-					fNormal->show(1,0);
-					cout << ") to SLA " << endl;
-#endif
-					//Add fAct to SLA
-					facet *marker;
-					marker = slEnd;
-					facet *f2Act;
-					f2Act = fAct->codim2Ptr;
-					
-					slEnd->next = new facet();
-					slEnd = slEnd->next;
-					facet *slEndCodim2Root;
-					facet *slEndCodim2Act;
-					slEndCodim2Root = slEnd->codim2Ptr;
-					slEndCodim2Act = slEndCodim2Root;
-							
-					slEnd->setUCN(this->getUCN());
-					slEnd->isFlippable = TRUE;
-					slEnd->setFacetNormal(fNormal);
-					slEnd->prev = marker;
-					//Copy codim2-facets
-					intvec *f2Normal;// = new intvec(this->numVars);
-					while(f2Act!=NULL)
+					}//while(slAct!=NULL)									
+					if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) || (doNotAdd==FALSE) )
+ 					//if( (notParallelCtr==lengthOfSearchList ) || doNotAdd==FALSE ) 
 					{
-						f2Normal=f2Act->getFacetNormal();
-						if(slEndCodim2Root==NULL)
+#ifdef gfan_DEBUG
+						cout << "Adding facet (";
+						fNormal->show(1,0);
+						cout << ") to SLA " << endl;
+#endif
+						//Add fAct to SLA
+						facet *marker;
+						marker = slEnd;
+						facet *f2Act;
+						f2Act = fAct->codim2Ptr;
+						
+						slEnd->next = new facet();
+						slEnd = slEnd->next;
+						facet *slEndCodim2Root;
+						facet *slEndCodim2Act;
+						slEndCodim2Root = slEnd->codim2Ptr;
+						slEndCodim2Act = slEndCodim2Root;
+								
+						slEnd->setUCN(this->getUCN());
+						slEnd->isFlippable = TRUE;
+						slEnd->setFacetNormal(fNormal);
+						slEnd->prev = marker;
+						//Copy codim2-facets
+						intvec *f2Normal;// = new intvec(this->numVars);
+						while(f2Act!=NULL)
 						{
-							slEndCodim2Root = new facet(2);
-							slEnd->codim2Ptr = slEndCodim2Root;			
-							slEndCodim2Root->setFacetNormal(f2Normal);
-							slEndCodim2Act = slEndCodim2Root;
+							f2Normal=f2Act->getFacetNormal();
+							if(slEndCodim2Root==NULL)
+							{
+								slEndCodim2Root = new facet(2);
+								slEnd->codim2Ptr = slEndCodim2Root;			
+								slEndCodim2Root->setFacetNormal(f2Normal);
+								slEndCodim2Act = slEndCodim2Root;
+							}
+							else					
+							{
+								slEndCodim2Act->next = new facet(2);
+								slEndCodim2Act = slEndCodim2Act->next;
+								slEndCodim2Act->setFacetNormal(f2Normal);
+							}
+							f2Act = f2Act->next;
 						}
-						else					
-						{
-							slEndCodim2Act->next = new facet(2);
-							slEndCodim2Act = slEndCodim2Act->next;
-							slEndCodim2Act->setFacetNormal(f2Normal);
-						}
-						f2Act = f2Act->next;
-					}
-					lengthOfSearchList++;
-					//delete f2Normal;
-					
-				}
-				fAct = fAct->next;
-				}
+						lengthOfSearchList++;
+						//delete f2Normal;						
+					}//if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) ||
+					//remove facets marked as non-flip
+// 					slAct=slHead;
+// 					while(slAct!=NULL)
+// 					{
+// 						if(slAct->isFlippable==FALSE)
+// 						{
+// 							if(slAct==slHead)	//We want to delete the first element of SearchList
+// 							{								
+// 								slHead = slAct->next;					
+// 								if(slHead!=NULL)
+// 									slHead->prev = NULL;
+// 						//set a bool flag to mark slAct as to be deleted
+// 							}
+// 							else if(slAct==slEndStatic)
+// 							{
+// 								if(slEndStatic->next==NULL)
+// 								{
+// 									slEndStatic = slEndStatic->prev;
+// 									slEndStatic->next = NULL;
+// 								}
+// 								else	//we already added a facet after slEndStatic
+// 								{
+// 									slEndStatic->prev->next = slEndStatic->next;
+// 									slEndStatic = slEndStatic->prev;
+// 							//slEnd = slEndStatic;
+// 								}
+// 							}
+// 							else
+// 							{
+// 								slAct->prev->next = slAct->next;
+// 							}
+// 					//update lengthOfSearchList					
+// 							lengthOfSearchList--;
+// 						}
+// 						slAct=slAct->next;
+// 					}
+					fAct = fAct->next;
+				}//if(fAct->isFlippable==TRUE)
 				else
 				{
 					fAct = fAct->next;
 				}
-			}//while(fAct!=NULL)
+			}//while(fAct!=NULL)						
 			return slHead;
 // 			delete sl2Normal;
 // 			delete slNormal;
@@ -2367,11 +2422,13 @@ ideal gfan(ideal inputIdeal)
 		gcAct = gcRoot;
 		gcAct->numVars=pVariables;
 		gcAct->getGB(inputIdeal);
+		cout << "GB of input ideal is:" << endl;
+		idShow(gcAct->gcBasis);
+		cout << endl;
 		gcAct->getConeNormals(gcAct->gcBasis);		
 		gcAct->noRevS(*gcAct);		
-		res=gcAct->gcBasis;	
+		res=gcAct->gcBasis;
 	}
-	
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
 	Assume gfan has finished, thus we have enumerated all the cones
