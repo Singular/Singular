@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: solve.lib,v 1.40 2009-07-17 16:16:40 Singular Exp $";
+version="$Id: solve.lib,v 1.41 2009-07-20 17:58:55 Singular Exp $";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: solve.lib     Complex Solving of Polynomial Systems
@@ -386,19 +386,19 @@ static proc splitsqrfree(poly p, poly x)
   if(dd==1){return(p);}
   int i=1;
   int j;
-  ideal split;
-  poly high,h;
+  ideal h,split;
+  poly high;
 
-  h=std(ideal(p,diff(p,x)))[1];
-  if(deg(h)==0){return(p);}
-  high=h;
+  h=interred(ideal(p,diff(p,x)));
+  if(deg(h[1])==0){return(p);}
+  high=h[1];
   split[1]=exdiv(p,high,x);
   while(1)
   {
-    h=std(ideal(split[i],high))[1];
-    j=deg(h);
+    h=interred(ideal(split[i],high));
+    j=deg(h[1]);
     if(j==0){return(p);}
-    if(deg(h)==deg(split[i]))
+    if(deg(h[1])==deg(split[i]))
     {
       split=split,split[i];
       split[i]=1;
@@ -743,8 +743,8 @@ EXAMPLE: example solve; shows an example
     else
     {
       def dphilb = basering;
-      G=std(G);
-      //attrib(G,"isSB",1);
+      G=interred(G);
+      attrib(G,"isSB",1);
     }
     execute("ring lexhilb=("+charstr(rin)+"),("+ varstr(rin)+"),lp;");
     option(redTail);
@@ -759,7 +759,7 @@ EXAMPLE: example solve; shows an example
     ideal H = imap(lexhilb,H);
     kill lexhilb;
   }
-  else{ideal H = std(G);}
+  else{ideal H = interred(G);}
 
 // only 1 variable
   def hr = basering;
@@ -1131,7 +1131,7 @@ static proc trisolve(list o, ideal T, int prec)
   int i,d;
 
   d = size(T);
-  S = std(ideal(T[1],diff(T[1],var(d))));
+  S = interred(ideal(T[1],diff(T[1],var(d))));
   if (deg(S[1]))
   {
     T[1] = exdiv(T[1],S[1],var(d));
