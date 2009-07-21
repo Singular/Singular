@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-20 12:39:26 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.78 2009-07-20 12:39:26 monerjan Exp $
-$Id: gfan.cc,v 1.78 2009-07-20 12:39:26 monerjan Exp $
+$Date: 2009-07-21 15:56:28 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.79 2009-07-21 15:56:28 monerjan Exp $
+$Id: gfan.cc,v 1.79 2009-07-21 15:56:28 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -53,7 +53,7 @@ $Id: gfan.cc,v 1.78 2009-07-20 12:39:26 monerjan Exp $
 #endif
 
 #ifndef gfan_DEBUG
-//#define gfan_DEBUG
+#define gfan_DEBUG
 #endif
 
 //#include gcone.h
@@ -1190,7 +1190,7 @@ class gcone
 			f->setFlipGB(dstRing_I);//store the flipped GB
 			f->flipRing=rCopy(dstRing);	//store the ring on the other side
 //#ifdef gfan_DEBUG
-			cout << "Flipped GB is: " << endl;
+			cout << "Flipped GB is UCN " << counter+1 << ":" << endl;
 			f->printFlipGB();
 			cout << endl;
 //#endif			
@@ -1275,7 +1275,7 @@ class gcone
 			for (int ii=0;ii<size;ii++)
 			{
 				res->m[ii]=restOfDiv(H->m[ii],G);
-				//res->m[ii]=kNF(H->m[ii],G);
+				//res->m[ii]=kNF(G, NULL,H->m[ii]);
 				temp1=H->m[ii];
 				temp2=res->m[ii];				
 				temp3=pSub(temp1, temp2);
@@ -1914,7 +1914,8 @@ class gcone
 			mpz_set(tmp,denom[0]);
 			for (int ii=0;ii<(M->colsize)-1;ii++)
 			{
-				mpz_lcm(kgV,tmp,denom[ii]);				
+				mpz_lcm(kgV,tmp,denom[ii]);
+				mpz_set(tmp,kgV);				
 			}
 			
 			/*Multiply the nominators by kgV*/
@@ -2081,6 +2082,7 @@ class gcone
 #endif
 								removalOccured=TRUE;
 								slAct->isFlippable=FALSE;
+								doNotAdd=TRUE;
 								if(slAct==slHead)	//We want to delete the first element of SearchList
 								{								
 									slHead = slAct->next;
@@ -2106,6 +2108,7 @@ class gcone
 								else
 								{
 									slAct->prev->next = slAct->next;
+									slAct->next->prev = slAct->prev;
 								}
 								//update lengthOfSearchList					
  								lengthOfSearchList--;
@@ -2114,7 +2117,7 @@ class gcone
 							else	//facets are NOT equal
 							{
 								doNotAdd=FALSE;
-								break;
+								//break;
 							}
 						}//if(!isParallel(fNormal, slNormal))
 						slAct = slAct->next;
