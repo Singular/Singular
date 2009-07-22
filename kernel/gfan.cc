@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-21 15:56:28 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.79 2009-07-21 15:56:28 monerjan Exp $
-$Id: gfan.cc,v 1.79 2009-07-21 15:56:28 monerjan Exp $
+$Date: 2009-07-22 09:57:23 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.80 2009-07-22 09:57:23 monerjan Exp $
+$Id: gfan.cc,v 1.80 2009-07-22 09:57:23 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -533,7 +533,10 @@ class gcone
 		
 		int getUCN()
 		{
-			return this->UCN;
+			if(this!=NULL)
+				return this->UCN;
+			else
+				return -1;
 		}
 		
 		/** \brief Compute the normals of the cone
@@ -1171,18 +1174,20 @@ class gcone
 			rWrite(dstRing); cout << endl;
 #endif
 			ideal dstRing_I;			
-			dstRing_I=idrCopyR(srcRing_HH,srcRing);			
+			dstRing_I=idrCopyR(srcRing_HH,srcRing);
+			//dstRing_I=idrCopyR(inputIdeal,srcRing);
 			//validOpts<1>=TRUE;
 #ifdef gfan_DEBUG
 			//idShow(dstRing_I);
 #endif			
 			BITSET save=test;
 			test|=Sy_bit(OPT_REDSB);
+			test|=Sy_bit(OPT_REDTAIL);
 			test|=Sy_bit(6);	//OPT_DEBUG
 			ideal tmpI;
 			tmpI = idrCopyR(this->inputIdeal,this->baseRing);				
 			dstRing_I=kStd(tmpI,NULL,testHomog,NULL);					
-			kInterRed(dstRing_I);
+			//kInterRed(dstRing_I);
 			idSkipZeroes(dstRing_I);
 			test=save;
 			/*End of step 3 - reduction*/
@@ -1294,12 +1299,16 @@ class gcone
 		*\param ideal
 		*\return void
 		*/
-		void getGB(ideal const &inputIdeal)
+		void getGB(ideal const &inputIdeal)		
 		{
+			BITSET save=test;
+			test|=Sy_bit(OPT_REDSB);
+			test|=Sy_bit(OPT_REDTAIL);
 			ideal gb;
 			gb=kStd(inputIdeal,NULL,testHomog,NULL);
 			idSkipZeroes(gb);
 			this->gcBasis=gb;	//write the GB into gcBasis
+			test=save;
 		}//void getGB
 		
 		/** \brief The Generic Groebner Walk due to FJLT
@@ -2011,6 +2020,8 @@ class gcone
 			codim2Act = this->facetPtr->codim2Ptr;
 			facet *sl2Act;
 			sl2Act = f.codim2Ptr;
+			facet *deleteMarker;
+			deleteMarker = NULL;
 			
 			bool doNotAdd=FALSE;
 			bool removalOccured=FALSE;
@@ -2037,6 +2048,54 @@ class gcone
 					fNormal=fAct->getFacetNormal();
 					slAct = slHead;
 					notParallelCtr=0;
+					/*If slAct==NULL and fAct!=NULL 
+					we just copy all remaining facets into SLA*/
+					if(slAct==NULL)
+					{
+						facet *fCopy;
+						fCopy = fAct;
+						while(fCopy!=NULL)
+						{
+							if(slAct==NULL)
+							{
+								slAct = new facet();
+								slHead = slAct;								
+							}
+							else
+							{
+								slAct->next = new facet();
+								slAct = slAct->next;
+							}							
+							slAct->setFacetNormal(fAct->getFacetNormal());
+							slAct->setUCN(fAct->getUCN());
+							slAct->isFlippable=fAct->isFlippable;
+							facet *f2Copy;
+							f2Copy = fCopy->codim2Ptr;
+							sl2Act = slAct->codim2Ptr;
+							while(f2Copy!=NULL)
+							{
+								if(sl2Act==NULL)
+								{
+									sl2Act = new facet(2);
+									slAct->codim2Ptr = sl2Act;					
+								}
+								else
+								{
+									facet *marker;
+									marker = sl2Act;
+									sl2Act->next = new facet(2);
+									sl2Act = sl2Act->next;
+									sl2Act->prev = marker;
+								}
+								sl2Act->setFacetNormal(f2Copy->getFacetNormal());
+								sl2Act->setUCN(f2Copy->getUCN());
+								f2Copy = f2Copy->next;
+							}
+							fCopy = fCopy->next;
+						}
+						break;
+					}
+					/*End of */
 					while(slAct!=NULL)
 					//while(slAct!=slEndStatic->next)
 					{
@@ -2082,18 +2141,19 @@ class gcone
 #endif
 								removalOccured=TRUE;
 								slAct->isFlippable=FALSE;
-								doNotAdd=TRUE;
+								doNotAdd=TRUE;								
 								if(slAct==slHead)	//We want to delete the first element of SearchList
-								{								
-									slHead = slAct->next;
+								{
+									deleteMarker = slHead;				
+									slHead = slAct->next;						
 									if(slHead!=NULL)
-										slHead->prev = NULL;
+										slHead->prev = NULL;					
 									//set a bool flag to mark slAct as to be deleted
-								}
+								}//NOTE find a way to delete without affecting slAct = slAct->next
 								else if(slAct==slEndStatic)
-									{
+									{							
 										if(slEndStatic->next==NULL)
-										{
+										{							
 											slEndStatic = slEndStatic->prev;
 											slEndStatic->next = NULL;
 											slEnd = slEndStatic;
@@ -2107,9 +2167,11 @@ class gcone
 									} 								
 								else
 								{
+									deleteMarker = slAct;
 									slAct->prev->next = slAct->next;
 									slAct->next->prev = slAct->prev;
 								}
+								
 								//update lengthOfSearchList					
  								lengthOfSearchList--;
  								break;
@@ -2121,6 +2183,8 @@ class gcone
 							}
 						}//if(!isParallel(fNormal, slNormal))
 						slAct = slAct->next;
+						delete deleteMarker;
+						deleteMarker=NULL;
 						//if slAct was marked as to be deleted, delete it here!
 					}//while(slAct!=NULL)									
 					if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) || (doNotAdd==FALSE) )
