@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
 ////////////////////////////////////////////////////////////
-/* $Id: alg_factor.cc,v 1.27 2009-06-04 17:54:59 Singular Exp $ */
+/* $Id: alg_factor.cc,v 1.28 2009-07-23 15:50:35 Singular Exp $ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>
@@ -10,7 +10,6 @@
 #include <Factor.h>
 #include <SqrFree.h>
 #include <helpstuff.h>
-#include <assert.h>
 // Charset - Includes
 #include "csutil.h"
 #include "charset.h"
@@ -442,7 +441,7 @@ CanonicalForm alg_lc(const CanonicalForm &f)
   {
     return alg_lc(f.LC());
   }
-  assert(f.inCoeffDomain());
+  //assert(f.inCoeffDomain());
   return f;
 }
 
@@ -830,6 +829,9 @@ newcfactor(const CanonicalForm & f, const CFList & as, int success ){
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.27  2009/06/04 17:54:59  Singular
+*hannes: code cleanup
+
 Revision 1.26  2008/11/06 14:47:03  Singular
 *hannes: newfactoras
 
