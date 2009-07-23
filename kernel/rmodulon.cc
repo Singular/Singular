@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.36 2009-07-03 14:38:34 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.37 2009-07-23 10:31:06 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -69,7 +69,7 @@ int nrnSize(number a)
  */
 int nrnInt(number &n)
 {
-  return (int) mpz_get_si( (int_number) &n);
+  return (int) mpz_get_si( (int_number) n);
 }
 
 /*
