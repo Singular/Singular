@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.308 2009-07-20 12:01:13 motsak Exp $ */
+/* $Id: extra.cc,v 1.309 2009-07-23 09:14:52 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -719,7 +719,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         res->data=(void *)id_TensorModuleMult(m, M, currRing);
         return FALSE;
       }
-      
       WerrorS("system(\"tensorModuleMult\", int, module) expected");
       return TRUE;
     } else
@@ -819,11 +818,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
        ideal I;
        if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
        {
-	 I=(ideal)h->CopyD();
-	 res->rtyp=IDEAL_CMD;
-	 if (rIsPluralRing(currRing)) res->data=Approx_Step(I);
-	 else res->data=I;
-	 setFlag(res,FLAG_STD);
+         I=(ideal)h->CopyD();
+         res->rtyp=IDEAL_CMD;
+         if (rIsPluralRing(currRing)) res->data=Approx_Step(I);
+         else res->data=I;
+         setFlag(res,FLAG_STD);
        }
        else return TRUE;
        return FALSE;
@@ -851,7 +850,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           h=h->next;
         }
         else
-	  return TRUE;
+          return TRUE;
         if ((h!=NULL) && (h->Typ()==INT_CMD))
         {
           metric=(int)((long)(h->Data()));
@@ -900,48 +899,48 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     if(strcmp(sys_cmd,"NCUseExtensions")==0)
     {
-      
+
       if ((h!=NULL) && (h->Typ()==INT_CMD))
         res->data=(void *)setNCExtensions( (int)((long)(h->Data())) );
       else
         res->data=(void *)getNCExtensions();
-        
-      res->rtyp=INT_CMD;      
+
+      res->rtyp=INT_CMD;
       return FALSE;
     }
 
-    
+
     if(strcmp(sys_cmd,"NCGetType")==0)
     {
       res->rtyp=INT_CMD;
-      
+
       if( rIsPluralRing(currRing) )
         res->data=(void *)ncRingType(currRing);
       else
         res->data=(void *)(-1);
-      
+
       return FALSE;
     }
 
-    
+
     if(strcmp(sys_cmd,"ForceSCA")==0)
     {
       if( !rIsPluralRing(currRing) )
         return TRUE;
 
       int b, e;
-      
+
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
         b = (int)((long)(h->Data()));
         h=h->next;
-      } 
+      }
       else return TRUE;
- 
+
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
         e = (int)((long)(h->Data()));
-      } 
+      }
       else return TRUE;
 
 
@@ -956,7 +955,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       if( !rIsPluralRing(currRing) )
         return TRUE;
 
-      if( !ncInitSpecialPairMultiplication(currRing) ) // No Plural! 
+      if( !ncInitSpecialPairMultiplication(currRing) ) // No Plural!
         return TRUE;
 
       return FALSE;
@@ -975,7 +974,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
 
 
-    
+
     /*==================== PLURAL =================*/
 /*==================== opp ==================================*/
     if (strcmp(sys_cmd, "opp")==0)
@@ -1043,26 +1042,26 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       int uptodeg, lVblock;
       if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
       {
-	I=(ideal)h->CopyD();
-	h=h->next;
+        I=(ideal)h->CopyD();
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	uptodeg=(int)((long)(h->Data()));
-	h=h->next;
+        uptodeg=(int)((long)(h->Data()));
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	lVblock=(int)((long)(h->Data()));
-	res->data = freegb(I,uptodeg,lVblock);
-	if (res->data == NULL)
-	{
-	  /* that is there were input errors */
-	  res->data = I;
-	}
-	res->rtyp = IDEAL_CMD;
+        lVblock=(int)((long)(h->Data()));
+        res->data = freegb(I,uptodeg,lVblock);
+        if (res->data == NULL)
+        {
+          /* that is there were input errors */
+          res->data = I;
+        }
+        res->rtyp = IDEAL_CMD;
       }
       else return TRUE;
       return FALSE;
@@ -1922,33 +1921,33 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
        int posInT19(const TSet set,const int length,LObject &p);
        if ((h!=NULL) && (h->Typ()==STRING_CMD))
        {
-	 const char *s=(const char *)h->Data();
-	 if (strcmp(s,"posInT_EcartFDegpLength")==0)
-	   test_PosInT=posInT_EcartFDegpLength;
+         const char *s=(const char *)h->Data();
+         if (strcmp(s,"posInT_EcartFDegpLength")==0)
+           test_PosInT=posInT_EcartFDegpLength;
          else if (strcmp(s,"posInT_FDegpLength")==0)
-	   test_PosInT=posInT_FDegpLength;
+           test_PosInT=posInT_FDegpLength;
          else if (strcmp(s,"posInT_pLength")==0)
-	   test_PosInT=posInT_pLength;
+           test_PosInT=posInT_pLength;
          else if (strcmp(s,"posInT0")==0)
-	   test_PosInT=posInT0;
+           test_PosInT=posInT0;
          else if (strcmp(s,"posInT1")==0)
-	   test_PosInT=posInT1;
+           test_PosInT=posInT1;
          else if (strcmp(s,"posInT2")==0)
-	   test_PosInT=posInT2;
+           test_PosInT=posInT2;
          else if (strcmp(s,"posInT11")==0)
-	   test_PosInT=posInT11;
+           test_PosInT=posInT11;
          else if (strcmp(s,"posInT110")==0)
-	   test_PosInT=posInT110;
+           test_PosInT=posInT110;
          else if (strcmp(s,"posInT13")==0)
-	   test_PosInT=posInT13;
+           test_PosInT=posInT13;
          else if (strcmp(s,"posInT15")==0)
-	   test_PosInT=posInT15;
+           test_PosInT=posInT15;
          else if (strcmp(s,"posInT17")==0)
-	   test_PosInT=posInT17;
+           test_PosInT=posInT17;
          else if (strcmp(s,"posInT17_c")==0)
-	   test_PosInT=posInT17_c;
+           test_PosInT=posInT17_c;
          else if (strcmp(s,"posInT19")==0)
-	   test_PosInT=posInT19;
+           test_PosInT=posInT19;
          else Print("valid posInT:0,1,2,11,110,13,15,17,17_c,19,_EcartFDegpLength,_FDegpLength,_pLength,_EcartpLength\n");
        }
        else
@@ -2058,23 +2057,24 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /*==================== poly debug ==================================*/
+#ifdef RDEBUG
       if(strcmp(sys_cmd,"p")==0)
       {
-#ifdef RDEBUG
         pDebugPrint((poly)h->Data());
-#endif
         return FALSE;
       }
       else
+#endif
 /*==================== ring debug ==================================*/
+#ifdef RDEBUG
       if(strcmp(sys_cmd,"r")==0)
       {
-#ifdef RDEBUG
         rDebugPrint((ring)h->Data());
-#endif
         return FALSE;
       }
+#endif
 /*==================== generic debug ==================================*/
+#ifdef PDEBUG
       if(strcmp(sys_cmd,"DebugPrint")==0)
       {
         if( h->Typ() == RING_CMD)
@@ -2102,7 +2102,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         }
 
         return FALSE;
-      } else
+      }
+      else
+#endif
 /*==================== mtrack ==================================*/
     if(strcmp(sys_cmd,"mtrack")==0)
     {
@@ -2159,17 +2161,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 /*==================== backtrace ==================================*/
+#ifndef OM_NDEBUG
     if(strcmp(sys_cmd,"backtrace")==0)
     {
-#ifndef OM_NDEBUG
       omPrintCurrentBackTrace(stdout);
       return FALSE;
-#else
-     WerrorS("btrack not supported without OM_TRACK");
-     return TRUE;
-#endif
     }
     else
+#endif
 /*==================== naIdeal ==================================*/
     if(strcmp(sys_cmd,"naIdeal")==0)
     {
@@ -2289,10 +2288,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#ifdef FACTORY_GCD_TEST
 /*=======================gcd Testerei ================================*/
-    if ( ! strcmp( sys_cmd, "setgcd" ) ) {
-        if ( (h != NULL) && (h->Typ() == INT_CMD) ) {
+#ifdef FACTORY_GCD_TEST
+    if ( ! strcmp( sys_cmd, "setgcd" ) )
+    {
+        if ( (h != NULL) && (h->Typ() == INT_CMD) )
+        {
             CFPrimitiveGcdUtil::setAlgorithm( (int)h->Data() );
             return FALSE;
         } else
@@ -2302,7 +2303,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 
 #ifdef FACTORY_GCD_TIMING
-    if ( ! strcmp( sys_cmd, "gcdtime" ) ) {
+    if ( ! strcmp( sys_cmd, "gcdtime" ) )
+    {
         TIMING_PRINT( contentTimer, "time used for content: " );
         TIMING_PRINT( algContentTimer, "time used for algContent: " );
         TIMING_PRINT( algLcmTimer, "time used for algLcm: " );
@@ -2315,7 +2317,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #endif
 
 #ifdef FACTORY_GCD_STAT
-    if ( ! strcmp( sys_cmd, "gcdstat" ) ) {
+    if ( ! strcmp( sys_cmd, "gcdstat" ) )
+    {
         printGcdTotal();
         printContTotal();
         resetGcdTotal();
@@ -2324,8 +2327,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#if !defined(HAVE_NS)
 /*==================== lib ==================================*/
+#if !defined(HAVE_NS)
     if(strcmp(sys_cmd,"LIB")==0)
     {
       idhdl hh=idroot->get((char*)h->Data(),0);
@@ -2496,7 +2499,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return FALSE;
     }
     else
+#endif
 /*==================== sdb_edit =================*/
+#ifdef HAVE_SDB
     if (strcmp(sys_cmd, "sdb_edit") == 0)
     {
       if ((h!=NULL) && (h->Typ()==PROC_CMD))
@@ -2562,9 +2567,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
      }
      else
 #endif
+/*==================== DLL =================*/
 #ifdef ix86_Win
 #ifdef HAVE_DL
-/*==================== DLL =================*/
 /* testing the DLL functionality under Win32 */
       if (strcmp(sys_cmd, "DLL") == 0)
       {
@@ -2634,8 +2639,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
-#ifdef HAVE_VANIDEAL
 /*==================== Creating zero polynomials =================*/
+#ifdef HAVE_VANIDEAL
     if (strcmp(sys_cmd, "createG0")==0)
     {
       /* long exp[50];
@@ -2660,6 +2665,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== redNF_ring =================*/
     if (strcmp(sys_cmd, "redNF_ring")==0)
     {
       ring r = currRing;
@@ -2672,6 +2678,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== minor =================*/
     if (strcmp(sys_cmd, "minor")==0)
     {
       ring r = currRing;
@@ -2699,16 +2706,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return(FALSE);
     }
     else
-#ifdef HAVE_F5
 /*==================== F5 Implementation =================*/
+#ifdef HAVE_F5
     if (strcmp(sys_cmd, "f5")==0)
     {
       if (h->Typ()!=IDEAL_CMD)
       {
         WerrorS("ideal expected");
         return TRUE;
-      } 
-      
+      }
+
       ring r = currRing;
       ideal G = (ideal) h->Data();
       h = h->next;
@@ -2725,16 +2732,16 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#ifdef HAVE_F5C
 /*==================== F5C Implementation =================*/
+#ifdef HAVE_F5C
     if (strcmp(sys_cmd, "f5c")==0)
     {
       if (h->Typ()!=IDEAL_CMD)
       {
         WerrorS("ideal expected");
         return TRUE;
-      } 
-      
+      }
+
       ring r = currRing;
       ideal G = (ideal) h->Data();
       res->rtyp=IDEAL_CMD;
@@ -2743,8 +2750,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#ifdef HAVE_RINGS
 /*==================== Testing groebner basis =================*/
+#ifdef HAVE_RINGS
     if (strcmp(sys_cmd, "NF_ring")==0)
     {
       ring r = currRing;
@@ -2778,8 +2785,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-#ifdef HAVE_PLURAL
 /*==================== sca?AltVar ==================================*/
+#ifdef HAVE_PLURAL
     if ( (strcmp(sys_cmd, "AltVarStart") == 0) || (strcmp(sys_cmd, "AltVarEnd") == 0) )
     {
       ring r = currRing;
@@ -2806,9 +2813,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
+/*==================== RatNF, noncomm rational coeffs =================*/
 #ifdef HAVE_PLURAL
 #ifdef HAVE_RATGRING
-/*==================== RatNF, noncomm rational coeffs =================*/
     if (strcmp(sys_cmd, "intratNF") == 0)
     {
       poly p;
@@ -2817,45 +2824,45 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       int is, k, id;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
-	p=(poly)h->CopyD();
-	h=h->next;
-	//	Print("poly is done\n");
+        p=(poly)h->CopyD();
+        h=h->next;
+        //        Print("poly is done\n");
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==IDEAL_CMD))
       {
-	I=(ideal)h->CopyD();
-	q = I->m;
-	h=h->next;
-	//	Print("ideal is done\n");
+        I=(ideal)h->CopyD();
+        q = I->m;
+        h=h->next;
+        //        Print("ideal is done\n");
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	is=(int)((long)(h->Data()));
-	//	res->rtyp=INT_CMD;
-	//	Print("int is done\n");
-	//	res->rtyp=IDEAL_CMD;
-	if (rIsPluralRing(currRing))
-	{ 
-	  id = IDELEMS(I);
+        is=(int)((long)(h->Data()));
+        //        res->rtyp=INT_CMD;
+        //        Print("int is done\n");
+        //        res->rtyp=IDEAL_CMD;
+        if (rIsPluralRing(currRing))
+        {
+          id = IDELEMS(I);
                  int *pl=(int*)omAlloc0(IDELEMS(I)*sizeof(int));
-	  for(k=0; k < id; k++)
-	  {
-	    pl[k] = pLength(I->m[k]);
-	  }
-	  Print("starting redRat\n");
-	  //res->data = (char *)
-	  redRat(&p, q, pl, (int)IDELEMS(I),is,currRing);
-	  res->data=p;
-	  res->rtyp=POLY_CMD;
-	  //	res->data = ncGCD(p,q,currRing);	
-	}
-	else 
-	{
-	  res->rtyp=POLY_CMD;
-	  res->data=p;
-	}
+          for(k=0; k < id; k++)
+          {
+            pl[k] = pLength(I->m[k]);
+          }
+          Print("starting redRat\n");
+          //res->data = (char *)
+          redRat(&p, q, pl, (int)IDELEMS(I),is,currRing);
+          res->data=p;
+          res->rtyp=POLY_CMD;
+          //        res->data = ncGCD(p,q,currRing);
+        }
+        else
+        {
+          res->rtyp=POLY_CMD;
+          res->data=p;
+        }
       }
       else return TRUE;
       return FALSE;
@@ -2868,28 +2875,28 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       int is, htype;
       if ((h!=NULL) && ( (h->Typ()==POLY_CMD) || (h->Typ()==VECTOR_CMD) ) )
       {
-	p=(poly)h->CopyD();
-	h=h->next;
-	htype = h->Typ();
+        p=(poly)h->CopyD();
+        h=h->next;
+        htype = h->Typ();
       }
       else return TRUE;
       if ((h!=NULL) && ( (h->Typ()==POLY_CMD) || (h->Typ()==VECTOR_CMD) ) )
       {
-	q=(poly)h->CopyD();
-	h=h->next;
+        q=(poly)h->CopyD();
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	is=(int)((long)(h->Data()));
-	res->rtyp=htype;
-	//	res->rtyp=IDEAL_CMD;
-	if (rIsPluralRing(currRing))
-	{ 
-	  res->data = nc_rat_ReduceSpolyNew(q,p,is, currRing);
-	  //	res->data = ncGCD(p,q,currRing);	
-	}
-	else res->data=p;
+        is=(int)((long)(h->Data()));
+        res->rtyp=htype;
+        //        res->rtyp=IDEAL_CMD;
+        if (rIsPluralRing(currRing))
+        {
+          res->data = nc_rat_ReduceSpolyNew(q,p,is, currRing);
+          //        res->data = ncGCD(p,q,currRing);
+        }
+        else res->data=p;
       }
       else return TRUE;
       return FALSE;
@@ -2902,27 +2909,27 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       int is;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
-	p=(poly)h->CopyD();
-	h=h->next;
+        p=(poly)h->CopyD();
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
-	q=(poly)h->CopyD();
-	h=h->next;
+        q=(poly)h->CopyD();
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	is=(int)((long)(h->Data()));
-	res->rtyp=POLY_CMD;
-	//	res->rtyp=IDEAL_CMD;
-	if (rIsPluralRing(currRing))
-	{ 
-	  res->data = nc_rat_CreateSpoly(p,q,is,currRing);
-	  //	res->data = ncGCD(p,q,currRing);	
-	}
-	else res->data=p;
+        is=(int)((long)(h->Data()));
+        res->rtyp=POLY_CMD;
+        //        res->rtyp=IDEAL_CMD;
+        if (rIsPluralRing(currRing))
+        {
+          res->data = nc_rat_CreateSpoly(p,q,is,currRing);
+          //        res->data = ncGCD(p,q,currRing);
+        }
+        else res->data=p;
       }
       else return TRUE;
       return FALSE;
@@ -2936,14 +2943,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       int is;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
-	start=pIsPurePower((poly)h->Data());
-	h=h->next;
+        start=pIsPurePower((poly)h->Data());
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
-	end=pIsPurePower((poly)h->Data());
-	h=h->next;
+        end=pIsPurePower((poly)h->Data());
+        h=h->next;
       }
       else return TRUE;
       currRing->real_var_start=start;
@@ -2959,28 +2966,28 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       int sh,uptodeg, lVblock;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
-	p=(poly)h->CopyD();
-	h=h->next;
+        p=(poly)h->CopyD();
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	sh=(int)((long)(h->Data()));
-	h=h->next;
+        sh=(int)((long)(h->Data()));
+        h=h->next;
       }
       else return TRUE;
 
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	uptodeg=(int)((long)(h->Data()));
-	h=h->next;
+        uptodeg=(int)((long)(h->Data()));
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	lVblock=(int)((long)(h->Data()));
-	res->data = pLPshift(p,sh,uptodeg,lVblock);
-	res->rtyp = POLY_CMD;
+        lVblock=(int)((long)(h->Data()));
+        res->data = pLPshift(p,sh,uptodeg,lVblock);
+        res->rtyp = POLY_CMD;
       }
       else return TRUE;
       return FALSE;
@@ -2995,15 +3002,15 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       int lV;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
-	p=(poly)h->CopyD();
-	h=h->next;
+        p=(poly)h->CopyD();
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	lV=(int)((long)(h->Data()));
-	res->rtyp = INT_CMD;
-	res->data = (void*)pLastVblock(p, lV);
+        lV=(int)((long)(h->Data()));
+        res->rtyp = INT_CMD;
+        res->data = (void*)pLastVblock(p, lV);
       }
       else return TRUE;
       return FALSE;
@@ -3016,18 +3023,18 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       int lV;
       if ((h!=NULL) && (h->Typ()==POLY_CMD))
       {
-	p=(poly)h->CopyD();
-	h=h->next;
+        p=(poly)h->CopyD();
+        h=h->next;
       }
       else return TRUE;
       if ((h!=NULL) && (h->Typ()==INT_CMD))
       {
-	lV=(int)((long)(h->Data()));
-	res->rtyp = POLY_CMD;
-	//	res->data = p_mShrink(p, lV, currRing);
-	//	kStrategy strat=new skStrategy;
-	//	strat->tailRing = currRing;
-	res->data = p_Shrink(p, lV, currRing);
+        lV=(int)((long)(h->Data()));
+        res->rtyp = POLY_CMD;
+        //        res->data = p_mShrink(p, lV, currRing);
+        //        kStrategy strat=new skStrategy;
+        //        strat->tailRing = currRing;
+        res->data = p_Shrink(p, lV, currRing);
       }
       else return TRUE;
       return FALSE;
@@ -3255,9 +3262,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     {
       if (h!=NULL)
       {
-	extern ring rSubring(ring r,leftv v); /* ipshell.cc*/
-	res->data=(char *)rSubring(currRing,h);
-	res->rtyp=RING_CMD;
+        extern ring rSubring(ring r,leftv v); /* ipshell.cc*/
+        res->data=(char *)rSubring(currRing,h);
+        res->rtyp=RING_CMD;
         return res->data==NULL;
       }
       else return TRUE;
@@ -3322,7 +3329,7 @@ ipshell()");
 #ifdef HAVE_SINGULAR_PLUS_PLUS
   if (strcmp(sys_cmd,"Singular++")==0)
   {
-//    using namespace SINGULAR_NS; 
+//    using namespace SINGULAR_NS;
     extern BOOLEAN Main(leftv res, leftv h); // FALSE = Ok, TRUE = Error!
     return Main(res, h);
   };
@@ -3336,18 +3343,18 @@ WILL HAVE TO CHANGE RETURN TYPE TO LIST_CMD
 */
 if (strcmp(sys_cmd,"gfan")==0)
 {
-	if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
+        if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
         {
-		Werror("system(\"gfan\"...) Ideal expected");
-		return TRUE; //Ooooops
-	}
+                Werror("system(\"gfan\"...) Ideal expected");
+                return TRUE; //Ooooops
+        }
 ideal I=((ideal)h->Data());
 res->rtyp=IDEAL_CMD;
 res->data=(ideal) gfan(I);
 //res->rtyp=LIST_CMD;
 //res->data= ???
-	
-return FALSE; //Everything went fine	
+
+return FALSE; //Everything went fine
 }
 else
 #endif
