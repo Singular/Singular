@@ -292,7 +292,7 @@ install-nolns: install
 
 install-libsingular:
 	${MKINSTALLDIRS} ${includedir}/singular
-	-for file in *.h; do \
+	-for file in *.h kInline.cc; do \
 	${INSTALL_PROGRAM} $$file ${includedir}/singular; \
 	done
 
