@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-22 09:57:23 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.80 2009-07-22 09:57:23 monerjan Exp $
-$Id: gfan.cc,v 1.80 2009-07-22 09:57:23 monerjan Exp $
+$Date: 2009-07-23 12:34:53 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.81 2009-07-23 12:34:53 monerjan Exp $
+$Id: gfan.cc,v 1.81 2009-07-23 12:34:53 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -1183,10 +1183,14 @@ class gcone
 			BITSET save=test;
 			test|=Sy_bit(OPT_REDSB);
 			test|=Sy_bit(OPT_REDTAIL);
+#ifdef gfan_DEBUG
 			test|=Sy_bit(6);	//OPT_DEBUG
+#endif
 			ideal tmpI;
-			tmpI = idrCopyR(this->inputIdeal,this->baseRing);				
-			dstRing_I=kStd(tmpI,NULL,testHomog,NULL);					
+			//NOTE Any of the two variants of tmpI={idrCopy(),dstRing_I} does the trick
+			//tmpI = idrCopyR(this->inputIdeal,this->baseRing);
+			tmpI = dstRing_I;
+			dstRing_I=kStd(tmpI,NULL,testHomog,NULL);			
 			//kInterRed(dstRing_I);
 			idSkipZeroes(dstRing_I);
 			test=save;
@@ -2183,7 +2187,7 @@ class gcone
 							}
 						}//if(!isParallel(fNormal, slNormal))
 						slAct = slAct->next;
-						delete deleteMarker;
+						//delete deleteMarker;
 						deleteMarker=NULL;
 						//if slAct was marked as to be deleted, delete it here!
 					}//while(slAct!=NULL)									
