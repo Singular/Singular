@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-23 12:34:53 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.81 2009-07-23 12:34:53 monerjan Exp $
-$Id: gfan.cc,v 1.81 2009-07-23 12:34:53 monerjan Exp $
+$Date: 2009-07-24 08:59:45 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.82 2009-07-24 08:59:45 monerjan Exp $
+$Id: gfan.cc,v 1.82 2009-07-24 08:59:45 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -92,7 +92,9 @@ class facet
 		ideal flipGB;		//The Groebner Basis on the other side, computed via gcone::flip		
 			
 	public:	
-		/** 
+		/** \brief Boolean value to indicate whether a facet is flippable or not
+		* This is also used to mark facets that nominally are flippable but which do
+		* not intersect with the positive orthant. This check is done in gcone::getCodim2Normals
 		*/	
 		bool isFlippable;	//**flippable facet? */
 		bool isIncoming;	//Is the facet incoming or outgoing in the reverse search?
@@ -1170,9 +1172,9 @@ class gcone
 			rComplete(dstRing);					
 			rChangeCurrRing(dstRing);
 			
-#ifdef gfan_DEBUG
+//#ifdef gfan_DEBUG
 			rWrite(dstRing); cout << endl;
-#endif
+//#endif
 			ideal dstRing_I;			
 			dstRing_I=idrCopyR(srcRing_HH,srcRing);
 			//dstRing_I=idrCopyR(inputIdeal,srcRing);
@@ -1703,6 +1705,7 @@ class gcone
 		{	
 			facet *SearchListRoot = new facet(); //The list containing ALL facets we come across
 			facet *SearchListAct;
+			SearchListAct = NULL;
 			//SearchListAct = SearchListRoot;
 			
 			gcone *gcAct;
@@ -1748,15 +1751,15 @@ class gcone
 				if(fAct->isFlippable==TRUE)
 				{
 					fNormal = fAct->getFacetNormal();
-					if(ii==0)
+					if( ii==0 || (ii>0 && SearchListAct==NULL) ) //1st facet may be non-flippable
 					{						
 						SearchListAct = SearchListRoot;
 						//memcpy(SearchListAct,fAct,sizeof(facet));					
 					}
 					else
-					{
+					{			
 						SearchListAct->next = new facet();
-						SearchListAct = SearchListAct->next;
+						SearchListAct = SearchListAct->next;						
 						//memcpy(SearchListAct,fAct,sizeof(facet));				
 					}
 					SearchListAct->setFacetNormal(fNormal);
@@ -1796,14 +1799,14 @@ class gcone
 			{
 				if(SearchListAct->next!=NULL)
 				{
-					SearchListAct->next->prev = SearchListAct;
-					//SearchListAct = SearchListAct->next;
+					SearchListAct->next->prev = SearchListAct;					
 				}
 				SearchListAct = SearchListAct->next;
 			}
 			SearchListAct = SearchListRoot;	//Set to beginning of List
 			
-			fAct = gcAct->facetPtr;			
+			fAct = gcAct->facetPtr;
+			//NOTE Disabled until code works as expected
 			//gcAct->writeConeToFile(*gcAct);
 			
 			/*End of initialisation*/
@@ -1811,8 +1814,8 @@ class gcone
 			/*2nd step
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			We always choose the first facet from fListPtr as facet to be flipped
-			*/
- 			while(SearchListAct!=NULL)
+			*/			
+			while(SearchListAct!=NULL)// && counter<limit)
 			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!				
 				fAct = SearchListAct;
 				//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) )
@@ -2004,7 +2007,14 @@ class gcone
 				//delete new_n;
 			}	*/		
 		}
-		/** 
+		/** \brief Enqueue new facets into the searchlist 
+		* The searchlist (SLA for short) is implemented as a FIFO
+		* Checks are done as follows:
+		* 1) Check facet fAct against all facets in SLA for parallelity. If it is not parallel to any one add it.
+		* 2) If it is parallel compare the codim2 facets. If they coincide the facets are equal and we delete the 
+		*	facet from SLA and do not add fAct.
+		* It may very well happen, that SLA=\f$ \emptyset \f$ but we do not have checked all fActs yet. In this case we
+		* can be sure, that none of the facets that are still there already were in SLA once, so we just dump them into SLA.
 		* Takes ptr to search list root
 		* Returns a pointer to new first element of Searchlist
 		*/
@@ -2024,10 +2034,16 @@ class gcone
 			codim2Act = this->facetPtr->codim2Ptr;
 			facet *sl2Act;
 			sl2Act = f.codim2Ptr;
+			/** Pointer to a facet that will be deleted */
 			facet *deleteMarker;
 			deleteMarker = NULL;
 			
+			/** Flag to indicate a facet that should be added to SLA*/
 			bool doNotAdd=FALSE;
+			/**A facet was removed, lengthOfSearchlist-- thus we must not rely on 
+			* if(notParallelCtr==lengthOfSearchList) but rather
+			* if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE)
+			*/
 			bool removalOccured=FALSE;
 			int ctr=0;	//encountered qualities in SLA
 			int notParallelCtr=0;
@@ -2115,6 +2131,7 @@ class gcone
 						if(!isParallel(fNormal, slNormal))
 						{
 							notParallelCtr++;
+							slAct = slAct->next;
 						}
 						else
 						{
@@ -2155,7 +2172,8 @@ class gcone
 									//set a bool flag to mark slAct as to be deleted
 								}//NOTE find a way to delete without affecting slAct = slAct->next
 								else if(slAct==slEndStatic)
-									{							
+									{
+										deleteMarker = slAct;					
 										if(slEndStatic->next==NULL)
 										{							
 											slEndStatic = slEndStatic->prev;
@@ -2185,9 +2203,15 @@ class gcone
 								doNotAdd=FALSE;
 								//break;
 							}
+							slAct = slAct->next;
+							delete deleteMarker;
 						}//if(!isParallel(fNormal, slNormal))
-						slAct = slAct->next;
-						//delete deleteMarker;
+						/* NOTE The following lines must not be here but rather called inside the if-block above.
+						Otherwise results get crappy. Unfortunately there are two slAct=slAct->next calls now,
+						(not nice!) but since they are in seperate branches of the if-statement there should not
+						be a way it gets called twice thus ommiting one facet:
+ 						slAct = slAct->next;						
+						delete deleteMarker;*/
 						deleteMarker=NULL;
 						//if slAct was marked as to be deleted, delete it here!
 					}//while(slAct!=NULL)									
