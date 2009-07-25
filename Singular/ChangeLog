@@ -1,5 +1,5 @@
 Changes w.r.t 3-1-0-4:
-- SAGE patches for gcc 4.4
+- SAGE patches for gcc 4.4 etc.
 - fixed bug in ring change during tail reduction
 - new libs: binresol.lib, trial.lib
 - NTL: update to version 5.5.1
