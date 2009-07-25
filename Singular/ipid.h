@@ -3,15 +3,13 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.43 2008-03-19 17:44:34 Singular Exp $ */
+/* $Id: ipid.h,v 1.44 2009-07-25 13:21:02 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
 #include <string.h>
 #include "structs.h"
-#ifdef TOK_H
 #include "subexpr.h"
-#endif
 
 struct sip_command
 {
