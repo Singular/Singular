@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.123 2009-07-20 12:00:51 motsak Exp $ */
+/* $Id: ring.cc,v 1.124 2009-07-26 20:16:24 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -2692,7 +2692,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     {
       case ringorder_S:
       {
+#ifndef NDEBUG
         dReportError("Error: unhandled ordering in rModifyRing: ringorder_S = [%d]", r_ord);
+#endif
         order[j]=r_ord; /*r->order[i];*/
         break;
       }
@@ -2758,7 +2760,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         assume((i == 0) && (j == 0));
         if (omit_comp)
         {
-          dReportError("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d", i, r_ord);
+#ifndef NDEBUG
+          Warn("WRONG USAGE? of rModifyRing: omitting component due to the ordering block [%d]: %d", i, r_ord);
+#endif
           omit_comp = FALSE;
         }
         order[j]=r_ord; /*r->order[i];*/
@@ -2863,7 +2867,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   {
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
+#ifndef NDEBUG
       WarnS("error in nc_rComplete");
+#endif
       // cleanup?
 
 //      rDelete(res);
@@ -2918,7 +2924,9 @@ ring rModifyRing_Wp(ring r, int* weights)
   {
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
+#ifndef NDEBUG
       WarnS("error in nc_rComplete");
+#endif
       // cleanup?
 
 //      rDelete(res);
@@ -2978,8 +2986,10 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
+#ifndef NDEBUG
         WarnS("error in nc_rComplete");
-      // cleanup?
+#endif
+        // cleanup?
 
 //      rDelete(res);
 //      return r;
@@ -3791,7 +3801,9 @@ void rUnComplete(ring r)
           r->typ[i].data.syz.syz_index = NULL;
         } else if (r->typ[i].ord_typ == ro_syzcomp)
         {
+#ifndef NDEBUG
           Warn( "rUnComplete : ord_typ == ro_syzcomp was unhandled!!! Possibly memory leak!!!"  );
+#endif
         }
 
       omFreeSize((ADDRESS)r->typ,r->OrdSize*sizeof(sro_ord)); r->typ = NULL;
@@ -4217,7 +4229,9 @@ static ring rAssure_SyzComp(const ring r, BOOLEAN complete)
   if ( (r->order[0] == ringorder_s) ) return r;
   if ( (r->order[0] == ringorder_IS) )
   {
+#ifndef NDEBUG
     WarnS("rAssure_SyzComp in an IS ring!");
+#endif
 //    return r;
   }
   ring res=rCopy0(r, FALSE, FALSE);
@@ -4251,7 +4265,9 @@ static ring rAssure_SyzComp(const ring r, BOOLEAN complete)
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
+#ifndef NDEBUG
         WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
+#endif
       }
     }
     assume(rIsPluralRing(r) == rIsPluralRing(res));
@@ -4373,8 +4389,10 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   {
     if ( nc_rComplete(r, res, false) ) // no qideal!
     {
+#ifndef NDEBUG
       WarnS("error in nc_rComplete");
-    // just go on..
+#endif
+      // just go on..
     }
   }
 #endif
@@ -4443,7 +4461,9 @@ ring rAssure_HasComp(ring r)
   {
     if ( nc_rComplete(r, new_r, false) ) // no qideal!
     {
+#ifndef NDEBUG
       WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
+#endif      
     }
   }
   assume(rIsPluralRing(r) == rIsPluralRing(new_r));
@@ -4492,7 +4512,9 @@ static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
         {
           if ( nc_rComplete(r, new_r, false) ) // no qideal!
           {
+#ifndef NDEBUG
             WarnS("error in nc_rComplete");   // cleanup?//      rDelete(res);//      return r;      // just go on..
+#endif
           }
         }
         assume(rIsPluralRing(r) == rIsPluralRing(new_r));
@@ -4519,7 +4541,9 @@ ring rCurrRingAssure_CompLastBlock()
       if( rIsPluralRing(new_r) )
         if( nc_SetupQuotient(new_r, old_r, true) )
         {
+#ifndef NDEBUG
           WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+#endif
         }
 #endif
     }
@@ -4553,8 +4577,10 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
     {
       if ( nc_rComplete(old_r, new_r, false) ) // no qideal!
       {
+#ifndef NDEBUG
         WarnS("error in nc_rComplete"); // cleanup?      rDelete(res);       return r;  // just go on...?
-      }
+#endif
+        }
     }
     assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
 #endif
@@ -4568,7 +4594,9 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
       if( rIsPluralRing(old_r) )
         if( nc_SetupQuotient(new_r, old_r, true) )
         {
+#ifndef NDEBUG
           WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
+#endif
         }
 #endif
     }
@@ -4706,7 +4734,9 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
     {
       if ( nc_rComplete(r, res, false) ) // no qideal!
       {
+#ifndef NDEBUG
         WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
+#endif
       }
     }
     assume(rIsPluralRing(r) == rIsPluralRing(res));
@@ -4897,7 +4927,9 @@ void rSetSyzComp(int k)
            )
   {
 //      (currRing->typ[currRing->typ[0].data.isTemp.suffixpos].data.is.limit == k)
+#ifndef NDEBUG
     Warn("rSetSyzComp(%d) in an IS ring! Be careful!", k);
+#endif
   } else
   if ((currRing->order[0]!=ringorder_c) && (k!=0)) // ???
   {
