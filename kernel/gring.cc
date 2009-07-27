@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.74 2009-05-15 13:21:31 motsak Exp $
+ *  Version: $Id: gring.cc,v 1.75 2009-07-27 08:33:59 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -3586,7 +3586,7 @@ ideal Approx_Step(ideal L)
       //      h2 = idSimpleAdd(h2,I);
       //      h2->rank=flag+idI+1;
       idTest(h2);
-      idShow(h2);
+      //idShow(h2);
       ring orig_ring=currRing;
       ring syz_ring=rCurrRingAssure_SyzComp();
       syzcomp = 1;
@@ -3617,7 +3617,7 @@ ideal Approx_Step(ideal L)
       Print("...computing Syz");
       s_h3 = kStd(s_h2, currQuotient,(tHomog)FALSE,NULL,NULL,syzcomp,idI);
       test=save_test;
-      idShow(s_h3);
+      //idShow(s_h3);
       if (orig_ring != syz_ring)
       {
         idDelete(&s_h2);
@@ -3660,7 +3660,7 @@ ideal Approx_Step(ideal L)
       SI = S[0];
     else
       SI = idMultSect(S, syzcnt);
-    idShow(SI);
+    //idShow(SI);
     MI = idModule2Matrix(SI);
     res= idInit(MATCOLS(MI),1);
     for (i=1; i<= MATCOLS(MI); i++)
