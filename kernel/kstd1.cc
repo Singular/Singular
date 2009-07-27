@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.56 2009-07-20 12:00:50 motsak Exp $ */
+/* $Id: kstd1.cc,v 1.57 2009-07-27 08:31:44 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1915,7 +1915,10 @@ ideal kMin_std(ideal F, ideal Q, tHomog h,intvec ** w, ideal &M, intvec *hilb,
               int syzComp, int reduced)
 {
   if(idIs0(F))
+  {
+    M=idInit(1,F->rank);
     return idInit(1,F->rank);
+  }
 
   ideal r=NULL;
   int Kstd1_OldDeg = Kstd1_deg,i;
