@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #################################################################
-# $Id: regress.cmd,v 1.41 2009-07-27 19:31:16 motsak Exp $
+# $Id: regress.cmd,v 1.42 2009-07-28 10:39:05 Singular Exp $
 # FILE:    regress.cmd
 # PURPOSE: Script which runs regress test of Singular
 # CREATED: 2/16/98
@@ -716,10 +716,10 @@ if (-d $singular)
   print (STDERR "$singular is a directory\n") && &Usage && die;
 }
 
-sub file_check
+
+# now do the work
+foreach (@ARGV)
 {
-  local($t)= $_[0];
-  print( "Processing: $t\n");
 
   if ( /^(.*)\.([^\.\/]*)$/ )
   {
@@ -731,10 +731,6 @@ sub file_check
   {
     $path = $1;
     $base = $2;
-
-    local($pwd);
-    chop($pwd=`pwd`);
-
     chdir($path);
     print "cd $path\n" if ($verbosity > 2);
   }
@@ -752,6 +748,7 @@ sub file_check
   }
   elsif ($extension eq "lst")
   {
+    
     if (! open(LST_FILE, "<$file"))
     {
       print (STDERR "Can not open $path/$file for reading\n");
@@ -765,27 +762,13 @@ sub file_check
     {
       if (/^;/)          # ignore lines starting with ;
       {
-          print unless ($verbosity == 0);
+        print unless ($verbosity == 0);
         next;
       }
       next if (/^\s*$/); #ignore whitespaced lines
-      chop;   #chop of \n
+      chop if (/\n$/);   #chop of \n
 
-      $t = $_;
-
-      if ( /^(.*)\.([^\.\/]*)$/ )
-      {
-        $_ = $1; # chop of extension
-
-        if( $2 eq "lst")
-        {
-          print("going... recursive into: $t!\n");
-          file_check("$t");
-          next;
-        }
-      } 
-#     $_ = $1 if (/^(.*)\.([^\.\/]*)$/ ); 
-
+      $_ = $1 if (/^(.*)\.([^\.\/]*)$/ ); # chop of extension
       if ( /^(.*)\/([^\/]*)$/ )
       {
         $tst_path = $1;
@@ -812,6 +795,8 @@ sub file_check
       }
     }
     close (LST_FILE);
+    printf("$base Summary: Checks:$lst_checks Failed:%d Time:%.2f\n", $lst_checks - $lst_checks_pass, $lst_used_time) 
+      unless ($verbosity < 2)
   }
   else
   {
@@ -820,21 +805,10 @@ sub file_check
   }
   if ($path ne "")
   {
-    chdir($pwd);
+    chdir($curr_dir);
     print "cd $curr_dir\n" if ($verbosity > 2);
   }
 }
-
-
-# now do the work
-foreach (@ARGV)
-{
-  file_check($_);
-}
-
-printf("$base Summary: Checks:$lst_checks Failed:%d Time:%.2f\n", $lst_checks - $lst_checks_pass, $lst_used_time) 
-  unless ($verbosity < 2);
-
 
 unless ($verbosity < 2 || $lst_checks == $total_checks)
 {
