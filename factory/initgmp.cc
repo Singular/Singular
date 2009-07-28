@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: initgmp.cc,v 1.4 1998-06-14 13:23:18 Singular Exp $ */
+/* $Id: initgmp.cc,v 1.5 2009-07-28 14:51:07 Singular Exp $ */
 
 #include <config.h>
 
@@ -49,7 +49,10 @@ int initializeGMP()
 #ifdef MDEBUG
     mp_set_memory_functions( mgAllocBlock, mgReallocBlock, mgFreeBlock );
 #else
+#ifndef SINGULAR
+    // do not initialize this within Singular:
     mp_set_memory_functions( mmAllocBlock, mmReallocBlock, mmFreeBlock );
+#endif
 #endif
 #endif
   }
