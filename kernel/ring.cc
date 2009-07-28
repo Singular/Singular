@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.126 2009-07-28 09:56:59 Singular Exp $ */
+/* $Id: ring.cc,v 1.127 2009-07-28 10:01:32 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1681,8 +1681,9 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 ring rCopy(ring r)
 {
   if (r == NULL) return NULL;
-  ring res=rCopy0(r);
+  ring res=rCopy0(r,FALSE,TRUE);
   rComplete(res, 1); // res is purely commutative so far
+  if (r->qideal!=NULL) res->qideal=idrCopyR_NoSort(r->qideal, r, res);
 
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(r))
