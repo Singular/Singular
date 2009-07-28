@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.14 2009-07-28 08:13:38 Singular Exp $";
+version="$Id: gmssing.lib,v 1.15 2009-07-28 10:34:55 Singular Exp $";
 category="Singularities";
 
 info="
@@ -37,7 +37,7 @@ SEE ALSO: mondromy_lib, spectrum_lib, gmspoly_lib
 
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration
-          Bernstein-Sato polynomial; monodromy; spectrum; spectral pairs; 
+          Bernstein-Sato polynomial; monodromy; spectrum; spectral pairs;
           good basis
 ";
 
@@ -589,7 +589,7 @@ list bs;  Bernstein-Sato polynomial b(s) of t
   intvec bs[2];
     int bs[2][i];  multiplicity of i-th root of b(s)
 @end format
-KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice; 
+KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           Bernstein-Sato polynomial
 EXAMPLE:  example bernstein; shows examples
 "
@@ -632,11 +632,11 @@ ASSUME:   characteristic 0; local degree ordering;
 RETURN:
 @format
 list l;  Jordan data jordan(M) of monodromy matrix exp(-2*pi*i*M)
-  ideal l[1]; 
+  ideal l[1];
     number l[1][i];  eigenvalue of i-th Jordan block of M
-  intvec l[2]; 
+  intvec l[2];
     int l[2][i];  size of i-th Jordan block of M
-  intvec l[3]; 
+  intvec l[3];
     int l[3][i];  multiplicity of i-th Jordan block of M
 @end format
 SEE ALSO: mondromy_lib, linalg_lib

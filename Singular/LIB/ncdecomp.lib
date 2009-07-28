@@ -1,14 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncdecomp.lib,v 1.15 2009-07-07 16:29:58 levandov Exp $";
+version="$Id: ncdecomp.lib,v 1.16 2009-07-28 10:34:55 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  ncdecomp.lib     Decomposition of a module into its central characters
 AUTHORS:  Viktor Levandovskyy,     levandov@mathematik.uni-kl.de.
 
 OVERVIEW:
-@* This library presents algorithms for the central character decomposition of a module, 
-@* i.e. a decomposition into generalized weight modules with respect to the center. 
-@* Based on ideas of O. Khomenko and V. Levandovskyy (see the article [L2] in the 
+@* This library presents algorithms for the central character decomposition of a module,
+@* i.e. a decomposition into generalized weight modules with respect to the center.
+@* Based on ideas of O. Khomenko and V. Levandovskyy (see the article [L2] in the
 @* References for details).
 
 PROCEDURES:
@@ -118,7 +118,7 @@ proc CentralQuot(module I, ideal G)
 ASSUME: G is an ideal in the center of the base ring
 RETURN:  module
 PURPOSE: compute the central quotient M:G
-THEORY:  for an ideal G of the center of an algebra and a submodule M of A^n, 
+THEORY:  for an ideal G of the center of an algebra and a submodule M of A^n,
 @* the central quotient of M by G is defined to be
 @* M:G  :=  { v in A^n | z*v in M, for all z in G }.
 NOTE:    the output module is not necessarily given in a Groebner basis

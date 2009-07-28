@@ -2,7 +2,7 @@
 //help for finitenessTest and mapIsFinite edited
 //new proc  nonZeroEntry(id), used to fix a bug in proc finitenessTest
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: algebra.lib,v 1.23 2009-04-15 11:07:30 seelisch Exp $";
+version="$Id: algebra.lib,v 1.24 2009-07-28 10:34:54 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  algebra.lib   Compute with Algbras and Algebra Maps
@@ -253,7 +253,7 @@ RETURN:
 @end format
 NOTE:    the proc algebra_containment tests the same using a different
          algorithm, which is often faster
-         if l[1] == 0 then l[2] may contain more than one relation h(y(0),y(1),...,y(k)), 
+         if l[1] == 0 then l[2] may contain more than one relation h(y(0),y(1),...,y(k)),
          separated by comma
 EXAMPLE: example inSubring; shows an example
 "

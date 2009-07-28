@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.64 2009-07-15 14:43:52 motsak Exp $";
+version="$Id: general.lib,v 1.65 2009-07-28 10:34:55 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -845,13 +845,13 @@ example
 
    // Note that in general: lead(sort(M)) != sort(lead(M)), e.g:
    module M = [0, 1, 1, 0], [1, 0, 0, 1]; M;
-   sort(lead(M), "c, dp")[1]; 
-   lead(sort(M, "c, dp")[1]);  
+   sort(lead(M), "c, dp")[1];
+   lead(sort(M, "c, dp")[1]);
 
    // In order to sort M wrt a NEW ordering by considering OLD leading
    // terms use one of the following equivalent commands:
-   module( M[ sort(lead(M), "c,dp")[2] ] ); 
-   sort( M, sort(lead(M), "c,dp")[2] )[1]; 
+   module( M[ sort(lead(M), "c,dp")[2] ] );
+   sort( M, sort(lead(M), "c,dp")[2] )[1];
 }
 ///////////////////////////////////////////////////////////////////////////////
 
