@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.117 2009-07-28 14:59:52 Singular Exp $ */
+/* $Id: tesths.cc,v 1.118 2009-07-28 15:22:04 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -38,6 +38,52 @@
 extern int iiInitArithmetic();
 
 const char *singular_date=__DATE__ " " __TIME__;
+
+#include <si_gmp.h>
+
+int mmInit( void );
+int mmIsInitialized=mmInit();
+
+extern "C"
+{
+  void omSingOutOfMemoryFunc()
+  {
+    fprintf(stderr, "\nerror: no more memory\n");
+    omPrintStats(stderr);
+    m2_end(14);
+    /* should never get here */
+    exit(1);
+  }
+}
+
+int mmInit( void )
+{
+  if(mmIsInitialized==0)
+  {
+
+#ifndef LIBSINGULAR
+#if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
+    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
+    /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
+    /* solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, */
+    /* do not rely on the default in Singular as libsingular may be different */
+    mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
+#else
+    mp_set_memory_functions(malloc,reallocSize,freeSize);
+#endif
+#endif // ifndef LIBSINGULAR
+    om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
+#ifndef OM_NDEBUG
+    om_Opts.ErrorHook = dErrorBreak;
+#endif
+    omInitInfo();
+#ifdef OM_SING_KEEP
+    om_Opts.Keep = OM_SING_KEEP;
+#endif
+  }
+  mmIsInitialized=1;
+  return 1;
+}
 
 #ifdef LIBSINGULAR
 int siInit(char *name)
