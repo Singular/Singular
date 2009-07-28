@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.125 2009-07-28 08:49:15 Singular Exp $ */
+/* $Id: ring.cc,v 1.126 2009-07-28 09:56:59 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -383,8 +383,8 @@ void rWrite(ring r)
         Print("::suffix (sign: %d)", r->block0[l]);
 #endif
       continue;
-    } else
-    if (
+    }
+    else if (
     (  (r->order[l] >= ringorder_lp)
     ||(r->order[l] == ringorder_M)
     ||(r->order[l] == ringorder_a)
@@ -410,12 +410,12 @@ void rWrite(ring r)
         {
           if (r->order[l] == ringorder_a64)
           {
-	    int64 *w=(int64 *)r->wvhdl[l];
-	    #if SIZEOF_LONG == 4
+            int64 *w=(int64 *)r->wvhdl[l];
+            #if SIZEOF_LONG == 4
                   Print("%*lld " ,nlen,w[i+j],i+j);
-	    #else
+            #else
             Print(" %*ld"  ,nlen,w[i+j],i+j);
-	    #endif
+            #endif
           }
           else
             Print(" %*d" ,nlen,r->wvhdl[l][i+j],i+j);
@@ -468,7 +468,8 @@ void rWrite(ring r)
           iiWriteMatrix((matrix)Q,"scaQ",1);
         }
         else PrintS(" ...");
-      } else
+      }
+      else
         PrintS(" (NULL)");
     }
 #endif
@@ -1644,20 +1645,20 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   }
   if (r->qideal!=NULL)
   {
-    if (copy_qideal) 
+    if (copy_qideal)
     {
       #ifndef NDEBUG
       if (!copy_ordering)
-	WerrorS("internal error: rCopy0(Q,TRUE,FALSE)");
+        WerrorS("internal error: rCopy0(Q,TRUE,FALSE)");
       else
       #endif
       {
       #ifndef NDEBUG
-	WarnS("internal bad stuff: rCopy0(Q,TRUE,TRUE)");
+        WarnS("internal bad stuff: rCopy0(Q,TRUE,TRUE)");
       #endif
-	rComplete(res);
+        rComplete(res);
         res->qideal= idrCopyR_NoSort(r->qideal, r, res);
-	rUnComplete(res);
+        rUnComplete(res);
       }
     }
     //memset: else res->qideal = NULL;
@@ -2097,8 +2098,8 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
             j = p - 1; // SKIP ALL INTERNAL BLOCKS...???
             continue; // To make for check OrdSize bound...
           }
-        } else
-        if (r->typ[j].ord_typ == ro_is)
+        }
+        else if (r->typ[j].ord_typ == ro_is)
         {
           // Skip all intermediate blocks for undone variables:
           if(r->typ[j].data.is.pVarOffset[i] != -1)
@@ -2106,7 +2107,8 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
             // ???
           }
 
-        } else
+        }
+        else
         {
           if (r->typ[j].ord_typ==ro_cp)
           {
@@ -2407,7 +2409,7 @@ static void rO_ISPrefix(int &place, int &bitplace, int &prev_ord,
   ord_struct.data.isTemp.suffixpos = -1;
 
   // We will act as rO_Syz on our own!!!
-  // Here we allocate an exponent as a level placeholder 
+  // Here we allocate an exponent as a level placeholder
   o[place]= -1;
   prev_ord=-1;
   place++;
@@ -2479,7 +2481,8 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
 #if MYTEST
       Print("v[%d]: %010x", i, pVarOffset[i]);
 #endif
-    } else
+    }
+    else
       pVarOffset[i] = -1; // No change here...
   }
 
@@ -2506,7 +2509,7 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
 //       return;
 //     }
 
-  
+
   // Moreover: we need to allocate the module component (v[0]) here!
   if( v[0] == -1) // It's possible that there was module component v0 at the begining (before prefix)!
   {
@@ -3801,7 +3804,6 @@ void rUnComplete(ring r)
             delete r->typ[i].data.is.componentWeights;
             r->typ[i].data.is.componentWeights = NULL; // ?
           }
-          
 
           if( r->typ[i].data.is.pVarOffset != NULL )
           {
@@ -3812,9 +3814,10 @@ void rUnComplete(ring r)
         else if (r->typ[i].ord_typ == ro_syz)
         {
           if(r->typ[i].data.syz.limit > 0)
-            omFreeSize(r->typ[i].data.syz.syz_index, ((r->typ[i].data.syz.limit) +1)*sizeof(int)); 
+            omFreeSize(r->typ[i].data.syz.syz_index, ((r->typ[i].data.syz.limit) +1)*sizeof(int));
           r->typ[i].data.syz.syz_index = NULL;
-        } else if (r->typ[i].ord_typ == ro_syzcomp)
+        }
+        else if (r->typ[i].ord_typ == ro_syzcomp)
         {
 #ifndef NDEBUG
           Warn( "rUnComplete : ord_typ == ro_syzcomp was unhandled!!! Possibly memory leak!!!"  );
@@ -3833,7 +3836,7 @@ void rUnComplete(ring r)
       omUnGetSpecBin(&(r->PolyBin));
 
     omFreeSize((ADDRESS)r->VarOffset, (r->N +1)*sizeof(int));
-    
+
     if (r->ordsgn != NULL && r->CmpL_Size != 0)
       omFreeSize((ADDRESS)r->ordsgn,r->ExpL_Size*sizeof(long));
     if (r->p_Procs != NULL)
@@ -3981,7 +3984,7 @@ void rDebugPrint(ring r)
     {
       Print("  start (level) %d, suffixpos: %d, VO: ",r->typ[j].data.isTemp.start, r->typ[j].data.isTemp.suffixpos);
 
-#if MYTEST      
+#if MYTEST
       for( int k = 0; k <= r->N; k++)
         if (r->typ[j].data.isTemp.pVarOffset[k] != -1)
           Print("[%2d]: %09x; ", k, r->typ[j].data.isTemp.pVarOffset[k]);
@@ -3997,15 +4000,15 @@ void rDebugPrint(ring r)
       Print("  limit %d\n  F: ",r->typ[j].data.is.limit); idShow(r->typ[j].data.is.F, r, r, 1);
 
       PrintS("weights: ");
-      
+
       if( r->typ[j].data.is.componentWeights == NULL )
         PrintS("NULL == [0,...0]\n");
       else
       {
         (r->typ[j].data.is.componentWeights)->show(); PrintLn();
       }
-      
-    } else
+    }
+    else
     {
       Print("  place %d",r->typ[j].data.dp.place);
 
@@ -4127,7 +4130,7 @@ void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const in
   if( p != NULL )
   {
     assume( p != NULL );
-    
+
     p_Write(p, lmRing, tailRing);
 
     if( (p != NULL) && (nTerms > 0) )
@@ -4145,11 +4148,11 @@ void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const in
         m_DebugPrint(q, tailRing);
 
       if (q != NULL)
-        PrintS("...\n");    
+        PrintS("...\n");
     }
   }
   else
-    PrintS("0\n");          
+    PrintS("0\n");
 }
 
 
@@ -4478,7 +4481,7 @@ ring rAssure_HasComp(ring r)
     {
 #ifndef NDEBUG
       WarnS("error in nc_rComplete");      // cleanup?//      rDelete(res);//      return r;      // just go on..
-#endif      
+#endif
     }
   }
   assume(rIsPluralRing(r) == rIsPluralRing(new_r));
@@ -4874,7 +4877,6 @@ bool rSetISReference(const ideal F, const int i = 0, const int p = 0, const intv
 
         assume(r->typ[pos].data.is.F == NULL);
 
-        
         r->typ[pos].data.is.F = FF; // F is owened by ring now! TODO: delete at the end!
 
         if(r->typ[pos].data.is.componentWeights != NULL)
@@ -4935,9 +4937,9 @@ void rSetSyzComp(int k)
     }
     currRing->typ[0].data.syz.limit = k;
     currRing->typ[0].data.syz.curr_index++;
-      
-  } else if(
-            (currRing->typ!=NULL) && 
+  }
+  else if(
+            (currRing->typ!=NULL) &&
             (currRing->typ[0].ord_typ==ro_isTemp)
            )
   {
@@ -4945,7 +4947,8 @@ void rSetSyzComp(int k)
 #ifndef NDEBUG
     Warn("rSetSyzComp(%d) in an IS ring! Be careful!", k);
 #endif
-  } else
+  }
+  else
   if ((currRing->order[0]!=ringorder_c) && (k!=0)) // ???
   {
     dReportError("syzcomp in incompatible ring");
