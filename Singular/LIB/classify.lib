@@ -1,6 +1,6 @@
 // KK,GMG last modified: 17.12.00
 ///////////////////////////////////////////////////////////////////////////////
-version  = "$Id: classify.lib,v 1.56 2009-04-15 11:11:11 seelisch Exp $";
+version  = "$Id: classify.lib,v 1.57 2009-07-28 14:17:00 Singular Exp $";
 category="Singularities";
 info="
 LIBRARY:  classify.lib  Arnold Classifier of Singularities
@@ -77,9 +77,8 @@ EXAMPLE:  example classify; shows an example"
   list   v;
   def ring_ext = basering;
 
-  if(system("with","Namespaces")) {
-    if(defined(A_Z)==0) { proc A_Z = general_lib::A_Z; export A_Z; }
-  }
+  // Namespaces:
+  if(defined(A_Z)==0) { proc A_Z = general_lib::A_Z; export A_Z; }
   init_debug();                    // initialize trace/debug mode
   if(checkring()) { return(f_in); }
   n = nvars(basering);

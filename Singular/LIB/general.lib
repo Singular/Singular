@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.65 2009-07-28 10:34:55 Singular Exp $";
+version="$Id: general.lib,v 1.66 2009-07-28 14:17:00 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type
@@ -344,14 +344,7 @@ NOTE:    killall should never be used inside a procedure
 EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
 "
 {
-  if (system("with","Namespaces"))
-  {
-    list @marie=names(Top);
-  }
-  else
-  {
-    list @marie=names();
-  }
+  list @marie=names(Top);
   int j, no_kill, @joni;
   for ( @joni=1; @joni<=size(#);  @joni++)
   {
@@ -392,7 +385,7 @@ EXAMPLE: example killall; shows an example AND KILLS ALL YOUR VARIABLES
           }
           if (!defined(@joni)) break;
         }
-        if ((system("with","Namespaces")) && defined(General))
+        if (defined(General))
         {
           @marie=names(General);
           for ( @joni=size(@marie); @joni>0; @joni-- )
