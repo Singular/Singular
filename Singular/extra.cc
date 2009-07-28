@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.310 2009-07-28 14:18:33 Singular Exp $ */
+/* $Id: extra.cc,v 1.311 2009-07-28 15:16:04 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2069,6 +2069,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         rDebugPrint((ring)h->Data());
         return FALSE;
       }
+      else
 #endif
 /*==================== generic debug ==================================*/
 #ifdef PDEBUG
