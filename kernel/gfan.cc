@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-24 08:59:45 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.82 2009-07-24 08:59:45 monerjan Exp $
-$Id: gfan.cc,v 1.82 2009-07-24 08:59:45 monerjan Exp $
+$Date: 2009-07-28 07:46:18 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.83 2009-07-28 07:46:18 monerjan Exp $
+$Id: gfan.cc,v 1.83 2009-07-28 07:46:18 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -144,8 +144,15 @@ class facet
 			this->isFlippable=FALSE;
 		}
 		
+		/** \brief The copy constructor
+		*/
+		facet(const facet& f)
+		{
+		}
+		
 		/** The default destructor */
-		~facet(){;}
+		~facet();
+		
 		
 		/** \brief Comparison of facets*/
 		bool areEqual(facet &f, facet &g)
@@ -332,6 +339,13 @@ class facet
 		
 		friend class gcone;	//Bad style
 };
+
+facet::~facet()
+{
+	idDelete((ideal *)this->flipGB);
+	rDelete(this->flipRing);
+	//this=NULL;
+}
 
 /**
 *\brief Implements the cone structure
@@ -2196,6 +2210,9 @@ class gcone
 								
 								//update lengthOfSearchList					
  								lengthOfSearchList--;
+								slAct = slAct->next;
+								//delete deleteMarker;
+								deleteMarker=NULL;
  								break;
 							}//if(ctr==fAct->numCodim2Facets)
 							else	//facets are NOT equal
@@ -2203,8 +2220,8 @@ class gcone
 								doNotAdd=FALSE;
 								//break;
 							}
-							slAct = slAct->next;
-							delete deleteMarker;
+							//slAct = slAct->next;
+							//delete deleteMarker;							
 						}//if(!isParallel(fNormal, slNormal))
 						/* NOTE The following lines must not be here but rather called inside the if-block above.
 						Otherwise results get crappy. Unfortunately there are two slAct=slAct->next calls now,
