@@ -90,7 +90,7 @@ endif
 
 # normal C++ source files
 CXXSOURCES=clapconv.cc \
-    clapsing.cc mminit.cc\
+    clapsing.cc \
     febase.cc feread.cc feResource.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
     sca.cc gring.cc gr_kstd2.cc summator.cc ncSAMult.cc ncSACache.cc ncSAFormula.cc \
