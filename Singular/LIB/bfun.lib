@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: bfun.lib,v 1.10 2009-07-07 20:46:51 levandov Exp $";
+version="$Id: bfun.lib,v 1.11 2009-07-28 10:19:59 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: bfun.lib     Algorithms for b-functions and Bernstein-Sato polynomial
