@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.207 2009-06-04 09:58:49 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.208 2009-07-28 14:18:34 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -262,61 +262,6 @@ void killlocals_list(lists l,int v)
       killlocals0(v,&(((ring)(l->m[i].data))->idroot),currRing);
   }
 }
-#ifndef HAVE_NS
-void killlocals(int v)
-{
-  killlocals0(v,&IDROOT,currRing);
-
-  if ((iiRETURNEXPR_len > myynest)
-  && ((iiRETURNEXPR[myynest].Typ()==RING_CMD)
-    || (iiRETURNEXPR[myynest].Typ()==QRING_CMD)))
-  {
-    leftv h=&iiRETURNEXPR[myynest];
-    killlocals0(v,&(((ring)h->data)->idroot),(ring)h->data);
-  }
-
-  idhdl sh=currRingHdl;
-  ring sr=currRing;
-  BOOLEAN changed=FALSE;
-  idhdl h = IDROOT;
-
-//  Print("killlocals in %s\n",IDID(currPackHdl));
-  while (h!=NULL)
-  {
-    if (((IDTYP(h)==QRING_CMD) || (IDTYP(h) == RING_CMD))
-    && (IDRING(h)->idroot!=NULL))
-    {
-      if (IDRING(h)!=currRing) {changed=TRUE;rSetHdl(h);}
-      killlocals0(v,&(IDRING(h)->idroot),IDRING(h));
-    }
-    else if (IDTYP(h) == PACKAGE_CMD)
-    {
-      killlocals0(v,&(IDPACKAGE(h)->idroot),IDRING(h));
-    }
-    else if (IDTYP(h) == LIST_CMD)
-    {
-      killlocals_list(IDLIST(h),v);
-    }
-    h = IDNEXT(h);
-  }
-  if (changed)
-  {
-    currRing=NULL;
-    currRingHdl=NULL;
-    if (sh!=NULL) rSetHdl(sh);
-    else if (sr!=NULL)
-    {
-      sh=rFindHdl(sr,NULL,NULL);
-      rSetHdl(sh);
-    }
-  }
-
-  if (myynest<=1) iiNoKeepRing=TRUE;
-  //Print("end killlocals  >= %d\n",v);
-  //listall();
-}
-#endif
-#ifdef HAVE_NS
 void killlocals_rec(idhdl *root,int v, ring r)
 {
   idhdl h=*root;
@@ -413,7 +358,6 @@ void killlocals(int v)
   //Print("end killlocals  >= %d\n",v);
   //listall();
 }
-#endif
 
 void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOOLEAN fullname)
 {
@@ -428,11 +372,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
     if (strcmp(what,"all")==0)
     {
       really_all=TRUE;
-#ifdef HAVE_NS
       h=basePack->idroot;
-#else
-      h=IDROOT;
-#endif
     }
     else
     {
@@ -442,9 +382,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
         if (iterate) list1(prefix,h,TRUE,fullname);
         if ((IDTYP(h)==RING_CMD)
             || (IDTYP(h)==QRING_CMD)
-#ifdef HAVE_NS
             //|| (IDTYP(h)==PACKE_CMD)
-#endif
         )
         {
           h=IDRING(h)->idroot;
@@ -486,7 +424,6 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
       {
         list_cmd(0,IDID(h),"//      ",FALSE);
       }
-#ifdef HAVE_NS
       if (IDTYP(h)==PACKAGE_CMD && really_all)
       {
         package save_p=currPack;
@@ -494,7 +431,6 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
         list_cmd(0,IDID(h),"//      ",FALSE);
         currPack=save_p;
       }
-#endif /* HAVE_NS */
     }
     h = IDNEXT(h);
   }
@@ -667,7 +603,6 @@ leftv iiMap(map theMap, const char * what)
   nMapFunc nMap;
 
   r=IDROOT->get(theMap->preimage,myynest);
-#ifdef HAVE_NS
   if ((currPack!=basePack)
   &&((r==NULL) || ((r->typ != RING_CMD) && (r->typ != QRING_CMD))))
     r=basePack->idroot->get(theMap->preimage,myynest);
@@ -676,7 +611,6 @@ leftv iiMap(map theMap, const char * what)
   {
     r=currRingHdl;
   }
-#endif /* HAVE_NS */
   if ((r!=NULL) && ((r->typ == RING_CMD) || (r->typ== QRING_CMD)))
   {
     //if ((nMap=nSetMap(rInternalChar(IDRING(r)),
@@ -1242,7 +1176,6 @@ static BOOLEAN iiInternalExport (leftv v, int toLev)
   return FALSE;
 }
 
-#ifdef HAVE_NS
 BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
 {
   idhdl h=(idhdl)v->data;
@@ -1290,14 +1223,11 @@ BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl)
   }
   return FALSE;
 }
-#endif /* HAVE_NS */
 
 BOOLEAN iiExport (leftv v, int toLev)
 {
-#ifdef HAVE_NS
 #ifndef NDEBUG
   checkall();
-#endif
 #endif
   BOOLEAN nok=FALSE;
   leftv r=v;
@@ -1319,16 +1249,13 @@ BOOLEAN iiExport (leftv v, int toLev)
     v=v->next;
   }
   r->CleanUp();
-#ifdef HAVE_NS
 #ifndef NDEBUG
   checkall();
-#endif
 #endif
   return nok;
 }
 
 /*assume root!=idroot*/
-#ifdef HAVE_NS
 BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 {
 #ifndef NDEBUG
@@ -1386,7 +1313,6 @@ BOOLEAN iiExport (leftv v, int toLev, idhdl root)
 #endif
   return nok;
 }
-#endif
 
 BOOLEAN iiCheckRing(int i)
 {
@@ -1432,7 +1358,6 @@ poly    iiHighCorner(ideal I, int ak)
   return po;
 }
 
-#ifdef HAVE_NS
 void iiCheckPack(package &p)
 {
   if (p==basePack) return;
@@ -1448,7 +1373,6 @@ void iiCheckPack(package &p)
   }
   return;
 }
-#endif
 
 idhdl rDefault(const char *s)
 {
@@ -1501,7 +1425,6 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
 {
   idhdl h=rSimpleFindHdl(r,IDROOT,n);
   if (h!=NULL)  return h;
-#ifdef HAVE_NS
   if (IDROOT!=basePack->idroot) h=rSimpleFindHdl(r,basePack->idroot,n);
   if (h!=NULL)  return h;
   proclevel *p=procstack;
@@ -1521,7 +1444,6 @@ idhdl rFindHdl(ring r, idhdl n, idhdl w)
     if (h!=NULL)  return h;
     tmp=IDNEXT(tmp);
   }
-#endif
   return NULL;
 }
 

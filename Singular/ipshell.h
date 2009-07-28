@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.h,v 1.54 2009-07-13 16:35:56 Singular Exp $ */
+/* $Id: ipshell.h,v 1.55 2009-07-28 14:18:34 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -53,10 +53,8 @@ int     IsPrime(int i);
 
 BOOLEAN iiWRITE(leftv res,leftv exprlist);
 BOOLEAN iiExport(leftv v, int toLev);
-#ifdef HAVE_NS
 BOOLEAN iiExport(leftv v, int toLev, idhdl roothdl);
 BOOLEAN iiInternalExport (leftv v, int toLev, idhdl roothdl);
-#endif /* HAVE_NS */
 char *  iiGetLibName(procinfov v);
 char *  iiGetLibProcBuffer( procinfov pi, int part=1 );
 char *  iiProcName(char *buf, char & ct, char* &e);
@@ -177,11 +175,7 @@ BOOLEAN iiParameter(leftv p);
 /* ================================================================== */
 int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);
-#ifdef HAVE_NS
 sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl);
-#else /* HAVE_NS */
-sleftv * iiMake_proc(idhdl pn, sleftv* sl);
-#endif /* HAVE_NS */
 // from misc.cc:
 char *  showOption();
 BOOLEAN setOption(leftv res, leftv v);
@@ -192,12 +186,10 @@ void  singular_example(char *str);
 
 BOOLEAN iiTryLoadLib(leftv v, const char *id);
 
-#ifdef HAVE_NS
 void listall(int showproc=1);
 void iiCheckPack(package &p);
 #ifndef NDEBUG
 void checkall();
-#endif
 #endif
 #endif
 

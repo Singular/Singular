@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.129 2009-02-27 17:25:22 Singular Exp $ */
+/* $Id: grammar.y,v 1.130 2009-07-28 14:18:34 Singular Exp $ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */
@@ -179,7 +179,8 @@ void yyerror(const char * fmt)
   {
     Werror("leaving %s",VoiceName());
   }
-  #ifdef HAVE_LIBFAC_P
+  #ifdef HAVE_FACTORY
+  // libfac:
   extern int libfac_interruptflag;
   libfac_interruptflag=0;
   #endif
@@ -893,21 +894,13 @@ currring_lists:
 declare_ip_variable:
         ROOT_DECL elemexpr
           {
-            #ifdef HAVE_NS
             if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
-            #endif
           }
         | ROOT_DECL_LIST elemexpr
           {
-            #ifdef HAVE_NS
             if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
-            #endif
           }
         | RING_DECL elemexpr
           {
@@ -945,12 +938,8 @@ declare_ip_variable:
               MYYERROR("rows must be greater than 0");
             if (c < 0)
               MYYERROR("cols must be greater than -1");
-            #ifdef HAVE_NS
             if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
-            #endif
             leftv v=&$$;
             idhdl h=(idhdl)v->data;
             delete IDINTVEC(h);
@@ -959,12 +948,8 @@ declare_ip_variable:
           }
         | INTMAT_CMD elemexpr
           {
-            #ifdef HAVE_NS
             if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
-            #endif
             leftv v=&$$;
             idhdl h;
             do
@@ -987,12 +972,8 @@ declare_ip_variable:
             }
             else
             {
-              #ifdef HAVE_NS
               if (iiDeclCommand(&r,&$3,myynest,t,&($3.req_packhdl->idroot)))
                 YYERROR;
-              #else
-              if (iiDeclCommand(&r,&$3,myynest,t,&IDROOT)) YYERROR;
-              #endif
             }
             leftv v=&$1;
             while (v->next!=NULL) v=v->next;
@@ -1002,12 +983,8 @@ declare_ip_variable:
           }
         | PROC_CMD elemexpr
           {
-            #ifdef HAVE_NS
             if (iiDeclCommand(&$$,&$2,myynest,$1,&($2.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&$$,&$2,myynest,$1,&IDROOT)) YYERROR;
-            #endif
           }
         ;
 
@@ -1152,13 +1129,11 @@ examplecmd:
 exportcmd:
         EXPORT_CMD exprlist
         {
-#ifdef HAVE_NS
           if (basePack!=$2.req_packhdl)
           {
             if(iiExport(&$2,0,currPackHdl)) YYERROR;
           }
           else
-#endif /* HAVE_NS */
             if (iiExport(&$2,0)) YYERROR;
         }
         ;
@@ -1177,11 +1152,7 @@ killcmd:
           }
           else
           {
-            #ifdef HAVE_NS
             killhdl((idhdl)v->data,v->req_packhdl);
-            #else
-            killhdl((idhdl)v->data);
-            #endif
           }
         }
         | killcmd ',' elemexpr
@@ -1197,11 +1168,7 @@ killcmd:
           }
           else
           {
-            #ifdef HAVE_NS
             killhdl((idhdl)v->data,v->req_packhdl);
-            #else
-            killhdl((idhdl)v->data);
-            #endif
           }
         }
         ;
@@ -1247,83 +1214,56 @@ listcmd:
           }
         | LISTVAR_CMD '(' elemexpr ',' ROOT_DECL ')'
           {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' elemexpr ',' ROOT_DECL_LIST ')'
           {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' elemexpr ',' RING_DECL ')'
           {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' elemexpr ',' currring_lists ')'
           {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' elemexpr ',' RING_CMD ')'
           {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' elemexpr ',' MATRIX_CMD ')'
           {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' elemexpr ',' INTMAT_CMD ')'
           {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             $3.CleanUp();
           }
         | LISTVAR_CMD '(' elemexpr ',' PROC_CMD ')'
           {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if($3.Typ() == PACKAGE_CMD)
               list_cmd($5,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             $3.CleanUp();
           }
         //| LISTVAR_CMD '(' elemexpr ',' elemexpr ')'
         //  {
-        //#ifdef HAVE_NS
-        //    //PrintS("?????\n");
         //    //if($3.Typ() == PACKAGE_CMD)
         //    //  list_cmd($5,NULL,"// ",TRUE);
-        //#endif /* HAVE_NS */
         //    $3.CleanUp();
         //  }
         | LISTVAR_CMD '(' ')'
@@ -1352,12 +1292,8 @@ ringcmd:
 
             if (b!=NULL)
             {
-              #ifdef HAVE_NS
                 newRingHdl=enterid(ring_name, myynest, RING_CMD,
                                    &($2.req_packhdl->idroot));
-              #else
-                newRingHdl=enterid(ring_name, myynest, RING_CMD, &IDROOT);
-              #endif
               $2.CleanUp();
               if (newRingHdl!=NULL)
               {

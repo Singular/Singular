@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipassign.cc,v 1.105 2009-05-04 15:06:15 Singular Exp $ */
+/* $Id: ipassign.cc,v 1.106 2009-07-28 14:18:34 Singular Exp $ */
 
 /*
 * ABSTRACT: interpreter:
@@ -1617,7 +1617,6 @@ BOOLEAN iiAssign(leftv l, leftv r)
 }
 BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
 {
-  #ifdef HAVE_NS
   //Print("importfrom %s::%s ->.\n",v->Name(),u->Name() );
   assume(u->Typ()==PACKAGE_CMD);
   char *vn=(char *)v->Name();
@@ -1650,6 +1649,5 @@ BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
     Werror("`%s` not found in `%s`",v->Name(), u->Name());
     return TRUE;
   }
-#endif
   return FALSE;
 }

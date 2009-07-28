@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.l,v 1.62 2008-03-19 17:44:36 Singular Exp $ */
+/* $Id: libparse.l,v 1.63 2009-07-28 14:18:35 Singular Exp $ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -89,9 +89,7 @@ void main_init(int argc, char *argv[]);
 void main_result(char *libname);
 #else /* STANDALONE_PARSER */
 idhdl h0;
-#ifdef HAVE_NS
 idhdl h_top;
-#endif
 #define pi IDPROC(h0)
 extern "C"
 {
@@ -148,16 +146,9 @@ do                                            \
 while(0)
 
 #undef YY_DECL
-#ifdef HAVE_NS
 #define YY_DECL int yylex(char *newlib, char *libfile, \
                            lib_style_types *lib_style, \
                            idhdl pl, BOOLEAN autoexport, lp_modes mode)
-#else
-#define YY_DECL int yylex(char *newlib, char *libfile, \
-                           lib_style_types *lib_style, \
-                           lp_modes mode)
-#endif /* HAVE_NS */
-
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
           if ( ((result = libread( (yyin), (char *) buf, max_size )) < 0 ) \
@@ -327,7 +318,6 @@ static     { p_static=TRUE; }
              #else /*STANDALONE_PARSER*/
              if( mode == LOAD_LIB)
              {
-               #ifdef HAVE_NS
                h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
                                  &(IDPACKAGE(pl)->idroot), TRUE);
                if (h0==NULL) return(1);
@@ -340,16 +330,11 @@ static     { p_static=TRUE; }
                   currPack=save;
                   if (h_top==NULL) return(1);
                }
-               #else
-               h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
-                                   &IDROOT, TRUE );
-               #endif /* HAVE_NS */
                /* omCheckAddr(IDID(h0)); */
                if (h0!=NULL)
                {
                  iiInitSingularProcinfo(IDPROC(h0), newlib, proc,
                                 yylplineno, current_pos(0),p_static);
-                 #ifdef HAVE_NS
                  if ((!p_static) && (h_top != NULL) && autoexport)
                  {
                    if(IDPROC(h_top)!=NULL) piCleanUp((procinfo *)IDPROC(h_top));
@@ -357,7 +342,6 @@ static     { p_static=TRUE; }
                    IDPROC(h_top)->ref++;
                  }
                  IDPROC(h0)->pack=IDPACKAGE(pl);
-                 #endif /* HAVE_NS */
                  if (BVERBOSE(V_LOAD_PROC))
                    Warn( "     proc '%s' registered", proc );
                }
@@ -981,7 +965,8 @@ main( int argc, char *argv[] )
 {
   lib_style_types lib_style;
   main_init(argc, argv);
-  if(yyin == NULL) {
+  if(yyin == NULL)
+  {
     fprintf(stderr, "No library found to parse.\n");
     exit(1);
   }
@@ -995,12 +980,9 @@ main( int argc, char *argv[] )
             "function", "line", "start-eod", "line", "body-eob",
             "line", "example-eoe");
   }
-#ifdef HAVE_NS
   yylplex(argv[0], argv[0], &lib_style,NULL);
-#else
-  yylplex(argv[0], argv[0], &lib_style);
-#endif
-  if(yylp_errno) {
+  if(yylp_errno)
+  {
     printf("ERROR occured: [%d] ", yylp_errno);
     printf(yylp_errlist[yylp_errno], yylplineno);
     printf("\n");

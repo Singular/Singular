@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: subexpr.h,v 1.36 2008-03-19 17:44:37 Singular Exp $ */
+/* $Id: subexpr.h,v 1.37 2009-07-28 14:19:05 Singular Exp $ */
 /*
 * ABSTRACT: handling of leftv
 */
@@ -52,10 +52,8 @@ class sleftv
                   * ....
                   */
     Subexpr e;    /* holds the indices for indexed values */
-#ifdef HAVE_NS
     package     packhdl;
     package     req_packhdl;
-#endif /* HAVE_NS */
     inline void Init() { memset(this,0,sizeof(*this)); }
     void Set(int val);
     void Print(leftv store=NULL,int spaces=0);

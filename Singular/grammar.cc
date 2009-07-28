@@ -258,10 +258,10 @@ void yyerror(const char * fmt)
     { /* omit output of line number if tclmode and stdin */
       const char *n=VoiceName();
       if (strcmp(n,"STDIN")==0)
-        Werror( "error occurred in %s: `%s`"
+        Werror( "error occurred in or before %s: `%s`"
                ,n, my_yylinebuf);
       else
-        Werror( "error occurred in %s line %d: `%s`"
+        Werror( "error occurred in or before %s line %d: `%s`"
                ,n, yylineno, my_yylinebuf);
     }
     else
@@ -271,7 +271,7 @@ void yyerror(const char * fmt)
       && (strncmp(fmt,"parse",5)!=0)
       && (strncmp(fmt,"syntax",6)!=0))
         WerrorS(fmt);
-      Werror( "error occurred in %s line %d: `%s`"
+      Werror( "error occurred in or before %s line %d: `%s`"
              ,VoiceName(), yylineno, my_yylinebuf);
     }
     if (cmdtok!=0)
@@ -302,7 +302,8 @@ void yyerror(const char * fmt)
   {
     Werror("leaving %s",VoiceName());
   }
-  #ifdef HAVE_LIBFAC_P
+  #ifdef HAVE_FACTORY
+  // libfac:
   extern int libfac_interruptflag;
   libfac_interruptflag=0;
   #endif
@@ -463,23 +464,23 @@ static const short yyrhs[] = {    -1,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   365,   367,   401,   403,   405,   407,   411,   416,   418,   466,
-   467,   468,   469,   470,   471,   472,   473,   477,   480,   481,
-   482,   483,   484,   485,   486,   487,   488,   491,   497,   503,
-   507,   511,   515,   535,   563,   587,   593,   601,   613,   619,
-   624,   625,   626,   630,   634,   638,   642,   646,   650,   654,
-   658,   662,   666,   670,   674,   678,   682,   686,   690,   694,
-   698,   702,   706,   710,   714,   718,   722,   726,   730,   734,
-   738,   742,   759,   765,   777,   785,   793,   798,   802,   806,
-   810,   814,   818,   822,   826,   830,   834,   838,   842,   849,
-   855,   857,   875,   877,   888,   889,   893,   903,   912,   916,
-   920,   936,   940,   960,   978,  1003,  1014,  1018,  1020,  1033,
-  1041,  1051,  1095,  1097,  1105,  1107,  1113,  1124,  1129,  1132,
-  1138,  1144,  1152,  1166,  1187,  1209,  1214,  1218,  1223,  1227,
-  1231,  1235,  1239,  1243,  1248,  1257,  1266,  1275,  1284,  1293,
-  1302,  1311,  1329,  1335,  1339,  1382,  1391,  1405,  1405,  1407,
-  1483,  1490,  1519,  1532,  1549,  1558,  1563,  1570,  1582,  1601,
-  1613,  1633,  1656,  1663,  1674,  1682
+   366,   368,   402,   404,   406,   408,   412,   417,   419,   467,
+   468,   469,   470,   471,   472,   473,   474,   478,   481,   482,
+   483,   484,   485,   486,   487,   488,   489,   492,   498,   504,
+   508,   512,   516,   536,   564,   588,   594,   602,   614,   620,
+   625,   626,   627,   631,   635,   639,   643,   647,   651,   655,
+   659,   663,   667,   671,   675,   679,   683,   687,   691,   695,
+   699,   703,   707,   711,   715,   719,   723,   727,   731,   735,
+   739,   743,   760,   766,   778,   786,   794,   799,   803,   807,
+   811,   815,   819,   823,   827,   831,   835,   839,   843,   850,
+   856,   858,   876,   878,   889,   890,   894,   900,   905,   909,
+   913,   929,   933,   949,   963,   984,   991,   995,   997,  1010,
+  1018,  1028,  1072,  1074,  1082,  1084,  1090,  1101,  1106,  1109,
+  1115,  1121,  1129,  1141,  1158,  1176,  1181,  1185,  1190,  1194,
+  1198,  1202,  1206,  1210,  1215,  1221,  1227,  1233,  1239,  1245,
+  1251,  1257,  1269,  1275,  1279,  1318,  1327,  1341,  1341,  1343,
+  1419,  1426,  1455,  1468,  1485,  1494,  1499,  1506,  1518,  1537,
+  1549,  1569,  1592,  1599,  1610,  1618
 };
 #endif
 
@@ -1577,7 +1578,7 @@ yyreduce:
   switch (yyn) {
 
 case 2:
-#line 368 "grammar.y"
+#line 369 "grammar.y"
 {
             if (timerv)
             {
@@ -1611,32 +1612,32 @@ case 2:
           ;
     break;}
 case 4:
-#line 404 "grammar.y"
+#line 405 "grammar.y"
 {currentVoice->ifsw=0;;
     break;}
 case 5:
-#line 406 "grammar.y"
+#line 407 "grammar.y"
 { yyvsp[-1].lv.CleanUp(); currentVoice->ifsw=0;;
     break;}
 case 6:
-#line 408 "grammar.y"
+#line 409 "grammar.y"
 {
             YYACCEPT;
           ;
     break;}
 case 7:
-#line 412 "grammar.y"
+#line 413 "grammar.y"
 {
             currentVoice->ifsw=0;
             iiDebug();
           ;
     break;}
 case 8:
-#line 417 "grammar.y"
+#line 418 "grammar.y"
 {currentVoice->ifsw=0;;
     break;}
 case 9:
-#line 419 "grammar.y"
+#line 420 "grammar.y"
 {
             #ifdef SIQ
             siq=0;
@@ -1684,46 +1685,46 @@ case 9:
           ;
     break;}
 case 17:
-#line 474 "grammar.y"
+#line 475 "grammar.y"
 {if (currentVoice!=NULL) currentVoice->ifsw=0;;
     break;}
 case 18:
-#line 477 "grammar.y"
+#line 478 "grammar.y"
 { omFree((ADDRESS)yyvsp[0].name); ;
     break;}
 case 28:
-#line 492 "grammar.y"
+#line 493 "grammar.y"
 {
             if(iiAssign(&yyvsp[-1].lv,&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 29:
-#line 499 "grammar.y"
+#line 500 "grammar.y"
 {
             if (currRing==NULL) MYYERROR("no ring active");
             syMake(&yyval.lv,omStrDup(yyvsp[0].name));
           ;
     break;}
 case 30:
-#line 504 "grammar.y"
+#line 505 "grammar.y"
 {
             syMake(&yyval.lv,yyvsp[0].name);
           ;
     break;}
 case 31:
-#line 508 "grammar.y"
+#line 509 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv, &yyvsp[-2].lv, COLONCOLON, &yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 32:
-#line 512 "grammar.y"
+#line 513 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-2].lv,'(')) YYERROR;
           ;
     break;}
 case 33:
-#line 516 "grammar.y"
+#line 517 "grammar.y"
 {
             if (yyvsp[-3].lv.rtyp==LIB_CMD)
             {
@@ -1745,7 +1746,7 @@ case 33:
           ;
     break;}
 case 34:
-#line 536 "grammar.y"
+#line 537 "grammar.y"
 {
             if (currRingHdl==NULL) MYYERROR("no ring active");
             int j = 0;
@@ -1775,7 +1776,7 @@ case 34:
           ;
     break;}
 case 35:
-#line 564 "grammar.y"
+#line 565 "grammar.y"
 {
             memset(&yyval.lv,0,sizeof(yyval.lv));
             int i = atoi(yyvsp[0].name);
@@ -1801,7 +1802,7 @@ case 35:
           ;
     break;}
 case 36:
-#line 588 "grammar.y"
+#line 589 "grammar.y"
 {
             memset(&yyval.lv,0,sizeof(yyval.lv));
             yyval.lv.rtyp = yyvsp[0].i;
@@ -1809,7 +1810,7 @@ case 36:
           ;
     break;}
 case 37:
-#line 594 "grammar.y"
+#line 595 "grammar.y"
 {
             memset(&yyval.lv,0,sizeof(yyval.lv));
             yyval.lv.rtyp  = STRING_CMD;
@@ -1817,7 +1818,7 @@ case 37:
           ;
     break;}
 case 38:
-#line 603 "grammar.y"
+#line 604 "grammar.y"
 {
             leftv v = &yyvsp[-2].lv;
             while (v->next!=NULL)
@@ -1830,202 +1831,202 @@ case 38:
           ;
     break;}
 case 39:
-#line 614 "grammar.y"
+#line 615 "grammar.y"
 {
             yyval.lv = yyvsp[0].lv;
           ;
     break;}
 case 40:
-#line 620 "grammar.y"
+#line 621 "grammar.y"
 {
             /*if ($1.typ == eunknown) YYERROR;*/
             yyval.lv = yyvsp[0].lv;
           ;
     break;}
 case 41:
-#line 624 "grammar.y"
+#line 625 "grammar.y"
 { yyval.lv = yyvsp[0].lv; ;
     break;}
 case 42:
-#line 625 "grammar.y"
+#line 626 "grammar.y"
 { yyval.lv = yyvsp[-1].lv; ;
     break;}
 case 43:
-#line 627 "grammar.y"
+#line 628 "grammar.y"
 {
             if(iiExprArith3(&yyval.lv,'[',&yyvsp[-5].lv,&yyvsp[-3].lv,&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 44:
-#line 631 "grammar.y"
+#line 632 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-3].lv,'[',&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 45:
-#line 635 "grammar.y"
+#line 636 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 46:
-#line 639 "grammar.y"
+#line 640 "grammar.y"
 {
             if(iiExprArithM(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 47:
-#line 643 "grammar.y"
+#line 644 "grammar.y"
 {
             if(iiExprArithM(&yyval.lv,NULL,yyvsp[-2].i)) YYERROR;
           ;
     break;}
 case 48:
-#line 647 "grammar.y"
+#line 648 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 49:
-#line 651 "grammar.y"
+#line 652 "grammar.y"
 {
             if(iiExprArithM(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 50:
-#line 655 "grammar.y"
+#line 656 "grammar.y"
 {
             if(iiExprArithM(&yyval.lv,NULL,yyvsp[-2].i)) YYERROR;
           ;
     break;}
 case 51:
-#line 659 "grammar.y"
+#line 660 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 52:
-#line 663 "grammar.y"
+#line 664 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-3].lv,yyvsp[-5].i,&yyvsp[-1].lv,TRUE)) YYERROR;
           ;
     break;}
 case 53:
-#line 667 "grammar.y"
+#line 668 "grammar.y"
 {
             if(iiExprArith3(&yyval.lv,yyvsp[-7].i,&yyvsp[-5].lv,&yyvsp[-3].lv,&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 54:
-#line 671 "grammar.y"
+#line 672 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-3].lv,yyvsp[-5].i,&yyvsp[-1].lv,TRUE)) YYERROR;
           ;
     break;}
 case 55:
-#line 675 "grammar.y"
+#line 676 "grammar.y"
 {
             if(iiExprArith3(&yyval.lv,yyvsp[-7].i,&yyvsp[-5].lv,&yyvsp[-3].lv,&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 56:
-#line 679 "grammar.y"
+#line 680 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 57:
-#line 683 "grammar.y"
+#line 684 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 58:
-#line 687 "grammar.y"
+#line 688 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-3].lv,yyvsp[-5].i,&yyvsp[-1].lv,TRUE)) YYERROR;
           ;
     break;}
 case 59:
-#line 691 "grammar.y"
+#line 692 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 60:
-#line 695 "grammar.y"
+#line 696 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-3].lv,yyvsp[-5].i,&yyvsp[-1].lv,TRUE)) YYERROR;
           ;
     break;}
 case 61:
-#line 699 "grammar.y"
+#line 700 "grammar.y"
 {
             if(iiExprArith3(&yyval.lv,yyvsp[-7].i,&yyvsp[-5].lv,&yyvsp[-3].lv,&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 62:
-#line 703 "grammar.y"
+#line 704 "grammar.y"
 {
             if(iiExprArith3(&yyval.lv,yyvsp[-7].i,&yyvsp[-5].lv,&yyvsp[-3].lv,&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 63:
-#line 707 "grammar.y"
+#line 708 "grammar.y"
 {
             if(iiExprArithM(&yyval.lv,NULL,yyvsp[-2].i)) YYERROR;
           ;
     break;}
 case 64:
-#line 711 "grammar.y"
+#line 712 "grammar.y"
 {
             if(iiExprArithM(&yyval.lv,&yyvsp[-1].lv,yyvsp[-3].i)) YYERROR;
           ;
     break;}
 case 65:
-#line 715 "grammar.y"
+#line 716 "grammar.y"
 {
             if(iiExprArith3(&yyval.lv,MATRIX_CMD,&yyvsp[-5].lv,&yyvsp[-3].lv,&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 66:
-#line 719 "grammar.y"
+#line 720 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,MATRIX_CMD)) YYERROR;
           ;
     break;}
 case 67:
-#line 723 "grammar.y"
+#line 724 "grammar.y"
 {
             if(iiExprArith3(&yyval.lv,INTMAT_CMD,&yyvsp[-5].lv,&yyvsp[-3].lv,&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 68:
-#line 727 "grammar.y"
+#line 728 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,INTMAT_CMD)) YYERROR;
           ;
     break;}
 case 69:
-#line 731 "grammar.y"
+#line 732 "grammar.y"
 {
             if(iiExprArith3(&yyval.lv,RING_CMD,&yyvsp[-5].lv,&yyvsp[-3].lv,&yyvsp[-1].lv)) YYERROR;
           ;
     break;}
 case 70:
-#line 735 "grammar.y"
+#line 736 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,RING_CMD)) YYERROR;
           ;
     break;}
 case 71:
-#line 739 "grammar.y"
+#line 740 "grammar.y"
 {
             yyval.lv=yyvsp[-1].lv;
           ;
     break;}
 case 72:
-#line 743 "grammar.y"
+#line 744 "grammar.y"
 {
             #ifdef SIQ
             siq++;
@@ -2044,7 +2045,7 @@ case 72:
           ;
     break;}
 case 73:
-#line 760 "grammar.y"
+#line 761 "grammar.y"
 {
             #ifdef SIQ
             siq--;
@@ -2052,7 +2053,7 @@ case 73:
           ;
     break;}
 case 74:
-#line 766 "grammar.y"
+#line 767 "grammar.y"
 {
             #ifdef SIQ
             if (siq<=0) yyvsp[-1].lv.Eval();
@@ -2064,7 +2065,7 @@ case 74:
           ;
     break;}
 case 75:
-#line 778 "grammar.y"
+#line 779 "grammar.y"
 {
             #ifdef SIQ
             siq++;
@@ -2072,7 +2073,7 @@ case 75:
           ;
     break;}
 case 76:
-#line 786 "grammar.y"
+#line 787 "grammar.y"
 {
             #ifdef SIQ
             siq--;
@@ -2080,79 +2081,79 @@ case 76:
           ;
     break;}
 case 77:
-#line 795 "grammar.y"
+#line 796 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,PLUSPLUS)) YYERROR;
           ;
     break;}
 case 78:
-#line 799 "grammar.y"
+#line 800 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[-1].lv,MINUSMINUS)) YYERROR;
           ;
     break;}
 case 79:
-#line 803 "grammar.y"
+#line 804 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,'+',&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 80:
-#line 807 "grammar.y"
+#line 808 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,'-',&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 81:
-#line 811 "grammar.y"
+#line 812 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,yyvsp[-1].i,&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 82:
-#line 815 "grammar.y"
+#line 816 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,'^',&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 83:
-#line 819 "grammar.y"
+#line 820 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,yyvsp[-1].i,&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 84:
-#line 823 "grammar.y"
+#line 824 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,yyvsp[-1].i,&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 85:
-#line 827 "grammar.y"
+#line 828 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,NOTEQUAL,&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 86:
-#line 831 "grammar.y"
+#line 832 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,EQUAL_EQUAL,&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 87:
-#line 835 "grammar.y"
+#line 836 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,DOTDOT,&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 88:
-#line 839 "grammar.y"
+#line 840 "grammar.y"
 {
             if(iiExprArith2(&yyval.lv,&yyvsp[-2].lv,':',&yyvsp[0].lv)) YYERROR;
           ;
     break;}
 case 89:
-#line 843 "grammar.y"
+#line 844 "grammar.y"
 {
             memset(&yyval.lv,0,sizeof(yyval.lv));
             int i; TESTSETINT(yyvsp[0].lv,i);
@@ -2161,17 +2162,17 @@ case 89:
           ;
     break;}
 case 90:
-#line 850 "grammar.y"
+#line 851 "grammar.y"
 {
             if(iiExprArith1(&yyval.lv,&yyvsp[0].lv,'-')) YYERROR;
           ;
     break;}
 case 91:
-#line 856 "grammar.y"
+#line 857 "grammar.y"
 { yyval.lv = yyvsp[-1].lv; ;
     break;}
 case 92:
-#line 858 "grammar.y"
+#line 859 "grammar.y"
 {
             if (yyvsp[-1].lv.rtyp==0)
             {
@@ -2188,7 +2189,7 @@ case 92:
           ;
     break;}
 case 94:
-#line 878 "grammar.y"
+#line 879 "grammar.y"
 {
             if (yyvsp[-1].lv.Typ()!=STRING_CMD)
             {
@@ -2199,41 +2200,33 @@ case 94:
           ;
     break;}
 case 97:
-#line 895 "grammar.y"
+#line 896 "grammar.y"
 {
-            #ifdef HAVE_NS
             if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&(yyvsp[0].lv.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&IDROOT)) YYERROR;
-            #endif
           ;
     break;}
 case 98:
-#line 904 "grammar.y"
+#line 901 "grammar.y"
 {
-            #ifdef HAVE_NS
             if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&(yyvsp[0].lv.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&IDROOT)) YYERROR;
-            #endif
           ;
     break;}
 case 99:
-#line 913 "grammar.y"
+#line 906 "grammar.y"
 {
             if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&(currRing->idroot), TRUE)) YYERROR;
           ;
     break;}
 case 100:
-#line 917 "grammar.y"
+#line 910 "grammar.y"
 {
             if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&(currRing->idroot), TRUE)) YYERROR;
           ;
     break;}
 case 101:
-#line 921 "grammar.y"
+#line 914 "grammar.y"
 {
             if (iiDeclCommand(&yyval.lv,&yyvsp[-6].lv,myynest,yyvsp[-7].i,&(currRing->idroot), TRUE)) YYERROR;
             int r; TESTSETINT(yyvsp[-4].lv,r);
@@ -2251,13 +2244,13 @@ case 101:
           ;
     break;}
 case 102:
-#line 937 "grammar.y"
+#line 930 "grammar.y"
 {
             if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&(currRing->idroot), TRUE)) YYERROR;
           ;
     break;}
 case 103:
-#line 941 "grammar.y"
+#line 934 "grammar.y"
 {
             int r; TESTSETINT(yyvsp[-4].lv,r);
             int c; TESTSETINT(yyvsp[-1].lv,c);
@@ -2265,12 +2258,8 @@ case 103:
               MYYERROR("rows must be greater than 0");
             if (c < 0)
               MYYERROR("cols must be greater than -1");
-            #ifdef HAVE_NS
             if (iiDeclCommand(&yyval.lv,&yyvsp[-6].lv,myynest,yyvsp[-7].i,&(yyvsp[-6].lv.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&yyval.lv,&yyvsp[-6].lv,myynest,yyvsp[-7].i,&IDROOT)) YYERROR;
-            #endif
             leftv v=&yyval.lv;
             idhdl h=(idhdl)v->data;
             delete IDINTVEC(h);
@@ -2279,14 +2268,10 @@ case 103:
           ;
     break;}
 case 104:
-#line 961 "grammar.y"
+#line 950 "grammar.y"
 {
-            #ifdef HAVE_NS
             if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&(yyvsp[0].lv.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&IDROOT)) YYERROR;
-            #endif
             leftv v=&yyval.lv;
             idhdl h;
             do
@@ -2299,7 +2284,7 @@ case 104:
           ;
     break;}
 case 105:
-#line 979 "grammar.y"
+#line 964 "grammar.y"
 {
             int t=yyvsp[-2].lv.Typ();
             sleftv r;
@@ -2311,12 +2296,8 @@ case 105:
             }
             else
             {
-              #ifdef HAVE_NS
               if (iiDeclCommand(&r,&yyvsp[0].lv,myynest,t,&(yyvsp[0].lv.req_packhdl->idroot)))
                 YYERROR;
-              #else
-              if (iiDeclCommand(&r,&yyvsp[0].lv,myynest,t,&IDROOT)) YYERROR;
-              #endif
             }
             leftv v=&yyvsp[-2].lv;
             while (v->next!=NULL) v=v->next;
@@ -2326,18 +2307,14 @@ case 105:
           ;
     break;}
 case 106:
-#line 1004 "grammar.y"
+#line 985 "grammar.y"
 {
-            #ifdef HAVE_NS
             if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&(yyvsp[0].lv.req_packhdl->idroot)))
               YYERROR;
-            #else
-            if (iiDeclCommand(&yyval.lv,&yyvsp[0].lv,myynest,yyvsp[-1].i,&IDROOT)) YYERROR;
-            #endif
           ;
     break;}
 case 109:
-#line 1021 "grammar.y"
+#line 998 "grammar.y"
 {
             leftv v = &yyvsp[-3].lv;
             while (v->next!=NULL)
@@ -2350,14 +2327,14 @@ case 109:
           ;
     break;}
 case 110:
-#line 1035 "grammar.y"
+#line 1012 "grammar.y"
 {
           // let rInit take care of any errors
           yyval.i=rOrderName(yyvsp[0].name);
         ;
     break;}
 case 111:
-#line 1043 "grammar.y"
+#line 1020 "grammar.y"
 {
             memset(&yyval.lv,0,sizeof(yyval.lv));
             intvec *iv = new intvec(2);
@@ -2368,7 +2345,7 @@ case 111:
           ;
     break;}
 case 112:
-#line 1052 "grammar.y"
+#line 1029 "grammar.y"
 {
             memset(&yyval.lv,0,sizeof(yyval.lv));
             leftv sl = &yyvsp[-1].lv;
@@ -2412,7 +2389,7 @@ case 112:
           ;
     break;}
 case 114:
-#line 1098 "grammar.y"
+#line 1075 "grammar.y"
 {
             yyval.lv = yyvsp[-2].lv;
             yyval.lv.next = (sleftv *)omAllocBin(sleftv_bin);
@@ -2420,61 +2397,59 @@ case 114:
           ;
     break;}
 case 116:
-#line 1108 "grammar.y"
+#line 1085 "grammar.y"
 {
             yyval.lv = yyvsp[-1].lv;
           ;
     break;}
 case 117:
-#line 1114 "grammar.y"
+#line 1091 "grammar.y"
 {
             expected_parms = TRUE;
           ;
     break;}
 case 118:
-#line 1126 "grammar.y"
+#line 1103 "grammar.y"
 { if (yyvsp[-1].i != '<') YYERROR;
             if((feFilePending=feFopen(yyvsp[0].name,"r",NULL,TRUE))==NULL) YYERROR; ;
     break;}
 case 119:
-#line 1129 "grammar.y"
+#line 1106 "grammar.y"
 { newFile(yyvsp[-2].name,feFilePending); ;
     break;}
 case 120:
-#line 1134 "grammar.y"
+#line 1111 "grammar.y"
 {
             feHelp(yyvsp[-1].name);
             omFree((ADDRESS)yyvsp[-1].name);
           ;
     break;}
 case 121:
-#line 1139 "grammar.y"
+#line 1116 "grammar.y"
 {
             feHelp(NULL);
           ;
     break;}
 case 122:
-#line 1146 "grammar.y"
+#line 1123 "grammar.y"
 {
             singular_example(yyvsp[-1].name);
             omFree((ADDRESS)yyvsp[-1].name);
           ;
     break;}
 case 123:
-#line 1154 "grammar.y"
+#line 1131 "grammar.y"
 {
-#ifdef HAVE_NS
           if (basePack!=yyvsp[0].lv.req_packhdl)
           {
             if(iiExport(&yyvsp[0].lv,0,currPackHdl)) YYERROR;
           }
           else
-#endif /* HAVE_NS */
             if (iiExport(&yyvsp[0].lv,0)) YYERROR;
         ;
     break;}
 case 124:
-#line 1168 "grammar.y"
+#line 1143 "grammar.y"
 {
           leftv v=&yyvsp[0].lv;
           if (v->rtyp!=IDHDL)
@@ -2487,16 +2462,12 @@ case 124:
           }
           else
           {
-            #ifdef HAVE_NS
             killhdl((idhdl)v->data,v->req_packhdl);
-            #else
-            killhdl((idhdl)v->data);
-            #endif
           }
         ;
     break;}
 case 125:
-#line 1188 "grammar.y"
+#line 1159 "grammar.y"
 {
           leftv v=&yyvsp[0].lv;
           if (v->rtyp!=IDHDL)
@@ -2509,170 +2480,142 @@ case 125:
           }
           else
           {
-            #ifdef HAVE_NS
             killhdl((idhdl)v->data,v->req_packhdl);
-            #else
-            killhdl((idhdl)v->data);
-            #endif
           }
         ;
     break;}
 case 126:
-#line 1211 "grammar.y"
+#line 1178 "grammar.y"
 {
             list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
           ;
     break;}
 case 127:
-#line 1215 "grammar.y"
+#line 1182 "grammar.y"
 {
             list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
           ;
     break;}
 case 128:
-#line 1219 "grammar.y"
+#line 1186 "grammar.y"
 {
             if (yyvsp[-1].i==QRING_CMD) yyvsp[-1].i=RING_CMD;
             list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
           ;
     break;}
 case 129:
-#line 1224 "grammar.y"
+#line 1191 "grammar.y"
 {
             list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
           ;
     break;}
 case 130:
-#line 1228 "grammar.y"
+#line 1195 "grammar.y"
 {
             list_cmd(RING_CMD,NULL,"// ",TRUE);
           ;
     break;}
 case 131:
-#line 1232 "grammar.y"
+#line 1199 "grammar.y"
 {
             list_cmd(MATRIX_CMD,NULL,"// ",TRUE);
            ;
     break;}
 case 132:
-#line 1236 "grammar.y"
+#line 1203 "grammar.y"
 {
             list_cmd(INTMAT_CMD,NULL,"// ",TRUE);
           ;
     break;}
 case 133:
-#line 1240 "grammar.y"
+#line 1207 "grammar.y"
 {
             list_cmd(PROC_CMD,NULL,"// ",TRUE);
           ;
     break;}
 case 134:
-#line 1244 "grammar.y"
+#line 1211 "grammar.y"
 {
             list_cmd(0,yyvsp[-1].lv.Fullname(),"// ",TRUE);
             yyvsp[-1].lv.CleanUp();
           ;
     break;}
 case 135:
-#line 1249 "grammar.y"
+#line 1216 "grammar.y"
 {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if(yyvsp[-3].lv.Typ() == PACKAGE_CMD)
               list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             yyvsp[-3].lv.CleanUp();
           ;
     break;}
 case 136:
-#line 1258 "grammar.y"
+#line 1222 "grammar.y"
 {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if(yyvsp[-3].lv.Typ() == PACKAGE_CMD)
               list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             yyvsp[-3].lv.CleanUp();
           ;
     break;}
 case 137:
-#line 1267 "grammar.y"
+#line 1228 "grammar.y"
 {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if(yyvsp[-3].lv.Typ() == PACKAGE_CMD)
               list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             yyvsp[-3].lv.CleanUp();
           ;
     break;}
 case 138:
-#line 1276 "grammar.y"
+#line 1234 "grammar.y"
 {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if(yyvsp[-3].lv.Typ() == PACKAGE_CMD)
               list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             yyvsp[-3].lv.CleanUp();
           ;
     break;}
 case 139:
-#line 1285 "grammar.y"
+#line 1240 "grammar.y"
 {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if(yyvsp[-3].lv.Typ() == PACKAGE_CMD)
               list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             yyvsp[-3].lv.CleanUp();
           ;
     break;}
 case 140:
-#line 1294 "grammar.y"
+#line 1246 "grammar.y"
 {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if(yyvsp[-3].lv.Typ() == PACKAGE_CMD)
               list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             yyvsp[-3].lv.CleanUp();
           ;
     break;}
 case 141:
-#line 1303 "grammar.y"
+#line 1252 "grammar.y"
 {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if(yyvsp[-3].lv.Typ() == PACKAGE_CMD)
               list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             yyvsp[-3].lv.CleanUp();
           ;
     break;}
 case 142:
-#line 1312 "grammar.y"
+#line 1258 "grammar.y"
 {
-#ifdef HAVE_NS
-            //PrintS("?????\n");
             if(yyvsp[-3].lv.Typ() == PACKAGE_CMD)
               list_cmd(yyvsp[-1].i,NULL,"// ",TRUE);
-#endif /* HAVE_NS */
             yyvsp[-3].lv.CleanUp();
           ;
     break;}
 case 143:
-#line 1330 "grammar.y"
+#line 1270 "grammar.y"
 {
             list_cmd(-1,NULL,"// ",TRUE);
           ;
     break;}
 case 144:
-#line 1336 "grammar.y"
+#line 1276 "grammar.y"
 { yyInRingConstruction = TRUE; ;
     break;}
 case 145:
-#line 1345 "grammar.y"
+#line 1285 "grammar.y"
 {
             const char *ring_name = yyvsp[-6].lv.name;
             ring b=
@@ -2683,12 +2626,8 @@ case 145:
 
             if (b!=NULL)
             {
-              #ifdef HAVE_NS
                 newRingHdl=enterid(ring_name, myynest, RING_CMD,
                                    &(yyvsp[-6].lv.req_packhdl->idroot));
-              #else
-                newRingHdl=enterid(ring_name, myynest, RING_CMD, &IDROOT);
-              #endif
               yyvsp[-6].lv.CleanUp();
               if (newRingHdl!=NULL)
               {
@@ -2712,7 +2651,7 @@ case 145:
           ;
     break;}
 case 146:
-#line 1383 "grammar.y"
+#line 1319 "grammar.y"
 {
             const char *ring_name = yyvsp[0].lv.name;
             if (!inerror) rDefault(ring_name);
@@ -2721,7 +2660,7 @@ case 146:
           ;
     break;}
 case 147:
-#line 1393 "grammar.y"
+#line 1329 "grammar.y"
 {
             if ((yyvsp[-1].i!=LIB_CMD)||(iiLibCmd(yyvsp[0].name,TRUE,TRUE,TRUE)))
             //if ($1==LIB_CMD)
@@ -2734,7 +2673,7 @@ case 147:
           ;
     break;}
 case 150:
-#line 1409 "grammar.y"
+#line 1345 "grammar.y"
 {
             if ((yyvsp[-1].i==KEEPRING_CMD) && (myynest==0))
                MYYERROR("only inside a proc allowed");
@@ -2809,7 +2748,7 @@ case 150:
           ;
     break;}
 case 151:
-#line 1485 "grammar.y"
+#line 1421 "grammar.y"
 {
             if (yyvsp[0].lv.rtyp!=IDHDL) MYYERROR("identifier expected");
             idhdl h = (idhdl)yyvsp[0].lv.data;
@@ -2817,7 +2756,7 @@ case 151:
           ;
     break;}
 case 152:
-#line 1491 "grammar.y"
+#line 1427 "grammar.y"
 {
             //Print("typ is %d, rtyp:%d\n",$1.Typ(),$1.rtyp);
             #ifdef SIQ
@@ -2842,7 +2781,7 @@ case 152:
           ;
     break;}
 case 153:
-#line 1520 "grammar.y"
+#line 1456 "grammar.y"
 {
             int i; TESTSETINT(yyvsp[-2].lv,i);
             if (i!=0)
@@ -2857,7 +2796,7 @@ case 153:
           ;
     break;}
 case 154:
-#line 1533 "grammar.y"
+#line 1469 "grammar.y"
 {
             if (currentVoice->ifsw==1)
             {
@@ -2876,7 +2815,7 @@ case 154:
           ;
     break;}
 case 155:
-#line 1550 "grammar.y"
+#line 1486 "grammar.y"
 {
             int i; TESTSETINT(yyvsp[-2].lv,i);
             if (i)
@@ -2887,21 +2826,21 @@ case 155:
           ;
     break;}
 case 156:
-#line 1559 "grammar.y"
+#line 1495 "grammar.y"
 {
             if (exitBuffer(BT_break)) YYERROR;
             currentVoice->ifsw=0;
           ;
     break;}
 case 157:
-#line 1564 "grammar.y"
+#line 1500 "grammar.y"
 {
             if (contBuffer(BT_break)) YYERROR;
             currentVoice->ifsw=0;
           ;
     break;}
 case 158:
-#line 1572 "grammar.y"
+#line 1508 "grammar.y"
 {
             /* -> if(!$2) break; $3; continue;*/
             char * s = (char *)omAlloc( strlen(yyvsp[-1].name) + strlen(yyvsp[0].name) + 36);
@@ -2912,7 +2851,7 @@ case 158:
           ;
     break;}
 case 159:
-#line 1584 "grammar.y"
+#line 1520 "grammar.y"
 {
             /* $2 */
             /* if (!$3) break; $5; $4; continue; */
@@ -2930,7 +2869,7 @@ case 159:
           ;
     break;}
 case 160:
-#line 1603 "grammar.y"
+#line 1539 "grammar.y"
 {
             procinfov pi;
             idhdl h = enterid(yyvsp[-1].name,myynest,PROC_CMD,&IDROOT,TRUE);
@@ -2943,7 +2882,7 @@ case 160:
           ;
     break;}
 case 161:
-#line 1614 "grammar.y"
+#line 1550 "grammar.y"
 {
             idhdl h = enterid(yyvsp[-2].name,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
@@ -2965,7 +2904,7 @@ case 161:
           ;
     break;}
 case 162:
-#line 1634 "grammar.y"
+#line 1570 "grammar.y"
 {
             omFree((ADDRESS)yyvsp[-1].name);
             idhdl h = enterid(yyvsp[-3].name,myynest,PROC_CMD,&IDROOT,TRUE);
@@ -2988,7 +2927,7 @@ case 162:
           ;
     break;}
 case 163:
-#line 1658 "grammar.y"
+#line 1594 "grammar.y"
 {
             //Print("par:%s, %d\n",$2.Name(),$2.Typ());
             //yylineno--;
@@ -2996,7 +2935,7 @@ case 163:
           ;
     break;}
 case 164:
-#line 1664 "grammar.y"
+#line 1600 "grammar.y"
 {
             //Print("par:%s, %d\n",$2.Name(),$2.Typ());
             sleftv tmp_expr;
@@ -3007,7 +2946,7 @@ case 164:
           ;
     break;}
 case 165:
-#line 1676 "grammar.y"
+#line 1612 "grammar.y"
 {
             if(iiRETURNEXPR==NULL) YYERROR;
             iiRETURNEXPR[myynest].Copy(&yyvsp[-1].lv);
@@ -3016,7 +2955,7 @@ case 165:
           ;
     break;}
 case 166:
-#line 1683 "grammar.y"
+#line 1619 "grammar.y"
 {
             if (yyvsp[-2].i==RETURN)
             {
@@ -3249,4 +3188,4 @@ yyerrhandle:
     }
   return 1;
 }
-#line 1693 "grammar.y"
+#line 1629 "grammar.y"

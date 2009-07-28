@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.50 2008-09-19 14:15:14 Singular Exp $ */
+/* $Id: silink.cc,v 1.51 2009-07-28 14:18:35 Singular Exp $ */
 
 /*
 * ABSTRACT: general interface to links
@@ -606,10 +606,8 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   const char *type_str = GetIdString(h);
   idtyp type_id = IDTYP(h);
 
-#ifdef HAVE_NS
   if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
     return FALSE;
-#endif
 
   // we do not throw an error if a wrong type was attempted to be dumped
   if (type_str == NULL)
@@ -618,12 +616,6 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   // handle qrings separately
   if (type_id == QRING_CMD)
     return DumpQring(fd, h, type_str);
-
-#ifndef HAVE_NS
-  // do not dump LIB string
-  if (type_id == STRING_CMD && strcmp("LIB", IDID(h)) == 0)
-    return FALSE;
-#endif
 
   // put type and name
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF)
@@ -640,12 +632,10 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
         == EOF) return TRUE;
   }
 
-#ifdef HAVE_NS
   if (type_id == PACKAGE_CMD)
   {
     return (fprintf(fd, ";\n") == EOF);
   }
-#endif
 
   // write the equal sign
   if (fprintf(fd, " = ") == EOF) return TRUE;

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.148 2009-07-20 12:00:51 motsak Exp $ */
+/* $Id: kutil.cc,v 1.149 2009-07-28 14:15:05 Singular Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -806,11 +806,12 @@ BOOLEAN kTest (kStrategy strat)
       kFalseReturn(kTest_L(&(strat->L[i]), strat->tailRing,
                            strat->L[i].Next() != strat->tail, i,
                            strat->T, strat->tl));
-      if (strat->use_buckets && strat->L[i].Next() != strat->tail &&
-          strat->L[i].Next() != NULL && strat->L[i].p1 != NULL)
-      {
-        assume(strat->L[i].bucket != NULL);
-      }
+      // may be unused
+      //if (strat->use_buckets && strat->L[i].Next() != strat->tail &&
+      //    strat->L[i].Next() != NULL && strat->L[i].p1 != NULL)
+      //{
+      //  assume(strat->L[i].bucket != NULL);
+      //}
     }
   }
 
@@ -6245,7 +6246,8 @@ BOOLEAN kCheckStrongCreation(int atR, poly m1, int atS, poly m2, kStrategy strat
 
 BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned long expbound)
 {
-  assume(strat->tailRing == currRing);
+  assume((strat->tailRing == currRing) || (strat->tailRing->bitmask < currRing->bitmask));
+  /* initial setup or extending */
 
   if (expbound == 0) expbound = strat->tailRing->bitmask << 1;
   if (expbound >= currRing->bitmask) return FALSE;
@@ -6350,7 +6352,6 @@ void kStratInitChangeTailRing(kStrategy strat)
   unsigned long l = 0;
   int i;
   Exponent_t e;
-//  ring new_tailRing; // What for???
 
   assume(strat->tailRing == currRing);
 

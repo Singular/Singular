@@ -34,13 +34,11 @@
 
 #ifdef HAVE_FACTORY
 #include <factory.h>
-#endif
-
-/* version strings */
-#ifdef HAVE_LIBFAC_P
+/* libfac version strings */
   extern const char * libfac_version;
   extern const char * libfac_date;
 #endif
+
 #include <si_gmp.h>
 #ifdef HAVE_MPSR
 #include <MP_Config.h>

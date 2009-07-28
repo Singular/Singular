@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.129 2009-06-21 14:10:18 Singular Exp $ */
+/* $Id: iplib.cc,v 1.130 2009-07-28 14:18:34 Singular Exp $ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */
@@ -66,15 +66,6 @@ BOOLEAN iiGetLibStatus(char *lib)
 {
   idhdl hl;
 
-#ifndef HAVE_NS
-  char *p;
-
-  hl = IDROOT->get("LIB", 0);
-  if (hl == NULL || (p=strstr(IDSTRING(hl), lib)) == NULL) return FALSE;
-  if ((p!=IDSTRING(hl)) && (*(p-1)!=',')) return FALSE;
-
-  return TRUE;
-#else
   char *plib = iiConvName(lib);
   hl = basePack->idroot->get(plib,0);
   if((hl==NULL) ||(IDTYP(hl)!=PACKAGE_CMD))
@@ -84,7 +75,6 @@ BOOLEAN iiGetLibStatus(char *lib)
   }
   omFree(plib);
   return (strcmp(lib,IDPACKAGE(hl)->libname)==0);
-#endif
 }
 
 /*2
@@ -342,10 +332,8 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
   else
   {
     err=yyparse();
-#ifdef HAVE_NS
 #ifndef NDEBUG
     checkall();
-#endif
 #endif
     if (sLastPrinted.rtyp!=0)
     {
@@ -353,10 +341,8 @@ BOOLEAN iiPStart(idhdl pn, sleftv  * v)
     }
     //Print("kill locals for %s (level %d)\n",IDID(pn),myynest);
     killlocals(myynest);
-#ifdef HAVE_NS
 #ifndef NDEBUG
     checkall();
-#endif
 #endif
     //Print("end kill locals for %s (%d)\n",IDID(pn),myynest);
   }
@@ -390,7 +376,6 @@ static void iiShowLevRings()
   }
 #endif
 #if  0
-//#ifdef HAVE_NS
   i=myynest;
   proclevel *p=procstack;
   while (p!=NULL)
@@ -425,11 +410,7 @@ static void iiCheckNest()
     iiRETURNEXPR_len+=16;
   }
 }
-#ifdef HAVE_NS
 sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
-#else /* HAVE_NS */
-sleftv * iiMake_proc(idhdl pn, sleftv* sl)
-#endif /* HAVE_NS */
 {
   int err;
   procinfov pi = IDPROC(pn);
@@ -464,7 +445,6 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
                  break;
 
     case LANG_SINGULAR:
-                 #ifdef HAVE_NS
                  if ((pi->pack!=NULL)&&(currPack!=pi->pack))
                  {
                    currPack=pi->pack;
@@ -479,10 +459,7 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
                    currPackHdl=packFindHdl(currPack);
                    //Print("set pack=%s\n",IDID(currPackHdl));
                  }
-                 #endif
                  err=iiPStart(pn,sl);
-                 #ifdef HAVE_NS
-                 #endif
                  break;
     case LANG_C:
                  leftv res = (leftv)omAlloc0Bin(sleftv_bin);
@@ -571,14 +548,12 @@ sleftv * iiMake_proc(idhdl pn, sleftv* sl)
       {
         //PrintS("reset ring\n");
         procstack->cRingHdl=rFindHdl(procstack->cRing,NULL, NULL);
-        #ifdef HAVE_NS
         if (procstack->cRingHdl==NULL)
           procstack->cRingHdl=
            rFindHdl(procstack->cRing,NULL,procstack->currPack->idroot);
         if (procstack->cRingHdl==NULL)
           procstack->cRingHdl=
            rFindHdl(procstack->cRing,NULL,basePack->idroot);
-        #endif
         o=IDID(procstack->cRingHdl);
         currRing=procstack->cRing;
         currRingHdl=procstack->cRingHdl;
@@ -691,7 +666,6 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
 BOOLEAN iiTryLoadLib(leftv v, const char *id)
 {
   BOOLEAN LoadResult = TRUE;
-#ifdef HAVE_NS
   char libnamebuf[128];
   char *libname = (char *)omAlloc(strlen(id)+5);
   const char *suffix[] = { "", ".lib", ".so", ".sl", NULL };
@@ -724,30 +698,6 @@ BOOLEAN iiTryLoadLib(leftv v, const char *id)
     }
   }
   omFree(libname);
-#endif /* HAVE_NS */
-  return LoadResult;
-}
-
-BOOLEAN iiReLoadLib(idhdl packhdl)
-{
-  BOOLEAN LoadResult = TRUE;
-#ifdef HAVE_NAMESPACES
-  char libnamebuf[128];
-  package pack = IDPACKAGE(packhdl);
-
-  if(pack->language == LANG_NONE) return FALSE;
-
-  FILE * fp = feFopen( pack->libname, "r", libnamebuf, FALSE);
-  if (fp==NULL)
-  {
-    return TRUE;
-  }
-  namespaceroot->push(IDPACKAGE(packhdl), IDID(packhdl));
-  LoadResult = iiLoadLIB(fp, libnamebuf, IDPACKAGE(packhdl)->libname,
-                         packhdl, FALSE, FALSE);
-  namespaceroot->pop();
-#else /* HAVE_NAMESPACES */
-#endif /* HAVE_NAMESPACES */
   return LoadResult;
 }
 
@@ -793,80 +743,23 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
   char libnamebuf[128];
   idhdl h;
   BOOLEAN LoadResult = TRUE;
-#ifdef HAVE_NS
   idhdl pl;
-#endif
   idhdl hl;
   int lines = 1;
   long pos = 0L;
   procinfov pi;
-#ifdef HAVE_NS
   char *plib = iiConvName(newlib);
-#endif
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
   if (fp==NULL)
   {
     return TRUE;
   }
-#ifndef HAVE_NS
-  hl = idroot->get("LIB",0);
-  if (hl==NULL)
-  {
-    hl = enterid( "LIB",0, STRING_CMD, &idroot, FALSE );
-    IDSTRING(hl) = omStrDup(newlib);
-  }
-  else
-  {
-#ifdef TEST
-    if (IDSTRING(hl) != NULL)
-#endif
-    {
-      char *s = (char *)omAlloc( strlen(newlib) + strlen(IDSTRING(hl)) + 2 );
-      strcpy(s,IDSTRING(hl));
-      BOOLEAN f=FALSE;
-      if(strchr(s,',')==NULL)
-      {
-        if (strcmp(s,newlib)==0)
-          f=TRUE;
-      }
-      else
-      {
-        char *p=strtok(s,",");
-        do
-        {
-          if(strcmp(p,newlib)==0)
-          {
-            f=TRUE;
-            break;
-          }
-          p=strtok(NULL,",");
-        } while (p!=NULL);
-      }
-      if (f)
-        omFree((ADDRESS)s);
-      else
-      {
-        sprintf( s, "%s,%s", IDSTRING(hl), newlib);
-        omFree((ADDRESS)IDSTRING(hl));
-        IDSTRING(hl) = s;
-      }
-    }
-#ifdef TEST
-    else
-    {
-      PrintS("## empty LIB string\n");
-      IDSTRING(hl) = omStrDup(newlib);
-    }
-#endif
-  }
-#endif /* HAVE_NS */
 #ifdef HAVE_TCL
   if (tclmode)
   {
     PrintTCLS('L',newlib);
   }
 #endif
-#ifdef HAVE_NS
   pl = basePack->idroot->get(plib,0);
   if (pl==NULL)
   {
@@ -886,16 +779,10 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
     if (!force) return FALSE;
   }
   LoadResult = iiLoadLIB(fp, libnamebuf, newlib, pl, autoexport, tellerror);
-#else /* HAVE_NS */
-  LoadResult = iiLoadLIB(fp, libnamebuf, newlib, NULL, FALSE, tellerror);
-#endif /* HAVE_NS */
-
   omFree((ADDRESS)newlib);
 
-#ifdef HAVE_NS
   if(!LoadResult) IDPACKAGE(pl)->loaded = TRUE;
   omFree((ADDRESS)plib);
-#endif /* HAVE_NS */
 
  return LoadResult;
 }
@@ -945,11 +832,7 @@ BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
   extern int lpverbose;
   if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1;
   else lpverbose=0;
-  #ifdef HAVE_NS
-    yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
-  #else
-    yylplex(newlib, libnamebuf, &lib_style);
-  #endif /* HAVE_NS */
+  yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
   if(yylp_errno)
   {
     Werror("Library %s: ERROR occured: in line %d, %d.", newlib, yylplineno,
@@ -1021,9 +904,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
     pi->procname = omStrDup(procname);
   pi->language = LANG_SINGULAR;
   pi->ref = 1;
-#ifdef HAVE_NS
   pi->pack = NULL;
-#endif
   pi->is_static = pstatic;
   pi->data.s.proc_start = pos;
   pi->data.s.def_end    = 0L;
@@ -1071,12 +952,10 @@ int iiAddCprocTop(char *libname, char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v))
 {
   int r=iiAddCproc(libname,procname,pstatic,func);
-  #ifdef HAVE_NS
   package s=currPack;
   currPack=basePack;
   if (r) r=iiAddCproc(libname,procname,pstatic,func);
   currPack=s;
-  #endif
   return r;
 }
 
@@ -1138,10 +1017,8 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   {
     SModulFunctions sModulFunctions;
     
-#ifdef HAVE_NS
     package s=currPack;
     currPack=IDPACKAGE(pl);
-#endif
     fktn = (fktn2_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
     if( fktn!= NULL)
     {
@@ -1152,10 +1029,8 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
     }
     else Werror("mod_init: %s\n", dynl_error());
     if (BVERBOSE(V_LOAD_LIB)) Print( "// ** loaded %s \n", fullname);
-#ifdef HAVE_NS
     currPack->loaded=1;
     currPack=s;
-#endif
   }
   RET=FALSE;
 

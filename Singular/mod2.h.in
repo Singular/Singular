@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.146 2009-07-28 12:05:18 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.147 2009-07-28 14:18:35 Singular Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -27,8 +27,6 @@
 #undef HAVE_MPSR
 /* Define to have factory functionality added */
 #undef HAVE_FACTORY
-/* Define to have libfac functionality added */
-#undef HAVE_LIBFAC_P
 /* Define if you have stdc headers */
 #undef STDC_HEADERS
 /* Define if you have asm/sigcontext.h */
@@ -141,9 +139,6 @@
 #define S_UNAME ""
 /* Absolute pathname of root directory of Singular source */
 #define S_ROOT_DIR ""
-/* Define to use new namespaces techniks */
-#undef HAVE_NAMESPACES
-#undef HAVE_NS
 /* Define to enable dynamic module code */
 #undef HAVE_DYNAMIC_LOADING
 /* Define to enable plural */
@@ -211,7 +206,6 @@
 #define HAVE_UNITS
 
 /* Define to use old mechanismen for saving currRing with procedures
- * Does not work with HAVE_NAMESPACES enabled
  */
 #undef USE_IILOCALRING
 
@@ -225,9 +219,6 @@
 #else
 #define PROFILER
 #endif
-
-/* Define to use gmp for rational arithmetic */
-#define HAVE_GMP
 
 /*******************************************************************
  * Evaluate the set defines
@@ -243,9 +234,7 @@
 #endif
 
 /* Spectrum needs GMP */
-#ifdef HAVE_GMP
 #define HAVE_SPECTRUM 1
-#endif
 
 /* Undefine to disable real time measurments  */
 #ifdef HAVE_GETTIMEOFDAY
@@ -581,10 +570,6 @@ int hpux9_system(const char* system);
 #define YYDEBUG 0
 
 #endif /* not NDEBUG */
-
-#ifdef HAVE_NAMESPACES
-#  undef USE_IILOCALRING
-#endif
 
 /*******************************************************************
  *

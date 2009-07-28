@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.511 2009-07-13 16:35:56 Singular Exp $ */
+/* $Id: iparith.cc,v 1.512 2009-07-28 14:18:34 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -818,7 +818,6 @@ static BOOLEAN jjPLUSMINUS_Gen(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
 {
-#ifdef HAVE_NS
   idhdl packhdl;
   switch(u->Typ())
   {
@@ -836,8 +835,6 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         if((!IDPACKAGE(packhdl)->loaded)
         && (IDPACKAGE(packhdl)->language > LANG_TOP))
         {
-          //if(iiReLoadLib(packhdl))
-          //  Werror("unable to reload package '%s'", IDID(packhdl));
           Werror("'%s' not loaded", u->name);
           return TRUE;
         }
@@ -857,9 +854,6 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
         WerrorS("<package>::<id> expected");
         return TRUE;
   }
-#else /* HAVE_NS */
-  WerrorS("package is not supported in this version");
-#endif /* HAVE_NS */
   return FALSE;
 }
 static BOOLEAN jjPLUS_I(leftv res, leftv u, leftv v)
@@ -1667,15 +1661,11 @@ BOOLEAN jjPROC(leftv res, leftv u, leftv v)
     t=TRUE;
     typ=u->rtyp; u->rtyp=IDHDL;
   }
-#ifdef HAVE_NS
   leftv sl;
   if (u->req_packhdl==currPack)
     sl = iiMake_proc((idhdl)u->data,NULL,v);
   else
     sl = iiMake_proc((idhdl)u->data,u->req_packhdl,v);
-#else /* HAVE_NS */
-  leftv sl = iiMake_proc((idhdl)u->data,v);
-#endif /* HAVE_NS */
   if (t)
   {
     u->rtyp=typ;
@@ -1996,12 +1986,8 @@ static BOOLEAN jjELIMIN_IV(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjEXPORTTO(leftv res, leftv u, leftv v)
 {
-#ifdef HAVE_NS
   //Print("exportto %s -> %s\n",v->Name(),u->Name() );
   return iiExport(v,0,(idhdl)u->data);
-#else /* HAVE_NS */
-  return TRUE;
-#endif /* HAVE_NS */
 }
 static BOOLEAN jjERROR(leftv res, leftv u)
 {
@@ -3434,7 +3420,7 @@ struct sValCmd2 dArith2[]=
 ,{jjGCD_I,     GCD_CMD,        INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjGCD_N,     GCD_CMD,        NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjGCD_BI,    GCD_CMD,        BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL |ALLOW_RING}
-#if defined(HAVE_FACTORY) && defined(HAVE_LIBFAC_P)
+#if defined(HAVE_FACTORY)
 ,{jjGCD_P,     GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD, NO_PLURAL |NO_RING}
 #else
 ,{jjWRONG2,    GCD_CMD,        POLY_CMD,       POLY_CMD,   POLY_CMD, NO_PLURAL |NO_RING}
@@ -4850,7 +4836,6 @@ static BOOLEAN jjLOAD1(leftv res, leftv v)
 }
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 {
-#ifdef HAVE_NS
   char * s=(char *)v->CopyD();
   char libnamebuf[256];
   lib_types LT = type_of_LIB(s, libnamebuf);
@@ -4903,7 +4888,6 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
         break;
 #endif /* HAVE_DYNAMIC_LOADING */
   }
-#endif
   return TRUE;
 }
 

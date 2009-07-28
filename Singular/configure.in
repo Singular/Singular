@@ -641,9 +641,6 @@ AC_ARG_WITH(
   libfac,
   [  --without-libfac        do not use libfac (no primary decompositions)])
 AC_ARG_WITH(
-  namespaces,
-  [  --with-namespaces       do compile namespace support])
-AC_ARG_WITH(
   dl,
   [  --without-dl            do not use dynamic linking, modules, and kernel])
 AC_ARG_WITH(
@@ -962,16 +959,15 @@ if test "${with_libfac}" != yes && test "${with_libfac}" != no; then
   if (test "${will_have_factory}" = yes) && \
      (test "$ac_libfac_ok" =  yes || test "$enable_libfac" = yes); then
     AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_LIBFAC_P)
     NEED_LIBS="-lsingfac ${NEED_LIBS}"
   else
     AC_MSG_RESULT(no)
+    AC_MSG_ERROR(can not build without libfac)
   fi
 elif  test "${with_libfac}" = yes; then
   if (test "${will_have_factory}" = yes) && \
      (test "$ac_libfac_ok" =  yes || test "$enable_libfac" = yes); then
     AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_LIBFAC_P)
     NEED_LIBS="-lsingfac ${NEED_LIBS}"
   else
     AC_MSG_RESULT(no)
@@ -996,14 +992,6 @@ AC_MSG_CHECKING(whether to have dbm links)
 if test "$with_dbm" != no; then
   AC_DEFINE(HAVE_DBM)
   AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-fi
-
-AC_MSG_CHECKING(whether to have namespaces)
-if test "$with_namespaces" != no; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(HAVE_NS)
 else
   AC_MSG_RESULT(no)
 fi

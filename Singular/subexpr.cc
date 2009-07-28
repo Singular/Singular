@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.104 2009-05-05 09:54:38 Singular Exp $ */
+/* $Id: subexpr.cc,v 1.105 2009-07-28 14:18:35 Singular Exp $ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -971,17 +971,9 @@ void * sleftv::Data()
                        else
                          return (void *)nNULL;
       case VNOETHER:   return (void *) ppNoether;
-#ifndef HAVE_NS
-      case LIB_CMD:    {
-                         idhdl h = ggetid( "LIB" );
-                         if(h==NULL) return (void *)sNoName;
-                         return IDSTRING(h);
-                       }
-#else
       case LIB_CMD:    {
                          return (void *)sNoName;
                        }
-#endif
       case IDHDL:
         return IDDATA((idhdl)data);
       case POINTER_CMD:
@@ -1258,7 +1250,6 @@ void syMake(leftv v,const char * id, idhdl packhdl)
   }
 #endif
   v->Init();
-#ifdef HAVE_NS
   v->packhdl = NULL;
   if(packhdl != NULL)
   {
@@ -1268,7 +1259,6 @@ void syMake(leftv v,const char * id, idhdl packhdl)
   else v->req_packhdl = currPack;
 //  if (v->req_packhdl!=basePack)
 //    Print("search %s in %s\n",id,v->req_packhdl->libname);
-#endif /* HAVE_NS */
   idhdl h=NULL;
 #ifdef SIQ
   if (siq<=0)
@@ -1290,7 +1280,6 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           return; /* undefined */
         }
       }
-#ifdef HAVE_NS
       else if (strcmp(id,"Current")==0)
       {
         if (currPackHdl!=NULL)
@@ -1310,7 +1299,6 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         h=v->req_packhdl->idroot->get(id,myynest);
       }
       else
-#endif
       h=ggetid(id);
       /* 3) existing identifier, local */
       if ((h!=NULL) && (IDLEV(h)==myynest))
@@ -1425,7 +1413,6 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         goto id_found;
       }
     }
-#ifdef HAVE_NS
     if((v->req_packhdl!=basePack) && (v->req_packhdl==currPack))
     {
       h=basePack->idroot->get(id,myynest);
@@ -1436,7 +1423,6 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         goto id_found;
       }
     }
-#endif
   }
 #ifdef SIQ
   else
@@ -1492,11 +1478,7 @@ int sleftv::Eval()
         nok=d->arg2.Eval();
         if(!nok)
         {
-#ifdef HAVE_NS
           leftv r=iiMake_proc(h,req_packhdl,&d->arg2);
-#else /* HAVE_NS */
-          leftv r=iiMake_proc(h,&d->arg2);
-#endif /* HAVE_NS */
           if (r!=NULL)
             memcpy(this,r,sizeof(sleftv));
           else

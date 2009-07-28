@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.36 2009-03-17 16:51:31 Singular Exp $
+// $Id: clapsing.cc,v 1.37 2009-07-28 14:15:05 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -19,11 +19,9 @@
 #include "ffields.h"
 #include <factory.h>
 #include "clapconv.h"
-#ifdef HAVE_LIBFAC_P
 #include <factor.h>
 //CanonicalForm algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const Varlist & order);
 CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList &);
-#endif
 #include "ring.h"
 
 //
@@ -239,7 +237,6 @@ poly singclap_gcd ( poly f, poly g )
     if (currRing->minpoly!=NULL)
     {
     #if 0
-    #ifdef HAVE_LIBFAC_P
       if (( nGetChar()==1 ) /* Q(a) */ && (!isOn(SW_USE_QGCD)))
       {
       //  WerrorS( feNotImplemented );
@@ -255,7 +252,6 @@ poly singclap_gcd ( poly f, poly g )
         res= convFactoryAPSingAP( alg_gcd( F, G, as) );
       }
       else
-      #endif
       #endif
       {
         bool b=isOn(SW_USE_QGCD);
@@ -781,9 +777,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
 }
 
 int singclap_factorize_retry;
-#ifdef HAVE_LIBFAC_P
 extern int libfac_interruptflag;
-#endif
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 {
@@ -913,16 +907,12 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     }
     else /* Fp */
     {
-#ifdef HAVE_LIBFAC_P
       do
       {
         libfac_interruptflag=0;
         L = Factorize( F );
       }
       while ((libfac_interruptflag!=0) ||(L.isEmpty()));
-#else
-      goto notImpl;
-#endif
     }
   }
   #if 0
@@ -958,7 +948,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       else
       {
         CanonicalForm G( convSingTrPFactoryP( f ) );
-#ifdef HAVE_LIBFAC_P
         //  over Q(a) / multivariate over Fp(a)
         do
         {
@@ -970,17 +959,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         printf("while okay\n");
         #endif
         libfac_interruptflag=0;
-#else
-        WarnS("complete factorization only for univariate polynomials");
-        if (rField_is_Q_a() ||(!F.isUnivariate())) /* Q(a) */
-        {
-          L = factorize( G );
-        }
-        else
-        {
-          L = factorize( G, a );
-        }
-#endif
       }
     }
     else
@@ -992,11 +970,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       }
       else /* Fp(a) */
       {
-#ifdef HAVE_LIBFAC_P
         L = Factorize( F );
-#else
-        goto notImpl;
-#endif
       }
     }
   }
@@ -1366,7 +1340,6 @@ notImpl:
 }
 matrix singclap_irrCharSeries ( ideal I)
 {
-#ifdef HAVE_LIBFAC_P
   if (idIs0(I)) return mpNew(1,1);
 
   // for now there is only the possibility to handle polynomials over
@@ -1455,14 +1428,10 @@ matrix singclap_irrCharSeries ( ideal I)
   }
   Off(SW_RATIONAL);
   return res;
-#else
-  return NULL;
-#endif
 }
 
 char* singclap_neworder ( ideal I)
 {
-#ifdef HAVE_LIBFAC_P
   int i;
   Off(SW_RATIONAL);
   On(SW_SYMMETRIC_FF);
@@ -1542,9 +1511,6 @@ char* singclap_neworder ( ideal I)
   char * s=omStrDup(StringAppendS(""));
   if (s[strlen(s)-1]==',') s[strlen(s)-1]='\0';
   return s;
-#else
-  return NULL;
-#endif
 }
 
 BOOLEAN singclap_isSqrFree(poly f)

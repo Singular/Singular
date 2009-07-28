@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.24 2009-06-22 17:16:57 Singular Exp $ */
+/* $Id: febase.cc,v 1.25 2009-07-28 14:15:05 Singular Exp $ */
 /*
 * ABSTRACT: i/o system
 */
@@ -955,7 +955,8 @@ void WerrorS(const char *s)
     }
   }
   errorreported = TRUE;
-#ifdef HAVE_LIBFAC_P
+#ifdef HAVE_FACTORY
+  // libfac:
   extern int libfac_interruptflag;
   libfac_interruptflag=1;
 #endif

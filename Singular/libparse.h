@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.h,v 1.18 2008-03-25 15:04:42 Singular Exp $ */
+/* $Id: libparse.h,v 1.19 2009-07-28 14:18:35 Singular Exp $ */
 /*
 * ABSTRACT: lib parsing
 */
@@ -15,13 +15,8 @@ typedef enum { OLD_LIBSTYLE, NEW_LIBSTYLE } lib_style_types;
 procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
               const char *procname, int line, long pos, BOOLEAN pstatic=FALSE);
 
-#ifdef HAVE_NS
 int yylplex(char *libname, char *libfile, lib_style_types *lib_style,
            idhdl pl, BOOLEAN autoexport=FALSE, lp_modes=LOAD_LIB);
-#else
-int yylplex(char *libname, char *libfile, lib_style_types *lib_style,
-            lp_modes=LOAD_LIB);
-#endif /* HAVE_NS */
 
 void reinit_yylp();
 

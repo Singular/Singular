@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.62 2009-07-20 12:00:51 motsak Exp $ */
+/* $Id: structs.h,v 1.63 2009-07-28 14:15:05 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -328,18 +328,11 @@ extern ring      currRing;
 extern ideal     currQuotient;
 extern idhdl      currRingHdl;
 
-#ifndef HAVE_NS
-extern idhdl      idroot;
-#define IDROOT idroot
-#endif /* ! HAVE_NS */
-
-#ifdef HAVE_NS
 extern idhdl currPackHdl;
 extern idhdl basePackHdl;
 extern package currPack;
 extern package basePack;
 #define IDROOT (currPack->idroot)
-#endif /* HAVE_NS */
 
 /* the function pointer types */
 
@@ -1045,9 +1038,7 @@ class procinfo
 public:
   char          *libname;
   char          *procname;
-#ifdef HAVE_NS
   package       pack;
-#endif
   language_defs language;
   short         ref;
   char          is_static;        // if set, proc not accessible for user

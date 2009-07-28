@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.309 2009-07-23 09:14:52 Singular Exp $ */
+/* $Id: extra.cc,v 1.310 2009-07-28 14:18:33 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -290,9 +290,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #endif
         #ifdef HAVE_FACTORY
           TEST_FOR("factory")
-        #endif
-        #ifdef HAVE_LIBFAC_P
-          TEST_FOR("libfac")
+          //TEST_FOR("libfac")
         #endif
         #ifdef HAVE_MPSR
           TEST_FOR("MP")
@@ -306,9 +304,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         #ifdef TEST_MAC_ORDER
           TEST_FOR("MAC_ORDER");
         #endif
-        #ifdef HAVE_NS
+        // unconditional since 3-1-0-6
           TEST_FOR("Namespaces");
-        #endif
         #ifdef HAVE_DYNAMIC_LOADING
           TEST_FOR("DynamicLoading");
         #endif
@@ -554,7 +551,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
 /*==================== neworder =============================*/
 // should go below
-#ifdef HAVE_LIBFAC_P
+#ifdef HAVE_FACTORY
     if(strcmp(sys_cmd,"neworder")==0)
     {
       if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
@@ -2327,61 +2324,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== lib ==================================*/
-#if !defined(HAVE_NS)
-    if(strcmp(sys_cmd,"LIB")==0)
-    {
-      idhdl hh=idroot->get((char*)h->Data(),0);
-      if ((hh!=NULL)&&(IDTYP(hh)==PROC_CMD))
-      {
-        res->rtyp=STRING_CMD;
-        char *r=iiGetLibName(IDPROC(hh));
-        if (r==NULL) r="";
-        res->data=omStrDup(r);
-        return FALSE;
-      }
-      else
-        Warn("`%s` not found",(char*)h->Data());
-    }
-    else
-#endif
 /*==================== listall ===================================*/
     if(strcmp(sys_cmd,"listall")==0)
     {
       int showproc=0;
       if ((h!=NULL) && (h->Typ()==INT_CMD)) showproc=(int)((long)h->Data());
-#ifdef HAVE_NS
       listall(showproc);
-#else
-      idhdl hh=IDROOT;
-      while (hh!=NULL)
-      {
-        if (IDDATA(hh)==(void *)currRing) PrintS("(R)");
-        else PrintS("   ");
-        Print("::%s, typ %s level %d\n",
-               IDID(hh),Tok2Cmdname(IDTYP(hh)),IDLEV(hh));
-        hh=IDNEXT(hh);
-      }
-      hh=IDROOT;
-      while (hh!=NULL)
-      {
-        if ((IDTYP(hh)==RING_CMD)
-        || (IDTYP(hh)==QRING_CMD)
-        || (IDTYP(hh)==PACKAGE_CMD))
-        {
-          idhdl h2=IDRING(hh)->idroot;
-          while (h2!=NULL)
-          {
-            if (IDDATA(h2)==(void *)currRing) PrintS("(R)");
-            else PrintS("   ");
-            Print("%s::%s, typ %s level %d\n",
-            IDID(hh),IDID(h2),Tok2Cmdname(IDTYP(h2)),IDLEV(h2));
-            h2=IDNEXT(h2);
-          }
-        }
-        hh=IDNEXT(hh);
-      }
-#endif /* HAVE_NS */
       return FALSE;
     }
     else

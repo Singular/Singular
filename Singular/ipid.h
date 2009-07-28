@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.h,v 1.44 2009-07-25 13:21:02 Singular Exp $ */
+/* $Id: ipid.h,v 1.45 2009-07-28 14:18:34 Singular Exp $ */
 /*
 * ABSTRACT: identfier handling
 */
@@ -46,10 +46,8 @@ class proclevel {
   proclevel * next;
   idhdl      cRingHdl;
   ring       cRing;
-  #ifdef HAVE_NS
   idhdl      cPackHdl;
   package    cPack;
-  #endif
   char      * name;
   proclevel()  { memset(this,0,sizeof(*this)); }
   void    push(char *);
@@ -77,18 +75,12 @@ idhdl enterid(const char * a, int lev, idtyp t, idhdl* root, BOOLEAN init=TRUE);
 idhdl ggetid(const char *n, BOOLEAN local = FALSE);
 idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl);
 void  killid(const char * a, idhdl * i);
-#ifdef HAVE_NS
 void killhdl(idhdl h, package prooti=currPack);
-#else
-void  killhdl(idhdl h);
-#endif
 void  killhdl2(idhdl h, idhdl * ih, ring r);
 lists ipNameList(idhdl root);
 void  ipMoveId(idhdl h);
 BOOLEAN checkPackage(package pack);
-#ifdef HAVE_NS
 idhdl packFindHdl(package r);
-#endif
 
 #define FLAG_STD   0
 #define FLAG_TWOSTD  3

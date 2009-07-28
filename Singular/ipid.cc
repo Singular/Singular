@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.86 2009-05-05 09:54:38 Singular Exp $ */
+/* $Id: ipid.cc,v 1.87 2009-07-28 14:18:34 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -42,12 +42,10 @@ proclevel *procstack=NULL;
 #define TEST
 idhdl idroot = NULL;
 
-#ifdef HAVE_NS
 idhdl currPackHdl = NULL;
 idhdl basePackHdl = NULL;
 package currPack =NULL;
 package basePack =NULL;
-#endif /* HAVE_NS */
 idhdl currRingHdl = NULL;
 ring  currRing = NULL;
 ideal currQuotient = NULL;
@@ -436,19 +434,15 @@ idhdl enterid(const char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
     }
   }
   *root = (*root)->set(s, lev, t, init);
-#ifdef HAVE_NS
 #ifndef NDEBUG
   checkall();
-#endif
 #endif
   return *root;
 
   errlabel:
     //Werror("identifier `%s` in use(lev h=%d,typ=%d,t=%d, curr=%d)",s,IDLEV(h),IDTYP(h),t,lev);
     Werror("identifier `%s` in use",s);
-#ifdef HAVE_NS
     //listall();
-#endif
     omFree((ADDRESS)s);
     return NULL;
 }
@@ -480,25 +474,6 @@ void killid(const char * id, idhdl * ih)
     Werror("kill what ?");
 }
 
-#ifndef HAVE_NS
-void killhdl(idhdl h)
-{
-  int t=IDTYP(h);
-  if (((BEGIN_RING<t) && (t<END_RING) && (t!=QRING_CMD))
-  || ((t==LIST_CMD) && (lRingDependend((lists)IDDATA(h)))))
-    killhdl2(h,&currRing->idroot,currRing);
-  else
-  {
-    {
-      idhdl s=IDROOT;
-      while ((s!=h) && (s!=NULL)) s=s->next;
-      if (s==NULL) killhdl2(h,&(currRing->idroot),currRing);
-      else killhdl2(h,&IDROOT,currRing);
-    }
-  }
-}
-#else 
-//#ifdef HAVE_NS
 void killhdl(idhdl h, package proot)
 {
   int t=IDTYP(h);
@@ -529,7 +504,6 @@ void killhdl(idhdl h, package proot)
     }
   }
 }
-#endif /* HAVE_NS */
 
 void killhdl2(idhdl h, idhdl * ih, ring r)
 {
@@ -553,7 +527,6 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     
     rKill(h);
   }
-#ifdef HAVE_NS
   // package -------------------------------------------------------------
   else if (IDTYP(h) == PACKAGE_CMD)
   {
@@ -581,7 +554,6 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     if (currPackHdl==h) currPackHdl=packFindHdl(currPack);
     iiCheckPack(currPack);
   }
-#endif /* HAVE_NS */
   // poly / vector -------------------------------------------------------
   else if ((IDTYP(h) == POLY_CMD) || (IDTYP(h) == VECTOR_CMD))
   {
@@ -717,10 +689,8 @@ idhdl ggetid(const char *n, BOOLEAN local)
   }
   if (h2!=NULL) return h2;
   if (h!=NULL) return h;
-#ifdef HAVE_NS
   if (basePack!=currPack)
     return basePack->idroot->get(n,myynest);
-#endif
   return NULL;
 }
 
@@ -791,12 +761,8 @@ void  ipMoveId(idhdl tomove)
     || ((IDTYP(tomove)==LIST_CMD) && (lRingDependend(IDLIST(tomove)))))
     {
       /*move 'tomove' to ring id's*/
-#ifdef HAVE_NS
       if (ipSwapId(tomove,IDROOT,currRing->idroot))
       ipSwapId(tomove,basePack->idroot,currRing->idroot);
-#else
-      ipSwapId(tomove,IDROOT,currRing->idroot);
-#endif
     }
     else
     {
@@ -948,10 +914,8 @@ void proclevel::push(char *n)
   p->cRing=currRing;
   p->cRingHdl=currRingHdl;
   p->name=n;
-  #ifdef HAVE_NS
   p->cPackHdl=currPackHdl;
   p->cPack=currPack;
-  #endif
   p->next=this;
   procstack=p;
 }
@@ -964,18 +928,15 @@ void proclevel::pop()
   //::currRingHdl=this->currRingHdl;
   //if((::currRingHdl==NULL)||(IDRING(::currRingHdl)!=(::currRing)))
   //  ::currRingHdl=rFindHdl(::currRing,NULL,NULL);
-  #ifdef HAVE_NS
   //Print("restore pack=%s,1.obj=%s\n",IDID(currPackHdl),IDID(currPack->idroot));
   currPackHdl=this->cPackHdl;
   currPack=this->cPack;
   iiCheckPack(currPack);
-  #endif
   proclevel *p=this;
   procstack=next;
   omFreeSize(p,sizeof(proclevel));
 }
 
-#ifdef HAVE_NS
 idhdl packFindHdl(package r)
 {
   idhdl h=basePack->idroot;
@@ -988,4 +949,3 @@ idhdl packFindHdl(package r)
   }
   return NULL;
 }
-#endif

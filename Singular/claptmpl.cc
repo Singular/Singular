@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.43 2008-07-15 16:27:11 motsak Exp $
+// $Id: claptmpl.cc,v 1.44 2009-07-28 14:18:32 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -65,7 +65,7 @@
 
   #endif
 // place here your own template stuff, not instantiated by factory
-  #ifdef HAVE_LIBFAC_P
+  // libfac:
     #include <factor.h>
 
 // class.h:
@@ -157,7 +157,6 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
 // for charsets:
     template class ListIterator<CFList>;
 
-  #endif
 #endif
 
 #ifdef HAVE_FGLM

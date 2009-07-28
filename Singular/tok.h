@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.70 2008-08-22 09:01:18 Singular Exp $ */
+/* $Id: tok.h,v 1.71 2009-07-28 14:19:05 Singular Exp $ */
 
 #ifndef MYYSTYPE
 #include "structs.h"
@@ -23,7 +23,6 @@ extern int  yyparse(void);
 #endif
 
 /* Define to use old mechanismen for saving currRing with procedures
- * Does work with HAVE_NAMESPACES enabled
  */
 #define USE_IILOCALRING 1
 

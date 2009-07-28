@@ -48,13 +48,12 @@
 
 #ifdef HAVE_FACTORY
 #include <factory.h>
-#endif
-
-/* version strings */
-#ifdef HAVE_LIBFAC_P
+// libfac:
   extern const char * libfac_version;
   extern const char * libfac_date;
 #endif
+
+/* version strings */
 #include <si_gmp.h>
 #ifdef HAVE_MPSR
 #include <MP_Config.h>
@@ -480,8 +479,6 @@ char * versionString()
   StringAppendS("\t");
 #ifdef HAVE_FACTORY
               StringAppend("factory(%s),", factoryVersion);
-#endif
-#ifdef HAVE_LIBFAC_P
               StringAppend("libfac(%s,%s),\n\t",libfac_version,libfac_date);
 #endif
 #if defined (__GNU_MP_VERSION) && defined (__GNU_MP_VERSION_MINOR)
@@ -532,9 +529,6 @@ char * versionString()
               StringAppendS("DBM,\n\t");
 #else
               StringAppendS("\n\t");
-#endif
-#ifdef HAVE_NS
-              StringAppendS("namespaces,");
 #endif
 #ifdef HAVE_DYNAMIC_LOADING
               StringAppendS("dynamic modules,");
@@ -625,7 +619,6 @@ void p_SetRingOfLeftv(leftv l, ring r)
 #endif
 #endif
 
-#ifdef HAVE_NS
 void listall(int showproc)
 {
       idhdl hh=basePack->idroot;
@@ -708,7 +701,6 @@ void checkall()
         hh=IDNEXT(hh);
       }
 }
-#endif
 #endif
 
 #include <sys/types.h>

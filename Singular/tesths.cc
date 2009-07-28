@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.115 2008-09-10 09:33:58 Singular Exp $ */
+/* $Id: tesths.cc,v 1.116 2009-07-28 14:19:05 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -53,6 +53,16 @@ int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
 {
+// do not call mp_set_memory_functions in LIBSINGULAR:
+#if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
+    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
+    /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
+    /* solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, */
+    /* do not rely on the default in Singular as libsingular may be different */
+    mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
+#else
+    mp_set_memory_functions(malloc,reallocSize,freeSize);
+#endif
 #ifdef HAVE_FACTORY
   On(SW_USE_NTL);
   Off(SW_USE_GCD_P);
@@ -132,7 +142,6 @@ int main(          /* main entry to Singular */
 
   /* say hello */
   {
-#ifdef HAVE_NS
     basePack=(package)omAlloc0(sizeof(*basePack));
     currPack=basePack;
     idhdl h;
@@ -141,7 +150,6 @@ int main(          /* main entry to Singular */
     IDPACKAGE(h)=basePack;
     currPackHdl=h;
     basePackHdl=h;
-#endif /* HAVE_NS */
   }
   if (BVERBOSE(0))
   {

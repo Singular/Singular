@@ -258,8 +258,7 @@ libkernel.a: ${OBJS}
 
 p_Procs_Lib.o: p_Procs_Lib.inc
 
-kversion.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
-           configure.in
+kversion.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in
 	echo "#define feVersionId0 "  `date '+%Y%m%d%H'` >kversion.h
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation

@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.58 2009-06-21 14:10:18 Singular Exp $
+* versin $Id: fehelp.cc,v 1.59 2009-07-28 14:18:34 Singular Exp $
 */
 
 #include <string.h>
@@ -776,11 +776,7 @@ static BOOLEAN heOnlineHelp(char* s)
     lib_style_types lib_style; // = OLD_LIBSTYLE;
 
     yylpin = fp;
-#ifdef HAVE_NS
     yylplex(str, libnamebuf, &lib_style, IDROOT, FALSE, GET_INFO);
-#else
-    yylplex(str, libnamebuf, &lib_style, GET_INFO);
-#endif /* HAVE_NS */
     reinit_yylp();
     if(lib_style == OLD_LIBSTYLE)
     {
@@ -826,11 +822,7 @@ static BOOLEAN heOnlineHelp(char* s)
 static long heKeyChksum(char* key)
 {
   if (key == NULL || *key == '\0') return 0;
-#ifdef HAVE_NS
   idhdl h=IDROOT->get(key,myynest);
-#else
-  idhdl h=idroot->get(key,myynest);
-#endif /* HAVE_NS */
   if ((h!=NULL) && (IDTYP(h)==PROC_CMD))
   {
     procinfo *pi = IDPROC(h);
