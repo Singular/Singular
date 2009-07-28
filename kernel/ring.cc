@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.124 2009-07-26 20:16:24 motsak Exp $ */
+/* $Id: ring.cc,v 1.125 2009-07-28 08:49:15 Singular Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -1644,7 +1644,22 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   }
   if (r->qideal!=NULL)
   {
-    if (copy_qideal) res->qideal= idrCopyR_NoSort(r->qideal, r, res);
+    if (copy_qideal) 
+    {
+      #ifndef NDEBUG
+      if (!copy_ordering)
+	WerrorS("internal error: rCopy0(Q,TRUE,FALSE)");
+      else
+      #endif
+      {
+      #ifndef NDEBUG
+	WarnS("internal bad stuff: rCopy0(Q,TRUE,TRUE)");
+      #endif
+	rComplete(res);
+        res->qideal= idrCopyR_NoSort(r->qideal, r, res);
+	rUnComplete(res);
+      }
+    }
     //memset: else res->qideal = NULL;
   }
   //memset: else res->qideal = NULL;
