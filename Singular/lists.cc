@@ -1,11 +1,11 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.30 2005-07-27 15:47:57 Singular Exp $ */
+/* $Id: lists.cc,v 1.31 2009-07-29 14:49:38 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
-#ifndef LISTS_CC
+// to produce a non-inline version from lists.h
 #define LISTS_CC
 
 #include "mod2.h"
@@ -405,5 +405,3 @@ char* lString(lists l, BOOLEAN typed, int dim)
   omFreeSize(slist, (l->nr+1) * sizeof(char*));
   return s;
 }
-
-#endif /* LISTS_CC */

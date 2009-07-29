@@ -8,8 +8,6 @@
 #include "ring.h"
 #include "janet.h"
 
-#define pow_(x) pTotaldegree((x))
-
 //extern int (*ListGreatMove)(jList *,jList *,poly);
 extern int ComputeBasis(jList *,jList *);
 extern void Initialization(char *);
@@ -90,7 +88,7 @@ BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
       pTest(iT->info->root);
       if ((flag==1) && dpO)
       {
-        //if (pow_(iT->info->lead) == pow_(iT->info->history))
+        //if (pTotaldegree(iT->info->lead) == pTotaldegree(iT->info->history))
         if (pDeg(iT->info->lead) == pDeg(iT->info->history))
         {
           result->m[ideal_length-ideal_index-1]=pCopy(iT->info->root);
