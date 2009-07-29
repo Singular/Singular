@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.118 2009-07-28 15:22:04 Singular Exp $ */
+/* $Id: tesths.cc,v 1.119 2009-07-29 12:00:04 Singular Exp $ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL
@@ -178,7 +178,6 @@ int main(          /* main entry to Singular */
 
   /* say hello */
   {
-#ifdef HAVE_NS
     basePack=(package)omAlloc0(sizeof(*basePack));
     currPack=basePack;
     idhdl h;
@@ -187,7 +186,6 @@ int main(          /* main entry to Singular */
     IDPACKAGE(h)=basePack;
     currPackHdl=h;
     basePackHdl=h;
-#endif /* HAVE_NS */
   }
   if (BVERBOSE(0))
   {
