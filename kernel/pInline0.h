@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly Level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.h,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $
+ *  Version: $Id: pInline0.h,v 1.2 2009-07-29 10:07:22 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE0_H
 #define PINLINE0_H
@@ -163,22 +163,9 @@ PINLINE0 int pLength(poly a)
 
 /*2
 * returns the length of a (numbers of monomials)
+* respect syzComp
 */
-PINLINE0 poly pLast(poly a, int &l)
-{
-  if (a == NULL)
-  {
-    l = 0;
-    return NULL;
-  }
-  l = 1;
-  while (pNext(a)!=NULL)
-  {
-    pIter(a);
-    l++;
-  }
-  return a;
-}
+poly pLast(poly a, int &l);
 
 #endif // PINLINE_CC
 

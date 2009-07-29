@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.38 2009-05-19 08:44:30 Singular Exp $ */
+/* $Id: polys.cc,v 1.39 2009-07-29 10:07:22 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials
@@ -1112,5 +1112,41 @@ int pSize(poly p)
     pIter( p );
   }
   return count;
+}
+
+/*2
+* returns the length of a (numbers of monomials)
+* respect syzComp
+*/
+poly pLast(poly a, int &l)
+{
+  if (a == NULL)
+  {
+    l = 0;
+    return NULL;
+  }
+  l = 1;
+  if (! rIsSyzIndexRing(currRing))
+  {
+    while (pNext(a)!=NULL)
+    {
+      pIter(a);
+      l++;
+    }
+  }
+  else
+  {
+    int curr_limit = rGetCurrSyzLimit(currRing);
+    poly pp = a;
+    while ((a=pNext(a))!=NULL)
+    {
+      if (pGetComp(a)<=curr_limit/*syzComp*/)
+        l++;
+      else break;
+      pp = a;
+    }
+    a=pp;
+  }
+  return a;
 }
 
