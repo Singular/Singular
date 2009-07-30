@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.38 2008-08-22 11:56:55 Singular Exp $ */
+/* $Id: longalg.cc,v 1.39 2009-07-30 11:49:09 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -438,7 +438,7 @@ void napWrite(napoly p,const BOOLEAN has_denom)
     BOOLEAN kl=FALSE;
     if (has_denom)
     {
-      number den=nacRing->cf->n_GetDenom(napGetCoeff(p), nacRing);
+      number den=n_GetDenom(napGetCoeff(p), nacRing);
       kl=!n_IsOne(den,nacRing);
       n_Delete(&den, nacRing);
     }
@@ -2461,6 +2461,20 @@ number   naGetDenom(number &n, const ring r)
     return (number)rr;
   }
   return r->cf->nInit(1);
+}
+number   naGetNumerator(number &n, const ring r)
+{
+  if (r==currRing) naNormalize(n);
+  lnumber x=(lnumber)n;
+  if (x!=NULL)
+  {
+    lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+    rr->z=nap_Copy(naGetNom0(x),r);
+    rr->s = 2;
+    rr->cnt=0;
+    return (number)rr;
+  }
+  return NULL;
 }
 
 #ifdef LDEBUG

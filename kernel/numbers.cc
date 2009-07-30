@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.23 2009-07-03 13:14:10 seelisch Exp $ */
+/* $Id: numbers.cc,v 1.24 2009-07-30 11:49:09 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -110,6 +110,7 @@ number ndGcd(number a, number b, const ring r) { return r->cf->nInit(1); }
 number ndIntMod(number a, number b) { return nInit(0); }
 
 number ndGetDenom(number &n, const ring r) { return n_Init(1,r); }
+number ndGetNumerator(number &a,const ring r) { return r->cf->nCopy(a); }
 
 int ndSize(number a) { return (int)nIsZero(a)==FALSE; }
 
@@ -296,7 +297,8 @@ void nInitChar(ring r)
   n->nPar  = ndPar;
   n->nParDeg=ndParDeg;
   n->nSize = ndSize;
-  n->n_GetDenom= ndGetDenom;
+  n->cfGetDenom= ndGetDenom;
+  n->cfGetNumerator= ndGetNumerator;
   n->nName =  ndName;
   n->nImPart=ndReturn0;
   n->cfDelete= ndDelete;
@@ -348,7 +350,8 @@ void nInitChar(ring r)
     n->cfSetMap    = naSetMap;
     n->nName       = naName;
     n->nSize       = naSize;
-    n->n_GetDenom   = naGetDenom;
+    n->cfGetDenom   = naGetDenom;
+    n->cfGetNumerator= naGetNumerator;
 #ifdef LDEBUG
     n->nDBTest     = naDBTest;
 #endif
@@ -509,7 +512,8 @@ void nInitChar(ring r)
     n->nLcm  = nlLcm;
     n->cfSetMap = nlSetMap;
     n->nSize  = nlSize;
-    n->n_GetDenom = nlGetDenom;
+    n->cfGetDenom = nlGetDenom;
+    n->cfGetNumerator = nlGetNumerator;
 #ifdef LDEBUG
     n->nDBTest=nlDBTest;
 #endif

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.42 2009-07-16 16:01:26 Singular Exp $ */
+/* $Id: longrat.cc,v 1.43 2009-07-30 11:49:09 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -1420,7 +1420,7 @@ number   nlGetDenom(number &n, const ring r)
 /*2
 * acces to Nominator, nlCopy(n) for integers
 */
-number   nlGetNom(number &n, const ring r)
+number   nlGetNumerator(number &n, const ring r)
 {
   if (!(SR_HDL(n) & SR_INT))
   {

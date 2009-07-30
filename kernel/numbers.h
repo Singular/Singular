@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.16 2008-12-08 17:47:35 Singular Exp $ */
+/* $Id: numbers.h,v 1.17 2009-07-30 11:49:09 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -34,6 +34,8 @@
 #define n_InpMult(a, b, r)    (r)->cf->nInpMult(a,b,r)
 #define n_Power(a, b, res, r) (r)->cf->nPower(a,b,res)
 #define n_Size(n,r)           (r)->cf->nSize(n)
+#define n_GetDenom(N,r)       (r)->cf->cfGetDenom((N),r)
+#define n_GetNumerator(N,r)   (r)->cf->cfGetNumerator((N),r)
 
 #define n_New(n, r)           (r)->cf->nNew(n)
 
@@ -82,7 +84,8 @@ extern number nNULL; /* the 0 as constant */
 extern void    (*n__Delete)(number * a, const ring r);
 #define nTest(a) (1)
 #define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
-#define nGetDenom(N) (currRing->cf->n_GetDenom((N),currRing))
+#define nGetDenom(N) (currRing->cf->cfGetDenom((N),currRing))
+#define nGetNumerator(N) (currRing->cf->cfGetNumerator((N),currRing))
 
 #define nSetMap(R) (currRing->cf->cfSetMap(R,currRing))
 extern char *  (*nName)(number n);
