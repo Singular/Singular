@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.163 2009-06-04 08:55:36 Singular Exp $ */
+/* $Id: tgb.cc,v 1.164 2009-08-05 07:20:40 bricken Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -4233,7 +4233,6 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
   // nullen loeschen
   while(curr_pos>=0){
     if ((c->use_noro_last_block)&&(lies_in_last_dp_block(los[curr_pos].p,c))){
-        PrintS("L");
         int pn_noro=curr_pos+1;
         poly* p_noro=(poly*) omalloc(pn_noro*sizeof(poly));
         for(i=0;i<pn_noro;i++){
