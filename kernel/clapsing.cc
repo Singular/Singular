@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.37 2009-07-28 14:15:05 Singular Exp $
+// $Id: clapsing.cc,v 1.38 2009-08-05 17:29:12 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -195,7 +195,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 
-poly singclap_gcd ( poly f, poly g )
+poly singclap_gcd ( poly f, poly g, const ring r )
 {
   poly res=NULL;
 
@@ -287,6 +287,41 @@ poly singclap_gcd ( poly f, poly g )
   Off(SW_RATIONAL);
   pDelete(&f);
   pDelete(&g);
+  pTest(res);
+  return res;
+}
+
+poly singclap_gcd_r ( poly f, poly g, const ring r )
+{
+  // assume pCleardenom is done
+  // assume f!=0, g!=0
+  poly res=NULL;
+
+  if (p_IsConstantPoly(f,r) || p_IsConstantPoly(g,r))
+  {
+    return pOne();
+  }
+
+  // for now there is only the possibility to handle polynomials over
+  // Q and Fp ...
+  Off(SW_RATIONAL);
+  if (rField_is_Q(r) || (rField_is_Zp(r)))
+  {
+    CanonicalForm newGCD(const CanonicalForm & A, const CanonicalForm & B);
+    setCharacteristic( n_GetChar(r) );
+    CanonicalForm F( conv_SingPFactoryP( f,r ) ), G( conv_SingPFactoryP( g, r ) );
+    //if (nGetChar() > 1 )
+    //{
+    //  res=convFactoryPSingP( newGCD( F,G ));
+    //  if (!nGreaterZero(pGetCoeff(res))) res=pNeg(res);
+    //}
+    //else
+      res=conv_FactoryPSingP( gcd( F, G ) , r);
+  }
+  else
+    WerrorS( feNotImplemented );
+
+  Off(SW_RATIONAL);
   pTest(res);
   return res;
 }

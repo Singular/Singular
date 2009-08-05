@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.h,v 1.2 2008-01-23 15:42:10 Singular Exp $
+// $Id: clapsing.h,v 1.3 2009-08-05 17:29:12 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -18,6 +18,7 @@
 #include "matpol.h"
 
 poly singclap_gcd ( poly f, poly g );
+poly singclap_gcd_r ( poly f, poly g, const ring r );
 napoly singclap_alglcm ( napoly f, napoly g );
 void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
 
