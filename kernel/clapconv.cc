@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.12 2008-12-17 15:07:46 Singular Exp $
+// $Id: clapconv.cc,v 1.13 2009-08-05 17:28:16 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -226,7 +226,7 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
 CanonicalForm convSingTrFactoryP( napoly p )
 {
   CanonicalForm result = 0;
-  int e, n = napVariables;
+  int e, n = rPar(currRing);
 
   while ( p!=NULL)
   {
@@ -234,18 +234,18 @@ CanonicalForm convSingTrFactoryP( napoly p )
     /* does only work for finite fields */
     if ( getCharacteristic() != 0 )
     {
-      term = npInt( napGetCoeff( p ) );
+      term = npInt( pGetCoeff( p ) );
     }
     else
     {
-      if ( SR_HDL(napGetCoeff( p )) & SR_INT )
-        term = SR_TO_INT( napGetCoeff( p ) );
+      if ( SR_HDL(pGetCoeff( p )) & SR_INT )
+        term = SR_TO_INT( pGetCoeff( p ) );
       else
       {
-        if ( napGetCoeff( p )->s == 3 )
+        if ( pGetCoeff( p )->s == 3 )
         {
           MP_INT dummy;
-          mpz_init_set( &dummy, &(napGetCoeff( p )->z) );
+          mpz_init_set( &dummy, &(pGetCoeff( p )->z) );
           term = make_cf( dummy );
         }
         else
@@ -253,19 +253,19 @@ CanonicalForm convSingTrFactoryP( napoly p )
           // assume s==0 or s==1
           MP_INT num, den;
           On(SW_RATIONAL);
-          mpz_init_set( &num, &(napGetCoeff( p )->z) );
-          mpz_init_set( &den, &(napGetCoeff( p )->n) );
-          term = make_cf( num, den, ( napGetCoeff( p )->s != 1 ));
+          mpz_init_set( &num, &(pGetCoeff( p )->z) );
+          mpz_init_set( &den, &(pGetCoeff( p )->n) );
+          term = make_cf( num, den, ( pGetCoeff( p )->s != 1 ));
         }
       }
     }
     for ( int i = n; i >0; i-- )
     {
-      if ( (e = napGetExp( p, i )) != 0 )
+      if ( (e = p_GetExp( p, i, currRing->algring )) != 0 )
         term *= power( Variable( i ), e );
     }
     result += term;
-    p = napNext( p );
+    pIter( p );
   }
   return result;
 }
@@ -273,8 +273,8 @@ CanonicalForm convSingTrFactoryP( napoly p )
 napoly convFactoryPSingTr ( const CanonicalForm & f )
 {
 //    cerr << " f = " << f << endl;
-  int n = napVariables+1;
-  /* ASSERT( level( f ) <= napVariables, "illegal number of variables" ); */
+  int n = rPar(currRing)+1;
+  /* ASSERT( level( f ) <= rPar(currRing), "illegal number of variables" ); */
   int * exp = (int *)omAlloc0(n*sizeof(int));
   napoly result = NULL;
   convRecPTr( f, exp, result );
@@ -300,10 +300,11 @@ static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
   {
     napoly term = napNew();
     // napNext( term ) = NULL; //already done by napNew
-    for ( int i = 1; i <= napVariables; i++ )
-      napSetExp( term, i , exp[i]);
+    for ( int i = rPar(currRing); i>=1; i-- )
+      p_SetExp( term, i , exp[i],currRing->algring);
+    p_Setm(term, currRing->algring);
     if ( f.isImm() )
-      napGetCoeff( term ) = nacInit( f.intval() );
+      pGetCoeff( term ) = n_Init( f.intval(), currRing->algring );
     else
     {
       number z=(number)omAllocBin(rnumber_bin);
@@ -326,12 +327,12 @@ static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
         else
         {
           z->s = 0;
-          nacNormalize(z);
+          n_Normalize(z,currRing->algring);
         }
       }
-      napGetCoeff( term ) = z;
+      pGetCoeff( term ) = z;
     }
-    if (nacIsZero(pGetCoeff(term)))
+    if (n_IsZero(pGetCoeff(term),currRing->algring))
     {
       napDelete(&term);
     }
@@ -473,7 +474,7 @@ CanonicalForm convSingAFactoryA ( napoly p , const Variable & a )
 static number convFactoryNSingAN( const CanonicalForm &f)
 {
   if ( f.isImm() )
-    return nacInit( f.intval() );
+    return n_Init( f.intval(), currRing->algring );
   else
   {
     number z=(number)omAllocBin(rnumber_bin);
@@ -507,7 +508,7 @@ napoly convFactoryASingA ( const CanonicalForm & f )
     t=napNew();
     // napNext( t ) = NULL; //already done by napNew
     napGetCoeff(t)=convFactoryNSingAN( i.coeff() );
-    if (nacIsZero(napGetCoeff(t)))
+    if (n_IsZero(napGetCoeff(t),currRing->algring))
     {
       napDelete(&t);
     }
