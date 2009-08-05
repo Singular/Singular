@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.10 2009-07-30 14:13:45 Singular Exp $ */
+/* $Id: longalg.h,v 1.11 2009-08-05 15:56:35 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -41,7 +41,6 @@ BOOLEAN naEqual(number a, number b);                  /* a = b ? */
 BOOLEAN naGreater(number a, number b);                  /* dummy */
 number  naNeg(number za);                           /* za := - za */
 number  naInvers(number a);
-BOOLEAN naGreaterZero(number a);
 void    naPower(number x, int exp, number *lo);
 BOOLEAN naGreaterZero(number a);
 number  naCopy(number p);                              /* erg:= p */
