@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.17 2009-07-30 11:49:09 Singular Exp $ */
+/* $Id: numbers.h,v 1.18 2009-08-06 14:35:18 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -108,4 +108,7 @@ void nKillChar(ring r);
 void nSetChar(ring r);
 
 #define nDivBy0 "div by 0"
+
+// dummy routines
+void   nDummy2(number& d); // nNormalize...
 #endif
