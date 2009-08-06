@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.41 2009-08-06 14:36:51 Singular Exp $ */
+/* $Id: longalg.cc,v 1.42 2009-08-06 16:35:56 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -307,7 +307,7 @@ static napoly napInvers(napoly x, const napoly c)
     t = nacInvers(napGetCoeff(r));
     nacNormalize(t);
     t = nacNeg(t);
-    qa=p_Mult_nn(qa,t,nacRing);
+    qa=p_Mult_nn(qa,t,nacRing); p_Normalize(qa,nacRing);
     nacDelete(&t,nacRing);
     napNormalize(qa);
     napDelete(&x);
@@ -327,7 +327,7 @@ static napoly napInvers(napoly x, const napoly c)
     q = napAdd(q, napInit(1));
     nacNormalize(napGetCoeff(r));
     t = nacInvers(napGetCoeff(r));
-    q=p_Mult_nn(q,t,nacRing);
+    q=p_Mult_nn(q,t,nacRing); p_Normalize(q,nacRing);
     napNormalize(q);
     nacDelete(&t,nacRing);
     napDelete(&x);
@@ -356,7 +356,7 @@ static napoly napInvers(napoly x, const napoly c)
       nacNormalize(napGetCoeff(r));
       t = nacInvers(napGetCoeff(r));
       //nacNormalize(t);
-      q=p_Mult_nn(q,t,nacRing);
+      q=p_Mult_nn(q,t,nacRing); p_Normalize(q,nacRing);
       napNormalize(q);
       nacDelete(&t,nacRing);
       napDelete(&x);
@@ -650,14 +650,7 @@ static void napCleardenom(napoly ph)
   if(!nacIsOne(h))
   {
     p = ph;
-    while (p!=NULL)
-    {
-      d=nacMult(h, napGetCoeff(p));
-      nacDelete(&napGetCoeff(p),nacRing);
-      nacNormalize(d);
-      napGetCoeff(p) = d;
-      napIter(p);
-    }
+    p=p_Mult_nn(p,h,nacRing);p_Normalize(p,nacRing);
     nacDelete(&h,nacRing);
   }
   napContent(ph);
@@ -745,7 +738,10 @@ static napoly napGcd(napoly a, napoly b)
       {
         napCleardenom(y);
         if (!nacIsOne(napGetCoeff(g)))
+	{
           y=p_Mult_nn(y,napGetCoeff(g),nacRing);
+	  p_Normalize(y,nacRing);
+        }
         napDelete1(&g);
         return y;
       }
@@ -1762,8 +1758,8 @@ void naNormalize(number &pp)
   // p->n !=NULL:
   /* collect all denoms from y and multiply x and y by it */
     number n=napLcm(y);
-    x=p_Mult_nn(x,n,nacRing);
-    y=p_Mult_nn(y,n,nacRing);
+    x=p_Mult_nn(x,n,nacRing);p_Normalize(x,nacRing);
+    y=p_Mult_nn(y,n,nacRing);p_Normalize(y,nacRing);
     nacDelete(&n,nacRing);
     while(x!=NULL)
     {
@@ -1812,7 +1808,7 @@ void naNormalize(number &pp)
     }
     number h1 = nacInvers(napGetCoeff(y));
     nacNormalize(h1);
-    x=p_Mult_nn(x,h1,nacRing);
+    x=p_Mult_nn(x,h1,nacRing);p_Normalize(x,nacRing);
     nacDelete(&h1,nacRing);
     napDelete1(&y);
     p->n = NULL;
@@ -1857,8 +1853,8 @@ void naNormalize(number &pp)
     if (naIsChar0)
     {
       number n=napLcm(y);
-      x=p_Mult_nn(x,n,nacRing);
-      y=p_Mult_nn(y,n,nacRing);
+      x=p_Mult_nn(x,n,nacRing);p_Normalize(x,nacRing);
+      y=p_Mult_nn(y,n,nacRing);p_Normalize(y,nacRing);
       nacDelete(&n,nacRing);
       while(x!=NULL)
       {
@@ -2046,7 +2042,7 @@ void naSetIdeal(ideal I)
         a=nacCopy(napGetCoeff(x));
         number aa=nacInvers(a);
         nacDelete(&a,nacRing);
-        x=p_Mult_nn(x,aa,nacRing);
+        x=p_Mult_nn(x,aa,nacRing);p_Normalize(x,nacRing);
         nacDelete(&aa,nacRing);
       }
     }
