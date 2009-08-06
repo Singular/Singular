@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.38 2009-08-05 17:29:12 Singular Exp $
+// $Id: clapsing.cc,v 1.39 2009-08-06 07:21:58 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -195,7 +195,7 @@ TIMING_DEFINE_PRINT( algLcmTimer );
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 
-poly singclap_gcd ( poly f, poly g, const ring r )
+poly singclap_gcd ( poly f, poly g )
 {
   poly res=NULL;
 
