@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.311 2009-07-28 15:16:04 Singular Exp $ */
+/* $Id: extra.cc,v 1.312 2009-08-06 10:18:00 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -159,20 +159,6 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 //#include <python_wrapper.h>
 #endif
 
-
-// see clapsing.cc for a description of the `FACTORY_*' options
-
-#ifdef FACTORY_GCD_STAT
-#include "gcd_stat.h"
-#endif
-
-#ifdef FACTORY_GCD_TIMING
-#define TIMING
-#include "timing.h"
-TIMING_DEFINE_PRINTPROTO( contentTimer );
-TIMING_DEFINE_PRINTPROTO( algContentTimer );
-TIMING_DEFINE_PRINTPROTO( algLcmTimer );
-#endif
 
 void piShowProcList();
 #ifndef MAKE_DISTRIBUTION
@@ -2283,45 +2269,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
         WerrorS("ideal expected");
-    }
-    else
-#endif
-/*=======================gcd Testerei ================================*/
-#ifdef FACTORY_GCD_TEST
-    if ( ! strcmp( sys_cmd, "setgcd" ) )
-    {
-        if ( (h != NULL) && (h->Typ() == INT_CMD) )
-        {
-            CFPrimitiveGcdUtil::setAlgorithm( (int)h->Data() );
-            return FALSE;
-        } else
-            WerrorS("int expected");
-    }
-    else
-#endif
-
-#ifdef FACTORY_GCD_TIMING
-    if ( ! strcmp( sys_cmd, "gcdtime" ) )
-    {
-        TIMING_PRINT( contentTimer, "time used for content: " );
-        TIMING_PRINT( algContentTimer, "time used for algContent: " );
-        TIMING_PRINT( algLcmTimer, "time used for algLcm: " );
-        TIMING_RESET( contentTimer );
-        TIMING_RESET( algContentTimer );
-        TIMING_RESET( algLcmTimer );
-        return FALSE;
-    }
-    else
-#endif
-
-#ifdef FACTORY_GCD_STAT
-    if ( ! strcmp( sys_cmd, "gcdstat" ) )
-    {
-        printGcdTotal();
-        printContTotal();
-        resetGcdTotal();
-        resetContTotal();
-        return FALSE;
     }
     else
 #endif
