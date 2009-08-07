@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.12 2009-08-05 17:29:44 Singular Exp $ */
+/* $Id: longalg.h,v 1.13 2009-08-07 11:13:40 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -19,7 +19,6 @@ struct slnumber
   napoly z;
   napoly n;
   BOOLEAN s;
-  short cnt;
 };
 
 extern int naNumbOfPar;             /* maximal number of parameters */
