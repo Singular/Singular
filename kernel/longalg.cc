@@ -1,9 +1,12 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.43 2009-08-07 11:13:40 Singular Exp $ */
+/* $Id: longalg.cc,v 1.44 2009-08-07 13:55:21 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
+* convention: A) minpoly==0: n->z, n->n are from Z[a] resp. Z/p[a],
+*                no common div., L(n->n) >0 (or n->n==NULL)
+*             B) minpoly!=NULL: n->z from k[a], n->n==NULL
 */
 
 #include <stdio.h>
@@ -512,7 +515,7 @@ static const char  *napRead(const char *s, napoly *b)
     s = napHandlePars(s, i, a);
     if (olds == s)
       i++;
-    else if (*s == '\0') 
+    else if (*s == '\0')
     {
       *b = a;
       return s;
@@ -942,8 +945,8 @@ void naDelete(number *p, const ring r)
   {
     lnumber l = (lnumber) * p;
     if (l==NULL) return;
-    nap_Delete(&(l->z),r);
-    nap_Delete(&(l->n),r);
+    p_Delete(&(l->z),r->algring);
+    p_Delete(&(l->n),r->algring);
     omFreeBin((ADDRESS)l,  rnumber_bin);
   }
   *p = NULL;
@@ -983,127 +986,6 @@ number na_Copy(number p, const ring r)
 void naNew(number *z)
 {
   *z = NULL;
-}
-
-/*2
-*  addition; lu:= la + lb
-*/
-number naAdd(number la, number lb)
-{
-  napoly x, y;
-  lnumber lu;
-  lnumber a = (lnumber)la;
-  lnumber b = (lnumber)lb;
-  if (a==NULL) return naCopy(lb);
-  if (b==NULL) return naCopy(la);
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
-  lu = (lnumber)omAllocBin(rnumber_bin);
-  if (b->n!=NULL) x = napMultCopy(a->z, b->n);
-  else            x = napCopy(a->z);
-  if (a->n!=NULL) y = napMultCopy(b->z, a->n);
-  else            y = napCopy(b->z);
-  lu->z = napAdd(x, y);
-  if (lu->z==NULL)
-  {
-    omFreeBin((ADDRESS)lu,  rnumber_bin);
-    return (number)NULL;
-  }
-  if (a->n!=NULL)
-  {
-    if (b->n!=NULL) x = napMultCopy(a->n, b->n);
-    else            x = napCopy(a->n);
-  }
-  else
-  {
-    if (b->n!=NULL) x = napCopy(b->n);
-    else            x = NULL;
-  }
-  //if (x!=NULL)
-  //{
-  //  if (napIsConstant(x))
-  //  {
-  //    number inv=nacInvers(napGetCoeff(x));
-  //    napMultN(lu->z,inv);
-  //    n_Delete(&inv,nacRing);
-  //    napDelete(&x);
-  //  }
-  //}
-  lu->n = x;
-  lu->s = FALSE;
-  if (lu->n!=NULL)
-  {
-     number luu=(number)lu;
-     naNormalize(luu);
-     lu=(lnumber)luu;
-  }
-  naTest((number)lu);
-  return (number)lu;
-}
-
-/*2
-*  subtraction; r:= la - lb
-*/
-number naSub(number la, number lb)
-{
-  lnumber lu;
-
-  if (lb==NULL) return naCopy(la);
-  if (la==NULL)
-  {
-    lu = (lnumber)naCopy(lb);
-    lu->z = napNeg(lu->z);
-    return (number)lu;
-  }
-
-  lnumber a = (lnumber)la;
-  lnumber b = (lnumber)lb;
-
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
-
-  napoly x, y;
-  lu = (lnumber)omAllocBin(rnumber_bin);
-  if (b->n!=NULL) x = napMultCopy(a->z, b->n);
-  else            x = napCopy(a->z);
-  if (a->n!=NULL) y = napMult(napCopy(b->z), napCopyNeg(a->n));
-  else            y = napCopyNeg(b->z);
-  lu->z = napAdd(x, y);
-  if (lu->z==NULL)
-  {
-    omFreeBin((ADDRESS)lu,  rnumber_bin);
-    return (number)NULL;
-  }
-  if (a->n!=NULL)
-  {
-    if (b->n!=NULL) x = napMultCopy(a->n, b->n);
-    else            x = napCopy(a->n);
-  }
-  else
-  {
-    if (b->n!=NULL) x = napCopy(b->n);
-    else            x = NULL;
-  }
-  //if (x!=NULL)
-  //{
-  //  if (napIsConstant(x))
-  //  {
-  //    number inv=nacInvers(napGetCoeff(x));
-  //    napMultN(lu->z,inv);
-  //    n_Delete(&inv,nacRing);
-  //    napDelete(&x);
-  //  }
-  //}
-  lu->n = x;
-  lu->s = FALSE;
-  if (lu->n!=NULL)
-  {
-     number luu=(number)lu;
-     naNormalize(luu);
-     lu=(lnumber)luu;
-  }
-  naTest((number)lu);
-  return (number)lu;
 }
 
 /*2
@@ -1537,12 +1419,12 @@ BOOLEAN naIsOne(number za)
 #endif
   if (a->n==NULL)
   {
-    if (napIsConstant(a->z)) 
+    if (napIsConstant(a->z))
     {
 #ifdef LDEBUG
        if (a->z==NULL) return FALSE;
-       else 
-#endif 
+       else
+#endif
          return nacIsOne(napGetCoeff(a->z));
     }
     else                 return FALSE;
@@ -1624,7 +1506,7 @@ number naGcd(number a, number b, const ring r)
 {
   if (a==NULL)  return naCopy(b);
   if (b==NULL)  return naCopy(a);
-  
+
   lnumber x, y;
   lnumber result = (lnumber)omAlloc0Bin(rnumber_bin);
 
@@ -1648,13 +1530,13 @@ number naGcd(number a, number b, const ring r)
 
     napoly rz=napGcd(x->z, y->z);
     CanonicalForm F, G, R;
-    R=convSingTrFactoryP(rz); 
+    R=convSingTrFactoryP(rz);
     napNormalize(x->z);
-    F=convSingTrFactoryP(x->z)/R; 
+    F=convSingTrFactoryP(x->z)/R;
     napNormalize(y->z);
-    G=convSingTrFactoryP(y->z)/R; 
+    G=convSingTrFactoryP(y->z)/R;
     F = gcd( F, G );
-    if (F.isOne()) 
+    if (F.isOne())
       result->z= rz;
     else
     {
@@ -2456,4 +2338,86 @@ BOOLEAN naDBTest(number a, const char *f,const int l)
   return TRUE;
 }
 #endif
+//-------------------------------------------------------------------------
+/// static: Normalize: case mipo==0, result: n->z, n->n integer
+static void naNormalize_0(number n)
+{
+  lnumber p = (lnumber) n;
+  napoly x = p->z;
+  napoly y = p->n;
+  if (nacRing->cf->nNormalize!=nDummy2)
+  {
+    /* collect all denoms from x and multiply x and y by it */
+    number n;
+    if (y!=NULL)
+    {
+      n=napLcm(y);
+      x=p_Mult_nn(x,n,nacRing); p_Normalize(x,nacRing);
+      y=p_Mult_nn(y,n,nacRing); p_Normalize(y,nacRing);
+      n_Delete(&n,nacRing);
+    }
+    /* collect all denoms from x and multiply x and y by it */
+    n=napLcm(y);
+    x=p_Mult_nn(x,n,nacRing);
+    if (y!=NULL)   { y=p_Mult_nn(y,n,nacRing); n_Delete(&n,nacRing); }
+    else           y=p_NSet(n,nacRing);
+    p->n=y;
+    // normalize all coeffs in x
+    p_Normalize(x,nacRing);
+    // normalize all coeffs in y
+    p_Normalize(y,nacRing);
+  }
+}
+/// return la+li
+number  naAdd(number la, number lb)               /* lu := la+lb */
+{
+  napoly x, y;
+  lnumber lu;
+  lnumber a = (lnumber)la;
+  lnumber b = (lnumber)lb;
+  if (a==NULL) return naCopy(lb);
+  if (b==NULL) return naCopy(la);
+  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(b,sizeof(snumber));
+  lu = (lnumber)omAllocBin(rnumber_bin);
+  if (b->n!=NULL) x = pp_Mult_qq(a->z, b->n, nacRing);
+  else            x = p_Copy(a->z,nacRing);
+  if (a->n!=NULL) y = pp_Mult_qq(b->z, a->n,nacRing);
+  else            y = p_Copy(b->z,nacRing);
+  lu->z = p_Add_q(x, y,nacRing);
+  if (lu->z==NULL)
+  {
+    omFreeBin((ADDRESS)lu,  rnumber_bin);
+    return (number)NULL;
+  }
+  if (a->n!=NULL)
+  {
+    if (b->n!=NULL) x = pp_Mult_qq(a->n, b->n,nacRing);
+    else            x = p_Copy(a->n,nacRing);
+  }
+  else
+  {
+    if (b->n!=NULL) x = p_Copy(b->n,nacRing);
+    else            x = NULL;
+  }
+  lu->n = x;
+  lu->s = FALSE;
+  if (lu->n!=NULL)
+  {
+     number luu=(number)lu;
+     naNormalize_0(luu);
+     lu=(lnumber)luu;
+  }
+  naTest((number)lu);
+  return (number)lu;
+}
 
+/// return la -lb
+number  naSub(number la, number lb)               /* lu := la-lb */
+{
+  number llb=naCopy(lb);
+  llb=naNeg(llb);
+  number res=naAdd(la,llb);
+  naDelete(&llb,currRing);
+  return res;
+}
