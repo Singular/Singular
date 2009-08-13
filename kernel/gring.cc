@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.75 2009-07-27 08:33:59 Singular Exp $
+ *  Version: $Id: gring.cc,v 1.76 2009-08-13 17:26:31 motsak Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -2919,6 +2919,8 @@ BOOLEAN nc_CallPlural(
 // NOTE: all the data belong to the curr,
 // we change r which may be the same ring, and must have the same representation!
 {
+  assume( r->qideal == NULL ); // The basering must NOT be a qring!
+  
 //  assume( curr != r );
   assume( rSamePolyRep(r, curr) );
 
@@ -3829,7 +3831,7 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 bool nc_SetupQuotient(ring rGR, const ring rG, bool bCopy)
 {
   if( rGR->qideal == NULL )
-    return false; // no quotient = no work! done!?
+    return false; // no quotient = no work! done!? What about factors of SCA?
 
   bool ret = true;
   // currently only super-commutative extension deals with factors.
