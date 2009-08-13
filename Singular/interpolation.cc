@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: interpolation.cc,v 1.6 2009-06-04 09:58:49 Singular Exp $ */
+/* $Id: interpolation.cc,v 1.7 2009-08-13 15:30:51 Singular Exp $ */
 
 #include "mod2.h"
 #include "structs.h"
@@ -886,7 +886,7 @@ void PrepareRow (mono_type mon) // prepares a row and puts it into matrix
      modp_number *row;
      int first_col=-1;
      int col;
-     modp_number red_val;
+     modp_number red_val=1;
      row=my_row;
 #ifdef integerstrategy
      for (col=0;col<final_base_dim;col++)
