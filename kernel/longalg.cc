@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.45 2009-08-13 15:17:03 Singular Exp $ */
+/* $Id: longalg.cc,v 1.46 2009-08-13 15:31:27 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 * convention: A) minpoly==0: n->z, n->n are from Z[a] resp. Z/p[a],
@@ -1529,11 +1529,11 @@ number naGcd(number a, number b, const ring r)
 
     napoly rz=napGcd(x->z, y->z);
     CanonicalForm F, G, R;
-    R=convSingPFactoryP(rz,0,nacRing);
+    R=convSingPFactoryP(rz,nacRing);
     p_Normalize(x->z,nacRing);
-    F=convSingPFactoryP(x->z,0,nacRing)/R;
+    F=convSingPFactoryP(x->z,nacRing)/R;
     p_Normalize(y->z,nacRing);
-    G=convSingPFactoryP(y->z,0,nacRing)/R;
+    G=convSingPFactoryP(y->z,nacRing)/R;
     F = gcd( F, G );
     if (F.isOne())
       result->z= rz;

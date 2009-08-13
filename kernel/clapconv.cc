@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.15 2009-08-13 15:17:02 Singular Exp $
+// $Id: clapconv.cc,v 1.16 2009-08-13 15:31:27 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -161,7 +161,7 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
 }
 
 
-CanonicalForm convSingPFactoryP( poly p, const int off, const ring r )
+CanonicalForm convSingPFactoryP( poly p, const ring r )
 {
   CanonicalForm result = 0;
   int e, n = rVar(r);
@@ -205,7 +205,7 @@ CanonicalForm convSingPFactoryP( poly p, const int off, const ring r )
     for ( int i = n; i >0; i-- )
     {
       if ( (e = p_GetExp( p, i, r)) != 0 )
-        term *= power( Variable( i+off ), e );
+        term *= power( Variable( i ), e );
     }
     result += term;
     pIter( p );
@@ -408,7 +408,7 @@ CanonicalForm convSingTrPFactoryP ( poly p, const ring r )
   while ( p!=NULL )
   {
     n_Normalize(pGetCoeff(p),r);
-    CanonicalForm term=convSingPFactoryP(((lnumber)pGetCoeff(p))->z,0,r->algring);
+    CanonicalForm term=convSingPFactoryP(((lnumber)pGetCoeff(p))->z,r->algring);
 
     if ((((lnumber)pGetCoeff(p))->n!=NULL)
     && (!errorreported))

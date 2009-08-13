@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.h,v 1.5 2009-08-13 15:17:02 Singular Exp $
+// $Id: clapconv.h,v 1.6 2009-08-13 15:31:27 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -16,7 +16,7 @@
 #include <factory.h>
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r=currRing );
-CanonicalForm convSingPFactoryP( poly p, const int off=0, const ring r=currRing );
+CanonicalForm convSingPFactoryP( poly p, const ring r=currRing );
 
 CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a );
 poly convFactoryAPSingAP ( const CanonicalForm & f );
