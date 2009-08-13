@@ -4,7 +4,7 @@
 //stdhilb can be called with std or slimgb (Jan 2008, GMG)
 //### Todo: im lokalen Fall die Hilbert-Samuel Funktion verwenden
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.109 2009-04-15 11:15:56 seelisch Exp $";
+version="$Id: standard.lib,v 1.110 2009-08-13 17:45:06 motsak Exp $";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up
@@ -1377,10 +1377,11 @@ See also
      p_opt = 1;
    }
 
-   if(size(ideal(basering)) > 0)
+   if( (size(ideal(basering)) > 0) || (size(ringlist(P)) > 4) ) 
    {
      // the quick hack for qrings - seems to fit most needs
      // (lres is not implemented for qrings, sres is not so efficient)
+     // || non-commutative, since only n/m-res are implemented for NC rings
      if (p_opt) { "using nres";}
      return(nres(m,i));
    }
