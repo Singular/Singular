@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.38 2009-05-29 16:23:17 Singular Exp $
+ *  Version: $Id: sca.cc,v 1.39 2009-08-13 17:25:55 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -83,7 +83,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Super Commutative Algabra extension by Motsak
+// Super Commutative Algebra extension by Oleksandr 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -111,10 +111,10 @@ inline int sca_Sign_mm_Mult_mm( const poly pMonomM, const poly pMonomMM, const r
     const unsigned int iFirstAltVar = scaFirstAltVar(rRing);
     const unsigned int iLastAltVar  = scaLastAltVar(rRing);
 
-    unsigned int tpower = 0;
-    unsigned int cpower = 0;
+    register unsigned int tpower = 0;
+    register unsigned int cpower = 0;
 
-    for( unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
+    for( register unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
     {
       const unsigned int iExpM  = p_GetExp(pMonomM,  j, rRing);
       const unsigned int iExpMM = p_GetExp(pMonomMM, j, rRing);
@@ -124,7 +124,7 @@ inline int sca_Sign_mm_Mult_mm( const poly pMonomM, const poly pMonomMM, const r
       assume( iExpMM <= 1);
 #endif
 
-      if( iExpMM != 0 )
+      if( iExpMM != 0 ) // TODO: think about eliminating there if-s...
       {
         if( iExpM != 0 )
         {
@@ -162,10 +162,10 @@ inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring rRing )
     const unsigned int iFirstAltVar = scaFirstAltVar(rRing);
     const unsigned int iLastAltVar = scaLastAltVar(rRing);
 
-    unsigned int tpower = 0;
-    unsigned int cpower = 0;
+    register unsigned int tpower = 0;
+    register unsigned int cpower = 0;
 
-    for( unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
+    for( register unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
     {
       const unsigned int iExpM  = p_GetExp(pMonomM,  j, rRing);
       const unsigned int iExpMM = p_GetExp(pMonomMM, j, rRing);
@@ -226,10 +226,10 @@ inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring rRing )
     const unsigned int iFirstAltVar = scaFirstAltVar(rRing);
     const unsigned int iLastAltVar = scaLastAltVar(rRing);
 
-    unsigned int tpower = 0;
-    unsigned int cpower = 0;
+    register unsigned int tpower = 0;
+    register unsigned int cpower = 0;
 
-    for( unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
+    for( register unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
     {
       const unsigned int iExpMM = p_GetExp(pMonomMM, j, rRing);
       const unsigned int iExpM  = p_GetExp(pMonomM,  j, rRing);
@@ -291,10 +291,10 @@ inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
     const unsigned int iFirstAltVar = scaFirstAltVar(rRing);
     const unsigned int iLastAltVar = scaLastAltVar(rRing);
 
-    unsigned int tpower = 0;
-    unsigned int cpower = 0;
+    register unsigned int tpower = 0;
+    register unsigned int cpower = 0;
 
-    for( unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
+    for( register unsigned int j = iLastAltVar; j >= iFirstAltVar; j-- )
     {
       const unsigned int iExp1 = p_GetExp(pMonom1, j, rRing);
       const unsigned int iExp2 = p_GetExp(pMonom2, j, rRing);
@@ -363,9 +363,9 @@ inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring rRing)
 
     const unsigned int iFirstAltVar = scaFirstAltVar(rRing);
 
-    unsigned int cpower = 0;
+    register unsigned int cpower = 0;
 
-    for( unsigned int j = iFirstAltVar; j < i ; j++ )
+    for( register unsigned int j = iFirstAltVar; j < i ; j++ )
       cpower ^= p_GetExp(pMonom, j, rRing);
 
 #ifdef PDEBUG
@@ -1303,7 +1303,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   assume(rG  != NULL);
   assume(rIsPluralRing(rG));
 
-#if MYTEST
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   PrintS("sca_SetupQuotient(rGR, rG, bCopy)");
 
   {
@@ -1359,8 +1359,10 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   int iAltVarEnd = -1;
   int iAltVarStart   = N+1;
 
-  const ring rBase = rG->GetNC()->basering;
-  const matrix C   = rG->GetNC()->C; // live in rBase!
+  const nc_struct* NC = rG->GetNC();
+  const ring rBase = NC->basering;
+  const matrix C   = NC->C; // live in rBase!
+  const matrix D   = NC->D; // live in rBase!
 
 #if OUTPUT
   PrintS("sca_SetupQuotient: AltVars?!\n");
@@ -1370,6 +1372,15 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   {
     for(int j = i + 1; j <= N; j++)
     {
+      if( MATELEM(D,i,j) != NULL) // !!!???
+      {
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
+        Print("Nonzero D[%d, %d]\n", i, j);
+#endif
+        return false;
+      }
+      
+      
       assume(MATELEM(C,i,j) != NULL); // after CallPlural!
       number c = p_GetCoeff(MATELEM(C,i,j), rBase);
 
@@ -1384,11 +1395,8 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
       {
         if( !n_IsOne(c, rBase) )
         {
-#if OUTPUT
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
           Print("Wrong Coeff at: [%d, %d]\n", i, j);
-#endif
-#if MYTEST
-           Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
         }
@@ -1396,7 +1404,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
     }
   }
 
-#if MYTEST
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   Print("AltVars?1: [%d, %d]\n", iAltVarStart, iAltVarEnd);
 #endif
 
@@ -1416,13 +1424,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
       { // anticommutative part
         if( !n_IsMOne(c, rBase) )
         {
-#ifdef PDEBUG
-#if OUTPUT
-           Print("Wrong Coeff at: [%d, %d]\n", i, j);
-#endif
-#endif
-
-#if MYTEST
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
            Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
@@ -1431,12 +1433,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
       { // should commute
         if( !n_IsOne(c, rBase) )
         {
-#ifdef PDEBUG
-#if OUTPUT
-          Print("Wrong Coeff at: [%d, %d]\n", i, j);
-#endif
-#endif
-#if MYTEST
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
            Print("Wrong Coeff at: [%d, %d]\n", i, j);
 #endif
           return false;
@@ -1445,7 +1442,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
     }
   }
 
-#if MYTEST
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   Print("AltVars!?: [%d, %d]\n", iAltVarStart, iAltVarEnd);
 #endif
 
@@ -1464,7 +1461,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   const ideal idQuotient = rGR->qideal;
 
 
-#if MYTEST
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   PrintS("Analyzing quotient ideal:\n");
   idPrint(idQuotient); // in rG!!!
 #endif
@@ -1484,7 +1481,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
     b = si_min(b, scaFirstAltVar(rG));
     e = si_max(e, scaLastAltVar(rG));
 
-#if MYTEST
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
     Print("AltVars!?: [%d, %d]\n", b, e);
 #endif
     
@@ -1516,10 +1513,8 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   if(!bSCA) return false;
 
 
-#ifdef PDEBUG
-#if OUTPUT
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   Print("ScaVars!: [%d, %d]\n", iAltVarStart, iAltVarEnd);
-#endif
 #endif
 
 
@@ -1529,13 +1524,11 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   ideal tempQ = id_KillSquares(idQuotient, iAltVarStart, iAltVarEnd, rG); // in rG!!!
 
 
-#ifdef PDEBUG
-#if OUTPUT
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   PrintS("Quotient: \n");
   iiWriteMatrix((matrix)idQuotient,"__",1);
   PrintS("tempSCAQuotient: \n");
   iiWriteMatrix((matrix)tempQ,"__",1);
-#endif
 #endif
   
   idSkipZeroes( tempQ );
@@ -1553,14 +1546,12 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   nc_p_ProcsSet(rGR, rGR->p_Procs); // !!!!!!!!!!!!!!!!!
 
 
-#ifdef PDEBUG
-#if OUTPUT
+#if ((defined(PDEBUG) && OUTPUT) || MYTEST)
   PrintS("SCAQuotient: \n");
   if(tempQ != NULL)
     iiWriteMatrix((matrix)tempQ,"__",1);
   else
     PrintS("(NULL)\n");
-#endif
 #endif
   
   return true;
