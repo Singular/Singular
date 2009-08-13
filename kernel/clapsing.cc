@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.41 2009-08-13 12:48:39 Singular Exp $
+// $Id: clapsing.cc,v 1.42 2009-08-13 15:17:02 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -26,102 +26,6 @@ CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList
 
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
-poly singclap_gcd ( poly f, poly g )
-{
-  poly res=NULL;
-
-  if (f!=NULL) pCleardenom(f);
-  if (g!=NULL) pCleardenom(g);
-  else         return f; // g==0 => gcd=f (but do a pCleardenom)
-  if (f==NULL) return g; // f==0 => gcd=g (but do a pCleardenom)
-
-  if (pIsConstantPoly(f) || pIsConstantPoly(g))
-  {
-    pDelete(&f);
-    pDelete(&g);
-    return pOne();
-  }
-
-  // for now there is only the possibility to handle polynomials over
-  // Q and Fp ...
-  Off(SW_RATIONAL);
-  if (( nGetChar() == 0 || nGetChar() > 1 )
-  && (currRing->parameter==NULL))
-  {
-    CanonicalForm newGCD(const CanonicalForm & A, const CanonicalForm & B);
-    setCharacteristic( nGetChar() );
-    CanonicalForm F( convSingPFactoryP( f ) ), G( convSingPFactoryP( g ) );
-    //if (nGetChar() > 1 )
-    //{
-    //  res=convFactoryPSingP( newGCD( F,G ));
-    //  if (!nGreaterZero(pGetCoeff(res))) res=pNeg(res);
-    //}
-    //else
-      res=convFactoryPSingP( gcd( F, G ) );
-  }
-  // and over Q(a) / Fp(a)
-  else if (( nGetChar()==1 ) /* Q(a) */
-  || (nGetChar() <-1))       /* Fp(a) */
-  {
-    if (nGetChar()==1) setCharacteristic( 0 );
-    else               setCharacteristic( -nGetChar() );
-    if (currRing->minpoly!=NULL)
-    {
-    #if 0
-      if (( nGetChar()==1 ) /* Q(a) */ && (!isOn(SW_USE_QGCD)))
-      {
-      //  WerrorS( feNotImplemented );
-        CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
-        //Varlist ord;
-        //ord.append(mipo.mvar());
-        CFList as(mipo);
-        Variable a=rootOf(mipo);
-        //CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
-        CanonicalForm F( convSingTrPFactoryP(f) ), G( convSingTrPFactoryP(g) );
-        //res= convFactoryAPSingAP( algcd( F, G, as, ord) );
-        //res= convFactoryAPSingAP( alg_gcd( F, G, as) );
-        res= convFactoryAPSingAP( alg_gcd( F, G, as) );
-      }
-      else
-      #endif
-      {
-        bool b=isOn(SW_USE_QGCD);
-        if ( nGetChar()==1 ) On(SW_USE_QGCD);
-        CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
-        Variable a=rootOf(mipo);
-        CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
-        res= convFactoryAPSingAP( gcd( F, G ) );
-        if (!b) Off(SW_USE_QGCD);
-      }
-    }
-    else
-    {
-      CanonicalForm F( convSingTrPFactoryP( f ) ), G( convSingTrPFactoryP( g ) );
-      res= convFactoryPSingTrP( gcd( F, G ) );
-    }
-  }
-  #if 0
-  else if (( nGetChar()>1 )&&(currRing->parameter!=NULL)) /* GF(q) */
-  {
-    int p=rChar(currRing);
-    int n=2;
-    int t=p*p;
-    while (t!=nChar) { t*=p;n++; }
-    setCharacteristic(p,n,'a');
-    CanonicalForm F( convSingGFFactoryGF( f ) ), G( convSingGFFactoryGF( g ) );
-    res= convFactoryGFSingGF( gcd( F, G ) );
-  }
-  #endif
-  else
-    WerrorS( feNotImplemented );
-
-  Off(SW_RATIONAL);
-  pDelete(&f);
-  pDelete(&g);
-  pTest(res);
-  return res;
-}
-
 poly singclap_gcd_r ( poly f, poly g, const ring r )
 {
   // assume pCleardenom is done
@@ -140,7 +44,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   {
     CanonicalForm newGCD(const CanonicalForm & A, const CanonicalForm & B);
     setCharacteristic( n_GetChar(r) );
-    CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
+    CanonicalForm F( convSingPFactoryP( f,0,r ) ), G( convSingPFactoryP( g,0, r ) );
     //if (nGetChar() > 1 )
     //{
     //  res=convFactoryPSingP( newGCD( F,G ));
@@ -149,10 +53,80 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
     //else
       res=convFactoryPSingP( gcd( F, G ) , r);
   }
+  // and over Q(a) / Fp(a)
+  else if (( n_GetChar(r)==1 ) /* Q(a) */
+  || (n_GetChar(r) <-1))       /* Fp(a) */
+  {
+    if (n_GetChar(r)==1) setCharacteristic( 0 );
+    else                 setCharacteristic( -n_GetChar(r) );
+    if (r->minpoly!=NULL)
+    {
+    #if 0
+      if (( n_GetChar(r)==1 ) /* Q(a) */ && (!isOn(SW_USE_QGCD)))
+      {
+      //  WerrorS( feNotImplemented );
+        CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,0,r->algring);
+        //Varlist ord;
+        //ord.append(mipo.mvar());
+        CFList as(mipo);
+        Variable a=rootOf(mipo);
+        //CanonicalForm F( convSingAPFactoryAP( f,a,r ) ), G( convSingAPFactoryAP( g,a,r ) );
+        CanonicalForm F( convSingTrPFactoryP(f,r) ), G( convSingTrPFactoryP(g,r) );
+        //res= convFactoryAPSingAP( algcd( F, G, as, ord) );
+        //res= convFactoryAPSingAP( alg_gcd( F, G, as) );
+        res= convFactoryAPSingAP( alg_gcd( F, G, as),r );
+      }
+      else
+      #endif
+      {
+        bool b=isOn(SW_USE_QGCD);
+        if ( nGetChar()==1 ) On(SW_USE_QGCD);
+        CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
+                                           0,r->algring);
+        Variable a=rootOf(mipo);
+        CanonicalForm F( convSingAPFactoryAP( f,a ) ),
+                      G( convSingAPFactoryAP( g,a ) );
+        res= convFactoryAPSingAP( gcd( F, G ) );
+        if (!b) Off(SW_USE_QGCD);
+      }
+    }
+    else
+    {
+      CanonicalForm F( convSingTrPFactoryP( f,r ) ), G( convSingTrPFactoryP( g,r ) );
+      res= convFactoryPSingTrP( gcd( F, G ),r );
+    }
+  }
+  #if 0
+  else if (( n_GetChar(r)>1 )&&(r->parameter!=NULL)) /* GF(q) */
+  {
+    int p=rChar(r);
+    int n=2;
+    int t=p*p;
+    while (t!=n_Char(r)) { t*=p;n++; }
+    setCharacteristic(p,n,'a');
+    CanonicalForm F( convSingGFFactoryGF( f,r ) ), G( convSingGFFactoryGF( g,r ) );
+    res= convFactoryGFSingGF( gcd( F, G ),r );
+  }
+  #endif
   else
     WerrorS( feNotImplemented );
 
   Off(SW_RATIONAL);
+  return res;
+}
+
+poly singclap_gcd ( poly f, poly g )
+{
+  poly res=NULL;
+
+  if (f!=NULL) pCleardenom(f);
+  if (g!=NULL) pCleardenom(g);
+  else         return f; // g==0 => gcd=f (but do a pCleardenom)
+  if (f==NULL) return g; // f==0 => gcd=g (but do a pCleardenom)
+
+  res=singclap_gcd_r(f,g,currRing);
+  pDelete(&f);
+  pDelete(&g);
   return res;
 }
 
@@ -203,7 +177,8 @@ poly singclap_resultant ( poly f, poly g , poly x)
     if (currRing->minpoly!=NULL)
     {
       //Variable X(i);
-      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                                                 0,currRing->algring);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
       res= convFactoryAPSingAP( resultant( F, G, X ) );
@@ -344,7 +319,8 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
     CanonicalForm Fa,Gb;
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                                                 0,currRing->algring);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
       CanonicalForm FpG=F+G;
@@ -383,6 +359,83 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
   return FALSE;
 }
 
+BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const ring r )
+{
+  // for now there is only the possibility to handle univariate
+  // polynomials over
+  // Q and Fp ...
+  res=NULL;pa=NULL;pb=NULL;
+  On(SW_SYMMETRIC_FF);
+  if (( n_GetChar(r) == 0 || n_GetChar(r) > 1 )
+  && (r->parameter==NULL))
+  {
+    setCharacteristic( n_GetChar(r) );
+    CanonicalForm F( convSingPFactoryP( f,0,r ) ), G( convSingPFactoryP( g,0,r) );
+    CanonicalForm FpG=F+G;
+    if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
+    //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
+    {
+      Off(SW_RATIONAL);
+      WerrorS("not univariate");
+      return TRUE;
+    }
+    CanonicalForm Fa,Gb;
+    On(SW_RATIONAL);
+    res=convFactoryPSingP( extgcd( F, G, Fa, Gb ),r );
+    pa=convFactoryPSingP(Fa,r);
+    pb=convFactoryPSingP(Gb,r);
+    Off(SW_RATIONAL);
+  }
+  // and over Q(a) / Fp(a)
+  else if (( n_GetChar(r)==1 ) /* Q(a) */
+  || (n_GetChar(r) <-1))       /* Fp(a) */
+  {
+    if (n_GetChar(r)==1) setCharacteristic( 0 );
+    else                 setCharacteristic( -n_GetChar(r) );
+    CanonicalForm Fa,Gb;
+    if (r->minpoly!=NULL)
+    {
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
+                                            0,r->algring);
+      Variable a=rootOf(mipo);
+      CanonicalForm F( convSingAPFactoryAP( f,a ) ),
+                    G( convSingAPFactoryAP( g,a ) );
+      CanonicalForm FpG=F+G;
+      if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
+      //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
+      {
+        WerrorS("not univariate");
+        return TRUE;
+      }
+      res= convFactoryAPSingAP( extgcd( F, G, Fa, Gb ) );
+      pa=convFactoryAPSingAP(Fa);
+      pb=convFactoryAPSingAP(Gb);
+    }
+    else
+    {
+      CanonicalForm F( convSingTrPFactoryP( f, r ) ), G( convSingTrPFactoryP( g, r ) );
+      CanonicalForm FpG=F+G;
+      if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
+      //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
+      {
+        Off(SW_RATIONAL);
+        WerrorS("not univariate");
+        return TRUE;
+      }
+      res= convFactoryPSingTrP( extgcd( F, G, Fa, Gb ), r );
+      pa=convFactoryPSingTrP(Fa, r);
+      pb=convFactoryPSingTrP(Gb, r);
+    }
+    Off(SW_RATIONAL);
+  }
+  else
+  {
+    WerrorS( feNotImplemented );
+    return TRUE;
+  }
+  return FALSE;
+}
+
 poly singclap_pdivide ( poly f, poly g )
 {
   // for now there is only the possibility to handle polynomials over
@@ -404,7 +457,8 @@ poly singclap_pdivide ( poly f, poly g )
     else               setCharacteristic( -nGetChar() );
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                                                 0,currRing->algring);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
       res= convFactoryAPSingAP(  F / G  );
@@ -491,15 +545,15 @@ void singclap_divide_content ( poly f )
       }
       pIter(p);
     }
-    g = convSingTrFactoryP( ((lnumber)g1)->z );
-    g = gcd( g, convSingTrFactoryP( ((lnumber)g2)->z ));
+    g = convSingPFactoryP( ((lnumber)g1)->z, 0,currRing->algring );
+    g = gcd( g, convSingPFactoryP( ((lnumber)g2)->z , 0,currRing->algring));
 
     // second run: gcd's
 
     p = f;
     while ( (p != NULL) && (g != 1)  && ( g != 0))
     {
-      h = convSingTrFactoryP( ((lnumber)pGetCoeff(p))->z );
+      h = convSingPFactoryP( ((lnumber)pGetCoeff(p))->z, 0,currRing->algring );
       pIter( p );
 
       g = gcd( g, h );
@@ -518,7 +572,7 @@ void singclap_divide_content ( poly f )
       {
         lnumber c=(lnumber)pGetCoeff(p);
         napDelete(&c->z);
-        c->z=convFactoryPSingTr( i.getItem() / g );
+        c->z=convFactoryPSingP( i.getItem() / g, currRing->algring );
         //nTest((number)c);
         //#ifdef LDEBUG
         //number cn=(number)c;
@@ -565,7 +619,8 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
     {
       if (currRing->minpoly!=NULL)
       {
-        CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+        CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                                    0,currRing->algring);
         a=rootOf(mipo);
         F=convSingAPFactoryAP( f,a );
         FAC=convSingAPFactoryAP( fac,a );
@@ -788,7 +843,8 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     else                 setCharacteristic( -nGetChar() );
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                   0,currRing->algring);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a ) );
       if (rField_is_Zp_a() && F.isUnivariate())
@@ -1132,7 +1188,8 @@ ideal singclap_sqrfree ( poly f)
     else                 setCharacteristic( -nGetChar() );
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                    0,currRing->algring);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a ) );
       CFFList SqrFreeMV( const CanonicalForm & f , const CanonicalForm & mipo=0) ;
@@ -1385,7 +1442,8 @@ BOOLEAN singclap_isSqrFree(poly f)
     else               setCharacteristic( -nGetChar() );
     //if (currRing->minpoly!=NULL)
     //{
-    //  CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+    //  CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+    //                                             0,currRing->algring);
     //  Variable a=rootOf(mipo);
     //  CanonicalForm F( convSingAPFactoryAP( f,a ) );
     //  ...
@@ -1439,7 +1497,8 @@ poly singclap_det( const matrix m )
     poly res;
     if (currRing->minpoly!=NULL)
     {
-      CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                                            0,currRing->algring);
       Variable a=rootOf(mipo);
       int i,j;
       for(i=r;i>0;i--)
@@ -1496,7 +1555,8 @@ napoly singclap_alglcm ( napoly f, napoly g )
 
  if (currRing->minpoly!=NULL)
  {
-   CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+   CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                                         0,currRing->algring);
    Variable a=rootOf(mipo);
    CanonicalForm F( convSingAFactoryA( f,a ) ), G( convSingAFactoryA( g,a ) );
    CanonicalForm GCD;
@@ -1509,13 +1569,14 @@ napoly singclap_alglcm ( napoly f, napoly g )
  }
  else
  {
-   CanonicalForm F( convSingTrFactoryP( f ) ), G( convSingTrFactoryP( g ) );
+   CanonicalForm F( convSingPFactoryP( f,0,currRing->algring ) ),
+                 G( convSingPFactoryP( g,0,currRing->algring ) );
    CanonicalForm GCD;
    // calculate gcd
    GCD = gcd( F, G );
 
    // calculate lcm
-   res= convFactoryPSingTr( (F/GCD)*G );
+   res= convFactoryPSingP( (F/GCD)*G, currRing->algring );
  }
 
  Off(SW_RATIONAL);
@@ -1532,7 +1593,8 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
 
  if (currRing->minpoly!=NULL)
  {
-   CanonicalForm mipo=convSingTrFactoryP(((lnumber)currRing->minpoly)->z);
+   CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
+                         0,currRing->algring);
    Variable a=rootOf(mipo);
    CanonicalForm F( convSingAFactoryA( f,a ) ), G( convSingAFactoryA( g,a ) );
    CanonicalForm GCD;
@@ -1547,15 +1609,16 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
  }
  else
  {
-   CanonicalForm F( convSingTrFactoryP( f ) ), G( convSingTrFactoryP( g ) );
+   CanonicalForm F( convSingPFactoryP( f,0,currRing->algring ) ),
+                 G( convSingPFactoryP( g,0,currRing->algring ) );
    CanonicalForm GCD;
 
    GCD=gcd( F, G );
 
    if ((GCD!=1) && (GCD!=0))
    {
-     ff= convFactoryPSingTr( F/ GCD );
-     gg= convFactoryPSingTr( G/ GCD );
+     ff= convFactoryPSingP( F/ GCD, currRing->algring );
+     gg= convFactoryPSingP( G/ GCD, currRing->algring );
    }
  }
 

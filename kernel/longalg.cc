@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.44 2009-08-07 13:55:21 Singular Exp $ */
+/* $Id: longalg.cc,v 1.45 2009-08-13 15:17:03 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 * convention: A) minpoly==0: n->z, n->n are from Z[a] resp. Z/p[a],
@@ -33,7 +33,6 @@ naIdeal naI=NULL;
 int naNumbOfPar;
 napoly naMinimalPoly;
 #define naParNames (currRing->parameter)
-#define napNormalize(p) p_Normalize(p,nacRing)
 static int naIsChar0;
 static int naPrimeM;
 
@@ -203,8 +202,8 @@ napoly napRemainder(napoly f, const napoly  g)
 
   qq = (napoly)p_Init(nacRing);
   napNext(qq) = NULL;
-  napNormalize(g);
-  napNormalize(f);
+  p_Normalize(g,nacRing);
+  p_Normalize(f,nacRing);
   a = f;
   do
   {
@@ -215,7 +214,7 @@ napoly napRemainder(napoly f, const napoly  g)
     nacNormalize(napGetCoeff(qq));
     h = napCopy(g);
     napMultT(h, qq);
-    napNormalize(h);
+    p_Normalize(h,nacRing);
     n_Delete(&napGetCoeff(qq),nacRing);
     a = napAdd(a, h);
   }
@@ -233,8 +232,8 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
 
   qq = (napoly)p_Init(nacRing);
   napNext(qq) = b = NULL;
-  napNormalize(g);
-  napNormalize(f);
+  p_Normalize(g,nacRing);
+  p_Normalize(f,nacRing);
   a = f;
   do
   {
@@ -246,7 +245,7 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
     napGetCoeff(qq) = nacNeg(napGetCoeff(qq));
     h = napCopy(g);
     napMultT(h, qq);
-    napNormalize(h);
+    p_Normalize(h,nacRing);
     n_Delete(&napGetCoeff(qq),nacRing);
     a = napAdd(a, h);
   }
@@ -296,7 +295,7 @@ static napoly napInvers(napoly x, const napoly c)
     t = nacNeg(t);
     qa=p_Mult_nn(qa,t,nacRing); p_Normalize(qa,nacRing);
     n_Delete(&t,nacRing);
-    napNormalize(qa);
+    p_Normalize(qa,nacRing);
     napDelete(&x);
     napDelete(&r);
     return qa;
@@ -315,7 +314,7 @@ static napoly napInvers(napoly x, const napoly c)
     nacNormalize(napGetCoeff(r));
     t = nacInvers(napGetCoeff(r));
     q=p_Mult_nn(q,t,nacRing); p_Normalize(q,nacRing);
-    napNormalize(q);
+    p_Normalize(q,nacRing);
     n_Delete(&t,nacRing);
     napDelete(&x);
     napDelete(&r);
@@ -344,7 +343,7 @@ static napoly napInvers(napoly x, const napoly c)
       t = nacInvers(napGetCoeff(r));
       //nacNormalize(t);
       q=p_Mult_nn(q,t,nacRing); p_Normalize(q,nacRing);
-      napNormalize(q);
+      p_Normalize(q,nacRing);
       n_Delete(&t,nacRing);
       napDelete(&x);
       napDelete(&r);
@@ -1530,19 +1529,19 @@ number naGcd(number a, number b, const ring r)
 
     napoly rz=napGcd(x->z, y->z);
     CanonicalForm F, G, R;
-    R=convSingTrFactoryP(rz);
-    napNormalize(x->z);
-    F=convSingTrFactoryP(x->z)/R;
-    napNormalize(y->z);
-    G=convSingTrFactoryP(y->z)/R;
+    R=convSingPFactoryP(rz,0,nacRing);
+    p_Normalize(x->z,nacRing);
+    F=convSingPFactoryP(x->z,0,nacRing)/R;
+    p_Normalize(y->z,nacRing);
+    G=convSingPFactoryP(y->z,0,nacRing)/R;
     F = gcd( F, G );
     if (F.isOne())
       result->z= rz;
     else
     {
       napDelete(&rz);
-      result->z=convFactoryPSingTr( F*R );
-      napNormalize(result->z);
+      result->z=convFactoryPSingP( F*R, nacRing );
+      p_Normalize(result->z,nacRing);
     }
   }
 #endif

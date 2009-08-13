@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.14 2009-08-13 12:48:39 Singular Exp $
+// $Id: clapconv.cc,v 1.15 2009-08-13 15:17:02 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -30,9 +30,7 @@ static void convRecAlg( const CanonicalForm & f, int * exp, napoly & result );
 
 static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, ring r );
 
-static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result );
-
-static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int offs );
+static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int offs, const ring r );
 
 static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
 
@@ -96,70 +94,10 @@ number convFactoryNSingN( const CanonicalForm & n)
   }
 }
 
-CanonicalForm convSingPFactoryP( poly p, const ring r )
-{
-  CanonicalForm result = 0;
-  int e, n = r->N;
-  assume( rPar(r)==0);
-
-  if ( getCharacteristic() != 0 )
-  {
-    /* does only work for finite fields Z/p*/
-    while ( p != NULL )
-    {
-      CanonicalForm term = npInt( pGetCoeff( p ) );
-      for ( int i = n; i >0; i-- )
-      {
-        if ( (e = p_GetExp( p, i, r )) != 0 )
-           term *= power( Variable( i ), e );
-      }
-      result += term;
-      pIter( p );
-    }
-  }
-  else
-  {
-    while ( p != NULL )
-    {
-      CanonicalForm term;
-      if ( SR_HDL(pGetCoeff( p )) & SR_INT )
-      {
-        term = SR_TO_INT( pGetCoeff( p ) );
-      }
-      else
-      {
-        if ( pGetCoeff( p )->s == 3 )
-        {
-          MP_INT dummy;
-          mpz_init_set( &dummy, &(pGetCoeff( p )->z) );
-          term = make_cf( dummy );
-        }
-        else
-        {
-          // assume s==1 or s==0
-          MP_INT num, den;
-          On(SW_RATIONAL);
-          mpz_init_set( &num, &(pGetCoeff( p )->z) );
-          mpz_init_set( &den, &(pGetCoeff( p )->n) );
-          term = make_cf( num, den, ( pGetCoeff( p )->s != 1 ));
-        }
-      }
-      for ( int i = n; i >0; i-- )
-      {
-        if ( (e = p_GetExp( p, i, r )) != 0 )
-           term *= power( Variable( i ), e );
-      }
-      result += term;
-      pIter( p );
-    }
-  }
-  return result;
-}
-
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r )
 {
 //    cerr << " f = " << f << endl;
-  int n = r->N+1;
+  int n = rVar(r)+1;
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
   int * exp = (int*)omAlloc0(n*sizeof(int));
   sBucket_pt result_bucket=sBucketCreate(r);
@@ -223,20 +161,20 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
 }
 
 
-CanonicalForm convSingTrFactoryP( napoly p )
+CanonicalForm convSingPFactoryP( poly p, const int off, const ring r )
 {
   CanonicalForm result = 0;
-  int e, n = rPar(currRing);
+  int e, n = rVar(r);
 
   while ( p!=NULL)
   {
     CanonicalForm term;
     /* does only work for finite fields */
-    if ( getCharacteristic() != 0 )
+    if ( rField_is_Zp(r) )
     {
       term = npInt( pGetCoeff( p ) );
     }
-    else
+    else if (rField_is_Q(r))
     {
       if ( SR_HDL(pGetCoeff( p )) & SR_INT )
         term = SR_TO_INT( pGetCoeff( p ) );
@@ -259,88 +197,20 @@ CanonicalForm convSingTrFactoryP( napoly p )
         }
       }
     }
+    else
+    {
+      WerrorS("conversion error");
+      return result;
+    }
     for ( int i = n; i >0; i-- )
     {
-      if ( (e = p_GetExp( p, i, currRing->algring )) != 0 )
-        term *= power( Variable( i ), e );
+      if ( (e = p_GetExp( p, i, r)) != 0 )
+        term *= power( Variable( i+off ), e );
     }
     result += term;
     pIter( p );
   }
   return result;
-}
-
-napoly convFactoryPSingTr ( const CanonicalForm & f )
-{
-//    cerr << " f = " << f << endl;
-  int n = rPar(currRing)+1;
-  /* ASSERT( level( f ) <= rPar(currRing), "illegal number of variables" ); */
-  int * exp = (int *)omAlloc0(n*sizeof(int));
-  napoly result = NULL;
-  convRecPTr( f, exp, result );
-  omFreeSize((ADDRESS)exp,n*sizeof(int));
-  return result;
-}
-
-static void convRecPTr ( const CanonicalForm & f, int * exp, napoly & result )
-{
-  if (f.isZero())
-    return;
-  if ( ! f.inCoeffDomain() )
-  {
-    int l = f.level();
-    for ( CFIterator i = f; i.hasTerms(); i++ )
-    {
-        exp[l] = i.exp();
-        convRecPTr( i.coeff(), exp, result );
-    }
-    exp[l] = 0;
-  }
-  else
-  {
-    napoly term = napNew();
-    // napNext( term ) = NULL; //already done by napNew
-    for ( int i = rPar(currRing); i>=1; i-- )
-      p_SetExp( term, i , exp[i],currRing->algring);
-    p_Setm(term, currRing->algring);
-    if ( f.isImm() )
-      pGetCoeff( term ) = n_Init( f.intval(), currRing->algring );
-    else
-    {
-      number z=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG)
-      z->debug=123456;
-#endif
-      z->z = gmp_numerator( f );
-      if ( f.den().isOne() )
-      {
-        z->s = 3;
-      }
-      else
-      {
-        z->n = gmp_denominator( f );
-        if (mpz_cmp_si(&z->n,(long)1)==0)
-        {
-          mpz_clear(&z->n);
-          z->s=3;
-        }
-        else
-        {
-          z->s = 0;
-          n_Normalize(z,currRing->algring);
-        }
-      }
-      pGetCoeff( term ) = z;
-    }
-    if (n_IsZero(pGetCoeff(term),currRing->algring))
-    {
-      napDelete(&term);
-    }
-    else
-    {
-      result = napAdd( result, term );
-    }
-  }
 }
 
 CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a)
@@ -529,16 +399,16 @@ napoly convFactoryASingA ( const CanonicalForm & f )
   return a;
 }
 
-CanonicalForm convSingTrPFactoryP ( poly p )
+CanonicalForm convSingTrPFactoryP ( poly p, const ring r )
 {
   CanonicalForm result = 0;
-  int e, n = pVariables;
-  int offs = rPar(currRing);
+  int e, n = rVar(r);
+  int offs = rPar(r);
 
   while ( p!=NULL )
   {
-    nNormalize(pGetCoeff(p));
-    CanonicalForm term=convSingTrFactoryP(((lnumber)pGetCoeff(p))->z);
+    n_Normalize(pGetCoeff(p),r);
+    CanonicalForm term=convSingPFactoryP(((lnumber)pGetCoeff(p))->z,0,r->algring);
 
     if ((((lnumber)pGetCoeff(p))->n!=NULL)
     && (!errorreported))
@@ -548,7 +418,7 @@ CanonicalForm convSingTrPFactoryP ( poly p )
 
     for ( int i = n; i > 0; i-- )
     {
-      if ( (e = pGetExp( p, i )) != 0 )
+      if ( (e = p_GetExp( p, i,r )) != 0 )
         term = term * power( Variable( i + offs ), e );
     }
     result += term;
@@ -557,18 +427,18 @@ CanonicalForm convSingTrPFactoryP ( poly p )
   return result;
 }
 
-poly convFactoryPSingTrP ( const CanonicalForm & f )
+poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r )
 {
-  int n = pVariables+1;
+  int n = rVar(r)+1;
   int * exp = (int*)omAlloc0(n*sizeof(int));
   poly result = NULL;
-  convRecTrP( f, exp, result , rPar(currRing) );
+  convRecTrP( f, exp, result , rPar(r), r );
   omFreeSize((ADDRESS)exp,n*sizeof(int));
   return result;
 }
 
 static void
-convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
+convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const ring r)
 {
   if (f.isZero())
     return;
@@ -578,21 +448,21 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs)
     for ( CFIterator i = f; i.hasTerms(); i++ )
     {
       exp[l-offs] = i.exp();
-      convRecTrP( i.coeff(), exp, result, offs );
+      convRecTrP( i.coeff(), exp, result, offs, r );
     }
     exp[l-offs] = 0;
   }
   else
   {
-    poly term = pInit();
+    poly term = p_Init(r);
     pNext( term ) = NULL;
-    for ( int i = 1; i <= pVariables; i++ )
-      pSetExp( term, i ,exp[i]);
+    for ( int i = rVar(r); i>0; i-- )
+      p_SetExp( term, i ,exp[i], r);
     //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit
     pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
-    ((lnumber)pGetCoeff(term))->z=convFactoryPSingTr( f );
-    pSetm( term );
-    result = pAdd( result, term );
+    ((lnumber)pGetCoeff(term))->z=convFactoryPSingP( f, r->algring );
+    p_Setm( term,r );
+    result = p_Add_q( result, term,r );
   }
 }
 
