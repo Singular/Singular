@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.512 2009-07-28 14:18:34 Singular Exp $ */
+/* $Id: iparith.cc,v 1.513 2009-08-13 17:24:45 motsak Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -2592,6 +2592,12 @@ static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 #ifdef HAVE_PLURAL
 static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
 {
+  if( currRing->qideal != NULL )
+  {
+    WerrorS("basering must NOT be a qring!");
+    return TRUE;
+  }
+  
   if (iiOp==NCALGEBRA_CMD)
   {
     return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
@@ -2607,6 +2613,12 @@ static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
 }
 static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
 {
+  if( currRing->qideal != NULL )
+  {
+    WerrorS("basering must NOT be a qring!");
+    return TRUE;
+  }
+
   if (iiOp==NCALGEBRA_CMD)
   {
     return nc_CallPlural(NULL,(matrix)b->Data(),(poly)a->Data(),NULL,currRing);
@@ -2622,6 +2634,12 @@ static BOOLEAN jjPlural_num_mat(leftv res, leftv a, leftv b)
 }
 static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
 {
+  if( currRing->qideal != NULL )
+  {
+    WerrorS("basering must NOT be a qring!");
+    return TRUE;
+  }
+
   if (iiOp==NCALGEBRA_CMD)
   {
     return nc_CallPlural((matrix)a->Data(),NULL,NULL,(poly)b->Data(),currRing);
@@ -2637,6 +2655,12 @@ static BOOLEAN jjPlural_mat_poly(leftv res, leftv a, leftv b)
 }
 static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 {
+  if( currRing->qideal != NULL )
+  {
+    WerrorS("basering must NOT be a qring!");
+    return TRUE;
+  }
+
   if (iiOp==NCALGEBRA_CMD)
   {
     return nc_CallPlural((matrix)a->Data(),(matrix)b->Data(),NULL,NULL,currRing);
