@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.57 2009-07-27 08:31:44 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.58 2009-08-13 17:31:49 motsak Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1763,7 +1763,11 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   idTest(Q);
 
 #if MYTEST
-  PrintS("kSTD: currRing: "); rWrite(currRing);
+  if (TEST_OPT_DEBUG)
+  {
+    PrintS("// kSTD: currRing: ");
+    rWrite(currRing);
+  }
 #endif
 
 #endif

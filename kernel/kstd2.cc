@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.99 2009-07-20 12:00:51 motsak Exp $ */
+/* $Id: kstd2.cc,v 1.100 2009-08-13 17:31:49 motsak Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -1001,14 +1001,18 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 
 #ifdef KDEBUG
 #if MYTEST
-  PrintS("bba start GB: currRing: ");
-  rWrite(currRing);PrintLn(); rDebugPrint(currRing);
-  PrintLn();
+  if (TEST_OPT_DEBUG)
+  {  
+    PrintS("bba start GB: currRing: ");
+    // rWrite(currRing);PrintLn();
+    rDebugPrint(currRing);
+    PrintLn();
 
-  if(strat->tailRing != NULL && strat->tailRing != currRing)
-  {
-    PrintS("bba start GB: tailRing: ");
-    rWrite(strat->tailRing);PrintLn(); rDebugPrint(strat->tailRing);
+    if(strat->tailRing != NULL && strat->tailRing != currRing)
+    {
+      PrintS("// **** bba start GB: tailRing: ");
+      rWrite(strat->tailRing);PrintLn(); rDebugPrint(strat->tailRing);
+    }
   }
 #endif /* MYTEST */
 #endif /* KDEBUG */

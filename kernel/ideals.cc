@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.76 2009-07-27 08:31:18 Singular Exp $ */
+/* $Id: ideals.cc,v 1.77 2009-08-13 17:31:49 motsak Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -69,8 +69,8 @@ ideal idInit(int idsize, int rank)
   return hh;
 }
 
-#ifndef __OPTIMIZE__
-// this is mainly for outputting an ideal within the debugger
+//#ifndef __OPTIMIZE__
+// this is mainly for outputting an ideal within the debugger & DetailedPrint
 void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint)
 {
   assume( debugPrint >= 0 );
@@ -90,7 +90,7 @@ void idShow(const ideal id, const ring lmRing, const ring tailRing, const int de
     }
   }
 }
-#endif
+//#endif
 
 /*2
 * initialise the maximal ideal (at 0)

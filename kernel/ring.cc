@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.127 2009-07-28 10:01:32 Singular Exp $ */
+/* $Id: ring.cc,v 1.128 2009-08-13 17:31:50 motsak Exp $ */
 
 /*
 * ABSTRACT - the interpreter related ring operations
@@ -4154,6 +4154,47 @@ void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const in
   }
   else
     PrintS("0\n");
+}
+
+
+
+//    F = system("ISUpdateComponents", F, V, MIN );
+//    // replace gen(i) -> gen(MIN + V[i-MIN]) for all i > MIN in all terms from F!
+void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r = currRing)
+{
+  assume( V != NULL );
+  assume( MIN >= 0 );
+
+  if( F == NULL )
+    return;
+
+  for( int j = (F->ncols*F->nrows) - 1; j >= 0; j-- )
+  {
+#ifdef PDEBUG
+    Print("F[%d]:", j);
+    p_DebugPrint(F->m[j], r, r, 0);
+#endif
+    
+    for( poly p = F->m[j]; p != NULL; pIter(p) )
+    {      
+      int c = p_GetComp(p, r);
+
+      if( c > MIN )
+      {
+#ifdef PDEBUG    
+        Print("gen[%d] -> gen(%d)\n", c, MIN + (*V)[ c - MIN - 1 ]);
+#endif
+        
+        p_SetComp( p, MIN + (*V)[ c - MIN - 1 ], r );
+      }
+    }
+#ifdef PDEBUG    
+    Print("new F[%d]:", j);
+    p_Test(F->m[j], r);
+    p_DebugPrint(F->m[j], r, r, 0);
+#endif
+  }
+
 }
 
 

@@ -6,10 +6,18 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.18 2009-07-20 12:00:51 motsak Exp $
+ *  Version: $Id: p_polys.cc,v 1.19 2009-08-13 17:31:50 motsak Exp $
  *******************************************************************/
 
+
 #include "mod2.h"
+
+#ifndef NDEBUG
+# define MYTEST 0
+#else /* ifndef NDEBUG */
+# define MYTEST 0
+#endif /* ifndef NDEBUG */
+
 #include "structs.h"
 #include "structs.h"
 #include "p_polys.h"

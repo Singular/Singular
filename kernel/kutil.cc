@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.cc,v 1.149 2009-07-28 14:15:05 Singular Exp $ */
+/* $Id: kutil.cc,v 1.150 2009-08-13 17:31:50 motsak Exp $ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */
@@ -1585,7 +1585,7 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 #if MYTEST
       if (TEST_OPT_DEBUG)
       {
-        PrintS("strat->S[i]: "); pWrite(strat->S[i]);
+        PrintS("enterOnePairNormal::\n strat->S[i]: "); pWrite(strat->S[i]);
         PrintS("p: "); pWrite(p);
         PrintS("SPoly: "); pWrite(Lp.p);
       }
@@ -1600,7 +1600,7 @@ void enterOnePairNormal (int i,poly p,int ecart, int isFromQ,kStrategy strat, in
 #if MYTEST
       if (TEST_OPT_DEBUG)
       {
-        PrintS("strat->S[i]: "); pWrite(strat->S[i]);
+        PrintS("enterOnePairNormal::\n strat->S[i]: "); pWrite(strat->S[i]);
         PrintS("p: "); pWrite(p);
         PrintS("commutative SPoly: "); pWrite(Lp.p);
       }

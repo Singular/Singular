@@ -5,7 +5,7 @@
  *  mod2.h: Main configuration file for Singular
  *          DO NOT EDIT!
  *
- *  Version: $Id: mod2.h.in,v 1.40 2009-07-28 14:15:05 Singular Exp $
+ *  Version: $Id: mod2.h.in,v 1.41 2009-08-13 17:31:50 motsak Exp $
  *******************************************************************/
 #ifndef MOD2_H
 #define MOD2_H
@@ -108,7 +108,7 @@
 /* Define if you have siginterrupt (BSD4.3) */
 #undef HAVE_SIGINTERRUPT
 /* define for boost includes and lib */
-#undef HAVE_BOOST_DYNAMIC_BITSET_HPP
+/////////////////////// #undef HAVE_BOOST_DYNAMIC_BITSET_HPP
 /* define for std:vector includes */
 #undef USE_STDVECBOOL
 /* Define sizeof(char) */
