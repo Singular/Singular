@@ -308,9 +308,7 @@ else
 ifeq (,${DL_LIBSG})
 else
 	-${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
-	-${INSTALL_PROGRAM} ${DL_LIBS} ../Singular
-	-${INSTALL_PROGRAM} ${DL_LIBSG} ../Singular
-	-${INSTALL_PROGRAM} ${DL_LIBSP} ../Singular
+	-${INSTALL_PROGRAM} ${DL_LIBS} ${DL_LIBSG} ${DL_LIBSP} ../Singular
 endif
 endif
 
