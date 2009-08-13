@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.40 2009-08-06 10:18:24 Singular Exp $
+// $Id: clapsing.cc,v 1.41 2009-08-13 12:48:39 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -130,7 +130,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
 
   if (p_IsConstantPoly(f,r) || p_IsConstantPoly(g,r))
   {
-    return pOne();
+    return p_One(r);
   }
 
   // for now there is only the possibility to handle polynomials over
@@ -140,20 +140,19 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   {
     CanonicalForm newGCD(const CanonicalForm & A, const CanonicalForm & B);
     setCharacteristic( n_GetChar(r) );
-    CanonicalForm F( conv_SingPFactoryP( f,r ) ), G( conv_SingPFactoryP( g, r ) );
+    CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
     //if (nGetChar() > 1 )
     //{
     //  res=convFactoryPSingP( newGCD( F,G ));
     //  if (!nGreaterZero(pGetCoeff(res))) res=pNeg(res);
     //}
     //else
-      res=conv_FactoryPSingP( gcd( F, G ) , r);
+      res=convFactoryPSingP( gcd( F, G ) , r);
   }
   else
     WerrorS( feNotImplemented );
 
   Off(SW_RATIONAL);
-  pTest(res);
   return res;
 }
 

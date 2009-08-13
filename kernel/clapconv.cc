@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.13 2009-08-05 17:28:16 Singular Exp $
+// $Id: clapconv.cc,v 1.14 2009-08-13 12:48:39 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -96,7 +96,7 @@ number convFactoryNSingN( const CanonicalForm & n)
   }
 }
 
-CanonicalForm conv_SingPFactoryP( poly p, ring r )
+CanonicalForm convSingPFactoryP( poly p, const ring r )
 {
   CanonicalForm result = 0;
   int e, n = r->N;
@@ -156,7 +156,7 @@ CanonicalForm conv_SingPFactoryP( poly p, ring r )
   return result;
 }
 
-poly conv_FactoryPSingP ( const CanonicalForm & f, ring r )
+poly convFactoryPSingP ( const CanonicalForm & f, const ring r )
 {
 //    cerr << " f = " << f << endl;
   int n = r->N+1;
