@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.14 2009-08-07 13:55:21 Singular Exp $ */
+/* $Id: longalg.h,v 1.15 2009-08-14 17:14:30 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -21,9 +21,9 @@ struct slnumber
   BOOLEAN s;
 };
 
-extern int naNumbOfPar;             /* maximal number of parameters */
-
 extern napoly naMinimalPoly;
+extern ring nacRing;
+
 
 void naSetChar(int p, ring r);
 void    naDelete (number *p, const ring r);
@@ -71,13 +71,10 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napLength(p)           pLength(p)
 #define napNeg(p)              (p_Neg(p,currRing->algring))
 #define napVariables           naNumbOfPar
-#define napNext(p)             pNext(p)
-#define napIter(p)             pIter(p)
 #define napGetCoeff(p)         pGetCoeff(p)
 #define napGetExp(p,i)         (p_GetExp(p,i,currRing->algring))
 #define napGetExpFrom(p,i,r)   (p_GetExp(p,i,r->algring))
 #define napSetExp(p,i,e)       (p_SetExp(p,i,e,currRing->algring))
-#define napDelete(p)           p_Delete(p, currRing->algring)
 #define napNew()               (p_Init(currRing->algring))
 #define napAdd(p1,p2)          (p_Add_q(p1,p2,currRing->algring))
 #define napSetm(p)             p_Setm(p,currRing->algring)

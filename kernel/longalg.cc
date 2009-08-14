@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.46 2009-08-13 15:31:27 Singular Exp $ */
+/* $Id: longalg.cc,v 1.47 2009-08-14 17:14:30 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 * convention: A) minpoly==0: n->z, n->n are from Z[a] resp. Z/p[a],
@@ -30,7 +30,6 @@
 
 naIdeal naI=NULL;
 
-int naNumbOfPar;
 napoly naMinimalPoly;
 #define naParNames (currRing->parameter)
 static int naIsChar0;
@@ -65,7 +64,7 @@ static napoly napRedp(napoly q);
 static napoly napTailred(napoly q);
 static BOOLEAN napDivPoly(napoly p, napoly q);
 static int napExpi(int i, napoly a, napoly b);
-static ring nacRing;
+       ring nacRing;
 
 #define napCopy(p)       (napoly)p_Copy((poly)p,nacRing)
 
@@ -79,7 +78,7 @@ void naSetChar(int i, ring r)
   {
     int j;
     for (j=naI->anz-1; j>=0; j--)
-       napDelete (&naI->liste[j]);
+       p_Delete (&naI->liste[j],nacRing);
     omFreeSize((ADDRESS)naI->liste,naI->anz*sizeof(napoly));
     omFreeBin((ADDRESS)naI, snaIdeal_bin);
     naI=NULL;
@@ -106,7 +105,6 @@ void naSetChar(int i, ring r)
     }
   }
 
-  naNumbOfPar=rPar(r);
   if (i == 1)
   {
     naIsChar0 = 1;
@@ -155,7 +153,7 @@ static void napTest(napoly p)
   {
     if (naIsChar0)
       nlDBTest(napGetCoeff(p), "", 0);
-    napIter(p);
+    pIter(p);
   }
 }
 #else
@@ -201,7 +199,7 @@ napoly napRemainder(napoly f, const napoly  g)
   napoly a, h, qq;
 
   qq = (napoly)p_Init(nacRing);
-  napNext(qq) = NULL;
+  pNext(qq) = NULL;
   p_Normalize(g,nacRing);
   p_Normalize(f,nacRing);
   a = f;
@@ -231,7 +229,7 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
   napoly a, h, b, qq;
 
   qq = (napoly)p_Init(nacRing);
-  napNext(qq) = b = NULL;
+  pNext(qq) = b = NULL;
   p_Normalize(g,nacRing);
   p_Normalize(f,nacRing);
   a = f;
@@ -296,8 +294,8 @@ static napoly napInvers(napoly x, const napoly c)
     qa=p_Mult_nn(qa,t,nacRing); p_Normalize(qa,nacRing);
     n_Delete(&t,nacRing);
     p_Normalize(qa,nacRing);
-    napDelete(&x);
-    napDelete(&r);
+    p_Delete(&x,nacRing);
+    p_Delete(&r,nacRing);
     return qa;
   }
   y = x;
@@ -316,8 +314,8 @@ static napoly napInvers(napoly x, const napoly c)
     q=p_Mult_nn(q,t,nacRing); p_Normalize(q,nacRing);
     p_Normalize(q,nacRing);
     n_Delete(&t,nacRing);
-    napDelete(&x);
-    napDelete(&r);
+    p_Delete(&x,nacRing);
+    p_Delete(&r,nacRing);
     if (napGetExp(q,1) >= napGetExp(c,1))
       q = napRemainder(q, c);
     return q;
@@ -345,8 +343,8 @@ static napoly napInvers(napoly x, const napoly c)
       q=p_Mult_nn(q,t,nacRing); p_Normalize(q,nacRing);
       p_Normalize(q,nacRing);
       n_Delete(&t,nacRing);
-      napDelete(&x);
-      napDelete(&r);
+      p_Delete(&x,nacRing);
+      p_Delete(&r,nacRing);
       if (napGetExp(q,1) >= napGetExp(c,1))
         q = napRemainder(q, c);
       return q;
@@ -372,7 +370,7 @@ static int  napMaxDeg(napoly p)
   while(p!=NULL)
   {
     d=si_max(d,napDeg(p));
-    napIter(p);
+    pIter(p);
   }
   return d;
 }
@@ -387,7 +385,7 @@ static int  napMaxDegLen(napoly p, int &l)
   while(p!=NULL)
   {
     d=si_max(d,napDeg(p));
-    napIter(p);
+    pIter(p);
     ll++;
   }
   l=ll;
@@ -434,7 +432,7 @@ void napWrite(napoly p,const BOOLEAN has_denom)
         StringAppendS("-");
       }
       int  i;
-      for (i = 0; i < naNumbOfPar; i++)
+      for (i = 0; i < rPar(currRing); i++)
       {
         if (napGetExp(p,i+1) > 0)
         {
@@ -451,7 +449,7 @@ void napWrite(napoly p,const BOOLEAN has_denom)
           }
         }
       } /*for*/
-      napIter(p);
+      pIter(p);
       if (p==NULL)
         break;
       if (nacGreaterZero(napGetCoeff(p)))
@@ -519,7 +517,7 @@ static const char  *napRead(const char *s, napoly *b)
       *b = a;
       return s;
     }
-    if (i >= naNumbOfPar)
+    if (i >= rPar(currRing))
       break;
   }
   i=0;
@@ -531,7 +529,7 @@ static const char  *napRead(const char *s, napoly *b)
       i++;
     else
       i = 0;
-    if ((*s == '\0') || (i >= naNumbOfPar))
+    if ((*s == '\0') || (i >= rPar(currRing)))
       break;
   }
   *b = a;
@@ -540,10 +538,10 @@ static const char  *napRead(const char *s, napoly *b)
 
 static int napExp(napoly a, napoly b)
 {
-  while (napNext(a)!=NULL) napIter(a);
+  while (pNext(a)!=NULL) pIter(a);
   int m = napGetExp(a,1);
   if (m==0) return 0;
-  while (napNext(b)!=NULL) napIter(b);
+  while (pNext(b)!=NULL) pIter(b);
   int mm=napGetExp(b,1);
   if (m > mm) m = mm;
   return m;
@@ -558,9 +556,9 @@ static int napExpi(int i, napoly a, napoly b)
   if (a==NULL || b==NULL) return 0;
   int m = napGetExp(a,i+1);
   if (m==0) return 0;
-  while (napNext(a) != NULL)
+  while (pNext(a) != NULL)
   {
-    napIter(a);
+    pIter(a);
     if (m > napGetExp(a,i+1))
     {
       m = napGetExp(a,i+1);
@@ -574,7 +572,7 @@ static int napExpi(int i, napoly a, napoly b)
       m = napGetExp(b,i+1);
       if (m==0) return 0;
     }
-    napIter(b);
+    pIter(b);
   }
   while (b != NULL);
   return m;
@@ -589,7 +587,7 @@ static void napContent(napoly ph)
   if (nacIsOne(napGetCoeff(p)))
     return;
   h = nacCopy(napGetCoeff(p));
-  napIter(p);
+  pIter(p);
   do
   {
     d=nacGcd(napGetCoeff(p), h, nacRing);
@@ -601,7 +599,7 @@ static void napContent(napoly ph)
     }
     n_Delete(&h,nacRing);
     h = d;
-    napIter(p);
+    pIter(p);
   }
   while (p!=NULL);
   h = nacInvers(d);
@@ -612,7 +610,7 @@ static void napContent(napoly ph)
     d = nacMult(napGetCoeff(p), h);
     n_Delete(&napGetCoeff(p),nacRing);
     napGetCoeff(p) = d;
-    napIter(p);
+    pIter(p);
   }
   n_Delete(&h,nacRing);
 }
@@ -631,7 +629,7 @@ static void napCleardenom(napoly ph)
     d = nacLcm(h, napGetCoeff(p), nacRing);
     n_Delete(&h,nacRing);
     h = d;
-    napIter(p);
+    pIter(p);
   }
   if(!nacIsOne(h))
   {
@@ -650,9 +648,9 @@ static napoly napGcd0(napoly a, napoly b)
   x = nacCopy(napGetCoeff(a));
   if (nacIsOne(x))
     return napInitz(x);
-  while (napNext(a)!=NULL)
+  while (pNext(a)!=NULL)
   {
-    napIter(a);
+    pIter(a);
     y = nacGcd(x, napGetCoeff(a), nacRing);
     n_Delete(&x,nacRing);
     x = y;
@@ -666,7 +664,7 @@ static napoly napGcd0(napoly a, napoly b)
     x = y;
     if (nacIsOne(x))
       return napInitz(x);
-    napIter(b);
+    pIter(b);
   }
   while (b!=NULL);
   return napInitz(x);
@@ -680,10 +678,10 @@ static napoly napGcd(napoly a, napoly b)
   int i;
   napoly g, x, y, h;
   if ((a==NULL)
-  || ((napNext(a)==NULL)&&(nacIsZero(napGetCoeff(a)))))
+  || ((pNext(a)==NULL)&&(nacIsZero(napGetCoeff(a)))))
   {
     if ((b==NULL)
-    || ((napNext(b)==NULL)&&(nacIsZero(napGetCoeff(b)))))
+    || ((pNext(b)==NULL)&&(nacIsZero(napGetCoeff(b)))))
     {
       return napInit(1);
     }
@@ -691,7 +689,7 @@ static napoly napGcd(napoly a, napoly b)
   }
   else
   if ((b==NULL)
-  || ((napNext(b)==NULL)&&(nacIsZero(napGetCoeff(b)))))
+  || ((pNext(b)==NULL)&&(nacIsZero(napGetCoeff(b)))))
   {
     return napCopy(a);
   }
@@ -709,7 +707,7 @@ static napoly napGcd(napoly a, napoly b)
     }
     if (!naIsChar0) g = napInit(1);
     else            g = napGcd0(x, y);
-    if (napNext(y)==NULL)
+    if (pNext(y)==NULL)
     {
       napSetExp(g,1, napExp(x, y));
       p_Setm(g,nacRing);
@@ -731,12 +729,12 @@ static napoly napGcd(napoly a, napoly b)
         napDelete1(&g);
         return y;
       }
-      else if (napNext(h)==NULL)
+      else if (pNext(h)==NULL)
         break;
       x = y;
       y = h;
     }
-    napDelete(&y);
+    p_Delete(&y,nacRing);
     napDelete1(&h);
     napSetExp(g,1, napExp(a, b));
     p_Setm(g,nacRing);
@@ -748,7 +746,7 @@ static napoly napGcd(napoly a, napoly b)
   h=b;
   if (!naIsChar0) x = napInit(1);
   else            x = napGcd0(g,h);
-  for (i=(naNumbOfPar-1); i>=0; i--)
+  for (i=(rPar(currRing)-1); i>=0; i--)
   {
     napSetExp(x,i+1, napExpi(i,a,b));
     p_Setm(x,nacRing);
@@ -771,7 +769,7 @@ number napLcm(napoly a)
       d = nacLcm(h, napGetCoeff(b), nacRing);
       n_Delete(&h,nacRing);
       h = d;
-      napIter(b);
+      pIter(b);
     }
   }
   return h;
@@ -790,7 +788,7 @@ static BOOLEAN napDivPoly (napoly p, napoly q)
   while (napGetExp(p,j) <= napGetExp(q,j))
   {
     j++;
-    if (j > naNumbOfPar)
+    if (j > rPar(currRing))
       return 1;
   }
   return 0;
@@ -813,16 +811,16 @@ napoly napRedp (napoly q)
     {
       /* h = lt(q)/lt(naI->liste[i])*/
       napGetCoeff(h) = nacCopy(napGetCoeff(q));
-      for (j=naNumbOfPar; j>0; j--)
+      for (j=rPar(currRing); j>0; j--)
         napSetExp(h,j, napGetExp(q,j) - napGetExp(naI->liste[i],j));
       p_Setm(h,nacRing);
       h = napMult (h, napCopy(naI->liste[i]));
       h = napNeg (h);
       q = napAdd (q, napCopy(h));
-      napDelete (&napNext(h));
+      p_Delete (&pNext(h),nacRing);
       if (q == NULL)
       {
-        napDelete(&h);
+        p_Delete(&h,nacRing);
         return q;
       }
       /* try to reduce further */
@@ -833,7 +831,7 @@ napoly napRedp (napoly q)
       i++;
       if (i >= naI->anz)
       {
-        napDelete(&h);
+        p_Delete(&h,nacRing);
         return q;
       }
     }
@@ -851,13 +849,13 @@ napoly napTailred (napoly q)
 {
   napoly h;
 
-  h = napNext(q);
+  h = pNext(q);
   while (h != NULL)
   {
      h = napRedp (h);
      if (h == NULL)
         return q;
-     napIter(h);
+     pIter(h);
   }
   return q;
 }
@@ -1046,7 +1044,7 @@ number naMult(number la, number lb)
     }
   }
   if ((x!=NULL) && (napIsConstant(x)) && nacIsOne(napGetCoeff(x)))
-    napDelete(&x);
+    p_Delete(&x,nacRing);
   lo->n = x;
   if(lo->z==NULL)
   {
@@ -1092,7 +1090,7 @@ number naIntDiv(number la, number lb)
   number nres=(number)res;
   naNormalize(nres);
 
-  //napDelete(&res->n);
+  //p_Delete(&res->n,nacRing);
   naTest(nres);
   return nres;
 }
@@ -1146,7 +1144,7 @@ number naDiv(number la, number lb)
     }
   }
   if ((napIsConstant(x)) && nacIsOne(napGetCoeff(x)))
-    napDelete(&x);
+    p_Delete(&x,nacRing);
   lo->n = x;
   if (lo->n!=NULL)
   {
@@ -1217,7 +1215,7 @@ number naInvers(number a)
     while (x!=NULL)
     {
       nacNormalize(napGetCoeff(x));
-      napIter(x);
+      pIter(x);
     }
   }
   else
@@ -1354,10 +1352,10 @@ char * naName(number n)
   if ((ph==NULL)||(ph->z==NULL))
     return NULL;
   int i;
-  char *s=(char *)omAlloc(4* naNumbOfPar);
+  char *s=(char *)omAlloc(4* rPar(currRing));
   char *t=(char *)omAlloc(8);
   s[0]='\0';
-  for (i = 0; i <= naNumbOfPar - 1; i++)
+  for (i = 0; i <= rPar(currRing) - 1; i++)
   {
     if (napGetExp(ph->z,i+1) > 0)
     {
@@ -1445,13 +1443,13 @@ BOOLEAN naIsOne(number za)
       else
         n_Delete(&t,nacRing);
     }
-    napIter(x);
-    napIter(y);
+    pIter(x);
+    pIter(y);
   }
   while ((x!=NULL) && (y!=NULL));
   if ((x!=NULL) || (y!=NULL)) return FALSE;
-  napDelete(&a->z);
-  napDelete(&a->n);
+  p_Delete(&a->z,nacRing);
+  p_Delete(&a->n,nacRing);
   a->z = napInit(1);
   a->n = NULL;
   a->s = 2;
@@ -1511,9 +1509,9 @@ number naGcd(number a, number b, const ring r)
 
   x = (lnumber)a;
   y = (lnumber)b;
-  if ((naNumbOfPar == 1) && (naMinimalPoly!=NULL))
+  if ((rPar(currRing) == 1) && (naMinimalPoly!=NULL))
   {
-    if (napNext(x->z)!=NULL)
+    if (pNext(x->z)!=NULL)
       result->z = napCopy(x->z);
     else
       result->z = napGcd0(x->z, y->z);
@@ -1539,7 +1537,7 @@ number naGcd(number a, number b, const ring r)
       result->z= rz;
     else
     {
-      napDelete(&rz);
+      p_Delete(&rz,nacRing);
       result->z=convFactoryPSingP( F*R, nacRing );
       p_Normalize(result->z,nacRing);
     }
@@ -1551,13 +1549,13 @@ number naGcd(number a, number b, const ring r)
 
 
 /*2
-* naNumbOfPar = 1:
+* rPar(currRing) = 1:
 * clears denominator         algebraic case;
 * tries to simplify ratio    transcendental case;
 *
 * cancels monomials
 * occuring in denominator
-* and enumerator  ?          naNumbOfPar != 1;
+* and enumerator  ?          rPar(currRing) != 1;
 *
 */
 void naNormalize(number &pp)
@@ -1594,7 +1592,7 @@ void naNormalize(number &pp)
     while(x!=NULL)
     {
       nacNormalize(napGetCoeff(x));
-      napIter(x);
+      pIter(x);
     }
     x = p->z;
   }
@@ -1604,7 +1602,7 @@ void naNormalize(number &pp)
     while(y!=NULL)
     {
       nacNormalize(napGetCoeff(y));
-      napIter(y);
+      pIter(y);
     }
     y = p->n;
   // p->n !=NULL:
@@ -1616,20 +1614,20 @@ void naNormalize(number &pp)
     while(x!=NULL)
     {
       nacNormalize(napGetCoeff(x));
-      napIter(x);
+      pIter(x);
     }
     x = p->z;
     while(y!=NULL)
     {
       nacNormalize(napGetCoeff(y));
-      napIter(y);
+      pIter(y);
     }
     y = p->n;
   }
   if ((naMinimalPoly == NULL) && (x!=NULL) && (y!=NULL))
   {
     int i;
-    for (i=naNumbOfPar-1; i>=0; i--)
+    for (i=rPar(currRing)-1; i>=0; i--)
     {
       napoly xx=x;
       napoly yy=y;
@@ -1639,12 +1637,12 @@ void naNormalize(number &pp)
         while (xx != NULL)
         {
           napAddExp(xx,i+1, -m);
-          napIter(xx);
+          pIter(xx);
         }
         while (yy != NULL)
         {
           napAddExp(yy,i+1, -m);
-          napIter(yy);
+          pIter(yy);
         }
       }
     }
@@ -1667,7 +1665,7 @@ void naNormalize(number &pp)
     naTest(pp);
     return;
   }
-  if (naNumbOfPar == 1) /* apply built-in gcd */
+  if (rPar(currRing) == 1) /* apply built-in gcd */
   {
     napoly x1,y1;
     if (napGetExp(x,1) >= napGetExp(y,1))
@@ -1684,20 +1682,20 @@ void naNormalize(number &pp)
     loop
     {
       r = napRemainder(x1, y1);
-      if ((r==NULL) || (napNext(r)==NULL)) break;
+      if ((r==NULL) || (pNext(r)==NULL)) break;
       x1 = y1;
       y1 = r;
     }
     if (r!=NULL)
     {
-      napDelete(&r);
-      napDelete(&y1);
+      p_Delete(&r,nacRing);
+      p_Delete(&y1,nacRing);
     }
     else
     {
       napDivMod(x, y1, &(p->z), &r);
       napDivMod(y, y1, &(p->n), &r);
-      napDelete(&y1);
+      p_Delete(&y1,nacRing);
     }
     x = p->z;
     y = p->n;
@@ -1711,17 +1709,17 @@ void naNormalize(number &pp)
       while(x!=NULL)
       {
         nacNormalize(napGetCoeff(x));
-        napIter(x);
+        pIter(x);
       }
       x = p->z;
       while(y!=NULL)
       {
         nacNormalize(napGetCoeff(y));
-        napIter(y);
+        pIter(y);
       }
       y = p->n;
     }
-    if (napNext(y)==NULL)
+    if (pNext(y)==NULL)
     {
       if (nacIsOne(napGetCoeff(y)))
       {
@@ -1744,8 +1742,8 @@ void naNormalize(number &pp)
     {
       p->z=xx;
       p->n=yy;
-      napDelete(&x);
-      napDelete(&y);
+      p_Delete(&x,nacRing);
+      p_Delete(&y,nacRing);
     }
   }
 #endif
@@ -1758,7 +1756,7 @@ void naNormalize(number &pp)
     y=napNeg(y);
   }
   number g=nacCopy(napGetCoeff(x));
-  napIter(x);
+  pIter(x);
   while (x!=NULL)
   {
     number d=nacGcd(g,napGetCoeff(x), nacRing);
@@ -1771,7 +1769,7 @@ void naNormalize(number &pp)
     }
     n_Delete(&g,nacRing);
     g = d;
-    napIter(x);
+    pIter(x);
   }
   while (y!=NULL)
   {
@@ -1785,7 +1783,7 @@ void naNormalize(number &pp)
     }
     n_Delete(&g,nacRing);
     g = d;
-    napIter(y);
+    pIter(y);
   }
   x=p->z;
   y=p->n;
@@ -1793,13 +1791,13 @@ void naNormalize(number &pp)
   {
     number d = nacIntDiv(napGetCoeff(x),g);
     napSetCoeff(x,d);
-    napIter(x);
+    pIter(x);
   }
   while (y!=NULL)
   {
     number d = nacIntDiv(napGetCoeff(y),g);
     napSetCoeff(y,d);
-    napIter(y);
+    pIter(y);
   }
   n_Delete(&g,nacRing);
   naTest(pp);
@@ -1838,7 +1836,7 @@ number naLcm(number la, number lb, const ring r)
       nacNormalize(napGetCoeff(xx));
       n_Delete(&bt,nacRing);
       n_Delete(&r,nacRing);
-      napIter(xx);
+      pIter(xx);
     }
   }
   n_Delete(&t,nacRing);
@@ -1847,7 +1845,7 @@ number naLcm(number la, number lb, const ring r)
   if (b->n!=NULL)
   {
     result->z=singclap_alglcm(result->z,b->n);
-    napDelete(&x);
+    p_Delete(&x,nacRing);
   }
 #endif
   naTest(la);
@@ -1867,7 +1865,7 @@ void naSetIdeal(ideal I)
   if (idIs0(I))
   {
     for (i=naI->anz-1; i>=0; i--)
-      napDelete(&naI->liste[i]);
+      p_Delete(&naI->liste[i],nacRing);
     omFreeBin((ADDRESS)naI, snaIdeal_bin);
     naI=NULL;
   }
@@ -1995,16 +1993,16 @@ static napoly napMap(napoly p)
   napGetCoeff(w) = nacMap(napGetCoeff(p));
   loop
   {
-    napIter(p);
+    pIter(p);
     if (p==NULL) break;
-    napNext(a) = (napoly)p_Init(nacRing);
-    napIter(a);
+    pNext(a) = (napoly)p_Init(nacRing);
+    pIter(a);
     for(i=1;i<=naParsToCopy;i++)
       napSetExp(a,i,napGetExpFrom(p,i,napMapRing));
     p_Setm(a,nacRing);
     napGetCoeff(a) = nacMap(napGetCoeff(p));
   }
-  napNext(a) = NULL;
+  pNext(a) = NULL;
   return w;
 }
 
@@ -2031,7 +2029,7 @@ static napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMa
     }
     napGetCoeff(w) = nMap(napGetCoeff(p));
     p_Setm(w,nacRing);
-    napIter(p);
+    pIter(p);
     if (!not_null)
     {
       if (p==NULL)
@@ -2047,7 +2045,7 @@ static napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMa
       if (p==NULL) return w;
       else
       {
-        napNext(w)=napPerm(p,par_perm,src_ring,nMap);
+        pNext(w)=napPerm(p,par_perm,src_ring,nMap);
         return w;
       }
     }
@@ -2082,7 +2080,7 @@ number naMapQaQb(number c)
       if (napGetExp(erg->n,1) >= napGetExp(naMinimalPoly,1))
         erg->n = napRemainder(erg->n, naMinimalPoly);
       if ((napIsConstant(erg->n)) && nacIsOne(napGetCoeff(erg->n)))
-        napDelete(&(erg->n));
+        p_Delete(&(erg->n),nacRing);
     }
   }
   return (number)erg;
@@ -2257,7 +2255,7 @@ poly naPermNumber(number z, int * par_perm, int P, ring oldRing)
       pTest(p);
       res=pAdd(res,p);
     }
-    napIter(za);
+    pIter(za);
   }
   while (za!=NULL);
   pTest(res);
@@ -2325,14 +2323,14 @@ BOOLEAN naDBTest(number a, const char *f,const int l)
     //}
     if (naIsChar0 && !(nlDBTest(napGetCoeff(p),f,l)))
       return FALSE;
-    napIter(p);
+    pIter(p);
   }
   p = naGetDenom0(x);
   while(p!=NULL)
   {
     if (naIsChar0 && !(nlDBTest(napGetCoeff(p),f,l)))
       return FALSE;
-    napIter(p);
+    pIter(p);
   }
   return TRUE;
 }

@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_PutPoly.cc,v 1.23 2004-04-13 15:38:03 Singular Exp $ */
+/* $Id: mpsr_PutPoly.cc,v 1.24 2009-08-14 17:13:42 Singular Exp $ */
 
 /***************************************************************
  *
@@ -221,7 +221,7 @@ static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a, ring ar)
       for (i=0; i<gNalgvars; i++)
         gTa[i] = p_GetExp((poly)a,i+1,ar);
       mp_failr(IMP_PutSint32Vector(link, gTa, gNalgvars));
-      napIter(a);
+      pIter(a);
     }
   else
   {
@@ -229,7 +229,7 @@ static mpsr_Status_t PutAlgPoly(MP_Link_pt link, napoly a, ring ar)
     {
       failr(PutAlgAlgNumber(link, napGetCoeff(a)));
       IMP_PutSint32(link, (MP_Sint32_t) p_GetExp((poly)a,1,ar));
-      napIter(a);
+      pIter(a);
     }
   }
   return mpsr_Success;

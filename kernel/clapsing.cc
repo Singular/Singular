@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.43 2009-08-13 15:31:27 Singular Exp $
+// $Id: clapsing.cc,v 1.44 2009-08-14 17:14:30 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -80,7 +80,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
       #endif
       {
         bool b=isOn(SW_USE_QGCD);
-        if ( nGetChar()==1 ) On(SW_USE_QGCD);
+        if ( rField_is_Q_a() ) On(SW_USE_QGCD);
         CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
                                            r->algring);
         Variable a=rootOf(mipo);
@@ -156,8 +156,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
     return NULL;
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
-  if (( nGetChar() == 0 || nGetChar() > 1 )
-  && (currRing->parameter==NULL))
+  if (rField_is_Zp() || rField_is_Q())
   {
     Variable X(i);
     setCharacteristic( nGetChar() );
@@ -167,10 +166,9 @@ poly singclap_resultant ( poly f, poly g , poly x)
     return res;
   }
   // and over Q(a) / Fp(a)
-  else if (( nGetChar()==1 ) /* Q(a) */
-  || (nGetChar() <-1))       /* Fp(a) */
+  else if (rField_is_Extension())
   {
-    if (nGetChar()==1) setCharacteristic( 0 );
+    if (rField_is_Q_a()) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
     poly res;
     Variable X(i+rPar(currRing));
@@ -290,8 +288,7 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
   // Q and Fp ...
   res=NULL;pa=NULL;pb=NULL;
   On(SW_SYMMETRIC_FF);
-  if (( nGetChar() == 0 || nGetChar() > 1 )
-  && (currRing->parameter==NULL))
+  if (rField_is_Zp() || rField_is_Q())
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPFactoryP( f ) ), G( convSingPFactoryP( g ) );
@@ -311,10 +308,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
     Off(SW_RATIONAL);
   }
   // and over Q(a) / Fp(a)
-  else if (( nGetChar()==1 ) /* Q(a) */
-  || (nGetChar() <-1))       /* Fp(a) */
+  else if (rField_is_Extension())
   {
-    if (nGetChar()==1) setCharacteristic( 0 );
+    if (rField_is_Q_a()) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
     CanonicalForm Fa,Gb;
     if (currRing->minpoly!=NULL)
@@ -438,22 +434,17 @@ BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const
 
 poly singclap_pdivide ( poly f, poly g )
 {
-  // for now there is only the possibility to handle polynomials over
-  // Q and Fp ...
   poly res=NULL;
   On(SW_RATIONAL);
-  if (( nGetChar() == 0 || nGetChar() > 1 )
-  && (currRing->parameter==NULL))
+  if (rField_is_Zp() || rField_is_Q())
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPFactoryP( f ) ), G( convSingPFactoryP( g ) );
     res = convFactoryPSingP( F / G );
   }
-  // and over Q(a) / Fp(a)
-  else if (( nGetChar()==1 ) /* Q(a) */
-  || (nGetChar() <-1))       /* Fp(a) */
+  else if (rField_is_Extension())
   {
-    if (nGetChar()==1) setCharacteristic( 0 );
+    if (rField_is_Q_a()) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
     if (currRing->minpoly!=NULL)
     {
@@ -497,14 +488,10 @@ void singclap_divide_content ( poly f )
   }
   else
   {
-    if ( nGetChar() == 1 )
+    if ( rField_is_Q_a() )
       setCharacteristic( 0 );
-    else  if ( nGetChar() == -1 )
-      return; /* not implemented for R */
-    else  if ( nGetChar() < 0 )
+    else  if ( rField_is_Zp_a() )
       setCharacteristic( -nGetChar() );
-    else if (currRing->parameter==NULL) /* not GF(q) */
-      setCharacteristic( nGetChar() );
     else
       return; /* not implemented*/
 
@@ -571,7 +558,7 @@ void singclap_divide_content ( poly f )
       for ( i = L, p = f; i.hasItem(); i++, p=pNext(p) )
       {
         lnumber c=(lnumber)pGetCoeff(p);
-        napDelete(&c->z);
+        p_Delete(&c->z,nacRing);
         c->z=convFactoryPSingP( i.getItem() / g, currRing->algring );
         //nTest((number)c);
         //#ifdef LDEBUG
@@ -607,15 +594,12 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
     On(SW_RATIONAL);
     CanonicalForm F, FAC,Q,R;
     Variable a;
-    if (( nGetChar() == 0 || nGetChar() > 1 )
-    && (currRing->parameter==NULL))
+    if (rField_is_Zp() || rField_is_Q())
     {
       F=convSingPFactoryP( f );
       FAC=convSingPFactoryP( fac );
     }
-    // and over Q(a) / Fp(a)
-    else if (( nGetChar()==1 ) /* Q(a) */
-    || (nGetChar() <-1))       /* Fp(a) */
+    else if (rField_is_Extension())
     {
       if (currRing->minpoly!=NULL)
       {
@@ -644,13 +628,11 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
       R-=F;
       if (R.isZero())
       {
-        if (( nGetChar() == 0 || nGetChar() > 1 )
-        && (currRing->parameter==NULL))
+        if (rField_is_Zp() || rField_is_Q())
         {
           q = convFactoryPSingP( Q );
         }
-        else if (( nGetChar()==1 ) /* Q(a) */
-        || (nGetChar() <-1))       /* Fp(a) */
+        else if (rField_is_Extension())
         {
           if (currRing->minpoly!=NULL)
           {
@@ -806,7 +788,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPFactoryP( f ) );
-    if (nGetChar()==0) /* Q */
+    if (rField_is_Q())
     {
       L = factorize( F );
     }

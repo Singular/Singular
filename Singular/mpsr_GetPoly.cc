@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.35 2005-05-18 15:59:36 Singular Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.36 2009-08-14 17:13:42 Singular Exp $ */
 
 /***************************************************************
  *
@@ -319,20 +319,20 @@ static inline mpsr_Status_t GetAlgPoly(MP_Link_pt link, napoly *p)
   *p = a;
 
   failr(GetAlgNumberNumber(link, &(napGetCoeff(a))));
-  mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
-  for (i=0; i<naNumbOfPar; i++)
+  mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, rPar(currRing)));
+  for (i=0; i<rPar(currRing); i++)
     napSetExp(a,i+1,gTa[i]);
 
   for (j=1; j<nm; j++)
   {
-    napNext(a) = napNew();
-    napIter(a);
+    pNext(a) = napNew();
+    pIter(a);
     failr(GetAlgNumberNumber(link, &(napGetCoeff(a))));
-    mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, naNumbOfPar));
-    for (i=0; i<naNumbOfPar; i++)
+    mp_failr(IMP_GetSint32Vector(link, (MP_Sint32_t **) &gTa, rPar(currRing)));
+    for (i=0; i<rPar(currRing); i++)
       napSetExp(a,i+1,gTa[i]);
   }
-  napNext(a) = NULL;
+  pNext(a) = NULL;
 
   return mpsr_Success;
 }
