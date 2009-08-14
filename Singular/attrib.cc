@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: attrib.cc,v 1.34 2009-05-05 09:54:38 Singular Exp $ */
+/* $Id: attrib.cc,v 1.35 2009-08-14 12:43:18 Singular Exp $ */
 
 /*
 * ABSTRACT: attributes to leftv and idhdl
@@ -54,50 +54,55 @@ attr sattr::Copy()
 //  return s_internalCopy(atyp,data);
 //}
 
+static void attr_free(attr h, const ring r=currRing)
+{
+  switch (h->atyp)
+  {
+  case INTVEC_CMD:
+  case INTMAT_CMD:
+    delete (intvec *)(h->data);
+    break;
+  case IDEAL_CMD:
+  case MODUL_CMD:
+  case MATRIX_CMD:
+    id_Delete((ideal *)&(h->data),r);
+    break;
+  case POLY_CMD:
+  case VECTOR_CMD:
+    p_Delete((poly *)&(h->data),r);
+    break;
+  case INT_CMD:
+    break;
+  case STRING_CMD:
+    omFree((ADDRESS)(h->data));
+    break;
+#ifdef TEST
+  default:
+    ::Print("atKill: unknown type(%d)\n",h->atyp);  /* DEBUG */
+#endif
+  } /* end switch: (atyp) */
+  h->data=NULL;
+}
+
 attr sattr::set(const char * s, void * data, int t)
 {
   attr h = get(s);
+  attr result=this;
   if (h!=NULL)
   {
-    switch (h->atyp)
-    {
-    case INTVEC_CMD:
-      delete (intvec *)h->data;
-      break;
-    case IDEAL_CMD:
-    case MODUL_CMD:
-    case MATRIX_CMD:
-      idDelete((ideal *)&h->data);
-      break;
-    case POLY_CMD:
-    case VECTOR_CMD:
-      pDelete((poly *)&h->data);
-      break;
-    case INT_CMD:
-      break;
-    case STRING_CMD:
-      omFree((ADDRESS)h->data);
-      break;
-#ifdef TEST
-    default:
-      ::Print("at-set: unknown type(%d)\n",atyp);  /* DEBUG */
-#endif
-    } /* end switch: (atyp) */
-    omFree((ADDRESS)s);
+    attr_free(h);
   }
   else
   {
-     h = (attr)omAlloc0Bin(sattr_bin);
-     h->name = s;
-     h->next = this;
-     h->data = data;
-     h->atyp = t;
-     return  h;
+    h = (attr)omAlloc0Bin(sattr_bin);
+    h->next = this;
+    result=h;
   }
-  //::Print("set attr >>%s<< of type %d\n",h->name,t);
+  h->name = s;
   h->data = data;
   h->atyp = t;
-  return  this;
+  //::Print("set attr >>%s<< of type %d\n",h->name,t);
+  return  result;
 }
 
 attr sattr::get(const char * s)
@@ -197,31 +202,7 @@ void sattr::kill(const ring r)
 {
   omFree((ADDRESS)name);
   name=NULL;
-  switch (atyp)
-  {
-  case INTVEC_CMD:
-    delete (intvec *)data;
-    break;
-  case IDEAL_CMD:
-  case MODUL_CMD:
-  case MATRIX_CMD:
-    id_Delete((ideal *)&data,r);
-    break;
-  case POLY_CMD:
-  case VECTOR_CMD:
-    p_Delete((poly *)&data,r);
-    break;
-  case INT_CMD:
-    break;
-  case STRING_CMD:
-    omFree((ADDRESS)data);
-    break;
-#ifdef TEST
-  default:
-    ::Print("atKill: unknown type(%d)\n",atyp);  /* DEBUG */
-#endif
-  } /* end switch: (atyp) */
-  data=NULL;
+  attr_free(this,r);
   omFreeBin((ADDRESS)this, sattr_bin);
 }
 
@@ -273,21 +254,19 @@ BOOLEAN atATTRIB1(leftv res,leftv a)
     if (v==NULL) return TRUE;
   }
   attr at=v->attribute;
+  BOOLEAN haveNoAttribute=TRUE;
   if (hasFlag(v,FLAG_STD))
   {
     PrintS("attr:isSB, type int\n");
-    if (at!=NULL) at->Print();
+    haveNoAttribute=FALSE;
   }
   else if (((t=v->Typ())==RING_CMD)||(t==QRING_CMD))
   {
     PrintS("attr:global, type int\n");
-    if (at!=NULL) at->Print();
+    haveNoAttribute=FALSE;
   }
-  else
-  {
-    if (at!=NULL) at->Print();
-    else          PrintS("no attributes\n");
-  }
+  if (at!=NULL)                    at->Print();
+  else  if(haveNoAttribute)        PrintS("no attributes\n");
   return FALSE;
 }
 BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
@@ -449,3 +428,4 @@ BOOLEAN atKILLATTR2(leftv res,leftv a,leftv b)
   }
   return FALSE;
 }
+
