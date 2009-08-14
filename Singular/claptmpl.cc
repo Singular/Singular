@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.44 2009-07-28 14:18:32 Singular Exp $
+// $Id: claptmpl.cc,v 1.45 2009-08-14 11:15:34 Singular Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -239,18 +239,18 @@ template class std::vector<PolySimple>;
 //template class std::priority_queue<MonRedRes>;
 //template class std::vector<NoroPlaceHolder>;
 //template class std::vector<std::vector<NoroPlaceHolder> >;
-template class std::vector<DataNoroCacheNode<tgb_uint16>* >;
-template class std::vector<DataNoroCacheNode<tgb_uint8>* >;
+//template class std::vector<DataNoroCacheNode<tgb_uint16>* >;
+//template class std::vector<DataNoroCacheNode<tgb_uint8>* >;
 template class std::vector<DataNoroCacheNode<tgb_uint32>* >;
-template SparseRow<tgb_uint16> * noro_red_to_non_poly_t<tgb_uint16>(poly p, int &len, NoroCache<tgb_uint16>* cache,slimgb_alg* c);
+//template SparseRow<tgb_uint16> * noro_red_to_non_poly_t<tgb_uint16>(poly p, int &len, NoroCache<tgb_uint16>* cache,slimgb_alg* c);
 template SparseRow<tgb_uint32>* noro_red_to_non_poly_t<tgb_uint32>(poly p, int &len, NoroCache<tgb_uint32>* cache,slimgb_alg* c);
-template SparseRow<tgb_uint8>* noro_red_to_non_poly_t<tgb_uint8>(poly p, int &len, NoroCache<tgb_uint8>* cache,slimgb_alg* c);
-template void simplest_gauss_modp<tgb_uint16> (tgb_uint16* a, int nrows,int ncols);
+//template SparseRow<tgb_uint8>* noro_red_to_non_poly_t<tgb_uint8>(poly p, int &len, NoroCache<tgb_uint8>* cache,slimgb_alg* c);
+//template void simplest_gauss_modp<tgb_uint16> (tgb_uint16* a, int nrows,int ncols);
 template void simplest_gauss_modp<tgb_uint32> (tgb_uint32* a, int nrows,int ncols);
-template void simplest_gauss_modp<tgb_uint8> (tgb_uint8* a, int nrows,int ncols);
-template poly row_to_poly<tgb_uint8>(tgb_uint8* row, poly* terms, int tn, ring r);
+//template void simplest_gauss_modp<tgb_uint8> (tgb_uint8* a, int nrows,int ncols);
+//template poly row_to_poly<tgb_uint8>(tgb_uint8* row, poly* terms, int tn, ring r);
 template poly row_to_poly<tgb_uint32>(tgb_uint32* row, poly* terms, int tn, ring r);
-template poly row_to_poly<tgb_uint16>(tgb_uint16* row, poly* terms, int tn, ring r);
+//template poly row_to_poly<tgb_uint16>(tgb_uint16* row, poly* terms, int tn, ring r);
 template void noro_step<tgb_uint8>(poly*p,int &pn,slimgb_alg* c);
 template void noro_step<tgb_uint16>(poly*p,int &pn,slimgb_alg* c);
 template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
