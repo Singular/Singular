@@ -302,13 +302,10 @@ installbin: ${DL_LIBS} ${DL_LIBSG} ${DL_LIBSP}
 	- ranlib libkernel_p.a
 ifeq (,${DL_LIBS})
 else
-
+	-${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
 ifeq (,${DL_LIBSG})
 else
-	-${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
-	-for file in ${DL_LIBS} ${DL_LIBSG} ${DL_LIBSP}; do\
-	${INSTALL_PROGRAM} $$file ../Singular; \
-	done
+	-for file in ${DL_LIBS} ${DL_LIBSG} ${DL_LIBSP}; do ${INSTALL_PROGRAM} $$file ../Singular; done
 endif
 endif
 
