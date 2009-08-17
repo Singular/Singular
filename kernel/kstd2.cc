@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.100 2009-08-13 17:31:49 motsak Exp $ */
+/* $Id: kstd2.cc,v 1.101 2009-08-17 08:29:23 Singular Exp $ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */
@@ -389,7 +389,7 @@ int redRing (LObject* h,kStrategy strat)
       }
       else if ((TEST_OPT_PROT) && (strat->Ll < 0))
       {
-        Print(".%d",d);mflush();
+        Print(".%ld",d);mflush();
         reddeg = d;
       }
     }
@@ -665,7 +665,7 @@ int redLazy (LObject* h,kStrategy strat)
       }
       else if ((TEST_OPT_PROT) && (strat->Ll < 0))
       {
-        Print(".%d",d);mflush();
+        Print(".%ld",d);mflush();
         reddeg = d;
       }
     }

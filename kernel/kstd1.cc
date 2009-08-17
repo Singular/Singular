@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.58 2009-08-13 17:31:49 motsak Exp $ */
+/* $Id: kstd1.cc,v 1.59 2009-08-17 08:29:23 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -333,7 +333,7 @@ int redEcart (LObject* h,kStrategy strat)
     }
     else if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
     {
-      Print(".%d",d);mflush();
+      Print(".%ld",d);mflush();
       reddeg = d+1;
       if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
       {
@@ -465,7 +465,7 @@ int redFirst (LObject* h,kStrategy strat)
       if ((TEST_OPT_PROT) && (strat->Ll < 0) && (d >= reddeg))
       {
         reddeg = d+1;
-        Print(".%d",d);mflush();
+        Print(".%ld",d);mflush();
         if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
         {
           strat->overflow=TRUE;
