@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpsr_GetMisc.cc,v 1.31 2009-08-17 08:29:04 Singular Exp $ */
+/* $Id: mpsr_GetMisc.cc,v 1.32 2009-08-17 10:03:17 Singular Exp $ */
 
 /***************************************************************
  *
@@ -25,7 +25,7 @@
 
 BOOLEAN currComplete = FALSE;
 
-static ring rDefault(short ch, const char *name);
+static ring mpsr_rDefault(short ch, const char *name);
 static char* GenerateRingName();
 
 
@@ -53,7 +53,7 @@ int mpsr_rDefault(short ch, const char *name, ring &r)
       }
     }
   }
-  r = rDefault(ch, name);
+  r = mpsr_rDefault(ch, name);
   return 0;
 }
 
@@ -66,10 +66,10 @@ ring mpsr_rDefault(short ch)
     return currRing;
   }
   else
-    return rDefault(ch, MPSR_DEFAULT_VARNAME);
+    return mpsr_rDefault(ch, MPSR_DEFAULT_VARNAME);
 }
 
-static ring rDefault(short ch, const char *name)
+static ring mpsr_rDefault(short ch, const char *name)
 {
   ring r = (ring) omAlloc0Bin(sip_sring_bin);
   r->ch = ch;
