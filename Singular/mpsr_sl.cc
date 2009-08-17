@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.10 2008-09-12 17:03:41 Singular Exp $
+ *  Version: $Id: mpsr_sl.cc,v 1.11 2009-08-17 08:51:58 Singular Exp $
  *******************************************************************/
 
 #include "mod2.h"
@@ -266,8 +266,8 @@ MP_Link_pt slOpenMPLaunch(int n_argc, char **n_argv)
 LINKAGE MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
 {
   MP_Link_pt link = NULL;
-  char *argv[] = {"--MPtransp", "TCP", "--MPmode", "fork", "--MPport", "1703"};
-  char *port = IMP_GetCmdlineArg(n_argc, n_argv, "--MPport");
+  const char *argv[] = {"--MPtransp", "TCP", "--MPmode", "fork", "--MPport", "1703"};
+  char *port = IMP_GetCmdlineArg(n_argc, n_argv, (char *)"--MPport");
 
   if (port != NULL) argv[5] = port;
 
