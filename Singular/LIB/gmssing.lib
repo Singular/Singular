@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.16 2009-07-28 14:17:00 Singular Exp $";
+version="$Id: gmssing.lib,v 1.17 2009-08-19 13:31:24 Singular Exp $";
 category="Singularities";
 
 info="
@@ -218,7 +218,7 @@ proc gmsnf(ideal p,int K)
 ASSUME:   basering returned by gmsring
 RETURN:
   list nf;
-  ideal nf[1];  projection of p to <gmsbasis>C{{s}} mod s^(K+1)
+  ideal nf[1];  projection of p to <gmsbasis>C[[s]] mod s^(K+1)
   ideal nf[2];  p==nf[1]+nf[2]
 NOTE:     computation can be continued by setting p=nf[2]
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice
