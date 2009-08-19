@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.55 2009-05-29 09:27:20 Singular Exp $";
+version="$Id: normal.lib,v 1.56 2009-08-19 13:17:25 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -10,8 +10,8 @@ AUTHORS:  G.-M. Greuel,  greuel@mathematik.uni-kl.de,
 
 MAIN PROCEDURES:
  normal(I[...]);     normalization of an affine ring
- normalP(I,[...];    normalization of an affine ring in positive characteristic
- normalC(I,[...];    normalization of an affine ring through a chain of rings
+ normalP(I,[...]);   normalization of an affine ring in positive characteristic
+ normalC(I,[...]);   normalization of an affine ring through a chain of rings
  HomJJ(L);           presentation of End_R(J) as affine ring, J an ideal
  genus(I);           computes the geometric genus of a projective curve
  primeClosure(L);    integral closure of R/p, p a prime ideal
