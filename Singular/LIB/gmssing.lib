@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib,v 1.17 2009-08-19 13:31:24 Singular Exp $";
+version="$Id: gmssing.lib,v 1.18 2009-08-20 08:17:03 Singular Exp $";
 category="Singularities";
 
 info="
@@ -297,7 +297,7 @@ ASSUME:   basering constructed by gmsring
 RETURN:
 @format
 list l;
-  matrix l[1];  C{{s}}-basis representation of p mod s^(K+1)
+  matrix l[1];  C[[s]]-basis representation of p mod s^(K+1)
   ideal l[2];  p==matrix(gmsbasis)*l[1]+l[2]
 @end format
 NOTE:     computation can be continued by setting p=l[2]
