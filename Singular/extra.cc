@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.313 2009-08-13 17:24:45 motsak Exp $ */
+/* $Id: extra.cc,v 1.314 2009-08-20 09:21:40 Singular Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -3285,7 +3285,8 @@ ipshell()");
 //    using namespace SINGULAR_NS;
     extern BOOLEAN Main(leftv res, leftv h); // FALSE = Ok, TRUE = Error!
     return Main(res, h);
-  };
+  }
+  else
 #endif // HAVE_SINGULAR_PLUS_PLUS
 
 
