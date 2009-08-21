@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.15 2009-08-14 17:14:30 Singular Exp $ */
+/* $Id: longalg.h,v 1.16 2009-08-21 10:55:46 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -79,8 +79,6 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napAdd(p1,p2)          (p_Add_q(p1,p2,currRing->algring))
 #define napSetm(p)             p_Setm(p,currRing->algring)
 #define nanumber               lnumber
-#define naGetNom0(na)          (((nanumber)(na))->z)
-#define naGetDenom0(na)        (((nanumber)(na))->n)
 napoly napRemainder(napoly f, const napoly  g);
 void napWrite(napoly l,const BOOLEAN denom=TRUE);
 number   naGetDenom(number &n, const ring r);
