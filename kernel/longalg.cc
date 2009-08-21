@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.48 2009-08-21 10:55:46 Singular Exp $ */
+/* $Id: longalg.cc,v 1.49 2009-08-21 10:58:50 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -2436,7 +2436,7 @@ number   naGetDenom(number &n, const ring r)
   return r->cf->nInit(1);
 }
 
-number   naNumerator(number &n, const ring r)
+number   naGetNumerator(number &n, const ring r)
 {
   if (r==currRing) naNormalize(n);
   lnumber x=(lnumber)n;
