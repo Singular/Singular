@@ -1,4 +1,5 @@
-version="$Id: nchomolog.lib,v 1.11 2009-04-06 17:43:33 motsak Exp $";
+//
+version="$Id: nchomolog.lib,v 1.12 2009-08-21 14:14:05 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY:  nchomolog.lib   Procedures for Noncommutative Homological Algebra

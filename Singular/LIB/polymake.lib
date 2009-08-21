@@ -1,4 +1,5 @@
-version="$Id: polymake.lib,v 1.18 2009-07-28 10:34:55 Singular Exp $";
+//
+version="$Id: polymake.lib,v 1.19 2009-08-21 14:12:52 Singular Exp $";
 category="Tropical Geometry";
 info="
 LIBRARY:   polymake.lib    Computations with polytopes and fans,

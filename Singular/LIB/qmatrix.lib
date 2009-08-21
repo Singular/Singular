@@ -1,4 +1,5 @@
-version="$Id: qmatrix.lib,v 1.16 2009-04-09 12:04:42 seelisch Exp $";
+//
+version="$Id: qmatrix.lib,v 1.17 2009-08-21 14:12:22 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups
@@ -290,6 +291,4 @@ static proc ijtoi(int i, j, n)
 {
   return((j-1)+n*(i-1)+1);
 }
-
 ///////////////////////////////////////////////////////////////////////////////
-
