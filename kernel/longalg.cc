@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.49 2009-08-21 10:58:50 Singular Exp $ */
+/* $Id: longalg.cc,v 1.50 2009-08-21 13:24:56 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -65,14 +65,6 @@ static napoly napTailred(napoly q);
 static BOOLEAN napDivPoly(napoly p, napoly q);
 static int napExpi(int i, napoly a, napoly b);
        ring nacRing;
-static inline void naNormalize0(number &pp)
-{
-  lnumber p = (lnumber)pp;
-  if ((p!=NULL) && (p->z!=NULL))
-  {
-      naNormalize(pp);
-  }
-}
 
 #define napCopy(p)       (napoly)p_Copy((poly)p,nacRing)
 
@@ -987,7 +979,7 @@ number naCopy(number p)
 {
   if (p==NULL) return NULL;
   naTest(p);
-  naNormalize(p);
+  //naNormalize(p);
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
@@ -1065,7 +1057,7 @@ number naAdd(number la, number lb)
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
-     naNormalize0(luu);
+     naNormalize(luu);
      lu=(lnumber)luu;
   }
   naTest((number)lu);
@@ -1130,7 +1122,7 @@ number naSub(number la, number lb)
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
-     naNormalize0(luu);
+     naNormalize(luu);
      lu=(lnumber)luu;
   }
   naTest((number)lu);
@@ -1208,7 +1200,7 @@ number naMult(number la, number lb)
   {
     lo->s = 0;
     number luu=(number)lo;
-    naNormalize0(luu);
+    naNormalize(luu);
     lo=(lnumber)luu;
   }
   else
@@ -1375,7 +1367,7 @@ number naInvers(number a)
   if (lo->n!=NULL)
   {
      number luu=(number)lo;
-     naNormalize0(luu);
+     naNormalize(luu);
      lo=(lnumber)luu;
   }
   naTest((number)lo);
@@ -1542,7 +1534,7 @@ void naWrite(number &phn)
   else
   {
     phn->s = 0;
-    naNormalize(phn);
+    //naNormalize(phn);
     BOOLEAN has_denom=(ph->n!=NULL);
     napWrite(ph->z,has_denom/*(ph->n!=NULL)*/);
     if (has_denom/*(ph->n!=NULL)*/)
@@ -1578,6 +1570,7 @@ BOOLEAN naIsOne(number za)
     }
     else                 return FALSE;
   }
+#if 0
   x = a->z;
   y = a->n;
   do
@@ -1606,6 +1599,9 @@ BOOLEAN naIsOne(number za)
   a->n = NULL;
   a->s = 2;
   return TRUE;
+#else
+  return FALSE;
+#endif
 }
 
 /*2
@@ -1978,7 +1974,7 @@ number naLcm(number la, number lb, const ring r)
   //  result->z = napInit(1);
   //  return (number)result;
   //}
-  naNormalize(lb);
+  //naNormalize(lb);
   naTest(la);
   naTest(lb);
   napoly x = napCopy(a->z);
@@ -2424,7 +2420,7 @@ poly naPermNumber(number z, int * par_perm, int P, ring oldRing)
 
 number   naGetDenom(number &n, const ring r)
 {
-  if (r==currRing) naNormalize(n);
+  //if (r==currRing) naNormalize(n);
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
@@ -2438,7 +2434,7 @@ number   naGetDenom(number &n, const ring r)
 
 number   naGetNumerator(number &n, const ring r)
 {
-  if (r==currRing) naNormalize(n);
+  //if (r==currRing) naNormalize(n);
   lnumber x=(lnumber)n;
   lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
   rr->z=nap_Copy(x->z,r);
