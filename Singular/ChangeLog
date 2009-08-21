@@ -1,8 +1,10 @@
 Changes w.r.t 3-1-0-5:
+- 3-1-0-6: Fri Aug 21 12:59:52 CEST 2009
 - code cleanup: removed HAVE_NAMESPACES (always 0), HAVE_NS(1), HAVE_GMP(1)
                 HAVE_LIBFAC_P (=HAVE_FACTORY)
 - moved mp_set_memory_functions-call from kernel/mminit.cc to tesths.cc:main
   (in order not to call it for libsingular)
+- some changes for super-commutaive algeras
 
 Changes w.r.t 3-1-0-4:
 - 3-1-0-5: Tue Jul 28 14:03:59 CEST 2009
