@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.208 2009-07-28 14:18:34 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.209 2009-08-26 07:59:40 seelisch Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4651,7 +4651,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   if (ringtype > 0)
   {
-    WarnS("You are using coefficients rings which are not fields.");
+    WarnS("You are using coefficient rings which are not fields.");
     WarnS("Please note that only limited functionality is available");
     WarnS("for these coefficients.");
     WarnS("");
