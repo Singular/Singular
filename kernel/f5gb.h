@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.42 2009-07-16 07:47:51 ederc Exp $ */
+/* $Id: f5gb.h,v 1.43 2009-08-30 15:26:00 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -42,7 +42,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag);
+LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag,int termination);
 
 /*
 ================================================================
@@ -94,7 +94,7 @@ inline void reduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev);
+inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev, int termination);
 
 /*!
  * ================================================================================
@@ -108,7 +108,7 @@ inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RL
  * later on for possible new rules and S-polynomials to be added to the algorithm
  * ================================================================================
  */
-void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag); 
+void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, int termination); 
 
 /*
 =====================================================================================
@@ -139,7 +139,7 @@ inline LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LLi
 main function of our F5 implementation
 ======================================
 */
-ideal F5main(ideal i, ring r, int opt);
+ideal F5main(ideal i, ring r, int opt, int termination);
 
 #endif
 #endif
