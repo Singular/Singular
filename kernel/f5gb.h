@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.43 2009-08-30 15:26:00 ederc Exp $ */
+/* $Id: f5gb.h,v 1.44 2009-08-31 13:55:46 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -33,7 +33,7 @@ long sumVector(int* v, int k);
 compare monomials, i.e. divisibility tests for criterion 1 and criterion 2
 ==========================================================================
 */
-bool compareMonomials(int* m1, int** m2, int numberOfRules);
+bool compareMonomials(int* m1, int** m2, int numberOfRuleOlds);
 
 
 /*
@@ -42,7 +42,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-LList* F5inc(int i, poly f_i, LList* gPrev, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag,int termination);
+LList* F5inc(int i, poly f_i, LList* gPrev,LList* reducers, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag,int termination);
 
 /*
 ================================================================
@@ -51,7 +51,7 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* rules);
+void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* RuleOlds);
 
 /*
 ========================================
@@ -65,28 +65,28 @@ inline bool criterion1(LList* gPrev, poly t, LNode* l, LTagList* lTag);
 Criterion 2, i.e. Rewritten Criterion
 =====================================
 */
-inline bool criterion2(int idx, poly t, LNode* l, RList* rules, RTagList* rTag);
+inline bool criterion2(int idx, poly t, LNode* l, RList* RuleOlds, RTagList* rTag);
 
 /*
 ==========================================================================================================
-Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with added lastRuleTested parameter
+Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with added lastRuleOldTested parameter
 ==========================================================================================================
 */
-inline bool criterion2(poly t, LPoly* l, RList* rules, Rule* testedRule);
+inline bool criterion2(poly t, LPolyOld* l, RList* RuleOlds, RuleOld* testedRuleOld);
 
 /*
 ==================================
 Computation of S-Polynomials in F5
 ==================================
 */
-inline void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList);
+inline void computeSPols(CNode* first, RTagList* rTag, RList* RuleOlds, LList* sPolyList);
 
 /*
 ========================================================================
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-inline void reduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag,
+inline void reduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* RuleOlds, LTagList* lTag, RTagList* rTag,
                  ideal gbPrev);
 
 /*
@@ -94,7 +94,7 @@ inline void reduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev, int termination);
+inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, LList* reducers, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev, int termination);
 
 /*!
  * ================================================================================
@@ -105,10 +105,10 @@ inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RL
  * these the normal form of temp is computed
  *
  * the "bad" ones are the reducers which corrupt the label of temp, they are tested 
- * later on for possible new rules and S-polynomials to be added to the algorithm
+ * later on for possible new RuleOlds and S-polynomials to be added to the algorithm
  * ================================================================================
  */
-void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, int termination); 
+void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, LList* reducers, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, int termination); 
 
 /*
 =====================================================================================
@@ -116,7 +116,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
+inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs, RList* RuleOlds, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
 
 /*
 =======================================================================================
@@ -132,7 +132,7 @@ poly p_MergeEq_q(poly p, poly q, const ring r);
 subalgorithm to find a possible reductor for the labeled polynomial l
 =====================================================================
 */
-inline LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LList* gPrev, RList* rules, LTagList* lTag,RTagList* rTag);
+inline LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LList* gPrev, RList* RuleOlds, LTagList* lTag,RTagList* rTag);
 
 /*
 ======================================

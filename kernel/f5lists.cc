@@ -29,31 +29,31 @@ LNode::LNode() {
     data                =   NULL;
     next                =   NULL;
 }
-LNode::LNode(LPoly* lp) {
+LNode::LNode(LPolyOld* lp) {
     data                =   lp;
     next                =   NULL;
 }
        
-LNode::LNode(LPoly* lp, LNode* l) {
+LNode::LNode(LPolyOld* lp, LNode* l) {
 //Print("HIER LNODE\n");
     data                =   lp;
     next                =   l;
 }
 
-LNode::LNode(poly t, int i, poly p, Rule* r) {
-LPoly* lp           =   new LPoly(t,i,p,r);
+LNode::LNode(poly t, int i, poly p, RuleOld* r) {
+LPolyOld* lp           =   new LPolyOld(t,i,p,r);
 data                =   lp;
 next                =   NULL;
 }
        
-LNode::LNode(poly t, int i, poly p, Rule* r, LNode* l) {
-    LPoly* lp           =   new LPoly(t,i,p,r);
+LNode::LNode(poly t, int i, poly p, RuleOld* r, LNode* l) {
+    LPolyOld* lp           =   new LPolyOld(t,i,p,r);
     data                =   lp;
     next                =   l;
 }
 
 LNode::LNode(LNode* ln) {
-    data                =   ln->getLPoly();
+    data                =   ln->getLPolyOld();
     next                =   ln->getNext();
 }
         
@@ -74,7 +74,7 @@ void LNode::deleteAll() {
 
 // insert new elements to the list always at the end (labeled / classical polynomial view)
 // needed for list gPrev
-inline LNode* LNode::insert(LPoly* lp) {
+inline LNode* LNode::insert(LPolyOld* lp) {
     //Print("LAST GPREV: ");
     //pWrite(this->getPoly());
     if(NULL == this) {
@@ -88,7 +88,7 @@ inline LNode* LNode::insert(LPoly* lp) {
     }
 }
         
-inline LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
+inline LNode* LNode::insert(poly t, int i, poly p, RuleOld* r) {
     if(NULL == this) {
         LNode* newElement   =   new LNode(t,i,p,r,this);
         return newElement;
@@ -102,14 +102,14 @@ inline LNode* LNode::insert(poly t, int i, poly p, Rule* r) {
 
 // insert new elements to the list always in front (labeled / classical polynomial view)
 // needed for sPolyList
-inline LNode* LNode::insertSP(LPoly* lp) {
+inline LNode* LNode::insertSP(LPolyOld* lp) {
     LNode* newElement   =   new LNode(lp, this);
     //Print("INSERTED IN SPOLYLIST: ");
     //pWrite(lp->getTerm());
     return newElement;
 }
         
-inline LNode* LNode::insertSP(poly t, int i, poly p, Rule* r) {
+inline LNode* LNode::insertSP(poly t, int i, poly p, RuleOld* r) {
     LNode* newElement   =   new LNode(t, i, p, r, this);
      //Print("INSERTED IN SPOLYLIST: ");
   //pWrite(t);
@@ -117,7 +117,7 @@ return newElement;
 }
 // insert new elemets to the list w.r.t. increasing labels
 // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
-inline LNode* LNode::insertByLabel(poly t, int i, poly p, Rule* r) {
+inline LNode* LNode::insertByLabel(poly t, int i, poly p, RuleOld* r) {
     //Print("ADDING SOLYS TO THE LIST\n");
     //Print("new element: ");
     //pWrite(t);
@@ -221,12 +221,12 @@ LNode* LNode::getNext() {
     return next;
 }
 
-// get the LPoly* out of LNode*
-LPoly* LNode::getLPoly() {
+// get the LPolyOld* out of LNode*
+LPolyOld* LNode::getLPolyOld() {
     return data;
 }
 
-// get the data from the LPoly saved in LNode
+// get the data from the LPolyOld saved in LNode
 poly LNode::getPoly() {
     return data->getPoly();
 }
@@ -239,19 +239,19 @@ int LNode::getIndex() {
     return data->getIndex();
 }
 
-Rule* LNode::getRule() {
-    return data->getRule();
+RuleOld* LNode::getRuleOld() {
+    return data->getRuleOld();
 }
 
-void LNode::setRule(Rule* r) {
-    return data->setRule(r);
+void LNode::setRuleOld(RuleOld* r) {
+    return data->setRuleOld(r);
 }
 
 bool LNode::getDel() {
     return data->getDel();
 }
 
-// set the data from the LPoly saved in LNode
+// set the data from the LPolyOld saved in LNode
 void LNode::setPoly(poly p) {
     data->setPoly(p);
 }
@@ -332,13 +332,13 @@ LList::LList() {
     length  =   0;
 }
 
-LList::LList(LPoly* lp) {
+LList::LList(LPolyOld* lp) {
     first   =   new LNode(lp);
     last    =   first;
     length  =   1;
 }
 
-LList::LList(poly t,int i,poly p,Rule* r) {
+LList::LList(poly t,int i,poly p,RuleOld* r) {
     first   =   new LNode(t,i,p,r);
     last    =   first;
     length  =   1;
@@ -355,7 +355,7 @@ LList::~LList() {
 }
 
 // insertion at the end of the list, needed for gPrev
-void LList::insert(LPoly* lp) {
+void LList::insert(LPolyOld* lp) {
     last = last->insert(lp);
     if(NULL == first) {
         first   =   last;
@@ -368,7 +368,7 @@ void LList::insert(LPoly* lp) {
     //Print("LENGTH %d\n",length);
 }
 
-void LList::insert(poly t,int i, poly p, Rule* r) {
+void LList::insert(poly t,int i, poly p, RuleOld* r) {
     last = last->insert(t,i,p,r);
     if(NULL == first) {
         first   =   last;
@@ -378,20 +378,20 @@ void LList::insert(poly t,int i, poly p, Rule* r) {
 }
 
 // insertion in front of the list, needed for sPolyList
-void LList::insertSP(LPoly* lp) {
+void LList::insertSP(LPolyOld* lp) {
     first = first->insertSP(lp);
     length++;
     //Print("LENGTH %d\n",length);
 }
 
-void LList::insertSP(poly t,int i, poly p, Rule* r) {
+void LList::insertSP(poly t,int i, poly p, RuleOld* r) {
     first = first->insertSP(t,i,p,r);
     length++;
     //Print("LENGTH %d\n",length);
 }
 
 
-void LList::insertByLabel(poly t, int i, poly p, Rule* r) {
+void LList::insertByLabel(poly t, int i, poly p, RuleOld* r) {
     first = first->insertByLabel(t,i,p,r);
     length++;
     //Print("LENGTH %d\n",length);
@@ -482,7 +482,7 @@ LTagNode* LTagNode::getNext() {
 }
 
 // NOTE: We insert at the beginning of the list and length = i-1, where i is the actual index.
-//       Thus given actual index i and idx being the index of the LPoly under investigation
+//       Thus given actual index i and idx being the index of the LPolyOld under investigation
 //       the element on position length-idx is the right one
 LNode* LTagNode::get(int idx, int length) {
     if(idx == 1) {
@@ -718,11 +718,11 @@ CNode* CNode::getNext() {
     return next;
 }
 
-LPoly* CNode::getAdLp1() {
+LPolyOld* CNode::getAdLp1() {
     return this->data->getAdLp1();
 }
 
-LPoly* CNode::getAdLp2() {
+LPolyOld* CNode::getAdLp2() {
     return this->data->getAdLp2();
 }
 
@@ -766,8 +766,8 @@ poly* CNode::getAdT2() {
     return this->data->getAdT2();
 }
 
-Rule* CNode::getTestedRule() {
-    return this->data->getTestedRule();
+RuleOld* CNode::getTestedRuleOld() {
+    return this->data->getTestedRuleOld();
 }
 
 // for debugging
@@ -853,17 +853,17 @@ RNode::RNode() {
     next    =   NULL;
 }
 
-RNode::RNode(Rule* r) {
+RNode::RNode(RuleOld* r) {
     data    =   r;
     next    =   NULL;
 }
 
 RNode::~RNode() {
-    //Print("DELETE RULE\n");
+    //Print("DELETE RuleOld\n");
     delete  data;
 }
 
-RNode* RNode::insert(Rule* r) {
+RNode* RNode::insert(RuleOld* r) {
     RNode* newElement   =   new RNode(r);
     newElement->next    =   this;
     return newElement;
@@ -872,29 +872,29 @@ RNode* RNode::insert(Rule* r) {
 RNode* RNode::insert(int i, poly t) {
     //Print("IN INSERT: ");
     //pWrite(t);
-    Rule*   r           =   new Rule(i,t);
-    //Print("ADDRESS OF RULE: %p\n",r);
+    RuleOld*   r           =   new RuleOld(i,t);
+    //Print("ADDRESS OF RuleOld: %p\n",r);
     RNode* newElement   =   new RNode(r);
     //Print("ADDRESS OF RNODE: %p\n",newElement);
-    //Print("ADDRESS OF RNODE DATA: %p\n",newElement->getRule());
+    //Print("ADDRESS OF RNODE DATA: %p\n",newElement->getRuleOld());
     newElement->next    =   this;
     return newElement;
 }
 
 
-RNode* RNode::insertOrdered(Rule* r) {
+RNode* RNode::insertOrdered(RuleOld* r) {
     RNode* newElement   =   new RNode(r); 
     RNode* temp         =   this;
     if(NULL == temp) {
         newElement->next =   temp;
         return newElement;
     }
-    if(1 == pLmCmp(newElement->getRuleTerm(),temp->getRuleTerm())) {
+    if(1 == pLmCmp(newElement->getRuleOldTerm(),temp->getRuleOldTerm())) {
         newElement->next =   temp;
         return newElement;
     }
     else {
-        while(NULL != temp && 1 ==  pLmCmp(temp->getRuleTerm(),newElement->getRuleTerm())) {
+        while(NULL != temp && 1 ==  pLmCmp(temp->getRuleOldTerm(),newElement->getRuleOldTerm())) {
             temp    =   temp->getNext();
         }
         newElement->next =   temp;
@@ -907,23 +907,23 @@ RNode* RNode::getNext() {
     return next;
 }    
 
-Rule* RNode::getRule() {
+RuleOld* RNode::getRuleOld() {
     return data;
 }
 
-int RNode::getRuleIndex() {
+int RNode::getRuleOldIndex() {
     return data->getIndex();
 }
 
-poly RNode::getRuleTerm() {
+poly RNode::getRuleOldTerm() {
     return data->getTerm();
 }
 
 void RNode::print() {
     RNode* temp  =   this;
     while(NULL != temp) {
-        pWrite(temp->getRuleTerm());
-        Print("%d\n\n",temp->getRuleIndex());
+        pWrite(temp->getRuleOldTerm());
+        Print("%d\n\n",temp->getRuleOldIndex());
         temp    =   temp->getNext();
     }
 }
@@ -937,7 +937,7 @@ RList::RList() {
     first = NULL;
 }
 
-RList::RList(Rule* r) {
+RList::RList(RuleOld* r) {
     first = new RNode(r);
 }
 
@@ -949,10 +949,10 @@ RList::~RList() {
         first   =   first->getNext();
         //Print("1 %p\n",first);
         //if(first) {
-            //Print("1' %p\n",first->getRule());
+            //Print("1' %p\n",first->getRuleOld());
             //Print("2 %p\n",first->getNext());
-            //Print("3 %p\n",first->getNext()->getRule());
-            //Print("3 %p\n",first->getNext()->getRuleTerm());
+            //Print("3 %p\n",first->getNext()->getRuleOld());
+            //Print("3 %p\n",first->getNext()->getRuleOldTerm());
         //}
         delete  temp;
     }
@@ -963,11 +963,11 @@ void RList::insert(int i, poly t) {
     first = first->insert(i,t);
 }
 
-void RList::insert(Rule* r) {
+void RList::insert(RuleOld* r) {
     first = first->insert(r);
 }
 
-void RList::insertOrdered(Rule* r) {
+void RList::insertOrdered(RuleOld* r) {
     first   =   first->insertOrdered(r);
 }
 
@@ -975,8 +975,8 @@ RNode* RList::getFirst() {
     return first;
 }
 
-Rule* RList::getRule() {
-    return this->getRule();
+RuleOld* RList::getRuleOld() {
+    return this->getRuleOld();
 }
 
 void RList::print() {
@@ -1028,7 +1028,7 @@ RTagNode* RTagNode::getNext() {
 }
 
 // NOTE: We insert at the beginning of the list and length = i-1, where i is the actual index.
-//       Thus given actual index i and idx being the index of the LPoly under investigation
+//       Thus given actual index i and idx being the index of the LPolyOld under investigation
 //       the element on position length-idx+1 is the right one
 RNode* RTagNode::get(int idx, int length) {
     if(idx==1 || idx==0) {
@@ -1057,13 +1057,13 @@ void RTagNode::set(RNode* r) {
 void RTagNode::print() {
     RTagNode* temp  =   this;
     if(NULL != temp && NULL != temp->getRNode()) {
-        Print("1. element: %d,  ",getRNode()->getRule()->getIndex());
-        pWrite(getRNode()->getRule()->getTerm());
+        Print("1. element: %d,  ",getRNode()->getRuleOld()->getIndex());
+        pWrite(getRNode()->getRuleOld()->getTerm());
         temp    =   temp->next;
         int i   =   2;
         while(NULL != temp->getRNode() && NULL != temp) {
-            Print("%d. element: %d,  ",i,getRNode()->getRule()->getIndex());
-            pWrite(getRNode()->getRule()->getTerm());
+            Print("%d. element: %d,  ",i,getRNode()->getRuleOld()->getIndex());
+            pWrite(getRNode()->getRuleOld()->getTerm());
             temp    =   temp->next;
             i++;
         }

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.13 2009-07-16 07:47:51 ederc Exp $ */
+/* $Id: f5data.h,v 1.14 2009-08-31 13:55:46 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -16,9 +16,9 @@ classes for labeled polynomials/pairs/S-polynomials in F5
 =========================================================
 =========================================================
 */
-class LPoly;
+class LPolyOld;
 class CPairOld;
-class Rule;
+class RuleOld;
 
 
 /*!
@@ -26,86 +26,86 @@ class Rule;
 class of labeled polynomials
 ============================
 */
-class LPoly {
+class LPolyOld {
     private:
         poly    term;           //term of signature
         int     index;          //index of signature
         poly    polynomial;     //standard polynomial data
-        Rule*   _rule;
+        RuleOld*   _RuleOld;
         bool    del;
     public:
-        inline          LPoly(poly t, int i, poly p, Rule* r=NULL);
+        inline          LPolyOld(poly t, int i, poly p, RuleOld* r=NULL);
         inline  void    setPoly(poly p);
         inline  poly    getPoly();
         inline  void    setTerm(poly t);
         inline  poly    getTerm();
         inline  void    setIndex(int i);
         inline  int     getIndex();
-        inline  void    setRule(Rule* r);
-        inline  Rule*   getRule();
+        inline  void    setRuleOld(RuleOld* r);
+        inline  RuleOld*   getRuleOld();
         inline  void    setDel(bool d);
         inline  bool    getDel();
-        inline  void    set(poly t, int i, poly p, Rule* r);
-        inline  LPoly*  get();
+        inline  void    set(poly t, int i, poly p, RuleOld* r);
+        inline  LPolyOld*  get();
 };
 
-LPoly::LPoly(poly t,int i,poly p, Rule* r) {
+LPolyOld::LPolyOld(poly t,int i,poly p, RuleOld* r) {
     set(t,i,p,r);
     del =   0;
 }
 
-void LPoly::setPoly(poly p)  {
+void LPolyOld::setPoly(poly p)  {
     //poly _p     =   pInit();
     //_p          =   pCopy(p);
     polynomial = p;
 }
 
-void LPoly::setTerm(poly t) {
+void LPolyOld::setTerm(poly t) {
     //poly _t     =   pInit();
     //_t          =   pCopy(t);
     term = t;
 }
 
-void LPoly::setIndex(int i) {
+void LPolyOld::setIndex(int i) {
     index = i;
 }
 
-void LPoly::setRule(Rule* r) {
-    _rule   =   r;
+void LPolyOld::setRuleOld(RuleOld* r) {
+    _RuleOld   =   r;
 }
 
-void LPoly::setDel(bool d) {
+void LPolyOld::setDel(bool d) {
     del =   d;
 }
 
-poly LPoly::getPoly() {
+poly LPolyOld::getPoly() {
     return polynomial;
 }
 
-poly LPoly::getTerm() {
+poly LPolyOld::getTerm() {
     return term;
 }
 
-int LPoly::getIndex() {
+int LPolyOld::getIndex() {
     return index;
 }
 
-Rule* LPoly::getRule() {
-    return _rule;
+RuleOld* LPolyOld::getRuleOld() {
+    return _RuleOld;
 }
 
-bool LPoly::getDel() {
+bool LPolyOld::getDel() {
     return del;
 }
 
-void LPoly::set(poly t, int i, poly p, Rule* r) {
+void LPolyOld::set(poly t, int i, poly p, RuleOld* r) {
     this->setTerm(t);
     this->setIndex(i);
     this->setPoly(p);
-    this->setRule(r);
+    this->setRuleOld(r);
 }
 
-LPoly* LPoly::get() {
+LPolyOld* LPolyOld::get() {
     return this;
 }
 
@@ -119,36 +119,36 @@ class CPairOld {
     private:
         long    deg;            // total degree of the critical pair
         poly    t1;             // first term for label
-        LPoly*  lp1;            // first labeled poly
+        LPolyOld*  lp1;            // first labeled poly
         poly    t2;             // second term for label
-        LPoly*  lp2;            // second labeled poly
-        Rule*   testedRule;     // already tested by rules up to lastRuleTested
+        LPolyOld*  lp2;            // second labeled poly
+        RuleOld*   testedRuleOld;     // already tested by RuleOlds up to lastRuleOldTested
     public:
-        inline          CPairOld(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, Rule* r = NULL);
+        inline          CPairOld(long degree, poly term1, LPolyOld* LPolyOld1, poly term2, LPolyOld* LPolyOld2, RuleOld* r = NULL);
         inline  long    getDeg();
         inline  poly    getT1();
         inline  poly*   getAdT1();
-        inline  LPoly*  getAdLp1();
+        inline  LPolyOld*  getAdLp1();
         inline  poly    getLp1Poly();
         inline  poly    getLp1Term();
         inline  int     getLp1Index();
         inline  poly    getT2();
         inline  poly*   getAdT2();
-        inline  LPoly*  getAdLp2();
+        inline  LPolyOld*  getAdLp2();
         inline  poly    getLp2Poly();
         inline  poly    getLp2Term();
         inline  int     getLp2Index();
-        inline  Rule*   getTestedRule();
-        inline  void    setTestedRule(Rule* r);
+        inline  RuleOld*   getTestedRuleOld();
+        inline  void    setTestedRuleOld(RuleOld* r);
 };
 
-CPairOld::CPairOld(long degree, poly term1, LPoly* lpoly1, poly term2, LPoly* lpoly2, Rule* r) {
+CPairOld::CPairOld(long degree, poly term1, LPolyOld* LPolyOld1, poly term2, LPolyOld* LPolyOld2, RuleOld* r) {
    deg              =   degree;
    t1               =   term1;
-   lp1              =   lpoly1;
+   lp1              =   LPolyOld1;
    t2               =   term2;
-   lp2              =   lpoly2;
-   testedRule       =   r;
+   lp2              =   LPolyOld2;
+   testedRuleOld       =   r;
 }
 
 long CPairOld::getDeg() {
@@ -171,11 +171,11 @@ poly CPairOld::getT2() {
     return t2;
 }
 
-LPoly* CPairOld::getAdLp1() {
+LPolyOld* CPairOld::getAdLp1() {
     return lp1;
 }
 
-LPoly* CPairOld::getAdLp2() {
+LPolyOld* CPairOld::getAdLp2() {
     return lp2;
 }
 
@@ -203,45 +203,45 @@ int CPairOld::getLp2Index() {
     return lp2->getIndex();
 }
 
-Rule* CPairOld::getTestedRule() {
-    return testedRule;
+RuleOld* CPairOld::getTestedRuleOld() {
+    return testedRuleOld;
 }
 
-void CPairOld::setTestedRule(Rule* r) {
-    testedRule      =   r;
+void CPairOld::setTestedRuleOld(RuleOld* r) {
+    testedRuleOld      =   r;
 }
 
 
 /*!
 ========================================================
-structure of rules(i.e. already computed / known labels)
+structure of RuleOlds(i.e. already computed / known labels)
 ========================================================
 */
-class Rule {
+class RuleOld {
     private:
-        int     index;      // index of the labeled polynomial the rule comes from 
-        poly    term;       // term of the labeled polynomial the rule comes from
+        int     index;      // index of the labeled polynomial the RuleOld comes from 
+        poly    term;       // term of the labeled polynomial the RuleOld comes from
     public:
-        inline          Rule(int i, poly term);
-        inline          ~Rule();
+        inline          RuleOld(int i, poly term);
+        inline          ~RuleOld();
         inline  int     getIndex();
         inline  poly    getTerm();
 };
 
-Rule::Rule(int i, poly t) {
+RuleOld::RuleOld(int i, poly t) {
     index   =   i;
     term    =   t;
 }
 
-Rule::~Rule() {
+RuleOld::~RuleOld() {
     //pDelete(&term);
 }
 
-int Rule::getIndex() {
+int RuleOld::getIndex() {
     return index;
 }
 
-poly Rule::getTerm() {
+poly RuleOld::getTerm() {
     return term;
 }
 #endif

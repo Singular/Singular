@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.23 2009-07-16 07:47:51 ederc Exp $ */
+/* $Id: f5lists.h,v 1.24 2009-08-31 13:55:46 ederc Exp $ */
 /*
 * ABSTRACT: list interface
 */
@@ -31,35 +31,35 @@ class RTagList;
 
 /*
 =======================================
-class LNode (nodes for lists of LPolys)
+class LNode (nodes for lists of LPolyOlds)
 =======================================
 */
 class LNode {
     private:
-        LPoly*  data;
+        LPolyOld*  data;
         LNode*  next;
     public:
         // generating new list elements from the labeled / classical polynomial view
                 LNode();
-                LNode(LPoly* lp);
-                LNode(LPoly* lp, LNode* l);
-                LNode(poly t, int i, poly p, Rule* r=NULL);
-                LNode(poly t, int i, poly p, Rule* r, LNode* l);
+                LNode(LPolyOld* lp);
+                LNode(LPolyOld* lp, LNode* l);
+                LNode(poly t, int i, poly p, RuleOld* r=NULL);
+                LNode(poly t, int i, poly p, RuleOld* r, LNode* l);
                 LNode(LNode* ln);
                 ~LNode();
         void    deleteAll();
         // insert new elements to the list at the end from the labeled / classical polynomial view
         // needed for gPrev
-        LNode*  insert(LPoly* lp);
-        LNode*  insert(poly t, int i, poly p, Rule* r);
-        LNode*  insertByDeg(LPoly* lp);
+        LNode*  insert(LPolyOld* lp);
+        LNode*  insert(poly t, int i, poly p, RuleOld* r);
+        LNode*  insertByDeg(LPolyOld* lp);
         // insert new elements to the list in front from the labeled / classical polynomial view
         // needed for sPolyList
-        LNode*  insertSP(LPoly* lp);
-        LNode*  insertSP(poly t, int i, poly p, Rule* r);
+        LNode*  insertSP(LPolyOld* lp);
+        LNode*  insertSP(poly t, int i, poly p, RuleOld* r);
         // insert new elements to the list with resp. to increasing labels
         // only used for the S-polys to be reduced (TopReduction building new S-polys with higher label)
-        LNode*  insertByLabel(poly t, int i, poly p, Rule* r);
+        LNode*  insertByLabel(poly t, int i, poly p, RuleOld* r);
         LNode*  insertByLabel(LNode* l);
         LNode*  insertFirst(LNode* l);
         // deletes the first elements of the list with the same degree
@@ -68,20 +68,20 @@ class LNode {
         LNode*  getPrev();
         // only used for the S-polys, which are already sorted by increasing degree by CListOld
         LNode*  deleteByDeg();
-        // get the LPoly* out of LNode*
-        LPoly*  getLPoly();
-        // get the data from the LPoly saved in LNode
+        // get the LPolyOld* out of LNode*
+        LPolyOld*  getLPolyOld();
+        // get the data from the LPolyOld saved in LNode
         poly    getPoly();
         poly    getTerm();
         int     getIndex(); 
-        Rule*   getRule();
+        RuleOld*   getRuleOld();
         bool    getDel();
-        // set the data from the LPoly saved in LNode
+        // set the data from the LPolyOld saved in LNode
         void    setPoly(poly p);
         void    setTerm(poly t);
         void    setIndex(int i);
         void    setNext(LNode* l);
-        void    setRule(Rule* r);
+        void    setRuleOld(RuleOld* r);
         void    setDel(bool d);
         // test if for any list element the polynomial part of the data is equal to *p
         bool    polyTest(poly* p);
@@ -93,7 +93,7 @@ class LNode {
 
 /*
 ============================
-class LList(lists of LPolys)
+class LList(lists of LPolyOlds)
 ============================
 */
 class LList {
@@ -103,19 +103,19 @@ class LList {
         int     length;
     public:
                 LList();
-                LList(LPoly* lp);
-                LList(poly t,int i,poly p, Rule* r = NULL);
+                LList(LPolyOld* lp);
+                LList(poly t,int i,poly p, RuleOld* r = NULL);
                 ~LList();
         // insertion at the end of the list
         // needed for gPrev
-        void    insert(LPoly* lp);
-        void    insert(poly t,int i, poly p, Rule* r = NULL);
-        void    insertByDeg(LPoly* lp);
+        void    insert(LPolyOld* lp);
+        void    insert(poly t,int i, poly p, RuleOld* r = NULL);
+        void    insertByDeg(LPolyOld* lp);
         // insertion in front of the list
         // needed for sPolyList
-        void    insertSP(LPoly* lp);
-        void    insertSP(poly t,int i, poly p, Rule* r = NULL);
-        void    insertByLabel(poly t, int i, poly p, Rule* r = NULL);
+        void    insertSP(LPolyOld* lp);
+        void    insertSP(poly t,int i, poly p, RuleOld* r = NULL);
+        void    insertByLabel(poly t, int i, poly p, RuleOld* r = NULL);
         void    insertByLabel(LNode* l);
         void    insertFirst(LNode* l);
         void    deleteByDeg();
@@ -132,7 +132,7 @@ class LList {
 
 /*
 ==============================================
-class LtagNode (nodes for lists of LPoly tags)
+class LtagNode (nodes for lists of LPolyOld tags)
 ==============================================
 */
 class LTagNode {
@@ -154,7 +154,7 @@ class LTagNode {
 
 /*
 =========================================================================
-class LTagList(lists of LPoly tags, i.e. first elements of a given index)
+class LTagList(lists of LPolyOld tags, i.e. first elements of a given index)
 =========================================================================
 */
 class LTagList {
@@ -214,8 +214,8 @@ class CNode {
         CNode*  getMinDeg();
         CPairOld*  getData();
         CNode*  getNext();
-        LPoly*  getAdLp1();
-        LPoly*  getAdLp2();
+        LPolyOld*  getAdLp1();
+        LPolyOld*  getAdLp2();
         poly    getLp1Poly();
         poly    getLp2Poly();
         poly    getLp1Term();
@@ -226,7 +226,7 @@ class CNode {
         poly*   getAdT2();  
         int     getLp1Index();
         int     getLp2Index();
-        Rule*   getTestedRule();
+        RuleOld*   getTestedRuleOld();
         void    print();
 };
 
@@ -253,30 +253,30 @@ class CListOld {
 
 /*
 ======================================
-class RNode (nodes for lists of Rules)
+class RNode (nodes for lists of RuleOlds)
 ======================================
 */
 class RNode {
     private:
-        Rule*   data;
+        RuleOld*   data;
         RNode*  next;
     public:
                 RNode();
-                RNode(Rule* r);
+                RNode(RuleOld* r);
                 ~RNode();
-        RNode*  insert(Rule* r);
+        RNode*  insert(RuleOld* r);
         RNode*  insert(int i, poly t);
-        RNode*  insertOrdered(Rule* r);
+        RNode*  insertOrdered(RuleOld* r);
         RNode*  getNext();
-        Rule*   getRule();
-        int     getRuleIndex();
-        poly    getRuleTerm();
+        RuleOld*   getRuleOld();
+        int     getRuleOldIndex();
+        poly    getRuleOldTerm();
         void    print();
 };
 
 /*
 ============================
-class RList (lists of Rules)
+class RList (lists of RuleOlds)
 ============================
 */
 class RList {
@@ -286,13 +286,13 @@ class RList {
         RNode*  last;
     public:
                 RList();
-                RList(Rule* r);
+                RList(RuleOld* r);
                 ~RList();
-        void    insert(Rule* r);
+        void    insert(RuleOld* r);
         void    insert(int i, poly t);
-        void    insertOrdered(Rule* r);
+        void    insertOrdered(RuleOld* r);
         RNode*  getFirst();
-        Rule*   getRule();
+        RuleOld*   getRuleOld();
         void    print();
 };
 
@@ -300,7 +300,7 @@ class RList {
 
 /*
 =============================================
-class RtagNode (nodes for lists of Rule tags)
+class RtagNode (nodes for lists of RuleOld tags)
 =============================================
 */
 class RTagNode {
@@ -324,7 +324,7 @@ class RTagNode {
 
 /*
 ========================================================================
-class RTagList(lists of Rule tags, i.e. first elements of a given index)
+class RTagList(lists of RuleOld tags, i.e. first elements of a given index)
 ========================================================================
 */
 class RTagList {
