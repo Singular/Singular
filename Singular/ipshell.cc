@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.209 2009-08-26 07:59:40 seelisch Exp $ */
+/* $Id: ipshell.cc,v 1.210 2009-09-01 08:05:36 seelisch Exp $ */
 /*
 * ABSTRACT:
 */
@@ -4658,6 +4658,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     WarnS("The following commands are meant to work:");
     WarnS("- basic polynomial arithmetic");
     WarnS("- std");
+    WarnS("- lift");
     WarnS("- reduce");
   }
 #endif
