@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.56 2009-08-19 13:17:25 Singular Exp $";
+version="$Id: normal.lib,v 1.57 2009-09-03 21:20:03 laplagne Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -4242,7 +4242,7 @@ static proc normalM(ideal I, int decomp, int withDelta){
       setring R;
       ideal Id1 = fetch(Q, Id1), I;
       Id1 = groebner(Id1);
-      ideal I2 = quotient(I, Id1);
+      ideal Id2 = quotient(I, Id1);
       // I = Id1 \cap Id2
       printlevel = printlevel + 1;
 
