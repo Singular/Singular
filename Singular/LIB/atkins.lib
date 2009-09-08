@@ -1,15 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: atkins.lib,v 1.6 2009-04-06 12:39:02 seelisch Exp $";
+version="$Id: atkins.lib,v 1.7 2009-09-08 14:14:43 seelisch Exp $";
 category="Teaching";
 info="
 LIBRARY:  atkins.lib     Procedures for teaching cryptography
 AUTHOR:                  Stefan Steidel, steidel@mathematik.uni-kl.de
 
 NOTE: The library contains auxiliary procedures to compute the elliptic
-       curve primality test of Atkin and the Atkin's Test itself.
-       The library is intended to be used for teaching purposes but not
-       for serious computations. Sufficiently high printlevel allows to
-       control each step, thus illustrating the algorithms at work.
+      curve primality test of Atkin and the Atkin's Test itself.
+      The library is intended to be used for teaching purposes but not
+      for serious computations. Sufficiently high printlevel allows to
+      control each step, thus illustrating the algorithms at work.
 
 
 PROCEDURES:
@@ -44,13 +44,13 @@ RETURN:  1, if D does not already exist in L,
 EXAMPLE:example new; shows an example
 "
 {
-  number a=1;                // a=1 bedeutet: D noch nicht in L vorhanden
+  number a=1;                // a=1 means: D does not already exist in L
   int i;
   for(i=1;i<=size(L);i++)
   {
     if(D==L[i])
     {
-      a=-1;            // a=-1 bedeutet: D bereits in L vorhanden
+      a=-1;                 // a=-1 means: D does already exist in L
       break;
     }
   }
@@ -63,6 +63,7 @@ example
     number D=-55603;
     newTest(L,D);
 }
+
 
 proc bubblesort(list L)
 "USAGE: bubblesort(L);
@@ -95,6 +96,7 @@ example
     list L=-567,-233,446,12,-34,8907;
     bubblesort(L);
 }
+
 
 proc disc(number N, int k)
 "USAGE: disc(N,k);
@@ -130,7 +132,6 @@ example
 }
 
 
-
 proc Cornacchia(number d, number p)
 "USAGE: Cornacchia(d,p);
 RETURN: x,y such that x^2+d*y^2=p with p prime,
@@ -140,7 +141,7 @@ ASSUME: 0<d<p
 EXAMPLE:example Cornacchia; shows an example
 "
 {
-  if((d<0)||(p<d))            // (0)[Test if assumptions well-defined]
+  if((d<0)||(p<d))              // (0)[Test if assumptions well-defined]
   {
     return(0);
     // ERROR("Parameters wrong selected! It has to be 0<d<p!");
@@ -149,7 +150,7 @@ EXAMPLE:example Cornacchia; shows an example
   {
     number k,x(0),a,b,l,r,c,i;
 
-    k=Jacobi(-d,p);          // (1)[Test if residue]
+    k=Jacobi(-d,p);             // (1)[Test if residue]
     if(k==-1)
     {
       return(-1);
@@ -165,13 +166,13 @@ EXAMPLE:example Cornacchia; shows an example
        a=p;
        b=x(0);
        l=intRoot(p);
-       while(b>l)       // (3)[Euclidean algorithm]
+       while(b>l)               // (3)[Euclidean algorithm]
        {
           r=a mod b;
           a=b;
           b=r;
        }
-       c=(p-b^2)/d;     // (4)[Test solution]
+       c=(p-b^2)/d;             // (4)[Test solution]
        i=intRoot(c);
        if((((p-b^2) mod d)!=0)||(c!=i^2))
        {
@@ -191,6 +192,7 @@ example
     Cornacchia(55,9551);
 }
 
+
 proc CornacchiaModified(number D, number p)
 "USAGE: CornacchiaModified(D,p);
 RETURN: x,y such that x^2+|D|*y^2=p with p prime,
@@ -201,13 +203,13 @@ EXAMPLE:example CornacchiaModified; shows an example
 "
 {
   if((D>=0)||((D mod 4)==2)||((D mod 4)==3)||(absValue(D)>=4*p))
-  {// (0)[Test if assumptions well-defined]
+  {                                  // (0)[Test if assumptions well-defined]
     return(0);
     // ERROR("Parameters wrong selected!");
   }
   else
   {
-    if(p==2)                          // (1)[Case p=2]
+    if(p==2)                         // (1)[Case p=2]
     {
       if((D+8)==intRoot(D+8)^2)
       {
@@ -222,7 +224,7 @@ EXAMPLE:example CornacchiaModified; shows an example
     else
     {
       number k,x(0),a,b,l,r,c;
-      k=Jacobi(D,p);                // (2)[Test if residue]
+      k=Jacobi(D,p);                 // (2)[Test if residue]
       if(k==-1)
       {
         return(-1);
@@ -230,7 +232,7 @@ EXAMPLE:example CornacchiaModified; shows an example
       }
       else
       {
-        x(0)=squareRoot(D,p);    // (3)[Compute square root]
+        x(0)=squareRoot(D,p);        // (3)[Compute square root]
         if((x(0) mod 2)!=(D mod 2))
         {
           x(0)=p-x(0);
@@ -238,13 +240,13 @@ EXAMPLE:example CornacchiaModified; shows an example
         a=2*p;
         b=x(0);
         l=intRoot(4*p);
-        while(b>l)     // (4)[Euclidean algorithm]
+        while(b>l)                   // (4)[Euclidean algorithm]
         {
           r=a mod b;
           a=b;
           b=r;
         }
-        c=(4*p-b^2)/absValue(D);// (5)[Test solution]
+        c=(4*p-b^2)/absValue(D);     // (5)[Test solution]
         if((((4*p-b^2) mod absValue(D))!=0)||(c!=intRoot(c)^2))
         {
           return(-1);
@@ -264,6 +266,7 @@ example
     ring R = 0,x,dp;
     CornacchiaModified(-107,1319);
 }
+
 
 proc pFactor1(number n,int B, list P)
 "USAGE: pFactor1(n,B,P); n to be factorized, B a bound , P a list of primes
@@ -304,6 +307,7 @@ example
    pFactor1(h,20,L);
 }
 
+
 proc maximum(list L)
 "USAGE: maximum(list L);
 RETURN: the maximal number contained in list L
@@ -328,6 +332,7 @@ example
     maximum(L);
 }
 
+
 static proc cmod(number x, number y)
 "USAGE: cmod(x,y);
 RETURN: x mod y
@@ -351,6 +356,7 @@ example
     number y=1233;
     cmod(x,y);
 }
+
 
 proc sqr(number w, int k)
 "USAGE: sqr(w,k);
@@ -379,7 +385,6 @@ example
 }
 
 
-
 proc expo(number z, int k)
 "USAGE: expo(z,k);
 RETURN: e^z to the order k
@@ -397,14 +402,12 @@ EXAMPLE:example expo; shows an example
   }
   return(e);
 }
-
 example
 { "EXAMPLE:"; echo = 2;
     ring r = (real,30),x,dp;
     number z=40.35;
     expo(z,1000);
 }
-
 
 
 proc jOft(number t, int k)
@@ -453,6 +456,7 @@ example
     number t=(-7+i*sqr(7,250))/2;
     jOft(t,50);
 }
+
 
 proc round(number r)
 "USAGE: round(r);
@@ -508,7 +512,6 @@ example
 }
 
 
-
 proc HilbertClassPoly(number D, int k)
 "USAGE: HilbertClassPoly(D,k);
 RETURN: the monic polynomial of degree h(D) in Z[X] of which jOft((D+sqr(D))/2) is a root
@@ -519,7 +522,7 @@ NOTE:   k is input for the procedure "jOft",
 EXAMPLE:example HilbertClassPoly; shows an example
 "
 {
-  if(D>=0)                // (0)[Test if assumptions well-defined]
+  if(D>=0)                     // (0)[Test if assumptions well-defined]
   {
     ERROR("Parameter wrong selected!");
   }
@@ -536,7 +539,7 @@ EXAMPLE:example HilbertClassPoly; shows an example
     ring C=(complex,10*k,i),x,dp;
     number D=imap(S,D);
 
-    poly P=1;          // (1)[Initialize]
+    poly P=1;                  // (1)[Initialize]
     number b=cmod(D,2);
     number B=imap(R,B);
 
@@ -554,7 +557,7 @@ EXAMPLE:example HilbertClassPoly; shows an example
         step=3;
       }
 
-      if(step==3)               // (3)[Test]
+      if(step==3)              // (3)[Test]
       {
         if((cmod(t,a)!=0))
         {
@@ -596,7 +599,7 @@ EXAMPLE:example HilbertClassPoly; shows an example
         }
       }
 
-      if(step==4)                  // (4)[Loop on a]
+      if(step==4)              // (4)[Loop on a]
       {
         a=a+1;
         if(a^2<=t)
@@ -610,7 +613,7 @@ EXAMPLE:example HilbertClassPoly; shows an example
         }
       }
 
-      if(step==5)                 // (5)[Loop on b]
+      if(step==5)              // (5)[Loop on b]
       {
         b=b+2;
         if(b<=B)
@@ -653,6 +656,7 @@ example
     HilbertClassPoly(D,50);
 }
 
+
 proc rootsModp(int p, poly P)
 "USAGE: rootsModp(p,P);
 RETURN: list of roots of the polynomial P modulo p with p prime
@@ -662,7 +666,7 @@ NOTE:   this algorithm will be called recursively, and it is understood
 EXAMPLE:example rootsModp; shows an example
 "
 {
-  if(p<3)                         // (0)[Test if assumptions well-defined]
+  if(p<3)                                 // (0)[Test if assumptions well-defined]
   {
     ERROR("Parameter wrong selected, since p<3!");
   }
@@ -676,14 +680,14 @@ EXAMPLE:example rootsModp; shows an example
     int a;
     list L;
 
-    poly A=gcd(var(1)^p-var(1),P);         // (1)[Isolate roots in Z/pZ]
+    poly A=gcd(var(1)^p-var(1),P);        // (1)[Isolate roots in Z/pZ]
     if(subst(A,var(1),0)==0)
     {
       L[1]=0;
       A=A/var(1);
     }
 
-    if(deg(A)==0)                          // (2)[Small degree?]
+    if(deg(A)==0)                         // (2)[Small degree?]
     {
       return(L);
     }
@@ -715,7 +719,7 @@ EXAMPLE:example rootsModp; shows an example
       return(L);
     }
 
-    poly B=1;                       // (3)[Random splitting]
+    poly B=1;                             // (3)[Random splitting]
     poly C;
     while((deg(B)==0)||(deg(B)==deg(A)))
     {
@@ -724,7 +728,7 @@ EXAMPLE:example rootsModp; shows an example
       C=A/B;
     }
 
-    setring S;                      // (4)[Recurse]
+    setring S;                            // (4)[Recurse]
     poly B=imap(R,B);
     poly C=imap(R,C);
     list l=L+rootsModp(p,B)+rootsModp(p,C);
@@ -739,6 +743,7 @@ example
     poly g=x5+112x4+655x3+551x2+1129x+831;
     rootsModp(1223,g);
 }
+
 
 proc wUnit(number D)
 "USAGE: wUnit(D);
@@ -766,23 +771,22 @@ example
 }
 
 
-
 proc Atkin(number N, int K, int B)
 "USAGE: Atkin(N,K,B);
 RETURN:  1, if N is prime,
         -1, if N is not prime,
-         0, if the algorithm is not applicable, since there are too little discriminants
+         0, if the algorithm is not applicable, since there are too few discriminants
 ASSUME: N is coprime to 6 and different from 1
 NOTE:   K/2 is input for the procedure "disc",@*
-        K is input for the procedure "HilbertClassPolynomial",@*
+        K is input for the procedure "HilbertClassPoly",@*
         B describes the number of recursions being calculated.@*
         The basis of the algorithm is the following theorem:
           Let N be an integer coprime to 6 and different from 1 and E be an
-          ellipic curve modulo N. Assume that we know an integer m and a
+          ellipic curve modulo N.@* Assume that we know an integer m and a
           point P of E(Z/NZ) satisfying the following conditions.@*
-           (1) There exists a prime divisor q of m such that q>(4-th root(N)+1)^2.@*
-           (2) m*P=O(E)=(0:1:0).@*
-           (3) (m/q)*P=(x:y:t) with t element of (Z/NZ)*.@*
+           (1) There exists a prime divisor q of m such that q > (4-th root(N)+1)^2.@*
+           (2) m*P = O(E) = (0:1:0).@*
+           (3) (m/q)*P = (x:y:t) with t element of (Z/NZ)*.@*
           Then N is prime.
 EXAMPLE:example Atkin; shows an example
 "
@@ -791,7 +795,7 @@ EXAMPLE:example Atkin; shows an example
   if((N==2)||(N==3)) {return(1);}
   if(gcdN(N,6)!=1)
   {
-    if(printlevel>=1) {"ggT(N,6)="+string(gcdN(N,6));pause();}
+    if(printlevel>=1) {"gcd(N,6) = "+string(gcdN(N,6));pause();"";}
     return(-1);
   }
   else
@@ -799,7 +803,7 @@ EXAMPLE:example Atkin; shows an example
     int i;                         // (1)[Initialize]
     int n(i);
     number N(i)=N;
-    if(printlevel>=1) {"Setze i=0, n=0 und N(i)=N(0)="+string(N(i))+".";pause();}
+    if(printlevel>=1) {"Set i = 0, n = 0 and N(i) = N(0)= "+string(N(i))+".";pause();"";}
 
     // declarations:
     int j(0),j(1),j(2),j(3),j(4),k;    // running indices
@@ -814,9 +818,9 @@ EXAMPLE:example Atkin; shows an example
     poly T;                            // T=HilbertClassPoly(D,K)
     matrix M;                          // M contains the coefficients of T
 
-    if(printlevel>=1) {"Liste H der moeglichen geeigneten Diskriminanten wird berechnet.";}
+    if(printlevel>=1) {"List H of possibly suitable discriminants will be calculated.";}
     H=disc(N,K/2);
-    if(printlevel>=1) {"H="+string(H);pause();}
+    if(printlevel>=1) {"H = "+string(H);pause();"";}
 
     int step=2;
     while(1)
@@ -829,7 +833,7 @@ EXAMPLE:example Atkin; shows an example
           if(N(i)==L[j(0)]){return(1);}
           if(((N(i) mod L[j(0)])==0)&&(N(i)!=L[j(0)]))
           {
-            if(printlevel>=1) {"N("+string(i)+")="+string(N(i))+" ist durch "+string(L[j(0)])+" teilbar.";pause();}
+            if(printlevel>=1) {"N("+string(i)+") = "+string(N(i))+" is divisible by "+string(L[j(0)])+".";pause();"";}
             step=14;
             break;
           }
@@ -845,15 +849,15 @@ EXAMPLE:example Atkin; shows an example
         n(i)=n(i)+1;
         if(n(i)==size(H)+1)
         {
-          if(printlevel>=1) {"Algorithmus nicht anwendbar, da zu wenige geeignete Diskriminanten existieren.";
-                             "Erhoehe den Genauigkeitsparameter K und starte den Algorithmus erneut.";pause();}
+          if(printlevel>=1) {"Algorithm is not applicable, since there are not enough suitable discriminants.";
+                             "Increase the parameter of accuracy K and start the algorithm again.";pause();"";}
           return(0);
         }
         D=H[n(i)];
-        if(printlevel>=1) {"Naechste Diskriminante D wird gewaehlt. D="+string(D)+".";pause();}
+        if(printlevel>=1) {"Next discriminant D will be chosen. D = "+string(D)+".";pause();"";}
         if(Jacobi(D,N(i))!=1)
         {
-          if(printlevel>=1) {"Jacobi(D,N("+string(i)+"))="+string(Jacobi(D,N(i)));pause();}
+          if(printlevel>=1) {"Jacobi(D,N("+string(i)+")) = "+string(Jacobi(D,N(i)));pause();"";}
           continue;
         }
         else
@@ -861,20 +865,20 @@ EXAMPLE:example Atkin; shows an example
           L1=CornacchiaModified(D,N(i));
           if(size(L1)>1)
           {
-            if(printlevel>=1) {"Die Loesung (x,y) der Gleichung x^2+|D|y^2=4N("+string(i)+") lautet";L1;pause();}
+            if(printlevel>=1) {"The solution (x,y) of the equation x^2+|D|y^2 = 4N("+string(i)+") is";L1;pause();"";}
             step=4;
           }
           else
           {
             if(L1[1]==-1)
             {
-              if(printlevel>=1) {"Die Gleichung x^2+|D|y^2=4N("+string(i)+") hat keine Loesung.";pause();}
+              if(printlevel>=1) {"The equation x^2+|D|y^2 = 4N("+string(i)+") has no solution.";pause();"";}
               continue;
             }
             if(L1[1]==0)
             {
-              if(printLevel>=1) {"Algorithmus fuer N("+string(i)+")="+string(N(i))+" nicht anwendbar,";
-                                 "da zu wenige geeignete Diskriminanten existieren.";pause();}
+              if(printLevel>=1) {"Algorithm is not applicable for N("+string(i)+") = "+string(N(i))+",";
+                                 "since there are not enough suitable discriminants.";pause();"";}
               step=14;
             }
           }
@@ -883,14 +887,14 @@ EXAMPLE:example Atkin; shows an example
 
       if(step==4)                  // (4)[Factor m]
       {
-        if(printlevel>=1) {"Die Liste L2 der moeglichen m=|E(Z/N("+string(i)+")Z)| wird berechnet.";}
+        if(printlevel>=1) {"List L2 of possible m = |E(Z/N("+string(i)+")Z)| will be calculated.";}
         if(absValue(L1[1])^2<=4*N(i)) {L2=N(i)+1+L1[1],N(i)+1-L1[1];}
         if(D==-4)
         {
           if(absValue(2*L1[2])^2<=4*N(i)) {L2[size(L2)+1]=N(i)+1+2*L1[2];
                                            L2[size(L2)+1]=N(i)+1-2*L1[2];}
         }
-// An dieser Stelle wurde "<=4*N(i)" durch "<=16*N(i)" ersetzt.
+// At this point "<=4*N(i)" has been replaced by "<=16*N(i)".
         if(D==-3)
         {
           if(absValue(L1[1]+3*L1[2])^2<=16*N(i)) {L2[size(L2)+1]=N(i)+1+(L1[1]+3*L1[2])/2;
@@ -901,17 +905,17 @@ EXAMPLE:example Atkin; shows an example
 ///////////////////////////////////////////////////////////////
         if(size(L2)==0)
         {
-          if(printlevel>=1) {"Nach dem Satz von Hasse wurden keine moeglichen m=|E(Z/N("+string(i)+")Z)|";
-                             "fuer D="+string(D)+" gefunden.";}
+          if(printlevel>=1) {"Due to the theorem of Hasse there were no possible m = |E(Z/N("+string(i)+")Z)|";
+                             "found for D = "+string(D)+".";}
           step=3;
           continue;
         }
         else
         {
-          if(printlevel>=1) {"L2=";L2;pause();}
+          if(printlevel>=1) {"L2 = ";L2;pause();"";}
         }
 
-        if(printlevel>=1) {"Die Liste S der Faktoren aller moeglichen m wird berechnet.";}
+        if(printlevel>=1) {"List S of factors of all possible m will be calculated.";}
         S=list();
         for(j(1)=1;j(1)<=size(L2);j(1)++)
         {
@@ -923,7 +927,7 @@ EXAMPLE:example Atkin; shows an example
             S[size(S)+1]=list(m,S1+S2);
           }
         }
-        if(printlevel>=1) {"S=";S;pause();}
+        if(printlevel>=1) {"S=";S;pause();"";}
         step=5;
       }
 
@@ -935,7 +939,7 @@ EXAMPLE:example Atkin; shows an example
           for(j(3)=1;j(3)<=size(S[j(2)][2]);j(3)++)
           {
             q=S[j(2)][2][j(3)];
-// sqr(sqr(N(i),50),50) ersetzt intRoot(intRoot(N(i)))
+// sqr(sqr(N(i),50),50) replaces intRoot(intRoot(N(i)))
             if((q>(sqr(sqr(N(i),50),50)+1)^2) && (MillerRabin(q,5)==1))
             {
               step=6;
@@ -945,9 +949,9 @@ EXAMPLE:example Atkin; shows an example
           }
           if(step==6)
           {
-            if(printlevel>=1) {"Geeignetes Paar (m,q) gefunden, so dass q|m,";
-                               "q>(4-th root(N("+string(i)+"))+1)^2 und q den Miller-Rabin-Test passiert.";
-                               "m="+string(m)+",";"q="+string(q);pause();}
+            if(printlevel>=1) {"Suitable pair (m,q) has been found such that q|m,";
+                               "q > (4-th root(N("+string(i)+"))+1)^2 and q passes the Miller-Rabin-Test.";
+                               "m = "+string(m)+",";"q = "+string(q);pause();"";}
             break;
           }
           else
@@ -957,9 +961,9 @@ EXAMPLE:example Atkin; shows an example
         }
         if(step==3)
         {
-          if(printlevel>=1) {"Kein geeignetes Paar (m,q), so dass q|m,";
-                             "q>(4-th root(N("+string(i)+"))+1)^2 und q den Miller-Rabin-Test passiert, gefunden.";
-                              pause();}
+          if(printlevel>=1) {"No suitable pair (m,q) has been found such that q|m,";
+                             "q > (4-th root(N("+string(i)+"))+1)^2 and q passes the Miller-Rabin-Test.";
+                              pause();"";}
           continue;
         }
       }
@@ -970,19 +974,19 @@ EXAMPLE:example Atkin; shows an example
         {
           a=-1;
           b=0;
-          if(printlevel>=1) {"Da D=-4, setze a=-1 und b=0.";pause();}
+          if(printlevel>=1) {"Since D = -4, set a = -1 and b = 0.";pause();"";}
         }
         if(D==-3)
         {
           a=0;
           b=-1;
-          if(printlevel>=1) {"Da D=-3, setze a=0 und b=-1.";pause();}
+          if(printlevel>=1) {"Since D = -3, set a = 0 and b = -1.";pause();"";}
         }
         if(D<-4)
         {
-          if(printlevel>=1) {"Das Minimalpolynom T von j((D+sqr(D))/2) aus Z[X] fuer D="+string(D)+" wird berechnet.";}
+          if(printlevel>=1) {"The minimal polynomial T of j((D+sqr(D))/2) in Z[X] will be calculated for D="+string(D)+".";}
           T=HilbertClassPoly(D,K);
-          if(printlevel>=1) {"T="+string(T);pause();}
+          if(printlevel>=1) {"T = "+string(T);pause();"";}
 
           M=coeffs(T,var(1));
           T=0;
@@ -992,24 +996,24 @@ EXAMPLE:example Atkin; shows an example
             M[j(4),1]=leadcoef(M[j(4),1]) mod N(i);
             T=T+M[j(4),1]*var(1)^(j(4)-1);
           }
-          if(printlevel>=1) {"Setze T=T mod N("+string(i)+").";"T="+string(T);pause();}
+          if(printlevel>=1) {"Set T = T mod N("+string(i)+").";"T = "+string(T);pause();"";}
 
           R=rootsModp(int(N(i)),T);
           if(deg(T)>size(R))
           {
-            ERROR("Das Polynom T zerfaellt modulo N("+string(i)+") nicht vollstaendig in Linearfaktoren."
-                  "Erhoehe den Genauigkeitsparameter K und starte den Algorithmus erneut.");
+            ERROR("The polynomial T does not completely split into linear factors modulo N("+string(i)+")."
+                  "Increase the parameter of accuracy K and start the algorithm again.");
           }
-          if(printlevel>=1) {if(deg(T)>1) {"Die "+string(deg(T))+" Nullstellen von T modulo N("+string(i)+") sind";
-                                           R;pause();}
-                             if(deg(T)==1){"Die Nullstelle von T modulo N("+string(i)+") ist";R;pause();}}
+          if(printlevel>=1) {if(deg(T)>1) {"The "+string(deg(T))+" zeroes of T modulo N("+string(i)+") are";
+                                           R;pause();"";}
+                             if(deg(T)==1){"The zero of T modulo N("+string(i)+") is";R;pause();"";}}
 
           j=R[1];
           c=j*exgcdN(j-1728,N(i))[1];
           a=-3*c mod N(i);
           b=2*c mod N(i);
-          if(printlevel>=1) {"Waehle die Nullstelle j="+string(j)+" aus und setze";"c=j/(j-1728) mod N("+string(i)+"), a=-3c mod N("+string(i)+"), b=2c mod N("+string(i)+").";
-                             "a="+string(a)+",";"b="+string(b);pause();}
+          if(printlevel>=1) {"Choose the zero j = "+string(j)+" and set"; "c = j/(j-1728) mod N("+string(i)+"), a = -3c mod N("+string(i)+"), b = 2c mod N("+string(i)+").";
+                             "a = "+string(a)+",";"b = "+string(b);pause();"";}
         }
         step=7;
       }
@@ -1024,7 +1028,7 @@ EXAMPLE:example Atkin; shows an example
             u=Jacobi(g,N(i));
             if((u==-1)&&(powerN(g,(N(i)-1)/3,N(i))!=1))
             {
-              if(printlevel>=1) {"g="+string(g);pause();}
+              if(printlevel>=1) {"g = "+string(g);pause();"";}
               break;
             }
           }
@@ -1037,7 +1041,7 @@ EXAMPLE:example Atkin; shows an example
             u=Jacobi(g,N(i));
             if(u==-1)
             {
-              if(printlevel>=1) {"g="+string(g);pause();}
+              if(printlevel>=1) {"g = "+string(g);pause();"";}
               break;
             }
           }
@@ -1047,11 +1051,11 @@ EXAMPLE:example Atkin; shows an example
 
       if(step==8)                  // (8)[Find P]
       {
-        if(printlevel>=1) {"Ein zufaelliger Punkt P auf der Elliptischen Kurve";
-                           "mit der Gleichung y^2=x^3+ax+b fuer";"N("+string(i)+")="+string(N(i))+",";
-                           "   a="+string(a)+",";"   b="+string(b);"wird gewaehlt.";}
+        if(printlevel>=1) {"A random point P on the elliptic curve corresponding";
+                           "to the equation y^2 = x^3+ax+b for";"N("+string(i)+") = "+string(N(i))+",";
+                           "   a = "+string(a)+",";"   b = "+string(b);"will be chosen.";}
         P=ellipticRandomPoint(N(i),a,b);
-        if(printlevel>=1) {"P=("+string(P)+")";pause();}
+        if(printlevel>=1) {"P = ("+string(P)+")";pause();"";}
 
         if(size(P)==1)
         {
@@ -1065,10 +1069,10 @@ EXAMPLE:example Atkin; shows an example
 
       if(step==9)                  // (9)[Find right curve]
       {
-        if(printlevel>=1) {"Die Punkte P2=(m/q)*P und P1=q*P2 auf der Kurve werden berechnet.";}
+        if(printlevel>=1) {"The points P2 = (m/q)*P and P1 = q*P2 on the curve will be calculated.";}
         P2=ellipticMult(N(i),a,b,P,m/q);
         P1=ellipticMult(N(i),a,b,P2,q);
-        if(printlevel>=1) {"P1=("+string(P1)+"),";"P2=("+string(P2)+")";pause();}
+        if(printlevel>=1) {"P1 = ("+string(P1)+"),";"P2 = ("+string(P2)+")";pause();"";}
 
         if((P1[1]==0)&&(P1[2]==1)&&(P1[3]==0))
         {
@@ -1076,8 +1080,8 @@ EXAMPLE:example Atkin; shows an example
         }
         else
         {
-          if(printlevel>=1) {"Da P1!=(0:1:0), ist fuer die Koeffizienten a="+string(a)+" und b="+string(b)+" m!=|E(Z/N("+string(i)+")Z)|.";
-                             "Waehle daher neue Koeffizienten a und b.";pause();}
+          if(printlevel>=1) {"Since P1 != (0:1:0), it holds m != |E(Z/N("+string(i)+")Z)| for the coefficients a = "+string(a)+" and b = "+string(b)+".";
+                             "Therefore choose new coefficients a and b.";pause();"";}
           step=10;
         }
       }
@@ -1087,20 +1091,20 @@ EXAMPLE:example Atkin; shows an example
         k=k+1;
         if(k>=wUnit(D))
         {
-          if(printlevel>=1) {"Da k=wUnit(D)="+string(k)+", ist N("+string(i)+")="+string(N(i))+" nicht prim.";pause();}
+          if(printlevel>=1) {"Since k = wUnit(D) = "+string(k)+", it holds that N("+string(i)+") = "+string(N(i))+" is not prime.";pause();"";}
           step=14;
         }
         else
         {
           if(D<-4) {a=a*g^2 mod N(i); b=b*g^3 mod N(i);
-                    if(printlevel>=1) {"Da D<-4, setze a=a*g^2 mod N("+string(i)+") und b=b*g^3 mod N("+string(i)+").";
-                                       "a="+string(a)+",";"b="+string(b)+",";"k="+string(k);pause();}}
+                    if(printlevel>=1) {"Since D < -4, set a = a*g^2 mod N("+string(i)+") and b = b*g^3 mod N("+string(i)+").";
+                                       "a = "+string(a)+",";"b = "+string(b)+",";"k = "+string(k);pause();"";}}
           if(D==-4){a=a*g mod N(i);
-                    if(printlevel>=1) {"Da D=-4, setze a=a*g mod N("+string(i)+").";"a="+string(a)+",";
-                                       "b="+string(b)+",";"k="+string(k);pause();}}
+                    if(printlevel>=1) {"Since D = -4, set a = a*g mod N("+string(i)+").";"a = "+string(a)+",";
+                                       "b = "+string(b)+",";"k = "+string(k);pause();"";}}
           if(D==-3){b=b*g mod N(i);
-                    if(printlevel>=1) {"Da D=-3, setze b=b*g mod N("+string(i)+").";"a="+string(a)+",";
-                                       "b="+string(b)+",";"k="+string(k);pause();}}
+                    if(printlevel>=1) {"Since D = -3, set b = b*g mod N("+string(i)+").";"a = "+string(a)+",";
+                                       "b = "+string(b)+",";"k = "+string(k);pause();"";}}
           step=8;
           continue;
         }
@@ -1108,10 +1112,10 @@ EXAMPLE:example Atkin; shows an example
 
       if(step==11)                 // (11)[Find a new P]
       {
-        if(printlevel>=1) {"Ein neuer zufaelliger Punkt P auf der Elliptischen Kurve wird gewaehlt,";
-                           "da auch P2=(0:1:0).";}
+        if(printlevel>=1) {"A new random point P on the elliptic curve will be chosen,";
+                           "since also P2 = (0:1:0).";}
         P=ellipticRandomPoint(N(i),a,b);
-        if(printlevel>=1) {"P=("+string(P)+")";pause();}
+        if(printlevel>=1) {"P = ("+string(P)+")";pause();"";}
 
         if(size(P)==1)
         {
@@ -1119,15 +1123,15 @@ EXAMPLE:example Atkin; shows an example
         }
         else
         {
-          if(printlevel>=1) {"Die Punkte P2=(m/q)*P und P1=q*P2 auf der Kurve werden berechnet.";}
+          if(printlevel>=1) {"The points P2 = (m/q)*P and P1 = q*P2 on the curve will be calculated.";}
           P2=ellipticMult(N(i),a,b,P,m/q);
           P1=ellipticMult(N(i),a,b,P2,q);
-          if(printlevel>=1) {"P1=("+string(P1)+"),";"P2=("+string(P2)+")";pause();}
+          if(printlevel>=1) {"P1 = ("+string(P1)+"),";"P2 = ("+string(P2)+")";pause();"";}
 
           if((P1[1]!=0)||(P1[2]!=1)||(P1[3]!=0))
           {
-            if(printlevel>=1) {"Da P1!=(0:1:0), ist, fuer die Koeffizienten a="+string(a)+" und b="+string(b)+", m!=|E(Z/N("+string(i)+")Z)|.";
-                               "Waehle daher neue Koeffizienten a und b.";pause();}
+            if(printlevel>=1) {"Since P1 != (0:1:0), it holds m != |E(Z/N("+string(i)+")Z)| for the coefficients a = "+string(a)+" and b = "+string(b)+".";
+                               "Therefore choose new coefficients a and b.";pause();"";}
             step=10;
             continue;
           }
@@ -1155,11 +1159,11 @@ EXAMPLE:example Atkin; shows an example
       {
         if(i<B)
         {
-          if(printlevel>=1) {string(i+1)+". Rekursion:";"";
-                             "N("+string(i)+")="+string(N(i))+" erfuellt die Bedingungen des zugrunde liegenden Satzes,";
-                             "da P1=(0:1:0) und P2[3] aus (Z/N("+string(i)+")Z)*.";"";
-                             "Untersuche nun, ob auch der gefundene Faktor q="+string(q)+" diese Bedingungen erfuellt.";
-                             "Setze dazu i=i+1, N("+string(i+1)+")=q="+string(q)+" und beginne den Algorithmus von vorne.";pause();}
+          if(printlevel>=1) {string(i+1)+". Recursion:";"";
+                             "N("+string(i)+") = "+string(N(i))+" suffices the conditions of the underlying theorem,";
+                             "since P1 = (0:1:0) and P2[3] in (Z/N("+string(i)+")Z)*.";"";
+                             "Now check if also the found factor q="+string(q)+" suffices these assumptions.";
+                             "Therefore set i = i+1, N("+string(i+1)+") = q = "+string(q)+" and restart the algorithm.";pause();"";}
           i=i+1;
           int n(i);
           number N(i)=q;
@@ -1169,9 +1173,9 @@ EXAMPLE:example Atkin; shows an example
         }
         else
         {
-          if(printlevel>=1) {"N(B)=N("+string(i)+")="+string(N(i))+" erfuellt die Bedingungen des zugrunde liegenden Satzes,";
-                             "da P1=(0:1:0) und P2[3] aus (Z/N("+string(i)+")Z)*.";
-                             "Insbesondere ist N="+string(N)+" prim.";pause();}
+          if(printlevel>=1) {"N(B) = N("+string(i)+") = "+string(N(i))+" suffices the conditions of the underlying theorem,";
+                             "since P1 = (0:1:0) and P2[3] in (Z/N("+string(i)+")Z)*.";
+                             "In particular N = "+string(N)+" is prime.";pause();"";}
           return(1);
         }
       }
@@ -1180,15 +1184,15 @@ EXAMPLE:example Atkin; shows an example
       {
         if(i>0)
         {
-          if(printlevel>=1) {"Setze i=i-1 und starte den Algorithmus fuer N("+string(i-1)+")="+string(N(i-1))+" mit";
-                             "neuer Diskriminanten von vorne.";pause();}
+          if(printlevel>=1) {"Set i = i-1 and restart the algorithm for N("+string(i-1)+") = "+string(N(i-1))+" with";
+                             "a new discriminant.";pause();"";}
           i=i-1;
           k=0;
           step=3;
         }
         else
         {
-          if(printlevel>=1) {"N(0)=N="+string(N)+" und daher ist N nicht prim.";pause(n);}
+          if(printlevel>=1) {"N(0) = N = "+string(N)+" and therefore N is not prime.";pause();"";}
           return(-1);
         }
       }
@@ -1198,8 +1202,9 @@ EXAMPLE:example Atkin; shows an example
 example
 { "EXAMPLE:"; echo = 2;
     ring R = 0,x,dp;
-    printlevel=1;
     Atkin(7691,100,5);
+    Atkin(3473,10,2);
+    printlevel=1;
     Atkin(10000079,100,2);
 }
 
