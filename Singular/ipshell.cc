@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.210 2009-09-01 08:05:36 seelisch Exp $ */
+/* $Id: ipshell.cc,v 1.211 2009-09-14 09:06:09 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -555,6 +555,21 @@ restart:
     }
     if (j > end_p) return p;
   }
+#ifdef HAVE_FACTORY
+  if (i>=end_i)
+  {
+    while(j<=end_p)
+    {
+      j+=2;
+      if ((p%j) == 0)
+      {
+        if (p<=32751) return iiIsPrime0(p-2);
+        p-=2;
+        goto restart;
+      }
+    }
+  }
+#endif
   return p;
 }
 int IsPrime(int p)  /* brute force !!!! */
