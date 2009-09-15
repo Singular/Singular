@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.164 2009-08-05 07:20:40 bricken Exp $ */
+/* $Id: tgb.cc,v 1.165 2009-09-15 10:17:06 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -2175,7 +2175,8 @@ MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg
 
   unsigned long sev=p_GetShortExpVector(t,currRing);
   int i=kFindDivisibleByInS_easy(c->strat,t,sev);
-  if (i>=0){
+  if (i>=0)
+  {
     number coef_bak=p_GetCoeff(t,c->r);
 
     p_SetCoeff(t,npInit(1),c->r);
@@ -2185,7 +2186,8 @@ MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg
       //poly t_copy_mon=p_Copy(t,c->r);
     poly exp_diff=cache->temp_term;
     p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
-    p_SetCoeff(exp_diff,npNeg(npInvers(coefstrat)),c->r);
+    p_SetCoeff(exp_diff,npNeg(nInvers(coefstrat)),c->r); 
+      // nInvers may be npInvers or nvInvers
     p_Setm(exp_diff,c->r);
     assume(c->strat->S[i]!=NULL);
       //poly t_to_del=t;
