@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.15 2009-07-09 12:11:34 Singular Exp $ */
+/* $Id: modulop.cc,v 1.16 2009-09-15 10:18:04 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -576,7 +576,8 @@ long nvInvMod(long a)
    u2=0; v2=1;
    u = a; v = npPrimeM;
 
-   while (v != 0) {
+   while (v != 0)
+   {
       q = u / v;
       r = u % v;
       u = v;
@@ -626,5 +627,22 @@ number  nvInvers (number c)
     return (number)0;
   }
   return nvInversM(c);
+}
+void nvPower (number a, int i, number * result)
+{
+  if (i==0)
+  {
+    //npInit(1,result);
+    *(long *)result = 1;
+  }
+  else if (i==1)
+  {
+    *result = a;
+  }
+  else
+  {
+    nvPower(a,i-1,result);
+    *result = nvMultM(a,*result);
+  }
 }
 #endif

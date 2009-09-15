@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.24 2009-07-30 11:49:09 Singular Exp $ */
+/* $Id: numbers.cc,v 1.25 2009-09-15 10:18:04 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -554,6 +554,7 @@ void nInitChar(ring r)
       n->nDiv   = nvDiv;
       n->nExactDiv= nvDiv;
       n->nInvers= nvInvers;
+      n->nPower= nvPower;
     }
 #endif
   }

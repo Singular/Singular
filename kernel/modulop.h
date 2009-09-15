@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.7 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id: modulop.h,v 1.8 2009-09-15 10:18:04 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -183,6 +183,7 @@ static inline number nvMultM(number a, number b)
 number  nvMult        (number a, number b);
 number  nvDiv         (number a, number b);
 number  nvInvers      (number c);
+void    nvPower       (number a, int i, number * result);
 #endif
 
 #endif
