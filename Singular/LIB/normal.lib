@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: normal.lib,v 1.58 2009-09-07 08:26:43 seelisch Exp $";
+version="$Id: normal.lib,v 1.59 2009-09-15 08:16:24 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  normal.lib     Normalization of Affine Rings
@@ -55,8 +55,8 @@ proc normal(ideal id, list #)
          minimal associated primes;
          Other:@*
          - \"useRing\" -> uses the original ring ordering.@*
-         If this option is set and if the ring ordering is not global, normal 
-         will change to a global ordering only for computing radicals and prime 
+         If this option is set and if the ring ordering is not global, normal
+         will change to a global ordering only for computing radicals and prime
          or equidimensional decompositions.@*
          If this option is not set, normal changes to dp ordering and performs
          all computations with respect to this ordering.@*
@@ -70,8 +70,8 @@ ASSUME:  The ideal must be radical, for non-radical ideals the output may
 NOTE:    \"isPrim\" should only be used if id is known to be prime.
 RETURN:  a list, say nor, of size 2 (resp. 3 with option \"withDelta\").
 @format  Let R denote the basering and id the input ideal.
-         * nor[1] is a list of r rings, where r is the number of associated 
-         primes P_i with option \"prim\" (resp. >= no of equidimenensional 
+         * nor[1] is a list of r rings, where r is the number of associated
+         primes P_i with option \"prim\" (resp. >= no of equidimenensional
          components P_i with option \"equidim\").@*
          Each ring Ri := nor[1][i], i=1..r, contains two ideals with given
          names @code{norid} and @code{normap} such that: @*
@@ -83,8 +83,8 @@ RETURN:  a list, say nor, of size 2 (resp. 3 with option \"withDelta\").
            of R/id as affine algebra; @*
          * nor[2] is a list of size r with information on the normalization of
          the i-th component as module over the basering R:@*
-         nor[2][i] is an ideal, say U, in R such that the integral closure 
-         of basering/P_i is generated as module over R by 1/c * U, with c 
+         nor[2][i] is an ideal, say U, in R such that the integral closure
+         of basering/P_i is generated as module over R by 1/c * U, with c
          the last element U[size(U)] of U.@*
          * nor[3] (if option \"withDelta\" is set) is a list of an intvec
          of size r, the delta invariants of the r components, and an integer,
@@ -93,22 +93,22 @@ RETURN:  a list, say nor, of size 2 (resp. 3 with option \"withDelta\").
 @end format
 THEORY:  We use here a general algorithm described in [G.-M.Greuel, S.Laplagne,
          F.Seelisch: Normalization of Rings (2009)].@*
-         The procedure computes the R-module structure, the algebra structure 
+         The procedure computes the R-module structure, the algebra structure
          and the delta invariant of the normalization of R/id:@*
-         The normalization of R/id is the integral closure of R/id in its total 
-         ring of fractions. It is a finitely generated R-module and nor[2] 
+         The normalization of R/id is the integral closure of R/id in its total
+         ring of fractions. It is a finitely generated R-module and nor[2]
          computes R-module generators of it. More precisely: If U:=nor[2][i]
-         and c:=U[size(U)], then c is a non-zero divisor and U/c is an R-module 
-         in the total ring of fractions, the integral closure of R/P_i. Since 
-         U[size(U)]/c is equal to 1, R/P_i resp. R/id is contained in the 
+         and c:=U[size(U)], then c is a non-zero divisor and U/c is an R-module
+         in the total ring of fractions, the integral closure of R/P_i. Since
+         U[size(U)]/c is equal to 1, R/P_i resp. R/id is contained in the
          integral closure.@*
-         The normalization is also an affine algebra over the ground field 
+         The normalization is also an affine algebra over the ground field
          and nor[1] presents it as such. For geometric considerations nor[1] is
-         relevant since the variety of the ideal norid in Ri is the 
+         relevant since the variety of the ideal norid in Ri is the
          normalization of the variety of the ideal P_i in R.@*
          The delta invariant of a reduced ring A is dim_K(normalization(A)/A).
          For A=K[x1,...,xn]/id we call this number also the delta invariant of
-         id. nor[3] returns the delta invariants of the components P_i and of 
+         id. nor[3] returns the delta invariants of the components P_i and of
          id.
 NOTE:    To use the i-th ring type e.g.: @code{def R=nor[1][i]; setring R;}.
 @*       Increasing/decreasing printlevel displays more/less comments
@@ -116,7 +116,7 @@ NOTE:    To use the i-th ring type e.g.: @code{def R=nor[1][i]; setring R;}.
 @*       Implementation works also for local rings.
 @*       Not implemented for quotient rings.
 @*       If the input ideal id is weighted homogeneous a weighted ordering may
-         be used together with the useRing-option (qhweight(id); computes 
+         be used together with the useRing-option (qhweight(id); computes
          weights).
 KEYWORDS: normalization; integral closure; delta invariant.
 SEE ALSO: normalC, normalP.
@@ -187,7 +187,7 @@ EXAMPLE: example normal; shows an example
       withDelta = 1;
     }
     else
-    { 
+    {
       decomp = 3;
       withDelta = 1;
       //Note: the delta invariants cannot be computed with an equidimensional
@@ -442,7 +442,7 @@ EXAMPLE: example normal; shows an example
   {
     resultNew = list(RL, MG);
   }
-    
+
   sp = size(RL);              //RL = list of rings
   option(set, opt);
 
@@ -460,7 +460,7 @@ EXAMPLE: example normal; shows an example
     "// To see the list type";
     "      nor;";
     "";
-    "// * nor[1] is a list of", sp, "ring(s)."; 
+    "// * nor[1] is a list of", sp, "ring(s).";
     "// To access the i-th ring nor[1][i], give it a name, say Ri, and type";
     "     def R1 = nor[1][1]; setring R1; norid; normap;";
     "// For the other rings type first (if R is the name of your base ring)";
@@ -3319,53 +3319,53 @@ proc normalP(ideal id,list #)
          \"noRed\", where@*
          - \"noFac\" -> factorization is avoided during the computation
          of the minimal associated primes.@*
-         - \"isPrim\" -> assumes that the ideal is prime. If the assumption 
-         does not hold, output might be wrong.@* 
-         - \"withRing\" -> the ring structure of the normalization is 
+         - \"isPrim\" -> assumes that the ideal is prime. If the assumption
+         does not hold, output might be wrong.@*
+         - \"withRing\" -> the ring structure of the normalization is
          computed. The number of variables in the new ring is reduced as much
          as possible.@*
          - \"noRed\" -> when computing the ring structure, no reduction on the
          number of variables is done, it creates one new variable for every
          new module generator of the integral closure in the quotient field.@*
-ASSUME:  The characteristic of the ground field must be positive. If the 
-         option \"isPrim\" is not set, the minimal associated primes of id 
-         are computed first and hence normal computes the normalization of 
-         the radical of id. If option \"isPrim\" is set, the ideal must be 
+ASSUME:  The characteristic of the ground field must be positive. If the
+         option \"isPrim\" is not set, the minimal associated primes of id
+         are computed first and hence normal computes the normalization of
+         the radical of id. If option \"isPrim\" is set, the ideal must be
          a prime ideal otherwise the result may be wrong.
 RETURN:  a list, say 'nor' of size 2 (resp. 3 if \"withRing\" is set).@*
          ** If option \"withRing\" is not set: @*
          Only the module structure is computed: @*
-         * nor[1] is a list of ideals Ii, i=1..r, in the basering R where r 
-         is the number of minimal associated prime ideals P_i of the input 
+         * nor[1] is a list of ideals Ii, i=1..r, in the basering R where r
+         is the number of minimal associated prime ideals P_i of the input
          ideal id, describing the module structure:@*
          If Ii is given by polynomials g_1,...,g_k in R, then c:=g_k is
          non-zero in the ring R/P_i and g_1/c,...,g_k/c generate the integral
          closure of R/P_i as R-module in the quotient field of R/P_i.@*
          * nor[2] shows the delta invariants: it is a list of an intvec
          of size r, the delta invariants of the r components, and an integer,
-         the total delta invariant of R/id 
+         the total delta invariant of R/id
          (-1 means infinite, and 0 that R/P_i resp. R/id is normal). @*
          ** If option \"withRing\" is set: @*
          The ring structure is also computed, and in this case:@*
          * nor[1] is a list of r rings.@*
          Each ring Ri = nor[1][i], i=1..r, contains two ideals with given
          names @code{norid} and @code{normap} such that @*
-         - Ri/norid is the normalization of R/P_i, i.e. isomorphic as 
+         - Ri/norid is the normalization of R/P_i, i.e. isomorphic as
            K-algebra (K the ground field) to the integral closure of R/P_i in
            the field of fractions of R/P_i; @*
          - the direct sum of the rings Ri/norid is the normalization
            of R/id; @*
          - @code{normap} gives the normalization map from R to Ri/norid.@*
-         * nor[2] gives the module generators of the normalization of R/P_i, 
+         * nor[2] gives the module generators of the normalization of R/P_i,
          it is the same as nor[1] if \"withRing\" is not set.@*
          * nor[3] shows the delta invariants, it is the same as nor[2] if
          \"withRing\" is not set.
 THEORY:  normalP uses the Leonard-Pellikaan-Singh-Swanson algorithm (using the
-         Frobenius) cf. [A. K. Singh, I. Swanson: An algorithm for computing 
+         Frobenius) cf. [A. K. Singh, I. Swanson: An algorithm for computing
          the integral closure, arXiv:0901.0871].
          The delta invariant of a reduced ring A is dim_K(normalization(A)/A).
          For A=K[x1,...,xn]/id we call this number also the delta invariant of
-         id. The procedure returns the delta invariants of the components P_i 
+         id. The procedure returns the delta invariants of the components P_i
          and of id.
 NOTE:    To use the i-th ring type: @code{def R=nor[1][i]; setring R;}.
 @*       Increasing/decreasing printlevel displays more/less comments
@@ -5162,44 +5162,44 @@ RETURN:  a list, say nor, of size 2 (resp. 3 if option \"withGens\" is set).@*
           integral closure in its field of fractions as affine ring, i.e. Ri is
           given in the form K[X(1..p),T(1..q)], where K is the ground field;
          - normap gives the normalization map from basering/id to
-           Ri/norid for each i (the j-th element of normap is mapped to the 
+           Ri/norid for each i (the j-th element of normap is mapped to the
            j-th variable of R).@*
          - the direct sum of the rings Ri/norid is the normalization
            of basering/id; @*
          ** If option \"withGens\" is not set: @*
-         * nor[2] shows the delta invariants: nor[2] is a list of an intvec of 
-         size r, the delta invariants of the r components, and an integer, the 
-         delta invariant of basering/id. (-1 means infinite, 0 that basering/P_i 
-         resp. basering/input is normal, -2 means that delta resp. delta of one 
-         of the components is not computed (which may happen if \"equidim\" is 
+         * nor[2] shows the delta invariants: nor[2] is a list of an intvec of
+         size r, the delta invariants of the r components, and an integer, the
+         delta invariant of basering/id. (-1 means infinite, 0 that basering/P_i
+         resp. basering/input is normal, -2 means that delta resp. delta of one
+         of the components is not computed (which may happen if \"equidim\" is
          given). @*
          ** If option \"withGens\" is set:
-         * nor[2] is a list of ideals Ii=nor[2][i], i=1..r, in the basering, 
+         * nor[2] is a list of ideals Ii=nor[2][i], i=1..r, in the basering,
          generating the integral closure of basering/P_i in its quotient field
-         as K-algebra (K the ground field):@* 
-         If Ii is given by polynomials g_1,...,g_k, then c:=g_k is a non-zero 
+         as K-algebra (K the ground field):@*
+         If Ii is given by polynomials g_1,...,g_k, then c:=g_k is a non-zero
          divisor and the j-th variables of the ring Ri satisfies var(j)=g_j/c,
-         j=1..k-1, as element in the quotient field of basering/P_i. The 
-         g_j/g_k+1 are K-algebra generators  of the integral closure of 
+         j=1..k-1, as element in the quotient field of basering/P_i. The
+         g_j/g_k+1 are K-algebra generators  of the integral closure of
          basering/P_i.@*
          * nor[3] shows the delta invariant as above.
-THEORY:  We use the Grauert-Remmert-de Jong algorithm [c.f. G.-M. Greuel, 
+THEORY:  We use the Grauert-Remmert-de Jong algorithm [c.f. G.-M. Greuel,
          G. Pfister: A SINGULAR Introduction to Commutative Algebra, 2nd Edition.
          Springer Verlag (2007)].
-         The procedure computes the algebra structure and the delta invariant of 
+         The procedure computes the algebra structure and the delta invariant of
          the normalization of R/id:@*
          The normalization is an affine algebra over the ground field K
          and nor[1] presents it as such: Ri = K[X(1..p),T(1..q)] and Ri/norid
-         is the integral closure of R/P_i; if option \"withGens\" is set the 
-         X(j) and T(j) are expressed as quotients in the total ring of 
-         fractions. Note that the X(j) and T(j) generate the integral closure 
-         as K-algebra, but not necessarily as R-module (since relations of the 
-         form X(1)=T(1)*T(2) may have been eliminated). Geometrically the   
-         algebra structure is relevant since the variety of the ideal norid in  
+         is the integral closure of R/P_i; if option \"withGens\" is set the
+         X(j) and T(j) are expressed as quotients in the total ring of
+         fractions. Note that the X(j) and T(j) generate the integral closure
+         as K-algebra, but not necessarily as R-module (since relations of the
+         form X(1)=T(1)*T(2) may have been eliminated). Geometrically the
+         algebra structure is relevant since the variety of the ideal norid in
          Ri is the normalization of the variety of the ideal P_i in R.@*
          The delta invariant of a reduced ring A is dim_K(normalization(A)/A).
          For A=K[x1,...,xn]/id we call this number also the delta invariant of
-         id. nor[3] returns the delta invariants of the components P_i and of 
+         id. nor[3] returns the delta invariants of the components P_i and of
          id.
 NOTE:    To use the i-th ring type: @code{def R=nor[1][i]; setring R;}.
 @*       Increasing/decreasing printlevel displays more/less comments
@@ -5411,10 +5411,10 @@ EXAMPLE: example normalC; shows an example
 // To see the list type
       nor;
 
-// * nor[1] is a list of",sr,"ring(s) 
+// * nor[1] is a list of",sr,"ring(s)
 // To access the i-th ring nor[1][i] give it a name, say Ri, and type e.g.
      def R1 = nor[1][1]; setring R1;  norid; normap;
-// For the other rings type first (if R is the name of your original basering) 
+// For the other rings type first (if R is the name of your original basering)
      setring R;
 // and then continue as for R1.
 // Ri/norid is the affine algebra of the normalization of the i-th
@@ -5530,7 +5530,7 @@ EXAMPLE: example normalC; shows an example
    //ACHTUNG: equidim berechnet bei nicht reduzierten id die eingebetteten
    //Komponenten als niederdim Komponenten, waehrend diese bei primdecGTZ
    //nicht auftauchen: ideal(x,y)*xy
-   //this is default for nvars > 2 
+   //this is default for nvars > 2
 
    if( decomp == 2 )
    {
@@ -5775,12 +5775,12 @@ EXAMPLE: example normalC; shows an example
 // To access the i-th ring nor[1][i] give it a name, say Ri, and type e.g.
       def R1 = nor[1][1];  setring R1;  norid;  normap;
 // and similair for the other rings nor[1][i];
-// Ri/norid is the affine algebra of the normalization of r/P_i  (where P_i 
+// Ri/norid is the affine algebra of the normalization of r/P_i  (where P_i
 // is an associated prime or an equidimensional part of the input ideal id)
 // and normap the normalization map from the basering to Ri/norid;
 
 // * nor[2] shows the delta-invariant of each component and of id
-// (-1 means infinite, 0 that r/P_i resp. r/id is normal, and -2 that delta 
+// (-1 means infinite, 0 that r/P_i resp. r/id is normal, and -2 that delta
 // of a component was not computed).";
    }
    return(result);
