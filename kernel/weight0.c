@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: weight0.c,v 1.2 2007-04-04 14:13:31 Singular Exp $ */
+/* $Id: weight0.c,v 1.3 2009-09-16 09:25:07 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -165,8 +165,8 @@ void wFirstSearch(int *A, int *x, int mons,
   xn = n + 6 + (21 / n);
   a0 = n * sizeof(double);
   a = n * sizeof(int);
-  y = (int * )omAlloc(a);
-  adr = (void * )omAllocAligned(a0);
+  y = (int * )omAlloc((long)a);
+  adr = (void * )omAllocAligned((long)a0);
   pr = adr;
   *pr = (double)1.0;
   *y = 0;
@@ -199,8 +199,8 @@ void wFirstSearch(int *A, int *x, int mons,
         if (t==0)
         {
           *fopt = fy;
-          omFreeSize((ADDRESS)y, a);
-          omFreeSize((ADDRESS)adr, a0);
+          omFreeSize((ADDRESS)y, (long)a);
+          omFreeSize((ADDRESS)adr, (long)a0);
           return;
         }
       }
