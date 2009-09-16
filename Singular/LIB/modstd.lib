@@ -1,6 +1,6 @@
 //GP, last modified 23.10.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: modstd.lib,v 1.16 2009-06-12 08:01:11 Singular Exp $";
+version="$Id: modstd.lib,v 1.17 2009-09-16 16:21:48 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY: modstd.lib  Grobner basis of ideals
@@ -357,7 +357,7 @@ NOTE:    works only for homogeneous ideals with global orderings or
 }
 example
 { "EXAMPLE:"; echo = 2;
-   list L=2,3,5,7,11;
+   intvec L=2,3,5,7,11;
    ring r=0,(y,x),Dp;
    ideal I1=y2x,y6;
    ideal I2=yx2,y3x,x5,y6;
@@ -410,7 +410,7 @@ example
 proc liftPoly1(list T, intvec L)
 "USAGE:  liftPoly1(T,L); T list of polys, L intvec of primes
 RETURN:  poly p in Q[x] such that p mod L[i]=T[i]
-EXAMPLE: example liftPoly; shows an example
+EXAMPLE: example liftPoly1; shows an example
 "
 {
    poly result;
@@ -613,7 +613,7 @@ example
 proc transmat(int p,ideal i,ideal G)
 "USAGE:  transmat(p,I,G); p integer, I,G ideal;
 RETURN:  the transformationmatrix Z for the ideal i mod p and the groebner base for i mod p
-EXAMPLE: example transmit; shows an example
+EXAMPLE: example transmat; shows an example
 "
 {
   def r=basering;
