@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.50 2009-08-21 13:24:56 Singular Exp $ */
+/* $Id: longalg.cc,v 1.51 2009-09-16 12:26:26 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -49,7 +49,7 @@ static number   (*nacGcd)(number a, number b, const ring r);
 static number   (*nacLcm)(number a, number b, const ring r);
 static void     (*nacDelete)(number *a, const ring r);
        number   (*nacInit)(int i);
-static int      (*nacInt)(number &n);
+static int      (*nacInt)(number &n, const ring r);
        void     (*nacNormalize)(number &a);
 static number   (*nacNeg)(number a);
 static void     (*nacWrite)(number &a);
@@ -123,7 +123,7 @@ void naSetChar(int i, ring r)
 #endif
   nacRing        = r->algring;
   nacInit        = nacRing->cf->nInit;
-  nacInt         = nacRing->cf->nInt;
+  nacInt         = nacRing->cf->n_Int;
   nacCopy        = nacRing->cf->nCopy;
   nacAdd         = nacRing->cf->nAdd;
   nacSub         = nacRing->cf->nSub;
@@ -945,13 +945,13 @@ int     naSize(number n)     /* size desc. */
 /*2
 * convert a number to int (if possible)
 */
-int naInt(number &n)
+int naInt(number &n, const ring r)
 {
   lnumber l=(lnumber)n;
   naNormalize(n);
-  if ((l!=NULL)&&(l->n==NULL)&&(napIsConstant(l->z)))
+  if ((l!=NULL)&&(l->n==NULL)&&(p_IsConstant(l->z,r->algring)))
   {
-    return nacInt(pGetCoeff(l->z));
+    return nacInt(pGetCoeff(l->z),r->algring);
   }
   return 0;
 }

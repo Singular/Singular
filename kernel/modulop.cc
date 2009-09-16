@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.16 2009-09-15 10:18:04 Singular Exp $ */
+/* $Id: modulop.cc,v 1.17 2009-09-16 12:26:26 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -72,10 +72,10 @@ number npInit (int i)
 /*2
 * convert a number to int (-p/2 .. p/2)
 */
-int npInt(number &n)
+int npInt(number &n, const ring r)
 {
-  if ((long)n > (npPrimeM >>1)) return (int)((long)n -npPrimeM);
-  else                          return (int)((long)n);
+  if ((long)n > (r->ch >>1)) return (int)((long)n -(r->ch));
+  else                       return (int)((long)n);
 }
 
 number npAdd (number a, number b)

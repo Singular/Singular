@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.25 2009-09-15 10:18:04 Singular Exp $ */
+/* $Id: numbers.cc,v 1.26 2009-09-16 12:26:26 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -37,7 +37,7 @@ number  (*nInit_bigint)(number i);
 number (*nPar)(int i);
 int    (*nParDeg)(number n);
 int    (*nSize)(number n);
-int    (*nInt)(number &n);
+int    (*n_Int)(number &n, const ring r);
 numberfunc nMult, nSub, nAdd, nDiv, nIntDiv, nIntMod, nExactDiv;
 number (*nNeg)(number a);
 number (*nInvers)(number a);
@@ -212,7 +212,7 @@ void nSetChar(ring r)
   nInit  = r->cf->nInit;
   nPar   = r->cf->nPar;
   nParDeg= r->cf->nParDeg;
-  nInt   = r->cf->nInt;
+  n_Int  = r->cf->n_Int;
   nAdd   = r->cf->nAdd;
   nSub   = r->cf->nSub;
   nMult  = r->cf->nMult;
@@ -325,7 +325,7 @@ void nInitChar(ring r)
     n->nInit       = naInit;
     n->nPar        = naPar;
     n->nParDeg     = naParDeg;
-    n->nInt        = naInt;
+    n->n_Int       = naInt;
     n->nAdd        = naAdd;
     n->nSub        = naSub;
     n->nMult       = naMult;
@@ -363,7 +363,7 @@ void nInitChar(ring r)
      nr2mInitExp(c,r);
      n->nInit  = nr2mInit;
      n->nCopy  = ndCopy;
-     n->nInt   = nr2mInt;
+     n->n_Int  = nr2mInt;
      n->nAdd   = nr2mAdd;
      n->nSub   = nr2mSub;
      n->nMult  = nr2mMult;
@@ -406,7 +406,7 @@ void nInitChar(ring r)
      n->nCopy  = nrnCopy;
      n->cfCopy = cfrnCopy;
      n->nSize  = nrnSize;
-     n->nInt   = nrnInt;
+     n->n_Int  = nrnInt;
      n->nAdd   = nrnAdd;
      n->nSub   = nrnSub;
      n->nMult  = nrnMult;
@@ -447,7 +447,7 @@ void nInitChar(ring r)
      n->nCopy  = nrzCopy;
      n->cfCopy = cfrzCopy;
      n->nSize  = nrzSize;
-     n->nInt   = nrzInt;
+     n->n_Int  = nrzInt;
      n->nAdd   = nrzAdd;
      n->nSub   = nrzSub;
      n->nMult  = nrzMult;
@@ -487,7 +487,7 @@ void nInitChar(ring r)
     n->nNew   = nlNew;
     n->nNormalize=nlNormalize;
     n->nInit  = nlInit;
-    n->nInt   = nlInt;
+    n->n_Int  = nlInt;
     n->nAdd   = nlAdd;
     n->nSub   = nlSub;
     n->nMult  = nlMult;
@@ -523,7 +523,7 @@ void nInitChar(ring r)
   {
     npInitChar(c,r);
     n->nInit  = npInit;
-    n->nInt   = npInt;
+    n->n_Int  = npInt;
     n->nAdd   = npAdd;
     n->nSub   = npSub;
     n->nMult  = npMult;
@@ -565,7 +565,7 @@ void nInitChar(ring r)
     n->nInit  = nfInit;
     n->nPar   = nfPar;
     n->nParDeg= nfParDeg;
-    n->nInt   = nfInt;
+    n->n_Int  = nfInt;
     n->nAdd   = nfAdd;
     n->nSub   = nfSub;
     n->nMult  = nfMult;
@@ -595,7 +595,7 @@ void nInitChar(ring r)
   else if (rField_is_R(r))
   {
     n->nInit  = nrInit;
-    n->nInt   = nrInt;
+    n->n_Int  = nrInt;
     n->nAdd   = nrAdd;
     n->nSub   = nrSub;
     n->nMult  = nrMult;
@@ -626,7 +626,7 @@ void nInitChar(ring r)
     n->cfDelete= ngfDelete;
     n->nNew=ngfNew;
     n->nInit  = ngfInit;
-    n->nInt   = ngfInt;
+    n->n_Int  = ngfInt;
     n->nAdd   = ngfAdd;
     n->nSub   = ngfSub;
     n->nMult  = ngfMult;
@@ -658,7 +658,7 @@ void nInitChar(ring r)
     n->nNew=ngcNew;
     n->nNormalize=nDummy2;
     n->nInit  = ngcInit;
-    n->nInt   = ngcInt;
+    n->n_Int  = ngcInt;
     n->nAdd   = ngcAdd;
     n->nSub   = ngcSub;
     n->nMult  = ngcMult;

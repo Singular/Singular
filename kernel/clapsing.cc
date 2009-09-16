@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.44 2009-08-14 17:14:30 Singular Exp $
+// $Id: clapsing.cc,v 1.45 2009-09-16 12:26:26 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -84,8 +84,8 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
         CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
                                            r->algring);
         Variable a=rootOf(mipo);
-        CanonicalForm F( convSingAPFactoryAP( f,a ) ),
-                      G( convSingAPFactoryAP( g,a ) );
+        CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
+                      G( convSingAPFactoryAP( g,a,r ) );
         res= convFactoryAPSingAP( gcd( F, G ) );
         if (!b) Off(SW_USE_QGCD);
       }
@@ -178,7 +178,8 @@ poly singclap_resultant ( poly f, poly g , poly x)
       CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
                                                  currRing->algring);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) ),
+                    G( convSingAPFactoryAP( g,a,currRing ) );
       res= convFactoryAPSingAP( resultant( F, G, X ) );
     }
     else
@@ -318,7 +319,8 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
       CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
                                                  currRing->algring);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) ),
+                    G( convSingAPFactoryAP( g,a,currRing ) );
       CanonicalForm FpG=F+G;
       if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
       //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
@@ -394,8 +396,8 @@ BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const
       CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
                                             r->algring);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPFactoryAP( f,a ) ),
-                    G( convSingAPFactoryAP( g,a ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
+                    G( convSingAPFactoryAP( g,a,r ) );
       CanonicalForm FpG=F+G;
       if (!(FpG.isUnivariate()|| FpG.inCoeffDomain()))
       //if (!F.isUnivariate() || !G.isUnivariate() || F.mvar()!=G.mvar())
@@ -451,7 +453,8 @@ poly singclap_pdivide ( poly f, poly g )
       CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
                                                  currRing->algring);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPFactoryAP( f,a ) ), G( convSingAPFactoryAP( g,a ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) ),
+                    G( convSingAPFactoryAP( g,a,currRing ) );
       res= convFactoryAPSingAP(  F / G  );
     }
     else
@@ -606,8 +609,8 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
         CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
                                     currRing->algring);
         a=rootOf(mipo);
-        F=convSingAPFactoryAP( f,a );
-        FAC=convSingAPFactoryAP( fac,a );
+        F=convSingAPFactoryAP( f,a,currRing );
+        FAC=convSingAPFactoryAP( fac,a,currRing );
       }
       else
       {
@@ -828,7 +831,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
                    currRing->algring);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPFactoryAP( f,a ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) );
       if (rField_is_Zp_a() && F.isUnivariate())
       {
         L = factorize( F, a );
@@ -1173,7 +1176,7 @@ ideal singclap_sqrfree ( poly f)
       CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
                     currRing->algring);
       Variable a=rootOf(mipo);
-      CanonicalForm F( convSingAPFactoryAP( f,a ) );
+      CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) );
       CFFList SqrFreeMV( const CanonicalForm & f , const CanonicalForm & mipo=0) ;
 
       L = SqrFreeMV( F,mipo );
@@ -1487,7 +1490,7 @@ poly singclap_det( const matrix m )
       {
         for(j=r;j>0;j--)
         {
-          M(i,j)=convSingAPFactoryAP(MATELEM(m,i,j),a);
+          M(i,j)=convSingAPFactoryAP(MATELEM(m,i,j),a,currRing);
         }
       }
       res= convFactoryAPSingAP( determinant(M,r) ) ;
@@ -1540,7 +1543,8 @@ napoly singclap_alglcm ( napoly f, napoly g )
    CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
                                          currRing->algring);
    Variable a=rootOf(mipo);
-   CanonicalForm F( convSingAFactoryA( f,a ) ), G( convSingAFactoryA( g,a ) );
+   CanonicalForm F( convSingAFactoryA( f,a, currRing ) ),
+                 G( convSingAFactoryA( g,a, currRing ) );
    CanonicalForm GCD;
 
    // calculate gcd
@@ -1578,7 +1582,8 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
    CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
                          currRing->algring);
    Variable a=rootOf(mipo);
-   CanonicalForm F( convSingAFactoryA( f,a ) ), G( convSingAFactoryA( g,a ) );
+   CanonicalForm F( convSingAFactoryA( f,a, currRing ) ),
+                 G( convSingAFactoryA( g,a, currRing ) );
    CanonicalForm GCD;
 
    GCD=gcd( F, G );

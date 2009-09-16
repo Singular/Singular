@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.h,v 1.9 2009-06-09 18:10:44 Singular Exp $ */
+/* $Id: rintegers.h,v 1.10 2009-09-16 12:26:27 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -20,7 +20,7 @@ void    nrzDelete      (number *a, const ring r);
 BOOLEAN nrzGreaterZero (number k);
 number  nrzMult        (number a, number b);
 number  nrzInit        (int i);
-int     nrzInt         (number &n);
+int     nrzInt         (number &n, const ring r);
 number  nrzAdd         (number a, number b);
 number  nrzSub         (number a, number b);
 void    nrzPower       (number a, int i, number * result);

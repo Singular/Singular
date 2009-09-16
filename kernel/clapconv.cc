@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.17 2009-08-14 17:14:29 Singular Exp $
+// $Id: clapconv.cc,v 1.18 2009-09-16 12:26:26 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -36,13 +36,13 @@ static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
 
 static number convFactoryNSingAN( const CanonicalForm &f);
 
-CanonicalForm convSingNFactoryN( number n )
+CanonicalForm convSingNFactoryN( number n, const ring r )
 {
   CanonicalForm term;
   /* does only work for Zp, Q */
   if ( getCharacteristic() != 0 )
   {
-    term = npInt( n );
+    term = npInt( n,r );
   }
   else
   {
@@ -172,7 +172,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
     /* does only work for finite fields */
     if ( rField_is_Zp(r) )
     {
-      term = npInt( pGetCoeff( p ) );
+      term = npInt( pGetCoeff( p ),r );
     }
     else if (rField_is_Q(r))
     {
@@ -213,7 +213,7 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
   return result;
 }
 
-CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a)
+CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a, const ring r)
 {
   CanonicalForm result = 0;
   int e, n = pVariables;
@@ -222,7 +222,7 @@ CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a)
   On(SW_RATIONAL);
   while ( p!=NULL)
   {
-    CanonicalForm term=convSingAFactoryA(((lnumber)pGetCoeff(p))->z,a);
+    CanonicalForm term=convSingAFactoryA(((lnumber)pGetCoeff(p))->z,a, r);
     for ( int i = 1; i <= n; i++ )
     {
       if ( (e = pGetExp( p, i )) != 0 )
@@ -297,7 +297,7 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
   }
 }
 
-CanonicalForm convSingAFactoryA ( napoly p , const Variable & a )
+CanonicalForm convSingAFactoryA ( napoly p , const Variable & a, const ring r )
 {
   CanonicalForm result = 0;
   int e;
@@ -308,7 +308,7 @@ CanonicalForm convSingAFactoryA ( napoly p , const Variable & a )
     /* does only work for finite fields:Z/p */
     if ( rField_is_Zp_a() )
     {
-      term = npInt( napGetCoeff( p ) );
+      term = npInt( napGetCoeff( p ),r );
     }
     else
     {
@@ -474,8 +474,8 @@ number   nlChineseRemainder(number *x, number *q,int rl)
   int i;
   for(i=rl-1;i>=0;i--)
   {
-    X[i]=CanonicalForm(nlInt(x[i]));
-    Q[i]=CanonicalForm(nlInt(q[i]));
+    X[i]=CanonicalForm(nlInt(x[i],currRing));
+    Q[i]=CanonicalForm(nlInt(q[i],currRing));
   }
   CanonicalForm xnew,qnew;
   chineseRemainder(X,Q,xnew,qnew);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.10 2008-12-17 15:07:46 Singular Exp $ */
+/* $Id: ffields.cc,v 1.11 2009-09-16 12:26:26 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -201,7 +201,7 @@ int nfParDeg(number n)
 /*2
 * number -> int
 */
-int nfInt (number &n)
+int nfInt (number &n, const ring r)
 {
   return 0;
 }

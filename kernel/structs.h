@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.64 2009-07-30 11:49:09 Singular Exp $ */
+/* $Id: structs.h,v 1.65 2009-09-16 12:26:27 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -278,7 +278,7 @@ struct n_Procs_s
    number  (*nPar)(int i);
    int     (*nParDeg)(number n);
    int     (*nSize)(number n);
-   int     (*nInt)(number &n);
+   int     (*n_Int)(number &n, const ring r);
 #ifdef HAVE_RINGS
    int     (*nDivComp)(number a,number b);
    BOOLEAN (*nIsUnit)(number a);

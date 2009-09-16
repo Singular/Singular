@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.23 2009-06-09 18:10:44 Singular Exp $ */
+/* $Id: rintegers.cc,v 1.24 2009-09-16 12:26:27 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -122,7 +122,7 @@ int nrzSize(number a)
 /*
  * convert a number to int (-p/2 .. p/2)
  */
-int nrzInt(number &n)
+int nrzInt(number &n, const ring r)
 {
   return (int) mpz_get_si( (int_number) &n);
 }

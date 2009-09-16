@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.10 2008-10-13 17:32:35 Singular Exp $ */
+/* $Id: gnumpfl.cc,v 1.11 2009-09-16 12:26:26 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *
@@ -20,11 +20,12 @@
 #include "mpr_complex.h"
 
 extern size_t gmp_output_digits;
+ring ngfMapRing; // to be used also in gnumpc.cc
 
 static number ngfMapP(number from)
 {
   if ( from != NULL)
-    return ngfInit(npInt(from));
+    return ngfInit(npInt(from,ngfMapRing));
   else
     return NULL;
 }
@@ -84,6 +85,7 @@ nMapFunc ngfSetMap(ring src, ring dst)
   }
   if (rField_is_Zp(src))
   {
+    ngfMapRing=src;
     return ngfMapP;
   }
   if (rField_is_long_C(src))
@@ -114,7 +116,7 @@ number ngfInit (int i)
 /*2
 * convert number to int
 */
-int ngfInt(number &i)
+int ngfInt(number &i, const ring r)
 {
   if ( i == NULL ) return 0;
   double d=(double)*(gmp_float*)i;

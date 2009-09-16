@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.26 2009-07-03 14:38:34 Singular Exp $ */
+/* $Id: rmodulo2m.cc,v 1.27 2009-09-16 12:26:27 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -141,7 +141,7 @@ number nr2mInit (int i)
 /*
  * convert a number to int (-p/2 .. p/2)
  */
-int nr2mInt(number &n)
+int nr2mInt(number &n, const ring r)
 {
   if ((NATNUMBER)n > (nr2mModul >>1)) return (int)((NATNUMBER)n - nr2mModul);
   else return (int)((NATNUMBER)n);
@@ -507,7 +507,8 @@ void nr2mSetExp(int m, ring r)
   {
     nr2mExp = m;
     nr2mModul = 2;
-    for (int i = 1; i < m; i++) {
+    for (int i = 1; i < m; i++)
+    {
       nr2mModul = nr2mModul * 2;
     }
   }

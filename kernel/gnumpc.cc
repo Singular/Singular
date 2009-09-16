@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.8 2008-10-13 17:32:34 Singular Exp $ */
+/* $Id: gnumpc.cc,v 1.9 2009-09-16 12:26:26 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *
@@ -61,10 +61,11 @@ static number ngcMapR(number from)
   else
     return NULL;
 }
+extern ring ngfMapRing;
 static number ngcMapP(number from)
 {
   if ( from != NULL)
-    return ngcInit(npInt(from));
+    return ngcInit(npInt(from,ngfMapRing));
   else
     return NULL;
 }
@@ -89,6 +90,7 @@ nMapFunc ngcSetMap(ring src,ring dst)
   }
   if (rField_is_Zp(src))
   {
+    ngfMapRing=src;
     return ngcMapP;
   }
   return NULL;
@@ -121,7 +123,7 @@ number ngcInit (int i)
 /*2
 * convert number to int
 */
-int ngcInt(number &i)
+int ngcInt(number &i, const ring r)
 {
   if ( i == NULL ) return 0;
   return (int)((gmp_complex*)i)->real();

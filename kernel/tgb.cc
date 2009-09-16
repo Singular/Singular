@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.165 2009-09-15 10:17:06 Singular Exp $ */
+/* $Id: tgb.cc,v 1.166 2009-09-16 12:26:27 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -1884,10 +1884,11 @@ static void export_mat(number* number_array,int pn, int tn,const char* format_st
     fprintf(out,"[\n");
     for(j=0;j<tn;j++)
     {
-      if (j>0){
+      if (j>0)
+      {
         fprintf(out,", ");
       }
-      fprintf(out,"%i",npInt(number_array[i*tn+j]));
+      fprintf(out,"%i",npInt(number_array[i*tn+j],currRing));
     }
     if (i<pn-1)
       fprintf(out,"],\n");

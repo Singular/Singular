@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.12 2009-07-03 13:14:10 seelisch Exp $ */
+/* $Id: rmodulon.h,v 1.13 2009-09-16 12:26:27 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -21,7 +21,7 @@ void    nrnDelete      (number *a, const ring r);
 BOOLEAN nrnGreaterZero (number k);
 number  nrnMult        (number a, number b);
 number  nrnInit        (int i);
-int     nrnInt         (number &n);
+int     nrnInt         (number &n, const ring r);
 number  nrnAdd         (number a, number b);
 number  nrnSub         (number a, number b);
 void    nrnPower       (number a, int i, number * result);

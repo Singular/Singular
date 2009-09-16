@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.43 2009-07-30 11:49:09 Singular Exp $ */
+/* $Id: longrat.cc,v 1.44 2009-09-16 12:26:26 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -101,14 +101,11 @@ void mpz_mul_si (mpz_ptr r, mpz_srcptr s, long int si)
 }
 #endif
 
-static int nlPrimeM;
+static ring nlMapRing;
 static number nlMapP(number from)
 {
   number to;
-  int save=npPrimeM;
-  npPrimeM=nlPrimeM;
-  to = nlInit(npInt(from));
-  npPrimeM=save;
+  to = nlInit(npInt(from,nlMapRing));
   return to;
 }
 
@@ -155,9 +152,9 @@ nMapFunc nlSetMap(ring src, ring dst)
   {
     return nlCopy;
   }
+  nlMapRing=src;
   if (rField_is_Zp(src))
   {
-    nlPrimeM=rChar(src);
     return nlMapP;
   }
   if (rField_is_R(src))
@@ -467,7 +464,7 @@ int nlSize(number a)
 /*2
 * convert number to int
 */
-int nlInt(number &i)
+int nlInt(number &i, const ring r)
 {
 #ifdef LDEBUG
   nlTest(i);

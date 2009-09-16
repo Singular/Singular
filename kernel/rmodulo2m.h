@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.12 2009-07-03 13:14:10 seelisch Exp $ */
+/* $Id: rmodulo2m.h,v 1.13 2009-09-16 12:26:27 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -16,7 +16,7 @@ extern NATNUMBER nr2mModul;
 BOOLEAN nr2mGreaterZero (number k);
 number  nr2mMult        (number a, number b);
 number  nr2mInit        (int i);
-int     nr2mInt         (number &n);
+int     nr2mInt         (number &n, const ring r);
 number  nr2mAdd         (number a, number b);
 number  nr2mSub         (number a, number b);
 void    nr2mPower       (number a, int i, number * result);

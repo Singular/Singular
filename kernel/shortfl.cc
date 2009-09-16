@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.7 2008-08-06 13:56:14 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.8 2009-09-16 12:26:27 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -56,7 +56,7 @@ number nrInit (int i)
 /*2
 * convert a number to int
 */
-int nrInt(number &n)
+int nrInt(number &n, const ring R)
 {
   int i;
   float r = nf(n).F();
@@ -325,7 +325,7 @@ number nrMapQ(number from)
   float ba,rr,rn,y;
 
   if (IS_IMM(from))
-    return nf((float)nlInt(from)).N();
+    return nf((float)nlInt(from,NULL /* dummy for nlInt*/)).N();
   z=GET_NOM(from);
   s=0X10000;
   ba=(float)s;

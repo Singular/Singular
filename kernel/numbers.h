@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.18 2009-08-06 14:35:18 Singular Exp $ */
+/* $Id: numbers.h,v 1.19 2009-09-16 12:26:27 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -50,7 +50,7 @@ extern number  (*nInit_bigint)(number i);
 extern number  (*nPar)(int i);
 extern int     (*nParDeg)(number n);
 extern int     (*nSize)(number n);
-extern int     (*nInt)(number &n);
+extern int     (*n_Int)(number &n, const ring r);
 #ifdef HAVE_RINGS
 extern int     (*nDivComp)(number a,number b);
 extern BOOLEAN (*nIsUnit)(number a);
