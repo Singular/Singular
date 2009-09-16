@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.513 2009-08-13 17:24:45 motsak Exp $ */
+/* $Id: iparith.cc,v 1.514 2009-09-16 12:40:44 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4490,7 +4490,7 @@ static BOOLEAN jjP2I(leftv res, leftv v)
     WerrorS("poly must be constant");
     return TRUE;
   }
-  res->data = (char *)(long)nInt(pGetCoeff(p));
+  res->data = (char *)(long)nInt(pGetCoeff(p),currRing);
   return FALSE;
 }
 static BOOLEAN jjPREIMAGE_R(leftv res, leftv v)
@@ -5131,7 +5131,7 @@ static BOOLEAN jjnInt(leftv res, leftv u)
 static BOOLEAN jjnlInt(leftv res, leftv u)
 {
   number n=(number)u->Data();
-  res->data=(char *)(long)nlInt(n);
+  res->data=(char *)(long)nlInt(n,NULL /*dummy for nlInt*/);
   return FALSE;
 }
 #define s short
