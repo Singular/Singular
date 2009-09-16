@@ -1,3 +1,7 @@
+Changes w.r.t 3-1-0-6:
+- bug fix in primes/IspPrimea (track 166)
+- bug fixed for Z/p (p>32003): nPower
+
 Changes w.r.t 3-1-0-5:
 - 3-1-0-6: Fri Aug 21 12:59:52 CEST 2009
 - code cleanup: removed HAVE_NAMESPACES (always 0), HAVE_NS(1), HAVE_GMP(1)
