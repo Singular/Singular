@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.315 2009-08-30 15:45:43 ederc Exp $ */
+/* $Id: extra.cc,v 1.316 2009-09-17 10:27:37 seelisch Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -53,6 +53,8 @@
 #include "distrib.h"
 #include "prCopy.h"
 #include "mpr_complex.h"
+#include "Wrappers.h" // for testing C++ wrappers (Frank Seelisch)
+#include "TestMinors.h" // for testing minor code (Frank Seelisch)
 #include "ffields.h" // test GF only
 
 #ifdef HAVE_RINGS
@@ -2093,6 +2095,66 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
 #endif
+/*==================== debug C++ wrappers (Frank Seelisch) ========================*/
+      if(strcmp(sys_cmd,"c++wrappers")==0)
+      {
+        testWrappers();
+        return FALSE;
+      }
+      else
+/*==================== debug minor code (Frank Seelisch) ========================*/
+      if(strcmp(sys_cmd,"minors")==0)
+      {
+        if (h == NULL) minorUsageInfo();  /* writes some info to the console
+                                             on how to use this experimental code
+                                          */
+        else if (h->Typ() == INT_CMD)
+        {
+           testIntMinors(0);  /* effectively no arguments provided:
+                                 this starts 5 default tests
+                                 with a random matrix with
+                                 integer entries;
+                                 for that, no ring needs to be
+                                 declared
+                              */
+        }
+        else if ((h->Typ() == MATRIX_CMD) &&
+                 (h->next->Typ() == INT_CMD) &&
+                 (h->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->next->next->Typ() == INT_CMD))
+        {
+          const matrix m          = (const matrix)h->Data();
+          const int k             = (const int)h->next->Data();
+          const int cacheEntries  = (const int)h->next->next->Data();
+          const int cacheWeight   = (const int)h->next->next->next->Data();
+          const int strategies    = (const int)h->next->next->next->next->Data();
+          const int dumpMinors    = (const int)h->next->next->next->next->next->Data();
+          const int dumpResults   = (const int)h->next->next->next->next->next->next->Data();
+          const int dumpComplete  = (const int)h->next->next->next->next->next->next->next->Data();
+          const int dumpConsole   = (const int)h->next->next->next->next->next->next->next->next->Data();
+          testAllPolyMinors(m, k, cacheEntries, cacheWeight, strategies, dumpMinors, dumpResults, dumpComplete, dumpConsole);
+            /* starts the computation of all k x k minors in the
+               provided matrix m (which is assumed to have polynomial
+               entries) using a cache with a maximum number of
+               'cacheEntries' entries and a maximum weight of 'cacheWeight';
+               when calling this method, a ring must be declared before;
+               strategy = "310" means that the code is run first without a
+               cache ("0") and then afterwards with the caching strategies
+               1 and 3
+            */
+        }
+        else if (h->Typ() == POLY_CMD)
+        { // for quick tests
+          const poly p = (const poly)h->Data();
+          testStuff(p);
+        }
+        return FALSE;
+      }
+      else
 /*==================== generic debug ==================================*/
 //#ifdef PDEBUG
       if(strcmp(sys_cmd,"DetailedPrint")==0)
@@ -2679,15 +2741,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else {
         opt = 2;
       }
-      h = h->next;
-      int termination;
-      if(h != NULL) {
-        termination = (int) (long) h->Data();
-      }
-      else {
-        termination = 0;
-      }res->rtyp=IDEAL_CMD;
-      res->data=(ideal) F5main(G,r,opt,termination);
+      res->rtyp=IDEAL_CMD;
+      res->data=(ideal) F5main(G,r,opt);
       return FALSE;
     }
     else
@@ -3296,6 +3351,11 @@ ipshell()");
   else
 #endif // HAVE_SINGULAR_PLUS_PLUS
 
+    if (strcmp(sys_cmd,"FrankTest")==0)
+  {
+    PrintS("Hell Or Word!");
+    return FALSE;
+  };
 
 #ifdef HAVE_GFAN
 /*======== GFAN ==============*/
