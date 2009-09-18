@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-07-28 07:46:18 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.83 2009-07-28 07:46:18 monerjan Exp $
-$Id: gfan.cc,v 1.83 2009-07-28 07:46:18 monerjan Exp $
+$Date: 2009-09-18 07:26:06 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.84 2009-09-18 07:26:06 monerjan Exp $
+$Id: gfan.cc,v 1.84 2009-09-18 07:26:06 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -1805,7 +1805,7 @@ class gcone
 					fAct = fAct->next;
 				}//if(fAct->isFlippable==TRUE)
 				else {fAct = fAct->next;}
-			}				
+			}//End of copying facets into SLA				
 			
 			SearchListAct = SearchListRoot;	//Set to beginning of list
 			/*Make SearchList doubly linked*/
@@ -2058,8 +2058,8 @@ class gcone
 			* if(notParallelCtr==lengthOfSearchList) but rather
 			* if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE)
 			*/
-			bool removalOccured=FALSE;
-			int ctr=0;	//encountered qualities in SLA
+			volatile bool removalOccured=FALSE;
+			int ctr=0;	//encountered equalities in SLA
 			int notParallelCtr=0;
 			int lengthOfSearchList=1;
 			while(slEnd->next!=NULL)
@@ -2147,7 +2147,7 @@ class gcone
 							notParallelCtr++;
 							slAct = slAct->next;
 						}
-						else
+						else	//fN and slN are parallel
 						{
 							codim2Act = fAct->codim2Ptr;
 							ctr=0;
@@ -2218,7 +2218,7 @@ class gcone
 							else	//facets are NOT equal
 							{
 								doNotAdd=FALSE;
-								//break;
+								break;
 							}
 							//slAct = slAct->next;
 							//delete deleteMarker;							
