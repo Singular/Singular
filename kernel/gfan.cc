@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-09-18 07:26:06 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.84 2009-09-18 07:26:06 monerjan Exp $
-$Id: gfan.cc,v 1.84 2009-09-18 07:26:06 monerjan Exp $
+$Date: 2009-09-18 11:54:36 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.85 2009-09-18 11:54:36 monerjan Exp $
+$Id: gfan.cc,v 1.85 2009-09-18 11:54:36 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -2201,24 +2201,32 @@ class gcone
 											//slEnd = slEndStatic;
 										}
 									} 								
-								else
-								{
-									deleteMarker = slAct;
-									slAct->prev->next = slAct->next;
-									slAct->next->prev = slAct->prev;
-								}
+									else
+									{
+										deleteMarker = slAct;
+										slAct->prev->next = slAct->next;
+										slAct->next->prev = slAct->prev;
+									}
 								
 								//update lengthOfSearchList					
  								lengthOfSearchList--;
 								slAct = slAct->next;
 								//delete deleteMarker;
 								deleteMarker=NULL;
+								//fAct = fAct->next;
  								break;
 							}//if(ctr==fAct->numCodim2Facets)
-							else	//facets are NOT equal
+							else	//facets are parallel but NOT equal. But this does not imply that there
+								//is no other facet later in SLA that might be equal.
 							{
-								doNotAdd=FALSE;
-								break;
+//   								if(slAct->next==NULL)
+//   								{
+									doNotAdd=FALSE;
+ 									slAct = slAct->next;
+									break;
+//   								}
+//   								else
+//   									slAct=slAct->next;
 							}
 							//slAct = slAct->next;
 							//delete deleteMarker;							
@@ -2280,42 +2288,6 @@ class gcone
 						lengthOfSearchList++;
 						//delete f2Normal;						
 					}//if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) ||
-					//remove facets marked as non-flip
-// 					slAct=slHead;
-// 					while(slAct!=NULL)
-// 					{
-// 						if(slAct->isFlippable==FALSE)
-// 						{
-// 							if(slAct==slHead)	//We want to delete the first element of SearchList
-// 							{								
-// 								slHead = slAct->next;					
-// 								if(slHead!=NULL)
-// 									slHead->prev = NULL;
-// 						//set a bool flag to mark slAct as to be deleted
-// 							}
-// 							else if(slAct==slEndStatic)
-// 							{
-// 								if(slEndStatic->next==NULL)
-// 								{
-// 									slEndStatic = slEndStatic->prev;
-// 									slEndStatic->next = NULL;
-// 								}
-// 								else	//we already added a facet after slEndStatic
-// 								{
-// 									slEndStatic->prev->next = slEndStatic->next;
-// 									slEndStatic = slEndStatic->prev;
-// 							//slEnd = slEndStatic;
-// 								}
-// 							}
-// 							else
-// 							{
-// 								slAct->prev->next = slAct->next;
-// 							}
-// 					//update lengthOfSearchList					
-// 							lengthOfSearchList--;
-// 						}
-// 						slAct=slAct->next;
-// 					}
 					fAct = fAct->next;
 				}//if(fAct->isFlippable==TRUE)
 				else
