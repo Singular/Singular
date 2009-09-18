@@ -621,9 +621,9 @@ class LongMinorValue : public MinorValue {
              
              ~LongMinorValue ();
              
-             long LongMinorValue::getResult() const;
+             long getResult() const;
 
-             int LongMinorValue::getWeight () const;
+             int getWeight () const;
 
              /**
              * A method for providing a printable version of the represented MinorValue.
@@ -660,9 +660,9 @@ class PolyMinorValue : public MinorValue {
              
              ~PolyMinorValue ();
 
-             poly PolyMinorValue::getResult() const;
+             poly getResult() const;
 
-             int PolyMinorValue::getWeight () const;
+             int getWeight () const;
 
              /**
              * A method for providing a printable version of the represented MinorValue.

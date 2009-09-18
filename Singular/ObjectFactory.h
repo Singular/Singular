@@ -10,9 +10,9 @@ class ObjectFactory // just static methods for providing new objects, like insta
 public:
   static Poly newStringPoly(const std::string& polyString);
   static Poly newCanonicalPoly(const int i, const ring r);
-  static ring ObjectFactory::newRing(const char* ringName, const int characteristic,
-                                     const int varNumber, const char** varNames,
-                                     const char* ringOrder); // so far only "lp", "dp", "Dp", "ls", "ds", "Ds"
+  static ring newRing(const char* ringName, const int characteristic,
+                      const int varNumber, const char** varNames,
+                      const char* ringOrder); // so far only "lp", "dp", "Dp", "ls", "ds", "Ds"
 };
 
 #endif

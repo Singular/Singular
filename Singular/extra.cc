@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.316 2009-09-17 10:27:37 seelisch Exp $ */
+/* $Id: extra.cc,v 1.317 2009-09-18 09:01:34 seelisch Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2128,14 +2128,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                  (h->next->next->next->next->next->next->next->Typ() == INT_CMD))
         {
           const matrix m          = (const matrix)h->Data();
-          const int k             = (const int)h->next->Data();
-          const int cacheEntries  = (const int)h->next->next->Data();
-          const int cacheWeight   = (const int)h->next->next->next->Data();
-          const int strategies    = (const int)h->next->next->next->next->Data();
-          const int dumpMinors    = (const int)h->next->next->next->next->next->Data();
-          const int dumpResults   = (const int)h->next->next->next->next->next->next->Data();
-          const int dumpComplete  = (const int)h->next->next->next->next->next->next->next->Data();
-          const int dumpConsole   = (const int)h->next->next->next->next->next->next->next->next->Data();
+          const int k             = (const int)(long)h->next->Data();
+          const int cacheEntries  = (const int)(long)h->next->next->Data();
+          const int cacheWeight   = (const int)(long)h->next->next->next->Data();
+          const int strategies    = (const int)(long)h->next->next->next->next->Data();
+          const int dumpMinors    = (const int)(long)h->next->next->next->next->next->Data();
+          const int dumpResults   = (const int)(long)h->next->next->next->next->next->next->Data();
+          const int dumpComplete  = (const int)(long)h->next->next->next->next->next->next->next->Data();
+          const int dumpConsole   = (const int)(long)h->next->next->next->next->next->next->next->next->Data();
           testAllPolyMinors(m, k, cacheEntries, cacheWeight, strategies, dumpMinors, dumpResults, dumpComplete, dumpConsole);
             /* starts the computation of all k x k minors in the
                provided matrix m (which is assumed to have polynomial
