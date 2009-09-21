@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.74 2009-04-30 17:02:33 Singular Exp $ */
+/* $Id: tgb_internal.h,v 1.75 2009-09-21 14:39:55 Singular Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -1017,7 +1017,7 @@ int temp_size,const number_type* row, int len)
   int i;
   for(i=0;i<len;i++)
   {
-      temp_array[i]=F4mat_to_number_type(npAddM((number) temp_array[i], (number) row[i]));
+      temp_array[i]=F4mat_to_number_type(npAddM((number)(long) temp_array[i], (number)(long) row[i]));
       assume(i<temp_size);
   }
 
@@ -1053,7 +1053,7 @@ template <class number_type> void add_sparse(number_type* const temp_array,int t
         for(j=0;j<len;j++)
         {
           int idx=idx_array[j];
-          temp_array[idx]=F4mat_to_number_type(   npAddM((number) temp_array[idx],(number) coef_array[j]));
+          temp_array[idx]=F4mat_to_number_type(   (number_type)(long)npAddM((number) temp_array[idx],(number) coef_array[j]));
           assume(idx<temp_size);
         }
 }
@@ -1067,7 +1067,7 @@ template <class number_type> void sub_sparse(number_type* const temp_array,int t
         for(j=0;j<len;j++)
         {
           int idx=idx_array[j];
-          temp_array[idx]=F4mat_to_number_type(   npSubM((number) temp_array[idx],(number) coef_array[j]));
+          temp_array[idx]=F4mat_to_number_type(  (number_type)(long) npSubM((number) temp_array[idx],(number) coef_array[j]));
           assume(idx<temp_size);
         }
 }
