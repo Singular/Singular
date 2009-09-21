@@ -1,6 +1,6 @@
 // (GMG/BM, last modified 22.06.96)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: inout.lib,v 1.34 2009-04-15 11:14:36 seelisch Exp $";
+version="$Id: inout.lib,v 1.35 2009-09-21 10:14:40 Singular Exp $";
 category="General purpose";
 info="
 LIBRARY:  inout.lib     Printing and Manipulating In- and Output
@@ -686,10 +686,30 @@ EXAMPLE: example writelist; shows an example
    write(fil,"list "+nam+";");
    if( fil[1]==">" ) { fil=fil[2..size(fil)]; }
    if( fil[1]==">" ) { fil=fil[2..size(fil)]; }
-   for( i=1;i<=size(L);i=i+1 )
-   {
-     write(fil,"   "+nam+"["+string(i)+"]="+typeof(L[i])+"(",string(L[i])+");");
-   }
+    for( i=1;i<=size(L);i=i+1 )
+    {
+      if (typeof(L[i]) == "intmat")
+      {
+        write(fil,"   "+nam+"["+string(i)+"]="+
+        "intmat(intvec("+string(L[i])+
+        "),"+string(nrows(L[i]))+","+string(ncols(L[i]))+");");
+      }
+      else
+      {
+        if ( typeof(L[i])== "matrix")
+        {
+          write(fil,"
+          "+nam+"["+string(i)+"]="+
+          "matrix(ideal("+string(L[i])+
+          "),"+string(nrows(L[i]))+","+string(ncols(L[i]))+");");
+        }
+        else
+        {
+          write(fil,"
+          "+nam+"["+string(i)+"]="+typeof(L[i])+"(",string(L[i])+");");
+        }
+      }
+    }
    return();
 }
 example
