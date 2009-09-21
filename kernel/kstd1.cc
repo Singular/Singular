@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.59 2009-08-17 08:29:23 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.60 2009-09-21 14:39:19 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -1167,6 +1167,8 @@ static int mora_count = 0;
 static int mora_loop_count;
 #endif
 
+void kDebugPrint(kStrategy strat);
+
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 {
 #ifdef HAVE_ASSUME
@@ -1212,14 +1214,19 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     reorderL(strat);
   }
   srmax = strat->sl;
+
   kTest_TS(strat);
   strat->use_buckets = kMoraUseBucket(strat);
   /*- compute-------------------------------------------*/
 
 #ifdef HAVE_TAIL_RING
 //  if (strat->homog && strat->red == redFirst)
-    kStratInitChangeTailRing(strat);
+  kStratInitChangeTailRing(strat);
 #endif
+  if (BVERBOSE(23))
+  {
+    kDebugPrint(strat);
+  }
 
   while (strat->Ll >= 0)
   {
