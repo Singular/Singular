@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication by formulas in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAFormula.cc,v 1.2 2008-07-26 14:28:03 motsak Exp $
+ *  Version: $Id: ncSAFormula.cc,v 1.3 2009-09-22 10:20:56 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -19,6 +19,8 @@
 
 
 #include "mod2.h"
+
+#ifdef HAVE_PLURAL
 
 #ifndef NDEBUG
 #define OUTPUT 1
@@ -557,4 +559,4 @@ poly CFormulaPowerMultiplier::ncSA_1xy0xBy0(const int i, const int j, const int 
 {
   return ::ncSA_1xy0xBy0(i, j, n, m, m_shiftCoef, r);
 }
-
+#endif

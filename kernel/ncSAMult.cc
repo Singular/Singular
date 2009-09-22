@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.12 2009-02-23 13:52:19 Singular Exp $
+ *  Version: $Id: ncSAMult.cc,v 1.13 2009-09-22 10:20:56 Singular Exp $
  *******************************************************************/
 
 #define MYTEST 0
@@ -19,6 +19,8 @@
 
 
 #include "mod2.h"
+
+#ifdef HAVE_PLURAL
 
 #ifndef NDEBUG
 #define OUTPUT 1
@@ -1044,7 +1046,4 @@ poly CSpecialPairMultiplier::MultiplyEM(const CExponent expLeft, const poly pMon
 
   return MultiplyEE(expLeft, p_GetExp(pMonom, GetI(), GetBasering()));
 }
-
-
-
-
+#endif

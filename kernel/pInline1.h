@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.17 2009-02-23 13:27:31 Singular Exp $
+ *  Version: $Id: pInline1.h,v 1.18 2009-09-22 10:20:56 Singular Exp $
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H
@@ -18,6 +18,7 @@
 #include <mylimits.h>
 #include "p_MemCmp.h"
 #include "structs.h"
+#include "ring.h"
 #include "numbers.h"
 
 #if PDEBUG > 0 || defined(NO_PINLINE1)
