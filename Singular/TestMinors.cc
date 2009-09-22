@@ -1,6 +1,7 @@
 #include "mod2.h"
 #include "structs.h"
 #include "polys.h"
+#include "matpol.h"
 #include <Cache.h>
 #include <Minor.h>
 #include <MinorProcessor.h>
