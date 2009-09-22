@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-09-18 11:54:36 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.85 2009-09-18 11:54:36 monerjan Exp $
-$Id: gfan.cc,v 1.85 2009-09-18 11:54:36 monerjan Exp $
+$Date: 2009-09-22 09:40:10 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.86 2009-09-22 09:40:10 monerjan Exp $
+$Id: gfan.cc,v 1.86 2009-09-22 09:40:10 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -52,8 +52,17 @@ $Id: gfan.cc,v 1.85 2009-09-18 11:54:36 monerjan Exp $
 #include "/u/slg/monerjan/cddlib/include/cddmp.h"
 #endif
 
+#ifdef p800
+#include "../../cddlib/include/setoper.h"
+#include "../../cddlib/include/cdd.h"
+#include "../../cddlib/include/cddmp.h"
+#endif
+
 #ifndef gfan_DEBUG
 #define gfan_DEBUG
+#ifndef gfan_DEBUGLEVEL
+#define gfan_DEBUGLEVEL 1
+#endif
 #endif
 
 //#include gcone.h
@@ -274,24 +283,27 @@ class facet
 			intvec *f2Normal;
 			cout << "=======================" << endl;
 			cout << "Facet normal = (";
-			for(int ii=0;ii<pVariables;ii++)
+			fNormal->show(1,1);
+			cout << ")"<<endl;
+			/*for(int ii=0;ii<pVariables;ii++)
 			{
 				cout << (*fNormal)[ii] << ",";
 			}
 			if(this->isFlippable==TRUE)
 				cout << ")" << endl;
 			else
-				cout << ")*" << endl;	//This case should never happen in SLA!
+				cout << ")*" << endl;*/	//This case should never happen in SLA!
 			cout << "-----------------------" << endl;
 			cout << "Codim2 facets:" << endl;
 			while(codim2Act!=NULL)
 			{
 				f2Normal = codim2Act->getFacetNormal();
 				cout << "(";
-				for(int jj=0;jj<pVariables;jj++)
-				{
-					cout << (*f2Normal)[jj] << ",";
-				}
+				f2Normal->show(1,0);
+// 				for(int jj=0;jj<pVariables;jj++)
+// 				{
+// 					cout << (*f2Normal)[jj] << ",";
+// 				}
 				cout << ")" << endl;
 				codim2Act = codim2Act->next;
 			}
@@ -667,8 +679,8 @@ class gcone
 #ifdef gfan_DEBUG
 			else
 			{
-				cout << "Redundant rows: ";
-				set_fwrite(stdout, ddredrows);		//otherwise print the redundant rows
+// 				cout << "Redundant rows: ";
+// 				set_fwrite(stdout, ddredrows);		//otherwise print the redundant rows
 			}//if dd_Error
 #endif
 			//Remove reduntant rows here!
@@ -810,6 +822,8 @@ class gcone
 		
 		/** \brief Compute the (codim-2)-facets of a given cone
 		* This method is used during noRevS
+		* Additionally we check whether the codim2-facet normal is strictly positive. Otherwise
+		* the facet is marked as non-flippable.
 		*/
 		void getCodim2Normals(gcone const &gc)
 		{
@@ -972,9 +986,9 @@ class gcone
 					}						
 				}//while
 #ifdef gfan_DEBUG
- 				cout << "Initial Form=";				
- 				pWrite(initialFormElement[ii]);
- 				cout << "---" << endl;
+//  				cout << "Initial Form=";				
+//  				pWrite(initialFormElement[ii]);
+//  				cout << "---" << endl;
 #endif
 				/*Now initialFormElement must be added to (ideal)initialForm */
 				initialForm->m[ii]=initialFormElement[ii];
@@ -1069,7 +1083,7 @@ class gcone
 			/* additionally one row for the standard-simplex and another for a row that becomes 0 during
 			construction of the differences
 			*/
-			intPointMatrix = dd_CreateMatrix(iPMatrixRows+10,this->numVars+1);
+			intPointMatrix = dd_CreateMatrix(iPMatrixRows+3,this->numVars+1); //iPMatrixRows+10;
 			intPointMatrix->numbtype=dd_Integer;	//NOTE: DO NOT REMOVE OR CHANGE TO dd_Rational
 			
 			for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
@@ -1408,6 +1422,10 @@ class gcone
 			//NOTE: Make this n-dimensional!
 			//dd_set_si(M->rowvec[0],1);dd_set_si(M->rowvec[1],1);dd_set_si(M->rowvec[2],1);
 									
+			/*NOTE: Leave the following line commented out!
+			* Otherwise it will cause interior points that are not strictly positive on some examples
+			* 
+			*/
 			//dd_MatrixCanonicalize(&M, &ddlinset, &ddredrows, &ddnewpos, &err);
 			//if (err!=dd_NoError){cout << "Error during dd_MatrixCanonicalize" << endl;}
 			//cout << "Tick 2" << endl;
@@ -1829,7 +1847,7 @@ class gcone
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			We always choose the first facet from fListPtr as facet to be flipped
 			*/			
-			while(SearchListAct!=NULL)// && counter<limit)
+			while((SearchListAct!=NULL) )
 			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!				
 				fAct = SearchListAct;
 				//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) )
@@ -2054,6 +2072,15 @@ class gcone
 			
 			/** Flag to indicate a facet that should be added to SLA*/
 			bool doNotAdd=FALSE;
+			/** \brief  Flag to mark a facet that might be added
+			* The following case may occur:
+			* A facet fAct is found to be parallel but not equal to the current facet slAct from SLA.
+			* This does however not mean that there does not exist a facet behind the current slAct that is actually equal
+			* to fAct. In this case we set the boolean flag maybe to TRUE. If we encounter an equality lateron, it is reset to
+			* FALSE and the according slAct is deleted. 
+			* If slAct->next==NULL AND maybe==TRUE we know, that fAct must be added
+			*/
+			volatile bool maybe=FALSE;
 			/**A facet was removed, lengthOfSearchlist-- thus we must not rely on 
 			* if(notParallelCtr==lengthOfSearchList) but rather
 			* if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE)
@@ -2075,9 +2102,10 @@ class gcone
 			intvec *sl2Normal=NULL; //= new intvec(this->numVars);
 			
 			while(fAct!=NULL)
-			{				
+			{						
 				if(fAct->isFlippable==TRUE)
 				{
+					maybe=FALSE;
 					doNotAdd=TRUE;
 					fNormal=fAct->getFacetNormal();
 					slAct = slHead;
@@ -2145,10 +2173,11 @@ class gcone
 						if(!isParallel(fNormal, slNormal))
 						{
 							notParallelCtr++;
-							slAct = slAct->next;
+// 							slAct = slAct->next;
 						}
 						else	//fN and slN are parallel
 						{
+							//We check whether the codim-2-facets coincide
 							codim2Act = fAct->codim2Ptr;
 							ctr=0;
 							while(codim2Act!=NULL)
@@ -2171,12 +2200,13 @@ class gcone
 								cout << "Removing facet (";
 								slNormal->show(1,0);
 								cout << ") from SLA:" << endl;
-								fAct->fDebugPrint();
-								slAct->fDebugPrint();
+ 								fAct->fDebugPrint();
+ 								slAct->fDebugPrint();
 #endif
 								removalOccured=TRUE;
 								slAct->isFlippable=FALSE;
-								doNotAdd=TRUE;								
+								doNotAdd=TRUE;
+								maybe=FALSE;								
 								if(slAct==slHead)	//We want to delete the first element of SearchList
 								{
 									deleteMarker = slHead;				
@@ -2210,7 +2240,7 @@ class gcone
 								
 								//update lengthOfSearchList					
  								lengthOfSearchList--;
-								slAct = slAct->next;
+								//slAct = slAct->next; //not needed, since facets are equal
 								//delete deleteMarker;
 								deleteMarker=NULL;
 								//fAct = fAct->next;
@@ -2219,18 +2249,25 @@ class gcone
 							else	//facets are parallel but NOT equal. But this does not imply that there
 								//is no other facet later in SLA that might be equal.
 							{
-//   								if(slAct->next==NULL)
-//   								{
-									doNotAdd=FALSE;
- 									slAct = slAct->next;
-									break;
-//   								}
-//   								else
-//   									slAct=slAct->next;
+								maybe=TRUE;
+//       								if(slAct->next==NULL && maybe==TRUE)
+//       								{
+//  									doNotAdd=FALSE;
+//    									slAct = slAct->next;
+//  									break;
+//       								}
+//       								else
+//    									slAct=slAct->next;
 							}
 							//slAct = slAct->next;
 							//delete deleteMarker;							
 						}//if(!isParallel(fNormal, slNormal))
+ 						if( (slAct->next==NULL) && (maybe==TRUE) )
+ 						{
+ 							doNotAdd=FALSE;
+ 							break;
+ 						}
+ 						slAct = slAct->next;
 						/* NOTE The following lines must not be here but rather called inside the if-block above.
 						Otherwise results get crappy. Unfortunately there are two slAct=slAct->next calls now,
 						(not nice!) but since they are in seperate branches of the if-statement there should not
