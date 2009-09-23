@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-09-22 09:40:10 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.86 2009-09-22 09:40:10 monerjan Exp $
-$Id: gfan.cc,v 1.86 2009-09-22 09:40:10 monerjan Exp $
+$Date: 2009-09-23 09:36:06 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.87 2009-09-23 09:36:06 monerjan Exp $
+$Id: gfan.cc,v 1.87 2009-09-23 09:36:06 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -799,6 +799,14 @@ class gcone
 			if (compIntPoint==TRUE)
 			{
 				intvec *iv = new intvec(this->numVars);
+				dd_MatrixPtr posRestr=dd_CreateMatrix(this->numVars,this->numVars+1);
+				int jj=1;
+				for (int ii=0;ii<=this->numVars;ii++)
+				{
+					dd_set_si(posRestr->matrix[ii][jj],1);
+					jj++;							
+				}
+				dd_MatrixAppendTo(&ddineq,posRestr);
 				interiorPoint(ddineq, *iv);	//NOTE ddineq contains non-flippable facets
 				this->setIntPoint(iv);	//stores the interior point in gcone::ivIntPt
 				//delete iv;
@@ -1083,7 +1091,7 @@ class gcone
 			/* additionally one row for the standard-simplex and another for a row that becomes 0 during
 			construction of the differences
 			*/
-			intPointMatrix = dd_CreateMatrix(iPMatrixRows+3,this->numVars+1); //iPMatrixRows+10;
+			intPointMatrix = dd_CreateMatrix(iPMatrixRows+10,this->numVars+1); //iPMatrixRows+10;
 			intPointMatrix->numbtype=dd_Integer;	//NOTE: DO NOT REMOVE OR CHANGE TO dd_Rational
 			
 			for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
@@ -1167,6 +1175,15 @@ class gcone
 			{
 				dd_set_si(intPointMatrix->matrix[aktrow][jj],1);
 			}
+			//Let's make sure we compute interior points from the positive orthant
+			dd_MatrixPtr posRestr=dd_CreateMatrix(this->numVars,this->numVars+1);
+			int jj=1;
+			for (int ii=0;ii<this->numVars;ii++)
+			{
+				dd_set_si(posRestr->matrix[ii][jj],1);
+				jj++;							
+			}
+			dd_MatrixAppendTo(&intPointMatrix,posRestr);
 #ifdef gfan_DEBUG
 // 			dd_WriteMatrix(stdout,intPointMatrix);
 #endif
