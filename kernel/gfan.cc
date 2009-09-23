@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-09-23 09:36:06 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.87 2009-09-23 09:36:06 monerjan Exp $
-$Id: gfan.cc,v 1.87 2009-09-23 09:36:06 monerjan Exp $
+$Date: 2009-09-23 10:20:00 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.88 2009-09-23 10:20:00 monerjan Exp $
+$Id: gfan.cc,v 1.88 2009-09-23 10:20:00 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -548,6 +548,19 @@ class gcone
 			}
 		}
 		
+		void idDebugPrint(ideal const &I)
+		{
+			int numElts=IDELEMS(I);
+			cout << "Ideal with " << numElts << " generators" << endl;
+			cout << "Leading terms: ";
+			for (int ii=0;ii<numElts;ii++)
+			{
+				pWrite0(pHead(I->m[ii]));
+				cout << ",";
+			}
+			cout << endl;
+		}
+		
 		/** \brief Set gcone::numFacets */
 		void setNumFacets()
 		{
@@ -946,10 +959,10 @@ class gcone
 			//std::cout << "===" << std::endl;
 			std::cout << "running gcone::flip" << std::endl;
 			std::cout << "flipping UCN " << this->getUCN() << endl;
-			for(int ii=0;ii<IDELEMS(gb);ii++)
-			{
-				pWrite((poly)gb->m[ii]);
-			}
+// 			for(int ii=0;ii<IDELEMS(gb);ii++)	//not very handy with large examples
+// 			{
+// 				pWrite((poly)gb->m[ii]);
+// 			}
 			cout << "over facet (";
  			fNormal->show(1,0);
 			cout << ") with UCN " << f->getUCN();
@@ -1247,7 +1260,8 @@ class gcone
 			f->flipRing=rCopy(dstRing);	//store the ring on the other side
 //#ifdef gfan_DEBUG
 			cout << "Flipped GB is UCN " << counter+1 << ":" << endl;
-			f->printFlipGB();
+			//f->printFlipGB();
+			this->idDebugPrint(dstRing_I);
 			cout << endl;
 //#endif			
 			rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
@@ -1864,7 +1878,7 @@ class gcone
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			We always choose the first facet from fListPtr as facet to be flipped
 			*/			
-			while((SearchListAct!=NULL) )
+			while((SearchListAct!=NULL) && counter<157)
 			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!				
 				fAct = SearchListAct;
 				//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) )
