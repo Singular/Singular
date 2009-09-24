@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.52 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id: longalg.cc,v 1.53 2009-09-24 17:59:09 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -1637,7 +1637,7 @@ BOOLEAN naIsMOne(number za)
 void naPower(number p, int i, number *rc)
 {
   number x;
-  *rc = naInit(1,nacRing);
+  *rc = naInit(1,currRing);
   for (; i > 0; i--)
   {
     x = naMult(*rc, p);
