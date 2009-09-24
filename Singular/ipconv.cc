@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.41 2008-12-09 10:53:49 Singular Exp $ */
+/* $Id: ipconv.cc,v 1.42 2009-09-24 16:36:12 Singular Exp $ */
 /*
 * ABSTRACT: automatic type conversions
 */
@@ -154,7 +154,7 @@ static void * iiI2N(void *data)
 
 static void * iiI2BI(void *data)
 {
-  number n=nlInit((int)(long)data);
+  number n=nlInit((int)(long)data, NULL /*dummy for nlInit*/);
   return (void *)n;
 }
 

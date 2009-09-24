@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.17 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: longalg.h,v 1.18 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -27,7 +27,7 @@ extern ring nacRing;
 
 void naSetChar(int p, ring r);
 void    naDelete (number *p, const ring r);
-number  naInit(int i);                              /* z := i */
+number  naInit(int i, const ring r);                /* z := i */
 number  naPar(int i);                               /* z := par(i) */
 int     naParDeg(number n);                         /* i := deg(n) */
 int     naSize(number n);                           /* size desc. */

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.h,v 1.4 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: gnumpfl.h,v 1.5 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
@@ -16,7 +16,7 @@ BOOLEAN  ngfIsOne(number a);
 BOOLEAN  ngfIsMOne(number a);
 BOOLEAN  ngfIsZero(number za);
 void     ngfNew(number *r);
-number   ngfInit(int i);
+number   ngfInit(int i, const ring r);
 int      ngfInt(number &n, const ring r);
 number   ngfNeg(number za);
 number   ngfInvers(number a);

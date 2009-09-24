@@ -2,7 +2,7 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 
-/* $Id: mpsr_GetPoly.cc,v 1.36 2009-08-14 17:13:42 Singular Exp $ */
+/* $Id: mpsr_GetPoly.cc,v 1.37 2009-09-24 16:36:13 Singular Exp $ */
 
 /***************************************************************
  *
@@ -144,7 +144,7 @@ static mpsr_Status_t GetModuloNumber(MP_Link_pt link, number *a)
 {
   MP_Uint32_t x;
   mp_failr(IMP_GetUint32(link, &x));
-  *a=npInit((int)x);
+  *a=npInit((int)x, currRing);
   return mpsr_Success;
 }
 
@@ -224,7 +224,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   if (node == MP_Sint32Type)
   {
     mp_failr(IMP_GetSint32(link, &i));
-    *x = nlInit(i);
+    *x = nlInit(i, currRing);
   }
   else if (node == MP_ApIntType)
   {
@@ -261,17 +261,17 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   }
   // check for some more esoteric cases
   else if (node == MP_Uint8Type)
-    *x = nlInit(cvalue);
+    *x = nlInit(cvalue, currRing);
   else if (node == MP_Sint8Type)
     // be careful -- need to handle the value "-2", for example
-    *x = nlInit((int) ((MP_Sint8_t) cvalue));
+    *x = nlInit((int) ((MP_Sint8_t) cvalue), currRing);
   else if (node == MP_Uint32Type)
   {
     MP_Uint32_t ui;
     mp_failr(IMP_GetUint32(link, &ui));
     // check whether u_int can be casted safely to int
     if (ui < INT_MAX)
-      *x = nlInit(ui);
+      *x = nlInit(ui, currRing);
     else
     {
       // otherwise, make an apint out of it

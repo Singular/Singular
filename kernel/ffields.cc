@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.cc,v 1.11 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: ffields.cc,v 1.12 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -158,7 +158,7 @@ number nfMult (number a,number b)
 /*2
 * int -> number
 */
-number nfInit (int i)
+number nfInit (int i, const ring r)
 {
   // Hmm .. this is just to prevent initialization
   // from nfInitChar to go into an infinite loop
@@ -478,13 +478,13 @@ const char * nfRead (const char *s, number *a)
   number n;
 
   s = nfEati(s, &i);
-  z=nfInit(i);
+  z=nfInit(i, currRing);
   *a=z;
   if (*s == '/')
   {
     s++;
     s = nfEati(s, &i);
-    n=nfInit(i);
+    n=nfInit(i, currRing);
     *a = nfDiv(z,n);
   }
   if (strncmp(s,nfParameter,strlen(nfParameter))==0)
@@ -669,7 +669,7 @@ err:
 */
 number nfMapP(number c)
 {
-  return nfInit((int)((long)c));
+  return nfInit((int)((long)c), currRing);
 }
 
 /*2

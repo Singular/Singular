@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.19 2009-08-13 17:31:50 motsak Exp $
+ *  Version: $Id: p_polys.cc,v 1.20 2009-09-24 16:37:41 Singular Exp $
  *******************************************************************/
 
 
@@ -1111,7 +1111,7 @@ poly p_ISet(int i, const ring r)
   if (i!=0)
   {
     rc = p_Init(r);
-    pSetCoeff0(rc,r->cf->nInit(i));
+    pSetCoeff0(rc,n_Init(i,r));
     if (r->cf->nIsZero(p_GetCoeff(rc,r)))
       p_DeleteLm(&rc,r);
   }
@@ -1124,7 +1124,7 @@ poly p_ISet(int i, const ring r)
 poly p_One(const ring r)
 {
   poly rc = p_Init(r);
-  pSetCoeff0(rc,r->cf->nInit(1));
+  pSetCoeff0(rc,n_Init(1,r));
   return rc;
 }
 

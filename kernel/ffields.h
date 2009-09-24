@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ffields.h,v 1.4 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: ffields.h,v 1.5 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
@@ -12,7 +12,7 @@
 
 BOOLEAN nfGreaterZero (number k);
 number  nfMult        (number a, number b);
-number  nfInit        (int i);
+number  nfInit        (int i, const ring r);
 number  nfPar         (int i);
 int     nfParDeg      (number n);
 int     nfInt         (number &n, const ring r);

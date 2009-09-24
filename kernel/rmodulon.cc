@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.38 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.39 2009-09-24 16:37:42 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -30,7 +30,7 @@ unsigned long nrnExponent = 0;
 /*
  * create a number from int
  */
-number nrnInit (int i)
+number nrnInit (int i, const ring r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init_set_si(erg, i);
@@ -144,7 +144,7 @@ number nrnLcm (number a,number b,ring r)
  */
 number nrnGcd (number a,number b,ring r)
 {
-  if ((a == NULL) && (b == NULL)) return nrnInit(0);
+  if ((a == NULL) && (b == NULL)) return nrnInit(0,r);
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init_set(erg, nrnModul);
   if (a != NULL) mpz_gcd(erg, erg, (int_number) a);
@@ -227,7 +227,7 @@ BOOLEAN nrnIsUnit (number a)
 
 number  nrnGetUnit (number k)
 {
-  if (mpz_divisible_p(nrnModul, (int_number) k)) return nrnInit(1);
+  if (mpz_divisible_p(nrnModul, (int_number) k)) return nrnInit(1,currRing);
 
   int_number unit = (int_number) nrnGcd(k, 0, currRing);
   mpz_tdiv_q(unit, (int_number) k, unit);

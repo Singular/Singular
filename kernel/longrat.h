@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.15 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: longrat.h,v 1.16 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers
 */
@@ -47,7 +47,7 @@ struct snumber
 #endif // DO_LINLINE
 
 LINLINE BOOLEAN  nlEqual(number a, number b);
-LINLINE number   nlInit(int i);
+LINLINE number   nlInit(int i, const ring r);
 number nlRInit (int i);
 LINLINE BOOLEAN  nlIsOne(number a);
 LINLINE BOOLEAN  nlIsZero(number za);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shortfl.cc,v 1.8 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: shortfl.cc,v 1.9 2009-09-24 16:37:42 Singular Exp $ */
 
 /*
 * ABSTRACT:
@@ -47,7 +47,7 @@ number nrMult (number a,number b)
 /*2
 * create a number from int
 */
-number nrInit (int i)
+number nrInit (int i, const ring R)
 {
   float r = (float)i;
   return nf(nf(r).F()).N();

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.cc,v 1.18 2009-09-21 13:59:32 Singular Exp $ */
+/* $Id: modulop.cc,v 1.19 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -61,11 +61,11 @@ number npMult (number a,number b)
 /*2
 * create a number from int
 */
-number npInit (int i)
+number npInit (int i, const ring r)
 {
   long ii=i;
-  while (ii <  0)                    ii += npPrimeM;
-  while ((ii>1) && (ii >= npPrimeM)) ii -= npPrimeM;
+  while (ii <  0L)                         ii += (long)r->ch;
+  while ((ii>1L) && (ii >= ((long)r->ch))) ii -= (long)r->ch;
   return (number)ii;
 }
 
@@ -405,7 +405,7 @@ BOOLEAN npDBTest (number a, const char *f, const int l)
 
 number npMap0(number from)
 {
-  return npInit(nlModP(from,npPrimeM));
+  return npInit(nlModP(from,npPrimeM),currRing);
 }
 
 number npMapP(number from)
@@ -433,7 +433,7 @@ static number npMapLongR(number from)
 
   size = (*f)[0]._mp_size;
   if (size == 0)
-    return npInit(0);
+    return npInit(0,currRing);
   if(size<0)
     size = -size;
 

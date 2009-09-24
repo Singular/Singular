@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.13 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: rmodulo2m.h,v 1.14 2009-09-24 16:37:42 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -15,7 +15,7 @@ extern NATNUMBER nr2mModul;
 
 BOOLEAN nr2mGreaterZero (number k);
 number  nr2mMult        (number a, number b);
-number  nr2mInit        (int i);
+number  nr2mInit        (int i, const ring r);
 int     nr2mInt         (number &n, const ring r);
 number  nr2mAdd         (number a, number b);
 number  nr2mSub         (number a, number b);

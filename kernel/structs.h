@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.65 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: structs.h,v 1.66 2009-09-24 16:37:42 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -274,7 +274,7 @@ struct n_Procs_s
    // general stuff
    numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
    void    (*nNew)(number * a);
-   number  (*nInit)(int i);
+   number  (*cfInit)(int i,const ring r);
    number  (*nPar)(int i);
    int     (*nParDeg)(number n);
    int     (*nSize)(number n);

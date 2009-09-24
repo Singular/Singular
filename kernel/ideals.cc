@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.77 2009-08-13 17:31:49 motsak Exp $ */
+/* $Id: ideals.cc,v 1.78 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -3978,7 +3978,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
           xx[j]->m[i]=hh;
         }
         else
-          x[j]=nlInit(0);
+          x[j]=nlInit(0, currRing);
       }
       number n=nlChineseRemainder(x,q,rl);
       for(j=rl-1;j>=0;j--)

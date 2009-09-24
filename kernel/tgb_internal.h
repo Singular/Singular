@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.75 2009-09-21 14:39:55 Singular Exp $ */
+/* $Id: tgb_internal.h,v 1.76 2009-09-24 16:37:42 Singular Exp $ */
 /*
  * ABSTRACT: tgb internal .h file
 */
@@ -792,7 +792,7 @@ template<class number_type> MonRedResNP<number_type> noro_red_mon_to_non_poly(po
   {
     number coef_bak=p_GetCoeff(t,c->r);
 
-    p_SetCoeff(t,npInit(1),c->r);
+    p_SetCoeff(t,npInit(1,c->r),c->r);
     assume(npIsOne(p_GetCoeff(c->strat->S[i],c->r)));
     number coefstrat=p_GetCoeff(c->strat->S[i],c->r);
 
@@ -819,7 +819,7 @@ template<class number_type> MonRedResNP<number_type> noro_red_mon_to_non_poly(po
 
   } else {
     number coef_bak=p_GetCoeff(t,c->r);
-    number one=npInit(1);
+    number one=npInit(1, currRing);
     p_SetCoeff(t,one,c->r);
 
     res_holder.ref=cache->insertAndTransferOwnerShip(t,c->r);
@@ -1079,7 +1079,7 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
    number_type* temp_array=(number_type*) cache->tempBuffer;//omalloc(cache->nIrreducibleMonomials*sizeof(number_type));
    int temp_size=cache->nIrreducibleMonomials;
    memset(temp_array,0,temp_size_bytes);
-   number minus_one=npInit(-1);
+   number minus_one=npInit(-1,currRing);
    int i;
    for(i=0;i<len;i++)
    {
@@ -1285,8 +1285,8 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
   CoefIdx<number_type>* pairs=(CoefIdx<number_type>*) cache->tempBuffer; //omalloc(together*sizeof(CoefIdx<number_type>));
   int pos=0;
   int j;
-  const number one=npInit(1);
-  const number minus_one=npInit(-1);
+  const number one=npInit(1, currRing);
+  const number minus_one=npInit(-1, currRing);
   for(i=0;i<len;i++)
   {
     MonRedResNP<number_type> red=mon[i];
@@ -1393,17 +1393,18 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
 template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c){
   assume(len==pLength(p));
   poly orig_p=p;
-  if (p==NULL) {
+  if (p==NULL)
+  {
     len=0;
     return NULL;
   }
 
-  number zero=npInit(0);
+  number zero=npInit(0,currRing);
   MonRedResNP<number_type>* mon=(MonRedResNP<number_type>*) omalloc(len*sizeof(MonRedResNP<number_type>));
   int i=0;
   double max_density=0.0;
-  while(p){
-
+  while(p!=NULL)
+  {
     poly t=p;
     pIter(p);
     pNext(t)=NULL;
@@ -1541,7 +1542,7 @@ public:
   {
     //assume rows "under r" have bigger or equal start index
     number_type* row_array=rows[r];
-    number_type zero=F4mat_to_number_type(npInit(0));
+    number_type zero=F4mat_to_number_type(npInit(0, currRing));
     int start=startIndices[r];
     number_type coef=row_array[start];
     assume(start<ncols);
@@ -1551,7 +1552,7 @@ public:
       multiplyRow(r,F4mat_to_number_type(npInvers((number) coef)));
     assume(npIsOne((number) row_array[start]));
     int lastIndex=modP_lastIndexRow(row_array, ncols);
-    number minus_one=npInit(-1);
+    number minus_one=npInit(-1, currRing);
     for (other_row=r+1;other_row<nrows;other_row++)
     {
       assume(startIndices[other_row]>=start);
@@ -1820,7 +1821,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   pn=non_zeros;
   number_type* number_array=(number_type*) omalloc(n*pn*sizeof(number_type));
   memset(number_array,0,sizeof(number_type)*n*pn);
-  number zero=npInit(0);
+  number zero=npInit(0, currRing);
 
   for(j=0;j<pn;j++){
     int i;

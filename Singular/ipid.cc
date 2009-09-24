@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipid.cc,v 1.87 2009-07-28 14:18:34 Singular Exp $ */
+/* $Id: ipid.cc,v 1.88 2009-09-24 16:36:12 Singular Exp $ */
 
 /*
 * ABSTRACT: identfier handling
@@ -294,7 +294,7 @@ idhdl idrec::set(const char * s, int lev, idtyp t, BOOLEAN init)
         IDNUMBER(h) = nInit(0);
         break;
       case BIGINT_CMD:
-        IDNUMBER(h) = nlInit(0);
+        IDNUMBER(h) = nlInit(0, NULL /* dummy for nlInit*/);
         break;
       case IDEAL_CMD:
       case MODUL_CMD:

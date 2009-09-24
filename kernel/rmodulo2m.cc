@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.27 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: rmodulo2m.cc,v 1.28 2009-09-24 16:37:42 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -130,7 +130,7 @@ void nr2mPower (number a, int i, number * result)
 /*
  * create a number from int
  */
-number nr2mInit (int i)
+number nr2mInit (int i, const ring r)
 {
   long ii = i;
   while (ii < 0) ii += nr2mModul;

@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.18 2009-09-16 12:26:26 Singular Exp $
+// $Id: clapconv.cc,v 1.19 2009-09-24 16:37:41 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -481,7 +481,7 @@ number   nlChineseRemainder(number *x, number *q,int rl)
   chineseRemainder(X,Q,xnew,qnew);
   number n=convFactoryNSingN(xnew);
   number p=convFactoryNSingN(qnew);
-  number p2=nlIntDiv(p,nlInit(2));
+  number p2=nlIntDiv(p,nlInit(2, currRing));
   if (nlGreater(n,p2))
   {
      number n2=nlSub(n,p);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.44 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: longrat.cc,v 1.45 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -105,7 +105,7 @@ static ring nlMapRing;
 static number nlMapP(number from)
 {
   number to;
-  to = nlInit(npInt(from,nlMapRing));
+  to = nlInit(npInt(from,nlMapRing), currRing);
   return to;
 }
 
@@ -2228,7 +2228,7 @@ LINLINE BOOLEAN nlEqual (number a, number b)
 }
 
 
-LINLINE number nlInit (int i)
+LINLINE number nlInit (int i, const ring r)
 {
   number n;
   if ( ((i << 3) >> 3) == i ) n=INT_TO_SR(i);

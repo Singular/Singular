@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: modulop.h,v 1.9 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: modulop.h,v 1.10 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
@@ -27,7 +27,7 @@ extern long npMapPrime;
 
 BOOLEAN npGreaterZero (number k);
 number  npMult        (number a, number b);
-number  npInit        (int i);
+number  npInit        (int i, const ring r);
 int     npInt         (number &n, const ring r);
 number  npAdd         (number a, number b);
 number  npSub         (number a, number b);

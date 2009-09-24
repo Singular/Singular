@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.19 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: numbers.h,v 1.20 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -19,7 +19,7 @@
 #define n_Sub(n1, n2, r)      (r)->cf->nSub(n1, n2)
 //#define n_GetChar(r)          ((r)->cf->nChar)
 #define n_GetChar(r)          ((r)->ch)
-#define n_Init(i, r)          (r)->cf->nInit(i)
+#define n_Init(i, r)          (r)->cf->cfInit(i,r)
 #define n_IsOne(n, r)         (r)->cf->nIsOne(n)
 #define n_IsMOne(n, r)        (r)->cf->nIsMOne(n)
 #define n_GreaterZero(n, r)   (r)->cf->nGreaterZero(n)
@@ -45,8 +45,8 @@ extern unsigned short fftable[];
 /* prototypes */
 extern numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
 extern void    (*nNew)(number * a);
-extern number  (*nInit)(int i);
 extern number  (*nInit_bigint)(number i);
+#define        nInit(i) n_Init(i,currRing)
 extern number  (*nPar)(int i);
 extern int     (*nParDeg)(number n);
 extern int     (*nSize)(number n);

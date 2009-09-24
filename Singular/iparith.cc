@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.515 2009-09-16 12:45:30 Singular Exp $ */
+/* $Id: iparith.cc,v 1.516 2009-09-24 16:36:12 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1719,14 +1719,14 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
   int i;
   for(i=rl-1;i>=0;i--)
   {
-    q[i]=nlInit((*p)[i]);
-    x[i]=nlInit((*c)[i]);
+    q[i]=nlInit((*p)[i], NULL);
+    x[i]=nlInit((*c)[i], NULL);
   }
   number n=nlChineseRemainder(x,q,rl);
   for(i=rl-1;i>=0;i--)
   {
-    nlDelete(&(q[i]),currRing);
-    nlDelete(&(x[i]),currRing);
+    nlDelete(&(q[i]),NULL);
+    nlDelete(&(x[i]),NULL);
   }
   omFree(x); omFree(q);
   res->data=(char *)n;
@@ -1817,7 +1817,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   number *q=(number *)omAlloc(rl*sizeof(number));
   for(i=rl-1;i>=0;i--)
   {
-    q[i]=nlInit((*p)[i]);
+    q[i]=nlInit((*p)[i], currRing);
   }
   result=idChineseRemainder(x,q,rl);
   for(i=rl-1;i>=0;i--)
@@ -2254,7 +2254,7 @@ static BOOLEAN jjGCD_BI(leftv res, leftv u, leftv v)
   number b=(number) v->Data();
   if (nlIsZero(a))
   {
-    if (nlIsZero(b)) res->data=(char *)nlInit(1);
+    if (nlIsZero(b)) res->data=(char *)nlInit(1, NULL);
     else             res->data=(char *)nlCopy(b);
   }
   else
@@ -4277,7 +4277,7 @@ static number jjLONG2N(long d)
   int i=(int)d;
   if ((long)i == d)
   {
-    return nlInit(i);
+    return nlInit(i, NULL);
   }
   else
   {
@@ -4290,7 +4290,7 @@ static number jjLONG2N(long d)
   }
 }
 #else
-#define jjLONG2N(D) nlInit((int)D)
+#define jjLONG2N(D) nlInit((int)D, NULL)
 #endif
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
@@ -4368,15 +4368,12 @@ static BOOLEAN jjN2BI(leftv res, leftv v)
   number n,i; i=(number)v->Data();
   if (rField_is_Zp())
   {
-     if (((long)i)>(npPrimeM>>1))
-       n=nlInit((int)(((long)i)-npPrimeM));
-     else
-       n=nlInit((int)(long)i);
+    n=nlInit(npInt(i,currRing),NULL);
   }
   else if (rField_is_Q()) n=nlBigInt(i);
 #ifdef HAVE_RINGS
   else if (rField_is_Ring_Z() || rField_is_Ring_ModN() || rField_is_Ring_PtoM()) n=nlMapGMP(i);
-  else if (rField_is_Ring_2toM()) n=nlInit((unsigned long) i);
+  else if (rField_is_Ring_2toM()) n=nlInit((unsigned long) i,NULL);
 #endif
   else goto err;
   res->data=(void *)n;
@@ -4455,7 +4452,7 @@ static BOOLEAN jjPARSTR1(leftv res, leftv v)
 static BOOLEAN jjP2BI(leftv res, leftv v)
 {
   poly p=(poly)v->Data();
-  if (p==NULL) { res->data=(char *)nlInit(0); return FALSE; }
+  if (p==NULL) { res->data=(char *)nlInit(0,NULL); return FALSE; }
   if ((pNext(p)!=NULL)|| (!pIsConstant(p)))
   {
     WerrorS("poly must be constant");
@@ -4465,15 +4462,14 @@ static BOOLEAN jjP2BI(leftv res, leftv v)
   number n;
   if (rField_is_Zp())
   {
-     if (((long)i)>(npPrimeM>>1))
-       n=nlInit((int)(((long)i)-npPrimeM));
-     else
-       n=nlInit((int)(long)i);
+    n=nlInit(npInt(i,currRing), NULL);
   }
   else if (rField_is_Q()) n=nlBigInt(i);
 #ifdef HAVE_RINGS
-  else if (rField_is_Ring_Z() || rField_is_Ring_ModN() || rField_is_Ring_PtoM()) n=nlMapGMP(i);
-  else if (rField_is_Ring_2toM()) n=nlInit((unsigned long) i);
+  else if (rField_is_Ring_Z() || rField_is_Ring_ModN() || rField_is_Ring_PtoM())
+    n=nlMapGMP(i);
+  else if (rField_is_Ring_2toM())
+    n=nlInit((unsigned long) i, NULL);
 #endif
   else goto err;
   res->data=(void *)n;

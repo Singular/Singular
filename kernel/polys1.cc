@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.40 2009-06-04 08:32:59 Singular Exp $ */
+/* $Id: polys1.cc,v 1.41 2009-09-24 16:37:42 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -578,8 +578,8 @@ void pContent(poly ph)
 #endif
     if (rField_is_Q_a())
     {
-      number hzz = nlInit(1);
-      h = nlInit(1);
+      number hzz = nlInit(1, currRing);
+      h = nlInit(1, currRing);
       p=ph;
       while (p!=NULL)
       { // each monom: coeff in Q_a
@@ -1337,7 +1337,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
                 napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
               else /* more difficult: we have really to multiply: */
               {
-                lnumber mmc=(lnumber)naInit(1);
+                lnumber mmc=(lnumber)naInit(1,currRing);
                 napSetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
                 napSetm(mmc->z);
                 pGetCoeff(qq)=naMult((number)c,(number)mmc);

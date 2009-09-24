@@ -6,12 +6,12 @@
 /*
 * ABSTRACT
 */
-/* $Id: shortfl.h,v 1.4 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: shortfl.h,v 1.5 2009-09-24 16:37:42 Singular Exp $ */
 #include "structs.h"
 
 BOOLEAN nrGreaterZero (number k);
 number  nrMult        (number a, number b);
-number  nrInit        (int i);
+number  nrInit        (int i, const ring r);
 int     nrInt         (number &n, const ring r);
 number  nrAdd         (number a, number b);
 number  nrSub         (number a, number b);

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.51 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: longalg.cc,v 1.52 2009-09-24 16:37:41 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -32,7 +32,7 @@ napoly naMinimalPoly;
 #define naParNames (currRing->parameter)
 #define napNormalize(p) p_Normalize(p,nacRing)
 static int naIsChar0;
-static int naPrimeM;
+static ring naMapRing;
 
 #ifdef LDEBUG
 #define naTest(a) naDBTest(a,__FILE__,__LINE__)
@@ -48,7 +48,7 @@ static numberfunc
 static number   (*nacGcd)(number a, number b, const ring r);
 static number   (*nacLcm)(number a, number b, const ring r);
 static void     (*nacDelete)(number *a, const ring r);
-       number   (*nacInit)(int i);
+static number   (*nacInit)(int i, const ring r);
 static int      (*nacInt)(number &n, const ring r);
        void     (*nacNormalize)(number &a);
 static number   (*nacNeg)(number a);
@@ -68,7 +68,7 @@ static int napExpi(int i, napoly a, napoly b);
 
 #define napCopy(p)       (napoly)p_Copy((poly)p,nacRing)
 
-static number nadGcd( number a, number b, const ring r) { return nacInit(1); }
+static number nadGcd( number a, number b, const ring r) { return nacInit(1,r); }
 /*2
 *  sets the appropriate operators
 */
@@ -122,7 +122,7 @@ void naSetChar(int i, ring r)
   }
 #endif
   nacRing        = r->algring;
-  nacInit        = nacRing->cf->nInit;
+  nacInit        = nacRing->cf->cfInit;
   nacInt         = nacRing->cf->n_Int;
   nacCopy        = nacRing->cf->nCopy;
   nacAdd         = nacRing->cf->nAdd;
@@ -523,7 +523,7 @@ static const char  *napRead(const char *s, napoly *b)
     }
   }
   else
-    pGetCoeff(a) = nacInit(1);
+    pGetCoeff(a) = nacInit(1,nacRing);
   i = 0;
   const char  *olds=s;
   loop
@@ -642,7 +642,7 @@ static void napCleardenom(napoly ph)
   if (!naIsChar0)
     return;
   p = ph;
-  h = nacInit(1);
+  h = nacInit(1,nacRing);
   while (p!=NULL)
   {
     d = nacLcm(h, pGetCoeff(p), nacRing);
@@ -780,7 +780,7 @@ static napoly napGcd(napoly a, napoly b)
 
 number napLcm(napoly a)
 {
-  number h = nacInit(1);
+  number h = nacInit(1,nacRing);
 
   if (naIsChar0)
   {
@@ -889,13 +889,15 @@ napoly napTailred (napoly q)
 /*2
 *  z:= i
 */
-number naInit(int i)
+number naInit(int i, const ring r)
 {
   if (i!=0)
   {
-    napoly z=napInit(i);
-    if (z!=NULL)
+    number c=n_Init(i,r->algring);
+    if (!n_IsZero(c,r->algring))
     {
+      poly z=p_Init(r->algring);
+      pSetCoeff0(z,c);
       lnumber l = (lnumber)omAllocBin(rnumber_bin);
       l->z = z;
       l->s = 2;
@@ -1635,7 +1637,7 @@ BOOLEAN naIsMOne(number za)
 void naPower(number p, int i, number *rc)
 {
   number x;
-  *rc = naInit(1);
+  *rc = naInit(1,nacRing);
   for (; i > 0; i--)
   {
     x = naMult(*rc, p);
@@ -2064,8 +2066,8 @@ number naMapP0(number c)
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   int i=(int)((long)c);
-  if (i>(naPrimeM>>2)) i-=naPrimeM;
-  pGetCoeff(l->z)=nlInit(i);
+  if (i>((long)naMapRing->ch>>2)) i-=(long)naMapRing->ch;
+  pGetCoeff(l->z)=nlInit(i, nacRing);
   l->n=NULL;
   return (number)l;
 }
@@ -2105,8 +2107,8 @@ number naMapPP1(number c)
 {
   if (npIsZero(c)) return NULL;
   int i=(int)((long)c);
-  if (i>naPrimeM) i-=naPrimeM;
-  number n=npInit(i);
+  if (i>(long)naMapRing->ch) i-=(long)naMapRing->ch;
+  number n=npInit(i,naMapRing);
   if (npIsZero(n)) return NULL;
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
   l->s=2;
@@ -2122,7 +2124,7 @@ number naMapPP1(number c)
 number naMap0P(number c)
 {
   if (nlIsZero(c)) return NULL;
-  number n=npInit(nlModP(c,npPrimeM));
+  number n=npInit(nlModP(c,npPrimeM),nacRing);
   if (npIsZero(n)) return NULL;
   npTest(n);
   lnumber l=(lnumber)omAllocBin(rnumber_bin);
@@ -2135,7 +2137,6 @@ number naMap0P(number c)
 
 static number (*nacMap)(number);
 static int naParsToCopy;
-static ring napMapRing;
 static napoly napMap(napoly p)
 {
   napoly w, a;
@@ -2144,7 +2145,7 @@ static napoly napMap(napoly p)
   a = w = (napoly)p_Init(nacRing);
   int i;
   for(i=1;i<=naParsToCopy;i++)
-    napSetExp(a,i,napGetExpFrom(p,i,napMapRing));
+    napSetExp(a,i,napGetExpFrom(p,i,naMapRing));
   p_Setm(a,nacRing);
   pGetCoeff(w) = nacMap(pGetCoeff(p));
   loop
@@ -2154,7 +2155,7 @@ static napoly napMap(napoly p)
     pNext(a) = (napoly)p_Init(nacRing);
     pIter(a);
     for(i=1;i<=naParsToCopy;i++)
-      napSetExp(a,i,napGetExpFrom(p,i,napMapRing));
+      napSetExp(a,i,napGetExpFrom(p,i,naMapRing));
     p_Setm(a,nacRing);
     pGetCoeff(a) = nacMap(pGetCoeff(p));
   }
@@ -2244,6 +2245,7 @@ number naMapQaQb(number c)
 
 nMapFunc naSetMap(ring src, ring dst)
 {
+  naMapRing=src;
   if (rField_is_Q_a(dst)) /* -> Q(a) */
   {
     if (rField_is_Q(src))
@@ -2252,7 +2254,6 @@ nMapFunc naSetMap(ring src, ring dst)
     }
     if (rField_is_Zp(src))
     {
-      naPrimeM = rChar(src);
       return naMapP0;  /* Z/p -> Q(a)*/
     }
     if (rField_is_Q_a(src))
@@ -2266,7 +2267,6 @@ nMapFunc naSetMap(ring src, ring dst)
            return NULL;
         naParsToCopy++;
       }
-      napMapRing=src;
       nacMap=nacCopy;
       if ((naParsToCopy==rPar(dst))&&(naParsToCopy==rPar(src)))
         return naCopy;    /* Q(a) -> Q(a) */
@@ -2282,14 +2282,12 @@ nMapFunc naSetMap(ring src, ring dst)
     }
     if (rField_is_Zp(src))
     {
-      int c=rChar(src);
-      if (c==npPrimeM)
+      if (src->ch==dst->ch)
       {
         return naMapPP;  /* Z/p -> Z/p(a)*/
       }
       else
       {
-        naPrimeM = c;
         return naMapPP1;  /* Z/p' -> Z/p(a)*/
       }
     }
@@ -2301,7 +2299,6 @@ nMapFunc naSetMap(ring src, ring dst)
       }
       else
       {
-        npMapPrime=rChar(src);
         nacMap = npMapP;
       }
       int i;
@@ -2313,7 +2310,6 @@ nMapFunc naSetMap(ring src, ring dst)
            return NULL;
         naParsToCopy++;
       }
-      napMapRing=src;
       if ((naParsToCopy==rPar(dst))&&(naParsToCopy==rPar(src))
       && (nacMap==nacCopy))
         return naCopy;    /* Z/p(a) -> Z/p(a) */
@@ -2429,7 +2425,7 @@ number   naGetDenom(number &n, const ring r)
     rr->s = 2;
     return (number)rr;
   }
-  return r->cf->nInit(1);
+  return n_Init(1,r);
 }
 
 number   naGetNumerator(number &n, const ring r)

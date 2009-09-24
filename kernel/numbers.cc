@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.26 2009-09-16 12:26:26 Singular Exp $ */
+/* $Id: numbers.cc,v 1.27 2009-09-24 16:37:41 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -32,7 +32,6 @@
 extern int IsPrime(int p);
 
 void   (*nNew)(number *a);
-number (*nInit)(int i);
 number  (*nInit_bigint)(number i);
 number (*nPar)(int i);
 int    (*nParDeg)(number n);
@@ -105,7 +104,7 @@ number ndReturn0(number n) { return nInit(0); }
 
 int    ndParDeg(number n) { return 0; }
 
-number ndGcd(number a, number b, const ring r) { return r->cf->nInit(1); }
+number ndGcd(number a, number b, const ring r) { return n_Init(1,r); }
 
 number ndIntMod(number a, number b) { return nInit(0); }
 
@@ -209,7 +208,6 @@ void nSetChar(ring r)
 #endif
   nNew   = r->cf->nNew;
   nNormalize=r->cf->nNormalize;
-  nInit  = r->cf->nInit;
   nPar   = r->cf->nPar;
   nParDeg= r->cf->nParDeg;
   n_Int  = r->cf->n_Int;
@@ -322,7 +320,7 @@ void nInitChar(ring r)
     n->cfDelete = naDelete;
     n-> nNew       = naNew;
     n-> nNormalize = naNormalize;
-    n->nInit       = naInit;
+    n->cfInit      = naInit;
     n->nPar        = naPar;
     n->nParDeg     = naParDeg;
     n->n_Int       = naInt;
@@ -361,7 +359,7 @@ void nInitChar(ring r)
   else if (rField_is_Ring_2toM(r))
   {
      nr2mInitExp(c,r);
-     n->nInit  = nr2mInit;
+     n->cfInit = nr2mInit;
      n->nCopy  = ndCopy;
      n->n_Int  = nr2mInt;
      n->nAdd   = nr2mAdd;
@@ -401,7 +399,7 @@ void nInitChar(ring r)
   )
   {
      nrnInitExp(c,r);
-     n->nInit  = nrnInit;
+     n->cfInit  = nrnInit;
      n->cfDelete= nrnDelete;
      n->nCopy  = nrnCopy;
      n->cfCopy = cfrnCopy;
@@ -442,7 +440,7 @@ void nInitChar(ring r)
   /* -------------- Z ----------------------- */
   else if (rField_is_Ring_Z(r))
   {
-     n->nInit  = nrzInit;
+     n->cfInit  = nrzInit;
      n->cfDelete= nrzDelete;
      n->nCopy  = nrzCopy;
      n->cfCopy = cfrzCopy;
@@ -486,7 +484,7 @@ void nInitChar(ring r)
     n->cfDelete= nlDelete;
     n->nNew   = nlNew;
     n->nNormalize=nlNormalize;
-    n->nInit  = nlInit;
+    n->cfInit = nlInit;
     n->n_Int  = nlInt;
     n->nAdd   = nlAdd;
     n->nSub   = nlSub;
@@ -522,7 +520,7 @@ void nInitChar(ring r)
   /*----------------------char. p----------------*/
   {
     npInitChar(c,r);
-    n->nInit  = npInit;
+    n->cfInit = npInit;
     n->n_Int  = npInt;
     n->nAdd   = npAdd;
     n->nSub   = npSub;
@@ -562,7 +560,7 @@ void nInitChar(ring r)
   else if (rField_is_GF(r))
   {
     //nfSetChar(c,r->parameter);
-    n->nInit  = nfInit;
+    n->cfInit = nfInit;
     n->nPar   = nfPar;
     n->nParDeg= nfParDeg;
     n->n_Int  = nfInt;
@@ -594,7 +592,7 @@ void nInitChar(ring r)
   //if (c==(-1))
   else if (rField_is_R(r))
   {
-    n->nInit  = nrInit;
+    n->cfInit = nrInit;
     n->n_Int  = nrInt;
     n->nAdd   = nrAdd;
     n->nSub   = nrSub;
@@ -625,7 +623,7 @@ void nInitChar(ring r)
   {
     n->cfDelete= ngfDelete;
     n->nNew=ngfNew;
-    n->nInit  = ngfInit;
+    n->cfInit = ngfInit;
     n->n_Int  = ngfInt;
     n->nAdd   = ngfAdd;
     n->nSub   = ngfSub;
@@ -657,7 +655,7 @@ void nInitChar(ring r)
     n->cfDelete= ngcDelete;
     n->nNew=ngcNew;
     n->nNormalize=nDummy2;
-    n->nInit  = ngcInit;
+    n->cfInit = ngcInit;
     n->n_Int  = ngcInt;
     n->nAdd   = ngcAdd;
     n->nSub   = ngcSub;
@@ -696,7 +694,7 @@ void nInitChar(ring r)
 #endif
   if (!errorreported)
   {
-    n->nNULL=n->nInit(0);
+    n->nNULL=n->cfInit(0,r);
     if (n->nRePart==NULL)
       n->nRePart=n->nCopy;
     if (n->nIntDiv==NULL)

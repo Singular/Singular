@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.166 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: tgb.cc,v 1.167 2009-09-24 16:37:42 Singular Exp $ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */
@@ -112,7 +112,7 @@ static inline poly p_Init_Special(const ring r)
 static inline poly pOne_Special(const ring r=currRing)
 {
   poly rc = p_Init_Special(r);
-  pSetCoeff0(rc,r->cf->nInit(1));
+  pSetCoeff0(rc,n_Init(1,r));
   return rc;
 }
 // zum Initialiseren: in t_rep_gb plazieren:

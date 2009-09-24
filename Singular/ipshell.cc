@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.212 2009-09-17 07:43:15 seelisch Exp $ */
+/* $Id: ipshell.cc,v 1.213 2009-09-24 16:36:12 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2155,7 +2155,7 @@ ring rCompose(const lists  L)
         {
           if (IDELEMS(R->algring->qideal)==1)
           {
-            R->minpoly=naInit(1);
+            R->minpoly=naInit(1,R);
             lnumber n=(lnumber)R->minpoly;
             n->z=R->algring->qideal->m[0];
             R->algring->qideal->m[0]=NULL;

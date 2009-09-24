@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.24 2009-09-16 12:26:27 Singular Exp $ */
+/* $Id: rintegers.cc,v 1.25 2009-09-24 16:37:42 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -86,7 +86,7 @@ void nrzPower (number a, int i, number * result)
 /*
  * create a number from int
  */
-number nrzInit (int i)
+number nrzInit (int i, const ring r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, i);
@@ -145,7 +145,7 @@ number nrzSub (number a, number b)
 
 number  nrzGetUnit (number a)
 {
-  return nrzInit(1);
+  return nrzInit(1, currRing);
 }
 
 BOOLEAN nrzIsUnit (number a)
