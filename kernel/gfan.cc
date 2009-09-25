@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-09-23 10:20:00 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.88 2009-09-23 10:20:00 monerjan Exp $
-$Id: gfan.cc,v 1.88 2009-09-23 10:20:00 monerjan Exp $
+$Date: 2009-09-25 13:29:10 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.89 2009-09-25 13:29:10 monerjan Exp $
+$Id: gfan.cc,v 1.89 2009-09-25 13:29:10 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -34,7 +34,7 @@ $Id: gfan.cc,v 1.88 2009-09-23 10:20:00 monerjan Exp $
 #endif
 
 //Hacks for different working places
-#define ITWM
+#define p800
 
 #ifdef UNI
 #include "/users/urmel/alggeom/monerjan/cddlib/include/setoper.h" //Support for cddlib. Dirty hack
@@ -1250,7 +1250,8 @@ class gcone
 			//NOTE Any of the two variants of tmpI={idrCopy(),dstRing_I} does the trick
 			//tmpI = idrCopyR(this->inputIdeal,this->baseRing);
 			tmpI = dstRing_I;
-			dstRing_I=kStd(tmpI,NULL,testHomog,NULL);			
+			dstRing_I=kStd(tmpI,NULL,testHomog,NULL);
+			idNorm(dstRing_I);			
 			//kInterRed(dstRing_I);
 			idSkipZeroes(dstRing_I);
 			test=save;
@@ -1878,7 +1879,7 @@ class gcone
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			We always choose the first facet from fListPtr as facet to be flipped
 			*/			
-			while((SearchListAct!=NULL) && counter<157)
+			while((SearchListAct!=NULL))// && counter<160)
 			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!				
 				fAct = SearchListAct;
 				//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) )
@@ -2258,6 +2259,7 @@ class gcone
 										else	//we already added a facet after slEndStatic
 										{
 											slEndStatic->prev->next = slEndStatic->next;
+											slEndStatic->next->prev = slEndStatic->prev;
 											slEndStatic = slEndStatic->prev;
 											//slEnd = slEndStatic;
 										}
