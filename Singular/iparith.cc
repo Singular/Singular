@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.516 2009-09-24 16:36:12 Singular Exp $ */
+/* $Id: iparith.cc,v 1.517 2009-09-25 08:00:48 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -4318,18 +4318,6 @@ static BOOLEAN jjMEMORY(leftv res, leftv v)
   res->data = (char *)0;
   return FALSE;
 }
-#if SIZEOF_LONG == 8
-static number jjBI2N(long d)
-{
-  if (d<((long)INT_MAX)) return nlInit((int)d);
-  else
-  {
-    number n=nlRInit(0);
-    mpz_set_si(&n->z,d);
-    return n;
-  }
-}
-#endif
 //static BOOLEAN jjMONITOR1(leftv res, leftv v)
 //{
 //  return jjMONITOR2(res,v,NULL);
