@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.28 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id: rmodulo2m.cc,v 1.29 2009-09-25 12:49:21 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -113,7 +113,6 @@ void nr2mPower (number a, int i, number * result)
 {
   if (i==0)
   {
-    //npInit(1,result);
     *(NATNUMBER *)result = 1;
   }
   else if (i==1)
@@ -501,7 +500,7 @@ nMapFunc nr2mSetMap(ring src, ring dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
-void nr2mSetExp(int m, ring r)
+void nr2mSetExp(int m, const ring r)
 {
   if (m>1)
   {
@@ -519,7 +518,7 @@ void nr2mSetExp(int m, ring r)
   }
 }
 
-void nr2mInitExp(int m, ring r)
+void nr2mInitExp(int m, const ring r)
 {
   nr2mSetExp(m, r);
   if (m<2) WarnS("nInitExp failed: using Z/2^2");

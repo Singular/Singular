@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.39 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.40 2009-09-25 12:49:21 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -34,7 +34,7 @@ number nrnInit (int i, const ring r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init_set_si(erg, i);
-  mpz_mod(erg, erg, nrnModul);
+  mpz_mod(erg, erg, r->ringflaga);
   return (number) erg;
 }
 

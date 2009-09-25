@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.h,v 1.14 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id: rmodulo2m.h,v 1.15 2009-09-25 12:49:21 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */
@@ -44,8 +44,8 @@ char *  nr2mName        (number n);
 #ifdef LDEBUG
 BOOLEAN nr2mDBTest      (number a, const char *f, const int l);
 #endif
-void    nr2mSetExp(int c, ring r);
-void    nr2mInitExp(int c, ring r);
+void    nr2mSetExp(int c, const ring r);
+void    nr2mInitExp(int c, const ring r);
 
 
 static inline number nr2mMultM(number a, number b)
