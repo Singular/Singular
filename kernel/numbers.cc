@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.28 2009-09-28 12:44:06 Singular Exp $ */
+/* $Id: numbers.cc,v 1.29 2009-09-28 13:21:54 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -26,6 +26,8 @@
 #include "rmodulo2m.h"
 #include "rmodulon.h"
 #include "rintegers.h"
+
+extern omBin gmp_nrz_bin;
 #endif
 
 //static int characteristic = 0;
@@ -771,7 +773,7 @@ void nKillChar(ring r)
     if (r->nrnModul!=NULL)
     {
       mpz_clear((int_number) r->nrnModul);
-      omFreeBin((ADDRESS) *a, gmp_nrn_bin);
+      omFreeBin((ADDRESS) r->nrnModul, gmp_nrz_bin);
       r->nrnModul=NULL;
     }
     #endif
