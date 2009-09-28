@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.20 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id: numbers.h,v 1.21 2009-09-28 13:29:03 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -81,7 +81,6 @@ extern number (*nLcm)(number a, number b, const ring r);
 
 extern number nNULL; /* the 0 as constant */
 
-extern void    (*n__Delete)(number * a, const ring r);
 #define nTest(a) (1)
 #define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
 #define nGetDenom(N) (currRing->cf->cfGetDenom((N),currRing))

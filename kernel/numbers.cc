@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.29 2009-09-28 13:21:54 Singular Exp $ */
+/* $Id: numbers.cc,v 1.30 2009-09-28 13:29:03 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -65,7 +65,6 @@ void    (*nPower)(number a, int i, number * result);
 number  (*nGcd)(number a, number b, const ring r);
 number  (*nLcm)(number a, number b, const ring r);
 char * (*nName)(number n);
-void   (*n__Delete)(number *a, const ring r);
 
 /*0 implementation*/
 number nNULL; /* the 0 as constant */
@@ -132,8 +131,6 @@ number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 void nSetChar(ring r)
 {
   int c=rInternalChar(r);
-
-  n__Delete= r->cf->cfDelete;
 
   /*--------------------- Q -----------------*/
   if (rField_is_Q(r))
