@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.cc,v 1.45 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id: longrat.cc,v 1.46 2009-09-28 12:44:06 Singular Exp $ */
 /*
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
@@ -125,7 +125,18 @@ number nlMapGMP(number from)
   mpz_init_set(&z->z,(MP_INT*) from);
   //mpz_init_set_ui(&z->n,1);
   z->s = 3;
-  nlNormalize(z);
+  if ((mpz_cmp_ui(&z->z,(long)0)==0)
+  || (mpz_size1(&z->z)<=MP_SMALL))
+  {
+    int ui=(int)mpz_get_si(&z->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&z->z,(long)ui)==0))
+    {
+      mpz_clear(&z->z);
+      omFreeBin((ADDRESS)z, rnumber_bin);
+      return INT_TO_SR(ui);
+    }
+  }
   return z;
 }
 
@@ -139,9 +150,19 @@ number nlMapMachineInt(number from)
   z->debug=123456;
 #endif
   mpz_init_set_ui(&z->z,(unsigned long) from);
-  //mpz_init_set_ui(&z->n,1);
   z->s = 3;
-  nlNormalize(z);
+  if ((mpz_cmp_ui(&z->z,(long)0)==0)
+  || (mpz_size1(&z->z)<=MP_SMALL))
+  {
+    int ui=(int)mpz_get_si(&z->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&z->z,(long)ui)==0))
+    {
+      mpz_clear(&z->z);
+      omFreeBin((ADDRESS)z, rnumber_bin);
+      return INT_TO_SR(ui);
+    }
+  }
   return z;
 }
 #endif

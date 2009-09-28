@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.cc,v 1.40 2009-09-25 12:49:21 Singular Exp $ */
+/* $Id: rmodulon.cc,v 1.41 2009-09-28 12:44:21 Singular Exp $ */
 /*
 * ABSTRACT: numbers modulo n
 */
@@ -23,7 +23,6 @@
   #define gmp_nrn_bin gmp_nrz_bin
   extern omBin gmp_nrz_bin;
 
-int_number nrnModul = NULL;
 int_number nrnMinusOne = NULL;
 unsigned long nrnExponent = 0;
 
@@ -34,7 +33,7 @@ number nrnInit (int i, const ring r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init_set_si(erg, i);
-  mpz_mod(erg, erg, r->ringflaga);
+  mpz_mod(erg, erg, r->nrnModul);
   return (number) erg;
 }
 
@@ -80,7 +79,7 @@ number nrnMult (number a, number b)
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_mul(erg, (int_number) a, (int_number) b);
-  mpz_mod(erg, erg, nrnModul);
+  mpz_mod(erg, erg, currRing->nrnModul);
   return (number) erg;
 }
 
@@ -88,7 +87,7 @@ void nrnPower (number a, int i, number * result)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
-  mpz_powm_ui(erg, (int_number) a, i, nrnModul);
+  mpz_powm_ui(erg, (int_number) a, i, currRing->nrnModul);
   *result = (number) erg;
 }
 
@@ -97,7 +96,7 @@ number nrnAdd (number a, number b)
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_add(erg, (int_number) a, (int_number) b);
-  mpz_mod(erg, erg, nrnModul);
+  mpz_mod(erg, erg, currRing->nrnModul);
   return (number) erg;
 }
 
@@ -106,14 +105,14 @@ number nrnSub (number a, number b)
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_sub(erg, (int_number) a, (int_number) b);
-  mpz_mod(erg, erg, nrnModul);
+  mpz_mod(erg, erg, currRing->nrnModul);
   return (number) erg;
 }
 
 number nrnNeg (number c)
 {
 // nNeg inplace !!!
-  mpz_sub((int_number) c, nrnModul, (int_number) c);
+  mpz_sub((int_number) c, currRing->nrnModul, (int_number) c);
   return c;
 }
 
@@ -121,7 +120,7 @@ number  nrnInvers (number c)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
-  mpz_invert(erg, (int_number) c, nrnModul);
+  mpz_invert(erg, (int_number) c, currRing->nrnModul);
   return (number) erg;
 }
 
@@ -131,8 +130,8 @@ number  nrnInvers (number c)
  */
 number nrnLcm (number a,number b,ring r)
 {
-  number erg = nrnGcd(NULL, a, NULL);
-  number tmp = nrnGcd(NULL, b, NULL);
+  number erg = nrnGcd(NULL, a, r);
+  number tmp = nrnGcd(NULL, b, r);
   mpz_lcm((int_number) erg, (int_number) erg, (int_number) tmp);
   nrnDelete(&tmp, NULL);
   return (number) erg;
@@ -146,7 +145,7 @@ number nrnGcd (number a,number b,ring r)
 {
   if ((a == NULL) && (b == NULL)) return nrnInit(0,r);
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
-  mpz_init_set(erg, nrnModul);
+  mpz_init_set(erg, r->nrnModul);
   if (a != NULL) mpz_gcd(erg, erg, (int_number) a);
   if (b != NULL) mpz_gcd(erg, erg, (int_number) b);
   return (number) erg;
@@ -157,12 +156,12 @@ number nrnGcd3 (number a,number b, number c,ring r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
-  if (a == NULL) a = (number) nrnModul;
-  if (b == NULL) b = (number) nrnModul;
-  if (c == NULL) c = (number) nrnModul;
+  if (a == NULL) a = (number) r->nrnModul;
+  if (b == NULL) b = (number) r->nrnModul;
+  if (c == NULL) c = (number) r->nrnModul;
   mpz_gcd(erg, (int_number) a, (int_number) b);
   mpz_gcd(erg, erg, (int_number) c);
-  mpz_gcd(erg, erg, nrnModul);
+  mpz_gcd(erg, erg, r->nrnModul);
   return (number) erg;
 }
 */
@@ -180,8 +179,8 @@ number  nrnExtGcd (number a, number b, number *s, number *t)
   mpz_init(bs);
   mpz_init(bt);
   mpz_gcdext(erg, bs, bt, (int_number) a, (int_number) b);
-  mpz_mod(bs, bs, nrnModul);
-  mpz_mod(bt, bt, nrnModul);
+  mpz_mod(bs, bs, currRing->nrnModul);
+  mpz_mod(bt, bt, currRing->nrnModul);
   *s = (number) bs;
   *t = (number) bt;
   return (number) erg;
@@ -219,7 +218,7 @@ BOOLEAN nrnGreaterZero (number k)
 
 BOOLEAN nrnIsUnit (number a)
 {
-  number tmp = nrnGcd(a, (number) nrnModul, NULL);
+  number tmp = nrnGcd(a, (number) currRing->nrnModul, currRing);
   bool res = nrnIsOne(tmp);
   nrnDelete(&tmp, NULL);
   return res;
@@ -227,7 +226,7 @@ BOOLEAN nrnIsUnit (number a)
 
 number  nrnGetUnit (number k)
 {
-  if (mpz_divisible_p(nrnModul, (int_number) k)) return nrnInit(1,currRing);
+  if (mpz_divisible_p(currRing->nrnModul, (int_number) k)) return nrnInit(1,currRing);
 
   int_number unit = (int_number) nrnGcd(k, 0, currRing);
   mpz_tdiv_q(unit, (int_number) k, unit);
@@ -247,14 +246,14 @@ number  nrnGetUnit (number k)
       gcd_new = ctmp;
       // tmp := tmp * unit
       mpz_mul(tmp, tmp, unit);
-      mpz_mod(tmp, tmp, nrnModul);
+      mpz_mod(tmp, tmp, currRing->nrnModul);
       // gcd_new := gcd(tmp, 0)
-      mpz_gcd(gcd_new, tmp, nrnModul);
+      mpz_gcd(gcd_new, tmp, currRing->nrnModul);
     }
     // unit := unit + nrnModul / gcd_new
-    mpz_tdiv_q(tmp, nrnModul, gcd_new);
+    mpz_tdiv_q(tmp, currRing->nrnModul, gcd_new);
     mpz_add(unit, unit, tmp);
-    mpz_mod(unit, unit, nrnModul);
+    mpz_mod(unit, unit, currRing->nrnModul);
     nrnDelete((number*) &gcd_new, NULL);
     nrnDelete((number*) &tmp, NULL);
   }
@@ -265,11 +264,11 @@ number  nrnGetUnit (number k)
 BOOLEAN nrnDivBy (number a,number b)
 {
   if (a == NULL)
-    return mpz_divisible_p(nrnModul, (int_number) b);
+    return mpz_divisible_p(currRing->nrnModul, (int_number) b);
   else
     return mpz_divisible_p((int_number) a, (int_number) b);
   /*
-  number bs = nrnGcd(a, b, NULL);
+  number bs = nrnGcd(a, b, currRing);
   mpz_tdiv_q((int_number) bs, (int_number) b, (int_number) bs);
   bool res = nrnIsUnit(bs);
   nrnDelete(&bs, NULL);
@@ -287,7 +286,7 @@ int nrnDivComp(number a, number b)
 
 number nrnDiv (number a,number b)
 {
-  if (a == NULL) a = (number) nrnModul;
+  if (a == NULL) a = (number) currRing->nrnModul;
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   if (mpz_divisible_p((int_number) a, (int_number) b))
@@ -297,7 +296,7 @@ number nrnDiv (number a,number b)
   }
   else
   {
-    int_number gcd = (int_number) nrnGcd(a, b, NULL);
+    int_number gcd = (int_number) nrnGcd(a, b, currRing);
     mpz_divexact(erg, (int_number) b, gcd);
     if (!nrnIsUnit((number) erg))
     {
@@ -313,7 +312,7 @@ number nrnDiv (number a,number b)
     mpz_mul(erg, erg, tmp);
     nrnDelete((number*) &gcd, NULL);
     nrnDelete((number*) &tmp, NULL);
-    mpz_mod(erg, erg, nrnModul);
+    mpz_mod(erg, erg, currRing->nrnModul);
     return (number) erg;
   }
 }
@@ -343,7 +342,7 @@ number nrnMod (number a, number b)
   int_number r = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(g);
   mpz_init_set_si(r,(long)0);
-  mpz_gcd(g, (int_number) nrnModul, (int_number)b); // g is now as above
+  mpz_gcd(g, (int_number) currRing->nrnModul, (int_number)b); // g is now as above
   if (mpz_cmp_si(g, (long)1) != 0) mpz_mod(r, (int_number)a, g); // the case g <> 1
   mpz_clear(g);
   omFreeBin(g, gmp_nrn_bin);
@@ -354,7 +353,7 @@ number nrnIntDiv (number a,number b)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
-  if (a == NULL) a = (number) nrnModul;
+  if (a == NULL) a = (number) currRing->nrnModul;
   mpz_tdiv_q(erg, (int_number) a, (int_number) b);
   return (number) erg;
 }
@@ -375,7 +374,7 @@ number nrnMap2toM(number from)
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_mul_ui(erg, nrnMapCoef, (NATNUMBER) from);
-  mpz_mod(erg, erg, nrnModul);
+  mpz_mod(erg, erg, currRing->nrnModul);
   return (number) erg;
 }
 
@@ -384,7 +383,7 @@ number nrnMapZp(number from)
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   mpz_mul_si(erg, nrnMapCoef, (NATNUMBER) from);
-  mpz_mod(erg, erg, nrnModul);
+  mpz_mod(erg, erg, currRing->nrnModul);
   return (number) erg;
 }
 
@@ -392,7 +391,7 @@ number nrnMapGMP(number from)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
-  mpz_mod(erg, (int_number) from, nrnModul);
+  mpz_mod(erg, (int_number) from, currRing->nrnModul);
   return (number) erg;
 }
 
@@ -401,7 +400,7 @@ number nrnMapQ(number from)
   int_number erg = (int_number) omAllocBin(gmp_nrn_bin);
   mpz_init(erg);
   nlGMP(from, (number) erg);
-  mpz_mod(erg, erg, nrnModul);
+  mpz_mod(erg, erg, currRing->nrnModul);
   return (number) erg;
 }
 
@@ -443,26 +442,26 @@ nMapFunc nrnSetMap(ring src, ring dst)
         nrnMapCoef = (int_number) omAllocBin(gmp_nrn_bin);
         mpz_init(nrnMapCoef);
       }
-      if (mpz_divisible_p(nrnMapModul, nrnModul))
+      if (mpz_divisible_p(nrnMapModul, currRing->nrnModul))
       {
         mpz_set_si(nrnMapCoef, 1);
       }
       else
       if (nrnDivBy(NULL, (number) nrnMapModul))
       {
-        mpz_divexact(nrnMapCoef, nrnModul, nrnMapModul);
-        int_number tmp = nrnModul;
-        nrnModul = nrnMapModul;
+        mpz_divexact(nrnMapCoef, currRing->nrnModul, nrnMapModul);
+        int_number tmp = currRing->nrnModul;
+        currRing->nrnModul = nrnMapModul;
         if (!nrnIsUnit((number) nrnMapCoef))
         {
-          nrnModul = tmp;
+          currRing->nrnModul = tmp;
           nrnDelete((number*) &nrnMapModul, currRing);
           return NULL;
         }
         int_number inv = (int_number) nrnInvers((number) nrnMapCoef);
-        nrnModul = tmp;
+        currRing->nrnModul = tmp;
         mpz_mul(nrnMapCoef, nrnMapCoef, inv);
-        mpz_mod(nrnMapCoef, nrnMapCoef, nrnModul);
+        mpz_mod(nrnMapCoef, nrnMapCoef, currRing->nrnModul);
         nrnDelete((number*) &inv, currRing);
       }
       else
@@ -488,26 +487,26 @@ nMapFunc nrnSetMap(ring src, ring dst)
 
 void nrnSetExp(int m, ring r)
 {
-  if ((nrnModul != NULL) && (mpz_cmp(nrnModul, r->ringflaga) == 0) && (nrnExponent == r->ringflagb)) return;
+  if ((r->nrnModul != NULL) && (mpz_cmp(r->nrnModul, r->ringflaga) == 0) && (nrnExponent == r->ringflagb)) return;
 
   nrnExponent = r->ringflagb;
-  if (nrnModul == NULL)
+  if (r->nrnModul == NULL)
   {
-    nrnModul = (int_number) omAllocBin(gmp_nrn_bin);
-    mpz_init(nrnModul);
+    r->nrnModul = (int_number) omAllocBin(gmp_nrn_bin);
+    mpz_init(r->nrnModul);
     nrnMinusOne = (int_number) omAllocBin(gmp_nrn_bin);
     mpz_init(nrnMinusOne);
   }
-  mpz_set(nrnModul, r->ringflaga);
-  mpz_pow_ui(nrnModul, nrnModul, nrnExponent);
-  mpz_sub_ui(nrnMinusOne, nrnModul, 1);
+  mpz_set(r->nrnModul, r->ringflaga);
+  mpz_pow_ui(r->nrnModul, r->nrnModul, nrnExponent);
+  mpz_sub_ui(nrnMinusOne, r->nrnModul, 1);
 }
 
 void nrnInitExp(int m, ring r)
 {
   nrnSetExp(m, r);
 
-  if (mpz_cmp_ui(nrnModul,2) <= 0)
+  if (mpz_cmp_ui(r->nrnModul,2) <= 0)
   {
     WarnS("nrnInitExp failed");
   }
@@ -516,7 +515,7 @@ void nrnInitExp(int m, ring r)
 #ifdef LDEBUG
 BOOLEAN nrnDBTest (number a, const char *f, const int l)
 {
-  if ( (mpz_cmp_si((int_number) a, 0) < 0) || (mpz_cmp((int_number) a, nrnModul) > 0) )
+  if ( (mpz_cmp_si((int_number) a, 0) < 0) || (mpz_cmp((int_number) a, currRing->nrnModul) > 0) )
   {
     return FALSE;
   }
@@ -576,7 +575,7 @@ const char * nrnRead (const char *s, number *a)
   {
     s = nlCPEatLongC((char *)s, z);
   }
-  mpz_mod(z, z, nrnModul);
+  mpz_mod(z, z, currRing->nrnModul);
   *a = (number) z;
   return s;
 }

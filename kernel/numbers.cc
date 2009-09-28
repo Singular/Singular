@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.27 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id: numbers.cc,v 1.28 2009-09-28 12:44:06 Singular Exp $ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics
@@ -767,5 +767,13 @@ void nKillChar(ring r)
       rKill(r->algring);
       r->algring=NULL;
     }
+    #ifdef HAVE_RINGS
+    if (r->nrnModul!=NULL)
+    {
+      mpz_clear((int_number) r->nrnModul);
+      omFreeBin((ADDRESS) *a, gmp_nrn_bin);
+      r->nrnModul=NULL;
+    }
+    #endif
   }
 }

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.66 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id: structs.h,v 1.67 2009-09-28 12:44:21 Singular Exp $ */
 /*
 * ABSTRACT
 */
@@ -630,8 +630,9 @@ struct sip_sring
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
 #ifdef HAVE_RINGS
   unsigned int  ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
-  int_number    ringflaga;
+  int_number    ringflaga; /* Z/(ringfalga^ringflagb)=Z/nrnModul*/
   unsigned long ringflagb;
+  int_number    nrnModul;
 #endif
   unsigned long options; /* ring dependent options */
 
