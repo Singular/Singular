@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.517 2009-09-25 08:00:48 Singular Exp $ */
+/* $Id: iparith.cc,v 1.518 2009-09-29 10:37:15 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -1940,11 +1940,12 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
   ideal m = idLift(vi,ui,&R, FALSE,hasFlag(v,FLAG_STD),TRUE,&U);
   // now make sure that all matices have the corect size:
   matrix T = idModule2formatedMatrix(m,vl,ul);
+  int i;
   if (MATCOLS(U) != ul)
   {
     int mul=si_min(ul,MATCOLS(U));
     matrix UU=mpNew(ul,ul);
-    int i,j;
+    int j;
     for(i=mul;i>0;i--)
     {
       for(j=mul;j>0;j--)
@@ -1955,6 +1956,11 @@ static BOOLEAN jjDIVISION(leftv res, leftv u, leftv v)
     }
     idDelete((ideal *)&U);
     U=UU;
+  }
+  // make sure that U is a diagonal matrix of units
+  for(i=ul;i>0;i--)
+  {
+    if(MATELEM(U,i,i)==NULL) MATELEM(U,i,i)=pOne();
   }
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(3);
