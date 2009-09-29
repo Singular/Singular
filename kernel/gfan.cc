@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-09-25 13:29:10 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.89 2009-09-25 13:29:10 monerjan Exp $
-$Id: gfan.cc,v 1.89 2009-09-25 13:29:10 monerjan Exp $
+$Date: 2009-09-29 06:03:16 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.90 2009-09-29 06:03:16 monerjan Exp $
+$Id: gfan.cc,v 1.90 2009-09-29 06:03:16 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -59,7 +59,7 @@ $Id: gfan.cc,v 1.89 2009-09-25 13:29:10 monerjan Exp $
 #endif
 
 #ifndef gfan_DEBUG
-#define gfan_DEBUG
+//#define gfan_DEBUG
 #ifndef gfan_DEBUGLEVEL
 #define gfan_DEBUGLEVEL 1
 #endif
@@ -254,7 +254,7 @@ class facet
 		*/
 		int getUCN()
 		{
-			if(this!=NULL)
+			if(this!=NULL && this!=(facet *)0xfbfbfbfbfbfbfbfb)
 				return this->UCN;
 			else
 				return -1;
@@ -354,7 +354,11 @@ class facet
 
 facet::~facet()
 {
-	idDelete((ideal *)this->flipGB);
+// 	idDelete((ideal *)this->flipGB);
+	delete this->fNormal;
+	delete this->interiorPoint;
+	delete this->codim2Ptr;
+	idDelete((ideal *)&this->flipGB);
 	rDelete(this->flipRing);
 	//this=NULL;
 }
@@ -935,6 +939,7 @@ class gcone
 				fAct = fAct->next;	
 				dd_FreeMatrix(ddakt);
 				dd_FreePolyhedra(ddpolyh);
+				delete iv_intPoint;
 			}//while
 		}
 		
@@ -1197,6 +1202,7 @@ class gcone
 				jj++;							
 			}
 			dd_MatrixAppendTo(&intPointMatrix,posRestr);
+			dd_FreeMatrix(posRestr);
 #ifdef gfan_DEBUG
 // 			dd_WriteMatrix(stdout,intPointMatrix);
 #endif
@@ -1229,7 +1235,8 @@ class gcone
 			dstRing->wvhdl[0]=(int*)A;
 			rComplete(dstRing);					
 			rChangeCurrRing(dstRing);
-			
+			rDelete(tmpRing);
+			delete iv_weight;
 //#ifdef gfan_DEBUG
 			rWrite(dstRing); cout << endl;
 //#endif
@@ -1266,6 +1273,7 @@ class gcone
 			cout << endl;
 //#endif			
 			rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
+			rDelete(dstRing);
 		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute the remainder of a polynomial by a given ideal
@@ -1422,17 +1430,19 @@ class gcone
 		bool isParallel(intvec const &a, intvec const &b)
 		{			
 			int lhs,rhs;
+			bool res;
 			lhs=dotProduct(a,b)*dotProduct(a,b);
 			rhs=dotProduct(a,a)*dotProduct(b,b);
 			//cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
 			if (lhs==rhs)
 			{
-				return TRUE;
+				res = TRUE;
 			}
 			else
 			{
-				return FALSE;
+				res = FALSE;
 			}
+			return res;
 		}//bool isParallel
 		
 		/** \brief Compute an interior point of a given cone
@@ -1905,6 +1915,7 @@ class gcone
 						gcTmp->showSLA(*SearchListRoot);
 #endif
  					rChangeCurrRing(gcAct->baseRing);
+					rDelete(rTmp);
  					gcPtr->next=gcTmp;
  					gcPtr=gcPtr->next;
 					if(fAct->getUCN() == fAct->next->getUCN())
@@ -2142,6 +2153,8 @@ class gcone
 					fNormal=fAct->getFacetNormal();
 					slAct = slHead;
 					notParallelCtr=0;
+// 					delete deleteMarker;
+// 					deleteMarker=NULL;
 					/*If slAct==NULL and fAct!=NULL 
 					we just copy all remaining facets into SLA*/
 					if(slAct==NULL)
@@ -2273,9 +2286,10 @@ class gcone
 								
 								//update lengthOfSearchList					
  								lengthOfSearchList--;
+								//delete slAct;
 								//slAct = slAct->next; //not needed, since facets are equal
 								//delete deleteMarker;
-								deleteMarker=NULL;
+								//deleteMarker=NULL;
 								//fAct = fAct->next;
  								break;
 							}//if(ctr==fAct->numCodim2Facets)
@@ -2305,8 +2319,8 @@ class gcone
 						Otherwise results get crappy. Unfortunately there are two slAct=slAct->next calls now,
 						(not nice!) but since they are in seperate branches of the if-statement there should not
 						be a way it gets called twice thus ommiting one facet:
- 						slAct = slAct->next;						
-						delete deleteMarker;*/
+ 						slAct = slAct->next;*/						
+						//delete deleteMarker;
 						deleteMarker=NULL;
 						//if slAct was marked as to be deleted, delete it here!
 					}//while(slAct!=NULL)									
