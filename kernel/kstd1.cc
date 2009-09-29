@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd1.cc,v 1.60 2009-09-21 14:39:19 Singular Exp $ */
+/* $Id: kstd1.cc,v 1.61 2009-09-29 10:52:39 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -2141,6 +2141,7 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
   strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(p));
+  strat->ak = si_max(strat->ak,(int)F->rank);
 
 
   if (pOrdSgn==-1)
