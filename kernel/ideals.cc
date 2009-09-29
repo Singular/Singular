@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.78 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id: ideals.cc,v 1.79 2009-09-29 10:36:23 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -1818,7 +1818,7 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
   }
   k=idRankFreeModule(mod);
   if  ((k!=0) && (lsmod==0)) lsmod=1;
-  k=si_max(k,1);
+  k=si_max(k,(int)mod->rank);
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssure_SyzComp();
