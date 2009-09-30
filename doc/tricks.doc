@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: tricks.doc,v 1.27 2009-04-15 10:41:15 seelisch Exp $
+@comment $Id: tricks.doc,v 1.28 2009-09-30 13:33:21 Singular Exp $
 @comment this file contains the "Tricks and pittfalls" sections
 
 @c The following directives are necessary for proper compilation
@@ -81,6 +81,8 @@ displays only the first 20 characters
 @c @code{@}} and the end of the line.)
 @item
 statements may not contain more than 10000 tokens
+@item
+tokens (i.e. strings, numbers, ...) may not be longer than 16382 characters
 @item
 @cindex German Umlaute
 @cindex non-english special characters
