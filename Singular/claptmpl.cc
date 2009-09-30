@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.46 2009-09-17 10:27:36 seelisch Exp $
+// $Id: claptmpl.cc,v 1.47 2009-09-30 17:05:07 seelisch Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -256,6 +256,7 @@ template void noro_step<tgb_uint16>(poly*p,int &pn,slimgb_alg* c);
 template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 //std::priority_queue<MonRedRes>
 //
+/*
 // begin of template declarations for minor code (Frank Seelisch)
 #include <list>
 #include "Minor.h"
@@ -267,5 +268,6 @@ template class std::list<PolyMinorValue>;
 template class Cache<MinorKey, LongMinorValue>;
 template class Cache<MinorKey, PolyMinorValue>;
 // end of template declarations for minor code (Frank Seelisch)
+*/
 #endif
 //template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);
