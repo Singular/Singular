@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-10-01 13:58:24 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.94 2009-10-01 13:58:24 monerjan Exp $
-$Id: gfan.cc,v 1.94 2009-10-01 13:58:24 monerjan Exp $
+$Date: 2009-10-01 16:50:22 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.95 2009-10-01 16:50:22 monerjan Exp $
+$Id: gfan.cc,v 1.95 2009-10-01 16:50:22 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -309,6 +309,7 @@ void facet::fDebugPrint()
 gcone::gcone()
 {
 	this->next=NULL;
+	this->prev=NULL;
 	this->facetPtr=NULL;	//maybe this->facetPtr = new facet();			
 	this->baseRing=currRing;
 	this->counter++;
@@ -327,6 +328,7 @@ gcone::gcone()
 gcone::gcone(ring r, ideal I)
 {
 	this->next=NULL;
+	this->prev=NULL;
 	this->facetPtr=NULL;			
 	this->rootRing=r;
 	this->inputIdeal=I;
@@ -345,6 +347,8 @@ gcone::gcone(ring r, ideal I)
 gcone::gcone(const gcone& gc, const facet &f)
 {
 	this->next=NULL;
+// 	this->prev=(gcone *)&gc; //comment in to get a tree
+	this->prev=NULL;
 	this->numVars=gc.numVars;						
 	this->counter++;
 	this->UCN=this->counter;			
@@ -362,7 +366,21 @@ gcone::gcone(const gcone& gc, const facet &f)
 */
 gcone::~gcone()
 {
-			//NOTE SAVE THE FACET STRUCTURE!!!
+	idDelete((ideal *)&this->gcBasis);
+	idDelete((ideal *)&this->inputIdeal);
+	rDelete(this->rootRing);
+	rDelete(this->baseRing);
+	facet *fAct;
+	facet *fDel;
+	/*Delete the facet structure*/
+	fAct=this->facetPtr;
+	fDel=fAct;
+	while(fAct!=NULL)
+	{
+		fDel=fAct;
+		fAct=fAct->next;
+		delete fDel;
+	}
 }			
 		
 /** \brief Set the interior point of a cone */
@@ -855,7 +873,7 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 {			
 	intvec *fNormal = new intvec(this->numVars);	//facet normal, check for parallelity			
 	fNormal = f->getFacetNormal();	//read this->fNormal;
-#ifdef gfan_DEBUG
+//#ifdef gfan_DEBUG
 			//std::cout << "===" << std::endl;
 	std::cout << "running gcone::flip" << std::endl;
 	std::cout << "flipping UCN " << this->getUCN() << endl;
@@ -867,7 +885,7 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	fNormal->show(1,0);
 	cout << ") with UCN " << f->getUCN();
 	std::cout << std::endl;
-#endif				
+//#endif				
 	/*1st step: Compute the initial ideal*/
 	poly initialFormElement[IDELEMS(gb)];	//array of #polys in GB to store initial form
 	ideal initialForm=idInit(IDELEMS(gb),this->gcBasis->rank);
@@ -1813,6 +1831,8 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 #endif
 			rChangeCurrRing(gcAct->baseRing);
 			//rDelete(rTmp);
+			//doubly linked for easier removal
+			gcTmp->prev = gcPtr;
 			gcPtr->next=gcTmp;
 			gcPtr=gcPtr->next;
 			if(fAct->getUCN() == fAct->next->getUCN())
@@ -1830,8 +1850,14 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 		//Search for cone with smallest UCN
 		gcNext = gcHead;
 		while(gcNext!=NULL)
-		{
-			//if( gcNext->getUCN() == UCNcounter+1 )
+		{			
+			/*NOTE if gcNext->getUCN is smaller than SearchListRoot->getUCN it follows, that the cone
+			gcNext will not be used in any more computation. So -> delete
+			*/
+			if (gcNext->getUCN() < SearchListRoot->getUCN() )
+			{
+				idDelete((ideal *)&gcNext->gcBasis);	//at least drop huge gröbner bases
+			}
 			if( gcNext->getUCN() == SearchListRoot->getUCN() )
 			{
 				gcAct = gcNext;
@@ -1840,9 +1866,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 				rChangeCurrRing(rAct);						
 				break;						
 			}
-			/*NOTE if gcNext->getUCN is smaller than SearchListRoot->getUCN it follows, that the cone
-			 gcNext will not be used in any more computation. So -> delete
-			*/
+			
 // 			if (gcNext->getUCN() < SearchListRoot->getUCN() )
 // 			{
 // 				idDelete((ideal *)&gcAct->gcBasis);
@@ -2517,7 +2541,9 @@ ideal gfan(ideal inputIdeal)
 		cout << endl;
 		gcAct->getConeNormals(gcAct->gcBasis);		
 		gcAct->noRevS(*gcAct);		
-		res=gcAct->gcBasis;
+		//res=gcAct->gcBasis;
+		//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS
+		res = inputIdeal; 
 	}
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD

@@ -2,9 +2,9 @@
 gfan.h Interface to gfan.cc
 
 $Author: monerjan $
-$Date: 2009-10-01 07:57:24 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.8 2009-10-01 07:57:24 monerjan Exp $
-$Id: gfan.h,v 1.8 2009-10-01 07:57:24 monerjan Exp $
+$Date: 2009-10-01 16:50:22 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.9 2009-10-01 16:50:22 monerjan Exp $
+$Id: gfan.h,v 1.9 2009-10-01 16:50:22 monerjan Exp $
 */
 #ifdef HAVE_GFAN
 #include "intvec.h"
@@ -138,8 +138,8 @@ class gcone
 		
 		/** Contains the Groebner basis of the cone. Is set by gcone::getGB(ideal I)*/
 		ideal gcBasis;		//GB of the cone, set by gcone::getGB();
-		gcone *next;		//Pointer to *previous* cone in search tree	
-		
+		gcone *next;		//Pointer to next cone
+		gcone *prev;
 		
 		gcone();
 		gcone(ring r, ideal I);
