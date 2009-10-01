@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-09-29 06:03:16 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.90 2009-09-29 06:03:16 monerjan Exp $
-$Id: gfan.cc,v 1.90 2009-09-29 06:03:16 monerjan Exp $
+$Date: 2009-10-01 06:36:23 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.91 2009-10-01 06:36:23 monerjan Exp $
+$Id: gfan.cc,v 1.91 2009-10-01 06:36:23 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -59,7 +59,7 @@ $Id: gfan.cc,v 1.90 2009-09-29 06:03:16 monerjan Exp $
 #endif
 
 #ifndef gfan_DEBUG
-//#define gfan_DEBUG
+#define gfan_DEBUG
 #ifndef gfan_DEBUGLEVEL
 #define gfan_DEBUGLEVEL 1
 #endif
@@ -254,7 +254,7 @@ class facet
 		*/
 		int getUCN()
 		{
-			if(this!=NULL && this!=(facet *)0xfbfbfbfbfbfbfbfb)
+			if(this!=NULL && ( this!=0xfbfbfbfb || this!=(facet *)0xfbfbfbfbfbfbfbfb) )
 				return this->UCN;
 			else
 				return -1;
@@ -308,46 +308,7 @@ class facet
 				codim2Act = codim2Act->next;
 			}
 			cout << "=======================" << endl;
-		}
-		
-		/*bool isFlippable(intvec &load)
-		{
-			bool res=TRUE;			
-			int jj;
-			for (int jj = 0; jj<load.length(); jj++)
-			{
-				intvec *ivCanonical = new intvec(load.length());
-				(*ivCanonical)[jj]=1;				
-				if (ivMult(&load,ivCanonical)<0)
-				{
-					res=FALSE;
-					break;
-				}
-			}
-			return res;
-			
-			/*while (dotProduct(load,ivCanonical)>=0)
-			{
-				if (jj!=this->numVars)
-				{
-					intvec *ivCanonical = new intvec(this->numVars);
-					(*ivCanonical)[jj]=1;			
-				 	res=TRUE;
-					jj += 1;
-				} 
-			}
-			if (jj==this->numVars)
-			{			
-				delete ivCanonical;
-				return FALSE;
-			}
-			else
-			{
-				delete ivCanonical;
-				return TRUE;
-		}*/						
-		//}//bool isFlippable(facet &f)
-		
+		}		
 		
 		friend class gcone;	//Bad style
 };
@@ -1235,7 +1196,7 @@ class gcone
 			dstRing->wvhdl[0]=(int*)A;
 			rComplete(dstRing);					
 			rChangeCurrRing(dstRing);
-			rDelete(tmpRing);
+			//rDelete(tmpRing);
 			delete iv_weight;
 //#ifdef gfan_DEBUG
 			rWrite(dstRing); cout << endl;
@@ -1273,7 +1234,7 @@ class gcone
 			cout << endl;
 //#endif			
 			rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
-			rDelete(dstRing);
+// 			rDelete(dstRing);
 		}//void flip(ideal gb, facet *f)
 				
 		/** \brief Compute the remainder of a polynomial by a given ideal
@@ -1398,12 +1359,7 @@ class gcone
 		{
 			intvec *res = new intvec(iv->length());
 			res=ivCopy(iv);
-			*res *= (int)-1;
-			//for(int ii=0;ii<this->numVars;ii++)
-			//{			
-				//(res)[ii] = (*res[ii])*(int)(-1);
-			//}
-			//res->show(1,0);			
+			*res *= (int)-1;						
 			return res;
 		}
 
@@ -1412,9 +1368,7 @@ class gcone
 		*
 		*/
 		int dotProduct(intvec const &iva, intvec const &ivb)				
-		{
-			//intvec iva=a;
-			//intvec ivb=b;
+		{			
 			int res=0;
 			for (int i=0;i<this->numVars;i++)
 			{
@@ -1889,11 +1843,10 @@ class gcone
 			Choose a facet from fListPtr, flip it and forget the previous cone
 			We always choose the first facet from fListPtr as facet to be flipped
 			*/			
-			while((SearchListAct!=NULL))// && counter<160)
+			while((SearchListAct!=NULL))// && counter<10)
 			{//NOTE See to it that the cone is only changed after ALL facets have been flipped!				
 				fAct = SearchListAct;
-				//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) )
-				//do
+				
 				while(fAct!=NULL)
 				{	//Since SLA should only contain flippables there should be no need to check for that
 					gcAct->flip(gcAct->gcBasis,fAct);
@@ -1915,7 +1868,7 @@ class gcone
 						gcTmp->showSLA(*SearchListRoot);
 #endif
  					rChangeCurrRing(gcAct->baseRing);
-					rDelete(rTmp);
+					//rDelete(rTmp);
  					gcPtr->next=gcTmp;
  					gcPtr=gcPtr->next;
 					if(fAct->getUCN() == fAct->next->getUCN())
@@ -1985,22 +1938,7 @@ class gcone
 				mpz_set( denom[ii], z);
 				mpz_clear(z);				
 			}
-			
-			//Check whether denom is all ones, in which case we will divide out the gcd of the nominators
-// 			mpz_t checksum; mpz_t rop;
-// 			mpz_init(checksum);
-// 			mpz_init(rop);
-// 			bool divideOutGcd=FALSE;
-// 			for(int ii=0;ii<this->numVars;ii++)
-// 			{
-// 				mpz_add(rop, checksum, denom[ii]);
-// 				mpz_set(checksum, rop);
-// 			}
-// 			if( (int)mpz_get_ui(checksum)==this->numVars)
-// 			{
-// 				divideOutGcd=TRUE;
-// 			}
-			
+						
 			/*Compute lcm of the denominators*/
 			mpz_set(tmp,denom[0]);
 			for (int ii=0;ii<(M->colsize)-1;ii++)
@@ -2065,22 +2003,7 @@ class gcone
 				}
 				fAct = fAct->next;
 			}
-		
-			//delete n;
-			/*codim2Act = this->facetPtr->codim2Ptr;	//reset to start of linked list			
-			while(codim2Act!=NULL)
-			{				
-				n=codim2Act->getFacetNormal();
-				intvec *new_n = new intvec(this->numVars);
-				for(int ii=0;ii<this->numVars;ii++)
-				{
-					(*new_n)[ii] = (*n)[ii]*ggT;
-				}
-				codim2Act->setFacetNormal(new_n);
-				codim2Act = codim2Act->next;
-				//delete n;
-				//delete new_n;
-			}	*/		
+				
 		}
 		/** \brief Enqueue new facets into the searchlist 
 		* The searchlist (SLA for short) is implemented as a FIFO
@@ -2206,6 +2129,11 @@ class gcone
 					while(slAct!=NULL)
 					//while(slAct!=slEndStatic->next)
 					{
+// 						if(deleteMarker!=NULL)
+// 						{
+// 							delete deleteMarker;
+// 							deleteMarker=NULL;
+// 						}
 						removalOccured=FALSE;
 						slNormal = slAct->getFacetNormal();
 #ifdef gfan_DEBUG
@@ -2287,6 +2215,7 @@ class gcone
 								//update lengthOfSearchList					
  								lengthOfSearchList--;
 								//delete slAct;
+								//slAct=NULL;
 								//slAct = slAct->next; //not needed, since facets are equal
 								//delete deleteMarker;
 								//deleteMarker=NULL;
@@ -2321,7 +2250,7 @@ class gcone
 						be a way it gets called twice thus ommiting one facet:
  						slAct = slAct->next;*/						
 						//delete deleteMarker;
-						deleteMarker=NULL;
+						//deleteMarker=NULL;
 						//if slAct was marked as to be deleted, delete it here!
 					}//while(slAct!=NULL)									
 					if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) || (doNotAdd==FALSE) )
