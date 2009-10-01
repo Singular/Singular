@@ -33,6 +33,8 @@ int reductionTime       =   0;
 int spolsTime           =   0;
 int highestDegree       =   0;
 int degreeBound         =   0;
+int numberUsefulPairs   =   0;
+int numberUselessPairs  =   0;
 /*
 ====================================================================
 sorting ideals by decreasing total degree "left" and "right" are the 
@@ -151,7 +153,14 @@ LList* F5inc(int i, poly f_i, LList* gPrev, LList* reducers, ideal gbPrev, poly 
         //int timer4  =   initTimer();
         //startTimer();
         //critPairs->print();
-        computeSPols(critPairsMinDeg,rTag,rules,sPolyList);
+        if(numberUsefulPairs > 0) {
+          Print("number of useful pairs:  %d\n",numberUsefulPairs);
+          Print("number of useless pairs: %d\n\n",numberUselessPairs);
+          computeSPols(critPairsMinDeg,rTag,rules,sPolyList);
+        }
+        else {
+          return gPrev;
+        }
         //timer4  =   getTimer();
         //Print("SPOLS TIMER: %d\n",timer4);
         //spolsTime  =   spolsTime  +   timer4;
@@ -167,6 +176,9 @@ LList* F5inc(int i, poly f_i, LList* gPrev, LList* reducers, ideal gbPrev, poly 
         //startTimer();
         //sPolyList->print();
         //reduction(sPolyList, critPairs, gPrev, rules, lTag, rTag, gbPrev);
+        Print("BEFORE REDUCTION: \n");
+        Print("number of useful pairs:  %d\n",numberUsefulPairs);
+        Print("number of useless pairs: %d\n\n",numberUselessPairs);
         newReduction(sPolyList, critPairs, gPrev, reducers, rules, lTag, rTag, gbPrev, termination);
         //timer3      =  getTimer();
         //reductionTime = reductionTime + timer3;
@@ -236,11 +248,100 @@ LList* F5inc(int i, poly f_i, LList* gPrev, LList* reducers, ideal gbPrev, poly 
 /*
 ================================================================
 computes a list of critical pairs for the next reduction process
+the first element is always "useful" thus the critical pair 
+computed is either "useful" or "useless" depending on the second 
+element which generates the critical pair.
 first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
 inline void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* rules) {
+    //Print("IN CRITPAIRS\n");
+    // initialization for usage in pLcm()
+    number nOne         =   nInit(1);
+    LNode* newElement   =   gPrev->getLast();
+    LNode* temp         =   gPrev->getFirst();
+    poly u1             =   pOne();
+    poly u2             =   pOne();
+    poly lcm            =   pOne();
+    poly t              =   pHead(newElement->getPoly());
+    RuleOld* testedRuleOld    =   NULL;
+    if(NULL != rules->getFirst()) {
+        testedRuleOld  =   rules->getFirst()->getRuleOld();
+    }
+    // computation of critical pairs
+    while( gPrev->getLast() != temp) {
+        pLcm(newElement->getPoly(), temp->getPoly(), lcm);
+        pSetCoeff(lcm,nOne);
+        // computing factors u2 for new labels
+        u1 = pDivide(lcm,t);
+        if(NULL == u1) {
+            break;
+        }
+        pSetCoeff(u1,nOne);
+        u2 = pDivide(lcm,pHead(temp->getPoly()));
+        pSetCoeff(u2,nOne);
+        // testing both new labels by the F5 Criterion
+        if(!temp->getDel()) {
+          if(!criterion2(gPrev->getFirst()->getIndex(), u2, temp, rules, rTag)
+            && !criterion2(gPrev->getFirst()->getIndex(), u1, newElement, rules, rTag) 
+            && !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
+              // if they pass the test, add them to CListOld critPairs, having the LPolyOld with greater
+              // label as first element in the CPairOld
+              if(newElement->getIndex() == temp->getIndex() && 
+              -1 == pLmCmp(ppMult_qq(u1, newElement->getTerm()),ppMult_qq(u2, temp->getTerm()))) {
+                  CPairOld* cp   =   new CPairOld(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u2, 
+                                  temp->getLPolyOld(), u1, newElement->getLPolyOld(), 0 , testedRuleOld);                   
+                  critPairs->insert(cp);
+                  // counting the number of useful pairs
+                  numberUsefulPairs++;
+              }
+              else {
+                  CPairOld* cp   =   new CPairOld(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u1, 
+                                  newElement->getLPolyOld(), u2, temp->getLPolyOld(), 0, testedRuleOld);                   
+                  critPairs->insert(cp);
+                  // counting the number of useful pairs
+                  numberUsefulPairs++;
+              }
+          }
+        }
+        else {
+          if(!criterion2(gPrev->getFirst()->getIndex(), u2, temp, rules, rTag)
+            && !criterion2(gPrev->getFirst()->getIndex(), u1, newElement, rules, rTag) 
+            && !criterion1(gPrev,u1,newElement,lTag) && !criterion1(gPrev,u2,temp,lTag)) {
+              // if they pass the test, add them to CListOld critPairs, having the LPolyOld with greater
+              // label as first element in the CPairOld
+              if(newElement->getIndex() == temp->getIndex() && 
+              -1 == pLmCmp(ppMult_qq(u1, newElement->getTerm()),ppMult_qq(u2, temp->getTerm()))) {
+                  CPairOld* cp   =   new CPairOld(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u2, 
+                                  temp->getLPolyOld(), u1, newElement->getLPolyOld(), 1 , testedRuleOld);                   
+                  critPairs->insert(cp);
+                  numberUselessPairs++;
+              }
+              else {
+                  CPairOld* cp   =   new CPairOld(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u1, 
+                                  newElement->getLPolyOld(), u2, temp->getLPolyOld(), 1, testedRuleOld);                   
+                  critPairs->insert(cp);
+                  numberUselessPairs++;
+              }
+          }
+        }
+        temp    =   temp->getNext();
+    }
+}
+
+
+
+/*
+================================================================
+computes a list of critical pairs for the next reduction process
+the first element is always "useless" thus the critical pair 
+computed is "useless".
+first element in gPrev is always the newest element which must
+build critical pairs with all other elements in gPrev
+================================================================
+*/
+inline void criticalPair2(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* rules) {
     //Print("IN CRITPAIRS\n");
     // initialization for usage in pLcm()
     number nOne         =   nInit(1);
@@ -275,24 +376,20 @@ inline void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTag
             if(newElement->getIndex() == temp->getIndex() && 
             -1 == pLmCmp(ppMult_qq(u1, newElement->getTerm()),ppMult_qq(u2, temp->getTerm()))) {
                 CPairOld* cp   =   new CPairOld(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u2, 
-                                temp->getLPolyOld(), u1, newElement->getLPolyOld(), testedRuleOld);                   
+                                temp->getLPolyOld(), u1, newElement->getLPolyOld(), 1 , testedRuleOld);                   
                 critPairs->insert(cp);
+                numberUselessPairs++;
             }
             else {
                 CPairOld* cp   =   new CPairOld(pDeg(ppMult_qq(u2,pHead(temp->getPoly()))), u1, 
-                                newElement->getLPolyOld(), u2, temp->getLPolyOld(), testedRuleOld);                   
+                                newElement->getLPolyOld(), u2, temp->getLPolyOld(), 1, testedRuleOld);                   
                 critPairs->insert(cp);
+                numberUselessPairs++;
             }
-        }
-        else {
         }
         temp    =   temp->getNext();
     }
 }
-
-
-
-
 
 
 
@@ -527,6 +624,14 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
     //first->print();
 
     while(NULL != temp) {
+        // counting the number of useful pairs
+        if(!temp->getDel()) {
+          //Print("%d\n",numberUsefulPairs);
+          numberUsefulPairs--;
+        }
+        else {
+          numberUselessPairs--;
+        }
         //Print("JA\n");
         // only if a new RuleOld was added since the last test in subalgorithm criticalPair()
         //if(rules->getFirst() != rTag->getFirst()) {
@@ -586,6 +691,9 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         }
                         // data is saved in sPolyList or zero => delete sp
                     }
+                    else {
+                      Print("CRITERION 2 in SPOLS 2nd generator\n");
+                    }
                 }
                 else { // temp->getLp2Index() < temp->getLp1Index()
                     // computation of S-polynomial
@@ -639,6 +747,9 @@ void computeSPols(CNode* first, RTagList* rTag, RList* rules, LList* sPolyList) 
                         //sPolyList->insertByLabel(ppMult_qq(temp->getT1(),temp->getLp1Term()),temp->getLp1Index(),sp,rNew);
                     }
                 }
+            }
+            else {
+              Print("CRITERION 2 in SPOLS 1st generator\n");
             }
         //}
         //Print("%p\n",temp);
@@ -839,7 +950,7 @@ void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, LList*
                                       //pWrite(u);
                                       //pWrite(tempRed->getTerm());
                                       //pWrite(pHead(tempRed->getPoly())); 
-                                      //addToG  = 0;
+                                      addToG  = 0;
                         }
                         if(pLmCmp(ppMult_qq(u,tempRed->getTerm()),l->getTerm()) != 0) {
                             // passing criterion2 ?
@@ -1069,12 +1180,15 @@ addToG  = 0;
             //pDelete(&redPoly);
         }
         else {
-            //Print("\nELEMENT ADDED TO GPREV: ");
+            Print("\nELEMENT ADDED TO GPREV: ");
             pNorm(redPoly);
-            //pWrite(pHead(redPoly));
-            //pWrite(l->getTerm());
+            pWrite(pHead(redPoly));
+            pWrite(l->getTerm());
             //Print("%d\n",canonicalize);
             l->setPoly(redPoly);
+            // give "l" the label if it is "useful" (addToG = 0) or "useless"
+            // (addToG = 1)
+            l->setDel(!addToG);
             if(addToG == 0 && termination == 1) {
               reducers->insert(l->getLPolyOld());
             }
@@ -1094,8 +1208,16 @@ addToG  = 0;
               //pWrite(l->getTerm());
             }
             }
+            // case in which all new elements are added to gPrev!
+            // using boolean "addToG" to know if the element is "useful" (0) or
+            // "useless" (1)
             else {
-              criticalPair(gPrev,critPairs,lTag,rTag,rules);
+              if(!l->getDel()) {
+                criticalPair(gPrev,critPairs,lTag,rTag,rules);
+              }
+              else {
+                criticalPair2(gPrev,critPairs,lTag,rTag,rules);
+              }
             }
         }
     
@@ -1661,6 +1783,8 @@ ideal F5main(ideal id, ring r, int opt, int termination) {
     highestDegree       =   0;
     reductionTime       =   0;
     spolsTime           =   0;
+    numberUselessPairs  =   0;
+    numberUsefulPairs   =   0;
     return(gbPrev);
 
 

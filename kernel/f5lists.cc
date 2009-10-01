@@ -766,6 +766,10 @@ poly* CNode::getAdT2() {
     return this->data->getAdT2();
 }
 
+bool CNode::getDel() {
+  return data->getDel();
+}
+
 RuleOld* CNode::getTestedRuleOld() {
     return this->data->getTestedRuleOld();
 }

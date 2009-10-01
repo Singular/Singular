@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.44 2009-08-31 13:55:46 ederc Exp $ */
+/* $Id: f5gb.h,v 1.45 2009-10-01 13:40:16 ederc Exp $ */
 /*
 * ABSTRACT: f5gb interface
 */
@@ -47,11 +47,25 @@ LList* F5inc(int i, poly f_i, LList* gPrev,LList* reducers, ideal gbPrev, poly O
 /*
 ================================================================
 computes a list of critical pairs for the next reduction process
+the first element is always "useful" thus the critical pair 
+computed is either "useful" or "useless" depending on the second 
+element which generates the critical pair.
 first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
 void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* RuleOlds);
+
+/*
+================================================================
+computes a list of critical pairs for the next reduction process
+the first element is always "useless" thus the critical pair 
+computed is "useless".
+first element in gPrev is always the newest element which must
+build critical pairs with all other elements in gPrev
+================================================================
+*/
+void criticalPair2(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* RuleOlds);
 
 /*
 ========================================

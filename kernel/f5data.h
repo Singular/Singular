@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.14 2009-08-31 13:55:46 ederc Exp $ */
+/* $Id: f5data.h,v 1.15 2009-10-01 13:40:16 ederc Exp $ */
 /*
 * ABSTRACT: labeled polynomial interface
 */
@@ -123,8 +123,9 @@ class CPairOld {
         poly    t2;             // second term for label
         LPolyOld*  lp2;            // second labeled poly
         RuleOld*   testedRuleOld;     // already tested by RuleOlds up to lastRuleOldTested
+        bool  del;
     public:
-        inline          CPairOld(long degree, poly term1, LPolyOld* LPolyOld1, poly term2, LPolyOld* LPolyOld2, RuleOld* r = NULL);
+        inline          CPairOld(long degree, poly term1, LPolyOld* LPolyOld1, poly term2, LPolyOld* LPolyOld2, bool useless, RuleOld* r = NULL);
         inline  long    getDeg();
         inline  poly    getT1();
         inline  poly*   getAdT1();
@@ -138,17 +139,19 @@ class CPairOld {
         inline  poly    getLp2Poly();
         inline  poly    getLp2Term();
         inline  int     getLp2Index();
+        inline  bool    getDel();
         inline  RuleOld*   getTestedRuleOld();
         inline  void    setTestedRuleOld(RuleOld* r);
 };
 
-CPairOld::CPairOld(long degree, poly term1, LPolyOld* LPolyOld1, poly term2, LPolyOld* LPolyOld2, RuleOld* r) {
+CPairOld::CPairOld(long degree, poly term1, LPolyOld* LPolyOld1, poly term2, LPolyOld* LPolyOld2, bool useless, RuleOld* r) {
    deg              =   degree;
    t1               =   term1;
    lp1              =   LPolyOld1;
    t2               =   term2;
    lp2              =   LPolyOld2;
    testedRuleOld       =   r;
+   del              =   useless;
 }
 
 long CPairOld::getDeg() {
@@ -201,6 +204,10 @@ int CPairOld::getLp1Index() {
 
 int CPairOld::getLp2Index() {
     return lp2->getIndex();
+}
+
+bool CPairOld::getDel() {
+  return del;
 }
 
 RuleOld* CPairOld::getTestedRuleOld() {
