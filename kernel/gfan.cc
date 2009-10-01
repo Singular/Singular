@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-10-01 06:36:23 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.91 2009-10-01 06:36:23 monerjan Exp $
-$Id: gfan.cc,v 1.91 2009-10-01 06:36:23 monerjan Exp $
+$Date: 2009-10-01 07:15:49 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.92 2009-10-01 07:15:49 monerjan Exp $
+$Id: gfan.cc,v 1.92 2009-10-01 07:15:49 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -65,7 +65,7 @@ $Id: gfan.cc,v 1.91 2009-10-01 06:36:23 monerjan Exp $
 #endif
 #endif
 
-//#include gcone.h
+#include <gfan.h>
 using namespace std;
 
 /**
@@ -73,246 +73,54 @@ using namespace std;
 *	Implements the facet structure as a linked list
 *
 */
-class facet
-{
-	private:
-		/** \brief Inner normal of the facet, describing it uniquely up to isomorphism */
-		intvec *fNormal;
 		
-		/** \brief An interior point of the facet*/
-		intvec *interiorPoint;
-		
-		/** \brief Universal Cone Number
-		* The number of the cone the facet belongs to, Set in getConeNormals()
-		*/
-		int UCN;
-		
-		/** \brief The codim of the facet
-		*/
-		int codim;
-		
-		/** \brief The Groebner basis on the other side of a shared facet
-		 *
-		 * In order not to have to compute the flipped GB twice we store the basis we already get
-		 * when identifying search facets. Thus in the next step of the reverse search we can 
-		 * just copy the old cone and update the facet and the gcBasis.
-		 * facet::flibGB is set via facet::setFlipGB() and printed via facet::printFlipGB
-		 */
-		ideal flipGB;		//The Groebner Basis on the other side, computed via gcone::flip		
-			
-	public:	
-		/** \brief Boolean value to indicate whether a facet is flippable or not
-		* This is also used to mark facets that nominally are flippable but which do
-		* not intersect with the positive orthant. This check is done in gcone::getCodim2Normals
-		*/	
-		bool isFlippable;	//**flippable facet? */
-		bool isIncoming;	//Is the facet incoming or outgoing in the reverse search?
-		facet *next;		//Pointer to next facet
-		facet *prev;		//Pointer to predecessor. Needed for the SearchList in noRevS
-		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
-		int numCodim2Facets;	//#of (codim-2)-facets of this facet. Set in getCodim2Normals()
-		ring flipRing;		//the ring on the other side of the facet
-						
 		/** The default constructor. Do I need a constructor of type facet(intvec)? */
-		facet()			
-		{
-			// Pointer to next facet.  */
-			/* Defaults to NULL. This way there is no need to check explicitly */
-			this->fNormal=NULL;
-			this->interiorPoint=NULL;		
-			this->UCN=0;
-			this->codim2Ptr=NULL;
-			this->codim=1;		//default for (codim-1)-facets
-			this->numCodim2Facets=0;
-			this->flipGB=NULL;
-			this->isIncoming=FALSE;
-			this->next=NULL;
-			this->prev=NULL;		
-			this->flipRing=NULL;
-			this->isFlippable=FALSE;
-		}
+facet::facet()			
+{
+	// Pointer to next facet.  */
+	/* Defaults to NULL. This way there is no need to check explicitly */
+	this->fNormal=NULL;
+	this->interiorPoint=NULL;		
+	this->UCN=0;
+	this->codim2Ptr=NULL;
+	this->codim=1;		//default for (codim-1)-facets
+	this->numCodim2Facets=0;
+	this->flipGB=NULL;
+	this->isIncoming=FALSE;
+	this->next=NULL;
+	this->prev=NULL;		
+	this->flipRing=NULL;
+	this->isFlippable=FALSE;
+}
 		
-		/** \brief Constructor for facets of codim >= 2
-		*/
-		facet(int const &n)
-		{
-			this->fNormal=NULL;
-			this->interiorPoint=NULL;			
-			this->UCN=0;
-			this->codim2Ptr=NULL;
-			if(n>1)
-			{
-				this->codim=n;
-			}//NOTE Handle exception here!			
-			this->numCodim2Facets=0;
-			this->flipGB=NULL;
-			this->isIncoming=FALSE;
-			this->next=NULL;
-			this->prev=NULL;
-			this->flipRing=NULL;
-			this->isFlippable=FALSE;
-		}
+/** \brief Constructor for facets of codim >= 2
+*/
+facet::facet(int const &n)
+{
+	this->fNormal=NULL;
+	this->interiorPoint=NULL;			
+	this->UCN=0;
+	this->codim2Ptr=NULL;
+	if(n>1)
+	{
+		this->codim=n;
+	}//NOTE Handle exception here!			
+	this->numCodim2Facets=0;
+	this->flipGB=NULL;
+	this->isIncoming=FALSE;
+	this->next=NULL;
+	this->prev=NULL;
+	this->flipRing=NULL;
+	this->isFlippable=FALSE;
+}
 		
-		/** \brief The copy constructor
-		*/
-		facet(const facet& f)
-		{
-		}
+/** \brief The copy constructor
+*/
+facet::facet(const facet& f)
+{
+}
 		
-		/** The default destructor */
-		~facet();
-		
-		
-		/** \brief Comparison of facets*/
-		bool areEqual(facet &f, facet &g)
-		{
-			bool res = TRUE;
-			intvec *fNormal = new intvec(pVariables);
-			intvec *gNormal = new intvec(pVariables);
-			fNormal = f.getFacetNormal();
-			gNormal = g.getFacetNormal();
-			if((fNormal == gNormal))//||(gcone::isParallel(fNormal,gNormal)))
-			{
-				if(f.numCodim2Facets==g.numCodim2Facets)
-				{
-					facet *f2Act;
-					facet *g2Act;
-					f2Act = f.codim2Ptr;
-					g2Act = g.codim2Ptr;
-					intvec *f2N = new intvec(pVariables);
-					intvec *g2N = new intvec(pVariables);
-					while(f2Act->next!=NULL && g2Act->next!=NULL)
-					{
-						for(int ii=0;ii<f2N->length();ii++)
-						{
-							if(f2Act->getFacetNormal() != g2Act->getFacetNormal())
-							{
-								res=FALSE;								
-							}
-							if (res==FALSE)
-								break;
-						}
-						if(res==FALSE)
-							break;
-						
-						f2Act = f2Act->next;
-						g2Act = g2Act->next;
-					}//while
-				}//if		
-			}//if
-			else
-			{
-				res = FALSE;
-			}
-			return res;
-		}
-		
-		/** Stores the facet normal \param intvec*/
-		void setFacetNormal(intvec *iv)
-		{
-			this->fNormal = ivCopy(iv);			
-		}
-		
-		/** Hopefully returns the facet normal */
-		intvec *getFacetNormal()
-		{				
-			return this->fNormal;
-		}
-		
-		/** Method to print the facet normal*/
-		void printNormal()
-		{
-			fNormal->show();
-		}
-		
-		/** Store the flipped GB*/
-		void setFlipGB(ideal I)
-		{
-			this->flipGB=idCopy(I);
-		}
-		
-		/** Return the flipped GB*/
-		ideal getFlipGB()
-		{
-			return this->flipGB;
-		}
-		
-		/** Print the flipped GB*/
-		void printFlipGB()
-		{
-			idShow(this->flipGB);
-		}
-		
-		/** Set the UCN */
-		void setUCN(int n)
-		{
-			this->UCN=n;
-		}
-		
-		/** \brief Get the UCN 
-		* Returns the UCN iff this != NULL, else -1
-		*/
-		int getUCN()
-		{
-			if(this!=NULL && ( this!=0xfbfbfbfb || this!=(facet *)0xfbfbfbfbfbfbfbfb) )
-				return this->UCN;
-			else
-				return -1;
-		}
-		
-		/** Store an interior point of the facet */
-		void setInteriorPoint(intvec *iv)
-		{
-			this->interiorPoint = ivCopy(iv);
-		}
-		
-		intvec *getInteriorPoint()
-		{
-			return this->interiorPoint;
-		}	
-		
-		/** \brief Debugging function
-		* prints the facet normal an all (codim-2)-facets that belong to it
-		*/
-		void fDebugPrint()
-		{			
-			facet *codim2Act;			
-			codim2Act = this->codim2Ptr;
-			intvec *fNormal;
-			fNormal = this->getFacetNormal();
-			intvec *f2Normal;
-			cout << "=======================" << endl;
-			cout << "Facet normal = (";
-			fNormal->show(1,1);
-			cout << ")"<<endl;
-			/*for(int ii=0;ii<pVariables;ii++)
-			{
-				cout << (*fNormal)[ii] << ",";
-			}
-			if(this->isFlippable==TRUE)
-				cout << ")" << endl;
-			else
-				cout << ")*" << endl;*/	//This case should never happen in SLA!
-			cout << "-----------------------" << endl;
-			cout << "Codim2 facets:" << endl;
-			while(codim2Act!=NULL)
-			{
-				f2Normal = codim2Act->getFacetNormal();
-				cout << "(";
-				f2Normal->show(1,0);
-// 				for(int jj=0;jj<pVariables;jj++)
-// 				{
-// 					cout << (*f2Normal)[jj] << ",";
-// 				}
-				cout << ")" << endl;
-				codim2Act = codim2Act->next;
-			}
-			cout << "=======================" << endl;
-		}		
-		
-		friend class gcone;	//Bad style
-};
-
+/** The default destructor */
 facet::~facet()
 {
 // 	idDelete((ideal *)this->flipGB);
@@ -323,6 +131,157 @@ facet::~facet()
 	rDelete(this->flipRing);
 	//this=NULL;
 }
+		
+		
+/** \brief Comparison of facets*/
+bool facet::areEqual(facet &f, facet &g)
+{
+	bool res = TRUE;
+	intvec *fNormal = new intvec(pVariables);
+	intvec *gNormal = new intvec(pVariables);
+	fNormal = f.getFacetNormal();
+	gNormal = g.getFacetNormal();
+	if((fNormal == gNormal))//||(gcone::isParallel(fNormal,gNormal)))
+	{
+		if(f.numCodim2Facets==g.numCodim2Facets)
+		{
+			facet *f2Act;
+			facet *g2Act;
+			f2Act = f.codim2Ptr;
+			g2Act = g.codim2Ptr;
+			intvec *f2N = new intvec(pVariables);
+			intvec *g2N = new intvec(pVariables);
+			while(f2Act->next!=NULL && g2Act->next!=NULL)
+			{
+				for(int ii=0;ii<f2N->length();ii++)
+				{
+					if(f2Act->getFacetNormal() != g2Act->getFacetNormal())
+					{
+						res=FALSE;								
+					}
+					if (res==FALSE)
+						break;
+				}
+				if(res==FALSE)
+					break;
+				
+				f2Act = f2Act->next;
+				g2Act = g2Act->next;
+			}//while
+		}//if		
+	}//if
+	else
+	{
+		res = FALSE;
+	}
+	return res;
+}
+		
+/** Stores the facet normal \param intvec*/
+void facet::setFacetNormal(intvec *iv)
+{
+	this->fNormal = ivCopy(iv);			
+}
+		
+/** Hopefully returns the facet normal */
+intvec *facet::getFacetNormal()
+{				
+	return this->fNormal;
+}
+		
+/** Method to print the facet normal*/
+void facet::printNormal()
+{
+	fNormal->show();
+}
+		
+/** Store the flipped GB*/
+void facet::setFlipGB(ideal I)
+{
+	this->flipGB=idCopy(I);
+}
+		
+/** Return the flipped GB*/
+ideal facet::getFlipGB()
+{
+	return this->flipGB;
+}
+		
+/** Print the flipped GB*/
+void facet::printFlipGB()
+{
+	idShow(this->flipGB);
+}
+		
+/** Set the UCN */
+void facet::setUCN(int n)
+{
+	this->UCN=n;
+}
+		
+/** \brief Get the UCN 
+* Returns the UCN iff this != NULL, else -1
+*/
+int facet::getUCN()
+{
+	if(this!=NULL && ( this!=(facet *)0xfbfbfbfb || this!=(facet *)0xfbfbfbfbfbfbfbfb) )
+		return this->UCN;
+	else
+		return -1;
+}
+		
+/** Store an interior point of the facet */
+void facet::setInteriorPoint(intvec *iv)
+{
+	this->interiorPoint = ivCopy(iv);
+}
+		
+intvec *facet::getInteriorPoint()
+{
+	return this->interiorPoint;
+}	
+		
+/** \brief Debugging function
+* prints the facet normal an all (codim-2)-facets that belong to it
+*/
+void facet::fDebugPrint()
+{			
+	facet *codim2Act;			
+	codim2Act = this->codim2Ptr;
+	intvec *fNormal;
+	fNormal = this->getFacetNormal();
+	intvec *f2Normal;
+	cout << "=======================" << endl;
+	cout << "Facet normal = (";
+	fNormal->show(1,1);
+	cout << ")"<<endl;
+	/*for(int ii=0;ii<pVariables;ii++)
+	{
+		cout << (*fNormal)[ii] << ",";
+	}
+	if(this->isFlippable==TRUE)
+		cout << ")" << endl;
+	else
+		cout << ")*" << endl;*/	//This case should never happen in SLA!
+	cout << "-----------------------" << endl;
+	cout << "Codim2 facets:" << endl;
+	while(codim2Act!=NULL)
+	{
+		f2Normal = codim2Act->getFacetNormal();
+		cout << "(";
+		f2Normal->show(1,0);
+// 		for(int jj=0;jj<pVariables;jj++)
+// 		{
+// 				cout << (*f2Normal)[jj] << ",";
+// 		}
+		cout << ")" << endl;
+		codim2Act = codim2Act->next;
+	}
+	cout << "=======================" << endl;
+}		
+		
+//friend class gcone;	//Bad style
+
 
 /**
 *\brief Implements the cone structure
