@@ -1,5 +1,7 @@
-#ifndef MinorProcessorIncluded
-#define MinorProcessorIncluded
+#ifndef MINOR_PROCESSOR_H
+#define MINOR_PROCESSOR_H
+
+#ifdef HAVE_MINOR
 
 #include <Cache.h>
 #include <Minor.h>
@@ -27,7 +29,7 @@
     MinorProcessor makes use of MinorKey, MinorValue, and Cache. Therefore, it only works for matrices with integer
     entries. But the implementation of all mentioned classes (MinorKey, MinorValue, and MinorProcessor) is in this
     respect generic enough to quickly replace integer matrix entries by any other kind of objects (which only need
-    to implement binary summation and multiplication).<br>
+    to implement binary addition and multiplication).<br>
     Elements of any ring, such as polynomial rings, are canonical choices for such objects.
     \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
 */
@@ -142,6 +144,7 @@ class MinorProcessor {
         
         virtual bool isEntryZero (const int absoluteRowIndex, const int absoluteColumnIndex) const;
     public:
+        MinorProcessor ();
         /**
         * A method for defining a sub-matrix within a pre-defined matrix.
         * @param numberOfRows the number of rows in the sub-matrix
@@ -445,4 +448,7 @@ class PolyMinorProcessor : public MinorProcessor {
         string toString () const;
 };
 
+#endif // HAVE_MINOR
+
 #endif
+/* MINOR_PROCESSOR_H */

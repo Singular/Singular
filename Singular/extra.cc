@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.318 2009-09-30 17:05:07 seelisch Exp $ */
+/* $Id: extra.cc,v 1.319 2009-10-02 13:51:19 seelisch Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -158,6 +158,14 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 //#include <Python.h>
 //#include <python_wrapper.h>
 #endif
+
+#ifdef HAVE_MINOR
+#include "TestMinors.h" // for testing new minor code
+#endif // HAVE_MINOR
+
+#ifdef HAVE_WRAPPERS
+#include "Wrappers.h" // for testing C++ wrappers
+#endif // HAVE_WRAPPERS
 
 
 void piShowProcList();
@@ -2093,6 +2101,96 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
 #endif
+/*==================== C++ wrappers ========================*/
+#ifdef HAVE_WRAPPERS
+      if(strcmp(sys_cmd,"c++wrappers")==0)
+      {
+        if (h == NULL) testWrappers(FALSE);  // wrapper tests, no detailed printout
+        else if (h->Typ() == INT_CMD)
+        {
+          const int detailedOutput = (const int)h->Data();
+          testWrappers(detailedOutput == 0 ? FALSE : TRUE);
+          // wrapper tests, with or without detailed printout
+        }
+        return FALSE;
+      }
+      else
+#endif // HAVE_WRAPPERS
+/*==================== new minor code ========================*/
+#ifdef HAVE_MINOR
+      if(strcmp(sys_cmd,"minors")==0)
+      {
+        if (h == NULL) minorUsageInfo();  // writes some info to the console
+                                          // on how to use this experimental code
+        else if (h->Typ() == INT_CMD)
+        {
+           testIntMinors(0);  // effectively no arguments provided:
+                              // this starts 5 default tests
+                              // with a random matrix with
+                              // integer entries;
+                              // for that, no ring needs to be
+                              // declared
+        }
+        else if ((h->Typ() == MATRIX_CMD) &&
+                 (h->next->Typ() == INT_CMD) &&
+                 (h->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next == NULL))
+        {
+          const matrix m           = (const matrix)h->Data();
+          const int k              = (const int)h->next->Data();
+          const int strategy       = (const int)h->next->next->Data();
+          const int cacheEntries   = (const int)h->next->next->next->Data();
+          const long cacheWeight   = (const long)h->next->next->next->next->Data();
+          ideal iii = testAllPolyMinorsAsIdeal(m, k, strategy, cacheEntries, cacheWeight);
+            // starts the computation of all k x k minors in the
+            // provided matrix m (which is assumed to have polynomial
+            // entries) using a cache with 200 entries and a maximum total
+            // number of 10000 cached monomials;
+            // when calling this method, a ring must be declared before;
+            // there will be a run without using a cache; afterwards all 5
+            // caching strategies will be run
+          res->rtyp = IDEAL_CMD;
+          res->data = iii;
+        }
+        else if ((h->Typ() == MATRIX_CMD) &&
+                 (h->next->Typ() == INT_CMD) &&
+                 (h->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->next->next->Typ() == INT_CMD))
+        {
+          const matrix m           = (const matrix)h->Data();
+          const int k              = (const int)h->next->Data();
+          const int strategies     = (const int)h->next->next->Data();
+          const int cacheEntries   = (const int)h->next->next->next->Data();
+          const long cacheWeight   = (const long)h->next->next->next->next->Data();
+          const int dumpMinors     = (const int)h->next->next->next->next->next->Data();
+          const int dumpResults    = (const int)h->next->next->next->next->next->next->Data();
+          const int dumpComplete   = (const int)h->next->next->next->next->next->next->next->Data();
+          const int dumpConsole    = (const int)h->next->next->next->next->next->next->next->next->Data();
+          testAllPolyMinors(m, k, strategies, cacheEntries, cacheWeight, dumpMinors, dumpResults, dumpComplete, dumpConsole);
+            // starts the computation of all k x k minors in the
+            // provided matrix m (which is assumed to have polynomial
+            // entries) using a cache with a maximum number of
+            // 'cacheEntries' entries and a maximum weight of 'cacheWeight';
+            // when calling this method, a ring must be declared before;
+            // strategy = "310" means that the code is run first without a
+            // cache ("0") and then afterwards with the caching strategies
+            // "1" and "3"
+        }
+        else if (h->Typ() == POLY_CMD)
+        { // for quick tests with a single polynomial
+          const poly p = (const poly)h->Data();
+          testStuff(p);
+        }
+        return FALSE;
+      }
+      else
+#endif // HAVE_MINOR
 /*==================== generic debug ==================================*/
 //#ifdef PDEBUG
       if(strcmp(sys_cmd,"DetailedPrint")==0)

@@ -1,5 +1,7 @@
-#ifndef MinorIncluded
-#define MinorIncluded
+#ifndef Minor_H
+#define Minor_H
+
+#ifdef HAVE_MINOR
 
 #include <assert.h>
 #include <iostream>
@@ -341,9 +343,9 @@ class MinorValue {
              long _multiplications;
 
              /**
-             * a store for the actual number of summations to compute the current minor
+             * a store for the actual number of additions to compute the current minor
              */
-             long _summations;
+             long _additions;
 
              /**
              * a store for the accumulated number of multiplications to compute the current minor;
@@ -353,8 +355,8 @@ class MinorValue {
              long _accumulatedMult;
 
              /**
-             * a store for the accumulated number of summations to compute the current minor;
-             * This also includes all summations nested in sub-minors which may be retrieved
+             * a store for the accumulated number of additions to compute the current minor;
+             * This also includes all additions nested in sub-minors which may be retrieved
              * from a cache. (Thus, these nested operations do not need to be performed again.)
              */
              long _accumulatedSum;
@@ -456,7 +458,7 @@ class MinorValue {
              * @return the weight of a given instance of MinorValue
              * @see Cache::getWeight () const
              */
-             virtual int getWeight () const;
+             virtual long getWeight () const;
 
              /**
              * A method for accessing the number of retrievals of this minor. Multiple retrievals will
@@ -501,24 +503,24 @@ class MinorValue {
              long getAccumulatedMultiplications () const;
 
              /**
-             * A method for accessing the summations performed while computing this minor.
-             * Summations that were needed to compute cached sub-minors will not be counted,
+             * A method for accessing the additions performed while computing this minor.
+             * Additions that were needed to compute cached sub-minors will not be counted,
              * as the value of those sub-minors can be directly retrieved from the cache.
-             * @return the number of summations performed
-             * @see MinorValue::getAccumulatedSummations () const
+             * @return the number of additions performed
+             * @see MinorValue::getAccumulatedAdditions () const
              */
-             long getSummations () const;
+             long getAdditions () const;
 
              /**
-             * A method for accessing the summations performed while computing this minor, including
-             * all nested summations.
-             * Contrary to MinorValue::getSummations () const, this method will also count summations
+             * A method for accessing the additions performed while computing this minor, including
+             * all nested additions.
+             * Contrary to MinorValue::getAdditions () const, this method will also count additions
              * needed to compute all cached sub-minors (, although they need not be performed again in order to
              * compute the given instance of MinorValue).
-             * @return the number of summations performed, including nested summations
-             * @see MinorValue::getSummations () const
+             * @return the number of additions performed, including nested additions
+             * @see MinorValue::getAdditions () const
              */
-             long getAccumulatedSummations () const;
+             long getAccumulatedAdditions () const;
 
              /**
              * A method for incrementing the number of performed retrievals of \a this instance of MinorValue.<br>
@@ -585,7 +587,7 @@ class MinorValue {
     an example implementation which assumes matrices with long entries, such that the result
     of any minor is a long again.<br>
     Besides capturing the actual value of a minor, LongMinorValue also has built-in facilities to
-    count the number of summations and multiplications performed when computing a minor. These two
+    count the number of additions and multiplications performed when computing a minor. These two
     counters, especially the latter, are important measures when we want to investigate the complexity
     of computing minors.<br>
     When used in a cache, each minor \e M (e.g. of size 3 x 3) may be used several times, e.g. when
@@ -604,14 +606,14 @@ class LongMinorValue : public MinorValue {
              * A constructor for class MinorValue.
              * @param result the actual value of the represented minor
              * @param multiplications number of multiplications to compute \a this minor
-             * @param summations number of summations to compute \a this minor
+             * @param additions number of additions to compute \a this minor
              * @param accumulatedMultiplications number of multiplications to compute \a this minor, including nested operations
-             * @param accumulatedSummations number of summations to compute \a this minor, including nested operations
+             * @param accumulatedAdditions number of additions to compute \a this minor, including nested operations
              * @param retrievals number of times this minor has been retrieved from cache
              * @param potentialRetrievals maximum number of times this minor may be retrieved from cache
              */
-             LongMinorValue (const long result, const int multiplications, const int summations,
-                             const int accumulatedMultiplications, const int accumulatedSummations,
+             LongMinorValue (const long result, const int multiplications, const int additions,
+                             const int accumulatedMultiplications, const int accumulatedAdditions,
                              const int retrievals, const int potentialRetrievals);
 
              LongMinorValue (const LongMinorValue& mv);
@@ -623,7 +625,7 @@ class LongMinorValue : public MinorValue {
              
              long getResult() const;
 
-             int getWeight () const;
+             long getWeight () const;
 
              /**
              * A method for providing a printable version of the represented MinorValue.
@@ -643,14 +645,14 @@ class PolyMinorValue : public MinorValue {
              * A constructor for class MinorValue.
              * @param result the actual value of the represented minor
              * @param multiplications number of multiplications to compute \a this minor
-             * @param summations number of summations to compute \a this minor
+             * @param additions number of additions to compute \a this minor
              * @param accumulatedMultiplications number of multiplications to compute \a this minor, including nested operations
-             * @param accumulatedSummations number of summations to compute \a this minor, including nested operations
+             * @param accumulatedAdditions number of additions to compute \a this minor, including nested operations
              * @param retrievals number of times this minor has been retrieved from cache
              * @param potentialRetrievals maximum number of times this minor may be retrieved from cache
              */
-             PolyMinorValue (const poly result, const int multiplications, const int summations,
-                             const int accumulatedMultiplications, const int accumulatedSummations,
+             PolyMinorValue (const poly result, const int multiplications, const int additions,
+                             const int accumulatedMultiplications, const int accumulatedAdditions,
                              const int retrievals, const int potentialRetrievals);
 
              PolyMinorValue (const PolyMinorValue& mv);
@@ -662,7 +664,7 @@ class PolyMinorValue : public MinorValue {
 
              poly getResult() const;
 
-             int getWeight () const;
+             long getWeight () const;
 
              /**
              * A method for providing a printable version of the represented MinorValue.
@@ -671,4 +673,7 @@ class PolyMinorValue : public MinorValue {
              string toString () const;
 };
 
+#endif // HAVE_MINOR
+
 #endif
+/* Minor_H */

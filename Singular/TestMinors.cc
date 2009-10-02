@@ -1,7 +1,10 @@
 #include "mod2.h"
+
+#ifdef HAVE_MINOR
+
 #include "structs.h"
 #include "polys.h"
-#include "matpol.h"
+#include "ideals.h"
 #include <Cache.h>
 #include <Minor.h>
 #include <MinorProcessor.h>
@@ -10,65 +13,62 @@
 #include <time.h>
 #include "TestMinors.h"
 #include <stdio.h>
+#include "PrettyPrinter.h"
+#include "febase.h"
 
 using namespace std;
 
-bool writeMinorOutputToFiles = false;
-bool writeMinorOutputToConsole = false;
-bool writeMinorOutputToResults = false;
-bool writeMinorOutputToComplete = false;
-bool writeNonZeroMinorsToFile = false;
-
-/**
-* The file name for complete output (as the content of the console);<br>
-* This file will be constructed in the same path where the executable resides.
-*/
-char* filenameForCompleteOutput = "minor_output_complete.txt";
-
-/**
-* The file name for condensed result output, only;<br>
-* This file will be constructed in the same path where the executable resides.
-*/
-char* filenameForResultOutput = "minor_output_results.txt";
-
-char* filenameForNonZeroMinors = "non_zero_minors.txt";
 poly zeroPoly = pISet(0);
 int nonZeroCounter = 0;
 
-/**
-* An ofstream for writing a file with the same content as the console
-*/
-ofstream outputFileComplete;
-
-/**
-* An ofstream for writing a file with condensed results, only
-*/
-ofstream outputFileResults;
-
-ofstream outputFileMinors;
+void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
+                  int minorSize, int randomSeed, int cacheEntries, long cacheWeight);
+void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
+                   int minorRows, int minorColumns, int minorSize, int randomSeed, int cacheEntries, long cacheWeight);
+void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
+                        int minorSize, int randomSeed, int cacheEntries, long cacheWeight, int targetMinor,
+                        bool checkForEquality, int maxLoops);
 
 void minorUsageInfo()
 {
-  std::cout << "\nWrite 'system(\"minors\", 0)' to run 5 default tests with a random";
-  std::cout << "\ninteger matrix. This test, for which no ring needs to be declared,";
-  std::cout << "\nwill generate two files including all results and runtimes (in the";
-  std::cout << "\nfolder of the SINGULAR executable.";
-  std::cout << "\n\nWrite 'system(m, k, nCache, wCache, strategies";
-  std::cout << "\n              dumpMinors, dumpResults, dumpComplete, dumpConsole)'";
-  std::cout << "\nto compute all k x k minors of the poly matrix m. Depending on the int";
-  std::cout << "\n'strategies', e.g. = 420, these tests will first be performed without a";
-  std::cout << "\ncache (due to lowest digit '0') and afterwards with a cache, deploying";
-  std::cout << "\nthe strategies 2 and 4. The cache has a maximum number of cached entries";
-  std::cout << "\nof 'nCache' and a maximum weight of 'wCache'. (The latter parameter";
-  std::cout << "\nrelates to the total number of monomials in the cached polynomials.)";
-  std::cout << "\nNote that a ring needs to be defined beforehand, and the poly matrix m.";
-  std::cout << "\nSet 'dumpMinors' to 1 in order to write all non-zero minors to a file.";
-  std::cout << "\nWith 'dumpResults' equal to 1, an additional file will be written";
-  std::cout << "\nwhich contains an overview over all results and runtimes. Set";
-  std::cout << "\n'dumpComplete' to 1 in order to obtain a very detailed file output of";
-  std::cout << "\nall results (All files will be created in the folder of the SINGULAR";
-  std::cout << "\nexecutable.)";
-  std::cout << "\nSet 'dumpConsole' to 1 in order to write everything also to the console.\n";
+  PrintS("\nType 'system(\"minors\", 0);' to run 5 default tests with a random");
+  PrintS("\ninteger matrix. This test, for which no ring needs to be declared");
+  PrintS("\nbeforehand, will generate the file 'minor_output_results_longs.txt'");
+  PrintS("\nincluding all results and runtimes, and a much more detailed file");
+  PrintS("\n'minor_output_complete_longs.txt' (both in the folder of the SIN-");
+  PrintS("\nGULAR executable).");
+  PrintS("\n\nType 'system(\"minors\", m, k, strategies, nCache, wCache,");
+  PrintS("\n             dumpMinors, dumpResults, dumpComplete, dumpConsole);'");
+  PrintS("\nto compute all k x k minors of the poly matrix m. Depending on the");
+  PrintS("\ninteger 'strategies', e.g. = '420', these tests will first be per-");
+  PrintS("\nformed without a cache (due to lowest digit '0') and afterwards");
+  PrintS("\nwith a cache, deploying the strategies '2' and '4'. (There are five");
+  PrintS("\nstrategies available; always sort strategies from highest to lowest,");
+  PrintS("\ni.e., use '5210' instead of '2501'.");
+  PrintS("\nWhen a cache is used, it has a maximum number of 'nCache' entries");
+  PrintS("\nand a maximum weight of 'wCache'. (The weight of the cache equals");
+  PrintS("\nthe total number of monomials counted over all cached polynomials.)");
+  PrintS("\nNote that a ring needs to be defined beforehand, and the poly matrix");
+  PrintS("\nm. Set 'dumpMinors' to 1 in order to write all non-zero minors to");
+  PrintS("\nthe file 'non_zero_poly_minors.txt'. When 'dumpResults' equals 1,");
+  PrintS("\nan additional file 'minor_output_results_polys.txt' will be written");
+  PrintS("\nwhich contains an overview over all results and runtimes. Set");
+  PrintS("\n'dumpComplete' to 1 in order to obtain a very detailed file output");
+  PrintS("\nin 'minor_output_complete_polys.txt'. (All files will be created in");
+  PrintS("\nthe folder of the SINGULAR executable.)");
+  PrintS("\nSet 'dumpConsole' to 1 in order to write everything also to the con-");
+  PrintS("\nsole.");
+  PrintS("\n\nType 'ideal i = system(\"minors\", m, k, strategy, nCache, wCache);'");
+  PrintS("\nto obtain the ideal generated by all k x k non-zero minors of the");
+  PrintS("\npoly matrix m. Note again that both ring and matrix must be defined");
+  PrintS("\nbeforehand. (Note that no checks for duplicate ideal generators will");
+  PrintS("\nbe performed.) With 'strategy' == 0, the computation will be run with-");
+  PrintS("\nout cache; otherwise a cache with the respective strategy (1, ..., 5)");
+  PrintS("\nwill be used. In this case, the cache will have at most 'nCache' en-");
+  PrintS("\ntries, i.e. cached sub-minors, and a maximum weight of 'wCache'. (The");
+  PrintS("\nweight of the cache equals the total number of monomials counted over");
+  PrintS("\nall cached polynomials.)");
+  PrintS("\nFor this command, there will be no file or console outputs.\n\n");
 }
 
 /**
@@ -76,10 +76,9 @@ void minorUsageInfo()
 * The returned structure is 1-dimensional, i.e., the matrix from
 * top to bottom, left to right.
 */
-int* randomMatrix(const int rowCount, const int columnCount, const int randomSeed,
-                  const int zeroPercentage, const int entryBound) {
+void fillRandomMatrix(const int rowCount, const int columnCount, const int randomSeed,
+                      const int zeroPercentage, const int entryBound, int* theMatrix) {
     int theSize = rowCount * columnCount;
-    int theMatrix[theSize]; // we will use a 1-dimensional structure
     srand(randomSeed); // random seed for ensuring reproducability of experiments
     for (int i = 0; i < theSize; i++) {
         if ((rand() % 100) < zeroPercentage)
@@ -87,80 +86,14 @@ int* randomMatrix(const int rowCount, const int columnCount, const int randomSee
         else
             theMatrix[i] = 1 + (rand() % entryBound); // ranges from 1 to entryBound, including both
     }
-    return theMatrix;
 }
 
-void writeTheMinorIfNonZero(const PolyMinorValue& pmv) {
+void writeTheMinorIfNonZero(PrettyPrinter& pm, const PolyMinorValue& pmv) {
     if (!pEqualPolys(pmv.getResult(), zeroPoly))
     {
       nonZeroCounter++;
-      if (writeNonZeroMinorsToFile)
-      {
-        outputFileMinors << std::endl << nonZeroCounter << ". " << pString(pmv.getResult());
-      }
+      +pm < nonZeroCounter < ". " < pString(pmv.getResult());
     }
-}
-
-void writeSep(const string s) {
-  outputFileMinors << s;
-}
-
-void writeSep3(const string s, const int i, const string t)
-{
-  outputFileMinors << s << i << t;
-}
-
-/**
-* A method for simultaneously writing an output string to std::cout and the output file
-* specified by \c filenameForCompleteOutput.
-* @param s the string to be written
-*/
-void writeMinor(const string s) {
-    if (writeMinorOutputToConsole) std::cout << s;
-    if (writeMinorOutputToComplete) outputFileComplete << s;
-}
-
-/**
-* A method for simultaneously writing an output string to std::cout and the output files
-* specified by \c filenameForCompleteOutput and \c filenameForResultOutput.
-* @param s the string to be written
-*/
-void writeMinorWithResults(const string s) {
-    if (writeMinorOutputToConsole) std::cout << s;
-    if (writeMinorOutputToComplete) outputFileComplete << s;
-    if (writeMinorOutputToResults) outputFileResults << s;
-}
-
-/**
-* A method for simultaneously writing an output string to std::cout and the output files
-* specified by \c filenameForCompleteOutput and \c filenameForResultOutput.
-* @param s the string to be written
-*/
-void writeMinorWithResults(const long l) {
-    if (writeMinorOutputToConsole) std::cout << l;
-    if (writeMinorOutputToComplete) outputFileComplete << l;
-    if (writeMinorOutputToResults) outputFileResults << l;
-}
-
-/**
-* A method for simultaneously writing an integer to std::cout and the output file
-* specified by \c filenameForCompleteOutput.
-* @param i the integer to be written
-*/
-void writeMinor(const int i) {
-    if (writeMinorOutputToConsole) std::cout << i;
-    if (writeMinorOutputToComplete) outputFileComplete << i;
-}
-
-/**
-* A method for simultaneously writing an integer to std::cout and the output files
-* specified by \c filenameForCompleteOutput and \c filenameForResultOutput.
-* @param i the integer to be written
-*/
-void writeMinorWithResults(const int i) {
-    if (writeMinorOutputToConsole) std::cout << i;
-    if (writeMinorOutputToComplete) outputFileComplete << i;
-    if (writeMinorOutputToResults) outputFileResults << i;
 }
 
 /**
@@ -172,79 +105,63 @@ void writeMinorWithResults(const int i) {
 * @param *argv[] not used
 */
 int testIntMinors (const int dummy) {
-  writeMinorOutputToFiles = true;
-
-  filenameForCompleteOutput = "minor_output_complete_longs.txt";
-  filenameForResultOutput = "minor_output_results_longs.txt";
-
-  if (writeMinorOutputToFiles)
-  {
-    outputFileComplete.open(filenameForCompleteOutput);
-    outputFileResults.open(filenameForResultOutput);
-  }
+  // for output of non-zero minors into file
+  PrettyPrinter prpr("minor_output_complete_longs.txt", "minor_output_results_longs.txt", false, false, -1, "   ");
 
   // computes just one minor:
-  testOneMinor("Test I", 7, 10, 50, 20, 5, 471, 70, 1000);
-  writeMinor("\n\n");
+  testOneMinor(prpr, "Test I", 7, 10, 50, 20, 5, 471, 70, 1000);
+  +prpr; +prpr;
 
   // computes all (1470) minors of a specified size (6x6):
-  testAllMinors("Test II", 7, 10, 50, 20, 7, 10, 6, 471, 200, 10000);
-  writeMinor("\n\n");
+  testAllMinors(prpr, "Test II", 7, 10, 50, 20, 7, 10, 6, 471, 200, 10000);
+  +prpr; +prpr;
 
   // looks for minor == 3000; to this end, it needs to compute 1001 minors:
-  testAllMinorsUntil("Test III", 100, 60, 10, 10, 6, 471, 300, 10000, 3000, true, 10000);
-  writeMinor("\n\n");
+  testAllMinorsUntil(prpr, "Test III", 100, 60, 10, 10, 6, 471, 300, 10000, 3000, true, 10000);
+  +prpr; +prpr;
 
   // looks for the first non-zero minor (6x6); to this end, it needs to compute 476 minors:
-  testAllMinorsUntil("Test IV", 100, 60, 10, 75, 6, 4712, 300, 10000, 0, false, 10000);
-  writeMinor("\n\n");
+  testAllMinorsUntil(prpr, "Test IV", 100, 60, 10, 75, 6, 4712, 300, 10000, 0, false, 10000);
+  +prpr; +prpr;
 
   // looks for minor == 265986; to this end, it needs to compute 16 minors:
-  testAllMinorsUntil("Test V", 100, 60, 10, 10, 6, 471, 300, 10000, 265986, true, 10000);
-
-  if (writeMinorOutputToFiles)
-  {
-    outputFileComplete.close();
-    outputFileResults.close();
-  }
+  testAllMinorsUntil(prpr, "Test V", 100, 60, 10, 10, 6, 471, 300, 10000, 265986, true, 10000);
 
   return 0;
 }
 
 void testStuff (const poly p)
 {
-  std::cout << std::endl << "poly = " << pString(p);
-  std::cout << std::endl << "length of poly = " << pLength(p);
+  PrintLn(); PrintS("poly = "); PrintS(pString(p));
+  PrintLn(); PrintS("length of poly = ");
+  char h[10];
+  sprintf(h, "%d", pLength(p));
+  PrintS(h);
 }
 
-int testAllPolyMinors(matrix mat, int minorSize, int cacheEntries, int cacheWeight, int strategies,
+int testAllPolyMinors(matrix mat, int minorSize, int strategies, int cacheEntries, long cacheWeight,
                       int dumpMinors, int dumpResults, int dumpComplete, int dumpConsole) {
-  writeNonZeroMinorsToFile = (dumpMinors == 1 ? true : false);
-  writeMinorOutputToResults = (dumpResults == 1 ? true : false);
-  writeMinorOutputToComplete = (dumpComplete == 1 ? true : false);
-  writeMinorOutputToConsole = (dumpConsole == 1 ? true : false);
+  // for pretty printing and file output of results and runtimes
+  PrettyPrinter prpr(dumpComplete == 1 ? "minor_output_complete_polys.txt" : "",
+                     dumpResults == 1 ? "minor_output_results_polys.txt" : "",
+                     false, false, dumpConsole == 1 ? 0 : -1, "   ");
 
-  filenameForCompleteOutput = "minor_output_complete_polys.txt";
-  filenameForResultOutput = "minor_output_results_polys.txt";
-  filenameForNonZeroMinors = "non_zero_poly_minors.txt";
-
-  if (writeMinorOutputToComplete) outputFileComplete.open(filenameForCompleteOutput);
-  if (writeMinorOutputToResults) outputFileResults.open(filenameForResultOutput);
-  if (writeNonZeroMinorsToFile) outputFileMinors.open(filenameForNonZeroMinors);
+  // for output of non-zero minors into file
+  PrettyPrinter pm(dumpMinors == 1 ? "non_zero_poly_minors.txt" : "", "", false, false, -1, "   ");
 
   int rowCount = mat->nrows;
   int columnCount = mat->ncols;
   long totalTimeStart, totalTime, printTimeStart, printTime;
   string testHeader = "COMPUTE ALL MINORS IN A POLY MATRIX";
 
-  writeMinor(testHeader);
-  writeMinor("\n"); for (int i = 0; i < int(testHeader.size()); i++) writeMinor("="); // underlines the header string
-  writeMinor("\nTesting the successive computation of all minors of a given size without and with cache, respectively.");
-  writeMinor("\nIn the case of computing with cache, different caching strategies may be deployed.");
-  writeMinor("\nThe provided matrix is expected to have SINGULAR polys as entries.");
+  prpr < testHeader;
+  +prpr; for (int i = 0; i < int(testHeader.size()); i++) prpr < "="; // underlines the header string
+  +prpr < "Testing the successive computation of all minors of a given size without and with cache, respectively.";
+  +prpr < "In the case of computing with cache, different caching strategies may be deployed.";
+  +prpr < "The provided matrix is expected to have SINGULAR polys as entries.";
 
   poly* myPolyMatrix = (poly*)(mat->m);
-  PolyMinorProcessor mp = PolyMinorProcessor();
+  PolyMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, myPolyMatrix);
 
   /* The next lines are for defining the sub-matrix of myPolyMatrix
@@ -268,9 +185,9 @@ int testAllPolyMinors(matrix mat, int minorSize, int cacheEntries, int cacheWeig
   // counters...
   int k = 1;
   int totalMultiplications = 0;
-  int totalSummations = 0;
+  int totalAdditions = 0;
   int totalMultiplicationsAccumulated = 0;
-  int totalSummationsAccumulated = 0;
+  int totalAdditionsAccumulated = 0;
 
   // target for retrieving and writing momentary row and column indices:
   int myIndexArray[32];
@@ -278,57 +195,55 @@ int testAllPolyMinors(matrix mat, int minorSize, int cacheEntries, int cacheWeig
   if (strategies % 10 == 0)
   {
     strategies = strategies / 10;
-    writeMinor("\n\nResults - "); writeMinor(testHeader); writeMinor(" - no cache");
-    writeMinor("\ncomputing all minors of size "); writeMinor(minorSize); writeMinor("x"); writeMinor(minorSize);
+    +prpr; +prpr < "Results - " < testHeader < " - no cache";
+    +prpr < "computing all minors of size " < minorSize < "x" < minorSize;
 
-    writeSep("non-zero minors - no cache\n==========================");
+    pm < "non-zero minors - no cache\n==========================";
     nonZeroCounter = 0;
-  
+
     printTime = 0; totalTimeStart = clock();
     // iteration over all minors of size "minorSize x minorSize"
     while (mp.hasNextMinor()) {
         // retrieving the minor:
         theMinor = mp.getNextMinor();
         printTimeStart = clock();
-        writeTheMinorIfNonZero(theMinor);
+        writeTheMinorIfNonZero(pm, theMinor);
 
         // updating counters:
         totalMultiplications += theMinor.getMultiplications();
-        totalSummations += theMinor.getSummations();
+        totalAdditions += theMinor.getAdditions();
         totalMultiplicationsAccumulated += theMinor.getAccumulatedMultiplications();
-        totalSummationsAccumulated += theMinor.getAccumulatedSummations();
+        totalAdditionsAccumulated += theMinor.getAccumulatedAdditions();
   
         // writing current row indices:
         mp.getCurrentRowIndices(myIndexArray);
-        writeMinor("\n"); writeMinor(k++); writeMinor(". minor (rows: ");
+        +prpr; prpr < k++ < ". minor (rows: ";
         for (int i = 0; i < minorSize; i++) {
-            if (i != 0) writeMinor(", ");
-            writeMinor(myIndexArray[i]);
+            if (i != 0) prpr < ", ";
+            prpr < myIndexArray[i];
         };
   
         // writing current column indices:
         mp.getCurrentColumnIndices(myIndexArray);
-        writeMinor("; columns: ");
+        prpr < "; columns: ";
         for (int i = 0; i < minorSize; i++) {
-            if (i != 0) writeMinor(", ");
-            writeMinor(myIndexArray[i]);
+            if (i != 0) prpr < ", ";
+            prpr < myIndexArray[i];
         };
-        writeMinor(") = ");
+        prpr < ") = ";
   
         // write the actual value of the minor:
-        writeMinor(theMinor.toString());
+        prpr < theMinor.toString();
         printTime += clock() - printTimeStart;
     };
     totalTime = clock() - totalTimeStart - printTime;
 
     // writing summarized information
-    writeMinorWithResults("\n\nOperation counters - "); writeMinorWithResults(testHeader);
-    writeMinorWithResults(" - no cache");
-    writeMinorWithResults("\nperformed in total "); writeMinorWithResults(totalMultiplications);
-    writeMinorWithResults(" multiplications and ");
-    writeMinorWithResults(totalSummations); writeMinorWithResults(" summations");
-    writeMinorWithResults("\nnumber of non-zero minors = "); writeMinorWithResults(nonZeroCounter);
-    writeMinorWithResults("\n(time = "); writeMinorWithResults(totalTime); writeMinorWithResults(" msec)");
+    ++prpr; ++prpr << "Operation counters - " << testHeader << " - no cache";
+    ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
+    prpr << totalAdditions << " additions";
+    ++prpr << "number of non-zero minors = " << nonZeroCounter;
+    ++prpr << "(time = " << totalTime << " msec)";
   }
 
   for (int strategy = 1; strategy <= 5; strategy++) {
@@ -343,19 +258,19 @@ int testAllPolyMinors(matrix mat, int minorSize, int cacheEntries, int cacheWeig
       // counters...
       k = 1;
       totalMultiplications = 0;
-      totalSummations = 0;
+      totalAdditions = 0;
       totalMultiplicationsAccumulated = 0;
-      totalSummationsAccumulated = 0;
+      totalAdditionsAccumulated = 0;
   
       // cleaning up and redefinition of the cache:
       cch.clear();
       Cache<MinorKey, PolyMinorValue> cch(cacheEntries, cacheWeight);
   
-      writeMinor("\n\nResults - "); writeMinor(testHeader); writeMinor(" - using cache - deploying caching strategy #"); writeMinor(strategy);
-      writeMinor("\ncomputing all minors of size "); writeMinor(minorSize); writeMinor("x"); writeMinor(minorSize);
-  
-      writeSep3("\n\nnon-zero minors - using cache - deploying caching strategy #", strategy,
-                  "\n=============================================================");
+      +prpr; +prpr <  "Results - " < testHeader < " - using cache - deploying caching strategy #" < strategy;
+      +prpr < "computing all minors of size " < minorSize < "x" < minorSize;
+
+      pm < "\n\nnon-zero minors - using cache - deploying caching strategy #" < strategy
+         < "\n=============================================================";
       nonZeroCounter = 0;
   
       printTime = 0; totalTimeStart = clock();
@@ -364,57 +279,120 @@ int testAllPolyMinors(matrix mat, int minorSize, int cacheEntries, int cacheWeig
           // retrieving the minor:
           theMinor = mp.getNextMinor(cch);
           printTimeStart = clock();
-          writeTheMinorIfNonZero(theMinor);
+          writeTheMinorIfNonZero(pm, theMinor);
   
           // updating counters:
           totalMultiplications += theMinor.getMultiplications();
-          totalSummations += theMinor.getSummations();
+          totalAdditions += theMinor.getAdditions();
           totalMultiplicationsAccumulated += theMinor.getAccumulatedMultiplications();
-          totalSummationsAccumulated += theMinor.getAccumulatedSummations();
-  
+          totalAdditionsAccumulated += theMinor.getAccumulatedAdditions();
+
           // writing current row indices:
           mp.getCurrentRowIndices(myIndexArray);
-          writeMinor("\n"); writeMinor(k++); writeMinor(". minor (rows: ");
+          +prpr < k++ < ". minor (rows: ";
           for (int i = 0; i < minorSize; i++) {
-              if (i != 0) writeMinor(", ");
-              writeMinor(myIndexArray[i]);
+              if (i != 0) prpr < ", ";
+              prpr < myIndexArray[i];
           };
   
           // writing current column indices:
           mp.getCurrentColumnIndices(myIndexArray);
-          writeMinor("; columns: ");
+          prpr < "; columns: ";
           for (int i = 0; i < minorSize; i++) {
-              if (i != 0) writeMinor(", ");
-              writeMinor(myIndexArray[i]);
+              if (i != 0) prpr < ", ";
+              prpr < myIndexArray[i];
           };
-          writeMinor(") = ");
+          prpr < ") = ";
   
           // writeMinor the actual value of the minor:
-          writeMinor(theMinor.toString());
+          prpr < theMinor.toString();
           printTime += clock() - printTimeStart;
       };
       totalTime = clock() - totalTimeStart - printTime;
   
       // writing summarized information
-      writeMinorWithResults("\n\nOperation counters - "); writeMinorWithResults(testHeader);
-      writeMinorWithResults(" - using cache - deploying caching strategy #");
-      writeMinorWithResults(strategy);
-      writeMinorWithResults("\nperformed in total "); writeMinorWithResults(totalMultiplications);
-      writeMinorWithResults(" multiplications and ");
-      writeMinorWithResults(totalSummations); writeMinorWithResults(" summations");
-      writeMinor("\n(computation without reuse would need "); writeMinor(totalMultiplicationsAccumulated);
-      writeMinor(" and "); writeMinor(totalSummationsAccumulated); writeMinor(" summations)");
-      writeMinorWithResults("\nnumber of non-zero minors = "); writeMinorWithResults(nonZeroCounter);
-      writeMinorWithResults("\n(time = "); writeMinorWithResults(totalTime); writeMinorWithResults(" msec)");
-      writeMinor("\nThe cache looks like this:\n"); writeMinor(cch.toString());
+      ++prpr; ++prpr << "Operation counters - " << testHeader << " - using cache - deploying caching strategy #" << strategy;
+      ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
+      prpr << totalAdditions << " additions";
+      ++prpr << "(computation without reuse would need " << totalMultiplicationsAccumulated << " and ";
+      prpr << totalAdditionsAccumulated << " additions)";
+      ++prpr << "number of non-zero minors = " << nonZeroCounter;
+      ++prpr << "(time = " << totalTime << " msec)";
+      +prpr < "The cache looks like this:";
+      +prpr < cch.toString();
     }
   }
 
-  if (writeMinorOutputToComplete) outputFileComplete.close();
-  if (writeMinorOutputToResults) outputFileResults.close();
-  if (writeNonZeroMinorsToFile) outputFileMinors.close();
-
   return 0;
+}
+
+ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cacheEntries, long cacheWeight)
+{
+  int rowCount = mat->nrows;
+  int columnCount = mat->ncols;
+
+  poly* myPolyMatrix = (poly*)(mat->m);
+  PolyMinorProcessor mp;
+  mp.defineMatrix(rowCount, columnCount, myPolyMatrix);
+
+  /* The next lines are for defining the sub-matrix of myPolyMatrix
+     from which we want to compute all k x k - minors.
+     In the given setting, we want the entire matrix to form the sub-matrix. */
+  int minorRows = rowCount;
+  int minorColumns = columnCount;
+  int myRowIndices[minorRows];  for (int i = 0; i < minorRows; i++) myRowIndices[i] = i;
+  int myColumnIndices[minorColumns]; for (int i = 0; i < minorColumns; i++) myColumnIndices[i] = i;
+
+  // setting sub-matrix and size of minors of interest within that sub-matrix:
+  mp.defineSubMatrix(minorRows, myRowIndices, minorColumns, myColumnIndices);
+  mp.setMinorSize(minorSize);
+
+  // containers for all upcoming results
+  PolyMinorValue theMinor;
+  poly po;
+  int nonZeroCounter = 0;
+  std::list<poly> generators;
+
+  if (strategy == 0)
+  {
+    // iteration over all minors of size "minorSize x minorSize"
+    while (mp.hasNextMinor()) {
+      // retrieving the minor:
+      theMinor = mp.getNextMinor();
+      po = theMinor.getResult();
+      if (!pEqualPolys(po, zeroPoly))
+      {
+        nonZeroCounter++;
+        generators.insert(generators.end(), po);
+      }
+    }
+  }
+  else
+  {
+    MinorValue::SetRankingStrategy(strategy);
+    Cache<MinorKey, PolyMinorValue> cch(cacheEntries, cacheWeight);
+    // iteration over all minors of size "minorSize x minorSize"
+    while (mp.hasNextMinor()) {
+      // retrieving the minor:
+      theMinor = mp.getNextMinor(cch);
+      po = theMinor.getResult();
+      if (!pEqualPolys(po, zeroPoly))
+      {
+        nonZeroCounter++;
+        generators.insert(generators.end(), po);
+      }
+    }
+  }
+
+  // build the return value, i.e. the ideal of non-zero minors
+  ideal iii = idInit(nonZeroCounter, 0);
+  int i = 0;
+  for (std::list<poly>::iterator it = generators.begin(); it != generators.end(); it++)
+  {
+    iii->m[i] = *it;
+    i++;
+  }
+  return iii;
 }
 
 /**
@@ -422,38 +400,38 @@ int testAllPolyMinors(matrix mat, int minorSize, int cacheEntries, int cacheWeig
 * All results should be equal no matter whether we do or do not use a cache. Neither should
 * the cache strategy influence the mathematical value of the minor.
 */
-void testOneMinor(string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                  int minorSize, int randomSeed, int cacheEntries, int cacheWeight) {
+void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
+                  int minorSize, int randomSeed, int cacheEntries, long cacheWeight) {
     long start, end;
 
-    writeMinor(testHeader);
-    writeMinor("\n"); for (int i = 0; i < int(testHeader.size()); i++) writeMinor("="); // underlines the header string
-    writeMinor("\nTesting the computation of one minor without and with cache, respectively.");
-    writeMinor("\nFor computing with cache, 5 different caching strategies will be deployed.");
+    prpr < testHeader;
+    +prpr; for (int i = 0; i < int(testHeader.size()); i++) prpr < "="; /* underlines the header string */
+    +prpr < "Testing the computation of one minor without and with cache, respectively.";
+    +prpr < "For computing with cache, 5 different caching strategies will be deployed.";
 
-    int* myMatrix = randomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound);
+    int* myMatrix = new int[rowCount * columnCount];
+    fillRandomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound, myMatrix);
 
-    LongMinorProcessor mp = LongMinorProcessor();
+    LongMinorProcessor mp;
     mp.defineMatrix(rowCount, columnCount, myMatrix);
 
     int myRowIndices[minorSize];  for (int i = 0; i < minorSize; i++) myRowIndices[i] = i;
     int myColumnIndices[minorSize]; for (int i = 0; i < minorSize; i++) myColumnIndices[i] = columnCount - minorSize + i;
 
     // We would like to printout mp. For that, we need to provide complete information of
-    // what minors we intend to do compute later on.
-    // The next two lines of code have just this purpose and nothing more:
+    // what minors we intend to compute later on.
     mp.defineSubMatrix(minorSize, myRowIndices, minorSize, myColumnIndices);
     mp.setMinorSize(minorSize);
 
-    writeMinor("\n\n"); writeMinor(mp.toString()); writeMinor("\n\n");
+    +prpr; +prpr < mp.toString(); +prpr; +prpr;
 
     // compute the minor without cache:
-    writeMinorWithResults("Results - "); writeMinorWithResults(testHeader); writeMinorWithResults(" - no cache");
+    prpr << "Results - " << testHeader << " - no cache";
     start = clock();
     LongMinorValue mv = mp.getMinor(minorSize, myRowIndices, myColumnIndices);
     end = clock();
-    writeMinorWithResults("\nvalue of minor = "); writeMinorWithResults(mv.toString());
-    writeMinorWithResults("\n(time = "); writeMinorWithResults(end - start); writeMinorWithResults(" msec)");
+    ++prpr << "value of minor = " << mv.toString();
+    ++prpr << "(time = " << (end - start) << " msec)";
 
     // define the cache:
     Cache<MinorKey, LongMinorValue> cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
@@ -470,12 +448,14 @@ void testOneMinor(string testHeader, int rowCount, int columnCount, int entryBou
         mv = mp.getMinor(minorSize, myRowIndices, myColumnIndices, cch);
         end = clock();
 
-        writeMinorWithResults("\n\nResults - "); writeMinorWithResults(testHeader);
-        writeMinorWithResults(" - using cache - deploying caching strategy #"); writeMinorWithResults(strategy);
-        writeMinorWithResults("\nvalue of minor = "); writeMinorWithResults(mv.toString());
-        writeMinorWithResults("\n(time = "); writeMinorWithResults(end - start); writeMinorWithResults(" msec)");
-        writeMinor("\nThe cache looks like this:\n"); writeMinor(cch.toString());
+        ++prpr; ++prpr << "Results - " << testHeader;
+        prpr << " - using cache - deploying caching strategy #" << strategy;
+        ++prpr << "value of minor = " << mv.toString();
+        ++prpr << "(time = " << (end - start) << " msec)";
+        +prpr < "The cache looks like this:";
+        +prpr < cch.toString();
     }
+    delete [] myMatrix;
 }
 
 /**
@@ -485,18 +465,19 @@ void testOneMinor(string testHeader, int rowCount, int columnCount, int entryBou
 * All results should be equal no matter whether we do or do not use a cache. Neither should the cache strategy
 * influence the mathematical value of the minor.
 */
-void testAllMinors(string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                   int minorRows, int minorColumns, int minorSize, int randomSeed, int cacheEntries, int cacheWeight) {
+void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
+                   int minorRows, int minorColumns, int minorSize, int randomSeed, int cacheEntries, long cacheWeight) {
     long totalTimeStart, totalTime, printTimeStart, printTime;
 
-    writeMinor(testHeader);
-    writeMinor("\n"); for (int i = 0; i < int(testHeader.size()); i++) writeMinor("="); // underlines the header string
-    writeMinor("\nTesting the successive computation of all minors of a given size without and with cache, respectively.");
-    writeMinor("\nIn the case of computing with cache, 5 different caching strategies will be deployed.");
+    prpr < testHeader;
+    +prpr; for (int i = 0; i < int(testHeader.size()); i++) prpr < "="; // underlines the header string
+    +prpr < "Testing the successive computation of all minors of a given size without and with cache, respectively.";
+    +prpr < "In the case of computing with cache, 5 different caching strategies will be deployed.";
 
-    int* myMatrix = randomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound);
+    int* myMatrix = new int[rowCount * columnCount];
+    fillRandomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound, myMatrix);
 
-    LongMinorProcessor mp = LongMinorProcessor();
+    LongMinorProcessor mp;
     mp.defineMatrix(rowCount, columnCount, myMatrix);
 
     int myRowIndices[minorRows];  for (int i = 0; i < minorRows; i++) myRowIndices[i] = i;
@@ -506,7 +487,7 @@ void testAllMinors(string testHeader, int rowCount, int columnCount, int entryBo
     mp.defineSubMatrix(minorRows, myRowIndices, minorColumns, myColumnIndices);
     mp.setMinorSize(minorSize);
 
-    writeMinor("\n\n"); writeMinor(mp.toString());
+    +prpr; +prpr < mp.toString();
 
     // define the cache:
     Cache<MinorKey, LongMinorValue> cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
@@ -517,15 +498,15 @@ void testAllMinors(string testHeader, int rowCount, int columnCount, int entryBo
     // counters...
     int k = 1;
     int totalMultiplications = 0;
-    int totalSummations = 0;
+    int totalAdditions = 0;
     int totalMultiplicationsAccumulated = 0;
-    int totalSummationsAccumulated = 0;
+    int totalAdditionsAccumulated = 0;
 
     // target for retrieving and writing momentary row and column indices:
     int myIndexArray[32];
 
-    writeMinor("\n\nResults - "); writeMinor(testHeader); writeMinor(" - no cache");
-    writeMinor("\ncomputing all minors of size "); writeMinor(minorSize); writeMinor("x"); writeMinor(minorSize);
+    +prpr; +prpr < "Results - " < testHeader < " - no cache";
+    +prpr < "computing all minors of size " < minorSize < "x" < minorSize;
 
     printTime = 0; totalTimeStart = clock();
     // iteration over all minors of size "minorSize x minorSize"
@@ -536,39 +517,37 @@ void testAllMinors(string testHeader, int rowCount, int columnCount, int entryBo
 
         // updating counters:
         totalMultiplications += theMinor.getMultiplications();
-        totalSummations += theMinor.getSummations();
+        totalAdditions += theMinor.getAdditions();
         totalMultiplicationsAccumulated += theMinor.getAccumulatedMultiplications();
-        totalSummationsAccumulated += theMinor.getAccumulatedSummations();
+        totalAdditionsAccumulated += theMinor.getAccumulatedAdditions();
 
         // writing current row indices:
         mp.getCurrentRowIndices(myIndexArray);
-        writeMinor("\n"); writeMinor(k++); writeMinor(". minor (rows: ");
+        +prpr < k++ < ". minor (rows: ";
         for (int i = 0; i < minorSize; i++) {
-            if (i != 0) writeMinor(", ");
-            writeMinor(myIndexArray[i]);
+            if (i != 0) prpr < ", ";
+            prpr < myIndexArray[i];
         };
 
         // writing current column indices:
         mp.getCurrentColumnIndices(myIndexArray);
-        writeMinor("; columns: ");
+        prpr < "; columns: ";
         for (int i = 0; i < minorSize; i++) {
-            if (i != 0) writeMinor(", ");
-            writeMinor(myIndexArray[i]);
+            if (i != 0) prpr < ", ";
+            prpr < myIndexArray[i];
         };
-        writeMinor(") = ");
+        prpr < ") = ";
 
         // write the actual value of the minor:
-        writeMinor(theMinor.toString());
+        prpr < theMinor.toString();
         printTime += clock() - printTimeStart;
     };
     totalTime = clock() - totalTimeStart - printTime;
     // writing summarized information
-    writeMinorWithResults("\n\nOperation counters - "); writeMinorWithResults(testHeader);
-    writeMinorWithResults(" - no cache");
-    writeMinorWithResults("\nperformed in total "); writeMinorWithResults(totalMultiplications);
-    writeMinorWithResults(" multiplications and ");
-    writeMinorWithResults(totalSummations); writeMinorWithResults(" summations");
-    writeMinorWithResults("\n(time = "); writeMinorWithResults(totalTime); writeMinorWithResults(" msec)");
+    ++prpr; ++prpr << "Operation counters - " << testHeader << " - no cache";
+    ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
+    prpr << totalAdditions << " additions";
+    ++prpr << "(time = " << totalTime << " msec)";
 
     for (int strategy = 1; strategy <= 5; strategy++) {
         // setting sub-matrix, size of minors of interest within that sub-matrix, and strategy:
@@ -579,16 +558,16 @@ void testAllMinors(string testHeader, int rowCount, int columnCount, int entryBo
         // counters...
         k = 1;
         totalMultiplications = 0;
-        totalSummations = 0;
+        totalAdditions = 0;
         totalMultiplicationsAccumulated = 0;
-        totalSummationsAccumulated = 0;
+        totalAdditionsAccumulated = 0;
 
         // cleaning up and redefinition of the cache:
         cch.clear();
         cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
 
-        writeMinor("\n\nResults - "); writeMinor(testHeader); writeMinor(" - using cache - deploying caching strategy #"); writeMinor(strategy);
-        writeMinor("\ncomputing all minors of size "); writeMinor(minorSize); writeMinor("x"); writeMinor(minorSize);
+        +prpr; +prpr < "Results - " < testHeader < " - using cache - deploying caching strategy #" < strategy;
+        +prpr < "computing all minors of size " < minorSize < "x" < minorSize;
 
         printTime = 0; totalTimeStart = clock();
         // iteration over all minors of size "minorSize x minorSize"
@@ -599,44 +578,43 @@ void testAllMinors(string testHeader, int rowCount, int columnCount, int entryBo
 
             // updating counters:
             totalMultiplications += theMinor.getMultiplications();
-            totalSummations += theMinor.getSummations();
+            totalAdditions += theMinor.getAdditions();
             totalMultiplicationsAccumulated += theMinor.getAccumulatedMultiplications();
-            totalSummationsAccumulated += theMinor.getAccumulatedSummations();
+            totalAdditionsAccumulated += theMinor.getAccumulatedAdditions();
 
             // writing current row indices:
             mp.getCurrentRowIndices(myIndexArray);
-            writeMinor("\n"); writeMinor(k++); writeMinor(". minor (rows: ");
+            +prpr < k++ < ". minor (rows: ";
             for (int i = 0; i < minorSize; i++) {
-                if (i != 0) writeMinor(", ");
-                writeMinor(myIndexArray[i]);
+                if (i != 0) prpr < ", ";
+                prpr < myIndexArray[i];
             };
 
             // writing current column indices:
             mp.getCurrentColumnIndices(myIndexArray);
-            writeMinor("; columns: ");
+            prpr < "; columns: ";
             for (int i = 0; i < minorSize; i++) {
-                if (i != 0) writeMinor(", ");
-                writeMinor(myIndexArray[i]);
+                if (i != 0) prpr < ", ";
+                prpr < myIndexArray[i];
             };
-            writeMinor(") = ");
+            prpr < ") = ";
 
             // writeMinor the actual value of the minor:
-            writeMinor(theMinor.toString());
+            prpr < theMinor.toString();
             printTime += clock() - printTimeStart;
         };
         totalTime = clock() - totalTimeStart - printTime;
         // writing summarized information
-        writeMinorWithResults("\n\nOperation counters - "); writeMinorWithResults(testHeader);
-        writeMinorWithResults(" - using cache - deploying caching strategy #");
-        writeMinorWithResults(strategy);
-        writeMinorWithResults("\nperformed in total "); writeMinorWithResults(totalMultiplications);
-        writeMinorWithResults(" multiplications and ");
-        writeMinorWithResults(totalSummations); writeMinorWithResults(" summations");
-        writeMinor("\n(computation without reuse would need "); writeMinor(totalMultiplicationsAccumulated);
-        writeMinor(" and "); writeMinor(totalSummationsAccumulated); writeMinor(" summations)");
-        writeMinorWithResults("\n(time = "); writeMinorWithResults(totalTime); writeMinorWithResults(" msec)");
-        writeMinor("\nThe cache looks like this:\n"); writeMinor(cch.toString());
+        ++prpr; ++prpr << "Operation counters - " << testHeader << " - using cache - deploying caching strategy #" << strategy;
+        ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
+        prpr << totalAdditions << " additions";
+        ++prpr << "(computation without reuse would need " << totalMultiplicationsAccumulated << " and ";
+        prpr << totalAdditionsAccumulated << " additions)";
+        ++prpr << "(time = " << totalTime << " msec)";
+        +prpr < "The cache looks like this:";
+        +prpr < cch.toString();
     }
+    delete [] myMatrix;
 }
 
 /**
@@ -648,27 +626,28 @@ void testAllMinors(string testHeader, int rowCount, int columnCount, int entryBo
 * zeroP: this is the probability for zero entries in the matrix;
 *        all other matrix entries will range from 1 to entryBound and be equally distributed
 */
-void testAllMinorsUntil(string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                        int minorSize, int randomSeed, int cacheEntries, int cacheWeight, int targetMinor,
+void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
+                        int minorSize, int randomSeed, int cacheEntries, long cacheWeight, int targetMinor,
                         bool checkForEquality, int maxLoops) {
     long totalTimeStart, totalTime, printTimeStart, printTime;
 
-    writeMinor(testHeader);
-    writeMinor("\n"); for (int i = 0; i < int(testHeader.size()); i++) writeMinor("="); // underlines the header string
-    writeMinor("\nTesting the successive computation of minors of a given size without and with ");
-    writeMinor("\ncache, respectively, until a minor with a certain value is found.");
-    writeMinor("\nIn the case of computing with cache, 5 different caching strategies will be deployed.");
+    prpr < testHeader;
+    +prpr; for (int i = 0; i < int(testHeader.size()); i++) prpr < "="; // underlines the header string
+    +prpr < "Testing the successive computation of minors of a given size without and with ";
+    +prpr < "cache, respectively, until a minor with a certain value is found.";
+    +prpr < "In the case of computing with cache, 5 different caching strategies will be deployed.";
 
-    writeMinor("\n\nIn this test, the matrix is "); writeMinor(rowCount); writeMinor(" x "); writeMinor(columnCount); writeMinor(".");
-    writeMinor("\nThe minor we are looking for is "); writeMinor(minorSize); writeMinor(" x "); writeMinor(minorSize); writeMinor(", and ");
-    writeMinor("is supposed to have a value of ");
-    if (!checkForEquality) writeMinor("<> ");
-    writeMinor(targetMinor); writeMinor(".");
-    writeMinor("\nAs an upper bound for the number of loops, at most "); writeMinor(maxLoops); writeMinor(" minors will be computed.");
+    +prpr; +prpr < "In this test, the matrix is " < rowCount < " x " < columnCount < ".";
+    +prpr < "The minor we are looking for is " < minorSize < " x " < minorSize < ", and ";
+    prpr < "is supposed to have a value of ";
+    if (!checkForEquality) prpr < "<> ";
+    prpr < targetMinor < ".";
+    +prpr < "As an upper bound for the number of loops, at most " < maxLoops < " minors will be computed.";
 
-    int* myMatrix = randomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound);
+    int* myMatrix = new int[rowCount * columnCount];
+    fillRandomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound, myMatrix);
 
-    LongMinorProcessor mp = LongMinorProcessor();
+    LongMinorProcessor mp;
     mp.defineMatrix(rowCount, columnCount, myMatrix);
 
     int myRowIndices[rowCount]; for (int i = 0; i < rowCount; i++) myRowIndices[i] = i; // choosing all rows
@@ -683,19 +662,19 @@ void testAllMinorsUntil(string testHeader, int rowCount, int columnCount, int en
     // counters...
     int k = 1;
     int totalMultiplications = 0;
-    int totalSummations = 0;
+    int totalAdditions = 0;
     int totalMultiplicationsAccumulated = 0;
-    int totalSummationsAccumulated = 0;
+    int totalAdditionsAccumulated = 0;
 
     // setting sub-matrix and size of minors of interest within that sub-matrix:
     mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
     mp.setMinorSize(minorSize);
 
-    writeMinor("\n\n"); writeMinor(mp.toString());
+    +prpr; +prpr < mp.toString();
 
-    writeMinor("\n\nResults - "); writeMinor(testHeader); writeMinor(" - no cache");
-    writeMinor("\ncomputing all minors of size "); writeMinor(minorSize); writeMinor("x"); writeMinor(minorSize);
-    writeMinor(" until first minor with specified value is found:");
+    +prpr < "Results - " < testHeader < " - no cache";
+    +prpr < "computing all minors of size " < minorSize < "x" < minorSize;
+    prpr < " until first minor with specified value is found:";
 
     bool minorFound = false;
     int loops = 0;
@@ -710,24 +689,22 @@ void testAllMinorsUntil(string testHeader, int rowCount, int columnCount, int en
 
         // updating counters:
         totalMultiplications += theMinor.getMultiplications();
-        totalSummations += theMinor.getSummations();
+        totalAdditions += theMinor.getAdditions();
         totalMultiplicationsAccumulated += theMinor.getAccumulatedMultiplications();
-        totalSummationsAccumulated += theMinor.getAccumulatedSummations();
+        totalAdditionsAccumulated += theMinor.getAccumulatedAdditions();
 
         // writing current minor
-        writeMinor("\n"); writeMinor(k++); writeMinor(". minor = "); writeMinor(theMinor.getResult());
+        +prpr < k++ < ". minor = " < theMinor.getResult();
 
         loops++;
         printTime += clock() - printTimeStart;
     };
     totalTime = clock() - totalTimeStart - printTime;
     // writing summarized information
-    writeMinorWithResults("\n\nOperation counters - "); writeMinorWithResults(testHeader);
-    writeMinorWithResults(" - no cache");
-    writeMinorWithResults("\nperformed in total "); writeMinorWithResults(totalMultiplications);
-    writeMinorWithResults(" multiplications and ");
-    writeMinorWithResults(totalSummations); writeMinorWithResults(" summations");
-    writeMinorWithResults("\n(time = "); writeMinorWithResults(totalTime); writeMinorWithResults(" msec)");
+    ++prpr; ++prpr << "Operation counters - " << testHeader << " - no cache";
+    ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
+    prpr << totalAdditions << " additions";
+    ++prpr << "(time = " << totalTime << " msec)";
 
     for (int strategy = 1; strategy <= 5; strategy++) {
         // setting sub-matrix, size of minors of interest within that sub-matrix, and strategy:
@@ -738,18 +715,17 @@ void testAllMinorsUntil(string testHeader, int rowCount, int columnCount, int en
         // counters...
         k = 1;
         totalMultiplications = 0;
-        totalSummations = 0;
+        totalAdditions = 0;
         totalMultiplicationsAccumulated = 0;
-        totalSummationsAccumulated = 0;
+        totalAdditionsAccumulated = 0;
 
         // cleaning up and redefinition of the cache:
         cch.clear();
         cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
 
-        writeMinor("\n\nResults - "); writeMinor(testHeader);
-        writeMinor(" - using cache - deploying caching strategy #"); writeMinor(strategy);
-        writeMinor("\ncomputing all minors of size "); writeMinor(minorSize); writeMinor("x"); writeMinor(minorSize);
-        writeMinor(" until first minor with specified value is found:");
+        +prpr; +prpr < testHeader < " - using cache - deploying caching strategy #" < strategy;
+        +prpr < "computing all minors of size " < minorSize < "x" < minorSize;
+        prpr < " until first minor with specified value is found:";
 
         int loops = 0;
         bool minorFound = false;
@@ -764,30 +740,28 @@ void testAllMinorsUntil(string testHeader, int rowCount, int columnCount, int en
 
             // updating counters:
             totalMultiplications += theMinor.getMultiplications();
-            totalSummations += theMinor.getSummations();
+            totalAdditions += theMinor.getAdditions();
             totalMultiplicationsAccumulated += theMinor.getAccumulatedMultiplications();
-            totalSummationsAccumulated += theMinor.getAccumulatedSummations();
+            totalAdditionsAccumulated += theMinor.getAccumulatedAdditions();
 
             // writing current minor
-            writeMinor("\n"); writeMinor(k++); writeMinor(". minor = "); writeMinor(theMinor.getResult());
+            +prpr < k++ < ". minor = " < theMinor.getResult();
 
             loops++;
             printTime += clock() - printTimeStart;
         };
         totalTime = clock() - totalTimeStart - printTime;
         // writing summarized information
-        writeMinorWithResults("\n\nOperation counters - "); writeMinorWithResults(testHeader);
-        writeMinorWithResults(" - using cache - deploying caching strategy #");
-        writeMinorWithResults(strategy);
-        writeMinorWithResults("\nperformed in total "); writeMinorWithResults(totalMultiplications);
-        writeMinorWithResults(" multiplications and ");
-        writeMinorWithResults(totalSummations); writeMinorWithResults(" summations");
-        writeMinor("\n(computation without reuse would need "); writeMinor(totalMultiplicationsAccumulated);
-        writeMinor(" and "); writeMinor(totalSummationsAccumulated); writeMinor(" summations)");
-        writeMinorWithResults("\n(time = "); writeMinorWithResults(totalTime); writeMinorWithResults(" msec)");
-        writeMinor("\nThe cache has "); writeMinor(cch.getNumberOfEntries()); writeMinor(" (of max. ");
-        writeMinor(cacheEntries); writeMinor(") entries and a weight of ");
-        writeMinor(cch.getWeight()); writeMinor(" (of max. ");
-        writeMinor(cacheWeight); writeMinor(").");
+        ++prpr; ++prpr << "Operation counters - " << testHeader << " - using cache - deploying caching strategy #" << strategy;
+        ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
+        prpr << totalAdditions << " additions";
+        ++prpr << "(computation without reuse would need " << totalMultiplicationsAccumulated << " and ";
+        prpr << totalAdditionsAccumulated << " additions)";
+        ++prpr << "(time = " << totalTime << " msec)";
+        +prpr < "The cache has " < cch.getNumberOfEntries() < " (of max. " < cacheEntries < ") entries and a weight of ";
+        prpr < cch.getWeight() < " (of max. " < cacheWeight < ").";
     }
+    delete [] myMatrix;
 }
+
+#endif // HAVE_MINOR

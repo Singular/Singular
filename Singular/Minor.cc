@@ -1,4 +1,7 @@
 #include "mod2.h"
+
+#ifdef HAVE_MINOR
+
 #include "structs.h"
 #include "polys.h"
 #include <Minor.h>
@@ -27,10 +30,27 @@ MinorKey::MinorKey (const MinorKey& mk) {
         _columnKey[c] = mk.getColumnKey(c);
 }
 
-// just to make the compiler happy;
-// this method should never be called
-MinorKey& MinorKey::operator=(const MinorKey&) {
-    assert(false);
+MinorKey& MinorKey::operator=(const MinorKey& mk) {
+    if (_numberOfRowBlocks != 0)    delete [] _rowKey;
+    if (_numberOfColumnBlocks != 0) delete [] _columnKey;
+    _numberOfRowBlocks = 0;
+    _numberOfColumnBlocks = 0;
+    _rowKey = 0;
+    _columnKey = 0;
+
+    _numberOfRowBlocks = mk.getNumberOfRowBlocks();
+    _numberOfColumnBlocks = mk.getNumberOfColumnBlocks();;
+
+    // allocate memory for new entries in _rowKey and _columnKey;
+    _rowKey = new unsigned long[_numberOfRowBlocks];
+    _columnKey = new unsigned long[_numberOfColumnBlocks];
+
+    // copying values from parameter arrays to private arrays
+    for (int r = 0; r < _numberOfRowBlocks; r++)
+        _rowKey[r] = mk.getRowKey(r);
+    for (int c = 0; c < _numberOfColumnBlocks; c++)
+        _columnKey[c] = mk.getColumnKey(c);
+        
     return *this;
 }
 
@@ -62,10 +82,6 @@ MinorKey::MinorKey(const int lengthOfRowArray, const unsigned long* const rowKey
     // allocate memory for new entries in _rowKey and _columnKey;
     _rowKey = new unsigned long[_numberOfRowBlocks];
     _columnKey = new unsigned long[_numberOfColumnBlocks];
-    assert(_rowKey != rowKey);
-    assert(_columnKey != rowKey);
-    assert(_rowKey != columnKey);
-    assert(_columnKey != columnKey);
 
     // copying values from parameter arrays to private arrays
     for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -688,15 +704,15 @@ long MinorValue::getMultiplications() const {
     return _multiplications;
 }
 
-long MinorValue::getSummations() const {
-    return _summations;
+long MinorValue::getAdditions() const {
+    return _additions;
 }
 
 long MinorValue::getAccumulatedMultiplications() const {
     return _accumulatedMult;
 }
 
-long MinorValue::getAccumulatedSummations() const {
+long MinorValue::getAccumulatedAdditions() const {
     return _accumulatedSum;
 }
 
@@ -760,21 +776,21 @@ int MinorValue::rankMeasure5 () const {
     return this->getPotentialRetrievals() - this->getRetrievals();
 }
 
-int LongMinorValue::getWeight () const {
+long LongMinorValue::getWeight () const {
     // put measure for size of MinorValue here, i.e. number of monomials in polynomial;
     // so far, we use the accumulated number of multiplications (i.e., including all nested ones)
     // to simmulate the size of a polynomial
     return _accumulatedMult;
 }
 
-LongMinorValue::LongMinorValue (const long result, const int multiplications, const int summations,
-                                const int accumulatedMultiplications, const int accumulatedSummations,
+LongMinorValue::LongMinorValue (const long result, const int multiplications, const int additions,
+                                const int accumulatedMultiplications, const int accumulatedAdditions,
                                 const int retrievals, const int potentialRetrievals) {
     _result = result;
     _multiplications = multiplications;
-    _summations = summations;
+    _additions = additions;
     _accumulatedMult = accumulatedMultiplications;
-    _accumulatedSum = accumulatedSummations;
+    _accumulatedSum = accumulatedAdditions;
     _potentialRetrievals = potentialRetrievals;
     _retrievals = retrievals;
 }
@@ -782,7 +798,7 @@ LongMinorValue::LongMinorValue (const long result, const int multiplications, co
 LongMinorValue::LongMinorValue () {
     _result = -1;
     _multiplications = -1;
-    _summations = -1;
+    _additions = -1;
     _accumulatedMult = -1;
     _accumulatedSum = -1;
     _potentialRetrievals = -1;
@@ -817,12 +833,10 @@ string LongMinorValue::toString () const {
     s += " (accumulated: ";
     sprintf(h, "%ld", this->getAccumulatedMultiplications()); s += h;
     s += "), +: ";
-    sprintf(h, "%ld", this->getSummations()); s += h;
+    sprintf(h, "%ld", this->getAdditions()); s += h;
     s += " (accumulated: ";
-    sprintf(h, "%ld", this->getAccumulatedSummations()); s += h;
-    s += "), weight: ";
-    sprintf(h, "%d", this->getWeight()); s += h;
-    s += ", rank: ";
+    sprintf(h, "%ld", this->getAccumulatedAdditions()); s += h;
+    s += "), rank: ";
     if (cacheHasBeenUsed) { sprintf(h, "%d", this->getUtility()); s += h; }
     else s += "/";
     s += "]";
@@ -834,20 +848,20 @@ LongMinorValue::LongMinorValue (const LongMinorValue& mv) {
     _retrievals = mv.getRetrievals();
     _potentialRetrievals = mv.getPotentialRetrievals();
     _multiplications = mv.getMultiplications();
-    _summations = mv.getSummations();
+    _additions = mv.getAdditions();
     _accumulatedMult = mv.getAccumulatedMultiplications();
-    _accumulatedSum = mv.getAccumulatedSummations();
+    _accumulatedSum = mv.getAccumulatedAdditions();
 }
 
-PolyMinorValue::PolyMinorValue (const poly result, const int multiplications, const int summations,
-                                const int accumulatedMultiplications, const int accumulatedSummations,
+PolyMinorValue::PolyMinorValue (const poly result, const int multiplications, const int additions,
+                                const int accumulatedMultiplications, const int accumulatedAdditions,
                                 const int retrievals, const int potentialRetrievals) {
     _result = pCopy(result);
     // std::cout << std::endl << "PolyMinorValue creator, " << pString(_result);
     _multiplications = multiplications;
-    _summations = summations;
+    _additions = additions;
     _accumulatedMult = accumulatedMultiplications;
-    _accumulatedSum = accumulatedSummations;
+    _accumulatedSum = accumulatedAdditions;
     _potentialRetrievals = potentialRetrievals;
     _retrievals = retrievals;
 }
@@ -856,7 +870,7 @@ PolyMinorValue::PolyMinorValue () {
     _result = pISet(0);
     // std::cout << std::endl << "PolyMinorValue creator, " << pString(_result) << " STANDARD!";
     _multiplications = -1;
-    _summations = -1;
+    _additions = -1;
     _accumulatedMult = -1;
     _accumulatedSum = -1;
     _potentialRetrievals = -1;
@@ -872,10 +886,9 @@ poly PolyMinorValue::getResult() const {
     return _result;
 }
 
-int PolyMinorValue::getWeight () const {
-    // put measure for size of MinorValue here, i.e. number of monomials in polynomial;
-    // so far, we use the accumulated number of multiplications (i.e., including all nested ones)
-    // to simmulate the size of a polynomial
+long PolyMinorValue::getWeight () const {
+    // put measure for size of PolyMinorValue here, e.g. the number of monomials
+    // the cached polynomial
     return pLength(_result); // the number of monomials in the polynomial
 }
 
@@ -898,12 +911,10 @@ string PolyMinorValue::toString () const {
     s += " (accumulated: ";
     sprintf(h, "%ld", this->getAccumulatedMultiplications()); s += h;
     s += "), +: ";
-    sprintf(h, "%ld", this->getSummations()); s += h;
+    sprintf(h, "%ld", this->getAdditions()); s += h;
     s += " (accumulated: ";
-    sprintf(h, "%ld", this->getAccumulatedSummations()); s += h;
-    s += "), weight: ";
-    sprintf(h, "%d", this->getWeight()); s += h;
-    s += ", rank: ";
+    sprintf(h, "%ld", this->getAccumulatedAdditions()); s += h;
+    s += "), rank: ";
     if (cacheHasBeenUsed) { sprintf(h, "%d", this->getUtility()); s += h; }
     else s += "/";
     s += "]";
@@ -915,7 +926,9 @@ PolyMinorValue::PolyMinorValue (const PolyMinorValue& mv) {
     _retrievals = mv.getRetrievals();
     _potentialRetrievals = mv.getPotentialRetrievals();
     _multiplications = mv.getMultiplications();
-    _summations = mv.getSummations();
+    _additions = mv.getAdditions();
     _accumulatedMult = mv.getAccumulatedMultiplications();
-    _accumulatedSum = mv.getAccumulatedSummations();
+    _accumulatedSum = mv.getAccumulatedAdditions();
 }
+
+#endif // HAVE_MINOR

@@ -1,26 +1,74 @@
 #include "mod2.h"
+
+#ifdef HAVE_WRAPPERS
+
 #include "structs.h"
 #include "polys.h"
 #include "CanonicalPoly.h"
-#include <string>
+#include "Wrappers.h"
+#include <iostream>
 
-using namespace std;
-
-CanonicalPoly::CanonicalPoly(const int i, const ring r)
+CanonicalPoly::CanonicalPoly (const SingularPoly& sp, const RingWrapper& r):InternPoly(r)
 {
-  cout << "\n      CanonicalPoly constructor with argument '" << i << "'";
-  m_Poly = p_ISet(i, r);
-  m_r = r;
+  +prpr > "CanonicalPoly constructor with poly argument = " <
+        p_String(sp, r.getSingularRing(), r.getSingularRing());
+  m_poly = sp;
 }
 
-CanonicalPoly::~CanonicalPoly()
-{
-  std::cout << "\n      CanonicalPoly destructor for '";
-  this->print();
-  std::cout << "' THIS STILL MISSES THE DESTRUCTION OF THE WRAPPED SINGULAR POLY!";
+CanonicalPoly::CanonicalPoly (const int i, const RingWrapper& r):InternPoly(r)
+{ // this method seems to work in char 0 only; is this due to a malfunction of p_ISet?
+  +prpr > "CanonicalPoly constructor with int argument = " < i;
+  m_poly = p_ISet(i, r.getSingularRing());
 }
 
-void CanonicalPoly::print() const
+CanonicalPoly::~CanonicalPoly ()
 {
-  p_Write0(m_Poly, m_r, m_r);
+  +prpr > "CanonicalPoly destructor, object = " < this->toString();
+  //p_Delete(&m_poly, m_ring.getSingularRing());
 }
+
+char* CanonicalPoly::toString () const
+{
+  SingularRing r = this->getRing().getSingularRing();
+  return p_String(this->getSingularPoly(), r, r);
+}
+
+void CanonicalPoly::addCompatible (const InternPoly* ip)
+{
+  if (ip->getPolyType() == 1)
+  {
+    const CanonicalPoly* pcp = static_cast<const CanonicalPoly*>(ip);
+    +prpr > "value of CanonicalPoly is being changed";
+    prpr+1;
+    +prpr > "old value = " < this->toString();
+    +prpr > "value to be added = " < pcp->toString();
+    m_poly = p_Add_q(m_poly, pcp->deepCopy()->getSingularPoly(), this->getRing().getSingularRing());
+    +prpr > "new value = " < this->toString();
+    prpr-1;
+    +prpr > "value of CanonicalPoly has been changed";
+  }
+  else
+  {
+    assume(false);
+  }
+}
+
+int CanonicalPoly::getPolyType () const
+{
+  return CANONICAL_POLY_TYPE;
+}
+
+const SingularPoly& CanonicalPoly::getSingularPoly () const
+{
+  return m_poly;
+}
+
+CanonicalPoly* CanonicalPoly::deepCopy () const
+{
+  +prpr > "creating a deep copy of CanonicalPoly, argument = " < this->toString();
+  SingularPoly sp = p_Copy(this->getSingularPoly(), this->getRing().getSingularRing());  // SINGULAR poly is deeply copied.
+  CanonicalPoly* pcp = new CanonicalPoly(sp, this->getRing());  // ring is not deeply copied!
+  return pcp;
+}
+
+#endif // HAVE_WRAPPERS

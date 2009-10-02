@@ -1,10 +1,14 @@
 #include "mod2.h"
+
+#ifdef HAVE_MINOR
+
 #include "structs.h"
 #include "polys.h"
 #include <MinorProcessor.h>
+#include "febase.h"
 
 void MinorProcessor::print() const {
-    cout << this->toString();
+    PrintS(this->toString().c_str());
 }
 
 int MinorProcessor::getBestLine (const int k, const MinorKey& mk) const {
@@ -177,15 +181,18 @@ int MinorProcessor::NumberOfRetrievals (const int rows, const int columns, const
     return result;
 }
 
-LongMinorProcessor::LongMinorProcessor() {
+MinorProcessor::MinorProcessor () {          
     _container = MinorKey(0, 0, 0, 0);
     _minor = MinorKey(0, 0, 0, 0);
     _containerRows = 0;
     _containerColumns = 0;
     _minorSize = 0;
-    _matrix = 0;
     _rows = 0;
     _columns = 0;
+}
+
+LongMinorProcessor::LongMinorProcessor () {
+    _matrix = 0;
 }
 
 string LongMinorProcessor::toString () const {
@@ -296,7 +303,7 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         // Here, the minor must be 2x2 or larger.
         int b = getBestLine(k, mk);                          // row or column with most zeros
         int result = 0;                                      // This will contain the value of the minor.
-        int s = 0; int m = 0; int as = 0; int am = 0;        // counters for summations and multiplications,
+        int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
         if (b >= 0) {
             // This means that the best line is the row with absolute (0-based) index b.
@@ -309,12 +316,12 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                 if (_matrix[b][absoluteC] != 0) { // Only then do we have to consider this sub-determinante.
                     LongMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
                     m += mv.getMultiplications();
-                    s += mv.getSummations();
+                    s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
-                    as += mv.getAccumulatedSummations();
+                    as += mv.getAccumulatedAdditions();
                     result += sign * mv.getResult() * _matrix[b][absoluteC]; // adding sub-determinante times matrix entry
                                                                              // times appropriate sign
-                    s++; m++; as++, am++; // This is for the summation and multiplication in the previous line of code.
+                    s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
             }
@@ -331,19 +338,19 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                 if (_matrix[absoluteR][b] != 0) { // Only then do we have to consider this sub-determinante.
                     LongMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
                     m += mv.getMultiplications();
-                    s += mv.getSummations();
+                    s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
-                    as += mv.getAccumulatedSummations();
+                    as += mv.getAccumulatedAdditions();
                     result += sign * mv.getResult() * _matrix[absoluteR][b]; // adding sub-determinante times matrix entry
                                                                              // times appropriate sign
-                    s++; m++; as++, am++; // This is for the summation and multiplication in the previous line of code.
+                    s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
             }
         }
-        s--; as--; // first summation was 0 + ..., so we do not count it
-        if (s < 0) s = 0; // may happen when all subminors are zero and no summation needs to be performed
-        if (as < 0) as = 0; // may happen when all subminors are zero and no summation needs to be performed
+        s--; as--; // first addition was 0 + ..., so we do not count it
+        if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
+        if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
         LongMinorValue newMV = LongMinorValue(result, m, s, am, as, -1, -1); // "-1" is to signal that any statistics about the
                                                                              // number of retrievals does not make sense, as we
                                                                              // do not use a cache.
@@ -363,7 +370,7 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
     else {
         int b = getBestLine(k, mk);                          // row or column with most zeros
         int result = 0;                                      // This will contain the value of the minor.
-        int s = 0; int m = 0; int as = 0; int am = 0;        // counters for summations and multiplications,
+        int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
         LongMinorValue mv = LongMinorValue(0, 0, 0, 0, 0, 0, 0);     // for storing all intermediate minors
         if (b >= 0) {
@@ -383,17 +390,17 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     }
                     else {
                         mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch); // recursive call
-                        // As this minor was not in the cache, we count the summations and
+                        // As this minor was not in the cache, we count the additions and
                         // multiplications that we needed to do in the recursive call:
                         m += mv.getMultiplications();
-                        s += mv.getSummations();
+                        s += mv.getAdditions();
                     }
                     // In any case, we count all nested operations in the accumulative counters:
                     am += mv.getAccumulatedMultiplications();
-                    as += mv.getAccumulatedSummations();
+                    as += mv.getAccumulatedAdditions();
                     result += sign * mv.getResult() * _matrix[b][absoluteC]; // adding sub-determinante times matrix entry
                                                                              // times appropriate sign
-                    s++; m++; as++; am++; // This is for the summation and multiplication in the previous line of code.
+                    s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
             }
@@ -416,41 +423,34 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     }
                     else {
                         mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch); // recursive call
-                        // As this minor was not in the cache, we count the summations and
+                        // As this minor was not in the cache, we count the additions and
                         // multiplications that we needed to do in the recursive call:
                         m += mv.getMultiplications();
-                        s += mv.getSummations();
+                        s += mv.getAdditions();
                     }
                     // In any case, we count all nested operations in the accumulative counters:
                     am += mv.getAccumulatedMultiplications();
-                    as += mv.getAccumulatedSummations();
+                    as += mv.getAccumulatedAdditions();
                     result += sign * mv.getResult() * _matrix[absoluteR][b]; // adding sub-determinante times matrix entry
                                                                              // times appropriate sign
-                    s++; m++; as++; am++; // This is for the summation and multiplication in the previous line of code.
+                    s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
             }
         }
         // Let's cache the newly computed minor:
         int potentialRetrievals = NumberOfRetrievals(_containerRows, _containerColumns, _minorSize, k, multipleMinors);
-        s--; as--; // first summation was 0 + ..., so we do not count it
-        if (s < 0) s = 0; // may happen when all subminors are zero and no summation needs to be performed
-        if (as < 0) as = 0; // may happen when all subminors are zero and no summation needs to be performed
+        s--; as--; // first addition was 0 + ..., so we do not count it
+        if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
+        if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
         LongMinorValue newMV = LongMinorValue(result, m, s, am, as, 1, potentialRetrievals);
         cch.put(mk, newMV); // Here's the actual put inside the cache.
         return newMV;
     }
 }
 
-PolyMinorProcessor::PolyMinorProcessor() {
-    _container = MinorKey(0, 0, 0, 0);
-    _minor = MinorKey(0, 0, 0, 0);
-    _containerRows = 0;
-    _containerColumns = 0;
-    _minorSize = 0;
+PolyMinorProcessor::PolyMinorProcessor () {
     _polyMatrix = 0;
-    _rows = 0;
-    _columns = 0;
 }
 
 string PolyMinorProcessor::toString () const {
@@ -568,7 +568,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         // Here, the minor must be 2x2 or larger.
         int b = getBestLine(k, mk);                          // row or column with most zeros
         poly result = pISet(0);                              // This will contain the value of the minor.
-        int s = 0; int m = 0; int as = 0; int am = 0;        // counters for summations and multiplications,
+        int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
         if (b >= 0) {
             // This means that the best line is the row with absolute (0-based) index b.
@@ -582,12 +582,12 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                 if (!isEntryZero(b, absoluteC)) { // Only then do we have to consider this sub-determinante.
                     PolyMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
                     m += mv.getMultiplications();
-                    s += mv.getSummations();
+                    s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
-                    as += mv.getAccumulatedSummations();
+                    as += mv.getAccumulatedAdditions();
                     result = ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]); // adding sub-determinante times matrix entry
                                                                                                // times appropriate sign
-                    s++; m++; as++, am++; // This is for the summation and multiplication in the previous line of code.
+                    s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
                 signPoly = pISet(sign);
@@ -607,21 +607,21 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                 if (!isEntryZero(absoluteR, b)) { // Only then do we have to consider this sub-determinante.
                     PolyMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
                     m += mv.getMultiplications();
-                    s += mv.getSummations();
+                    s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
-                    as += mv.getAccumulatedSummations();
+                    as += mv.getAccumulatedAdditions();
                     result = ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]); // adding sub-determinante times matrix entry
                                                                                                // times appropriate sign
-                    s++; m++; as++, am++; // This is for the summation and multiplication in the previous line of code.
+                    s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
                 signPoly = pISet(sign);
             }
             // p_Delete(&signPoly, currRing);
         }
-        s--; as--; // first summation was 0 + ..., so we do not count it
-        if (s < 0) s = 0; // may happen when all subminors are zero and no summation needs to be performed
-        if (as < 0) as = 0; // may happen when all subminors are zero and no summation needs to be performed
+        s--; as--; // first addition was 0 + ..., so we do not count it
+        if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
+        if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
         PolyMinorValue newMV(result, m, s, am, as, -1, -1); // "-1" is to signal that any statistics about the
                                                             // number of retrievals does not make sense, as we
                                                             // do not use a cache.
@@ -642,7 +642,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
     else {
         int b = getBestLine(k, mk);                          // row or column with most zeros
         poly result = pISet(0);                              // This will contain the value of the minor.
-        int s = 0; int m = 0; int as = 0; int am = 0;        // counters for summations and multiplications,
+        int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
         PolyMinorValue mv = PolyMinorValue(0, 0, 0, 0, 0, 0, 0);     // for storing all intermediate minors
         if (b >= 0) {
@@ -663,17 +663,17 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     }
                     else {
                         mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch); // recursive call
-                        // As this minor was not in the cache, we count the summations and
+                        // As this minor was not in the cache, we count the additions and
                         // multiplications that we needed to do in the recursive call:
                         m += mv.getMultiplications();
-                        s += mv.getSummations();
+                        s += mv.getAdditions();
                     }
                     // In any case, we count all nested operations in the accumulative counters:
                     am += mv.getAccumulatedMultiplications();
-                    as += mv.getAccumulatedSummations();
+                    as += mv.getAccumulatedAdditions();
                     result = ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]); // adding sub-determinante times matrix entry
                                                                                                // times appropriate sign
-                    s++; m++; as++; am++; // This is for the summation and multiplication in the previous line of code.
+                    s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
                 signPoly = pISet(sign);
@@ -698,17 +698,17 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     }
                     else {
                         mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch); // recursive call
-                        // As this minor was not in the cache, we count the summations and
+                        // As this minor was not in the cache, we count the additions and
                         // multiplications that we needed to do in the recursive call:
                         m += mv.getMultiplications();
-                        s += mv.getSummations();
+                        s += mv.getAdditions();
                     }
                     // In any case, we count all nested operations in the accumulative counters:
                     am += mv.getAccumulatedMultiplications();
-                    as += mv.getAccumulatedSummations();
+                    as += mv.getAccumulatedAdditions();
                     result = ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]); // adding sub-determinante times matrix entry
                                                                                                // times appropriate sign
-                    s++; m++; as++; am++; // This is for the summation and multiplication in the previous line of code.
+                    s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
                 signPoly = pISet(sign);
@@ -716,15 +716,16 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         }
         // Let's cache the newly computed minor:
         int potentialRetrievals = NumberOfRetrievals(_containerRows, _containerColumns, _minorSize, k, multipleMinors);
-        s--; as--; // first summation was 0 + ..., so we do not count it
-        if (s < 0) s = 0; // may happen when all subminors are zero and no summation needs to be performed
-        if (as < 0) as = 0; // may happen when all subminors are zero and no summation needs to be performed
+        s--; as--; // first addition was 0 + ..., so we do not count it
+        if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
+        if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
         PolyMinorValue newMV = PolyMinorValue(result, m, s, am, as, 1, potentialRetrievals);
         cch.put(mk, newMV); // Here's the actual put inside the cache.
         return newMV;
     }
 }
 
+#endif // HAVE_MINOR
 
 
 
