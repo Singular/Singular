@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.18 2009-10-02 14:16:57 seelisch Exp $ */
+/* $Id: matpol.cc,v 1.19 2009-10-02 14:19:17 seelisch Exp $ */
 
 /*
 * ABSTRACT:
@@ -654,7 +654,6 @@ matrix mpWedge(matrix a, int ar)
   tmp=mpNew(ar,ar);
   l = 1; /* k,l:the index in result*/
   idInitChoise(ar,1,a->nrows,&rowch,rowchoise);
-  totalNumOfMult = 0; totalNumOfAdd = 0; // for counting basic arithmetic operations
   while (!rowch)
   {
     k=1;
@@ -677,16 +676,7 @@ matrix mpWedge(matrix a, int ar)
     idGetNextChoise(ar,a->nrows,&rowch,rowchoise);
     l++;
   }
-<<<<<<< matpol.cc
-  PrintS("==========================================================================");
-  printf("total number of calls to pAdd = %d", totalNumOfAdd);
-  printf("total number of calls to smMultDiv = %d", totalNumOfMult);
-  PrintS("(smMultDiv(a,b,c) returns the portion of (a*b)/LM(c) with nonegative");
-  PrintS(" exponents; for more than five monomials this method makes use of buckets)");
-  PrintS("==========================================================================");
-=======
 
->>>>>>> 1.17
   /*delete the matrix tmp*/
   for (i=1; i<=ar; i++)
   {
@@ -1120,20 +1110,16 @@ void mp_permmatrix::mpElimBareiss(poly div)
         jj = qcol[j];
         if (ap[jj] != NULL)
         {
-          totalNumOfMult++;
           q2 = SM_MULT(ap[jj], elim, div);
           if (a[jj] != NULL)
           {
-            totalNumOfMult++;
             q1 = SM_MULT(a[jj], piv, div);
             pDelete(&a[jj]);
-            totalNumOfAdd++;
             q2 = pAdd(q2, q1);
           }
         }
         else if (a[jj] != NULL)
         {
-          totalNumOfMult++;
           q2 = SM_MULT(a[jj], piv, div);
         }
         if ((q2!=NULL) && div)
@@ -1149,7 +1135,6 @@ void mp_permmatrix::mpElimBareiss(poly div)
         jj = qcol[j];
         if (a[jj] != NULL)
         {
-          totalNumOfMult++;
           q2 = SM_MULT(a[jj], piv, div);
           pDelete(&a[jj]);
           if (div)
