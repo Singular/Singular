@@ -129,11 +129,13 @@ bool MinorProcessor::setNextKeys(const int k) {
 bool MinorProcessor::isEntryZero (const int absoluteRowIndex, const int absoluteColumnIndex) const
 {
   assume(false);
+  return false;
 }
 
 string MinorProcessor::toString () const
 {
   assume(false);
+  return "";
 }
 
 int MinorProcessor::IOverJ(const int i, const int j) {

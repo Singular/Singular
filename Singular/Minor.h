@@ -621,7 +621,7 @@ class LongMinorValue : public MinorValue {
              // just to make the compiler happy
              LongMinorValue ();
              
-             ~LongMinorValue ();
+             virtual ~LongMinorValue ();
              
              long getResult() const;
 
@@ -660,7 +660,7 @@ class PolyMinorValue : public MinorValue {
              // just to make the compiler happy
              PolyMinorValue ();
              
-             ~PolyMinorValue ();
+             virtual ~PolyMinorValue ();
 
              poly getResult() const;
 
