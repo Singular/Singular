@@ -458,7 +458,7 @@ class MinorValue {
              * @return the weight of a given instance of MinorValue
              * @see Cache::getWeight () const
              */
-             virtual long getWeight () const;
+             virtual long getWeight () const {};
 
              /**
              * A method for accessing the number of retrievals of this minor. Multiple retrievals will
@@ -563,7 +563,7 @@ class MinorValue {
              * A method for providing a printable version of the represented MinorValue.
              * @return a printable version of the given instance as instance of class string
              */
-             virtual string toString () const;
+             virtual string toString () const {};
 
              /**
              * A method for printing a string representation of the given MinorValue to std::cout.
