@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipshell.cc,v 1.213 2009-09-24 16:36:12 Singular Exp $ */
+/* $Id: ipshell.cc,v 1.214 2009-10-05 10:30:21 Singular Exp $ */
 /*
 * ABSTRACT:
 */
@@ -512,7 +512,7 @@ int exprlist_length(leftv v)
 
 int iiIsPrime0(unsigned p)  /* brute force !!!! */
 {
-  unsigned i,j;
+  unsigned i,j=0 /*only to avoid compiler warnings*/;
 #ifdef HAVE_FACTORY
   if (p<=32749) // max. small prime in factory
   {
@@ -521,7 +521,8 @@ int iiIsPrime0(unsigned p)  /* brute force !!!! */
     i=e/2;
     do
     {
-      if (p==(j=cf_getSmallPrime(i))) return p;
+      j=cf_getSmallPrime(i);
+      if (p==j) return p;
       if (p<j) e=i-1;
       else     a=i+1;
       i=a+(e-a)/2;
