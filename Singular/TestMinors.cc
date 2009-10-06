@@ -328,6 +328,13 @@ int testAllPolyMinors(matrix mat, int minorSize, int strategies, int cacheEntrie
 
 ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cacheEntries, long cacheWeight)
 {
+    // counters + auxiliary stuff
+  long totalMultiplications = 0;
+  long totalAdditions = 0;
+  long totalMultiplicationsAccumulated = 0;
+  long totalAdditionsAccumulated = 0;
+  char h[30];
+
   int rowCount = mat->nrows;
   int columnCount = mat->ncols;
 
@@ -350,25 +357,27 @@ ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cach
   // containers for all upcoming results
   PolyMinorValue theMinor;
   poly po;
-  int nonZeroCounter = 0;
-  std::list<poly> generators;
+  ideal iii = idInit(nonZeroCounter, 0);
 
   if (strategy == 0)
   {
+    PrintLn(); PrintS("new code uses no cache");
     // iteration over all minors of size "minorSize x minorSize"
     while (mp.hasNextMinor()) {
       // retrieving the minor:
       theMinor = mp.getNextMinor();
       po = theMinor.getResult();
-      if (!pEqualPolys(po, zeroPoly))
-      {
-        nonZeroCounter++;
-        generators.insert(generators.end(), po);
-      }
+      totalMultiplicationsAccumulated += theMinor.getAccumulatedMultiplications();
+      totalMultiplications += theMinor.getMultiplications();
+      totalAdditionsAccumulated += theMinor.getAccumulatedAdditions();
+      totalAdditions += theMinor.getAdditions();
+      idInsertPoly(iii, po); // will include po only if it is not the zero polynomial
     }
   }
   else
   {
+    PrintLn(); PrintS("new code uses cache with caching strategy ");
+    sprintf(h, "%d", strategy); PrintS(h);
     MinorValue::SetRankingStrategy(strategy);
     Cache<MinorKey, PolyMinorValue> cch(cacheEntries, cacheWeight);
     // iteration over all minors of size "minorSize x minorSize"
@@ -376,22 +385,25 @@ ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cach
       // retrieving the minor:
       theMinor = mp.getNextMinor(cch);
       po = theMinor.getResult();
-      if (!pEqualPolys(po, zeroPoly))
-      {
-        nonZeroCounter++;
-        generators.insert(generators.end(), po);
-      }
+      totalMultiplicationsAccumulated += theMinor.getAccumulatedMultiplications();
+      totalMultiplications += theMinor.getMultiplications();
+      totalAdditionsAccumulated += theMinor.getAccumulatedAdditions();
+      totalAdditions += theMinor.getAdditions();
+      idInsertPoly(iii, po); // will include po only if it is not the zero polynomial
     }
   }
+  
+  PrintLn(); PrintS("numbers of performed operations");
+  PrintLn(); PrintS("   polynomial-to-polynomial multiplications: ");
+  sprintf(h, "%ld", totalMultiplications); PrintS(h);
+  PrintLn(); PrintS("   polynomial-to-polynomial additions: ");
+  sprintf(h, "%ld", totalAdditions); PrintS(h);
+  PrintLn(); PrintS("   (polynomial-to-polynomial multiplications without cache would be: ");
+  sprintf(h, "%ld", totalMultiplicationsAccumulated); PrintS(h); PrintS(")");
+  PrintLn(); PrintS("   (polynomial-to-polynomial additions without cache would be: ");
+  sprintf(h, "%ld", totalAdditionsAccumulated); PrintS(h); PrintS(")");
+  PrintLn(); PrintLn();
 
-  // build the return value, i.e. the ideal of non-zero minors
-  ideal iii = idInit(nonZeroCounter, 0);
-  int i = 0;
-  for (std::list<poly>::iterator it = generators.begin(); it != generators.end(); it++)
-  {
-    iii->m[i] = *it;
-    i++;
-  }
   return iii;
 }
 

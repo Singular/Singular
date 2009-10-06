@@ -674,11 +674,23 @@ string MinorKey::toString() const {
 
 int MinorValue::_RankingStrategy = -1;
 
+long MinorValue::getWeight () const
+{
+  assert(false);  // must be overridden in derived classes
+  return 0;
+}
+
 // just to make the compiler happy;
 // this method should never be called
 bool MinorValue::operator==(const MinorValue& mv) const {
     assert(false);
     return (this == &mv);  // compare addresses of both objects
+}
+
+string MinorValue::toString () const
+{
+  assert(false);  // must be overridden in derived classes
+  return "";
 }
 
 // just to make the compiler happy;

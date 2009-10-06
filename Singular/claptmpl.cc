@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.48 2009-10-02 13:51:19 seelisch Exp $
+// $Id: claptmpl.cc,v 1.49 2009-10-06 12:09:00 seelisch Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -262,7 +262,6 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 #include "Cache.h"
 template class std::list<int>;
 template class std::list<long>;
-template class std::list<poly>;
 template class std::list<MinorKey>;
 template class std::list<LongMinorValue>;
 template class std::list<PolyMinorValue>;
