@@ -357,7 +357,7 @@ ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cach
   // containers for all upcoming results
   PolyMinorValue theMinor;
   poly po;
-  ideal iii = idInit(nonZeroCounter, 0);
+  ideal iii = idInit(1, 0);
 
   if (strategy == 0)
   {
