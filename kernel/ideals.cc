@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.79 2009-09-29 10:36:23 Singular Exp $ */
+/* $Id: ideals.cc,v 1.80 2009-10-06 09:32:54 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -69,8 +69,8 @@ ideal idInit(int idsize, int rank)
   return hh;
 }
 
-//#ifndef __OPTIMIZE__
-// this is mainly for outputting an ideal within the debugger & DetailedPrint
+#ifndef __OPTIMIZE__
+// this is only for outputting an ideal within the debugger
 void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint)
 {
   assume( debugPrint >= 0 );
@@ -90,7 +90,7 @@ void idShow(const ideal id, const ring lmRing, const ring tailRing, const int de
     }
   }
 }
-//#endif
+#endif
 
 /*2
 * initialise the maximal ideal (at 0)
@@ -537,6 +537,23 @@ ideal idSimpleAdd (ideal h1,ideal h2)
     result->m[r] = pCopy(h2->m[l]);
   }
   return result;
+}
+
+/*2
+* concat h1 and h2
+*/
+void idInsertPoly (ideal h1,poly h2)
+{
+  if (h2==NULL) return;
+  int j = IDELEMS(h1)-1;
+  while ((j >= 0) && (h1->m[j] == NULL)) j--;
+  j++;
+  if (j==IDELEMS(h1))
+  {
+    pEnlargeSet(&(h1->m),IDELEMS(h1),16);
+    IDELEMS(h1)+=16;
+  }
+  h1->m[j]=h2;
 }
 
 /*2

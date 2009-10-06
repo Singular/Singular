@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.h,v 1.14 2009-07-20 12:00:50 motsak Exp $ */
+/* $Id: ideals.h,v 1.15 2009-10-06 09:32:54 Singular Exp $ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
@@ -54,6 +54,8 @@ ideal idDBCopy(ideal h1,const char *f,int l);
 ideal idSimpleAdd (ideal h1,ideal h2);
   /*adds the quotient ideal*/
 ideal idAdd (ideal h1,ideal h2);
+  /* h1 + h2 */
+void idInsertPoly (ideal h1,poly h2);
   /* h1 + h2 */
 ideal idMult (ideal h1,ideal h2);
   /*hh := h1 * h2*/
