@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_ops.cc,v 1.11 2007-12-19 14:26:20 Singular Exp $ */
+/* $Id: cf_ops.cc,v 1.12 2009-10-07 10:26:11 Singular Exp $ */
 
 //{{{ docu
 //
@@ -506,8 +506,7 @@ degreesRec ( const CanonicalForm & f, int * degs )
 // is allocated automatically.
 //
 //}}}
-int *
-degrees ( const CanonicalForm & f, int * degs )
+int * degrees ( const CanonicalForm & f, int * degs )
 {
     if ( f.inCoeffDomain() )
         return 0;
@@ -534,8 +533,7 @@ degrees ( const CanonicalForm & f, int * degs )
 // polynomial variables.
 //
 //}}}
-int
-totaldegree ( const CanonicalForm & f )
+int totaldegree ( const CanonicalForm & f )
 {
     if ( f.isZero() )
         return -1;

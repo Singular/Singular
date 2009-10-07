@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.14 2006-05-15 09:03:04 Singular Exp $ */
+/* $Id: cf_map.cc,v 1.15 2009-10-07 10:26:11 Singular Exp $ */
 
 //{{{ docu
 //
@@ -26,8 +26,8 @@ MapPair &
 MapPair::operator = ( const MapPair & p )
 {
     if ( this != &p ) {
-	V = p.V;
-	S = p.S;
+        V = p.V;
+        S = p.S;
     }
     return *this;
 }
@@ -67,7 +67,7 @@ CFMap::CFMap ( const CFList & L )
     CFListIterator i;
     int j;
     for ( i = L, j = 1; i.hasItem(); i++, j++ )
-	P.insert( MapPair( Variable(j), i.getItem() ) );
+        P.insert( MapPair( Variable(j), i.getItem() ) );
 }
 //}}}
 
@@ -81,7 +81,7 @@ CFMap &
 CFMap::operator = ( const CFMap & m )
 {
     if ( this != &m )
-	P = m.P;
+        P = m.P;
     return *this;
 }
 //}}}
@@ -154,29 +154,29 @@ subsrec ( const CanonicalForm & f, const MPListIterator & i )
     while ( j.hasItem() && j.getItem().var() > f.mvar() ) j++;
 
     if ( j.hasItem() )
-	if ( j.getItem().var() != f.mvar() ) {
-	    // simply descend if the current MapPair variable is
-	    // not the main variable of f
-	    CanonicalForm result = 0;
-	    CFIterator I;
-	    for ( I = f; I.hasTerms(); I++ )
-		result += power( f.mvar(), I.exp() ) * subsrec( I.coeff(), j );
-	    return result;
-	}
-	else {
-	    // replace the main variable of f with the image of
-	    // the current variable under MapPair
-	    CanonicalForm result = 0;
-	    CanonicalForm s = j.getItem().subst();
-	    CFIterator I;
-	    // move on to the next MapPair
-	    j++;
-	    for ( I = f; I.hasTerms(); I++ )
-		result += subsrec( I.coeff(), j ) * power( s, I.exp() );
-	    return result;
-	}
+        if ( j.getItem().var() != f.mvar() ) {
+            // simply descend if the current MapPair variable is
+            // not the main variable of f
+            CanonicalForm result = 0;
+            CFIterator I;
+            for ( I = f; I.hasTerms(); I++ )
+                result += power( f.mvar(), I.exp() ) * subsrec( I.coeff(), j );
+            return result;
+        }
+        else {
+            // replace the main variable of f with the image of
+            // the current variable under MapPair
+            CanonicalForm result = 0;
+            CanonicalForm s = j.getItem().subst();
+            CFIterator I;
+            // move on to the next MapPair
+            j++;
+            for ( I = f; I.hasTerms(); I++ )
+                result += subsrec( I.coeff(), j ) * power( s, I.exp() );
+            return result;
+        }
     else
-	return f;
+        return f;
 }
 //}}}
 
@@ -234,13 +234,13 @@ compress ( const CanonicalForm & f, CFMap & m )
     m = CFMap();
     n = i = 1;
     while ( i <= level( f ) ) {
-	while( degs[i] == 0 ) i++;
-	if ( i != n ) {
-	    // swap variables and remember the swap in the map
-	    m.newpair( Variable( n ), Variable( i ) );
-	    result = swapvar( result, Variable( i ), Variable( n ) );
-	}
-	n++; i++;
+        while( degs[i] == 0 ) i++;
+        if ( i != n ) {
+            // swap variables and remember the swap in the map
+            m.newpair( Variable( n ), Variable( i ) );
+            result = swapvar( result, Variable( i ), Variable( n ) );
+        }
+        n++; i++;
     }
     delete [] degs;
     return result;
@@ -266,39 +266,39 @@ compress ( const CFArray & a, CFMap & M, CFMap & N )
 {
     M = N = CFMap();
     if ( a.size() == 0 )
-	return;
+        return;
     int maxlevel = level( a[a.min()] );
     int i, j;
 
     // get the maximum of levels in a
     for ( i = a.min() + 1; i <= a.max(); i++ )
-	if ( level( a[i] ) > maxlevel )
-	    maxlevel = level( a[i] );
+        if ( level( a[i] ) > maxlevel )
+            maxlevel = level( a[i] );
     if ( maxlevel <= 0 )
-	return;
+        return;
 
     int * degs = new int[maxlevel+1];
     int * tmp = new int[maxlevel+1];
     for ( i = 1; i <= maxlevel; i++ )
-	degs[i] = 0;
+        degs[i] = 0;
 
     // calculate the union of all levels occuring in a
     for ( i = a.min(); i <= a.max(); i++ ) {
-	tmp = degrees( a[i], tmp );
-	for ( j = 1; j <= level( a[i] ); j++ )
-	    if ( tmp[j] != 0 )
-		degs[j] = 1;
+        tmp = degrees( a[i], tmp );
+        for ( j = 1; j <= level( a[i] ); j++ )
+            if ( tmp[j] != 0 )
+                degs[j] = 1;
     }
 
     // create the maps
     i = 1; j = 1;
     while ( i <= maxlevel ) {
-	if ( degs[i] != 0 ) {
-	    M.newpair( Variable(i), Variable(j) );
-	    N.newpair( Variable(j), Variable(i) );
-	    j++;
-	}
-	i++;
+        if ( degs[i] != 0 ) {
+            M.newpair( Variable(i), Variable(j) );
+            N.newpair( Variable(j), Variable(i) );
+            j++;
+        }
+        i++;
     }
     delete [] tmp;
     delete [] degs;
@@ -372,8 +372,9 @@ compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & 
     int * degsf = new int[n+1];
     int * degsg = new int[n+1];
 
-    for ( i = 0; i <= n; i++ ) {
-	degsf[i] = degsg[i] = 0;
+    for ( i = 0; i <= n; i++ )
+    {
+        degsf[i] = degsg[i] = 0;
     }
 
     degsf = degrees( f, degsf );
@@ -381,41 +382,50 @@ compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & 
     optvalues( degsf, degsg, n, p1, pe );
     
     i = 1; k = 1;
-    if ( pe > 1 ){
-	M.newpair( Variable(pe), Variable(k) );
-	N.newpair( Variable(k), Variable(pe) );
+    if ( pe > 1 )
+    {
+        M.newpair( Variable(pe), Variable(k) );
+        N.newpair( Variable(k), Variable(pe) );
         k++;
     }
-    while ( i <= n ) {
-	if ( degsf[i] > 0 && degsg[i] > 0 ) {
-	    if ( ( i != k ) && ( i != pe ) && ( i != p1 ) ) {
-		M.newpair( Variable(i), Variable(k) );
-		N.newpair( Variable(k), Variable(i) );
-	    }
-	    k++;
-	}
-	i++;
+    while ( i <= n )
+    {
+        if ( degsf[i] > 0 && degsg[i] > 0 )
+        {
+            if ( ( i != k ) && ( i != pe ) && ( i != p1 ) )
+            {
+                M.newpair( Variable(i), Variable(k) );
+                N.newpair( Variable(k), Variable(i) );
+            }
+            k++;
+        }
+        i++;
     }
-    if ( p1 != pe ){
-	M.newpair( Variable(p1), Variable(k) );
-	N.newpair( Variable(k), Variable(p1) );
+    if ( p1 != pe )
+    {
+        M.newpair( Variable(p1), Variable(k) );
+        N.newpair( Variable(k), Variable(p1) );
         k++;
     }
     i = 1;
-    while ( i <= n ) {
-	if ( degsf[i] > 0 && degsg[i] == 0 ) {
-	    if ( i != k ) {
-	        M.newpair( Variable(i), Variable(k) );
-	        k++;
+    while ( i <= n )
+    {
+        if ( degsf[i] > 0 && degsg[i] == 0 ) {
+            if ( i != k )
+            {
+                M.newpair( Variable(i), Variable(k) );
+                k++;
             }
-	}
-	else if ( degsf[i] == 0 && degsg[i] > 0 ) {
-	    if ( i != k ) {
-	        M.newpair( Variable(i), Variable(k) );
-	        k++;
+        }
+        else if ( degsf[i] == 0 && degsg[i] > 0 )
+        {
+            if ( i != k )
+            {
+                M.newpair( Variable(i), Variable(k) );
+                k++;
             }
-	}
-	i++;
+        }
+        i++;
     }
 
     delete [] degsf;
