@@ -392,7 +392,8 @@ ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cach
       idInsertPoly(iii, po); // will include po only if it is not the zero polynomial
     }
   }
-  
+  idSkipZeroes(iii);  // remove zero generators (resulting from block-wise allocation of memory)
+
   PrintLn(); PrintS("numbers of performed operations");
   PrintLn(); PrintS("   polynomial-to-polynomial multiplications: ");
   sprintf(h, "%ld", totalMultiplications); PrintS(h);
