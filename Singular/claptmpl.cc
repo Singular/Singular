@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.50 2009-10-06 12:58:39 Singular Exp $
+// $Id: claptmpl.cc,v 1.51 2009-10-07 09:05:27 seelisch Exp $
 /*
 * ABSTRACT - instantiation of all templates
 */
@@ -257,14 +257,14 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 //std::priority_queue<MonRedRes>
 //
 #ifdef HAVE_MINOR // new minor code
-//#include <list>
+#include <list>
 #include "Minor.h"
 #include "Cache.h"
-//template class std::list<int>;
-//template class std::list<long>;
-//template class std::list<MinorKey>;
-//template class std::list<LongMinorValue>;
-//template class std::list<PolyMinorValue>;
+template class std::list<int>;
+template class std::list<long>;
+template class std::list<MinorKey>;
+template class std::list<LongMinorValue>;
+template class std::list<PolyMinorValue>;
 template class Cache<MinorKey, LongMinorValue>;
 template class Cache<MinorKey, PolyMinorValue>;
 #endif // HAVE_MINOR
