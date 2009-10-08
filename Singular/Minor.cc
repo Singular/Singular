@@ -583,7 +583,7 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk) {
                                       // number of hit bits. This will later be needed; see below.
             }
             shiftedBit = shiftedBit >> 1;
-        }                                           
+        }
     }
 
     if (newBitToBeSet == 0) {
@@ -657,14 +657,14 @@ string MinorKey::toString() const {
     string t = "";
     string s = "(";
     for (int r = this->getNumberOfRowBlocks() - 1; r >= 0; r--) {
-        sprintf(h, "%du", this->getRowKey(r)); t += h;
+        sprintf(h, "%u", this->getRowKey(r)); t += h;
         if (r < this->getNumberOfRowBlocks() - 1)
             t = string(32 - t.length(), '0') + t;
         s += t;
     }
     s += ", ";
     for (int c = this->getNumberOfColumnBlocks() - 1; c >= 0; c--) {
-        sprintf(h, "%du", this->getColumnKey(c)); t += h;
+        sprintf(h, "%u", this->getColumnKey(c)); t += h;
         if (c < this->getNumberOfColumnBlocks() - 1)
             t = string(32 - t.length(), '0') + t;
         s += t;

@@ -79,12 +79,12 @@ void minorUsageInfo()
 void fillRandomMatrix(const int rowCount, const int columnCount, const int randomSeed,
                       const int zeroPercentage, const int entryBound, int* theMatrix) {
     int theSize = rowCount * columnCount;
-    srand(randomSeed); // random seed for ensuring reproducability of experiments
+    siSeed = randomSeed; // random seed for ensuring reproducability of experiments
     for (int i = 0; i < theSize; i++) {
-        if ((rand() % 100) < zeroPercentage)
+        if ((siRand() % 100) < zeroPercentage)
             theMatrix[i] = 0;
         else
-            theMatrix[i] = 1 + (rand() % entryBound); // ranges from 1 to entryBound, including both
+            theMatrix[i] = 1 + (siRand() % entryBound); // ranges from 1 to entryBound, including both
     }
 }
 
@@ -116,16 +116,16 @@ int testIntMinors (const int dummy) {
   testAllMinors(prpr, "Test II", 7, 10, 50, 20, 7, 10, 6, 471, 200, 10000);
   +prpr; +prpr;
 
-  // looks for minor == 3000; to this end, it needs to compute 1001 minors:
-  testAllMinorsUntil(prpr, "Test III", 100, 60, 10, 10, 6, 471, 300, 10000, 3000, true, 10000);
+  // looks for minor == 92868; to this end, it needs to compute 1632 minors:
+  testAllMinorsUntil(prpr, "Test III", 100, 60, 10, 10, 6, 471, 300, 10000, 92868, true, 10000);
   +prpr; +prpr;
 
-  // looks for the first non-zero minor (6x6); to this end, it needs to compute 476 minors:
+  // looks for the first non-zero minor (6x6); to this end, it needs to compute 229 minors:
   testAllMinorsUntil(prpr, "Test IV", 100, 60, 10, 75, 6, 4712, 300, 10000, 0, false, 10000);
   +prpr; +prpr;
 
-  // looks for minor == 265986; to this end, it needs to compute 16 minors:
-  testAllMinorsUntil(prpr, "Test V", 100, 60, 10, 10, 6, 471, 300, 10000, 265986, true, 10000);
+  // looks for minor == -43065; to this end, it needs to compute 23 minors:
+  testAllMinorsUntil(prpr, "Test V", 100, 60, 10, 10, 6, 471, 300, 10000, -43065, true, 10000);
 
   return 0;
 }
