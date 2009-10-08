@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.19 2009-09-24 16:37:41 Singular Exp $
+// $Id: clapconv.cc,v 1.20 2009-10-08 10:43:33 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -333,7 +333,7 @@ CanonicalForm convSingAFactoryA ( napoly p , const Variable & a, const ring r )
         }
       }
     }
-    if ( (e = napGetExp( p, 1 )) != 0 )
+    if ( (e = p_GetExp( p, 1, r->algring )) != 0 )
       term *= power( a , e );
     result += term;
     p = pNext( p );
@@ -392,7 +392,7 @@ napoly convFactoryASingA ( const CanonicalForm & f )
   {
     if (naMinimalPoly!=NULL)
     {
-      if (napGetExp(a,1) >= napGetExp(naMinimalPoly,1))
+      if (p_GetExp(a,1,currRing->algring) >= p_GetExp(naMinimalPoly,1,currRing->algring))
         a = napRemainder( a, naMinimalPoly);
     }
   }
