@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.54 2009-10-08 08:30:14 Singular Exp $ */
+/* $Id: longalg.cc,v 1.55 2009-10-08 08:38:31 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -30,7 +30,6 @@ naIdeal naI=NULL;
 int naNumbOfPar;
 napoly naMinimalPoly;
 #define naParNames (currRing->parameter)
-#define napNormalize(p) p_Normalize(p,nacRing)
 static int naIsChar0;
 static ring naMapRing;
 
@@ -218,8 +217,8 @@ napoly napRemainder(napoly f, const napoly  g)
 
   qq = (napoly)p_Init(nacRing);
   pNext(qq) = NULL;
-  napNormalize(g);
-  napNormalize(f);
+  p_Normalize(g, nacRing);
+  p_Normalize(f, nacRing);
   a = f;
   do
   {
@@ -230,7 +229,7 @@ napoly napRemainder(napoly f, const napoly  g)
     nacNormalize(pGetCoeff(qq));
     h = napCopy(g);
     napMultT(h, qq);
-    napNormalize(h);
+    p_Normalize(h,nacRing);
     nacDelete(&pGetCoeff(qq),nacRing);
     a = napAdd(a, h);
   }
@@ -248,8 +247,8 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
 
   qq = (napoly)p_Init(nacRing);
   pNext(qq) = b = NULL;
-  napNormalize(g);
-  napNormalize(f);
+  p_Normalize(g,nacRing);
+  p_Normalize(f,nacRing);
   a = f;
   do
   {
@@ -261,7 +260,7 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
     pGetCoeff(qq) = nacNeg(pGetCoeff(qq));
     h = napCopy(g);
     napMultT(h, qq);
-    napNormalize(h);
+    p_Normalize(h,nacRing);
     nacDelete(&pGetCoeff(qq),nacRing);
     a = napAdd(a, h);
   }
@@ -311,7 +310,7 @@ static napoly napInvers(napoly x, const napoly c)
     t = nacNeg(t);
     napMultN(qa, t);
     nacDelete(&t,nacRing);
-    napNormalize(qa);
+    p_Normalize(qa,nacRing);
     p_Delete(&x,nacRing);
     p_Delete(&r,nacRing);
     return qa;
@@ -330,7 +329,7 @@ static napoly napInvers(napoly x, const napoly c)
     nacNormalize(pGetCoeff(r));
     t = nacInvers(pGetCoeff(r));
     napMultN(q, t);
-    napNormalize(q);
+    p_Normalize(q,nacRing);
     nacDelete(&t,nacRing);
     p_Delete(&x,nacRing);
     p_Delete(&r,nacRing);
@@ -359,7 +358,7 @@ static napoly napInvers(napoly x, const napoly c)
       t = nacInvers(pGetCoeff(r));
       //nacNormalize(t);
       napMultN(q, t);
-      napNormalize(q);
+      p_Normalize(q,nacRing);
       nacDelete(&t,nacRing);
       p_Delete(&x,nacRing);
       p_Delete(&r,nacRing);
@@ -1661,7 +1660,7 @@ number naGcd(number a, number b, const ring r)
   if ((naNumbOfPar == 1) && (naMinimalPoly!=NULL))
   {
     if (pNext(x->z)!=NULL)
-      result->z = napCopy(x->z);
+      result->z = p_Copy(x->z, r->algring);
     else
       result->z = napGcd0(x->z, y->z);
   }
@@ -1676,19 +1675,19 @@ number naGcd(number a, number b, const ring r)
 
     napoly rz=napGcd(x->z, y->z);
     CanonicalForm F, G, R;
-    R=convSingPFactoryP(rz,nacRing); 
-    napNormalize(x->z);
-    F=convSingPFactoryP(x->z,nacRing)/R; 
-    napNormalize(y->z);
-    G=convSingPFactoryP(y->z,nacRing)/R; 
+    R=convSingPFactoryP(rz,r->algring); 
+    p_Normalize(x->z,nacRing);
+    F=convSingPFactoryP(x->z,r->algring)/R; 
+    p_Normalize(y->z,nacRing);
+    G=convSingPFactoryP(y->z,r->algring)/R; 
     F = gcd( F, G );
     if (F.isOne()) 
       result->z= rz;
     else
     {
-      p_Delete(&rz,nacRing);
-      result->z=convFactoryPSingP( F*R,nacRing );
-      napNormalize(result->z);
+      p_Delete(&rz,r->algring);
+      result->z=convFactoryPSingP( F*R,r->algring );
+      p_Normalize(result->z,nacRing);
     }
   }
 #endif
@@ -1978,31 +1977,31 @@ number naLcm(number la, number lb, const ring r)
   //naNormalize(lb);
   naTest(la);
   naTest(lb);
-  napoly x = napCopy(a->z);
+  napoly x = p_Copy(a->z, r->algring);
   number t = napLcm(b->z); // get all denom of b->z
   if (!nacIsOne(t))
   {
-    number bt, r;
+    number bt, rr;
     napoly xx=x;
     while (xx!=NULL)
     {
-      bt = nacGcd(t, pGetCoeff(xx), nacRing);
-      r = nacMult(t, pGetCoeff(xx));
-      nacDelete(&pGetCoeff(xx),nacRing);
-      pGetCoeff(xx) = nacDiv(r, bt);
+      bt = nacGcd(t, pGetCoeff(xx), r->algring);
+      rr = nacMult(t, pGetCoeff(xx));
+      nacDelete(&pGetCoeff(xx),r->algring);
+      pGetCoeff(xx) = nacDiv(rr, bt);
       nacNormalize(pGetCoeff(xx));
-      nacDelete(&bt,nacRing);
-      nacDelete(&r,nacRing);
+      nacDelete(&bt,r->algring);
+      nacDelete(&rr,r->algring);
       pIter(xx);
     }
   }
-  nacDelete(&t,nacRing);
+  nacDelete(&t,r->algring);
   result->z = x;
 #ifdef HAVE_FACTORY
   if (b->n!=NULL)
   {
     result->z=singclap_alglcm(result->z,b->n);
-    p_Delete(&x,nacRing);
+    p_Delete(&x,r->algring);
   }
 #endif
   naTest(la);
