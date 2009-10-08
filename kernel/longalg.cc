@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.53 2009-09-24 17:59:09 Singular Exp $ */
+/* $Id: longalg.cc,v 1.54 2009-10-08 08:30:14 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -165,7 +165,6 @@ static void napTest(napoly p)
 #define napInit(i)       (napoly)p_ISet(i,nacRing)
 #define napSetCoeff(p,n) {nacDelete(&pGetCoeff(p),nacRing);pGetCoeff(p)=n;}
 #define napDelete1(p)    p_LmDelete((poly *)p, nacRing)
-#define nap_Copy(p,r)       (napoly)p_Copy((poly)p,r->algring)
 #define napComp(p,q)     p_LmCmp((poly)p,(poly)q, nacRing)
 #define napMultT(A,E)    A=(napoly)p_Mult_mm((poly)A,(poly)E,nacRing)
 #define napMult(A,B)     (napoly)p_Mult_q((poly)A,(poly)B,nacRing)
@@ -985,8 +984,8 @@ number naCopy(number p)
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
-  erg->z = napCopy(src->z);
-  erg->n = napCopy(src->n);
+  erg->z = p_Copy(src->z, nacRing);
+  erg->n = p_Copy(src->n, nacRing);
   erg->s = src->s;
   return (number)erg;
 }
@@ -996,8 +995,8 @@ number na_Copy(number p, const ring r)
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
-  erg->z = nap_Copy(src->z,r);
-  erg->n = nap_Copy(src->n,r);
+  erg->z = p_Copy(src->z,r->algring);
+  erg->n = p_Copy(src->n,r->algring);
   erg->s = src->s;
   return (number)erg;
 }
@@ -2416,12 +2415,11 @@ poly naPermNumber(number z, int * par_perm, int P, ring oldRing)
 
 number   naGetDenom(number &n, const ring r)
 {
-  //if (r==currRing) naNormalize(n);
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
     lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
-    rr->z=nap_Copy(x->n,r);
+    rr->z=p_Copy(x->n,r->algring);
     rr->s = 2;
     return (number)rr;
   }
@@ -2430,10 +2428,9 @@ number   naGetDenom(number &n, const ring r)
 
 number   naGetNumerator(number &n, const ring r)
 {
-  //if (r==currRing) naNormalize(n);
   lnumber x=(lnumber)n;
   lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
-  rr->z=nap_Copy(x->z,r);
+  rr->z=p_Copy(x->z,r->algring);
   rr->s = 2;
   return (number)rr;
 }
