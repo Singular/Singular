@@ -106,7 +106,7 @@ void writeTheMinorIfNonZero(PrettyPrinter& pm, const PolyMinorValue& pmv) {
 */
 int testIntMinors (const int dummy) {
   // for output of non-zero minors into file
-  PrettyPrinter prpr("minor_output_complete_ints.txt", "minor_output_results_int.txt", false, false, -1, "   ");
+  PrettyPrinter prpr("minor_output_complete_ints.txt", "minor_output_results_ints.txt", false, false, -1, "   ");
 
   // computes just one minor:
   testOneMinor(prpr, "Test I", 7, 10, 50, 20, 5, 471, 70, 1000);
@@ -151,7 +151,7 @@ int testAllPolyMinors(matrix mat, int minorSize, int strategies, int cacheEntrie
 
   int rowCount = mat->nrows;
   int columnCount = mat->ncols;
-  long totalTimeStart, totalTime, printTimeStart, printTime;
+  clock_t totalTimeStart, totalTime, printTimeStart, printTime;
   string testHeader = "COMPUTE ALL MINORS IN A POLY MATRIX";
 
   prpr < testHeader;
@@ -243,7 +243,7 @@ int testAllPolyMinors(matrix mat, int minorSize, int strategies, int cacheEntrie
     ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
     prpr << totalAdditions << " additions";
     ++prpr << "number of non-zero minors = " << nonZeroCounter;
-    ++prpr << "(time = " << totalTime << " msec)";
+    ++prpr << "(time = " << ((totalTime * 1000) / CLOCKS_PER_SEC) << " msec)";
   }
 
   for (int strategy = 1; strategy <= 5; strategy++) {
@@ -317,7 +317,7 @@ int testAllPolyMinors(matrix mat, int minorSize, int strategies, int cacheEntrie
       ++prpr << "(computation without reuse would need " << totalMultiplicationsAccumulated << " and ";
       prpr << totalAdditionsAccumulated << " additions)";
       ++prpr << "number of non-zero minors = " << nonZeroCounter;
-      ++prpr << "(time = " << totalTime << " msec)";
+      ++prpr << "(time = " << ((totalTime * 1000) / CLOCKS_PER_SEC) << " msec)";
       +prpr < "The cache looks like this:";
       +prpr < cch.toString();
     }
@@ -480,7 +480,7 @@ void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int colu
 */
 void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
                    int minorRows, int minorColumns, int minorSize, int randomSeed, int cacheEntries, int cacheWeight) {
-    long totalTimeStart, totalTime, printTimeStart, printTime;
+    clock_t totalTimeStart, totalTime, printTimeStart, printTime;
 
     prpr < testHeader;
     +prpr; for (int i = 0; i < int(testHeader.size()); i++) prpr < "="; // underlines the header string
@@ -560,7 +560,7 @@ void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int col
     ++prpr; ++prpr << "Operation counters - " << testHeader << " - no cache";
     ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
     prpr << totalAdditions << " additions";
-    ++prpr << "(time = " << totalTime << " msec)";
+    ++prpr << "(time = " << ((totalTime * 1000) / CLOCKS_PER_SEC) << " msec)";
 
     for (int strategy = 1; strategy <= 5; strategy++) {
         // setting sub-matrix, size of minors of interest within that sub-matrix, and strategy:
@@ -623,7 +623,7 @@ void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int col
         prpr << totalAdditions << " additions";
         ++prpr << "(computation without reuse would need " << totalMultiplicationsAccumulated << " and ";
         prpr << totalAdditionsAccumulated << " additions)";
-        ++prpr << "(time = " << totalTime << " msec)";
+        ++prpr << "(time = " << ((totalTime * 1000) / CLOCKS_PER_SEC) << " msec)";
         +prpr < "The cache looks like this:";
         +prpr < cch.toString();
     }
@@ -642,7 +642,7 @@ void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int col
 void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
                         int minorSize, int randomSeed, int cacheEntries, int cacheWeight, int targetMinor,
                         bool checkForEquality, int maxLoops) {
-    long totalTimeStart, totalTime, printTimeStart, printTime;
+    clock_t totalTimeStart, totalTime, printTimeStart, printTime;
 
     prpr < testHeader;
     +prpr; for (int i = 0; i < int(testHeader.size()); i++) prpr < "="; // underlines the header string
@@ -717,7 +717,7 @@ void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, in
     ++prpr; ++prpr << "Operation counters - " << testHeader << " - no cache";
     ++prpr << "performed in total " << totalMultiplications << " multiplications and ";
     prpr << totalAdditions << " additions";
-    ++prpr << "(time = " << totalTime << " msec)";
+    ++prpr << "(time = " << ((totalTime * 1000) / CLOCKS_PER_SEC) << " msec)";
 
     for (int strategy = 1; strategy <= 5; strategy++) {
         // setting sub-matrix, size of minors of interest within that sub-matrix, and strategy:
@@ -770,7 +770,7 @@ void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, in
         prpr << totalAdditions << " additions";
         ++prpr << "(computation without reuse would need " << totalMultiplicationsAccumulated << " and ";
         prpr << totalAdditionsAccumulated << " additions)";
-        ++prpr << "(time = " << totalTime << " msec)";
+        ++prpr << "(time = " << ((totalTime * 1000) / CLOCKS_PER_SEC) << " msec)";
         +prpr < "The cache has " < cch.getNumberOfEntries() < " (of max. " < cacheEntries < ") entries and a weight of ";
         prpr < cch.getWeight() < " (of max. " < cacheWeight < ").";
     }
