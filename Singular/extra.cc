@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.322 2009-10-08 10:11:57 seelisch Exp $ */
+/* $Id: extra.cc,v 1.323 2009-10-08 14:39:52 seelisch Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2190,46 +2190,67 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
-      if(strcmp(sys_cmd,"changeVars")==0)
+      if(strcmp(sys_cmd,"changeRing")==0)
       {
-        /*
-        The following code changes the N variables names in currRing in
-        the following way: var(i) is replaced by f(i), 1 <= i <= N,
-        where f(j) is j written to the base of 26 with the digit '0'
-        written as 'a', '1' as 'b', ..., '25' as 'z'.
-        E.g. var(1) goes to f(1)='b', ..., var(25) goes to f(25)='z',
-             var(26) goes to f(26)='ba', etc.
-        The purpose of this rewriting is to eliminate indexed variables,
-        as they may cause problems when generating scripts for Magma,
-        Maple, or Macaulay2.
-        */
-        ring newRing = rCopy0(currRing);
-        int varN = newRing->N;
-        char* alphabet = "abcdefghijklmnopqrstuvwxyz";
-        char theName[10];
-        char tempChars[10];
-        int j; int k; int l;
-        for (int i = 1; i <= varN; i++)
+        if ((h->Typ() == INT_CMD) &&
+            (h->next->Typ() == INT_CMD))
         {
-          k = i;
-          l = 9;
-          j = k % 26;
-          tempChars[l--] = alphabet[j];
-          k = (k - j) / 26;
-          while (k != 0)
+          const int fc     = (const int)(long)h->Data();
+          const int varN   = (const int)(long)h->next->Data();
           {
-            j = k % 26;
-            tempChars[l--] = alphabet[j];
-            k = (k - j) / 26;
+            /*
+            The following code creates a ring with characteristic fc, order dp and
+            varN variables with the following names: var(j) is j written to the
+            base of 26 with the digit '0' written as 'a', '1' as 'b', ..., and '25'
+            as 'z'.
+            I.e., var(1) has the name 'b', ..., var(25) the name 'z',
+                 var(26) the name 'ba', etc.
+            Afterwards, the new ring will become the current ring.
+            The purpose of this rewriting is to eliminate indexed variables,
+            as they may cause problems when generating scripts for Magma,
+            Maple, or Macaulay2.
+            */
+            ring newRing = (ring) omAlloc0Bin(sip_sring_bin);
+            newRing->ch = fc;
+            newRing->N = varN;
+            newRing->names = (char **) omAlloc0(varN * sizeof(char_ptr));
+            char* alphabet = "abcdefghijklmnopqrstuvwxyz";
+            char theName[10];
+            char tempChars[10];
+            int j; int k; int l;
+            for (int i = 1; i <= varN; i++)
+            {
+              k = i;
+              l = 9;
+              j = k % 26;
+              tempChars[l--] = alphabet[j];
+              k = (k - j) / 26;
+              while (k != 0)
+              {
+                j = k % 26;
+                tempChars[l--] = alphabet[j];
+                k = (k - j) / 26;
+              }
+              l++;
+              for (j = l; j < 10; j++) theName[j - l] = tempChars[j];
+              theName[10 - l] = '\0';
+              newRing->names[i - 1] = omStrDup(theName);
+            }
+            newRing->wvhdl = (int **)omAlloc0(2 * sizeof(int_ptr));
+            newRing->order = (int *)omAlloc(2* sizeof(int *));
+            newRing->block0 = (int *)omAlloc0(2 * sizeof(int *));
+            newRing->block1 = (int *)omAlloc0(2 * sizeof(int *));
+            newRing->order[0] = ringorder_dp;
+            newRing->block0[0] = 1;
+            newRing->block1[0] = varN;
+            newRing->order[1]  = 0;
+            newRing->OrdSgn    = 1;
+            rComplete(newRing);
+            res->rtyp = RING_CMD;
+            res->data = (void *)newRing;
+            return FALSE;
           }
-          l++;
-          for (j = l; j < 10; j++) theName[j - l] = tempChars[j];
-          theName[10 - l] = '\0';
-          newRing->names[i - 1] = omStrDup(theName);
-        }
-        rComplete(newRing);
-        currRing = newRing;
-        return FALSE;
+        }  
       }
       else
 #endif // HAVE_MINOR
