@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys1.cc,v 1.41 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id: polys1.cc,v 1.42 2009-10-08 10:06:59 Singular Exp $ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials:
@@ -1159,6 +1159,26 @@ void pCleardenom_n(poly ph,number &c)
       }
     }
   }
+}
+
+number p_GetAllDenom(poly ph, const ring r)
+{
+  number d=n_Init(1,r);
+  poly p = ph;
+
+  while (p!=NULL)
+  {
+    number h=n_GetDenom(pGetCoeff(p),r);
+    if (!n_IsOne(h,r))
+    {
+      number dd=n_Mult(d,h,r);
+      n_Delete(&d,r);
+      d=dd;
+    }
+    n_Delete(&h,r);
+    pIter(p);
+  }
+  return d;
 }
 
 /*2
