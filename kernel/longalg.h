@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.18 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id: longalg.h,v 1.19 2009-10-08 12:52:18 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -72,7 +72,6 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napNeg(p)              (p_Neg(p,currRing->algring))
 #define napVariables           naNumbOfPar
 #define napGetCoeff(p)         pGetCoeff(p)
-#define napGetExp(p,i)         (p_GetExp(p,i,currRing->algring))
 #define napGetExpFrom(p,i,r)   (p_GetExp(p,i,r->algring))
 #define napSetExp(p,i,e)       (p_SetExp(p,i,e,currRing->algring))
 #define napNew()               (p_Init(currRing->algring))
