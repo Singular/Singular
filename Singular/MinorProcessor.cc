@@ -71,14 +71,14 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows, const int* rowIndic
                                      const int numberOfColumns, const int* columnIndices) {
     // The method assumes ascending row and column indices in the two argument arrays.
     // These indices are understood to be zero-based.
-    // The method will set the two arrays of unsigned longs in _container.
-    // Example: The indices 0, 2, 3, 7 will be converted to an array with one unsigned long
+    // The method will set the two arrays of ints in _container.
+    // Example: The indices 0, 2, 3, 7 will be converted to an array with one int
     // representing the binary number 10001101 (check bits from right to left).
 
     _containerRows = numberOfRows;
     int highestRowIndex = rowIndices[numberOfRows - 1];
     int rowBlockCount = (highestRowIndex / 32) + 1;
-    unsigned long rowBlocks[rowBlockCount];
+    unsigned int rowBlocks[rowBlockCount];
     for (int i = 0; i < rowBlockCount; i++) rowBlocks[i] = 0;
     for (int i = 0; i < numberOfRows; i++) {
         int blockIndex = rowIndices[i] / 32;
@@ -89,7 +89,7 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows, const int* rowIndic
     _containerColumns = numberOfColumns;
     int highestColumnIndex = columnIndices[numberOfColumns - 1];
     int columnBlockCount = (highestColumnIndex / 32) + 1;
-    unsigned long columnBlocks[columnBlockCount];
+    unsigned int columnBlocks[columnBlockCount];
     for (int i = 0; i < columnBlockCount; i++) columnBlocks[i] = 0;
     for (int i = 0; i < numberOfColumns; i++) {
         int blockIndex = columnIndices[i] / 32;
@@ -193,14 +193,14 @@ MinorProcessor::MinorProcessor () {
     _columns = 0;
 }
 
-LongMinorProcessor::LongMinorProcessor () {
+IntMinorProcessor::IntMinorProcessor () {
     _matrix = 0;
 }
 
-string LongMinorProcessor::toString () const {
+string IntMinorProcessor::toString () const {
     char h[32];
     string t = "";
-    string s = "LongMinorProcessor:";
+    string s = "IntMinorProcessor:";
     s += "\n   matrix: ";
     sprintf(h, "%d", _rows); s += h;
     s += " x ";
@@ -235,12 +235,12 @@ string LongMinorProcessor::toString () const {
     return s;
 }
 
-bool LongMinorProcessor::isEntryZero (const int absoluteRowIndex, const int absoluteColumnIndex) const
+bool IntMinorProcessor::isEntryZero (const int absoluteRowIndex, const int absoluteColumnIndex) const
 {
   return _matrix[absoluteRowIndex][absoluteColumnIndex] == 0;
 }
 
-LongMinorProcessor::~LongMinorProcessor() {
+IntMinorProcessor::~IntMinorProcessor() {
     // free memory of _matrix
     for (int i = 0; i < _rows; i++) {
         delete [] _matrix[i]; _matrix[i] = 0;
@@ -248,7 +248,7 @@ LongMinorProcessor::~LongMinorProcessor() {
     delete [] _matrix; _matrix = 0;
 }
 
-void LongMinorProcessor::defineMatrix (const int numberOfRows, const int numberOfColumns, const int* matrix) {
+void IntMinorProcessor::defineMatrix (const int numberOfRows, const int numberOfColumns, const int* matrix) {
     // free memory of _matrix
     for (int i = 0; i < _rows; i++) {
         delete [] _matrix[i]; _matrix[i] = 0;
@@ -268,36 +268,36 @@ void LongMinorProcessor::defineMatrix (const int numberOfRows, const int numberO
             _matrix[r][c] = matrix[r * _columns + c];
 }
 
-LongMinorValue LongMinorProcessor::getMinor(const int dimension, const int* rowIndices, const int* columnIndices,
-                                            Cache<MinorKey, LongMinorValue>& c) {
+IntMinorValue IntMinorProcessor::getMinor(const int dimension, const int* rowIndices, const int* columnIndices,
+                                            Cache<MinorKey, IntMinorValue>& c) {
     defineSubMatrix(dimension, rowIndices, dimension, columnIndices);
     _minorSize = dimension;
     // call a helper method which recursively computes the minor using the cache c:
     return getMinorPrivate(dimension, _container, false, c);
 }
 
-LongMinorValue LongMinorProcessor::getMinor(const int dimension, const int* rowIndices, const int* columnIndices) {
+IntMinorValue IntMinorProcessor::getMinor(const int dimension, const int* rowIndices, const int* columnIndices) {
     defineSubMatrix(dimension, rowIndices, dimension, columnIndices);
     _minorSize = dimension;
     // call a helper method which recursively computes the minor (without using a cache):
     return getMinorPrivate(_minorSize, _container);
 }
 
-LongMinorValue LongMinorProcessor::getNextMinor() {
+IntMinorValue IntMinorProcessor::getNextMinor() {
     // computation without cache
     return getMinorPrivate(_minorSize, _minor);
 }
 
-LongMinorValue LongMinorProcessor::getNextMinor(Cache<MinorKey, LongMinorValue>& c) {
+IntMinorValue IntMinorProcessor::getNextMinor(Cache<MinorKey, IntMinorValue>& c) {
     // computation with cache
     return getMinorPrivate(_minorSize, _minor, true, c);
 }
 
-LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk) {
+IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk) {
     assert(k > 0); // k is the minor's dimension; the minor must be at least 1x1
     // The method works by recursion, and using Lapace's Theorem along the row/column with the most zeros.
     if (k == 1) {
-        return LongMinorValue(_matrix[mk.getAbsoluteRowIndex(0)][mk.getAbsoluteColumnIndex(0)],
+        return IntMinorValue(_matrix[mk.getAbsoluteRowIndex(0)][mk.getAbsoluteColumnIndex(0)],
                               0, 0, 0, 0, -1, -1); // "-1" is to signal that any statistics about the
                                                    // number of retrievals does not make sense, as we do not use a cache.
     }
@@ -316,7 +316,7 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                 int absoluteC = mk.getAbsoluteColumnIndex(c);      // This iterates over all involved columns.
                 MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey when we omit row b and column absoluteC.
                 if (_matrix[b][absoluteC] != 0) { // Only then do we have to consider this sub-determinante.
-                    LongMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
+                    IntMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
                     m += mv.getMultiplications();
                     s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
@@ -338,7 +338,7 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                 int absoluteR = mk.getAbsoluteRowIndex(r);        // This iterates over all involved rows.
                 MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey when we omit row absoluteR and column b.
                 if (_matrix[absoluteR][b] != 0) { // Only then do we have to consider this sub-determinante.
-                    LongMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
+                    IntMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
                     m += mv.getMultiplications();
                     s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
@@ -353,20 +353,20 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         s--; as--; // first addition was 0 + ..., so we do not count it
         if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
         if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
-        LongMinorValue newMV = LongMinorValue(result, m, s, am, as, -1, -1); // "-1" is to signal that any statistics about the
+        IntMinorValue newMV = IntMinorValue(result, m, s, am, as, -1, -1); // "-1" is to signal that any statistics about the
                                                                              // number of retrievals does not make sense, as we
                                                                              // do not use a cache.
         return newMV;
     }
 }
 
-LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk,
+IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk,
                                                    const bool multipleMinors,
-                                                   Cache<MinorKey, LongMinorValue>& cch) {
+                                                   Cache<MinorKey, IntMinorValue>& cch) {
     assert(k > 0); // k is the minor's dimension; the minor must be at least 1x1
     // The method works by recursion, and using Lapace's Theorem along the row/column with the most zeros.
     if (k == 1) {
-        return LongMinorValue(_matrix[mk.getAbsoluteRowIndex(0)][mk.getAbsoluteColumnIndex(0)],
+        return IntMinorValue(_matrix[mk.getAbsoluteRowIndex(0)][mk.getAbsoluteColumnIndex(0)],
                               0, 0, 0, 0, -1, -1); // we set "-1" as, for k == 1, we do not have any cache retrievals
     }
     else {
@@ -374,7 +374,7 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         int result = 0;                                      // This will contain the value of the minor.
         int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
-        LongMinorValue mv = LongMinorValue(0, 0, 0, 0, 0, 0, 0);     // for storing all intermediate minors
+        IntMinorValue mv = IntMinorValue(0, 0, 0, 0, 0, 0, 0);     // for storing all intermediate minors
         if (b >= 0) {
             // This means that the best line is the row with absolute (0-based) index b.
             // Using Laplace, the sign of the contributing minors must be iterating;
@@ -445,7 +445,7 @@ LongMinorValue LongMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         s--; as--; // first addition was 0 + ..., so we do not count it
         if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
         if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
-        LongMinorValue newMV = LongMinorValue(result, m, s, am, as, 1, potentialRetrievals);
+        IntMinorValue newMV = IntMinorValue(result, m, s, am, as, 1, potentialRetrievals);
         cch.put(mk, newMV); // Here's the actual put inside the cache.
         return newMV;
     }

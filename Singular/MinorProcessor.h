@@ -216,7 +216,7 @@ class MinorProcessor {
         void print () const;
 };
 
-class LongMinorProcessor : public MinorProcessor {
+class IntMinorProcessor : public MinorProcessor {
     private:
         /**
         * private store for integer matrix entries; \c _matrix[r][c] is the entry in row \c r and column \c c
@@ -235,9 +235,9 @@ class LongMinorProcessor : public MinorProcessor {
         * @return an instance of MinorValue representing the value of the corresponding minor
         * @see MinorProcessor::getMinorPrivate (const int, const MinorKey&)
         */
-        LongMinorValue getMinorPrivate (const int k, const MinorKey& mk,
+        IntMinorValue getMinorPrivate (const int k, const MinorKey& mk,
                                         const bool multipleMinors,
-                                        Cache<MinorKey, LongMinorValue>& c);
+                                        Cache<MinorKey, IntMinorValue>& c);
 
         /**
         * A method for computing the value of a minor, without using a cache.<br>
@@ -249,19 +249,19 @@ class LongMinorProcessor : public MinorProcessor {
         * @return an instance of MinorValue representing the value of the corresponding minor
         * @see MinorProcessor::getMinorPrivate (const int, const MinorKey&, const bool, Cache<MinorKey, MinorValue>&)
         */
-        LongMinorValue getMinorPrivate (const int k, const MinorKey& mk);
+        IntMinorValue getMinorPrivate (const int k, const MinorKey& mk);
     protected:
         bool isEntryZero (const int absoluteRowIndex, const int absoluteColumnIndex) const;
     public:
         /**
         * A constructor for creating an instance.
         */
-        LongMinorProcessor ();
+        IntMinorProcessor ();
 
         /**
         * A destructor for deleting an instance.
         */
-        ~LongMinorProcessor ();
+        ~IntMinorProcessor ();
 
         /**
         * A method for defining a matrix with integer entries.
@@ -276,20 +276,20 @@ class LongMinorProcessor : public MinorProcessor {
         * A method for computing the value of a minor, without using a cache.<br>
         * The sub-matrix is determined by \c rowIndices and \c columnIndices. Computation works recursively
         * using Laplace's Theorem. We always develop along the row or column with most zeros; see
-        * MinorProcessor::getBestLine (const int, const unsigned long, const unsigned long).
+        * MinorProcessor::getBestLine (const int, const int, const int).
         * @param dimension the size of the minor to be computed
         * @param rowIndices 0-based indices of the rows of the minor
         * @param columnIndices 0-based indices of the column of the minor
         * @return an instance of MinorValue representing the value of the corresponding minor
         * @see MinorProcessor::getMinor (const int, const int*, const int*, Cache<MinorKey, MinorValue>&)
         */
-        LongMinorValue getMinor (const int dimension, const int* rowIndices, const int* columnIndices);
+        IntMinorValue getMinor (const int dimension, const int* rowIndices, const int* columnIndices);
 
         /**
         * A method for computing the value of a minor, using a cache.<br>
         * The sub-matrix is determined by \c rowIndices and \c columnIndices. Computation works recursively
         * using Laplace's Theorem. We always develop along the row or column with most zeros; see
-        * MinorProcessor::getBestLine (const int, const unsigned long, const unsigned long).
+        * MinorProcessor::getBestLine (const int, const int, const int).
         * @param dimension the size of the minor to be computed
         * @param rowIndices 0-based indices of the rows of the minor
         * @param columnIndices 0-based indices of the column of the minor
@@ -297,8 +297,8 @@ class LongMinorProcessor : public MinorProcessor {
         * @return an instance of MinorValue representing the value of the corresponding minor
         * @see MinorProcessor::getMinor (const int, const int*, const int*)
         */
-        LongMinorValue getMinor (const int dimension, const int* rowIndices, const int* columnIndices,
-                                 Cache<MinorKey, LongMinorValue>& c);
+        IntMinorValue getMinor (const int dimension, const int* rowIndices, const int* columnIndices,
+                                 Cache<MinorKey, IntMinorValue>& c);
 
         /**
         * A method for obtaining the next minor when iterating
@@ -310,7 +310,7 @@ class LongMinorProcessor : public MinorProcessor {
         * @see MinorProcessor::getMinor (const int, const int*, const int*)
         * @see MinorProcessor::hasNextMinor ()
         */
-        LongMinorValue getNextMinor ();
+        IntMinorValue getNextMinor ();
 
         /**
         * A method for obtaining the next minor when iterating
@@ -323,7 +323,7 @@ class LongMinorProcessor : public MinorProcessor {
         * @see MinorProcessor::getMinor (const int, const int*, const int*)
         * @see MinorProcessor::hasNextMinor ()
         */
-        LongMinorValue getNextMinor (Cache<MinorKey, LongMinorValue>& c);
+        IntMinorValue getNextMinor (Cache<MinorKey, IntMinorValue>& c);
 
         /**
         * A method for providing a printable version of the represented MinorProcessor.
@@ -392,7 +392,7 @@ class PolyMinorProcessor : public MinorProcessor {
         * A method for computing the value of a minor, without using a cache.<br>
         * The sub-matrix is determined by \c rowIndices and \c columnIndices. Computation works recursively
         * using Laplace's Theorem. We always develop along the row or column with most zeros; see
-        * MinorProcessor::getBestLine (const int, const unsigned long, const unsigned long).
+        * MinorProcessor::getBestLine (const int, const int, const int).
         * @param dimension the size of the minor to be computed
         * @param rowIndices 0-based indices of the rows of the minor
         * @param columnIndices 0-based indices of the column of the minor
@@ -405,7 +405,7 @@ class PolyMinorProcessor : public MinorProcessor {
         * A method for computing the value of a minor, using a cache.<br>
         * The sub-matrix is determined by \c rowIndices and \c columnIndices. Computation works recursively
         * using Laplace's Theorem. We always develop along the row or column with most zeros; see
-        * MinorProcessor::getBestLine (const int, const unsigned long, const unsigned long).
+        * MinorProcessor::getBestLine (const int, const int, const int).
         * @param dimension the size of the minor to be computed
         * @param rowIndices 0-based indices of the rows of the minor
         * @param columnIndices 0-based indices of the column of the minor

@@ -5,6 +5,7 @@
 #include "structs.h"
 #include "polys.h"
 #include <Minor.h>
+#include "febase.h"
 
 void MinorKey::reset() {
     _numberOfRowBlocks = 0;
@@ -20,8 +21,8 @@ MinorKey::MinorKey (const MinorKey& mk) {
     _numberOfColumnBlocks = mk.getNumberOfColumnBlocks();;
 
     // allocate memory for new entries in _rowKey and _columnKey;
-    _rowKey = new unsigned long[_numberOfRowBlocks];
-    _columnKey = new unsigned long[_numberOfColumnBlocks];
+    _rowKey = new unsigned int[_numberOfRowBlocks];
+    _columnKey = new unsigned int[_numberOfColumnBlocks];
 
     // copying values from parameter arrays to private arrays
     for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -42,8 +43,8 @@ MinorKey& MinorKey::operator=(const MinorKey& mk) {
     _numberOfColumnBlocks = mk.getNumberOfColumnBlocks();;
 
     // allocate memory for new entries in _rowKey and _columnKey;
-    _rowKey = new unsigned long[_numberOfRowBlocks];
-    _columnKey = new unsigned long[_numberOfColumnBlocks];
+    _rowKey = new unsigned int[_numberOfRowBlocks];
+    _columnKey = new unsigned int[_numberOfColumnBlocks];
 
     // copying values from parameter arrays to private arrays
     for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -54,8 +55,8 @@ MinorKey& MinorKey::operator=(const MinorKey& mk) {
     return *this;
 }
 
-void MinorKey::set(const int lengthOfRowArray, const unsigned long* rowKey,
-                   const int lengthOfColumnArray, const unsigned long* columnKey) {
+void MinorKey::set(const int lengthOfRowArray, const unsigned int* rowKey,
+                   const int lengthOfColumnArray, const unsigned int* columnKey) {
     // free memory of _rowKey and _columnKey
     if (_numberOfRowBlocks > 0) { delete [] _rowKey; }
     if (_numberOfColumnBlocks > 0) { delete [] _columnKey; }
@@ -64,8 +65,8 @@ void MinorKey::set(const int lengthOfRowArray, const unsigned long* rowKey,
     _numberOfColumnBlocks = lengthOfColumnArray;
 
     // allocate memory for new entries in _rowKey and _columnKey;
-    _rowKey = new unsigned long[_numberOfRowBlocks];
-    _columnKey = new unsigned long[_numberOfColumnBlocks];
+    _rowKey = new unsigned int[_numberOfRowBlocks];
+    _columnKey = new unsigned int[_numberOfColumnBlocks];
 
     // copying values from parameter arrays to private arrays
     for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -74,14 +75,14 @@ void MinorKey::set(const int lengthOfRowArray, const unsigned long* rowKey,
         _columnKey[c] = columnKey[c];
 }
 
-MinorKey::MinorKey(const int lengthOfRowArray, const unsigned long* const rowKey,
-                   const int lengthOfColumnArray, const unsigned long* const columnKey) {
+MinorKey::MinorKey(const int lengthOfRowArray, const unsigned int* const rowKey,
+                   const int lengthOfColumnArray, const unsigned int* const columnKey) {
     _numberOfRowBlocks = lengthOfRowArray;
     _numberOfColumnBlocks = lengthOfColumnArray;
 
     // allocate memory for new entries in _rowKey and _columnKey;
-    _rowKey = new unsigned long[_numberOfRowBlocks];
-    _columnKey = new unsigned long[_numberOfColumnBlocks];
+    _rowKey = new unsigned int[_numberOfRowBlocks];
+    _columnKey = new unsigned int[_numberOfColumnBlocks];
 
     // copying values from parameter arrays to private arrays
     for (int r = 0; r < _numberOfRowBlocks; r++)
@@ -108,8 +109,8 @@ int MinorKey::getAbsoluteRowIndex(const int i) const {
 
     int matchedBits = -1; // counter for matched bits; this needs to reach i, then we're done
     for (int block = 0; block < getNumberOfRowBlocks(); block ++) { // start with lowest bits, i.e. in block No. 0
-        unsigned long blockBits = getRowKey(block); // the bits in this block of 32 bits
-        unsigned long shiftedBit = 1;
+        unsigned int blockBits = getRowKey(block); // the bits in this block of 32 bits
+        unsigned int shiftedBit = 1;
         int exponent = 0;
         // The invariant "shiftedBit = 2^exponent" will hold throughout the entire while loop.
         while (exponent < 32) {
@@ -130,8 +131,8 @@ int MinorKey::getAbsoluteColumnIndex(const int i) const {
 
     int matchedBits = -1; // counter for matched bits; this needs to reach i, then we're done
     for (int block = 0; block < getNumberOfColumnBlocks(); block ++) { // start with lowest bits, i.e. in block No. 0
-        unsigned long blockBits = getColumnKey(block); // the bits in this block of 32 bits
-        unsigned long shiftedBit = 1;
+        unsigned int blockBits = getColumnKey(block); // the bits in this block of 32 bits
+        unsigned int shiftedBit = 1;
         int exponent = 0;
         // The invariant "shiftedBit = 2^exponent" will hold throughout the entire while loop.
         while (exponent < 32) {
@@ -148,8 +149,8 @@ int MinorKey::getAbsoluteColumnIndex(const int i) const {
 void MinorKey::getAbsoluteRowIndices(int* const target) const {
     int i = 0; // index for filling the target array
     for (int block = 0; block < getNumberOfRowBlocks(); block ++) { // start with lowest bits, i.e. in block No. 0
-        unsigned long blockBits = getRowKey(block); // the bits in this block of 32 bits
-        unsigned long shiftedBit = 1;
+        unsigned int blockBits = getRowKey(block); // the bits in this block of 32 bits
+        unsigned int shiftedBit = 1;
         int exponent = 0;
         // The invariant "shiftedBit = 2^exponent" will hold throughout the entire while loop.
         while (exponent < 32) {
@@ -164,8 +165,8 @@ void MinorKey::getAbsoluteRowIndices(int* const target) const {
 void MinorKey::getAbsoluteColumnIndices(int* const target) const {
     int i = 0; // index for filling the target array
     for (int block = 0; block < getNumberOfColumnBlocks(); block ++) { // start with lowest bits, i.e. in block No. 0
-        unsigned long blockBits = getColumnKey(block); // the bits in this block of 32 bits
-        unsigned long shiftedBit = 1;
+        unsigned int blockBits = getColumnKey(block); // the bits in this block of 32 bits
+        unsigned int shiftedBit = 1;
         int exponent = 0;
         // The invariant "shiftedBit = 2^exponent" will hold throughout the entire while loop.
         while (exponent < 32) {
@@ -185,8 +186,8 @@ int MinorKey::getRelativeRowIndex(const int i) const {
 
     int matchedBits = -1; // counter for matched bits; this is going to contain our return value
     for (int block = 0; block < getNumberOfRowBlocks(); block ++) { // start with lowest bits, i.e. in block No. 0
-        unsigned long blockBits = getRowKey(block); // the bits in this block of 32 bits
-        unsigned long shiftedBit = 1;
+        unsigned int blockBits = getRowKey(block); // the bits in this block of 32 bits
+        unsigned int shiftedBit = 1;
         int exponent = 0;
         // The invariant "shiftedBit = 2^exponent" will hold throughout the entire while loop.
         while (exponent < 32) {
@@ -208,8 +209,8 @@ int MinorKey::getRelativeColumnIndex(const int i) const {
 
     int matchedBits = -1; // counter for matched bits; this is going to contain our return value
     for (int block = 0; block < getNumberOfColumnBlocks(); block ++) { // start with lowest bits, i.e. in block No. 0
-        unsigned long blockBits = getColumnKey(block); // the bits in this block of 32 bits
-        unsigned long shiftedBit = 1;
+        unsigned int blockBits = getColumnKey(block); // the bits in this block of 32 bits
+        unsigned int shiftedBit = 1;
         int exponent = 0;
         // The invariant "shiftedBit = 2^exponent" will hold throughout the entire while loop.
         while (exponent < 32) {
@@ -223,11 +224,11 @@ int MinorKey::getRelativeColumnIndex(const int i) const {
     assert(false);
 }
 
-unsigned long MinorKey::getRowKey(const int blockIndex) const {
+unsigned int MinorKey::getRowKey(const int blockIndex) const {
     return _rowKey[blockIndex];
 }
 
-unsigned long MinorKey::getColumnKey(const int blockIndex) const {
+unsigned int MinorKey::getColumnKey(const int blockIndex) const {
     return _columnKey[blockIndex];
 }
 
@@ -243,8 +244,8 @@ int MinorKey::getSetBits(const int a) const {
     int b = 0;
     if (a == 1) { // rows
         for (int i = 0; i < _numberOfRowBlocks; i++) {
-            unsigned long m = _rowKey[i];
-            unsigned long k = 1;
+            unsigned int m = _rowKey[i];
+            unsigned int k = 1;
             for (int j = 0; j < 32; j++) {
                 // k = 2^j
                 if (m & k) b++;
@@ -254,8 +255,8 @@ int MinorKey::getSetBits(const int a) const {
     }
     else { // columns
         for (int i = 0; i < _numberOfColumnBlocks; i++) {
-            unsigned long m = _columnKey[i];
-            unsigned long k = 1;
+            unsigned int m = _columnKey[i];
+            unsigned int k = 1;
             for (int j = 0; j < 32; j++) {
                 // k = 2^j
                 if (m & k) b++;
@@ -270,7 +271,7 @@ MinorKey MinorKey::getSubMinorKey (const int absoluteEraseRowIndex,
                                    const int absoluteEraseColumnIndex) const {
     int rowBlock = absoluteEraseRowIndex / 32;
     int exponent = absoluteEraseRowIndex % 32;
-    unsigned long newRowBits = getRowKey(rowBlock) - (1 << exponent);
+    unsigned int newRowBits = getRowKey(rowBlock) - (1 << exponent);
     int highestRowBlock = getNumberOfRowBlocks() - 1;
     // highestRowBlock will finally contain the highest block index with non-zero bit pattern
     if ((newRowBits == 0) && (rowBlock == highestRowBlock)) {
@@ -284,7 +285,7 @@ MinorKey MinorKey::getSubMinorKey (const int absoluteEraseRowIndex,
 
     int columnBlock = absoluteEraseColumnIndex / 32;
     exponent = absoluteEraseColumnIndex % 32;
-    unsigned long newColumnBits = getColumnKey(columnBlock) - (1 << exponent);
+    unsigned int newColumnBits = getColumnKey(columnBlock) - (1 << exponent);
     int highestColumnBlock = getNumberOfColumnBlocks() - 1;
     // highestColumnBlock will finally contain the highest block index with non-zero bit pattern
     if ((newColumnBits == 0) && (columnBlock == highestColumnBlock)) {
@@ -317,11 +318,11 @@ MinorKey MinorKey::getSubMinorKey (const int absoluteEraseRowIndex,
     return result;
 }
 
-void MinorKey::setRowKey (const int blockIndex, const unsigned long rowKey) {
+void MinorKey::setRowKey (const int blockIndex, const unsigned int rowKey) {
     _rowKey[blockIndex] = rowKey;
 }
 
-void MinorKey::setColumnKey (const int blockIndex, const unsigned long columnKey) {
+void MinorKey::setColumnKey (const int blockIndex, const unsigned int columnKey) {
     _columnKey[blockIndex] = columnKey;
 }
 
@@ -368,21 +369,21 @@ bool MinorKey::operator<(const MinorKey& mk) const {
 void MinorKey::selectFirstRows (const int k, const MinorKey& mk) {
     int hitBits = 0;      // the number of bits we have hit; in the end, this has to be equal to k,
                           // the dimension of the minor
-    int blockIndex = -1;  // the index of the current long in mk
-    unsigned long highestLong = 0;  // the new highest block of this MinorKey
-    // We determine which longs of mk we can copy. Their indices will be 0, 1, ..., blockIndex - 1.
-    // And highestLong is going to capture the highest long (which may be only a portion of
-    // the corresponding long in mk. We loop until hitBits = k:
+    int blockIndex = -1;  // the index of the current int in mk
+    unsigned int highestInt = 0;  // the new highest block of this MinorKey
+    // We determine which ints of mk we can copy. Their indices will be 0, 1, ..., blockIndex - 1.
+    // And highestInt is going to capture the highest int (which may be only a portion of
+    // the corresponding int in mk. We loop until hitBits = k:
     while (hitBits < k) {
         blockIndex++;
-        highestLong = 0;
-        unsigned long currentLong = mk.getRowKey(blockIndex);
-        unsigned long shiftedBit = 1;
+        highestInt = 0;
+        unsigned int currentInt = mk.getRowKey(blockIndex);
+        unsigned int shiftedBit = 1;
         int exponent = 0;
         // invariant in the loop: shiftedBit = 2^exponent
         while (exponent < 32 && hitBits < k) {
-            if (shiftedBit & currentLong) {
-                highestLong += shiftedBit;
+            if (shiftedBit & currentInt) {
+                highestInt += shiftedBit;
                 hitBits++;
             }
             shiftedBit = shiftedBit << 1;
@@ -393,31 +394,31 @@ void MinorKey::selectFirstRows (const int k, const MinorKey& mk) {
     delete [] _rowKey; _rowKey = 0;
     _numberOfRowBlocks = blockIndex + 1;
     // allocate memory for new entries in _rowKey;
-    _rowKey = new unsigned long[_numberOfRowBlocks];
+    _rowKey = new unsigned int[_numberOfRowBlocks];
     // copying values from mk to this MinorKey
     for (int r = 0; r < blockIndex; r++)
         _rowKey[r] = mk.getRowKey(r);
-    _rowKey[blockIndex] = highestLong;
+    _rowKey[blockIndex] = highestInt;
 }
 
 void MinorKey::selectFirstColumns (const int k, const MinorKey& mk) {
     int hitBits = 0;      // the number of bits we have hit; in the end, this has to be equal to k,
                           // the dimension of the minor
-    int blockIndex = -1;  // the index of the current long in mk
-    unsigned long highestLong = 0;  // the new highest block of this MinorKey
-    // We determine which longs of mk we can copy. Their indices will be 0, 1, ..., blockIndex - 1.
-    // And highestLong is going to capture the highest long (which may be only a portion of
-    // the corresponding long in mk. We loop until hitBits = k:
+    int blockIndex = -1;  // the index of the current int in mk
+    unsigned int highestInt = 0;  // the new highest block of this MinorKey
+    // We determine which ints of mk we can copy. Their indices will be 0, 1, ..., blockIndex - 1.
+    // And highestInt is going to capture the highest int (which may be only a portion of
+    // the corresponding int in mk. We loop until hitBits = k:
     while (hitBits < k) {
         blockIndex++;
-        highestLong = 0;
-        unsigned long currentLong = mk.getColumnKey(blockIndex);
-        unsigned long shiftedBit = 1;
+        highestInt = 0;
+        unsigned int currentInt = mk.getColumnKey(blockIndex);
+        unsigned int shiftedBit = 1;
         int exponent = 0;
         // invariant in the loop: shiftedBit = 2^exponent
         while (exponent < 32 && hitBits < k) {
-            if (shiftedBit & currentLong) {
-                highestLong += shiftedBit;
+            if (shiftedBit & currentInt) {
+                highestInt += shiftedBit;
                 hitBits++;
             }
             shiftedBit = shiftedBit << 1;
@@ -428,11 +429,11 @@ void MinorKey::selectFirstColumns (const int k, const MinorKey& mk) {
     delete [] _columnKey; _columnKey = 0;
     _numberOfColumnBlocks = blockIndex + 1;
     // allocate memory for new entries in _columnKey;
-    _columnKey = new unsigned long[_numberOfColumnBlocks];
+    _columnKey = new unsigned int[_numberOfColumnBlocks];
     // copying values from mk to this MinorKey
     for (int c = 0; c < blockIndex; c++)
         _columnKey[c] = mk.getColumnKey(c);
-    _columnKey[blockIndex] = highestLong;
+    _columnKey[blockIndex] = highestInt;
 }
 
 bool MinorKey::selectNextRows (const int k, const MinorKey& mk) {
@@ -452,9 +453,9 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk) {
     // If we should not be able to find such a row, then there is no next subset of rows.
     // In this case, the method will return false; otherwise always true.
     int newBitBlockIndex = 0;         // the block index of the bit
-    unsigned long newBitToBeSet = 0;  // the bit as 2^e, where 0 <= e <= 31
+    unsigned int newBitToBeSet = 0;  // the bit as 2^e, where 0 <= e <= 31
 
-    int blockCount = this->getNumberOfRowBlocks();  // number of longs (representing rows) in this MinorKey
+    int blockCount = this->getNumberOfRowBlocks();  // number of ints (representing rows) in this MinorKey
     int mkBlockIndex = mk.getNumberOfRowBlocks();   // for iterating along the blocks of mk
 
     int hitBits = 0;    // the number of bits we have hit
@@ -462,12 +463,12 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk) {
 
     while (hitBits < k) {
         mkBlockIndex--;
-        unsigned long currentLong = mk.getRowKey(mkBlockIndex);
-        unsigned long shiftedBit = 1 << 31; // initially, this equals 2^31, i.e. the highest bit
+        unsigned int currentInt = mk.getRowKey(mkBlockIndex);
+        unsigned int shiftedBit = 1 << 31; // initially, this equals 2^31, i.e. the highest bit
         while (hitBits < k && shiftedBit > 0) {
-            if (blockCount - 1 >= mkBlockIndex &&
-                shiftedBit & this->getRowKey(mkBlockIndex)) hitBits++;
-            else if (shiftedBit & currentLong) {
+            if ((blockCount - 1 >= mkBlockIndex) &&
+                (shiftedBit & this->getRowKey(mkBlockIndex))) hitBits++;
+            else if (shiftedBit & currentInt) {
                 newBitToBeSet = shiftedBit;
                 newBitBlockIndex = mkBlockIndex;
                 bitCounter = hitBits; // So, whenever we set newBitToBeSet, we want to remember the momentary
@@ -495,17 +496,17 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk) {
             delete [] _rowKey; _rowKey = 0;
             _numberOfRowBlocks = newBitBlockIndex + 1;
             // allocate memory for new entries in _rowKey;
-            _rowKey = new unsigned long[_numberOfRowBlocks];
+            _rowKey = new unsigned int[_numberOfRowBlocks];
         }
         else {
             // We need to delete all bits in _rowKey[newBitBlockIndex] that are below newBitToBeSet:
-            unsigned long aLong = this->getRowKey(newBitBlockIndex);
-            unsigned long deleteBit = newBitToBeSet >> 1; // in example: = 2^5
+            unsigned int anInt = this->getRowKey(newBitBlockIndex);
+            unsigned int deleteBit = newBitToBeSet >> 1; // in example: = 2^5
             while (deleteBit > 0) {
-                if (aLong & deleteBit) aLong -= deleteBit;
+                if (anInt & deleteBit) anInt -= deleteBit;
                 deleteBit = deleteBit >> 1;
             };
-            _rowKey[newBitBlockIndex] = aLong;
+            _rowKey[newBitBlockIndex] = anInt;
             // ...and we delete all entries in _rowKey[i] for 0 <= i < newBitBlockIndex
             for (int i = 0; i < newBitBlockIndex; i++)
                 _rowKey[i] = 0;
@@ -524,12 +525,12 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk) {
         mkBlockIndex = -1;
         while (bitCounter < k) {
             mkBlockIndex++;
-            unsigned long currentLong = mk.getRowKey(mkBlockIndex);
-            unsigned long shiftedBit = 1;
+            unsigned int currentInt = mk.getRowKey(mkBlockIndex);
+            unsigned int shiftedBit = 1;
             int exponent = 0;
             // invariant: shiftedBit = 2^exponent
             while (bitCounter < k && exponent < 32) {
-                if (shiftedBit & currentLong) {
+                if (shiftedBit & currentInt) {
                     _rowKey[mkBlockIndex] += shiftedBit;
                     bitCounter++;
                 };
@@ -560,9 +561,9 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk) {
     // If we should not be able to find such a columns, then there is no next subset of columns.
     // In this case, the method will return false; otherwise always true.
     int newBitBlockIndex = 0;         // the block index of the bit
-    unsigned long newBitToBeSet = 0;  // the bit as 2^e, where 0 <= e <= 31
+    unsigned int newBitToBeSet = 0;  // the bit as 2^e, where 0 <= e <= 31
 
-    int blockCount = this->getNumberOfColumnBlocks();  // number of longs (representing columns) in this MinorKey
+    int blockCount = this->getNumberOfColumnBlocks();  // number of ints (representing columns) in this MinorKey
     int mkBlockIndex = mk.getNumberOfColumnBlocks();   // for iterating along the blocks of mk
 
     int hitBits = 0;    // the number of bits we have hit
@@ -570,19 +571,19 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk) {
 
     while (hitBits < k) {
         mkBlockIndex--;
-        unsigned long currentLong = mk.getColumnKey(mkBlockIndex);
-        unsigned long shiftedBit = 1 << 31; // initially, this equals 2^31, i.e. the highest bit
+        unsigned int currentInt = mk.getColumnKey(mkBlockIndex);
+        unsigned int shiftedBit = 1 << 31; // initially, this equals 2^31, i.e. the highest bit
         while (hitBits < k && shiftedBit > 0) {
-            if (blockCount - 1 >= mkBlockIndex &&
-                shiftedBit & this->getColumnKey(mkBlockIndex)) hitBits++;
-            else if (shiftedBit & currentLong) {
+            if ((blockCount - 1 >= mkBlockIndex) &&
+                (shiftedBit & this->getColumnKey(mkBlockIndex))) hitBits++;
+            else if (shiftedBit & currentInt) {
                 newBitToBeSet = shiftedBit;
                 newBitBlockIndex = mkBlockIndex;
                 bitCounter = hitBits; // So, whenever we set newBitToBeSet, we want to remember the momentary
                                       // number of hit bits. This will later be needed; see below.
             }
             shiftedBit = shiftedBit >> 1;
-        }
+        }                                           
     }
 
     if (newBitToBeSet == 0) {
@@ -603,17 +604,17 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk) {
             delete [] _columnKey; _columnKey = 0;
             _numberOfColumnBlocks = newBitBlockIndex + 1;
             // allocate memory for new entries in _columnKey;
-            _columnKey = new unsigned long[_numberOfColumnBlocks];
+            _columnKey = new unsigned int[_numberOfColumnBlocks];
         }
         else {
             // We need to delete all bits in _columnKey[newBitBlockIndex] that are below newBitToBeSet:
-            unsigned long aLong = this->getColumnKey(newBitBlockIndex);
-            unsigned long deleteBit = newBitToBeSet >> 1; // in example: = 2^5
+            unsigned int anInt = this->getColumnKey(newBitBlockIndex);
+            unsigned int deleteBit = newBitToBeSet >> 1; // in example: = 2^5
             while (deleteBit > 0) {
-                if (aLong & deleteBit) aLong -= deleteBit;
+                if (anInt & deleteBit) anInt -= deleteBit;
                 deleteBit = deleteBit >> 1;
             };
-            _columnKey[newBitBlockIndex] = aLong;
+            _columnKey[newBitBlockIndex] = anInt;
             // ...and we delete all entries in _columnKey[i] for 0 <= i < newBitBlockIndex
             for (int i = 0; i < newBitBlockIndex; i++)
                 _columnKey[i] = 0;
@@ -632,12 +633,12 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk) {
         mkBlockIndex = -1;
         while (bitCounter < k) {
             mkBlockIndex++;
-            unsigned long currentLong = mk.getColumnKey(mkBlockIndex);
-            unsigned long shiftedBit = 1;
+            unsigned int currentInt = mk.getColumnKey(mkBlockIndex);
+            unsigned int shiftedBit = 1;
             int exponent = 0;
             // invariant: shiftedBit = 2^exponent
             while (bitCounter < k && exponent < 32) {
-                if (shiftedBit & currentLong) {
+                if (shiftedBit & currentInt) {
                     _columnKey[mkBlockIndex] += shiftedBit;
                     bitCounter++;
                 };
@@ -656,14 +657,14 @@ string MinorKey::toString() const {
     string t = "";
     string s = "(";
     for (int r = this->getNumberOfRowBlocks() - 1; r >= 0; r--) {
-        sprintf(h, "%ld", this->getRowKey(r)); t += h;
+        sprintf(h, "%du", this->getRowKey(r)); t += h;
         if (r < this->getNumberOfRowBlocks() - 1)
             t = string(32 - t.length(), '0') + t;
         s += t;
     }
     s += ", ";
     for (int c = this->getNumberOfColumnBlocks() - 1; c >= 0; c--) {
-        sprintf(h, "%ld", this->getColumnKey(c)); t += h;
+        sprintf(h, "%du", this->getColumnKey(c)); t += h;
         if (c < this->getNumberOfColumnBlocks() - 1)
             t = string(32 - t.length(), '0') + t;
         s += t;
@@ -674,7 +675,7 @@ string MinorKey::toString() const {
 
 int MinorValue::_RankingStrategy = -1;
 
-long MinorValue::getWeight () const
+int MinorValue::getWeight () const
 {
   assert(false);  // must be overridden in derived classes
   return 0;
@@ -700,7 +701,7 @@ bool MinorValue::operator<(const MinorValue& mv) const {
     return (this < &mv);  // compare addresses of both objects
 }
 
-long MinorValue::getRetrievals() const {
+int MinorValue::getRetrievals() const {
     return _retrievals;
 }
 
@@ -708,23 +709,23 @@ void MinorValue::incrementRetrievals() {
     _retrievals++;
 }
 
-long MinorValue::getPotentialRetrievals() const {
+int MinorValue::getPotentialRetrievals() const {
     return _potentialRetrievals;
 }
 
-long MinorValue::getMultiplications() const {
+int MinorValue::getMultiplications() const {
     return _multiplications;
 }
 
-long MinorValue::getAdditions() const {
+int MinorValue::getAdditions() const {
     return _additions;
 }
 
-long MinorValue::getAccumulatedMultiplications() const {
+int MinorValue::getAccumulatedMultiplications() const {
     return _accumulatedMult;
 }
 
-long MinorValue::getAccumulatedAdditions() const {
+int MinorValue::getAccumulatedAdditions() const {
     return _accumulatedSum;
 }
 
@@ -788,14 +789,14 @@ int MinorValue::rankMeasure5 () const {
     return this->getPotentialRetrievals() - this->getRetrievals();
 }
 
-long LongMinorValue::getWeight () const {
+int IntMinorValue::getWeight () const {
     // put measure for size of MinorValue here, i.e. number of monomials in polynomial;
     // so far, we use the accumulated number of multiplications (i.e., including all nested ones)
     // to simmulate the size of a polynomial
     return _accumulatedMult;
 }
 
-LongMinorValue::LongMinorValue (const long result, const int multiplications, const int additions,
+IntMinorValue::IntMinorValue (const int result, const int multiplications, const int additions,
                                 const int accumulatedMultiplications, const int accumulatedAdditions,
                                 const int retrievals, const int potentialRetrievals) {
     _result = result;
@@ -807,7 +808,7 @@ LongMinorValue::LongMinorValue (const long result, const int multiplications, co
     _retrievals = retrievals;
 }
 
-LongMinorValue::LongMinorValue () {
+IntMinorValue::IntMinorValue () {
     _result = -1;
     _multiplications = -1;
     _additions = -1;
@@ -817,37 +818,37 @@ LongMinorValue::LongMinorValue () {
     _retrievals = -1;
 }
 
-LongMinorValue::~LongMinorValue()
+IntMinorValue::~IntMinorValue()
 {
 }
 
-long LongMinorValue::getResult() const {
+int IntMinorValue::getResult() const {
     return _result;
 }
 
-string LongMinorValue::toString () const {
+string IntMinorValue::toString () const {
     char h[10];
 
     // Let's see whether a cache has been used to compute this MinorValue:
     bool cacheHasBeenUsed = true;
     if (this->getRetrievals() == -1) cacheHasBeenUsed = false;
 
-    sprintf(h, "%ld", this->getResult());
+    sprintf(h, "%d", this->getResult());
     string s = h;
     s += " [retrievals: ";
-    if (cacheHasBeenUsed) { sprintf(h, "%ld", this->getRetrievals()); s += h; }
+    if (cacheHasBeenUsed) { sprintf(h, "%d", this->getRetrievals()); s += h; }
     else s += "/";
     s += " (of ";
-    if (cacheHasBeenUsed) { sprintf(h, "%ld", this->getPotentialRetrievals()); s += h; }
+    if (cacheHasBeenUsed) { sprintf(h, "%d", this->getPotentialRetrievals()); s += h; }
     else s += "/";
     s += "), *: ";
-    sprintf(h, "%ld", this->getMultiplications()); s += h;
+    sprintf(h, "%d", this->getMultiplications()); s += h;
     s += " (accumulated: ";
-    sprintf(h, "%ld", this->getAccumulatedMultiplications()); s += h;
+    sprintf(h, "%d", this->getAccumulatedMultiplications()); s += h;
     s += "), +: ";
-    sprintf(h, "%ld", this->getAdditions()); s += h;
+    sprintf(h, "%d", this->getAdditions()); s += h;
     s += " (accumulated: ";
-    sprintf(h, "%ld", this->getAccumulatedAdditions()); s += h;
+    sprintf(h, "%d", this->getAccumulatedAdditions()); s += h;
     s += "), rank: ";
     if (cacheHasBeenUsed) { sprintf(h, "%d", this->getUtility()); s += h; }
     else s += "/";
@@ -855,7 +856,7 @@ string LongMinorValue::toString () const {
     return s;
 }
 
-LongMinorValue::LongMinorValue (const LongMinorValue& mv) {
+IntMinorValue::IntMinorValue (const IntMinorValue& mv) {
     _result = mv.getResult();
     _retrievals = mv.getRetrievals();
     _potentialRetrievals = mv.getPotentialRetrievals();
@@ -898,7 +899,7 @@ poly PolyMinorValue::getResult() const {
     return _result;
 }
 
-long PolyMinorValue::getWeight () const {
+int PolyMinorValue::getWeight () const {
     // put measure for size of PolyMinorValue here, e.g. the number of monomials
     // the cached polynomial
     return pLength(_result); // the number of monomials in the polynomial
@@ -913,19 +914,19 @@ string PolyMinorValue::toString () const {
 
     string s = pString(_result);
     s += " [retrievals: ";
-    if (cacheHasBeenUsed) { sprintf(h, "%ld", this->getRetrievals()); s += h; }
+    if (cacheHasBeenUsed) { sprintf(h, "%d", this->getRetrievals()); s += h; }
     else s += "/";
     s += " (of ";
-    if (cacheHasBeenUsed) { sprintf(h, "%ld", this->getPotentialRetrievals()); s += h; }
+    if (cacheHasBeenUsed) { sprintf(h, "%d", this->getPotentialRetrievals()); s += h; }
     else s += "/";
     s += "), *: ";
-    sprintf(h, "%ld", this->getMultiplications()); s += h;
+    sprintf(h, "%d", this->getMultiplications()); s += h;
     s += " (accumulated: ";
-    sprintf(h, "%ld", this->getAccumulatedMultiplications()); s += h;
+    sprintf(h, "%d", this->getAccumulatedMultiplications()); s += h;
     s += "), +: ";
-    sprintf(h, "%ld", this->getAdditions()); s += h;
+    sprintf(h, "%d", this->getAdditions()); s += h;
     s += " (accumulated: ";
-    sprintf(h, "%ld", this->getAccumulatedAdditions()); s += h;
+    sprintf(h, "%d", this->getAccumulatedAdditions()); s += h;
     s += "), rank: ";
     if (cacheHasBeenUsed) { sprintf(h, "%d", this->getUtility()); s += h; }
     else s += "/";

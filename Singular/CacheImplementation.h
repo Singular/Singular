@@ -4,7 +4,7 @@
 #ifdef HAVE_MINOR
 
 template<class KeyClass, class ValueClass>
-Cache<KeyClass, ValueClass>::Cache (const int maxEntries, const long maxWeight) {
+Cache<KeyClass, ValueClass>::Cache (const int maxEntries, const int maxWeight) {
     _maxEntries = maxEntries;
     _maxWeight = maxWeight;
     _rank.clear();
@@ -17,7 +17,7 @@ Cache<KeyClass, ValueClass>::Cache (const int maxEntries, const long maxWeight) 
 }
 
 template<class KeyClass, class ValueClass>
-long Cache<KeyClass, ValueClass>::getWeight() const {
+int Cache<KeyClass, ValueClass>::getWeight() const {
     return _weight;
 }
 
@@ -90,7 +90,7 @@ int Cache<KeyClass, ValueClass>::getMaxNumberOfEntries() const {
 }
 
 template<class KeyClass, class ValueClass>
-long Cache<KeyClass, ValueClass>::getMaxWeight() const {
+int Cache<KeyClass, ValueClass>::getMaxWeight() const {
     return _maxWeight;
 }
 
@@ -113,7 +113,7 @@ bool Cache<KeyClass, ValueClass>::deleteLast(const KeyClass& key) {
     int k = 0;
     typename list<KeyClass>::iterator itKey;
     typename list<ValueClass>::iterator itValue = _value.begin();
-    typename list<long>::iterator itWeights = _weights.begin();
+    typename list<int>::iterator itWeights = _weights.begin();
     for (itKey = _key.begin(); itKey != _key.end(); itKey++) {
         if (k == deleteIndex) {
             result = (key.compare(*itKey) == 0);
@@ -124,7 +124,7 @@ bool Cache<KeyClass, ValueClass>::deleteLast(const KeyClass& key) {
         k++;
     }
     _key.erase(itKey);
-    long deleteWeight = *itWeights;
+    int deleteWeight = *itWeights;
     _value.erase(itValue);
     _weights.erase(itWeights);
 
@@ -150,7 +150,7 @@ bool Cache<KeyClass, ValueClass>::put (const KeyClass& key, const ValueClass& va
     int k = 0;
     typename list<KeyClass>::iterator itKey;
     typename list<ValueClass>::iterator itOldValue = _value.begin(); // will later only be used in the case keyWasContained == true
-    typename list<long>::iterator itOldWeights = _weights.begin(); // will later only be used in the case keyWasContained == true
+    typename list<int>::iterator itOldWeights = _weights.begin(); // will later only be used in the case keyWasContained == true
     for (itKey = _key.begin(); itKey != _key.end(); itKey++) {
         int c = key.compare(*itKey);
         if (c == -1) {
@@ -167,7 +167,7 @@ bool Cache<KeyClass, ValueClass>::put (const KeyClass& key, const ValueClass& va
         k++;
     }
     int utility = value.getUtility();
-    long newWeight = value.getWeight();
+    int newWeight = value.getWeight();
     k = 0;
     typename list<ValueClass>::iterator itValue = _value.begin();
     for (itValue = _value.begin(); itValue != _value.end(); itValue++) {
@@ -265,7 +265,7 @@ bool Cache<KeyClass, ValueClass>::put (const KeyClass& key, const ValueClass& va
         _rank.insert(itRank, newIndexInKey);
         // let's insert new key and new value at index newIndexInKey:
         itValue = _value.begin();
-        typename list<long>::iterator itWeights = _weights.begin();
+        typename list<int>::iterator itWeights = _weights.begin();
         k = 0;
         for (itKey = _key.begin(); itKey != _key.end(); itKey++) {
             if (k == newIndexInKey) break;
@@ -298,9 +298,9 @@ string Cache<KeyClass, ValueClass>::toString() const {
     s += " of at most ";
     sprintf(h, "%d", getMaxNumberOfEntries()); s += h;
     s += "\n   weight: ";
-    sprintf(h, "%ld", getWeight()); s += h;
+    sprintf(h, "%d", getWeight()); s += h;
     s += " of at most ";
-    sprintf(h, "%ld", getMaxWeight()); s += h;
+    sprintf(h, "%d", getMaxWeight()); s += h;
     if (_key.size() == 0) {
         s += "\n   no pairs, i.e. cache is empty";
     }

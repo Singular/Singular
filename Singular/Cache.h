@@ -89,7 +89,7 @@ template<class KeyClass, class ValueClass> class Cache {
              */
              list<ValueClass> _value;
              
-             list<long> _weights;
+             list<int> _weights;
 
              mutable typename list<KeyClass>::const_iterator _itKey;
              mutable typename list<ValueClass>::const_iterator _itValue;
@@ -99,7 +99,7 @@ template<class KeyClass, class ValueClass> class Cache {
              * This is the sum of \c _value[i].getWeight() over all \e i,
              * i.e., over all cached values.
              */
-             long _weight;
+             int _weight;
 
              /**
              * the bound of cache entries;<br>
@@ -113,7 +113,7 @@ template<class KeyClass, class ValueClass> class Cache {
              * The cache will automatically ensure that this bound will never be exceeded; see
              * see Cache::shrink (const KeyClass&) and Cache::deleteLast ().
              */
-             long _maxWeight;
+             int _maxWeight;
 
              /**
              * A method for providing the index of a given key in the vector _key.
@@ -178,7 +178,7 @@ template<class KeyClass, class ValueClass> class Cache {
              * @param maxEntries the (positive) maximal number of pairs (key --> value) in the cache
              * @param maxWeight the (positive) maximal weight of the cache
              */
-             Cache (const int maxEntries, const long maxWeight);
+             Cache (const int maxEntries, const int maxWeight);
 
              /**
              * A method for retrieving the momentary weight of the cache.
@@ -189,7 +189,7 @@ template<class KeyClass, class ValueClass> class Cache {
              * @see Cache::getMaxWeight () const
              * @see MinorValue::getWeight () const
              */
-             long getWeight () const;
+             int getWeight () const;
 
              /**
              * A method for retrieving the momentary number of (key --> value) pairs
@@ -220,7 +220,7 @@ template<class KeyClass, class ValueClass> class Cache {
              * @see Cache::getWeight () const
              * @see Cache::Cache (const int, const int)
              */
-             long getMaxWeight () const;
+             int getMaxWeight () const;
 
              /**
              * Checks whether the cache contains a pair (k --> v) such that

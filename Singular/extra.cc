@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.321 2009-10-06 12:09:00 seelisch Exp $ */
+/* $Id: extra.cc,v 1.322 2009-10-08 10:11:57 seelisch Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2142,7 +2142,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           const int k              = (const int)(long)h->next->Data();
           const int strategy       = (const int)(long)h->next->next->Data();
           const int cacheEntries   = (const int)(long)h->next->next->next->Data();
-          const long cacheWeight   = (const long)h->next->next->next->next->Data();
+          const int cacheWeight    = (const int)(long)h->next->next->next->next->Data();
           ideal iii = testAllPolyMinorsAsIdeal(m, k, strategy, cacheEntries, cacheWeight);
             // starts the computation of all k x k minors in the
             // provided matrix m (which is assumed to have polynomial
@@ -2167,7 +2167,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           const int k              = (const int)(long)h->next->Data();
           const int strategies     = (const int)(long)h->next->next->Data();
           const int cacheEntries   = (const int)(long)h->next->next->next->Data();
-          const long cacheWeight   = (const long)h->next->next->next->next->Data();
+          const int cacheWeight    = (const int)(long)h->next->next->next->next->Data();
           const int dumpMinors     = (const int)(long)h->next->next->next->next->next->Data();
           const int dumpResults    = (const int)(long)h->next->next->next->next->next->next->Data();
           const int dumpComplete   = (const int)(long)h->next->next->next->next->next->next->next->Data();
@@ -2187,6 +2187,48 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           const poly p = (const poly)h->Data();
           testStuff(p);
         }
+        return FALSE;
+      }
+      else
+      if(strcmp(sys_cmd,"changeVars")==0)
+      {
+        /*
+        The following code changes the N variables names in currRing in
+        the following way: var(i) is replaced by f(i), 1 <= i <= N,
+        where f(j) is j written to the base of 26 with the digit '0'
+        written as 'a', '1' as 'b', ..., '25' as 'z'.
+        E.g. var(1) goes to f(1)='b', ..., var(25) goes to f(25)='z',
+             var(26) goes to f(26)='ba', etc.
+        The purpose of this rewriting is to eliminate indexed variables,
+        as they may cause problems when generating scripts for Magma,
+        Maple, or Macaulay2.
+        */
+        ring newRing = rCopy0(currRing);
+        int varN = newRing->N;
+        char* alphabet = "abcdefghijklmnopqrstuvwxyz";
+        char theName[10];
+        char tempChars[10];
+        int j; int k; int l;
+        for (int i = 1; i <= varN; i++)
+        {
+          k = i;
+          l = 9;
+          j = k % 26;
+          tempChars[l--] = alphabet[j];
+          k = (k - j) / 26;
+          while (k != 0)
+          {
+            j = k % 26;
+            tempChars[l--] = alphabet[j];
+            k = (k - j) / 26;
+          }
+          l++;
+          for (j = l; j < 10; j++) theName[j - l] = tempChars[j];
+          theName[10 - l] = '\0';
+          newRing->names[i - 1] = omStrDup(theName);
+        }
+        rComplete(newRing);
+        currRing = newRing;
         return FALSE;
       }
       else

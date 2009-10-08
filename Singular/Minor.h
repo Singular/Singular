@@ -18,12 +18,12 @@ using namespace std;
     need to implement at least the methods:<br>
     <c>bool MinorKey::operator< (const MinorKey& key),</c><br>
     <c>bool MinorKey::operator== (const MinorKey& key),</c><br>
-    MinorKey uses two private arrays of unsigned longs \c _rowKey and \c _columnKey to encode rows and
+    MinorKey uses two private arrays of ints \c _rowKey and \c _columnKey to encode rows and
     columns of a pre-defined matrix. Semantically, the row indices and column indices form the key
     for caching the value of the corresponding minor.<br>
     More concretely, let us assume that the pre-defined matrix has <em>32*R+r, r<32,</em> rows and
-    <em>32*C+c, c<32,</em> columns. All row indices can then be captured using R+1 unsigned longs, since
-    a long is a 32-bit-number. The analog holds for the columns. Consequently, each instance of MinorKey
+    <em>32*C+c, c<32,</em> columns. All row indices can then be captured using R+1 ints, since
+    an int is a 32-bit-number (regardless of the platform). The analog holds for the columns. Consequently, each instance of MinorKey
     encodes the sets of rows and columns which shall belong to the minor of interest (and which shall not).<br>
     Example: The \c _rowKey with \c _rowKey[1] = 0...011 and \c _rowKey[0] = 0...01101 encodes the rows with
     indices 33, 32, 3, 2, and 0.
@@ -32,48 +32,48 @@ using namespace std;
 class MinorKey {
       private:
              /**
-             * a pointer to an array[0..k-1] of longs, capturing k*32 bits for determining which
+             * a pointer to an array[0..k-1] of ints, capturing k*32 bits for determining which
              * rows of a pre-defined matrix shall belong to the minor of interest;
              * for i < j, _rowKey[i] holds lower bits than _rowKey[j]
              */
-             unsigned long* _rowKey;
+             unsigned int* _rowKey;
 
              /**
-             * a pointer to an array[0..k-1] of longs, capturing k*32 bits for determining which
+             * a pointer to an array[0..k-1] of ints, capturing k*32 bits for determining which
              * columns of a pre-defined matrix shall belong to the minor of interest;
              * for i < j, _columnKey[i] holds lower bits than _columnKey[j]
              */
-             unsigned long* _columnKey;
+             unsigned int* _columnKey;
 
              /**
-             * the number of unsigned longs (i.e. 32-bit-numbers) we need to encode the set of rows;
+             * the number of ints (i.e. 32-bit-numbers) we need to encode the set of rows;
              * If the higest row index is 70, we need 3 blocks of 32 bits to also encode the 70th bit.
              */
              int _numberOfRowBlocks;
 
              /**
-             * the number of unsigned longs (i.e. 32-bit-numbers) we need to encode the set of columns;
+             * the number of ints (i.e. 32-bit-numbers) we need to encode the set of columns;
              * If the higest column index is 70, we need 3 blocks of 32 bits to also encode the 70th bit.
              */
              int _numberOfColumnBlocks;
 
              /**
              * Inlined accessor of blockIndex-th element of _rowKey.
-             * @param blockIndex the index of the long to be retrieved
+             * @param blockIndex the index of the int to be retrieved
              * @return an entry of _rowKey
              */
-             unsigned long getRowKey (const int blockIndex) const;
+             unsigned int getRowKey (const int blockIndex) const;
 
              /**
              * Inlined accessor of blockIndex-th element of _columnKey.
-             * @param blockIndex the index of the long to be retrieved
+             * @param blockIndex the index of the int to be retrieved
              * @return an entry of _columnKey
              */
-             unsigned long getColumnKey (const int blockIndex) const;
+             unsigned int getColumnKey (const int blockIndex) const;
 
-             void setRowKey (const int blockIndex, const unsigned long rowKey);
+             void setRowKey (const int blockIndex, const unsigned int rowKey);
 
-             void setColumnKey (const int blockIndex, const unsigned long columnKey);
+             void setColumnKey (const int blockIndex, const unsigned int columnKey);
 
              /**
              * Inlined accessor of _numberOfRowBlocks.
@@ -96,16 +96,16 @@ class MinorKey {
       public:
              /**
              * A constructor for class MinorKey.
-             * The longs given in the array rowKey encode all rows which shall belong to the minor.
+             * The ints given in the array rowKey encode all rows which shall belong to the minor.
              * Each array entry encodes 32 rows, e.g. the i-th array entry 0...01101 encodes the rows with
              * absolute matrix row indices 3+i*32, 2+i*32, and 0+i*32. Analog for columns.
              * @param lengthOfRowArray the length of the array rowKey
-             * @param rowKey a pointer to an array of longs encoding the set of rows of the minor
+             * @param rowKey a pointer to an array of ints encoding the set of rows of the minor
              * @param lengthOfColumnArray the length of the array columnKey
-             * @param columnKey a pointer to an array of longs encoding the set of columns of the minor
+             * @param columnKey a pointer to an array of ints encoding the set of columns of the minor
              */
-             MinorKey (const int lengthOfRowArray = 0, const unsigned long* const rowKey = 0,
-                       const int lengthOfColumnArray = 0, const unsigned long* const columnKey = 0);
+             MinorKey (const int lengthOfRowArray = 0, const unsigned int* const rowKey = 0,
+                       const int lengthOfColumnArray = 0, const unsigned int* const columnKey = 0);
 
              /**
              * A setter method for class MinorKey.
@@ -113,13 +113,13 @@ class MinorKey {
              * fields according to the given parameters. Note that this method will change the given
              * instance of MinorKey.
              * @param lengthOfRowArray the length of the array rowKey
-             * @param rowKey a pointer to an array of longs encoding the set of rows of the minor
+             * @param rowKey a pointer to an array of ints encoding the set of rows of the minor
              * @param lengthOfColumnArray the length of the array columnKey
-             * @param columnKey a pointer to an array of longs encoding the set of columns of the minor
-             * @see MinorKey::MinorKey (const int lengthOfRowArray, const unsigned long* rowKey, const int lengthOfColumnArray, const unsigned long* columnKey)
+             * @param columnKey a pointer to an array of ints encoding the set of columns of the minor
+             * @see MinorKey::MinorKey (const int lengthOfRowArray, const int* rowKey, const int lengthOfColumnArray, const int* columnKey)
              */
-             void set(const int lengthOfRowArray, const unsigned long* rowKey,
-                      const int lengthOfColumnArray, const unsigned long* columnKey);
+             void set(const int lengthOfRowArray, const unsigned int* rowKey,
+                      const int lengthOfColumnArray, const unsigned int* columnKey);
 
              /**
              * A copy constructor.
@@ -329,37 +329,37 @@ class MinorValue {
              /**
              * -1 iff cache is not used, otherwise the number of retrievals so far of the current minor
              */
-             long _retrievals;
+             int _retrievals;
 
              /**
              * // -1 iff cache is not used, otherwise the maximum number of potential retrievals of
              * this minor (e.g. when the minor would be kept in cache forever)
              */
-             long _potentialRetrievals;
+             int _potentialRetrievals;
 
              /**
              * a store for the actual number of multiplications to compute the current minor
              */
-             long _multiplications;
+             int _multiplications;
 
              /**
              * a store for the actual number of additions to compute the current minor
              */
-             long _additions;
+             int _additions;
 
              /**
              * a store for the accumulated number of multiplications to compute the current minor;
              * This also includes all multiplications nested in sub-minors which may be retrieved
              * from a cache. (Thus, these nested operations do not need to be performed again.)
              */
-             long _accumulatedMult;
+             int _accumulatedMult;
 
              /**
              * a store for the accumulated number of additions to compute the current minor;
              * This also includes all additions nested in sub-minors which may be retrieved
              * from a cache. (Thus, these nested operations do not need to be performed again.)
              */
-             long _accumulatedSum;
+             int _accumulatedSum;
 
              /**
              * A method for obtaining a rank measure for the given MinorValue.<br>
@@ -458,7 +458,7 @@ class MinorValue {
              * @return the weight of a given instance of MinorValue
              * @see Cache::getWeight () const
              */
-             virtual long getWeight () const;
+             virtual int getWeight () const;
 
              /**
              * A method for accessing the number of retrievals of this minor. Multiple retrievals will
@@ -467,7 +467,7 @@ class MinorValue {
              * @return the number of retrievals of this minor
              * @see MinorValue::getPotentialRetrievals () const
              */
-             long getRetrievals () const;
+             int getRetrievals () const;
 
              /**
              * A method for accessing the maximum number of potential retrievals of this minor.
@@ -477,7 +477,7 @@ class MinorValue {
              * @return the maximum number of potential retrievals of this minor
              * @see MinorValue::getRetrievals () const
              */
-             long getPotentialRetrievals () const;
+             int getPotentialRetrievals () const;
 
              /**
              * A method for accessing the multiplications performed while computing this minor.
@@ -489,7 +489,7 @@ class MinorValue {
              * @return the number of multiplications performed
              * @see MinorValue::getAccumulatedMultiplications () const
              */
-             long getMultiplications () const;
+             int getMultiplications () const;
 
              /**
              * A method for accessing the multiplications performed while computing this minor, including
@@ -500,7 +500,7 @@ class MinorValue {
              * @return the number of multiplications performed, including nested multiplications
              * @see MinorValue::getMultiplications () const
              */
-             long getAccumulatedMultiplications () const;
+             int getAccumulatedMultiplications () const;
 
              /**
              * A method for accessing the additions performed while computing this minor.
@@ -509,7 +509,7 @@ class MinorValue {
              * @return the number of additions performed
              * @see MinorValue::getAccumulatedAdditions () const
              */
-             long getAdditions () const;
+             int getAdditions () const;
 
              /**
              * A method for accessing the additions performed while computing this minor, including
@@ -520,7 +520,7 @@ class MinorValue {
              * @return the number of additions performed, including nested additions
              * @see MinorValue::getAdditions () const
              */
-             long getAccumulatedAdditions () const;
+             int getAccumulatedAdditions () const;
 
              /**
              * A method for incrementing the number of performed retrievals of \a this instance of MinorValue.<br>
@@ -571,22 +571,22 @@ class MinorValue {
              void print () const;
 };
 
-/*! \class LongMinorValue
-    \brief Class LongMinorValue can be used for representing values in a cache for
+/*! \class IntMinorValue
+    \brief Class IntMinorValue can be used for representing values in a cache for
     sub-determinantes; see class Cache.
 
     As such, it is a realization of the template class ValueClass which is used in
     the declaration of class Cache. Following the documentation of class Cache, we
     need to implement at least the methods:<br>
-    <c>bool LongMinorValue::operator< (const LongMinorValue& key),</c><br>
-    <c>bool LongMinorValue::operator== (const LongMinorValue& key),</c><br>
-    <c>int LongMinorValue::getWeight ().</c><br><br>
-    The main purpose of LongMinorValue is to represent values of sub-determinantes of a pre-defined
+    <c>bool IntMinorValue::operator< (const IntMinorValue& key),</c><br>
+    <c>bool IntMinorValue::operator== (const IntMinorValue& key),</c><br>
+    <c>int IntMinorValue::getWeight ().</c><br><br>
+    The main purpose of IntMinorValue is to represent values of sub-determinantes of a pre-defined
     matrix. Class MinorKey is used to determine which rows and columns of this pre-defined matrix
-    ought to belong to the respective sub-determinante of interest. So far, LongMinorValue is just
-    an example implementation which assumes matrices with long entries, such that the result
-    of any minor is a long again.<br>
-    Besides capturing the actual value of a minor, LongMinorValue also has built-in facilities to
+    ought to belong to the respective sub-determinante of interest. So far, IntMinorValue is just
+    an example implementation which assumes matrices with int entries, such that the result
+    of any minor is again an int.<br>
+    Besides capturing the actual value of a minor, IntMinorValue also has built-in facilities to
     count the number of additions and multiplications performed when computing a minor. These two
     counters, especially the latter, are important measures when we want to investigate the complexity
     of computing minors.<br>
@@ -595,12 +595,12 @@ class MinorValue {
     to also count the number of retrievals of \e M in such a computational context.
     \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
 */
-class LongMinorValue : public MinorValue {
+class IntMinorValue : public MinorValue {
       private:
              /**
              * a store for the actual value of the minor
              */
-             long _result;
+             int _result;
       public:
              /**
              * A constructor for class MinorValue.
@@ -612,20 +612,20 @@ class LongMinorValue : public MinorValue {
              * @param retrievals number of times this minor has been retrieved from cache
              * @param potentialRetrievals maximum number of times this minor may be retrieved from cache
              */
-             LongMinorValue (const long result, const int multiplications, const int additions,
+             IntMinorValue (const int result, const int multiplications, const int additions,
                              const int accumulatedMultiplications, const int accumulatedAdditions,
                              const int retrievals, const int potentialRetrievals);
 
-             LongMinorValue (const LongMinorValue& mv);
+             IntMinorValue (const IntMinorValue& mv);
              
              // just to make the compiler happy
-             LongMinorValue ();
+             IntMinorValue ();
              
-             virtual ~LongMinorValue ();
+             virtual ~IntMinorValue ();
              
-             long getResult() const;
+             int getResult() const;
 
-             long getWeight () const;
+             int getWeight () const;
 
              /**
              * A method for providing a printable version of the represented MinorValue.
@@ -664,7 +664,7 @@ class PolyMinorValue : public MinorValue {
 
              poly getResult() const;
 
-             long getWeight () const;
+             int getWeight () const;
 
              /**
              * A method for providing a printable version of the represented MinorValue.

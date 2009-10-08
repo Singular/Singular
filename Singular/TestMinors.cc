@@ -22,20 +22,20 @@ poly zeroPoly = pISet(0);
 int nonZeroCounter = 0;
 
 void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                  int minorSize, int randomSeed, int cacheEntries, long cacheWeight);
+                  int minorSize, int randomSeed, int cacheEntries, int cacheWeight);
 void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                   int minorRows, int minorColumns, int minorSize, int randomSeed, int cacheEntries, long cacheWeight);
+                   int minorRows, int minorColumns, int minorSize, int randomSeed, int cacheEntries, int cacheWeight);
 void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                        int minorSize, int randomSeed, int cacheEntries, long cacheWeight, int targetMinor,
+                        int minorSize, int randomSeed, int cacheEntries, int cacheWeight, int targetMinor,
                         bool checkForEquality, int maxLoops);
 
 void minorUsageInfo()
 {
   PrintS("\nType 'system(\"minors\", 0);' to run 5 default tests with a random");
   PrintS("\ninteger matrix. This test, for which no ring needs to be declared");
-  PrintS("\nbeforehand, will generate the file 'minor_output_results_longs.txt'");
+  PrintS("\nbeforehand, will generate the file 'minor_output_results_ints.txt'");
   PrintS("\nincluding all results and runtimes, and a much more detailed file");
-  PrintS("\n'minor_output_complete_longs.txt' (both in the folder of the SIN-");
+  PrintS("\n'minor_output_complete_ints.txt' (both in the folder of the SIN-");
   PrintS("\nGULAR executable).");
   PrintS("\n\nType 'system(\"minors\", m, k, strategies, nCache, wCache,");
   PrintS("\n             dumpMinors, dumpResults, dumpComplete, dumpConsole);'");
@@ -106,7 +106,7 @@ void writeTheMinorIfNonZero(PrettyPrinter& pm, const PolyMinorValue& pmv) {
 */
 int testIntMinors (const int dummy) {
   // for output of non-zero minors into file
-  PrettyPrinter prpr("minor_output_complete_longs.txt", "minor_output_results_longs.txt", false, false, -1, "   ");
+  PrettyPrinter prpr("minor_output_complete_ints.txt", "minor_output_results_int.txt", false, false, -1, "   ");
 
   // computes just one minor:
   testOneMinor(prpr, "Test I", 7, 10, 50, 20, 5, 471, 70, 1000);
@@ -139,7 +139,7 @@ void testStuff (const poly p)
   PrintS(h);
 }
 
-int testAllPolyMinors(matrix mat, int minorSize, int strategies, int cacheEntries, long cacheWeight,
+int testAllPolyMinors(matrix mat, int minorSize, int strategies, int cacheEntries, int cacheWeight,
                       int dumpMinors, int dumpResults, int dumpComplete, int dumpConsole) {
   // for pretty printing and file output of results and runtimes
   PrettyPrinter prpr(dumpComplete == 1 ? "minor_output_complete_polys.txt" : "",
@@ -326,13 +326,13 @@ int testAllPolyMinors(matrix mat, int minorSize, int strategies, int cacheEntrie
   return 0;
 }
 
-ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cacheEntries, long cacheWeight)
+ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cacheEntries, int cacheWeight)
 {
     // counters + auxiliary stuff
-  long totalMultiplications = 0;
-  long totalAdditions = 0;
-  long totalMultiplicationsAccumulated = 0;
-  long totalAdditionsAccumulated = 0;
+  int totalMultiplications = 0;
+  int totalAdditions = 0;
+  int totalMultiplicationsAccumulated = 0;
+  int totalAdditionsAccumulated = 0;
   char h[30];
 
   int rowCount = mat->nrows;
@@ -396,13 +396,13 @@ ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cach
 
   PrintLn(); PrintS("numbers of performed operations");
   PrintLn(); PrintS("   polynomial-to-polynomial multiplications: ");
-  sprintf(h, "%ld", totalMultiplications); PrintS(h);
+  sprintf(h, "%d", totalMultiplications); PrintS(h);
   PrintLn(); PrintS("   polynomial-to-polynomial additions: ");
-  sprintf(h, "%ld", totalAdditions); PrintS(h);
+  sprintf(h, "%d", totalAdditions); PrintS(h);
   PrintLn(); PrintS("   (polynomial-to-polynomial multiplications without cache would be: ");
-  sprintf(h, "%ld", totalMultiplicationsAccumulated); PrintS(h); PrintS(")");
+  sprintf(h, "%d", totalMultiplicationsAccumulated); PrintS(h); PrintS(")");
   PrintLn(); PrintS("   (polynomial-to-polynomial additions without cache would be: ");
-  sprintf(h, "%ld", totalAdditionsAccumulated); PrintS(h); PrintS(")");
+  sprintf(h, "%d", totalAdditionsAccumulated); PrintS(h); PrintS(")");
   PrintLn(); PrintLn();
 
   return iii;
@@ -414,8 +414,8 @@ ideal testAllPolyMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cach
 * the cache strategy influence the mathematical value of the minor.
 */
 void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                  int minorSize, int randomSeed, int cacheEntries, long cacheWeight) {
-    long start, end;
+                  int minorSize, int randomSeed, int cacheEntries, int cacheWeight) {
+    int start, end;
 
     prpr < testHeader;
     +prpr; for (int i = 0; i < int(testHeader.size()); i++) prpr < "="; /* underlines the header string */
@@ -425,7 +425,7 @@ void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int colu
     int* myMatrix = new int[rowCount * columnCount];
     fillRandomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound, myMatrix);
 
-    LongMinorProcessor mp;
+    IntMinorProcessor mp;
     mp.defineMatrix(rowCount, columnCount, myMatrix);
 
     int myRowIndices[minorSize];  for (int i = 0; i < minorSize; i++) myRowIndices[i] = i;
@@ -441,13 +441,13 @@ void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int colu
     // compute the minor without cache:
     prpr << "Results - " << testHeader << " - no cache";
     start = clock();
-    LongMinorValue mv = mp.getMinor(minorSize, myRowIndices, myColumnIndices);
+    IntMinorValue mv = mp.getMinor(minorSize, myRowIndices, myColumnIndices);
     end = clock();
     ++prpr << "value of minor = " << mv.toString();
     ++prpr << "(time = " << (end - start) << " msec)";
 
     // define the cache:
-    Cache<MinorKey, LongMinorValue> cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
+    Cache<MinorKey, IntMinorValue> cch = Cache<MinorKey, IntMinorValue>(cacheEntries, cacheWeight);
 
     // compute minor using the cache, for all implemented caching strategies:
     for (int strategy = 1; strategy <= 5; strategy++) {
@@ -456,7 +456,7 @@ void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int colu
         mp.defineSubMatrix(minorSize, myRowIndices, minorSize, myColumnIndices);
 
         // compute the minor using the cache and current strategy
-        LongMinorValue::SetRankingStrategy(strategy);
+        IntMinorValue::SetRankingStrategy(strategy);
         start = clock();
         mv = mp.getMinor(minorSize, myRowIndices, myColumnIndices, cch);
         end = clock();
@@ -479,7 +479,7 @@ void testOneMinor(PrettyPrinter& prpr, string testHeader, int rowCount, int colu
 * influence the mathematical value of the minor.
 */
 void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                   int minorRows, int minorColumns, int minorSize, int randomSeed, int cacheEntries, long cacheWeight) {
+                   int minorRows, int minorColumns, int minorSize, int randomSeed, int cacheEntries, int cacheWeight) {
     long totalTimeStart, totalTime, printTimeStart, printTime;
 
     prpr < testHeader;
@@ -490,7 +490,7 @@ void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int col
     int* myMatrix = new int[rowCount * columnCount];
     fillRandomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound, myMatrix);
 
-    LongMinorProcessor mp;
+    IntMinorProcessor mp;
     mp.defineMatrix(rowCount, columnCount, myMatrix);
 
     int myRowIndices[minorRows];  for (int i = 0; i < minorRows; i++) myRowIndices[i] = i;
@@ -503,10 +503,10 @@ void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int col
     +prpr; +prpr < mp.toString();
 
     // define the cache:
-    Cache<MinorKey, LongMinorValue> cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
+    Cache<MinorKey, IntMinorValue> cch = Cache<MinorKey, IntMinorValue>(cacheEntries, cacheWeight);
 
     // container for all upcoming results
-    LongMinorValue theMinor;
+    IntMinorValue theMinor;
 
     // counters...
     int k = 1;
@@ -566,7 +566,7 @@ void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int col
         // setting sub-matrix, size of minors of interest within that sub-matrix, and strategy:
         mp.defineSubMatrix(minorRows, myRowIndices, minorColumns, myColumnIndices);
         mp.setMinorSize(minorSize);
-        LongMinorValue::SetRankingStrategy(strategy);
+        IntMinorValue::SetRankingStrategy(strategy);
 
         // counters...
         k = 1;
@@ -577,7 +577,7 @@ void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int col
 
         // cleaning up and redefinition of the cache:
         cch.clear();
-        cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
+        cch = Cache<MinorKey, IntMinorValue>(cacheEntries, cacheWeight);
 
         +prpr; +prpr < "Results - " < testHeader < " - using cache - deploying caching strategy #" < strategy;
         +prpr < "computing all minors of size " < minorSize < "x" < minorSize;
@@ -640,7 +640,7 @@ void testAllMinors(PrettyPrinter& prpr, string testHeader, int rowCount, int col
 *        all other matrix entries will range from 1 to entryBound and be equally distributed
 */
 void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, int columnCount, int entryBound, int zeroPercentage,
-                        int minorSize, int randomSeed, int cacheEntries, long cacheWeight, int targetMinor,
+                        int minorSize, int randomSeed, int cacheEntries, int cacheWeight, int targetMinor,
                         bool checkForEquality, int maxLoops) {
     long totalTimeStart, totalTime, printTimeStart, printTime;
 
@@ -660,17 +660,17 @@ void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, in
     int* myMatrix = new int[rowCount * columnCount];
     fillRandomMatrix(rowCount, columnCount, randomSeed, zeroPercentage, entryBound, myMatrix);
 
-    LongMinorProcessor mp;
+    IntMinorProcessor mp;
     mp.defineMatrix(rowCount, columnCount, myMatrix);
 
     int myRowIndices[rowCount]; for (int i = 0; i < rowCount; i++) myRowIndices[i] = i; // choosing all rows
     int myColumnIndices[columnCount]; for (int i = 0; i < columnCount; i++) myColumnIndices[i] = i; // choosing all columns
 
     // define the cache:
-    Cache<MinorKey, LongMinorValue> cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
+    Cache<MinorKey, IntMinorValue> cch = Cache<MinorKey, IntMinorValue>(cacheEntries, cacheWeight);
 
     // container for all upcoming results
-    LongMinorValue theMinor;
+    IntMinorValue theMinor;
 
     // counters...
     int k = 1;
@@ -723,7 +723,7 @@ void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, in
         // setting sub-matrix, size of minors of interest within that sub-matrix, and strategy:
         mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
         mp.setMinorSize(minorSize);
-        LongMinorValue::SetRankingStrategy(strategy);
+        IntMinorValue::SetRankingStrategy(strategy);
 
         // counters...
         k = 1;
@@ -734,7 +734,7 @@ void testAllMinorsUntil(PrettyPrinter& prpr, string testHeader, int rowCount, in
 
         // cleaning up and redefinition of the cache:
         cch.clear();
-        cch = Cache<MinorKey, LongMinorValue>(cacheEntries, cacheWeight);
+        cch = Cache<MinorKey, IntMinorValue>(cacheEntries, cacheWeight);
 
         +prpr; +prpr < testHeader < " - using cache - deploying caching strategy #" < strategy;
         +prpr < "computing all minors of size " < minorSize < "x" < minorSize;
