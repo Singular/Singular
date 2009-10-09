@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.58 2009-10-09 12:24:16 Singular Exp $ */
+/* $Id: longalg.cc,v 1.59 2009-10-09 12:27:04 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -166,7 +166,6 @@ static void napTest(napoly p)
 #define napSetCoeff(p,n) {n_Delete(&pGetCoeff(p),nacRing);pGetCoeff(p)=n;}
 #define napComp(p,q)     p_LmCmp((poly)p,(poly)q, nacRing)
 #define napMultT(A,E)    A=(napoly)p_Mult_mm((poly)A,(poly)E,nacRing)
-#define napIsConstant(p) p_LmIsConstant(p,nacRing)
 #define napDeg(p)        (int)p_ExpVectorQuerSum(p, nacRing)
 
 /*3
@@ -415,7 +414,7 @@ void napWrite(napoly p,const BOOLEAN has_denom)
 {
   if (p==NULL)
     StringAppendS("0");
-  else if (napIsConstant(p))
+  else if (p_LmIsConstant(p,nacRing))
   {
     BOOLEAN kl=FALSE;
     if (has_denom)
@@ -435,7 +434,7 @@ void napWrite(napoly p,const BOOLEAN has_denom)
     loop
     {
       BOOLEAN wroteCoeff=FALSE;
-      if ((napIsConstant(p))
+      if ((p_LmIsConstant(p,nacRing))
       || ((!nacIsOne(pGetCoeff(p)))
         && (!nacIsMOne(pGetCoeff(p)))))
       {
@@ -1043,7 +1042,7 @@ number naAdd(number la, number lb)
   }
   //if (x!=NULL)
   //{
-  //  if (napIsConstant(x))
+  //  if (p_LmIsConstant(x,nacRing))
   //  {
   //    number inv=nacInvers(pGetCoeff(x));
   //    napMultN(lu->z,inv);
@@ -1108,7 +1107,7 @@ number naSub(number la, number lb)
   }
   //if (x!=NULL)
   //{
-  //  if (napIsConstant(x))
+  //  if (p_LmIsConstant(x,nacRing))
   //  {
   //    number inv=nacInvers(pGetCoeff(x));
   //    napMultN(lu->z,inv);
@@ -1186,7 +1185,7 @@ number naMult(number la, number lb)
         x = napTailred (x);
     }
   }
-  if ((x!=NULL) && (napIsConstant(x)) && nacIsOne(pGetCoeff(x)))
+  if ((x!=NULL) && (p_LmIsConstant(x,nacRing)) && nacIsOne(pGetCoeff(x)))
     p_Delete(&x,nacRing);
   lo->n = x;
   if(lo->z==NULL)
@@ -1286,7 +1285,7 @@ number naDiv(number la, number lb)
         x = napTailred (x);
     }
   }
-  if ((napIsConstant(x)) && nacIsOne(pGetCoeff(x)))
+  if ((p_LmIsConstant(x,nacRing)) && nacIsOne(pGetCoeff(x)))
     p_Delete(&x,nacRing);
   lo->n = x;
   if (lo->n!=NULL)
@@ -1338,7 +1337,7 @@ number naInvers(number a)
   else
     lo->z = p_ISet(1,nacRing);
   x = b->z;
-  if ((!napIsConstant(x)) || !nacIsOne(pGetCoeff(x)))
+  if ((!p_LmIsConstant(x,nacRing)) || !nacIsOne(pGetCoeff(x)))
     x = napCopy(x);
   else
   {
@@ -1394,7 +1393,7 @@ BOOLEAN naGreaterZero(number za)
   naTest(za);
   if (zb!=NULL)
   {
-    return (nacGreaterZero(pGetCoeff(zb->z))||(!napIsConstant(zb->z)));
+    return (nacGreaterZero(pGetCoeff(zb->z))||(!p_LmIsConstant(zb->z,nacRing)));
   }
   /* else */ return FALSE;
 }
@@ -1564,7 +1563,7 @@ BOOLEAN naIsOne(number za)
 #endif
   if (a->n==NULL)
   {
-    if (napIsConstant(a->z))
+    if (p_LmIsConstant(a->z,nacRing))
     {
       return nacIsOne(pGetCoeff(a->z));
     }
@@ -1623,7 +1622,7 @@ BOOLEAN naIsMOne(number za)
 #endif
   if (a->n==NULL)
   {
-    if (napIsConstant(a->z)) return nacIsMOne(pGetCoeff(a->z));
+    if (p_LmIsConstant(a->z,nacRing)) return nacIsMOne(pGetCoeff(a->z));
     /*else                   return FALSE;*/
   }
   return FALSE;
@@ -1828,7 +1827,7 @@ void naNormalize(number &pp)
       }
     }
   }
-  if (napIsConstant(y)) /* i.e. => simplify to (1/c)*z / monom */
+  if (p_LmIsConstant(y,nacRing)) /* i.e. => simplify to (1/c)*z / monom */
   {
     if (nacIsOne(pGetCoeff(y)))
     {
@@ -2263,7 +2262,7 @@ number naMapQaQb(number c)
     {
       if (p_GetExp(erg->n,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
         erg->n = napRemainder(erg->n, naMinimalPoly);
-      if ((napIsConstant(erg->n)) && nacIsOne(pGetCoeff(erg->n)))
+      if ((p_LmIsConstant(erg->n,nacRing)) && nacIsOne(pGetCoeff(erg->n)))
         p_Delete(&(erg->n),nacRing);
     }
   }
