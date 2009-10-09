@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.323 2009-10-08 14:39:52 seelisch Exp $ */
+/* $Id: extra.cc,v 1.324 2009-10-09 09:05:18 seelisch Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2199,13 +2199,9 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           const int varN   = (const int)(long)h->next->Data();
           {
             /*
-            The following code creates a ring with characteristic fc, order dp and
-            varN variables with the following names: var(j) is j written to the
-            base of 26 with the digit '0' written as 'a', '1' as 'b', ..., and '25'
-            as 'z'.
-            I.e., var(1) has the name 'b', ..., var(25) the name 'z',
-                 var(26) the name 'ba', etc.
-            Afterwards, the new ring will become the current ring.
+            The following code creates and returns a ring with characteristic fc,
+            order dp and varN variables with the names "x1", "x2", ..., "x4711"
+            (in the case varN = 4711).
             The purpose of this rewriting is to eliminate indexed variables,
             as they may cause problems when generating scripts for Magma,
             Maple, or Macaulay2.
@@ -2213,28 +2209,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
             ring newRing = (ring) omAlloc0Bin(sip_sring_bin);
             newRing->ch = fc;
             newRing->N = varN;
+            char h[10];
             newRing->names = (char **) omAlloc0(varN * sizeof(char_ptr));
-            char* alphabet = "abcdefghijklmnopqrstuvwxyz";
-            char theName[10];
-            char tempChars[10];
-            int j; int k; int l;
             for (int i = 1; i <= varN; i++)
             {
-              k = i;
-              l = 9;
-              j = k % 26;
-              tempChars[l--] = alphabet[j];
-              k = (k - j) / 26;
-              while (k != 0)
-              {
-                j = k % 26;
-                tempChars[l--] = alphabet[j];
-                k = (k - j) / 26;
-              }
-              l++;
-              for (j = l; j < 10; j++) theName[j - l] = tempChars[j];
-              theName[10 - l] = '\0';
-              newRing->names[i - 1] = omStrDup(theName);
+              sprintf(h, "x%d", i);
+              newRing->names[i - 1] = omStrDup(h);
             }
             newRing->wvhdl = (int **)omAlloc0(2 * sizeof(int_ptr));
             newRing->order = (int *)omAlloc(2* sizeof(int *));
