@@ -11,6 +11,7 @@ int testIntMinors (const int dummy);
 int testAllPolyMinors(matrix m, int minorSize, int strategies, int cacheEntries, int cacheWeight,
                       int dumpMinors, int dumpResults, int dumpComplete, int dumpConsole);
 ideal testAllPolyMinorsAsIdeal(matrix m, int minorSize, int strategy, int cacheEntries, int cacheWeight);
+ideal testAllIntMinorsAsIdeal(matrix m, int minorSize, int strategy, int cacheEntries, int cacheWeight, int characteristic);
 void testStuff (const poly p);
 
 #endif // HAVE_MINOR

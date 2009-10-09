@@ -269,31 +269,31 @@ void IntMinorProcessor::defineMatrix (const int numberOfRows, const int numberOf
 }
 
 IntMinorValue IntMinorProcessor::getMinor(const int dimension, const int* rowIndices, const int* columnIndices,
-                                            Cache<MinorKey, IntMinorValue>& c) {
+                                            Cache<MinorKey, IntMinorValue>& c, const int characteristic) {
     defineSubMatrix(dimension, rowIndices, dimension, columnIndices);
     _minorSize = dimension;
     // call a helper method which recursively computes the minor using the cache c:
-    return getMinorPrivate(dimension, _container, false, c);
+    return getMinorPrivate(dimension, _container, false, c, characteristic);
 }
 
-IntMinorValue IntMinorProcessor::getMinor(const int dimension, const int* rowIndices, const int* columnIndices) {
+IntMinorValue IntMinorProcessor::getMinor(const int dimension, const int* rowIndices, const int* columnIndices, const int characteristic) {
     defineSubMatrix(dimension, rowIndices, dimension, columnIndices);
     _minorSize = dimension;
     // call a helper method which recursively computes the minor (without using a cache):
-    return getMinorPrivate(_minorSize, _container);
+    return getMinorPrivate(_minorSize, _container, characteristic);
 }
 
-IntMinorValue IntMinorProcessor::getNextMinor() {
+IntMinorValue IntMinorProcessor::getNextMinor(const int characteristic) {
     // computation without cache
-    return getMinorPrivate(_minorSize, _minor);
+    return getMinorPrivate(_minorSize, _minor, characteristic);
 }
 
-IntMinorValue IntMinorProcessor::getNextMinor(Cache<MinorKey, IntMinorValue>& c) {
+IntMinorValue IntMinorProcessor::getNextMinor(Cache<MinorKey, IntMinorValue>& c, const int characteristic) {
     // computation with cache
-    return getMinorPrivate(_minorSize, _minor, true, c);
+    return getMinorPrivate(_minorSize, _minor, true, c, characteristic);
 }
 
-IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk) {
+IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk, const int characteristic) {
     assert(k > 0); // k is the minor's dimension; the minor must be at least 1x1
     // The method works by recursion, and using Lapace's Theorem along the row/column with the most zeros.
     if (k == 1) {
@@ -316,13 +316,14 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
                 int absoluteC = mk.getAbsoluteColumnIndex(c);      // This iterates over all involved columns.
                 MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey when we omit row b and column absoluteC.
                 if (_matrix[b][absoluteC] != 0) { // Only then do we have to consider this sub-determinante.
-                    IntMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
+                    IntMinorValue mv = getMinorPrivate(k - 1, subMk, characteristic);  // recursive call
                     m += mv.getMultiplications();
                     s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
                     as += mv.getAccumulatedAdditions();
                     result += sign * mv.getResult() * _matrix[b][absoluteC]; // adding sub-determinante times matrix entry
                                                                              // times appropriate sign
+                    if (characteristic != 0) result = result % characteristic;
                     s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
@@ -338,13 +339,14 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
                 int absoluteR = mk.getAbsoluteRowIndex(r);        // This iterates over all involved rows.
                 MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey when we omit row absoluteR and column b.
                 if (_matrix[absoluteR][b] != 0) { // Only then do we have to consider this sub-determinante.
-                    IntMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
+                    IntMinorValue mv = getMinorPrivate(k - 1, subMk, characteristic);  // recursive call
                     m += mv.getMultiplications();
                     s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
                     as += mv.getAccumulatedAdditions();
                     result += sign * mv.getResult() * _matrix[absoluteR][b]; // adding sub-determinante times matrix entry
                                                                              // times appropriate sign
+                    if (characteristic != 0) result = result % characteristic;
                     s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
@@ -361,8 +363,9 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
 }
 
 IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk,
-                                                   const bool multipleMinors,
-                                                   Cache<MinorKey, IntMinorValue>& cch) {
+                                                 const bool multipleMinors,
+                                                 Cache<MinorKey, IntMinorValue>& cch,
+                                                 const int characteristic) {
     assert(k > 0); // k is the minor's dimension; the minor must be at least 1x1
     // The method works by recursion, and using Lapace's Theorem along the row/column with the most zeros.
     if (k == 1) {
@@ -391,7 +394,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
                                             // an impact on the internal ordering among cache entries.
                     }
                     else {
-                        mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch); // recursive call
+                        mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch, characteristic); // recursive call
                         // As this minor was not in the cache, we count the additions and
                         // multiplications that we needed to do in the recursive call:
                         m += mv.getMultiplications();
@@ -402,6 +405,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
                     as += mv.getAccumulatedAdditions();
                     result += sign * mv.getResult() * _matrix[b][absoluteC]; // adding sub-determinante times matrix entry
                                                                              // times appropriate sign
+                    if (characteristic != 0) result = result % characteristic;
                     s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
@@ -424,7 +428,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
                                             // an impact on the internal ordering among cache entries.
                     }
                     else {
-                        mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch); // recursive call
+                        mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch, characteristic); // recursive call
                         // As this minor was not in the cache, we count the additions and
                         // multiplications that we needed to do in the recursive call:
                         m += mv.getMultiplications();
@@ -435,6 +439,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
                     as += mv.getAccumulatedAdditions();
                     result += sign * mv.getResult() * _matrix[absoluteR][b]; // adding sub-determinante times matrix entry
                                                                              // times appropriate sign
+                    if (characteristic != 0) result = result % characteristic;
                     s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign

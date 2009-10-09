@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.324 2009-10-09 09:05:18 seelisch Exp $ */
+/* $Id: extra.cc,v 1.325 2009-10-09 13:46:30 seelisch Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2146,11 +2146,33 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           ideal iii = testAllPolyMinorsAsIdeal(m, k, strategy, cacheEntries, cacheWeight);
             // starts the computation of all k x k minors in the
             // provided matrix m (which is assumed to have polynomial
-            // entries) using a cache with 200 entries and a maximum total
-            // number of 10000 cached monomials;
+            // entries);
             // when calling this method, a ring must be declared before;
-            // there will be a run without using a cache; afterwards all 5
-            // caching strategies will be run
+            // there will be one run using a cache with specified properties
+          res->rtyp = IDEAL_CMD;
+          res->data = iii;
+        }
+        else if ((h->Typ() == MATRIX_CMD) &&
+                 (h->next->Typ() == INT_CMD) &&
+                 (h->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->next == NULL))
+        {
+          const matrix m           = (const matrix)h->Data();
+          const int k              = (const int)(long)h->next->Data();
+          const int strategy       = (const int)(long)h->next->next->Data();
+          const int cacheEntries   = (const int)(long)h->next->next->next->Data();
+          const int cacheWeight    = (const int)(long)h->next->next->next->next->Data();
+          const int characteristic = (const int)(long)h->next->next->next->next->next->Data();
+          ideal iii = testAllIntMinorsAsIdeal(m, k, strategy, cacheEntries, cacheWeight, characteristic);
+            // starts the computation of all k x k minors in the
+            // provided matrix m (which is assumed to have integer
+            // entries);
+            // when calling this method, a ring must be declared before;
+            // there will be one run using a cache with specified properties;
+            // the resulting minors will be computed modulo the given characteristic
           res->rtyp = IDEAL_CMD;
           res->data = iii;
         }
@@ -2161,7 +2183,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                  (h->next->next->next->next->Typ() == INT_CMD) &&
                  (h->next->next->next->next->next->Typ() == INT_CMD) &&
                  (h->next->next->next->next->next->next->Typ() == INT_CMD) &&
-                 (h->next->next->next->next->next->next->next->Typ() == INT_CMD))
+                 (h->next->next->next->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->next->next->next == NULL))
         {
           const matrix m           = (const matrix)h->Data();
           const int k              = (const int)(long)h->next->Data();

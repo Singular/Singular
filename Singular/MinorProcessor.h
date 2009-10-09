@@ -236,8 +236,9 @@ class IntMinorProcessor : public MinorProcessor {
         * @see MinorProcessor::getMinorPrivate (const int, const MinorKey&)
         */
         IntMinorValue getMinorPrivate (const int k, const MinorKey& mk,
-                                        const bool multipleMinors,
-                                        Cache<MinorKey, IntMinorValue>& c);
+                                       const bool multipleMinors,
+                                       Cache<MinorKey, IntMinorValue>& c,
+                                       int characteristic);
 
         /**
         * A method for computing the value of a minor, without using a cache.<br>
@@ -249,7 +250,7 @@ class IntMinorProcessor : public MinorProcessor {
         * @return an instance of MinorValue representing the value of the corresponding minor
         * @see MinorProcessor::getMinorPrivate (const int, const MinorKey&, const bool, Cache<MinorKey, MinorValue>&)
         */
-        IntMinorValue getMinorPrivate (const int k, const MinorKey& mk);
+        IntMinorValue getMinorPrivate (const int k, const MinorKey& mk, int characteristic);
     protected:
         bool isEntryZero (const int absoluteRowIndex, const int absoluteColumnIndex) const;
     public:
@@ -283,7 +284,7 @@ class IntMinorProcessor : public MinorProcessor {
         * @return an instance of MinorValue representing the value of the corresponding minor
         * @see MinorProcessor::getMinor (const int, const int*, const int*, Cache<MinorKey, MinorValue>&)
         */
-        IntMinorValue getMinor (const int dimension, const int* rowIndices, const int* columnIndices);
+        IntMinorValue getMinor (const int dimension, const int* rowIndices, const int* columnIndices, const int characteristic);
 
         /**
         * A method for computing the value of a minor, using a cache.<br>
@@ -298,7 +299,7 @@ class IntMinorProcessor : public MinorProcessor {
         * @see MinorProcessor::getMinor (const int, const int*, const int*)
         */
         IntMinorValue getMinor (const int dimension, const int* rowIndices, const int* columnIndices,
-                                 Cache<MinorKey, IntMinorValue>& c);
+                                 Cache<MinorKey, IntMinorValue>& c, const int characteristic);
 
         /**
         * A method for obtaining the next minor when iterating
@@ -310,7 +311,7 @@ class IntMinorProcessor : public MinorProcessor {
         * @see MinorProcessor::getMinor (const int, const int*, const int*)
         * @see MinorProcessor::hasNextMinor ()
         */
-        IntMinorValue getNextMinor ();
+        IntMinorValue getNextMinor (const int characteristic);
 
         /**
         * A method for obtaining the next minor when iterating
@@ -323,7 +324,7 @@ class IntMinorProcessor : public MinorProcessor {
         * @see MinorProcessor::getMinor (const int, const int*, const int*)
         * @see MinorProcessor::hasNextMinor ()
         */
-        IntMinorValue getNextMinor (Cache<MinorKey, IntMinorValue>& c);
+        IntMinorValue getNextMinor (Cache<MinorKey, IntMinorValue>& c, const int characteristic);
 
         /**
         * A method for providing a printable version of the represented MinorProcessor.
