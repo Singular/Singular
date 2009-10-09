@@ -424,11 +424,24 @@ ideal testAllIntMinorsAsIdeal(matrix mat, int minorSize, int strategy, int cache
   int rowCount = mat->nrows;
   int columnCount = mat->ncols;
 
-  int* myPolyMatrix = (int*)(mat->m);
-  IntMinorProcessor mp;
-  mp.defineMatrix(rowCount, columnCount, myPolyMatrix);
+  poly* myPolyMatrix = (poly*)(mat->m);
+  int theSize = rowCount * columnCount;
+  int myIntMatrix[theSize]; int vv;
+  for (int i = 0; i < theSize; i++)
+  {
+    vv = 0;
+    if (myPolyMatrix[i] != NULL)
+    {
+      vv = n_Int(pGetCoeff(myPolyMatrix[i]), currRing);
+      if (characteristic != 0) vv = vv % characteristic;
+    }
+    myIntMatrix[i] = vv;
+  }
 
-  /* The next lines are for defining the sub-matrix of myPolyMatrix
+  IntMinorProcessor mp;
+  mp.defineMatrix(rowCount, columnCount, myIntMatrix);
+
+  /* The next lines are for defining the sub-matrix of myIntMatrix
      from which we want to compute all k x k - minors.
      In the given setting, we want the entire matrix to form the sub-matrix. */
   int minorRows = rowCount;
