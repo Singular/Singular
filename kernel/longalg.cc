@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.56 2009-10-08 17:02:33 Singular Exp $ */
+/* $Id: longalg.cc,v 1.57 2009-10-09 12:21:25 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -163,7 +163,6 @@ static void napTest(napoly p)
 #define napTest(p) ((void) 0)
 #endif
 
-#define napInit(i)       (napoly)p_ISet(i,nacRing)
 #define napSetCoeff(p,n) {n_Delete(&pGetCoeff(p),nacRing);pGetCoeff(p)=n;}
 #define napDelete1(p)    p_LmDelete((poly *)p, nacRing)
 #define napComp(p,q)     p_LmCmp((poly)p,(poly)q, nacRing)
@@ -325,7 +324,7 @@ static napoly napInvers(napoly x, const napoly c)
   if (p_GetExp(r,1,nacRing)==0)
   {
     q = p_Mult_q(q, qa,nacRing);
-    q = napAdd(q, napInit(1));
+    q = napAdd(q, p_ISet(1,nacRing));
     nacNormalize(pGetCoeff(r));
     t = nacInvers(pGetCoeff(r));
     napMultN(q, t);
@@ -338,7 +337,7 @@ static napoly napInvers(napoly x, const napoly c)
     return q;
   }
   q = p_Mult_q(q, napCopy(qa),nacRing);
-  q = napAdd(q, napInit(1));
+  q = napAdd(q, p_ISet(1,nacRing));
   qa = napNeg(qa);
   loop
   {
@@ -669,7 +668,7 @@ static napoly napGcd0(napoly a, napoly b)
 {
   number x, y;
   if (!naIsChar0)
-    return napInit(1);
+    return p_ISet(1,nacRing);
   x = nacCopy(pGetCoeff(a));
   if (nacIsOne(x))
     return napInitz(x);
@@ -708,7 +707,7 @@ static napoly napGcd(napoly a, napoly b)
     if ((b==NULL)
     || ((pNext(b)==NULL)&&(nacIsZero(pGetCoeff(b)))))
     {
-      return napInit(1);
+      return p_ISet(1,nacRing);
     }
     return napCopy(b);
   }
@@ -730,7 +729,7 @@ static napoly napGcd(napoly a, napoly b)
       x = b;
       y = a;
     }
-    if (!naIsChar0) g = napInit(1);
+    if (!naIsChar0) g = p_ISet(1,nacRing);
     else            g = napGcd0(x, y);
     if (pNext(y)==NULL)
     {
@@ -766,7 +765,7 @@ static napoly napGcd(napoly a, napoly b)
   // x = (napoly)p_Init(nacRing);
   g=a;
   h=b;
-  if (!naIsChar0) x = napInit(1);
+  if (!naIsChar0) x = p_ISet(1,nacRing);
   else            x = napGcd0(g,h);
   for (i=(naNumbOfPar-1); i>=0; i--)
   {
@@ -912,7 +911,7 @@ number  naPar(int i)
 {
   lnumber l = (lnumber)omAllocBin(rnumber_bin);
   l->s = 2;
-  l->z = napInit(1);
+  l->z = p_ISet(1,nacRing);
   napSetExp(l->z,i,1);
   p_Setm(l->z,nacRing);
   l->n = NULL;
@@ -1338,7 +1337,7 @@ number naInvers(number a)
   if (b->n!=NULL)
     lo->z = napCopy(b->n);
   else
-    lo->z = napInit(1);
+    lo->z = p_ISet(1,nacRing);
   x = b->z;
   if ((!napIsConstant(x)) || !nacIsOne(pGetCoeff(x)))
     x = napCopy(x);
@@ -1597,7 +1596,7 @@ BOOLEAN naIsOne(number za)
   if ((x!=NULL) || (y!=NULL)) return FALSE;
   p_Delete(&a->z,nacRing);
   p_Delete(&a->n,nacRing);
-  a->z = napInit(1);
+  a->z = p_ISet(1,nacRing);
   a->n = NULL;
   a->s = 2;
   return TRUE;
@@ -2002,7 +2001,7 @@ number naLcm(number la, number lb, const ring r)
   result = (lnumber)omAlloc0Bin(rnumber_bin);
   //if (((naMinimalPoly==NULL) && (naI==NULL)) || !naIsChar0)
   //{
-  //  result->z = napInit(1);
+  //  result->z = p_ISet(1,nacRing);
   //  return (number)result;
   //}
   //naNormalize(lb);
