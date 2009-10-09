@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.59 2009-10-09 12:27:04 Singular Exp $ */
+/* $Id: longalg.cc,v 1.60 2009-10-09 17:44:07 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -194,15 +194,16 @@ static napoly napCopyNeg(napoly p)
 static void napMultN(napoly p, number z)
 {
   number t;
+  poly pp=p;
 
   while (p!=NULL)
   {
     t = nacMult(pGetCoeff(p), z);
-    nacNormalize(t);
     n_Delete(&pGetCoeff(p),nacRing);
     pGetCoeff(p) = t;
     pIter(p);
   }
+  p_Normalize(pp,nacRing);
 }
 
 /*3
@@ -223,10 +224,8 @@ napoly napRemainder(napoly f, const napoly  g)
     napSetm(qq);
     pGetCoeff(qq) = nacDiv(pGetCoeff(a), pGetCoeff(g));
     pGetCoeff(qq) = nacNeg(pGetCoeff(qq));
-    nacNormalize(pGetCoeff(qq));
     h = napCopy(g);
     napMultT(h, qq);
-    p_Normalize(h,nacRing);
     n_Delete(&pGetCoeff(qq),nacRing);
     a = napAdd(a, h);
   }
@@ -257,7 +256,6 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
     pGetCoeff(qq) = nacNeg(pGetCoeff(qq));
     h = napCopy(g);
     napMultT(h, qq);
-    p_Normalize(h,nacRing);
     n_Delete(&pGetCoeff(qq),nacRing);
     a = napAdd(a, h);
   }
@@ -285,7 +283,6 @@ static napoly napInvers(napoly x, const napoly c)
   {
     if (!nacIsOne(pGetCoeff(x)))
     {
-      nacNormalize(pGetCoeff(x));
       t = nacInvers(pGetCoeff(x));
       nacNormalize(t);
       n_Delete(&pGetCoeff(x),nacRing);
@@ -301,13 +298,10 @@ static napoly napInvers(napoly x, const napoly c)
   }
   if (p_GetExp(r,1,nacRing)==0)
   {
-    nacNormalize(pGetCoeff(r));
     t = nacInvers(pGetCoeff(r));
-    nacNormalize(t);
     t = nacNeg(t);
     napMultN(qa, t);
     n_Delete(&t,nacRing);
-    p_Normalize(qa,nacRing);
     p_Delete(&x,nacRing);
     p_Delete(&r,nacRing);
     return qa;
@@ -323,10 +317,8 @@ static napoly napInvers(napoly x, const napoly c)
   {
     q = p_Mult_q(q, qa,nacRing);
     q = napAdd(q, p_ISet(1,nacRing));
-    nacNormalize(pGetCoeff(r));
     t = nacInvers(pGetCoeff(r));
     napMultN(q, t);
-    p_Normalize(q,nacRing);
     n_Delete(&t,nacRing);
     p_Delete(&x,nacRing);
     p_Delete(&r,nacRing);
@@ -351,11 +343,8 @@ static napoly napInvers(napoly x, const napoly c)
       q = p_Mult_q(q, qn,nacRing);
       q = napNeg(q);
       q = napAdd(q, qa);
-      nacNormalize(pGetCoeff(r));
       t = nacInvers(pGetCoeff(r));
-      //nacNormalize(t);
       napMultN(q, t);
-      p_Normalize(q,nacRing);
       n_Delete(&t,nacRing);
       p_Delete(&x,nacRing);
       p_Delete(&r,nacRing);
@@ -946,7 +935,6 @@ int     naSize(number n)     /* size desc. */
 int naInt(number &n, const ring r)
 {
   lnumber l=(lnumber)n;
-  naNormalize(n);
   if ((l!=NULL)&&(l->n==NULL)&&(p_IsConstant(l->z,r->algring)))
   {
     return nacInt(pGetCoeff(l->z),r->algring);
@@ -977,7 +965,6 @@ number naCopy(number p)
 {
   if (p==NULL) return NULL;
   naTest(p);
-  //naNormalize(p);
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
@@ -1052,12 +1039,9 @@ number naAdd(number la, number lb)
   //}
   lu->n = x;
   lu->s = FALSE;
-  if (lu->n!=NULL)
-  {
-     number luu=(number)lu;
-     naNormalize(luu);
-     lu=(lnumber)luu;
-  }
+  number luu=(number)lu;
+  naCoefNormalize(luu);
+  lu=(lnumber)luu;
   naTest((number)lu);
   return (number)lu;
 }
@@ -1117,12 +1101,9 @@ number naSub(number la, number lb)
   //}
   lu->n = x;
   lu->s = FALSE;
-  if (lu->n!=NULL)
-  {
-     number luu=(number)lu;
-     naNormalize(luu);
-     lu=(lnumber)luu;
-  }
+  number luu=(number)lu;
+  naCoefNormalize(luu);
+  lu=(lnumber)luu;
   naTest((number)lu);
   return (number)lu;
 }
@@ -1193,17 +1174,13 @@ number naMult(number la, number lb)
     omFreeBin((ADDRESS)lo, rnumber_bin);
     lo=NULL;
   }
-#if 1
-  else if (lo->n!=NULL)
+  else
   {
     lo->s = 0;
     number luu=(number)lo;
-    naNormalize(luu);
+    naCoefNormalize(luu);
     lo=(lnumber)luu;
   }
-  else
-    lo->s=3;
-#endif
   naTest((number)lo);
   return (number)lo;
 }
@@ -1288,15 +1265,9 @@ number naDiv(number la, number lb)
   if ((p_LmIsConstant(x,nacRing)) && nacIsOne(pGetCoeff(x)))
     p_Delete(&x,nacRing);
   lo->n = x;
-  if (lo->n!=NULL)
-  {
-    lo->s = 0;
-    number luu=(number)lo;
-    naNormalize(luu);
-    lo=(lnumber)luu;
-  }
-  else
-    lo->s=3;
+  number luu=(number)lo;
+  naCoefNormalize(luu);
+  lo=(lnumber)luu;
   naTest((number)lo);
   return (number)lo;
 }
