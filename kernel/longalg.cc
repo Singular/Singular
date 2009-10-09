@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.57 2009-10-09 12:21:25 Singular Exp $ */
+/* $Id: longalg.cc,v 1.58 2009-10-09 12:24:16 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -164,7 +164,6 @@ static void napTest(napoly p)
 #endif
 
 #define napSetCoeff(p,n) {n_Delete(&pGetCoeff(p),nacRing);pGetCoeff(p)=n;}
-#define napDelete1(p)    p_LmDelete((poly *)p, nacRing)
 #define napComp(p,q)     p_LmCmp((poly)p,(poly)q, nacRing)
 #define napMultT(A,E)    A=(napoly)p_Mult_mm((poly)A,(poly)E,nacRing)
 #define napIsConstant(p) p_LmIsConstant(p,nacRing)
@@ -515,7 +514,7 @@ static const char  *napRead(const char *s, napoly *b)
     s = nacRead(s, &pGetCoeff(a));
     if (nacIsZero(pGetCoeff(a)))
     {
-      napDelete1(&a);
+      p_LmDelete(&a,nacRing);
       *b = NULL;
       return s;
     }
@@ -747,7 +746,7 @@ static napoly napGcd(napoly a, napoly b)
         napCleardenom(y);
         if (!nacIsOne(pGetCoeff(g)))
           napMultN(y, pGetCoeff(g));
-        napDelete1(&g);
+        p_LmDelete(&g,nacRing);
         return y;
       }
       else if (pNext(h)==NULL)
@@ -756,7 +755,7 @@ static napoly napGcd(napoly a, napoly b)
       y = h;
     }
     p_Delete(&y,nacRing);
-    napDelete1(&h);
+    p_LmDelete(&h,nacRing);
     napSetExp(g,1, napExp(a, b));
     p_Setm(g,nacRing);
     return g;
@@ -1833,7 +1832,7 @@ void naNormalize(number &pp)
   {
     if (nacIsOne(pGetCoeff(y)))
     {
-      napDelete1(&y);
+      p_LmDelete(&y,nacRing);
       p->n = NULL;
       naTest(pp);
       return;
@@ -1842,7 +1841,7 @@ void naNormalize(number &pp)
     nacNormalize(h1);
     napMultN(x, h1);
     n_Delete(&h1,nacRing);
-    napDelete1(&y);
+    p_LmDelete(&y,nacRing);
     p->n = NULL;
     naTest(pp);
     return;
@@ -1908,7 +1907,7 @@ void naNormalize(number &pp)
       {
         if (p_GetExp(y,1,nacRing)==0)
         {
-          napDelete1(&y);
+          p_LmDelete(&y,nacRing);
           p->n = NULL;
         }
         naTest(pp);
