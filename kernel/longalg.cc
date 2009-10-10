@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.60 2009-10-09 17:44:07 Singular Exp $ */
+/* $Id: longalg.cc,v 1.61 2009-10-10 10:44:37 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -68,6 +68,8 @@ static int napExpi(int i, napoly a, napoly b);
        ring nacRing;
 
 #define napCopy(p)       p_Copy(p,nacRing)
+
+void naCoefNormalize(number pp);
 
 static number nadGcd( number a, number b, const ring r) { return nacInit(1,r); }
 /*2
