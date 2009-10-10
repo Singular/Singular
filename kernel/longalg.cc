@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.61 2009-10-10 10:44:37 Singular Exp $ */
+/* $Id: longalg.cc,v 1.62 2009-10-10 17:15:40 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -68,8 +68,6 @@ static int napExpi(int i, napoly a, napoly b);
        ring nacRing;
 
 #define napCopy(p)       p_Copy(p,nacRing)
-
-void naCoefNormalize(number pp);
 
 static number nadGcd( number a, number b, const ring r) { return nacInit(1,r); }
 /*2
@@ -196,16 +194,15 @@ static napoly napCopyNeg(napoly p)
 static void napMultN(napoly p, number z)
 {
   number t;
-  poly pp=p;
 
   while (p!=NULL)
   {
     t = nacMult(pGetCoeff(p), z);
+    nacNormalize(t);
     n_Delete(&pGetCoeff(p),nacRing);
     pGetCoeff(p) = t;
     pIter(p);
   }
-  p_Normalize(pp,nacRing);
 }
 
 /*3
@@ -226,8 +223,10 @@ napoly napRemainder(napoly f, const napoly  g)
     napSetm(qq);
     pGetCoeff(qq) = nacDiv(pGetCoeff(a), pGetCoeff(g));
     pGetCoeff(qq) = nacNeg(pGetCoeff(qq));
+    nacNormalize(pGetCoeff(qq));
     h = napCopy(g);
     napMultT(h, qq);
+    p_Normalize(h,nacRing);
     n_Delete(&pGetCoeff(qq),nacRing);
     a = napAdd(a, h);
   }
@@ -258,6 +257,7 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
     pGetCoeff(qq) = nacNeg(pGetCoeff(qq));
     h = napCopy(g);
     napMultT(h, qq);
+    p_Normalize(h,nacRing);
     n_Delete(&pGetCoeff(qq),nacRing);
     a = napAdd(a, h);
   }
@@ -285,6 +285,7 @@ static napoly napInvers(napoly x, const napoly c)
   {
     if (!nacIsOne(pGetCoeff(x)))
     {
+      nacNormalize(pGetCoeff(x));
       t = nacInvers(pGetCoeff(x));
       nacNormalize(t);
       n_Delete(&pGetCoeff(x),nacRing);
@@ -300,10 +301,13 @@ static napoly napInvers(napoly x, const napoly c)
   }
   if (p_GetExp(r,1,nacRing)==0)
   {
+    nacNormalize(pGetCoeff(r));
     t = nacInvers(pGetCoeff(r));
+    nacNormalize(t);
     t = nacNeg(t);
     napMultN(qa, t);
     n_Delete(&t,nacRing);
+    p_Normalize(qa,nacRing);
     p_Delete(&x,nacRing);
     p_Delete(&r,nacRing);
     return qa;
@@ -319,8 +323,10 @@ static napoly napInvers(napoly x, const napoly c)
   {
     q = p_Mult_q(q, qa,nacRing);
     q = napAdd(q, p_ISet(1,nacRing));
+    nacNormalize(pGetCoeff(r));
     t = nacInvers(pGetCoeff(r));
     napMultN(q, t);
+    p_Normalize(q,nacRing);
     n_Delete(&t,nacRing);
     p_Delete(&x,nacRing);
     p_Delete(&r,nacRing);
@@ -345,8 +351,11 @@ static napoly napInvers(napoly x, const napoly c)
       q = p_Mult_q(q, qn,nacRing);
       q = napNeg(q);
       q = napAdd(q, qa);
+      nacNormalize(pGetCoeff(r));
       t = nacInvers(pGetCoeff(r));
+      //nacNormalize(t);
       napMultN(q, t);
+      p_Normalize(q,nacRing);
       n_Delete(&t,nacRing);
       p_Delete(&x,nacRing);
       p_Delete(&r,nacRing);
@@ -937,6 +946,7 @@ int     naSize(number n)     /* size desc. */
 int naInt(number &n, const ring r)
 {
   lnumber l=(lnumber)n;
+  naNormalize(n);
   if ((l!=NULL)&&(l->n==NULL)&&(p_IsConstant(l->z,r->algring)))
   {
     return nacInt(pGetCoeff(l->z),r->algring);
@@ -967,6 +977,7 @@ number naCopy(number p)
 {
   if (p==NULL) return NULL;
   naTest(p);
+  //naNormalize(p);
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
@@ -1041,9 +1052,12 @@ number naAdd(number la, number lb)
   //}
   lu->n = x;
   lu->s = FALSE;
-  number luu=(number)lu;
-  naCoefNormalize(luu);
-  lu=(lnumber)luu;
+  if (lu->n!=NULL)
+  {
+     number luu=(number)lu;
+     naNormalize(luu);
+     lu=(lnumber)luu;
+  }
   naTest((number)lu);
   return (number)lu;
 }
@@ -1103,9 +1117,12 @@ number naSub(number la, number lb)
   //}
   lu->n = x;
   lu->s = FALSE;
-  number luu=(number)lu;
-  naCoefNormalize(luu);
-  lu=(lnumber)luu;
+  if (lu->n!=NULL)
+  {
+     number luu=(number)lu;
+     naNormalize(luu);
+     lu=(lnumber)luu;
+  }
   naTest((number)lu);
   return (number)lu;
 }
@@ -1176,13 +1193,17 @@ number naMult(number la, number lb)
     omFreeBin((ADDRESS)lo, rnumber_bin);
     lo=NULL;
   }
-  else
+#if 1
+  else if (lo->n!=NULL)
   {
     lo->s = 0;
     number luu=(number)lo;
-    naCoefNormalize(luu);
+    naNormalize(luu);
     lo=(lnumber)luu;
   }
+  else
+    lo->s=3;
+#endif
   naTest((number)lo);
   return (number)lo;
 }
@@ -1267,9 +1288,15 @@ number naDiv(number la, number lb)
   if ((p_LmIsConstant(x,nacRing)) && nacIsOne(pGetCoeff(x)))
     p_Delete(&x,nacRing);
   lo->n = x;
-  number luu=(number)lo;
-  naCoefNormalize(luu);
-  lo=(lnumber)luu;
+  if (lo->n!=NULL)
+  {
+    lo->s = 0;
+    number luu=(number)lo;
+    naNormalize(luu);
+    lo=(lnumber)luu;
+  }
+  else
+    lo->s=3;
   naTest((number)lo);
   return (number)lo;
 }
@@ -1688,8 +1715,6 @@ void naCoefNormalize(number pp)
   lnumber p = (lnumber)pp;
   number nz; // all denom. of the numerator
   nz=p_GetAllDenom(p->z,nacRing);
-  number nn;
-  nn=p_GetAllDenom(p->n,nacRing);
   BOOLEAN norm=FALSE;
   if (!n_IsOne(nz,nacRing))
   {
@@ -1709,6 +1734,14 @@ void naCoefNormalize(number pp)
   {
     n_Delete(&nz, nacRing);
   }
+  if (norm)
+  {
+    norm=FALSE;
+    p_Normalize(p->z,nacRing);
+    p_Normalize(p->n,nacRing);
+  }
+  number nn;
+  nn=p_GetAllDenom(p->n,nacRing);
   if (!n_IsOne(nn,nacRing))
   {
     norm=TRUE;
@@ -1725,6 +1758,47 @@ void naCoefNormalize(number pp)
     p_Normalize(p->z,nacRing);
     p_Normalize(p->n,nacRing);
   }
+  // remove common factors in n, z:
+  if (p->n!=NULL)
+  {
+    poly pp=p->z;
+    nz=n_Copy(pGetCoeff(pp),nacRing);
+    pIter(pp);
+    while(pp!=NULL)
+    { 
+      if (n_IsOne(nz,nacRing)) break;
+      number d=n_Gcd(nz,pGetCoeff(pp),nacRing);
+      n_Delete(&nz,nacRing); nz=d;
+      pIter(pp);
+    }
+    if (!n_IsOne(nz,nacRing))
+    {
+      pp=p->n;
+      nn=n_Copy(pGetCoeff(pp),nacRing);
+      pIter(pp);
+      while(pp!=NULL)
+      { 
+        if (n_IsOne(nn,nacRing)) break;
+        number d=n_Gcd(nn,pGetCoeff(pp),nacRing);
+        n_Delete(&nn,nacRing); nn=d;
+        pIter(pp);
+      }
+      number ng=n_Gcd(nz,nn,nacRing);
+      n_Delete(&nn,nacRing);
+      if (!n_IsOne(ng,nacRing))
+      {
+        number ni=n_Invers(ng,nacRing);
+	p->z=p_Mult_nn(p->z,ni,nacRing);
+	p->n=p_Mult_nn(p->n,ni,nacRing);
+        p_Normalize(p->z,nacRing);
+        p_Normalize(p->n,nacRing);
+	n_Delete(&ni,nacRing);
+      }
+      n_Delete(&ng,nacRing);
+    }
+    n_Delete(&nz,nacRing);
+  }
+
   if ((p->n!=NULL)
   && (p_IsConstant(p->n,nacRing))
   && (n_IsOne(pGetCoeff(p->n),nacRing)))
