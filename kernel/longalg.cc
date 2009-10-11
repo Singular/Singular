@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.cc,v 1.62 2009-10-10 17:15:40 Singular Exp $ */
+/* $Id: longalg.cc,v 1.63 2009-10-11 14:19:08 Singular Exp $ */
 /*
 * ABSTRACT:   algebraic numbers
 */
@@ -66,6 +66,8 @@ static napoly napTailred(napoly q);
 static BOOLEAN napDivPoly(napoly p, napoly q);
 static int napExpi(int i, napoly a, napoly b);
        ring nacRing;
+
+void naCoefNormalize(number pp);
 
 #define napCopy(p)       p_Copy(p,nacRing)
 
@@ -946,7 +948,6 @@ int     naSize(number n)     /* size desc. */
 int naInt(number &n, const ring r)
 {
   lnumber l=(lnumber)n;
-  naNormalize(n);
   if ((l!=NULL)&&(l->n==NULL)&&(p_IsConstant(l->z,r->algring)))
   {
     return nacInt(pGetCoeff(l->z),r->algring);
@@ -977,7 +978,6 @@ number naCopy(number p)
 {
   if (p==NULL) return NULL;
   naTest(p);
-  //naNormalize(p);
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
@@ -1055,7 +1055,9 @@ number naAdd(number la, number lb)
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
-     naNormalize(luu);
+     //if (p_IsConstant(lu->n,nacRing)) naCoefNormalize(luu);
+     //else            
+                naNormalize(luu);
      lu=(lnumber)luu;
   }
   naTest((number)lu);
@@ -1105,22 +1107,14 @@ number naSub(number la, number lb)
     if (b->n!=NULL) x = napCopy(b->n);
     else            x = NULL;
   }
-  //if (x!=NULL)
-  //{
-  //  if (p_LmIsConstant(x,nacRing))
-  //  {
-  //    number inv=nacInvers(pGetCoeff(x));
-  //    napMultN(lu->z,inv);
-  //    n_Delete(&inv,nacRing);
-  //    napDelete(&x);
-  //  }
-  //}
   lu->n = x;
   lu->s = FALSE;
   if (lu->n!=NULL)
   {
      number luu=(number)lu;
-     naNormalize(luu);
+     //if (p_IsConstant(lu->n,nacRing)) naCoefNormalize(luu);
+     //else   
+                         naNormalize(luu);
      lu=(lnumber)luu;
   }
   naTest((number)lu);
@@ -1193,17 +1187,15 @@ number naMult(number la, number lb)
     omFreeBin((ADDRESS)lo, rnumber_bin);
     lo=NULL;
   }
-#if 1
   else if (lo->n!=NULL)
   {
     lo->s = 0;
     number luu=(number)lo;
-    naNormalize(luu);
+    // if (p_IsConstant(lo->n,nacRing)) naCoefNormalize(luu);
+    // else      
+                      naNormalize(luu);
     lo=(lnumber)luu;
   }
-  else
-    lo->s=3;
-#endif
   naTest((number)lo);
   return (number)lo;
 }
@@ -1222,7 +1214,6 @@ number naIntDiv(number la, number lb)
     WerrorS(nDivBy0);
     return NULL;
   }
-  naNormalize(la);
   assume(a->z!=NULL && b->z!=NULL);
   assume(a->n==NULL && b->n==NULL);
   res = (lnumber)omAllocBin(rnumber_bin);
@@ -1292,11 +1283,11 @@ number naDiv(number la, number lb)
   {
     lo->s = 0;
     number luu=(number)lo;
-    naNormalize(luu);
+     //if (p_IsConstant(lo->n,nacRing)) naCoefNormalize(luu);
+     //else   
+                         naNormalize(luu);
     lo=(lnumber)luu;
   }
-  else
-    lo->s=3;
   naTest((number)lo);
   return (number)lo;
 }
@@ -1353,7 +1344,6 @@ number naInvers(number a)
       x = napRemainder(x, naMinimalPoly);
     lo->z = x;
     lo->n = NULL;
-    lo->s = 2;
     while (x!=NULL)
     {
       nacNormalize(pGetCoeff(x));
@@ -1365,7 +1355,9 @@ number naInvers(number a)
   if (lo->n!=NULL)
   {
      number luu=(number)lo;
-     naNormalize(luu);
+     //if (p_IsConstant(lo->n,nacRing)) naCoefNormalize(luu);
+     //else  
+                           naNormalize(luu);
      lo=(lnumber)luu;
   }
   naTest((number)lo);
@@ -1533,7 +1525,6 @@ void naWrite(number &phn)
   else
   {
     phn->s = 0;
-    //naNormalize(phn);
     BOOLEAN has_denom=(ph->n!=NULL);
     napWrite(ph->z,has_denom/*(ph->n!=NULL)*/);
     if (has_denom/*(ph->n!=NULL)*/)
@@ -1596,7 +1587,6 @@ BOOLEAN naIsOne(number za)
   p_Delete(&a->n,nacRing);
   a->z = p_ISet(1,nacRing);
   a->n = NULL;
-  a->s = 2;
   return TRUE;
 #else
   return FALSE;
@@ -1798,13 +1788,21 @@ void naCoefNormalize(number pp)
     }
     n_Delete(&nz,nacRing);
   }
-
-  if ((p->n!=NULL)
-  && (p_IsConstant(p->n,nacRing))
-  && (n_IsOne(pGetCoeff(p->n),nacRing)))
+  if (p->n!=NULL)
   {
-    p_Delete(&(p->n), nacRing);
-    p->n = NULL;
+    if(!nacGreaterZero(pGetCoeff(p->n)))
+    {
+      p->z=napNeg(p->z);
+      p->n=napNeg(p->n);
+    }
+
+    if (/*(p->n!=NULL) && */
+    (p_IsConstant(p->n,nacRing))
+    && (n_IsOne(pGetCoeff(p->n),nacRing)))
+    {
+      p_Delete(&(p->n), nacRing);
+      p->n = NULL;
+    }
   }
 }
 void naNormalize(number &pp)
@@ -1813,7 +1811,7 @@ void naNormalize(number &pp)
   //naTest(pp); // input may not be "normal"
   lnumber p = (lnumber)pp;
 
-  if ((p==NULL) /*|| (p->s==2)*/)
+  if (p==NULL)
     return;
   naCoefNormalize(pp);
   p->s = 2;
