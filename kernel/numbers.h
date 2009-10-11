@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.21 2009-09-28 13:29:03 Singular Exp $ */
+/* $Id: numbers.h,v 1.22 2009-10-11 09:19:24 Singular Exp $ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
@@ -28,6 +28,7 @@
 #define n_Gcd(a, b, r)        (r)->cf->nGcd(a,b,r)
 #define n_IntDiv(a, b, r)     (r)->cf->nIntDiv(a,b)
 #define n_Div(a, b, r)        (r)->cf->nDiv(a,b)
+#define n_Invers(a, r)     (r)->cf->nInvers(a)
 #define n_ExactDiv(a, b, r)   (r)->cf->nExactDiv(a,b)
 #define n_Test(a,r)           (r)->cf->nDBTest(a,__FILE__,__LINE__)
 
