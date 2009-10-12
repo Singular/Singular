@@ -6,7 +6,7 @@
  *  Purpose: supercommutative kernel procedures
  *  Author:  motsak (Oleksandr Motsak)
  *  Created: 2006/12/18
- *  Version: $Id: sca.cc,v 1.39 2009-08-13 17:25:55 motsak Exp $
+ *  Version: $Id: sca.cc,v 1.40 2009-10-12 12:15:46 motsak Exp $
  *******************************************************************/
 
 // set it here if needed.
@@ -87,7 +87,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-inline ring AssureCurrentRing(ring r)
+inline ring assureCurrentRing(ring r)
 {
   ring save = currRing;
 
@@ -1307,17 +1307,17 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   PrintS("sca_SetupQuotient(rGR, rG, bCopy)");
 
   {
-    ring rSaveRing = AssureCurrentRing(rG);
+    ring rSaveRing = assureCurrentRing(rG);
 
     PrintS("\nrG: \n"); rWrite(rG);
 
-    AssureCurrentRing(rGR);
+    assureCurrentRing(rGR);
 
     PrintS("\nrGR: \n"); rWrite(rGR);
 
     PrintLn();
     
-    AssureCurrentRing(rSaveRing);
+    assureCurrentRing(rSaveRing);
   }  
 #endif
   
@@ -1451,7 +1451,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   assume( iAltVarEnd   <= N            );
 
 
-  ring rSaveRing = AssureCurrentRing(rG);
+  ring rSaveRing = assureCurrentRing(rG);
 
 
   assume(rGR->qideal != NULL);
@@ -1508,7 +1508,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
     }
   }
 
-  AssureCurrentRing(rSaveRing);
+  assureCurrentRing(rSaveRing);
   
   if(!bSCA) return false;
 
