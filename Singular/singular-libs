@@ -12,13 +12,14 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	kskernel.lib  latex.lib  linalg.lib  lll.lib  makedbm.lib \
 	matrix.lib  modstd.lib  mondromy.lib  mprimdec.lib  mregular.lib \
 	noether.lib normal.lib ntsolve.lib phindex.lib pointid.lib poly.lib \
-	presolve.lib  primdec.lib  primitiv.lib  qhmoduli.lib  random.lib \
+	polymake.lib presolve.lib  primdec.lib  primitiv.lib  qhmoduli.lib \
+        random.lib \
 	realrad.lib  redcgs.lib  reesclos.lib  resgraph.lib  resolve.lib \
 	reszeta.lib  ring.lib  rinvar.lib  rootsmr.lib  rootsur.lib \
 	sagbi.lib  sheafcoh.lib  sing.lib  sing4ti2.lib  signcond.lib \
 	solve.lib  spcurve.lib  spectrum.lib  standard.lib  stratify.lib \
 	surf.lib  surfex.lib  teachstd.lib  toric.lib  triang.lib \
-	weierstr.lib  zeroset.lib
+	tropical.lib weierstr.lib  zeroset.lib
 
 
 PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib \

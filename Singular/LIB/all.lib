@@ -1,6 +1,6 @@
-// $Id: all.lib,v 1.67 2009-05-09 11:55:24 Singular Exp $
+// $Id: all.lib,v 1.68 2009-10-12 07:18:05 Singular Exp $
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: all.lib,v 1.67 2009-05-09 11:55:24 Singular Exp $";
+version="$Id: all.lib,v 1.68 2009-10-12 07:18:05 Singular Exp $";
 category = "General purpose";
 info="
 LIBRARY:  all.lib   Load all libraries (commutative case)
@@ -57,6 +57,7 @@ LIB "ntsolve.lib";
 LIB "phindex.lib";
 LIB "pointid.lib";
 LIB "poly.lib";
+LIB "polymake.lib";
 LIB "presolve.lib";
 LIB "primdec.lib";
 LIB "primitiv.lib";
@@ -87,6 +88,7 @@ LIB "surfex.lib";
 LIB "teachstd.lib";
 LIB "toric.lib";
 LIB "triang.lib";
+LIB "tropical.lib";
 LIB "weierstr.lib";
 LIB "zeroset.lib";
 LIB "bfun.lib";
