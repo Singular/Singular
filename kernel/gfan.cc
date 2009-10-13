@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-10-01 16:50:22 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.95 2009-10-01 16:50:22 monerjan Exp $
-$Id: gfan.cc,v 1.95 2009-10-01 16:50:22 monerjan Exp $
+$Date: 2009-10-13 14:35:17 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.96 2009-10-13 14:35:17 monerjan Exp $
+$Id: gfan.cc,v 1.96 2009-10-13 14:35:17 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -358,6 +358,7 @@ gcone::gcone(const gcone& gc, const facet &f)
 	this->baseRing=rCopy(f.flipRing);
 	this->numFacets=0;
 	this->ivIntPt=NULL;
+	this->rootRing=NULL;
 	//rComplete(this->baseRing);
 	//rChangeCurrRing(this->baseRing);
 }
@@ -366,10 +367,13 @@ gcone::gcone(const gcone& gc, const facet &f)
 */
 gcone::~gcone()
 {
-	idDelete((ideal *)&this->gcBasis);
-	idDelete((ideal *)&this->inputIdeal);
-	rDelete(this->rootRing);
-	rDelete(this->baseRing);
+	if(this->gcBasis!=NULL)
+		idDelete((ideal *)&this->gcBasis);
+	if(this->inputIdeal!=NULL)
+		idDelete((ideal *)&this->inputIdeal);
+	if (this->rootRing!=NULL && this->rootRing!=(ip_sring *)0xfefefefefefefefe)
+		rDelete(this->rootRing);
+	//rDelete(this->baseRing);
 	facet *fAct;
 	facet *fDel;
 	/*Delete the facet structure*/
@@ -492,7 +496,7 @@ int gcone::getNumFacets()
 		
 int gcone::getUCN()
 {
-	if(this!=NULL && ( this!=(gcone *)0xfbfbfbfb || this!=(gcone *)0xfbfbfbfbfbfbfbfb) )
+	if( this!=NULL && ( this!=(gcone * const)0xfbfbfbfbfbfbfbfb && this!=(gcone * const)0xfbfbfbfb ) )
 		return this->UCN;
 	else
 		return -1;
@@ -748,8 +752,8 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 		//this->numFacets=ddineq->rowsize;
 		
 		//Clean up but don't delete the return value! (Whatever it will turn out to be)			
-		//dd_FreeMatrix(ddineq);
-		//set_free(ddredrows);
+		dd_FreeMatrix(ddineq);
+		set_free(ddredrows);
 		//free(ddnewpos);
 		//set_free(ddlinset);
 		//NOTE Commented out. Solved the bug that after facet2Matrix there were facets lost
@@ -796,7 +800,7 @@ void gcone::getCodim2Normals(gcone const &gc)
 #endif
 		ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 		P=dd_CopyGenerators(ddpolyh);				
-#ifdef gfan_DEBUG
+#ifdef gfan_DEBUG 
 //   		cout << "Codim2 facet:" << endl;
 //      		dd_WriteMatrix(stdout,P);
 //   		cout << endl;
@@ -851,6 +855,7 @@ void gcone::getCodim2Normals(gcone const &gc)
 		/*End of check*/					
 		fAct = fAct->next;	
 		dd_FreeMatrix(ddakt);
+// 		dd_FreeMatrix(ddineq);
 		dd_FreePolyhedra(ddpolyh);
 		delete iv_intPoint;
 	}//while
@@ -1704,7 +1709,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 		hdd
 	};
 	heuristic h;
-	h=hdd;
+	h=ram;
 	
 #ifdef gfan_DEBUG
 	cout << "NoRevs" << endl;
@@ -1729,7 +1734,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			
 	for(int ii=0;ii<this->numFacets;ii++)
 	{
-		//only copy flippable facets!
+		//only copy flippable facets! NOTE: We do not need flipRing or any such information.
 		if(fAct->isFlippable==TRUE)
 		{
 			fNormal = fAct->getFacetNormal();
@@ -1805,24 +1810,29 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 		{	//Since SLA should only contain flippables there should be no need to check for that
 			gcAct->flip(gcAct->gcBasis,fAct);
 			ring rTmp=rCopy(fAct->flipRing);
-			rComplete(rTmp);
+			rComplete(rTmp);			
 			rChangeCurrRing(rTmp);
 			gcone *gcTmp = new gcone::gcone(*gcAct,*fAct);
-			/* Now gcTmp->gcBasis and gcTmp->baseRing are set from fAct->flipGB and fAct->flipRing,
-			 * therefore we can delete them.
+			/* Now gcTmp->gcBasis and gcTmp->baseRing are set from fAct->flipGB and fAct->flipRing.
+			 * Since we come at most once across a given facet from gcAct->facetPtr we can delete them.
+			 * NOTE: Can this cause trouble with the destructor?
+			 * Answer: Yes it bloody well does!
+			 * However I'd like to delete this data here, since if we have a cone with many many facets it
+			 * should pay to get rid of the flipGB as soon as possible.
+			 * Destructor must be equipped with necessary checks.
 			*/
-			idDelete((ideal *)&fAct->flipGB);
-			rDelete(fAct->flipRing);
+// 			idDelete((ideal *)&fAct->flipGB);
+// 			rDelete(fAct->flipRing);
 			gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);					
 			gcTmp->getCodim2Normals(*gcTmp);					
 			gcTmp->normalize();
 #ifdef gfan_DEBUG
 			gcTmp->showFacets(1);
 #endif
-			if(h==hdd)
-			{
+ 			if(h==hdd)
+ 			{
 				gcTmp->writeConeToFile(*gcTmp);
-			}
+ 			}
 			/*add facets to SLA here*/
 			SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
 #ifdef gfan_DEBUG
@@ -1846,33 +1856,58 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 		gcone *deleteMarker;
 		deleteMarker=gcAct;		
 // 		delete deleteMarker;
-		deleteMarker=NULL;
+// 		deleteMarker=NULL;
 		//Search for cone with smallest UCN
 		gcNext = gcHead;
-		while(gcNext!=NULL)
+		while(gcNext!=NULL && SearchListRoot!=NULL && gcNext!=(gcone * const)0xfbfbfbfbfbfbfbfb && gcNext!=(gcone * const)0xfbfbfbfb)
 		{			
 			/*NOTE if gcNext->getUCN is smaller than SearchListRoot->getUCN it follows, that the cone
 			gcNext will not be used in any more computation. So -> delete
 			*/
 			if (gcNext->getUCN() < SearchListRoot->getUCN() )
 			{
-				idDelete((ideal *)&gcNext->gcBasis);	//at least drop huge gröbner bases
+				//idDelete((ideal *)&gcNext->gcBasis);	//at least drop huge gröbner bases
+				if(gcNext == gcHead)
+				{
+ 					deleteMarker = gcHead;
+ 					gcHead = gcNext->next;
+					//gcNext->next->prev = NULL;
+				}
+				else
+				{
+					deleteMarker = gcNext;
+					gcNext->prev->next = gcNext->next;
+					gcNext->next->prev = gcNext->prev;
+				}
+// 				gcNext = gcNext->next;
+//  				delete deleteMarker;
+// 				deleteMarker = NULL;
 			}
-			if( gcNext->getUCN() == SearchListRoot->getUCN() )
-			{
-				gcAct = gcNext;
-				rAct=rCopy(gcAct->baseRing);
-				rComplete(rAct);
-				rChangeCurrRing(rAct);						
-				break;						
-			}
-			
-// 			if (gcNext->getUCN() < SearchListRoot->getUCN() )
-// 			{
-// 				idDelete((ideal *)&gcAct->gcBasis);
-// 				rDelete(gcAct->baseRing);
-// 			}
-			gcNext = gcNext->next;
+			else if( gcNext->getUCN() == SearchListRoot->getUCN() )
+			{//NOTE: Implement heuristic to be used!
+				if(h==ram)
+				{
+					gcAct = gcNext;
+					rAct=rCopy(gcAct->baseRing);
+					rComplete(rAct);
+					rChangeCurrRing(rAct);						
+					break;
+				}
+				else if(h==hdd)
+				{
+					//Read st00f from file
+					gcAct = gcNext;
+					//implant the GB into gcAct
+					readConeFromFile(gcNext->getUCN(), gcAct);
+					break;
+				}				
+			}			
+ 			gcNext = gcNext->next;
+//   			if(deleteMarker!=NULL && deleteMarker!=(gcone *)0xfbfbfbfbfbfbfbfb)
+			if(this->getUCN()!=1)	//workaround to avoid unpredictable behaviour towards end of program
+ 				delete deleteMarker;
+// 			deleteMarker = NULL;
+// 			gcNext = gcNext->next;
 		}
 		UCNcounter++;
 				//SearchListAct = SearchListAct->next;
@@ -2058,9 +2093,9 @@ facet * gcone::enqueueNewFacets(facet &f)
 			fNormal=fAct->getFacetNormal();
 			slAct = slHead;
 			notParallelCtr=0;
-// 					delete deleteMarker;
-// 					deleteMarker=NULL;
-					/*If slAct==NULL and fAct!=NULL 
+// 			delete deleteMarker;
+// 			deleteMarker=NULL;
+			/*If slAct==NULL and fAct!=NULL 
 			we just copy all remaining facets into SLA*/
 			if(slAct==NULL)
 			{
@@ -2107,15 +2142,15 @@ facet * gcone::enqueueNewFacets(facet &f)
 				}
 				break;
 			}
-			/*End of */
+			/*End of dumping into SLA*/
 			while(slAct!=NULL)
 					//while(slAct!=slEndStatic->next)
 			{
-// 						if(deleteMarker!=NULL)
-// 						{
-// 							delete deleteMarker;
-// 							deleteMarker=NULL;
-// 						}
+// 				if(deleteMarker!=NULL)
+// 				{
+// 					delete deleteMarker;
+// 					deleteMarker=NULL;
+// 				}
 				removalOccured=FALSE;
 				slNormal = slAct->getFacetNormal();
 #ifdef gfan_DEBUG
@@ -2194,18 +2229,18 @@ facet * gcone::enqueueNewFacets(facet &f)
 							slAct->next->prev = slAct->prev;
 						}
 								
-								//update lengthOfSearchList					
+						//update lengthOfSearchList					
 						lengthOfSearchList--;
-								//delete slAct;
-								//slAct=NULL;
-								//slAct = slAct->next; //not needed, since facets are equal
-								//delete deleteMarker;
-								//deleteMarker=NULL;
-								//fAct = fAct->next;
+						//delete slAct;
+						//slAct=NULL;
+						//slAct = slAct->next; //not needed, since facets are equal
+						//delete deleteMarker;
+						//deleteMarker=NULL;
+						//fAct = fAct->next;
 						break;
 					}//if(ctr==fAct->numCodim2Facets)
 					else	//facets are parallel but NOT equal. But this does not imply that there
-								//is no other facet later in SLA that might be equal.
+						//is no other facet later in SLA that might be equal.
 					{
 						maybe=TRUE;
 //       								if(slAct->next==NULL && maybe==TRUE)
@@ -2226,10 +2261,10 @@ facet * gcone::enqueueNewFacets(facet &f)
 					break;
 				}
 				slAct = slAct->next;
-						/* NOTE The following lines must not be here but rather called inside the if-block above.
+				/* NOTE The following lines must not be here but rather called inside the if-block above.
 				Otherwise results get crappy. Unfortunately there are two slAct=slAct->next calls now,
 				(not nice!) but since they are in seperate branches of the if-statement there should not
-						be a way it gets called twice thus ommiting one facet:
+				be a way it gets called twice thus ommiting one facet:
 				slAct = slAct->next;*/						
 						//delete deleteMarker;
 						//deleteMarker=NULL;
@@ -2260,7 +2295,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 				slEnd->isFlippable = TRUE;
 				slEnd->setFacetNormal(fNormal);
 				slEnd->prev = marker;
-						//Copy codim2-facets
+				//Copy codim2-facets
 				intvec *f2Normal;// = new intvec(this->numVars);
 				while(f2Act!=NULL)
 				{
@@ -2280,8 +2315,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 					}
 					f2Act = f2Act->next;
 				}
-				lengthOfSearchList++;
-						//delete f2Normal;						
+				lengthOfSearchList++;				
 			}//if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) ||
 			fAct = fAct->next;
 		}//if(fAct->isFlippable==TRUE)
@@ -2332,7 +2366,7 @@ dd_MatrixPtr gcone::facets2Matrix(gcone const &gc)
 	M=dd_CreateMatrix(ddrows,ddcols);			
 			
 	int jj=0;
-			//while(fAct->next!=NULL)
+	
 	while(fAct!=NULL)
 	{
 		intvec *comp;
@@ -2389,7 +2423,9 @@ void gcone::writeConeToFile(gcone const &gc, bool usingIntPoints)
 		gcOutputFile << "UCN" << endl;
 		gcOutputFile << this->UCN << endl;
 		gcOutputFile << "RING" << endl;	
-		gcOutputFile << ringString << endl;			
+		gcOutputFile << ringString << endl;
+		gcOutputFile << "GCBASISLENGTH" << endl;
+		gcOutputFile << IDELEMS(gc.gcBasis) << endl;			
 		//Write this->gcBasis into file
 		gcOutputFile << "GCBASIS" << endl;				
 		for (int ii=0;ii<IDELEMS(gc.gcBasis);ii++)
@@ -2445,23 +2481,140 @@ void gcone::writeConeToFile(gcone const &gc, bool usingIntPoints)
 		
 /** \brief Reads a cone from a file identified by its number
  */
-void gcone::readConeFromFile(int UCN)
+void gcone::readConeFromFile(int UCN, gcone *gc)
 {
 	//int UCN=gc.UCN;
 	stringstream ss;
 	ss << UCN;
-	string UCNstr = ss.str();		
-			
+	string UCNstr = ss.str();
+	string line;
+	string modLine;
+	string strMonom, strCoeff;		
+	int gcBasisLength=0;
+	int intCoeff=1;
+	bool hasCoeffInQ = FALSE;	//does the polynomial have rational coeff?
+		
 	char prefix[]="/tmp/cone";
-	char *UCNstring;
-	strcpy(UCNstring,UCNstr.c_str());
+	const char *UCNstring = UCNstr.c_str();
+	//strcpy(UCNstring,UCNstr.c_str());
+	
 	char suffix[]=".sg";
 	char *filename=strcat(prefix,UCNstring);
 	strcat(filename,suffix);
 					
 	ifstream gcInputFile(filename, ifstream::in);
 	
+	ring saveRing=currRing;	
+	rChangeCurrRing(gc->baseRing);
+	poly strPoly=pInit();
+	poly resPoly=pInit();	//The poly to be read in
+	
+	string::iterator EOL;
+	int terms=1;	//#Terms in the poly
+	
+	while( !gcInputFile.eof() )
+	{
+		getline(gcInputFile,line);
+	
+		if(line=="GCBASISLENGTH")
+		{
+			getline(gcInputFile, line);
+			ss << line;
+			ss >> gcBasisLength;
+		}
+		if(line=="GCBASIS")
+		{
+			for(int jj=0;jj<gcBasisLength;jj++)
+			{
+				getline(gcInputFile,line);
+				//find out how many terms the poly consists of
+				for(EOL=line.begin(); EOL!=line.end();++EOL)
+				{
+					string s;
+					s=*EOL;
+					if(s=="+" || s=="-")
+						terms++;
+				}
+				//magically convert strings into polynomials
+				//polys.cc:p_Read
+				//check until first occurance of + or -
+				//data or c_str
+// 				for(EOL=line.begin(); EOL!=line.end();++EOL)
+// 				{
+// 					string s;
+// 					s=*EOL;
+//  					if(s=="+" || s=="-")
+// 					{
+// 						strMonom=line.substr(0,*EOL);						
+// 						modLine=line.substr(*EOL,line.length());	//Truncate
+// 						line=modLine;
+// 						const char* monom = strMonom.c_str();
+// 						p_Read(monom,strPoly,currRing);
+// 						resPoly=pAdd(resPoly,strPoly);						
+// 					}
+// 						
+// 				}
+				int start,stop;
+				start=0;
+				stop=0;
+				for(int ii=0;ii<line.length();ii++)
+				{
+					if(line[ii]=='+' || line[ii]=='-')
+					{
+						stop=ii;
+						if(start==0)
+							strMonom = line.substr(start,stop);
+						else
+							strMonom = line.substr(start,stop-1);
+						start=stop+1; //forget + or - between monomials
+						//Check for coeff != 1
+						int coeffStop=0;						
+						if(strMonom[0] == '1' ||
+									strMonom[jj] == 2 || strMonom[jj] == 3 ||
+									strMonom[jj] == 4 || strMonom[jj] == 5 ||
+									strMonom[jj] == 6 || strMonom[jj] == 7 ||
+									strMonom[jj] == 8 || strMonom[jj] == 9 ||
+									strMonom[jj] == 0  )
+						{
+							for(int jj=1;jj<strMonom.length();jj++)
+							{
+								if(strMonom[jj] != 1 &&
+								  		strMonom[jj] != 2 && strMonom[jj] != 3 &&
+										strMonom[jj] != 4 && strMonom[jj] != 5 &&
+										strMonom[jj] != 6 && strMonom[jj] != 7 &&
+										strMonom[jj] != 8 && strMonom[jj] != 9 &&
+										strMonom[jj] != 0 )
+								{
+									coeffStop=jj-1;
+								}
+							}
+							strCoeff = strMonom.substr(0,coeffStop);
+							ss << strCoeff;
+							ss >> intCoeff;
+							//Trim
+							strMonom = strMonom.substr( coeffStop,strMonom.length() );		
+						}//strMonom==1||
+						//Check for coeff from Q
+						
+						const char* monom = strMonom.c_str();
+						
+						p_Read(monom,strPoly,currRing);
+						pSetCoeff(strPoly, (number) intCoeff);//Why is this set to zero instead of 1???
+						if(pIsConstantComp(resPoly))
+							resPoly=pCopy(strPoly);							
+						else
+							resPoly=pAdd(resPoly,strPoly);							
+					}
+				}				
+				gcBasis->m[jj]=pCopy(resPoly);
+				resPoly=NULL;	//reset
+			}
+			break;
+		}		
+	}//while(!gcInputFile.eof())
+	
 	gcInputFile.close();
+	rChangeCurrRing(saveRing);
 }	
 
 
@@ -2545,6 +2698,7 @@ ideal gfan(ideal inputIdeal)
 		//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS
 		res = inputIdeal; 
 	}
+	dd_free_global_constants();
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
 	Assume gfan has finished, thus we have enumerated all the cones

@@ -2,9 +2,9 @@
 gfan.h Interface to gfan.cc
 
 $Author: monerjan $
-$Date: 2009-10-01 16:50:22 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.9 2009-10-01 16:50:22 monerjan Exp $
-$Id: gfan.h,v 1.9 2009-10-01 16:50:22 monerjan Exp $
+$Date: 2009-10-13 14:35:18 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.10 2009-10-13 14:35:18 monerjan Exp $
+$Id: gfan.h,v 1.10 2009-10-13 14:35:18 monerjan Exp $
 */
 #ifdef HAVE_GFAN
 #include "intvec.h"
@@ -176,7 +176,7 @@ class gcone
 		int intgcd(int a, int b);
 		dd_MatrixPtr facets2Matrix(gcone const &gc);
 		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE);
-		void readConeFromFile(int gcNum);
+		void readConeFromFile(int gcNum, gcone *gc);
 		friend class facet;	
 };
 
