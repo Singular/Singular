@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.20 2009-10-08 10:43:33 Singular Exp $
+// $Id: clapconv.cc,v 1.21 2009-10-16 10:29:28 Singular Exp $
 /*
 * ABSTRACT: convert data between Singular and factory
 */
@@ -34,7 +34,7 @@ static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int 
 
 static void convRecGFGF ( const CanonicalForm & f, int * exp, poly & result );
 
-static number convFactoryNSingAN( const CanonicalForm &f);
+static number convFactoryNSingAN( const CanonicalForm &f, const ring r);
 
 CanonicalForm convSingNFactoryN( number n, const ring r )
 {
@@ -235,24 +235,24 @@ CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a, const ring r)
 }
 
 static void
-convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start) ;
+convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start, const ring r) ;
 
-poly convFactoryAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start )
+poly convFactoryAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start, const ring r )
 {
-  int n = pVariables+1+rPar(currRing);
+  int n = rVar(r)+rPar(r)+1;
   int * exp = (int *)omAlloc0(n*sizeof(int));
   poly result = NULL;
-  convRecAP_R( f, exp, result,par_start, var_start );
+  convRecAP_R( f, exp, result,par_start, var_start, r );
   omFreeSize((ADDRESS)exp,n*sizeof(int));
   return result;
 }
 
-poly convFactoryAPSingAP ( const CanonicalForm & f )
+poly convFactoryAPSingAP ( const CanonicalForm & f, const ring r )
 {
-  return convFactoryAPSingAP_R(f,0,rPar(currRing));
+  return convFactoryAPSingAP_R(f,0,rPar(r),r);
 }
 
-static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start )
+static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int par_start, int var_start, const ring r )
 {
   if (f.isZero())
     return;
@@ -262,37 +262,37 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
     for ( CFIterator i = f; i.hasTerms(); i++ )
     {
       exp[l] = i.exp();
-      convRecAP_R( i.coeff(), exp, result, par_start, var_start );
+      convRecAP_R( i.coeff(), exp, result, par_start, var_start, r);
     }
     exp[l] = 0;
   }
   else
   {
-    napoly z=(napoly)convFactoryASingA( f );
+    napoly z=(napoly)convFactoryASingA( f,r );
     if (z!=NULL)
     {
-      poly term = pInit();
+      poly term = p_Init(r);
       pNext( term ) = NULL;
       int i;
-      for ( i = 1; i <= pVariables; i++ )
-        pSetExp( term, i , exp[i+var_start]);
+      for ( i = rVar(r); i>0 ; i-- )
+        p_SetExp( term, i , exp[i+var_start],r);
       //if (rRing_has_Comp(currRing->algring)) p_SetComp(term, 0, currRing->algring); // done by pInit
       if (par_start==0)
       {
         for ( i = 1; i <= var_start; i++ )
         //z->e[i-1]+=exp[i];
-          napAddExp(z,i,exp[i]);
+          p_AddExp(z,i,exp[i],r->algring);
       }
       else
       {
         for ( i = par_start+1; i <= var_start+rPar(currRing); i++ )
         //z->e[i-1]+=exp[i];
-          napAddExp(z,i,exp[i-par_start]);
+          p_AddExp(z,i,exp[i-par_start],r->algring);
       }
       pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
       ((lnumber)pGetCoeff(term))->z=z;
-      pSetm( term );
-      result = pAdd( result, term );
+      p_Setm( term,r );
+      result = p_Add_q( result, term, r );
     }
   }
 }
@@ -341,10 +341,10 @@ CanonicalForm convSingAFactoryA ( napoly p , const Variable & a, const ring r )
   return result;
 }
 
-static number convFactoryNSingAN( const CanonicalForm &f)
+static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
 {
   if ( f.isImm() )
-    return n_Init( f.intval(), currRing->algring );
+    return n_Init( f.intval(), r->algring );
   else
   {
     number z=(number)omAllocBin(rnumber_bin);
@@ -369,31 +369,32 @@ static number convFactoryNSingAN( const CanonicalForm &f)
   }
 }
 
-napoly convFactoryASingA ( const CanonicalForm & f )
+napoly convFactoryASingA ( const CanonicalForm & f, const ring r )
 {
-  napoly a=NULL;
-  napoly t;
+  poly a=NULL;
+  poly t;
   for( CFIterator i=f; i.hasTerms(); i++)
   {
     t=napNew();
     // pNext( t ) = NULL; //already done by napNew
-    napGetCoeff(t)=convFactoryNSingAN( i.coeff() );
-    if (n_IsZero(napGetCoeff(t),currRing->algring))
+    pGetCoeff(t)=convFactoryNSingAN( i.coeff(), r );
+    if (n_IsZero(napGetCoeff(t),r->algring))
     {
-      p_Delete(&t,nacRing);
+      p_Delete(&t,r->algring);
     }
     else
     {
-      napSetExp(t,1,i.exp());
-      a=napAdd(a,t);
+      p_SetExp(t,1,i.exp(),r->algring);
+      a=p_Add_q(a,t,r->algring);
     }
   }
   if (a!=NULL)
   {
-    if (naMinimalPoly!=NULL)
+    if (r->minpoly!=NULL)
     {
-      if (p_GetExp(a,1,currRing->algring) >= p_GetExp(naMinimalPoly,1,currRing->algring))
-        a = napRemainder( a, naMinimalPoly);
+      lnumber l=(lnumber)r->minpoly;
+      if (p_GetExp(a,1,r->algring) >= p_GetExp(l->z,1,r->algring))
+        a = napRemainder( a, l->z);
     }
   }
   return a;
