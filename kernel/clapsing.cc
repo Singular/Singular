@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.45 2009-09-16 12:26:26 Singular Exp $
+// $Id: clapsing.cc,v 1.46 2009-10-16 10:35:00 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -86,7 +86,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
         Variable a=rootOf(mipo);
         CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
                       G( convSingAPFactoryAP( g,a,r ) );
-        res= convFactoryAPSingAP( gcd( F, G ) );
+        res= convFactoryAPSingAP( gcd( F, G ),currRing );
         if (!b) Off(SW_USE_QGCD);
       }
     }
@@ -180,7 +180,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) ),
                     G( convSingAPFactoryAP( g,a,currRing ) );
-      res= convFactoryAPSingAP( resultant( F, G, X ) );
+      res= convFactoryAPSingAP( resultant( F, G, X ),currRing );
     }
     else
     {
@@ -328,9 +328,9 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
         WerrorS("not univariate");
         return TRUE;
       }
-      res= convFactoryAPSingAP( extgcd( F, G, Fa, Gb ) );
-      pa=convFactoryAPSingAP(Fa);
-      pb=convFactoryAPSingAP(Gb);
+      res= convFactoryAPSingAP( extgcd( F, G, Fa, Gb ),currRing );
+      pa=convFactoryAPSingAP(Fa,currRing);
+      pb=convFactoryAPSingAP(Gb,currRing);
     }
     else
     {
@@ -405,9 +405,9 @@ BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const
         WerrorS("not univariate");
         return TRUE;
       }
-      res= convFactoryAPSingAP( extgcd( F, G, Fa, Gb ) );
-      pa=convFactoryAPSingAP(Fa);
-      pb=convFactoryAPSingAP(Gb);
+      res= convFactoryAPSingAP( extgcd( F, G, Fa, Gb ),currRing );
+      pa=convFactoryAPSingAP(Fa,currRing);
+      pb=convFactoryAPSingAP(Gb,currRing);
     }
     else
     {
@@ -455,12 +455,56 @@ poly singclap_pdivide ( poly f, poly g )
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) ),
                     G( convSingAPFactoryAP( g,a,currRing ) );
-      res= convFactoryAPSingAP(  F / G  );
+      res= convFactoryAPSingAP(  F / G,currRing  );
     }
     else
     {
       CanonicalForm F( convSingTrPFactoryP( f ) ), G( convSingTrPFactoryP( g ) );
       res= convFactoryPSingTrP(  F / G  );
+    }
+  }
+  #if 0 // not yet working
+  else if (rField_is_GF())
+  {
+    //Print("GF(%d^%d)\n",nfCharP,nfMinPoly[0]);
+    setCharacteristic( nfCharP,nfMinPoly[0], currRing->parameter[0][0] );
+    CanonicalForm F( convSingGFFactoryGF( f ) ), G( convSingGFFactoryGF( g ) );
+    res = convFactoryGFSingGF( F / G );
+  }
+  #endif
+  else
+    WerrorS( feNotImplemented );
+  Off(SW_RATIONAL);
+  return res;
+}
+
+poly singclap_pdivide_r ( poly f, poly g, const ring r )
+{
+  poly res=NULL;
+  On(SW_RATIONAL);
+  if (rField_is_Zp(r) || rField_is_Q(r))
+  {
+    setCharacteristic( n_GetChar(r) );
+    CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r ) );
+    res = convFactoryPSingP( F / G,r );
+  }
+  else if (rField_is_Extension(r))
+  {
+    if (rField_is_Q_a(r)) setCharacteristic( 0 );
+    else               setCharacteristic( -n_GetChar(r) );
+    if (r->minpoly!=NULL)
+    {
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
+                                                 r->algring);
+      Variable a=rootOf(mipo);
+      CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
+                    G( convSingAPFactoryAP( g,a,r ) );
+      res= convFactoryAPSingAP(  F / G, r  );
+    }
+    else
+    {
+      CanonicalForm F( convSingTrPFactoryP( f,r ) ), G( convSingTrPFactoryP( g,r ) );
+      res= convFactoryPSingTrP(  F / G,r  );
     }
   }
   #if 0 // not yet working
@@ -639,7 +683,7 @@ BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
         {
           if (currRing->minpoly!=NULL)
           {
-            q= convFactoryAPSingAP(  Q  );
+            q= convFactoryAPSingAP(  Q,currRing  );
           }
           else
           {
@@ -917,7 +961,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         }
         else
         {
-          if (!count_Factors(res,w,j,ff,convFactoryAPSingAP( J.getItem().factor() )))
+          if (!count_Factors(res,w,j,ff,convFactoryAPSingAP( J.getItem().factor(),currRing )))
           {
 	    if (w!=NULL)
               (*w)[j]=1;
@@ -1216,7 +1260,7 @@ ideal singclap_sqrfree ( poly f)
         if (currRing->minpoly==NULL)
           res->m[j]=convFactoryPSingTrP( J.getItem().factor() );
         else
-          res->m[j]=convFactoryAPSingAP( J.getItem().factor() );
+          res->m[j]=convFactoryAPSingAP( J.getItem().factor(),currRing );
       }
     }
     if (res->m[0]==NULL)
@@ -1493,7 +1537,7 @@ poly singclap_det( const matrix m )
           M(i,j)=convSingAPFactoryAP(MATELEM(m,i,j),a,currRing);
         }
       }
-      res= convFactoryAPSingAP( determinant(M,r) ) ;
+      res= convFactoryAPSingAP( determinant(M,r),currRing ) ;
     }
     else
     {
@@ -1551,7 +1595,7 @@ napoly singclap_alglcm ( napoly f, napoly g )
    GCD = gcd( F, G );
 
    // calculate lcm
-   res= convFactoryASingA( (F/GCD)*G );
+   res= convFactoryASingA( (F/GCD)*G,currRing );
  }
  else
  {
@@ -1590,8 +1634,8 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
 
    if ((GCD!=1) && (GCD!=0))
    {
-     ff= convFactoryASingA( F/ GCD );
-     gg= convFactoryASingA( G/ GCD );
+     ff= convFactoryASingA( F/ GCD, currRing );
+     gg= convFactoryASingA( G/ GCD, currRing );
    }
  }
  else

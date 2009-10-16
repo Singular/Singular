@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.h,v 1.4 2009-08-13 15:17:03 Singular Exp $
+// $Id: clapsing.h,v 1.5 2009-10-16 10:35:00 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -28,6 +28,7 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb );
 BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const ring r );
 
 poly singclap_pdivide ( poly f, poly g );
+poly singclap_pdivide_r ( poly f, poly g, const ring r );
 
 void singclap_divide_content ( poly f );
 
