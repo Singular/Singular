@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-10-13 14:35:17 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.96 2009-10-13 14:35:17 monerjan Exp $
-$Id: gfan.cc,v 1.96 2009-10-13 14:35:17 monerjan Exp $
+$Date: 2009-10-19 15:40:39 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.97 2009-10-19 15:40:39 monerjan Exp $
+$Id: gfan.cc,v 1.97 2009-10-19 15:40:39 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -1186,8 +1186,8 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	f->flipRing=rCopy(dstRing);	//store the ring on the other side
 //#ifdef gfan_DEBUG
 	cout << "Flipped GB is UCN " << counter+1 << ":" << endl;
-			//f->printFlipGB();
-	this->idDebugPrint(dstRing_I);
+	f->printFlipGB();
+// 	this->idDebugPrint(dstRing_I);
 	cout << endl;
 //#endif			
 	rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
@@ -1709,7 +1709,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 		hdd
 	};
 	heuristic h;
-	h=ram;
+	h=hdd;
 	
 #ifdef gfan_DEBUG
 	cout << "NoRevs" << endl;
@@ -1899,6 +1899,9 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 					gcAct = gcNext;
 					//implant the GB into gcAct
 					readConeFromFile(gcNext->getUCN(), gcAct);
+					rAct=rCopy(gcAct->baseRing);
+					rComplete(rAct);
+					rChangeCurrRing(rAct);
 					break;
 				}				
 			}			
@@ -2488,21 +2491,34 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 	ss << UCN;
 	string UCNstr = ss.str();
 	string line;
-	string modLine;
-	string strMonom, strCoeff;		
+	string strGcBasisLength;
+	string strMonom, strCoeff, strCoeffNom, strCoeffDenom;		
 	int gcBasisLength=0;
 	int intCoeff=1;
+	int intCoeffNom=1;		//better (number) but that's not compatible with stringstream;
+	int intCoeffDenom=1;
+	number nCoeff=nInit(1);
+	number nCoeffNom=nInit(1);
+	number nCoeffDenom=nInit(1);
 	bool hasCoeffInQ = FALSE;	//does the polynomial have rational coeff?
+	bool hasNegCoeff = FALSE;	//or a negative one?
+	size_t found;			//used for find_first_(not)_of
 		
-	char prefix[]="/tmp/cone";
-	const char *UCNstring = UCNstr.c_str();
+// 	char prefix[]="/tmp/cone";
+	string prefix="/tmp/cone";
+// 	const char *UCNstring = UCNstr.c_str();
 	//strcpy(UCNstring,UCNstr.c_str());
 	
-	char suffix[]=".sg";
-	char *filename=strcat(prefix,UCNstring);
-	strcat(filename,suffix);
+// 	char suffix[]=".sg";
+	string suffix=".sg";
+// 	char *filename=strcat(prefix,UCNstring);
+	string filename;
+	filename.append(prefix);
+	filename.append(UCNstr);
+	filename.append(suffix);
+// 	strcat(filename,suffix);
 					
-	ifstream gcInputFile(filename, ifstream::in);
+	ifstream gcInputFile(filename.c_str(), ifstream::in);
 	
 	ring saveRing=currRing;	
 	rChangeCurrRing(gc->baseRing);
@@ -2515,12 +2531,15 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 	while( !gcInputFile.eof() )
 	{
 		getline(gcInputFile,line);
-	
+		hasCoeffInQ = FALSE;
+		hasNegCoeff = FALSE;
+		
 		if(line=="GCBASISLENGTH")
 		{
 			getline(gcInputFile, line);
-			ss << line;
-			ss >> gcBasisLength;
+			strGcBasisLength = line;
+// 			 >> gcBasisLength;
+			gcBasisLength=atoi(strGcBasisLength.c_str());
 		}
 		if(line=="GCBASIS")
 		{
@@ -2539,73 +2558,89 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 				//polys.cc:p_Read
 				//check until first occurance of + or -
 				//data or c_str
-// 				for(EOL=line.begin(); EOL!=line.end();++EOL)
-// 				{
-// 					string s;
-// 					s=*EOL;
-//  					if(s=="+" || s=="-")
-// 					{
-// 						strMonom=line.substr(0,*EOL);						
-// 						modLine=line.substr(*EOL,line.length());	//Truncate
-// 						line=modLine;
-// 						const char* monom = strMonom.c_str();
-// 						p_Read(monom,strPoly,currRing);
-// 						resPoly=pAdd(resPoly,strPoly);						
-// 					}
-// 						
-// 				}
-				int start,stop;
-				start=0;
-				stop=0;
-				for(int ii=0;ii<line.length();ii++)
+				while(!line.empty())
 				{
-					if(line[ii]=='+' || line[ii]=='-')
+					found = line.find_first_of("+-");	//get the first monomial
+					string tmp;
+					tmp=line[found];
+// 					if(found!=0 && (tmp.compare("-")==0) )
+// 						hasNegCoeff = TRUE;	//We have a coeff < 0
+					if(found==0)
 					{
-						stop=ii;
-						if(start==0)
-							strMonom = line.substr(start,stop);
-						else
-							strMonom = line.substr(start,stop-1);
-						start=stop+1; //forget + or - between monomials
-						//Check for coeff != 1
-						int coeffStop=0;						
-						if(strMonom[0] == '1' ||
-									strMonom[jj] == 2 || strMonom[jj] == 3 ||
-									strMonom[jj] == 4 || strMonom[jj] == 5 ||
-									strMonom[jj] == 6 || strMonom[jj] == 7 ||
-									strMonom[jj] == 8 || strMonom[jj] == 9 ||
-									strMonom[jj] == 0  )
-						{
-							for(int jj=1;jj<strMonom.length();jj++)
-							{
-								if(strMonom[jj] != 1 &&
-								  		strMonom[jj] != 2 && strMonom[jj] != 3 &&
-										strMonom[jj] != 4 && strMonom[jj] != 5 &&
-										strMonom[jj] != 6 && strMonom[jj] != 7 &&
-										strMonom[jj] != 8 && strMonom[jj] != 9 &&
-										strMonom[jj] != 0 )
-								{
-									coeffStop=jj-1;
-								}
-							}
-							strCoeff = strMonom.substr(0,coeffStop);
-							ss << strCoeff;
-							ss >> intCoeff;
-							//Trim
-							strMonom = strMonom.substr( coeffStop,strMonom.length() );		
-						}//strMonom==1||
-						//Check for coeff from Q
-						
-						const char* monom = strMonom.c_str();
-						
-						p_Read(monom,strPoly,currRing);
-						pSetCoeff(strPoly, (number) intCoeff);//Why is this set to zero instead of 1???
-						if(pIsConstantComp(resPoly))
-							resPoly=pCopy(strPoly);							
-						else
-							resPoly=pAdd(resPoly,strPoly);							
+						if(tmp.compare("-")==0)
+							hasNegCoeff = TRUE;
+						line.erase(0,1);	//remove leading + or -
+						found = line.find_first_of("+-");	//adjust found
 					}
-				}				
+					strMonom = line.substr(0,found);
+					line.erase(0,found);
+					found = strMonom.find_first_of("/");
+					if(found!=string::npos)	//i.e. "/" exists in strMonom
+					{
+						hasCoeffInQ = TRUE;
+						strCoeffNom=strMonom.substr(0,found);
+						strCoeffDenom=strMonom.substr(found+1,strMonom.find_first_not_of("1234567890"));//string::npos);
+ 						ss << strCoeffNom;
+ 						ss >> intCoeffNom;
+						nCoeffNom=nInit(intCoeffNom);
+ 						ss << strCoeffDenom;
+ 						ss >> intCoeffDenom;
+						nCoeffDenom=nInit(intCoeffDenom);
+						//NOTE NOT SURE WHETHER THIS WILL WORK!
+  						//nCoeffNom=nInit(intCoeffNom);
+//   						nCoeffDenom=(number)strCoeffDenom.c_str();
+// 						nCoeffDenom=(number)strCoeffDenom.c_str();
+					}
+					else
+					{
+						found = strMonom.find_first_not_of("1234567890");
+						strCoeff = strMonom.substr(0,found);
+						if(!strCoeff.empty())
+						{
+// 							ss << strCoeff;
+// 							ss >> intCoeff;
+ 							nCoeff=(snumber*)strCoeff.c_str();
+						}
+						else
+						{
+// 							intCoeff = 1;
+							nCoeff = nInit(1);
+						}
+												
+					}
+					const char* monom = strMonom.c_str();
+						
+					p_Read(monom,strPoly,currRing);
+					switch (hasCoeffInQ)
+					{
+						case TRUE:
+							if(hasNegCoeff)
+								nCoeff=nNeg(nCoeffNom);
+// 								intCoeffNom *= -1;
+// 							pSetCoeff(strPoly, nDiv((number)intCoeffNom, (number)intCoeffDenom));
+							pSetCoeff(strPoly, nDiv(nCoeffNom, nCoeffDenom));
+						case FALSE:
+							if(hasNegCoeff)
+								nCoeff=nNeg(nCoeff);
+// 								intCoeff *= -1;
+							if(!nIsOne(nCoeff))
+							{
+// 								if(hasNegCoeff)
+// 									intCoeff *= -1;
+// 								pSetCoeff(strPoly,(number) intCoeff);
+								pSetCoeff(strPoly, nCoeff );
+							}
+													
+					}
+						//pSetCoeff(strPoly, (number) intCoeff);//Why is this set to zero instead of 1???
+					if(pIsConstantComp(resPoly))
+						resPoly=pCopy(strPoly);							
+					else
+						resPoly=pAdd(resPoly,strPoly);
+					
+					
+				}//while(!line.empty())		
+			
 				gcBasis->m[jj]=pCopy(resPoly);
 				resPoly=NULL;	//reset
 			}
