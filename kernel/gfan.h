@@ -2,9 +2,9 @@
 gfan.h Interface to gfan.cc
 
 $Author: monerjan $
-$Date: 2009-10-13 14:35:18 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.10 2009-10-13 14:35:18 monerjan Exp $
-$Id: gfan.h,v 1.10 2009-10-13 14:35:18 monerjan Exp $
+$Date: 2009-10-20 10:39:18 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.11 2009-10-20 10:39:18 monerjan Exp $
+$Id: gfan.h,v 1.11 2009-10-20 10:39:18 monerjan Exp $
 */
 #ifdef HAVE_GFAN
 #include "intvec.h"
@@ -15,8 +15,9 @@ $Id: gfan.h,v 1.10 2009-10-13 14:35:18 monerjan Exp $
 #include "../../cddlib/include/cdd.h"
 #include "../../cddlib/include/cddmp.h"
 #endif
+extern int gfanHeuristic;
 //ideal getGB(ideal inputIdeal);
-ideal gfan(ideal inputIdeal);
+ideal gfan(ideal inputIdeal, int heuristic);
 //int dotProduct(intvec a, intvec b);
 //bool isParallel(intvec a, intvec b);
 

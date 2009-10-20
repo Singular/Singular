@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.325 2009-10-09 13:46:30 seelisch Exp $ */
+/* $Id: extra.cc,v 1.326 2009-10-20 10:39:17 monerjan Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -3466,18 +3466,45 @@ WILL HAVE TO CHANGE RETURN TYPE TO LIST_CMD
 */
 if (strcmp(sys_cmd,"gfan")==0)
 {
-        if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
-        {
-                Werror("system(\"gfan\"...) Ideal expected");
-                return TRUE; //Ooooops
-        }
-ideal I=((ideal)h->Data());
-res->rtyp=IDEAL_CMD;
-res->data=(ideal) gfan(I);
+//         if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
+//         {
+//                 Werror("system(\"gfan\"...) Ideal expected");
+//                 return TRUE; //Ooooops
+//         }
+// 	else if(h->next==NULL)
+// 	{
+// 		Werror("gfan expects an integer parameter");
+// 		return TRUE;
+// 	}
+// 	else if(h->next!=NULL && h->next->Typ()!=INT_CMD)
+// 	{
+// 		Werror("1st parameter ist no integer");
+// 		return TRUE;
+// 	}
+	/*
+	heuristic:
+	0 = keep all Gröbner bases in memory
+	1 = write all Gröbner bases to disk and read whenever necessary
+	2 = use a mixed heuristic, based on length of Gröbner bases
+	*/
+	if( h!=NULL && h->Typ()==IDEAL_CMD && h->next!=NULL && h->next->Typ()==INT_CMD)
+	{
+		int heuristic;
+		heuristic=(int)(long)h->next->Data();
+		ideal I=((ideal)h->Data());
+		res->rtyp=IDEAL_CMD;
+		res->data=(ideal) gfan(I,heuristic);
+		return FALSE;
+	}
+	else
+	{
+		WerrorS("Usage: system(\"gfan\",I,int)");
+		return TRUE;
+	}
 //res->rtyp=LIST_CMD;
 //res->data= ???
 
-return FALSE; //Everything went fine
+// return FALSE; //Everything went fine
 }
 else
 #endif

@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-10-19 15:40:39 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.97 2009-10-19 15:40:39 monerjan Exp $
-$Id: gfan.cc,v 1.97 2009-10-19 15:40:39 monerjan Exp $
+$Date: 2009-10-20 10:39:18 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.98 2009-10-20 10:39:18 monerjan Exp $
+$Id: gfan.cc,v 1.98 2009-10-20 10:39:18 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -1704,12 +1704,12 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 	int UCNcounter=gcAct->getUCN();
 	
 	/* Use pure SLA or writeCone2File */
-	enum heuristic {
-		ram,
-		hdd
-	};
-	heuristic h;
-	h=hdd;
+// 	enum heuristic {
+// 		ram,
+// 		hdd
+// 	};
+// 	heuristic h;
+// 	h=hdd;
 	
 #ifdef gfan_DEBUG
 	cout << "NoRevs" << endl;
@@ -1829,7 +1829,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 #ifdef gfan_DEBUG
 			gcTmp->showFacets(1);
 #endif
- 			if(h==hdd)
+ 			if(gfanHeuristic==1)
  			{
 				gcTmp->writeConeToFile(*gcTmp);
  			}
@@ -1885,7 +1885,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			}
 			else if( gcNext->getUCN() == SearchListRoot->getUCN() )
 			{//NOTE: Implement heuristic to be used!
-				if(h==ram)
+				if(gfanHeuristic==0)
 				{
 					gcAct = gcNext;
 					rAct=rCopy(gcAct->baseRing);
@@ -1893,7 +1893,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 					rChangeCurrRing(rAct);						
 					break;
 				}
-				else if(h==hdd)
+				else if(gfanHeuristic==1)
 				{
 					//Read st00f from file
 					gcAct = gcNext;
@@ -2560,6 +2560,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 				//data or c_str
 				while(!line.empty())
 				{
+					hasNegCoeff = FALSE;
 					found = line.find_first_of("+-");	//get the first monomial
 					string tmp;
 					tmp=line[found];
@@ -2578,14 +2579,20 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 					if(found!=string::npos)	//i.e. "/" exists in strMonom
 					{
 						hasCoeffInQ = TRUE;
-						strCoeffNom=strMonom.substr(0,found);
-						strCoeffDenom=strMonom.substr(found+1,strMonom.find_first_not_of("1234567890"));//string::npos);
- 						ss << strCoeffNom;
- 						ss >> intCoeffNom;
-						nCoeffNom=nInit(intCoeffNom);
- 						ss << strCoeffDenom;
- 						ss >> intCoeffDenom;
-						nCoeffDenom=nInit(intCoeffDenom);
+						strCoeffNom=strMonom.substr(0,found);						
+						strCoeffDenom=strMonom.substr(found+1,strMonom.find_first_not_of("1234567890"));
+						strMonom.erase(0,found);
+						strMonom.erase(0,strMonom.find_first_not_of("1234567890/"));			
+//  						ss << strCoeffNom;
+//  						ss >> intCoeffNom;
+// 						nCoeffNom=(snumber*)strCoeffNom.c_str();
+						nRead(strCoeffNom.c_str(), &nCoeffNom);
+						nRead(strCoeffDenom.c_str(), &nCoeffDenom);
+// 						nCoeffNom=nInit(intCoeffNom);
+//  						ss << strCoeffDenom;
+//  						ss >> intCoeffDenom;
+// 						nCoeffDenom=nInit(intCoeffDenom);
+// 						nCoeffDenom=(snumber*)strCoeffNom.c_str();
 						//NOTE NOT SURE WHETHER THIS WILL WORK!
   						//nCoeffNom=nInit(intCoeffNom);
 //   						nCoeffDenom=(number)strCoeffDenom.c_str();
@@ -2597,9 +2604,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 						strCoeff = strMonom.substr(0,found);
 						if(!strCoeff.empty())
 						{
-// 							ss << strCoeff;
-// 							ss >> intCoeff;
- 							nCoeff=(snumber*)strCoeff.c_str();
+ 							nRead(strCoeff.c_str(),&nCoeff);
 						}
 						else
 						{
@@ -2615,10 +2620,11 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 					{
 						case TRUE:
 							if(hasNegCoeff)
-								nCoeff=nNeg(nCoeffNom);
+								nCoeffNom=nNeg(nCoeffNom);
 // 								intCoeffNom *= -1;
 // 							pSetCoeff(strPoly, nDiv((number)intCoeffNom, (number)intCoeffDenom));
 							pSetCoeff(strPoly, nDiv(nCoeffNom, nCoeffDenom));
+							break;
 						case FALSE:
 							if(hasNegCoeff)
 								nCoeff=nNeg(nCoeff);
@@ -2630,6 +2636,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 // 								pSetCoeff(strPoly,(number) intCoeff);
 								pSetCoeff(strPoly, nCoeff );
 							}
+							break;
 													
 					}
 						//pSetCoeff(strPoly, (number) intCoeff);//Why is this set to zero instead of 1???
@@ -2654,10 +2661,11 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 
 
 int gcone::counter=0;
-
-ideal gfan(ideal inputIdeal)
+int gfanHeuristic;
+ideal gfan(ideal inputIdeal, int h)
 {
 	int numvar = pVariables; 
+	gfanHeuristic = h;
 	
 	enum searchMethod {
 		reverseSearch,
