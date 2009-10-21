@@ -2,11 +2,11 @@
 
 #ifdef HAVE_WRAPPERS
 
+#include <iostream>
 #include "structs.h"
 #include "polys.h"
-#include "CanonicalPoly.h"
 #include "Wrappers.h"
-#include <iostream>
+#include "CanonicalPoly.h"
 
 CanonicalPoly::CanonicalPoly (const SingularPoly& sp, const RingWrapper& r):InternPoly(r)
 {
@@ -16,7 +16,7 @@ CanonicalPoly::CanonicalPoly (const SingularPoly& sp, const RingWrapper& r):Inte
 }
 
 CanonicalPoly::CanonicalPoly (const int i, const RingWrapper& r):InternPoly(r)
-{ // this method seems to work in char 0 only; is this due to a malfunction of p_ISet?
+{
   +prpr > "CanonicalPoly constructor with int argument = " < i;
   m_poly = p_ISet(i, r.getSingularRing());
 }
@@ -24,7 +24,6 @@ CanonicalPoly::CanonicalPoly (const int i, const RingWrapper& r):InternPoly(r)
 CanonicalPoly::~CanonicalPoly ()
 {
   +prpr > "CanonicalPoly destructor, object = " < this->toString();
-  //p_Delete(&m_poly, m_ring.getSingularRing());
 }
 
 char* CanonicalPoly::toString () const
@@ -35,7 +34,7 @@ char* CanonicalPoly::toString () const
 
 void CanonicalPoly::addCompatible (const InternPoly* ip)
 {
-  if (ip->getPolyType() == 1)
+  if (ip->getPolyType() == CANONICAL_POLY_TYPE)
   {
     const CanonicalPoly* pcp = static_cast<const CanonicalPoly*>(ip);
     +prpr > "value of CanonicalPoly is being changed";
@@ -48,9 +47,7 @@ void CanonicalPoly::addCompatible (const InternPoly* ip)
     +prpr > "value of CanonicalPoly has been changed";
   }
   else
-  {
     assume(false);
-  }
 }
 
 int CanonicalPoly::getPolyType () const
@@ -66,9 +63,10 @@ const SingularPoly& CanonicalPoly::getSingularPoly () const
 CanonicalPoly* CanonicalPoly::deepCopy () const
 {
   +prpr > "creating a deep copy of CanonicalPoly, argument = " < this->toString();
-  SingularPoly sp = p_Copy(this->getSingularPoly(), this->getRing().getSingularRing());  // SINGULAR poly is deeply copied.
-  CanonicalPoly* pcp = new CanonicalPoly(sp, this->getRing());  // ring is not deeply copied!
+  SingularPoly sp = p_Copy(this->getSingularPoly(), this->getRing().getSingularRing()); /* SINGULAR poly is deeply copied. */
+  CanonicalPoly* pcp = new CanonicalPoly(sp, this->getRing()); /* ring is not deeply copied! */
   return pcp;
 }
 
-#endif // HAVE_WRAPPERS
+#endif
+/* HAVE_WRAPPERS */

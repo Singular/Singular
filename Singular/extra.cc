@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.326 2009-10-20 10:39:17 monerjan Exp $ */
+/* $Id: extra.cc,v 1.327 2009-10-21 15:36:00 seelisch Exp $ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */
@@ -2105,31 +2105,43 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 #ifdef HAVE_WRAPPERS
       if(strcmp(sys_cmd,"c++wrappers")==0)
       {
-        if (h == NULL) testWrappers(FALSE);  // wrapper tests, no detailed printout
+        if (h == NULL) testWrappers(FALSE);  /* wrapper tests, without detailed printout */
         else if (h->Typ() == INT_CMD)
         {
           const int detailedOutput = (const int)(long)h->Data();
           testWrappers(detailedOutput == 0 ? FALSE : TRUE);
-          // wrapper tests, with or without detailed printout
+          /* wrapper tests, with or without detailed printout */
+        }
+        else if ((h->Typ() == POLY_CMD) &&
+                 (h->next->Typ() == POLY_CMD))
+        {
+          const poly& p1 = (const poly)h->Data();
+          const poly& p2 = (const poly)h->next->Data();
+          wrapSINGULARPolys(p1, p2);
+          /* wraps the given polys (as elements of the current ring)
+             and displays the created instances of PolyWrapper, then
+             their sum is computed as an instance of PolyWrapper and
+             also displayed */
         }
         return FALSE;
       }
       else
-#endif // HAVE_WRAPPERS
+#endif
+/* HAVE_WRAPPERS */
 /*==================== new minor code ========================*/
 #ifdef HAVE_MINOR
       if(strcmp(sys_cmd,"minors")==0)
       {
-        if (h == NULL) minorUsageInfo();  // writes some info to the console
-                                          // on how to use this experimental code
+        if (h == NULL) minorUsageInfo();  /* writes some info to the console
+                                             on how to use this experimental code */
         else if (h->Typ() == INT_CMD)
         {
-           testIntMinors(0);  // effectively no arguments provided:
-                              // this starts 5 default tests
-                              // with a random matrix with
-                              // integer entries;
-                              // for that, no ring needs to be
-                              // declared
+           testIntMinors(0);  /* no arguments provided:
+                                 this starts 5 default tests
+                                 with a random matrix with
+                                 integer entries;
+                                 for that, no ring needs to be
+                                 declared beforehand */
         }
         else if ((h->Typ() == MATRIX_CMD) &&
                  (h->next->Typ() == INT_CMD) &&
@@ -2144,11 +2156,11 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           const int cacheEntries   = (const int)(long)h->next->next->next->Data();
           const int cacheWeight    = (const int)(long)h->next->next->next->next->Data();
           ideal iii = testAllPolyMinorsAsIdeal(m, k, strategy, cacheEntries, cacheWeight);
-            // starts the computation of all k x k minors in the
-            // provided matrix m (which is assumed to have polynomial
-            // entries);
-            // when calling this method, a ring must be declared before;
-            // there will be one run using a cache with specified properties
+            /* starts the computation of all (k x k)-minors in the
+               provided matrix m (which is assumed to have polynomial
+               entries);
+               when calling this method, a ring must have been declared before;
+               there will be one run using a cache with specified properties */
           res->rtyp = IDEAL_CMD;
           res->data = iii;
         }
@@ -2167,12 +2179,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           const int cacheWeight    = (const int)(long)h->next->next->next->next->Data();
           const int characteristic = (const int)(long)h->next->next->next->next->next->Data();
           ideal iii = testAllIntMinorsAsIdeal(m, k, strategy, cacheEntries, cacheWeight, characteristic);
-            // starts the computation of all k x k minors in the
-            // provided matrix m (which is assumed to have integer
-            // entries);
-            // when calling this method, a ring must be declared before;
-            // there will be one run using a cache with specified properties;
-            // the resulting minors will be computed modulo the given characteristic
+            /* starts the computation of all (k x k)-minors in the
+               provided matrix m (which is assumed to have integer
+               entries);
+               when calling this method, a ring must have been declared before;
+               there will be one run using a cache with specified properties;
+               the resulting minors will be computed modulo the given characteristic */
           res->rtyp = IDEAL_CMD;
           res->data = iii;
         }
@@ -2196,17 +2208,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           const int dumpComplete   = (const int)(long)h->next->next->next->next->next->next->next->Data();
           const int dumpConsole    = (const int)(long)h->next->next->next->next->next->next->next->next->Data();
           testAllPolyMinors(m, k, strategies, cacheEntries, cacheWeight, dumpMinors, dumpResults, dumpComplete, dumpConsole);
-            // starts the computation of all k x k minors in the
-            // provided matrix m (which is assumed to have polynomial
-            // entries) using a cache with a maximum number of
-            // 'cacheEntries' entries and a maximum weight of 'cacheWeight';
-            // when calling this method, a ring must be declared before;
-            // strategy = "310" means that the code is run first without a
-            // cache ("0") and then afterwards with the caching strategies
-            // "1" and "3"
+            /* starts the computation of all (k x k)-minors in the
+               provided matrix m (which is assumed to have polynomial
+               entries) using a cache with a maximum number of
+               'cacheEntries' entries and a maximum weight of 'cacheWeight'
+               (The weight is the number of cached monomials, counted over
+               all cached polynomials.);
+               when calling this method, a ring must have been declared before;
+               strategy = "310" means that the code is run first without a
+               cache ("0") and then afterwards with the caching strategies
+               "1" and "3" */
         }
         else if (h->Typ() == POLY_CMD)
-        { // for quick tests with a single polynomial
+        { /* for quick tests with a single polynomial */
           const poly p = (const poly)h->Data();
           testStuff(p);
         }
@@ -2221,14 +2235,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           const int fc     = (const int)(long)h->Data();
           const int varN   = (const int)(long)h->next->Data();
           {
-            /*
-            The following code creates and returns a ring with characteristic fc,
-            order dp and varN variables with the names "x1", "x2", ..., "x4711"
-            (in the case varN = 4711).
-            The purpose of this rewriting is to eliminate indexed variables,
-            as they may cause problems when generating scripts for Magma,
-            Maple, or Macaulay2.
-            */
+            /* The following code creates and returns a ring with characteristic fc,
+               order dp and varN variables with the names "x1", "x2", ..., "x4711"
+               (in the case varN = 4711).
+               The purpose of this rewriting is to eliminate indexed variables,
+               as they may cause problems when generating scripts for Magma,
+               Maple, or Macaulay2. */
             ring newRing = (ring) omAlloc0Bin(sip_sring_bin);
             newRing->ch = fc;
             newRing->N = varN;
@@ -2256,7 +2268,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         }  
       }
       else
-#endif // HAVE_MINOR
+#endif
+/* HAVE_MINOR */
 /*==================== generic debug ==================================*/
 #ifdef PDEBUG
       if(strcmp(sys_cmd,"DetailedPrint")==0)
@@ -3449,7 +3462,7 @@ ipshell()");
 //    using namespace SINGULAR_NS;
     extern BOOLEAN Main(leftv res, leftv h); // FALSE = Ok, TRUE = Error!
     return Main(res, h);
-  }
+  }                            
   else
 #endif // HAVE_SINGULAR_PLUS_PLUS
 
@@ -3466,45 +3479,18 @@ WILL HAVE TO CHANGE RETURN TYPE TO LIST_CMD
 */
 if (strcmp(sys_cmd,"gfan")==0)
 {
-//         if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
-//         {
-//                 Werror("system(\"gfan\"...) Ideal expected");
-//                 return TRUE; //Ooooops
-//         }
-// 	else if(h->next==NULL)
-// 	{
-// 		Werror("gfan expects an integer parameter");
-// 		return TRUE;
-// 	}
-// 	else if(h->next!=NULL && h->next->Typ()!=INT_CMD)
-// 	{
-// 		Werror("1st parameter ist no integer");
-// 		return TRUE;
-// 	}
-	/*
-	heuristic:
-	0 = keep all Gröbner bases in memory
-	1 = write all Gröbner bases to disk and read whenever necessary
-	2 = use a mixed heuristic, based on length of Gröbner bases
-	*/
-	if( h!=NULL && h->Typ()==IDEAL_CMD && h->next!=NULL && h->next->Typ()==INT_CMD)
-	{
-		int heuristic;
-		heuristic=(int)(long)h->next->Data();
-		ideal I=((ideal)h->Data());
-		res->rtyp=IDEAL_CMD;
-		res->data=(ideal) gfan(I,heuristic);
-		return FALSE;
-	}
-	else
-	{
-		WerrorS("Usage: system(\"gfan\",I,int)");
-		return TRUE;
-	}
+        if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
+        {
+                Werror("system(\"gfan\"...) Ideal expected");
+                return TRUE; //Ooooops
+        }
+ideal I=((ideal)h->Data());
+res->rtyp=IDEAL_CMD;
+res->data=(ideal) gfan(I);
 //res->rtyp=LIST_CMD;
 //res->data= ???
 
-// return FALSE; //Everything went fine
+return FALSE; //Everything went fine
 }
 else
 #endif

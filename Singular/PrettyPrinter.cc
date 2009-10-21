@@ -7,7 +7,7 @@
 #include "febase.h"
 #include "PrettyPrinter.h"
 
-PrettyPrinter::PrettyPrinter (const char* fileName1, const char* fileName2,   // choose filename "" for no output file
+PrettyPrinter::PrettyPrinter (const char* fileName1, const char* fileName2,
                               const bool append1, const bool append2,
                               const int console, const char* baseIndent)
 {
@@ -47,30 +47,20 @@ PrettyPrinter::~PrettyPrinter ()
 PrettyPrinter& PrettyPrinter::operator< (const char* s)
 {
   if (strcmp(m_fileName1, "") != 0)
-  {
     m_file1 << s;
-  }
   if (m_console == 0 || m_console == 1)
-  {
     PrintS(s);
-  }
   return *this;
 }
 
 PrettyPrinter& PrettyPrinter::operator<< (const char* s)
 {
   if (strcmp(m_fileName1, "") != 0)
-  {
     m_file1 << s;
-  }
   if (strcmp(m_fileName2, "") != 0)
-  {
     m_file2 << s;
-  }
   if (m_console == 0 || m_console == 1 || m_console == 2)
-  {
     PrintS(s);
-  }
   return *this;
 }
 
@@ -179,32 +169,22 @@ PrettyPrinter& PrettyPrinter::operator>> (const unsigned long ul)
 }
 
 PrettyPrinter& PrettyPrinter::operator+ ()
-{
+{                                                                 
   if (strcmp(m_fileName1, "") != 0)
-  {
     m_file1 << "\n";
-  }
   if (m_console == 0 || m_console == 1)
-  {
     PrintLn();
-  }
   return *this;
 }
 
 PrettyPrinter& PrettyPrinter::operator++ ()
 {
   if (strcmp(m_fileName1, "") != 0)
-  {
     m_file1 << "\n";
-  }
   if (strcmp(m_fileName2, "") != 0)
-  {
     m_file2 << "\n";
-  }
   if (m_console == 0 || m_console == 1 || m_console == 2)
-  {
     PrintLn();
-  }
   return *this;
 }
 
@@ -285,4 +265,5 @@ int PrettyPrinter::getConsole () const
   return m_console;
 }
 
-#endif // defined(HAVE_MINOR) || defined(HAVE_WRAPPERS)
+#endif
+/* defined(HAVE_MINOR) || defined(HAVE_WRAPPERS) */

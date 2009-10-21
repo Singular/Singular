@@ -2,11 +2,12 @@
 
 #ifdef HAVE_WRAPPERS
 
-#include "PolyWrapper.h"
-#include "CanonicalPoly.h"
-#include "Wrappers.h"
 #include <iostream>
 #include "febase.h"
+#include "Wrappers.h"
+#include "PolyWrapper.h"
+#include "RingWrapper.h"
+#include "CanonicalPoly.h"
 
 PolyWrapper PolyWrapper::operator+ (const PolyWrapper& p) const
 {
@@ -15,7 +16,7 @@ PolyWrapper PolyWrapper::operator+ (const PolyWrapper& p) const
   +prpr > "first argument = " < this->toString();
   +prpr > "second argument = " < p.toString();
   prpr-1;
-  PolyWrapper q(this->getInternPoly()->deepCopy());  // deep copy of given PolyWrapper
+  PolyWrapper q(this->getInternPoly()->deepCopy()); /* deep copy of given PolyWrapper */
   q.getInternPoly()->add(p.getInternPoly());
   return q;
 }
@@ -43,8 +44,8 @@ const RingWrapper& PolyWrapper::getRing () const
 
 PolyWrapper::PolyWrapper (): m_pInternPoly(0)
 {
-  assume(false); // the default constructor, i.e. the one
-                 // without arguments should never be called
+  assume(false); /* the default constructor, i.e. the one
+                    without arguments should never be called */
 }
 
 PolyWrapper::PolyWrapper (InternPoly* ip): m_pInternPoly(ip)
@@ -112,4 +113,10 @@ PolyWrapper::PolyWrapper (const int i, const RingWrapper& r) {
   m_pInternPoly = new CanonicalPoly(i, r);
 }
 
-#endif // HAVE_WRAPPERS
+PolyWrapper::PolyWrapper (const SingularPoly& sp, const RingWrapper& r) {
+  +prpr > "creating a new PolyWrapper (internal type: CanonicalPoly)";
+  m_pInternPoly = new CanonicalPoly(sp, r);
+}
+
+#endif
+/* HAVE_WRAPPERS */

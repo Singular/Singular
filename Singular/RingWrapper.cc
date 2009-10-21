@@ -2,16 +2,16 @@
 
 #ifdef HAVE_WRAPPERS
 
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include "febase.h"
 #include "ipshell.h"
 #include "grammar.h"
 #include "ipid.h"
 #include "polys.h"
-#include <iostream>
-#include "RingWrapper.h"
 #include "Wrappers.h"
-#include <stdio.h>
-#include <string.h>
-#include "febase.h"
+#include "RingWrapper.h"
 
 RingWrapper::RingWrapper (const char* ringName, const int characteristic,
                           const int varNumber, const char** varNames, const char* ringOrder)
@@ -29,7 +29,7 @@ RingWrapper::RingWrapper (const char* ringName, const int characteristic,
   m_singularRing->order  = (int *) omAlloc(2* sizeof(int *));
   m_singularRing->block0 = (int *)omAlloc0(2 * sizeof(int *));
   m_singularRing->block1 = (int *)omAlloc0(2 * sizeof(int *));
-  /* ringorder 'ringOrder' for the first block: var 1..N */
+  /* ringorder 'ringOrder' for the first block: var 1..varNumber */
   if (strcmp(ringOrder, "dp") == 0) m_singularRing->order[0]  = ringorder_dp;
   if (strcmp(ringOrder, "lp") == 0) m_singularRing->order[0]  = ringorder_lp;
   if (strcmp(ringOrder, "Dp") == 0) m_singularRing->order[0]  = ringorder_Dp;
@@ -40,7 +40,7 @@ RingWrapper::RingWrapper (const char* ringName, const int characteristic,
   m_singularRing->block1[0] = varNumber;
   /* the last block: everything is 0 */
   m_singularRing->order[1]  = 0;
-  /*polynomial ring*/
+  /* polynomial ring */
   m_singularRing->OrdSgn    = 1;
 
   /* complete ring intializations */
@@ -49,8 +49,8 @@ RingWrapper::RingWrapper (const char* ringName, const int characteristic,
 
 RingWrapper::RingWrapper ()
 {
-  assume(false); // the default constructor, i.e. the one
-                 // without arguments should never be called
+  +prpr > "creating a new RingWrapper (internal type: SINGULAR ring)";
+  m_singularRing = currRing;
 }
 
 RingWrapper::~RingWrapper ()
@@ -65,9 +65,7 @@ char* RingWrapper::toString () const
   int ch = rChar(m_singularRing);
   int n = rVar(m_singularRing);
   if (ch == 0)
-  {
     strcat(str, "Q");
-  }
   else
   {
     char h[10];
@@ -75,7 +73,8 @@ char* RingWrapper::toString () const
     strcat(str, h);
   }
   strcat(str, "[");
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++)
+  {
     if (i > 0) strcat(str, ",");
     strcat(str, m_singularRing->names[i]);
   }
@@ -113,4 +112,5 @@ bool RingWrapper::isCompatible (const RingWrapper& r) const
   return result;
 }
 
-#endif // HAVE_WRAPPERS
+#endif
+/* HAVE_WRAPPERS */
