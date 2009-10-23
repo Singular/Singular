@@ -3,6 +3,7 @@ Changes w.r.t 3-1-0-6:
 - bug fixed for Z/p (p>32003): nPower
 - bug fixed in Singular<->factory conversion (track 164)
 - nInt, nInit are now indep. from currRing
+- intmat [n][0] fixed
 
 Changes w.r.t 3-1-0-5:
 - 3-1-0-6: Fri Aug 21 12:59:52 CEST 2009
