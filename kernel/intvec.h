@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.8 2009-06-05 05:18:27 motsak Exp $ */
+/* $Id: intvec.h,v 1.9 2009-10-23 09:58:49 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -35,11 +35,15 @@ public:
     assume( iv != NULL );
     row = iv->rows();
     col = iv->cols();
-    v   = (int *)omAlloc(sizeof(int)*row*col);
-    for (int i=row*col-1;i>=0; i--)
+    if (row*col>0)
     {
-      v[i] = (*iv)[i];
+      v   = (int *)omAlloc(sizeof(int)*row*col);
+      for (int i=row*col-1;i>=0; i--)
+      {
+        v[i] = (*iv)[i];
+      }
     }
+    else v=NULL;
   }
 
   void resize(int new_length);

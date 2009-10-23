@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: intvec.cc,v 1.5 2009-05-15 13:20:05 motsak Exp $ */
+/* $Id: intvec.cc,v 1.6 2009-10-23 09:58:49 Singular Exp $ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */
@@ -56,7 +56,7 @@ intvec::intvec(int r, int c, int init)
   row = r;
   col = c;
   int l = r*c;
-  if ((r>0) && (c>0))
+  if (l>0) /*(r>0) && (c>0) */
     v = (int *)omAlloc(sizeof(int)*l);
   else
     v = NULL;
@@ -71,7 +71,7 @@ char * intvec::ivString(int not_mat,int spaces, int dim) const
   //Print("ivString:this=%x,v=%x,row=%d\n",this,v,row);
 #ifndef OM_NDEBUG
   omCheckAddr((void *)this);
-  omCheckAddr((void *)v);
+  if (v!=NULL) omCheckAddr((void *)v);
 #endif
   StringSetS("");
   if ((col == 1)&&(not_mat))
