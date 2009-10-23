@@ -2,9 +2,9 @@
 gfan.h Interface to gfan.cc
 
 $Author: monerjan $
-$Date: 2009-10-20 10:39:18 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.11 2009-10-20 10:39:18 monerjan Exp $
-$Id: gfan.h,v 1.11 2009-10-20 10:39:18 monerjan Exp $
+$Date: 2009-10-23 14:56:55 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.12 2009-10-23 14:56:55 monerjan Exp $
+$Id: gfan.h,v 1.12 2009-10-23 14:56:55 monerjan Exp $
 */
 #ifdef HAVE_GFAN
 #include "intvec.h"
@@ -152,6 +152,7 @@ class gcone
 		void showFacets(short codim=1);
 		void showSLA(facet &f);
 		void idDebugPrint(ideal const &I);
+		bool isMonomial(ideal const &I);
 		void setNumFacets();
 		int getNumFacets();
 		int getUCN();

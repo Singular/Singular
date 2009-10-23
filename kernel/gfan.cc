@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-10-20 15:14:02 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.99 2009-10-20 15:14:02 monerjan Exp $
-$Id: gfan.cc,v 1.99 2009-10-20 15:14:02 monerjan Exp $
+$Date: 2009-10-23 14:56:55 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.100 2009-10-23 14:56:55 monerjan Exp $
+$Id: gfan.cc,v 1.100 2009-10-23 14:56:55 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -471,6 +471,20 @@ void gcone::idDebugPrint(ideal const &I)
 		cout << ",";
 	}
 	cout << endl;
+}
+
+bool gcone::isMonomial(ideal const &I)
+{
+	bool res = TRUE;
+	for(int ii=0;ii<IDELEMS(I);ii++)
+	{
+		if(pLength((poly)I->m[ii])>1)
+		{
+			res = FALSE;
+			break;
+		}						 
+	}
+	return res;
 }
 		
 /** \brief Set gcone::numFacets */
@@ -2713,6 +2727,12 @@ ideal gfan(ideal inputIdeal, int h)
 		gcAct->getGB(inputIdeal);
 		cout << "GB of input ideal is:" << endl;
 		idShow(gcAct->gcBasis);
+		if(gcAct->isMonomial(gcAct->gcBasis))
+		{
+			WerrorS("Monomial input - terminating");
+			res=gcAct->gcBasis;
+			//break;
+		}
 		cout << endl;
 		gcAct->getConeNormals(gcAct->gcBasis);		
 		gcAct->noRevS(*gcAct);		
