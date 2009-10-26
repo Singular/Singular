@@ -12,7 +12,7 @@
  *  \section design Design Overview
  *  The following picture shows a UML-like design of the classes implemented so far,
  *  and their relationship.
- *  \image html "file:///C:/Work/C++Code/inside SINGULAR/C++Wrappers/Overview1.jpg"
+ *  \image html "Overview1.jpg"
  *
  *  \section howto How to run this code inside SINGULAR
  *  The following steps need to be done to run the C++ wrapper code inside SINGULAR:<br><br>
