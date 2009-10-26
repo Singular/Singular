@@ -91,13 +91,17 @@ char* RingWrapper::toString () const
 
 void RingWrapper::print () const
 {
-  PrintS(this->toString());
+  char* s = this->toString();
+  PrintS(s);
+  delete s;
 }
 
 void RingWrapper::printLn () const
 {
-  PrintS(this->toString());
+  char* s = this->toString();
+  PrintS(s);
   PrintLn();
+  delete s;
 }
 
 const SingularRing& RingWrapper::getSingularRing () const
