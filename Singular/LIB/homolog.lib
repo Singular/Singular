@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: homolog.lib,v 1.28 2009-04-07 16:18:05 seelisch Exp $";
+version="$Id: homolog.lib,v 1.29 2009-10-27 09:53:18 Singular Exp $";
 category="Commutative Algebra";
 info="
 LIBRARY:  homolog.lib   Procedures for Homological Algebra
@@ -8,6 +8,7 @@ AUTHORS:  Gert-Martin Greuel, greuel@mathematik.uni-kl.de,
 @*        Christoph Lossen,  lossen@mathematik.uni-kl.de
 
 PROCEDURES:
+ canonMap(id);          the kernel and the cokernel of the canonical map
  cup(M);                cup: Ext^1(M',M') x Ext^1() --> Ext^2()
  cupproduct(M,N,P,p,q); cup: Ext^p(M',N') x Ext^q(N',P') --> Ext^p+q(M',P')
  depth(I,M);            depth(I,M'),    I ideal, M module, M'=coker(M)
@@ -1864,5 +1865,66 @@ example
 
   M=x2+y2,z7;          // test if R/<x2+y2,z7> is Cohen-Macaulay
   isCM(M);
+}
+
+proc canonMap(list #)
+"USAGE:  canonMap(id); id= ideal/module,
+RETURN:  a list L, the kernel in two different representations and
+@*       the cokernel of the canonical map
+@*       M ---> Ext^c_R(Ext^c_R(M,R),R) given by presentations
+@*       Here M is the R-module (R=basering) given by the presentation
+@*       defined by id, i.e. M=R/id resp. M=R^n/id
+@*       c is the codimension of M
+@*       L[1] is the preimage of the kernel in R resp. R^n
+@*       L[2] is a presentation of the kernel
+@*       L[3] is a presentation of the cokernel
+EXAMPLE: example canonMap; shows an example
+"
+{
+   module M=#[1];
+   int c=nvars(basering)-dim(std(M));
+   if(c==0)
+   {
+      module K=syz(transpose(M));
+      module Ke=syz(transpose(K));
+      module Co=modulo(syz(transpose(syz(K))),transpose(K));
+    }
+   else
+   {
+      int i;
+      resolution F=mres(M,c+1);
+      module K=syz(transpose(F[c+1]));
+      K=simplify(reduce(K,std(transpose(F[c]))),2);
+      module A=modulo(K,transpose(F[c]));
+      resolution G=nres(A,c+1);
+      for(i=1;i<=c;i++)
+      {
+         K=lift(transpose(F[c-i+1]),K*G[i]);
+      }
+      module Ke=modulo(transpose(K),transpose(G[c]));
+      module Co=modulo(syz(transpose(G[c+1])),transpose(K)+transpose(G[c]));
+   }
+   return(list(prune(Ke),prune(modulo(Ke,M)),prune(Co)));
+
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(x,y),dp;
+   ideal i = x,y;
+   canonMap(i);
+   ring R = 0,(x,y,z,w),dp;
+   ideal I1 = x,y;
+   ideal I2 = z,w;
+   ideal I = intersect(I1,I2);
+   canonMap(I);
+   module M = syz(I);
+   canonMap(M);
+   ring S = 0,(x,y,z,t),Wp(3,4,5,1);
+   ideal I = x-t3,y-t4,z-t5;
+   ideal J = eliminate(I,t);
+   ring T = 0,(x,y,z),Wp(3,4,5);
+   ideal p = imap(S,J);
+   ideal p2 = p^2;
+   canonMap(p2);
 }
 
