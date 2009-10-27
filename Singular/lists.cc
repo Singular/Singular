@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.31 2009-07-29 14:49:38 Singular Exp $ */
+/* $Id: lists.cc,v 1.32 2009-10-27 09:23:26 Singular Exp $ */
 /*
 * ABSTRACT: handling of the list type
 */
@@ -74,7 +74,7 @@ BOOLEAN lAdd(leftv res, leftv u, leftv v)
 }
 
 /*2
-* insert v into list u, destroys u
+* insert v into list ul, destroys u
 */
 lists lInsert0(lists ul, leftv v, int pos)
 {
@@ -87,7 +87,7 @@ lists lInsert0(lists ul, leftv v, int pos)
   for(i=j=0;i<=ul->nr;i++,j++)
   {
     if(j==pos) j++;
-    l->m[j].Copy(&ul->m[i]);
+    l->m[j]=ul->m[i];
   }
   for(j=ul->nr+1;j<pos;j++)
     l->m[j].rtyp=DEF_CMD;
