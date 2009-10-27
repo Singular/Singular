@@ -269,7 +269,7 @@ void IntMinorProcessor::defineMatrix (const int numberOfRows, const int numberOf
 }
 
 IntMinorValue IntMinorProcessor::getMinor(const int dimension, const int* rowIndices, const int* columnIndices,
-                                            Cache<MinorKey, IntMinorValue>& c, const int characteristic) {
+                                          Cache<MinorKey, IntMinorValue>& c, const int characteristic) {
     defineSubMatrix(dimension, rowIndices, dimension, columnIndices);
     _minorSize = dimension;
     // call a helper method which recursively computes the minor using the cache c:
@@ -355,9 +355,9 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
         s--; as--; // first addition was 0 + ..., so we do not count it
         if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
         if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
-        IntMinorValue newMV = IntMinorValue(result, m, s, am, as, -1, -1); // "-1" is to signal that any statistics about the
-                                                                             // number of retrievals does not make sense, as we
-                                                                             // do not use a cache.
+        IntMinorValue newMV(result, m, s, am, as, -1, -1); // "-1" is to signal that any statistics about the
+                                                           // number of retrievals does not make sense, as we
+                                                           // do not use a cache.
         return newMV;
     }
 }
@@ -377,7 +377,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
         int result = 0;                                      // This will contain the value of the minor.
         int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
-        IntMinorValue mv = IntMinorValue(0, 0, 0, 0, 0, 0, 0);     // for storing all intermediate minors
+        IntMinorValue mv(0, 0, 0, 0, 0, 0, 0);               // for storing all intermediate minors
         if (b >= 0) {
             // This means that the best line is the row with absolute (0-based) index b.
             // Using Laplace, the sign of the contributing minors must be iterating;
@@ -450,7 +450,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
         s--; as--; // first addition was 0 + ..., so we do not count it
         if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
         if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
-        IntMinorValue newMV = IntMinorValue(result, m, s, am, as, 1, potentialRetrievals);
+        IntMinorValue newMV(result, m, s, am, as, 1, potentialRetrievals);
         cch.put(mk, newMV); // Here's the actual put inside the cache.
         return newMV;
     }
@@ -492,8 +492,7 @@ string PolyMinorProcessor::toString () const {
 
 bool PolyMinorProcessor::isEntryZero (const int absoluteRowIndex, const int absoluteColumnIndex) const
 {
-  poly zeroPoly = pISet(0);
-  return pEqualPolys(_polyMatrix[absoluteRowIndex][absoluteColumnIndex], zeroPoly);
+  return (_polyMatrix[absoluteRowIndex][absoluteColumnIndex] == NULL);
 }
 
 PolyMinorProcessor::~PolyMinorProcessor() {
@@ -556,11 +555,11 @@ PolyMinorValue PolyMinorProcessor::getNextMinor(Cache<MinorKey, PolyMinorValue>&
 
 // performs the assignment a = a + (b * c * d)
 // c and d must neither be destroyed nor modified
-// b may be destroyed
-// a must finally contain the new value
-poly ops(poly a, poly b, poly c, poly d)
+// the old value of a and b will be destroyed
+// a will finally contain the new value
+void ops(poly a, poly b, poly c, poly d)
 {
-  return p_Add_q(a, p_Mult_q(b, pp_Mult_qq(c, d, currRing), currRing), currRing);
+  a = p_Add_q(a, p_Mult_q(b, pp_Mult_qq(c, d, currRing), currRing), currRing);
 }
 
 PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk) {
@@ -582,7 +581,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
             // Using Laplace, the sign of the contributing minors must be iterating;
             // the initial sign depends on the relative index of b in minorRowKey:
             int sign = (mk.getRelativeRowIndex(b) % 2 == 0 ? 1 : -1);
-            poly signPoly = pISet(sign);
+            poly signPoly = NULL;
             for (int c = 0; c < k; c++) {
                 int absoluteC = mk.getAbsoluteColumnIndex(c);      // This iterates over all involved columns.
                 MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey when we omit row b and column absoluteC.
@@ -592,14 +591,15 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
                     as += mv.getAccumulatedAdditions();
-                    result = ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]); // adding sub-determinante times matrix entry
-                                                                                               // times appropriate sign
+                    pDelete(&signPoly);
+                    signPoly = pISet(sign);
+                    ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]); // adding in "result" the product of sign,
+                                                                                      // sub-determinante, and matrix entry
+                    signPoly = NULL;
                     s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
-                signPoly = pISet(sign);
             }
-            // p_Delete(&signPoly, currRing);
         }
         else {
             b = - b - 1;
@@ -607,7 +607,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
             // Using Laplace, the sign of the contributing minors must be iterating;
             // the initial sign depends on the relative index of b in minorColumnKey:
             int sign = (mk.getRelativeColumnIndex(b) % 2 == 0 ? 1 : -1);
-            poly signPoly = pISet(sign);
+            poly signPoly = NULL;
             for (int r = 0; r < k; r++) {
                 int absoluteR = mk.getAbsoluteRowIndex(r);        // This iterates over all involved rows.
                 MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey when we omit row absoluteR and column b.
@@ -617,14 +617,15 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     s += mv.getAdditions();
                     am += mv.getAccumulatedMultiplications();
                     as += mv.getAccumulatedAdditions();
-                    result = ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]); // adding sub-determinante times matrix entry
-                                                                                               // times appropriate sign
+                    pDelete(&signPoly);
+                    signPoly = pISet(sign);
+                    ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]); // adding in "result" the product of sign,
+                                                                                      // sub-determinante, and matrix entry
+                    signPoly = NULL;
                     s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
-                signPoly = pISet(sign);
             }
-            // p_Delete(&signPoly, currRing);
         }
         s--; as--; // first addition was 0 + ..., so we do not count it
         if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
@@ -632,7 +633,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         PolyMinorValue newMV(result, m, s, am, as, -1, -1); // "-1" is to signal that any statistics about the
                                                             // number of retrievals does not make sense, as we
                                                             // do not use a cache.
-        // p_Delete(&result, currRing);
+        pDelete(&result);
         return newMV;
     }
 }
@@ -651,17 +652,17 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         poly result = pISet(0);                              // This will contain the value of the minor.
         int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
-        PolyMinorValue mv = PolyMinorValue(0, 0, 0, 0, 0, 0, 0);     // for storing all intermediate minors
         if (b >= 0) {
             // This means that the best line is the row with absolute (0-based) index b.
             // Using Laplace, the sign of the contributing minors must be iterating;
             // the initial sign depends on the relative index of b in minorRowKey:
             int sign = (mk.getRelativeRowIndex(b) % 2 == 0 ? 1 : -1);
-            poly signPoly = pISet(sign);
+            poly signPoly = NULL;
             for (int c = 0; c < k; c++) {
                 int absoluteC = mk.getAbsoluteColumnIndex(c);      // This iterates over all involved columns.
                 MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey when we omit row b and column absoluteC.
                 if (!isEntryZero(b, absoluteC)) { // Only then do we have to consider this sub-determinante.
+                    PolyMinorValue mv;              // for storing all intermediate minors
                     if (cch.hasKey(subMk)) { // trying to find the result in the cache
                         mv = cch.getValue(subMk);
                         mv.incrementRetrievals(); // once more, we made use of the cached value for key mk
@@ -678,12 +679,14 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     // In any case, we count all nested operations in the accumulative counters:
                     am += mv.getAccumulatedMultiplications();
                     as += mv.getAccumulatedAdditions();
-                    result = ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]); // adding sub-determinante times matrix entry
-                                                                                               // times appropriate sign
+                    pDelete(&signPoly);
+                    signPoly = pISet(sign);
+                    ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]); // adding in "result" the product of sign,
+                                                                                      // sub-determinante, and matrix entry
+                    signPoly = NULL;
                     s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
-                signPoly = pISet(sign);
             }
         }
         else {
@@ -692,11 +695,12 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
             // Using Laplace, the sign of the contributing minors must be iterating;
             // the initial sign depends on the relative index of b in minorColumnKey:
             int sign = (mk.getRelativeColumnIndex(b) % 2 == 0 ? 1 : -1);
-            poly signPoly = pISet(sign);
+            poly signPoly = NULL;
             for (int r = 0; r < k; r++) {
                 int absoluteR = mk.getAbsoluteRowIndex(r);        // This iterates over all involved rows.
                 MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey when we omit row absoluteR and column b.
                 if (!isEntryZero(absoluteR, b)) { // Only then do we have to consider this sub-determinante.
+                    PolyMinorValue mv;              // for storing all intermediate minors
                     if (cch.hasKey(subMk)) { // trying to find the result in the cache
                         mv = cch.getValue(subMk);
                         mv.incrementRetrievals(); // once more, we made use of the cached value for key mk
@@ -713,12 +717,14 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     // In any case, we count all nested operations in the accumulative counters:
                     am += mv.getAccumulatedMultiplications();
                     as += mv.getAccumulatedAdditions();
-                    result = ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]); // adding sub-determinante times matrix entry
-                                                                                               // times appropriate sign
+                    pDelete(&signPoly);
+                    signPoly = pISet(sign);
+                    ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]); // adding in "result" the product of sign,
+                                                                                      // sub-determinante, and matrix entry
+                    signPoly = NULL;
                     s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
                 sign = - sign; // alternating the sign
-                signPoly = pISet(sign);
             }
         }
         // Let's cache the newly computed minor:
@@ -726,7 +732,8 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         s--; as--; // first addition was 0 + ..., so we do not count it
         if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
         if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
-        PolyMinorValue newMV = PolyMinorValue(result, m, s, am, as, 1, potentialRetrievals);
+        PolyMinorValue newMV(result, m, s, am, as, 1, potentialRetrievals);
+        pDelete(&result);
         cch.put(mk, newMV); // Here's the actual put inside the cache.
         return newMV;
     }
