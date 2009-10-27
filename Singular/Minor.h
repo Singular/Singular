@@ -657,6 +657,8 @@ class PolyMinorValue : public MinorValue {
 
              PolyMinorValue (const PolyMinorValue& mv);
              
+             void operator= (const PolyMinorValue& mv);
+
              // just to make the compiler happy
              PolyMinorValue ();
              
