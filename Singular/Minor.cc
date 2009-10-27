@@ -892,7 +892,7 @@ PolyMinorValue::PolyMinorValue () {
 
 PolyMinorValue::~PolyMinorValue()
 {
-  // p_Delete(&_result, currRing);
+  p_Delete(&_result, currRing);
 }
 
 poly PolyMinorValue::getResult() const {
@@ -935,7 +935,18 @@ string PolyMinorValue::toString () const {
 }
 
 PolyMinorValue::PolyMinorValue (const PolyMinorValue& mv) {
-    _result = mv.getResult();
+    _result = pCopy(mv.getResult());
+    _retrievals = mv.getRetrievals();
+    _potentialRetrievals = mv.getPotentialRetrievals();
+    _multiplications = mv.getMultiplications();
+    _additions = mv.getAdditions();
+    _accumulatedMult = mv.getAccumulatedMultiplications();
+    _accumulatedSum = mv.getAccumulatedAdditions();
+}
+
+void PolyMinorValue::operator= (const PolyMinorValue& mv) {
+    pDelete(&_result);
+    _result = pCopy(mv.getResult());
     _retrievals = mv.getRetrievals();
     _potentialRetrievals = mv.getPotentialRetrievals();
     _multiplications = mv.getMultiplications();
