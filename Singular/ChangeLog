@@ -4,6 +4,8 @@ Changes w.r.t 3-1-0-6:
 - bug fixed in Singular<->factory conversion (track 164)
 - nInt, nInit are now indep. from currRing
 - intmat [n][0] fixed
+- insert: memeory leak fixed (track 177)
+- homolog.lib: canonMap new
 
 Changes w.r.t 3-1-0-5:
 - 3-1-0-6: Fri Aug 21 12:59:52 CEST 2009
