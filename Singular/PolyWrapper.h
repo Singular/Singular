@@ -27,7 +27,7 @@
  *  Polynomials wrapped by PolyWrapper <em>know</em> in which ring they live.
  *  A wrapper object of that ring can be obtained by calling
  *  PolyWrapper::getRing () const.
- *  \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
+ *  \author Michael Brickenstein, Alexander Dreyer, Oleksandr Motsak, Hans Sch&ouml;nemann, Frank Seelisch, http://www.mathematik.uni-kl.de
  */
 class PolyWrapper
 {

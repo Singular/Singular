@@ -15,7 +15,7 @@
  *  make shallow copies of instances of C by simply incrementing the
  *  reference counter (which is a member of the superclass of C, i.e.,
  *  of ReferenceCounter).
- *  \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
+ *  \author Michael Brickenstein, Alexander Dreyer, Oleksandr Motsak, Hans Sch&ouml;nemann, Frank Seelisch, http://www.mathematik.uni-kl.de
  */
 class ReferenceCounter {
 private:

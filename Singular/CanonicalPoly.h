@@ -16,7 +16,7 @@
  *  thus any instance of CanonicalPoly deploys reference counting and
  *  facilities for fast shallow copying.<br>
  *  Any instance of CanonicalPoly wraps an actual SINGULAR polynomial.
- *  \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
+ *  \author Michael Brickenstein, Alexander Dreyer, Oleksandr Motsak, Hans Sch&ouml;nemann, Frank Seelisch, http://www.mathematik.uni-kl.de
  */
 class CanonicalPoly : public InternPoly
 {

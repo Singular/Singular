@@ -19,7 +19,7 @@
  *  An important feature of RingWrapper is the check whether two given rings
  *  (wrapped as instances of RingWrapper) are compatible with respect to
  *  basic arithmetics; such as PolyWrapper::operator+ (const PolyWrapper& p) const.
- *  \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
+ *  \author Michael Brickenstein, Alexander Dreyer, Oleksandr Motsak, Hans Sch&ouml;nemann, Frank Seelisch, http://www.mathematik.uni-kl.de
  */
 class RingWrapper
 {

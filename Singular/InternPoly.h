@@ -24,7 +24,7 @@
  *  can be implemented inside InternPoly (and in the classes derived from it)
  *  and only the user interface for polynomail actions can by made available
  *  through PolyWrapper.<br>
- *  \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
+ *  \author Michael Brickenstein, Alexander Dreyer, Oleksandr Motsak, Hans Sch&ouml;nemann, Frank Seelisch, http://www.mathematik.uni-kl.de
  */
 class InternPoly : public ReferenceCounter
 {
