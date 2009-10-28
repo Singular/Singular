@@ -175,8 +175,10 @@ newtonInterp(const CanonicalForm alpha, const CanonicalForm u, const CanonicalFo
 
   CanonicalForm interPoly;
 
-  interPoly = oldInterPoly + (u - oldInterPoly(alpha, x)) / newtonPoly(alpha, x) * newtonPoly;
-
+  interPoly = oldInterPoly + ((u - oldInterPoly(alpha, x)) / newtonPoly(alpha, x)) * newtonPoly;
+  /*cout << "newtonPoly (alpha,x)= " << newtonPoly (alpha,x) << "\n";
+  cout << "1/newtonPoly (alpha,x)= " << 1/newtonPoly (alpha,x) << "\n";
+  cout << "newtonPoly (alpha,x)*(1/newtonPoly (alpha,x))= " << newtonPoly (alpha,x)*(1/newtonPoly (alpha,x)) << "\n";*/
   //if(debug)cout << "newtonInterpIncremental output:" << interPoly << endl;
   return interPoly;
 }
@@ -218,7 +220,7 @@ static CanonicalForm simpleGCD(const CanonicalForm & A, const CanonicalForm & B)
     P2 = rem;
   }
   //if(debug == 1)cout << "simpleGCD output: " << P1 << endl;
-  return(P1);
+  return(P1/lc(P1));
 }
 
 
@@ -229,7 +231,7 @@ static CanonicalForm GFPowDown(const CanonicalForm & A, int k)
 {
   CanonicalForm result = 0;
   int i, j;
-  int fieldSize = (int)pow(getCharacteristic(), getGFDegree());
+  int fieldSize = (int) ::pow(getCharacteristic(), getGFDegree());
   CanonicalForm g;
   for(i = 0; i <= degree(A); i++)
   {
@@ -350,7 +352,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
   if (CFFactory::gettype() == GaloisFieldDomain)
   {
     k=getGFDegree();
-    fieldSize = (int)pow(p, k);
+    fieldSize = (int) ::pow(p, k);
   }
 
   //if(debug)
@@ -507,14 +509,14 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
         degMax = totaldegree(B);
       }
       int expon = 2; // expon <= will not extend the field
-      while(pow(fieldSize, expon) < degMax)
+      while(::pow(fieldSize, expon) < degMax)
       {
         expon++;
       }
       //if(debug)cout << "Not enough elements in the base field. An extension to " << p << "^" << k*expon << " is needed." << endl;
       if(k > 1)
       {
-        if(pow(p,k * expon) < (1<<16))
+        if(::pow(p,k * expon) < (1<<16))
         {
           setCharacteristic(p, k * expon, 'b');
           CanonicalForm P1 = GFMapUp(A, k);
@@ -538,7 +540,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
       }
       else
       {
-        if(pow(p,k * expon) < (1<<16))
+        if(::pow(p,k * expon) < (1<<16))
         {
           setCharacteristic(p, k * expon, 'a');
           CanonicalForm P1 = A.mapinto();

@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.26 2009-06-04 17:50:49 Singular Exp $ */
+/* $Id: NTLconvert.cc,v 1.27 2009-10-28 14:51:26 Singular Exp $ */
 #include <config.h>
 
 #ifdef HAVE_SINGULAR
@@ -1100,5 +1100,23 @@ zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f, zz_pX mipo)
   for(k=NTLcurrentExp;k>=0;k--) SetCoeff(result,k,0);
   result.normalize();
   return result;
+}
+
+CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
+{
+  CanonicalForm bigone= 0;
+  for (int j=0;j<deg(f)+1;j++)
+  {
+    if (IsOne(coeff(f,j)))
+      bigone+=power(x,j);
+      else
+      {
+        //cout << "hier doof" << "\n";
+        CanonicalForm coefficient=convertNTLzzpE2CF(coeff(f,j),alpha);
+        //cout << "ja" << "\n";
+        if (coeff(f,j)!=0)
+          bigone += (power(x,j)*coefficient);
+      }
+  }
 }
 #endif
