@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_inst.cc,v 1.10 2006-05-15 09:03:05 Singular Exp $ */
+/* $Id: ftmpl_inst.cc,v 1.11 2009-10-28 14:44:57 Singular Exp $ */
 
 //{{{ docu
 //
@@ -76,5 +76,9 @@ template int tabs ( const int & );
 //}}}
 
 //
+template List<CanonicalForm> Union ( const List<CanonicalForm> &, const List<CanonicalForm> & );
+template List<CanonicalForm> Difference ( const List<CanonicalForm> &, const List<CanonicalForm> & );
+template CanonicalForm prod ( const List<CanonicalForm> & );
+template bool find ( const List<CanonicalForm> &, const CanonicalForm&);
 // place here your own template stuff, not yet instantiated by factory
 //

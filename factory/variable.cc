@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.cc,v 1.8 2009-06-04 17:50:50 Singular Exp $ */
+/* $Id: variable.cc,v 1.9 2009-10-28 14:43:38 Singular Exp $ */
 
 #include <config.h>
 
@@ -223,6 +223,12 @@ CanonicalForm getMipo( const Variable & alpha )
     ASSERT( alpha.level() < 0 && alpha.level() != LEVELBASE, "illegal extension" );
     return CanonicalForm( algextensions[-alpha.level()].mipo()->copyObject() );
 }
+
+/*void setMipo ( const Variable & alpha, const CanonicalForm & mipo)
+{
+    ASSERT( alpha.level() < 0 && alpha.level() != LEVELBASE, "illegal extension" );
+    algextensions[-alpha.level()]= ext_entry((InternalPoly*)(conv2mipo( mipo, alpha ).getval()), true );
+}*/
 
 bool hasMipo( const Variable & alpha )
 {

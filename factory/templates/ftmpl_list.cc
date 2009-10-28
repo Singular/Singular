@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.cc,v 1.9 2006-05-15 09:03:07 Singular Exp $ */
+/* $Id: ftmpl_list.cc,v 1.10 2009-10-28 14:42:23 Singular Exp $ */
 
 #include <factoryconf.h>
 
@@ -46,10 +46,11 @@ ListItem<T>::~ListItem()
 template <class T>
 ListItem<T>& ListItem<T>::operator=( const ListItem<T>& i )
 {
-    if ( this != &i ) {
-	next = i.next;
-	prev = i.prev;
-	item = i.item;
+    if ( this != &i )
+    {
+        next = i.next;
+        prev = i.prev;
+        item = i.item;
     }
     return *this;
 }
@@ -80,9 +81,9 @@ template <class T>
 void ListItem<T>::print( OSTREAM & os )
 {
     if ( item )
-	os << *item;
+        os << *item;
     else
-	os << "(no item)";
+        os << "(no item)";
 }
 #endif /* NOSTREAMIO */
 
@@ -100,20 +101,23 @@ template <class T>
 List<T>::List( const List<T>& l )
 {
     ListItem<T>* cur = l.last;
-    if ( cur ) {
-	first = new ListItem<T>( *(cur->item), 0, 0 );
-	last = first;
-	cur = cur->prev;
-	while ( cur ) {
-	    first = new ListItem<T>( *(cur->item), first, 0 );
-	    first->next->prev = first;
-	    cur = cur->prev;
-	}
-	_length = l._length;
+    if ( cur )
+    {
+        first = new ListItem<T>( *(cur->item), 0, 0 );
+        last = first;
+        cur = cur->prev;
+        while ( cur )
+	{
+            first = new ListItem<T>( *(cur->item), first, 0 );
+            first->next->prev = first;
+            cur = cur->prev;
+        }
+        _length = l._length;
     }
-    else {
-	first = last = 0;
-	_length = 0;
+    else
+    {
+        first = last = 0;
+        _length = 0;
     }
 }
 
@@ -130,10 +134,11 @@ template <class T>
 List<T>::~List()
 {
     ListItem<T> *dummy;
-    while ( first ) {
-	dummy = first;
-	first = first->next;
-	delete dummy;
+    while ( first )
+    {
+        dummy = first;
+        first = first->next;
+        delete dummy;
     }
 }
 
@@ -141,30 +146,35 @@ List<T>::~List()
 template <class T>
 List<T>& List<T>::operator=( const List<T>& l )
 {
-    if ( this != &l ) {
-	ListItem<T> *dummy;
-	while ( first ) {
-	    dummy = first;
-	    first = first->next;
-	    delete dummy;
-	}
-	ListItem<T>* cur = l.last;
-	if ( cur ) {
-	    first = new ListItem<T>( *(cur->item), 0, 0 );
-	    last = first;
-	    cur = cur->prev;
-	    while ( cur ) {
-		first = new ListItem<T>( *(cur->item), first, 0 );
-		first->next->prev = first;
-		cur = cur->prev;
-	    }
-	    _length = l._length;
-	}
-	else {
-	    first = last = 0;
-	    _length = 0;
-	}
-	_length = l._length;
+    if ( this != &l )
+    {
+        ListItem<T> *dummy;
+        while ( first )
+	{
+            dummy = first;
+            first = first->next;
+            delete dummy;
+        }
+        ListItem<T>* cur = l.last;
+        if ( cur )
+	{
+            first = new ListItem<T>( *(cur->item), 0, 0 );
+            last = first;
+            cur = cur->prev;
+            while ( cur )
+	    {
+                first = new ListItem<T>( *(cur->item), first, 0 );
+                first->next->prev = first;
+                cur = cur->prev;
+            }
+            _length = l._length;
+        }
+        else
+	{
+            first = last = 0;
+            _length = 0;
+        }
+        _length = l._length;
     }
     return *this;
 }
@@ -175,7 +185,7 @@ void List<T>::insert ( const T& t )
 {
     first = new ListItem<T>( t, first, 0 );
     if ( last )
-	first->next->prev = first;
+        first->next->prev = first;
     last = ( last ) ? last : first;
     _length++;
 }
@@ -185,22 +195,24 @@ template <class T>
 void List<T>::insert ( const T& t, int (*cmpf)( const T&, const T& ) )
 {
     if ( ! first || cmpf( *first->item, t ) > 0 )
-	insert( t );
+        insert( t );
     else if ( cmpf( *last->item, t ) < 0 )
-	append( t );
-    else {
-	ListItem<T> * cursor = first;
-	int c;
-	while ( (c = cmpf( *cursor->item, t )) < 0 )
-	    cursor = cursor->next;
-	if ( c == 0 )
-	    *cursor->item = t;
-	else {
-	    cursor = cursor->prev;
-	    cursor->next = new ListItem<T>( t, cursor->next, cursor );
-	    cursor->next->next->prev = cursor->next;
-	    _length++;
-	}
+        append( t );
+    else
+    {
+        ListItem<T> * cursor = first;
+        int c;
+        while ( (c = cmpf( *cursor->item, t )) < 0 )
+            cursor = cursor->next;
+        if ( c == 0 )
+            *cursor->item = t;
+        else
+	{
+            cursor = cursor->prev;
+            cursor->next = new ListItem<T>( t, cursor->next, cursor );
+            cursor->next->next->prev = cursor->next;
+            _length++;
+        }
     }
 }
 
@@ -209,22 +221,24 @@ template <class T>
 void List<T>::insert ( const T& t, int (*cmpf)( const T&, const T& ), void (*insf)( T&, const T& ) )
 {
     if ( ! first || cmpf( *first->item, t ) > 0 )
-	insert( t );
+        insert( t );
     else if ( cmpf( *last->item, t ) < 0 )
-	append( t );
-    else {
-	ListItem<T> * cursor = first;
-	int c;
-	while ( (c = cmpf( *cursor->item, t )) < 0 )
-	    cursor = cursor->next;
-	if ( c == 0 )
-	    insf( *cursor->item, t );
-	else {
-	    cursor = cursor->prev;
-	    cursor->next = new ListItem<T>( t, cursor->next, cursor );
-	    cursor->next->next->prev = cursor->next;
-	    _length++;
-	}
+        append( t );
+    else
+    {
+        ListItem<T> * cursor = first;
+        int c;
+        while ( (c = cmpf( *cursor->item, t )) < 0 )
+            cursor = cursor->next;
+        if ( c == 0 )
+            insf( *cursor->item, t );
+        else
+	{
+            cursor = cursor->prev;
+            cursor->next = new ListItem<T>( t, cursor->next, cursor );
+            cursor->next->next->prev = cursor->next;
+            _length++;
+        }
     }
 }
 
@@ -234,7 +248,7 @@ void List<T>::append ( const T& t )
 {
     last = new ListItem<T>( t, 0, last );
     if ( first )
-	last->prev->next = last;
+        last->prev->next = last;
     first = ( first ) ? first : last;
     _length++;
 }
@@ -263,18 +277,21 @@ T List<T>::getFirst() const
 template <class T>
 void List<T>::removeFirst()
 {
-    if ( first ) {
-	_length--;
-	if ( first == last ) {
-	    delete first;
-	    first = last = 0;
-	}
-	else {
-	    ListItem<T> *dummy = first;
-	    first->next->prev = 0;
-	    first = first->next;
-	    delete dummy;
-	}
+    if ( first )
+    {
+        _length--;
+        if ( first == last )
+	{
+            delete first;
+            first = last = 0;
+        }
+        else
+	{
+            ListItem<T> *dummy = first;
+            first->next->prev = 0;
+            first = first->next;
+            delete dummy;
+        }
     }
 }
 
@@ -290,18 +307,21 @@ T List<T>::getLast() const
 template <class T>
 void List<T>::removeLast()
 {
-    if ( last ) {
-	_length--;
-	if ( first == last ) {
-	    delete last;
-	    first = last = 0;
-	}
-	else {
-	    ListItem<T> *dummy = last;
-	    last->prev->next = 0;
-	    last = last->prev;
-	    delete dummy;
-	}
+    if ( last )
+    {
+        _length--;
+        if ( first == last )
+	{
+            delete last;
+            first = last = 0;
+        }
+        else
+	{
+            ListItem<T> *dummy = last;
+            last->prev->next = 0;
+            last = last->prev;
+            delete dummy;
+        }
     }
 }
 
@@ -309,21 +329,25 @@ void List<T>::removeLast()
 template <class T>
 void List<T>::sort( int (*swapit) ( const T&, const T& ) )
 {
-    if ( first != last ) {
-	int swap;
-	do {
-	    swap = 0;
-	    ListItem<T> *cur = first;
-	    while ( cur->next ) {
-		if ( swapit( *(cur->item), *(cur->next->item) ) ) {
-		    T* dummy = cur->item;
-		    cur->item = cur->next->item;
-		    cur->next->item = dummy;
-		    swap = 1;
-		}
-		cur = cur->next;
-	    }
-	} while (swap);
+    if ( first != last )
+    {
+        int swap;
+        do
+	{
+            swap = 0;
+            ListItem<T> *cur = first;
+            while ( cur->next )
+	    {
+                if ( swapit( *(cur->item), *(cur->next->item) ) )
+		{
+                    T* dummy = cur->item;
+                    cur->item = cur->next->item;
+                    cur->next->item = dummy;
+                    swap = 1;
+                }
+                cur = cur->next;
+            }
+        } while (swap);
     }
 }
 
@@ -334,10 +358,11 @@ void List<T>::print ( OSTREAM & os ) const
 {
     ListItem<T> *cur = first;
     os << "( ";
-    while ( cur ) {
-	cur->print( os );
-	if ( (cur = cur->getNext()) )
-	    os << ", ";
+    while ( cur )
+    {
+        cur->print( os );
+        if ( (cur = cur->getNext()) )
+            os << ", ";
     }
     os << " )";
 }
@@ -375,9 +400,10 @@ ListIterator<T>::~ListIterator() { }
 template <class T>
 ListIterator<T>& ListIterator<T>::operator= ( const ListIterator<T> & I )
 {
-    if ( this != &I ) {
-	theList = I.theList;
-	current = I.current;
+    if ( this != &I )
+    {
+        theList = I.theList;
+        current = I.current;
     }
     return *this;
 }
@@ -411,7 +437,7 @@ template <class T>
 void ListIterator<T>::operator++ ()
 {
     if ( current )
-	current = current->next;
+        current = current->next;
 }
 
 
@@ -419,7 +445,7 @@ template <class T>
 void ListIterator<T>::operator-- ()
 {
     if ( current )
-	current = current->prev;
+        current = current->prev;
 }
 
 
@@ -427,7 +453,7 @@ template <class T>
 void ListIterator<T>::operator++ ( int )
 {
     if ( current )
-	current = current->next;
+        current = current->next;
 }
 
 
@@ -435,7 +461,7 @@ template <class T>
 void ListIterator<T>::operator-- ( int )
 {
     if ( current )
-	current = current->prev;
+        current = current->prev;
 }
 
 
@@ -456,14 +482,16 @@ void ListIterator<T>::lastItem ()
 template <class T>
 void ListIterator<T>::insert ( const T & t )
 {
-    if ( current ) {
-	if ( ! current->prev )
-	    theList->insert( t );
-	else {
-	    current->prev = new ListItem<T>( t, current, current->prev );
-	    current->prev->prev->next = current->prev;
-	    theList->_length++;
-	}
+    if ( current )
+    {
+        if ( ! current->prev )
+            theList->insert( t );
+        else
+	{
+            current->prev = new ListItem<T>( t, current, current->prev );
+            current->prev->prev->next = current->prev;
+            theList->_length++;
+        }
     }
 }
 
@@ -471,14 +499,16 @@ void ListIterator<T>::insert ( const T & t )
 template <class T>
 void ListIterator<T>::append ( const T & t )
 {
-    if ( current ) {
-	if ( ! current->next )
-	    theList->append( t );
-	else {
-	    current->next = new ListItem<T>( t, current->next, current );
-	    current->next->next->prev = current->next;
-	    theList->_length++;
-	}
+    if ( current )
+    {
+        if ( ! current->next )
+            theList->append( t );
+        else
+	{
+            current->next = new ListItem<T>( t, current->next, current );
+            current->next->next->prev = current->next;
+            theList->_length++;
+        }
     }
 }
 
@@ -486,24 +516,27 @@ void ListIterator<T>::append ( const T & t )
 template <class T>
 void ListIterator<T>::remove ( int moveright )
 {
-    if ( current ) {
-	ListItem <T>*dummynext = current->next, *dummyprev = current->prev;
-	if ( current->prev ) {
-	    current->prev->next = current->next;
-	    if ( current->next )
-		current->next->prev = current->prev;
-	    else
-		theList->last = current->prev;
-	    delete current;
-	    current = ( moveright ) ? dummynext : dummyprev;
-	}
-	else {
-	    if ( current->next )
-		current->next->prev = 0;
-	    theList->first = current->next;
-	    delete current;
-	    current = ( moveright ) ? dummynext : dummyprev;
-	}
+    if ( current )
+    {
+        ListItem <T>*dummynext = current->next, *dummyprev = current->prev;
+        if ( current->prev )
+	{
+            current->prev->next = current->next;
+            if ( current->next )
+                current->next->prev = current->prev;
+            else
+                theList->last = current->prev;
+            delete current;
+            current = ( moveright ) ? dummynext : dummyprev;
+        }
+        else
+	{
+            if ( current->next )
+                current->next->prev = 0;
+            theList->first = current->next;
+            delete current;
+            current = ( moveright ) ? dummynext : dummyprev;
+        }
     }
 }
 
@@ -524,16 +557,18 @@ List<T> Union ( const List<T> & F, const List<T> & G )
     T f;
     bool iselt;
 
-    for ( i = F; i.hasItem(); i++ ) {
-	f = i.getItem();
-	iselt = false;
-	j = G;
-	while ( ( ! iselt ) && j.hasItem() ) {
-	    iselt =  f == j.getItem();
-	    j++;
-	}
-	if ( ! iselt )
-	    L.append( f );
+    for ( i = F; i.hasItem(); i++ )
+    {
+        f = i.getItem();
+        iselt = false;
+        j = G;
+        while ( ( ! iselt ) && j.hasItem() )
+	{
+            iselt =  f == j.getItem();
+            j++;
+        }
+        if ( ! iselt )
+            L.append( f );
     }
     return L;
 }
@@ -545,7 +580,7 @@ List<T> Union ( const List<T> & F, const List<T> & G, int (*cmpf)( const T&, con
     ListIterator<T> i;
 
     for ( i = F; i.hasItem(); ++i )
-	L.insert( i.getItem(), cmpf, insf );
+        L.insert( i.getItem(), cmpf, insf );
     return L;
 }
 
@@ -556,13 +591,14 @@ List<T> Difference ( const List<T> & F, const List<T> & G )
     ListIterator<T> i, j;
     T f;
     int found;
-    for ( i = F; i.hasItem(); ++i ) {
-	f = i.getItem();
-	found = 0;
-	for ( j = G; j.hasItem() && (!found); ++j )
-	    found = f == j.getItem();
-	if ( ! found )
-	    L.append( f );
+    for ( i = F; i.hasItem(); ++i )
+    {
+        f = i.getItem();
+        found = 0;
+        for ( j = G; j.hasItem() && (!found); ++j )
+            found = f == j.getItem();
+        if ( ! found )
+            L.append( f );
     }
     return L;
 }
@@ -573,6 +609,20 @@ T prod ( const List<T> & F )
     ListIterator<T> i;
     T p = 1;
     for ( i = F; i.hasItem(); i++ )
-	p = p * i.getItem();
+        p = p * i.getItem();
     return p;
+}
+
+template <class T>
+bool find (const List<T> & F, const T& t)
+{
+  if (F.length() == 0) return false;
+  ListIterator<T> J= F;
+  while (J.hasItem())
+  {
+    if (J.getItem() == t)
+      return true;
+    J++;
+  }
+  return false;
 }

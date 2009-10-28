@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.h,v 1.10 2006-05-15 09:03:07 Singular Exp $ */
+/* $Id: ftmpl_list.h,v 1.11 2009-10-28 14:42:23 Singular Exp $ */
 
 #ifndef INCL_LIST_H
 #define INCL_LIST_H
@@ -122,5 +122,8 @@ List<T> Union ( const List<T>&, const List<T>&, int (*cmpf)( const T&, const T& 
 
 template <class T>
 T prod ( const List<T>& );
+
+template <class T>
+bool find (const List<T>&, const T& t);
 
 #endif /* ! INCL_LIST_H */

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: application.cc,v 1.4 1998-03-13 17:03:49 schmidt Exp $ */
+/* $Id: application.cc,v 1.5 2009-10-28 14:43:02 Singular Exp $ */
 
 //{{{ docu
 //
@@ -8,6 +8,7 @@
 //}}}
 
 #include <factory.h>
+#include <iostream.h>
 
 int
 main()
