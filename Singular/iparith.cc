@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.519 2009-10-29 17:52:37 Singular Exp $ */
+/* $Id: iparith.cc,v 1.520 2009-10-29 18:27:45 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -3415,7 +3415,7 @@ struct sValCmd2 dArith2[]=
 ,{jjDIFF_ID,   DIFF_CMD,       MODUL_CMD,      MODUL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjDIFF_ID,   DIFF_CMD,       MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjDIM2,      DIM_CMD,        INT_CMD,        IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |NO_RING}
-,{jjDIM2,      DIM_CMD,        INT_CMD,        MODUL_CMD,  IDEAL_CMD, NO_PLURAL |NO_RING}
+,{jjDIM2,      DIM_CMD,        INT_CMD,        MODUL_CMD,  IDEAL_CMD, ALLOW_PLURAL |NO_RING}
 ,{jjDIVISION,  DIVISION_CMD,   LIST_CMD,       IDEAL_CMD,  IDEAL_CMD, NO_PLURAL |ALLOW_RING}
 ,{jjDIVISION,  DIVISION_CMD,   LIST_CMD,       MODUL_CMD,  MODUL_CMD, NO_PLURAL |ALLOW_RING}
 ,{jjELIMIN,    ELIMINATION_CMD,IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -5197,9 +5197,9 @@ struct sValCmd1 dArith1[]=
 ,{jjWRONG,      DET_CMD,         INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |NO_RING}
 ,{jjmpDetBareiss,DET_CMD,        XS(POLY_CMD),   MATRIX_CMD    , NO_PLURAL |ALLOW_RING}
 #endif
-,{jjDIM,        DIM_CMD,         INT_CMD,        IDEAL_CMD     , NO_PLURAL |ALLOW_RING}
-,{jjDIM,        DIM_CMD,         INT_CMD,        MODUL_CMD     , NO_PLURAL |ALLOW_RING}
-,{jjDIM_R,      DIM_CMD,         XS(INT_CMD),    RESOLUTION_CMD, NO_PLURAL |ALLOW_RING}
+,{jjDIM,        DIM_CMD,         INT_CMD,        IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{jjDIM,        DIM_CMD,         INT_CMD,        MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{jjDIM_R,      DIM_CMD,         XS(INT_CMD),    RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjDUMP,       DUMP_CMD,        NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{jjE,          E_CMD,           VECTOR_CMD,     INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{jjEXECUTE,    EXECUTE_CMD,     NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
