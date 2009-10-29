@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-10-29 15:54:04 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.101 2009-10-29 15:54:04 monerjan Exp $
-$Id: gfan.cc,v 1.101 2009-10-29 15:54:04 monerjan Exp $
+$Date: 2009-10-29 16:26:32 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.102 2009-10-29 16:26:32 monerjan Exp $
+$Id: gfan.cc,v 1.102 2009-10-29 16:26:32 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -224,7 +224,9 @@ ideal facet::getFlipGB()
 /** Print the flipped GB*/
 void facet::printFlipGB()
 {
+#ifndef NDEBUG
 	idShow(this->flipGB);
+#endif
 }
 		
 /** Set the UCN */
@@ -2696,13 +2698,15 @@ ideal gfan(ideal inputIdeal, int h)
 		theMap->preimage=NULL;	//neccessary?
 		ideal rootIdeal;
 		rootIdeal=fast_map(inputIdeal,inputRing,(ideal)theMap, currRing);
+#ifndef NDEBUG
 	#ifdef gfan_DEBUG
 		cout << "Root ideal is " << endl;
 		idShow(rootIdeal);
 		cout << "The root ring is " << endl;
 		rWrite(rootRing);
 		cout << endl;
-	#endif	
+	#endif
+#endif
 		
 		//gcone *gcRoot = new gcone();	//Instantiate the sink
 		gcone *gcRoot = new gcone(rootRing,rootIdeal);
@@ -2710,7 +2714,9 @@ ideal gfan(ideal inputIdeal, int h)
 		gcAct = gcRoot;
 		gcAct->numVars=pVariables;
 		gcAct->getGB(rootIdeal);	//sets gcone::gcBasis
+#ifndef NDEBUG
 		idShow(gcAct->gcBasis);
+#endif
 		gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals	
 		//gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);	
 		/*Now it is time to compute the search facets, respectively start the reverse search.
@@ -2730,7 +2736,9 @@ ideal gfan(ideal inputIdeal, int h)
 		gcAct->numVars=pVariables;
 		gcAct->getGB(inputIdeal);
 		cout << "GB of input ideal is:" << endl;
+#ifndef NDEBUG
 		idShow(gcAct->gcBasis);
+#endif
 		if(gcAct->isMonomial(gcAct->gcBasis))
 		{
 			WerrorS("Monomial input - terminating");
