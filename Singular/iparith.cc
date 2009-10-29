@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.518 2009-09-29 10:37:15 Singular Exp $ */
+/* $Id: iparith.cc,v 1.519 2009-10-29 17:52:37 Singular Exp $ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter
@@ -232,7 +232,6 @@ cmdnames cmds[] =
   { "division",    0, DIVISION_CMD ,      CMD_M},
   { "dump",        0, DUMP_CMD,           CMD_1},
   { "extgcd",      0, EXTGCD_CMD ,        CMD_2},
-  { "EXTGCD",      2, EXTGCD_CMD ,        CMD_2},
   { "ERROR",       0, ERROR_CMD ,         CMD_1},
   { "eliminate",   0, ELIMINATION_CMD,    CMD_23},
   { "else",        0, ELSE_CMD ,          ELSE_CMD},
@@ -3415,7 +3414,7 @@ struct sValCmd2 dArith2[]=
 ,{jjDIFF_ID_ID,DIFF_CMD,       MATRIX_CMD,     IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjDIFF_ID,   DIFF_CMD,       MODUL_CMD,      MODUL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjDIFF_ID,   DIFF_CMD,       MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{jjDIM2,      DIM_CMD,        INT_CMD,        IDEAL_CMD,  IDEAL_CMD, NO_PLURAL |NO_RING}
+,{jjDIM2,      DIM_CMD,        INT_CMD,        IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |NO_RING}
 ,{jjDIM2,      DIM_CMD,        INT_CMD,        MODUL_CMD,  IDEAL_CMD, NO_PLURAL |NO_RING}
 ,{jjDIVISION,  DIVISION_CMD,   LIST_CMD,       IDEAL_CMD,  IDEAL_CMD, NO_PLURAL |ALLOW_RING}
 ,{jjDIVISION,  DIVISION_CMD,   LIST_CMD,       MODUL_CMD,  MODUL_CMD, NO_PLURAL |ALLOW_RING}

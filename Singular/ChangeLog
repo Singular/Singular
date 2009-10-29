@@ -6,6 +6,8 @@ Changes w.r.t 3-1-0-6:
 - intmat [n][0] fixed
 - insert: memeory leak fixed (track 177)
 - homolog.lib: canonMap new
+- fixed NF for some block ordering (track 159)
+- removed EXTGCD: use extgcd
 
 Changes w.r.t 3-1-0-5:
 - 3-1-0-6: Fri Aug 21 12:59:52 CEST 2009
