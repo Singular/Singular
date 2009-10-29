@@ -1,9 +1,9 @@
 /*
 Compute the Groebner fan of an ideal
 $Author: monerjan $
-$Date: 2009-10-23 14:56:55 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.100 2009-10-23 14:56:55 monerjan Exp $
-$Id: gfan.cc,v 1.100 2009-10-23 14:56:55 monerjan Exp $
+$Date: 2009-10-29 15:54:04 $
+$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.101 2009-10-29 15:54:04 monerjan Exp $
+$Id: gfan.cc,v 1.101 2009-10-29 15:54:04 monerjan Exp $
 */
 
 #include "mod2.h"
@@ -26,6 +26,7 @@ $Id: gfan.cc,v 1.100 2009-10-23 14:56:55 monerjan Exp $
 #include <gmp.h>
 #include <string>
 #include <sstream>
+#include <time.h>
 //#include <gmpxx.h>
 
 /*DO NOT REMOVE THIS*/
@@ -1050,7 +1051,7 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 			for (int kk=1;kk<=this->numVars;kk++)
 			{
 #ifdef gfan_DEBUG
-						//cout << src_ExpV[kk] << "," << dst_ExpV[kk] << endl;
+						cout << src_ExpV[kk] << "," << dst_ExpV[kk] << endl;
 #endif
 				if (src_ExpV[kk]!=dst_ExpV[kk])
 				{
@@ -1062,7 +1063,7 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 			{
 				markingsAreCorrect=TRUE; //everything is fine
 #ifdef gfan_DEBUG
-//						cout << "correct markings" << endl;
+						cout << "correct markings" << endl;
 #endif
 			}//if (pHead(aktpoly)==pHead(H->m[jj])
 			delete src_ExpV;
@@ -1274,8 +1275,8 @@ ideal gcone::ffG(ideal const &H, ideal const &G)
 	poly temp1, temp2, temp3;	//polys to temporarily store values for pSub
 	for (int ii=0;ii<size;ii++)
 	{
-		res->m[ii]=restOfDiv(H->m[ii],G);
-				//res->m[ii]=kNF(G, NULL,H->m[ii]);
+// 		res->m[ii]=restOfDiv(H->m[ii],G);
+		res->m[ii]=kNF(G, NULL,H->m[ii],0,0);
 		temp1=H->m[ii];
 		temp2=res->m[ii];				
 		temp3=pSub(temp1, temp2);
@@ -2657,6 +2658,9 @@ int gcone::counter=0;
 int gfanHeuristic;
 ideal gfan(ideal inputIdeal, int h)
 {
+	time_t tic,tac;
+	time(&tic);
+	
 	int numvar = pVariables; 
 	gfanHeuristic = h;
 	
@@ -2751,6 +2755,8 @@ ideal gfan(ideal inputIdeal, int h)
 	//rChangeCurrRing(rootRing);
 	//res=gcAct->gcBasis;
 	//res=gcRoot->gcBasis;	
+	time(&tac);
+	cout << "Time: " << difftime(tac,tic) << "sec" << endl;
 	return res;
 	//return GBlist;
 }
