@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gkdim.lib,v 1.13 2009-04-10 13:04:12 Singular Exp $";
+version="$Id: gkdim.lib,v 1.14 2009-10-29 17:52:12 Singular Exp $";
 category="Noncommutative";
 info="
 LIBRARY: gkdim.lib     Procedures for calculating the Gelfand-Kirillov dimension
@@ -23,20 +23,8 @@ NOTE: uses the dim procedure, if the factor-module is zero, -1 is returned
   {
     I=std(I);
   }
-  int i;
-  for (i=1; i<=size(I); i++)
-  {
-    I[i]=leadmonom(I[i]);
-  }
 
-  def oldring=basering;
-  string newringstring="ring newring=("+charstr(basering)+"),("+varstr(basering)+"),("+ordstr(basering)+");";
-  execute (newringstring);
-  setring newring;
-  ideal J  = imap(oldring,I);
-  ideal sJ = std(J);
-  int d    = dim(sJ);
-  setring oldring;
+  int d    = dim(I);
   //  if (d==-1) {d++;} // The GK-dimension of a finite dimensional module is zero
   // levandov: but for consistency, GKdim(std(1)) == -1,
   //           mimicking the behaviour of dim() procedure.
