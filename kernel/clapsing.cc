@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.cc,v 1.46 2009-10-16 10:35:00 Singular Exp $
+// $Id: clapsing.cc,v 1.47 2009-10-29 16:43:30 Singular Exp $
 /*
 * ABSTRACT: interface between Singular and factory
 */
@@ -20,8 +20,6 @@
 #include <factory.h>
 #include "clapconv.h"
 #include <factor.h>
-//CanonicalForm algcd(const CanonicalForm & F, const CanonicalForm & g, const CFList & as, const Varlist & order);
-CanonicalForm alg_gcd(const CanonicalForm &, const CanonicalForm &, const CFList &);
 #include "ring.h"
 
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
@@ -72,8 +70,6 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
         Variable a=rootOf(mipo);
         //CanonicalForm F( convSingAPFactoryAP( f,a,r ) ), G( convSingAPFactoryAP( g,a,r ) );
         CanonicalForm F( convSingTrPFactoryP(f,r) ), G( convSingTrPFactoryP(g,r) );
-        //res= convFactoryAPSingAP( algcd( F, G, as, ord) );
-        //res= convFactoryAPSingAP( alg_gcd( F, G, as) );
         res= convFactoryAPSingAP( alg_gcd( F, G, as),r );
       }
       else
