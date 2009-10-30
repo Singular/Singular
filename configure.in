@@ -637,11 +637,9 @@ if test "$enable_Texinfo" != no && test -d Texinfo; then
   enable_texinfo=yes
   CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texinfo"
   BUILD_SUBDIRS="$BUILD_SUBDIRS Texinfo"	
-  TEXI2DVI=${bindir}/texi2dvi
   TEXI2PDF=${bindir}/texi2pdf
   MAKEINFO="${bindir}/makeinfo"
   TEXINDEX=${bindir}/texindex
-  AC_SUBST(TEXI2DVI)
   AC_SUBST(TEXI2PDF)
   AC_SUBST(MAKEINFO)
   AC_SUBST(TEXINDEX)
@@ -653,7 +651,6 @@ else
   AC_MSG_WARN(Building of doc might fail. Need Texinfo)
   enable_texinfo=no
   AC_CHECK_PROG(MAKEINFO, makeinfo, makeinfo, ${pwd}/warn_not_found.sh makeinfo)
-  AC_CHECK_PROG(TEXI2DVI, texi2dvi, texi2dvi, ${pwd}/warn_not_found.sh texi2dvi)
   AC_CHECK_PROG(TEXINDEX, texindex, texindex, ${pwd}/warn_not_found.sh texindex)
   AC_CHECK_PROG(TEXI2PDF, texi2pdf, texi2pdf, ${pwd}/warn_not_found.sh texi2pdf)
 fi  

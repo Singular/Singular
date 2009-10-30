@@ -1,7 +1,7 @@
 #####################################################################
 ###
 ### Makefile for Singular documentation
-### $Id: Makefile.in,v 1.108 2009-05-25 09:22:51 Singular Exp $
+### $Id: Makefile.in,v 1.109 2009-10-30 09:37:25 Singular Exp $
 #####################################################################
 SHELL=/bin/sh
 
@@ -44,7 +44,6 @@ UUDECODE        = @UUDECODE@
 PERL            = @PERL@
 TEX             = tex
 MAKEINFO        = @MAKEINFO@ --force
-TEXI2DVI        = @TEXI2DVI@
 TEXI2PDF        = @TEXI2PDF@
 TEXINDEX        = @TEXINDEX@
 # use our local texi2html
@@ -134,16 +133,22 @@ singular.hlp: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
 dvi: manual.dvi usercard.dvi
 
 singular.dvi: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
-	${TEXI2DVI} singular.tex
+	tex singular.tex
+	tex singular.tex
+	tex singular.tex
 
 singular.pdf: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
 	${TEXI2PDF} singular.tex
 
 manual.dvi: ${MANUAL_FILES} manual.tex s-plural.tex s-plulibs.tex
-	${TEXI2DVI} manual.tex
+	tex manual.tex
+	tex manual.tex
+	tex manual.tex
 
 tutor.dvi: ${TUTOR_FILES}
-	${TEXI2DVI} tutor.tex
+	tex tutor.tex
+	tex tutor.tex
+	tex tutor.tex
 
 tutor.pdf: ${TUTOR_FILES}
 	${TEXI2PDF} tutor.tex
