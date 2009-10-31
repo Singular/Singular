@@ -1,4 +1,5 @@
 Changes w.r.t 3-1-0-6:
+- 3-1-0-7: Sat Oct 31 12:39:50 CET 2009
 - bug fix in primes/IspPrime (track 166)
 - bug fixed for Z/p (p>32003): nPower
 - bug fixed in Singular<->factory conversion (track 164)
@@ -8,6 +9,9 @@ Changes w.r.t 3-1-0-6:
 - homolog.lib: canonMap new
 - fixed NF for some block ordering (track 159)
 - removed EXTGCD: use extgcd
+- gcd over algebraic extensions in factory
+- tropical.lib and polymake.lib as official libraries
+- bug fixed in mapping real -> rational (track 161)
 
 Changes w.r.t 3-1-0-5:
 - 3-1-0-6: Fri Aug 21 12:59:52 CEST 2009
