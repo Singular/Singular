@@ -2682,11 +2682,9 @@ if test "$enable_Texinfo" != no && test -d Texinfo; then
   enable_texinfo=yes
   CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texinfo"
   BUILD_SUBDIRS="$BUILD_SUBDIRS Texinfo"	
-  TEXI2DVI=${bindir}/texi2dvi
   TEXI2PDF=${bindir}/texi2pdf
   MAKEINFO="${bindir}/makeinfo"
   TEXINDEX=${bindir}/texindex
-  
   
   
   
@@ -2700,7 +2698,7 @@ else
   # Extract the first word of "makeinfo", so it can be a program name with args.
 set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2704: checking for $ac_word" >&5
+echo "configure:2702: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_MAKEINFO'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2727,40 +2725,10 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-  # Extract the first word of "texi2dvi", so it can be a program name with args.
-set dummy texi2dvi; ac_word=$2
-echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2734: checking for $ac_word" >&5
-if eval "test \"`echo '$''{'ac_cv_prog_TEXI2DVI'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  if test -n "$TEXI2DVI"; then
-  ac_cv_prog_TEXI2DVI="$TEXI2DVI" # Let the user override the test.
-else
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
-  ac_dummy="$PATH"
-  for ac_dir in $ac_dummy; do
-    test -z "$ac_dir" && ac_dir=.
-    if test -f $ac_dir/$ac_word; then
-      ac_cv_prog_TEXI2DVI="texi2dvi"
-      break
-    fi
-  done
-  IFS="$ac_save_ifs"
-  test -z "$ac_cv_prog_TEXI2DVI" && ac_cv_prog_TEXI2DVI="${pwd}/warn_not_found.sh texi2dvi"
-fi
-fi
-TEXI2DVI="$ac_cv_prog_TEXI2DVI"
-if test -n "$TEXI2DVI"; then
-  echo "$ac_t""$TEXI2DVI" 1>&6
-else
-  echo "$ac_t""no" 1>&6
-fi
-
   # Extract the first word of "texindex", so it can be a program name with args.
 set dummy texindex; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2764: checking for $ac_word" >&5
+echo "configure:2732: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXINDEX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2790,7 +2758,7 @@ fi
   # Extract the first word of "texi2pdf", so it can be a program name with args.
 set dummy texi2pdf; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2794: checking for $ac_word" >&5
+echo "configure:2762: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXI2PDF'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2820,7 +2788,7 @@ fi
 fi  
 
 echo $ac_n "checking whether to configure and build Texi2html""... $ac_c" 1>&6
-echo "configure:2824: checking whether to configure and build Texi2html" >&5
+echo "configure:2792: checking whether to configure and build Texi2html" >&5
 if test "$enable_Texi2html" != no && test -d Texi2html; then
  echo "$ac_t""yes" 1>&6
  CONFIG_SUBDIRS="$CONFIG_SUBDIRS Texi2html"
@@ -2835,7 +2803,7 @@ else
  # Extract the first word of "texi2html", so it can be a program name with args.
 set dummy texi2html; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:2839: checking for $ac_word" >&5
+echo "configure:2807: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_TEXI2HTML'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -2876,7 +2844,7 @@ fi
 
 
 echo $ac_n "checking whether to build doc""... $ac_c" 1>&6
-echo "configure:2880: checking whether to build doc" >&5
+echo "configure:2848: checking whether to build doc" >&5
 if test "$enable_doc" != no && test -d doc; then
  echo "$ac_t""yes" 1>&6
  BUILD_SUBDIRS="$BUILD_SUBDIRS doc"
@@ -2890,7 +2858,7 @@ else
 fi
 
 echo $ac_n "checking whether to build emacs""... $ac_c" 1>&6
-echo "configure:2894: checking whether to build emacs" >&5
+echo "configure:2862: checking whether to build emacs" >&5
 if test "$enable_doc" = yes && test "$enable_emacs" != no && test -d emacs; then
  echo "$ac_t""yes" 1>&6
  BUILD_SUBDIRS="$BUILD_SUBDIRS emacs"
@@ -2902,7 +2870,7 @@ else
 fi
 
 echo $ac_n "checking which apint package to use""... $ac_c" 1>&6
-echo "configure:2906: checking which apint package to use" >&5
+echo "configure:2874: checking which apint package to use" >&5
 if test "$with_apint" = gmp; then
   if test "$ac_gmp_ok" = yes || test "$enable_gmp" = yes; then
     echo "$ac_t""gmp" 1>&6
@@ -2918,7 +2886,7 @@ else
 fi
 
 echo $ac_n "checking whether to use with MP""... $ac_c" 1>&6
-echo "configure:2922: checking whether to use with MP" >&5
+echo "configure:2890: checking whether to use with MP" >&5
 if test "$with_MP" = yes; then
   if test "$ac_MP_ok" = yes || test "$enable_MP" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2938,7 +2906,7 @@ else
 fi
 
 echo $ac_n "checking whether to use with factory""... $ac_c" 1>&6
-echo "configure:2942: checking whether to use with factory" >&5
+echo "configure:2910: checking whether to use with factory" >&5
 if test "$with_factory" = yes; then
   if test "$ac_factory_ok" = yes || test "$enable_factory" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2957,7 +2925,7 @@ else
 fi
   
 echo $ac_n "checking whether to use with libfac""... $ac_c" 1>&6
-echo "configure:2961: checking whether to use with libfac" >&5
+echo "configure:2929: checking whether to use with libfac" >&5
 if test "$with_libfac" = yes; then
   if test "$ac_libfac_ok" = yes || test "$enable_libfac" = yes; then
     echo "$ac_t""yes" 1>&6
@@ -2978,7 +2946,7 @@ fi
 
 
 echo $ac_n "checking whether to use with Singular""... $ac_c" 1>&6
-echo "configure:2982: checking whether to use with Singular" >&5
+echo "configure:2950: checking whether to use with Singular" >&5
 if test "$with_Singular" != no && test "$with_Singular" != yes; then
   if test "$enable_Singular" = yes; then
     with_Singular=yes
@@ -3047,7 +3015,7 @@ if test -d "modules"; then
 fi
   
 echo $ac_n "checking whether to use libsvd""... $ac_c" 1>&6
-echo "configure:3051: checking whether to use libsvd" >&5
+echo "configure:3019: checking whether to use libsvd" >&5
 if test "$with_svd" = yes; then
   echo "$ac_t""yes" 1>&6
    CONFIG_SUBDIRS=$CONFIG_SUBDIRS" svd"
@@ -3057,7 +3025,7 @@ else
 fi
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:3061: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:3029: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3260,7 +3228,6 @@ s%@SINGULAR@%$SINGULAR%g
 s%@DOC2TEX_EXAMPLE_EXCLUSIONS@%$DOC2TEX_EXAMPLE_EXCLUSIONS%g
 s%@TMP_DIR@%$TMP_DIR%g
 s%@CXXCPP@%$CXXCPP%g
-s%@TEXI2DVI@%$TEXI2DVI%g
 s%@TEXI2PDF@%$TEXI2PDF%g
 s%@MAKEINFO@%$MAKEINFO%g
 s%@TEXINDEX@%$TEXINDEX%g
