@@ -6,7 +6,7 @@
  *  Purpose: macros for memory addition
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_MemAdd.h,v 1.1.1.1 2003-10-06 12:15:59 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef P_MEM_ADD_H
 #define P_MEM_ADD_H

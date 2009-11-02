@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: config.h,v 1.3 1997-12-08 16:43:46 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CONFIG_H
 #define INCL_CONFIG_H

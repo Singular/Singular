@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: silink.cc,v 1.51 2009-07-28 14:18:35 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT: general interface to links

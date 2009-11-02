@@ -6,7 +6,7 @@
  *  Purpose: source for shared library of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Lib.cc,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"

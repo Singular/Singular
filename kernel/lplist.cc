@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lplist.cc,v 1.1 2008-11-27 17:15:55 ederc Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: list interface
 */

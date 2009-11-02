@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: application.cc,v 1.5 2009-10-28 14:43:02 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

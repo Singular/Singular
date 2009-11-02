@@ -6,7 +6,7 @@
 /*
 *  ABSTRACT - get the computing time
 */
-/* $Id: timer.h,v 1.2 2008-03-19 17:44:13 Singular Exp $ */
+/* $Id$ */
 
 extern int timerv;
 void startTimer(void);

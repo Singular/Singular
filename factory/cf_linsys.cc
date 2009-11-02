@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_linsys.cc,v 1.11 2007-09-26 09:17:40 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

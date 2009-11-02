@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hdegree.cc,v 1.11 2009-01-15 17:03:19 Singular Exp $ */
+/* $Id$ */
 /*
 *  ABSTRACT -  dimension, multiplicity, HC, kbase
 */

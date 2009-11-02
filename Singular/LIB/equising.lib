@@ -1,5 +1,5 @@
 //
-version="$Id: equising.lib,v 1.21 2009-08-21 14:15:14 Singular Exp $";
+version="$Id$";
 category="Singularities";
 info="
 LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves

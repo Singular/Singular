@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rintegers.cc,v 1.25 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: numbers modulo n
 */

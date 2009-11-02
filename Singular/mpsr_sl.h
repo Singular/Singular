@@ -6,7 +6,7 @@
  *  Purpose: declaration of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.h,v 1.3 2008-09-12 17:03:41 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 LINKAGE BOOLEAN slOpenMPFile(si_link l, short flag);
 LINKAGE MP_Link_pt slOpenMPConnect(int n_argc, char **n_argv);

@@ -40,7 +40,7 @@
  ************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Vector.c,v 1.2 2008-07-09 07:42:24 Singular Exp $";
+static char vcid[] = "@(#) $Id$";
 #endif /* lint */
 
 #include "MP.h"

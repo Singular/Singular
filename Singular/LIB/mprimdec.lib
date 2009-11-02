@@ -1,4 +1,4 @@
-// $Id: mprimdec.lib,v 1.7 2009-03-30 13:49:52 dreyer Exp $
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 // mprimdec.lib
 // algorithms for primary decomposition for modules based on
@@ -25,7 +25,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: mprimdec.lib,v 1.7 2009-03-30 13:49:52 dreyer Exp $";
+version="$Id$";
 category="Commutative Algebra";
 
 info="

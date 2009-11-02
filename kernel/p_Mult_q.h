@@ -7,7 +7,7 @@
  *           p_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.h,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"

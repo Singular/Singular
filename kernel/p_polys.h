@@ -7,7 +7,7 @@
  *           currRing
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: p_polys.h,v 1.9 2009-05-22 17:15:59 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H

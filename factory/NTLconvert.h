@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.h,v 1.10 2009-10-28 14:45:57 Singular Exp $ */
+/* $Id$ */
 #ifndef INCL_NTLCONVERT_H
 #define INCL_NTLCONVERT_H
 

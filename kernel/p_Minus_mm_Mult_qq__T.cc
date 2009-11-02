@@ -6,7 +6,7 @@
  *  Purpose: template for p_Minus_m_Mult_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Minus_mm_Mult_qq__T.cc,v 1.8 2008-02-07 08:41:00 wienand Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 /***************************************************************

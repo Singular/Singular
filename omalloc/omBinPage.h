@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for primitve BinPage managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBinPage.h,v 1.5 2001-04-30 09:02:03 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_BIN_PAGE_H
 #define OM_BIN_PAGE_H

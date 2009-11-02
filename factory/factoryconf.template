@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: factoryconf.template,v 1.5 1997-10-23 13:18:07 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FACTORYCONF_H
 #define INCL_FACTORYCONF_H

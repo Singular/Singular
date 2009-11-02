@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: eigenval.h,v 1.2 2004-03-04 10:08:24 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */

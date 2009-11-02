@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_iter.h,v 1.4 1998-06-29 14:37:34 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_ITER_H
 #define INCL_CF_ITER_H

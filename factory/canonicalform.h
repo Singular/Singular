@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.h,v 1.34 2007-12-07 11:23:11 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CANONICALFORM_H
 #define INCL_CANONICALFORM_H

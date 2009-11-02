@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: demo.mod,v 1.2 2002-07-03 12:52:25 anne Exp $
+ *  $Id$
  *
  *  Test mod fuer modgen
  */
@@ -14,7 +14,7 @@ extern void piShowProcList();
 
 category="tests";
 package="demo_module";
-version	= "$Id: demo.mod,v 1.2 2002-07-03 12:52:25 anne Exp $";
+version	= "$Id$";
 info	="
 LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
 

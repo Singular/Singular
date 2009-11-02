@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_generator.cc,v 1.3 2004-12-10 10:14:45 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

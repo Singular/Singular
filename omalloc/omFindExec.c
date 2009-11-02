@@ -3,7 +3,7 @@
  *  Purpose: routine which determines absolute pathname of executable
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.c,v 1.12 2009-05-04 15:03:40 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H

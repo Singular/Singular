@@ -3,7 +3,7 @@
  *  Purpose: implementation of omCheck functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugCheck.c,v 1.15 2009-05-06 10:28:33 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include <mylimits.h>
 #include <stdarg.h>

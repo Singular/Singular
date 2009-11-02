@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: extra.cc,v 1.328 2009-10-29 15:55:50 monerjan Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: general interface to internals of Singular ("system" command)
 */

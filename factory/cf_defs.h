@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_defs.h,v 1.15 2008-06-24 12:52:44 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_DEFS_H
 #define INCL_CF_DEFS_H

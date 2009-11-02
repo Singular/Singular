@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: numbers.cc,v 1.30 2009-09-28 13:29:03 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT: interface to coefficient aritmetics

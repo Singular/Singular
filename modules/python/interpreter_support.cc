@@ -1,4 +1,4 @@
-//$Id: interpreter_support.cc,v 1.22 2006-09-15 09:27:44 Singular Exp $
+//$Id$
 
 #include <sstream>
 #include <boost/python.hpp>

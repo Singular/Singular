@@ -5,7 +5,7 @@
  *           and end with the Func suffix.
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocFunc.h,v 1.8 2008-08-22 10:32:19 wienand Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 void* omCallocFunc(size_t nmemb, size_t size);

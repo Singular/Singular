@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: sagbi.lib,v 1.13 2009-04-07 16:18:06 seelisch Exp $";
+version="$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY:  sagbi.lib  Compute subalgebra bases analogous to Groebner bases for ideals

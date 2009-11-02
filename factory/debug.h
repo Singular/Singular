@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: debug.h,v 1.6 2006-05-15 08:17:52 Singular Exp $ */
+/* $Id$ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of DEBUGOUTPUT */

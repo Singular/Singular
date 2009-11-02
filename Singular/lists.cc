@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: lists.cc,v 1.32 2009-10-27 09:23:26 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: handling of the list type
 */

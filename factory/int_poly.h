@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_poly.h,v 1.10 2006-05-15 09:03:06 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_INT_POLY_H
 #define INCL_INT_POLY_H

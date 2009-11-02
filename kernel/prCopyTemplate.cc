@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopyTemplate.cc,v 1.1.1.1 2003-10-06 12:16:02 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT - templates for pr routines
 */

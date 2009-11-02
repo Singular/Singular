@@ -1,5 +1,5 @@
-/* $Id: si_gmp.h,v 1.5 2006-06-13 16:57:12 Singular Exp $ */
-/* $Id: si_gmp.h,v 1.5 2006-06-13 16:57:12 Singular Exp $ */
+/* $Id$ */
+/* $Id$ */
 
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: qhmoduli.lib,v 1.18 2009-04-15 11:17:11 seelisch Exp $";
+version="$Id$";
 category="Singularities";
 info="
 LIBRARY:  qhmoduli.lib    Moduli Spaces of Semi-Quasihomogeneous Singularities

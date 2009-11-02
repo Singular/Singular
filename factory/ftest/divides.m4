@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: divides.m4,v 1.1 1998-06-30 14:37:34 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( divides, `"
 Usage: divides [<options>] [<envSpec>] <f> <g>

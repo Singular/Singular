@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_rat.cc,v 1.16 2008-01-08 14:33:36 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

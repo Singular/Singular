@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: pointid.lib,v 1.3 2009-05-09 12:04:13 Singular Exp $";
+version="$Id$";
 category="Commutative algebra";
 info="
 LIBRARY:  pointid.lib     Procedures for computing a factorized lex GB of

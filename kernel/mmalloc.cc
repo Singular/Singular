@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.cc,v 1.7 2008-10-28 09:12:40 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: standard version of C++-memory management alloc func
 */

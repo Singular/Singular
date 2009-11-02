@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ratgring.h,v 1.12 2009-02-27 19:30:47 levandov Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */

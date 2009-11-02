@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_cantzass.cc,v 1.8 2005-12-09 08:35:38 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: pcv.mod,v 1.4 2007-09-17 09:35:49 Singular Exp $
+ *  $Id$
  *
  *  Test mod fuer modgen
  */
@@ -58,7 +58,7 @@ BOOLEAN pcvBasis(leftv res,leftv h);
 // module="pcv";
 package="pcv";
 
-version="$Id: pcv.mod,v 1.4 2007-09-17 09:35:49 Singular Exp $";
+version="$Id$";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de

@@ -6,7 +6,7 @@
  *  Purpose: macros for memory comparisons
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_MemCmp.h,v 1.1.1.1 2003-10-06 12:15:59 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef P_MEM_CMP_H
 #define P_MEM_CMP_H

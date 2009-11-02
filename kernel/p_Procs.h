@@ -7,7 +7,7 @@
  *  Purpose: declaration of primitive procs for polys
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs.h,v 1.2 2008-03-19 17:44:10 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: arcpoint.lib,v 1.2 2007-11-16 18:55:57 Singular Exp $";
+version="$Id$";
 //-*- mode:C++;-*-
 
 category="Singularities";

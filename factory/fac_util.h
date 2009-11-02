@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_util.h,v 1.6 1998-03-12 14:31:07 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FAC_UTIL_H
 #define INCL_FAC_UTIL_H

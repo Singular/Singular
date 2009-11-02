@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: spcurve.tst,v 1.2 2000-12-12 14:02:30 anne Exp $");
+tst_ignore("CVS ID $Id$");
 LIB "spcurve.lib";
 example isCMcod2;
 example CMtype;

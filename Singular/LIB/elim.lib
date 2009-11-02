@@ -1,4 +1,4 @@
-// $Id: elim.lib,v 1.35 2009-07-28 10:34:55 Singular Exp $
+// $Id$
 // (GMG, modified 22.06.96)
 // GMG, last modified 30.10.08: new procedure elimRing;
 // elim changes now to ring with elimination ordering (extra weight vector
@@ -9,7 +9,7 @@
 // GMG, last modified 5.01.09: elim uses now stdhilb(id,@w) instead of std(id)
 // and can now choose as method slimgb or std.
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: elim.lib,v 1.35 2009-07-28 10:34:55 Singular Exp $";
+version="$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY:  elim.lib      Elimination, Saturation and Blowing up

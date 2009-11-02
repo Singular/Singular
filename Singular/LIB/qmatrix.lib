@@ -1,5 +1,5 @@
 //
-version="$Id: qmatrix.lib,v 1.17 2009-08-21 14:12:22 Singular Exp $";
+version="$Id$";
 category="Noncommutative";
 info="
 LIBRARY: qmatrix.lib     Quantum matrices, quantum minors and symmetric groups

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: int64vec.h,v 1.3 2005-05-09 13:47:29 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: class intvec: lists/vectors of int64
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: prCopy.cc,v 1.4 2009-06-05 05:16:07 motsak Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */

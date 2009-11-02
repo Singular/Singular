@@ -1,4 +1,4 @@
-# Singular help browser file $Id: help.cnf,v 1.13 2008-03-14 15:48:13 Singular Exp $
+# Singular help browser file $Id$
 # each line which start with an # is a comment
 # each other line defines a (possible) help browser
 # the format of the entries is: <name>!<requirements>!<shell command>

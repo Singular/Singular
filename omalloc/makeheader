@@ -1,5 +1,5 @@
 #! /bin/sh
-# $Id: makeheader,v 1.2 2006-05-02 13:27:49 Singular Exp $
+# $Id$
 
 #
 # makeheader.sh - generate a header file out of several header files.

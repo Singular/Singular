@@ -3,7 +3,7 @@
  *  Purpose: routines for getting Backtraces of stack
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omGetBackTrace.h,v 1.5 2001-04-30 09:02:07 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_GET_BACKTRACE_H
 #define OM_GET_BACKTRACE_H

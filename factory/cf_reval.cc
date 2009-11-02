@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_reval.cc,v 1.7 2005-11-18 10:03:50 pohl Exp $ */
+/* $Id$ */
 
 #define MORE_ZEROES
 

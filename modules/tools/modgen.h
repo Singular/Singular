@@ -1,5 +1,5 @@
 /*
- *  $Id: modgen.h,v 1.4 1999-03-31 22:03:23 krueger Exp $
+ *  $Id$
  *
  */
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: hyperel.lib,v 1.2 2009-04-06 12:39:02 seelisch Exp $";
+version="$Id$";
 category="Teaching";
 info="
 LIBRARY:    hyperel.lib

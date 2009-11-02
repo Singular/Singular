@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2idx.pl,v 1.2 2000-04-27 10:07:19 obachman Exp $
+# $Id$
 ###################################################################
 #  Computer Algebra System SINGULAR
 #

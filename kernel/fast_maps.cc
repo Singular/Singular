@@ -6,7 +6,7 @@
  *  Purpose: implementation of fast maps
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 02/01
- *  Version: $Id: fast_maps.cc,v 1.7 2009-06-04 08:32:59 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>

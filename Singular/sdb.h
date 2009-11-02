@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.h,v 1.7 2001-08-27 14:47:38 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: Singular debugger
 */

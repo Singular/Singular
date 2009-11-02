@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps_ip.cc,v 1.9 2005-04-29 16:07:46 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */

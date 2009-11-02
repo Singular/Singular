@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mod_raw.cc,v 1.16 2009-06-04 10:18:12 Singular Exp $ */
+/* $Id$ */
 /*
  * ABSTRACT: machine depend code for dynamic modules
  *

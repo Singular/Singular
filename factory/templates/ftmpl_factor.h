@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_factor.h,v 1.7 2006-05-15 09:03:07 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FACTOR_H
 #define INCL_FACTOR_H

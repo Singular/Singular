@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omTest functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.c,v 1.17 2002-01-22 16:17:41 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>

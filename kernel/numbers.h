@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: numbers.h,v 1.22 2009-10-11 09:19:24 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */

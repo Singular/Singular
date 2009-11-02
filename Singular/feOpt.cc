@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: feOpt.cc,v 1.26 2009-06-04 09:58:49 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: Implementation of option buisness
 */

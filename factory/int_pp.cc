@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: int_pp.cc,v 1.11 2006-05-15 09:03:06 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

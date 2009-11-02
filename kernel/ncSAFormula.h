@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSAFormula.h,v 1.1 2008-07-23 07:09:45 motsak Exp $ */
+/* $Id$ */
 #ifdef HAVE_PLURAL
 
 // #include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType

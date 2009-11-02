@@ -1,6 +1,6 @@
 // (anne, last modified 23.5.00) last modified: 12.12.2000
 /////////////////////////////////////////////////////////////////////////////
-version="$Id: stratify.lib,v 1.9 2009-04-15 11:15:56 seelisch Exp $";
+version="$Id$";
 category="Invariant theory";
 info="
 LIBRARY: stratify.lib   Algorithmic Stratification for Unipotent Group-Actions

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ntl_util.cc,v 1.2 1999-02-16 16:56:14 schmidt Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

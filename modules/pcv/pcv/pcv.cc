@@ -70,7 +70,7 @@ void fill_example_package(idhdl pl);
 
 #line 2 "pcv.mod"
 /*
- *  $Id: pcv.cc,v 1.3 2000-03-30 11:47:51 Singular Exp $
+ *  $Id$
  *
  *  Test mod fuer modgen
  */
@@ -97,7 +97,7 @@ int mod_init(int(*iiAddCproc)())
      Warn("Cannot create example-package\n");
    else fill_example_package(examplehdl);
 #line 15 "pcv.mod"
-  enter_id("version","$Id: pcv.cc,v 1.3 2000-03-30 11:47:51 Singular Exp $", STRING_CMD);
+  enter_id("version","$Id$", STRING_CMD);
 #line 25 "pcv.mod"
   enter_id("info","
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS

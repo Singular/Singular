@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: factorize.cc,v 1.2 1997-10-27 16:51:02 schmidt Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

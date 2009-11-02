@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: commonden.m4,v 1.1 1998-03-11 18:34:15 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( commonden, `"
 Usage: commonden [<options>] [<envSpec>] <f>

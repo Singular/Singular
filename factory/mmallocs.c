@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: mmallocs.c,v 1.2 1997-06-19 12:22:11 schmidt Exp $ */
+/* $Id$ */
 
 #define _POSIX_SOURCE 1
 

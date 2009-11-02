@@ -1,4 +1,4 @@
-/* $Id: NTLconvert.cc,v 1.27 2009-10-28 14:51:26 Singular Exp $ */
+/* $Id$ */
 #include <config.h>
 
 #ifdef HAVE_SINGULAR

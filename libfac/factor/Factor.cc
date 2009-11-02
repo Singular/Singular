@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-/* $Id: Factor.cc,v 1.49 2008-11-06 14:47:04 Singular Exp $ */
+/* $Id$ */
 static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathematik.uni-kl.de\nPlease include above information and your input (the ideal/polynomial and characteristic) in your bug-report.\nThank you.";
 ///////////////////////////////////////////////////////////////////////////////
 // FACTORY - Includes

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_globals.cc,v 1.8 1997-10-23 12:14:01 schmidt Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

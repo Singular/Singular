@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz2.cc,v 1.3 2005-02-17 09:42:23 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: resolutions
 */

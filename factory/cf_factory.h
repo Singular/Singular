@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factory.h,v 1.4 2003-10-15 17:19:40 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_FACTORY_H
 #define INCL_CF_FACTORY_H

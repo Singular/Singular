@@ -7,7 +7,7 @@
  *           rebuilt the library).
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: omSingularConfig.h,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_SINGULAR_CONFIG_H
 #define OM_SINGULAR_CONFIG_H

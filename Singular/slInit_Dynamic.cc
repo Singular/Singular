@@ -6,7 +6,7 @@
  *  Purpose: link initialization for dynamic linking
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: slInit_Dynamic.cc,v 1.3 2009-01-14 16:49:22 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 /***************************************************************

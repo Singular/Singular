@@ -1,6 +1,6 @@
 // IB/PG/GMG, last modified:  15.10.2004
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: mregular.lib,v 1.10 2009-04-07 16:18:05 seelisch Exp $";
+version = "$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY: mregular.lib   Castelnuovo-Mumford regularity of homogeneous ideals

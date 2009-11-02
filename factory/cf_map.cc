@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_map.cc,v 1.15 2009-10-07 10:26:11 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

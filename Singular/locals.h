@@ -1,5 +1,5 @@
 /*
- * $Id: locals.h,v 1.2 2008-03-19 17:44:36 Singular Exp $
+ * $Id$
  */
 
 #include <mod2.h>

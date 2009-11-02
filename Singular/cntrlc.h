@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.h,v 1.7 1999-11-15 17:19:52 obachman Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT - interupt and signal handling
 */

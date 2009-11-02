@@ -6,7 +6,7 @@
  *  Purpose: template for p_Add_q
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Add_q__T.cc,v 1.3 2008-08-07 15:08:22 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 /***************************************************************

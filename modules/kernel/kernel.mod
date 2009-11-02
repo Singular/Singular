@@ -1,10 +1,10 @@
 /*
- *  $Id: kernel.mod,v 1.3 2000-12-05 15:26:58 obachman Exp $
+ *  $Id$
  *
  *  Test mod fuer modgen
  */
 module="kernel";
-version="$Id: kernel.mod,v 1.3 2000-12-05 15:26:58 obachman Exp $";
+version="$Id$";
 info="
 LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITTEN IN C
 

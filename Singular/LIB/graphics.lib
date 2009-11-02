@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: graphics.lib,v 1.15 2009-04-14 16:33:10 Singular Exp $";
+version="$Id$";
 category="Visualization";
 info="
 LIBRARY: graphics.lib    Procedures to use Graphics with Mathematica

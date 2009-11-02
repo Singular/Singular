@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_switches.cc,v 1.13 2008-09-12 10:43:58 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

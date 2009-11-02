@@ -1,4 +1,4 @@
-// $Id: gcd0_s.tst,v 1.2 1998-07-01 10:20:23 obachman Exp $
+// $Id$
 
 //
 // gcd0_s.tst - short tests for gcd calculations in Z.
@@ -19,7 +19,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: gcd0_s.tst,v 1.2 1998-07-01 10:20:23 obachman Exp $");
+tst_ignore("CVS ID  : $Id$");
 
 //
 // - ring r1=0,x,dp.

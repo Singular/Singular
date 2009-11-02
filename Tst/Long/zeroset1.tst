@@ -19,7 +19,7 @@ LIB "tst.lib";
 LIB "zeroset.lib";         
 
 tst_init();
-tst_ignore("CVS ID $Id: zeroset1.tst,v 1.2 2009-04-14 10:29:45 Singular Exp $"); 
+tst_ignore("CVS ID $Id$"); 
  
 
 

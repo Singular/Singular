@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: structs.h,v 1.67 2009-09-28 12:44:21 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT
 */

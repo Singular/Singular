@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: creat_top.cc,v 1.27 2008-11-18 21:48:05 dreyer Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: lib parsing
 */

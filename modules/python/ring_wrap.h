@@ -1,4 +1,4 @@
-//$Id: ring_wrap.h,v 1.7 2006-03-22 13:12:32 bricken Exp $
+//$Id$
 #ifndef RING_WRAP_HEADER
 #define RING_WRAP_HEADER
 #include "ring.h"

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sscanf.cc,v 1.1 1999-03-19 14:13:28 krueger Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */

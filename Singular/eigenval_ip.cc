@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: eigenval_ip.cc,v 1.3 2006-01-05 15:55:08 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: eigenvalues of constant square matrices
 */

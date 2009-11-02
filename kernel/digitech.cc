@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: digitech.cc,v 1.6 2009-04-30 17:00:27 Singular Exp $ */
+/* $Id$ */
 #include "mod2.h"
 #include "ring.h"
 

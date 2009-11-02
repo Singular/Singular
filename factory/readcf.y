@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: readcf.y,v 1.11 2008-04-15 12:04:31 Singular Exp $ */
+/* $Id$ */
 
 %{
 

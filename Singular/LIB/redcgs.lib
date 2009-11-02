@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: redcgs.lib,v 1.6 2009-04-15 11:15:06 seelisch Exp $";
+version="$Id$";
 category="General purpose";
 info="
 LIBRARY:  redcgs.lib      Reduced Comprehensive Groebner Systems.

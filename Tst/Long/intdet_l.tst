@@ -1,4 +1,4 @@
-// $Id: intdet_l.tst,v 1.3 1998-07-01 10:10:47 obachman Exp $
+// $Id$
 
 //
 // indet_l.tst - long tests for integer determinant.
@@ -9,7 +9,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: intdet_l.tst,v 1.3 1998-07-01 10:10:47 obachman Exp $");
+tst_ignore("CVS ID  : $Id$");
 
 ring r=0,x,dp;
 

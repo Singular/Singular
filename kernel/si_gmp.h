@@ -1,4 +1,4 @@
-/* $Id: si_gmp.h,v 1.7 2008-08-22 09:03:21 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_GMP_H
 #define INCL_CF_GMP_H

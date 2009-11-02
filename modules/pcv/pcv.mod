@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: pcv.mod,v 1.6 2000-12-05 15:27:00 obachman Exp $
+ *  $Id$
  *
  *  Test mod fuer modgen
  */
@@ -13,7 +13,7 @@
 // module="pcv";
 package="pcv";
 
-version="$Id: pcv.mod,v 1.6 2000-12-05 15:27:00 obachman Exp $";
+version="$Id$";
 info="
 LIBRARY: pcv.so  CONVERSION BETWEEN POLYS AND COEF VECTORS
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de

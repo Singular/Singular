@@ -3,7 +3,7 @@
 /*****************************************
  *  Computer Algebra System SINGULAR     *
  *****************************************/
-/* $Id: ncSACache.h,v 1.5 2009-02-23 13:50:51 Singular Exp $ */
+/* $Id$ */
 
 // #include <ncSACache.h> // for CCacheHash etc classes
 

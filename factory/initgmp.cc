@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: initgmp.cc,v 1.5 2009-07-28 14:51:07 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

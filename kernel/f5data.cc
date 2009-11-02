@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.cc,v 1.9 2009-03-04 20:23:05 ederc Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: lpolynomial definition 
 */

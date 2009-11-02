@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_base.h,v 1.2 2005-07-28 09:56:58 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT - multipolynomial resultants - resultant matrices

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulon.h,v 1.14 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: numbers modulo n
 */

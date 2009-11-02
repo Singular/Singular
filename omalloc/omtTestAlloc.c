@@ -3,7 +3,7 @@
  *  Purpose: alloc function to be included in omMain.c
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omtTestAlloc.c,v 1.11 2001-04-30 15:26:21 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "omtTest.h"
 

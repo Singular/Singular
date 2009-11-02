@@ -1,4 +1,4 @@
-version="$Id: involut.lib,v 1.18 2009-04-15 11:14:36 seelisch Exp $";
+version="$Id$";
 category="Noncommutative";
 info="
 LIBRARY:  involut.lib  Computations and operations with involutions

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_functions.h,v 1.5 1998-06-29 15:44:45 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FUNCTIONS_H
 #define INCL_FUNCTIONS_H

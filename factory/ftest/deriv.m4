@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: deriv.m4,v 1.5 1998-04-06 10:50:46 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( deriv, `"
 Usage: deriv [<options>] [<envSpec>] <f> [<x>]

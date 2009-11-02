@@ -3,7 +3,7 @@
  *  Purpose: default declaration of of configurable stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDefaultConfig.h,v 1.8 2001-04-30 09:02:05 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 /********************************************************************

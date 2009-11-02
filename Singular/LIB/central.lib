@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: central.lib,v 1.10 2009-04-15 11:11:04 seelisch Exp $"
+version="$Id$"
 category="Noncommutative"
 info="
 LIBRARY:  central.lib      Computation of central elements of GR-algebras

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: makeheader.pl,v 1.2 1997-07-01 15:21:53 Singular Exp $
+# $Id$
 #
 # makeheader.pl - generate a header file out of several header file (ver 1.2).
 #

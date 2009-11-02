@@ -1,4 +1,4 @@
-# $Id: Makefile.dist,v 1.2 1997-06-09 15:55:46 Singular Exp $
+# $Id$
 #################################################
 factoryversion = 1.2b
 factorypath = ../factory/$(factoryversion)

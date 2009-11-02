@@ -1,4 +1,4 @@
-// $Id: king_3_colors_l.tst,v 1.2 2006-06-29 10:04:16 bricken Exp $
+// $Id$
 
 //
 //
@@ -9,7 +9,7 @@ LIB "tst.lib";
 LIB "poly.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: king_3_colors_l.tst,v 1.2 2006-06-29 10:04:16 bricken Exp $");
+tst_ignore("CVS: $Id$");
 
 proc char_out(ideal i){
   return(sort(simplify(lead(i),1))[1]);

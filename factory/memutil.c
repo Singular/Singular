@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: memutil.c,v 1.5 2004-03-19 11:13:51 Singular Exp $ */
+/* $Id$ */
 
 #define _POSIX_SOURCE 1
 

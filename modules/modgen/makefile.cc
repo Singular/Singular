@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: makefile.cc,v 1.32 2008-11-18 21:48:05 dreyer Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: lib parsing
 */

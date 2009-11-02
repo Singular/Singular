@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_globals.h,v 1.5 1997-10-23 12:15:57 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_GLOBALS_H
 #define INCL_CF_GLOBALS_H

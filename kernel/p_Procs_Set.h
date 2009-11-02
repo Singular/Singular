@@ -11,7 +11,7 @@
  *           have to be defined before this file is included
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Set.h,v 1.17 2008-07-03 13:55:04 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "modulop.h"
 

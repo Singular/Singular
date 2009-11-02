@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kspoly.cc,v 1.16 2008-12-10 19:48:51 levandov Exp $ */
+/* $Id$ */
 /*
 *  ABSTRACT -  Routines for Spoly creation and reductions
 */

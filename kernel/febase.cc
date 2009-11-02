@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: febase.cc,v 1.25 2009-07-28 14:15:05 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: i/o system
 */

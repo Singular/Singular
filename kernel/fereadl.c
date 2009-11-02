@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fereadl.c,v 1.5 2009-09-16 17:14:47 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: input from ttys, simulating fgets
 */

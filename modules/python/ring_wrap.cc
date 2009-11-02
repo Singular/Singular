@@ -1,4 +1,4 @@
-//$Id: ring_wrap.cc,v 1.8 2006-03-22 13:12:32 bricken Exp $
+//$Id$
 
 #include <boost/python.hpp>
 #include "mod2.h"

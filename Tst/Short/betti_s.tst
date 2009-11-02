@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: betti_s.tst,v 1.1 2000-03-16 12:21:06 siebert Exp $");
+tst_ignore("CVS ID $Id$");
 ring an=32003,(w,x,y,z),(dp,C);
 ideal i=
 0,

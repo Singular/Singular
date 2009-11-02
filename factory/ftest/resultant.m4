@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: resultant.m4,v 1.5 1997-11-05 16:12:16 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( resultant, `"
 Usage: resultant [<options>] [<envSpec>] <f> <g> <x>

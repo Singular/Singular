@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////
 // version string automatically expanded by CVS
 
-version="$Id: template.lib,v 1.10 2001-01-16 13:48:46 Singular Exp $";
+version="$Id$";
 category="Miscellaneous";
 // summary description of the library
 info="

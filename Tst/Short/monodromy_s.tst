@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: monodromy_s.tst,v 1.9 2001-01-11 12:04:33 pfister Exp $");
+tst_ignore("CVS ID $Id$");
 
 LIB "mondromy.lib";
 

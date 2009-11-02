@@ -6,7 +6,7 @@
  *  Purpose: noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: gring.cc,v 1.76 2009-08-13 17:26:31 motsak Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #define MYTEST 0

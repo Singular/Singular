@@ -1,6 +1,6 @@
 //GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: crypto.lib,v 1.10 2009-07-28 10:34:54 Singular Exp $";
+version="$Id$";
 category="Teaching";
 info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography

@@ -4,7 +4,7 @@
  *           be inlined
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omInline.h,v 1.10 2006-06-14 07:54:08 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #if defined(OM_INLINE) || defined(OM_ALLOC_C)
 

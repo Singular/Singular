@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gkdim.lib,v 1.14 2009-10-29 17:52:12 Singular Exp $";
+version="$Id$";
 category="Noncommutative";
 info="
 LIBRARY: gkdim.lib     Procedures for calculating the Gelfand-Kirillov dimension

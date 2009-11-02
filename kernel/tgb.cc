@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.cc,v 1.167 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: slimgb and F4 implementation
 */

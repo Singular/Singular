@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly level 0 functions
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline0.cc,v 1.1.1.1 2003-10-06 12:15:58 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef PINLINE0_CC
 

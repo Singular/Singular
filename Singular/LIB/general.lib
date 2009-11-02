@@ -2,7 +2,7 @@
 //anne, added deleteSublist and watchdog 12.12.2000
 //eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: general.lib,v 1.66 2009-07-28 14:17:00 Singular Exp $";
+version="$Id$";
 category="General purpose";
 info="
 LIBRARY:  general.lib   Elementary Computations of General Type

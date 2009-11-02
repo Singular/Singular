@@ -14,7 +14,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: F4.h,v 1.4 2005-10-19 16:11:17 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: interface for F4 only routines
 */

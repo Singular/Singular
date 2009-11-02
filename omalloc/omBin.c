@@ -3,7 +3,7 @@
  *  Purpose: definitions of routines for working with bins
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBin.c,v 1.7 2001-04-30 09:02:02 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #include "om_Alloc.h"

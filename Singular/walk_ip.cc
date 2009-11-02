@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: walk_ip.cc,v 1.3 2009-05-05 10:09:24 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: frwalk: interpreter link
 */

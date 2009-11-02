@@ -132,7 +132,7 @@ void fill_example_package();
 
 #line 2 "python.mod"
 /*
- *  $Id: python.cc,v 1.6 2007-01-15 09:45:54 bricken Exp $
+ *  $Id$
  *
  *  Test mod fuer modgen
  */
@@ -187,7 +187,7 @@ extern "C" {
 #line 20 "python.mod"
   enter_id("category","tests", STRING_CMD);
 #line 22 "python.mod"
-  enter_id("version","$Id: python.cc,v 1.6 2007-01-15 09:45:54 bricken Exp $", STRING_CMD);
+  enter_id("version","$Id$", STRING_CMD);
 #line 23 "python.mod"
   enter_id("info","LIBRARY: kernel.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C python(input); eval a string  in python", STRING_CMD);
 #line 26 "python.mod"

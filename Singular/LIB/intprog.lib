@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: intprog.lib,v 1.7 2009-04-07 16:18:05 seelisch Exp $";
+version="$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY: intprog.lib      Integer Programming with Groebner Basis Methods

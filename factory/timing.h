@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: timing.h,v 1.8 2008-08-20 13:35:55 Singular Exp $ */
+/* $Id$ */
 
 /* It should be possible to include this file multiple times for different */
 /* settings of TIMING */

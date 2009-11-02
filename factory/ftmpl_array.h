@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_array.h,v 1.1 1998-03-10 14:43:24 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_ARRAY_H
 

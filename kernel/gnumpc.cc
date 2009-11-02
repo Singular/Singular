@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpc.cc,v 1.10 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: computations with GMP complex floating-point numbers
 *

@@ -2,7 +2,7 @@ LIB "tst.lib";
 LIB "graphics.lib";
 
 tst_init(); 
-tst_ignore("CVS ID $Id: graphics.tst,v 1.3 1999-09-23 13:40:31 Singular Exp $");
+tst_ignore("CVS ID $Id$");
  
  // test staircase
 

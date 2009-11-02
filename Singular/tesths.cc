@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tesths.cc,v 1.119 2009-07-29 12:00:04 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT - initialize SINGULARs components, run Script and start SHELL

@@ -1,7 +1,7 @@
 LIB "tst.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: dbm_s.tst,v 1.2 1998-07-01 10:20:13 obachman Exp $");
+tst_ignore("CVS: $Id$");
 
 "==============================================";
 " DBM link tests ";

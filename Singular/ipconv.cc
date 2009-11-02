@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipconv.cc,v 1.42 2009-09-24 16:36:12 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: automatic type conversions
 */

@@ -7,7 +7,7 @@
  *  Note:    this file is included by p_Procs.cc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Procs_Generate.cc,v 1.4 2008-08-06 13:55:42 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 

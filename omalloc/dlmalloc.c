@@ -3,7 +3,7 @@
  *  Purpose: implementation of Doug Lea's malloc
  *  This was obtained by taking cutting out the end of malloc.c
  *
- *  Version: $Id: dlmalloc.c,v 1.5 2007-10-16 08:45:35 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifdef HAVE_CONFIG_H
 #include "omMalloc.h"

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_algorithm.cc,v 1.16 2008-09-23 12:18:45 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

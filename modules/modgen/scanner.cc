@@ -701,7 +701,7 @@ char *yytext;
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: scanner.cc,v 1.5 2007-09-12 09:31:40 Singular Exp $ */
+/* $Id$ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

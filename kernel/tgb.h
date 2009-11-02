@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb.h,v 1.9 2006-05-16 08:38:39 bricken Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: trepgb interface
 */

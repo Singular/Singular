@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: toric.lib,v 1.11 2001-02-06 11:43:23 anne Exp $";
+version="$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY: toric.lib   Standard Basis of Toric Ideals

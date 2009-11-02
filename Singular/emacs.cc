@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: emacs.cc,v 1.27 2009-07-06 12:50:41 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: Esingular main file
 */

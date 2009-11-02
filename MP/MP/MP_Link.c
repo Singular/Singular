@@ -139,7 +139,7 @@
  */
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_Link.c,v 1.7 2009-06-04 09:43:40 Singular Exp $";
+static char vcid[] = "@(#) $Id$";
 #endif /* lint */
 
 #include "MP.h"

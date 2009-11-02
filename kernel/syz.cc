@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.cc,v 1.21 2009-04-14 12:40:46 motsak Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT: resolutions

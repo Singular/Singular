@@ -3,7 +3,7 @@
  *  Purpose: low-level Macros for memory operations
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omMemOps.h,v 1.4 2000-08-14 12:26:47 obachman Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #ifndef OM_MEM_OPS_H

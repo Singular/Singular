@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_primetab.cc,v 1.1 1998-02-09 10:42:34 schmidt Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

@@ -1,6 +1,6 @@
 //last change: 13.02.2001 (Eric Westenberger)
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: triang.lib,v 1.14 2009-04-14 12:00:15 Singular Exp $";
+version="$Id$";
 category="Symbolic-numerical solving";
 info="
 LIBRARY: triang.lib   Decompose Zero-dimensional Ideals into Triangular Sets

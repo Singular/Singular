@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_cantzass.h,v 1.3 1997-12-08 18:24:29 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FAC_CANTZASS_H
 #define INCL_FAC_CANTZASS_H

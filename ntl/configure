@@ -1,5 +1,5 @@
 #!/bin/sh
-# version $Id: configure,v 1.25 2006-05-29 16:49:47 Singular Exp $
+# version $Id$
 
 while [ $# -ne 0 ]; do
    case $1 in 

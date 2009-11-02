@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gf_tabutil.cc,v 1.2 1997-06-19 12:23:02 schmidt Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

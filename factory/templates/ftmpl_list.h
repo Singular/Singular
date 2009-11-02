@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.h,v 1.11 2009-10-28 14:42:23 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_LIST_H
 #define INCL_LIST_H

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.2 1999-03-19 14:13:27 krueger Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */

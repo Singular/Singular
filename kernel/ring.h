@@ -6,7 +6,7 @@
 /*
 * ABSTRACT - the interpreter related ring operations
 */
-/* $Id: ring.h,v 1.43 2009-07-22 11:13:42 seelisch Exp $ */
+/* $Id$ */
 
 /* includes */
 #include "structs.h"

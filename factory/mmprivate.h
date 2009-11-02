@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: mmprivate.h,v 1.2 1997-06-19 12:22:07 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_MMPRIVATE_H
 #define INCL_MMPRIVATE_H

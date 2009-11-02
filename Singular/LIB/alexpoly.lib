@@ -1,4 +1,4 @@
-version="$Id: alexpoly.lib,v 1.18 2009-04-15 11:06:40 seelisch Exp $";
+version="$Id$";
 category="Singularities";
 info="
 LIBRARY:  alexpoly.lib   Resolution Graph and Alexander Polynomial

@@ -1,5 +1,5 @@
 # @configure_input@
-# $Id: GNUmakefile.in,v 1.65 2009-07-22 17:18:05 Singular Exp $
+# $Id$
 
 #
 # GNUmakefile.in - used by `configure' to create `GNUmakefile', the

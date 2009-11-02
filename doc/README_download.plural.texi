@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_download.plural.texi,v 1.4 2009-04-15 10:41:14 seelisch Exp $
+@comment $Id$
 @c FILE: README_download.texi
 @c PURPOSE: download instructions, to be includeded in manual and README_ftp
 @c

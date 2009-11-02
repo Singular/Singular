@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ringgb.cc,v 1.18 2009-06-04 12:39:32 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: ringgb interface
 */

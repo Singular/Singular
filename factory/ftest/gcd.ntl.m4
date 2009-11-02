@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gcd.ntl.m4,v 1.2 1999-02-16 17:06:42 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( gcd.ntl, `"
 Usage: gcd.ntl [<options>] [<envSpec>] <f> <g> [<realResult>]

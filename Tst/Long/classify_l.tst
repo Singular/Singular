@@ -2,7 +2,7 @@ LIB "tst.lib";
 LIB "classify.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: classify_l.tst,v 1.3 2000-12-04 13:12:45 Singular Exp $");
+tst_ignore("CVS: $Id$");
 
 
 "======================================================================";

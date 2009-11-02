@@ -4,7 +4,7 @@
 //stdhilb can be called with std or slimgb (Jan 2008, GMG)
 //### Todo: im lokalen Fall die Hilbert-Samuel Funktion verwenden
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: standard.lib,v 1.110 2009-08-13 17:45:06 motsak Exp $";
+version="$Id$";
 category="Miscellaneous";
 info="
 LIBRARY: standard.lib   Procedures which are always loaded at Start-up

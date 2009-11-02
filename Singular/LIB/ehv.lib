@@ -1,4 +1,4 @@
-// $Id: ehv.lib,v 1.3 2009-04-10 13:28:50 Singular Exp $
+// $Id$
 /////////////////////////////////////////////////////////////////////
 // EHV.lib                                                         //
 // algorithms for primary decomposition of ideals based on         //
@@ -7,7 +7,7 @@
 //                                                                 //
 /////////////////////////////////////////////////////////////////////
 
-version="$Id: ehv.lib,v 1.3 2009-04-10 13:28:50 Singular Exp $";
+version="$Id$";
 category="Commutative Algebra";
 
 info="

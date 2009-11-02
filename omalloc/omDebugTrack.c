@@ -3,7 +3,7 @@
  *  Purpose: implementation of main omDebug functions
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omDebugTrack.c,v 1.16 2002-01-22 16:17:43 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>

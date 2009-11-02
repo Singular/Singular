@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: divrem.m4,v 1.4 1998-07-03 10:04:15 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( divrem, `"
 Usage: divrem [<options>] [<envSpec>] <f> <g> [<divisionCheck>]

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: summator.h,v 1.3 2009-05-27 16:15:14 motsak Exp $ */
+/* $Id$ */
 
 // #include <summator.h> // for CPolynomialSummator class
 

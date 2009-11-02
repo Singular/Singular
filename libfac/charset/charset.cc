@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: charset.cc,v 1.17 2008-06-10 14:49:14 Singular Exp $ */
+/* $Id$ */
 /////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>

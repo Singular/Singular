@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_win.cc,v 1.7 2008-06-10 14:39:43 wienand Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT: Windows specific routines

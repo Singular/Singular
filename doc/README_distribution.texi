@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_distribution.texi,v 1.7 2001-03-01 10:13:14 Singular Exp $
+@comment $Id$
 @c FILE: README_distribution.texi
 @c PURPOSE: general README file to be included in the distribution
 @c

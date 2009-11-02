@@ -4,7 +4,7 @@
  *            which are to be provided by omalloc library
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omalloc_provide.c,v 1.5 2001-04-30 09:02:13 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "omConfig.h"
 

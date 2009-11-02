@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: interpolation.cc,v 1.7 2009-08-13 15:30:51 Singular Exp $ */
+/* $Id$ */
 
 #include "mod2.h"
 #include "structs.h"

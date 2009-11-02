@@ -1,4 +1,4 @@
-version="$Id: brnoeth.lib,v 1.22 2009-04-15 11:10:53 seelisch Exp $";
+version="$Id$";
 category="Coding theory";
 info="
 LIBRARY:   brnoeth.lib  Brill-Noether Algorithm, Weierstrass-SG and AG-codes

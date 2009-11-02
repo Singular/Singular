@@ -3,7 +3,7 @@
  *  Purpose: declaration of common Debug/Check/Track stuff
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 7/00
- *  Version: $Id: omDebug.h,v 1.16 2007-02-13 17:19:45 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_DEBUG_H
 #define OM_DEBUG_H

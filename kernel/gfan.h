@@ -4,7 +4,7 @@ gfan.h Interface to gfan.cc
 $Author: monerjan $
 $Date: 2009-10-23 14:56:55 $
 $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.12 2009-10-23 14:56:55 monerjan Exp $
-$Id: gfan.h,v 1.12 2009-10-23 14:56:55 monerjan Exp $
+$Id$
 */
 #ifdef HAVE_GFAN
 #include "intvec.h"

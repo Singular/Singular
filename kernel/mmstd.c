@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmstd.c,v 1.8 2009-03-19 10:34:00 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: standard version of C-memory management alloc func 
 * i.e. (malloc/realloc/free)

@@ -66,7 +66,7 @@
  ************************************************************************/
 
 #ifndef lint
-static char vcid[] = "@(#) $Id: MP_SacBigInt.c,v 1.2 2008-07-09 07:42:23 Singular Exp $";
+static char vcid[] = "@(#) $Id$";
 #endif /* lint */
 
 #include "MP.h"

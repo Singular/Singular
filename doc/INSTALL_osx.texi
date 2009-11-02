@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_osx.texi,v 1.4 2005-02-23 11:27:39 pohl Exp $
+@comment $Id$
 @c FILE:    INSTALL_osx.texi
 @c PURPOSE: Installation instructions for Singular on Macintosh
 

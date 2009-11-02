@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: singext.h,v 1.10 2008-08-22 09:35:08 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_SINGEXT_H
 #define INCL_SINGEXT_H

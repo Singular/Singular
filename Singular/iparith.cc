@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iparith.cc,v 1.520 2009-10-29 18:27:45 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT: table driven kernel interface, used by interpreter

@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: mres_s.tst,v 1.1 2000-12-05 14:15:59 obachman Exp $");
+tst_ignore("CVS ID $Id$");
 
 proc tst_test_mres(ideal i)
 {

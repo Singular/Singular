@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: var_intglobal.cc,v 1.1 1998-01-19 10:14:21 schmidt Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

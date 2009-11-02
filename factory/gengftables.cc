@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gengftables.cc,v 1.3 2006-05-15 08:17:53 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

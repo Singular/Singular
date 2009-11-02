@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gring.h,v 1.30 2009-08-13 17:26:57 motsak Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT additional defines etc for --with-plural
 */

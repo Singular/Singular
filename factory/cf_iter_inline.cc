@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_iter_inline.cc,v 1.1 1998-06-29 10:43:09 schmidt Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

@@ -1,6 +1,6 @@
-// $Id: ncall.lib,v 1.7 2007-07-13 16:35:43 Singular Exp $
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ncall.lib,v 1.7 2007-07-13 16:35:43 Singular Exp $";
+version="$Id$";
 category = "Noncommutative";
 info="
 LIBRARY:  ncall.lib   Load all noncommutative libraries

@@ -1,4 +1,4 @@
-#$Id: SConstruct,v 1.19 2006-03-31 09:21:49 Singular Exp $
+#$Id$
 import os
 import re
 try:

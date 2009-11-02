@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kutil.h,v 1.48 2009-07-10 15:13:57 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */

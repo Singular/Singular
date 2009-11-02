@@ -5,7 +5,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: F4.cc,v 1.4 2006-03-28 05:25:03 bricken Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: F4 implementation
 */

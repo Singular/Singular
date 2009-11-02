@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stype.h,v 1.4 2000-03-29 09:31:43 krueger Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: flex/bison interface
 */

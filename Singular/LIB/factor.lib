@@ -1,8 +1,8 @@
-// $Id: factor.lib,v 1.7 2000-05-12 12:25:43 Singular Exp $
+// $Id$
 //(RS)
 ///////////////////////////////////////////////////////////////////////////////
 
-version="$Id: factor.lib,v 1.7 2000-05-12 12:25:43 Singular Exp $";
+version="$Id$";
 info="
 LIBRARY:  factor.lib    PROCEDURES FOR CALLING THE REDUCE FACTORIZER
 

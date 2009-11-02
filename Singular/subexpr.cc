@@ -4,7 +4,7 @@
 /*
 * ABSTRACT: handling of leftv
 */
-/* $Id: subexpr.cc,v 1.105 2009-07-28 14:18:35 Singular Exp $ */
+/* $Id$ */
 
 #include <stdlib.h>
 #include <stdio.h>

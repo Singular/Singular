@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: fast_mult.cc,v 1.22 2009-04-30 16:57:20 Singular Exp $ */
+/* $Id$ */
 #include "mod2.h"
 #include "ring.h"
 #include "fast_mult.h"

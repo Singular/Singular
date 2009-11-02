@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: shiftgb.h,v 1.6 2008-08-07 18:08:37 levandov Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: kernel: utils for kStd
 */

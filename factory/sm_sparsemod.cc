@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.cc,v 1.9 2006-05-16 13:43:19 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

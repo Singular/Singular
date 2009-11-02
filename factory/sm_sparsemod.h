@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_sparsemod.h,v 1.1 1997-07-15 13:01:49 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_SM_SPARSEMOD_H
 #define INCL_SM_SPARSEMOD_H

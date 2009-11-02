@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: interpolation.h,v 1.1 2006-08-10 12:51:38 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: ideals of points (with multiplicities)
 */

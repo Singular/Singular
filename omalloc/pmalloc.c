@@ -2,7 +2,7 @@
  *  File:    pmalloc.h
  *  Purpose: implementation of malloc from Perl's 5.005 distribution
  *
- *  Version: $Id: pmalloc.c,v 1.4 2001-04-30 09:02:15 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #include "omMalloc.h"

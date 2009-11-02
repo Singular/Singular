@@ -1,4 +1,4 @@
-// $Id: finduni_s.tst,v 1.2 1998-07-01 10:20:20 obachman Exp $
+// $Id$
 
 //
 // finduni_s.tst - short tests for finduni
@@ -7,7 +7,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id: finduni_s.tst,v 1.2 1998-07-01 10:20:20 obachman Exp $");
+tst_ignore("CVS: $Id$");
 
 option(redSB);
 

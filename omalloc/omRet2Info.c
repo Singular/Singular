@@ -3,7 +3,7 @@
  *  Purpose: translation of return addr to RetInfo
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omRet2Info.c,v 1.14 2001-04-30 09:02:10 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include <stdio.h>
 #include <string.h>

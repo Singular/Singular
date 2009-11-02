@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fbinops.m4,v 1.5 1998-04-06 11:05:17 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( fbinops, `"
 Usage: fbinops [<options>] [<envSpec>] <f> <operator> <g>

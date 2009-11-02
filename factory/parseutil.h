@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: parseutil.h,v 1.2 1997-06-19 12:22:00 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_PARSEUTIL_H
 #define INCL_PARSEUTIL_H

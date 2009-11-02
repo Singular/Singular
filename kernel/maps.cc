@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: maps.cc,v 1.9 2008-06-10 10:17:32 motsak Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */

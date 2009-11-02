@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.h,v 1.8 2006-05-15 09:03:05 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_GFOPS_H
 #define INCL_GFOPS_H

@@ -4,7 +4,7 @@
  *  Purpose: configuration for omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omConfig.h.in,v 1.9 2001-04-30 09:02:03 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_CONFIG_H
 #define OM_CONFIG_H

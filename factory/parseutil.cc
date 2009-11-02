@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: parseutil.cc,v 1.2 1997-06-19 12:22:01 schmidt Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

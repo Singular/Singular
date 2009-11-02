@@ -9,7 +9,7 @@
  *           use kbuckets, instead.
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.h,v 1.3 2009-05-27 16:15:14 motsak Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H

@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID: $Id: fetch_l.tst,v 1.4 2000-05-12 16:30:50 Singular Exp $");
+tst_ignore("CVS ID: $Id$");
 
 proc generate_ring_str(int n, string r_name, string ostring)
 {

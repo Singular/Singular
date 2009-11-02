@@ -108,7 +108,7 @@ To add a new test for a library/commando to the test-suite:
   preamble: 
          LIB "tst.lib";
          tst_init();
-	 tst_ignore("CVS ID $Id:$"); // or, write own version number here
+	 tst_ignore("CVS ID $Id$"); // or, write own version number here
   tst_init() writes some general info to stdout (like date,
   uname, hostname, version, etc.). The library tst.lib (contained in
   the Singular distribution) provides, among others, the routines

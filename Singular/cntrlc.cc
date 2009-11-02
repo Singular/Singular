@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: cntrlc.cc,v 1.59 2009-03-19 10:33:14 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT - interupt handling
 */

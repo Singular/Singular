@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: khstd.cc,v 1.4 2008-09-24 15:55:19 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT:utils for hilbert driven kStd
 */

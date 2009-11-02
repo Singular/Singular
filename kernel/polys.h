@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.h,v 1.22 2009-10-08 10:06:59 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT - all basic methods to manipulate polynomials of the
              currRing

@@ -1,4 +1,4 @@
-//$Id: intvec_wrap.cc,v 1.5 2006-03-09 14:49:17 bricken Exp $
+//$Id$
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "mod2.h"

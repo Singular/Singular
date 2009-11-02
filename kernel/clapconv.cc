@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapconv.cc,v 1.21 2009-10-16 10:29:28 Singular Exp $
+// $Id$
 /*
 * ABSTRACT: convert data between Singular and factory
 */

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_list.cc,v 1.10 2009-10-28 14:42:23 Singular Exp $ */
+/* $Id$ */
 
 #include <factoryconf.h>
 

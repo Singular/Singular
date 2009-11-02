@@ -19,7 +19,7 @@
  *
  * The author may be contacted via http://dmalloc.com/
  *
- * $Id: omReturn.h,v 1.3 2000-08-14 12:26:49 obachman Exp $
+ * $Id$
  */
 
 /*

@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sca.h,v 1.16 2009-03-02 18:06:54 motsak Exp $ */
+/* $Id$ */
 
 #include <ring.h>
 #include <gring.h>

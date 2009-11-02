@@ -1,5 +1,5 @@
 /*
- * $Id: utils.cc,v 1.16 2008-11-18 21:48:05 dreyer Exp $
+ * $Id$
  */
 
 #include <stdio.h>

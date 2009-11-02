@@ -3,7 +3,7 @@
  *  Purpose: implementation of emulated omalloc routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocEmulate.c,v 1.5 2009-06-03 19:01:04 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include <stdlib.h>
 #include <string.h>

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ipprint.cc,v 1.26 2005-10-31 17:40:00 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: interpreter: printing
 */

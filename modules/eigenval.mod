@@ -38,7 +38,7 @@ BOOLEAN evEigenvals(leftv res,leftv h);
 
 
 package="eigenval";
-version="$Id: eigenval.mod,v 1.2 2007-08-15 17:38:27 motsak Exp $";
+version="$Id$";
 info="
 LIBRARY: EIGENVALUES AND HESSENBERG FORM
 AUTHOR:  Mathias Schulze, email: mschulze@mathematik.uni-kl.de

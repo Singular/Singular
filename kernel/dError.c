@@ -6,7 +6,7 @@
  *  Purpose: implementation for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.c,v 1.3 2005-05-24 08:05:07 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C

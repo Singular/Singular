@@ -3,7 +3,7 @@
  *  Purpose: implementation of Error handling routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.c,v 1.11 2009-02-28 13:39:57 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #include <stdarg.h>

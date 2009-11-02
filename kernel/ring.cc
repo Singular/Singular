@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ring.cc,v 1.129 2009-09-28 12:44:06 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT - the interpreter related ring operations

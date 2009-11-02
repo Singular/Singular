@@ -1,4 +1,4 @@
-// $Id: fglmquot1_l.tst,v 1.1 1999-11-24 13:45:31 wichmann Exp $
+// $Id$
 
 //
 // fglmquot1_l.tst - long tests for fglmquot command
@@ -6,7 +6,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS: $Id: fglmquot1_l.tst,v 1.1 1999-11-24 13:45:31 wichmann Exp $");
+tst_ignore("CVS: $Id$");
 
 option(redSB);
 

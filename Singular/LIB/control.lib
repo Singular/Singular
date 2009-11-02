@@ -1,4 +1,4 @@
-version="$Id: control.lib,v 1.40 2009-04-07 09:30:44 seelisch Exp $";
+version="$Id$";
 category="System and Control Theory";
 info="
 LIBRARY:  control.lib     Algebraic analysis tools for System and Control Theory

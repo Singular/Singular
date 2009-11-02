@@ -1,6 +1,6 @@
 //GMG, last modified 28.10.2001
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: weierstr.lib,v 1.7 2009-04-15 11:20:08 seelisch Exp $";
+version="$Id$";
 category="Teaching";
 info="
 LIBRARY:  weierstr.lib   Procedures for the Weierstrass Theorems

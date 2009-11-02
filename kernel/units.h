@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: units.h,v 1.1.1.1 2003-10-06 12:16:04 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: procedures to compute with units
 */

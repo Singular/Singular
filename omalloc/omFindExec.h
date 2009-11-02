@@ -3,7 +3,7 @@
  *  Purpose: declaration routines for getting Backtraces of stack
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omFindExec.h,v 1.4 2000-08-14 12:26:44 obachman Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_FIND_EXEC_H
 #define OM_FIND_EXEC_H

@@ -3,7 +3,7 @@
  *  Purpose: declarations for dlmalloc
  *  This was obtained by taking cutting out the beginning of malloc.c
  *
- *  Version: $Id: dlmalloc.h,v 1.12 2007-10-16 08:56:57 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef DL_MALLOC_H
 #define DL_MALLOC_H

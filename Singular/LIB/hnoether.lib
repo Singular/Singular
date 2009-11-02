@@ -1,4 +1,4 @@
-version="$Id: hnoether.lib,v 1.59 2009-04-15 11:14:36 seelisch Exp $";
+version="$Id$";
 // (GMG, last modified 08.06.08: comments to Newton non-degenerate added)
 ///////////////////////////////////////////////////////////////////////////////
 

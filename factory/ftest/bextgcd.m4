@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: bextgcd.m4,v 1.1 1998-01-22 09:47:46 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( bextgcd, `"
 Usage: bextgcd [<options>] [<envSpec>] <f> <g> [<realResult>]

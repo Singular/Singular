@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat.h,v 1.16 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: computation with long rational numbers
 */

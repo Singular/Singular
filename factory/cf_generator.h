@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_generator.h,v 1.3 2004-12-10 10:14:46 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_GENERATOR_H
 #define INCL_CF_GENERATOR_H

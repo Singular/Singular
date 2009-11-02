@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C -*- */
-/* $Id: memman.h,v 1.3 2004-09-23 16:51:48 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_MEMMAN_H
 #define INCL_MEMMAN_H

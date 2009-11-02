@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_multivar.h,v 1.4 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FAC_MULTIVAR_H
 #define INCL_FAC_MULTIVAR_H

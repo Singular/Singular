@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: matpol.cc,v 1.19 2009-10-02 14:19:17 seelisch Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT:

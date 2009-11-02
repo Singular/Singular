@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstdfac.cc,v 1.22 2009-07-28 14:15:05 Singular Exp $ */
+/* $Id$ */
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */

@@ -7,7 +7,7 @@
  *           a bucket sort
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: sbuckets.cc,v 1.3 2009-05-27 16:15:14 motsak Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "mod2.h"
 

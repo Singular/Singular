@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mpr_complex.h,v 1.6 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT - multipolynomial resultants - real floating-point numbers using gmp

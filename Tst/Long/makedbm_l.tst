@@ -2,7 +2,7 @@ LIB "tst.lib";
 LIB "makedbm.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: makedbm_l.tst,v 1.2 1998-07-01 10:10:50 obachman Exp $");
+tst_ignore("CVS: $Id$");
 
 // ===============================================
 int i;

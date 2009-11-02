@@ -6,7 +6,7 @@
  *  Purpose: implementation of debug related poly routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pDebug.cc,v 1.12 2009-07-02 15:15:38 ederc Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #ifndef PDEBUG_CC

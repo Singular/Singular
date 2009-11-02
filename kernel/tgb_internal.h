@@ -4,7 +4,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgb_internal.h,v 1.76 2009-09-24 16:37:42 Singular Exp $ */
+/* $Id$ */
 /*
  * ABSTRACT: tgb internal .h file
 */

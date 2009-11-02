@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: pl2doc.pl,v 1.23 2008-12-18 16:17:51 Singular Exp $
+# $Id$
 ###################################################################
 #  Computer Algebra System SINGULAR
 #

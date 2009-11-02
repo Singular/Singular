@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgbgauss.cc,v 1.9 2009-02-21 19:15:55 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: gauss implementation for F4
 */

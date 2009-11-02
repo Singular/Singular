@@ -6,7 +6,7 @@
  *  Purpose: implementation of currRing independent poly procedures
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_polys.cc,v 1.20 2009-09-24 16:37:41 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 

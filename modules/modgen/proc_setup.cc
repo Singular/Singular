@@ -1,5 +1,5 @@
 /*
- * $Id: proc_setup.cc,v 1.8 2008-11-18 21:48:05 dreyer Exp $
+ * $Id$
  */
 
 #include <stdio.h>

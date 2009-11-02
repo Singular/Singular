@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_irred.h,v 1.2 1997-06-19 12:24:25 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_IRRED_H
 #define INCL_CF_IRRED_H

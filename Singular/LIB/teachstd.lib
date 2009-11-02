@@ -1,7 +1,7 @@
 // $Id:
 //GMG, last modified 28.9.01
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: teachstd.lib,v 1.13 2009-04-15 11:23:27 seelisch Exp $";
+version="$Id$";
 category="Teaching";
 info="
 LIBRARY:  teachstd.lib   Procedures for teaching standard bases

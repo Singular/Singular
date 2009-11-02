@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: claptmpl.cc,v 1.52 2009-10-08 10:11:56 seelisch Exp $
+// $Id$
 /*
 * ABSTRACT - instantiation of all templates
 */

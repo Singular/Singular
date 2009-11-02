@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_char.cc,v 1.11 2008-08-22 09:35:08 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

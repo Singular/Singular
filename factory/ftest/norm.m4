@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: norm.m4,v 1.2 1998-04-06 11:05:03 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( norm, `"
 Usage: norm [<options>] [<envSpec>] <f> [<euclideanFlag>]

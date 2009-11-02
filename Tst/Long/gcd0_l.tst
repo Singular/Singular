@@ -1,4 +1,4 @@
-// $Id: gcd0_l.tst,v 1.3 2005-04-22 15:07:15 Singular Exp $
+// $Id$
 
 //
 // gcd0_l.tst - long tests for gcd calculations in Z.
@@ -18,7 +18,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: gcd0_l.tst,v 1.3 2005-04-22 15:07:15 Singular Exp $");
+tst_ignore("CVS ID  : $Id$");
 
 //
 // - ring r1=0,u,dp.

@@ -3,7 +3,7 @@
  *  Purpose: definitions of stats related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omStats.c,v 1.7 2001-04-30 09:02:11 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include <unistd.h>
 #define OM_NO_MALLOC_MACROS

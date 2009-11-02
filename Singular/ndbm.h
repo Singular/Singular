@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ndbm.h,v 1.3 2008-06-10 15:44:50 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: DBM
 */

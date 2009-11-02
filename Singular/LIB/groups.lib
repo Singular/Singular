@@ -1,7 +1,7 @@
-// $Id: groups.lib,v 1.4 2008-12-12 17:19:59 Singular Exp $
+// $Id$
 //(GP, last modified 26.10.01)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: groups.lib,v 1.4 2008-12-12 17:19:59 Singular Exp $";
+version="$Id$";
 category="Applications";
 info="
 LIBRARY:  groups.lib      Finite Group Theory

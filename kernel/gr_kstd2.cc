@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gr_kstd2.cc,v 1.37 2009-03-10 15:47:17 levandov Exp $ */
+/* $Id$ */
 /*
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */

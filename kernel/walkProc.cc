@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: walkProc.cc,v 1.2 2009-01-06 13:59:36 Singular Exp $ */
+/* $Id$ */
 
 #include "mod2.h"
 #include "structs.h"

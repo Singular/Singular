@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_inst.cc,v 1.11 2009-10-28 14:44:57 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

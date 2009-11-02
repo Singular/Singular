@@ -3,7 +3,7 @@
 ****************************************/
 /*
 * ABSTRACT: help system
-* versin $Id: fehelp.cc,v 1.59 2009-07-28 14:18:34 Singular Exp $
+* versin $Id$
 */
 
 #include <string.h>

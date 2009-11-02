@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: rmodulo2m.cc,v 1.29 2009-09-25 12:49:21 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: numbers modulo 2^m
 */

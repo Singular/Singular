@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: variable.h,v 1.8 2008-07-01 14:17:49 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_VARIABLE_H
 #define INCL_VARIABLE_H

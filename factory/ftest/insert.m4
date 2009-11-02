@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: insert.m4,v 1.2 1998-04-06 10:48:37 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( insert, `"
 Usage: insert [<options>] [<envSpec>] <f> <g> [<v>]

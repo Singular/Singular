@@ -1,6 +1,6 @@
 //(GMG, last modified 16.12.00)
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: ntsolve.lib,v 1.16 2009-04-06 09:17:01 seelisch Exp $";
+version="$Id$";
 category="Symbolic-numerical solving";
 info="
 LIBRARY:  ntsolve.lib     Real Newton Solving of Polynomial Systems

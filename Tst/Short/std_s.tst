@@ -1,4 +1,4 @@
-// $Id: std_s.tst,v 1.5 2000-05-12 12:50:55 Singular Exp $
+// $Id$
 
 // std_s.tst -- long tests for std
 // uses rcyclic examples from ISSAC'98 paper

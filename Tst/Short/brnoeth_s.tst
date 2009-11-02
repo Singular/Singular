@@ -1,5 +1,5 @@
 LIB "tst.lib";
-tst_ignore("CVS ID $Id: brnoeth_s.tst,v 1.5 2005-10-06 16:21:28 Singular Exp $");
+tst_ignore("CVS ID $Id$");
 tst_init();
 
 // tst_status();

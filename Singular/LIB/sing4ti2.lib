@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-version="$Id: sing4ti2.lib,v 1.3 2009-04-14 12:00:15 Singular Exp $";
+version="$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY:  sing4ti2.lib          Communication Interface to 4ti2

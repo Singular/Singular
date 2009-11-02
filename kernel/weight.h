@@ -6,7 +6,7 @@
 /*
 * ABSTRACT
 */
-/* $Id: weight.h,v 1.2 2007-04-04 14:13:31 Singular Exp $ */
+/* $Id$ */
 
 #include "structs.h"
 

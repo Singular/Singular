@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: size.m4,v 1.4 1998-04-06 10:49:03 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( size, `"
 Usage: size [<options>] [<envSpec>] <f> [<x>]

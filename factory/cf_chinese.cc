@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_chinese.cc,v 1.12 2007-09-26 14:31:12 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

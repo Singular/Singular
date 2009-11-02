@@ -1,5 +1,5 @@
 #! /bin/sh
-# $Id: makeheader,v 1.1 1997-06-27 08:32:07 schmidt Exp $
+# $Id$
 
 #
 # makeheader.sh - generate a header file out of several header files.

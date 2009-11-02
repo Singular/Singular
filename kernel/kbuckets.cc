@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.cc,v 1.35 2008-04-04 10:30:09 Singular Exp $ */
+/* $Id$ */
 
 #include "mod2.h"
 #include "structs.h"

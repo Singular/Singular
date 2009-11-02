@@ -1051,7 +1051,7 @@ char *yytext;
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: libparse.cc,v 1.15 2009-07-28 15:22:17 Singular Exp $ */
+/* $Id$ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

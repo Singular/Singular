@@ -1,4 +1,4 @@
-//$Id: ideal_wrap.cc,v 1.10 2006-06-21 06:27:11 bricken Exp $
+//$Id$
 #include <boost/python.hpp>
 #include "mod2.h"
 #include "Poly.h"

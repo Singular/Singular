@@ -1,7 +1,7 @@
 // Singular-library
 ///////////////////////////////////////////////////////////////////////////////
 // version string automatically expanded by CVS
-version="$Id: ringgb.lib,v 1.16 2001/01/16 13:48:40 Singular Exp $";
+version="$Id$";
 category="Miscellaneous";
 info="
 LIBRARY:  ringgb.lib     Functions for coefficient rings

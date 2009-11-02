@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: totaldegree.m4,v 1.4 1998-04-06 10:49:17 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( totaldegree, `"
 Usage: totaldegree [<options>] [<envSpec>] <f> [<x> <y>]

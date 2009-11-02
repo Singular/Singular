@@ -1,4 +1,4 @@
-// $Id: resultantp_s.tst,v 1.3 1998-07-01 10:20:50 obachman Exp $
+// $Id$
 
 //
 // resultantp_s.tst - short tests for resultant calculations mod p.
@@ -18,7 +18,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: resultantp_s.tst,v 1.3 1998-07-01 10:20:50 obachman Exp $");
+tst_ignore("CVS ID  : $Id$");
 
 //
 // - ring r1=32003,x,dp.

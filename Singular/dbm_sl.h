@@ -6,7 +6,7 @@
  *  Purpose: declaration of sl_link routines for dbm
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: dbm_sl.h,v 1.1 2000-12-12 08:44:43 obachman Exp $
+ *  Version: $Id$
  *******************************************************************/
 LINKAGE BOOLEAN dbOpen(si_link l, short flag);
 LINKAGE BOOLEAN dbWrite(si_link l, leftv v);

@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: README_src.texi,v 1.5 2009-04-15 10:41:14 seelisch Exp $
+@comment $Id$
 @c FILE: README_src.texi
 @c PURPOSE: This should reside as README file in the src directory of the
 @c          Singular ftp site.

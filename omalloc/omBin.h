@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines related to Bins
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omBin.h,v 1.5 2001-04-30 09:02:02 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_BIN_H
 #define OM_BIN_H

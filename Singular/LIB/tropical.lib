@@ -1,5 +1,5 @@
 //
-version="$Id: tropical.lib,v 1.20 2009-08-21 14:11:42 Singular Exp $";
+version="$Id$";
 category="Tropical Geometry";
 info="
 LIBRARY:         tropical.lib  Computations in Tropical Geometry

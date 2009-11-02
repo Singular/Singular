@@ -1,6 +1,6 @@
 //CM, last modified 10.12.06
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: aksaka.lib,v 1.5 2009-04-15 11:05:47 seelisch Exp $";
+version="$Id$";
 category="Teaching";
 info="
 LIBRARY: aksaka.lib     Procedures for primality testing after Agrawal, Saxena, Kayal

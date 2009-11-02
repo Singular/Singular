@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longrat0.cc,v 1.5 2008-03-19 17:44:10 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT -
 * IO for long rational numbers (Hubert Grassmann)

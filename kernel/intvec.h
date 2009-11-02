@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: intvec.h,v 1.9 2009-10-23 09:58:49 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: class intvec: lists/vectors of integers
 */

@@ -3,7 +3,7 @@
  *  Purpose: declaration of public routines for omalloc
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: om_Alloc.h,v 1.5 2006-06-14 14:28:19 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_ALLOC_H
 #define OM_ALLOC_H

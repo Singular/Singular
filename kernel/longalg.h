@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: longalg.h,v 1.19 2009-10-08 12:52:18 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT:   algebraic numbers
 */

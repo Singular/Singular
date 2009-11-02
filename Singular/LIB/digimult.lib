@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: digimult.lib,v 1.6 2006-07-18 15:48:11 Singular Exp $";
+version="$Id$";
 category="Logic";
 info="
 LIBRARY: digimult.lib   Satisfiability of prop. logical expressions

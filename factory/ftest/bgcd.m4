@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: bgcd.m4,v 1.1 1998-01-22 09:46:32 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( bgcd, `"
 Usage: bgcd [<options>] [<envSpec>] <f> <g> [<realResult>]

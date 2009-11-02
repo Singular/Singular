@@ -2,7 +2,7 @@
  *  File:    gmalloc.c
  *  Purpose: implementation of malloc and friends from libc of
  *           Linux kernel version 5
- *  Version: $Id: gmalloc.c,v 1.6 2001-04-30 09:01:59 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "omMalloc.h"
 

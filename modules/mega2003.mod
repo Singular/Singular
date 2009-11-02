@@ -1,6 +1,6 @@
 %{
 /*
- *  $Id: mega2003.mod,v 1.1 2003-06-11 10:21:51 anne Exp $
+ *  $Id$
  *
  *  Test mod fuer modgen
  */
@@ -16,7 +16,7 @@ extern void piShowProcList();
 
 category="mega";
 package="mega_module";
-version	= "$Id: mega2003.mod,v 1.1 2003-06-11 10:21:51 anne Exp $";
+version	= "$Id$";
 info	="
 LIBRARY: mega.lib  PROCEDURES OF GENERAL TYPE WRITEN IN C
 

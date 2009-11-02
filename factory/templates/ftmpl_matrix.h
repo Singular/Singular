@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftmpl_matrix.h,v 1.13 2006-05-15 09:03:07 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_MATRIX_H
 #define INCL_MATRIX_H

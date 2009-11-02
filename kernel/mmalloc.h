@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: mmalloc.h,v 1.3 2005-05-19 14:38:22 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: declaration of routines for memory stuff
 */

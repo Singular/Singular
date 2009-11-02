@@ -1,4 +1,4 @@
-//$Id: wrapper.h,v 1.34 2006-06-21 06:27:12 bricken Exp $
+//$Id$
 #ifndef PYTHON_SINGULAR_WRAPPER_HEADER
 #define PYTHON_SINGULAR_WRAPPER_HEADER
 #include <Python.h>

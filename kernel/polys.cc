@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: polys.cc,v 1.40 2009-08-07 13:57:16 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT - all basic methods to manipulate polynomials

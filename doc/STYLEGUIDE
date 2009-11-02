@@ -282,4 +282,4 @@ i;  // mit Leerzeichen beginnen.
 + Innerhalb einer @tex-Umgebeung keine texinfo-Befehle (wie @ref) verwenden.
 
 ------------------------------------------------------------
-$Id: STYLEGUIDE,v 1.20 2008-10-29 15:42:36 Singular Exp $
+$Id$

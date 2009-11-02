@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: syz.h,v 1.4 2007-02-16 10:54:07 motsak Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: Resolutions
 */

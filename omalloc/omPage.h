@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for primitve page managment
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omPage.h,v 1.8 2001-04-30 09:02:10 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_PAGE_H
 #define OM_PAGE_H

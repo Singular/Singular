@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5lists.h,v 1.25 2009-10-01 13:40:16 ederc Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: list interface
 */

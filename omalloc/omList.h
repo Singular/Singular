@@ -3,7 +3,7 @@
  *  Purpose: declaration of routines for operations on linked lists
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omList.h,v 1.6 2001-04-30 09:02:08 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #ifndef OM_LIST_H

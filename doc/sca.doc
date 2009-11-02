@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: sca.doc,v 1.6 2009-04-17 12:53:22 motsak Exp $
+@comment $Id$
 @comment this file describes super-commutative algebras and their implementation in Singular
 
 @node Super-commutative algebras,LETTERPLACE,Mathematical background (plural),Non-commutative subsystem

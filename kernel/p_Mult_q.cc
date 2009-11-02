@@ -6,7 +6,7 @@
  *  Purpose: multiplication of polynomials
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Mult_q.cc,v 1.9 2009-01-07 17:07:04 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "mod2.h"
 

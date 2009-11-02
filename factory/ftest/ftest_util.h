@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ftest_util.h,v 1.12 1998-03-11 16:11:12 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FTEST_UTIL_H
 #define INCL_FTEST_UTIL_H

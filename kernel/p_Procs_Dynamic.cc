@@ -6,7 +6,7 @@
  *  Purpose: source for dynamically loaded version of p_Procs
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: p_Procs_Dynamic.cc,v 1.5 2009-06-04 10:25:22 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "mod2.h"
 #include "structs.h"

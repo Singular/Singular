@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kstd2.cc,v 1.102 2009-10-29 16:44:15 Singular Exp $ */
+/* $Id$ */
 /*
 *  ABSTRACT -  Kernel: alg. of Buchberger
 */

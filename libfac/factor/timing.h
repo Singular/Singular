@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id: timing.h,v 1.5 2008-06-10 14:49:16 Singular Exp $";
+// static char * rcsid = "$Id$";
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of TIMING (but now this isn't used)

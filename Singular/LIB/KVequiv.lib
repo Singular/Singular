@@ -1,10 +1,10 @@
-// $Id: KVequiv.lib,v 1.4 2009-03-30 13:16:58 dreyer Exp $
+// $Id$
 // (anne, last modified 27.11.2001)
 /////////////////////////////////////////////////////////////////////////////
 // LIBRARY HEADER
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: KVequiv.lib,v 1.4 2009-03-30 13:16:58 dreyer Exp $";
+version="$Id$";
 info="
 LIBRARY:  KVequiv.lib    PROCEDURES RELATED TO K_V-EQUIVALENCE
 AUTHOR:   Anne Fruehbis-Krueger, anne@mathematik.uni-kl.de

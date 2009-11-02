@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ffops.h,v 1.11 2007-01-04 10:40:19 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FFOPS_H
 #define INCL_FFOPS_H

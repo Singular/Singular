@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: iplib.cc,v 1.130 2009-07-28 14:18:34 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: interpreter: LIB and help
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: hilb.cc,v 1.4 2009-07-06 11:54:10 Singular Exp $ */
+/* $Id$ */
 /*
 *  ABSTRACT -  Hilbert series
 */

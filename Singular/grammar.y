@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: grammar.y,v 1.130 2009-07-28 14:18:34 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: SINGULAR shell grammatik
 */

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: walkMain.cc,v 1.1 2005-05-04 15:41:26 Singular Exp $ */
+/* $Id$ */
 /*
  * ABSTRACT: fractal walk stuff
  *

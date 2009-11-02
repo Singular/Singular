@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sing_dbm.h,v 1.6 2001-08-27 14:47:39 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: interface to DBM links
 */

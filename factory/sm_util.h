@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_util.h,v 1.5 1998-03-10 14:48:41 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_SM_UTIL_H
 #define INCL_SM_UTIL_H

@@ -1,8 +1,8 @@
-// $Id: tst.lib,v 1.35 2009-04-15 11:20:08 seelisch Exp $
+// $Id$
 //(obachman, last modified 6/30/98)
 /////////////////////////////////////////////////////////////////////////////
 
-version="$Id: tst.lib,v 1.35 2009-04-15 11:20:08 seelisch Exp $";
+version="$Id$";
 category="Utilities";
 info="
 LIBRARY:  tst.lib      Procedures for running automatic tst Tests

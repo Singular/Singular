@@ -1,6 +1,6 @@
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: facstd.tst,v 1.1 2000-11-06 14:46:45 obachman Exp $");
+tst_ignore("CVS ID $Id$");
 option(prot);
 ring r=32003,(a,b,c,d,e,f),(C,dp);
 ideal i=

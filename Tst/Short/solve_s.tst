@@ -3,7 +3,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID $Id: solve_s.tst,v 1.6 2005-05-03 13:02:58 Singular Exp $");
+tst_ignore("CVS ID $Id$");
 
 LIB "solve.lib";
 

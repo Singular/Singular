@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: units.cc,v 1.2 2007-07-25 10:53:15 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: procedures to compute with units
 */

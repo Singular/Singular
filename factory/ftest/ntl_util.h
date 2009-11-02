@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: ntl_util.h,v 1.2 1999-02-16 16:56:28 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_NTL_UTIL_H
 #define INCL_NTL_UTIL_H

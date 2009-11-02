@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-version="$Id: curvepar.lib,v 1.4 2009-04-15 11:11:20 seelisch Exp $";
+version="$Id$";
 category="Singularities";
 info="
 LIBRARY:  space_curve.lib

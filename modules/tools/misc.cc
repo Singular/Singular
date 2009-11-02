@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: misc.cc,v 1.5 1999-03-31 22:03:22 krueger Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: lib parsing
 */

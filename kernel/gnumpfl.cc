@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: gnumpfl.cc,v 1.12 2009-09-24 16:37:41 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 *

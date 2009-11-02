@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-// $Id: clapsing.h,v 1.5 2009-10-16 10:35:00 Singular Exp $
+// $Id$
 /*
 * ABSTRACT: interface between Singular and factory
 */

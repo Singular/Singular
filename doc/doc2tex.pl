@@ -1,5 +1,5 @@
 #!/usr/local/bin/perl
-# $Id: doc2tex.pl,v 1.29 2007-07-25 16:10:45 Singular Exp $
+# $Id$
 ###################################################################
 #  Computer Algebra System SINGULAR
 #

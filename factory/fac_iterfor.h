@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_iterfor.h,v 1.6 2006-05-15 09:03:04 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FAC_ITERFOR_H
 #define INCL_FAC_ITERFOR_H

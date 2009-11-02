@@ -6,7 +6,7 @@
 /*
 * ABSTRACT: tokens, types for interpreter; general macros
 */
-/* $Id: tok.h,v 1.71 2009-07-28 14:19:05 Singular Exp $ */
+/* $Id$ */
 
 #ifndef MYYSTYPE
 #include "structs.h"

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_binom.h,v 1.3 1997-06-19 12:27:29 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_BINOM_H
 #define INCL_CF_BINOM_H

@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: stype.h,v 1.1.1.1 2003-10-06 12:15:55 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: flex/bison interface
 */

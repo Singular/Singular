@@ -3,7 +3,7 @@ Compute the Groebner fan of an ideal
 $Author: monerjan $
 $Date: 2009-10-29 16:26:32 $
 $Header: /exports/cvsroot-2/cvsroot/kernel/gfan.cc,v 1.102 2009-10-29 16:26:32 monerjan Exp $
-$Id: gfan.cc,v 1.102 2009-10-29 16:26:32 monerjan Exp $
+$Id$
 */
 
 #include "mod2.h"

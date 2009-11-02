@@ -6,7 +6,7 @@
  *  Purpose: implementation of std related inline routines
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: kInline.cc,v 1.17 2009-07-10 15:13:56 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef KINLINE_CC
 #define KINLINE_CC

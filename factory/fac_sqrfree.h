@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_sqrfree.h,v 1.6 2008-03-17 17:44:04 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_FAC_SQRFREE_H
 #define INCL_FAC_SQRFREE_H

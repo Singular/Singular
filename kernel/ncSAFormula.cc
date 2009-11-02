@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication by formulas in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAFormula.cc,v 1.3 2009-09-22 10:20:56 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #define MYTEST 0

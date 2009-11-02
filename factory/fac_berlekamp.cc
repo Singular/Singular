@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: fac_berlekamp.cc,v 1.5 1997-09-09 07:11:05 schmidt Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

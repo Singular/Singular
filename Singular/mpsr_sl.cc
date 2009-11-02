@@ -6,7 +6,7 @@
  *  Purpose: implementation of sl_link routines for MP
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: mpsr_sl.cc,v 1.12 2009-08-17 09:54:13 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #include "mod2.h"

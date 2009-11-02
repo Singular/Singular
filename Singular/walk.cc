@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: walk.cc,v 1.18 2009-03-19 11:06:04 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: Implementation of the Groebner walk
 */

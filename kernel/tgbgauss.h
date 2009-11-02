@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: tgbgauss.h,v 1.5 2005-05-17 15:26:27 bricken Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: gauss implementation for F4 header
 */

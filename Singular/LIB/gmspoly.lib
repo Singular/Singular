@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmspoly.lib,v 1.16 2008-03-18 15:50:14 Singular Exp $";
+version="$Id$";
 category="Singularities";
 
 info="

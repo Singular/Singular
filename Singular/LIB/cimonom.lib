@@ -1,6 +1,6 @@
 // IB/IG/JJS, last modified: 10.07.2007
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-version = "$Id: cimonom.lib,v 1.4 2009-04-07 16:18:05 seelisch Exp $";
+version = "$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY: cimonom.lib   Determines if the toric ideal of an affine monomial curve is a complete intersection

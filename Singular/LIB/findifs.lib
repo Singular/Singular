@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: findifs.lib,v 1.7 2009-04-15 11:11:35 seelisch Exp $";
+version="$Id$";
 category="Applications";
 info="
 LIBRARY: findifs.lib  Tools for the finite difference schemes

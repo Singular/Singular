@@ -1,4 +1,4 @@
-// $Id: slimgb_s.tst,v 1.5 2005-06-03 12:19:08 bricken Exp $
+// $Id$
 
 //
 //
@@ -9,7 +9,7 @@ LIB "tst.lib";
 LIB "poly.lib";
 
 tst_init();
-tst_ignore("CVS: $Id: slimgb_s.tst,v 1.5 2005-06-03 12:19:08 bricken Exp $");
+tst_ignore("CVS: $Id$");
 
 proc char_out(ideal i){
   return(sort(simplify(lead(i),1))[1]);

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: perron.lib,v 1.14 2009-04-09 12:04:42 seelisch Exp $";
+version="$Id$";
 category="Noncommutative";
 info="
 LIBRARY:  perron.lib         computation of algebraic dependences

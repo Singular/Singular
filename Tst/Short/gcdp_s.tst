@@ -1,4 +1,4 @@
-// $Id: gcdp_s.tst,v 1.4 1998-07-01 10:20:25 obachman Exp $
+// $Id$
 
 //
 // gcdp_s.tst - short tests for gcd calculations mod p.
@@ -16,7 +16,7 @@
 
 LIB "tst.lib";
 tst_init();
-tst_ignore("CVS ID  : $Id: gcdp_s.tst,v 1.4 1998-07-01 10:20:25 obachman Exp $");
+tst_ignore("CVS ID  : $Id$");
 
 //
 // - functions.

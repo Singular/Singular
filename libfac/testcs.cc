@@ -1,4 +1,4 @@
-// $Id: testcs.cc,v 1.3 2006-05-16 14:46:48 Singular Exp $
+// $Id$
 
 #include <factory.h>
 #include <factor.h>

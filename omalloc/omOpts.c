@@ -3,7 +3,7 @@
  *  Purpose: definitions of stats related stuff
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omOpts.c,v 1.7 2001-04-30 09:02:09 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #include "om_Alloc.h"

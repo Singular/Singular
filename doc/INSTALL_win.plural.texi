@@ -1,5 +1,5 @@
 @comment -*-texinfo-*-
-@comment $Id: INSTALL_win.plural.texi,v 1.4 2009-04-15 10:41:14 seelisch Exp $
+@comment $Id$
 @c FILE: INSTALL_unix.texi
 @c PURPOSE: Installation instruction for Singular on Unix
 @c

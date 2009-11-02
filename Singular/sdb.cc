@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sdb.cc,v 1.17 2008-03-19 17:44:37 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: Singular debugger
 */

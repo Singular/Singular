@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gf_tabutil.h,v 1.2 1997-06-19 12:23:01 schmidt Exp $ */
+/* $Id$ */
 
 #ifndef INCL_GF_TABUTIL_H
 #define INCL_GF_TABUTIL_H

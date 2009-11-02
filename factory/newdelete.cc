@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: newdelete.cc,v 1.4 2008-10-28 08:46:23 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 #include <new>

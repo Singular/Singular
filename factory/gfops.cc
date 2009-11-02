@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: gfops.cc,v 1.10 2009-06-04 17:50:50 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

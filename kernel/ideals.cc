@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: ideals.cc,v 1.80 2009-10-06 09:32:54 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */

@@ -1,4 +1,4 @@
-version="$Id: absfact.lib,v 1.7 2008-07-16 12:39:51 Singular Exp $";
+version="$Id$";
 category="Factorization";
 info="
 LIBRARY: absfact.lib   Absolute factorization for characteristic 0

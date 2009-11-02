@@ -6,7 +6,7 @@
  *  Purpose: declaration for debug error handling
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 9/00
- *  Version: $Id: dError.h,v 1.1.1.1 2003-10-06 12:15:51 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef DERROR_H
 #define DERROR_H

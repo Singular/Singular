@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gaussman.lib,v 1.92 2008-07-26 12:22:43 Singular Exp $";
+version="$Id$";
 category="Singularities";
 
 info="

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sm_util.cc,v 1.5 1998-03-10 14:48:34 schmidt Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

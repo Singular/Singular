@@ -1,4 +1,4 @@
-//$Id: Poly.h,v 1.35 2009-02-23 13:50:51 Singular Exp $
+//$Id$
 
 
 

@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_irred.cc,v 1.3 1997-08-29 08:38:25 schmidt Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

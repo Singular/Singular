@@ -6,7 +6,7 @@
  *  Purpose: Ore-noncommutative kernel procedures
  *  Author:  levandov (Viktor Levandovsky)
  *  Created: 8/00 - 11/00
- *  Version: $Id: ratgring.cc,v 1.25 2009-06-04 12:43:27 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #include "mod2.h"
 #include "ratgring.h"

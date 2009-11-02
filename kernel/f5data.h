@@ -2,7 +2,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5data.h,v 1.15 2009-10-01 13:40:16 ederc Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: labeled polynomial interface
 */

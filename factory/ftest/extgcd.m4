@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: extgcd.m4,v 1.1 1998-07-07 16:20:18 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( extgcd, `"
 Usage: extgcd [<options>] [<envSpec>] <f> <g> [<realResult>]

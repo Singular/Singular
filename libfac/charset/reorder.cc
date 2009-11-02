@@ -10,7 +10,7 @@
 // computing time for your example!
 /////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-/* $Id: reorder.cc,v 1.7 2008-06-10 14:49:15 Singular Exp $ */
+/* $Id$ */
 ////////////////////////////////////////////////////////////
 // FACTORY - Includes
 #include <factory.h>

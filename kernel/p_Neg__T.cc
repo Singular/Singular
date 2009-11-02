@@ -6,7 +6,7 @@
  *  Purpose: template for p_Neg
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: p_Neg__T.cc,v 1.1.1.1 2003-10-06 12:16:00 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 /***************************************************************

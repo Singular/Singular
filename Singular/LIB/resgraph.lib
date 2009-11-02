@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-version="$Id: resgraph.lib,v 1.5 2007-01-10 10:24:56 Singular Exp $";
+version="$Id$";
 category="Visualization";
 info="
 LIBRARY:  resgraph.lib            Visualization of Resolution Data

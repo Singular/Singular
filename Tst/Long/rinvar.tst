@@ -14,7 +14,7 @@ LIB "tst.lib";
 LIB "rinvar.lib";        
 
 tst_init();
-tst_ignore("CVS ID $Id: rinvar.tst,v 1.2 2005-04-25 10:11:18 Singular Exp $"); 
+tst_ignore("CVS ID $Id$"); 
  
 
 // example 1

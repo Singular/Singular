@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_random.h,v 1.4 2008-08-06 14:16:57 Singular Exp $ */
+/* $Id$ */
 
 #ifndef INCL_CF_RANDOM_H
 #define INCL_CF_RANDOM_H

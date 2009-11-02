@@ -1,4 +1,4 @@
-//static char rcsid[] = "$Id: test.cc,v 1.4 2006-05-16 14:46:48 Singular Exp $";
+//static char rcsid[] = "$Id$";
 ///////////////////////////////////////////////////////////////////////////////
 // Factor - Includes
 #include "factor.h"

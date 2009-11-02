@@ -6,7 +6,7 @@
  *  Purpose: link initialization for static linking
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 12/00
- *  Version: $Id: slInit_Static.cc,v 1.2 2001-08-27 14:47:40 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 /***************************************************************

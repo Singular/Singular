@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id: debug.h,v 1.6 2008-06-10 14:49:16 Singular Exp $" ;
+// static char * rcsid = "$Id$" ;
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of FACDEBUG and/or DEBUGOUTPUT

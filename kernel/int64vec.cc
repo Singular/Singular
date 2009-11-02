@@ -1,7 +1,7 @@
 /*****************************************
 *  Computer Algebra System SINGULAR      *
 *****************************************/
-/* $Id: int64vec.cc,v 1.4 2007-11-08 09:47:13 Singular Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: class int64vec: lists/vectors of int64
 */

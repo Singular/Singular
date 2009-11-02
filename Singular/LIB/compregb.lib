@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: compregb.lib,v 1.3 2009-01-14 16:07:03 Singular Exp $";
+version="$Id$";
 category="General purpose";
 info="
 LIBRARY:  compregb.lib      experimental implementation for comprehensive Groebner systems

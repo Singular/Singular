@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: sqrfree.m4,v 1.1 1999-02-16 16:47:38 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( sqrfree, `"
 Usage: sqrfree [<options>] [<envSpec>] [sort=<flag>] <f>

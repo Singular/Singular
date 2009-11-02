@@ -6,7 +6,7 @@
  *  Purpose: implementation of poly procs which iter over ExpVector
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
- *  Version: $Id: pInline1.h,v 1.18 2009-09-22 10:20:56 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef PINLINE1_H
 #define PINLINE1_H

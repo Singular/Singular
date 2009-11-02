@@ -3,7 +3,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: kbuckets.h,v 1.7 2007-06-19 09:17:28 Singular Exp $ */
+/* $Id$ */
 #include "structs.h"
 #include "p_Procs.h"
 #include "pShallowCopyDelete.h"

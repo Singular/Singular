@@ -4,7 +4,7 @@
  *           and page management
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omAllocSystem.h,v 1.4 2001-04-30 09:02:02 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_ALLOC_SYSTEM_H
 #define OM_ALLOC_SYSTEM_H

@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: sparsmat.cc,v 1.4 2009-06-04 08:32:59 Singular Exp $ */
+/* $Id$ */
 
 /*
 * ABSTRACT: operations with sparse matrices (bareiss, ...)

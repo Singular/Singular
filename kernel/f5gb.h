@@ -1,7 +1,7 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id: f5gb.h,v 1.45 2009-10-01 13:40:16 ederc Exp $ */
+/* $Id$ */
 /*
 * ABSTRACT: f5gb interface
 */

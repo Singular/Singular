@@ -1,6 +1,6 @@
 // last modified 21.07.2005, Oliver Wienand
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: surf.lib,v 1.35 2009-09-28 09:00:56 Singular Exp $";
+version="$Id$";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf

@@ -6,7 +6,7 @@
  *  Purpose: implementation of special Cache+Hash for Multiplier 
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSACache.cc,v 1.5 2008-07-23 07:09:45 motsak Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #define MYTEST 0

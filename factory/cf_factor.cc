@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_factor.cc,v 1.43 2009-06-04 17:50:49 Singular Exp $ */
+/* $Id$ */
 
 //{{{ docu
 //

@@ -3,7 +3,7 @@
  *  Purpose: Error handling of omalloc
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 11/99
- *  Version: $Id: omError.h,v 1.9 2009-05-06 10:28:33 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 #ifndef OM_ERROR_H
 #define OM_ERROR_H

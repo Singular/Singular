@@ -6,7 +6,7 @@
  *  Purpose: simple Summator usecase implementation
  *  Author:  motsak
  *  Created:
- *  Version: $Id: summator.cc,v 1.6 2009-05-28 08:53:08 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 

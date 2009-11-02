@@ -6,7 +6,7 @@
  *  Purpose: implementation of multiplication in simple NC subalgebras
  *  Author:  motsak
  *  Created: 
- *  Version: $Id: ncSAMult.cc,v 1.13 2009-09-22 10:20:56 Singular Exp $
+ *  Version: $Id$
  *******************************************************************/
 
 #define MYTEST 0

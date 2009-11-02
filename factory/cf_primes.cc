@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: cf_primes.cc,v 1.6 1997-09-09 09:03:28 schmidt Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

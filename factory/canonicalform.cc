@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: canonicalform.cc,v 1.45 2008-07-01 14:17:49 Singular Exp $ */
+/* $Id$ */
 
 #include <config.h>
 

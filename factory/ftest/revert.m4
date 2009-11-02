@@ -1,5 +1,5 @@
 /* emacs edit mode for this file is -*- C++ -*- */
-/* $Id: revert.m4,v 1.1 1999-02-16 16:32:26 schmidt Exp $ */
+/* $Id$ */
 
 ftestSetNameOfGame( revert, `"
 Usage: revert [<options>] [<envSpec>] <f>
