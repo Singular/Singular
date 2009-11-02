@@ -673,17 +673,11 @@ windist: ${SINGULAR}
 srcdist:
 	rm -rf ${SI_TMPDIR}
 	${MKINSTALLDIRS} ${SI_TMPDIR}/Singular-${S_VERSION}
-	cd ${SI_TMPDIR}/Singular-${S_VERSION}; cvs co All
-	cd  ${SI_TMPDIR}; \
+	cd ${SI_TMPDIR}/Singular-${S_VERSION}; svn co http://www.singular.uni-kl.de/svn/trunk; mv trunk/* trunk/.??* .; rmdir trunk
+	cd  ${SI_TMPDIR}; rm -rf .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn */*/*/*/*/.svn */*/*/*/*/*/.svn */*/*/*/*/*/*/.svn;\
 	tar cf - Singular-${S_VERSION}| ${MYGZIP} > Singular-${S_VERSION}.tar.gz
 	cp ${SI_TMPDIR}/Singular-${S_VERSION}.tar.gz .
 	rm -rf ${SI_TMPDIR}
-
-# You can remeber the password with "iwd" == "ich war dabei"
-CRYPT	= enigma # it does not seem to decrypt correctly with the HP crypt
-cryptdist: srcdist
-	${CRYPT} S-${S_VERSION}-iwd < Singular-${S_VERSION}.tar.gz > Singular-${S_VERSION}.tar.gz.crypt
-
 
 ##############################################################
 # stuff for configure
