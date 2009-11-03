@@ -60,25 +60,7 @@ EXAMPLE: example GKdim; shows examples
       {
         M=std(M);
       }
-      int n = ncols(M); // Num of vectors defining M
-      int m = nrows(M); // The rank of the free module where M is imbedded
-      int i,j;
-      for (j=1; j<=n; j++)
-      {
-        M[j] = leadmonom(M[j]); // Only consider the leader monomial of each vector
-      }
-      intmat v[1][m]; // v will be the dimension of each stable subset
-      ideal I;
-      for (i=1; i<=m; i++)
-      {
-        I=0;
-        for (j=1; j<=n; j++)
-        { // Extract each row like an ideal .LV: ????
-          I=I, M[i,j];
-        }
-        v[1,i] = idGKdim(I);
-        if (v[1,i]>d) { d = v[1,i]; }
-      }
+      d=dim(M);
     }
     else
     {
