@@ -672,9 +672,9 @@ windist: ${SINGULAR}
 
 srcdist:
 	rm -rf ${SI_TMPDIR}
-	${MKINSTALLDIRS} ${SI_TMPDIR}/Singular-${S_VERSION}
-	cd ${SI_TMPDIR}/Singular-${S_VERSION}; svn co http://www.singular.uni-kl.de/svn/trunk; mv trunk/* trunk/.??* .; rmdir trunk
-	cd  ${SI_TMPDIR}; rm -rf .svn */.svn */*/.svn */*/*/.svn */*/*/*/.svn */*/*/*/*/.svn */*/*/*/*/*/.svn */*/*/*/*/*/*/.svn;\
+	${MKINSTALLDIRS} ${SI_TMPDIR}
+	cd ${SI_TMPDIR}; svn export http://www.singular.uni-kl.de/svn/trunk Singular-${S_VERSION}
+	cd  ${SI_TMPDIR}; \
 	tar cf - Singular-${S_VERSION}| ${MYGZIP} > Singular-${S_VERSION}.tar.gz
 	cp ${SI_TMPDIR}/Singular-${S_VERSION}.tar.gz .
 	rm -rf ${SI_TMPDIR}
