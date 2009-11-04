@@ -643,11 +643,15 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{chinrem (} list, intvec @code{)}
+@*@code{chinrem (} list, list @code{)}
 @*@code{chinrem (} intvec, intvec @code{)}
 @item @strong{Type:}
 ideal resp. bigint
 @item @strong{Purpose:}
-applies chinese remainder theorem to the fisrt argument w.r.t. the moduli given in the second.
+applies chinese remainder theorem to the first argument w.r.t. the moduli given in the second.
+The elements in the first list must be of same type which can be @code{ideal},
+@code{module) or @code{matrix}.
+The moduli, if given by a list, must be from the type @code{bigint}.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -655,6 +659,7 @@ applies chinese remainder theorem to the fisrt argument w.r.t. the moduli given 
   ideal i1=5x+2y,x2+3y2+xy;
   ideal i2=2x-3y,2x2+4y2+5xy;
   chinrem(list(i1,i2),intvec(7,11));
+  chinrem(list(i1,i2),list(bigint(7),bigint(11)));
   chinrem(intvec(2,-3),intvec(7,11));
 @c example
 @end smallexample
