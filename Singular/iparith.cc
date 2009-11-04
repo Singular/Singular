@@ -1797,34 +1797,67 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
   lists c=(lists)u->CopyD(); // list of ideal
-  intvec* p=(intvec*)v->Data();
-  int rl=p->length();
+  lists pl=NULL;
+  intvec *p=NULL;
+  if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
+  else                    p=(intvec*)v->Data();
+  int rl=c->nr+1;
   poly r=NULL,h;
   ideal result;
   ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
   int i;
+  int return_type=c->m[0].Typ();
+  if ((return_type!=IDEAL_CMD)
+  && (return_type!=MODUL_CMD)
+  && (return_type!=MATRIX_CMD))
+  {
+    WerrorS("ideal/module/matrix expected");
+    omFree(x); // delete c
+    return TRUE;
+  }
   for(i=rl-1;i>=0;i--)
   {
-    if (c->m[i].Typ()!=IDEAL_CMD)
+    if (c->m[i].Typ()!=return_type)
     {
-      Werror("ideal expected at pos %d",i+1);
+      Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
       omFree(x); // delete c
       return TRUE;
     }
     x[i]=((ideal)c->m[i].Data());
   }
   number *q=(number *)omAlloc(rl*sizeof(number));
-  for(i=rl-1;i>=0;i--)
+  if (p!=NULL)
   {
-    q[i]=nlInit((*p)[i], currRing);
+    for(i=rl-1;i>=0;i--)
+    {
+      q[i]=nlInit((*p)[i], currRing);
+    }
+  }
+  else
+  {
+    for(i=rl-1;i>=0;i--)
+    {
+      if (pl->m[i].Typ()!=BIGINT_CMD)
+      {
+        Werror("bigint expected at pos %d",i+1);
+        omFree(x); // delete c
+        omFree(q); // delete pl
+        return TRUE;
+      }
+      q[i]=(number)(pl->m[i].Data());
+    }
   }
   result=idChineseRemainder(x,q,rl);
-  for(i=rl-1;i>=0;i--)
+  if (p!=NULL)
   {
-    nlDelete(&(q[i]),currRing);
+    for(i=rl-1;i>=0;i--)
+    {
+      nlDelete(&(q[i]),currRing);
+    }
   }
   omFree(q);
   res->data=(char *)result;
+  res->rtyp=return_type;
   return FALSE;
 }
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
@@ -3397,7 +3430,8 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjCHINREM_BI,CHINREM_CMD,    BIGINT_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{jjCHINREM_P, CHINREM_CMD,    POLY_CMD,       LIST_CMD,   INTVEC_CMD, ALLOW_PLURAL}
-,{jjCHINREM_ID,CHINREM_CMD,    IDEAL_CMD,      LIST_CMD,   INTVEC_CMD, ALLOW_PLURAL |NO_RING}
+,{jjCHINREM_ID,CHINREM_CMD,    IDEAL_CMD/*set by p*/,LIST_CMD,INTVEC_CMD, ALLOW_PLURAL |NO_RING}
+,{jjCHINREM_ID,CHINREM_CMD,    IDEAL_CMD/*set by p*/,LIST_CMD,LIST_CMD, ALLOW_PLURAL |NO_RING}
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
