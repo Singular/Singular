@@ -385,14 +385,14 @@ EXAMPLE: example liftPoly; shows an example
    poly p=lead(h);
    poly result;
    number n;
-   number N=L[1];
+   bigint N=L[1];
    for(i=size(L);i>1;i--)
    {
       N=N*L[i];
    }
    while(h!=0)
    {
-     n=Farey(N,leadcoef(h));
+     n=Farey(N,bigint(leadcoef(h)));
      result=result+n*p;
      h=h-lead(h);
      p=leadmonom(h);
@@ -419,7 +419,7 @@ EXAMPLE: example liftPoly1; shows an example
    list TT;
    number n;
 
-   number N=L[1];
+   bigint N=L[1];
    for(i=2;i<=size(L);i++)
    {
       N=N*L[i];
@@ -448,7 +448,7 @@ EXAMPLE: example liftPoly1; shows an example
        }
      }
      n=chineseR(TT,L,N);
-     n=Farey(N,n);
+     n=Farey(N,bigint(n));
      result=result+n*p;
    }
 }
@@ -465,7 +465,7 @@ proc fareyIdeal(ideal I,intvec L)
    poly result,p;
    int i,j;
    number n;
-   number N=L[1];
+   bigint N=L[1];
    for(i=2;i<=size(L);i++)
    {
       N=N*L[i];
@@ -479,7 +479,7 @@ proc fareyIdeal(ideal I,intvec L)
      {
         if (p==0) {break;}
         p=p-lead(p);
-        n=Farey(N,leadcoef(p));
+        n=Farey(N,bigint(leadcoef(p)));
         result=result+n*leadmonom(p);
      }
      I[i]=result;
@@ -487,7 +487,7 @@ proc fareyIdeal(ideal I,intvec L)
    return(I);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc Farey (number P, number N)
+proc Farey (bigint P, bigint N)
 "USAGE:  Farey (P,N); P, N number;
 RETURN:  a rational number a/b such that a/b=N mod P
          and |a|,|b|<(P/2)^{1/2}
@@ -495,17 +495,17 @@ RETURN:  a rational number a/b such that a/b=N mod P
 {
    if (P<0){P=-P;}
    if (N<0){N=N+P;}
-   number A,B,C,D,E;
+   bigint A,B,C,D,E;
    E=P;
    B=1;
    while (N!=0)
    {
         if (2*N^2<P)
         {
-           return(N/B);
+           return(number(N)/number(B));
         }
         D=E mod N;
-        C=A-(E-E mod N)/N*B;
+        C=A-(E div N)*B;
         E=N;
         N=D;
         A=B;
@@ -580,10 +580,11 @@ EXAMPLE: example pStd; shows an example
   matrix Z2=-M*Z;
   kill r1;
   number c=p;
+  bigint cb=p;
   matrix G0=transpose(matrix(G));
-  G0= MmodN(G0+ (c)* G22,c^2);
-  matrix GF=fareyMatrix(G0,c^2);
-  Z=MmodN(Z+(c)*Z2,c^2);
+  G0= MmodN(G0+ (c)* G22,cb^2);
+  matrix GF=fareyMatrix(G0,cb^2);
+  Z=MmodN(Z+(c)*Z2,cb^2);
   matrix C=transpose(G);
   int n=3;
   while(GF<>C)
@@ -595,9 +596,9 @@ EXAMPLE: example pStd; shows an example
     G22=transpose(matrix(g22));
     M=redmat(G,G1,G22);
     Z2=-M*Z;
-    Z=MmodN(Z+(c^(n-1))*Z2,c^n);
-    G0= MmodN(G0+ (c^(n-1))* G22,c^n);
-    GF=fareyMatrix(G0,c^n);
+    Z=MmodN(Z+(c^(n-1))*Z2,cb^n);
+    G0= MmodN(G0+ (c^(n-1))* G22,cb^n);
+    GF=fareyMatrix(G0,cb^n);
     n++;
   }
   return(ideal(GF));
@@ -690,7 +691,7 @@ RETURN:  a matrix M such that i=M*h+g
   return(M);
 }
 ///////////////////////////////////////////////////////////////////////////
-proc fareyMatrix(matrix m,number N)
+proc fareyMatrix(matrix m,bigint N)
 "USAGE:  fareyMatrix(m,y); m matrix, y integer;
 RETURN:  a matrix k of the matrix m with Farey rational numbers a/b as coefficients
 EXAMPLE: example fareyMatrix; shows an example
@@ -708,7 +709,7 @@ EXAMPLE: example fareyMatrix; shows an example
     {
       if (p==0) {break;}
       p=p-lead(p);
-      n=Farey(N,leadcoef(p));
+      n=Farey(N,bigint(leadcoef(p)));
       result=result+n*leadmonom(p);
     }
     I[i]=result;
@@ -725,8 +726,8 @@ example
    b;
 }
 ///////////////////////////////////////////////////////////////////////////
-proc MmodN(matrix Z,number N)
-"USAGE:  MmodN(Z,N);Z matrix, N number;
+proc MmodN(matrix Z,bigint N)
+"USAGE:  MmodN(Z,N);Z matrix, N bigint;
 RETURN:  the matrix Z mod N
 EXAMPLE: example MmodN;
 "
@@ -741,7 +742,7 @@ EXAMPLE: example MmodN;
       for(k=1;k<=size(Z[i,j]);k++)
       {
         m=leadmonom(Z[i,j][k]);
-        c=leadcoef(Z[i,j][k]) mod N;
+        c=bigint(leadcoef(Z[i,j][k])) mod N;
         p=p+c*m;
       }
       Z[i,j]=p;
@@ -754,7 +755,7 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r = 0,(x,y,z),dp;
    matrix m[3][1]= x3+10668x2+10668, z4-12801z2+12802, y5-8728y3+14547;
-   number p=32003;
+   bigint p=32003;
    matrix b=MmodN(m,p^2);
    b;
 }
