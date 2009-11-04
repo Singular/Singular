@@ -164,7 +164,7 @@ ideal idXXX (ideal  h1, int k);
 poly id_GCD(poly f, poly g, const ring r);
 
 ideal idChineseRemainder(ideal *x, number *q, int rl);
-ideal idChineseRemainder(ideal *x, intvec *iv);
+//ideal idChineseRemainder(ideal *x, intvec *iv); /* currently unused */
 
 
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing = currRing); // image of certain map for BGG

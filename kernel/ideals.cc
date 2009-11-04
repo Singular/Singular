@@ -4013,6 +4013,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
   omFree(xx);
   return result;
 }
+/* currently unsed:
 ideal idChineseRemainder(ideal *xx, intvec *iv)
 {
   int rl=iv->length();
@@ -4024,9 +4025,7 @@ ideal idChineseRemainder(ideal *xx, intvec *iv)
   }
   return idChineseRemainder(xx,q,rl);
 }
-
-
-
+*/
 
 /*2
 * transpose a module
