@@ -17,6 +17,7 @@ void MinorKey::reset() {
 }
 
 MinorKey::MinorKey (const MinorKey& mk) {
+//printf("\n%s", "MinorKey::MinorKey copy");
     _numberOfRowBlocks = mk.getNumberOfRowBlocks();
     _numberOfColumnBlocks = mk.getNumberOfColumnBlocks();;
 
@@ -77,6 +78,7 @@ void MinorKey::set(const int lengthOfRowArray, const unsigned int* rowKey,
 
 MinorKey::MinorKey(const int lengthOfRowArray, const unsigned int* const rowKey,
                    const int lengthOfColumnArray, const unsigned int* const columnKey) {
+//printf("\n%s", "MinorKey::MinorKey (args)");
     _numberOfRowBlocks = lengthOfRowArray;
     _numberOfColumnBlocks = lengthOfColumnArray;
 
@@ -93,6 +95,7 @@ MinorKey::MinorKey(const int lengthOfRowArray, const unsigned int* const rowKey,
 }
 
 MinorKey::~MinorKey() {
+//printf("\n%s", "MinorKey::~MinorKey");
     // free memory of _rowKey and _columnKey
     delete [] _rowKey;
     delete [] _columnKey;
@@ -869,6 +872,7 @@ IntMinorValue::IntMinorValue (const IntMinorValue& mv) {
 PolyMinorValue::PolyMinorValue (const poly result, const int multiplications, const int additions,
                                 const int accumulatedMultiplications, const int accumulatedAdditions,
                                 const int retrievals, const int potentialRetrievals) {
+//printf("\n%s(%s)", "PolyMinorValue::PolyMinorValue (args)", pString(result));
     _result = pCopy(result);
     // std::cout << std::endl << "PolyMinorValue creator, " << pString(_result);
     _multiplications = multiplications;
@@ -880,7 +884,8 @@ PolyMinorValue::PolyMinorValue (const poly result, const int multiplications, co
 }
 
 PolyMinorValue::PolyMinorValue () {
-    _result = pISet(0);
+//printf("\n%s", "PolyMinorValue::PolyMinorValue ()");
+    _result = NULL;
     // std::cout << std::endl << "PolyMinorValue creator, " << pString(_result) << " STANDARD!";
     _multiplications = -1;
     _additions = -1;
@@ -892,7 +897,8 @@ PolyMinorValue::PolyMinorValue () {
 
 PolyMinorValue::~PolyMinorValue()
 {
-  p_Delete(&_result, currRing);
+//printf("\n%s", "PolyMinorValue::~PolyMinorValue");
+    p_Delete(&_result, currRing);
 }
 
 poly PolyMinorValue::getResult() const {
@@ -901,12 +907,12 @@ poly PolyMinorValue::getResult() const {
 
 int PolyMinorValue::getWeight () const {
     // put measure for size of PolyMinorValue here, e.g. the number of monomials
-    // the cached polynomial
+    // in the cached polynomial
     return pLength(_result); // the number of monomials in the polynomial
 }
 
 string PolyMinorValue::toString () const {
-    char h[10];
+    char h[20];
 
     // Let's see whether a cache has been used to compute this MinorValue:
     bool cacheHasBeenUsed = true;
@@ -935,6 +941,7 @@ string PolyMinorValue::toString () const {
 }
 
 PolyMinorValue::PolyMinorValue (const PolyMinorValue& mv) {
+//printf("\n%s", "PolyMinorValue::PolyMinorValue copy");
     _result = pCopy(mv.getResult());
     _retrievals = mv.getRetrievals();
     _potentialRetrievals = mv.getPotentialRetrievals();
@@ -944,9 +951,12 @@ PolyMinorValue::PolyMinorValue (const PolyMinorValue& mv) {
     _accumulatedSum = mv.getAccumulatedAdditions();
 }
 
-void PolyMinorValue::operator= (const PolyMinorValue& mv) {
-    pDelete(&_result);
+void PolyMinorValue::operator= (const PolyMinorValue& mv)
+{
+//printf("\nPolyMinorValue::operator=; mv = %s", mv.toString().c_str());
+    if (_result != mv.getResult()) pDelete(&_result);
     _result = pCopy(mv.getResult());
+//printf("\nPolyMinorValue::operator=; _result = %s", pString(_result));
     _retrievals = mv.getRetrievals();
     _potentialRetrievals = mv.getPotentialRetrievals();
     _multiplications = mv.getMultiplications();
