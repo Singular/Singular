@@ -2659,6 +2659,55 @@ void nlInpMult(number &a, number b, const ring r)
   }
 }
 
+number nlFarey(number nP, number nN)
+{
+  MP_INT tmp; mpz_init(&tmp);
+  MP_INT A,B,C,D,E,N,P;
+  if (SR_HDL(nN) & SR_INT) mpz_init_set_si(&N,SR_TO_INT(nN));
+  else                     mpz_init_set(&N,&(nN->z));
+  if (SR_HDL(nP) & SR_INT) mpz_init_set_si(&P,SR_TO_INT(nP));
+  else                     mpz_init_set(&P,&(nP->z));
+  assume(!mpz_isNeg(&P));
+  if (mpz_isNeg(&N))  mpz_add(&N,&N,&P);
+  mpz_init_set_si(&A,(long)0);
+  mpz_init_set_ui(&B,(unsigned long)1);
+  mpz_init_set_si(&C,(long)0);
+  mpz_init(&D);
+  mpz_init_set(&E,&P);
+  number z=INT_TO_SR(0);
+  while(mpz_cmp_si(&N,(long)0)!=0)
+  {
+    mpz_mul(&tmp,&N,&N);
+    mpz_add(&tmp,&tmp,&tmp);
+    if (mpz_cmp(&tmp,&P)<0)
+    {
+       // return N/B
+       z=(number)omAllocBin(rnumber_bin);
+       mpz_init_set(&z->z,&N);
+       mpz_init_set(&z->n,&B);
+       z->s = 0;
+       nlNormalize(z);
+       break;
+    }
+    mpz_mod(&D,&E,&N);
+    mpz_div(&tmp,&E,&N);
+    mpz_mul(&tmp,&tmp,&B);
+    mpz_sub(&C,&A,&tmp);
+    mpz_set(&E,&N);
+    mpz_set(&N,&D);
+    mpz_set(&A,&B);
+    mpz_set(&B,&C);
+  }
+  mpz_clear(&tmp);
+  mpz_clear(&A);
+  mpz_clear(&B);
+  mpz_clear(&C);
+  mpz_clear(&D);
+  mpz_clear(&E);
+  mpz_clear(&N);
+  mpz_clear(&P);
+  return z;
+}
 #if 0
 number nlMod(number a, number b)
 {

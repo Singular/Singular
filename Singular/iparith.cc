@@ -244,6 +244,7 @@ cmdnames cmds[] =
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
   { "exportto",    0, EXPORTTO_CMD ,      CMD_2},
   { "factorize",   0, FAC_CMD ,           CMD_12},
+  { "farey",       0, FAREY_CMD ,         CMD_2},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
   { "fglmquot",    0, FGLMQUOT_CMD,       CMD_2},
@@ -1710,26 +1711,30 @@ static BOOLEAN jjCALL2MANY(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
 {
-  intvec *c=(intvec*)u->Data();
-  intvec* p=(intvec*)v->Data();
-  int rl=p->length();
-  number *x=(number *)omAlloc(rl*sizeof(number));
-  number *q=(number *)omAlloc(rl*sizeof(number));
-  int i;
-  for(i=rl-1;i>=0;i--)
+  if (rField_is_Q())
   {
-    q[i]=nlInit((*p)[i], NULL);
-    x[i]=nlInit((*c)[i], NULL);
+    intvec *c=(intvec*)u->Data();
+    intvec* p=(intvec*)v->Data();
+    int rl=p->length();
+    number *x=(number *)omAlloc(rl*sizeof(number));
+    number *q=(number *)omAlloc(rl*sizeof(number));
+    int i;
+    for(i=rl-1;i>=0;i--)
+    {
+      q[i]=nlInit((*p)[i], NULL);
+      x[i]=nlInit((*c)[i], NULL);
+    }
+    number n=nlChineseRemainder(x,q,rl);
+    for(i=rl-1;i>=0;i--)
+    {
+      nlDelete(&(q[i]),NULL);
+      nlDelete(&(x[i]),NULL);
+    }
+    omFree(x); omFree(q);
+    res->data=(char *)n;
+    return FALSE;
   }
-  number n=nlChineseRemainder(x,q,rl);
-  for(i=rl-1;i>=0;i--)
-  {
-    nlDelete(&(q[i]),NULL);
-    nlDelete(&(x[i]),NULL);
-  }
-  omFree(x); omFree(q);
-  res->data=(char *)n;
-  return FALSE;
+  else return TRUE;
 }
 #if 0
 static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
@@ -1796,69 +1801,73 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #endif
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
-  lists c=(lists)u->CopyD(); // list of ideal
-  lists pl=NULL;
-  intvec *p=NULL;
-  if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
-  else                    p=(intvec*)v->Data();
-  int rl=c->nr+1;
-  poly r=NULL,h;
-  ideal result;
-  ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
-  int i;
-  int return_type=c->m[0].Typ();
-  if ((return_type!=IDEAL_CMD)
-  && (return_type!=MODUL_CMD)
-  && (return_type!=MATRIX_CMD))
+  if (rField_is_Q())
   {
-    WerrorS("ideal/module/matrix expected");
-    omFree(x); // delete c
-    return TRUE;
-  }
-  for(i=rl-1;i>=0;i--)
-  {
-    if (c->m[i].Typ()!=return_type)
+    lists c=(lists)u->CopyD(); // list of ideal
+    lists pl=NULL;
+    intvec *p=NULL;
+    if (v->Typ()==LIST_CMD) pl=(lists)v->Data();
+    else                    p=(intvec*)v->Data();
+    int rl=c->nr+1;
+    poly r=NULL,h;
+    ideal result;
+    ideal *x=(ideal *)omAlloc(rl*sizeof(ideal));
+    int i;
+    int return_type=c->m[0].Typ();
+    if ((return_type!=IDEAL_CMD)
+    && (return_type!=MODUL_CMD)
+    && (return_type!=MATRIX_CMD))
     {
-      Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
+      WerrorS("ideal/module/matrix expected");
       omFree(x); // delete c
       return TRUE;
     }
-    x[i]=((ideal)c->m[i].Data());
-  }
-  number *q=(number *)omAlloc(rl*sizeof(number));
-  if (p!=NULL)
-  {
     for(i=rl-1;i>=0;i--)
     {
-      q[i]=nlInit((*p)[i], currRing);
-    }
-  }
-  else
-  {
-    for(i=rl-1;i>=0;i--)
-    {
-      if (pl->m[i].Typ()!=BIGINT_CMD)
+      if (c->m[i].Typ()!=return_type)
       {
-        Werror("bigint expected at pos %d",i+1);
+        Werror("%s expected at pos %d",Tok2Cmdname(return_type),i+1);
         omFree(x); // delete c
-        omFree(q); // delete pl
         return TRUE;
       }
-      q[i]=(number)(pl->m[i].Data());
+      x[i]=((ideal)c->m[i].Data());
     }
-  }
-  result=idChineseRemainder(x,q,rl);
-  if (p!=NULL)
-  {
-    for(i=rl-1;i>=0;i--)
+    number *q=(number *)omAlloc(rl*sizeof(number));
+    if (p!=NULL)
     {
-      nlDelete(&(q[i]),currRing);
+      for(i=rl-1;i>=0;i--)
+      {
+        q[i]=nlInit((*p)[i], currRing);
+      }
     }
+    else
+    {
+      for(i=rl-1;i>=0;i--)
+      {
+        if (pl->m[i].Typ()!=BIGINT_CMD)
+        {
+          Werror("bigint expected at pos %d",i+1);
+          omFree(x); // delete c
+          omFree(q); // delete pl
+          return TRUE;
+        }
+        q[i]=(number)(pl->m[i].Data());
+      }
+    }
+    result=idChineseRemainder(x,q,rl);
+    if (p!=NULL)
+    {
+      for(i=rl-1;i>=0;i--)
+      {
+        nlDelete(&(q[i]),currRing);
+      }
+    }
+    omFree(q);
+    res->data=(char *)result;
+    res->rtyp=return_type;
+    return FALSE;
   }
-  omFree(q);
-  res->data=(char *)result;
-  res->rtyp=return_type;
-  return FALSE;
+  else return TRUE;
 }
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
@@ -2151,6 +2160,29 @@ static BOOLEAN jjFACSTD2(leftv res, leftv v, leftv w)
   return FALSE;
 }
 #endif /* HAVE_FACTORY */
+static BOOLEAN jjFAREY_BI(leftv res, leftv u, leftv v)
+{
+  if (rField_is_Q())
+  {
+    number uu=(number)u->Data();
+    number vv=(number)v->Data();
+    res->data=(char *)nlFarey(uu,vv);
+    return FALSE;
+  }
+  else return TRUE;
+}
+static BOOLEAN jjFAREY_ID(leftv res, leftv u, leftv v)
+{
+  if (rField_is_Q())
+  {
+    ideal uu=(ideal)u->Data();
+    number vv=(number)v->Data();
+    res->data=(void*)idFarey(uu,vv);
+    res->rtyp=u->Typ();
+    return FALSE;
+  }
+  else return TRUE;
+}
 static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
 {
   ring r=(ring)u->Data();
@@ -3430,8 +3462,8 @@ struct sValCmd2 dArith2[]=
 #endif
 ,{jjCHINREM_BI,CHINREM_CMD,    BIGINT_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{jjCHINREM_P, CHINREM_CMD,    POLY_CMD,       LIST_CMD,   INTVEC_CMD, ALLOW_PLURAL}
-,{jjCHINREM_ID,CHINREM_CMD,    IDEAL_CMD/*set by p*/,LIST_CMD,INTVEC_CMD, ALLOW_PLURAL |NO_RING}
-,{jjCHINREM_ID,CHINREM_CMD,    IDEAL_CMD/*set by p*/,LIST_CMD,LIST_CMD, ALLOW_PLURAL |NO_RING}
+,{jjCHINREM_ID,CHINREM_CMD,    ANY_TYPE/*set by p*/,LIST_CMD,INTVEC_CMD, ALLOW_PLURAL |NO_RING}
+,{jjCHINREM_ID,CHINREM_CMD,    ANY_TYPE/*set by p*/,LIST_CMD,LIST_CMD, ALLOW_PLURAL |NO_RING}
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -3467,6 +3499,10 @@ struct sValCmd2 dArith2[]=
 ,{jjWRONG2,    FAC_CMD,        IDEAL_CMD,      POLY_CMD,   INT_CMD, NO_PLURAL |NO_RING}
 ,{jjWRONG2,    FACSTD_CMD,     LIST_CMD,       IDEAL_CMD,  IDEAL_CMD, NO_PLURAL |NO_RING}
 #endif
+,{jjFAREY_BI,  FAREY_CMD,      NUMBER_CMD,     BIGINT_CMD,  BIGINT_CMD, ALLOW_PLURAL |NO_RING}
+,{jjFAREY_ID,   FAREY_CMD,     ANY_TYPE/*set by p*/,IDEAL_CMD,BIGINT_CMD, ALLOW_PLURAL |NO_RING}
+,{jjFAREY_ID,   FAREY_CMD,     ANY_TYPE/*set by p*/,MODUL_CMD,BIGINT_CMD, ALLOW_PLURAL |NO_RING}
+,{jjFAREY_ID,   FAREY_CMD,     ANY_TYPE/*set by p*/,MATRIX_CMD,BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_FGLM

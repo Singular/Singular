@@ -107,6 +107,8 @@ void nlInpAdd_(number &a, number b, const ring r);
 LINLINE number   nlInpAdd(number la, number li, const ring r);
 void nlInpMult(number &a, number b, ring r);
 
+number nlFarey(number nP, number nN);
+
 #ifdef LDEBUG
 #define nlTest(a) nlDBTest(a,__FILE__,__LINE__)
 BOOLEAN nlDBTest(number a, char *f,int l);

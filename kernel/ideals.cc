@@ -3966,7 +3966,7 @@ poly id_GCD(poly f, poly g, const ring r)
 */
 ideal idChineseRemainder(ideal *xx, number *q, int rl)
 {
-  ideal result=idInit(IDELEMS(xx[0]),1);
+  ideal result=idInit(IDELEMS(xx[0]),xx[0]->rank);
   int i,j;
   poly r,h,hh,res_p;
   number *x=(number *)omAlloc(rl*sizeof(number));
@@ -4026,6 +4026,27 @@ ideal idChineseRemainder(ideal *xx, intvec *iv)
   return idChineseRemainder(xx,q,rl);
 }
 */
+/*
+ * lift ideal with coeffs over Z (mod N) to Q via Farey
+ */
+ideal idFarey(ideal x, number N)
+{
+  ideal result=idInit(IDELEMS(x),x->rank);
+  int i;
+  for(i=IDELEMS(result)-1;i>=0;i--)
+  {
+    poly h=pCopy(x->m[i]);
+    result->m[i]=h;
+    while(h!=NULL)
+    {
+      number c=pGetCoeff(h);
+      pSetCoeff0(h,nlFarey(c,N));
+      nDelete(&c);
+      pIter(h);
+    }
+  }
+  return result;
+}
 
 /*2
 * transpose a module
