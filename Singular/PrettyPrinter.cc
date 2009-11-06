@@ -44,6 +44,14 @@ PrettyPrinter::~PrettyPrinter ()
   delete m_indent;
 }
 
+void PrettyPrinter::flush ()
+{
+  if (strcmp(m_fileName1, "") != 0) m_file1.close();
+  if (strcmp(m_fileName2, "") != 0) m_file2.close();
+  m_file1.open(m_fileName1, std::fstream::app);
+  m_file2.open(m_fileName2, std::fstream::app);
+}
+
 PrettyPrinter& PrettyPrinter::operator< (const char* s)
 {
   if (strcmp(m_fileName1, "") != 0)

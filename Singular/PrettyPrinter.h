@@ -92,6 +92,13 @@ public:
   ~PrettyPrinter ();
   
   /*!
+   *  A method for writing all pending output to all defined output files.
+   *  This works simply by closing all output files and re-opening them in
+   *  append mode.
+   */
+  void flush ();
+
+  /*!
    *  A method for including a linefeed in the output to the primary file
    *  (if any) and to the console (if console output has been declared accordingly).
    *  @return a reference to the modified instance of PrettyPrinter
