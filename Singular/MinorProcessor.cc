@@ -183,7 +183,7 @@ int MinorProcessor::NumberOfRetrievals (const int rows, const int columns, const
     return result;
 }
 
-MinorProcessor::MinorProcessor () {          
+MinorProcessor::MinorProcessor () {
     _container = MinorKey(0, 0, 0, 0);
     _minor = MinorKey(0, 0, 0, 0);
     _containerRows = 0;
@@ -314,8 +314,8 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
             int sign = (mk.getRelativeRowIndex(b) % 2 == 0 ? 1 : -1);
             for (int c = 0; c < k; c++) {
                 int absoluteC = mk.getAbsoluteColumnIndex(c);      // This iterates over all involved columns.
-                MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey when we omit row b and column absoluteC.
                 if (_matrix[b][absoluteC] != 0) { // Only then do we have to consider this sub-determinante.
+                    MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is mk with row b and column absoluteC omitted.
                     IntMinorValue mv = getMinorPrivate(k - 1, subMk, characteristic);  // recursive call
                     m += mv.getMultiplications();
                     s += mv.getAdditions();
@@ -337,8 +337,8 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
             int sign = (mk.getRelativeColumnIndex(b) % 2 == 0 ? 1 : -1);
             for (int r = 0; r < k; r++) {
                 int absoluteR = mk.getAbsoluteRowIndex(r);        // This iterates over all involved rows.
-                MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey when we omit row absoluteR and column b.
                 if (_matrix[absoluteR][b] != 0) { // Only then do we have to consider this sub-determinante.
+                    MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is mk with row absoluteR and column b omitted.
                     IntMinorValue mv = getMinorPrivate(k - 1, subMk, characteristic);  // recursive call
                     m += mv.getMultiplications();
                     s += mv.getAdditions();
@@ -385,8 +385,8 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
             int sign = (mk.getRelativeRowIndex(b) % 2 == 0 ? 1 : -1);
             for (int c = 0; c < k; c++) {
                 int absoluteC = mk.getAbsoluteColumnIndex(c);      // This iterates over all involved columns.
-                MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey when we omit row b and column absoluteC.
                 if (_matrix[b][absoluteC] != 0) { // Only then do we have to consider this sub-determinante.
+                    MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is mk with row b and column absoluteC omitted.
                     if (cch.hasKey(subMk)) { // trying to find the result in the cache
                         mv = cch.getValue(subMk);
                         mv.incrementRetrievals(); // once more, we made use of the cached value for key mk
@@ -419,8 +419,8 @@ IntMinorValue IntMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk
             int sign = (mk.getRelativeColumnIndex(b) % 2 == 0 ? 1 : -1);
             for (int r = 0; r < k; r++) {
                 int absoluteR = mk.getAbsoluteRowIndex(r);        // This iterates over all involved rows.
-                MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey when we omit row absoluteR and column b.
                 if (_matrix[absoluteR][b] != 0) { // Only then do we have to consider this sub-determinante.
+                    MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is mk with row absoluteR and column b omitted.
                     if (cch.hasKey(subMk)) { // trying to find the result in the cache
                         mv = cch.getValue(subMk);
                         mv.incrementRetrievals(); // once more, we made use of the cached value for key mk
@@ -553,15 +553,6 @@ PolyMinorValue PolyMinorProcessor::getNextMinor(Cache<MinorKey, PolyMinorValue>&
     return getMinorPrivate(_minorSize, _minor, true, c);
 }
 
-// performs the assignment a = a + (b * c * d)
-// c and d must neither be destroyed nor modified
-// the old value of a and b will be destroyed
-// a will finally contain the new value
-void ops(poly a, poly b, poly c, poly d)
-{
-  a = p_Add_q(a, p_Mult_q(b, pp_Mult_qq(c, d, currRing), currRing), currRing);
-}
-
 PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk) {
     assert(k > 0); // k is the minor's dimension; the minor must be at least 1x1
     // The method works by recursion, and using Lapace's Theorem along the row/column with the most zeros.
@@ -573,7 +564,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
     else {
         // Here, the minor must be 2x2 or larger.
         int b = getBestLine(k, mk);                          // row or column with most zeros
-        poly result = pISet(0);                              // This will contain the value of the minor.
+        poly result = NULL;                                  // This will contain the value of the minor.
         int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
         if (b >= 0) {
@@ -584,8 +575,8 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
             poly signPoly = NULL;
             for (int c = 0; c < k; c++) {
                 int absoluteC = mk.getAbsoluteColumnIndex(c);      // This iterates over all involved columns.
-                MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey when we omit row b and column absoluteC.
                 if (!isEntryZero(b, absoluteC)) { // Only then do we have to consider this sub-determinante.
+                    MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey with row b and column absoluteC omitted.
                     PolyMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
                     m += mv.getMultiplications();
                     s += mv.getAdditions();
@@ -593,8 +584,9 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     as += mv.getAccumulatedAdditions();
                     pDelete(&signPoly);
                     signPoly = pISet(sign);
-                    ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]); // adding in "result" the product of sign,
-                                                                                      // sub-determinante, and matrix entry
+                    poly temp = pp_Mult_qq(mv.getResult(), _polyMatrix[b][absoluteC], currRing);
+                    temp = p_Mult_q(signPoly, temp, currRing);
+                    result = p_Add_q(result, temp, currRing);
                     signPoly = NULL;
                     s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
@@ -610,8 +602,8 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
             poly signPoly = NULL;
             for (int r = 0; r < k; r++) {
                 int absoluteR = mk.getAbsoluteRowIndex(r);        // This iterates over all involved rows.
-                MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey when we omit row absoluteR and column b.
                 if (!isEntryZero(absoluteR, b)) { // Only then do we have to consider this sub-determinante.
+                    MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey with row absoluteR and column b omitted.
                     PolyMinorValue mv = getMinorPrivate(k - 1, subMk);  // recursive call
                     m += mv.getMultiplications();
                     s += mv.getAdditions();
@@ -619,8 +611,9 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     as += mv.getAccumulatedAdditions();
                     pDelete(&signPoly);
                     signPoly = pISet(sign);
-                    ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]); // adding in "result" the product of sign,
-                                                                                      // sub-determinante, and matrix entry
+                    poly temp = pp_Mult_qq(mv.getResult(), _polyMatrix[absoluteR][b], currRing);
+                    temp = p_Mult_q(signPoly, temp, currRing);
+                    result = p_Add_q(result, temp, currRing);
                     signPoly = NULL;
                     s++; m++; as++, am++; // This is for the addition and multiplication in the previous line of code.
                 }
@@ -633,6 +626,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         PolyMinorValue newMV(result, m, s, am, as, -1, -1); // "-1" is to signal that any statistics about the
                                                             // number of retrievals does not make sense, as we
                                                             // do not use a cache.
+//printf("\nMINOR to put: %s", pString(result));
         pDelete(&result);
         return newMV;
     }
@@ -641,6 +635,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
 PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& mk,
                                                    const bool multipleMinors,
                                                    Cache<MinorKey, PolyMinorValue>& cch) {
+//omUpdateInfo(); printf("\nused bytes: %12ld, called: %s  (k = %d)", om_Info.UsedBytes, "getMinorPrivate", k);
     assert(k > 0); // k is the minor's dimension; the minor must be at least 1x1
     // The method works by recursion, and using Lapace's Theorem along the row/column with the most zeros.
     if (k == 1) {
@@ -649,7 +644,8 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
     }
     else {
         int b = getBestLine(k, mk);                          // row or column with most zeros
-        poly result = pISet(0);                              // This will contain the value of the minor.
+        poly result = NULL;                                  // This will contain the value of the minor.
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d)", om_Info.UsedBytes, "poly result = NULL;", k);
         int s = 0; int m = 0; int as = 0; int am = 0;        // counters for additions and multiplications,
                                                              // ..."a*" for accumulated operation counters
         if (b >= 0) {
@@ -660,17 +656,22 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
             poly signPoly = NULL;
             for (int c = 0; c < k; c++) {
                 int absoluteC = mk.getAbsoluteColumnIndex(c);      // This iterates over all involved columns.
-                MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is MinorKey when we omit row b and column absoluteC.
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 1)", om_Info.UsedBytes, "MinorKey subMk = mk.getSubMinorKey(b, absoluteC);", k);
                 if (!isEntryZero(b, absoluteC)) { // Only then do we have to consider this sub-determinante.
                     PolyMinorValue mv;              // for storing all intermediate minors
+                    MinorKey subMk = mk.getSubMinorKey(b, absoluteC);  // This is mk with row b and column absoluteC omitted.
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 1)", om_Info.UsedBytes, "PolyMinorValue mv;", k);
                     if (cch.hasKey(subMk)) { // trying to find the result in the cache
                         mv = cch.getValue(subMk);
                         mv.incrementRetrievals(); // once more, we made use of the cached value for key mk
                         cch.put(subMk, mv); // We need to do this with "put", as the (altered) number of retrievals may have
                                             // an impact on the internal ordering among cache entries.
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 1)", om_Info.UsedBytes, "cch.put(subMk, mv);", k);
                     }
                     else {
+//omUpdateInfo(); printf("\nused bytes: %12ld, before: %s  (k = %d, case 1)", om_Info.UsedBytes, "mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch);", k);
                         mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch); // recursive call
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 1)", om_Info.UsedBytes, "mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch);", k);
                         // As this minor was not in the cache, we count the additions and
                         // multiplications that we needed to do in the recursive call:
                         m += mv.getMultiplications();
@@ -680,9 +681,15 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     am += mv.getAccumulatedMultiplications();
                     as += mv.getAccumulatedAdditions();
                     pDelete(&signPoly);
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 1)", om_Info.UsedBytes, "pDelete(&signPoly);", k);
                     signPoly = pISet(sign);
-                    ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]); // adding in "result" the product of sign,
-                                                                                      // sub-determinante, and matrix entry
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 1)", om_Info.UsedBytes, "signPoly = pISet(sign);", k);
+//printf("\nmv.getResult() = %s", pString(mv.getResult()));
+                    poly temp = pp_Mult_qq(mv.getResult(), _polyMatrix[b][absoluteC], currRing);
+                    temp = p_Mult_q(signPoly, temp, currRing);
+                    result = p_Add_q(result, temp, currRing);
+//printf("\nresult = %s", pString(result));
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 1)", om_Info.UsedBytes, "ops(result, signPoly, mv.getResult(), _polyMatrix[b][absoluteC]);", k);
                     signPoly = NULL;
                     s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
@@ -696,16 +703,20 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
             // the initial sign depends on the relative index of b in minorColumnKey:
             int sign = (mk.getRelativeColumnIndex(b) % 2 == 0 ? 1 : -1);
             poly signPoly = NULL;
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 2)", om_Info.UsedBytes, "poly signPoly = NULL;", k);
             for (int r = 0; r < k; r++) {
                 int absoluteR = mk.getAbsoluteRowIndex(r);        // This iterates over all involved rows.
-                MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is MinorKey when we omit row absoluteR and column b.
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 2)", om_Info.UsedBytes, "MinorKey subMk = mk.getSubMinorKey(absoluteR, b);", k);
                 if (!isEntryZero(absoluteR, b)) { // Only then do we have to consider this sub-determinante.
                     PolyMinorValue mv;              // for storing all intermediate minors
+                    MinorKey subMk = mk.getSubMinorKey(absoluteR, b); // This is mk with row absoluteR and column b omitted.
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 2)", om_Info.UsedBytes, "PolyMinorValue mv;", k);
                     if (cch.hasKey(subMk)) { // trying to find the result in the cache
                         mv = cch.getValue(subMk);
                         mv.incrementRetrievals(); // once more, we made use of the cached value for key mk
                         cch.put(subMk, mv); // We need to do this with "put", as the (altered) number of retrievals may have
                                             // an impact on the internal ordering among cache entries.
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 2)", om_Info.UsedBytes, "cch.put(subMk, mv);", k);
                     }
                     else {
                         mv = getMinorPrivate(k - 1, subMk, multipleMinors, cch); // recursive call
@@ -718,9 +729,13 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
                     am += mv.getAccumulatedMultiplications();
                     as += mv.getAccumulatedAdditions();
                     pDelete(&signPoly);
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 2)", om_Info.UsedBytes, "pDelete(&signPoly);", k);
                     signPoly = pISet(sign);
-                    ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]); // adding in "result" the product of sign,
-                                                                                      // sub-determinante, and matrix entry
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 2)", om_Info.UsedBytes, "signPoly = pISet(sign);", k);
+                    poly temp = pp_Mult_qq(mv.getResult(), _polyMatrix[absoluteR][b], currRing);
+                    temp = p_Mult_q(signPoly, temp, currRing);
+                    result = p_Add_q(result, temp, currRing);
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d, case 2)", om_Info.UsedBytes, "ops(result, signPoly, mv.getResult(), _polyMatrix[absoluteR][b]);", k);
                     signPoly = NULL;
                     s++; m++; as++; am++; // This is for the addition and multiplication in the previous line of code.
                 }
@@ -733,8 +748,12 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivate(const int k, const MinorKey& 
         if (s < 0) s = 0; // may happen when all subminors are zero and no addition needs to be performed
         if (as < 0) as = 0; // may happen when all subminors are zero and no addition needs to be performed
         PolyMinorValue newMV(result, m, s, am, as, 1, potentialRetrievals);
-        pDelete(&result);
+//printf("\nMINOR to put: %s", pString(result));
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d)", om_Info.UsedBytes, "PolyMinorValue newMV(result, m, s, am, as, 1, potentialRetrievals);", k);
+        pDelete(&result); result = NULL;
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d)", om_Info.UsedBytes, "pDelete(&result);", k);
         cch.put(mk, newMV); // Here's the actual put inside the cache.
+//omUpdateInfo(); printf("\nused bytes: %12ld, after: %s  (k = %d)", om_Info.UsedBytes, "cch.put(mk, newMV);", k);
         return newMV;
     }
 }
