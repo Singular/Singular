@@ -2196,7 +2196,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                  (h->next->next->next->next->next->Typ() == INT_CMD) &&
                  (h->next->next->next->next->next->next->Typ() == INT_CMD) &&
                  (h->next->next->next->next->next->next->next->Typ() == INT_CMD) &&
-                 (h->next->next->next->next->next->next->next->next == NULL))
+                 (h->next->next->next->next->next->next->next->next->Typ() == INT_CMD) &&
+                 (h->next->next->next->next->next->next->next->next->next == NULL))
         {
           const matrix m           = (const matrix)h->Data();
           const int k              = (const int)(long)h->next->Data();
