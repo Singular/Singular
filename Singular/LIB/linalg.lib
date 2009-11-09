@@ -122,7 +122,7 @@ EXAMPLE:  example inverse; shows an example
 "
 {
 //--------------------------- initialization and check ------------------------
-   int ii,u,i,opt;
+   int ii,u,notInvertible,opt;
    matrix invA;
    int db = printlevel-voice+3;      //used for comments
    def R=basering;
@@ -197,8 +197,7 @@ EXAMPLE:  example inverse; shows an example
       {
          if ( D1[ii] != gen(ii) )
          {
-            dbprint(db,"// ** matrix is not invertible");
-            i = 1;
+            notInvertible = 1;
             break;
          }
       }
@@ -213,7 +212,25 @@ EXAMPLE:  example inverse; shows an example
       { module D1 = fetch(@R,D1);}
       kill @R;
    }
-   if( i==1 ) { return(invA); }     //matrix not invetible
+   if( notInvertible == 1 )
+   {
+     // The matrix A seems to be non-invertible.
+     // Note that there are examples, where this is not true but only due to
+     // inexact computations in the field of reals or complex numbers:
+     // ring r = complex, x, dp;
+     // The following matrix has non-zero determinante but seems non-invertible:
+     // matrix A[3][3] = 1,i,i,0,1,2,1,0,1+i;
+     // For this example, inverse_B yields the correct answer.
+     // So, let's use this as a workaround whenever we have this situation:
+     list myList = inverse_B(A);
+     matrix Try = inverse_B(A)[1];
+     if (myList[2] == poly(1)) { return (Try); }
+     else
+     {
+       dbprint(db,"// ** matrix is not invertible");
+       return(invA);
+     }
+   }
    else { return(matrix(D2)); }     //matrix invertible with inverse D2
 
 }
