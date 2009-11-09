@@ -36,7 +36,8 @@ static poly maGetMaxExpP(poly* max_map_monomials,
   int n = si_min(pi_r->N, n_max_map_monomials);
   int i, j;
   unsigned long e_i, e_j;
-  poly m_i, map_j = p_Init(map_r);
+  poly m_i=NULL;
+  poly map_j = p_Init(map_r);
 
   for (i=1; i <= n; i++)
   {
@@ -80,6 +81,12 @@ static unsigned long maGetMaxExp(ideal pi_id, ring pi_r, ideal map_id, ring map_
     p_LmFree(max_pi_i, pi_r);
     p_LmFree(max_map_i, map_r);
   }
+  for (i=0; i<IDELEMS(map_id); i++)
+  {
+    p_Delete(&max_map_monomials[i], map_r);
+  }
+  omFreeSize(max_map_monomials,IDELEMS(map_id)*sizeof(poly));
+
   return max;
 }
 
@@ -163,6 +170,7 @@ void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r)
         p_Delete(&(mp->dest), dest_r);
       }
     }
+    //if (mp->next!=NULL) maMonomial_Destroy(mp->next,dest_r);
   }
   omFreeBin(mp, mapolyBin);
 }
@@ -268,7 +276,6 @@ void maMap_CreatePolyIdeal(ideal map_id, ring map_r, ring src_r, ring dest_r,
   }
 }
 
-
 void maMap_CreateRings(ideal map_id, ring map_r,
                        ideal image_id, ring image_r,
                        ring &src_r, ring &dest_r, BOOLEAN &simple)
@@ -321,6 +328,7 @@ ideal maIdeal_2_Ideal(maideal m_id, ring dest_r)
     if (m_id->buckets[i]!=NULL)
       sBucketDestroyAdd(m_id->buckets[i], &(res->m[i]), &l);
   }
+  omFreeSize(m_id->buckets,m_id->n*sizeof(sBucket_pt));
   omFree(m_id);
   return res;
 }
@@ -402,6 +410,7 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
     res_image_id = res_dest_id;
 
   if (TEST_OPT_PROT) Print(".");
+
   // clean-up the rings
   maMap_KillRings(map_r, image_r, src_r, dest_r);
 
@@ -692,7 +701,8 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
  * adds and integrates subexpressions                               *
  *******************************************************************/
 
-void maPoly_Optimize(mapoly mpoly, ring src_r){
+void maPoly_Optimize(mapoly mpoly, ring src_r)
+{
   assume(mpoly!=NULL && mpoly->src!=NULL);
   mapoly iter = mpoly;
   mapoly choice;
