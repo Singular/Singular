@@ -170,7 +170,6 @@ void maMonomial_Destroy(mapoly mp, ring src_r, ring dest_r)
         p_Delete(&(mp->dest), dest_r);
       }
     }
-    //if (mp->next!=NULL) maMonomial_Destroy(mp->next,dest_r);
   }
   omFreeBin(mp, mapolyBin);
 }
@@ -363,7 +362,9 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
 
   // construct dest_id
   if (dest_r != image_r)
+  {
     dest_id = idrShallowCopyR(image_id, image_r, dest_r);
+  }
   else
     dest_id = image_id;
 
@@ -405,6 +406,7 @@ ideal fast_map(ideal map_id, ring map_r, ideal image_id, ring image_r)
     //else
       res_image_id = idrShallowCopyR(res_dest_id, dest_r, image_r);
     id_ShallowDelete(&res_dest_id, dest_r);
+    id_ShallowDelete(&dest_id,dest_r);
   }
   else
     res_image_id = res_dest_id;
@@ -587,7 +589,8 @@ static poly maEggT(const poly m1, const poly m2, poly &q1, poly &q2,const ring r
   q2 = p_Init(r);
   ggt=p_Init(r);
 
-  for (i=1;i<=r->N;i++) {
+  for (i=1;i<=r->N;i++)
+  {
     unsigned long e1 = p_GetExp(m1, i, r);
     unsigned long e2 = p_GetExp(m2, i, r);
     if (e1 > 0 && e2 > 0)
@@ -654,7 +657,6 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
           p_LmFree(ggT, r);
           p_LmFree(fp_p, r);
           p_LmFree(fq_p, r);
-
         }
         ggt_deg = pDeg(q, r);
         ggT = q;
