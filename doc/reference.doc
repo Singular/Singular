@@ -3513,6 +3513,8 @@ See
 @item @strong{Syntax:}
 @code{liftstd (} ideal_expression@code{,} matrix_name @code{)}
 @*@code{liftstd (} module_expression@code{,} matrix_name @code{)}
+@*@code{liftstd (} ideal_expression@code{,} matrix_name@code{,} module_name @code{)}
+@*@code{liftstd (} module_expression@code{,} matrix_name@code{,} module_name @code{)}
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
@@ -3522,6 +3524,7 @@ matrix from the given ideal, resp.@: module, to the standard basis.
 basis returned by @code{liftstd}, and @code{T} the transformation matrix
 then @code{matrix(sm)=matrix(m)*T} and @code{sm=ideal(matrix(m)*T)},
 resp.@: @code{sm=module(matrix(m)*T)}.
+@*In an optional third argument the syzygy module will be returned.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3533,6 +3536,9 @@ resp.@: @code{sm=module(matrix(m)*T)}.
   sm;
   print(T);
   matrix(sm)-matrix(i)*T;
+  module s;
+  sm=liftstd(i,T,s);
+  print(s);
 @c example
 @end smallexample
 @end table

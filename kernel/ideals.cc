@@ -1593,34 +1593,41 @@ ideal idXXX (ideal  h1, int k)
 *computes a standard basis for h1 and stores the transformation matrix
 * in ma
 */
-ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
+ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
 {
   int   i, j, k, t, inputIsIdeal=idRankFreeModule(h1);
   poly  p=NULL, q, qq;
   intvec *w=NULL;
 
   idDelete((ideal*)ma);
-  *ma=mpNew(1,0);
+  BOOLEAN lift3=FALSE;
+  if (syz!=NULL) { lift3=TRUE; idDelete(syz); }
   if (idIs0(h1))
+  {
+    *ma=mpNew(1,0);
+    if (lift3)
+    {
+      *syz=idFreeModule(IDELEMS(h1));
+      int curr_syz_limit=rGetCurrSyzLimit();
+      if (curr_syz_limit>0)
+      for (int ii=0;ii<IDELEMS(h1);ii++)
+      {
+        if (h1->m[ii]!=NULL)
+          pShift(&h1->m[ii],curr_syz_limit);
+      }
+    }
     return idInit(1,h1->rank);
+  }
 
   BITSET save_verbose=verbose;
 
   k=si_max(1,(int)idRankFreeModule(h1));
 
-  if (k==1) verbose |=Sy_bit(V_IDLIFT);
+  if ((k==1) && (!lift3)) verbose |=Sy_bit(V_IDLIFT);
 
   ring orig_ring = currRing;
   ring syz_ring = rCurrRingAssure_SyzComp();
   rSetSyzComp(k);
-
-
-#if MYTEST
-#ifdef RDEBUG
-  rWrite(syz_ring);
-  rDebugPrint(syz_ring);
-#endif
-#endif
 
   ideal s_h1=h1;
 
@@ -1629,79 +1636,55 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   else
     s_h1 = h1;
 
-#if MYTEST
-#ifdef RDEBUG
-  Print("idLiftStd Input: ");
-  idPrint(s_h1);
-#endif
-#endif
-
-
-  ideal s_h3=idPrepare(s_h1,h,k,&w);
-
-#if MYTEST
-#ifdef RDEBUG
-  Print("idLiftStd Prepare: ");
-  idPrint(s_h3);
-#endif
-#endif
+  ideal s_h3=idPrepare(s_h1,hi,k,&w); // main (syz) GB computation
 
   ideal s_h2 = idInit(IDELEMS(s_h3), s_h3->rank);
 
-#if MYTEST
-#ifdef RDEBUG
-  Print("idLiftStd Temp: ");
-  idPrint(s_h2);
-#endif
-#endif
+  if (lift3) (*syz)=idInit(IDELEMS(s_h3),IDELEMS(h1));
 
   if (w!=NULL) delete w;
   i = 0;
 
   for (j=0; j<IDELEMS(s_h3); j++)
   {
-    if ((s_h3->m[j] != NULL) && (p_MinComp(s_h3->m[j],syz_ring) <= k))
+    if (s_h3->m[j] != NULL)
     {
-      i++;
-      q = s_h3->m[j];
-      while (pNext(q) != NULL)
+      if (p_MinComp(s_h3->m[j],syz_ring) <= k)
       {
-        if (pGetComp(pNext(q)) > k)
+        i++;
+        q = s_h3->m[j];
+        while (pNext(q) != NULL)
         {
-          s_h2->m[j] = pNext(q);
-          pNext(q) = NULL;
+          if (pGetComp(pNext(q)) > k)
+          {
+            s_h2->m[j] = pNext(q);
+            pNext(q) = NULL;
+          }
+          else
+          {
+            pIter(q);
+          }
         }
-        else
-        {
-          pIter(q);
-        }
+        if (!inputIsIdeal) pShift(&(s_h3->m[j]), -1);
       }
-      if (!inputIsIdeal) pShift(&(s_h3->m[j]), -1);
-    }
-    else
-    {
-      pDelete(&(s_h3->m[j]));
+      else
+      {
+        if (lift3)
+        {
+          pShift(&s_h3->m[j], -k);
+          (*syz)->m[j]=s_h3->m[j];
+          s_h3->m[j]=NULL;
+        } 
+        else
+          pDelete(&(s_h3->m[j]));
+      }
     }
   }
 
   idSkipZeroes(s_h3);
-
-#if MYTEST
-#ifdef RDEBUG
-  Print("idLiftStd Input'': ");
-  idPrint(s_h3);
-#endif
-#endif
+  if (lift3) idSkipZeroes(*syz);
 
   j = IDELEMS(s_h1);
-
-
-#if MYTEST
-#ifdef RDEBUG
-  Print("idLiftStd Temp Result: ");
-  idPrint(s_h2);
-#endif
-#endif
 
 
   if (syz_ring!=orig_ring)
@@ -1710,7 +1693,6 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
     rChangeCurrRing(orig_ring);
   }
 
-  idDelete((ideal*)ma);
   *ma = mpNew(j,i);
 
   i = 1;
@@ -1740,17 +1722,13 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog h)
   {
     s_h3->m[i] = prMoveR_NoSort(s_h3->m[i], syz_ring);
   }
-
-#if MYTEST
-#ifdef RDEBUG
-  Print("idLiftStd Output STD Ideal: ");
-  idPrint(s_h3);
-
-  Print("idLiftStd Output Matrix: ");
-  iiWriteMatrix(*ma, "ma", 2, 4);
-#endif
-#endif
-
+  if (lift3)
+  {
+    for (i=0; i<IDELEMS(*syz); i++)
+    {
+      (*syz)->m[i] = prMoveR_NoSort((*syz)->m[i], syz_ring);
+    }
+  }
 
   if (syz_ring!=orig_ring) rKill(syz_ring);
   verbose = save_verbose;

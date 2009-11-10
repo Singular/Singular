@@ -294,7 +294,7 @@ cmdnames cmds[] =
   { "leadmonom",   0, LEADMONOM_CMD ,     CMD_1},
   { "LIB",         0, LIB_CMD ,           SYSVAR},
   { "lift",        0, LIFT_CMD ,          CMD_23},
-  { "liftstd",     0, LIFTSTD_CMD ,       CMD_2},
+  { "liftstd",     0, LIFTSTD_CMD ,       CMD_23},
   { "link",        0, LINK_CMD ,          ROOT_DECL},
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},
@@ -2510,7 +2510,7 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
   res->data = (char *)idLiftStd((ideal)u->Data(),
                                 &(h->data.umatrix),testHomog);
-  setFlag(res,FLAG_STD);
+  setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
 static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
@@ -6173,6 +6173,19 @@ static BOOLEAN jjLIFT3(leftv res, leftv u, leftv v, leftv w)
   test=save_test;
   return FALSE;
 }
+static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
+{
+  if ((v->rtyp!=IDHDL)||(v->e!=NULL)) return TRUE;
+  if ((w->rtyp!=IDHDL)||(w->e!=NULL)) return TRUE;
+  idhdl hv=(idhdl)v->data;
+  idhdl hw=(idhdl)w->data;
+  // CopyD for IDEAL_CMD and MODUL_CMD are identical:
+  res->data = (char *)idLiftStd((ideal)u->Data(),
+                                &(hv->data.umatrix),testHomog,
+				&(hw->data.uideal));
+  setFlag(res,FLAG_STD); v->flag=0; w->flag=0;
+  return FALSE;
+}
 static BOOLEAN jjREDUCE3_CP(leftv res, leftv u, leftv v, leftv w)
 {
   assumeStdFlag(v);
@@ -6351,6 +6364,8 @@ struct sValCmd3 dArith3[]=
 ,{jjJET_ID_M,       JET_CMD,    MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjWRONG3,         JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{mpKoszul,         KOSZUL_CMD, MATRIX_CMD, INT_CMD,    INT_CMD,    IDEAL_CMD, NO_PLURAL |NO_RING}
+,{jjLIFTSTD3,       LIFTSTD_CMD,IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{jjLIFTSTD3,       LIFTSTD_CMD,MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjCALL3MANY,      LIST_CMD,   LIST_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjMATRIX_Id,      MATRIX_CMD, MATRIX_CMD, IDEAL_CMD,  INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjMATRIX_Mo,      MATRIX_CMD, MATRIX_CMD, MODUL_CMD,  INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
