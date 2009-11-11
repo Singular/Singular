@@ -70,6 +70,7 @@ inline void sBucketDestroyAdd(sBucket_pt bucket, poly *p, int *length)
   sBucketDestroy(&bucket);
 }
 
+void sBucketDeleteAndDestroy(sBucket_pt *bucket_pt);
 
 //////////////////////////////////////////////////////////////////////////
 ///
