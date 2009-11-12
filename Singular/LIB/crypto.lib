@@ -23,7 +23,7 @@ PROCEDURES:
  chineseRem(T,L)            compute x such that x = T[i] mod L[i]
  Jacobi(a,n)                the generalized Legendre symbol of a and n
  primList(n)                the list of all primes <=n
- primL(q)                   all primes p_1,...,p_r such that q<p_1*...*p_r
+ primL(q)                   first primes p_1,...,p_r such that q<p_1*...*p_r
  intPart(x)                 the integral part of a rational number
  intRoot(m)                 the integral part of the square root of m
  squareRoot(a,p)            the square root of a in Z/p, p prime
@@ -305,7 +305,8 @@ example
 
 proc primL(number q)
 "USAGE:  primL(q);
-RETURN: list of all primes p_1,...,p_r such that q<p_1*...*p_r
+RETURN: list of the first primes p_1,...,p_r such that q>p_1*...*p_(r-1)
+        and q<p_1*...*p_r
 EXAMPLE:example primL; shows an example
 "
 {
@@ -317,7 +318,7 @@ EXAMPLE:example primL; shows an example
    i=3;
    while(s<=q)
    {
-     i++;
+     i=i+2;
      j=1;
      while(j<=size(re))
      {
