@@ -19,7 +19,7 @@
 #include "cf_primes.h"
 #include "fac_distrib.h"
 
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 void out_cff(CFFList &L);
 
 TIMING_DEFINE_PRINT(fac_content);
