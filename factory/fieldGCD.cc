@@ -20,7 +20,7 @@
 #include "cf_map.h"
 #include "cf_generator.h"
 
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 
 CanonicalForm fieldGCD( const CanonicalForm & F, const CanonicalForm & G );

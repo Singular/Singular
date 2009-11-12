@@ -30,7 +30,7 @@
 #include "cf_iter.h"
 #include "ftmpl_functions.h"
 
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 //{{{ CanonicalForm psr ( const CanonicalForm & f, const CanonicalForm & g, const Variable & x )
 //{{{ docu

@@ -85,7 +85,7 @@ int find_mvar(const CanonicalForm & f)
 
 #if 1
 //#ifndef NOSTREAMIO
-void out_cf(char *s1,const CanonicalForm &f,char *s2)
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
 {
   printf("%s",s1);
   if (f.isZero()) printf("+0");

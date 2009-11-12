@@ -52,7 +52,7 @@
 #define Free(A,L) free(A)
 #endif
  
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 	
 
 int fac_NTL_char=-1;            // the current characterstic for NTL calls
@@ -72,38 +72,6 @@ NTL_CLIENT
 // INPUT:  A canonicalform f                                                  //
 // OUTPUT: The converted NTL-polynomial over F_p of type ZZpX                 //
 ////////////////////////////////////////////////////////////////////////////////
-
-#if 0
-void out_cf(char *s1,const CanonicalForm &f,char *s2)
-{
-  printf("%s",s1);
-  if (f.isZero()) printf("+0");
-  else if (! f.inCoeffDomain() )
-  {
-    int l = f.level();
-    for ( CFIterator i = f; i.hasTerms(); i++ )
-    {
-      int e=i.exp();
-      printf("+(");out_cf("+(",i.coeff(),")*v(");printf("%d)^%d",l,e);
-    }
-  }
-  else
-  {
-    if ( f.isImm() )
-    {
-      printf("+%d(",f.intval());
-    }
-    else printf("+...(");
-    if (f.inZ()) printf("Z)");
-    else if (f.inQ()) printf("Q)");
-    else if (f.inFF()) printf("FF)");
-    else if (f.inPP()) printf("PP)");
-    else if (f.inGF()) printf("PP)");
-    else if (f.inExtension()) printf("E(%d))",f.level());
-  }
-  printf("%s",s2);
-}
-#endif
 
 ZZ_pX convertFacCF2NTLZZpX(CanonicalForm f)
 {

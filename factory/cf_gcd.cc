@@ -30,7 +30,7 @@ static CanonicalForm cf_content ( const CanonicalForm &, const CanonicalForm & )
 static bool gcd_avoid_mtaildegree ( CanonicalForm &, CanonicalForm &, CanonicalForm & );
 static void cf_prepgcd( const CanonicalForm &, const CanonicalForm &, int &, int &, int & );
 
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 CanonicalForm chinrem_gcd(const CanonicalForm & FF,const CanonicalForm & GG);
 CanonicalForm newGCD(CanonicalForm A, CanonicalForm B);
