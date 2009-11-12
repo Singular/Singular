@@ -2,8 +2,8 @@
 gfan.h Interface to gfan.cc
 
 $Author: monerjan $
-$Date: 2009-10-23 14:56:55 $
-$Header: /exports/cvsroot-2/cvsroot/kernel/gfan.h,v 1.12 2009-10-23 14:56:55 monerjan Exp $
+$Date: 2009/11/03 06:57:32 $
+$Header: /usr/local/Singular/cvsroot/kernel/gfan.h,v 1.13 2009/11/03 06:57:32 monerjan Exp $
 $Id$
 */
 #ifdef HAVE_GFAN
@@ -152,6 +152,7 @@ class gcone
 		void showFacets(short codim=1);
 		void showSLA(facet &f);
 		void idDebugPrint(ideal const &I);
+		void invPrint(ideal const &I);
 		bool isMonomial(ideal const &I);
 		void setNumFacets();
 		int getNumFacets();
@@ -159,6 +160,7 @@ class gcone
 		void getConeNormals(ideal const &I, bool compIntPoint=FALSE);
 		void getCodim2Normals(gcone const &gc);
 		void flip(ideal gb, facet *f);
+		void computeInv(ideal &gb, ideal &inv, intvec &f);
 		poly restOfDiv(poly const &f, ideal const &I);
 		ideal ffG(ideal const &H, ideal const &G);
 		void getGB(ideal const &inputIdeal);
@@ -179,6 +181,7 @@ class gcone
 		dd_MatrixPtr facets2Matrix(gcone const &gc);
 		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE);
 		void readConeFromFile(int gcNum, gcone *gc);
+// 		static void gcone::idPrint(ideal &I);
 		friend class facet;	
 };
 
