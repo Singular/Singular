@@ -22,7 +22,7 @@
 #include <factor.h>
 #include "ring.h"
 
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 poly singclap_gcd_r ( poly f, poly g, const ring r )
 {
@@ -350,6 +350,17 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
     WerrorS( feNotImplemented );
     return TRUE;
   }
+#ifndef NDEBUG
+  // checking the result of extgcd:
+  poly dummy;
+  dummy=pSub(pAdd(pMult(pCopy(f),pCopy(pa)),pMult(pCopy(g),pCopy(pb))),pCopy(res));
+  if (dummy!=NULL)
+  {
+    PrintS("extgcd( ");pWrite(f);pWrite0(g);PrintS(" )\n");
+    PrintS("gcd, co-factors:");pWrite(res); pWrite(pa);pWrite(pb);
+    pDelete(&dummy);
+  }
+#endif  
   return FALSE;
 }
 
@@ -950,7 +961,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         {
           if(!count_Factors(res,w,j,ff,convFactoryPSingTrP( J.getItem().factor() )))
           {
-	    if (w!=NULL)
+            if (w!=NULL)
               (*w)[j]=1;
             res->m[j]=pOne();
           }
@@ -959,7 +970,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
         {
           if (!count_Factors(res,w,j,ff,convFactoryAPSingAP( J.getItem().factor(),currRing )))
           {
-	    if (w!=NULL)
+            if (w!=NULL)
               (*w)[j]=1;
             res->m[j]=pOne();
           }

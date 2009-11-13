@@ -139,7 +139,7 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
 {
 #ifdef HAVE_NTL
   if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 )
-  && isPurePoly(f) && isPurePoly(g))
+  &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
     if (fac_NTL_char!=getCharacteristic())
     {
@@ -178,7 +178,44 @@ extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, Ca
     return convertNTLzzpX2CF(R,f.mvar());
     #endif
   }
+  if (isOn(SW_USE_NTL_GCD_0) && ( getCharacteristic() ==0)
+  && (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
+  {
+    CanonicalForm fc=bCommonDen(f);
+    CanonicalForm gc=bCommonDen(g);
+    ZZX F1=convertFacCF2NTLZZX(f*fc);
+    ZZX G1=convertFacCF2NTLZZX(g*gc);
+    ZZX R=GCD(F1,G1);
+    CanonicalForm r=convertNTLZZX2CF(R,f.mvar());
+    ZZ RR;
+    ZZX A,B;
+    if (r.inCoeffDomain())
+    {
+      XGCD(RR,A,B,F1,G1,1);
+      CanonicalForm rr=convertZZ2CF(RR);
+      ASSERT (!rr.isZero(), "NTL:XGCD failed");
+      a=convertNTLZZX2CF(A,f.mvar())*fc/rr;
+      b=convertNTLZZX2CF(B,f.mvar())*gc/rr;
+      return CanonicalForm(1);
+    }
+    else
+    {
+      fc=bCommonDen(f);
+      gc=bCommonDen(g);
+      F1=convertFacCF2NTLZZX(f*fc/r);
+      G1=convertFacCF2NTLZZX(g*gc/r);
+      XGCD(RR,A,B,F1,G1,1);
+      a=convertNTLZZX2CF(A,f.mvar())*fc;
+      b=convertNTLZZX2CF(B,f.mvar())*gc;
+      CanonicalForm rr=convertZZ2CF(RR);
+      ASSERT (!rr.isZero(), "NTL:XGCD failed");
+      r*=rr;
+      if ( r.sign() < 0 ) { r= -r; a= -a; b= -b; }
+      return r;
+    }
+  }
 #endif
+  // may contain bug in the co-factors, see track 107
   CanonicalForm contf = content( f );
   CanonicalForm contg = content( g );
 

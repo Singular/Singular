@@ -1,9 +1,10 @@
 Changes w.r.t 3-1-0-7:
 - adaption to svn
 - new command: farey
-- test for basering over Q for chinrem
+- test for basering over Q for chinrem/farey
 - (some) memory leaks fixed in fast_map (track 183)
-- linalg.lib:inverse for real/complex unexcat coeffs fixed
+- extgcd via NTL in char 0 (track 107)
+- linalg.lib:inverse for real/complex inexact coeffs fixed
 
 Changes w.r.t 3-1-0-6:
 - 3-1-0-7: Sat Oct 31 12:39:50 CET 2009
