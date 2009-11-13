@@ -510,12 +510,6 @@ void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_
     {
       if ((p->f1!=NULL)&&(p->f2!=NULL))
       {
-#if 0
-        printf("found prod:");
-        p_wrp(p->src,src_r);printf("=");
-        p_wrp(p->f1->src,src_r);printf(" * ");
-        p_wrp(p->f2->src,src_r);printf("\n");
-#endif
         poly f1=p->f1->dest;
         poly f2=p->f2->dest;
         if (p->f1->ref>0) f1=p_Copy(f1,dest_r);
@@ -536,13 +530,9 @@ void maPoly_Eval(mapoly root, ring src_r, ideal dest_id, ring dest_r, int total_
       } /* factors : 2 */
       else
       {
-        //printf("compute "); p_wrp(p->src,src_r);printf("\n");
         assume((p->f1==NULL) && (p->f2==NULL));
-        //if(p->f1!=NULL) { printf(" but f1="); p_wrp(p->f1->src,src_r);printf("\n"); }
-        //if(p->f2!=NULL) { printf(" but f2="); p_wrp(p->f2->src,src_r);printf("\n"); }
         // no factorization provided, use the classical method:
         p->dest=maPoly_EvalMon(p->src,src_r,dest_id->m,dest_r);
-        //p_wrp(p->dest, dest_r); printf(" is p->dest\n");
       }
     } /* p->dest==NULL */
     // substitute the monomial: go through macoeff
@@ -584,10 +574,9 @@ static poly maEggT(const poly m1, const poly m2, poly &q1, poly &q2,const ring r
 
   int i;
   int dg = 0;
-  poly ggt = NULL;
+  poly ggt = p_Init(r);
   q1 = p_Init(r);
   q2 = p_Init(r);
-  ggt=p_Init(r);
 
   for (i=1;i<=r->N;i++)
   {
@@ -648,8 +637,9 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
     q = maEggT(p, iter->src, q1, q2,r);
     if (q != NULL)
     {
+      int tmp_deg;
       assume((q1!=NULL)&&(q2!=NULL));
-      if (pDeg(q,r) > ggt_deg)
+      if ((tmp_deg=pDeg(q,r)) > ggt_deg)
       {
         choice=iter;
         if (ggT != NULL)
@@ -658,7 +648,7 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
           p_LmFree(fp_p, r);
           p_LmFree(fq_p, r);
         }
-        ggt_deg = pDeg(q, r);
+        ggt_deg = tmp_deg ; /*pDeg(q, r);*/
         ggT = q;
         fp_p = q1;
         fq_p = q2;
@@ -728,6 +718,7 @@ void maPoly_Optimize(mapoly mpoly, ring src_r)
           choice->f2=ggT;
         }
       }
+      else assume(ggT==NULL);
     }
     iter=iter->next;
   }
