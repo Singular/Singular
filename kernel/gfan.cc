@@ -19,6 +19,8 @@ $Id$
 #include "fast_maps.h"	//Mapping of ideals
 #include "maps.h"
 #include "ring.h"
+#include "structs.h"
+#include "../Singular/lists.h"
 #include "prCopy.h"
 #include <iostream>
 #include <bitset>
@@ -2899,9 +2901,18 @@ int gcone::counter=0;
 int gfanHeuristic;
 ideal gfan(ideal inputIdeal, int h)
 {
-	time_t tic,tac;
-	time(&tic);
-	
+	lists lResList=(lists)omAllocBin(slists_bin);
+	lResList->Init(5);
+	lResList->m[0].rtyp=INT_CMD;
+	lResList->m[0].data=(int*)255;
+	lResList->m[1].rtyp=MATRIX_CMD;
+	lResList->m[1].data=(void*)NULL;
+	lResList->m[2].rtyp=IDEAL_CMD;
+	lResList->m[2].data=(ideal*)NULL;
+	lResList->m[3].rtyp=RING_CMD;
+	lResList->m[3].data=(ring*)NULL;
+	lResList->m[4].rtyp=LIST_CMD;
+	lResList->m[4].data=(lists)NULL;
 	int numvar = pVariables; 
 	gfanHeuristic = h;
 	
@@ -3002,8 +3013,6 @@ ideal gfan(ideal inputIdeal, int h)
 	//rChangeCurrRing(rootRing);
 	//res=gcAct->gcBasis;
 	//res=gcRoot->gcBasis;	
-	time(&tac);
-	cout << "Time: " << difftime(tac,tic) << "sec" << endl;
 	return res;
 	//return GBlist;
 }
