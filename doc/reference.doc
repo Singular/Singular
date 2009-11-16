@@ -85,6 +85,7 @@ and @code{LIB} no brackets are allowed.
 * extgcd::
 * facstd::
 * factorize::
+* farey::
 * fetch::
 * fglm::
 * fglmquot::
@@ -1759,7 +1760,7 @@ See
 @ref{ideal}.
 @c ref
 @c ---------------------------------------
-@node factorize, fetch, facstd, Functions
+@node factorize, farey, facstd, Functions
 @subsection factorize
 @cindex factorize
 
@@ -1811,7 +1812,41 @@ See
 @ref{absFactorize}.
 @c ref
 @c ---------------------------------------
-@node fetch, fglm, factorize, Functions
+@node farey, fetch, factorize, Functions
+@subsection farey
+@cindex farey
+
+@table @code
+@item @strong{Syntax:}
+@code{factorize (} poly_expression @code{)}
+@*@code{factorize (} poly_expression@code{, 0 )}
+@*@code{factorize (} poly_expression@code{, 2 )}
+@item @strong{Type:}
+list of ideal and intvec
+@*
+@item @strong{Syntax:}
+@code{farey (} bigint_expression@code{,} bigint_expression @code{)}
+@*@code{farey (} ideal_expression@code{,} bigint_expression @code{)}
+@item @strong{Type:}
+number/ideal
+@item @strong{Purpose:}
+lift the first argument modulo the second to the rationals
+@item @strong{Note:}
+The current coefficient field must be the rationals.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,x,dp;
+  farey(2,32003);
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{chinrem}.
+@c ref
+@c ---------------------------------------
+@node fetch, fglm, farey, Functions
 @subsection fetch
 @cindex fetch
 

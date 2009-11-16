@@ -2659,7 +2659,7 @@ void nlInpMult(number &a, number b, const ring r)
   }
 }
 
-number nlFarey(number nP, number nN)
+number nlFarey(number nN, number nP)
 {
   MP_INT tmp; mpz_init(&tmp);
   MP_INT A,B,C,D,E,N,P;
