@@ -100,6 +100,8 @@ facet::facet()
 }
 		
 /** \brief Constructor for facets of codim >= 2
+* Note that as of now the code of the constructors is only for facets and codim2-faces. One
+* could easily change that by renaming numCodim2Facets to numCodimNminusOneFacets or similar
 */
 facet::facet(int const &n)
 {
@@ -755,8 +757,8 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 
 	// The inequalities are now stored in ddineq
 	// Next we check for superflous rows
-	time_t canonicalizeTic, canonicalizeTac;
-	time(&canonicalizeTic);
+// 	time_t canonicalizeTic, canonicalizeTac;
+// 	time(&canonicalizeTic);
 // 	ddredrows = dd_RedundantRows(ddineq, &dderr);
 // 	if (dderr!=dd_NoError)			// did an error occur?
 // 	{
@@ -773,8 +775,8 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 	//Necessary check here! C.f. FJT p18
 		
 	dd_MatrixCanonicalize(&ddineq, &ddlinset, &ddredrows, &ddnewpos, &dderr);
-	time(&canonicalizeTac);
-	cout << "dd_MatrixCanonicalize time: " << difftime(canonicalizeTac,canonicalizeTic) << "sec" << endl;
+// 	time(&canonicalizeTac);
+// 	cout << "dd_MatrixCanonicalize time: " << difftime(canonicalizeTac,canonicalizeTic) << "sec" << endl;
 	ddrows = ddineq->rowsize;	//Size of the matrix with redundancies removed
 	ddcols = ddineq->colsize;
 			
@@ -2035,10 +2037,10 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 				
 		while(fAct!=NULL)
 		{	//Since SLA should only contain flippables there should be no need to check for that
-			time(&tic);
+			
 			gcAct->flip(gcAct->gcBasis,fAct);
-			time(&tac);
-			cout << "t_flip = " << difftime(tac,tic) << endl;
+			
+			
 			ring rTmp=rCopy(fAct->flipRing);
 			rComplete(rTmp);			
 			rChangeCurrRing(rTmp);
@@ -2053,11 +2055,9 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			*/
 // 			idDelete((ideal *)&fAct->flipGB);
 // 			rDelete(fAct->flipRing);
-			time(&tic);
-			gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);					
-			time(&tac);
-			cout << "t_getConeNormals = " << difftime(tac,tic) << endl;
-			gcTmp->getCodim2Normals(*gcTmp);					
+			
+			gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);	
+			gcTmp->getCodim2Normals(*gcTmp);
 			gcTmp->normalize();
 #ifdef gfan_DEBUG
 			gcTmp->showFacets(1);
@@ -2896,17 +2896,62 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 // 	}
 // }
 
+void gcone::lprepareResult(lists l, gcone &gc)
+{
+	gcone *gcAct;
+	gcAct = &gc;
+	matrix mFacetNormal=mpNew(counter,gc.numVars);
+	
+	facet *fAct;
+	fAct = gc.facetPtr;
+	while( gcAct!=NULL )
+	{
+		l->m[0].data=(int*)gc.getUCN();
+		l->m[1].data=(intvec*)(&gcAct->f2M(gcAct,gcAct->facetPtr));
+		gcAct = gcAct->next;
+	}
+}
+/** \brief Write facets of a cone into a matrix
+* Takes a pointer to a facet as 2nd arg in order to determine whether 
+* it operates in codim 1 or 2
+*/
+intvec gcone::f2M(gcone *gc, facet *f)
+{
+	facet *fAct;
+	int codim=1;
+	if(f==gc->facetPtr)
+		fAct = gc->facetPtr;
+	else
+	{
+		fAct = gc->facetPtr->codim2Ptr;
+		codim=2;
+	}
+	intvec mRes=new intvec(counter,gc->numVars,0);//nrows==counter, ncols==numVars
+	intvec *fNormal = new intvec(this->numVars);
+	for(int ii=0;ii<gc->numFacets*(this->numVars);ii++)
+	{
+		fNormal=fAct->getFacetNormal();
+		for(int jj=0;jj<this->numVars ;jj++ )
+		{			
+			mRes[ii]=(*fNormal)[jj];
+			ii++;
+		}
+		fAct = fAct->next;
+	}
+	return mRes;
+}
 
 int gcone::counter=0;
 int gfanHeuristic;
-ideal gfan(ideal inputIdeal, int h)
+// ideal gfan(ideal inputIdeal, int h)
+lists gfan(ideal inputIdeal, int h)
 {
 	lists lResList=(lists)omAllocBin(slists_bin);
 	lResList->Init(5);
 	lResList->m[0].rtyp=INT_CMD;
 	lResList->m[0].data=(int*)255;
-	lResList->m[1].rtyp=MATRIX_CMD;
-	lResList->m[1].data=(void*)NULL;
+	lResList->m[1].rtyp=INTVEC_CMD;
+	lResList->m[1].data=(intvec*)NULL;
 	lResList->m[2].rtyp=IDEAL_CMD;
 	lResList->m[2].data=(ideal*)NULL;
 	lResList->m[3].rtyp=RING_CMD;
@@ -3001,8 +3046,11 @@ ideal gfan(ideal inputIdeal, int h)
 		//res=gcAct->gcBasis;
 		//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS
 		res = inputIdeal; 
+// 		intvec mRes=gcRoot->f2M(gcRoot,gcRoot->facetPtr);
+		gcRoot->lprepareResult(lResList,*gcRoot);
 	}
 	dd_free_global_constants();
+	
 	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
 	The return type will then be of type LIST_CMD
 	Assume gfan has finished, thus we have enumerated all the cones
@@ -3013,7 +3061,8 @@ ideal gfan(ideal inputIdeal, int h)
 	//rChangeCurrRing(rootRing);
 	//res=gcAct->gcBasis;
 	//res=gcRoot->gcBasis;	
-	return res;
+// 	return res;
+	return lResList;
 	//return GBlist;
 }
 /*

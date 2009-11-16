@@ -7,6 +7,10 @@ $Header: /usr/local/Singular/cvsroot/kernel/gfan.h,v 1.13 2009/11/03 06:57:32 mo
 $Id$
 */
 #ifdef HAVE_GFAN
+
+#ifndef GFAN_H
+#define GFAN_H
+
 #include "intvec.h"
 
 #define p800
@@ -17,7 +21,8 @@ $Id$
 #endif
 extern int gfanHeuristic;
 //ideal getGB(ideal inputIdeal);
-ideal gfan(ideal inputIdeal, int heuristic);
+// ideal gfan(ideal inputIdeal, int heuristic);
+lists gfan(ideal inputIdeal, int heuristic);
 //int dotProduct(intvec a, intvec b);
 //bool isParallel(intvec a, intvec b);
 
@@ -98,6 +103,7 @@ class facet
 		 * prints the facet normal an all (codim-2)-facets that belong to it
 		 */
 		void fDebugPrint();
+		
 		friend class gcone;		
 };
 
@@ -181,8 +187,11 @@ class gcone
 		dd_MatrixPtr facets2Matrix(gcone const &gc);
 		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE);
 		void readConeFromFile(int gcNum, gcone *gc);
+		void lprepareResult(lists l, gcone &gc);
 // 		static void gcone::idPrint(ideal &I);
+		intvec f2M(gcone *gc, facet *f);
 		friend class facet;	
 };
 
+#endif
 #endif

@@ -3506,8 +3506,10 @@ if (strcmp(sys_cmd,"gfan")==0)
 		  int heuristic;
 		  heuristic=(int)(long)h->next->Data();
 		  ideal I=((ideal)h->Data());
-		  res->rtyp=IDEAL_CMD;
-		  res->data=(ideal) gfan(I,heuristic);
+// 		  res->rtyp=IDEAL_CMD;
+// 		  res->data=(ideal) gfan(I,heuristic);
+		  res->rtyp=LIST_CMD;
+		  res->data=(lists) gfan(I,heuristic);
 		  return FALSE;
 	  }
 	  else
