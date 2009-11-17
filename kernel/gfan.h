@@ -23,6 +23,7 @@ extern int gfanHeuristic;
 //ideal getGB(ideal inputIdeal);
 // ideal gfan(ideal inputIdeal, int heuristic);
 lists gfan(ideal inputIdeal, int heuristic);
+
 //int dotProduct(intvec a, intvec b);
 //bool isParallel(intvec a, intvec b);
 
@@ -122,7 +123,7 @@ class gcone
 		ring baseRing;		//the basering of the cone				
 		intvec *ivIntPt;	//an interior point of the cone
 		int UCN;		//unique number of the cone
-		static int counter;
+ 		static int counter;
 		
 	public:	
 		/** \brief Pointer to the first facet */
@@ -152,6 +153,8 @@ class gcone
 		gcone(ring r, ideal I);
 		gcone(const gcone& gc, const facet &f);
 		~gcone();
+		int getCounter();
+		ring getBaseRing();
 		void setIntPoint(intvec *iv);
 		intvec *getIntPoint();
 		void showIntPoint();
@@ -187,11 +190,11 @@ class gcone
 		dd_MatrixPtr facets2Matrix(gcone const &gc);
 		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE);
 		void readConeFromFile(int gcNum, gcone *gc);
-		void lprepareResult(lists l, gcone &gc);
+		
 // 		static void gcone::idPrint(ideal &I);
 		intvec f2M(gcone *gc, facet *f);
 		friend class facet;	
 };
-
+lists lprepareResult(gcone *gc, int n);
 #endif
 #endif
