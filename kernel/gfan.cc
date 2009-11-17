@@ -1410,63 +1410,7 @@ void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
  */
 //NOTE: Should be replaced by kNF or kNF2
 //NOTE: Done
-poly gcone::restOfDiv(poly const &f, ideal const &I)
-{
-// 			cout << "Entering restOfDiv" << endl;
-// 	poly p=f;
-// 			//pWrite(p);			
-// 	poly r=NULL;	//The zero polynomial
-// 	int ii;
-// 	bool divOccured;
-// 			
-// 	while (p!=NULL)
-// 	{
-// 		ii=1;
-// 		divOccured=FALSE;
-// 				
-// 		while( (ii<=IDELEMS(I) && (divOccured==FALSE) ))
-// 		{					
-// 			if (pDivisibleBy(I->m[ii-1],p))	//does LM(I->m[ii]) divide LM(p) ?
-// 			{						
-// 				poly step1,step2,step3;
-// 						//cout << "dividing "; pWrite(pHead(p));cout << "by ";pWrite(pHead(I->m[ii-1])); cout << endl;
-// 				step1 = pDivideM(pHead(p),pHead(I->m[ii-1]));
-// 						//cout << "LT(p)/LT(f_i)="; pWrite(step1); cout << endl;				
-// 				step2 = ppMult_qq(step1, I->m[ii-1]);						
-// 				step3 = pSub(pCopy(p), step2);
-// 						//p=pSub(p,pMult( pDivide(pHead(p),pHead(I->m[ii])), I->m[ii]));			
-// 						//pSetm(p);
-// 				pSort(step3); //must be here, otherwise strange behaviour with many +o+o+o+o+ terms
-// 				p=step3;
-// 						//pWrite(p);						
-// 				divOccured=TRUE;
-// 			}
-// 			else
-// 			{
-// 				ii += 1;
-// 			}//if (pLmDivisibleBy(I->m[ii],p,currRing))
-// 		}//while( (ii<IDELEMS(I) && (divOccured==FALSE) ))
-// 		if (divOccured==FALSE)
-// 		{
-// 					//cout << "TICK 5" << endl;
-// 			r=pAdd(pCopy(r),pHead(p));
-// 			pSetm(r);
-// 			pSort(r);
-// 					//cout << "r="; pWrite(r); cout << endl;
-// 					
-// 			if (pLength(p)!=1)
-// 			{
-// 				p=pSub(pCopy(p),pHead(p));	//Here it may occur that p=0 instead of p=NULL
-// 			}
-// 			else
-// 			{
-// 				p=NULL;	//Hack to correct this situation						
-// 			}					
-// 					//cout << "p="; pWrite(p);
-// 		}//if (divOccured==FALSE)
-// 	}//while (p!=0)
-// 	return r;
-}//poly restOfDiv(poly const &f, ideal const &I)
+//NOTE: removed with r12286
 		
 /** \brief Compute \f$ f-f^{\mathcal{G}} \f$
 */
@@ -1482,13 +1426,13 @@ ideal gcone::ffG(ideal const &H, ideal const &G)
 // 		res->m[ii]=restOfDiv(H->m[ii],G);
 		res->m[ii]=kNF(G, NULL,H->m[ii],0,0);
 		temp1=H->m[ii];
-		temp2=res->m[ii];				
+		temp2=res->m[ii];
 		temp3=pSub(temp1, temp2);
 		res->m[ii]=temp3;
 		//res->m[ii]=pSub(temp1,temp2); //buggy
 		//pSort(res->m[ii]);
 		//pSetm(res->m[ii]);
-		//cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);						
+		//cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);	
 	}			
 	return res;
 }
@@ -1716,113 +1660,7 @@ ring rCopyAndChangeWeight(ring const &r, intvec *ivw)
  * We then check whether the fNormal of this facet is parallel to the fNormal of our testfacet.
  * If this is the case, then our facet is indeed a search facet and TRUE is retuned. 
 */
-bool gcone::isSearchFacet(gcone &gcTmp, facet *testfacet)
-{				
-	ring actRing=currRing;
-	facet *facetPtr=(facet*)gcTmp.facetPtr;			
-	facet *fMin=new facet(*facetPtr);	//Pointer to the "minimal" facet
-			//facet *fMin = new facet(tmpcone.facetPtr);
-			//fMin=tmpcone.facetPtr;		//Initialise to first facet of tmpcone
-	facet *fAct;	//Ptr to alpha_i
-	facet *fCmp;	//Ptr to alpha_j
-	fAct = fMin;
-	fCmp = fMin->next;				
-			
-	rChangeCurrRing(this->rootRing);	//because we compare the monomials in the rootring			
-	poly p=pInit();
-	poly q=pInit();
-	intvec *alpha_i = new intvec(this->numVars);			
-	intvec *alpha_j = new intvec(this->numVars);
-	intvec *sigma = new intvec(this->numVars);
-	sigma=gcTmp.getIntPoint();
-			
-	int *u=(int *)omAlloc((this->numVars+1)*sizeof(int));
-	int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
-	u[0]=0; v[0]=0;
-	int weight1,weight2;
-	while(fAct->next->next!=NULL)	//NOTE this is ugly. Can it be done without fCmp?
-	{
-		/* Get alpha_i and alpha_{i+1} */
-		alpha_i=fAct->getFacetNormal();
-		alpha_j=fCmp->getFacetNormal();
-#ifdef gfan_DEBUG
-		alpha_i->show(); 
-		alpha_j->show();
-#endif
-		/*Compute the dot product of sigma and alpha_{i,j}*/
-		weight1=dotProduct(sigma,alpha_i);
-		weight2=dotProduct(sigma,alpha_j);
-#ifdef gfan_DEBUG
-		cout << "weight1=" << weight1 << " " << "weight2=" << weight2 << endl;
-#endif
-		/*Adjust alpha_i and alpha_i+1 accordingly*/
-		for(int ii=1;ii<=this->numVars;ii++)
-		{					
-			u[ii]=weight1*(*alpha_i)[ii-1];
-			v[ii]=weight2*(*alpha_j)[ii-1];
-		}				
-				
-		/*Now p_weight and q_weight need to be compared as exponent vectors*/
-		pSetCoeff0(p,nInit(1));
-		pSetCoeff0(q,nInit(1));
-		pSetExpV(p,u); 
-		pSetm(p);			
-		pSetExpV(q,v); 
-		pSetm(q);
-#ifdef gfan_DEBUG				
-		pWrite(p);pWrite(q);
-#endif	
-				/*We want to check whether x^p < x^q 
-		=> want to check for return value 1 */
-		if (pLmCmp(p,q)==1)	//i.e. x^q is smaller
-		{
-			fMin=fCmp;
-			fAct=fMin;
-			fCmp=fCmp->next;
-		}
-		else
-		{
-					//fAct=fAct->next;
-			if(fCmp->next!=NULL)
-			{
-				fCmp=fCmp->next;
-			}
-			else
-			{
-				fAct=fAct->next;
-			}
-		}
-				//fAct=fAct->next;
-	}//while(fAct.facetPtr->next!=NULL)
-	delete alpha_i,alpha_j,sigma;
-			
-	/*If testfacet was minimal then fMin should still point there */
-			
-			//if(fMin->getFacetNormal()==ivNeg(testfacet.getFacetNormal()))			
-#ifdef gfan_DEBUG
-	cout << "Checking for parallelity" << endl <<" fMin is";
-	fMin->printNormal();
-	cout << "testfacet is ";
-	testfacet->printNormal();
-	cout << endl;
-#endif
-	if (fMin==gcTmp.facetPtr)			
-			//if(areEqual(fMin->getFacetNormal(),ivNeg(testfacet.getFacetNormal())))
-			//if (isParallel(fMin->getFacetNormal(),testfacet->getFacetNormal()))
-	{				
-		cout << "Parallel" << endl;
-		rChangeCurrRing(actRing);
-				//delete alpha_min, test;
-		return TRUE;
-	}
-	else 
-	{
-		cout << "Not parallel" << endl;
-		rChangeCurrRing(actRing);
-				//delete alpha_min, test;
-		return FALSE;
-	}
-}//bool isSearchFacet
+//removed with r12286
 		
 /** \brief Check for equality of two intvecs
  */
@@ -1842,44 +1680,7 @@ bool gcone::areEqual(intvec const &a, intvec const &b)
 		
 /** \brief The reverse search algorithm
  */
-void gcone::reverseSearch(gcone *gcAct) //no const possible here since we call gcAct->flip
-{
-// 	facet *fAct=new facet();
-// 	fAct = gcAct->facetPtr;			
-// 			
-// 	while(fAct!=NULL) 
-// 	{
-// 		cout << "======================"<< endl;
-// 		gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);
-// 		gcone *gcTmp = new gcone(*gcAct);
-// 				//idShow(gcTmp->gcBasis);
-// 		gcTmp->getConeNormals(gcTmp->gcBasis, TRUE);
-// #ifdef gfan_DEBUG
-// 		facet *f = new facet();
-// 		f=gcTmp->facetPtr;
-// 		while(f!=NULL)
-// 		{
-// 			f->printNormal();
-// 			f=f->next;					
-// 		}
-// #endif
-// 		gcTmp->showIntPoint();
-// 		/*recursive part goes gere*/
-// 		if (isSearchFacet(*gcTmp,(facet*)gcAct->facetPtr))
-// 		{
-// 			gcAct->next=gcTmp;
-// 			cout << "PING"<< endl;
-// 			reverseSearch(gcTmp);
-// 		}
-// 		else
-// 		{
-// 			delete gcTmp;
-// 			/*NOTE remove fAct from linked list. It's no longer needed*/
-// 		}
-// 		/*recursion ends*/
-// 		fAct = fAct->next;		
-// 	}//while(fAct->next!=NULL)
-}//reverseSearch
+//removed with r12286
 		
 /** \brief The new method of Markwig and Jensen
  * Compute gcBasis and facets for the arbitrary starting cone. Store \f$(codim-1)\f$-facets as normals.
@@ -2906,22 +2707,13 @@ lists lprepareResult(gcone *gc, int n)
 		l->m[0].data=(void*)gcAct->getUCN();
 		intvec iv=(gcAct->f2M(gcAct,gcAct->facetPtr));
 		l->m[1].data=(void*)ivCopy(&iv);
-		l->m[2].data=(void*)idCopy(gcAct->gcBasis);
+		l->m[2].data=(void*)idrCopyR_NoSort(gcAct->gcBasis,gcAct->getBaseRing());
 		l->m[3].data=(void*)(gcAct->getBaseRing());
 // 		l->m[4].data=(void*)0;
 		res->m[ii].data=(void*)l;
 		gcAct = gcAct->next;
 	}		
 	
-// 	while( gcAct!=NULL )
-// 	{
-// 		l->m[0].data=(void*)gc->getUCN();
-// 		l->m[1].data=(intvec*)(&gcAct->f2M(gcAct,gcAct->facetPtr));
-// 		gcAct = gcAct->next;
-// 		lAdd((sleftv*)res,(sleftv*)res,(sleftv*)l);
-// 	}
-// 	char *v=lString(res);
-// 	cout << v;
 	return res;
 }
 /** \brief Write facets of a cone into a matrix
@@ -2962,7 +2754,10 @@ int gfanHeuristic;
 // ideal gfan(ideal inputIdeal, int h)
 lists gfan(ideal inputIdeal, int h)
 {
-	lists lResList;
+	lists lResList; //this is the object we return
+	
+	if(rHasGlobalOrdering(currRing))
+	{	
 	int numvar = pVariables; 
 	gfanHeuristic = h;
 	
@@ -2973,7 +2768,7 @@ lists gfan(ideal inputIdeal, int h)
 	
 	searchMethod method;
 	method = noRevS;
-// 	method = reverseSearch;
+
 	
 #ifdef gfan_DEBUG
 	cout << "Now in subroutine gfan" << endl;
@@ -2981,52 +2776,7 @@ lists gfan(ideal inputIdeal, int h)
 	ring inputRing=currRing;	// The ring the user entered
 	ring rootRing;			// The ring associated to the target ordering
 	ideal res;	
-	facet *fRoot;
-	
-	if (method==reverseSearch)
-	{
-	
-		/* Construct a new ring which will serve as our root*/
-		rootRing=rCopy0(currRing);
-		rootRing->order[0]=ringorder_lp;
-		
-		rComplete(rootRing);
-		rChangeCurrRing(rootRing);
-		
-		/* Fetch the inputIdeal into our rootRing */
-		map theMap=(map)idMaxIdeal(1);	//evil hack!
-		theMap->preimage=NULL;	//neccessary?
-		ideal rootIdeal;
-		rootIdeal=fast_map(inputIdeal,inputRing,(ideal)theMap, currRing);
-#ifndef NDEBUG
-	#ifdef gfan_DEBUG
-		cout << "Root ideal is " << endl;
-		idShow(rootIdeal);
-		cout << "The root ring is " << endl;
-		rWrite(rootRing);
-		cout << endl;
-	#endif
-#endif
-		
-		//gcone *gcRoot = new gcone();	//Instantiate the sink
-		gcone *gcRoot = new gcone(rootRing,rootIdeal);
-		gcone *gcAct;
-		gcAct = gcRoot;
-		gcAct->numVars=pVariables;
-		gcAct->getGB(rootIdeal);	//sets gcone::gcBasis
-#ifndef NDEBUG
-		idShow(gcAct->gcBasis);
-#endif
-		gcAct->getConeNormals(gcAct->gcBasis);	//hopefully compute the normals	
-		//gcAct->flip(gcAct->gcBasis,gcAct->facetPtr);	
-		/*Now it is time to compute the search facets, respectively start the reverse search.
-		But since we are in the root all facets should be search facets. IS THIS TRUE?
-		NOTE: Check for flippability is not very sophisticated
-		*/	
-		//gcAct->reverseSearch(gcAct);	
-		rChangeCurrRing(rootRing);
-		res=gcRoot->gcBasis;	
-	}//if method==reverSearch
+	facet *fRoot;	
 	
 	if(method==noRevS)
 	{
@@ -3034,9 +2784,9 @@ lists gfan(ideal inputIdeal, int h)
 		gcone *gcAct;
 		gcAct = gcRoot;
 		gcAct->numVars=pVariables;
-		gcAct->getGB(inputIdeal);
-		cout << "GB of input ideal is:" << endl;
+		gcAct->getGB(inputIdeal);		
 #ifndef NDEBUG
+		cout << "GB of input ideal is:" << endl;
 		idShow(gcAct->gcBasis);
 #endif
 		if(gcAct->isMonomial(gcAct->gcBasis))
@@ -3051,27 +2801,21 @@ lists gfan(ideal inputIdeal, int h)
 		//res=gcAct->gcBasis;
 		//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS
 		res = inputIdeal; 
-// 		intvec mRes=gcRoot->f2M(gcRoot,gcRoot->facetPtr);		
 		lResList=lprepareResult(gcRoot,gcRoot->getCounter());
 // 		res=lResList;
 	}
 	dd_free_global_constants();
+	}//rHasGlobalOrdering
+	else
+	{
+		WerrorS("Ring has non-global ordering - terminating");
+		lResList->Init(1);
+		lResList->m[0].rtyp=INT_CMD;
+		int ires=0;
+		lResList->m[0].data=(void*)&ires;
+	}
 	
-	/*As of now extra.cc expects gfan to return type ideal. Probably this will change in near future.
-	The return type will then be of type LIST_CMD
-	Assume gfan has finished, thus we have enumerated all the cones
-	Create an array of size of #cones. Let each entry in the array contain a pointer to the respective
-	Groebner Basis and merge this somehow with LIST_CMD
-	=> Count the cones!
-	*/
-	//rChangeCurrRing(rootRing);
-	//res=gcAct->gcBasis;
-	//res=gcRoot->gcBasis;	
-// 	return res;
 	return lResList;
-	//return GBlist;
 }
-/*
-Since gfan.cc is #included from extra.cc there must not be a int main(){} here
-*/
+
 #endif

@@ -170,7 +170,7 @@ class gcone
 		void getCodim2Normals(gcone const &gc);
 		void flip(ideal gb, facet *f);
 		void computeInv(ideal &gb, ideal &inv, intvec &f);
-		poly restOfDiv(poly const &f, ideal const &I);
+// 		poly restOfDiv(poly const &f, ideal const &I); removed with r12286
 		ideal ffG(ideal const &H, ideal const &G);
 		void getGB(ideal const &inputIdeal);
 		intvec *ivNeg(const intvec *iv);
@@ -179,9 +179,9 @@ class gcone
 		void interiorPoint(dd_MatrixPtr const &M, intvec &iv);
 		ring rCopyAndAddWeight(ring const &r, intvec const *ivw);
 		ring rCopyAndChangeWeight(ring const &r, intvec *ivw);
-		bool isSearchFacet(gcone &gcTmp, facet *testfacet);
 		bool areEqual(intvec const &a, intvec const &b);
-		void reverseSearch(gcone *gcAct);
+// 		void reverseSearch(gcone *gcAct); //NOTE both removed from r12286
+// 		bool isSearchFacet(gcone &gcTmp, facet *testfacet);
 		void noRevS(gcone &gcRoot, bool usingIntPoint=FALSE);
 		void makeInt(dd_MatrixPtr const &M, int const line, intvec &n);
 		void normalize();
