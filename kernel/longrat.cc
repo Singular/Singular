@@ -2683,10 +2683,10 @@ number nlFarey(number nN, number nP)
     {
        // return N/B
        z=(number)omAllocBin(rnumber_bin);
-       if (mpz_isNeg(B))
+       if (mpz_isNeg(&B))
        {
-         mpz_neg(B,B);
-         mpz_neg(N,N);
+         mpz_neg(&B,&B);
+         mpz_neg(&N,&N);
        }
        mpz_init_set(&z->z,&N);
        mpz_init_set(&z->n,&B);
