@@ -192,7 +192,7 @@ class gcone
 		void readConeFromFile(int gcNum, gcone *gc);
 		
 // 		static void gcone::idPrint(ideal &I);
-		intvec f2M(gcone *gc, facet *f);
+		intvec f2M(gcone *gc, facet *f, int n=1);
 		friend class facet;	
 };
 lists lprepareResult(gcone *gc, int n);

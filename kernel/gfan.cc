@@ -645,7 +645,7 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 		
 	} //for
 		
-#if false
+#if true
 	/*Let's make the preprocessing here. This could already be done in the above for-loop,
 	* but for a start it is more convenient here.
 	* We check the necessary condition of FJT p.18
@@ -659,7 +659,8 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 	int num_elts=0;	
 	for(int ii=0;ii<ddineq->rowsize;ii++)
 	{
-		double tmp;		
+		//read row ii into gamma
+		double tmp;	
 		for(int jj=1;jj<=this->numVars;jj++)
 		{
 			tmp=mpq_get_d(ddineq->matrix[ii][jj]);
@@ -676,37 +677,16 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 		
 		LObject *P = new sLObject();
 		memset(P,0,sizeof(LObject));
-// 		P->p1=L->m[0];
-// 		P->p2=L->m[1];
-// 		ksCreateSpoly(P);
-// 		pWrite(P->p);
-// 		cout << "gamma=";
-// 		gamma->show(1,0);
-// 		cout << endl;
-// 		cout << "inv=";
-// 		for(int qq=0;qq<IDELEMS(initialForm);qq++)
-// 		{
-// 			pWrite0(initialForm->m[qq]);
-// 			cout << ",";			
-// 		}
-// 		cout << endl;
+
 		for(int jj=0;jj<=IDELEMS(initialForm)-2;jj++)
 		{
 			bool isMaybeFacet=FALSE;
 			P->p1=initialForm->m[jj];	//build spolys of initialForm in_v
-// 			cout << "P->p1=";
-// 			pWrite0(P->p1);
-// 			cout << endl;
+
 			for(int kk=jj+1;kk<=IDELEMS(initialForm)-1;kk++)
 			{
 				P->p2=initialForm->m[kk];
-				ksCreateSpoly(P);
-				/*cout << "P->p2=";
-				pWrite0(P->p2);
-				cout << endl;
-				cout << "spoly(p1,p2)=";
-				pWrite0(P->p);
-				cout << endl;	*/			
+				ksCreateSpoly(P);							
 				if(P->p!=NULL)	//spoly non zero=?
 				{	
 					poly p=pInit();			
@@ -726,16 +706,11 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 							if(pLmEqual(L->m[ll],q) || pDivisibleBy(L->m[ll],q))
 							{							
 								isMaybeFacet=TRUE;
- 								break;
+ 								break;//for
 							}
 						}
 						if(isMaybeFacet==TRUE)
-						{
-// 							dd_MatrixRowRemove(&ddineq,ii);
-// 							set_addelem(redRows,ii);
-// 							dd_set_si(ddineq->matrix[ii][0],1);
-// 							falseGammaCounter++;
-// 							cout << "Removing gamma!" << endl;
+						{ 							
 							break;//while(p!=NULL)
 						}
 						p=pNext(p);						
@@ -749,15 +724,17 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 							num_alloc += 1;
 						void *_tmp = realloc(redRowsArray,(num_alloc*sizeof(int)));
 						if(!_tmp)
-							WerrorS("Couldn't realloc memory\n");
+							WerrorS("Woah dude! Couldn't realloc memory\n");
 						redRowsArray = (int*)_tmp;
 						redRowsArray[num_elts]=ii;
 						num_elts++;
-						break;//for(int kk, since we have found one that is not in L	
+						//break;//for(int kk, since we have found one that is not in L	
+						goto _start;	//mea culpa, mea culpa, mea maxima culpa
 					}
-				}//if(P->p!=NULL)
-			}
-		}//for
+				}//if(P->p!=NULL)				
+			}//for k
+		}//for jj
+		_start:;
 		delete P;
 		//idDelete(L);		
 	}//for(ii<ddineq-rowsize
@@ -2683,7 +2660,9 @@ ring gcone::getBaseRing()
 }
 /** \brief Gather the output
 * List of lists
+*\param *gc Pointer to gcone, preferably gcRoot ;-)
 *\param n the number of cones
+*
 */
 lists lprepareResult(gcone *gc, int n)
 {
@@ -2693,23 +2672,41 @@ lists lprepareResult(gcone *gc, int n)
 	fAct = gc->facetPtr;
 	
 	lists res=(lists)omAllocBin(slists_bin);
-	res->Init(n);
+	res->Init(n);	//initialize to store n cones
 	for(int ii=0;ii<n;ii++)
 	{
 		res->m[ii].rtyp=LIST_CMD;
 		lists l=(lists)omAllocBin(slists_bin);
-		l->Init(4);
+		l->Init(5);
 		l->m[0].rtyp=INT_CMD;
-		l->m[1].rtyp=INTVEC_CMD;
-		l->m[2].rtyp=IDEAL_CMD;
-		l->m[3].rtyp=RING_CMD;
-// 		l->m[4].rtyp=LIST_CMD;
 		l->m[0].data=(void*)gcAct->getUCN();
+		l->m[1].rtyp=IDEAL_CMD;
+		l->m[1].data=(void*)idrCopyR_NoSort(gcAct->gcBasis,gcAct->getBaseRing());
+		
+		l->m[2].rtyp=INTVEC_CMD;
 		intvec iv=(gcAct->f2M(gcAct,gcAct->facetPtr));
-		l->m[1].data=(void*)ivCopy(&iv);
-		l->m[2].data=(void*)idrCopyR_NoSort(gcAct->gcBasis,gcAct->getBaseRing());
-		l->m[3].data=(void*)(gcAct->getBaseRing());
-// 		l->m[4].data=(void*)0;
+		l->m[2].data=(void*)ivCopy(&iv);
+		
+		l->m[3].rtyp=LIST_CMD;
+			lists lCodim2List = (lists)omAllocBin(slists_bin);
+			lCodim2List->Init(gcAct->numFacets);		
+ 
+			fAct = gcAct->facetPtr;//fAct->codim2Ptr;
+			int jj=0;
+			while(fAct!=NULL && jj<gcAct->numFacets)
+			{
+				lCodim2List->m[jj].rtyp=INTVEC_CMD;
+				intvec ivC2=(gcAct->f2M(gcAct,fAct,2));
+				lCodim2List->m[jj].data=(void*)ivCopy(&ivC2);
+				jj++;
+				fAct = fAct->next;
+			} 		
+		l->m[3].data=(void*)lCodim2List;
+		
+		
+		l->m[4].rtyp=RING_CMD;
+		l->m[4].data=(void*)(gcAct->getBaseRing()); 		
+		
 		res->m[ii].data=(void*)l;
 		gcAct = gcAct->next;
 	}		
@@ -2717,36 +2714,48 @@ lists lprepareResult(gcone *gc, int n)
 	return res;
 }
 /** \brief Write facets of a cone into a matrix
-* Takes a pointer to a facet as 2nd arg in order to determine whether 
-* it operates in codim 1 or 2
+* Takes a pointer to a facet as 2nd arg 
+* f should always point to gc->facetPtr
+* param n is used to determine whether it operates in codim 1 or 2
+*
 */
-intvec gcone::f2M(gcone *gc, facet *f)
+intvec gcone::f2M(gcone *gc, facet *f, int n)
 {
 	facet *fAct;
-	int codim=1;
-	if(f==gc->facetPtr)
+	intvec *res;
+	intvec *fNormal = new intvec(gc->numVars);
+// 	int codim=n;
+// 	int bound;
+// 	if(f==gc->facetPtr)
+	if(n==1)
+	{
+		intvec *m1Res=new intvec(gc->numFacets,gc->numVars,0);
+		res = m1Res;
 		fAct = gc->facetPtr;
+// 		bound = gc->numFacets*(this->numVars);		
+	}
 	else
 	{
-		fAct = gc->facetPtr->codim2Ptr;
-		codim=2;
+		fAct = f->codim2Ptr;
+		intvec *m2Res = new intvec(f->numCodim2Facets,gc->numVars,0);
+		res = m2Res;		
+// 		bound = fAct->numCodim2Facets*(this->numVars);
+
 	}
-	/** mrRes is a matrix containing the facet normals AS ROWS*/
-	intvec *mRes=new intvec(this->numFacets,gc->numVars,0);//nrows==numFacets, ncols==numVars
-	intvec *fNormal = new intvec(this->numVars);
 	int ii=0;
-// 	for(int ii=0;ii<gc->numFacets*(this->numVars);ii++)
-	while(fAct!=NULL && ii<gc->numFacets*(this->numVars))
+	while(fAct!=NULL )//&& ii < bound )
 	{
-		fNormal=fAct->getFacetNormal();
-		for(int jj=0;jj<this->numVars ;jj++ )
-		{			
-			(*mRes)[ii]=(*fNormal)[jj];
+		fNormal = fAct->getFacetNormal();
+		for(int jj=0;jj<this->numVars;jj++)
+		{
+			(*res)[ii]=(*fNormal)[jj];
 			ii++;
 		}
 		fAct = fAct->next;
 	}
-	return *mRes;
+
+	delete fNormal;
+	return *res;
 }
 
 int gcone::counter=0;
