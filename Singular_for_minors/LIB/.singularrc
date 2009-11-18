@@ -1,1 +1,0 @@
-system("--allow-net", 1);
