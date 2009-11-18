@@ -1,0 +1,2 @@
+# computing a movie which shows a rotating surface from a .sux-file without opening a window:
+surfex --inch --dpi 300 --size 1 1 --outfile example_cayley_rotate.mng --antialiasing --movie --fps 10 --length 5 --rot 1 2 0 --nowindow example_cayley.sux

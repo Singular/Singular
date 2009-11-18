@@ -1,0 +1,669 @@
+////////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Commutative algebra";
+info="
+LIBRARY:  pointid.lib     Procedures for computing a factorized lex GB of
+                          the vanishing ideal of a set of points via the
+                          Axis-of-Evil Theorem (M.G. Marinari, T. Mora)
+
+AUTHOR:   Stefan Steidel, steidel@mathematik.uni-kl.de
+
+OVERVIEW:
+    The algorithm of Cerlienco-Mureddu [Marinari M.G., Mora T., A remark on a
+    remark by Macaulay or Enhancing Lazard Structural Theorem. Bull. of the
+    Iranian Math. Soc., 29 (2003), 103-145] associates to each ordered set of
+    points A:={a1,...,as} in K^n, ai:=(ai1,...,ain)@*
+          - a set of monomials N and@*
+          - a bijection phi: A --> N.
+    Here I(A):={f in K[x(1),...,x(n)] | f(ai)=0, for all 1<=i<=s} denotes the
+    vanishing ideal of A and N = Mon(x(1),...,x(n)) \ {LM(f)|f in I(A)} is the
+    set of monomials which do not lie in the leading ideal of I(A) (w.r.t. the
+    lexicographical ordering with x(n)>...>x(1)). N is also called the set of
+    non-monomials of I(A). NOTE: #A = #N and N is a monomial basis of
+    K[x(1..n)]/I(A). In particular, this allows to deduce the set of
+    corner-monomials, i.e. the minimal basis M:={m1,...,mr}, m1<...<mr, of its
+    associated monomial ideal M(I(A)), such that@*
+    M(I(A))= {k*mi | k in Mon(x(1),...,x(n)), mi in M},@*
+    and (by interpolation) the unique reduced lexicographical Groebner basis
+    G := {f1,...,fr} such that LM(fi)=mi for each i, that is, I(A)=<G>.
+    Moreover, a variation of this algorithm allows to deduce a canonical linear
+    factorization of each element of such a Groebner basis in the sense ot the
+    Axis-of-Evil Theorem by M.G. Marinari and T. Mora. More precisely, a
+    combinatorial algorithm and interpolation allow to deduce polynomials
+@*
+@*                y_mdi = x(m) - g_mdi(x(1),...,x(m-1)),
+@*
+    i=1,...,r; m=1,...,n; d in a finite index-set F, satisfying
+@*
+@*                 fi = (product of y_mdi) modulo (f1,...,f(i-1))
+@*
+    where the product runs over all m=1,...,n; and all d in F.
+
+PROCEDURES:
+ nonMonomials(id);   non-monomials of the vanishing ideal id of a set of points
+ cornerMonomials(N); corner-monomials of the set of non-monomials N
+ facGBIdeal(id);     GB G of id and linear factors of each element of G
+";
+
+LIB "poly.lib";
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc subst1(id, int m)
+{
+//id = poly/ideal/list, substitute the first m variables occuring in id by 1
+
+  int i,j;
+  def I = id;
+  if(typeof(I) == "list")
+  {
+    for(j = 1; j <= size(I); j++)
+    {
+      for(i = 1; i <= m; i++)
+      {
+        I[j] = subst(I[j],var(i),1);
+      }
+    }
+    return(I);
+  }
+  else
+  {
+    for(i = 1; i <= m; i++)
+    {
+      I = subst(I,var(i),1);
+    }
+    return(I);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc nonMonomials(id)
+"USAGE:  nonMonomials(id); id = <list of vectors> or <list of lists> or <module>
+         or <matrix>.@*
+         Let A= {a1,...,as} be a set of points in K^n, ai:=(ai1,...,ain), then
+         A can be given as@*
+          - a list of vectors (the ai are vectors) or@*
+          - a list of lists (the ai are lists of numbers) or@*
+          - a module s.t. the ai are generators or@*
+          - a matrix s.t. the ai are columns
+ASSUME:  basering must have ordering rp, i.e., be of the form 0,x(1..n),rp;
+         (the first entry of a point belongs to the lex-smallest variable, etc.)
+RETURN:  ideal, the non-monomials of the vanishing ideal I(A) of A
+PURPOSE: compute the set of non-monomials Mon(x(1),...,x(n)) \ {LM(f)|f in I(A)}
+         of the vanishing ideal I(A) of the given set of points A in K^n, where
+         K[x(1),...,x(n)] is equipped with the lexicographical ordering induced
+         by x(1)<...<x(n) by using the algorithm of Cerlienco-Mureddu
+EXAMPLE: example nonMonomials; shows an example
+"
+{
+  list A;
+  int i,j;
+  if(typeof(id) == "list")
+  {
+    for(i = 1; i <= size(id); i++)
+    {
+      if(typeof(id[i]) == "list")
+      {
+        vector a;
+        for(j = 1; j <= size(id[i]); j++)
+        {
+          a = a+id[i][j]*gen(j);
+        }
+        A[size(A)+1] = a;
+        kill a;
+      }
+      if(typeof(id[i]) == "vector")
+      {
+        A[size(A)+1] = id[i];
+      }
+    }
+  }
+  else
+  {
+    if(typeof(id) == "module")
+    {
+      for(i = 1; i <= size(id); i++)
+      {
+        A[size(A)+1] = id[i];
+      }
+    }
+    else
+    {
+      if(typeof(id) == "matrix")
+      {
+        for(i = 1; i <= ncols(id); i++)
+        {
+          A[size(A)+1] = id[i];
+        }
+      }
+      else
+      {
+        ERROR("Wrong type of input!!");
+      }
+    }
+  }
+
+  int n = nvars(basering);
+  int s;
+  int m,d;
+  ideal N = 1;
+  ideal N1,N2;
+  list Y,D,W,Z;
+  poly my,t;
+  for(s = 2; s <= size(A); s++)
+  {
+
+//-- compute m = max{ j | ex. i<s: pr_j(a_i) = pr_j(a_s)} ---------------------
+//-- compute d = |{ a_i | i<s: pr_m(a_i) = pr_m(a_s), phi(a_i) in T[1,m+1]}| --
+    m = 0;
+    Y = A[1..s-1];
+    N2 = N[1..s-1];
+    while(size(Y) > 0)      //assume all points different (m <= size(basering))
+    {
+      D = Y;
+      N1 = N2;
+      Y = list();
+      N2 = ideal();
+      m++;
+      for(i = 1; i <= size(D); i++)
+      {
+        if(A[s][m] == D[i][m])
+        {
+          Y[size(Y)+1] = D[i];
+          N2[size(N2)+1] = N1[i];
+        }
+      }
+    }
+    m = m - 1;
+    d = size(D);
+    if(m < n-1)
+    {
+      for(i = 1; i <= size(N1); i++)
+      {
+        if(N1[i] >= var(m+2))
+        {
+          d = d - 1;
+        }
+      }
+    }
+
+//------- compute t = my * x(m+1)^d where my is obtained recursively --------
+    if(m == 0)
+    {
+      my = 1;
+    }
+    else
+    {
+      W = list();
+      Z = list();
+      for(i = 2; i <= s-1; i++)
+      {
+        if((leadexp(N[i])[m+1] == d) && (coeffs(N[i],var(m+1))[nrows(coeffs(N[i],var(m+1))),1] < var(m+1)))
+        {
+          W[size(W)+1] = A[i];
+          Z[size(Z)+1] = A[i][1..m];
+        }
+      }
+      W[size(W)+1] = A[s];
+      Z[size(Z)+1] = A[s][1..m];
+
+      my = nonMonomials(Z)[size(Z)];
+    }
+
+    t = my * var(m+1)^d;
+
+//---------------------------- t is added to N --------------------------------
+    N[size(N)+1] = t;
+  }
+  return(N);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R1 = 0,x(1..3),rp;
+   vector a1 = [4,0,0];
+   vector a2 = [2,1,4];
+   vector a3 = [2,4,0];
+   vector a4 = [3,0,1];
+   vector a5 = [2,1,3];
+   vector a6 = [1,3,4];
+   vector a7 = [2,4,3];
+   vector a8 = [2,4,2];
+   vector a9 = [1,0,2];
+   list A = a1,a2,a3,a4,a5,a6,a7,a8,a9;
+   nonMonomials(A);
+
+   matrix MAT[9][3] = 4,0,0,2,1,4,2,4,0,3,0,1,2,1,3,1,3,4,2,4,3,2,4,2,1,0,2;
+   MAT = transpose(MAT);
+   print(MAT);
+   nonMonomials(MAT);
+
+   module MOD = gen(3),gen(2)-2*gen(3),2*gen(1)+2*gen(3),2*gen(2)-2*gen(3),gen(1)+3*gen(3),gen(1)+gen(2)+3*gen(3),gen(1)+gen(2)+gen(3);
+   print(MOD);
+   nonMonomials(MOD);
+
+   ring R2 = 0,x(1..2),rp;
+   list l1 = 0,0;
+   list l2 = 0,1;
+   list l3 = 2,0;
+   list l4 = 0,2;
+   list l5 = 1,0;
+   list l6 = 1,1;
+   list L = l1,l2,l3,l4,l5,l6;
+   nonMonomials(L);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc cornerMonomials(ideal N)
+"USAGE:  cornerMonomials(N); N ideal
+ASSUME:  N is given by monomials satisfying the condition that if a monomial is
+         in N then any of its factors is in N (N is then called an order ideal)
+RETURN:  ideal, the corner-monomials of the order ideal N @*
+         The corner-monomials are the leading monomials of an ideal I s.t. N is
+         a basis of basering/I.
+NOTE:    In our applications, I is the vanishing ideal of a finte set of points.
+EXAMPLE: example cornerMonomials; shows an example
+"
+{
+  int n = nvars(basering);
+  int i,j,h;
+  list C;
+  poly m,p;
+  int Z;
+  int vars;
+  intvec v;
+  ideal M;
+
+//-------------------- Test: Is 1 in N ?, if no, return <1> ----------------------
+  for(i = 1; i <= size(N); i++)
+  {
+    if(1 == N[i])
+    {
+      h = 1;
+      break;
+    }
+  }
+  if(h == 0)
+  {
+    return(ideal(1));
+  }
+
+//----------------------------- compute the set M -----------------------------
+  for(i = 1; i <= n; i++)
+  {
+    C[size(C)+1] = list(var(i),1);
+  }
+  while(size(C) > 0)
+  {
+    m = C[1][1];
+    Z = C[1][2];
+    C = delete(C,1);
+    vars = 0;
+    v = leadexp(m);
+    for(i = 1; i <= n; i++)
+    {
+      vars = vars + (v[i] != 0);
+    }
+
+    if(vars == Z)
+    {
+      h = 0;
+      for(i = 1; i <= size(N); i++)
+      {
+        if(m == N[i])
+        {
+          h = 1;
+          break;
+        }
+      }
+
+      if(h == 0)
+      {
+        M[size(M)+1] = m;
+      }
+      else
+      {
+        for(i = 1; i <= n; i++)
+        {
+          p = m * var(i);
+          for(j = 1; j <= size(C); j++)
+          {
+            if(p <= C[j][1] || j == size(C))
+            {
+              if(p == C[j][1])
+              {
+                C[j][2] = C[j][2] + 1;
+              }
+              else
+              {
+                if(p < C[j][1])
+                {
+                  C = insert(C,list(p,1),j-1);
+                }
+                else
+                {
+                  C[size(C)+1] = list(p,1);
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  return(M);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x(1..3),rp;
+   poly n1 = 1;
+   poly n2 = x(1);
+   poly n3 = x(2);
+   poly n4 = x(1)^2;
+   poly n5 = x(3);
+   poly n6 = x(1)^3;
+   poly n7 = x(2)*x(3);
+   poly n8 = x(3)^2;
+   poly n9 = x(1)*x(2);
+   ideal N = n1,n2,n3,n4,n5,n6,n7,n8,n9;
+   cornerMonomials(N);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc facGBIdeal(id)
+"USAGE:  facGBIdeal(id); id = <list of vectors> or <list of lists> or <module>
+         or <matrix>.@*
+         Let A= {a1,...,as} be a set of points in K^n, ai:=(ai1,...,ain), then
+         A can be given as@*
+          - a list of vectors (the ai are vectors) or@*
+          - a list of lists (the ai are lists of numbers) or@*
+          - a module s.t. the ai are generators or@*
+          - a matrix s.t. the ai are columns
+ASSUME:  basering must have ordering rp, i.e., be of the form 0,x(1..n),rp;
+         (the first entry of a point belongs to the lex-smallest variable, etc.)
+RETURN:  a list where the first entry contains the Groebner basis G of I(A)
+         and the second entry contains the linear factors of each element of G
+NOTE:    combinatorial algorithm due to the Axis-of-Evil Theorem of M.G.
+         Marinari, T. Mora
+EXAMPLE: example facGBIdeal; shows an example
+"
+{
+  list A;
+  int i,j;
+  if(typeof(id) == "list")
+  {
+    for(i = 1; i <= size(id); i++)
+    {
+      if(typeof(id[i]) == "list")
+      {
+        vector a;
+        for(j = 1; j <= size(id[i]); j++)
+        {
+          a = a+id[i][j]*gen(j);
+        }
+        A[size(A)+1] = a;
+        kill a;
+      }
+      if(typeof(id[i]) == "vector")
+      {
+        A[size(A)+1] = id[i];
+      }
+    }
+  }
+  else
+  {
+    if(typeof(id) == "module")
+    {
+      for(i = 1; i <= size(id); i++)
+      {
+        A[size(A)+1] = id[i];
+      }
+    }
+    else
+    {
+      if(typeof(id) == "matrix")
+      {
+        for(i = 1; i <= ncols(id); i++)
+        {
+          A[size(A)+1] = id[i];
+        }
+      }
+      else
+      {
+        ERROR("Wrong type of input!!");
+      }
+    }
+  }
+
+  int n = nvars(basering);
+  def S = basering;
+  def R;
+
+  ideal N = nonMonomials(A);
+  ideal eN;
+  ideal M = cornerMonomials(N);
+  poly my, emy;
+
+  int d,k,l,m;
+
+  int d1;
+  poly y(1);
+
+  list N2,D,H;
+  poly z,h;
+
+  int dm;
+  list Am,Z;
+  ideal E;
+  list V,eV;
+  poly p;
+  poly y(2..n),y;
+  poly xi;
+
+  poly f;
+  ideal G1;          // stores the elements of G, i.e. G1 = G the GB of I(A)
+  ideal Y;           // stores the linear factors of GB-elements in each loop
+  list G2;           // contains the linear factors of each element of G
+
+  for(j = 1; j <= size(M); j++)
+  {
+    my = M[j];
+    emy = subst(my,var(1),1);         // auxiliary polynomial
+    eN = subst(N,var(1),1);           // auxiliary monomial ideal
+    Y = ideal();
+
+    d1 = leadexp(my)[1];
+    y(1) = 1;
+    i = 0;
+    k = 1;
+    while(i < d1)
+    {
+//---------- searching for phi^{-1}(x_1^i*x_2^d_2*...*x_n^d_n) ----------------
+      while(my*var(1)^i/var(1)^d1 != N[k])
+      {
+        k++;
+      }
+      y(1) = y(1)*(var(1)-A[k][1]);
+      Y[size(Y)+1] = cleardenom(var(1)-A[k][1]);
+      i++;
+    }
+    f = y(1);                             // gamma_1my
+
+//--------------- Recursion over number of variables --------------------------
+    z = 1;                                // zeta_mmy
+    for(m = 2; m <= n; m++)
+    {
+      z = z * y(m-1);
+
+      D = list();
+      H = list();
+      for(i = 1; i <= size(A); i++)
+      {
+        h = z;
+        for(k = 1; k <= n; k++)
+        {
+          h = subst(h,var(k),A[i][k]);
+        }
+        if(h != 0)
+        {
+          D[size(D)+1] = A[i];
+          H[size(H)+1] = i;
+        }
+      }
+
+      if(size(D) == 0)
+      {
+        break;
+      }
+
+      dm = leadexp(my)[m];
+      while(dm == 0)
+      {
+        m = m + 1;
+        dm = leadexp(my)[m];
+      }
+
+      N2 = list();                        // N2 = N_m
+      emy = subst(emy,var(m),1);
+      eN = subst(eN,var(m),1);
+      for(i = 1; i <= size(N); i++)
+      {
+        if((emy == eN[i]) && (my > N[i]))
+        {
+          N2[size(N2)+1] = N[i];
+        }
+      }
+
+      y(m) = 1;
+      xi = z;
+      for(d = 1; d <= dm; d++)
+      {
+        Am = list();
+        Z = list();                       // Z = pr_m(Am)
+
+//------- V contains all ny*x_m^{d_m-d}*x_m+1^d_m+1*...+x_n^d_n in N_m --------
+        eV = subst1(N2,m-1);
+        V = list();
+        for(i = 1; i <= size(eV); i++)
+        {
+          if(eV[i] == subst1(my,m-1)/var(m)^d)
+          {
+            V[size(V)+1] = eV[i];
+          }
+        }
+
+//------- A_m = phi^{-1}(V) intersect D_md-1 ----------------------------------
+        for(i = 1; i <= size(D); i++)
+        {
+          p = N[H[i]];
+          p = subst1(p,m-1);
+          for(l = 1; l <= size(V); l++)
+          {
+            if(p == V[l])
+            {
+              Am[size(Am)+1] = D[i];
+              Z[size(Z)+1] = D[i][1..m];
+              break;
+            }
+          }
+        }
+
+        E = nonMonomials(Z);
+
+        R = extendring(size(E), "c(", "lp");
+        setring R;
+        ideal E = imap(S,E);
+        list Am = imap(S,Am);
+        poly g = var(size(E)+m);
+        for(i = 1; i <= size(E); i++)
+        {
+          g = g + c(i)*E[i];
+        }
+
+        ideal I = ideal();
+        poly h;
+        for (i = 1; i <= size(Am); i++)
+        {
+          h = g;
+          for(k = 1; k <= n; k++)
+          {
+            h = subst(h,var(size(E)+k),Am[i][k]);
+          }
+          I[size(I)+1] = h;
+        }
+
+        ideal sI = std(I);
+        g = reduce(g,sI);
+
+        setring S;
+        y = imap(R,g);
+        Y[size(Y)+1] = cleardenom(y);
+        xi = xi * y;
+
+        D = list();
+        H = list();
+        for(i = 1; i <= size(A); i++)
+        {
+          h = xi;
+          for(k = 1; k <= n; k++)
+          {
+            h = subst(h,var(k),A[i][k]);
+          }
+          if(h != 0)
+          {
+            D[size(D)+1] = A[i];
+            H[size(H)+1] = i;
+          }
+        }
+
+        y(m) = y(m) * y;
+
+        if(size(D) == 0)
+        {
+          break;
+        }
+      }
+
+      f = f * y(m);
+    }
+    G1[size(G1)+1] = f;
+    G2[size(G2)+1] = Y;
+  }
+  return(list(G1,G2));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x(1..3),rp;
+   vector a1 = [4,0,0];
+   vector a2 = [2,1,4];
+   vector a3 = [2,4,0];
+   vector a4 = [3,0,1];
+   vector a5 = [2,1,3];
+   vector a6 = [1,3,4];
+   vector a7 = [2,4,3];
+   vector a8 = [2,4,2];
+   vector a9 = [1,0,2];
+   list A = a1,a2,a3,a4,a5,a6,a7,a8,a9;
+   facGBIdeal(A);
+
+   matrix MAT[9][3] = 4,0,0,2,1,4,2,4,0,3,0,1,2,1,3,1,3,4,2,4,3,2,4,2,1,0,2;
+   MAT = transpose(MAT);
+   print(MAT);
+   facGBIdeal(MAT);
+
+   module MOD = gen(3),gen(2)-2*gen(3),2*gen(1)+2*gen(3),2*gen(2)-2*gen(3),gen(1)+3*gen(3),gen(1)+gen(2)+3*gen(3),gen(1)+gen(2)+gen(3);
+   print(MOD);
+   facGBIdeal(MOD);
+
+   list l1 = 0,0,1;
+   list l2 = 0,1,-2;
+   list l3 = 2,0,2;
+   list l4 = 0,2,-2;
+   list l5 = 1,0,3;
+   list l6 = 1,1,3;
+   list L = l1,l2,l3,l4,l5,l6;
+   facGBIdeal(L);
+}

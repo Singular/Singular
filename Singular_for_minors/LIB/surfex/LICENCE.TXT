@@ -1,0 +1,57 @@
+SURFEX version 0.90.00
+=================
+
+Saarland University at Saarbruecken, Germany
+Department of Mathematics and Computer Science
+
+SURFEX on the web: www.surfex.AlgebraicSurface.net
+
+Authors: Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
+
+Copyright (C) 2001-2008
+ 
+ 
+*NOTICE*
+========
+ 
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation ( version 2 or version 3 of the License ).
+ 
+The following software used with SURFEX have their own copyright: 
+- surf (http://surf.sourceforge.net), for computing the visualization
+- JavaView (www.javaview.de), for displaying triangulated data
+- convert (http://www.imagemagick.com/), for computing animations from several images
+Their copyrights and licenses can be found in the accompanying files
+which are distributed along with these packages.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+See the GNU General Public License for more details.
+ 
+You should have received a copy of the GNU General Public License along
+with this program (see the doc subdirectory); 
+if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA (see GPL)
+ 
+Please send any comments or bug reports to
+<surfex@AlgebraicSurface.net>.
+ 
+For information of how to cite SURFEX, see
+`http://www.surfex.AlgebraicSurface.net'.
+ 
+You can also support SURFEX by informing us about your visualizations 
+produced by using SURFEX.
+ 
+Availability
+============
+ 
+The latest information about SURFEX is always available from
+`http://www.surfex.AlgebraicSurface.net'.
+ 
+Acknowledgements
+================
+
+We should like to acknowledge the financial support given by the
+Johannes Gutenberg University to the SURFEX project in 2004 and 2005.

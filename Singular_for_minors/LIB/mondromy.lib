@@ -1,0 +1,1032 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Singularities";
+info="
+LIBRARY:  mondromy.lib  Monodromy of an Isolated Hypersurface Singularity
+AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
+
+OVERVIEW:
+ A library to compute the monodromy of an isolated hypersurface singularity.
+ It uses an algorithm by Brieskorn (manuscripta math. 2 (1970), 103-161) to
+ compute a connection matrix of the meromorphic Gauss-Manin connection up to
+ arbitrarily high order, and an algorithm of Gerard and Levelt (Ann. Inst.
+ Fourier, Grenoble 23,1 (1973), pp. 157-195) to transform it to a simple pole.
+
+PROCEDURES:
+ detadj(U);            determinant and adjoint matrix of square matrix U
+ invunit(u,n);         series inverse of polynomial u up to order n
+ jacoblift(f);         lifts f^kappa in jacob(f) with minimal kappa
+ monodromyB(f[,opt]);  monodromy of isolated hypersurface singularity f
+ H2basis(f);           basis of Brieskorn lattice H''
+
+KEYWORDS: Monodromy; hypersurface singularity; Gauss-Manin connection;
+          Brieskorn lattice
+
+SEE ALSO: gmspoly_lib, gmssing_lib
+";
+
+LIB "ring.lib";
+LIB "sing.lib";
+LIB "linalg.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc pcvladdl(list l1,list l2)
+{
+  return(system("pcvLAddL",l1,l2));
+}
+
+static proc pcvpmull(poly p,list l)
+{
+  return(system("pcvPMulL",p,l));
+}
+
+static proc pcvmindeg(list #)
+{
+  return(system("pcvMinDeg",#[1]));
+}
+
+static proc pcvp2cv(list l,int i0,int i1)
+{
+  return(system("pcvP2CV",l,i0,i1));
+}
+
+static proc pcvcv2p(list l,int i0,int i1)
+{
+  return(system("pcvCV2P",l,i0,i1));
+}
+
+static proc pcvdim(int i0,int i1)
+{
+  return(system("pcvDim",i0,i1));
+}
+
+static proc pcvbasis(int i0,int i1)
+{
+  return(system("pcvBasis",i0,i1));
+}
+
+static proc pcvinit()
+{
+  if(0 ) //system("with","DynamicLoading"))
+  {
+    pcvladdl=Pcv::LAddL;
+    pcvpmull=Pcv::PMulL;
+    pcvmindeg=Pcv::MinDeg;
+    pcvp2cv=Pcv::P2CV;
+    pcvcv2p=Pcv::CV2P;
+    pcvdim=Pcv::Dim;
+    pcvbasis=Pcv::Basis;
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc min(intvec v)
+{
+  int m=v[1];
+  int i;
+  for(i=2;i<=size(v);i++)
+  {
+    if(m>v[i])
+    {
+      m=v[i];
+    }
+  }
+  return(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc max(intvec v)
+{
+  int m=v[1];
+  int i;
+  for(i=2;i<=size(v);i++)
+  {
+    if(m<v[i])
+    {
+      m=v[i];
+    }
+  }
+  return(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc mdivp(matrix m,poly p)
+{
+  int i,j;
+  for(i=nrows(m);i>=1;i--)
+  {
+    for(j=ncols(m);j>=1;j--)
+    {
+      m[i,j]=m[i,j]/p;
+    }
+  }
+  return(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc codimV(list V,int N)
+{
+  int codim=pcvdim(0,N);
+  if(size(V)>0)
+  {
+    dbprint(printlevel-voice+2,"//vector space dimension: "+string(codim));
+    dbprint(printlevel-voice+2,
+      "//number of subspace generators: "+string(size(V)));
+    int t=timer;
+    codim=codim-ncols(interred(module(V[1..size(V)])));
+    dbprint(printlevel-voice+2,"//codimension: "+string(codim));
+  }
+  return(codim);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc quotV(list V,int N)
+{
+  module Q=freemodule(pcvdim(0,N));
+  if(size(V)>0)
+  {
+    dbprint(printlevel-voice+2,"//vector space dimension: "+string(nrows(Q)));
+    dbprint(printlevel-voice+2,
+      "//number of subspace generators: "+string(size(V)));
+    int t=timer;
+    Q=interred(reduce(std(Q),std(module(V[1..size(V)]))));
+  }
+  return(list(Q[1..size(Q)]));
+}
+///////////////////////////////////////////////////////////////////////////////
+proc invunit(poly u,int n)
+"USAGE:   invunit(u,n); u poly, n int
+ASSUME:  The polynomial u is a series unit.
+RETURN:  The procedure returns the series inverse of u up to order n
+         or a zero polynomial if u is no series unit.
+DISPLAY: The procedure displays comments if printlevel>=1.
+EXAMPLE: example invunit; shows an example.
+"
+{
+  if(pcvmindeg(u)==0)
+  {
+    dbprint(printlevel-voice+2,"//computing inverse...");
+    int t=timer;
+    poly u0=jet(u,0);
+    u=jet(1-u/u0,n);
+    poly ui=u;
+    poly v=1+u;
+    int i;
+    for(i=n div pcvmindeg(u);i>1;i--)
+    {
+      ui=jet(ui*u,n);
+      v=v+ui;
+    }
+    v=jet(v,n)/u0;
+    dbprint(printlevel-voice+2,"//...inverse computed ["+string(timer-t)+
+      " secs, "+string((memory(1)+1023)/1024)+" K]");
+    return(v);
+  }
+  else
+  {
+    print("//no series unit");
+    return(poly(0));
+  }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),dp;
+  invunit(2+x3+xy4,10);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc detadj(module U)
+"USAGE:   detadj(U); U matrix
+ASSUME:  U is a square matrix with non zero determinant.
+RETURN:  The procedure returns a list with at most 2 entries.
+         If U is not a sqaure matrix, the list is empty.
+         If U is a sqaure matrix, then the first entry is the determinant of U.
+         If U is a square matrix and the determinant of U not zero,
+         then the second entry is the adjoint matrix of U.
+DISPLAY: The procedure displays comments if printlevel>=1.
+EXAMPLE: example detadj; shows an example.
+"
+{
+  if(nrows(U)==ncols(U))
+  {
+    dbprint(printlevel-voice+2,"//computing determinant...");
+    int t=timer;
+    poly detU=det(U);
+    dbprint(printlevel-voice+2,"//...determinant computed ["+string(timer-t)+
+      " secs, "+string((memory(1)+1023)/1024)+" K]");
+
+    if(detU==0)
+    {
+      print("//determinant zero");
+      return(list(detU));
+    }
+    else
+    {
+      def br=basering;
+      def pr=changeord("dp"); setring pr;
+      matrix U=fetch(br,U);
+      poly detU=fetch(br,detU);
+
+      dbprint(printlevel-voice+2,"//computing adjoint matrix...");
+      t=timer;
+      matrix adjU=lift(U,detU*freemodule(nrows(U)));
+      dbprint(printlevel-voice+2,"//...adjoint matrix computed ["
+        +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+      setring br;
+      matrix adjU=fetch(pr,adjU);
+      kill pr;
+    }
+  }
+  else
+  {
+    print("//no square matrix");
+    return(list());
+  }
+
+  return(list(detU,adjU));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,x,dp;
+  matrix U[2][2]=1,1+x,1+x2,1+x3;
+  list daU=detadj(U);
+  daU[1];
+  print(daU[2]);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc jacoblift(poly f)
+"USAGE:   jacoblift(f); f poly
+ASSUME:  The polynomial f in a series ring (local ordering) defines
+         an isolated hypersurface singularity.
+RETURN:  The procedure returns a list with entries kappa, xi, u of type
+         int, vector, poly such that kappa is minimal with f^kappa in jacob(f),
+         u is a unit, and u*f^kappa=(matrix(jacob(f))*xi)[1,1].
+DISPLAY: The procedure displays comments if printlevel>=1.
+EXAMPLE: example jacoblift; shows an example.
+"
+{
+  dbprint(printlevel-voice+2,"//computing kappa...");
+  int t=timer;
+  ideal jf=jacob(f);
+  ideal sjf=std(jf);
+  int kappa=1;
+  poly fkappa=f;
+  while(reduce(fkappa,sjf)!=0)
+  {
+    dbprint(printlevel-voice+2,"//kappa="+string(kappa));
+    kappa++;
+    fkappa=fkappa*f;
+  }
+  dbprint(printlevel-voice+2,"//kappa="+string(kappa));
+  dbprint(printlevel-voice+2,"//...kappa computed ["+string(timer-t)+" secs, "
+    +string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,"//computing xi...");
+  t=timer;
+  vector xi=lift(jf,fkappa)[1];
+  dbprint(printlevel-voice+2,"//...xi computed ["+string(timer-t)+" secs, "
+    +string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,"//computing u...");
+  t=timer;
+  poly u=(matrix(jf)*xi)[1,1]/fkappa;
+  dbprint(printlevel-voice+2,"//...u computed ["+string(timer-t)+" secs, "
+    +string((memory(1)+1023)/1024)+" K]");
+
+  return(list(kappa,xi,u));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x2y2+x6+y6;
+  jacoblift(f);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc getdeltaP1(poly f,int K,int N,int dN)
+{
+  return(pcvpmull(f^K,pcvbasis(0,N+dN-K*pcvmindeg(f))));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc getdeltaP2(poly f,int N,int dN)
+{
+  def of,jf=pcvmindeg(f),jacob(f);
+  list b=pcvbasis(N-of+2,N+dN-of+2);
+  list P2;
+  P2[size(b)*((nvars(basering)-1)*nvars(basering))/2]=0;
+  int i,j,k,l;
+  intvec alpha;
+  for(k,l=1,1;k<=size(b);k++)
+  {
+    alpha=leadexp(b[k]);
+    for(i=nvars(basering)-1;i>=1;i--)
+    {
+      for(j=nvars(basering);j>i;j--)
+      {
+        P2[l]=alpha[i]*jf[j]*(b[k]/var(i))-alpha[j]*jf[i]*(b[k]/var(j));
+        l++;
+      }
+    }
+  }
+  return(P2);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc getdeltaPe(poly f,list e,int K,int dK)
+{
+  int k;
+  list Pe,fke;
+  for(k,fke=K,pcvpmull(f^K,e);k<K+dK;k,fke=k+1,pcvpmull(f,fke))
+  {
+    Pe=Pe+fke;
+  }
+  return(Pe);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc incK(poly f,int mu,int K,int deltaK,int N,
+  list e,list P1,list P2,list Pe,list V1,list V2,list Ve)
+{
+  int deltaN=deltaK*pcvmindeg(f);
+
+  list deltaP1;
+  P1=pcvpmull(f^deltaK,P1);
+  V1=pcvp2cv(P1,0,N+deltaN);
+
+  list deltaP2=getdeltaP2(f,N,deltaN);
+  V2=pcvladdl(V2,pcvp2cv(P2,N,N+deltaN))+pcvp2cv(deltaP2,0,N+deltaN);
+  P2=P2+deltaP2;
+
+  list deltaPe=getdeltaPe(f,e,K,deltaK);
+  Ve=pcvladdl(Ve,pcvp2cv(Pe,N,N+deltaN))+pcvp2cv(deltaPe,0,N+deltaN);
+  Pe=Pe+deltaPe;
+
+  K=K+deltaK;
+  dbprint(printlevel-voice+2,"//K="+string(K));
+
+  N=N+deltaN;
+  dbprint(printlevel-voice+2,"//N="+string(N));
+
+  deltaN=1;
+  dbprint(printlevel-voice+2,"//computing codimension of");
+  dbprint(printlevel-voice+2,"//df^dOmega^(n-1)+f^K*Omega^(n+1) in "
+    +"Omega^(n+1) mod m^N*Omega^(n+1)...");
+  int t=timer;
+  while(codimV(V1+V2,N)<K*mu)
+  {
+    dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)
+      +" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+    deltaP1=getdeltaP1(f,K,N,deltaN);
+    V1=pcvladdl(V1,pcvp2cv(P1,N,N+deltaN))+pcvp2cv(deltaP1,0,N+deltaN);
+    P1=P1+deltaP1;
+
+    deltaP2=getdeltaP2(f,N,deltaN);
+    V2=pcvladdl(V2,pcvp2cv(P2,N,N+deltaN))+pcvp2cv(deltaP2,0,N+deltaN);
+    P2=P2+deltaP2;
+
+    Ve=pcvladdl(Ve,pcvp2cv(Pe,N,N+deltaN));
+
+    N=N+deltaN;
+    dbprint(printlevel-voice+2,"//N="+string(N));
+
+    dbprint(printlevel-voice+2,"//computing codimension of");
+    dbprint(printlevel-voice+2,"//df^dOmega^(n-1)+f^K*Omega^(n+1) in "
+      +"Omega^(n+1) mod m^N*Omega^(n+1)...");
+    t=timer;
+  }
+  dbprint(printlevel-voice+2,"//...codimension computed ["+string(timer-t)
+    +" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+  return(K,N,P1,P2,Pe,V1,V2,Ve);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc nablaK(poly f,int kappa,vector xi,poly u,int N,int prevN,
+  list Vnablae,list e)
+{
+  xi=jet(xi,N);
+  u=invunit(u,N);
+  poly fkappa=kappa*f^(kappa-1);
+
+  poly p,q;
+  list nablae;
+  int i,j;
+  for(i=1;i<=size(e);i++)
+  {
+    for(j,p=nvars(basering),0;j>=1;j--)
+    {
+      q=jet(e[i]*xi[j],N);
+      if(q!=0)
+      {
+        p=p+diff(q*jet(u,N-pcvmindeg(q)),var(j));
+      }
+    }
+    nablae=nablae+list(p-jet(fkappa*e[i],N-1));
+  }
+
+  return(pcvladdl(Vnablae,pcvp2cv(nablae,prevN,N-prevN)));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc MK(poly f,int mu,int kappa,vector xi,poly u,
+  int K,int N,int prevN,list e,list V1,list V2,list Ve,list Vnablae)
+{
+  dbprint(printlevel-voice+2,"//computing nabla(e)...");
+  int t=timer;
+  Vnablae=nablaK(f,kappa,xi,u,N,prevN,Vnablae,e);
+  dbprint(printlevel-voice+2,"//...nabla(e) computed ["+string(timer-t)
+    +" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,
+    "//lifting nabla(e) to C-basis of H''/t^KH''...");
+  list V=Ve+V1+V2;
+  module W=module(V[1..size(V)]);
+  dbprint(printlevel-voice+2,"//vector space dimension: "+string(nrows(W)));
+  dbprint(printlevel-voice+2,"//number of generators: "+string(ncols(W)));
+  t=timer;
+  matrix C=lift(W,module(Vnablae[1..size(Vnablae)]));
+  dbprint(printlevel-voice+2,"//...nabla(e) lifted ["+string(timer-t)
+    +" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,"//computing e-lift of nabla(e)...");
+  t=timer;
+  int i1,i2,j,k;
+  matrix M[mu][mu];
+  for(j=1;j<=mu;j++)
+  {
+    for(k,i2=0,1;k<K;k++)
+    {
+      for(i1=1;i1<=mu;i1,i2=i1+1,i2+1)
+      {
+        M[i1,j]=M[i1,j]+C[i2,j]*var(1)^k;
+      }
+    }
+  }
+  dbprint(printlevel-voice+2,"//...e-lift of nabla(e) computed ["
+    +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+  return(M,N,Vnablae);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc mid(ideal l)
+{
+  int i,j,id;
+  int mid=0;
+  for(i=size(l);i>=1;i--)
+  {
+    for(j=i-1;j>=1;j--)
+    {
+      id=int(l[i]-l[j]);
+      id=max(intvec(id,-id));
+      mid=max(intvec(id,mid));
+    }
+  }
+  return(mid);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc decmide(matrix M,ideal eM0,list bM0)
+{
+  matrix M0=jet(M,0);
+
+  dbprint(printlevel-voice+2,
+    "//computing basis U of generalized eigenspaces of M0...");
+  int t=timer;
+  int i,j;
+  matrix U,M0e;
+  matrix E=freemodule(nrows(M));
+  for(i=ncols(eM0);i>=1;i--)
+  {
+    M0e=E;
+    for(j=max(bM0[i]);j>=1;j--)
+    {
+      M0e=M0e*(M0-eM0[i]*E);
+    }
+    U=syz(M0e)+U;
+  }
+  dbprint(printlevel-voice+2,"//...U computed ["+string(timer-t)+" secs, "
+    +string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,"//transforming M to U...");
+  t=timer;
+  list daU=detadj(U);
+  daU[2]=(1/number(daU[1]))*daU[2];
+  M=daU[2]*M*U;
+  dbprint(printlevel-voice+2,"//...M transformed ["+string(timer-t)+" secs, "
+    +string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,
+    "//computing integer differences of eigenvalues of M0...");
+  t=timer;
+  int k;
+  intvec ideM0;
+  ideM0[ncols(eM0)]=0;
+  for(i=ncols(eM0);i>=1;i--)
+  {
+    for(j=ncols(eM0);j>=1;j--)
+    {
+      k=int(eM0[i]-eM0[j]);
+      if(k)
+      {
+        if(k>0)
+        {
+          ideM0[i]=max(intvec(k,ideM0[i]));
+        }
+        else
+        {
+          ideM0[j]=max(intvec(-k,ideM0[j]));
+        }
+      }
+    }
+  }
+  for(i,k=size(bM0),nrows(M);i>=1;i--)
+  {
+    for(j=sum(bM0[i]);j>=1;j--)
+    {
+      ideM0[k]=ideM0[i];
+      k--;
+    }
+  }
+  dbprint(printlevel-voice+2,
+    "//...integer differences of eigenvalues of M0 computed ["+string(timer-t)
+    +" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,"//transforming M...");
+  t=timer;
+  for(i=nrows(M);i>=1;i--)
+  {
+    if(!ideM0[i])
+    {
+      M[i,i]=M[i,i]+1;
+    }
+    for(j=ncols(M);j>=1;j--)
+    {
+      if(ideM0[i]&&!ideM0[j])
+      {
+        M[i,j]=M[i,j]*var(1);
+      }
+      else
+      {
+        if(!ideM0[i]&&ideM0[j])
+        {
+          M[i,j]=M[i,j]/var(1);
+        }
+      }
+    }
+  }
+  dbprint(printlevel-voice+2,"//...M transformed ["+string(timer-t)+" secs, "
+    +string((memory(1)+1023)/1024)+" K]");
+
+  return(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc nonqhmonodromy(poly f,int mu,int opt)
+{
+  pcvinit();
+
+  dbprint(printlevel-voice+2,"//computing kappa, xi and u with "+
+    "u*f^kappa=(matrix(jacob(f))*xi)[1,1]...");
+  list jl=jacoblift(f);
+  def kappa,xi,u=jl[1..3];
+  dbprint(printlevel-voice+2,"//...kappa, xi and u computed");
+  dbprint(printlevel-voice+2,"//kappa="+string(kappa));
+  if(kappa==1)
+  {
+    dbprint(printlevel-voice+2,
+      "//f quasihomogenous with respect to suitable coordinates");
+  }
+  else
+  {
+    dbprint(printlevel-voice+2,
+      "//f not quasihomogenous for any choice of coordinates");
+  }
+  dbprint(printlevel-voice+2,"//xi=");
+  dbprint(printlevel-voice+2,xi);
+  dbprint(printlevel-voice+2,"//u="+string(u));
+
+  int K,N,prevN;
+  list e,P1,P2,Pe,V1,V2,Ve,Vnablae;
+
+  dbprint(printlevel-voice+2,"//increasing K and N...");
+  K,N,P1,P2,Pe,V1,V2,Ve=incK(f,mu,K,1,N,e,P1,P2,Pe,V1,V2,Ve);
+  dbprint(printlevel-voice+2,"//...K and N increased");
+
+  dbprint(printlevel-voice+2,"//computing C{f}-basis e of Brieskorn lattice "
+    +"H''=Omega^(n+1)/df^dOmega^(n-1)...");
+  int t=timer;
+  e=pcvcv2p(quotV(V1+V2,N),0,N);
+  dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
+    +string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,"//e=");
+  dbprint(printlevel-voice+2,e);
+
+  Pe=e;
+  Ve=pcvp2cv(Pe,0,N);
+
+  if(kappa==1)
+  {
+    dbprint(printlevel-voice+2,
+      "//computing 0-jet M of e-matrix of t*nabla...");
+    matrix M=list(MK(f,mu,kappa,xi,u,K,N,prevN,e,V1,V2,Ve,Vnablae))[1];
+    dbprint(printlevel-voice+2,"//...M computed");
+  }
+  else
+  {
+    dbprint(printlevel-voice+2,
+      "//computing transformation matrix U to simple pole...");
+
+    dbprint(printlevel-voice+2,"//computing t*nabla-stable lattice...");
+    matrix M,prevU;
+    matrix U=freemodule(mu)*var(1)^((mu-1)*(kappa-1));
+    int i;
+    dbprint(printlevel-voice+2,"//comparing with previous lattice...");
+    t=timer;
+    for(i=mu-1;i>=1&&size(reduce(U,std(prevU)))>0;i--)
+    {
+      dbprint(printlevel-voice+2,"//...compared with previous lattice ["
+        +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+      dbprint(printlevel-voice+2,"//increasing K and N...");
+      K,N,P1,P2,Pe,V1,V2,Ve=incK(f,mu,K,kappa-1,N,e,P1,P2,Pe,V1,V2,Ve);
+      dbprint(printlevel-voice+2,"//...K and N increased");
+
+      dbprint(printlevel-voice+2,
+        "//computing (K-1)-jet M of e-matrix of t^kappa*nabla...");
+      M,prevN,Vnablae=MK(f,mu,kappa,xi,u,K,N,prevN,e,V1,V2,Ve,Vnablae);
+      dbprint(printlevel-voice+2,"//...M computed");
+
+      prevU=U;
+
+      dbprint(printlevel-voice+2,"//enlarging lattice...");
+      t=timer;
+      U=interred(jet(module(U)+module(var(1)*diff(U,var(1)))+
+        module(mdivp(M*U,var(1)^(kappa-1))),(kappa-1)*(mu-1)));
+      dbprint(printlevel-voice+2,"//...lattice enlarged ["+string(timer-t)
+        +" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+      dbprint(printlevel-voice+2,"//comparing with previous lattice...");
+      t=timer;
+    }
+    dbprint(printlevel-voice+2,"//...compared with previous lattice ["
+      +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
+    dbprint(printlevel-voice+2,"//...t*nabla-stable lattice computed");
+
+    if(ncols(U)>nrows(U))
+    {
+      dbprint(printlevel-voice+2,
+        "//computing C{f}-basis of t*nabla-stable lattice...");
+      t=timer;
+      U=minbase(U);
+      dbprint(printlevel-voice+2,
+        "//...C{f}-basis of t*nabla-stable lattice computed ["+string(timer-t)
+        +" secs, "+string((memory(1)+1023)/1024)+" K]");
+    }
+
+    U=mdivp(U,var(1)^pcvmindeg(U));
+
+    dbprint(printlevel-voice+2,"//...U computed");
+
+    dbprint(printlevel-voice+2,
+      "//computing determinant and adjoint matrix of U...");
+    list daU=detadj(U);
+    poly p=var(1)^min(intvec(pcvmindeg(daU[2]),pcvmindeg(daU[1])));
+    daU[1]=daU[1]/p;
+    daU[2]=mdivp(daU[2],p);
+    dbprint(printlevel-voice+2,
+      "//...determinant and adjoint matrix of U computed");
+
+    if(K<kappa+pcvmindeg(daU[1]))
+    {
+      dbprint(printlevel-voice+2,"//increasing K and N...");
+      K,N,P1,P2,Pe,V1,V2,Ve=
+        incK(f,mu,K,kappa+pcvmindeg(daU[1])-K,N,e,P1,P2,Pe,V1,V2,Ve);
+      dbprint(printlevel-voice+2,"//...K and N increased");
+
+      dbprint(printlevel-voice+2,"//computing M...");
+      M,prevN,Vnablae=MK(f,mu,kappa,xi,u,K,N,prevN,e,V1,V2,Ve,Vnablae);
+      dbprint(printlevel-voice+2,"//...M computed");
+    }
+
+    dbprint(printlevel-voice+2,"//transforming M/t^kappa to simple pole...");
+    t=timer;
+    M=mdivp(daU[2]*(var(1)^kappa*diff(U,var(1))+M*U),
+      leadcoef(daU[1])*var(1)^(kappa+pcvmindeg(daU[1])-1));
+    dbprint(printlevel-voice+2,"//...M/t^kappa transformed to simple pole ["
+      +string(timer-t)+" secs, "+string((memory(1)+1023)/1024)+" K]");
+  }
+
+  if(opt==0)
+  {
+    dbprint(printlevel-voice+2,
+      "//computing maximal integer difference delta of eigenvalues of M0...");
+    t=timer;
+    list jd=jordan(M);
+    def eM0,bM0=jd[1..2];
+    int delta=mid(eM0);
+    dbprint(printlevel-voice+2,"//...delta computed ["+string(timer-t)
+      +" secs, "+string((memory(1)+1023)/1024)+" K]");
+
+    dbprint(printlevel-voice+2,"//delta="+string(delta));
+
+    if(delta>0)
+    {
+      dbprint(printlevel-voice+2,"//increasing K and N...");
+      if(kappa==1)
+      {
+        K,N,P1,P2,Pe,V1,V2,Ve=incK(f,mu,K,1+delta-K,N,e,P1,P2,Pe,V1,V2,Ve);
+      }
+      else
+      {
+        K,N,P1,P2,Pe,V1,V2,Ve=
+          incK(f,mu,K,kappa+pcvmindeg(daU[1])+delta-K,N,e,P1,P2,Pe,V1,V2,Ve);
+      }
+      dbprint(printlevel-voice+2,"//...K and N increased");
+
+      dbprint(printlevel-voice+2,"//computing M...");
+      M,prevN,Vnablae=MK(f,mu,kappa,xi,u,K,N,prevN,e,V1,V2,Ve,Vnablae);
+      dbprint(printlevel-voice+2,"//...M computed");
+
+      if(kappa>1)
+      {
+        dbprint(printlevel-voice+2,
+          "//transforming M/t^kappa to simple pole...");
+        t=timer;
+        M=mdivp(invunit(daU[1]/var(1)^pcvmindeg(daU[1]),delta)*
+          daU[2]*(var(1)^kappa*diff(U,var(1))+M*U),
+          var(1)^(kappa+pcvmindeg(daU[1])-1));
+        dbprint(printlevel-voice+2,
+          "//...M/t^kappa transformed to simple pole ["+string(timer-t)
+          +" secs, "+string((memory(1)+1023)/1024)+" K]");
+      }
+
+      dbprint(printlevel-voice+2,"//decreasing delta...");
+      M=decmide(M,eM0,bM0);
+      delta--;
+      dbprint(printlevel-voice+2,"//delta="+string(delta));
+
+      while(delta>0)
+      {
+        jd=jordan(M);
+        eM0,bM0=jd[1..2];
+        M=decmide(M,eM0,bM0);
+        delta--;
+        dbprint(printlevel-voice+2,"//delta="+string(delta));
+      }
+      dbprint(printlevel-voice+2,"//...delta decreased");
+    }
+  }
+
+  dbprint(printlevel-voice+2,"//computing 0-jet M0 of M...");
+  matrix M0=jet(M,0);
+  dbprint(printlevel-voice+2,"//...M0 computed");
+
+  return(M0);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc qhmonodromy(poly f,intvec w)
+{
+  dbprint(printlevel-voice+2,"//computing basis e of Milnor algebra...");
+  int t=timer;
+  ideal e=kbase(std(jacob(f)));
+  dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
+    +string((memory(1)+1023)/1024)+" K]");
+
+  dbprint(printlevel-voice+2,
+    "//computing Milnor number mu and quasihomogeneous degree d...");
+  int mu,d=size(e),(transpose(leadexp(f))*w)[1];
+  dbprint(printlevel-voice+2,"...mu and d computed");
+
+  dbprint(printlevel-voice+2,"//computing te-matrix M of t*nabla...");
+  matrix M[mu][mu];
+  int i;
+  for(i=mu;i>=1;i--)
+  {
+    M[i,i]=number((transpose(leadexp(e[i])+1)*w)[1])/d;
+  }
+  dbprint(printlevel-voice+2,"//...M computed");
+
+  return(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc monodromyB(poly f, list #)
+"USAGE:   monodromyB(f[,opt]); f poly, opt int
+ASSUME:  The polynomial f in a series ring (local ordering) defines
+         an isolated hypersurface singularity.
+RETURN:  The procedure returns a residue matrix M of the meromorphic
+         Gauss-Manin connection of the singularity defined by f
+         or an empty matrix if the assumptions are not fulfilled.
+         If opt=0 (default), exp(-2*pi*i*M) is a monodromy matrix of f,
+         else, only the characteristic polynomial of exp(-2*pi*i*M) coincides
+         with the characteristic polynomial of the monodromy of f.
+DISPLAY: The procedure displays more comments for higher printlevel.
+EXAMPLE: example monodromyB; shows an example.
+"
+{
+  int opt;
+  if(size(#)>0)
+  {
+    if(typeof(#[1])=="int")
+    {
+      opt=#[1];
+    }
+    else
+    {
+      print("\\second parameter no int");
+      return();
+    }
+
+  }
+
+  dbprint(printlevel-voice+2,"//basering="+string(basering));
+
+  int i;
+  for(i=nvars(basering);i>=1;i--)
+  {
+    if(1<var(i))
+    {
+      i=-1;
+    }
+  }
+
+  if(i<0)
+  {
+    print("//no series ring (local ordering)");
+
+    matrix M[1][0];
+    return(M);
+  }
+  else
+  {
+    dbprint(printlevel-voice+2,"//f="+string(f));
+
+    dbprint(printlevel-voice+2,"//computing milnor number mu of f...");
+    int t=timer;
+    int mu=milnor(f);
+    dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs, "
+      +string((memory(1)+1023)/1024)+" K]");
+
+    dbprint(printlevel-voice+2,"//mu="+string(mu));
+
+    if(mu<=0)
+    {
+      if(mu==0)
+      {
+        print("//no singularity");
+      }
+      else
+      {
+        print("//non isolated singularity");
+      }
+
+      matrix M[1][0];
+      return(M);
+    }
+    else
+    {
+      dbprint(printlevel-voice+2,"//computing weight vector w...");
+      intvec w=qhweight(f);
+      dbprint(printlevel-voice+2,"//...w computed");
+
+      dbprint(printlevel-voice+2,"//w="+string(w));
+
+      if(w==0)
+      {
+        dbprint(printlevel-voice+2,
+          "//f not quasihomogeneous with respect to given coordinates");
+        return(nonqhmonodromy(f,mu,opt));
+      }
+      else
+      {
+        dbprint(printlevel-voice+2,
+          "//f quasihomogeneous with respect to given coordinates");
+        return(qhmonodromy(f,w));
+      }
+    }
+  }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x2y2+x6+y6;
+  matrix M=monodromyB(f);
+  print(M);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc H2basis(poly f)
+"USAGE:   H2basis(f); f poly
+ASSUME:  The polynomial f in a series ring (local ordering) defines
+         an isolated hypersurface singularity.
+RETURN:  The procedure returns a list of representatives of a C{f}-basis of the
+         Brieskorn lattice H''=Omega^(n+1)/df^dOmega^(n-1).
+THEORY:  H'' is a free C{f}-module of rank milnor(f).
+DISPLAY: The procedure displays more comments for higher printlevel.
+EXAMPLE: example H2basis; shows an example.
+"
+{
+  pcvinit();
+
+  dbprint(printlevel-voice+2,"//basering="+string(basering));
+
+  int i;
+  for(i=nvars(basering);i>=1;i--)
+  {
+    if(1<var(i))
+    {
+      i=-1;
+    }
+  }
+
+  if(i<0)
+  {
+    print("//no series ring (local ordering)");
+
+    return(list());
+  }
+  else
+  {
+    dbprint(printlevel-voice+2,"//f="+string(f));
+
+    dbprint(printlevel-voice+2,"//computing milnor number mu of f...");
+    int t=timer;
+    int mu=milnor(f);
+    dbprint(printlevel-voice+2,"//...mu computed ["+string(timer-t)+" secs, "
+      +string((memory(1)+1023)/1024)+" K]");
+
+    dbprint(printlevel-voice+2,"//mu="+string(mu));
+
+    if(mu<=0)
+    {
+      if(mu==0)
+      {
+        print("//no singularity");
+      }
+      else
+      {
+        print("//non isolated singularity");
+      }
+
+      return(list());
+    }
+    else
+    {
+      dbprint(printlevel-voice+2,"//computing kappa, xi and u with "+
+        "u*f^kappa=(matrix(jacob(f))*xi)[1,1]...");
+      list jl=jacoblift(f);
+      def kappa,xi,u=jl[1..3];
+      dbprint(printlevel-voice+2,"//...kappa, xi and u computed");
+      dbprint(printlevel-voice+2,"//kappa="+string(kappa));
+      if(kappa==1)
+      {
+        dbprint(printlevel-voice+2,
+          "//f quasihomogenous with respect to suitable coordinates");
+      }
+      else
+      {
+        dbprint(printlevel-voice+2,
+          "//f not quasihomogenous for any choice of coordinates");
+      }
+      dbprint(printlevel-voice+2,"//xi=");
+      dbprint(printlevel-voice+2,xi);
+      dbprint(printlevel-voice+2,"//u="+string(u));
+
+      int K,N,prevN;
+      list e,P1,P2,Pe,V1,V2,Ve,Vnablae;
+
+      dbprint(printlevel-voice+2,"//increasing K and N...");
+      K,N,P1,P2,Pe,V1,V2,Ve=incK(f,mu,K,1,N,e,P1,P2,Pe,V1,V2,Ve);
+      dbprint(printlevel-voice+2,"//...K and N increased");
+
+      dbprint(printlevel-voice+2,
+        "//computing C{f}-basis e of Brieskorn lattice "
+        +"H''=Omega^(n+1)/df^dOmega^(n-1)...");
+      t=timer;
+      e=pcvcv2p(quotV(V1+V2,N),0,N);
+      dbprint(printlevel-voice+2,"//...e computed ["+string(timer-t)+" secs, "
+        +string((memory(1)+1023)/1024)+" K]");
+
+      dbprint(printlevel-voice+2,"//e=");
+      dbprint(printlevel-voice+2,e);
+
+      return(e);
+    }
+  }
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring R=0,(x,y),ds;
+  poly f=x2y2+x6+y6;
+  H2basis(f);
+}
+///////////////////////////////////////////////////////////////////////////////

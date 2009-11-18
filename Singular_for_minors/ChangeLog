@@ -1,0 +1,73 @@
+Changes w.r.t 3-1-0-7:
+- adaption to svn
+- new command: farey
+- test for basering over Q for chinrem/farey
+- (some) memory leaks fixed in fast_map (track 183)
+- extgcd via NTL in char 0 (track 107)
+- linalg.lib:inverse for real/complex inexact coeffs fixed
+
+Changes w.r.t 3-1-0-6:
+- 3-1-0-7: Sat Oct 31 12:39:50 CET 2009
+- bug fix in primes/IspPrime (track 166)
+- bug fixed for Z/p (p>32003): nPower
+- bug fixed in Singular<->factory conversion (track 164)
+- nInt, nInit are now indep. from currRing
+- intmat [n][0] fixed
+- insert: memeory leak fixed (track 177)
+- homolog.lib: canonMap new
+- fixed NF for some block ordering (track 159)
+- removed EXTGCD: use extgcd
+- gcd over algebraic extensions in factory
+- tropical.lib and polymake.lib as official libraries
+- bug fixed in mapping real -> rational (track 161)
+
+Changes w.r.t 3-1-0-5:
+- 3-1-0-6: Fri Aug 21 12:59:52 CEST 2009
+- code cleanup: removed HAVE_NAMESPACES (always 0), HAVE_NS(1), HAVE_GMP(1)
+                HAVE_LIBFAC_P (=HAVE_FACTORY)
+- moved mp_set_memory_functions-call from kernel/mminit.cc to tesths.cc:main
+  (in order not to call it for libsingular)
+- some changes for super-commutaive algeras
+
+Changes w.r.t 3-1-0-4:
+- 3-1-0-5: Tue Jul 28 14:03:59 CEST 2009
+- SAGE patches for gcc 4.4 etc.
+- fixed bug in ring change during tail reduction
+- new libs: binresol.lib, trial.lib
+- NTL: update to version 5.5.1
+- tail reduction for coeffcients also from Z/m, Z/p^n, Z/2^m (trac 137)
+- better tests for overflow of exponents: std,  ^, TODO: *, NF, redTail, slimgb
+- solve.lib fixed, interred fixed (bug_55)
+
+Changes w.r.t 3-1-0-3:
+- 3-1-0-4: Wed Jun 10 2009
+- tail reduction for coeffs from Z (trac 137)
+- code cleanup for gcc 4.3
+- more updates/fixes to presolve.lib, normal.lib
+- minor updates
+
+Changes w.r.t 3-1-0-2:
+- 3-1-0-3: Mon May 25 2009
+- SAGE patches
+- test for homogeneity nowe consistent (see Tst/Short/bug_homog)
+- presolve::elimpart improved (see Tst/Short/bug_presolve)
+- pointid.lib added
+- dmod.lib extended (operatorModulo)
+- normal.lib improved (matrix orderings etc.)
+- minor updates
+
+Changes w.r.t 3-1-0-1:
+- 3-1-0-2 Wed May  6 12:34:23 CEST 2009
+- TMPDIR causes problems on MacOsX builds (or fails): renamed to SI_TMPDIR
+- better error handling in assigning qring
+- attributes which depend on the ring: cleanup fixed (see Tst/Short/bug_tr134)
+- minor updates
+
+Changes w.r.t 3-1-0:
+- 3-1-0-1 Tue Apr 28 20:11:22 CEST 2009
+- reduction was not complete in some cases fixed (char 0, qring, module, ordering (c,...))
+  (see Tst/Short/bug_tr132)
+- better test for arguments of elim (check for old syntax)
+  (see elim.lib, tr 133)
+- minor doc updates
+

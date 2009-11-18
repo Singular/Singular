@@ -1,0 +1,1138 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="General purpose";
+info="
+LIBRARY:  poly.lib      Procedures for Manipulating Polys, Ideals, Modules
+AUTHORS:  O. Bachmann, G.-M. Greuel, A. Fruehbis
+
+PROCEDURES:
+ cyclic(int);           ideal of cyclic n-roots
+ katsura([i]);          katsura [i] ideal
+ freerank(poly/...)     rank of coker(input) if coker is free else -1
+ is_zero(poly/...);     int, =1 resp. =0 if coker(input) is 0 resp. not
+ lcm(ideal);            lcm of given generators of ideal
+ maxcoef(poly/...);     maximal length of coefficient occurring in poly/...
+ maxdeg(poly/...);      int/intmat = degree/s of terms of maximal order
+ maxdeg1(poly/...);     int = [weighted] maximal degree of input
+ mindeg(poly/...);      int/intmat = degree/s of terms of minimal order
+ mindeg1(poly/...);     int = [weighted] minimal degree of input
+ normalize(poly/...);   normalize poly/... such that leading coefficient is 1
+ rad_con(p,I);          check radical containment of polynomial p in ideal I
+ content(f);            content of polynomial/vector f
+ numerator(n);          numerator of number n
+ denominator(n)         denominator of number n
+ mod2id(M,iv);          conversion of a module M to an ideal
+ id2mod(i,iv);          conversion inverse to mod2id
+ substitute(I,...)      substitute in I variables by polynomials
+ subrInterred(i1,i2,iv);interred w.r.t. a subset of variables
+ newtonDiag(f);         Newton diagram of a polynomial
+ hilbPoly(I);           Hilbert polynomial of basering/I
+          (parameters in square brackets [] are optional)
+
+";
+
+LIB "general.lib";
+LIB "ring.lib";
+///////////////////////////////////////////////////////////////////////////////
+static proc bino(int a, int b)
+{
+//computes binomial var(1)+a over b
+   int i;
+   if(b==0){return(1);}
+   poly p=(var(1)+a)/b;
+   for(i=1;i<=b-1;i++)
+   {
+      p=p*(var(1)+a-i)/i;
+   }
+   return(p);
+}
+
+proc hilbPoly(ideal I)
+"USAGE: hilbPoly(I); I a homogeneous ideal
+RETURN: the Hilbert polynomial of basering/I as an intvec v=v_0,...,v_r
+        such that the Hilbert polynomial is (v_0+v_1*t+...v_r*t^r)/r!
+EXAMPLE: example hilbPoly; shows an example
+"
+{
+   def R=basering;
+   if(!attrib(I,"isSB")){I=std(I);}
+   intvec v=hilb(I,2);
+   int s=dim(I);
+   intvec hp;
+   if(s==0){return(hp);}
+   int d=size(v)-2;
+   ring S=0,t,dp;
+   poly p=v[1+d]*bino(s-1-d,s-1);
+   int i;
+   for(i=1;i<=d;i++)
+   {
+      p=p+v[d-i+1]*bino(s-1-d+i,s-1);
+   }
+   int n=1;
+   for(i=2;i<=s-1;i++){n=n*i;}
+   p=n*p;
+   for(i=1;i<=s;i++)
+   {
+      hp[i]=int(leadcoef(p[s-i+1]));
+   }
+   setring R;
+   return(hp);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(b,c,t,h),dp;
+   ideal I=
+   bct-t2h+2th2+h3,
+   bt3-ct3-t4+b2th+c2th-2bt2h+2ct2h+2t3h-bch2-2bth2+2cth2+2th3,
+   b2c2+bt2h-ct2h-t3h+b2h2+2bch2+c2h2-2bth2+2cth2+t2h2-2bh3+2ch3+2th3+3h4,
+   c2t3+ct4-c3th-2c2t2h-2ct3h-t4h+bc2h2-2c2th2-bt2h2+4t3h2+2bth3-2cth3-t2h3
+   +bh4-6th4-2h5;
+   hilbPoly(I);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc substitute (I,list #)
+"USAGE:  - case 1: typeof(#[1])==poly:
+           substitute (I,v,f[,v1,f1,v2,f2,...]); I object of basering which
+           can be mapped, v,v1,v2,.. ring variables, f,f1,f2,... poly
+@*       - case 2: typeof(#[1])==ideal:
+           substitute (I,v,f); I object of basering which can be mapped,
+           v ideal of ring variables, f ideal
+RETURN:  object of same type as I,
+@*       - case 1: ring variable v,v1,v2,... substituted by polynomials
+           f,f1,f2,..., in this order
+@*       - case 2: ring variables in v substituted by polynomials in f:
+           v[i] is substituted by f[i], i=1,...,i=min(size(v),ncols(f))
+NOTE:    this procedure extends the built-in command subst via maps
+EXAMPLE: example substitute; shows an example
+"
+{
+  def bas = basering;
+  ideal m = maxideal(1);
+  int i,ii;
+  if(typeof(#[1])=="poly")
+  {
+    poly v = #[1];
+    poly f = #[2];
+    map phi = bas,m;
+    def J = I;
+    for (ii=1; ii<=size(#) - 1; ii=ii+2)
+    {
+      m = maxideal(1);
+      i=rvar(#[ii]);
+      m[i] = #[ii+1];
+      phi = bas,m;
+      J = phi(J);
+    }
+    return(J);
+  }
+  if(typeof(#[1])=="ideal")
+  {
+    ideal v = #[1];
+    ideal f = #[2];
+    int mi = ncols(v);
+    if(ncols(f)<mi)
+    {
+      mi = ncols(f);
+    }
+    def J = I;
+    for (ii=1; ii<=mi; ii++)
+    {
+      m[rvar(v[ii])]=f[ii];
+    }
+    map phi = bas,m;
+    J = phi(I);
+    return(J);
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(b,c,t),dp;
+   ideal I = -bc+4b2c2t,bc2t-5b2c;
+   substitute(I,c,b+c,t,0,b,b-1);
+   ideal v = c,t,b;
+   ideal f = b+c,0,b-1;
+   substitute(I,v,f);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc cyclic (int n)
+"USAGE:   cyclic(n);  n integer
+RETURN:  ideal of cyclic n-roots from 1-st n variables of basering
+EXAMPLE: example cyclic; shows examples
+"
+{
+//----------------------------- procedure body --------------------------------
+   ideal m = maxideal(1);
+   m = m[1..n],m[1..n];
+   int i,j;
+   ideal s; poly t;
+   for ( j=0; j<=n-2; j++ )
+   {
+      t=0;
+      for( i=1;i<=n;i++ ) { t=t+product(m,i..i+j); }
+      s=s+t;
+   }
+   s=s,product(m,1..n)-1;
+   return (s);
+}
+//-------------------------------- examples -----------------------------------
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(u,v,w,x,y,z),lp;
+   cyclic(nvars(basering));
+   homog(cyclic(5),z);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc katsura
+"USAGE: katsura([n]); n integer
+RETURN: katsura(n) : n-th katsura ideal of
+         (1) newly created and set ring (32003, x(0..n), dp), if
+             nvars(basering) < n
+         (2) basering, if nvars(basering) >= n
+        katsura()  : katsura ideal of basering
+EXAMPLE: example katsura; shows examples
+"
+{
+  int n;
+  if ( size(#) == 1 && typeof(#[1]) == "int")
+  {
+    n = #[1] - 1;
+    while (1)
+    {
+      if (defined(basering))
+      {
+        if (nvars(basering) >= #[1]) {break;}
+      }
+      ring katsura_ring = 32003, x(0..#[1]), dp;
+      keepring katsura_ring;
+      break;
+    }
+  }
+  else
+  {
+    n = nvars(basering) -1;
+  }
+
+  ideal s;
+  int i, j;
+  poly p;
+
+  p = -1;
+  for (i = -n; i <= n; i++)
+  {
+    p = p + kat_var(i, n);
+  }
+  s[1] = p;
+
+  for (i = 0; i < n; i++)
+  {
+    p = -1 * kat_var(i,n);
+    for (j = -n; j <= n; j++)
+    {
+      p = p + kat_var(j,n) * kat_var(i-j, n);
+    }
+    s = s,p;
+  }
+  return (s);
+}
+//-------------------------------- examples -----------------------------------
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r; basering;
+  katsura();
+  katsura(4); basering;
+}
+
+proc kat_var(int i, int n)
+{
+  poly p;
+  if (i < 0)  { i = -i;}
+  if (i <= n) { p = var(i+1); }
+  return (p);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc freerank
+"USAGE:   freerank(M[,any]);  M=poly/ideal/vector/module/matrix
+COMPUTE: rank of module presented by M in case it is free.
+         By definition this is vdim(coker(M)/m*coker(M)) if coker(M)
+         is free, where m is the maximal ideal of the variables of the
+         basering and M is considered to be a matrix.
+         (the 0-module is free of rank 0)
+RETURN:  rank of coker(M) if coker(M) is free and -1 else;
+         in case of a second argument return a list:
+                L[1] = rank of coker(M) or -1
+                L[2] = minbase(M)
+NOTE:    freerank(syz(M)); computes the rank of M if M is free (and -1 else)
+EXAMPLE: example freerank; shows examples
+"
+{
+  int rk;
+  def M = simplify(#[1],10);
+  resolution mre = res(M,2);
+  intmat B = betti(mre);
+  if ( ncols(B)>1 ) { rk = -1; }
+  else { rk = sum(B[1..nrows(B),1]); }
+  if (size(#) == 2) { list L=rk,mre[1]; return(L);}
+  return(rk);
+}
+example
+{"EXAMPLE";   echo=2;
+  ring r;
+  ideal i=x;
+  module M=[x,0,1],[-x,0,-1];
+  freerank(M);          // should be 2, coker(M) is not free
+  freerank(syz (M),"");
+  // [1] should be 1, coker(syz(M))=M is free of rank 1
+  // [2] should be gen(2)+gen(1) (minimal relation of M)
+  freerank(i);
+  freerank(syz(i));     // should be 1, coker(syz(i))=i is free of rank 1
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc is_zero
+"USAGE:   is_zero(M[,any]); M=poly/ideal/vector/module/matrix
+RETURN:  integer, 1 if coker(M)=0 resp. 0 if coker(M)!=0, where M is
+         considered as matrix.
+         If a second argument is given, return a list:
+                L[1] = 1 if coker(M)=0 resp. 0 if coker(M)!=0
+                L[2] = dim(M)
+EXAMPLE: example is_zero; shows examples
+"
+{
+  int d=dim(std(#[1]));
+  int a = ( d==-1 );
+  if( size(#) >1 ) { return(list(a,d)); }
+  return(a);
+}
+example
+{ "EXAMPLE:";   echo=2;
+  ring r;
+  module m = [x],[y],[1,z];
+  is_zero(m,1);
+  qring q = std(ideal(x2+y3+z2));
+  ideal j = x2+y3+z2-37;
+  is_zero(j);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc maxcoef (f)
+"USAGE:   maxcoef(f);  f  poly/ideal/vector/module/matrix
+RETURN:  maximal length of coefficient of f of type int (by measuring the
+         length of the string of each coefficient)
+EXAMPLE: example maxcoef; shows examples
+"
+{
+//----------------------------- procedure body --------------------------------
+   int max,s,ii,jj; string t;
+   ideal i = ideal(matrix(f));
+   i = simplify(i,6);            // delete 0's and keep first of equal elements
+   poly m = var(1); matrix C;
+   for (ii=2;ii<=nvars(basering);ii++) { m = m*var(ii); }
+   for (ii=1; ii<=size(i); ii++)
+   {
+      C = coef(i[ii],m);
+      for (jj=1; jj<=ncols(C); jj++)
+      {
+         t = string(C[2,jj]);  s = size(t);
+         if ( t[1] == "-" ) { s = s - 1; }
+         if ( s > max ) { max = s; }
+      }
+   }
+   return(max);
+}
+//-------------------------------- examples -----------------------------------
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r= 0,(x,y,z),ds;
+   poly g = 345x2-1234567890y+7/4z;
+   maxcoef(g);
+   ideal i = g,10/1234567890;
+   maxcoef(i);
+   // since i[2]=1/123456789
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc maxdeg (id)
+"USAGE:   maxdeg(id);  id  poly/ideal/vector/module/matrix
+RETURN:  int/intmat, each component equals maximal degree of monomials in the
+         corresponding component of id, independent of ring ordering
+         (maxdeg of each var is 1).
+         Of type int, if id is of type poly; of type intmat otherwise
+SEE ALSO: maxdeg1
+EXAMPLE: example maxdeg; shows examples
+"
+{
+   //-------- subprocedure to find maximal degree of given component ----------
+   proc findmaxdeg
+   {
+      poly c = #[1];
+      if (c==0) { return(-1); }
+   //--- guess upper 'o' and lower 'u' bound, in case of negative weights -----
+      int d = (deg(c)>=0)*deg(c)-(deg(c)<0)*deg(c);
+      int i = d;
+      while ( c-jet(c,i) != 0 ) { i = 2*(i+1); }
+      int o = i-1;
+      int u = (d != i)*((i /  2)-1);
+   //----------------------- "quick search" for maxdeg ------------------------
+      while ( (c-jet(c,i)==0)*(c-jet(c,i-1)!=0) == 0)
+      {
+         i = (o+1+u) /  2;
+         if (c-jet(c,i)!=0) { u = i+1; }
+         else { o = i-1; }
+      }
+      return(i);
+   }
+//------------------------------ main program ---------------------------------
+   matrix M = matrix(id);
+   int r,c = nrows(M), ncols(M); int i,j;
+   intmat m[r][c];
+   for (i=r; i>0; i--)
+   {
+      for (j=c; j>0; j--) { m[i,j] = findmaxdeg(M[i,j]); }
+   }
+   if (typeof(id)=="poly") { return(m[1,1]); }
+   return(m);
+}
+//-------------------------------- examples -----------------------------------
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),wp(1,2,3);
+   poly f = x+y2+z3;
+   deg(f);             //deg; returns weighted degree (in case of 1 block)!
+   maxdeg(f);
+   matrix m[2][2]=f+x10,1,0,f^2;
+   maxdeg(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc maxdeg1 (id,list #)
+"USAGE:   maxdeg1(id[,v]);  id=poly/ideal/vector/module/matrix, v=intvec
+RETURN:  integer, maximal [weighted] degree of monomials of id independent of
+         ring ordering, maxdeg1 of i-th variable is v[i] (default: v=1..1).
+NOTE:    This proc returns one integer while maxdeg returns, in general,
+         a matrix of integers. For one polynomial and if no intvec v is given
+         maxdeg is faster
+EXAMPLE: example maxdeg1; shows examples
+"
+{
+   //-------- subprocedure to find maximal degree of given component ----------
+   proc findmaxdeg
+   {
+      poly c = #[1];
+      if (c==0) { return(-1); }
+      intvec v = #[2];
+   //--- guess upper 'o' and lower 'u' bound, in case of negative weights -----
+      int d = (deg(c)>=0)*deg(c)-(deg(c)<0)*deg(c);
+      int i = d;
+      if ( c == jet(c,-1,v))      //case: maxdeg is negative
+      {
+         i = -d;
+         while ( c == jet(c,i,v) ) { i = 2*(i-1); }
+         int o = (d != -i)*((i /  2)+2) - 1;
+         int u = i+1;
+         int e = -1;
+      }
+      else                        //case: maxdeg is nonnegative
+      {
+         while ( c != jet(c,i,v) ) { i = 2*(i+1); }
+         int o = i-1;
+         int u = (d != i)*((i /  2)-1);
+         int e = 1;
+      }
+   //----------------------- "quick search" for maxdeg ------------------------
+      while ( ( c==jet(c,i,v) )*( c!=jet(c,i-1,v) ) == 0 )
+      {
+         i = (o+e+u) /  2;
+         if ( c!=jet(c,i,v) ) { u = i+1; }
+         else { o = i-1; }
+      }
+      return(i);
+   }
+//------------------------------ main program ---------------------------------
+   ideal M = simplify(ideal(matrix(id)),8);   //delete scalar multiples from id
+   int c = ncols(M);
+   int i,n;
+   if( size(#)==0 )
+   {
+      int m = maxdeg(M[c]);
+      for (i=c-1; i>0; i--)
+      {
+          n = maxdeg(M[i]);
+          m = (m>=n)*m + (m<n)*n;             //let m be the maximum of m and n
+      }
+   }
+   else
+   {
+      intvec v=#[1];                          //weight vector for the variables
+      int m = findmaxdeg(M[c],v);
+      for (i=c-1; i>0; i--)
+      {
+         n = findmaxdeg(M[i],v);
+         if( n>m ) { m=n; }
+      }
+   }
+   return(m);
+}
+//-------------------------------- examples -----------------------------------
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),wp(1,2,3);
+   poly f = x+y2+z3;
+   deg(f);            //deg returns weighted degree (in case of 1 block)!
+   maxdeg1(f);
+   intvec v = ringweights(r);
+   maxdeg1(f,v);                        //weighted maximal degree
+   matrix m[2][2]=f+x10,1,0,f^2;
+   maxdeg1(m,v);                        //absolute weighted maximal degree
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc mindeg (id)
+"USAGE:   mindeg(id);  id  poly/ideal/vector/module/matrix
+RETURN:  minimal degree/s of monomials of id, independent of ring ordering
+         (mindeg of each variable is 1) of type int if id of type poly, else
+         of type intmat.
+SEE ALSO: mindeg1
+EXAMPLE: example mindeg; shows examples
+"
+{
+   //--------- subprocedure to find minimal degree of given component ---------
+   proc findmindeg
+   {
+      poly c = #[1];
+      if (c==0) { return(-1); }
+   //--- guess upper 'o' and lower 'u' bound, in case of negative weights -----
+      int d = (ord(c)>=0)*ord(c)-(ord(c)<0)*ord(c);
+      int i = d;
+      while ( jet(c,i) == 0 ) { i = 2*(i+1); }
+      int o = i-1;
+      int u = (d != i)*((i /  2)-1);
+   //----------------------- "quick search" for mindeg ------------------------
+      while ( (jet(c,u)==0)*(jet(c,o)!=0) )
+      {
+         i = (o+u) / 2;
+         if (jet(c,i)==0) { u = i+1; }
+         else { o = i-1; }
+      }
+      if (jet(c,u)!=0) { return(u); }
+      else { return(o+1); }
+   }
+//------------------------------ main program ---------------------------------
+   matrix M = matrix(id);
+   int r,c = nrows(M), ncols(M); int i,j;
+   intmat m[r][c];
+   for (i=r; i>0; i--)
+   {
+      for (j=c; j>0; j--) { m[i,j] = findmindeg(M[i,j]); }
+   }
+   if (typeof(id)=="poly") { return(m[1,1]); }
+   return(m);
+}
+//-------------------------------- examples -----------------------------------
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),ls;
+   poly f = x5+y2+z3;
+   ord(f);                  // ord returns weighted order of leading term!
+   mindeg(f);               // computes minimal degree
+   matrix m[2][2]=x10,1,0,f^2;
+   mindeg(m);               // computes matrix of minimum degrees
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc mindeg1 (id, list #)
+"USAGE:   mindeg1(id[,v]);  id=poly/ideal/vector/module/matrix, v=intvec
+RETURN:  integer, minimal [weighted] degree of monomials of id independent of
+         ring ordering, mindeg1 of i-th variable is v[i] (default v=1..1).
+NOTE:    This proc returns one integer while mindeg returns, in general,
+         a matrix of integers. For one polynomial and if no intvec v is given
+         mindeg is faster.
+EXAMPLE: example mindeg1; shows examples
+"
+{
+   //--------- subprocedure to find minimal degree of given component ---------
+   proc findmindeg
+   {
+      poly c = #[1];
+      intvec v = #[2];
+      if (c==0) { return(-1); }
+   //--- guess upper 'o' and lower 'u' bound, in case of negative weights -----
+      int d = (ord(c)>=0)*ord(c)-(ord(c)<0)*ord(c);
+      int i = d;
+      if ( jet(c,-1,v) !=0 )      //case: mindeg is negative
+      {
+         i = -d;
+         while ( jet(c,i,v) != 0 ) { i = 2*(i-1); }
+         int o = (d != -i)*((i /  2)+2) - 1;
+         int u = i+1;
+         int e = -1; i=u;
+      }
+      else                        //case: inded is nonnegative
+      {
+         while ( jet(c,i,v) == 0 ) { i = 2*(i+1); }
+         int o = i-1;
+         int u = (d != i)*((i /  2)-1);
+         int e = 1; i=u;
+      }
+   //----------------------- "quick search" for mindeg ------------------------
+      while ( (jet(c,i-1,v)==0)*(jet(c,i,v)!=0) == 0 )
+      {
+         i = (o+e+u) /  2;
+         if (jet(c,i,v)==0) { u = i+1; }
+         else { o = i-1; }
+      }
+      return(i);
+   }
+//------------------------------ main program ---------------------------------
+   ideal M = simplify(ideal(matrix(id)),8);   //delete scalar multiples from id
+   int c = ncols(M);
+   int i,n;
+   if( size(#)==0 )
+   {
+      int m = mindeg(M[c]);
+      for (i=c-1; i>0; i--)
+      {
+          n = mindeg(M[i]);
+          m = (m<=n)*m + (m>n)*n;             //let m be the maximum of m and n
+      }
+   }
+   else
+   {
+      intvec v=#[1];                          //weight vector for the variables
+      int m = findmindeg(M[c],v);
+      for (i=c-1; i>0; i--)
+      {
+         n = findmindeg(M[i],v);
+         m = (m<=n)*m + (m>n)*n;              //let m be the maximum of m and n
+      }
+   }
+   return(m);
+}
+//-------------------------------- examples -----------------------------------
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),ls;
+   poly f = x5+y2+z3;
+   ord(f);                  // ord returns weighted order of leading term!
+   intvec v = 1,-3,2;
+   mindeg1(f,v);            // computes minimal weighted degree
+   matrix m[2][2]=x10,1,0,f^2;
+   mindeg1(m,1..3);         // computes absolute minimum of weighted degrees
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc normalize (id)
+"USAGE:   normalize(id);  id=poly/vector/ideal/module
+RETURN:  object of same type
+         each element is normalized with leading coefficient equal to 1
+EXAMPLE: example normalize; shows an example
+"
+{
+   return(simplify(id,1));
+}
+//-------------------------------- examples -----------------------------------
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y,z),ls;
+   poly f = 2x5+3y2+4z3;
+   normalize(f);
+   module m=[9xy,0,3z3],[4z,6y,2x];
+   normalize(m);
+   ring s = 0,(x,y,z),(c,ls);
+   module m=[9xy,0,3z3],[4z,6y,2x];
+   normalize(m);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// Input: <ideal>=<f1,f2,...,fm> and <polynomial> g
+// Question: Does g lie in the radical of <ideal>?
+// Solution: Compute a standard basis G for <f1,f2,...,fm,gz-1> where z is a
+//           new variable. Then g is contained in the radical of <ideal> <=>
+//           1 is generator in G.
+///////////////////////////////////////////////////////////////////////////////
+proc rad_con (poly g,ideal I)
+"USAGE:   rad_con(g,I); g polynomial, I ideal
+RETURN:  1 (TRUE) (type int) if g is contained in the radical of I
+@*       0 (FALSE) (type int) otherwise
+EXAMPLE: example rad_con; shows an example
+"
+{ def br=basering;
+  int n=nvars(br);
+  int dB=degBound;
+  degBound=0;
+  string mp=string(minpoly);
+  if (attrib(br,"global")==1)
+  {
+    execute("ring R=("+charstr(br)+"),(@x(1..n),@z),dp;");
+  }
+  else
+  {
+    execute("ring R=("+charstr(br)+"),(@z,@x(1..n)),(dp(1),"+ordstr(br)+");");
+  }
+  execute("minpoly=number("+mp+");");
+  ideal irrel=@x(1..n);
+  map f=br,irrel;
+  poly p=f(g);
+  ideal J=f(I),ideal(p*@z-1);
+  J=std(J);
+  degBound=dB;
+  if (J[1]==1)
+  {
+     setring br;
+     return(1);
+  }
+  else
+  {
+     setring br;
+     return(0);
+  }
+}
+example
+{ "EXAMPLE:"; echo=2;
+   ring R=0,(x,y,z),dp;
+   ideal I=x2+y2,z2;
+   poly f=x4+y4;
+   rad_con(f,I);
+   ideal J=x2+y2,z2,x4+y4;
+   poly g=z;
+   rad_con(g,I);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc lcm (id, list #)
+"USAGE:   lcm(p[,q]); p int/intvec q a list of integers or
+          p poly/ideal q a list of polynomials
+RETURN:  the least common multiple of p and q:
+@*         - of type int if p is an int/intvec
+@*         - of type poly if p is a poly/ideal
+EXAMPLE: example lcm; shows an example
+"
+{
+  int k,j;
+//------------------------------ integer case --------------------------------
+  if( typeof(id) == "int" or typeof(id) == "intvec" )
+  {
+     intvec i = id;
+     if (size(#)!=0)
+     {
+        for (j = 1; j<=size(#); j++)
+        {
+           if (typeof(#[j]) !="int" and typeof(#[j]) !="intvec")
+           { ERROR("// ** list element must be an integer");}
+           else
+           { i = i,#[j]; }
+        }
+     }
+     int p,q;
+     if( i == 0 )
+     {
+        return(0);
+     }
+     for(j=1;j<=size(i);j++)
+     {
+       if( i[j] != 0 )
+       {
+         p=i[j];
+         break;
+       }
+     }
+     for (k=j+1;k<=size(i);k++)
+     {
+        if( i[k] !=0)
+        {
+           q=gcd(p,i[k]);
+           p=p/q;
+           p=p*i[k];
+        }
+     }
+     if(p <0 )
+     {return(-p);}
+     return(p);
+   }
+
+//----------------------------- polynomial case ------------------------------
+  if( typeof(id) == "poly" or typeof(id) == "ideal" )
+  {
+     ideal i = id;
+     if (size(#)!=0)
+     {
+        for (j = 1; j<=size(#); j++)
+        {
+           if (typeof(#[j]) !="poly" and typeof(#[j]) !="ideal"
+              and typeof(#[j]) !="int" and typeof(#[j]) !="intvec")
+           { ERROR("// ** list element must be a polynomial");}
+           else
+           { i = i,#[j]; }
+        }
+     }
+     poly p,q;
+     i=simplify(i,10);
+     if(size(i) == 0)
+     {
+        return(0);
+     }
+     for(j=1;j<=size(i);j++)
+     {
+       if(maxdeg(i[j])!= 0)
+       {
+         p=i[j];
+         break;
+       }
+     }
+     if(deg(p)==-1)
+     {
+       return(1);
+     }
+     for (k=j+1;k<=size(i);k++)
+     {
+        if(maxdeg(i[k])!=0)
+        {
+           q=gcd(p,i[k]);
+           if(maxdeg(q)==0)
+           {
+                 p=p*i[k];
+           }
+           else
+           {
+              p=p/q;
+              p=p*i[k];
+           }
+        }
+     }
+     return(p);
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),lp;
+   poly  p = (x+y)*(y+z);
+   poly  q = (z4+2)*(y+z);
+   lcm(p,q);
+   ideal i=p,q,y+z;
+   lcm(i,p);
+   lcm(2,3,6);
+   lcm(2..6);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc content(f)
+"USAGE:   content(f); f polynomial/vector
+RETURN:  number, the content (greatest common factor of coefficients)
+         of the polynomial/vector f
+SEE ALSO: cleardenom
+EXAMPLE: example content; shows an example
+"
+{
+  if (f==0) { return(number(1)); }
+  return(leadcoef(f)/leadcoef(cleardenom(f)));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),(c,lp);
+   content(3x2+18xy-27xyz);
+   vector v=[3x2+18xy-27xyz,15x2+12y4,3];
+   content(v);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc numerator(number n)
+"USAGE:    numerator(n); n number
+RETURN:   number, the numerator of n
+SEE ALSO: denominator, content, cleardenom
+EXAMPLE:  example numerator; shows an example
+"
+{
+  poly p = cleardenom(n+var(1));
+  return (number(coeffs(p,var(1))[1,1]));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x, dp;
+  number n = 3/2;
+  numerator(n);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc denominator(number n)
+"USAGE:    denominator(n); n number
+RETURN:   number, the denominator of n
+SEE ALSO: numerator, content, cleardenom
+EXAMPLE:  example denominator; shows an example
+"
+{
+  poly p = cleardenom(n+var(1));
+  return (number(coeffs(p,var(1))[2,1]));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x, dp;
+  number n = 3/2;
+  denominator(n);
+}
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+// The idea of the procedures mod2id, id2mod and subrInterred is, to
+// perform standard basis computation or interreduction of a submodule
+// of a free module with generators gen(1),...,gen(n) over a ring R
+// in a ring R[t1,...,tn]/<ti*tj> with gen(i) maped to ti
+////////////////////////////////////////////////////////////////////////
+
+proc mod2id(matrix M,intvec vpos)
+"USAGE:   mod2id(M,vpos); M matrix, vpos intvec
+ASSUME:  vpos is an integer vector such that gen(i) corresponds
+         to var(vpos[i]).
+         The basering contains variables var(vpos[i]) which do not occur
+         in M.
+RETURN:  ideal I in which each gen(i) from the module is replaced by
+         var(vpos[i]) and all monomials var(vpos[i])*var(vpos[j]) have
+         been added to the generating set of I.
+NOTE:    This procedure should be used in the following situation:
+         one wants to pass to a ring with new variables, say e(1),..,e(s),
+         which correspond to the components gen(1),..,gen(s) of the
+         module M such that e(i)*e(j)=0 for all i,j.
+         The new ring should already exist and be the current ring
+EXAMPLE: example mod2id; shows an example"
+{
+  int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
+//----------------------------------------------------------------------
+// define the ideal generated by the var(vpos[i]) and set up the matrix
+// for the multiplication
+//----------------------------------------------------------------------
+  ideal vars=var(vpos[1]);
+  for(int i=2;i<=size(vpos);i++)
+  {
+    vars=vars,var(vpos[i]);
+  }
+  matrix varm[1][size(vpos)]=vars;
+  if (size(vpos) > nrows(M))
+  {
+    matrix Mt[size(vpos)][ncols(M)];
+    Mt[1..nrows(M),1..ncols(M)]=M;
+    kill M;
+    matrix M=Mt;
+  }
+//----------------------------------------------------------------------
+// define the desired ideal
+//----------------------------------------------------------------------
+  ideal ret=vars^2,varm*M;
+  return(ret);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(e(1),e(2),x,y,z),(dp(2),ds(3));
+  module mo=x*gen(1)+y*gen(2);
+  intvec iv=2,1;
+  mod2id(mo,iv);
+}
+////////////////////////////////////////////////////////////////////////
+
+proc id2mod(ideal i,intvec vpos)
+"USAGE:   id2mod(I,vpos); I ideal, vpos intvec
+RETURN:  module corresponding to the ideal by replacing var(vpos[i]) by
+         gen(i) and omitting all generators var(vpos[i])*var(vpos[j])
+NOTE:    * This procedure only makes sense if the ideal contains
+           all var(vpos[i])*var(vpos[j]) as monomial generators and
+           all other generators of I are linear combinations of the
+           var(vpos[i]) over the ring in the other variables.
+         * This is the inverse procedure to mod2id and should be applied
+           only to ideals created by mod2id using the same intvec vpos
+           (possibly after a standard basis computation)
+EXAMPLE: example id2mod; shows an example"
+{
+  int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
+//---------------------------------------------------------------------
+// Initialization
+//---------------------------------------------------------------------
+  int n=size(i);
+  int v=size(vpos);
+  matrix tempmat;
+  matrix mm[v][n];
+//---------------------------------------------------------------------
+// Conversion
+//---------------------------------------------------------------------
+  for(int j=1;j<=v;j++)
+  {
+    tempmat=coeffs(i,var(vpos[j]));
+    mm[j,1..n]=tempmat[2,1..n];
+  }
+  for(j=1;j<=v;j++)
+  {
+    mm=subst(mm,var(vpos[j]),0);
+  }
+  module ret=simplify(mm,10);
+  return(ret);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(e(1),e(2),x,y,z),(dp(2),ds(3));
+  ideal i=e(2)^2,e(1)*e(2),e(1)^2,e(1)*y+e(2)*x;
+  intvec iv=2,1;
+  id2mod(i,iv);
+}
+///////////////////////////////////////////////////////////////////////
+
+proc subrInterred(ideal mon, ideal sm, intvec iv)
+"USAGE:   subrInterred(mon,sm,iv);
+         sm:   ideal in a ring r with n + s variables,
+               e.g. x_1,..,x_n and t_1,..,t_s
+         mon:  ideal with monomial generators (not divisible by
+               any of the t_i) such that sm is contained in the module
+               k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)]
+         iv:   intvec listing the variables which are supposed to be used
+               as x_i
+RETURN:  list l:
+          l[1]=the monomials from mon in the order used
+          l[2]=their coefficients after interreduction
+          l[3]=l[1]*l[2]
+PURPOSE:  Do interred only w.r.t. a subset of variables.
+         The procedure returns an interreduced system of generators of
+         sm considered as a k[t_1,..,t_s]-submodule of the free module
+         k[t_1,..,t_s]*mon[1]+..+k[t_1,..,t_s]*mon[size(mon)]).
+EXAMPLE: example subrInterred; shows an example
+"
+{
+  int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
+//-----------------------------------------------------------------------
+// check that mon is really generated by monomials
+// and sort its generators with respect to the monomial ordering
+//-----------------------------------------------------------------------
+  int err;
+  for(int i=1;i<=ncols(mon);i++)
+  {
+    if ( size(mon[i]) > 1 )
+    {
+      err=1;
+    }
+  }
+  if (err==1)
+  {
+    ERROR("mon has to be generated by monomials");
+  }
+  intvec sv=sortvec(mon);
+  ideal mons;
+  for(i=1;i<=size(sv);i++)
+  {
+    mons[i]=mon[sv[i]];
+  }
+  ideal itemp=maxideal(1);
+  for(i=1;i<=size(iv);i++)
+  {
+    itemp=subst(itemp,var(iv[i]),0);
+  }
+  itemp=simplify(itemp,10);
+  def r=basering;
+  string tempstr="ring rtemp=" + charstr(basering) + ",(" + string(itemp)
+                               + "),(C,dp);";
+//-----------------------------------------------------------------------
+// express m in terms of the generators of mon and check whether m
+// can be considered as a submodule of k[t_1,..,t_n]*mon
+//-----------------------------------------------------------------------
+  module motemp;
+  motemp[ncols(sm)]=0;
+  poly ptemp;
+  int j;
+  for(i=1;i<=ncols(mons);i++)
+  {
+    for(j=1;j<=ncols(sm);j++)
+    {
+      ptemp=sm[j]/mons[i];
+      motemp[j]=motemp[j]+ptemp*gen(i);
+    }
+  }
+  for(i=1;i<=size(iv);i++)
+  {
+    motemp=subst(motemp,var(iv[i]),0);
+  }
+  matrix monmat[1][ncols(mons)]=mons;
+  ideal dummy=monmat*motemp;
+  for(i=1;i<=size(sm);i++)
+  {
+    if(sm[i]-dummy[i]!=0)
+    {
+      ERROR("the second argument is not a submodule of the assumed structure");
+    }
+  }
+//----------------------------------------------------------------------
+// do the interreduction and convert back
+//----------------------------------------------------------------------
+  execute(tempstr);
+  def motemp=imap(r,motemp);
+  intvec save=option(get);
+  option(redSB);
+  motemp=interred(motemp);
+  option(set,save);
+  setring r;
+  kill motemp;
+  def motemp=imap(rtemp,motemp);
+  //list ret=monmat,motemp,monmat*motemp;
+  module motemp2=motemp;
+  for(i=1;i<=ncols(motemp2);i++)
+  {
+    motemp2[i]=cleardenom(motemp2[i]);
+  }
+  module motemp3=monmat*motemp;
+  for(i=1;i<=ncols(motemp3);i++)
+  {
+    motemp3[i]=cleardenom(motemp3[i]);
+  }
+  list ret=monmat,motemp2,matrix(motemp3);
+  return(ret);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),dp;
+  ideal i=x^2+x*y^2,x*y+x^2*y,z;
+  ideal j=x^2+x*y^2,x*y,z;
+  ideal mon=x^2,z,x*y;
+  intvec iv=1,3;
+  subrInterred(mon,i,iv);
+  subrInterred(mon,j,iv);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// moved here from nctools.lib
+// This procedure calculates the Newton diagram of the polynomial f
+// The output is a intmat M, each row of M is the exp of a monomial in f
+////////////////////////////////////////////////////////////////////////
+proc newtonDiag(poly f)
+"USAGE:  newtonDiag(f); f a poly
+RETURN:  intmat
+PURPOSE: compute the Newton diagram of f
+NOTE:    each row is the exponent of a monomial of f
+EXAMPLE: example newtonDiag; shows examples
+"{
+  int n = nvars(basering);
+  intvec N=0;
+  if ( f != 0 )
+  {
+    while ( f != 0 )
+    {
+      N = N, leadexp(f);
+      f = f-lead(f);
+    }
+  }
+  else
+  {
+    N=N, leadexp(f);
+  }
+  N = N[2..size(N)]; // Deletes the zero added in the definition of T
+  intmat M=intmat(N,(size(N)/n),n); // Conversion from vector to matrix
+  return (M);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r = 0,(x,y,z),lp;
+  poly f = x2y+3xz-5y+3;
+  newtonDiag(f);
+}
+
+////////////////////////////////////////////////////////////////////////

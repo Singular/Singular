@@ -1,0 +1,1842 @@
+//////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Noncommutative";
+info="
+LIBRARY: dmodapp.lib     Applications of algebraic D-modules
+AUTHORS: Viktor Levandovskyy,      levandov@math.rwth-aachen.de
+@*             Daniel Andres, daniel.andres@math.rwth-aachen.de
+
+GUIDE: Let K be a field of characteristic 0, R = K[x1,..xN] and
+@* D be the Weyl algebra in variables x1,..xN,d1,..dN.
+@* In this library there are the following procedures for algebraic D-modules:
+@* - localization of a holonomic module D/I with respect to a mult. closed set
+@* of all powers of a given polynomial F from R. Our aim is to compute an
+@* ideal L in D, such that D/L is a presentation of a localized module. Such L
+@* always exists, since such localizations are known to be holonomic and thus
+@* cyclic modules. The procedures for the localization are DLoc,SDLoc and DLoc0.
+@*
+@* - annihilator in D of a given polynomial F from R as well as
+@* of a given rational function G/F from Quot(R). These can be computed via
+@* procedures annPoly resp. annRat.
+@*
+@* - initial form and initial ideals in Weyl algebras with respect to a given
+@* weight vector can be computed with  inForm, initialMalgrange, initialIdealW.
+@*
+@* - appelF1, appelF2 and appelF4 return ideals in parametric Weyl algebras,
+@* which annihilate corresponding Appel hypergeometric functions.
+
+REFERENCES:
+@* (SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric
+@*         Differential Equations', Springer, 2000
+@* (ONW) Oaku, Takayama, Walther 'A Localization Algorithm for D-modules', 2000
+
+MAIN PROCEDURES:
+
+annPoly(f);   annihilator of a polynomial f in the corr. Weyl algebra
+annRat(f,g);  annihilator of a rational function f/g in the corr. Weyl algebra
+DLoc(I,F);     presentation of the localization of D/I w.r.t. f^s
+SDLoc(I, F);  a generic presentation of the localization of D/I w.r.t. f^s
+DLoc0(I, F);  presentation of the localization of D/I w.r.t. f^s, based on SDLoc
+
+initialMalgrange(f[,s,t,v]); Groebner basis of the initial Malgrange ideal for f
+initialIdealW(I,u,v[,s,t]); initial ideal of a given ideal w.r.t. given weights
+inForm(f,w);     initial form of a poly/ideal w.r.t. a given weight
+isFsat(I, F);       check whether the ideal I is F-saturated
+
+AUXILIARY PROCEDURES:
+
+bFactor(F);  computes the roots of irreducible factors of an univariate poly
+appelF1();      create an ideal annihilating Appel F1 function
+appelF2();      create an ideal annihilating Appel F2 function
+appelF4();      create an ideal annihilating Appel F4 function
+engine(I,i);     computes a Groebner basis with the algorithm given by i
+poly2list(f);   decompose a polynomial into a list of terms and exponents
+fl2poly(L,s);  reconstruct a monic univariate polynomial from its factorization
+insertGenerator(id,p[,k]); insert an element into an ideal/module
+deleteGenerator(id,k); delete the k-th element from an ideal/module
+
+
+SEE ALSO: dmod_lib, gmssing_lib, bfun_lib
+";
+
+LIB "poly.lib";
+LIB "sing.lib";
+LIB "primdec.lib";
+LIB "dmod.lib";    // loads e.g. nctools.lib
+LIB "bfun.lib";    //formerly LIB "bfct.lib";
+LIB "nctools.lib"; // for isWeyl etc
+LIB "gkdim.lib";
+
+// todo: complete and include into above list
+// charVariety(I);       compute the characteristic variety of the ideal I
+// charInfo(); ???
+
+
+///////////////////////////////////////////////////////////////////////////////
+// testing for consistency of the library:
+proc testdmodapp()
+{
+  example initialIdealW;
+  example initialMalgrange;
+  example DLoc;
+  example DLoc0;
+  example SDLoc;
+  example inForm;
+  example isFsat;
+  example annRat;
+  example annPoly;
+  example appelF1;
+  example appelF2;
+  example appelF4;
+  example poly2list;
+  example fl2poly;
+  example insertGenerator;
+  example deleteGenerator;
+  example bFactor;
+}
+
+proc inForm (ideal I, intvec w)
+"USAGE:  inForm(I,w);  I ideal, w intvec
+RETURN:  the initial form of I w.r.t. the weight vector w
+PURPOSE: computes the initial form of an ideal w.r.t. a given weight vector
+NOTE:  the size of the weight vector must be equal to the number of variables
+@*     of the basering.
+EXAMPLE: example inForm; shows examples
+"
+{
+  if (size(w) != nvars(basering))
+  {
+    ERROR("weight vector has wrong dimension");
+  }
+  if (I == 0)
+  {
+    return(I);
+  }
+  int j,i,s,m;
+  list l;
+  poly g;
+  ideal J;
+  for (j=1; j<=ncols(I); j++)
+  {
+    l = poly2list(I[j]);
+    m = scalarProd(w,l[1][1]);
+    g = l[1][2];
+    for (i=2; i<=size(l); i++)
+    {
+      s = scalarProd(w,l[i][1]);
+      if (s == m)
+      {
+        g = g + l[i][2];
+      }
+      else
+      {
+        if (s > m)
+        {
+          m = s;
+          g = l[i][2];
+        }
+      }
+    }
+    J[j] = g;
+  }
+  return(J);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring @D = 0,(x,y,Dx,Dy),dp;
+  def D = Weyl();
+  setring D;
+  poly F = 3*x^2*Dy+2*y*Dx;
+  poly G = 2*x*Dx+3*y*Dy+6;
+  ideal I = F,G;
+  intvec w1 = -1,-1,1,1;
+  intvec w2 = -1,-2,1,2;
+  intvec w3 = -2,-3,2,3;
+  inForm(I,w1);
+  inForm(I,w2);
+  inForm(I,w3);
+}
+
+/*
+
+proc charVariety(ideal I)
+"USAGE:  charVariety(I);  I an ideal
+RETURN:  ring
+PURPOSE: compute the characteristic variety of a D-module D/I
+STATUS: experimental, todo
+ASSUME: the ground ring is the Weyl algebra with x's before d's
+NOTE:    activate the output ring with the @code{setring} command.
+@*       In the output (in a commutative ring):
+@*       - the ideal CV is the characteristic variety char(I)
+@*       If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
+EXAMPLE: example charVariety; shows examples
+"
+{
+  // 1. introduce the weights 0, 1
+  def save = basering;
+  list LL = ringlist(save);
+  list L;
+  int i;
+  for(i=1;i<=4;i++)
+  {
+    L[i] = LL[i];
+  }
+  list OLD = L[3];
+  list NEW; list tmp;
+  tmp[1] = "a";  // string
+  intvec iv;
+  int N = nvars(basering); N = N div 2;
+  for(i=N+1; i<=2*N; i++)
+  {
+    iv[i] = 1;
+  }
+  tmp[2] = iv;
+  NEW[1] = tmp;
+  for (i=2; i<=size(OLD);i++)
+  {
+    NEW[i] = OLD[i-1];
+  }
+  L[3] = NEW;
+  list ncr =ncRelations(save);
+  matrix @C = ncr[1];
+  matrix @D = ncr[2];
+  def @U = ring(L);
+  // 2. create the commutative ring
+  setring save;
+  list CL;
+  for(i=1;i<=4;i++)
+  {
+    CL[i] = L[i];
+  }
+  CL[3] = OLD;
+  def @CU = ring(CL);
+  // comm ring is ready
+  setring @U;
+  // make @U noncommutative
+  matrix @C = imap(save,@C);
+  matrix @D = imap(save,@D);
+  def @@U = nc_algebra(@C,@D);
+  setring @@U; kill @U;
+  // 2. compute Groebner basis
+  ideal I = imap(save,I);
+  //  I = groebner(I);
+  I = slimgb(I); // a bug?
+  setring @CU;
+  ideal CV = imap(@@U,I);
+  //  CV = groebner(CV); // cosmetics
+  CV = slimgb(CV);
+  export CV;
+  return(@CU);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),Dp;
+  poly F = x3-y2;
+  printlevel = 0;
+  def A  = annfs(F);
+  setring A; // Weyl algebra
+  LD; // the ideal
+  def CA = charVariety(LD);
+  setring CA;
+  CV;
+  dim(CV);
+}
+
+/*
+
+// TODO
+
+/*
+proc charInfo(ideal I)
+"USAGE:  charInfo(I);  I an ideal
+RETURN:  ring
+STATUS: experimental, todo
+PURPOSE: compute the characteristic information for I
+ASSUME: the ground ring is the Weyl algebra with x's before d's
+NOTE:    activate the output ring with the @code{setring} command.
+@*       In the output (in a commutative ring):
+@*       - the ideal CV is the characteristic variety char(I)
+@*       - the ideal SL is the singular locus of char(I)
+@*       - the list PD is the primary decomposition of char(I)
+@*       If @code{printlevel}=1, progress debug messages will be printed,
+@*       if @code{printlevel}>=2, all the debug messages will be printed.
+EXAMPLE: example annfs; shows examples
+"
+{
+  def save = basering;
+  def @A = charVariety(I);
+  setring @A;
+  // run slocus
+  // run primdec
+}
+*/
+
+
+proc appelF1()
+"USAGE:  appelF1();
+RETURN:  ring  (and exports an ideal into it)
+PURPOSE: define the ideal in a parametric Weyl algebra,
+@* which annihilates Appel F1 hypergeometric function
+NOTE: the ideal called  IAppel1 is exported to the output ring
+EXAMPLE: example appelF1; shows examples
+"
+{
+  // Appel F1, d = b', SST p.48
+  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,1,0),dp);
+  matrix @D[4][4];
+  @D[1,3]=1; @D[2,4]=1;
+  def @S = nc_algebra(1,@D);
+  setring @S;
+  ideal IAppel1 =
+    (x*Dx)*(x*Dx+y*Dy+c-1) - x*(x*Dx+y*Dy+a)*(x*Dx+b),
+    (y*Dy)*(x*Dx+y*Dy+c-1) - y*(x*Dx+y*Dy+a)*(y*Dy+d),
+    (x-y)*Dx*Dy - d*Dx + b*Dy;
+  export IAppel1;
+  kill @r;
+  return(@S);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  def A = appelF1();
+  setring A;
+  IAppel1;
+}
+
+proc appelF2()
+"USAGE:  appelF2();
+RETURN:  ring (and exports an ideal into it)
+PURPOSE: define the ideal in a parametric Weyl algebra,
+@* which annihilates Appel F2 hypergeometric function
+NOTE: the ideal called  IAppel2 is exported to the output ring
+EXAMPLE: example appelF2; shows examples
+"
+{
+  // Appel F2, c = b', SST p.85
+  ring @r = (0,a,b,c),(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,1,0),dp);
+  matrix @D[4][4];
+  @D[1,3]=1; @D[2,4]=1;
+  def @S = nc_algebra(1,@D);
+  setring @S;
+  ideal IAppel2 =
+    (x*Dx)^2 - x*(x*Dx+y*Dy+a)*(x*Dx+b),
+    (y*Dy)^2 - y*(x*Dx+y*Dy+a)*(y*Dy+c);
+  export IAppel2;
+  kill @r;
+  return(@S);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  def A = appelF2();
+  setring A;
+  IAppel2;
+}
+
+proc appelF4()
+"USAGE:  appelF4();
+RETURN:  ring  (and exports an ideal into it)
+PURPOSE: define the ideal in a parametric Weyl algebra,
+@* which annihilates Appel F4 hypergeometric function
+NOTE: the ideal called  IAppel4 is exported to the output ring
+EXAMPLE: example appelF4; shows examples
+"
+{
+  // Appel F4, d = c', SST, p. 39
+  ring @r = (0,a,b,c,d),(x,y,Dx,Dy),(a(0,0,1,1),a(0,0,1,0),dp);
+  matrix @D[4][4];
+  @D[1,3]=1; @D[2,4]=1;
+  def @S = nc_algebra(1,@D);
+  setring @S;
+  ideal IAppel4 =
+    Dx*(x*Dx+c-1) - (x*Dx+y*Dy+a)*(x*Dx+y*Dy+b),
+    Dy*(y*Dy+d-1) - (x*Dx+y*Dy+a)*(x*Dx+y*Dy+b);
+  export IAppel4;
+  kill @r;
+  return(@S);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  def A = appelF4();
+  setring A;
+  IAppel4;
+}
+
+proc poly2list (poly f)
+"USAGE:  poly2list(f); f a poly
+RETURN:  list of exponents and corresponding terms of f
+PURPOSE: convert a polynomial to a list of exponents and corresponding terms
+EXAMPLE: example poly2list; shows examples
+"
+{
+  list l;
+  int i = 1;
+  if (f == 0) // just for the zero polynomial
+  {
+    l[1] = list(leadexp(f), lead(f));
+  }
+  else { l[size(f)] = list(); } // memory pre-allocation
+  while (f != 0)
+  {
+    l[i] = list(leadexp(f), lead(f));
+    f = f - lead(f);
+    i++;
+  }
+  return(l);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,x,dp;
+  poly F = x;
+  poly2list(F);
+  ring r2 = 0,(x,y),dp;
+  poly F = x2y+x*y2;
+  poly2list(F);
+}
+
+proc isFsat(ideal I, poly F)
+"USAGE:  isFsat(I, F);  I an ideal, F a poly
+RETURN: int
+PURPOSE: check whether the ideal I is F-saturated
+NOTE:    1 is returned if I is F-saturated, otherwise 0 is returned.
+@*   we check indeed that Ker(D --F--> D/I) is (0)
+EXAMPLE: example isFsat; shows examples
+"
+{
+  /* checks whether I is F-saturated, that is Ke  (D -F-> D/I) is 0 */
+  /* works in any algebra */
+  /*  for simplicity : later check attrib */
+  /* returns -1 if true */
+  if (attrib(I,"isSB")!=1)
+  {
+    I = groebner(I);
+  }
+  matrix @M = matrix(I);
+  matrix @F[1][1] = F;
+  module S = modulo(@F,@M);
+  S = NF(S,I);
+  S = groebner(S);
+  return( (gkdim(S) == -1) );
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  poly G = x*(x-y)*y;
+  def A = annfs(G);
+  setring A;
+  poly F = x3-y2;
+  isFsat(LD,F);
+  ideal J = LD*F;
+  isFsat(J,F);
+}
+
+proc DLoc(ideal I, poly F)
+"USAGE:  DLoc(I, F);  I an ideal, F a poly
+RETURN: nothing (exports objects instead)
+ASSUME: the basering is a Weyl algebra
+PURPOSE: compute the presentation of the localization of D/I w.r.t. f^s
+NOTE:    In the basering, the following objects are exported:
+@* the ideal LD0 (in Groebner basis) is the presentation of the localization
+@* the list BS contains roots with multiplicities of Bernstein polynomial of (D/I)_f.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example DLoc; shows examples
+"
+{
+  /* runs SDLoc and DLoc0 */
+  /* assume: run from Weyl algebra */
+  if (dmodappassumeViolation())
+  {
+    ERROR("Basering is inappropriate: characteristic>0 or qring present");
+  }
+  if (!isWeyl())
+  {
+    ERROR("Basering is not a Weyl algebra");
+  }
+  if (defined(LD0) || defined(BS))
+  {
+    ERROR("Reserved names LD0 and/or BS are used. Please rename the objects.");
+  }
+  int old_printlevel = printlevel;
+  printlevel=printlevel+1;
+  def @R = basering;
+  def @R2 = SDLoc(I,F);
+  setring @R2;
+  poly F = imap(@R,F);
+  def @R3 = DLoc0(LD,F);
+  setring @R3;
+  ideal bs = BS[1];
+  intvec m = BS[2];
+  setring @R;
+  ideal LD0 = imap(@R3,LD0);
+  export LD0;
+  ideal bs = imap(@R3,bs);
+  list BS; BS[1] = bs; BS[2] = m;
+  export BS;
+  kill @R3;
+  printlevel = old_printlevel;
+}
+example;
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,Dx,Dy),dp;
+  def R = Weyl();    setring R; // Weyl algebra in variables x,y,Dx,Dy
+  poly F = x2-y3;
+  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F;
+  // I is not holonomic, since its dimension is not 4/2=2
+  gkdim(I);
+  DLoc(I, x2-y3); // exports LD0 and BS
+  LD0; // localized module (R/I)_f is isomorphic to R/LD0
+  BS; // description of b-function for localization
+}
+
+proc DLoc0(ideal I, poly F)
+"USAGE:  DLoc0(I, F);  I an ideal, F a poly
+RETURN:  ring
+PURPOSE: compute the presentation of the localization of D/I w.r.t. f^s,
+@*           where D is a Weyl Algebra, based on the output of procedure SDLoc
+ASSUME: the basering is similar to the output ring of SDLoc procedure
+NOTE:    activate this ring with the @code{setring} command. In this ring,
+@* the ideal LD0 (in Groebner basis) is the presentation of the localization
+@* the list BS contains roots and multiplicities of Bernstein polynomial of (D/I)_f.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example DLoc0; shows examples
+"
+{
+  if (dmodappassumeViolation())
+  {
+    ERROR("Basering is inappropriate: characteristic>0 or qring present");
+  }
+  /* assume: to be run in the output ring of SDLoc */
+  /* doing: add F, eliminate vars*Dvars, factorize BS */
+  /* analogue to annfs0 */
+  def @R2 = basering;
+  // we're in D_n[s], where the elim ord for s is set
+  ideal J = NF(I,std(F));
+  // make leadcoeffs positive
+  int i;
+  for (i=1; i<= ncols(J); i++)
+  {
+    if (leadcoef(J[i]) <0 )
+    {
+      J[i] = -J[i];
+    }
+  }
+  J = J,F;
+  ideal M = groebner(J);
+  int Nnew = nvars(@R2);
+  ideal K2 = nselect(M,1..Nnew-1);
+  int ppl = printlevel-voice+2;
+  dbprint(ppl,"// -1-1- _x,_Dx are eliminated in basering");
+  dbprint(ppl-1, K2);
+  // the ring @R3 and the search for minimal negative int s
+  ring @R3 = 0,s,dp;
+  dbprint(ppl,"// -2-1- the ring @R3 = K[s] is ready");
+  ideal K3 = imap(@R2,K2);
+  poly p = K3[1];
+  dbprint(ppl,"// -2-2- attempt the factorization");
+  list PP = factorize(p);          //with constants and multiplicities
+  ideal bs; intvec m;             //the Bernstein polynomial is monic, so we are not interested in constants
+  for (i=2; i<= size(PP[1]); i++)  //we delete P[1][1] and P[2][1]
+  {
+    bs[i-1] = PP[1][i];
+    m[i-1]  = PP[2][i];
+  }
+  ideal bbs; int srat=0; int HasRatRoots = 0;
+  int sP;
+  for (i=1; i<= size(bs); i++)
+  {
+    if (deg(bs[i]) == 1)
+    {
+      bbs = bbs,bs[i];
+    }
+  }
+  if (size(bbs)==0)
+  {
+    dbprint(ppl-1,"// -2-3- factorization: no rational roots");
+    //    HasRatRoots = 0;
+    HasRatRoots = 1; // s0 = -1 then
+    sP = -1;
+    // todo: return ideal with no subst and a b-function unfactorized
+  }
+  else
+  {
+    // exist rational roots
+    dbprint(ppl-1,"// -2-3- factorization: rational roots found");
+    HasRatRoots = 1;
+    //    dbprint(ppl-1,bbs);
+    bbs = bbs[2..ncols(bbs)];
+    ideal P = bbs;
+    dbprint(ppl-1,P);
+    srat = size(bs) - size(bbs);
+    // define minIntRoot on linear factors or find out that it doesn't exist
+    intvec vP;
+    number nP;
+    P = normalize(P); // now leadcoef = 1
+    P = lead(P)-P;
+    sP = size(P);
+    int cnt = 0;
+    for (i=1; i<=sP; i++)
+    {
+      nP = leadcoef(P[i]);
+      if ( (nP - int(nP)) == 0 )
+      {
+        cnt++;
+        vP[cnt] = int(nP);
+      }
+    }
+//     if ( size(vP)>=2 )
+//     {
+//       vP = vP[2..size(vP)];
+//     }
+    if ( size(vP)==0 )
+    {
+      // no roots!
+      dbprint(ppl,"// -2-4- no integer root, setting s0 = -1");
+      sP = -1;
+      //      HasRatRoots = 0; // older stuff, here we do substitution
+      HasRatRoots = 1;
+    }
+    else
+    {
+      HasRatRoots = 1;
+      sP = -Max(-vP);
+      dbprint(ppl,"// -2-4- minimal integer root found");
+      dbprint(ppl-1, sP);
+      //    int sP = minIntRoot(bbs,1);
+//       P =  normalize(P);
+//       bs = -subst(bs,s,0);
+      if (sP >=0)
+      {
+        dbprint(ppl,"// -2-5- nonnegative root, setting s0 = -1");
+        sP = -1;
+      }
+      else
+      {
+        dbprint(ppl,"// -2-5- the root is negative");
+      }
+    }
+  }
+
+  if (HasRatRoots)
+  {
+    setring @R2;
+    K2 = subst(I,s,sP);
+    // IF min int root exists ->
+    // create the ordinary Weyl algebra and put the result into it,
+    // thus creating the ring @R5
+    // ELSE : return the same ring with new objects
+    // keep: N, i,j,s, tmp, RL
+    Nnew = Nnew - 1; // former 2*N;
+    // list RL = ringlist(save);  // is defined earlier
+    //  kill Lord, tmp, iv;
+    list L = 0;
+    list Lord, tmp;
+    intvec iv;
+    list RL = ringlist(basering);
+    L[1] = RL[1];
+    L[4] = RL[4];  //char, minpoly
+    // check whether vars have admissible names -> done earlier
+    // list Name = RL[2]M
+    // DName is defined earlier
+    list NName; // = RL[2]; // skip the last var 's'
+    for (i=1; i<=Nnew; i++)
+    {
+      NName[i] =  RL[2][i];
+    }
+    L[2] = NName;
+    // dp ordering;
+    string s = "iv=";
+    for (i=1; i<=Nnew; i++)
+    {
+      s = s+"1,";
+    }
+    s[size(s)] = ";";
+    execute(s);
+    tmp     = 0;
+    tmp[1]  = "dp";  // string
+    tmp[2]  = iv;  // intvec
+    Lord[1] = tmp;
+    kill s;
+    tmp[1]  = "C";
+    iv = 0;
+    tmp[2]  = iv;
+    Lord[2] = tmp;
+    tmp     = 0;
+    L[3]    = Lord;
+    // we are done with the list
+    // Add: Plural part
+    def @R4@ = ring(L);
+    setring @R4@;
+    int N = Nnew/2;
+    matrix @D[Nnew][Nnew];
+    for (i=1; i<=N; i++)
+    {
+      @D[i,N+i]=1;
+    }
+    def @R4 = nc_algebra(1,@D);
+    setring @R4;
+    kill @R4@;
+    dbprint(ppl,"// -3-1- the ring @R4 is ready");
+    dbprint(ppl-1, @R4);
+    ideal K4 = imap(@R2,K2);
+    intvec vopt = option(get);
+    option(redSB);
+    dbprint(ppl,"// -3-2- the final cosmetic std");
+    K4 = groebner(K4);  // std does the job too
+    option(set,vopt);
+    // total cleanup
+    setring @R2;
+    ideal bs = imap(@R3,bs);
+    bs = -normalize(bs); // "-" for getting correct coeffs!
+    bs = subst(bs,s,0);
+    kill @R3;
+    setring @R4;
+    ideal bs = imap(@R2,bs); // only rationals are the entries
+    list BS; BS[1] = bs; BS[2] = m;
+    export BS;
+    //    list LBS = imap(@R3,LBS);
+    //    list BS; BS[1] = sbs; BS[2] = m;
+    //    BS;
+    //    export BS;
+    ideal LD0 = K4;
+    export LD0;
+    return(@R4);
+  }
+  else
+  {
+    /* SHOULD NEVER GET THERE */
+    /* no rational/integer roots */
+    /* return objects in the copy of current ring */
+    setring @R2;
+    ideal LD0 = I;
+    poly BS = normalize(K2[1]);
+    export LD0;
+    export BS;
+    return(@R2);
+  }
+}
+example;
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,Dx,Dy),dp;
+  def R = Weyl();    setring R; // Weyl algebra in variables x,y,Dx,Dy
+  poly F = x2-y3;
+  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F;
+  // moreover I is not holonomic, since its dimension is not 2 = 4/2
+  gkdim(I); // 3
+  def W = SDLoc(I,F);  setring W; // creates ideal LD in W = R[s]
+  def U = DLoc0(LD, x2-y3);  setring U; // compute in R
+  LD0; // Groebner basis of the presentation of localization
+  BS; // description of b-function for localization
+}
+
+
+proc SDLoc(ideal I, poly F)
+"USAGE:  SDLoc(I, F);  I an ideal, F a poly
+RETURN:  ring
+PURPOSE: compute a generic presentation of the localization of D/I w.r.t. f^s
+ASSUME: the basering D is a Weyl algebra
+NOTE:    activate this ring with the @code{setring} command. In this ring,
+@*  the ideal LD (in Groebner basis) is the presentation of the localization
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example SDLoc; shows examples
+"
+{
+  /* analogue to Sannfs */
+  /* printlevel >=4 gives debug info */
+  /* assume: we're in the Weyl algebra D  in x1,x2,...,d1,d2,... */
+
+  if (dmodappassumeViolation())
+  {
+    ERROR("Basering is inappropriate: characteristic>0 or qring present");
+  }
+  if (!isWeyl())
+  {
+    ERROR("Basering is not a Weyl algebra");
+  }
+  def save = basering;
+  /* 1. create D <t, dt, s > as in LOT */
+  /* ordering: eliminate t,dt */
+  int ppl = printlevel-voice+2;
+  int N = nvars(save); N = N div 2;
+  int Nnew = 2*N + 3; // t,Dt,s
+  int i,j;
+  string s;
+  list RL = ringlist(save);
+  list L, Lord;
+  list tmp;
+  intvec iv;
+  L[1] = RL[1]; // char
+  L[4] = RL[4]; // char, minpoly
+  // check whether vars have admissible names
+  list Name  = RL[2];
+  list RName;
+  RName[1] = "@t";
+  RName[2] = "@Dt";
+  RName[3] = "@s";
+  for(i=1;i<=N;i++)
+  {
+    for(j=1; j<=size(RName);j++)
+    {
+      if (Name[i] == RName[j])
+      {
+        ERROR("Variable names should not include @t,@Dt,@s");
+      }
+    }
+  }
+  // now, create the names for new vars
+  tmp    =  0;
+  tmp[1] = "@t";
+  tmp[2] = "@Dt";
+  list SName ; SName[1] = "@s";
+  list NName = tmp + Name + SName;
+  L[2]   = NName;
+  tmp    = 0;
+  kill NName;
+  // block ord (a(1,1),dp);
+  tmp[1]  = "a"; // string
+  iv      = 1,1;
+  tmp[2]  = iv; //intvec
+  Lord[1] = tmp;
+  // continue with dp 1,1,1,1...
+  tmp[1]  = "dp"; // string
+  s       = "iv=";
+  for(i=1;i<=Nnew;i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)]= ";";
+  execute(s);
+  tmp[2]    = iv;
+  Lord[2]   = tmp;
+  tmp[1]    = "C";
+  iv        = 0;
+  tmp[2]    = iv;
+  Lord[3]   = tmp;
+  tmp       = 0;
+  L[3]      = Lord;
+  // we are done with the list
+  def @R@ = ring(L);
+  setring @R@;
+  matrix @D[Nnew][Nnew];
+  @D[1,2]=1;
+  for(i=1; i<=N; i++)
+  {
+    @D[2+i,N+2+i]=1;
+  }
+  // ADD [s,t]=-t, [s,Dt]=Dt
+  @D[1,Nnew] = -var(1);
+  @D[2,Nnew] = var(2);
+  def @R = nc_algebra(1,@D);
+  setring @R;
+  kill @R@;
+  dbprint(ppl,"// -1-1- the ring @R(@t,@Dt,_x,_Dx,@s) is ready");
+  dbprint(ppl-1, @R);
+  poly  F = imap(save,F);
+  ideal I = imap(save,I);
+  dbprint(ppl-1, "the ideal after map:");
+  dbprint(ppl-1, I);
+  poly p = 0;
+  for(i=1; i<=N; i++)
+  {
+    p = diff(F,var(2+i))*@Dt + var(2+N+i);
+    dbprint(ppl-1, p);
+    I = subst(I,var(2+N+i),p);
+    dbprint(ppl-1, var(2+N+i));
+    p = 0;
+  }
+  I = I, @t - F;
+  // t*Dt + s +1 reduced with t-f gives f*Dt + s
+  I = I, F*var(2) + var(Nnew); // @s
+  // -------- the ideal I is ready ----------
+  dbprint(ppl,"// -1-2- starting the elimination of @t,@Dt in @R");
+  dbprint(ppl-1, I);
+  //  ideal J = engine(I,eng);
+  ideal J = groebner(I);
+  dbprint(ppl-1,"// -1-2-1- result of the  elimination of @t,@Dt in @R");
+  dbprint(ppl-1, J);;
+  ideal K = nselect(J,1..2);
+  dbprint(ppl,"// -1-3- @t,@Dt are eliminated");
+  dbprint(ppl-1, K);  // K is without t, Dt
+  K = groebner(K);  // std does the job too
+  // now, we must change the ordering
+  // and create a ring without t, Dt
+  setring save;
+  // ----------- the ring @R3 ------------
+  // _x, _Dx,s;  elim.ord for _x,_Dx.
+  // keep: N, i,j,s, tmp, RL
+  Nnew = 2*N+1;
+  kill Lord, tmp, iv, RName;
+  list Lord, tmp;
+  intvec iv;
+  L[1] = RL[1];
+  L[4] = RL[4];  // char, minpoly
+  // check whether vars hava admissible names -> done earlier
+  // now, create the names for new var
+  tmp[1] = "s";
+  list NName = Name + tmp;
+  L[2] = NName;
+  tmp = 0;
+  // block ord (dp(N),dp);
+  // string s is already defined
+  s = "iv=";
+  for (i=1; i<=Nnew-1; i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)]=";";
+  execute(s);
+  tmp[1] = "dp";  // string
+  tmp[2] = iv;   // intvec
+  Lord[1] = tmp;
+  // continue with dp 1,1,1,1...
+  tmp[1] = "dp";  // string
+  s[size(s)] = ",";
+  s = s+"1;";
+  execute(s);
+  kill s;
+  kill NName;
+  tmp[2]      = iv;
+  Lord[2]     = tmp;
+  tmp[1]      = "C";  iv  = 0;  tmp[2]=iv;
+  Lord[3]     = tmp;  tmp = 0;
+  L[3]        = Lord;
+  // we are done with the list. Now add a Plural part
+  def @R2@ = ring(L);
+  setring @R2@;
+  matrix @D[Nnew][Nnew];
+  for (i=1; i<=N; i++)
+  {
+    @D[i,N+i]=1;
+  }
+  def @R2 = nc_algebra(1,@D);
+  setring @R2;
+  kill @R2@;
+  dbprint(ppl,"//  -2-1- the ring @R2(_x,_Dx,s) is ready");
+  dbprint(ppl-1, @R2);
+  ideal MM = maxideal(1);
+  MM = 0,s,MM;
+  map R01 = @R, MM;
+  ideal K = R01(K);
+  // total cleanup
+  ideal LD = K;
+  // make leadcoeffs positive
+  for (i=1; i<= ncols(LD); i++)
+  {
+    if (leadcoef(LD[i]) <0 )
+    {
+      LD[i] = -LD[i];
+    }
+  }
+  export LD;
+  kill @R;
+  return(@R2);
+}
+example;
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,Dx,Dy),dp;
+  def R = Weyl(); // Weyl algebra on the variables x,y,Dx,Dy
+  setring R;
+  poly F = x2-y3;
+  ideal I = Dx*F, Dy*F;
+  // note, that I is not holonomic, since it's dimension is not 2
+  gkdim(I); // 3, while dim R = 4
+  def W = SDLoc(I,F);
+  setring W; // = R[s], where s is a new variable
+  LD; // Groebner basis of s-parametric presentation
+}
+
+proc annRat(poly g, poly f)
+"USAGE:  annRat(g,f);  f, g polynomials
+RETURN:  ring
+PURPOSE: compute the annihilator of the rational function g/f in the Weyl algebra D
+NOTE: activate the output ring with the @code{setring} command.
+@*      In the output ring, the ideal LD (in Groebner basis) is the annihilator.
+@*      The algorithm uses the computation of ann f^{-1} via D-modules.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+SEE ALSO: annPoly
+EXAMPLE: example annRat; shows examples
+"
+{
+
+  if (dmodappassumeViolation())
+  {
+    ERROR("Basering is inappropriate: characteristic>0 or qring present");
+  }
+
+  // assumptions: f is not a constant
+  if (f==0) { ERROR("Denominator cannot be zero"); }
+  if (leadexp(f) == 0)
+  {
+    // f = const, so use annPoly
+    g = g/f;
+    def @R = annPoly(g);
+    return(@R);
+  }
+    // computes the annihilator of g/f
+  def save = basering;
+  int ppl = printlevel-voice+2;
+  dbprint(ppl,"// -1-[annRat] computing the ann f^s");
+  def  @R1 = SannfsBM(f);
+  setring @R1;
+  poly f = imap(save,f);
+  int i,mir;
+  int isr = 0; // checkRoot1(LD,f,1); // roots are negative, have to enter positive int
+  if (!isr)
+  {
+    // -1 is not the root
+    // find the m.i.r iteratively
+    mir = 0;
+    for(i=nvars(save)+1; i>=1; i--)
+    {
+      isr =  checkRoot1(LD,f,i);
+      if (isr) { mir =-i; break; }
+    }
+    if (mir ==0)
+    {
+      "No integer root found! Aborting computations, inform the authors!";
+      return(0);
+    }
+    // now mir == i is m.i.r.
+  }
+  else
+  {
+    // -1 is the m.i.r
+    mir = -1;
+  }
+  dbprint(ppl,"// -2-[annRat] the minimal integer root is ");
+  dbprint(ppl-1, mir);
+  // use annfspecial
+  dbprint(ppl,"// -3-[annRat] running annfspecial ");
+  ideal AF = annfspecial(LD,f,mir,-1); // ann f^{-1}
+  //  LD = subst(LD,s,j);
+  //  LD = engine(LD,0);
+  // modify the ring: throw s away
+  // output ring comes from SannfsBM
+  list U = ringlist(@R1);
+  list tmp; // variables
+  for(i=1; i<=size(U[2])-1; i++)
+  {
+    tmp[i] = U[2][i];
+  }
+  U[2] = tmp;
+  tmp = 0;
+  tmp[1] = U[3][1]; // x,Dx block
+  tmp[2] = U[3][3]; // module block
+  U[3] = tmp;
+  tmp = 0;
+  tmp = U[1],U[2],U[3],U[4];
+  def @R2 = ring(tmp);
+  setring @R2;
+  // now supply with Weyl algebra relations
+  int N = nvars(@R2)/2;
+  matrix @D[2*N][2*N];
+  for(i=1; i<=N; i++)
+  {
+    @D[i,N+i]=1;
+  }
+  def @R3 = nc_algebra(1,@D);
+  setring @R3;
+  dbprint(ppl,"// - -[annRat] ring without s is ready:");
+  dbprint(ppl-1,@R3);
+  poly g = imap(save,g);
+  matrix G[1][1] = g;
+  matrix LL = matrix(imap(@R1,AF));
+  kill @R1;   kill @R2;
+  dbprint(ppl,"// -4-[annRat] running modulo");
+  ideal LD  = modulo(G,LL);
+  dbprint(ppl,"// -4-[annRat] running GB on the final result");
+  LD  = engine(LD,0);
+  export LD;
+  return(@R3);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  poly g = 2*x*y;  poly f = x^2 - y^3;
+  def B = annRat(g,f);
+  setring B;
+  LD;
+  // Now, compare with the output of Macaulay2:
+  ideal tst = 3*x*Dx + 2*y*Dy + 1, y^3*Dy^2 - x^2*Dy^2 + 6*y^2*Dy + 6*y,
+9*y^2*Dx^2*Dy-4*y*Dy^3+27*y*Dx^2+2*Dy^2, 9*y^3*Dx^2-4*y^2*Dy^2+10*y*Dy -10;
+ option(redSB); option(redTail);
+ LD = groebner(LD);
+ tst = groebner(tst);
+ print(matrix(NF(LD,tst)));  print(matrix(NF(tst,LD)));
+ // So, these two answers are the same
+}
+
+/*
+//static proc ex_annRat()
+{
+  // more complicated example for annRat
+  ring r = 0,(x,y,z),dp;
+  poly f = x3+y3+z3; // mir = -2
+  poly g = x*y*z;
+  def A = annRat(g,f);
+  setring A;
+}
+*/
+
+proc annPoly(poly f)
+"USAGE:  annPoly(f);  f a poly
+RETURN:  ring
+PURPOSE: compute the complete annihilator ideal of f in the Weyl algebra D
+NOTE:  activate the output ring with the @code{setring} command.
+@*   In the output ring, the ideal LD (in Groebner basis) is the annihilator.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+SEE ALSO: annRat
+EXAMPLE: example annPoly; shows examples
+"
+{
+  // computes a system of linear PDEs with polynomial coeffs for f
+  def save = basering;
+  list L = ringlist(save);
+  list Name = L[2];
+  int N = nvars(save);
+  int i;
+  for (i=1; i<=N; i++)
+  {
+    Name[N+i] = "D"+Name[i]; // concat
+  }
+  L[2] = Name;
+  def @R = ring(L);
+  setring @R;
+  def @@R = Weyl();
+  setring @@R;
+  kill @R;
+  matrix M[1][N];
+  for (i=1; i<=N; i++)
+  {
+    M[1,i] = var(N+i);
+  }
+  matrix F[1][1] = imap(save,f);
+  ideal I = modulo(F,M);
+  ideal LD = groebner(I);
+  export LD;
+  return(@@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  poly f = x^2*z - y^3;
+  def A = annPoly(f);
+  setring A; // A is the 3rd Weyl algebra in 6 variables
+  LD; // the Groebner basis of annihilator
+  gkdim(LD); // must be 3 = 6/2, since A/LD is holonomic module
+  NF(Dy^4, LD); // must be 0 since Dy^4 clearly annihilates f
+}
+
+/* DIFFERENT EXAMPLES
+
+//static proc exCusp()
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,Dx,Dy),dp;
+  def R = Weyl();   setring R;
+  poly F = x2-y3;
+  ideal I = (y^3 - x^2)*Dx - 2*x, (y^3 - x^2)*Dy + 3*y^2; // I = Dx*F, Dy*F;
+  def W = SDLoc(I,F);
+  setring W;
+  LD;
+  def U = DLoc0(LD,x2-y3);
+  setring U;
+  LD0;
+  BS;
+  // the same with DLoc:
+  setring R;
+  DLoc(I,F);
+}
+
+//static proc exWalther1()
+{
+  // p.18 Rem 3.10
+  ring r = 0,(x,Dx),dp;
+  def R = nc_algebra(1,1);
+  setring R;
+  poly F = x;
+  ideal I = x*Dx+1;
+  def W = SDLoc(I,F);
+  setring W;
+  LD;
+  ideal J = LD, x;
+  eliminate(J,x*Dx); // must be [1]=s // agree!
+  // the same result with Dloc0:
+  def U = DLoc0(LD,x);
+  setring U;
+  LD0;
+  BS;
+}
+
+//static proc exWalther2()
+{
+  // p.19 Rem 3.10 cont'd
+  ring r = 0,(x,Dx),dp;
+  def R = nc_algebra(1,1);
+  setring R;
+  poly F = x;
+  ideal I = (x*Dx)^2+1;
+  def W = SDLoc(I,F);
+  setring W;
+  LD;
+  ideal J = LD, x;
+  eliminate(J,x*Dx); // must be [1]=s^2+2*s+2 // agree!
+  // the same result with Dloc0:
+  def U = DLoc0(LD,x);
+  setring U;
+  LD0;
+  BS;
+  // almost the same with DLoc
+  setring R;
+  DLoc(I,F);
+  LD0;  BS;
+}
+
+//static proc exWalther3()
+{
+  // can check with annFs too :-)
+  // p.21 Ex 3.15
+  LIB "nctools.lib";
+  ring r = 0,(x,y,z,w,Dx,Dy,Dz,Dw),dp;
+  def R = Weyl();
+  setring R;
+  poly F = x2+y2+z2+w2;
+  ideal I = Dx,Dy,Dz,Dw;
+  def W = SDLoc(I,F);
+  setring W;
+  LD;
+  ideal J = LD, x2+y2+z2+w2;
+  eliminate(J,x*y*z*w*Dx*Dy*Dz*Dw); // must be [1]=s^2+3*s+2 // agree
+  ring r2 =  0,(x,y,z,w),dp;
+  poly F = x2+y2+z2+w2;
+  def Z = annfs(F);
+  setring Z;
+  LD;
+  BS;
+  // the same result with Dloc0:
+  setring W;
+  def U = DLoc0(LD,x2+y2+z2+w2);
+  setring U;
+  LD0;  BS;
+  // the same result with DLoc:
+  setring R;
+  DLoc(I,F);
+  LD0;  BS;
+}
+
+*/
+
+proc engine(def I, int i)
+"USAGE:  engine(I,i);  I  ideal/module/matrix, i an int
+RETURN:  the same type as I
+PURPOSE: compute the Groebner basis of I with the algorithm, chosen via i
+NOTE: By default and if i=0, slimgb is used; otherwise std does the job.
+EXAMPLE: example engine; shows examples
+"
+{
+  /* std - slimgb mix */
+  def J;
+  //  ideal J;
+  if (i==0)
+  {
+    J = slimgb(I);
+  }
+  else
+  {
+    // without options -> strange! (ringlist?)
+    intvec v = option(get);
+    option(redSB);
+    option(redTail);
+    J = std(I);
+    option(set, v);
+  }
+  return(J);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),Dp;
+  ideal I  = y*(x3-y2),x*(x3-y2);
+  engine(I,0); // uses slimgb
+  engine(I,1); // uses std
+}
+
+proc insertGenerator (list #)
+"USAGE:  insertGenerator(id,p[,k]);  id an ideal/module, p a poly/vector, k an optional int
+RETURN:  same as id
+PURPOSE: inserts p into the first argument at k-th index position and returns the enlarged object
+NOTE:    If k is given, p is inserted at position k, otherwise (and by default),
+@*       p is inserted at the beginning.
+EXAMPLE: example insertGenerator; shows examples
+"
+{
+  if (size(#) < 2)
+  {
+    ERROR("insertGenerator has to be called with at least 2 arguments (ideal/module,poly/vector)");
+  }
+  string inp1 = typeof(#[1]);
+  if (inp1 == "ideal" || inp1 == "module")
+  {
+    if (inp1 == "ideal") { ideal id = #[1]; }
+    else { module id = #[1]; }
+  }
+  else { ERROR("first argument has to be of type ideal or module"); }
+  string inp2 = typeof(#[2]);
+  if (inp2 == "poly" || inp2 == "vector")
+  {
+    if (inp2 =="poly") { poly f = #[2]; }
+    else
+    {
+      if (inp1 == "ideal")
+      {
+        ERROR("second argument has to be a polynomial if first argument is an ideal");
+      }
+      else { vector f = #[2]; }
+    }
+  }
+  else { ERROR("second argument has to be of type poly/vector"); }
+  int n = ncols(id);
+  int k = 1; // default
+  if (size(#)>=3)
+  {
+    if (typeof(#[3]) == "int")
+    {
+      k = #[3];
+      if (k<=0)
+      {
+        ERROR("third argument has to be positive");
+      }
+    }
+    else { ERROR("third argument has to be of type int"); }
+  }
+  execute(inp1 +" J;");
+  if (k == 1) { J = f,id; }
+  else
+  {
+    if (k>n)
+    {
+      J = id;
+      J[k] = f;
+    }
+    else // 1<k<=n
+    {
+      J[1..k-1] = id[1..k-1];
+      J[k] = f;
+      J[k+1..n+1] = id[k..n];
+    }
+  }
+  return(J);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  ideal I = x^2,z^4;
+  insertGenerator(I,y^3);
+  insertGenerator(I,y^3,2);
+  module M = I;
+  insertGenerator(M,[x^3,y^2,z],2);
+}
+
+proc deleteGenerator (list #)
+"USAGE:  deleteGenerator(id,k);  id an ideal/module, k an int
+RETURN:  same as id
+PURPOSE: deletes the k-th generator from the first argument and returns the altered object
+EXAMPLE: example insertGenerator; shows examples
+"
+{
+  if (size(#) < 2)
+  {
+    ERROR("deleteGenerator has to be called with 2 arguments (ideal/module,int)");
+  }
+  string inp1 = typeof(#[1]);
+  if (inp1 == "ideal" || inp1 == "module")
+  {
+    if (inp1 == "ideal") { ideal id = #[1]; }
+    else { module id = #[1]; }
+  }
+  else { ERROR("first argument has to be of type ideal or module"); }
+  string inp2 = typeof(#[2]);
+  if (inp2 == "int" || inp2 == "number") { int k = int(#[2]); }
+  else { ERROR("second argument has to be of type int"); }
+  int n = ncols(id);
+  if (n == 1) { ERROR(inp1+" must have more than one generator"); }
+  if (k<=0 || k>n) { ERROR("second argument has to be in the range 1,...,"+string(n)); }
+  execute(inp1 +" J;");
+  if (k == 1) { J = id[2..n]; }
+  else
+  {
+    if (k == n) { J = id[1..n-1]; }
+    else
+    {
+      J[1..k-1] = id[1..k-1];
+      J[k..n-1] = id[k+1..n];
+    }
+  }
+  return(J);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  ideal I = x^2,y^3,z^4;
+  deleteGenerator(I,2);
+  module M = [x,y,z],[x2,y2,z2],[x3,y3,z3];;
+  deleteGenerator(M,2);
+}
+
+proc fl2poly(list L, string s)
+"USAGE:  fl2poly(L,s); L a list, s a string
+RETURN:  poly
+PURPOSE: reconstruct a monic polynomial in one variable from its factorization
+ASSUME:  s is a string with the name of some variable and
+@*         L is supposed to consist of two entries:
+@*         L[1] of the type ideal with the roots of a polynomial
+@*         L[2] of the type intvec with the multiplicities of corr. roots
+EXAMPLE: example fl2poly; shows examples
+"
+{
+  if (varNum(s)==0)
+  {
+    ERROR("no such variable found in the basering"); return(0);
+  }
+  poly x = var(varNum(s));
+  poly P = 1;
+  int sl = size(L[1]);
+  ideal RR = L[1];
+  intvec IV = L[2];
+  for(int i=1; i<= sl; i++)
+  {
+    if (IV[i] > 0)
+    {
+      P = P*((x-RR[i])^IV[i]);
+    }
+    else
+    {
+      printf("Ignored the root with incorrect multiplicity %s",string(IV[i]));
+    }
+  }
+  return(P);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z,s),Dp;
+  ideal I = -1,-4/3,-5/3,-2;
+  intvec mI = 2,1,1,1;
+  list BS = I,mI;
+  poly p = fl2poly(BS,"s");
+  p;
+  factorize(p,2);
+}
+
+static proc safeVarName (string s, string cv)
+{
+  string S;
+  if (cv == "v")  { S = "," + "," + varstr(basering)  + ","; }
+  if (cv == "c")  { S = "," + "," + charstr(basering) + ","; }
+  if (cv == "cv") { S = "," + charstr(basering) + "," + varstr(basering) + ","; }
+  s = "," + s + ",";
+  while (find(S,s) <> 0)
+  {
+    s[1] = "@";
+    s = "," + s;
+  }
+  s = s[2..size(s)-1];
+  return(s)
+}
+
+proc initialIdealW (ideal I, intvec u, intvec v, list #)
+"USAGE:  initialIdealW(I,u,v [,s,t,w]);  I ideal, u,v intvecs, s,t optional ints,
+@*       w an optional intvec
+RETURN:  ideal, GB of initial ideal of the input ideal w.r.t. the weights u and v
+ASSUME:  The basering is the n-th Weyl algebra in characteristic 0 and  for all
+@*       1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1 holds, i.e. the
+@*       sequence of variables is given by x(1),...,x(n),D(1),...,D(n),
+@*       where D(i) is the differential operator belonging to x(i).
+PURPOSE: computes the initial ideal with respect to given weights.
+NOTE:    u and v are understood as weight vectors for x(1..n) and D(1..n)
+@*       respectively.
+@*       If s<>0, @code{std} is used for Groebner basis computations,
+@*       otherwise, and by default, @code{slimgb} is used.
+@*       If t<>0, a matrix ordering is used for Groebner basis computations,
+@*       otherwise, and by default, a block ordering is used.
+@*       If w consist of 2n strictly positive entries, w is used for weighted
+@*       homogenization, otherwise, and by default, no weights are used.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example initialIdealW; shows examples
+"
+{
+  if (dmodappassumeViolation())
+  {
+    ERROR("Basering is inappropriate: characteristic>0 or qring present");
+  }
+  if (!isWeyl())
+  {
+    ERROR("Basering is not a Weyl algebra.");
+  }
+  int ppl = printlevel - voice +2;
+  def save = basering;
+  int n = nvars(save)/2;
+  int N = 2*n+1;
+  list RL = ringlist(save);
+  int i;
+  int whichengine = 0;           // default
+  int methodord   = 0;           // default
+  intvec homogweights = 1:(2*n); // default
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int" || typeof(#[1])=="number")
+    {
+      whichengine = int(#[1]);
+    }
+    if (size(#)>1)
+    {
+      if (typeof(#[2])=="int" || typeof(#[2])=="number")
+      {
+        methodord = int(#[2]);
+      }
+      if (size(#)>2)
+      {
+	if (typeof(#[3])=="intvec")
+	{
+	  if (size(#[3])==2*n && allPositive(#[3])==1)
+	  {
+	    homogweights = #[3];
+	  }
+	  else
+	  {
+	    print("// Homogenization weight vector must consist of positive entries and be");
+	    print("// of size " + string(n) + ". Using no weights.");
+	  }
+	}
+      }
+    }
+  }
+  for (i=1; i<=n; i++)
+  {
+    if (bracket(var(i+n),var(i))<>1)
+    {
+      ERROR(string(var(i+n)) + " is not a differential operator for " + string(var(i)));
+    }
+  }
+  // 1. create  homogenized Weyl algebra
+  // 1.1 create ordering
+  intvec uv = u,v,0;
+  homogweights = homogweights,1;
+  list Lord = list(list("a",homogweights));
+  list C0 = list("C",intvec(0));
+  if (methodord == 0) // default: blockordering
+  {
+    Lord[2] = list("a",uv);
+    Lord[3] = list("dp",intvec(1:(N-1)));
+    Lord[4] = list("lp",intvec(1));
+    Lord[5] = C0;
+  }
+  else // M() ordering
+  {
+    intmat @Ord[N][N];
+    @Ord[1,1..N] = uv; @Ord[2,1..N] = 1:(N-1);
+    for (i=1; i<=N-2; i++) { @Ord[2+i,N - i] = -1; }
+    dbprint(ppl-1,"// the ordering matrix:",@Ord);
+    Lord[2] = list("M",intvec(@Ord));
+    Lord[3] = C0;
+  }
+  // 1.2 the new var
+  list Lvar = RL[2]; Lvar[N] = safeVarName("h","cv");
+  // 1.3 create commutative ring
+  list L@@Dh = RL; L@@Dh = L@@Dh[1..4];
+  L@@Dh[2] = Lvar; L@@Dh[3] = Lord;
+  def @Dh = ring(L@@Dh); kill L@@Dh;
+  setring @Dh;
+  dbprint(ppl-1,"// the ring @Dh:",@Dh);
+  // 1.4 create non-commutative relations
+  matrix @relD[N][N];
+  for (i=1; i<=n; i++) { @relD[i,n+i] = var(N)^(homogweights[i]+homogweights[n+i]); }
+  def Dh = nc_algebra(1,@relD);
+  setring Dh; kill @Dh;	
+  dbprint(ppl-1,"// computing in ring",Dh);
+  // 2. Compute the initial ideal
+  ideal I = imap(save,I);
+  I = homog(I,h);
+  // 2.1 the hard part: Groebner basis computation
+  dbprint(ppl, "// starting Groebner basis computation with engine: "+string(whichengine));
+  I = engine(I, whichengine);
+  dbprint(ppl, "// finished Groebner basis computation");
+  dbprint(ppl-1, "// I before dehomogenization is " +string(I));
+  I = subst(I,var(N),1); // dehomogenization
+  dbprint(ppl-1, "I after dehomogenization is " +string(I));
+  // 2.2 the initial form
+  I = inForm(I,uv);
+  setring save;
+  I = imap(Dh,I); kill Dh;
+  // 2.3 the final GB
+  dbprint(ppl, "// starting cosmetic Groebner basis computation with engine: "+string(whichengine));
+  I = engine(I, whichengine);
+  dbprint(ppl,"// finished cosmetic Groebner basis computation");
+  return(I);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring @D = 0,(x,Dx),dp;
+  def D = Weyl();
+  setring D;
+  intvec u = -1; intvec v = 2;
+  ideal I = x^2*Dx^2,x*Dx^4;
+  ideal J = initialIdealW(I,u,v); J;
+}
+
+proc initialMalgrange (poly f,list #)
+"USAGE:  initialMalgrange(f,[,a,b,v]); f poly, a,b optional ints, v opt. intvec
+RETURN:  ring, Weyl algebra induced by basering, extended by two new vars t,Dt
+PURPOSE: computes the initial Malgrange ideal of a given polynomial w.r.t. the weight
+@*       vector (-1,0...,0,1,0,...,0) such that the weight of t is -1 and the
+@*       weight of Dt is 1.
+ASSUME:  The basering is commutative and of characteristic 0.
+NOTE:    Activate the output ring with the @code{setring} command.
+@*       The returned ring contains the ideal \"inF\", being the initial ideal
+@*       of the Malgrange ideal of f.
+@*       Varnames of the basering should not include t and Dt.
+@*       If a<>0, @code{std} is used for Groebner basis computations,
+@*       otherwise, and by default, @code{slimgb} is used.
+@*       If b<>0, a matrix ordering is used for Groebner basis computations,
+@*       otherwise, and by default, a block ordering is used.
+@*       If a positive weight vector v is given, the weight
+@*       (d,v[1],...,v[n],1,d+1-v[1],...,d+1-v[n]) is used for homogenization
+@*       computations, where d denotes the weighted degree of f.
+@*       Otherwise and by default, v is set to (1,...,1). See Noro, 2002.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example initialMalgrange; shows examples
+"
+{
+  if (dmodappassumeViolation())
+  {
+    ERROR("Basering is inappropriate: characteristic>0 or qring present");
+  }
+  if (!isCommutative())
+  {
+    ERROR("Basering must be commutative.");
+  }
+  int ppl = printlevel - voice +2;
+  def save = basering;
+  int n = nvars(save);
+  int i;
+  int whichengine = 0; // default
+  int methodord   = 0; // default
+  intvec u0 = 1:n;     // default
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int" || typeof(#[1])=="number")
+    {
+      whichengine = int(#[1]);
+    }
+    if (size(#)>1)
+    {
+      if (typeof(#[2])=="int" || typeof(#[2])=="number")
+      {
+        methodord = int(#[2]);
+      }
+      if (size(#)>2)
+      {
+	if (typeof(#[3])=="intvec" && size(#[3])==n && allPositive(#[3])==1)
+        {
+	  u0 = #[3];
+	}
+      }
+    }
+  }
+  // creating the homogenized extended Weyl algebra
+  list RL = ringlist(save);
+  RL = RL[1..4]; // if basering is commutative nc_algebra
+  list C0 = list("C",intvec(0));
+  // 1. create homogenization weights
+  // 1.1. get the weighted degree of f
+  list Lord = list(list("wp",u0),C0);
+  list L@r = RL;
+  L@r[3] = Lord;
+  def r = ring(L@r); kill L@r,Lord;
+  setring r;
+  poly f = imap(save,f);
+  int d = deg(f);
+  setring save; kill r;
+  // 1.2 the homogenization weights
+  intvec homogweights = d;
+  homogweights[n+2] = 1;
+  for (i=1; i<=n; i++)
+  {
+    homogweights[i+1]   = u0[i];
+    homogweights[n+2+i] = d+1-u0[i];
+  }
+  // 2. create extended Weyl algebra
+  int N = 2*n+2;
+  // 2.1 create names for vars
+  string vart  = safeVarName("t","cv");
+  string varDt = safeVarName("D"+vart,"cv");
+  while (varDt <> "D"+vart)
+  {
+    vart  = safeVarName("@"+vart,"cv");
+    varDt = safeVarName("D"+vart,"cv");
+  }
+  list Lvar;
+  Lvar[1] = vart; Lvar[n+2] = varDt;
+  for (i=1; i<=n; i++)
+  {
+    Lvar[i+1]   = string(var(i));
+    Lvar[i+n+2] = safeVarName("D" + string(var(i)),"cv");
+  }
+  //  2.2 create ordering
+  list Lord = list(list("dp",intvec(1:N)),C0);
+  // 2.3 create the (n+1)-th Weyl algebra
+  list L@D = RL; L@D[2] = Lvar; L@D[3] = Lord;
+  def @D = ring(L@D); kill L@D;
+  setring @D;
+  def D = Weyl();
+  setring D; kill @D;
+  dbprint(ppl,"// the (n+1)-th Weyl algebra :" ,D);
+  // 3. compute the initial ideal
+  // 3.1 create the Malgrange ideal
+  poly f = imap(save,f);
+  ideal I = var(1)-f;
+  for (i=1; i<=n; i++)
+  {
+    I = I, var(n+2+i)+diff(f,var(i+1))*var(n+2);
+  }
+  // I = engine(I,whichengine); // todo is it efficient to compute a GB first wrt dp first?
+  // 3.2 computie the initial ideal
+  intvec w = 1,0:n;
+  I = initialIdealW(I,-w,w,whichengine,methodord,homogweights);
+  ideal inF = I; attrib(inF,"isSB",1);
+  export(inF);
+  setring save;
+  return(D);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  poly f = x^2+y^3+x*y^2;
+  def D = initialMalgrange(f);
+  setring D;
+  inF;
+  setring r;
+  intvec v = 3,2;
+  def D2 = initialMalgrange(f,1,1,v);
+  setring D2;
+  inF;
+}
+
+proc dmodappassumeViolation()
+{
+  // returns Boolean : yes/no [for assume violation]
+  // char K = 0
+  // no qring
+  if (  (size(ideal(basering)) >0) || (char(basering) >0) )
+  {
+    //    "ERROR: no qring is allowed";
+    return(1);
+  }
+  return(0);
+}
+
+proc bFactor (poly F)
+"USAGE:  bFactor(f);  f poly
+RETURN:  list
+PURPOSE: tries to compute the roots of a univariate poly f
+NOTE:    The output list consists of two or three entries:
+@*       roots of f as an ideal, their multiplicities as intvec, and,
+@*       if present, a third one being the product of all irreducible factors
+@*       of degree greater than one, given as string.
+DISPLAY: If printlevel=1, progress debug messages will be printed,
+@*       if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example bFactor; shows examples
+"
+{
+  int ppl = printlevel - voice +2;
+  def save = basering;
+  ideal LI = variables(F);
+  list L;
+  int i = size(LI);
+  if (i>1) { ERROR("poly has to be univariate")}
+  if (i == 0)
+  {
+    dbprint(ppl,"// poly is constant");
+    L = list(ideal(0),intvec(0),string(F));
+    return(L);
+  }
+  poly v = LI[1];
+  L = ringlist(save); L = L[1..4];
+  L[2] = list(string(v));
+  L[3] = list(list("dp",intvec(1)),list("C",intvec(0)));
+  def @S = ring(L);
+  setring @S;
+  poly ir = 1; poly F = imap(save,F);
+  list L = factorize(F);
+  ideal I = L[1];
+  intvec m = L[2];
+  ideal II; intvec mm;
+  for (i=2; i<=ncols(I); i++)
+  {
+    if (deg(I[i]) > 1)
+    {
+      ir = ir * I[i]^m[i];
+    }
+    else
+    {
+      II[size(II)+1] = I[i];
+      mm[size(II)] = m[i];
+    }
+  }
+  II = normalize(II);
+  II = subst(II,var(1),0);
+  II = -II;
+  if (size(II)>0)
+  {
+    dbprint(ppl,"// found roots");
+    dbprint(ppl-1,string(II));
+  }
+  else
+  {
+    dbprint(ppl,"// found no roots");
+  }
+  L = list(II,mm);
+  if (ir <> 1)
+  {
+    dbprint(ppl,"// found irreducible factors");
+    ir = cleardenom(ir);
+    dbprint(ppl-1,string(ir));
+    L = L + list(string(ir));
+  }
+  else
+  {
+    dbprint(ppl,"// no irreducible factors found");
+  }
+  setring save;
+  L = imap(@S,L);
+  return(L);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  bFactor((x^2-1)^2);
+  bFactor((x^2+1)^2);
+  bFactor((y^2+1/2)*(y+9)*(y-7));
+}

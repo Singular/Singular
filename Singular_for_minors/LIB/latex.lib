@@ -1,0 +1,3103 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Visualization";
+info="
+LIBRARY: latex.lib    Typesetting of Singular-Objects in LaTeX2e
+AUTHOR: Christian Gorzel, gorzelc@math.uni-muenster.de
+
+PROCEDURES:
+ closetex(fnm)       writes closing line for LaTeX-document
+ opentex(fnm)        writes header for LaTeX-file fnm
+ tex(fnm)            calls LaTeX2e for LaTeX-file fnm
+ texdemo([n])        produces a file explaining the features of this lib
+ texfactorize(fnm,f) creates string in LaTeX-format for factors of polynomial f
+ texmap(fnm,m,r1,r2) creates string in LaTeX-format for map m:r1->r2
+ texname(fnm,s)      creates string in LaTeX-format for identifier
+ texobj(l)           creates string in LaTeX-format for any (basic) type
+ texpoly(f,n[,l])    creates string in LaTeX-format for poly
+ texproc(fnm,p)      creates string in LaTeX-format of text from proc p
+ texring(fnm,r[,l])  creates string in LaTeX-format for ring/qring
+ rmx(s)              removes .aux and .log files of LaTeX-files
+ xdvi(s)             calls xdvi for dvi-files
+        (parameters in square brackets [] are optional)
+        (Procedures with file output assume sufficient write permissions
+        when trying to append existing or create new files.)
+
+GLOBAL VARIABLES:
+  TeXwidth, TeXnofrac, TeXbrack, TeXproj, TeXaligned, TeXreplace, NoDollars
+  are used to control the typesetting.
+  Call @code{texdemo();} to obtain a LaTeX2e file @code{texlibdemo.tex}
+  explaining the features of @code{latex.lib} and its global variables.
+@format
+  @code{TeXwidth} (int) -1, 0, 1..9, >9:  controls breaking of long polynomials
+  @code{TeXnofrac} (int) flag:  write 1/2 instead of \\frac@{1@}@{2@}
+  @code{TeXbrack} (string) \"@{\", \"(\", \"<\", \"|\", empty string:
+                                   controls brackets around ideals and matrices
+  @code{TeXproj} (int) flag:  write \":\" instead of \",\" in vectors
+  @code{TeXaligned} (int) flag:  write maps (and ideals) aligned
+  @code{TeXreplace} (list) list entries = 2 strings:  replacing symbols
+  @code{NoDollars} (int) flag:  suppresses surrounding $ signs
+@end format
+";
+
+LIB "inout.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc closetex(string fname, list #)
+"USAGE:   closetex(fname); fname string
+RETURN:  nothing; writes a LaTeX2e closing line into file @code{<fname>}.
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
+         is added to @code{fname}.
+EXAMPLE: example closetex; shows an example
+"
+{
+  string default = "latex2e";
+  string s;
+  int i = 1;
+  int flag;
+
+  if (size(#)) { default = #[1];}
+
+  if (default=="latex2e" or default == "latex")
+   {  s = "\\end{document}"; flag = 1;}
+  if (default=="amstex") {s = "\\enddocument"; flag = 1;}
+  if (default=="tex") {s = "\\bye"; flag = 1;}
+  if (not(flag)) { s = "";}
+
+  if (size(fname))
+  {
+   while (fname[i]==">"){i++;}
+   fname = fname[i,size(fname)-i+1];
+
+   if (size(fname)>=4)               // check if filename is ending with ".tex"
+   { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+   }
+   else {fname = fname + ".tex";}
+   write(fname, s);
+   write(fname," - Thanks latex.lib and Singular - ");
+  }
+  else {return(s);}
+}
+example
+{ "EXAMPLE:"; echo=2;
+   opentex("exmpl");
+   texobj("exmpl","{\\large \\bf hello}");
+   closetex("exmpl");
+   echo=0;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc tex(string fname, list #)
+"USAGE:   tex(fname); fname string
+RETURN:  nothing; calls latex (LaTeX2e) for compiling the file fname
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
+         is added to @code{fname}.
+EXAMPLE: example tex; shows an example
+"
+{
+  string default = "latex2e";
+  int retval;
+  int i=1;
+  if (size(#)) {default = string(#[1]);}
+  if (size(fname))
+  {
+   while (fname[i]==">"){i++;}
+   fname = fname[i,size(fname)-i+1];
+
+   if (size(fname)>=4)          // check if filename is ending with ".tex"
+   { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+   }
+   else {fname = fname + ".tex";}
+   "calling ",default, " for :",fname,newline;
+
+   if (default=="latex2e")
+   {
+     retval = system("sh","latex " +  fname);
+   }
+   else
+   {
+     retval = system("sh",default + " " +  fname);
+   }
+  }
+  else
+  { " -- Need a filename ";
+    return();
+  }
+}
+example
+{ "EXAMPLE:"; echo =2;
+  ring r;
+  ideal I = maxideal(7);
+  opentex("exp001");              // open latex2e document
+  texobj("exp001","An ideal ",I);
+  closetex("exp001");
+  tex("exp001");
+  echo=0;
+  pause("the created files will be deleted after pressing <RETURN>");
+  system("sh","rm exp001.*");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc opentex(string fname, list #)
+"USAGE:   opentex(fname); fname string
+RETURN:  nothing; writes a LaTeX2e header into a new file @code{<fname>}.
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
+         is added to @code{fname}.
+EXAMPLE: example opentex; shows an example
+"
+{
+  string default = "latex2e";
+  string s;
+  int i =1;
+  int flag;
+
+  if (size(#)) { default = #[1];}
+
+  if (default == "latex2e")          // the default  latex2e header
+  { s =
+      "\\documentclass{article}" + newline +
+      "\\usepackage{amsmath,amssymb}" + newline +
+      "\\setlength{\\textwidth}{390pt}" + newline +
+      "\\parindent=0pt" + newline +
+      "\\newcommand{\\C}{\\mathbb{C}}" + newline +
+      "\\newcommand{\\F}{\\mathbb{F}}" + newline +
+      "\\newcommand{\\N}{\\mathbb{N}}" + newline +
+   // "\\newcommand{\\P}{{\\Bbb P}}" + newline +
+      "\\newcommand{\\Q}{\\mathbb{Q}}" + newline +
+      "\\newcommand{\\R}{\\mathbb{R}}" + newline +
+      "\\newcommand{\\T}{\\mathbb{T}}" + newline +
+      "\\newcommand{\\Z}{\\mathbb{Z}}" + newline + newline +
+      "\\begin{document}";
+    flag = 1;
+  }
+  if (default == "latex")
+  { s =
+      "\\documentstyle[12pt,amstex]{article}" + newline +
+      "\\parindent=0pt" + newline +
+      "\\newcommand{\\C}{{\\Bbb C}}" + newline +
+      "\\newcommand{\\F}{{\\Bbb F}}" + newline +
+      "\\newcommand{\\N}{{\\Bbb N}}" + newline +
+   // "\\newcommand{\\P}{{\\Bbb P}}" + newline +
+      "\\newcommand{\\Q}{{\\Bbb Q}}" + newline +
+      "\\newcommand{\\R}{{\\Bbb R}}" + newline +
+      "\\newcommand{\\T}{{\\Bbb T}}" + newline +
+      "\\newcommand{\\Z}{{\\Bbb Z}}" + newline + newline +
+      "\\begin{document}";
+    flag = 1;
+  }
+  if (default == "amstex")
+  { s =
+     "\\documentstyle{amsppt} " + newline + newline +
+     "\\document";
+    flag = 1;
+  }
+
+  if (default == "tex")
+  { s =
+     "";
+    flag = 1;
+  }
+  if (default == "own")            // the proper own header
+  { s = "";
+    flag = 1;
+  }
+  if (not(flag)) { s = "";}
+
+  if (size(fname))
+  {
+   while (fname[i]==">"){i++;}
+   fname = fname[i,size(fname)-i+1];
+
+   if (size(fname)>=4)               // check if filename is ending with ".tex"
+   { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+   }
+   else {fname = fname + ".tex";}
+   fname = ">" + fname;
+   write(fname,s);
+  }
+  else {return(s);}
+}
+example
+{ "EXAMPLE:"; echo=2;
+   opentex("exmpl");
+   texobj("exmpl","hello");
+   closetex("exmpl");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc texdemo(list #)
+"USAGE:   texdemo();
+RETURN:  nothing; generates a LaTeX2e file called @code{texlibdemo.tex}
+         explaining the features of @code{latex.lib} and its global variables.
+NOTE:    this procedure may take some time.
+"
+{ int TeXdemostart = system("pid");
+  string fname = "texlibdemo";
+
+  if (size(#))
+  { if (typeof(#[1])=="int") {TeXdemostart = #[1];}
+  }
+  system("--random",TeXdemostart);
+
+  if (size(#) ==2)
+  { if (typeof(#[2]) == "string") { fname = #[2];}
+  }
+
+    if (size(fname))
+    {
+     if (size(fname)>=4)           // check if filename is ending with ".tex"
+     { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+     } else {fname = fname + ".tex";}
+    }
+
+  // -------- save global variables ---------
+  if (defined(TeXaligned)) {int Teali=TeXaligned; kill TeXaligned;}
+  if (defined(TeXreplace)) {list Terep=TeXreplace; kill TeXreplace;}
+  if (defined(TeXwidth)) {int Tewid=TeXwidth; kill TeXwidth;}
+  if (defined(TeXbrack)) {string Tebra=TeXbrack; kill TeXbrack;}
+  if (defined(TeXnofrac)) {int Tenof=TeXnofrac; kill TeXnofrac;}
+  if (defined(TeXproj)) {int Tepro=TeXproj; kill TeXproj;}
+  // ----------------------------------------
+
+   part0(fname);
+   part1(fname);
+   part2(fname);
+   part3(fname);
+   print(" Demofile generated ...");
+   if (size(fname))
+   {
+    print(" call latex now by tex(\"" + fname + "\");" );
+    print(" .log and .aux files may be deleted with rmx(\"texlibdemo\");");
+   }
+  // -------- save global variables ---------
+  if (defined(Teali)) {int TeXaligned=Teali; export TeXaligned; kill Teali;}
+  if (defined(Terep)) {list TeXreplace=Terep; export TeXreplace; kill Terep;}
+  if (defined(Tewid)) {int TeXwidth=Tewid; export TeXwidth; kill Tewid;}
+  if (defined(Tebra)) {string TeXbrack=Tebra; export TeXbrack; kill Tebra;}
+  if (defined(Tenof)) {int TeXnofrac=Tenof; export TeXnofrac; kill Tenof;}
+  if (defined(Tepro)) {int TeXproj=Tepro; export TeXproj; kill Tepro;}
+  // ----------------------------------------
+
+  return();
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc texfactorize(string fname, poly f, list #)
+"USAGE:   texfactorize(fname,f); fname string, f poly
+RETURN:  if @code{fname=\"\"}: string, f as a product of its irreducible
+         factors@*
+         otherwise: append this string to the file @code{<fname>}, and
+         return nothing.
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
+         is added to @code{fname}.
+EXAMPLE: example texfactorize; shows an example
+"
+{
+  def @r = basering;
+  list l;
+  int i,j,k,Tw,TW,ND;;
+  intvec v;
+  string s,t;
+  string D = "$";
+  poly g;
+
+  ND = defined(NoDollars);
+  if (!(ND)) {int NoDollars; export NoDollars;}
+  else { D = ""; }
+  TW = defined(TeXwidth);
+  if (TW) {Tw = TeXwidth; TeXwidth = -1;}
+  else {int TeXwidth = -1; export TeXwidth;}
+
+  if (f==0) {s= D + "0" + D;}
+  else
+  {
+   l = factorize(f);      // sollte auch fuer f== 0 direkt funktionieren
+   if (l[1][1]<>1){s = texpoly("",l[1][1]);}
+   for(i=2;i<=size(l[1]);i++)
+   {
+    if(size(s)){s = s+"\\cdot ";}
+    g = l[1][i];
+    v = leadexp(g);
+    k=0;
+    for(j=1;j<=size(v);j++){k = k + v[j];}
+    if(size(g)>1 or (size(g)==1 and k>1))
+    { t = "(" + texpoly("",l[1][i]) + ")";}
+    else { t =  texpoly("",l[1][i]);}
+    if (l[2][i]>1)
+    { t = t+"^{" +string(l[2][i]) + "}";}
+    s = s + t;
+   }
+   if (!(ND)) { kill NoDollars;}
+   s = D + s + D;
+   if (TW) {TeXwidth = Tw;}
+  }
+  if(size(fname))
+  { i=1;
+    while (fname[i]==">"){i++;}
+    fname = fname[i,size(fname)-i+1];
+
+    if (size(fname)>=4)             // check if filename is ending with ".tex"
+    { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+    }
+    else {fname = fname + ".tex";}
+    write(fname,s);
+  }
+  else{return(s);}
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r2 = 13,(x,y),dp;
+  poly f = (x+1+y)^2*x3y*(2x-2y)*y12;
+  texfactorize("",f);
+  ring R49 = (7,a),x,dp;
+  minpoly = a2+a+3;
+  poly f = (a24x5+x3)*a2x6*(x+1)^2;
+  f;
+  texfactorize("",f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc rp(string s)
+  { int i;
+
+    for(i=1;i<=size(TeXreplace);i++)
+    { if (TeXreplace[i][1]==s) {s= TeXreplace[i][2]; break;}}
+    return(s);
+  }
+///////////////////////////////////////////////////////////////////////////////
+
+
+proc texmap(string fname, def m, def @r1, def @r2, list #)
+"USAGE:   texmap(fname,m,@r1,@r2); fname string, m string/map, @r1,@r2 rings
+RETURN:  if @code{fname=\"\"}: string, the map m from @r1 to @r2 (preceded
+         by its name if m = string) in TeX-typesetting;@*
+         otherwise: append this string to the file @code{<fname>}, and
+         return nothing.
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+         (if not given) is added to @code{fname}.
+         If m is a string then it has to be the name of an existing map
+         from @r1 to @r2.
+EXAMPLE: example texmap; shows an example
+"
+{
+  int saveDollars= defined(NoDollars);
+  int TX = defined(TeXwidth);
+  int Tw;
+  int i,n;
+  string r1str,r2str, varr1str, varr2str;
+  string mapname,t,s;
+  string D,DD,vrg = "$","$$",",";
+  def @r = basering;
+  def themap;
+  list l1,l2;
+  string rr1,rr2 = "@r1","@r2";
+
+// --- store all actual informations
+  if(TX) { Tw = TeXwidth; TeXwidth = -1;}
+  else { int TeXwidth = -1; export TeXwidth;}
+  if (!(saveDollars)) { int  NoDollars; export NoDollars;}
+  if (defined(TeXproj)) {vrg = ":";}
+
+  if (size(#))
+  { if (typeof(#[1])=="list")
+    { l1 = #[1];
+      if(size(#)==2) { l2 = #[2];}
+    }
+    else {l1=#; l2 =#;}
+  }
+// --- tex the information in preimring r1
+
+  setring(@r1);
+  r1str = texring("",@r1,l1);
+// --- avoid an execute; hence construct an ideal
+
+  n = nvars(@r1);
+  if (n>1) { t = "\\left(";}
+  ideal @I = var(1);
+  t = t + texpoly("",var(1));
+  for(i=2;i<=n;i++)
+  { @I = @I + var(i);
+    t = t + vrg + texpoly("",var(i));
+  }
+  if (n>1) { t = t + "\\right)";}
+  varr1str = t;
+
+// --- now the things in ring ring r2
+
+  setring(@r2);
+ // listvar();
+
+  if (typeof(m)=="string")
+  { themap = `m`;
+    mapname = m;
+    if (defined(TeXreplace))
+    { mapname = rp(mapname);   // rp ausschreiben !
+    }
+    mapname = mapname + ":";
+  }
+  if (typeof(m)=="map") { themap = m;}
+
+  r2str = texring("",@r2,l2);
+  ideal @J  = themap(@I);
+  n = size(matrix(@J));
+  if (n>1) { t = " \\left(";}
+  if (!(defined(TeXaligned)) and (n>1))
+      { t = t + newline + "\\begin{array}{c}" + newline;}
+  t = t + texpoly("",@J[1]);
+  for (i=2;i<=n; i++)
+  {if(defined(TeXaligned))
+   { t = t + vrg + texpoly("",@J[i]); }
+   else { t = t + "\\\\" + newline + texpoly("",@J[i]);}
+  }
+  if (!(defined(TeXaligned)) and (n>1))
+      { t = t + newline + "\\end{array}" + newline;}
+  if (n>1) {t = t + "\\right)";}
+  varr2str = t;
+
+// --- go back to  ring r1 to kill @I
+
+  setring(@r1);
+  kill @I;
+
+// --- now reset the old settings and stick all the information together
+
+  setring(@r);
+  if (!(saveDollars)) { kill NoDollars;}
+  if (TX) {TeXwidth = Tw;}
+  else { kill TeXwidth;}
+  if (defined(NoDollars))
+  { D,DD = "",""; }
+
+  if (defined(TeXaligned))
+  { s = D + mapname;
+    s =  s + r1str + "\\longrightarrow" + r2str + ", \\ " +
+        varr1str + "\\longmapsto" + varr2str + D; }
+  else
+  { s = DD;
+    s = s + newline + "\\begin{array}{rcc}" +  newline;
+    s = s + mapname + r1str + " & \\longrightarrow & " +  r2str + "\\\\[2mm]"
+          + newline;
+    s = s + varr1str + " & \\longmapsto & " +  newline + varr2str + newline;
+    s = s + "\\end{array}" + newline;
+    s = s +  DD;
+  }
+
+  if (size(fname))
+  { i=1;
+    while (fname[i]==">"){i++;}
+    fname = fname[i,size(fname)-i+1];
+
+    if (size(fname)>=4)          // check if filename is ending with ".tex"
+    { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+    }
+    else {fname = fname + ".tex";}
+    write(fname,s);
+  }
+  else {return(s);}
+}
+example
+{
+  echo=0;
+  // -------- prepare for example ---------
+  if (defined(TeXaligned)) {int Teali=TeXaligned; kill TeXaligned;}
+  if (defined(TeXreplace)) {list Terep=TeXreplace; kill TeXreplace;}
+  // -------- the example starts here ---------
+  //
+  "EXAMPLE:"; echo = 2;
+  string fname = "tldemo";
+  ring @r1=0,(x,y,z),dp;
+  export @r1;
+  ring r2=0,(u,v),dp;
+  map @phi =(@r1,u2,uv -v,v2); export @phi;
+  list TeXreplace;
+  TeXreplace[1] = list("@phi","\\phi");    // @phi --> \phi
+  export TeXreplace;
+  texmap("","@phi",@r1,r2);                // standard form
+  //
+  int TeXaligned; export TeXaligned;       // map in one line
+  texmap("",@phi,@r1,r2);
+  //
+  kill @r1,TeXreplace,TeXaligned;
+  echo = 0;
+  //
+  // --- restore global variables if previously defined ---
+  if (defined(Teali)) {int TeXaligned=Teali; export TeXaligned; kill Teali;}
+  if (defined(Terep)) {list TeXreplace=Terep; export TeXreplace; kill Terep;}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+static proc manipul(string s)
+{
+  string st;
+  int i,anf,end,op,bigch;
+  int n;
+  if (s[1]=="{") { return(s[2,size(s)-2]);}
+  if (s=="") { return(s);}
+  s = s + newline;             // add a terminating sign
+  anf=1;
+  while(s[i]!=newline)
+  {
+    i =anf;
+    while(s[i]<"0" or s[i]>"9" and s[i]!="'" and s[i]!= "_" and s[i]!="~" and
+          s[i]!="(" and s[i]!=")" and s[i]!= "[" and s[i]!=newline) {i++;}
+    if (s[i]==newline){st = st + s[anf,i-anf]; n = n+10*(i-anf); return(st);}
+    st = st + s[anf,i-anf];                        // the starting letters
+    if (s[anf]>="A" and s[anf]<="Z") {bigch=1;}
+    if (s[i]=="'") { st = st + "'";i++;}
+    if (s[i]=="~") { st = "\\tilde{" + st + "}"; i++;}
+    if (s[i]=="_") { i++;}
+    if (s[i]=="(") { op =1;i++;}
+    if (s[i]=="[") { anf = i+1;
+    while(s[i]!="]"){i++;}                    // matrices and vectors
+    st = st + "_{" + s[anf,i-anf] + "}"; n = n+ 5*(i-anf); i++;
+   // besser: while s[i]<> nwline : scan forward: end, return
+  }
+  if (s[i]==newline) {return(st);}
+  anf =i;
+  while (s[i]>="0" and s[i]<="9") {i++;}  // parse number after the letters
+  if (bigch and not(op)) { st = st + "^{" + s[anf,i-anf] + "}"; bigch =0;}
+  else { st = st + "_{" + s[anf,i-anf] + "}";}
+  n = n+5*(i-anf);
+  anf =i;            // the next text in ( , ) as exponent
+  if (op)
+  {
+    if (s[i]== ","){anf = anf+1;}
+    while(s[i] !=")"){ i++;}
+    if (i<>anf)
+      {
+        st = st + "^{" + s[anf,i-anf] + "}"; n = n +5*(i-anf);}
+        i++;
+      }
+    anf =i;
+  }
+  return(st);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc texname(string fname, string s)
+"USAGE:   texname(fname,s);  fname,s  strings
+RETURN:  if @code{fname=\"\"}: the transformed string s, for which the
+         following rules apply:
+@example
+      s' + \"~\"             -->  \"\\tilde@{\"+ s' +\"@}\"
+     \"_\" + int             -->       \"_@{\" + int +\"@}\"
+  \"[\" + s' + \"]\"           -->      \"_@{\" + s' + \"@}\"
+   \"A..Z\" + int            --> \"A..Z\" + \"^@{\" + int + \"@}\"
+   \"a..z\" + int            --> \"a..z\" + \"_@{\" + int + \"@}\"
+\"(\" + int + \",\" + s' + \")\" --> \"_@{\"+ int +\"@}\" + \"^@{\" + s'+\"@}\"
+@end example
+         Furthermore, strings which begin with a left brace are modified
+         by deleting the first and the last character (which is then assumed to
+         be a right brace).
+
+         if @code{fname!=\"\"}: append the transformed string s to the file
+         @code{<fname>}, and return nothing.
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+         (if not given) is added to @code{fname}.
+EXAMPLE: example texname; shows an example
+"
+{
+  string st, extr;
+  st=manipul(s);
+  if (size(fname))
+  {
+    int i=1;
+    while (fname[i]==">"){i++;}
+    fname = fname[i,size(fname)-i+1];
+    if (size(fname)>=4)            // check if filename is ending with ".tex"
+    {
+      if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+    }
+    else {fname = fname + ".tex";}
+    write(fname,st);
+  }
+  else {return(st);}
+}
+example
+{ "EXAMPLE:"; echo =2;
+   ring r = 0,(x,y),lp;
+   poly f = 3xy4 + 2xy2 + x5y3 + x + y6;
+   texname("","{f(10)}");
+   texname("","f(10) =");
+   texname("","n1");
+   texname("","T1_12");
+   texname("","g'_11");
+   texname("","f23");
+   texname("","M[2,3]");
+   texname("","A(0,3);");
+   texname("","E~(3)");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc absterm(poly f)
+{
+  int k;
+  for (k=1; k<=nvars(basering); k++)
+  { f = subst(f,var(k),0); }
+  return(f);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc texobj(string fname, list #)
+"USAGE:   texobj(fname,l); fname string, l list
+RETURN:  if @code{fname=\"\"}: string, the entries of l in LaTeX-typesetting;@*
+         otherwise: append this string to the file @code{<fname>}, and
+         return nothing.
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+         (if not given) is added to @code{fname}.
+EXAMPLE: example texobj; shows an example
+"
+{
+ int i,j,k,nr,nc,linear,Tw,Dollars;
+ int ND = defined(NoDollars);
+ int TW = defined(TeXwidth);
+
+ if(defined(basering)){ poly g,h; matrix M;}
+ string s,t,l,ineq,sg,Iname;
+ string sep= ",";
+ string D,DA,DE = "$","$$","$$";
+ string OB,CB = "(",")";
+ if (defined(TeXbrack))
+ {// if (TeXbrack=="(") {OB = "("; CB = ")";}
+   if (TeXbrack=="<") {OB = "<"; CB = ">";}
+   if (TeXbrack=="{") {OB = "{"; CB = "}";}
+   if (TeXbrack=="|") {OB = "|"; CB = "|";}
+   if (TeXbrack=="" ) {OB = "."; CB = ".";}
+ }
+
+ if (!(TW)) { int TeXwidth = -1; export TeXwidth; }
+ Tw = TeXwidth;
+
+ if (defined(TeXproj)){ sep = ":";}
+ if(ND) { D,DA,DE="","","";}
+ else {int NoDollars; export NoDollars;}
+
+ if (size(#)==1)
+ { if (typeof(#[1])=="int" or typeof(#[1])=="intvec" or typeof(#[1])=="vector"
+    or typeof(#[1])=="number" or typeof(#[1])=="bigint" or defined(TeXaligned))
+   { DA = D; DE = D; }
+}
+
+ s = DA;
+
+ for (k=1; k<=size(#); k++)
+ { def obj = #[k];
+   if (typeof(obj) == "string")
+   { if (defined(`obj`))
+     { if (typeof(`obj`)=="ideal")
+       {
+         Iname = obj; def e = `obj`;     //convert to correct type ideal
+         kill obj; def obj = e; kill e;
+       }
+       else {s = s + obj + newline;}
+     }
+    else {s = s + obj + newline;}
+   }
+   if (typeof(obj) == "int" or typeof(#[1])=="bigint")
+   { s = s + "  " + string(obj) + "  ";}
+
+   if (typeof(obj) == "intvec")
+   { s = s + " (";
+     for(j=1; j<size(obj);j++) { s = s + string(obj[j]) + sep;}
+     s = s +  string(obj[j]) + ") ";
+   }
+
+   if (typeof(obj) == "number" )
+   { s = s + texpoly("",obj) + newline;
+   }
+
+   if (typeof(obj) == "poly")
+   { int TeXdisplay; export TeXdisplay;
+     s = s + "\\begin{array}{rl}" + newline;
+     s = s + texpoly("",obj) + "\\\\" + newline;
+     s = s + "\\end{array}" + newline;
+    kill TeXdisplay;
+   }
+
+   if (typeof(obj) == "vector")
+   { if (obj==0) { s = s  + "0" ;}
+     else
+     { if (Tw==0) { TeXwidth = -1;}
+      s = s + "\\left" + OB;
+      for(j=1; j<nrows(obj); j++) {s = s + texpoly("",obj[j]) + sep;}
+      s = s + texpoly("",obj[j])  + "\\right" + CB + newline;
+      TeXwidth = Tw;
+     }
+    }
+
+   if (typeof(obj) == "ideal")
+   { if (size(Iname))   // verwende hier align
+     { if (Tw==0) {TeXwidth = -1;}
+
+      // Lasse hier TeXwidth == 0 zu !
+      // if (!(defined(TeXaligned)))
+      //  { untereinander }
+      // else { hintereinander }
+      //
+      //
+      //  s = s + Iname + "=" + texpoly("",obj,",");
+      //  siehe ebenso noch einmal am Ende : ! (TeXwidth <> 0 !? )
+
+       s =  s + "\\begin{array}{rcl}" + newline;
+       for (i=1;i<=size(matrix(obj));i++)
+       { s =  s + Iname+ "_{" + string(i) + "} & = & "
+               + texpoly("",obj[i]);
+         if (i<size(matrix(obj))){ s = s  + "\\\\" + newline;}
+       }
+       s = s + newline;
+       s = s + "\\end{array}" + newline;
+       TeXwidth = Tw;
+       Iname ="";
+     }
+     else
+     {
+      if (TeXwidth==0)
+      { TeXwidth = -1;
+        obj= simplify(obj,2);
+        linear = 1;
+        for (j=1;j<=size(obj);j++)
+        { if (deg(obj[j])>1){linear =0; break;}
+        }
+        if (!(linear))
+        { s = s + "\\begin{array}{rcl}" + newline;
+          for(j=1;j<=size(obj);j++)
+          { h = absterm(obj[j]);
+            ineq = attrib(obj[j],"ineq");
+            if(!(size(ineq))) { ineq = "=" ; }
+            l = texpoly("",obj[j]-h) + " & " + ineq + " & " + texpoly("",-h);
+            if(j<size(obj)) { l = l + " \\\\";}
+            s =s+ l + newline;
+           }
+          s = s + "\\end{array}" + newline;
+        }
+        else   // linear
+        { s = s +
+   "\\begin{array}{*{" + string(2*nvars(basering)-1) + "}{c}cr}" + newline;
+           for(j=1; j<=size(obj);j++)
+           { h = absterm(obj[j]);
+             ineq = attrib(obj[j],"ineq");
+             if(!(size(ineq))) { ineq = "=" ; }
+              l = ""; nc = 0;
+              for (i=1; i<=nvars(basering);i++)
+              { t = " "; sg ="";
+                g = obj[j]-subst(obj[j],var(i),0);
+                if (g!=0) { t = texpoly("",g);}
+                if (i>1)
+                { if (t[1]!="-" and t[1]!= " " and nc ){sg = "+";}
+                  if  (t[1]=="-") { sg = "-"; nc =1; t=t[2,size(t)-1];}
+                  if (t==" ") {sg ="";}
+                  l = l + " & " + sg + " & " + t;
+                }
+                else { l = t;}
+                if (g!=0) {nc = 1;}
+               }
+
+               l = l + " & " + ineq + " & " + texpoly("",-h);
+             if (j < size(obj)) { l = l + " \\\\";}
+             s = s + l + newline;
+            } // end for (j)
+          s = s + "\\end{array}";
+         }  // end else linear
+        TeXwidth = 0;
+       } // end TeXwidth == 0
+   else // TeXwidth <> 0
+   { s =  s + "\\left"+ OB;
+     if (defined(TeXaligned))
+     { s = s + texpoly("",obj,",");
+     }
+     else
+     { s = s + newline + "\\begin{array}{c}" + newline +
+               texpoly("",obj,", \\\\" + newline) +
+                newline + "\\end{array}" + newline;
+     }
+    s = s + "\\right" + CB;
+    } // end TeXwidth <> 0
+   }  // not Iname
+// s;
+  }
+
+   if (typeof(obj) == "module")
+   { M = matrix(obj);
+     if (Tw ==0 or Tw > 9) { TeXwidth = -1;}
+     s = s + "\\left" + OB + newline;
+     if (!(defined(TeXaligned)))
+     {  // Naechste Zeile nicht notwendig !
+     // s = s + "\\begin{array}{*{"+ string(ncols(M)) + "}{c}}" + newline;
+      for(j=1;j<=ncols(M);j++)
+      { l = "\\left" + OB + newline + "\\begin{array}{c}" + newline;
+        l = l + texpoly("",ideal(M[1..nrows(M),j]), " \\\\" + newline)
+              + newline + "\\end{array}" +newline + "\\right" + CB + newline;
+        if (j< ncols(M)) { l = l + " , " + newline;}
+        s = s + l ;
+      }
+     }
+     else    // TeXaligned
+     {
+      for(j=1;j<=ncols(M);j++)
+      { s = s + "\\left" + OB + newline +
+           texpoly("",ideal(M[1..nrows(M),j]),",") + newline + "\\right" + CB;
+        if (j<ncols(M)) { s = s + "," + newline; }
+      }
+     }
+    s = s  + "\\right" + CB + newline;
+   } // module part
+
+   if (typeof(obj) == "matrix")
+   { if (Tw==0 or Tw > 9) {TeXwidth = -1;}
+     l = "";
+   //  M = transpose(obj);
+     s = s + "\\left" + OB + newline +
+             "\\begin{array}{*{"+ string(ncols(obj)) + "}{c}" + "}"+ newline;
+     for(i=1;i<=nrows(obj);i++)
+     { l = l + texpoly("",ideal(obj[i,1..ncols(obj)])," & ");
+       if (i<nrows(obj)) { l = l + " \\\\" + newline;}
+     }
+     l = l + newline;
+     s = s + l + "\\end{array}" + newline +
+                 "\\right" + CB + newline;
+    TeXwidth = Tw;
+  }
+
+   if (typeof(obj) == "intmat")
+   { nr,nc = nrows(obj),ncols(obj);
+     l = "";
+     l =  "\\left" + OB + newline +
+          "\\begin{array}{*{"+ string(nc) + "}{r}}"+ newline;
+     for(i=1;i<=nr;i++)
+     { for(j=1;j<=nc;j++)
+       { l = l + string(obj[i,j]);
+         if (j <nc ) { l = l + " & ";}
+         else {if( i < nr) { l = l + "\\\\" + newline;}}
+       }
+     }
+     l = l + newline + "\\end{array}" + newline +
+             "\\right" + CB + newline;
+    s = s + l;
+  }
+
+  if (typeof(obj) == "ring" or
+      typeof(obj) == "qring") { s = s + D + texring("",obj) + D + newline;}
+
+  kill obj;
+ }
+
+ s = s +  DE + newline;
+
+ if(!(ND)) { kill NoDollars;}
+
+// s;
+ if(size(fname))
+ { i=1;
+  while (fname[i]==">"){i++;}
+  fname = fname[i,size(fname)-i+1];
+  if (size(fname)>=4)               // check if filename is ending with ".tex"
+  { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+  }
+  else {fname = fname + ".tex";}
+  write(fname,s);
+ }
+ else {return(s);}
+}
+example
+{
+   echo=0;
+   // -------- prepare for example ---------
+   if (defined(TeXaligned)) {int Teali=TeXaligned; kill TeXaligned;}
+   if (defined(TeXbrack)){string Tebra=TeXbrack; kill TeXbrack;}
+   "EXAMPLE:"; echo = 2;
+   //
+   //  --------------  typesetting for polynomials ----------
+   ring r = 0,(x,y),lp;
+   poly f = x5y3 + 3xy4 + 2xy2 + y6;
+   f;
+   texobj("",f);
+   pause();
+   //  --------------  typesetting for ideals ----------
+   ideal G = jacob(f);
+   G;
+   texobj("",G);
+   pause();
+   //  --------------  variation of typesetting for ideals ----------
+   int TeXaligned = 1; export TeXaligned;
+   string TeXbrack = "<"; export TeXbrack;
+   texobj("",G);
+   pause();
+   kill TeXaligned, TeXbrack;
+   //  --------------  typesetting for matrices ----------
+   matrix J = jacob(G);
+   texobj("",J);
+   pause();
+   //  --------------  typesetting for intmats ----------
+   intmat m[3][4] = 9,2,4,5,2,5,-2,4,-6,10,-1,2,7;
+   texobj("",m);
+   echo=0;
+   //
+   // --- restore global variables if previously defined ---
+   if (defined(Teali)){int TeXaligned=Teali; export TeXaligned; kill Teali;}
+   if (defined(Tebra)){string TeXbrack=Tebra; export TeXbrack; kill Tebra;}
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc texproc(string fname,string pname)
+"USAGE:   texproc(fname,pname); fname,pname strings
+ASSUME:  @code{`pname`} is a procedure.
+RETURN:  if @code{fname=\"\"}: string, the proc @code{`pname`} in a verbatim
+         environment in LaTeX-typesetting;@*
+         otherwise: append this string to the file @code{<fname>}, and
+         return nothing.
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+         (if not given) is added to @code{fname}.@*
+         @code{texproc} cannot be applied to itself correctly.
+EXAMPLE: example texproc; shows an example
+"
+{
+  int i,j=1,1;
+  string p,s,t;
+
+  if (defined(pname))
+  { if (typeof(`pname`)=="proc")
+    { p = string(`pname`);
+      s = "\\begin{verbatim}" + newline;
+      s = s + "proc " + pname + "(";
+      i = find(p,"parameter");       // collecting the parameters
+      while(i)
+      { j=find(p,";",i);
+        t = p[i+10,j-i-10];
+        if(i>1){s = s + ",";};
+        s = s + t;
+        i = find(p,"parameter",j);
+      }
+      s = s + ")" + newline;
+     j++;                      // skip one for the newline
+     i = find(p,"return();",j);
+     if (!(i))
+     { i = find(p,";RETURN();",j); }  // j kann hier weg
+     s = s + "{" + p[j,i-j-2] + "}" + newline;
+     s = s + "\\end{verbatim}" + newline;
+   }
+  }
+  else
+  { print(" --Error: No such proc defined");
+    return();
+  }
+  if(size(fname))
+  { i=1;
+    while (fname[i]==">"){i++;}
+    fname = fname[i,size(fname)-i+1];
+    if (size(fname)>=4)        // check if filename is ending with ".tex"
+    { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+    }
+    else {fname = fname + ".tex";}
+    write(fname,s);
+  }
+  else{return(s);}
+}
+example
+{ "EXAMPLE:"; echo=2;
+  proc exp(int i,int j,list #)
+  { string s;
+
+    if (size(#))
+    {
+     for(i;i<=j;i++)
+     { s = s + string(j) + string(#); }
+    }
+   return(s);
+  }
+  export exp;
+  texproc("","exp");
+  kill exp;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc tvar(intvec v)
+{
+  int i,j,ldots;
+  string s;
+  j = 1;
+  s = texpoly("",var(1));
+
+  if (nvars(basering)==1) { return(s);}
+  if (nvars(basering)==2) { return(s + "," + texpoly("",var(2)));}
+  if (size(v)==1 and v[1] == 1)
+     {return(s + ",\\ldots,"+ texpoly("",var(nvars(basering))));}
+  if (v[1]==1 and size(v) >1) {j++;}
+  for(i=2;i<nvars(basering);i++)
+  { if (i<v[j]  and !(ldots))
+    { s = s + ",\\ldots";
+      ldots =1;
+    }
+    if (i== v[j])
+    { s = s + "," + texpoly("",var(i));
+      ldots =0;
+      if (j< size(v)) {j++;}
+    }
+  }
+ if (v[j]<nvars(basering)-1) { s = s + ",\\ldots";}
+ return(s + "," + texpoly("",var(nvars(basering))));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc texring(string fname, def r, list #)
+"USAGE:   texring(fname, r[,L]); fname string, r ring, L list
+RETURN:  if @code{fname=\"\"}: string, the ring in TeX-typesetting;@*
+         otherwise: append this string to the file @code{<fname>} and
+         return nothing.
+NOTE:    preceding \">>\" are deleted and suffix \".tex\" (if not given)
+         is added to @code{fname}.@*
+         The optional list L is assumed to be a list of strings which control,
+         for instance the symbol for the field of coefficients.@*
+         For more details call @code{texdemo();} (generates a LaTeX2e
+         file called @code{texlibdemo.tex} which explains all features of
+         @code{texring}).
+EXAMPLE: example texring; shows an example
+"
+{
+  int i,galT,flag,mipo,nopar,Dollars,TB,TA;
+  string ob,cb,cf,en,s,t,savebrack; //opening bracket, closing br, coef.field
+  intvec v;
+
+  setring r;
+  if (!(defined(NoDollars))){ Dollars = 1; int NoDollars; export NoDollars;}
+  ob,cb = "[","]";
+  if (find(ordstr(r),"s")) { ob,cb="[[","]]";}
+  if(char(r)==0){cf="\\Q";}
+  if(charstr(r)=="real"){cf="\\R";}
+  if(char(r)==prime(char(r))){cf="\\Z_{"+string(char(r))+"}";}
+  if(char(r)>0)
+  { i = find(charstr(r),",");
+    if(i)
+    { t= charstr(r)[1,i-1];
+      galT = (t <> string(char(r)));
+      if (galT) { cf = "\\F_{"+ t + "}";}
+    }
+  }     // all other cases are cover already by char(r)=? prime(char)
+
+  if (size(#))
+  { if (typeof(#[1])=="list") { # = #[1];}
+  }
+  for (i=1;i<=size(#);i++)
+  { flag =0;
+    if(typeof(#[i])=="string")
+    {
+     if(#[i][1]=="^" or #[i][1]=="_"){en=en+#[i];flag = 1;}
+     if(#[i]=="mipo"){mipo=1; flag = 1;}
+     if(#[i]=="{"){ob,cb="\\{","\\}";flag=1;}
+     if(#[i]=="{{"){ob,cb="\\{\\{","\\}\\}";flag=1;}
+     if(#[i]=="["){ob,cb="[","]";flag=1;}
+     if(#[i]=="[["){ob,cb="[[","]]";flag=1;}
+     if(#[i]=="<"){ob,cb="<",">";flag=1;}
+     if(#[i]=="<<"){ob,cb="{\\ll}","{\\gg}";flag=1;}
+     if(#[i]=="C"){cf="\\C";flag=1;}
+     if(#[i]=="Q"){cf="\\Q";flag=1;}
+     if((#[i]=="k" or #[i]=="K" or #[i]=="R") and !(galT))
+                   {cf=#[i]; flag=1; nopar=1;}
+     if (flag!=1) {cf = #[i];}  // for all the cases not covered here e.g Z_(p)
+    }                           // or Q[i]
+
+    if ((typeof(#[i])=="intvec") or
+        (typeof(#[i])=="int")){v=#[i];}
+   }
+  s = cf;
+ // now the parameters
+ // t;
+  if(npars(r) and ((t==string(char(r))) or char(r)==0) and !(nopar))
+  {
+   s = s + "(";                      // !! mit ideal !!
+   for(i=1;i<npars(r);i++) {s = s + texpoly("",par(i)) + ",";}
+   s = s + texpoly("",par(npars(r))) + ")";
+  }                               // parameters done
+  if (!(galT) and mipo and minpoly!=0)
+  { s = s + "/" + list(parsp(string(minpoly),0))[1];}
+  s = s + ob;
+  if (v!=0 and nvars(r)>3)
+  { s = s + tvar(v);}
+  else
+  { s = s + texpoly("",maxideal(1),","); }
+   s = s + cb + en;
+
+  if (typeof(r)=="qring")
+  { ideal @I = ideal(r);
+    if (defined(TeXbrack))
+    {
+      TB =1; savebrack = TeXbrack;
+      if (TeXbrack!= "<" and TeXbrack!="(") { TeXbrack = "<";}
+    }
+    TA = defined(TeXaligned);
+    if (!(TA)) { int TeXaligned; export TeXaligned; }
+    t = texobj("",@I);
+ //   @I;
+ //   t;
+    if (TB) { TeXbrack = savebrack;}
+    if (!(TA)) { kill TeXaligned;}
+    s = s + "/" + t;
+  }
+
+  if (Dollars)
+  { kill NoDollars;
+    s =  "$" + s + "$";
+  }
+  if (size(fname))
+  { i=1;
+     while (fname[i]==">"){i++;}
+     fname = fname[i,size(fname)-i+1];
+
+     if (size(fname)>=4)           // check if filename is ending with ".tex"
+     { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+     }
+     else {fname = fname + ".tex";}
+     write(fname,s);
+  }
+  else{return(s);}
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r0 = 0,(x,y),dp;                // char = 0, polynomial ordering
+  texring("",r0);
+  //
+  ring r7 =7,(x(0..2)),ds;             // char = 7, local ordering
+  texring("",r7);
+  //
+  ring r1 = 0,(x1,x2,y1,y2),wp(1,2,3,4);
+  texring("",r1);
+  //
+  ring rr = real,(x),dp;               // real numbers
+  texring("",rr);
+  //
+  pause();
+
+  ring rabc =(0,t1,t2,t3),(x,y),dp;    // ring with parameters
+  texring("",rabc);
+  //
+  ring ralg = (7,a),(x1,x2),ds;        // algebraic extension
+  minpoly = a2-a+3;
+  texring("",ralg);
+  texring("",ralg,"mipo");
+  //
+  ring r49=(49,a),x,dp;                // Galois field
+  texring("",r49);
+  //
+  setring r0;                          // quotient ring
+  ideal i = x2-y3;
+  qring q = std(i);
+  texring("",q);
+  //
+  pause();
+  // ------------------ additional features -------------------
+  ring r9 =0,(x(0..9)),ds;
+  texring("",r9,1);
+  texring("",r9,"C","{","^G");
+  //
+  ring rxy = 0,(x(1..5),y(1..6)),ds;
+  intvec v = 5,6;
+  texring("",rxy,v);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc rmx(string fname)
+"USAGE:   rmx(fname); fname string
+RETURN:  nothing; removes the @code{.log} and @code{.aux} files associated to
+         the LaTeX file <fname>.@*
+NOTE:    If @code{fname} ends by @code{\".dvi\"} or @code{\".tex\"}, the
+         @code{.dvi} or @code{.tex} file will be deleted, too.
+EXAMPLE: example rmx; shows an example
+"
+{
+  int i,suffix= 1,0;
+  int retval;
+
+  if (size(fname))
+  {
+   while (fname[i]==">"){i++;}
+   fname = fname[i,size(fname)-i+1];
+   if (size(fname)>4)
+   { if (fname[size(fname)-3,4]==".tex") { suffix = 2;}
+     if (fname[size(fname)-3,4]==".dvi") { suffix = 1; }
+     if (suffix) { fname = fname[1,size(fname)-4]; }
+   }
+   retval = system("sh","rm " + fname + ".aux");
+   retval = system("sh","rm " + fname + ".log");
+   if (suffix==2) {retval = system("sh","/bin/rm -i " + fname +".tex");}
+   if (suffix>=1) {retval = system("sh","/bin/rm -i " + fname +".dvi");}
+  }
+  else
+  {" -- Need a filename ";
+    return();
+  }
+}
+example
+{ "EXAMPLE:"; echo =2;
+  ring r;
+  poly f = x+y+z;
+  opentex("exp001");              // defaulted latex2e document
+  texobj("exp001","A polynom",f);
+  closetex("exp001");
+  tex("exp001");
+  rmx("exp001");   // removes aux and log file of exp001
+  echo = 0;
+  pause("remaining files will be deleted after pressing <RETURN>");
+  echo = 2;
+  system("sh","rm exp001.*");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc xdvi(string fname, list #)
+"USAGE:   xdvi(fname[,style]); fname,style = string
+RETURN:  nothing; displays dvi-file fname.dvi with previewer xdvi
+NOTE:    suffix .dvi may be omitted in fname
+         style captures the program that will be called instead of the default (xdvi)
+EXAMPLE: example xdvi; shows an example
+"
+{
+  int i=1;
+  int retval;
+  string default = "xdvi";
+
+  if (size(#)) {default = string(#[1]);}
+
+  if (size(fname))
+  {
+   while (fname[i]==">") {i++;}
+   fname = fname[i,size(fname)-i+1];
+
+   if (size(fname)>=4)
+   { if(fname[size(fname)-3,4]==".tex") {fname = fname[1,size(fname)-4];}}
+
+   "calling ",default, " for :",fname,newline;
+
+   if (default=="latex2e")
+   {
+     retval = system("sh","latex " +  fname +" &");
+   }
+   else
+   {
+     retval = system("sh",default + " " +  fname +" &");
+   }
+  }
+  else
+  { " -- Need a filename ";
+    return();
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  intmat m[3][4] = 9,2,4,5,2,5,-2,4,-6,10,-1,2,7;
+  opentex("exp001");
+  texobj("exp001","An intmat:  ",m);
+  closetex("exp001");
+  tex("exp001");
+  xdvi("exp001");
+  echo = 0;
+  pause("the created files will be deleted after pressing <RETURN>");
+  echo = 2;
+  system("sh","rm exp001.*");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc parsr(string s)                     // parse real
+{
+  string t;
+  if (s=="      Inf") { return("\\infty",3);}
+  if (s=="     -Inf") { return("\\-infty",6);}
+  if (s[7]=="-"){t ="-";}
+  if (s[8]<>"0"){t = t + s[8];}
+  if (s[9]<>"0" or s[8]<>"0"){t = t + s[9];}
+  if (size(t))
+  { if (t=="1") {return(s[1,5]+"*10",21);}
+    if (size(t)>1) {return(s[1,5]+"*10^{"+t+"}",21+2*size(t));}
+    else {return(s[1,5]+"*10^"+t,23);}
+  }
+  else
+  {
+    return(s[1,5],12);
+  }
+}
+
+static proc parsg(string s)                  // parse Galois field
+{
+  int i,j = 1,1;
+  string t;
+  if (short)
+  {
+    t =s[1];
+    if(size(s)>1) {return(t+"^{" + s[2,size(s)-1] + "}",3+2*(size(s)-1));}
+    else{return(t,5);}
+  }
+  else
+  {
+    return(parselong(s+"!"));
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc texpoly(string fname,def p,list #)
+"USAGE:   texpoly(fname,p); fname string, p poly
+RETURN:  if @code{fname=\"\"}: string, the polynomial p in LaTeX-typesetting;@*
+         otherwise: append this string to the file @code{<fname>}, and
+         return nothing.
+NOTE:    preceding \">>\" are deleted in @code{fname}, and suffix \".tex\"
+         (if not given) is added to @code{fname}.
+EXAMPLE: example texpoly; shows an example
+"
+{
+  def @r = basering;
+
+  poly f,monom;
+  ideal I;
+  number cfm;
+  string sign,cfmt,pt,s,bg,t,monomt,  lnbreak;
+  string sep = newline;
+  int i,b,b2,n, msz,linesz, count,k;
+  int realT, parT, galT;
+  int C = 2 + defined(TeXdisplay);
+
+  string notvalid = "intvec intmat vector matrix module map ";
+
+  if (typeof(p) == "int") { return(p);}
+  if (typeof(p)  == "ring" or typeof(p) == "qring")
+  { " -- Call  texring  instead "; return();}
+  if (find(notvalid,typeof(p)))
+  { " -- Call  texobj  instead "; return();}
+  if (typeof(p)  == "map")
+  { " -- Call  texmap  instead "; return();}
+  if (typeof(p)  == "proc")
+  { " -- Call  texmap  instead "; return();}
+  if (typeof(p)  == "link" or typeof(p) == "list" or typeof(p) == "resolution")
+  { " -- Object cannot translated into tex "; return();}
+
+  if (!(defined(TeXdisplay))){ lnbreak = "\\\\[2mm]" + newline;}
+  else { lnbreak = "\\\\" + newline;}
+
+
+  if (defined(TeXdisplay)) { bg = "& ";}
+  if (!(defined(TeXwidth))) { int TeXwidth = -1; export TeXwidth;}
+
+
+// -- Type check
+
+ if (typeof(p)=="string")
+  { if(defined(`p`))
+    { pt = p + " = ";
+      p = `p`;
+    }
+  }
+  if (typeof(p)=="poly" or typeof(p)=="number") {I = p;}
+
+  if (typeof(p)=="ideal")
+  { I = p;
+    if(size(#)){ sep = #[1];}
+  }
+
+  if (I==0)
+  { if (!(defined(NoDollars))){return("$0$");}
+    else {return("0");}
+  }
+
+// -- Type check ende
+
+//---------------------
+
+
+//------- set flags: --------------------------------------------------------
+
+  if (size(#))
+  { if (typeof(#[1])=="int") { linesz = #[1];}
+ //   if (typeof(#[1])=="string") { linesz = #[1];}
+  }
+
+  parT = npars(@r);
+  realT = (charstr(@r)=="real");
+  i = find(charstr(@r),",");
+  if (i)
+  { t = charstr(@r)[1,i-1];
+    galT = (t <> string(char(@r)));  // the char is not the same as the ...
+  }
+  i = 0;
+
+//------- parse the polynomial
+  pt = bg;
+
+ for(k=1;k<=size(matrix(I));k++)
+ { i = 0; linesz = 0; count =0;
+   sign ="";
+   f = I[k];
+   if (f==0) { pt = pt + "0";}
+  while(f<>0)
+  { count++; msz = 0;
+
+// ------ tex the coefficient
+    monom = lead(f);
+    f = f - monom;
+    cfm = leadcoef(monom);
+    if (cfm*1 != 0) { monom = monom/cfm;} // the normalized monom
+    if (defined(TeXreplace)) { short =0;}  // this is essential //31.5.07
+    s = string(monom) + "!";              // add a terminating sign
+    cfmt = "";
+
+    cfmt = string(cfm);
+    if (size(cfmt)>1)                   // check if sign is < 0
+    { if (cfmt[2]=="-") { cfm = (-1) *cfm; sign = "-";}}
+    if (cfmt[1] == "-") { cfm = (-1) * cfm; sign = "-";}
+    if  (cfm!=1 or monom==1) {cfmt = string(cfm);}
+    else {cfmt="";}
+
+    if (defined(TeXwidth) and TeXwidth > 0 and TeXwidth <9 and count> TeXwidth)
+    { pt = pt + sign + "\\ldots"; break;}
+   // ----------------------------------------  linesz ??
+
+    if (size(cfmt))                            // parse the coefficient
+    {
+     monomt = cfmt;                   // (already a good choice for integers)
+     msz = 3*size(cfmt);
+
+     if(realT) { monomt,msz = parsr(cfmt);}
+     if (galT) { monomt,msz = parsg(cfmt);}
+     b = find(cfmt,"/(");                     // look if fraction  // 31.5.07
+     b2 = find(cfmt,"/");
+     // if (b) {b++;}                         // 31.5.07
+     n = size(cfmt);
+     if (!(parT) and  !(realT) and !(galT))
+     { if( !(b2) or defined(TeXnofrac))
+       { monomt = cfmt; msz = 3*size(monomt);}
+       else
+       { monomt = "\\frac{" + cfmt[1,b2-1] + "}{" + cfmt[b2+1,n-b2] + "}";
+          if (n-2*b2>0) {msz = C*(n-b2);}
+          else {msz = C*b2;}
+       }
+     }
+     if (parT and !(galT))
+     { monomt,msz = parsp(cfmt,b);}
+    }
+
+// -- now parse the monom
+    if (monom <> 1)
+    { i = 1;
+      if(short)
+      { while(s[i]<>"!")
+        { monomt = monomt + s[i]; i++;
+          b = i;
+          msz = msz + 3; // it was a single lettered var
+          while(s[i]!="!" and s[i]>="0" and s[i]<="9"){i++;}
+          if (i-b)
+          { monomt = monomt + "^{" + s[b,i-b] + "}";
+            msz = msz + 2*(i-b);
+          }
+        }
+      }
+      else          //  not short
+      { t,i = parselong(s);
+        monomt = monomt + t;
+        msz = msz + i;
+      }
+    }
+
+   msz = msz + 6*size(sign);   // Wieso mal 6 ??
+//  string(msz) + "  ," + string(linesz) + "  " + string(cfm*monom);
+
+   if (TeXwidth > 10 and (linesz + msz > 3*TeXwidth) and linesz)
+   { pt = pt + lnbreak + bg;
+     linesz = msz;
+   }
+   else { linesz = linesz + msz; }  // 3 for sign
+    pt = pt + sign + monomt;
+   sign = "+";
+   monomt = "";
+  }
+
+  if (k<size(matrix(I))){ pt = pt + sep;}
+ }
+
+  if (TeXwidth==0 and typeof(p)=="poly"){ pt = pt + "= 0";}
+  if (not(defined(NoDollars))) { pt = "$"+pt+"$";}
+
+  if (size(fname))
+  { i=1;
+    while (fname[i]==">"){i++;}
+    fname = fname[i,size(fname)-i+1];
+
+    if (size(fname)>=4)         // check if filename is ending with ".tex"
+    { if(fname[size(fname)-3,4]!=".tex") {fname = fname +".tex"; }
+    }
+    else {fname = fname + ".tex";}
+    write(fname,pt);
+   }
+  else {return(pt);}
+}
+example
+{ "EXAMPLE:"; echo =2;
+  ring r0=0,(x,y,z),dp;
+  poly f = -1x^2 + 2;
+  texpoly("",f);
+  ring rr= real,(x,y,z),dp;
+  texpoly("",2x2y23z);
+  ring r7= 7,(x,y,z),dp;
+  poly f = 2x2y23z;
+  texpoly("",f);
+  ring rab =(0,a,b),(x,y,z),dp;
+  poly f = (-2a2 +b3 -2)/a * x2y4z5 + (a2+1)*x + a+1;
+  f;
+  texpoly("",f);
+  texpoly("",1/(a2+2)*x+2/b);
+}
+
+static proc parsp(string cfmt, int b)
+{ string mt, nom,denom;
+  int fl1,fl2,sz1,sz2,msz;
+
+  if (!(b))
+  { mt,fl1 = parst(cfmt,0); msz = size(cfmt)-2;
+    if (fl1) { mt = "(" + mt + ")"; msz = msz +1; }
+  }
+  else
+  { nom,fl1 = parst(cfmt[1,b-1],1);
+    denom,fl2 = parst(cfmt[b+1,size(cfmt)-b],1);
+    if (defined(TeXnofrac))
+    { if(fl1) { nom = "(" + nom + ")"; sz1++;}
+      if(fl2) {denom = "(" + denom + ")"; sz2++;}
+      mt = "(" + nom+ "/"+ denom+ ")"; msz = sz1+sz2 +1;   //31.5.07
+    }
+    else
+    { mt = "\\frac{" + nom + "}{" + denom + "}";
+      if (sz1-sz2) { msz = 5*sz1;}
+      else {msz = 5*sz2;}
+    }
+   }
+  return(mt,msz);
+}
+example
+{"EXAMPLE:"; echo =2;
+  ring r=(0,a,b),x,dp;
+  int i;
+  poly f = (a2b12 + 23a2 -b13-1)/(a2+2b -1);
+  f;
+  string s;
+  s= string(f);
+  i = find(s,")/(");
+  parsp(s,i);
+}
+
+static proc parst(string s,int sec)                // parse parameter
+// sec parameter to see if in parsp a fraction follows
+{ int i,j =1,-1;
+  int b,k,jj,mz;                         // begin and end
+  int saveshort=short;
+            string t,c,vn,nom,denom,sg;
+  if (s[1]=="(") { s = s[2,size(s)-2]; }
+  s = s + "!";
+
+  //if(defined(TeXreplace)){ short =0;}   // hier ueberfluessig 31.5.07
+  if (short)
+  { j = 0;  // 31.5.07
+    while(s[i]<>"!")
+    { b=i; if (s[i]=="+" or s[i]=="-") {j++;}  // 31.5.07
+      while(s[i]>="0" and s[i]<="9" or (s[i]=="+" or s[i]=="-") and s[i]!="!")
+      {i++;}     // scan the number
+        t =s[b,i-b];
+    //  if (t=="-1" and s[i]!="!" and s[i]!="-" and s[i]!="+"){t = "-";}
+      if (t=="-1" and (s[i]<="0" or s[i]>="9") and s[i]!= "/" and s[i]!="!")
+       {
+     t = "-";}
+      if (s[i]=="/")
+      { i++;
+        sg = "";
+        if (t[1]=="+" or t[1]=="-")
+        { nom = t[2,size(t)-1];
+          sg = t[1];
+        }
+        else { nom = t;}
+        b =i;
+        while(s[i]>="0" and s[i]<="9") {i++;}
+        denom = s[b,i-b];
+        if (!(sec) and (!(defined(TeXaligned))))
+        { t = sg + "\\frac{" + nom + "}{" + denom + "}";}
+        else
+        { t = sg + "(" + nom + "/" + denom + ")";
+        }
+      }
+      c = c + t;
+      if(s[i]!="!"){c = c + s[i]; i++;}      // the parameter
+      b=i;
+      while(s[i]>="0" and s[i]<="9")
+      {i++;}  //the exponent
+     if(i-b){ c = c + "^{" + s[b,i-b]+"}";}
+     }
+   }
+   else                         // if not short ....
+   { while (s[i] <> "!")
+     { b=i; j++;
+       while(s[i]=="-" or s[i]=="+" or (s[i]>="0" and s[i]<="9")){i++;}
+       t = s[b,i-b];
+       if (t=="-1" and s[i]=="*" ) {t="-";}
+      if (s[i]=="/")
+      { i++;
+        sg = "";
+        if (t[1]=="+" or t[1]=="-")
+        { nom = t[2,size(t)-1];
+          sg = t[1];
+        }
+        else { nom = t;}
+        b =i;
+        while(s[i]>="0" and s[i]<="9") {i++;}
+        denom = s[b,i-b];
+        if (!(sec) and (!(defined(TeXaligned))))
+        { t = sg + "\\frac{" + nom + "}{" + denom + "}";}
+        else
+        { t = sg + "(" + nom + "/" + denom + ")";
+        }
+      }
+       c = c+t; t="";
+       if (s[i]=="*"){i++;}
+       b=i;
+       while(s[i]!="+" and s[i]!="-" and s[i]!="!")  //pass a monom
+       { // start with letters
+        // alternativ:
+        while((s[i]>="a" and s[i]<="z") or (s[i]>="A" and s[i]<="Z")){i++;}
+             k = i-b;
+        vn = s[b,k];
+        if (defined(TeXreplace))
+        { for (jj=1; jj<= size(TeXreplace);jj++)
+         { if (vn == TeXreplace[jj][1])
+           {vn = TeXreplace[jj][2]; k=1;
+             if (s[i]=="*") {vn = vn + " ";}
+            break;} //suppose replacing by a single sign
+         }
+        }
+        t = t + vn;
+        mz = mz + 10*k;
+        if (s[i]=="_"  or s[i]=="(") { i++;}    // the index is coming
+        b = i;
+        while(s[i]>="0" and s[i]<="9"){ i++;}
+        k = i-b;
+        if (k){ t = t + "_{" +s[b,k] + "}";}
+        if(s[i]==")") {i++;}
+            if (s[i]=="^")
+        { i++; b = i;
+          while(s[i]>="0" and s[i]<="9"){ i++;} // for neg. expon.
+          if (b-i) { t = t + "^{" + s[b,i-b] + "}";}
+        }
+          if (i-b > k) { mz = mz + 5*(i-b);}
+        else {mz = mz + 5*k;}
+       if (s[i]=="*"){i++;}
+       b=i;
+        }
+      c =c+t;
+      }
+   }
+  short = saveshort;
+  return(c,j);
+}
+example
+{ "EXAMPLE:"; echo =2;
+  ring r=(0,a,b),x,dp;
+  poly f = (a2b12 + 23a2 -b13-1);
+  f;
+  parst(string(f));
+
+  f =(-a +4b2 -2);
+  f;
+  parst(string(f));
+
+  f = a23;
+  f;
+  parst(string(f));
+  f = 2a12b3 -4ab15 +2a4b12 -2;
+  short =0;
+  f;
+  parst(string(f));
+   ring r2=(0,a1,b1),x,dp;
+  poly f = 2*a1^12*b1^3 -4*a1*b1^15 +2*a1^4*b1^12 -2;
+  f;
+  parst(string(f));
+}
+
+
+static proc parselong(string s)
+{
+  int i,j,k,b,mz;
+  string t,vn;              // varname
+
+ // "s=" + s;
+  i = 1;
+  while (s[i] <> "!")
+  { b=i;
+
+// -- scan now the letter ...
+
+  //  while(s[i]!="!" and )
+
+// alternativ:
+ while((s[i]>="a" and s[i]<="z") or (s[i]>="A" and s[i]<="Z"))
+ { i++;}
+ // s[i]; i;
+   k = i-b;
+   vn = s[b,k];
+
+   if (defined(TeXreplace))
+   { for (j=1; j<= size(TeXreplace);j++)
+     { if (vn == TeXreplace[j][1])
+       {vn = TeXreplace[j][2]; k=1;
+        if (s[i]=="*") {vn = vn + " ";}
+         break;} //suppose replacing by a single sign
+     }
+   }
+   t = t + vn;
+   mz = mz + 10*k;
+   if (s[i]=="_"  or s[i]=="(") { i++;}    // the index is coming
+   b = i;
+   while(s[i]>="0" and s[i]<="9"){ i++;}
+   j = i-b;
+   if (j){ t = t + "_{" +s[b,j] + "}";}
+   if(s[i]==")") {i++;}
+   if (s[i]=="^")
+   { i++; b = i;
+     while(s[i]>="0" and s[i]<="9" or s[i]=="-")
+     { i++;}  // for neg. expon.
+     if (b-i) { t = t + "^{" + s[b,i-b] + "}";}
+   }
+   if (i-b > j) { mz = mz + 5*(i-b);}
+   else {mz = mz + 5*j;}
+   if (s[i]=="*"){i++;}
+  }
+  return(t,mz);
+}
+example
+{ "EXAMPLE:"; echo =2;
+  ring r =(49,a),x,dp;
+  number f = a13;
+  parsg(string(f));
+  list TeXreplace; export TeXreplace;
+  TeXreplace[1] = list("b","\\beta");
+  TeXreplace[2] = list("a","\\alpha");
+  TeXreplace[3] = list("c","\\gamma");
+  parselong(string(f)+"!");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+static proc tktex (def d)
+{
+ // calls appropriate proc from latex lib
+
+ string typeofd =typeof(d);
+ if (typeofd=="int" or typeofd=="string" or typeofd=="resolution" or typeofd=="map" or typeofd =="list"){ return(d);}
+
+ if (typeofd=="intvec" or typeofd == "intmat" or typeofd =="vector" or
+     typeofd=="matrix" or typeofd == "module")   { return(texobj("",d));}
+ if (typeofd=="ring" or typeofd=="qring") { return(texring("",d));}
+ if (typeofd =="ideal") { return(texobj("",d));}
+ if (typeofd=="number" or typeofd=="poly" or typeofd=="ideal")
+                                                 { return(texpoly("",d));}
+ if (typeofd=="link") {return(d);}
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static  proc splt(string s)
+  { int n,i= size(s),1;
+    int p;
+    string t;
+
+    while(n-i+1 >pagewidth)
+    { p = find(s,newline,i);
+      if (p and (p-i)<pagewidth)
+      { t = t + s[i,p];
+        i = i + p;
+      }
+      else
+      {
+       t = t+ s[i,pagewidth] + newline;
+       i = i + pagewidth;
+      }
+    }
+    if (n) { t= t + s[i,n-i+1];}
+    return(t);
+  }
+
+/////////////////////////////  PART0 //////////////////////////////////////////
+static proc part0(string fname)
+{
+ int texdemopart =0;
+ export texdemopart;
+
+
+// Singular script for generating tldemo.tex
+
+ string nl = newline;
+ string nl2 = newline + newline;
+ string lb = "\\\\";
+ string bv = "\\begin{verbatim}" + newline ;
+ string ev = "\\end{verbatim}" ;
+
+// "generating part0 of " + fname  + nl;
+
+ opentex(fname);
+
+write(fname,"\\newcommand{\\Line}{\\rule{\\textwidth}{0.25mm}\\\\[5mm]}");
+
+   write(fname,"\\centerline{\\large \\bf Demo file for latex.lib }");
+   write(fname,"\\centerline{07/05/3}");
+   write(fname,"\\vspace{1cm}");
+
+//--
+
+ write(fname,"\\section{Introduction}");
+ write(fname,"The procedures in \\verb|latex.lib| translate the output of
+ {\\sc Singular} into \\LaTeX \\ text.
+ This document illustrates the functionality of the library."+"\\\\" +  nl);
+ write(fname,"\\begin{tabular}{ll}" + nl +
+"LIBRARY: {\\tt latex.lib} &   PROCEDURES FOR TYPESETTING SINGULAR" +
+"\\\\" +  nl +
+" & OBJECTS IN LATEX2E"+
+"\\\\" +  nl +
+"{\\tt closetex(fnm);} & writes closing line for \\LaTeX-document"+
+"\\\\" +  nl +
+"{\\tt  opentex(fnm);} & writes header for \\LaTeX-file fnm"+
+"\\\\" +  nl +
+"{\\tt  tex(fnm);} & calls \\LaTeX2e for file fnm"+
+"\\\\" +  nl +
+"{\\tt  texdemo([n]);} & produces a file explaining the features of this lib"+
+"\\\\" +  nl +
+"{\\tt  texfactorize(fnm,f);} & creates string in \\LaTeX-format for
+factors of polynomial f"+ "\\\\" +  nl +
+"{\\tt  texmap(fnm,m,r1,r2);} & creates string in \\LaTeX-format for
+map m:r1$\\rightarrow$r2"+ "\\\\" +  nl +
+"{\\tt  texname(fnm,s);} &      creates string in \\LaTeX-format for
+identifier"+ "\\\\" +  nl +
+"{\\tt  texobj(l);} &           creates string in \\LaTeX-format for
+any (basic) type"+ "\\\\" +  nl +
+"{\\tt  texpoly(f,n[,l]);} &    creates string in \\LaTeX-format for poly"+
+"\\\\" +  nl +
+"{\\tt  texproc(fnm,p);} &      creates string in \\LaTeX-format of
+text from proc p"+ "\\\\" +  nl +
+"{\\tt  texring(fnm,r[,l]);} &  creates string in \\LaTeX-lformat for
+ring/qring"+ "\\\\" +  nl +
+"{\\tt  rmx(s);} &              removes .aux and .log files of \\LaTeX-files"+
+"\\\\" +  nl +
+"{\\tt  xdvi(s);} &             calls xdvi for dvi-files"+
+"\\\\" +  nl +
+" \\end{tabular} " + nl2 + "\\vspace{0.2cm}" + nl2 +
+"(parameters in square brackets {\\tt [ ]} are optional)"+
+"\\\\" +  nl2 + "\\vspace{0.2cm}" + nl2 +
+"The global variables {\\tt TeXwidth}, {\\tt TeXnofrac}, {\\tt
+ TeXbrack}, {\\tt TeXproj}, {\\tt TeXaligned}, {\\tt TeXreplace}, {\\tt
+ NoDollars} are used to control the typesetting: "
+);
+
+write(fname,
+bv +
+"
+  TeXwidth   (int) -1, 0, 1..9, >9:  controls breaking of long polynomials
+  TeXnofrac  (int) flag:  write 1/2 instead of \\frac{1}{2}
+  TeXbrack   (string) \"{\", \"(\", \"<\", \"|\", empty string:
+                            controls brackets around ideals and matrices
+  TeXproj    (int) flag:  write \":\" instead of \",\" in vectors
+  TeXaligned (int) flag:  write mappings (and ideals) aligned
+  TeXreplace (list) list entries = 2 strings:  replacing symbols
+  NoDollars  (int) flag:  suppresses surrounding $ signs
+
+" +
+ev);
+write(fname,"Notice that none of these global variables are defined when
+loading \\verb|latex.lib|. A flag variable is set as soon as it is defined.");
+
+
+//% The procs and
+//% the global variables
+
+//----------------------- opentex -----------------------------
+   write(fname,"\\section{Opening a \\LaTeX\\ file}");
+   write(fname,"In order to create a \\LaTeX\\ document and write a standard
+header into it, use the following command."+
+bv+
+"> string fname = \"" + fname + "\";" + nl +
+"> texopen(fname);" +
+ev + nl);
+
+write(fname,"The variable \\verb|fname| is always the first argument when
+calling one of the procedures of \\verb|latex.lib|. If this string is the
+empty string, then the output in not written into a file but displayed on
+the screen.");
+
+ //% opentex, defaulted to latex, possibly extension are ... and
+ //% ``own''
+
+
+pagewidth = 65;
+int TeXwidth = 100; export TeXwidth;
+// "part 0 generated " + nl;
+} //part0
+
+
+/////////////////////////////  PART1 //////////////////////////////////////////
+
+
+static proc part1(string fname)
+{
+
+  int st = defined(texdemopart);
+  string nl = newline;
+  string nl2 = newline + newline;
+  string lb = "\\\\";
+  string bv = "\\begin{verbatim}" + newline ;
+  string ev = "\\end{verbatim}" ;
+
+  if (not(st) or texdemopart>=1)
+  { print(" Call part0 first");
+    return();
+  }
+  else { texdemopart=1; }
+
+//"Continuing part1 of " + fname + nl;
+
+write(fname,
+"\\section{Rings, polynomials and ideals}"+nl2);
+
+// -1a------ a ring in char 0, short varnames and poly. ordering ----------
+write(fname,
+" A ring in characteristic 0 with short names of variables and polynomial
+ordering." +nl);
+ ring r0=0,(x,y,z),dp;
+ poly g=-x2y+2y13z+1;
+write(fname,
+bv +
+"> ring r0=0,(x,y,z),dp;" +nl+
+"> texring(fname,r0);" +
+ev);
+  texring(fname,r0);
+  write(fname,nl2);
+write(fname,
+bv +
+"> poly g=-x2y+2y13z+1;  g;" + nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g);
+  write(fname,"\\\\"+nl2);
+
+// write(fname,"\\Line");
+
+// -1b------ still in the same ring, a polynomial with rational coefs --------
+write(fname,
+" A polynomial with rational coefficients.
+" +nl);
+write(fname,
+bv +
+"> texpoly(fname,g/280);" +nl +
+ev
+);
+  texpoly(fname,g/280);
+  kill r0;
+
+write(fname,"\\\\"+nl2);
+write(fname,"\\Line");
+// -2-------- a ring in char 7, indexed varnames and series ordering ----------
+write(fname,
+" A ring in characteristic 7 with indexed names of variables and local
+ordering." +nl);
+ ring r1=7,(x1,x2,x3,x4),Ds;
+ poly g=-2*x1+x4-1;
+write(fname,
+bv +
+"> ring r1=7,(x1,x2,x3,x4),Ds;" +nl +
+"> texring(fname,r1);" +nl +
+ev);
+texring(fname,r1);
+write(fname,lb);
+
+write(fname, bv +
+"> poly g=-2*x1+x4-1;  g;" +nl +
+"> texpoly(fname,g);" +nl +
+ev);
+
+  texpoly(fname,g);
+
+write(fname,lb);
+write(fname,"\\Line");
+
+// -3-------- a ring in char 0, indexed varnames and local ordering ----------
+write(fname,
+" A ring in characteristic 0 with indexed names of variables and local
+ordering.
+" +nl);
+ ring r2=0,(x(1..5),y(1..2)),(ds(5),ls(2));
+ poly g=-y(1)^3*x(5) +y(1)*x(2);
+write(fname,
+bv +
+"> ring r2=0,(x(1..5),y(1..2)),(ds(5),ls(2));" + nl +
+"> texring(fname,r2);" +nl +
+ev);
+  texring(fname,r2);
+
+write(fname,
+bv +
+"> poly g=-y(1)^3*x(5)+y(1)*x(2);  g;" +nl+
+ string(g) + nl +
+"> texpoly(fname,g);"  +nl +
+ev
+);
+  texpoly(fname,g);
+  write(fname,lb);
+
+write(fname,"\\Line");
+
+// -4-------- a ring in char 0, indexed varnames and weighted ordering ------
+write(fname,
+" A ring in characteristic 0 with indexed names of variables and weighted
+ ordering." +nl);
+ ring r3=0,(x_1,x_2,x_3),wp(3,2,1);
+ poly g=-x_1*x_2+2*x_2*x_3+x_1*x_3;
+write(fname,
+bv +
+"> ring r3=0,(x_1,x_2,x_3),wp(3,2,1);" +nl+
+"> texring(fname,r3);" +nl +
+ev);
+  texring(fname,r3);
+write(fname,
+bv +
+"> poly g=-x_1*x_2+2*x_2*x_3+x_1*x_3;  g;" +nl+
+  string(g) + nl +
+"> texpoly(fname,g);"  +nl +
+ev
+);
+  texpoly(fname,g); write(fname,lb);
+
+write(fname,"\\Line");
+
+// -5-------- a ring with real coeff and matrix ordering -------------------
+write(fname,
+" A ring with real coefficients and matrix ordering.
+" +nl);
+ ring rr=real,(x,y),M(1,2,3,4);
+ poly g =-1.2e-10*x2+y+1;
+write(fname,
+bv +
+"> ring rr=real,(x,y),M(1,2,3,4);"+nl+
+"> texring(fname,rr);"+nl+
+ev);
+  texring(fname,rr);
+
+write(fname,
+bv +
+"> poly g=-1.2e-10*x2+y+1;  g;"+nl+
+  string(g) + nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g);  write(fname,lb);
+
+write(fname,"\\Line");
+
+// -6a-------- a ring in char 0, and indexed parameters --------- ----------
+write(fname,
+" A ring in characteristic 0 and indexed parameters.
+" +nl);
+ ring r0t=(0,s,t),(x,y),dp;
+ poly g=8*(-s+2t)/(st+t3)*x+t2*x-1;
+write(fname,
+bv +
+"> ring r0t=(0,s,t),(x,y),dp;" +nl +
+"> texring(fname,r0t);" +nl +
+ev);
+ texring(fname,r0t);
+write(fname,
+bv +
+"> poly g=8*(-s+2t)/(st+t3)*x+t2*x-1;  g;"+nl+
+  string(g) +nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g); write(fname,lb);
+write(fname,"\\Line");
+
+// -6b------- a ring in char 11003, and indexed parameters --------- ----------
+write(fname,
+" A ring in characteristic 11 and indexed parameters.
+" +nl);
+ ring rt=(11003,t1,t2,t3),(X,Y),dp;
+ poly g=8*(-t1+t2)/(t1+t3)*X+t2*Y-1;
+write(fname,
+bv +
+"> ring rt=(11003,t1,t2,t3),(X,Y),dp;" +nl +
+"> texring(fname,rt);" +nl+
+ev);
+  texring(fname,rt);
+
+write(fname,
+bv +
+"> poly g=8*(-t1+t2)/(t1+t3)*X+t2*Y-1;  g;" + nl+
+ string(g) +nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g); write(fname,lb);
+
+write(fname,"\\Line");
+
+// -7-------- a ring over an algebraic extension in char 7 ---------------
+write(fname,
+" A ring over an algebraic extension in char 7.
+" +nl);
+
+  ring ralg = (7,a),x,dp;
+  minpoly = a2-a+3;
+  poly g = -(2a13+a)*x2+a2*x-a+1;
+
+write(fname,
+bv +
+"> ring ralg=(7,a),x,dp;" +nl +
+"> minpoly=a2-a+3;" +nl +
+"> texring(fname,ralg);" +nl+
+ev);
+ texring(fname,ralg);
+
+write(fname,
+bv +
+"> poly g=-(2a13+a)*x2+a2*x-a+1;  g;"+nl+
+ string(g) +nl +
+"> texpoly(fname,g);" +nl +
+ev
+);
+  texpoly(fname,g); write(fname,lb);
+
+write(fname,"\\Line");
+
+// -8-------- the same ring a in 7 ralg, defined with gftables -- F_49 -------
+write(fname,
+" A ring defined with \\verb|gftables|, the same as \\verb|ralg| before, but
+with primitive element in the Galois field $\\F_{49}$." +nl);
+ ring r49 =(49,a),x,dp;
+ poly g=-(2a13+a)*x2+a2*x-a+1;
+write(fname,
+bv +
+"> ring r49 =(49,a),x,dp;" +nl+
+"> texring(fname,r49);" +nl+
+ev);
+ texring(fname,r49);
+
+write(fname,
+bv +
+"> poly g=-(2a13+a)*x2+a2*x-a+1;  g;" +nl+
+ string(g) +nl +
+"> texpoly(fname,g);" +nl +
+ev);
+  texpoly(fname,g); write(fname,lb);
+
+write(fname,"\\Line");
+
+// -9-------- a ring over the Gaussian numbers  ----------
+write(fname,
+" A ring over the Gaussian numbers.
+" +nl);
+ ring ri=(0,i),(x,y,z),ls;
+ minpoly=i2+1;
+ poly g=-(i+1)*x+2i2y2+i+x;
+write(fname,
+bv +
+"> ring ri=(0,i),(x,y,z),ls;" +nl +
+"> minpoly=i2+1;" +nl +
+"> texring(fname,ri);" +nl+
+ev);
+ texring(fname,ri);
+
+write(fname,
+bv +
+"> poly g=-(i+1)*x+2i2y2+i+x;  g;" +nl+
+ string(g) +nl +
+"> texpoly(fname,g);" +nl +
+ev
+);
+  texpoly(fname,g); write(fname,lb);
+
+write(fname,"\\Line");
+
+// -10--------- a quotient ring performed from  ----------
+write(fname,
+" A quotient ring performed of \\verb|r0| by an ideal
+" +nl);
+ ring r0=0,(x,y,z),dp;
+ ideal I = x2-y,y+z2, xy;
+ I = std(I);
+string sI = string(I);
+ qring qr = I;
+write(fname,
+bv +
+"> setring r0;" +nl +
+"> ideal I=x2-y,y+z2, xy;" +nl +
+"> I=std(I);" +nl +
+"> string(I);" + nl +
+splt(sI) + nl +
+"> qring qr=I;"+ nl+
+"> texring(fname,qr);" +
+ev
+);
+  texring(fname,qr); write(fname,lb);
+
+write(fname,"\\Line");
+
+// ------------------------- Features for rings
+
+write(fname,"\\subsection{Features for rings}");
+
+write(fname,
+"In many cases it might be convenient to change the standard typesetting
+of rings. This can be done by passing additional arguments to \\verb|texring|."
++nl);
+
+// changing the brackets
+
+write(fname,nl,"In order to change the displayed brackets one has to give
+the desired ones as additional argument (accepted brackets are: \\verb|\"\{\"|,
+\\verb|\"\{\{\"|,\\verb|\"[\"|,\\verb|\"[[\"|,\\verb|\"<\"|,\\verb|\"<<\"|).");
+
+write(fname,
+bv +
+"> texring(fname,rr,\"{{\");" + nl +
+ev
+);
+
+texring(fname,rr,"{{");
+
+write(fname,
+bv +
+"> texring(fname,r2,\"[\");" + nl +
+ev
+);
+
+texring(fname,r2,"[");
+
+write(fname,nl+"\\vspace{0.2cm}" + nl2);
+
+write(fname,"The brackets around the ideal in a quotient ring can be
+changed by setting  the global variable \\verb|TeXbrack| (see section
+{\\tt Ideals}).",nl);
+
+
+write(fname,
+bv +
+"> string TeXbrack = \"<\";" +nl +
+"> texring(fname,qr);" +nl +
+ev
+);
+
+  string TeXbrack = "<"; export TeXbrack;
+  texring(fname,qr);
+  kill TeXbrack;
+
+write(fname,
+bv +
+"> kill TeXbrack;" + nl +
+ev);
+
+
+write(fname,nl2,"\\Line");
+
+// changing the ground field
+// -------------------------------------------------
+
+write(fname,
+"It is possible to display a ground field different from the
+actual one by passing any letter in \\LaTeX \\ notation as additional
+argument.  Predefined values are \\verb|\"\\\\C\"|, \\verb|\"\\\\R\"|,
+\\verb|\"k\"|, \\verb|\"K\"| and \\verb|\"R\"|."+nl+
+"If for example a ground field of characteristic 0 should be written as
+$\\C$ instead of $\\Q$ use this as additonal argument.",nl);
+
+write(fname,
+bv +
+"> texring(fname,r3,\"\\\\C\");" + nl +
+ev);
+
+texring(fname,r3,"\\C");
+write(fname,nl+ "\\vspace{0.2cm}" + nl2);
+
+write(fname,"The values \\verb|\"k\"|, \\verb|\"K\"|, \\verb|\"R\"| play a
+ special role when the ground field is an algebraic extension. In this case
+the parameters will be omitted.");
+
+write(fname,
+bv +
+"> texring(fname,ralg,\"k\");" + nl +
+ev
+);
+
+texring(fname, ralg,"k");
+write(fname,nl+"\\vspace{0.2cm}" + nl2);
+
+write(fname,"If an algebraic extension should be displayed together with
+its minimal polynomial the optional parameter \\verb|mipo| has to be used.");
+
+write(fname,
+bv +
+"> texring(fname,ralg,\"mipo\");" + nl +
+ev
+);
+
+texring(fname, ralg,"mipo");
+write(fname,nl,"\\Line");
+
+// displaying only certain vars
+
+write(fname,"By default all variables of a ring will be displayed. It is
+possible to print only certain variables with $\\ldots$ between
+them. The positions of the variables which should be displayed have to be
+passed to \\verb|texring| as an \\verb|intvec|.");
+
+write(fname,
+bv +
+"> intvec v=5,6;
+> texring(fname,r2,v);" +nl +
+ev
+);
+
+  intvec v = 5,6;
+  texring(fname,r2,v);
+  kill v;
+
+write(fname,
+bv +
+"> kill v;" + nl +
+ev
+);
+
+write(fname,nl+ "\\vspace{0.2cm}" + nl2);
+
+write(fname,"The first and the last variable will always be printed.
+In order to print only these it is sufficient to give a 1 as third argument.");
+
+write(fname,
+bv +
+"> texring(fname,r1,1);" + nl +
+ev
+);
+texring(fname,r1,1);
+
+write(fname,nl2,"\\Line");
+
+// invariant ring under a group action
+
+write(fname,"If you want for example to display a ring as the invariant ring
+under a group, additional information starting with \\verb|^| may be added.");
+
+write(fname,
+bv +
+"> texring(fname,r0,\"^G\");" + nl +
+ev
+);
+
+texring(fname, r0,"^G");
+write(fname,nl2,"\\Line");
+
+// passing several optional arguments at once
+
+write(fname,"It is also possible to pass several of the arguments described
+above at once (in any order).");
+
+
+write(fname,
+bv +
+"> texring(fname,r3,\"\\\\R\",\"{{\",\"^G\");" + nl +
+ev
+);
+
+texring(fname, r3,"\\R","{{","^G");
+write(fname,nl2);
+//"end part 1" + nl;
+}
+
+
+/////////////////////////////  PART2 //////////////////////////////////////////
+
+
+static proc part2(string fname)
+{
+
+  int st = defined(texdemopart);
+  string nl = newline;
+  string nl2 = newline + newline;
+  string lb = "\\\\";
+  string bv = "\\begin{verbatim}" + newline ;
+  string ev = "\\end{verbatim}" ;
+
+  if (not(st) or texdemopart>=2)
+  { print(" Call part1 first");
+    return();
+  }
+  else { texdemopart=2; }
+
+// "Continuing Part2 of " + fname + nl;
+
+//-------------------- texfactorize ------------------------------
+write(fname,"\\subsection{Factorized polynomials}");
+
+write(fname,"The command \\verb|texfactorize| calls internally the
+{\\sc Singular} command \\verb|factorize| and returns the product of the
+irreducible factors. Note that, at the moment, it is not possible to pass
+any optional arguments for \\verb|factorize| through \\verb|texfactorize|.");
+
+  ring r0=0,(x,y,z),dp;
+  poly h=(x+1+y)^2*x3y*(2x-2y)*y12;
+
+write(fname,
+bv +
+"> setring r0;"+nl+
+"> poly h=(x+1+y)^2*x3y*(2x-2y)*y12;"+nl+
+"> h;" +nl+
+ splt(string(h)) + nl +
+"> texfactorize(fname,h);" +
+ev);
+texfactorize(fname,h);
+
+//  setring ralg;
+  ring ralg = (7,a),x,dp;
+  minpoly = a2-a+3;
+  poly h = (a24x5+x3)*a2x6*(x+1)^2;
+
+write(fname,
+bv +
+"> setring ralg;"+nl+
+"> poly h=(a24x5+x3)*a2x6*(x+1)^2;" +nl+
+"> h;"+ nl +
+ splt(string(h)) + nl +
+"> texfactorize(fname,h);"+ nl +
+ev);
+texfactorize(fname,h);
+
+//--------------------- features for polynomials -----------------
+write(fname,"\\subsection{Features for polynomials}");
+
+// TeXreplace
+// ---------------------------------------------
+write(fname,"By setting the global variable \\verb|TeXreplace| it is possible
+to define rules for replacing strings or variable names.
+\\verb|TeXreplace| has to be a list of twoelemented lists where the first
+entry is the text which should be replaced by the second entry.
+This may be applied to replace names of variables, but is also used
+when calling \\verb|texname| or \\verb|texmap|. Note that it
+is necessary to write a double backslash \\verb|\\\\\| at the beginning of
+a \\TeX \\ symbol." + lb+nl);
+
+write(fname,"Let us denote the primitive element of an algebraic extension
+by $\\xi$.");
+
+list TeXreplace; export TeXreplace;
+TeXreplace[1] = list("a","\\xi");
+// setring r49;
+  ring r49 =(49,a),x,dp;
+  poly g=-(2a13 +a)*x2+a2*x-a+1;
+write(fname,
+bv +
+"> list TeXreplace;" +nl +
+"> TeXreplace[1]=list(\"a\",\"\\\\xi\");" +nl+
+"> setring r49;" +nl+
+"> texpoly(fname,g);"+ nl +
+ev);
+
+texpoly(fname,g);
+
+write(fname,nl+ "\\vspace{0.2cm}" + nl2);
+write(fname,"Now let us write $\\lambda$ and $\\mu$ for deformation
+parameters.");
+TeXreplace[2]= list("s","\\lambda");
+TeXreplace[3]= list("t","\\mu");
+// setring(r0t);
+  ring r0t=(0,s,t),(x,y),dp;
+  poly g=8*(-s+2t)/(st+t3)*x+t2*x-1;
+write(fname,
+bv +
+"> TeXreplace[2]=list(\"s\",\"\\\\lambda\");"+nl+
+"> TeXreplace[3]=list(\"t\",\"\\\\mu\");"+nl+
+"> setring(r0t);"+nl+
+"> texpoly(fname,g);"+ nl +
+ev);
+texpoly(fname,g);
+
+kill TeXreplace;
+write(fname,nl+ "\\vspace{0.4cm}" + nl2);
+write(fname,nl2+"Note that, if \\verb|TeXreplace| is defined, the translation
+into \\LaTeX  code runs significantly slower, because every polynomial will be
+compiled in the \\verb|non short| mode."+ lb );
+
+write(fname,nl,"\\Line");
+
+//linebreaking   TeXwdith
+//-----------------------------------------------------------------------
+write(fname,"The global variable \\verb|TeXwidth| controls the wrapping of
+polynomials; possible values are:" + lb);
+
+write(fname,
+"\\[ " + nl +
+"\\text{TeXwidth} = ",
+"\\begin{cases} ",
+" -1 & \\text{no linebreaking} \\\\ ",
+"  0 & \\text{print the polynomial as equation } f=0 \\\\ ",
+" 1,\\dots,9 & \\text{the first n terms followed by the sign of the next
+term} \\\\ ",
+" > 9 & \\text{line break after terms of length n (see below)} ",
+"\\end{cases}",
+"\\]",nl);
+
+write(fname,"Note that the size of terms is calculated with certain
+multiplicities.",nl);
+
+//----------------------------------------------------------
+
+write(fname,"\\begin{itemize}",nl);
+write(fname,"\\item",nl);
+
+write(fname,
+bv +
+"> TeXwidth=-1;"+nl+
+"> setring r0;"+nl+
+"> poly f=g^2;"+nl+
+"> texpoly(fname,f);" + nl +
+ev);
+
+  setring r0;
+  poly g=-x2y+2y13z+1;
+  poly f=g^2;
+  texpoly(fname,f);
+
+write(fname,"\\item",nl);
+
+write(fname,
+bv +
+"> TeXwidth=0;"+nl+
+"> texpoly(fname,f);"+nl+
+ev);
+TeXwidth = 0;
+texpoly(fname,f);
+
+write(fname,"\\item",nl);
+
+write(fname,
+bv +
+"> TeXwidth=2;"+nl+
+"> texpoly(fname,f);"+nl+
+ev);
+TeXwidth=2;
+texpoly(fname,f);
+
+write(fname,"\\item",nl);
+
+write(fname,
+bv +
+"> TeXwidth=20;"+nl+
+"> texpoly(fname,f);"+nl+
+ev);
+TeXwidth=20;
+texpoly(fname,f);
+TeXwidth=-1;
+
+write(fname,"\\end{itemize}",nl);
+
+write(fname,nl2,"\\Line");
+
+write(fname,"There are two possibilities to convert a polynomial into
+\\LaTeX \\ code: either by using \\verb|texpoly| or by calling \\verb|texobj|.
+The difference is that \\verb|texpoly| puts the polynomial in textmode
+while \\verb|texobj| uses the display mode."+nl+
+"The following examples show the different outputs:");
+
+write(fname,
+bv +
+"> setring r3;
+> texpoly(fname,g/180);" + nl +
+ev);
+
+// setring r3;
+
+  ring r3=0,(x_1,x_2,x_3),wp(3,2,1);
+  poly g=-x_1*x_2+2*x_2*x_3+x_1*x_3;
+  texpoly(fname,g/180);
+
+write(fname,
+bv +
+"> texobj(fname,g/180);
+" + nl +
+ev);
+
+texobj(fname,g/180);
+
+//write(fname,"Some explanation how it works: if \\verb|texobj| is called for
+//a polynomial, then it defines a global variable \\verb|TeXdisp| which forces
+//\\verb|texpoly| to count fraction with space corresponding
+//the displaymode."+lb,nl2);
+//---------------------texobj for ideal ---------------
+
+write(fname,"\\subsection{Ideals}");
+write(fname,"By default, ideals are displayed as column vectors.");
+
+  ring r;
+  ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
+
+write(fname,
+bv +
+"> ring r;   // the default ring"+nl+
+"> ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;"+nl+
+"> texobj(fname,I);" + nl +
+ev);
+
+texobj(fname,I);
+
+write(fname,"\\Line");
+//----------------------------------------------------------------------
+write(fname,"If the global variable \\verb|Texaligned| is set then the ideal
+is displayed as a row vector.");
+
+write(fname,
+bv +
+"> int TeXaligned;
+> texobj(fname,I);" + nl +
+ev);
+
+int TeXaligned; export TeXaligned;
+texobj(fname,I);
+
+write(fname,"\\Line");
+//----------------------------------------------------------------------
+write(fname,"By setting the global variable \\verb|TeXbrack| it is possible
+to change the brackets.");
+
+write(fname,
+bv +
+"> string TeXbrack=\"<\";"+nl+
+"> texobj(fname,I);"+nl+
+ev);
+
+string TeXbrack="<";  export TeXbrack;
+texobj(fname,I);
+
+write(fname,
+bv +
+"> kill TeXbrack, TeXaligned;" + nl +
+ev);
+
+kill TeXbrack,TeXaligned;
+write(fname,"\\Line");
+//----------------------------------------------------------------------
+write(fname,
+" If \\verb|TeXwidth| is 0, an ideal is displayed as a system of
+equations.");
+
+// ------------- a linear equation system
+
+  ring r5=0,x(1..5),dp;
+  ideal I=-x(1)+2*x(3)+x(5), x(2)-x(4)+2*x(5)-1, 8*x(1)+x(4)+2;
+  TeXwidth=0;
+
+write(fname,
+bv +
+"> ring r5=0,x(1..5),dp;"+nl+
+"> ideal I=-x(1)+2*x(3)+x(5), x(2)-x(4)+2*x(5)-1, 8*x(1)+x(4)+2;"+nl+
+"> TeXwidth=0;"+nl+
+"> texobj(fname,I);" +nl+
+ev);
+
+  texobj(fname,I);
+
+  setring r;
+  ideal J=4x4y21+z25y7-y2,x3+y2,y2-z4;
+
+write(fname,
+bv +
+"> setring r;"+nl+
+"> ideal J=4x4y21+z25y7-y2,x3+y2,y2-z4;"+nl+
+"> texobj(fname,J);" +nl+
+ev
+);
+  texobj(fname,J);
+
+write(fname,"\\Line");
+//-----------------------------------------------------------------------
+write(fname,"Call the ideal by its name and it is printed as follows");
+
+write(fname,
+bv +
+"> setring r;
+> ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
+> texobj(fname,\"I\");" + nl +
+ev);
+
+ setring r; export(I);
+ texobj(fname,"I");
+ kill I,r;
+//" end part 2 " + nl;
+}
+
+/////////////////////////////  PART3 //////////////////////////////////////////
+
+static proc part3(string fname)
+{
+  int st=defined(texdemopart);
+  string nl=newline;
+  string nl2=newline + newline;
+  string lb="\\\\";
+  string bv="\\begin{verbatim}" + newline ;
+  string ev="\\end{verbatim}" ;
+
+  if (not(st) or st>=3)
+  {
+    print(" Call part2 first");
+    return();
+  }
+  else { texdemopart=3; }
+
+// " Continuing part 3 of " + fname +
+// " : map,matrices,vectors,intvec,intmats,proc";
+
+//---------------------- texmap ------------------------------
+write(fname,"\\section{Typeseting maps between rings}");
+write(fname,"By default, maps are displayed in the following way:");
+
+write(fname,
+bv +
+"> ring r4=0,(x,y,z),dp;"+nl+
+"> ring r5=0,(u,v),dp;"+nl+
+"> map phi=r1,u2,uv -v,v2;"+nl+
+"> texmap(fname,phi,r4,r5);" + nl +
+ev);
+
+  ring @r4_h=0,(x,y,z),dp;
+  export @r4_h;
+  ring r5=0,(u,v),dp;
+  map @phi_h=@r4_h,u2,uv -v,v2;  export @phi_h;
+  texmap(fname,@phi_h,@r4_h,r5);
+
+write(fname,"\\Line");
+//--------------------------------------------------------------------
+
+write(fname,"If the global variable \\verb|TeXaligned| is set, then the
+map is displayed in one line.");
+
+write(fname,
+bv +
+"> int TeXaligned;"+nl+
+"> texmap(fname,phi,r4,r5,\"\\\\C\");" + nl +
+ev );
+
+  int TeXaligned; export TeXaligned;
+  texmap(fname,@phi_h,@r4_h,r5,"\\C");
+
+write(fname,nl+"\\Line");
+//--------------------------------------------------------------------
+
+write(fname,"It is possible to pass the same additional arguments to
+\\verb|texmap| as to \\verb|texring| (see section {\\tt Rings}). This can
+be done by calling \\verb|texmap| with two lists as additional parameters,
+where the first list contains the optional parameters for the source and
+the second one contains the parameters for the domain. Note that if only one
+list is present then it is applied to both of the rings.");
+
+write(fname,
+bv +
+"> texmap(fname,phi,r4,r5,\"\\\\C\",\"{\");" + nl +
+ev );
+  texmap(fname,@phi_h,@r4_h,r5,"\\C","{");
+
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+write(fname,"The next example shows how to format the two rings in different
+ways.");
+
+write(fname,
+bv +
+"> texmap(fname,phi,r4,r5,list(),list(\"{\"));"+nl+
+ev );
+
+ texmap(fname,@phi_h,@r4_h,r5,list(),list("{"));
+
+write(fname,nl+"\\Line");
+//--------------------------------------------------------------------
+
+write(fname,"If the map is called by its name then \\verb|texmap| displays,
+in addition, also the name of the map.");
+
+write(fname,
+bv +
+"> list TeXreplace;" +nl+
+"> TeXreplace[1]=list(\"phi\",\"\\\\phi\")" +nl+
+"> texmap(fname,\"phi\",r4,r5);" + nl +
+ev);
+
+  list TeXreplace;
+  TeXreplace[1]=list("@phi_h","\\phi");
+  export TeXreplace;
+  texmap(fname,"@phi_h",@r4_h,r5);
+  kill @phi_h,@r4_h,r5,TeXreplace,TeXaligned;
+
+
+write(fname,
+bv +
+"> kill phi,r4,r5,TeXreplace,TeXaligned;" + nl +
+ev);
+
+
+//% the texobj part
+write(fname,"\\section{Typesetting composed data structures}");
+//=======================================================================
+
+write(fname, "Complex data structures such as matrices, vectors or modules
+can be displayed by using the procedure \\verb|texobj|.");
+
+write(fname,"\\subsection{Matrices and vectors}");
+//=======================================================================
+
+write(fname,"The following example shows how to typeset the hessian of a
+polynomial."+
+bv +
+"> ring r;",
+"> poly h=2xy3-x2z+x4z7+y4z2;",
+"> matrix H=jacob(jacob(h));",
+"> texobj(fname,H);",
+ev );
+
+ring r;
+poly h=2xy3-x2z+x4z7+y4z2;
+matrix H=jacob(jacob(h));
+
+texobj(fname,H);
+
+write(fname,"By default, \\verb|vectors| are written as row vectors:");
+
+vector V = H[2];
+
+write(fname,
+bv +
+"> vector V=H[2];",
+"> texobj(fname,V);",
+ev );
+
+texobj(fname,V);
+
+write(fname,nl2+"\\vspace{0.2cm}"+nl);
+write(fname,"In order to transpose it, it has to be converted into a
+matrix.");
+write(fname,
+bv +
+"> texobj(fname,matrix(V));",
+ev );
+
+texobj(fname,matrix(V));
+
+write(fname,nl+"\\Line");
+//------------------------------------------------------------------------
+
+write(fname,"All the features for typesetting polynomials work also for
+matrices or vectors with polynomial entries.");
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+write(fname,"By setting the global variable \\verb|TeXwidth| it is possible
+to display only the first terms of the polynomials.");
+
+write(fname,bv +
+"> TeXwidth=1;",
+"> texobj(fname,H);",
+"> TeXwidth=-1;",
+ev );
+
+TeXwidth = 1;
+texobj(fname,H);
+TeXwidth = -1;
+
+write(fname,nl,"\\Line");
+//------------------------------------------------------------------------
+write(fname,"The flag variable \\verb|TeXnofrac| controls the typesetting
+of fractions.");
+
+write(fname,
+bv +
+"> ring R0=0,x,dp;",
+"> matrix M[2][3]=1/2, 0, 1/2, 0, 1/3, 2/3;",
+"> texobj(fname,M);",
+ev);
+
+
+ring R0 = 0,x,dp;
+matrix M[2][3] = 1/2, 0, 1/2, 0, 1/3, 2/3;
+texobj(fname,M);
+
+write(fname,bv +
+"> int TeXnofrac;",
+"> texobj(fname,M);",
+ev );
+
+  int TeXnofrac; export TeXnofrac;
+  texobj(fname,M);
+  kill TeXnofrac;
+
+write(fname,bv +
+"> kill TeXnofrac;",
+ev );
+
+write(fname,nl,"\\Line");
+//------------------------------------------------------------------------
+
+write(fname,"Printing a vector with homogeneous coordinates can be done by
+setting \\verb|TeXproj|.");
+write(fname,bv +
+"> setring r;",
+"> int TeXproj;",
+"> texobj(fname,V);",
+ev );
+
+  setring r;
+  ideal I=3xz5+x2y3-3z,7xz5+y3z+x-z,-xyz2+4yz+2x;
+  int TeXproj; export TeXproj;
+
+  texobj(fname,V);
+  kill TeXproj;
+
+write(fname,
+bv +
+"> kill TeXproj;"+nl+
+ev);
+
+write(fname,"\\subsection{Modules}",nl2);
+
+write(fname,"By default, modules are displayed in the following way:"+
+bv +
+"> setring r;",
+"> module md=module(H);",
+"> texobj(fname,md);",
+ev );
+
+setring r;
+module md = module(H);
+texobj(fname,md);
+
+write(fname,nl,"\\Line");
+//------------------------------------------------------------------------
+
+write(fname,"In order to write the generators of a module aligned, the flag
+variable \\verb|TeXaligned| has to be defined.",nl2);
+
+write(fname,bv +
+"> int TeXaligned;",
+"> texobj(fname,md);",
+ev );
+
+int TeXaligned; export TeXaligned;
+texobj(fname,md);
+kill TeXaligned;
+write(fname,bv +
+"> kill TeXaligned;",
+ev );
+
+//----------------------------------------------------------------
+write(fname,"\\subsection{Integer matrices and vectors}");
+
+write(fname,"Integer matrices are displayed in the following way.");
+
+intmat m[3][4]=-1,3,5,2,-2,8,6,0,2,5,8,7;
+
+write(fname,
+bv +
+"> intmat m[3][4]=-1,3,5,2,-2,8,6,0,2,5,8,7;" + nl +
+"> m;" + nl +
+string(m) + nl +
+"> texobj(fname,m);" + nl2 +
+ev );
+
+texobj(fname,m);
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+write(fname,"Integer vectors are displayed as row vectors.");
+intvec v = 1..4;
+write(fname,
+bv +
+"> intvec v=1..4;"+nl+
+"> v;" + nl +
+string(v) + nl +
+"> texobj(fname,v);"+nl+
+ev );
+
+texobj(fname,v);
+
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+write(fname,"To typeset the transposed vector, it has to be converted into
+an integer matrix."+
+bv +
+"> texobj(fname,intmat(v));" + nl2 +
+ev );
+
+texobj(fname,intmat(v));
+
+write(fname,nl+ "\\vspace{0.2cm}" + nl);
+
+write(fname,"The following example shows how to typeset the multiplication of
+a matrix with a vector."+
+bv +
+"> texobj(fname,intmat(m*v),\"=\",m,\"*\",intmat(v));" + nl2 +
+ev );
+
+texobj(fname,intmat(m*v),"=",m,"*",intmat(v));
+
+//-----------------------------------------------------------------
+write(fname,"\\Line");
+
+write(fname,"Of course, the brackets of a \\verb|intmat| can be changed
+by setting \\verb|TeXbrack|.");
+
+write(fname,
+bv +
+"> intmat mat[3][3]=1,2,3,4,5,6,7,8,9;" + nl +
+"> string TeXbrack=\"|\";" + nl +
+"> texobj(fname,mat,\" = \",det(mat)); " + nl2 +
+ev );
+
+intmat mat[3][3] = 1,2,3,4,5,6,7,8,9;
+string TeXbrack = "|"; export TeXbrack;
+texobj(fname,mat," = ",det(mat));
+kill TeXbrack;
+
+//----------------------------------texname-------------------
+
+//write(fname,"\\section{Names of identifiers}");
+
+
+//write(fname,"The proc \\verb|texname| is used to write indexed names in a
+//correct way"+lb,nl);
+
+
+
+// ------------------------------- texproc -------------------------------
+  proc milnor_number (poly p)
+  {
+    ideal i= std(jacob(p));
+    int m_nr=vdim(i);
+    if (m_nr<0)
+    {
+      "// not an isolated singularity";
+    }
+    return(m_nr);
+  }
+  export(milnor_number);
+
+write(fname,"\\section{Typesetting procedures}");
+write(fname,"The following procedure allows to include the source code
+of procedures into a \\LaTeX document.");
+write(fname,
+bv +
+"> texproc(fname,\"milnor\_number\");" +nl+
+ev);
+
+ texproc(fname,"milnor_number");
+
+  kill milnor_number;
+
+// ------------------------------ closing the tex file -------------------
+write(fname,"\\section{Closing the \\LaTeX\\ file}");
+write(fname,"To close the file use \\verb|closetex(fname);|. It should now
+contain pure \\LaTeX \\ code and may be compiled with " +
+"\\verb|tex(fname)| and displayed with \\verb|xdvi(fname)|.");
+
+// write(fname,"\\section{Remarks}");
+closetex(fname);
+//"end of part3" + nl;
+
+pagewidth =80;
+kill texdemopart,TeXwidth;
+}
+
+///////////////////////////////////////////////////////////////////////////////

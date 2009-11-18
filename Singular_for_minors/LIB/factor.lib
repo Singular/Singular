@@ -1,0 +1,90 @@
+// $Id$
+//(RS)
+///////////////////////////////////////////////////////////////////////////////
+
+version="$Id$";
+info="
+LIBRARY:  factor.lib    PROCEDURES FOR CALLING THE REDUCE FACTORIZER
+
+ delete_dollar(s)       return the string s with '$' deleted
+ reduce_factor(f)       list of factors of f, calling REDUCE (UNIX only)
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc delete_dollar ( string s )
+"USAGE:   delete_dollar(s);  s = string
+RETURN:  string, with '$' replaced by ' '
+EXAMPLE: example delete_dollar; shows an example
+"
+{
+   while( s[size(s)]=="$" and size(s)!=1 ) { s=s[1,size(s)-1]; }
+   while( s[1]=="$" and size(s)!=1 )       { s=s[2,size(s)-1]; }
+   if( size(s)==1 and s[1]=="$" )          { return(""); }
+   int i=find(s,"$");
+   while( i!=0 )
+   {
+     s=s[1,i-1]+s[i+1,size(s)-i];
+     i=find(s,"$");
+   }
+   return(s);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  string s = "123$456$";
+  delete_dollar(s);
+  delete_dollar(s)+"789";
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc reduce_factor ( poly f )
+"USAGE:   reduce_factor(f);  f = poly
+RETURN:  list, the factors of f
+NOTE:    due to a limitation of REDUCE, multivariate polynomials can only
+         be factorized in characteristic 0
+         This proc runs under UNIX only
+EXAMPLE: example reduce_factor; shows an example
+"
+{
+  string pid = string( system( "pid" ) );
+  string outname = "/tmp/singred." + pid + ".out";
+  string scriptname = "/tmp/singred." + pid + ".sh";
+  int n = char( basering );
+  int shortOutput = short;
+  short = 0;
+  write (scriptname,"#!/bin/sh
+                    $reduce/reduce >/dev/null <<EOF
+                    off nat$ off echo$ setmod " + string( n ) + "$
+                    erg:=factorize(",f,")$
+                    out \"" + outname + "\"$
+                    write(\"list result;\")$
+                    counter:=1$
+                    for each a in erg do begin
+                        write(\"result[\",counter,\"]=\",a,\";\");
+                        counter:=counter+1;
+                    end;
+                    shut \"" + outname + "\";
+                    quit$
+               EOF");
+  system( "sh", "chmod 700 " + scriptname );
+  system( "sh", scriptname );
+  string resultstring = read( outname );
+  if ( resultstring <> "" )
+  {
+    resultstring = delete_dollar( resultstring );
+    execute(resultstring);
+  }
+  // remove tmp-files after usage */
+  system( "sh", "/bin/rm " + outname );
+  system( "sh", "/bin/rm " + scriptname );
+  short = shortOutput;
+  return( result );
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),lp;
+  poly f=(x+y)*(y+z)^2*(z+x);
+  f;
+  list L=reduce_factor(f);
+  L;
+}

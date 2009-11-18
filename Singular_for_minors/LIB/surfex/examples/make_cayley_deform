@@ -1,0 +1,3 @@
+# computing a movie which shows a deformation from a .sux-file without opening a window,
+# to make the movie slower around the interesting parts, you may transform the parameters:
+surfex --inch --dpi 300 --size 1 1 --outfile example_cayley_deform.mng --movie --fps 15 --length 3 --rot 0 0 0 --runningParameter p1 --nowindow --showMoviePreview example_cayley.sux

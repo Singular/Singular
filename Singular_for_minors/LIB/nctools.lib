@@ -1,0 +1,1726 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Noncommutative";
+info="
+LIBRARY: nctools.lib     General tools for noncommutative algebras
+AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
+@*         Lobillo, F.J.,       jlobillo@ugr.es,
+@*         Rabelo, C.,          crabelo@ugr.es,
+@*         Motsak, O.,          U@D, where U={motsak}, D={mathematik.uni-kl.de}
+
+
+
+SUPPORT: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
+
+MAIN PROCEDURES:
+Gweights(r);              compute weights for a compatible ordering in a G-algebra,
+weightedRing(r);          change the ordering of a ring to a weighted one,
+ndcond();                 the ideal of non-degeneracy conditions in G-algebra,
+Weyl([p]);                create Weyl algebra structure in a basering (two different realizations),
+makeWeyl(n, [p]);         return n-th Weyl algebra in (x(i),D(i)) presentation,
+makeHeisenberg(N, [p,d]); return n-th Heisenberg algebra in (x(i),y(i),h) realization,
+Exterior();               return qring, the exterior algebra of a basering,
+findimAlgebra(M,[r]);     create finite dimensional algebra structure from the basering and the multiplication matrix M,
+superCommutative([b,e,Q]);  return qring, the super-commutative algebra over a basering,
+rightStd(I);              compute a right Groebner basis of an ideal,
+
+AUXILIARY PROCEDURES:
+moduloSlim(A,B);  compute modulo via slimgb
+ncRelations(r);      recover the non-commutative relations of a G-algebra,
+isCentral(p);         check for the commutativity of a polynomial in the G-algebra,
+isNC();                 check whether basering is noncommutative,
+isCommutative();  check whether basering is commutative
+isWeyl();               check whether basering is a Weyl algebra
+UpOneMatrix();   return NxN matrix with 1's in the whole upper triagle,
+AltVarStart();        return first alternating variable of a super-commutative algebra,
+AltVarEnd();          return last alternating variable of a super-commutative algebra,
+IsSCA();                check whether current ring is a super-commutative algebra
+makeModElimRing(R); equip a ring with module elimination ordering
+";
+
+
+LIB "ring.lib"; // for rootofUnity
+LIB "poly.lib"; // for newtonDiag
+LIB "matrix.lib"; // for submat
+// LIB "ncalg.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+// This procedure computes a weights vector for a G-algebra r
+
+proc Gweights(def r)
+"USAGE:   Gweights(r); r a ring or a square matrix
+RETURN:   intvec
+PURPOSE: compute an appropriate weight int vector for a G-algebra, i.e., such that
+\foral\;i<j\;\;lm_w(d_{ij}) <_w x_i x_j.
+@*       the polynomials d_{ij} are taken from r itself, if it is of the type ring
+@*       or defined by the given square polynomial matrix
+THEORY:   @code{Gweights} returns an integer vector, whose weighting should be used to redefine the G-algebra in order
+to get the same non-commutative structure w.r.t. a weighted ordering. If the input is a matrix and the output is the zero
+vector then there is not a G-algebra structure associated to these relations with respect to the given variables.
+@*Another possibility is to use @code{weightedRing} to obtain directly a G-algebra with the new appropriate (weighted) ordering.
+EXAMPLE: example Gweights; shows examples
+SEE ALSO: weightedRing
+"{
+  int novalid=0;
+  if (typeof(r)=="ring") //a ring is admissible as input
+  {
+    setring r;
+    matrix tails;
+    def l = ncRelations(r);
+    tails = l[2]; // l=C,D we need D, the tails of the relations
+  }
+  else
+  {
+    matrix tails;
+    if ( (typeof(r)=="matrix") || (typeof(r)=="intmat") )
+    {
+      if ( nrows(r)==ncols(r) ) //the input is a square matrix
+      {
+        tails = matrix(r);
+      }
+      else
+      {
+        novalid = 1;
+      }
+    }
+    else
+    {
+      novalid=1;
+    }
+  }
+  if (novalid==0)
+  {
+    intmat IM = SimplMat(tails);
+    if ( size(IM)>1 )
+    {
+      int n  = ncols(tails);
+      int m  = nrows(IM)-1;
+      int m1 = 0;
+      int m2 = m;
+      int m3 = 0;
+      ring simplexring=(real,10),(x),lp;// The simplex procedure requires a basering of this type
+      matrix M = IM;
+      list sol = simplex (M,m,n,m1,m2,m3);
+      return(weightvector(sol));
+    }
+    else
+    {
+      "Invalid input"; //usually because the input is a one variable ring
+      return();
+    }
+  }
+  else
+  {
+    "The input must be a ring or a square matrix";
+    return();
+  }
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r = (0,q),(a,b,c,d),lp;
+  matrix C[4][4];
+  C[1,2]=q; C[1,3]=q; C[1,4]=1; C[2,3]=1; C[2,4]=q; C[3,4]=q;
+  matrix D[4][4];
+  D[1,4]=(q-1/q)*b*c;
+  def S = nc_algebra(C,D); setring S; S;
+  Gweights(S);
+  def D=fetch(r,D);
+  Gweights(D);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// This procedure take a ring r, call to Gweights(r) and use the output
+// of Gweights(r) to make a change of order in r
+// The output is a new ring, equal to r but the order
+// r must be a G-algebra
+
+proc weightedRing(def r)
+"USAGE:   weightedRing(r); r a ring
+RETURN:  ring
+PURPOSE:  equip the variables of the given ring with weights such that the relations of new ring (with weighted variables) satisfies the ordering condition for G-algebras:
+e.g. \forall\;i<j\;\;lm_w(d_{ij})<_w x_i x_j.
+NOTE:    activate this ring with the \"setring\" command
+EXAMPLE: example weightedRing; shows examples
+SEE ALSO: Gweights
+"{
+  def wv=Gweights(r);
+  if (typeof(wv)=="intvec")
+  {
+    setring r;
+    int n=nvars(r);
+    // Generating an nxn-intmat order
+    intmat m[n][n];
+    m[1,1]=wv[1];
+    int i;
+    for (i=2; i<=n; i++)
+    {
+      m[1,i]=wv[i];
+      m[i,n+2-i]=1;
+    }
+    // End of generation.
+    def lr=ncRelations(r);
+    string newringstring="ring newring=("+charstr(r)+"),("+varstr(r)+"),M("+string(m)+")";
+    execute (newringstring);
+    def lnewring=imap(r,lr);
+    return( nc_algebra(lnewring[1],lnewring[2]) );
+  }
+  else
+  {
+    "Invalid input.";//usually because the input is a one variable ring
+    return();
+  }
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r = (0,q),(a,b,c,d),lp;
+  matrix C[4][4];
+  C[1,2]=q; C[1,3]=q; C[1,4]=1; C[2,3]=1; C[2,4]=q; C[3,4]=q;
+  matrix D[4][4];
+  D[1,4]=(q-1/q)*b*c;
+  def S = nc_algebra(C,D); setring S; S;
+  def t=weightedRing(S);
+  setring t; t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// This procedure computes ei+ej-f with f running in Newton(pij) and deletes the zero rows
+
+static proc Cij(intmat M, int i,j)
+{
+  M=(-1)*M;
+  int nc=ncols(M);
+  intvec N;
+  int k;
+  for (k=1; k<=nrows(M); k++)
+  {
+    M[k,i]=M[k,i]+1;
+    M[k,j]=M[k,j]+1;
+    if (intvec(M[k,1..nc])!=0)
+    {
+      N=N,intvec(M[k,1..nc]);
+    } // we only want non-zero rows
+  }
+  if (size(N)>1)
+  {
+    N=N[2..size(N)]; // Deleting the zero added in the definition of N
+    M=intmat(N,size(N)/nc,nc); // Conversion from vector to matrix
+  }
+  else
+  {
+    intmat M[1][1]=0;
+  }
+  return (M);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// This procedure run over the matrix of pij calculating Cij
+
+static proc Ct(matrix P)
+{
+  int    k = ncols(P);
+  intvec T = 0;
+  int    i,j;
+//  int notails=1;
+  def S;
+  for (j=2; j<=k; j++)
+  {
+    for (i=1; i<j; i++)
+    {
+      if ( P[i,j] != 0 )
+      {
+//        notails=0;
+        S = newtonDiag(P[i,j]);
+        S = Cij(S,i,j);
+        if ( size(S)>1 )
+        {
+          T = T,S;
+        }
+      }
+    }
+  }
+  if ( size(T)==1 )
+  {
+    intmat C[1][1] = 0;
+  }
+  else
+  {
+    T=T[2..size(T)]; // Deleting the zero added in the definition of T
+    intmat C = intmat(T,size(T)/k,k); // Conversion from vector to matrix
+  }
+  return (C);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// The purpose of this procedure is to produce the input matrix required by simplex procedure
+
+static proc SimplMat(matrix P)
+{
+  intmat C=Ct(P);
+  if (size(C)>1)
+  {
+    int r = nrows(C);
+    int n = ncols(C);
+    int f = 1+n+r;
+    intmat M[f][n+1]=0;
+    int i;
+    for (i=2; i<=(n+1); i++)
+    {
+      M[1,i]=-1; // (0,-1,-1,-1,...) objective function in the first row
+    }
+    for (i=2; i<=f; i++) {M[i,1]=1;} // All the independent terms are 1
+    for (i=2; i<=(n+1); i++) {M[i,i]=-1;} // wi>=1 is an identity matrix
+    M[(n+2)..f,2..(n+1)]=(-1)*intvec(C); // <wi,a> >= 1, a in C ...
+  }
+  else
+  {
+    int n = ncols(P);
+    int f = 1+n;
+    intmat M[f][n+1]=0;
+    int i;
+    for (i=2; i<=(n+1); i++) {M[1,i]=-1;} // (0,-1,-1,-1,...) objective function in the first row
+    for (i=2; i<=f; i++) {M[i,1]=1;} // All the independent terms are 1
+    for (i=2; i<=(n+1); i++) {M[i,i]=-1;} // wi>=1 is an identity matrix
+  }
+  return (M);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+// This procedure generates a nice output of the simplex method consisting of a vector
+// with the solutions. The vector is ordered.
+
+static proc weightvector(list l)
+"ASSUME:  l is the output of simplex.
+RETURN: if there is a solution, an intvec with it will be returned"
+{
+  matrix m=l[1];
+  intvec nv=l[3];
+  int sol=l[2];
+  int rows=nrows(m);
+  int N=l[6];
+  intmat wv[1][N]=0;
+  int i;
+  if (sol)
+  {
+    "no solution satisfies the given constraints";
+  }
+  else
+  {
+    for ( i = 2; i <= rows; i++ )
+    {
+      if ( nv[i-1] <= N )
+      {
+        wv[1,nv[i-1]]=int(m[i,1]);
+      }
+    }
+  }
+  return (intvec(wv));
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+// This procedure recover the non-conmutative relations (matrices C and D)
+
+proc ncRelations(def r)
+"USAGE:   ncRelations(r); r a ring
+RETURN:  list L with two elements, both elements are of type matrix:
+@*         L[1] = matrix of coefficients C,
+@*         L[2] = matrix of polynomials D
+PURPOSE: recover the noncommutative relations via matrices C and D from
+a noncommutative ring
+SEE ALSO: ringlist, G-algebras
+EXAMPLE: example ncRelations; shows examples
+"{
+  list l;
+  if (typeof(r)=="ring")
+  {
+    int n=nvars(r);
+    matrix C[n][n]=0;
+    matrix D[n][n]=0;
+    poly f; poly g;
+    if (n>1)
+    {
+      int i,j;
+      for (i=2; i<=n; i++)
+      {
+        for (j=1; j<i; j++)
+        {
+          f=var(i)*var(j); // yx=c*xy+...
+          g=var(j)*var(i); // xy
+          while (C[j,i]==0)
+          {
+            if (leadmonom(f)==leadmonom(g))
+            {
+              C[j,i]=leadcoef(f);
+              D[j,i]=D[j,i]+f-lead(f);
+            }
+            else
+            {
+              D[j,i]=D[j,i]+lead(f);
+              f=f-lead(f);
+            }
+          }
+        }
+      }
+      l=C,D;
+    }
+    else { "The ring must have two or more variables"; }
+  }
+  else { "The input must be of a type ring";}
+  return (l);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r = 0,(x,y,z),dp;
+  matrix C[3][3]=0,1,2,0,0,-1,0,0,0;
+  print(C);
+  matrix D[3][3]=0,1,2y,0,0,-2x+y+1;
+  print(D);
+  def S=nc_algebra(C,D);setring S; S;
+  def l=ncRelations(S);
+  print (l[1]);
+  print (l[2]);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc findimAlgebra(matrix M, list #)
+"USAGE:   findimAlgebra(M,[r]); M a matrix, r an optional ring
+RETURN:  ring
+PURPOSE: define a finite dimensional algebra structure on a ring
+NOTE:  the matrix M is used to define the relations x(j)*x(i) = M[i,j] in the
+basering (by default) or in the optional ring r.
+@* The procedure equips the ring with the noncommutative structure.
+@* The procedure exports the ideal (not a two-sided Groebner basis!), called @code{fdQuot}, for further qring definition.
+THEORY: finite dimensional algebra can be represented as a factor algebra
+of a G-algebra modulo certain two-sided ideal. The relations of a f.d. algebra are thus naturally divided into two groups: firstly, the relations
+on the variables of the ring, making it into G-algebra and the rest of them, which constitute the ideal which will be factored out.
+EXAMPLE: example findimAlgebra; shows examples
+"
+{
+  if (size(#) >0)
+  {
+    if ( typeof(#[1])!="ring" ) { return();}
+    else
+    {
+      def @R1 = #[1];
+      setring @R1;
+    }
+  }
+  int i,j;
+  int n=nvars(basering);
+  poly p;
+  ideal I;
+  number c;
+  matrix C[n][n];
+  matrix D[n][n];
+  for (i=1; i<=n; i++)
+  {
+    for (j=i; j<=n; j++)
+    {
+      p=var(i)*var(j)-M[i,j];
+      if ( (size(I)==1) && (I[1]==0) )   { I=p; }
+      else { I=I,p; }
+      if (j>i)
+      {
+        if ((M[i,j]!=0) && (M[j,i]!=0))
+        {
+          c = leadcoef(M[j,i])/leadcoef(M[i,j]);
+        }
+        else
+        {
+          c = 1;
+        }
+        C[i,j]=c;
+        D[i,j]= - M[j,i] +c*M[i,j];
+      }
+    }
+  }
+  def save = basering;
+  def S = nc_algebra(C,D); setring S;
+  ideal fdQuot = fetch(save,D);
+  export fdQuot;
+  return(S);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r=(0,a,b),(x(1..3)),dp;
+  matrix S[3][3];
+  S[2,3]=a*x(1); S[3,2]=-b*x(1);
+  def A=findimAlgebra(S); setring A;
+  fdQuot = twostd(fdQuot);
+  qring Qr = fdQuot;
+  Qr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc isCentral(poly p, list #)
+"USAGE:   isCentral(p); p poly
+RETURN:  int, 1 if p commutes with all variables and 0 otherwise
+PURPOSE: check whether p is central in a basering (that is, commutes with every generator of the ring)
+NOTE: if @code{printlevel} > 0, the procedure displays intermediate information (by default, @code{printlevel}=0 )
+EXAMPLE: example isCentral; shows examples
+"{
+  //v an integer (with v!=0, procedure will be verbose)
+  int N = nvars(basering);
+  int in;
+  int flag = 1;
+  poly   q = 0;
+  for (in=1; in<=N; in++)
+  {
+    q = p*var(in)-var(in)*p;
+    if (q!=0)
+    {
+      if ( (size(#) >0 ) || (printlevel>0) )
+      {
+        "Non-central at:", var(in);
+      }
+      flag = 0;
+    }
+  }
+  return(flag);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r=0,(x,y,z),dp;
+  matrix D[3][3]=0;
+  D[1,2]=-z;
+  D[1,3]=2*x;
+  D[2,3]=-2*y;
+  def S = nc_algebra(1,D); setring S;
+  S; // this is U(sl_2)
+  poly c = 4*x*y+z^2-2*z;
+  printlevel = 0;
+  isCentral(c);
+  poly h = x*c;
+  printlevel = 1;
+  isCentral(h);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc UpOneMatrix(int N)
+"USAGE:   UpOneMatrix(n); n an integer
+RETURN:  intmat
+PURPOSE: compute an  n x n matrix with 1's in the whole upper triangle
+NOTE: helpful for setting noncommutative algebras with complicated
+coefficient matrices
+EXAMPLE: example UpOneMatrix; shows examples
+"{
+  int ii,jj;
+  intmat U[N][N]=0;
+  for (ii=1;ii<N;ii++)
+  {
+    for (jj=ii+1;jj<=N;jj++)
+    {
+      U[ii,jj]=1;
+    }
+  }
+  return(U);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring   r = (0,q),(x,y,z),dp;
+  matrix C = UpOneMatrix(3);
+  C[1,3]   = q;
+  print(C);
+  def S = nc_algebra(C,0); setring S;
+  S;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc ndcond(list #)
+"USAGE:   ndcond();
+RETURN:  ideal
+PURPOSE: compute the non-degeneracy conditions of the basering
+NOTE: if @code{printlevel} > 0, the procedure displays intermediate information (by default, @code{printlevel}=0 )
+EXAMPLE: example ndcond; shows examples
+"
+{
+  // internal documentation, for tests etc
+  // 1st arg: v an optional integer (if v!=0, will be verbose)
+  // if the second argument is given, produces ndc w.r.t. powers x^N
+  int N = 1;
+  int Verbose = 0;
+  if ( size(#)>=1 ) { Verbose = int(#[1]); }
+  if ( size(#)>=2 ) { N = int(#[2]); }
+  Verbose = ((Verbose) || (printlevel>0));
+  int cnt = 1;
+  int numvars = nvars(basering);
+  int a,b,c;
+  poly p = 1;
+  ideal res = 0;
+  for (cnt=1; cnt<=N; cnt++)
+  {
+    if (Verbose) { "Processing degree :",cnt;}
+    for (a=1; a<=numvars-2; a++)
+    {
+      for (b=a+1; b<=numvars-1; b++)
+      {
+        for(c=b+1; c<=numvars; c++)
+        {
+          p = (var(c)^cnt)*(var(b)^cnt);
+          p = p*(var(a)^cnt);
+          p = p-(var(c)^cnt)*((var(b)^cnt)*(var(a)^cnt));
+          if (Verbose) {a,".",b,".",c,".";}
+          if (p!=0)
+          {
+            if ( res==0 )
+            {
+              res[1] = p;
+            }
+            else
+            {
+              res = res,p;
+            }
+            if (Verbose) { "failed:",p; }
+          }
+        }
+      }
+    }
+    if (Verbose) { "done"; }
+  }
+  return(res);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring r = (0,q1,q2),(x,y,z),dp;
+  matrix C[3][3];
+  C[1,2]=q2; C[1,3]=q1; C[2,3]=1;
+  matrix D[3][3];
+  D[1,2]=x; D[1,3]=z;
+  def S = nc_algebra(C,D); setring S;
+  S;
+  ideal j=ndcond(); // the silent version
+  j;
+  printlevel=1;
+  ideal i=ndcond(); // the verbose version
+  i;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc Weyl(list #)
+"USAGE:   Weyl()
+RETURN:  ring
+PURPOSE: create a Weyl algebra structure on the basering
+NOTE: Activate this ring using the command @code{setring}.
+@*Assume the number of variables of a basering is 2k.
+(if the number of variables is odd, an error message will be returned)
+@*    by default, the procedure treats first k variables as coordinates x_i and the last k as differentials d_i
+@*    if a non-zero optional argument is given, the procedure treats 2k variables of a basering as k pairs (x_i,d_i), i.e. variables with odd numbers are treated as coordinates and with even numbers as differentials
+SEE ALSO: makeWeyl
+EXAMPLE: example Weyl; shows examples
+"
+{
+  //there are two possibilities for choosing the PBW basis.
+  //The variables have names x(i) for coordinates and d(i) for partial
+  // differentiations. By default, the procedure
+  //creates a ring, where the variables are ordered as x(1..n),d(1..n).  the
+  // tensor product-like realization x(1),d(1),x(2),d(2),... is used.
+  string rname=nameof(basering);
+  if ( rname == "basering") // i.e. no ring has been set yet
+  {
+    "You have to call the procedure from the ring";
+    return();
+  }
+  int @chr = 0;
+  if ( size(#) > 0 )
+  {
+    if ( typeof( #[1] ) == "int" )
+    {
+      @chr = #[1];
+    }
+  }
+  int nv = nvars(basering);
+  int N = nv div 2;
+  if ((nv % 2) != 0)
+  {
+    "Cannot create Weyl structure for an odd number of generators";
+    return();
+  }
+  matrix @D[nv][nv];
+  int i;
+  for ( i=1; i<=N; i++ )
+  {
+    if ( @chr==0 ) // default
+    {
+      @D[i,N+i]=1;
+    }
+    else
+    {
+      @D[2*i-1,2*i]=1;
+    }
+  }
+  def @R = nc_algebra(1,@D);
+  return(@R);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring A1=0,(x(1..2),d(1..2)),dp;
+  def S=Weyl();
+  setring S;  S;
+  kill A1,S;
+  ring B1=0,(x1,d1,x2,d2),dp;
+  def S=Weyl(1);
+  setring S;  S;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc makeHeisenberg(int N, list #)
+"USAGE:  makeHeisenberg(n, [p,d]); int n (setting 2n+1 variables), optional int p (field characteristic), optional int d (power of h in the commutator)
+RETURN: ring
+PURPOSE: create the n-th Heisenberg algebra in the variables x(1),y(1),...,x(n),y(n),h over the rationals Q or F_p with the relations
+\forall\;i\in\{1,2,\ldots,n\}\;\;y(j)x(i) = x(i)y(j)+h^d.
+SEE ALSO: makeWeyl
+NOTE: activate this ring with the @code{setring} command
+@*       If p is not prime, the next larger prime number will be used.
+EXAMPLE: example makeHeisenberg; shows examples
+"
+{
+  int @chr = 0;
+  int @deg = 1;
+  if ( size(#) > 0 )
+  {
+    if ( typeof( #[1] ) == "int" )
+    {
+      @chr = #[1];
+    }
+  }
+  if ( size(#) > 1 )
+  {
+    if ( typeof( #[2] ) == "int" )
+    {
+      @deg = #[2];
+      if (@deg <1) { @deg = 1; }
+    }
+  }
+  ring @@r=@chr,(x(1..N),y(1..N),h),lp;
+  matrix D[2*N+1][2*N+1];
+  int i;
+  for (i=1;i<=N;i++)
+  {
+    D[i,N+i]=h^@deg;
+  }
+  return(nc_algebra(1,D));
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  def a = makeHeisenberg(2);
+  setring a;   a;
+  def H3 = makeHeisenberg(3, 7, 2);
+  setring H3;  H3;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc superCommutative(list #)
+"USAGE:   superCommutative([b,[e, [Q, [flag]]]]);
+RETURN:  qring
+PURPOSE:  create a super-commutative algebra (as a GR-algebra) over a basering,
+NOTE: activate this qring with the \"setring\" command.
+NOTE: if b==e then the resulting ring is commutative unless 'flag' is given and non-zero.
+@* By default, @code{b=1, e=nvars(basering), Q=0}, and @code{flag=0}.
+THEORY: given a basering, this procedure introduces the anticommutative relations x(j)x(i)=-x(i)x(j) for all e>=j>i>=b,
+@* moreover, creates a factor algebra modulo the two-sided ideal, generated by x(b)^2, ..., x(e)^2[ + Q]
+DISPLAY: If @code{printlevel} > 1, warning debug messages will be printed
+EXAMPLE: example superCommutative; shows examples
+"
+{
+  int fprot = (printlevel > 1); // (find(option(),"prot") != 0);
+
+  string rname=nameof(basering);
+
+  if ( rname == "basering") // i.e. no ring has been set yet
+  {
+    ERROR("You have to call the procedure from the ring");
+    return();
+  }
+
+  def saveRing = basering;
+
+  int N = nvars(saveRing);
+  int b = 1;
+  int e = N;
+  int flag = 0;
+
+  ideal Q = 0;
+
+  if(size(#)>0)
+  {
+    if(typeof(#[1]) != "int")
+    {
+      ERROR("The argument 'b' must be an integer!");
+      return();
+    }
+    b = #[1];
+
+    if((b < 1)||(b > N))
+    {
+      ERROR("The argument 'b' must within [1..nvars(basering)]!");
+      return();
+    }
+
+  }
+
+  if(size(#)>1)
+  {
+    if(typeof(#[2]) != "int")
+    {
+      ERROR("The argument 'e' must be an integer!");
+      return();
+    }
+    e = #[2];
+
+    if((e < 1)||(e > N))
+    {
+      ERROR("The argument 'e' must within [1..nvars(basering)]!");
+      return();
+    }
+
+    if(e < b)
+    {
+      ERROR("The argument 'e' must be bigger or equal to 'b'!");
+      return();
+    }
+  }
+
+  if(size(#)>2)
+  {
+    if(typeof(#[3]) != "ideal")
+    {
+      ERROR("The argument 'Q' must be an ideal!");
+      return();
+    }
+    Q = #[3];
+  }
+
+  if(size(#)>3)
+  {
+    if(typeof(#[4]) != "int")
+    {
+      ERROR("The argument 'flag' must be an integer!");
+      return();
+    }
+    flag = #[4];
+  }
+
+  int iSavedDegBoung = degBound;
+
+  if( (b == e) && (flag == 0) ) // commutative ring!!!
+  {
+    if( fprot == 1)
+    {
+      print("Warning: (b==e) means that the resulting ring will be commutative!");
+    }
+
+    degBound=0;
+    Q = std(Q + (var(b)^2));
+    degBound = iSavedDegBoung;
+
+    qring @EA = Q; // and it will be internally commutative as well!!!
+
+    return(@EA);
+  }
+
+/*
+  // Singular'(H.S.) politics: no ring copies!
+  // in future nc_algebra() should return a new ring!!!
+  list CurrRing = ringlist(basering);
+  def @R = ring(CurrRing);
+  setring @R; // @R;
+*/
+
+  if( (char(basering)==2) && (flag == 0) )// commutative ring!!!
+  {
+    if( fprot == 1)
+    {
+      print("Warning: (char == 2) means that the resulting ring will be commutative!");
+    }
+
+    int j = ncols(Q) + 1;
+
+    for ( int i=e; i>=b; i--, j++ )
+    {
+      Q[j] = var(i)^2;
+    }
+
+    degBound=0;
+    Q = std(Q);
+    degBound = iSavedDegBoung;
+
+    qring @EA = Q; // and it will be internally commutative as well!!!
+    return(@EA);
+  }
+
+
+  int i, j;
+
+  if( (b == 1) && (e == N) ) // just an exterior algebra?
+  {
+    def S = nc_algebra(-1, 0); // define ground G-algebra!
+    setring S;
+  } else
+  {
+    matrix @E = UpOneMatrix(N);
+
+    for ( i = b; i < e; i++ )
+    {
+      for ( j = i+1; j <= e; j++ )
+      {
+        @E[i, j] = -1;
+      }
+    }
+    def S = nc_algebra(@E, 0); // define ground G-algebra!
+    setring S;
+  }
+
+  ideal @Q = fetch(saveRing, Q);
+
+  j = ncols(@Q) + 1;
+
+  for ( i=e; i>=b; i--, j++ )
+  {
+    @Q[j] = var(i)^2;
+  }
+
+  if( (fprot == 1) and (attrib(basering, "global") != 1) )
+  {
+    print("Warning: Since the current ordering is not global there might be problems computing twostd(Q)!");
+    "Q:"; 
+    @Q;
+  }
+
+  degBound=0;
+  @Q = twostd(@Q); // must be computed within the ground G-algebra => problems with local orderings!
+  degBound = iSavedDegBoung;
+
+  qring @EA = @Q;
+
+//   "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
+  return(@EA);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = 0,(x(1..4)),dp; // global!
+  def ER = superCommutative(); // the same as Exterior (b = 1, e = N)
+  setring ER; ER;
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
+  kill R; kill ER;
+  ring R = 0,(x(1..4)),(lp(1), dp(3)); // global!
+  def ER = superCommutative(2); // b = 2, e = N
+  setring ER; ER;
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
+  kill R; kill ER;
+  ring R = 0,(x(1..6)),(ls(2), dp(2), lp(2)); // local!
+  def ER = superCommutative(3,4); // b = 3, e = 4
+  setring ER; ER;
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
+  kill R; kill ER;
+}
+
+// Please, don't throw this away!!! Needed for backward compatibility.
+proc SuperCommutative(list #)
+{
+  // "Please use superCommutative instead";
+  return( superCommutative(#) );
+}
+
+
+static proc ParseSCA()
+"
+RETURN: list {AltVarStart, AltVarEnd} is currRing is SCA, returns undef otherwise.
+NOTE: rings with only one non-commutative variable are commutative rings which are super-sommutative itself!
+"
+{
+  def saveRing = basering;
+
+  int i, j;
+  int N = nvars(saveRing);
+
+  int b = N+1;
+  int e =  -1;
+
+  int fprot = (find(option(),"prot") != 0);
+
+
+  if( size(ideal(saveRing)) == 0 )
+  {
+    return("SCA rings are factors by (at least) squares!"); // no squares in the factor ideal!
+  }
+
+  list L = ringlist(saveRing);
+
+  if( size(L)!=6 )
+  {
+    if(fprot)
+    {
+      print("Warning: The current ring is internally commutative!");
+    }
+
+    for( i = N; i > 0; i-- )
+    {
+      if( NF(var(i)^2, std(0)) == 0 )
+      {
+        if( (fprot == 1) and (i > 1) )
+        {
+          print("Warning: the SCA representation of the current commutative factor ring may be ambiguous!");
+        }
+
+        return( list(i, i) ); // this is not unique in this case! there may be other squares in the factor ideal!
+      }
+    }
+
+    return("The current commutative ring is not SCA! (Wrong quotient ideal)"); // no squares in the factor ideal!
+  }
+
+  module D = simplify(L[6], 2 + 4);
+
+  if( size(D)>0 )
+  {
+    return("The current ring is not SCA! (D!=0)");
+  }
+
+  matrix C = L[5];
+  poly c;
+
+  for( i = 1; i < N; i++ )
+  {
+    for( j = i+1; j <= N; j++ )
+    {
+      c = C[i, j];
+
+      if( c == -1 )
+      {
+        if(i < b)
+        {
+          b = i;
+        }
+
+        if(j > e)
+        {
+          e = j;
+        }
+      } else
+      { // should commute
+        if( c!=1 )
+        {
+          return("The current ring is not SCA! (C["+ string(i)+"," + string(j)+"]!=1)");
+        }
+      }
+    }
+  }
+
+  if( (b > N) || (e < 1))
+  {
+    if(fprot)
+    {
+      print("Warning: The current ring is a commutative GR-algebra!");
+    }
+
+    for( i = N; i > 0; i-- )
+    {
+      if( NF(var(i)^2, std(0)) == 0 )
+      {
+        if( (fprot == 1) and (i > 1) )
+        {
+          print("Warning: the SCA representation of the current factor ring may be ambiguous!");
+        }
+
+        return( list(i, i) ); // this is not unique in this case! there may be other squares in the factor ideal!
+      }
+    }
+
+    return("The current commutative GR-algebra is not SCA! (Wrong quotient ideal)"); // no squares in the factor ideal!
+  }
+
+  for( i = 1; i < N; i++ )
+  {
+    for( j = i+1; j <= N; j++ )
+    {
+      c = C[i, j];
+
+      if( (b <= i) && (j <= e) ) // S <= i < j <= E
+      { // anticommutative part
+        if( c!= -1 )
+        {
+          return("The current ring is not SCA! (C["+ string(i)+"," + string(j)+"]!=-1)");
+        }
+      } else
+      { // should commute
+        if( c!=1 )
+        {
+          return("The current ring is not SCA! (C["+ string(i)+"," + string(j)+"]!=1)");
+        }
+      }
+    }
+  }
+
+  for( i = b; i <= e; i++ )
+  {
+    if( NF(var(i)^2, std(0)) != 0 )
+    {
+      return("The current ring is not SCA! (Wrong quotient ideal)");
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  // ok. it is a SCA!!!
+
+  return(list(b, e));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc AltVarStart()
+"USAGE:   AltVarStart();
+RETURN:  int
+PURPOSE:  returns the number of the first alternating variable of basering
+NOTE:  basering should be a super-commutative algebra with at most one block of anti-commutative variables
+@* For commutative rings, @code{nvars(basering)+1} will be returned.
+EXAMPLE: example AltVarStart; shows examples
+"
+{
+  def l = ParseSCA();
+
+  if( typeof(l) != "string" )
+  {
+    return(l[1]);
+  }
+
+  ERROR(l);
+  return();
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = 0,(x(1..4)),dp; // global!
+  def ER = superCommutative(2); // (b = 2, e = N)
+  setring ER; ER;
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc AltVarEnd()
+"USAGE:   AltVarStart();
+RETURN:  int
+PURPOSE:  returns the number of the last alternating variable of basering
+NOTE:  basering should be a super-commutative algebra with at most one block of anti-commutative variables
+@* returns -1 for commutative rings
+EXAMPLE: example AltVarEnd; shows examples
+"
+{
+  def l = ParseSCA();
+
+  if( typeof(l) != "string" )
+  {
+    return(l[2]);
+  }
+
+  ERROR(l);
+  return();
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = 0,(x(1..4)),dp; // global!
+  def ER = superCommutative(2); // (b = 2, e = N)
+  setring ER; ER;
+  "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "].";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc IsSCA()
+"USAGE:   IsSCA();
+RETURN:  int
+PURPOSE:  returns 1 if basering is a super-commutative algebra and 0 otherwise.
+NOTE:     shows hint message for non-SCA algebras if the 'prot' option is on.
+EXAMPLE: example IsSCA; shows examples
+"
+{
+  def l = ParseSCA();
+
+  if( typeof(l) != "string" )
+  {
+    return(1);
+  }
+
+  if( find(option(),"prot") != 0 )
+  {
+    print(l);
+  }
+
+  return(0);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+/////////////////////////////////////////////////////////////////////
+  ring R = 0,(x(1..4)),dp; // commutative
+  if(IsSCA())
+    { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
+  else
+    { "Not a super-commutative algebra!!!"; }
+  kill R;
+/////////////////////////////////////////////////////////////////////
+  ring R = 0,(x(1..4)),dp;
+  def S = nc_algebra(1, 0); setring S; S; // still commutative!
+  if(IsSCA())
+    { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
+  else
+    { "Not a super-commutative algebra!!!"; }
+  kill R, S;
+/////////////////////////////////////////////////////////////////////
+  ring R = 0,(x(1..4)),dp;
+  list CurrRing = ringlist(R);
+  def ER = ring(CurrRing);
+  setring ER; // R;
+
+  matrix E = UpOneMatrix(nvars(R));
+
+  int i, j; int b = 2; int e = 3;
+
+  for ( i = b; i < e; i++ )
+  {
+    for ( j = i+1; j <= e; j++ )
+    {
+      E[i, j] = -1;
+    }
+  }
+
+  def S = nc_algebra(E,0); setring S; S;
+
+  if(IsSCA())
+    { "Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
+  else
+    { "Not a super-commutative algebra!!!"; }
+  kill R, ER, S;
+/////////////////////////////////////////////////////////////////////
+  ring R = 0,(x(1..4)),dp;
+  def ER = superCommutative(2); // (b = 2, e = N)
+  setring ER; ER;
+  if(IsSCA())
+    { "This is a SCA! Alternating variables: [", AltVarStart(), ",", AltVarEnd(), "]."; }
+  else
+    { "Not a super-commutative algebra!!!"; }
+  kill R, ER;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+proc Exterior(list #)
+"USAGE:   Exterior();
+RETURN:  qring
+PURPOSE:  create the exterior algebra of a basering
+NOTE:  activate this qring with the \"setring\" command
+THEORY: given a basering, this procedure introduces the anticommutative relations x(j)x(i)=-x(i)x(j) for all j>i,
+@* moreover, creates a factor algebra modulo the two-sided ideal, generated by x(i)^2 for all i
+EXAMPLE: example Exterior; shows examples
+"
+{
+  string rname=nameof(basering);
+  if ( rname == "basering") // i.e. no ring has been set yet
+  {
+    "You have to call the procedure from the ring";
+    return();
+  }
+  int N = nvars(basering);
+  string NewRing = "ring @R=("+charstr(basering)+"),("+varstr(basering)+"),("+ordstr(basering)+");";
+  execute(NewRing);
+  matrix @E = UpOneMatrix(N);
+  @E = -1*(@E);
+  def @@RR = nc_algebra(@E,0); setring @@RR;
+  int i;
+  ideal Q;
+  for ( i=1; i<=N; i++ )
+  {
+    Q[i] = var(i)^2;
+  }
+  Q = twostd(Q);
+  qring @EA = Q;
+  return(@EA);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = 0,(x(1..3)),dp;
+  def ER = Exterior();
+  setring ER;
+  ER;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc makeWeyl(int n, list #)
+"USAGE:  makeWeyl(n,[p]); n an integer, n>0; p an optional integer (field characteristic)
+RETURN:  ring
+PURPOSE: create the n-th Weyl algebra over the rationals Q or F_p
+NOTE:    activate this ring with the \"setring\" command.
+@*       The presentation of an n-th Weyl algebra is classical: D(i)x(i)=x(i)D(i)+1,
+@*       where x(i) correspond to coordinates and D(i) to partial differentiations, i=1,...,n.
+@*       If p is not prime, the next larger prime number will be used.
+SEE ALSO: Weyl
+EXAMPLE: example makeWeyl; shows examples
+"{
+  if (n<1)
+  {
+    print("Incorrect input");
+    return();
+  }
+  int @p = 0;
+  if ( size(#) > 0 )
+  {
+    if ( typeof( #[1] ) == "int" )
+    {
+      @p = #[1];
+    }
+  }
+  if (n ==1)
+  {
+    ring @rr = @p,(x,D),dp;
+  }
+  else
+  {
+    ring @rr = @p,(x(1..n),D(1..n)),dp;
+  }
+  setring @rr;
+  def @rrr = Weyl();
+  return(@rrr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def a = makeWeyl(3);
+   setring a;
+   a;
+}
+
+//////////////////////////////////////////////////////////////////////
+proc isNC()
+"USAGE:   isNC();
+PURPOSE: check whether a basering is commutative or not
+RETURN:   int, 1 if basering is noncommutative and 0 otherwise
+EXAMPLE: example isNC; shows examples
+"{
+  string rname=nameof(basering);
+  if ( rname == "basering") // i.e. no ring has been set yet
+  {
+    "You have to call the procedure from the ring";
+    return();
+  }
+  int n = nvars(basering);
+  int i,j;
+  poly p;
+  for (i=1; i<n; i++)
+  {
+    for (j=i+1; j<=n; j++)
+    {
+      p = var(j)*var(i) - var(i)*var(j);
+      if (p!=0) { return(1);}
+    }
+  }
+  return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   def a = makeWeyl(2);
+   setring a;
+   isNC();
+   kill a;
+   ring r = 17,(x(1..7)),dp;
+   isNC();
+   kill r;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc rightStd(def I)
+"USAGE:  rightStd(I); I an ideal/ module
+PURPOSE: compute a right Groebner basis of I
+RETURN:  the same type as input
+EXAMPLE: example rightStd; shows examples
+"
+{
+  def A = basering;
+  def Aopp = opposite(A);
+  setring Aopp;
+  def Iopp = oppose(A,I);
+  def Jopp = groebner(Iopp);
+  setring A;
+  def J = oppose(Aopp,Jopp);
+  return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  LIB "ncalg.lib";
+  def A = makeUsl(2);
+  setring A;
+  ideal I = e2,f;
+  option(redSB);
+  option(redTail);
+  ideal LI = std(I);
+  LI;
+  ideal RI = rightStd(I);
+  RI;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc rightSyz(def I)
+"USAGE:  rightSyz(I); I an ideal/ module
+PURPOSE: compute a right syzygy module of I
+RETURN:  the same type as input
+EXAMPLE: example rightSyz; shows examples
+"
+{
+  def A = basering;
+  def Aopp = opposite(A);
+  setring Aopp;
+  def Iopp = oppose(A,I);
+  def Jopp = syz(Iopp);
+  setring A;
+  def J = oppose(Aopp,Jopp);
+  return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,d),dp;
+  def S = nc_algebra(1,1); setring S; // the first Weyl algebra
+  ideal I = x,d;
+  module LS = syz(I);
+  print(LS);
+  module RS = rightSyz(I);
+  print(RS);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc rightNF(def v, def M)
+"USAGE:  rightNF(I); v a poly/vector, M an ideal/module
+PURPOSE: compute a right normal form of v w.r.t. M
+RETURN:  poly/vector (as of the 1st argument)
+EXAMPLE: example rightNF; shows examples
+"
+{
+  def A = basering;
+  def Aopp = opposite(A);
+  setring Aopp;
+  def vopp = oppose(A,v);
+  def Mopp = oppose(A,M);
+  Mopp = std(Mopp);
+  def wopp = NF(vopp,Mopp);
+  setring A;
+  def w    = oppose(Aopp,wopp);
+  w = simplify(w,2); // skip zeros in ideal/module
+  return(w);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  LIB "ncalg.lib";
+  ring r = 0,(x,d),dp;
+  def S = nc_algebra(1,1); setring S; // Weyl algebra
+  ideal I = x; I = std(I);
+  poly  p = x*d+1;
+  NF(p,I); // left normal form
+  rightNF(p,I); // right normal form
+}
+
+// **********************************
+// * NF: Example for vector/module: *
+// **********************************
+// module M = [x,0],[0,d]; M = std(M);
+// vector v = (x*d+1)*[1,1];
+// print(NF(v,M));
+// print(rightNF(v,M));
+
+///////////////////////////////////////////////////////////////////////////////
+proc rightModulo(def M, def N)
+"USAGE:  rightModulo(M,N); M,N are ideals/modules
+PURPOSE: compute a right representation of the module (M+N)/N
+RETURN:  module
+ASSUME:  M,N are presentation matrices for right modules
+EXAMPLE: example rightModulo; shows examples
+"
+{
+  def A = basering;
+  def Aopp = opposite(A);
+  setring Aopp;
+  def Mopp = oppose(A,M);
+  def Nopp = oppose(A,N);
+  def Kopp = modulo(Mopp,Nopp);
+  setring A;
+  def K = oppose(Aopp,Kopp);
+  return(K);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  LIB "ncalg.lib";
+  def A = makeUsl(2);
+  setring A;
+  option(redSB);
+  option(redTail);
+  ideal I = e2,f2,h2-1;
+  I = twostd(I);
+  print(matrix(I));
+  ideal E  = std(e);
+  ideal TL = e,h-1; // the result of left modulo
+  TL;
+  ideal T = rightModulo(E,I);
+  T = rightStd(T+I);
+  T = rightStd(rightNF(T,I)); // make the output canonic
+  T;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+proc isCommutative ()
+"USAGE:  isCommutative();
+RETURN:  int, 1 if basering is commutative, or 0 otherwise
+PURPOSE: check whether basering is commutative
+EXAMPLE: example isCommutative; shows an example
+"
+{
+  int iscom = 1;
+  list L = ringlist(basering);
+  if (size(L) > 4) // basering is nc_algebra
+  {
+    matrix C = L[5];
+    matrix D = L[6];
+    if (size(module(D)) <> 0) { iscom = 0; }
+    else
+    {
+      matrix U = UpOneMatrix(nvars(basering));
+      if (size(module(C-U)) <> 0) { iscom = 0; }
+    }
+  }
+  return(iscom);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  isCommutative();
+  def D = Weyl(); setring D;
+  isCommutative();
+  setring r;
+  def R = nc_algebra(1,0); setring R;
+  isCommutative();
+}
+
+//////////////////////////////////////////////////////////////////////
+
+proc isWeyl ()
+"USAGE:  isWeyl();
+RETURN:  int, 1 if basering is a Weyl algebra, or 0 otherwise
+PURPOSE: check whether basering is a Weyl algebra
+EXAMPLE: example isWeyl; shows an example
+"
+{
+  int i,j;
+  int notW = 0;
+  int N = nvars(basering);
+  if (N mod 2 <> 0) { return(notW); } // odd number of generators
+  int n = N/2;
+  list L = ringlist(basering);
+  if (size(L) < 6) { return(notW); } // basering is commutative
+  matrix C = L[5];
+  matrix D = L[6];
+  matrix U = UpOneMatrix(N);
+  if (size(ideal(C-U)) <> 0) { return(notW); } // lt(xy)<>lt(yx)
+  ideal I = D;
+  if (size(I) <> n) { return(notW); } // not n entries<>0
+  I = simplify(I,4+2);
+  int sI = size(I);
+  if (sI > 2) { return(notW); }  // more than 2 distinct entries
+  for (i=1; i<=sI; i++)
+  {
+    if (I[i]<>1 && I[i]<>-1) { return (notW); } // other values apart from 1,-1
+  }
+  ideal Ro,Co;
+  for (i=1; i<=N; i++)
+  {
+    Ro = D[1..N,i];
+    Co = D[i,1..N];
+    if (size(Ro)>1 || size(Co)>1)
+    {
+      return(int(0)); // var(i) doesn't commute with more than 1 other vars
+    }
+  }
+  return(int(1)); // all tests passed: basering is Weyl algebra
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(a,b,c,d),dp;
+  isWeyl();
+  def D = Weyl(1); setring D; //make from r a Weyl algebra
+  b*a;
+  isWeyl();
+  ring t = 0,(Dx,x,y,Dy),dp;
+  matrix M[4][4]; M[1,2]=-1; M[3,4]=1;
+  def T = nc_algebra(1,M); setring T;
+  isWeyl();
+}
+
+//////////////////////////////////////////////////////////////////////
+
+proc moduloSlim (module A, module B)
+"USAGE:  moduloSlim(A,B); A,B module/matrix/ideal
+RETURN:  module
+PURPOSE: compute @code{modulo} with slimgb as engine
+EXAMPLE: example moduloSlim; shows an example
+"
+{ 
+  def save  = basering;
+  int rA = nrows(A);
+  if (rA != nrows(B)) 
+  {
+    // add 0 rows?
+    ERROR("incorrect input: different rank");
+  }
+  def mering = makeModElimRing(save);
+  setring mering;
+  module A = imap(save, A);
+  module B = imap(save, B);
+  int cA = ncols(A);  int cB = ncols(B);
+  // create matrix C
+  //  matrix C[2*rA][cA+cB];
+  module C;
+  int i;
+  for(i=1; i<= cA; i++)
+  {
+    C = C, A[i] + gen(rA + i);
+  }
+  C = C,B;
+//   for(i=1; i<=cB; i++)
+//   {
+//     C = C, B[i];
+//   }
+  C = C[2..ncols(C)];
+  matrix D = slimgb(C);
+  module E;
+  for(i=1; i<= ncols(D); i++)
+  {
+    if (D[1,i]==0)
+    {
+      E = E,D[i];
+    }
+  }
+  // this E has 1st column and 1st row zero
+  // use submat@matrix.lib
+  E = submat(E,2..nrows(E),2..ncols(E));
+//   E = E[2..ncols(E)]; // skip 1st 0 row  //   E = transpose(E);
+//   E = E[2..ncols(E)]; // skip 1st 0 row //   E = transpose(E);
+  setring save;
+  module E = imap(mering,E);
+  kill mering;
+  return(E);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  LIB "ncalg.lib";
+  ring r; // first classical example for modulo
+  ideal h1=x,y,z;    ideal h2=x;
+  module m=moduloSlim(h1,h2);
+  print(m);
+  // now, a noncommutative example
+  def A = makeUsl2(); setring A; // this algebra is U(sl_2)
+  ideal H2 = e2,f2,h2-1; H2 = twostd(H2);
+  print(matrix(H2)); // print H2 in a compact form
+  ideal H1 = std(e);
+  ideal T = moduloSlim(H1,H2);
+  T = std( NF(std(H2+T),H2) ); 
+  T;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+proc makeModElimRing(list #)
+"USAGE:  makeModElimRing(L); L a list
+RETURN:  ring
+PURPOSE: create a copy of a given ring equipped with the
+@* elimination ordering for module components @code{(c,<)}
+NOTE: usually the list argument contains a ring to work with
+EXAMPLE: example makeModElimRing; shows an example
+"
+{
+  // supports qring;
+  // can be extended to handle C istead of c
+  /* input/basering business */
+  def save; int Noinput = 0;
+  if ( size(#)>0 )
+  {
+    if ( (typeof(#[1]) == "ring" ) || (typeof(#[1]) == "qring" ) )
+    {
+      save = #[1]; 
+    }
+    else
+    {
+      print("unsupported input type, proceeding with basering");  
+      Noinput = 1;
+    }
+  }  
+  if (Noinput)
+  {
+    if (nameof(basering)=="basering")
+    {
+      ERROR("no rings are given");
+    }
+    else
+    {
+      save = basering;
+    }
+  }
+  /* END input/basering business */
+  list L = ringlist(save);
+  list Ord = L[3];
+  int s = size(Ord); int done;
+  // detect where module ordering is located: either 1st or last entry
+  int i,j;
+  for(i=1; i<=s; i++)
+  {
+    if ( (Ord[i][1] == "C") || (Ord[i][1] == "c") )
+    {
+      Ord[i][1] = "c";
+      j = i; i=s;
+    }
+  }
+  if (j==0) { ERROR("no component entry found in the ringlist"); }
+  list N;
+  N[1] = Ord[j];
+  for(i=2; i<=j; i++)
+  {
+    N[i] = Ord[i-1];
+  }
+  for(i=j+1; i<=s; i++)
+  {
+    N[i] = Ord[i];
+  }
+  L[3] = N; def NR = ring(L); 
+  return(NR);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r1 = 0,(x,y,z),(C,Dp);
+  def r2 = makeModElimRing(r1); setring r2; r2;   kill r2;
+  ring r3 = 0,(z,t),(wp(2,3),c);
+  def r2 = makeModElimRing(r3); setring r2; r2; kill r2;
+  ring r4 = 0,(z,t,u,w),(a(1,2),C,wp(2,3,4,5));
+  def r2 = makeModElimRing(r4); setring r2; r2;
+}
+

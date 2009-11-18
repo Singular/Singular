@@ -1,0 +1,1125 @@
+// $Id$
+//(GP, last modified 26.10.01)
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Applications";
+info="
+LIBRARY:  groups.lib      Finite Group Theory
+AUTHORS:  Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de @*
+          Gerhard Pfister, email: pfister@mathematik.uni-kl.de
+
+PROCEDURES:
+
+   noSolution(I)         I an ideal in a polynomial ring over Z[x1..xn]
+                         returns a list l of primes <=32003 such that 1
+                         is in IZ/p[x1..xn] for p not in l or an ERROR
+                         if this is wrong or not decided.
+"
+/*
+// ===================== A Problem in Finite Group Theory ===================
+// Posed by Boris Kunyavskii, Bar-Ilan University, Tel Aviv
+//
+// For any word w in X,Y,X^(-1),Y^(-1) consider the sequence U_n
+// of words (depending on w) inductively
+//           U_1 = w
+//         U_n+1 = [X*U_n*X^(-1),Y*U_n*Y^(-1)]
+// with
+//         [X,Y] = X*Y*X^(-1)*Y^(-1)  (the commutator)
+
+
+// Conjecture (1):
+// (by B. Plotkin, slightly modified):
+// A finite group G is solvable <==>
+// there is an n >= 1 such that U_n(x,y) = 1 for all x,y in G
+// and for any of the 4 following words
+//         w1 = X^(-1)*Y*X*Y^(-1)*X
+//         w2 = X^(-2)*Y^(-1)*X
+//         w3 = Y^(-2)*X^(-1)*X
+//         w4 = X*Y^(-2)*X^(-1)*Y*X^(-1)
+//
+// (These words remained as possibly good words by a computer search
+// through about 10 000 candidates, by Fritz Grunewald)
+
+
+//  ==>  is clear
+// The minimal finite non-solvable groups (i.e. every proper subgroup is
+// solvable) have been classified by Thompson in 1968, they are:
+//
+// 1. PSL(2,p)    (p=5 or p=+-2 (mod 5), p!=3)
+// 2. PSL(2,2^p)
+// 3. PSL(2,3^p)  (p odd)
+// 4. Sz(2^p)     (p odd)      (Suzuki group)
+// 5. PSL(3,3)
+//
+// In view of this result Conjecture (1) is equivalent to
+//
+// Conjecture (2):
+// Let G be one of the groups above, then, for at least one of the 4 words w
+// above there are x,y in G such that 1 != U_n(x,y) = U_n+1(x,y) for some n.
+// (then U_n(x,y) != 1 for all n by definitionof U_n)
+
+
+// We give a computer aided proof, using SINGULAR, of Conjecture (2) for
+// the groups 1. - 3. (up to checking for a small, explicit number of primes)
+// Hence only the Suzuki groups have to be checked.
+//
+// We show:  1 != U_1(x,y) = U_2(x,y) for word w1 and some x,y in G
+// We need:
+// Theory
+//   - simple facts from algebraic geometry, singularity theory, finite fields
+//   - theorem of Lang-Weil, estimating the number of rational points on an
+//     absolutely irreducible projective curve C defined over Z (g=genus):
+//     if q >= N(g) ==> #C(F_q) != 0
+//     (N(g) = 4g^2 -2, g arithmetic genus)
+// SINGULAR
+//   - Groebner basis (elimination), multivariate factorization, resolution of
+//     plane curve singularities (Hamburger Noether developement), primary
+//     decomposition
+
+*/
+
+LIB "standard.lib";
+LIB "general.lib";
+LIB "matrix.lib";
+///////////////////////////////////////////////////////////////////////////////
+
+static proc splitS1(ideal I,int s,list #)
+"USAGE: splitS1(I,s[,l]) I ideal, s integer, l list of ideals
+COMPUTE: Factorizes the generators of I. If for one generator f=f1*f2 and
+         fi=ni*gi^ri, ni an integer and gi a polynomial, then
+         compute a standardbasis of I1=I,g1 and I2=I,g2, if this can be
+         done in < s seconds. Then apply splitS to I1 and I2 and continue
+         in the same way. The procedure stops if no generator can be
+         factorized.
+RETURN:  A list L of ideals and prime numbers
+         L[1]: A list of ideals such that the radical of the intersection
+               of these ideals coincides with the radical of I
+               If the optional list l of the input is not empty then
+               the ideals of L[1] which contain an ideal of l are canceled.
+         L[2]: A list of prime numbers appearing as factors of the ni.
+NOTE:   The computation avoids division by integers (by using
+        option(contentSB)) hence the result is correct modulo any prime
+        number which does not appear in the list L[2].
+EXAMPLE: example splitS1; shows an example
+"
+{
+   option(redSB);
+   option(contentSB);
+   int j,k,e;
+   int i=1;
+   int l=attrib(I,"isSB");
+   ideal J;
+   list re,fac,te,pr,qr,w;
+   number n;
+   poly p;
+   re=#;
+
+   if(deg(I[1])==0){return(list(re+list(std(I)),qr));}
+
+   fac=factorize(I[1]);
+
+   while((size(fac[1])==2)&&(i<size(I)))
+   {
+      I[i]=fac[1][2]*fac[1][1];   //not in splitS
+      i++;
+      fac=factorize(I[i]);
+   }
+   if(size(fac[1])==2){I[size(I)]=fac[1][2]*fac[1][1];}  //not in splitS
+   if(size(fac[1])>2)
+   {
+      w=squarefreeP(number(fac[1][1]));
+      n=w[1];
+      qr=insResult(qr,w[2]);
+      for(j=2;j<=size(fac[1]);j++)
+      {
+         I[i]=fac[1][j];
+         attrib(I,"isSB",1);
+         e=1;
+         k=0;
+         while(k<size(re))
+         {
+            k++;
+            if(size(reduce(re[k],I))==0){e=0;break;}
+            attrib(re[k],"isSB",1);
+            if(size(reduce(I,re[k]))==0){re=delete(re,k);k--;}
+         }
+         if(j==2){I[i]=I[i]*n;}
+         if(e)
+         {
+            if(l)
+            {
+               J=I;
+               p=I[i];
+               J[i]=0;
+               J=simplify(J,2);
+               attrib(J,"isSB",1);
+               pr=splitS(std(J,p),s,re);
+               re=pr[1];
+               qr=insResult(qr,pr[2]);
+            }
+            else
+            {
+               J=interred(I);
+               pr=splitS(timeStd(J,s),s,re);
+               re=pr[1];
+               qr=insResult(qr,pr[2]);
+            }
+         }
+      }
+      return(list(re,qr));
+   }
+   J=timeStd(I,s);       //J=std(I) in splitS
+   attrib(I,"isSB",1);
+   if(size(reduce(J,I))==0){return(list(re+list(I),qr));}
+   pr=splitS(J,s,re);
+   return(list(re+pr[1],pr[2]));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(b,s,t,u,v,w,x,y,z),dp;
+   ideal i=
+   bv+su,
+   bw+tu,
+   sw+tv,
+   by+sx,
+   bz+tx,
+   sz+ty,
+   uy+vx,
+   uz+wx,
+   vz+wy,
+   bvz;
+   splitS1(i,5);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc splitS(ideal I,int s,list #)
+"USAGE: splitS(I,s[,l]) I ideal, s integer, l list of ideals
+COMPUTE: Factorizes the generators of I. If for one generator f=f1*f2 and
+         fi=ni*gi^ri, ni an integer and gi a polynomial, then
+         compute a standardbasis of I1=I,g1 and I2=I,g2, if this can be
+         done in < s seconds. Then apply splitS to I1 and I2 and continue
+         in the same way. The procedure stops if no generator can be
+         factorized.
+RETURN:  A list L of ideals and prime numbers
+         L[1]: A list of ideals such that the radical of the intersection
+               of these ideals coincides with the radical of I
+               If the optional list l of the input is not empty then
+               the ideals of L[1] which contain an ideal of l are canceled.
+         L[2]: A list of prime numbers appearing as factors of the ni.
+NOTE:   The computation avoids division by integers (by using
+        option(contentSB)) hence the result is correct modulo any prime
+        number which does not appear in the list L[2].
+EXAMPLE: example splitS; shows an example
+"
+{
+   option(redSB);
+   option(contentSB);
+   int j,k,e;
+   int i=1;
+   int l=attrib(I,"isSB");
+   ideal J;
+   list re,fac,te,pr,qr,w;
+   number n;
+   poly p;
+   re=#;
+
+   if(deg(I[1])==0){return(list(re+list(std(I)),qr));}
+
+   fac=factorize(I[1]);
+
+   while((size(fac[1])==2)&&(i<size(I)))
+   {
+      i++;
+      fac=factorize(I[i]);
+   }
+   if(size(fac[1])>2)
+   {
+      w=squarefreeP(number(fac[1][1]));
+      n=w[1];
+      qr=insResult(qr,w[2]);
+      for(j=2;j<=size(fac[1]);j++)
+      {
+         I[i]=fac[1][j];
+         attrib(I,"isSB",1);
+         e=1;
+         k=0;
+         while(k<size(re))
+         {
+            k++;
+            if(size(reduce(re[k],I))==0){e=0;break;}
+            attrib(re[k],"isSB",1);
+            if(size(reduce(I,re[k]))==0){re=delete(re,k);k--;}
+         }
+         if(j==2){I[i]=I[i]*n;}
+         if(e)
+         {
+            if(l)
+            {
+               J=I;
+               p=I[i];
+               J[i]=0;
+               J=simplify(J,2);
+               attrib(J,"isSB",1);
+               pr=splitS(std(J,p),s,re);
+               re=pr[1];
+               qr=insResult(qr,pr[2]);
+            }
+            else
+            {
+               J=interred(I);
+               pr=splitS(timeStd(J,s),s,re);
+               re=pr[1];
+               qr=insResult(qr,pr[2]);
+            }
+         }
+      }
+      return(list(re,qr));
+   }
+   J=std(I);
+   attrib(I,"isSB",1);
+   if(size(reduce(J,I))==0){return(list(re+list(I),qr));}
+   pr=splitS(J,s,re);
+   return(list(re+pr[1],pr[2]));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(b,s,t,u,v,w,x,y,z),dp;
+   ideal i=
+   bv+su,
+   bw+tu,
+   sw+tv,
+   by+sx,
+   bz+tx,
+   sz+ty,
+   uy+vx,
+   uz+wx,
+   vz+wy,
+   bvz;
+   splitS(i,5);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc finalSplit(list I,list qr)
+"USAGE: finalSplit(I,qr) I list of ideals, qr list of primes
+RETURN: list l of primes <=32003 such that 1 is in I[j]Z/p[x1..xn]
+        for p not in l and all j or an ERROR if this is wrong or
+        not decided.
+EXAMPLE: example finalSplit; shows an example
+"
+{
+   option(redThrough);
+   option(contentSB);
+   ideal J,K;
+   int i,j,k,n;
+   int count=1;
+   list q,pr,l;
+
+   "trivial splitting";
+   pr=trivialSplit(I,4);
+   l=pr[1];
+   qr=insResult(qr,pr[2]);
+   while(count)
+   {
+      k++;
+      "loop";k;size(l);"======";
+      count=0;list p;
+      for(i=1;i<=size(l);i++)
+      {
+         i;
+         K=changeOrdTest(l[i]);
+         if(deg(K[1])!=0)
+         {
+            "split";
+            pr=splitS1(shortid_L(K,3),2);
+            q=pr[1];
+            qr=insResult(qr,pr[2]);
+            size(q);"out";
+            for(j=1;j<=size(q);j++)
+            {
+               if(deg(q[j][1])==0)
+               {
+                  pr=contentS(q[j]);
+                  q[j]=pr[1];
+                  qr=insResult(qr,pr[2]);
+               }
+               else
+               {
+                  pr=simpliFy(q[j]+K);
+                  q[j]=pr[1];
+                  qr=insResult(qr,pr[2]);
+                  pr=contentS(q[j]);
+                  q[j]=pr[1];
+                  qr=insResult(qr,pr[2]);
+               }
+            }
+            if((size(q)==1)&&(deg(q[1][1])>0))
+            {
+               "split again";
+               K=sort(q[1])[1];
+               J=K[1..20+4*k];
+               pr=splitS(J,5);
+               q=pr[1];
+               qr=insResult(qr,pr[2]);
+               size(q);"out";
+               for(j=1;j<=size(q);j++)
+               {
+                  if(deg(q[j][1])==0)
+                  {
+                     pr=contentS(q[j]);
+                     q[j]=pr[1];
+                     qr=insResult(qr,pr[2]);
+                  }
+                  else
+                  {
+                     pr=simpliFy(q[j]+K);
+                     q[j]=pr[1];
+                     qr=insResult(qr,pr[2]);
+                     pr=contentS(q[j]);
+                     q[j]=pr[1];
+                     qr=insResult(qr,pr[2]);
+                  }
+               }
+
+            }
+            if((size(q)==1)&&(deg(q[1][1])>0))
+            {
+               n++;
+               "split again";
+               K=q[1];
+               J=shortid_L(K,3+n);
+               pr=splitS1(J,5);
+               if(size(pr[1])>1)
+               {
+                  q=pr[1];
+                  qr=insResult(qr,pr[2]);
+                  size(q);"out";
+                  for(j=1;j<=size(q);j++)
+                  {
+                     if(deg(q[j][1])==0)
+                     {
+                       pr=contentS(q[j]);
+                       q[j]=pr[1];
+                       qr=insResult(qr,pr[2]);
+                     }
+                     else
+                     {
+                       pr=simpliFy(q[j]+K);
+                       q[j]=pr[1];
+                       qr=insResult(qr,pr[2]);
+                       pr=contentS(q[j]);
+                       q[j]=pr[1];
+                       qr=insResult(qr,pr[2]);
+                     }
+                  }
+               }
+            }
+            if(size(q)>1)
+            {
+                count++;
+            }
+            else
+            {
+               if(deg(q[1][1])>0)
+               {
+                  q[1]=changeOrdTest(q[1]);
+               }
+            }
+            p=p+q;
+         }
+         else
+         {
+           pr=primefactors(number(K[1]));
+           qr=insResult(qr,pr[1]);
+         }
+      }
+      l=p;
+      kill p;
+   }
+l;
+   for(i=1;i<=size(l);i++)
+   {
+
+      if(deg(l[i][1])>0){l;ERROR("not ready");}
+      pr=primefactors(number(l[i][1]));
+      if(pr[3]!=1){pr;ERROR("not ready");}
+      qr=insResult(qr,pr[1]);
+   }
+   return(qr);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,x,dp;
+   list qr=2,5,7;
+   ideal i=181x-181,11x+11;
+   list pr=i;
+   finalSplit(pr,qr);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+proc noSolution(ideal I)
+"USAGE: noSolution(I) I ideal
+RETURN: list l of primes <=32003 such that 1 is in IZ/p[x1..xn]
+        for p not in l or an ERROR if this is wrong or not decided.
+EXAMPLE: example noSolution; shows an example
+"
+{
+   int s=1;
+   int t=30;
+   option(redThrough);
+   option(contentSB);
+   ideal J=shortid_L(I,3);
+   ideal K;
+   number n;
+
+   "first splitting";
+   int i,j,k;
+   list l,p,q,re,pr,qr;
+   pr=splitS(J,s);
+   l=pr[1];
+   qr=pr[2];
+   size(l);
+
+   for(i=1;i<=size(l);i++)
+   {
+      if(deg(l[i][1])==0)
+      {
+         K=l[i][1];
+      }
+      else
+      {
+         pr=simpliFy(I+l[i]);
+         J=pr[1];
+         qr=insResult(qr,pr[2]);
+         pr=contentS(J);
+         J=pr[1];
+         qr=insResult(qr,pr[2]);
+         K=timeStd(J,1);
+      }
+      if(deg(K[1])==0)
+      {
+         n=number(K[1]);
+         pr=primefactors(n);
+         if(pr[3]!=1)
+         {
+             J=changeOrdTest(J);
+             p=p+list(J);
+         }
+         else
+         {
+             qr=insResult(qr,pr[1]);
+         }
+      }
+      else
+      {
+         pr=contentS(K);
+         p=p+list(pr[1]);
+         qr=insResult(qr,pr[2]);
+      }
+   }
+   "trivial splitting 1";
+   pr=trivialSplit(p,3);
+   p=pr[1];
+   qr=insResult(qr,pr[2]);
+   size(p);
+   "second splitting";
+
+   for(i=1;i<=size(p);i++)
+   {
+      i;
+      if(size(p[i])<t)
+      {
+         K=timeStd(p[i],10);
+         if(deg(K[1])==0)
+         {
+            n=number(K[1]);
+            pr=primefactors(n);
+            if(pr[3]!=1)
+            {
+                p[i]=changeOrdTest(p[i]);
+                re=re+list(p[i]);
+            }
+            else
+            {
+               qr=insResult(qr,pr[1]);
+            }
+         }
+         else
+         {
+            pr=contentS(K);
+            re=re+list(pr[1]);
+            qr=insResult(qr,pr[2]);
+         }
+      }
+      else
+      {
+         J=p[i];
+         J=J[1..t];
+         "in splitting";
+         pr=splitS(J,s);
+         l=pr[1];
+         qr=insResult(qr,pr[2]);
+         size(l);
+         "out";
+         for(k=1;k<=size(l);k++)
+         {
+            pr=contentS(l[k]);
+            l[k]= pr[1];
+            qr=insResult(qr,pr[2]);
+            pr=simpliFy(l[k]+p[i]);
+            J=pr[1];
+            qr=insResult(qr,pr[2]);
+            K=timeStd(J,10);
+            if(deg(K[1])==0)
+            {
+               n=number(K[1]);
+               pr=primefactors(n);
+               if(pr[3]!=1)
+               {
+                  pr=contentS(J);
+                  qr=insResult(qr,pr[2]);
+                  J=pr[1];
+                  J=changeOrdTest(J);
+                  re=re+list(J);
+               }
+               else
+               {
+                  qr=insResult(qr,pr[1]);
+               }
+            }
+            else
+            {
+               pr=contentS(K);
+               qr=insResult(qr,pr[2]);
+               re=re+list(pr[1]);
+            }
+         }
+      }
+   }
+   "trivial splitting 2";
+   size(re);
+   pr=trivialSplit(re,2);
+   re=pr[1];
+   qr=insResult(qr,pr[2]);
+   "third splitting";
+   size(re);
+   for(i=1;i<=size(re);i++)
+   {
+      if(deg(re[i][1])>0)
+      {
+         i;
+         pr=simpliFy(re[i]);
+         J=pr[1];
+         qr=insResult(qr,pr[2]);
+         "in splitting";
+         J=shortid_L(J,3);
+         pr=splitS(J,s);
+         l=pr[1];
+         if(size(l)==1)
+         {
+            "split again";
+            pr=simpliFy(re[i]);
+            J=pr[1];
+            qr=insResult(qr,pr[2]);
+            J=J[1..t];
+            pr=splitS(J,s);
+            l=pr[1];
+            qr=insResult(qr,pr[2]);
+         }
+         else
+         {
+            qr=insResult(qr,pr[2]);
+         }
+         size(l);
+         "out";
+         for(j=1;j<=size(l);j++)
+         {
+            pr=contentS(l[j]);
+            l[j]=pr[1];
+            qr=insResult(qr,pr[2]);
+            pr=simpliFy(re[i]+l[j]);
+            J=pr[1];
+            qr=insResult(qr,pr[2]);
+            K=timeStd(J,10);
+            if(deg(K[1])==0)
+            {
+               n=number(K[1]);
+               pr=primefactors(n);
+               if(pr[3]!=1)
+               {
+                  pr=contentS(J);
+                  J=pr[1];
+                  qr=insResult(qr,pr[2]);
+                  J=changeOrdTest(J);
+                  q=q+list(J);
+               }
+               else
+               {
+                 qr=insResult(qr,pr[1]);
+               }
+            }
+            else
+            {
+               pr=contentS(K);
+               qr=insResult(qr,pr[2]);
+               q=q+list(pr[1]);
+            }
+         }
+      }
+      else
+      {
+         i;
+         pr=primefactors(number(re[i][1]));
+         qr=insResult(qr,pr[1]);
+      }
+   }
+"jetzt geht es los";
+   return(finalSplit(q,qr));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,x,dp;
+   ideal i=181x-181,11x+11;
+   noSolution(i);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc changeOrdTest(ideal I)
+{
+   def R=basering;
+   if(deg(I[1])==0){return(I);}
+   def RR=changeord("dp");
+   setring RR;
+   ideal I=imap(R,I);
+   ideal K=timeStd(I,5);
+   if(deg(K[1])==0)
+   {
+      number n=number(K[1]);
+      if(primefactors(n)[3]==1)
+      {
+         I=K;
+      }
+   }
+   setring R;
+   I=imap(RR,I);
+   kill RR;
+   return(I);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc trivialSplit(list p,int depth, list #)
+"USAGE: trivialSplit(p,s) p list of ideals, s integer the number of iterations
+COMPUTE: Factorizes the monomials among the generators of I.
+         If  one monomial contains the variables x1,..xr, then
+         I1=I(x1=0),...,Ir=I(xr=0) is considered. Then apply
+         trivialSplit to I1 ...Ir and continue in the same way s times.
+RETURN:  A list L of ideals and prime numbers
+         L[1]: A list of ideals such that the radical of the intersection
+               of these ideals at x1=...=xr=0 coincides with the radical of
+               I at x1=...=xr=0.
+         L[2]: A list of prime numbers appearing as factors of the monomials.
+NOTE:   The computation avoids division by integers  hence the result
+        is correct modulo any prime
+        number which does not appear in the list L[2].
+EXAMPLE: example trivialSplit; shows an example
+"
+{
+   list re,l,pr,qr;
+   int i,k;
+   ideal J,K,T,Ke;
+   number n;
+
+   if(size(p)==0){return(list(p,qr));}
+   if(depth<=0){return(list(p,qr));}
+   if(size(#)>0)
+   {
+      T=#[1];
+   }
+   else
+   {
+      T=1;
+   }
+   for(k=1;k<=size(p);k++)
+   {
+      pr=simpliFy(p[k]);
+      p[k]=pr[1];
+      qr=insResult(qr,pr[2]);
+      J=shortid_L(p[k],1);
+      if((size(J)>0)&&(deg(J[1])>=1))
+      {
+         pr=splitS1(J,10);
+         l=pr[1];
+         qr=insResult(qr,pr[2]);
+         for(i=1;i<=size(l);i++)
+         {
+            Ke=l[i];
+            l[i]=trivialSimplify(p[k],l[i]);
+            pr=simpliFy(l[i]);
+            l[i]=pr[1];
+            qr=insResult(qr,pr[2]);
+            K=timeStd(l[i],1);
+            attrib(K,"isSB",1);
+            if(deg(K[1])==0)
+            {
+               n=number(K[1]);
+               if(primefactors(n)[3]!=1)
+               {
+                  l[i]=changeOrdTest(l[i]);
+                  pr=trivialSplit(l[i],depth-1,T);
+                  re=re+pr[1];
+                  qr=insResult(qr,pr[2]);
+               }
+               else
+               {
+                  l[i]=K; //neu
+               }
+            }
+            else
+            {
+               if(size(reduce(trivialSimplify(T,Ke),K))!=0)
+               {
+                  pr=trivialSplit(K,depth-1,trivialSimplify(T,Ke));
+                  re=re+pr[1];
+                  qr=insResult(qr,pr[2]);
+               }
+            }
+            T=intersect(T,Ke);
+         }
+      }
+      else
+      {
+         J=timeStd(p[k],5);
+         if(deg(J[1])==0)
+         {
+            n=number(J[1]);
+            if(primefactors(n)[3]!=1)
+            {
+               p[k]=changeOrdTest(p[k]);
+               re=re+list(p[k]);
+            }
+            else
+            {
+                re=re+list(J);
+            }
+         }
+         else
+         {
+            re=re+list(J);
+         }
+      }
+   }
+   return(list(re,qr));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(b,s,t,u,v,w,x,y,z),dp;
+   ideal i=
+   bv+su,
+   bw+tu,
+   sw+tv,
+   by+sx,
+   bz+tx,
+   sz+ty,
+   uy+vx,
+   uz+wx,
+   vz+wy,
+   bvz;
+   trivialSplit(i,2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc trivialSimplify(ideal I, ideal J)
+"USAGE:  trivialSimplify(I,J);  I,J ideals, J generated by variables
+RETURN:  ideal K = eliminate(I,m) m the product of variables of J
+EXAMPLE: example trivialSimplify; shows an example
+"
+{
+   int i;
+   for(i=1;i<=size(J);i++){I=subst(I,J[i],0);}
+   return(simplify(I,2));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z,w,t,u),dp;
+   ideal i=
+   t,u,
+   x3+y2+2z,
+   x2+3y,
+   x2+y2+z2,
+   w2+z+u;
+   ideal j=t,u;
+   trivialSimplify(i,j);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc simpliFy(ideal J,list #)
+"USAGE:  simpliFy(id);  id ideal
+RETURN:  ideal I = eliminate(Id,m) m is a product of variables
+         which are in linear equations involved in the generators of id
+EXAMPLE: example simpliFy; shows an example
+"
+{
+   ideal I=J;
+   if(size(#)!=0){I=#[1];}
+   def R=basering;
+   matrix M=jacob(I);
+   ideal ma=maxideal(1);
+   int i,j,k;
+   map phi;
+   list pr,re;
+
+   for(i=1;i<=nrows(M);i++)
+   {
+      for(j=1;j<=ncols(M);j++)
+      {
+         if((deg(M[i,j])==0)&&(deg(I[i])==1))
+         {
+            ma[j]=(-1/M[i,j])*(I[i]-M[i,j]*var(j));
+            pr=primefactors(number(M[i,j]));
+            if(pr[3]>1){pr[3];ERROR("number too big in simpliFy");}
+            re=insResult(re,pr[1]);
+            phi=R,ma;
+            I=phi(I);
+            J=phi(J);
+            for(k=1;k<=ncols(I);k++)
+            {
+               I[k]=cleardenom(I[k]);
+            }
+            M=jacob(I);
+         }
+      }
+   }
+   J=simplify(J,2);
+   for(i=1;i<=size(J);i++)
+   {
+      if(deg(J[i])==0){J=std(J);break;}
+      J[i]=cleardenom(J[i]);
+   }
+   return(list(J,re));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z,w),dp;
+   ideal i=
+   x3+y2+2z,
+   x2+3y,
+   x2+y2+z2,
+   w2+z;
+   simpliFy(i);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc squarefreeP(number n)
+"USAGE:  squarefreeP(n);  n number
+RETURN:  list l of numbers. l[2] contains all prime factors of n less
+         then 32003, l[1] is the part of m which has prime factors greater
+         then 32003
+EXAMPLE: example squarefreeP; shows an example
+"
+{
+   list re;
+   if(n<0){n=-n;}
+   if(n==1){return(list(n,re));}
+   list pr=primefactors(n);
+   int i;
+   number m=number(pr[3][1]);
+   re=insResult(re,pr[1]);
+   return(list(m,re));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,x,dp;
+   squarefreeP(123456789100);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc contentS(ideal I)
+"USAGE:  contentS(I);  I ideal
+RETURN:  list l
+         l[1] the ideal I. Te generators of I are the generators of the
+         input ideal devided by the part of the content which have
+         prime factors less then 32003.
+         l[2] contains the prime numbers which occured in the division
+EXAMPLE: example contentS; shows an example
+"
+
+{
+   option(contentSB);
+   int i,k;
+   number n,m;
+   list pr,re;
+   for(i=1;i<=size(I);i++)
+   {
+      n=leadcoef(I[i]);
+      if(n<0){n=-n;}
+      if(n>1)
+      {
+         pr=primefactors(n);
+         if(n<=32003)
+         {
+            m=n;
+         }
+         else
+         {
+            m=number(pr[1][1])^pr[2][1];
+            for(k=2;k<=size(pr[1]);k++)
+            {
+               m=m*number(pr[1][k])^pr[2][k];
+            }
+         }
+         I[i]=cleardenom(I[i]/m);
+         re=insResult(re,pr[1]);
+      }
+   }
+   return(list(I,re));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y),dp;
+   ideal I=2x+2,3y+3x,1234567891x+1234567891;
+   contentS(I);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc insResult(list r,#)
+{
+   if(size(#)==0){return(r);}
+   if(size(r)==0){r[1]=1;}
+   int i,j;
+   for(i=1;i<=size(#);i++)
+   {
+      j=1;
+      while((#[i]>r[j])&&(j<size(r))){j++;}
+      if(#[i]>r[j]){r=insert(r,#[i],j);}
+      if(#[i]<r[j]){r=insert(r,#[i],j-1);}
+   }
+   return(r);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   list r=list(3,7,13);
+   intvec v=2,3,5,11,17;
+   insResult(r,v);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc shortid_L (ideal id,int n)
+{
+  ideal Lc;
+  intvec v;
+  int ii;
+  for(ii= 1; ii<=ncols(id); ii++)
+  {
+   if (size(id[ii])<=n and id[ii]!=0)
+   {
+       Lc = Lc,id[ii];
+       v=v,ii;
+   }
+  }
+  Lc = simplify(Lc,2);
+  list L = Lc,v;
+  return(Lc);
+}
+
+
+/*
+//-------------- the solution of the problem -----------------
+ring r = 0,(b,c,t),dp;   //global (affine) ring
+matrix X[2][2] = 0, -1,
+                 1, t;
+matrix Y[2][2] = 1, b,
+                 c, 1+bc;
+;
+
+//------------ create word W1 and ideal I of U1-U2 ------------
+matrix iX = inverse(X);
+matrix iY = inverse(Y);
+matrix U1 = iX*Y*X*iY*X;          //the word w1
+//matrix U1=iX*iX*iY*X;           //das neue Wort
+matrix N  = X*U1*iX;
+matrix M  = Y*U1*iY;
+matrix iN = inverse(N);
+matrix iM = inverse(M);
+matrix U2 = N*M*iN*iM;
+ideal I = ideal(U1-U2);
+
+//list qr=primdecGTZ(I);
+//I=qr[1][2];
+
+ring rh = 0,(b,c,t,h),dp;
+ideal I = imap(r,I);
+ideal sI = groebner(I);
+ideal hI = homog(sI,h);
+ideal shI =std(hI);
+ideal J = eliminate(shI,c);       //eliminate c
+poly f = J[1];
+
+ring r1 = 0,(b,t,h),dp;
+poly hf=b6t6-2b5t7+b4t8+b8t3h-4b7t4h+7b6t5h-6b5t6h+2b4t7h-7b6t4h2+12b5t5h2+b4t6h2-6b3t7h2-3b8th3+12b7t2h3-16b6t3h3+19b4t5h3-12b3t6h3-2b8h4+8b7th4-3b6t2h4+2b5t3h4-45b4t4h4+32b3t5h4+12b2t6h4-12b6th5+50b5t2h5-64b4t3h5+4b3t4h5+26b2t5h5-12b6h6+24b5th6+22b4t2h6+12b3t3h6-73b2t4h6-10bt5h6-8b5h7-6b4th7+88b3t2h7-68b2t3h7-26bt4h7-29b4h8+16b3th8+42b2t2h8+54bt3h8+3t4h8-28b3h9-12b2th9+88bt2h9+10t3h9-38b2h10-8bth10-11t2h10-28bh11-34th11-17h12;
+//poly hf=b3t4-b2t5+b4t2h-2b3t3h+2b2t4h-bt5h-2b3t2h2+4bt4h2+b2t2h3-bt3h3+t4h3
+//+2b2th4-6bt2h4-4t3h4+b2h5-2bth5+2t2h5+4th6+h7;
+
+int n,m,sA,sB;
+ n=6;
+//n=3;
+//m=7-n;
+
+ m = 12-n;
+ ideal A = maxideal(n);       ideal B = maxideal(m);
+ sA =size(A);
+ sB = size(B);
+
+ring R = 0,(b(1..sB),a(1..sA),b,t,h),dp;
+poly hf = imap(r1,hf);
+ideal A = imap(r1,A);
+ideal B = imap(r1,B);
+matrix aa[sA][1]= a(1..sA);
+matrix bb[sB][1] = b(1..sB);
+poly f1= (matrix(A)*aa)[1,1];   //Ansatz for degree n
+poly f2= (matrix(B)*bb)[1,1];   //Ansatz for degree m=12-n
+poly g = f1*f2-hf;              //assume hf factors
+matrix C = coef(g,bth);
+ideal co = submat(C,2,1..ncols(C));//condition for decomposition, size 91
+
+ring R1 = 0,(b(1..sB),a(1..sA)),lp;
+ideal co = imap(R,co);
+co=subst(co,a(1),1);          //OE a1=1
+co = subst(co,b(1),-17);      //co1[91]=b(1)+17
+//co = subst(co,b(1),1);
+
+int aa=timer;
+list pr=noSolution(co);
+timer-aa;
+
+
+//n=1 0 sec
+// keine Primzahl
+//n=2   628 sec
+// 2,3,5,7,11,13,17,19,23,29,31,37,43,47,61,89,293,347,367,487,491,3463,7498
+//n=3  1604 sec
+// 2,3,5,7,11,13,17,19,23,29,31,59,71,79,101,163,197,211,269,281,541,647,863,
+// 7129,9041,10343,18413,20857
+//n=4  8296 sec
+// 2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,61,67,71,73,83,89,101,109,127,
+   131,149,151,157,163,167,173,179,193,199,211,223,229,251,263,283,307,313,331,
+   347,373,401,601,607,631,643,701,719,727,829,857,887,971,1279,1361,1453,1721,
+   1847,2003,2069,2213,2671,2693,3299,3373,3391,3517,3593,3701,3779,4111,4409,
+   4423,4561,4657,4793,5273,5399,5659,5987,6949,7487,8011,8243,8887,9769,10159,
+   10177,12007,26347
+//n=5  4715 sec
+// 2,3,5,7,11,13,17,19,23,31,41,43,61,283,421,631,1609
+//n=6 18317 sec
+// 2,3,5,7,11,13,17,19,29,31,37,41,47,61,71,73,79,89,97,127,131,173,181,223,
+// 269,953,1039,6151,6343,7823
+
+
+//fuer das andere Wort
+//n=1  keine Primzahl
+//n=2  2,3,7,109
+//n=3  2,3,5,7,11,13,19,29,31,41,43,47,89,139,149,167,173,991,1381,1637,27367
+
+*/

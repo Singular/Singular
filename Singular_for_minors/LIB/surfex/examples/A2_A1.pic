@@ -1,0 +1,29 @@
+scale_x = 0.3556187766714083;
+scale_y = 0.3556187766714083;
+scale_z = 0.3556187766714083;
+radius=10.0;
+illumination = ambient_light + diffuse_light + reflected_light + transmitted_light;
+ambient      = 40;
+diffuse      = 80;
+reflected    = 80;
+transmitted  = 20;
+smoothness   = 50;
+transparence = 0;
+thickness = 10;
+antialiasing = 0;
+
+background_red=255; background_green=255; background_blue=255;
+
+poly f1 = x^2+y^2-1*z^3-1*p1*z^2;
+surface = f1;
+surface_red = 240;surface_green = 160;surface_blue = 0;
+inside_red = 243;inside_green = 179;inside_blue = 50;
+transparence = 0;
+surface=rotate(surface,1.0136129476813718,yAxis);
+surface=rotate(surface,-0.9220694629383108,xAxis);
+surface=rotate(surface,-1.0995444281437265,zAxis);
+
+draw_surface;
+filename="/home/labs/mytools/surfex_0_89_07/examples/A2_A1.pic.jpg";
+color_file_format=jpg;
+save_color_image;

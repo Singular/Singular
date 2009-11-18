@@ -1,0 +1,78 @@
+C++ conventions
+---------------
+- struct are used in sense of C, otherwise use a class
+- a class must have a constructor and destruction, do not rely on the default ones
+- avoid virtual methods, if possible
+- under all circumstances, avoid multiple inheritance
+- remember, that Singular has C and C++ parts, i.e. ia C compiler must be able
+  to comple your .h file (wrap C++-only parts in #ifdef)
+- use // comments only in C++-parts
+
+
+Compiler conventions
+--------------------
+- should compile with gcc/g++ version 2.9.3 to 4.x
+- should create correct code with gcc/g++ version 2.9.3 to 4.x : with
+  well known exeptions
+  ( IA64: gcc 4.0.x, 4.1.x produce wrong code,
+    OsX: ..., etc.)
+ 
+Naming conventions(variables/functions/methods):
+------------------------------------------------
+- global names start with a prefix in small letters,
+  describing the general field of that routine
+  and have capital initial letters.
+  Example: pGetExp
+- local names should be short and,
+  if they coantain a capital letter, start with a capital letter.
+  Example: i
+- macros (which do not substitute procedures) should be all in capital letters.
+  Example: INT_MAX
+
+Naming conventions(filenames, libraries):
+-----------------------------------------
+- to avoid confusion on poor file systems, 
+  filenames should be all in small letters, or, at least, be unique if converted
+  to small letters
+
+Error messages:
+--------------
+- allways test for wrong input from the user,
+  report errors via Werror/WerrorS, warnings via Warn/WarnS
+- trust other parts of Singular:
+  - only very fast tests
+  - have a complete test of the input in debug mode (#ifndef NDEBUG)
+- report internal errors via dReportError
+
+Indentiation:
+-------------
+- matching  { } should be in the same line (for very short staements) 
+  or in the same column
+
+System dependicies:
+------------------
+- for code specific for certain cpu types, use the following macros
+  CPU type: i[3456]86:  SI_CPU_I386 
+  CPU type: sparc:      SI_CPU_SPARC 
+  CPU type: ppc:        SI_CPU_PPC 
+  CPU type: IA64:       SI_CPU_IA64
+  CPU type: x86_64:     SI_CPU_X86_64 
+- always provide a general version also
+- if NTL is included, one may also use:
+  NTL_AVOID_BRANCHING (currently not used, substituted by SI_CPU_*)
+- only for dependicies on the OS, use
+  the result of  singuname (#ifdef ix86_Linux etc.)
+
+Misc. remarks:
+--------------
+* never use fopen, but myfopen, in order to open text files
+
+* call rComplete after constructing a ring 
+
+* note: you will get a purely commutative ring from rCopy/rCopy0/rComplete,
+* if you want to construct a noncommutative ring you need to call 
+* the general nc_CallPlural or nc_rComplete whenever appropriate
+
+
+* never allocate memory with 0 as size request
+

@@ -1,0 +1,2528 @@
+//////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Noncommutative";
+info="
+LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace
+AUTHOR: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
+
+THEORY: See chapter 'LETTERPLACE' in the @sc{Singular} Manual.
+
+PROCEDURES:
+makeLetterplaceRing(d);    creates a ring with d blocks of shifted original variables
+freeGBasis(L, n);   compute two-sided Groebner basis of ideal, encoded via L, up to degree n
+setLetterplaceAttributes(R,d,b);  supplies ring R with the letterplace structure
+
+AUXILIARY PROCEDURES:
+
+lpMult(f,g);        letterplace multiplication of letterplace polynomials
+lp2lstr(K, s);      convert letter-place ideal to a list of modules
+lst2str(L[, n]);     convert a list (of modules) into polynomials in free algebra
+mod2str(M[, n]); convert a module into a polynomial in free algebra
+vct2str(M[, n]);   convert a vector into a word in free algebra
+lieBracket(a,b[, N]);    compute Lie bracket ab-ba of two letterplace polynomials
+serreRelations(A,z);   compute the ideal of Serre's relations associated to a generalized Cartan matrix A
+isVar(p);                   check whether p is a power of a single variable
+ademRelations(i,j);    compute the ideal of Adem relations for i<2j in char 0
+
+SEE ALSO: LETTERPLACE
+"
+
+// this library computes two-sided GB of an ideal
+// in a free associative algebra
+
+// a monomial is encoded via a vector V
+// where V[1] = coefficient
+// V[1+i] = the corresponding symbol
+
+LIB "qhmoduli.lib"; // for Max
+
+proc setLetterplaceAttributes(def R, int uptodeg, int lV)
+"USAGE: setLetterplaceAttributes(R, d, b); R a ring, b,d integers
+RETURN: ring with special attributes set
+PURPOSE: sets attributes for a letterplace ring:
+@*      'isLetterplaceRing' = true, 'uptodeg' = d, 'lV' = b, where
+@*      'uptodeg' stands for the degree bound,
+@*      'lV' for the number of variables in the block 0.
+NOTE: Activate the resulting ring by using @code{setring}
+"
+{
+  if (uptodeg*lV != nvars(R))
+  {
+    ERROR("uptodeg and lV do not agree on the basering!");
+  }
+
+    // Set letterplace-specific attributes for the output ring!
+  attrib(R, "uptodeg", uptodeg);
+  attrib(R, "lV", lV);
+  attrib(R, "isLetterplaceRing", 1);
+  return (R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
+  def R = setLetterplaceAttributes(r, 4, 2); setring R;
+  attrib(R,"isLetterplaceRing");
+  lieBracket(x(1),y(1),2);
+}
+
+
+// obsolete?
+
+static proc lshift(module M, int s, string varing, def lpring)
+{
+  // FINALLY IMPLEMENTED AS A PART OT THE CODE
+  // shifts a polynomial from the ring R to s positions
+  // M lives in varing, the result in lpring
+  // to be run from varing
+  int i, j, k, sm, sv;
+  vector v;
+  //  execute("setring "+lpring);
+  setring lpring;
+  poly @@p;
+  ideal I;
+  execute("setring "+varing);
+  sm = ncols(M);
+  for (i=1; i<=s; i++)
+  {
+    // modules, e.g. free polynomials
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      v  = M[j];
+      sv = size(v);
+      sp = "@@p = @@p + ";
+      for (k=2; k<=sv; k++)
+      {
+        sp = sp + string(v[k])+"("+string(k-1+s)+")*";
+      }
+      sp = sp + string(v[1])+";"; // coef;
+      setring lpring;
+      //      execute("setring "+lpring);
+      execute(sp);
+      execute("setring "+varing);
+    }
+    setring lpring;
+    //    execute("setring "+lpring);
+    I = I,@@p;
+    @@p = 0;
+  }
+  setring lpring;
+  //execute("setring "+lpring);
+  export(I);
+  //  setring varing;
+  execute("setring "+varing);
+}
+
+static proc skip0(vector v)
+{
+  // skips zeros in a vector, producing another vector
+  if ( (v[1]==0) || (v==0) ) { return(vector(0)); }
+  int sv = nrows(v);
+  int sw = size(v);
+  if (sv == sw)
+  {
+    return(v);
+  }
+  int i;
+  int j=1;
+  vector w;
+  for (i=1; i<=sv; i++)
+  {
+    if (v[i] != 0)
+    {
+      w = w + v[i]*gen(j);
+      j++;
+    }
+  }
+  return(w);
+}
+
+proc lst2str(list L, list #)
+"USAGE:  lst2str(L[,n]);  L a list of modules, n an optional integer
+RETURN:  list (of strings)
+PURPOSE: convert a list (of modules) into polynomials in free algebra
+EXAMPLE: example lst2str; shows examples
+NOTE: if an optional integer is not 0, stars signs are used in multiplication
+"
+{
+  // returns a list of strings
+  // being sentences in words built from L
+  // if #[1] = 1, use * between generators
+  int useStar = 0;
+  if ( size(#)>0 )
+  {
+    if ( typeof(#[1]) != "int")
+    {
+      ERROR("Second argument of type int expected");
+    }
+    if (#[1])
+    {
+      useStar = 1;
+    }
+  }
+  int i;
+  int s    = size(L);
+  if (s<1) { return(list(""));}
+  list N;
+  for(i=1; i<=s; i++)
+  {
+    if ((typeof(L[i]) == "module") || (typeof(L[i]) == "matrix") )
+    {
+      N[i] = mod2str(L[i],useStar);
+    }
+    else
+    {
+      "module or matrix expected in the list";
+      return(N);
+    }
+  }
+  return(N);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  module M = [-1,x,y],[-7,y,y],[3,x,x];
+  module N = [1,x,y,x,y],[-2,y,x,y,x],[6,x,y,y,x,y];
+  list L; L[1] = M; L[2] = N;
+  lst2str(L);
+  lst2str(L[1],1);
+}
+
+
+proc mod2str(module M, list #)
+"USAGE:  mod2str(M[,n]);  M a module, n an optional integer
+RETURN:  string
+PURPOSE: convert a module into a polynomial in free algebra
+EXAMPLE: example mod2str; shows examples
+NOTE: if an optional integer is not 0, stars signs are used in multiplication
+"
+{
+  if (size(M)==0) { return(""); }
+  // returns a string
+  // a sentence in words built from M
+  // if #[1] = 1, use * between generators
+  int useStar = 0;
+  if ( size(#)>0 )
+  {
+    if ( typeof(#[1]) != "int")
+    {
+      ERROR("Second argument of type int expected");
+    }
+    if (#[1])
+    {
+      useStar = 1;
+    }
+  }
+  int i;
+  int s    = ncols(M);
+  string t;
+  string mp;
+  for(i=1; i<=s; i++)
+  {
+    mp = vct2str(M[i],useStar);
+    if (mp[1] == "-")
+    {
+      t = t + mp;
+    }
+    else
+    {
+      if (mp != "")
+      {
+         t = t + "+" + mp;
+      }
+    }
+  }
+  if (t[1]=="+")
+  {
+    t = t[2..size(t)]; // remove first "+"
+  }
+  return(t);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp);
+  module M = [1,x,y,x,y],[-2,y,x,y,x],[6,x,y,y,x,y];
+  mod2str(M);
+  mod2str(M,1);
+}
+
+proc vct2str(vector v, list #)
+"USAGE:  vct2str(v[,n]);  v a vector, n an optional integer
+RETURN:  string
+PURPOSE: convert a vector into a word in free algebra
+EXAMPLE: example vct2str; shows examples
+NOTE: if an optional integer is not 0, stars signs are used in multiplication
+"
+{
+  if (v==0) { return(""); }
+  // if #[1] = 1, use * between generators
+  int useStar = 0;
+  if ( size(#)>0 )
+  {
+    if (#[1])
+    {
+      useStar = 1;
+    }
+  }
+  int ppl = printlevel-voice+2;
+  // for a word, encoded by v
+  // produces a string for it
+  v = skip0(v);
+  if (v==0) { return(string(""));}
+  number cf = leadcoef(v[1]);
+  int s = size(v);
+  string vs,vv,vp,err;
+  int i,j,p,q;
+  for (i=1; i<=s-1; i++)
+  {
+    p     = isVar(v[i+1]);
+    if (p==0)
+    {
+      err = "Error: monomial expected at nonzero position " + string(i+1);
+      ERROR(err+" in vct2str");
+      //      dbprint(ppl,err);
+      //      return("_");
+    }
+    if (p==1)
+    {
+      if (useStar && (size(vs) >0))       {   vs = vs + "*"; }
+        vs = vs + string(v[i+1]);
+    }
+    else //power
+    {
+      vv = string(v[i+1]);
+      q = find(vv,"^");
+      if (q==0)
+      {
+        q = find(vv,string(p));
+        if (q==0)
+        {
+          err = "error in find for string "+vv;
+          dbprint(ppl,err);
+          return("_");
+        }
+      }
+      // q>0
+      vp = vv[1..q-1];
+      for(j=1;j<=p;j++)
+      {
+         if (useStar && (size(vs) >0))       {   vs = vs + "*"; }
+         vs = vs + vp;
+      }
+    }
+  }
+  string scf;
+  if (cf == -1)
+  {
+    scf = "-";
+  }
+  else
+  {
+    scf = string(cf);
+    if ( (cf == 1) && (size(vs)>0) )
+    {
+      scf = "";
+    }
+  }
+  if (useStar && (size(scf) >0) && (scf!="-") )       {   scf = scf + "*"; }
+  vs = scf + vs;
+  return(vs);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = (0,a),(x,y3,z(1)),dp;
+  vector v = [-7,x,y3^4,x2,z(1)^3];
+  vct2str(v);
+  vct2str(v,1);
+  vector w = [-7a^5+6a,x,y3,y3,x,z(1),z(1)];
+  vct2str(w);
+  vct2str(w,1);
+}
+
+proc isVar(poly p)
+"USAGE:  isVar(p);  poly p
+RETURN:  int
+PURPOSE: check, whether leading monomial of p is a power of a single variable
+@* from the basering. Returns the exponent or 0 if p is multivariate.
+EXAMPLE: example isVar; shows examples
+"
+{
+  // checks whether p is a variable indeed
+  // if it's a power of a variable, returns the power
+  if (p==0) {  return(0); } //"p=0";
+  poly q   = leadmonom(p);
+  if ( (p-lead(p)) !=0 ) { return(0); } // "p-lm(p)>0";
+  intvec v = leadexp(p);
+  int s = size(v);
+  int i=1;
+  int cnt = 0;
+  int pwr = 0;
+  for (i=1; i<=s; i++)
+  {
+    if (v[i] != 0)
+    {
+      cnt++;
+      pwr = v[i];
+    }
+  }
+  //  "cnt:";  cnt;
+  if (cnt==1) { return(pwr); }
+  else { return(0); }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  poly f = xy+1;
+  isVar(f);
+  poly g = y^3;
+  isVar(g);
+  poly h = 7*x^3;
+  isVar(h);
+  poly i = 1;
+  isVar(i);
+}
+
+// new conversion routines
+
+static proc id2words(ideal I, int d)
+{
+  // NOT FINISHED
+  // input: ideal I of polys in letter-place notation
+  // in the ring with d real vars
+  // output: the list of strings: associative words
+  // extract names of vars
+  int i,m,n; string s; string place = "(1)";
+  list lv;
+  for(i=1; i<=d; i++)
+  {
+    s = string(var(i));
+    // get rid of place
+    n = find(s, place);
+    if (n>0)
+    {
+      s = s[1..n-1];
+    }
+    lv[i] = s;
+  }
+  poly p,q;
+  for (i=1; i<=ncols(I); i++)
+  {
+    if (I[i] != 0)
+    {
+      p = I[i];
+      while (p!=0)
+      {
+         q = leadmonom(p);
+      }
+    }
+  }
+
+  return(lv);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x(1),y(1),z(1),x(2),y(2),z(2)),dp;
+  ideal I = x(1)*y(2) -z(1)*x(2);
+  id2words(I,3);
+}
+
+static proc mono2word(poly p, int d)
+{
+}
+
+// given the element -7xy^2x, it is represented as [-7,x,y^2,x] or as [-7,x,y,y,x]
+// use the orig ord on (x,y,z) and expand it blockwise to (x(i),y(i),z(i))
+
+// the correspondences:
+// monomial in K<x,y,z>    <<--->> vector in R
+// polynomial in K<x,y,z>  <<--->> list of vectors (matrix/module) in R
+// ideal in K<x,y,z>       <<--->> list of matrices/modules in R
+
+
+// 1. form a new ring
+// 2. NOP
+// 3. compute GB -> with the kernel stuff
+// 4. skip shifted elts (check that no such exist?)
+// 5. go back to orig vars, produce strings/modules
+// 6. return the result
+
+proc freeGBasis(list LM, int d)
+"USAGE:  freeGBasis(L, d);  L a list of modules, d an integer
+RETURN:  ring
+PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L in
+the free associative algebra, up to degree d
+NOTE: Apply @code{lst2str} to the output in order to obtain a human-readable
+representation
+EXAMPLE: example freeGBasis; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  // determine max no of places in the input
+  int slm = size(LM); // numbers of polys in the ideal
+  int sm;
+  intvec iv;
+  module M;
+  for (i=1; i<=slm; i++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[i];
+    sm = ncols(M);
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      iv = iv, size(M[j])-1; // 1 place is reserved by the coeff
+    }
+  }
+  int D = Max(iv); // max size of input words
+  if (d<D) {"bad d"; return(LM);}
+  D = D + d-1;
+  //  D = d;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+        LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  setring @R;
+  ideal I;
+  poly @p;
+  s = size(OrigNames);
+  //  "s:";s;
+  // convert LM to canonical vectors (no powers)
+  setring save;
+  kill M; // M was defined earlier
+  module M;
+  slm = size(LM); // numbers of polys in the ideal
+  int sv,k,l;
+  vector v;
+  //  poly p;
+  string sp;
+  setring @R;
+  poly @@p=0;
+  setring save;
+  for (l=1; l<=slm; l++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[l];
+    sm = ncols(M); // in intvec iv the sizes are stored
+    // modules, e.g. free polynomials
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      v  = M[j];
+      sv = size(v);
+      //        "sv:";sv;
+      sp = "@@p = @@p + ";
+      for (k=2; k<=sv; k++)
+      {
+        sp = sp + string(v[k])+"("+string(k-1)+")*";
+      }
+      sp = sp + string(v[1])+";"; // coef;
+      setring @R;
+      execute(sp);
+      setring save;
+    }
+    setring @R;
+    //      "@@p:"; @@p;
+    I = I,@@p;
+    @@p = 0;
+    setring save;
+  }
+  kill sp;
+  // 3. compute GB
+  setring @R;
+  dbprint(ppl,"computing GB");
+  ideal J = system("freegb",I,d,nvars(save));
+  //  ideal J = slimgb(I);
+  dbprint(ppl,J);
+  // 4. skip shifted elts
+  ideal K = select1(J,1..s); // s = size(OrigNames)
+  dbprint(ppl,K);
+  dbprint(ppl, "done with GB");
+  // K contains vars x(1),...z(1) = images of originals
+  // 5. go back to orig vars, produce strings/modules
+  if (K[1] == 0)
+  {
+    "no reasonable output, GB gives 0";
+    return(0);
+  }
+  int sk = size(K);
+  int sp, sx, a, b;
+  intvec x;
+  poly p,q;
+  poly pn;
+  // vars in 'save'
+  setring save;
+  module N;
+  list LN;
+  vector V;
+  poly pn;
+  // test and skip exponents >=2
+  setring @R;
+  for(i=1; i<=sk; i++)
+  {
+    p  = K[i];
+    while (p!=0)
+    {
+      q  = lead(p);
+      //      "processing q:";q;
+      x  = leadexp(q);
+      sx = size(x);
+      for(k=1; k<=sx; k++)
+      {
+        if ( x[k] >= 2 )
+        {
+          err = "skip: the value x[k] is " + string(x[k]);
+          dbprint(ppl,err);
+          //            return(0);
+          K[i] = 0;
+          p    = 0;
+          q    = 0;
+          break;
+        }
+      }
+      p  = p - q;
+    }
+  }
+  K  = simplify(K,2);
+  sk = size(K);
+  for(i=1; i<=sk; i++)
+  {
+    //    setring save;
+    //    V  = 0;
+    setring @R;
+    p  = K[i];
+    while (p!=0)
+    {
+      q  = lead(p);
+      err =  "processing q:" + string(q);
+      dbprint(ppl,err);
+      x  = leadexp(q);
+      sx = size(x);
+      pn = leadcoef(q);
+      setring save;
+      pn = imap(@R,pn);
+      V  = V + leadcoef(pn)*gen(1);
+      for(k=1; k<=sx; k++)
+      {
+        if (x[k] ==1)
+        {
+          a = k / s; // block number=a+1, a!=0
+          b = k % s; // remainder
+          //          printf("a: %s, b: %s",a,b);
+          if (b == 0)
+          {
+            // that is it's the last var in the block
+            b = s;
+            a = a-1;
+          }
+          V = V + var(b)*gen(a+2);
+        }
+//         else
+//         {
+//           printf("error: the value x[k] is %s", x[k]);
+//           return(0);
+//         }
+      }
+      err = "V: " + string(V);
+      dbprint(ppl,err);
+      //      printf("V: %s", string(V));
+      N = N,V;
+      V  = 0;
+      setring @R;
+      p  = p - q;
+      pn = 0;
+    }
+    setring save;
+    LN[i] = simplify(N,2);
+    N     = 0;
+  }
+  setring save;
+  return(LN);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  module M = [-1,x,y],[-7,y,y],[3,x,x];
+  module N = [1,x,y,x],[-1,y,x,y];
+  list L; L[1] = M; L[2] = N;
+  lst2str(L);
+  def U = freeGBasis(L,5);
+  lst2str(U);
+}
+
+static proc crs(list LM, int d)
+"USAGE:  crs(L, d);  L a list of modules, d an integer
+RETURN:  ring
+PURPOSE: create a ring and shift the ideal
+EXAMPLE: example crs; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  // determine max no of places in the input
+  int slm = size(LM); // numbers of polys in the ideal
+  int sm;
+  intvec iv;
+  module M;
+  for (i=1; i<=slm; i++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[i];
+    sm = ncols(M);
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      iv = iv, size(M[j])-1; // 1 place is reserved by the coeff
+    }
+  }
+  int D = Max(iv); // max size of input words
+  if (d<D) {"bad d"; return(LM);}
+  D = D + d-1;
+  //  D = d;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(0)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+        LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  setring @R;
+  ideal I;
+  poly @p;
+  s = size(OrigNames);
+  //  "s:";s;
+  // convert LM to canonical vectors (no powers)
+  setring save;
+  kill M; // M was defined earlier
+  module M;
+  slm = size(LM); // numbers of polys in the ideal
+  int sv,k,l;
+  vector v;
+  //  poly p;
+  string sp;
+  setring @R;
+  poly @@p=0;
+  setring save;
+  for (l=1; l<=slm; l++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[l];
+    sm = ncols(M); // in intvec iv the sizes are stored
+    for (i=0; i<=d-iv[l]; i++)
+    {
+      // modules, e.g. free polynomials
+      for (j=1; j<=sm; j++)
+      {
+        //vectors, e.g. free monomials
+        v  = M[j];
+        sv = size(v);
+        //        "sv:";sv;
+        sp = "@@p = @@p + ";
+        for (k=2; k<=sv; k++)
+        {
+          sp = sp + string(v[k])+"("+string(k-2+i)+")*";
+        }
+        sp = sp + string(v[1])+";"; // coef;
+        setring @R;
+        execute(sp);
+        setring save;
+      }
+      setring @R;
+      //      "@@p:"; @@p;
+      I = I,@@p;
+      @@p = 0;
+      setring save;
+    }
+  }
+  setring @R;
+  export I;
+  return(@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  module M = [-1,x,y],[-7,y,y],[3,x,x];
+  module N = [1,x,y,x],[-1,y,x,y];
+  list L; L[1] = M; L[2] = N;
+  lst2str(L);
+  def U = crs(L,5);
+  setring U; U;
+  I;
+}
+
+static proc polylen(ideal I)
+{
+  // returns the ideal of length of polys
+  int i;
+  intvec J;
+  number s = 0;
+  for(i=1;i<=ncols(I);i++)
+  {
+    J[i] = size(I[i]);
+    s = s + J[i];
+  }
+  printf("the sum of length %s",s);
+  //  print(s);
+  return(J);
+}
+
+//proc freegbRing(int d)
+proc makeLetterplaceRing(int d)
+"USAGE:  makeLetterplaceRing(d); d an integer
+RETURN:  ring
+PURPOSE: creates a ring with d blocks of shifted original variables
+EXAMPLE: example makeLetterplaceRing; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int uptodeg = d; int lV = nvars(basering);
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  int D = d-1;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  // TODO: make L(2) ordering! exponent is maximally 2
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+        LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  //  setring @R;
+  //  int uptodeg = d; int lV = nvars(basering); // were defined before
+  def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
+  return (@@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  def A = makeLetterplaceRing(2);
+  setring A;
+  A;
+  attrib(A,"isLetterplaceRing");
+  attrib(A,"uptodeg");  // degree bound
+  attrib(A,"lV"); // number of variables in the main block
+}
+
+/* EXAMPLES:
+
+//static proc ex_shift()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  module M = [-1,x,y],[-7,y,y],[3,x,x];
+  module N = [1,x,y,x],[-1,y,x,y];
+  list L; L[1] = M; L[2] = N;
+  lst2str(L);
+  def U = crs(L,5);
+  setring U; U;
+  I;
+  poly p = I[2]; // I[8];
+  p;
+  system("stest",p,7,7,3); // error -> the world is ok
+  poly q1 = system("stest",p,1,7,3); //ok
+  poly q6 = system("stest",p,6,7,3); //ok
+  system("btest",p,3); //ok
+  system("btest",q1,3); //ok
+  system("btest",q6,3); //ok
+}
+
+//static proc test_shrink()
+{
+  LIB "freegb.lib";
+  ring r =0,(x,y,z),dp;
+  int d = 5;
+  def R = makeLetterplaceRing(d);
+  setring R;
+  poly p1 = x(1)*y(2)*z(3);
+  poly p2 = x(1)*y(4)*z(5);
+  poly p3 = x(1)*y(1)*z(3);
+  poly p4 = x(1)*y(2)*z(2);
+  poly p5 = x(3)*z(5);
+  poly p6 = x(1)*y(1)*x(3)*z(5);
+  poly p7 = x(1)*y(2)*x(3)*y(4)*z(5);
+  poly p8 = p1+p2+p3+p4+p5 + p6 + p7;
+  p1; system("shrinktest",p1,3);
+  p2; system("shrinktest",p2,3);
+  p3; system("shrinktest",p3,3);
+  p4; system("shrinktest",p4,3);
+  p5; system("shrinktest",p5,3);
+  p6; system("shrinktest",p6,3);
+  p7; system("shrinktest",p7,3);
+  p8; system("shrinktest",p8,3);
+  poly p9 = p1 + 2*p2 + 5*p5 + 7*p7;
+  p9; system("shrinktest",p9,3);
+}
+
+//static proc ex2()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y),dp;
+  module M = [-1,x,y],[3,x,x]; // 3x^2 - xy
+  def U = freegb(M,7);
+  lst2str(U);
+}
+
+//static proc ex_nonhomog()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y,h),dp;
+  list L;
+  module M;
+  M = [-1,y,y],[1,x,x,x];  // x3-y2
+  L[1] = M;
+  M = [1,x,h],[-1,h,x];  // xh-hx
+  L[2] = M;
+  M = [1,y,h],[-1,h,y];  // yh-hy
+  L[3] = M;
+  def U = freegb(L,4);
+  lst2str(U);
+  // strange elements in the basis
+}
+
+//static proc ex_nonhomog_comm()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y),dp;
+  module M = [-1,y,y],[1,x,x,x];
+  def U = freegb(M,5);
+  lst2str(U);
+}
+
+//static proc ex_nonhomog_h()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y,h),(a(1,1),dp);
+  module M = [-1,y,y,h],[1,x,x,x]; // x3 - y2h
+  def U = freegb(M,6);
+  lst2str(U);
+}
+
+//static proc ex_nonhomog_h2()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = 0,(x,y,h),(dp);
+  list L;
+  module M;
+  M = [-1,y,y,h],[1,x,x,x]; // x3 - y2h
+  L[1] = M;
+  M = [1,x,h],[-1,h,x]; // xh - hx
+  L[2] = M;
+  M = [1,y,h],[-1,h,y]; // yh - hy
+  L[3] = M;
+  def U = freeGBasis(L,3);
+  lst2str(U);
+  // strange answer CHECK
+}
+
+
+//static proc ex_nonhomog_3()
+{
+  option(prot);
+  LIB "./freegb.lib";
+  ring r = 0,(x,y,z),(dp);
+  list L;
+  module M;
+  M = [1,z,y],[-1,x]; // zy - x
+  L[1] = M;
+  M = [1,z,x],[-1,y]; // zx - y
+  L[2] = M;
+  M = [1,y,x],[-1,z]; // yx - z
+  L[3] = M;
+  lst2str(L);
+  list U = freegb(L,4);
+  lst2str(U);
+  // strange answer CHECK
+}
+
+//static proc ex_densep_2()
+{
+  option(prot);
+  LIB "freegb.lib";
+  ring r = (0,a,b,c),(x,y),(Dp); // deglex
+  module M = [1,x,x], [a,x,y], [b,y,x], [c,y,y];
+  lst2str(M);
+  list U = freegb(M,5);
+  lst2str(U);
+  // a=b is important -> finite basis!!!
+  module M = [1,x,x], [a,x,y], [a,y,x], [c,y,y];
+  lst2str(M);
+  list U = freegb(M,5);
+  lst2str(U);
+}
+
+// END COMMENTED EXAMPLES
+
+*/
+
+// 1. form a new ring
+// 2. produce shifted generators
+// 3. compute GB
+// 4. skip shifted elts
+// 5. go back to orig vars, produce strings/modules
+// 6. return the result
+
+static proc freegbold(list LM, int d)
+"USAGE:  freegbold(L, d);  L a list of modules, d an integer
+RETURN:  ring
+PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L in
+the free associative algebra, up to degree d
+EXAMPLE: example freegbold; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  // determine max no of places in the input
+  int slm = size(LM); // numbers of polys in the ideal
+  int sm;
+  intvec iv;
+  module M;
+  for (i=1; i<=slm; i++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[i];
+    sm = ncols(M);
+    for (j=1; j<=sm; j++)
+    {
+      //vectors, e.g. free monomials
+      iv = iv, size(M[j])-1; // 1 place is reserved by the coeff
+    }
+  }
+  int D = Max(iv); // max size of input words
+  if (d<D) {"bad d"; return(LM);}
+  D = D + d-1;
+  //  D = d;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  for (i=1; i<=s; i++)
+  {
+    tmp[i] = string(tmp[i])+"("+string(1)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the ord on r
+  // try to get whether the ord on r is blockord itself
+  // TODO: make L(2) ordering! exponent is maximally 2
+  s = size(LR[3]);
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+        LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  setring @R;
+  ideal I;
+  poly @p;
+  s = size(OrigNames);
+  //  "s:";s;
+  // convert LM to canonical vectors (no powers)
+  setring save;
+  kill M; // M was defined earlier
+  module M;
+  slm = size(LM); // numbers of polys in the ideal
+  int sv,k,l;
+  vector v;
+  //  poly p;
+  string sp;
+  setring @R;
+  poly @@p=0;
+  setring save;
+  for (l=1; l<=slm; l++)
+  {
+    // modules, e.g. free polynomials
+    M  = LM[l];
+    sm = ncols(M); // in intvec iv the sizes are stored
+    for (i=0; i<=d-iv[l]; i++)
+    {
+      // modules, e.g. free polynomials
+      for (j=1; j<=sm; j++)
+      {
+        //vectors, e.g. free monomials
+        v  = M[j];
+        sv = size(v);
+        //        "sv:";sv;
+        sp = "@@p = @@p + ";
+        for (k=2; k<=sv; k++)
+        {
+          sp = sp + string(v[k])+"("+string(k-1+i)+")*";
+        }
+        sp = sp + string(v[1])+";"; // coef;
+        setring @R;
+        execute(sp);
+        setring save;
+      }
+      setring @R;
+      //      "@@p:"; @@p;
+      I = I,@@p;
+      @@p = 0;
+      setring save;
+    }
+  }
+  kill sp;
+  // 3. compute GB
+  setring @R;
+  dbprint(ppl,"computing GB");
+  //  ideal J = groebner(I);
+  ideal J = slimgb(I);
+  dbprint(ppl,J);
+  // 4. skip shifted elts
+  ideal K = select1(J,1..s); // s = size(OrigNames)
+  dbprint(ppl,K);
+  dbprint(ppl, "done with GB");
+  // K contains vars x(1),...z(1) = images of originals
+  // 5. go back to orig vars, produce strings/modules
+  if (K[1] == 0)
+  {
+    "no reasonable output, GB gives 0";
+    return(0);
+  }
+  int sk = size(K);
+  int sp, sx, a, b;
+  intvec x;
+  poly p,q;
+  poly pn;
+  // vars in 'save'
+  setring save;
+  module N;
+  list LN;
+  vector V;
+  poly pn;
+  // test and skip exponents >=2
+  setring @R;
+  for(i=1; i<=sk; i++)
+  {
+    p  = K[i];
+    while (p!=0)
+    {
+      q  = lead(p);
+      //      "processing q:";q;
+      x  = leadexp(q);
+      sx = size(x);
+      for(k=1; k<=sx; k++)
+      {
+        if ( x[k] >= 2 )
+        {
+          err = "skip: the value x[k] is " + string(x[k]);
+          dbprint(ppl,err);
+          //            return(0);
+          K[i] = 0;
+          p    = 0;
+          q    = 0;
+          break;
+        }
+      }
+      p  = p - q;
+    }
+  }
+  K  = simplify(K,2);
+  sk = size(K);
+  for(i=1; i<=sk; i++)
+  {
+    //    setring save;
+    //    V  = 0;
+    setring @R;
+    p  = K[i];
+    while (p!=0)
+    {
+      q  = lead(p);
+      err =  "processing q:" + string(q);
+      dbprint(ppl,err);
+      x  = leadexp(q);
+      sx = size(x);
+      pn = leadcoef(q);
+      setring save;
+      pn = imap(@R,pn);
+      V  = V + leadcoef(pn)*gen(1);
+      for(k=1; k<=sx; k++)
+      {
+        if (x[k] ==1)
+        {
+          a = k / s; // block number=a+1, a!=0
+          b = k % s; // remainder
+          //          printf("a: %s, b: %s",a,b);
+          if (b == 0)
+          {
+            // that is it's the last var in the block
+            b = s;
+            a = a-1;
+          }
+          V = V + var(b)*gen(a+2);
+        }
+//         else
+//         {
+//           printf("error: the value x[k] is %s", x[k]);
+//           return(0);
+//         }
+      }
+      err = "V: " + string(V);
+      dbprint(ppl,err);
+      //      printf("V: %s", string(V));
+      N = N,V;
+      V  = 0;
+      setring @R;
+      p  = p - q;
+      pn = 0;
+    }
+    setring save;
+    LN[i] = simplify(N,2);
+    N     = 0;
+  }
+  setring save;
+  return(LN);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  module M = [-1,x,y],[-7,y,y],[3,x,x];
+  module N = [1,x,y,x],[-1,y,x,y];
+  list L; L[1] = M; L[2] = N;
+  lst2str(L);
+  def U = freegbold(L,5);
+  lst2str(U);
+}
+
+/* begin older procs and tests
+
+static proc sgb(ideal I, int d)
+{
+  // new code
+  // map x_i to x_i(1) via map()
+  //LIB "freegb.lib";
+  def save = basering;
+  //int d =7;// degree
+  int nv = nvars(save);
+  def R = makeLetterplaceRing(d);
+  setring R;
+  int i;
+  ideal Imap;
+  for (i=1; i<=nv; i++)
+  {
+    Imap[i] = var(i);
+  }
+  //ideal I = x(1)*y(2), y(1)*x(2)+z(1)*z(2);
+  ideal I = x(1)*x(2),x(1)*y(2) + z(1)*x(2);
+  option(prot);
+  //option(teach);
+  ideal J = system("freegb",I,d,nv);
+}
+
+static proc checkCeq()
+{
+  ring r = 0,(x,y),Dp;
+  def A = makeLetterplaceRing(4);
+  setring A;
+  A;
+  // I = x2-xy
+  ideal I = x(1)*x(2) - x(1)*y(2), x(2)*x(3) - x(2)*y(3), x(3)*x(4) - x(3)*y(4);
+  ideal C = x(2)-x(1),x(3)-x(2),x(4)-x(3),y(2)-y(1),y(3)-y(2),y(4)-y(3);
+  ideal K = I,C;
+  groebner(K);
+}
+
+static proc exHom1()
+{
+  // we start with
+  // z*y - x, z*x - y, y*x - z
+  LIB "freegb.lib";
+  LIB "elim.lib";
+  ring r = 0,(x,y,z,h),dp;
+  list L;
+  module M;
+  M = [1,z,y],[-1,x,h]; // zy - xh
+  L[1] = M;
+  M = [1,z,x],[-1,y,h]; // zx - yh
+  L[2] = M;
+  M = [1,y,x],[-1,z,h]; // yx - zh
+  L[3] = M;
+  lst2str(L);
+  def U = crs(L,4);
+  setring U;
+  I = I,
+    y(2)*h(3)+z(2)*x(3),     y(3)*h(4)+z(3)*x(4),
+    y(2)*x(3)-z(2)*h(3),     y(3)*x(4)-z(3)*h(4);
+  I = simplify(I,2);
+  ring r2 = 0,(x(0..4),y(0..4),z(0..4),h(0..4)),dp;
+  ideal J = imap(U,I);
+  //  ideal K = homog(J,h);
+  option(redSB);
+  option(redTail);
+  ideal L = groebner(J); //(K);
+  ideal LL = sat(L,ideal(h))[1];
+  ideal M = subst(LL,h,1);
+  M = simplify(M,2);
+  setring U;
+  ideal M = imap(r2,M);
+  lst2str(U);
+}
+
+static proc test1()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y),Dp;
+  int d = 10; // degree
+  def R = makeLetterplaceRing(d);
+  setring R;
+  ideal I = x(1)*x(2) - y(1)*y(2);
+  option(prot);
+  option(teach);
+  ideal J = system("freegb",I,d,2);
+  J;
+}
+
+static proc test2()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y),Dp;
+  int d = 10; // degree
+  def R = makeLetterplaceRing(d);
+  setring R;
+  ideal I = x(1)*x(2) - x(1)*y(2);
+  option(prot);
+  option(teach);
+  ideal J = system("freegb",I,d,2);
+  J;
+}
+
+static proc test3()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y,z),dp;
+  int d =5; // degree
+  def R = makeLetterplaceRing(d);
+  setring R;
+  ideal I = x(1)*y(2), y(1)*x(2)+z(1)*z(2);
+  option(prot);
+  option(teach);
+  ideal J = system("freegb",I,d,3);
+}
+
+static proc schur2-3()
+{
+  // nonhomog:
+  //  h^4-10*h^2+9,f*e-e*f+h, h*2-e*h-2*e,h*f-f*h+2*f
+  // homogenized with t
+  //  h^4-10*h^2*t^2+9*t^4,f*e-e*f+h*t, h*2-e*h-2*e*t,h*f-f*h+2*f*t,
+  // t*h - h*t, t*f - f*t, t*e - e*t
+}
+
+end older procs and tests */
+
+proc ademRelations(int i, int j)
+"USAGE:  ademRelations(i,j); i,j int
+RETURN:  ring (and exports ideal)
+ASSUME: there are at least i+j variables in the basering
+PURPOSE: compute the ideal of Adem relations for i<2j in characteristic 0
+@*  the ideal is exported under the name AdemRel in the output ring
+EXAMPLE: example ademRelations; shows examples
+"
+{
+  // produces Adem relations for i<2j in char 0
+  // assume: 0<i<2j
+  // requires presence of vars up to i+j
+  if ( (i<0) || (i >= 2*j) )
+  {
+    ERROR("arguments out of range"); return(0);
+  }
+  ring @r = 0,(s(i+j..0)),lp;
+  poly p,q;
+  number n;
+  int ii = i div 2; int k;
+  // k=0 => s(0)=1
+  n = binomial(j-1,i);
+  q = n*s(i+j)*s(0);
+  //  printf("k=0, term=%s",q);
+  p = p + q;
+  for (k=1; k<= ii; k++)
+  {
+    n = binomial(j-k-1,i-2*k);
+    q = n*s(i+j-k)*s(k);;
+    //    printf("k=%s, term=%s",k,q);
+    p = p + q;
+  }
+  poly AdemRel = p;
+  export AdemRel;
+  return(@r);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  def A = ademRelations(2,5);
+  setring A;
+  AdemRel;
+}
+
+/*
+1,1: 0
+1,2: s(3)*s(0) == s(3) -> def for s(3):=s(1)s(2)
+2,1: adm
+2,2: s(3)*s(1) == s(1)s(2)s(1)
+1,3: 0 ( since 2*s(4)*s(0) = 0 mod 2)
+3,1: adm
+2,3: s(5)*s(0)+s(4)*s(1) == s(5)+s(4)*s(1)
+3,2: 0
+3,3: s(5)*s(1)
+1,4: 3*s(5)*s(0) == s(5)  -> def for s(5):=s(1)*s(4)
+4,1: adm
+2,4: 3*s(6)*s(0)+s(5)*s(1) == s(6) + s(5)*s(1) == s(6) + s(1)*s(4)*s(1)
+4,2: adm
+4,3: s(5)*s(2)
+3,4: s(7)*s(0)+2*s(6)*s(1) == s(7) -> def for s(7):=s(3)*s(4)
+4,4: s(7)*s(1)+s(6)*s(2)
+*/
+
+/* s1,s2:
+s1*s1 =0, s2*s2 = s1*s2*s1
+*/
+
+/*
+try char 0:
+s1,s2:
+s1*s1 =0, s2*s2 = s1*s2*s1, s(1)*s(3)== s(1)*s(1)*s(3) == 0 = 2*s(4) ->def for s(4)
+hence 2==0! only in char 2
+ */
+
+  // Adem rels modulo 2 are interesting
+
+static proc stringpoly2lplace(string s)
+{
+  // decomposes sentence into terms
+  s = replace(s,newline,""); // get rid of newlines
+  s = replace(s," ",""); // get rid of empties
+  //arith symbols: +,-
+  // decompose into words with coeffs
+  list LS;
+  int i,j,ie,je,k,cnt;
+  // s[1]="-" situation
+  if (s[1]=="-")
+  {
+    LS = stringpoly2lplace(string(s[2..size(s)]));
+    LS[1] = string("-"+string(LS[1]));
+    return(LS);
+  }
+  i = find(s,"-",2);
+  // i==1 might happen if the 1st symbol coeff is negative
+  j = find(s,"+");
+  list LL;
+  if (i==j)
+  {
+    "return a monomial";
+    // that is both are 0 -> s is a monomial
+    LS[1] = s;
+    return(LS);
+  }
+  if (i==0)
+  {
+    "i==0 situation";
+    // no minuses at all => pluses only
+    cnt++;
+    LS[cnt] = string(s[1..j-1]);
+    s = s[j+1..size(s)];
+    while (s!= "")
+    {
+      j = find(s,"+");
+      cnt++;
+      if (j==0)
+      {
+        LS[cnt] = string(s);
+        s = "";
+      }
+      else
+      {
+        LS[cnt] = string(s[1..j-1]);
+        s = s[j+1..size(s)];
+      }
+    }
+    return(LS);
+  }
+  if (j==0)
+  {
+    "j==0 situation";
+    // no pluses at all except the lead coef => the rest are minuses only
+    cnt++;
+    LS[cnt] = string(s[1..i-1]);
+    s = s[i..size(s)];
+    while (s!= "")
+    {
+      i = find(s,"-",2);
+      cnt++;
+      if (i==0)
+      {
+        LS[cnt] = string(s);
+        s = "";
+      }
+      else
+      {
+        LS[cnt] = string(s[1..i-1]);
+        s = s[i..size(s)];
+      }
+    }
+    return(LS);
+  }
+  // now i, j are nonzero
+  if (i>j)
+  {
+    "i>j situation";
+    // + comes first, at place j
+    cnt++;
+    //    "cnt:"; cnt; "j:"; j;
+    LS[cnt] = string(s[1..j-1]);
+    s = s[j+1..size(s)];
+    LL = stringpoly2lplace(s);
+    LS = LS + LL;
+    kill LL;
+    return(LS);
+  }
+  else
+  {
+    "j>i situation";
+    // - might come first, at place i
+    if (i>1)
+    {
+      cnt++;
+      LS[cnt] = string(s[1..i-1]);
+      s = s[i..size(s)];
+    }
+    else
+    {
+      // i==1->  minus at leadcoef
+      ie = find(s,"-",i+1);
+      je = find(s,"+",i+1);
+      if (je == ie)
+      {
+         "ie=je situation";
+        //monomial
+        cnt++;
+        LS[cnt] = s;
+        return(LS);
+      }
+      if (je < ie)
+      {
+         "je<ie situation";
+        // + comes first
+        cnt++;
+        LS[cnt] = s[1..je-1];
+        s = s[je+1..size(s)];
+      }
+      else
+      {
+        // ie < je
+         "ie<je situation";
+        cnt++;
+        LS[cnt] = s[1..ie-1];
+        s = s[ie..size(s)];
+      }
+    }
+    "going into recursion with "+s;
+    LL = stringpoly2lplace(s);
+    LS = LS + LL;
+    return(LS);
+  }
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  string s = "x*y+y*z+z*t"; // + only
+  stringpoly2lplace(s);
+  string s2 = "x*y - y*z-z*t*w*w"; // +1, - only
+  stringpoly2lplace(s2);
+  string s3 = "-x*y + y - 2*x +7*w*w*w";
+  stringpoly2lplace(s3);
+}
+
+static proc addplaces(list L)
+{
+  // adds places to the list of strings
+  // according to their order in the list
+  int s = size(L);
+  int i;
+  for (i=1; i<=s; i++)
+  {
+    if (typeof(L[i]) == "string")
+    {
+      L[i] = L[i] + "(" + string(i) + ")";
+    }
+    else
+    {
+      ERROR("entry of type string expected");
+      return(0);
+    }
+  }
+  return(L);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  string a = "f1";   string b = "f2";
+  list L = a,b,a;
+  addplaces(L);
+}
+
+static proc sent2lplace(string s)
+{
+  // SENTence of words TO LetterPLACE
+  list L =   stringpoly2lplace(s);
+  int i; int ss = size(L);
+  for(i=1; i<=ss; i++)
+  {
+    L[i] = str2lplace(L[i]);
+  }
+  return(L);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(f2,f1),dp;
+  string s = "f2*f1*f1 - 2*f1*f2*f1+ f1*f1*f2";
+  sent2lplace(s);
+}
+
+static proc testnumber(string s)
+{
+  string t;
+  if (s[1]=="-")
+  {
+    // two situations: either there's a negative number
+    t = s[2..size(s)];
+    if (testnumber(t))
+    {
+      //a negative number
+    }
+    else
+    {
+      // a variable times -1
+    }
+    // or just a "-" for -1
+  }
+  t = "ring @r=(";
+  t = t + charstr(basering)+"),";
+  t = t + string(var(1))+",dp;";
+  //  write(":w tstnum.tst",t);
+  t = t+ "number @@Nn = " + s + ";"+"$";
+  write(":w tstnum.tst",t);
+  string runsing = system("Singular");
+  int k;
+  t = runsing+ " -teq <tstnum.tst >tstnum.out";
+  k = system("sh",t);
+  if (k!=0)
+  {
+    ERROR("Problems running Singular");
+  }
+  int i = system("sh", "grep error tstnum.out > /dev/NULL");
+  if (i!=0)
+  {
+    // no error: s is a number
+    i = 1;
+  }
+  k = system("sh","rm tstnum.tst tstnum.out > /dev/NULL");
+  return(i);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = (0,a),x,dp;
+  string s = "a^2+7*a-2";
+  testnumber(s);
+  s = "b+a";
+  testnumber(s);
+}
+
+static proc str2lplace(string s)
+{
+  // converts a word (monomial) with coeff into letter-place
+  // string: coef*var1^exp1*var2^exp2*...varN^expN
+  s = strpower2rep(s); // expand powers
+  if (size(s)==0) { return(0); }
+  int i,j,k,insC;
+  string a,b,c,d,t;
+  // 1. get coeff
+  i = find(s,"*");
+  if (i==0) { return(s); }
+  list VN;
+  c = s[1..i-1]; // incl. the case like (-a^2+1)
+  int tn = testnumber(c);
+  if (tn == 0)
+  {
+    // failed test
+    if (c[1]=="-")
+    {
+      // two situations: either there's a negative number
+      t = c[2..size(c)];
+      if (testnumber(t))
+      {
+         //a negative number
+        // nop here
+      }
+      else
+      {
+         // a variable times -1
+          c = "-1";
+          j++; VN[j] = t; //string(c[2..size(c)]);
+          insC = 1;
+      }
+    }
+    else
+    {
+      // just a variable with coeff 1
+          j++; VN[j] = string(c);
+          c = "1";
+          insC = 1;
+    }
+  }
+ // get vars
+  t = s;
+  //  t = s[i+1..size(s)];
+  k = size(t); //j = 0;
+  while (k>0)
+  {
+    t = t[i+1..size(t)]; //next part
+    i = find(t,"*"); // next *
+    if (i==0)
+    {
+      // last monomial
+      j++;
+      VN[j] = t;
+      k = size(t);
+      break;
+    }
+    b = t[1..i-1];
+    //    print(b);
+    j++;
+    VN[j] = b;
+    k = size(t);
+  }
+  VN = addplaces(VN);
+  VN[size(VN)+1] = string(c);
+  return(VN);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = (0,a),(f2,f1),dp;
+  str2lplace("-2*f2^2*f1^2*f2");
+  str2lplace("-f1*f2");
+  str2lplace("(-a^2+7a)*f1*f2");
+}
+
+static proc strpower2rep(string s)
+{
+  // makes x*x*x*x out of x^4 ., rep statys for repetitions
+  // looks for "-" problem
+  // exception: "-" as coeff
+  string ex,t;
+  int i,j,k;
+
+  i = find(s,"^"); // first ^
+  if (i==0) { return(s); } // no ^ signs
+
+  if (s[1] == "-")
+  {
+    // either -coef or -1
+    // got the coeff:
+    i = find(s,"*");
+    if (i==0)
+    {
+      // no *'s   => coef == -1 or s == -23
+      i = size(s)+1;
+    }
+    t = string(s[2..i-1]); // without "-"
+    if ( testnumber(t) )
+    {
+      // a good number
+      t = strpower2rep(string(s[2..size(s)]));
+      t = "-"+t;
+      return(t);
+    }
+    else
+    {
+      // a variable
+      t = strpower2rep(string(s[2..size(s)]));
+      t = "-1*"+ t;
+      return(t);
+    }
+  }
+  // the case when leadcoef is a number in ()
+  if (s[1] == "(")
+  {
+    i = find(s,")",2);    // must be nonzero
+    t = s[2..i-1];
+    if ( testnumber(t) )
+    {
+      // a good number
+    }
+    else {"strpower2rep: bad number as coef";}
+    ex = string(s[i+2..size(s)]); // 2 because of *
+    ex =  strpower2rep(ex);
+    t = "("+t+")*"+ex;
+    return(t);
+  }
+
+  i = find(s,"^"); // first ^
+  j = find(s,"*",i+1); // next * == end of ^
+  if (j==0)
+  {
+    ex = s[i+1..size(s)];
+  }
+  else
+  {
+    ex = s[i+1..j-1];
+  }
+  execute("int @exp = " + ex + ";"); //@exp = exponent
+  // got varname
+  for (k=i-1; k>0; k--)
+  {
+    if (s[k] == "*") break;
+  }
+  string varn = s[k+1..i-1];
+  //  "varn:";  varn;
+  string pref;
+  if (k>0)
+  {
+    pref = s[1..k]; // with * on the k-th place
+  }
+  //  "pref:";  pref;
+  string suf;
+  if ( (j>0) && (j+1 <= size(s)) )
+  {
+    suf = s[j+1..size(s)]; // without * on the 1st place
+  }
+  //  "suf:"; suf;
+  string toins;
+  for (k=1; k<=@exp; k++)
+  {
+    toins = toins + varn+"*";
+  }
+  //  "toins: ";  toins;
+  if (size(suf) == 0)
+  {
+    toins = toins[1..size(toins)-1]; // get rid of trailing *
+  }
+  else
+  {
+    suf = strpower2rep(suf);
+  }
+  ex = pref + toins + suf;
+  return(ex);
+  //  return(strpower2rep(ex));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = (0,a),(x,y,z,t),dp;
+  strpower2rep("-x^4");
+  strpower2rep("-2*x^4*y^3*z*t^2");
+  strpower2rep("-a^2*x^4");
+}
+
+proc lieBracket(poly a, poly b, list #)
+"USAGE:  lieBracket(a,b[,N]); a,b letterplace polynomials, N an optional integer
+RETURN:  poly
+ASSUME: basering has a letterplace ring structure
+PURPOSE: compute the Lie bracket [a,b] = ab - ba between letterplace polynomials
+NOTE: if N>1 is specified, then the left normed bracket [a,[...[a,b]]]] is computed.
+EXAMPLE: example lieBracket; shows examples
+"
+{
+  if (lpAssumeViolation())
+  {
+    //    ERROR("Either 'uptodeg' or 'lV' global variables are not set!");
+    ERROR("Incomplete Letterplace structure on the basering!");
+  }
+  // alias ppLiebr;
+  //if int N is given compute [a,[...[a,b]]]] left normed bracket
+  poly q;
+  int N=1;
+  if (size(#)>0)
+  {
+    if (typeof(#[1])=="int")
+    {
+      N = int(#[1]);
+    }
+  }
+  if (N<=0) { return(q); }
+  while (b!=0)
+  {
+    q = q + pmLiebr(a,lead(b));
+    b = b - lead(b);
+  }
+  int i;
+  if (N >1)
+  {
+    for(i=1; i<=N; i++)
+    {
+      q = lieBracket(a,q);
+    }
+  }
+  return(q);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
+  def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
+  setring R;
+  poly a = x(1)*y(2); poly b = y(1);
+  lieBracket(a,b);
+  lieBracket(x(1),y(1),2);
+}
+
+static proc pmLiebr(poly a, poly b)
+{
+  //  a poly, b mono
+  poly s;
+  while (a!=0)
+  {
+    s = s + mmLiebr(lead(a),lead(b));
+    a = a - lead(a);
+  }
+  return(s);
+}
+
+proc shiftPoly(poly a, int i)
+"USAGE:  shiftPoly(p,i); p letterplace poly, i int
+RETURN: poly
+ASSUME: basering has letterplace ring structure
+PURPOSE: compute the i-th shift of letterplace polynomial p
+EXAMPLE: example shiftPoly; shows examples
+"
+{
+  // shifts a monomial a by i
+  // calls pLPshift(p,sh,uptodeg,lVblock);
+  if (lpAssumeViolation())
+  {
+    ERROR("Incomplete Letterplace structure on the basering!");
+  }
+  int uptodeg = attrib(basering,"uptodeg");
+  int lV = attrib(basering,"lV");
+  if (deg(a) + i > uptodeg)
+  {
+    ERROR("degree bound violated by the shift!");
+  }
+  return(system("stest",a,i,uptodeg,lV));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),dp;
+  int uptodeg = 5; int lV = 3;
+  def R = makeLetterplaceRing(uptodeg);
+  setring R;
+  poly f = x(1)*z(2)*y(3) - 2*z(1)*y(2) + 3*x(1);
+  shiftPoly(f,1);
+  shiftPoly(f,2);
+}
+
+
+static proc mmLiebr(poly a, poly b)
+{
+  // a,b, monomials
+  a = lead(a);
+  b = lead(b);
+  int sa = deg(a);
+  int sb = deg(b);
+  poly v = a*shiftPoly(b,sa) - b*shiftPoly(a,sb);
+  return(v);
+}
+
+static proc test_shift()
+{
+  LIB "freegb.lib";
+  ring r = 0,(a,b),dp;
+  int d =5;
+  def R = makeLetterplaceRing(d);
+  setring R;
+  int uptodeg = d;
+  int lV = 2;
+  def R = setLetterplaceAttributes(r,uptodeg,2); // supply R with letterplace structure
+  setring R;
+  poly p = mmLiebr(a(1),b(1));
+  poly p = lieBracket(a(1),b(1));
+}
+
+proc serreRelations(intmat A, int zu)
+"USAGE:  serreRelations(A,z); A an intmat, z an int
+RETURN:  ideal
+ASSUME: basering has a letterplace ring structure and
+@*          A is a generalized Cartan matrix with integer entries
+PURPOSE: compute the ideal of Serre's relations associated to A
+EXAMPLE: example serreRelations; shows examples
+"
+{
+  // zu = 1 -> with commutators [f_i,f_j]; zu == 0 without them
+  // suppose that A is cartan matrix
+  // then Serre's relations are
+  // (ad f_j)^{1-A_{ij}} ( f_i)
+  int ppl = printlevel-voice+2;
+  int n = ncols(A); // hence n variables
+  int i,j,k,el;
+  poly p,q;
+  ideal I;
+  for (i=1; i<=n; i++)
+  {
+    for (j=1; j<=n; j++)
+    {
+      el = 1 - A[i,j];
+      //     printf("i:%s, j: %s, l: %s",i,j,l);
+      dbprint(ppl,"i, j, l: ",i,j,el);
+      //      if ((i!=j) && (l >0))
+      //      if ( (i!=j) &&  ( ((zu ==0) &&  (l >=2)) || ((zu ==1) &&  (l >=1)) ) )
+      if ((i!=j) && (el >0))
+      {
+        q = lieBracket(var(j),var(i));
+        dbprint(ppl,"first bracket: ",q);
+        //        if (l >=2)
+        //        {
+          for (k=1; k<=el-1; k++)
+          {
+            q = lieBracket(var(j),q);
+            dbprint(ppl,"further bracket:",q);
+          }
+          //        }
+      }
+      if (q!=0) { I = I,q; q=0;}
+    }
+  }
+  I = simplify(I,2);
+  return(I);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat A[3][3] =
+    2, -1, 0,
+    -1, 2, -3,
+    0, -1, 2; // G^1_2 Cartan matrix
+  ring r = 0,(f1,f2,f3),dp;
+  int uptodeg = 5;
+  def R = makeLetterplaceRing(uptodeg);
+  setring R;
+  ideal I = serreRelations(A,1); I = simplify(I,1+2+8);
+  I;
+}
+
+/* setup for older example:
+  intmat A[2][2] = 2, -1, -1, 2; // sl_3 == A_2
+  ring r = 0,(f1,f2),dp;
+  int uptodeg = 5; int lV = 2;
+*/
+
+proc lp2lstr(ideal K, def save)
+"USAGE:  lp2lstr(K,s); K an ideal, s a ring name
+RETURN:  nothing (exports object @LN into the ring named s)
+ASSUME: basering has a letterplace ring structure
+PURPOSE: converts letterplace ideal to list of modules
+NOTE: useful as preprocessing to 'lst2str'
+EXAMPLE: example lp2lstr; shows examples
+"
+{
+  def @R = basering;
+  string err;
+  int s = nvars(save);
+  int i,j,k;
+    // K contains vars x(1),...z(1) = images of originals
+  // 5. go back to orig vars, produce strings/modules
+  int sk = size(K);
+  int sp, sx, a, b;
+  intvec x;
+  poly p,q;
+  poly pn;
+  // vars in 'save'
+  setring save;
+  module N;
+  list LN;
+  vector V;
+  poly pn;
+  // test and skip exponents >=2
+  setring @R;
+  for(i=1; i<=sk; i++)
+  {
+    p  = K[i];
+    while (p!=0)
+    {
+      q  = lead(p);
+      //      "processing q:";q;
+      x  = leadexp(q);
+      sx = size(x);
+      for(k=1; k<=sx; k++)
+      {
+        if ( x[k] >= 2 )
+        {
+          err = "skip: the value x[k] is " + string(x[k]);
+          dbprint(ppl,err);
+          //            return(0);
+          K[i] = 0;
+          p    = 0;
+          q    = 0;
+          break;
+        }
+      }
+      p  = p - q;
+    }
+  }
+  K  = simplify(K,2);
+  sk = size(K);
+  for(i=1; i<=sk; i++)
+  {
+    //    setring save;
+    //    V  = 0;
+    setring @R;
+    p  = K[i];
+    while (p!=0)
+    {
+      q  = lead(p);
+      err =  "processing q:" + string(q);
+      dbprint(ppl,err);
+      x  = leadexp(q);
+      sx = size(x);
+      pn = leadcoef(q);
+      setring save;
+      pn = imap(@R,pn);
+      V  = V + leadcoef(pn)*gen(1);
+      for(k=1; k<=sx; k++)
+      {
+        if (x[k] ==1)
+        {
+          a = k / s; // block number=a+1, a!=0
+          b = k % s; // remainder
+          //          printf("a: %s, b: %s",a,b);
+          if (b == 0)
+          {
+            // that is it's the last var in the block
+            b = s;
+            a = a-1;
+          }
+          V = V + var(b)*gen(a+2);
+        }
+      }
+      err = "V: " + string(V);
+      dbprint(ppl,err);
+      //      printf("V: %s", string(V));
+      N = N,V;
+      V  = 0;
+      setring @R;
+      p  = p - q;
+      pn = 0;
+    }
+    setring save;
+    LN[i] = simplify(N,2);
+    N     = 0;
+  }
+  setring save;
+  list @LN = LN;
+  export @LN;
+  //  return(LN);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  intmat A[2][2] = 2, -1, -1, 2; // sl_3 == A_2
+  ring r = 0,(f1,f2),dp;
+  def R = makeLetterplaceRing(3);
+  setring R;
+  ideal I = serreRelations(A,1);
+  lp2lstr(I,r);
+  setring r;
+  lst2str(@LN,1);
+}
+
+static proc strList2poly(list L)
+{
+  //  list L comes from sent2lplace (which takes a polynomial as input)
+  // each entry of L is a sublist with the coef on the last place
+  int s = size(L); int t;
+  int i,j;
+  list M;
+  poly p,q;
+  string Q;
+  for(i=1; i<=s; i++)
+  {
+    M = L[i];
+    t = size(M);
+    //    q = M[t]; // a constant
+    Q = string(M[t]);
+    for(j=1; j<t; j++)
+    {
+      //      q = q*M[j];
+      Q = Q+"*"+string(M[j]);
+    }
+    execute("q="+Q+";");
+    //    q;
+    p = p + q;
+  }
+  kill Q;
+  return(p);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r =0,(x,y,z,t),Dp;
+  def A = makeLetterplaceRing(4);
+  setring A;
+  string t = "-2*y*z*y*z + y*t*z*z - z*x*x*y  + 2*z*y*z*y";
+  list L = sent2lplace(t);
+  L;
+  poly p = strList2poly(L);
+  p;
+}
+
+static proc file2lplace(string fname)
+"USAGE:  file2lplace(fnm);  fnm a string
+RETURN:  ideal
+PURPOSE: convert the contents of the file fnm into ideal of polynomials in free algebra
+EXAMPLE: example file2lplace; shows examples
+"
+{
+  // format: from the usual string to letterplace
+  string s = read(fname);
+  // assume: file is a comma-sep list of polys
+  // the vars are declared before
+  // the file ends with ";"
+  string t; int i;
+  ideal I;
+  list tst;
+  while (s!="")
+  {
+    i = find(s,",");
+    "i"; i;
+    if (i==0)
+    {
+      i = find(s,";");
+      if (i==0)
+      {
+        // no ; ??
+         "no colon or semicolon found anymore";
+         return(I);
+      }
+      // no "," but ";" on the i-th place
+      t = s[1..i-1];
+      s = "";
+      "processing: "; t;
+      tst = sent2lplace(t);
+      tst;
+      I = I, strList2poly(tst);
+      return(I);
+    }
+    // here i !=0
+    t = s[1..i-1];
+    s = s[i+1..size(s)];
+    "processing: "; t;
+    tst = sent2lplace(t);
+    tst;
+    I = I, strList2poly(tst);
+  }
+  return(I);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r =0,(x,y,z,t),dp;
+  def A = makeLetterplaceRing(4);
+  setring A;
+  string fn = "myfile";
+  string s1 = "z*y*y*y - 3*y*z*x*y  + 3*y*y*z*y - y*x*y*z,";
+  string s2 = "-2*y*x*y*z + y*y*z*z - z*z*y*y + 2*z*y*z*y,";
+  string s3 = "z*y*x*t - 2*y*z*y*t + y*y*z*t - t*z*y*y + 2*t*y*z*y - t*x*y*z;";
+  write(":w "+fn,s1);  write(":a "+fn,s2);   write(":a "+fn,s3);
+  read(fn);
+  ideal I = file2lplace(fn);
+  I;
+}
+
+/* EXAMPLES AGAIN:
+//static proc get_ls3nilp()
+{
+//first app of file2lplace
+  ring r =0,(x,y,z,t),dp;
+  int d = 10;
+  def A = makeLetterplaceRing(d);
+  setring A;
+  ideal I = file2lplace("./ls3nilp.bg");
+  // and now test the correctness: go back from lplace to strings
+  lp2lstr(I,r);
+  setring r;
+  lst2str(@LN,1); // agree!
+}
+
+//static proc doc_example()
+{
+  LIB "freegb.lib";
+  ring r = 0,(x,y,z),dp;
+  int d =4; // degree bound
+  def R = makeLetterplaceRing(d);
+  setring R;
+  ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
+  option(redSB);option(redTail);
+  ideal J = system("freegb",I,d,nvars(r));
+  J;
+  // visualization:
+  lp2lstr(J,r); // export an object called @LN to the ring r
+  setring r;  // change to the ring r
+  lst2str(@LN,1); // output the strings
+}
+
+*/
+
+// TODO:
+// multiply two letterplace polynomials, lpMult
+// reduction/ Normalform? needs kernel stuff
+
+proc lpMult(poly f, poly g)
+"USAGE:  lpMult(f,g); f,g letterplace polynomials
+RETURN:  poly
+ASSUME: basering has a letterplace ring structure
+PURPOSE: compute the letterplace form of f*g
+EXAMPLE: example lpMult; shows examples
+"
+{
+  if (lpAssumeViolation())
+  {
+    ERROR("Incomplete Letterplace structure on the basering!");
+  }
+  int sf = deg(f);
+  int sg = deg(g);
+  int uptodeg = attrib(basering, "uptodeg");
+  if (sf+sg > uptodeg)
+  {
+    ERROR("degree bound violated by the product!");
+  }
+  //  if (sf>1) { sf = sf -1; }
+  poly v = f*shiftPoly(g,sf);
+  return(v);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  // define a ring in letterplace form as follows:
+  ring r = 0,(x(1),y(1),x(2),y(2),x(3),y(3),x(4),y(4)),dp;
+  def R = setLetterplaceAttributes(r,4,2); // supply R with letterplace structure
+  setring R;
+  poly a = x(1)*y(2); poly b = y(1);
+  lpMult(b,a);
+  lpMult(a,b);
+}
+
+static proc lpAssumeViolation()
+{
+  // checks whether the global vars
+  // uptodeg and lV are defined
+  // returns Boolean : yes/no [for assume violation]
+  def lpring = attrib(basering,"isLetterplaceRing");
+  if ( typeof(lpring)!="int" )
+  {
+    //  if ( typeof(lpring)=="string" ) ??
+    // basering is NOT lp Ring
+
+    return(1);
+  }
+  def uptodeg = attrib(basering,"uptodeg");
+  if ( typeof(uptodeg)!="int" )
+  {
+    return(1);
+  }
+  def lV = attrib(basering,"lV");
+  if ( typeof(lV)!="int" )
+  {
+    return(1);
+  }
+  //  int i = ( defined(uptodeg) && (defined(lV)) );
+  //  return ( !i );
+  return(0);
+}
