@@ -617,9 +617,9 @@ void p_SetRingOfLeftv(leftv l, ring r)
     case COMMAND:
     {
       command d=(command)l->data;
-      p_SetRingOfLeftv(d->arg1, r);
-      if (d-argc>1) p_SetRingOfLeftv(d->arg2, r);
-      if (d-argc>2) p_SetRingOfLeftv(d->arg3, r);
+      p_SetRingOfLeftv(&d->arg1, r);
+      if (d->argc>1) p_SetRingOfLeftv(&d->arg2, r);
+      if (d->argc>2) p_SetRingOfLeftv(&d->arg3, r);
       break;
     }
     default:
