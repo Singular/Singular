@@ -17,9 +17,6 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <unistd.h>
-#ifdef NeXT
-#include <sys/file.h>
-#endif
 
 #ifdef HAVE_PWD_H
 #include "pwd.h"
@@ -35,7 +32,12 @@
 
 char fe_promptstr[] ="  ";
 
+// output/print buffer:
 #define INITIAL_PRINT_BUFFER 24*1024L
+// line buffer for reading:
+// minimal value for MAX_FILE_BUFFER: 4*4096 - see Tst/Long/gcd0_l.tst
+// this is an upper limit for the size of monomials/numbers read via the interpreter
+#define MAX_FILE_BUFFER 4*4096
 static long feBufferLength=INITIAL_PRINT_BUFFER;
 static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
@@ -593,7 +595,7 @@ int feReadLine(char* b, int l)
       currentVoice->fptr=0;
       if (currentVoice->buffer==NULL)
       {
-        currentVoice->buffer=(char *)omAlloc(4096-sizeof(ADDRESS));
+        currentVoice->buffer=(char *)omAlloc(MAX_FILE_BUFFER-sizeof(ADDRESS));
         omMarkAsStaticAddr(currentVoice->buffer);
       }
     }
@@ -605,25 +607,15 @@ int feReadLine(char* b, int l)
       feShowPrompt();
       s=fe_fgets_stdin(fe_promptstr,
                        &(currentVoice->buffer[offset]),
-                       (4096-1-sizeof(ADDRESS))-offset);
+                       omSizeOfAddr(currentVoice->buffer)-1-offset);
       int i=0;
       if (s!=NULL)
-        while((s[i]!='\0') && (i<4096)) {s[i] &= (char)127;i++;}
+        while((s[i]!='\0') /*&& (i<MAX_FILE_BUFFER)*/) {s[i] &= (char)127;i++;}
     }
     else if (currentVoice->sw==BI_file)
     {
-#ifdef DEFECT_SINGULAR
-      feShowPrompt();
-      s=fe_fgets_stdin(fe_promptstr,
-                       &(currentVoice->buffer[offset]),
-                       (4096-1-sizeof(ADDRESS))-offset);
-      int i=0;
-      if (s!=NULL)
-        while((s[i]!='\0') && (i<4096)) {s[i] &= (char)127;i++;}
-#else
-      s=fgets(currentVoice->buffer+offset,(4096-1-sizeof(ADDRESS))-offset,
+      s=fgets(currentVoice->buffer+offset,(MAX_FILE_BUFFER-1-sizeof(ADDRESS))-offset,
               currentVoice->files);
-#endif
     }
     //else /* BI_buffer */ s==NULL  => return 0
     // done by the default return
