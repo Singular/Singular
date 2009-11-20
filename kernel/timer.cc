@@ -112,6 +112,10 @@ int initTimer()
   siStartTime = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
                +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +5000)/10000; // unit is 1/100 sec
+  getrusage(RUSAGE_CHILDREN,&t_rec); 
+  siStartTime += (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
+               +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
+               +5000)/10000; // unit is 1/100 sec
 #else
   times(&t_rec);
   siStartTime = t_rec.tms_utime+t_rec.tms_stime;
@@ -124,6 +128,10 @@ void startTimer()
 #ifdef GETRUSAGE
   getrusage(RUSAGE_SELF,&t_rec); 
   startl = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+               +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
+               +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  getrusage(RUSAGE_CHILDREN,&t_rec); 
+  startl += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
 #else
@@ -141,6 +149,10 @@ int getTimer()
   int64 curr;
   getrusage(RUSAGE_SELF,&t_rec); 
   curr = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+         +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
+         +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  getrusage(RUSAGE_CHILDREN,&t_rec); 
+  curr += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
          +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
          +(int64)5000)/(int64)10000; // unit is 1/100 sec
   curr -= siStartTime;
@@ -170,6 +182,10 @@ void writeTime(const char* v)
   int64 curr;
   getrusage(RUSAGE_SELF,&t_rec); 
   curr = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
+               +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
+               +(int64)5000)/(int64)10000; // unit is 1/100 sec
+  getrusage(RUSAGE_CHILDREN,&t_rec); 
+  curr += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
   curr -= startl;
