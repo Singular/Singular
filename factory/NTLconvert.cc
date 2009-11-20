@@ -616,7 +616,9 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
     //built up the string in dummy[0]
     dummy[0]=numbers[to_long(coefficient)];
     //NTL_SNS
-    strcat(cf_stringtemp,dummy);
+    l++;
+    cf_stringtemp[l-1]=dummy[0];
+    cf_stringtemp[l]='\0';
     //tmp*=10; tmp+=to_long(coefficient);
 
     if (minusremainder==1)
@@ -627,14 +629,12 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
     }
 
     //reverse the list to obtain the correct string
-    int len=
     //NTL_SNS 
-    strlen(cf_stringtemp);
-    for (int i=len-1;i>=0;i--)
+    for (int i=l-1;i>=0;i--) // l ist the position of \0
     {
-      cf_stringtemp2[len-i-1+minusremainder]=cf_stringtemp[i];
+      cf_stringtemp2[l-i-1+minusremainder]=cf_stringtemp[i];
     }
-    cf_stringtemp2[len+minusremainder]='\0';
+    cf_stringtemp2[l+minusremainder]='\0';
   }
 
   //convert the string to canonicalform using the char*-Constructor
