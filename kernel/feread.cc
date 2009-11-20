@@ -306,9 +306,6 @@ char * fe_fgets(const char *pr,char *s, int size)
   if (BVERBOSE(V_PROMPT))
   {
     fprintf(stdout,"%s",pr);
-#ifdef DEFECT_SINGULAR
-    fprintf(stdout,"\n");
-#endif
   }
   mflush();
   return fgets(s,size,stdin);
