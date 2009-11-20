@@ -79,7 +79,6 @@ using namespace std;
 */
 		
 /** \brief The default constructor for facets
-* Do I need a constructor of type facet(intvec)? 
 */
 facet::facet()			
 {
@@ -245,7 +244,8 @@ void facet::setUCN(int n)
 */
 int facet::getUCN()
 {
-	if(this!=NULL && ( this!=(facet *)0xfbfbfbfb || this!=(facet *)0xfbfbfbfbfbfbfbfb) )
+ 	if(this!=NULL && ( this!=(facet *)0xfbfbfbfb || this!=(facet *)0xfbfbfbfbfbfbfbfb) )
+// 	if(this!=NULL && ( this->fNormal!=(intvec *)0xfbfbfbfb || this->fNormal!=(intvec *)0xfbfbfbfbfbfbfbfb) )
 		return this->UCN;
 	else
 		return -1;
@@ -2162,7 +2162,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 				}
 				else	//fN and slN are parallel
 				{
-							//We check whether the codim-2-facets coincide
+					//We check whether the codim-2-facets coincide
 					codim2Act = fAct->codim2Ptr;
 					ctr=0;
 					while(codim2Act!=NULL)
@@ -2197,7 +2197,8 @@ facet * gcone::enqueueNewFacets(facet &f)
 							deleteMarker = slHead;				
 							slHead = slAct->next;						
 							if(slHead!=NULL)
-								slHead->prev = NULL;					
+								slHead->prev = NULL;
+							/*delete deleteMarker*/;					
 									//set a bool flag to mark slAct as to be deleted
 						}//NOTE find a way to delete without affecting slAct = slAct->next
 						else if(slAct==slEndStatic)
@@ -2229,7 +2230,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 						//delete slAct;
 						//slAct=NULL;
 						//slAct = slAct->next; //not needed, since facets are equal
-						//delete deleteMarker;
+// 						delete deleteMarker;
 						//deleteMarker=NULL;
 						//fAct = fAct->next;
 						break;
