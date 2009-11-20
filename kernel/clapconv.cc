@@ -475,8 +475,8 @@ number   nlChineseRemainder(number *x, number *q,int rl)
   int i;
   for(i=rl-1;i>=0;i--)
   {
-    X[i]=CanonicalForm(nlInt(x[i],currRing));
-    Q[i]=CanonicalForm(nlInt(q[i],currRing));
+    X[i]=CanonicalForm(nlInt(x[i],currRing)); // always < MAX_INT
+    Q[i]=convSingNFactoryN(q[i],currRing); // may be larger MAX_INT
   }
   CanonicalForm xnew,qnew;
   chineseRemainder(X,Q,xnew,qnew);
