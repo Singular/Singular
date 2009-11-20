@@ -8699,6 +8699,7 @@ const char * Tok2Cmdname(int tok)
   {
     return cmds[0].name;
   }
+  if (tok==COMMAND) return "command";
   if (tok==ANY_TYPE) return "any_type";
   if (tok==NONE) return "nothing";
   //if (tok==IFBREAK) return "if_break";
@@ -8727,6 +8728,7 @@ const char * Tok2Cmdname(int tok)
     return sArithBase.sCmds[0].name;
   }
   if (tok==ANY_TYPE) return "any_type";
+  if (tok==COMMAND) return "command";
   if (tok==NONE) return "nothing";
   //if (tok==IFBREAK) return "if_break";
   //if (tok==VECTOR_FROM_POLYS) return "vector_from_polys";

@@ -591,6 +591,9 @@ void p_SetRingOfLeftv(leftv l, ring r)
 {
   switch(l->rtyp)
   {
+    case INT_CMD:
+    case BIGINT_CMD:
+      break;
     case POLY_CMD:
     case VECTOR_CMD:
     {
@@ -609,6 +612,14 @@ void p_SetRingOfLeftv(leftv l, ring r)
         poly p=I->m[i];
         while(p!=NULL) { p_SetRingOfLm(p,r); pIter(p); }
       }
+      break;
+    }
+    case COMMAND:
+    {
+      command d=(command)l->data;
+      p_SetRingOfLeftv(d->arg1, r);
+      if (d-argc>1) p_SetRingOfLeftv(d->arg2, r);
+      if (d-argc>2) p_SetRingOfLeftv(d->arg3, r);
       break;
     }
     default:
