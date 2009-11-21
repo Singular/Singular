@@ -1756,6 +1756,8 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 		{			
 			/*NOTE if gcNext->getUCN is smaller than SearchListRoot->getUCN it follows, that the cone
 			gcNext will not be used in any more computation. So -> delete
+			BAD IDEA!!! Luckily the delete statement below is never executed since noRevs is 
+			invoked from gcRoot which has UCN==1. And apparently the else below is also never executed!
 			*/
 			if (gcNext->getUCN() < SearchListRoot->getUCN() )
 			{
