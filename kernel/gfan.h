@@ -164,7 +164,7 @@ class gcone
 		int getUCN();
 		int getPredUCN();		
 		void showFacets(short codim=1);
-		void showSLA(facet &f);
+		volatile void showSLA(facet &f);
 		void idDebugPrint(ideal const &I);
 		void invPrint(ideal const &I);
 		bool isMonomial(ideal const &I);

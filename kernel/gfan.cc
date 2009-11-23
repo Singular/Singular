@@ -63,7 +63,7 @@ $Id$
 #endif
 
 #ifndef gfan_DEBUG
-//#define gfan_DEBUG
+// #define gfan_DEBUG 1
 #ifndef gfan_DEBUGLEVEL
 #define gfan_DEBUGLEVEL 1
 #endif
@@ -376,7 +376,8 @@ gcone::~gcone()
 		idDelete((ideal *)&this->inputIdeal);
 // 	if (this->rootRing!=NULL && this->rootRing!=(ip_sring *)0xfefefefefefefefe)
 // 		rDelete(this->rootRing);
-	//rDelete(this->baseRing);
+// 	if(this->UCN!=1)
+// 		rDelete(this->baseRing);
 	facet *fAct;
 	facet *fDel;
 	/*Delete the facet structure*/
@@ -388,6 +389,8 @@ gcone::~gcone()
 		fAct=fAct->next;
 		delete fDel;
 	}
+	this->counter--;
+	dd_FreeMatrix(this->ddFacets);
 	//dd_FreeMatrix(this->ddFacets);
 }			
 	
@@ -446,7 +449,7 @@ void gcone::showFacets(short codim)
 }
 		
 /** For debugging purposes only */
-void gcone::showSLA(facet &f)
+volatile void gcone::showSLA(facet &f)
 {
 	facet *fAct;
 	fAct = &f;
@@ -951,12 +954,12 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	intvec *fNormal = new intvec(this->numVars);	//facet normal, check for parallelity			
 	fNormal = f->getFacetNormal();	//read this->fNormal;
 
-	std::cout << "running gcone::flip" << std::endl;
-	std::cout << "flipping UCN " << this->getUCN() << endl;
-	cout << "over facet (";
-	fNormal->show(1,0);
-	cout << ") with UCN " << f->getUCN();
-	std::cout << std::endl;
+// 	std::cout << "running gcone::flip" << std::endl;
+// 	std::cout << "flipping UCN " << this->getUCN() << endl;
+// 	cout << "over facet (";
+// 	fNormal->show(1,0);
+// 	cout << ") with UCN " << f->getUCN();
+// 	std::cout << std::endl;
 
 	/*1st step: Compute the initial ideal*/
 	/*poly initialFormElement[IDELEMS(gb)];*/	//array of #polys in GB to store initial form
@@ -1215,7 +1218,7 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	f->setFlipGB(dstRing_I);//store the flipped GB
 	f->flipRing=rCopy(dstRing);	//store the ring on the other side
 //#ifdef gfan_DEBUG
-	cout << "Flipped GB is UCN " << counter+1 << ":" << endl;
+// 	cout << "Flipped GB is UCN " << counter+1 << ":" << endl;
 //  	this->idDebugPrint(dstRing_I);
 // 	cout << endl;
 //#endif			
@@ -1722,13 +1725,20 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 #ifdef gfan_DEBUG
 			gcTmp->showFacets(1);
 #endif
+			/*add facets to SLA here*/
+			SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
+			
  			if(gfanHeuristic==1)
  			{
 				gcTmp->writeConeToFile(*gcTmp);
+// 				idDelete((ideal*)&gcTmp->gcBasis);
+				for(int ii=0;ii<IDELEMS(gcTmp->gcBasis);ii++)
+				{
+					gcTmp->gcBasis->m[ii]=(poly)NULL;
+				}
  			}
-			/*add facets to SLA here*/
-			SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
-#ifdef gfan_DEBUG
+			
+#if gfan_DEBUG
 			if(SearchListRoot!=NULL)
 				gcTmp->showSLA(*SearchListRoot);
 #endif
@@ -1765,14 +1775,14 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 				if(gcNext == gcHead)
 				{
  					deleteMarker = gcHead;
- 					gcHead = gcNext->next;
+//  					gcHead = gcNext->next;
 					//gcNext->next->prev = NULL;
 				}
 				else
 				{
 					deleteMarker = gcNext;
-					gcNext->prev->next = gcNext->next;
-					gcNext->next->prev = gcNext->prev;
+// 					gcNext->prev->next = gcNext->next;
+// 					gcNext->next->prev = gcNext->prev;
 				}
 // 				gcNext = gcNext->next;
 //  				delete deleteMarker;
@@ -1793,7 +1803,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 					//Read st00f from file
 					gcAct = gcNext;
 					//implant the GB into gcAct
-					readConeFromFile(gcNext->getUCN(), gcAct);
+					readConeFromFile(gcAct->getUCN(), gcAct);
 					rAct=rCopy(gcAct->baseRing);
 					rComplete(rAct);
 					rChangeCurrRing(rAct);
@@ -2452,7 +2462,10 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 				//data or c_str
 				while(!line.empty())
 				{
+// 					resPoly=pInit();
+// 					strPoly=pInit();
 					hasNegCoeff = FALSE;
+					hasCoeffInQ = FALSE;
 					found = line.find_first_of("+-");	//get the first monomial
 					string tmp;
 					tmp=line[found];
@@ -2472,7 +2485,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 					{
 						hasCoeffInQ = TRUE;
 						strCoeffNom=strMonom.substr(0,found);						
-						strCoeffDenom=strMonom.substr(found+1,strMonom.find_first_not_of("1234567890"));
+						strCoeffDenom=strMonom.substr(found+1,strMonom.find_first_not_of("1234567890",found+1));
 						strMonom.erase(0,found);
 						strMonom.erase(0,strMonom.find_first_not_of("1234567890/"));			
 //  						ss << strCoeffNom;
@@ -2540,7 +2553,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 					
 				}//while(!line.empty())		
 			
-				gcBasis->m[jj]=pCopy(resPoly);
+				gc->gcBasis->m[jj]=pCopy(resPoly);
 				resPoly=NULL;	//reset
 			}
 			break;
@@ -2585,8 +2598,14 @@ lists lprepareResult(gcone *gc, int n)
 		l->m[0].rtyp=INT_CMD;
 		l->m[0].data=(void*)gcAct->getUCN();
 		l->m[1].rtyp=IDEAL_CMD;
+		/*The following is necessary for leaves in the tree of cones
+		* Since we don't use them in the computation and gcBasis is 
+		* set to (poly)NULL in noRevS we need to get this back here.
+		*/
+		if(gcAct->gcBasis->m[0]==(poly)NULL)
+			gcAct->readConeFromFile(gcAct->getUCN(),gcAct);
 		l->m[1].data=(void*)idrCopyR_NoSort(gcAct->gcBasis,gcAct->getBaseRing());
-		
+
 		l->m[2].rtyp=INTVEC_CMD;
 		intvec iv=(gcAct->f2M(gcAct,gcAct->facetPtr));
 		l->m[2].data=(void*)ivCopy(&iv);
@@ -2716,7 +2735,16 @@ lists gfan(ideal inputIdeal, int h)
 		//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS
 		res = inputIdeal; 
 		lResList=lprepareResult(gcRoot,gcRoot->getCounter());
-// 		res=lResList;
+		/*Cleanup*/
+		gcone *gcDel;	
+		gcDel = gcRoot;
+		gcAct = gcRoot;
+		do
+		{
+			gcDel = gcAct;
+			gcAct = gcAct->next;
+			delete gcDel;
+		}while(gcAct!=NULL);
 	}
 	dd_free_global_constants();
 	}//rHasGlobalOrdering
@@ -2729,6 +2757,7 @@ lists gfan(ideal inputIdeal, int h)
 		lResList->m[0].data=(void*)&ires;
 	}
 	
+	/*Return result*/
 	return lResList;
 }
 
