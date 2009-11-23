@@ -3968,7 +3968,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
         hh=xx[j]->m[i];
         if ((hh!=NULL) && (pLmCmp(r,hh)==0))
         {
-          x[j]=pGetCoeff(hh);
+          x[j]=nlCopy(pGetCoeff(hh));
           hh=pLmFreeAndNext(hh);
           xx[j]->m[i]=hh;
         }
