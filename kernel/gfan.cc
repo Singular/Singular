@@ -122,29 +122,36 @@ facet::facet(int const &n)
 }
 		
 /** \brief The copy constructor
+* By default only copies the fNormal, f2Normals and UCN
 */
 facet::facet(const facet& f)
 {
-// 	this->setFacetNormal(f.getFacetNormal());
-// 	this->setUCN(f.getUCN());
-// 	this->isFlippable=f.isFlippable;
-// 	facet* f2Copy;
-// 	f2Copy=f.codim2Ptr;
-// 	facet* f2Act;
-// 	f2Act=this->codim2Ptr;
-// 	while(f2Copy!=NULL)
-// 	{
-// 		if(f2Act==NULL)
-// 		{
-// 			f2Act=new facet(2);			
-// 		}
-// 		else
-// 		{
-// 			f2Act->next = new facet(2);
-// 		}
-// 		f2Act->setFacetNormal(f2Copy->getFacetNormal());
-// 		f2Copy = f2Copy->next;
-// 	}
+	this->fNormal=ivCopy(f.fNormal);
+	this->UCN=f.UCN;
+	this->isFlippable=f.isFlippable;
+	facet* f2Copy;
+	f2Copy=f.codim2Ptr;
+	facet* f2Act;
+	f2Act=this->codim2Ptr;
+	while(f2Copy!=NULL)
+	{
+		if(f2Act==NULL)
+		{
+			f2Act=new facet(2);
+			this->codim2Ptr=f2Act;			
+		}
+		else
+		{
+			facet* marker;
+			marker = f2Act;
+			f2Act->next = new facet(2);
+			f2Act = f2Act->next;
+			f2Act->prev = marker;
+		}
+		f2Act->setFacetNormal(f2Copy->getFacetNormal());
+		f2Act->setUCN(f2Copy->getUCN());
+		f2Copy = f2Copy->next;
+	}	
 }
 		
 /** The default destructor */
@@ -172,48 +179,46 @@ facet::~facet()
 		
 		
 /** \brief Comparison of facets*/
-bool facet::areEqual(facet &f, facet &g)
+bool gcone::areEqual(facet *f, facet *s)
 {
 	bool res = TRUE;
-	intvec *fNormal = new intvec(pVariables);
-	intvec *gNormal = new intvec(pVariables);
-	fNormal = f.getFacetNormal();
-	gNormal = g.getFacetNormal();
-	if((fNormal == gNormal))//||(gcone::isParallel(fNormal,gNormal)))
+	int notParallelCtr=0;
+	int ctr=0;
+	intvec* fNormal;// = new intvec(pVariables);
+	intvec* sNormal;// = new intvec(pVariables);
+	fNormal = f->getFacetNormal();
+	sNormal = s->getFacetNormal();
+	if(!isParallel(fNormal,sNormal))
+		notParallelCtr++;
+	else//parallelity, so we check the codim2-facets
 	{
-		if(f.numCodim2Facets==g.numCodim2Facets)
+		facet* f2Act;
+		facet* s2Act;
+		f2Act = f->codim2Ptr;
+		intvec* f2Normal;
+		intvec* s2Normal;
+		ctr=0;
+		while(f2Act!=NULL)
 		{
-			facet *f2Act;
-			facet *g2Act;
-			f2Act = f.codim2Ptr;
-			g2Act = g.codim2Ptr;
-			intvec *f2N = new intvec(pVariables);
-			intvec *g2N = new intvec(pVariables);
-			while(f2Act->next!=NULL && g2Act->next!=NULL)
+			f2Normal = f2Act->getFacetNormal();
+			s2Act = s->codim2Ptr;
+			while(s2Act!=NULL)
 			{
-				for(int ii=0;ii<f2N->length();ii++)
-				{
-					if(f2Act->getFacetNormal() != g2Act->getFacetNormal())
-					{
-						res=FALSE;								
-					}
-					if (res==FALSE)
-						break;
-				}
-				if(res==FALSE)
-					break;
-				
-				f2Act = f2Act->next;
-				g2Act = g2Act->next;
-			}//while
-		}//if		
-	}//if
-	else
-	{
-		res = FALSE;
+				s2Normal = s2Act->getFacetNormal();
+				bool foo=areEqual(f2Normal,s2Normal);
+				if(foo)
+					ctr++;
+				s2Act = s2Act->next;		       							       
+			}
+			f2Act = f2Act->next;
+		}
 	}
+	if(ctr==f->numCodim2Facets)
+		res=TRUE;
+	else
+		res=FALSE;				
 	return res;
-}
+}	
 		
 /** Stores the facet normal \param intvec*/
 void facet::setFacetNormal(intvec *iv)
@@ -2037,39 +2042,40 @@ facet * gcone::enqueueNewFacets(facet &f)
 				{
 					if(slAct==NULL)
 					{
-						slAct = new facet();
+						slAct = new facet(*fCopy);
 						slHead = slAct;								
 					}
 					else
 					{
-						slAct->next = new facet();
+						slAct->next = new facet(*fCopy);
 						slAct = slAct->next;
-					}							
-					slAct->setFacetNormal(fAct->getFacetNormal());
-					slAct->setUCN(fAct->getUCN());
-					slAct->isFlippable=fAct->isFlippable;
-					facet *f2Copy;
-					f2Copy = fCopy->codim2Ptr;
-					sl2Act = slAct->codim2Ptr;
-					while(f2Copy!=NULL)
-					{
-						if(sl2Act==NULL)
-						{
-							sl2Act = new facet(2);
-							slAct->codim2Ptr = sl2Act;					
-						}
-						else
-						{
-							facet *marker;
-							marker = sl2Act;
-							sl2Act->next = new facet(2);
-							sl2Act = sl2Act->next;
-							sl2Act->prev = marker;
-						}
-						sl2Act->setFacetNormal(f2Copy->getFacetNormal());
-						sl2Act->setUCN(f2Copy->getUCN());
-						f2Copy = f2Copy->next;
 					}
+					//NOTE Below went into copy constructor							
+// 					slAct->setFacetNormal(fAct->getFacetNormal());
+// 					slAct->setUCN(fAct->getUCN());
+// 					slAct->isFlippable=fAct->isFlippable;
+// 					facet *f2Copy;
+// 					f2Copy = fCopy->codim2Ptr;
+// 					sl2Act = slAct->codim2Ptr;
+// 					while(f2Copy!=NULL)
+// 					{
+// 						if(sl2Act==NULL)
+// 						{
+// 							sl2Act = new facet(2);
+// 							slAct->codim2Ptr = sl2Act;					
+// 						}
+// 						else
+// 						{
+// 							facet *marker;
+// 							marker = sl2Act;
+// 							sl2Act->next = new facet(2);
+// 							sl2Act = sl2Act->next;
+// 							sl2Act->prev = marker;
+// 						}
+// 						sl2Act->setFacetNormal(f2Copy->getFacetNormal());
+// 						sl2Act->setUCN(f2Copy->getUCN());
+// 						f2Copy = f2Copy->next;
+// 					}
 					fCopy = fCopy->next;
 				}
 				break;
@@ -2091,101 +2097,47 @@ facet * gcone::enqueueNewFacets(facet &f)
 				cout << ") against (";
 				slNormal->show(1,1);
 				cout << ")" << endl;
-#endif
-				if(!isParallel(fNormal, slNormal))
+#endif				
+ 				if(areEqual(fAct,slAct))
 				{
-					notParallelCtr++;
-				}
-				else	//fN and slN are parallel
-				{
-					//We check whether the codim-2-facets coincide
-					codim2Act = fAct->codim2Ptr;
-					ctr=0;
-					while(codim2Act!=NULL)
+					if(slAct==slHead)
 					{
-						f2Normal = codim2Act->getFacetNormal();
-								//sl2Act = f.codim2Ptr;
-						sl2Act = slAct->codim2Ptr;
-						while(sl2Act!=NULL)
-						{
-							sl2Normal = sl2Act->getFacetNormal();
-							if(areEqual(f2Normal, sl2Normal))
-								ctr++;
-							sl2Act = sl2Act->next;
-						}//while(sl2Act!=NULL)
-						codim2Act = codim2Act->next;
-					}//while(codim2Act!=NULL)
-					if(ctr==fAct->numCodim2Facets)	//facets ARE equal
+						deleteMarker = slAct;				
+						slHead = slAct->next;						
+						if(slHead!=NULL)
+							slHead->prev = NULL;
+					}
+					else if (slAct==slEnd)
 					{
-#ifdef gfan_DEBUG
-						cout << "Removing facet (";
-						slNormal->show(1,0);
-						cout << ") from SLA:" << endl;
-						fAct->fDebugPrint();
-						slAct->fDebugPrint();
-#endif
-						removalOccured=TRUE;
-						slAct->isFlippable=FALSE;
-						doNotAdd=TRUE;
-						maybe=FALSE;								
-						if(slAct==slHead)	//We want to delete the first element of SearchList
-						{
-							deleteMarker = slAct;				
-							slHead = slAct->next;						
-							if(slHead!=NULL)
-								slHead->prev = NULL;
-// 							delete deleteMarker; deleteMarker=NULL;
-							//set a bool flag to mark slAct as to be deleted
-						}//NOTE find a way to delete without affecting slAct = slAct->next
-						else if(slAct==slEndStatic)
-						{
-							deleteMarker = slAct;					
-							if(slEndStatic->next==NULL)
-							{							
-								slEndStatic = slEndStatic->prev;
-								slEndStatic->next = NULL;
-								slEnd = slEndStatic;
-							}
-							else	//we already added a facet after slEndStatic
-							{
-								slEndStatic->prev->next = slEndStatic->next;
-								slEndStatic->next->prev = slEndStatic->prev;
-								slEndStatic = slEndStatic->prev;
-								//slEnd = slEndStatic;
-							}
-						} 								
-						else
-						{
-							deleteMarker = slAct;
-							slAct->prev->next = slAct->next;
-							slAct->next->prev = slAct->prev;
-						}								
-						//update lengthOfSearchList					
-						lengthOfSearchList--;						
-						break;
-					}//if(ctr==fAct->numCodim2Facets)
-					else	//facets are parallel but NOT equal. But this does not imply that there
-						//is no other facet later in SLA that might be equal.
+						deleteMarker = slAct;
+						slEnd=slEnd->prev;
+						slEnd->next = NULL;
+					}								
+					else
 					{
-						maybe=TRUE;//       								
-					}							
-				}//if(!isParallel(fNormal, slNormal))
-				if( (slAct->next==NULL) && (maybe==TRUE) )
-				{
-					doNotAdd=FALSE;
-					break;
-				}
+						deleteMarker = slAct;
+						slAct->prev->next = slAct->next;
+						slAct->next->prev = slAct->prev;
+					}
+					removalOccured=TRUE;
+					break;//leave the while loop, since we found fAct=slAct thus delete slAct and do not add fAct
+				}		
+				
 				slAct = slAct->next;
 				/* NOTE The following lines must not be here but rather called inside the if-block above.
 				Otherwise results get crappy. Unfortunately there are two slAct=slAct->next calls now,
 				(not nice!) but since they are in seperate branches of the if-statement there should not
 				be a way it gets called twice thus ommiting one facet:
-				slAct = slAct->next;*/						
-// 						delete deleteMarker;
-// 						deleteMarker=NULL;
+				slAct = slAct->next;*/
+				if(deleteMarker!=NULL)
+				{						
+//  					delete deleteMarker;
+//  					deleteMarker=NULL;
+				}
 						//if slAct was marked as to be deleted, delete it here!
-			}//while(slAct!=NULL)									
-			if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) || (doNotAdd==FALSE) )
+			}//while(slAct!=NULL)
+			if(removalOccured==FALSE)
+// 			if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) || (doNotAdd==FALSE) )
 					//if( (notParallelCtr==lengthOfSearchList ) || doNotAdd==FALSE ) 
 			{
 #ifdef gfan_DEBUG

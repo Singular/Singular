@@ -78,7 +78,7 @@ class facet
 		~facet();
 				
 		/** \brief Comparison of facets*/
-		bool areEqual(facet &f, facet &g);
+		bool areEqual(facet *f, facet *g);
 		/** Stores the facet normal \param intvec*/
 		void setFacetNormal(intvec *iv);
 		/** Hopefully returns the facet normal */
@@ -172,6 +172,7 @@ class gcone
 		int dotProduct(intvec const &iva, intvec const &ivb);
 		bool isParallel(intvec const &a, intvec const &b);
 		bool areEqual(intvec const &a, intvec const &b);
+		bool areEqual(facet *f, facet *g);
 		int intgcd(int a, int b);
 		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE);
 		void readConeFromFile(int gcNum, gcone *gc);
