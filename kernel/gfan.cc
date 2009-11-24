@@ -125,6 +125,26 @@ facet::facet(int const &n)
 */
 facet::facet(const facet& f)
 {
+// 	this->setFacetNormal(f.getFacetNormal());
+// 	this->setUCN(f.getUCN());
+// 	this->isFlippable=f.isFlippable;
+// 	facet* f2Copy;
+// 	f2Copy=f.codim2Ptr;
+// 	facet* f2Act;
+// 	f2Act=this->codim2Ptr;
+// 	while(f2Copy!=NULL)
+// 	{
+// 		if(f2Act==NULL)
+// 		{
+// 			f2Act=new facet(2);			
+// 		}
+// 		else
+// 		{
+// 			f2Act->next = new facet(2);
+// 		}
+// 		f2Act->setFacetNormal(f2Copy->getFacetNormal());
+// 		f2Copy = f2Copy->next;
+// 	}
 }
 		
 /** The default destructor */
@@ -219,7 +239,10 @@ void facet::setFlipGB(ideal I)
 	this->flipGB=idCopy(I);
 }
 		
-/** Return the flipped GB*/
+/** Return the flipped GB
+Seems not be used
+Anyhow idCopy would make sense here.
+*/
 ideal facet::getFlipGB()
 {
 	return this->flipGB;
@@ -244,7 +267,7 @@ void facet::setUCN(int n)
 */
 int facet::getUCN()
 {
- 	if(this!=NULL && ( this!=(facet *)0xfbfbfbfb || this!=(facet *)0xfbfbfbfbfbfbfbfb) )
+	if(this!=NULL  && this!=(facet *)0xfbfbfbfbfbfbfbfb)// || this!=(facet *)0xfbfbfbfb) )
 // 	if(this!=NULL && ( this->fNormal!=(intvec *)0xfbfbfbfb || this->fNormal!=(intvec *)0xfbfbfbfbfbfbfbfb) )
 		return this->UCN;
 	else
@@ -408,7 +431,7 @@ void gcone::setIntPoint(intvec *iv)
 /** \brief Return the interior point */
 intvec *gcone::getIntPoint()
 {
-	return this->ivIntPt;
+	return ivCopy(this->ivIntPt);
 }
 		
 /** \brief Print the interior point */
@@ -1723,7 +1746,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			gcTmp->getCodim2Normals(*gcTmp);
 			gcTmp->normalize();
 #ifdef gfan_DEBUG
-			gcTmp->showFacets(1);
+// 			gcTmp->showFacets(1);
 #endif
 			/*add facets to SLA here*/
 			SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
@@ -1734,13 +1757,14 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 // 				idDelete((ideal*)&gcTmp->gcBasis);
 				for(int ii=0;ii<IDELEMS(gcTmp->gcBasis);ii++)
 				{
-					gcTmp->gcBasis->m[ii]=(poly)NULL;
+// 					gcTmp->gcBasis->m[ii]=(poly)NULL;
+					pDelete(&gcTmp->gcBasis->m[ii]);
 				}
  			}
 			
 #if gfan_DEBUG
-			if(SearchListRoot!=NULL)
-				gcTmp->showSLA(*SearchListRoot);
+// 			if(SearchListRoot!=NULL)
+// 				gcTmp->showSLA(*SearchListRoot);
 #endif
 			rChangeCurrRing(gcAct->baseRing);
 			//rDelete(rTmp);
@@ -1987,10 +2011,10 @@ facet * gcone::enqueueNewFacets(facet &f)
 	}
 	slEndStatic = slEnd;
 	/*1st step: compare facetNormals*/
-	intvec *fNormal=NULL; //= new intvec(this->numVars);
-	intvec *f2Normal=NULL; //= new intvec(this->numVars);
-	intvec *slNormal=NULL; //= new intvec(this->numVars);
-	intvec *sl2Normal=NULL; //= new intvec(this->numVars);
+	intvec *fNormal=NULL;
+	intvec *f2Normal=NULL;
+	intvec *slNormal=NULL;
+	intvec *sl2Normal=NULL;
 			
 	while(fAct!=NULL)
 	{						
@@ -2054,11 +2078,11 @@ facet * gcone::enqueueNewFacets(facet &f)
 			while(slAct!=NULL)
 					//while(slAct!=slEndStatic->next)
 			{
-// 				if(deleteMarker!=NULL)
-// 				{
+				if(deleteMarker!=NULL)
+				{
 // 					delete deleteMarker;
 // 					deleteMarker=NULL;
-// 				}
+				}
 				removalOccured=FALSE;
 				slNormal = slAct->getFacetNormal();
 #ifdef gfan_DEBUG
@@ -2071,7 +2095,6 @@ facet * gcone::enqueueNewFacets(facet &f)
 				if(!isParallel(fNormal, slNormal))
 				{
 					notParallelCtr++;
-// 							slAct = slAct->next;
 				}
 				else	//fN and slN are parallel
 				{
@@ -2107,12 +2130,12 @@ facet * gcone::enqueueNewFacets(facet &f)
 						maybe=FALSE;								
 						if(slAct==slHead)	//We want to delete the first element of SearchList
 						{
-							deleteMarker = slHead;				
+							deleteMarker = slAct;				
 							slHead = slAct->next;						
 							if(slHead!=NULL)
 								slHead->prev = NULL;
-							/*delete deleteMarker*/;					
-									//set a bool flag to mark slAct as to be deleted
+// 							delete deleteMarker; deleteMarker=NULL;
+							//set a bool flag to mark slAct as to be deleted
 						}//NOTE find a way to delete without affecting slAct = slAct->next
 						else if(slAct==slEndStatic)
 						{
@@ -2128,7 +2151,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 								slEndStatic->prev->next = slEndStatic->next;
 								slEndStatic->next->prev = slEndStatic->prev;
 								slEndStatic = slEndStatic->prev;
-											//slEnd = slEndStatic;
+								//slEnd = slEndStatic;
 							}
 						} 								
 						else
@@ -2136,33 +2159,16 @@ facet * gcone::enqueueNewFacets(facet &f)
 							deleteMarker = slAct;
 							slAct->prev->next = slAct->next;
 							slAct->next->prev = slAct->prev;
-						}
-								
+						}								
 						//update lengthOfSearchList					
-						lengthOfSearchList--;
-						//delete slAct;
-						//slAct=NULL;
-						//slAct = slAct->next; //not needed, since facets are equal
-// 						delete deleteMarker;
-						//deleteMarker=NULL;
-						//fAct = fAct->next;
+						lengthOfSearchList--;						
 						break;
 					}//if(ctr==fAct->numCodim2Facets)
 					else	//facets are parallel but NOT equal. But this does not imply that there
 						//is no other facet later in SLA that might be equal.
 					{
-						maybe=TRUE;
-//       								if(slAct->next==NULL && maybe==TRUE)
-//       								{
-//  									doNotAdd=FALSE;
-//    									slAct = slAct->next;
-//  									break;
-//       								}
-//       								else
-//    									slAct=slAct->next;
-					}
-							//slAct = slAct->next;
-							//delete deleteMarker;							
+						maybe=TRUE;//       								
+					}							
 				}//if(!isParallel(fNormal, slNormal))
 				if( (slAct->next==NULL) && (maybe==TRUE) )
 				{
@@ -2175,8 +2181,8 @@ facet * gcone::enqueueNewFacets(facet &f)
 				(not nice!) but since they are in seperate branches of the if-statement there should not
 				be a way it gets called twice thus ommiting one facet:
 				slAct = slAct->next;*/						
-						//delete deleteMarker;
-						//deleteMarker=NULL;
+// 						delete deleteMarker;
+// 						deleteMarker=NULL;
 						//if slAct was marked as to be deleted, delete it here!
 			}//while(slAct!=NULL)									
 			if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) || (doNotAdd==FALSE) )
@@ -2205,7 +2211,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 				slEnd->setFacetNormal(fNormal);
 				slEnd->prev = marker;
 				//Copy codim2-facets
-				intvec *f2Normal;// = new intvec(this->numVars);
+				intvec *f2Normal;
 				while(f2Act!=NULL)
 				{
 					f2Normal=f2Act->getFacetNormal();
@@ -2234,10 +2240,6 @@ facet * gcone::enqueueNewFacets(facet &f)
 		}
 	}//while(fAct!=NULL)						
 	return slHead;
-// 			delete sl2Normal;
-// 			delete slNormal;
-// 			delete f2Normal;
-// 			delete fNormal;
 }//addC2N
 		
 /** \brief Compute the gcd of two ints
@@ -2573,7 +2575,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 // }
 ring gcone::getBaseRing()
 {
-	return this->baseRing;
+	return rCopy(this->baseRing);
 }
 /** \brief Gather the output
 * List of lists
@@ -2739,12 +2741,12 @@ lists gfan(ideal inputIdeal, int h)
 		gcone *gcDel;	
 		gcDel = gcRoot;
 		gcAct = gcRoot;
-		do
+		while(gcAct!=NULL)
 		{
 			gcDel = gcAct;
 			gcAct = gcAct->next;
 			delete gcDel;
-		}while(gcAct!=NULL);
+		}
 	}
 	dd_free_global_constants();
 	}//rHasGlobalOrdering
