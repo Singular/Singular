@@ -192,7 +192,7 @@ void test_cff(CFFList &L,const CanonicalForm & f)
     j=J.getItem().exp();
     while(j>0) { t*=tt; j--; }
   }
-  if ((f-t)!=0) { printf("problem:\n");out_cf("factor:",f," has problems\n");}
+  if (!(f-t).isZero()) { printf("problem:\n");out_cf("factor:",f," has problems\n");}
 }
 //#endif
 #endif

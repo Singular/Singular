@@ -287,7 +287,7 @@ CanonicalForm convertNTLZZpX2CF(ZZ_pX poly,Variable x)
     bigone.mapinto();
     // Compute the canonicalform coefficient by coefficient,
     // bigone summarizes the result.
-    for (int j=0;j<deg(poly)+1;j++)
+    for (int j=0;j<=deg(poly);j++)
     {
       if (coeff(poly,j)!=0)
       {
@@ -317,7 +317,7 @@ CanonicalForm convertNTLzzpX2CF(zz_pX poly,Variable x)
     bigone.mapinto();
     // Compute the canonicalform coefficient by coefficient,
     // bigone summarizes the result.
-    for (int j=0;j<deg(poly)+1;j++)
+    for (int j=0;j<=deg(poly);j++)
     {
       if (coeff(poly,j)!=0)
       {
@@ -386,7 +386,7 @@ CanonicalForm convertNTLGF2X2CF(GF2X poly,Variable x)
     // In constrast to the more general conversion to ZZpX
     // the only possible coefficients are zero
     // and one yielding the following simplified loop
-    for (int j=0;j<deg(poly)+1;j++)
+    for (int j=0;j<=deg(poly);j++)
     {
       if (coeff(poly,j)!=0) bigone+=power(x,j);
      // *CanonicalForm(to_long(rep(coeff(poly,j))))) is not necessary any more;
@@ -518,7 +518,7 @@ CFFList convertNTLvec_pair_GF2X_long2FacCFFList
 
     polynom=e[i].a;
     exponent=e[i].b;
-    for (int j=0;j<deg(polynom)+1;j++)
+    for (int j=0;j<=deg(polynom);j++)
     {
       if (coeff(polynom,j)!=0)
         bigone += (power(x,j)*CanonicalForm(to_long(rep(coeff(polynom,j)))));
@@ -824,7 +824,7 @@ CFFList convertNTLvec_pair_ZZpEX_long2FacCFFList(vec_pair_ZZ_pEX_long e,ZZ_pE mu
     polynom=e[i].a;
     exponent=e[i].b;
 
-    for (int j=0;j<deg(polynom)+1;j++)
+    for (int j=0;j<=deg(polynom);j++)
     {
       if (IsOne(coeff(polynom,j)))
       {
@@ -868,7 +868,7 @@ CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE mu
     polynom=e[i].a;
     exponent=e[i].b;
 
-    for (int j=0;j<deg(polynom)+1;j++)
+    for (int j=0;j<=deg(polynom);j++)
     {
       if (IsOne(coeff(polynom,j)))
       {
@@ -958,7 +958,7 @@ CFFList convertNTLvec_pair_GF2EX_long2FacCFFList(vec_pair_GF2EX_long e,GF2E mult
     polynom=e[i].a;
     exponent=e[i].b;
 
-    for (int j=0;j<deg(polynom)+1;j++)
+    for (int j=0;j<=deg(polynom);j++)
     {
       if (IsOne(coeff(polynom,j)))
       {
@@ -1073,7 +1073,7 @@ zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f, zz_pX mipo)
 CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
 {
   CanonicalForm bigone= 0;
-  for (int j=0;j<deg(f)+1;j++)
+  for (int j=0;j<=deg(f);j++)
   {
     if (IsOne(coeff(f,j)))
       bigone+=power(x,j);
