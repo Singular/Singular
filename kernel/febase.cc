@@ -608,9 +608,9 @@ int feReadLine(char* b, int l)
       s=fe_fgets_stdin(fe_promptstr,
                        &(currentVoice->buffer[offset]),
                        omSizeOfAddr(currentVoice->buffer)-1-offset);
-      int i=0;
-      if (s!=NULL)
-        while((s[i]!='\0') /*&& (i<MAX_FILE_BUFFER)*/) {s[i] &= (char)127;i++;}
+      //int i=0;
+      //if (s!=NULL)
+      //  while((s[i]!='\0') /*&& (i<MAX_FILE_BUFFER)*/) {s[i] &= (char)127;i++;}
     }
     else if (currentVoice->sw==BI_file)
     {

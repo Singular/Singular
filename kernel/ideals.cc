@@ -3968,7 +3968,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
         hh=xx[j]->m[i];
         if ((hh!=NULL) && (pLmCmp(r,hh)==0))
         {
-          x[j]=nlCopy(pGetCoeff(hh));
+          x[j]=pGetCoeff(hh);
           hh=pLmFreeAndNext(hh);
           xx[j]->m[i]=hh;
         }
@@ -3978,7 +3978,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
       number n=nlChineseRemainder(x,q,rl);
       for(j=rl-1;j>=0;j--)
       {
-        nlDelete(&(x[j]),currRing);
+        x[j]=NULL; // nlInit(0...) takes no memory
       }
       pSetCoeff(h,n);
       //Print("new mon:");pWrite(h);
