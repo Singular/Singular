@@ -171,9 +171,11 @@ facet::~facet()
 		}
 	}
 	delete this->codim2Ptr;
-	idDelete((ideal *)&this->flipGB);
-	rDelete(this->flipRing);
-	this->flipRing=NULL;
+	if(this->flipGB!=NULL)
+		idDelete((ideal *)&this->flipGB);
+	if(this->flipRing!=NULL)
+		rDelete(this->flipRing);
+// 	this->flipRing=NULL;
 	//this=NULL;
 }
 		
@@ -418,7 +420,8 @@ gcone::~gcone()
 		delete fDel;
 	}
 	this->counter--;
-	dd_FreeMatrix(this->ddFacets);
+	//should be deleted in noRevS
+// 	dd_FreeMatrix(this->ddFacets);
 	//dd_FreeMatrix(this->ddFacets);
 }			
 	
@@ -606,7 +609,7 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 	}
 
 	dd_rowrange aktmatrixrow=0;	// needed to store the diffs of the expvects in the rows of ddineq
-	dd_set_global_constants();
+// 	dd_set_global_constants();
 	ddrows=rows;
 	ddcols=this->numVars;
 	dd_MatrixPtr ddineq; 		//Matrix to store the inequalities			
@@ -888,7 +891,7 @@ void gcone::getCodim2Normals(gcone const &gc)
 	facet *codim2Act;
 	//codim2Act = this->facetPtr->codim2Ptr;
 			
-	dd_set_global_constants();
+// 	dd_set_global_constants();
 			
 	dd_MatrixPtr ddineq,P,ddakt;
 	dd_rowset impl_linset, redset;
@@ -960,8 +963,17 @@ void gcone::getCodim2Normals(gcone const &gc)
 		dd_FreeMatrix(intPointMatrix);
 		dd_FreePolyhedra(ddpolyh);
 		delete iv_intPoint;
+		dd_FreeMatrix(P);
+		set_free(impl_linset);
+		set_free(redset);
+		free(newpos);
 	}//for
 	dd_FreeMatrix(ddineq);
+// 	dd_FreeMatrix(P);
+// 	set_free(impl_linset);
+// 	set_free(redset);
+// 	free(newpos);
+	
 }
 		
 /** \brief Compute the Groebner Basis on the other side of a shared facet 
@@ -1079,7 +1091,7 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	 * Thus we check whether the leading monomials of srcRing_HH and srcRing_H coincide. If not we 
 	 * compute the difference accordingly
 	*/
-	dd_set_global_constants();
+// 	dd_set_global_constants();
 	bool markingsAreCorrect=FALSE;
 	dd_MatrixPtr intPointMatrix;
 	int iPMatrixRows=0;
@@ -1194,7 +1206,7 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	intvec *iv_weight = new intvec(this->numVars);
 	interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
 	dd_FreeMatrix(intPointMatrix);
-	dd_free_global_constants();
+// 	dd_free_global_constants();
 			
 	/*Step 3
 	turn the minimal basis into a reduced one
@@ -1267,7 +1279,7 @@ void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 	
 	for (int ii=0;ii<IDELEMS(gb);ii++)
 	{
-		aktpoly = (poly)gb->m[ii];								
+		aktpoly = pCopy((poly)gb->m[ii]);	
 		int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		pGetExpV(aktpoly,leadExpV);	//find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
@@ -1276,7 +1288,7 @@ void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 		while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
 		{
 			aktpoly=pNext(aktpoly);	//next term
-			pSetm(aktpoly);
+// 			pSetm(aktpoly);
 			pGetExpV(aktpoly,v);		
 			/* Convert (int)v into (intvec)check */			
 			for (int jj=0;jj<this->numVars;jj++)
@@ -1302,11 +1314,13 @@ void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 //  		cout << "---" << endl;
 #endif
 		/*Now initialFormElement must be added to (ideal)initialForm */
-		initialForm->m[ii]=initialFormElement[ii];
+		initialForm->m[ii]=pCopy(initialFormElement[ii]);
+		pDelete(&initialFormElement[ii]);
 		omFree(leadExpV);
 		omFree(v);		
 	}//for
 	delete check;
+	pDelete(&aktpoly);
 }
 
 /** \brief Compute the remainder of a polynomial by a given ideal
@@ -1328,20 +1342,26 @@ ideal gcone::ffG(ideal const &H, ideal const &G)
 // 			cout << "Entering ffG" << endl;
 	int size=IDELEMS(H);
 	ideal res=idInit(size,1);
-	poly temp1, temp2, temp3;	//polys to temporarily store values for pSub
+	poly temp1=pInit();
+	poly temp2=pInit();
+	poly temp3=pInit();	//polys to temporarily store values for pSub
 	for (int ii=0;ii<size;ii++)
 	{
 // 		res->m[ii]=restOfDiv(H->m[ii],G);
-		res->m[ii]=kNF(G, NULL,H->m[ii],0,0);
-		temp1=H->m[ii];
-		temp2=res->m[ii];
+// 		res->m[ii]=pCopy(kNF(G, NULL,H->m[ii],0,0));
+		temp1=pCopy(H->m[ii]);
+// 		temp2=pCopy(res->m[ii]);
+		temp2=pCopy(kNF(G, NULL,H->m[ii],0,0));
 		temp3=pSub(temp1, temp2);
-		res->m[ii]=temp3;
+		res->m[ii]=pCopy(temp3);
 		//res->m[ii]=pSub(temp1,temp2); //buggy
 		//pSort(res->m[ii]);
 		//pSetm(res->m[ii]);
 		//cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);	
-	}			
+	}	
+	pDelete(&temp1);		
+//  	pDelete(&temp2);
+// 	pDelete(&temp3);
 	return res;
 }
 		
@@ -1510,7 +1530,8 @@ void gcone::interiorPoint(dd_MatrixPtr const &M, intvec &iv) //no const &M here 
 	dd_FreeLPData(lpInt);
 	dd_FreeLPData(lp);
 	set_free(ddlinset);
-	set_free(ddredrows);			
+	set_free(ddredrows);
+// 	free(ddnewpos);	//segfaults
 			
 }//void interiorPoint(dd_MatrixPtr const &M)
 		
@@ -1744,12 +1765,14 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			 * should pay to get rid of the flipGB as soon as possible.
 			 * Destructor must be equipped with necessary checks.
 			*/
-// 			idDelete((ideal *)&fAct->flipGB);
-// 			rDelete(fAct->flipRing);
+ 			idDelete((ideal *)&fAct->flipGB);
+			rDelete(fAct->flipRing);
 			
 			gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);	
 			gcTmp->getCodim2Normals(*gcTmp);
 			gcTmp->normalize();
+			//gcTmp->ddFacets should not be needed anymore, so
+			dd_FreeMatrix(gcTmp->ddFacets);
 #ifdef gfan_DEBUG
 // 			gcTmp->showFacets(1);
 #endif
@@ -1970,7 +1993,6 @@ void gcone::normalize()
  * Takes ptr to search list root
  * Returns a pointer to new first element of Searchlist
  */
-		//void enqueueNewFacets(facet &f)
 facet * gcone::enqueueNewFacets(facet &f)
 {
 	facet *slHead;
@@ -1979,7 +2001,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 	slAct = &f;
 	facet *slEnd;	//Pointer to end of SLA
 	slEnd = &f;
-	facet *slEndStatic;	//marks the end before a new facet is added		
+// 	facet *slEndStatic;	//marks the end before a new facet is added		
 	facet *fAct;
 	fAct = this->facetPtr;
 	facet *codim2Act;
@@ -1991,7 +2013,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 	deleteMarker = NULL;
 			
 	/** Flag to indicate a facet that should be added to SLA*/
-	bool doNotAdd=FALSE;
+// 	bool doNotAdd=FALSE;
 	/** \brief  Flag to mark a facet that might be added
 	 * The following case may occur:
 	 * A facet fAct is found to be parallel but not equal to the current facet slAct from SLA.
@@ -2000,7 +2022,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 	 * FALSE and the according slAct is deleted. 
 	 * If slAct->next==NULL AND maybe==TRUE we know, that fAct must be added
 	 */
-	volatile bool maybe=FALSE;
+// 	volatile bool maybe=FALSE;
 	/**A facet was removed, lengthOfSearchlist-- thus we must not rely on 
 	 * if(notParallelCtr==lengthOfSearchList) but rather
 	 * if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE)
@@ -2014,19 +2036,19 @@ facet * gcone::enqueueNewFacets(facet &f)
 		slEnd=slEnd->next;
 		lengthOfSearchList++;
 	}
-	slEndStatic = slEnd;
+// 	slEndStatic = slEnd;
 	/*1st step: compare facetNormals*/
-	intvec *fNormal=NULL;
-	intvec *f2Normal=NULL;
-	intvec *slNormal=NULL;
-	intvec *sl2Normal=NULL;
+ 	intvec *fNormal=NULL;
+// 	intvec *f2Normal=NULL;
+ 	intvec *slNormal=NULL;
+// 	intvec *sl2Normal=NULL;
 			
 	while(fAct!=NULL)
 	{						
 		if(fAct->isFlippable==TRUE)
 		{
-			maybe=FALSE;
-			doNotAdd=TRUE;
+// 			maybe=FALSE;
+// 			doNotAdd=TRUE;
 			fNormal=fAct->getFacetNormal();
 			slAct = slHead;
 			notParallelCtr=0;
@@ -2120,6 +2142,7 @@ facet * gcone::enqueueNewFacets(facet &f)
 						slAct->next->prev = slAct->prev;
 					}
 					removalOccured=TRUE;
+					lengthOfSearchList--;
 					break;//leave the while loop, since we found fAct=slAct thus delete slAct and do not add fAct
 				}		
 				
@@ -2664,7 +2687,7 @@ lists gfan(ideal inputIdeal, int h)
 	ring rootRing;			// The ring associated to the target ordering
 	ideal res;	
 	facet *fRoot;	
-	
+ 	dd_set_global_constants();
 	if(method==noRevS)
 	{
 		gcone *gcRoot = new gcone(currRing,inputIdeal);
