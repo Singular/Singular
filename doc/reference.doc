@@ -651,8 +651,8 @@ ideal resp. bigint
 @item @strong{Purpose:}
 applies chinese remainder theorem to the first argument w.r.t. the moduli given in the second.
 The elements in the first list must be of same type which can be @code{ideal},
-@code{module) or @code{matrix}.
-The moduli, if given by a list, must be from the type @code{bigint}.
+@code{module} or @code{matrix}.
+The moduli, if given by a list, must be of type @code{bigint} or @code{int}.
 @item @strong{Example:}
 @smallexample
 @c example
