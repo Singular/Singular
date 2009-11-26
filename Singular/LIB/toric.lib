@@ -20,8 +20,7 @@ static proc toric_ideal_1(intmat A, string alg)
   // check suitability of actual basering
   if(nvars(basering)<ncols(A))
   {
-    "ERROR: The number of matrix columns is smaller than the number of ring variables.";
-    return(I);
+    ERROR("The number of matrix columns is smaller than the number of ring variables.");
   }
 
   // check suitability of actual term ordering
@@ -204,8 +203,7 @@ static proc toric_ideal_1(intmat A, string alg)
 
   if(external_ord=="")
   {
-    "ERROR: The term ordering of the actual basering is not supported.";
-    return(I);
+    ERROR("The term ordering of the actual basering is not supported.");
   }
 
   // check algorithm
@@ -214,8 +212,7 @@ static proc toric_ideal_1(intmat A, string alg)
     // however, they do not compute the toric ideal of A, but of an
     // extended matrix
   {
-    "ERROR: The chosen algorithm is not suitable.";
-    return(I);
+    ERROR("The chosen algorithm is not suitable.");
   }
 
   // create temporary file with which the external program is called
@@ -262,10 +259,9 @@ static proc toric_ideal_1(intmat A, string alg)
     }
     if(found==0)
     {
-      "ERROR: The chosen algorithm needs a positive vector in the row space of the matrix.";
       close(MATRIX);
       dummy=system("sh","rm -f "+matrixfile);
-      return(I);
+      ERROR("The chosen algorithm needs a positive vector in the row space of the matrix.");
     }
     write(MATRIX,"positive row space vector:");
     for(j=1;j<=ncols(A);j++)
@@ -278,6 +274,7 @@ static proc toric_ideal_1(intmat A, string alg)
 
   // call external program
   dummy=system("sh","toric_ideal -alg "+alg+" "+matrixfile);
+  if (dummy!=0) { ERROR("toric_ideal failed with error code "+string(dummy)); }
 
   // read toric ideal from created file
   link TORIC_IDEAL=":r "+matrixfile+".GB."+alg;
@@ -354,15 +351,13 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
   // check arguments
   if(size(prsv)<ncols(A))
   {
-    "ERROR: The number of matrix columns does not equal the size of the positive row space vector.";
-    return(I);
+    ERROR("The number of matrix columns does not equal the size of the positive row space vector.");
   }
 
   // check suitability of actual basering
   if(nvars(basering)!=ncols(A))
   {
-    "ERROR: The number of matrix columns is smaller than the number of ring variables.";
-    return(I);
+    ERROR("The number of matrix columns is smaller than the number of ring variables.");
   }
 
   // check suitability of actual term ordering
@@ -545,8 +540,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
 
   if(external_ord=="")
   {
-    "ERROR: The term ordering of the actual basering is not supported.";
-    return(I);
+    ERROR("The term ordering of the actual basering is not supported.");
   }
 
   // check algorithm
@@ -555,8 +549,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
     // however, they do not compute the toric ideal of A, but of an
     // extended matrix
   {
-    "ERROR: The chosen algorithm is not suitable.";
-    return(I);
+    ERROR("The chosen algorithm is not suitable.");
   }
 
   // create temporary file with that the external program is called
@@ -594,6 +587,7 @@ static proc toric_ideal_2(intmat A, string alg, intvec prsv)
 
   // call external program
   dummy=system("sh","toric_ideal -alg "+alg+" "+matrixfile);
+  if (dummy!=0) { ERROR("toric_ideal failed with error code "+string(dummy)); }
 
   // read toric ideal from created file
   link TORIC_IDEAL=":r "+matrixfile+".GB."+alg;
@@ -929,8 +923,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
 
   if(external_ord=="")
   {
-    "ERROR: The term ordering of the actual basering is not supported.";
-    return(I);
+    ERROR("The term ordering of the actual basering is not supported.");
   }
 
   // create first temporary file with which the external program is called
@@ -966,19 +959,17 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
 
     if(head==0 && tail==0 && rest!=0)
     {
-      "ERROR: Generator "+string(j)+" of the input ideal is no binomial.";
       close(GROEBNER);
       dummy=system("sh","rm -f "+groebnerfile);
-      return(J);
+      ERROR("Generator "+string(j)+" of the input ideal is no binomial.");
     }
 
     if(leadcoef(tail)!=-leadcoef(head))
       // generator is no difference of monomials (or a constant multiple)
     {
-      "ERROR: Generator "+string(j)+" of the input ideal is no difference of monomials.";
       close(GROEBNER);
       dummy=system("sh","rm -f "+groebnerfile);
-      return(J);
+      ERROR("Generator "+string(j)+" of the input ideal is no difference of monomials.");
     }
 
     if(gcd(head,tail)!=1)
@@ -1009,6 +1000,7 @@ SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
 
   // call external program
   dummy=system("sh","change_cost "+groebnerfile+" "+newcostfile);
+  if (dummy!=0) { ERROR("change_cost failed with error code "+string(dummy)); }
 
   // read toric standard basis from created file
   link TORIC_IDEAL=":r "+newcostfile+".GB.pt";
