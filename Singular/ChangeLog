@@ -7,6 +7,7 @@ Changes w.r.t 3-1-0-7:
 - bug fixes for chinrem
 - linalg.lib:inverse for real/complex inexact coeffs fixed
 - timer now adds time of child processes
+- error handling in toric_ideal, toric.lib
 
 Changes w.r.t 3-1-0-6:
 - 3-1-0-7: Sat Oct 31 12:39:50 CET 2009
