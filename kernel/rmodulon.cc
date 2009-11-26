@@ -299,8 +299,8 @@ number nrnDiv (number a,number b)
     mpz_divexact(erg, (int_number) b, gcd);
     if (!nrnIsUnit((number) erg))
     {
-      WarnS("Division not possible, even by cancelling zero divisors.");
-      WarnS("Result is integer division without remainder.");
+      WerrorS("Division not possible, even by cancelling zero divisors.");
+      WerrorS("Result is integer division without remainder.");
       mpz_tdiv_q(erg, (int_number) a, (int_number) b);
       nrnDelete((number*) &gcd, NULL);
       return (number) erg;

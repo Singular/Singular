@@ -205,8 +205,8 @@ number nrzDiv (number a,number b)
   mpz_tdiv_qr(erg, r, (int_number) a, (int_number) b);
   if (!nrzIsZero((number) r))
   {
-    WarnS("Division by non divisible element.");
-    WarnS("Result is without remainder.");
+    WerrorS("Division by non divisible element.");
+    WerrorS("Result is without remainder.");
   }
   mpz_clear(r);
   omFreeBin(r, gmp_nrz_bin);
@@ -236,7 +236,7 @@ number  nrzInvers (number c)
 {
   if (!nrzIsUnit((number) c))
   {
-    WarnS("Non invertible element.");
+    WerrorS("Non invertible element.");
     return (number)0; //TODO
   }
   return nrzCopy(c);
