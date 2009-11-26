@@ -310,11 +310,17 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
 
   // build "saturation generator"
 
+
   // The use of the hosten_shapiro procedure is useful here because the head
   // of the computed saturation generator is smaller if less variables are
   // involved.
-  short* sat_var;
-  short number_of_sat_var=A.hosten_shapiro(sat_var);
+  short* sat_var = NULL;  
+  short number_of_sat_var = A.hosten_shapiro(sat_var);
+  if( (number_of_sat_var == 0) || (sat_var == NULL) )
+  {
+    delete[] generator;
+    return *this;
+  }
 
   for(short j=0;j<A.columns;j++)
     generator[j]=0;
@@ -329,7 +335,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
   // The "saturation generator" seems to be a monomial, but is interpreted
   // as a binomial with tail 1 by the designed data structures.
 
-  delete[] sat_var;
+  delete[] sat_var; 
   delete[] generator;
 
   return *this;
@@ -1008,8 +1014,7 @@ void ideal::print(FILE *output) const
 
   fprintf(output,"\nnumber of generators: %ld\n",size);
 
-  fprintf(output,"\nInterreduction frequency:  %.1f %\n",
-          interreduction_percentage);
+  fprintf(output,"\nInterreduction frequency:  %.1f %% \n", interreduction_percentage);
 }
 
 void ideal::print_all(FILE* output) const
