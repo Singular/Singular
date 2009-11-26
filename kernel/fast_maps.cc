@@ -709,6 +709,8 @@ void maPoly_Optimize(mapoly mpoly, ring src_r)
       ggT=maFindBestggT(iter, choice, fp, fq,src_r);
       if (choice!=NULL)
       {
+        assume(iter->f1==NULL);
+        assume(iter->f2==NULL);
         iter->f1=fp;
         iter->f2=ggT;
         if (fq!=NULL)

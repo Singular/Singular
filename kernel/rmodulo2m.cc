@@ -336,8 +336,8 @@ number nr2mDiv (number a,number b)
     }
     if ((NATNUMBER) b%2 == 0)
     {
-      WarnS("Division not possible, even by cancelling zero divisors.");
-      WarnS("Result is integer division without remainder.");
+      WerrorS("Division not possible, even by cancelling zero divisors.");
+      WerrorS("Result is integer division without remainder.");
       return (number) ((NATNUMBER) a / (NATNUMBER) b);
     }
   }
