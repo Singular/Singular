@@ -1043,7 +1043,7 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     // u->next exists: copy v
     b=pCopy((poly)v->Data());
     #if 0
-    if ((a!=NULL) && (b!=NULL) 
+    if ((a!=NULL) && (b!=NULL)
     && (pLDeg(a,&dummy,currRing)+pLDeg(b,&dummy,currRing)>=currRing->bitmask))
     {
       pDelete(&a);
@@ -1844,23 +1844,31 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
     {
       for(i=rl-1;i>=0;i--)
       {
-        if (pl->m[i].Typ()!=BIGINT_CMD)
+        if (pl->m[i].Typ()==INT_CMD)
+        {
+          q[i]=nlInit((int)(long)pl->m[i].Data(),currRing);
+        }
+        else if (pl->m[i].Typ()==BIGINT_CMD)
+        {
+          q[i]=nlCopy((number)(pl->m[i].Data()));
+        }
+        else
         {
           Werror("bigint expected at pos %d",i+1);
+          for(i++;i<rl;i++)
+          {
+            nlDelete(&(q[i]),currRing);
+          }
           omFree(x); // delete c
           omFree(q); // delete pl
           return TRUE;
         }
-        q[i]=(number)(pl->m[i].Data());
       }
     }
     result=idChineseRemainder(x,q,rl);
-    if (p!=NULL)
+    for(i=rl-1;i>=0;i--)
     {
-      for(i=rl-1;i>=0;i--)
-      {
-        nlDelete(&(q[i]),currRing);
-      }
+      nlDelete(&(q[i]),currRing);
     }
     omFree(q);
     res->data=(char *)result;
@@ -2667,7 +2675,7 @@ static BOOLEAN jjPlural_num_poly(leftv res, leftv a, leftv b)
     WerrorS("basering must NOT be a qring!");
     return TRUE;
   }
-  
+
   if (iiOp==NCALGEBRA_CMD)
   {
     return nc_CallPlural(NULL,NULL,(poly)a->Data(),(poly)b->Data(),currRing);
@@ -2747,7 +2755,7 @@ static BOOLEAN jjPlural_mat_mat(leftv res, leftv a, leftv b)
 static BOOLEAN jjBRACKET(leftv res, leftv a, leftv b)
 {
   res->data=NULL;
-            
+
   if (rIsPluralRing(currRing))
   {
     const poly q = (poly)b->Data();
@@ -3216,7 +3224,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
     i0=(ideal)v->CopyD(); // TODO: memory leak? !
   }
   int ii0=idElem(i0); /* size of i0 */
-  i1=idSimpleAdd(i1,i0); // 
+  i1=idSimpleAdd(i1,i0); //
   memset(i0->m,0,sizeof(poly)*IDELEMS(i0)); // TODO: memory leak? !!
   idDelete(&i0);
   intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
@@ -3238,7 +3246,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   }
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
-  /* IDELEMS(il)-ii0 appears to be the position of the first element of il that 
+  /* IDELEMS(il)-ii0 appears to be the position of the first element of il that
      does not belong to the input ideal */
   result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-ii0);
   test=save_test;
@@ -4119,7 +4127,7 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
   if (w==NULL)
   {
     res->data=(void *)(long)idHomModule(v_id,currQuotient,&w);
-    if (res->data!=NULL) 
+    if (res->data!=NULL)
     {
       if (v->rtyp==IDHDL)
       {
@@ -4255,13 +4263,13 @@ static BOOLEAN jjJACOB_M(leftv res, leftv a)
   id = idTransp(id);
   int W = IDELEMS(id);
 
-  ideal result = idInit(W * pVariables, id->rank); 
+  ideal result = idInit(W * pVariables, id->rank);
   poly *p = result->m;
-        
+
   for( int v = 1; v <= pVariables; v++ )
   {
     poly* q = id->m;
-    for( int i = 0; i < W; i++, p++, q++ ) 
+    for( int i = 0; i < W; i++, p++, q++ )
       *p = pDiff( *q, v );
   }
   idDelete(&id);
@@ -6182,7 +6190,7 @@ static BOOLEAN jjLIFTSTD3(leftv res, leftv u, leftv v, leftv w)
   // CopyD for IDEAL_CMD and MODUL_CMD are identical:
   res->data = (char *)idLiftStd((ideal)u->Data(),
                                 &(hv->data.umatrix),testHomog,
-				&(hw->data.uideal));
+                                &(hw->data.uideal));
   setFlag(res,FLAG_STD); v->flag=0; w->flag=0;
   return FALSE;
 }
