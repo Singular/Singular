@@ -756,8 +756,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     switch(with_exps)
     {
       case 0: // with coef & exp.
-        res->m[0]=pOne();
-        pSetCoeff(res->m[0],nCopy(pGetCoeff(f)));
+        res->m[0]=pNSet(nCopy(pGetCoeff(f)));
         // no break
       case 2: // with exp.
         (*v)=new intvec(si_max(1,n));
@@ -1147,8 +1146,7 @@ ideal singclap_sqrfree ( poly f)
     for(i=pVariables;i>0;i--) if(pGetExp(f,i)!=0) n++;
     n++; // with coeff
     res=idInit(si_max(n,1),1);
-    res->m[0]=pOne();
-    pSetCoeff(res->m[0],nCopy(pGetCoeff(f)));
+    res->m[0]=pNSet(nCopy(pGetCoeff(f)));
     if (n==0)
     {
       res->m[0]=pOne();
