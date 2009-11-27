@@ -789,7 +789,7 @@ installp: Singularp
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
 depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h claptmpl.dd
-	-cat *.dd >>depend
+	-cat *.dd >depend
 
 ifeq (depend,$(wildcard depend))
 include depend
