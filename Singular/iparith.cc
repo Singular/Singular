@@ -1093,6 +1093,18 @@ static BOOLEAN jjTIMES_IV(leftv res, leftv u, leftv v)
     return jjOP_REST(res,u,v);
   return FALSE;
 }
+static BOOLEAN jjTIMES_MA_BI1(leftv res, leftv u, leftv v)
+{
+  number n=nInit_bigint((number)v->Data());
+  poly p=pNSet(n);
+  ideal I= (ideal)mpMultP((matrix)u->CopyD(MATRIX_CMD),p);
+  res->data = (char *)I;
+  return FALSE;
+}
+static BOOLEAN jjTIMES_MA_BI2(leftv res, leftv u, leftv v)
+{
+  return jjTIMES_MA_BI1(res,v,u);
+}
 static BOOLEAN jjTIMES_MA_P1(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->CopyD(POLY_CMD);
@@ -1110,8 +1122,7 @@ static BOOLEAN jjTIMES_MA_P2(leftv res, leftv u, leftv v)
 static BOOLEAN jjTIMES_MA_N1(leftv res, leftv u, leftv v)
 {
   number n=(number)v->CopyD(NUMBER_CMD);
-  poly p=pOne();
-  pSetCoeff(p,n);
+  poly p=pNSet(n);
   res->data = (char *)mpMultP((matrix)u->CopyD(MATRIX_CMD),p);
   idNormalize((ideal)res->data);
   return FALSE;
@@ -3342,6 +3353,8 @@ struct sValCmd2 dArith2[]=
 ,{jjTIMES_MA_I1,'*',           MATRIX_CMD,     MATRIX_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_I2,'*',           MATRIX_CMD,     INT_CMD,    MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA,  '*',            MATRIX_CMD,     MATRIX_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{jjTIMES_MA_BI1,'*',          MATRIX_CMD,     MATRIX_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{jjTIMES_MA_BI2,'*',          MATRIX_CMD,     BIGINT_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjOP_IV_I,   '*',            INTVEC_CMD,     INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjOP_I_IV,   '*',            INTVEC_CMD,     INT_CMD,    INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjOP_IV_I,   '*',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -3793,9 +3806,7 @@ static BOOLEAN jjBI2P(leftv res, leftv u)
     if (nIsZero(n)) { res->data=NULL;nDelete(&n); }
     else
     {
-      poly p=pOne();
-      pSetCoeff(p,n);
-      res->data=(void *)p;
+      res->data=(void *)pNSet(n);
     }
   }
   return bo;
@@ -6613,8 +6624,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
         number n=nInit((int)(long)h->Data());
         if (!nIsZero(n))
         {
-          p=pOne();
-          pSetCoeff(p,n);
+          p=pNSet(n);
         }
         else
         {
@@ -6629,8 +6639,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
         number n=nInit_bigint(b);
         if (!nIsZero(n))
         {
-          p=pOne();
-          pSetCoeff(p,n);
+          p=pNSet(n);
         }
         else
         {
@@ -6644,8 +6653,7 @@ static BOOLEAN jjIDEAL_PL(leftv res, leftv v)
         number n=(number)h->CopyD(NUMBER_CMD);
         if (!nIsZero(n))
         {
-          p=pOne();
-          pSetCoeff(p,n);
+          p=pNSet(n);
         }
         else
         {
