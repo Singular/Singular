@@ -255,5 +255,9 @@ template void noro_step<tgb_uint8>(poly*p,int &pn,slimgb_alg* c);
 template void noro_step<tgb_uint16>(poly*p,int &pn,slimgb_alg* c);
 template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 //std::priority_queue<MonRedRes>
+#ifdef HAVE_VANISHING_IDEAL
+#include <list>
+template class std::list<int>;
+#endif /* HAVE_VANISHING_IDEAL */
 #endif
 //template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);
