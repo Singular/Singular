@@ -1,0 +1,85 @@
+-------------------------------------------------------------
+History of the "surfex" algebraic geometry visualization tool
+-------------------------------------------------------------
+
+If you experience any bug which is not listed here, 
+or if you would want us to add another feature, 
+please, feel free to contact us via our website:
+www.surfex.AlgebraicSurface.net
+
+Below the bugs and features you will find a list of changes
+which occured in the version which appeared up to now.
+
+
+known bugs:
+-----------
+
+- HC: does not work if blanks occur in path names or file names
+- NT: when using files in only two variables the program sometimes hangs up
+- NT: when trying to close the last project, surfex hangs up (so: disabled)
+
+
+feature requests: 
+-----------------
+
+- OL: good end user documentation
+- OL: good internal documentation
+- NT: make a clear licence statement
+- HC: mpeg-export
+- HC: check-box in save movie allowing to omit the first/last frame or not
+- OL: allow other clipping then sphere-clipping
+- HC: produce mpeg-movies
+- OL: save surfex-command-line which would have to be used for producing 
+      the raytraced image / movie
+- OL: run surfex as a "compute-" or "display-server" for other tools
+- OL: plane curves
+
+- OL: combine multiple images/movies into a single one
+- OL: use a config file to store configurations, such as browser, tempdir, etc.
+- OL: save backups of all open projects regularly
+- OL: open several projects at the same time
+- OL: when quitting, check if all projects saved
+- OL: complete light source positioning
+- OL: allow to remove parameters/equations/curves/points
+- OL: allow cutting with (several) arbitrary surfaces 
+- OL: allow boolean operations (this requires either to use PovRay or to implement
+  this feature in surf!)
+- OL: API to allow other tools to access surfex's features 
+      (e.g. for use from Cinderella)
+- OL: internally seperate computational part from windows
+      (e.g., this makes surfex a lot faster when used as a command line
+      script)
+- OL: use some triangulation tool to compute triangulations of the surfaces /
+  curves
+- OL: allow building real-world models using the triangulation combined with
+  additional features such as: boolean operations / offset on triangulations
+- OL: make internal check for changes in a project more efficient
+
+
+0.89.05
+-------
+November 2006
+
+new features / repaired bugs:
+
+- OL: windows install improved - should now find surf.exe and convert.exe on
+      most systems quickly
+- OL: free scaling added (user can give bounds for the scaling slider)
+- OL: clear project menu item added
+- OL: load project menu item added (was disabled because of a bug)
+- bug repaired (OL): HC: parameters always start at 0.0 when used in movies
+- OL: filename shown on top of the tab
+- OL: several minor bugs repaired
+
+0.89.04
+-------
+September 2006
+
+new features / repaired bugs:
+
+- OL: save dialogues are now really save dialogues (not open dialogues as before)
+- OL: now remembers the directory which was used to open/save a file/movie
+- OL: some bugs corrected
+- OL: disabled the features which had bugs and which where not so important
+
+

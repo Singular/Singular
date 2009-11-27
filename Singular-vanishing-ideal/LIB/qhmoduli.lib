@@ -1,0 +1,1532 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Singularities";
+info="
+LIBRARY:  qhmoduli.lib    Moduli Spaces of Semi-Quasihomogeneous Singularities
+AUTHOR:   Thomas Bayer, email: bayert@in.tum.de
+
+PROCEDURES:
+ ArnoldAction(f, [G, w])  Induced action of G_f on T_.
+ ModEqn(f)                Equations of the moduli space for principal part f
+ QuotientEquations(G,A,I) Equations of Variety(I)/G w.r.t. action 'A'
+ StabEqn(f)               Equations of the stabilizer of f.
+ StabEqnId(I, w)          Equations of the stabilizer of the qhom. ideal I.
+ StabOrder(f)             Order of the stabilizer of f.
+ UpperMonomials(f, [w])   Upper basis of the Milnor algebra of f.
+
+ Max(data)                maximal integer contained in 'data'
+ Min(data)                minimal integer contained in  'data'
+";
+
+// NOTE: This library has been written in the frame of the diploma thesis
+// 'Computing moduli spaces of semiquasihomogeneous singularities and an
+//  implementation in Singular', Arbeitsgruppe Algebraische Geometrie,
+// Fachbereich Mathematik, University Kaiserslautern,
+// Advisor: Prof. Gert-Martin Greuel
+
+LIB "rinvar.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc ModEqn(poly f, list #)
+"USAGE:   ModEqn(f [, opt]); poly f; int opt;
+PURPOSE: compute equations of the moduli space of semiquasihomogenos hypersurface         singularity with principal part f w.r.t. right equivalence
+ASSUME:  f quasihomogeneous polynomial with an isolated singularity at 0
+RETURN:  polynomial ring, possibly a simple extension of the ground field of
+         the basering, containing the ideal 'modid'
+         - 'modid' is the ideal of the moduli space  if opt is even (> 0).
+           otherwise it contains generators of the coordinate ring R of the
+           moduli space (note : Spec(R) is the moduli space)
+OPTIONS: 1 compute equations of the mod. space,
+         2 use a primary decomposition,
+         4 compute E_f0, i.e., the image of G_f0,
+         to combine options, add their value, default: opt =7
+EXAMPLE: example ModEqn; shows an example
+"
+{
+  int sizeOfAction, i, dimT, nonLinearQ, milnorNr, dbPrt;
+  int imageQ, opt;
+  intvec wt;
+  ideal B;
+  list Gf, tIndex, sList;
+  string ringSTR;
+
+  dbPrt = printlevel-voice+2;
+  if(size(#) > 0) { opt = #[1]; }
+  else { opt = 7; }
+  if(opt / 4 > 0) { imageQ = 1; opt = opt - 4;}
+  else { imageQ = 0; }
+
+  wt = weight(f);
+  milnorNr = vdim(std(jacob(f)));
+  if(milnorNr == -1) {
+                ERROR("the polynomial " + string(f) + " has a nonisolated singularity at 0");
+        }       // singularity not isolated
+
+  // 1st step : compute a basis of T_
+
+  B = UpperMonomials(f, wt);
+  dimT = size(B);
+  dbprint(dbPrt, "moduli equations of f = " + string(f) + ", f has Milnor number = " + string(milnorNr));
+  dbprint(dbPrt, " upper basis = " + string(B));
+  if(size(B) > 1) {
+
+    // 2nd step : compute the stabilizer G_f of f
+
+    dbprint(dbPrt, " compute equations of the stabilizer of f, called G_f");
+    Gf = StabEqn(f);
+    dbprint(dbPrt, " order of the stabilizer = " + string(StabOrder(Gf)));
+
+    // 3rd step : compute the induced action of G_f on T_ by means of a theorem of Arnold
+
+    dbprint(dbPrt, " compute the induced action");
+    def RME1 = ArnoldAction(f, Gf, B);
+    setring(RME1);
+    export(RME1);
+    dbprint(dbPrt, " G_f = " + string(stabid));
+    dbprint(dbPrt, " action of G_f : " + string(actionid));
+
+    // 4th step : linearize the action of G_f
+
+    sizeOfAction = size(actionid);
+    def RME2 = LinearizeAction(stabid, actionid, nvars(Gf[1]));
+    setring RME2;
+    export(RME2);
+    kill RME1;
+
+    if(size(actionid) == sizeOfAction) { nonLinearQ = 0;}
+    else  {
+      nonLinearQ = 1;
+      dbprint(dbPrt, " linearized action = " + string(actionid));
+      dbprint(dbPrt, " embedding of T_ = " + string(embedid));
+    }
+
+
+
+    if(!imageQ) {        // do not compute the image of Gf
+      // 5th step : set E_f = G_f,
+      dbprint(dbPrt, " compute equations of the quotient T_/G_f");
+      def RME3 = basering;
+    }
+    else {
+
+      // 5th step : compute the ideal and the action of E_f
+
+      dbprint(dbPrt, " compute E_f");
+      def RME3 = ImageGroup(groupid, actionid);
+      setring(RME3);
+      ideal embedid = imap(RME2, embedid);
+      dbprint(dbPrt, " E_f  = (" + string(groupid) + ")");
+      dbprint(dbPrt, " action of E'f = " + string(actionid));
+      dbprint(dbPrt, " compute equations of the quotient T_/E_f");
+    }
+    export(RME3);
+    kill RME2;
+
+    // 6th step : compute the equations of the quotient T_/E_f
+
+                ideal G = groupid; ideal variety = embedid;
+                kill groupid,embedid;
+    def RME4 = QuotientEquations(G, actionid, variety, opt);
+    setring RME4;
+    poly mPoly = minpoly;
+    kill RME3;
+    export(RME4);
+
+    // simplify the ideal and create a new ring with propably less variables
+
+    if(opt == 1 || opt == 3) {      // equations computed ?
+      sList = SimplifyIdeal(id, 0, "Y");
+      ideal newid = sList[1];
+      dbprint(dbPrt, " number of equations = " + string(size(sList[1])));
+      dbprint(dbPrt, " number of variables = " + string(size(sList[3])));
+      ringSTR = "ring RME5 = (" + charstr(basering) + "), (Y(1.." + string(size(sList[3])) + ")),dp;";
+      execute(ringSTR);
+      minpoly = number(imap(RME4, mPoly));
+      ideal modid = imap(RME4, newid);
+    }
+    else {
+      def RME5 = RME4;
+      setring(RME5);
+      ideal modid = imap(RME4, id);
+    }
+    export(modid);
+    kill RME4;
+  }
+  else {
+                def RME5 = basering;
+                ideal modid = maxideal(1);
+                if(size(B) == 1) {                      // 1-dimensional
+                        modid[size(modid)] = 0;
+                        modid = simplify(modid,2);
+                }
+                export(modid);
+        }
+dbprint(dbPrt, "
+// 'ModEqn' created a new ring.
+// To see the ring, type (if the name of the ring is R):
+     show(R);
+// To access the ideal of the moduli space of semiquasihomogeneous singularities
+// with principal part f, type
+     def R = ModEqn(f); setring R;  modid;
+// 'modid' is the ideal of the moduli space.
+// if 'opt' = 0 or even, then 'modid' contains algebra generators of S s.t.
+// spec(S) = moduli space of f.
+");
+  return(RME5);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring B   = 0,(x,y), ls;
+  poly f = -x4 + xy5;
+  def R = ModEqn(f);
+  setring R;
+  modid;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc QuotientEquations(ideal G, ideal Gaction, ideal embedding, list#)
+"USAGE:   QuotientEquations(G,action,emb [, opt]); ideal G,action,emb;int opt
+PURPOSE: compute the quotient of the variety given by the parameterization
+         'emb'  by the linear action 'action' of the algebraic group G.
+ASSUME:  'action' is linear, G must be finite if the Reynolds operator is
+         needed (i.e., NullCone(G,action) returns some non-invariant polys)
+RETURN:   polynomial ring over a simple extension of the ground field of the
+          basering, containing the ideals 'id' and 'embedid'.
+          - 'id' contains the equations of the quotient, if opt = 1;
+            if opt = 0, 2, 'id' contains generators of the coordinate ring R
+            of the quotient (Spec(R) is the quotient)
+          - 'embedid' = 0, if opt = 1;
+            if opt = 0, 2, it is the ideal defining the equivariant embedding
+OPTIONS: 1 compute equations of the quotient,
+         2 use a primary decomposition when computing the Reynolds operator,@*
+         to combine options, add their value, default: opt =3.
+EXAMPLE: example QuotientEquations; shows an example
+"
+{
+  int i, opt, primaryDec, relationsQ, dbPrt;
+  ideal Gf, variety;
+  intvec wt;
+
+  dbPrt = printlevel-voice+3;
+  if(size(#) > 0) { opt = #[1]; }
+  else { opt = 3; }
+
+  if(opt / 2 > 0) { primaryDec = 1; opt = opt - 2; }
+  else { primaryDec = 0; }
+  if(opt > 0) { relationsQ = 1;}
+  else { relationsQ = 0; }
+
+  Gf = std(G);
+  variety = EquationsOfEmbedding(embedding, nvars(basering) - size(Gaction));
+
+  if(size(variety) == 0) {    // use Hilbert function !
+    //for(i = 1; i <= ncols(Gaction); i ++) { wt[i] = 1;};
+    for(i = 1; i <= nvars(basering); i ++) { wt[i] = 1;};
+  }
+  def RQER = InvariantRing(Gf, Gaction, primaryDec);    // compute the nullcone of the linear action
+
+  def RQEB = basering;
+  setring(RQER);
+  export(RQER);
+
+  if(relationsQ > 0) {
+    dbprint(dbPrt, " compute equations of the variety (" + string(size(imap(RQER, invars))) + " invariants) ");
+    if(!defined(variety)) { ideal variety = imap(RQEB, variety); }
+    if(wt[1] > 0) {
+      def RQES = ImageVariety(variety, imap(RQER, invars), wt);
+    }
+    else {
+      def RQES = ImageVariety(variety, imap(RQER, invars));  // forget imap
+    }
+    setring(RQES);
+    ideal id = imageid;
+    ideal embedid = 0;
+  }
+  else {
+    def RQES = basering;
+    ideal id =  imap(RQER, invars);
+    ideal embedid = imap(RQEB, variety);
+  }
+  kill RQER;
+  export(id);
+  export(embedid);
+  return(RQES);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc UpperMonomials(poly f, list #)
+"USAGE:   UpperMonomials(poly f, [intvec w])
+PURPOSE: compute the upper monomials of the milnor algebra of f.
+ASSUME:  f is quasihomogeneous (w.r.t. w)
+RETURN:  ideal
+EXAMPLE: example UpperMonomials; shows an example
+"
+{
+  int i,d;
+  intvec wt;
+  ideal I, J;
+
+  if(size(#) == 0) { wt = weight(f);}
+  else { wt = #[1];}
+   J = kbase(std(jacob(f)));
+  d = deg(f, wt);
+  for(i = 1; i <= size(J); i++) { if(deg(J[i], wt) > d) {I = I, J[i];} }
+  return(simplify(I, 2));
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring B   = 0,(x,y,z), ls;
+  poly f = -z5+y5+x2z+x2y;
+  UpperMonomials(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc ArnoldAction(poly f, list #)
+"USAGE:   ArnoldAction(f, [Gf, B]); poly f; list Gf, B;
+         'Gf' is a list of two rings (coming from 'StabEqn')
+PURPOSE: compute the induced action of the stabilizer G of f on T_, where
+         T_ is given by the upper monomials B of the Milnor algebra of f.
+ASSUME:  f is quasihomogeneous
+RETURN:  polynomial ring over the same ground field, containing the ideals
+         'actionid' and 'stabid'.
+         - 'actionid' is the ideal defining the induced action of Gf on T_ @*
+         - 'stabid' is the ideal of the stabilizer Gf in the new ring
+EXAMPLE: example ArnoldAction; shows an example
+"
+{
+  int i, offset, ub, pos, nrStabVars, dbPrt;
+  intvec wt = weight(f);
+  ideal B;
+  list Gf, parts, baseDeg;
+  string ringSTR1, ringSTR2, parName, namesSTR, varSTR;
+
+  dbPrt = printlevel-voice+2;
+  if(size(#) == 0) {
+    Gf = StabEqn(f);
+    B = UpperMonomials(f, wt);
+  }
+  else {
+    Gf = #[1];
+    if(size(#) > 1) { B = #[2];}
+    else {B = UpperMonomials(f, wt);}
+  }
+  if(size(B) == 0) { ERROR("the principal part " + string(f) + " has no upper monomials");}
+  for(i = 1; i <= size(B); i = i + 1) {
+    baseDeg[i] = deg(B[i], wt);
+  }
+  ub = Max(baseDeg) + 1;          // max degree of an upper mono.
+  def RAAB = basering;
+  def STR1 = Gf[1];
+  def STR2 = Gf[2];
+  nrStabVars = nvars(STR1);
+
+  dbprint(dbPrt, "ArnoldAction of f = ", f, ", upper base = " + string(B));
+
+  setring STR1;
+  poly mPoly = minpoly;
+  setring RAAB;
+
+  // setup new ring with s(..) and t(..) as parameters
+
+  varSTR = string(maxideal(1));
+  ringSTR2 = "ring RAAS = ";
+  if(npars(basering) == 1) {
+    parName = parstr(basering);
+    ringSTR2 = ringSTR2 + "(0, " + parstr(1) + "), ";
+  }
+  else {
+    parName = "a";
+    ringSTR2 = ringSTR2 + "0, ";
+  }
+  offset = 1 + nrStabVars;
+  namesSTR = "s(1.." + string(nrStabVars) + "), t(1.." + string(size(B)) + ")";
+  ringSTR2 = ringSTR2 + "(" + namesSTR + "), lp;";
+  ringSTR1 = "ring RAAR = (0, " + parName + "," + namesSTR + "), (" + varSTR + "), ls;";  // lp ?
+
+  execute(ringSTR1);
+  export(RAAR);
+  ideal upperBasis, stabaction, action, mPoly, reduceIdeal;
+  poly f, F, monos, h;
+
+  reduceIdeal = imap(STR1, mPoly), imap(STR1, stabid);
+  f = imap(RAAB, f);
+  F = f;
+  upperBasis = imap(RAAB, B);
+  for(i = 1; i <= size(upperBasis); i = i + 1) {
+    F = F + par(i + offset)*upperBasis[i];
+  }
+  monos = F - f;
+  stabaction = imap(STR2, actionid);
+
+  // action of the stabilizer on the semiuniversal unfolding of f
+
+  F = f + APSubstitution(monos, stabaction, reduceIdeal, wt, ub, nrStabVars, size(upperBasis));
+
+  // apply the theorem of Arnold
+
+  h = ArnoldFormMain(f, upperBasis, F, reduceIdeal, nrStabVars, size(upperBasis)) - f;
+
+  // extract the polynomials of the action of the stabilizer on T_
+
+  parts = MonosAndTerms(h, wt, ub);
+  for(i = 1; i <= size(parts[1]); i = i + 1) {
+    pos = FirstEntryQHM(upperBasis, parts[1][i]);
+    action[pos] = parts[2][i]/parts[1][i];
+  }
+  execute(ringSTR2);
+  minpoly = number(imap(STR1, mPoly));
+  ideal actionid = imap(RAAR, action);
+  ideal stabid = imap(STR1, stabid);
+  export(actionid);
+  export(stabid);
+  kill RAAR;
+dbprint(dbPrt, "
+// 'ArnoldAction' created a new ring.
+// To see the ring, type (if the name of the ring is R):
+     show(R);
+// To access the ideal of the stabilizer G of f and its group action,
+// where f is the quasihomogeneous principal part, type
+     def R = ArnoldAction(f); setring R;  stabid; actionid;
+// 'stabid' is the ideal of the group G and 'actionid' is the ideal defining
+// the group action of the group G on T_. Note: this action might be nonlinear
+");
+  return(RAAS);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring B   = 0,(x,y,z), ls;
+  poly f = -z5+y5+x2z+x2y;
+  def R = ArnoldAction(f);
+  setring R;
+  actionid;
+  stabid;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc StabOrder(list #)
+"USAGE:   StabOrder(f); poly f
+PURPOSE: compute the order of the stabilizer group of f.
+ASSUME:  f quasihomogeneous polynomial with an isolated singularity at 0
+RETURN:  int
+GLOBAL: varSubsList
+"
+{
+  list stab;
+
+  if(size(#) == 1) { stab = StabEqn(#[1]); }
+  else {  stab = #;}
+
+  def RSTO = stab[1];
+  setring(RSTO);
+  return(vdim(std(stabid)));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc StabEqn(poly f)
+"USAGE:   StabEqn(f); f polynomial
+PURPOSE: compute the equations of the isometry group of f.
+ASSUME:  f semiquasihomogeneous polynomial with an isolated singularity at 0
+RETURN:  list of two rings 'S1', 'S2'
+         - 'S1' contians the equations of the stabilizer (ideal 'stabid') @*
+         - 'S2' contains the action of the stabilizer (ideal 'actionid')
+EXAMPLE: example StabEqn; shows an example
+GLOBAL: varSubsList, contains the index j s.t. x(i) -> x(i)t(j) ...
+"
+{
+dbprint(dbPrt, "
+// 'StabEqn' created a list of 2 rings.
+// To see the rings, type (if the name of your list is stab):
+     show(stab);
+// To access the 1-st ring and map (and similair for the others), type:
+     def S1 = stab[1]; setring S1;  stabid;
+// S1/stabid is the coordinate ring of the variety of the
+// stabilizer, say G. If G x K^n --> K^n is the action of G on
+// K^n, then the ideal 'actionid' in the second ring describes
+// the dual map on the ring level.
+// To access the 2-nd ring and map (and similair for the others), type:
+     def S2 = stab[2]; setring S2;  actionid;
+");
+
+        return(StabEqnId(ideal(f), qhweight(f)));
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring B = 0,(x,y,z), ls;
+  poly f = -z5+y5+x2z+x2y;
+  list stab = StabEqn(f);
+  def S1 = stab[1]; setring S1;  stabid;
+  def S2 = stab[2]; setring S2;  actionid;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc StabEqnId(ideal data, intvec wt)
+"USAGE:   StabEqn(I, w); I ideal, w intvec
+PURPOSE: compute the equations of the isometry group of the ideal I,
+         each generator of I is fixed by the stabilizer.
+ASSUME:  I semiquasihomogeneous ideal w.r.t. 'w' with an isolated singularity at 0
+RETURN:  list of two rings 'S1', 'S2'
+         - 'S1' contians the equations of the stabilizer (ideal 'stabid') @*
+         - 'S2' contains the action of the stabilizer (ideal 'actionid')
+EXAMPLE: example StabEqnId; shows an example
+GLOBAL: varSubsList, contains the index j s.t. t(i) -> t(i)t(j) ...
+"
+{
+  int i, j, c, k, r, nrVars, offset, n, sln, dbPrt;
+  list Variables, rd, temp, sList, varSubsList;
+  poly mPoly;
+  string ringSTR, ringSTR1, varString, parString;
+
+  dbPrt = printlevel-voice+2;
+  dbprint(dbPrt, "StabilizerEquations of " + string(data));
+
+  export(varSubsList);
+  n = nvars(basering);
+  Variables = StabVar(wt);    // possible quasihomogeneous substitutions
+  nrVars = 0;
+  for(i = 1; i <= size(wt); i++)
+  {
+    nrVars = nrVars + size(Variables[i]);
+  }
+
+  // set the new basering needed for the substitutions
+
+  varString = "s(1.." + string(nrVars) + ")";
+  if(npars(basering) == 1)
+  {
+    parString = "(0, " + parstr(basering) + ")";
+  }
+  else { parString = "0"; }
+
+  def RSTB = basering;
+  mPoly = minpoly;
+  ringSTR = "ring RSTR = " + parString + ", (" + varstr(basering) + ", " + varString + "), dp;";  // dp
+        ringSTR1 = "ring RSTT = " + parString + ", (" + varString + ", " + varstr(basering) + "), dp;";
+
+  if(defined(RSTR)) { kill RSTR;}
+        if(defined(RSTT)) { kill RSTT;}
+        execute(ringSTR1);      // this ring is only used for the result, where the variables
+  export(RSTT);           // are s(1..m),t(1..n), as needed for Derksens algorithm (NullCone)
+  minpoly = number(imap(RSTB, mPoly));
+
+  execute(ringSTR);
+  export(RSTR);
+  minpoly = number(imap(RSTB, mPoly));
+  poly f, f1, g, h, vars, pp;      // f1 is the polynomial after subs,
+  ideal allEqns, qhsubs, actionid, stabid, J;
+  list ringList;          // all t(i)`s which do not appear in f1
+  ideal data = simplify(imap(RSTB, data), 2);
+
+  // generate the quasihomogeneous substitution map F
+
+  nrVars = 0;
+  offset = 0;
+  for(i = 1; i <= size(wt); i++)
+  {    // build the substitution t(i) -> ...
+    if(i > 1) { offset = offset + size(Variables[i - 1]); }
+    g = 0;
+    for(j = 1; j <= size(Variables[i]); j++)
+    {
+      pp = 1;
+      for(k = 2; k <= size(Variables[i][j]); k++)
+      {
+        pp = pp * var(Variables[i][j][k]);
+        if(Variables[i][j][k] == i) { varSubsList[i] = offset + j;}
+      }
+      g = g + s(offset + j) * pp;
+    }
+    qhsubs[i] = g;
+  }
+  dbprint(dbPrt, "  qhasihomogenous substituion =" + string(qhsubs));
+  map F = RSTR, qhsubs;
+  kill varSubsList;
+
+  // get the equations of the stabilizer by comparing coefficients
+  // in the equation f = F(f).
+
+  vars = RingVarProduct(Table("i", "i", 1, size(wt)));
+
+  allEqns = 0;
+
+  matrix newcoMx, coMx;
+  int d;
+  for(r = 1; r <= ncols(data); r++)
+  {
+
+  f = data[r];
+  f1 = F(f);
+  d = deg(f);
+  newcoMx = coef(f1, vars);        // coefficients of F(f)
+  coMx = coef(f, vars);          // coefficients of f
+
+  for(i = 1; i <= ncols(newcoMx); i++)
+  {      // build the system of eqns via coeff. comp.
+    j = 1;
+    h = 0;
+    while(j <= ncols(coMx))
+    {        // all monomials in f
+      if(coMx[j][1] == newcoMx[i][1]) { h = coMx[j][2]; j = ncols(coMx) + 1;}
+      else {j = j + 1;}
+    }
+    J = J, newcoMx[i][2] - h;        // add equation
+  }
+  allEqns =  allEqns, J;
+
+  }
+  allEqns = std(allEqns);
+
+  // simplify the equations, i.e., if s(i) in J then remove s(i) from J
+  // and from the basering
+
+  sList = SimplifyIdeal(allEqns, n, "s");
+  stabid = sList[1];
+  map phi = basering, sList[2];
+        sln = size(sList[3]) - n;
+
+  // change the substitution
+
+  actionid = phi(qhsubs);
+
+        // change to new ring, auxillary construction
+
+        setring(RSTT);
+        ideal actionid, stabid;
+
+        actionid = imap(RSTR, actionid);
+        stabid = imap(RSTR, stabid);
+        export(stabid);
+  export(actionid);
+  ringList[2] = RSTT;
+
+  dbprint(dbPrt, "  substitution = " + string(actionid));
+  dbprint(dbPrt, "  equations of stabilizer = " + string(stabid));
+
+  varString = "s(1.." + string(sln) + ")";
+  ringSTR = "ring RSTS = " + parString + ", (" + varString + "), dp;";
+  execute(ringSTR);
+  minpoly = number(imap(RSTB, mPoly));
+  ideal stabid = std(imap(RSTR, stabid));
+  export(stabid);
+  ringList[1] = RSTS;
+dbprint(dbPrt, "
+// 'StabEqnId' created a list of 2 rings.
+// To see the rings, type (if the name of your list is stab):
+     show(stab);
+// To access the 1-st ring and map (and similair for the others), type:
+     def S1 = stab[1]; setring S1;  stabid;
+// S1/stabid is the coordinate ring of the variety of the
+// stabilizer, say G. If G x K^n --> K^n is the action of G on
+// K^n, then the ideal 'actionid' in the second ring describes
+// the dual map on the ring level.
+// To access the 2-nd ring and map (and similair for the others), type:
+     def S2 = stab[2]; setring S2;  actionid;
+");
+  return(ringList);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring B   = 0,(x,y,z), ls;
+  ideal I = x2,y3,z6;
+  intvec w = 3,2,1;
+  list stab = StabEqnId(I, w);
+  def S1 = stab[1]; setring S1;  stabid;
+  def S2 = stab[2]; setring S2;  actionid;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static
+proc ArnoldFormMain(poly f, B, poly Fs, ideal reduceIdeal, int nrs, int nrt)
+"USAGE:   ArnoldFormMain(f, B, Fs, rI, nrs, nrt);
+   poly f,Fs; ideal B, rI; int nrs, nrt
+PURPOSE: compute the induced action of 'G_f' on T_, where f is the principal
+         part and 'Fs' is the semiuniversal unfolding of 'f' with x_i
+         substituted by actionid[i], 'B' is a list of upper basis monomials
+         for the milnor algebra of 'f', 'nrs' = number of variables for 'G_f'
+         and 'nrt' = dimension of T_
+ASSUME:  f is quasihomogeneous with an isolated singularity at 0,
+         s(1..r), t(1..m) are parameters of the basering
+RETURN:  poly
+EXAMPLE: example ArnoldAction; shows an example
+"
+{
+  int i, j, d, ub, dbPrt;
+  list upperBasis, basisDegList, gmonos, common, parts;
+  ideal jacobianId, jacobIdstd, mapId;    // needed for phi
+  intvec wt = weight(f);
+  matrix gCoeffMx;        // for lift command
+  poly newFs, g, gred, tt;        // g = sum of all monomials of degree d, gred is needed for lift
+  map phi;          // the map from Arnold's Theorem
+
+  dbPrt = printlevel-voice+2;
+  jacobianId = jacob(f);
+  jacobIdstd = std(jacobianId);
+  newFs = Fs;
+  for(i = 1; i <= size(B); i++)
+  {
+    basisDegList[i] = deg(B[i], wt);
+  }
+  ub = Max(basisDegList) + 1;          // max degree of an upper monomial
+
+  parts = MonosAndTerms(newFs - f, wt, ub);
+  gmonos = parts[1];
+  d = deg(f, wt);
+
+  for(i = d + 1; i < ub; i++)
+  {    // base[1] = monomials of degree i
+    upperBasis[i] = SelectMonos(list(B, B), wt, i);    // B must not contain 0's
+  }
+
+  // test if each monomial of Fs is contained in B, if not,
+  // compute a substitution via Arnold's theorem and substitutite
+  // it into newFs
+
+  for(i = d + 1; i < ub; i = i + 1)
+  {  // ub instead of @UB
+    dbprint(dbPrt, "-- degree = " + string(i) + " of " + string(ub - 1) + " ---------------------------");
+    if(size(newFs) < 80) { dbprint(dbPrt, "  polynomial = " + string(newFs - f));}
+    else {  dbprint(dbPrt, "  poly has deg (not weighted) " + string(deg(newFs)) + " and contains " + string(size(newFs)) + " monos");}
+
+    // select monomials of degree i and intersect them with upperBasis[i]
+
+    gmonos = SelectMonos(parts, wt, i);
+    common = IntersectionQHM(upperBasis[i][1], gmonos[1]);
+    if(size(common) == size(gmonos[1]))
+    {
+      dbprint(dbPrt, " no additional monomials ");
+    }
+
+    // other monomials than those in upperBasis occur, compute
+    // the map constructed in the proof of Arnold's theorem
+    // write g = c[i] * jacobianId[i]
+
+    else
+    {
+      dbprint(dbPrt, "  additional Monomials found, compute the map ");
+      g = PSum(gmonos[2]);      // sum of all monomials in g of degree i
+      dbprint(dbPrt, "  sum of degree " + string(i) + " is " + string(g));
+
+      gred = reduce(g, jacobIdstd);
+      gCoeffMx = lift(jacobianId, g - gred);    // compute c[i]
+      mapId = var(1) - gCoeffMx[1][1];    // generate the map
+      for(j = 2; j <= size(gCoeffMx); j++)
+      {
+        mapId[j] = var(j) - gCoeffMx[1][j];
+      }
+      dbprint(dbPrt, "  map = " + string(mapId));
+      // apply the map to newFs
+      newFs = APSubstitution(newFs, mapId, reduceIdeal, wt, ub, nrs, nrt);
+      parts = MonosAndTerms(newFs - f, wt, ub);  // monos and terms of deg < ub
+      newFs = PSum(parts[2]) + f;      // result of APS... is already reduced
+      dbprint(dbPrt, "  monomials of degree " + string(i));
+    }
+  }
+  return(newFs);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc MonosAndTerms(poly f, wt, int ub)
+"USAGE:   MonosAndTerms(f, w, ub); poly f, intvec w, int ub
+PURPOSE: returns a list of all monomials and terms occuring in f of
+         weighted degree < ub
+RETURN:  list
+         _[1]  list of monomials
+         _[2]  list of terms
+EXAMPLE: example MonosAndTerms shows an example
+"
+{
+  int i, k;
+  list monomials, terms;
+  poly mono, lcInv, data;
+
+  data = jet(f, ub - 1, wt);
+  k = 0;
+  for(i = 1; i <= size(data); i++)
+  {
+    mono = lead(data[i]);
+    if(deg(mono, wt) < ub)
+    {
+      k = k + 1;
+      lcInv = 1/leadcoef(mono);
+      monomials[k] = mono * lcInv;
+      terms[k] = mono;
+    }
+  }
+  return(list(monomials, terms));
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring B = 0,(x,y,z), lp;
+  poly f = 6*x2 + 2*x3 + 9*x*y2 + z*y + x*z6;
+  MonosAndTerms(f, intvec(2,1,1), 5);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc SelectMonos(parts, intvec wt, int d)
+"USAGE:   SelectMonos(parts, w, d); list/ideal parts, intvec w, int d
+PURPOSE: returns a list of all monomials and terms occuring in f of
+         weighted degree = d
+RETURN:  list
+         _[1]  list of monomials
+         _[2]  list of terms
+EXAMPLE: example SelectMonos; shows an example
+"
+{
+  int i, k;
+  list monomials, terms;
+  poly mono;
+
+  k = 0;
+  for(i = 1; i <= size(parts[1]); i++)
+  {
+    mono = parts[1][i];
+    if(deg(mono, wt) == d)
+    {
+      k++;
+      monomials[k] = mono;
+      terms[k] = parts[2][i];
+    }
+  }
+  return(list(monomials, terms));
+}
+example
+{"EXAMPLE:";  echo = 2;
+  ring B = 0,(x,y,z), lp;
+  poly f = 6*x2 + 2*x3 + 9*x*y2 + z*y + x*z6;
+  list mt =  MonosAndTerms(f, intvec(2,1,1), 5);
+  SelectMonos(mt, intvec(2,1,1), 4);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc Expand(substitution, degVec, ideal reduceI, intvec w1, int ub, list truncated)
+"USAGE:   Expand(substitution, degVec, reduceI, w, ub, truncated);
+         ideal/list substitution, list/intvec degVec, ideal reduceI, intvec w,
+         int ub, list truncated
+PURPOSE: substitute 'substitution' in the monomial given by the list of
+         exponents 'degVec', omit all terms of weighted degree > ub and reduce
+         the result w.r.t. 'reduceI'. If truncated[i] = 0 then the result is
+         stored for later use.
+RETURN:  poly
+NOTE:    used by APSubstitution
+GLOBAL:  computedPowers
+"
+{
+  int i, minDeg;
+  list powerList;
+  poly g, h;
+
+  // compute substitution[1]^degVec[1],...,subs[n]^degVec[n]
+
+  for(i = 1; i <= ncols(substitution); i++)
+  {
+    if(size(substitution[i]) < 3 || degVec[i] < 4)
+    {
+      powerList[i] = reduce(substitution[i]^degVec[i], reduceI); // new
+    }  // directly for small exponents
+    else
+    {
+      powerList[i] = PolyPower1(i, substitution[i], degVec[i], reduceI, w1, truncated[i], ub);
+    }
+  }
+  // multiply the terms obtained by using PolyProduct();
+  g = powerList[1];
+  minDeg = w1[1] * degVec[1];
+  for(i = 2; i <= ncols(substitution); i++)
+  {
+    g = jet(g, ub - w1[i] * degVec[i] - 1, w1);
+    h = jet(powerList[i], ub - minDeg - 1, w1);
+    g = PolyProduct(g, h, reduceI, w1, ub);
+    if(g == 0) { Print(" g = 0 "); break;}
+    minDeg = minDeg + w1[i] * degVec[i];
+  }
+  return(g);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc PolyProduct(poly g1, poly h1, ideal reduceI, intvec wt, int ub)
+"USAGE:   PolyProduct(g, h, reduceI, wt, ub); poly g, h; ideal reduceI,
+          intvec wt, int ub.
+PURPOSE: compute g*h and reduce it w.r.t 'reduceI' and omit terms of weighted
+         degree > ub.
+RETURN:  poly
+NOTE:    used by 'Expand'
+"
+{
+  int SUBSMAXSIZE = 3000;
+  int i, nrParts, sizeOfPart, currentPos, partSize, maxSIZE;
+  poly g, h, gxh, prodComp, @g2;    // replace @g2 by subst.
+
+  g = g1;
+  h = h1;
+
+  if(size(g)*size(h) > SUBSMAXSIZE)
+  {
+    // divide the polynomials with more terms in parts s.t.
+    // the product of each part with the other polynomial
+    // has at most SUBMAXSIZE terms
+
+    if(size(g) < size(h)) { poly @h = h; h = g; g = @h;@h = 0; }
+    maxSIZE = SUBSMAXSIZE / size(h);
+    //print(" SUBSMAXSIZE = "+string(SUBSMAXSIZE)+" exceeded by "+string(size(g)*size(h)) + ", maxSIZE = ", string(maxSIZE));
+    nrParts = size(g) / maxSIZE + 1;
+    partSize = size(g) / nrParts;
+    gxh = 0;  // 'g times h'
+    for(i = 1; i <= nrParts; i++)
+    {
+      //print(" loop #" + string(i) + " of " + string(nrParts));
+      currentPos = (i - 1) * partSize;
+      if(i < nrParts) {sizeOfPart = partSize;}
+      else { sizeOfPart = size(g) - (nrParts - 1) * partSize; print(" last #" + string(sizeOfPart) + " terms ");}
+      prodComp = g[currentPos + 1..sizeOfPart + currentPos] * h;  // multiply a part
+      @g2 = jet(prodComp, ub - 1, wt);  // eventual reduce ...
+      if(size(@g2) < size(prodComp)) { print(" killed " + string(size(prodComp) - size(@g2)) + " terms ");}
+      gxh =  reduce(gxh + @g2, reduceI);
+    }
+  }
+  else
+  {
+    gxh = reduce(jet(g * h,ub - 1, wt), reduceI);
+  }  // compute directly
+  return(gxh);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc PolyPower1(int varIndex, poly f, int e, ideal reduceI, intvec wt,
+                       int truncated, int ub)
+"USAGE:   PolyPower1(i, f, e, reduceI, wt, truncated, ub);int i, e, ub;poly f;
+         ideal reduceI; intvec wt; list truncated;
+PURPOSE: compute f^e, use previous computations if possible, and reduce it
+         w.r.t reudecI and omit terms of weighted degree > ub.
+RETURN:  poly
+NOTE:    used by 'Expand'
+GLOBAL:  'computedPowers'
+"
+{
+  int i, ordOfg, lb, maxPrecomputedPower;
+  poly g, fn;
+
+  if(e == 0) { return(1);}
+  if(e == 1) { return(f);}
+  if(f == 0) { return(1); }
+  else
+  {
+    // test if f has been computed to some power
+    if(computedPowers[varIndex][1] > 0)
+    {
+      maxPrecomputedPower = computedPowers[varIndex][1];
+      if(maxPrecomputedPower >= e)
+      {
+        // no computation necessary, f^e has already benn computed
+        g = computedPowers[varIndex][2][e - 1];
+        //Print("No computation, from list : g = elem [", varIndex, ", 2, ", e - 1, "]");
+        lb = e + 1;
+      }
+      else {  // f^d computed, where d < e
+        g = computedPowers[varIndex][2][maxPrecomputedPower - 1];
+        ordOfg = maxPrecomputedPower * wt[varIndex];
+        lb = maxPrecomputedPower + 1;
+      }
+    }
+    else
+    {    // no precomputed data
+      lb = 2;
+      ordOfg = wt[varIndex];
+      g = f;
+    }
+    for(i = lb; i <= e; i++)
+    {
+      fn = jet(f, ub - ordOfg - 1, wt); // reduce w.r.t. reduceI
+      g = PolyProduct(g, fn, reduceI, wt, ub);
+      ordOfg = ordOfg + wt[varIndex];
+      if(g == 0) { break; }
+      if((i > maxPrecomputedPower) && !truncated)
+      {
+        if(maxPrecomputedPower == 0)
+	{  // init computedPowers
+          computedPowers[varIndex] = list(i, list(g));
+        }
+        computedPowers[varIndex][1] = i;  // new degree
+        computedPowers[varIndex][2][i - 1] = g;
+        maxPrecomputedPower = i;
+      }
+    }
+  }
+  return(g);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc RingVarsToList(list @index)
+{
+  int i;
+  list temp;
+
+  for(i = 1; i <= size(@index); i++) { temp[i] = string(var(@index[i])); }
+  return(temp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static
+proc APSubstitution(poly f, ideal substitution, ideal reduceIdeal, intvec wt, int ub, int nrs, int nrt)
+"USAGE:   APSubstitution(f, subs, reduceI, w, ub, int nrs, int nrt); poly f
+         ideal subs, reduceI, intvec w, int ub, nrs, nrt;
+         nrs = number of parameters s(1..nrs),
+         nrt = number of parameters t(1..nrt)
+PURPOSE: substitute 'subs' in f, omit all terms with weighted degree > ub and
+         reduce the result w.r.t. 'reduceI'.
+RETURN:  poly
+GLOBAL:  'computedPowers'
+"
+{
+  int i, j, k, d, offset;
+  int n = nvars(basering);
+  list  coeffList, parts, degVecList, degOfMonos;
+  list computedPowers, truncatedQ, degOfSubs, @temp;
+  string ringSTR, @ringVars;
+
+  export(computedPowers);
+
+  // store arguments in strings
+
+  def RASB = basering;
+
+  parts = MonosAndTerms(f, wt, ub);
+  for(i = 1; i <= size(parts[1]); i = i + 1)
+  {
+    coeffList[i] = parts[2][i]/parts[1][i];
+    degVecList[i] = leadexp(parts[1][i]);
+    degOfMonos[i] = deg(parts[1][i], wt);
+  }
+
+  // built new basering with no parameters and order dp !
+  // the parameters of the basering are appended to
+  // the variables of the basering !
+  // set ideal mpoly = minpoly for reduction !
+
+  @ringVars = "(" + varstr(basering) + ", " + parstr(1) + ",";  // precondition
+  if(nrs > 0)
+  {
+    @ringVars = @ringVars + "s(1.." + string(nrs) + "), ";
+  }
+  @ringVars = @ringVars + "t(1.." + string(nrt) + "))";
+  ringSTR = "ring RASR = 0, " + @ringVars + ", dp;";    // new basering
+
+  // built the "reduction" ring with the reduction ideal
+
+  execute(ringSTR);
+  export(RASR);
+  ideal reduceIdeal, substitution, newSubs;
+  intvec w1, degVec;
+  list minDeg, coeffList, degList;
+  poly f, g, h, subsPoly;
+
+  w1 = wt;            // new weights
+  offset = nrs + nrt + 1;
+  for(i = n + 1; i <= offset + n; i = i + 1) { w1[i] = 0; }
+
+  reduceIdeal = std(imap(RASB, reduceIdeal)); // omit later !
+  coeffList = imap(RASB, coeffList);
+  substitution = imap(RASB, substitution);
+
+  f = imap(RASB, f);
+
+  for(i = 1; i <= n; i++)
+  {      // all "base" variables
+    computedPowers[i] = list(0);
+    for(j = 1; j <= size(substitution[i]); j++) { degList[j] = deg(substitution[i][j], w1);}
+    degOfSubs[i] = degList;
+  }
+
+  // substitute in each monomial seperately
+
+  g = 0;
+  for(i = 1; i <= size(degVecList); i++)
+  {
+    truncatedQ = Table("0", "i", 1, n);
+    newSubs = 0;
+    degVec = degVecList[i];
+    d = degOfMonos[i];
+
+    // check if some terms in the substitution can be omitted
+    // degVec = list of exponents of the monomial m
+    // minDeg[j] denotes the weighted degree of the monomial m'
+    // where m' is the monomial m without the j-th variable
+
+    for(j = 1; j <= size(degVec); j++) { minDeg[j] = d - degVec[j] * wt[j]; }
+
+    for(j = 1; j <= size(degVec); j++)
+    {
+      subsPoly = 0;      // set substitution to 0
+      if(degVec[j] > 0)
+      {
+        // if variable occurs then check if
+        // substitution[j][k] * (linear part)^(degVec[j]-1) + minDeg[j] < ub
+        // i.e. look for the smallest possible combination in subs[j]^degVec[j]
+        // which comes from the term substitution[j][k]. This term is multiplied
+        // with the rest of the monomial, which has at least degree minDeg[j].
+        // If the degree of this product is < ub then substitution[j][k] contributes
+        // to the result and cannot be omitted
+
+        for(k = 1; k <= size(substitution[j]); k++)
+	{
+          if(degOfSubs[j][k] + (degVec[j] - 1) * wt[j] + minDeg[j]  < ub)
+	  {
+            subsPoly = subsPoly + substitution[j][k];
+          }
+        }
+      }
+      newSubs[j] = subsPoly;        // set substitution
+      if(substitution[j] - subsPoly != 0) { truncatedQ[j] = 1;}  // mark that substitution[j] is truncated
+    }
+    h = Expand(newSubs, degVec, reduceIdeal, w1, ub, truncatedQ) * coeffList[i];  // already reduced
+    g = reduce(g + h, reduceIdeal);
+  }
+  kill computedPowers;
+  setring RASB;
+  poly fnew = imap(RASR, g);
+  kill RASR;
+  return(fnew);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc StabVar(intvec wt)
+"USAGE:   StabVar(w); intvec w
+PURPOSE: compute the indicies for quasihomogeneous substitutions of each
+         variable.
+ASSUME:  f semiquasihomogeneous polynomial with an isolated singularity at 0
+RETURN:  list
+         _[i]  list of combinations for var(i) (i must be appended
+         to each comb)
+GLOBAL:  'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
+"
+{
+  int i, j, k, uw, ic;
+  list varList, Variables, subs;
+  string str, varString;
+
+  varList = StabVarComb(wt);
+  for(i = 1; i <= size(wt); i = i + 1)
+  {
+    subs = 0;
+    // built linear substituitons
+    for(j = 1; j <= size(varList[1][i]); j++)
+    {
+      subs[j] = list(i) + list(varList[1][i][j]);
+    }
+    Variables[i] = subs;
+    if(size(varList[2][i]) > 0)
+    {
+      // built nonlinear substituitons
+      subs = 0;
+      for(j = 1; j <= size(varList[2][i]); j++)
+      {
+        subs[j] = list(i) + varList[2][i][j];
+      }
+      Variables[i] = Variables[i] + subs;
+    }
+  }
+  return(Variables);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc StabVarComb(intvec wt)
+"USAGE:   StabVarComb(w); intvec w
+PURPOSE: list all possible indices of indeterminates for a quasihom. subs.
+RETURN:  list
+         _[1] linear substitutions
+         _[2] nonlinear substiutions
+GLOBAL: 'varSubsList', contains the index j s.t. x(i) -> x(i)t(j) ...
+"
+{
+  int mmi, mma, ii, j, k, uw, ic;
+  list index, indices, usedWeights, combList, combinations;
+  list linearSubs, nonlinearSubs;
+  list partitions, subs, temp;        // subs[i] = substitution for var(i)
+
+  linearSubs = Table("0", "i", 1, size(wt));
+  nonlinearSubs = Table("0", "i", 1, size(wt));
+
+  uw = 0;
+  ic = 0;
+  mmi = Min(wt);
+  mma = Max(wt);
+
+  for(ii = mmi; ii <= mma; ii++)
+  {
+    if(containedQ(wt, ii))
+    {    // find variables of weight ii
+      k = 0;
+      index = 0;
+      // collect the indices of all variables of weight i
+      for(j = 1; j <= size(wt); j++)
+      {
+        if(wt[j] == ii)
+        {
+          k++;
+          index[k] = j;
+        }
+      }
+      uw++;
+      usedWeights[uw] = ii;
+      ic++;
+      indices[ii] = index;
+
+      // linear part of the substitution
+
+      for(j = 1; j <= size(index); j++)
+      {
+        linearSubs[index[j]] = index;
+      }
+
+      // nonlinear part of the substitution
+
+      if(uw > 1)
+      {    // variables of least weight do not allow nonlinear subs.
+
+        partitions = Partitions(ii, delete(usedWeights, uw));
+        for(j = 1; j <= size(partitions); j++)
+        {
+          combinations[j] = AllCombinations(partitions[j], indices);
+        }
+        for(j = 1; j <= size(index); j++)
+        {
+          nonlinearSubs[index[j]] = FlattenQHM(combinations);   // flatten one level !
+        }
+      }
+    }
+  }
+  "type of i:", typeof(i);
+  combList[1] = linearSubs;
+  combList[2] = nonlinearSubs;
+  return(combList);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc AllCombinations(list partition, list indices)
+"USAGE:   AllCombinations(partition,indices); list partition, indices)
+PURPOSE: all combinations for a given partititon
+RETURN:  list
+GLOBAL: varSubsList, contains the index j s.t. x(i) -> x(i)t(j) ...
+"
+{
+  int i, k, m, ok, p, offset;
+  list nrList, indexList;
+
+  k = 0;
+  offset = 0;
+  i = 1;
+  ok = 1;
+  m = partition[1];
+  while(ok)
+  {
+    if(i > size(partition))
+    {
+      ok = 0;
+      p = 0;
+    }
+    else { p = partition[i];}
+    if(p == m) { i = i + 1;}
+    else
+    {
+      k = k + 1;
+      nrList[k] = i - 1 - offset;
+      offset = offset + i - 1;
+      indexList[k] = indices[m];
+      if(ok) { m = partition[i];}
+    }
+  }
+  return(AllCombinationsAux(nrList, indexList));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc AllSingleCombinations(int n, list index)
+"USAGE:   AllSingleCombinations(n index); int n, list index
+PURPOSE: all combinations for var(n)
+RETURN:  list
+"
+{
+  int i, j, k;
+  list comb, newC, temp, newIndex;
+
+  if(n == 1)
+  {
+    for(i = 1; i <= size(index); i++)
+    {
+      temp = index[i];
+      comb[i] = temp;
+    }
+    return(comb);
+  }
+  if(size(index) == 1)
+  {
+    temp = Table(string(index[1]), "i", 1, n);
+    comb[1] = temp;
+    return(comb);
+  }
+  newIndex = index;
+  for(i = 1; i <= size(index); i = i + 1)
+  {
+    if(i > 1) { newIndex = delete(newIndex, 1); }
+    newC = AllSingleCombinations(n - 1, newIndex);
+    k = size(comb);
+    temp = 0;
+    for(j = 1; j <= size(newC); j++)
+    {
+      temp[1] = index[i];
+      temp = temp + newC[j];
+      comb[k + j] = temp;
+      temp = 0;
+    }
+  }
+  return(comb);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc AllCombinationsAux(list parts, list index)
+"USAGE:  AllCombinationsAux(parts ,index); list parts, index
+PURPOSE: all compbinations for nonlinear substituiton
+RETURN:  list
+"
+{
+  int i, j, k;
+  list comb, firstC, restC;
+
+  if(size(parts) == 0 || size(index) == 0) { return(comb);}
+
+  firstC = AllSingleCombinations(parts[1], index[1]);
+  restC = AllCombinationsAux(delete(parts, 1), delete(index, 1));
+
+  if(size(restC) == 0) { comb = firstC;}
+  else
+  {
+    for(i = 1; i <= size(firstC); i++)
+    {
+      k = size(comb);
+      for(j = 1; j <= size(restC); j++)
+      {
+        //elem = firstC[i] + restC[j];
+        // comb[k + j] = elem;
+        comb[k + j] = firstC[i] + restC[j];
+      }
+    }
+  }
+  return(comb);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc Partitions(int n, list nr)
+"USAGE:   Partitions(n, nr); int n, list nr
+PURPOSE: partitions of n consisting of elements from nr
+RETURN:  list
+"
+{
+  int i, j, k;
+  list parts, temp, restP, newP, decP;
+
+  if(size(nr) == 0) { return(list());}
+  if(size(nr) == 1)
+  {
+    if(NumFactor(nr[1], n) > 0)
+    {
+      parts[1] = Table(string(nr[1]), "i", 1, NumFactor(nr[1], n));
+    }
+    return(parts);
+  }
+  else
+  {
+    parts =  Partitions(n, nr[1]);
+    restP = Partitions(n, delete(nr, 1));
+
+    parts = parts + restP;
+    for(i = 1; i <= n / nr[1]; i = i + 1)
+    {
+      temp = Table(string(nr[1]), "i", 1, i);
+      decP = Partitions(n - i*nr[1], delete(nr, 1));
+      k = size(parts);
+      for(j = 1; j <= size(decP); j++)
+      {
+        newP = temp + decP[j];        // new partition
+        if(!containedQ(parts, newP, 1))
+	{
+          k = k + 1;
+          parts[k] = newP;
+        }
+      }
+    }
+  }
+  return(parts);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc NumFactor(int a, int b)
+" USAGE: NumFactor(a, b); int a, b
+PURPOSE: if b divides a then return b/a, else return 0
+RETURN:  int
+"
+{
+  int c = int(b/a);
+  if(c*a == b) { return(c); }
+  else {return(0)}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc Table(string cmd, string iterator, int lb, int ub)
+" USAGE: Table(cmd,i, lb, ub); string cmd, i; int lb, ub
+PURPOSE: generate a list of size ub - lb + 1 s.t. _[i] = cmd(i)
+RETURN:  list
+"
+{
+  list data;
+  execute("int " + iterator + ";");
+
+  for(int @i = lb; @i <= ub; @i++)
+  {
+    execute(iterator + " = " + string(@i));
+    execute("data[" + string(@i) + "] = " + cmd + ";");
+  }
+  return(data);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc FlattenQHM(list data)
+" USAGE: FlattenQHM(n, nr); list data
+PURPOSE: flatten the list (one level) 'data', which is a list of lists
+RETURN:  list
+"
+{
+  int i, j, c;
+  list fList, temp;
+
+  c = 1;
+
+  for(i = 1; i <= size(data); i++)
+  {
+    for(j = 1; j <= size(data[i]); j++)
+    {
+      fList[c] = data[i][j];
+      c = c + 1;
+    }
+  }
+  return(fList);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc IntersectionQHM(list l1, list l2)
+// Type : list
+// Purpose : Intersection of l1 and l2
+{
+  list l;
+  int b, c;
+
+  c = 1;
+
+  for(int i = 1; i <= size(l1); i++)
+  {
+    b = containedQ(l2, l1[i]);
+    if(b == 1)
+    {
+      l[c] = l1[i];
+      c++;
+    }
+  }
+  return(l);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc FirstEntryQHM(data, elem)
+// Type : int
+// Purpose : position of first entry equal to elem in data (from left to right)
+{
+  int i, pos;
+
+  i = 0;
+  pos = 0;
+  while(i < size(data))
+  {
+    i++;
+    if(data[i] == elem) { pos = i; break;}
+  }
+  return(pos);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc PSum(e)
+{
+  poly f;
+  for(int i = size(e);i>=1;i--)
+  {
+    f = f + e[i];
+  }
+  return(f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc Max(data)
+"USAGE:   Max(data); intvec/list of integers
+PURPOSE: find the maximal integer contained in 'data'
+RETURN:  list
+ASSUME:  'data' contians only integers and is not empty
+"
+{
+  int i;
+  int max = data[1];
+
+  for(i = size(data); i>1;i--)
+  {
+    if(data[i] > max) { max = data[i]; }
+  }
+  return(max);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  Max(list(1,2,3));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc Min(data)
+"USAGE:   Min(data); intvec/list of integers
+PURPOSE: find the minimal integer contained in 'data'
+RETURN:  list
+ASSUME:  'data' contians only integers and is not empty
+"
+{
+  int i;
+  int min = data[1];
+
+  for(i = size(data);i>1; i--)
+  {
+    if(data[i] < min) { min = data[i]; }
+  }
+  return(min);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  Min(intvec(1,2,3));
+}
+
+///////////////////////////////////////////////////////////////////////////////

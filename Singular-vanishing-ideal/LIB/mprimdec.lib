@@ -1,0 +1,2370 @@
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+// mprimdec.lib
+// algorithms for primary decomposition for modules based on
+// the algorithms of Gianni, Trager and Zacharias and
+// Shimoyama and Yokoyama (generalization of the latter
+// suggested by Hans-Gert Gräbe, Leipzig  )
+// using elments of primdec.lib
+// written by Alexander Dreyer
+//
+// $Log: not supported by cvs2svn $
+// Revision 1.6  2006/07/25 17:54:27  Singular
+// *hannes: Michael C.
+//
+// Revision 1.5  2005/04/28 09:22:17  Singular
+// *hannes/lossen: new ring.lib
+//
+// Revision 1.4  2001/08/27 14:47:54  Singular
+// *hannes: merge-2-0-2
+//
+// Revision 1.3  2001/07/10 11:49:19  dreyer
+// + changed commands factor to factorize(...,2), idealsEqual to modulesEqual
+//   minAssPrimes to minAssGTZ;  minAssChar;
+//
+//
+///////////////////////////////////////////////////////////////////////////////
+
+version="$Id$";
+category="Commutative Algebra";
+
+info="
+LIBRARY: mprimdec.lib   PROCEDURES FOR PRIMARY DECOMPOSITION OF MODULES
+AUTHORS:  Alexander Dreyer, dreyer@mathematik.uni-kl.de; adreyer@web.de
+
+REMARK:
+These procedures are implemented to be used in characteristic 0.
+@*They also work in positive characteristic >> 0.
+@*In small characteristic and for algebraic extensions, the
+procedures via Gianni, Trager, Zacharias may not terminate.
+
+PROCEDURES:
+  separator(l);                computes a list of separators of prime ideals
+  PrimdecA(N[,i]);             (not necessarily minimal) primary decomposition
+                               via Shimoyama/Yokoyama (suggested by Graebe)
+  PrimdecB(N,p);               (not necessarily minimal) primary decomposition
+                               for pseudo-primary ideals
+  modDec(N[,i]);               minimal primary decomposition
+                               via Shimoyama/Yokoyama (suggested by Graebe)
+  zeroMod(N[,check]);          minimal zero-dimensional primary decomposition
+                               via Gianni, Trager and Zacharias
+  GTZmod(N[,check]);           minimal primary decomposition
+                               via Gianni, Trager and Zacharias
+  dec1var(N[,check[,ann]]);    primary decomposition for one variable
+  annil(N);                    the annihilator of M/N in the basering
+  splitting(N[,check[,ann]]);  splitting to simpler modules
+  primTest(i[,p]);             tests whether i is prime or homogeneous
+  preComp(N,check[,ann]);      enhanced Version of splitting
+  indSet(i);                   lists with varstrings of(in)dependend variables
+  GTZopt(N[,check[,ann]]);     a faster version of GTZmod
+  zeroOpt(N[,check[,ann]]);    a faster version of zeroMod
+";
+
+LIB "primdec.lib";
+LIB "ring.lib";
+
+
+/////////////////////////////////////////////////////////////////////////////
+// separator(l)
+// computes a list of separators for a list of prime ideals
+// it in a generalization of parts of pseudo_prim_dec_i from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+proc separator (list @L)
+"USAGE:   separator(l); list l of prime ideals
+RETURN:  list sepList;
+         a list of separators of the prime ideals in l,
+         i.e. polynomials p_ij, s.th. p_ij is in l[j],
+         for all l[j] not contained in l[i]
+         but p_ij is not in l[i]
+EXAMPLE: example separator; shows an example
+"
+
+{
+  ideal p_ij;                        // generating p_ij in @L[@j], not in @L[@i]
+  list f_i;                        // generating f_i NOT in @L[@i], but in all @L[@j]
+  int @i,@j,@k;
+  int sizeL=size(@L);
+  poly @tmp;
+
+  for(@i=1;@i<=sizeL;@i++)
+  {
+    p_ij=0;
+
+    @L[@i]=std(@L[@i]);
+    for(@j=1;@j<=sizeL;@j++)            // compute the separator sep_i
+                                        // of the i-th component
+                                        // f_i separates {Pj not incl in Pi} from Pi
+    {
+      if (@i!=@j)                       // searching for g: not in @L[@i], but @L[@j]
+      {
+        for(@k=1;@k<=ncols(@L[@j]);@k++)
+        {
+          if(NF(@L[@j][@k],@L[@i],1)!=0)
+          {
+            p_ij=p_ij+@L[@j][@k];
+            break;
+          }
+        }
+      }
+    }
+  @tmp=lcm(p_ij);
+  if(@tmp==0)
+  {
+    @tmp=1;
+  }
+  f_i=f_i+list(@tmp);
+  }
+  return(f_i);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  ideal i=(x2y,xz2,y2z,z3);
+  list l=minAssGTZ(i);
+  list sepL=separator(l);
+  sepL;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// PrimdecA(N[,i])
+// computes a primary decomposition, not necessarily minimal,
+// using a generalization of the algorithm of Shimoyama/Yokoyama,
+// suggested by Hans-Gerd Graebe, Leipzig
+// [Hans-Gert Graebe, Minimal Primary Decompostion
+//  and Factorized Groebner Bases, AAECC 8, 265-278 (1997)]
+/////////////////////////////////////////////////////////////////////////////
+
+
+proc PrimdecA(module @N, list #)
+"USAGE:   PrimdecA (N[, i]); module N, int i
+RETURN:  list l
+         a (not necessarily minimal) primary decomposition of N
+         computed by a generalized version of the algorithm of Shimoyama/Yokoyama,
+         @*if i!=0 is given, the factorizing Groebner is used to compute the
+         isolated primes
+EXAMPLE: example PrimdecA; shows an example
+"
+
+{
+  module @M=freemodule(nrows(@N));        // @M=basering^k
+  ideal ann=annil(@N);                    // the annihilator of @N
+  ////////////////////////////////////////////////////////////////
+  // in the trivial case we avoid to compute anything
+  ////////////////////////////////////////////////////////////////
+  if (ann[1]==1)
+  {
+    return(list());
+  }
+  ////////////////////////////////////////////////////////////////
+  // Computation of the Associated Primes
+  ////////////////////////////////////////////////////////////////
+  if (ann[1]==0)
+  {
+    list pr=list(ideal(0));
+  }
+  else
+  {
+    if( (size(#)>0) ){
+      list pr = minAssChar(ann);   // causes message  "/ ** redefining @res **"
+    }
+    else{
+      list pr = minAssGTZ(ann);
+    }
+  }
+
+  list sp, pprimary;     // the separators and the pseudo-primary modules
+  int @i;
+  ideal rest;            // for the computation of the remaining components
+  sp=separator(pr);
+  int sizeSp=size(sp);   // the number of separators
+
+  ////////////////////////////////////////////////////////////////
+  // Computation of the pseudo-primary modules
+  // and an ideal rest s.th. @N is the intersection of the
+  // pseudo-primary modules and @N+rest*@M
+  ////////////////////////////////////////////////////////////////
+  for(@i=1;@i<=sizeSp;@i++)
+  {
+    pprimary=pprimary+list(sat(@N,sp[@i]));
+    rest=rest+sp[@i]^pprimary[@i][2];
+  }
+  list result;           // a primary decomposition of @N
+
+  ////////////////////////////////////////////////////////////////
+  // Extraction of the pseudo-primary modules
+  ////////////////////////////////////////////////////////////////
+  for (@i=1;@i<=size(pprimary);@i++)
+  {
+   result=result+PrimdecB(pprimary[@i][1],pr[@i]);
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Computation of remaining components
+  ////////////////////////////////////////////////////////////////
+  result=result+PrimdecA(@N+rest*@M);
+
+  return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  module N=x*gen(1)+ y*gen(2),
+           x*gen(1)-x2*gen(2);
+  list l=PrimdecA(N);
+  l;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// PrimdecB(N, p)
+// computes a primary decomposition, not necessarily minimal,
+// of a pseudo-primary module N with isolated prime p
+// it is based on extraction in primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+proc PrimdecB(module @N, ideal isoPrim)
+"USAGE:   PrimdecB (N, p); pseudo-primary module N, isolated prime ideal p
+RETURN:  list l
+         a (not necessarily minimal) primary decomposition of N
+EXAMPLE: example PrimdecB; shows an example
+"
+
+{
+  module @M=freemodule(nrows(@N));        // @M=basering^k
+  ideal ann=annil(@N);                    // the annihilator of @N
+
+  ////////////////////////////////////////////////////////////////
+  // the not-that-trivial case of ann==0
+  ////////////////////////////////////////////////////////////////
+  if(size(ann)==0)
+  {
+    def BAS=basering;
+    execute("ring Rloc=("+charstr(basering)+","+varstr(basering)+"),dummy,("+ordstr(basering)+");");
+    module @N=imap(BAS, @N);
+    poly @q=prepareSat(@N);
+
+    setring BAS;
+    poly @q=imap(Rloc, @q);
+    list satu=sat(@N,@q);
+    if(satu[2]==0)
+    {
+      return(list(list(@N,ideal(0))));
+    }
+    else
+    {
+      return(list(list(satu[1],ideal(0)))+ PrimdecA(@N+(@q^satu[2])*@M));
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Extraction of the isolated component @N' and
+  // searching for a polynomial @f of minimal degree
+  // s.th. @N=intersect(@N', @N+@f*@M)
+  ////////////////////////////////////////////////////////////////
+  list indSets=indepSet(ann,0);
+  poly @f;
+  if(size(indSets)!=0)           //check, whether dim isoPrim !=0
+  {
+    intvec indVec;               // a maximal independent set of variables
+                                 // modulo isoPrim
+    string @U;                   // the independent variables
+    string @A;                   // the dependent variables
+    int @j,@k;
+    int szA;                     //  the size of @A
+    int degf;
+    ideal @g;
+    list polys;
+    int sizePolys;
+    list newPoly;
+
+    ////////////////////////////////////////////////////////////////
+    // the preparation of the quotient ring
+    ////////////////////////////////////////////////////////////////
+    def BAS=basering;
+    for (@k=1;@k<=size(indSets);@k++)
+    {
+      indVec=indSets[@k];
+      for (@j=1;@j<=nvars(BAS);@j++)
+      {
+        if (indVec[@j]==1)
+        {
+          @U=@U+varstr(@j)+",";
+        }
+        else
+        {
+          @A=@A+varstr(@j)+",";
+          szA++;
+        }
+      }
+
+      @U[size(@U)]=")";           // we compute the extractor (w.r.t. @U)
+      execute("ring RAU="+charstr(basering)+",("+@A+@U+",(C,dp("+string(szA)+"),dp);");
+      module @N=std(imap(BAS,@N));
+                                  // this is also a standard basis in (R[U])[A]
+      @A[size(@A)]=")";
+      execute("ring Rloc=("+charstr(basering)+","+@U+",("+@A+",(C,dp);");
+      ideal @N=imap(RAU,@N);
+      ideal @h;
+      for(@j=ncols(@N);@j>=1;@j--)
+      {
+        @h[@j]=leadcoef(@N[@j]);  // consider I in (R(U))[A]
+      }
+      setring BAS;
+      @g=imap(Rloc,@h);
+      kill RAU,Rloc;
+      @U="";
+      @A="";
+      szA=0;
+      @f=lcm(@g);
+      newPoly[1]=@f;
+      polys=polys+newPoly;
+      newPoly=list();
+    }
+    @f=polys[1];
+    degf=deg(@f);
+    sizePolys=size(polys);
+    for (@k=2;@k<=sizePolys;@k++)
+    {
+      if (deg(polys[@k])<degf)
+      {
+        //Wählt das poly mit dem geringsten Grad.
+        @f=polys[@k];
+        degf=deg(@f);
+      }
+    }
+  }
+  else
+  {
+    @f=1;
+  }
+  if(@f!=1)
+  {
+    list satu = minSatMod(@N,@f);
+    return(list(list(satu[1],isoPrim))+ PrimdecA(@N+satu[2]*@M));
+    //    list satu = sat(@N,@f);
+    //return(list(list(satu[1],isoPrim))+ PrimdecA(@N+@f^satu[2]*@M));
+  }
+  else
+  {
+    return(list(list(@N,isoPrim)));
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  module N=y*gen(1),y2*gen(2),yz*gen(2),yx*gen(2);
+  ideal p=y;
+  list l=PrimdecB(N,p);
+  l;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// modDec(N[,i])
+// extracts a minimal primary decomposition from the
+// primary decomposition computed by PrimdecA(N[, i])
+// using a Minimality Test suggested by Hans-Gerd Graebe, Leipzig
+/////////////////////////////////////////////////////////////////////////////
+
+proc modDec(module @N, list #)
+"USAGE:   modDec (N[, i]); module N, int i
+RETURN:  list l
+         a minimal primary decomposition of N
+         computed by an generalized version of the algorithm of Shimoyama/Yokoyama,
+         @*if i=1 is given, the factorizing Groebner basis algorithm is used internally.
+EXAMPLE: example modDec; shows an example
+"
+{
+  list prim = PrimdecA(@N, #);
+  int @i,@j,@k,@l;
+  int sizePrim=size(prim);
+
+  ////////////////////////////////////////////////////////////////
+  // the trivial case
+  ////////////////////////////////////////////////////////////////
+  if (sizePrim==0)
+  {
+    return(list(list(@N, ideal(1))));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // collect primary components with the same associated prime
+  // and substitute them by their intersection
+  ////////////////////////////////////////////////////////////////
+  for(@i=1;@i<=sizePrim;@i++)
+  {
+    for(@j=@i+1;@j<=sizePrim;@j++)
+    {
+      if (@j!=@i)
+      {
+        if (modulesEqual(prim[@i][2],prim[@j-@l][2])==1)
+        {
+          prim[@i][1]=intersect(prim[@i][1],prim[@j-@l][1]);
+          prim=delete(prim,@j-@l);
+          @l++;
+          sizePrim--;
+        }
+      }
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // minimality test suggested by Graebe:
+  // if f separates the prime p from the primes not contained in p,
+  // then p is not in Ass(M/N) <=> sat(N,f)=sat(sat(N,f),p)
+  ////////////////////////////////////////////////////////////////
+  list tempList;
+  for(@i=1;@i<=sizePrim;@i++)
+  {
+    tempList=tempList+list(prim[@i][2]);
+  }
+  list sepPrimes=separator(tempList);   // the separators of the primes
+  tempList=list();
+  for(@i=1;@i<=sizePrim;@i++)     // compute sat(N,f), for all separators f
+  {
+    tempList=tempList+list(sat(@N,sepPrimes[@i])[1]);
+  }
+  module testMod;
+  @k=0;
+  for(@i=1;@i<=sizePrim;@i++)
+  {
+    testMod=sat(tempList[@i],prim[@i-@k][2])[1];  // computes sat(sat(N,f),p)
+    if (size(NF(testMod,std(tempList[@i]),1))==0) // tests if equal to sat(N,f)
+    {
+      prim=delete(prim,@i-@k);                    // if yes: the component
+      @k++;                                       // is superfluous
+    }
+  }
+
+  return(prim);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  module N=x*gen(1)+ y*gen(2),
+           x*gen(1)-x2*gen(2);
+  list l=modDec(N);
+  l;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// zeroMod (N[, check])
+// computes a minimal primary decomposition of a zero-dimensional Module
+// using a generalized version of the algorithm of
+// Gianni, Trager and Zacharias, suggested by Alexander Dreyer
+// [Diploma Thesis, University of Kaiserslautern, 2001]
+/////////////////////////////////////////////////////////////////////////////
+
+proc zeroMod (module @N, list #)
+"USAGE:   zeroMod (N[, check]); zero-dimensional module N[, module check]
+RETURN:  list l
+         the minimal primary decomposition of a zero-dimensional module N,
+         computed by a generalized version of the algorithm of Gianni, Trager and Zacharias
+NOTE:    if the parameter check is given, only components not containing check are computed
+EXAMPLE: example zeroMod; shows an example
+"
+{
+  ////////////////////////////////////////////////////////////////
+  // the module check is needed to compute a minimal decomposition
+  // components containing check are ignored
+  ////////////////////////////////////////////////////////////////
+  if (size(#)>0)
+  {
+    module check=#[1];
+    if (size(NF(check,std(@N),1))==0)
+    {
+      return(list());
+    }
+  }
+  else
+  {
+    module check=freemodule(nrows(@N));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the ordering is changed to lex
+  ////////////////////////////////////////////////////////////////
+  def BAS = basering;
+  def @R=changeord("lp");
+  setring @R;
+  module @N=fetch(BAS,@N);
+  int nVar=nvars(@R);
+  module @M=freemodule(nrows(@N));     // @M=basering^k
+  ideal ann=std(quotient(@N,@M));      // the annihilator of @M/@N
+  int @k;
+  list result, rest;
+  ideal primary, prim;
+  module primMod;
+
+  ////////////////////////////////////////////////////////////////
+  // the random coordnate change and its inverse
+  ////////////////////////////////////////////////////////////////
+  option(redSB);
+  ideal prepMap=maxideal(1);
+  prepMap[nVar]=0;
+  prepMap[nVar]=(random(100,1,nVar)*transpose(prepMap))[1,1]+var(nVar);
+  map phi=@R,prepMap;
+  prepMap[nVar]=2*var(nVar)-prepMap[nVar];
+  map invphi=@R,prepMap;
+
+  ideal @j=std(phi(ann));
+
+  list fac=factorize(@j[1],2);   // factorization of the 1st elt. in Ann(@N)
+
+  ////////////////////////////////////////////////////////////////
+  // Case: 1st element irreducible
+  ////////////////////////////////////////////////////////////////
+  if(size(fac[2])==1)
+  {
+    prim=primaryTest(@j,fac[1][1]);
+    prim=invphi(prim);
+    setring BAS;
+    @N=std(@N);
+    ideal prim=std(imap(@R,prim));
+    kill @R;
+    if(prim!=0)
+    {
+      return(list(list(@N,prim)));
+    }
+    else
+    {
+      return(zeroMod(@N,check));
+    }
+   }
+2;
+  ////////////////////////////////////////////////////////////////
+  // Computation of the - hopefully primary - modules
+  // their annihilators and associated primes
+  ////////////////////////////////////////////////////////////////
+  poly @p, @h;
+  module check;
+  for (@k=1;@k<=size(fac[1]);@k++)
+  {
+    @p=fac[1][@k]^fac[2][@k];
+    @h=@j[1]/@p;
+    primMod=std(quotient(phi(@N),@h));
+    check=imap(BAS,check);
+    check=phi(check);
+    if (size(NF(check,primMod,1))>0)
+    {
+      primary=std(@j+@p);
+      // test if the modules were primary and in general position
+      prim=primaryTest(primary,fac[1][@k]);
+      if (prim==0)
+      {
+            rest[size(rest)+1]=invphi(primMod);
+      }
+      else
+      {
+            result[size(result)+1]=list(std(invphi(primMod)),std(invphi(prim)));
+      }
+
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the bad cases
+  ////////////////////////////////////////////////////////////////
+
+  for (@k=1; @k<=size(rest);@k++)
+  {
+    result = result+zeroMod(rest[@k],invphi(check));
+  }
+
+  option(noredSB);
+  setring BAS;
+  list result=imap(@R, result);
+  kill @R;
+  return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,z,dp;
+  module N=z*gen(1),(z-1)*gen(2),(z+1)*gen(3);
+  list l=zeroMod(N);
+  l;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// GTZmod (N[, check])
+// computes a minimal primary decomposition of N
+// using a generalized version of the algorithm of
+// Gianni, Trager and Zacharias, suggested by Alexander Dreyer
+// [Diploma Thesis, University of Kaiserslautern, Germany, 2001]
+/////////////////////////////////////////////////////////////////////////////
+
+proc GTZmod (module @N, list #)
+"USAGE:   GTZmod (N[, check]); module N[, module check]
+RETURN:  list l
+         the minimal primary decomposition of the module N,
+         computed by a generalized version of the algorithm of Gianni, Trager and Zacharias
+NOTE:    if the parameter check is given, only components not containing check are computed
+EXAMPLE: example GTZmod; shows an example
+"
+{
+  if (size(@N)==0)
+  {
+    return(list(@N,ideal(0)));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the module check is needed to compute a minimal decomposition
+  // components containing check are ignored
+  ////////////////////////////////////////////////////////////////
+  if (size(#)>0)
+  {
+    module check=#[1];
+    if (size(NF(check,std(@N),1))==0)
+    {
+      return(list());
+    }
+  }
+  else
+  {
+    module check= freemodule(nrows(@N));
+  }
+
+  module @M=freemodule(nrows(@N));
+  def BAS = basering;
+  int @j;
+  int nVar=nvars(BAS);
+  int @k;
+  string @U;                       // the independent variables
+  string @A;                       // the dependent variables
+  @N=std(@N);
+  ideal ann=std(quotient(@N,@M));  // the annihilator of @M/@N
+
+
+  ////////////////////////////////////////////////////////////////
+  // the trivial and the zero-dimensional case
+  ////////////////////////////////////////////////////////////////
+  int Ndim=dim(@N);
+  if ((Ndim==0)||(Ndim==-1))
+  {
+    return(zeroMod(@N, check));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the not-that-trivial case of ann==0
+  ////////////////////////////////////////////////////////////////
+  if(size(ann)==0)
+  {
+    execute("ring Rloc=("+charstr(basering)+","+varstr(basering)+"),dummy,("+ordstr(basering)+");");
+    module @N=imap(BAS, @N);
+    poly @q=prepareSat(@N);
+
+    setring BAS;
+    poly @q=imap(Rloc, @q);
+    list satu=sat(@N,@q);
+    if(satu[2]==0)
+    {
+      return(list(list(@N,ideal(0))));
+    }
+    else
+    {
+      check=intersect(check,satu[1]);
+      return(list(list(satu[1],ideal(0)))+GTZmod(@N+(@q^satu[2])*@M,check));
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the preparation of the quotient ring
+  ////////////////////////////////////////////////////////////////
+  intvec indVec=indepSet(ann);
+  int szA;
+  for (@k=1;@k<=size(indVec);@k++)
+  {
+    if (indVec[@k]==1)
+    {
+      @U=@U+varstr(@k)+",";
+    }
+    else
+    {
+      @A=@A+varstr(@k)+",";
+      szA++;
+    }
+  }
+  @U[size(@U)]=")";             // we compute the extractor (w.r.t. @U)
+  execute("ring RAU="+charstr(basering)+",("+@A+@U+",(C,dp("+string(szA)+"),dp);");
+  module @N=std(imap(BAS,@N));  // this is also a standard basis in (R[U])[A]
+  @A[size(@A)]=")";
+  execute("ring Rloc=("+charstr(basering)+","+@U+",("+@A+",(C,dp);");
+  module @N=imap(RAU,@N);
+  kill RAU;
+
+  ////////////////////////////////////////////////////////////////
+  // the zero-dimensional decomposition
+  ////////////////////////////////////////////////////////////////
+  list qprim=zeroMod(@N,imap(BAS,check));
+
+  ////////////////////////////////////////////////////////////////
+  //  preparation for saturation
+  ////////////////////////////////////////////////////////////////
+  poly @q=prepareSat(@N);
+  if (size(qprim)==0)
+  {
+    setring BAS;
+    poly @q=imap(Rloc,@q);
+    kill Rloc;
+    @q=@q^sat(@N,@q)[2];
+    if (deg(@q)>0)
+    {
+      return(GTZmod(@N+@q*@M,check));
+    }
+    else
+    {
+      return(list());
+    }
+  }
+
+  list @p;
+  for (@k=1;@k<=size(qprim);@k++)
+  {
+    @p[@k]=list(prepareSat(qprim[@k][1]),prepareSat(qprim[@k][2]));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // compute the recontractions
+  // back in the original ring
+  ////////////////////////////////////////////////////////////////
+  setring BAS;
+  list @p=imap(Rloc,@p);
+  list qprim=imap(Rloc,qprim);
+  poly @q=imap(Rloc,@q);
+  kill Rloc;
+  for(@k=1;@k<=size(qprim);@k++)
+  {
+    qprim[@k]=list(sat(qprim[@k][1],@p[@k][1])[1],
+                   sat(qprim[@k][2],@p[@k][2])[1]);
+    check=intersect(check,qprim[@k][1]);
+  }
+  @q=@q^sat(@N,@q)[2];
+  if (deg(@q)>0)
+  {
+    qprim=qprim+GTZmod(@N+@q*@M,check);
+  }
+
+  return(qprim);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  module N=x*gen(1)+ y*gen(2),
+           x*gen(1)-x2*gen(2);
+  list l=GTZmod(N);
+  l;
+}
+
+
+proc prepareSat(module @N, list #)
+
+{
+  int @k;
+  poly @p=leadcoef(@N[1]);
+  for (@k=2;@k<=size(@N);@k++)
+  {
+    @p=lcm_chr(@p,leadcoef(@N[@k]));
+    //    @p=@p*leadcoef(@N[@k]);
+  }
+  return(@p);
+}
+
+proc lcm_chr(poly @i, poly @j)
+
+{
+  def LBAS = basering;
+  if (npars(basering)==0)
+  {
+    string strg="";
+  }
+  else
+  {
+     if (nvars(basering)==0)
+     {
+       string strg=parstr(basering);
+     }
+     else
+     {
+       string strg=parstr(basering)+",";
+     }
+  }
+  execute("ring PRing="+string(char(basering))+",("+strg+varstr(basering)+"),dp");
+  ideal @a=ideal(imap(LBAS,@i),imap(LBAS,@j));
+  poly @p=lcm(@a);
+  setring LBAS;
+  poly @p=imap(PRing,@p);
+  kill PRing;
+  return(@p);
+}
+
+///////////////////////////////////////////////////////////////////////
+// The optimized procedures and procdures needed for this optimization
+///////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+// testit (N, l)
+// a small procedure, which checks whether
+// N=intersect(l[1][1],...,l[size(l)][1])
+// and whether annil(l[i][1]) is primary
+// Just for testing the procedures.
+/////////////////////////////////////////////////////////////////////////////
+
+proc testit (module N, list #)
+"USAGE:   testit (N, l); module N, list l
+EXAMPLE: example testit; shows an example
+"
+{
+  if (size(#)==0)
+  {
+    return()
+  }
+  int i;
+  list l=#;
+  module nn=freemodule(nrows(N));
+  module M=freemodule(nrows(N));
+
+  for(i=1;i<=size(l);i++)
+  {
+    nn=intersect(nn,l[i][1]);
+    if ((size(decomp(quotient(l[i][1],M)))>2)&&(size(l[i][2])>0))
+    {
+     "nicht primary obwohl erkannt!";
+     l[i];std(quotient(l[i][1],M));std(radical(quotient(l[i][1],M)));
+      pause();
+     }
+  }
+  int j,k;
+  j=size(NF(nn,std(N),1));
+  k=size(NF(N,std(nn),1));
+  if ((j!=0)||(k!=0))
+  {
+    "testit fehler!!!";
+    pause();
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  module N=x*gen(1)+ y*gen(2),
+           x*gen(1)-x2*gen(2);
+  list l=GTZmod(N);
+  testit(N,l);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// annil (N)
+// computes the annihilator of M/N in the basering
+/////////////////////////////////////////////////////////////////////////////
+
+proc annil (module N)
+"USAGE:   annil(N);  modul N
+RETURN:  ideal ann=std(quotient(N,freemodule(nrows(N))));
+         the annihilator of M/N in the basering
+NOTE:    ann is a std basis in the basering
+EXAMPLE: example annil; shows an example
+"
+{
+ intvec optionsVec=option(get);
+ option (returnSB);
+ ideal ann=quotient(N,freemodule(nrows(N)));
+ attrib (ann, "isSB",1);
+ option (set,optionsVec);
+ return(ann);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  module N=x*gen(1), y*gen(2);
+  ideal ann=annil(N);
+  ann;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  splitting(N[,check[, ann]])
+//  INPUT:  a zero-dimensional module N, module check, ideal ann=annil(N)
+//          splitting computes an list of modules
+//          using the factorization of the elements of annil(N)
+//          s.th. N is equal to the intersections of these modules
+//          A prim test is used to check if the modules are primary
+//  OUTPUT: (l, check)
+/////////////////////////////////////////////////////////////////////////////
+
+proc splitting (module @N, list #)
+"USAGE:   splitting(N[,check[, ann]]);  modul N, module check, ideal ann
+RETURN:  (l, check) list l, module check
+         the elements of l consists of quadruples, where
+         [1] is of type module, [2], [3] and [4] are of type ideal,
+         s.th. the intersection of the modules is equal to the
+         zero-dimensional module N, furthermore l[j][3]=annil(l[j][1])
+         and l[j][4] contains internal ideal data;
+         if l[j][2]!=0 then the module l[j][1] is primary
+            with associated prime l[j][2], and check=intersect(check, l[j][1]) is computed
+NOTE:    if the parameter check is given, only components not containing
+         check are computed; if ann is given, ann is used instead of annil(N)
+EXAMPLE: example splitting; shows an example
+"
+{
+  ideal ann; module check, @M; int checked;
+  (ann, check, @M,checked)=getData(@N,#);
+  if(checked)
+  {
+    return(list());
+  }
+  if(size(#)>=3)
+  {
+    ideal splitPrime=#[3];
+  }
+  else
+  {
+    ideal splitPrime=ann;
+  }
+
+  list fact, result, splitTemp;
+  int @i,@k,@j,szFact;
+  for (@i=1;@i<=size(ann);@i++)
+  {
+    fact=factorize(ann[@i],2);
+    szFact=size(fact[2]);
+    // if the element is the power of an irreducible element
+    if(szFact==1)
+    {
+      if(vdim(ann)==deg(ann[@i]))
+      {
+        splitPrime=interred(splitPrime+ideal(fact[1][1]));
+        result=result+list(list(@N,splitPrime,ann,splitPrime));
+      }
+      else
+      {
+        splitPrime=interred(splitPrime+ideal(fact[1][1]));
+        if (homog(splitPrime))
+        {
+           result=result+list(list(@N,maxideal(1),ann,splitPrime));
+        }
+      }
+    }
+    else
+    {
+      if(gcdTest(fact[1]))       // Case: (f1,...,fk)=(1)
+      {
+        (splitTemp, check)=sp1(@N,fact,check,ann,splitPrime);
+        result=result+splitTemp;
+      }
+      else
+      {
+                                // if the element is not irreducible
+        (splitTemp, check)=sp2(@N,fact[1][1],check,ann,splitPrime);
+        result=result+splitTemp;
+      }
+    }
+  }
+  @i=1;@k=size(result);
+
+  ////////////////////////////////////////////////////////////////
+  // delete multiple Modules
+  ////////////////////////////////////////////////////////////////
+  while (@i<=@k)
+  {
+    @j=1;
+    while(@j<=@i-1)
+    {
+      if (stdModulesEqual(result[@j][1],result[@k][1]))
+      {
+        result=delete(result,@i);
+        @k--;@i--;break;
+      }
+      @j++;
+    }
+    @i++;
+  }
+  list rest;
+  @i=1;@k=size(result);
+
+  ////////////////////////////////////////////////////////////////
+  // if not primary then split the obtained modules once again
+  ////////////////////////////////////////////////////////////////
+  while (@i<=@k)
+  {
+    if (size(result[@i][2])==0)
+    {
+      rest=rest+list(list(result[@i][1],result[@i][3],result[@i][4]));
+      result=delete(result,@i);
+      @k--;@i--;
+    }
+    else
+    {
+      check=intersect(check,result[@i][1]);
+    }
+    @i++;
+  }
+  for(@i=1;@i<=size(rest);@i++)
+  {
+    (splitTemp,check)=splitting(rest[@i][1],check,rest[@i][2],rest[@i][3]);
+    result=result+splitTemp;
+  }
+
+  if (size(result)==0)
+  {
+    result=list(list(@N,ideal(0),ann,ann));
+  }
+  return(result, check);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,z,lp;
+  module N=z*gen(1), (z+1)*gen(2);
+  N=std(N);
+  list l; module check;
+  (l, check)=splitting(N);
+  l;
+  check;
+}
+
+  ////////////////////////////////////////////////////////////////
+  // sp1: splits a module as follows
+  // (N+f*g*M)=intersect((N+f*M),(N+g*M)) if (f,g)=(1)
+  ////////////////////////////////////////////////////////////////
+
+static proc sp1(module @N,list fact,list #)
+{
+  ideal ann; module check, @M; int @i;
+  (ann, check, @M, @i)=getData(@N, #);
+  if(size(#)>=3)
+  {
+    ideal splitPrime=#[3];
+  }
+  else
+  {
+    ideal splitPrime=ann;
+  }
+  list pr;
+  module splitMod;
+  ideal splitAnn, prim, tempPrime;
+  for(@i=1;@i<=size(fact[2]);@i++)
+  {
+    splitMod=std(@N+(fact[1][@i]^fact[2][@i])*@M);
+    if(size(NF(check,splitMod,1))>0)
+    {
+      splitAnn=std(ann,(fact[1][@i]^fact[2][@i]));
+      tempPrime=interred(splitPrime+ideal(fact[1][@i]));
+      prim=primTest(splitAnn,fact[1][@i],tempPrime);
+      pr=pr+list(list(splitMod,prim,splitAnn,tempPrime));
+      if (size(prim)>0)
+      {
+        check=intersect(check,splitMod);
+      }
+    }
+  }
+  return (pr, check);
+}
+
+  ////////////////////////////////////////////////////////////////
+  // sp2: splits a module as follows
+  // N=intersect((N:f),(N+f*M))
+  ////////////////////////////////////////////////////////////////
+
+static proc sp2(module @N,  poly p, list #)
+{
+  ideal ann; module check, @M; int @i;
+  (ann, check, @M, @i)=getData(@N, #);
+  if(size(#)>=3)
+  {
+    ideal splitPrime=#[3];
+  }
+  else
+  {
+    ideal splitPrime=ann;
+  }
+  list fact=sat(@N, p);
+  list splitList;
+  ideal splitAnn, prim, tempPrime;
+  if (fact[2]>0)
+  {
+   module n1=std(@N+(p^fact[2]*@M));
+   module n2=fact[1];
+   if (size(NF(check,n1,1))>0)
+   {
+    splitAnn=std(ann+ideal(p^fact[2]));
+    tempPrime=interred(splitPrime+ideal(p));
+    prim=primTest(tempPrime);
+    splitList=list(list(n1, prim, splitAnn,tempPrime));
+    if(size(prim)>0)
+    {
+      check=intersect(check, n1);
+    }
+   }
+   if(size(NF(check,n2,1))>0)
+   {
+    splitAnn=annil(n2);
+    prim=primTest(splitAnn);
+    splitList=splitList+list(list(n2,prim,splitAnn,splitAnn));
+    if(size(prim)>0)
+    {
+    check=intersect(check, n2);
+    }
+   }
+   return(splitList, check);
+  }
+  else
+  {
+   return (list(list(@N,ideal(0),ideal(0))), check);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  primeTest(i[, p])
+//  tests whether i is prime or homogeneous
+//  is both cases radical(i) is returned
+/////////////////////////////////////////////////////////////////////////////
+
+proc primTest(ideal id, list #)
+"USAGE:   primTest(i[, p]); a zero-dimensional ideal i, irreducible poly p in i
+RETURN:  if i is neither prime nor homogeneous then ideal(0) is returned,
+         otherwise radical(i)
+EXAMPLE: example primTest; shows an example
+"
+{
+  ideal tempPrime;
+  int testTempPrime;
+  if (size(#)>0)
+  {
+    poly @p=#[1];
+    if(size(#)>1)
+    {
+      tempPrime=#[2];
+      testTempPrime=1;
+    }
+  }
+  else
+  {
+    poly @p=0;
+
+  }
+  ideal prim=ideal(0);
+  if((size(#)>0)&&(vdim(id)==deg(@p)))
+  {
+    prim=id;
+  }
+  else
+  {
+    if ((homog(id))||((testTempPrime)&&(homog(tempPrime))))
+    {
+      prim=maxideal(1);
+    }
+  }
+  return (prim);
+}
+example
+{ "EXAMPLE:"; echo=2;
+  ring r=0,(x,y,z),lp;
+  ideal i=x+1,y-1,z;
+  i=std(i);
+  ideal primId=primTest(i,z);
+  primId;
+
+  i=x,z2,yz,y2;
+  i=std(i);
+  primId=primTest(i);
+  primId;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// preComp(N, check[, ann])
+// preComp is an enhanced version of splitting,
+// but before computing splitting the first element of std(annil(N))
+// is factorized and the obtained modules are tested for primarity
+/////////////////////////////////////////////////////////////////////////////
+
+proc preComp (module @N, list #)
+"USAGE:   preComp(N,check[, ann]);  modul N, module check, ideal ann
+RETURN:  (l, check) list l, module check
+         the elements of l consists of a triple with
+         [1] of type module [2] and [3] of type ideal
+         s.th. the intersection of the modules is equal to the
+         zero-dimensional module N, furthermore l[j][3]=annil(l[j][1])
+         if l[j][2]!=0 then the module l[j][1] is primary
+            with associated prime l[j][2],
+            and check=intersect(check, l[j][1]) is computed
+NOTE:    only components not containing check are computed;
+         if ann is given, ann is used instead of annil(N)
+EXAMPLE: example preComp; shows an example
+"
+{
+  def BAS=basering;
+  def @R=changeord("C,lp");
+  setring @R;
+  module @N=std(imap(BAS,@N));
+  ideal ann; module check, @M; int @k;
+  (ann, check, @M, @k)=getData(@N,imap(BAS,#),1);
+  list act,primary;
+  ideal primid,helpid;
+  module primmod;
+
+  ////////////////////////////////////////////////////////////////
+  // the first element of the standardbase is factorized
+  ////////////////////////////////////////////////////////////////
+  if(deg(ann[1])>0)
+  {
+    act=factorize(ann[1],2);
+  }
+  else
+  {
+    setring BAS;
+    module check=imap(@R,check);
+    kill @R;
+    return(list(), check);
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // with the factors new modules are created
+  // (hopefully the primary decomposition)
+  ////////////////////////////////////////////////////////////////
+  if(size(act[1])>1)               // Case: act[1] not irreducible
+  {
+     for(@k=1;@k<=size(act[1]);@k++)
+     {
+       primmod=std(@N+(act[1][@k]^act[2][@k])*@M);
+       if (size(NF(check,primmod,1))>0)
+       {
+         primid=std(ann,act[1][@k]^act[2][@k]);
+         if((act[2][@k]==1)&&(vdim(primid)==deg(act[1][@k])))
+         {
+           primary = primary+list(list(primmod,primid,primid));
+         }
+         else
+         {
+           helpid=primid;
+           primid=primaryTest(primid,act[1][@k]);
+           primary = primary+list(list(primmod,primid,helpid));
+         }
+       }
+       if (size(primid)>0)
+       {
+         check=intersect(check, primmod);
+       }
+     }
+   }
+   else                            // Case: act[1]  irreducible
+   {
+     primid=ann;
+     primmod=@N;
+
+     if (size(NF(check,primmod,1))>0)
+     {
+       if((act[2][1]==1)&&(vdim(primid)==deg(act[1][1])))
+       {
+         primary = primary+list(list(primmod,primid,primid));
+       }
+       else
+       {
+         primid = primaryTest(primid,act[1][1]);
+         primary = primary+list(list(primmod,primid,ann));
+       }
+       if (size(primid)>0)
+       {
+         check=intersect(check,primmod);
+       }
+     }
+  }
+
+  if (size(primary)==0)
+  {
+    setring BAS;
+    module check=imap(@R,check);
+    kill @R;
+    return(list(), check);
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the modules which are not primary are splitted
+  ////////////////////////////////////////////////////////////////
+  list splitTemp;
+  int sz=size(primary);
+  @k=1;
+  while (@k<=sz)
+  {
+    if (size(primary[@k][2])==0)
+    {
+      (splitTemp, check)=splitting(primary[@k][1],check,primary[@k][3]);
+      primary = delete(primary, @k)+splitTemp;
+      @k--;sz--;
+    }
+    @k++;
+  }
+
+  setring BAS;
+  list primary=imap(@R,primary);
+  module check=imap(@R,check);
+  kill @R;
+  return(primary,check);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,z,lp;
+  module N=z*gen(1), (z+1)*gen(2);
+  N=std(N);
+  list l; module check;
+  (l, check)=preComp(N,freemodule(2));
+  l;
+  check;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// indSet(i)
+// based on independendSet from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+proc indSet (ideal @j)
+"USAGE:   indSet(i); i ideal
+RETURN:  list with two entries
+         both are lists of new varstrings with the dependent variables,
+         the independent set, the ordstring with the corresp. block ordering,
+         and the integer where the independent set starts in the varstring
+NOTE:    the first entry gives the strings for all maximal independent sets
+         the second gives the strings for the independent sets,
+         which cannot be enhanced
+EXAMPLE: example indSet; shows an example
+"
+{
+   int n,k,di;
+   int jdim=dim(@j);
+   list maxind, rest,hilf;
+   string var1,var2;
+   list v=indepSet(@j,1);
+
+   for(n=1;n<=size(v);n++)
+   {
+      di=0;
+      var1="";
+      var2="";
+      for(k=1;k<=size(v[n]);k++)
+      {
+         if(v[n][k]!=0)
+         {
+            di++;
+            var2=var2+string(var(k))+",";
+         }
+         else
+         {
+            var1=var1+string(var(k))+",";
+         }
+      }
+      if(di>0)
+      {
+         var1=var1[1..size(var1)-1];
+         var2=var2[1..size(var2)-1];
+         hilf[1]=var1;
+         hilf[2]=var2;
+         hilf[3]="(C,dp("+string(nvars(basering)-di)+"),dp)";
+         //"lp("+string(nvars(basering)-di)+"),dp("+string(di)+")";
+         hilf[4]=di;
+         if(di==jdim)
+         {
+          maxind=maxind+list(hilf);
+         }
+         else
+         {
+          rest=rest+list(hilf);
+         }
+     }
+      else
+      {
+
+        if(jdim==0)
+         {
+          maxind=maxind+list(varstr(basering),"dummy",ordstr(basering),0);
+         }
+         else
+         {
+          rest=rest+list(varstr(basering),"dummy",ordstr(basering),0);
+         }
+         resu[n]=varstr(basering),ordstr(basering),0;
+      }
+   }
+   return(list(maxind,rest));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s1=(0,x,y),(a,b,c,d,e,f,g),lp;
+   ideal i=ea-fbg,fa+be,ec-fdg,fc+de;
+   i=std(i);
+   list  l=indSet(i);
+   l;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// GTZopt(N[,check[, ann]])
+// a faster version of GTZMod
+/////////////////////////////////////////////////////////////////////////////
+
+proc GTZopt (module @N, list #)
+"USAGE:   GTZopt (N[, check]); module N[, module check]
+RETURN:  list l
+         the minimal primary decomposition of the module N,
+         computed by a generalized and optimized version of
+         the algorithm of Gianni, Trager and Zacharias
+NOTE:    if the parameter check is given, only components
+         not containing check are computed
+EXAMPLE: example GTZmod; shows an example
+"
+{
+  @N=std(@N);
+  if (size(@N)==0)
+  {
+    return(list(@N,ideal(0)));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the module check is needed to compute a minimal decomposition
+  // components containing check are ignored
+  ////////////////////////////////////////////////////////////////
+  ideal ann; module check, @M; int checked;
+  (ann, check, @M, checked)=getData(@N, #);
+  if (checked)
+  {
+    return(list());
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // if ann is zero-dimensional and homogeneous
+  // then it is primary with associated prime maxideal(1)
+  ////////////////////////////////////////////////////////////////
+  if((homog(ann)==1)&&(dim(ann)==0))
+  {
+    return(list(list(@N,maxideal(1))));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the not-that-trivial case of ann==0
+  ////////////////////////////////////////////////////////////////
+  def BAS = basering;
+  if(size(ann)==0)      //check, whether ann=0
+  {
+   execute("ring Rloc=("+charstr(basering)+","+varstr(basering)+"),dummy,("+ordstr(basering)+");");
+   module @N=clrSBmod(imap(BAS, @N));
+   module @M=freemodule(nrows(@N));
+   poly @q=prepareSat(@N);
+
+   setring BAS;
+   poly @q=imap(Rloc, @q);
+   list satu=sat(@N,@q);
+
+   if(satu[2]==0)
+   {
+     return(list(list(@N,ideal(0))));
+   }
+   else
+   {
+    check=intersect(check,satu[1]);
+    return(list(list(satu[1],ideal(0)))+GTZopt(@N+(@q^satu[2])*@M,check));
+   }
+  }
+
+  int @k1, @k2, @k3, @k4;   // the indices for nested for/while loops
+  int nVar=nvars(BAS);
+  int Ndim=dim(@N);
+
+  ////////////////////////////////////////////////////////////////
+  // Simplification of the modules using
+  // N=N/(a*x_i+b)*M+(a*x_i+b)*M, for (a*x_i+b) in ann
+  ////////////////////////////////////////////////////////////////
+  if (size(#)==0)
+  {
+    ideal fried;
+    @k2=size(ann);
+    for(@k1=1;@k1<=@k2;@k1++)
+    {
+      if(deg(lead(ann[@k1]))==1)
+      {
+        fried[size(fried)+1]=ann[@k1];
+      }
+    }
+    if(size(fried)==nVar)
+    {
+       return(list(list(@N, ann)));
+    }
+    if(size(fried)>0)
+    {
+       string newva;
+       string newma;
+       for(@k1=1;@k1<=nVar;@k1++)
+       {
+          checked=0;
+          for(@k2=1;@k2<=size(fried);@k2++)
+          {
+             if(leadmonom(fried[@k2])==var(@k1))
+             {
+                checked=1;
+                break;
+             }
+          }
+          if(checked==0)
+          {
+            newva=newva+string(var(@k1))+",";
+            newma=newma+string(var(@k1))+",";
+          }
+          else
+          {
+            newma=newma+string(var(@k1)-((1/leadcoef(fried[@k2]))*fried[@k2]))+",";
+          }
+       }
+       newva[size(newva)]=")";
+       newma[size(newma)]=";";
+       execute("ring @deirf=("+charstr(BAS)+"),("+newva+",(C,lp);");
+       execute("map @kappa=BAS,"+newma);
+       ideal @j = @kappa(ann);
+       module @N = @kappa(@N);
+       @N=simplify(@N,2);
+       @j=simplify(@j,2);
+       list pr=GTZopt(@N,freemodule(nrows(@N)),@j);
+       setring BAS;
+       list pr=imap(@deirf,pr);
+
+       for(@k1=1;@k1<=size(pr);@k1++)
+       {
+         pr[@k1][1]=std(pr[@k1][1]+fried*@M);
+         pr[@k1][2]=std(pr[@k1][2]+fried);
+       }
+       return(pr);
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the trivial case
+  ////////////////////////////////////////////////////////////////
+  if(Ndim==-1)
+  {
+    return(list(list(@N,ideal(1))));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the case of one variable
+  ////////////////////////////////////////////////////////////////
+  if(nVar==1)
+  {
+    return(dec1var(@N));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the zerodimensional case
+  ////////////////////////////////////////////////////////////////
+  if (Ndim==0)
+  {
+    return(zeroOpt(@N, check, ann));
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the preparation of the quotient ring
+  ////////////////////////////////////////////////////////////////
+  list result;
+  list indep =indSet(ann);
+  poly @q;
+  list @p,primary;
+  ideal @h;
+  int szIndep;
+  for (@k1=1;@k1<=2;@k1++)
+  {
+    szIndep=size(indep[@k1]);
+    for (@k2=1;@k2<=szIndep;@k2++)
+    {
+      execute("ring RAU=("+charstr(basering)+"),("+indep[@k1][@k2][1]+","+indep[@k1][@k2][2]+"),"+indep[@k1][@k2][3]+";");
+      module @N=std(imap(BAS,@N)); // the standard basis in (R[U])[A]
+      execute("ring Rloc=("+charstr(basering)+","+indep[@k1][@k2][2]+"),("+indep[@k1][@k2][1]+"),(C,dp);");
+      module @N=imap(RAU,@N); //std in lokalisierung
+      @N=clrSBmod(@N);
+      kill RAU;
+
+      ////////////////////////////////////////////////////////////////
+      // the zero-dimensional decomposition
+      ////////////////////////////////////////////////////////////////
+      list qprim, preList;
+      module check=imap(BAS, check);
+      (preList,check)=preComp(@N,check);
+      for (@k3=1; @k3<=size(preList); @k3++)
+      {
+        if(size(preList[@k3][2])>0)
+        {
+          qprim=qprim+list(list(preList[@k3][1],preList[@k3][2]));
+        }
+        else
+        {
+          checked=size(qprim);
+          qprim=qprim+zeroOpt(preList[@k3][1], check, preList[@k3][3]);
+          for(@k4=checked+1;@k4<=size(qprim);@k4++)
+          {
+            check=intersect(check, qprim[@k4][1]);
+          }
+        }
+      }  // end of for(@k3...)
+      kill preList;
+
+      ////////////////////////////////////////////////////////////////
+      // Preparation of the saturation of @N
+      ////////////////////////////////////////////////////////////////
+      //poly pp=prepareSat(@N);
+      ideal @h2;
+      for (@k3=1;@k3<=size(@N);@k3++)
+      {
+        @h2[@k3]=leadcoef(@N[@k3]);
+      }
+
+      if (size(qprim)==0)     // there aren't any new components
+      {
+        setring BAS;
+        check=imap(Rloc,check);
+        @h=imap(Rloc,@h2);
+        @q=minSatMod(imap(BAS,@N),@h)[2];
+        // @q=imap(Rloc,pp)^sat(imap(BAS,@N),imap(Rloc,pp))[2];
+        kill Rloc;
+        if (deg(@q)>0)
+        {
+          @N=std(@N+@q*@M);
+          ann=std(ideal(ann+@q));
+          kill qprim;
+        }
+      }
+      else                    // there are new components
+      {
+        ////////////////////////////////////////////////////////////////
+        // Preparation of the saturation of qprim
+        ////////////////////////////////////////////////////////////////
+        list @p2;
+        for (@k3=1;@k3<=size(qprim);@k3++)
+        {
+          @p2[@k3]=list(prepareSat(qprim[@k3][1]),prepareSat(qprim[@k3][2]));
+        }
+
+
+        ////////////////////////////////////////////////////////////////
+        // compute the recontractions
+        // back in the original ring
+        ////////////////////////////////////////////////////////////////
+        setring BAS;
+        @p=imap(Rloc,@p2);
+        primary=imap(Rloc,qprim);
+        @h=imap(Rloc,@h2);
+        kill Rloc;
+        for(@k3=1;@k3<=size(primary);@k3++)
+        {
+          primary[@k3]=list(sat(primary[@k3][1],@p[@k3][1])[1],
+                            sat(primary[@k3][2],@p[@k3][2])[1]);
+          check=intersect(check,primary[@k3][1]);
+        }
+        @q=minSatMod(imap(BAS,@N),@h)[2];
+        result=result+primary;
+        if (deg(@q)>0)
+        {
+          @N=std(@N+@q*@M);
+          ann=std(ideal(ann+@q));
+        }
+      }                       // end of else
+      if ((@k1==1)&&(@k2<szIndep)&&(Ndim>dim(ann)))
+      {
+        break;
+      }
+    }
+  }
+  return(result+GTZopt(@N,check,ann));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,(x,y,z),dp;
+  module N=x*gen(1)+ y*gen(2),
+           x*gen(1)-x2*gen(2);
+  list l=GTZopt(N);
+  l;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// dec1var(N[,check[, ann]])
+// primary decompostion for a ring with one variable
+/////////////////////////////////////////////////////////////////////////////
+
+proc dec1var (module @N, list #)
+"USAGE:   dec1var (N); zero-dimensional module N[, module check]
+RETURN:  list l
+         the minimal primary decomposition of a submodule N of R^s
+         if nvars(R)=1
+NOTE:    if the parameter check is given, only components not containing check are computed
+EXAMPLE: example zeroMod; shows an example
+"
+{
+  ideal ann; module @M, check; int checked;
+  (ann, check, @M, checked)=getData(@N, #);
+
+  list fac = factorize(ann[1],2);
+  if(size(fac[2])==1)
+  {
+   return(list(list(@N,ann)));
+  }
+  // comp of the primary modules, the primary ideals and the primes
+  poly @h;
+  module primod;
+  list result;
+  int @k;
+  for (@k=1;@k<=size(fac[1]);@k++)
+  {
+    @h=ann[1]/(fac[1][@k]^fac[2][@k]);
+    result =result+list(list(std(quotient(@N,@h)), std(ann,fac[1][@k])));
+  }
+    return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,z,dp;
+  module N=z*gen(1),(z-1)*gen(2),(z+1)*gen(3);
+  list l=dec1var(N);
+  l;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// zeroOpt(N[,check[, ann]])
+// a faster version of zeroMod
+/////////////////////////////////////////////////////////////////////////////
+
+proc zeroOpt (module @N, list #)
+"USAGE:   zeroOpt (N[, check]); zero-dimensional module N[, module check]
+RETURN:  list l
+         the minimal primary decomposition of a zero-dimensional module N,
+         computed by a generalized and optimized version of the algorithm
+         of Gianni, Trager and Zacharias
+NOTE:    if the parameter check is given, only components
+         not containing check are computed
+EXAMPLE: example zeroMod; shows an example
+"
+{
+  @N=interred(@N);
+  attrib(@N,"isSB",1);
+
+  ////////////////////////////////////////////////////////////////
+  // the module check is needed to compute a minimal decomposition
+  // components containing check are ignored
+  ////////////////////////////////////////////////////////////////
+  ideal ann; module @M, check; int checked;
+  (ann, check, @M, checked)=getData(@N, #);
+
+  if (checked)
+  {
+    return(list());
+  }
+  ////////////////////////////////////////////////////////////////
+  // the ordering is changed to lex
+  ////////////////////////////////////////////////////////////////
+  def BAS = basering;
+  def @R=changeord("C,lp");
+  setring @R;
+  module @N=std(imap(BAS,@N));
+  module @M=imap(BAS,@M);
+  ideal ann=std(imap(BAS,ann));
+  module check=imap(BAS,check);
+
+  ////////////////////////////////////////////////////////////////
+  if(vdim(ann)==deg(ann[1]))           // if ann ist prime
+  {
+    list fact=factorize(ann[1],2);
+    int k;ideal id;list result;
+    module hilf;
+    for(k=1;k<=size(fact[1]);k++)
+    {
+      id=ann;
+      hilf=std(@N+(fact[1][k]^fact[2][k])*@M);
+      id[1]=fact[1][k];
+      if(size(NF(check,hilf,1))>0)
+      {
+        result=result+list(list(hilf,interred(id)));
+      }
+    }
+    setring BAS;
+    list result=imap(@R, result);
+    kill @R;
+    return(result);
+
+  }
+
+
+  if (homog(ann))                      // if ann is homogeneous
+  {                                    // then radical(ann)=maxideal(1)
+    if(size(NF(check,@N,1))>0)
+    {
+      setring BAS;
+      kill @R;
+      return (list(list(@N,maxideal(1))));
+    }
+    else
+    {
+      setring BAS;
+      kill @R;
+      return(list());
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the random coordnate change and its inverse
+  // furthermore the module is simplified using
+  // N=N/(a*x_i+b)+(a*x_i+b)*M, for a*x_i+b in ann
+  ////////////////////////////////////////////////////////////////
+  int nVar=nvars(@R);
+  int @k, @k1;
+  list result, rest;
+  ideal primary, prim;
+  module primmod;
+  ideal fried;
+  intvec optionsVec=option(get);
+  option(redSB);
+  ideal prepMap = randomLast(100);
+  ideal prepInv=maxideal(1);
+  for(@k=1;@k<=size(ann);@k++)
+  {
+    if(deg(lead(ann[@k]))==1)
+    {
+      fried[size(fried)+1]=ann[@k];
+    }
+  }
+  if(size(fried)==nVar)
+  {
+    return(list(list(@N, ann)));
+  }
+  if(size(fried)>0)
+  {
+    for(@k=1;@k<@k1;@k1++)
+    {
+      for(@k1=1;@k1<=size(fried);@k1++)
+      {
+        if(leadmonom(fried[@k1])==var(@k))
+        {
+          prepMap[@k]=var(@k)+((1/leadcoef(fried[@k1]))*(var(@k)-fried[@k1]));
+          prepMap[nVar]=subst(prepMap[nVar],var(@k),0);
+          prepInv[@k]=fried[@k1];
+        }
+      }
+    }
+  }
+  map phi=@R,prepMap;
+  prepInv[nVar]=2*var(nVar)-prepMap[nVar];
+  map invphi=@R,prepInv;
+  ideal @j=std(phi(ann));         // factorization of the 1st elt. in Ann(@N)
+  list fac = factorize(@j[1],2);
+
+  ////////////////////////////////////////////////////////////////
+  // Case: 1st element irreducible
+  ////////////////////////////////////////////////////////////////
+  if(size(fac[2])==1)
+  {
+    prim=primaryTest(@j,fac[1][1]);
+    prim=invphi(prim);
+    setring BAS;
+    @N=std(@N);
+    ideal prim =imap(@R,prim);
+    kill @R;
+    if(prim!=0)
+    {
+      return(list(list(@N,prim)));
+    }
+    else
+    {
+      return(zeroOpt(@N,check));
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Computation of the - hopefully primary - modules
+  // their annihilators and associated primes
+  ////////////////////////////////////////////////////////////////
+  poly @p, @h;
+  for (@k=1;@k<=size(fac[1]);@k++)
+  {
+    @p=fac[1][@k]^fac[2][@k];
+    @h=@j[1]/@p;
+    primmod=std(quotient(phi(@N),@h));
+    check=phi(check);
+    if (size(NF(check,primmod,1))>0)
+    {
+      primary=std(@j+@p);
+      // test if the modules were primary and in general position
+      prim=primTest(primary,fac[1][@k]);
+      if(size(prim)==0)
+      {
+        prim=primaryTest(primary,fac[1][@k]);
+      }
+      if (prim==0)
+      {
+        rest[size(rest)+1]=invphi(primmod);
+      }
+      else
+      {
+        result[size(result)+1]=list(std(invphi(primmod)),std(invphi(prim)));
+      }
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // the bad cases
+  ////////////////////////////////////////////////////////////////
+  for (@k=1; @k<=size(rest);@k++)
+  {
+    result = result+zeroOpt(rest[@k],check);
+  }
+  option (set,optionsVec);
+  if(size(result)==0)
+  {
+    setring BAS;
+    kill @R;
+    return(list());
+  }
+  setring BAS;
+  list result=imap(@R, result);
+  kill @R;
+
+  return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r=0,z,dp;
+  module N=z*gen(1),(z-1)*gen(2),(z+1)*gen(3);
+  list l=zeroOpt(N);
+  l;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// clrSBmod(N)
+// Generalization of clearSB from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+static proc clrSBmod (module @N)
+"USAGE:   clrSBmod(N); N module which is SB ordered by monomial ordering
+RETURN:  module = minimal SB
+EXAMPLE: example clrSBmod; shows an example
+"
+{
+  int @k,@j;
+  list Nsizes;
+  for (@k=1;@k<=size(@N);@k++)
+  {
+    Nsizes[@k]=size(@N[@k]);
+  }
+  module leadVec;
+  int szN=size(@N);
+  @j=0;
+  while(@j<szN-1)
+  {
+    @j++;
+    if(deg(@N[@j])>0)
+    {
+      leadVec=lead(@N[@j]);
+      attrib(leadVec,"isSB",1);
+      for(@k=@j+1;@k<=szN;@k++)
+      {
+        if(size(NF(lead(@N[@k]),leadVec,1))==0)
+        {
+          if((leadexp(leadVec[1])!=leadexp(@N[@k]))||(Nsizes[@j]<=Nsizes[@k]))
+          {
+            @N[@k]=0;
+          }
+          else
+          {
+            @N[@j]=0;
+             break;
+          }
+        }
+      }
+    }
+  }
+  return(simplify(@N,2));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = (0,a,b),(x,y,z),dp;
+   module N1=ax2+y,a2x+y,bx;
+   module N2=clrSBmod(N1);
+   N2;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// minSatMod(N, id)
+// Generalization of minsat from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+static proc minSatMod(module Nnew, ideal @h)
+"USAGE:   minSatMod(N, I); module N, ideal I
+RETURN:  list with 2 elements:
+         [1]=sat(N,product(I))[1],
+         [2]=p, the polynomial of minimal degree s.th. [1]=quotient(N,p)
+EXAMPLE: example minSatMod; shows an example
+"
+{
+   int @i,@k;
+   poly @f=1;
+   module Nold;
+   ideal fac;
+   list quotM,@l;
+
+   for(@i=1;@i<=ncols(@h);@i++)
+   {
+      if(deg(@h[@i])>0)
+      {
+         fac=fac+factorize(@h[@i],1);
+      }
+   }
+   fac=simplify(fac,4);
+   if(size(fac)==0)
+   {
+      @l=Nnew,1;
+      return(@l);
+   }
+   fac=sort(fac)[1];
+   for(@i=1;@i<=size(fac);@i++)
+   {
+      @f=@f*fac[@i];
+   }
+   quotM[1]=Nnew;
+   quotM[2]=fac;
+   quotM[3]=@f;
+   @f=1;
+   while(specialModulesEqual(Nold,quotM[1])==0)
+   {
+      if(@k>0)
+      {
+         @f=@f*quotM[3];
+      }
+      Nold=quotM[1];
+      quotM=quotMinMod(quotM);
+      @k++;
+   }
+   @l=quotM[1],@f;
+   return(@l);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),dp;
+   module N=xy*gen(1);
+   ideal h=yz,z2;
+   list l=minSatMod(N,h);
+   l;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// quotMinMod(N, fac, f)
+// Generalization of quotMin from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+proc quotMinMod(list tsil)
+{
+   int @i,@j,action;
+   module verg;
+   list @l;
+   poly @g;
+   intvec optionsVec;
+
+   module laedi=tsil[1];
+   ideal fac=tsil[2];
+   poly @f=tsil[3];
+   optionsVec=option(get);
+   option(returnSB);
+   module star=quotient(laedi,@f);
+   option(set,optionsVec);
+   if(specialModulesEqual(star,laedi))
+   {
+      @l=star,fac,@f;
+      return(@l);
+   }
+
+   action=1;
+   while(action==1)
+   {
+      if(size(fac)==1)
+      {
+         action=0;
+         break;
+      }
+      for(@i=1;@i<=size(fac);@i++)
+      {
+        @g=1;
+        verg=laedi;
+
+         for(@j=1;@j<=size(fac);@j++)
+         {
+            if(@i!=@j)
+            {
+               @g=@g*fac[@j];
+            }
+         }
+         optionsVec=option(get);
+         option(returnSB);
+         verg=quotient(laedi,@g);
+         option(set,optionsVec);
+         if(specialModulesEqual(verg,star)==1)
+         {
+            @f=@g;
+            fac[@i]=0;
+            fac=simplify(fac,2);
+            break;
+         }
+
+         if(@i==size(fac))
+         {
+            action=0;
+         }
+      }
+   }
+   @l=star,fac,@f;
+   return(@l);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// specialModulesEqual(N1,N2)
+// Generalization of specialIdealsEqual from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+static proc specialModulesEqual( module k1, module k2)
+"USAGE:   specialModulesEqual(N1, N2) N1, N2 standard bases of modules,
+         s.th. N1 is contained in N2 or vice versa
+RETURN:  int i
+         if (N1==N2) then i=1
+         else i=0
+EXAMPLE: example specialModulesEqual; shows an example
+"
+{
+   int @j;
+
+   if(size(k1)==size(k2))
+   {
+      for(@j=1;@j<=size(k1);@j++)
+      {
+         if(leadexp(k1[@j])!=leadexp(k2[@j]))
+         {
+            return(0);
+         }
+      }
+      return(1);
+   }
+   return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),dp;
+   module N1=x*freemodule(2);
+   module N2=xy*freemodule(2);
+   int i=specialModulesEqual(N1,N2);
+   i;
+
+   N2=N1;
+   i=specialModulesEqual(N1,N2);
+   i;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// sat2mod(N,i)
+// Generalization of sat2 from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+proc sat2mod (module id, ideal h1)
+"USAGE:   sat2mod(id,j);  id ideal, j polynomial
+RETURN:  saturation of id with respect to j (= union_(k=1...) of id:j^k)
+NOTE:    result is a std basis in the basering
+"
+{
+   int @k,@i;
+   def @P= basering;
+   if(ordstr(basering)[1,2]!="dp")
+   {
+      execute("ring @Phelp=("+charstr(@P)+"),("+varstr(@P)+"),(C,dp);");
+      module inew=std(imap(@P,id));
+      ideal  @h=imap(@P,h1);
+   }
+   else
+   {
+      ideal @h=h1;
+      module inew=std(id);
+   }
+   ideal fac;
+
+   for(@i=1;@i<=ncols(@h);@i++)
+   {
+     if(deg(@h[@i])>0)
+     {
+        fac=fac+factorize(@h[@i],1);
+     }
+   }
+   fac=simplify(fac,4);
+   poly @f=1;
+   if(deg(fac[1])>0)
+   {
+      module iold;
+
+      for(@i=1;@i<=size(fac);@i++)
+      {
+        @f=@f*fac[@i];
+      }
+      intvec optionsVec=option(get)
+      option(returnSB);
+      while(specialModulesEqual(iold,inew)==0 )
+      {
+         iold=inew;
+         if(deg(iold[size(iold)])!=1)
+         {
+            inew=quotient(iold,@f);
+         }
+         else
+         {
+            inew=iold;
+         }
+         @k++;
+      }
+      option(set,optionsVec);
+      @k--;
+   }
+
+   if(ordstr(@P)[1,2]!="dp")
+   {
+      setring @P;
+      module inew=std(imap(@Phelp,inew));
+      poly @f=imap(@Phelp,@f);
+   }
+   list L =inew,@f^@k;
+   return (L);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// stdModulesEqual(N1,N2)
+// Generalization of stdIdealsEqual from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+static proc stdModulesEqual(module k1, module k2)
+"USAGE:   stdModulesEqual(N1, N2) N1, N2 standard bases of modules,
+RETURN:  int i
+         if (N1==N2) then i=1
+         else i=0
+EXAMPLE: example stdModulesEqual; shows an example
+"
+{
+   int @j;
+
+   if(size(k1)==size(k2))
+   {
+      for(@j=1;@j<=size(k1);@j++)
+      {
+         if(leadexp(k1[@j])!=leadexp(k2[@j]))
+         {
+            return(0);
+         }
+      }
+      attrib(k2,"isSB",1);
+      if(size(reduce(k1,k2,1))==0)
+      {
+         return(1);
+      }
+   }
+   return(0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),dp;
+   module N1=x*freemodule(2);
+   module N2=xy*freemodule(2);
+   int i=stdModulesEqual(N1,N2);
+   i;
+
+   N2=N1;
+   i=stdModulesEqual(N1,N2);
+   i;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// ModulesEqual(N1,N2)
+// Generalization of IdealsEqual from primdec.lib
+/////////////////////////////////////////////////////////////////////////////
+
+static proc modulesEqual( module @k, module @j)
+"USAGE:   modulesEqual(N1, N2) N1, N2 modules,
+RETURN:  int i
+         if (N1==N2) then i=1
+         else i=0
+EXAMPLE: example modulesEqual; shows an example
+"
+{
+   return(stdModulesEqual(std(@k),std(@j)));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),dp;
+   module N1=x*freemodule(2);
+   module N2=xy*freemodule(2);
+   int i=stdModulesEqual(N1,N2);
+   i;
+
+   N2=N1;
+   i=modulesEqual(N1,N2);
+   i;
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),dp;
+   module N1=x*freemodule(2);
+   module N2=xy*freemodule(2);
+   int i=modulesEqual(N1,N2);
+   i;
+
+   N2=N1;
+   i=modulesEqual(N1,N2);
+   i;
+}
+
+static proc getData (module @N, list oldData, list #)
+"USAGE:   getData(N, l[, noCheck]);  module N, list l[, int noCheck]
+RETURN:  (ann, check, M, checked)
+         ideal ann, module check, M, int checked
+
+         if l[1] is contained in N [and noCheck is not given]
+            then checked=1, ann=ideal(0), check=0, M=0;
+         else checked=0, M=freemodule(nrows(N)); check=l[1]
+            (resp. check=M if l is an empty list) and
+            if size(l)>1 then  ann=l[2] else ann is the annihilator of M/N.
+
+NOTE:    ann is a std basis in the basering
+EXAMPLE: example getData; shows an example
+"
+{
+  if (size(oldData)>0)
+  {
+    if ((size(#)==0)&&(size(NF(oldData[1],@N,1))==0))
+    {
+      return(ideal(0), 0 ,  0, 1);
+    }
+    module @M=freemodule(nrows(@N));
+    if (size(oldData)>1)
+    {
+      ideal ann=oldData[2];
+      attrib(ann,"isSB",1);
+    }
+    else
+    {
+      ideal ann=annil(@N);
+    }
+  }
+  else
+  {
+   module @M=freemodule(nrows(@N));
+   oldData[1]=@M;
+   ideal ann=annil(@N);
+  }
+ return(ann, oldData[1], @M, 0);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring  r = 0,(x,y,z),lp;
+   module N=x*gen(1),y*gen(2);
+   N=std(N);
+   ideal ann; module check, M; int checked; list l;
+   (ann, check, M, checked)=getData(N,l);
+   ann; check; M; checked;
+
+   l=list(check,ann);
+   (ann, check, M, checked)=getData(N,l);
+   ann; check; M; checked;
+
+   l=list(N);
+   (ann, check, M, checked)=getData(N,l);
+   ann; check; M; checked;
+}

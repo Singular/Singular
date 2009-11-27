@@ -1,0 +1,73 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Singularities";
+info="
+LIBRARY:  spectrum.lib  Singularity Spectrum for Nondegenerate Singularities
+AUTHOR:   S. Endrass
+
+PROCEDURES:
+ spectrumnd(poly f[,1]);  spectrum of nondegenerate isolated singularity f
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc spectrumnd (poly f,list #)
+"USAGE:    spectrumnd(f[,1]); poly f
+ASSUME:   basering has characteristic 0 and local ordering,
+          f has isolated singularity at 0 and nondegenerate principal part
+RETURN:
+@format
+list S:
+  ideal S[1]: spectral numbers in increasing order
+  intvec S[2]:
+    int S[2][i]: multiplicity of spectral number S[1][i]
+@end format
+NOTE:     if a second argument 1 is given,
+          no test for a degenerate principal part will be done
+SEE_ALSO: gmssing_lib
+KEYWORDS: singularities; Gauss-Manin connection; spectrum
+EXAMPLE:  example spectrumnd; shows an example
+"
+{
+  if(charstr(basering)!="0")
+  {
+    ERROR("characteristic 0 expected");
+  }
+  if(size(#)==0)
+  {
+    list S=system("spectrum",f);
+  }
+  else
+  {
+    list S=system("spectrum",f,#[1]);
+  }
+  ideal a=number(S[4][1])/S[5][1]-1;
+  int i;
+  for(i=S[3];i>1;i--)
+  {
+    a[i]=number(S[4][i])/S[5][i]-1;
+  }
+  return(list(a,S[6]));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R=0,(x,y),ds;
+  poly f=x^31+x^6*y^7+x^2*y^12+x^13*y^2+y^29;
+  list s=spectrumnd(f);
+  size(s[1]);
+  s[1][22];
+  s[2][22];
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc semicont(list #)
+{
+  ERROR("semicont was replaced by spsemicont in gmssing.lib");
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc semicontqh(list #)
+{
+  ERROR("semicontqh was replaced by spsemicont in gmssing.lib");
+}
+///////////////////////////////////////////////////////////////////////////////

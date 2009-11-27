@@ -1,0 +1,1098 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Commutative Algebra";
+info="
+LIBRARY: toric.lib   Standard Basis of Toric Ideals
+AUTHOR:  Christine Theis, email: ctheis@math.uni-sb.de
+
+PROCEDURES:
+toric_ideal(A,..);   computes the toric ideal of A
+toric_std(ideal I);  standard basis of I by a specialized Buchberger algorithm
+";
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc toric_ideal_1(intmat A, string alg)
+{
+  ideal I;
+  // to be returned
+
+  // check suitability of actual basering
+  if(nvars(basering)<ncols(A))
+  {
+    ERROR("The number of matrix columns is smaller than the number of ring variables.");
+  }
+
+  // check suitability of actual term ordering
+  // the "module ordering" c or C is ignored
+  string singular_ord=ordstr(basering);
+  string test_ord;
+  string external_ord="";
+  int i,j;
+  intvec weightvec;
+
+  if(find(singular_ord,"lp")==1)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=0;
+    }
+    test_ord="lp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; lp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"lp")==3)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=0;
+    }
+    test_ord="lp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; lp used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"dp")==1)
+  {
+    external_ord="W_REV_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="dp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; dp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"dp")==3)
+  {
+    external_ord="W_REV_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="dp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; dp used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"Dp")==1)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="Dp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; Dp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"Dp")==3)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="Dp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; Dp used for computation.";
+    }
+  }
+
+  int pos;
+  string number_string;
+
+  if(external_ord=="" && find(singular_ord,"wp")==1)
+  {
+    external_ord="W_REV_LEX";
+    pos=3;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="wp("+string(weightvec)+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; wp("+string(weightvec)+") used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"wp")==3)
+  {
+    external_ord="W_REV_LEX";
+    pos=5;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="wp("+string(weightvec)+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; wp("+string(weightvec)+") used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"Wp")==1)
+  {
+    external_ord="W_LEX";
+    pos=3;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="Wp("+string(weightvec)+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; Wp("+string(weightvec)+") used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"Wp")==3)
+  {
+    external_ord="W_LEX";
+    pos=5;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="Wp("+string(weightvec)+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; Wp("+string(weightvec)+") used for computation.";
+    }
+  }
+
+  if(external_ord=="")
+  {
+    ERROR("The term ordering of the actual basering is not supported.");
+  }
+
+  // check algorithm
+  if(alg=="ct" || alg=="pct")
+    // these algorithms will not cause an error in the external program;
+    // however, they do not compute the toric ideal of A, but of an
+    // extended matrix
+  {
+    ERROR("The chosen algorithm is not suitable.");
+  }
+
+  // create temporary file with which the external program is called
+
+  int dummy;
+  int process=system("pid");
+  string matrixfile="temp_MATRIX"+string(process);
+  link MATRIX=":w "+matrixfile;
+  open(MATRIX);
+
+  write(MATRIX,"MATRIX","columns:",ncols(A),"cost vector:");
+  for(j=1;j<=ncols(A);j++)
+  {
+    write(MATRIX,weightvec[j]);
+  }
+  write(MATRIX,"rows:",nrows(A),"matrix:");
+  for(i=1;i<=nrows(A);i++)
+  {
+    for(j=1;j<=ncols(A);j++)
+    {
+      write(MATRIX,A[i,j]);
+    }
+  }
+
+  // search for positive row space vector, if required by the
+  // algorithm
+  int found=0;
+  if((alg=="blr") || (alg=="hs"))
+  {
+    for(i=1;i<=nrows(A);i++)
+    {
+      found=i;
+      for(j=1;j<=ncols(A);j++)
+      {
+        if(A[i,j]<=0)
+        {
+          found=0;
+        }
+      }
+      if(found>0)
+      {
+        break;
+      }
+    }
+    if(found==0)
+    {
+      close(MATRIX);
+      dummy=system("sh","rm -f "+matrixfile);
+      ERROR("The chosen algorithm needs a positive vector in the row space of the matrix.");
+    }
+    write(MATRIX,"positive row space vector:");
+    for(j=1;j<=ncols(A);j++)
+    {
+      write(MATRIX,A[found,j]);
+    }
+  }
+  close(MATRIX);
+
+
+  // call external program
+  dummy=system("sh","toric_ideal -alg "+alg+" "+matrixfile);
+  if (dummy!=0) { ERROR("toric_ideal failed with error code "+string(dummy)); }
+
+  // read toric ideal from created file
+  link TORIC_IDEAL=":r "+matrixfile+".GB."+alg;
+  string toric_id=read(TORIC_IDEAL);
+
+  int generators;
+  pos=find(toric_id,"size");
+  pos=find(toric_id,":",pos);
+  pos++;
+
+  while(toric_id[pos]==" " || toric_id[pos]==newline)
+  {
+    pos++;
+  }
+  number_string="";
+  while(toric_id[pos]!=" " && toric_id[pos]!=newline)
+  {
+    number_string=number_string+toric_id[pos];
+    pos++;
+  }
+  execute("generators="+number_string+";");
+
+  intvec v;
+  poly head;
+  poly tail;
+
+  pos=find(toric_id,"basis");
+  pos=find(toric_id,":",pos);
+  pos++;
+
+  for(i=1;i<=generators;i++)
+  {
+    head=1;
+    tail=1;
+
+    for(j=1;j<=ncols(A);j++)
+    {
+      while(toric_id[pos]==" " || toric_id[pos]==newline)
+      {
+        pos++;
+      }
+      number_string="";
+      while(toric_id[pos]!=" " && toric_id[pos]!=newline)
+      {
+        number_string=number_string+toric_id[pos];
+        pos++;
+      }
+      execute("v[j]="+number_string+";");
+      if(v[j]<0)
+      {
+        tail=tail*var(j)^(-v[j]);
+      }
+      if(v[j]>0)
+      {
+        head=head*var(j)^v[j];
+      }
+    }
+    I[i]=head-tail;
+  }
+
+  // delete all created files
+  dummy=system("sh","rm -f "+matrixfile);
+  dummy=system("sh","rm -f "+matrixfile+".GB."+alg);
+
+  return(I);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+static proc toric_ideal_2(intmat A, string alg, intvec prsv)
+{
+  ideal I;
+  // to be returned
+
+  // check arguments
+  if(size(prsv)<ncols(A))
+  {
+    ERROR("The number of matrix columns does not equal the size of the positive row space vector.");
+  }
+
+  // check suitability of actual basering
+  if(nvars(basering)!=ncols(A))
+  {
+    ERROR("The number of matrix columns is smaller than the number of ring variables.");
+  }
+
+  // check suitability of actual term ordering
+  // the "module ordering" c or C is ignored
+  string singular_ord=ordstr(basering);
+  string test_ord;
+  string external_ord="";
+  int i,j;
+  intvec weightvec;
+
+  if(find(singular_ord,"lp")==1)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=0;
+    }
+    test_ord="lp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; lp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"lp")==3)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=0;
+    }
+    test_ord="lp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; lp used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"dp")==1)
+  {
+    external_ord="W_REV_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="dp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; dp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"dp")==3)
+  {
+    external_ord="W_REV_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="dp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; dp used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"Dp")==1)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="Dp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; Dp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"Dp")==3)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="Dp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; Dp used for computation.";
+    }
+  }
+
+  int pos;
+  string number_string;
+
+  if(external_ord=="" && find(singular_ord,"wp")==1)
+  {
+    external_ord="W_REV_LEX";
+    pos=3;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="wp("+string(weightvec)+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; wp("+string(weightvec)+") used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"wp")==3)
+  {
+    external_ord="W_REV_LEX";
+    pos=5;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="wp("+string(weightvec)+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; wp("+string(weightvec)+") used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"Wp")==1)
+  {
+    external_ord="W_LEX";
+    pos=3;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="Wp("+string(weightvec)+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; Wp("+string(weightvec)+") used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"Wp")==3)
+  {
+    external_ord="W_LEX";
+    pos=5;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="Wp("+string(weightvec)+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; Wp("+string(weightvec)+") used for computation.";
+    }
+  }
+
+  if(external_ord=="")
+  {
+    ERROR("The term ordering of the actual basering is not supported.");
+  }
+
+  // check algorithm
+  if(alg=="ct" || alg=="pct")
+    // these algorithms will not cause an error in the external program;
+    // however, they do not compute the toric ideal of A, but of an
+    // extended matrix
+  {
+    ERROR("The chosen algorithm is not suitable.");
+  }
+
+  // create temporary file with that the external program is called
+
+  int dummy;
+  int process=system("pid");
+  string matrixfile="temp_MATRIX"+string(process);
+  link MATRIX=":w "+matrixfile;
+  open(MATRIX);
+
+  write(MATRIX,"MATRIX","columns:",ncols(A),"cost vector:");
+  for(j=1;j<=ncols(A);j++)
+  {
+    write(MATRIX,weightvec[j]);
+  }
+  write(MATRIX,"rows:",nrows(A),"matrix:");
+  for(i=1;i<=nrows(A);i++)
+  {
+    for(j=1;j<=ncols(A);j++)
+    {
+      write(MATRIX,A[i,j]);
+    }
+  }
+
+  // enter positive row space vector, if required by the algorithm
+  if((alg=="blr") || (alg=="hs"))
+  {
+    write(MATRIX,"positive row space vector:");
+    for(j=1;j<=ncols(A);j++)
+    {
+      write(MATRIX,prsv[j]);
+    }
+  }
+  close(MATRIX);
+
+  // call external program
+  dummy=system("sh","toric_ideal -alg "+alg+" "+matrixfile);
+  if (dummy!=0) { ERROR("toric_ideal failed with error code "+string(dummy)); }
+
+  // read toric ideal from created file
+  link TORIC_IDEAL=":r "+matrixfile+".GB."+alg;
+  string toric_id=read(TORIC_IDEAL);
+
+  int generators;
+  pos=find(toric_id,"size");
+  pos=find(toric_id,":",pos);
+  pos++;
+
+  while(toric_id[pos]==" " || toric_id[pos]==newline)
+  {
+    pos++;
+  }
+  number_string="";
+  while(toric_id[pos]!=" " && toric_id[pos]!=newline)
+  {
+    number_string=number_string+toric_id[pos];
+    pos++;
+  }
+  execute("generators="+number_string+";");
+
+  intvec v;
+  poly head;
+  poly tail;
+
+  pos=find(toric_id,"basis");
+  pos=find(toric_id,":",pos);
+  pos++;
+
+  for(i=1;i<=generators;i++)
+  {
+    head=1;
+    tail=1;
+
+    for(j=1;j<=ncols(A);j++)
+    {
+      while(toric_id[pos]==" " || toric_id[pos]==newline)
+      {
+        pos++;
+      }
+      number_string="";
+      while(toric_id[pos]!=" " && toric_id[pos]!=newline)
+      {
+        number_string=number_string+toric_id[pos];
+        pos++;
+      }
+      execute("v[j]="+number_string+";");
+      if(v[j]<0)
+      {
+        tail=tail*var(j)^(-v[j]);
+      }
+      if(v[j]>0)
+      {
+        head=head*var(j)^v[j];
+      }
+    }
+    I[i]=head-tail;
+  }
+
+  // delete all created files
+  dummy=system("sh","rm -f "+matrixfile);
+  dummy=system("sh","rm -f "+matrixfile+".GB."+alg);
+
+  return(I);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc toric_ideal
+"USAGE: toric_ideal(A,alg);      A intmat, alg string
+        toric_ideal(A,alg,prsv); A intmat, alg string, prsv intvec
+RETURN: ideal: standard basis of the toric ideal of A
+NOTE:   These procedures return the standard basis of the toric ideal of A
+        with respect to the term ordering in the current basering. Not all
+        term orderings are supported: The usual global term orderings may be
+        used, but no block orderings combining them.
+        One may call the procedure with several different algorithms: @*
+        - the algorithm of Conti/Traverso using elimination (ect), @*
+        - the algorithm of Pottier (pt),
+        - an algorithm of Bigatti/La Scala/Robbiano (blr),
+        - the algorithm of Hosten/Sturmfels (hs),
+        - the algorithm of DiBiase/Urbanke (du).
+       The argument `alg' should be the abbreviation for an algorithm as
+       above: ect, pt, blr, hs or du.
+
+      If `alg' is chosen to be `blr' or `hs', the algorithm needs a vector
+      with positive coefficients in the row space of A.
+      If no row of A contains only positive entries, one has to use the
+      second version of toric_ideal which takes such a vector as its third
+      argument.
+      For the mathematical background, see
+  @texinfo
+  @ref{Toric ideals and integer programming}.
+  @end texinfo
+EXAMPLE:  example toric_ideal; shows an example
+SEE ALSO: toric_std, toric_lib, intprog_lib, Toric ideals
+"
+{
+  if(size(#)==2)
+  {
+    return(toric_ideal_1(#[1],#[2]));
+  }
+  else
+  {
+    return(toric_ideal_2(#[1],#[2],#[3]));
+  }
+}
+
+
+
+example
+{
+"EXAMPLE"; echo=2;
+
+ring r=0,(x,y,z),dp;
+
+// call with two arguments
+intmat A[2][3]=1,1,0,0,1,1;
+A;
+
+ideal I=toric_ideal(A,"du");
+I;
+
+I=toric_ideal(A,"blr");
+I;
+
+// call with three arguments
+intvec prsv=1,2,1;
+I=toric_ideal(A,"blr",prsv);
+I;
+
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc toric_std(ideal I)
+"USAGE:   toric_std(I);      I ideal
+RETURN:   ideal: standard basis of I
+NOTE:     This procedure computes the standard basis of I using a specialized
+          Buchberger algorithm. The generating system by which I is given has
+          to consist of binomials of the form x^u-x^v. There is no real check
+          if I is toric. If I is generated by binomials of the above form,
+          but not toric, toric_std computes an ideal `between' I and its
+          saturation with respect to all variables.
+          For the mathematical background, see
+   @texinfo
+   @ref{Toric ideals and integer programming}.
+   @end texinfo
+EXAMPLE:  example toric_std; shows an example
+SEE ALSO: toric_ideal, toric_lib, intprog_lib, Toric ideals
+"
+{
+  ideal J;
+  // to be returned
+
+  // check suitability of actual term ordering
+  // the "module ordering" c or C is ignored
+  string singular_ord=ordstr(basering);
+  string test_ord;
+  string external_ord="";
+  int i,j;
+  intvec weightvec;
+
+  if(find(singular_ord,"lp")==1)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=0;
+    }
+    test_ord="lp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; lp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"lp")==3)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=0;
+    }
+    test_ord="lp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; lp used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"dp")==1)
+  {
+    external_ord="W_REV_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="dp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; dp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"dp")==3)
+  {
+    external_ord="W_REV_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="dp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; dp used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"Dp")==1)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="Dp("+string(nvars(basering))+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; Dp used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"Dp")==3)
+  {
+    external_ord="W_LEX";
+    for(i=1;i<=nvars(basering);i++)
+    {
+      weightvec[i]=1;
+    }
+    test_ord="Dp("+string(nvars(basering))+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; Dp used for computation.";
+    }
+  }
+
+  int pos;
+  string number_string;
+
+  if(external_ord=="" && find(singular_ord,"wp")==1)
+  {
+    external_ord="W_REV_LEX";
+    pos=3;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!="," && singular_ord[pos]!=")")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec["+string(i)+"]="+number_string+";");
+    }
+    test_ord="wp("+string(weightvec)+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; wp("+string(weightvec)+") used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"wp")==3)
+  {
+    external_ord="W_REV_LEX";
+    pos=5;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="wp("+string(weightvec)+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; wp("+string(weightvec)+") used for computation.";
+    }
+  }
+
+  if(external_ord=="" && find(singular_ord,"Wp")==1)
+  {
+    external_ord="W_LEX";
+    pos=3;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="Wp("+string(weightvec)+"),";
+    if(singular_ord!=(test_ord+"C") && singular_ord!=(test_ord+"c"))
+    {
+      "Warning: Block orderings are not supported; Wp("+string(weightvec)+") used for computation.";
+    }
+  }
+  if(external_ord=="" && find(singular_ord,"Wp")==3)
+  {
+    external_ord="W_LEX";
+    pos=5;
+    for(i=1;i<=nvars(basering);i++)
+    {
+      pos++;
+      number_string="";
+      while(singular_ord[pos]!=",")
+      {
+        number_string=number_string+singular_ord[pos];
+        pos++;
+      }
+      execute("weightvec[i]="+number_string);
+    }
+    test_ord="Wp("+string(weightvec)+"),";
+    if(singular_ord!=("C"+test_ord) && singular_ord!=("c"+test_ord))
+    {
+      "Warning: Block orderings are not supported; Wp("+string(weightvec)+") used for computation.";
+    }
+  }
+
+  if(external_ord=="")
+  {
+    ERROR("The term ordering of the actual basering is not supported.");
+  }
+
+  // create first temporary file with which the external program is called
+
+  int dummy;
+  int process=system("pid");
+  string groebnerfile="temp_GROEBNER"+string(process);
+  link GROEBNER=":w "+groebnerfile;
+  open(GROEBNER);
+
+  write(GROEBNER,"GROEBNER","computed with algorithm:","pt","term ordering:","elimination block",0,"weighted block",nvars(basering),external_ord);
+  // algorithm is totally unimportant, only required by the external program
+
+  for(i=1;i<=nvars(basering);i++)
+  {
+    write(GROEBNER,weightvec[i]);
+  }
+
+  write(GROEBNER,"size:",size(I),"Groebner basis:");
+  poly head;
+  poly tail;
+  poly rest;
+  intvec v;
+
+  for(j=1;j<=size(I);j++)
+  {
+    // test suitability of generator j
+    rest=I[j];
+    head=lead(rest);
+    rest=rest-head;
+    tail=lead(rest);
+    rest=rest-tail;
+
+    if(head==0 && tail==0 && rest!=0)
+    {
+      close(GROEBNER);
+      dummy=system("sh","rm -f "+groebnerfile);
+      ERROR("Generator "+string(j)+" of the input ideal is no binomial.");
+    }
+
+    if(leadcoef(tail)!=-leadcoef(head))
+      // generator is no difference of monomials (or a constant multiple)
+    {
+      close(GROEBNER);
+      dummy=system("sh","rm -f "+groebnerfile);
+      ERROR("Generator "+string(j)+" of the input ideal is no difference of monomials.");
+    }
+
+    if(gcd(head,tail)!=1)
+    {
+      "Warning: The monomials of generator "+string(j)+" of the input ideal are not relatively prime.";
+    }
+
+    // write vector representation of generator j into the file
+    v=leadexp(head)-leadexp(tail);
+    for(i=1;i<=nvars(basering);i++)
+    {
+      write(GROEBNER,v[i]);
+    }
+  }
+  close(GROEBNER);
+
+  // create second temporary file
+
+  string newcostfile="temp_NEW_COST"+string(process);
+  link NEW_COST=":w "+newcostfile;
+  open(NEW_COST);
+
+  write(NEW_COST,"NEW_COST","variables:",nvars(basering),"cost vector:");
+  for(i=1;i<=nvars(basering);i++)
+  {
+    write(NEW_COST,weightvec[i]);
+  }
+
+  // call external program
+  dummy=system("sh","change_cost "+groebnerfile+" "+newcostfile);
+  if (dummy!=0) { ERROR("change_cost failed with error code "+string(dummy)); }
+
+  // read toric standard basis from created file
+  link TORIC_IDEAL=":r "+newcostfile+".GB.pt";
+  string toric_id=read(TORIC_IDEAL);
+
+  int generators;
+  pos=find(toric_id,"size");
+  pos=find(toric_id,":",pos);
+  pos++;
+
+  while(toric_id[pos]==" " || toric_id[pos]==newline)
+  {
+    pos++;
+  }
+  number_string="";
+  while(toric_id[pos]!=" " && toric_id[pos]!=newline)
+  {
+    number_string=number_string+toric_id[pos];
+    pos++;
+  }
+  execute("generators="+number_string+";");
+
+  pos=find(toric_id,"basis");
+  pos=find(toric_id,":",pos);
+  pos++;
+
+  for(j=1;j<=generators;j++)
+  {
+    head=1;
+    tail=1;
+
+    for(i=1;i<=nvars(basering);i++)
+    {
+      while(toric_id[pos]==" " || toric_id[pos]==newline)
+      {
+        pos++;
+      }
+      number_string="";
+      while(toric_id[pos]!=" " && toric_id[pos]!=newline)
+      {
+        number_string=number_string+toric_id[pos];
+        pos++;
+      }
+      execute("v[i]="+number_string+";");
+      if(v[i]<0)
+      {
+        tail=tail*var(i)^(-v[i]);
+      }
+      if(v[i]>0)
+      {
+        head=head*var(i)^v[i];
+      }
+    }
+    J[j]=head-tail;
+  }
+
+  // delete all created files
+  dummy=system("sh","rm -f "+groebnerfile);
+  dummy=system("sh","rm -f "+groebnerfile+".GB.pt");
+  dummy=system("sh","rm -f "+newcostfile);
+
+  return(J);
+}
+
+example
+{
+"EXAMPLE"; echo=2;
+
+ring r=0,(x,y,z),wp(3,2,1);
+
+// call with toric ideal (of the matrix A=(1,1,1))
+ideal I=x-y,x-z;
+ideal J=toric_std(I);
+J;
+
+// call with the same ideal, but badly chosen generators:
+// 1) not only binomials
+I=x-y,2x-y-z;
+J=toric_std(I);
+// 2) binomials whose monomials are not relatively prime
+I=x-y,xy-yz,y-z;
+J=toric_std(I);
+J;
+
+// call with a non-toric ideal that seems to be toric
+I=x-yz,xy-z;
+J=toric_std(I);
+J;
+// comparison with real standard basis and saturation
+ideal H=std(I);
+H;
+LIB "elim.lib";
+sat(H,xyz);
+}
+///////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,294 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Miscellaneous";
+info="
+LIBRARY:  makedbm.lib     Data Base of Singularities for the Arnold-Classifier
+AUTHOR:   Kai Krueger, krueger@mathematik.uni-kl.de
+
+PROCEDURES:
+ dbm_read(l);          read all entries from a DBM-databaes pointed by l
+ dbm_getnext(l);       read next entry from a DBM-databaes pointed by l
+ create_sing_dbm();
+ read_sing_dbm();
+";
+
+//=============================================================================
+
+proc makedbm_init()
+{
+  string s;
+  link l="DBM:r NFlist";
+  s = read(l,"VERSION");
+  if (s == "" ) {
+    "Need to create database...";
+    create_sing_dbm();
+  }
+  close(l);
+  l="DBM:r NFlist";
+  s = read(l,"VERSION");
+  "Creation done. Current version:", s;
+}
+//=============================================================================
+
+proc dbm_read (link l)
+{
+  string s="";
+  s=read(l);
+  while( s != "" )
+  {
+    s,"=",read(l,s);
+    s=read(l);
+  }
+}
+
+//=============================================================================
+proc dbm_getnext (link l)
+{
+  string s="";
+  s=read(l);
+  if( s != "" ) { s,"=",read(l,s); }
+}
+
+//=============================================================================
+proc create_sing_dbm
+{
+// DatenFormat: crk=#; Mu=#; MlrCd=#;
+  string s;
+  link l="DBM:rw NFlist";
+
+  write(l, "A[k]", "x^(k+1)");
+  s ="crk=1; Mu=k; MlnCd=k;";
+  write(l, "I_A[k]", s);
+
+  write(l, "D[k]", "x2y+y^(k-1)");
+  s = "crk=2; Mu=k; MlnCd=1,1,k-3";
+  write(l, "I_D[k]", s);
+
+  write(l, "E[6k]", "x3+y^(3*k+1)+a*x*(y^(2*k+1))");
+  s = "crk=2; Mu=6*k; MlnCd=1,2*k,2*k-1";
+  write(l, "I_E[6k]", s);
+
+  write(l, "E[6k+1]", "x3+x*(y^(2*k+1))+a*(y^(3*k+2))");
+  write(l, "E[6k+2]", "x3+y^(3*k+2)+a*x*(y^(2*k+2))");
+  write(l, "J[k,0]", "x3+b*x^2*y^k+y^(3*k)+c*x*y^(2*k+1)");
+  write(l, "J[k,r]", "x3+x2*y^k+a*y^(3*k+r)");
+  write(l, "X[1,0]", "x4+a*x2y2+y4");
+  write(l, "X[1,r]", "x4+x2y2+a*y^(4+r)");
+  write(l, "X[k,0]", "x4+b*x^3*y^k+a*x^2*y^(2*k) + x*y^(3*k)");
+  write(l, "X[k,r]", "x4+a*x^3*y^k+x^2*y^(2*k)+b*(y^(4*k+r))");
+  write(l, "W[12k]", "x4+y^(4*k+1)+a*x*(y^(3*k+1))+c*x^2*(y^(2*k+1))");
+  write(l, "W[12k+1]", "x4+x*(y^(3*k+1))+a*x^2*(y^(2*k+1))+c*y^(4*k+2)");
+  write(l, "W[12k+5]", "x4+x*(y^(3*k+2))+a*x2*(y^(2*k+2))+b*y^(4*k+3)");
+  write(l, "W[12k+6]", "x4+y^(4*k+3)+a*x*(y^(3*k+3))+b*x2*(y^(2*k+2))");
+  write(l, "W[k,0]", "x4+b*x2*(y^(2*k+1))+a*x*(y^(3*k+2))+y^(4*k+2)");
+  write(l, "W[k,r]", "x4+a*x3*(y^(k+1))+x2*(y^(2*k+1))+b*y^(4*k+2+r)");
+  write(l, "W#[k,2r-1]", "(x2+y^(2*k+1))^2+b*x*(y^(3*k+1+r))+a*y^(4*k+2+r)");
+  write(l, "W#[k,2r]", "(x2+y^(2*k+1))^2+b*x2*(y^(2*k+1+r))+a*x*(y^(3*k+2+r))");
+  write(l, "Y[1,r,s]", "x^(4+r)+a*x2*(y2)+y^(4+s)");
+  write(l, "Y[k,r,s]", "((x+a*y^k)^2 + b*y^(2*k+s))*( x2 + y^(2*k+r))");
+  write(l, "Z[1,0]", "x3y + x2y3 + xy6 +y7");
+  write(l, "Z[1,r]", "x3y + x2*(y^3) + a*y^(7+r)");
+  write(l, "Z[k,r,s]", "(x2+a*x*(y^k)+b*y^(2*k+r))*(x2+y^(2*k+2*r+s))");
+  write(l, "Z[k,r,0]", "(x+a*(y^k))*(x3+d*x2*(y^(k+r))+c*x*(y^(2*k+2*r+1))+y^(3*k+3*r))");
+  write(l, "Z[k,12k+6r-1]", "(x+a*(y^k))*(x3+b*x*(y^(2*k+2*r+1))+y^(3*k+3*r+1))");
+  write(l, "Z[k,12k+6r]", "(x+a*(y^k))*(x3+x*(y^(2*k+2*r+1))+b*y^(3*k+3*r+2))");
+  write(l, "Z[k,12k+6r+1]", "(x+a*(y^k))*(x3+b*x*(y^(2*k+2*r+2))+y^(3*k+3*r+2))");
+  write(l, "Z[k,0]", "y*(x3+d*x2*(y^(k+1))+c*x*(y^(2*k+3))+y^(3*k+3))");
+  write(l, "Z[k,r]", "y*(x3+x^2*y^(k+1)+b*(y^(3*k+r+3)))");
+  write(l, "Z[6k+5]", "y*(x3+b*x*(y^(2*k+1))+y^(3*k+1))");
+  write(l, "Z[6k+6]", "y*(x3+x*(y^(2*k+1))+b*y^(3*k+2))");
+  write(l, "Z[6k+7]", "y*(x3+b*x*(y^(2*k+2))+y^(3*k+2))");
+  write(l, "Q[k,0]", "x3+z2y+b*x2*(y^k)+x*(y^(2*k))");
+  write(l, "Q[k,r]", "x3+z2y+x2*(y^k)+b*y^(3*k+r)");
+  write(l, "Q[6k+4]", "x3+z2y+y^(3*k+1)+b*x*(y^(2*k+1))");
+  write(l, "Q[6k+5]", "x3+z2y+x*(y^(2*k+1))+b*y^(3*k+2)");
+  write(l, "Q[6k+6]", "x3+z2y+y^(3*k+2)+b*x*(y^(2*k+2))");
+  write(l, "S[12k-1]", "x2z+z2y+y^(4*k)+a*x*(y^(3*k))+c*z*(y^(2*k+1))");
+  write(l, "S[12k]", "x2z+z2y+x*(y^(3*k))+c*y^(4*k+1)+a*z*(y^(2*k+1))");
+  write(l, "S[k,0]", "x2z+z2y+y^(4*k+1)+a*x*(y^(3*k+1))+b*z*(y^(2*k+1))");
+  write(l, "S[k,r]", "x2z+z2y+x2*(y^(2*k))+a*x3*(y^k)+b*y^(4*k+r+1)");
+  write(l, "S#[k,2r-1]", "x2z+z2y+z*(y^(2*k+1))+b*x*(y^(3*k+r))+a*(y^(4*k+r+1))");
+  write(l, "S#[k,2r]", "x2z+z2y+z*(y^(2*k+1))+b*x2*(y^(2*k+r))");
+  write(l, "S[12k+4]", "x2z+z2y+x*(y^(3*k+1))+a*z*(y^(2*k+2))+b*y^(4*k+2)");
+  write(l, "S[12k+5]", "x2z+z2y+y^(4*k+2)+a*x*(y^(3*k+2))+b*z*(y^(2*k+2))");
+  write(l, "U[12k]", "x3+z2x+y^(3*k+1)+a*x*(y^(2*k+1))+b*z*(y^(2*k+1))+d*x2*(y^(k+1))");
+  write(l, "U[k,2r-1]", "x3+z2x+x*(y^(2*k+1))+a*x2*(y^(k+1))+b*(y^(3*k+r+2))+c*z*(y^(2*k+r+1))");
+  write(l, "U[k,2r]", "x3+z2x+x*(y^(2*k+1))+a*x2*(y^(k+1))+b*z*(y^(2*k+r+1))+c*z2*(y^(k+r))");
+  write(l, "U[12k+4]", "x3+z2x+y^(3*k+2)+a*x*(y^(2*k+2))+b*z*(y^(2*k+2))+c*x2*(y^(k+1))");
+  write(l, "V[1,0]", "x2y+z4+a*z3y+b*z2y2+y3z");
+  write(l, "V[1,r]", "x2y+z4+b*z3y+z2y2+a*(y^(r+4))");
+  write(l, "V#[1,2r-1]", "x2y+z3y+a*z2y2+y4+b*x*(z^(r+2))");
+  write(l, "V#[1,2r]", "x2y+z3y+a*z2y2+y4+b*(z^(r+4))");
+  write(l, "T[k,r,s]", "x^k+y^r+z^s+xyz");
+
+  s = "crk=2; Mu=6*k+1; MlnCd=1,2*k,2*k";
+  write(l, "I_E[6k+1]", s);
+//"I_E[6k+1]=", read(l, "I_E[6k+1]");
+  s = "crk=2; Mu=6*k+2; MlnCd=1,2*k+1,2*k-1";
+  write(l, "I_E[6k+2]", s);
+  s = "crk=2; Mu=6*k-2; MlnCd=1,2*k-1,2*k-1";
+  write(l, "I_J[k,0]", s);
+//"I_J[k,0]=", read(l, "I_J[k,0]");
+  s = "crk=2; Mu=6*k-2+r; MlnCd=1,2*k-1,2*k-1+r";
+  write(l, "I_J[k,r]", s);
+//"I_J[k,r]=", read(l, "I_J[k,r]");
+  s = "crk=2; Mu=9; MlnCd=1,1,1,1,1";
+  write(l, "I_X[1,0]", s);
+  s = "crk=2; Mu=9+r; MlnCd=1,1,1,1,1+r";
+  write(l, "I_X[1,r]", s);
+  s = "crk=2; Mu=12*k-3; MlnCd=1,1,2*k-1,2*k-1,2*k-1";
+  write(l, "I_X[k,0]", s);
+  s = "crk=2; Mu=12*k-3+r; MlnCd=1,1,2*k-1,2*k-1,2*k-1+r";
+  write(l, "I_X[k,r]", s);
+  s = "crk=2; Mu=12*k;";
+  write(l, "I_W[12k]", s);
+  s = "crk=2; Mu=12*k+1;";
+  write(l, "I_W[12k+1]", s);
+  s = "crk=2; Mu=12*k+5;";
+  write(l, "I_W[12k+5]", s);
+  s = "crk=2; Mu=12*k+6;";
+  write(l, "I_W[12k+6]", s);
+  s = "crk=2; Mu=12*k+3;";
+  write(l, "I_W[k,0]", s);
+  s = "crk=2; Mu=12*k+3+r;";
+  write(l, "I_W[k,r]", s);
+  s = "crk=2; Mu=12*k+2+2*r;";
+  write(l, "I_W#[k,2r-1]", s);
+  s = "crk=2; Mu=12*k+3+2*r;";
+  write(l, "I_W#[k,2r]", s);
+  s = "crk=2; Mu=9+r+s;";
+  write(l, "I_Y[1,r,s]", s);
+  s = "crk=2; Mu=12*k-3+r+s;";
+  write(l, "I_Y[k,r,s]", s);
+  s = "crk=2; Mu=15;";
+  write(l, "I_Z[1,0]", s);
+  s = "crk=2; Mu=15+r;";
+  write(l, "I_Z[1,r]", s);
+  s = "crk=2; Mu=9+6*k+r;";
+  write(l, "I_Z[k,r]", s);
+  s = "crk=2; Mu=12*k+6*r-3;";
+  write(l, "I_Z[k,r,0]", s);
+  s = "crk=2; Mu=12*k+6*r+s-3;";
+  write(l, "I_Z[k,r,s]", s);
+  s = "crk=2; Mu=12*k+6*r-1;";
+  write(l, "I_Z[k,12k+6r-1]", s);
+  s = "crk=2; Mu=12*k+6*r;";
+  write(l, "I_Z[k,12k+6r]", s);
+  s = "crk=2; Mu=12*k+6*r+1;";
+  write(l, "I_Z[k,12k+6r+1]", s);
+  s = "crk=2; Mu=9+6*k;";
+  write(l, "I_Z[k,0]", s);
+  s = "crk=2; Mu=6*(r+1)-1;";
+  write(l, "I_Z[6k+5]", s);
+  s = "crk=2; Mu=6*(r+1);";
+  write(l, "I_Z[6k+6]", s);
+  s = "crk=2; Mu=6*(r+1)+1;";
+  write(l, "I_Z[6k+7]", s);
+  s = "crk=3; Mu=6*k+2;";
+  write(l, "I_Q[k,0]", s);
+  s = "crk=3; Mu=6*k+2+r;";
+  write(l, "I_Q[k,r]", s);
+  s = "crk=3; Mu=6*k+4;";
+  write(l, "I_Q[6k+4]", s);
+  s = "crk=3; Mu=6*k+5;";
+  write(l, "I_Q[6k+5]", s);
+  s = "crk=3; Mu=6*k+6;";
+  write(l, "I_Q[6k+6]", s);
+  s = "crk=3; Mu=12*k-1;";
+  write(l, "I_S[12k-1]", s);
+  s = "crk=3; Mu=12*k;";
+  write(l, "I_S[12k]", s);
+  s = "crk=3; Mu=12*k+2;";
+  write(l, "I_S[k,0]", s);
+  s = "crk=3; Mu=12*k+2+r;";
+  write(l, "I_S[k,r]", s);
+  s = "crk=3; Mu=12*k+2*r+1;";
+  write(l, "I_S#[k,2r-1]", s);
+  s = "crk=3; Mu=12*k+2*r+2;";
+  write(l, "I_S#[k,2r]", s);
+  s = "crk=3; Mu=12*k+4;";
+  write(l, "I_S[12k+4]", s);
+  s = "crk=3; Mu=12*k+5;";
+  write(l, "I_S[12k+5]", s);
+  s = "crk=3; Mu=12*k;";
+  write(l, "I_U[12k]", s);
+  s = "crk=3; Mu=12*k+4;";
+  write(l, "I_U[12k+4]", s);
+  s = "crk=3; Mu=12*k+1+2*r;";
+  write(l, "I_U[k,2r-1]", s);
+  s = "crk=3; Mu=12*k+2+2*r;";
+  write(l, "I_U[k,2r]", s);
+  s = "crk=3; Mu=15;";
+  write(l, "I_V[1,0]", s);
+  s = "crk=3; Mu=15+r;";
+  write(l, "I_V[1,r]", s);
+  s = "crk=3; Mu=14+2*r;";
+  write(l, "I_V#[1,2r-1]", s);
+  s = "crk=3; Mu=15+2*r;";
+  write(l, "I_V#[1,2r]", s);
+  s = "crk=3; Mu=0;";
+  write(l, "I_T[k,r,s]", s);
+  write(l,"VERSION", "1.0");
+  close(l);
+}
+
+proc read_sing_dbm
+{
+  link l="DBM: NFlist";
+  "A[k]     = "+read(l, "A[k]");
+  "D[k]     = "+read(l, "D[k]");
+  "E[6k]    = "+read(l, "E[6k]");
+  "E[6k+1]  = "+read(l, "E[6k+1]");
+  "E[6k+2]  = "+read(l, "E[6k+2]");
+  "J[k,0]   = "+read(l, "J[k,0]");
+  "J[k,r]   = "+read(l, "J[k,r]");
+  "X[1,0]   = "+read(l, "X[1,0]");
+  "X[1,r]   = "+read(l, "X[1,r]");
+  "X[k,0]   = "+read(l, "X[k,0]");
+  "X[k,r]   = "+read(l, "X[k,r]");
+  "W[12k]   = "+read(l, "W[12k]");
+  "W[12k+1] = "+read(l, "W[12k+1]");
+  "W[12k+5] = "+read(l, "W[12k+5]");
+  "W[12k+6] = "+read(l, "W[12k+6]");
+  "W[k,0]   = "+read(l, "W[k,0]");
+  "W[k,r]   = "+read(l, "W[k,r]");
+  "W#[k,2r-1]   = "+read(l, "W#[k,2r-1]");
+  "W#[k,2r] = "+read(l, "W#[k,2r]");
+  "Y[1,r,s] = "+read(l, "Y[1,r,s]");
+  "Y[k,r,s] = "+read(l, "Y[k,r,s]");
+  "Z[1,0]   = "+read(l, "Z[1,0]");
+  "Z[1,r]   = "+read(l, "Z[1,r]");
+  "Z[k,r,s] = "+read(l, "Z[k,r,s]");
+  "Z[k,r,0] = "+read(l, "Z[k,r,0]");
+  "Z[k,12k+6r-1]= "+read(l, "Z[k,12k+6r-1]");
+  "Z[k,12k+6r]  = "+read(l, "Z[k,12k+6r]");
+  "Z[k,12k+6r+1]= "+read(l, "Z[k,12k+6r+1]");
+  "Z[k,0]   = "+read(l, "Z[k,0]");
+  "Z[k,r]   = "+read(l, "Z[k,r]");
+  "Z[6k+5]  = "+read(l, "Z[6k+5]");
+  "Z[6k+6]  = "+read(l, "Z[6k+6]");
+  "Z[6k+7]  = "+read(l, "Z[6k+7]");
+  "Q[k,0]   = "+read(l, "Q[k,0]");
+  "Q[k,r]   = "+read(l, "Q[k,r]");
+  "Q[6k+4]  = "+read(l, "Q[6k+4]");
+  "Q[6k+5]  = "+read(l, "Q[6k+5]");
+  "Q[6k+6]  = "+read(l, "Q[6k+6]");
+  "S[12k-1] = "+read(l, "S[12k-1]");
+  "S[12k]   = "+read(l, "S[12k]");
+  "S[k,0]   = "+read(l, "S[k,0]");
+  "S[k,r]   = "+read(l, "S[k,r]");
+  "S#[k,2r-1]   = "+read(l, "S#[k,2r-1]");
+  "S#[k,2r] = "+read(l, "S#[k,2r]");
+  "S[12k+4] = "+read(l, "S[12k+4]");
+  "S[12k+5] = "+read(l, "S[12k+5]");
+  "U[12k]   = "+read(l, "U[12k]");
+  "U[k,2r-1]= "+read(l, "U[k,2r-1]");
+  "U[k,2r]  = "+read(l, "U[k,2r]");
+  "U[12k+4] = "+read(l, "U[12k+4]");
+  "V[1,0]   = "+read(l, "V[1,0]");
+  "V[1,r]   = "+read(l, "V[1,r]");
+  "V#[1,2r-1]   = "+read(l, "V#[1,2r-1]");
+  "V#[1,2r] = "+read(l, "V#[1,2r]");
+  "T[k,r,s] = "+read(l, "T[k,r,s]");
+  close(l);
+}

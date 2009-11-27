@@ -1,0 +1,491 @@
+#!/bin/bash
+#
+# surfex install script and documentation
+# ---------------------------------------
+#
+# Short Version of the Installation Intructions:
+# ----------------------------------------------
+# (For longer installation instructions, see further down.)
+# 
+# Run this script by typing the following into a shell:
+# ./INSTALL_WINDOWS
+# This writes a script called "surfex" to a directory contained in your bash path.
+# You can then start surfex by typing:
+# surfex
+#
+
+#
+# surfex:
+# -------
+#
+# visualizing real algebraic surfaces using several visualization tools:
+# - raytracing: surf
+# - triangulation: (display: JavaView)
+#
+# main features:
+# - high quality output for printed publications and for the internet
+# - interactivity, in particular: intuitive rotation/scaling
+#
+# @version 0.89.07, 2006 / 11 / 23
+#
+# @author Stephan Holzer, Oliver Labs
+#         idea: Oliver Labs (2001) during the Dagstuhl workshop Algebra, Geometry, and Software Systems
+#         this version is based on some older code by Richard Morris and Oliver Labs
+#
+# this file: Oliver Labs
+#
+# @address previous versions: 
+#          - (until Oct. 2005): department of mathematics, University of Mainz, Germany
+#          - (until March 2006): RICAM at Linz, Austria
+#          - since then: University of the Saarland (Saarbruecken, Germany)
+#
+# @web	   www.surfex.algebraicsurface.net
+#
+
+
+#
+# INSTALL_WINDOWS surfex on Linux/Unix/Mac OS X
+# -------------------------------------
+#
+# - Requisites to be able to run "surfex" (all are freely available):
+#   - required: Java, version >= 1.4.2 (www.java.sun.com)
+#   - required: surf (www.surf.sourceforge.net)
+#   - optional (for movies): convert (www.imagemagick.org)
+#
+# - Download surfex_<version>.tar.gz to a directory of your choice.
+#   In the sequel, we will call this directory install_dir.
+#   The current version of surfex should always be available from:
+#   www.surfex.algebraicsurface.net
+#
+# - Uncompress the file, e.g. by typing the following into a shell:
+#   tar -xzf surfex_<version>.tar.gz
+#
+# - This should have created a sub-directory called surfex_<version>.
+#   Change to this directory, e.g. by typing the following into the shell:
+#   cd surfex_<version>
+#
+# - Run the INSTALL_WINDOWS script, e.g. by typing the following into the shell:
+#   ./INSTALL_WINDOWS
+#
+# - This produces a script, called "surfex" and copies it to a directory contained in your bash path. 
+#
+
+#
+# The installation program:
+# -------------------------
+
+echo
+
+mytmp=/tmp/tmp.txt
+mytmp2=/tmp/tmp2.txt
+failmsg=""
+
+my_java_prg=java.exe
+
+my_surf_prg=surf.exe
+my_surf_test="surf -n testsurf.pic"
+my_surf_out="testsurf.jpg"
+
+my_convert_prg=convert.exe
+my_convert_test="convert surfex_logo.png surfex_logo.gif"
+my_convert_out="surfex_logo.gif"
+
+#
+# try to locate the helper tools we need:
+#
+
+function findbinpath() {
+    mybinpath=""
+
+    # first, try to use the user's private bin directory for surfex:
+    tstbinpath=~/bin
+    echo $PATH | grep "$tstbinpath" >$mytmp
+    if [ -s $mytmp ] && [ -a $tstbinpath ]; then return 0; fi
+    
+    echo
+    echo
+    echo ">>> $tstbinpath is not contained in your bash path."
+    echo
+    echo "This is the standard location for surfex."
+    echo "Should INSTALL_WINDOWS add this directory to the bash path for you now?"
+    echo "(Please, type 'yes' or 'no' and then press ENTER.)"
+    read
+    answer="$REPLY"
+    echo 
+    echo "REPLY:$answer."
+    echo 
+    if [ "$answer" == "yes" ] && ! [ -d $tstbinpath ]; then mkdir $tstbinpath; fi
+    failmsg="$tstbinpath could not be created. 
+Please solve this problem (probably you have to login as superuser (root), and then rerun INSTALL_WINDOWS."
+    if [ "$answer" == "yes" ] && ! [ -d $tstbinpath ]; then failexit; fi
+    if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then echo "export PATH=$tstbinpath:\$PATH" >>~/.bashrc ; fi
+    if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then echo "export PATH=$tstbinpath:\$PATH" >>~/.profile ; fi
+    if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then export PATH=$tstbinpath:$PATH; fi
+    if [ "$answer" == "yes" ] && [ -d $tstbinpath ]; then return 0; fi
+
+    #
+    # if the user did not want to use the user's private bin directory:
+    #
+    echo "Okay, we try the directory /usr/local/bin then...";
+    tstbinpath=/usr/local/bin
+    echo $PATH | grep "$tstbinpath" >$mytmp
+    if [ -s $mytmp ]; then return 0; fi
+
+    tstbinpath=""
+    failmsg="We could not find a nice path in your bash path.
+You chose not to create ~/bin. 
+So, please, solve the problem on your own or contact us via our website
+www.surfex.AlgebraicSurface.net."
+    failexit
+}
+
+function copytopath() {
+#    echo "copytopath()"
+    if [ -e $knownpath ]; then 
+	echo $knownpath > $mytmp
+    else 
+	echo "searching for $tstprg (this may take some time)..."
+	find / -name $tstprg | sed 1q >$mytmp
+    fi
+    failmsg=""
+    if [ -s $mytmp ]; then echo "$tstprg found"; else failexit; fi
+
+    srcpath=`cat $mytmp`
+    # just in case the x-bit is not set yet:
+    chmod + $srcpath
+
+    if [ -e $mytmp ]; then rm $mytmp; fi
+    echo "at: $srcpath."
+#    echo "look for a directory which is contained in your path:"
+    # search for a nice path in the $PATH:
+    findbinpath
+    # if we found a writable one, then copy the program to that path:
+#    echo "try: cp $srcpath $tstbinpath/."
+    if [ -w $tstbinpath ]; then cp $srcpath $tstbinpath/; fi
+    if [ -w $tstbinpath ]; then return 0; fi
+
+    failmsg=">>> The directory '$tstbinpath' to which INSTALL_WINDOWS wants to copy $tstprg is not writable!
+Maybe you have to login as a superuser (root) to have the right to write to this directory.
+In that case, type 'su', enter the superuser password and rerun INSTALL_WINDOWS.
+"
+    failexit
+}
+
+function maybecopytopath() {
+    echo "How do you want to proceed? Type '1' or '2', followed by ENTER.";
+    REPLY=""
+    read
+    answer="$REPLY"
+    echo
+    failmsg="Okay, you chose to exit INSTALL_WINDOWS, solve the problem on your own, and rerun INSTALL_WINDOWS then again."
+    if [ "$answer" == "3" ]; then return 0; fi
+    if [ "$answer" == "2" ]; then copytopath; else failexit; fi
+}
+
+function failexit() {
+    echo 
+    # if a message was specified, then display it and exit:
+    if [ -n "$failmsg" ]; then echo $failmsg; fi
+    if [ -n "$failmsg" ]; then exit; fi
+
+    # else display the standard message:
+    echo ">>> surfex needs to find $tstprg to be able to work."
+    echo ">>> Please install $tstprg and copy it to a directory"
+    echo ">>> which is contained in your bash path."
+    echo ">>> Your current path is:
+$PATH
+"
+    echo ">>> Then run INSTALL_WINDOWS again."
+#    rm $mytmp
+    exit
+}
+
+
+echo "
+surfex INSTALL script
+-----------------------------
+";
+
+#
+# test if java is usable:
+#
+
+tstprg=$my_java_prg
+
+which $tstprg >$mytmp 2>/dev/null
+if [ -s $mytmp ]; then echo "
+$tstprg found.
+"; else echo "
+
+>>> $tstprg not found!
+
+This problem might be caused by two reasons: 
+
+(1) Either you have not installed java (e.g. from www.java.sun.com) yet.
+In that case, quit INSTALL_WINDOWS, install java, and rerun INSTALL_WINDOWS.
+
+(2) Or $tstprg is not contained in your path yet.
+In that case, INSTALL_WINDOWS can try to solve this problem for you by copying $tstprg to a directory 
+which is contained in your path.
+"; fi
+if ! [ -s $mytmp ]; then maybecopytopath; fi
+
+echo "
+-----------------------------
+";
+
+#
+# test if surf is usable:
+#
+
+tstprg=$my_surf_prg
+
+if [ -e $my_surf_out ]; then rm $my_surf_out; fi
+$my_surf_test >/dev/null
+
+if [ -s $my_surf_out ]; then echo "
+$my_surf_prg seems to work correctly.
+"; else echo " 
+$my_surf_prg does not work correctly. 
+Trying to find it in the Singular-Binary-Directory...
+"; 
+
+    which Singular >$mytmp 2>/dev/null
+
+    if [ -s $mytmp ]; then
+	echo "Singular found.
+Trying to find $my_surf_prg via the Singular start script...
+";
+	read SingPath <$mytmp
+	sed -n '/BIN_DIR/p' $SingPath | sed -e 's/.*=//g' >$mytmp
+	
+	read SingPath <$mytmp
+	knownpath=$SingPath/surf.exe
+	if [ -e $knownpath ]; then 
+	    echo "Probably found $my_surf_prg. Trying to copy it to a useful directory.";
+	    copytopath
+	else 
+	    echo "
+>>> surf.exe not found.
+If you have not installed the Singular-version which contains surf
+then, please, do this.
+surfex needs surf.exe to work.
+
+If you have already installed this Singular-version, but our install-script
+was not able to locate surf.exe, then, please, copy the file surf.exe to 
+a directory (preferably the first) of your PATH.
+";
+	    failmsg="Your current PATH is:
+$PATH
+";
+	    failexit
+	fi
+    else 
+	echo "
+>>> Singular not found.
+";
+	failmsg="
+Currently, surfex only works if Singular is installed correctly.
+";
+	failexit
+    fi
+
+    
+    if [ -e /usr/lib/Singular/surf.exe ]; then 
+	echo "Found surf. Copying to a location contained in your PATH...
+"
+	knownpath=/usr/lib/Singular/surf.exe
+	copytopath
+
+	# test again:
+	$my_surf_test >/dev/null
+	if [ -s $my_surf_out ]; then echo "
+$my_surf_prg seems to work correctly.
+"; else 
+	    echo " 
+>>> $my_surf_prg does not work as expected.
+
+";
+	    failmsg="Please contact us via our website:
+www.surfex.AlgebraicSurface.net
+";
+	    failexit
+	fi
+    else 
+	echo "
+>>> surf not found.
+Please, install the Singular-version which comes together with surf.
+
+If you have already installed this Singular-version then, please, copy the file 
+surf.exe to a directory wihch is contained your PATH.
+";
+	failmsg="Your current PATH is:
+$PATH
+"; 
+
+	failexit
+    fi    
+fi
+
+echo "
+-----------------------------
+";
+
+
+#
+# test if convert is usable:
+#
+tstprg=$my_convert_prg
+
+if [ -e $my_convert_out ]; then rm $my_convert_out; fi
+$my_convert_test 
+
+if [ -s $my_convert_out ]; then echo "
+$my_convert_prg seems to work correctly.
+"; else echo " 
+$my_convert_prg does not work correctly. 
+Trying to find the ImageMagick suite...
+"; 
+    which identify.exe >$mytmp 2>/dev/null
+
+    if [ -s $mytmp ]; then 
+	echo "Probably found the ImageMagick suite. 
+Trying to copy convert.exe from there.
+"
+	sed -e 's/\/identify\.exe/\/convert.exe/' $mytmp >$mytmp2
+	read knownpath <$mytmp2
+	
+	echo "knownpath:"
+	echo $knownpath
+	copytopath
+
+	# test again:
+	echo "
+test again...
+";
+
+	$my_convert_test
+	if [ -s $my_convert_out ]; then echo "
+$my_convert_prg seems to work correctly.
+"; 
+	else 
+	    echo " 
+>>> $my_convert_prg does not work as expected.
+>>> Try to rerun INSTALL_WINDOWS once. This sometimes solves the problem.
+If not then, please, read the information below.
+
+Please, try to find the correct convert.exe file which is part of the
+ImageMagick suite by yourself and copy it to a directory where surfex
+can find it.
+E.g., the first directory which is contained in your PATH.
+Your current PATH is:
+$PATH
+
+If that does not work then, please, contact us via our website:
+www.surfex.AlgebraicSurface.net
+
+However, convert.exe is not needed for the basic features of surfex;
+it is mainly needed for producing movies of surfaces.
+So you might want to try out surfex without convert. 
+";
+
+failmsg=">>> Try to run INSTALL_WINDOWS once again. This sometimes solves the problem.
+If not then, please, read the the information above.
+";
+	    
+	    echo $failmsg
+	fi
+    else 
+	echo "
+>>> convert and the ImageMagick-suite not found.
+
+Please, install the Image-Magick suite which comes together with the tool convert.
+
+If you have already installed convert but this install-tool could not find it 
+then, please, copy the file convert.exe from the ImageMagick suite to a directory 
+wihch is contained your PATH.
+Your current PATH is:
+$PATH
+
+If you already did this but you still see this message
+then you have there is probably another convert.exe contained in one of the directories
+of your PATH.
+In that case, copy convert.exe to a directory which is listed in your PATH before that directory,
+e.g., to the first directory listed in your PATH.
+
+";
+
+	failmsg="However, convert.exe is not needed for the basic features of surfex;
+it is mainly needed for producing movies of surfaces.
+So you might want to try out surfex without convert. 
+"; 
+
+	echo $failmsg
+    fi    
+fi
+
+echo "
+-----------------------------
+";
+
+#
+# build the start script:
+#
+
+echo "
+building the surfex start script...
+";
+
+cat surfex_start_part1 >surfex
+echo "surfex_dir=$PWD" >>surfex
+cat surfex_start_part2 >>surfex
+chmod +x surfex
+
+# copy surfex to a directory which is contained in the user's $PATH:
+findbinpath
+# if we found a writable one, then copy the program to that path:
+if [ -w $tstbinpath ]; then cp ./surfex $tstbinpath; fi
+failmsg="surfex could not be copied to $tstbinpath.
+Maybe you have to login as a superuser (root) to have the right to write to this directory.
+In that case, type 'su', enter the superuser password and then rerun INSTALL_WINDOWS.
+"
+if ! [ -w $tstbinpath ]; then failexit; fi
+
+echo "
+-------------------------------------------------------------------------------
+This INSTALL_WINDOWS script has written the script \"surfex\" the directory $tstbinpath.
+This directory is contained in your bash path.
+
+To start surfex, you can now type:
+surfex
+or something like
+surfex -e \"x^3+(y-z)*(y+z)\"
+if you want to envoke surfex with a particular equation.
+Once you have done that, three windows should open up.
+To rotate the surface which you see in one of them, drag your mouse pointer
+over the green sphere.
+
+If this does not work, you might have to edit the file \"surfex\".
+Please, contact us if you do not manage to get surfex run on your system.
+"
+
+echo "We are happy to receive any kind of feedback, 
+
+Stephan Holzer and Oliver Labs
+
+
+surfex comes without any warranty. For download, documentation, examples, etc., see:
+www.surfex.AlgebraicSurface.net
+-------------------------------------------------------------------------------
+"
+#
+# Disclaimer:
+# -----------
+#
+# surfex comes without any warranty. 
+# Feel free to use and distribute surfex. 
+#
+
+if [ -e $mytmp ]; then rm $mytmp; fi
+
+bash

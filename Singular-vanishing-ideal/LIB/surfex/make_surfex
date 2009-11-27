@@ -1,0 +1,16 @@
+# surfex
+#
+# compile the java source code
+#
+#
+# compile:
+#
+javac *.java
+
+#javac surfex.java
+#javac Project.java
+#javac SavePicDialog.java
+#javac SaveMovieDialog.java
+#javac jv4surfex.java
+
+jar cmf mainClass.txt surfex.jar *.class images jv 

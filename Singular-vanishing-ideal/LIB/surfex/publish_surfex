@@ -1,0 +1,61 @@
+#
+# publish script for the java program surfex
+# 
+# - copies all necessary files to a subdirectory
+# - then makes a .tar.gz from that
+#
+
+# make all 
+# and compress to jar file:
+./make_surfex
+
+#
+# copy the necessary files:
+#
+
+subdir="surfex_0_90_00"
+
+rm $subdir.tar.gz
+
+if ! [ -d $subdir ]; then mkdir $subdir; fi
+rm -r $subdir/*
+
+# the LICENCE file:
+cp LICENCE.TXT $subdir/
+
+# the needed files:
+cp *.java $subdir/
+cp mainClass.txt $subdir/
+cp surfex.jar $subdir/
+mkdir $subdir/jv
+cp -r jv/* $subdir/jv/
+mkdir $subdir/images
+cp images/* $subdir/images/
+mkdir $subdir/examples
+cp examples/* $subdir/examples/
+mkdir $subdir/doc
+cp doc/*.* $subdir/doc/
+mkdir $subdir/Singular
+cp Singular/* $subdir/Singular/
+
+# the startscript files:
+cp surfex_start_part1 $subdir/
+cp surfex_start_part2 $subdir/
+
+# the INSTALL files:
+cp INSTALL_LINUX $subdir/
+cp INSTALL_WINDOWS $subdir/
+
+# the script to start surf under cygwin:
+cp cygwinsurf $subdir/
+
+# the programming helper scripts: 
+cp make_surfex $subdir/
+cp publish_surfex $subdir/
+
+# produce a .tar.gz from this:
+tar -czf $subdir.tar.gz $subdir
+
+echo "
+Produced the zipped tar file: $subdir.tar.gz
+"

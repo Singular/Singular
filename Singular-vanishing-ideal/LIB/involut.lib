@@ -1,0 +1,842 @@
+version="$Id$";
+category="Noncommutative";
+info="
+LIBRARY:  involut.lib  Computations and operations with involutions
+AUTHORS:  Oleksandr Iena,       yena@mathematik.uni-kl.de,
+@*        Markus Becker,        mbecker@mathematik.uni-kl.de,
+@*        Viktor Levandovskyy,  levandov@mathematik.uni-kl.de
+
+THEORY: Involution is an anti-isomorphism of a noncommutative algebra with the
+ property that applied an involution twice, one gets an identity. Involution is linear with respect to the ground field. In this library we compute linear involutions, distinguishing the case of a diagonal matrix (such involutions are called homothetic) and a general one.
+
+SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
+and V. Levandovskyy), Uni Kaiserslautern
+
+NOTE: This library provides algebraic tools for computations and operations
+with algebraic involutions and linear automorphisms of non-commutative algebras
+
+PROCEDURES:
+findInvo();          computes linear involutions on a basering;
+findInvoDiag();     computes homothetic (diagonal) involutions on a basering;
+findAuto();          computes linear automorphisms of a basering;
+ncdetection();        computes an ideal, presenting an involution map on some particular noncommutative algebras;
+involution(m,theta);  applies the involution to an object.
+";
+
+LIB "ncalg.lib";
+LIB "poly.lib";
+LIB "primdec.lib";
+///////////////////////////////////////////////////////////////////////////////
+proc ncdetection()
+"USAGE:  ncdetection();
+RETURN:  ideal, representing an involution map
+PURPOSE: compute classical involutions (i.e. acting rather on operators than on variables) for some particular noncommutative algebras
+ASSUME: the procedure is aimed at non-commutative algebras with differential, shift or advance operators arising in Control Theory.
+It has to be executed in a ring.
+EXAMPLE: example ncdetection; shows an example
+"{
+// in this procedure an involution map is generated from the NCRelations
+// that will be used in the function involution
+// in dieser proc. wird eine matrix erzeugt, die in der i-ten zeile die indices
+// der differential-, shift- oder advance-operatoren enthaelt mit denen die i-te
+// variable nicht kommutiert.
+  if ( nameof(basering)=="basering" )
+  {
+    "No current ring defined.";
+    return(ideal(0));
+  }
+  def r = basering;
+  setring r;
+  int i,j,k,LExp;
+  int NVars  = nvars(r);
+  matrix rel = ncRelations(r)[2];
+  intmat M[NVars][3];
+  int NRows = nrows(rel);
+  intvec v,w;
+  poly d,d_lead;
+  ideal I;
+  map theta;
+  for( j=NRows; j>=2; j-- )
+  {
+   if( rel[j] == w )       //the whole column is zero
+    {
+      j--;
+      continue;
+    }
+    for( i=1; i<j; i++ )
+    {
+      if( rel[i,j]==1 )        //relation of type var(j)*var(i) = var(i)*var(j) +1
+      {
+         M[i,1]=j;
+      }
+      if( rel[i,j] == -1 )    //relation of type var(i)*var(j) = var(j)*var(i) -1
+      {
+        M[j,1]=i;
+      }
+      d = rel[i,j];
+      d_lead = lead(d);
+      v = leadexp(d_lead); //in the next lines we check wether we have a  relation of differential or shift type
+      LExp=0;
+      for(k=1; k<=NVars; k++)
+      {
+        LExp = LExp + v[k];
+      }
+      //      if( (d-d_lead != 0) || (LExp > 1) )
+if ( ( (d-d_lead) != 0) || (LExp > 1) || ( (LExp==0) && ((d_lead>1) || (d_lead<-1)) ) )
+      {
+        return(theta);
+      }
+
+      if( v[j] == 1)                   //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(j)
+      {
+        if (leadcoef(d) < 0)
+        {
+          M[i,2] = j;
+        }
+        else
+        {
+          M[i,3] = j;
+        }
+      }
+      if( v[i]==1 )                    //relation of type var(j)*var(i) = var(i)*var(j) -lambda*var(i)
+      {
+        if (leadcoef(d) > 0)
+        {
+          M[j,2] = i;
+        }
+        else
+        {
+          M[j,3] = i;
+        }
+      }
+    }
+  }
+  // from here on, the map is computed
+  for(i=1;i<=NVars;i++)
+  {
+    I=I+var(i);
+  }
+
+  for(i=1;i<=NVars;i++)
+  {
+    if( M[i,1..3]==(0,0,0) )
+    {
+      i++;
+      continue;
+    }
+    if( M[i,1]!=0 )
+    {
+      if( (M[i,2]!=0) && (M[i,3]!=0) )
+      {
+        I[M[i,1]] = -var(M[i,1]);
+        I[M[i,2]] = var(M[i,3]);
+        I[M[i,3]] = var(M[i,2]);
+      }
+      if( (M[i,2]==0) && (M[i,3]==0) )
+      {
+        I[M[i,1]] = -var(M[i,1]);
+      }
+      if( ( (M[i,2]!=0) && (M[i,3]==0) )|| ( (M[i,2]!=0) && (M[i,3]==0) )
+)
+      {
+        I[i] = -var(i);
+      }
+    }
+    else
+    {
+      if( (M[i,2]!=0) && (M[i,3]!=0) )
+      {
+        I[i] = -var(i);
+        I[M[i,2]] = var(M[i,3]);
+        I[M[i,3]] = var(M[i,2]);
+      }
+      else
+      {
+        I[i] = -var(i);
+      }
+    }
+  }
+  return(I);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring R = 0,(x,y,z,D(1..3)),dp;
+  matrix D[6][6];
+  D[1,4]=1; D[2,5]=1;  D[3,6]=1;
+  def r = nc_algebra(1,D); setring r;
+  ncdetection();
+  kill r, R;
+  //----------------------------------------
+  ring R=0,(x,S),dp;
+  def r = nc_algebra(1,-S); setring r;
+  ncdetection();
+  kill r, R;
+  //----------------------------------------
+  ring R=0,(x,D(1),S),dp;
+  matrix D[3][3];
+  D[1,2]=1;  D[1,3]=-S;
+  def r = nc_algebra(1,D); setring r;
+  ncdetection();
+}
+
+static proc In_Poly(poly mm, list l, int NVars)
+// applies the involution to the polynomial mm
+// entries of a list l are images of variables under invo
+// more general than invo_poly; used in many rings setting
+{
+  int i,j;
+  intvec v;
+  poly pp, zz;
+  poly nn = 0;
+  i = 1;
+  while(mm[i]!=0)
+  {
+    v  = leadexp(mm[i]);
+    zz = 1;
+    for( j=NVars; j>=1; j--)
+    {
+      if (v[j]!=0)
+      {
+        pp = l[j];
+        zz = zz*(pp^v[j]);
+      }
+    }
+    nn = nn + (leadcoef(mm[i])*zz);
+    i++;
+  }
+  return(nn);
+}
+
+static proc Hom_Poly(poly mm, list l, int NVars)
+// applies the endomorphism to the polynomial mm
+// entries of a list l are images of variables under endo
+// should not be replaced by map-based stuff! used in
+// many rings setting
+{
+  int i,j;
+  intvec v;
+  poly pp, zz;
+  poly nn = 0;
+  i = 1;
+  while(mm[i]!=0)
+  {
+    v  = leadexp(mm[i]);
+    zz = 1;
+    for( j=NVars; j>=1; j--)
+    {
+      if (v[j]!=0)
+      {
+        pp = l[j];
+        zz = (pp^v[j])*zz;
+      }
+    }
+    nn = nn + (leadcoef(mm[i])*zz);
+    i++;
+  }
+  return(nn);
+}
+
+static proc invo_poly(poly m, map theta)
+// applies the involution map theta to m, where m=polynomial
+{
+  // compatibility:
+  ideal l = ideal(theta);
+  int i;
+  list L;
+  for (i=1; i<=size(l); i++)
+  {
+    L[i] = l[i];
+  }
+  int nv = nvars(basering);
+  return (In_Poly(m,L,nv));
+//   if (m==0) { return(m); }
+//   int i,j;
+//   intvec v;
+//   poly p,z;
+//   poly n = 0;
+//   i = 1;
+//   while(m[i]!=0)
+//   {
+//     v = leadexp(m[i]);
+//     z =1;
+//     for(j=nvars(basering); j>=1; j--)
+//     {
+//       if (v[j]!=0)
+//       {
+//         p = var(j);
+//         p = theta(p);
+//         z = z*(p^v[j]);
+//       }
+//     }
+//     n = n + (leadcoef(m[i])*z);
+//     i++;
+//   }
+//   return(n);
+}
+///////////////////////////////////////////////////////////////////////////////////
+proc involution(m, map theta)
+"USAGE:  involution(m, theta); m is a poly/vector/ideal/matrix/module, theta is a map
+RETURN:  object of the same type as m
+PURPOSE: applies the involution, presented by theta to the object m
+THEORY: for an involution theta and two polynomials a,b from the algebra, theta(ab) = theta(b) theta(a); theta is linear with respect to the ground field
+NOTE: This is generalized ''theta(m)'' for data types unsupported by ''map''.
+EXAMPLE: example involution; shows an example
+"{
+  // applies the involution map theta to m,
+  // where m= vector, polynomial, module, matrix, ideal
+  int i,j;
+  intvec v;
+  poly p,z;
+  if (typeof(m)=="poly")
+  {
+    return (invo_poly(m,theta));
+  }
+  if ( typeof(m)=="ideal" )
+  {
+    ideal n;
+    for (i=1; i<=size(m); i++)
+    {
+      n[i] = invo_poly(m[i], theta);
+    }
+    return(n);
+  }
+  if (typeof(m)=="vector")
+  {
+    for(i=1; i<=size(m); i++)
+    {
+      m[i] = invo_poly(m[i], theta);
+    }
+    return (m);
+  }
+  if ( (typeof(m)=="matrix") || (typeof(m)=="module"))
+  {
+    matrix n = matrix(m);
+    int @R=nrows(n);
+    int @C=ncols(n);
+    for(i=1; i<=@R; i++)
+    {
+      for(j=1; j<=@C; j++)
+      {
+        if (m[i,j]!=0)
+        {
+          n[i,j] = invo_poly( m[i,j], theta);
+        }
+      }
+    }
+    if (typeof(m)=="module")
+    {
+      return (module(n));
+    }
+    else // matrix
+    {
+      return(n);
+    }
+  }
+  // if m is not of the supported type:
+  "Error: unsupported argument type!";
+  return();
+}
+example
+{
+  "EXAMPLE:";echo = 2;
+  ring R = 0,(x,d),dp;
+  def r = nc_algebra(1,1); setring r; // Weyl-Algebra
+  map F = r,x,-d;
+  F(F);  // should be maxideal(1) for an involution
+  poly f =  x*d^2+d;
+  poly If = involution(f,F);
+  f-If;
+  poly g = x^2*d+2*x*d+3*x+7*d;
+  poly tg = -d*x^2-2*d*x+3*x-7*d;
+  poly Ig = involution(g,F);
+  tg-Ig;
+  ideal I = f,g;
+  ideal II = involution(I,F);
+  II;
+  I - involution(II,F);
+  module M  = [f,g,0],[g,0,x^2*d];
+  module IM = involution(M,F);
+  print(IM);
+  print(M - involution(IM,F));
+}
+///////////////////////////////////////////////////////////////////////////////////
+static proc new_var()
+//generates a string of new variables
+{
+
+  int NVars=nvars(basering);
+  int i,j;
+  //  string s="@_1_1";
+  string s="a11";
+  for(i=1; i<=NVars; i++)
+  {
+    for(j=1; j<=NVars; j++)
+    {
+      if(i*j!=1)
+      {
+        s = s+ ","+NVAR(i,j);
+      };
+    };
+  };
+  return(s);
+};
+
+static proc NVAR(int i, int j)
+{
+  //  return("@_"+string(i)+"_"+string(j));
+  return("a"+string(i)+string(j));
+};
+///////////////////////////////////////////////////////////////////////////////////
+static proc new_var_special()
+//generates a string of new variables
+{
+  int NVars=nvars(basering);
+  int i;
+  //  string s="@_1_1";
+  string s="a11";
+  for(i=2; i<=NVars; i++)
+  {
+    s = s+ ","+NVAR(i,i);
+  };
+  return(s);
+};
+///////////////////////////////////////////////////////////////////////////////////
+static proc RelMatr()
+// returns the matrix of relations
+// only Lie-type relations x_j x_i= x_i x_j + .. are taken into account
+{
+  int i,j;
+  int NVars = nvars(basering);
+  matrix Rel[NVars][NVars];
+  for(i=1; i<NVars; i++)
+  {
+    for(j=i+1; j<=NVars; j++)
+    {
+      Rel[i,j]=var(j)*var(i)-var(i)*var(j);
+    };
+  };
+  return(Rel);
+};
+/////////////////////////////////////////////////////////////////
+proc findInvo()
+"USAGE: findInvo();
+RETURN: a ring containing a list L of pairs, where
+@*        L[i][1]  =  ideal; a Groebner Basis of an i-th associated prime,
+@*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
+PURPOSE: computed the ideal of linear involutions of the basering
+NOTE: for convenience, the full ideal of relations @code{idJ}
+and the initial matrix with indeterminates @code{matD} are exported in the output ring
+SEE ALSO: findInvoDiag, involution
+EXAMPLE: example findInvo; shows examples
+
+"{
+  def @B    = basering; //save the name of basering
+  int NVars = nvars(@B); //number of variables in basering
+  int i, j;
+
+  matrix Rel = RelMatr(); //the matrix of relations
+
+  string @ss   = new_var(); //string of new variables
+  string Par = parstr(@B); //string of parameters in old ring
+
+  if (Par=="") // if there are no parameters
+  {
+    execute("ring @@@KK=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
+  }
+  else //if there exist parameters
+  {
+     execute("ring @@@KK=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
+  };
+
+  matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
+
+  int Sz = NVars*NVars+NVars; // number of variables in new ring
+
+  matrix M[Sz][Sz]; //to be the matrix of relations in new ring
+
+  for(i=1; i<NVars; i++) //initialize that matrix of relations
+  {
+    for(j=i+1; j<=NVars; j++)
+    {
+      M[i,j] = Rel[i,j];
+    };
+  };
+
+  def @@K = nc_algebra(1, M); setring @@K; //now new ring @@K become a noncommutative ring
+
+  list l; //list to define an involution
+  poly @@F;
+  for(i=1; i<=NVars; i++) //initializing list for involution
+  {
+    @@F=0;
+    for(j=1; j<=NVars; j++)
+    {
+      execute( "@@F = @@F+"+NVAR(i,j)+"*"+string( var(j) )+";" );
+    };
+    l=l+list(@@F);
+  };
+
+  matrix N = imap(@@@KK,Rel);
+
+  for(i=1; i<NVars; i++)//get matrix by applying the involution to relations
+  {
+    for(j=i+1; j<=NVars; j++)
+    {
+      N[i,j]= l[j]*l[i] - l[i]*l[j] + In_Poly( N[i,j], l, NVars);
+    };
+  };
+  kill l;
+  //---------------------------------------------
+  //get the ideal of coefficients of N
+  ideal J;
+  ideal idN = simplify(ideal(N),2);
+  J = ideal(coeffs( idN, var(1) ) );
+  for(i=2; i<=NVars; i++)
+  {
+    J = ideal( coeffs( J, var(i) ) );
+  };
+  J = simplify(J,2);
+  //-------------------------------------------------
+  if ( Par=="" ) //initializes the ring of relations
+  {
+    execute("ring @@KK=0,("+@ss+"), dp;");
+  }
+  else
+  {
+    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
+  };
+  ideal J = imap(@@K,J); // ideal, considered in @@KK now
+  string snv = "["+string(NVars)+"]";
+  execute("matrix @@D"+snv+snv+"="+@ss+";"); // matrix with entries=new variables
+
+  J = J, ideal( @@D*@@D-matrix( freemodule(NVars) ) ); // add the condition that involution to square is just identity
+  J = simplify(J,2); // without extra zeros
+  list mL = minAssGTZ(J); // components not in GB
+  int sL  = size(mL);
+  option(redSB);       // important for reduced GBs
+  option(redTail);
+  matrix IM = @@D;     // involution map
+  list L    = list();  // the answer
+  list TL;
+  ideal tmp = 0;
+  for (i=1; i<=sL; i++) // compute GBs of components
+  {
+    TL    = list();
+    TL[1] = std(mL[i]);
+    tmp   = NF( ideal(IM), TL[1] );
+    TL[2] = matrix(tmp, NVars,NVars);
+    L[i]  = TL;
+  }
+  export(L); // main export
+  ideal idJ = J; // debug-comfortable exports
+  matrix matD = @@D;
+  export(idJ);
+  export(matD);
+  return(@@KK);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  def a = makeWeyl(1);
+  setring a; // this algebra is a first Weyl algebra
+  a;
+  def X = findInvo();
+  setring X; // ring with new variables, corr. to unknown coefficients
+  X;
+  L;
+  // look at the matrix in the new variables, defining the linear involution
+  print(L[1][2]);
+  L[1][1];  // where new variables obey these relations
+  idJ;
+}
+///////////////////////////////////////////////////////////////////////////
+proc findInvoDiag()
+"USAGE: findInvoDiag();
+RETURN: a ring together with a list of pairs L, where
+@*        L[i][1]  =  ideal; a Groebner Basis of an i-th associated prime,
+@*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
+PURPOSE: compute homothetic (diagonal) involutions of the basering
+NOTE: for convenience, the full ideal of relations @code{idJ}
+and the initial matrix with indeterminates @code{matD} are exported in the output ring
+SEE ALSO: findInvo, involution
+EXAMPLE: example findInvoDiag; shows examples
+"{
+  def @B    = basering; //save the name of basering
+  int NVars = nvars(@B); //number of variables in basering
+  int i, j;
+
+  matrix Rel = RelMatr(); //the matrix of relations
+
+  string @ss   = new_var_special(); //string of new variables
+  string Par = parstr(@B); //string of parameters in old ring
+
+  if (Par=="") // if there are no parameters
+  {
+    execute("ring @@@KK=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
+  }
+  else //if there exist parameters
+  {
+    execute("ring @@@KK=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
+  };
+
+  matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
+
+  int Sz = 2*NVars; // number of variables in new ring
+
+  matrix M[Sz][Sz]; //to be the matrix of relations in new ring
+  for(i=1; i<NVars; i++) //initialize that matrix of relations
+  {
+    for(j=i+1; j<=NVars; j++)
+    {
+      M[i,j] = Rel[i,j];
+    };
+  };
+
+  def @@K = nc_algebra(1, M); setring @@K; //now new ring @@K become a noncommutative ring
+
+  list l; //list to define an involution
+
+  for(i=1; i<=NVars; i++) //initializing list for involution
+  {
+    execute( "l["+string(i)+"]="+NVAR(i,i)+"*"+string( var(i) )+";" );
+
+  };
+  matrix N = imap(@@@KK,Rel);
+
+  for(i=1; i<NVars; i++)//get matrix by applying the involution to relations
+  {
+    for(j=i+1; j<=NVars; j++)
+    {
+      N[i,j]= l[j]*l[i] - l[i]*l[j] + In_Poly( N[i,j], l, NVars);
+    };
+  };
+  kill l;
+  //---------------------------------------------
+  //get the ideal of coefficients of N
+
+  ideal J;
+  ideal idN = simplify(ideal(N),2);
+  J = ideal(coeffs( idN, var(1) ) );
+  for(i=2; i<=NVars; i++)
+  {
+    J = ideal( coeffs( J, var(i) ) );
+  };
+  J = simplify(J,2);
+  //-------------------------------------------------
+
+  if ( Par=="" ) //initializes the ring of relations
+  {
+    execute("ring @@KK=0,("+@ss+"), dp;");
+  }
+  else
+  {
+    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
+  };
+
+  ideal J = imap(@@K,J); // ideal, considered in @@KK now
+
+  matrix @@D[NVars][NVars]; // matrix with entries=new variables to square i.e. @@D=@@D^2
+  for(i=1;i<=NVars;i++)
+  {
+    execute("@@D["+string(i)+","+string(i)+"]="+NVAR(i,i)+";");
+  };
+  J = J, ideal( @@D*@@D - matrix( freemodule(NVars) ) ); // add the condition that involution to square is just identity
+  J = simplify(J,2); // without extra zeros
+
+  list mL = minAssGTZ(J); // components not in GB
+  int sL  = size(mL);
+  option(redSB); // important for reduced GBs
+  option(redTail);
+  matrix IM = @@D; // involution map
+  list L = list(); // the answer
+  list TL;
+  ideal tmp = 0;
+  for (i=1; i<=sL; i++) // compute GBs of components
+  {
+    TL    = list();
+    TL[1] = std(mL[i]);
+    tmp   = NF( ideal(IM), TL[1] );
+    TL[2] = matrix(tmp, NVars,NVars);
+    L[i]  = TL;
+  }
+  export(L);
+  ideal idJ = J; // debug-comfortable exports
+  matrix matD = @@D;
+  export(idJ);
+  export(matD);
+  return(@@KK);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  def a = makeWeyl(1);
+  setring a; // this algebra is a first Weyl algebra
+  a;
+  def X = findInvoDiag();
+  setring X; // ring with new variables, corresponding to unknown coefficients
+  X;
+  // print matrices, defining linear involutions
+  print(L[1][2]);  // a first matrix: we see it is constant
+  print(L[2][2]);  // and a second possible matrix; it is constant too
+  L; // let us take a look on the whole list
+  idJ;
+}
+/////////////////////////////////////////////////////////////////////
+proc findAuto(int n)
+"USAGE: findAuto(n); n an integer
+RETURN: a ring together with a list of pairs L, where
+@*        L[i][1]  =  ideal; a Groebner Basis of an i-th associated prime,
+@*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
+PURPOSE: compute the ideal of linear automorphisms of the basering, given by a matrix, n-th power of which gives identity (i.e. unipotent matrix)
+NOTE: if n=0, a matrix, defining an automorphism is not assumed to be unipotent but just non-degenerate. A nonzero parameter @code{@@p} is introduced as the value of the determinant of the matrix above.
+@* For convenience, the full ideal of relations @code{idJ} and the initial matrix with indeterminates @code{matD} are mutually exported in the output ring
+SEE ALSO: findInvo
+EXAMPLE: example findAuto; shows examples
+"{
+  if ((n<0 ) || (n==1))
+  {
+    "The index of unipotency is too small.";
+    return(0);
+  }
+  def @B    = basering; //save the name of basering
+  int NVars = nvars(@B); //number of variables in basering
+  int i, j;
+
+  matrix Rel = RelMatr(); //the matrix of relations
+
+  string @ss = new_var(); //string of new variables
+  string Par = parstr(@B); //string of parameters in old ring
+
+  if (Par=="") // if there are no parameters
+  {
+    execute("ring @@@K=0,("+varstr(@B)+","+@ss+"), dp;"); //new ring with new variables
+  }
+  else //if there exist parameters
+  {
+     execute("ring @@@K=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
+  };
+
+  matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
+
+  int Sz = NVars*NVars+NVars; // number of variables in new ring
+
+  matrix M[Sz][Sz]; //to be the matrix of relations in new ring
+
+  for(i=1; i<NVars; i++) //initialize that matrix of relations
+  {
+    for(j=i+1; j<=NVars; j++)
+    {
+      M[i,j] = Rel[i,j];
+    };
+  };
+
+  def @@K = nc_algebra(1, M); setring @@K; //now new ring @@K become a noncommutative ring
+
+  list l; //list to define a homomorphism(isomorphism)
+  poly @@F;
+  for(i=1; i<=NVars; i++) //initializing list for involution
+  {
+    @@F=0;
+    for(j=1; j<=NVars; j++)
+    {
+      execute( "@@F = @@F+"+NVAR(i,j)+"*"+string( var(j) )+";" );
+    };
+    l=l+list(@@F);
+  };
+
+  matrix N = imap(@@@K,Rel);
+
+  for(i=1; i<NVars; i++)//get matrix by applying the homomorphism  to relations
+  {
+    for(j=i+1; j<=NVars; j++)
+    {
+      N[i,j]= l[j]*l[i] - l[i]*l[j] - Hom_Poly( N[i,j], l, NVars);
+    };
+  };
+  kill l;
+  //---------------------------------------------
+  //get the ideal of coefficients of N
+  ideal J;
+  ideal idN = simplify(ideal(N),2);
+  J = ideal(coeffs( idN, var(1) ) );
+  for(i=2; i<=NVars; i++)
+  {
+    J = ideal( coeffs( J, var(i) ) );
+  };
+  J = simplify(J,2);
+  //-------------------------------------------------
+  if (( Par=="" ) && (n!=0)) //initializes the ring of relations
+  {
+    execute("ring @@KK=0,("+@ss+"), dp;");
+  }
+  if (( Par=="" ) && (n==0)) //initializes the ring of relations
+  {
+    execute("ring @@KK=(0,@p),("+@ss+"), dp;");
+  }
+  if ( Par!="" )
+  {
+    execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
+  };
+  //  execute("setring @@KK;");
+  //  basering;
+  ideal J = imap(@@K,J); // ideal, considered in @@KK now
+  string snv = "["+string(NVars)+"]";
+  execute("matrix @@D"+snv+snv+"="+@ss+";"); // matrix with entries=new variables
+
+  if (n>=2)
+  {
+    J = J, ideal( @@D*@@D-matrix( freemodule(NVars) ) ); // add the condition that homomorphism to square is just identity
+  }
+  if (n==0)
+  {
+    J = J, det(@@D)-@p; // det of non-unipotent matrix is nonzero
+  }
+  J       = simplify(J,2); // without extra zeros
+  list mL = minAssGTZ(J); // components not in GB
+  int sL  = size(mL);
+  option(redSB); // important for reduced GBs
+  option(redTail);
+  matrix IM = @@D; //  map
+  list L = list(); // the answer
+  list TL;
+  ideal tmp = 0;
+  for (i=1; i<=sL; i++)// compute GBs of components
+  {
+    TL    = list();
+    TL[1] = std(mL[i]);
+    tmp   = NF( ideal(IM), TL[1] );
+    TL[2] = matrix(tmp,NVars, NVars);
+    L[i]  = TL;
+  }
+  export(L);
+  ideal idJ = J; // debug-comfortable exports
+  matrix matD = @@D;
+  export(idJ);
+  export(matD);
+  return(@@KK);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  def a = makeWeyl(1);
+  setring a; // this algebra is a first Weyl algebra
+  a;
+  def X = findAuto(2);  // in contrast to findInvo look for automorphisms
+  setring X; // ring with new variables - unknown coefficients
+  X;
+  size(L); // we have (size(L)) families in the answer
+  // look at matrices, defining linear automorphisms:
+  print(L[1][2]);  // a first one: we see it is the identity
+  print(L[2][2]);  // and a second possible matrix; it is diagonal
+  // L; // we can take a look on the whole list, too
+  idJ;
+  kill X; kill a;
+  //----------- find all the linear automorphisms --------------------
+  //----------- use the call findAuto(0)          --------------------
+  ring R = 0,(x,s),dp;
+  def r = nc_algebra(1,s); setring r; // the shift algebra
+  s*x; // the only relation in the algebra is:
+  def Y = findAuto(0);
+  setring Y;
+  size(L); // here, we have 1 parametrized family
+  print(L[1][2]); // here, @p is a nonzero parameter
+  det(L[1][2]-@p);  // check whether determinante is zero
+}

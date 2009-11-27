@@ -1,0 +1,7 @@
+#
+#
+#
+echo "$1","$2"
+surf -n "$2"
+#surf -n "c:\\cygwin\\tmp\\test.pic"
+#surf -n "/tmp/test.pic"

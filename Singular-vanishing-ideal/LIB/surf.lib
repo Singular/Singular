@@ -1,0 +1,279 @@
+// last modified 21.07.2005, Oliver Wienand
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Visualization";
+info="
+LIBRARY: surf.lib    Procedures for Graphics with Surf
+AUTHOR: Hans Schoenemann
+
+NOTE:
+ @texinfo
+ Using this library requires the program @code{surf} to be installed.
+ You can download @code{surf} either from
+  @uref{http://sourceforge.net/projects/surf}
+  or from @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/utils/}.
+ The procedure surfer requires the program @code{surfer} to be installed.
+ You can download @code{surfer} from
+  @uref{http://www.imaginary2008.de/surfer.imaginary2008.de}
+ @*Under Windows, version 159 or newer of @code{surfer} is required.
+ @end texinfo
+
+SEE ALSO: surfex_lib
+
+PROCEDURES:
+ plot(I);    plots plane curves and surfaces
+ surfer(I);  plots surfaces interactivly
+";
+
+///////////////////////////////////////////////////////////////////////////////
+proc num_of_vars(ideal I)
+"USAGE: num_of_vars(ideal I)
+
+RETURN: an intvec containing one entry for each ring variable.
+each contains the sums of all degrees in this variable of all monomials
+occuring in the ideal.
+An entry is zero if and only if the corresponding variable does not occur in the ideal.
+"
+{
+  intvec v;
+  int i;
+  poly p;
+  for(i=ncols(I);i>0;i--)
+  {
+    p=I[i];
+    while(p!=0)
+    {
+      v=v+leadexp(p);
+      p=p-lead(p);
+    }
+  }
+  return(v);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0, (x,y,z),dp;
+  ideal j0 = x^2-x*y;
+  num_of_vars(j0);
+  ideal j1 = x^2-x*y-y;
+  num_of_vars(j1);
+  ideal j2 = x^2-x*y-y, x^3-2*y;
+  num_of_vars(j2);
+}
+
+proc plot(ideal I,list #)
+"USAGE:   plot(I);  I ideal or poly
+ASSUME: I defines a plane curve or a surface given by one equation
+RETURN: nothing
+NOTE: requires the external program 'surf' to be installed,
+      to close the graphical interface just press 'Q'
+EXAMPLE: example plot; shows an example
+"
+{
+  string extra_surf_opts=" -x --auto-resize "; // remove this line for surf 0.9
+  string l = "/tmp/surf"+string(system("pid"));
+  string err_mes; // string containing error messages
+  def base=basering;
+  intvec v=num_of_vars(I);
+  int i,j,n;
+  for(i=size(v);i>0;i--)
+  {
+    if (v[i]!=0) { n++; }
+  }
+  if (n==0 or n>3)
+  {
+    err_mes="Cannot plot equations with "+string(n)+" variables";
+    ERROR(err_mes);
+  }
+  ring r=0,(x,y,z),dp;
+  short=0;
+  map phi=base,0;
+  j=1;
+  for(i=1;i<=size(v);i++)
+  {
+    if (v[i]!=0)
+    {
+      phi[i]=var(j);
+      j++;
+      if(j==4) break;
+    }
+  }
+  ideal I=simplify(phi(I),2);
+  if (leadcoef(I[1]) <0) { I[1]=-I[1]; }
+  if (ncols(I)==1 and n<=2 and nvars(base)!=3) // curve
+  {
+    write(":w "+l,"clip=none;");
+      write(l, "width=500; height=500; set_size; do_background=yes;
+background_red=255; background_green=255; background_blue=255;");
+    write(l,
+    "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
+    write(l, "curve_green=0; curve_blue=0; curve_width=1.5;");
+    if (size(#)>0)
+    {
+      write(l,#[1]);
+    }
+    write(l,"curve=",I[1],";");
+    write(l,"draw_curve;");
+  }
+  else
+  {
+    if (ncols(I)==1 and (n==3 or nvars(base)==3)) // surface
+    {
+      write(":w " + l,
+            "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
+      write(l, "width=500; height=500; set_size; do_background=yes; background_red=255; background_green=255; background_blue=255;");
+      write(l, "rot_x=0.14; rot_y=-0.3;");
+      if (size(#) > 0)
+      {
+          write(l, #[1]);
+      }
+      write(l, "surface=",I[1],";");
+      write(l, "draw_surface;");
+    }
+    else
+    {
+      err_mes = "cannot plot " + string(ncols(I)) + " equations in "
+              + string(n) + " variables";
+      ERROR(err_mes);
+    }
+  }
+  string surf_call;
+  surf_call = "surf ";
+  if (defined(extra_surf_opts))
+  {
+    surf_call = surf_call + " " + extra_surf_opts;
+  }
+  surf_call =surf_call + l + " >/dev/null 2>&1";
+
+  "Press q to exit from 'surf'";
+  if ("ppcMac-darwin" != system("uname"))
+  {
+     i=system("sh", surf_call);
+  }
+  else
+  {
+     surf_call = surf_call + " || " + "singularsurf "
+                 + extra_surf_opts + " " + l +" >/dev/null 2>&1";
+     i = system("sh", surf_call);
+  }
+
+  if (i != 0)
+  {
+    err_mes = "calling `surf` failed. (the shell return the error code "
+          + string(i) + ")." + newline +
+          "probably the executable `surf` is not found.";
+    ERROR(err_mes);
+  }
+  i = system("sh", "/bin/rm "+l);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  // ---------  plane curves ------------
+  ring rr0 = 0,(x1,x2),dp;
+
+  ideal I = x1^3 - x2^2;
+  plot(I);
+
+  ring rr1 = 0,(x,y,z),dp;
+  ideal I(1) = 2x2-1/2x3 +1-y+1;
+  plot(I(1));
+
+  //  ---- Singular Logo --------------
+  poly logo = ((x+3)^3 + 2*(x+3)^2 - y^2)*(x^3 - y^2)*((x-3)^3-2*(x-3)^2-y^2);
+  plot(logo);
+
+  // Steiner surface
+  ideal J(2) = x^2*y^2+x^2*z^2+y^2*z^2-17*x*y*z;
+  plot(J(2));
+
+  // --------------------
+  plot(x*(x2-y2)+z2);
+
+  // E7
+  plot(x^3-x*y^3+z^2);
+
+  // Whitney umbrella
+  plot(z^2-x^2*y);
+
+}
+proc surfer(ideal I)
+"USAGE:   surfer(f);  f poly
+ASSUME: f defines a surface given by one equation
+RETURN: nothing
+NOTE: requires the external program 'surfer' to be installed,
+      to close the graphical interface just close the window of surfer
+EXAMPLE: example surfer; shows an example
+"
+{
+  string l = "/tmp/surf"+string(system("pid"));
+  string err_mes; // string containing error messages
+  def base=basering;
+  intvec v=num_of_vars(I);
+  int i,j,n;
+  for(i=size(v);i>0;i--)
+  {
+    if (v[i]!=0) { n++; }
+  }
+  if (n==0 or n>3)
+  {
+    err_mes="Cannot plot equations with "+string(n)+" variables";
+    ERROR(err_mes);
+  }
+  ring r=0,(x,y,z),dp;
+  short=0;
+  map phi=base,0;
+  j=1;
+  for(i=1;i<=size(v);i++)
+  {
+    if (v[i]!=0)
+    {
+      phi[i]=var(j);
+      j++;
+      if(j==4) break;
+    }
+  }
+  ideal I=simplify(phi(I),2);
+  if (leadcoef(I[1]) <0) { I[1]=-I[1]; }
+  if (ncols(I)==1 and (n==3 or nvars(base)==3)) // surface
+  {
+    write(":w " + l, "surface=",I[1],";");
+  }
+  else
+  {
+    err_mes = "cannot plot " + string(ncols(I)) + " equations in "
+            + string(n) + " variables";
+    ERROR(err_mes);
+  }
+  string surf_call;
+  surf_call ="surfer " + l + " >/dev/null 2>&1";
+
+  "Close window to exit from 'surfer'";
+  i=system("sh", surf_call);
+
+  if (i != 0)
+  {
+    err_mes = "calling `surfer` failed. (the shell return the error code "
+          + string(i) + ")." + newline +
+          "probably the executable `surfer` is not found.";
+    ERROR(err_mes);
+  }
+  i = system("sh", "/bin/rm "+l);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring rr1 = 0,(x,y,z),dp;
+  // Steiner surface
+  ideal J(2) = x^2*y^2+x^2*z^2+y^2*z^2-17*x*y*z;
+  surfer(J(2));
+
+  // --------------------
+  surfer(x*(x2-y2)+z2);
+
+  // E7
+  surfer(x^3-x*y^3+z^2);
+
+  // Whitney umbrella
+  surfer(z^2-x^2*y);
+
+}
+///////////////////////////////////////////////////////////////////////////////

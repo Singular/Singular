@@ -1,0 +1,1540 @@
+///////////////////////////////////////////////////////////////////////////////
+//changed GMG 20.5.09: degreepart, linearpart, elimpart
+///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
+category="Symbolic-numerical solving";
+info="
+LIBRARY:  presolve.lib     Pre-Solving of Polynomial Equations
+AUTHOR:   Gert-Martin Greuel, email: greuel@mathematik.uni-kl.de,
+
+PROCEDURES:
+ degreepart(id,d1,d2);  elements of id of total degree >= d1 and <= d2, and rest
+ elimlinearpart(id);    linear part eliminated from id
+ elimpart(id[,n]);      partial elimination of vars [among first n vars]
+ elimpartanyr(i,p);     factors of p partially eliminated from i in any ring
+ fastelim(i,p[..]);     fast elimination of factors of p from i [options]
+ findvars(id[..]);      ideal of variables occuring in id [more information]
+ hilbvec(id[,c,o]);     intvec of Hilberseries of id [in char c and ord o]
+ linearpart(id);        elements of id of total degree <=1
+ tolessvars(id[,]);     maps id to new basering having only vars occuring in id
+ solvelinearpart(id);   reduced std-basis of linear part of id
+ sortandmap(id[..]);    map to new basering with vars sorted w.r.t. complexity
+ sortvars(id[n1,p1..]); sort vars w.r.t. complexity in id [different blocks]
+ valvars(id[..]);       valuation of vars w.r.t. to their complexity in id
+ idealSplit(id,tF,fS);  a list of ideals such that their intersection
+                        has the same radical as id
+                       ( parameters in square brackets [] are optional)
+";
+
+LIB "inout.lib";
+LIB "general.lib";
+LIB "matrix.lib";
+LIB "ring.lib";
+LIB "elim.lib";
+///////////////////////////////////////////////////////////////////////////////
+proc shortid (id,int n,list #)
+"USAGE:   shortid(id,n[,e]); id= ideal/module, n,e=integers
+RETURN:  - if called with two arguments or e=0:
+@*       same type as id, containing generators of id having <= n terms.
+@*       - if called with three arguments and e!=0:
+@*       a list L:
+@*       L[1]: same type as id, containing generators of id having <= n terms.
+@*       L[2]: number of corresponding generator of id
+NOTE:    May be used to compute partial standard basis in case id is to hard
+EXAMPLE: example shortid; shows an example
+"
+{
+  intvec v;
+  int ii;
+  for(ii=1; ii<=ncols(id); ii++)
+  {
+   if (size(id[ii]) <=n and id[ii]!=0 )
+   {
+     v=v,ii;
+   }
+   if (size(id[ii]) > n )
+   {
+       id[ii]=0;
+   }
+  }
+  if( size(v)>1 )
+  {
+    v = v[2..size(v)];
+  }
+  id = simplify(id,2);
+  list L = id,v;
+  if ( size(#)==0 )
+  {
+    return(id);
+  }
+  if ( size(#)!=0 )
+  {
+    if(#[1]==0)
+    {
+      return(id);
+    }
+    if(#[1]!=0)
+    {
+      return(L);
+    }
+  }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(x,y,z,w),dp;
+   ideal i = (x3+y2+yw2)^2,(xz+z2)^2,xyz-w2-xzw;
+   shortid(i,3);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc degreepart (id,int d1,int d2,list #)
+"USAGE:   degreepart(id,d1,d2[,v]);  id=ideal/module, d1,d1=integers, v=intvec
+RETURN:  list of size 2,
+         _[1]: generators of id of [v-weighted] total degree >= d1 and <= d2
+          (default: v = 1,...,1)
+         _[2]: remaining generators of id
+NOTE:    if id is of type int/number/poly it is converted to ideal, if id is
+         of type intmat/matrix/vector to module and then the corresponding
+         generators are computed
+EXAMPLE: example degreepart; shows an example
+"
+{
+   if( typeof(id)=="int" or typeof(id)=="number"
+       or typeof(id)=="ideal" or typeof(id)=="poly" )
+   {
+      ideal dpart = ideal(id);
+   }
+   if( typeof(id)=="intmat" or typeof(id)=="matrix"
+       or typeof(id)=="module" or typeof(id)=="vector")
+   {
+      module dpart = module(id);
+   }
+
+   def epart = dpart;
+   int s,ii = ncols(id),0;
+   if ( size(#)==0 )
+   {
+      for ( ii=1; ii<=s; ii++ )
+      {
+         dpart[ii] = (jet(id[ii],d1-1)==0)*(id[ii]==jet(id[ii],d2))*id[ii];
+         epart[ii] = (size(dpart[ii])==0) * id[ii];
+      }
+   }
+   else
+   {
+      for ( ii=1; ii<=s; ii=ii+1 )
+      {
+      dpart[ii]=(jet(id[ii],d1-1,#[1])==0)*(id[ii]==jet(id[ii],d2,#[1]))*id[ii];
+       epart[ii] = (size(dpart[ii])==0)*id[ii];
+      }
+   }
+   list L = simplify(dpart,2),simplify(epart,2);
+   return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal i=1+x+x2+x3+x4,3,xz+y3+z8;
+   degreepart(i,0,4);
+
+   module m=[x,y,z],x*[x3,y2,z],[1,x2,z3,0,1];
+   intvec v=2,3,6;
+   show(degreepart(m,8,8,v));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc linearpart (id)
+"USAGE:   linearpart(id);  id=ideal/module
+RETURN:  list of size 2,
+         _[1]: generators of id of total degree <= 1
+         _[2]: remaining generators of id
+NOTE:    all variables have degree 1 (independent of ordering of basering)
+EXAMPLE: example linearpart; shows an example
+"
+{
+   return(degreepart(id,0,1));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z),dp;
+   ideal i=1+x+x2+x3,3,x+3y+5z;
+   linearpart(i);
+
+   module m=[x,y,z],x*[x3,y2,z],[1,x2,z3,0,1];
+   show(linearpart(m));
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc elimlinearpart (ideal i,list #)
+"USAGE:   elimlinearpart(i[,n]);  i=ideal, n=integer,@*
+          default: n=nvars(basering)
+RETURN:   list L with 5 entries:
+  @format
+  L[1]: ideal obtained from i by substituting from the first n variables those
+        which appear in a linear part of i, by putting this part into triangular
+        form
+  L[2]: ideal of variables which have been substituted
+  L[3]: ideal, j-th element defines substitution of j-th var in [2]
+  L[4]: ideal of variables of basering, eliminated ones are set to 0
+  L[5]: ideal, describing the map from the basering to itself such that
+        L[1] is the image of i
+  @end format
+NOTE:    the procedure always interreduces the ideal i internally w.r.t.
+         ordering dp.
+EXAMPLE: example elimlinearpart; shows an example
+"
+{
+   int ii,n,k,ringchange;
+   string o;
+   intvec getoption = option(get);
+   option(redSB);
+   def BAS = basering;
+   n = nvars(BAS);
+   list gnirlist = ringlist(basering);
+   list g3 = gnirlist[3];
+   list g32 = g3[size(g3)];
+
+//---------------------------------- start ------------------------------------
+   if ( size(#)!=0 ) {  n=#[1]; }
+   ideal maxi,rest = maxideal(1),0;
+   if ( n < nvars(BAS) )
+   {
+      rest = maxi[n+1..nvars(BAS)];     //variables which are not substituted
+   }
+   attrib(rest,"isSB",1);
+
+//-------------------- find linear part and reduce rest ----------------------
+// Perhaps for big systems, check only those generators of id
+// which do not contain elements not to be eliminated
+
+   //ideal id = interred(i);
+   //## gmg, geŠndert 9/2008: interred sehr lange z.B. bei Leonard1 in normal,
+   //daher interred ersetzt durch: std nur auf linearpart angewendet
+   //Wechsel zu dp Ordnung (da Lin affin linear)
+
+//--------------- replace ordering different from dp by dp -------------------
+   o = "dp("+string(n)+")";
+   if( ! find(ordstr(BAS),o) or find(ordstr(BAS),"a") )
+   {
+      ringchange = 1;                         //remember change of ring
+      intvec V;
+      V[n]=0; V=V+1;                          //weights for dp ordering
+      gnirlist[3] = list("dp",V), g32;
+      def newBAS = ring(gnirlist);            //change of ring to dp ordering
+      setring newBAS;
+      ideal rest = imap(BAS,rest);
+      attrib(rest,"isSB",1);
+      ideal i = imap(BAS,i);
+   }
+
+   list  Lin = linearpart(i);
+   ideal lin = std(Lin[1]);          //SB of ideal generated by polys of i
+                                     //having at most degree 1
+   ideal id = Lin[2];                //remaining polys from i, of deg > 1
+   id = simplify(NF(id,lin),2);      //instead of subst
+   ideal id1 = linearpart(id)[1];
+   while( size(id1) != 0 )           //repeat to find linear parts
+   {
+      lin = lin,id1;
+      lin = std(lin);
+      id = simplify(NF(id,lin),2);   //instead of subst, (### is faster)
+      id1 = linearpart(id)[1];
+   }
+//------------- check for special case of unit ideal and return ---------------
+   int check;
+   if( lin[1] == 1 )
+   {
+     check = 1;
+   }
+   else
+   {
+     for (ii=1; ii<=size(id); ii++ )
+     {
+       if ( id[ii] == 1 )
+       {
+         check = 1; break;
+        }
+      }
+    }
+
+   if (check == 1)        //case of a unit ideal
+   {
+     setring BAS;
+     list L = ideal(1), ideal(0), ideal(0), maxideal(1), maxideal(1);
+     option(set,getoption);
+     return(L);
+   }
+//----- remove generators from lin containing vars not to be eliminated  ------
+   if ( n < nvars(BAS) )
+   {
+      for ( ii=1; ii<=size(lin); ii++ )
+      {
+         if ( reduce(lead(lin[ii]),rest) == 0 )
+         {
+            id=lin[ii],id;
+            lin[ii] = 0;
+         }
+      }
+   }
+   lin = simplify(lin,1);
+   ideal eva = lead(lin);               //vars to be eliminated
+   attrib(eva,"isSB",1);
+   ideal neva = NF(maxideal(1),eva);    //vars not to be eliminated
+//------------------ go back to original ring end return  ---------------------
+
+   if ( ringchange  )                   //i.e there was a ring change
+   {
+      setring BAS;
+      ideal id = imap(newBAS,id);
+      ideal eva = imap(newBAS,eva);
+      ideal lin = imap(newBAS,lin);
+      ideal neva = imap(newBAS,neva);
+   }
+
+   eva = eva[ncols(eva)..1];  // sorting according to variables in basering
+   lin = lin[ncols(lin)..1];
+   ideal phi = neva;
+   k = 1;
+   for( ii=1; ii<=n; ii++ )
+   {
+      if( neva[ii] == 0 )
+      {
+         phi[ii] = eva[k]-lin[k];
+         k=k+1;
+      }
+   }
+
+   list L = id, eva, lin, neva, phi;
+   option(set,getoption);
+   return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(u,x,y,z),dp;
+   ideal i = u3+y3+z-x,x2y2+z3,y+z+1,y+u;
+   elimlinearpart(i);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc elimpart (ideal i,list #)
+"USAGE:   elimpart(i [,n,e] );  i=ideal, n,e=integers
+         n   : only the first n vars are considered for substitution,@*
+         e =0: substitute from linear part of i (same as elimlinearpart)@*
+         e!=0: eliminate also by direct substitution@*
+         (default: n = nvars(basering), e = 1)
+RETURN:  list of 5 objects:
+  @format
+  [1]: ideal obtained by substituting from the first n variables those
+       from i, which appear in the linear part of i (or, if e!=0, which
+       can be expressed directly in the remaining vars)
+  [2]: ideal, variables which have been substituted
+  [3]: ideal, i-th element defines substitution of i-th var in [2]
+  [4]: ideal of variables of basering, substituted ones are set to 0
+  [5]: ideal, describing the map from the basering, say k[x(1..m)], to
+       itself onto k[..variables from [4]..] and [1] is the image of i
+  @end format
+  The ideal i is generated by [1] and [3] in k[x(1..m)], the map [5]
+  maps [3] to 0, hence induces an isomorphism
+  @format
+            k[x(1..m)]/i -> k[..variables from [4]..]/[1]
+  @end format
+NOTE:    Applying elimpart to interred(i) may result in more substitutions.
+         However, interred may be more expansive than elimpart for big ideals
+EXAMPLE: example elimpart; shows an example
+"
+{
+   def BAS = basering;
+   int n,e = nvars(BAS),1;
+   if ( size(#)==1 ) {  n=#[1]; }
+   if ( size(#)==2 ) {  n=#[1]; e=#[2];}
+//----------- interreduce linear part with proc elimlinearpart ----------------
+// lin = ideal i after interreduction with linear part
+// eva = eliminated (substituted) variables
+// sub = polynomials defining substitution
+// neva= not eliminated variables
+// phi = map describing substitution
+
+   list L = elimlinearpart(i,n);
+   ideal lin, eva, sub, neva, phi = L[1], L[2], L[3], L[4], L[5];
+   if ( e == 0 )
+   {
+       return(L);
+   }
+
+//-------- direct substitution of variables if possible and if e!=0 -----------
+// first find terms lin1 in lin of pure degree 1 in each polynomial of lin
+// k1 = pure degree 1 part, i.e. nonzero elts of lin1, renumbered
+// k2 = lin2 (=matrix(lin) - matrix(lin2)), renumbered
+// kin = matrix(k1)+matrix(k2) = those polys of lin which contained a pure
+// degree 1 part.
+/*
+Alte Version mit interred:
+// Then go to ring newBAS with ordering c,dp(n) and create a matrix with
+// size(k1) colums and 2 rows, such that if [f1,f2] is a column of M then f1+f2
+// is one of the polys of lin containing a pure degree 1 part and f1 is this
+// part interreduce this matrix (i.e. Gauss elimination on linear part, with
+// rest transformed accordingly).
+//Ist jetzt durch direkte Substitution gemacht (schneller!)
+         //Variante falls wieder interred angewendet werden soll:
+         //ideal k12 = k1,k2;
+         //matrix M = matrix(k12,2,kk);     //degree 1 part is now in row 1
+         //M = interred(M);
+         //### interred zu teuer, muss nicht sein. Wenn interred angewendet
+         //werden soll, vorher in Ring mit Ordnung (c,dp) wechseln!
+         //Abfrage:  if( ordstr(BAS) != "c,dp("+string(n)+")" )
+         //auf KEINEN Fall std (wird zu gross)
+         //l = ncols(M);
+         //k1 = M[1,1..l];
+         //k2 = M[2,1..l];
+Interred ist jetzt ganz weggelassen. Aber es gibt Beispiele wo interred polys
+mit Grad 1 Teilen produziert, die vorher nicht da waren (aus polys, die einen konstanten Term haben).
+z.B. i=xy2-xu4-x+y2,x2y2+z3+zy,y+z2+1,y+u2;, interred(i)=z2+y+1,y2-x,u2+y,x3-z
+-z ergibt ich auch i[2]-z*i[3] mit option(redThrough)
+statt interred kann man hier auch NF(i,i[3])+i[3] verwenden
+hier lifert elimpart(i) 2 Substitutionen (x,y) elimpart(interred(i))
+aber 3 (x,y,z)
+Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
+*/
+   int ii, kk;
+   ideal k1, k2, lin2;
+   int l = ncols(lin);                  // lin=i after applying elimlinearpart
+   ideal lin1 = jet(lin,1)-jet(lin,0);  // part of pure degree 1
+   //Note: If i,i1,i2 are ideals, then i = i1 - i2 is equivalent to
+   //i = ideal(matrix(i1) - matrix(i2))
+
+   if (size(lin1) == 0 )
+   {
+       return(L);
+   }
+
+   //-------- check candidates for direct substitution of variables ----------
+   //since lin1 != 0 there are candidates for substituting variables
+
+   lin2 = lin - lin1;      //difference as matrix
+   // rest of lin, part of pure degree 1 substracted from each generator of lin
+
+   for( ii=1; ii<=l; ii++ )
+   {
+      if( lin1[ii] != 0 )
+      {
+         kk = kk+1;
+         k1[kk] = lin1[ii];  // part of pure degree 1, renumbered
+         k2[kk] = lin2[ii];  // rest of those polys which had a degree 1 part
+         lin2[ii] = 0;
+      }
+   }
+   //Now each !=0 generator of lin2 contains only constant terms or terms of
+   //degree >= 2, hence lin 2 can never be used for further substitutions
+   //We have: lin = ideal(matrix(k1)+matrix(k2)), lin2
+
+   ideal kin = matrix(k1)+matrix(k2);
+   //kin = polys of lin which contained a pure degree 1 part.
+   kin = simplify(kin,2);
+   l = size(kin);                      //l != 0 since lin1 != 0
+   poly p,kip,vip, cand;
+   int count=1;
+   while ( count != 0 )
+   {
+         count = 0;
+         for ( ii=1; ii<=n; ii++  )    //start direct substitution of var(ii)
+         {
+            for (kk=1; kk<=l; kk++ )
+            {
+               p = kin[kk]/var(ii);
+               //if ( deg(p) == 0 )
+               //old test, does not work if some var has deg 0
+               //geaendert Mai 09 gmg
+
+               if( p!=0 & p == jet(p,0) )
+                   //this means that kin[kk]= p*var(ii) + h,
+                   //with p=const !=0 and h not depending on var(ii)
+               {
+                  //we look for the shortest candidate to substitute var(ii)
+                  if ( cand == 0 )
+                  {
+                     cand = kin[kk];  //candidate for substituting var(ii)
+                  }
+                  else
+                  {
+                     if ( size(kin[kk]) < size(cand) )
+                     {
+                        cand = kin[kk];
+                     }
+                  }
+                }
+            }
+            if ( cand != 0 )
+            {
+                  p = cand/var(ii);
+                  kip = cand/p;     //normalized polynomial of kin w.r.t var(ii)
+                  eva = eva+var(ii); //var(ii) added to list of elimin. vars
+                  neva[ii] = 0;
+                  sub = sub+kip;     //polynomial defining substituion
+                  //## gmg: geŠndert 08/2008, map durch subst ersetzt
+                  //(viel schneller)
+                  vip = var(ii) - kip;  //polynomial to be substituted
+                  lin = subst(lin, var(ii), vip);  //subst in rest
+                  lin = simplify(lin,2);
+                  kin = subst(kin, var(ii), vip);  //subst in pure dgree 1 part
+                  kin = simplify(kin,2);
+                  l = size(kin);
+                  count = 1;
+            }
+            cand=0;
+         }
+   }
+
+   lin = kin+lin;
+
+   for( ii=1; ii<=size(lin); ii++ )
+   {
+      lin[ii] = cleardenom(lin[ii]);
+   }
+
+   for( ii=1; ii<=n; ii++ )
+   {
+      for( kk=1; kk<=size(eva); kk++ )
+      {
+         if (phi[ii] == eva[kk] )
+         {  phi[ii] = eva[kk]-sub[kk]; break; }
+      }
+   }
+   map psi = BAS,phi;
+   ideal phi1 = maxideal(1);
+   for(ii=1; ii<=size(eva); ii++)
+   {
+      phi1=psi(phi1);
+   }
+   L = lin, eva, sub, neva, phi1;
+   return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(u,x,y,z),dp;
+   ideal i = xy2-xu4-x+y2,x2y2+z3+zy,y+z2+1,y+u2;
+   elimpart(i);
+
+   i = interred(i); i;
+   elimpart(i);
+
+   elimpart(i,2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc elimpartanyr (ideal i, list #)
+"USAGE:   elimpartanyr(i [,p,e] );  i=ideal, p=polynomial, e=integer@*
+         p: product of vars to be eliminated,@*
+         e =0: substitute from linear part of i (same as elimlinearpart)@*
+         e!=0: eliminate also by direct substitution@*
+         (default: p=product of all vars, e=1)
+RETURN:  list of 6 objects:
+  @format
+  [1]: (interreduced) ideal obtained by substituting from i those vars
+       appearing in p, which occur in the linear part of i (or which can
+       be expressed directly in the remaining variables, if e!=0)
+  [2]: ideal, variables which have been substituted
+  [3]: ideal, i-th element defines substitution of i-th var in [2]
+  [4]: ideal of variables of basering, substituted ones are set to 0
+  [5]: ideal, describing the map from the basering, say k[x(1..m)], to
+       itself onto k[..variables fom [4]..] and [1] is the image of i
+  [6]: int, # of vars considered for substitution (= # of factors of p)
+  @end format
+  The ideal i is generated by [1] and [3] in k[x(1..m)], the map [5]
+  maps [3] to 0, hence induces an isomorphism
+  @format
+            k[x(1..m)]/i -> k[..variables fom [4]..]/[1]
+  @end format
+NOTE:    the procedure uses @code{execute} to create a ring with ordering dp
+         and vars placed correctly and then applies @code{elimpart}.
+EXAMPLE: example elimpartanyr; shows an example
+"
+{
+   def P = basering;
+   int j,n,e = 0,0,1;
+   poly p = product(maxideal(1));
+   if ( size(#)==1 ) { p=#[1]; }
+   if ( size(#)==2 ) { p=#[1]; e=#[2]; }
+   string a,b;
+   for ( j=1; j<=nvars(P); j++ )
+   {
+      if (deg(p/var(j))>=0) { a = a+varstr(j)+","; n = n+1; }
+      else { b = b+varstr(j)+","; }
+   }
+   if ( size(b) != 0 ) { b = b[1,size(b)-1]; }
+   else { a = a[1,size(a)-1]; }
+   execute("ring gnir ="+charstr(P)+",("+a+b+"),dp;");
+   ideal i = imap(P,i);
+   list L = elimpart(i,n,e)+list(n);
+   setring P;
+   list L = imap(gnir,L);
+   return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(x,y,z),dp;
+   ideal i = x3+y2+z,x2y2+z3,y+z+1;
+   elimpartanyr(i,z);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc fastelim (ideal i, poly p, list #)
+"USAGE:   fastelim(i,p[h,o,a,b,e,m]); i=ideal, p=polynomial; h,o,a,b,e=integers@*
+          p: product of variables to be eliminated;@*
+  Optional parameters:
+  @format
+  - h !=0: use Hilbert-series driven std-basis computation
+  - o !=0: use proc @code{valvars} for a - hopefully - optimal ordering of vars
+  - a !=0: order vars to be eliminated w.r.t. increasing complexity
+  - b !=0: order vars not to be eliminated w.r.t. increasing complexity
+  - e !=0: use @code{elimpart} first to eliminate easy part
+  - m !=0: compute a minimal system of generators
+  @end format
+  (default: h,o,a,b,e,m = 0,1,0,0,0,0)
+RETURN:  ideal obtained from i by eliminating those variables, which occur in p
+EXAMPLE: example fastelim; shows an example.
+"
+{
+   def P = basering;
+   int h,o,a,b,e,m = 0,1,0,0,0,0;
+   if ( size(#) == 1 ) { h=#[1]; }
+   if ( size(#) == 2 ) { h=#[1]; o=#[2]; }
+   if ( size(#) == 3 ) { h=#[1]; o=#[2]; a=#[3]; }
+   if ( size(#) == 4 ) { h=#[1]; o=#[2]; a=#[3]; b=#[4];}
+   if ( size(#) == 5 ) { h=#[1]; o=#[2]; a=#[3]; b=#[4]; e=#[5]; }
+   if ( size(#) == 6 ) { h=#[1]; o=#[2]; a=#[3]; b=#[4]; e=#[5]; m=#[6]; }
+   list L = elimpartanyr(i,p,e);
+   poly q = product(L[2]);     //product of vars which are already eliminated
+   if ( q==0 ) { q=1; }
+   p = p/q;                    //product of vars which must still be eliminated
+   int nu = size(L[5])-size(L[2]);   //number of vars which must still be eliminated
+   if ( p==1 )                 //ready if no vars are left
+   {                           //compute minbase if 3-rd argument !=0
+      if ( m != 0 ) { L[1]=minbase(L[1]); }
+      return(L);
+   }
+//---------------- create new ring with remaining variables -------------------
+   string newvar = string(L[4]);
+   L = L[1],p;
+   execute("ring r1=("+charstr(P)+"),("+newvar+"),"+"dp;");
+   list L = imap(P,L);
+//------------------- find "best" ordering of variables  ----------------------
+   newvar = string(maxideal(1));
+   if ( o != 0 )
+   {
+      list ordevar = valvars(L[1],a,L[2],b);
+      intvec v = ordevar[1];
+      newvar=string(sort(maxideal(1),v)[1]);
+//------------ create new ring with "best" ordering of variables --------------
+      def r0=changevar(newvar);
+      setring r0;
+      list L = imap(r1,L);
+      kill r1;
+      def r1 = r0;
+      kill r0;
+   }
+//----------------- h==0: eliminate remaining vars directly -------------------
+   if ( h == 0 )
+   {
+      L[1] = eliminate(L[1],L[2]);
+      def r2 = r1;
+   }
+   else
+//------- h!=0: homogenize and compute Hilbert series using hilbvec ----------
+   {
+      intvec hi = hilbvec(L[1]);         // Hilbert series of i
+      execute("ring r2=("+charstr(P)+"),("+varstr(basering)+",@homo),dp;");
+      list L = imap(r1,L);
+      L[1] = homog(L[1],@homo);          // @homo = homogenizing var
+//---- use Hilbert-series to eliminate variables with Hilbert-driven std -----
+      L[1] = eliminate(L[1],L[2],hi);
+      L[1]=subst(L[1],@homo,1);          // dehomogenize by setting @homo=1
+   }
+   if ( m != 0 )                         // compute minbase
+   {
+      if ( #[1] != 0 ) { L[1] = minbase(L[1]); }
+   }
+   def id = L[1];
+   setring P;
+   return(imap(r2,id));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=31991,(e,f,x,y,z,t,u,v,w,a,b,c,d),dp;
+   ideal i = w2+f2-1, x2+t2+a2-1,  y2+u2+b2-1, z2+v2+c2-1,
+            d2+e2-1, f4+2u, wa+tf, xy+tu+ab;
+   fastelim(i,xytua,1,1);       //with hilb,valvars
+   fastelim(i,xytua,1,0,1);     //with hilb,minbase
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc faststd (@id, list #)
+"USAGE:   faststd(id [,\"hilb\",\"sort\",\"dec\",o,\"blocks\"]);
+         id=ideal/module, o=string (allowed:\"lp\",\"dp\",\"Dp\",\"ls\",
+         \"ds\",\"Ds\"),  \"hilb\",\"sort\",\"dec\",\"block\" options for
+         Hilbert-driven std, and the procedure sortandmap
+RETURN:  a ring R, in which an ideal STD_id is stored: @*
+         - the ring R differs from the active basering only in the choice
+         of monomial ordering and in the sorting of the variables.
+         - STD_id is a standard basis for the image (under imap) of the input
+         ideal/module id with respect to the new monomial ordering. @*
+NOTE:    Using the optional input parameters, we may modify the computations
+         performed: @*
+         - \"hilb\"  : use Hilbert-driven standard basis computation@*
+         - \"sort\"  : use 'sortandmap' for a best sorting of the variables@*
+         - \"dec\"   : order vars w.r.t. decreasing complexity (with \"sort\")@*
+         - \"block\" : create block ordering, each block having ordstr=o, s.t.
+                     vars of same complexity are in one block (with \"sort\")@*
+         - o       : defines the basic ordering of the resulting ring@*
+         [default: o=ordering of 1st block of basering (if allowed, else o=\"dp\"],
+                  \"sort\", if none of the optional parameters is given @*
+         This procedure is only useful for hard problems where other methods fail.@*
+         \"hilb\" is useful for hard orderings (as \"lp\") or for characteristic 0,@*
+         it is correct for \"lp\",\"dp\",\"Dp\" (and for block orderings combining
+         these) but not for s-orderings or if the vars have different weights.@*
+         There seem to be only few cases in which \"dec\" is fast.
+SEE ALSO: groebner
+EXAMPLE: example faststd; shows an example.
+"
+{
+   def @P = basering;
+   int @h,@s,@n,@m,@ii = 0,0,0,0,0;
+   string @o,@va,@c = ordstr(basering),"","";
+//-------------------- prepare ordering and set options -----------------------
+   if ( @o[1]=="c" or @o[1]=="C")
+      {  @o = @o[3,2]; }
+   else
+      { @o = @o[1,2]; }
+   if( @o[1]!="d" and @o[1]!="D" and @o[1]!="l")
+      { @o="dp"; }
+
+   if (size(#) == 0 )
+      { @s = 1; }
+   for ( @ii=1; @ii<=size(#); @ii++ )
+   {
+      if ( typeof(#[@ii]) != "string" )
+      {
+         "// wrong syntax! type: help faststd";
+         return();
+      }
+      else
+      {
+         if ( #[@ii] == "hilb"  ) { @h = 1; }
+         if ( #[@ii] == "dec"   ) { @n = 1; }
+         if ( #[@ii] == "block" ) { @m = 1; }
+         if ( #[@ii] == "sort"  ) { @s = 1; }
+         if ( #[@ii]=="lp" or #[@ii]=="dp" or #[@ii]=="Dp" or #[@ii]=="ls"
+              or #[@ii]=="ds" or #[@ii]=="Ds" ) { @o = #[@ii]; }
+      }
+   }
+   if( voice==2 ) { "// chosen options, hilb sort dec block:",@h,@s,@n,@m; }
+
+//-------------------- nosort: create ring with new name ----------------------
+   if ( @s==0 )
+   {
+      execute("ring @S1 =("+charstr(@P)+"),("+varstr(@P)+"),("+@o+");");
+      def STD_id = imap(@P,@id);
+      if ( @h==0 ) { STD_id = std(STD_id); }
+   }
+
+//---------------------- no hilb: compute SB directly -------------------------
+   if ( @s != 0 and @h == 0 )
+   {
+      intvec getoption = option(get);
+      option(redSB);
+      @id = interred(sort(@id)[1]);
+      poly @p = product(maxideal(1),1..nvars(@P));
+      def @S1=sortandmap(@id,@n,@p,0,@o,@m);
+      setring @S1;
+      option(set,getoption);
+      def STD_id=imap(@S1,IMAG);
+      STD_id = std(STD_id);
+   }
+//------- hilb: homogenize and compute Hilbert-series using hilbvec -----------
+// this uses another standardbasis computation
+   if ( @h != 0 )
+   {
+      execute("ring @Q=("+charstr(@P)+"),("+varstr(@P)+",@homo),("+@o+");");
+      def @id = imap(@P,@id);
+      @id = homog(@id,@homo);               // @homo = homogenizing var
+      if ( @s != 0 )
+      {
+        intvec getoption = option(get);
+        option(redSB);
+        @id = interred(sort(@id)[1]);
+        poly @p = product(maxideal(1),1..(nvars(@Q)-1));
+        def @S1=sortandmap(@id,@n,@p,0,@o,@m);
+        setring @S1;
+        option(set,getoption);
+        kill @Q;
+        def @Q= basering;
+        def @id = IMAG;
+      }
+      intvec @hi;                     // encoding of Hilbert-series of i
+      @hi = hilbvec(@id);
+      //if ( @s!=0 ) { @hi = hilbvec(@id,"32003",ordstr(@Q)); }
+      //else { @hi = hilbvec(@id); }
+//-------------------------- use Hilbert-driven std --------------------------
+      @id = std(@id,@hi);
+      @id = subst(@id,@homo,1);             // dehomogenize by setting @homo=1
+      @va = varstr(@Q)[1,size(varstr(@Q))-6];
+      if ( @s!=0 )
+      {
+         @o = ordstr(@Q);
+         if ( @o[1]=="c" or @o[1]=="C") { @o = @o[1,size(@o)-6]; }
+         else { @o = @o[1,size(@o)-8] + @o[size(@o)-1,2]; }
+      }
+      kill @S1;
+      execute("ring @S1=("+charstr(@Q)+"),("+@va+"),("+@o+");");
+      def STD_id = imap(@Q,@id);
+   }
+   attrib(STD_id,"isSB",1);
+   export STD_id;
+   if (defined(IMAG)) { kill IMAG; }
+   setring @P;
+   dbprint(printlevel-voice+3,"
+// 'faststd' created a ring, in which an object STD_id is stored.
+// To access the object, type (if the name R was assigned to the return value):
+        setring R; STD_id; ");
+   return(@S1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   system("--ticks-per-sec",100); // show time in 1/100 sec
+   ring s = 0,(e,f,x,y,z,t,u,v,w,a,b,c,d),(c,lp);
+   ideal i = w2+f2-1, x2+t2+a2-1,  y2+u2+b2-1, z2+v2+c2-1,
+            d2+e2-1, f4+2u, wa+tf, xy+tu+ab;
+   option(prot); timer=1;
+   int time = timer;
+   ideal j=std(i);
+   timer-time;
+   dim(j),mult(j);
+
+   time = timer;
+   def R=faststd(i);                      // use "best" ordering of vars
+   timer-time;
+   show(R);setring R;dim(STD_id),mult(STD_id);
+
+   setring s;kill R;time = timer;
+   def R=faststd(i,"hilb");                // hilb-std only
+   timer-time;
+   show(R);setring R;dim(STD_id),mult(STD_id);
+
+   setring s;kill R;time = timer;
+   def R=faststd(i,"hilb","sort");         // hilb-std,"best" ordering
+   timer-time;
+   show(R);setring R;dim(STD_id),mult(STD_id);
+
+   setring s;kill R;time = timer;
+   def R=faststd(i,"hilb","sort","block","dec"); // hilb-std,"best",blocks
+   timer-time;
+   show(R);setring R;dim(STD_id),mult(STD_id);
+
+   setring s;kill R;time = timer;
+   timer-time;time = timer;
+   def R=faststd(i,"sort","block","Dp"); //"best",decreasing,Dp-blocks
+   timer-time;
+   show(R);setring R;dim(STD_id),mult(STD_id);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc findvars(id, list #)
+"USAGE:   findvars(id [,any] ); id=poly/ideal/vector/module/matrix, any=any type
+RETURN:  if no second argument is present: ideal of variables occuring in id,@*
+         if a second argument is given (of any type): list L with 4 entries:
+  @format
+  L[1]: ideal of variables occuring in id
+  L[2]: intvec of variables occuring in id
+  L[3]: ideal of variables not occuring in id
+  L[4]: intvec of variables not occuring in id
+  @end format
+EXAMPLE: example findvars; shows an example
+"
+{
+   int ii,n;
+   ideal found, notfound;
+   intvec f,nf;
+   n = nvars(basering);
+   ideal i = simplify(ideal(matrix(id)),10);
+   matrix M[ncols(i)][1] = i;
+   vector v = module(M)[1];
+   ideal max = maxideal(1);
+
+   for (ii=1; ii<=n; ii++)
+   {
+      if ( v != subst(v,var(ii),0) )
+      {
+         found = found+var(ii);
+         f = f,ii;
+      }
+      else
+      {
+         notfound = notfound+var(ii);
+         nf = nf,ii;
+      }
+   }
+   if ( size(f)>1 ) { f = f[2..size(f)]; }      //intvec of found vars
+   if ( size(nf)>1 ) { nf = nf[2..size(nf)]; }  //intvec of vars not found
+   if( size(#)==0 )  { return(found); }
+   if( size(#)!=0 )  { list L = found,f,notfound,nf; return(L); }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s  = 0,(e,f,x,y,t,u,v,w,a,d),dp;
+   ideal i = w2+f2-1, x2+t2+a2-1;
+   findvars(i);
+   findvars(i,1);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc hilbvec (@id, list #)
+"USAGE:   hilbvec(id[,c,o]); id=poly/ideal/vector/module/matrix, c,o=strings,@*
+          c=char, o=ordering used by @code{hilb} (default: c=\"32003\", o=\"dp\")
+RETURN:  intvec of 1st Hilbert-series of id, computed in char c and ordering o
+NOTE:    id must be homogeneous (i.e. all vars have weight 1)
+EXAMPLE: example hilbvec; shows an example
+"
+{
+   def @P = basering;
+   string @c,@o = "32003", "dp";
+   if ( size(#) == 1 ) {  @c = #[1]; }
+   if ( size(#) == 2 ) {  @c = #[1]; @o = #[2]; }
+   string @si = typeof(@id)+" @i = "+string(@id)+";";  //** weg
+   execute("ring @r=("+@c+"),("+varstr(basering)+"),("+@o+");");
+   //**def i = imap(P,@id);
+   execute(@si);                   //** weg
+   //show(basering);
+   @i = std(@i);
+   intvec @hi = hilb(@i,1);         // intvec of 1-st Hilbert-series of id
+   return(@hi);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s   = 0,(e,f,x,y,z,t,u,v,w,a,b,c,d,H),dp;
+   ideal id = w2+f2-1, x2+t2+a2-1,  y2+u2+b2-1, z2+v2+c2-1,
+              d2+e2-1, f4+2u, wa+tf, xy+tu+ab;
+   id = homog(id,H);
+   hilbvec(id);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc tolessvars (id ,list #)
+"USAGE:   tolessvars(id [,s1,s2] ); id poly/ideal/vector/module/matrix,
+          s1=string (new ordering)@*
+          [default: s1=\"dp\" or \"ds\" depending on whether the first block
+          of the old ordering is a p- or an s-ordering, respectively]
+RETURN:  If id contains all vars of the basering: empty list. @*
+         Else: ring R with the same char as the basering, but possibly less
+         variables (only those variables which actually occur in id). In R
+         an object IMAG (image of id under imap) is stored.
+DISPLAY: If printlevel >=0, display ideal of vars, which have been omitted
+         from the old ring.
+EXAMPLE: example tolessvars; shows an example
+"
+{
+//---------------- initialisation and check occurence of vars -----------------
+   int s,ii,n,fp,fs;
+   string s2,newvar;
+   int pr = printlevel-voice+3;  // p = printlevel+1 (default: p=1)
+   def P = basering;
+   s2 = ordstr(P);
+
+   list L = findvars(id,1);
+   newvar = string(L[1]);    // string of new variables
+   n = size(L[1]);           // number of new variables
+   if( n == 0 )
+   {
+      dbprint( pr,"","// no variable occured in "+typeof(id)+", no change of ring!");
+      return(id);
+   }
+   if( n == nvars(P) )
+   {
+     dbprint(printlevel-voice+3,"
+// All variables appear in input object.
+// empty list returned. ");
+     return(list());
+   }
+//----------------- prepare new ring, map to it and return --------------------
+   if ( size(#) == 0 )
+   {
+       fp = find(s2,"p");
+       fs = find(s2,"s");
+       if( fs==0 or (fs>=fp && fp!=0) ) { s2="dp"; }
+       else {  s2="ds"; }
+   }
+   if ( size(#) ==1 ) { s2=#[1]; }
+   dbprint( pr,"","// variables which did not occur:",L[3] );
+   execute("ring S1=("+charstr(P)+"),("+newvar+"),("+s2+");");
+   def IMAG = imap(P,id);
+   export IMAG;
+   dbprint(printlevel-voice+3,"
+// 'tolessvars' created a ring, in which an object IMAG is stored.
+// To access the object, type (if the name R was assigned to the return value):
+        setring R; IMAG; ");
+   return(S1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r  = 0,(x,y,z),dp;
+   ideal i = y2-x3,x-3,y-2x;
+   def R_r = tolessvars(i,"lp");
+   setring R_r;
+   show(basering);
+   IMAG;
+   kill R_r;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc solvelinearpart (id,list #)
+"USAGE:   solvelinearpart(id [,n] );  id=ideal/module, n=integer (default: n=0)
+RETURN:  (interreduced) generators of id of degree <=1 in reduced triangular
+         form if n=0 [non-reduced triangular form if n!=0]
+ASSUME:  monomial ordering is a global ordering (p-ordering)
+NOTE:    may be used to solve a system of linear equations,
+         see @code{gauss_row} from 'matrix.lib' for a different method
+WARNING: the result is very likely to be false for 'real' coefficients, use
+         char 0 instead!
+EXAMPLE: example solvelinearpart; shows an example
+"
+{
+   intvec getoption = option(get);
+   option(redSB);
+   if ( size(#)!=0 )
+   {
+      if(#[1]!=0) { option(noredSB); }
+   }
+   def lin = interred(degreepart(id,0,1)[1]);
+   if ( size(#)!=0 )
+   {
+      if(#[1]!=0)
+      {
+         return(lin);
+      }
+   }
+   option(set,getoption);
+   return(simplify(lin,1));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   // Solve the system of linear equations:
+   //         3x +   y +  z -  u = 2
+   //         3x +  8y + 6z - 7u = 1
+   //        14x + 10y + 6z - 7u = 0
+   //         7x +  4y + 3z - 3u = 3
+   ring r = 0,(x,y,z,u),lp;
+   ideal i= 3x +   y +  z -  u,
+           13x +  8y + 6z - 7u,
+           14x + 10y + 6z - 7u,
+            7x +  4y + 3z - 3u;
+   ideal j= 2,1,0,3;
+   j = i-j;                        // difference of 1x4 matrices
+                                   // compute reduced triangular form, setting
+   solvelinearpart(j);             // the RHS equal 0 gives the solutions!
+   solvelinearpart(j,1); "";       // triangular form, not reduced
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sortandmap (@id, list #)
+"USAGE:   sortandmap(id [,n1,p1,n2,p2...,o1,m1,o2,m2...]);@*
+         id=poly/ideal/vector/module,@*
+         p1,p2,...= polynomials (product of variables),@*
+         n1,n2,...= integers,@*
+         o1,o2,...= strings,@*
+         m1,m2,...= integers@*
+         (default: p1=product of all vars, n1=0, o1=\"dp\",m1=0)
+         the last pi (containing the remaining vars) may be omitted
+RETURN:  a ring R, in which a poly/ideal/vector/module IMAG is stored: @*
+         - the ring R differs from the active basering only in the choice
+         of monomial ordering and in the sorting of the variables.@*
+         - IMAG is the image (under imap) of the input ideal/module id @*
+         The new monomial ordering and sorting of vars is as follows:
+  @format
+  - each block of vars occuring in pi is sorted w.r.t. its complexity in id,
+  - ni controls the sorting in i-th block (= vars occuring in pi):
+    ni=0 (resp. ni!=0) means that least complex (resp. most complex) vars come
+    first
+  - oi and mi define the monomial ordering of the i-th block:
+    if mi =0, oi=ordstr(i-th block)
+    if mi!=0, the ordering of the i-th block itself is a blockordering,
+      each subblock having ordstr=oi, such that vars of same complexity are
+      in one block
+  @end format
+         Note that only simple ordstrings oi are allowed: \"lp\",\"dp\",\"Dp\",
+         \"ls\",\"ds\",\"Ds\". @*
+NOTE:    We define a variable x to be more complex than y (with respect to id)
+         if val(x) > val(y) lexicographically, where val(x) denotes the
+         valuation vector of x:@*
+         consider id as list of polynomials in x with coefficients in the
+         remaining variables. Then:@*
+         val(x) = (maximal occuring power of x,  # of all monomials in leading
+         coefficient, # of all monomials in coefficient of next smaller power
+         of x,...).
+EXAMPLE: example sortandmap; shows an example
+"
+{
+   def @P = basering;
+   int @ii,@jj;
+   intvec @v;
+   string @o;
+//----------------- find o in # and split # into 2 lists ---------------------
+   # = # +list("dp",0);
+   for ( @ii=1; @ii<=size(#); @ii++)
+   {
+      if ( typeof(#[@ii])=="string" )  break;
+   }
+   if ( @ii==1 ) { list @L1 = list(); }
+   else { list @L1 = #[1..@ii-1]; }
+   list @L2 = #[@ii..size(#)];
+   list @L = sortvars(@id,@L1);
+   string @va = string(@L[1]);
+   list @l = @L[2];   //e.g. @l[4]=intvec describing permutation of 1-st block
+//----------------- construct correct ordering with oi and mi ----------------
+   for ( @ii=4; @ii<=size(@l); @ii=@ii+4 )
+   {
+      @L2=@L2+list("dp",0);
+      if ( @L2[@ii/2] != 0)
+      {
+         @v = @l[@ii];
+         for ( @jj=1; @jj<=size(@v); @jj++ )
+         {
+           @o = @o+@L2[@ii/2 -1]+"("+string(@v[@jj])+"),";
+         }
+      }
+      else
+      {
+         @o = @o+@L2[@ii/2 -1]+"("+string(size(@l[@ii/2]))+"),";
+      }
+   }
+   @o=@o[1..size(@o)-1];
+   execute("ring @S1 =("+charstr(@P)+"),("+@va+"),("+@o+");");
+   def IMAG = imap(@P,@id);
+   export IMAG;
+   dbprint(printlevel-voice+3,"
+// 'sortandmap' created a ring, in which an object IMAG is stored.
+// To access the object, type (if the name R was assigned to the return value):
+        setring R; IMAG; ");
+   return(@S1);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s = 32003,(x,y,z),dp;
+   ideal i=x3+y2,xz+z2;
+   def R_r=sortandmap(i);
+   show(R_r);
+   setring R_r; IMAG;
+   kill R_r; setring s;
+   def R_r=sortandmap(i,1,xy,0,z,0,"ds",0,"lp",0);
+   show(R_r);
+   setring R_r; IMAG;
+   kill R_r;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc sortvars (id, list #)
+"USAGE:   sortvars(id[,n1,p1,n2,p2,...]);@*
+         id=poly/ideal/vector/module,@*
+         p1,p2,...= polynomials (product of vars),@*
+         n1,n2,...= integers@*
+         (default: p1=product of all vars, n1=0)
+         the last pi (containing the remaining vars) may be omitted
+COMPUTE: sort variables with respect to their complexity in id
+RETURN:  list of two elements, an ideal and a list:
+  @format
+  [1]: ideal, variables of basering sorted w.r.t their complexity in id
+       ni controls the ordering in i-th block (= vars occuring in pi):
+       ni=0 (resp. ni!=0) means that less (resp. more) complex vars come first
+  [2]: a list with 4 entries for each pi:
+       _[1]: ideal ai : vars of pi in correct order,
+       _[2]: intvec vi: permutation vector describing the ordering in ai,
+       _[3]: intmat Mi: valuation matrix of ai, the columns of Mi being the
+                  valuation vectors of the vars in ai
+       _[4]: intvec wi: size of 1-st, 2-nd,... block of identical columns of Mi
+                  (vars with same valuation)
+  @end format
+NOTE:    We define a variable x to be more complex than y (with respect to id)
+         if val(x) > val(y) lexicographically, where val(x) denotes the
+         valuation vector of x:@*
+         consider id as list of polynomials in x with coefficients in the
+         remaining variables. Then:@*
+         val(x) = (maximal occuring power of x,  # of all monomials in leading
+         coefficient, # of all monomials in coefficient of next smaller power
+         of x,...).
+EXAMPLE: example sortvars; shows an example
+"
+{
+   int ii,jj,n,s;
+   list L = valvars(id,#);
+   list L2, L3 = L[2], L[3];
+   list K; intmat M; intvec v1,v2,w;
+   ideal i = sort(maxideal(1),L[1])[1];
+   for ( ii=1; ii<=size(L2); ii++ )
+   {
+      M = transpose(L3[2*ii]);
+      M = M[L2[ii],1..nrows(L3[2*ii])];
+      w = 0; s = 0;
+      for ( jj=1; jj<=nrows(M)-1; jj++ )
+      {
+         v1 = M[jj,1..ncols(M)];
+         v2 = M[jj+1,1..ncols(M)];
+         if ( v1 != v2 ) { n=jj-s; s=s+n; w = w,n; }
+      }
+      w=w,nrows(M)-s; w=w[2..size(w)];
+      K = K+sort(L3[2*ii-1],L2[ii])+list(transpose(M))+list(w);
+   }
+   L = i,K;
+   return(L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(x,y,z,w),dp;
+   ideal i = x3+y2+yw2,xz+z2,xyz-w2;
+   sortvars(i,0,xy,1,zw);
+}
+///////////////////////////////////////////////////////////////////////////////
+
+proc valvars (id, list #)
+"USAGE:   valvars(id[,n1,p1,n2,p2,...]);@*
+         id=poly/ideal/vector/module,@*
+         p1,p2,...= polynomials (product of vars),@*
+         n1,n2,...= integers,
+
+         ni controls the ordering of vars occuring in pi: ni=0 (resp. ni!=0)
+         means that less (resp. more) complex vars come first (default: p1=product of all vars, n1=0),@*
+         the last pi (containing the remaining vars) may be omitted
+COMPUTE: valuation (complexity) of variables with respect to id.@*
+         ni controls the ordering of vars occuring in pi:@*
+         ni=0 (resp. ni!=0) means that less (resp. more) complex vars come first.
+RETURN:  list with 3 entries:
+  @format
+  [1]: intvec, say v, describing the permutation such that the permuted
+       ring variables are ordered with respect to their complexity in id
+  [2]: list of intvecs, i-th intvec, say v(i) describing permutation
+       of vars in a(i) such that v=v(1),v(2),...
+  [3]: list of ideals and intmat's, say a(i) and M(i), where
+       a(i): factors of pi,
+       M(i): valuation matrix of a(i), such that the j-th column of M(i)
+             is the valuation vector of j-th generator of a(i)
+         @end format
+NOTE:    Use @code{sortvars} in order to actually sort the variables!
+         We define a variable x to be more complex than y (with respect to id)
+         if val(x) > val(y) lexicographically, where val(x) denotes the
+         valuation vector of x:@*
+         consider id as list of polynomials in x with coefficients in the
+         remaining variables. Then:@*
+         val(x) = (maximal occuring power of x,  # of all monomials in leading
+         coefficient, # of all monomials in coefficient of next smaller power
+         of x,...).
+EXAMPLE: example valvars; shows an example
+"
+{
+//---------------------------- initialization ---------------------------------
+   int ii,jj,kk,n;
+   list L;                    // list of valuation vectors in one block
+   intvec vec;                // describes permutation of vars (in one block)
+   list blockvec;             // i-th element = vec of i-th block
+   intvec varvec;             // result intvector
+   list Li;                   // result list of ideals
+   list LM;                   // result list of intmat's
+   intvec v,w,s;              // w valuation vector for one variable
+   matrix C;                  // coefficient matrix for different variables
+   ideal i = simplify(ideal(matrix(id)),10);
+
+//---- for each pii in # create ideal a(ii) intvec v(ii) and list L(ii) -------
+// a(ii) = ideal of vars in product, v(ii)[j]=k <=> a(ii)[j]=var(k)
+
+   v = 1..nvars(basering);
+   int l = size(#);
+   if ( l >= 2 )
+   {
+      ideal m=maxideal(1);
+      for ( ii=2; ii<=l; ii=ii+2 )
+      {
+         int n(ii) = #[ii-1];
+         ideal a(ii);
+         intvec v(ii);
+         for ( jj=1; jj<=nvars(basering); jj++ )
+         {
+            if ( #[ii]/var(jj) != 0)
+            {
+               a(ii) = a(ii) + var(jj);
+               v(ii)=v(ii),jj;
+               m[jj]=0;
+               v[jj]=0;
+            }
+         }
+         v(ii)=v(ii)[2..size(v(ii))];
+      }
+      if ( size(m)!=0 )
+      {
+         l = 2*(l/2)+2;
+         ideal a(l) = simplify(m,2);
+         intvec v(l) = compress(v);
+         int n(l);
+         if ( size(#)==l-1 ) { n(l) = #[l-1]; }
+      }
+   }
+   else
+   {
+      l = 2;
+      ideal a(2) = maxideal(1);
+      intvec v(2) = v;
+      int n(2);
+      if ( size(#)==1 ) { n(2) = #[1]; }
+   }
+//------------- start loop to order variables in each a(ii) -------------------
+
+   for ( kk=2; kk<=l; kk=kk+2 )
+   {
+      L = list();
+      n = 0;
+//---------------- get valuation of all variables in a(kk) --------------------
+      for ( ii=1; ii<=size(a(kk)); ii++ )
+      {
+         C = coeffs(i,a(kk)[ii]);
+         w = nrows(C); // =(maximal occuring power of a(kk)[ii])+1
+         for ( jj=w[1]; jj>1; jj-- )
+         {
+            s = size(C[jj,1..ncols(C)]);
+            w[w[1]-jj+2] = sum(s);
+         }
+         // w[1] should represent the maximal occuring power of a(kk)[ii] so it
+         // has to be decreased by 1 since otherwise the constant term is also
+         // counted
+         w[1]=w[1]-1;
+
+         L[ii]=w;
+         n = size(w)*(size(w) > n) + n*(size(w) <= n);
+      }
+      intmat M(kk)[size(a(kk))][n];
+      for ( ii=1; ii<=size(a(kk)); ii++ )
+      {
+         if ( n==1 ) { w = L[ii]; M(kk)[ii,1] = w[1]; }
+         else  { M(kk)[ii,1..n] = L[ii]; }
+      }
+      LM[kk-1] = a(kk);
+      LM[kk] = transpose(compress(M(kk)));
+//------------------- compare valuation and insert in vec ---------------------
+      vec = sort(L)[2];
+      if ( n(kk) != 0 ) { vec = vec[size(vec)..1]; }
+      blockvec[kk/2] = vec;
+      vec = sort(v(kk),vec)[1];
+      varvec = varvec,vec;
+   }
+   varvec = varvec[2..size(varvec)];
+   list result = varvec,blockvec,LM;
+   return(result);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring s=0,(x,y,z,a,b),dp;
+   ideal i=ax2+ay3-b2x,abz+by2;
+   valvars (i,0,xyz);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc idealSplit(ideal I,list #)
+"USAGE:  idealSplit(id,timeF,timeS);  id ideal and optional
+         timeF, timeS integers to bound the time which can be used
+         for factorization resp. standard basis computation
+RETURN:  a list of ideals such that their intersection
+         has the same radical as id
+EXAMPLE: example idealSplit; shows an example
+"
+{
+   option(redSB);
+   int j,k,e;
+   int i=1;
+   int l=attrib(I,"isSB");
+   ideal J;
+   int timeF;
+   int timeS;
+   list re,fac,te;
+
+   if(size(#)==1)
+   {
+     if(typeof(#[1])=="ideal")
+     {
+        re=#;
+     }
+     else
+     {
+       timeF=#[1];
+     }
+   }
+   if(size(#)==2)
+   {
+     if(typeof(#[1])=="list")
+     {
+        re=#[1];
+        timeF=#[2];
+     }
+     else
+     {
+       timeF=#[1];
+       timeS=#[2];
+     }
+   }
+   if(size(#)==3){re=#[1];timeF=#[2];timeS=#[3];}
+
+   fac=timeFactorize(I[1],timeF);
+
+   while((size(fac[1])==2)&&(i<size(I)))
+   {
+      i++;
+      fac=timeFactorize(I[i],timeF);
+   }
+   if(size(fac[1])>2)
+   {
+      for(j=2;j<=size(fac[1]);j++)
+      {
+         I[i]=fac[1][j];
+         attrib(I,"isSB",1);
+         e=1;
+         k=0;
+         while(k<size(re))
+         {
+            k++;
+            if(size(reduce(re[k],I))==0){e=0;break;}
+            attrib(re[k],"isSB",1);
+            if(size(reduce(I,re[k]))==0){re=delete(re,k);k--;}
+         }
+         if(e)
+         {
+            if(l)
+            {
+               J=I;
+               J[i]=0;
+               J=simplify(J,2);
+               attrib(J,"isSB",1);
+               re=idealSplit(std(J,fac[1][j]),re,timeF,timeS);
+            }
+            else
+            {
+               re=idealSplit(timeStd(I,timeS),re,timeF,timeS);
+            }
+         }
+      }
+      return(re);
+   }
+   J=timeStd(I,timeS);
+   attrib(I,"isSB",1);
+   if(size(reduce(J,I))==0){return(re+list(I));}
+   return(re+idealSplit(J,re,timeF,timeS));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=32003,(b,s,t,u,v,w,x,y,z),dp;
+   ideal i=
+   bv+su,
+   bw+tu,
+   sw+tv,
+   by+sx,
+   bz+tx,
+   sz+ty,
+   uy+vx,
+   uz+wx,
+   vz+wy,
+   bvz;
+   idealSplit(i);
+}
+///////////////////////////////////////////////////////////////////////////////
+proc idealSimplify(ideal J,list #)
+"USAGE:  idealSimplify(id);  id ideal
+RETURN:  ideal I = eliminate(Id,m) m is a product of variables
+         which are only linearly involved in the generators of id
+EXAMPLE: example idealSimplify; shows an example
+"
+{
+   ideal I=J;
+   if(size(#)!=0){I=#[1];}
+   def R=basering;
+   matrix M=jacob(I);
+   ideal ma=maxideal(1);
+   int i,j,k;
+   map phi;
+
+   for(i=1;i<=nrows(M);i++)
+   {
+      for(j=1;j<=ncols(M);j++)
+      {
+         if(deg(M[i,j])==0)
+         {
+            ma[j]=(-1/M[i,j])*(I[i]-M[i,j]*var(j));
+            phi=R,ma;
+            I=phi(I);
+            J=phi(J);
+            for(k=1;k<=ncols(I);k++){I[k]=cleardenom(I[k]);}
+            M=jacob(I);
+         }
+      }
+   }
+   J=simplify(J,2);
+   for(i=1;i<=size(J);i++){J[i]=cleardenom(J[i]);}
+   return(J);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r=0,(x,y,z,w,t),dp;
+   ideal i=
+   t,
+   x3+y2+2z,
+   x2+3y,
+   x2+y2+z2,
+   w2+z;
+   ideal j=idealSimplify(i);
+   ideal k=eliminate(i,zyt);
+   reduce(k,std(j));
+   reduce(j,std(k));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+
+ ring s=31991,(e,f,x,y,z,t,u,v,w,a,b,c,d),dp;
+ ring s=31991,(x,y,z,t,u,v,w,a,b,c,d,f,e,h),dp; //standard
+ ring s1=31991,(y,u,b,c,a,z,t,x,v,d,w,e,f,h),dp; //gut
+v;
+13,12,11,10,8,7,6,5,4,3,2,1,9,14
+print(matrix(sort(maxideal(1),v)));
+f,e,w,d,x,t,z,a,c,b,u,y,v,h
+print(matrix(maxideal(1)));
+y,u,b,c,a,z,t,x,v,d,w,e,f,h
+v0;
+14,9,12,11,10,8,7,6,5,4,3,2,1,13
+print(matrix(sort(maxideal(1),v0)));
+h,v,e,w,d,x,t,z,a,c,b,u,y,f
+v1;v2;
+9,12,11,10,8,7,6,5,4,3,2,1,13,14
+13,12,11,10,8,7,6,5,4,3,2,1,9,14
+
+Ev. Gute Ordnung fuer i:
+========================
+i=ad*x^d+ad-1*x^(d-1)+...+a1*x+a0, ad!=0
+mit ar=(ar1,...,ark), k=size(i)
+    arj in K[..x^..]
+d=deg_x(i) := max{deg_x(i[k]) | k=1..size(i)}
+size_x(i,deg_x(i)..0) := size(ad),...,size(a0)
+x>y  <==
+  1. deg_x(i)>deg_y(i)
+  2. "=" in 1. und size_x lexikographisch
+
+hier im Beispiel:
+f: 5,1,0,1,2
+
+u: 3,1,4
+
+y: 3,1,3
+b: 3,1,3
+c: 3,1,3
+a: 3,1,3
+z: 3,1,3
+t: 3,1,3
+
+x: 3,1,2
+v: 3,1,2
+d: 3,1,2
+w: 3,1,2
+e: 3,1,2
+probier mal:
+ ring s=31991,(f,u,y,z,t,a,b,c,v,w,d,e,h),dp; //standard
+
+*/

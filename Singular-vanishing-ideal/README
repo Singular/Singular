@@ -1,0 +1,104 @@
+			 Singular version 3.0
+		     University of Kaiserslautern
+     Department of Mathematics        Centre for Computer Algebra
+	  Authors: G.-M. Greuel, G. Pfister, H. Schoenemann
+		  (C) 1986-2005 All Rights Reserved
+
+		   README FILE FOR SINGULAR KERNEL
+		   ===============================
+
+This directory contains the source files for the Singular interpreter and
+the following subdirectories:
+ 
+  'LIB'   -- contains Singular libraries written in Singular's
+             programming language
+
+See the following files in this directory
+  'INSTALL' -- for information on how to install Singular
+  'COPYING' -- for copying and license information
+
+See below for an overview of Singular, and for distribution and
+support information.
+
+If you receive this file as part of a complete Singular distribution,
+see also the files contained in the top
+directory of the full Singular distribution.
+
+
+Overview of Singular
+====================
+Singular is a special-purpose computer algebra system for commutative
+algebra and algebraic geometry. The main features of Singular are:
+
+ * Computations in very general rings (polynomial rings, localizations
+   of rings at a prime ideal, tensor products of rings) over many
+   ground fields (rational numbers, mod p numbers, Galois fields,
+   transcendental/algebraic extensions) and monomial orderings (all
+   standard monomial orderings, including matrix orderings)
+
+ * Very fast standard (resp. Groebner) bases computations
+
+ * Polynomial factorization, resultant, and gcd computations
+
+ * Large variety of implemented related algorithm: FGLM,
+   Hilbert-driven, Factorizing Buchberger; Minimal resolutions,
+   Primary decomposition; Usual ideal theoretic operations; standard
+   combinatorial algorithms.
+
+ * Efficient and flexible communication links based on the MP
+   protocol and library
+
+ * Easy-to-use, command-driven user-interface
+
+ * Intuitive, C-like programming language
+
+ * Extensive libraries of procedures, written in Singular's
+   programming language
+
+ * Written in C/C++. Available as source and binary for some hard- and
+   software platforms (including most Un*x variants, MS-DOG, MacOS)
+
+
+Distribution of Singular
+========================
+The newest version of Singular is always available by anonymous ftp
+from 
+	     http://www.singular.uni-kl.de
+
+Binary versions of Singular for common hard- and software
+platforms are available.
+
+Architecture - independent files (such as libraries written in the
+Singular programming language, and the Singular documentation) are
+distributed as Singular-<version>-share.tar.gz.
+
+Singular's terminal i/o is most convenient if it is linked with the
+GNU readline library.
+The GMP library and the readline library is available at
+your local GNU mirrors. You have to have these library
+already installed, before Singular can be linked with them.
+
+The MP library library is available from mcs.kent.edu:/pub/MP/
+For further information on MP, see also
+http://symbolicnet.mcs.kent.edu/areas/protocols/mp.html
+
+The NTL library (Victor Shoup) is recommended.
+It is avavailable from http://www.shoup.net.
+
+The factory and libfac library are available from
+ftp://www.mathematik.uni-kl.de:/pub/Math/Singular/src
+
+More information about Singular: Comments, Questions, Bug Reports
+=================================================================
+
+More and up-to-date information about Singular is always available
+from 
+	   http://www.singular.uni-kl.de
+We very much welcome any comments, questions, and bug reports. Please
+contact us at  
+		    singular@mathematik.uni-kl.de
+
+
+GOOD LUCK and ENJOY!                         Your Singular team.
+
+
