@@ -1,4 +1,0 @@
-Makefile *.dd *.d depend
-config.log config.status stamp-h
-*.sop *.op
-*.o_ndebug*

@@ -1,9 +1,0 @@
-GNUmakefile
-config.h
-config.cache
-config.log
-config.status
-factoryconf.h
-factory.h
-stamp-h
-*.d
