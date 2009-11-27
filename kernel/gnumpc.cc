@@ -102,11 +102,6 @@ number   ngcPar(int i)
   return (number)n;
 }
 
-void ngcNew (number * r)
-{
-  *r=NULL;
-}
-
 /*2
 * n := i
 */

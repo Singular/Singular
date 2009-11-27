@@ -32,7 +32,6 @@ number  naPar(int i);                               /* z := par(i) */
 int     naParDeg(number n);                         /* i := deg(n) */
 int     naSize(number n);                           /* size desc. */
 int     naInt(number &n, const ring r);
-void    naNew(number *z);
 BOOLEAN naIsZero(number za);                         /* za = 0 ? */
 BOOLEAN naIsOne(number  za);                         /* za = 1 ? */
 BOOLEAN naIsMOne(number  za);                        /* za = -1 ? */

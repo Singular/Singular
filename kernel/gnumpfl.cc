@@ -95,11 +95,6 @@ nMapFunc ngfSetMap(ring src, ring dst)
   return NULL;
 }
 
-void ngfNew (number * r)
-{
-  *r= NULL;
-}
-
 /*2
 * n := i
 */

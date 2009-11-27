@@ -15,7 +15,6 @@ BOOLEAN  ngfEqual(number a, number b);
 BOOLEAN  ngfIsOne(number a);
 BOOLEAN  ngfIsMOne(number a);
 BOOLEAN  ngfIsZero(number za);
-void     ngfNew(number *r);
 number   ngfInit(int i, const ring r);
 int      ngfInt(number &n, const ring r);
 number   ngfNeg(number za);

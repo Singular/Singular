@@ -38,14 +38,14 @@
 #define n_GetDenom(N,r)       (r)->cf->cfGetDenom((N),r)
 #define n_GetNumerator(N,r)   (r)->cf->cfGetNumerator((N),r)
 
-#define n_New(n, r)           (r)->cf->nNew(n)
+#define n_New(n, r)           nNew(n)
 
 /* variables */
 extern unsigned short fftable[];
 
 /* prototypes */
 extern numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
-extern void    (*nNew)(number * a);
+void           nNew(number * a);
 extern number  (*nInit_bigint)(number i);
 #define        nInit(i) n_Init(i,currRing)
 extern number  (*nPar)(int i);

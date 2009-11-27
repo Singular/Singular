@@ -2294,11 +2294,6 @@ LINLINE number nlCopy(number a)
 }
 
 
-LINLINE void nlNew (number * r)
-{
-  *r=NULL;
-}
-
 /*2
 * delete a
 */

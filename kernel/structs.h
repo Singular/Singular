@@ -273,7 +273,6 @@ struct n_Procs_s
 
    // general stuff
    numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
-   void    (*nNew)(number * a);
    number  (*cfInit)(int i,const ring r);
    number  (*nPar)(int i);
    int     (*nParDeg)(number n);

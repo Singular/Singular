@@ -999,14 +999,6 @@ number na_Copy(number p, const ring r)
 }
 
 /*2
-* a dummy number: 0
-*/
-void naNew(number *z)
-{
-  *z = NULL;
-}
-
-/*2
 *  addition; lu:= la + lb
 */
 number naAdd(number la, number lb)

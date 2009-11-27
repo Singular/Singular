@@ -52,7 +52,6 @@ number nlRInit (int i);
 LINLINE BOOLEAN  nlIsOne(number a);
 LINLINE BOOLEAN  nlIsZero(number za);
 LINLINE number   nlCopy(number a);
-LINLINE void     nlNew(number *r);
 LINLINE void     nlDelete(number *a, const ring r);
 LINLINE number   nlNeg(number za);
 LINLINE number   nlAdd(number la, number li);

@@ -33,7 +33,6 @@ extern omBin gmp_nrz_bin;
 //static int characteristic = 0;
 extern int IsPrime(int p);
 
-void   (*nNew)(number *a);
 number  (*nInit_bigint)(number i);
 number (*nPar)(int i);
 int    (*nParDeg)(number n);
@@ -71,7 +70,7 @@ number nNULL; /* the 0 as constant */
 
 n_Procs_s *cf_root=NULL;
 
-void   nDummy1(number* d) { *d=NULL; }
+void   nNew(number* d) { *d=NULL; }
 void   ndDelete(number* d, const ring r) { *d=NULL; }
 void   ndInpMult(number &a, number b, const ring r)
 {
@@ -205,7 +204,6 @@ void nSetChar(ring r)
     WerrorS("unknown field");
   }
 #endif
-  nNew   = r->cf->nNew;
   nNormalize=r->cf->nNormalize;
   nPar   = r->cf->nPar;
   nParDeg= r->cf->nParDeg;
@@ -299,7 +297,6 @@ void nInitChar(ring r)
   n->nName =  ndName;
   n->nImPart=ndReturn0;
   n->cfDelete= ndDelete;
-  n->nNew=nDummy1;
   n->nInpMult=ndInpMult;
   n->cfCopy=nd_Copy;
   n->nIntMod=ndIntMod; /* dummy !! */
@@ -317,7 +314,6 @@ void nInitChar(ring r)
   {
     //naInitChar(c,TRUE,r);
     n->cfDelete = naDelete;
-    n-> nNew       = naNew;
     n-> nNormalize = naNormalize;
     n->cfInit      = naInit;
     n->nPar        = naPar;
@@ -481,7 +477,6 @@ void nInitChar(ring r)
   else if (rField_is_Q(r))
   {
     n->cfDelete= nlDelete;
-    n->nNew   = nlNew;
     n->nNormalize=nlNormalize;
     n->cfInit = nlInit;
     n->n_Int  = nlInt;
@@ -621,7 +616,6 @@ void nInitChar(ring r)
   else if (rField_is_long_R(r))
   {
     n->cfDelete= ngfDelete;
-    n->nNew=ngfNew;
     n->cfInit = ngfInit;
     n->n_Int  = ngfInt;
     n->nAdd   = ngfAdd;
@@ -652,7 +646,6 @@ void nInitChar(ring r)
   else if (rField_is_long_C(r))
   {
     n->cfDelete= ngcDelete;
-    n->nNew=ngcNew;
     n->nNormalize=nDummy2;
     n->cfInit = ngcInit;
     n->n_Int  = ngcInt;
