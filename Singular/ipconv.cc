@@ -187,8 +187,7 @@ static void * iiN2P(void *data)
   poly p=NULL;
   if (!nIsZero((number)data))
   {
-    p=pOne();
-    pSetCoeff(p,(number)data);
+    p=pNSet((number)data);
   }
   //else
   //{
@@ -202,8 +201,7 @@ static void * iiN2Ma(void *data)
   ideal I=idInit(1,1);
   if (!nIsZero((number)data))
   {
-    poly p=pOne();
-    pSetCoeff(p,(number)data);
+    poly p=pNSet((number)data);
     I->m[0]=p;
   }
   //else

@@ -1545,8 +1545,7 @@ void rDecomposeCF(leftv h,const ring r,const ring R)
   {
     ideal I=idInit(1,1);
     L->m[3].data=(void *)I;
-    I->m[0]=pOne();
-    pSetCoeff(I->m[0],R->minpoly);
+    I->m[0]=pNSet(R->minpoly);
   }
   // ----------------------------------------
 }

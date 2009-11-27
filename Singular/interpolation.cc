@@ -1743,9 +1743,6 @@ ideal interpolation(lists L, intvec *v)
       {
           if (mpz_sgn(temp->polycoef[a])!=0)
           {
-             p=pOne(); //a monomial
-             for (j=0;j<variables;j++) pSetExp(p,j+1,temp->polyexp[a][j]);
-             pSetm(p); // after all pSetExp
              number n=(number)omAllocBin(rnumber_bin);
 #ifdef LDEBUG
              n->debug=123456;
@@ -1753,7 +1750,9 @@ ideal interpolation(lists L, intvec *v)
              mpz_init_set(&n->z,temp->polycoef[a]);
              n->s=3;
              nlNormalize(n);
-             pSetCoeff(p,n);
+             p=pNSet(n); //a monomial
+             for (j=0;j<variables;j++) pSetExp(p,j+1,temp->polyexp[a][j]);
+             pSetm(p); // after all pSetExp
              sum=pAdd(sum,p);
           }
       }
