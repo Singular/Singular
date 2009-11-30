@@ -194,7 +194,7 @@ class gcone
 		void noRevS(gcone &gcRoot, bool usingIntPoint=FALSE);
 		void makeInt(dd_MatrixPtr const &M, int const line, intvec &n);
 		void normalize();
-		facet * enqueueNewFacets(facet &f);
+		facet * enqueueNewFacets(facet *f);
 		dd_MatrixPtr facets2Matrix(gcone const &gc);		
 // 		static void gcone::idPrint(ideal &I);		
 		friend class facet;	

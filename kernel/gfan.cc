@@ -157,8 +157,10 @@ facet::facet(const facet& f)
 /** The default destructor */
 facet::~facet()
 {
-	delete this->fNormal;
-	delete this->interiorPoint;
+	if(this->fNormal!=NULL)
+		delete this->fNormal;
+	if(this->interiorPoint!=NULL)
+		delete this->interiorPoint;
 	/* Cleanup the codim2-structure */
 	if(this->codim==2)
 	{
@@ -166,15 +168,19 @@ facet::~facet()
 		codim2Ptr = this->codim2Ptr;
 		while(codim2Ptr!=NULL)
 		{
-			delete codim2Ptr->fNormal;
-			codim2Ptr = codim2Ptr->next;
+			if(codim2Ptr->fNormal!=NULL)
+			{
+				delete codim2Ptr->fNormal;
+				codim2Ptr = codim2Ptr->next;
+			}
 		}
 	}
-	delete this->codim2Ptr;
-	if(this->flipGB!=NULL)
-		idDelete((ideal *)&this->flipGB);
-	if(this->flipRing!=NULL)
-		rDelete(this->flipRing);
+	if(this->codim2Ptr!=NULL)
+		delete this->codim2Ptr;
+// 	if(this->flipGB!=NULL)
+// 		idDelete((ideal *)&this->flipGB);
+// 	if(this->flipRing!=NULL && this->flipRing->idroot!=(idhdl)0xfbfbfbfbfbfbfbfb)
+// 		rDelete(this->flipRing);
 // 	this->flipRing=NULL;
 	//this=NULL;
 }
@@ -609,7 +615,6 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 	}
 
 	dd_rowrange aktmatrixrow=0;	// needed to store the diffs of the expvects in the rows of ddineq
-// 	dd_set_global_constants();
 	ddrows=rows;
 	ddcols=this->numVars;
 	dd_MatrixPtr ddineq; 		//Matrix to store the inequalities			
@@ -712,10 +717,13 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 							num_alloc += 1;
 						else
 							num_alloc += 1;
-						void *_tmp = realloc(redRowsArray,(num_alloc*sizeof(int)));
-						if(!_tmp)
+						void *tmp = realloc(redRowsArray,(num_alloc*sizeof(int)));
+						if(!tmp)
+						{
 							WerrorS("Woah dude! Couldn't realloc memory\n");
-						redRowsArray = (int*)_tmp;
+							exit(-1);
+						}
+						redRowsArray = (int*)tmp;
 						redRowsArray[num_elts]=ii;
 						num_elts++;
 						//break;//for(int kk, since we have found one that is not in L	
@@ -728,7 +736,6 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 		delete P;
 		//idDelete(L);		
 	}//for(ii<ddineq-rowsize
-	
 	int offset=0;//needed for correction of redRowsArray[ii]
 	for( int ii=0;ii<num_elts;ii++ )
 	{
@@ -737,12 +744,7 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 	}
 	free(redRowsArray);
 #endif
-// 	cout << "Found " << falseGammaCounter << " false in " << rows << endl;
-	//Maybe add another row to contain the constraints of the standard simplex?
 
-
-	//Remove redundant rows here!
-	//Necessary check here! C.f. FJT p18		
 	dd_MatrixCanonicalize(&ddineq, &ddlinset, &ddredrows, &ddnewpos, &dderr);
 	//time(&canonicalizeTac);
 	//cout << "dd_MatrixCanonicalize time: " << difftime(canonicalizeTac,canonicalizeTic) << "sec" << endl;
@@ -752,14 +754,8 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 	//ddCreateMatrix(ddrows,ddcols+1);
 	ddFacets = dd_CopyMatrix(ddineq);
 			
-	/*Write the normals into class facet*/
-	/*The pointer *fRoot should be the return value of this function*/
-	//facet *fRoot = new facet();	//instantiate new facet
-	//fRoot->setUCN(this->getUCN());
-	//this->facetPtr = fRoot;		//set variable facetPtr of class gcone to first facet
-	facet *fAct; 	//pointer to active facet
-			//fAct = fRoot;			//Seems to do the trick. fRoot and fAct have to point to the same adress!
-			//std::cout << "fRoot = " << fRoot << ", fAct = " << fAct << endl;
+	/*Write the normals into class facet*/	
+	facet *fAct; 	//pointer to active facet	
 	int numNonFlip=0;
 	for (int kk = 0; kk<ddrows; kk++)
 	{
@@ -836,6 +832,7 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 	if(numNonFlip==this->numFacets)
 	{					
 		WerrorS ("Only non-flippable facets. Terminating...\n");
+		exit(-1);//Bit harsh maybe...
 	}
 			
 	/*
@@ -843,8 +840,7 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 	-irredundant
 	-flipable
 	Adressing is done via *facetPtr
-	*/
-			
+	*/			
 	if (compIntPoint==TRUE)
 	{
 		intvec *iv = new intvec(this->numVars);
@@ -859,24 +855,15 @@ void gcone::getConeNormals(ideal const &I, bool compIntPoint)
 		interiorPoint(ddineq, *iv);	//NOTE ddineq contains non-flippable facets
 		this->setIntPoint(iv);	//stores the interior point in gcone::ivIntPt
 		delete iv;
-	}
-			
-	//Compute the number of facets
-	// wrong because ddineq->rowsize contains only irredundant facets. There can still be
-	// non-flippable ones!
-	//this->numFacets=ddineq->rowsize;
-	
-	//Clean up but don't delete the return value! (Whatever it will turn out to be)			
+	}	
+	//Clean up but don't delete the return value!
 	dd_FreeMatrix(ddineq);
 	set_free(ddredrows);
 	set_free(ddlinset);
 	//free(ddnewpos);
-	//set_free(ddlinset);
-	//NOTE Commented out. Solved the bug that after facet2Matrix there were facets lost
-	//THIS SUCKS
-	//dd_free_global_constants();
+	
 
-}//method getConeNormals(ideal I)	
+}//gcone::getConeNormals(ideal I)
 		
 /** \brief Compute the (codim-2)-facets of a given cone
  * This method is used during noRevS
@@ -890,9 +877,6 @@ void gcone::getCodim2Normals(gcone const &gc)
 	fAct = this->facetPtr;		
 	facet *codim2Act;
 	//codim2Act = this->facetPtr->codim2Ptr;
-			
-// 	dd_set_global_constants();
-			
 	dd_MatrixPtr ddineq,P,ddakt;
 	dd_rowset impl_linset, redset;
 	dd_ErrorType err;
@@ -907,7 +891,7 @@ void gcone::getCodim2Normals(gcone const &gc)
 	{				
 		ddakt = dd_CopyMatrix(ddineq);
 		ddakt->representation=dd_Inequality;
-		set_addelem(ddakt->linset,ii+1);				
+		set_addelem(ddakt->linset,ii+1);/*Now set appropriate linearity*/				
 		dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
 		ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 		P=dd_CopyGenerators(ddpolyh);				
@@ -995,18 +979,22 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	fNormal = f->getFacetNormal();	//read this->fNormal;
 
 // 	std::cout << "running gcone::flip" << std::endl;
-// 	std::cout << "flipping UCN " << this->getUCN() << endl;
-// 	cout << "over facet (";
-// 	fNormal->show(1,0);
-// 	cout << ") with UCN " << f->getUCN();
-// 	std::cout << std::endl;
-
+	std::cout << "flipping UCN " << this->getUCN() << endl;
+	cout << "over facet (";
+	fNormal->show(1,0);
+	cout << ") with UCN " << f->getUCN();
+	std::cout << std::endl;
+	if(this->getUCN() != f->getUCN())
+	{
+		WerrorS("Uh oh... Trying to flip over facet with incompatible UCN");
+		exit(-1);
+	}
 	/*1st step: Compute the initial ideal*/
 	/*poly initialFormElement[IDELEMS(gb)];*/	//array of #polys in GB to store initial form
 	ideal initialForm=idInit(IDELEMS(gb),this->gcBasis->rank);
-	poly aktpoly;	
+	
 	computeInv(gb,initialForm,*fNormal);
-	//NOTE The code below went into gcone::computeInv
+
 #ifdef gfan_DEBUG
 /*	cout << "Initial ideal is: " << endl;
 	idShow(initialForm);
@@ -1041,28 +1029,18 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 		tmpRing->block1[0]=length;
 		rComplete(tmpRing);	
 	}
- 	delete fNormal; //NOTE: Why does this crash?
-	rChangeCurrRing(tmpRing);
-			
-	//rWrite(currRing); cout << endl;
+ 	delete fNormal; 
+	rChangeCurrRing(tmpRing);	
 			
 	ideal ina;			
 	ina=idrCopyR(initialForm,srcRing);
-#ifndef NDEBUG			
-#ifdef gfan_DEBUG
-   	cout << "ina=";
-   	idShow(ina); cout << endl;
-#endif
-#endif
+	idDelete(&initialForm);
 	ideal H;
-	//H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
+// 	H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 	H=kStd(ina,NULL,testHomog,NULL);	//This is \mathcal(G)_{>_-\alpha}(in_v(I))
 	idSkipZeroes(H);
-#ifndef NDEBUG
-#ifdef gfan_DEBUG
-   			cout << "H="; idShow(H); cout << endl;
-#endif
-#endif
+	idDelete(&ina);
+
 	/*Substep 2.2
 	do the lifting and mark according to H
 	*/
@@ -1070,19 +1048,10 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	ideal srcRing_H;
 	ideal srcRing_HH;			
 	srcRing_H=idrCopyR(H,tmpRing);
-#ifndef NDEBUG
-#ifdef gfan_DEBUG
-   	cout << "srcRing_H = ";
-   	idShow(srcRing_H); cout << endl;
-#endif
-#endif
- 	srcRing_HH=ffG(srcRing_H,this->gcBasis);	
-#ifndef NDEBUG
-#ifdef gfan_DEBUG
-   	cout << "srcRing_HH = ";
-   	idShow(srcRing_HH); cout << endl;
-#endif
-#endif
+	//H is needed further below, so don't idDelete here
+ 	srcRing_HH=ffG(srcRing_H,this->gcBasis);
+// 	idDelete(&srcRing_H);
+	
 	/*Substep 2.2.1
 	 * Mark according to G_-\alpha
 	 * Here we have a minimal basis srcRing_HH. In order to turn this basis into a reduced basis
@@ -1091,26 +1060,25 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	 * Thus we check whether the leading monomials of srcRing_HH and srcRing_H coincide. If not we 
 	 * compute the difference accordingly
 	*/
-// 	dd_set_global_constants();
 	bool markingsAreCorrect=FALSE;
 	dd_MatrixPtr intPointMatrix;
 	int iPMatrixRows=0;
 	dd_rowrange aktrow=0;			
 	for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
 	{
-		poly aktpoly=(poly)srcRing_HH->m[ii];
-		iPMatrixRows = iPMatrixRows+pLength(aktpoly);
+		poly aktpoly=(poly)srcRing_HH->m[ii];//This is a pointer, so don't pDelete
+		iPMatrixRows = iPMatrixRows+pLength(aktpoly);		
 	}
 	/* additionally one row for the standard-simplex and another for a row that becomes 0 during
 	 * construction of the differences
 	 */
-	intPointMatrix = dd_CreateMatrix(iPMatrixRows+2,this->numVars+1); //iPMatrixRows+10;
+	intPointMatrix = dd_CreateMatrix(iPMatrixRows+2,this->numVars+1); 
 	intPointMatrix->numbtype=dd_Integer;	//NOTE: DO NOT REMOVE OR CHANGE TO dd_Rational
 	
 	for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
 	{
 		markingsAreCorrect=FALSE;	//crucial to initialise here
-		poly aktpoly=srcRing_HH->m[ii];
+		poly aktpoly=srcRing_HH->m[ii]; //Only a pointer, so don't pDelete
 		/*Comparison of leading monomials is done via exponent vectors*/
 		for (int jj=0;jj<IDELEMS(H);jj++)
 		{
@@ -1181,10 +1149,9 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 		omFree(v);
 		omFree(leadExpV);
 	}//for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
-	/*Now we add the constraint for the standard simplex*/
-	/*NOTE:Might actually work without the standard simplex
-	* No, it won't. MM 
-	*/
+	/*Now it is safe to idDelete(H)*/
+	idDelete(&H);
+	/*Now we add the constraint for the standard simplex*/	
 	dd_set_si(intPointMatrix->matrix[aktrow][0],-1);
 	for (int jj=1;jj<=this->numVars;jj++)
 	{
@@ -1200,19 +1167,13 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	}
 	dd_MatrixAppendTo(&intPointMatrix,posRestr);
 	dd_FreeMatrix(posRestr);
-#ifdef gfan_DEBUG
-// 			dd_WriteMatrix(stdout,intPointMatrix);
-#endif
 	intvec *iv_weight = new intvec(this->numVars);
 	interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
 	dd_FreeMatrix(intPointMatrix);
-// 	dd_free_global_constants();
 			
 	/*Step 3
 	turn the minimal basis into a reduced one
-	*/
-	//ring dstRing=rCopyAndAddWeight(tmpRing,iv_weight);	
-			
+	*/			
 	// NOTE May assume that at this point srcRing already has 3 blocks of orderins, starting with a
 	// Thus: 
 	//ring dstRing=rCopyAndChangeWeight(srcRing,iv_weight);	
@@ -1224,20 +1185,16 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 		A[jj]=(*iv_weight)[jj];
 	}
 	dstRing->wvhdl[0]=(int*)A;
-	rComplete(dstRing);					
+	rComplete(dstRing);
+// 	omFree(A);					
 	rChangeCurrRing(dstRing);
-	//rDelete(tmpRing);
+ 	rDelete(tmpRing);
 	delete iv_weight;
-
-	//rWrite(dstRing); cout << endl;
 
 	ideal dstRing_I;			
 	dstRing_I=idrCopyR(srcRing_HH,srcRing);
+	//idDelete(&srcRing_HH); //Hmm.... causes trouble
 	//dstRing_I=idrCopyR(inputIdeal,srcRing);
-	//validOpts<1>=TRUE;
-#ifdef gfan_DEBUG
-	//idShow(dstRing_I);
-#endif			
 	BITSET save=test;
 	test|=Sy_bit(OPT_REDSB);
 	test|=Sy_bit(OPT_REDTAIL);
@@ -1249,13 +1206,15 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	//tmpI = idrCopyR(this->inputIdeal,this->baseRing);
 	tmpI = dstRing_I;
 	dstRing_I=kStd(tmpI,NULL,testHomog,NULL);
+	idDelete(&tmpI);
 	idNorm(dstRing_I);			
-			//kInterRed(dstRing_I);
+	//kInterRed(dstRing_I);
 	idSkipZeroes(dstRing_I);
 	test=save;
 	/*End of step 3 - reduction*/
 			
 	f->setFlipGB(dstRing_I);//store the flipped GB
+	idDelete(&dstRing_I);
 	f->flipRing=rCopy(dstRing);	//store the ring on the other side
 //#ifdef gfan_DEBUG
 // 	cout << "Flipped GB is UCN " << counter+1 << ":" << endl;
@@ -1263,7 +1222,7 @@ void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 // 	cout << endl;
 //#endif			
 	rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
-// 	rDelete(dstRing);
+ 	rDelete(dstRing);
 }//void flip(ideal gb, facet *f)
 
 /** \brief Compute initial ideal
@@ -1304,7 +1263,7 @@ void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 #endif
 			if (isParallel(*check,fNormal)) //pass *check when 
 			{
-// 				cout << "Parallel vector found, adding to initialFormElement" << endl;			
+				//Found a parallel vector. Add it
 				initialFormElement[ii] = pAdd(pCopy(initialFormElement[ii]),(poly)pHead(aktpoly));
 			}						
 		}//while
@@ -1680,20 +1639,18 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			fNormal = fAct->getFacetNormal();
 			if( ii==0 || (ii>0 && SearchListAct==NULL) ) //1st facet may be non-flippable
 			{						
-				SearchListAct = SearchListRoot;
-						//memcpy(SearchListAct,fAct,sizeof(facet));					
+				SearchListAct = SearchListRoot;				
 			}
 			else
 			{			
 				SearchListAct->next = new facet();
 				SearchListAct = SearchListAct->next;						
-						//memcpy(SearchListAct,fAct,sizeof(facet));				
 			}
 			SearchListAct->setFacetNormal(fNormal);
 			SearchListAct->setUCN(this->getUCN());
 			SearchListAct->numCodim2Facets=fAct->numCodim2Facets;
 			SearchListAct->isFlippable=TRUE;
-					//Copy codim2-facets				
+			//Copy codim2-facets				
 			codim2Act=fAct->codim2Ptr;
 			SearchListAct->codim2Ptr = new facet(2);
 			sl2Root = SearchListAct->codim2Ptr;
@@ -1734,26 +1691,25 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 	
 	fAct = gcAct->facetPtr;
 	//NOTE Disabled until code works as expected. Reenabled 2.11.2009
-	gcAct->writeConeToFile(*gcAct);
-			
+	gcAct->writeConeToFile(*gcAct);			
 	/*End of initialisation*/
+	
 	fAct = SearchListAct;
 	/*2nd step
 	  Choose a facet from fListPtr, flip it and forget the previous cone
 	  We always choose the first facet from fListPtr as facet to be flipped
 	*/			
-// 	time_t tic, tac;
 	while((SearchListAct!=NULL))// && counter<10)
 	{//NOTE See to it that the cone is only changed after ALL facets have been flipped!				
 		fAct = SearchListAct;
 				
-		while(fAct!=NULL)
-		{	//Since SLA should only contain flippables there should be no need to check for that
-			
-			gcAct->flip(gcAct->gcBasis,fAct);
-			
-			
+ 		while(fAct!=NULL)
+// 		while( (fAct->getUCN() == fAct->next->getUCN()) )		
+		{	//Since SLA should only contain flippables there should be no need to check for that			
+			gcAct->flip(gcAct->gcBasis,fAct);			
+			//NOTE rCopy needed?
 			ring rTmp=rCopy(fAct->flipRing);
+// 			ring rTmp=fAct->flipRing; //segfaults
 			rComplete(rTmp);			
 			rChangeCurrRing(rTmp);
 			gcone *gcTmp = new gcone::gcone(*gcAct,*fAct);//copy constructor!
@@ -1777,23 +1733,20 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 // 			gcTmp->showFacets(1);
 #endif
 			/*add facets to SLA here*/
-			SearchListRoot=gcTmp->enqueueNewFacets(*SearchListRoot);
-			
+			SearchListRoot=gcTmp->enqueueNewFacets(SearchListRoot);			
  			if(gfanHeuristic==1)
  			{
 				gcTmp->writeConeToFile(*gcTmp);
-// 				idDelete((ideal*)&gcTmp->gcBasis);
 				for(int ii=0;ii<IDELEMS(gcTmp->gcBasis);ii++)
 				{
-// 					gcTmp->gcBasis->m[ii]=(poly)NULL;
 					pDelete(&gcTmp->gcBasis->m[ii]);
 				}
- 			}
-			
-#if gfan_DEBUG
-// 			if(SearchListRoot!=NULL)
-// 				gcTmp->showSLA(*SearchListRoot);
-#endif
+// 				idDelete((ideal*)&gcTmp->gcBasis);
+ 			}			
+// #if gfan_DEBUG
+			if(SearchListRoot!=NULL)
+				gcTmp->showSLA(*SearchListRoot);
+// #endif
 			rChangeCurrRing(gcAct->baseRing);
 			//rDelete(rTmp);
 			//doubly linked for easier removal
@@ -1806,46 +1759,23 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			}
 			else
 				break;
+// 			fAct=fAct->next;
 		}//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) );
 		//NOTE Now all neighbouring cones of gcAct have been computed, so we may delete gcAct
 		gcone *deleteMarker;
-		deleteMarker=gcAct;		
-// 		delete deleteMarker;
-// 		deleteMarker=NULL;
+		deleteMarker=gcAct;
 		//Search for cone with smallest UCN
 		gcNext = gcHead;
 		while(gcNext!=NULL && SearchListRoot!=NULL && gcNext!=(gcone * const)0xfbfbfbfbfbfbfbfb && gcNext!=(gcone * const)0xfbfbfbfb)
 		{			
-			/*NOTE if gcNext->getUCN is smaller than SearchListRoot->getUCN it follows, that the cone
-			gcNext will not be used in any more computation. So -> delete
-			BAD IDEA!!! Luckily the delete statement below is never executed since noRevs is 
-			invoked from gcRoot which has UCN==1. And apparently the else below is also never executed!
-			*/
-			if (gcNext->getUCN() < SearchListRoot->getUCN() )
-			{
-				//idDelete((ideal *)&gcNext->gcBasis);	//at least drop huge gröbner bases
-				if(gcNext == gcHead)
-				{
- 					deleteMarker = gcHead;
-//  					gcHead = gcNext->next;
-					//gcNext->next->prev = NULL;
-				}
-				else
-				{
-					deleteMarker = gcNext;
-// 					gcNext->prev->next = gcNext->next;
-// 					gcNext->next->prev = gcNext->prev;
-				}
-// 				gcNext = gcNext->next;
-//  				delete deleteMarker;
-// 				deleteMarker = NULL;
-			}
-			else if( gcNext->getUCN() == SearchListRoot->getUCN() )
+			if( gcNext->getUCN() == SearchListRoot->getUCN() )
 			{//NOTE: Implement heuristic to be used!
 				if(gfanHeuristic==0)
 				{
 					gcAct = gcNext;
-					rAct=rCopy(gcAct->baseRing);
+					//Seems better to not to use rCopy here
+// 					rAct=rCopy(gcAct->baseRing);
+					rAct=gcAct->baseRing;
 					rComplete(rAct);
 					rChangeCurrRing(rAct);						
 					break;
@@ -1856,36 +1786,21 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 					gcAct = gcNext;
 					//implant the GB into gcAct
 					readConeFromFile(gcAct->getUCN(), gcAct);
-					rAct=rCopy(gcAct->baseRing);
+// 					rAct=rCopy(gcAct->baseRing);
+					rAct=gcAct->baseRing;
 					rComplete(rAct);
 					rChangeCurrRing(rAct);
 					break;
 				}				
 			}			
  			gcNext = gcNext->next;
-//   			if(deleteMarker!=NULL && deleteMarker!=(gcone *)0xfbfbfbfbfbfbfbfb)
-			if(this->getUCN()!=1)	//workaround to avoid unpredictable behaviour towards end of program
- 				delete deleteMarker;
-// 			deleteMarker = NULL;
-// 			gcNext = gcNext->next;
 		}
 		UCNcounter++;
-				//SearchListAct = SearchListAct->next;
-				//SearchListAct = fAct->next;
+		//SearchListAct = SearchListAct->next;
+		//SearchListAct = fAct->next;
 		SearchListAct = SearchListRoot;
 	}
 	cout << endl << "Found " << counter << " cones - terminating" << endl;
-		
-			//NOTE Hm, comment in and get a crash for free...
-			//dd_free_global_constants();				
-			//gc.writeConeToFile(gc);
-			
-			
-			//fAct = fListPtr;
-			//gcone *gcTmp = new gcone(gc);	//copy
-			//gcTmp->flip(gcTmp->gcBasis,fAct);
-			//NOTE: gcTmp may be deleted, gcRoot from main proc should probably not!
-			
 }//void noRevS(gcone &gc)	
 		
 		
@@ -1993,23 +1908,23 @@ void gcone::normalize()
  * Takes ptr to search list root
  * Returns a pointer to new first element of Searchlist
  */
-facet * gcone::enqueueNewFacets(facet &f)
+facet * gcone::enqueueNewFacets(facet *f)
 {
 	facet *slHead;
-	slHead = &f;
+	slHead = f;
 	facet *slAct;	//called with f=SearchListRoot
-	slAct = &f;
+	slAct = f;
 	facet *slEnd;	//Pointer to end of SLA
-	slEnd = &f;
+	slEnd = f;
 // 	facet *slEndStatic;	//marks the end before a new facet is added		
 	facet *fAct;
 	fAct = this->facetPtr;
 	facet *codim2Act;
 	codim2Act = this->facetPtr->codim2Ptr;
 	facet *sl2Act;
-	sl2Act = f.codim2Ptr;
+	sl2Act = f->codim2Ptr;
 	/** Pointer to a facet that will be deleted */
-	facet *deleteMarker;
+	volatile facet *deleteMarker;
 	deleteMarker = NULL;
 			
 	/** Flag to indicate a facet that should be added to SLA*/
@@ -2106,43 +2021,49 @@ facet * gcone::enqueueNewFacets(facet &f)
 			while(slAct!=NULL)
 					//while(slAct!=slEndStatic->next)
 			{
-				if(deleteMarker!=NULL)
-				{
+// 				if(deleteMarker!=NULL)
+// 				{
 // 					delete deleteMarker;
 // 					deleteMarker=NULL;
-				}
+// 				}
 				removalOccured=FALSE;
 				slNormal = slAct->getFacetNormal();
-#ifdef gfan_DEBUG
+// #ifdef gfan_DEBUG
 				cout << "Checking facet (";
 				fNormal->show(1,1);
 				cout << ") against (";
 				slNormal->show(1,1);
 				cout << ")" << endl;
-#endif				
+// #endif				
  				if(areEqual(fAct,slAct))
 				{
+					deleteMarker = slAct;
 					if(slAct==slHead)
-					{
-						deleteMarker = slAct;				
+					{						
 						slHead = slAct->next;						
 						if(slHead!=NULL)
-							slHead->prev = NULL;
+							slHead->prev = NULL;						
 					}
 					else if (slAct==slEnd)
 					{
-						deleteMarker = slAct;
 						slEnd=slEnd->prev;
-						slEnd->next = NULL;
+						slEnd->next = NULL;						
 					}								
 					else
 					{
-						deleteMarker = slAct;
 						slAct->prev->next = slAct->next;
-						slAct->next->prev = slAct->prev;
+						slAct->next->prev = slAct->prev;						
 					}
 					removalOccured=TRUE;
 					lengthOfSearchList--;
+					if(deleteMarker!=NULL)
+					{
+// 						delete deleteMarker;
+// 						deleteMarker=NULL;
+					}
+					cout << "Removing (";
+					fNormal->show(1,1);
+					cout << ") from list" << endl;
 					break;//leave the while loop, since we found fAct=slAct thus delete slAct and do not add fAct
 				}		
 				
@@ -2163,11 +2084,11 @@ facet * gcone::enqueueNewFacets(facet &f)
 // 			if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) || (doNotAdd==FALSE) )
 					//if( (notParallelCtr==lengthOfSearchList ) || doNotAdd==FALSE ) 
 			{
-#ifdef gfan_DEBUG
+// #ifdef gfan_DEBUG
 				cout << "Adding facet (";
 				fNormal->show(1,0);
 				cout << ") to SLA " << endl;
-#endif
+// #endif
 						//Add fAct to SLA
 				facet *marker;
 				marker = slEnd;
