@@ -169,7 +169,7 @@ class gcone
 		void invPrint(ideal const &I);
 		bool isMonomial(ideal const &I);
 		intvec *ivNeg(const intvec *iv);
-		int dotProduct(intvec const &iva, intvec const &ivb);
+		int dotProduct(const intvec &iva, const intvec &ivb);
 		bool isParallel(intvec const &a, intvec const &b);
 		bool areEqual(intvec const &a, intvec const &b);
 		bool areEqual(facet *f, facet *g);
