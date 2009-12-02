@@ -20,8 +20,6 @@ ideal idInit (int size, int rank=1);
 #define idDelete(h) id_Delete(h, currRing)
 void id_Delete (ideal* h, ring r);
 void id_ShallowDelete (ideal* h, ring r);
-/* Shows an ideal -- mainly for debugging */
-void idShow(const ideal id, const ring lmRing = currRing, const ring tailRing = currRing, const int debugPrint = 0);
   /*- initialise an ideal -*/
 ideal idMaxIdeal (int deg);
   /*- initialise the maximal ideal (at 0) -*/
@@ -154,7 +152,6 @@ ideal   idTransp(ideal a);
 // version of "ideal idTransp(ideal)" which works within a given ring.
 ideal id_Transp(ideal a, const ring rRing = currRing);
 
-
 intvec *idQHomWeight(ideal id);
 
 void    idNormalize(ideal id);
@@ -167,9 +164,10 @@ ideal idChineseRemainder(ideal *x, number *q, int rl);
 //ideal idChineseRemainder(ideal *x, intvec *iv); /* currently unused */
 ideal idFarey(ideal x, number N);
 
-
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing = currRing); // image of certain map for BGG
 
-
-
+#ifndef NDEBUG
+/* Shows an ideal -- only for debugging */
+void idShow(const ideal id, const ring lmRing = currRing, const ring tailRing = currRing, const int debugPrint = 0);
+#endif
 #endif
