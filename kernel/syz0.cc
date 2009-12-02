@@ -70,10 +70,6 @@ static void syInitSort(ideal arg,intvec **modcomp)
   (**modcomp)[rkF+1] = Fl;
   arg->m = F;
   omFreeSize((ADDRESS)oldF,IDELEMS(arg)*sizeof(poly));
-#ifndef __OPTIMIZE__
-//Print("Neue Anordnung: ");
-//idPrint(arg);
-#endif
 }
 
 static void syCreatePairs(polyset F,int lini,int wend,int k,int j,int i,
