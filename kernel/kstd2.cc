@@ -11,7 +11,7 @@
 // TODO: why the following is here instead of mod2.h???
 
 // define to enable tailRings
-#define HAVE_TAIL_RING
+//#define HAVE_TAIL_RING
 
 #include "mod2.h"
 
@@ -21,7 +21,7 @@
 # define MYTEST 0
 #endif /* ifndef NDEBUG */
 
-#if MYTEST 
+#if MYTEST
 # ifdef HAVE_TAIL_RING
 #  undef HAVE_TAIL_RING
 # endif // ifdef HAVE_TAIL_RING
@@ -300,9 +300,9 @@ poly kFindDivisibleByZeroPoly(LObject* h)
 */
 int redRing (LObject* h,kStrategy strat)
 {
-  if (h->p == NULL && h->t_p == NULL) return 0; // spoly is zero (can only occure with zero divisors)
+  if (h->IsNull()) return 0; // spoly is zero (can only occure with zero divisors)
+  if (strat->tl<0) return 1;
 
-//  if (strat->tl<0) return 1;
   int at,i;
   long d;
   int j = 0;
@@ -317,17 +317,12 @@ int redRing (LObject* h,kStrategy strat)
   h->SetShortExpVector();
   loop
   {
-      j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
-      if (j < 0) return 1;
-#ifdef KDEBUG
-      if (TEST_OPT_DEBUG)
-      {
-        PrintS("T red:");
-      }
-#endif
+    j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
+    if (j < 0) return 1;
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG)
     {
+      PrintS("T red:");
       h->wrp();
       PrintS(" with ");
       strat->T[j].wrp();
@@ -351,6 +346,7 @@ int redRing (LObject* h,kStrategy strat)
 #ifdef KDEBUG
       h->lcm=NULL;
 #endif
+      h->Clear();
       return 0;
     }
     h->SetShortExpVector();
@@ -361,6 +357,8 @@ int redRing (LObject* h,kStrategy strat)
         (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
+      if (strat->posInLDependsOnLength)
+        h->SetLength(strat->length_pLength);
       at = strat->posInL(strat->L,strat->Ll,h,strat);
       if (at <= strat->Ll)
       {
@@ -372,18 +370,18 @@ int redRing (LObject* h,kStrategy strat)
         return -1;
       }
     }
-    else if (d != reddeg)
+    if (d != reddeg)
     {
       if (d >= strat->tailRing->bitmask)
       {
-	if (h->pTotalDeg() >= strat->tailRing->bitmask)
-	{
-	  strat->overflow=TRUE;
+        if (h->pTotalDeg() >= strat->tailRing->bitmask)
+        {
+          strat->overflow=TRUE;
           //Print("OVERFLOW in redRing d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
-	  h->GetP();
-	  at = strat->posInL(strat->L,strat->Ll,h,strat);
-	  enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-	  h->Clear();
+          h->GetP();
+          at = strat->posInL(strat->L,strat->Ll,h,strat);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+          h->Clear();
           return -1;
         }
       }
@@ -652,14 +650,14 @@ int redLazy (LObject* h,kStrategy strat)
     {
       if (d>=strat->tailRing->bitmask)
       {
-	if (h->pTotalDeg() >= strat->tailRing->bitmask)
-	{
-	  strat->overflow=TRUE;
+        if (h->pTotalDeg() >= strat->tailRing->bitmask)
+        {
+          strat->overflow=TRUE;
           //Print("OVERFLOW in redLazy d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
-	  h->GetP();
-	  at = strat->posInL(strat->L,strat->Ll,h,strat);
-	  enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-	  h->Clear();
+          h->GetP();
+          at = strat->posInL(strat->L,strat->Ll,h,strat);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+          h->Clear();
           return -1;
         }
       }
@@ -830,14 +828,14 @@ int redHoney (LObject* h, kStrategy strat)
     {
       if (d>=strat->tailRing->bitmask)
       {
-	if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
-	{
-	  strat->overflow=TRUE;
+        if (h->pTotalDeg()+h->ecart >= strat->tailRing->bitmask)
+        {
+          strat->overflow=TRUE;
           //Print("OVERFLOW in redHoney d=%ld, max=%ld\n",d,strat->tailRing->bitmask);
-	  h->GetP();
-	  at = strat->posInL(strat->L,strat->Ll,h,strat);
-	  enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
-	  h->Clear();
+          h->GetP();
+          at = strat->posInL(strat->L,strat->Ll,h,strat);
+          enterL(&strat->L,&strat->Ll,&strat->Lmax,*h,at);
+          h->Clear();
           return -1;
         }
       }
@@ -1002,7 +1000,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #ifdef KDEBUG
 #if MYTEST
   if (TEST_OPT_DEBUG)
-  {  
+  {
     PrintS("bba start GB: currRing: ");
     // rWrite(currRing);PrintLn();
     rDebugPrint(currRing);
@@ -1029,6 +1027,9 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   }
 
 
+#ifdef KDEBUG
+  //kDebugPrint(strat);
+#endif
   /* compute------------------------------------------------------- */
   while (strat->Ll >= 0)
   {
@@ -1081,7 +1082,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
         // large enough
         if (!kStratChangeTailRing(strat))
         {
-          WerrorS("OVERFLOW..."); 
+          WerrorS("OVERFLOW...");
           break;
         }
       }
