@@ -11,7 +11,7 @@
 // TODO: why the following is here instead of mod2.h???
 
 // define to enable tailRings
-//#define HAVE_TAIL_RING
+#define HAVE_TAIL_RING
 
 #include "mod2.h"
 
