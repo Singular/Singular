@@ -187,6 +187,9 @@ number  nrnExtGcd (number a, number b, number *s, number *t)
 
 BOOLEAN nrnIsZero (number  a)
 {
+#ifdef LDEBUG
+  if (a==NULL) return FALSE;
+#endif
   return 0 == mpz_cmpabs_ui((int_number) a, 0);
 }
 
@@ -514,6 +517,7 @@ void nrnInitExp(int m, ring r)
 #ifdef LDEBUG
 BOOLEAN nrnDBTest (number a, const char *f, const int l)
 {
+  if (a==NULL) return TRUE;
   if ( (mpz_cmp_si((int_number) a, 0) < 0) || (mpz_cmp((int_number) a, currRing->nrnModul) > 0) )
   {
     return FALSE;
