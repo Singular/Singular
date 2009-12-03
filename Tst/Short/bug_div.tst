@@ -27,4 +27,15 @@ bigint M = 6;
 int m = 6;  // fuer int OK
 -m;
 
+// ----------------------------------------
+
+kill M;
+ring rr=0,(x,y,z),dp;
+matrix M[1][3]=x,y,z;
+ideal I=x2+1,y2+3,z2+5;
+bigint p=3;
+
+M+3*matrix(I);
+M+p*matrix(I);
+
 tst_status(1);$
