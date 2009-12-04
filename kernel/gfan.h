@@ -165,37 +165,37 @@ class gcone
 		int getPredUCN();		
 		void showFacets(short codim=1);
 		volatile void showSLA(facet &f);
-		void idDebugPrint(ideal const &I);
-		void invPrint(ideal const &I);
-		bool isMonomial(ideal const &I);
+		void idDebugPrint(const ideal &I);
+		void invPrint(const ideal &I);
+		bool isMonomial(const ideal &I);
 		intvec *ivNeg(const intvec *iv);
 		int dotProduct(const intvec &iva, const intvec &ivb);
-		bool isParallel(intvec const &a, intvec const &b);
-		bool areEqual(intvec const &a, intvec const &b);
+		bool isParallel(const intvec &a, const intvec &b);
+		bool areEqual(const intvec &a, const intvec &b);
 		bool areEqual(facet *f, facet *g);
 		int intgcd(int a, int b);
-		void writeConeToFile(gcone const &gc, bool usingIntPoints=FALSE);
+		void writeConeToFile(const gcone &gc, bool usingIntPoints=FALSE);
 		void readConeFromFile(int gcNum, gcone *gc);
 		intvec f2M(gcone *gc, facet *f, int n=1);
 		
 		//The real stuff
-		void getConeNormals(ideal const &I, bool compIntPoint=FALSE);
-		void getCodim2Normals(gcone const &gc);
+		void getConeNormals(const ideal &I, bool compIntPoint=FALSE);
+		void getCodim2Normals(const gcone &gc);
 		void flip(ideal gb, facet *f);
 		void computeInv(ideal &gb, ideal &inv, intvec &f);
 // 		poly restOfDiv(poly const &f, ideal const &I); removed with r12286
-		ideal ffG(ideal const &H, ideal const &G);
+		ideal ffG(const ideal &H, const ideal &G);
 		void getGB(ideal const &inputIdeal);		
-		void interiorPoint(dd_MatrixPtr const &M, intvec &iv);
-		ring rCopyAndAddWeight(ring const &r, intvec const *ivw);
-		ring rCopyAndChangeWeight(ring const &r, intvec *ivw);		
+		void interiorPoint(const dd_MatrixPtr &M, intvec &iv);
+		ring rCopyAndAddWeight(const ring &r, const intvec *ivw);
+		ring rCopyAndChangeWeight(const ring &r, intvec *ivw);		
 // 		void reverseSearch(gcone *gcAct); //NOTE both removed from r12286
 // 		bool isSearchFacet(gcone &gcTmp, facet *testfacet);
 		void noRevS(gcone &gcRoot, bool usingIntPoint=FALSE);
-		void makeInt(dd_MatrixPtr const &M, int const line, intvec &n);
+		void makeInt(const dd_MatrixPtr &M, const int line, intvec &n);
 		void normalize();
 		facet * enqueueNewFacets(facet *f);
-		dd_MatrixPtr facets2Matrix(gcone const &gc);		
+		dd_MatrixPtr facets2Matrix(const gcone &gc);		
 // 		static void gcone::idPrint(ideal &I);		
 		friend class facet;	
 };

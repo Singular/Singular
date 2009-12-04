@@ -16,7 +16,7 @@ $Id$
 #include "polys.h"
 #include "ideals.h"
 #include "kmatrix.h"
-#include "fast_maps.h"	//Mapping of ideals
+//#include "fast_maps.h"	//Mapping of ideals
 #include "maps.h"
 #include "ring.h"
 #include "structs.h"
@@ -148,7 +148,11 @@ facet::facet(const facet& f)
 			f2Act = f2Act->next;
 			f2Act->prev = marker;
 		}
-		f2Act->setFacetNormal(f2Copy->getFacetNormal());
+		intvec *f2Normal;
+		f2Normal = f2Copy->getFacetNormal();
+// 		f2Act->setFacetNormal(f2Copy->getFacetNormal());
+		f2Act->setFacetNormal(f2Normal);
+		delete f2Normal;
 		f2Act->setUCN(f2Copy->getUCN());
 		f2Copy = f2Copy->next;
 	}	
@@ -180,7 +184,7 @@ facet::~facet()
 	if(this->flipGB!=NULL)
 		idDelete((ideal *)&this->flipGB);
 	if(this->flipRing!=NULL && this->flipRing->idroot!=(idhdl)0xfbfbfbfbfbfbfbfb)
-		rDelete(this->flipRing);
+// 		rDelete(this->flipRing);
 // 	this->flipRing=NULL;
 	this->prev=NULL;
 	this->next=NULL;
@@ -287,7 +291,7 @@ void facet::setUCN(int n)
 */
 int facet::getUCN()
 {
-	if(this!=NULL  && this!=(facet *)0xfbfbfbfbfbfbfbfb)// || this!=(facet *)0xfbfbfbfb) )
+	if(this!=NULL)//  && this!=(facet *)0xfbfbfbfbfbfbfbfb)// || this!=(facet *)0xfbfbfbfb) )
 // 	if(this!=NULL && ( this->fNormal!=(intvec *)0xfbfbfbfb || this->fNormal!=(intvec *)0xfbfbfbfbfbfbfbfb) )
 		return this->UCN;
 	else
@@ -583,7 +587,7 @@ int gcone::getNumFacets()
 		
 int gcone::getUCN()
 {
-	if( this!=NULL && ( this!=(gcone * const)0xfbfbfbfbfbfbfbfb && this!=(gcone * const)0xfbfbfbfb ) )
+	if( this!=NULL)// && ( this!=(gcone * const)0xfbfbfbfbfbfbfbfb && this!=(gcone * const)0xfbfbfbfb ) )
 		return this->UCN;
 	else
 		return -1;
@@ -1371,7 +1375,7 @@ void gcone::getGB(const ideal &inputIdeal)
 intvec *gcone::ivNeg(const intvec *iv)
 {
 	//NOTE: Can't this be done without new?
-	intvec *res = new intvec(iv->length());
+	intvec *res;// = new intvec(iv->length());
 	res=ivCopy(iv);
 	*res *= (int)-1;						
 	return res;
