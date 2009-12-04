@@ -557,6 +557,21 @@ void idInsertPoly (ideal h1,poly h2)
 }
 
 /*2
+* concat h1 and h2 (if h2 is neither zero nor a generator of h1)
+*/
+void idInsertPolyNoDuplicates (ideal h1,poly h2)
+{
+  bool h2FoundInH1 = false;
+  int i = 0;
+  while ((i < IDELEMS(h1)) && (!h2FoundInH1))
+  {
+    h2FoundInH1 = pEqualPolys(h1->m[i], h2);
+    i++;
+  }
+  if (!h2FoundInH1) idInsertPoly(h1, h2);
+}
+
+/*2
 * h1 + h2
 */
 ideal idAdd (ideal h1,ideal h2)

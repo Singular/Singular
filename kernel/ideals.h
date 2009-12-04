@@ -55,6 +55,8 @@ ideal idAdd (ideal h1,ideal h2);
   /* h1 + h2 */
 void idInsertPoly (ideal h1,poly h2);
   /* h1 + h2 */
+void idInsertPolyNoDuplicates (ideal h1,poly h2);
+  /* h1 + h2 */
 ideal idMult (ideal h1,ideal h2);
   /*hh := h1 * h2*/
 
