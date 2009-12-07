@@ -63,7 +63,7 @@ $Id$
 #endif
 
 #ifndef gfan_DEBUG
-// #define gfan_DEBUG 1
+// #define gfan_DEBUG
 #ifndef gfan_DEBUGLEVEL
 #define gfan_DEBUGLEVEL 1
 #endif
@@ -405,13 +405,16 @@ gcone::gcone(const gcone& gc, const facet &f)
 	this->UCN=this->counter;
 	this->pred=gc.UCN;
 	this->facetPtr=NULL;
-    	this->gcBasis=idCopy(f.flipGB);
-//    	ring saveRing=currRing;
-//    	rChangeCurrRing(gc.baseRing);
-//   	this->gcBasis=idCopy(f.flipGB);
+//     	this->gcBasis=idCopy(f.flipGB);
+//     	ring saveRing=currRing;
+// 	ring tmpRing=f.flipRing;
+// 	rComplete(f.flipRing);
+//     	rChangeCurrRing(f.flipRing);
+   	this->gcBasis=idrCopyR(f.flipGB, f.flipRing);
 //  	this->inputIdeal=idCopy(this->gcBasis);
 	this->baseRing=rCopy(f.flipRing);
-//    	rChangeCurrRing(saveRing);
+// 	rComplete(this->baseRing);
+//     	rChangeCurrRing(saveRing);
 	this->numFacets=0;
 	this->ivIntPt=NULL;
 // 	this->rootRing=NULL;
@@ -1333,9 +1336,9 @@ inline ideal gcone::ffG(const ideal &H, const ideal &G)
 // 			cout << "Entering ffG" << endl;
 	int size=IDELEMS(H);
 	ideal res=idInit(size,1);
-	poly temp1=pInit();
-	poly temp2=pInit();
-	poly temp3=pInit();	//polys to temporarily store values for pSub
+	poly temp1;//=pInit();
+	poly temp2;//=pInit();
+	poly temp3;//=pInit();	//polys to temporarily store values for pSub
 	for (int ii=0;ii<size;ii++)
 	{
 // 		res->m[ii]=restOfDiv(H->m[ii],G);
@@ -1776,13 +1779,13 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 				{
 					pDelete(&gcTmp->gcBasis->m[ii]);
 				}
-//  				idDelete((ideal*)&gcTmp->gcBasis);
-//  				rDelete(gcTmp->baseRing);
+//  				idDelete((ideal*)&gcTmp->gcBasis);//Whonder why?
+//     				rDelete(gcTmp->baseRing);
  			}			
-#if gfan_DEBUG
-			if(SearchListRoot!=NULL)
-				gcTmp->showSLA(*SearchListRoot);
-#endif
+// #ifdef gfan_DEBUG
+// 			if(SearchListRoot!=NULL)
+// 				gcTmp->showSLA(*SearchListRoot);
+// #endif
 			rChangeCurrRing(gcAct->baseRing);
 			//rDelete(rTmp);
 			//doubly linked for easier removal
@@ -2334,11 +2337,10 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 	ifstream gcInputFile(filename.c_str(), ifstream::in);
 	
 	ring saveRing=currRing;	
-	rChangeCurrRing(gc->baseRing);
-	ring newRing;	//The ring to be read in
-	
-	string::iterator EOL;
-	int terms=1;	//#Terms in the poly
+	//Comment the following if you uncomment the if(line=="RING") part below
+ 	rChangeCurrRing(gc->baseRing);
+// 	string::iterator EOL;
+// 	int terms=1;	//#Terms in the poly
 	
 	while( !gcInputFile.eof() )
 	{
@@ -2348,40 +2350,51 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 		
 		if(line=="RING")
 		{
-			/*getline(gcInputFile,line);
-			found = line.find("a(");
-			line.erase(0,found+2);
-			string strweight;
-			strweight=line.substr(0,line.find_first_of(")"));
-			intvec *iv=new intvec(this->numVars);
-			for(int ii=0;ii<this->numVars;ii++)
-			{
-				string weight;
-				weight=line.substr(0,line.find_first_of(",)"));				
-				(*iv)[ii]=atoi(weight.c_str());
-				line.erase(0,line.find_first_of(",)")+1);
-			}
- 			ring newRing;
-			newRing=rCopy0(currRing);
-			int length=this->numVars;
-			int *A=(int *)omAlloc0(length*sizeof(int));
-			for(int jj=0;jj<length;jj++)
-			{
-				A[jj]=-(*iv)[jj];
-			}
-			omFree(newRing->wvhdl[0]);
-			newRing->wvhdl[0]=(int*)A;
-			newRing->block1[0]=length;
-			rComplete(newRing);
-			baseRing=rCopy(newRing);*/			
+// 			getline(gcInputFile,line);
+// 			found = line.find("a(");
+// 			line.erase(0,found+2);
+// 			string strweight;
+// 			strweight=line.substr(0,line.find_first_of(")"));
+// 			intvec *iv=new intvec(this->numVars);
+// 			for(int ii=0;ii<this->numVars;ii++)
+// 			{
+// 				string weight;
+// 				weight=line.substr(0,line.find_first_of(",)"));				
+// 				(*iv)[ii]=atoi(weight.c_str());
+// 				line.erase(0,line.find_first_of(",)")+1);
+// 			}
+// 			ring newRing;
+// 			if(currRing->order[0]!=ringorder_a)
+// 			{
+// 				newRing=rCopyAndAddWeight(currRing,iv);
+// 			}
+// 			else
+// 			{ 			
+// 				newRing=rCopy0(currRing);
+// 				int length=this->numVars;
+// 				int *A=(int *)omAlloc0(length*sizeof(int));
+// 				for(int jj=0;jj<length;jj++)
+// 				{
+// 					A[jj]=-(*iv)[jj];
+// 				}
+// 				omFree(newRing->wvhdl[0]);
+// 				newRing->wvhdl[0]=(int*)A;
+// 				newRing->block1[0]=length;
+// 			}
+// 			delete iv;
+//  			rComplete(newRing);
+// 			gc->baseRing=rCopy(newRing);
+// 			if(currRing!=gc->baseRing)
+// 				rChangeCurrRing(gc->baseRing);
 		}
+		
 		if(line=="GCBASISLENGTH")
 		{
 			getline(gcInputFile, line);
 			strGcBasisLength = line;
 			int size=atoi(strGcBasisLength.c_str());
 			gcBasisLength=size;		
-			gcBasis=idInit(size,1);
+			gc->gcBasis=idInit(size,1);
 		}
 		if(line=="GCBASIS")
 		{
@@ -2523,7 +2536,8 @@ lists lprepareResult(gcone *gc, int n)
 // 		ring saveRing=currRing;
 // 		ring tmpRing=gcAct->getBaseRing;
 // 		rChangeCurrRing(tmpRing);
-		l->m[1].data=(void*)idrCopyR_NoSort(gcAct->gcBasis,gcAct->getBaseRing());
+// 		l->m[1].data=(void*)idrCopyR_NoSort(gcAct->gcBasis,gcAct->getBaseRing());
+		l->m[1].data=(void*)idrCopyR(gcAct->gcBasis,gcAct->getBaseRing());
 // 		rChangeCurrRing(saveRing);
 
 		l->m[2].rtyp=INTVEC_CMD;
