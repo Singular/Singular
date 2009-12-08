@@ -759,13 +759,5 @@ void nKillChar(ring r)
       rKill(r->algring);
       r->algring=NULL;
     }
-    #ifdef HAVE_RINGS
-    if (r->nrnModul!=NULL)
-    {
-      mpz_clear((int_number) r->nrnModul);
-      omFreeBin((ADDRESS) r->nrnModul, gmp_nrz_bin);
-      r->nrnModul=NULL;
-    }
-    #endif
   }
 }
