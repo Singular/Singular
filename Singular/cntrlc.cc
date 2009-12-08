@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "mod2.h"
 #include "omalloc.h"
 #include "tok.h"
@@ -213,6 +215,7 @@ void sigsegv_handler(int sig, sigcontext s)
 /*---------------------------------------------------------------------*/
 void sig_ign_hdl(int sig)
 {
+ waitpid(-1,NULL,WNOHANG);  
 }
 
 /*2
@@ -241,7 +244,6 @@ void init_signals()
   {
     PrintS("cannot set signal handler for INT\n");
   }
-  //si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
   si_set_signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
 }
 
