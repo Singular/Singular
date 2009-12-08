@@ -20,6 +20,14 @@ $Id$
 #include "../../cddlib/include/cddmp.h"
 #endif
 extern int gfanHeuristic;
+#define gfanp
+// #ifdef gfanp
+// extern	static float time_getConeNormals;
+// extern	static float time_getCodim2Normals;
+// extern	static float time_flip;
+// extern	static float time_enqueue;
+// extern	static float time_computeInv;
+// #endif
 //ideal getGB(ideal inputIdeal);
 // ideal gfan(ideal inputIdeal, int heuristic);
 lists gfan(ideal inputIdeal, int heuristic);
@@ -104,7 +112,6 @@ class facet
 		 * prints the facet normal an all (codim-2)-facets that belong to it
 		 */
 		inline void fDebugPrint();
-		
 		friend class gcone;		
 };
 
@@ -129,7 +136,17 @@ class gcone
 	public:	
 		/** \brief Pointer to the first facet */
 		facet *facetPtr;	//Will hold the adress of the first facet; set by gcone::getConeNormals
-		
+#ifdef gfanp
+		static float time_getConeNormals;
+		static float time_getCodim2Normals;
+		static float time_flip;
+		static float time_enqueue;		
+		static float time_computeInv;
+		static float t_ddMC;
+		static float t_mI;
+		static float t_iP;
+#endif
+
 		/** # of variables in the ring */
 		int numVars;		//#of variables in the ring
 		

@@ -11,25 +11,25 @@ $Id$
 #ifdef HAVE_GFAN
 
 #include "kstd1.h"
-#include "kutil.h"
-#include "intvec.h"
+#include "kutil.h"	//ksCreateSpoly
+// #include "intvec.h"
 #include "polys.h"
 #include "ideals.h"
-#include "kmatrix.h"
+// #include "kmatrix.h"
 //#include "fast_maps.h"	//Mapping of ideals
-#include "maps.h"
-#include "ring.h"
-#include "structs.h"
+// #include "maps.h"
+// #include "ring.h"	//apparently not needed
+// #include "structs.h"
 #include "../Singular/lists.h"
-#include "prCopy.h"
+#include "prCopy.h"	//Needed for idrCopyR
 #include <iostream>
-#include <bitset>
+// #include <bitset>
 #include <fstream>	//read-write cones to files
-#include <gmp.h>
+// #include <gmp.h>
 #include <string>
 #include <sstream>
 #include <time.h>
-
+#include <sys/time.h>
 //#include <gmpxx.h>
 
 /*DO NOT REMOVE THIS*/
@@ -68,7 +68,7 @@ $Id$
 #define gfan_DEBUGLEVEL 1
 #endif
 #endif
-
+#define gfanp
 #include <gfan.h>
 using namespace std;
 
@@ -620,6 +620,10 @@ inline int gcone::getPredUCN()
 		 */
 inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 {
+#ifdef gfanp
+	timeval start, end;
+	gettimeofday(&start, 0);
+#endif
 	poly aktpoly;
 	int rows; 			// will contain the dimensions of the ineq matrix - deprecated by
 	dd_rowrange ddrows;
@@ -649,19 +653,20 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		aktpoly=(poly)I->m[i];		//get aktpoly as i-th component of I
 		//simpler version of storing expvect diffs
 		int *leadexpv=(int*)omAlloc(((this->numVars)+1)*sizeof(int));
-		int *tailexpv=(int*)omAlloc(((this->numVars)+1)*sizeof(int));
+// 		int *tailexpv=(int*)omAlloc(((this->numVars)+1)*sizeof(int));
 		pGetExpV(aktpoly,leadexpv);
 		while(pNext(aktpoly)!=NULL)
 		{
 			aktpoly=pNext(aktpoly);
+			int *tailexpv=(int*)omAlloc(((this->numVars)+1)*sizeof(int));
 			pGetExpV(aktpoly,tailexpv);
 			for(int kk=1;kk<=this->numVars;kk++)
 			{
 				dd_set_si(ddineq->matrix[(dd_rowrange)aktmatrixrow][kk],leadexpv[kk]-tailexpv[kk]);
 			}
 			aktmatrixrow += 1;
-		}
-		omFree(tailexpv);
+			omFree(tailexpv);
+		}		
 		omFree(leadexpv);	
 	} //for
 #if true
@@ -890,7 +895,11 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	dd_FreeMatrix(ddineq);
 	set_free(ddredrows);
 	set_free(ddlinset);
-	//free(ddnewpos);
+	free(ddnewpos);
+#ifdef gfanp
+	gettimeofday(&end, 0);
+	time_getConeNormals += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
+#endif
 	
 
 }//gcone::getConeNormals(ideal I)
@@ -900,31 +909,49 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
  * Additionally we check whether the codim2-facet normal is strictly positive. Otherwise
  * the facet is marked as non-flippable.
  */
-inline void gcone::getCodim2Normals(gcone const &gc)
+inline void gcone::getCodim2Normals(const gcone &gc)
 {
+#ifdef gfanp
+	timeval start, end;
+  	gettimeofday(&start, 0);
+#endif
 	//this->facetPtr->codim2Ptr = new facet(2);	//instantiate a (codim-2)-facet
 	facet *fAct;
 	fAct = this->facetPtr;		
 	facet *codim2Act;
 	//codim2Act = this->facetPtr->codim2Ptr;
-	dd_MatrixPtr ddineq,P,ddakt;
-	dd_rowset impl_linset, redset;
+	dd_MatrixPtr ddineq;//,P,ddakt;
 	dd_ErrorType err;
-	dd_rowindex newpos;		
-
 	//ddineq = facets2Matrix(gc);	//get a matrix representation of the cone
 	ddineq = dd_CopyMatrix(gc.ddFacets);
-				
 	/*Now set appropriate linearity*/
-	dd_PolyhedraPtr ddpolyh;
 	for (int ii=0; ii<this->numFacets; ii++)			
-	{				
-		ddakt = dd_CopyMatrix(ddineq);
+	{	
+// 		dd_rowset LL;
+// 		set_initialize(&LL,ddineq->rowsize);
+// 		set_copy(LL,ddineq->linset);
+// 		set_copy(ddineq->linset,LL);
+		dd_rowset impl_linset, redset;
+		dd_rowindex newpos;
+		dd_MatrixPtr ddakt;
+  		ddakt = dd_CopyMatrix(ddineq);
 		ddakt->representation=dd_Inequality;
-		set_addelem(ddakt->linset,ii+1);/*Now set appropriate linearity*/				
-		dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);			
+		set_addelem(ddakt->linset,ii+1);/*Now set appropriate linearity*/
+#ifdef gfanp
+		timeval t_ddMC_start, t_ddMC_end;
+		gettimeofday(&t_ddMC_start,0);
+#endif				
+		dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);
+//  		set_copy(LL,ddakt->linset);
+		dd_PolyhedraPtr ddpolyh;
 		ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
-		P=dd_CopyGenerators(ddpolyh);				
+		dd_MatrixPtr P;
+		P=dd_CopyGenerators(ddpolyh);
+		dd_FreePolyhedra(ddpolyh);
+#ifdef gfanp
+		gettimeofday(&t_ddMC_end,0);
+		t_ddMC += (t_ddMC_end.tv_sec - t_ddMC_start.tv_sec + 1e-6*(t_ddMC_end.tv_usec - t_ddMC_start.tv_usec));
+#endif				
 		/* We loop through each row of P normalize it by making all
 		* entries integer ones and add the resulting vector to the
 		* int matrix facet::codim2Facets */
@@ -942,7 +969,15 @@ inline void gcone::getCodim2Normals(gcone const &gc)
 				codim2Act = codim2Act->next;
 			}
 			intvec *n = new intvec(this->numVars);
+#ifdef gfanp
+			timeval t_mI_start, t_mI_end;
+			gettimeofday(&t_mI_start,0);
+#endif
 			makeInt(P,jj,*n);
+#ifdef gfanp
+			gettimeofday(&t_mI_end,0);
+			t_mI += (t_mI_end.tv_sec - t_mI_start.tv_sec + 1e-6*(t_mI_end.tv_usec - t_mI_start.tv_usec));
+#endif
 			codim2Act->setFacetNormal(n);
 			delete n;					
 		}		
@@ -959,8 +994,16 @@ inline void gcone::getCodim2Normals(gcone const &gc)
 			dd_set_si(shiftMatrix->matrix[kk][0],1);
 			dd_set_si(shiftMatrix->matrix[kk][kk+1],1);
 		}
-		intPointMatrix=dd_MatrixAppend(ddakt,shiftMatrix);		
+		intPointMatrix=dd_MatrixAppend(ddakt,shiftMatrix);
+#ifdef gfanp
+		timeval t_iP_start, t_iP_end;
+		gettimeofday(&t_iP_start, 0);
+#endif		
 		interiorPoint(intPointMatrix,*iv_intPoint);
+#ifdef gfanp
+		gettimeofday(&t_iP_end, 0);
+		t_iP += (t_iP_end.tv_sec - t_iP_start.tv_sec + 1e-6*(t_iP_end.tv_usec - t_iP_start.tv_usec));
+#endif
 		for(int ll=0;ll<this->numVars;ll++)
 		{
 			if( (*iv_intPoint)[ll] < 0 )
@@ -972,22 +1015,20 @@ inline void gcone::getCodim2Normals(gcone const &gc)
 		/*End of check*/					
 		fAct = fAct->next;	
 		dd_FreeMatrix(ddakt);
-//  		dd_FreeMatrix(ddineq);
 		dd_FreeMatrix(shiftMatrix);
-		dd_FreeMatrix(intPointMatrix);
-		dd_FreePolyhedra(ddpolyh);
+		dd_FreeMatrix(intPointMatrix);		
 		delete iv_intPoint;
 		dd_FreeMatrix(P);
 		set_free(impl_linset);
-		set_free(redset);
+		set_free(redset);		
 		free(newpos);
-	}//for
+// 		set_free(LL);
+	}//for 	
 	dd_FreeMatrix(ddineq);
-// 	dd_FreeMatrix(P);
-// 	set_free(impl_linset);
-// 	set_free(redset);
-// 	free(newpos);
-	
+#ifdef gfanp
+	gettimeofday(&end, 0);
+	time_getCodim2Normals += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
+#endif
 }
 		
 /** \brief Compute the Groebner Basis on the other side of a shared facet 
@@ -1004,7 +1045,11 @@ inline void gcone::getCodim2Normals(gcone const &gc)
  * Input: a marked,reduced Groebner basis and a facet
  */
 inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
-{			
+{	
+#ifdef gfanp
+	timeval start, end;
+	gettimeofday(&start, 0);
+#endif		
 	intvec *fNormal;// = new intvec(this->numVars);	//facet normal, check for parallelity			
 	fNormal = f->getFacetNormal();	//read this->fNormal;
 
@@ -1071,7 +1116,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	ina=idrCopyR(initialForm,srcRing);
 	idDelete(&initialForm);
 	ideal H;
-// 	H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
+//  	H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
 	H=kStd(ina,NULL,testHomog,NULL);	//This is \mathcal(G)_{>_-\alpha}(in_v(I))
 	idSkipZeroes(H);
 	idDelete(&ina);
@@ -1145,8 +1190,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 			omFree(src_ExpV);
 			omFree(dst_ExpV);
 		}//for (int jj=0;jj<IDELEMS(H);jj++)
-				
-		int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
+		
 		int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		if (markingsAreCorrect==TRUE)
 		{
@@ -1161,6 +1205,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 		/*compute differences of the expvects*/				
 		while (pNext(aktpoly)!=NULL)
 		{
+			int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 			/*The following if-else-block makes sure the first term (i.e. the wrongly marked term) 
 			is not omitted when computing the differences*/
 			if(markingsAreCorrect==TRUE)
@@ -1180,8 +1225,9 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 				dd_set_si(intPointMatrix->matrix[aktrow][jj+1],leadExpV[jj+1]-v[jj+1]);
 			}
 			aktrow +=1;
+			omFree(v);
 		}
-		omFree(v);
+// 		omFree(v);
 		omFree(leadExpV);
 	}//for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
 	/*Now it is safe to idDelete(H)*/
@@ -1243,7 +1289,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	dstRing_I=kStd(tmpI,NULL,testHomog,NULL);
 	idDelete(&tmpI);
 	idNorm(dstRing_I);			
-	//kInterRed(dstRing_I);
+// 	kInterRed(dstRing_I);
 	idSkipZeroes(dstRing_I);
 	test=save;
 	/*End of step 3 - reduction*/
@@ -1258,6 +1304,10 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 //#endif			
 	rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
  	rDelete(dstRing);
+#ifdef gfanp
+	gettimeofday(&end, 0);
+	time_flip += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
+#endif
 }//void flip(ideal gb, facet *f)
 
 /** \brief Compute initial ideal
@@ -1267,30 +1317,28 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 */
 inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 {
-	intvec *check = new intvec(this->numVars);
-	poly initialFormElement;//[IDELEMS(gb)];
-// 	poly aktpoly;
-	
+#ifdef gfanp
+	timeval start, end;
+	gettimeofday(&start, 0);
+#endif
 	for (int ii=0;ii<IDELEMS(gb);ii++)
 	{
-// 		aktpoly = pCopy((poly)gb->m[ii]);
+		poly initialFormElement;
 		poly aktpoly = (poly)gb->m[ii];//Ptr, so don't pDelete(aktpoly)
-		int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		pGetExpV(aktpoly,leadExpV);	//find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
 // 		initialFormElement[ii]=pHead(aktpoly);
 		initialFormElement=pHead(aktpoly);
-				
 		while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
 		{
+			intvec *check = new intvec(this->numVars);
 			aktpoly=pNext(aktpoly);	//next term
 // 			pSetm(aktpoly);
+			int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 			pGetExpV(aktpoly,v);		
 			/* Convert (int)v into (intvec)check */			
 			for (int jj=0;jj<this->numVars;jj++)
 			{
-						//cout << "v["<<jj+1<<"]="<<v[jj+1]<<endl;
-						//cout << "leadExpV["<<jj+1<<"]="<<leadExpV[jj+1]<<endl;
 				(*check)[jj]=v[jj+1]-leadExpV[jj+1];
 			}
 			if (isParallel(*check,fNormal)) //pass *check when 
@@ -1298,7 +1346,9 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 				//Found a parallel vector. Add it
 // 				initialFormElement[ii] = pAdd(pCopy(initialFormElement[ii]),(poly)pHead(aktpoly));
 				initialFormElement = pAdd((initialFormElement),(poly)pHead(aktpoly));
-			}						
+			}
+			omFree(v);
+			delete check;
 		}//while
 #ifdef gfan_DEBUG
 //  		cout << "Initial Form=";				
@@ -1311,10 +1361,12 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 		initialForm->m[ii]=pCopy(initialFormElement);
 		pDelete(&initialFormElement);
 		omFree(leadExpV);
-		omFree(v);		
+// 		delete check;
 	}//for
-	delete check;
-// 	pDelete(&aktpoly);
+#ifdef gfanp
+	gettimeofday(&end, 0);
+	time_computeInv += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
+#endif
 }
 
 /** \brief Compute the remainder of a polynomial by a given ideal
@@ -1336,26 +1388,28 @@ inline ideal gcone::ffG(const ideal &H, const ideal &G)
 // 			cout << "Entering ffG" << endl;
 	int size=IDELEMS(H);
 	ideal res=idInit(size,1);
-	poly temp1;//=pInit();
-	poly temp2;//=pInit();
-	poly temp3;//=pInit();	//polys to temporarily store values for pSub
+// 	poly temp1;//=pInit();
+// 	poly temp2;//=pInit();
+// 	poly temp3;//=pInit();	//polys to temporarily store values for pSub
 	for (int ii=0;ii<size;ii++)
 	{
+		poly temp1=pInit();
+		poly temp2=pInit();
+		poly temp3=pInit();
 // 		res->m[ii]=restOfDiv(H->m[ii],G);
 // 		res->m[ii]=pCopy(kNF(G, NULL,H->m[ii],0,0));
 		temp1=pCopy(H->m[ii]);
 // 		temp2=pCopy(res->m[ii]);
+		//NOTE if gfanHeuristic=0 (sic!) this results in dPolyErrors - mon from wrong ring
 		temp2=pCopy(kNF(G, NULL,H->m[ii],0,0));
 		temp3=pSub(temp1, temp2);
 		res->m[ii]=pCopy(temp3);
-		//res->m[ii]=pSub(temp1,temp2); //buggy
-		//pSort(res->m[ii]);
-		//pSetm(res->m[ii]);
-		//cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);	
-	}	
-	pDelete(&temp1);		
-//  	pDelete(&temp2);
-// 	pDelete(&temp3);
+		//res->m[ii]=pSub(temp1,temp2); //buggy		
+		//cout << "res->m["<<ii<<"]=";pWrite(res->m[ii]);
+		pDelete(&temp1);
+// 		pDelete(&temp2);
+// 		pDelete(&temp3); //NOTE does not work, so commented out
+	}
 	return res;
 }
 		
@@ -1436,7 +1490,7 @@ inline void gcone::interiorPoint(const dd_MatrixPtr &M, intvec &iv) //no const &
 	dd_LPSolverType solver=dd_DualSimplex;
 	dd_LPSolutionPtr lpSol=NULL;
 	dd_rowset ddlinset,ddredrows;	//needed for dd_FindRelativeInterior
-	dd_rowindex ddnewpos;
+// 	dd_rowindex ddnewpos;
 	dd_NumberType numb;	
 			//M->representation=dd_Inequality;
 			//M->objective-dd_LPMin;  //Not sure whether this is needed
@@ -1524,8 +1578,7 @@ inline void gcone::interiorPoint(const dd_MatrixPtr &M, intvec &iv) //no const &
 	dd_FreeLPData(lpInt);
 	dd_FreeLPData(lp);
 	set_free(ddlinset);
-	set_free(ddredrows);
-// 	free(ddnewpos);	//segfaults
+	set_free(ddredrows); 	
 			
 }//void interiorPoint(dd_MatrixPtr const &M)
 		
@@ -1775,19 +1828,21 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
  			if(gfanHeuristic==1)
  			{
 				gcTmp->writeConeToFile(*gcTmp);
-				for(int ii=0;ii<IDELEMS(gcTmp->gcBasis);ii++)
-				{
-					pDelete(&gcTmp->gcBasis->m[ii]);
-				}
-//  				idDelete((ideal*)&gcTmp->gcBasis);//Whonder why?
-//     				rDelete(gcTmp->baseRing);
+				//The for loop is no longer needed
+// 				for(int ii=0;ii<IDELEMS(gcTmp->gcBasis);ii++)
+// 				{
+// 					pDelete(&gcTmp->gcBasis->m[ii]);
+// 				}
+ 				idDelete((ideal*)&gcTmp->gcBasis);//Whonder why?
+				//If you use the following make sure it is uncommented in readConeFromFile
+				//rDelete(gcTmp->baseRing);
  			}			
-// #ifdef gfan_DEBUG
+#ifdef gfan_DEBUG
 // 			if(SearchListRoot!=NULL)
 // 				gcTmp->showSLA(*SearchListRoot);
-// #endif
+#endif
 			rChangeCurrRing(gcAct->baseRing);
-			//rDelete(rTmp);
+			rDelete(rTmp);
 			//doubly linked for easier removal
 			gcTmp->prev = gcPtr;
 			gcPtr->next=gcTmp;
@@ -1951,6 +2006,10 @@ inline void gcone::normalize()
  */
 facet * gcone::enqueueNewFacets(facet *f)
 {
+#ifdef gfanp
+	timeval start, end;
+	gettimeofday(&start, 0);
+#endif
 	facet *slHead;
 	slHead = f;
 	facet *slAct;	//called with f=SearchListRoot
@@ -2148,7 +2207,11 @@ facet * gcone::enqueueNewFacets(facet *f)
 		{
 			fAct = fAct->next;
 		}
-	}//while(fAct!=NULL)						
+	}//while(fAct!=NULL)
+#ifdef gfanp
+	gettimeofday(&end, 0);
+	time_enqueue += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
+#endif						
 	return slHead;
 }//addC2N
 		
@@ -2171,7 +2234,7 @@ inline int gcone::intgcd(const int a, const int b)
 }		
 		
 /** \brief Construct a dd_MatrixPtr from a cone's list of facets
- * 
+ * NO LONGER USED
  */
 inline dd_MatrixPtr gcone::facets2Matrix(const gcone &gc)
 {
@@ -2200,7 +2263,6 @@ inline dd_MatrixPtr gcone::facets2Matrix(const gcone &gc)
 		delete comp;
 		fAct=fAct->next;				
 	}			
-			
 	return M;
 }
 		
@@ -2315,16 +2377,16 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 	stringstream ss;
 	ss << UCN;
 	string UCNstr = ss.str();
-	string line;
-	string strGcBasisLength;
-	string strMonom, strCoeff, strCoeffNom, strCoeffDenom;		
+// 	string line;
+// 	string strGcBasisLength;
+// 	string strMonom, strCoeff, strCoeffNom, strCoeffDenom;
 	int gcBasisLength=0;
 // 	int intCoeff=1;
 // 	int intCoeffNom=1;		//better (number) but that's not compatible with stringstream;
 // 	int intCoeffDenom=1;
 	
-	bool hasCoeffInQ = FALSE;	//does the polynomial have rational coeff?
-	bool hasNegCoeff = FALSE;	//or a negative one?
+// 	bool hasCoeffInQ = FALSE;	//does the polynomial have rational coeff?
+// 	bool hasNegCoeff = FALSE;	//or a negative one?
 	size_t found;			//used for find_first_(not)_of
 
 	string prefix="/tmp/cone";
@@ -2339,57 +2401,57 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 	ring saveRing=currRing;	
 	//Comment the following if you uncomment the if(line=="RING") part below
  	rChangeCurrRing(gc->baseRing);
-// 	string::iterator EOL;
-// 	int terms=1;	//#Terms in the poly
 	
 	while( !gcInputFile.eof() )
 	{
+		string line;
 		getline(gcInputFile,line);
-		hasCoeffInQ = FALSE;
-		hasNegCoeff = FALSE;
+// 		hasCoeffInQ = FALSE;
+// 		hasNegCoeff = FALSE;
 		
 		if(line=="RING")
-		{
-// 			getline(gcInputFile,line);
-// 			found = line.find("a(");
-// 			line.erase(0,found+2);
-// 			string strweight;
-// 			strweight=line.substr(0,line.find_first_of(")"));
-// 			intvec *iv=new intvec(this->numVars);
-// 			for(int ii=0;ii<this->numVars;ii++)
-// 			{
-// 				string weight;
-// 				weight=line.substr(0,line.find_first_of(",)"));				
-// 				(*iv)[ii]=atoi(weight.c_str());
-// 				line.erase(0,line.find_first_of(",)")+1);
-// 			}
-// 			ring newRing;
-// 			if(currRing->order[0]!=ringorder_a)
-// 			{
-// 				newRing=rCopyAndAddWeight(currRing,iv);
-// 			}
-// 			else
-// 			{ 			
-// 				newRing=rCopy0(currRing);
-// 				int length=this->numVars;
-// 				int *A=(int *)omAlloc0(length*sizeof(int));
-// 				for(int jj=0;jj<length;jj++)
-// 				{
-// 					A[jj]=-(*iv)[jj];
-// 				}
-// 				omFree(newRing->wvhdl[0]);
-// 				newRing->wvhdl[0]=(int*)A;
-// 				newRing->block1[0]=length;
-// 			}
-// 			delete iv;
-//  			rComplete(newRing);
-// 			gc->baseRing=rCopy(newRing);
-// 			if(currRing!=gc->baseRing)
-// 				rChangeCurrRing(gc->baseRing);
+		{/*
+			getline(gcInputFile,line);
+			found = line.find("a(");
+			line.erase(0,found+2);
+			string strweight;
+			strweight=line.substr(0,line.find_first_of(")"));
+			intvec *iv=new intvec(this->numVars);
+			for(int ii=0;ii<this->numVars;ii++)
+			{
+				string weight;
+				weight=line.substr(0,line.find_first_of(",)"));				
+				(*iv)[ii]=atoi(weight.c_str());
+				line.erase(0,line.find_first_of(",)")+1);
+			}
+			ring newRing;
+			if(currRing->order[0]!=ringorder_a)
+			{
+				newRing=rCopyAndAddWeight(currRing,iv);
+			}
+			else
+			{ 			
+				newRing=rCopy0(currRing);
+				int length=this->numVars;
+				int *A=(int *)omAlloc0(length*sizeof(int));
+				for(int jj=0;jj<length;jj++)
+				{
+					A[jj]=-(*iv)[jj];
+				}
+				omFree(newRing->wvhdl[0]);
+				newRing->wvhdl[0]=(int*)A;
+				newRing->block1[0]=length;
+			}
+			delete iv;
+ 			rComplete(newRing);
+			gc->baseRing=rCopy(newRing);
+			if(currRing!=gc->baseRing)
+				rChangeCurrRing(gc->baseRing);*/
 		}
 		
 		if(line=="GCBASISLENGTH")
 		{
+			string strGcBasisLength;
 			getline(gcInputFile, line);
 			strGcBasisLength = line;
 			int size=atoi(strGcBasisLength.c_str());
@@ -2398,22 +2460,24 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 		}
 		if(line=="GCBASIS")
 		{
-			number nCoeff=nInit(1);
-			number nCoeffNom=nInit(1);
-			number nCoeffDenom=nInit(1);			
 			for(int jj=0;jj<gcBasisLength;jj++)
 			{
 				getline(gcInputFile,line);
 				//magically convert strings into polynomials
 				//polys.cc:p_Read
 				//check until first occurance of + or -
-				//data or c_str
-				poly strPoly=pInit();
-				poly resPoly=pInit();	//The poly to be read in
+				//data or c_str	
+				poly strPoly=pInit();//Ought to be inside the while loop, but that will eat your memory
+				poly resPoly=pInit();	//The poly to be read in							
 				while(!line.empty())
 				{
-					hasNegCoeff = FALSE;
-					hasCoeffInQ = FALSE;
+// 					poly strPoly=pInit();
+					number nCoeff=nInit(1);
+					number nCoeffNom=nInit(1);
+					number nCoeffDenom=nInit(1);
+					string strMonom, strCoeff, strCoeffNom, strCoeffDenom;
+					bool hasCoeffInQ = FALSE;	//does the polynomial have rational coeff?
+					bool hasNegCoeff = FALSE;	//or a negative one?
 					found = line.find_first_of("+-");	//get the first monomial
 					string tmp;
 					tmp=line[found];
@@ -2456,20 +2520,17 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 					}
 					const char* monom = strMonom.c_str();
 						
-					p_Read(monom,strPoly,currRing);
+					p_Read(monom,strPoly,currRing);	//strPoly:=monom				
 					switch (hasCoeffInQ)
 					{
 						case TRUE:
 							if(hasNegCoeff)
 								nCoeffNom=nNeg(nCoeffNom);
-// 								intCoeffNom *= -1;
-// 							pSetCoeff(strPoly, nDiv((number)intCoeffNom, (number)intCoeffDenom));
 							pSetCoeff(strPoly, nDiv(nCoeffNom, nCoeffDenom));
 							break;
 						case FALSE:
 							if(hasNegCoeff)
-								nCoeff=nNeg(nCoeff);
-// 								intCoeff *= -1;
+								nCoeff=nNeg(nCoeff);							
 							if(!nIsOne(nCoeff))
 							{
 // 								if(hasNegCoeff)
@@ -2484,15 +2545,16 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 					if(pIsConstantComp(resPoly))
 						resPoly=pCopy(strPoly);							
 					else
-						resPoly=pAdd(resPoly,strPoly);					
+						resPoly=pAdd(resPoly,strPoly);
+					nDelete(&nCoeff);
+					nDelete(&nCoeffNom);
+					nDelete(&nCoeffDenom);
+// 					pDelete(&strPoly);
 				}//while(!line.empty())			
 				gc->gcBasis->m[jj]=pCopy(resPoly);
 				pDelete(&resPoly);	//reset
-// 				pDelete(&strPoly);	//NOTE Crashes
+// 				pDelete(&strPoly);	//NOTE Crashes				
 			}
-			nDelete(&nCoeff);
-			nDelete(&nCoeffNom);
-			nDelete(&nCoeffDenom);
 			break;
 		}//if(line=="GCBASIS")		
 	}//while(!gcInputFile.eof())	
@@ -2531,7 +2593,8 @@ lists lprepareResult(gcone *gc, int n)
 		* Since we don't use them in the computation and gcBasis is 
 		* set to (poly)NULL in noRevS we need to get this back here.
 		*/
-		if(gcAct->gcBasis->m[0]==(poly)NULL)
+// 		if(gcAct->gcBasis->m[0]==(poly)NULL)
+		if(gfanHeuristic==1)
 			gcAct->readConeFromFile(gcAct->getUCN(),gcAct);
 // 		ring saveRing=currRing;
 // 		ring tmpRing=gcAct->getBaseRing;
@@ -2576,8 +2639,7 @@ lists lprepareResult(gcone *gc, int n)
 inline intvec gcone::f2M(gcone *gc, facet *f, int n)
 {
 	facet *fAct;
-	intvec *res=new intvec(this->numVars);
-	intvec *fNormal;
+	intvec *res;//=new intvec(this->numVars);	
 // 	int codim=n;
 // 	int bound;
 // 	if(f==gc->facetPtr)
@@ -2601,6 +2663,7 @@ inline intvec gcone::f2M(gcone *gc, facet *f, int n)
 	int ii=0;
 	while(fAct!=NULL )//&& ii < bound )
 	{
+		intvec *fNormal;
 		fNormal = fAct->getFacetNormal();
 		for(int jj=0;jj<this->numVars;jj++)
 		{
@@ -2608,13 +2671,23 @@ inline intvec gcone::f2M(gcone *gc, facet *f, int n)
 			ii++;
 		}
 		fAct = fAct->next;
-	}
-	delete fNormal;
+		delete fNormal;
+	}	
 	return *res;
 }
 
 int gcone::counter=0;
 int gfanHeuristic;
+#ifdef gfanp
+float gcone::time_getConeNormals;
+float gcone::time_getCodim2Normals;
+float gcone::time_flip;
+float gcone::time_enqueue;
+float gcone::time_computeInv;
+float gcone::t_ddMC;
+float gcone::t_mI;
+float gcone::t_iP;
+#endif
 // ideal gfan(ideal inputIdeal, int h)
 lists gfan(ideal inputIdeal, int h)
 {
@@ -2690,6 +2763,16 @@ lists gfan(ideal inputIdeal, int h)
 	}
 	//gcone::counter=0;
 	/*Return result*/
+#ifdef gfanp
+	cout << "t_getConeNormals:" << gcone::time_getConeNormals << endl;
+	cout << "t_getCodim2Normals:" << gcone::time_getCodim2Normals << endl;
+	cout << "  t_ddMC:" << gcone::t_ddMC << endl;
+	cout << "  t_mI:" << gcone::t_mI << endl;
+	cout << "  t_iP:" << gcone::t_iP << endl;
+	cout << "t_Flip:" << gcone::time_flip << endl;
+	cout << "t_computeInv:" << gcone::time_computeInv << endl;
+	cout << "t_enqueue:" << gcone::time_enqueue << endl;
+#endif
 	return lResList;
 }
 
