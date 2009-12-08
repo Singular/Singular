@@ -406,7 +406,7 @@ number nrnMapQ(number from)
   return (number) erg;
 }
 
-nMapFunc nrnSetMap(ring src, ring dst)
+nMapFunc nrnSetMap(const ring src, const ring dst)
 {
   /* dst = currRing */
   if (rField_is_Ring_Z(src))

@@ -431,7 +431,7 @@ static number nrMapC(number from)
   return nf(t).N();
 }
 
-nMapFunc nrSetMap(ring src, ring dst)
+nMapFunc nrSetMap(const ring src, const ring dst)
 {
   if (rField_is_Q(src))
   {

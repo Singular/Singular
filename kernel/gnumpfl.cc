@@ -69,7 +69,7 @@ static number ngfMapC(number from)
     return NULL;
 }
 
-nMapFunc ngfSetMap(ring src, ring dst)
+nMapFunc ngfSetMap(const ring src, const ring dst)
 {
   if (rField_is_Q(src))
   {

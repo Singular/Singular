@@ -89,7 +89,7 @@ BOOLEAN  nlDBTest(number a, const char *f, const int l);
 #endif
 extern number nlOne;
 
-nMapFunc nlSetMap(ring src, ring dst);
+nMapFunc nlSetMap(const ring src, const ring dst);
 #ifdef HAVE_RINGS
 number nlMapGMP(number from);
 #endif

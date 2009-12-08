@@ -41,7 +41,7 @@ BOOLEAN nrzEqual       (number a, number b);
 number  nrzLcm         (number a,number b, ring r);
 number  nrzGcd         (number a,number b,ring r);
 number  nrzExtGcd      (number a, number b, number *s, number *t);
-nMapFunc nrzSetMap     (ring src, ring dst);
+nMapFunc nrzSetMap     (const ring src, const ring dst);
 void    nrzWrite       (number &a);
 const char *  nrzRead  (const char *s, number *a);
 char *  nrzName        (number n);

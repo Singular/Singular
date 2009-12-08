@@ -31,7 +31,7 @@ int     nrGetChar();
 BOOLEAN nrDBTest(number a, const char *f, const int l);
 #endif
 
-nMapFunc nrSetMap(ring src, ring dst);
+nMapFunc nrSetMap(const ring src, const ring dst);
 
 float   nrFloat(number n);
 number nrMapQ(number from);

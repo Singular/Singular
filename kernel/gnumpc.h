@@ -38,7 +38,7 @@ BOOLEAN  ngcDBTest(number a, const char *f, const int l);
 #endif
 void     ngcDelete(number *a, const ring r);
 
-nMapFunc  ngcSetMap(ring src, ring dst);
+nMapFunc  ngcSetMap(const ring src, const ring dst);
 
 number ngcMapQ(number from);
 #endif

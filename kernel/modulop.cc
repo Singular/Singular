@@ -518,7 +518,7 @@ number npMapMachineInt(number from)
 }
 #endif
 
-nMapFunc npSetMap(ring src, ring dst)
+nMapFunc npSetMap(const ring src, const ring dst)
 {
 #ifdef HAVE_RINGS
   if (rField_is_Ring_2toM(src))

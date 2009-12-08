@@ -698,7 +698,7 @@ number nfMapGGrev(number c)
 /*2
 * set map function nMap ... -> GF(p,n)
 */
-nMapFunc nfSetMap(ring src, ring dst)
+nMapFunc nfSetMap(const ring src, const ring dst)
 {
   if (rField_is_GF(src,nfCharQ))
   {

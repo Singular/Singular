@@ -55,7 +55,7 @@ number  naLcm(number a, number b, const ring r);
 const char *  naRead(const char * s, number * p);
 void    naWrite(number &p);
 char *  naName(number n);
-nMapFunc naSetMap(ring src, ring dst);
+nMapFunc naSetMap(const ring src, const ring dst);
 number naMap0P(number c);
 number naMap00(number c);
 #ifdef LDEBUG

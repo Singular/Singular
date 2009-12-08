@@ -42,7 +42,7 @@ BOOLEAN nrnEqual       (number a, number b);
 number  nrnLcm         (number a,number b, ring r);
 number  nrnGcd         (number a,number b,ring r);
 number  nrnExtGcd      (number a, number b, number *s, number *t);
-nMapFunc nrnSetMap     (ring src, ring dst);
+nMapFunc nrnSetMap     (const ring src, const ring dst);
 void    nrnWrite       (number &a);
 const char *  nrnRead  (const char *s, number *a);
 char *  nrnName        (number n);

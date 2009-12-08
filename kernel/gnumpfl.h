@@ -34,7 +34,7 @@ BOOLEAN  ngfDBTest(number a, const char *f, const int l);
 #endif
 void     ngfDelete(number *a, const ring r);
 
-nMapFunc  ngfSetMap(ring src, ring dst);
+nMapFunc  ngfSetMap(const ring src, const ring dst);
 
 void setGMPFloatDigits( size_t digits, size_t rest );
 number ngfMapQ(number from);

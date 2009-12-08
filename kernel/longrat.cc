@@ -167,7 +167,7 @@ number nlMapMachineInt(number from)
 }
 #endif
 
-nMapFunc nlSetMap(ring src, ring dst)
+nMapFunc nlSetMap(const ring src, const ring dst)
 {
   if (rField_is_Q(src))
   {

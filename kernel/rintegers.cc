@@ -271,7 +271,7 @@ number nrzMapQ(number from)
   return (number) erg;
 }
 
-nMapFunc nrzSetMap(ring src, ring dst)
+nMapFunc nrzSetMap(const ring src, const ring dst)
 {
   /* dst = currRing */
   if (rField_is_Ring_Z(src) || rField_is_Ring_ModN(src) || rField_is_Ring_PtoM(src))

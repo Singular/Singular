@@ -2306,7 +2306,7 @@ number naMapQaQb(number c)
   return (number)erg;
 }
 
-nMapFunc naSetMap(ring src, ring dst)
+nMapFunc naSetMap(const ring src, const ring dst)
 {
   naMapRing=src;
   if (rField_is_Q_a(dst)) /* -> Q(a) */

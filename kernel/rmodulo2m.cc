@@ -456,7 +456,7 @@ number nr2mMapGMP(number from)
   return (number) r;
 }
 
-nMapFunc nr2mSetMap(ring src, ring dst)
+nMapFunc nr2mSetMap(const ring src, const ring dst)
 {
   if (rField_is_Ring_2toM(src)
      && (src->ringflagb >= dst->ringflagb))

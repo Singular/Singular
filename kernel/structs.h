@@ -308,7 +308,7 @@ struct n_Procs_s
    number  (*nGcd)(number a, number b, const ring r);
    number  (*nLcm)(number a, number b, const ring r);
    void    (*cfDelete)(number * a, const ring r);
-   nMapFunc (*cfSetMap)(ring src, ring dst);
+   nMapFunc (*cfSetMap)(const ring src, const ring dst);
    char *  (*nName)(number n);
    void    (*nInpMult)(number &a, number b, ring r);
 #ifdef LDEBUG

@@ -53,7 +53,7 @@ void    npInitChar(int c, ring r);
 
 //int     npGetChar();
 
-nMapFunc npSetMap(ring src, ring dst);
+nMapFunc npSetMap(const ring src, const ring dst);
 number  npMapP(number from);
 number  npMap0(number from);
 /*-------specials for spolys, do NOT use otherwise--------------------------*/

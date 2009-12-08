@@ -70,7 +70,7 @@ static number ngcMapP(number from)
     return NULL;
 }
 
-nMapFunc ngcSetMap(ring src,ring dst)
+nMapFunc ngcSetMap(const ring src,const ring dst)
 {
   if(rField_is_Q(src))
   {
