@@ -27,7 +27,7 @@ void     ngfPower(number x, int exp, number *lu);
 number   ngfCopy(number a);
 number   ngf_Copy(number a, ring r);
 const char *   ngfRead (const char *s, number *a);
-void     ngfWrite(number &a);
+void     ngfWrite(number &a, const ring r);
 
 #ifdef LDEBUG
 BOOLEAN  ngfDBTest(number a, const char *f, const int l);

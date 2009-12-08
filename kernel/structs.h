@@ -290,7 +290,7 @@ struct n_Procs_s
    number  (*cfCopy)(number a, const ring r);
    number  (*nRePart)(number a);
    number  (*nImPart)(number a);
-   void    (*nWrite)(number &a);
+   void    (*cfWrite)(number &a, const ring r);
    const char *  (*nRead)(const char * s, number * a);
    void    (*nNormalize)(number &a);
    BOOLEAN (*nGreater)(number a,number b),

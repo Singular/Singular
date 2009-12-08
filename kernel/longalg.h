@@ -53,7 +53,7 @@ void    naNormalize(number &p);
 number  naGcd(number a, number b, const ring r);
 number  naLcm(number a, number b, const ring r);
 const char *  naRead(const char * s, number * p);
-void    naWrite(number &p);
+void    naWrite(number &p, const ring r);
 char *  naName(number n);
 nMapFunc naSetMap(const ring src, const ring dst);
 number naMap0P(number c);
@@ -78,7 +78,7 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napSetm(p)             p_Setm(p,currRing->algring)
 #define nanumber               lnumber
 napoly napRemainder(napoly f, const napoly  g);
-void napWrite(napoly l,const BOOLEAN denom=TRUE);
+//void napWrite(napoly l,const BOOLEAN denom=TRUE);
 number   naGetDenom(number &n, const ring r);
 number   naGetNumerator(number &n, const ring r);
 #endif

@@ -469,7 +469,7 @@ const char * ngfRead (const char * start, number * a)
 /*2
 * write a floating point number
 */
-void ngfWrite (number &a)
+void ngfWrite (number &a, const ring r)
 {
   char *out;
   if ( a != NULL )

@@ -53,7 +53,7 @@ static void     (*nacDelete)(number *a, const ring r);
 #define n_Delete(A,R) nacDelete(A,R)
        void     (*nacNormalize)(number &a);
 static number   (*nacNeg)(number a);
-static void     (*nacWrite)(number &a);
+#define nacWrite(A) n_Write(A,nacRing)
        number   (*nacCopy)(number a);
 static number   (*nacInvers)(number a);
        BOOLEAN  (*nacIsZero)(number a);
@@ -134,7 +134,6 @@ void naSetChar(int i, ring r)
   nacNeg         = nacRing->cf->nNeg;
   nacIsZero      = nacRing->cf->nIsZero;
   nacRead        = nacRing->cf->nRead;
-  nacWrite       = nacRing->cf->nWrite;
   nacGreaterZero = nacRing->cf->nGreaterZero;
   nacIsOne       = nacRing->cf->nIsOne;
   nacIsMOne      = nacRing->cf->nIsMOne;
@@ -412,22 +411,23 @@ static int  napMaxDegLen(napoly p, int &l)
 /*3
 *writes a polynomial number
 */
-void napWrite(napoly p,const BOOLEAN has_denom)
+void napWrite(napoly p,const BOOLEAN has_denom, const ring r)
 {
+  ring nacring=r->algring;
   if (p==NULL)
     StringAppendS("0");
-  else if (p_LmIsConstant(p,nacRing))
+  else if (p_LmIsConstant(p,nacring))
   {
     BOOLEAN kl=FALSE;
     if (has_denom)
     {
-      number den=nacRing->cf->cfGetDenom(pGetCoeff(p), nacRing);
-      kl=!n_IsOne(den,nacRing);
-      n_Delete(&den, nacRing);
+      number den=nacring->cf->cfGetDenom(pGetCoeff(p),nacring );
+      kl=!n_IsOne(den,nacring);
+      n_Delete(&den, nacring);
     }
     if (kl) StringAppendS("(");
     //StringAppendS("-1");
-    nacWrite(pGetCoeff(p));
+    n_Write(pGetCoeff(p),nacring);
     if (kl) StringAppendS(")");
   }
   else
@@ -436,31 +436,31 @@ void napWrite(napoly p,const BOOLEAN has_denom)
     loop
     {
       BOOLEAN wroteCoeff=FALSE;
-      if ((p_LmIsConstant(p,nacRing))
-      || ((!nacIsOne(pGetCoeff(p)))
-        && (!nacIsMOne(pGetCoeff(p)))))
+      if ((p_LmIsConstant(p,nacring))
+      || ((!n_IsOne(pGetCoeff(p),nacring))
+        && (!n_IsMOne(pGetCoeff(p),nacring))))
       {
-        nacWrite(pGetCoeff(p));
-        wroteCoeff=(currRing->ShortOut==0);
+        n_Write(pGetCoeff(p),nacring);
+        wroteCoeff=(r->ShortOut==0);
       }
-      else if (nacIsMOne(pGetCoeff(p)))
+      else if (n_IsMOne(pGetCoeff(p),nacring))
       {
         StringAppendS("-");
       }
       int  i;
-      for (i = 0; i < naNumbOfPar; i++)
+      for (i = 0; i < r->P; i++)
       {
-        int e=p_GetExp(p,i+1,nacRing);
+        int e=p_GetExp(p,i+1,nacring);
         if (e > 0)
         {
           if (wroteCoeff)
             StringAppendS("*");
           else
-            wroteCoeff=(currRing->ShortOut==0);
-          StringAppendS(naParNames[i]);
+            wroteCoeff=(r->ShortOut==0);
+          StringAppendS(r->parameter[i]);
           if (e > 1)
           {
-            if (currRing->ShortOut == 0)
+            if (r->ShortOut == 0)
               StringAppendS("^");
             StringAppend("%d", e);
           }
@@ -469,7 +469,7 @@ void napWrite(napoly p,const BOOLEAN has_denom)
       pIter(p);
       if (p==NULL)
         break;
-      if (nacGreaterZero(pGetCoeff(p)))
+      if (n_GreaterZero(pGetCoeff(p),nacring))
         StringAppendS("+");
     }
     StringAppendS(")");
@@ -1509,7 +1509,7 @@ char * naName(number n)
 /*2
 *  writes a number
 */
-void naWrite(number &phn)
+void naWrite(number &phn, const ring r)
 {
   lnumber ph = (lnumber)phn;
   if (ph==NULL)
@@ -1518,11 +1518,11 @@ void naWrite(number &phn)
   {
     phn->s = 0;
     BOOLEAN has_denom=(ph->n!=NULL);
-    napWrite(ph->z,has_denom/*(ph->n!=NULL)*/);
+    napWrite(ph->z,has_denom/*(ph->n!=NULL)*/,r);
     if (has_denom/*(ph->n!=NULL)*/)
     {
       StringAppendS("/");
-      napWrite(ph->n,TRUE);
+      napWrite(ph->n,TRUE,r);
     }
   }
 }

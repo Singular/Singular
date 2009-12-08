@@ -691,7 +691,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           {
           StringSetS((char*) (typed ? "bigint(" : ""));
           number nl=(number)d;
-          nlWrite(nl);
+          nlWrite(nl,NULL);
           s = StringAppendS((char*) (typed ? ")" : ""));
           return omStrDup(s);
           }

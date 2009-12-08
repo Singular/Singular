@@ -183,7 +183,7 @@ while(0)
 /* maximal number of stack frames kept for stack at the allocation time of addr (track >= 2)
    and free time of addr (track >= 5) */
 #ifndef OM_MAX_KEPT_FRAMES
-#define OM_MAX_KEPT_FRAMES 5
+#define OM_MAX_KEPT_FRAMES 10
 #endif
 
 /* pattern with which memory is initalized, for front and back padding,

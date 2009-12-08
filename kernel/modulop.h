@@ -40,7 +40,7 @@ number  npNeg         (number c);
 number  npInvers      (number c);
 BOOLEAN npGreater     (number a, number b);
 BOOLEAN npEqual       (number a, number b);
-void    npWrite       (number &a);
+void    npWrite       (number &a, const ring r);
 const char *  npRead  (const char *s, number *a);
 #ifdef LDEBUG
 BOOLEAN npDBTest      (number a, const char *f, const int l);

@@ -24,7 +24,7 @@ number  nrNeg         (number c);
 number  nrInvers      (number c);
 BOOLEAN nrGreater     (number a, number b);
 BOOLEAN nrEqual       (number a, number b);
-void    nrWrite       (number &a);
+void    nrWrite       (number &a, const ring r);
 const char *  nrRead  (const char *s, number *a);
 int     nrGetChar();
 #ifdef LDEBUG

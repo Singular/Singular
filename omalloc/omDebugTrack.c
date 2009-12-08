@@ -602,6 +602,7 @@ void omPrintTrackAddrInfo(FILE* fd, void* addr, int max_frames)
   omTrackAddr d_addr = omOutAddr_2_TrackAddr(addr);
   omAssume(d_addr->track > 0);
   if (max_frames <= 0) return;
+  if (! (d_addr->flags & OM_FUSED)) return;
 
   if (max_frames > OM_MAX_KEPT_FRAMES) max_frames = OM_MAX_KEPT_FRAMES;
 

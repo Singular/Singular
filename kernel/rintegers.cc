@@ -313,7 +313,7 @@ void nrzInitExp(int m, ring r)
 //}
 #endif
 
-void nrzWrite (number &a)
+void nrzWrite (number &a, const ring r)
 {
   char *s,*z;
   if (a==NULL)

@@ -38,7 +38,7 @@ number  nr2mLcm         (number a,number b, ring r);
 number  nr2mGcd         (number a,number b,ring r);
 number  nr2mExtGcd      (number a, number b, number *s, number *t);
 nMapFunc nr2mSetMap     (const ring src, const ring dst);
-void    nr2mWrite       (number &a);
+void    nr2mWrite       (number &a, const ring r);
 const char *  nr2mRead  (const char *s, number *a);
 char *  nr2mName        (number n);
 #ifdef LDEBUG

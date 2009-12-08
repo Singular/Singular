@@ -185,7 +185,7 @@ BOOLEAN nrEqual (number a,number b)
   return nf(x).F() == nf((float)0.0).F();
 }
 
-void nrWrite (number &a)
+void nrWrite (number &a, const ring r)
 {
   StringAppend("%9.3e", nf(a).F());
 }

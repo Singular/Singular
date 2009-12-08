@@ -78,7 +78,7 @@ number   nlIntDiv(number a, number b);
 number   nlIntMod(number a, number b);
 void     nlPower(number x, int exp, number *lu);
 const char *   nlRead (const char *s, number *a);
-void     nlWrite(number &a);
+void     nlWrite(number &a, const ring r);
 int      nlModP(number n, int p);
 int      nlSize(number n);
 number   nlGetDenom(number &n, const ring r);

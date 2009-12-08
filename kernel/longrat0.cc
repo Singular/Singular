@@ -107,7 +107,7 @@ const char * nlRead (const char *s, number *a)
 /*2
 * write a rational number
 */
-void nlWrite (number &a)
+void nlWrite (number &a, const ring r)
 {
   char *s,*z;
   if (SR_HDL(a) & SR_INT)
@@ -123,7 +123,7 @@ void nlWrite (number &a)
     if (a->s==0)
     {
       nlNormalize(a);
-      nlWrite(a);
+      nlWrite(a,r);
       return;
     }
     int l=mpz_sizeinbase(&a->z,10);

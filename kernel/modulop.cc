@@ -217,10 +217,10 @@ BOOLEAN npEqual (number a,number b)
   return npEqualM(a,b);
 }
 
-void npWrite (number &a)
+void npWrite (number &a, const ring r)
 {
-  if ((long)a > (npPrimeM >>1)) StringAppend("-%d",(int)(npPrimeM-((long)a)));
-  else                          StringAppend("%d",(int)((long)a));
+  if ((long)a>(((long)r->ch) >>1)) StringAppend("-%d",(int)(((long)r->ch)-((long)a)));
+  else                             StringAppend("%d",(int)((long)a));
 }
 
 void npPower (number a, int i, number * result)

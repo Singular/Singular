@@ -32,7 +32,7 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
   {
 #ifndef HAVE_ZERODIVISORS
     p_AllocBin(pNext(q), bin, r);
-    q = pNext(q);
+    pIter(q);
     number nc = pGetCoeff(p);
     pSetCoeff0(q, n_Mult(n, nc, r));
     p_MemCopy(q->exp, p->exp, length);
@@ -42,7 +42,7 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
     if (! nIsZero(tmp))
     {
       p_AllocBin(pNext(q), bin, r);
-      q = pNext(q);
+      pIter(q);
       pSetCoeff0(q, tmp);
       p_MemCopy(q->exp, p->exp, length);
     }

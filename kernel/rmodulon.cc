@@ -526,25 +526,6 @@ BOOLEAN nrnDBTest (number a, const char *f, const int l)
 }
 #endif
 
-void nrnWrite (number &a)
-{
-  char *s,*z;
-  if (a==NULL)
-  {
-    StringAppendS("o");
-  }
-  else
-  {
-    int l=mpz_sizeinbase((int_number) a, 10);
-    if (a->s<2) l=si_max(l,mpz_sizeinbase((int_number) a,10));
-    l+=2;
-    s=(char*)omAlloc(l);
-    z=mpz_get_str(s,10,(int_number) a);
-    StringAppendS(z);
-    omFreeSize((ADDRESS)s,l);
-  }
-}
-
 /*2
 * extracts a long integer from s, returns the rest    (COPY FROM longrat0.cc)
 */

@@ -23,7 +23,7 @@
 #define n_IsOne(n, r)         (r)->cf->nIsOne(n)
 #define n_IsMOne(n, r)        (r)->cf->nIsMOne(n)
 #define n_GreaterZero(n, r)   (r)->cf->nGreaterZero(n)
-#define n_Write(n, r)         (r)->cf->nWrite(n)
+#define n_Write(n, r)         (r)->cf->cfWrite(n,r)
 #define n_Normalize(n, r)     (r)->cf->nNormalize(n)
 #define n_Gcd(a, b, r)        (r)->cf->nGcd(a,b,r)
 #define n_IntDiv(a, b, r)     (r)->cf->nIntDiv(a,b)
@@ -64,7 +64,7 @@ extern number  (*nInvers)(number a);
 extern number  (*nCopy)(number a);
 extern number  (*nRePart)(number a);
 extern number  (*nImPart)(number a);
-extern void    (*nWrite)(number &a);
+#define nWrite(A) n_Write(A,currRing)
 extern const char *  (*nRead)(const char * s, number * a);
 extern void    (*nNormalize)(number &a);
 extern BOOLEAN (*nGreater)(number a,number b),

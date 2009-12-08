@@ -535,9 +535,8 @@ BOOLEAN nr2mDBTest (number a, const char *f, const int l)
 }
 #endif
 
-void nr2mWrite (number &a)
+void nr2mWrite (number &a, const ring r)
 {
-  ring r=currRing;
   if ((NATNUMBER)a > (r->nr2mModul  >>1))
      StringAppend("-%d",(int)(r->nr2mModul -((NATNUMBER)a)));
   else                          StringAppend("%d",(int)((NATNUMBER)a));

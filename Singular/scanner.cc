@@ -1327,7 +1327,7 @@ YY_RULE_SETUP
                            #endif
                            #ifdef OM_TRACK
 			   #ifndef NDEBUG
-                             omPrintUsedTrackAddrs(stdout, 1);
+                             omPrintUsedTrackAddrs(stdout, 10);
                            #endif
                            #endif
                            m2_end(0);

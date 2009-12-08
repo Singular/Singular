@@ -28,7 +28,7 @@ void     ngcPower(number x, int exp, number *lu);
 number   ngcCopy(number a);
 number   ngc_Copy(number a, ring r);
 const char * ngcRead (const char *s, number *a);
-void     ngcWrite(number &a);
+void     ngcWrite(number &a, const ring r);
 number   ngcRePart(number a);
 number   ngcImPart(number a);
 

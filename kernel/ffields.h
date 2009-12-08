@@ -27,7 +27,7 @@ number  nfNeg         (number c);
 number  nfInvers      (number c);
 BOOLEAN nfGreater     (number a, number b);
 BOOLEAN nfEqual       (number a, number b);
-void    nfWrite       (number &a);
+void    nfWrite       (number &a, const ring r);
 const char *  nfRead  (const char *s, number *a);
 #ifdef LDEBUG
 BOOLEAN nfDBTest      (number a, const char *f, const int l);

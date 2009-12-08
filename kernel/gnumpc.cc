@@ -454,7 +454,7 @@ const char * ngcRead (const char * s, number * a)
 /*2
 * write a floating point number
 */
-void ngcWrite (number &a)
+void ngcWrite (number &a, const ring r)
 {
   if (a==NULL)
     StringAppendS("0");
