@@ -551,6 +551,11 @@ void rDelete(ring r)
     mpz_clear(r->ringflaga);
     omFree((ADDRESS)r->ringflaga);
   }
+  if (r->nrnModul != NULL)
+  {
+    mpz_clear(r->nrnModul);
+    omFree((ADDRESS)r->nrnModul);
+  }
 #endif
   omFreeBin(r, ip_sring_bin);
 }

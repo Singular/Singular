@@ -629,8 +629,9 @@ struct sip_sring
   struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
 #ifdef HAVE_RINGS
   unsigned int  ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
-  int_number    ringflaga; /* Z/(ringfalga^ringflagb)=Z/nrnModul*/
+  int_number    ringflaga; /* Z/(ringflag^ringflagb)=Z/nrnModul*/
   unsigned long ringflagb;
+  unsigned long nr2mModul;  /* Z/nr2mModul */
   int_number    nrnModul;
 #endif
   unsigned long options; /* ring dependent options */

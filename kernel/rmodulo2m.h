@@ -51,22 +51,22 @@ void    nr2mInitExp(int c, const ring r);
 static inline number nr2mMultM(number a, number b)
 {
   return (number) 
-    ((((NATNUMBER) a)*((NATNUMBER) b)) % ((NATNUMBER) nr2mModul));
+    ((((NATNUMBER) a)*((NATNUMBER) b)) % ((NATNUMBER) currRing->nr2mModul));
 }
 
 static inline number nr2mAddM(number a, number b)
 {
   NATNUMBER r = (NATNUMBER)a + (NATNUMBER)b;
-  return (number) (r >= nr2mModul ? r - nr2mModul : r);
+  return (number) (r >= currRing->nr2mModul ? r - currRing->nr2mModul : r);
 }
 
 static inline number nr2mSubM(number a, number b)
 {
   return (number)((NATNUMBER)a<(NATNUMBER)b ?
-                       nr2mModul-(NATNUMBER)b+(NATNUMBER)a : (NATNUMBER)a-(NATNUMBER)b);
+                       currRing->nr2mModul-(NATNUMBER)b+(NATNUMBER)a : (NATNUMBER)a-(NATNUMBER)b);
 }
 
-#define nr2mNegM(A) (number)(nr2mModul-(NATNUMBER)(A))
+#define nr2mNegM(A) (number)(currRing->nr2mModul-(NATNUMBER)(A))
 #define nr2mEqualM(A,B)  ((A)==(B))
 
 number nr2mMapQ(number from);

@@ -22,7 +22,6 @@
 #include "si_gmp.h"
 
 int nr2mExp;
-NATNUMBER nr2mModul;
 
 /*
  * Multiply two numbers
@@ -132,8 +131,8 @@ void nr2mPower (number a, int i, number * result)
 number nr2mInit (int i, const ring r)
 {
   long ii = i;
-  while (ii < 0) ii += nr2mModul;
-  while ((ii>1) && (ii >= nr2mModul)) ii -= nr2mModul;
+  while (ii < 0) ii += r->nr2mModul ;
+  while ((ii>1) && (ii >= r->nr2mModul )) ii -= r->nr2mModul ;
   return (number) ii;
 }
 
@@ -142,7 +141,7 @@ number nr2mInit (int i, const ring r)
  */
 int nr2mInt(number &n, const ring r)
 {
-  if ((NATNUMBER)n > (nr2mModul >>1)) return (int)((NATNUMBER)n - nr2mModul);
+  if ((NATNUMBER)n > (r->nr2mModul  >>1)) return (int)((NATNUMBER)n - r->nr2mModul );
   else return (int)((NATNUMBER)n);
 }
 
@@ -183,7 +182,8 @@ BOOLEAN nr2mIsOne (number a)
 
 BOOLEAN nr2mIsMOne (number a)
 {
-  return (nr2mModul == (NATNUMBER)a + 1) && (nr2mModul != 2);
+  return (currRing->nr2mModul  == (NATNUMBER)a + 1) 
+        && (currRing->nr2mModul != 2);
 }
 
 BOOLEAN nr2mEqual (number a,number b)
@@ -199,7 +199,7 @@ BOOLEAN nr2mGreater (number a,number b)
 BOOLEAN nr2mDivBy (number a,number b)
 {
   if (a == NULL)
-    return (nr2mModul % (NATNUMBER) b) == 0;
+    return (currRing->nr2mModul  % (NATNUMBER) b) == 0;
   else
     return ((NATNUMBER) a % (NATNUMBER) b) == 0;
   /*
@@ -243,7 +243,7 @@ int nr2mDivComp(number as, number bs)
 
 BOOLEAN nr2mGreaterZero (number k)
 {
-  return ((NATNUMBER) k !=0) && ((NATNUMBER) k <= (nr2mModul>>1));
+  return ((NATNUMBER) k !=0) && ((NATNUMBER) k <= (currRing->nr2mModul >>1));
 }
 
 //#ifdef HAVE_DIV_MOD
@@ -303,10 +303,10 @@ NATNUMBER InvMod(NATNUMBER a)
 {
    long d, s, t;
 
-   XGCD(d, s, t, a, nr2mModul);
+   XGCD(d, s, t, a, currRing->nr2mModul );
    assume (d == 1);
    if (s < 0)
-      return s + nr2mModul;
+      return s + currRing->nr2mModul ;
    else
       return s;
 }
@@ -371,7 +371,7 @@ number nr2mMod (number a, number b)
   NATNUMBER b_div = (NATNUMBER)b;
   if (b_div < 0) b_div = - b_div; // b_div now represents |b|
   NATNUMBER r = 0;
-  while ((g < nr2mModul) && (b_div > 0) && (b_div % 2 == 0))
+  while ((g < currRing->nr2mModul ) && (b_div > 0) && (b_div % 2 == 0))
   {
     b_div = b_div >> 1;
     g = g << 1;
@@ -389,7 +389,7 @@ number nr2mIntDiv (number a,number b)
       return (number) 1;
     if ((NATNUMBER)b==1)
       return (number) 0;
-    return (number) (nr2mModul / (NATNUMBER) b);
+    return (number) (currRing->nr2mModul  / (NATNUMBER) b);
   }
   else
   {
@@ -417,15 +417,15 @@ number nr2mNeg (number c)
 
 number nr2mMapMachineInt(number from)
 {
-  NATNUMBER i = ((NATNUMBER) from) % nr2mModul;
+  NATNUMBER i = ((NATNUMBER) from) % currRing->nr2mModul ;
   return (number) i;
 }
 
 number nr2mMapZp(number from)
 {
   long ii = (long) from;
-  while (ii < 0) ii += nr2mModul;
-  while ((ii>1) && (ii >= nr2mModul)) ii -= nr2mModul;
+  while (ii < 0) ii += currRing->nr2mModul ;
+  while ((ii>1) && (ii >= currRing->nr2mModul )) ii -= currRing->nr2mModul ;
   return (number) ii;
 }
 
@@ -435,7 +435,7 @@ number nr2mMapQ(number from)
   mpz_init(erg);
 
   nlGMP(from, (number) erg);
-  mpz_mod_ui(erg, erg, nr2mModul);
+  mpz_mod_ui(erg, erg, currRing->nr2mModul );
   number r = (number) mpz_get_ui(erg);
 
   mpz_clear(erg);
@@ -448,7 +448,7 @@ number nr2mMapGMP(number from)
   int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
   mpz_init(erg);
 
-  mpz_mod_ui(erg, (int_number) from, nr2mModul);
+  mpz_mod_ui(erg, (int_number) from, currRing->nr2mModul );
   number r = (number) mpz_get_ui(erg);
 
   mpz_clear(erg);
@@ -505,16 +505,16 @@ void nr2mSetExp(int m, const ring r)
   if (m>1)
   {
     nr2mExp = m;
-    nr2mModul = 2;
+    r->nr2mModul  = 2;
     for (int i = 1; i < m; i++)
     {
-      nr2mModul = nr2mModul * 2;
+      r->nr2mModul  = r->nr2mModul  * 2;
     }
   }
   else
   {
     nr2mExp=2;
-    nr2mModul=4;
+    r->nr2mModul =4;
   }
 }
 
@@ -527,7 +527,7 @@ void nr2mInitExp(int m, const ring r)
 #ifdef LDEBUG
 BOOLEAN nr2mDBTest (number a, const char *f, const int l)
 {
-  if (((NATNUMBER)a<0) || ((NATNUMBER)a>nr2mModul))
+  if (((NATNUMBER)a<0) || ((NATNUMBER)a>currRing->nr2mModul ))
   {
     return FALSE;
   }
@@ -537,7 +537,9 @@ BOOLEAN nr2mDBTest (number a, const char *f, const int l)
 
 void nr2mWrite (number &a)
 {
-  if ((NATNUMBER)a > (nr2mModul >>1)) StringAppend("-%d",(int)(nr2mModul-((NATNUMBER)a)));
+  ring r=currRing;
+  if ((NATNUMBER)a > (r->nr2mModul  >>1))
+     StringAppend("-%d",(int)(r->nr2mModul -((NATNUMBER)a)));
   else                          StringAppend("%d",(int)((NATNUMBER)a));
 }
 
@@ -551,10 +553,10 @@ static const char* nr2mEati(const char *s, int *i)
     {
       (*i) *= 10;
       (*i) += *s++ - '0';
-      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % nr2mModul;
+      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % currRing->nr2mModul ;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    if ((*i) >= nr2mModul) (*i) = (*i) % nr2mModul;
+    (*i) = (*i) % currRing->nr2mModul ;
   }
   else (*i) = 1;
   return s;
