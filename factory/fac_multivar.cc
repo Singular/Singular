@@ -269,25 +269,20 @@ static CFArray ZFactorizeMulti ( const CanonicalForm & arg )
           int p=cf_getSmallPrime(i);
           //printf("found:p=%d (%d)\n",p,i);
           if (p==0)
-          { 
-	    printf("out of primes - switch ot non-NTL\n");
-	    // non-NTL stuff
-             b = coeffBound( U, getZFacModulus().getp() );
-             if ( getZFacModulus().getpk() > b.getpk() )
-                b = getZFacModulus();
+          {
+            return conv_to_factor_array(CFFactor(arg,1));
+            //printf("out of primes - switch ot non-NTL\n");
           }
-	  else if (((i==0)||(i!=prime_number)))
+          else if (((i==0)||(i!=prime_number)))
           {
             b = coeffBound( U, p );
             prime_number=i;
           }
-	  if (p!=0)
-	  {
-            modpk bb=coeffBound(U0,p);
-            if (bb.getk() > b.getk() ) b=bb;
-            bb=coeffBound(arg,p);
-            if (bb.getk() > b.getk() ) b=bb;
-	  }
+          // p!=0:
+          modpk bb=coeffBound(U0,p);
+          if (bb.getk() > b.getk() ) b=bb;
+          bb=coeffBound(arg,p);
+          if (bb.getk() > b.getk() ) b=bb;
         }
         #else
         b = coeffBound( U, getZFacModulus().getp() );
@@ -408,7 +403,6 @@ CFFList ZFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
 
 static CFArray FpFactorizeMulti ( const CanonicalForm & arg )
 {
-    out_cf("FpFactorizeMulti:",arg,"\n");
     DEBINCLEVEL( cerr, "FpFactorizeMulti" );
     CFMap M;
     CanonicalForm UU, U = compress( arg, M );
@@ -432,7 +426,6 @@ static CFArray FpFactorizeMulti ( const CanonicalForm & arg )
     DEBOUTLN( cerr, "which is factorized as " << F );
 
     maxdeg = 0;
-    out_cf("try:",U,"\n");
     for ( i = 2; i <= t; i++ )
     {
         j = U.degree( Variable( i ) );
@@ -463,7 +456,6 @@ static CFArray FpFactorizeMulti ( const CanonicalForm & arg )
     {
         TIMING_START(fac_findeval);
         findEvaluation( U, V, omega, F, A, U0, delta, D, r );
-        out_cf("univ.U0:",U0,"\n");
         TIMING_END(fac_findeval);
         DEBOUTLN( cerr, "the evaluation point to reduce to an univariate problem is " << A );
         DEBOUTLN( cerr, "corresponding delta = " << delta );
@@ -512,11 +504,8 @@ CFFList FpFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
     else
         F = sqrFree( f );
 
-    printf("nach sqrFree:\n");
-    out_cff(F);
     for ( i = F; i.hasItem(); i++ )
     {
-        out_cf("consider:",i.getItem().factor(),"\n");
         if ( i.getItem().factor().inCoeffDomain() )
         {
             if ( ! i.getItem().factor().isOne() )
@@ -550,9 +539,7 @@ CFFList FpFactorizeMultivariate ( const CanonicalForm & f, bool issqrfree )
                     if ( ! GG[k].isOne() )
                         R.append( CFFactor( M( GG[k] ), n ) );
             }
-            out_cf("try cont:",cont,"\n");
             G = factorize( cont, true );
-            out_cff(G);
             for ( j = G; j.hasItem(); j++ )
                 if ( ! j.getItem().factor().isOne() )
                     R.append( CFFactor( M( j.getItem().factor() ), n ) );

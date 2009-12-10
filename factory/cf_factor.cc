@@ -83,7 +83,7 @@ int find_mvar(const CanonicalForm & f)
   return mv;
 }
 
-#if 1
+#if 0
 //#ifndef NOSTREAMIO
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
 {
