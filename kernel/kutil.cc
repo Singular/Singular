@@ -5985,8 +5985,9 @@ void updateResult(ideal r,ideal Q, kStrategy strat)
     for (l=IDELEMS(r)-1;l>=0;l--)
     {
       if ((r->m[l]!=NULL)
-      && (strat->syzComp>0)
-      && (pGetComp(r->m[l])<=strat->syzComp))
+      //&& (strat->syzComp>0)
+      //&& (pGetComp(r->m[l])<=strat->syzComp)
+      )
       {
         for(q=IDELEMS(Q)-1; q>=0;q--)
         {

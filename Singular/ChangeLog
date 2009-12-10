@@ -1,6 +1,7 @@
 Changes w.r.t 3-1-0-7:
 - adaption to svn
 - new command: farey
+- extended: liftstd (also computes syzygies) (track 174)
 - test for basering over Q for chinrem/farey
 - (some) memory leaks fixed in fast_map (track 183)
 - extgcd via NTL in char 0 (track 107)

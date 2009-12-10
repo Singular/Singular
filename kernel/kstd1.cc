@@ -2081,13 +2081,9 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
     return pCopy(p); /*F+Q=0*/
   }
 
-
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
   strat->ak = si_max(idRankFreeModule(F),pMaxComp(p));
-
-
-
   poly res;
 
   if (pOrdSgn==-1)
@@ -2100,7 +2096,6 @@ poly kNF(ideal F, ideal Q, poly p,int syzComp, int lazyReduce)
   if(pp != p)
     p_Delete(&pp, currRing);
 #endif
-
   return res;
 }
 
@@ -2127,14 +2122,12 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   }
 #endif
 
-
   if ((idIs0(F))&&(Q==NULL))
   {
 #ifdef HAVE_PLURAL
     if(p != pp)
       return pp;
 #endif
-
     return idCopy(p); /*F+Q=0*/
   }
 
@@ -2142,7 +2135,6 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   strat->syzComp = syzComp;
   strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(p));
   strat->ak = si_max(strat->ak,(int)F->rank);
-
 
   if (pOrdSgn==-1)
     res=kNF1(F,Q,pp,strat,lazyReduce);
@@ -2246,12 +2238,10 @@ ideal kInterRedOld (ideal F, ideal Q)
     shdl=res;
   }
   delete(strat);
-
 #ifdef HAVE_PLURAL
   if( tempF != F )
     id_Delete( &tempF, currRing);
 #endif
-
   return shdl;
 }
 // new version
