@@ -540,11 +540,12 @@ ideal idSimpleAdd (ideal h1,ideal h2)
 }
 
 /*2
-* concat h1 and h2
+* insert h2 into h1 (if h2 is not the zero polynomial)
+* return TRUE iff h2 was indeed inserted
 */
-void idInsertPoly (ideal h1,poly h2)
+BOOLEAN idInsertPoly (ideal h1, poly h2)
 {
-  if (h2==NULL) return;
+  if (h2==NULL) return FALSE;
   int j = IDELEMS(h1)-1;
   while ((j >= 0) && (h1->m[j] == NULL)) j--;
   j++;
@@ -554,12 +555,15 @@ void idInsertPoly (ideal h1,poly h2)
     IDELEMS(h1)+=16;
   }
   h1->m[j]=h2;
+  return TRUE;
 }
 
 /*2
-* concat h1 and h2 (if h2 is neither zero nor a generator of h1)
+* insert h2 into h1 (if h2 is neither the zero polynomial
+* nor a generator in h1)
+* return TRUE iff h2 was indeed inserted
 */
-void idInsertPolyNoDuplicates (ideal h1,poly h2)
+BOOLEAN idInsertPolyNoDuplicates (ideal h1, poly h2)
 {
   bool h2FoundInH1 = false;
   int i = 0;
@@ -568,7 +572,8 @@ void idInsertPolyNoDuplicates (ideal h1,poly h2)
     h2FoundInH1 = pEqualPolys(h1->m[i], h2);
     i++;
   }
-  if (!h2FoundInH1) idInsertPoly(h1, h2);
+  if (!h2FoundInH1) return idInsertPoly(h1, h2);
+  else return FALSE;
 }
 
 /*2

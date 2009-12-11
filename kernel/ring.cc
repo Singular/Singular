@@ -765,8 +765,31 @@ int  rIsExtension()
   return rIsExtension( currRing );
 }
 
+int binaryPower (const int a, const int b)
+{
+  /* computes a^b according to the binary representation of b,
+     i.e., a^7 = a^4 * a^2 * a^1. This saves some multiplications. */
+  int result = 1;
+  int factor = a;
+  int bb = b;
+  while (bb != 0)
+  {
+    if (bb % 2 != 0) result = result * factor;
+    bb = bb / 2;
+    factor = factor * factor;
+  }
+  return result;
+}
+
 int rChar(ring r)
 {
+  if (rField_is_Ring_2toM(r))
+    return binaryPower(2, (int)(unsigned long)r->ringflagb);
+  if (rField_is_Ring_ModN(r))
+    return (int)mpz_get_ui(r->ringflaga);
+  if (rField_is_Ring_PtoM(r))
+    return binaryPower((int)mpz_get_ui(r->ringflaga),
+                       (int)(unsigned long)r->ringflagb);
   if (rField_is_numeric(r))
     return 0;
   if (!rIsExtension(r)) /* Q, Fp */
