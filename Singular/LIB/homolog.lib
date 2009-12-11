@@ -1904,7 +1904,7 @@ EXAMPLE: example canonMap; shows an example
       module Ke=modulo(transpose(K),transpose(G[c]));
       module Co=modulo(syz(transpose(G[c+1])),transpose(K)+transpose(G[c]));
    }
-   return(list(prune(Ke),prune(modulo(Ke,M)),prune(Co)));
+   return(list(Ke,prune(modulo(Ke,M)),prune(Co)));
 
 }
 example

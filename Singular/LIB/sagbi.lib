@@ -537,7 +537,7 @@ EXAMPLE: example sagbi; show example "
     oldS=S;
     S=S+Red;
   }
-  return(S);
+  return(interreduced(S));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -545,6 +545,23 @@ example
  ideal I=x2,y2,xy+y;
  sagbi(I,1,1);
 }
+
+proc interreduced(ideal I)
+{
+  ideal J,B;
+  int i,j,k;
+  poly f;
+  for(k=1;k<=ncols(I);k++)
+  {
+    f=I[k];
+    I[k]=0;
+    f=sagbiNF(f,I,1);
+    I[k]=f;
+  }
+  I=simplify(I,2);
+  return(I);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 proc sagbiPart(id,int k,int c,list #)
 "USAGE: sagbiPart(id,k,c[,n]); id ideal, k, c and n positive integers
