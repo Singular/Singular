@@ -354,11 +354,11 @@ example
   ideal I = f,g;
   ideal II = involution(I,F);
   II;
-  I - involution(II,F);
+  matrix(I) - involution(II,F);
   module M  = [f,g,0],[g,0,x^2*d];
   module IM = involution(M,F);
   print(IM);
-  print(M - involution(IM,F));
+  print(matrix(M) - involution(IM,F));
 }
 ///////////////////////////////////////////////////////////////////////////////////
 static proc new_var()

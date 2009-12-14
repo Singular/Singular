@@ -5143,7 +5143,7 @@ EXAMPLE: example minIntRoot; shows examples
     // the result comes from "factorize"
     P = normalize(P); // now leadcoef = 1
     // TODO: hunt for units and kill then !!!
-    P = lead(P)-P;
+    P = matrix(lead(P))-P;
     // nP = leadcoef(P[i]-lead(P[i])); // for 1 var only, extract the coeff
   }
   else

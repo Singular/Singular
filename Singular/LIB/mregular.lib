@@ -1299,7 +1299,7 @@ EXAMPLE: example regMonCurve; shows some examples
       }
    m=subst(maxideal(1),s,0);
    m=simplify(subst(m,t,0),2);
-   i=m-param;
+   i=matrix(m)-matrix(param);
    ttime=rtimer;
    i=eliminate(i,st);
    ring r=0,(x(1..n),x(0)),dp;

@@ -397,7 +397,7 @@ Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
    int ii, kk;
    ideal k1, k2, lin2;
    int l = ncols(lin);                  // lin=i after applying elimlinearpart
-   ideal lin1 = jet(lin,1)-jet(lin,0);  // part of pure degree 1
+   ideal lin1 = ideal(matrix(jet(lin,1))-matrix(jet(lin,0)));  // part of pure degree 1
    //Note: If i,i1,i2 are ideals, then i = i1 - i2 is equivalent to
    //i = ideal(matrix(i1) - matrix(i2))
 
@@ -409,7 +409,7 @@ Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
    //-------- check candidates for direct substitution of variables ----------
    //since lin1 != 0 there are candidates for substituting variables
 
-   lin2 = lin - lin1;      //difference as matrix
+   lin2 = matrix(lin) - matrix(lin1);      //difference as matrix
    // rest of lin, part of pure degree 1 substracted from each generator of lin
 
    for( ii=1; ii<=l; ii++ )
@@ -1026,7 +1026,7 @@ example
            14x + 10y + 6z - 7u,
             7x +  4y + 3z - 3u;
    ideal j= 2,1,0,3;
-   j = i-j;                        // difference of 1x4 matrices
+   j = matrix(i)-matrix(j);        // difference of 1x4 matrices
                                    // compute reduced triangular form, setting
    solvelinearpart(j);             // the RHS equal 0 gives the solutions!
    solvelinearpart(j,1); "";       // triangular form, not reduced

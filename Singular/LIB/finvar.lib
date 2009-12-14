@@ -7767,7 +7767,7 @@ EXAMPLE:  example rel_orbit_variety; shows an example.
     vars=vars,y(1..m);
     map emb=newring,vars;
     ideal G=emb(J);
-    J=J-G;
+    J=matrix(J)-G;
     for (i=1;i<=ncols(G);i++)
     { if (J[i]<>0)
       { G[i]=0;
@@ -7868,7 +7868,7 @@ EXAMPLE: example relative_orbit_variety; shows an example
     vars=vars,y(1..m);
     map emb=R,vars;
     ideal G=emb(J);
-    J=J-G;
+    J=matrix(J)-G;
     for (i=1;i<=ncols(G);i++)
     { if (J[i]<>0)
       { G[i]=0;

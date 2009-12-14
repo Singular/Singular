@@ -105,7 +105,7 @@ static proc MyIsEqual(module A, module B)
   int ANSWER = 1;
   if ( ( ncols(A) == ncols(B) ) && ( nrows(A) == nrows(B) ) )
   {
-    module @AB = A-B;
+    module @AB = module(matrix(A)-matrix(B));
     @AB = simplify(@AB,2);
     if (@AB[1]!=0) { ANSWER = 0; }
   }

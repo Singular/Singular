@@ -580,7 +580,7 @@ EXAMPLE: example DLoc0; shows examples
     intvec vP;
     number nP;
     P = normalize(P); // now leadcoef = 1
-    P = lead(P)-P;
+    P = ideal(matrix(lead(P))-matrix(P));
     sP = size(P);
     int cnt = 0;
     for (i=1; i<=sP; i++)

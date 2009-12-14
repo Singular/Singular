@@ -1147,7 +1147,7 @@ static proc esComputation (int typ, poly p_F, list #)
     ideal b_appears_in(i);            // Eintraege sind spaeter 1 oder 0
     intmat b_app_in(i)[1][ncJ];       // Eintraege sind spaeter 1 oder 0
     b_appears_in(i)[ncJ]=0;
-    J_Tmp = J-subst(J,b(i),0);
+    J_Tmp = matrix(J)-subst(J,b(i),0);
     for (Z=1; Z<=ncJ; Z++) {
       if (J_Tmp[Z]<>0) {      // b(i) appear in J_Tmp[Z]
         b_appears_in(i)[Z]=1;

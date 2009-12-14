@@ -104,7 +104,7 @@ example
    string s=lprint(m); s;"";
    execute("matrix M[2][2]="+s+";");      //use the string s as input
    module m1 = transpose(M);              //should be the same as m
-   print(m-m1);
+   print(matrix(m)-matrix(m1));
 }
 ///////////////////////////////////////////////////////////////////////////////
 

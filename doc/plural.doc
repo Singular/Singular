@@ -846,9 +846,8 @@ D[1,2]=-z;  D[1,3]=y;  D[2,3]=x;  // this algebra is U(so_3)
 def B=nc_algebra(1,D);
 setring B;
 module M = [x,y],[0,0,x*z];
-module N = (x+y-z)*M - M*(x+y-z);
-print(-N);  // implicit conversion into a matrix
-typeof(-N);
+module N = matrix((x+y-z)*M) - matrix(M*(x+y-z)); // no - for type module
+print(N);
 @c example
 @end smallexample
 
@@ -2008,7 +2007,7 @@ j;
 matrix T = lift(i,j);
 print(T);
 ideal tj = ideal(transpose(T)*transpose(matrix(i)));
-size(ideal(j-tj)); // test
+size(ideal(matrix(j)-matrix(tj))); // test for 0
 @c example
 @end smallexample
 @end table
@@ -2053,7 +2052,7 @@ ideal j = liftstd(i,T);
 print(matrix(j));
 print(T);  // the transformation matrix
 ideal tj = ideal(transpose(T)*transpose(matrix(i)));
-size(ideal(j-tj)); // test
+size(ideal(matrix(j)-matrix(tj))); // test for 0
 @c example
 @end smallexample
 @end table
@@ -2551,11 +2550,11 @@ module MM = oppose(r,mm);
 def c = opposite(b);
 setring c;   // now let's check the correctness:
 // print compact presentations of objects
-print(matrix(oppose(b,P)-imap(r,p)));
-print(matrix(oppose(b,V)-imap(r,v)));
-print(matrix(oppose(b,I)-imap(r,i)));
-print(matrix(oppose(b,M)-imap(r,m)));
-print(matrix(oppose(b,MM)-imap(r,mm)));
+print(oppose(b,P)-imap(r,p));
+print(oppose(b,V)-imap(r,v));
+print(matrix(oppose(b,I))-imap(r,i));
+print(matrix(oppose(b,M))-imap(r,m));
+print(matrix(oppose(b,MM))-imap(r,mm));
 @c example
 @end smallexample
 @end table

@@ -464,7 +464,7 @@ example
   list l = linReduceIdeal(I,1); // reduces tails and shows reductions used
   l;
   module M = I;
-  l[1] - ideal(M*l[2]);
+  matrix(l[1]) - M*l[2];
 }
 
 proc linReduce(poly f, ideal I, list #)

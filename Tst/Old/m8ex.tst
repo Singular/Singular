@@ -38,7 +38,7 @@
   ideal T = x,y;
   ideal J = jac*transpose(T);
   ideal H = M[5..9];
-  ideal i = H-J;         // this is tricky: difference between two
+  ideal i = matrix(H)-J;         // this is tricky: difference between two
                          // ideals is not defined, but between two
                          // matrices. By automatic type conversion
                          // the ideals are converted to matrices,

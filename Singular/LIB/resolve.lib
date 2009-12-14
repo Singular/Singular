@@ -1158,7 +1158,7 @@ EXAMPLE: example blowUpBO;  shows an example
            for(l=1;l<=size(BO[4]);l++)
            {
               if(BO[6][l]==1){l++;continue;}
-              if(size(ideal(reduce(BO[4][l],H)-BO[4][l]))==0)
+              if(size(ideal(matrix(reduce(BO[4][l],H))-BO[4][l]))==0)
               {
 //!!! need further cleanup:
 //!!! this part of the code is no longer used since it did not glue properly

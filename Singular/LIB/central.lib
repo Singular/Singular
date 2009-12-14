@@ -270,7 +270,7 @@ PURPOSE: smooths the ideal in a current QUOTIENT(!) ring.
 {
   /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "smoothQideal", I ); }; /*4DEBUG*/
 
-  ideal A = I - NF( I, twostd(DefaultIdeal(#)), 1 ); // component wise
+  ideal A = matrix(I) - matrix(NF( I, twostd(DefaultIdeal(#)), 1 )); // component wise
 
   if( size(A) > 0 ) // Were there any changes (any non-zero component)?
     {

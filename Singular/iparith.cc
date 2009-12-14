@@ -3333,6 +3333,8 @@ struct sValCmd2 dArith2[]=
 ,{jjOP_IM_I,   '-',            INTMAT_CMD,     INTMAT_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjMINUS_IV,  '-',            INTVEC_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjMINUS_IV,  '-',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{jjWRONG2,    '-',            NONE,           IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{jjWRONG2,    '-',            NONE,           MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_I,   '*',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_BI,  '*',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_N,   '*',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
