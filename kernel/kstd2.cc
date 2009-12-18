@@ -1192,14 +1192,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
         enterpairs(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl);
       // posInS only depends on the leading term
-      if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
-      {
       strat->enterS(strat->P, pos, strat, strat->tl);
-      }
-      else
-      {
-      //  strat->P.Delete(); // syzComp test: it is in T
-      }
 #if 0
       int pl=pLength(strat->P.p);
       if (pl==1)
@@ -1711,14 +1704,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
       enterpairsShift(strat->P.p,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       //      enterpairsShift(vw,strat->sl,strat->P.ecart,pos,strat, strat->tl,uptodeg,lV);
       // posInS only depends on the leading term
-      if ((!TEST_OPT_IDLIFT) || (pGetComp(strat->P.p) <= strat->syzComp))
-      {
-        strat->enterS(strat->P, pos, strat, strat->tl);
-      }
-      else
-      {
-      //  strat->P.Delete(); // syzComp test: it is in T
-      }
+      strat->enterS(strat->P, pos, strat, strat->tl);
 
       if (hilb!=NULL) khCheck(Q,w,hilb,hilbeledeg,hilbcount,strat);
 //      Print("[%d]",hilbeledeg);

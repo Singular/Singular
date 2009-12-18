@@ -716,11 +716,8 @@ void pDeleteComp(poly * p,int k)
 BOOLEAN pHasNotCF(poly p1, poly p2)
 {
 
-  if (!TEST_OPT_IDLIFT)
-  {
-    if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
-      return FALSE;
-  }
+  if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
+    return FALSE;
   int i = pVariables;
   loop
   {
