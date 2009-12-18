@@ -193,6 +193,19 @@ void idSkipZeroes (ideal ide)
 }
 
 /*2
+* copies the first k (>= 1) entries of the given ideal
+* and returns these as a new ideal
+* (Note that the copied polynomials may be zero.)
+*/
+ideal idCopyFirstK (const ideal ide, const int k)
+{
+  ideal newI = idInit(k, 0);
+  for (int i = 0; i < k; i++)
+    newI->m[i] = pCopy(ide->m[i]);
+  return newI;
+}
+
+/*2
 * ideal id = (id[i])
 * result is leadcoeff(id[i]) = 1
 */
@@ -559,21 +572,34 @@ BOOLEAN idInsertPoly (ideal h1, poly h2)
 }
 
 /*2
-* insert h2 into h1 (if h2 is neither the zero polynomial
-* nor a generator in h1)
+* insert h2 into h1 depending on the two boolean parameters:
+* - if zeroOk is true, then h2 will also be inserted when it is zero
+* - if duplicateOk is true, then h2 will also be inserted when it is
+*   already present in h1
 * return TRUE iff h2 was indeed inserted
 */
-BOOLEAN idInsertPolyNoDuplicates (ideal h1, poly h2)
+BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries,
+  const poly h2, const bool zeroOk, const bool duplicateOk)
 {
-  bool h2FoundInH1 = false;
-  int i = 0;
-  while ((i < IDELEMS(h1)) && (!h2FoundInH1))
+  if ((!zeroOk) && (h2 == NULL)) return FALSE;
+  if (!duplicateOk)
   {
-    h2FoundInH1 = pEqualPolys(h1->m[i], h2);
-    i++;
+    bool h2FoundInH1 = false;
+    int i = 0;
+    while ((i < validEntries) && (!h2FoundInH1))
+    {
+      h2FoundInH1 = pEqualPolys(h1->m[i], h2);
+      i++;
+    }
+    if (h2FoundInH1) return FALSE;
   }
-  if (!h2FoundInH1) return idInsertPoly(h1, h2);
-  else return FALSE;
+  if (validEntries == IDELEMS(h1))
+  {
+    pEnlargeSet(&(h1->m), IDELEMS(h1), 16);
+    IDELEMS(h1) += 16;
+  }
+  h1->m[validEntries] = h2;
+  return TRUE;
 }
 
 /*2

@@ -11,10 +11,12 @@
 
 #ifdef PDEBUG
 ideal idDBInit (int size, int rank, const char *f, int l);
+ideal idCopyFirstK (const ideal ide, const int k);
 #define idInit(A,B) idDBInit(A,B,__FILE__,__LINE__)
 #else
 /*- creates an ideal -*/
 ideal idInit (int size, int rank=1);
+ideal idCopyFirstK (const ideal ide, const int k);
 #endif
 /*- deletes an ideal -*/
 #define idDelete(h) id_Delete(h, currRing)
@@ -55,7 +57,8 @@ ideal idAdd (ideal h1,ideal h2);
   /* h1 + h2 */
 BOOLEAN idInsertPoly (ideal h1,poly h2);
   /* h1 + h2 */
-BOOLEAN idInsertPolyNoDuplicates (ideal h1,poly h2);
+BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries,
+  const poly h2, const bool zeroOk, const bool duplicateOk);
   /* h1 + h2 */
 ideal idMult (ideal h1,ideal h2);
   /*hh := h1 * h2*/
