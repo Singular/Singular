@@ -807,6 +807,8 @@ COMPUTE: consider the Hilbert series iv1(t) of id1 and iv2(t) of id2.
 EXAMPLE: example codim; shows an example
 "
 {
+   if (typeof(attrib(id1,"isSB"))!="int") { "first argument of codim is not a SB";}
+   if (typeof(attrib(id2,"isSB"))!="int") { "second argument of codim is not a SB";}
    intvec iv1, iv2, iv;
    int i, d1, d2, dd, i1, i2, ia, ie;
   //--------------------------- check id2 < id1 -------------------------------
