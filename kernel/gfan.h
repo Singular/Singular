@@ -140,6 +140,10 @@ class gcone
 		static float time_getConeNormals;
 		static float time_getCodim2Normals;
 		static float time_flip;
+		static float t_ffG;
+		static float t_markings;
+		static float t_dd;
+		static float t_kStd;
 		static float time_enqueue;		
 		static float time_computeInv;
 		static float t_ddMC;
@@ -203,7 +207,9 @@ class gcone
 // 		poly restOfDiv(poly const &f, ideal const &I); removed with r12286
 		inline ideal ffG(const ideal &H, const ideal &G);
 		inline void getGB(ideal const &inputIdeal);		
-		inline void interiorPoint(const dd_MatrixPtr &M, intvec &iv);
+		inline void interiorPoint( dd_MatrixPtr &M, intvec &iv);
+		inline void interiorPoint2(const dd_MatrixPtr &M, intvec &iv);
+		inline void preprocessInequalities(dd_MatrixPtr &M);
 		ring rCopyAndAddWeight(const ring &r, const intvec *ivw);
 		ring rCopyAndChangeWeight(const ring &r, intvec *ivw);		
 // 		void reverseSearch(gcone *gcAct); //NOTE both removed from r12286

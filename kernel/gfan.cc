@@ -15,7 +15,8 @@ $Id$
 // #include "intvec.h"
 #include "polys.h"
 #include "ideals.h"
-// #include "kmatrix.h"
+#include "kmatrix.h"
+#include "GMPrat.h"
 //#include "fast_maps.h"	//Mapping of ideals
 // #include "maps.h"
 // #include "ring.h"	//apparently not needed
@@ -777,6 +778,59 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		offset++;
 	}
 	free(redRowsArray);
+	/*And now for the strictly positive rows
+	* Doesn't gain significant speedup
+	*/
+	/*int *posRowsArray=NULL;
+	num_alloc=0;
+	num_elts=0;
+	for(int ii=0;ii<ddineq->rowsize;ii++)
+	{
+		intvec *ivPos = new intvec(this->numVars);
+		for(int jj=0;jj<this->numVars;jj++)
+			(*ivPos)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
+		bool isStrictlyPos=FALSE;
+		int posCtr=0;		
+		for(int jj=0;jj<this->numVars;jj++)
+		{
+			intvec *ivCanonical = new intvec(this->numVars);
+			jj==0 ? (*ivCanonical)[ivPos->length()-1]=1 : (*ivCanonical)[jj-1]=1;
+			if(dotProduct(*ivCanonical,*ivPos)!=0)
+			{
+				if ((*ivPos)[jj]>=0)
+				{				
+					posCtr++;				
+				}
+			}			
+			delete ivCanonical;
+		}
+		if(posCtr==ivPos->length())
+			isStrictlyPos=TRUE;
+		if(isStrictlyPos==TRUE)
+		{
+			if(num_alloc==0)
+				num_alloc += 1;
+			else
+				num_alloc += 1;
+			void *tmp = realloc(posRowsArray,(num_alloc*sizeof(int)));
+			if(!tmp)
+			{
+				WerrorS("Woah dude! Couldn't realloc memory\n");
+				exit(-1);
+			}
+			posRowsArray = (int*)tmp;
+			posRowsArray[num_elts]=ii;
+			num_elts++;	
+		}
+		delete ivPos;
+	}
+	offset=0;
+	for(int ii=0;ii<num_elts;ii++)
+	{
+		dd_MatrixRowRemove(&ddineq,posRowsArray[ii]+1-offset);
+		offset++;
+	}
+	free(posRowsArray);*/
 #endif
 
 	dd_MatrixCanonicalize(&ddineq, &ddlinset, &ddredrows, &ddnewpos, &dderr);
@@ -941,7 +995,7 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		timeval t_ddMC_start, t_ddMC_end;
 		gettimeofday(&t_ddMC_start,0);
 #endif				
-		dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);
+ 		/*dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);*/
 //  		set_copy(LL,ddakt->linset);
 		dd_PolyhedraPtr ddpolyh;
 		ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
@@ -951,11 +1005,11 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 #ifdef gfanp
 		gettimeofday(&t_ddMC_end,0);
 		t_ddMC += (t_ddMC_end.tv_sec - t_ddMC_start.tv_sec + 1e-6*(t_ddMC_end.tv_usec - t_ddMC_start.tv_usec));
-#endif				
+#endif	
 		/* We loop through each row of P normalize it by making all
 		* entries integer ones and add the resulting vector to the
 		* int matrix facet::codim2Facets */
-		for (int jj=1;jj<=P->rowsize;jj++)
+		for (int jj=1;jj<=/*ddakt*/P->rowsize;jj++)
 		{					
 			fAct->numCodim2Facets++;
 			if(fAct->numCodim2Facets==1)					
@@ -974,6 +1028,12 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 			gettimeofday(&t_mI_start,0);
 #endif
 			makeInt(P,jj,*n);
+			/*for(int kk=0;kk<this->numVars;kk++)
+			{
+				int foo;
+				foo = (int)mpq_get_d(ddakt->matrix[ii][kk+1]);
+				(*n)[kk]=foo;
+			}*/
 #ifdef gfanp
 			gettimeofday(&t_mI_end,0);
 			t_mI += (t_mI_end.tv_sec - t_mI_start.tv_sec + 1e-6*(t_mI_end.tv_usec - t_mI_start.tv_usec));
@@ -983,7 +1043,8 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		}		
 		/*We check whether the facet spanned by the codim-2 facets
 		* intersects with the positive orthant. Otherwise we define this
-		* facet to be non-flippable
+		* facet to be non-flippable. Works since we set the appropriate 
+		* linearity for ddakt above.
 		*/
 		intvec *iv_intPoint = new intvec(this->numVars);
 		dd_MatrixPtr shiftMatrix;
@@ -1000,6 +1061,10 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		gettimeofday(&t_iP_start, 0);
 #endif		
 		interiorPoint(intPointMatrix,*iv_intPoint);
+// 		dd_rowset impl_linste,lbasis;
+// 		dd_LPSolutionPtr lps=NULL;
+// 		dd_ErrorType err;
+// 		dd_FindRelativeInterior(intPointMatrix, &impl_linset, &lbasis, &lps, &err);
 #ifdef gfanp
 		gettimeofday(&t_iP_end, 0);
 		t_iP += (t_iP_end.tv_sec - t_iP_start.tv_sec + 1e-6*(t_iP_end.tv_usec - t_iP_start.tv_usec));
@@ -1019,9 +1084,9 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		dd_FreeMatrix(intPointMatrix);		
 		delete iv_intPoint;
 		dd_FreeMatrix(P);
-		set_free(impl_linset);
-		set_free(redset);		
-		free(newpos);
+// 		set_free(impl_linset);
+// 		set_free(redset);		
+// 		free(newpos);
 // 		set_free(LL);
 	}//for 	
 	dd_FreeMatrix(ddineq);
@@ -1140,6 +1205,10 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	 * Thus we check whether the leading monomials of srcRing_HH and srcRing_H coincide. If not we 
 	 * compute the difference accordingly
 	*/
+#ifdef gfanp
+	timeval t_markings_start, t_markings_end;
+	gettimeofday(&t_markings_start, 0);
+#endif		
 	bool markingsAreCorrect=FALSE;
 	dd_MatrixPtr intPointMatrix;
 	int iPMatrixRows=0;
@@ -1230,9 +1299,17 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 // 		omFree(v);
 		omFree(leadExpV);
 	}//for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
+#ifdef gfanp
+	gettimeofday(&t_markings_end, 0);
+	t_markings += (t_markings_end.tv_sec - t_markings_start.tv_sec + 1e-6*(t_markings_end.tv_usec - t_markings_start.tv_usec));
+#endif
 	/*Now it is safe to idDelete(H)*/
 	idDelete(&H);
-	/*Now we add the constraint for the standard simplex*/	
+	/*Now we add the constraint for the standard simplex*/
+// #ifdef gfanp
+// 	timeval t_dd_start, t_dd_end;
+// 	gettimeofday(&t_dd_start, 0);
+// #endif
 	dd_set_si(intPointMatrix->matrix[aktrow][0],-1);
 	for (int jj=1;jj<=this->numVars;jj++)
 	{
@@ -1240,6 +1317,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	}
 	//Let's make sure we compute interior points from the positive orthant
 	dd_MatrixPtr posRestr=dd_CreateMatrix(this->numVars,this->numVars+1);
+	
 	int jj=1;
 	for (int ii=0;ii<this->numVars;ii++)
 	{
@@ -1248,10 +1326,48 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	}
 	dd_MatrixAppendTo(&intPointMatrix,posRestr);
 	dd_FreeMatrix(posRestr);
+	/*Insert preprocessing here. If it is before the dd_CreateMatrix things go pear shaped
+	* Otherwise things will go pear shaped if called after the standard simplex constraints are added
+	*/
+	preprocessInequalities(intPointMatrix);
 	intvec *iv_weight = new intvec(this->numVars);
+#ifdef gfanp
+	timeval t_dd_start, t_dd_end;
+	gettimeofday(&t_dd_start, 0);
+#endif
+	dd_ErrorType err;
+	dd_rowset implLin, redrows;
+	dd_rowindex newpos;
+	
+	dd_MatrixCanonicalize(&intPointMatrix,&implLin,&redrows,&newpos,&err);
+// 	dd_MatrixCanonicalizeLinearity(&intPointMatrix,&implLin, &newpos,&err);
+	//dd_MatrixRedundancyRemove is our time sink!
+// 	dd_MatrixRedundancyRemove(&intPointMatrix,&redrows,&newpos,&err);
 	interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
 	dd_FreeMatrix(intPointMatrix);
-			
+	/*Crude attempt for interior point */
+	/*dd_PolyhedraPtr ddpolyh;
+	dd_ErrorType err;
+	dd_rowset impl_linset,redset;
+	dd_rowindex newpos;
+	dd_MatrixCanonicalize(&intPointMatrix, &impl_linset, &redset, &newpos, &err);
+	ddpolyh=dd_DDMatrix2Poly(intPointMatrix, &err);
+	dd_MatrixPtr P;
+	P=dd_CopyGenerators(ddpolyh);
+	dd_FreePolyhedra(ddpolyh);
+	for(int ii=0;ii<P->rowsize;ii++)
+	{
+ 		intvec *iv_row=new intvec(this->numVars);
+		makeInt(P,ii+1,*iv_row);
+		iv_weight =ivAdd(iv_weight, iv_row);
+		delete iv_row;
+	}
+	dd_FreeMatrix(P);
+	dd_FreeMatrix(intPointMatrix);*/
+#ifdef gfanp
+	gettimeofday(&t_dd_end, 0);
+	t_dd += (t_dd_end.tv_sec - t_dd_start.tv_sec + 1e-6*(t_dd_end.tv_usec - t_dd_start.tv_usec));
+#endif			
 	/*Step 3
 	turn the minimal basis into a reduced one
 	*/			
@@ -1412,7 +1528,132 @@ inline ideal gcone::ffG(const ideal &H, const ideal &G)
 	}
 	return res;
 }
-		
+	
+/** \brief Preprocessing of inequlities
+* Do some preprocessing on the matrix of inequalities
+* 1) Replace several constraints on the pos. orthants by just one for each orthant
+* 2) Remove duplicates of inequalities
+* 3) Remove inequalities that arise as sums of other inequalities
+*/
+void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
+{
+//Remove strictly positive rows
+// 	int *posRowsArray=NULL;
+// 	int num_alloc=0;
+// 	int num_elts=0;
+// 	for(int ii=0;ii<ddineq->rowsize;ii++)
+// 	{
+// 		intvec *ivPos = new intvec(pVariables);
+// 		for(int jj=0;jj<pVariables;jj++)
+// 			(*ivPos)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
+// 		bool isStrictlyPos=FALSE;
+// 		int posCtr=0;		
+// 		for(int jj=0;jj<pVariables;jj++)
+// 		{
+// 			intvec *ivCanonical = new intvec(pVariables);
+// 			jj==0 ? (*ivCanonical)[ivPos->length()-1]=1 : (*ivCanonical)[jj-1]=1;
+// 			if(dotProduct(*ivCanonical,*ivPos)!=0)
+// 			{
+// 				if ((*ivPos)[jj]>=0)
+// 				{				
+// 					posCtr++;				
+// 				}
+// 			}			
+// 			delete ivCanonical;
+// 		}
+// 		if(posCtr==ivPos->length())
+// 			isStrictlyPos=TRUE;
+// 		if(isStrictlyPos==TRUE)
+// 		{
+// 			if(num_alloc==0)
+// 				num_alloc += 1;
+// 			else
+// 				num_alloc += 1;
+// 			void *tmp = realloc(posRowsArray,(num_alloc*sizeof(int)));
+// 			if(!tmp)
+// 			{
+// 				WerrorS("Woah dude! Couldn't realloc memory\n");
+// 				exit(-1);
+// 			}
+// 			posRowsArray = (int*)tmp;
+// 			posRowsArray[num_elts]=ii;
+// 			num_elts++;	
+// 		}
+// 		delete ivPos;
+// 	}
+ 	int offset=0;
+// 	for(int ii=0;ii<num_elts;ii++)
+// 	{
+// 		dd_MatrixRowRemove(&ddineq,posRowsArray[ii]+1-offset);
+// 		offset++;
+// 	}
+// 	free(posRowsArray);
+	//Remove zeroes
+	int rowsize=ddineq->rowsize;
+	for(int ii=0;ii<ddineq->rowsize;ii++)
+	{
+		intvec *iv = new intvec(this->numVars);
+		int posCtr=0;
+		for(int jj=0;jj<this->numVars;jj++)
+		{
+			(*iv)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
+			if((*iv)[ii]>0)
+				posCtr++;
+		}
+		if( (iv->compare(0)==0)) //|| (posCtr==iv->length()) )
+		{
+			dd_MatrixRowRemove(&ddineq,ii+1);
+			ii--;		
+// 			rowsize=ddineq->rowsize;
+		}
+		delete iv;
+	}
+	//Remove duplicates of rows
+// 	posRowsArray=NULL;
+// 	num_alloc=0;
+// 	num_elts=0;
+// 	offset=0;
+// 	int num_newRows = ddineq->rowsize;
+// 	for(int ii=0;ii<ddineq->rowsize-1;ii++)
+// 	for(int ii=0;ii<num_newRows-1;ii++)
+// 	{
+// 		intvec *iv = new intvec(this->numVars);//1st vector to check against
+// 		for(int jj=0;jj<this->numVars;jj++)
+// 			(*iv)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
+// 		for(int jj=ii+1;jj</*ddineq->rowsize*/num_newRows;jj++)
+// 		{
+// 			intvec *ivCheck = new intvec(this->numVars);//Checked against iv
+// 			for(int kk=0;kk<this->numVars;kk++)
+// 				(*ivCheck)[kk]=(int)mpq_get_d(ddineq->matrix[jj][kk+1]);
+// 			if (iv->compare(ivCheck)==0)
+// 			{
+// // 				cout << "=" << endl;
+// // 				num_alloc++;
+// // 				void *tmp=realloc(posRowsArray,(num_alloc*sizeof(int)));
+// // 				if(!tmp)
+// // 				{
+// // 					WerrorS("Woah dude! Couldn't realloc memory\n");
+// // 					exit(-1);
+// // 				}
+// // 				posRowsArray = (int*)tmp;
+// // 				posRowsArray[num_elts]=jj;
+// // 				num_elts++;
+// 				dd_MatrixRowRemove(&ddineq,jj+1);
+// 				num_newRows = ddineq->rowsize;
+// 			}
+// 			delete ivCheck;
+// 		}
+// 		delete iv;
+// 	}
+// 	for(int ii=0;ii<num_elts;ii++)
+// 	{
+// 		dd_MatrixRowRemove(&ddineq,posRowsArray[ii]+1-offset);
+// 		offset++;
+// 	}
+// 	free(posRowsArray);
+	//Apply Thm 2.1 of JOTA Vol 53 No 1 April 1987*/	
+}//preprocessInequalities
+	
 /** \brief Compute a Groebner Basis
  *
  * Computes the Groebner basis and stores the result in gcone::gcBasis
@@ -1483,30 +1724,35 @@ inline bool gcone::isParallel(const intvec &a, const intvec &b)
  * Result will be written into intvec iv. 
  * Any rational point is automatically converted into an integer.
  */
-inline void gcone::interiorPoint(const dd_MatrixPtr &M, intvec &iv) //no const &M here since we want to remove redundant rows
+inline void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M here since we want to remove redundant rows
 {
 	dd_LPPtr lp,lpInt;
 	dd_ErrorType err=dd_NoError;
 	dd_LPSolverType solver=dd_DualSimplex;
 	dd_LPSolutionPtr lpSol=NULL;
 	dd_rowset ddlinset,ddredrows;	//needed for dd_FindRelativeInterior
-// 	dd_rowindex ddnewpos;
+ 	dd_rowindex ddnewpos;
 	dd_NumberType numb;	
-			//M->representation=dd_Inequality;
-			//M->objective-dd_LPMin;  //Not sure whether this is needed
+	//M->representation=dd_Inequality;
 			
-			//NOTE: Make this n-dimensional!
-			//dd_set_si(M->rowvec[0],1);dd_set_si(M->rowvec[1],1);dd_set_si(M->rowvec[2],1);
+	//NOTE: Make this n-dimensional!
+	//dd_set_si(M->rowvec[0],1);dd_set_si(M->rowvec[1],1);dd_set_si(M->rowvec[2],1);
 									
-			/*NOTE: Leave the following line commented out!
-	* Otherwise it will cause interior points that are not strictly positive on some examples
-	* 
-			*/
-			//dd_MatrixCanonicalize(&M, &ddlinset, &ddredrows, &ddnewpos, &err);
-			//if (err!=dd_NoError){cout << "Error during dd_MatrixCanonicalize" << endl;}
-			//cout << "Tick 2" << endl;
-			//dd_WriteMatrix(stdout,M);
-			
+	/*NOTE: Leave the following line commented out!
+	* Otherwise it will slow down computations a great deal
+	* */
+// 	dd_MatrixCanonicalizeLinearity(&M, &ddlinset, &ddnewpos, &err);
+	//if (err!=dd_NoError){cout << "Error during dd_MatrixCanonicalize" << endl;}
+	dd_MatrixPtr posRestr=dd_CreateMatrix(this->numVars,this->numVars+1);
+	int jj=1;
+	for (int ii=0;ii<this->numVars;ii++)
+	{
+		dd_set_si(posRestr->matrix[ii][jj],1);
+		jj++;							
+	}
+	dd_MatrixAppendTo(&M,posRestr);
+	dd_FreeMatrix(posRestr);
+// 	dd_MatrixCanonicalizeLinearity(&M, &ddlinset, &ddnewpos, &err);
 	lp=dd_Matrix2LP(M, &err);
 	if (err!=dd_NoError){WerrorS("Error during dd_Matrix2LP in gcone::interiorPoint");}
 	if (lp==NULL){WerrorS("LP is NULL");}
@@ -1520,18 +1766,18 @@ inline void gcone::interiorPoint(const dd_MatrixPtr &M, intvec &iv) //no const &
 // 			dd_WriteLP(stdout,lpInt);
 #endif			
 
-	dd_FindRelativeInterior(M,&ddlinset,&ddredrows,&lpSol,&err);
+// 	dd_FindRelativeInterior(M,&ddlinset,&ddredrows,&lpSol,&err);
 	if (err!=dd_NoError)
 	{
 		WerrorS("Error during dd_FindRelativeInterior in gcone::interiorPoint");
 		dd_WriteErrorMessages(stdout, err);
 	}
 			
-			//dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
-	if (err!=dd_NoError){WerrorS("Error during dd_LPSolve");}
+	dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
+// 	if (err!=dd_NoError){WerrorS("Error during dd_LPSolve");}
 									
-			//lpSol=dd_CopyLPSolution(lpInt);
-	if (err!=dd_NoError){WerrorS("Error during dd_CopyLPSolution");}
+	lpSol=dd_CopyLPSolution(lpInt);
+// 	if (err!=dd_NoError){WerrorS("Error during dd_CopyLPSolution");}
 #ifdef gfan_DEBUG
 	cout << "Interior point: ";
 	for (int ii=1; ii<(lpSol->d)-1;ii++)
@@ -1577,11 +1823,60 @@ inline void gcone::interiorPoint(const dd_MatrixPtr &M, intvec &iv) //no const &
 	dd_FreeLPSolution(lpSol);
 	dd_FreeLPData(lpInt);
 	dd_FreeLPData(lp);
-	set_free(ddlinset);
-	set_free(ddredrows); 	
+// 	set_free(ddlinset);
+// 	set_free(ddredrows); 	
 			
 }//void interiorPoint(dd_MatrixPtr const &M)
-		
+
+inline void gcone::interiorPoint2(const dd_MatrixPtr &M, intvec &iv)
+{
+	KMatrix<Rational> mMat(M->rowsize+1,M->colsize);
+	for(int ii=0;ii<M->rowsize;ii++)
+	{
+		for(int jj=0;jj<M->colsize-1;jj++)
+		{
+			if(mpq_sgn(M->matrix[ii][jj+1])<-1)
+			{
+				mMat.set(ii,jj,-(Rational)mpq_get_d(M->matrix[ii][jj+1]));
+			}
+			else
+				mMat.set(ii,jj,(Rational)mpq_get_d(M->matrix[ii][jj+1]));
+				
+// 			mMat.set(ii,jj,&(M->matrix[ii][jj+1]) );
+			cout << mpq_get_d(M->matrix[ii][jj+1]) << " ";
+// 			int val=(int)mMat.get(ii,jj);
+// 			cout << ii << "," << jj << endl;;
+// 			mpq_out_str (NULL, 10, (__mpq_struct)mMat.get(ii,jj));
+		}
+		cout << endl;
+		mMat.set(ii,M->colsize-1,1);
+	}
+	dd_WriteMatrix(stdout,M);
+//  	for(int ii=0;ii<M->rowsize;ii++)
+// 	{
+// 		cout << mMat.get(ii,ii+M->colsize) << " ";
+// 		if((ii+M->colsize)%M->colsize==0)
+// 			cout << endl;
+// 	}
+	
+	Rational* mSol;
+	int rank;
+	int c;
+// 	dd_WriteMatrix(stdout,M);
+ 	rank=mMat.solve(&mSol,&c);
+// 	for(int ii=0;ii<c;ii++)	
+// 		iv[ii]=mSol[ii];
+// 		cout << mSol[ii].get_den() << "/" << mSol[ii].get_num() << endl;
+	int gcd=1;
+	for(int ii=0;ii<c-1;ii++)
+		gcd += intgcd(mSol[ii].get_den_si(),mSol[ii+1].get_den_si());
+	cout << gcd << endl;
+	for(int ii=0;ii<iv.length();ii++)
+		iv[ii]=(int)((mSol[ii].get_num_si()*gcd)/mSol[ii].get_den_si());
+
+}
+	
+	
 /** \brief Copy a ring and add a weighted ordering in first place
  * 
  */
@@ -1835,7 +2130,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 // 				}
  				idDelete((ideal*)&gcTmp->gcBasis);//Whonder why?
 				//If you use the following make sure it is uncommented in readConeFromFile
-				//rDelete(gcTmp->baseRing);
+// 				rDelete(gcTmp->baseRing);
  			}			
 #ifdef gfan_DEBUG
 // 			if(SearchListRoot!=NULL)
@@ -1873,8 +2168,11 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 				}
 				else if(gfanHeuristic==1)
 				{
-					//Read st00f from file
+					gcone *gcDel;
+					gcDel = gcAct;					
 					gcAct = gcNext;
+// 					rDelete(gcDel->baseRing);
+					//Read st00f from file
 					//implant the GB into gcAct
 					readConeFromFile(gcAct->getUCN(), gcAct);
 // 					rAct=rCopy(gcAct->baseRing);
@@ -2410,43 +2708,43 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 // 		hasNegCoeff = FALSE;
 		
 		if(line=="RING")
-		{/*
-			getline(gcInputFile,line);
-			found = line.find("a(");
-			line.erase(0,found+2);
-			string strweight;
-			strweight=line.substr(0,line.find_first_of(")"));
-			intvec *iv=new intvec(this->numVars);
-			for(int ii=0;ii<this->numVars;ii++)
-			{
-				string weight;
-				weight=line.substr(0,line.find_first_of(",)"));				
-				(*iv)[ii]=atoi(weight.c_str());
-				line.erase(0,line.find_first_of(",)")+1);
-			}
-			ring newRing;
-			if(currRing->order[0]!=ringorder_a)
-			{
-				newRing=rCopyAndAddWeight(currRing,iv);
-			}
-			else
-			{ 			
-				newRing=rCopy0(currRing);
-				int length=this->numVars;
-				int *A=(int *)omAlloc0(length*sizeof(int));
-				for(int jj=0;jj<length;jj++)
-				{
-					A[jj]=-(*iv)[jj];
-				}
-				omFree(newRing->wvhdl[0]);
-				newRing->wvhdl[0]=(int*)A;
-				newRing->block1[0]=length;
-			}
-			delete iv;
- 			rComplete(newRing);
-			gc->baseRing=rCopy(newRing);
-			if(currRing!=gc->baseRing)
-				rChangeCurrRing(gc->baseRing);*/
+		{
+// 			getline(gcInputFile,line);
+// 			found = line.find("a(");
+// 			line.erase(0,found+2);
+// 			string strweight;
+// 			strweight=line.substr(0,line.find_first_of(")"));
+// 			intvec *iv=new intvec(this->numVars);
+// 			for(int ii=0;ii<this->numVars;ii++)
+// 			{
+// 				string weight;
+// 				weight=line.substr(0,line.find_first_of(",)"));				
+// 				(*iv)[ii]=atoi(weight.c_str());
+// 				line.erase(0,line.find_first_of(",)")+1);
+// 			}
+// 			ring newRing;
+// 			if(currRing->order[0]!=ringorder_a)
+// 			{
+// 				newRing=rCopyAndAddWeight(currRing,iv);
+// 			}
+// 			else
+// 			{ 			
+// 				newRing=rCopy0(currRing);
+// 				int length=this->numVars;
+// 				int *A=(int *)omAlloc0(length*sizeof(int));
+// 				for(int jj=0;jj<length;jj++)
+// 				{
+// 					A[jj]=-(*iv)[jj];
+// 				}
+// 				omFree(newRing->wvhdl[0]);
+// 				newRing->wvhdl[0]=(int*)A;
+// 				newRing->block1[0]=length;
+// 			}
+// 			delete iv;
+//  			rComplete(newRing);
+// 			gc->baseRing=rCopy(newRing);
+// 			if(currRing!=gc->baseRing)
+// 				rChangeCurrRing(gc->baseRing);
 		}
 		
 		if(line=="GCBASISLENGTH")
@@ -2682,6 +2980,8 @@ int gfanHeuristic;
 float gcone::time_getConeNormals;
 float gcone::time_getCodim2Normals;
 float gcone::time_flip;
+float gcone::t_markings;
+float gcone::t_dd;
 float gcone::time_enqueue;
 float gcone::time_computeInv;
 float gcone::t_ddMC;
@@ -2770,6 +3070,8 @@ lists gfan(ideal inputIdeal, int h)
 	cout << "  t_mI:" << gcone::t_mI << endl;
 	cout << "  t_iP:" << gcone::t_iP << endl;
 	cout << "t_Flip:" << gcone::time_flip << endl;
+	cout << "  t_markings:" << gcone::t_markings << endl;
+	cout << "  t_dd:" << gcone::t_dd << endl;
 	cout << "t_computeInv:" << gcone::time_computeInv << endl;
 	cout << "t_enqueue:" << gcone::time_enqueue << endl;
 #endif
