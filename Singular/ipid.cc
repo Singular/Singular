@@ -35,7 +35,7 @@
 omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
 omBin ip_command_bin = omGetSpecBin(sizeof(ip_command));
 omBin sip_package_bin = omGetSpecBin(sizeof(sip_package));
-omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
+//omBin ip_package_bin = omGetSpecBin(sizeof(ip_package));
 omBin idrec_bin = omGetSpecBin(sizeof(idrec));
 
 proclevel *procstack=NULL;

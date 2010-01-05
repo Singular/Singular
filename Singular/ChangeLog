@@ -1,3 +1,7 @@
+Changes w.r.t 3-1-0-8:
+- NTL 5.5.2
+- parts of structs.h moved to febase.h, ring.h, ...
+
 Changes w.r.t 3-1-0-7:
 - 3-1-0-8: Tue Jan  5 11:11:08 CET 2010
 - adaption to svn
