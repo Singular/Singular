@@ -1287,7 +1287,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 				pGetExpV(pHead(aktpoly),v);
 				markingsAreCorrect=TRUE;
 			}
-
+			
 			for (int jj=0;jj<this->numVars;jj++)
 			{				
 				/*Store into ddMatrix*/								
@@ -1339,8 +1339,8 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	dd_rowset implLin, redrows;
 	dd_rowindex newpos;
 	
-	dd_MatrixCanonicalize(&intPointMatrix,&implLin,&redrows,&newpos,&err);
-// 	dd_MatrixCanonicalizeLinearity(&intPointMatrix,&implLin, &newpos,&err);
+// 	dd_MatrixCanonicalize(&intPointMatrix,&implLin,&redrows,&newpos,&err);
+	dd_MatrixCanonicalizeLinearity(&intPointMatrix,&implLin, &newpos,&err);
 	//dd_MatrixRedundancyRemove is our time sink!
 // 	dd_MatrixRedundancyRemove(&intPointMatrix,&redrows,&newpos,&err);
 	interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
@@ -1538,9 +1538,9 @@ inline ideal gcone::ffG(const ideal &H, const ideal &G)
 void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
 {
 //Remove strictly positive rows
-// 	int *posRowsArray=NULL;
-// 	int num_alloc=0;
-// 	int num_elts=0;
+	int *posRowsArray=NULL;
+	int num_alloc=0;
+	int num_elts=0;
 // 	for(int ii=0;ii<ddineq->rowsize;ii++)
 // 	{
 // 		intvec *ivPos = new intvec(pVariables);
@@ -1589,7 +1589,7 @@ void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
 // 	}
 // 	free(posRowsArray);
 	//Remove zeroes
-	int rowsize=ddineq->rowsize;
+// 	int rowsize=ddineq->rowsize;
 	for(int ii=0;ii<ddineq->rowsize;ii++)
 	{
 		intvec *iv = new intvec(this->numVars);
@@ -1597,10 +1597,10 @@ void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
 		for(int jj=0;jj<this->numVars;jj++)
 		{
 			(*iv)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
-			if((*iv)[ii]>0)
-				posCtr++;
+// 			if((*iv)[ii]>0)
+// 				posCtr++;
 		}
-		if( (iv->compare(0)==0)) //|| (posCtr==iv->length()) )
+		if( (iv->compare(0)==0) )//|| (posCtr==iv->length()) )
 		{
 			dd_MatrixRowRemove(&ddineq,ii+1);
 			ii--;		
