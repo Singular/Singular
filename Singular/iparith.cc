@@ -3014,7 +3014,7 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
     if (weights!=NULL)
     {
       atSet(res,omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
-      r->weights = (intvec**)omAlloc0Bin(void_ptr_bin);
+      r->weights = (intvec**)omAlloc0Bin(char_ptr_bin);
       (r->weights)[0] = ivCopy(weights);
     }
 //#endif
@@ -6270,7 +6270,7 @@ static BOOLEAN jjRES3(leftv res, leftv u, leftv v, leftv w)
       }
       else
       {
-        weights = (intvec**)omAlloc0Bin(void_ptr_bin);
+        weights = (intvec**)omAlloc0Bin(char_ptr_bin);
         weights[0] = ivCopy(iv);
       }
     }

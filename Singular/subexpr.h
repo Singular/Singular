@@ -12,6 +12,8 @@
 #include "grammar.h"
 #include "tok.h"
 #include "structs.h"
+#include "febase.h"
+#include "ring.h"
 
 struct _ssubexpr
 {
