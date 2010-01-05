@@ -48,8 +48,6 @@ extern char *iiArithGetCmd(int);
 /* ===================================================================*/
 #if defined(HAVE_READLINE) || defined(HAVE_DYN_RL) || defined(HAVE_LIBREADLINE)
 
-#include "../Singular/ipshell.h"
-
 #ifndef STDOUT_FILENO
 #define STDOUT_FILENO 1
 #endif

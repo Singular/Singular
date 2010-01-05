@@ -25,7 +25,6 @@
 #include "febase.h"
 #include "omalloc.h"
 #include "dError.h"
-#include "../Singular/ipshell.h"
 
 #define fePutChar(c) fputc((uchar)(c),stdout)
 /*0 implementation */
