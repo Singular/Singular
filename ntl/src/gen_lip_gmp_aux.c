@@ -23,7 +23,7 @@ int gcd(int a, int b)
       v = b;
       do {
          t = u % v;
-         u = v; 
+         u = v;
          v = t;
       } while (v != 0);
 
@@ -46,13 +46,13 @@ int pow2(int a)
       k++;
    }
 
-   if (m == a) 
+   if (m == a)
       return k;
    else
       return -1;
 }
-  
-   
+
+
 
 const char *accum[2] = { "", "yy | " };
 
@@ -91,12 +91,12 @@ void lip_to_gmp(int A, int B)
 
    printf("   if (q > 0) {\n");
 
-   if (na2 != -1) 
+   if (na2 != -1)
       printf("      x += (q << %d);\n", na2);
-   else 
+   else
       printf("      x += (q * %d);\n", na);
 
-   if (nb2 != -1) 
+   if (nb2 != -1)
       printf("      y += (q << %d);\n", nb2);
    else if (pow2(nb+1) != -1)
       printf("      y += (q << %d) - q;\n", pow2(nb+1));
@@ -111,7 +111,7 @@ void lip_to_gmp(int A, int B)
    printf("\n");
 
    printf("      switch (r-1) {\n");
-      
+
 
    xx = 0;
    yy = 0;
@@ -176,7 +176,7 @@ void lip_to_gmp(int A, int B)
       j = (i*A)/B;
       r = (i*A)%B;
 
-      
+
       if (xx) {
          printf("      ");
          printf("yy = %s (((mp_limb_t)(xx)) << %d);\n", accum[yy], B-r);
@@ -276,11 +276,11 @@ void gmp_to_lip(int A, int B, int alt)
    if (!alt) {
       if (na - nb == 1)
          printf("      yy = y[r-1];\n");
-      else if (na2 != -1) 
+      else if (na2 != -1)
          printf("      yy = y[((r*%d + %d) >> %d) - 1];\n", nb, na-1, na2);
       else
          printf("      yy = y[((r*%d + %d) / %d) - 1];\n", nb, na-1, na);
-   
+
    }
    else
       printf("      yy = 0;\n");
@@ -288,7 +288,7 @@ void gmp_to_lip(int A, int B, int alt)
    printf("\n");
 
    printf("      switch (r-1) {\n");
-      
+
 
 
    for (i = 1; ; i++) {
@@ -306,7 +306,7 @@ void gmp_to_lip(int A, int B, int alt)
          printf("         ");
          printf("xx = ((unsigned long)(yy)) << %d;\n", shamt);
          printf("         ");
-         printf("x[%d] = (xx | ((unsigned long)((yy = y[%d]) >> %d))) & NTL_RADIXM;\n", 
+         printf("x[%d] = (xx | ((unsigned long)((yy = y[%d]) >> %d))) & NTL_RADIXM;\n",
                 na-1-i, nb-2-j, 2*B-r-A);
       }
       else if (shamt == 0) {
@@ -342,7 +342,7 @@ void gmp_to_lip(int A, int B, int alt)
          printf("      ");
          printf("xx = ((unsigned long)(yy)) << %d;\n", shamt);
          printf("      ");
-         printf("x[%d] = (xx | ((unsigned long)((yy = y[%d]) >> %d))) & NTL_RADIXM;\n", 
+         printf("x[%d] = (xx | ((unsigned long)((yy = y[%d]) >> %d))) & NTL_RADIXM;\n",
                 na-1-i, nb-2-j, 2*B-r-A);
       }
       else if (shamt == 0) {
@@ -366,7 +366,7 @@ void rdup(int a, int b)
 {
    printf("((");
    if (pow2(a) != -1) {
-      printf("(x << %d)", pow2(a)); 
+      printf("(x << %d)", pow2(a));
    }
    else if (pow2(a+1) != -1) {
       printf("((x << %d) - x)", pow2(a+1));
@@ -374,7 +374,7 @@ void rdup(int a, int b)
    else {
       printf("(x*%d)", a);
    }
-   
+
    printf(" + %d)", b-1);
 
    if (pow2(b) != -1) {
@@ -395,7 +395,7 @@ void G_TO_L(int A, int B)
    nb = A/d;
 
    printf("#define G_TO_L(x) ");
-   
+
    rdup(na, nb);
 
    printf("\n");
@@ -410,7 +410,7 @@ void L_TO_G(int A, int B)
    nb = A/d;
 
    printf("#define L_TO_G(x) ");
-   
+
    rdup(nb, na);
 
    printf("\n");
@@ -422,7 +422,7 @@ void L_TO_G_CHECK(int BPL, int BPI)
    if (BPL != BPI) {
       printf("#define L_TO_G_CHECK_LEN\n");
    }
-      
+
 }
 
 
@@ -444,7 +444,7 @@ int main()
     * We compute B as the number of bits of a gmp limb.
     * We require that this quantity correspond to the number of bits
     * of a long, or possibly a "long long" that is twice as
-    * wide as a long.  These restrictions may not be entirely 
+    * wide as a long.  These restrictions may not be entirely
     * necessary, but they are satisfied on all platforms that I know of.
     */
 

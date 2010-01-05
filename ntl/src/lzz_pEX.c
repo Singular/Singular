@@ -98,7 +98,7 @@ void SetCoeff(zz_pEX& x, long i, const zz_pE& a)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("SetCoeff: negative index");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -176,7 +176,7 @@ void SetCoeff(zz_pEX& x, long i)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("coefficient index out of range");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -205,8 +205,8 @@ long IsX(const zz_pEX& a)
 {
    return deg(a) == 1 && IsOne(LeadCoeff(a)) && IsZero(ConstTerm(a));
 }
-      
-      
+
+
 
 const zz_pE& coeff(const zz_pEX& a, long i)
 {
@@ -247,7 +247,7 @@ void conv(zz_pEX& x, const zz_pE& a)
 
 void conv(zz_pEX& x, long a)
 {
-   if (a == 0) 
+   if (a == 0)
       clear(x);
    else if (a == 1)
       set(x);
@@ -267,7 +267,7 @@ void conv(zz_pEX& x, const ZZ& a)
 
 void conv(zz_pEX& x, const zz_p& a)
 {
-   if (IsZero(a)) 
+   if (IsZero(a))
       clear(x);
    else if (IsOne(a))
       set(x);
@@ -307,7 +307,7 @@ void add(zz_pEX& x, const zz_pEX& a, const zz_pEX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const zz_pE *ap, *bp; 
+   const zz_pE *ap, *bp;
    zz_pE* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -408,7 +408,7 @@ void sub(zz_pEX& x, const zz_pEX& a, const zz_pEX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const zz_pE *ap, *bp; 
+   const zz_pE *ap, *bp;
    zz_pE* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -539,7 +539,7 @@ void sub(zz_pEX& x, const zz_p& a, const zz_pEX& b)
 
 void sub(zz_pEX& x, long a, const zz_pEX& b)
 {
-   NTL_zz_pRegister(T); 
+   NTL_zz_pRegister(T);
    T = a;
    negate(x, b);
    add(x, x, T);
@@ -560,7 +560,7 @@ void mul(zz_pEX& c, const zz_pEX& a, const zz_pEX& b)
    if (deg(a) == 0) {
       mul(c, b, ConstTerm(a));
       return;
-   } 
+   }
 
    if (deg(b) == 0) {
       mul(c, a, ConstTerm(b));
@@ -589,7 +589,7 @@ void mul(zz_pEX& c, const zz_pEX& a, const zz_pEX& b)
       const zz_pX& coeff = rep(a.rep[i]);
       long dcoeff = deg(coeff);
       for (j = 0; j <= dcoeff; j++)
-         A.rep[n2*i + j] = coeff.rep[j]; 
+         A.rep[n2*i + j] = coeff.rep[j];
    }
 
    A.normalize();
@@ -600,7 +600,7 @@ void mul(zz_pEX& c, const zz_pEX& a, const zz_pEX& b)
       const zz_pX& coeff = rep(b.rep[i]);
       long dcoeff = deg(coeff);
       for (j = 0; j <= dcoeff; j++)
-         B.rep[n2*i + j] = coeff.rep[j]; 
+         B.rep[n2*i + j] = coeff.rep[j];
    }
 
    B.normalize();
@@ -614,7 +614,7 @@ void mul(zz_pEX& c, const zz_pEX& a, const zz_pEX& b)
    c.rep.SetLength(dc+1);
 
    zz_pX tmp;
-   
+
    for (i = 0; i <= dc; i++) {
       tmp.rep.SetLength(n2);
       for (j = 0; j < n2 && n2*i + j < Clen; j++)
@@ -624,7 +624,7 @@ void mul(zz_pEX& c, const zz_pEX& a, const zz_pEX& b)
       tmp.normalize();
       conv(c.rep[i], tmp);
    }
-  
+
    c.normalize();
 }
 
@@ -703,7 +703,7 @@ void sqr(zz_pEX& c, const zz_pEX& a)
       sqr(res, ConstTerm(a));
       conv(c, res);
       return;
-   } 
+   }
 
    // general case...Kronecker subst
 
@@ -725,7 +725,7 @@ void sqr(zz_pEX& c, const zz_pEX& a)
       const zz_pX& coeff = rep(a.rep[i]);
       long dcoeff = deg(coeff);
       for (j = 0; j <= dcoeff; j++)
-         A.rep[n2*i + j] = coeff.rep[j]; 
+         A.rep[n2*i + j] = coeff.rep[j];
    }
 
    A.normalize();
@@ -739,7 +739,7 @@ void sqr(zz_pEX& c, const zz_pEX& a)
    c.rep.SetLength(dc+1);
 
    zz_pX tmp;
-   
+
    for (i = 0; i <= dc; i++) {
       tmp.rep.SetLength(n2);
       for (j = 0; j < n2 && n2*i + j < Clen; j++)
@@ -749,8 +749,8 @@ void sqr(zz_pEX& c, const zz_pEX& a)
       tmp.normalize();
       conv(c.rep[i], tmp);
    }
-  
-  
+
+
    c.normalize();
 }
 
@@ -799,12 +799,12 @@ void CopyReverse(zz_pEX& x, const zz_pEX& a, long hi)
    }
 
    x.normalize();
-} 
+}
 
 
 void trunc(zz_pEX& x, const zz_pEX& a, long m)
 
-// x = a % X^m, output may alias input 
+// x = a % X^m, output may alias input
 
 {
    if (m < 0) Error("trunc: bad args");
@@ -934,7 +934,7 @@ void PlainMul(zz_pEX& x, const zz_pEX& a, const zz_pEX& b)
 
    const zz_pE *ap, *bp;
    zz_pE *xp;
-   
+
    zz_pEX la, lb;
 
    if (&x == &a) {
@@ -1023,7 +1023,7 @@ void PlainDivRem(zz_pEX& q, zz_pEX& r, const zz_pEX& a, const zz_pEX& b)
 
    SetSize(x, da+1, 2*zz_pE::degree());
 
-   for (i = 0; i <= da; i++) 
+   for (i = 0; i <= da; i++)
       x[i] = rep(a.rep[i]);
 
    xp = x.elts();
@@ -1107,7 +1107,7 @@ void PlainRem(zz_pEX& r, const zz_pEX& a, const zz_pEX& b, vec_zz_pX& x)
 }
 
 
-void PlainDivRem(zz_pEX& q, zz_pEX& r, const zz_pEX& a, const zz_pEX& b, 
+void PlainDivRem(zz_pEX& q, zz_pEX& r, const zz_pEX& a, const zz_pEX& b,
      vec_zz_pX& x)
 {
    long da, db, dq, i, j, LCIsOne;
@@ -1314,7 +1314,7 @@ void RightShift(zz_pEX& x, const zz_pEX& a, long n)
 
    long da = deg(a);
    long i;
- 
+
    if (da < n) {
       clear(x);
       return;
@@ -1340,7 +1340,7 @@ void LeftShift(zz_pEX& x, const zz_pEX& a, long n)
    }
 
    if (n < 0) {
-      if (n < -NTL_MAX_LONG) 
+      if (n < -NTL_MAX_LONG)
          clear(x);
       else
          RightShift(x, a, -n);
@@ -1480,8 +1480,8 @@ zz_pEXModulus::zz_pEXModulus()
 }
 
 
-zz_pEXModulus::~zz_pEXModulus() 
-{ 
+zz_pEXModulus::~zz_pEXModulus()
+{
 }
 
 
@@ -1741,7 +1741,7 @@ void UseMulRem(zz_pEX& r, const zz_pEX& a, const zz_pEX& b)
    RightShift(P2, P2, da-db);
    mul(P1, P2, b);
    sub(P1, a, P1);
-   
+
    r = P1;
 }
 
@@ -1762,7 +1762,7 @@ void UseMulDivRem(zz_pEX& q, zz_pEX& r, const zz_pEX& a, const zz_pEX& b)
    RightShift(P2, P2, da-db);
    mul(P1, P2, b);
    sub(P1, a, P1);
-   
+
    r = P1;
    q = P2;
 }
@@ -1782,7 +1782,7 @@ void UseMulDiv(zz_pEX& q, const zz_pEX& a, const zz_pEX& b)
    RightShift(P2, a, db);
    mul(P2, P1, P2);
    RightShift(P2, P2, da-db);
-   
+
    q = P2;
 }
 
@@ -1889,13 +1889,13 @@ void GCD(zz_pEX& x, const zz_pEX& a, const zz_pEX& b)
    /* make gcd monic */
 
 
-   inv(t, LeadCoeff(x)); 
-   mul(x, x, t); 
+   inv(t, LeadCoeff(x));
+   mul(x, x, t);
 }
 
 
 
-         
+
 
 void XGCD(zz_pEX& d, zz_pEX& s, zz_pEX& t, const zz_pEX& a, const zz_pEX& b)
 {
@@ -1915,9 +1915,9 @@ void XGCD(zz_pEX& d, zz_pEX& s, zz_pEX& t, const zz_pEX& a, const zz_pEX& b)
    else {
       long e = max(deg(a), deg(b)) + 1;
 
-      zz_pEX temp(INIT_SIZE, e), u(INIT_SIZE, e), v(INIT_SIZE, e), 
-            u0(INIT_SIZE, e), v0(INIT_SIZE, e), 
-            u1(INIT_SIZE, e), v1(INIT_SIZE, e), 
+      zz_pEX temp(INIT_SIZE, e), u(INIT_SIZE, e), v(INIT_SIZE, e),
+            u0(INIT_SIZE, e), v0(INIT_SIZE, e),
+            u1(INIT_SIZE, e), v1(INIT_SIZE, e),
             u2(INIT_SIZE, e), v2(INIT_SIZE, e), q(INIT_SIZE, e);
 
 
@@ -2094,8 +2094,8 @@ void interpolate(zz_pEX& f, const vec_zz_pE& a, const vec_zz_pE& b)
    res.SetLength(m);
    f.rep = res;
 }
-   
-void InnerProduct(zz_pEX& x, const vec_zz_pE& v, long low, long high, 
+
+void InnerProduct(zz_pEX& x, const vec_zz_pE& v, long low, long high,
                    const vec_zz_pEX& H, long n, vec_zz_pX& t)
 {
    zz_pX s;
@@ -2124,7 +2124,7 @@ void InnerProduct(zz_pEX& x, const vec_zz_pE& v, long low, long high,
 
 
 
-void CompMod(zz_pEX& x, const zz_pEX& g, const zz_pEXArgument& A, 
+void CompMod(zz_pEX& x, const zz_pEX& g, const zz_pEXArgument& A,
              const zz_pEXModulus& F)
 {
    if (deg(g) <= 0) {
@@ -2233,7 +2233,7 @@ void Comp2Mod(zz_pEX& x1, zz_pEX& x2, const zz_pEX& g1, const zz_pEX& g2,
    x2 = xx2;
 }
 
-void Comp3Mod(zz_pEX& x1, zz_pEX& x2, zz_pEX& x3, 
+void Comp3Mod(zz_pEX& x1, zz_pEX& x2, zz_pEX& x3,
               const zz_pEX& g1, const zz_pEX& g2, const zz_pEX& g3,
               const zz_pEX& h, const zz_pEXModulus& F)
 
@@ -2281,11 +2281,11 @@ void build(zz_pEXTransMultiplier& B, const zz_pEX& b, const zz_pEXModulus& F)
    if (d < 0)
       B.shamt_fbi = 0;
    else
-      B.shamt_fbi = F.n-2 - d; 
+      B.shamt_fbi = F.n-2 - d;
 
    CopyReverse(B.fbi, t, d);
 
-   // The following code optimizes the case when 
+   // The following code optimizes the case when
    // f = X^n + low degree poly
 
    trunc(t, F.f, F.n);
@@ -2361,7 +2361,7 @@ void UpdateMap(vec_zz_pE& x, const vec_zz_pE& a,
 }
 
 static
-void ProjectPowers(vec_zz_pE& x, const zz_pEX& a, long k, 
+void ProjectPowers(vec_zz_pE& x, const zz_pEX& a, long k,
                    const zz_pEXArgument& H, const zz_pEXModulus& F)
 {
    if (k < 0 || NTL_OVERFLOW(k, 1, 0) || deg(a) >= F.n)
@@ -2390,7 +2390,7 @@ void ProjectPowers(vec_zz_pE& x, const zz_pEX& a, long k,
 }
 
 static
-void ProjectPowers(vec_zz_pE& x, const zz_pEX& a, long k, const zz_pEX& h, 
+void ProjectPowers(vec_zz_pE& x, const zz_pEX& a, long k, const zz_pEX& h,
                    const zz_pEXModulus& F)
 {
    if (k < 0 || deg(a) >= F.n || deg(h) >= F.n)
@@ -2477,7 +2477,7 @@ void BerlekampMassey(zz_pEX& h, const vec_zz_pE& a, long m)
       }
    }
 
-   // cerr << "finished: " << L << " " << deg(Lambda) << "\n"; 
+   // cerr << "finished: " << L << " " << deg(Lambda) << "\n";
 
    dl = deg(Lambda);
    h.rep.SetLength(L + 1);
@@ -2501,7 +2501,7 @@ void MinPolySeq(zz_pEX& h, const vec_zz_pE& a, long m)
 }
 
 
-void DoMinPolyMod(zz_pEX& h, const zz_pEX& g, const zz_pEXModulus& F, long m, 
+void DoMinPolyMod(zz_pEX& h, const zz_pEX& g, const zz_pEXModulus& F, long m,
                const zz_pEX& R)
 {
    vec_zz_pE x;
@@ -2544,7 +2544,7 @@ void MinPolyMod(zz_pEX& hh, const zz_pEX& g, const zz_pEXModulus& F, long m)
    zz_pEX h2, h3;
    zz_pEX R;
    zz_pEXTransMultiplier H1;
-   
+
 
    for (;;) {
       random(R, n);
@@ -2637,7 +2637,7 @@ long divide(zz_pEX& q, const zz_pEX& a, const zz_pEX& b)
 
    zz_pEX lq, r;
    DivRem(lq, r, a, b);
-   if (!IsZero(r)) return 0; 
+   if (!IsZero(r)) return 0;
    q = lq;
    return 1;
 }
@@ -2647,7 +2647,7 @@ long divide(const zz_pEX& a, const zz_pEX& b)
    if (IsZero(b)) return IsZero(a);
    zz_pEX lq, r;
    DivRem(lq, r, a, b);
-   if (!IsZero(r)) return 0; 
+   if (!IsZero(r)) return 0;
    return 1;
 }
 
@@ -2674,7 +2674,7 @@ long OptWinSize(long n)
 
    return k;
 }
-      
+
 
 
 void PowerMod(zz_pEX& h, const zz_pEX& g, const ZZ& e, const zz_pEXModulus& F)
@@ -2740,7 +2740,7 @@ void PowerMod(zz_pEX& h, const zz_pEX& g, const ZZ& e, const zz_pEXModulus& F)
    v.SetLength(1L << (k-1));
 
    v[0] = g;
- 
+
    if (k > 1) {
       zz_pEX t;
       SqrMod(t, g, F);
@@ -2756,7 +2756,7 @@ void PowerMod(zz_pEX& h, const zz_pEX& g, const ZZ& e, const zz_pEXModulus& F)
 
    val = 0;
    for (i = n-1; i >= 0; i--) {
-      val = (val << 1) | bit(e, i); 
+      val = (val << 1) | bit(e, i);
       if (val == 0)
          SqrMod(res, res, F);
       else if (val >= (1L << (k-1)) || i == 0) {
@@ -2910,7 +2910,7 @@ void power(zz_pEX& x, const zz_pEX& a, long e)
    zz_pEX res;
    res.SetMaxLength(da*e + 1);
    res = 1;
-   
+
    long k = NumBits(e);
    long i;
 
@@ -3008,7 +3008,7 @@ void TraceMod(zz_pE& x, const zz_pEX& a, const zz_pEXModulus& F)
    if (deg(a) >= n)
       Error("trace: bad args");
 
-   if (F.tracevec.length() == 0) 
+   if (F.tracevec.length() == 0)
       ComputeTraceVec(F);
 
    InnerProduct(x, a.rep, F.tracevec);
@@ -3026,10 +3026,10 @@ void TraceMod(zz_pE& x, const zz_pEX& a, const zz_pEX& f)
 void PlainResultant(zz_pE& rres, const zz_pEX& a, const zz_pEX& b)
 {
    zz_pE res;
- 
+
    if (IsZero(a) || IsZero(b))
       clear(res);
-   else if (deg(a) == 0 && deg(b) == 0) 
+   else if (deg(a) == 0 && deg(b) == 0)
       set(res);
    else {
       long d0, d1, d2;
@@ -3065,7 +3065,7 @@ void PlainResultant(zz_pE& rres, const zz_pEX& a, const zz_pEX& b)
             }
             else
                clear(res);
-        
+
             break;
          }
       }
@@ -3076,13 +3076,13 @@ void PlainResultant(zz_pE& rres, const zz_pEX& a, const zz_pEX& b)
 
 void resultant(zz_pE& rres, const zz_pEX& a, const zz_pEX& b)
 {
-   PlainResultant(rres, a, b); 
+   PlainResultant(rres, a, b);
 }
 
 
 void NormMod(zz_pE& x, const zz_pEX& a, const zz_pEX& f)
 {
-   if (deg(f) <= 0 || deg(a) >= deg(f)) 
+   if (deg(f) <= 0 || deg(a) >= deg(f))
       Error("norm: bad args");
 
    if (IsZero(a)) {
@@ -3166,7 +3166,7 @@ void CompTower(zz_pEX& x, const zz_pX& g, const zz_pEXArgument& A,
 }
 
 
-void CompTower(zz_pEX& x, const zz_pX& g, const zz_pEX& h, 
+void CompTower(zz_pEX& x, const zz_pX& g, const zz_pEX& h,
              const zz_pEXModulus& F)
    // x = g(h) mod f
 {
@@ -3200,7 +3200,7 @@ void PrepareProjection(vec_vec_zz_p& tt, const vec_zz_pE& s,
    }
 }
 
-void ProjectedInnerProduct(zz_p& x, const vec_zz_pE& a, 
+void ProjectedInnerProduct(zz_p& x, const vec_zz_pE& a,
                            const vec_vec_zz_p& b)
 {
    long n = min(a.length(), b.length());
@@ -3219,7 +3219,7 @@ void ProjectedInnerProduct(zz_p& x, const vec_zz_pE& a,
 }
 
 
-   
+
 void PrecomputeProj(vec_zz_p& proj, const zz_pX& f)
 {
    long n = deg(f);
@@ -3304,12 +3304,12 @@ void DoMinPolyTower(zz_pX& h, const zz_pEX& g, const zz_pEXModulus& F, long m,
    vec_zz_p x;
 
    ProjectPowersTower(x, R, 2*m, g, F, proj);
-   
+
    MinPolySeq(h, x, m);
 }
 
 
-void ProbMinPolyTower(zz_pX& h, const zz_pEX& g, const zz_pEXModulus& F, 
+void ProbMinPolyTower(zz_pX& h, const zz_pEX& g, const zz_pEXModulus& F,
                       long m)
 {
    long n = F.n;
@@ -3328,7 +3328,7 @@ void ProbMinPolyTower(zz_pX& h, const zz_pEX& g, const zz_pEXModulus& F,
 }
 
 
-void ProbMinPolyTower(zz_pX& h, const zz_pEX& g, const zz_pEXModulus& F, 
+void ProbMinPolyTower(zz_pX& h, const zz_pEX& g, const zz_pEXModulus& F,
                       long m, const vec_zz_p& proj)
 {
    long n = F.n;
@@ -3370,7 +3370,7 @@ void MinPolyTower(zz_pX& hh, const zz_pEX& g, const zz_pEXModulus& F, long m)
    zz_pEX h3;
    vec_zz_pE R;
    zz_pEXTransMultiplier H1;
-   
+
 
    for (;;) {
       R.SetLength(n);

@@ -5,10 +5,10 @@
 
 NTL_START_IMPL
 
-static inline 
+static inline
 void BlockConstruct(double *, double) { }
 
-static inline 
+static inline
 void BlockDestroy(double *, double) { }
 
 NTL_vector_impl_plain(double,vec_double)

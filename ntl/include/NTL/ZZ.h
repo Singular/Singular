@@ -420,6 +420,34 @@ inline ZZ& operator*=(ZZ& x, const ZZ& a)
 inline ZZ& operator*=(ZZ& x, long a)
   { mul(x, x, a); return x; }
 
+// x += a*b
+
+inline void
+MulAddTo(ZZ& x, const ZZ& a, long b)
+{
+   NTL_zsaddmul(a.rep, b, &x.rep);
+}
+
+inline void
+MulAddTo(ZZ& x, const ZZ& a, const ZZ& b)
+{
+   NTL_zaddmul(a.rep, b.rep, &x.rep);
+}
+
+// x -= a*b
+
+inline void
+MulSubFrom(ZZ& x, const ZZ& a, long b)
+{
+   NTL_zssubmul(a.rep, b, &x.rep);
+}
+
+inline void
+MulSubFrom(ZZ& x, const ZZ& a, const ZZ& b)
+{
+   NTL_zsubmul(a.rep, b.rep, &x.rep);
+}
+
 
 // Special routines for implementing CRT in ZZ_pX arithmetic
 

@@ -37,7 +37,7 @@ static void BalDiv(ZZ& q, const ZZ& a, const ZZ& d)
 
 
 
-static void MulAddDiv(ZZ& c, const ZZ& c1, const ZZ& c2, 
+static void MulAddDiv(ZZ& c, const ZZ& c1, const ZZ& c2,
                       const ZZ& x, const ZZ& y, const ZZ& z)
 
 // c = (x*c1 + y*c2)/z
@@ -52,7 +52,7 @@ static void MulAddDiv(ZZ& c, const ZZ& c1, const ZZ& c2,
 }
 
 
-static void MulSubDiv(ZZ& c, const ZZ& c1, const ZZ& c2, 
+static void MulSubDiv(ZZ& c, const ZZ& c1, const ZZ& c2,
                       const ZZ& x, const ZZ& y, const ZZ& z)
 
 // c = (x*c1 - y*c2)/z
@@ -65,7 +65,7 @@ static void MulSubDiv(ZZ& c, const ZZ& c1, const ZZ& c2,
    sub(t1, t1, t2);
    ExactDiv(c, t1, z);
 }
-   
+
 
 
 
@@ -83,7 +83,7 @@ static void MulSubDiv(vec_ZZ& c, const vec_ZZ& c1, const vec_ZZ& c2,
    c.SetLength(n);
 
    long i;
-   for (i = 1; i <= n; i++) 
+   for (i = 1; i <= n; i++)
       MulSubDiv(c(i), c1(i), c2(i), x, y, z);
 }
 
@@ -136,37 +136,36 @@ static void RowTransform(ZZ& c1, ZZ& c2,
 
 
 
-static void MulSub(ZZ& c, const ZZ& c1, const ZZ& c2, const ZZ& x)
+static void MulSubFrom(vec_ZZ& c, const vec_ZZ& c2, const ZZ& x)
 
-// c = c1 - x*c2
-
-{
-   static ZZ t1;
-
-   mul(t1, x, c2);
-   sub(c, c1, t1);
-}
-
-
-static void MulSub(vec_ZZ& c, const vec_ZZ& c1, const vec_ZZ& c2,
-                   const ZZ& x)
-
-// c = c1 - x*c2
+// c = c - x*c2
 
 {
-   long n = c1.length();
-   if (c2.length() != n) Error("MulSub: length mismatch");
-   c.SetLength(n);
+   long n = c.length();
+   if (c2.length() != n) Error("MulSubFrom: length mismatch");
 
    long i;
    for (i = 1; i <= n; i++)
-      MulSub(c(i), c1(i), c2(i), x);
+      MulSubFrom(c(i), c2(i), x);
+}
+
+static void MulSubFrom(vec_ZZ& c, const vec_ZZ& c2, long x)
+
+// c = c - x*c2
+
+{
+   long n = c.length();
+   if (c2.length() != n) Error("MulSubFrom: length mismatch");
+
+   long i;
+   for (i = 1; i <= n; i++)
+      MulSubFrom(c(i), c2(i), x);
 }
 
 
-      
-      
-   
+
+
+
 static long SwapTest(const ZZ& d0, const ZZ& d1, const ZZ& d2, const ZZ& lam,
                      long a, long b)
 
@@ -192,8 +191,8 @@ static long SwapTest(const ZZ& d0, const ZZ& d1, const ZZ& d2, const ZZ& lam,
 
 
 static
-void reduce(long k, long l, 
-            mat_ZZ& B, vec_long& P, vec_ZZ& D, 
+void reduce(long k, long l,
+            mat_ZZ& B, vec_long& P, vec_ZZ& D,
             vec_vec_ZZ& lam, mat_ZZ* U)
 {
    static ZZ t1;
@@ -205,22 +204,45 @@ void reduce(long k, long l,
    if (t1 <= D[P(l)]) return;
 
    long j;
+   long rr, small_r;
 
    BalDiv(r, lam(k)(P(l)), D[P(l)]);
-   MulSub(B(k), B(k), B(l), r);
 
-   if (U) MulSub((*U)(k), (*U)(k), (*U)(l), r);
+   if (r.WideSinglePrecision()) {
+      small_r = 1;
+      rr = to_long(r);
+   }
+   else {
+      small_r = 0;
+   }
 
-   for (j = 1; j <= l-1; j++)
-      if (P(j) != 0)
-         MulSub(lam(k)(P(j)), lam(k)(P(j)), lam(l)(P(j)), r);
+   if (small_r) {
+      MulSubFrom(B(k), B(l), rr);
 
-   MulSub(lam(k)(P(l)), lam(k)(P(l)), D[P(l)], r);
+      if (U) MulSubFrom((*U)(k), (*U)(l), rr);
+
+      for (j = 1; j <= l-1; j++)
+         if (P(j) != 0)
+            MulSubFrom(lam(k)(P(j)), lam(l)(P(j)), rr);
+      MulSubFrom(lam(k)(P(l)), D[P(l)], rr);
+   }
+   else {
+      MulSubFrom(B(k), B(l), r);
+
+      if (U) MulSubFrom((*U)(k), (*U)(l), r);
+
+      for (j = 1; j <= l-1; j++)
+         if (P(j) != 0)
+            MulSubFrom(lam(k)(P(j)), lam(l)(P(j)), r);
+      MulSubFrom(lam(k)(P(l)), D[P(l)], r);
+   }
+
+
 }
 
 
 static
-long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D, 
+long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D,
           vec_vec_ZZ& lam, mat_ZZ* U, long m, long verbose)
 
 // swaps vectors k-1 and k;  assumes P(k-1) != 0
@@ -236,15 +258,15 @@ long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D,
 
       swap(B(k-1), B(k));
       if (U) swap((*U)(k-1), (*U)(k));
-   
+
       for (j = 1; j <= k-2; j++)
          if (P(j) != 0)
             swap(lam(k-1)(P(j)), lam(k)(P(j)));
 
       for (i = k+1; i <= m; i++) {
-         MulAddDiv(t1, lam(i)(P(k)-1), lam(i)(P(k)), 
-                   lam(k)(P(k)-1), D[P(k)-2], D[P(k)-1]); 
-         MulSubDiv(t2, lam(i)(P(k)-1), lam(i)(P(k)), 
+         MulAddDiv(t1, lam(i)(P(k)-1), lam(i)(P(k)),
+                   lam(k)(P(k)-1), D[P(k)-2], D[P(k)-1]);
+         MulSubDiv(t2, lam(i)(P(k)-1), lam(i)(P(k)),
                    D[P(k)], lam(k)(P(k)-1), D[P(k)-1]);
          lam(i)(P(k)-1) = t1;
          lam(i)(P(k)) = t2;
@@ -289,10 +311,9 @@ long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D,
       return 1;
    }
    else {
-
       swap(B(k-1), B(k));
       if (U) swap((*U)(k-1), (*U)(k));
-   
+
       for (j = 1; j <= k-2; j++)
          if (P(j) != 0)
             swap(lam(k-1)(P(j)), lam(k)(P(j)));
@@ -303,11 +324,11 @@ long swap(long k, mat_ZZ& B, vec_long& P, vec_ZZ& D,
    }
 }
 
-   
+
 
 
 static
-void IncrementalGS(mat_ZZ& B, vec_long& P, vec_ZZ& D, vec_vec_ZZ& lam, 
+void IncrementalGS(mat_ZZ& B, vec_long& P, vec_ZZ& D, vec_vec_ZZ& lam,
                    long& s, long k)
 {
    long n = B.NumCols();
@@ -390,7 +411,7 @@ long LLL(vec_ZZ& D, mat_ZZ& B, mat_ZZ* U, long a, long b, long verbose)
       }
 
       if (k == 1) {
-         force_reduce = 1; 
+         force_reduce = 1;
          k++;
          continue;
       }
@@ -399,8 +420,8 @@ long LLL(vec_ZZ& D, mat_ZZ& B, mat_ZZ* U, long a, long b, long verbose)
          for (j = k-1; j >= 1; j--)
             reduce(k, j, B, P, D, lam, U);
 
-      if (P(k-1) != 0 && 
-          (P(k) == 0 || 
+      if (P(k-1) != 0 &&
+          (P(k) == 0 ||
            SwapTest(D[P(k)], D[P(k)-1], D[P(k)-2], lam(k)(P(k)-1), a, b))) {
          force_reduce = swap(k, B, P, D, lam, U, max_k, verbose);
          k--;
@@ -455,13 +476,13 @@ long image(ZZ& det, mat_ZZ& B, mat_ZZ* U, long verbose)
       }
 
       if (k == 1) {
-         force_reduce = 1; 
+         force_reduce = 1;
          k++;
          continue;
       }
 
       if (force_reduce)
-         for (j = k-1; j >= 1; j--) 
+         for (j = k-1; j >= 1; j--)
             reduce(k, j, B, P, D, lam, U);
 
       if (P(k-1) != 0 && P(k) == 0) {
@@ -608,7 +629,7 @@ long LatticeSolve(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& y, long reduce)
 
    new_rank = image(det2, A2, U2);
 
-   if (new_rank != im_rank || 
+   if (new_rank != im_rank ||
       (U2(1)(im_rank+1) != 1  && U2(1)(im_rank+1) != -1))
       return 0;
 
@@ -655,7 +676,7 @@ long LatticeSolve(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& y, long reduce)
    }
 
    return 0;
-} 
+}
 
 
 

@@ -16,6 +16,7 @@ void CheckFinite(double *p)
 
 
 
+
 static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
 // x = x - y*MU
 {
@@ -43,7 +44,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
 
    if (MU == 0) return;
 
-   if (NumTwos(MU) >= NTL_ZZ_NBITS) 
+   if (NumTwos(MU) >= NTL_ZZ_NBITS)
       k = MakeOdd(MU);
    else
       k = 0;
@@ -53,10 +54,21 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
       long mu1;
       conv(mu1, MU);
 
-      for (i = 1; i <= n; i++) {
-         mul(T, B(i), mu1);
-         if (k > 0) LeftShift(T, T, k);
-         sub(A(i), A(i), T);
+      if (k > 0) {
+
+         for (i = 1; i <= n; i++) {
+            mul(T, B(i), mu1);
+            LeftShift(T, T, k);
+            sub(A(i), A(i), T);
+         }
+
+      }
+      else {
+
+         for (i = 1; i <= n; i++) {
+            MulSubFrom(A(i), B(i), mu1);
+         }
+
       }
    }
    else {
@@ -67,6 +79,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
       }
    }
 }
+
 
 
 #define TR_BND (NTL_FDOUBLE_PRECISION/2.0)
@@ -119,7 +132,7 @@ static void RowTransformFinish(vec_ZZ& A, double *a, long *in_a)
 }
 
 
-static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1, 
+static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
                          double *a, double *b, long *in_a,
                          double& max_a, double max_b, long& in_float)
 // x = x - y*MU
@@ -185,7 +198,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
                conv(A(i), a[i]);
                in_a[i] = 0;
             }
-         
+
             sub(A(i), A(i), B(i));
          }
       }
@@ -204,7 +217,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
                conv(A(i), a[i]);
                in_a[i] = 0;
             }
-         
+
             add(A(i), A(i), B(i));
          }
       }
@@ -214,9 +227,9 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
    if (MU == 0) return;
 
    double b_bnd = fabs(TR_BND/mu) - 1;
-   if (b_bnd < 0) b_bnd = 0; 
+   if (b_bnd < 0) b_bnd = 0;
 
-   if (NumTwos(MU) >= NTL_ZZ_NBITS) 
+   if (NumTwos(MU) >= NTL_ZZ_NBITS)
       k = MakeOdd(MU);
    else
       k = 0;
@@ -242,7 +255,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
          for (i = 1; i <= n; i++) {
             if (in_a[i] && a[i] < TR_BND && a[i] > -TR_BND &&
                 b[i] < b_bnd && b[i] > -b_bnd) {
-   
+
                a[i] -= b[i]*mu;
             }
             else {
@@ -250,8 +263,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
                   conv(A(i), a[i]);
                   in_a[i] = 0;
                }
-               mul(T, B(i), mu1);
-               sub(A(i), A(i), T);
+               MulSubFrom(A(i), B(i), mu1);
             }
          }
       }
@@ -297,7 +309,7 @@ static void RowTransform2(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
 
    if (MU == 0) return;
 
-   if (NumTwos(MU) >= NTL_ZZ_NBITS) 
+   if (NumTwos(MU) >= NTL_ZZ_NBITS)
       k = MakeOdd(MU);
    else
       k = 0;
@@ -347,7 +359,7 @@ public:
 GivensCache_FP::GivensCache_FP(long m, long n)
 {
    sz = min(m, n)/10;
-   if (sz < 2) 
+   if (sz < 2)
       sz = 2;
    else if (sz > 20)
       sz = 20;
@@ -355,7 +367,7 @@ GivensCache_FP::GivensCache_FP(long m, long n)
    typedef double *doubleptr;
 
    long i;
-   buf = NTL_NEW_OP doubleptr[sz]; 
+   buf = NTL_NEW_OP doubleptr[sz];
    if (!buf) Error("out of memory");
    for (i = 0; i < sz; i++)
       if (!(buf[i] = NTL_NEW_OP double[n+1])) Error("out of memory");
@@ -442,7 +454,7 @@ void GivensCache_FP::incr()
       return;
    }
 
-   i = 0; 
+   i = 0;
    while (i < sz && bl[i] != 0)
       i++;
 
@@ -487,26 +499,26 @@ void GivensComputeGS(double **B1, double **mu, double **aux, long k, long n,
       if (backoff < 2)
          backoff = 2;
       else if (backoff > cache.sz + 2)
-         backoff = cache.sz + 2; 
+         backoff = cache.sz + 2;
 
       long ub = k-(backoff-1);
 
       for (i = 1; i < ub; i++) {
          double *cptr = mu[i];
          double *sptr = aux[i];
-   
+
          for (j = n; j > i; j--) {
             c = cptr[j];
             s = sptr[j];
-   
+
             a = c*pp[j-1] - s*pp[j];
             b = s*pp[j-1] + c*pp[j];
-   
+
             pp[j-1] = a;
             pp[j] = b;
          }
-   
-         pp[i] = pp[i]/mu[i][i]; 
+
+         pp[i] = pp[i]/mu[i][i];
       }
 
       cache.bl[cache.bp] = k;
@@ -519,18 +531,18 @@ void GivensComputeGS(double **B1, double **mu, double **aux, long k, long n,
    for (i = max(cache.bv[cache.bp]+1, 1); i < k; i++) {
       double *cptr = mu[i];
       double *sptr = aux[i];
-  
+
       for (j = n; j > i; j--) {
          c = cptr[j];
          s = sptr[j];
-  
+
          a = c*p[j-1] - s*p[j];
          b = s*p[j-1] + c*p[j];
-  
+
          p[j-1] = a;
          p[j] = b;
       }
-  
+
       p[i] = p[i]/mu[i][i];
    }
 
@@ -552,7 +564,7 @@ void GivensComputeGS(double **B1, double **mu, double **aux, long k, long n,
          c = 1/sqrt(1 + t*t);
          s = c*t;
       }
-   
+
       p[j-1] = c*a - s*b;
       p[j] = c;
       aux[k][j] = s;
@@ -593,7 +605,7 @@ static void inc_red_fudge()
    red_fudge = red_fudge * 2;
    log_red--;
 
-   
+
    //cerr << "G_LLL_FP: warning--relaxing reduction (" << log_red << ")\n";
 
    if (log_red < 4)
@@ -617,8 +629,8 @@ static void print_mus(double **mu, long k)
 
 
 static
-long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep, 
-           LLLCheckFct check, double **B1, double **mu, 
+long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
+           LLLCheckFct check, double **B1, double **mu,
            double **aux,
            long m, long init_k, long &quit, GivensCache_FP& cache)
 {
@@ -700,19 +712,19 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                sz = new_sz;
             }
             else {
-               Error( "G_LLL_FP: warning--infinite loop?\n");
+               Error("G_LLL_FP: warning--infinite loop?\n");
             }
          }
 
          Fc1 = 0;
-   
+
          for (j = k-1; j >= 1; j--) {
             t1 = fabs(mu[k][j]);
-            if (t1 > half_plus_fudge) { 
+            if (t1 > half_plus_fudge) {
 
 
                if (!Fc1) {
-                  if (j > trigger_index || 
+                  if (j > trigger_index ||
                       (j == trigger_index && small_trigger)) {
 
                      cnt++;
@@ -730,17 +742,17 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                   Fc1 = 1;
                   RowTransformStart(B1[k], in_vec, in_float, n);
                }
-                  
+
 
                mu1 = mu[k][j];
                if (mu1 >= 0)
                   mu1 = ceil(mu1-0.5);
                else
                   mu1 = floor(mu1+0.5);
-   
+
                double *mu_k = mu[k];
                double *mu_j = mu[j];
-   
+
                if (mu1 == 1) {
                   for (i = 1; i <= j-1; i++)
                      mu_k[i] -= mu_j[i];
@@ -753,9 +765,9 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                   for (i = 1; i <= j-1; i++)
                      mu_k[i] -= mu1*mu_j[i];
                }
-   
+
                mu_k[j] -= mu1;
-   
+
                conv(MU, mu1);
 
                RowTransform(B(k), B(j), MU, B1[k], B1[j], in_vec,
@@ -773,7 +785,7 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
          }
       } while (Fc1);
 
-      if (check && (*check)(B(k))) 
+      if (check && (*check)(B(k)))
          quit = 1;
 
       if (IsZero(B(k))) {
@@ -802,8 +814,8 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
       // test G_LLL reduction condition
 
-      if (k > 1 && 
-         sqrt(delta - mu[k][k-1]*mu[k][k-1])*fabs(mu[k-1][k-1]) > 
+      if (k > 1 &&
+         sqrt(delta - mu[k][k-1]*mu[k][k-1])*fabs(mu[k-1][k-1]) >
          fabs(mu[k][k])) {
          // swap rows k, k-1
 
@@ -839,7 +851,7 @@ long ll_G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
 
 static
-long G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep, 
+long G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
            LLLCheckFct check)
 {
    long m = B.NumRows();
@@ -891,7 +903,7 @@ long G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
          CheckFinite(&B1[i][j]);
       }
 
-         
+
    GivensCache_FP cache(m, n);
 
    new_m = ll_G_LLL_FP(B, U, delta, deep, check, B1, mu, aux, m, 1, quit, cache);
@@ -931,9 +943,9 @@ long G_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
    return m;
 }
 
-         
 
-long G_LLL_FP(mat_ZZ& B, double delta, long deep, LLLCheckFct check, 
+
+long G_LLL_FP(mat_ZZ& B, double delta, long deep, LLLCheckFct check,
            long verb)
 {
    verbose = verb;
@@ -944,7 +956,7 @@ long G_LLL_FP(mat_ZZ& B, double delta, long deep, LLLCheckFct check,
    return G_LLL_FP(B, 0, delta, deep, check);
 }
 
-long G_LLL_FP(mat_ZZ& B, mat_ZZ& U, double delta, long deep, 
+long G_LLL_FP(mat_ZZ& B, mat_ZZ& U, double delta, long deep,
            LLLCheckFct check, long verb)
 {
    verbose = verb;
@@ -986,7 +998,7 @@ void ComputeG_BKZConstant(long beta, long p)
          x = 0;
          for (j = 1; j <= k; j++)
             x = x + Log(j);
-          
+
          x = x * (1/double(k));
 
          x = exp(x);
@@ -1014,7 +1026,7 @@ void ComputeG_BKZConstant(long beta, long p)
 
 static vec_double G_BKZThresh;
 
-static 
+static
 void ComputeG_BKZThresh(double *c, long beta)
 {
    G_BKZThresh.SetLength(beta-1);
@@ -1032,16 +1044,16 @@ void ComputeG_BKZThresh(double *c, long beta)
 }
 
 static
-long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta, 
+long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          long beta, long prune, LLLCheckFct check)
 {
 
-   
+
 
    long m = BB.NumRows();
    long n = BB.NumCols();
    long m_orig = m;
-   
+
    long i, j;
    ZZ MU;
 
@@ -1150,7 +1162,7 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          CheckFinite(&B1[i][j]);
       }
 
-         
+
    GivensCache_FP cache(m, n);
 
    m = ll_G_LLL_FP(B, U, delta, 0, check, B1, mu, aux, m, 1, quit, cache);
@@ -1181,16 +1193,16 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
    if (!quit && m > 1) {
       if (beta > m) beta = m;
 
-      if (prune > 0) 
+      if (prune > 0)
          ComputeG_BKZConstant(beta, prune);
 
       z = 0;
       jj = 0;
-   
+
       while (z < m-1) {
          jj++;
          kk = min(jj+beta-1, m);
-   
+
          if (jj == m) {
             jj = 1;
             kk = beta;
@@ -1208,17 +1220,17 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
 
          if (prune > 0)
             ComputeG_BKZThresh(&c[jj], kk-jj+1);
-   
+
          cbar = c[jj];
          utildavec[jj] = uvec[jj] = 1;
-   
+
          yvec[jj] = vvec[jj] = 0;
          Deltavec[jj] = 0;
-   
-   
+
+
          s = t = jj;
          deltavec[jj] = 1;
-   
+
          for (i = jj+1; i <= kk+1; i++) {
             ctilda[i] = uvec[i] = utildavec[i] = yvec[i] = 0;
             Deltavec[i] = 0;
@@ -1227,20 +1239,19 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          }
 
          long enum_cnt = 0;
-   
-         while (t <= kk) {
 
-            ctilda[t] = ctilda[t+1] + 
+         while (t <= kk) {
+            ctilda[t] = ctilda[t+1] +
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
 
             ForceToMem(&ctilda[t]); // prevents an infinite loop
-   
+
             if (prune > 0 && t > jj) {
                eta = G_BKZThresh(t-jj);
             }
             else
                eta = 0;
-   
+
             if (ctilda[t] < cbar - eta) {
                if (t > jj) {
                   t--;
@@ -1255,7 +1266,7 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                      t1 = floor(t1+0.5);
                   utildavec[t] = vvec[t] = t1;
                   Deltavec[t] = 0;
-                  if (utildavec[t] > -yvec[t]) 
+                  if (utildavec[t] > -yvec[t])
                      deltavec[t] = -1;
                   else
                      deltavec[t] = 1;
@@ -1277,16 +1288,16 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          }
 
          NumIterations++;
-   
+
          h = min(kk+1, m);
-   
+
          if ((delta - 8*red_fudge)*c[jj] > cbar) {
 
             clean = 0;
 
             // we treat the case that the new vector is b_s (jj < s <= kk)
             // as a special case that appears to occur most of the time.
-   
+
             s = 0;
             for (i = jj+1; i <= kk; i++) {
                if (uvec[i] != 0) {
@@ -1296,23 +1307,23 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                      s = -1;
                }
             }
-   
+
             if (s == 0) Error("G_BKZ_FP: internal error");
-   
+
             if (s > 0) {
                // special case
 
                NumTrivial++;
-   
+
                for (i = s; i > jj; i--) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
                   if (U) swap((*U)(i-1), (*U)(i));
                   tp = B1[i-1]; B1[i-1] = B1[i]; B1[i] = tp;
                }
-   
+
                // cerr << "special case\n";
-               new_m = ll_G_LLL_FP(B, U, delta, 0, check, 
+               new_m = ll_G_LLL_FP(B, U, delta, 0, check,
                                 B1, mu, aux, h, jj, quit, cache);
                if (new_m != h) Error("G_BKZ_FP: internal error");
                if (quit) break;
@@ -1321,7 +1332,7 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                // the general case
 
                NumNonTrivial++;
-   
+
                for (i = 1; i <= n; i++) conv(B(m+1, i), 0);
 
                if (U) {
@@ -1335,38 +1346,38 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                   RowTransform2(B(m+1), B(i), MU);
                   if (U) RowTransform2((*U)(m+1), (*U)(i), MU);
                }
-      
+
                for (i = m+1; i >= jj+1; i--) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
                   if (U) swap((*U)(i-1), (*U)(i));
                   tp = B1[i-1]; B1[i-1] = B1[i]; B1[i] = tp;
                }
-      
+
                for (i = 1; i <= n; i++) {
                   conv(B1[jj][i], B(jj, i));
                   CheckFinite(&B1[jj][i]);
                }
 
                if (IsZero(B(jj))) Error("G_BKZ_FP: internal error");
-      
+
                // remove linear dependencies
-   
+
                // cerr << "general case\n";
-               new_m = ll_G_LLL_FP(B, U, delta, 0, 0, B1, mu, aux, 
+               new_m = ll_G_LLL_FP(B, U, delta, 0, 0, B1, mu, aux,
                                   kk+1, jj, quit, cache);
-              
-               if (new_m != kk) Error("G_BKZ_FP: internal error"); 
+
+               if (new_m != kk) Error("G_BKZ_FP: internal error");
 
                // remove zero vector
-      
+
                for (i = kk+2; i <= m+1; i++) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
                   if (U) swap((*U)(i-1), (*U)(i));
                   tp = B1[i-1]; B1[i-1] = B1[i]; B1[i] = tp;
                }
-      
+
                quit = 0;
                if (check) {
                   for (i = 1; i <= kk; i++)
@@ -1377,18 +1388,18 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                }
 
                if (quit) break;
-   
+
                if (h > kk) {
                   // extend reduced basis
-   
-                  new_m = ll_G_LLL_FP(B, U, delta, 0, check, 
+
+                  new_m = ll_G_LLL_FP(B, U, delta, 0, check,
                                    B1, mu, aux, h, h, quit, cache);
-   
+
                   if (new_m != h) Error("G_BKZ_FP: internal error");
                   if (quit) break;
                }
             }
-   
+
             z = 0;
          }
          else {
@@ -1398,12 +1409,12 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
             NumNoOps++;
 
             if (!clean) {
-               new_m = ll_G_LLL_FP(B, U, delta, 0, check, B1, mu, aux, 
+               new_m = ll_G_LLL_FP(B, U, delta, 0, check, B1, mu, aux,
                                    h, h, quit, cache);
                if (new_m != h) Error("G_BKZ_FP: internal error");
                if (quit) break;
             }
-   
+
             z++;
          }
       }
@@ -1465,7 +1476,7 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
    return m;
 }
 
-long G_BKZ_FP(mat_ZZ& BB, mat_ZZ& UU, double delta, 
+long G_BKZ_FP(mat_ZZ& BB, mat_ZZ& UU, double delta,
          long beta, long prune, LLLCheckFct check, long verb)
 {
    verbose = verb;
@@ -1477,7 +1488,7 @@ long G_BKZ_FP(mat_ZZ& BB, mat_ZZ& UU, double delta,
    return G_BKZ_FP(BB, &UU, delta, beta, prune, check);
 }
 
-long G_BKZ_FP(mat_ZZ& BB, double delta, 
+long G_BKZ_FP(mat_ZZ& BB, double delta,
          long beta, long prune, LLLCheckFct check, long verb)
 {
    verbose = verb;

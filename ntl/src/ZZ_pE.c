@@ -33,14 +33,14 @@ const ZZ& ZZ_pE::cardinality()
 
 
 
-ZZ_pEInfoT *ZZ_pEInfo = 0; 
+ZZ_pEInfoT *ZZ_pEInfo = 0;
 
 
 
 typedef ZZ_pEInfoT *ZZ_pEInfoPtr;
 
 
-static 
+static
 void CopyPointer(ZZ_pEInfoPtr& dst, ZZ_pEInfoPtr src)
 {
    if (src == dst) return;
@@ -48,14 +48,14 @@ void CopyPointer(ZZ_pEInfoPtr& dst, ZZ_pEInfoPtr src)
    if (dst) {
       dst->ref_count--;
 
-      if (dst->ref_count < 0) 
+      if (dst->ref_count < 0)
          Error("internal error: negative ZZ_pEContext ref_count");
 
       if (dst->ref_count == 0) delete dst;
    }
 
    if (src) {
-      if (src->ref_count == NTL_MAX_LONG) 
+      if (src->ref_count == NTL_MAX_LONG)
          Error("internal error: ZZ_pEContext ref_count overflow");
 
       src->ref_count++;
@@ -63,7 +63,7 @@ void CopyPointer(ZZ_pEInfoPtr& dst, ZZ_pEInfoPtr src)
 
    dst = src;
 }
-   
+
 
 
 

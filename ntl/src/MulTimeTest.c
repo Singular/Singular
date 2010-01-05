@@ -30,7 +30,7 @@ double clean_data(double *t)
       if (i != ix && i != iy) z+= t[i], n++;
    }
 
-   z = z/n;  
+   z = z/n;
 
    return z;
 }
@@ -53,7 +53,7 @@ int main()
 {
    _ntl_gmp_hack = 0;
 
-   
+
 
 #ifdef NTL_LONG_LONG
 
@@ -68,7 +68,7 @@ int main()
 
    long i, k;
 
-   
+
    k = 10*NTL_ZZ_NBITS;
 
    for (i = 0; i < 10000; i++) {
@@ -86,16 +86,16 @@ int main()
       }
    }
 
-   
+
 
    for (i = 0; i < 10000; i++) {
       ZZ a, b, c;
-      
+
       long da = RandomBnd(k);
       long db = RandomBnd(k);
       long dc = RandomBnd(k) + 2;
-      
-      RandomLen(a, da);  RandomLen(b, db);  RandomLen(c, dc); 
+
+      RandomLen(a, da);  RandomLen(b, db);  RandomLen(c, dc);
 
       if ( ( a * b ) % c != ((a % c) * (b % c)) % c ) {
 	 printf("999999999999999 ");
@@ -112,7 +112,7 @@ int main()
 
    RandomLen(x1, k);
    RandomLen(x2, k);
-   
+
 
    long iter;
 

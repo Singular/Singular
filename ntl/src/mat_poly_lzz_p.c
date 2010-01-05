@@ -42,7 +42,7 @@ void CharPoly(zz_pX& f, const mat_zz_p& M)
          if (i > m) {
             swap(H(i), H(m));
             // swap columns i and m
-            for (j = 1; j <= n; j++) 
+            for (j = 1; j <= n; j++)
                swap(H(j, i), H(j, m));
          }
 

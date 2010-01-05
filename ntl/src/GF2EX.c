@@ -55,13 +55,15 @@ void SetCoeff(GF2EX& x, long i, const GF2E& a)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("SetCoeff: negative index");
 
    if (NTL_OVERFLOW(i, 1, 0))
       Error("overflow in SetCoeff");
 
    m = deg(x);
+
+   if (i > m && IsZero(a)) return;
 
    if (i > m) {
       /* careful: a may alias a coefficient of x */
@@ -113,7 +115,7 @@ void SetCoeff(GF2EX& x, long i)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("coefficient index out of range");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -142,8 +144,8 @@ long IsX(const GF2EX& a)
 {
    return deg(a) == 1 && IsOne(LeadCoeff(a)) && IsZero(ConstTerm(a));
 }
-      
-      
+
+
 
 const GF2E& coeff(const GF2EX& a, long i)
 {
@@ -209,7 +211,7 @@ void conv(GF2EX& x, const ZZ& a)
 void conv(GF2EX& x, const GF2X& aa)
 {
    GF2X a = aa; // in case a aliases the rep of a coefficient of x
-   
+
    long n = deg(a)+1;
    long i;
 
@@ -234,7 +236,7 @@ void add(GF2EX& x, const GF2EX& a, const GF2EX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const GF2E *ap, *bp; 
+   const GF2E *ap, *bp;
    GF2E* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -325,7 +327,7 @@ void PlainMul(GF2EX& x, const GF2EX& a, const GF2EX& b)
 
    const GF2E *ap, *bp;
    GF2E *xp;
-   
+
    GF2EX la, lb;
 
    if (&x == &a) {
@@ -387,7 +389,7 @@ void sqr(GF2EX& x, const GF2EX& a)
 
 
 
-static 
+static
 void PlainMul1(GF2X *xp, const GF2X *ap, long sa, const GF2X& b)
 {
    long i;
@@ -505,7 +507,7 @@ void KarFix(GF2X *c, const GF2X *b, long sb, long hsa)
 
 
 static
-void KarMul(GF2X *c, const GF2X *a, 
+void KarMul(GF2X *c, const GF2X *a,
             long sa, const GF2X *b, long sb, GF2X *stk)
 {
    if (sa < sb) {
@@ -513,8 +515,8 @@ void KarMul(GF2X *c, const GF2X *a,
       { const GF2X *t = a; a = b; b = t; }
    }
 
-   if (sb == 1) {  
-      if (sa == 1) 
+   if (sb == 1) {
+      if (sa == 1)
          mul(*c, *a, *b);
       else
          PlainMul1(c, a, sa, *b);
@@ -530,7 +532,7 @@ void KarMul(GF2X *c, const GF2X *a,
       mul(c[1], stk[0], stk[1]);
       q_add(c[1], c[1], c[0]);
       q_add(c[1], c[1], c[2]);
-      
+
       return;
    }
 
@@ -617,14 +619,14 @@ void ExtractBits(_ntl_ulong *cp, const _ntl_ulong *ap, long k, long n)
       for (i = 0; i < sc-1; i++)
          cp[i] = (ap[i+wn] >> bn) | (ap[i+wn+1] << (NTL_BITS_PER_LONG - bn));
 
-      if ((k + n) % NTL_BITS_PER_LONG != 0)
+      if (k > sc*NTL_BITS_PER_LONG - bn)
          cp[sc-1] = (ap[sc+wn-1] >> bn)|(ap[sc+wn] << (NTL_BITS_PER_LONG - bn));
       else
          cp[sc-1] = ap[sc+wn-1] >> bn;
    }
 
    long p = k % NTL_BITS_PER_LONG;
-   if (p != 0) 
+   if (p != 0)
       cp[sc-1] &= ((1UL << p) - 1UL);
 
 }
@@ -648,11 +650,11 @@ void KronSubst(GF2X& aa, const GF2EX& a)
    for (i = 0; i < wsaa+1; i++)
       paa[i] = 0;
 
-   for (i = 0; i < sa; i++) 
+   for (i = 0; i < sa; i++)
       ShiftAdd(paa, rep(a.rep[i]).xrep.elts(), rep(a.rep[i]).xrep.length(),
                blocksz*i);
 
-   aa.normalize(); 
+   aa.normalize();
 }
 
 void KronMul(GF2EX& x, const GF2EX& a, const GF2EX& b)
@@ -735,7 +737,7 @@ void mul(GF2EX& c, const GF2EX& a, const GF2EX& b)
       KronMul(c, a, b);
       return;
    }
-   
+
 
    /* karatsuba */
 
@@ -750,7 +752,7 @@ void mul(GF2EX& c, const GF2EX& a, const GF2EX& b)
    } while (n > 1);
 
    GF2XVec stk;
-   stk.SetSize(sp + 2*(sa+sb)-1, 2*GF2E::WordLength()); 
+   stk.SetSize(sp + 2*(sa+sb)-1, 2*GF2E::WordLength());
 
    long i;
 
@@ -760,7 +762,7 @@ void mul(GF2EX& c, const GF2EX& a, const GF2EX& b)
    for (i = 0; i < sb; i++)
       stk[i+2*sa+sb-1] = rep(b.rep[i]);
 
-   KarMul(&stk[0], &stk[sa+sb-1], sa, &stk[2*sa+sb-1], sb, 
+   KarMul(&stk[0], &stk[sa+sb-1], sa, &stk[2*sa+sb-1], sb,
           &stk[2*(sa+sb)-1]);
 
    c.rep.SetLength(sa+sb-1);
@@ -1167,13 +1169,13 @@ void GCD(GF2EX& x, const GF2EX& a, const GF2EX& b)
    /* make gcd monic */
 
 
-   inv(t, LeadCoeff(x)); 
-   mul(x, x, t); 
+   inv(t, LeadCoeff(x));
+   mul(x, x, t);
 }
 
 
 
-         
+
 
 void XGCD(GF2EX& d, GF2EX& s, GF2EX& t, const GF2EX& a, const GF2EX& b)
 {
@@ -1193,9 +1195,9 @@ void XGCD(GF2EX& d, GF2EX& s, GF2EX& t, const GF2EX& a, const GF2EX& b)
    else {
       long e = max(deg(a), deg(b)) + 1;
 
-      GF2EX temp(INIT_SIZE, e), u(INIT_SIZE, e), v(INIT_SIZE, e), 
-            u0(INIT_SIZE, e), v0(INIT_SIZE, e), 
-            u1(INIT_SIZE, e), v1(INIT_SIZE, e), 
+      GF2EX temp(INIT_SIZE, e), u(INIT_SIZE, e), v(INIT_SIZE, e),
+            u0(INIT_SIZE, e), v0(INIT_SIZE, e),
+            u1(INIT_SIZE, e), v1(INIT_SIZE, e),
             u2(INIT_SIZE, e), v2(INIT_SIZE, e), q(INIT_SIZE, e);
 
 
@@ -1235,7 +1237,7 @@ void XGCD(GF2EX& d, GF2EX& s, GF2EX& t, const GF2EX& a, const GF2EX& b)
 
 void MulMod(GF2EX& x, const GF2EX& a, const GF2EX& b, const GF2EX& f)
 {
-   if (deg(a) >= deg(f) || deg(b) >= deg(f) || deg(f) == 0) 
+   if (deg(a) >= deg(f) || deg(b) >= deg(f) || deg(f) == 0)
       Error("MulMod: bad args");
 
    GF2EX t;
@@ -1349,7 +1351,7 @@ void random(GF2EX& x, long n)
    x.rep.SetLength(n);
 
    for (i = 0; i < n; i++)
-      random(x.rep[i]); 
+      random(x.rep[i]);
 
    x.normalize();
 }
@@ -1380,13 +1382,13 @@ void CopyReverse(GF2EX& x, const GF2EX& a, long hi)
    }
 
    x.normalize();
-} 
+}
 
 
 
 void trunc(GF2EX& x, const GF2EX& a, long m)
 
-// x = a % X^m, output may alias input 
+// x = a % X^m, output may alias input
 
 {
    if (m < 0) Error("trunc: bad args");
@@ -1790,7 +1792,7 @@ long OptWinSize(long n)
 
    return k;
 }
-      
+
 
 
 void PowerMod(GF2EX& h, const GF2EX& g, const ZZ& e, const GF2EXModulus& F)
@@ -1856,7 +1858,7 @@ void PowerMod(GF2EX& h, const GF2EX& g, const ZZ& e, const GF2EXModulus& F)
    v.SetLength(1L << (k-1));
 
    v[0] = g;
- 
+
    if (k > 1) {
       GF2EX t;
       SqrMod(t, g, F);
@@ -1872,7 +1874,7 @@ void PowerMod(GF2EX& h, const GF2EX& g, const ZZ& e, const GF2EXModulus& F)
 
    val = 0;
    for (i = n-1; i >= 0; i--) {
-      val = (val << 1) | bit(e, i); 
+      val = (val << 1) | bit(e, i);
       if (val == 0)
          SqrMod(res, res, F);
       else if (val >= (1L << (k-1)) || i == 0) {
@@ -1904,7 +1906,7 @@ void PowerMod(GF2EX& h, const GF2EX& g, const ZZ& e, const GF2EXModulus& F)
    h = res;
 }
 
-   
+
 
 
 void PowerXMod(GF2EX& hh, const ZZ& e, const GF2EXModulus& F)
@@ -1937,7 +1939,7 @@ void PowerXMod(GF2EX& hh, const ZZ& e, const GF2EXModulus& F)
 }
 
 
-      
+
 
 
 void UseMulRem(GF2EX& r, const GF2EX& a, const GF2EX& b)
@@ -1957,7 +1959,7 @@ void UseMulRem(GF2EX& r, const GF2EX& a, const GF2EX& b)
    RightShift(P2, P2, da-db);
    mul(P1, P2, b);
    add(P1, P1, a);
-   
+
    r = P1;
 }
 
@@ -1978,7 +1980,7 @@ void UseMulDivRem(GF2EX& q, GF2EX& r, const GF2EX& a, const GF2EX& b)
    RightShift(P2, P2, da-db);
    mul(P1, P2, b);
    add(P1, P1, a);
-   
+
    r = P1;
    q = P2;
 }
@@ -1998,7 +2000,7 @@ void UseMulDiv(GF2EX& q, const GF2EX& a, const GF2EX& b)
    RightShift(P2, a, db);
    mul(P2, P1, P2);
    RightShift(P2, P2, da-db);
-   
+
    q = P2;
 }
 
@@ -2058,7 +2060,7 @@ void div(GF2EX& q, const GF2EX& a, long b)
 
    q = a;
 }
-   
+
 
 
 void rem(GF2EX& r, const GF2EX& a, const GF2EX& b)
@@ -2120,7 +2122,7 @@ void RightShift(GF2EX& x, const GF2EX& a, long n)
 
    long da = deg(a);
    long i;
- 
+
    if (da < n) {
       clear(x);
       return;
@@ -2146,7 +2148,7 @@ void LeftShift(GF2EX& x, const GF2EX& a, long n)
    }
 
    if (n < 0) {
-      if (n < -NTL_MAX_LONG) 
+      if (n < -NTL_MAX_LONG)
          clear(x);
       else
          RightShift(x, a, -n);
@@ -2213,7 +2215,7 @@ void IterBuild(GF2E* a, long n)
       }
       mul(a[0], a[0], b);
    }
-} 
+}
 
 
 
@@ -2265,7 +2267,7 @@ void eval(vec_GF2E& b, const GF2EX& f, const vec_GF2E& a)
    long m = a.length();
    b.SetLength(m);
    long i;
-   for (i = 0; i < m; i++) 
+   for (i = 0; i < m; i++)
       eval(b[i], f, a[i]);
 }
 
@@ -2340,8 +2342,8 @@ void interpolate(GF2EX& f, const vec_GF2E& a, const vec_GF2E& b)
    f.rep = res;
 }
 
-   
-void InnerProduct(GF2EX& x, const vec_GF2E& v, long low, long high, 
+
+void InnerProduct(GF2EX& x, const vec_GF2E& v, long low, long high,
                    const vec_GF2EX& H, long n, GF2XVec& t)
 {
    GF2X s;
@@ -2369,7 +2371,7 @@ void InnerProduct(GF2EX& x, const vec_GF2E& v, long low, long high,
 }
 
 
-void CompMod(GF2EX& x, const GF2EX& g, const GF2EXArgument& A, 
+void CompMod(GF2EX& x, const GF2EX& g, const GF2EXArgument& A,
              const GF2EXModulus& F)
 {
    if (deg(g) <= 0) {
@@ -2419,7 +2421,7 @@ void build(GF2EXArgument& A, const GF2EX& h, const GF2EXModulus& F, long m)
 
    set(A.H[0]);
    A.H[1] = h;
-   for (i = 2; i <= m; i++) 
+   for (i = 2; i <= m; i++)
       MulMod(A.H[i], A.H[i-1], h, F);
 }
 
@@ -2474,7 +2476,7 @@ void Comp2Mod(GF2EX& x1, GF2EX& x2, const GF2EX& g1, const GF2EX& g2,
    x2 = xx2;
 }
 
-void Comp3Mod(GF2EX& x1, GF2EX& x2, GF2EX& x3, 
+void Comp3Mod(GF2EX& x1, GF2EX& x2, GF2EX& x3,
               const GF2EX& g1, const GF2EX& g2, const GF2EX& g3,
               const GF2EX& h, const GF2EXModulus& F)
 
@@ -2526,11 +2528,11 @@ void build(GF2EXTransMultiplier& B, const GF2EX& b, const GF2EXModulus& F)
    if (d < 0)
       B.shamt_fbi = 0;
    else
-      B.shamt_fbi = F.n-2 - d; 
+      B.shamt_fbi = F.n-2 - d;
 
    CopyReverse(B.fbi, t, d);
 
-   // The following code optimizes the case when 
+   // The following code optimizes the case when
    // f = X^n + low degree poly
 
    trunc(t, F.f, F.n);
@@ -2573,21 +2575,21 @@ void TransMulMod(GF2EX& x, const GF2EX& a, const GF2EXTransMultiplier& B,
 }
 
 
-void UpdateMap(vec_GF2E& x, const vec_GF2E& a, 
+void UpdateMap(vec_GF2E& x, const vec_GF2E& a,
          const GF2EXTransMultiplier& B, const GF2EXModulus& F)
 {
    GF2EX xx;
    TransMulMod(xx, to_GF2EX(a), B, F);
    x = xx.rep;
 }
-   
+
 
 
 static
-void ProjectPowers(vec_GF2E& x, const GF2EX& a, long k, 
+void ProjectPowers(vec_GF2E& x, const GF2EX& a, long k,
                    const GF2EXArgument& H, const GF2EXModulus& F)
 {
-   if (k < 0 || NTL_OVERFLOW(k, 1, 0) || deg(a) >= F.n) 
+   if (k < 0 || NTL_OVERFLOW(k, 1, 0) || deg(a) >= F.n)
       Error("ProjectPowers: bad args");
 
    long m = H.H.length()-1;
@@ -2613,7 +2615,7 @@ void ProjectPowers(vec_GF2E& x, const GF2EX& a, long k,
 }
 
 static
-void ProjectPowers(vec_GF2E& x, const GF2EX& a, long k, const GF2EX& h, 
+void ProjectPowers(vec_GF2E& x, const GF2EX& a, long k, const GF2EX& h,
                    const GF2EXModulus& F)
 {
    if (k < 0 || deg(a) >= F.n || deg(h) >= F.n)
@@ -2638,7 +2640,7 @@ void ProjectPowers(vec_GF2E& x, const vec_GF2E& a, long k,
    ProjectPowers(x, to_GF2EX(a), k, H, F);
 }
 
-void ProjectPowers(vec_GF2E& x, const vec_GF2E& a, long k, 
+void ProjectPowers(vec_GF2E& x, const vec_GF2E& a, long k,
                    const GF2EX& h, const GF2EXModulus& F)
 {
    ProjectPowers(x, to_GF2EX(a), k, h, F);
@@ -2703,7 +2705,7 @@ void BerlekampMassey(GF2EX& h, const vec_GF2E& a, long m)
       }
    }
 
-   // cerr << "finished: " << L << " " << deg(Lambda) << "\n"; 
+   // cerr << "finished: " << L << " " << deg(Lambda) << "\n";
 
    dl = deg(Lambda);
    h.rep.SetLength(L + 1);
@@ -2725,7 +2727,7 @@ void MinPolySeq(GF2EX& h, const vec_GF2E& a, long m)
 }
 
 
-void DoMinPolyMod(GF2EX& h, const GF2EX& g, const GF2EXModulus& F, long m, 
+void DoMinPolyMod(GF2EX& h, const GF2EX& g, const GF2EXModulus& F, long m,
                const GF2EX& R)
 {
    vec_GF2E x;
@@ -2769,7 +2771,7 @@ void MinPolyMod(GF2EX& hh, const GF2EX& g, const GF2EXModulus& F, long m)
    GF2EX h2, h3;
    GF2EX R;
    GF2EXTransMultiplier H1;
-   
+
 
    for (;;) {
       random(R, n);
@@ -2838,7 +2840,7 @@ long divide(GF2EX& q, const GF2EX& a, const GF2EX& b)
 
    GF2EX lq, r;
    DivRem(lq, r, a, b);
-   if (!IsZero(r)) return 0; 
+   if (!IsZero(r)) return 0;
    q = lq;
    return 1;
 }
@@ -2848,7 +2850,7 @@ long divide(const GF2EX& a, const GF2EX& b)
    if (IsZero(b)) return IsZero(a);
    GF2EX lq, r;
    DivRem(lq, r, a, b);
-   if (!IsZero(r)) return 0; 
+   if (!IsZero(r)) return 0;
    return 1;
 }
 
@@ -2913,7 +2915,7 @@ void power(GF2EX& x, const GF2EX& a, long e)
    GF2EX res;
    res.SetMaxLength(da*e + 1);
    res = 1;
-   
+
    long k = NumBits(e);
    long i;
 
@@ -3024,7 +3026,7 @@ void TraceMod(GF2E& x, const GF2EX& a, const GF2EXModulus& F)
    if (deg(a) >= n)
       Error("trace: bad args");
 
-   if (F.tracevec.length() == 0) 
+   if (F.tracevec.length() == 0)
       ComputeTraceVec(F);
 
    InnerProduct(x, a.rep, F.tracevec);
@@ -3042,10 +3044,10 @@ void TraceMod(GF2E& x, const GF2EX& a, const GF2EX& f)
 void PlainResultant(GF2E& rres, const GF2EX& a, const GF2EX& b)
 {
    GF2E res;
- 
+
    if (IsZero(a) || IsZero(b))
       clear(res);
-   else if (deg(a) == 0 && deg(b) == 0) 
+   else if (deg(a) == 0 && deg(b) == 0)
       set(res);
    else {
       long d0, d1, d2;
@@ -3080,7 +3082,7 @@ void PlainResultant(GF2E& rres, const GF2EX& a, const GF2EX& b)
             }
             else
                clear(res);
-        
+
             break;
          }
       }
@@ -3091,13 +3093,13 @@ void PlainResultant(GF2E& rres, const GF2EX& a, const GF2EX& b)
 
 void resultant(GF2E& rres, const GF2EX& a, const GF2EX& b)
 {
-   PlainResultant(rres, a, b); 
+   PlainResultant(rres, a, b);
 }
 
 
 void NormMod(GF2E& x, const GF2EX& a, const GF2EX& f)
 {
-   if (deg(f) <= 0 || deg(a) >= deg(f)) 
+   if (deg(f) <= 0 || deg(a) >= deg(f))
       Error("norm: bad args");
 
    if (IsZero(a)) {
@@ -3178,7 +3180,7 @@ void CompTower(GF2EX& x, const GF2X& g, const GF2EXArgument& A,
 }
 
 
-void CompTower(GF2EX& x, const GF2X& g, const GF2EX& h, 
+void CompTower(GF2EX& x, const GF2X& g, const GF2EX& h,
              const GF2EXModulus& F)
    // x = g(h) mod f
 {
@@ -3212,7 +3214,7 @@ void PrepareProjection(vec_vec_GF2& tt, const vec_GF2E& s,
    }
 }
 
-void ProjectedInnerProduct(GF2& x, const vec_GF2E& a, 
+void ProjectedInnerProduct(GF2& x, const vec_GF2E& a,
                            const vec_vec_GF2& b)
 {
    long n = min(a.length(), b.length());
@@ -3316,12 +3318,12 @@ void DoMinPolyTower(GF2X& h, const GF2EX& g, const GF2EXModulus& F, long m,
    vec_GF2 x;
 
    ProjectPowersTower(x, R, 2*m, g, F, proj);
-   
+
    MinPolySeq(h, x, m);
 }
 
 
-void ProbMinPolyTower(GF2X& h, const GF2EX& g, const GF2EXModulus& F, 
+void ProbMinPolyTower(GF2X& h, const GF2EX& g, const GF2EXModulus& F,
                       long m)
 {
    long n = F.n;
@@ -3338,7 +3340,7 @@ void ProbMinPolyTower(GF2X& h, const GF2EX& g, const GF2EXModulus& F,
    DoMinPolyTower(h, g, F, m, R, proj);
 }
 
-void ProbMinPolyTower(GF2X& h, const GF2EX& g, const GF2EXModulus& F, 
+void ProbMinPolyTower(GF2X& h, const GF2EX& g, const GF2EXModulus& F,
                       long m, const vec_GF2& proj)
 {
    long n = F.n;
@@ -3379,7 +3381,7 @@ void MinPolyTower(GF2X& hh, const GF2EX& g, const GF2EXModulus& F, long m)
    GF2EX h3;
    vec_GF2E R;
    GF2EXTransMultiplier H1;
-   
+
 
    for (;;) {
       R.SetLength(n);
@@ -3392,9 +3394,9 @@ void MinPolyTower(GF2X& hh, const GF2EX& g, const GF2EXModulus& F, long m)
       if (deg(h) == m) { hh = h; return; }
       CompTower(h3, h2, g, F);
       MulMod(h1, h3, h1, F);
-      if (IsZero(h1)) { 
-         hh = h; 
-         return; 
+      if (IsZero(h1)) {
+         hh = h;
+         return;
       }
    }
 }

@@ -19,6 +19,34 @@ A Tour of NTL: Summary of Changes
 
 <p> <hr> <p>
 <h3>
+2009.08.14: Changes between NTL 5.5.1 and 5.5.2
+</h3>
+
+<ul>
+<li>
+New routines <tt>MulAddTo</tt> and <tt>MulSubFrom</tt>
+for computing <tt>x += a*b</tt> and <tt>x -= a*b</tt>,
+where <tt>x</tt> and <tt>a</tt> are <tt>ZZ</tt>'s and
+<tt>b</tt> is a <tt>ZZ</tt> or a <tt>long</tt>.
+In the case where <tt>b</tt> is a <tt>long</tt>,
+this may be much faster than writing 
+<tt>mul(t, a, b); add(x, x, t)</tt>.
+See <a href="ZZ.txt">ZZ.txt</a> for details.
+
+These new routines are used in a number of places in
+NTL to get faster algorithms (for example, the <tt>LLL</tt> routine).
+
+<li>
+Fixed a relatively benign indexing bug in <tt>GF2EX</tt>
+discovered by Berend-Benjamin Tams using the <tt>valgrind</tt> tool.
+
+
+
+
+</ul>
+
+<p> <hr> <p>
+<h3>
 2009.05.05: Changes between NTL 5.5 and 5.5.1
 </h3>
 

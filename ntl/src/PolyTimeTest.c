@@ -30,7 +30,7 @@ double clean_data(double *t)
       if (i != ix && i != iy) z+= t[i], n++;
    }
 
-   z = z/n;  
+   z = z/n;
 
    return z;
 }
@@ -144,7 +144,7 @@ int main()
      }
      t = GetTime() - t;
      tvec[w] = t;
-   } 
+   }
 
 
    t = clean_data(tvec);

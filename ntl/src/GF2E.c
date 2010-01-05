@@ -25,7 +25,7 @@ GF2EInfoT::GF2EInfoT(const GF2X& NewP)
       KarCross = 4;
    else if (p.size == 6)
       KarCross = 3;
-   else 
+   else
       KarCross = 2;
 
 
@@ -56,7 +56,7 @@ GF2EInfoT::GF2EInfoT(const GF2X& NewP)
       DivCross = 150;
    else if (p.size <= 13)
       DivCross = 100;
-   else 
+   else
       DivCross = 75;
 
    _card_init = 0;
@@ -79,14 +79,14 @@ const ZZ& GF2E::cardinality()
 
 
 
-GF2EInfoT *GF2EInfo = 0; 
+GF2EInfoT *GF2EInfo = 0;
 
 
 
 typedef GF2EInfoT *GF2EInfoPtr;
 
 
-static 
+static
 void CopyPointer(GF2EInfoPtr& dst, GF2EInfoPtr src)
 {
    if (src == dst) return;
@@ -94,14 +94,14 @@ void CopyPointer(GF2EInfoPtr& dst, GF2EInfoPtr src)
    if (dst) {
       dst->ref_count--;
 
-      if (dst->ref_count < 0) 
+      if (dst->ref_count < 0)
          Error("internal error: negative GF2EContext ref_count");
 
       if (dst->ref_count == 0) delete dst;
    }
 
    if (src) {
-      if (src->ref_count == NTL_MAX_LONG) 
+      if (src->ref_count == NTL_MAX_LONG)
          Error("internal error: GF2EContext ref_count overflow");
 
       src->ref_count++;
@@ -110,7 +110,7 @@ void CopyPointer(GF2EInfoPtr& dst, GF2EInfoPtr src)
 
    dst = src;
 }
-   
+
 
 
 

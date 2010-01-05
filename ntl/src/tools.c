@@ -96,7 +96,7 @@ long IsWhiteSpace(long a)
 
    if (isspace(b))
       return 1;
-   else 
+   else
       return 0;
 }
 

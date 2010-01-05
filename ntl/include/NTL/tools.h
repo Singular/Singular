@@ -250,6 +250,7 @@ inline double to_double(double a) { return a; }
 long SkipWhiteSpace(NTL_SNS istream& s);
 #endif
 long IsWhiteSpace(long c);
+long IsEOFChar(long c);
 
 long CharToIntVal(long c);
 char IntValToChar(long a);

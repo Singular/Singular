@@ -94,7 +94,6 @@ long CRT(vec_ZZ& gg, ZZ& a, const vec_zz_p& G)
    long modified = 0;
 
    long h;
-   ZZ ah;
 
    ZZ g;
    long i;
@@ -106,21 +105,20 @@ long CRT(vec_ZZ& gg, ZZ& a, const vec_zz_p& G)
       }
       else
          g = gg[i];
-   
+
       h = rem(g, p);
       h = SubMod(rep(G[i]), h, p);
       h = MulMod(h, a_inv, p);
       if (h > p1)
          h = h - p;
-   
+
       if (h != 0) {
          modified = 1;
-         mul(ah, a, h);
-   
+
          if (!p_odd && g > 0 && (h == p1))
-            sub(g, g, ah);
+            MulSubFrom(g, a, h);
          else
-            add(g, g, ah);
+            MulAddTo(g, a, h);
       }
 
       gg[i] = g;
@@ -147,13 +145,13 @@ void mul(vec_zz_p& x, const vec_zz_p& a, zz_p b)
 
    }
    else {
- 
+
       long p = zz_p::modulus();
       double pinv = zz_p::ModulusInverse();
       long bb = rep(b);
       mulmod_precon_t bpinv = PrepMulModPrecon(bb, p, pinv);
-      
-      
+
+
       const zz_p *ap = a.elts();
       zz_p *xp = x.elts();
 
@@ -262,7 +260,7 @@ void VectorCopy(vec_zz_p& x, const vec_zz_p& a, long n)
    long m = min(n, a.length());
 
    x.SetLength(n);
-  
+
    long i;
 
    for (i = 0; i < m; i++)

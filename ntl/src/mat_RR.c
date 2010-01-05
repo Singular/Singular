@@ -9,105 +9,105 @@ NTL_matrix_impl(RR,vec_RR,vec_vec_RR,mat_RR)
 NTL_eq_matrix_impl(RR,vec_RR,vec_vec_RR,mat_RR)
 
 
-  
-void add(mat_RR& X, const mat_RR& A, const mat_RR& B)  
-{  
-   long n = A.NumRows();  
-   long m = A.NumCols();  
-  
-   if (B.NumRows() != n || B.NumCols() != m)   
-      Error("matrix add: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j;  
-   for (i = 1; i <= n; i++)   
-      for (j = 1; j <= m; j++)  
-         add(X(i,j), A(i,j), B(i,j));  
-}  
-  
-void sub(mat_RR& X, const mat_RR& A, const mat_RR& B)  
-{  
-   long n = A.NumRows();  
-   long m = A.NumCols();  
-  
-   if (B.NumRows() != n || B.NumCols() != m)  
-      Error("matrix sub: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j;  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= m; j++)  
-         sub(X(i,j), A(i,j), B(i,j));  
-}  
-  
-void mul_aux(mat_RR& X, const mat_RR& A, const mat_RR& B)  
-{  
-   long n = A.NumRows();  
-   long l = A.NumCols();  
-   long m = B.NumCols();  
-  
-   if (l != B.NumRows())  
-      Error("matrix mul: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j, k;  
-   RR acc, tmp;  
-  
-   for (i = 1; i <= n; i++) {  
-      for (j = 1; j <= m; j++) {  
-         clear(acc);  
-         for(k = 1; k <= l; k++) {  
-            mul(tmp, A(i,k), B(k,j));  
-            add(acc, acc, tmp);  
-         }  
-         X(i,j) = acc;  
-      }  
-   }  
-}  
-  
-  
-void mul(mat_RR& X, const mat_RR& A, const mat_RR& B)  
-{  
-   if (&X == &A || &X == &B) {  
-      mat_RR tmp;  
-      mul_aux(tmp, A, B);  
-      X = tmp;  
-   }  
-   else  
-      mul_aux(X, A, B);  
-}  
-  
-  
+
+void add(mat_RR& X, const mat_RR& A, const mat_RR& B)
+{
+   long n = A.NumRows();
+   long m = A.NumCols();
+
+   if (B.NumRows() != n || B.NumCols() != m)
+      Error("matrix add: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j;
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= m; j++)
+         add(X(i,j), A(i,j), B(i,j));
+}
+
+void sub(mat_RR& X, const mat_RR& A, const mat_RR& B)
+{
+   long n = A.NumRows();
+   long m = A.NumCols();
+
+   if (B.NumRows() != n || B.NumCols() != m)
+      Error("matrix sub: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j;
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= m; j++)
+         sub(X(i,j), A(i,j), B(i,j));
+}
+
+void mul_aux(mat_RR& X, const mat_RR& A, const mat_RR& B)
+{
+   long n = A.NumRows();
+   long l = A.NumCols();
+   long m = B.NumCols();
+
+   if (l != B.NumRows())
+      Error("matrix mul: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j, k;
+   RR acc, tmp;
+
+   for (i = 1; i <= n; i++) {
+      for (j = 1; j <= m; j++) {
+         clear(acc);
+         for(k = 1; k <= l; k++) {
+            mul(tmp, A(i,k), B(k,j));
+            add(acc, acc, tmp);
+         }
+         X(i,j) = acc;
+      }
+   }
+}
+
+
+void mul(mat_RR& X, const mat_RR& A, const mat_RR& B)
+{
+   if (&X == &A || &X == &B) {
+      mat_RR tmp;
+      mul_aux(tmp, A, B);
+      X = tmp;
+   }
+   else
+      mul_aux(X, A, B);
+}
+
+
 static
-void mul_aux(vec_RR& x, const mat_RR& A, const vec_RR& b)  
-{  
-   long n = A.NumRows();  
-   long l = A.NumCols();  
-  
-   if (l != b.length())  
-      Error("matrix mul: dimension mismatch");  
-  
-   x.SetLength(n);  
-  
-   long i, k;  
-   RR acc, tmp;  
-  
-   for (i = 1; i <= n; i++) {  
-      clear(acc);  
-      for (k = 1; k <= l; k++) {  
-         mul(tmp, A(i,k), b(k));  
-         add(acc, acc, tmp);  
-      }  
-      x(i) = acc;  
-   }  
-}  
-  
-  
-void mul(vec_RR& x, const mat_RR& A, const vec_RR& b)  
-{  
+void mul_aux(vec_RR& x, const mat_RR& A, const vec_RR& b)
+{
+   long n = A.NumRows();
+   long l = A.NumCols();
+
+   if (l != b.length())
+      Error("matrix mul: dimension mismatch");
+
+   x.SetLength(n);
+
+   long i, k;
+   RR acc, tmp;
+
+   for (i = 1; i <= n; i++) {
+      clear(acc);
+      for (k = 1; k <= l; k++) {
+         mul(tmp, A(i,k), b(k));
+         add(acc, acc, tmp);
+      }
+      x(i) = acc;
+   }
+}
+
+
+void mul(vec_RR& x, const mat_RR& A, const vec_RR& b)
+{
    if (&b == &x || A.position1(x) != -1) {
       vec_RR tmp;
       mul_aux(tmp, A, b);
@@ -115,31 +115,31 @@ void mul(vec_RR& x, const mat_RR& A, const vec_RR& b)
    }
    else
       mul_aux(x, A, b);
-}  
+}
 
 static
-void mul_aux(vec_RR& x, const vec_RR& a, const mat_RR& B)  
-{  
-   long n = B.NumRows();  
-   long l = B.NumCols();  
-  
-   if (n != a.length())  
-      Error("matrix mul: dimension mismatch");  
-  
-   x.SetLength(l);  
-  
-   long i, k;  
-   RR acc, tmp;  
-  
-   for (i = 1; i <= l; i++) {  
-      clear(acc);  
-      for (k = 1; k <= n; k++) {  
+void mul_aux(vec_RR& x, const vec_RR& a, const mat_RR& B)
+{
+   long n = B.NumRows();
+   long l = B.NumCols();
+
+   if (n != a.length())
+      Error("matrix mul: dimension mismatch");
+
+   x.SetLength(l);
+
+   long i, k;
+   RR acc, tmp;
+
+   for (i = 1; i <= l; i++) {
+      clear(acc);
+      for (k = 1; k <= n; k++) {
          mul(tmp, a(k), B(k,i));
-         add(acc, acc, tmp);  
-      }  
-      x(i) = acc;  
-   }  
-}  
+         add(acc, acc, tmp);
+      }
+      x(i) = acc;
+   }
+}
 
 void mul(vec_RR& x, const vec_RR& a, const mat_RR& B)
 {
@@ -152,20 +152,20 @@ void mul(vec_RR& x, const vec_RR& a, const mat_RR& B)
       mul_aux(x, a, B);
 }
 
-     
-  
-void ident(mat_RR& X, long n)  
-{  
-   X.SetDims(n, n);  
-   long i, j;  
-  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= n; j++)  
-         if (i == j)  
-            set(X(i, j));  
-         else  
-            clear(X(i, j));  
-} 
+
+
+void ident(mat_RR& X, long n)
+{
+   X.SetDims(n, n);
+   long i, j;
+
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= n; j++)
+         if (i == j)
+            set(X(i, j));
+         else
+            clear(X(i, j));
+}
 
 
 void determinant(RR& d, const mat_RR& M_in)
@@ -216,7 +216,7 @@ void determinant(RR& d, const mat_RR& M_in)
 
          mul(det, det, M[k][k]);
 
-         // make M[k, k] == -1 
+         // make M[k, k] == -1
 
          inv(t1, M[k][k]);
          negate(t1, t1);
@@ -227,7 +227,7 @@ void determinant(RR& d, const mat_RR& M_in)
          for (i = k+1; i < n; i++) {
             // M[i] = M[i] + M[k]*M[i,k]
 
-            t1 = M[i][k];   
+            t1 = M[i][k];
 
             x = M[i].elts() + (k+1);
             y = M[k].elts() + (k+1);
@@ -271,7 +271,7 @@ long IsIdent(const mat_RR& A, long n)
 
    return 1;
 }
-            
+
 
 void transpose(mat_RR& X, const mat_RR& A)
 {
@@ -302,9 +302,9 @@ void transpose(mat_RR& X, const mat_RR& A)
             X(j, i) = A(i, j);
    }
 }
-   
 
-void solve(RR& d, vec_RR& X, 
+
+void solve(RR& d, vec_RR& X,
            const mat_RR& A, const vec_RR& b)
 
 {
@@ -329,7 +329,7 @@ void solve(RR& d, vec_RR& X,
    M.SetDims(n, n+1);
 
    for (i = 0; i < n; i++) {
-      for (j = 0; j < n; j++) 
+      for (j = 0; j < n; j++)
          M[i][j] = A[j][i];
       M[i][n] = b[i];
    }
@@ -358,7 +358,7 @@ void solve(RR& d, vec_RR& X,
 
          mul(det, det, M[k][k]);
 
-         // make M[k, k] == -1 
+         // make M[k, k] == -1
 
          inv(t1, M[k][k]);
          negate(t1, t1);
@@ -369,7 +369,7 @@ void solve(RR& d, vec_RR& X,
          for (i = k+1; i < n; i++) {
             // M[i] = M[i] + M[k]*M[i,k]
 
-            t1 = M[i][k];   
+            t1 = M[i][k];
 
             x = M[i].elts() + (k+1);
             y = M[k].elts() + (k+1);
@@ -454,7 +454,7 @@ void inv(RR& d, mat_RR& X, const mat_RR& A)
 
          mul(det, det, M[k][k]);
 
-         // make M[k, k] == -1 
+         // make M[k, k] == -1
 
          inv(t1, M[k][k]);
          negate(t1, t1);
@@ -465,7 +465,7 @@ void inv(RR& d, mat_RR& X, const mat_RR& A)
          for (i = k+1; i < n; i++) {
             // M[i] = M[i] + M[k]*M[i,k]
 
-            t1 = M[i][k];   
+            t1 = M[i][k];
 
             x = M[i].elts() + (k+1);
             y = M[k].elts() + (k+1);
@@ -501,7 +501,7 @@ void inv(RR& d, mat_RR& X, const mat_RR& A)
 }
 
 
-   
+
 void mul(mat_RR& X, const mat_RR& A, const RR& b_in)
 {
    RR b = b_in;
@@ -532,19 +532,19 @@ void mul(mat_RR& X, const mat_RR& A, double b_in)
          mul(X[i][j], A[i][j], b);
 }
 
-void diag(mat_RR& X, long n, const RR& d_in)  
-{  
+void diag(mat_RR& X, long n, const RR& d_in)
+{
    RR d = d_in;
-   X.SetDims(n, n);  
-   long i, j;  
-  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= n; j++)  
-         if (i == j)  
-            X(i, j) = d;  
-         else  
-            clear(X(i, j));  
-} 
+   X.SetDims(n, n);
+   long i, j;
+
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= n; j++)
+         if (i == j)
+            X(i, j) = d;
+         else
+            clear(X(i, j));
+}
 
 long IsDiag(const mat_RR& A, long n, const RR& d)
 {

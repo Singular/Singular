@@ -48,7 +48,6 @@ long CRT(ZZX& gg, ZZ& a, const zz_pX& G)
    long modified = 0;
 
    long h;
-   ZZ ah;
 
    long m = G.rep.length();
 
@@ -67,7 +66,7 @@ long CRT(ZZX& gg, ZZ& a, const zz_pX& G)
       }
       else
          g = gg.rep[i];
-   
+
       h = rem(g, p);
 
       if (i < m)
@@ -78,15 +77,14 @@ long CRT(ZZX& gg, ZZ& a, const zz_pX& G)
       h = MulMod(h, a_inv, p);
       if (h > p1)
          h = h - p;
-   
+
       if (h != 0) {
          modified = 1;
-         mul(ah, a, h);
-   
+
          if (!p_odd && g > 0 && (h == p1))
-            sub(g, g, ah);
+            MulSubFrom(g, a, h);
          else
-            add(g, g, ah);
+            MulAddTo(g, a, h);
       }
 
       gg.rep[i] = g;
@@ -98,7 +96,7 @@ long CRT(ZZX& gg, ZZ& a, const zz_pX& G)
       h = MulMod(h, a_inv, p);
       if (h > p1)
          h = h - p;
-   
+
       modified = 1;
       mul(g, a, h);
       gg.rep[i] = g;
@@ -153,7 +151,7 @@ long CRT(ZZX& gg, ZZ& a, const ZZ_pX& G)
       }
       else
          g = gg.rep[i];
-   
+
       rem(h, g, p);
 
       if (i < m)
@@ -164,11 +162,11 @@ long CRT(ZZX& gg, ZZ& a, const ZZ_pX& G)
       MulMod(h, h, a_inv, p);
       if (h > p1)
          sub(h, h, p);
-   
+
       if (h != 0) {
          modified = 1;
          mul(ah, a, h);
-   
+
          if (!p_odd && g > 0 && (h == p1))
             sub(g, g, ah);
          else
@@ -184,7 +182,7 @@ long CRT(ZZX& gg, ZZ& a, const ZZ_pX& G)
       MulMod(h, h, a_inv, p);
       if (h > p1)
          sub(h, h, p);
-   
+
       modified = 1;
       mul(g, a, h);
       gg.rep[i] = g;
@@ -265,7 +263,7 @@ static void fft(vec_ZZ& a, long r, long l, const ZZ& p, long n)
     halfsize =  1L << (l - 1 - round);
     for (i = (1L << round) - 1, off = 0; i >= 0; i--, off += halfsize) {
       for (j = 0, e = 0; j < halfsize; j++, off++, e+=r) {
-	/* One butterfly : 
+	/* One butterfly :
 	 ( a[off], a[off+halfsize] ) *= ( 1  w^{j2^round} )
 	                                ( 1 -w^{j2^round} ) */
 	/* tmp = a[off] - a[off + halfsize] mod p */
@@ -299,7 +297,7 @@ static void ifft(vec_ZZ& a, long r, long l, const ZZ& p, long n)
     halfsize = 1L << (l - 1 - round);
     for (i = (1L << round) - 1, off = 0; i >= 0; i--, off += halfsize) {
       for (j = 0, e = 0; j < halfsize; j++, off++, e+=r) {
-	/* One inverse butterfly : 
+	/* One inverse butterfly :
 	 ( a[off], a[off+halfsize] ) *= ( 1               1             )
 	                                ( w^{-j2^round}  -w^{-j2^round} ) */
 	/* a[off + halfsize] *= w^{-j2^round} mod p */
@@ -405,7 +403,7 @@ void SSMul(ZZX& c, const ZZX& a, const ZZX& b)
     }
     aa[i] = ai;
   }
-  
+
   ifft(aa, r, l + 1, p, mr);
 
   /* Retrieve c, dividing by 2m, and subtracting p where necessary */
@@ -422,7 +420,7 @@ void SSMul(ZZX& c, const ZZX& a, const ZZX& b)
       }
       else
         ci = tmp;
-    } 
+    }
     else
        clear(ci);
   }
@@ -510,8 +508,9 @@ void HomMul(ZZX& x, const ZZX& a, const ZZX& b)
 
       for (j = 0; j <= m; j++) {
          /* c[j] += coeff*rep(C.rep[j]) */
-         mul(t1, coeff, rep(C.rep[j]));
-         add(c[j], c[j], t1); 
+         MulAddTo(c[j], coeff, rep(C.rep[j]));
+         // mul(t1, coeff, rep(C.rep[j]));
+         // add(c[j], c[j], t1);
       }
    }
 
@@ -569,7 +568,7 @@ void mul(ZZX& c, const ZZX& a, const ZZX& b)
    long k = min(maxa, maxb);
    long s = min(deg(a), deg(b)) + 1;
 
-   if (s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || 
+   if (s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) ||
                  (k == 3 && s < 10)) {
 
       PlainMul(c, a, b);
@@ -582,8 +581,8 @@ void mul(ZZX& c, const ZZX& a, const ZZX& b)
    }
 
 
-   if (maxa + maxb >= 40 && 
-       SSRatio(deg(a), MaxBits(a), deg(b), MaxBits(b)) < 1.75) 
+   if (maxa + maxb >= 40 &&
+       SSRatio(deg(a), MaxBits(a), deg(b), MaxBits(b)) < 1.75)
       SSMul(c, a, b);
    else
       HomMul(c, a, b);
@@ -643,7 +642,7 @@ void SSSqr(ZZX& c, const ZZX& a)
     }
     aa[i] = ai;
   }
-  
+
   ifft(aa, r, l + 1, p, mr);
 
   ZZ ci;
@@ -663,7 +662,7 @@ void SSSqr(ZZX& c, const ZZX& a)
       }
       else
         ci = tmp;
-    } 
+    }
     else
        clear(ci);
   }
@@ -725,8 +724,9 @@ void HomSqr(ZZX& x, const ZZX& a)
 
       for (j = 0; j <= m; j++) {
          /* c[j] += coeff*rep(C.rep[j]) */
-         mul(t1, coeff, rep(C.rep[j]));
-         add(c[j], c[j], t1); 
+         MulAddTo(c[j], coeff, rep(C.rep[j]));
+         // mul(t1, coeff, rep(C.rep[j]));
+         // add(c[j], c[j], t1);
       }
    }
 
@@ -762,7 +762,7 @@ void sqr(ZZX& c, const ZZX& a)
    long k = maxa;
    long s = deg(a) + 1;
 
-   if (s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || 
+   if (s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) ||
                  (k == 3 && s < 25) || (k == 4 && s < 10)) {
 
       PlainSqr(c, a);
@@ -775,9 +775,9 @@ void sqr(ZZX& c, const ZZX& a)
    }
 
    long mba = MaxBits(a);
-   
-   if (2*maxa >= 40 && 
-       SSRatio(deg(a), mba, deg(a), mba) < 1.75) 
+
+   if (2*maxa >= 40 &&
+       SSRatio(deg(a), mba, deg(a), mba) < 1.75)
       SSSqr(c, a);
    else
       HomSqr(c, a);
@@ -803,7 +803,7 @@ void mul(ZZX& x, const ZZX& a, const ZZ& b)
    ap = a.rep.elts();
    xp = x.rep.elts();
 
-   for (i = 0; i <= da; i++) 
+   for (i = 0; i <= da; i++)
       mul(xp[i], ap[i], t);
 }
 
@@ -824,7 +824,7 @@ void mul(ZZX& x, const ZZX& a, long b)
    ap = a.rep.elts();
    xp = x.rep.elts();
 
-   for (i = 0; i <= da; i++) 
+   for (i = 0; i <= da; i++)
       mul(xp[i], ap[i], b);
 }
 
@@ -908,7 +908,7 @@ void HomPseudoDivRem(ZZX& q, ZZX& r, const ZZX& a, const ZZX& b)
 
       conv(A, a);
       conv(B, b);
-      
+
       if (!IsOne(LC)) {
          zz_p y;
          conv(y, LC);
@@ -1041,7 +1041,7 @@ void PlainPseudoDivRem(ZZX& q, ZZX& r, const ZZX& a, const ZZX& b)
          if (i < dq) mul(t, t, LC);
       }
    }
-      
+
 
    r.rep.SetLength(db);
    for (i = 0; i < db; i++)
@@ -1157,7 +1157,7 @@ void div(ZZX& q, const ZZX& a, const ZZX& b)
    else if (divide(q, a, b)) {
 
       // nothing to do
-      
+
    }
    else {
       ZZX q1;
@@ -1297,7 +1297,7 @@ long HomDivide(ZZX& q, const ZZX& a, const ZZX& b)
       if (!Qinstable) {
          // stabilized...check if prod is big enough
 
-         long bound = b_bound + MaxBits(qq) + 
+         long bound = b_bound + MaxBits(qq) +
                      NumBits(min(deg(bb), deg(qq)) + 1);
 
          if (a_bound > bound)
@@ -1305,7 +1305,7 @@ long HomDivide(ZZX& q, const ZZX& a, const ZZX& b)
 
          bound += 3;
 
-         if (NumBits(prod) > bound) 
+         if (NumBits(prod) > bound)
             break;
       }
    }
@@ -1366,7 +1366,7 @@ long PlainDivide(ZZX& qq, const ZZX& aa, const ZZX& bb)
 
    if (!divide(cq, ca, cb)) {
       return 0;
-   } 
+   }
 
 
    ZZX a, b, q;
@@ -1423,7 +1423,7 @@ long PlainDivide(ZZX& qq, const ZZX& aa, const ZZX& bb)
 
 long PlainDivide(const ZZX& a, const ZZX& b)
 {
-   if (deg(b) == 0) 
+   if (deg(b) == 0)
       return divide(a, ConstTerm(b));
    else {
       ZZX q;
@@ -1565,7 +1565,7 @@ long divide(const ZZX& a, long b)
    return 1;
 }
 
-   
+
 
 void content(ZZ& d, const ZZX& f)
 {
@@ -1588,7 +1588,7 @@ void PrimitivePart(ZZX& pp, const ZZX& f)
       clear(pp);
       return;
    }
- 
+
    ZZ d;
 
    content(d, f);
@@ -1614,7 +1614,7 @@ void BalCopy(ZZX& g, const zz_pX& G)
 }
 
 
-   
+
 void GCD(ZZX& d, const ZZX& a, const ZZX& b)
 {
    if (IsZero(a)) {
@@ -1672,7 +1672,7 @@ void GCD(ZZX& d, const ZZX& a, const ZZX& b)
       mul(G, G, LD);
 
 
-      if (deg(G) == 0) { 
+      if (deg(G) == 0) {
          set(res);
          break;
       }
@@ -1682,7 +1682,7 @@ void GCD(ZZX& d, const ZZX& a, const ZZX& b)
          conv(prod, p);
          BalCopy(g, G);
       }
-      else if (deg(G) > deg(g)) 
+      else if (deg(G) > deg(g))
          continue;
       else if (!CRT(g, prod, G)) {
          PrimitivePart(res, g);
@@ -1739,7 +1739,7 @@ void LeftShift(ZZX& x, const ZZX& a, long n)
    }
 
    if (n < 0) {
-      if (n < -NTL_MAX_LONG)  
+      if (n < -NTL_MAX_LONG)
          clear(x);
       else
          RightShift(x, a, -n);
@@ -1834,7 +1834,7 @@ void EuclLength(ZZ& l, const ZZX& a)
 {
    long n = a.rep.length();
    long i;
- 
+
    ZZ sum, t;
 
    clear(sum);
@@ -1856,7 +1856,7 @@ void EuclLength(ZZ& l, const ZZX& a)
 static
 long ResBound(const ZZX& a, const ZZX& b)
 {
-   if (IsZero(a) || IsZero(b)) 
+   if (IsZero(a) || IsZero(b))
       return 0;
 
    ZZ t1, t2, t;
@@ -1993,8 +1993,8 @@ void MinPolyMod(ZZX& gg, const ZZX& a, const ZZX& f)
             break;
       }
 
-      if (!instable && 
-         (deg(g) < n || 
+      if (!instable &&
+         (deg(g) < n ||
          (deg(g) == n && bound > 1000 && NumBits(prod) < 0.75*bound))) {
 
          // guarantees 2^{-80} error probability
@@ -2017,13 +2017,13 @@ void MinPolyMod(ZZX& gg, const ZZX& a, const ZZX& f)
 
          ZZ_pX H;
          CompMod(H, G, A, FF);
-         
+
          if (IsZero(H))
             break;
 
          instable = 1;
-      } 
-         
+      }
+
       zz_p::FFTInit(i);
 
       zz_pX A, F;
@@ -2054,7 +2054,7 @@ void MinPolyMod(ZZX& gg, const ZZX& a, const ZZX& f)
 }
 
 
-void XGCD(ZZ& rr, ZZX& ss, ZZX& tt, const ZZX& a, const ZZX& b, 
+void XGCD(ZZ& rr, ZZX& ss, ZZX& tt, const ZZX& a, const ZZX& b,
           long deterministic)
 {
    ZZ r;
@@ -2098,7 +2098,7 @@ void XGCD(ZZ& rr, ZZX& ss, ZZX& tt, const ZZX& a, const ZZX& b,
          conv(S, s);
          conv(T, t);
          zz_pX t1, t2;
-         mul(t1, A, S); 
+         mul(t1, A, S);
          mul(t2, B, T);
          add(t1, t1, t2);
 
@@ -2110,21 +2110,21 @@ void XGCD(ZZ& rr, ZZX& ss, ZZX& tt, const ZZX& a, const ZZX& b,
 
       if (instable) {
          XGCD(D, S, T, A, B);
-   
+
          mul(S, S, R);
          mul(T, T, R);
-   
+
          tmp = prod;
          long Sinstable = CRT(s, tmp, S);
          long Tinstable = CRT(t, prod, T);
-   
+
          instable = Sinstable || Tinstable;
       }
 
       if (!instable) {
-         long bound1 = NumBits(min(deg(a), deg(s)) + 1) 
+         long bound1 = NumBits(min(deg(a), deg(s)) + 1)
                       + MaxBits(a) + MaxBits(s);
-         long bound2 = NumBits(min(deg(b), deg(t)) + 1) 
+         long bound2 = NumBits(min(deg(b), deg(t)) + 1)
                       + MaxBits(b) + MaxBits(t);
 
          long bound = 4 + max(NumBits(r), max(bound1, bound2));
@@ -2194,7 +2194,7 @@ void discriminant(ZZ& d, const ZZX& a, long deterministic)
 
 void MulMod(ZZX& x, const ZZX& a, const ZZX& b, const ZZX& f)
 {
-   if (deg(a) >= deg(f) || deg(b) >= deg(f) || deg(f) == 0 || 
+   if (deg(a) >= deg(f) || deg(b) >= deg(f) || deg(f) == 0 ||
        !IsOne(LeadCoeff(f)))
       Error("MulMod: bad args");
 
@@ -2275,7 +2275,7 @@ void EuclLength1(ZZ& l, const ZZX& a)
 {
    long n = a.rep.length();
    long i;
- 
+
    ZZ sum, t;
 
    clear(sum);
@@ -2321,7 +2321,7 @@ long CharPolyBound(const ZZX& a, const ZZX& f)
 
 void SetCoeff(ZZX& x, long i, long a)
 {
-   if (a == 1) 
+   if (a == 1)
       SetCoeff(x, i);
    else {
       static ZZ aa;

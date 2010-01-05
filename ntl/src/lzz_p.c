@@ -114,7 +114,7 @@ zz_pInfoT *zz_pInfo = 0;
 
 typedef zz_pInfoT *zz_pInfoPtr;
 
-static 
+static
 void CopyPointer(zz_pInfoPtr& dst, zz_pInfoPtr src)
 {
    if (src == dst) return;
@@ -122,14 +122,14 @@ void CopyPointer(zz_pInfoPtr& dst, zz_pInfoPtr src)
    if (dst) {
       dst->ref_count--;
 
-      if (dst->ref_count < 0) 
+      if (dst->ref_count < 0)
          Error("internal error: negative zz_pContext ref_count");
 
       if (dst->ref_count == 0) delete dst;
    }
 
    if (src) {
-      if (src->ref_count == NTL_MAX_LONG) 
+      if (src->ref_count == NTL_MAX_LONG)
          Error("internal error: zz_pContext ref_count overflow");
 
       src->ref_count++;
@@ -137,7 +137,7 @@ void CopyPointer(zz_pInfoPtr& dst, zz_pInfoPtr src)
 
    dst = src;
 }
-   
+
 
 void zz_p::init(long p, long maxroot)
 {
@@ -217,7 +217,7 @@ void zz_pBak::restore()
 
 
 
-static inline 
+static inline
 long reduce(long a, long p)
 {
    if (a >= 0 && a < p)

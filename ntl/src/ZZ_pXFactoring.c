@@ -61,13 +61,13 @@ void SquareFreeDecomp(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff)
          conv(p, ZZ_p::modulus());
          d = deg(r)/p;
          f.rep.SetLength(d+1);
-         for (k = 0; k <= d; k++) 
+         for (k = 0; k <= d; k++)
             f.rep[k] = r.rep[k*p];
          m = m*p;
       }
    } while (!finished);
 }
-         
+
 
 
 static
@@ -192,7 +192,7 @@ void RecFindRoots(vec_ZZ_p& x, const ZZ_pX& f)
       negate(x[k], ConstTerm(f));
       return;
    }
-      
+
    ZZ_pX h;
 
    ZZ_p r;
@@ -200,7 +200,7 @@ void RecFindRoots(vec_ZZ_p& x, const ZZ_pX& f)
 
 
    RightShift(p1, ZZ_p::modulus(), 1);
-   
+
    {
       ZZ_pXModulus F;
       build(F, f);
@@ -214,7 +214,7 @@ void RecFindRoots(vec_ZZ_p& x, const ZZ_pX& f)
    }
 
    RecFindRoots(x, h);
-   div(h, f, h); 
+   div(h, f, h);
    RecFindRoots(x, h);
 }
 
@@ -270,7 +270,7 @@ void RandomBasisElt(ZZ_pX& g, const vec_long& D, const vec_ZZVec& M)
 
 static
 void split(ZZ_pX& f1, ZZ_pX& g1, ZZ_pX& f2, ZZ_pX& g2,
-           const ZZ_pX& f, const ZZ_pX& g, 
+           const ZZ_pX& f, const ZZ_pX& g,
            const vec_ZZ_p& roots, long lo, long mid)
 {
    long r = mid-lo+1;
@@ -291,7 +291,7 @@ void split(ZZ_pX& f1, ZZ_pX& g1, ZZ_pX& f2, ZZ_pX& g2,
 
 
    GCD(f1, a, f);
-   
+
    div(f2, f, f1);
 
    rem(g1, g, f1);
@@ -355,7 +355,7 @@ void IterFindFactors(vec_ZZ_pX& factors, const ZZ_pX& f,
 #endif
 
 
-   
+
 
 void SFBerlekamp(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
 {
@@ -452,7 +452,7 @@ void berlekamp(vec_pair_ZZ_pX_long& factors, const ZZ_pX& f, long verbose)
    if (!IsOne(LeadCoeff(f)))
       Error("berlekamp: bad args");
 
-   
+
    SquareFreeDecomp(sfd, f);
 
    factors.SetLength(0);
@@ -477,7 +477,7 @@ void AddFactor(vec_pair_ZZ_pX_long& factors, const ZZ_pX& g, long d, long verbos
 }
 
 static
-void ProcessTable(ZZ_pX& f, vec_pair_ZZ_pX_long& factors, 
+void ProcessTable(ZZ_pX& f, vec_pair_ZZ_pX_long& factors,
                   const ZZ_pXModulus& F, long limit, const vec_ZZ_pX& tbl,
                   long d, long verbose)
 
@@ -514,7 +514,7 @@ void ProcessTable(ZZ_pX& f, vec_pair_ZZ_pX_long& factors,
    d = d - limit + 1;
 
    while (2*d <= deg(t1)) {
-      GCD(t2, tbl[i], t1); 
+      GCD(t2, tbl[i], t1);
       if (deg(t2) > 0) {
          AddFactor(factors, t2, d, verbose);
          div(t1, t1, t2);
@@ -529,7 +529,7 @@ void ProcessTable(ZZ_pX& f, vec_pair_ZZ_pX_long& factors,
 }
 
 
-void TraceMap(ZZ_pX& w, const ZZ_pX& a, long d, const ZZ_pXModulus& F, 
+void TraceMap(ZZ_pX& w, const ZZ_pX& a, long d, const ZZ_pXModulus& F,
               const ZZ_pX& b)
 
 {
@@ -543,7 +543,7 @@ void TraceMap(ZZ_pX& w, const ZZ_pX& a, long d, const ZZ_pXModulus& F,
 
    while (d) {
       if (d == 1) {
-         if (IsZero(w)) 
+         if (IsZero(w))
             w = y;
          else {
             CompMod(w, w, z, F);
@@ -644,7 +644,7 @@ long ProbIrredTest(const ZZ_pX& f, long iter)
    long pp;
 
    conv(pp, p);
-   
+
    if (n % pp != 0) return 1;
 
    PowerCompose(s, b, n/pp, F);
@@ -653,7 +653,7 @@ long ProbIrredTest(const ZZ_pX& f, long iter)
 
 long ZZ_pX_BlockingFactor = 10;
 
-void DDF(vec_pair_ZZ_pX_long& factors, const ZZ_pX& ff, const ZZ_pX& hh, 
+void DDF(vec_pair_ZZ_pX_long& factors, const ZZ_pX& ff, const ZZ_pX& hh,
          long verbose)
 {
    ZZ_pX f = ff;
@@ -672,7 +672,7 @@ void DDF(vec_pair_ZZ_pX_long& factors, const ZZ_pX& ff, const ZZ_pX& hh,
       return;
    }
 
-   long CompTableSize = 2*SqrRoot(deg(f)); 
+   long CompTableSize = 2*SqrRoot(deg(f));
 
    long GCDTableSize = ZZ_pX_BlockingFactor;
 
@@ -712,7 +712,7 @@ void DDF(vec_pair_ZZ_pX_long& factors, const ZZ_pX& ff, const ZZ_pX& hh,
          // we need to go further
 
          if (deg(f) < old_n) {
-            // f has changed 
+            // f has changed
 
             build(F, f);
             rem(h, h, f);
@@ -752,7 +752,7 @@ void EDFSplit(vec_ZZ_pX& v, const ZZ_pX& f, const ZZ_pX& b, long d)
    ZZ_pX a, g, h;
    ZZ_pXModulus F;
    vec_ZZ_p roots;
-   
+
    build(F, f);
    long n = F.n;
    long r = n/d;
@@ -783,7 +783,7 @@ void RecEDF(vec_ZZ_pX& factors, const ZZ_pX& f, const ZZ_pX& b, long d,
       }
    }
 }
-         
+
 
 void EDF(vec_ZZ_pX& factors, const ZZ_pX& ff, const ZZ_pX& bb,
          long d, long verbose)
@@ -845,7 +845,7 @@ void SFCanZass(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
 
    const ZZ& p = ZZ_p::modulus();
 
-   
+
    ZZ_pXModulus F;
    build(F, f);
 
@@ -887,7 +887,7 @@ void SFCanZass(vec_ZZ_pX& factors, const ZZ_pX& ff, long verbose)
       }
    }
 }
-   
+
 void CanZass(vec_pair_ZZ_pX_long& factors, const ZZ_pX& f, long verbose)
 {
    if (!IsOne(LeadCoeff(f)))
@@ -897,7 +897,7 @@ void CanZass(vec_pair_ZZ_pX_long& factors, const ZZ_pX& f, long verbose)
    vec_pair_ZZ_pX_long sfd;
    vec_ZZ_pX x;
 
-   
+
    SquareFreeDecomp(sfd, f);
 
    factors.SetLength(0);
@@ -958,7 +958,7 @@ long BaseCase(const ZZ_pX& h, long q, long a, const ZZ_pXModulus& F)
 
 
 static
-void TandemPowerCompose(ZZ_pX& y1, ZZ_pX& y2, const ZZ_pX& h, 
+void TandemPowerCompose(ZZ_pX& y1, ZZ_pX& y2, const ZZ_pX& h,
                         long q1, long q2, const ZZ_pXModulus& F)
 {
    ZZ_pX z(INIT_SIZE, F.n);
@@ -1038,7 +1038,7 @@ long RecComputeDegree(long u, const ZZ_pX& h, const ZZ_pXModulus& F,
    ZZ_pX h1, h2;
    long q1, q2, r1, r2;
 
-   q1 = fvec[fvec[u].link].val; 
+   q1 = fvec[fvec[u].link].val;
    q2 = fvec[fvec[u].link+1].val;
 
    TandemPowerCompose(h1, h2, h, q1, q2, F);
@@ -1047,7 +1047,7 @@ long RecComputeDegree(long u, const ZZ_pX& h, const ZZ_pXModulus& F,
    return r1*r2;
 }
 
-   
+
 
 
 long ComputeDegree(const ZZ_pX& h, const ZZ_pXModulus& F)
@@ -1098,7 +1098,7 @@ void FindRoot(ZZ_p& root, const ZZ_pX& ff)
    ZZ p1;
 
    f = ff;
-   
+
    if (!IsOne(LeadCoeff(f)))
       Error("FindRoot: bad args");
 
@@ -1168,11 +1168,11 @@ long RecIrredTest(long u, const ZZ_pX& h, const ZZ_pXModulus& F,
    }
 
 
-   q1 = fvec[fvec[u].link].val; 
+   q1 = fvec[fvec[u].link].val;
    q2 = fvec[fvec[u].link+1].val;
 
    TandemPowerCompose(h1, h2, h, q1, q2, F);
-   return RecIrredTest(fvec[u].link, h2, F, fvec) 
+   return RecIrredTest(fvec[u].link, h2, F, fvec)
           && RecIrredTest(fvec[u].link+1, h1, F, fvec);
 }
 
@@ -1184,7 +1184,7 @@ long DetIrredTest(const ZZ_pX& f)
    ZZ_pXModulus F;
 
    build(F, f);
-   
+
    ZZ_pX h;
 
    PowerXMod(h, ZZ_p::modulus(), F);
@@ -1210,7 +1210,7 @@ long IterIrredTest(const ZZ_pX& f)
    ZZ_pXModulus F;
 
    build(F, f);
-   
+
    ZZ_pX h;
 
    PowerXMod(h, ZZ_p::modulus(), F);
@@ -1420,7 +1420,7 @@ static vec_ZZ_pX GiantStepFile;
 
 
 
-static 
+static
 double CalcTableSize(long n, long k)
 {
    double sz = ZZ_p::storage();
@@ -1513,7 +1513,7 @@ void NewAddFactor(vec_pair_ZZ_pX_long& u, const ZZ_pX& g, long m, long verbose)
 
 }
 
-   
+
 
 
 static
@@ -1583,7 +1583,7 @@ void FetchBabySteps(vec_ZZ_pX& v, long k)
          v[i] = BabyStepFile(i);
    }
 }
-      
+
 
 
 static
@@ -1643,7 +1643,7 @@ void GiantRefine(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff, long k, long l,
          build(F, f);
 
          long i;
-         for (i = 1; i <= k-1; i++) 
+         for (i = 1; i <= k-1; i++)
             rem(BabyStep[i], BabyStep[i], F);
       }
    }
@@ -1652,7 +1652,7 @@ void GiantRefine(vec_pair_ZZ_pX_long& u, const ZZ_pX& ff, long k, long l,
       NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
    }
 
-   if (deg(f) > 0) 
+   if (deg(f) > 0)
       NewAddFactor(u, f, 0, verbose);
 
 }
@@ -1707,10 +1707,10 @@ void IntervalRefine(vec_pair_ZZ_pX_long& factors, const ZZ_pX& ff,
 
    NewProcessTable(factors, f, F, buf, size, first_d, 1, verbose);
 
-   if (deg(f) > 0) 
+   if (deg(f) > 0)
       NewAddFactor(factors, f, deg(f), verbose);
 }
-   
+
 
 
 
@@ -1740,10 +1740,10 @@ void BabyRefine(vec_pair_ZZ_pX_long& factors, const vec_pair_ZZ_pX_long& u,
 
 }
 
-      
-      
 
-      
+
+
+
 
 void NewDDF(vec_pair_ZZ_pX_long& factors,
             const ZZ_pX& f,
@@ -1767,7 +1767,7 @@ void NewDDF(vec_pair_ZZ_pX_long& factors,
 
    if (!ZZ_pX_stem[0])
       sprintf(ZZ_pX_stem, "ddf-%ld", RandomBnd(10000));
-      
+
    long B = deg(f)/2;
    long k = SqrRoot(B);
    long l = (B+k-1)/k;

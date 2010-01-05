@@ -49,11 +49,11 @@ void ZZVec::kill()
    }
 
    free(v);
-   v = 0; 
+   v = 0;
 }
 
 
-ZZVec& ZZVec::operator=(const ZZVec& a) 
+ZZVec& ZZVec::operator=(const ZZVec& a)
 {
    if (this == &a)
       return *this;
@@ -67,7 +67,7 @@ ZZVec& ZZVec::operator=(const ZZVec& a)
 
   return *this;
 }
-   
+
 ZZVec::ZZVec(const ZZVec& a)
 {
    v = 0; len = 0; bsize = 0;

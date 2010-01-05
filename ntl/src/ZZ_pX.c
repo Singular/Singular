@@ -2,7 +2,7 @@
 #include <NTL/ZZ_pX.h>
 
 
-// The mul & sqr routines use routines from ZZX, 
+// The mul & sqr routines use routines from ZZX,
 // which is faster for small degree polynomials.
 // Define this macro to revert to old strategy.
 
@@ -87,7 +87,7 @@ void SetCoeff(ZZ_pX& x, long i, const ZZ_p& a)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("SetCoeff: negative index");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -95,7 +95,7 @@ void SetCoeff(ZZ_pX& x, long i, const ZZ_p& a)
 
    m = deg(x);
 
-   if (i > m && IsZero(a)) return; 
+   if (i > m && IsZero(a)) return;
 
    if (i > m) {
       /* careful: a may alias a coefficient of x */
@@ -124,10 +124,10 @@ void SetCoeff(ZZ_pX& x, long i, const ZZ_p& a)
 
 void SetCoeff(ZZ_pX& x, long i, long a)
 {
-   if (a == 1) 
+   if (a == 1)
       SetCoeff(x, i);
    else {
-      ZZ_pTemp TT;  ZZ_p& T = TT.val(); 
+      ZZ_pTemp TT;  ZZ_p& T = TT.val();
       conv(T, a);
       SetCoeff(x, i, T);
    }
@@ -137,7 +137,7 @@ void SetCoeff(ZZ_pX& x, long i)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("coefficient index out of range");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -166,8 +166,8 @@ long IsX(const ZZ_pX& a)
 {
    return deg(a) == 1 && IsOne(LeadCoeff(a)) && IsZero(ConstTerm(a));
 }
-      
-      
+
+
 
 const ZZ_p& coeff(const ZZ_pX& a, long i)
 {
@@ -250,7 +250,7 @@ void add(ZZ_pX& x, const ZZ_pX& a, const ZZ_pX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const ZZ_p *ap, *bp; 
+   const ZZ_p *ap, *bp;
    ZZ_p* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -319,7 +319,7 @@ void sub(ZZ_pX& x, const ZZ_pX& a, const ZZ_pX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const ZZ_p *ap, *bp; 
+   const ZZ_p *ap, *bp;
    ZZ_p* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -389,7 +389,7 @@ void sub(ZZ_pX& x, const ZZ_pX& a, long b)
 
 void sub(ZZ_pX& x, const ZZ_p& a, const ZZ_pX& b)
 {
-   ZZ_pTemp TT; ZZ_p& T = TT.val(); 
+   ZZ_pTemp TT; ZZ_p& T = TT.val();
    T = a;
 
    negate(x, b);
@@ -398,7 +398,7 @@ void sub(ZZ_pX& x, const ZZ_p& a, const ZZ_pX& b)
 
 void sub(ZZ_pX& x, long a, const ZZ_pX& b)
 {
-   ZZ_pTemp TT; ZZ_p& T = TT.val(); 
+   ZZ_pTemp TT; ZZ_p& T = TT.val();
    T = a;
 
    negate(x, b);
@@ -460,7 +460,7 @@ void mul(ZZ_pX& c, const ZZ_pX& a, const ZZ_pX& b)
    else {
       long mbits;
       mbits = NumBits(ZZ_p::modulus());
-      if (k >= SS_kbound && 
+      if (k >= SS_kbound &&
           SSRatio(deg(a), mbits, deg(b), mbits) < SS_rbound) {
          ZZX A, B, C;
          conv(A, a);
@@ -500,7 +500,7 @@ void sqr(ZZ_pX& c, const ZZ_pX& a)
    else {
       long mbits;
       mbits = NumBits(ZZ_p::modulus());
-      if (k >= SS_kbound && 
+      if (k >= SS_kbound &&
           SSRatio(deg(a), mbits, deg(a), mbits) < SS_rbound) {
          ZZX A, C;
          conv(A, a);
@@ -566,7 +566,7 @@ void PlainMul(ZZ_pX& x, const ZZ_pX& a, const ZZ_pX& b)
 
    const ZZ_p *ap, *bp;
    ZZ_p *xp;
-   
+
    ZZ_pX la, lb;
 
    if (&x == &a) {
@@ -996,7 +996,7 @@ void mul(ZZ_pX& x, const ZZ_pX& a, const ZZ_p& b)
    ap = a.rep.elts();
    xp = x.rep.elts();
 
-   for (i = 0; i <= da; i++) 
+   for (i = 0; i <= da; i++)
       mul(xp[i], ap[i], t);
 
    x.normalize();
@@ -1039,13 +1039,13 @@ void PlainGCD(ZZ_pX& x, const ZZ_pX& a, const ZZ_pX& b)
    /* make gcd monic */
 
 
-   inv(t, LeadCoeff(x)); 
-   mul(x, x, t); 
+   inv(t, LeadCoeff(x));
+   mul(x, x, t);
 }
 
 
 
-         
+
 
 void PlainXGCD(ZZ_pX& d, ZZ_pX& s, ZZ_pX& t, const ZZ_pX& a, const ZZ_pX& b)
 {
@@ -1065,9 +1065,9 @@ void PlainXGCD(ZZ_pX& d, ZZ_pX& s, ZZ_pX& t, const ZZ_pX& a, const ZZ_pX& b)
    else {
       long e = max(deg(a), deg(b)) + 1;
 
-      ZZ_pX temp(INIT_SIZE, e), u(INIT_SIZE, e), v(INIT_SIZE, e), 
-            u0(INIT_SIZE, e), v0(INIT_SIZE, e), 
-            u1(INIT_SIZE, e), v1(INIT_SIZE, e), 
+      ZZ_pX temp(INIT_SIZE, e), u(INIT_SIZE, e), v(INIT_SIZE, e),
+            u0(INIT_SIZE, e), v0(INIT_SIZE, e),
+            u1(INIT_SIZE, e), v1(INIT_SIZE, e),
             u2(INIT_SIZE, e), v2(INIT_SIZE, e), q(INIT_SIZE, e);
 
 
@@ -1107,7 +1107,7 @@ void PlainXGCD(ZZ_pX& d, ZZ_pX& s, ZZ_pX& t, const ZZ_pX& a, const ZZ_pX& b)
 
 void MulMod(ZZ_pX& x, const ZZ_pX& a, const ZZ_pX& b, const ZZ_pX& f)
 {
-   if (deg(a) >= deg(f) || deg(b) >= deg(f) || deg(f) == 0) 
+   if (deg(a) >= deg(f) || deg(b) >= deg(f) || deg(f) == 0)
       Error("MulMod: bad args");
 
    ZZ_pX t;
@@ -1220,7 +1220,7 @@ void random(ZZ_pX& x, long n)
    x.rep.SetLength(n);
 
    for (i = 0; i < n; i++)
-      random(x.rep[i]); 
+      random(x.rep[i]);
 
    x.normalize();
 }
@@ -1254,7 +1254,7 @@ void FFTRep::SetSize(long NewK)
          Error("out of space in FFTRep::SetSize()");
    }
    else {
-      for (i = 0; i < NumPrimes; i++) 
+      for (i = 0; i < NumPrimes; i++)
          free(tbl[i]);
    }
 
@@ -1279,7 +1279,7 @@ FFTRep::FFTRep(const FFTRep& R)
    NumPrimes = R.NumPrimes;
 
    long i, j, n;
- 
+
    tbl = (long **) NTL_MALLOC(NumPrimes, sizeof(long *), 0);
    if (!tbl)
       Error("out of space in FFTRep");
@@ -1318,12 +1318,12 @@ FFTRep& FFTRep::operator=(const FFTRep& R)
             Error("out of space in FFTRep");
       }
       else {
-         for (i = 0; i < NumPrimes; i++) 
+         for (i = 0; i < NumPrimes; i++)
             free(tbl[i]);
       }
-   
+
       n = 1L << R.k;
-   
+
       for (i = 0; i < NumPrimes; i++) {
          if ( !(tbl[i] = (long *) NTL_MALLOC(n, sizeof(long), 0)) )
             Error("out of space in FFTRep");
@@ -1374,7 +1374,7 @@ void ZZ_pXModRep::SetSize(long NewN)
    }
 
    long i;
- 
+
 
    if (MaxN == 0) {
       tbl = (long **) NTL_MALLOC(ZZ_pInfo->NumPrimes, sizeof(long *), 0);
@@ -1382,7 +1382,7 @@ void ZZ_pXModRep::SetSize(long NewN)
          Error("out of space in ZZ_pXModRep::SetSize()");
    }
    else {
-      for (i = 0; i < ZZ_pInfo->NumPrimes; i++) 
+      for (i = 0; i < ZZ_pInfo->NumPrimes; i++)
          free(tbl[i]);
    }
 
@@ -1439,14 +1439,14 @@ void FromModularRep(ZZ_p& x, const vec_long& a)
       x.LoopHole() = t;
       return;
    }
-      
+
 
    if (ZZ_pInfo->QuickCRT) {
       y = 0;
       for (i = 0; i < n; i++)
          y += ((double) a[i])*ZZ_pInfo->x[i];
 
-      conv(q, (y + 0.5)); 
+      conv(q, (y + 0.5));
    } else {
       long Q, r;
       static ZZ qq;
@@ -1488,7 +1488,7 @@ void ToFFTRep(FFTRep& y, const ZZ_pX& x, long k, long lo, long hi)
    ZZ_p accum;
 
 
-   if (k > ZZ_pInfo->MaxRoot) 
+   if (k > ZZ_pInfo->MaxRoot)
       Error("Polynomial too big for FFT");
 
    if (lo < 0)
@@ -1537,7 +1537,7 @@ void ToFFTRep(FFTRep& y, const ZZ_pX& x, long k, long lo, long hi)
 
 
 
-void RevToFFTRep(FFTRep& y, const vec_ZZ_p& x, 
+void RevToFFTRep(FFTRep& y, const vec_ZZ_p& x,
                  long k, long lo, long hi, long offset)
 // computes an n = 2^k point convolution of X^offset*x[lo..hi] mod X^n-1
 // using "inverted" evaluation points.
@@ -1550,7 +1550,7 @@ void RevToFFTRep(FFTRep& y, const vec_ZZ_p& x,
    vec_long& s = FFTBuf;
    ZZ_p accum;
 
-   if (k > ZZ_pInfo->MaxRoot) 
+   if (k > ZZ_pInfo->MaxRoot)
       Error("Polynomial too big for FFT");
 
    if (lo < 0)
@@ -1610,7 +1610,7 @@ void FromFFTRep(ZZ_pX& x, FFTRep& y, long lo, long hi)
 
    // converts from FFT-representation to coefficient representation
    // only the coefficients lo..hi are computed
-   
+
 
 {
    ZZ_pInfo->check();
@@ -1646,8 +1646,8 @@ void FromFFTRep(ZZ_pX& x, FFTRep& y, long lo, long hi)
    x.rep.SetLength(l);
 
    for (j = 0; j < l; j++) {
-      for (i = 0; i < ZZ_pInfo->NumPrimes; i++) 
-         t[i] = y.tbl[i][j+lo]; 
+      for (i = 0; i < ZZ_pInfo->NumPrimes; i++)
+         t[i] = y.tbl[i][j+lo];
 
       FromModularRep(x.rep[j], t);
    }
@@ -1660,7 +1660,7 @@ void RevFromFFTRep(vec_ZZ_p& x, FFTRep& y, long lo, long hi)
    // converts from FFT-representation to coefficient representation
    // using "inverted" evaluation points.
    // only the coefficients lo..hi are computed
-   
+
 
 {
    ZZ_pInfo->check();
@@ -1693,8 +1693,8 @@ void RevFromFFTRep(vec_ZZ_p& x, FFTRep& y, long lo, long hi)
    x.SetLength(l);
 
    for (j = 0; j < l; j++) {
-      for (i = 0; i < ZZ_pInfo->NumPrimes; i++) 
-         t[i] = y.tbl[i][j+lo]; 
+      for (i = 0; i < ZZ_pInfo->NumPrimes; i++)
+         t[i] = y.tbl[i][j+lo];
 
       FromModularRep(x[j], t);
    }
@@ -1732,8 +1732,8 @@ void NDFromFFTRep(ZZ_pX& x, const FFTRep& y, long lo, long hi, FFTRep& z)
    x.rep.SetLength(l);
 
    for (j = 0; j < l; j++) {
-      for (i = 0; i < ZZ_pInfo->NumPrimes; i++) 
-         t[i] = z.tbl[i][j+lo]; 
+      for (i = 0; i < ZZ_pInfo->NumPrimes; i++)
+         t[i] = z.tbl[i][j+lo];
 
       FromModularRep(x.rep[j], t);
    }
@@ -1751,7 +1751,7 @@ void FromFFTRep(ZZ_p* x, FFTRep& y, long lo, long hi)
 
    // converts from FFT-representation to coefficient representation
    // only the coefficients lo..hi are computed
-   
+
 
 {
    ZZ_pInfo->check();
@@ -1784,8 +1784,8 @@ void FromFFTRep(ZZ_p* x, FFTRep& y, long lo, long hi)
       if (j >= n)
          clear(x[j-lo]);
       else {
-         for (i = 0; i < ZZ_pInfo->NumPrimes; i++) 
-            t[i] = y.tbl[i][j]; 
+         for (i = 0; i < ZZ_pInfo->NumPrimes; i++)
+            t[i] = y.tbl[i][j];
 
          FromModularRep(x[j-lo], t);
       }
@@ -1886,9 +1886,9 @@ void reduce(FFTRep& x, const FFTRep& a, long k)
    x.SetSize(k);
 
    for (i = 0; i < ZZ_pInfo->NumPrimes; i++) {
-      ap = &a.tbl[i][0];   
+      ap = &a.tbl[i][0];
       xp = &x.tbl[i][0];
-      for (j = 0; j < n; j++) 
+      for (j = 0; j < n; j++)
          xp[j] = ap[j << (l-k)];
    }
 }
@@ -1978,7 +1978,7 @@ void ToFFTRep(FFTRep& x, const ZZ_pXModRep& a, long k, long lo, long hi)
          sp[j] = ap[lo+j];
       for (j = m; j < n; j++)
          sp[j] = 0;
-      
+
       FFT(xp, sp, k, FFTPrime[i], Root);
    }
 }
@@ -2053,7 +2053,7 @@ void CopyReverse(ZZ_pX& x, const ZZ_pX& a, long lo, long hi)
    }
 
    x.normalize();
-} 
+}
 
 void copy(ZZ_pX& x, const ZZ_pX& a, long lo, long hi)
 
@@ -2080,7 +2080,7 @@ void copy(ZZ_pX& x, const ZZ_pX& a, long lo, long hi)
    }
 
    x.normalize();
-} 
+}
 
 
 void rem21(ZZ_pX& x, const ZZ_pX& a, const ZZ_pXModulus& F)
@@ -2423,7 +2423,7 @@ void MulMod(ZZ_pX& x, const ZZ_pX& a, const ZZ_pX& b, const ZZ_pXModulus& F)
    ToFFTRep(R2, b, k);
    mul(R1, R1, R2);
    NDFromFFTRep(P1, R1, n, d-1, R2); // save R1 for future use
-   
+
    ToFFTRep(R2, P1, F.l);
    mul(R2, R2, F.HRep);
    FromFFTRep(P1, R2, n-2, 2*n-4);
@@ -2444,7 +2444,7 @@ void SqrMod(ZZ_pX& x, const ZZ_pX& a, const ZZ_pXModulus& F)
 
    if (n < 0) Error("SqrMod: uninitailized modulus");
 
-   if (da >= n) 
+   if (da >= n)
       Error("bad args to SqrMod(ZZ_pX,ZZ_pX,ZZ_pXModulus)");
 
    if (!F.UseFFT || da <= NTL_ZZ_pX_FFT_CROSSOVER) {
@@ -2466,7 +2466,7 @@ void SqrMod(ZZ_pX& x, const ZZ_pX& a, const ZZ_pXModulus& F)
    ToFFTRep(R1, a, k);
    mul(R1, R1, R1);
    NDFromFFTRep(P1, R1, n, d-1, R2);  // save R1 for future use
-   
+
    ToFFTRep(R2, P1, F.l);
    mul(R2, R2, F.HRep);
    FromFFTRep(P1, R2, n-2, 2*n-4);
@@ -2488,7 +2488,7 @@ void PlainInvTrunc(ZZ_pX& x, const ZZ_pX& a, long m)
    ZZ_p s;
    const ZZ_p* ap;
    ZZ_p* xp;
-   
+
 
    n = deg(a);
 
@@ -2527,7 +2527,7 @@ void PlainInvTrunc(ZZ_pX& x, const ZZ_pX& a, long m)
 
 void trunc(ZZ_pX& x, const ZZ_pX& a, long m)
 
-// x = a % X^m, output may alias input 
+// x = a % X^m, output may alias input
 
 {
    if (m < 0) Error("trunc: bad args");
@@ -2615,7 +2615,7 @@ void InvTrunc(ZZ_pX& x, const ZZ_pX& a, long m)
          PlainInvTrunc(x, a, m);
    }
 }
-   
+
 
 
 void build(ZZ_pXModulus& x, const ZZ_pX& f)
@@ -2655,10 +2655,10 @@ ZZ_pXModulus::ZZ_pXModulus(const ZZ_pX& ff)
 
 ZZ_pXMultiplier::ZZ_pXMultiplier(const ZZ_pX& b, const ZZ_pXModulus& F)
 {
-   build(*this, b, F); 
+   build(*this, b, F);
 }
 
-void build(ZZ_pXMultiplier& x, const ZZ_pX& b, 
+void build(ZZ_pXMultiplier& x, const ZZ_pX& b,
                          const ZZ_pXModulus& F)
 {
    long db;
@@ -2680,12 +2680,12 @@ void build(ZZ_pXMultiplier& x, const ZZ_pX& b,
 
    FFTRep R1(INIT_SIZE, F.l);
    ZZ_pX P1(INIT_SIZE, n);
-   
+
 
    ToFFTRep(R1, b, F.l);
    reduce(x.B2, R1, F.k);
    mul(R1, R1, F.HRep);
-   FromFFTRep(P1, R1, n-1, 2*n-3); 
+   FromFFTRep(P1, R1, n-1, 2*n-3);
    ToFFTRep(x.B1, P1, F.l);
 }
 
@@ -2729,7 +2729,7 @@ void MulMod(ZZ_pX& x, const ZZ_pX& a, const ZZ_pXMultiplier& B,
 
    FromFFTRep(x, R1, 0, n-1);
 }
-   
+
 
 void PowerXMod(ZZ_pX& hh, const ZZ& e, const ZZ_pXModulus& F)
 {
@@ -2845,17 +2845,17 @@ void NewtonInvTrunc(ZZ_pX& x, const ZZ_pX& a, long m)
    ZZ_pXModRep a_rep;
    ToZZ_pXModRep(a_rep, a, 0, a_len-1);
 
-   k = 1L << log2_newton; 
+   k = 1L << log2_newton;
    t = log2_newton;
 
    while (k < m) {
       long l = min(2*k, m);
 
       ToFFTRep(R1, x, t+1);
-      ToFFTRep(R2, a_rep, t+1, 0, l-1); 
+      ToFFTRep(R2, a_rep, t+1, 0, l-1);
       mul(R2, R2, R1);
       FromFFTRep(P1, R2, k, l-1);
-      
+
       ToFFTRep(R2, P1, t+1);
       mul(R2, R2, R1);
       FromFFTRep(P1, R2, 0, l-k-1);
@@ -2912,10 +2912,10 @@ void FFTDivRem(ZZ_pX& q, ZZ_pX& r, const ZZ_pX& a, const ZZ_pX& b)
    ToFFTRep(R2, a, k, n, m);
    mul(R1, R1, R2);
    FromFFTRep(P3, R1, m-n, 2*(m-n));
-   
+
    l = 1L << k1;
 
-   
+
    ToFFTRep(R1, b, k1);
    ToFFTRep(R2, P3, k1);
    mul(R1, R1, R2);
@@ -3000,9 +3000,9 @@ void FFTRem(ZZ_pX& r, const ZZ_pX& a, const ZZ_pX& b)
    ToFFTRep(R2, a, k, n, m);
    mul(R1, R1, R2);
    FromFFTRep(P3, R1, m-n, 2*(m-n));
-   
+
    l = 1L << k1;
-   
+
    ToFFTRep(R1, b, k1);
    ToFFTRep(R2, P3, k1);
    mul(R1, R1, R2);
@@ -3121,7 +3121,7 @@ void power(ZZ_pX& x, const ZZ_pX& a, long e)
    ZZ_pX res;
    res.SetMaxLength(da*e + 1);
    res = 1;
-   
+
    long k = NumBits(e);
    long i;
 

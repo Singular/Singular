@@ -170,7 +170,7 @@ void VectorCopy(vec_ZZ_pE& x, const vec_ZZ_pE& a, long n)
    long m = min(n, a.length());
 
    x.SetLength(n);
-  
+
    long i;
 
    for (i = 0; i < m; i++)

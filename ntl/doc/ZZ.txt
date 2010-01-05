@@ -141,6 +141,26 @@ ZZ sqr(const ZZ& a);
 // PROMOTIONS: operator * and procedure mul support promotion
 // from long to ZZ on (a, b).
 
+/**************************************************************************\
+
+                            Combined Multiply and Add 
+
+\**************************************************************************/
+
+
+void MulAddTo(ZZ& x, const ZZ& a, const ZZ& b); // x += a*b
+void MulAddTo(ZZ& x, const ZZ& a, long b);      // x += a*b
+
+
+void MulSubFrom(ZZ& x, const ZZ& a, const ZZ& b); // x -= a*b
+void MulSubFrom(ZZ& x, const ZZ& a, long b);      // x -= a*b
+
+// NOTE: these are provided for both convenience and efficiency.
+// The single-precision versions may be significantly
+// faster than the code sequence 
+//   mul(tmp, a, b); add(x, x, tmp);
+
+
 
 /**************************************************************************\
 

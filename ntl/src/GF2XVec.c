@@ -51,11 +51,11 @@ void GF2XVec::kill()
    }
 
    free(v);
-   v = 0; 
+   v = 0;
 }
 
 
-GF2XVec& GF2XVec::operator=(const GF2XVec& a) 
+GF2XVec& GF2XVec::operator=(const GF2XVec& a)
 {
    if (this == &a)
       return *this;
@@ -69,7 +69,7 @@ GF2XVec& GF2XVec::operator=(const GF2XVec& a)
 
    return *this;
 }
-   
+
 GF2XVec::GF2XVec(const GF2XVec& a)
 {
    v = 0; len = 0; bsize = 0;

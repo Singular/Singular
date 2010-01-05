@@ -25,7 +25,7 @@ void IterPower(zz_pE& c, const zz_pE& a, long n)
 
    c = res;
 }
-   
+
 
 
 void SquareFreeDecomp(vec_pair_zz_pEX_long& u, const zz_pEX& ff)
@@ -73,17 +73,17 @@ void SquareFreeDecomp(vec_pair_zz_pEX_long& u, const zz_pEX& ff)
          /* r is a p-th power */
 
          long k, d;
-         long p = to_long(zz_p::modulus()); 
+         long p = to_long(zz_p::modulus());
 
          d = deg(r)/p;
          f.rep.SetLength(d+1);
-         for (k = 0; k <= d; k++) 
+         for (k = 0; k <= d; k++)
             IterPower(f.rep[k], r.rep[k*p], zz_pE::degree()-1);
          m = m*p;
       }
    } while (!finished);
 }
-         
+
 
 
 static
@@ -122,12 +122,12 @@ void RecFindRoots(vec_zz_pE& x, const zz_pEX& f)
       negate(x[k], ConstTerm(f));
       return;
    }
-      
+
    zz_pEX h;
 
    zz_pEX r;
 
-   
+
    {
       zz_pEXModulus F;
       build(F, f);
@@ -146,7 +146,7 @@ void RecFindRoots(vec_zz_pE& x, const zz_pEX& f)
    }
 
    RecFindRoots(x, h);
-   div(h, f, h); 
+   div(h, f, h);
    RecFindRoots(x, h);
 }
 
@@ -163,7 +163,7 @@ void FindRoots(vec_zz_pE& x, const zz_pEX& ff)
 }
 
 void split(zz_pEX& f1, zz_pEX& g1, zz_pEX& f2, zz_pEX& g2,
-           const zz_pEX& f, const zz_pEX& g, 
+           const zz_pEX& f, const zz_pEX& g,
            const vec_zz_pE& roots, long lo, long mid)
 {
    long r = mid-lo+1;
@@ -184,7 +184,7 @@ void split(zz_pEX& f1, zz_pEX& g1, zz_pEX& f2, zz_pEX& g2,
 
 
    GCD(f1, a, f);
-   
+
    div(f2, f, f1);
 
    rem(g1, g, f1);
@@ -241,7 +241,7 @@ void IterFindFactors(vec_zz_pEX& factors, const zz_pEX& f,
 }
 
 
-void TraceMap(zz_pEX& w, const zz_pEX& a, long d, const zz_pEXModulus& F, 
+void TraceMap(zz_pEX& w, const zz_pEX& a, long d, const zz_pEXModulus& F,
               const zz_pEX& b)
 
 {
@@ -255,7 +255,7 @@ void TraceMap(zz_pEX& w, const zz_pEX& a, long d, const zz_pEXModulus& F,
 
    while (d) {
       if (d == 1) {
-         if (IsZero(w)) 
+         if (IsZero(w))
             w = y;
          else {
             CompMod(w, w, z, F);
@@ -385,7 +385,7 @@ void EDFSplit(vec_zz_pEX& v, const zz_pEX& f, const zz_pEX& b, long d)
    zz_pEX a, g, h;
    zz_pEXModulus F;
    vec_zz_pE roots;
-   
+
    build(F, f);
    long n = F.n;
    long r = n/d;
@@ -415,7 +415,7 @@ void RecEDF(vec_zz_pEX& factors, const zz_pEX& f, const zz_pEX& b, long d,
       }
    }
 }
-         
+
 
 void EDF(vec_zz_pEX& factors, const zz_pEX& ff, const zz_pEX& bb,
          long d, long verbose)
@@ -446,7 +446,7 @@ void EDF(vec_zz_pEX& factors, const zz_pEX& ff, const zz_pEX& bb,
       return;
    }
 
-   
+
    double t;
 
    factors.SetLength(0);
@@ -478,7 +478,7 @@ void SFCanZass(vec_zz_pEX& factors, const zz_pEX& ff, long verbose)
 
    double t;
 
-   
+
    zz_pEXModulus F;
    build(F, f);
 
@@ -520,7 +520,7 @@ void SFCanZass(vec_zz_pEX& factors, const zz_pEX& ff, long verbose)
       }
    }
 }
-   
+
 void CanZass(vec_pair_zz_pEX_long& factors, const zz_pEX& f, long verbose)
 {
    if (!IsOne(LeadCoeff(f)))
@@ -530,7 +530,7 @@ void CanZass(vec_pair_zz_pEX_long& factors, const zz_pEX& f, long verbose)
    vec_pair_zz_pEX_long sfd;
    vec_zz_pEX x;
 
-   
+
    SquareFreeDecomp(sfd, f);
 
    factors.SetLength(0);
@@ -587,7 +587,7 @@ long BaseCase(const zz_pEX& h, long q, long a, const zz_pEXModulus& F)
 
 
 
-void TandemPowerCompose(zz_pEX& y1, zz_pEX& y2, const zz_pEX& h, 
+void TandemPowerCompose(zz_pEX& y1, zz_pEX& y2, const zz_pEX& h,
                         long q1, long q2, const zz_pEXModulus& F)
 {
    zz_pEX z(INIT_SIZE, F.n);
@@ -665,7 +665,7 @@ long RecComputeDegree(long u, const zz_pEX& h, const zz_pEXModulus& F,
    zz_pEX h1, h2;
    long q1, q2, r1, r2;
 
-   q1 = fvec[fvec[u].link].val; 
+   q1 = fvec[fvec[u].link].val;
    q2 = fvec[fvec[u].link+1].val;
 
    TandemPowerCompose(h1, h2, h, q1, q2, F);
@@ -674,7 +674,7 @@ long RecComputeDegree(long u, const zz_pEX& h, const zz_pEXModulus& F,
    return r1*r2;
 }
 
-   
+
 
 
 long RecComputeDegree(const zz_pEX& h, const zz_pEXModulus& F)
@@ -682,7 +682,7 @@ long RecComputeDegree(const zz_pEX& h, const zz_pEXModulus& F)
    // h = X^p mod f
    // the common degree of the irreducible factors of f is computed
 {
-   if (F.n == 1 || IsX(h)) 
+   if (F.n == 1 || IsX(h))
       return 1;
 
    FacVec fvec;
@@ -703,7 +703,7 @@ void FindRoot(zz_pE& root, const zz_pEX& ff)
    zz_pEX r;
 
    f = ff;
-   
+
    if (!IsOne(LeadCoeff(f)))
       Error("FindRoot: bad args");
 
@@ -729,7 +729,7 @@ void FindRoot(zz_pE& root, const zz_pEX& ff)
             f = h;
       }
    }
- 
+
    negate(root, ConstTerm(f));
 }
 
@@ -776,11 +776,11 @@ long RecIrredTest(long u, const zz_pEX& h, const zz_pEXModulus& F,
    }
 
 
-   q1 = fvec[fvec[u].link].val; 
+   q1 = fvec[fvec[u].link].val;
    q2 = fvec[fvec[u].link+1].val;
 
    TandemPowerCompose(h1, h2, h, q1, q2, F);
-   return RecIrredTest(fvec[u].link, h2, F, fvec) 
+   return RecIrredTest(fvec[u].link, h2, F, fvec)
           && RecIrredTest(fvec[u].link+1, h1, F, fvec);
 }
 
@@ -792,7 +792,7 @@ long DetIrredTest(const zz_pEX& f)
    zz_pEXModulus F;
 
    build(F, f);
-   
+
    zz_pEX h;
 
    FrobeniusMap(h, F);
@@ -818,7 +818,7 @@ long IterIrredTest(const zz_pEX& f)
    zz_pEXModulus F;
 
    build(F, f);
-   
+
    zz_pEX h;
 
    FrobeniusMap(h, F);
@@ -1166,7 +1166,7 @@ void NewAddFactor(vec_pair_zz_pEX_long& u, const zz_pEX& g, long m, long verbose
 
 }
 
-   
+
 
 
 static
@@ -1238,7 +1238,7 @@ void FetchBabySteps(vec_zz_pEX& v, long k)
          v[i] = BabyStepFile(i);
    }
 }
-      
+
 
 
 static
@@ -1300,7 +1300,7 @@ void GiantRefine(vec_pair_zz_pEX_long& u, const zz_pEX& ff, long k, long l,
          build(F, f);
 
          long i;
-         for (i = 1; i <= k-1; i++) 
+         for (i = 1; i <= k-1; i++)
             rem(BabyStep[i], BabyStep[i], F);
       }
    }
@@ -1309,7 +1309,7 @@ void GiantRefine(vec_pair_zz_pEX_long& u, const zz_pEX& ff, long k, long l,
       NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
    }
 
-   if (deg(f) > 0) 
+   if (deg(f) > 0)
       NewAddFactor(u, f, 0, verbose);
 
 }
@@ -1364,10 +1364,10 @@ void IntervalRefine(vec_pair_zz_pEX_long& factors, const zz_pEX& ff,
 
    NewProcessTable(factors, f, F, buf, size, first_d, 1, verbose);
 
-   if (deg(f) > 0) 
+   if (deg(f) > 0)
       NewAddFactor(factors, f, deg(f), verbose);
 }
-   
+
 
 
 
@@ -1398,10 +1398,10 @@ void BabyRefine(vec_pair_zz_pEX_long& factors, const vec_pair_zz_pEX_long& u,
 
 }
 
-      
-      
 
-      
+
+
+
 
 void NewDDF(vec_pair_zz_pEX_long& factors,
             const zz_pEX& f,
@@ -1425,7 +1425,7 @@ void NewDDF(vec_pair_zz_pEX_long& factors,
 
    if (!zz_pEX_stem[0])
       sprintf(zz_pEX_stem, "ddf-%ld", RandomBnd(10000));
-      
+
    long B = deg(f)/2;
    long k = SqrRoot(B);
    long l = (B+k-1)/k;

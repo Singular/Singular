@@ -18,9 +18,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 *****************************************************
 
 The quad_float package is derived from the doubledouble package of
-Keith Briggs.  However, the version employed in NTL has been extensively 
+Keith Briggs.  However, the version employed in NTL has been extensively
 modified.  Below, I attach the copyright notice from the original
-doubledouble package, which is currently available at 
+doubledouble package, which is currently available at
 
    http://www.labs.bt.com/people/briggsk2
 
@@ -95,15 +95,15 @@ NTL_START_IMPL
 #endif
 
 
-static 
+static
 void normalize(quad_float& z, const double& xhi, const double& xlo)
 {
 START_FIX
    DOUBLE u, v;
 
-   u = xhi + xlo; 
-   v = xhi - u;    
-   v = v + xlo;    
+   u = xhi + xlo;
+   v = xhi - u;
+   v = v + xlo;
 
    z.hi = u;
    z.lo = v;
@@ -130,7 +130,7 @@ START_FIX
       xlo = double(n-long(xhi));
 
    // renormalize...just to be safe
-  
+
    u = xhi + xlo;
    v = xhi - u;
    v = v + xlo;
@@ -147,7 +147,7 @@ START_FIX
    const double bnd = double(1L << (NTL_BITS_PER_LONG-2))*4.0;
 
    xhi = double(n);
-   
+
    if (xhi >= bnd)
       t = xhi - bnd;
    else
@@ -174,7 +174,7 @@ void quad_float::SetOutputPrecision(long p)
 {
    if (p < 1) p = 1;
 
-   if (NTL_OVERFLOW(p, 1, 0)) 
+   if (NTL_OVERFLOW(p, 1, 0))
       Error("quad_float: output precision too big");
 
    oprec = p;
@@ -195,7 +195,7 @@ START_FIX
         t1 = x.hi-t1;
         s = y.hi-e;
         s = s + t1;
-        
+
         t1 = T-f;
         t1 = x.lo-t1;
         t = y.lo-f;
@@ -208,7 +208,7 @@ START_FIX
         h = h + s;
 
         h = h + t;
-        e = H + h; 
+        e = H + h;
         f = H - e;
         f = f + h;
 END_FIX
@@ -229,7 +229,7 @@ START_FIX
         t1 = x.hi-t1;
         s = y.hi-e;
         s = s + t1;
-        
+
         t1 = T-f;
         t1 = x.lo-t1;
         t = y.lo-f;
@@ -242,7 +242,7 @@ START_FIX
         h = h + s;
 
         h = h + t;
-        e = H + h; 
+        e = H + h;
         f = H - e;
         f = f + h;
 
@@ -269,7 +269,7 @@ START_FIX
         t1 = x.hi-t1;
         s = yhi-e;
         s = s + t1;
-        
+
         t1 = T-f;
         t1 = x.lo-t1;
         t = ylo-f;
@@ -282,7 +282,7 @@ START_FIX
         h = h + s;
 
         h = h + t;
-        e = H + h; 
+        e = H + h;
         f = H - e;
         f = f + h;
 
@@ -307,7 +307,7 @@ START_FIX
         t1 = x.hi-t1;
         s = yhi-e;
         s = s + t1;
-        
+
         t1 = T-f;
         t1 = x.lo-t1;
         t = ylo-f;
@@ -320,7 +320,7 @@ START_FIX
         h = h + s;
 
         h = h + t;
-        e = H + h; 
+        e = H + h;
         f = H - e;
         f = f + h;
 
@@ -341,7 +341,7 @@ START_FIX
    // it is a good idea to renormalize here, just in case
    // the rounding rule depends on sign, and thus we will
    // maintain the "normal form" for quad_float's.
-  
+
    u = xhi + xlo;
    v = xhi - u;
    v = v + xlo;
@@ -367,7 +367,7 @@ START_FIX
   ty = y.hi-hy;
 
   // c = ((((hx*hy-C)+hx*ty)+tx*hy)+tx*ty)+(x.hi*y.lo+x.lo*y.hi);
-  
+
   t1 = hx*hy;
   t1 = t1-C;
   t2 = hx*ty;
@@ -406,7 +406,7 @@ START_FIX
   ty = y.hi-hy;
 
   // c = ((((hx*hy-C)+hx*ty)+tx*hy)+tx*ty)+(x.hi*y.lo+x.lo*y.hi);
-  
+
   t1 = hx*hy;
   t1 = t1-C;
   t2 = hx*ty;
@@ -466,7 +466,7 @@ START_FIX
   t1 = C*y.lo;
   c = c - t1;
   c = c/y.hi;
-  
+
   hy = C+c;
   ty = C-hy;
   ty = ty+c;
@@ -510,7 +510,7 @@ START_FIX
   t1 = C*y.lo;
   c = c - t1;
   c = c/y.hi;
-  
+
   hy = C+c;
   ty = C-hy;
   ty = ty+c;
@@ -523,7 +523,7 @@ END_FIX
 
 
 quad_float sqrt(const quad_float& y) {
-  if (y.hi < 0.0) 
+  if (y.hi < 0.0)
     Error("Quad: attempto to take square root of negative number");
   if (y.hi == 0.0) return quad_float(0.0,0.0);
 
@@ -536,9 +536,9 @@ START_FIX
   DOUBLE p,q,hx,tx,u,uu,cc;
   DOUBLE t1;
 
-  p = NTL_QUAD_FLOAT_SPLIT*c; 
-  hx = (c-p); 
-  hx = hx+p; 
+  p = NTL_QUAD_FLOAT_SPLIT*c;
+  hx = (c-p);
+  hx = hx+p;
   tx = c-hx;
   p = hx*hx;
   q = hx*tx;
@@ -608,7 +608,7 @@ long to_long(const quad_float& x)
 
    fhi = floor(x.hi);
 
-   if (fhi == x.hi) 
+   if (fhi == x.hi)
       flo = floor(x.lo);
    else
       flo = 0;
@@ -653,10 +653,10 @@ void conv(quad_float& z, const ZZ& a)
    // The following is just paranoia.
    if (fabs(z.hi) < NTL_FDOUBLE_PRECISION && z.lo != 0)
       Error("internal error: ZZ to quad_float conversion");
-} 
+}
 
 void conv(ZZ& z, const quad_float& x)
-{ 
+{
    static ZZ t1, t2, t3;
 
    double fhi, flo;
@@ -695,7 +695,7 @@ quad_float random_quad_float()
    random(x);
    return x;
 }
-      
+
 long IsFinite(quad_float *x)
 {
    return IsFinite(&x->hi) && IsFinite(&x->lo);
@@ -742,11 +742,11 @@ quad_float floor(const quad_float& x)
 }
 
 
-quad_float ceil(const quad_float& x) { 
+quad_float ceil(const quad_float& x) {
   return -floor(-x);
 }
 
-quad_float trunc(const quad_float& x) { 
+quad_float trunc(const quad_float& x) {
   if (x>=0.0) return floor(x); else return -floor(-x);
 }
 
@@ -754,20 +754,20 @@ quad_float trunc(const quad_float& x) {
 
 long compare(const quad_float& x, const quad_float& y)
 {
-   if (x.hi > y.hi) 
+   if (x.hi > y.hi)
       return 1;
    else if (x.hi < y.hi)
       return -1;
    else if (x.lo > y.lo)
       return 1;
-   else if (x.lo < y.lo) 
+   else if (x.lo < y.lo)
       return -1;
    else
       return 0;
 }
 
 
-quad_float fabs(const quad_float& x) 
+quad_float fabs(const quad_float& x)
 { if (x.hi>=0.0) return x; else return -x; }
 
 quad_float to_quad_float(const char *s)
@@ -814,7 +814,7 @@ quad_float exp(const quad_float& x) { // New version 97 Aug 05
 !  This is halved and a Pade aproximation is used to approximate e^x over
 !  the region (-0.1733, +0.1733).   This approximation is then squared.
 */
-  if (x.hi<DBL_MIN_10_EXP*2.302585092994045684017991) 
+  if (x.hi<DBL_MIN_10_EXP*2.302585092994045684017991)
     return to_quad_float(0.0);
   if (x.hi>DBL_MAX_10_EXP*2.302585092994045684017991) {
     Error("exp(quad_float): overflow");
@@ -822,7 +822,7 @@ quad_float exp(const quad_float& x) { // New version 97 Aug 05
 
   // changed this from "const" to "static" in v5.3, since "const"
   // causes the initialization to be performed with *every* invocation.
-  static quad_float Log2 = 
+  static quad_float Log2 =
     to_quad_float("0.6931471805599453094172321214581765680755");
 
   quad_float y,temp,ysq,sum1,sum2;

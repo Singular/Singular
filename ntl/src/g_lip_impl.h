@@ -64,9 +64,9 @@ int _ntl_gmp_hack = 0;
 
 
 #ifdef __cplusplus
-extern "C" 
+extern "C"
 #endif
-void mpn_tdiv_qr(mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_size_t, 
+void mpn_tdiv_qr(mp_ptr, mp_ptr, mp_size_t, mp_srcptr, mp_size_t,
                  mp_srcptr, mp_size_t);
 
 #endif
@@ -84,12 +84,12 @@ union gbigint_header {
 
 };
 
-/* A bigint is represented as two long's, ALLOC and SIZE, followed by a 
- * vector DATA of mp_limb_t's.  
- * 
+/* A bigint is represented as two long's, ALLOC and SIZE, followed by a
+ * vector DATA of mp_limb_t's.
+ *
  * ALLOC is of the form
  *    (alloc << 2) | continue_flag | frozen_flag
- * where 
+ * where
  *    - alloc is the number of allocated mp_limb_t's,
  *    - continue flag is either 2 or 0,
  *    - frozen_flag is either 1 or 0.
@@ -97,30 +97,30 @@ union gbigint_header {
  * managed by the _ntl_gsetlength and _ntl_gfree routines,
  * but are instead managed by the vec_ZZ_p and ZZVec routines.
  * The continue_flag is only set when the frozen_flag is set.
- * 
+ *
  * SIZE is the number of mp_limb_t's actually
  * used by the bigint, with the sign of SIZE having
  * the sign of the bigint.
  * Note that the zero bigint is represented as SIZE=0.
- * 
+ *
  * Bigint's are accessed through a handle, which is pointer to void.
  * A null handle logically represents the bigint zero.
  * This is done so that the interface presented to higher level
  * routines is essentially the same as that of NTL's traditional
  * long integer package.
- * 
+ *
  * The components ALLOC, SIZE, and DATA are all accessed through
- * macros using pointer casts.  While all of may seem a bit dirty, 
+ * macros using pointer casts.  While all of may seem a bit dirty,
  * it should be quite portable: objects are never referenced
  * through pointers of different types, and no alignmement
  * problems should arise.
- * 
+ *
  * Actually, mp_limb_t is usually the type unsigned long.
  * However, on some 64-bit platforms, the type long is only 32 bits,
  * and gmp makes mp_limb_t unsigned long long in this case.
  * This is fairly rare, as the industry standard for Unix is to
  * have 64-bit longs on 64-bit machines.
- */ 
+ */
 
 #if 1
 
@@ -139,7 +139,7 @@ union gbigint_header {
  * 2*sizeof(long), and therfore, nothing special needs to
  * be done to enfoce alignment requirements.  If this assumption
  * should change, then the storage layout for bigints must be
- * re-designed.   
+ * re-designed.
  */
 
 #define MustAlloc(c, len)  (!(c) || (ALLOC(c) >> 2) < (len))
@@ -170,7 +170,7 @@ do  \
    while (_i >= 0 && p[_i] == 0) _i--;  \
    sz = _i + 1;  \
 }  \
-while (0) 
+while (0)
 
 #define ZEROP(p) (!p || !SIZE(p))
 
@@ -184,7 +184,7 @@ do  \
    a = b;  \
    b = _t;  \
 }  \
-while (0) 
+while (0)
 
 #define SWAP_LONG(a, b)  \
 do  \
@@ -194,7 +194,7 @@ do  \
    a = b;  \
    b = _t;  \
 }  \
-while (0) 
+while (0)
 
 #define SWAP_LIMB_PTR(a, b)  \
 do  \
@@ -204,7 +204,7 @@ do  \
    a = b;  \
    b = _t;  \
 }  \
-while (0) 
+while (0)
 
 #define COUNT_BITS(cnt, a)  \
 do  \
@@ -225,7 +225,7 @@ do  \
   \
    cnt = _i;  \
 }  \
-while (0) 
+while (0)
 
 #else
 
@@ -234,26 +234,26 @@ while (0)
  */
 
 
-inline long& ALLOC(_ntl_gbigint p) 
+inline long& ALLOC(_ntl_gbigint p)
    { return (((long *) p)[0]); }
 
-inline long& SIZE(_ntl_gbigint p) 
+inline long& SIZE(_ntl_gbigint p)
    { return (((long *) p)[1]); }
 
-inline mp_limb_t * DATA(_ntl_gbigint p) 
+inline mp_limb_t * DATA(_ntl_gbigint p)
    { return ((mp_limb_t *) (((long *) (p)) + 2)); }
 
 inline long STORAGE(long len)
    { return ((long)(2*sizeof(long) + (len)*sizeof(mp_limb_t))); }
 
-inline long MustAlloc(_ntl_gbigint c, long len)  
+inline long MustAlloc(_ntl_gbigint c, long len)
    { return (!(c) || (ALLOC(c) >> 2) < (len)); }
 
 
 inline void GET_SIZE_NEG(long& sz, long& neg, _ntl_gbigint p)
-{ 
-   long s; 
-   s = SIZE(p); 
+{
+   long s;
+   s = SIZE(p);
    if (s < 0) {
       sz = -s;
       neg = 1;
@@ -332,7 +332,7 @@ inline void COUNT_BITS(long& cnt, mp_limb_t a)
 
 /* ForceNormal ensures a normalized bigint */
 
-static 
+static
 void ForceNormal(_ntl_gbigint x)
 {
    long sx, xneg;
@@ -347,7 +347,7 @@ void ForceNormal(_ntl_gbigint x)
 }
 
 
-static 
+static
 void ghalt(char *c)
 {
    fprintf(stderr,"fatal error:\n   %s\nexit...\n",c);
@@ -384,7 +384,7 @@ void _ntl_gsetlength(_ntl_gbigint *v, long len)
       oldlen = oldlen >> 2;
 
       if (fixed) {
-         if (len > oldlen) 
+         if (len > oldlen)
             ghalt("internal error: can't grow this _ntl_gbigint");
          else
             return;
@@ -399,7 +399,7 @@ void _ntl_gsetlength(_ntl_gbigint *v, long len)
          len = oldlen;
 
       /* round up to multiple of MIN_SETL */
-      len = ((len+(MIN_SETL-1))/MIN_SETL)*MIN_SETL; 
+      len = ((len+(MIN_SETL-1))/MIN_SETL)*MIN_SETL;
 
       /* test len again */
       if (NTL_OVERFLOW(len, NTL_ZZ_NBITS, 0))
@@ -455,7 +455,7 @@ _ntl_gswap(_ntl_gbigint *a, _ntl_gbigint *b)
    _ntl_gbigint c;
 
    if ((*a && (ALLOC(*a) & 1)) || (*b && (ALLOC(*b) & 1))) {
-      static _ntl_gbigint t = 0; 
+      static _ntl_gbigint t = 0;
       _ntl_gcopy(*a, &t);
       _ntl_gcopy(*b, a);
       _ntl_gcopy(t, b);
@@ -503,7 +503,7 @@ void _ntl_gcopy(_ntl_gbigint a, _ntl_gbigint *bb)
 }
 
 
-void _ntl_gzero(_ntl_gbigint *aa) 
+void _ntl_gzero(_ntl_gbigint *aa)
 {
    _ntl_gbigint a = *aa;
 
@@ -529,7 +529,7 @@ long _ntl_giszero(_ntl_gbigint a)
 
 long _ntl_godd(_ntl_gbigint a)
 {
-   if (ZEROP(a)) 
+   if (ZEROP(a))
       return 0;
    else
       return DATA(a)[0]&1;
@@ -571,7 +571,7 @@ void _ntl_glowbits(_ntl_gbigint a, long b, _ntl_gbigint *cc)
 
    bl = b/NTL_ZZ_NBITS;
    wh = b - NTL_ZZ_NBITS*bl;
-   if (wh != 0) 
+   if (wh != 0)
       bl++;
    else
       wh = NTL_ZZ_NBITS;
@@ -603,7 +603,7 @@ void _ntl_glowbits(_ntl_gbigint a, long b, _ntl_gbigint *cc)
       cdata[bl-1] = adata[bl-1] & ((((mp_limb_t) 1) << wh) - ((mp_limb_t) 1));
 
    STRIP(bl, cdata);
-   SIZE(c) = bl; 
+   SIZE(c) = bl;
 }
 
 long _ntl_gslowbits(_ntl_gbigint a, long p)
@@ -644,7 +644,7 @@ long _ntl_gsetbit(_ntl_gbigint *a, long b)
       adata[bl] |= wh;
       if (tmp) return 1;
       return 0;
-   } 
+   }
    else {
       _ntl_gsetlength(a, bl+1);
       adata = DATA(*a);
@@ -693,7 +693,7 @@ long _ntl_gswitchbit(_ntl_gbigint *a, long b)
 
       if (tmp) return 1;
       return 0;
-   } 
+   }
    else {
       _ntl_gsetlength(a, bl+1);
       adata = DATA(*a);
@@ -715,11 +715,11 @@ _ntl_gweights(
 {
 	unsigned long a;
 	long res = 0;
-	if (aa < 0) 
+	if (aa < 0)
 		a = -((unsigned long) aa);
 	else
 		a = aa;
-   
+
 	while (a) {
 		if (a & 1) res ++;
 		a >>= 1;
@@ -733,7 +733,7 @@ gweights_mp_limb(
 	)
 {
 	long res = 0;
-   
+
 	while (a) {
 		if (a & 1) res ++;
 		a >>= 1;
@@ -764,7 +764,7 @@ _ntl_gweight(
 	return (res);
 }
 
-long 
+long
 _ntl_g2logs(
 	long aa
 	)
@@ -942,7 +942,7 @@ void _ntl_gxor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    if (sa > sb) {
       la = sa;
       sm = sb;
-   } 
+   }
    else {
       la = sb;
       sm = sa;
@@ -1006,7 +1006,7 @@ void _ntl_gor(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    if (sa > sb) {
       la = sa;
       sm = sb;
-   } 
+   }
    else {
       la = sb;
       sm = sa;
@@ -1059,7 +1059,7 @@ void _ntl_gintoz(long d, _ntl_gbigint *aa)
          _ntl_gsetlength(&a, 1);
          *aa = a;
       }
-   
+
       SIZE(a) = 1;
       DATA(a)[0] = d;
    }
@@ -1068,7 +1068,7 @@ void _ntl_gintoz(long d, _ntl_gbigint *aa)
          _ntl_gsetlength(&a, 1);
          *aa = a;
       }
-   
+
       SIZE(a) = -1;
       DATA(a)[0] = -((mp_limb_t) d); /* careful! */
    }
@@ -1093,7 +1093,7 @@ void _ntl_guintoz(unsigned long d, _ntl_gbigint *aa)
          _ntl_gsetlength(&a, 1);
          *aa = a;
       }
-   
+
       SIZE(a) = 1;
       DATA(a)[0] = d;
    }
@@ -1114,10 +1114,10 @@ long _ntl_gtoint(_ntl_gbigint a)
 
 unsigned long _ntl_gtouint(_ntl_gbigint a)
 {
-   if (ZEROP(a)) 
+   if (ZEROP(a))
       return 0;
 
-   if (SIZE(a) > 0) 
+   if (SIZE(a) > 0)
       return DATA(a)[0];
 
    return -DATA(a)[0];
@@ -1129,12 +1129,12 @@ long _ntl_gcompare(_ntl_gbigint a, _ntl_gbigint b)
    long sa, sb, cmp;
    mp_limb_t *adata, *bdata;
 
-   if (!a) 
+   if (!a)
       sa = 0;
    else
       sa = SIZE(a);
 
-   if (!b) 
+   if (!b)
       sb = 0;
    else
       sb = SIZE(b);
@@ -1157,7 +1157,7 @@ long _ntl_gcompare(_ntl_gbigint a, _ntl_gbigint b)
 
       if (cmp > 0)
          return 1;
-      else if (cmp < 0) 
+      else if (cmp < 0)
          return -1;
       else
          return 0;
@@ -1167,7 +1167,7 @@ long _ntl_gcompare(_ntl_gbigint a, _ntl_gbigint b)
 
       if (cmp > 0)
          return -1;
-      else if (cmp < 0) 
+      else if (cmp < 0)
          return 1;
       else
          return 0;
@@ -1235,7 +1235,7 @@ void _ntl_glshift(_ntl_gbigint n, long k, _ntl_gbigint *rres)
    }
 
    if (k < 0) {
-      if (k < -NTL_MAX_LONG) 
+      if (k < -NTL_MAX_LONG)
          _ntl_gzero(rres);
       else
          _ntl_grshift(n, -k, rres);
@@ -1245,7 +1245,7 @@ void _ntl_glshift(_ntl_gbigint n, long k, _ntl_gbigint *rres)
    GET_SIZE_NEG(sn, nneg, n);
 
    limb_cnt = k/NTL_ZZ_NBITS;
-   sres = sn + limb_cnt + 1; 
+   sres = sn + limb_cnt + 1;
 
    if (MustAlloc(res, sres)) {
       _ntl_gsetlength(&res, sres);
@@ -1337,8 +1337,8 @@ void _ntl_grshift(_ntl_gbigint n, long k, _ntl_gbigint *rres)
    if (nneg) sres = -sres;
    SIZE(res) = sres;
 }
-   
-   
+
+
 
 void
 _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
@@ -1379,7 +1379,7 @@ _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       sc = sa + 1;
       if (MustAlloc(c, sc)) {
          _ntl_gsetlength(&c, sc);
-         if (a_alias) a = c; 
+         if (a_alias) a = c;
          if (b_alias) b = c;
          *cc = c;
       }
@@ -1389,7 +1389,7 @@ _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       cdata = DATA(c);
 
       carry = mpn_add(cdata, adata, sa, bdata, sb);
-      if (carry) 
+      if (carry)
          cdata[sc-1] = carry;
       else
          sc--;
@@ -1403,7 +1403,7 @@ _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       sc = sa;
       if (MustAlloc(c, sc)) {
          _ntl_gsetlength(&c, sc);
-         if (a_alias) a = c; 
+         if (a_alias) a = c;
          if (b_alias) b = c;
          *cc = c;
       }
@@ -1412,7 +1412,7 @@ _ntl_gadd(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       bdata = DATA(b);
       cdata = DATA(c);
 
-      if (sa > sb) 
+      if (sa > sb)
          cmp = 1;
       else
          cmp = mpn_cmp(adata, bdata, sa);
@@ -1456,7 +1456,7 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    if (ZEROP(a)) {
       _ntl_gcopy(b, cc);
       c = *cc;
-      if (c) SIZE(c) = -SIZE(c); 
+      if (c) SIZE(c) = -SIZE(c);
       return;
    }
 
@@ -1474,7 +1474,7 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       SWAP_LONG(aneg, bneg);
       rev = 1;
    }
-   else 
+   else
       rev = 0;
 
    /* sa >= sb */
@@ -1489,7 +1489,7 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       sc = sa + 1;
       if (MustAlloc(c, sc)) {
          _ntl_gsetlength(&c, sc);
-         if (a_alias) a = c; 
+         if (a_alias) a = c;
          if (b_alias) b = c;
          *cc = c;
       }
@@ -1499,7 +1499,7 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       cdata = DATA(c);
 
       carry = mpn_add(cdata, adata, sa, bdata, sb);
-      if (carry) 
+      if (carry)
          cdata[sc-1] = carry;
       else
          sc--;
@@ -1513,7 +1513,7 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       sc = sa;
       if (MustAlloc(c, sc)) {
          _ntl_gsetlength(&c, sc);
-         if (a_alias) a = c; 
+         if (a_alias) a = c;
          if (b_alias) b = c;
          *cc = c;
       }
@@ -1522,7 +1522,7 @@ _ntl_gsub(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
       bdata = DATA(b);
       cdata = DATA(c);
 
-      if (sa > sb) 
+      if (sa > sb)
          cmp = 1;
       else
          cmp = mpn_cmp(adata, bdata, sa);
@@ -1575,7 +1575,7 @@ _ntl_gsubpos(_ntl_gbigint a, _ntl_gbigint b, _ntl_gbigint *cc)
    sc = sa;
    if (MustAlloc(c, sc)) {
       _ntl_gsetlength(&c, sc);
-      if (a_alias) a = c; 
+      if (a_alias) a = c;
       if (b_alias) b = c;
       *cc = c;
    }
@@ -1693,12 +1693,12 @@ _ntl_gsmul(_ntl_gbigint a, long d, _ntl_gbigint *bb)
    adata = DATA(a);
    bdata = DATA(b);
 
-   if (dd == 2) 
+   if (dd == 2)
       carry = mpn_lshift(bdata, adata, sa, 1);
    else
       carry = mpn_mul_1(bdata, adata, sa, dd);
 
-   if (carry) 
+   if (carry)
       bdata[sa] = carry;
    else
       sb--;
@@ -1751,7 +1751,7 @@ long _ntl_gsdiv(_ntl_gbigint a, long d, _ntl_gbigint *bb)
    adata = DATA(a);
    bdata = DATA(b);
 
-   if (dd == 2) 
+   if (dd == 2)
       r = mpn_rshift(bdata, adata, sa, 1) >> (NTL_ZZ_NBITS - 1);
    else
       r = mpn_divmod_1(bdata, adata, sa, dd);
@@ -1816,7 +1816,7 @@ long _ntl_gsmod(_ntl_gbigint a, long d)
 
    adata = DATA(a);
 
-   if (dd == 2) 
+   if (dd == 2)
       r = adata[0] & 1;
    else
       r = mpn_mod_1(adata, sa, dd);
@@ -1838,7 +1838,7 @@ long _ntl_gsmod(_ntl_gbigint a, long d)
 }
 
 
-void _ntl_gdiv(_ntl_gbigint a, _ntl_gbigint d, 
+void _ntl_gdiv(_ntl_gbigint a, _ntl_gbigint d,
                _ntl_gbigint *bb, _ntl_gbigint *rr)
 {
    static _ntl_gbigint b = 0, rmem = 0;
@@ -2086,7 +2086,7 @@ void _ntl_ggcd(_ntl_gbigint m1, _ntl_gbigint m2, _ntl_gbigint *r)
    /* set to max: gmp documentation is unclear on this point */
 
    _ntl_gsetlength(&res, sres);
-   
+
    if (l1 >= l2)
       SIZE(res) = mpn_gcd(DATA(res), DATA(s1), ss1, DATA(s2), ss2);
    else
@@ -2097,7 +2097,7 @@ void _ntl_ggcd(_ntl_gbigint m1, _ntl_gbigint m2, _ntl_gbigint *r)
    _ntl_gcopy(res, r);
 }
 
-static long 
+static long
 gxxeucl(
    _ntl_gbigint ain,
    _ntl_gbigint nin,
@@ -2203,7 +2203,7 @@ gxxeucl(
          try21 = 0;
          try22 = 1;
          parity = 1;
-         fast = 1; 
+         fast = 1;
          while (fast > 0)
          {
             parity = 1 - parity;
@@ -2285,7 +2285,7 @@ gxxeucl(
 
    if (_ntl_gscompare(a, 1) == 0)
       e = 0;
-   else 
+   else
       e = 1;
 
    _ntl_gcopy(a, &u);
@@ -2391,7 +2391,7 @@ _ntl_gexteucl(
       _ntl_gcopy(bin, dp);
       _ntl_gabs(dp);
       _ntl_gzero(xap);
-      _ntl_gintoz(bsign, xbp); 
+      _ntl_gintoz(bsign, xbp);
    }
    else {
       static _ntl_gbigint a = 0, b = 0, xa = 0, xb = 0, d = 0, tmp = 0;
@@ -2420,7 +2420,7 @@ _ntl_gexteucl(
          SWAP_LIMB_PTR(adata, bdata);
          rev = 1;
       }
-      else 
+      else
          rev = 0;
 
       _ntl_gsetlength(&d, sa+1); /* +1 because mpn_gcdext may need it...
@@ -2436,7 +2436,7 @@ _ntl_gexteucl(
       SIZE(d) = sd;
       SIZE(xa) = sxa;
 
-      /* Thes two ForceNormal's are work-arounds for GMP bugs 
+      /* Thes two ForceNormal's are work-arounds for GMP bugs
          in GMP 4.3.0 */
       ForceNormal(d);
       ForceNormal(xa);
@@ -2454,7 +2454,7 @@ _ntl_gexteucl(
          }
 
          if (SIZE(xa) > 0) { /* xa positive */
-            if (_ntl_gcompare(xa, b) > 0) { 
+            if (_ntl_gcompare(xa, b) > 0) {
                _ntl_gmod(xa, b, &xa);
             }
             _ntl_glshift(xa, 1, &tmp);
@@ -2481,7 +2481,7 @@ _ntl_gexteucl(
       }
 
       /* end normalize */
-    
+
 
       if (aneg) _ntl_gnegate(&xa);
 
@@ -2495,7 +2495,7 @@ _ntl_gexteucl(
 
       _ntl_gcopy(xa, xap);
       _ntl_gcopy(xb, xbp);
-      _ntl_gcopy(d, dp); 
+      _ntl_gcopy(d, dp);
    }
 }
 
@@ -2507,7 +2507,7 @@ long _ntl_ginv(_ntl_gbigint ain, _ntl_gbigint nin, _ntl_gbigint *invv)
    static _ntl_gbigint a = 0;
    static _ntl_gbigint n = 0;
 
-   long sz; 
+   long sz;
    long sd;
    mp_size_t su;
 
@@ -2552,7 +2552,7 @@ long _ntl_ginv(_ntl_gbigint ain, _ntl_gbigint nin, _ntl_gbigint *invv)
    SIZE(d) = sd;
    SIZE(u) = su;
 
-      /* Thes two ForceNormal's are work-arounds for GMP bugs 
+      /* Thes two ForceNormal's are work-arounds for GMP bugs
          in GMP 4.3.0 */
       ForceNormal(d);
       ForceNormal(u);
@@ -2640,9 +2640,9 @@ _ntl_gsubmod(
 	if ((cmp=_ntl_gcompare(a, b)) < 0) {
 		_ntl_gadd(n, a, &mem);
 		_ntl_gsubpos(mem, b, c);
-	} else if (!cmp) 
+	} else if (!cmp)
 		_ntl_gzero(c);
-	else 
+	else
 		_ntl_gsubpos(a, b, c);
 }
 
@@ -2734,7 +2734,7 @@ long _ntl_ground_correction(_ntl_gbigint a, long k, long residual)
       /* bit is 1...we have to see if lower bits are all 0
          in order to implement "round to even" */
 
-      if (adata[bl] & (wh - ((mp_limb_t) 1))) 
+      if (adata[bl] & (wh - ((mp_limb_t) 1)))
          direction = 1;
       else {
          i = bl - 1;
@@ -2750,7 +2750,7 @@ long _ntl_ground_correction(_ntl_gbigint a, long k, long residual)
       if (direction == 0 && residual != 0) {
          if (residual == sgn)
             direction = 1;
-         else 
+         else
             direction = -1;
       }
 
@@ -2923,7 +2923,7 @@ void _ntl_gdoubtoz(double a, _ntl_gbigint *xx)
  */
 
 
-long 
+long
 _ntl_gxxratrecon(
    _ntl_gbigint ain,
    _ntl_gbigint nin,
@@ -2997,7 +2997,7 @@ _ntl_gxxratrecon(
    if (_ntl_gsign(ain) < 0 || _ntl_gcompare(ain, nin) >= 0)
       ghalt("rational reconstruction: bad residue");
 
-      
+
    e = SIZE(nin);
 
    _ntl_gsetlength(&a, e);
@@ -3073,7 +3073,7 @@ _ntl_gxxratrecon(
          try21 = 0;
          try22 = 1;
          parity = 1;
-         fast = 1; 
+         fast = 1;
          while (fast > 0)
          {
             parity = 1 - parity;
@@ -3165,7 +3165,7 @@ _ntl_gxxratrecon(
       SIZE(w) = sa;
 
       if (SIZE(n) <= snum && _ntl_gcompare(n, num_bound) <= 0) break;
-      
+
       fast = 0;
       sa = SIZE(a);
       sn = SIZE(n);
@@ -3206,7 +3206,7 @@ _ntl_gxxratrecon(
          }
       }
 
-      if (fast) 
+      if (fast)
       {
          if (ilo != 0) {
             if (ilo == 1) {
@@ -3363,11 +3363,11 @@ long OptWinSize(long n)
 static
 mp_limb_t neg_inv_mod_limb(mp_limb_t m0)
 {
-   mp_limb_t x; 
+   mp_limb_t x;
    long k;
 
-   x = 1; 
-   k = 1; 
+   x = 1;
+   k = 1;
    while (k < NTL_ZZ_NBITS) {
       x += x * (1 - x * m0);
       k <<= 1;
@@ -3383,7 +3383,7 @@ mp_limb_t neg_inv_mod_limb(mp_limb_t m0)
  * It is assumed that N has n limbs, and that T has at most n + m limbs.
  * Also, inv should be set to -N^{-1} mod b.
  * Finally, it is assumed that T has space allocated for n + m limbs,
- * and that res has space allocated for n limbs.  
+ * and that res has space allocated for n limbs.
  * Note: res should not overlap any inputs, and T is destroyed.
  * Note: res will have at most n limbs, but may not be fully reduced
  * mod N.  In general, we will have res < T/b^m + N.
@@ -3392,8 +3392,8 @@ mp_limb_t neg_inv_mod_limb(mp_limb_t m0)
 /* DIRT: this routine may not work with non-empty "nails" */
 
 static
-void redc(_ntl_gbigint T, _ntl_gbigint N, long m, mp_limb_t inv, 
-          _ntl_gbigint res) 
+void redc(_ntl_gbigint T, _ntl_gbigint N, long m, mp_limb_t inv,
+          _ntl_gbigint res)
 {
    long n, sT, i;
    mp_limb_t *Ndata, *Tdata, *resdata, q, d, t, c;
@@ -3413,7 +3413,7 @@ void redc(_ntl_gbigint T, _ntl_gbigint N, long m, mp_limb_t inv,
       d = mpn_addmul_1(Tdata+i, Ndata, n, q);
       t = Tdata[i+n] + d;
       Tdata[i+n] = t + c;
-      if (t < d || (c == 1 && t + c  == 0)) 
+      if (t < d || (c == 1 && t + c  == 0))
          c = 1;
       else
          c = 0;
@@ -3453,8 +3453,8 @@ void _ntl_gpowermod(_ntl_gbigint g, _ntl_gbigint e, _ntl_gbigint F,
    long use_redc, sF;
    mp_limb_t inv;
 
-   if (_ntl_gsign(g) < 0 || _ntl_gcompare(g, F) >= 0 || 
-       _ntl_gscompare(F, 1) <= 0) 
+   if (_ntl_gsign(g) < 0 || _ntl_gcompare(g, F) >= 0 ||
+       _ntl_gscompare(F, 1) <= 0)
       ghalt("PowerMod: bad args");
 
    if (_ntl_gscompare(e, 0) == 0) {
@@ -3563,7 +3563,7 @@ void _ntl_gpowermod(_ntl_gbigint g, _ntl_gbigint e, _ntl_gbigint F,
    }
 
 
-   if (n < 16) { 
+   if (n < 16) {
       /* plain square-and-multiply algorithm */
 
       _ntl_gcopy(gg, &res);
@@ -3603,12 +3603,12 @@ void _ntl_gpowermod(_ntl_gbigint g, _ntl_gbigint e, _ntl_gbigint F,
    v = (_ntl_gbigint *) NTL_MALLOC((1L << (k-1)), sizeof(_ntl_gbigint), 0);
    if (!v) ghalt("out of memory");
    for (i = 0; i < (1L << (k-1)); i++) {
-      v[i] = 0; 
+      v[i] = 0;
       _ntl_gsetlength(&v[i], sF);
    }
 
    _ntl_gcopy(gg, &v[0]);
- 
+
    if (k > 1) {
       _ntl_gsq(gg, &t);
       if (use_redc) redc(t, F, sF, inv, res); else _ntl_gmod(t, F, &res);
@@ -3623,7 +3623,7 @@ void _ntl_gpowermod(_ntl_gbigint g, _ntl_gbigint e, _ntl_gbigint F,
 
    val = 0;
    for (i = n-2; i >= 0; i--) {
-      val = (val << 1) | _ntl_gbit(e, i); 
+      val = (val << 1) | _ntl_gbit(e, i);
       if (val == 0) {
          _ntl_gsq(res, &t);
          if (use_redc) redc(t, F, sF, inv, res); else _ntl_gmod(t, F, &res);
@@ -3693,14 +3693,14 @@ long _ntl_gisone(_ntl_gbigint rep)
 long _ntl_gsptest(_ntl_gbigint rep)
 {
    return !rep || SIZE(rep) == 0 ||
-          ((SIZE(rep) == 1 || SIZE(rep) == -1) && 
+          ((SIZE(rep) == 1 || SIZE(rep) == -1) &&
            DATA(rep)[0] < ((mp_limb_t) NTL_SP_BOUND));
 }
 
 long _ntl_gwsptest(_ntl_gbigint rep)
 {
    return !rep || SIZE(rep) == 0 ||
-          ((SIZE(rep) == 1 || SIZE(rep) == -1) && 
+          ((SIZE(rep) == 1 || SIZE(rep) == -1) &&
            DATA(rep)[0] < ((mp_limb_t) NTL_WSP_BOUND));
 }
 
@@ -3708,7 +3708,7 @@ long _ntl_gwsptest(_ntl_gbigint rep)
 
 long _ntl_gcrtinrange(_ntl_gbigint g, _ntl_gbigint a)
 {
-   long sa, sg, i; 
+   long sa, sg, i;
    mp_limb_t carry, u, v;
    mp_limb_t *adata, *gdata;
 
@@ -3777,12 +3777,12 @@ void _ntl_gfrombytes(_ntl_gbigint *x, const unsigned char *p, long n)
    lw = n/BytesPerLimb;
    r = n - lw*BytesPerLimb;
 
-   if (r != 0) 
+   if (r != 0)
       lw++;
    else
       r = BytesPerLimb;
 
-   _ntl_gsetlength(x, lw); 
+   _ntl_gsetlength(x, lw);
    xp = DATA(*x);
 
    for (i = 0; i < lw-1; i++) {
@@ -3806,7 +3806,7 @@ void _ntl_gfrombytes(_ntl_gbigint *x, const unsigned char *p, long n)
    xp[lw-1] = t;
 
    STRIP(lw, xp);
-   SIZE(*x) = lw; 
+   SIZE(*x) = lw;
 }
 
 
@@ -3951,7 +3951,7 @@ long _ntl_gblock_destroy(_ntl_gbigint x)
    char *p;
    _ntl_gbigint t;
 
-   
+
    d1 = ALLOC(x) >> 2;
    sz = STORAGE(d1);
 
@@ -3962,7 +3962,7 @@ long _ntl_gblock_destroy(_ntl_gbigint x)
    for (;;) {
       t = (_ntl_gbigint) p;
       alloc = ALLOC(t);
-      if ((alloc & 1) == 0) 
+      if ((alloc & 1) == 0)
          ghalt("corrupted memory detected in _ntl_gblock_destroy");
       if ((alloc & 2) == 0) break;
       m++;
@@ -3976,7 +3976,7 @@ long _ntl_gblock_destroy(_ntl_gbigint x)
 
 long _ntl_gblock_storage(long d)
 {
-   long d1, sz; 
+   long d1, sz;
 
    d1 = d + 1;
    sz = STORAGE(d1) + sizeof(_ntl_gbigint);
@@ -4029,7 +4029,7 @@ do {  \
    _res += (_res >> (NTL_BITS_PER_LONG-1)) & _n;  \
   \
    res = _res;  \
-} while (0)  
+} while (0)
 
 #else
 
@@ -4206,7 +4206,7 @@ void _ntl_gcrt_struct_init(void **crt_struct, long n, _ntl_gbigint p,
 
       temps[0] = 0;
       temps[1] = 0;
-   
+
       q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) ghalt("out of memory");
 
@@ -4259,7 +4259,7 @@ void _ntl_gcrt_struct_init(void **crt_struct, long n, _ntl_gbigint p,
       }
 
       for (i = (1L << (levels-1)) - 1; i < vec_len; i++) {
-         /* multiply primes index_vec[i]..index_vec[i+1]-1 into 
+         /* multiply primes index_vec[i]..index_vec[i+1]-1 into
           * prod_vec[i]
           */
 
@@ -4363,7 +4363,7 @@ void _ntl_gcrt_struct_free(void *crt_struct)
       break;
    }
 
-   case 2: { 
+   case 2: {
       struct crt_body_gmp1 *C = &c->U.G1;
       long n = C->n;
       long levels = C->levels;
@@ -4414,11 +4414,11 @@ void _ntl_gcrt_struct_free(void *crt_struct)
 }
 
 static
-void gadd_mul_many(_ntl_gbigint *res, _ntl_gbigint *a, long *b, 
+void gadd_mul_many(_ntl_gbigint *res, _ntl_gbigint *a, long *b,
                       long n, long sz)
 
 {
-   mp_limb_t *xx, *yy; 
+   mp_limb_t *xx, *yy;
    long i, sx;
    long sy;
    mp_limb_t carry;
@@ -4436,7 +4436,7 @@ void gadd_mul_many(_ntl_gbigint *res, _ntl_gbigint *a, long *b,
       if (!a[i]) continue;
 
       yy = DATA(a[i]);
-      sy = SIZE(a[i]); 
+      sy = SIZE(a[i]);
 
       if (!sy || !b[i]) continue;
 
@@ -4465,30 +4465,30 @@ void _ntl_gcrt_struct_eval(void *crt_struct, _ntl_gbigint *x, const long *b)
    case 1: {
       struct crt_body_gmp *C = &c->U.G;
 
-      mp_limb_t *xx, *yy; 
+      mp_limb_t *xx, *yy;
       _ntl_gbigint *a;
       long i, sx, n;
       long sy;
       mp_limb_t carry;
-   
+
       n = C->n;
       sx = C->sbuf;
-   
+
       xx = DATA(C->buf);
 
       for (i = 0; i < sx; i++)
          xx[i] = 0;
-   
+
       a = C->v;
-   
+
       for (i = 0; i < n; i++) {
          if (!a[i]) continue;
 
          yy = DATA(a[i]);
-         sy = SIZE(a[i]); 
-   
+         sy = SIZE(a[i]);
+
          if (!sy || !b[i]) continue;
-   
+
          carry = mpn_addmul_1(xx, yy, sy, b[i]);
          yy = xx + sy;
          *yy += carry;
@@ -4500,7 +4500,7 @@ void _ntl_gcrt_struct_eval(void *crt_struct, _ntl_gbigint *x, const long *b)
             } while (*yy == 0);
          }
       }
-   
+
       while (sx > 0 && xx[sx-1] == 0) sx--;
       SIZE(C->buf) = sx;
       _ntl_gcopy(C->buf, x);
@@ -4531,7 +4531,7 @@ void _ntl_gcrt_struct_eval(void *crt_struct, _ntl_gbigint *x, const long *b)
       for (i = (1L << (levels-1)) - 1; i < vec_len; i++) {
          long j1 = index_vec[i];
          long j2 = index_vec[i+1];
-         gadd_mul_many(&rem_vec[i], &coeff_vec[j1], &val_vec[j1], j2-j1, 
+         gadd_mul_many(&rem_vec[i], &coeff_vec[j1], &val_vec[j1], j2-j1,
                           SIZE(prod_vec[i]));
       }
 
@@ -4633,10 +4633,10 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
       double *corraux_vec;
       mp_limb_t *inv_vec;
       _ntl_gbigint *prod_vec, *rem_vec;
-   
+
       q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) ghalt("out of memory");
-   
+
       for (i = 0; i < n; i++)
          q[i] = p[i];
 
@@ -4686,23 +4686,23 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
       }
 
       for (i = (1L << (levels-1)) - 1; i < vec_len; i++) {
-         /* multiply primes index_vec[i]..index_vec[i+1]-1 into 
+         /* multiply primes index_vec[i]..index_vec[i+1]-1 into
           * prod_vec[i]
           */
 
          _ntl_gone(&prod_vec[i]);
          for (j = index_vec[i]; j < index_vec[i+1]; j++)
-            _ntl_gsmul(prod_vec[i], q[j], &prod_vec[i]); 
+            _ntl_gsmul(prod_vec[i], q[j], &prod_vec[i]);
       }
 
       for (i = (1L << (levels-1)) - 2; i >= 3; i--)
          _ntl_gmul(prod_vec[2*i+1], prod_vec[2*i+2], &prod_vec[i]);
 
-      
+
       for (i = 3; i < vec_len; i++)
          len_vec[i] = _ntl_gsize(prod_vec[i]);
 
-      /* Set len_vec[1] = len_vec[2] = 
+      /* Set len_vec[1] = len_vec[2] =
        *    max(_ntl_gsize(modulus), len_vec[3..6]).
        * This is a bit paranoid, but it makes the code
        * more robust. */
@@ -4757,10 +4757,10 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
       long levels, vec_len;
       long *index_vec;
       _ntl_gbigint *prod_vec, *rem_vec;
-   
+
       q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) ghalt("out of memory");
-   
+
       for (i = 0; i < n; i++)
          q[i] = p[i];
 
@@ -4798,13 +4798,13 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
       }
 
       for (i = (1L << (levels-1)) - 1; i < vec_len; i++) {
-         /* multiply primes index_vec[i]..index_vec[i+1]-1 into 
+         /* multiply primes index_vec[i]..index_vec[i+1]-1 into
           * prod_vec[i]
           */
 
          _ntl_gone(&prod_vec[i]);
          for (j = index_vec[i]; j < index_vec[i+1]; j++)
-            _ntl_gsmul(prod_vec[i], q[j], &prod_vec[i]); 
+            _ntl_gsmul(prod_vec[i], q[j], &prod_vec[i]);
       }
 
       for (i = (1L << (levels-1)) - 2; i >= 3; i--)
@@ -4843,10 +4843,10 @@ void _ntl_grem_struct_init(void **rem_struct, long n, _ntl_gbigint modulus,
       q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) ghalt("out of memory");
       R->primes = q;
-  
+
       for (i = 0; i < n; i++)
          q[i] = p[i];
-  
+
       *rem_struct = (void *) r;
    }
 
@@ -4937,7 +4937,7 @@ void _ntl_grem_struct_eval(void *rem_struct, long *x, _ntl_gbigint a)
       mp_limb_t *adata;
       long sa;
 
-      if (!a) 
+      if (!a)
          sa = 0;
       else
          sa = SIZE(a);
@@ -5066,5 +5066,291 @@ void _ntl_grem_struct_eval(void *rem_struct, long *x, _ntl_gbigint a)
 
 
 }
+
+
+
+/* routines for x += a*b for single-precision b
+ * DIRT: relies crucially on mp_limb_t being at least as
+ * wide as a long.
+ * Lightly massaged code taken from GMP's mpz routines */
+
+
+
+#define _ntl_mpn_com_n(d,s,n)                                \
+  do {                                                  \
+    mp_limb_t *  __d = (d);                               \
+    mp_limb_t *  __s = (s);                               \
+    long  __n = (n);                               \
+    do                                                  \
+      *__d++ = (~ *__s++);              \
+    while (--__n);                                      \
+  } while (0)
+
+
+#define _ntl_MPN_MUL_1C(cout, dst, src, size, n, cin)        \
+  do {                                                  \
+    mp_limb_t __cy;                                     \
+    __cy = mpn_mul_1 (dst, src, size, n);               \
+    (cout) = __cy + mpn_add_1 (dst, dst, size, cin);    \
+  } while (0)
+
+#define _ntl_g_inc(p, n)   \
+  do {   \
+    mp_limb_t * __p = (p);  \
+    long __n = (n);  \
+    while (__n > 0) {  \
+       (*__p)++;  \
+       if (*__p != 0) break;  \
+       __p++;  \
+       __n--;  \
+    }  \
+  } while (0);
+
+#define _ntl_g_inc_carry(c, p, n)   \
+  do {   \
+    mp_limb_t * __p = (p);  \
+    long __n = (n);  \
+    long __addc = 1; \
+    while (__n > 0) {  \
+       (*__p)++;  \
+       if (*__p != 0) { __addc = 0; break; }  \
+       __p++;  \
+       __n--;  \
+    }  \
+    c += __addc; \
+  } while (0);
+
+#define _ntl_g_dec(p, n)   \
+  do {   \
+    mp_limb_t * __p = (p);  \
+    mp_limb_t __tmp; \
+    long __n = (n);  \
+    while (__n > 0) {  \
+       __tmp = *__p; \
+       (*__p)--;  \
+       if (__tmp != 0) break;  \
+       __p++;  \
+       __n--;  \
+    }  \
+  } while (0);
+
+
+
+/* sub==0 means an addmul w += x*y, sub==1 means a submul w -= x*y. */
+void
+_ntl_gaorsmul_1(_ntl_gbigint x, long yy, long sub, _ntl_gbigint *ww)
+{
+  long  xsize, wsize, wsize_signed, new_wsize, min_size, dsize;
+  _ntl_gbigint w;
+  mp_limb_t *xp;
+  mp_limb_t *wp;
+  mp_limb_t  cy;
+  mp_limb_t  y;
+
+  if (ZEROP(x) || yy == 0)
+    return;
+
+  if (ZEROP(*ww)) {
+    _ntl_gsmul(x, yy, ww);
+    if (sub) SIZE(*ww) = -SIZE(*ww);
+    return;
+  }
+
+  if (yy == 1) {
+    if (sub)
+      _ntl_gsub(*ww, x, ww);
+    else
+      _ntl_gadd(*ww, x, ww);
+    return;
+  }
+
+  if (yy == -1) {
+    if (sub)
+      _ntl_gadd(*ww, x, ww);
+    else
+      _ntl_gsub(*ww, x, ww);
+    return;
+  }
+
+  if (*ww == x) {
+    static _ntl_gbigint tmp = 0;
+    _ntl_gsmul(x, yy, &tmp);
+    if (sub)
+       _ntl_gsub(*ww, tmp, ww);
+    else
+       _ntl_gadd(*ww, tmp, ww);
+    return;
+  }
+
+  xsize = SIZE(x);
+  if (xsize < 0) {
+    xsize = -xsize;
+    sub = 1-sub;
+  }
+
+  if (yy < 0) {
+    y = - ((mp_limb_t) yy); /* careful! */
+    sub = 1-sub;
+  }
+  else {
+    y = (mp_limb_t) yy;
+  }
+
+
+  w = *ww;
+
+  wsize_signed = SIZE(w);
+  if (wsize_signed < 0) {
+    sub = 1-sub;
+    wsize = -wsize_signed;
+  }
+  else {
+    wsize = wsize_signed;
+  }
+
+
+  if (wsize > xsize) {
+    new_wsize = wsize;
+    min_size = xsize;
+  }
+  else {
+    new_wsize = xsize;
+    min_size = wsize;
+  }
+
+  if (MustAlloc(w, new_wsize+1)) {
+    _ntl_gsetlength(&w, new_wsize+1);
+    *ww = w;
+  }
+
+  wp = DATA(w);
+  xp = DATA(x);
+
+  if (sub == 0)
+    {
+      /* addmul of absolute values */
+
+      cy = mpn_addmul_1 (wp, xp, min_size, y);
+      wp += min_size;
+      xp += min_size;
+
+      dsize = xsize - wsize;
+      if (dsize != 0)
+        {
+          mp_limb_t  cy2;
+          if (dsize > 0) {
+            cy2 = mpn_mul_1 (wp, xp, dsize, y);
+          }
+          else
+            {
+              dsize = -dsize;
+              cy2 = 0;
+            }
+          cy = cy2 + mpn_add_1 (wp, wp, dsize, cy);
+        }
+
+      wp[dsize] = cy;
+      new_wsize += (cy != 0);
+    }
+  else
+    {
+      /* submul of absolute values */
+
+      cy = mpn_submul_1 (wp, xp, min_size, y);
+      if (wsize >= xsize)
+        {
+          /* if w bigger than x, then propagate borrow through it */
+          if (wsize != xsize) {
+            cy = mpn_sub_1 (wp+xsize, wp+xsize, wsize-xsize, cy);
+          }
+
+          if (cy != 0)
+            {
+              /* Borrow out of w, take twos complement negative to get
+                 absolute value, flip sign of w.  */
+              wp[new_wsize] = ~-cy;  /* extra limb is 0-cy */
+              _ntl_mpn_com_n (wp, wp, new_wsize);
+              new_wsize++;
+              _ntl_g_inc(wp, new_wsize);
+              wsize_signed = -wsize_signed;
+            }
+        }
+      else /* wsize < xsize */
+        {
+          /* x bigger than w, so want x*y-w.  Submul has given w-x*y, so
+             take twos complement and use an mpn_mul_1 for the rest.  */
+
+          mp_limb_t  cy2;
+
+          /* -(-cy*b^n + w-x*y) = (cy-1)*b^n + ~(w-x*y) + 1 */
+          _ntl_mpn_com_n (wp, wp, wsize);
+          _ntl_g_inc_carry(cy, wp, wsize);
+          cy -= 1;
+
+          /* If cy-1 == -1 then hold that -1 for latter.  mpn_submul_1 never
+             returns cy==MP_LIMB_T_MAX so that value always indicates a -1. */
+          cy2 = (cy == ((mp_limb_t) -1));
+          cy += cy2;
+          _ntl_MPN_MUL_1C (cy, wp+wsize, xp+wsize, xsize-wsize, y, cy);
+          wp[new_wsize] = cy;
+          new_wsize += (cy != 0);
+
+          /* Apply any -1 from above.  The value at wp+wsize is non-zero
+             because y!=0 and the high limb of x will be non-zero.  */
+          if (cy2) {
+            _ntl_g_dec(wp+wsize, new_wsize-wsize);
+          }
+
+          wsize_signed = -wsize_signed;
+        }
+
+      /* submul can produce high zero limbs due to cancellation, both when w
+         has more limbs or x has more  */
+      STRIP(new_wsize, wp);
+    }
+
+  SIZE(w) = (wsize_signed >= 0 ? new_wsize : -new_wsize);
+}
+
+
+void
+_ntl_gsaddmul(_ntl_gbigint x, long yy,  _ntl_gbigint *ww)
+{
+  _ntl_gaorsmul_1(x, yy, 0, ww);
+}
+
+void
+_ntl_gssubmul(_ntl_gbigint x, long yy,  _ntl_gbigint *ww)
+{
+  _ntl_gaorsmul_1(x, yy, 1, ww);
+}
+
+
+void
+_ntl_gaorsmul(_ntl_gbigint x, _ntl_gbigint y, long sub,  _ntl_gbigint *ww)
+{
+   static _ntl_gbigint tmp = 0;
+
+   _ntl_gmul(x, y, &tmp);
+   if (sub)
+      _ntl_gsub(*ww, tmp, ww);
+   else
+      _ntl_gadd(*ww, tmp, ww);
+}
+
+
+void
+_ntl_gaddmul(_ntl_gbigint x, _ntl_gbigint y,  _ntl_gbigint *ww)
+{
+  _ntl_gaorsmul(x, y, 0, ww);
+}
+
+void
+_ntl_gsubmul(_ntl_gbigint x, _ntl_gbigint y,  _ntl_gbigint *ww)
+{
+  _ntl_gaorsmul(x, y, 1, ww);
+}
+
+
 
 

@@ -45,7 +45,7 @@ void normalize1(RR& z, const ZZ& y_x, long y_e, long prec, long residual)
 
       RightShift(z.x, y_x, len - prec);
 
-      if (correction) 
+      if (correction)
          add(z.x, z.x, correction);
 
       z.e = y_e + len - prec;
@@ -99,13 +99,13 @@ void MakeRRPrec(RR& x, const ZZ& a, long e, long p)
 void random(RR& z)
 {
    static RR t;
-   RandomBits(t.x, RR::prec); 
+   RandomBits(t.x, RR::prec);
    t.e = -RR::prec;
    normalize(z, t);
 }
 
 
-static inline 
+static inline
 void xcopy(RR& x, const RR& a)
    { normalize(x, a); }
 
@@ -128,7 +128,7 @@ void RoundToPrecision(RR& x, const RR& a, long p)
 {
    ConvPrec(x, a, p);
 }
-   
+
 
 void conv(RR& x, const RR& a)
 {
@@ -416,14 +416,14 @@ void SqrRoot(RR& z, const RR& a)
    if ((a.e - k) & 1) k++;
 
    LeftShift(T1, a.x, k);
-   // since k >= 2*prec - bits(a) + 1, T1 has at least 2*prec+1 bits,           
-   // thus T1 >= 2^(2*prec)                                                     
+   // since k >= 2*prec - bits(a) + 1, T1 has at least 2*prec+1 bits,
+   // thus T1 >= 2^(2*prec)
 
-   SqrRoot(t.x, T1); // t.x >= 2^prec thus t.x contains the round bit           
+   SqrRoot(t.x, T1); // t.x >= 2^prec thus t.x contains the round bit
    t.e = (a.e - k)/2;
-   sqr(T2, t.x);  
+   sqr(T2, t.x);
 
-   // T1-T2 is the (lower part of the) sticky bit                               
+   // T1-T2 is the (lower part of the) sticky bit
    normalize(z, t, T2 < T1);
 }
 
@@ -460,7 +460,7 @@ long compare(const RR& a, const RR& b)
 
 
 
-long operator==(const RR& a, const RR& b) 
+long operator==(const RR& a, const RR& b)
 {
    return a.e == b.e && a.x == b.x;
 }
@@ -470,7 +470,7 @@ void trunc(RR& z, const RR& a)
 {
    static RR t;
 
-   if (a.e >= 0) 
+   if (a.e >= 0)
       xcopy(z, a);
    else {
       RightShift(t.x, a.x, -a.e);
@@ -494,7 +494,7 @@ void floor(RR& z, const RR& a)
 {
    static RR t;
 
-   if (a.e >= 0) 
+   if (a.e >= 0)
       xcopy(z, a);
    else {
       RightShift(t.x, a.x, -a.e);
@@ -582,7 +582,7 @@ void RoundPrec(RR& x, const RR& a, const RR& b, long p)
 }
 
 
-   
+
 
 void conv(RR& z, const ZZ& a)
 {
@@ -702,7 +702,7 @@ void ConvPrec(RR& x, double a, long p)
 
 void conv(ZZ& z, const RR& a)
 {
-   if (a.e >= 0) 
+   if (a.e >= 0)
       LeftShift(z, a.x, a.e);
    else {
       long sgn = sign(a.x);
@@ -728,7 +728,7 @@ void TruncToZZ(ZZ& z, const RR& a)
 {
    if (a.e >= 0)
       LeftShift(z, a.x, a.e);
-   else 
+   else
       RightShift(z, a.x, -a.e);
 }
 
@@ -860,7 +860,7 @@ long compare(const RR& a, double b)
 }
 
 
-long operator==(const RR& a, double b) 
+long operator==(const RR& a, double b)
 {
    if (b == 0) return IsZero(a);
    if (b == 1) return IsOne(a);
@@ -893,7 +893,7 @@ void power(RR& z, const RR& a, long e)
 
    RR::SetPrecision(p);
 
-   if (e < 0) 
+   if (e < 0)
       inv(z, res);
    else
       xcopy(z, res);
@@ -904,10 +904,10 @@ void conv(RR& z, const xdouble& a)
 {
    conv(z, a.mantissa());
 
-   if (a.exponent() >  ((2*NTL_OVFBND)/(2*NTL_XD_HBOUND_LOG))) 
+   if (a.exponent() >  ((2*NTL_OVFBND)/(2*NTL_XD_HBOUND_LOG)))
       Error("RR: overlow");
 
-   if (a.exponent() < -((2*NTL_OVFBND)/(2*NTL_XD_HBOUND_LOG))) 
+   if (a.exponent() < -((2*NTL_OVFBND)/(2*NTL_XD_HBOUND_LOG)))
       Error("RR: underflow");
 
    z.e += a.exponent()*(2*NTL_XD_HBOUND_LOG);
@@ -941,7 +941,7 @@ void conv(xdouble& z, const RR& a)
    power2(y, a.e);
    z = x*y;
 }
-      
+
 void power2(RR& z, long e)
 {
    if (e >= NTL_OVFBND)
@@ -950,7 +950,7 @@ void power2(RR& z, long e)
    if (e <= -NTL_OVFBND)
       Error("RR: underflow");
 
-   set(z.x); 
+   set(z.x);
    z.e = e;
 }
 
@@ -1047,7 +1047,7 @@ void conv(RR& x, const char *s)
 
       if (cval >= 0 && cval <= 9) {
          got2 = 1;
-   
+
          while (cval >= 0 && cval <= 9) {
             mul(a, a, 10);
             add(a, a, cval);
@@ -1215,7 +1215,7 @@ void exp(RR& res, const RR& x)
    RR::SetPrecision(p + 10);
 
    RR t1;
-   power(t1, e, n); 
+   power(t1, e, n);
 
    // step 2: calculate t2 = e^f using Taylor series expansion
 
@@ -1340,7 +1340,7 @@ void log(RR& res, const RR& x)
       div(t, t1, i);
    }
 
-   if (n == 0) 
+   if (n == 0)
       t = 0;
    else {
       ComputeLn2(t);
@@ -1502,12 +1502,12 @@ void pow(RR& res, const RR& x, const RR& y)
    RR t1, t2;
    long k;
 
-   if (x > 0.5 && x < 1.5) { 
+   if (x > 0.5 && x < 1.5) {
       xcopy(t1, x - 1);
       k = Lg2(t1);
    }
    else {
-      k = NumBits(Lg2(x)); 
+      k = NumBits(Lg2(x));
    }
 
    k += Lg2(y);
@@ -1516,7 +1516,7 @@ void pow(RR& res, const RR& x, const RR& y)
 
    if (k < 0) k = 0;
 
-   
+
    RR::SetPrecision(p + k + 10);
 
    t1 = y*log(x);
@@ -1608,7 +1608,7 @@ void sin(RR& res, const RR& x)
       return;
    }
 
-   if (Lg2(x) > 1000) 
+   if (Lg2(x) > 1000)
       Error("sin: sorry...argument too large in absolute value");
 
    long p = RR::precision();
@@ -1631,12 +1631,12 @@ void sin(RR& res, const RR& x)
       // we want to write x/pi = n + f, |f| < 1/2....
       // but we have to do *this* very carefully, so that f is computed
       // to precision > p.  I know, this is sick!
-   
+
       long p1;
-   
+
       p1 = p + Lg2(x) + 20;
-   
-   
+
+
       for (;;) {
          RR::SetPrecision(p1);
          ComputePi(pi);
@@ -1661,7 +1661,7 @@ void sin(RR& res, const RR& x)
       ComputePi(pi);
 
       xcopy(f, pi * f);
-      
+
       if (n != 0 && n.exponent() == 0) {
          // n is odd, so we negate f, which negates sin(f)
 
@@ -1691,7 +1691,7 @@ void sin(RR& res, const RR& x)
    }
 
    RR::SetPrecision(p);
-   
+
    xcopy(res, s);
 
 }
@@ -1703,7 +1703,7 @@ void cos(RR& res, const RR& x)
       return;
    }
 
-   if (Lg2(x) > 1000) 
+   if (Lg2(x) > 1000)
       Error("cos: sorry...argument too large in absolute value");
 
    long p = RR::precision();
@@ -1740,7 +1740,7 @@ void cos(RR& res, const RR& x)
    ComputePi(pi);
 
    xcopy(f, pi * f);
-   
+
    if (n == 0 || n.exponent() != 0) {
       // n is even, so we negate f, which negates sin(f)
 
@@ -1768,7 +1768,7 @@ void cos(RR& res, const RR& x)
    }
 
    RR::SetPrecision(p);
-   
+
    xcopy(res, s);
 
 }

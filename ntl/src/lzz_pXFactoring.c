@@ -57,13 +57,13 @@ void SquareFreeDecomp(vec_pair_zz_pX_long& u, const zz_pX& ff)
          p = long(zz_p::modulus());
          d = deg(r)/p;
          f.rep.SetLength(d+1);
-         for (k = 0; k <= d; k++) 
+         for (k = 0; k <= d; k++)
             f.rep[k] = r.rep[k*p];
          m = m*p;
       }
    } while (!finished);
 }
-         
+
 
 
 static
@@ -142,7 +142,7 @@ void NullSpace(long& r, vec_long& D, vec_vec_zz_p& M, long verbose)
 
 
 static
-void BuildMatrix(vec_vec_zz_p& M, 
+void BuildMatrix(vec_vec_zz_p& M,
                  long n, const zz_pX& g, const zz_pXModulus& F, long verbose)
 {
    long i, j, m;
@@ -188,7 +188,7 @@ void RecFindRoots(vec_zz_p& x, const zz_pX& f)
       negate(x[k], ConstTerm(f));
       return;
    }
-      
+
    zz_pX h;
 
    zz_p r;
@@ -208,7 +208,7 @@ void RecFindRoots(vec_zz_p& x, const zz_pX& f)
    }
 
    RecFindRoots(x, h);
-   div(h, f, h); 
+   div(h, f, h);
    RecFindRoots(x, h);
 }
 
@@ -223,7 +223,7 @@ void FindRoots(vec_zz_p& x, const zz_pX& ff)
 
 
 static
-void RandomBasisElt(zz_pX& g, const vec_long& D, 
+void RandomBasisElt(zz_pX& g, const vec_long& D,
                     const vec_vec_zz_p& M)
 {
    zz_p t1, t2;
@@ -262,7 +262,7 @@ void RandomBasisElt(zz_pX& g, const vec_long& D,
 
 static
 void split(zz_pX& f1, zz_pX& g1, zz_pX& f2, zz_pX& g2,
-           const zz_pX& f, const zz_pX& g, 
+           const zz_pX& f, const zz_pX& g,
            const vec_zz_p& roots, long lo, long mid)
 {
    long r = mid-lo+1;
@@ -283,7 +283,7 @@ void split(zz_pX& f1, zz_pX& g1, zz_pX& f2, zz_pX& g2,
 
 
    GCD(f1, a, f);
-   
+
    div(f2, f, f1);
 
    rem(g1, g, f1);
@@ -346,7 +346,7 @@ void IterFindFactors(vec_zz_pX& factors, const zz_pX& f,
 
 #endif
 
-   
+
 
 void SFBerlekamp(vec_zz_pX& factors, const zz_pX& ff, long verbose)
 {
@@ -473,7 +473,7 @@ void AddFactor(vec_pair_zz_pX_long& factors, const zz_pX& g, long d, long verbos
 }
 
 static
-void ProcessTable(zz_pX& f, vec_pair_zz_pX_long& factors, 
+void ProcessTable(zz_pX& f, vec_pair_zz_pX_long& factors,
                   const zz_pXModulus& F, long limit, const vec_zz_pX& tbl,
                   long d, long verbose)
 
@@ -510,7 +510,7 @@ void ProcessTable(zz_pX& f, vec_pair_zz_pX_long& factors,
    d = d - limit + 1;
 
    while (2*d <= deg(t1)) {
-      GCD(t2, tbl[i], t1); 
+      GCD(t2, tbl[i], t1);
       if (deg(t2) > 0) {
          AddFactor(factors, t2, d, verbose);
          div(t1, t1, t2);
@@ -525,7 +525,7 @@ void ProcessTable(zz_pX& f, vec_pair_zz_pX_long& factors,
 }
 
 
-void TraceMap(zz_pX& w, const zz_pX& a, long d, const zz_pXModulus& F, 
+void TraceMap(zz_pX& w, const zz_pX& a, long d, const zz_pXModulus& F,
               const zz_pX& b)
 
 {
@@ -539,7 +539,7 @@ void TraceMap(zz_pX& w, const zz_pX& a, long d, const zz_pXModulus& F,
 
    while (d) {
       if (d == 1) {
-         if (IsZero(w)) 
+         if (IsZero(w))
             w = y;
          else {
             CompMod(w, w, z, F);
@@ -646,7 +646,7 @@ long ProbIrredTest(const zz_pX& f, long iter)
 
 long zz_pX_BlockingFactor = 10;
 
-void DDF(vec_pair_zz_pX_long& factors, const zz_pX& ff, const zz_pX& hh, 
+void DDF(vec_pair_zz_pX_long& factors, const zz_pX& ff, const zz_pX& hh,
          long verbose)
 {
    zz_pX f = ff;
@@ -658,14 +658,14 @@ void DDF(vec_pair_zz_pX_long& factors, const zz_pX& ff, const zz_pX& hh,
    factors.SetLength(0);
 
    if (deg(f) == 0)
-      return; 
+      return;
 
    if (deg(f) == 1) {
       AddFactor(factors, f, 1, verbose);
       return;
    }
 
-   long CompTableSize = 2*SqrRoot(deg(f)); 
+   long CompTableSize = 2*SqrRoot(deg(f));
 
    long GCDTableSize = zz_pX_BlockingFactor;
 
@@ -705,7 +705,7 @@ void DDF(vec_pair_zz_pX_long& factors, const zz_pX& ff, const zz_pX& hh,
          // we need to go further
 
          if (deg(f) < old_n) {
-            // f has changed 
+            // f has changed
 
             build(F, f);
             rem(h, h, f);
@@ -745,7 +745,7 @@ void EDFSplit(vec_zz_pX& v, const zz_pX& f, const zz_pX& b, long d)
    zz_pX a, g, h;
    zz_pXModulus F;
    vec_zz_p roots;
-   
+
    build(F, f);
    long n = F.n;
    long r = n/d;
@@ -776,7 +776,7 @@ void RecEDF(vec_zz_pX& factors, const zz_pX& f, const zz_pX& b, long d,
       }
    }
 }
-         
+
 
 void EDF(vec_zz_pX& factors, const zz_pX& ff, const zz_pX& bb,
          long d, long verbose)
@@ -807,7 +807,7 @@ void EDF(vec_zz_pX& factors, const zz_pX& ff, const zz_pX& bb,
       return;
    }
 
-   
+
    double t;
 
    factors.SetLength(0);
@@ -826,7 +826,7 @@ void SFCanZass1(vec_pair_zz_pX_long& u, zz_pX& h, const zz_pX& f, long verbose)
 
    long p = zz_p::modulus();
 
-   
+
    zz_pXModulus F;
    build(F, f);
 
@@ -898,7 +898,7 @@ void SFCanZass(vec_zz_pX& factors, const zz_pX& ff, long verbose)
 
    long p = zz_p::modulus();
 
-   
+
    zz_pXModulus F;
    build(F, f);
 
@@ -940,7 +940,7 @@ void SFCanZass(vec_zz_pX& factors, const zz_pX& ff, long verbose)
       }
    }
 }
-   
+
 void CanZass(vec_pair_zz_pX_long& factors, const zz_pX& f, long verbose)
 {
    if (!IsOne(LeadCoeff(f)))
@@ -1009,7 +1009,7 @@ long BaseCase(const zz_pX& h, long q, long a, const zz_pXModulus& F)
 
 
 
-void TandemPowerCompose(zz_pX& y1, zz_pX& y2, const zz_pX& h, 
+void TandemPowerCompose(zz_pX& y1, zz_pX& y2, const zz_pX& h,
                         long q1, long q2, const zz_pXModulus& F)
 {
    zz_pX z(INIT_SIZE, F.n);
@@ -1088,7 +1088,7 @@ long RecComputeDegree(long u, const zz_pX& h, const zz_pXModulus& F,
    zz_pX h1, h2;
    long q1, q2, r1, r2;
 
-   q1 = fvec[fvec[u].link].val; 
+   q1 = fvec[fvec[u].link].val;
    q2 = fvec[fvec[u].link+1].val;
 
    TandemPowerCompose(h1, h2, h, q1, q2, F);
@@ -1097,7 +1097,7 @@ long RecComputeDegree(long u, const zz_pX& h, const zz_pXModulus& F,
    return r1*r2;
 }
 
-   
+
 
 
 long ComputeDegree(const zz_pX& h, const zz_pXModulus& F)
@@ -1105,7 +1105,7 @@ long ComputeDegree(const zz_pX& h, const zz_pXModulus& F)
    // h = X^p mod f
    // the common degree of the irreducible factors of f is computed
 {
-   if (F.n == 1 || IsX(h)) 
+   if (F.n == 1 || IsX(h))
       return 1;
 
    FacVec fvec;
@@ -1220,11 +1220,11 @@ long RecIrredTest(long u, const zz_pX& h, const zz_pXModulus& F,
    }
 
 
-   q1 = fvec[fvec[u].link].val; 
+   q1 = fvec[fvec[u].link].val;
    q2 = fvec[fvec[u].link+1].val;
 
    TandemPowerCompose(h1, h2, h, q1, q2, F);
-   return RecIrredTest(fvec[u].link, h2, F, fvec) 
+   return RecIrredTest(fvec[u].link, h2, F, fvec)
           && RecIrredTest(fvec[u].link+1, h1, F, fvec);
 }
 
@@ -1236,7 +1236,7 @@ long DetIrredTest(const zz_pX& f)
    zz_pXModulus F;
 
    build(F, f);
-   
+
    zz_pX h;
 
    PowerXMod(h, zz_p::modulus(), F);
@@ -1262,7 +1262,7 @@ long IterIrredTest(const zz_pX& f)
    zz_pXModulus F;
 
    build(F, f);
-   
+
    zz_pX h;
 
    PowerXMod(h, zz_p::modulus(), F);
@@ -1509,15 +1509,15 @@ void GenerateBabySteps(zz_pX& h1, const zz_pX& f, const zz_pX& h, long k,
    else {
       zz_pXArgument H;
       build(H, h, F, 2*rootn);
-   
-   
+
+
       for (i = 1; i <= k-1; i++) {
-         (*BabyStepFile)(i) = h1; 
-   
+         (*BabyStepFile)(i) = h1;
+
          CompMod(h1, h1, H, F);
       }
    }
-   
+
 }
 
 
@@ -1560,7 +1560,7 @@ void NewAddFactor(vec_pair_zz_pX_long& u, const zz_pX& g, long m, long verbose)
 
 }
 
-   
+
 
 
 static
@@ -1650,7 +1650,7 @@ void FetchBabySteps(vec_zz_pX& v, long k)
       v[i] = (*BabyStepFile)(i);
    }
 }
-      
+
 
 
 static
@@ -1712,7 +1712,7 @@ void GiantRefine(vec_pair_zz_pX_long& u, const zz_pX& ff, long k, long l,
          build(F, f);
 
          long i;
-         for (i = 1; i <= k-1; i++) 
+         for (i = 1; i <= k-1; i++)
             rem(BabyStep[i], BabyStep[i], F);
       }
    }
@@ -1721,7 +1721,7 @@ void GiantRefine(vec_pair_zz_pX_long& u, const zz_pX& ff, long k, long l,
       NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
    }
 
-   if (deg(f) > 0) 
+   if (deg(f) > 0)
       NewAddFactor(u, f, 0, verbose);
 
 }
@@ -1776,10 +1776,10 @@ void IntervalRefine(vec_pair_zz_pX_long& factors, const zz_pX& ff,
 
    NewProcessTable(factors, f, F, buf, size, first_d, 1, verbose);
 
-   if (deg(f) > 0) 
+   if (deg(f) > 0)
       NewAddFactor(factors, f, deg(f), verbose);
 }
-   
+
 
 
 
@@ -1811,9 +1811,9 @@ void BabyRefine(vec_pair_zz_pX_long& factors, const vec_pair_zz_pX_long& u,
 
 }
 
-      
 
-      
+
+
 
 void NewDDF(vec_pair_zz_pX_long& factors,
             const zz_pX& f,

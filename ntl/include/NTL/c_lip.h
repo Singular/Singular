@@ -193,6 +193,19 @@ extern "C" {
 	  The division is performed in place (but may sometimes
           cause *r to grow by one digit) */
 
+    void _ntl_zsaddmul(_ntl_verylong x, long y,  _ntl_verylong *ww);
+      /* *ww += x*y */
+
+    void _ntl_zaddmul(_ntl_verylong x, _ntl_verylong y,  _ntl_verylong *ww);
+      /* *ww += x*y */
+
+    void _ntl_zssubmul(_ntl_verylong x, long y,  _ntl_verylong *ww);
+      /* *ww -= x*y */
+
+    void _ntl_zsubmul(_ntl_verylong x, _ntl_verylong y,  _ntl_verylong *ww);
+      /* *ww -= x*y */
+
+
 /********************************************************************
 
    Shifting and bit manipulation
@@ -640,4 +653,9 @@ extern int _ntl_gmp_hack;
 #define NTL_zxor _ntl_zxor
 #define NTL_zxxratrecon _ntl_zxxratrecon
 #define NTL_zzero _ntl_zzero1
+
+#define NTL_zsaddmul _ntl_zsaddmul
+#define NTL_zaddmul _ntl_zaddmul
+#define NTL_zssubmul _ntl_zssubmul
+#define NTL_zsubmul _ntl_zsubmul
 

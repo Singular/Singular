@@ -21,7 +21,7 @@ long divide(ZZ_pX& q, const ZZ_pX& a, const ZZ_pX& b)
 
    ZZ_pX lq, r;
    DivRem(lq, r, a, b);
-   if (!IsZero(r)) return 0; 
+   if (!IsZero(r)) return 0;
    q = lq;
    return 1;
 }
@@ -31,7 +31,7 @@ long divide(const ZZ_pX& a, const ZZ_pX& b)
    if (IsZero(b)) return IsZero(a);
    ZZ_pX lq, r;
    DivRem(lq, r, a, b);
-   if (!IsZero(r)) return 0; 
+   if (!IsZero(r)) return 0;
    return 1;
 }
 
@@ -62,7 +62,7 @@ void RightShift(ZZ_pX& x, const ZZ_pX& a, long n)
 
    long da = deg(a);
    long i;
- 
+
    if (da < n) {
       clear(x);
       return;
@@ -88,7 +88,7 @@ void LeftShift(ZZ_pX& x, const ZZ_pX& a, long n)
    }
 
    if (n < 0) {
-      if (n < -NTL_MAX_LONG) 
+      if (n < -NTL_MAX_LONG)
          clear(x);
       else
          RightShift(x, a, -n);
@@ -164,7 +164,7 @@ void mul(ZZ_pX& U, ZZ_pX& V, const ZZ_pXMatrix& M)
    long d = deg(U) - deg(M(1,1));
    long k = NextPowerOfTwo(d - 1);
 
-   // When the GCD algorithm is run on polynomials of degree n, n-1, 
+   // When the GCD algorithm is run on polynomials of degree n, n-1,
    // where n is a power of two, then d-1 is likely to be a power of two.
    // It would be more natural to set k = NextPowerOfTwo(d+1), but this
    // would be much less efficient in this case.
@@ -181,7 +181,7 @@ void mul(ZZ_pX& U, ZZ_pX& V, const ZZ_pXMatrix& M)
       xx = 1;
    else if (n == d)
       xx = 2;
-   else 
+   else
       xx = 3;
 
    switch (xx) {
@@ -200,7 +200,7 @@ void mul(ZZ_pX& U, ZZ_pX& V, const ZZ_pXMatrix& M)
 
       mul(t1, rep(a0), rep(u0));
       mul(t2, rep(b0), rep(v0));
-      add(t1, t1, t2); 
+      add(t1, t1, t2);
       conv(nu0, t1);
 
       mul(t1, rep(a1), rep(u0));
@@ -216,7 +216,7 @@ void mul(ZZ_pX& U, ZZ_pX& V, const ZZ_pXMatrix& M)
       mul(t2, rep(d0), rep(v0));
       add (t1, t1, t2);
       conv(nv0, t1);
-   
+
       break;
 
    case 2:
@@ -228,7 +228,7 @@ void mul(ZZ_pX& U, ZZ_pX& V, const ZZ_pXMatrix& M)
 
       mul(t1, rep(a0), rep(u0));
       mul(t2, rep(b0), rep(v0));
-      add(t1, t1, t2); 
+      add(t1, t1, t2);
       conv(nu0, t1);
 
       break;
@@ -238,11 +238,11 @@ void mul(ZZ_pX& U, ZZ_pX& V, const ZZ_pXMatrix& M)
 
    }
 
-   FFTRep RU(INIT_SIZE, k), RV(INIT_SIZE, k), R1(INIT_SIZE, k), 
+   FFTRep RU(INIT_SIZE, k), RV(INIT_SIZE, k), R1(INIT_SIZE, k),
           R2(INIT_SIZE, k);
 
-   ToFFTRep(RU, U, k);  
-   ToFFTRep(RV, V, k);  
+   ToFFTRep(RU, U, k);
+   ToFFTRep(RV, V, k);
 
    ToFFTRep(R1, M(0,0), k);
    mul(R1, R1, RU);
@@ -278,7 +278,7 @@ void mul(ZZ_pX& U, ZZ_pX& V, const ZZ_pXMatrix& M)
       SetCoeff(V, 0, nv0);
 
       break;
-      
+
 
    case 2:
       GetCoeff(u0, U, 0);
@@ -302,7 +302,7 @@ void mul(ZZ_pXMatrix& A, ZZ_pXMatrix& B, ZZ_pXMatrix& C)
    long k = NextPowerOfTwo(da+1);
 
    FFTRep B00, B01, B10, B11, C0, C1, T1, T2;
-   
+
    ToFFTRep(B00, B(0,0), k); B(0,0).kill();
    ToFFTRep(B01, B(0,1), k); B(0,1).kill();
    ToFFTRep(B10, B(1,0), k); B(1,0).kill();
@@ -368,7 +368,7 @@ void IterHalfGCD(ZZ_pXMatrix& M_out, ZZ_pX& U, ZZ_pX& V, long d_red)
       M_out(1,1) = t;
    }
 }
-   
+
 
 
 void HalfGCD(ZZ_pXMatrix& M_out, const ZZ_pX& U, const ZZ_pX& V, long d_red)
@@ -376,7 +376,7 @@ void HalfGCD(ZZ_pXMatrix& M_out, const ZZ_pX& U, const ZZ_pX& V, long d_red)
    if (IsZero(V) || deg(V) <= deg(U) - d_red) {
       set(M_out(0,0));   clear(M_out(0,1));
       clear(M_out(1,0)); set(M_out(1,1));
- 
+
       return;
    }
 
@@ -437,7 +437,7 @@ void HalfGCD(ZZ_pXMatrix& M_out, const ZZ_pX& U, const ZZ_pX& V, long d_red)
 
    t.kill();
 
-   mul(M_out, M2, M1); 
+   mul(M_out, M2, M1);
 }
 
 
@@ -448,7 +448,7 @@ void XHalfGCD(ZZ_pXMatrix& M_out, ZZ_pX& U, ZZ_pX& V, long d_red)
    if (IsZero(V) || deg(V) <= deg(U) - d_red) {
       set(M_out(0,0));   clear(M_out(0,1));
       clear(M_out(1,0)); set(M_out(1,1));
- 
+
       return;
    }
 
@@ -502,7 +502,7 @@ void XHalfGCD(ZZ_pXMatrix& M_out, ZZ_pX& U, ZZ_pX& V, long d_red)
 
    t.kill();
 
-   mul(M_out, M2, M1); 
+   mul(M_out, M2, M1);
 }
 
 void HalfGCD(ZZ_pX& U, ZZ_pX& V)
@@ -544,7 +544,7 @@ void HalfGCD(ZZ_pX& U, ZZ_pX& V)
 
    HalfGCD(M1, U, V, d2);
 
-   mul(U, V, M1); 
+   mul(U, V, M1);
 }
 
 
@@ -618,7 +618,7 @@ void XGCD(ZZ_pX& d, ZZ_pX& s, ZZ_pX& t, const ZZ_pX& a, const ZZ_pX& b)
    d = U;
 
    if (flag == 0) {
-      s = M(0,0); 
+      s = M(0,0);
       t = M(0,1);
    }
    else if (flag == 1) {
@@ -639,7 +639,7 @@ void XGCD(ZZ_pX& d, ZZ_pX& s, ZZ_pX& t, const ZZ_pX& a, const ZZ_pX& b)
    mul(t, t, w);
 }
 
-      
+
 
 
 
@@ -663,7 +663,7 @@ void IterBuild(ZZ_p* a, long n)
       }
       mul(a[0], a[0], b);
    }
-} 
+}
 
 void mul(ZZ_p* x, const ZZ_p* a, const ZZ_p* b, long n)
 {
@@ -726,7 +726,7 @@ void BuildFromRoots(ZZ_pX& x, const vec_ZZ_p& a)
       clear(b.rep[i]);
 
    set(b.rep[m]);
-   
+
    FFTRep R1(INIT_SIZE, k), R2(INIT_SIZE, k);
 
 
@@ -737,7 +737,7 @@ void BuildFromRoots(ZZ_pX& x, const vec_ZZ_p& a)
    ZZ_p *g = G.elts();
    ZZ_p *h = H.elts();
    ZZ_p *tmp;
-   
+
    for (i = 0; i < m; i+= crossover) {
       for (j = 0; j < crossover; j++)
          negate(g[j], b.rep[i+j]);
@@ -749,13 +749,13 @@ void BuildFromRoots(ZZ_pX& x, const vec_ZZ_p& a)
             g[j] = t1;
          }
       }
-   
+
       for (l = 1; l < k0; l++) {
          width = 1L << l;
 
          for (j = 0; j < crossover; j += 2*width)
             mul(&h[j], &g[j], &g[j+width], width);
-      
+
          tmp = g; g = h; h = tmp;
       }
 
@@ -820,7 +820,7 @@ void eval(vec_ZZ_p& b, const ZZ_pX& f, const vec_ZZ_p& a)
    long m = a.length();
    b.SetLength(m);
    long i;
-   for (i = 0; i < m; i++) 
+   for (i = 0; i < m; i++)
       eval(b[i], f, a[i]);
 }
 
@@ -890,7 +890,7 @@ void interpolate(ZZ_pX& f, const vec_ZZ_p& a, const vec_ZZ_p& b)
       }
    }
 
-   while (m > 0 && IsZero(res[m-1])) m--; 
+   while (m > 0 && IsZero(res[m-1])) m--;
    res.SetLength(m);
    f.rep = res;
 }
@@ -901,8 +901,8 @@ NTL_eq_vector_impl(ZZ_pX,vec_ZZ_pX)
 
 
 
-   
-void InnerProduct(ZZ_pX& x, const vec_ZZ_p& v, long low, long high, 
+
+void InnerProduct(ZZ_pX& x, const vec_ZZ_p& v, long low, long high,
                    const vec_ZZ_pX& H, long n, ZZVec& t)
 {
    static ZZ s;
@@ -930,7 +930,7 @@ void InnerProduct(ZZ_pX& x, const vec_ZZ_p& v, long low, long high,
 }
 
 
-void CompMod(ZZ_pX& x, const ZZ_pX& g, const ZZ_pXArgument& A, 
+void CompMod(ZZ_pX& x, const ZZ_pX& g, const ZZ_pXArgument& A,
              const ZZ_pXModulus& F)
 {
    if (deg(g) <= 0) {
@@ -984,7 +984,7 @@ void build(ZZ_pXArgument& A, const ZZ_pX& h, const ZZ_pXModulus& F, long m)
 
    set(A.H[0]);
    A.H[1] = h;
-   for (i = 2; i <= m; i++) 
+   for (i = 2; i <= m; i++)
       MulMod(A.H[i], A.H[i-1], M, F);
 }
 
@@ -1039,7 +1039,7 @@ void Comp2Mod(ZZ_pX& x1, ZZ_pX& x2, const ZZ_pX& g1, const ZZ_pX& g2,
    x2 = xx2;
 }
 
-void Comp3Mod(ZZ_pX& x1, ZZ_pX& x2, ZZ_pX& x3, 
+void Comp3Mod(ZZ_pX& x1, ZZ_pX& x2, ZZ_pX& x3,
               const ZZ_pX& g1, const ZZ_pX& g2, const ZZ_pX& g3,
               const ZZ_pX& h, const ZZ_pXModulus& F)
 
@@ -1078,7 +1078,7 @@ static void StripZeroes(vec_ZZ_p& x)
 }
 
 
-void PlainUpdateMap(vec_ZZ_p& xx, const vec_ZZ_p& a, 
+void PlainUpdateMap(vec_ZZ_p& xx, const vec_ZZ_p& a,
                     const ZZ_pX& b, const ZZ_pX& f)
 {
    long n = deg(f);
@@ -1108,9 +1108,9 @@ void PlainUpdateMap(vec_ZZ_p& xx, const vec_ZZ_p& a,
 
    xx = x;
 }
-   
 
-void UpdateMap(vec_ZZ_p& x, const vec_ZZ_p& aa, 
+
+void UpdateMap(vec_ZZ_p& x, const vec_ZZ_p& aa,
                const ZZ_pXMultiplier& B, const ZZ_pXModulus& F)
 {
    long n = F.n;
@@ -1146,7 +1146,7 @@ void UpdateMap(vec_ZZ_p& x, const vec_ZZ_p& aa,
    StripZeroes(x);
 }
 
-   
+
 
 void ProjectPowers(vec_ZZ_p& x, const vec_ZZ_p& a, long k,
                    const ZZ_pXArgument& H, const ZZ_pXModulus& F)
@@ -1154,7 +1154,7 @@ void ProjectPowers(vec_ZZ_p& x, const vec_ZZ_p& a, long k,
 {
    long n = F.n;
 
-   if (a.length() > n || k < 0 || NTL_OVERFLOW(k, 1, 0)) 
+   if (a.length() > n || k < 0 || NTL_OVERFLOW(k, 1, 0))
       Error("ProjectPowers: bad args");
 
    long m = H.H.length()-1;
@@ -1254,7 +1254,7 @@ void BerlekampMassey(ZZ_pX& h, const vec_ZZ_p& a, long m)
       }
    }
 
-   // cerr << "finished: " << L << " " << deg(Lambda) << "\n"; 
+   // cerr << "finished: " << L << " " << deg(Lambda) << "\n";
 
    dl = deg(Lambda);
    h.rep.SetLength(L + 1);
@@ -1304,7 +1304,7 @@ void MinPolySeq(ZZ_pX& h, const vec_ZZ_p& a, long m)
 
 
 void DoMinPolyMod(ZZ_pX& h, const ZZ_pX& g, const ZZ_pXModulus& F, long m,
-               const vec_ZZ_p& R) 
+               const vec_ZZ_p& R)
 {
    vec_ZZ_p x;
 
@@ -1313,11 +1313,11 @@ void DoMinPolyMod(ZZ_pX& h, const ZZ_pX& g, const ZZ_pXModulus& F, long m,
 }
 
 
-void ProbMinPolyMod(ZZ_pX& h, const ZZ_pX& g, const ZZ_pXModulus& F, long m) 
+void ProbMinPolyMod(ZZ_pX& h, const ZZ_pX& g, const ZZ_pXModulus& F, long m)
 {
    long n = F.n;
    if (m < 1 || m > n) Error("ProbMinPoly: bad args");
-   
+
    long i;
    vec_ZZ_p R(INIT_SIZE, n);
 
@@ -1325,7 +1325,7 @@ void ProbMinPolyMod(ZZ_pX& h, const ZZ_pX& g, const ZZ_pXModulus& F, long m)
    DoMinPolyMod(h, g, F, m, R);
 }
 
-void MinPolyMod(ZZ_pX& hh, const ZZ_pX& g, const ZZ_pXModulus& F, long m) 
+void MinPolyMod(ZZ_pX& hh, const ZZ_pX& g, const ZZ_pXModulus& F, long m)
 {
    ZZ_pX h, h1;
    long n = F.n;
@@ -1363,7 +1363,7 @@ void MinPolyMod(ZZ_pX& hh, const ZZ_pX& g, const ZZ_pXModulus& F, long m)
 
 
 
-void IrredPolyMod(ZZ_pX& h, const ZZ_pX& g, const ZZ_pXModulus& F, long m) 
+void IrredPolyMod(ZZ_pX& h, const ZZ_pX& g, const ZZ_pXModulus& F, long m)
 {
    vec_ZZ_p R(INIT_SIZE, 1);
    if (m < 1 || m > F.n) Error("IrredPoly: bad args");
@@ -1413,7 +1413,7 @@ void MakeMonic(ZZ_pX& x)
 }
 
 
-      
+
 void PlainMulTrunc(ZZ_pX& x, const ZZ_pX& a, const ZZ_pX& b, long n)
 {
    ZZ_pX y;
@@ -1452,7 +1452,7 @@ void MulTrunc(ZZ_pX& x, const ZZ_pX& a, const ZZ_pX& b, long n)
       FFTMulTrunc(x, a, b, n);
 }
 
-      
+
 void PlainSqrTrunc(ZZ_pX& x, const ZZ_pX& a, long n)
 {
    ZZ_pX y;
@@ -1495,7 +1495,7 @@ void FastTraceVec(vec_ZZ_p& S, const ZZ_pX& f)
 {
    long n = deg(f);
 
-   if (n <= 0) 
+   if (n <= 0)
       Error("FastTraceVec: bad args");
 
    if (n == 0) {
@@ -1508,7 +1508,7 @@ void FastTraceVec(vec_ZZ_p& S, const ZZ_pX& f)
       set(S[0]);
       return;
    }
-   
+
    long i;
    ZZ_pX f1;
 
@@ -1599,7 +1599,7 @@ void ComputeTraceVec(const ZZ_pXModulus& F)
 
    g.rep.SetLength(n-1);
    for (i = 1; i < n; i++)
-      mul(g.rep[n-i-1], F.f.rep[n-i], i); 
+      mul(g.rep[n-i-1], F.f.rep[n-i], i);
    g.normalize();
 
    ToFFTRep(R, g, F.l);
@@ -1620,7 +1620,7 @@ void TraceMod(ZZ_p& x, const ZZ_pX& a, const ZZ_pXModulus& F)
    if (deg(a) >= n)
       Error("trace: bad args");
 
-   if (F.tracevec.length() == 0) 
+   if (F.tracevec.length() == 0)
       ComputeTraceVec(F);
 
    InnerProduct(x, a.rep, F.tracevec);
@@ -1637,10 +1637,10 @@ void TraceMod(ZZ_p& x, const ZZ_pX& a, const ZZ_pX& f)
 void PlainResultant(ZZ_p& rres, const ZZ_pX& a, const ZZ_pX& b)
 {
    ZZ_p res;
- 
+
    if (IsZero(a) || IsZero(b))
       clear(res);
-   else if (deg(a) == 0 && deg(b) == 0) 
+   else if (deg(a) == 0 && deg(b) == 0)
       set(res);
    else {
       long d0, d1, d2;
@@ -1675,7 +1675,7 @@ void PlainResultant(ZZ_p& rres, const ZZ_pX& a, const ZZ_pX& b)
             }
             else
                clear(res);
-        
+
             break;
          }
       }
@@ -1722,7 +1722,7 @@ void ResIterHalfGCD(ZZ_pXMatrix& M_out, ZZ_pX& U, ZZ_pX& V, long d_red,
       M_out(1,1) = t;
    }
 }
-   
+
 
 
 void ResHalfGCD(ZZ_pXMatrix& M_out, const ZZ_pX& U, const ZZ_pX& V, long d_red,
@@ -1731,7 +1731,7 @@ void ResHalfGCD(ZZ_pXMatrix& M_out, const ZZ_pX& U, const ZZ_pX& V, long d_red,
    if (IsZero(V) || deg(V) <= deg(U) - d_red) {
       set(M_out(0,0));   clear(M_out(0,1));
       clear(M_out(1,0)); set(M_out(1,1));
- 
+
       return;
    }
 
@@ -1744,7 +1744,7 @@ void ResHalfGCD(ZZ_pXMatrix& M_out, const ZZ_pX& U, const ZZ_pX& V, long d_red,
    RightShift(U1, U, n);
    RightShift(V1, V, n);
 
-   if (d_red <= NTL_ZZ_pX_HalfGCD_CROSSOVER) { 
+   if (d_red <= NTL_ZZ_pX_HalfGCD_CROSSOVER) {
       ResIterHalfGCD(M_out, U1, V1, d_red, cvec, dvec);
       return;
    }
@@ -1794,7 +1794,7 @@ void ResHalfGCD(ZZ_pXMatrix& M_out, const ZZ_pX& U, const ZZ_pX& V, long d_red,
 
    t.kill();
 
-   mul(M_out, M2, M1); 
+   mul(M_out, M2, M1);
 }
 
 void ResHalfGCD(ZZ_pX& U, ZZ_pX& V, vec_ZZ_p& cvec, vec_long& dvec)
@@ -1838,13 +1838,13 @@ void ResHalfGCD(ZZ_pX& U, ZZ_pX& V, vec_ZZ_p& cvec, vec_long& dvec)
 
    ResHalfGCD(M1, U, V, d2, cvec, dvec);
 
-   mul(U, V, M1); 
+   mul(U, V, M1);
 }
 
 
 void resultant(ZZ_p& rres, const ZZ_pX& u, const ZZ_pX& v)
 {
-   if (deg(u) <= NTL_ZZ_pX_GCD_CROSSOVER || deg(v) <= NTL_ZZ_pX_GCD_CROSSOVER) { 
+   if (deg(u) <= NTL_ZZ_pX_GCD_CROSSOVER || deg(v) <= NTL_ZZ_pX_GCD_CROSSOVER) {
       PlainResultant(rres, u, v);
       return;
    }
@@ -1889,7 +1889,7 @@ void resultant(ZZ_p& rres, const ZZ_pX& u, const ZZ_pX& v)
    append(dvec, deg(u1));
 
 
-   while (deg(u1) > NTL_ZZ_pX_GCD_CROSSOVER && !IsZero(v1)) { 
+   while (deg(u1) > NTL_ZZ_pX_GCD_CROSSOVER && !IsZero(v1)) {
       ResHalfGCD(u1, v1, cvec, dvec);
 
       if (!IsZero(v1)) {
@@ -1943,7 +1943,7 @@ void resultant(ZZ_p& rres, const ZZ_pX& u, const ZZ_pX& v)
 
 void NormMod(ZZ_p& x, const ZZ_pX& a, const ZZ_pX& f)
 {
-   if (deg(f) <= 0 || deg(a) >= deg(f)) 
+   if (deg(f) <= 0 || deg(a) >= deg(f))
       Error("norm: bad args");
 
    if (IsZero(a)) {

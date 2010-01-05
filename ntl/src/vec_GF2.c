@@ -65,7 +65,7 @@ void vec_GF2::SetLength(long n)
    rep.SetLength(wdlen);
 
    wdlen = rep.MaxLength(); // careful! rep.MaxLength() may exceed the
-                            // old value of wdlen...this is due to 
+                            // old value of wdlen...this is due to
                             // the awkward semantics of WordVector.
 
    _ntl_ulong *x = rep.elts();
@@ -129,7 +129,7 @@ GF2 vec_GF2::get(long i) const
 {
    const vec_GF2& v = *this;
 
-   if (i < 0 || i >= v.length()) 
+   if (i < 0 || i >= v.length())
       Error("vec_GF2: subscript out of range");
 
    long q = i/NTL_BITS_PER_LONG;
@@ -308,7 +308,7 @@ void ShiftToHigh(vec_GF2& x, const vec_GF2& a, long n)
       for (i = sa-1; i >= wn; i--)
          xp[i] = ap[i-wn];
       for (i = wn-1; i >= 0; i--)
-         xp[i] = 0; 
+         xp[i] = 0;
    }
    else {
       for (i = sa-1; i >= wn+1; i--)
@@ -322,7 +322,7 @@ void ShiftToHigh(vec_GF2& x, const vec_GF2& a, long n)
 
    if (p != 0)
       xp[sa-1] &= (1UL << p) - 1UL;
-   
+
 }
 
 static
@@ -369,7 +369,7 @@ void shift(vec_GF2& x, const vec_GF2& a, long n)
       x.SetLength(l);
       clear(x);
    }
-   else if (n < 0) 
+   else if (n < 0)
       ShiftToLow(x, a, -n); // |n| < l, so -n won't overflow!
    else
       ShiftToHigh(x, a, n);
@@ -384,34 +384,34 @@ void shift(vec_GF2& x, const vec_GF2& a, long n)
 
 static _ntl_ulong revtab[256] = {
 
-0UL, 128UL, 64UL, 192UL, 32UL, 160UL, 96UL, 224UL, 16UL, 144UL, 
-80UL, 208UL, 48UL, 176UL, 112UL, 240UL, 8UL, 136UL, 72UL, 200UL, 
-40UL, 168UL, 104UL, 232UL, 24UL, 152UL, 88UL, 216UL, 56UL, 184UL, 
-120UL, 248UL, 4UL, 132UL, 68UL, 196UL, 36UL, 164UL, 100UL, 228UL, 
-20UL, 148UL, 84UL, 212UL, 52UL, 180UL, 116UL, 244UL, 12UL, 140UL, 
-76UL, 204UL, 44UL, 172UL, 108UL, 236UL, 28UL, 156UL, 92UL, 220UL, 
-60UL, 188UL, 124UL, 252UL, 2UL, 130UL, 66UL, 194UL, 34UL, 162UL, 
-98UL, 226UL, 18UL, 146UL, 82UL, 210UL, 50UL, 178UL, 114UL, 242UL, 
-10UL, 138UL, 74UL, 202UL, 42UL, 170UL, 106UL, 234UL, 26UL, 154UL, 
-90UL, 218UL, 58UL, 186UL, 122UL, 250UL, 6UL, 134UL, 70UL, 198UL, 
-38UL, 166UL, 102UL, 230UL, 22UL, 150UL, 86UL, 214UL, 54UL, 182UL, 
-118UL, 246UL, 14UL, 142UL, 78UL, 206UL, 46UL, 174UL, 110UL, 238UL, 
-30UL, 158UL, 94UL, 222UL, 62UL, 190UL, 126UL, 254UL, 1UL, 129UL, 
-65UL, 193UL, 33UL, 161UL, 97UL, 225UL, 17UL, 145UL, 81UL, 209UL, 
-49UL, 177UL, 113UL, 241UL, 9UL, 137UL, 73UL, 201UL, 41UL, 169UL, 
-105UL, 233UL, 25UL, 153UL, 89UL, 217UL, 57UL, 185UL, 121UL, 249UL, 
-5UL, 133UL, 69UL, 197UL, 37UL, 165UL, 101UL, 229UL, 21UL, 149UL, 
-85UL, 213UL, 53UL, 181UL, 117UL, 245UL, 13UL, 141UL, 77UL, 205UL, 
-45UL, 173UL, 109UL, 237UL, 29UL, 157UL, 93UL, 221UL, 61UL, 189UL, 
-125UL, 253UL, 3UL, 131UL, 67UL, 195UL, 35UL, 163UL, 99UL, 227UL, 
-19UL, 147UL, 83UL, 211UL, 51UL, 179UL, 115UL, 243UL, 11UL, 139UL, 
-75UL, 203UL, 43UL, 171UL, 107UL, 235UL, 27UL, 155UL, 91UL, 219UL, 
-59UL, 187UL, 123UL, 251UL, 7UL, 135UL, 71UL, 199UL, 39UL, 167UL, 
-103UL, 231UL, 23UL, 151UL, 87UL, 215UL, 55UL, 183UL, 119UL, 247UL, 
-15UL, 143UL, 79UL, 207UL, 47UL, 175UL, 111UL, 239UL, 31UL, 159UL, 
-95UL, 223UL, 63UL, 191UL, 127UL, 255UL  }; 
+0UL, 128UL, 64UL, 192UL, 32UL, 160UL, 96UL, 224UL, 16UL, 144UL,
+80UL, 208UL, 48UL, 176UL, 112UL, 240UL, 8UL, 136UL, 72UL, 200UL,
+40UL, 168UL, 104UL, 232UL, 24UL, 152UL, 88UL, 216UL, 56UL, 184UL,
+120UL, 248UL, 4UL, 132UL, 68UL, 196UL, 36UL, 164UL, 100UL, 228UL,
+20UL, 148UL, 84UL, 212UL, 52UL, 180UL, 116UL, 244UL, 12UL, 140UL,
+76UL, 204UL, 44UL, 172UL, 108UL, 236UL, 28UL, 156UL, 92UL, 220UL,
+60UL, 188UL, 124UL, 252UL, 2UL, 130UL, 66UL, 194UL, 34UL, 162UL,
+98UL, 226UL, 18UL, 146UL, 82UL, 210UL, 50UL, 178UL, 114UL, 242UL,
+10UL, 138UL, 74UL, 202UL, 42UL, 170UL, 106UL, 234UL, 26UL, 154UL,
+90UL, 218UL, 58UL, 186UL, 122UL, 250UL, 6UL, 134UL, 70UL, 198UL,
+38UL, 166UL, 102UL, 230UL, 22UL, 150UL, 86UL, 214UL, 54UL, 182UL,
+118UL, 246UL, 14UL, 142UL, 78UL, 206UL, 46UL, 174UL, 110UL, 238UL,
+30UL, 158UL, 94UL, 222UL, 62UL, 190UL, 126UL, 254UL, 1UL, 129UL,
+65UL, 193UL, 33UL, 161UL, 97UL, 225UL, 17UL, 145UL, 81UL, 209UL,
+49UL, 177UL, 113UL, 241UL, 9UL, 137UL, 73UL, 201UL, 41UL, 169UL,
+105UL, 233UL, 25UL, 153UL, 89UL, 217UL, 57UL, 185UL, 121UL, 249UL,
+5UL, 133UL, 69UL, 197UL, 37UL, 165UL, 101UL, 229UL, 21UL, 149UL,
+85UL, 213UL, 53UL, 181UL, 117UL, 245UL, 13UL, 141UL, 77UL, 205UL,
+45UL, 173UL, 109UL, 237UL, 29UL, 157UL, 93UL, 221UL, 61UL, 189UL,
+125UL, 253UL, 3UL, 131UL, 67UL, 195UL, 35UL, 163UL, 99UL, 227UL,
+19UL, 147UL, 83UL, 211UL, 51UL, 179UL, 115UL, 243UL, 11UL, 139UL,
+75UL, 203UL, 43UL, 171UL, 107UL, 235UL, 27UL, 155UL, 91UL, 219UL,
+59UL, 187UL, 123UL, 251UL, 7UL, 135UL, 71UL, 199UL, 39UL, 167UL,
+103UL, 231UL, 23UL, 151UL, 87UL, 215UL, 55UL, 183UL, 119UL, 247UL,
+15UL, 143UL, 79UL, 207UL, 47UL, 175UL, 111UL, 239UL, 31UL, 159UL,
+95UL, 223UL, 63UL, 191UL, 127UL, 255UL  };
 
-static inline 
+static inline
 _ntl_ulong rev1(_ntl_ulong a)
 {
    return NTL_BB_REV_CODE;
@@ -457,7 +457,7 @@ void reverse(vec_GF2& c, const vec_GF2& a)
       cp[i] = rev1(cp[i]);
 }
 
-static 
+static
 long weight1(_ntl_ulong a)
 {
    long res = 0;

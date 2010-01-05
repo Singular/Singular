@@ -11,119 +11,119 @@ NTL_matrix_impl(ZZ_p,vec_ZZ_p,vec_vec_ZZ_p,mat_ZZ_p)
 NTL_eq_matrix_impl(ZZ_p,vec_ZZ_p,vec_vec_ZZ_p,mat_ZZ_p)
 
 
-  
-void add(mat_ZZ_p& X, const mat_ZZ_p& A, const mat_ZZ_p& B)  
-{  
-   long n = A.NumRows();  
-   long m = A.NumCols();  
-  
-   if (B.NumRows() != n || B.NumCols() != m)   
-      Error("matrix add: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j;  
-   for (i = 1; i <= n; i++)   
-      for (j = 1; j <= m; j++)  
-         add(X(i,j), A(i,j), B(i,j));  
-}  
-  
-void sub(mat_ZZ_p& X, const mat_ZZ_p& A, const mat_ZZ_p& B)  
-{  
-   long n = A.NumRows();  
-   long m = A.NumCols();  
-  
-   if (B.NumRows() != n || B.NumCols() != m)  
-      Error("matrix sub: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j;  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= m; j++)  
-         sub(X(i,j), A(i,j), B(i,j));  
-}  
 
-void negate(mat_ZZ_p& X, const mat_ZZ_p& A)  
-{  
-   long n = A.NumRows();  
-   long m = A.NumCols();  
-  
-  
-   X.SetDims(n, m);  
-  
-   long i, j;  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= m; j++)  
-         negate(X(i,j), A(i,j));  
-}  
-  
-void mul_aux(mat_ZZ_p& X, const mat_ZZ_p& A, const mat_ZZ_p& B)  
-{  
-   long n = A.NumRows();  
-   long l = A.NumCols();  
-   long m = B.NumCols();  
-  
-   if (l != B.NumRows())  
-      Error("matrix mul: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j, k;  
-   ZZ acc, tmp;  
-  
-   for (i = 1; i <= n; i++) {  
-      for (j = 1; j <= m; j++) {  
-         clear(acc);  
-         for(k = 1; k <= l; k++) {  
-            mul(tmp, rep(A(i,k)), rep(B(k,j)));  
-            add(acc, acc, tmp);  
-         }  
-         conv(X(i,j), acc);  
-      }  
-   }  
-}  
-  
-  
-void mul(mat_ZZ_p& X, const mat_ZZ_p& A, const mat_ZZ_p& B)  
-{  
-   if (&X == &A || &X == &B) {  
-      mat_ZZ_p tmp;  
-      mul_aux(tmp, A, B);  
-      X = tmp;  
-   }  
-   else  
-      mul_aux(X, A, B);  
-}  
-  
-  
+void add(mat_ZZ_p& X, const mat_ZZ_p& A, const mat_ZZ_p& B)
+{
+   long n = A.NumRows();
+   long m = A.NumCols();
+
+   if (B.NumRows() != n || B.NumCols() != m)
+      Error("matrix add: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j;
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= m; j++)
+         add(X(i,j), A(i,j), B(i,j));
+}
+
+void sub(mat_ZZ_p& X, const mat_ZZ_p& A, const mat_ZZ_p& B)
+{
+   long n = A.NumRows();
+   long m = A.NumCols();
+
+   if (B.NumRows() != n || B.NumCols() != m)
+      Error("matrix sub: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j;
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= m; j++)
+         sub(X(i,j), A(i,j), B(i,j));
+}
+
+void negate(mat_ZZ_p& X, const mat_ZZ_p& A)
+{
+   long n = A.NumRows();
+   long m = A.NumCols();
+
+
+   X.SetDims(n, m);
+
+   long i, j;
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= m; j++)
+         negate(X(i,j), A(i,j));
+}
+
+void mul_aux(mat_ZZ_p& X, const mat_ZZ_p& A, const mat_ZZ_p& B)
+{
+   long n = A.NumRows();
+   long l = A.NumCols();
+   long m = B.NumCols();
+
+   if (l != B.NumRows())
+      Error("matrix mul: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j, k;
+   ZZ acc, tmp;
+
+   for (i = 1; i <= n; i++) {
+      for (j = 1; j <= m; j++) {
+         clear(acc);
+         for(k = 1; k <= l; k++) {
+            mul(tmp, rep(A(i,k)), rep(B(k,j)));
+            add(acc, acc, tmp);
+         }
+         conv(X(i,j), acc);
+      }
+   }
+}
+
+
+void mul(mat_ZZ_p& X, const mat_ZZ_p& A, const mat_ZZ_p& B)
+{
+   if (&X == &A || &X == &B) {
+      mat_ZZ_p tmp;
+      mul_aux(tmp, A, B);
+      X = tmp;
+   }
+   else
+      mul_aux(X, A, B);
+}
+
+
 static
-void mul_aux(vec_ZZ_p& x, const mat_ZZ_p& A, const vec_ZZ_p& b)  
-{  
-   long n = A.NumRows();  
-   long l = A.NumCols();  
-  
-   if (l != b.length())  
-      Error("matrix mul: dimension mismatch");  
-  
-   x.SetLength(n);  
-  
-   long i, k;  
-   ZZ acc, tmp;  
-  
-   for (i = 1; i <= n; i++) {  
-      clear(acc);  
-      for (k = 1; k <= l; k++) {  
-         mul(tmp, rep(A(i,k)), rep(b(k)));  
-         add(acc, acc, tmp);  
-      }  
-      conv(x(i), acc);  
-   }  
-}  
-  
-  
-void mul(vec_ZZ_p& x, const mat_ZZ_p& A, const vec_ZZ_p& b)  
-{  
+void mul_aux(vec_ZZ_p& x, const mat_ZZ_p& A, const vec_ZZ_p& b)
+{
+   long n = A.NumRows();
+   long l = A.NumCols();
+
+   if (l != b.length())
+      Error("matrix mul: dimension mismatch");
+
+   x.SetLength(n);
+
+   long i, k;
+   ZZ acc, tmp;
+
+   for (i = 1; i <= n; i++) {
+      clear(acc);
+      for (k = 1; k <= l; k++) {
+         mul(tmp, rep(A(i,k)), rep(b(k)));
+         add(acc, acc, tmp);
+      }
+      conv(x(i), acc);
+   }
+}
+
+
+void mul(vec_ZZ_p& x, const mat_ZZ_p& A, const vec_ZZ_p& b)
+{
    if (&b == &x || A.position1(x) != -1) {
       vec_ZZ_p tmp;
       mul_aux(tmp, A, b);
@@ -131,31 +131,31 @@ void mul(vec_ZZ_p& x, const mat_ZZ_p& A, const vec_ZZ_p& b)
    }
    else
       mul_aux(x, A, b);
-}  
+}
 
 static
-void mul_aux(vec_ZZ_p& x, const vec_ZZ_p& a, const mat_ZZ_p& B)  
-{  
-   long n = B.NumRows();  
-   long l = B.NumCols();  
-  
-   if (n != a.length())  
-      Error("matrix mul: dimension mismatch");  
-  
-   x.SetLength(l);  
-  
-   long i, k;  
-   ZZ acc, tmp;  
-  
-   for (i = 1; i <= l; i++) {  
-      clear(acc);  
-      for (k = 1; k <= n; k++) {  
+void mul_aux(vec_ZZ_p& x, const vec_ZZ_p& a, const mat_ZZ_p& B)
+{
+   long n = B.NumRows();
+   long l = B.NumCols();
+
+   if (n != a.length())
+      Error("matrix mul: dimension mismatch");
+
+   x.SetLength(l);
+
+   long i, k;
+   ZZ acc, tmp;
+
+   for (i = 1; i <= l; i++) {
+      clear(acc);
+      for (k = 1; k <= n; k++) {
          mul(tmp, rep(a(k)), rep(B(k,i)));
-         add(acc, acc, tmp);  
-      }  
-      conv(x(i), acc);  
-   }  
-}  
+         add(acc, acc, tmp);
+      }
+      conv(x(i), acc);
+   }
+}
 
 void mul(vec_ZZ_p& x, const vec_ZZ_p& a, const mat_ZZ_p& B)
 {
@@ -168,20 +168,20 @@ void mul(vec_ZZ_p& x, const vec_ZZ_p& a, const mat_ZZ_p& B)
       mul_aux(x, a, B);
 }
 
-     
-  
-void ident(mat_ZZ_p& X, long n)  
-{  
-   X.SetDims(n, n);  
-   long i, j;  
-  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= n; j++)  
-         if (i == j)  
-            set(X(i, j));  
-         else  
-            clear(X(i, j));  
-} 
+
+
+void ident(mat_ZZ_p& X, long n)
+{
+   X.SetDims(n, n);
+   long i, j;
+
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= n; j++)
+         if (i == j)
+            set(X(i, j));
+         else
+            clear(X(i, j));
+}
 
 
 void determinant(ZZ_p& d, const mat_ZZ_p& M_in)
@@ -287,7 +287,7 @@ long IsIdent(const mat_ZZ_p& A, long n)
 
    return 1;
 }
-            
+
 
 void transpose(mat_ZZ_p& X, const mat_ZZ_p& A)
 {
@@ -318,9 +318,9 @@ void transpose(mat_ZZ_p& X, const mat_ZZ_p& A)
             X(j, i) = A(i, j);
    }
 }
-   
 
-void solve(ZZ_p& d, vec_ZZ_p& X, 
+
+void solve(ZZ_p& d, vec_ZZ_p& X,
            const mat_ZZ_p& A, const vec_ZZ_p& b)
 
 {
@@ -351,7 +351,7 @@ void solve(ZZ_p& d, vec_ZZ_p& X,
 
    for (i = 0; i < n; i++) {
       M[i].SetSize(n+1, t1.size());
-      for (j = 0; j < n; j++) 
+      for (j = 0; j < n; j++)
          M[i][j] = rep(A[j][i]);
       M[i][n] = rep(b[i]);
    }
@@ -597,7 +597,7 @@ long gauss(mat_ZZ_p& M_in, long w)
          l++;
       }
    }
-   
+
    for (i = 0; i < n; i++)
       for (j = 0; j < m; j++)
          conv(M_in[i][j], M[i][j]);
@@ -651,7 +651,7 @@ void kernel(mat_ZZ_p& X, const mat_ZZ_p& A)
       } while (IsZero(M[i][j]));
 
       D[j] = i;
-      inv(inverses[j], M[i][j]); 
+      inv(inverses[j], M[i][j]);
    }
 
    for (k = 0; k < m-r; k++) {
@@ -682,7 +682,7 @@ void kernel(mat_ZZ_p& X, const mat_ZZ_p& A)
       }
    }
 }
-   
+
 void mul(mat_ZZ_p& X, const mat_ZZ_p& A, const ZZ_p& b_in)
 {
    NTL_ZZ_pRegister(b);
@@ -697,7 +697,7 @@ void mul(mat_ZZ_p& X, const mat_ZZ_p& A, const ZZ_p& b_in)
       for (j = 0; j < m; j++)
          mul(X[i][j], A[i][j], b);
 }
-   
+
 void mul(mat_ZZ_p& X, const mat_ZZ_p& A, long b_in)
 {
    NTL_ZZ_pRegister(b);
@@ -713,19 +713,19 @@ void mul(mat_ZZ_p& X, const mat_ZZ_p& A, long b_in)
          mul(X[i][j], A[i][j], b);
 }
 
-void diag(mat_ZZ_p& X, long n, const ZZ_p& d_in)  
-{  
+void diag(mat_ZZ_p& X, long n, const ZZ_p& d_in)
+{
    ZZ_p d = d_in;
-   X.SetDims(n, n);  
-   long i, j;  
-  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= n; j++)  
-         if (i == j)  
-            X(i, j) = d;  
-         else  
-            clear(X(i, j));  
-} 
+   X.SetDims(n, n);
+   long i, j;
+
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= n; j++)
+         if (i == j)
+            X(i, j) = d;
+         else
+            clear(X(i, j));
+}
 
 long IsDiag(const mat_ZZ_p& A, long n, const ZZ_p& d)
 {

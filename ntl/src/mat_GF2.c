@@ -8,118 +8,118 @@
 NTL_START_IMPL
 
 
-mat_GF2::mat_GF2(const mat_GF2& a)  
-{  
-   _mat_GF2__numcols = 0;  
-   SetDims(a.NumRows(), a.NumCols());  
-   _mat_GF2__rep = a._mat_GF2__rep;  
-}  
-  
-mat_GF2& mat_GF2::operator=(const mat_GF2& a)  
-{  
-   SetDims(a.NumRows(), a.NumCols());  
-   _mat_GF2__rep = a._mat_GF2__rep;  
+mat_GF2::mat_GF2(const mat_GF2& a)
+{
+   _mat_GF2__numcols = 0;
+   SetDims(a.NumRows(), a.NumCols());
+   _mat_GF2__rep = a._mat_GF2__rep;
+}
+
+mat_GF2& mat_GF2::operator=(const mat_GF2& a)
+{
+   SetDims(a.NumRows(), a.NumCols());
+   _mat_GF2__rep = a._mat_GF2__rep;
    return *this;
-}  
-  
-  
-mat_GF2::mat_GF2(INIT_SIZE_TYPE, long n, long m)  
-{  
-   _mat_GF2__numcols = 0;  
-   SetDims(n, m);  
-}  
-  
-void mat_GF2::kill()  
-{  
-   _mat_GF2__numcols = 0;  
-   _mat_GF2__rep.kill();  
-}  
-  
-void mat_GF2::SetDims(long n, long m)  
-{  
-   if (n < 0 || m < 0)  
-      Error("SetDims: bad args");  
-  
-   if (m != _mat_GF2__numcols) {  
-      _mat_GF2__rep.kill();  
-      _mat_GF2__numcols = m;  
-   }  
-        
-   long oldmax = _mat_GF2__rep.MaxLength();  
-   long i;  
-   _mat_GF2__rep.SetLength(n);  
-  
-   for (i = oldmax; i < n; i++)  
-      _mat_GF2__rep[i].FixLength(m);  
-}  
-     
-        
-void conv(mat_GF2& x, const vec_vec_GF2& a)  
-{  
-   long n = a.length();  
-  
-   if (n == 0) {  
-      x.SetDims(0, 0);  
-      return;  
-   }  
-  
-   long m = a[0].length();  
-   long i;  
-  
-   for (i = 1; i < n; i++)  
-      if (a[i].length() != m)  
-         Error("nonrectangular matrix");  
-  
-   x.SetDims(n, m);  
-   for (i = 0; i < n; i++)  
-      x[i] = a[i];  
-}  
-  
-void swap(mat_GF2& X, mat_GF2& Y)  
-{  
-   swap(X._mat_GF2__numcols, Y._mat_GF2__numcols);  
-   swap(X._mat_GF2__rep, Y._mat_GF2__rep);  
-}  
-  
+}
 
 
-long operator==(const mat_GF2& a, const mat_GF2& b)  
-{  
-   if (a.NumCols() != b.NumCols())  
-      return 0;  
-  
-   if (a.NumRows() != b.NumRows())  
-      return 0;  
-  
-   long n = a.NumRows();  
-   long i;  
-  
-   for (i = 0; i < n; i++)  
-      if (a[i] != b[i])  
-         return 0;  
-  
-   return 1;  
-}  
-  
-  
-long operator!=(const mat_GF2& a, const mat_GF2& b)  
-{  
-   return !(a == b);  
-}  
+mat_GF2::mat_GF2(INIT_SIZE_TYPE, long n, long m)
+{
+   _mat_GF2__numcols = 0;
+   SetDims(n, m);
+}
 
-void add(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)  
-{  
-   long n = A.NumRows();  
-   long m = A.NumCols();  
-  
-   if (B.NumRows() != n || B.NumCols() != m)   
-      Error("matrix add: dimension mismatch");  
-  
-   X.SetDims(n, m);  
+void mat_GF2::kill()
+{
+   _mat_GF2__numcols = 0;
+   _mat_GF2__rep.kill();
+}
+
+void mat_GF2::SetDims(long n, long m)
+{
+   if (n < 0 || m < 0)
+      Error("SetDims: bad args");
+
+   if (m != _mat_GF2__numcols) {
+      _mat_GF2__rep.kill();
+      _mat_GF2__numcols = m;
+   }
+
+   long oldmax = _mat_GF2__rep.MaxLength();
+   long i;
+   _mat_GF2__rep.SetLength(n);
+
+   for (i = oldmax; i < n; i++)
+      _mat_GF2__rep[i].FixLength(m);
+}
+
+
+void conv(mat_GF2& x, const vec_vec_GF2& a)
+{
+   long n = a.length();
+
+   if (n == 0) {
+      x.SetDims(0, 0);
+      return;
+   }
+
+   long m = a[0].length();
+   long i;
+
+   for (i = 1; i < n; i++)
+      if (a[i].length() != m)
+         Error("nonrectangular matrix");
+
+   x.SetDims(n, m);
+   for (i = 0; i < n; i++)
+      x[i] = a[i];
+}
+
+void swap(mat_GF2& X, mat_GF2& Y)
+{
+   swap(X._mat_GF2__numcols, Y._mat_GF2__numcols);
+   swap(X._mat_GF2__rep, Y._mat_GF2__rep);
+}
+
+
+
+long operator==(const mat_GF2& a, const mat_GF2& b)
+{
+   if (a.NumCols() != b.NumCols())
+      return 0;
+
+   if (a.NumRows() != b.NumRows())
+      return 0;
+
+   long n = a.NumRows();
+   long i;
+
+   for (i = 0; i < n; i++)
+      if (a[i] != b[i])
+         return 0;
+
+   return 1;
+}
+
+
+long operator!=(const mat_GF2& a, const mat_GF2& b)
+{
+   return !(a == b);
+}
+
+void add(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)
+{
+   long n = A.NumRows();
+   long m = A.NumCols();
+
+   if (B.NumRows() != n || B.NumCols() != m)
+      Error("matrix add: dimension mismatch");
+
+   X.SetDims(n, m);
 
    long mw = (m + NTL_BITS_PER_LONG - 1)/NTL_BITS_PER_LONG;
-  
-   long i;  
+
+   long i;
    for (i = 0; i < n; i++) {
       _ntl_ulong *xp = X[i].rep.elts();
       const _ntl_ulong *ap = A[i].rep.elts();
@@ -128,29 +128,29 @@ void add(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)
       for (j = 0; j < mw; j++)
          xp[j] = ap[j] ^ bp[j];
    }
-}  
-  
+}
+
 static
-void mul_aux(vec_GF2& x, const mat_GF2& A, const vec_GF2& b)  
-{  
-   long n = A.NumRows();  
-   long l = A.NumCols();  
-  
-   if (l != b.length())  
-      Error("matrix mul: dimension mismatch");  
-  
-   x.SetLength(n);  
-  
-   long i;  
-  
-   for (i = 0; i < n; i++) {  
+void mul_aux(vec_GF2& x, const mat_GF2& A, const vec_GF2& b)
+{
+   long n = A.NumRows();
+   long l = A.NumCols();
+
+   if (l != b.length())
+      Error("matrix mul: dimension mismatch");
+
+   x.SetLength(n);
+
+   long i;
+
+   for (i = 0; i < n; i++) {
       x.put(i, A[i] * b);
-   }  
-}  
-  
-  
-void mul(vec_GF2& x, const mat_GF2& A, const vec_GF2& b)  
-{  
+   }
+}
+
+
+void mul(vec_GF2& x, const mat_GF2& A, const vec_GF2& b)
+{
    if (&b == &x || A.position1(x) != -1) {
       vec_GF2 tmp;
       mul_aux(tmp, A, b);
@@ -158,18 +158,18 @@ void mul(vec_GF2& x, const mat_GF2& A, const vec_GF2& b)
    }
    else
       mul_aux(x, A, b);
-}  
+}
 
 static
-void mul_aux(vec_GF2& x, const vec_GF2& a, const mat_GF2& B)  
-{  
-   long n = B.NumRows();  
-   long l = B.NumCols();  
-  
-   if (n != a.length())  
-      Error("matrix mul: dimension mismatch");  
-  
-   x.SetLength(l);  
+void mul_aux(vec_GF2& x, const vec_GF2& a, const mat_GF2& B)
+{
+   long n = B.NumRows();
+   long l = B.NumCols();
+
+   if (n != a.length())
+      Error("matrix mul: dimension mismatch");
+
+   x.SetLength(l);
    clear(x);
 
    const _ntl_ulong *ap = a.rep.elts();
@@ -178,9 +178,9 @@ void mul_aux(vec_GF2& x, const vec_GF2& a, const mat_GF2& B)
    _ntl_ulong *xp = x.rep.elts();
 
    long lw = (l + NTL_BITS_PER_LONG - 1)/NTL_BITS_PER_LONG;
-  
-   long i;  
-   for (i = 0; i < n; i++) {  
+
+   long i;
+   for (i = 0; i < n; i++) {
       if (*ap & a_mask) {
          const _ntl_ulong *bp = B[i].rep.elts();
          long j;
@@ -193,8 +193,8 @@ void mul_aux(vec_GF2& x, const vec_GF2& a, const mat_GF2& B)
          a_mask = 1;
          ap++;
       }
-   }  
-}  
+   }
+}
 
 void mul(vec_GF2& x, const vec_GF2& a, const mat_GF2& B)
 {
@@ -206,49 +206,49 @@ void mul(vec_GF2& x, const vec_GF2& a, const mat_GF2& B)
    else
       mul_aux(x, a, B);
 }
-  
-void mul_aux(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)  
-{  
-   long n = A.NumRows();  
-   long l = A.NumCols();  
-   long m = B.NumCols();  
-  
-   if (l != B.NumRows())  
-      Error("matrix mul: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i;  
-  
-   for (i = 1; i <= n; i++) {  
-      mul_aux(X(i), A(i), B);
-   }  
-}  
-  
-  
-void mul(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)  
-{  
-   if (&X == &A || &X == &B) {  
-      mat_GF2 tmp;  
-      mul_aux(tmp, A, B);  
-      X = tmp;  
-   }  
-   else  
-      mul_aux(X, A, B);  
-}  
-  
 
-     
-  
-void ident(mat_GF2& X, long n)  
-{  
-   X.SetDims(n, n);  
+void mul_aux(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)
+{
+   long n = A.NumRows();
+   long l = A.NumCols();
+   long m = B.NumCols();
+
+   if (l != B.NumRows())
+      Error("matrix mul: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i;
+
+   for (i = 1; i <= n; i++) {
+      mul_aux(X(i), A(i), B);
+   }
+}
+
+
+void mul(mat_GF2& X, const mat_GF2& A, const mat_GF2& B)
+{
+   if (&X == &A || &X == &B) {
+      mat_GF2 tmp;
+      mul_aux(tmp, A, B);
+      X = tmp;
+   }
+   else
+      mul_aux(X, A, B);
+}
+
+
+
+
+void ident(mat_GF2& X, long n)
+{
+   X.SetDims(n, n);
    clear(X);
-   long i;  
-  
-   for (i = 0; i < n; i++)  
+   long i;
+
+   for (i = 0; i < n; i++)
       X.put(i, i, to_GF2(1));
-} 
+}
 
 
 void determinant(GF2& d, const mat_GF2& M_in)
@@ -375,7 +375,7 @@ void AddToCol(mat_GF2& x, long j, const vec_GF2& a)
 
    long i;
    for (i = 0; i < n; i++) {
-      if (*ap & a_mask) 
+      if (*ap & a_mask)
          x[i].rep.elts()[wj] ^= j_mask;
 
       a_mask <<= 1;
@@ -399,7 +399,7 @@ void transpose_aux(mat_GF2& X, const mat_GF2& A)
    for (i = 0; i < n; i++)
       AddToCol(X, i, A[i]);
 }
-            
+
 
 void transpose(mat_GF2& X, const mat_GF2& A)
 {
@@ -412,7 +412,7 @@ void transpose(mat_GF2& X, const mat_GF2& A)
       transpose_aux(X, A);
 }
 
-   
+
 
 void solve(GF2& d, vec_GF2& X, const mat_GF2& A, const vec_GF2& b)
 
@@ -577,11 +577,11 @@ void inv(GF2& d, mat_GF2& X, const mat_GF2& A)
       XX.SetLength(n+j+1);
       clear(XX);
       XX.put(n+j, to_GF2(1));
-      
+
       for (i = n-1; i >= 0; i--) {
          XX.put(i, XX*M[i]);
       }
-   
+
       XX.SetLength(n);
       AddToCol(X, j, XX);
    }
@@ -643,7 +643,7 @@ long gauss(mat_GF2& M, long w)
          l++;
       }
    }
-   
+
    return l;
 }
 
@@ -686,7 +686,7 @@ void kernel(mat_GF2& X, const mat_GF2& A)
    for (i = 0; i < r; i++) {
       do {
          j++;
-      } while (M.get(i, j) == 0); 
+      } while (M.get(i, j) == 0);
 
       D[j] = i;
    }
@@ -710,7 +710,7 @@ void kernel(mat_GF2& X, const mat_GF2& A)
    }
 }
 
-   
+
 void mul(mat_GF2& X, const mat_GF2& A, GF2 b)
 {
    X = A;
@@ -718,15 +718,15 @@ void mul(mat_GF2& X, const mat_GF2& A, GF2 b)
       clear(X);
 }
 
-void diag(mat_GF2& X, long n, GF2 d)  
-{  
+void diag(mat_GF2& X, long n, GF2 d)
+{
    if (d == 1)
       ident(X, n);
    else {
       X.SetDims(n, n);
       clear(X);
    }
-} 
+}
 
 long IsDiag(const mat_GF2& A, long n, GF2 d)
 {

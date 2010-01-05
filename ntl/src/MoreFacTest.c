@@ -8,7 +8,7 @@ long NumFacs(const vec_pair_ZZX_long& v)
    long res;
 
    res = 0;
-   
+
    for (i = 0; i < v.length(); i++)
       res += v[i].b;
 

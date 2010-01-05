@@ -101,7 +101,7 @@ void mul(ZZX& x, const vec_pair_ZZX_long& a)
 
 
 void SquareFreeDecomp(vec_pair_ZZX_long& u, const ZZX& ff)
-// input is primitive 
+// input is primitive
 {
    ZZX f = ff;
 
@@ -121,7 +121,7 @@ void SquareFreeDecomp(vec_pair_ZZX_long& u, const ZZX& ff)
       return;
    }
 
-   divide(v, f, d); 
+   divide(v, f, d);
    divide(w, t1, d);
    i = 0;
 
@@ -150,7 +150,7 @@ void SquareFreeDecomp(vec_pair_ZZX_long& u, const ZZX& ff)
 static
 void HenselLift(ZZX& Gout, ZZX& Hout, ZZX& Aout, ZZX& Bout,
                 const ZZX& f, const ZZX& g, const ZZX& h,
-                const ZZX& a, const ZZX& b, const ZZ& p) 
+                const ZZX& a, const ZZX& b, const ZZ& p)
 {
    ZZX c, g1, h1, G, H, A, B;
 
@@ -182,7 +182,7 @@ void HenselLift(ZZX& Gout, ZZX& Hout, ZZX& Aout, ZZX& Bout,
 
    rem(gg1, cc, GG);
    MulMod(gg1, gg1, BB, GG);
-   
+
    rem(hh1, cc, HH);
    MulMod(hh1, hh1, AA, HH);
 
@@ -210,7 +210,7 @@ void HenselLift(ZZX& Gout, ZZX& Hout, ZZX& Aout, ZZX& Bout,
    ZZ_pX rr, aa1, bb1;
 
    conv(rr, r);
-   
+
    rem(aa1, rr, HH);
    MulMod(aa1, aa1, AA, HH);
    rem(bb1, rr, GG);
@@ -233,9 +233,9 @@ void HenselLift(ZZX& Gout, ZZX& Hout, ZZX& Aout, ZZX& Bout,
 }
 
 static
-void HenselLift1(ZZX& Gout, ZZX& Hout, 
+void HenselLift1(ZZX& Gout, ZZX& Hout,
                 const ZZX& f, const ZZX& g, const ZZX& h,
-                const ZZX& a, const ZZX& b, const ZZ& p) 
+                const ZZX& a, const ZZX& b, const ZZ& p)
 {
    ZZX c, g1, h1, G, H;
 
@@ -261,7 +261,7 @@ void HenselLift1(ZZX& Gout, ZZX& Hout,
 
    rem(gg1, cc, GG);
    MulMod(gg1, gg1, bb, GG);
-   
+
    rem(hh1, cc, HH);
    MulMod(hh1, hh1, aa, HH);
 
@@ -363,7 +363,7 @@ void RecTreeLift(const vec_long& link, vec_ZZX& v, vec_ZZX& w,
 }
 
 static
-void TreeLift(const vec_long& link, vec_ZZX& v, vec_ZZX& w, 
+void TreeLift(const vec_long& link, vec_ZZX& v, vec_ZZX& w,
               long e0, long e1, const ZZX& f, long inv)
 
 // lift from p^{e0} to p^{e1}
@@ -381,7 +381,7 @@ void TreeLift(const vec_long& link, vec_ZZX& v, vec_ZZX& w,
    RecTreeLift(link, v, w, p0, f, v.length()-2, inv);
 
    bak.restore();
-} 
+}
 
 void MultiLift(vec_ZZX& A, const vec_zz_pX& a, const ZZX& f, long e,
                long verbose)
@@ -422,7 +422,7 @@ void MultiLift(vec_ZZX& A, const vec_zz_pX& a, const ZZX& f, long e,
    BuildTree(link, v, w, a);
 
    for (i = l-1; i > 0; i--) {
-      
+
       TreeLift(link, v, w, E[i], E[i-1], f, i != 1);
 
    }
@@ -455,7 +455,7 @@ void inplace_rev(ZZX& f)
 long ZZXFac_InitNumPrimes = 7;
 long ZZXFac_MaxNumPrimes = 50;
 
-static 
+static
 void RecordPattern(vec_long& pat, vec_pair_zz_pX_long& fac)
 {
    long n = pat.length()-1;
@@ -482,7 +482,7 @@ long NumFactors(const vec_long& pat)
    long i;
    long res = 0;
 
-   for (i = 0; i <= n; i++) 
+   for (i = 0; i <= n; i++)
       res += pat[i];
 
    return res;
@@ -497,18 +497,18 @@ void CalcPossibleDegrees(ZZ& pd, const vec_long& pat)
    long d, j;
    ZZ t1;
 
-   for (d = 1; d <= n; d++) 
+   for (d = 1; d <= n; d++)
       for (j = 0; j < pat[d]; j++) {
          LeftShift(t1, pd, d);
          bit_or(pd, pd, t1);
       }
 }
 
-static 
+static
 void CalcPossibleDegrees(vec_ZZ& S, const vec_ZZ_pX& fac, long k)
 
 // S[i] = possible degrees of the product of any subset of size k
-//        among fac[i...], encoded as a bit vector.      
+//        among fac[i...], encoded as a bit vector.
 
 {
    long r = fac.length();
@@ -573,8 +573,8 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
 
    LocalInfo.p.SetLength(ZZXFac_InitNumPrimes);
    LocalInfo.pattern.SetLength(ZZXFac_InitNumPrimes);
-  
-   // set bits 0..n of LocalInfo.PossibleDegrees 
+
+   // set bits 0..n of LocalInfo.PossibleDegrees
    SetBit(LocalInfo.PossibleDegrees, n+1);
    add(LocalInfo.PossibleDegrees, LocalInfo.PossibleDegrees, -1);
 
@@ -611,7 +611,7 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
 
 
       vec_pair_zz_pX_long thisfac;
-      zz_pX thish; 
+      zz_pX thish;
 
       SFCanZass1(thisfac, thish, ff, 0);
 
@@ -622,7 +622,7 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
 
       RecordPattern(pattern, thisfac);
       long r = NumFactors(pattern);
-      
+
       if (r == 1) {
          irred = 1;
          break;
@@ -677,12 +677,12 @@ SmallPrimeFactorization(LocalInfoT& LocalInfo, const ZZX& f,
 
 
 static
-long ConstTermTest(const vec_ZZ_pX& W, 
+long ConstTermTest(const vec_ZZ_pX& W,
                   const vec_long& I,
                   const ZZ& ct,
                   const ZZ_p& lc,
                   vec_ZZ_p& prod,
-                  long& ProdLen) 
+                  long& ProdLen)
 {
    long k = I.length();
    ZZ_p t;
@@ -761,7 +761,7 @@ void InvMul(ZZ_pX& g, const vec_ZZ_pX& W, const vec_long& I)
          i++;
       else
          w[j-i] = W[j];
-   } 
+   }
 
    mul(g, w);
 }
@@ -781,7 +781,7 @@ void RemoveFactors(vec_ZZ_pX& W, const vec_long& I)
       if (i < k && j == I[i])
          i++;
       else
-         swap(W[j-i], W[j]); 
+         swap(W[j-i], W[j]);
    }
 
    W.SetLength(r-k);
@@ -838,7 +838,7 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
 
          for (j = LocalInfo.NumFactors; j < factors.length(); j++) {
             vec_pair_zz_pX_long thisfac;
-            zz_pX thish; 
+            zz_pX thish;
 
             zz_pX ff;
             conv(ff, factors[j]);
@@ -878,11 +878,11 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
          zz_p::init(p, NextPowerOfTwo(deg(f))+1);
 
          zz_pX ff, ffp, d;
-   
+
          conv(ff, f);
          MakeMonic(ff);
          diff(ffp, ff);
-   
+
          GCD(d, ffp, ff);
          if (!IsOne(d)) {
             continue;
@@ -919,7 +919,7 @@ void UpdateLocalInfo(LocalInfoT& LocalInfo, vec_ZZ& pdeg,
 
 const int ZZX_OVERLIFT = NTL_BITS_PER_LONG;
   // number of bits by which we "overlift"....this enables, in particular,
-  // the "n-1" test.  
+  // the "n-1" test.
   // Must lie in the range 4..NTL_BITS_PER_LONG.
 
 
@@ -928,9 +928,9 @@ const int ZZX_OVERLIFT = NTL_BITS_PER_LONG;
 
 
 static
-void CardinalitySearch(vec_ZZX& factors, ZZX& f, 
-                       vec_ZZ_pX& W, 
-                       LocalInfoT& LocalInfo, 
+void CardinalitySearch(vec_ZZX& factors, ZZX& f,
+                       vec_ZZ_pX& W,
+                       LocalInfoT& LocalInfo,
                        long k,
                        long bnd,
                        long verbose)
@@ -966,7 +966,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
    ZZ_pX gg;
    ZZX g, h;
 
-   I[0] = 0;  
+   I[0] = 0;
 
    while (I[0] <= r-k) {
       bit_and(pd, pdeg[I[0]], LocalInfo.PossibleDegrees);
@@ -989,7 +989,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
          if (i == k) {
             // process indices I[0], ..., I[k-1]
 
-            if (cnt > 2000000) { 
+            if (cnt > 2000000) {
                cnt = 0;
                UpdateLocalInfo(LocalInfo, pdeg, W, factors, f, k, verbose);
                bit_and(pd, pdeg[I[0]], LocalInfo.PossibleDegrees);
@@ -1029,7 +1029,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
                   i--;
                   continue;
                }
-               
+
                // factor found!
                append(factors, g);
                f = h;
@@ -1061,9 +1061,9 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
             r = W.length();
             cnt = 0;
 
-            if (2*k > r) 
+            if (2*k > r)
                goto done;
-            else 
+            else
                break;
          }
          else if (state == 0) {
@@ -1087,7 +1087,7 @@ void CardinalitySearch(vec_ZZX& factors, ZZX& f,
    }
 
 
-   done: 
+   done:
 
    1;
 }
@@ -1118,7 +1118,7 @@ typedef unsigned long TBL_T;
 // recursive version
 
 static
-void RecInitTab(TBL_T ***lookup_tab, long i, const vec_ulong& ratio, 
+void RecInitTab(TBL_T ***lookup_tab, long i, const vec_ulong& ratio,
              long r, long k, unsigned long thresh1, long **shamt_tab,
              unsigned long sum, long card, long j)
 {
@@ -1138,13 +1138,13 @@ void RecInitTab(TBL_T ***lookup_tab, long i, const vec_ulong& ratio,
 
 
    RecInitTab(lookup_tab, i, ratio, r, k, thresh1, shamt_tab, sum, card, j+1);
-   RecInitTab(lookup_tab, i, ratio, r, k, thresh1, shamt_tab, 
+   RecInitTab(lookup_tab, i, ratio, r, k, thresh1, shamt_tab,
               sum+ratio[r-1-j], card+1, j+1);
 }
 
 
 static
-void DoInitTab(TBL_T ***lookup_tab, long i, const vec_ulong& ratio, 
+void DoInitTab(TBL_T ***lookup_tab, long i, const vec_ulong& ratio,
                long r, long k, unsigned long thresh1, long **shamt_tab)
 {
    RecInitTab(lookup_tab, i, ratio, r, k, thresh1, shamt_tab, 0, 0, 0);
@@ -1189,9 +1189,9 @@ void DoInitTab(TBL_T ***lookup_tab, long i, const vec_ulong& ratio,
                unsigned long index2 = ((-sum+thresh1) >> shamt);
                if (index1 != index2)
                   lookup_tab[i][card][index2 >> TBL_SHAMT] |= (1UL << (index2 & TBL_MSK));
-      
+
             }
-      
+
             location = location_vec[j];
             j--;
             continue;
@@ -1212,7 +1212,7 @@ void DoInitTab(TBL_T ***lookup_tab, long i, const vec_ulong& ratio,
          location_vec[j+1] = 2;
          j++;
          location = 0;
-         continue;  
+         continue;
 
       case 2:
 
@@ -1222,10 +1222,10 @@ void DoInitTab(TBL_T ***lookup_tab, long i, const vec_ulong& ratio,
       }
    }
 }
-         
+
 #endif
-   
-   
+
+
 
 static
 void InitTab(TBL_T ***lookup_tab, const vec_ulong& ratio, long r, long k,
@@ -1237,12 +1237,12 @@ void InitTab(TBL_T ***lookup_tab, const vec_ulong& ratio, long r, long k,
       for (i = 2; i <= pruning; i++) {
          long len = min(k-1, i);
          for (j = 2; j <= len; j++) {
-            long ub = (((1L << (NTL_BITS_PER_LONG-shamt_tab[i][j])) 
-                      + TBL_MSK) >> TBL_SHAMT); 
+            long ub = (((1L << (NTL_BITS_PER_LONG-shamt_tab[i][j]))
+                      + TBL_MSK) >> TBL_SHAMT);
             for (t = 0; t < ub; t++)
                lookup_tab[i][j][t] = 0;
          }
-   
+
          DoInitTab(lookup_tab, i, ratio, r, k, thresh1, shamt_tab);
       }
    }
@@ -1251,8 +1251,8 @@ void InitTab(TBL_T ***lookup_tab, const vec_ulong& ratio, long r, long k,
 
 static
 void RatioInit1(vec_ulong& ratio, const vec_ZZ_pX& W, const ZZ_p& lc,
-                long pruning, TBL_T ***lookup_tab, 
-                vec_vec_ulong& pair_ratio, long k, unsigned long thresh1, 
+                long pruning, TBL_T ***lookup_tab,
+                vec_vec_ulong& pair_ratio, long k, unsigned long thresh1,
                 long **shamt_tab)
 {
    long r = W.length();
@@ -1297,7 +1297,7 @@ void RatioInit1(vec_ulong& ratio, const vec_ZZ_pX& W, const ZZ_p& lc,
    }
 }
 
-static 
+static
 long SecondOrderTest(const vec_long& I_vec, const vec_vec_ulong& pair_ratio_vec,
                      vec_ulong& sum_stack_vec, long& SumLen)
 {
@@ -1343,7 +1343,7 @@ ZZ choose_fn(long r, long k)
 {
    ZZ a, b;
 
-   a = 1; 
+   a = 1;
    b = 1;
 
    long i;
@@ -1366,7 +1366,7 @@ void RemoveFactors1(vec_long& W, const vec_long& I, long r)
       if (i < k && j == I[i])
          i++;
       else
-         swap(W[j-i], W[j]); 
+         swap(W[j-i], W[j]);
    }
 }
 
@@ -1381,7 +1381,7 @@ void RemoveFactors1(vec_vec_long& W, const vec_long& I, long r)
       if (i < k && j == I[i])
          i++;
       else
-         swap(W[j-i], W[j]); 
+         swap(W[j-i], W[j]);
    }
 
    for (i = 0; i < r-k; i++)
@@ -1392,8 +1392,8 @@ void RemoveFactors1(vec_vec_long& W, const vec_long& I, long r)
 // should this swap go in tools.h?
 // Maybe not...I don't want to pollute the interface too much more.
 
-static inline 
-void swap(unsigned long& a, unsigned long& b)  
+static inline
+void swap(unsigned long& a, unsigned long& b)
    { unsigned long t;  t = a; a = b; b = t; }
 
 static
@@ -1407,7 +1407,7 @@ void RemoveFactors1(vec_ulong& W, const vec_long& I, long r)
       if (i < k && j == I[i])
          i++;
       else
-         swap(W[j-i], W[j]); 
+         swap(W[j-i], W[j]);
    }
 }
 
@@ -1422,7 +1422,7 @@ void RemoveFactors1(vec_vec_ulong& W, const vec_long& I, long r)
       if (i < k && j == I[i])
          i++;
       else
-         swap(W[j-i], W[j]); 
+         swap(W[j-i], W[j]);
    }
 
    for (i = 0; i < r-k; i++)
@@ -1473,12 +1473,12 @@ void SumCoeffs(ZZ_p& sum, const ZZ_pX& a)
 
 
 static
-long ConstTermTest(const vec_ZZ_p& W, 
+long ConstTermTest(const vec_ZZ_p& W,
                   const vec_long& I,
                   const ZZ& ct,
                   const ZZ_p& lc,
                   vec_ZZ_p& prod,
-                  long& ProdLen) 
+                  long& ProdLen)
 {
    long k = I.length();
    ZZ_p t;
@@ -1512,7 +1512,7 @@ long ZZXFac_MaxPrune = 10;
 static
 long pruning_bnd(long r, long k)
 {
-   double x = 0; 
+   double x = 0;
 
    long i;
    for (i = 0; i < k; i++) {
@@ -1534,11 +1534,11 @@ long shamt_tab_init(long pos, long card, long pruning, long thresh1_len)
 
    x *= pruning;  // this can be adjusted to control the density
    if (pos <= 6) x *= 2;  // a little boost that costs very little
-      
+
 
    long t = long(ceil(log(x)/log(2.0)));
 
-   t = max(t, TBL_SHAMT); 
+   t = max(t, TBL_SHAMT);
 
    t = min(t, NTL_BITS_PER_LONG-thresh1_len);
 
@@ -1551,9 +1551,9 @@ long shamt_tab_init(long pos, long card, long pruning, long thresh1_len)
 
 
 static
-void CardinalitySearch1(vec_ZZX& factors, ZZX& f, 
-                       vec_ZZ_pX& W, 
-                       LocalInfoT& LocalInfo, 
+void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
+                       vec_ZZ_pX& W,
+                       LocalInfoT& LocalInfo,
                        long k,
                        long bnd,
                        long verbose)
@@ -1592,7 +1592,7 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
    unsigned long thresh = epsilon + delta;
    unsigned long thresh1 = (epsilon << 1) + delta;
 
-   long thresh1_len = NumBits(long(thresh1)); 
+   long thresh1_len = NumBits(long(thresh1));
 
    long pruning;
 
@@ -1698,12 +1698,12 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
    ZZ_pX gg;
    ZZX g, h;
 
-   I[0] = 0;  
+   I[0] = 0;
 
-   long loop_cnt = 0, degree_cnt = 0, n2_cnt = 0, sl_cnt = 0, ct_cnt = 0, 
+   long loop_cnt = 0, degree_cnt = 0, n2_cnt = 0, sl_cnt = 0, ct_cnt = 0,
         pl_cnt = 0, c1_cnt = 0, pl1_cnt = 0, td_cnt = 0;
 
-   ZZ loop_total, degree_total, n2_total, sl_total, ct_total, 
+   ZZ loop_total, degree_total, n2_total, sl_total, ct_total,
       pl_total, c1_total, pl1_total, td_total;
 
    while (I[0] <= r-k) {
@@ -1726,7 +1726,7 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
       for (;;) {
          cnt++;
 
-         if (cnt > 2000000) { 
+         if (cnt > 2000000) {
             if (verbose) {
                loop_total += loop_cnt;  loop_cnt = 0;
                degree_total += degree_cnt;  degree_cnt = 0;
@@ -1756,14 +1756,14 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
 
             {
                long D_last = D[k-2];
-   
+
                unsigned long rs;
                long I_this;
                long D_this;
-   
+
                for (I_this = I_last+1; I_this < r; I_this++) {
                   loop_cnt++;
-   
+
                   rs = ratio_sum_last + ratio[I_this];
                   if (rs > thresh1) {
                      cnt++;
@@ -1771,14 +1771,14 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                   }
 
                   degree_cnt++;
-   
+
                   D_this = D_last + degv[I_this];
-   
+
                   if (!upd[D_this]) {
                      cnt++;
                      continue;
                   }
-   
+
                   n2_cnt++;
                   sl_cnt += (k-SumLen);
 
@@ -1808,9 +1808,9 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                   }
 
                   td_cnt++;
-   
+
                   cnt += 1000;
-   
+
                   if (2*D[k-1] <= deg(f)) {
                      mul(gg, W, I);
                      mul(gg, gg, lc);
@@ -1822,7 +1822,7 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                      if (!divide(h, f, g)) {
                         continue;
                      }
-                  
+
                      // factor found!
                      append(factors, g);
                      f = h;
@@ -1840,14 +1840,14 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                      if (!divide(h, f, g)) {
                         continue;
                      }
-      
+
                      // factor found!
                      append(factors, h);
                      f = g;
                      mul(ct, ConstTerm(f), LeadCoeff(f));
                      conv(lc, LeadCoeff(f));
                   }
-      
+
                   RemoveFactors(W, I);
                   RemoveFactors1(degv, I, r);
                   RemoveFactors1(sum_coeffs, I, r);
@@ -1862,16 +1862,16 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
 
                   InitTab(lookup_tab, ratio, r, k, thresh1, shamt_tab, pruning);
 
-                  if (2*k > r) 
+                  if (2*k > r)
                      goto done;
-                  else 
+                  else
                      goto restart;
-               } /* end of inner for loop */ 
+               } /* end of inner for loop */
 
             }
 
             i--;
-            state = 1;  
+            state = 1;
          }
          else {
             if (state == 0) {
@@ -1890,7 +1890,7 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                      pruned = 1;
                }
                else
-                  pruned = 0; 
+                  pruned = 0;
 
                if (pruned) {
                   i--;
@@ -1903,22 +1903,22 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                }
             }
             else { // state == 1
-      
+
                loop_cnt++;
-      
+
                if (i < ProdLen)
                   ProdLen = i;
-      
+
                if (i < ProdLen1)
                   ProdLen1 = i;
-      
+
                if (i < SumLen)
                   SumLen = i;
 
                long I_i = (++I[i]);
 
                if (i == 0) break;
-   
+
                if (I_i > r-k+i) {
                   i--;
                }
@@ -1936,8 +1936,8 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
                         pruned = 1;
                   }
                   else
-                     pruned = 0; 
-   
+                     pruned = 0;
+
 
                   if (pruned) {
                      i--;
@@ -1986,8 +1986,8 @@ void CardinalitySearch1(vec_ZZX& factors, ZZX& f,
 
 
 static
-void FindTrueFactors(vec_ZZX& factors, const ZZX& ff, 
-                     const vec_ZZX& w, const ZZ& P, 
+void FindTrueFactors(vec_ZZX& factors, const ZZX& ff,
+                     const vec_ZZX& w, const ZZ& P,
                      LocalInfoT& LocalInfo,
                      long verbose,
                      long bnd)
@@ -2033,13 +2033,13 @@ void FindTrueFactors(vec_ZZX& factors, const ZZX& ff,
 
 /**********************************************************************\
 
-                        van Hoeij's algorithm 
+                        van Hoeij's algorithm
 
 \**********************************************************************/
 
 
 
-const long van_hoeij_size_thresh = 12; 
+const long van_hoeij_size_thresh = 12;
 // Use van Hoeij's algorithm if number of modular factors exceeds this bound.
 // Must be >= 1.
 
@@ -2054,7 +2054,7 @@ const long van_hoeij_card_thresh = 3;
 // This routine assumes that the input f is a non-zero polynomial
 // of degree n, and returns the value f(a).
 
-static 
+static
 ZZ PolyEval(const ZZX& f, const ZZ& a)
 {
    if (f == 0) Error("PolyEval: internal error");
@@ -2076,11 +2076,11 @@ ZZ PolyEval(const ZZX& f, const ZZ& a)
 
 
 // This routine assumes that the input f is a polynomial with non-zero constant
-// term, of degree n, and with leading coefficient c; it returns 
+// term, of degree n, and with leading coefficient c; it returns
 // an upper bound on the absolute value of the roots of the
 // monic, integer polynomial g(X) =  c^{n-1} f(X/c).
 
-static 
+static
 ZZ RootBound(const ZZX& f)
 {
    if (ConstTerm(f) == 0) Error("RootBound: internal error");
@@ -2112,9 +2112,9 @@ ZZ RootBound(const ZZX& f)
    while (ub - lb > 1) {
       ZZ mb = (ub + lb)/2;
 
-      if (PolyEval(g, mb) < 0) 
+      if (PolyEval(g, mb) < 0)
          lb = mb;
-      else 
+      else
          ub = mb;
    }
 
@@ -2122,7 +2122,7 @@ ZZ RootBound(const ZZX& f)
 }
 
 
-// This routine takes as input an n x m integer matrix M, where the rows of M 
+// This routine takes as input an n x m integer matrix M, where the rows of M
 // are assumed to be linearly independent.
 // It is also required that both n and m are non-zero.
 // It computes an integer d, along with an n x m matrix R, such that
@@ -2153,7 +2153,7 @@ void gauss(ZZ& d_out, mat_ZZ& R_out, const mat_ZZ& M)
       long r = gauss(MM);
       if (r < n) continue;
 
-      // compute pos(1..n), so that pos(i) is the index 
+      // compute pos(1..n), so that pos(i) is the index
       // of the i-th pivot column
 
       vec_long pos;
@@ -2164,7 +2164,7 @@ void gauss(ZZ& d_out, mat_ZZ& R_out, const mat_ZZ& M)
          while (MM(i, j) == 0) j++;
          pos(i) = j;
          j++;
-      } 
+      }
 
       // compute the n x n sub-matrix consisting of the
       // pivot columns of M
@@ -2222,7 +2222,7 @@ void ComputeTrace(vec_ZZ& Tr, const ZZX& f, long d, const ZZ& P)
 
    // check arguments
 
-   if (n <= 0 || LeadCoeff(f) != 1) 
+   if (n <= 0 || LeadCoeff(f) != 1)
       Error("ComputeTrace: internal error (1)");
 
    if (d <= 0)
@@ -2243,7 +2243,7 @@ void ComputeTrace(vec_ZZ& Tr, const ZZX& f, long d, const ZZ& P)
       t1 = 0;
 
       for (i = 1; i <= n; i++) {
-         mul(t2, Tr(i + d - n - 1), f.rep[i-1]); 
+         mul(t2, Tr(i + d - n - 1), f.rep[i-1]);
          add(t1, t1, t2);
       }
 
@@ -2274,7 +2274,7 @@ void ComputeTrace(vec_ZZ& Tr, const ZZX& f, long d, const ZZ& P)
 // pdelta = p^delta for delta > 0.
 // P = p^a for some a >= max{ a_i : i=1..d }.
 
-// This routine computes C(1..d), where 
+// This routine computes C(1..d), where
 // C(i) = C_{a_i}^{a_i + delta}( Tr(i)*lc^i ) for i = 1..d.
 
 
@@ -2317,8 +2317,8 @@ void ChopTraces(vec_ZZ& C, const vec_ZZ& Tr, long d,
 
 
 static
-void DenseChopTraces(vec_ZZ& C, const vec_ZZ& Tr, long d, long d1, 
-                     const ZZ& pb_eff, const ZZ& pdelta, const ZZ& P, 
+void DenseChopTraces(vec_ZZ& C, const vec_ZZ& Tr, long d, long d1,
+                     const ZZ& pb_eff, const ZZ& pdelta, const ZZ& P,
                      const ZZ& lc, const mat_ZZ& A)
 {
 
@@ -2360,7 +2360,7 @@ void DenseChopTraces(vec_ZZ& C, const vec_ZZ& Tr, long d, long d1,
 
 
 static
-void Compute_pb(vec_long& b,vec_ZZ& pb, long p, long d, 
+void Compute_pb(vec_long& b,vec_ZZ& pb, long p, long d,
                 const ZZ& root_bound, long n)
 {
    ZZ t1, t2;
@@ -2409,7 +2409,7 @@ void Compute_pdelta(long& delta, ZZ& pdelta, long p, long bit_delta)
 
 static
 void BuildReductionMatrix(mat_ZZ& M, long& C, long r, long d, const ZZ& pdelta,
-                          const vec_vec_ZZ& chop_vec, 
+                          const vec_vec_ZZ& chop_vec,
                           const mat_ZZ& B_L, long verbose)
 {
    long s = B_L.NumRows();
@@ -2449,7 +2449,7 @@ void BuildReductionMatrix(mat_ZZ& M, long& C, long r, long d, const ZZ& pdelta,
 
          M(i, j+r) = t1;
       }
-  
+
 
    for (i = 1; i <= d; i++)
       M(i+s, i+r) = pdelta;
@@ -2458,7 +2458,7 @@ void BuildReductionMatrix(mat_ZZ& M, long& C, long r, long d, const ZZ& pdelta,
 
 
 static
-void CutAway(mat_ZZ& B1, vec_ZZ& D, mat_ZZ& M, 
+void CutAway(mat_ZZ& B1, vec_ZZ& D, mat_ZZ& M,
              long C, long r, long d)
 {
    long k = M.NumRows();
@@ -2493,10 +2493,10 @@ void CutAway(mat_ZZ& B1, vec_ZZ& D, mat_ZZ& M,
 
 
 static
-long GotThem(vec_ZZX& factors, 
+long GotThem(vec_ZZX& factors,
              const mat_ZZ& B_L,
-             const vec_ZZ_pX& W, 
-             const ZZX& f, 
+             const vec_ZZ_pX& W,
+             const ZZX& f,
              long bnd,
              long verbose)
 {
@@ -2641,12 +2641,12 @@ long GotThem(vec_ZZX& factors,
 }
 
 
-void AdditionalLifting(ZZ& P1, 
-                       long& e1, 
-                       vec_ZZX& w1, 
-                       long p, 
+void AdditionalLifting(ZZ& P1,
+                       long& e1,
+                       vec_ZZX& w1,
+                       long p,
                        long new_bound,
-                       const ZZX& f, 
+                       const ZZX& f,
                        long doubling,
                        long verbose)
 {
@@ -2673,7 +2673,7 @@ void AdditionalLifting(ZZ& P1,
    else {
       rem(t1, LeadCoeff(f), new_P1);
       InvMod(t1, t1, new_P1);
-      f1.rep.SetLength(n+1); 
+      f1.rep.SetLength(n+1);
       for (i = 0; i <= n; i++) {
          mul(t2, f.rep[i], t1);
          rem(f1.rep[i], t2, new_P1);
@@ -2709,8 +2709,8 @@ void AdditionalLifting(ZZ& P1,
 }
 
 static
-void Compute_pb_eff(long& b_eff, ZZ& pb_eff, long p, long d, 
-                    const ZZ& root_bound,  
+void Compute_pb_eff(long& b_eff, ZZ& pb_eff, long p, long d,
+                    const ZZ& root_bound,
                     long n, long ran_bits)
 {
    ZZ t1, t2;
@@ -2757,8 +2757,8 @@ long d1_val(long bit_delta, long r, long s)
 // a d x d identity matrix for van Hoeij's matrix A.
 // The number of "excess" bits used for each trace, bit_delta, is initially
 // 2*r.
-// 
-// When d*bit_delta exceeds 0.25*r*s, we switch to 
+//
+// When d*bit_delta exceeds 0.25*r*s, we switch to
 // a "dense" mode, where we use only about 0.25*r*s "compressed" traces.
 // These bounds follow from van Hoeij's heuristic estimates.
 //
@@ -2768,8 +2768,8 @@ long d1_val(long bit_delta, long r, long s)
 
 
 static
-void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff, 
-                        const vec_ZZX& w, const ZZ& P, 
+void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
+                        const vec_ZZX& w, const ZZ& P,
                         long p, long e,
                         LocalInfoT& LocalInfo,
                         long verbose,
@@ -2800,7 +2800,7 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
    k = 1;
    factors.SetLength(0);
-   while (2*k <= W.length() && 
+   while (2*k <= W.length() &&
       (k <= van_hoeij_card_thresh || W.length() <= van_hoeij_size_thresh)) {
 
       if (k <= 1)
@@ -2818,29 +2818,29 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
    else {
 
       // now we apply van Hoeij's algorithm proper to f
-   
+
       double time_start, time_stop, lll_time, tt0, tt1;
 
       time_start = GetTime();
       lll_time = 0;
-   
+
       ZZ P1 = P;
       long e1 = e;    // invariant: P1 = p^{e1}
-   
+
       r = W.length();
-   
+
       vec_ZZX w1;
       w1.SetLength(r);
       for (i = 0; i < r; i++)
          conv(w1[i], W[i]);
-   
+
       long n = deg(f);
-   
+
       mat_ZZ B_L;            // van Hoeij's lattice
       ident(B_L, r);
-   
+
       long d = 0;            // number of traces
-      
+
       long bit_delta = 0;    // number of "excess" bits
 
       vec_long b;
@@ -2849,15 +2849,15 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
       long delta = 0;
       ZZ pdelta = to_ZZ(1);  // pdelta = p^delta
       pdelta = 1;
-   
+
       vec_vec_ZZ trace_vec;
       trace_vec.SetLength(r);
-   
+
       vec_vec_ZZ chop_vec;
       chop_vec.SetLength(r);
-   
+
       ZZ root_bound = RootBound(f);
-   
+
       long dense = 0;
       long ran_bits = 32;
 
@@ -2869,11 +2869,11 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
       for (;;) {
 
          loop_cnt++;
-   
+
          // if we are using the power hack, then we do not try too hard...
          // this is really a hack on a hack!
 
-         if (ok_to_abandon && 
+         if (ok_to_abandon &&
              ((d >= 2 && s > 128) || (d >= 3 && s > 32) || (d >= 4 && s > 8) ||
               d >= 5) ) {
             append(factors, f);
@@ -2884,25 +2884,25 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
          d_last = d;
 
-         // set d_inc: 
+         // set d_inc:
 
          if (!dense) {
             d_inc = 1 + d/8;
          }
          else {
-            d_inc = 1 + d/4; 
+            d_inc = 1 + d/4;
          }
 
          d_inc = min(d_inc, n-1-d);
-            
+
          d += d_inc;
 
          // set bit_delta:
-   
+
          if (bit_delta == 0) {
             // set initial value...don't make it any smaller than 2*r
 
-            bit_delta = 2*r; 
+            bit_delta = 2*r;
          }
          else {
             long extra_bits;
@@ -2912,7 +2912,7 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
             }
             else if (d_inc != 0) {
                if (d1_val(bit_delta, r, s) > 1)
-                  extra_bits = 1 + bit_delta/16; 
+                  extra_bits = 1 + bit_delta/16;
                else
                   extra_bits = 0;
             }
@@ -2922,9 +2922,9 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
             bit_delta += extra_bits;
          }
 
-         if (d > d1_val(bit_delta, r, s)) 
+         if (d > d1_val(bit_delta, r, s))
             dense = 1;
-   
+
          Compute_pdelta(delta, pdelta, p, bit_delta);
 
          long d1;
@@ -2941,7 +2941,7 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
          }
          else {
             d1 = d1_val(bit_delta, r, s);
-            Compute_pb_eff(b_eff, pb_eff, p, d, root_bound, n, ran_bits); 
+            Compute_pb_eff(b_eff, pb_eff, p, d, root_bound, n, ran_bits);
          }
 
          if (b_eff + delta > e1) {
@@ -2949,7 +2949,7 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
             doubling = 1;
 
-            AdditionalLifting(P1, e1, w1, p, b_eff + delta, f, 
+            AdditionalLifting(P1, e1, w1, p, b_eff + delta, f,
                               doubling, verbose);
 
             tt0 = GetTime();
@@ -2967,7 +2967,7 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
             tt1 = GetTime();
          }
-   
+
          tt0 = GetTime();
 
          mat_ZZ A;
@@ -2980,86 +2980,86 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
                   if (RandomBnd(2)) negate(A(i, j), A(i, j));
                }
          }
-      
-   
+
+
          for (i = 0; i < r; i++) {
             trace_vec[i].SetLength(d);
             for (d_index = d_last + 1; d_index <= d; d_index++)
                ComputeTrace(trace_vec[i], w1[i], d_index, P1);
-   
+
             chop_vec[i].SetLength(d1);
 
             if (!dense)
-               ChopTraces(chop_vec[i], trace_vec[i], d, pb, pdelta, 
+               ChopTraces(chop_vec[i], trace_vec[i], d, pb, pdelta,
                           P1, LeadCoeff(f));
             else
-               DenseChopTraces(chop_vec[i], trace_vec[i], d, d1, pb_eff, 
+               DenseChopTraces(chop_vec[i], trace_vec[i], d, d1, pb_eff,
                                pdelta, P1, LeadCoeff(f), A);
          }
 
          A.kill();
-   
+
          tt1 = GetTime();
-   
+
          mat_ZZ M;
          long C;
-   
+
          tt0 = GetTime();
-   
+
          BuildReductionMatrix(M, C, r, d1, pdelta, chop_vec, B_L, verbose);
-   
+
          tt1 = GetTime();
-   
-         if (SkipSparse) {   
+
+         if (SkipSparse) {
             if (!dense) {
                continue;
             }
          }
 
-   
+
          tt0 = GetTime();
-   
+
          vec_ZZ D;
          long rnk = LLL_plus(D, M);
-   
+
          tt1 = GetTime();
 
          lll_time += (tt1-tt0);
-   
-   
+
+
          if (rnk != s + d1) {
             Error("van Hoeij -- bad rank");
          }
-   
+
          mat_ZZ B1;
-   
-   
+
+
          tt0 = GetTime();
-   
+
          CutAway(B1, D, M, C, r, d1);
-   
+
          tt1 = GetTime();
-   
+
          if (B1.NumRows() >= s) continue;
          // no progress...try again
 
          // otherwise, update B_L and test if we are done
-   
+
          swap(B1, B_L);
          B1.kill();
          s = B_L.NumRows();
-   
+
          if (s == 0)
             Error("oops! s == 0 should not happen!");
-   
+
          if (s == 1) {
             append(factors, f);
             break;
          }
-   
+
          if (s > r / (van_hoeij_card_thresh + 1)) continue;
          // dimension too high...we can't be done
-   
+
          if (GotThem(factors, B_L, W, f, bnd, verbose)) break;
       }
 
@@ -3072,7 +3072,7 @@ void FindTrueFactors_vH(vec_ZZX& factors, const ZZX& ff,
 
 
 static
-void ll_SFFactor(vec_ZZX& factors, const ZZX& ff, 
+void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
                  long verbose,
                  long bnd)
 
@@ -3150,7 +3150,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
       inplace_rev(f);
       rev = 1;
    }
-   else 
+   else
       rev = 0;
 
    // obtain factorization modulo small primes
@@ -3164,7 +3164,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
        SmallPrimeFactorization(LocalInfo, f, verbose);
 
    if (!spfactors) {
-      // f was found to be irreducible 
+      // f was found to be irreducible
 
       bak.restore();
 
@@ -3194,7 +3194,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
 
    // prepare for Hensel lifting
 
-   // first, calculate bit bound 
+   // first, calculate bit bound
 
    long bnd1;
    long n = deg(f);
@@ -3202,7 +3202,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
    long e;
    ZZ P;
    long p;
-   
+
    bnd1 = MaxBits(f) + (NumBits(n+1)+1)/2;
 
    if (!bnd || bnd1 < bnd)
@@ -3218,7 +3218,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
 
    long lift_bnd;
 
-   lift_bnd = coeff_bnd + 15;  
+   lift_bnd = coeff_bnd + 15;
    // +15 helps avoid trial divisions...can be any number >= 0
 
    lift_bnd = max(lift_bnd, bnd + lc_bnd + 2*NumBits(n) + ZZX_OVERLIFT);
@@ -3236,7 +3236,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
    e = long(double(lift_bnd)/(log(double(p))/log(double(2))));
    power(P, p, e);
 
-   while (NumBits(P) <= lift_bnd) { 
+   while (NumBits(P) <= lift_bnd) {
       mul(P, P, p);
       e++;
    }
@@ -3277,7 +3277,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
    // search for true factors
 
    if (ZZXFac_van_Hoeij && w.length() > van_hoeij_size_thresh)
-      FindTrueFactors_vH(factors, f, w, P, p, e, 
+      FindTrueFactors_vH(factors, f, w, P, p, e,
                          LocalInfo, verbose, coeff_bnd);
    else
       FindTrueFactors(factors, f, w, P, LocalInfo, verbose, coeff_bnd);
@@ -3310,7 +3310,7 @@ void ll_SFFactor(vec_ZZX& factors, const ZZX& ff,
 
 
 
-static 
+static
 long DeflationFactor(const ZZX& f)
 {
    long n = deg(f);
@@ -3333,7 +3333,7 @@ void inflate(ZZX& g, const ZZX& f, long m)
    long i;
 
    g = 0;
-   for (i = n; i >= 0; i--) 
+   for (i = n; i >= 0; i--)
       SetCoeff(g, i*m, f.rep[i]);
 }
 
@@ -3345,7 +3345,7 @@ void deflate(ZZX& g, const ZZX& f, long m)
    long i;
 
    g = 0;
-   for (i = n; i >= 0; i -= m) 
+   for (i = n; i >= 0; i -= m)
       SetCoeff(g, i/m, f.rep[i]);
 }
 
@@ -3369,7 +3369,7 @@ void MakeFacList(vec_long& v, long m)
 
 long ZZXFac_PowerHack = 1;
 
-void SFFactor(vec_ZZX& factors, const ZZX& ff, 
+void SFFactor(vec_ZZX& factors, const ZZX& ff,
               long verbose,
               long bnd)
 
@@ -3377,7 +3377,7 @@ void SFFactor(vec_ZZX& factors, const ZZX& ff,
 // coefficient
 
 {
-   if (ff == 0) 
+   if (ff == 0)
       Error("SFFactor: bad args");
 
    if (deg(ff) <= 0) {

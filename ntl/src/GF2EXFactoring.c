@@ -28,7 +28,7 @@ void IterSqr(GF2E& c, const GF2E& a, long n)
 
    c = res;
 }
-   
+
 
 
 void SquareFreeDecomp(vec_pair_GF2EX_long& u, const GF2EX& ff)
@@ -78,13 +78,13 @@ void SquareFreeDecomp(vec_pair_GF2EX_long& u, const GF2EX& ff)
          long k, d;
          d = deg(r)/2;
          f.rep.SetLength(d+1);
-         for (k = 0; k <= d; k++) 
+         for (k = 0; k <= d; k++)
             IterSqr(f.rep[k], r.rep[k*2], GF2E::degree()-1);
          m = m*2;
       }
    } while (!finished);
 }
-         
+
 
 
 static
@@ -215,7 +215,7 @@ void PlainFrobeniusMap(GF2EX& h, const GF2EXModulus& F)
 
    SetX(res);
    long i;
-   for (i = 0; i < GF2E::degree(); i++) 
+   for (i = 0; i < GF2E::degree(); i++)
       SqrMod(res, res, F);
 
    h = res;
@@ -240,9 +240,9 @@ long UseComposeFrobenius(long d, long n)
       while (i) {
          long m1 = 2*m;
          if (i & d) m1++;
-   
+
          if (m1 >= NTL_BITS_PER_LONG-1 || (1L << m1) >= n) break;
-   
+
          m = m1;
          i = i >> 1;
       }
@@ -289,9 +289,9 @@ void ComposeFrobeniusMap(GF2EX& y, const GF2EXModulus& F)
       while (i) {
          long m1 = 2*m;
          if (i & d) m1++;
-   
+
          if (m1 >= NTL_BITS_PER_LONG-1 || (1L << m1) >= n) break;
-   
+
          m = m1;
          i = i >> 1;
       }
@@ -343,7 +343,7 @@ void FrobeniusMap(GF2EX& h, const GF2EXModulus& F)
 
 
 
-   
+
 
 
 
@@ -358,12 +358,12 @@ void RecFindRoots(vec_GF2E& x, const GF2EX& f)
       x[k] = ConstTerm(f);
       return;
    }
-      
+
    GF2EX h;
 
    GF2E r;
 
-   
+
    {
       GF2EXModulus F;
       build(F, f);
@@ -378,7 +378,7 @@ void RecFindRoots(vec_GF2E& x, const GF2EX& f)
    }
 
    RecFindRoots(x, h);
-   div(h, f, h); 
+   div(h, f, h);
    RecFindRoots(x, h);
 }
 
@@ -434,7 +434,7 @@ void RandomBasisElt(GF2EX& g, const vec_long& D, const vec_GF2XVec& M)
 
 static
 void split(GF2EX& f1, GF2EX& g1, GF2EX& f2, GF2EX& g2,
-           const GF2EX& f, const GF2EX& g, 
+           const GF2EX& f, const GF2EX& g,
            const vec_GF2E& roots, long lo, long mid)
 {
    long r = mid-lo+1;
@@ -455,7 +455,7 @@ void split(GF2EX& f1, GF2EX& g1, GF2EX& f2, GF2EX& g2,
 
 
    GCD(f1, a, f);
-   
+
    div(f2, f, f1);
 
    rem(g1, g, f1);
@@ -519,7 +519,7 @@ void IterFindFactors(vec_GF2EX& factors, const GF2EX& f,
 #endif
 
 
-   
+
 
 void SFBerlekamp(vec_GF2EX& factors, const GF2EX& ff, long verbose)
 {
@@ -618,7 +618,7 @@ void berlekamp(vec_pair_GF2EX_long& factors, const GF2EX& f, long verbose)
    if (!IsOne(LeadCoeff(f)))
       Error("berlekamp: bad args");
 
-   
+
    SquareFreeDecomp(sfd, f);
 
    factors.SetLength(0);
@@ -643,7 +643,7 @@ void AddFactor(vec_pair_GF2EX_long& factors, const GF2EX& g, long d, long verbos
 }
 
 static
-void ProcessTable(GF2EX& f, vec_pair_GF2EX_long& factors, 
+void ProcessTable(GF2EX& f, vec_pair_GF2EX_long& factors,
                   const GF2EXModulus& F, long limit, const vec_GF2EX& tbl,
                   long d, long verbose)
 
@@ -680,7 +680,7 @@ void ProcessTable(GF2EX& f, vec_pair_GF2EX_long& factors,
    d = d - limit + 1;
 
    while (2*d <= deg(t1)) {
-      GCD(t2, tbl[i], t1); 
+      GCD(t2, tbl[i], t1);
       if (deg(t2) > 0) {
          AddFactor(factors, t2, d, verbose);
          div(t1, t1, t2);
@@ -695,7 +695,7 @@ void ProcessTable(GF2EX& f, vec_pair_GF2EX_long& factors,
 }
 
 
-void TraceMap(GF2EX& w, const GF2EX& a, long d, const GF2EXModulus& F, 
+void TraceMap(GF2EX& w, const GF2EX& a, long d, const GF2EXModulus& F,
               const GF2EX& b)
 
 {
@@ -709,7 +709,7 @@ void TraceMap(GF2EX& w, const GF2EX& a, long d, const GF2EXModulus& F,
 
    while (d) {
       if (d == 1) {
-         if (IsZero(w)) 
+         if (IsZero(w))
             w = y;
          else {
             CompMod(w, w, z, F);
@@ -816,7 +816,7 @@ long ProbIrredTest(const GF2EX& f, long iter)
 
 long GF2EX_BlockingFactor = 10;
 
-void DDF(vec_pair_GF2EX_long& factors, const GF2EX& ff, const GF2EX& hh, 
+void DDF(vec_pair_GF2EX_long& factors, const GF2EX& ff, const GF2EX& hh,
          long verbose)
 {
    GF2EX f = ff;
@@ -835,7 +835,7 @@ void DDF(vec_pair_GF2EX_long& factors, const GF2EX& ff, const GF2EX& hh,
       return;
    }
 
-   long CompTableSize = 2*SqrRoot(deg(f)); 
+   long CompTableSize = 2*SqrRoot(deg(f));
 
    long GCDTableSize = GF2EX_BlockingFactor;
 
@@ -875,7 +875,7 @@ void DDF(vec_pair_GF2EX_long& factors, const GF2EX& ff, const GF2EX& hh,
          // we need to go further
 
          if (deg(f) < old_n) {
-            // f has changed 
+            // f has changed
 
             build(F, f);
             rem(h, h, f);
@@ -915,7 +915,7 @@ void EDFSplit(vec_GF2EX& v, const GF2EX& f, const GF2EX& b, long d)
    GF2EX a, g, h;
    GF2EXModulus F;
    vec_GF2E roots;
-   
+
    build(F, f);
    long n = F.n;
    long r = n/d;
@@ -946,7 +946,7 @@ void RecEDF(vec_GF2EX& factors, const GF2EX& f, const GF2EX& b, long d,
       }
    }
 }
-         
+
 
 void EDF(vec_GF2EX& factors, const GF2EX& ff, const GF2EX& bb,
          long d, long verbose)
@@ -977,7 +977,7 @@ void EDF(vec_GF2EX& factors, const GF2EX& ff, const GF2EX& bb,
       return;
    }
 
-   
+
    factors.SetLength(0);
 
    RecEDF(factors, f, b, d, verbose);
@@ -1007,7 +1007,7 @@ void SFCanZass(vec_GF2EX& factors, const GF2EX& ff, long verbose)
 
    double t;
 
-   
+
    GF2EXModulus F;
    build(F, f);
 
@@ -1049,7 +1049,7 @@ void SFCanZass(vec_GF2EX& factors, const GF2EX& ff, long verbose)
       }
    }
 }
-   
+
 void CanZass(vec_pair_GF2EX_long& factors, const GF2EX& f, long verbose)
 {
    if (!IsOne(LeadCoeff(f)))
@@ -1059,7 +1059,7 @@ void CanZass(vec_pair_GF2EX_long& factors, const GF2EX& f, long verbose)
    vec_pair_GF2EX_long sfd;
    vec_GF2EX x;
 
-   
+
    SquareFreeDecomp(sfd, f);
 
    factors.SetLength(0);
@@ -1120,7 +1120,7 @@ long BaseCase(const GF2EX& h, long q, long a, const GF2EXModulus& F)
 
 
 static
-void TandemPowerCompose(GF2EX& y1, GF2EX& y2, const GF2EX& h, 
+void TandemPowerCompose(GF2EX& y1, GF2EX& y2, const GF2EX& h,
                         long q1, long q2, const GF2EXModulus& F)
 {
    GF2EX z(INIT_SIZE, F.n);
@@ -1200,7 +1200,7 @@ long RecComputeDegree(long u, const GF2EX& h, const GF2EXModulus& F,
    GF2EX h1, h2;
    long q1, q2, r1, r2;
 
-   q1 = fvec[fvec[u].link].val; 
+   q1 = fvec[fvec[u].link].val;
    q2 = fvec[fvec[u].link+1].val;
 
    TandemPowerCompose(h1, h2, h, q1, q2, F);
@@ -1209,7 +1209,7 @@ long RecComputeDegree(long u, const GF2EX& h, const GF2EXModulus& F,
    return r1*r2;
 }
 
-   
+
 
 
 long RecComputeDegree(const GF2EX& h, const GF2EXModulus& F)
@@ -1217,7 +1217,7 @@ long RecComputeDegree(const GF2EX& h, const GF2EXModulus& F)
    // h = X^p mod f
    // the common degree of the irreducible factors of f is computed
 {
-   if (F.n == 1 || IsX(h)) 
+   if (F.n == 1 || IsX(h))
       return 1;
 
    FacVec fvec;
@@ -1238,7 +1238,7 @@ void FindRoot(GF2E& root, const GF2EX& ff)
    GF2E r;
 
    f = ff;
-   
+
    if (!IsOne(LeadCoeff(f)))
       Error("FindRoot: bad args");
 
@@ -1260,7 +1260,7 @@ void FindRoot(GF2E& root, const GF2EX& ff)
             f = h;
       }
    }
- 
+
    root = ConstTerm(f);
 }
 
@@ -1307,11 +1307,11 @@ long RecIrredTest(long u, const GF2EX& h, const GF2EXModulus& F,
    }
 
 
-   q1 = fvec[fvec[u].link].val; 
+   q1 = fvec[fvec[u].link].val;
    q2 = fvec[fvec[u].link+1].val;
 
    TandemPowerCompose(h1, h2, h, q1, q2, F);
-   return RecIrredTest(fvec[u].link, h2, F, fvec) 
+   return RecIrredTest(fvec[u].link, h2, F, fvec)
           && RecIrredTest(fvec[u].link+1, h1, F, fvec);
 }
 
@@ -1323,7 +1323,7 @@ long DetIrredTest(const GF2EX& f)
    GF2EXModulus F;
 
    build(F, f);
-   
+
    GF2EX h;
 
    FrobeniusMap(h, F);
@@ -1349,7 +1349,7 @@ long IterIrredTest(const GF2EX& f)
    GF2EXModulus F;
 
    build(F, f);
-   
+
    GF2EX h;
 
    FrobeniusMap(h, F);
@@ -1671,7 +1671,7 @@ void GenerateGiantSteps(const GF2EX& f, const GF2EX& h, long l, long verbose)
 
    long i;
 
-   long HexOutput = GF2X::HexOutput; 
+   long HexOutput = GF2X::HexOutput;
    GF2X::HexOutput = 1;
 
       GiantStepFile.kill();
@@ -1707,7 +1707,7 @@ void NewAddFactor(vec_pair_GF2EX_long& u, const GF2EX& g, long m, long verbose)
 
 }
 
-   
+
 
 
 static
@@ -1777,7 +1777,7 @@ void FetchBabySteps(vec_GF2EX& v, long k)
          v[i] = BabyStepFile(i);
    }
 }
-      
+
 
 
 static
@@ -1837,7 +1837,7 @@ void GiantRefine(vec_pair_GF2EX_long& u, const GF2EX& ff, long k, long l,
          build(F, f);
 
          long i;
-         for (i = 1; i <= k-1; i++) 
+         for (i = 1; i <= k-1; i++)
             rem(BabyStep[i], BabyStep[i], F);
       }
    }
@@ -1846,7 +1846,7 @@ void GiantRefine(vec_pair_GF2EX_long& u, const GF2EX& ff, long k, long l,
       NewProcessTable(u, f, F, buf, size, first_gs, k, verbose);
    }
 
-   if (deg(f) > 0) 
+   if (deg(f) > 0)
       NewAddFactor(u, f, 0, verbose);
 
 }
@@ -1901,10 +1901,10 @@ void IntervalRefine(vec_pair_GF2EX_long& factors, const GF2EX& ff,
 
    NewProcessTable(factors, f, F, buf, size, first_d, 1, verbose);
 
-   if (deg(f) > 0) 
+   if (deg(f) > 0)
       NewAddFactor(factors, f, deg(f), verbose);
 }
-   
+
 
 
 
@@ -1934,10 +1934,10 @@ void BabyRefine(vec_pair_GF2EX_long& factors, const vec_pair_GF2EX_long& u,
 
 }
 
-      
-      
 
-      
+
+
+
 
 void NewDDF(vec_pair_GF2EX_long& factors,
             const GF2EX& f,
@@ -1961,7 +1961,7 @@ void NewDDF(vec_pair_GF2EX_long& factors,
 
    if (!GF2EX_stem[0])
       sprintf(GF2EX_stem, "ddf-%ld", RandomBnd(10000));
-      
+
    long B = deg(f)/2;
    long k = SqrRoot(B);
    long l = (B+k-1)/k;

@@ -37,7 +37,7 @@ void power(GF2& x, GF2 a, long e)
       return;
    }
 
-   if (e < 0 && a == 0) 
+   if (e < 0 && a == 0)
       Error("GF2: division by zero");
 
    x = a;

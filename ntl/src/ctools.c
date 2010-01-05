@@ -60,7 +60,7 @@ void _ntl_ForceToMem(double *p)
  * than int (e.g., most 64-bit platforms).
  *
  * We go out of our way to hide the fact that we are multiplying/dividing
- * by zero, so as to avoid unnecessary warnings, and to prevent 
+ * by zero, so as to avoid unnecessary warnings, and to prevent
  * overly-agressive optimizing compilers from screwing things up.
  */
 

@@ -30,7 +30,7 @@ double clean_data(double *t)
       if (i != ix && i != iy) z+= t[i], n++;
    }
 
-   z = z/n;  
+   z = z/n;
 
    return z;
 }
@@ -78,7 +78,7 @@ int main()
 	 return 0;
       }
    }
-   
+
 
    n = 16;
    s = 56;
@@ -139,5 +139,5 @@ int main()
 
    return 0;
 }
-   
+
 

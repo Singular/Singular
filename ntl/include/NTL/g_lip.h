@@ -95,6 +95,19 @@ extern "C" {
 	  assumes b > 0 and *r >= 0;
           cause *r to grow by one digit) */
 
+    void _ntl_gsaddmul(_ntl_gbigint x, long y,  _ntl_gbigint *ww);
+      /* *ww += x*y */
+
+    void _ntl_gaddmul(_ntl_gbigint x, _ntl_gbigint y,  _ntl_gbigint *ww);
+      /* *ww += x*y */
+
+    void _ntl_gssubmul(_ntl_gbigint x, long y,  _ntl_gbigint *ww);
+      /* *ww -= x*y */
+
+    void _ntl_gsubmul(_ntl_gbigint x, _ntl_gbigint y,  _ntl_gbigint *ww);
+      /* *ww -= x*y */
+
+
 /********************************************************************
 
    Shifting and bit manipulation
@@ -527,6 +540,11 @@ extern int _ntl_gmp_hack;
 #define NTL_zxor _ntl_gxor
 #define NTL_zxxratrecon _ntl_gxxratrecon
 #define NTL_zzero _ntl_gzero
+
+#define NTL_zsaddmul _ntl_gsaddmul
+#define NTL_zaddmul _ntl_gaddmul
+#define NTL_zssubmul _ntl_gssubmul
+#define NTL_zsubmul _ntl_gsubmul
 
 #define NTL_GMP_LIP
 

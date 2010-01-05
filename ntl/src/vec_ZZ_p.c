@@ -9,7 +9,7 @@ NTL_START_IMPL
 
 void BlockConstruct(ZZ_p* x, long n)
 {
-   if (n <= 0) return; 
+   if (n <= 0) return;
 
    if (!ZZ_pInfo)
       Error("ZZ_p constructor called while modulus undefined");
@@ -218,7 +218,7 @@ void VectorCopy(vec_ZZ_p& x, const vec_ZZ_p& a, long n)
    long m = min(n, a.length());
 
    x.SetLength(n);
-   
+
    long i;
 
    for (i = 0; i < m; i++)

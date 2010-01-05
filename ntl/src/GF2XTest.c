@@ -6,7 +6,7 @@ NTL_CLIENT
 struct wd {
    int amt;
 
-   wd(int x) { amt = x; } 
+   wd(int x) { amt = x; }
 };
 
 #define WD(x,y)  wd(x) << (y)
@@ -43,7 +43,7 @@ int main()
          return 1;
       }
 
-      cout << WD(12,n); 
+      cout << WD(12,n);
 
       iter = 0;
       do {

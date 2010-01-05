@@ -72,7 +72,7 @@ int main()
    }
 
    cerr << "\n";
- 
+
 
    cout << factors << "\n";
 

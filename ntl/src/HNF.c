@@ -14,12 +14,12 @@ NTL_START_IMPL
 // This modifiaction was put in place in v3.9b.
 
 static
-void EuclUpdate(vec_ZZ& u, vec_ZZ& v, 
+void EuclUpdate(vec_ZZ& u, vec_ZZ& v,
                 const ZZ& a, const ZZ& b, const ZZ& c, const ZZ& d,
                 const ZZ& M)
 
 {
-   long m = u.length(); 
+   long m = u.length();
    long i;
 
    ZZ M1;
@@ -75,7 +75,7 @@ void ReduceW(vec_ZZ& u, const ZZ& a, const vec_ZZ& v, const ZZ& M, long m)
       rem(u(i), t2, M);
    }
 }
-   
+
 
 
 void HNF(mat_ZZ& W, const mat_ZZ& A_in, const ZZ& D_in)

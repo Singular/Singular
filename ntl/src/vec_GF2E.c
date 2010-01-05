@@ -13,7 +13,7 @@ NTL_START_IMPL
 
 void BlockConstruct(GF2E* x, long n)
 {
-   if (n <= 0) return; 
+   if (n <= 0) return;
 
    if (!GF2EInfo)
       Error("GF2E constructor called while modulus undefined");
@@ -21,9 +21,9 @@ void BlockConstruct(GF2E* x, long n)
    long d = GF2E::WordLength();
 
    long m, j;
- 
+
    long i = 0;
- 
+
    while (i < n) {
       m = WV_BlockConstructAlloc(x[i]._GF2E__rep.xrep, d, n-i);
       for (j = 1; j < m; j++)
@@ -36,10 +36,10 @@ void BlockConstruct(GF2E* x, long n)
 void BlockDestroy(GF2E* x, long n)
 {
    if (n <= 0) return;
- 
+
    long i = 0;
    long m;
- 
+
    while (i < n) {
       m = WV_BlockDestroy(x[i]._GF2E__rep.xrep);
       i += m;

@@ -70,8 +70,8 @@ long DoubleRounding(long dp)
 
    if (y != power2(dp-1) + 1)
       return 1;
-   else 
-      return 0; 
+   else
+      return 0;
 }
 
 
@@ -171,7 +171,7 @@ void print2k(FILE *f, long k, long bpl)
 
       if (first)
          first = 0;
-      else 
+      else
          fprintf(f, "*");
 
       fprintf(f, "((double)(1L<<%ld))", l);
@@ -209,7 +209,7 @@ void print_mul_body(FILE *f, long n1, long k, long fn,
 
   fprintf(f, "BB_MUL_CODE%ld \\\n", fn);
 
-  
+
   if (fn > 0) /* Mul1/AddMul1 */
     {
       fprintf(f, "   long i;\\\n");
@@ -256,7 +256,7 @@ void print_mul_body(FILE *f, long n1, long k, long fn,
   mask = ~mask;
   if (half_flag) mask &= (1UL << n) - 1UL;
   mask2 = mask;
-  
+
   if (!short_flag) {
     for (i = 1; i < k; i++)
       {
@@ -296,7 +296,7 @@ void print_mul_body(FILE *f, long n1, long k, long fn,
 
       fprintf(f, "   }\\\n");
 
-      if (fn == 1 || fn == 3) 
+      if (fn == 1 || fn == 3)
         fprintf(f, "   cp[sb] = carry;\\\n");
       else
         fprintf(f, "   cp[sb] ^= carry;\\\n");
@@ -312,7 +312,7 @@ void print_mul_body(FILE *f, long n1, long k, long fn,
 
 
 /*
- * This generates anternative code that runs significantly faster 
+ * This generates anternative code that runs significantly faster
  * on some machines, like a PowerPC (and probably other RISC machines).
  * It makes it easier for the compiler to schedule instrucyions better,
  * and it avoids branches.  It seems like this does not help
@@ -320,7 +320,7 @@ void print_mul_body(FILE *f, long n1, long k, long fn,
  */
 
 
-void print_alt_mul_body(FILE *f, long n1, long k, long fn, 
+void print_alt_mul_body(FILE *f, long n1, long k, long fn,
                         long half_flag, long short_flag)
 {
 
@@ -343,7 +343,7 @@ void print_alt_mul_body(FILE *f, long n1, long k, long fn,
   if (short_flag) fprintf(f, "SHORT_");
 
   fprintf(f, "BB_MUL_CODE%ld \\\n", fn);
-  
+
   if (fn > 0) /* Mul1/AddMul1 */
     {
       fprintf(f, "   long i;\\\n");
@@ -399,17 +399,17 @@ void print_alt_mul_body(FILE *f, long n1, long k, long fn,
       fprintf(f, ";\\\n");
     else
       fprintf(f, "\\\n");
-      
-      
+
+
   }
- 
+
   mask = 0;
   for (i = 0; i < n; i += k)
     mask |= 1UL << i;
   mask = ~mask;
   if (half_flag) mask &= (1UL << n) - 1UL;
   mask2 = mask;
-  
+
   if (!short_flag) {
     for (i = 1; i < k; i++)
       {
@@ -421,15 +421,15 @@ void print_alt_mul_body(FILE *f, long n1, long k, long fn,
 
 	
         if (i == 1)
-          fprintf(f, 
-             "      ^ (((b & 0x%lxUL) >> %ld) & (-(a >> %ld)))", 
+          fprintf(f,
+             "      ^ (((b & 0x%lxUL) >> %ld) & (-(a >> %ld)))",
         	mask2, i, n1-1);
         else {
-          fprintf(f, 
-             "      ^ (((b & 0x%lxUL) >> %ld) & (-((a >> %ld) & 1UL)))",  
+          fprintf(f,
+             "      ^ (((b & 0x%lxUL) >> %ld) & (-((a >> %ld) & 1UL)))",
                   mask2, i, n1-i);
         }
-        if (i == k-1) 
+        if (i == k-1)
            fprintf(f, ";\\\n");
         else
             fprintf(f, "\\\n");
@@ -462,7 +462,7 @@ void print_alt_mul_body(FILE *f, long n1, long k, long fn,
 
       fprintf(f, "   }\\\n");
 
-      if (fn == 1 || fn == 3) 
+      if (fn == 1 || fn == 3)
         fprintf(f, "   cp[sb] = carry;\\\n");
       else
         fprintf(f, "   cp[sb] ^= carry;\\\n");
@@ -500,7 +500,7 @@ void print_alt1_mul_body(FILE *f, long n1, long k, long fn,
 
   fprintf(f, "BB_MUL_CODE%ld \\\n", fn);
 
-  
+
   if (fn > 0) /* Mul1/AddMul1 */
     {
       fprintf(f, "   long i;\\\n");
@@ -548,7 +548,7 @@ void print_alt1_mul_body(FILE *f, long n1, long k, long fn,
   if (half_flag) mask &= (1UL << n) - 1UL;
   mask2 = mask;
 
-  
+
   if (!short_flag) {
     for (i = 1; i < k; i++)
       {
@@ -560,15 +560,15 @@ void print_alt1_mul_body(FILE *f, long n1, long k, long fn,
 
 	
         if (i == 1)
-          fprintf(f, 
-             "   hi ^= (((b & 0x%lxUL) >> %ld) & (-(a >> %ld)))", 
+          fprintf(f,
+             "   hi ^= (((b & 0x%lxUL) >> %ld) & (-(a >> %ld)))",
         	mask2, i, n1-1);
         else {
-          fprintf(f, 
-             "      ^ (((b & 0x%lxUL) >> %ld) & (-((a >> %ld) & 1UL)))",  
+          fprintf(f,
+             "      ^ (((b & 0x%lxUL) >> %ld) & (-((a >> %ld) & 1UL)))",
                   mask2, i, n1-i);
         }
-        if (i == k-1) 
+        if (i == k-1)
            fprintf(f, ";\\\n");
         else
             fprintf(f, "\\\n");
@@ -579,7 +579,7 @@ void print_alt1_mul_body(FILE *f, long n1, long k, long fn,
       }
    }
 
-  
+
 
 
   if (fn > 0) fprintf(f, "   ");
@@ -604,7 +604,7 @@ void print_alt1_mul_body(FILE *f, long n1, long k, long fn,
 
       fprintf(f, "   }\\\n");
 
-      if (fn == 1 || fn == 3) 
+      if (fn == 1 || fn == 3)
         fprintf(f, "   cp[sb] = carry;\\\n");
       else
         fprintf(f, "   cp[sb] ^= carry;\\\n");
@@ -708,11 +708,11 @@ void print_BB_rev_code(FILE *f, long n)
 
    fprintf(f, "\n\n");
 }
-   
 
 
 
-char *yn_vec[2] = { "no", "yes" }; 
+
+char *yn_vec[2] = { "no", "yes" };
 
 
 
@@ -734,7 +734,7 @@ int main()
 
 
    /*
-    * compute bpl =  bits per long 
+    * compute bpl =  bits per long
     */
 
    ulval = val_ulong(1);
@@ -742,7 +742,7 @@ int main()
 
    while (ulval) {
       ulval <<= 1;
-      touch_ulong(&ulval); 
+      touch_ulong(&ulval);
       bpl++;
    }
 
@@ -750,7 +750,7 @@ int main()
 
 
    /*
-    * compute  bpi = bits per int 
+    * compute  bpi = bits per int
     */
 
    uival = val_uint(1);
@@ -824,7 +824,7 @@ int main()
     * The C99 standard, at least, is very precise about the possible
     * representations of unsigned and signed integer types, and so if
     * the following tests pass, we can be sure that the desired
-    * properties hold.  NTL relies implicitly and crucially on 
+    * properties hold.  NTL relies implicitly and crucially on
     * these properties.
     *
     * I know of no machines for which these properties do not hold.
@@ -858,13 +858,13 @@ int main()
     */
 
    if (((long) val_double(1.75)) != 1L) {
-      fprintf(stderr, 
+      fprintf(stderr,
          "BAD NEWS: machine must truncate floating point toward zero.\n");
       return 1;
    }
 
    if (((long) val_double(-1.75)) != -1L) {
-      fprintf(stderr, 
+      fprintf(stderr,
          "BAD NEWS: machine must truncate floating point toward zero.\n");
       return 1;
    }
@@ -927,8 +927,8 @@ int main()
 
    /*
     * Next, we check that the *range* of doubles is sufficiently large.
-    * Specifically, we require that DBL_MAX > 2^{7*max(bpl, dp)} 
-    * and 1/DBL_MIN > 2^{7*max(bpl, dp)}.  
+    * Specifically, we require that DBL_MAX > 2^{7*max(bpl, dp)}
+    * and 1/DBL_MIN > 2^{7*max(bpl, dp)}.
     * On IEEE floating point compliant machines, this
     * will hold, and the following test will pass, if bpl is at most 128, which
     * should be true for the foreseeable future.
@@ -940,14 +940,14 @@ int main()
       return 1;
    }
 
-   
+
 
    /*
     * Next, we check if the machine has wider "in-register" doubles or not.
     * This test almost always yields the correct result --- if not,
     * you will have to set the NTL_EXT_DOUBLE in "mach_desc.h"
     * by hand.
-    * 
+    *
     * The test effectively proves that in-register doubles are wide
     * if dp1 > dp || dr.
     */
@@ -974,7 +974,7 @@ int main()
    if (nbits % 2 != 0) nbits--;
 
 
-   /* 
+   /*
     * We next test if the NTL_SINGLE_MUL option is valid.  This test is
     * inherently DIRTY (i.e., the behavior of the test itself is not well
     * defined according to the standard), but in practice should not cause any
@@ -1005,7 +1005,7 @@ int main()
    fprintf(stderr, "NBITS (maximum) = %ld\n", nbits);
    fprintf(stderr, "single mul ok = %s\n", yn_vec[single_mul_ok != 0]);
    fprintf(stderr, "register double precision = %ld\n", dp1);
-   fprintf(stderr, "double rounding detected = %s\n", yn_vec[dr]);  
+   fprintf(stderr, "double rounding detected = %s\n", yn_vec[dr]);
 
    if (((dp1 > dp) || dr) && AutoFix)
       fprintf(stderr, "-- auto x86 fix\n");
@@ -1013,9 +1013,9 @@ int main()
    if (dp != 53) {
       warnings = 1;
 
-      fprintf(stderr, "\n\nWARNING:\n\n"); 
+      fprintf(stderr, "\n\nWARNING:\n\n");
       fprintf(stderr, "Nonstandard floating point precision.\n");
-      fprintf(stderr, "IEEE standard is 53 bits.\n"); 
+      fprintf(stderr, "IEEE standard is 53 bits.\n");
    }
 
 #if (defined(__sparc__) && !defined(__sparc_v8__) && \
@@ -1026,7 +1026,7 @@ int main()
    fprintf(stderr, "\n\nWARNING:\n\n");
    fprintf(stderr, "If this Sparc is a Sparc-10 or later (so it has\n");
    fprintf(stderr, "a hardware integer multiply instruction) you\n");
-   fprintf(stderr, "should specify the -mv8 option in the makefile\n"); 
+   fprintf(stderr, "should specify the -mv8 option in the makefile\n");
    fprintf(stderr, "to obtain more efficient code.\n");
 
 #endif
@@ -1100,6 +1100,6 @@ int main()
    fclose(f);
 
    fprintf(stderr, "\n\n");
-   
+
    return 0;
 }

@@ -17,7 +17,7 @@ ZZ_pInfoT::ZZ_pInfoT(const ZZ& NewP)
    p = NewP;
    size = p.size();
 
-   ExtendedModulusSize = 2*size + 
+   ExtendedModulusSize = 2*size +
                  (NTL_BITS_PER_LONG + NTL_ZZ_NBITS - 1)/NTL_ZZ_NBITS;
 
    initialized = 0;
@@ -96,9 +96,9 @@ void ZZ_pInfoT::init()
       long tt = rem(qq, q);
 
       mul(M2, p, tt);
-      add(M2, M2, rr); 
+      add(M2, M2, rr);
       div(M2, M2, q);  // = (M/q) rem p
-      
+
 
       div(M1, M, q);
       t = rem(M1, q);
@@ -134,12 +134,12 @@ ZZ_pInfoT::~ZZ_pInfoT()
 }
 
 
-ZZ_pInfoT *ZZ_pInfo = 0; 
+ZZ_pInfoT *ZZ_pInfo = 0;
 
 typedef ZZ_pInfoT *ZZ_pInfoPtr;
 
 
-static 
+static
 void CopyPointer(ZZ_pInfoPtr& dst, ZZ_pInfoPtr src)
 {
    if (src == dst) return;
@@ -147,7 +147,7 @@ void CopyPointer(ZZ_pInfoPtr& dst, ZZ_pInfoPtr src)
    if (dst) {
       dst->ref_count--;
 
-      if (dst->ref_count < 0) 
+      if (dst->ref_count < 0)
          Error("internal error: negative ZZ_pContext ref_count");
 
       if (dst->ref_count == 0) delete dst;
@@ -162,7 +162,7 @@ void CopyPointer(ZZ_pInfoPtr& dst, ZZ_pInfoPtr src)
 
    dst = src;
 }
-   
+
 
 
 void ZZ_p::init(const ZZ& p)
@@ -245,7 +245,7 @@ ZZ_pTemp::~ZZ_pTemp()
 
 ZZ_p& ZZ_pTemp::val() const
 {
-   if (!ZZ_pInfo->temps[pos]) 
+   if (!ZZ_pInfo->temps[pos])
       ZZ_pInfo->temps[pos] = NTL_NEW_OP ZZ_p;
 
    return *(ZZ_pInfo->temps[pos]);
@@ -266,13 +266,13 @@ ZZ_p::ZZ_p()
 {
    _ZZ_p__rep.SetSize(ModulusSize());
 }
-   
 
-ZZ_p::ZZ_p(INIT_VAL_TYPE, const ZZ& a) 
+
+ZZ_p::ZZ_p(INIT_VAL_TYPE, const ZZ& a)
 {
    _ZZ_p__rep.SetSize(ModulusSize());
    conv(*this, a);
-} 
+}
 
 ZZ_p::ZZ_p(INIT_VAL_TYPE, long a)
 {
@@ -297,7 +297,7 @@ void conv(ZZ_p& x, long a)
 
 void div(ZZ_p& x, const ZZ_p& a, const ZZ_p& b)
 {
-   ZZ_pTemp TT; ZZ_p& T = TT.val(); 
+   ZZ_pTemp TT; ZZ_p& T = TT.val();
 
    inv(T, b);
    mul(x, a, T);

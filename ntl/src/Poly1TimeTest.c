@@ -31,7 +31,7 @@ double clean_data(double *t)
       if (i != ix && i != iy) z+= t[i], n++;
    }
 
-   z = z/n;  
+   z = z/n;
 
    return z;
 }
@@ -96,7 +96,7 @@ int main()
    random(f, n);    // f =             "   "
 
    SetCoeff(f, n);  // Sets coefficient of X^n to 1
-   
+
 
    // For doing arithmetic mod f quickly, one must pre-compute
    // some information.

@@ -15,15 +15,15 @@ void xdouble::SetOutputPrecision(long p)
 {
    if (p < 1) p = 1;
 
-   if (NTL_OVERFLOW(p, 1, 0)) 
+   if (NTL_OVERFLOW(p, 1, 0))
       Error("xdouble: output precision too big");
 
    oprec = p;
 }
 
-void xdouble::normalize() 
+void xdouble::normalize()
 {
-   if (x == 0) 
+   if (x == 0)
       e = 0;
    else if (x > 0) {
       while (x < NTL_XD_HBOUND_INV) { x *= NTL_XD_BOUND; e--; }
@@ -40,15 +40,15 @@ void xdouble::normalize()
    if (e <= -NTL_OVFBND)
       Error("xdouble: underflow");
 }
-   
+
 
 
 xdouble to_xdouble(double a)
 {
    if (a == 0 || a == 1 || (a > 0 && a >= NTL_XD_HBOUND_INV && a <= NTL_XD_HBOUND)
        || (a < 0 && a <= -NTL_XD_HBOUND_INV && a >= -NTL_XD_HBOUND)) {
-      
-      return xdouble(a, 0); 
+
+      return xdouble(a, 0);
 
    }
 
@@ -82,12 +82,12 @@ xdouble operator+(const xdouble& a, const xdouble& b)
 {
    xdouble z;
 
-   if (a.x == 0) 
+   if (a.x == 0)
       return b;
 
    if (b.x == 0)
      return a;
-      
+
 
    if (a.e == b.e) {
       z.x = a.x + b.x;
@@ -205,7 +205,7 @@ long sign(const xdouble& z)
    else
       return 1;
 }
-   
+
 
 
 xdouble trunc(const xdouble& a)
@@ -269,7 +269,7 @@ xdouble to_xdouble(const ZZ& a)
 {
    long old_p = RR::precision();
    RR::SetPrecision(NTL_DOUBLE_PRECISION);
-   
+
    static RR t;
    conv(t, a);
 
@@ -332,7 +332,7 @@ xdouble sqrt(const xdouble& a)
 
    return t;
 }
-      
+
 
 void power(xdouble& z, const xdouble& a, const ZZ& e)
 {
@@ -350,7 +350,7 @@ void power(xdouble& z, const xdouble& a, const ZZ& e)
          res = res * b;
    }
 
-   if (sign(e) < 0) 
+   if (sign(e) < 0)
       z = 1/res;
    else
       z = res;
@@ -365,9 +365,9 @@ void power(xdouble& z, const xdouble& a, long e)
    E = e;
    power(z, a, E);
 }
-   
 
-   
+
+
 
 
 void power2(xdouble& z, long e)
@@ -412,7 +412,7 @@ void MulAdd(xdouble& z, const xdouble& a, const xdouble& b, const xdouble& c)
    e = b.e + c.e;
    x = b.x * c.x;
 
-   if (x == 0) { 
+   if (x == 0) {
       z = a;
       return;
    }
@@ -423,7 +423,7 @@ void MulAdd(xdouble& z, const xdouble& a, const xdouble& b, const xdouble& c)
       z.normalize();
       return;
    }
-      
+
 
    if (a.e == e) {
       z.x = a.x + x;
@@ -466,7 +466,7 @@ void MulSub(xdouble& z, const xdouble& a, const xdouble& b, const xdouble& c)
    e = b.e + c.e;
    x = b.x * c.x;
 
-   if (x == 0) { 
+   if (x == 0) {
       z = a;
       return;
    }
@@ -477,7 +477,7 @@ void MulSub(xdouble& z, const xdouble& a, const xdouble& b, const xdouble& c)
       z.normalize();
       return;
    }
-      
+
 
    if (a.e == e) {
       z.x = a.x - x;
@@ -576,7 +576,7 @@ xdouble PowerOf10(const ZZ& e)
       long old_p = RR::precision();
       k = ComputeMax10Power();
       RR::SetPrecision(NTL_DOUBLE_PRECISION);
-      v10k = to_xdouble(power(to_RR(10), k)); 
+      v10k = to_xdouble(power(to_RR(10), k));
       RR::SetPrecision(old_p);
       init = 1;
    }
@@ -668,7 +668,7 @@ xdouble to_xdouble(const char *s)
 
       if (cval >= 0 && cval <= 9) {
          got2 = 1;
-   
+
          while (cval >= 0 && cval <= 9) {
             mul(a, a, 10);
             add(a, a, cval);

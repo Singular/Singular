@@ -10,104 +10,104 @@ NTL_eq_matrix_impl(ZZ,vec_ZZ,vec_vec_ZZ,mat_ZZ)
 
 
 
-void add(mat_ZZ& X, const mat_ZZ& A, const mat_ZZ& B)  
-{  
-   long n = A.NumRows();  
-   long m = A.NumCols();  
-  
-   if (B.NumRows() != n || B.NumCols() != m)   
-      Error("matrix add: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j;  
-   for (i = 1; i <= n; i++)   
-      for (j = 1; j <= m; j++)  
-         add(X(i,j), A(i,j), B(i,j));  
-}  
-  
-void sub(mat_ZZ& X, const mat_ZZ& A, const mat_ZZ& B)  
-{  
-   long n = A.NumRows();  
-   long m = A.NumCols();  
-  
-   if (B.NumRows() != n || B.NumCols() != m)  
-      Error("matrix sub: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j;  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= m; j++)  
-         sub(X(i,j), A(i,j), B(i,j));  
-}  
-  
-void mul_aux(mat_ZZ& X, const mat_ZZ& A, const mat_ZZ& B)  
-{  
-   long n = A.NumRows();  
-   long l = A.NumCols();  
-   long m = B.NumCols();  
-  
-   if (l != B.NumRows())  
-      Error("matrix mul: dimension mismatch");  
-  
-   X.SetDims(n, m);  
-  
-   long i, j, k;  
-   ZZ acc, tmp;  
-  
-   for (i = 1; i <= n; i++) {  
-      for (j = 1; j <= m; j++) {  
-         clear(acc);  
-         for(k = 1; k <= l; k++) {  
-            mul(tmp, A(i,k), B(k,j));  
-            add(acc, acc, tmp);  
-         }  
-         X(i,j) = acc;  
-      }  
-   }  
-}  
-  
-  
-void mul(mat_ZZ& X, const mat_ZZ& A, const mat_ZZ& B)  
-{  
-   if (&X == &A || &X == &B) {  
-      mat_ZZ tmp;  
-      mul_aux(tmp, A, B);  
-      X = tmp;  
-   }  
-   else  
-      mul_aux(X, A, B);  
-}  
-  
-  
+void add(mat_ZZ& X, const mat_ZZ& A, const mat_ZZ& B)
+{
+   long n = A.NumRows();
+   long m = A.NumCols();
+
+   if (B.NumRows() != n || B.NumCols() != m)
+      Error("matrix add: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j;
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= m; j++)
+         add(X(i,j), A(i,j), B(i,j));
+}
+
+void sub(mat_ZZ& X, const mat_ZZ& A, const mat_ZZ& B)
+{
+   long n = A.NumRows();
+   long m = A.NumCols();
+
+   if (B.NumRows() != n || B.NumCols() != m)
+      Error("matrix sub: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j;
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= m; j++)
+         sub(X(i,j), A(i,j), B(i,j));
+}
+
+void mul_aux(mat_ZZ& X, const mat_ZZ& A, const mat_ZZ& B)
+{
+   long n = A.NumRows();
+   long l = A.NumCols();
+   long m = B.NumCols();
+
+   if (l != B.NumRows())
+      Error("matrix mul: dimension mismatch");
+
+   X.SetDims(n, m);
+
+   long i, j, k;
+   ZZ acc, tmp;
+
+   for (i = 1; i <= n; i++) {
+      for (j = 1; j <= m; j++) {
+         clear(acc);
+         for(k = 1; k <= l; k++) {
+            mul(tmp, A(i,k), B(k,j));
+            add(acc, acc, tmp);
+         }
+         X(i,j) = acc;
+      }
+   }
+}
+
+
+void mul(mat_ZZ& X, const mat_ZZ& A, const mat_ZZ& B)
+{
+   if (&X == &A || &X == &B) {
+      mat_ZZ tmp;
+      mul_aux(tmp, A, B);
+      X = tmp;
+   }
+   else
+      mul_aux(X, A, B);
+}
+
+
 static
-void mul_aux(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& b)  
-{  
-   long n = A.NumRows();  
-   long l = A.NumCols();  
-  
-   if (l != b.length())  
-      Error("matrix mul: dimension mismatch");  
-  
-   x.SetLength(n);  
-  
-   long i, k;  
-   ZZ acc, tmp;  
-  
-   for (i = 1; i <= n; i++) {  
-      clear(acc);  
-      for (k = 1; k <= l; k++) {  
-         mul(tmp, A(i,k), b(k));  
-         add(acc, acc, tmp);  
-      }  
-      x(i) = acc;  
-   }  
-}  
-  
-  
-void mul(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& b)  
-{  
+void mul_aux(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& b)
+{
+   long n = A.NumRows();
+   long l = A.NumCols();
+
+   if (l != b.length())
+      Error("matrix mul: dimension mismatch");
+
+   x.SetLength(n);
+
+   long i, k;
+   ZZ acc, tmp;
+
+   for (i = 1; i <= n; i++) {
+      clear(acc);
+      for (k = 1; k <= l; k++) {
+         mul(tmp, A(i,k), b(k));
+         add(acc, acc, tmp);
+      }
+      x(i) = acc;
+   }
+}
+
+
+void mul(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& b)
+{
    if (&b == &x || A.position1(x) != -1) {
       vec_ZZ tmp;
       mul_aux(tmp, A, b);
@@ -115,35 +115,35 @@ void mul(vec_ZZ& x, const mat_ZZ& A, const vec_ZZ& b)
    }
    else
       mul_aux(x, A, b);
-}  
+}
 
 static
-void mul_aux(vec_ZZ& x, const vec_ZZ& a, const mat_ZZ& B)  
-{  
-   long n = B.NumRows();  
-   long l = B.NumCols();  
-  
-   if (n != a.length())  
-      Error("matrix mul: dimension mismatch");  
-  
-   x.SetLength(l);  
-  
-   long i, k;  
-   ZZ acc, tmp;  
-  
-   for (i = 1; i <= l; i++) {  
-      clear(acc);  
-      for (k = 1; k <= n; k++) {  
+void mul_aux(vec_ZZ& x, const vec_ZZ& a, const mat_ZZ& B)
+{
+   long n = B.NumRows();
+   long l = B.NumCols();
+
+   if (n != a.length())
+      Error("matrix mul: dimension mismatch");
+
+   x.SetLength(l);
+
+   long i, k;
+   ZZ acc, tmp;
+
+   for (i = 1; i <= l; i++) {
+      clear(acc);
+      for (k = 1; k <= n; k++) {
          mul(tmp, a(k), B(k,i));
-         add(acc, acc, tmp);  
-      }  
-      x(i) = acc;  
-   }  
-}  
+         add(acc, acc, tmp);
+      }
+      x(i) = acc;
+   }
+}
 
 void mul(vec_ZZ& x, const vec_ZZ& a, const mat_ZZ& B)
 {
-   if (&a == &x) { 
+   if (&a == &x) {
       vec_ZZ tmp;
       mul_aux(tmp, a, B);
       x = tmp;
@@ -152,20 +152,20 @@ void mul(vec_ZZ& x, const vec_ZZ& a, const mat_ZZ& B)
       mul_aux(x, a, B);
 }
 
-     
-  
-void ident(mat_ZZ& X, long n)  
-{  
-   X.SetDims(n, n);  
-   long i, j;  
-  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= n; j++)  
-         if (i == j)  
-            set(X(i, j));  
-         else  
-            clear(X(i, j));  
-} 
+
+
+void ident(mat_ZZ& X, long n)
+{
+   X.SetDims(n, n);
+   long i, j;
+
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= n; j++)
+         if (i == j)
+            set(X(i, j));
+         else
+            clear(X(i, j));
+}
 
 static
 long DetBound(const mat_ZZ& a)
@@ -190,7 +190,7 @@ long DetBound(const mat_ZZ& a)
 
 
 
-   
+
 
 void determinant(ZZ& rres, const mat_ZZ& a, long deterministic)
 {
@@ -370,7 +370,6 @@ long CRT(mat_ZZ& gg, ZZ& a, const mat_zz_p& G)
    long modified = 0;
 
    long h;
-   ZZ ah;
 
    ZZ g;
    long i, j;
@@ -384,23 +383,23 @@ long CRT(mat_ZZ& gg, ZZ& a, const mat_zz_p& G)
          }
          else
             g = gg[i][j];
-      
+
          h = rem(g, p);
          h = SubMod(rep(G[i][j]), h, p);
          h = MulMod(h, a_inv, p);
          if (h > p1)
             h = h - p;
-      
+
          if (h != 0) {
             modified = 1;
-            mul(ah, a, h);
-      
+
             if (!p_odd && g > 0 && (h == p1))
-               sub(g, g, ah);
+               MulSubFrom(g, a, h);
             else
-               add(g, g, ah);
+               MulAddTo(g, a, h);
+
          }
-   
+
          gg[i][j] = g;
       }
    }
@@ -456,7 +455,7 @@ void ExactDiv(mat_ZZ& x, const ZZ& d)
 {
    long n = x.NumRows();
    long m = x.NumCols();
-   
+
    long i, j;
 
    for (i = 0; i < n; i++)
@@ -465,19 +464,19 @@ void ExactDiv(mat_ZZ& x, const ZZ& d)
             Error("inexact division");
 }
 
-void diag(mat_ZZ& X, long n, const ZZ& d_in)  
-{  
+void diag(mat_ZZ& X, long n, const ZZ& d_in)
+{
    ZZ d = d_in;
-   X.SetDims(n, n);  
-   long i, j;  
-  
-   for (i = 1; i <= n; i++)  
-      for (j = 1; j <= n; j++)  
-         if (i == j)  
-            X(i, j) = d;  
-         else  
-            clear(X(i, j));  
-} 
+   X.SetDims(n, n);
+   long i, j;
+
+   for (i = 1; i <= n; i++)
+      for (j = 1; j <= n; j++)
+         if (i == j)
+            X(i, j) = d;
+         else
+            clear(X(i, j));
+}
 
 long IsDiag(const mat_ZZ& A, long n, const ZZ& d)
 {
@@ -506,7 +505,7 @@ void solve(ZZ& d_out, vec_ZZ& x_out,
            long deterministic)
 {
    long n = A.NumRows();
-   
+
    if (A.NumCols() != n)
       Error("solve: nonsquare matrix");
 
@@ -553,21 +552,21 @@ void solve(ZZ& d_out, vec_ZZ& x_out,
                   bound > 1000 && NumBits(d_prod) < 0.25*bound) {
 
             ZZ P;
-   
+
             long plen = 90 + NumBits(max(bound, NumBits(d)));
             GenPrime(P, plen, 90 + 2*NumBits(gp_cnt++));
-   
+
             ZZ_p::init(P);
-   
+
             mat_ZZ_p AA;
             conv(AA, A);
-   
+
             ZZ_p dd;
             determinant(dd, AA);
-   
+
             if (CRT(d, d_prod, rep(dd), P))
                d_instable = 1;
-            else 
+            else
                break;
          }
       }
@@ -583,7 +582,7 @@ void solve(ZZ& d_out, vec_ZZ& x_out,
          vec_zz_p bb, xx;
          conv(bb, b);
 
-         zz_p dd; 
+         zz_p dd;
 
          solve(dd, xx, AA, bb);
 
@@ -626,7 +625,7 @@ void solve(ZZ& d_out, vec_ZZ& x_out,
 void inv(ZZ& d_out, mat_ZZ& x_out, const mat_ZZ& A, long deterministic)
 {
    long n = A.NumRows();
-   
+
    if (A.NumCols() != n)
       Error("solve: nonsquare matrix");
 
@@ -671,21 +670,21 @@ void inv(ZZ& d_out, mat_ZZ& x_out, const mat_ZZ& A, long deterministic)
                   bound > 1000 && NumBits(d_prod) < 0.25*bound) {
 
             ZZ P;
-   
+
             long plen = 90 + NumBits(max(bound, NumBits(d)));
             GenPrime(P, plen, 90 + 2*NumBits(gp_cnt++));
-   
+
             ZZ_p::init(P);
-   
+
             mat_ZZ_p AA;
             conv(AA, A);
-   
+
             ZZ_p dd;
             determinant(dd, AA);
-   
+
             if (CRT(d, d_prod, rep(dd), P))
                d_instable = 1;
-            else 
+            else
                break;
          }
       }
@@ -700,7 +699,7 @@ void inv(ZZ& d_out, mat_ZZ& x_out, const mat_ZZ& A, long deterministic)
       if (!check) {
          mat_zz_p xx;
 
-         zz_p dd; 
+         zz_p dd;
 
          inv(dd, xx, AA);
 
@@ -886,11 +885,11 @@ long MaxBits(const mat_ZZ& A)
 
 
 // Computes an upper bound on the numerators and denominators
-// to the solution x*A = b using Hadamard's bound and Cramer's rule. 
+// to the solution x*A = b using Hadamard's bound and Cramer's rule.
 // If A contains a zero row, then sets both bounds to zero.
 
 static
-void hadamard(ZZ& num_bound, ZZ& den_bound, 
+void hadamard(ZZ& num_bound, ZZ& den_bound,
               const mat_ZZ& A, const vec_ZZ& b)
 {
    long n = A.NumRows();
@@ -949,7 +948,7 @@ void MixedMul(vec_ZZ& x, const vec_zz_p& a, const mat_ZZ& B)
       }
       x(i) = acc;
     }
-} 
+}
 
 static
 void SubDiv(vec_ZZ& e, const vec_ZZ& t, long p)
@@ -996,7 +995,7 @@ void double_MixedMul1(vec_ZZ& x, double *a, double **B, long n)
       }
       conv(x[i], acc);
     }
-} 
+}
 
 
 static
@@ -1032,7 +1031,7 @@ void double_MixedMul2(vec_ZZ& x, double *a, double **B, long n, long limit)
 
       x[i] = acc1;
     }
-} 
+}
 
 
 static
@@ -1049,7 +1048,7 @@ void long_MixedMul1(vec_ZZ& x, long *a, long **B, long n)
       }
       conv(x[i], acc);
     }
-} 
+}
 
 
 static
@@ -1085,7 +1084,7 @@ void long_MixedMul2(vec_ZZ& x, long *a, long **B, long n, long limit)
 
       x[i] = acc1;
     }
-} 
+}
 
 
 void solve1(ZZ& d_out, vec_ZZ& x_out, const mat_ZZ& A, const vec_ZZ& b)
@@ -1140,7 +1139,7 @@ void solve1(ZZ& d_out, vec_ZZ& x_out, const mat_ZZ& A, const vec_ZZ& b)
       }
 
       mul(prod, prod, zz_p::modulus());
-      
+
       if (prod > den_bound) {
          d_out = 0;
          return;
@@ -1293,7 +1292,7 @@ void solve1(ZZ& d_out, vec_ZZ& x_out, const mat_ZZ& A, const vec_ZZ& b)
 
    num.SetLength(n);
    denom.SetLength(n);
- 
+
    d = 1;
    d_mod_prod = 1;
 
@@ -1301,7 +1300,7 @@ void solve1(ZZ& d_out, vec_ZZ& x_out, const mat_ZZ& A, const vec_ZZ& b)
       rem(x[i], x[i], prod);
       MulMod(x[i], x[i], d_mod_prod, prod);
 
-      if (!ReconstructRational(num[i], denom[i], x[i], prod, 
+      if (!ReconstructRational(num[i], denom[i], x[i], prod,
            num_bound, den_bound))
           Error("solve1 internal error: rat recon failed!");
 
@@ -1309,7 +1308,7 @@ void solve1(ZZ& d_out, vec_ZZ& x_out, const mat_ZZ& A, const vec_ZZ& b)
 
       if (i != n-1) {
          if (denom[i] != 1) {
-            div(den_bound, den_bound, denom[i]); 
+            div(den_bound, den_bound, denom[i]);
             mul(bound1, num_bound, den_bound);
             mul(bound1, bound1, 2);
 
@@ -1331,7 +1330,7 @@ void solve1(ZZ& d_out, vec_ZZ& x_out, const mat_ZZ& A, const vec_ZZ& b)
       mul(num[i], num[i], tmp1);
       mul(tmp1, tmp1, denom[i]);
    }
-   
+
    x_out.SetLength(n);
 
    for (i = 0; i < n; i++) {

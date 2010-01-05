@@ -8,7 +8,7 @@
 
 NTL_START_IMPL
 
-static inline 
+static inline
 void CheckFinite(double *p)
 {
    if (!IsFinite(p)) Error("LLL_FP: numbers too big...use LLL_XD");
@@ -20,7 +20,7 @@ static double InnerProduct(double *a, double *b, long n)
    long i;
 
    s = 0;
-   for (i = 1; i <= n; i++) 
+   for (i = 1; i <= n; i++)
       s += a[i]*b[i];
 
    return s;
@@ -53,7 +53,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
 
    if (MU == 0) return;
 
-   if (NumTwos(MU) >= NTL_ZZ_NBITS) 
+   if (NumTwos(MU) >= NTL_ZZ_NBITS)
       k = MakeOdd(MU);
    else
       k = 0;
@@ -63,10 +63,21 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
       long mu1;
       conv(mu1, MU);
 
-      for (i = 1; i <= n; i++) {
-         mul(T, B(i), mu1);
-         if (k > 0) LeftShift(T, T, k);
-         sub(A(i), A(i), T);
+      if (k > 0) {
+
+         for (i = 1; i <= n; i++) {
+            mul(T, B(i), mu1);
+            LeftShift(T, T, k);
+            sub(A(i), A(i), T);
+         }
+
+      }
+      else {
+
+         for (i = 1; i <= n; i++) {
+            MulSubFrom(A(i), B(i), mu1);
+         }
+
       }
    }
    else {
@@ -129,7 +140,7 @@ static void RowTransformFinish(vec_ZZ& A, double *a, long *in_a)
 }
 
 
-static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1, 
+static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
                          double *a, double *b, long *in_a,
                          double& max_a, double max_b, long& in_float)
 // x = x - y*MU
@@ -151,7 +162,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
       }
       else {
          max_a += mu_abs*max_b;
-         if (max_a >= TR_BND) 
+         if (max_a >= TR_BND)
             in_float = 0;
       }
    }
@@ -195,7 +206,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
                conv(A(i), a[i]);
                in_a[i] = 0;
             }
-         
+
             sub(A(i), A(i), B(i));
          }
       }
@@ -214,7 +225,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
                conv(A(i), a[i]);
                in_a[i] = 0;
             }
-         
+
             add(A(i), A(i), B(i));
          }
       }
@@ -224,9 +235,9 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
    if (MU == 0) return;
 
    double b_bnd = fabs(TR_BND/mu) - 1;
-   if (b_bnd < 0) b_bnd = 0; 
+   if (b_bnd < 0) b_bnd = 0;
 
-   if (NumTwos(MU) >= NTL_ZZ_NBITS) 
+   if (NumTwos(MU) >= NTL_ZZ_NBITS)
       k = MakeOdd(MU);
    else
       k = 0;
@@ -252,7 +263,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
          for (i = 1; i <= n; i++) {
             if (in_a[i] && a[i] < TR_BND && a[i] > -TR_BND &&
                 b[i] < b_bnd && b[i] > -b_bnd) {
-   
+
                a[i] -= b[i]*mu;
             }
             else {
@@ -260,8 +271,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1,
                   conv(A(i), a[i]);
                   in_a[i] = 0;
                }
-               mul(T, B(i), mu1);
-               sub(A(i), A(i), T);
+               MulSubFrom(A(i), B(i), mu1);
             }
          }
       }
@@ -307,7 +317,7 @@ static void RowTransform2(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
 
    if (MU == 0) return;
 
-   if (NumTwos(MU) >= NTL_ZZ_NBITS) 
+   if (NumTwos(MU) >= NTL_ZZ_NBITS)
       k = MakeOdd(MU);
    else
       k = 0;
@@ -382,13 +392,13 @@ void ComputeGS(mat_ZZ& B, double **B1, double **mu, double *b,
       for (i = 1; i <= j-1; i++) {
          t1 += mu_j[i]*buf[i];
       }
-  
+
       mu_k[j] = (buf[j] = (s - t1))/c[j];
    }
 
 #if (!NTL_EXT_DOUBLE)
 
-   // Kahan summation 
+   // Kahan summation
 
    double c1;
 
@@ -445,7 +455,7 @@ static void inc_red_fudge()
    red_fudge = red_fudge * 2;
    log_red--;
 
-   
+
    //cerr << "LLL_FP: warning--relaxing reduction (" << log_red << ")\n";
 
    if (log_red < 4)
@@ -466,17 +476,17 @@ static void print_mus(double **mu, long k)
 
 #endif
 
-void ComputeGS(const mat_ZZ& B, mat_RR& B1, 
+void ComputeGS(const mat_ZZ& B, mat_RR& B1,
                mat_RR& mu, vec_RR& b,
                vec_RR& c, long k, const RR& bound, long st,
                vec_RR& buf, const RR& bound2);
 
 
 
-static void RR_GS(mat_ZZ& B, double **B1, double **mu, 
+static void RR_GS(mat_ZZ& B, double **B1, double **mu,
                   double *b, double *c, double *buf, long prec,
                   long rr_st, long k, long m_orig,
-                  mat_RR& rr_B1, mat_RR& rr_mu, 
+                  mat_RR& rr_B1, mat_RR& rr_mu,
                   vec_RR& rr_b, vec_RR& rr_c)
 {
    double tt;
@@ -508,7 +518,7 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
    for (i = rr_st; i <= k; i++)
       InnerProduct(rr_b(i), rr_B1(i), rr_B1(i));
 
-   
+
 
    RR bound;
    power2(bound, 2*long(0.15*RR::precision()));
@@ -534,7 +544,7 @@ static void RR_GS(mat_ZZ& B, double **B1, double **mu,
       conv(b[i], rr_b(i));
       CheckFinite(&b[i]);
    }
-   
+
 
    for (i = rr_st; i <= k; i++) {
       conv(c[i], rr_c(i));
@@ -578,7 +588,7 @@ void ComputeGS(const mat_ZZ& B, mat_RR& mu, vec_RR& c)
    for (i = 1; i <= k; i++)
       InnerProduct(b(i), B1(i), B1(i));
 
-   
+
 
    RR bound;
    power2(bound, 2*long(0.15*RR::precision()));
@@ -597,8 +607,8 @@ void ComputeGS(const mat_ZZ& B, mat_RR& mu, vec_RR& c)
 
 
 static
-long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep, 
-           LLLCheckFct check, double **B1, double **mu, 
+long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
+           LLLCheckFct check, double **B1, double **mu,
            double *b, double *c,
            long m, long init_k, long &quit)
 {
@@ -743,20 +753,20 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
          Fc1 = 0;
          start_over = 0;
-   
+
          for (j = rst-1; j >= 1; j--) {
             t1 = fabs(mu[k][j]);
-            if (t1 > half_plus_fudge) { 
+            if (t1 > half_plus_fudge) {
 
 
                if (!Fc1) {
-                  if (j > trigger_index || 
+                  if (j > trigger_index ||
                       (j == trigger_index && small_trigger)) {
 
                      cnt++;
 
                      if (cnt > thresh) {
-                        if (log_red <= 15) { 
+                        if (log_red <= 15) {
 
                            while (log_red > 10)
                               inc_red_fudge();
@@ -791,17 +801,17 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                   if (k < rr_st) rr_st = k;
                   RowTransformStart(B1[k], in_vec, in_float, n);
                }
-                  
+
 
                mu1 = mu[k][j];
                if (mu1 >= 0)
                   mu1 = ceil(mu1-0.5);
                else
                   mu1 = floor(mu1+0.5);
-   
+
                double *mu_k = mu[k];
                double *mu_j = mu[j];
-   
+
                if (mu1 == 1) {
                   for (i = 1; i <= j-1; i++)
                      mu_k[i] -= mu_j[i];
@@ -814,9 +824,9 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                   for (i = 1; i <= j-1; i++)
                      mu_k[i] -= mu1*mu_j[i];
                }
-   
+
                mu_k[j] -= mu1;
-   
+
                conv(MU, mu1);
 
                RowTransform(B(k), B(j), MU, B1[k], B1[j], in_vec,
@@ -847,7 +857,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
          }
       } while (Fc1 || start_over);
 
-      if (check && (*check)(B(k))) 
+      if (check && (*check)(B(k)))
          quit = 1;
 
       if (b[k] == 0) {
@@ -879,10 +889,10 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
             cc = cc - mu[k][l]*mu[k][l]*c[l];
             l++;
          }
-   
+
          if (l <= k-1 && (l <= deep || k-l <= deep)) {
             // deep insertion at position l
-   
+
             for (i = k; i > l; i--) {
                // swap rows i, i-1
                swap(B(i), B(i-1));
@@ -892,7 +902,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
                t1 = max_b[i]; max_b[i] = max_b[i-1]; max_b[i-1] = t1;
                if (U) swap((*U)(i), (*U)(i-1));
             }
-   
+
             k = l;
             NumSwaps++;
             swap_cnt++;
@@ -935,7 +945,7 @@ long ll_LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
 
 
 static
-long LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep, 
+long LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
            LLLCheckFct check)
 {
    long m = B.NumRows();
@@ -989,7 +999,7 @@ long LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
          CheckFinite(&B1[i][j]);
       }
 
-         
+
    for (i = 1; i <= m; i++) {
       b[i] = InnerProduct(B1[i], B1[i], n);
       CheckFinite(&b[i]);
@@ -1030,9 +1040,9 @@ long LLL_FP(mat_ZZ& B, mat_ZZ* U, double delta, long deep,
    return m;
 }
 
-         
 
-long LLL_FP(mat_ZZ& B, double delta, long deep, LLLCheckFct check, 
+
+long LLL_FP(mat_ZZ& B, double delta, long deep, LLLCheckFct check,
            long verb)
 {
    verbose = verb;
@@ -1044,7 +1054,7 @@ long LLL_FP(mat_ZZ& B, double delta, long deep, LLLCheckFct check,
    return LLL_FP(B, 0, delta, deep, check);
 }
 
-long LLL_FP(mat_ZZ& B, mat_ZZ& U, double delta, long deep, 
+long LLL_FP(mat_ZZ& B, mat_ZZ& U, double delta, long deep,
            LLLCheckFct check, long verb)
 {
    verbose = verb;
@@ -1087,7 +1097,7 @@ void ComputeBKZConstant(long beta, long p)
          x = 0;
          for (j = 1; j <= k; j++)
             x = x + Log(j);
-          
+
          x = x * (1/double(k));
 
          x = exp(x);
@@ -1115,7 +1125,7 @@ void ComputeBKZConstant(long beta, long p)
 
 static vec_double BKZThresh;
 
-static 
+static
 void ComputeBKZThresh(double *c, long beta)
 {
    BKZThresh.SetLength(beta-1);
@@ -1133,16 +1143,16 @@ void ComputeBKZThresh(double *c, long beta)
 }
 
 static
-long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta, 
+long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          long beta, long prune, LLLCheckFct check)
 {
 
-   
+
 
    long m = BB.NumRows();
    long n = BB.NumCols();
    long m_orig = m;
-   
+
    long i, j;
    ZZ MU;
 
@@ -1247,7 +1257,7 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          CheckFinite(&B1[i][j]);
       }
 
-         
+
    for (i = 1; i <= m; i++) {
       b[i] = InnerProduct(B1[i], B1[i], n);
       CheckFinite(&b[i]);
@@ -1283,16 +1293,16 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
    if (!quit && m > 1) {
       if (beta > m) beta = m;
 
-      if (prune > 0) 
+      if (prune > 0)
          ComputeBKZConstant(beta, prune);
 
       z = 0;
       jj = 0;
-   
+
       while (z < m-1) {
          jj++;
          kk = min(jj+beta-1, m);
-   
+
          if (jj == m) {
             jj = 1;
             kk = beta;
@@ -1306,17 +1316,17 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          if (prune > 0)
             ComputeBKZThresh(&c[jj], kk-jj+1);
 
-   
+
          cbar = c[jj];
          utildavec[jj] = uvec[jj] = 1;
-   
+
          yvec[jj] = vvec[jj] = 0;
          Deltavec[jj] = 0;
-   
-   
+
+
          s = t = jj;
          deltavec[jj] = 1;
-   
+
          for (i = jj+1; i <= kk+1; i++) {
             ctilda[i] = uvec[i] = utildavec[i] = yvec[i] = 0;
             Deltavec[i] = 0;
@@ -1325,20 +1335,19 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          }
 
          long enum_cnt = 0;
-   
-         while (t <= kk) {
 
-            ctilda[t] = ctilda[t+1] + 
+         while (t <= kk) {
+            ctilda[t] = ctilda[t+1] +
                (yvec[t]+utildavec[t])*(yvec[t]+utildavec[t])*c[t];
 
             ForceToMem(&ctilda[t]);  // prevents an infinite loop
-   
+
             if (prune > 0 && t > jj) {
                eta = BKZThresh(t-jj);
             }
             else
                eta = 0;
-   
+
             if (ctilda[t] < cbar - eta) {
                if (t > jj) {
                   t--;
@@ -1353,7 +1362,7 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                      t1 = floor(t1+0.5);
                   utildavec[t] = vvec[t] = t1;
                   Deltavec[t] = 0;
-                  if (utildavec[t] > -yvec[t]) 
+                  if (utildavec[t] > -yvec[t])
                      deltavec[t] = -1;
                   else
                      deltavec[t] = 1;
@@ -1375,16 +1384,16 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
          }
 
          NumIterations++;
-   
+
          h = min(kk+1, m);
-   
+
          if ((delta - 8*red_fudge)*c[jj] > cbar) {
 
             clean = 0;
 
             // we treat the case that the new vector is b_s (jj < s <= kk)
             // as a special case that appears to occur most of the time.
-   
+
             s = 0;
             for (i = jj+1; i <= kk; i++) {
                if (uvec[i] != 0) {
@@ -1394,14 +1403,14 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                      s = -1;
                }
             }
-   
+
             if (s == 0) Error("BKZ_FP: internal error");
-   
+
             if (s > 0) {
                // special case
 
                NumTrivial++;
-   
+
                for (i = s; i > jj; i--) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
@@ -1409,9 +1418,9 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                   tp = B1[i-1]; B1[i-1] = B1[i]; B1[i] = tp;
                   t1 = b[i-1]; b[i-1] = b[i]; b[i] = t1;
                }
-   
+
                // cerr << "special case\n";
-               new_m = ll_LLL_FP(B, U, delta, 0, check, 
+               new_m = ll_LLL_FP(B, U, delta, 0, check,
                                 B1, mu, b, c, h, jj, quit);
                if (new_m != h) Error("BKZ_FP: internal error");
                if (quit) break;
@@ -1420,7 +1429,7 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                // the general case
 
                NumNonTrivial++;
-   
+
                for (i = 1; i <= n; i++) conv(B(m+1, i), 0);
 
                if (U) {
@@ -1434,7 +1443,7 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                   RowTransform2(B(m+1), B(i), MU);
                   if (U) RowTransform2((*U)(m+1), (*U)(i), MU);
                }
-      
+
                for (i = m+1; i >= jj+1; i--) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
@@ -1442,26 +1451,26 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                   tp = B1[i-1]; B1[i-1] = B1[i]; B1[i] = tp;
                   t1 = b[i-1]; b[i-1] = b[i]; b[i] = t1;
                }
-      
+
                for (i = 1; i <= n; i++) {
                   conv(B1[jj][i], B(jj, i));
                   CheckFinite(&B1[jj][i]);
                }
-      
+
                b[jj] = InnerProduct(B1[jj], B1[jj], n);
                CheckFinite(&b[jj]);
-      
-               if (b[jj] == 0) Error("BKZ_FP: internal error"); 
-      
+
+               if (b[jj] == 0) Error("BKZ_FP: internal error");
+
                // remove linear dependencies
-   
+
                // cerr << "general case\n";
                new_m = ll_LLL_FP(B, U, delta, 0, 0, B1, mu, b, c, kk+1, jj, quit);
-              
-               if (new_m != kk) Error("BKZ_FP: internal error"); 
+
+               if (new_m != kk) Error("BKZ_FP: internal error");
 
                // remove zero vector
-      
+
                for (i = kk+2; i <= m+1; i++) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
@@ -1469,7 +1478,7 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                   tp = B1[i-1]; B1[i-1] = B1[i]; B1[i] = tp;
                   t1 = b[i-1]; b[i-1] = b[i]; b[i] = t1;
                }
-      
+
                quit = 0;
                if (check) {
                   for (i = 1; i <= kk; i++)
@@ -1480,18 +1489,18 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
                }
 
                if (quit) break;
-   
+
                if (h > kk) {
                   // extend reduced basis
-   
-                  new_m = ll_LLL_FP(B, U, delta, 0, check, 
+
+                  new_m = ll_LLL_FP(B, U, delta, 0, check,
                                    B1, mu, b, c, h, h, quit);
-   
+
                   if (new_m != h) Error("BKZ_FP: internal error");
                   if (quit) break;
                }
             }
-   
+
             z = 0;
          }
          else {
@@ -1501,12 +1510,12 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
             NumNoOps++;
 
             if (!clean) {
-               new_m = 
+               new_m =
                   ll_LLL_FP(B, U, delta, 0, check, B1, mu, b, c, h, h, quit);
                if (new_m != h) Error("BKZ_FP: internal error");
                if (quit) break;
             }
-   
+
             z++;
          }
       }
@@ -1563,7 +1572,7 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ* UU, double delta,
    return m;
 }
 
-long BKZ_FP(mat_ZZ& BB, mat_ZZ& UU, double delta, 
+long BKZ_FP(mat_ZZ& BB, mat_ZZ& UU, double delta,
          long beta, long prune, LLLCheckFct check, long verb)
 {
    verbose = verb;
@@ -1576,7 +1585,7 @@ long BKZ_FP(mat_ZZ& BB, mat_ZZ& UU, double delta,
    return BKZ_FP(BB, &UU, delta, beta, prune, check);
 }
 
-long BKZ_FP(mat_ZZ& BB, double delta, 
+long BKZ_FP(mat_ZZ& BB, double delta,
          long beta, long prune, LLLCheckFct check, long verb)
 {
    verbose = verb;

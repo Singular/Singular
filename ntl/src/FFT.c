@@ -28,7 +28,7 @@ long IsFFTPrime(long n, long& w)
    if (n % 5 == 0) return 0;
 
    if (n % 7 == 0) return 0;
-   
+
    m = n - 1;
    k = 0;
    while ((m & 1) == 0) {
@@ -53,7 +53,7 @@ long IsFFTPrime(long n, long& w)
 
       if (z != 1 || y !=  n-1) return 0;
 
-      if (j == k) 
+      if (j == k)
          break;
    }
 
@@ -64,16 +64,16 @@ long IsFFTPrime(long n, long& w)
    TrialBound = m >> k;
    if (TrialBound > 0) {
       if (!ProbPrime(n, 5)) return 0;
-   
+
       /* we have to do trial division by special numbers */
-   
+
       TrialBound = SqrRoot(TrialBound);
-   
+
       long a, b;
-   
+
       for (a = 1; a <= TrialBound; a++) {
          b = (a << k) + 1;
-         if (n % b == 0) return 0; 
+         if (n % b == 0) return 0;
       }
    }
 
@@ -126,7 +126,7 @@ long CalcMaxRoot(long p)
    if (k > NTL_FFTMaxRoot)
       return NTL_FFTMaxRoot;
    else
-      return k; 
+      return k;
 }
 
 
@@ -145,7 +145,7 @@ void UseFFTPrime(long index)
 
    // tables are allocated in increments of 100
 
-   if (index == 0) { 
+   if (index == 0) {
       FFTPrime = (long *) NTL_MALLOC(100, sizeof(long), 0);
       RootTable = (long **) NTL_MALLOC(100, sizeof(long *), 0);
       RootInvTable = (long **) NTL_MALLOC(100, sizeof(long *), 0);
@@ -154,18 +154,18 @@ void UseFFTPrime(long index)
    }
    else if ((index % 100) == 0) {
       FFTPrime = (long *) NTL_REALLOC(FFTPrime, index+100, sizeof(long), 0);
-      RootTable = (long **) 
+      RootTable = (long **)
                   NTL_REALLOC(RootTable, index+100, sizeof(long *), 0);
-      RootInvTable = (long **) 
+      RootInvTable = (long **)
                      NTL_REALLOC(RootInvTable, index+100, sizeof(long *), 0);
-      TwoInvTable = (long **) 
+      TwoInvTable = (long **)
                     NTL_REALLOC(TwoInvTable, index+100, sizeof(long *), 0);
-      FFTPrimeInv = (double *) 
+      FFTPrimeInv = (double *)
                     NTL_REALLOC(FFTPrimeInv, index+100, sizeof(double), 0);
    }
 
    if (!FFTPrime || !RootTable || !RootInvTable || !TwoInvTable ||
-       !FFTPrimeInv) 
+       !FFTPrimeInv)
       Error("out of space");
 
    FFTPrime[index] = q;
@@ -199,14 +199,14 @@ void UseFFTPrime(long index)
 
    NumFFTPrimes++;
 }
-   
+
 
 static
 long RevInc(long a, long k)
 {
    long j, m;
 
-   j = k; 
+   j = k;
    m = 1L << (k-1);
 
    while (j && (m & a)) {
@@ -271,7 +271,7 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
 
    // assume k > 1
 
-   
+
 
    static long tab_size = 0;
    static long *wtab = 0;
@@ -281,7 +281,7 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
       tab_size = k;
 
       wtab = (long *) NTL_MALLOC(1L << (k-2), sizeof(long), 0);
-      wqinvtab = (mulmod_precon_t *) 
+      wqinvtab = (mulmod_precon_t *)
                  NTL_MALLOC(1L << (k-2), sizeof(mulmod_precon_t), 0);
       if (!wtab || !wqinvtab) Error("out of space");
    }
@@ -289,7 +289,7 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
       tab_size = k;
 
       wtab = (long *) NTL_REALLOC(wtab, 1L << (k-2), sizeof(long), 0);
-      wqinvtab = (mulmod_precon_t *) 
+      wqinvtab = (mulmod_precon_t *)
                  NTL_REALLOC(wqinvtab, 1L << (k-2), sizeof(mulmod_precon_t), 0);
       if (!wtab || !wqinvtab) Error("out of space");
    }
@@ -319,8 +319,8 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
       A[i+1] = SubMod(u, t, q);
    }
 
-   
-  
+
+
    for (s = 2; s < k; s++) {
       m = 1L << s;
       m_half = 1L << (s-1);
@@ -340,7 +340,7 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
 
       for (i = 0; i < n; i+= m) {
 
-          
+
          t = A[i + m_half];
          u = A[i];
          t1 = MulModPrecon(A[i + 1+ m_half], w, q, wqinv);
@@ -401,7 +401,7 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
    for (j = 2; j < m_half; j += 2) {
       t = MulModPrecon(A[j + m_half], wtab[j >> 1], q, wqinvtab[j >> 1]);
       u = A[j];
-      t1 = MulModPrecon(A[j + 1+ m_half], wtab[j >> 1], q, 
+      t1 = MulModPrecon(A[j + 1+ m_half], wtab[j >> 1], q,
                         wqinvtab[j >> 1]);
       t1 = MulModPrecon(t1, w, q, wqinv);
       u1 = A[j + 1];
@@ -410,7 +410,7 @@ void FFT(long* A, const long* a, long k, long q, const long* root)
       A[j + m_half] = SubMod(u, t, q);
       A[j + 1] = AddMod(u1, t1, q);
       A[j + 1 + m_half] = SubMod(u1, t1, q);
-     
+
    }
 }
 

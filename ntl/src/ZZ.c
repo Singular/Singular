@@ -80,7 +80,7 @@ static void InitZZIO()
 }
 
 // The class _ZZ_local_stack should be defined in an empty namespace,
-// but since I don't want to rely on namespaces, we just give it a funny 
+// but since I don't want to rely on namespaces, we just give it a funny
 // name to avoid accidental name clashes.
 
 struct _ZZ_local_stack {
@@ -140,7 +140,7 @@ long GCD(long a, long b)
       v = b;
       do {
          t = u % v;
-         u = v; 
+         u = v;
          v = t;
       } while (v != 0);
 
@@ -150,7 +150,7 @@ long GCD(long a, long b)
    return x;
 }
 
-         
+
 
 void XGCD(long& d, long& s, long& t, long a, long b)
 {
@@ -197,7 +197,7 @@ void XGCD(long& d, long& s, long& t, long a, long b)
    s = u1;
    t = v1;
 }
-   
+
 
 long InvMod(long a, long n)
 {
@@ -279,7 +279,7 @@ long ProbPrime(long n, long NumTests)
       if (x == 0) continue;
       z = PowerMod(x, m, n);
       if (z == 1) continue;
-   
+
       j = 0;
       do {
          y = z;
@@ -391,7 +391,7 @@ long ProbPrime(const ZZ& n, long NumTrials)
       } while (W == 0);
       // W == 0 is not a useful candidate for a witness!
 
-      if (MillerWitness(n, W)) 
+      if (MillerWitness(n, W))
          return 0;
    }
 
@@ -440,7 +440,7 @@ long NextPrime(long m, long NumTrials)
 {
    long x;
 
-   if (m <= 2) 
+   if (m <= 2)
       return 2;
 
    x = m;
@@ -458,7 +458,7 @@ long NextPrime(long m, long NumTrials)
 
 long NextPowerOfTwo(long m)
 {
-   long k; 
+   long k;
    unsigned long n, um;
 
    if (m < 0) return 0;
@@ -483,7 +483,7 @@ long NextPowerOfTwo(long m)
 long NumBits(long a)
 {
    unsigned long aa;
-   if (a < 0) 
+   if (a < 0)
       aa = - ((unsigned long) a);
    else
       aa = a;
@@ -506,7 +506,7 @@ long bit(long a, long k)
    else
       aa = a;
 
-   if (k < 0 || k >= NTL_BITS_PER_LONG) 
+   if (k < 0 || k >= NTL_BITS_PER_LONG)
       return 0;
    else
       return long((aa >> k) & 1);
@@ -584,7 +584,7 @@ long divide(const ZZ& a, long b)
    long r = rem(a,  b);
    return (r == 0);
 }
-   
+
 
 
 long RandomPrime_long(long l, long NumTrials)
@@ -678,11 +678,11 @@ void PrimeSeq::shift(long newshift)
 
    if (pshift == 0) {
       movesieve = lowsieve;
-   } 
+   }
    else {
       if (!movesieve_mem) {
          movesieve_mem = (char *) NTL_MALLOC(NTL_PRIME_BND, 1, 0);
-         if (!movesieve_mem) 
+         if (!movesieve_mem)
             Error("out of memory in PrimeSeq");
       }
 
@@ -723,7 +723,7 @@ void PrimeSeq::start()
 
    for (i = 0; i < NTL_PRIME_BND; i++)
       p[i] = 1;
-      
+
    jstep = 1;
    jstart = -1;
    ibnd = (SqrRoot(2 * NTL_PRIME_BND + 1) - 3) / 2;
@@ -752,7 +752,7 @@ void PrimeSeq::reset(long b)
    shift(((b-3) / (2*NTL_PRIME_BND))* (2*NTL_PRIME_BND));
    pindex = (b - pshift - 3)/2 - 1;
 }
- 
+
 long Jacobi(const ZZ& aa, const ZZ& nn)
 {
    ZZ a, n;
@@ -821,7 +821,7 @@ void SqrRootMod(ZZ& x, const ZZ& aa, const ZZ& nn)
       a = aa;
       InvMod(a_inv, a, n);
 
-      if (h == 2) 
+      if (h == 2)
          b = 2;
       else {
          do {
@@ -831,7 +831,7 @@ void SqrRootMod(ZZ& x, const ZZ& aa, const ZZ& nn)
 
 
       PowerMod(c, b, m, n);
-      
+
       add(m1, m, 1);
       RightShift(m1, m1, 1);
       PowerMod(r, a, m1, n);
@@ -844,11 +844,11 @@ void SqrRootMod(ZZ& x, const ZZ& aa, const ZZ& nn)
          if (!IsOne(d))
             MulMod(r, r, c, n);
          SqrMod(c, c, n);
-      } 
+      }
 
       x = r;
       return;
-   } 
+   }
 
 
 
@@ -895,7 +895,7 @@ void SqrRootMod(ZZ& x, const ZZ& aa, const ZZ& nn)
       mul(t4, t1, ma);
       add(t4, t4, t2);
       rem(v, t4, n);
-      
+
       if (bit(e, i)) {
          MulMod(t1, u, t, n);
          AddMod(t1, t1, v, n);
@@ -917,7 +917,7 @@ void SqrRootMod(ZZ& x, const ZZ& aa, const ZZ& nn)
 //
 // This function takes as input g, a, G, p,
 // such that a > 0, 0 <= G < p, and gcd(a, p) = 1.
-// It computes a' = a*p and g' such that 
+// It computes a' = a*p and g' such that
 //   * g' = g (mod a);
 //   * g' = G (mod p);
 //   * -a'/2 < g' <= a'/2.
@@ -960,7 +960,7 @@ long CRT(ZZ& gg, ZZ& a, long G, long p)
 
    long modified = 0;
 
-   ZZ g;
+   static ZZ g;
 
    if (!CRTInRange(gg, a)) {
       modified = 1;
@@ -989,13 +989,11 @@ long CRT(ZZ& gg, ZZ& a, long G, long p)
 
    if (h != 0) {
       modified = 1;
-      ZZ ah;
-      mul(ah, a, h);
 
       if (!(p & 1) && g > 0 && (h == p1))
-         sub(g, g, ah);
+         MulSubFrom(g, a, h);
       else
-         add(g, g, ah);
+         MulAddTo(g, a, h);
    }
 
    mul(a, a, p);
@@ -1076,7 +1074,7 @@ void power2(ZZ& x, long e)
    LeftShift(x, x, e);
 }
 
-   
+
 void conv(ZZ& x, const char *s)
 {
    long c;
@@ -1199,12 +1197,12 @@ long power_long(long a, long e)
 
 //  RANDOM NUMBER GENERATION
 
-// Idea for this PRNG.  Iteratively hash seed using md5 
+// Idea for this PRNG.  Iteratively hash seed using md5
 // to get 256 bytes to initialize arc4.
 // Then use arc4 to get a pseudo-random byte stream.
 
 // I've taken care that the pseudo-random numbers generated by
-// the routines RandomBnd, RandomBits, and RandomLen 
+// the routines RandomBnd, RandomBits, and RandomLen
 // are completely platform independent.
 
 // I make use of the md5 compression function,
@@ -1260,7 +1258,7 @@ long power_long(long a, long e)
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
 #define G(x, y, z) (((x) & (z)) | ((y) & (~z)))
 #define H(x, y, z) ((x) ^ (y) ^ (z))
-#define I(x, y, z) (TRUNC32((y) ^ ((x) | (~z)))) 
+#define I(x, y, z) (TRUNC32((y) ^ ((x) | (~z))))
 
 /* ROTATE_LEFT rotates x left n bits */
 #define ROTATE_LEFT(x, n) (TRUNC32(((x) << (n)) | ((x) >> (32-(n)))))
@@ -1425,7 +1423,7 @@ void words_from_bytes(unsigned long *txtl, unsigned char *txtc, long n)
    }
 }
 
-static 
+static
 void bytes_from_words(unsigned char *txtc, unsigned long *txtl, long n)
 {
    long i;
@@ -1448,7 +1446,7 @@ static
 void MD5_compress1(unsigned long *buf, unsigned char *in, long n)
 {
    unsigned long txtl[16];
-   unsigned char txtc[64]; 
+   unsigned char txtc[64];
    long i, j, k;
 
    if (n < 0) n = 0;
@@ -1468,12 +1466,12 @@ void MD5_compress1(unsigned long *buf, unsigned char *in, long n)
 }
 
 
-// the "cipherpunk" version of arc4 
+// the "cipherpunk" version of arc4
 
 struct _ZZ_arc4_key
-{      
-    unsigned char state[256];       
-    unsigned char x;        
+{
+    unsigned char state[256];
+    unsigned char x;
     unsigned char y;
 };
 
@@ -1481,64 +1479,64 @@ struct _ZZ_arc4_key
 static inline
 void swap_byte(unsigned char *a, unsigned char *b)
 {
-    unsigned char swapByte; 
-    
-    swapByte = *a; 
-    *a = *b;      
+    unsigned char swapByte;
+
+    swapByte = *a;
+    *a = *b;
     *b = swapByte;
 }
 
 static
-void prepare_key(unsigned char *key_data_ptr, 
+void prepare_key(unsigned char *key_data_ptr,
                  long key_data_len, _ZZ_arc4_key *key)
 {
     unsigned char index1;
     unsigned char index2;
     unsigned char* state;
-    long counter;     
-    
-    state = &key->state[0];         
-    for(counter = 0; counter < 256; counter++)              
-       state[counter] = counter;               
-    key->x = 0;     
-    key->y = 0;     
-    index1 = 0;     
-    index2 = 0;             
-    for(counter = 0; counter < 256; counter++)      
-    {               
-         index2 = (key_data_ptr[index1] + state[counter] + index2) & 255;                
-         swap_byte(&state[counter], &state[index2]);            
+    long counter;
 
-         index1 = (index1 + 1) % key_data_len;  
-    }       
+    state = &key->state[0];
+    for(counter = 0; counter < 256; counter++)
+       state[counter] = counter;
+    key->x = 0;
+    key->y = 0;
+    index1 = 0;
+    index2 = 0;
+    for(counter = 0; counter < 256; counter++)
+    {
+         index2 = (key_data_ptr[index1] + state[counter] + index2) & 255;
+         swap_byte(&state[counter], &state[index2]);
+
+         index1 = (index1 + 1) % key_data_len;
+    }
 }
 
 
 
 static
 void arc4(unsigned char *buffer_ptr, long buffer_len, _ZZ_arc4_key *key)
-{ 
+{
     unsigned char x;
     unsigned char y;
     unsigned char* state;
     unsigned char xorIndex;
-    long counter;              
-    
-    x = key->x;     
-    y = key->y;     
-    
-    state = &key->state[0];         
-    for(counter = 0; counter < buffer_len; counter ++)      
-    {               
+    long counter;
+
+    x = key->x;
+    y = key->y;
+
+    state = &key->state[0];
+    for(counter = 0; counter < buffer_len; counter ++)
+    {
          x = (x + 1) & 255;
          y = (state[x] + y) & 255;
-         swap_byte(&state[x], &state[y]);                        
-              
+         swap_byte(&state[x], &state[y]);
+
          xorIndex = (state[x] + state[y]) & 255;
-              
-         buffer_ptr[counter] = state[xorIndex];         
-     }               
-     key->x = x;     
+
+         buffer_ptr[counter] = state[xorIndex];
+     }
+     key->x = x;
      key->y = y;
 }
 
@@ -1548,9 +1546,9 @@ static long ran_initialized = 0;
 static _ZZ_arc4_key ran_key;
 
 static unsigned long default_md5_tab[16] = {
-744663023UL, 1011602954UL, 3163087192UL, 3383838527UL, 
-3305324122UL, 3197458079UL, 2266495600UL, 2760303563UL, 
-346234297UL, 1919920720UL, 1896169861UL, 2192176675UL, 
+744663023UL, 1011602954UL, 3163087192UL, 3383838527UL,
+3305324122UL, 3197458079UL, 2266495600UL, 2760303563UL,
+346234297UL, 1919920720UL, 1896169861UL, 2192176675UL,
 2027150322UL, 2090160759UL, 2134858730UL, 1131796244UL
 };
 
@@ -1560,7 +1558,7 @@ static
 void build_arc4_tab(unsigned char *seed_bytes, const ZZ& s)
 {
    long nb = NumBytes(s);
-   
+
    unsigned char *txt;
 
    typedef unsigned char u_char;
@@ -1605,7 +1603,7 @@ void SetSeed(const ZZ& s)
    ran_initialized = 1;
 }
 
-static 
+static
 void ran_bytes(unsigned char *bytes, long n)
 {
    if (!ran_initialized) SetSeed(ZZ::zero());
@@ -1633,7 +1631,7 @@ unsigned long RandomWord()
 long RandomBits_long(long l)
 {
    if (l <= 0) return 0;
-   if (l >= NTL_BITS_PER_LONG) 
+   if (l >= NTL_BITS_PER_LONG)
       Error("RandomBits: length too big");
 
    unsigned char buf[NTL_BITS_PER_LONG/8];
@@ -1649,13 +1647,13 @@ long RandomBits_long(long l)
       res = res | buf[i];
    }
 
-   return long(res & ((1UL << l)-1UL)); 
+   return long(res & ((1UL << l)-1UL));
 }
 
 unsigned long RandomBits_ulong(long l)
 {
    if (l <= 0) return 0;
-   if (l > NTL_BITS_PER_LONG) 
+   if (l > NTL_BITS_PER_LONG)
       Error("RandomBits: length too big");
 
    unsigned char buf[NTL_BITS_PER_LONG/8];
@@ -1681,10 +1679,10 @@ long RandomLen_long(long l)
 {
    if (l <= 0) return 0;
    if (l == 1) return 1;
-   if (l >= NTL_BITS_PER_LONG) 
+   if (l >= NTL_BITS_PER_LONG)
       Error("RandomLen: length too big");
 
-   return RandomBits_long(l-1) + (1L << (l-1)); 
+   return RandomBits_long(l-1) + (1L << (l-1));
 }
 
 
@@ -1782,7 +1780,7 @@ long RandomBnd(long bnd)
 
    long k = NumBits(bnd);
 
-   if (((bnd - 1) & bnd) == 0) 
+   if (((bnd - 1) & bnd) == 0)
       return RandomBits_long(k-1);
 
    long l = k + RandomBndExcess;
@@ -1800,7 +1798,7 @@ long RandomBnd(long bnd)
    do {
       t = RandomBits_long(l);
       r = t % bnd;
-   } while (t + bnd - r > (1L << l)); 
+   } while (t + bnd - r > (1L << l));
 
    return r;
 }
@@ -1817,8 +1815,8 @@ double Log2(double x)
    return log(x)/log2;
 }
 
-// Define p(k,t) to be the conditional probability that a random, odd, k-bit 
-// number is composite, given that it passes t iterations of the 
+// Define p(k,t) to be the conditional probability that a random, odd, k-bit
+// number is composite, given that it passes t iterations of the
 // Miller-Rabin test.
 // This routine returns 0 or 1, and if it returns 1 then
 // p(k,t) <= 2^{-n}.
@@ -1826,7 +1824,7 @@ double Log2(double x)
 // it uses floating point arithmetic, but is coded in such a way
 // that its results should be correct, assuming that the log function
 // is computed with reasonable precision.
-// 
+//
 // It is assumed that k >= 3 and t >= 1; if this does not hold,
 // then 0 is returned.
 
@@ -1866,7 +1864,7 @@ long ErrBoundTest(long kk, long tt, long nn)
       if ( ((log2_3 + log2_7 + log2_k + n)*fudge <= log2_20 + 5*t)  &&
            ((log2_3 + (15.0/4.0)*log2_k + n)*fudge <= log2_7 + k/2 + 2*t) &&
            ((2*log2_3 + 2 + log2_k + n)*fudge <= k/4 + 3*t) )
-         return 4; 
+         return 4;
    }
 
    if (4*t >= k && k >= 21) {
@@ -1963,7 +1961,7 @@ void GenGermainPrime(ZZ& n, long k, long err)
 
    ZZ n1;
 
-   
+
    PrimeSeq s;
 
    ZZ iter;
@@ -2012,12 +2010,12 @@ void GenGermainPrime(ZZ& n, long k, long err)
       if (MillerWitness(n1, two)) continue;
 
       // now do t M-R iterations...just to make sure
- 
+
       // First compute the appropriate number of M-R iterations, t
-      // The following computes t such that 
+      // The following computes t such that
       //       p(k,t)*8/k <= 2^{-err}/(5*iter^{1.25})
       // which suffices to get an overall error probability of 2^{-err}.
-      // Note that this method has the advantage of not requiring 
+      // Note that this method has the advantage of not requiring
       // any assumptions on the density of Germain primes.
 
       long err1 = max(1, err + 7 + (5*NumBits(iter) + 3)/4 - NumBits(k));

@@ -17,7 +17,7 @@
    /* Fast test to determine if allocation is necessary */
 
 
-static 
+static
 void zhalt(char *c)
 {
    fprintf(stderr,"fatal error:\n   %s\nexit...\n",c);
@@ -62,13 +62,13 @@ static long gspace_size = 0;
 static void alloc_gspace(long n)
 {
    if (n <= gspace_size) return;
-   
+
    if (n <= gspace_size*1.1)
       n = ((long) (gspace_size*1.1)) + 10;
 
    if (gspace_data)
-      gspace_data = 
-         (mp_limb_t *) NTL_REALLOC(gspace_data, n, sizeof(mp_limb_t), 0);   
+      gspace_data =
+         (mp_limb_t *) NTL_REALLOC(gspace_data, n, sizeof(mp_limb_t), 0);
    else
       gspace_data = (mp_limb_t *) NTL_MALLOC(n, sizeof(mp_limb_t), 0);
 
@@ -79,7 +79,7 @@ static void alloc_gspace(long n)
 
 
 #define NTL_GSPACE(n) \
-{ long _n = (n);  if (_n > gspace_size) alloc_gspace(_n); } 
+{ long _n = (n);  if (_n > gspace_size) alloc_gspace(_n); }
 
 
 static mpz_t gt_1, gt_2, gt_3, gt_4, gt_5;
@@ -166,8 +166,8 @@ void mpz_to_lip(long **x, mpz_t y)
    sx = G_TO_L(gsy);
 
    xp = *x;
-   if (MustAlloc(xp, sx)) { 
-      _ntl_zsetlength(x, sx); 
+   if (MustAlloc(xp, sx)) {
+      _ntl_zsetlength(x, sx);
       xp = *x;
    }
 
@@ -175,7 +175,7 @@ void mpz_to_lip(long **x, mpz_t y)
 
    while (xp[sx] == 0) sx--;
    if (neg) sx = -sx;
-   xp[0] = sx; 
+   xp[0] = sx;
 }
 
 
@@ -198,7 +198,7 @@ void _ntl_gmp_powermod(long **x, long *a, long *e, long *n)
    mpz_powm(gt_1, gt_2, gt_3, gt_4);
 
    /* This fixes a bug in GMP 3.0.1 */
-   if (mpz_cmp(gt_1, gt_4) >= 0) 
+   if (mpz_cmp(gt_1, gt_4) >= 0)
       mpz_sub(gt_1, gt_1, gt_4);
 
    if (neg) {
@@ -306,14 +306,14 @@ int _ntl_gmp_hack = 0;
    NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (d)) + ((t)+(a)); \
    (a) = ((long)(_pp)) & NTL_RADIXM; \
    (t) = (long) (_pp >> NTL_NBITS); \
-} 
+}
 
 
 #define zxmulp(a, b, d, t) { \
    NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (d)) + (t); \
    (a) = ((long)(_pp)) & NTL_RADIXM; \
    (t) = (long) (_pp >> NTL_NBITS); \
-} 
+}
 
 #define zaddmulpsq(a,b,t) { \
    NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (b)) + (a); \
@@ -334,14 +334,14 @@ int _ntl_gmp_hack = 0;
    NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (d)) + ((t)+(a)); \
    (a) = (long) (_pp & NTL_RADIXM); \
    (t) = (long) (_pp >> NTL_NBITS); \
-} 
+}
 
 
 #define zxmulp(a, b, d, t) { \
    NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (d)) + (t); \
    (a) = (long) (_pp & NTL_RADIXM); \
    (t) = (long) (_pp >> NTL_NBITS); \
-} 
+}
 
 #define zaddmulpsq(a,b,t) { \
    NTL_LL_TYPE _pp = ((NTL_LL_TYPE) (b)) * ((NTL_LL_TYPE) (b)) + (a); \
@@ -354,7 +354,7 @@ int _ntl_gmp_hack = 0;
 
 
 #elif (defined(NTL_AVOID_FLOAT))
-   
+
 
 #define zaddmulp(  a,  b,  d,  t) { \
         unsigned long _b1 = b & NTL_RADIXROOTM; \
@@ -412,7 +412,7 @@ int _ntl_gmp_hack = 0;
 
 
 /*
- * The macros CARRY_TYPE and CARRY_CONV are only used in the submul 
+ * The macros CARRY_TYPE and CARRY_CONV are only used in the submul
  * logic.
  */
 
@@ -821,7 +821,7 @@ int _ntl_gmp_hack = 0;
 
 #endif
 /* end of arithmemtic-right-shift if-then else */
-   
+
 #else
 /*  NTL_BITS_PER_LONG > NTL_NBITS + 2, and certain optimizations can be
     made.  Useful on 64-bit machines.  */
@@ -1197,34 +1197,34 @@ int _ntl_gmp_hack = 0;
 
 static
 void zaddmulone(long *lama, long *lamb)
-{ 
-   long lami; 
-   long lams = 0; 
- 
-   lams = 0; 
-   for (lami = (*lamb++); lami > 0; lami--) { 
-      lams += (*lama + *lamb++); 
-      *lama++ = lams & NTL_RADIXM; 
-      lams >>= NTL_NBITS; 
-   } 
-   *lama += lams; 
+{
+   long lami;
+   long lams = 0;
+
+   lams = 0;
+   for (lami = (*lamb++); lami > 0; lami--) {
+      lams += (*lama + *lamb++);
+      *lama++ = lams & NTL_RADIXM;
+      lams >>= NTL_NBITS;
+   }
+   *lama += lams;
 }
 
 #if (NTL_ARITH_RIGHT_SHIFT && !defined(NTL_CLEAN_INT))
 
 static
 void zsubmulone(long *lama, long *lamb)
-{ 
-   long lami; 
-   long lams = 0; 
- 
-   lams = 0; 
-   for (lami = (*lamb++); lami > 0; lami--) { 
-      lams += (*lama - *lamb++); 
-      *lama++ = lams & NTL_RADIXM; 
-      lams >>= NTL_NBITS; 
-   } 
-   *lama += lams; 
+{
+   long lami;
+   long lams = 0;
+
+   lams = 0;
+   for (lami = (*lamb++); lami > 0; lami--) {
+      lams += (*lama - *lamb++);
+      *lama++ = lams & NTL_RADIXM;
+      lams >>= NTL_NBITS;
+   }
+   *lama += lams;
 }
 
 
@@ -1233,24 +1233,24 @@ void zsubmulone(long *lama, long *lamb)
 
 static
 void zsubmulone(long *lama, long *lamb)
-{ 
-   long lami; 
-   long lams = 0; 
- 
-   lams = 0; 
-   for (lami = (*lamb++); lami > 0; lami--) { 
-      lams = *lama - *lamb++ - lams; 
-      *lama++ = lams & NTL_RADIXM; 
+{
+   long lami;
+   long lams = 0;
+
+   lams = 0;
+   for (lami = (*lamb++); lami > 0; lami--) {
+      lams = *lama - *lamb++ - lams;
+      *lama++ = lams & NTL_RADIXM;
       lams = (lams < 0);
-   } 
-   *lama -= lams; 
+   }
+   *lama -= lams;
 }
 
 #endif
 
 
 /*
- * definitions of zaddmul, zsxmul, zaddmulsq for the various 
+ * definitions of zaddmul, zsxmul, zaddmulsq for the various
  * long integer implementation options.
  */
 
@@ -1258,9 +1258,9 @@ void zsubmulone(long *lama, long *lamb)
 #if (defined(NTL_SINGLE_MUL))
 
 static
-void zaddmul(long ams, long *ama, long *amb) 
-{ 
-   long carry = 0; 
+void zaddmul(long ams, long *ama, long *amb)
+{
+   long carry = 0;
    long i = (*amb++);
    double dams = (double) ams;
    double xx;
@@ -1269,7 +1269,7 @@ void zaddmul(long ams, long *ama, long *amb)
    unsigned long hi_wd, hi;
 
    xx  =  ((double) (*amb++))*dams + DENORMALIZE;
-   for (; i > 1; i--) { 
+   for (; i > 1; i--) {
       yy =  ((double) (*amb++))*dams +DENORMALIZE;
       NTL_FetchHiLo(hi_wd, lo_wd, xx);
       lo = lo_wd & 0x3FFFFFF;
@@ -1277,9 +1277,9 @@ void zaddmul(long ams, long *ama, long *amb)
       lo = lo + (*ama) + carry;
       *ama = lo & 0x3FFFFFF;
       carry = hi + (lo >> 26);
-      ama++; 
+      ama++;
       xx = yy;
-   } 
+   }
 
    NTL_FetchHiLo(hi_wd, lo_wd, xx);
    lo = lo_wd & 0x3FFFFFF;
@@ -1287,14 +1287,14 @@ void zaddmul(long ams, long *ama, long *amb)
    lo = lo + (*ama) + carry;
    *ama = lo & 0x3FFFFFF;
    carry = hi + (lo >> 26);
-   ama++; 
-   *ama += carry; 
+   ama++;
+   *ama += carry;
 }
 
 static
-void zsxmul(long ams, long *ama, long *amb) 
-{ 
-   long carry = 0; 
+void zsxmul(long ams, long *ama, long *amb)
+{
+   long carry = 0;
    long i = (*amb++);
    double dams = (double) ams;
    double xx;
@@ -1303,7 +1303,7 @@ void zsxmul(long ams, long *ama, long *amb)
    unsigned long hi_wd, hi;
 
    xx  =  ((double) (*amb++))*dams + DENORMALIZE;
-   for (; i > 1; i--) { 
+   for (; i > 1; i--) {
       yy =  ((double) (*amb++))*dams +DENORMALIZE;
       NTL_FetchHiLo(hi_wd, lo_wd, xx);
       lo = lo_wd & 0x3FFFFFF;
@@ -1311,9 +1311,9 @@ void zsxmul(long ams, long *ama, long *amb)
       lo = lo + carry;
       *ama = lo & 0x3FFFFFF;
       carry = hi + (lo >> 26);
-      ama++; 
+      ama++;
       xx = yy;
-   } 
+   }
 
    NTL_FetchHiLo(hi_wd, lo_wd, xx);
    lo = lo_wd & 0x3FFFFFF;
@@ -1321,14 +1321,14 @@ void zsxmul(long ams, long *ama, long *amb)
    lo = lo + carry;
    *ama = lo & 0x3FFFFFF;
    carry = hi + (lo >> 26);
-   ama++; 
-   *ama = carry; 
+   ama++;
+   *ama = carry;
 }
 
 static
-void zaddmulsq(long ams, long *ama, long *amb) 
-{ 
-   long carry = 0; 
+void zaddmulsq(long ams, long *ama, long *amb)
+{
+   long carry = 0;
    long i = ams;
    double dams = (double) (*amb++);
    double xx;
@@ -1337,7 +1337,7 @@ void zaddmulsq(long ams, long *ama, long *amb)
    unsigned long hi, hi_wd;
 
    xx =  ((double) (*amb++))*dams + DENORMALIZE;
-   for (; i > 1; i--) { 
+   for (; i > 1; i--) {
       yy =  ((double) (*amb++))*dams + DENORMALIZE;
       NTL_FetchHiLo(hi_wd, lo_wd, xx);
       lo = lo_wd & 0x3FFFFFF;
@@ -1345,9 +1345,9 @@ void zaddmulsq(long ams, long *ama, long *amb)
       lo = lo + (*ama) + carry;
       *ama = lo & 0x3FFFFFF;
       carry = hi + (lo >> 26);
-      ama++; 
+      ama++;
       xx = yy;
-   } 
+   }
    if (i==1) {
       NTL_FetchHiLo(hi_wd, lo_wd, xx);
       lo = lo_wd & 0x3FFFFFF;
@@ -1355,9 +1355,9 @@ void zaddmulsq(long ams, long *ama, long *amb)
       lo = lo + (*ama) + carry;
       *ama = lo & 0x3FFFFFF;
       carry = hi + (lo >> 26);
-      ama++; 
+      ama++;
    }
-   *ama += carry; 
+   *ama += carry;
 }
 
 #elif (defined(NTL_AVOID_FLOAT) || defined(NTL_LONG_LONG))
@@ -1414,55 +1414,55 @@ void zaddmulsq(long lsqi, long *lsqa, long *lsqb)
 
 static
 void zaddmul(long lams, long *lama, long *lamb)
-{ 
-   long lami = (*lamb++)-1; 
-   long lamcarry = 0; 
+{
+   long lami = (*lamb++)-1;
+   long lamcarry = 0;
    zam_decl;
 
    zam_init(*lamb, lams);
    lamb++;
 
- 
-   for (; lami > 0; lami--) { 
+
+   for (; lami > 0; lami--) {
       zam_loop(*lama, lamcarry, *lamb);
-      lama++; 
-      lamb++; 
-   } 
+      lama++;
+      lamb++;
+   }
    zam_finish(*lama, lamcarry);
    lama++;
-   *lama += lamcarry; 
+   *lama += lamcarry;
 }
 
 
 
 static
 void zsxmul(long lams, long *lama, long *lamb)
-{ 
-   long lami = (*lamb++)-1; 
-   long lamcarry = 0; 
+{
+   long lami = (*lamb++)-1;
+   long lamcarry = 0;
    zam_decl;
 
    zam_init(*lamb, lams);
    lamb++;
 
- 
-   for (; lami > 0; lami--) { 
+
+   for (; lami > 0; lami--) {
       zsx_loop(*lama, lamcarry, *lamb);
-      lama++; 
-      lamb++; 
-   } 
+      lama++;
+      lamb++;
+   }
    zsx_finish(*lama, lamcarry);
    lama++;
-   *lama = lamcarry; 
+   *lama = lamcarry;
 }
 
 
 
 static
 void zaddmulsq(long lsqi, long *lsqa, long *lsqb)
-{ 
-   long lsqs; 
-   long lsqcarry; 
+{
+   long lsqs;
+   long lsqcarry;
    zam_decl
 
    if (lsqi <= 0) return;
@@ -1470,18 +1470,18 @@ void zaddmulsq(long lsqi, long *lsqa, long *lsqb)
    lsqs = *lsqb;
    lsqcarry = 0;
 
-   lsqb++; 
+   lsqb++;
    zam_init(*lsqb, lsqs);
    lsqb++;
    lsqi--;
-   for (; lsqi > 0; lsqi--) { 
+   for (; lsqi > 0; lsqi--) {
       zam_loop(*lsqa, lsqcarry, *lsqb);
-      lsqa++; 
-      lsqb++; 
-   } 
+      lsqa++;
+      lsqb++;
+   }
    zam_finish(*lsqa, lsqcarry);
    lsqa++;
-   *lsqa += lsqcarry; 
+   *lsqa += lsqcarry;
 }
 
 
@@ -1505,9 +1505,9 @@ void zaddmulsq(long lsqi, long *lsqa, long *lsqb)
 #if (NTL_ARITH_RIGHT_SHIFT)
 
 static
-void zsubmul(long ams, long *ama, long *amb) 
-{ 
-   long carry = 0; 
+void zsubmul(long ams, long *ama, long *amb)
+{
+   long carry = 0;
    long i = (*amb++);
    double dams = (double) ams;
    double xx;
@@ -1516,7 +1516,7 @@ void zsubmul(long ams, long *ama, long *amb)
    unsigned long hi_wd, hi;
 
    xx  =  ((double) (*amb++))*dams + DENORMALIZE;
-   for (; i > 1; i--) { 
+   for (; i > 1; i--) {
       yy =  ((double) (*amb++))*dams +DENORMALIZE;
       NTL_FetchHiLo(hi_wd, lo_wd, xx);
       lo = lo_wd & 0x3FFFFFF;
@@ -1524,9 +1524,9 @@ void zsubmul(long ams, long *ama, long *amb)
       lo = (*ama) + carry - lo;
       *ama = lo & 0x3FFFFFF;
       carry = (((long)lo) >> 26) - hi;
-      ama++; 
+      ama++;
       xx = yy;
-   } 
+   }
 
    NTL_FetchHiLo(hi_wd, lo_wd, xx);
    lo = lo_wd & 0x3FFFFFF;
@@ -1534,16 +1534,16 @@ void zsubmul(long ams, long *ama, long *amb)
    lo = (*ama) + carry - lo;
    *ama = lo & 0x3FFFFFF;
    carry = (((long)lo) >> 26) - hi;
-   ama++; 
-   *ama += carry; 
+   ama++;
+   *ama += carry;
 }
 
 #else
 
 static
-void zsubmul(long ams, long *ama, long *amb) 
-{ 
-   long carry = 0; 
+void zsubmul(long ams, long *ama, long *amb)
+{
+   long carry = 0;
    long i = (*amb++);
    double dams = (double) ams;
    double xx;
@@ -1552,7 +1552,7 @@ void zsubmul(long ams, long *ama, long *amb)
    unsigned long hi_wd, hi;
 
    xx  =  ((double) (*amb++))*dams + DENORMALIZE;
-   for (; i > 1; i--) { 
+   for (; i > 1; i--) {
       yy =  ((double) (*amb++))*dams +DENORMALIZE;
       NTL_FetchHiLo(hi_wd, lo_wd, xx);
       lo = lo_wd & 0x3FFFFFF;
@@ -1560,9 +1560,9 @@ void zsubmul(long ams, long *ama, long *amb)
       lo = (*ama) + carry - lo;
       *ama = lo & 0x3FFFFFF;
       carry = ((lo + (1L << 27)) >> 26) - hi - 2;
-      ama++; 
+      ama++;
       xx = yy;
-   } 
+   }
 
    NTL_FetchHiLo(hi_wd, lo_wd, xx);
    lo = lo_wd & 0x3FFFFFF;
@@ -1570,8 +1570,8 @@ void zsubmul(long ams, long *ama, long *amb)
    lo = (*ama) + carry - lo;
    *ama = lo & 0x3FFFFFF;
    carry = ((lo + (1L << 27)) >> 26) - hi - 2;
-   ama++; 
-   *ama += carry; 
+   ama++;
+   *ama += carry;
 }
 
 #endif
@@ -1604,10 +1604,10 @@ zsubmul(
 
 /*
  * NOTE: the implementation of zaddmulp for the NTL_LONG_LONG option
- * will work on most machines even when the single-precision 
+ * will work on most machines even when the single-precision
  * multiplicand is negative;  however, the C language standard does
  * not guarantee correct behaviour in this case, which is why the above
- * implementation is used when NTL_CLEAN_INT is set. 
+ * implementation is used when NTL_CLEAN_INT is set.
  */
 
 static
@@ -1633,23 +1633,23 @@ void zsubmul(long lams, long *lama, long *lamb)
 
 static
 void zsubmul(long lams, long *lama, long *lamb)
-{ 
-   long lami = (*lamb++)-1; 
-   CARRY_TYPE lamcarry = 0; 
+{
+   long lami = (*lamb++)-1;
+   CARRY_TYPE lamcarry = 0;
    zam_decl;
 
    zam_init(*lamb, lams);
    lamb++;
 
- 
-   for (; lami > 0; lami--) { 
+
+   for (; lami > 0; lami--) {
       zam_subloop(*lama, lamcarry, *lamb);
-      lama++; 
-      lamb++; 
-   } 
+      lama++;
+      lamb++;
+   }
    zam_subfinish(*lama, lamcarry);
    lama++;
-   *lama += CARRY_CONV(lamcarry); 
+   *lama += CARRY_CONV(lamcarry);
 }
 
 #endif
@@ -1830,7 +1830,7 @@ void _ntl_zsetlength(_ntl_verylong *v, long len)
       oldlen = oldlen >> 1;
 
       if (fixed) {
-         if (len > oldlen) 
+         if (len > oldlen)
             zhalt("internal error: can't grow this _ntl_verylong");
          else
             return;
@@ -1845,14 +1845,14 @@ void _ntl_zsetlength(_ntl_verylong *v, long len)
          len = oldlen;
 
       /* round up to multiple of MIN_SETL */
-      len = ((len+(MIN_SETL-1))/MIN_SETL)*MIN_SETL; 
+      len = ((len+(MIN_SETL-1))/MIN_SETL)*MIN_SETL;
 
       /* test len again */
       if (NTL_OVERFLOW(len, NTL_NBITS, 0))
          zhalt("size too big in _ntl_zsetlength");
 
       x[-1] = len << 1;
-      if (!(x = (_ntl_verylong)NTL_REALLOC(&(x[-1]), 
+      if (!(x = (_ntl_verylong)NTL_REALLOC(&(x[-1]),
                   len, sizeof(long), 2*sizeof(long)))) {
          zhalt("reallocation failed in _ntl_zsetlength");
       }
@@ -1866,7 +1866,7 @@ void _ntl_zsetlength(_ntl_verylong *v, long len)
          zhalt("size too big in _ntl_zsetlength");
 
 
-      if (!(x = (_ntl_verylong)NTL_MALLOC(len, 
+      if (!(x = (_ntl_verylong)NTL_MALLOC(len,
                   sizeof(long), 2*sizeof(long)))) {
          zhalt("allocation failed in _ntl_zsetlength");
       }
@@ -1921,7 +1921,7 @@ long _ntl_zround_correction(_ntl_verylong a, long k, long residual)
       /* bit is 1...we have to see if lower bits are all 0
          in order to implement "round to even" */
 
-      if (a[bl] & (wh - 1)) 
+      if (a[bl] & (wh - 1))
          direction = 1;
       else {
          i = bl - 1;
@@ -1937,7 +1937,7 @@ long _ntl_zround_correction(_ntl_verylong a, long k, long residual)
       if (direction == 0 && residual != 0) {
          if (residual == sgn)
             direction = 1;
-         else 
+         else
             direction = -1;
       }
 
@@ -2085,7 +2085,7 @@ void _ntl_zdoubtoz(double a, _ntl_verylong *xx)
       a = a*NTL_FRADIX_INV;
       sz++;
    }
-         
+
    x = *xx;
    if (MustAlloc(x, sz)) {
       _ntl_zsetlength(&x, sz);
@@ -2447,8 +2447,8 @@ _ntl_zadd(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
 
       if (MustAlloc(c, maxab+1)) {
          _ntl_zsetlength(&c, maxab + 1);
-         if (a_alias) a = c; 
-         if (b_alias) b = c; 
+         if (a_alias) a = c;
+         if (b_alias) b = c;
          *cc = c;
       }
 
@@ -2555,7 +2555,7 @@ _ntl_zsub(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
       if (!carry) {
          long *aa = a + sa;
          long *bb = b + sa;
-         
+
          i = sa;
          while (i && !(carry = (*aa - *bb))) {
             aa--; bb--; i--;
@@ -2618,7 +2618,7 @@ _ntl_zsub(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
          }
       }
       else {
-         while (sa > 1 && *pc == 0) { sa--; pc--; } 
+         while (sa > 1 && *pc == 0) { sa--; pc--; }
       }
 
       if (anegative) sa = -sa;
@@ -2786,7 +2786,7 @@ void _ntl_zsubpos(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
       }
    }
    else {
-      while (sa > 1 && *pc == 0) { sa--; pc--; } 
+      while (sa > 1 && *pc == 0) { sa--; pc--; }
    }
 
    *c = sa;
@@ -2806,7 +2806,7 @@ static long max_kmem = 0;
 #if (defined(NTL_SINGLE_MUL))
 #define KARX (18)
 #else
-#define KARX (16) 
+#define KARX (16)
 #endif
 
 /* Auxilliary routines for Karatsuba */
@@ -2928,8 +2928,8 @@ void kar_fix(long *c, long *T, long hsa)
       *c = t & NTL_RADIXM;
    }
 }
-      
-   
+
+
 
 static
 void kar_mul(long *c, long *a, long *b, long *stk)
@@ -2952,7 +2952,7 @@ void kar_mul(long *c, long *a, long *b, long *stk)
          pc++;
          *pc = 0;
       }
-   
+
       pc = c;
       pb = b;
       for (i = sb; i; i--) {
@@ -2984,7 +2984,7 @@ void kar_mul(long *c, long *a, long *b, long *stk)
          /* compute T2 = b_lo + b_hi */
 
          kar_fold(T2, b, hsa);
-         
+
          /* recursively compute T3 = T1 * T2 */
 
          kar_mul(T3, T1, T2, stk);
@@ -3025,7 +3025,7 @@ void kar_mul(long *c, long *a, long *b, long *stk)
          /* degenerate case */
 
          long *T;
-         
+
          T = stk;  stk += sb + hsa + 1;
 
          if (stk-kmem > max_kmem) zhalt("internal error: kmem overflow");
@@ -3062,7 +3062,7 @@ void kar_mul(long *c, long *a, long *b, long *stk)
 #if (defined(NTL_SINGLE_MUL))
 #define KARSX (36)
 #else
-#define KARSX (32) 
+#define KARSX (32)
 #endif
 
 static
@@ -3308,14 +3308,14 @@ void _ntl_zmul(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
          if (bneg) *b = -sb;
 
          return;
-         
+
       }
 
 
 #ifdef NTL_GMP_HACK
 
       if (_ntl_gmp_hack && sa >= NTL_GMP_MUL_CROSS && sb >= NTL_GMP_MUL_CROSS) {
-         long gsa = L_TO_G(sa); 
+         long gsa = L_TO_G(sa);
          long gsb = L_TO_G(sb);
 
          mp_limb_t *a_p, *b_p, *c_p, *end_p;
@@ -3327,7 +3327,7 @@ void _ntl_zmul(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
          end_p = c_p + (gsa + gsb);
 
          lip_to_gmp(a+1, a_p, sa);
-         lip_to_gmp(b+1, b_p, sb); 
+         lip_to_gmp(b+1, b_p, sb);
 
          if (!a_p[gsa-1]) gsa--;
          if (!b_p[gsb-1]) gsb--;
@@ -3341,7 +3341,7 @@ void _ntl_zmul(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
 
          gmp_to_lip(c+1, c_p, sc);
 
-         if (!c[sc]) sc--; 
+         if (!c[sc]) sc--;
          if (aneg != bneg) sc = -sc;
          c[0] = sc;
          if (aneg) *a = - *a;
@@ -3363,9 +3363,9 @@ void _ntl_zmul(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
             pc++;
             *pc = 0;
          }
-   
+
          pc = c;
-   
+
          if (*a >= *b) {
             long *pb = b;
             for (i = *pb; i; i--) {
@@ -3377,7 +3377,7 @@ void _ntl_zmul(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
          else {
             long *pa = a;
             for (i = *pa; i; i--) {
-               pa++; 
+               pa++;
                pc++;
                zaddmul(*pa, pc, b);
             }
@@ -3407,7 +3407,7 @@ void _ntl_zmul(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *cc)
          } while (n >= KARX);
 
          if (sp > max_kmem) {
-            if (max_kmem == 0) 
+            if (max_kmem == 0)
                kmem = (long *) NTL_MALLOC(sp, sizeof(long), 0);
             else
                kmem = (long *) NTL_REALLOC(kmem, sp, sizeof(long), 0);
@@ -3511,7 +3511,7 @@ void _ntl_zsq(_ntl_verylong a, _ntl_verylong *cc)
 #ifdef NTL_GMP_HACK
 
       if (_ntl_gmp_hack && sa >= NTL_GMP_SQR_CROSS) {
-         long gsa = L_TO_G(sa); 
+         long gsa = L_TO_G(sa);
 
          mp_limb_t *a_p, *c_p, *end_p;;
 
@@ -3530,7 +3530,7 @@ void _ntl_zsq(_ntl_verylong a, _ntl_verylong *cc)
 
          gmp_to_lip(c+1, c_p, sc);
 
-         if (!c[sc]) sc--; 
+         if (!c[sc]) sc--;
          c[0] = sc;
          if (aneg) *a = - *a;
          return;
@@ -3588,7 +3588,7 @@ void _ntl_zsq(_ntl_verylong a, _ntl_verylong *cc)
       } while (n >= KARSX);
 
       if (sp > max_kmem) {
-         if (max_kmem == 0) 
+         if (max_kmem == 0)
             kmem = (long *) NTL_MALLOC(sp, sizeof(long), 0);
          else
             kmem = (long *) NTL_REALLOC(kmem, sp, sizeof(long), 0);
@@ -3626,7 +3626,7 @@ long _ntl_zsdiv(_ntl_verylong a, long d, _ntl_verylong *bb)
       _ntl_zrshift(a, 1, bb);
       if (fix) _ntl_zsadd(*bb, -1, bb);
       return is_odd;
-   } 
+   }
 
 
    if ((sa = a[0]) < 0)
@@ -3791,10 +3791,10 @@ void _ntl_zmultirem(_ntl_verylong a, long n, long* dd, long *rr)
 void _ntl_zmultirem2(_ntl_verylong a, long n, long* dd, double **ttbl, long *rr)
 
 {
-   long d; 
+   long d;
    double *tbl;
    long ac0, ac1, ac2;
-   long *ap; 
+   long *ap;
    double *tp;
    long sa, i, j, k;
    unsigned long pc0, pc1, lo_wd, hi_wd;
@@ -3830,7 +3830,7 @@ void _ntl_zmultirem2(_ntl_verylong a, long n, long* dd, double **ttbl, long *rr)
 
          xx =  ((double) (*ap++))* (*tp++) + DENORMALIZE;
          for (; j > 1; j--) {
-            yy =  ((double) (*ap++))*(*tp++) 
+            yy =  ((double) (*ap++))*(*tp++)
                   + DENORMALIZE;
             NTL_FetchHiLo(hi_wd, lo_wd, xx);
             pc0 +=  lo_wd & 0x3FFFFFF;
@@ -3901,7 +3901,7 @@ void _ntl_zmultirem3(_ntl_verylong a, long n, long* dd, long **ttbl, long *rr)
    }
 
    sa = a[0];
- 
+
    for (i = 0; i < n; i++) {
       d = dd[i];
       tbl = ttbl[i];
@@ -3934,7 +3934,7 @@ void _ntl_zmultirem3(_ntl_verylong a, long n, long* dd, long **ttbl, long *rr)
 
       ac0 = (long) (acc & ( (((NTL_LL_TYPE) 1) << (NTL_NBITS)) - ((NTL_LL_TYPE) 1) ));
       ac1 = (long) (acc >> NTL_NBITS);
-      
+
 
       carry = 0;
       dinv = ((double) 1)/((double) d);
@@ -3964,7 +3964,7 @@ void _ntl_zmultirem3(_ntl_verylong a, long n, long* dd, long **ttbl, long *rr)
    }
 
    sa = a[0];
- 
+
    for (i = 0; i < n; i++) {
       d = dd[i];
       tbl = ttbl[i];
@@ -3974,7 +3974,7 @@ void _ntl_zmultirem3(_ntl_verylong a, long n, long* dd, long **ttbl, long *rr)
       ap = &a[2];
       tp = &tbl[1];
       k = sa-1;
-      
+
       while (k) {
          zxmulp(t, *ap, *tp, ac0);
          ac1 += ac0;
@@ -4112,7 +4112,7 @@ void _ntl_zdiv(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *qq, _ntl_verylon
 
    _ntl_zsetlength(&q, sq);
    _ntl_zsetlength(&r, sa+1);
- 
+
    _ntl_zcopy(a, &r);
    rp = &r[sa+1];
    *rp = 0;
@@ -4120,12 +4120,12 @@ void _ntl_zdiv(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *qq, _ntl_verylon
    r[0] = 0; /* this streamlines the last evaluation of aux */
 
    btopinv = b[sb]*NTL_FRADIX + b[sb-1];
-   if (sb > 2) 
+   if (sb > 2)
       btopinv = NTL_FRADIX / (btopinv*NTL_FRADIX + b[sb-2]);
    else
       btopinv = 1.0 / btopinv;
 
-   
+
    aux = btopinv*(rp[-1]*NTL_FRADIX + rp[-2]);
    if (aux >= NTL_FRADIX)
       aux = NTL_FRADIX-1;
@@ -4269,7 +4269,7 @@ _ntl_zmod(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *rr)
 #endif
 
    _ntl_zsetlength(&r, sa+1);
- 
+
    _ntl_zcopy(a, &r);
    rp = &r[sa+1];
    *rp = 0;
@@ -4277,12 +4277,12 @@ _ntl_zmod(_ntl_verylong a, _ntl_verylong b, _ntl_verylong *rr)
    r[0] = 0; /* this streamlines the last evaluation of aux */
 
    btopinv = b[sb]*NTL_FRADIX + b[sb-1];
-   if (sb > 2) 
+   if (sb > 2)
       btopinv = NTL_FRADIX / (btopinv*NTL_FRADIX + b[sb-2]);
    else
       btopinv = 1.0 / btopinv;
 
-   
+
    aux = btopinv*(rp[-1]*NTL_FRADIX + rp[-2]);
    if (aux >= NTL_FRADIX)
       aux = NTL_FRADIX-1;
@@ -4380,7 +4380,7 @@ _ntl_zquickmod(_ntl_verylong *rr, _ntl_verylong b)
 
    if (sq <= 0) {
       return;
-   } 
+   }
 
 #ifdef NTL_GMP_HACK
    if (_ntl_gmp_hack && sb >= NTL_GMP_QREM_CROSS && sq >= NTL_GMP_QREM_CROSS) {
@@ -4396,19 +4396,19 @@ _ntl_zquickmod(_ntl_verylong *rr, _ntl_verylong b)
 
    _ntl_zsetlength(rr, sa+1);
    r = *rr;
- 
+
    rp = &r[sa+1];
    *rp = 0;
 
    r[0] = 0; /* this streamlines the last evaluation of aux */
 
    btopinv = b[sb]*NTL_FRADIX + b[sb-1];
-   if (sb > 2) 
+   if (sb > 2)
       btopinv = NTL_FRADIX / (btopinv*NTL_FRADIX + b[sb-2]);
    else
       btopinv = 1.0 / btopinv;
 
-   
+
    aux = btopinv*(rp[-1]*NTL_FRADIX + rp[-2]);
    if (aux >= NTL_FRADIX)
       aux = NTL_FRADIX-1;
@@ -4490,9 +4490,9 @@ _ntl_zsubmod(
 	if ((cmp=_ntl_zcompare(a, b)) < 0) {
 		_ntl_zadd(n, a, &mem);
 		_ntl_zsubpos(mem, b, c);
-	} else if (!cmp) 
+	} else if (!cmp)
 		_ntl_zzero(c);
-	else 
+	else
 		_ntl_zsubpos(a, b, c);
 }
 
@@ -4556,7 +4556,7 @@ _ntl_zinvmod(
 }
 
 
-static long 
+static long
 zxxeucl(
    _ntl_verylong ain,
    _ntl_verylong nin,
@@ -4669,7 +4669,7 @@ zxxeucl(
          try21 = 0;
          try22 = 1;
          parity = 1;
-         fast = 1; 
+         fast = 1;
          while (fast > 0)
          {
             parity = 1 - parity;
@@ -4755,7 +4755,7 @@ zxxeucl(
 
    if ((a[0] == 1) && (a[1] == 1))
       e = 0;
-   else 
+   else
       e = 1;
 
    p = &u[0];
@@ -4768,7 +4768,7 @@ zxxeucl(
    return (e);
 }
 
-long 
+long
 _ntl_zinv(
 	_ntl_verylong ain,
 	_ntl_verylong nin,
@@ -4813,7 +4813,7 @@ _ntl_zinv(
 
 		if (u && u[0] == 1 && u[1] == 1) {
 
-			/* 
+			/*
 			 * We make sure v is in range 0..n-1,
 			 * just in case GMP is sloppy.
 		         */
@@ -4881,7 +4881,7 @@ _ntl_zexteucl(
 #ifdef NTL_GMP_HACK
 #if (__GNU_MP_VERSION >= 3)
 /* versions of gmp prior to version 3 have really bad xgcd */
-   if (_ntl_gmp_hack && 
+   if (_ntl_gmp_hack &&
        a[0] >= NTL_GMP_XGCD_CROSS && b[0] >= NTL_GMP_XGCD_CROSS) {
 
       static _ntl_verylong xa1 = 0, xb1 = 0, d1 = 0, b_red = 0;
@@ -4889,7 +4889,7 @@ _ntl_zexteucl(
 
       GT_INIT
 
-      
+
 
       lip_to_mpz(aa, gt_1);
       lip_to_mpz(bb, gt_2);
@@ -4912,7 +4912,7 @@ _ntl_zexteucl(
             _ntl_zsadd(tmp1, 1, &tmp1);
          }
          _ntl_zmul(tmp1, a, &tmp2);
-         if (anegative != bnegative) 
+         if (anegative != bnegative)
             _ntl_zsub(xb1, tmp2, &xb1);
          else
             _ntl_zadd(xb1, tmp2, &xb1);
@@ -4928,7 +4928,7 @@ _ntl_zexteucl(
             _ntl_zsadd(tmp1, 1, &tmp1);
          }
          _ntl_zmul(tmp1, b, &tmp2);
-         if (anegative != bnegative) 
+         if (anegative != bnegative)
             _ntl_zsub(xa1, tmp2, &xa1);
          else
             _ntl_zadd(xa1, tmp2, &xa1);
@@ -4973,7 +4973,7 @@ done:
  */
 
 
-long 
+long
 _ntl_zxxratrecon(
    _ntl_verylong ain,
    _ntl_verylong nin,
@@ -5047,7 +5047,7 @@ _ntl_zxxratrecon(
    if (_ntl_zsign(ain) < 0 || _ntl_zcompare(ain, nin) >= 0)
       zhalt("rational reconstruction: bad residue");
 
-      
+
    e = nin[0];
    _ntl_zsetlength(&a, e);
    _ntl_zsetlength(&n, e);
@@ -5119,7 +5119,7 @@ _ntl_zxxratrecon(
          try21 = 0;
          try22 = 1;
          parity = 1;
-         fast = 1; 
+         fast = 1;
          while (fast > 0)
          {
             parity = 1 - parity;
@@ -5211,7 +5211,7 @@ _ntl_zxxratrecon(
       w[0] = sa;
 
       if (n[0] <= snum && _ntl_zcompare(n, num_bound) <= 0) break;
-      
+
       fast = 0;
       sa = a[0];
       sn = n[0];
@@ -5249,7 +5249,7 @@ _ntl_zxxratrecon(
          }
       }
 
-      if (fast) 
+      if (fast)
       {
          if (ilo != 0) {
             if (ilo == 1) {
@@ -5329,10 +5329,10 @@ long OptWinSize(long n)
    return k;
 }
 
-      
+
 
 static
-void _ntl_zsppowermod(long a, _ntl_verylong e, _ntl_verylong n, 
+void _ntl_zsppowermod(long a, _ntl_verylong e, _ntl_verylong n,
                       _ntl_verylong *x)
 {
    _ntl_verylong res;
@@ -5364,7 +5364,7 @@ void _ntl_zsppowermod(long a, _ntl_verylong e, _ntl_verylong n,
 
 
 static
-void _ntl_ztwopowermod( _ntl_verylong e, _ntl_verylong n, 
+void _ntl_ztwopowermod( _ntl_verylong e, _ntl_verylong n,
                       _ntl_verylong *x)
 {
    _ntl_verylong res;
@@ -5407,8 +5407,8 @@ void _ntl_zpowermod(_ntl_verylong g, _ntl_verylong e, _ntl_verylong F,
    _ntl_verylong res, *v, t;
    long n, i, k, val, cnt, m;
 
-   if (_ntl_zsign(g) < 0 || _ntl_zcompare(g, F) >= 0 || 
-       _ntl_zscompare(F, 1) <= 0) 
+   if (_ntl_zsign(g) < 0 || _ntl_zcompare(g, F) >= 0 ||
+       _ntl_zscompare(F, 1) <= 0)
       zhalt("PowerMod: bad args");
 
 #ifdef NTL_GMP_HACK
@@ -5493,10 +5493,10 @@ void _ntl_zpowermod(_ntl_verylong g, _ntl_verylong e, _ntl_verylong F,
    v = (_ntl_verylong *) NTL_MALLOC(1L << (k-1), sizeof(_ntl_verylong), 0);
    if (!v) zhalt("out of memory");
    for (i = 0; i < (1L << (k-1)); i++)
-      v[i] = 0; 
+      v[i] = 0;
 
    _ntl_zcopy(g, &v[0]);
- 
+
    if (k > 1) {
       t = 0;
       _ntl_zsqmod(g, F, &t);
@@ -5510,7 +5510,7 @@ void _ntl_zpowermod(_ntl_verylong g, _ntl_verylong e, _ntl_verylong F,
 
    val = 0;
    for (i = n-1; i >= 0; i--) {
-      val = (val << 1) | _ntl_zbit(e, i); 
+      val = (val << 1) | _ntl_zbit(e, i);
       if (val == 0)
          _ntl_zsqmod(res, F, &res);
       else if (val >= (1L << (k-1)) || i == 0) {
@@ -5721,7 +5721,7 @@ _ntl_z2mul(
 }
 
 
-long 
+long
 _ntl_z2div(
 	_ntl_verylong n,
 	_ntl_verylong *rres
@@ -5809,8 +5809,8 @@ _ntl_zlshift(
 
 	if (k < 0)
 	{
-		if (k < -NTL_MAX_LONG) 
-			_ntl_zzero(rres); 
+		if (k < -NTL_MAX_LONG)
+			_ntl_zzero(rres);
 		else
 			_ntl_zrshift(n, -k, rres);
 		return;
@@ -5912,7 +5912,7 @@ _ntl_zrshift(
 	if ((sn = n[0]) < 0)
 		sn = -sn;
 
-	if ((big >= sn) || 
+	if ((big >= sn) ||
             ((big == sn - 1) && small && (!(n[sn] >> small))))
         /* The microsoft optimizer generates bad code without
            the above test for small != 0 */
@@ -5946,7 +5946,7 @@ _ntl_zrshift(
 }
 
 
-long 
+long
 _ntl_zmakeodd(
 	_ntl_verylong *nn
 	)
@@ -5971,7 +5971,7 @@ _ntl_zmakeodd(
 }
 
 
-long 
+long
 _ntl_znumtwos(
 	_ntl_verylong n
 	)
@@ -5994,7 +5994,7 @@ _ntl_znumtwos(
 }
 
 
-long 
+long
 _ntl_zsqrts(
 	long n
 	)
@@ -6005,7 +6005,7 @@ _ntl_zsqrts(
 	static _ntl_verylong ln=0;
 	static _ntl_verylong rr=0;
 
-	if (n < 0) 
+	if (n < 0)
 		zhalt("_ntl_zsqrts: negative argument");
 
 	if (n <= 0)
@@ -6096,7 +6096,7 @@ void _ntl_zsqrt(_ntl_verylong n, _ntl_verylong *rr)
 		_ntl_zdiv(n, a, &ndiva, &r);
 		_ntl_zadd(a, ndiva, &r);
 		_ntl_zrshift(r, 1, &r);
-		if (_ntl_zcompare(r, ndiva) <= 0) 
+		if (_ntl_zcompare(r, ndiva) <= 0)
 			goto done;
 
 		_ntl_zsubpos(r, ndiva, &diff);
@@ -6170,7 +6170,7 @@ _ntl_zgcd(
       if (s2 < 0) s2 = -s2;
 
       if (_ntl_gmp_hack && s1 >= NTL_GMP_GCD_CROSS && s2 >= NTL_GMP_GCD_CROSS) {
-         GT_INIT 
+         GT_INIT
 
          lip_to_mpz(mm1, gt_1);
          lip_to_mpz(mm2, gt_2);
@@ -6190,7 +6190,7 @@ _ntl_zgcd(
 	if ((agrb = mm1[0]) < mm2[0])
 		agrb = mm2[0];
 
-	_ntl_zsetlength(&aa, agrb+1); 
+	_ntl_zsetlength(&aa, agrb+1);
 	_ntl_zsetlength(&bb, agrb+1);
 	_ntl_zsetlength(&cc, agrb+1);
 
@@ -6294,7 +6294,7 @@ void _ntl_zabs(_ntl_verylong *pa)
 		a[0] = (-a[0]);
 }
 
-long 
+long
 _ntl_z2logs(
 	long aa
 	)
@@ -6320,7 +6320,7 @@ _ntl_z2logs(
 	return (i);
 }
 
-long 
+long
 _ntl_z2log(
 	_ntl_verylong a
 	)
@@ -6341,7 +6341,7 @@ _ntl_zscompare(
 	long b
 	)
 {
-	if (!b) 
+	if (!b)
 		return _ntl_zsign(a);
 	else {
 		static _ntl_verylong c = 0;
@@ -6359,7 +6359,7 @@ _ntl_zswap(
 	_ntl_verylong c;
 
 	if ((*a && ((*a)[-1] & 1)) || (*b && ((*b)[-1] & 1))) {
-		static _ntl_verylong t = 0; 
+		static _ntl_verylong t = 0;
 		_ntl_zcopy(*a, &t);
 		_ntl_zcopy(*b, a);
 		_ntl_zcopy(t, b);
@@ -6434,7 +6434,7 @@ _ntl_zlowbits(
 
         bl = b/NTL_NBITS;
         wh = b - NTL_NBITS*bl;
-	if (wh != 0) 
+	if (wh != 0)
 		bl++;
 	else
 		wh = NTL_NBITS;
@@ -6486,11 +6486,11 @@ _ntl_zweights(
 	unsigned long a;
 	long res = 0;
 
-	if (aa < 0) 
+	if (aa < 0)
 		a = - ((unsigned long) aa);
 	else
 		a = aa;
-   
+
 	while (a) {
 		if (a & 1) res ++;
 		a >>= 1;
@@ -6553,7 +6553,7 @@ _ntl_zand(
 	if (b_alias) b = c;
 	*cc = c;
 
-	for (sa = 1; sa <= sm; sa ++) 
+	for (sa = 1; sa <= sm; sa ++)
 		c[sa] = a[sa] & b[sa];
 
 	while ((sm > 1) && (!(c[sm])))
@@ -6774,7 +6774,7 @@ long _ntl_zsize(_ntl_verylong rep)
 }
 
 
-long _ntl_zdigit(_ntl_verylong rep, long i) 
+long _ntl_zdigit(_ntl_verylong rep, long i)
 {
    long sa;
    if (i < 0 || !rep) return 0;
@@ -6876,7 +6876,7 @@ void _ntl_zfrombytes(_ntl_verylong *x, const unsigned char *p, long n)
       diff = NTL_NBITS-bitoffset;
 
       if (diff < 8) {
-         a[wordpos+1] |= 
+         a[wordpos+1] |=
             ((( ((unsigned long)(p[i])) & 255UL ) << bitoffset) & NTL_RADIXM);
          a[wordpos+2] = ( ((long)(p[i])) & 255 ) >> diff;
       }
@@ -6933,10 +6933,10 @@ long _ntl_zblock_construct_alloc(_ntl_verylong *x, long d, long n)
 
    /* check d value */
 
-   if (d <= 0) 
+   if (d <= 0)
       zhalt("block construct: d must be positive");
 
-   if (NTL_OVERFLOW(d, NTL_NBITS, NTL_NBITS) || 
+   if (NTL_OVERFLOW(d, NTL_NBITS, NTL_NBITS) ||
        NTL_OVERFLOW(d, sizeof(long), 3*sizeof(long)))
       zhalt("block construct: d too large");
 
@@ -6948,7 +6948,7 @@ long _ntl_zblock_construct_alloc(_ntl_verylong *x, long d, long n)
 
    nwords = d + 3;
    nbytes = nwords*sizeof(long);
-   
+
    AllocAmt = (NTL_MAX_ALLOC_BLOCK - sizeof(long)) / nbytes;
    if (AllocAmt == 0) AllocAmt = 1;
 
@@ -6964,7 +6964,7 @@ long _ntl_zblock_construct_alloc(_ntl_verylong *x, long d, long n)
 
    q = p+2;
    *x = q;
-   
+
    for (j = 0; j < m; j++) {
       q[-1] = ((d+1) << 1) | 1;
       q[0] = 1;
@@ -7182,7 +7182,7 @@ void _ntl_crt_struct_init(void **crt_struct, long n, _ntl_verylong p,
 
       mpz_init(&temps[0]);
       mpz_init(&temps[1]);
-   
+
       q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) zhalt("out of memory");
 
@@ -7235,7 +7235,7 @@ void _ntl_crt_struct_init(void **crt_struct, long n, _ntl_verylong p,
       }
 
       for (i = (1L << (levels-1)) - 1; i < vec_len; i++) {
-         /* multiply primes index_vec[i]..index_vec[i+1]-1 into 
+         /* multiply primes index_vec[i]..index_vec[i+1]-1 into
           * prod_vec[i]
           */
 
@@ -7298,24 +7298,24 @@ void _ntl_crt_struct_init(void **crt_struct, long n, _ntl_verylong p,
       *crt_struct = (void *) c;
       return;
    }
-   
+
 #endif
 
    {
       struct crt_body_lip *C = &c->U.L;
       long i;
       c->strategy = 0;
-   
+
       C->n = n;
-   
+
       C->v = (_ntl_verylong *) NTL_MALLOC(n, sizeof(_ntl_verylong), 0);
       if (!C->v) zhalt("out of memory");
-   
-      for (i = 0; i < n; i++) 
+
+      for (i = 0; i < n; i++)
          C->v[i] = 0;
-   
+
       C->sbuf = p[0]+3;
-   
+
       *crt_struct = (void *) c;
    }
 }
@@ -7340,7 +7340,7 @@ void _ntl_crt_struct_insert(void *crt_struct, long i, _ntl_verylong m)
 
    default:
       zhalt("_ntl_crt_struct_insert: inconsistent strategy");
-      
+
    } /* end switch */
 }
 
@@ -7355,12 +7355,12 @@ void _ntl_crt_struct_free(void *crt_struct)
       long i, n;
 
       n = C->n;
-   
-      for (i = 0; i < n; i++) 
+
+      for (i = 0; i < n; i++)
          _ntl_zfree(&C->v[i]);
 
       free(C->v);
-   
+
       free(c);
 
       break;
@@ -7373,19 +7373,19 @@ void _ntl_crt_struct_free(void *crt_struct)
       long i, n;
 
       n = C->n;
-   
-      for (i = 0; i < n; i++) 
+
+      for (i = 0; i < n; i++)
          mpz_clear(&C->v[i]);
 
       mpz_clear(C->buf);
 
       free(C->v);
-   
+
       free(c);
       break;
    }
 
-   case 2: { 
+   case 2: {
       struct crt_body_gmp1 *C = &c->U.G1;
       long n = C->n;
       long levels = C->levels;
@@ -7443,11 +7443,11 @@ void _ntl_crt_struct_free(void *crt_struct)
 
 
 static
-void mpz_add_mul_many(MP_INT *res, MP_INT *a, long *b, 
+void mpz_add_mul_many(MP_INT *res, MP_INT *a, long *b,
                       long n, long sz)
 
 {
-   mp_limb_t *xx, *yy; 
+   mp_limb_t *xx, *yy;
    long i, sx;
    long sy;
    mp_limb_t carry;
@@ -7463,7 +7463,7 @@ void mpz_add_mul_many(MP_INT *res, MP_INT *a, long *b,
 
    for (i = 0; i < n; i++) {
       yy = a[i]._mp_d;
-      sy = a[i]._mp_size; 
+      sy = a[i]._mp_size;
 
       if (!sy || !b[i]) continue;
 
@@ -7496,29 +7496,29 @@ void _ntl_crt_struct_eval(void *crt_struct, _ntl_verylong *x, const long *b)
 
       _ntl_verylong xx, yy, *a;
       long i, sx, n;
-   
+
       n = C->n;
       sx = C->sbuf;
-   
+
       _ntl_zsetlength(x, sx);
       xx = *x;
-   
+
       a = C->v;
-   
-   
+
+
       for (i = 1; i <= sx; i++)
          xx[i] = 0;
-   
+
       xx++;
-   
+
       for (i = 0; i < n; i++) {
          yy = a[i];
-   
+
          if (!yy || !b[i]) continue;
-   
+
          zaddmul(b[i], xx, yy);
          yy = xx + yy[0];
-     
+
          if ((*yy) >= NTL_RADIX) {
             (*yy) -= NTL_RADIX;
             yy++;
@@ -7529,7 +7529,7 @@ void _ntl_crt_struct_eval(void *crt_struct, _ntl_verylong *x, const long *b)
             (*yy)++;
          }
       }
-   
+
       xx--;
       while (sx > 1 && xx[sx] == 0) sx--;
       xx[0] = sx;
@@ -7542,28 +7542,28 @@ void _ntl_crt_struct_eval(void *crt_struct, _ntl_verylong *x, const long *b)
    case 1: {
       struct crt_body_gmp *C = &c->U.G;
 
-      mp_limb_t *xx, *yy; 
+      mp_limb_t *xx, *yy;
       MP_INT *a;
       long i, sx, n;
       long sy;
       mp_limb_t carry;
-   
+
       n = C->n;
       sx = C->sbuf;
-   
+
       xx = C->buf->_mp_d;
 
       for (i = 0; i < sx; i++)
          xx[i] = 0;
-   
+
       a = C->v;
-   
+
       for (i = 0; i < n; i++) {
          yy = a[i]._mp_d;
-         sy = a[i]._mp_size; 
-   
+         sy = a[i]._mp_size;
+
          if (!sy || !b[i]) continue;
-   
+
          carry = mpn_addmul_1(xx, yy, sy, b[i]);
          yy = xx + sy;
          *yy += carry;
@@ -7575,7 +7575,7 @@ void _ntl_crt_struct_eval(void *crt_struct, _ntl_verylong *x, const long *b)
             } while (*yy == 0);
          }
       }
-   
+
       while (sx > 0 && xx[sx-1] == 0) sx--;
       C->buf->_mp_size = sx;
       mpz_to_lip(x, C->buf);
@@ -7606,7 +7606,7 @@ void _ntl_crt_struct_eval(void *crt_struct, _ntl_verylong *x, const long *b)
       for (i = (1L << (levels-1)) - 1; i < vec_len; i++) {
          long j1 = index_vec[i];
          long j2 = index_vec[i+1];
-         mpz_add_mul_many(&rem_vec[i], &coeff_vec[j1], &val_vec[j1], j2-j1, 
+         mpz_add_mul_many(&rem_vec[i], &coeff_vec[j1], &val_vec[j1], j2-j1,
                           prod_vec[i]._mp_size);
       }
 
@@ -7664,7 +7664,7 @@ struct rem_body_gmp {
 
 
 
-#ifdef NTL_SINGLE_MUL 
+#ifdef NTL_SINGLE_MUL
 
 struct rem_body_sm {
    long n;
@@ -7693,7 +7693,7 @@ struct rem_body {
 #ifdef NTL_GMP_HACK
       struct rem_body_gmp G;
 #endif
-#ifdef NTL_SINGLE_MUL 
+#ifdef NTL_SINGLE_MUL
       struct rem_body_sm S;
 #endif
 #if (defined(NTL_TBL_REM) && !defined(NTL_SINGLE_MUL))
@@ -7704,14 +7704,14 @@ struct rem_body {
 
 
 
-void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus, 
+void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
                           const long *p)
 {
    struct rem_body *r;
 
    r = (struct rem_body *) NTL_MALLOC(1, sizeof(struct rem_body), 0);
    if (!r) zhalt("out of memory");
-   
+
 #ifdef NTL_GMP_HACK
    if (_ntl_gmp_hack && n >= 32) {
       struct rem_body_gmp *R = &r->U.G;
@@ -7721,10 +7721,10 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
       long levels, vec_len;
       long *index_vec;
       MP_INT *prod_vec, *rem_vec;
-   
+
       q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) zhalt("out of memory");
-   
+
       for (i = 0; i < n; i++)
          q[i] = p[i];
 
@@ -7762,7 +7762,7 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
       }
 
       for (i = (1L << (levels-1)) - 1; i < vec_len; i++) {
-         /* multiply primes index_vec[i]..index_vec[i+1]-1 into 
+         /* multiply primes index_vec[i]..index_vec[i+1]-1 into
           * prod_vec[i]
           */
 
@@ -7797,13 +7797,13 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
       double **tbl;
       long t, t1, j, q;
       long sz = modulus[0];
-   
+
       r->strategy = 2;
       R->n = n;
       qq = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!qq) zhalt("out of memory");
       R->primes = qq;
-   
+
       for (i = 0; i < n; i++)
          qq[i] = p[i];
 
@@ -7815,8 +7815,8 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
          if (!tbl[i]) zhalt("out of space");
       }
       R->tbl = tbl;
-   
-   
+
+
       for (i = 0; i < n; i++) {
          q = qq[i];
          t = (((long)1) << NTL_NBITS) % q;
@@ -7827,7 +7827,7 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
             tbl[i][j] = (double) t1;
          }
       }
-      
+
       *rem_struct = (void *) r;
       return;
    }
@@ -7844,13 +7844,13 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
       long **tbl;
       long t, t1, j, q;
       long sz = modulus[0];
-   
+
       r->strategy = 3;
       R->n = n;
       qq = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!qq) zhalt("out of memory");
       R->primes = qq;
-   
+
       for (i = 0; i < n; i++)
          qq[i] = p[i];
 
@@ -7862,8 +7862,8 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
          if (!tbl[i]) zhalt("out of space");
       }
       R->tbl = tbl;
-   
-   
+
+
       for (i = 0; i < n; i++) {
          q = qq[i];
          t = (((long)1) << NTL_NBITS) % q;
@@ -7874,7 +7874,7 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
             tbl[i][j] = t1;
          }
       }
-      
+
       *rem_struct = (void *) r;
       return;
    }
@@ -7887,16 +7887,16 @@ void _ntl_rem_struct_init(void **rem_struct, long n, _ntl_verylong modulus,
 
       long *q;
       long i;
-   
+
       r->strategy = 0;
       R->n = n;
       q = (long *) NTL_MALLOC(n, sizeof(long), 0);
       if (!q) zhalt("out of memory");
       R->primes = q;
-   
+
       for (i = 0; i < n; i++)
          q[i] = p[i];
-   
+
       *rem_struct = (void *) r;
    }
 }
@@ -7922,10 +7922,10 @@ void _ntl_rem_struct_free(void *rem_struct)
       long vec_len = (1L << levels) - 1;
       long i;
 
-      for (i = 0; i < vec_len; i++) 
+      for (i = 0; i < vec_len; i++)
          mpz_clear(&R->prod_vec[i]);
 
-      for (i = 0; i < vec_len; i++) 
+      for (i = 0; i < vec_len; i++)
          mpz_clear(&R->rem_vec[i]);
 
       free(R->primes);
@@ -7962,7 +7962,7 @@ void _ntl_rem_struct_free(void *rem_struct)
 
 
 #if (defined(NTL_TBL_REM) && !defined(NTL_SINGLE_MUL))
-   
+
    case 3: {
       struct rem_body_tbl *R = &r->U.T;
 
@@ -8076,4 +8076,80 @@ void _ntl_rem_struct_eval(void *rem_struct, long *x, _ntl_verylong a)
 
    } /* end switch */
 }
+
+
+
+void
+_ntl_zaorsmul_1(_ntl_verylong x, long y, long sub,  _ntl_verylong *ww)
+{
+   static _ntl_verylong tmp = 0;
+
+   if (y == 0) return;
+
+   if (y == 1) {
+      if (sub)
+         _ntl_zsub(*ww, x, ww);
+      else
+         _ntl_zadd(*ww, x, ww);
+      return;
+   }
+
+   if (y == -1) {
+      if (!sub)
+         _ntl_zsub(*ww, x, ww);
+      else
+         _ntl_zadd(*ww, x, ww);
+      return;
+   }
+
+   _ntl_zsmul(x, y, &tmp);
+   if (sub)
+      _ntl_zsub(*ww, tmp, ww);
+   else
+      _ntl_zadd(*ww, tmp, ww);
+}
+
+
+void
+_ntl_zsaddmul(_ntl_verylong x, long y,  _ntl_verylong *ww)
+{
+  _ntl_zaorsmul_1(x, y, 0, ww);
+}
+
+void
+_ntl_zssubmul(_ntl_verylong x, long y,  _ntl_verylong *ww)
+{
+  _ntl_zaorsmul_1(x, y, 1, ww);
+}
+
+
+
+
+
+
+void
+_ntl_zaorsmul(_ntl_verylong x, _ntl_verylong y, long sub,  _ntl_verylong *ww)
+{
+   static _ntl_verylong tmp = 0;
+
+   _ntl_zmul(x, y, &tmp);
+   if (sub)
+      _ntl_zsub(*ww, tmp, ww);
+   else
+      _ntl_zadd(*ww, tmp, ww);
+}
+
+
+void
+_ntl_zaddmul(_ntl_verylong x, _ntl_verylong y,  _ntl_verylong *ww)
+{
+  _ntl_zaorsmul(x, y, 0, ww);
+}
+
+void
+_ntl_zsubmul(_ntl_verylong x, _ntl_verylong y,  _ntl_verylong *ww)
+{
+  _ntl_zaorsmul(x, y, 1, ww);
+}
+
 

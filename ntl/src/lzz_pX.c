@@ -67,7 +67,7 @@ void SetCoeff(zz_pX& x, long i, zz_p a)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("SetCoeff: negative index");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -98,7 +98,7 @@ void SetCoeff(zz_pX& x, long i)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("coefficient index out of range");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -127,8 +127,8 @@ long IsX(const zz_pX& a)
 {
    return deg(a) == 1 && IsOne(LeadCoeff(a)) && IsZero(ConstTerm(a));
 }
-      
-      
+
+
 
 zz_p coeff(const zz_pX& a, long i)
 {
@@ -173,7 +173,7 @@ void conv(zz_pX& x, long a)
       x.rep.SetLength(0);
       return;
    }
-   
+
    zz_p t;
 
    conv(t, a);
@@ -186,7 +186,7 @@ void conv(zz_pX& x, const ZZ& a)
       x.rep.SetLength(0);
       return;
    }
-   
+
    zz_p t;
 
    conv(t, a);
@@ -210,7 +210,7 @@ void add(zz_pX& x, const zz_pX& a, const zz_pX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const zz_p *ap, *bp; 
+   const zz_p *ap, *bp;
    zz_p* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -249,7 +249,7 @@ void sub(zz_pX& x, const zz_pX& a, const zz_pX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const zz_p *ap, *bp; 
+   const zz_p *ap, *bp;
    zz_p* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -356,7 +356,7 @@ void PlainMul(zz_p *xp, const zz_p *ap, long sa, const zz_p *bp, long sb)
 
 static vec_double a_buf, b_buf;
 
-static inline 
+static inline
 void reduce(zz_p& r, double x, long p, double pinv)
 {
    long rr = long(x - double(p)*double(long(x*pinv)));
@@ -637,7 +637,7 @@ void PlainMul(zz_pX& c, const zz_pX& a, const zz_pX& b)
    cp = c.rep.elts();
 
    long p = zz_p::modulus();
-   long use_FP = ((p < NTL_SP_BOUND/KARX) && 
+   long use_FP = ((p < NTL_SP_BOUND/KARX) &&
                  (double(p)*double(p) < NTL_FDOUBLE_PRECISION/KARX));
 
    if (sa < KARX || sb < KARX) {
@@ -850,7 +850,7 @@ void PlainSqr(zz_pX& c, const zz_pX& a)
    cp = c.rep.elts();
 
    long p = zz_p::modulus();
-   long use_FP = ((p < NTL_SP_BOUND/KARSX) && 
+   long use_FP = ((p < NTL_SP_BOUND/KARSX) &&
                  (double(p)*double(p) < NTL_FDOUBLE_PRECISION/KARSX));
 
    if (sa < KARSX) {
@@ -1137,7 +1137,7 @@ void mul(zz_pX& x, const zz_pX& a, zz_p b)
    ap = a.rep.elts();
    xp = x.rep.elts();
 
-   for (i = 0; i <= da; i++) 
+   for (i = 0; i <= da; i++)
       xp[i].LoopHole() = MulModPrecon(rep(ap[i]), t, p, bpinv);
 
    x.normalize();
@@ -1173,13 +1173,13 @@ void PlainGCD(zz_pX& x, const zz_pX& a, const zz_pX& b)
    /* make gcd monic */
 
 
-   inv(t, LeadCoeff(x)); 
-   mul(x, x, t); 
+   inv(t, LeadCoeff(x));
+   mul(x, x, t);
 }
 
 
 
-         
+
 
 void PlainXGCD(zz_pX& d, zz_pX& s, zz_pX& t, const zz_pX& a, const zz_pX& b)
 {
@@ -1199,7 +1199,7 @@ void PlainXGCD(zz_pX& d, zz_pX& s, zz_pX& t, const zz_pX& a, const zz_pX& b)
    else {
       long e = max(deg(a), deg(b)) + 1;
 
-      zz_pX temp(INIT_SIZE, e), u(INIT_SIZE, e), v(INIT_SIZE, e), u0(INIT_SIZE, e), v0(INIT_SIZE, e), 
+      zz_pX temp(INIT_SIZE, e), u(INIT_SIZE, e), v(INIT_SIZE, e), u0(INIT_SIZE, e), v0(INIT_SIZE, e),
             u1(INIT_SIZE, e), v1(INIT_SIZE, e), u2(INIT_SIZE, e), v2(INIT_SIZE, e), q(INIT_SIZE, e);
 
 
@@ -1239,7 +1239,7 @@ void PlainXGCD(zz_pX& d, zz_pX& s, zz_pX& t, const zz_pX& a, const zz_pX& b)
 
 void MulMod(zz_pX& x, const zz_pX& a, const zz_pX& b, const zz_pX& f)
 {
-   if (deg(a) >= deg(f) || deg(b) >= deg(f) || deg(f) == 0) 
+   if (deg(a) >= deg(f) || deg(b) >= deg(f) || deg(f) == 0)
       Error("MulMod: bad args");
 
    zz_pX t;
@@ -1351,7 +1351,7 @@ void random(zz_pX& x, long n)
    x.rep.SetLength(n);
 
    for (i = 0; i < n; i++)
-      random(x.rep[i]); 
+      random(x.rep[i]);
 
    x.normalize();
 }
@@ -1374,9 +1374,9 @@ void fftRep::SetSize(long NewK)
       Error("fftRep: inconsistent use");
 
    long i, n;
- 
-   if (MaxK != -1) 
-      for (i = 0; i < zz_pInfo->NumPrimes; i++) 
+
+   if (MaxK != -1)
+      for (i = 0; i < zz_pInfo->NumPrimes; i++)
          free(tbl[i]);
 
    n = 1L << NewK;
@@ -1428,9 +1428,9 @@ fftRep& fftRep::operator=(const fftRep& R)
          for (i = 0; i < NumPrimes; i++)
             free(tbl[i]);
       }
-  
+
       n = 1L << R.k;
-  
+
       for (i = 0; i < NumPrimes; i++) {
          if ( !(tbl[i] = (long *) NTL_MALLOC(n, sizeof(long), 0)) )
             Error("out of space in fftRep");
@@ -1481,8 +1481,8 @@ void FromModularRep(zz_p& x, long *a)
    double y;
 
 
-// I've re-written the following code in v5.3 so that it is 
-// a bit more robust.  
+// I've re-written the following code in v5.3 so that it is
+// a bit more robust.
 
 #if QUICK_CRT
 
@@ -1522,7 +1522,7 @@ void FromModularRep(zz_p& x, long *a)
       s = MulMod(a[i], zz_pInfo->CoeffModP[i], p, pinv);
       t = AddMod(t, s, p);
    }
-      
+
 
    s = MulMod(q, zz_pInfo->MinusMModP, p, pinv);
    t = AddMod(t, s, p);
@@ -1541,7 +1541,7 @@ void TofftRep(fftRep& y, const zz_pX& x, long k, long lo, long hi)
    long NumPrimes = zz_pInfo->NumPrimes;
 
 
-   if (k > zz_pInfo->MaxRoot) 
+   if (k > zz_pInfo->MaxRoot)
       Error("Polynomial too big for FFT");
 
    if (lo < 0)
@@ -1591,7 +1591,7 @@ void TofftRep(fftRep& y, const zz_pX& x, long k, long lo, long hi)
          }
       }
    }
-   
+
 
    s.SetLength(n);
    long *sp = s.elts();
@@ -1602,7 +1602,7 @@ void TofftRep(fftRep& y, const zz_pX& x, long k, long lo, long hi)
       FFT(sp, yp, y.k, FFTPrime[index], Root);
       for (j = 0; j < n; j++)
          yp[j] = sp[j];
-   } 
+   }
    else {
       for (i = 0; i < zz_pInfo->NumPrimes; i++) {
          long *Root = &RootTable[i][0];
@@ -1616,7 +1616,7 @@ void TofftRep(fftRep& y, const zz_pX& x, long k, long lo, long hi)
 
 
 
-void RevTofftRep(fftRep& y, const vec_zz_p& x, 
+void RevTofftRep(fftRep& y, const vec_zz_p& x,
                  long k, long lo, long hi, long offset)
 // computes an n = 2^k point convolution of X^offset*x[lo..hi] mod X^n-1
 // using "inverted" evaluation points.
@@ -1627,7 +1627,7 @@ void RevTofftRep(fftRep& y, const vec_zz_p& x,
    zz_p accum;
    long NumPrimes = zz_pInfo->NumPrimes;
 
-   if (k > zz_pInfo->MaxRoot) 
+   if (k > zz_pInfo->MaxRoot)
       Error("Polynomial too big for FFT");
 
    if (lo < 0)
@@ -1714,7 +1714,7 @@ void FromfftRep(zz_pX& x, fftRep& y, long lo, long hi)
 
    // converts from FFT-representation to coefficient representation
    // only the coefficients lo..hi are computed
-   
+
 
 {
    long k, n, i, j, l;
@@ -1749,9 +1749,9 @@ void FromfftRep(zz_pX& x, fftRep& y, long lo, long hi)
          double qinv = FFTPrimeInv[i];
          long w = TwoInvTable[i][k];
          long *Root = &RootInvTable[i][0];
-   
+
          FFT(sp, yp, k, q, Root);
-   
+
          for (j = 0; j < n; j++) yp[j] = MulMod(sp[j], w, q, qinv);
       }
    }
@@ -1764,14 +1764,14 @@ void FromfftRep(zz_pX& x, fftRep& y, long lo, long hi)
    if (index >= 0) {
       zz_p *xp = x.rep.elts();
       long *yp = &y.tbl[0][0];
-      for (j = 0; j < l; j++) 
+      for (j = 0; j < l; j++)
          xp[j].LoopHole() = yp[j+lo];
    }
    else {
       for (j = 0; j < l; j++) {
-         for (i = 0; i < NumPrimes; i++) 
-            t[i] = y.tbl[i][j+lo]; 
-   
+         for (i = 0; i < NumPrimes; i++)
+            t[i] = y.tbl[i][j+lo];
+
          FromModularRep(x.rep[j], t);
       }
    }
@@ -1784,7 +1784,7 @@ void RevFromfftRep(vec_zz_p& x, fftRep& y, long lo, long hi)
    // converts from FFT-representation to coefficient representation
    // using "inverted" evaluation points.
    // only the coefficients lo..hi are computed
-   
+
 
 {
    long k, n, i, j, l;
@@ -1815,7 +1815,7 @@ void RevFromfftRep(vec_zz_p& x, fftRep& y, long lo, long hi)
          long *yp = &y.tbl[i][0];
          long q = FFTPrime[i];
          long *Root = &RootTable[i][0];
-   
+
          FFT(sp, yp, k, q, Root);
          for (j = 0; j < n; j++)
             yp[j] = sp[j];
@@ -1830,14 +1830,14 @@ void RevFromfftRep(vec_zz_p& x, fftRep& y, long lo, long hi)
    if (index >= 0) {
       zz_p *xp = x.elts();
       long *yp = &y.tbl[0][0];
-      for (j = 0; j < l; j++) 
+      for (j = 0; j < l; j++)
          xp[j].LoopHole() = yp[j+lo];
    }
    else {
       for (j = 0; j < l; j++) {
-         for (i = 0; i < NumPrimes; i++) 
-            t[i] = y.tbl[i][j+lo]; 
-   
+         for (i = 0; i < NumPrimes; i++)
+            t[i] = y.tbl[i][j+lo];
+
          FromModularRep(x[j], t);
       }
    }
@@ -1875,9 +1875,9 @@ void NDFromfftRep(zz_pX& x, const fftRep& y, long lo, long hi, fftRep& z)
          double qinv = FFTPrimeInv[i];
          long w = TwoInvTable[i][k];
          long *Root = &RootInvTable[i][0];
-   
+
          FFT(zp, &y.tbl[i][0], k, q, Root);
-   
+
          for (j = 0; j < n; j++) zp[j] = MulMod(zp[j], w, q, qinv);
       }
    }
@@ -1890,14 +1890,14 @@ void NDFromfftRep(zz_pX& x, const fftRep& y, long lo, long hi, fftRep& z)
    if (index >= 0) {
       zz_p *xp = x.rep.elts();
       long *zp = &z.tbl[0][0];
-      for (j = 0; j < l; j++) 
+      for (j = 0; j < l; j++)
          xp[j].LoopHole() = zp[j+lo];
    }
    else {
       for (j = 0; j < l; j++) {
-         for (i = 0; i < NumPrimes; i++) 
-            t[i] = z.tbl[i][j+lo]; 
-   
+         for (i = 0; i < NumPrimes; i++)
+            t[i] = z.tbl[i][j+lo];
+
          FromModularRep(x.rep[j], t);
       }
    }
@@ -1915,7 +1915,7 @@ void FromfftRep(zz_p* x, fftRep& y, long lo, long hi)
 
    // converts from FFT-representation to coefficient representation
    // only the coefficients lo..hi are computed
-   
+
 
 {
    long k, n, i, j;
@@ -1957,19 +1957,19 @@ void FromfftRep(zz_p* x, fftRep& y, long lo, long hi)
          double qinv = FFTPrimeInv[i];
          long w = TwoInvTable[i][k];
          long *Root = &RootInvTable[i][0];
-   
+
          FFT(sp, yp, k, q, Root);
-   
+
          for (j = 0; j < n; j++) yp[j] = MulMod(sp[j], w, q, qinv);
       }
-   
+
       for (j = lo; j <= hi; j++) {
          if (j >= n)
             clear(x[j-lo]);
          else {
-            for (i = 0; i < zz_pInfo->NumPrimes; i++) 
-               t[i] = y.tbl[i][j]; 
-   
+            for (i = 0; i < zz_pInfo->NumPrimes; i++)
+               t[i] = y.tbl[i][j];
+
             FromModularRep(x[j-lo], t);
          }
       }
@@ -2007,7 +2007,7 @@ void mul(fftRep& z, const fftRep& x, const fftRep& y)
          const long *yp = &y.tbl[i][0];
          long q = FFTPrime[i];
          double qinv = FFTPrimeInv[i];
-   
+
          for (j = 0; j < n; j++)
             zp[j] = MulMod(xp[j], yp[j], q, qinv);
       }
@@ -2042,7 +2042,7 @@ void sub(fftRep& z, const fftRep& x, const fftRep& y)
          const long *xp = &x.tbl[i][0];
          const long *yp = &y.tbl[i][0];
          long q = FFTPrime[i];
-   
+
          for (j = 0; j < n; j++)
             zp[j] = SubMod(xp[j], yp[j], q);
       }
@@ -2077,7 +2077,7 @@ void add(fftRep& z, const fftRep& x, const fftRep& y)
          const long *xp = &x.tbl[i][0];
          const long *yp = &y.tbl[i][0];
          long q = FFTPrime[i];
-   
+
          for (j = 0; j < n; j++)
             zp[j] = AddMod(xp[j], yp[j], q);
       }
@@ -2101,9 +2101,9 @@ void reduce(fftRep& x, const fftRep& a, long k)
    x.SetSize(k);
 
    for (i = 0; i < zz_pInfo->NumPrimes; i++) {
-      ap = &a.tbl[i][0];   
+      ap = &a.tbl[i][0];
       xp = &x.tbl[i][0];
-      for (j = 0; j < n; j++) 
+      for (j = 0; j < n; j++)
          xp[j] = ap[j << (l-k)];
    }
 }
@@ -2120,7 +2120,7 @@ void AddExpand(fftRep& x, const fftRep& a)
    if (l < k) Error("AddExpand: bad args");
 
    long index = zz_pInfo->index;
-   
+
    if (index >= 0) {
       long q = FFTPrime[index];
       const long *ap = &a.tbl[0][0];
@@ -2210,7 +2210,7 @@ void CopyReverse(zz_pX& x, const zz_pX& a, long lo, long hi)
    }
 
    x.normalize();
-} 
+}
 
 void copy(zz_pX& x, const zz_pX& a, long lo, long hi)
 
@@ -2237,7 +2237,7 @@ void copy(zz_pX& x, const zz_pX& a, long lo, long hi)
    }
 
    x.normalize();
-} 
+}
 
 
 void rem21(zz_pX& x, const zz_pX& a, const zz_pXModulus& F)
@@ -2582,7 +2582,7 @@ void MulMod(zz_pX& x, const zz_pX& a, const zz_pX& b, const zz_pXModulus& F)
    mul(R1, R1, R2);
 
    NDFromfftRep(P1, R1, n, d-1, R2); // save R1 for future use
-   
+
    TofftRep(R2, P1, F.l);
    mul(R2, R2, F.HRep);
    FromfftRep(P1, R2, n-2, 2*n-4);
@@ -2603,7 +2603,7 @@ void SqrMod(zz_pX& x, const zz_pX& a, const zz_pXModulus& F)
 
    if (n < 0) Error("SqrMod: uninitialized modulus");
 
-   if (da >= n) 
+   if (da >= n)
       Error("bad args to SqrMod(zz_pX,zz_pX,zz_pXModulus)");
 
    if (!F.UseFFT || da <= NTL_zz_pX_MUL_CROSSOVER) {
@@ -2625,7 +2625,7 @@ void SqrMod(zz_pX& x, const zz_pX& a, const zz_pXModulus& F)
    TofftRep(R1, a, k);
    mul(R1, R1, R1);
    NDFromfftRep(P1, R1, n, d-1, R2);  // save R1 for future use
-   
+
    TofftRep(R2, P1, F.l);
    mul(R2, R2, F.HRep);
    FromfftRep(P1, R2, n-2, 2*n-4);
@@ -2647,7 +2647,7 @@ void PlainInvTrunc(zz_pX& x, const zz_pX& a, long m)
    zz_p s;
    const zz_p* ap;
    zz_p* xp;
-   
+
 
    n = deg(a);
 
@@ -2686,7 +2686,7 @@ void PlainInvTrunc(zz_pX& x, const zz_pX& a, long m)
 
 void trunc(zz_pX& x, const zz_pX& a, long m)
 
-// x = a % X^m, output may alias input 
+// x = a % X^m, output may alias input
 
 {
    if (m < 0) Error("trunc: bad args");
@@ -2773,7 +2773,7 @@ void InvTrunc(zz_pX& x, const zz_pX& a, long m)
          PlainInvTrunc(x, a, m);
    }
 }
-   
+
 
 
 void build(zz_pXModulus& x, const zz_pX& f)
@@ -2818,13 +2818,13 @@ zz_pXMultiplier::zz_pXMultiplier(const zz_pX& b, const zz_pXModulus& F)
 
 
 
-void build(zz_pXMultiplier& x, const zz_pX& b, 
+void build(zz_pXMultiplier& x, const zz_pX& b,
                          const zz_pXModulus& F)
 {
    long db;
    long n = F.n;
 
-   if (n < 0) Error("build zz_pXMultiplier: uninitialized modulus"); 
+   if (n < 0) Error("build zz_pXMultiplier: uninitialized modulus");
 
    x.b = b;
    db = deg(b);
@@ -2840,12 +2840,12 @@ void build(zz_pXMultiplier& x, const zz_pX& b,
 
    fftRep R1(INIT_SIZE, F.l);
    zz_pX P1(INIT_SIZE, n);
-   
+
 
    TofftRep(R1, b, F.l);
    reduce(x.B2, R1, F.k);
    mul(R1, R1, F.HRep);
-   FromfftRep(P1, R1, n-1, 2*n-3); 
+   FromfftRep(P1, R1, n-1, 2*n-3);
    TofftRep(x.B1, P1, F.l);
 }
 
@@ -2889,7 +2889,7 @@ void MulMod(zz_pX& x, const zz_pX& a, const zz_pXMultiplier& B,
 
    FromfftRep(x, R1, 0, n-1);
 }
-   
+
 
 void PowerXMod(zz_pX& hh, const ZZ& e, const zz_pXModulus& F)
 {
@@ -3020,7 +3020,7 @@ void NewtonInvTrunc(zz_pX& x, const zz_pX& a, long m)
       TofftRep(R2, a, t, 0, min(l, a_len)-1);
       mul(R1, R1, R2);
       FromfftRep(P1, R1, k, l-1);
-      
+
       x.rep.SetLength(l);
       long y_len = P1.rep.length();
       for (i = k; i < l; i++) {
@@ -3073,10 +3073,10 @@ void FFTDivRem(zz_pX& q, zz_pX& r, const zz_pX& a, const zz_pX& b)
    TofftRep(R2, a, k, n, m);
    mul(R1, R1, R2);
    FromfftRep(P3, R1, m-n, 2*(m-n));
-   
+
    l = 1L << k1;
 
-   
+
    TofftRep(R1, b, k1);
    TofftRep(R2, P3, k1);
    mul(R1, R1, R2);
@@ -3161,10 +3161,10 @@ void FFTRem(zz_pX& r, const zz_pX& a, const zz_pX& b)
    TofftRep(R2, a, k, n, m);
    mul(R1, R1, R2);
    FromfftRep(P3, R1, m-n, 2*(m-n));
-   
+
    l = 1L << k1;
 
-   
+
    TofftRep(R1, b, k1);
    TofftRep(R2, P3, k1);
    mul(R1, R1, R2);
@@ -3273,7 +3273,7 @@ void power(zz_pX& x, const zz_pX& a, long e)
    zz_pX res;
    res.SetMaxLength(da*e + 1);
    res = 1;
-   
+
    long k = NumBits(e);
    long i;
 

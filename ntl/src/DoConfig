@@ -85,6 +85,9 @@
 );
 
 
+%Variable = ();
+
+
 foreach $arg (@ARGV) {
 
    if ($arg =~ '-h|help|-help|--help') {
@@ -93,6 +96,8 @@ foreach $arg (@ARGV) {
    }
 
    if (($name, $val) = ($arg =~ /(.*?)=(.*)/)) {
+
+      $Variable{$name} = 0;
       
       if (exists($MakeFlag{$name}) && ($val =~ 'on|off')) {
          $MakeFlag{$name} = $val;
@@ -138,25 +143,46 @@ if ($MakeFlag{'SHARED'} eq 'off') {
 
 }
 
-# a special MakeVal value that is determined by NTL_GMP_LIP 
-# and NTL_GMP_HACK
+# special GMP variables
 
+$MakeVal{'GMPI'} = '# ';
+$MakeVal{'GMPL'} = '# ';
+$MakeVal{'GMP'} =  '# ';
 
 if ($ConfigFlag{'NTL_GMP_LIP'} eq 'on' || $ConfigFlag{'NTL_GMP_HACK'} eq 'on') {
    $MakeVal{'GMP'} = '';
-}
-else {
-   $MakeVal{'GMP'} = '# ';
+   if (exists($Variable{'DEF_PREFIX'}) ||
+       exists($Variable{'GMP_PREFIX'}) ||
+       exists($Variable{'GMP_INCDIR'})) {
+      $MakeVal{'GMPI'} = '';
+   }
+   if (exists($Variable{'DEF_PREFIX'}) ||
+       exists($Variable{'GMP_PREFIX'}) ||
+       exists($Variable{'GMP_LIBDIR'})) {
+      $MakeVal{'GMPL'} = '';
+   }
 }
 
-# a special MakeVal value that is determined by NTL_GF2X_LIB
+# special GF2X variables
+
+
+$MakeVal{'GF2XI'} = '# ';
+$MakeVal{'GF2XL'} = '# ';
+$MakeVal{'GF2X'} =  '# ';
 
 
 if ($ConfigFlag{'NTL_GF2X_LIB'} eq 'on') {
    $MakeVal{'GF2X'} = '';
-}
-else {
-   $MakeVal{'GF2X'} = '# ';
+   if (exists($Variable{'DEF_PREFIX'}) ||
+       exists($Variable{'GF2X_PREFIX'}) ||
+       exists($Variable{'GF2X_INCDIR'})) {
+      $MakeVal{'GF2XI'} = '';
+   }
+   if (exists($Variable{'DEF_PREFIX'}) ||
+       exists($Variable{'GF2X_PREFIX'}) ||
+       exists($Variable{'GF2X_LIBDIR'})) {
+      $MakeVal{'GF2XL'} = '';
+   }
 }
 
 

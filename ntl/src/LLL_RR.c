@@ -37,7 +37,7 @@ static void RowTransform(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
 
    if (MU == 0) return;
 
-   if (NumTwos(MU) >= NTL_ZZ_NBITS) 
+   if (NumTwos(MU) >= NTL_ZZ_NBITS)
       k = MakeOdd(MU);
    else
       k = 0;
@@ -89,7 +89,7 @@ static void RowTransform2(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
 
    if (MU == 0) return;
 
-   if (NumTwos(MU) >= NTL_ZZ_NBITS) 
+   if (NumTwos(MU) >= NTL_ZZ_NBITS)
       k = MakeOdd(MU);
    else
       k = 0;
@@ -113,9 +113,9 @@ static void RowTransform2(vec_ZZ& A, vec_ZZ& B, const ZZ& MU1)
    }
 }
 
-void ComputeGS(const mat_ZZ& B, mat_RR& B1, 
-               mat_RR& mu, vec_RR& b, 
-               vec_RR& c, long k, const RR& bound, long st, 
+void ComputeGS(const mat_ZZ& B, mat_RR& B1,
+               mat_RR& mu, vec_RR& b,
+               vec_RR& c, long k, const RR& bound, long st,
                vec_RR& buf, const RR& bound2)
 {
    long i, j;
@@ -194,8 +194,8 @@ static double LastTime = 0;
 
 
 static
-long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep, 
-           LLLCheckFct check, mat_RR& B1, mat_RR& mu, 
+long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
+           LLLCheckFct check, mat_RR& B1, mat_RR& mu,
            vec_RR& b, vec_RR& c, long m, long init_k, long &quit)
 {
    long n = B.NumCols();
@@ -303,7 +303,7 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
                }
 
                Fc1 = 1;
-   
+
                mu1 = mu(k,j);
                if (sign(mu1) >= 0) {
                   sub(mu1, mu1, half);
@@ -329,11 +329,11 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
                   }
                }
 
-   
+
                conv(MU, mu1);
 
                sub(mu(k,j), mu(k,j), mu1);
-   
+
                RowTransform(B(k), B(j), MU);
                if (U) RowTransform((*U)(k), (*U)(j), MU);
             }
@@ -342,13 +342,13 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
          if (Fc1) {
             for (i = 1; i <= n; i++)
                conv(B1(k, i), B(k, i));
-   
+
             InnerProduct(b(k), B1(k), B1(k));
             ComputeGS(B, B1, mu, b, c, k, bound, 1, buf, bound2);
          }
       } while (Fc1);
 
-      if (check && (*check)(B(k))) 
+      if (check && (*check)(B(k)))
          quit = 1;
 
       if (IsZero(b(k))) {
@@ -371,10 +371,10 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
 
       if (deep > 0) {
          // deep insertions
-   
+
          cc = b(k);
          long l = 1;
-         while (l <= k-1) { 
+         while (l <= k-1) {
             mul(t1, delta, c(l));
             if (t1 > cc) break;
             sqr(t1, mu(k,l));
@@ -382,10 +382,10 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
             sub(cc, cc, t1);
             l++;
          }
-   
+
          if (l <= k-1 && (l <= deep || k-l <= deep)) {
             // deep insertion at position l
-   
+
             for (i = k; i > l; i--) {
                // swap rows i, i-1
                swap(B(i), B(i-1));
@@ -394,7 +394,7 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
                swap(b(i), b(i-1));
                if (U) swap((*U)(i), (*U)(i-1));
             }
-   
+
             k = l;
             continue;
          }
@@ -417,7 +417,7 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
             swap(mu(k), mu(k-1));
             swap(b(k), b(k-1));
             if (U) swap((*U)(k), (*U)(k-1));
-   
+
             k--;
             NumSwaps++;
          }
@@ -431,7 +431,7 @@ long ll_LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
 }
 
 static
-long LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep, 
+long LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
            LLLCheckFct check)
 {
    long m = B.NumRows();
@@ -465,11 +465,11 @@ long LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
 
 
    for (i = 1; i <=m; i++)
-      for (j = 1; j <= n; j++) 
+      for (j = 1; j <= n; j++)
          conv(B1(i, j), B(i, j));
 
 
-         
+
    for (i = 1; i <= m; i++) {
       InnerProduct(b(i), B1(i), B1(i));
    }
@@ -492,9 +492,9 @@ long LLL_RR(mat_ZZ& B, mat_ZZ* U, const RR& delta, long deep,
    return m;
 }
 
-         
 
-long LLL_RR(mat_ZZ& B, double delta, long deep, 
+
+long LLL_RR(mat_ZZ& B, double delta, long deep,
             LLLCheckFct check, long verb)
 {
    verbose = verb;
@@ -507,7 +507,7 @@ long LLL_RR(mat_ZZ& B, double delta, long deep,
    return LLL_RR(B, 0, Delta, deep, check);
 }
 
-long LLL_RR(mat_ZZ& B, mat_ZZ& U, double delta, long deep, 
+long LLL_RR(mat_ZZ& B, mat_ZZ& U, double delta, long deep,
            LLLCheckFct check, long verb)
 {
    verbose = verb;
@@ -553,7 +553,7 @@ void ComputeBKZConstant(long beta, long p)
          x = 0;
          for (j = 1; j <= k; j++)
             x += Log(j);
-          
+
          x = exp(x/k);
 
       }
@@ -578,7 +578,7 @@ void ComputeBKZConstant(long beta, long p)
 
 static vec_RR BKZThresh;
 
-static 
+static
 void ComputeBKZThresh(RR *c, long beta)
 {
    BKZThresh.SetLength(beta-1);
@@ -602,13 +602,13 @@ void ComputeBKZThresh(RR *c, long beta)
 
 
 static
-long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta, 
+long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
          long beta, long prune, LLLCheckFct check)
 {
    long m = BB.NumRows();
    long n = BB.NumCols();
    long m_orig = m;
-   
+
    long i, j;
    ZZ MU;
 
@@ -678,10 +678,10 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
 
 
    for (i = 1; i <=m; i++)
-      for (j = 1; j <= n; j++) 
+      for (j = 1; j <= n; j++)
          conv(B1(i, j), B(i, j));
 
-         
+
    for (i = 1; i <= m; i++) {
       InnerProduct(b(i), B1(i), B1(i));
    }
@@ -725,11 +725,11 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
 
       z = 0;
       jj = 0;
-   
+
       while (z < m-1) {
          jj++;
          kk = min(jj+beta-1, m);
-   
+
          if (jj == m) {
             jj = 1;
             kk = beta;
@@ -746,15 +746,15 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
          cbar = c(jj);
          conv(utildavec(jj), 1);
          conv(uvec(jj), 1);
-   
+
          conv(yvec(jj), 0);
          conv(vvec(jj), 0);
          Deltavec(jj) = 0;
-   
-   
+
+
          s = t = jj;
          deltavec(jj) = 1;
-   
+
          for (i = jj+1; i <= kk+1; i++) {
             conv(ctilda(i), 0);
             conv(uvec(i), 0);
@@ -766,7 +766,7 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
          }
 
          long enum_cnt = 0;
-   
+
          while (t <= kk) {
 
             add(t1, yvec(t), utildavec(t));
@@ -774,12 +774,12 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
             mul(t1, t1, c(t));
             add(ctilda(t), ctilda(t+1), t1);
 
-            if (prune > 0 && t > jj) 
+            if (prune > 0 && t > jj)
                sub(t1, cbar, BKZThresh(t-jj));
             else
                t1 = cbar;
 
-   
+
             if (ctilda(t) <t1) {
                if (t > jj) {
                   t--;
@@ -806,7 +806,7 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
 
                   negate(t1, t1);
 
-                  if (t1 < yvec(t)) 
+                  if (t1 < yvec(t))
                      deltavec(t) = -1;
                   else
                      deltavec(t) = 1;
@@ -826,22 +826,22 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
                add(utildavec(t), vvec(t), Deltavec(t));
             }
          }
-         
+
          NumIterations++;
-   
+
          h = min(kk+1, m);
 
          mul(t1, red_fudge, -8);
          add(t1, t1, delta);
          mul(t1, t1, c(jj));
-   
+
          if (t1 > cbar) {
- 
+
             clean = 0;
 
             // we treat the case that the new vector is b_s (jj < s <= kk)
             // as a special case that appears to occur most of the time.
-   
+
             s = 0;
             for (i = jj+1; i <= kk; i++) {
                if (uvec(i) != 0) {
@@ -851,15 +851,15 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
                      s = -1;
                }
             }
-   
+
             if (s == 0) Error("BKZ_RR: internal error");
-   
+
             if (s > 0) {
                // special case
                // cerr << "special case\n";
 
                NumTrivial++;
-   
+
                for (i = s; i > jj; i--) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
@@ -867,8 +867,8 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
                   swap(b(i-1), b(i));
                   if (U) swap((*U)(i-1), (*U)(i));
                }
-   
-               new_m = ll_LLL_RR(B, U, delta, 0, check, 
+
+               new_m = ll_LLL_RR(B, U, delta, 0, check,
                                 B1, mu, b, c, h, jj, quit);
                if (new_m != h) Error("BKZ_RR: internal error");
                if (quit) break;
@@ -877,7 +877,7 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
                // the general case
 
                NumNonTrivial++;
-   
+
                for (i = 1; i <= n; i++) conv(B(m+1, i), 0);
 
                if (U) {
@@ -891,7 +891,7 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
                   RowTransform2(B(m+1), B(i), MU);
                   if (U) RowTransform2((*U)(m+1), (*U)(i), MU);
                }
-      
+
                for (i = m+1; i >= jj+1; i--) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
@@ -899,23 +899,23 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
                   swap(b(i-1), b(i));
                   if (U) swap((*U)(i-1), (*U)(i));
                }
-      
+
                for (i = 1; i <= n; i++)
                   conv(B1(jj, i), B(jj, i));
-      
+
                InnerProduct(b(jj), B1(jj), B1(jj));
-      
-               if (b(jj) == 0) Error("BKZ_RR: internal error"); 
-      
+
+               if (b(jj) == 0) Error("BKZ_RR: internal error");
+
                // remove linear dependencies
-   
+
                // cerr << "general case\n";
                new_m = ll_LLL_RR(B, U, delta, 0, 0, B1, mu, b, c, kk+1, jj, quit);
-              
-               if (new_m != kk) Error("BKZ_RR: internal error"); 
+
+               if (new_m != kk) Error("BKZ_RR: internal error");
 
                // remove zero vector
-      
+
                for (i = kk+2; i <= m+1; i++) {
                   // swap i, i-1
                   swap(B(i-1), B(i));
@@ -923,7 +923,7 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
                   swap(b(i-1), b(i));
                   if (U) swap((*U)(i-1), (*U)(i));
                }
-      
+
                quit = 0;
                if (check) {
                   for (i = 1; i <= kk; i++)
@@ -934,18 +934,18 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
                }
 
                if (quit) break;
-   
+
                if (h > kk) {
                   // extend reduced basis
-   
-                  new_m = ll_LLL_RR(B, U, delta, 0, check, 
+
+                  new_m = ll_LLL_RR(B, U, delta, 0, check,
                                    B1, mu, b, c, h, h, quit);
-   
+
                   if (new_m != h) Error("BKZ_RR: internal error");
                   if (quit) break;
                }
             }
-   
+
             z = 0;
          }
          else {
@@ -955,12 +955,12 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
             NumNoOps++;
 
             if (!clean) {
-               new_m = 
+               new_m =
                   ll_LLL_RR(B, U, delta, 0, check, B1, mu, b, c, h, h, quit);
                if (new_m != h) Error("BKZ_RR: internal error");
                if (quit) break;
             }
-   
+
             z++;
          }
       }
@@ -993,7 +993,7 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ* UU, const RR& delta,
    return m;
 }
 
-long BKZ_RR(mat_ZZ& BB, mat_ZZ& UU, double delta, 
+long BKZ_RR(mat_ZZ& BB, mat_ZZ& UU, double delta,
          long beta, long prune, LLLCheckFct check, long verb)
 {
    verbose = verb;
@@ -1008,7 +1008,7 @@ long BKZ_RR(mat_ZZ& BB, mat_ZZ& UU, double delta,
    return BKZ_RR(BB, &UU, Delta, beta, prune, check);
 }
 
-long BKZ_RR(mat_ZZ& BB, double delta, 
+long BKZ_RR(mat_ZZ& BB, double delta,
          long beta, long prune, LLLCheckFct check, long verb)
 {
    verbose = verb;
@@ -1064,7 +1064,7 @@ void NearVector(vec_ZZ& ww, const mat_ZZ& BB, const vec_ZZ& a)
    for (i = 1; i <= n+1; i++)
       InnerProduct(b(i), B1(i), B1(i));
 
-   
+
 
    RR bound;
    power2(bound, 2*long(0.15*RR::precision()));

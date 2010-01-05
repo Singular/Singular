@@ -59,7 +59,7 @@ void FactorInt(FacVec& fvec, long n)
             n = n/q;
             (fvec[NumFactors].a)++;
             fvec[NumFactors].val *= q;
-         }         
+         }
          fvec[NumFactors].link = -1;
          NumFactors++;
       }

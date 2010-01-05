@@ -104,7 +104,7 @@ int main()
 {
 
 
-   cerr << "This is NTL version " << NTL_VERSION << "\n"; 
+   cerr << "This is NTL version " << NTL_VERSION << "\n";
 
    cerr << "Basic Configuration Options:\n";
 
@@ -262,7 +262,7 @@ cerr << "Performance Options:\n";
    random(f, n);    // f =             "   "
 
    // SetCoeff(f, n);  // Sets coefficient of X^n to 1
-   
+
    ZZ_p lc;
 
    do {
@@ -298,7 +298,7 @@ cerr << "Performance Options:\n";
 
 
    // small prime tests...I've made some changes in v5.3
-   // that should be checked on various platforms, so 
+   // that should be checked on various platforms, so
    // we might as well check them here.
 
    if (SmallModulusTest(17, 1000)) {
@@ -317,7 +317,7 @@ cerr << "Performance Options:\n";
       cerr << "GF2X test failed!\n";
       return 1;
    }
-   
+
 
    cerr << "OK\n";
 
@@ -347,7 +347,7 @@ cerr << "Performance Options:\n";
          mul(x4, x2, x3);
       t = GetTime()-t;
 
-      cerr << " (" << (t*10) << "us without GMP)"; 
+      cerr << " (" << (t*10) << "us without GMP)";
 
       _ntl_gmp_hack = 1;
    }
@@ -366,18 +366,18 @@ cerr << "Performance Options:\n";
    if (_ntl_gmp_hack) {
       _ntl_gmp_hack = 0;
       rem(x2, x4, x1);
-   
+
       t = GetTime();
       for (i = 0; i < 100000; i++)
          rem(x2, x4, x1);
       t = GetTime()-t;
-      cerr << " (" << (t*10) << "us without GMP)"; 
+      cerr << " (" << (t*10) << "us without GMP)";
 
       _ntl_gmp_hack = 1;
    }
 
    cerr << "\n";
-   
+
 
    GenPrime(p, 1024);
    RandomBnd(x1, p);
@@ -395,12 +395,12 @@ cerr << "Performance Options:\n";
    if (_ntl_gmp_hack) {
       _ntl_gmp_hack = 0;
       InvMod(x2, x1, p);
-   
+
       t = GetTime();
       for (i = 0; i < 1000; i++)
          InvMod(x2, x1, p);
       t = GetTime()-t;
-         cerr << " (" << (t*1000) << "us without GMP)"; 
+         cerr << " (" << (t*1000) << "us without GMP)";
 
       _ntl_gmp_hack = 1;
    }
@@ -410,7 +410,7 @@ cerr << "Performance Options:\n";
 
 
    // test modulus switching
-   
+
    n = 1024;
    k = 1024;
    RandomLen(p, k);

@@ -14,7 +14,7 @@ extern double _ntl_GetTime();
 /* Assuming the processor speed is at most 200GHz, and that
  * the clock resolution is at least 1 millisecond, the following
  * code should correctly determine if the GetTime function
- * is working properly, and should not run for more than 
+ * is working properly, and should not run for more than
  * a few seconds on a machine with a speed of at least 100MHz.
  */
 
@@ -38,9 +38,9 @@ int main(int argc, char **argv)
    t0 = _ntl_GetTime();
 
    a = 1;
-   
+
    for (i = 1; i <= LOOP_COUNT; i++) {
-      for (j = 0; j < n; j++) 
+      for (j = 0; j < n; j++)
          a = (a + x) & m;
 
       if (a == 17) return -2; /* keeps the compiler honest! */

@@ -21,7 +21,7 @@ long compare(const ZZX& a, const ZZX& b)
 
    return 0;
 }
-      
+
 
 void sort(vec_pair_ZZX_long& v)
 {
@@ -35,14 +35,14 @@ void sort(vec_pair_ZZX_long& v)
             swap(v[j].b, v[j+1].b);
          }
 }
-            
- 
+
+
 
 int main(int argc, char **argv)
 {
    ZZX f1, f;
 
-   if (argc > 1) 
+   if (argc > 1)
       ZZXFac_MaxPrune = atoi(argv[1]);
 
    cin >> f;

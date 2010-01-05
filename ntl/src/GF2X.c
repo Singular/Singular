@@ -54,7 +54,7 @@ void GF2X::normalize()
    xrep.QuickSetLength(n);
 }
 
-long IsZero(const GF2X& a) 
+long IsZero(const GF2X& a)
    { return a.xrep.length() == 0; }
 
 long IsOne(const GF2X& a)
@@ -132,7 +132,7 @@ void SetCoeff(GF2X& x, long i)
 
    x.xrep[wi] |= (1UL << bi);
 }
-   
+
 
 
 void SetCoeff(GF2X& x, long i, long val)
@@ -156,7 +156,7 @@ void SetCoeff(GF2X& x, long i, long val)
    n = x.xrep.length();
    long wi = i/NTL_BITS_PER_LONG;
 
-   if (wi >= n) 
+   if (wi >= n)
       return;
 
    long bi = i - wi*NTL_BITS_PER_LONG;
@@ -203,7 +203,7 @@ long deg(const GF2X& aa)
 
    return NTL_BITS_PER_LONG*(n-1) + i - 1;
 }
-   
+
 
 long operator==(const GF2X& a, const GF2X& b)
 {
@@ -212,7 +212,7 @@ long operator==(const GF2X& a, const GF2X& b)
 
 long operator==(const GF2X& a, long b)
 {
-   if (b & 1) 
+   if (b & 1)
       return IsOne(a);
    else
       return IsZero(a);
@@ -220,7 +220,7 @@ long operator==(const GF2X& a, long b)
 
 long operator==(const GF2X& a, GF2 b)
 {
-   if (b == 1) 
+   if (b == 1)
       return IsOne(a);
    else
       return IsZero(a);
@@ -273,7 +273,7 @@ void add(GF2X& x, const GF2X& a, const GF2X& b)
       while (i >= 0 && !xp[i]) i--;
       x.xrep.QuickSetLength(i+1);
    }
-   
+
    else if (sa < sb) {
       x.xrep.SetLength(sb);
       _ntl_ulong *xp = x.xrep.elts();
@@ -341,7 +341,7 @@ void add(GF2X& x, const GF2X& a, const GF2X& b)
 
 
 
-static 
+static
 void mul1(_ntl_ulong *c, _ntl_ulong a, _ntl_ulong b)
 {
 
@@ -367,21 +367,21 @@ NTL_EFF_BB_MUL_CODE0
 
 }
 
-#define mul1_IL mul1_inline 
+#define mul1_IL mul1_inline
 #endif
 
 
-static 
+static
 void Mul1(_ntl_ulong *cp, const _ntl_ulong *bp, long sb, _ntl_ulong a)
 {
- 
+
 
 NTL_EFF_BB_MUL_CODE1
 
 
 }
 
-static 
+static
 void AddMul1(_ntl_ulong *cp, const _ntl_ulong* bp, long sb, _ntl_ulong a)
 {
 
@@ -392,10 +392,10 @@ NTL_EFF_BB_MUL_CODE2
 }
 
 
-static 
+static
 void Mul1_short(_ntl_ulong *cp, const _ntl_ulong *bp, long sb, _ntl_ulong a)
 {
- 
+
 
 NTL_EFF_SHORT_BB_MUL_CODE1
 
@@ -406,7 +406,7 @@ NTL_EFF_SHORT_BB_MUL_CODE1
 
 
 
-static 
+static
 void mul_half(_ntl_ulong *c, _ntl_ulong a, _ntl_ulong b)
 {
 
@@ -444,7 +444,7 @@ void mul2(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
 
 
 /*
- * This version of mul3 I got from Weimerskirch, Stebila, 
+ * This version of mul3 I got from Weimerskirch, Stebila,
  * and Shantz, "Generic GF(2^m) arithmetic in software
  * an its application to ECC" (ACISP 2003).
  */
@@ -461,7 +461,7 @@ void mul3 (_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    mul1_IL(d02, a[0]^a[2], b[0]^b[2]);
    mul1_IL(d12, a[1]^a[2], b[1]^b[2]);
 
-   
+
    c[0] = d0[0];
    c[1] = d0[1] ^ d01[0] ^ d1[0] ^ d0[0];
    c[2] = d01[1] ^ d1[1] ^ d0[1] ^ d02[0] ^ d2[0] ^ d0[0] ^ d1[0];
@@ -483,14 +483,14 @@ void mul4(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    hs1[1] = b[1] ^ b[3];
 
    mul2(c, a, b);
-   mul2(c+4, a+2, b+2); 
+   mul2(c+4, a+2, b+2);
    mul2(hl2, hs0, hs1);
 
    hl2[0] = hl2[0] ^ c[0] ^ c[4];
    hl2[1] = hl2[1] ^ c[1] ^ c[5];
    hl2[2] = hl2[2] ^ c[2] ^ c[6];
    hl2[3] = hl2[3] ^ c[3] ^ c[7];
-   
+
    c[2] ^= hl2[0];
    c[3] ^= hl2[1];
    c[4] ^= hl2[2];
@@ -503,25 +503,25 @@ void mul5 (_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    _ntl_ulong hs0[3], hs1[3];
    _ntl_ulong hl2[6];
 
-   hs0[0] = a[0] ^ a[3]; 
+   hs0[0] = a[0] ^ a[3];
    hs0[1] = a[1] ^ a[4];
    hs0[2] = a[2];
-   hs1[0] = b[0] ^ b[3]; 
+   hs1[0] = b[0] ^ b[3];
    hs1[1] = b[1] ^ b[4];
    hs1[2] = b[2];
 
-   mul3(c, a, b); 
+   mul3(c, a, b);
    mul3(hl2, hs0, hs1);
    mul2(c+6, a+3, b+3);
 
-   hl2[0] = hl2[0] ^ c[0] ^ c[6]; 
+   hl2[0] = hl2[0] ^ c[0] ^ c[6];
    hl2[1] = hl2[1] ^ c[1] ^ c[7];
    hl2[2] = hl2[2] ^ c[2] ^ c[8];
    hl2[3] = hl2[3] ^ c[3] ^ c[9];
    hl2[4] = hl2[4] ^ c[4];
    hl2[5] = hl2[5] ^ c[5];
 
-  
+
    c[3] ^= hl2[0];
    c[4] ^= hl2[1];
    c[5] ^= hl2[2];
@@ -536,16 +536,16 @@ void mul6(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    _ntl_ulong hs0[3], hs1[3];
    _ntl_ulong hl2[6];
 
-   hs0[0] = a[0] ^ a[3];   
+   hs0[0] = a[0] ^ a[3];
    hs0[1] = a[1] ^ a[4];
    hs0[2] = a[2] ^ a[5];
-   hs1[0] = b[0] ^ b[3];   
+   hs1[0] = b[0] ^ b[3];
    hs1[1] = b[1] ^ b[4];
    hs1[2] = b[2] ^ b[5];
 
-   mul3(c, a, b);   
-   mul3(c+6, a+3, b+3); 
-   mul3(hl2, hs0, hs1);  
+   mul3(c, a, b);
+   mul3(c+6, a+3, b+3);
+   mul3(hl2, hs0, hs1);
 
    hl2[0] = hl2[0] ^ c[0] ^ c[6];
    hl2[1] = hl2[1] ^ c[1] ^ c[7];
@@ -553,7 +553,7 @@ void mul6(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    hl2[3] = hl2[3] ^ c[3] ^ c[9];
    hl2[4] = hl2[4] ^ c[4] ^ c[10];
    hl2[5] = hl2[5] ^ c[5] ^ c[11];
-   
+
    c[3] ^= hl2[0];
    c[4] ^= hl2[1];
    c[5] ^= hl2[2];
@@ -568,18 +568,18 @@ void mul7(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    _ntl_ulong hs0[4], hs1[4];
    _ntl_ulong hl2[8];
 
-   hs0[0] = a[0] ^ a[4]; 
+   hs0[0] = a[0] ^ a[4];
    hs0[1] = a[1] ^ a[5];
    hs0[2] = a[2] ^ a[6];
    hs0[3] = a[3];
-   hs1[0] = b[0] ^ b[4]; 
+   hs1[0] = b[0] ^ b[4];
    hs1[1] = b[1] ^ b[5];
    hs1[2] = b[2] ^ b[6];
    hs1[3] = b[3];
 
-   mul4(c, a, b); 
+   mul4(c, a, b);
    mul4(hl2, hs0, hs1);
-   mul3(c+8, a+4, b+4); 
+   mul3(c+8, a+4, b+4);
 
    hl2[0] = hl2[0] ^ c[0] ^ c[8];
    hl2[1] = hl2[1] ^ c[1] ^ c[9];
@@ -589,7 +589,7 @@ void mul7(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    hl2[5] = hl2[5] ^ c[5] ^ c[13];
    hl2[6] = hl2[6] ^ c[6];
    hl2[7] = hl2[7] ^ c[7];
-   
+
    c[4]  ^= hl2[0];
    c[5]  ^= hl2[1];
    c[6]  ^= hl2[2];
@@ -606,18 +606,18 @@ void mul8(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    _ntl_ulong hs0[4], hs1[4];
    _ntl_ulong hl2[8];
 
-   hs0[0] = a[0] ^ a[4]; 
+   hs0[0] = a[0] ^ a[4];
    hs0[1] = a[1] ^ a[5];
    hs0[2] = a[2] ^ a[6];
    hs0[3] = a[3] ^ a[7];
-   hs1[0] = b[0] ^ b[4]; 
+   hs1[0] = b[0] ^ b[4];
    hs1[1] = b[1] ^ b[5];
    hs1[2] = b[2] ^ b[6];
    hs1[3] = b[3] ^ b[7];
 
-   mul4(c, a, b); 
+   mul4(c, a, b);
    mul4(c+8, a+4, b+4);
-   mul4(hl2, hs0, hs1); 
+   mul4(hl2, hs0, hs1);
 
    hl2[0] = hl2[0] ^ c[0] ^ c[8];
    hl2[1] = hl2[1] ^ c[1] ^ c[9];
@@ -627,7 +627,7 @@ void mul8(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
    hl2[5] = hl2[5] ^ c[5] ^ c[13];
    hl2[6] = hl2[6] ^ c[6] ^ c[14];
    hl2[7] = hl2[7] ^ c[7] ^ c[15];
-   
+
    c[4]  ^= hl2[0];
    c[5]  ^= hl2[1];
    c[6]  ^= hl2[2];
@@ -639,7 +639,7 @@ void mul8(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b)
 }
 
 static
-void KarMul(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b, 
+void KarMul(_ntl_ulong *c, const _ntl_ulong *a, const _ntl_ulong *b,
             long len, _ntl_ulong *stk)
 {
    if (len <= 8) {
@@ -716,7 +716,7 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
       clear(c);
       return;
    }
- 
+
    _ntl_ulong a0 = a.xrep[0];
    _ntl_ulong b0 = b.xrep[0];
 
@@ -867,7 +867,7 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
       clear(c);
       return;
    }
- 
+
    _ntl_ulong a0 = a.xrep[0];
    _ntl_ulong b0 = b.xrep[0];
 
@@ -1056,7 +1056,7 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
                cp[10] = v[10];
             }
          }
-         return; 
+         return;
 
          case 7: {
             _ntl_ulong v[14];
@@ -1097,7 +1097,7 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
                cp[12] = v[12];
             }
          }
-         return; 
+         return;
 
          case 8: {
             _ntl_ulong v[16];
@@ -1142,7 +1142,7 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
                cp[14] = v[14];
             }
          }
-         return; 
+         return;
 
       }
    }
@@ -1182,7 +1182,7 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
 
    // finally: the general case
 
-   
+
    static WordVector mem;
    static WordVector stk;
    static WordVector vec;
@@ -1243,7 +1243,7 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
 
       if (sa == 1) {
          AddMul1(cp, bp, sb, ap[0]);
-         
+
          break;
       }
 
@@ -1252,7 +1252,7 @@ void mul(GF2X& c, const GF2X& a, const GF2X& b)
       for (i = 0; i+sa <= sb; i += sa) {
          KarMul(v, ap, bp + i, sa, stk_p);
          for (j = 0; j < 2*sa; j++)
-            cp[i+j] ^= v[j]; 
+            cp[i+j] ^= v[j];
       }
 
       { const _ntl_ulong *t; t = ap; ap = bp + i; bp = t; }
@@ -1313,7 +1313,7 @@ void trunc(GF2X& x, const GF2X& a, long m)
          x.normalize();
       }
    }
-   else if (n*NTL_BITS_PER_LONG <= m) 
+   else if (n*NTL_BITS_PER_LONG <= m)
       x = a;
    else {
       long wm = (m-1)/NTL_BITS_PER_LONG;
@@ -1333,7 +1333,7 @@ void trunc(GF2X& x, const GF2X& a, long m)
       x.normalize();
    }
 }
-      
+
 
 /****** implementation of vec_GF2X ******/
 
@@ -1375,43 +1375,43 @@ void MulByX(GF2X& x, const GF2X& a)
 
 static _ntl_ulong sqrtab[256] = {
 
-0UL, 1UL, 4UL, 5UL, 16UL, 17UL, 20UL, 21UL, 64UL, 
-65UL, 68UL, 69UL, 80UL, 81UL, 84UL, 85UL, 256UL, 
-257UL, 260UL, 261UL, 272UL, 273UL, 276UL, 277UL, 320UL, 
-321UL, 324UL, 325UL, 336UL, 337UL, 340UL, 341UL, 1024UL, 
-1025UL, 1028UL, 1029UL, 1040UL, 1041UL, 1044UL, 1045UL, 1088UL, 
-1089UL, 1092UL, 1093UL, 1104UL, 1105UL, 1108UL, 1109UL, 1280UL, 
-1281UL, 1284UL, 1285UL, 1296UL, 1297UL, 1300UL, 1301UL, 1344UL, 
-1345UL, 1348UL, 1349UL, 1360UL, 1361UL, 1364UL, 1365UL, 4096UL, 
-4097UL, 4100UL, 4101UL, 4112UL, 4113UL, 4116UL, 4117UL, 4160UL, 
-4161UL, 4164UL, 4165UL, 4176UL, 4177UL, 4180UL, 4181UL, 4352UL, 
-4353UL, 4356UL, 4357UL, 4368UL, 4369UL, 4372UL, 4373UL, 4416UL, 
-4417UL, 4420UL, 4421UL, 4432UL, 4433UL, 4436UL, 4437UL, 5120UL, 
-5121UL, 5124UL, 5125UL, 5136UL, 5137UL, 5140UL, 5141UL, 5184UL, 
-5185UL, 5188UL, 5189UL, 5200UL, 5201UL, 5204UL, 5205UL, 5376UL, 
-5377UL, 5380UL, 5381UL, 5392UL, 5393UL, 5396UL, 5397UL, 5440UL, 
-5441UL, 5444UL, 5445UL, 5456UL, 5457UL, 5460UL, 5461UL, 16384UL, 
-16385UL, 16388UL, 16389UL, 16400UL, 16401UL, 16404UL, 16405UL, 16448UL, 
-16449UL, 16452UL, 16453UL, 16464UL, 16465UL, 16468UL, 16469UL, 16640UL, 
-16641UL, 16644UL, 16645UL, 16656UL, 16657UL, 16660UL, 16661UL, 16704UL, 
-16705UL, 16708UL, 16709UL, 16720UL, 16721UL, 16724UL, 16725UL, 17408UL, 
-17409UL, 17412UL, 17413UL, 17424UL, 17425UL, 17428UL, 17429UL, 17472UL, 
-17473UL, 17476UL, 17477UL, 17488UL, 17489UL, 17492UL, 17493UL, 17664UL, 
-17665UL, 17668UL, 17669UL, 17680UL, 17681UL, 17684UL, 17685UL, 17728UL, 
-17729UL, 17732UL, 17733UL, 17744UL, 17745UL, 17748UL, 17749UL, 20480UL, 
-20481UL, 20484UL, 20485UL, 20496UL, 20497UL, 20500UL, 20501UL, 20544UL, 
-20545UL, 20548UL, 20549UL, 20560UL, 20561UL, 20564UL, 20565UL, 20736UL, 
-20737UL, 20740UL, 20741UL, 20752UL, 20753UL, 20756UL, 20757UL, 20800UL, 
-20801UL, 20804UL, 20805UL, 20816UL, 20817UL, 20820UL, 20821UL, 21504UL, 
-21505UL, 21508UL, 21509UL, 21520UL, 21521UL, 21524UL, 21525UL, 21568UL, 
-21569UL, 21572UL, 21573UL, 21584UL, 21585UL, 21588UL, 21589UL, 21760UL, 
-21761UL, 21764UL, 21765UL, 21776UL, 21777UL, 21780UL, 21781UL, 21824UL, 
+0UL, 1UL, 4UL, 5UL, 16UL, 17UL, 20UL, 21UL, 64UL,
+65UL, 68UL, 69UL, 80UL, 81UL, 84UL, 85UL, 256UL,
+257UL, 260UL, 261UL, 272UL, 273UL, 276UL, 277UL, 320UL,
+321UL, 324UL, 325UL, 336UL, 337UL, 340UL, 341UL, 1024UL,
+1025UL, 1028UL, 1029UL, 1040UL, 1041UL, 1044UL, 1045UL, 1088UL,
+1089UL, 1092UL, 1093UL, 1104UL, 1105UL, 1108UL, 1109UL, 1280UL,
+1281UL, 1284UL, 1285UL, 1296UL, 1297UL, 1300UL, 1301UL, 1344UL,
+1345UL, 1348UL, 1349UL, 1360UL, 1361UL, 1364UL, 1365UL, 4096UL,
+4097UL, 4100UL, 4101UL, 4112UL, 4113UL, 4116UL, 4117UL, 4160UL,
+4161UL, 4164UL, 4165UL, 4176UL, 4177UL, 4180UL, 4181UL, 4352UL,
+4353UL, 4356UL, 4357UL, 4368UL, 4369UL, 4372UL, 4373UL, 4416UL,
+4417UL, 4420UL, 4421UL, 4432UL, 4433UL, 4436UL, 4437UL, 5120UL,
+5121UL, 5124UL, 5125UL, 5136UL, 5137UL, 5140UL, 5141UL, 5184UL,
+5185UL, 5188UL, 5189UL, 5200UL, 5201UL, 5204UL, 5205UL, 5376UL,
+5377UL, 5380UL, 5381UL, 5392UL, 5393UL, 5396UL, 5397UL, 5440UL,
+5441UL, 5444UL, 5445UL, 5456UL, 5457UL, 5460UL, 5461UL, 16384UL,
+16385UL, 16388UL, 16389UL, 16400UL, 16401UL, 16404UL, 16405UL, 16448UL,
+16449UL, 16452UL, 16453UL, 16464UL, 16465UL, 16468UL, 16469UL, 16640UL,
+16641UL, 16644UL, 16645UL, 16656UL, 16657UL, 16660UL, 16661UL, 16704UL,
+16705UL, 16708UL, 16709UL, 16720UL, 16721UL, 16724UL, 16725UL, 17408UL,
+17409UL, 17412UL, 17413UL, 17424UL, 17425UL, 17428UL, 17429UL, 17472UL,
+17473UL, 17476UL, 17477UL, 17488UL, 17489UL, 17492UL, 17493UL, 17664UL,
+17665UL, 17668UL, 17669UL, 17680UL, 17681UL, 17684UL, 17685UL, 17728UL,
+17729UL, 17732UL, 17733UL, 17744UL, 17745UL, 17748UL, 17749UL, 20480UL,
+20481UL, 20484UL, 20485UL, 20496UL, 20497UL, 20500UL, 20501UL, 20544UL,
+20545UL, 20548UL, 20549UL, 20560UL, 20561UL, 20564UL, 20565UL, 20736UL,
+20737UL, 20740UL, 20741UL, 20752UL, 20753UL, 20756UL, 20757UL, 20800UL,
+20801UL, 20804UL, 20805UL, 20816UL, 20817UL, 20820UL, 20821UL, 21504UL,
+21505UL, 21508UL, 21509UL, 21520UL, 21521UL, 21524UL, 21525UL, 21568UL,
+21569UL, 21572UL, 21573UL, 21584UL, 21585UL, 21588UL, 21589UL, 21760UL,
+21761UL, 21764UL, 21765UL, 21776UL, 21777UL, 21780UL, 21781UL, 21824UL,
 21825UL, 21828UL, 21829UL, 21840UL, 21841UL, 21844UL, 21845UL };
 
 
 
 
-static inline 
+static inline
 void sqr1(_ntl_ulong *c, _ntl_ulong a)
 {
    _ntl_ulong hi, lo;
@@ -1460,7 +1460,7 @@ void LeftShift(GF2X& c, const GF2X& a, long n)
    }
 
    if (n < 0) {
-      if (n < -NTL_MAX_LONG) 
+      if (n < -NTL_MAX_LONG)
          clear(c);
       else
          RightShift(c, a, -n);
@@ -1534,7 +1534,7 @@ void ShiftAdd(GF2X& c, const GF2X& a, long n)
    long ss = sa + wn;
    if (bn) ss++;
 
-   if (ss > sc) 
+   if (ss > sc)
       c.xrep.SetLength(ss);
 
    _ntl_ulong *cp = c.xrep.elts();
@@ -1613,34 +1613,34 @@ void RightShift(GF2X& c, const GF2X& a, long n)
 
 static _ntl_ulong revtab[256] = {
 
-0UL, 128UL, 64UL, 192UL, 32UL, 160UL, 96UL, 224UL, 16UL, 144UL, 
-80UL, 208UL, 48UL, 176UL, 112UL, 240UL, 8UL, 136UL, 72UL, 200UL, 
-40UL, 168UL, 104UL, 232UL, 24UL, 152UL, 88UL, 216UL, 56UL, 184UL, 
-120UL, 248UL, 4UL, 132UL, 68UL, 196UL, 36UL, 164UL, 100UL, 228UL, 
-20UL, 148UL, 84UL, 212UL, 52UL, 180UL, 116UL, 244UL, 12UL, 140UL, 
-76UL, 204UL, 44UL, 172UL, 108UL, 236UL, 28UL, 156UL, 92UL, 220UL, 
-60UL, 188UL, 124UL, 252UL, 2UL, 130UL, 66UL, 194UL, 34UL, 162UL, 
-98UL, 226UL, 18UL, 146UL, 82UL, 210UL, 50UL, 178UL, 114UL, 242UL, 
-10UL, 138UL, 74UL, 202UL, 42UL, 170UL, 106UL, 234UL, 26UL, 154UL, 
-90UL, 218UL, 58UL, 186UL, 122UL, 250UL, 6UL, 134UL, 70UL, 198UL, 
-38UL, 166UL, 102UL, 230UL, 22UL, 150UL, 86UL, 214UL, 54UL, 182UL, 
-118UL, 246UL, 14UL, 142UL, 78UL, 206UL, 46UL, 174UL, 110UL, 238UL, 
-30UL, 158UL, 94UL, 222UL, 62UL, 190UL, 126UL, 254UL, 1UL, 129UL, 
-65UL, 193UL, 33UL, 161UL, 97UL, 225UL, 17UL, 145UL, 81UL, 209UL, 
-49UL, 177UL, 113UL, 241UL, 9UL, 137UL, 73UL, 201UL, 41UL, 169UL, 
-105UL, 233UL, 25UL, 153UL, 89UL, 217UL, 57UL, 185UL, 121UL, 249UL, 
-5UL, 133UL, 69UL, 197UL, 37UL, 165UL, 101UL, 229UL, 21UL, 149UL, 
-85UL, 213UL, 53UL, 181UL, 117UL, 245UL, 13UL, 141UL, 77UL, 205UL, 
-45UL, 173UL, 109UL, 237UL, 29UL, 157UL, 93UL, 221UL, 61UL, 189UL, 
-125UL, 253UL, 3UL, 131UL, 67UL, 195UL, 35UL, 163UL, 99UL, 227UL, 
-19UL, 147UL, 83UL, 211UL, 51UL, 179UL, 115UL, 243UL, 11UL, 139UL, 
-75UL, 203UL, 43UL, 171UL, 107UL, 235UL, 27UL, 155UL, 91UL, 219UL, 
-59UL, 187UL, 123UL, 251UL, 7UL, 135UL, 71UL, 199UL, 39UL, 167UL, 
-103UL, 231UL, 23UL, 151UL, 87UL, 215UL, 55UL, 183UL, 119UL, 247UL, 
-15UL, 143UL, 79UL, 207UL, 47UL, 175UL, 111UL, 239UL, 31UL, 159UL, 
-95UL, 223UL, 63UL, 191UL, 127UL, 255UL  }; 
+0UL, 128UL, 64UL, 192UL, 32UL, 160UL, 96UL, 224UL, 16UL, 144UL,
+80UL, 208UL, 48UL, 176UL, 112UL, 240UL, 8UL, 136UL, 72UL, 200UL,
+40UL, 168UL, 104UL, 232UL, 24UL, 152UL, 88UL, 216UL, 56UL, 184UL,
+120UL, 248UL, 4UL, 132UL, 68UL, 196UL, 36UL, 164UL, 100UL, 228UL,
+20UL, 148UL, 84UL, 212UL, 52UL, 180UL, 116UL, 244UL, 12UL, 140UL,
+76UL, 204UL, 44UL, 172UL, 108UL, 236UL, 28UL, 156UL, 92UL, 220UL,
+60UL, 188UL, 124UL, 252UL, 2UL, 130UL, 66UL, 194UL, 34UL, 162UL,
+98UL, 226UL, 18UL, 146UL, 82UL, 210UL, 50UL, 178UL, 114UL, 242UL,
+10UL, 138UL, 74UL, 202UL, 42UL, 170UL, 106UL, 234UL, 26UL, 154UL,
+90UL, 218UL, 58UL, 186UL, 122UL, 250UL, 6UL, 134UL, 70UL, 198UL,
+38UL, 166UL, 102UL, 230UL, 22UL, 150UL, 86UL, 214UL, 54UL, 182UL,
+118UL, 246UL, 14UL, 142UL, 78UL, 206UL, 46UL, 174UL, 110UL, 238UL,
+30UL, 158UL, 94UL, 222UL, 62UL, 190UL, 126UL, 254UL, 1UL, 129UL,
+65UL, 193UL, 33UL, 161UL, 97UL, 225UL, 17UL, 145UL, 81UL, 209UL,
+49UL, 177UL, 113UL, 241UL, 9UL, 137UL, 73UL, 201UL, 41UL, 169UL,
+105UL, 233UL, 25UL, 153UL, 89UL, 217UL, 57UL, 185UL, 121UL, 249UL,
+5UL, 133UL, 69UL, 197UL, 37UL, 165UL, 101UL, 229UL, 21UL, 149UL,
+85UL, 213UL, 53UL, 181UL, 117UL, 245UL, 13UL, 141UL, 77UL, 205UL,
+45UL, 173UL, 109UL, 237UL, 29UL, 157UL, 93UL, 221UL, 61UL, 189UL,
+125UL, 253UL, 3UL, 131UL, 67UL, 195UL, 35UL, 163UL, 99UL, 227UL,
+19UL, 147UL, 83UL, 211UL, 51UL, 179UL, 115UL, 243UL, 11UL, 139UL,
+75UL, 203UL, 43UL, 171UL, 107UL, 235UL, 27UL, 155UL, 91UL, 219UL,
+59UL, 187UL, 123UL, 251UL, 7UL, 135UL, 71UL, 199UL, 39UL, 167UL,
+103UL, 231UL, 23UL, 151UL, 87UL, 215UL, 55UL, 183UL, 119UL, 247UL,
+15UL, 143UL, 79UL, 207UL, 47UL, 175UL, 111UL, 239UL, 31UL, 159UL,
+95UL, 223UL, 63UL, 191UL, 127UL, 255UL  };
 
-static inline 
+static inline
 _ntl_ulong rev1(_ntl_ulong a)
 {
    return NTL_BB_REV_CODE;
@@ -1674,7 +1674,7 @@ void CopyReverse(GF2X& c, const GF2X& a, long hi)
    }
 
    c.xrep.SetLength(wn);
-  
+
    _ntl_ulong *cp = c.xrep.elts();
    const _ntl_ulong *ap = a.xrep.elts();
 
@@ -1736,7 +1736,7 @@ void GF2XFromBytes(GF2X& x, const unsigned char *p, long n)
    lw = n/BytesPerLong;
    r = n - lw*BytesPerLong;
 
-   if (r != 0) 
+   if (r != 0)
       lw++;
    else
       r = BytesPerLong;

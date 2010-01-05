@@ -168,6 +168,6 @@ int main()
          break;
       }
    } while (c != EOF);
-   
+
    return 0;
 }

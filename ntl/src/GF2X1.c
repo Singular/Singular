@@ -15,13 +15,13 @@
 
 #ifdef NTL_GF2X_LIB
 
-#define NTL_GF2X_GCD_CROSSOVER (400L*NTL_BITS_PER_LONG) 
+#define NTL_GF2X_GCD_CROSSOVER (400L*NTL_BITS_PER_LONG)
 #define NTL_GF2X_HalfGCD_CROSSOVER (6L*NTL_BITS_PER_LONG)
 #define NTL_GF2X_BERMASS_CROSSOVER (200L*NTL_BITS_PER_LONG)
 
 #else
 
-#define NTL_GF2X_GCD_CROSSOVER (900L*NTL_BITS_PER_LONG) 
+#define NTL_GF2X_GCD_CROSSOVER (900L*NTL_BITS_PER_LONG)
 #define NTL_GF2X_HalfGCD_CROSSOVER (6L*NTL_BITS_PER_LONG)
 #define NTL_GF2X_BERMASS_CROSSOVER (450L*NTL_BITS_PER_LONG)
 
@@ -45,7 +45,7 @@ GF2XRegisterType()
 { xrep = &GF2XRegisterVec[GF2XRegisterTop]; GF2XRegisterTop++; }
 
 ~GF2XRegisterType()
-{ xrep->xrep.release();  
+{ xrep->xrep.release();
   GF2XRegisterTop--; }
 
 operator GF2X& () { return *xrep; }
@@ -101,8 +101,8 @@ void PlainDivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2X& b)
    long i;
 
    stab[posb] = b;
-   for (i = 1; i <= min(dq, NTL_BITS_PER_LONG-1); i++) 
-      MulByX(stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG], 
+   for (i = 1; i <= min(dq, NTL_BITS_PER_LONG-1); i++)
+      MulByX(stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG],
              stab[((_ntl_ulong)(posb+i-1))%NTL_BITS_PER_LONG]);
 
    _ntl_ulong *stab_ptr[NTL_BITS_PER_LONG];
@@ -205,8 +205,8 @@ void PlainRem(GF2X& r, const GF2X& a, const GF2X& b)
    long i;
 
    stab[posb] = b;
-   for (i = 1; i <= min(da-db, NTL_BITS_PER_LONG-1); i++) 
-      MulByX(stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG], 
+   for (i = 1; i <= min(da-db, NTL_BITS_PER_LONG-1); i++)
+      MulByX(stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG],
              stab[((_ntl_ulong)(posb+i-1))%NTL_BITS_PER_LONG]);
 
    _ntl_ulong *stab_ptr[NTL_BITS_PER_LONG];
@@ -348,7 +348,7 @@ void InvTrunc(GF2X& c, const GF2X& a, long e)
 
 
 
-static 
+static
 long weight1(_ntl_ulong a)
 {
    long res = 0;
@@ -391,7 +391,7 @@ void SparsityCheck(const GF2X& f, long& k3, long& k2, long& k1)
    long n = deg(f);
 
    trunc(g, g, n);
-   
+
    long t = deg(g);
 
    if (n-t < NTL_BITS_PER_LONG || t > (n+1)/2) {
@@ -439,7 +439,7 @@ void build(GF2XModulus& F, const GF2X& f)
    long sb = F.sn;
    long posb = n - NTL_BITS_PER_LONG*(sb-1);
 
-   F.posn = posb; 
+   F.posn = posb;
 
    if (F.posn > 0) {
       F.size = F.sn;
@@ -466,7 +466,7 @@ void build(GF2XModulus& F, const GF2X& f)
    trunc(f0, f, n);
    long deg_f0 = deg(f0);
 
-   if (F.sn > 1 && deg_f0 < NTL_BITS_PER_LONG 
+   if (F.sn > 1 && deg_f0 < NTL_BITS_PER_LONG
        && deg_f0 >= NTL_BITS_PER_LONG/2) {
       if (F.size >= 6)
          F.method = GF2X_MOD_MUL;
@@ -481,9 +481,9 @@ void build(GF2XModulus& F, const GF2X& f)
    }
    else if (F.size >= 8)
       F.method = GF2X_MOD_MUL;
-   else 
+   else
       F.method = GF2X_MOD_PLAIN;
-      
+
 
    if (F.method == GF2X_MOD_SPECIAL) {
       if (!F.stab_cnt) F.stab_cnt = NTL_NEW_OP long[NTL_BITS_PER_LONG];
@@ -504,10 +504,10 @@ void build(GF2XModulus& F, const GF2X& f)
          long kk1 = ((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG;
 
          stab1[kk1<<1] = stab1[kk0<<1] << 1;
-         stab1[(kk1<<1)+1] = (stab1[(kk0<<1)+1] << 1) 
+         stab1[(kk1<<1)+1] = (stab1[(kk0<<1)+1] << 1)
                           | (stab1[kk0<<1] >> (NTL_BITS_PER_LONG-1));
 
-         if (kk1 < posb) 
+         if (kk1 < posb)
             stab_cnt[kk1] = -sb;
          else
             stab_cnt[kk1] = -sb+1;
@@ -525,14 +525,14 @@ void build(GF2XModulus& F, const GF2X& f)
       if (!F.stab_cnt) F.stab_cnt = NTL_NEW_OP long[NTL_BITS_PER_LONG];
       long *stab_cnt = F.stab_cnt;
       if (!stab_cnt) Error("out of memory");
-      
-   
+
+
       stab[posb] = f;
-      for (i = 1; i < NTL_BITS_PER_LONG; i++) 
-         MulByX(stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG], 
+      for (i = 1; i < NTL_BITS_PER_LONG; i++)
+         MulByX(stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG],
                 stab[((_ntl_ulong)(posb+i-1))%NTL_BITS_PER_LONG]);
-   
-   
+
+
       for (i = 0; i < NTL_BITS_PER_LONG; i++) {
          WordVector& st = stab[((_ntl_ulong)(posb+i))%NTL_BITS_PER_LONG].xrep;
          long k = st.length();
@@ -567,7 +567,7 @@ GF2XModulus::GF2XModulus()
 
 GF2XModulus::GF2XModulus(const GF2XModulus& F) :
    f(F.f), n(F.n), sn(F.sn), posn(F.posn), k3(F.k3), k2(F.k2), k1(F.k1),
-   size(F.size), 
+   size(F.size),
    msk(F.msk), method(F.method), stab(F.stab), h0(F.h0), f0(F.f0),
    stab_cnt(0), stab_ptr(0), stab1(0), tracevec(F.tracevec)
 {
@@ -595,7 +595,7 @@ GF2XModulus::GF2XModulus(const GF2XModulus& F) :
       if (F.stab_ptr) {
          stab_ptr = NTL_NEW_OP _ntl_ulong_ptr[NTL_BITS_PER_LONG];
          if (!stab_ptr) Error("GF2XModulus: out of memory");
-      
+
          for (i = 0; i < NTL_BITS_PER_LONG; i++) {
             WordVector& st = stab[((_ntl_ulong)(posn+i))%NTL_BITS_PER_LONG].xrep;
             long k = st.length();
@@ -610,9 +610,9 @@ GF2XModulus& GF2XModulus::operator=(const GF2XModulus& F)
 {
    if (this == &F) return *this;
 
-   f=F.f; n=F.n; sn=F.sn; posn=F.posn; 
+   f=F.f; n=F.n; sn=F.sn; posn=F.posn;
    k3=F.k3; k2=F.k2; k1=F.k1;
-   size=F.size; 
+   size=F.size;
    msk=F.msk; method=F.method; stab=F.stab; h0=F.h0; f0 = F.f0;
    tracevec=F.tracevec;
 
@@ -640,7 +640,7 @@ GF2XModulus& GF2XModulus::operator=(const GF2XModulus& F)
       if (F.stab_ptr) {
          if (!stab_ptr) stab_ptr = NTL_NEW_OP _ntl_ulong_ptr[NTL_BITS_PER_LONG];
          if (!stab_ptr) Error("GF2XModulus: out of memory");
-      
+
          for (i = 0; i < NTL_BITS_PER_LONG; i++) {
             WordVector& st = stab[((_ntl_ulong)(posn+i))%NTL_BITS_PER_LONG].xrep;
             long k = st.length();
@@ -652,14 +652,14 @@ GF2XModulus& GF2XModulus::operator=(const GF2XModulus& F)
 
    return *this;
 }
-   
 
 
-GF2XModulus::~GF2XModulus() 
-{ 
-   delete [] stab_ptr; 
-   delete [] stab_cnt; 
-   delete [] stab1; 
+
+GF2XModulus::~GF2XModulus()
+{
+   delete [] stab_ptr;
+   delete [] stab_cnt;
+   delete [] stab1;
 }
 
 
@@ -750,7 +750,7 @@ void UseMulRemX1(GF2X& r, const GF2X& aa, const GF2XModulus& F)
 
    r = buf;
 }
-   
+
 
 void UseMulDivRemX1(GF2X& q, GF2X& r, const GF2X& aa, const GF2XModulus& F)
 {
@@ -794,7 +794,7 @@ void UseMulDivX1(GF2X& q, const GF2X& aa, const GF2XModulus& F)
    GF2XRegister(a);
    GF2XRegister(qq);
    GF2XRegister(qbuf);
-   
+
    clear(buf);
    a = aa;
    clear(qq);
@@ -889,7 +889,7 @@ void TrinomReduce(GF2X& x, const GF2X& a, long n, long k)
          p[m-wdiff] ^= w;
          p[0] ^= (w >> bn);
 
-         p[m] &= ((1UL<<bn)-1UL); 
+         p[m] &= ((1UL<<bn)-1UL);
       }
       else {
          // bn != 0 && bdiff != 0
@@ -910,7 +910,7 @@ void TrinomReduce(GF2X& x, const GF2X& a, long n, long k)
          p[m-wdiff] ^= (w >> bdiff);
          if (m-wdiff-1 >= 0) p[m-wdiff-1] ^= (w << (NTL_BITS_PER_LONG-bdiff));
          p[0] ^= (w >> bn);
-         p[m] &= ((1UL<<bn)-1UL); 
+         p[m] &= ((1UL<<bn)-1UL);
       }
    }
 
@@ -959,7 +959,7 @@ void PentReduce(GF2X& x, const GF2X& a, long n, long k3, long k2, long k1)
    while (m > wn) {
       w = p[m];
 
-      if (bn == 0) 
+      if (bn == 0)
          p[m-wn] ^= w;
       else {
          pp = &p[m-wn];
@@ -967,7 +967,7 @@ void PentReduce(GF2X& x, const GF2X& a, long n, long k3, long k2, long k1)
          *(pp-1) ^= (w << (NTL_BITS_PER_LONG-bn));
       }
 
-      if (bdiff1 == 0) 
+      if (bdiff1 == 0)
          p[m-wdiff1] ^= w;
       else {
          pp = &p[m-wdiff1];
@@ -975,7 +975,7 @@ void PentReduce(GF2X& x, const GF2X& a, long n, long k3, long k2, long k1)
          *(pp-1) ^= (w << (NTL_BITS_PER_LONG-bdiff1));
       }
 
-      if (bdiff2 == 0) 
+      if (bdiff2 == 0)
          p[m-wdiff2] ^= w;
       else {
          pp = &p[m-wdiff2];
@@ -983,7 +983,7 @@ void PentReduce(GF2X& x, const GF2X& a, long n, long k3, long k2, long k1)
          *(pp-1) ^= (w << (NTL_BITS_PER_LONG-bdiff2));
       }
 
-      if (bdiff3 == 0) 
+      if (bdiff3 == 0)
          p[m-wdiff3] ^= w;
       else {
          pp = &p[m-wdiff3];
@@ -996,7 +996,7 @@ void PentReduce(GF2X& x, const GF2X& a, long n, long k3, long k2, long k1)
 
    w = (p[m] >> bn) << bn;
 
-   p[0] ^= (w >> bn); 
+   p[0] ^= (w >> bn);
 
    if (bdiff1 == 0)
       p[m-wdiff1] ^= w;
@@ -1022,7 +1022,7 @@ void PentReduce(GF2X& x, const GF2X& a, long n, long k3, long k2, long k1)
    if (bn != 0)
       p[m] &= ((1UL<<bn)-1UL);
 
-   
+
    if (bn == 0)
       wn--;
 
@@ -1091,13 +1091,13 @@ void TriDiv21(GF2X& q, const GF2X& a, long n, long k)
    GF2XRegister(P1);
 
    RightShift(P1, a, n);
-   if (k != 1) 
+   if (k != 1)
       RightShiftAdd(P1, P1, n-k);
 
    q = P1;
 }
 
-static 
+static
 void TriDivRem21(GF2X& q, GF2X& r, const GF2X& a, long n, long k)
 {
    GF2XRegister(Q);
@@ -1119,7 +1119,7 @@ void PentDiv21(GF2X& q, const GF2X& a, long n, long k3, long k2, long k1)
    GF2XRegister(P2);
 
    RightShift(P1, a, n);
-   
+
    RightShift(P2, P1, n-k3);
    RightShiftAdd(P2, P1, n-k2);
    if (k1 != 1) {
@@ -1131,8 +1131,8 @@ void PentDiv21(GF2X& q, const GF2X& a, long n, long k3, long k2, long k1)
    q = P2;
 }
 
-static 
-void PentDivRem21(GF2X& q, GF2X& r, const GF2X& a, long n, 
+static
+void PentDivRem21(GF2X& q, GF2X& r, const GF2X& a, long n,
                   long k3, long k2, long k1)
 {
    GF2XRegister(Q);
@@ -1184,7 +1184,7 @@ void TriDivX1(GF2X& q, const GF2X& aa, long n, long k)
    GF2XRegister(a);
    GF2XRegister(qq);
    GF2XRegister(qbuf);
-   
+
    clear(buf);
    a = aa;
    clear(qq);
@@ -1210,7 +1210,7 @@ void TriDivX1(GF2X& q, const GF2X& aa, long n, long k)
 }
 
 static
-void PentDivRemX1(GF2X& q, GF2X& r, const GF2X& aa, long n, 
+void PentDivRemX1(GF2X& q, GF2X& r, const GF2X& aa, long n,
                   long k3, long k2, long k1)
 {
    GF2XRegister(buf);
@@ -1253,7 +1253,7 @@ void PentDivX1(GF2X& q, const GF2X& aa, long n, long k3, long k2, long k1)
    GF2XRegister(a);
    GF2XRegister(qq);
    GF2XRegister(qbuf);
-   
+
    clear(buf);
    a = aa;
    clear(qq);
@@ -1303,7 +1303,7 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
       r = a;
    }
    else if (F.method == GF2X_MOD_MUL) {
-      if (da <= 2*(n-1)) 
+      if (da <= 2*(n-1))
          UseMulRem21(r, a, F);
       else
          UseMulRemX1(r, a, F);
@@ -1311,7 +1311,7 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
    else if (F.method == GF2X_MOD_SPECIAL) {
       long sa = a.xrep.length();
       long posa = da - NTL_BITS_PER_LONG*(sa-1);
-   
+
       _ntl_ulong *ap;
       if (&r == &a)
          ap = r.xrep.elts();
@@ -1319,12 +1319,12 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
          GF2X_rembuf = a.xrep;
          ap = GF2X_rembuf.elts();
       }
-   
+
       _ntl_ulong *atop = &ap[sa-1];
       _ntl_ulong *stab_top;
-   
+
       long i;
-   
+
       while (1) {
          if (atop[0] & (1UL << posa)) {
             stab_top = &F.stab1[posa << 1];
@@ -1342,7 +1342,7 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
             atop--;
          }
       }
-   
+
       long sn = F.size;
       r.xrep.SetLength(sn);
       if (&r != &a) {
@@ -1356,8 +1356,8 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
    else {
       long sa = a.xrep.length();
       long posa = da - NTL_BITS_PER_LONG*(sa-1);
-   
-   
+
+
       _ntl_ulong *ap;
       if (&r == &a)
          ap = r.xrep.elts();
@@ -1365,19 +1365,19 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
          GF2X_rembuf = a.xrep;
          ap = GF2X_rembuf.elts();
       }
-   
+
       _ntl_ulong *atop = &ap[sa-1];
       _ntl_ulong *stab_top;
-   
+
       long i;
-   
+
       while (1) {
          if (atop[0] & (1UL << posa)) {
             stab_top = F.stab_ptr[posa];
             for (i = F.stab_cnt[posa]; i <= 0; i++)
                atop[i] ^= stab_top[i];
          }
-   
+
          da--;
          if (da < n) break;
 
@@ -1387,7 +1387,7 @@ void rem(GF2X& r, const GF2X& a, const GF2XModulus& F)
             atop--;
          }
       }
-   
+
       long sn = F.size;
       r.xrep.SetLength(sn);
       if (&r != &a) {
@@ -1413,19 +1413,19 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
       clear(q);
    }
    else if (F.method == GF2X_MOD_TRI) {
-      if (da <= 2*(n-1)) 
+      if (da <= 2*(n-1))
          TriDivRem21(q, r, a, F.n, F.k3);
       else
          TriDivRemX1(q, r, a, F.n, F.k3);
    }
    else if (F.method == GF2X_MOD_PENT) {
-      if (da <= 2*(n-1)) 
+      if (da <= 2*(n-1))
          PentDivRem21(q, r, a, F.n, F.k3, F.k2, F.k1);
       else
          PentDivRemX1(q, r, a, F.n, F.k3, F.k2, F.k1);
    }
    else if (F.method == GF2X_MOD_MUL) {
-      if (da <= 2*(n-1)) 
+      if (da <= 2*(n-1))
          UseMulDivRem21(q, r, a, F);
       else
          UseMulDivRemX1(q, r, a, F);
@@ -1433,11 +1433,11 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
    else if (F.method == GF2X_MOD_SPECIAL) {
       long sa = a.xrep.length();
       long posa = da - NTL_BITS_PER_LONG*(sa-1);
-   
+
       long dq = da - n;
       long sq = dq/NTL_BITS_PER_LONG + 1;
       long posq = dq - NTL_BITS_PER_LONG*(sq-1);
-   
+
       _ntl_ulong *ap;
       if (&r == &a)
          ap = r.xrep.elts();
@@ -1445,7 +1445,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
          GF2X_rembuf = a.xrep;
          ap = GF2X_rembuf.elts();
       }
-   
+
       _ntl_ulong *atop = &ap[sa-1];
       _ntl_ulong *stab_top;
 
@@ -1458,7 +1458,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
 
       _ntl_ulong *qtop = &qp[sq-1];
 
-   
+
       while (1) {
          if (atop[0] & (1UL << posa)) {
             qtop[0] |= (1UL << posq);
@@ -1467,7 +1467,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
             atop[i] ^= stab_top[0];
             atop[i+1] ^= stab_top[1];
          }
-   
+
          da--;
          if (da < n) break;
 
@@ -1483,7 +1483,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
             qtop--;
          }
       }
-   
+
       long sn = F.size;
       r.xrep.SetLength(sn);
       if (&r != &a) {
@@ -1497,11 +1497,11 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
    else {
       long sa = a.xrep.length();
       long posa = da - NTL_BITS_PER_LONG*(sa-1);
-   
+
       long dq = da - n;
       long sq = dq/NTL_BITS_PER_LONG + 1;
       long posq = dq - NTL_BITS_PER_LONG*(sq-1);
-   
+
       _ntl_ulong *ap;
       if (&r == &a)
          ap = r.xrep.elts();
@@ -1509,10 +1509,10 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
          GF2X_rembuf = a.xrep;
          ap = GF2X_rembuf.elts();
       }
-   
+
       _ntl_ulong *atop = &ap[sa-1];
       _ntl_ulong *stab_top;
-   
+
       long i;
 
       q.xrep.SetLength(sq);
@@ -1521,7 +1521,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
          qp[i] = 0;
 
       _ntl_ulong *qtop = &qp[sq-1];
-   
+
       while (1) {
          if (atop[0] & (1UL << posa)) {
             qtop[0] |= (1UL << posq);
@@ -1529,7 +1529,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
             for (i = F.stab_cnt[posa]; i <= 0; i++)
                atop[i] ^= stab_top[i];
          }
-   
+
          da--;
          if (da < n) break;
 
@@ -1545,7 +1545,7 @@ void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2XModulus& F)
             qtop--;
          }
       }
-   
+
       long sn = F.size;
       r.xrep.SetLength(sn);
       if (&r != &a) {
@@ -1573,19 +1573,19 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
       clear(q);
    }
    else if (F.method == GF2X_MOD_TRI) {
-      if (da <= 2*(n-1)) 
+      if (da <= 2*(n-1))
          TriDiv21(q, a, F.n, F.k3);
       else
          TriDivX1(q, a, F.n, F.k3);
    }
    else if (F.method == GF2X_MOD_PENT) {
-      if (da <= 2*(n-1)) 
+      if (da <= 2*(n-1))
          PentDiv21(q, a, F.n, F.k3, F.k2, F.k1);
       else
          PentDivX1(q, a, F.n, F.k3, F.k2, F.k1);
    }
    else if (F.method == GF2X_MOD_MUL) {
-      if (da <= 2*(n-1)) 
+      if (da <= 2*(n-1))
          UseMulDiv21(q, a, F);
       else
          UseMulDivX1(q, a, F);
@@ -1593,16 +1593,16 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
    else if (F.method == GF2X_MOD_SPECIAL) {
       long sa = a.xrep.length();
       long posa = da - NTL_BITS_PER_LONG*(sa-1);
-   
+
       long dq = da - n;
       long sq = dq/NTL_BITS_PER_LONG + 1;
       long posq = dq - NTL_BITS_PER_LONG*(sq-1);
-   
+
       _ntl_ulong *ap;
       GF2X_rembuf = a.xrep;
       ap = GF2X_rembuf.elts();
 
-   
+
       _ntl_ulong *atop = &ap[sa-1];
       _ntl_ulong *stab_top;
 
@@ -1614,7 +1614,7 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
          qp[i] = 0;
 
       _ntl_ulong *qtop = &qp[sq-1];
-   
+
       while (1) {
          if (atop[0] & (1UL << posa)) {
             qtop[0] |= (1UL << posq);
@@ -1623,7 +1623,7 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
             atop[i] ^= stab_top[0];
             atop[i+1] ^= stab_top[1];
          }
-   
+
          da--;
          if (da < n) break;
 
@@ -1643,18 +1643,18 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
    else {
       long sa = a.xrep.length();
       long posa = da - NTL_BITS_PER_LONG*(sa-1);
-   
+
       long dq = da - n;
       long sq = dq/NTL_BITS_PER_LONG + 1;
       long posq = dq - NTL_BITS_PER_LONG*(sq-1);
-   
+
       _ntl_ulong *ap;
       GF2X_rembuf = a.xrep;
       ap = GF2X_rembuf.elts();
-   
+
       _ntl_ulong *atop = &ap[sa-1];
       _ntl_ulong *stab_top;
-   
+
       long i;
 
       q.xrep.SetLength(sq);
@@ -1663,7 +1663,7 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
          qp[i] = 0;
 
       _ntl_ulong *qtop = &qp[sq-1];
-   
+
       while (1) {
          if (atop[0] & (1UL << posa)) {
             qtop[0] |= (1UL << posq);
@@ -1671,7 +1671,7 @@ void div(GF2X& q, const GF2X& a, const GF2XModulus& F)
             for (i = F.stab_cnt[posa]; i <= 0; i++)
                atop[i] ^= stab_top[i];
          }
-   
+
          da--;
          if (da < n) break;
 
@@ -1753,7 +1753,7 @@ long OptWinSize(long n)
 
    return k;
 }
-      
+
 
 
 void PowerMod(GF2X& h, const GF2X& g, const ZZ& e, const GF2XModulus& F)
@@ -1820,7 +1820,7 @@ void PowerMod(GF2X& h, const GF2X& g, const ZZ& e, const GF2XModulus& F)
    v.SetLength(1L << (k-1));
 
    v[0] = g;
- 
+
    if (k > 1) {
       GF2X t;
       SqrMod(t, g, F);
@@ -1836,7 +1836,7 @@ void PowerMod(GF2X& h, const GF2X& g, const ZZ& e, const GF2XModulus& F)
 
    val = 0;
    for (i = n-1; i >= 0; i--) {
-      val = (val << 1) | bit(e, i); 
+      val = (val << 1) | bit(e, i);
       if (val == 0)
          SqrMod(res, res, F);
       else if (val >= (1L << (k-1)) || i == 0) {
@@ -1868,7 +1868,7 @@ void PowerMod(GF2X& h, const GF2X& g, const ZZ& e, const GF2XModulus& F)
    h = res;
 }
 
-   
+
 
 
 void PowerXMod(GF2X& hh, const ZZ& e, const GF2XModulus& F)
@@ -1903,7 +1903,7 @@ void PowerXMod(GF2X& hh, const ZZ& e, const GF2XModulus& F)
 }
 
 
-      
+
 
 
 void UseMulRem(GF2X& r, const GF2X& a, const GF2X& b)
@@ -1923,7 +1923,7 @@ void UseMulRem(GF2X& r, const GF2X& a, const GF2X& b)
    RightShift(P2, P2, da-db);
    mul(P1, P2, b);
    add(P1, P1, a);
-   
+
    r = P1;
 }
 
@@ -1944,7 +1944,7 @@ void UseMulDivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2X& b)
    RightShift(P2, P2, da-db);
    mul(P1, P2, b);
    add(P1, P1, a);
-   
+
    r = P1;
    q = P2;
 }
@@ -1964,12 +1964,12 @@ void UseMulDiv(GF2X& q, const GF2X& a, const GF2X& b)
    RightShift(P2, a, db);
    mul(P2, P1, P2);
    RightShift(P2, P2, da-db);
-   
+
    q = P2;
 }
 
 
-const long GF2X_DIV_CROSS = 100; 
+const long GF2X_DIV_CROSS = 100;
 
 void DivRem(GF2X& q, GF2X& r, const GF2X& a, const GF2X& b)
 {
@@ -2020,8 +2020,8 @@ void rem(GF2X& r, const GF2X& a, const GF2X& b)
 }
 
 
-static inline 
-void swap(_ntl_ulong_ptr& a, _ntl_ulong_ptr& b)  
+static inline
+void swap(_ntl_ulong_ptr& a, _ntl_ulong_ptr& b)
 {  _ntl_ulong_ptr t;  t = a; a = b; b = t; }
 
 
@@ -2032,7 +2032,7 @@ void BaseGCD(GF2X& d, const GF2X& a_in, const GF2X& b_in)
 {
    GF2XRegister(a);
    GF2XRegister(b);
-   
+
    if (IsZero(a_in)) {
       d = b_in;
       return;
@@ -2042,7 +2042,7 @@ void BaseGCD(GF2X& d, const GF2X& a_in, const GF2X& b_in)
       d = a_in;
       return;
    }
-      
+
    a.xrep.SetMaxLength(a_in.xrep.length()+1);
    b.xrep.SetMaxLength(b_in.xrep.length()+1);
 
@@ -2239,7 +2239,7 @@ void XXGCD(GF2X& d, GF2X& r_out, const GF2X& a_in, const GF2X& b_in)
       clear(r_out);
       return;
    }
-      
+
    a.xrep.SetMaxLength(a_in.xrep.length()+1);
    b.xrep.SetMaxLength(b_in.xrep.length()+1);
 
@@ -2347,12 +2347,12 @@ void OldXGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
       DivRem(q, r, a, b);
       BaseXGCD(d, s1, t1, b, r);
 
-      
+
       mul(r, t1, q);
       add(r, r, s1);  // r = s1 - t1*q, but sign doesn't matter
 
       s = t1;
-      t = r;   
+      t = r;
    }
    else if (sa >= 10 && 2*sb > 3*sa) {
       GF2XRegister(r);
@@ -2364,12 +2364,12 @@ void OldXGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
       DivRem(q, r, b, a);
       BaseXGCD(d, s1, t1, a, r);
 
-      
+
       mul(r, t1, q);
       add(r, r, s1);  // r = s1 - t1*q, but sign doesn't matter
 
       t = t1;
-      s = r;  
+      s = r;
    }
    else {
       BaseXGCD(d, s, t, a, b);
@@ -2388,7 +2388,7 @@ void BaseInvMod(GF2X& d, GF2X& s, const GF2X& a, const GF2X& f)
    long sa = a.xrep.length();
    long sf = f.xrep.length();
 
-   if ((sa >= 10 && 2*sf > 3*sa) || 
+   if ((sa >= 10 && 2*sf > 3*sa) ||
        sf > NTL_GF2X_GCD_CROSSOVER/NTL_BITS_PER_LONG) {
       GF2XRegister(t);
 
@@ -2403,7 +2403,7 @@ void BaseInvMod(GF2X& d, GF2X& s, const GF2X& a, const GF2X& f)
 
 
 void InvMod(GF2X& c, const GF2X& a, const GF2X& f)
-{ 
+{
    GF2XRegister(d);
    GF2XRegister(s);
    BaseInvMod(d, s, a, f);
@@ -2416,7 +2416,7 @@ void InvMod(GF2X& c, const GF2X& a, const GF2X& f)
 
 
 long InvModStatus(GF2X& c, const GF2X& a, const GF2X& f)
-{ 
+{
    GF2XRegister(d);
    GF2XRegister(s);
    BaseInvMod(d, s, a, f);
@@ -2432,11 +2432,11 @@ long InvModStatus(GF2X& c, const GF2X& a, const GF2X& f)
 
 
 
-   
+
 void diff(GF2X& c, const GF2X& a)
 {
    RightShift(c, a, 1);
-   
+
    // clear odd coeffs
 
    long dc = deg(c);
@@ -2474,7 +2474,7 @@ void conv(vec_GF2& x, const GF2X& a)
 
 void VectorCopy(vec_GF2& x, const GF2X& a, long n)
 {
-   if (n < 0) Error("VectorCopy: negative length"); 
+   if (n < 0) Error("VectorCopy: negative length");
 
    if (NTL_OVERFLOW(n, 1, 0))
       Error("overflow in VectorCopy");
@@ -2510,7 +2510,7 @@ void add(GF2X& c, const GF2X& a, long b)
    c = a;
    if (b & 1) {
       long n = c.xrep.length();
-      if (n == 0) 
+      if (n == 0)
          set(c);
       else {
          c.xrep[0] ^= 1;
@@ -2576,7 +2576,7 @@ long divide(const GF2X& a, const GF2X& b)
 /*** modular composition routines and data structures ***/
 
 
-void InnerProduct(GF2X& x, const GF2X& v, long dv, long low, long high, 
+void InnerProduct(GF2X& x, const GF2X& v, long dv, long low, long high,
                    const vec_GF2X& H, long n, WordVector& t)
 {
    long i, j;
@@ -2590,7 +2590,7 @@ void InnerProduct(GF2X& x, const GF2X& v, long dv, long low, long high,
    long w_low = low/NTL_BITS_PER_LONG;
    long b_low = low - w_low*NTL_BITS_PER_LONG;
 
-   
+
    const _ntl_ulong *vp = &v.xrep[w_low];
    _ntl_ulong msk = 1UL << b_low;
    _ntl_ulong vv = *vp;
@@ -2659,7 +2659,7 @@ void build(GF2XArgument& A, const GF2X& h, const GF2XModulus& F, long m)
 
    set(A.H[0]);
    A.H[1] = h;
-   for (i = 2; i <= m; i++) 
+   for (i = 2; i <= m; i++)
       MulMod(A.H[i], A.H[i-1], h, F);
 }
 
@@ -2709,7 +2709,7 @@ void Comp2Mod(GF2X& x1, GF2X& x2, const GF2X& g1, const GF2X& g2,
    x2 = xx2;
 }
 
-void Comp3Mod(GF2X& x1, GF2X& x2, GF2X& x3, 
+void Comp3Mod(GF2X& x1, GF2X& x2, GF2X& x3,
               const GF2X& g1, const GF2X& g2, const GF2X& g3,
               const GF2X& h, const GF2XModulus& F)
 
@@ -2759,15 +2759,15 @@ void build(GF2XTransMultiplier& B, const GF2X& b, const GF2XModulus& F)
    if (d < 0)
       B.shamt_fbi = 0;
    else
-      B.shamt_fbi = F.n-2 - d; 
+      B.shamt_fbi = F.n-2 - d;
 
    CopyReverse(B.fbi, t, d);
 
    if (F.method != GF2X_MOD_TRI && F.method != GF2X_MOD_PENT) {
-   
-      // The following code optimizes the case when 
+
+      // The following code optimizes the case when
       // f = X^n + low degree poly
-   
+
       trunc(t, F.f, F.n);
       d = deg(t);
       if (d < 0)
@@ -2835,14 +2835,14 @@ void UpdateMap(vec_GF2& x, const vec_GF2& a, const GF2XTransMultiplier& B,
    TransMulMod(xx, aa, B, F);
    conv(x, xx);
 }
-   
+
 
 void ProjectPowers(GF2X& x, const GF2X& a, long k, const GF2XArgument& H,
                    const GF2XModulus& F)
 {
    long n = F.n;
 
-   if (deg(a) >= n || k < 0 || NTL_OVERFLOW(k, 1, 0)) 
+   if (deg(a) >= n || k < 0 || NTL_OVERFLOW(k, 1, 0))
       Error("ProjectPowers: bad args");
 
    long m = H.H.length()-1;
@@ -2869,7 +2869,7 @@ void ProjectPowers(GF2X& x, const GF2X& a, long k, const GF2XArgument& H,
 }
 
 
-void ProjectPowers(vec_GF2& x, const vec_GF2& a, long k, 
+void ProjectPowers(vec_GF2& x, const vec_GF2& a, long k,
                    const GF2XArgument& H, const GF2XModulus& F)
 {
    GF2X xx;
@@ -2878,7 +2878,7 @@ void ProjectPowers(vec_GF2& x, const vec_GF2& a, long k,
 }
 
 
-void ProjectPowers(GF2X& x, const GF2X& a, long k, const GF2X& h, 
+void ProjectPowers(GF2X& x, const GF2X& a, long k, const GF2X& h,
                    const GF2XModulus& F)
 {
    if (deg(a) >= F.n || k < 0) Error("ProjectPowers: bad args");
@@ -2919,7 +2919,7 @@ void OldMinPolyInternal(GF2X& h, const GF2X& x, long m)
    SetCoeff(a_in, 2*m);
 
    CopyReverse(b_in, x, 2*m-1);
-      
+
    a.xrep.SetMaxLength(a_in.xrep.length()+1);
    b.xrep.SetMaxLength(b_in.xrep.length()+1);
 
@@ -2976,7 +2976,7 @@ void OldMinPolyInternal(GF2X& h, const GF2X& x, long m)
       ShiftAdd(rp, sp, ss, da-db);
       long t = ss + (da-db+NTL_BITS_PER_LONG-1)/NTL_BITS_PER_LONG;
       if (t > sr) {
-         while (t > 0 && rp[t-1] == 0) t--; 
+         while (t > 0 && rp[t-1] == 0) t--;
          sr = t;
       }
 
@@ -3011,7 +3011,7 @@ void OldMinPolyInternal(GF2X& h, const GF2X& x, long m)
 }
 
 
-void DoMinPolyMod(GF2X& h, const GF2X& g, const GF2XModulus& F, long m, 
+void DoMinPolyMod(GF2X& h, const GF2X& g, const GF2XModulus& F, long m,
                const GF2X& R)
 {
    GF2X x;
@@ -3065,7 +3065,7 @@ void MinPolyMod(GF2X& hh, const GF2X& g, const GF2XModulus& F, long m)
    GF2X h2, h3;
    GF2X R;
    GF2XTransMultiplier H1;
-   
+
 
    for (;;) {
       random(R, n);
@@ -3111,7 +3111,7 @@ void MulByXMod(GF2X& c, const GF2X& a, const GF2XModulus& F)
 {
    long da = deg(a);
    long df = deg(F);
-   if (da >= df) Error("MulByXMod: bad args"); 
+   if (da >= df) Error("MulByXMod: bad args");
 
    MulByX(c, a);
 
@@ -3124,7 +3124,7 @@ void MulByXModAux(GF2X& c, const GF2X& a, const GF2X& f)
 {
    long da = deg(a);
    long df = deg(f);
-   if (da >= df) Error("MulByXMod: bad args"); 
+   if (da >= df) Error("MulByXMod: bad args");
 
    MulByX(c, a);
 
@@ -3170,7 +3170,7 @@ void power(GF2X& x, const GF2X& a, long e)
    GF2X res;
    res.SetMaxLength(da*e + 1);
    res = 1;
-   
+
    long k = NumBits(e);
    long i;
 
@@ -3202,7 +3202,7 @@ void PlainTraceVec(vec_GF2& S, const GF2X& f)
 {
    long n = deg(f);
 
-   if (n <= 0) 
+   if (n <= 0)
       Error("TraceVec: bad args");
 
    if (n == 0) {
@@ -3212,7 +3212,7 @@ void PlainTraceVec(vec_GF2& S, const GF2X& f)
 
    GF2X x = reverse(-LeftShift(reverse(diff(reverse(f)), n-1), n-1)/f, n-1);
 
-   VectorCopy(S, x, n); 
+   VectorCopy(S, x, n);
    S.put(0, to_GF2(n));
 }
 
@@ -3245,7 +3245,7 @@ void TraceMod(GF2& x, const GF2X& a, const GF2XModulus& F)
    if (deg(a) >= n)
       Error("trace: bad args");
 
-   if (F.tracevec.length() == 0) 
+   if (F.tracevec.length() == 0)
       ComputeTraceVec(F);
 
    project(x, F.tracevec, a);
@@ -3498,7 +3498,7 @@ void GCD(GF2X& d, const GF2X& u, const GF2X& v)
       OldGCD(d, u, v);
       return;
    }
-    
+
    GF2X u1, v1;
 
    u1 = u;
@@ -3664,7 +3664,7 @@ void XGCD(GF2X& d, GF2X& s, GF2X& t, const GF2X& a, const GF2X& b)
 
 
 void MinPolyInternal(GF2X& h, const GF2X& x, long m)
-{  
+{
    if (m < NTL_GF2X_BERMASS_CROSSOVER) {
       OldMinPolyInternal(h, x, m);
       return;
@@ -3672,7 +3672,7 @@ void MinPolyInternal(GF2X& h, const GF2X& x, long m)
 
    GF2X a, b;
    _NTL_GF2XMatrix M;
-      
+
    SetCoeff(b, 2*m);
    CopyReverse(a, x, 2*m-1);
    HalfGCD(M, b, a, m+1);

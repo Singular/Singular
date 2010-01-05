@@ -20,10 +20,10 @@ void HessCharPoly(zz_pX& g, const zz_pX& a, const zz_pX& f)
    t = a;
 
    for (i = 0; i < n; i++) {
-      for (j = 0; j < n; j++) 
+      for (j = 0; j < n; j++)
          M[i][j] = coeff(t, j);
 
-      if (i < n-1) 
+      if (i < n-1)
          MulByXMod(t, t, f);
    }
 
@@ -36,7 +36,7 @@ void CharPolyMod(zz_pX& g, const zz_pX& a, const zz_pX& ff)
    MakeMonic(f);
    long n = deg(f);
 
-   if (n <= 0 || deg(a) >= n) 
+   if (n <= 0 || deg(a) >= n)
       Error("CharPoly: bad args");
 
    if (IsZero(a)) {

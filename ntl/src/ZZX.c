@@ -107,7 +107,7 @@ void SetCoeff(ZZX& x, long i, const ZZ& a)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("SetCoeff: negative index");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -131,7 +131,7 @@ void SetCoeff(ZZX& x, long i, const ZZ& a)
          x.rep.SetLength(i+1);
          x.rep[i] = a;
       }
-         
+
       for (j = m+1; j < i; j++)
          clear(x.rep[j]);
    }
@@ -146,7 +146,7 @@ void SetCoeff(ZZX& x, long i)
 {
    long j, m;
 
-   if (i < 0) 
+   if (i < 0)
       Error("coefficient index out of range");
 
    if (NTL_OVERFLOW(i, 1, 0))
@@ -175,8 +175,8 @@ long IsX(const ZZX& a)
 {
    return deg(a) == 1 && IsOne(LeadCoeff(a)) && IsZero(ConstTerm(a));
 }
-      
-      
+
+
 
 const ZZ& coeff(const ZZX& a, long i)
 {
@@ -218,7 +218,7 @@ void conv(ZZX& x, const ZZ& a)
 
 void conv(ZZX& x, long a)
 {
-   if (a == 0) 
+   if (a == 0)
       x.rep.SetLength(0);
    else {
       x.rep.SetLength(1);
@@ -243,7 +243,7 @@ void add(ZZX& x, const ZZX& a, const ZZX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const ZZ *ap, *bp; 
+   const ZZ *ap, *bp;
    ZZ* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -278,7 +278,7 @@ void add(ZZX& x, const ZZX& a, const ZZ& b)
    else {
       // ugly...b could alias a coeff of x
 
-      ZZ *xp = x.rep.elts(); 
+      ZZ *xp = x.rep.elts();
       add(xp[0], a.rep[0], b);
       x.rep.SetLength(n);
       xp = x.rep.elts();
@@ -313,7 +313,7 @@ void sub(ZZX& x, const ZZX& a, const ZZX& b)
    x.rep.SetLength(maxab+1);
 
    long i;
-   const ZZ *ap, *bp; 
+   const ZZ *ap, *bp;
    ZZ* xp;
 
    for (i = minab+1, ap = a.rep.elts(), bp = b.rep.elts(), xp = x.rep.elts();
@@ -464,7 +464,7 @@ void PlainMul(ZZX& x, const ZZX& a, const ZZX& b)
 
    const ZZ *ap, *bp;
    ZZ *xp;
-   
+
    ZZX la, lb;
 
    if (&x == &a) {
@@ -636,7 +636,7 @@ static void PlainMul1(ZZ *xp, const ZZ *ap, long sa, const ZZ& b)
 
 
 static
-void KarMul(ZZ *c, const ZZ *a, 
+void KarMul(ZZ *c, const ZZ *a,
             long sa, const ZZ *b, long sb, ZZ *stk)
 {
    if (sa < sb) {
@@ -790,8 +790,8 @@ void KarMul(ZZX& c, const ZZX& a, const ZZX& b)
       } while (n >= xover);
 
       ZZVec stk;
-      stk.SetSize(sp, 
-         ((maxa + maxb + NumBits(min(sa, sb)) + 2*depth + 10) 
+      stk.SetSize(sp,
+         ((maxa + maxb + NumBits(min(sa, sb)) + 2*depth + 10)
           + NTL_ZZ_NBITS-1)/NTL_ZZ_NBITS);
 
       KarMul(cp, ap, sa, bp, sb, stk.elts());
@@ -868,7 +868,7 @@ void KarSqr(ZZ *c, const ZZ *a, long sa, ZZ *stk)
       sqr(c[4], a[2]);
 
       return;
- 
+
    }
 
    long hsa = (sa + 1) >> 1;
@@ -895,7 +895,7 @@ void KarSqr(ZZ *c, const ZZ *a, long sa, ZZ *stk)
    KarAdd(c+hsa, T2, hsa2-1);
 }
 
-      
+
 void KarSqr(ZZX& c, const ZZX& a)
 {
    if (IsZero(a)) {
@@ -944,8 +944,8 @@ void KarSqr(ZZX& c, const ZZX& a)
       } while (n >= xover);
 
       ZZVec stk;
-      stk.SetSize(sp, 
-         ((2*maxa + NumBits(sa) + 2*depth + 10) 
+      stk.SetSize(sp,
+         ((2*maxa + NumBits(sa) + 2*depth + 10)
           + NTL_ZZ_NBITS-1)/NTL_ZZ_NBITS);
 
       KarSqr(cp, ap, sa, stk.elts());
