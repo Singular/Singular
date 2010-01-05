@@ -53,7 +53,6 @@ omBin poly_bin = omGetSpecBin(sizeof(poly));
 omBin indlist_bin = omGetSpecBin(sizeof(indlist));
 omBin naIdeal_bin = omGetSpecBin(sizeof(naIdeal));
 omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
-omBin sm_prec_bin = omGetSpecBin(sizeof(sm_prec));
 omBin smprec_bin = omGetSpecBin(sizeof(smprec));
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 omBin sip_smap_bin = omGetSpecBin(sizeof(sip_smap));

@@ -130,6 +130,11 @@ enum nc_type
 
 typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O} lib_types;
 
+struct snumber;
+typedef struct snumber *   number;
+typedef number (*numberfunc)(number a,number b);
+typedef number (*nMapFunc)(number a);
+
 /* C++-part */
 #ifdef __cplusplus
 class ip_smatrix;
@@ -141,7 +146,6 @@ class sattr;
 class skStrategy;
 class ssyStrategy;
 class procinfo;
-class namerec;
 class kBucket;
 class sBucket;
 class CPolynomialSummator;
@@ -156,7 +160,6 @@ struct sip_link;
 struct spolynom;
 struct _ssubexpr;
 struct _sssym;
-struct snumber;
 struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
@@ -184,7 +187,6 @@ typedef int  *             int_ptr;
 typedef short *            short_ptr;
 typedef ip_sring *         ring;
 typedef int                idtyp;
-typedef struct snumber *   number;
 typedef polyrec *          poly;
 typedef poly *             polyset;
 typedef ip_sideal *        ideal;
@@ -208,7 +210,6 @@ typedef skStrategy *       kStrategy;
 typedef ip_package *       package;
 typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
-typedef namerec *          namehdl;
 typedef kBucket*           kBucket_pt;
 typedef sBucket*           sBucket_pt;
 typedef struct p_Procs_s p_Procs_s;
@@ -243,17 +244,6 @@ struct smprec
   float f;             // complexity of the element
 };
 
-struct _scmdnames
-{
-  char *name;
-  short alias;
-  short tokval;
-  short toktype;
-};
-typedef struct _scmdnames cmdnames;
-
-typedef number (*numberfunc)(number a,number b);
-typedef number (*nMapFunc)(number a);
 struct n_Procs_s
 {
    n_Procs_s* next;
@@ -909,7 +899,6 @@ extern struct omBin_s* poly_bin;
 extern struct omBin_s* indlist_bin;
 extern struct omBin_s* naIdeal_bin;
 extern struct omBin_s* snaIdeal_bin;
-extern struct omBin_s* sm_prec_bin;
 extern struct omBin_s* smprec_bin;
 extern struct omBin_s* sip_sideal_bin;
 extern struct omBin_s* sip_smap_bin;
