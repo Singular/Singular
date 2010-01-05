@@ -14,6 +14,7 @@
 #ifdef  HAVE_FACTORY
 #include "structs.h"
 #include "numbers.h"
+#include "ring.h"
 #include "omalloc.h"
 
 #include "fglmvec.h"

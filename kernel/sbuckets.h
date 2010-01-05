@@ -15,6 +15,7 @@
 #define S_BUCKETS_H
 
 #include "structs.h"
+#include "ring.h"
 
 
 

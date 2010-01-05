@@ -13,6 +13,7 @@
 
 #include "structs.h"
 #include "longalg.h"
+#include "ring.h"
 #include <factory.h>
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r=currRing );

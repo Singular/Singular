@@ -105,9 +105,9 @@ extern int  traceit ;
 #define TRACE_SHOW_LINE1  16
 #define TRACE_BREAKPOINT  32
 #define TRACE_TMP_BREAKPOINT  64
-extern int  myynest;
-
-
+extern int myynest;
+extern int yylineno;
+extern char     my_yylinebuf[80];
 
 #define PROT_NONE 0
 #define PROT_I    1

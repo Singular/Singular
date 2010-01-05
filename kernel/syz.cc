@@ -654,7 +654,7 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
   }
   if (w!=NULL)
   {
-    result->weights = (intvec**)omAlloc0Bin(void_ptr_bin);
+    result->weights = (intvec**)omAlloc0Bin(char_ptr_bin);
     (result->weights)[0] = ivCopy(w);
     result->length = 1;
   }

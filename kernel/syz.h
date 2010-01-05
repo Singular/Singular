@@ -8,6 +8,7 @@
 * ABSTRACT: Resolutions
 */
 #include "structs.h"
+#include "ring.h"
 
 // Logarithm of estimate of maximal number of new components
 #define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8

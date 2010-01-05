@@ -9,6 +9,7 @@
 /* $Id$ */
 
 #include "structs.h"
+#include "ring.h"
 
 extern short * ecartWeights;
 extern pFDegProc pFDegOld;

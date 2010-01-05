@@ -8,6 +8,7 @@
 * ABSTRACT
 */
 #include "structs.h"
+#include "ring.h"
 
 ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat);
 

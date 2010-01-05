@@ -11,6 +11,7 @@
 // //////////////////////////////////////////////////////////////////////// //
 
 #include <structs.h>
+#include <ring.h>
 
 bool ncInitSpecialPowersMultiplication(ring r);
 

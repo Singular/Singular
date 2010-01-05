@@ -15,6 +15,10 @@
 
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 
+extern ring      currRing;
+extern ideal     currQuotient;
+extern idhdl      currRingHdl;
+
 
 void   rChangeCurrRing(ring r);
 void   rSetHdl(idhdl h);

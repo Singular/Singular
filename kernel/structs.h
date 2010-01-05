@@ -182,7 +182,6 @@ typedef struct sip_package ip_package;
 typedef char *             char_ptr;
 typedef int  *             int_ptr;
 typedef short *            short_ptr;
-typedef void *             void_ptr;
 typedef ip_sring *         ring;
 typedef int                idtyp;
 typedef struct snumber *   number;
@@ -314,7 +313,6 @@ struct n_Procs_s
 #ifdef LDEBUG
    BOOLEAN (*nDBTest)(number a, const char *f,const int l);
 #endif
-//extern number  (*nMap)(number from);
 
    number nNULL; /* the 0 as constant */
    int     char_flag;
@@ -322,11 +320,6 @@ struct n_Procs_s
    short   nChar;
    n_coeffType type;
 };
-/* current ring stuff */
-
-extern ring      currRing;
-extern ideal     currQuotient;
-extern idhdl      currRingHdl;
 
 extern idhdl currPackHdl;
 extern idhdl basePackHdl;
@@ -789,9 +782,6 @@ extern int    yydebug;
 #endif
 #endif
 
-extern int      yylineno;
-extern char     my_yylinebuf[80];
-
 #define loop for(;;)
 
 #ifndef ABS
@@ -912,12 +902,10 @@ typedef libstack *  libstackv;
 #endif
 #endif /* HAVE_LIBPARSER */
 
-extern struct omBin_s* MP_INT_bin;
 extern struct omBin_s* char_ptr_bin;
 extern struct omBin_s* ideal_bin;
 extern struct omBin_s* int_bin;
 extern struct omBin_s* poly_bin;
-extern struct omBin_s* void_ptr_bin;
 extern struct omBin_s* indlist_bin;
 extern struct omBin_s* naIdeal_bin;
 extern struct omBin_s* snaIdeal_bin;
@@ -927,7 +915,6 @@ extern struct omBin_s* sip_sideal_bin;
 extern struct omBin_s* sip_smap_bin;
 extern struct omBin_s* sip_sring_bin;
 extern struct omBin_s* ip_sideal_bin;
-extern struct omBin_s* ip_smap_bin;
 extern struct omBin_s* ip_sring_bin;
 extern struct omBin_s* sleftv_bin;
 
@@ -994,58 +981,6 @@ class idrec
   idhdl set(const char * s, int lev, idtyp t, BOOLEAN init=TRUE);
   char * String();
 //  ~idrec();
-};
-
-class proc_singular
-{
-public:
-  long   proc_start;       // position where proc is starting
-  long   def_end;          // position where proc header is ending
-  long   help_start;       // position where help is starting
-  long   help_end;         // position where help is starting
-  long   body_start;       // position where proc-body is starting
-  long   body_end;         // position where proc-body is ending
-  long   example_start;    // position where example is starting
-  long   proc_end;         // position where proc is ending
-  int    proc_lineno;
-  int    body_lineno;
-  int    example_lineno;
-  char   *body;
-  long help_chksum;
-};
-
-struct proc_object
-{
-//public:
-  BOOLEAN (*function)(leftv res, leftv v);
-};
-
-union uprocinfodata;
-
-union uprocinfodata
-{
-public:
-  proc_singular  s;        // data of Singular-procedure
-  struct proc_object    o; // pointer to binary-function
-};
-
-typedef union uprocinfodata procinfodata;
-
-typedef enum { LANG_NONE, LANG_TOP, LANG_SINGULAR, LANG_C, LANG_MAX} language_defs;
-// LANG_TOP     : Toplevel package only
-// LANG_SINGULAR:
-// LANG_C       :
-class procinfo
-{
-public:
-  char          *libname;
-  char          *procname;
-  package       pack;
-  language_defs language;
-  short         ref;
-  char          is_static;        // if set, proc not accessible for user
-  char          trace_flag;
-  procinfodata  data;
 };
 
 #endif

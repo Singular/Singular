@@ -8,6 +8,7 @@
 * ABSTRACT - all basic methods to manipulate ideals
 */
 #include "structs.h"
+#include "ring.h"
 
 #ifdef PDEBUG
 ideal idDBInit (int size, int rank, const char *f, int l);
