@@ -37,10 +37,6 @@ typedef void * Sy_reference;
 #define BITSET  unsigned int
 
 /* EXPONENT_TYPE is determined by configure und defined in mod2.h */
-/* the following defines should really go into mod2.h,
-   but configure dislikes it */
-
-#define HAVE_IDI 1
 
 #if defined(SI_CPU_I386) || defined(SI_CPU_X86_64)
   // the following settings seems to be better on i386 and x86_64 processors
@@ -938,9 +934,7 @@ class idrec
 
   short      lev;
   short      ref;
-#ifdef HAVE_IDI
   int        id_i;
-#endif
 
 #define IDNEXT(a)    ((a)->next)
 #define IDTYP(a)     ((a)->typ)

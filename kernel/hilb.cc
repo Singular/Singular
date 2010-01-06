@@ -216,7 +216,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
 {
   intvec *work, *hseries1=NULL;
   int  mc;
-  int  *p0;
+  int  p0;
   int  i, j, k, l, ii, mw;
   hexist = hInit(S, Q, &hNexist, tailRing);
   if (hNexist==0)
@@ -236,8 +236,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   if (wdegree != NULL) hWDegree(wdegree);
   #endif
 
-  p0 = (int *)omAllocBin(int_bin);
-  *p0 = 1;
+  p0 = 1;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
   hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(int));
@@ -284,7 +283,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         hPure(hstc, 0, &hNstc, hvar, hNvar, hpure, &hNpure);
         hLexS(hstc, hNstc, hvar, hNvar);
         Q0[hNvar] = 0;
-        hHilbStep(hpure, hstc, hNstc, hvar, hNvar, p0, 1);
+        hHilbStep(hpure, hstc, hNstc, hvar, hNvar, &p0, 1);
       }
     }
     else
@@ -360,7 +359,6 @@ static intvec * hSeries(ideal S, intvec *modulweight,
   omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
-  omFreeBin((ADDRESS)p0,  int_bin);
   if (hisModule!=0)
     omFreeSize((ADDRESS)hstc, hNexist * sizeof(scmon));
   return hseries1;
