@@ -382,7 +382,7 @@ version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
 	echo "#define CXX \"" ${CXX} ${CXXFLAGS} ${DEFS} "\"" >>version.h
 
 libparse: libparse_main.o utils.o
-	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o ../kernel/fegetopt.o ${LDFLAGS2} -lomalloc_ndebug
+	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o ../kernel/fegetopt.o ${LDFLAGS2} -lomalloc
 
 libparse_main.o: libparse.cc
 	${CXX} ${CPPFLAGS} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
