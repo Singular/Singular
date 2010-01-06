@@ -56,8 +56,6 @@ omBin smprec_bin = omGetSpecBin(sizeof(smprec));
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 omBin sip_smap_bin = omGetSpecBin(sizeof(sip_smap));
 omBin sip_sring_bin = omGetSpecBin(sizeof(sip_sring));
-omBin ip_sideal_bin = omGetSpecBin(sizeof(ip_sideal));
-omBin ip_sring_bin = omGetSpecBin(sizeof(ip_sring));
 
 /*0 implementation*/
 

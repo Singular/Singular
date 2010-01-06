@@ -1024,7 +1024,7 @@ ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal,
 
   if (r == NULL) return NULL;
   int i,j;
-  ring res=(ring)omAllocBin(ip_sring_bin);
+  ring res=(ring)omAllocBin(sip_sring_bin);
 
   memcpy4(res,r,sizeof(ip_sring));
   res->VarOffset = NULL;

@@ -557,7 +557,7 @@ void rDelete(ring r)
     omFree((ADDRESS)r->nrnModul);
   }
 #endif
-  omFreeBin(r, ip_sring_bin);
+  omFreeBin(r, sip_sring_bin);
 }
 
 int rOrderName(char * ordername)
@@ -1310,7 +1310,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       return -1;
     }
   }
-  sum=(ring)omAllocBin(ip_sring_bin);
+  sum=(ring)omAllocBin(sip_sring_bin);
   memcpy(sum,&tmpR,sizeof(ip_sring));
   rComplete(sum);
 
@@ -1537,7 +1537,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 {
   if (r == NULL) return NULL;
   int i,j;
-  ring res=(ring)omAllocBin(ip_sring_bin);
+  ring res=(ring)omAllocBin(sip_sring_bin);
   memset(res,0,sizeof(ip_sring));
   //memcpy4(res,r,sizeof(ip_sring));
   //memset: res->idroot=NULL; /* local objects */
@@ -2841,7 +2841,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     omFreeSize(wvhdl,(nblocks+1)*sizeof(int_ptr));
     return r;
   }
-  ring res=(ring)omAlloc0Bin(ip_sring_bin);
+  ring res=(ring)omAlloc0Bin(sip_sring_bin);
   *res = *r;
 
 #ifdef HAVE_PLURAL
@@ -2944,7 +2944,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
 // construct Wp,C ring
 ring rModifyRing_Wp(ring r, int* weights)
 {
-  ring res=(ring)omAlloc0Bin(ip_sring_bin);
+  ring res=(ring)omAlloc0Bin(sip_sring_bin);
   *res = *r;
 #ifdef HAVE_PLURAL
   res->GetNC() = NULL;
@@ -3018,7 +3018,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     {
       order[1]=ringorder_C;
     }
-    ring res=(ring)omAlloc0Bin(ip_sring_bin);
+    ring res=(ring)omAlloc0Bin(sip_sring_bin);
     *res = *r;
 #ifdef HAVE_PLURAL
     res->GetNC() = NULL;
@@ -3071,7 +3071,7 @@ void rKillModifiedRing(ring r)
   omFree(r->block0);
   omFree(r->block1);
   omFree(r->wvhdl);
-  omFreeBin(r,ip_sring_bin);
+  omFreeBin(r,sip_sring_bin);
 }
 
 void rKillModified_Wp_Ring(ring r)
@@ -3082,7 +3082,7 @@ void rKillModified_Wp_Ring(ring r)
   omFree(r->block1);
   omFree(r->wvhdl[0]);
   omFree(r->wvhdl);
-  omFreeBin(r,ip_sring_bin);
+  omFreeBin(r,sip_sring_bin);
 }
 
 static void rSetOutParams(ring r)

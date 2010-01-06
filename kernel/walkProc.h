@@ -3,7 +3,7 @@
 #include "walkMain.h"
 ideal walkProc(leftv first, leftv second);
 ideal fractalWalkProc(leftv first, leftv second);
-WalkState walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm );
-WalkState fractalWalkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm );
+WalkState walkConsistency( ring sring, ring dring, int * vperm );
+WalkState fractalWalkConsistency( ring sring, ring dring, int * vperm );
 #endif
 

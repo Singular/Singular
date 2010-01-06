@@ -53,12 +53,10 @@
 ///////////////////////////////////////////////////////////////////
 
 WalkState
-walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
+walkConsistency( ring sring, ring dring, int * vperm )
 {
     int k;
     WalkState state= WalkOk;
-    ring dring = IDRING( dringHdl );
-    ring sring = IDRING( sringHdl );
 
     if ( rChar(sring) != rChar(dring) )
     {
@@ -211,12 +209,10 @@ walkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
 ///////////////////////////////////////////////////////////////////
 
 WalkState
-fractalWalkConsistency( idhdl sringHdl, idhdl dringHdl, int * vperm )
+fractalWalkConsistency( ring sring, ring dring, int * vperm )
 {
     int k;
     WalkState state= WalkOk;
-    ring dring = IDRING( dringHdl );
-    ring sring = IDRING( sringHdl );
 
     if ( rChar(sring) != rChar(dring) )
     {

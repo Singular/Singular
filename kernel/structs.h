@@ -898,8 +898,6 @@ extern struct omBin_s* smprec_bin;
 extern struct omBin_s* sip_sideal_bin;
 extern struct omBin_s* sip_smap_bin;
 extern struct omBin_s* sip_sring_bin;
-extern struct omBin_s* ip_sideal_bin;
-extern struct omBin_s* ip_sring_bin;
 extern struct omBin_s* sleftv_bin;
 
 #ifdef __cplusplus
@@ -934,29 +932,6 @@ class idrec
   short      lev;
   short      ref;
   int        id_i;
-
-#define IDNEXT(a)    ((a)->next)
-#define IDTYP(a)     ((a)->typ)
-#define IDFLAG(a)    ((a)->flag)
-#define IDLEV(a)     ((a)->lev)
-#define IDID(a)      ((a)->id)
-#define IDATTR(a)    ((a)->attribute)
-
-#define IDINT(a)    ((int)(long)((a)->data.ustring))
-#define IDDATA(a)   ((a)->data.ustring)
-#define IDRING(a)   ((a)->data.uring)
-#define IDINTVEC(a) ((a)->data.iv)
-#define IDPOLY(a)   ((a)->data.p)
-#define IDBIGINT(a) ((a)->data.n)
-#define IDNUMBER(a) ((a)->data.n)
-#define IDIDEAL(a)  (((a)->data).uideal)
-#define IDMATRIX(a) (((a)->data).umatrix)
-#define IDMAP(a)    (((a)->data).umap)
-#define IDSTRING(a) ((a)->data.ustring)
-#define IDLIST(a)   ((a)->data.l)
-#define IDLINK(a)   ((a)->data.li)
-#define IDPACKAGE(a) ((a)->data.pack)
-#define IDPROC(a)   ((a)->data.pinf)
 
   idrec() { memset(this,0,sizeof(*this)); }
   idhdl get(const char * s, int lev);

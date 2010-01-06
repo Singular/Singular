@@ -29,7 +29,7 @@
 #include "maps.h"
 #include "omalloc.h"
 #include "kstd1.h" // for kNF (see fglmquot)
-#include "intvec.h" 
+#include "intvec.h"
 #include "fglm.h"
 #include "fglmvec.h"
 #include "fglmgauss.h"
@@ -592,7 +592,7 @@ fglmSdata::getBorderDiv( const poly m, int & var ) const
 
 void
 internalCalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
-			      fglmSdata & data )
+                              fglmSdata & data )
 {
 
     // insert pOne() into basis and update the workingList:
@@ -662,13 +662,13 @@ CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l )
 
 static BOOLEAN
 CalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
-		      poly & p, fglmVector & v )
+                      poly & p, fglmVector & v )
 {
     fglmSdata data( theIdeal );
     internalCalculateFunctionals( theIdeal, l, data );
     //    STICKYPROT("Calculating vector rep\n");
     v = data.getVectorRep( p );
-    // if ( v.isZero() ) 
+    // if ( v.isZero() )
     //   STICKYPROT("vectorrep is 0\n");
     return ( data.state() );
 }
@@ -1018,7 +1018,7 @@ fglmDdata::gaussreduce( fglmVector & v, fglmVector & p, number & pdenom )
 
 static ideal
 GroebnerViaFunctionals( const idealFunctionals & l,
-			fglmVector iv = fglmVector() )
+                        fglmVector iv = fglmVector() )
 // If iv is zero, calculates the groebnerBasis for the ideal which is
 // defined by l.
 // If iv is not zero, then the groebnerBasis if i:p is calculated where
@@ -1038,7 +1038,7 @@ GroebnerViaFunctionals( const idealFunctionals & l,
       // STICKYPROT("initv is not zero\n");
       initv = iv;
     }
-      
+
     poly one = pOne();
     data.updateCandidates( one, initv );
     number nOne = nInit( 1 );
@@ -1103,7 +1103,7 @@ FindUnivariatePolys( const idealFunctionals & l )
     idDelete(&perm);
     for(i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
     delete iv;
-     
+
     for (i= 1; i <= pVariables; i++ )
     {
         // main loop
@@ -1156,20 +1156,24 @@ FindUnivariatePolys( const idealFunctionals & l )
 
 // for a descritption of the parameters see fglm.h
 BOOLEAN
-fglmzero( idhdl sourceRingHdl, ideal & sourceIdeal, idhdl destRingHdl, ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal )
+fglmzero( ring sourceRing, ideal & sourceIdeal, idhdl destRingHdl, ideal & destIdeal, BOOLEAN switchBack, BOOLEAN deleteIdeal )
 {
     idhdl initialRingHdl = currRingHdl;
     BOOLEAN fglmok;
 
-    if ( currRingHdl != sourceRingHdl )
-        rSetHdl( sourceRingHdl );
+    if ( currRing != sourceRing )
+    {
+        rChangeCurrRing( sourceRing );
+        currRingHdl=NULL;
+    }
     idealFunctionals L( 100, pVariables );
     fglmok = CalculateFunctionals( sourceIdeal, L );
     if ( deleteIdeal == TRUE )
         idDelete( & sourceIdeal );
     rSetHdl( destRingHdl );
-    if ( fglmok == TRUE ) {
-        L.map( IDRING( sourceRingHdl ) );
+    if ( fglmok == TRUE )
+    {
+        L.map( sourceRing );
         destIdeal= GroebnerViaFunctionals( L );
     }
     if ( (switchBack == TRUE) && (currRingHdl != initialRingHdl) )
