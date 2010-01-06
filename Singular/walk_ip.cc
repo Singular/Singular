@@ -75,7 +75,7 @@ walkProc(leftv first, leftv second)
     if(state==WalkOk)
     {
       int * vperm = (int *)omAlloc0( (pVariables+1)*sizeof( int ) );
-      state= walkConsistency( sourceRingHdl, destRingHdl, vperm );
+      state= walkConsistency( IDRING(sourceRingHdl), IDRING(destRingHdl), vperm );
       omFreeSize( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
     }
 
@@ -187,7 +187,7 @@ fractalWalkProc(leftv first, leftv second)
     ring sourceRing = currRing;
 
     int * vperm = (int *)omAlloc0( (pVariables+1)*sizeof( int ) );
-    state= fractalWalkConsistency( sourceRingHdl, destRingHdl, vperm );
+    state= fractalWalkConsistency( IDRING(sourceRingHdl), IDRING(destRingHdl), vperm );
     omFreeSize( (ADDRESS)vperm, (pVariables+1)*sizeof(int) );
 
     ideal sourceIdeal;
