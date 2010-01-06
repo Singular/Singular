@@ -292,7 +292,7 @@ static intvec * hSeries(ideal S, intvec *modulweight,
         (**Qpol)++;
       else
       {
-        *Qpol = (int *)omAllocBin(int_bin);
+        *Qpol = (int *)omAlloc(sizeof(int));
         hLength = *Ql = **Qpol = 1;
       }
     }

@@ -48,7 +48,6 @@
 
 omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr));
 omBin ideal_bin = omGetSpecBin(sizeof(ideal));
-omBin int_bin = omGetSpecBin(sizeof(int));
 omBin poly_bin = omGetSpecBin(sizeof(poly));
 omBin indlist_bin = omGetSpecBin(sizeof(indlist));
 omBin naIdeal_bin = omGetSpecBin(sizeof(naIdeal));

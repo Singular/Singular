@@ -890,7 +890,6 @@ typedef libstack *  libstackv;
 
 extern struct omBin_s* char_ptr_bin;
 extern struct omBin_s* ideal_bin;
-extern struct omBin_s* int_bin;
 extern struct omBin_s* poly_bin;
 extern struct omBin_s* indlist_bin;
 extern struct omBin_s* naIdeal_bin;
