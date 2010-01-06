@@ -55,7 +55,6 @@ void paCleanUp(package pack);
 
 /*0 implementation*/
 
-#ifdef HAVE_IDI
 int iiS2I(const char *s)
 {
   int i;
@@ -74,7 +73,7 @@ int iiS2I(const char *s)
   }
   return i;  
 }
-#endif
+
 idhdl idrec::get(const char * s, int lev)
 {
   assume(s!=NULL);
@@ -83,158 +82,6 @@ idhdl idrec::get(const char * s, int lev)
   idhdl found=NULL;
   int l;
   const char *id;
-#ifndef HAVE_IDI
-  if (s[1]=='\0')
-  {
-    while (h!=NULL)
-    {
-      omCheckAddr(IDID(h));
-// =============================================================
-#if 0
-// timings: ratchwum: 515 s, wilde13: 373 s, nepomuck: 267 s, lukas 863 s
-    id=IDID(h);
-    l=IDLEV(h);
-    if ((l==0) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
-    {
-      found=h;
-    }
-    else if ((l==lev) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
-    {
-      return h;
-    }
-#endif
-// =============================================================
-#if 0
-// timings: ratchwum: 515 s, wilde13: 398 s, nepomuck: 269 s, lukas 834 s
-    id=IDID(h);
-    if (*(short *)s==*(short *)id)
-    {
-      l=IDLEV(h);
-      if ((l==0) && (0 == strcmp(s+1,id+1)))
-      {
-        found=h;
-      }
-      else if ((l==lev) && (0 == strcmp(s+1,id+1)))
-      {
-        return h;
-      }
-    }
-#endif
-// =============================================================
-#if 1
-// timings: ratchwum: 501 s, wilde13: 357 s, nepomuck: 267 s, lukas 816 s
-// timings bug4: ratchwum: s, wilde13: s, nepomuck: 379.74 s, lukas s
-    l=IDLEV(h);
-    if ((l==0)||(l==lev))
-    {
-      id=IDID(h);
-      if (*s==*id)
-      {
-        if (id[1]=='\0')  // we know: s[1]=='\0'
-        {
-          if (l==lev) return h;
-          found=h;
-        }
-      }
-    }
-#endif
-// =============================================================
-#if 0
-// timings: ratchwum: s, wilde13: s, nepomuck: s, lukas s
-// timings bug4: ratchwum: s, wilde13: s, nepomuck: s, lukas s
-    l=IDLEV(h);
-    if ((l==0)||(l==lev))
-    {
-      id=IDID(h);
-      if (*(short *)s==*(short *)id)
-      {
-        if (l==lev) return h;
-        found=h;
-      }
-    }
-#endif
-// =============================================================
-    h = IDNEXT(h);
-  }
-  }
-  else
-  {
-  while (h!=NULL)
-  {
-    omCheckAddr(IDID(h));
-// =============================================================
-#if 0
-// timings: ratchwum: 515 s, wilde13: 373 s, nepomuck: 267 s, lukas 863 s
-    id=IDID(h);
-    l=IDLEV(h);
-    if ((l==0) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
-    {
-      found=h;
-    }
-    else if ((l==lev) && (*(short *)s==*(short *)id) && (0 == strcmp(s+1,id+1)))
-    {
-      return h;
-    }
-#endif
-// =============================================================
-#if 0
-// timings: ratchwum: 515 s, wilde13: 398 s, nepomuck: 269 s, lukas 834 s
-    id=IDID(h);
-    if (*(short *)s==*(short *)id)
-    {
-      l=IDLEV(h);
-      if ((l==0) && (0 == strcmp(s+1,id+1)))
-      {
-        found=h;
-      }
-      else if ((l==lev) && (0 == strcmp(s+1,id+1)))
-      {
-        return h;
-      }
-    }
-#endif
-// =============================================================
-#if 0
-// timings: ratchwum: 501 s, wilde13: 357 s, nepomuck: 267 s, lukas 816 s
-// timings bug4: ratchwum: s, wilde13: s, nepomuck: 379.74 s, lukas s
-    l=IDLEV(h);
-    if ((l==0)||(l==lev))
-    {
-      id=IDID(h);
-      if (*(short *)s==*(short *)id)
-      {
-        if (0 == strcmp(s+1,id+1))
-        {
-          if (l==lev) return h;
-          found=h;
-        }
-      }
-    }
-#endif
-// =============================================================
-#if 1
-// timings: ratchwum: s, wilde13: s, nepomuck: s, lukas s
-// timings bug4: ratchwum: s, wilde13: s, nepomuck: s, lukas s
-    l=IDLEV(h);
-    if ((l==0)||(l==lev))
-    {
-      id=IDID(h);
-      if (*(short *)s==*(short *)id)
-      {
-        if (0 == strcmp(s+1,id+1))
-        {
-          if (l==lev) return h;
-          found=h;
-        }
-      }
-    }
-#endif
-// =============================================================
-    h = IDNEXT(h);
-  }
-  }
-  return found;
-#else
   int i=iiS2I(s);
   int less4=(i < (1<<24));
   while (h!=NULL)
@@ -256,7 +103,6 @@ idhdl idrec::get(const char * s, int lev)
     h = IDNEXT(h);
   }
   return found;
-#endif
 }
 
 //idrec::~idrec()
@@ -278,9 +124,7 @@ idhdl idrec::set(const char * s, int lev, idtyp t, BOOLEAN init)
   IDTYP(h)  = t;
   IDLEV(h)  = lev;
   IDNEXT(h) = this;
-#ifdef HAVE_IDI
   h->id_i=iiS2I(s);
-#endif
   if (init)
   {
     switch (t)

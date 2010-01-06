@@ -110,10 +110,8 @@ inline idhdl mpsr_InitIdhdl(short tok, void *data, char *name)
   IDID(h) = omStrDup(name);
   IDTYP(h) = tok;
   IDDATA(h) = (char *) data;
-#ifdef HAVE_IDI
   extern int iiS2I(const char *s);
   h->id_i=iiS2I(name);
-#endif
   return h;
 }
 
