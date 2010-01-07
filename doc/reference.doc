@@ -6541,6 +6541,10 @@ resolution.
 @cindex system, browsers
 returns a string about available help browsers.
 @xref{The online help system}.
+@cindex cpu
+@cindex system, cpu
+returns the number of cpus as int (for creating multiple threads/processes).
+@item @code{system("pid")}
 @end table
 @item @strong{Example:}
 @smallexample
