@@ -2186,7 +2186,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
     }
     h4->m[IDELEMS(h4)-1] = p;
     idSkipZeroes(h4);
-    test |= Sy_bit(OPT_SB_1);
+    // test |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
   return h4;
@@ -2210,7 +2210,6 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
     return res;
   }
   BITSET old_test=test;
-  poly     p,q = NULL;
   int i,l,ll,k,kkk,kmax;
   BOOLEAN  addOnlyOne=TRUE;
   tHomog   hom=isNotHomog;
@@ -2240,7 +2239,6 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   if (weights1!=NULL) delete weights1;
   idDelete(&s_h4);
 
-
   for (i=0;i<IDELEMS(s_h3);i++)
   {
     if ((s_h3->m[i]!=NULL) && (pGetComp(s_h3->m[i])>=kmax))
@@ -2259,7 +2257,6 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
     s_h3->rank = h1->rank;
   if(syz_ring!=orig_ring)
   {
-//    pDelete(&q);
     rChangeCurrRing(orig_ring);
     s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
     rKill(syz_ring);
