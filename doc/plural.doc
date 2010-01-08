@@ -2601,6 +2601,7 @@ an opposite algebra will have variables X_N,...,X_1
 equipped with an opposed ordering @code{<_opp} (it is given
 by the matrix, obtained from the matrix ordering of @code{<}
 with the reverse order of columns).
+@*Currently not implemented for non-global orderings.
 @smallexample
 @c example
 LIB "ncalg.lib";
