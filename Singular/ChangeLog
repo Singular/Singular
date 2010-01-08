@@ -3,6 +3,8 @@ Changes w.r.t 3-1-0-8:
 - parts of structs.h moved to febase.h, ring.h, ...
 - bug in ideal quotient (by one polynom) fixed
 - system("cpu"): number of available CPUs or 1
+- opposite(ring) works also for commutative global rings
+  (but only, if compiled with HAVE_PLURAL)
 
 Changes w.r.t 3-1-0-7:
 - 3-1-0-8: Tue Jan  5 11:11:08 CET 2010

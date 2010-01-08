@@ -4819,11 +4819,16 @@ static BOOLEAN jjTRANSP_IV(leftv res, leftv v)
 static BOOLEAN jjOPPOSITE(leftv res, leftv a)
 {
   ring    r = (ring)a->Data();
-  if (rIsPluralRing(r))
+  //if (rIsPluralRing(r))
+  if (r->OrdSgn==1)
   {
     res->data = rOpposite(r);
   }
-  else res->data = rCopy(r);
+  else
+  {
+    WarnS("opposite only for global orderings");
+    res->data = rCopy(r);
+  }
   return FALSE;
 }
 static BOOLEAN jjENVELOPE(leftv res, leftv a)
