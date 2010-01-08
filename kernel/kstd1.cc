@@ -1790,6 +1790,11 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   }
   else
 #endif
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing)) 
+    r=bba(F,Q,NULL,hilb,strat); 
+  else
+#endif
   {
     if (pOrdSgn==-1)
     {
