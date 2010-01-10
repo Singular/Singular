@@ -188,18 +188,24 @@ number  nrnExtGcd (number a, number b, number *s, number *t)
 BOOLEAN nrnIsZero (number  a)
 {
 #ifdef LDEBUG
-  if (a==NULL) return FALSE;
+  if (a == NULL) return FALSE;
 #endif
   return 0 == mpz_cmpabs_ui((int_number) a, 0);
 }
 
 BOOLEAN nrnIsOne (number a)
 {
+#ifdef LDEBUG
+  if (a == NULL) return FALSE;
+#endif
   return 0 == mpz_cmp_si((int_number) a, 1);
 }
 
 BOOLEAN nrnIsMOne (number a)
 {
+#ifdef LDEBUG
+  if (a == NULL) return FALSE;
+#endif
   return 0 == mpz_cmp((int_number) a, nrnMinusOne);
 }
 
