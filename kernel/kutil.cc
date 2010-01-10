@@ -2916,7 +2916,7 @@ ideal createG0()
 */
 void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, int atR = -1)
 {
-
+  const int iCompH = pGetComp(h);
   if (!nIsOne(pGetCoeff(h)))
   {
     int j;
@@ -2927,9 +2927,12 @@ void initenterstrongPairs (poly h,int k,int ecart,int isFromQ,kStrategy strat, i
       // Print("j:%d, Ll:%d\n",j,strat->Ll);
 //      if (((unsigned long) pGetCoeff(h) % (unsigned long) pGetCoeff(strat->S[j]) != 0) &&
 //         ((unsigned long) pGetCoeff(strat->S[j]) % (unsigned long) pGetCoeff(h) != 0))
+      if ( iCompH == pGetComp(strat->S[k]) )
       {
-        if (enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR))
-          new_pair=TRUE;
+        {
+          if (enterOneStrongPoly(j,h,ecart,isFromQ,strat, atR))
+            new_pair=TRUE;
+        }
       }
     }
   }
