@@ -660,9 +660,9 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		{
 			aktpoly=pNext(aktpoly);
 			int *tailexpv=(int*)omAlloc(((this->numVars)+1)*sizeof(int));
-			pGetExpV(aktpoly,tailexpv);
+			pGetExpV(aktpoly,tailexpv);			
 			for(int kk=1;kk<=this->numVars;kk++)
-			{
+			{				
 				dd_set_si(ddineq->matrix[(dd_rowrange)aktmatrixrow][kk],leadexpv[kk]-tailexpv[kk]);
 			}
 			aktmatrixrow += 1;
@@ -989,19 +989,24 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		dd_rowindex newpos;
 		dd_MatrixPtr ddakt;
   		ddakt = dd_CopyMatrix(ddineq);
-		ddakt->representation=dd_Inequality;
+// 		ddakt->representation=dd_Inequality;	//Not using this makes it faster. But why does the quick check below still work?
 		set_addelem(ddakt->linset,ii+1);/*Now set appropriate linearity*/
 #ifdef gfanp
 		timeval t_ddMC_start, t_ddMC_end;
 		gettimeofday(&t_ddMC_start,0);
 #endif				
- 		/*dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);*/
+ 		//dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);
 //  		set_copy(LL,ddakt->linset);
 		dd_PolyhedraPtr ddpolyh;
 		ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
+// 		ddpolyh=dd_DDMatrix2Poly2(ddakt, dd_MaxCutoff, &err);
 		dd_MatrixPtr P;
-		P=dd_CopyGenerators(ddpolyh);
+		P=dd_CopyGenerators(ddpolyh);		
 		dd_FreePolyhedra(ddpolyh);
+// 		ddpolyh=dd_DDMatrix2Poly(P,&err);
+// 		dd_MatrixPtr R;
+// 		R=dd_CopyInequalities(ddpolyh);
+// 		dd_FreePolyhedra(ddpolyh);
 #ifdef gfanp
 		gettimeofday(&t_ddMC_end,0);
 		t_ddMC += (t_ddMC_end.tv_sec - t_ddMC_start.tv_sec + 1e-6*(t_ddMC_end.tv_usec - t_ddMC_start.tv_usec));
@@ -1046,43 +1051,70 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		* facet to be non-flippable. Works since we set the appropriate 
 		* linearity for ddakt above.
 		*/
-		intvec *iv_intPoint = new intvec(this->numVars);
-		dd_MatrixPtr shiftMatrix;
-		dd_MatrixPtr intPointMatrix;
-		shiftMatrix = dd_CreateMatrix(this->numVars,this->numVars+1);
-		for(int kk=0;kk<this->numVars;kk++)
-		{
-			dd_set_si(shiftMatrix->matrix[kk][0],1);
-			dd_set_si(shiftMatrix->matrix[kk][kk+1],1);
-		}
-		intPointMatrix=dd_MatrixAppend(ddakt,shiftMatrix);
+// 		intvec *iv_intPoint = new intvec(this->numVars);
+// 		dd_MatrixPtr shiftMatrix;
+// 		dd_MatrixPtr intPointMatrix;
+// 		shiftMatrix = dd_CreateMatrix(this->numVars,this->numVars+1);
+// 		for(int kk=0;kk<this->numVars;kk++)
+// 		{
+// 			dd_set_si(shiftMatrix->matrix[kk][0],1);
+// 			dd_set_si(shiftMatrix->matrix[kk][kk+1],1);
+// 		}
+// 		intPointMatrix=dd_MatrixAppend(ddakt,shiftMatrix);
+// #ifdef gfanp
+// 		timeval t_iP_start, t_iP_end;
+// 		gettimeofday(&t_iP_start, 0);
+// #endif		
+// 		interiorPoint(intPointMatrix,*iv_intPoint);
+// // 		dd_rowset impl_linste,lbasis;
+// // 		dd_LPSolutionPtr lps=NULL;
+// // 		dd_ErrorType err;
+// // 		dd_FindRelativeInterior(intPointMatrix, &impl_linset, &lbasis, &lps, &err);
+// #ifdef gfanp
+// 		gettimeofday(&t_iP_end, 0);
+// 		t_iP += (t_iP_end.tv_sec - t_iP_start.tv_sec + 1e-6*(t_iP_end.tv_usec - t_iP_start.tv_usec));
+// #endif
+// 		for(int ll=0;ll<this->numVars;ll++)
+// 		{
+// 			if( (*iv_intPoint)[ll] < 0 )
+// 			{
+// 				fAct->isFlippable=FALSE;
+// 				break;
+// 			}
+// 		}
+		/*End of check*/
+		/*This test should be way less time consuming*/
 #ifdef gfanp
 		timeval t_iP_start, t_iP_end;
 		gettimeofday(&t_iP_start, 0);
-#endif		
-		interiorPoint(intPointMatrix,*iv_intPoint);
-// 		dd_rowset impl_linste,lbasis;
-// 		dd_LPSolutionPtr lps=NULL;
-// 		dd_ErrorType err;
-// 		dd_FindRelativeInterior(intPointMatrix, &impl_linset, &lbasis, &lps, &err);
+#endif
+		bool containsStrictlyPosRay=TRUE;
+		for(int ii=0;ii<ddakt->rowsize;ii++)
+		{
+			containsStrictlyPosRay=TRUE;
+			for(int jj=1;jj<this->numVars;jj++)
+			{
+				if(ddakt->matrix[ii][jj]<=0)
+				{
+					containsStrictlyPosRay=FALSE;
+					break;
+				}
+			}
+			if(containsStrictlyPosRay==TRUE)
+				break;
+		}
+		if(containsStrictlyPosRay==FALSE)
+			fAct->isFlippable=FALSE;
 #ifdef gfanp
 		gettimeofday(&t_iP_end, 0);
 		t_iP += (t_iP_end.tv_sec - t_iP_start.tv_sec + 1e-6*(t_iP_end.tv_usec - t_iP_start.tv_usec));
 #endif
-		for(int ll=0;ll<this->numVars;ll++)
-		{
-			if( (*iv_intPoint)[ll] < 0 )
-			{
-				fAct->isFlippable=FALSE;
-				break;
-			}
-		}
-		/*End of check*/					
+		/**/
 		fAct = fAct->next;	
 		dd_FreeMatrix(ddakt);
-		dd_FreeMatrix(shiftMatrix);
-		dd_FreeMatrix(intPointMatrix);		
-		delete iv_intPoint;
+// 		dd_FreeMatrix(shiftMatrix);
+// 		dd_FreeMatrix(intPointMatrix);		
+// 		delete iv_intPoint;
 		dd_FreeMatrix(P);
 // 		set_free(impl_linset);
 // 		set_free(redset);		
@@ -1287,13 +1319,19 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 				pGetExpV(pHead(aktpoly),v);
 				markingsAreCorrect=TRUE;
 			}
-			
+			int ctr=0;
 			for (int jj=0;jj<this->numVars;jj++)
 			{				
-				/*Store into ddMatrix*/								
+				/*Store into ddMatrix*/				
+				if(leadExpV[jj+1]-v[jj+1])
+					ctr++;
 				dd_set_si(intPointMatrix->matrix[aktrow][jj+1],leadExpV[jj+1]-v[jj+1]);
 			}
-			aktrow +=1;
+			/*It ought to be more sensible to avoid 0-rows in the first place*/
+// 			if(ctr==this->numVars)//We have a 0-row
+// 				dd_MatrixRowRemove(&intPointMatrix,aktrow);
+// 			else
+				aktrow +=1;
 			omFree(v);
 		}
 // 		omFree(v);
@@ -1305,31 +1343,51 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 #endif
 	/*Now it is safe to idDelete(H)*/
 	idDelete(&H);
+	/*Preprocessing goes here since otherwise we would delete the constraint
+	* for the standard simplex.
+	*/
+	preprocessInequalities(intPointMatrix);
 	/*Now we add the constraint for the standard simplex*/
-// #ifdef gfanp
-// 	timeval t_dd_start, t_dd_end;
-// 	gettimeofday(&t_dd_start, 0);
-// #endif
-	dd_set_si(intPointMatrix->matrix[aktrow][0],-1);
-	for (int jj=1;jj<=this->numVars;jj++)
-	{
-		dd_set_si(intPointMatrix->matrix[aktrow][jj],1);
-	}
+// 	dd_set_si(intPointMatrix->matrix[aktrow][0],-1);
+// 	for (int jj=1;jj<=this->numVars;jj++)
+// 	{
+// 		dd_set_si(intPointMatrix->matrix[aktrow][jj],1);
+// 	}
 	//Let's make sure we compute interior points from the positive orthant
-	dd_MatrixPtr posRestr=dd_CreateMatrix(this->numVars,this->numVars+1);
-	
-	int jj=1;
-	for (int ii=0;ii<this->numVars;ii++)
+// 	dd_MatrixPtr posRestr=dd_CreateMatrix(this->numVars,this->numVars+1);
+// 	
+// 	int jj=1;
+// 	for (int ii=0;ii<this->numVars;ii++)
+// 	{
+// 		dd_set_si(posRestr->matrix[ii][jj],1);
+// 		jj++;							
+// 	}
+	/*We create a matrix containing the standard simplex
+	* and constraints to assure a strictly positive point
+	* is computed
+	*/
+	dd_MatrixPtr posRestr = dd_CreateMatrix(this->numVars+1, this->numVars+1);
+	for(int ii=0;ii<posRestr->rowsize;ii++)
 	{
-		dd_set_si(posRestr->matrix[ii][jj],1);
-		jj++;							
+		if(ii==0)
+		{
+			dd_set_si(posRestr->matrix[ii][0],-1);
+			for(int jj=1;jj<=this->numVars;jj++)			
+				dd_set_si(posRestr->matrix[ii][jj],1);			
+		}
+		else
+		{
+			dd_set_si(posRestr->matrix[ii][0],-1);
+			dd_set_si(posRestr->matrix[ii][ii],1);
+		}
 	}
+	/**/
 	dd_MatrixAppendTo(&intPointMatrix,posRestr);
 	dd_FreeMatrix(posRestr);
 	/*Insert preprocessing here. If it is before the dd_CreateMatrix things go pear shaped
 	* Otherwise things will go pear shaped if called after the standard simplex constraints are added
 	*/
-	preprocessInequalities(intPointMatrix);
+// 	preprocessInequalities(intPointMatrix);
 	intvec *iv_weight = new intvec(this->numVars);
 #ifdef gfanp
 	timeval t_dd_start, t_dd_end;
@@ -1340,7 +1398,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	dd_rowindex newpos;
 	
 // 	dd_MatrixCanonicalize(&intPointMatrix,&implLin,&redrows,&newpos,&err);
-	dd_MatrixCanonicalizeLinearity(&intPointMatrix,&implLin, &newpos,&err);
+// 	dd_MatrixCanonicalizeLinearity(&intPointMatrix,&implLin, &newpos,&err);
 	//dd_MatrixRedundancyRemove is our time sink!
 // 	dd_MatrixRedundancyRemove(&intPointMatrix,&redrows,&newpos,&err);
 	interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
@@ -1537,59 +1595,11 @@ inline ideal gcone::ffG(const ideal &H, const ideal &G)
 */
 void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
 {
-//Remove strictly positive rows
-	int *posRowsArray=NULL;
+/*	int *posRowsArray=NULL;
 	int num_alloc=0;
 	int num_elts=0;
-// 	for(int ii=0;ii<ddineq->rowsize;ii++)
-// 	{
-// 		intvec *ivPos = new intvec(pVariables);
-// 		for(int jj=0;jj<pVariables;jj++)
-// 			(*ivPos)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
-// 		bool isStrictlyPos=FALSE;
-// 		int posCtr=0;		
-// 		for(int jj=0;jj<pVariables;jj++)
-// 		{
-// 			intvec *ivCanonical = new intvec(pVariables);
-// 			jj==0 ? (*ivCanonical)[ivPos->length()-1]=1 : (*ivCanonical)[jj-1]=1;
-// 			if(dotProduct(*ivCanonical,*ivPos)!=0)
-// 			{
-// 				if ((*ivPos)[jj]>=0)
-// 				{				
-// 					posCtr++;				
-// 				}
-// 			}			
-// 			delete ivCanonical;
-// 		}
-// 		if(posCtr==ivPos->length())
-// 			isStrictlyPos=TRUE;
-// 		if(isStrictlyPos==TRUE)
-// 		{
-// 			if(num_alloc==0)
-// 				num_alloc += 1;
-// 			else
-// 				num_alloc += 1;
-// 			void *tmp = realloc(posRowsArray,(num_alloc*sizeof(int)));
-// 			if(!tmp)
-// 			{
-// 				WerrorS("Woah dude! Couldn't realloc memory\n");
-// 				exit(-1);
-// 			}
-// 			posRowsArray = (int*)tmp;
-// 			posRowsArray[num_elts]=ii;
-// 			num_elts++;	
-// 		}
-// 		delete ivPos;
-// 	}
- 	int offset=0;
-// 	for(int ii=0;ii<num_elts;ii++)
-// 	{
-// 		dd_MatrixRowRemove(&ddineq,posRowsArray[ii]+1-offset);
-// 		offset++;
-// 	}
-// 	free(posRowsArray);
-	//Remove zeroes
-// 	int rowsize=ddineq->rowsize;
+ 	int offset=0;*/
+	//Remove zeroes (and strictly pos rows?)
 	for(int ii=0;ii<ddineq->rowsize;ii++)
 	{
 		intvec *iv = new intvec(this->numVars);
@@ -1597,14 +1607,15 @@ void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
 		for(int jj=0;jj<this->numVars;jj++)
 		{
 			(*iv)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
-// 			if((*iv)[ii]>0)
-// 				posCtr++;
+			if((*iv)[jj]>0)//check for strictly pos rows
+				posCtr++;
+			//Behold! This will delete the row for the standard simplex!
 		}
-		if( (iv->compare(0)==0) )//|| (posCtr==iv->length()) )
+// 		if( (iv->compare(0)==0) || (posCtr==iv->length()) )
+		if( (posCtr==iv->length()) || (iv->compare(0)==0) )		
 		{
 			dd_MatrixRowRemove(&ddineq,ii+1);
-			ii--;		
-// 			rowsize=ddineq->rowsize;
+			ii--;//Yes. This is on purpose
 		}
 		delete iv;
 	}
