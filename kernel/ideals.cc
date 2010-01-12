@@ -2106,7 +2106,7 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
 
   intvec * weights;
   hom = (tHomog)idHomModule(h1,currQuotient,&weights);
-  if (addOnlyOne && (!h1IsStb))
+  if (*addOnlyOne && (!h1IsStb))
     temph1 = kStd(h1,currQuotient,hom,&weights,NULL);
   else
     temph1 = idCopy(h1);
