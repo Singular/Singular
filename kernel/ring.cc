@@ -4156,6 +4156,7 @@ inline void m_DebugPrint(const poly p, const ring R)
 }
 
 
+#ifndef NDEBUG
 /// debug-print at most nTerms (2 by default) terms from poly/vector p,
 /// assuming that lt(p) lives in lmRing and tail(p) lives in tailRing.
 void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const int nTerms)
@@ -4188,7 +4189,7 @@ void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const in
   else
     PrintS("0\n");
 }
-
+#endif
 
 
 //    F = system("ISUpdateComponents", F, V, MIN );

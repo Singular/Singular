@@ -407,9 +407,11 @@ void pDebugPrint(poly p);
 void p_DebugPrint(poly p, const ring r);
 #endif
 
+#ifndef NDEBUG
 /// debug-print at most nTerms (2 by default) terms from poly/vector p,
 /// assuming that lt(p) lives in lmRing and tail(p) lives in tailRing.
 void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const int nTerms = 2);
+#endif
 
 int64 * rGetWeightVec(ring r);
 void rSetWeightVec(ring r, int64 *wv);
