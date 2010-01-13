@@ -5,6 +5,8 @@ Changes w.r.t 3-1-0-8:
 - system("cpu"): number of available CPUs or 1
 - opposite(ring) works also for commutative global rings
   (but only, if compiled with HAVE_PLURAL)
+- new library: normaliz.lib
+- exotic bug in diff fixed (track 195)
 
 Changes w.r.t 3-1-0-7:
 - 3-1-0-8: Tue Jan  5 11:11:08 CET 2010

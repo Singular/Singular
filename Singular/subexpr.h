@@ -57,7 +57,6 @@ class sleftv
     package     packhdl;
     package     req_packhdl;
     inline void Init() { memset(this,0,sizeof(*this)); }
-    void Set(int val);
     void Print(leftv store=NULL,int spaces=0);
     void CleanUp(ring r=currRing);
     char * String(void *d=NULL, BOOLEAN typed = FALSE, int dim = 1);

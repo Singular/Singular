@@ -50,13 +50,6 @@ const char sNoName[]="_";
 BOOLEAN siq=FALSE;
 #endif
 
-void sleftv::Set(int val)
-{
-  Init();
-  rtyp = INT_CMD;
-  data = (void *)val;
-}
-
 int sleftv::listLength()
 {
   int n = 1;
