@@ -356,6 +356,7 @@ LIB "all.lib";
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * noether_lib:: Noether normalization of an ideal
 * normal_lib:: procedure for normalization
+* normaliz_lib:: integral closure, normalization for monomial ideals, toric ideals
 * pointid_lib:: factorized lex GB of the vanishing ideal of a set of points
 * primdec_lib:: procedures for primary decomposition
 * primitiv_lib:: procedures for finding a primitive element
@@ -418,11 +419,15 @@ LIB "all.lib";
 @subsection noether_lib
 @c lib noether.lib
 @c ---------------------------------------------------------
-@node normal_lib, pointid_lib, noether_lib, Commutative algebra
+@node normal_lib, normaliz_lib, noether_lib, Commutative algebra
 @subsection normal_lib
 @c lib normal.lib
+@c ---------------------------------------------------------
+@node normaliz_lib, pointid_lib, normal_lib, Commutative algebra
+@subsection normaliz_lib
+@c lib normaliz.lib
 @c ----------------------------------------------------------
-@node pointid_lib, primdec_lib, normal_lib, Commutative algebra
+@node pointid_lib, primdec_lib, normaliz_lib, Commutative algebra
 @subsection pointid_lib
 @c lib pointid.lib
 @c ----------------------------------------------------------
