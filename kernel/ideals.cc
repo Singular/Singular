@@ -2146,15 +2146,17 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
     }
     for (i=1; i<k; i++)
     {
-      p = pCopy_noCheck(h4->m[i-1]);
-      pShift(&p,1);
-      h4->m[i] = p;
+      if (h4->m[i-1]!=NULL)
+      {
+        p = pCopy_noCheck(h4->m[i-1]);
+        pShift(&p,1);
+        h4->m[i] = p;
+      }
     }
   }
-
+  idSkipZeroes(h4);
   kkk = IDELEMS(h4);
   i = IDELEMS(temph1);
-  while ((i>0) && (temph1->m[i-1]==NULL)) i--;
   for (l=0; l<i; l++)
   {
     if(temph1->m[l]!=NULL)
@@ -2179,14 +2181,14 @@ static ideal idInitializeQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb,
 /*--- if h2 goes in as single vector - the h1-part is just SB ---*/
   if (*addOnlyOne)
   {
+    idSkipZeroes(h4);
     p = h4->m[0];
     for (i=0;i<IDELEMS(h4)-1;i++)
     {
       h4->m[i] = h4->m[i+1];
     }
     h4->m[IDELEMS(h4)-1] = p;
-    idSkipZeroes(h4);
-    // test |= Sy_bit(OPT_SB_1);
+    test |= Sy_bit(OPT_SB_1);
   }
   idDelete(&temph1);
   return h4;
@@ -2226,15 +2228,32 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
   //  s_h4 = idrMoveR_NoSort(s_h4,orig_ring);
     s_h4 = idrMoveR(s_h4,orig_ring);
   idTest(s_h4);
+  #if 0
+  void ipPrint_MA0(matrix m, const char *name);
+  matrix m=idModule2Matrix(idCopy(s_h4));
+  PrintS("start:\n");
+  ipPrint_MA0(m,"Q");
+  idDelete((ideal *)&m);
+  PrintS("last elem:");wrp(s_h4->m[IDELEMS(s_h4)-1]);PrintLn();
+  #endif
   ideal s_h3;
   if (addOnlyOne)
   {
-    s_h3 = kStd(s_h4,currQuotient,hom,&weights1,NULL,kmax-1,IDELEMS(s_h4)-1);
+    s_h3 = kStd(s_h4,currQuotient,hom,&weights1,NULL,0/*kmax-1*/,IDELEMS(s_h4)-1);
   }
   else
   {
     s_h3 = kStd(s_h4,currQuotient,hom,&weights1,NULL,kmax-1);
   }
+  test = old_test;
+  #if 0
+  // only together with the above debug stuff
+  idSkipZeroes(s_h3);
+  m=idModule2Matrix(idCopy(s_h3));
+  Print("result, kmax=%d:\n",kmax);
+  ipPrint_MA0(m,"S");
+  idDelete((ideal *)&m);
+  #endif
   idTest(s_h3);
   if (weights1!=NULL) delete weights1;
   idDelete(&s_h4);
@@ -2262,7 +2281,6 @@ ideal idQuot (ideal  h1, ideal h2, BOOLEAN h1IsStb, BOOLEAN resultIsIdeal)
     rKill(syz_ring);
   }
   idSkipZeroes(s_h3);
-  test = old_test;
   idTest(s_h3);
   return s_h3;
 }
