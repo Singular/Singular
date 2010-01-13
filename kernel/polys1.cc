@@ -429,6 +429,7 @@ static poly pDiffOpM(poly a, poly b,BOOLEAN multiply)
   }
   pSetm(p);
   /*if (multiply)*/ pSetCoeff(p,n);
+  if (nIsZero(n))  p=pLmDeleteAndNext(p); // return NULL as p is a monomial
   return p;
 }
 
