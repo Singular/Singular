@@ -29,7 +29,7 @@ struct _scmdnames
 };
 typedef struct _scmdnames cmdnames;
 
-extern cmdnames cmds[];
+//extern cmdnames cmds[];
 extern const char *lastreserved;
 extern const char *singular_date;
 

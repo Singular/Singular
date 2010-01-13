@@ -133,6 +133,7 @@ clean mostlyclean: local-clean
 
 distclean: local-distclean
 	$(recurse)
+	rm -rf build
 
 maintainer-clean: uninstall local-maintainer-clean
 	$(recurse)
@@ -168,6 +169,11 @@ Tst-Short: ${SINGULAR} Tst/Short/ok_s.lst Tst/regress.cmd
 
 Tst-Long:  ${SINGULAR} Tst/Long/ok_l.lst Tst/regress.cmd
 	${PERL} Tst/regress.cmd -r -s ${SINGULAR} Tst/Long/ok_l.lst
+
+##############################################################
+test:
+	mkdir -p build
+	(cd build && cmake .. && make && make test)
 
 ##############################################################
 # distribution targets
