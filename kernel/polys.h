@@ -402,7 +402,7 @@ void pTakeOutComp(poly *p, Exponent_t comp, poly *q, int *lq);
 // taken out whose Order == order
 // ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
 //         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
-void pDecrOrdTakeOutComp(poly *p, Exponent_t comp, Order_t order,
+void pDecrOrdTakeOutComp(poly *p, Exponent_t comp, long order,
                          poly *q, int *lq);
 // This is something weird -- Don't use it, unless you know what you are doing
 poly      pTakeOutComp(poly * p, int k);

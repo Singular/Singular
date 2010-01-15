@@ -22,6 +22,7 @@
 #include "structs.h"
 #include "p_polys.h"
 #include "ring.h"
+#include "ideals.h"
 #include "int64vec.h"
 #ifndef NDEBUG
 #include "febase.h"

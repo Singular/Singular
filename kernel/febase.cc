@@ -26,7 +26,7 @@
 #include "omalloc.h"
 #include "dError.h"
 
-#define fePutChar(c) fputc((uchar)(c),stdout)
+#define fePutChar(c) fputc((unsigned char)(c),stdout)
 /*0 implementation */
 
 char fe_promptstr[] ="  ";

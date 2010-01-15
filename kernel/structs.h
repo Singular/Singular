@@ -18,7 +18,6 @@
 #endif
 
 /* standard types */
-typedef unsigned char  uchar;
 typedef unsigned short CARDINAL;
 #ifdef HAVE_RINGS
 typedef MP_INT *int_number;
@@ -35,8 +34,6 @@ typedef short BOOLEAN;
 typedef void * Sy_reference;
 #define ADDRESS Sy_reference
 #define BITSET  unsigned int
-
-/* EXPONENT_TYPE is determined by configure und defined in mod2.h */
 
 #if defined(SI_CPU_I386) || defined(SI_CPU_X86_64)
   // the following settings seems to be better on i386 and x86_64 processors
@@ -78,23 +75,12 @@ typedef long int64;
 
 
 typedef long Exponent_t;
-typedef long Order_t;
 
 enum tHomog
 {
    isNotHomog = FALSE,
    isHomog    = TRUE,
    testHomog
-};
-enum noeof_t
-{
-  noeof_brace = 1,
-  noeof_asstring,
-  noeof_block,
-  noeof_bracket,
-  noeof_comment,
-  noeof_procname,
-  noeof_string
 };
 
 enum n_coeffType
@@ -151,7 +137,6 @@ class CFormulaPowerMultiplier;
 
 struct n_Procs_s;
 struct sip_sring;
-struct sip_sideal;
 struct sip_link;
 struct spolynom;
 struct _ssubexpr;
@@ -159,6 +144,13 @@ struct _sssym;
 struct sip_command;
 struct sip_package;
 struct s_si_link_extension;
+
+// forward for ideals.h:
+struct sip_sideal;
+struct sip_smap;
+typedef struct sip_smap *         map;
+typedef struct sip_sideal *       ideal;
+
 
 typedef struct  n_Procs_s  n_Procs_s;
 
@@ -170,8 +162,6 @@ typedef struct nc_struct   nc_struct;
 typedef struct _ssubexpr   sSubexpr;
 typedef struct _sssym      ssym;
 typedef struct spolyrec    polyrec;
-typedef struct sip_sideal  ip_sideal;
-typedef struct sip_smap    ip_smap;
 typedef struct sip_sring   ip_sring;
 typedef struct sip_link    ip_link;
 typedef struct sip_command ip_command;
@@ -185,10 +175,6 @@ typedef ip_sring *         ring;
 typedef int                idtyp;
 typedef polyrec *          poly;
 typedef poly *             polyset;
-typedef ip_sideal *        ideal;
-typedef ip_smap *          map;
-typedef struct sideal_list *      ideal_list;
-typedef ideal *            resolvente;
 typedef union uutypes      utypes;
 typedef ip_command *       command;
 typedef struct s_si_link_extension *si_link_extension;
@@ -303,15 +289,9 @@ struct n_Procs_s
    number nNULL; /* the 0 as constant */
    int     char_flag;
    int     ref;
-   short   nChar;
    n_coeffType type;
+   short   nChar;
 };
-
-extern idhdl currPackHdl;
-extern idhdl basePackHdl;
-extern package currPack;
-extern package basePack;
-#define IDROOT (currPack->idroot)
 
 /* the function pointer types */
 
@@ -501,8 +481,10 @@ struct nc_struct
   private:
     // internal data for different implementations
     // if dynamic => must be deallocated in destructor (nc_rKill!)
-    union {
-      struct {
+    union
+    {
+      struct
+      {
         // treat variables from iAltVarsStart till iAltVarsEnd as alternating vars.
         // these variables should have odd degree, though that will not be checked
         // iAltVarsStart, iAltVarsEnd are only used together with nc_type=nc_exterior
@@ -513,7 +495,6 @@ struct nc_struct
         // the part of general quotient ideal modulo squares!    
         ideal idSCAQuotient; // = NULL by default. // must be deleted in Kill!
       } sca;
-
     } data;
 
     CGlobalMultiplier* m_Multiplier;
@@ -555,22 +536,6 @@ struct nc_struct
 
 };
 #endif
-#if 0
-struct nc_struct
-{
-  short ref;
-  nc_type type;
-  ring basering; // the ring C,D,.. live in
-  matrix C;
-  matrix D;
-  matrix *MT;
-  matrix COM;
-  int *MTsize;
-  int IsSkewConstant; /* indicates whethere coeffs C_ij are all equal */
-  /* effective together with nc_type=nc_skew */
-};
-#endif
-
 
 struct sip_sring
 {
@@ -601,7 +566,6 @@ struct sip_sring
   int*     VarOffset;
 
   ideal      qideal; /* extension to the ring structure: qring, rInit */
-
 
   int*     firstwv;
 
@@ -642,7 +606,6 @@ struct sip_sring
   BOOLEAN   MixedOrder; // TRUE for global/local mixed orderings, FALSE otherwise
 
   BOOLEAN   ComponentOrder; // ???
-
 
   // what follows below here should be set by rComplete, _only_
   // contains component, but no weight fields in E */
@@ -698,31 +661,6 @@ struct sip_sring
 #endif
 };
 
-struct sip_sideal
-{
-  poly*  m;
-  long rank;
-  int nrows;
-  int ncols;
-  #define IDELEMS(i) ((i)->ncols)
-};
-
-struct sip_smap
-{
-  poly *m;
-  char *preimage;
-  int nrows;
-  int ncols;
-};
-
-struct sideal_list
-{
-  ideal_list next;
-  ideal      d;
-#ifndef NDEBUG
-  int nr;
-#endif
-};
 #endif /* __cplusplus */
 
 
@@ -889,13 +827,10 @@ typedef libstack *  libstackv;
 #endif /* HAVE_LIBPARSER */
 
 extern struct omBin_s* char_ptr_bin;
-extern struct omBin_s* ideal_bin;
 extern struct omBin_s* indlist_bin;
 extern struct omBin_s* naIdeal_bin;
 extern struct omBin_s* snaIdeal_bin;
 extern struct omBin_s* smprec_bin;
-extern struct omBin_s* sip_sideal_bin;
-extern struct omBin_s* sip_smap_bin;
 extern struct omBin_s* sip_sring_bin;
 extern struct omBin_s* sleftv_bin;
 

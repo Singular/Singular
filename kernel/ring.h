@@ -15,6 +15,39 @@
 
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 
+#if 0
+enum n_coeffType
+{
+  n_unknown=0,
+  n_Zp,
+  n_Q,
+  n_R,
+  n_GF,
+  n_long_R,
+  n_Zp_a,
+  n_Q_a,
+  n_long_C
+};
+#endif
+
+
+// #ifdef HAVE_PLURAL
+#if 0
+enum nc_type
+{
+  nc_error = -1, // Something's gone wrong!
+  nc_general = 0, /* yx=q xy+... */
+  nc_skew, /*1*/ /* yx=q xy */
+  nc_comm, /*2*/ /* yx= xy */
+  nc_lie,  /*3*/ /* yx=xy+... */
+  nc_undef, /*4*/  /* for internal reasons */
+
+  nc_exterior /*5*/ // Exterior Algebra(SCA): yx= -xy & (!:) x^2 = 0
+};
+#endif
+// #endif
+
+
 extern ring      currRing;
 extern ideal     currQuotient;
 extern idhdl      currRingHdl;

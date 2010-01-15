@@ -1515,7 +1515,7 @@ static SSet syChosePairsIH(syStrategy syzstr, int *index,
 static void syStatistics(resolvente res,int length)
 {
   int i,j=1,k;
-  Order_t deg = 0;
+  long deg = 0;
 
   PrintLn();
   while ((j<length) && (res[j]!=NULL))
@@ -2512,7 +2512,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   if ((idIs0(arg)) ||
       ((idRankFreeModule(arg)>0) && (!idHomModule(arg,NULL,&(syzstr->cw)))))
   {
-    syzstr->minres = (resolvente)omAlloc0Bin(ideal_bin);
+    syzstr->minres = (resolvente)omAlloc0Bin(char_ptr_bin);
     syzstr->length = 1;
     syzstr->minres[0] = idInit(1,arg->rank);
     return syzstr;
@@ -2635,7 +2635,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   if ((idIs0(arg)) ||
       ((idRankFreeModule(arg)>0) && (!idTestHomModule(arg, NULL, syzstr->cw))))
   {
-    syzstr->minres = (resolvente)omAlloc0Bin(ideal_bin);
+    syzstr->minres = (resolvente)omAlloc0Bin(char_ptr_bin);
     syzstr->length = 1;
     syzstr->minres[0] = idInit(1,arg->rank);
     return syzstr;

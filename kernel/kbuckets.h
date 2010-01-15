@@ -104,7 +104,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 // ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
 //         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
 void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
-                               Exponent_t comp, Order_t order,
+                               Exponent_t comp, long order,
                                poly *p, int *l);
 
 //////////////////////////////////////////////////////////////////////////

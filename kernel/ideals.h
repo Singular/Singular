@@ -10,6 +10,41 @@
 #include "structs.h"
 #include "ring.h"
 
+struct sip_sideal
+{
+  poly*  m;
+  long rank;
+  int nrows;
+  int ncols;
+  #define IDELEMS(i) ((i)->ncols)
+};
+
+struct sip_smap
+{
+  poly *m;
+  char *preimage;
+  int nrows;
+  int ncols;
+};
+
+struct sideal_list;
+typedef struct sideal_list *      ideal_list;
+struct sideal_list
+{
+  ideal_list next;
+  ideal      d;
+#ifndef NDEBUG
+  int nr;
+#endif
+};
+
+//typedef struct sip_sideal *        ideal;
+//typedef struct sip_smap *          map;
+typedef ideal *            resolvente;
+
+
+extern omBin sip_sideal_bin;
+
 #ifdef PDEBUG
 ideal idDBInit (int size, int rank, const char *f, int l);
 ideal idCopyFirstK (const ideal ide, const int k);

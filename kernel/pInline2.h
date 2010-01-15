@@ -37,7 +37,7 @@ PINLINE2 number p_SetCoeff(poly p, number n, ring r)
 }
 
 // order
-PINLINE2 Order_t p_GetOrder(poly p, ring r)
+PINLINE2 long p_GetOrder(poly p, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   if (r->typ==NULL) return ((p)->exp[r->pOrdIndex]);
@@ -61,7 +61,7 @@ PINLINE2 Order_t p_GetOrder(poly p, ring r)
   }
 }
 
-PINLINE2 Order_t p_SetOrder(poly p, long o, ring r)
+PINLINE2 long p_SetOrder(poly p, long o, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(o >= 0);

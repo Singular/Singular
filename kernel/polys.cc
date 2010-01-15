@@ -574,7 +574,7 @@ void pTakeOutComp(poly *r_p, Exponent_t comp, poly *r_q, int *lq)
   pTest(*r_q);
 }
 
-void pDecrOrdTakeOutComp(poly *r_p, Exponent_t comp, Order_t order,
+void pDecrOrdTakeOutComp(poly *r_p, Exponent_t comp, long order,
                          poly *r_q, int *lq)
 {
   spolyrec pp, qq;

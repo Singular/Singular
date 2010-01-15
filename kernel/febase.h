@@ -77,6 +77,16 @@ FILE *myfopen(const char *path, const char *mode);
 #endif
 size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
+enum noeof_t
+{
+  noeof_brace = 1,
+  noeof_asstring,
+  noeof_block,
+  noeof_bracket,
+  noeof_comment,
+  noeof_procname,
+  noeof_string
+};  /* for scanner.l */
 
 extern char*  feErrors;
 extern char*  feArgv0;

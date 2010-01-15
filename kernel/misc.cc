@@ -47,13 +47,10 @@
 /* init bins from structs.h */
 
 omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr));
-omBin ideal_bin = omGetSpecBin(sizeof(ideal));
 omBin indlist_bin = omGetSpecBin(sizeof(indlist));
 omBin naIdeal_bin = omGetSpecBin(sizeof(naIdeal));
 omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
 omBin smprec_bin = omGetSpecBin(sizeof(smprec));
-omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
-omBin sip_smap_bin = omGetSpecBin(sizeof(sip_smap));
 omBin sip_sring_bin = omGetSpecBin(sizeof(sip_sring));
 
 /*0 implementation*/

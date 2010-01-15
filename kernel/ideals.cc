@@ -31,8 +31,7 @@
 #include "ideals.h"
 #include "prCopy.h"
 
-
-
+omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 
 /* #define WITH_OLD_MINOR */
 #define pCopy_noCheck(p) pCopy(p)

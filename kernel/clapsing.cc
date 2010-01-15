@@ -16,6 +16,7 @@
 #include "clapsing.h"
 #include "numbers.h"
 #include "ring.h"
+#include "ideals.h"
 #include "ffields.h"
 #include <factory.h>
 #include "clapconv.h"

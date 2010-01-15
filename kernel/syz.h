@@ -9,6 +9,7 @@
 */
 #include "structs.h"
 #include "ring.h"
+#include "ideals.h"
 
 // Logarithm of estimate of maximal number of new components
 #define SYZ_SHIFT_MAX_NEW_COMP_ESTIMATE 8
