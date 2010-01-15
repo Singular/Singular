@@ -90,7 +90,7 @@ void IpArithTest::test_iiArithFindCmd()
 
   const char * name2 = "nix";
   pos = iiArithFindCmd(name2);
-  CPPUNIT_ASSERT(std::string(name2) == std::string(iiArithGetCmd(pos)));
+  CPPUNIT_ASSERT(pos==-1);
   
   return;
 }

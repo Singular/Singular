@@ -1,6 +1,9 @@
 #ifndef _test_ipid_hpp_
 #define _test_ipid_hpp_
 
+#define NDEBUG
+
+
 #include <Singular/utils.h>
 #include <Singular/mod2.h>
 #include <kernel/structs.h>
