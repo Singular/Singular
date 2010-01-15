@@ -9,6 +9,10 @@ AUTHORS:  Winfried Bruns, Winfried.Bruns@Uni-Osnabrueck.de
 
 OVERVIEW:
 The library normaliz.lib provides an interface for the use of Normaliz 2.1 within Singular. The exchange of data is via files, the only possibility offered by Normaliz in its present version. In addition to the top level functions that aim at objects of type ideal or ring, several other auxiliary functions allow the user to apply Normaliz to data of type intmat. Therefore Singular can be used as a comfortable environment for the work with Normaliz.
+@* Using this library requires the program @code{normliz} to be installed.
+ You can download @code{normliz} from
+ @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}.
+
 
 NOTE:    This library functions use @code{sed} to transfer the @code{normaliz} output into a singular conform format.
 
