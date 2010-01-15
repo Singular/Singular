@@ -731,7 +731,7 @@ static mpsr_Status_t GetMapLeftv(MP_Link_pt link, MPT_Node_pt node,
     IDROOT = h;
   }
 
-  map m = (map) omAlloc0Bin(sip_smap_bin);
+  map m = (map) omAlloc0Bin(sip_sideal_bin);
   m->preimage = omStrDup(name);
   m->m = id->m;
   m->nrows = id->nrows;

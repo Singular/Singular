@@ -828,7 +828,7 @@ EXAMPLE: example noetherNormal; shows an example
    }
    // ------------------------ change of ordering ---------------------------
    //Now change the order to (dp(n-d),lp) creating a new basering @S
-    string s ="dp("+string(n-d)+"),lp";
+   string s ="dp("+string(n-d)+"),lp";
    def @S=changeord(s);
    setring @S;
    ideal m;

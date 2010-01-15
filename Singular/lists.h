@@ -7,8 +7,9 @@
 /*
 * ABSTRACT: handling of the list type
 */
-#include "structs.h"
 #include "omalloc.h"
+#include "structs.h"
+#include "ideals.h"
 #include "subexpr.h"
 #include "tok.h"
 

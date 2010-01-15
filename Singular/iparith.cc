@@ -100,6 +100,16 @@ struct sValCmdTab
 
 typedef sValCmdTab jjValCmdTab[];
 
+struct _scmdnames
+{
+  char *name;
+  short alias;
+  short tokval;
+  short toktype;
+};
+typedef struct _scmdnames cmdnames;
+
+
 /* ifdef GENTABLE: definitions are in ipshell.h */
 #ifndef GENTABLE
 typedef char * (*Proc1)(char *);

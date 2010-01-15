@@ -9,6 +9,7 @@
 */
 #include <stdio.h>
 #include "structs.h"
+#include "ideals.h"
 
 
 extern leftv iiCurrArgs;
@@ -20,18 +21,9 @@ extern sleftv *iiRETURNEXPR;
 #ifdef USE_IILOCALRING
 extern ring   *iiLocalRing;
 #endif
-struct _scmdnames
-{
-  char *name;
-  short alias;
-  short tokval;
-  short toktype;
-};
-typedef struct _scmdnames cmdnames;
-
 //extern cmdnames cmds[];
 extern const char *lastreserved;
-extern const char *singular_date;
+extern const char *singular_date; /* tesths.cc, set by final compile */
 
 extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
 
