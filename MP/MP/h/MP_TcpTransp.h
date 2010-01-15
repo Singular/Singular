@@ -86,7 +86,7 @@ MP_Status_t open_tcp_listen_mode _ANSI_ARGS_((MP_Link_pt, int, char**));
 MP_Status_t open_tcp_launch_mode _ANSI_ARGS_((MP_Link_pt, int, char**));
 MP_Status_t socket_accept_blocking _ANSI_ARGS_((MP_Link_pt, SOCKET*));
 MP_Status_t socket_accept_non_blocking _ANSI_ARGS_((MP_Link_pt, SOCKET*));
-char* IMP_GetCmdlineArg _ANSI_ARGS_((int, char**, char*));
+char* IMP_GetCmdlineArg _ANSI_ARGS_((int, char**, const char*));
 
 
 typedef struct{

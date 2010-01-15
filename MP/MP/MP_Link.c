@@ -193,7 +193,7 @@ MP_Status_t IMP_Restore(link, n)
 
 
 #ifdef __STDC__
-MP_Link_pt MP_OpenLink(MP_Env_pt env, int argc, char **argv)
+MP_Link_pt MP_OpenLink(MP_Env_pt env, int argc, const char **argv)
 #else
 MP_Link_pt MP_OpenLink(env, argc, argv)
     MP_Env_pt   env;

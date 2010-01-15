@@ -210,7 +210,7 @@ char* MP_ErrorStr(link, status)
 #ifdef __STDC__
 char* IMP_GetCmdlineArg(int argc,
                         char **argv,
-                        char *cmd)
+                        const char *cmd)
 #else
 char* IMP_GetCmdlineArg(argc, argv, cmd)
     int argc;

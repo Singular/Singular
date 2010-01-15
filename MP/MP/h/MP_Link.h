@@ -90,7 +90,7 @@ struct MP_Link_t
    if (link == NULL) return (MP_NullLink)
 
 EXTERN MP_Link_pt MP_OpenLink _ANSI_ARGS_((MP_Env_pt env, int argc,
-                                             char **argv));
+                                             const char **argv));
 
 EXTERN void MP_CloseLink _ANSI_ARGS_((MP_Link_pt link));
 

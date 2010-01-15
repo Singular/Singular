@@ -51,7 +51,7 @@ EXTERN char* MP_ErrorStr _ANSI_ARGS_((MP_Link_pt link));
 
 EXTERN char* MP_StatusErrorStr _ANSI_ARGS_((MP_Link_pt link, MP_Status_t status));
 
-EXTERN char *IMP_GetCmdlineArg _ANSI_ARGS_((int argc, char **argv, char *cmd));
+EXTERN char *IMP_GetCmdlineArg _ANSI_ARGS_((int argc, char **argv, const char *cmd));
 
 EXTERN char *IMP_TypeToString  _ANSI_ARGS_((MP_NodeType_t t));
 
