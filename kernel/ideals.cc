@@ -4004,11 +4004,14 @@ poly id_GCD(poly f, poly g, const ring r)
 */
 ideal idChineseRemainder(ideal *xx, number *q, int rl)
 {
-  ideal result=idInit(IDELEMS(xx[0]),xx[0]->rank);
+  int cnt=IDELEMS(xx[0])*xx[0]->nrows;
+  ideal result=idInit(cnt,xx[0]->rank);
+  result->nrows=xx[0]->nrows; // for lifting matrices
+  result->ncols=xx[0]->ncols; // for lifting matrices
   int i,j;
   poly r,h,hh,res_p;
   number *x=(number *)omAlloc(rl*sizeof(number));
-  for(i=IDELEMS(result)-1;i>=0;i--)
+  for(i=cnt-1;i>=0;i--)
   {
     res_p=NULL;
     loop
