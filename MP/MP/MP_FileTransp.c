@@ -78,7 +78,7 @@ static char vcid[] = "@(#) $Id$";
 
 /* #define MP_DEBUG */
 
-EXTERN char *IMP_GetCmdlineArg _ANSI_ARGS_((int, char**, char*));
+EXTERN char *IMP_GetCmdlineArg _ANSI_ARGS_((int, char**, const char*));
 
 #define log_msg_len 128
 static char log_msg[log_msg_len];
