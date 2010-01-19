@@ -14,7 +14,7 @@ The library normaliz.lib provides an interface for the use of Normaliz 2.1 withi
  @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}.
 
 
-NOTE:    This library functions use @code{sed} to transfer the @code{normaliz} output into a singular conform format.
+NOTE:    These library functions use @code{sed} to transfer the @code{normaliz} output into a SINGULAR compliant format.
 
 
 KEYWORDS: integral closure; normalization
