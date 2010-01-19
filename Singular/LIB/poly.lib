@@ -7,6 +7,7 @@ AUTHORS:  O. Bachmann, G.-M. Greuel, A. Fruehbis
 
 PROCEDURES:
  cyclic(int);           ideal of cyclic n-roots
+ elemSymmId(int);       ideal of elementary symmetric polynomials
  katsura([i]);          katsura [i] ideal
  freerank(poly/...)     rank of coker(input) if coker is free else -1
  is_zero(poly/...);     int, =1 resp. =0 if coker(input) is 0 resp. not
@@ -154,6 +155,7 @@ example
    ideal f = b+c,0,b-1;
    substitute(I,v,f);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 proc cyclic (int n)
 "USAGE:   cyclic(n);  n integer
@@ -182,8 +184,69 @@ example
    cyclic(nvars(basering));
    homog(cyclic(5),z);
 }
-///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+proc elemSymmPoly(int d, int lindex, int hindex)
+"USAGE:  elemSymmPoly(d,lindex,hindex); d,lindex,hindex integers
+RETURN:  elementary symmetric polynomial of degree d for variables
+@*       var(lindex),...,var(hindex) of basering
+EXAMPLE: example elemSymmPoly; shows an example
+"
+{
+ if(hindex - lindex + 1 < d)
+ {
+   int i = hindex - lindex + 1;
+   "========================================================";
+   "There is no elementary symmetric polynomial of degree "+string(d);
+   "for just "+string(i)+" variables.";
+   "========================================================";
+   return(poly(0));
+ }
+ if(d == 0)
+ {
+   return(poly(1));
+ }
+ else
+ {
+   int i;
+   poly p;
+   for (i = lindex; i <=  hindex - d + 1; i++)
+   {
+     p = p + var(i) * elemSymmPoly(d - 1, i + 1, hindex);
+   }
+   return(p);
+ }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R = 0, (u,v,w,x,y,z), lp;
+  elemSymmPoly(3,2,5);
+  elemSymmPoly(6,1,6);
+}
+
+//////////////////////////////////////////////////////////////////////////
+proc elemSymmId(int n)
+"USAGE:  elemSymmId(n); n integer
+RETURN:  ideal of elementary symmetric polynomials for 1-st n
+@*       variables of basering
+EXAMPLE: example elemSymmId; shows an example
+{
+ int i;
+ ideal symm;
+ for(i = 1; i <= n; i++)
+ {
+   symm = symm + elemSymmPoly(i, 1, n);
+ }
+ return(symm);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring R = 0, (v,w,x,y,z), lp;
+  elemSymmId(3);
+  elemSymmId(nvars(basering));
+}
+
+//////////////////////////////////////////////////////////////////////////
 proc katsura
 "USAGE: katsura([n]); n integer
 RETURN: katsura(n) : n-th katsura ideal of
