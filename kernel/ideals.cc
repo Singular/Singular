@@ -4072,9 +4072,13 @@ ideal idChineseRemainder(ideal *xx, intvec *iv)
  */
 ideal idFarey(ideal x, number N)
 {
-  ideal result=idInit(IDELEMS(x),x->rank);
+  int cnt=IDELEMS(x)*x->nrows;
+  ideal result=idInit(cnt,x->rank);
+  result->nrows=x->nrows; // for lifting matrices
+  result->ncols=x->ncols; // for lifting matrices
+
   int i;
-  for(i=IDELEMS(result)-1;i>=0;i--)
+  for(i=cnt-1;i>=0;i--)
   {
     poly h=pCopy(x->m[i]);
     result->m[i]=h;
@@ -4084,6 +4088,19 @@ ideal idFarey(ideal x, number N)
       pSetCoeff0(h,nlFarey(c,N));
       nDelete(&c);
       pIter(h);
+    }
+    while((result->m[i]!=NULL)&&(nIsZero(pGetCoeff(result->m[i]))))
+    {
+      pLmDelete(&(result->m[i]));
+    }
+    h=result->m[i];
+    while((h!=NULL) && (pNext(h)!=NULL))
+    {
+      if(nIsZero(pGetCoeff(pNext(h))))
+      {
+        pLmDelete(&pNext(h));
+      }
+      else pIter(h);
     }
   }
   return result;
