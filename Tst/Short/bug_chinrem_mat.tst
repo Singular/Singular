@@ -10,4 +10,8 @@ matrix trans = chinrem(T1,intvec(3,7,13));
 trans;
 print(trans);
 
+bigint N = 3*7*13;
+matrix M = farey(trans,N);
+print(M);
+
 tst_status(1);$
