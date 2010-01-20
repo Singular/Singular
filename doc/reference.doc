@@ -1818,9 +1818,9 @@ See
 
 @table @code
 @item @strong{Syntax:}
-@code{factorize (} poly_expression @code{)}
-@*@code{factorize (} poly_expression@code{, 0 )}
-@*@code{factorize (} poly_expression@code{, 2 )}
+@code{farey (} poly_expression @code{)}
+@*@code{farey (} poly_expression@code{, 0 )}
+@*@code{farey (} poly_expression@code{, 2 )}
 @item @strong{Type:}
 list of ideal and intvec
 @*
