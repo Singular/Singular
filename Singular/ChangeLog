@@ -1,4 +1,5 @@
 Changes w.r.t 3-1-0-8:
+- 3-1-0-9: Mon Jan 25 13:47:50 CET 2010
 - NTL 5.5.2
 - parts of structs.h moved to febase.h, ring.h, ...
 - bug in ideal quotient (by one polynom) fixed
