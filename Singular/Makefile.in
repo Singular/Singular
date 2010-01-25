@@ -527,12 +527,18 @@ installslib-nolns: LIB
 	${INSTALL_DATA} `pwd`/LIB/gftables/* ${slibdir}/gftables/
 
 install-libsingular: libsingular
+	${MKINSTALLDIRS} ${includedir}/singular
 	for file in *.$(SO_SUFFIX); do \
 	  ${INSTALL_PROGRAM}  $$file ${libdir}; \
 	done
 	${INSTALL_PROGRAM} libsingular.h ${includedir}
-
-
+	${INSTALL_PROGRAM} subexpr.h ${includedir}/singular
+	${INSTALL_PROGRAM} tok.h ${includedir}/singular
+	${INSTALL_PROGRAM} grammar.h ${includedir}/singular
+	${INSTALL_PROGRAM} ipid.h ${includedir}/singular
+	${INSTALL_PROGRAM} ipshell.h ${includedir}/singular
+	${INSTALL_PROGRAM} lists.h ${includedir}/singular
+	${INSTALL_PROGRAM} attrib.h ${includedir}/singular
 
 uninstall: uninstallbin
 

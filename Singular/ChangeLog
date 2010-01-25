@@ -7,6 +7,7 @@ Changes w.r.t 3-1-0-8:
   (but only, if compiled with HAVE_PLURAL)
 - new library: normaliz.lib
 - exotic bug in diff fixed (track 195)
+- SAGE patches (4.3.1)
 
 Changes w.r.t 3-1-0-7:
 - 3-1-0-8: Tue Jan  5 11:11:08 CET 2010

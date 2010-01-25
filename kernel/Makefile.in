@@ -290,8 +290,8 @@ p_Procs_%.so: p_Procs_Lib_%.dl_o
 install-nolns: install
 
 install-libsingular:
-	${MKINSTALLDIRS} ${includedir}/singular
-	-for file in *.h kInline.cc; do ${INSTALL_PROGRAM} $$file ${includedir}/singular; done
+	${INSTALL_PROGRAM} kInline.cc ${includedir}/singular
+	-for file in *.h; do ${INSTALL_PROGRAM} $$file ${includedir}/singular; done
 
 install: all installbin
 

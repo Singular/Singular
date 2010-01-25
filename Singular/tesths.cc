@@ -80,6 +80,30 @@ int mmInit( void )
 #ifdef OM_SING_KEEP
     om_Opts.Keep = OM_SING_KEEP;
 #endif
+#ifdef LIBSINGULAR   
+   // interpreter init for libsingular
+   iiInitArithmetic();
+ 
+   basePack=(package)omAlloc0(sizeof(*basePack));
+   currPack=basePack;
+   idhdl h;
+   h=enterid("Top", 0, PACKAGE_CMD, &IDROOT, TRUE);
+   IDPACKAGE(h)->language = LANG_TOP;
+   IDPACKAGE(h)=basePack;
+   currPackHdl=h;
+   basePackHdl=h;
+ 
+   slStandardInit();
+   myynest=0;
+   if (! feOptValue(FE_OPT_NO_STDLIB))
+   {
+     int vv=verbose;
+     verbose &= ~Sy_bit(V_LOAD_LIB);
+     iiLibCmd(omStrDup("standard.lib"), TRUE,TRUE,TRUE);
+     verbose=vv;
+   }
+   errorreported = 0;
+#endif   
   }
   mmIsInitialized=1;
   return 1;

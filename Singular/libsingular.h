@@ -13,6 +13,7 @@
 #include "singular/omalloc.h"
 #include "singular/clapsing.h"
 #include "singular/fast_maps.h"
+#include "singular/kutil.h"
 #include "singular/kstd1.h"
 #include "singular/tgb.h"
 #include "singular/sparsmat.h"
@@ -20,8 +21,17 @@
 #include "singular/rmodulo2m.h"
 #include "singular/rmodulon.h"
 
+#include "singular/subexpr.h"
+#include "singular/tok.h"
+#include "singular/grammar.h"
+#include "singular/ipid.h"
+#include "singular/ipshell.h"
+#include "singular/attrib.h"
 
 int siInit(char *);
+
+/* we need this function in Sage*/
+number nr2mMapZp(number from);
 
 #endif //SINGULAR__H
 
