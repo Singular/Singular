@@ -2371,7 +2371,7 @@ fi
           if test "$ac_cv_lib_dl_dlopen" = yes; then
 	  	LD_DYN_FLAGS="-ldl -dynamic"
 	  	SFLAGS="-fpic -DPIC"
-	  	SLDFLAGS="-dynamic -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
+	  	SLDFLAGS="-dynamiclib -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup"
                 if test "${LD+set}" != set; then
 		  LD=libtool
                 fi
