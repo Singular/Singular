@@ -32,6 +32,7 @@ $Id$
 #include <time.h>
 #include <sys/time.h>
 //#include <gmpxx.h>
+#include <vector>
 
 /*DO NOT REMOVE THIS*/
 #ifndef GMPRATIONAL
@@ -203,8 +204,12 @@ inline bool gcone::areEqual(facet *f, facet *s)
 	intvec* sNormal;
 	fNormal = f->getFacetNormal();
 	sNormal = s->getFacetNormal();
+	//Do not need parallelity. Too time consuming
 	if(!isParallel(fNormal,sNormal))
 		notParallelCtr++;
+// 	intvec *foo=ivNeg(sNormal);
+// 	if(fNormal->compare(foo)!=0) //facet normals
+// 		return TRUE;
 	else//parallelity, so we check the codim2-facets
 	{
 		facet* f2Act;
@@ -245,7 +250,13 @@ inline void facet::setFacetNormal(intvec *iv)
 	this->fNormal = ivCopy(iv);			
 }
 		
-/** Hopefully returns the facet normal */
+/** Hopefully returns the facet normal 
+* Mind: ivCopy returns a new intvec, so use this in the following way:
+* intvec *iv;
+* iv = this->getFacetNormal();
+* [...]
+* delete(iv);
+*/
 inline intvec *facet::getFacetNormal()
 {				
 	return ivCopy(this->fNormal);
@@ -719,6 +730,7 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 					p=pCopy(P->p);
 					q=pHead(p);	//Monomial q
 					isMaybeFacet=FALSE;
+					//TODO: Suffices to check LTs here
 					while(p!=NULL)
 					{
 						q=pHead(p);						
@@ -856,45 +868,49 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		}//for (int jj = 1; jj <ddcols; jj++)
 				
 		/*Quick'n'dirty hack for flippability*/	
-		bool isFlip=FALSE;								
-		for (int jj = 0; jj<load->length(); jj++)
-		{
-			intvec *ivCanonical = new intvec(load->length());
-			(*ivCanonical)[jj]=1;
-// 					cout << "dotProd=" << dotProduct(*load,*ivCanonical) << endl;
-			if (dotProduct(*load,*ivCanonical)<0)	
-					//if (ivMult(load,ivCanonical)<0)
+// 		bool isFlip=FALSE;
+// 		if(gcone::hasHomInput==FALSE)
+// 		{
+			//TODO: No dP needed
+			bool isFlip=FALSE;
+			for (int jj = 0; jj<load->length(); jj++)
 			{
-				isFlip=TRUE;
-				break;	//URGHS
-			}
-			delete ivCanonical;
-		}/*End of check for flippability*/
-		if (isFlip==FALSE)
-		{
-			this->numFacets++;
-			numNonFlip++;
-			if(this->numFacets==1)
+				intvec *ivCanonical = new intvec(load->length());
+				(*ivCanonical)[jj]=1;
+	// 					cout << "dotProd=" << dotProduct(*load,*ivCanonical) << endl;
+				if (dotProduct(*load,*ivCanonical)<0)	
+						//if (ivMult(load,ivCanonical)<0)
+				{
+					isFlip=TRUE;
+					break;	//URGHS
+				}
+				delete ivCanonical;
+			}/*End of check for flippability*/
+			if (isFlip==FALSE)
 			{
-				facet *fRoot = new facet();
-				this->facetPtr = fRoot;
-				fAct = fRoot;
-						
-			}
-			else
-			{
-				fAct->next = new facet();
-				fAct = fAct->next;
-			}
-			fAct->isFlippable=FALSE;
-			fAct->setFacetNormal(load);
-			fAct->setUCN(this->getUCN());
+				this->numFacets++;
+				numNonFlip++;
+				if(this->numFacets==1)
+				{
+					facet *fRoot = new facet();
+					this->facetPtr = fRoot;
+					fAct = fRoot;							
+				}
+				else
+				{
+					fAct->next = new facet();
+					fAct = fAct->next;
+				}
+				fAct->isFlippable=FALSE;
+				fAct->setFacetNormal(load);
+				fAct->setUCN(this->getUCN());
 #ifdef gfan_DEBUG
-			cout << "Marking facet (";
-			load->show(1,0);
-			cout << ") as non flippable" << endl;				
+				cout << "Marking facet (";
+				load->show(1,0);
+				cout << ") as non flippable" << endl;				
 #endif
-		}
+			}
+// 		}
 		else
 		{	/*Now load should be full and we can call setFacetNormal*/					
 			this->numFacets++;
@@ -981,32 +997,25 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 	/*Now set appropriate linearity*/
 	for (int ii=0; ii<this->numFacets; ii++)			
 	{	
-// 		dd_rowset LL;
-// 		set_initialize(&LL,ddineq->rowsize);
-// 		set_copy(LL,ddineq->linset);
-// 		set_copy(ddineq->linset,LL);
 		dd_rowset impl_linset, redset;
 		dd_rowindex newpos;
 		dd_MatrixPtr ddakt;
   		ddakt = dd_CopyMatrix(ddineq);
 // 		ddakt->representation=dd_Inequality;	//Not using this makes it faster. But why does the quick check below still work?
+// 		ddakt->representation=dd_Generator;
 		set_addelem(ddakt->linset,ii+1);/*Now set appropriate linearity*/
 #ifdef gfanp
 		timeval t_ddMC_start, t_ddMC_end;
 		gettimeofday(&t_ddMC_start,0);
 #endif				
  		//dd_MatrixCanonicalize(&ddakt, &impl_linset, &redset, &newpos, &err);
-//  		set_copy(LL,ddakt->linset);
 		dd_PolyhedraPtr ddpolyh;
 		ddpolyh=dd_DDMatrix2Poly(ddakt, &err);
 // 		ddpolyh=dd_DDMatrix2Poly2(ddakt, dd_MaxCutoff, &err);
 		dd_MatrixPtr P;
 		P=dd_CopyGenerators(ddpolyh);		
 		dd_FreePolyhedra(ddpolyh);
-// 		ddpolyh=dd_DDMatrix2Poly(P,&err);
-// 		dd_MatrixPtr R;
-// 		R=dd_CopyInequalities(ddpolyh);
-// 		dd_FreePolyhedra(ddpolyh);
+		//TODO Call for one cone , normalize - check equalities - plus lineality -done
 #ifdef gfanp
 		gettimeofday(&t_ddMC_end,0);
 		t_ddMC += (t_ddMC_end.tv_sec - t_ddMC_start.tv_sec + 1e-6*(t_ddMC_end.tv_usec - t_ddMC_start.tv_usec));
@@ -1051,6 +1060,7 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		* facet to be non-flippable. Works since we set the appropriate 
 		* linearity for ddakt above.
 		*/
+		//TODO It might be faster to compute jus the implied equations instead of a relative interior point
 // 		intvec *iv_intPoint = new intvec(this->numVars);
 // 		dd_MatrixPtr shiftMatrix;
 // 		dd_MatrixPtr intPointMatrix;
@@ -1104,6 +1114,7 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 				break;
 		}
 		if(containsStrictlyPosRay==FALSE)
+		//TODO Not sufficient. Intersect with pos orthant for pos int
 			fAct->isFlippable=FALSE;
 #ifdef gfanp
 		gettimeofday(&t_iP_end, 0);
@@ -1112,14 +1123,7 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		/**/
 		fAct = fAct->next;	
 		dd_FreeMatrix(ddakt);
-// 		dd_FreeMatrix(shiftMatrix);
-// 		dd_FreeMatrix(intPointMatrix);		
-// 		delete iv_intPoint;
 		dd_FreeMatrix(P);
-// 		set_free(impl_linset);
-// 		set_free(redset);		
-// 		free(newpos);
-// 		set_free(LL);
 	}//for 	
 	dd_FreeMatrix(ddineq);
 #ifdef gfanp
@@ -1127,6 +1131,93 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 	time_getCodim2Normals += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
 #endif
 }
+		
+/** Really extremal rays this time ;)
+* Extremal rays are unique modulo the homogeneity space.
+* Therefore we dd_MatrixAppend gc->ddFacets and gcone::dd_LinealitySpace
+* into ddineq. Next we compute the extremal rays of the so given subspace.
+* Figuring out whether a ray belongs to a given facet(normal) is done by
+* checking whether the inner product of the ray with the normal is zero.
+*/
+void gcone::getExtremalRays(const gcone &gc)
+{
+	//Add lineality space - dd_LinealitySpace
+	dd_MatrixPtr ddineq;
+	dd_ErrorType err;
+	ddineq = dd_AppendMatrix(gc.ddFacets,gcone::dd_LinealitySpace);
+	dd_PolyhedraPtr ddPolyh;
+	ddPolyh = dd_DDMatrix2Poly(ddineq, &err);
+	dd_MatrixPtr P;
+	P=dd_CopyGenerators(ddPolyh);
+	dd_FreePolyhedra(ddPolyh);
+	//Loop through the rows of P and check whether fNormal*row[i]=0 => row[i] belongs to fNormal
+	int rows=P->rowsize;
+	facet *fAct=gc.facetPtr;
+	while(fAct!=NULL)
+	{
+		intvec *fNormal;// = new intvec(this->numVars);
+		fNormal = fAct->getFacetNormal();
+		for(int ii=0;ii<rows;ii++)
+		{
+			intvec *rowvec = new intvec(this->numVars);
+			makeInt(P,ii+1,*rowvec);//get an integer entry instead of rational
+			if(dotProduct(*fNormal,*rowvec)==0)
+			{
+				fAct->numCodim2Facets++;
+				facet *codim2Act;
+				if(fAct->numCodim2Facets==1)					
+				{						
+					fAct->codim2Ptr = new facet(2);						
+					codim2Act = fAct->codim2Ptr;
+				}
+				else
+				{
+					codim2Act->next = new facet(2);
+					codim2Act = codim2Act->next;
+				}
+				codim2Act->setFacetNormal(rowvec);
+				//Check flippability				
+			}
+			delete(rowvec);
+		}		
+		delete fNormal;		
+		fAct = fAct->next;
+	}
+	//Now all extremal rays should be set w.r.t their respective fNormal
+	//TODO Not sufficient -> vol2 II/125&127
+	fAct=gc.facetPtr;
+	while(fAct!=NULL)
+	{
+		bool containsStrictlyPosRay=TRUE;
+		facet *codim2Act;
+		codim2Act = fAct->codim2Ptr;
+		while(codim2Act!=NULL)
+		{
+			containsStrictlyPosRay==TRUE;
+			intvec *rayvec;
+			rayvec = codim2Act->getFacetNormal();//Mind this is no normal but a ray!
+			int negCtr=0;
+			for(int ii=0;ii<rayvec->length();ii++)
+			{
+				if((*rayvec)[ii]<=0)
+				{
+					containsStrictlyPosRay==FALSE;
+					break;
+				}
+			}
+			if(containsStrictlyPosRay==TRUE)
+			{
+				delete(rayvec);
+				break;
+			}
+			delete(rayvec);
+			codim2Act = codim2Act->next;
+		}
+		if(containsStrictlyPosRay==FALSE)
+			fAct->isFlippable=FALSE;
+		fAct = fAct->next;
+	}	
+}		
 		
 /** \brief Compute the Groebner Basis on the other side of a shared facet 
  *
@@ -1214,7 +1305,15 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	idDelete(&initialForm);
 	ideal H;
 //  	H=kStd(ina,NULL,isHomog,NULL);	//we know it is homogeneous
+#ifdef gfanp
+	timeval t_kStd_start, t_kStd_end;
+	gettimeofday(&t_kStd_start,0);
+#endif
 	H=kStd(ina,NULL,testHomog,NULL);	//This is \mathcal(G)_{>_-\alpha}(in_v(I))
+#ifdef gfanp
+	gettimeofday(&t_kStd_end, 0);
+	t_kStd += (t_kStd_end.tv_sec - t_kStd_start.tv_sec + 1e-6*(t_kStd_end.tv_usec - t_kStd_start.tv_usec));
+#endif
 	idSkipZeroes(H);
 	idDelete(&ina);
 
@@ -1228,7 +1327,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	//H is needed further below, so don't idDelete here
  	srcRing_HH=ffG(srcRing_H,this->gcBasis);
  	idDelete(&srcRing_H);
-	
+		
 	/*Substep 2.2.1
 	 * Mark according to G_-\alpha
 	 * Here we have a minimal basis srcRing_HH. In order to turn this basis into a reduced basis
@@ -1364,8 +1463,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 // 	}
 	/*We create a matrix containing the standard simplex
 	* and constraints to assure a strictly positive point
-	* is computed
-	*/
+	* is computed */
 	dd_MatrixPtr posRestr = dd_CreateMatrix(this->numVars+1, this->numVars+1);
 	for(int ii=0;ii<posRestr->rowsize;ii++)
 	{
@@ -1377,17 +1475,14 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 		}
 		else
 		{
-			dd_set_si(posRestr->matrix[ii][0],-1);
+			/** Set all variables to \geq 1/10. YMMV but this choice is pretty equal*/
+			dd_set_si2(posRestr->matrix[ii][0],-1,2);
 			dd_set_si(posRestr->matrix[ii][ii],1);
 		}
 	}
-	/**/
 	dd_MatrixAppendTo(&intPointMatrix,posRestr);
 	dd_FreeMatrix(posRestr);
-	/*Insert preprocessing here. If it is before the dd_CreateMatrix things go pear shaped
-	* Otherwise things will go pear shaped if called after the standard simplex constraints are added
-	*/
-// 	preprocessInequalities(intPointMatrix);
+
 	intvec *iv_weight = new intvec(this->numVars);
 #ifdef gfanp
 	timeval t_dd_start, t_dd_end;
@@ -1396,11 +1491,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	dd_ErrorType err;
 	dd_rowset implLin, redrows;
 	dd_rowindex newpos;
-	
-// 	dd_MatrixCanonicalize(&intPointMatrix,&implLin,&redrows,&newpos,&err);
-// 	dd_MatrixCanonicalizeLinearity(&intPointMatrix,&implLin, &newpos,&err);
-	//dd_MatrixRedundancyRemove is our time sink!
-// 	dd_MatrixRedundancyRemove(&intPointMatrix,&redrows,&newpos,&err);
+
 	interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
 	dd_FreeMatrix(intPointMatrix);
 	/*Crude attempt for interior point */
@@ -1427,8 +1518,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	t_dd += (t_dd_end.tv_sec - t_dd_start.tv_sec + 1e-6*(t_dd_end.tv_usec - t_dd_start.tv_usec));
 #endif			
 	/*Step 3
-	turn the minimal basis into a reduced one
-	*/			
+	* turn the minimal basis into a reduced one */			
 	// NOTE May assume that at this point srcRing already has 3 blocks of orderins, starting with a
 	// Thus: 
 	//ring dstRing=rCopyAndChangeWeight(srcRing,iv_weight);	
@@ -1441,7 +1531,6 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	}
 	dstRing->wvhdl[0]=(int*)A;
 	rComplete(dstRing);
-// 	omFree(A);					
 	rChangeCurrRing(dstRing);
  	rDelete(tmpRing);
 	delete iv_weight;
@@ -1460,7 +1549,14 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	//NOTE Any of the two variants of tmpI={idrCopy(),dstRing_I} does the trick
 	//tmpI = idrCopyR(this->inputIdeal,this->baseRing);
 	tmpI = dstRing_I;
+#ifdef gfanp
+	gettimeofday(&t_kStd_start,0);
+#endif
 	dstRing_I=kStd(tmpI,NULL,testHomog,NULL);
+#ifdef gfanp
+	gettimeofday(&t_kStd_end, 0);
+	t_kStd += (t_kStd_end.tv_sec - t_kStd_start.tv_sec + 1e-6*(t_kStd_end.tv_usec - t_kStd_start.tv_usec));
+#endif
 	idDelete(&tmpI);
 	idNorm(dstRing_I);			
 // 	kInterRed(dstRing_I);
@@ -1501,7 +1597,6 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 		poly aktpoly = (poly)gb->m[ii];//Ptr, so don't pDelete(aktpoly)
 		int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		pGetExpV(aktpoly,leadExpV);	//find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
-// 		initialFormElement[ii]=pHead(aktpoly);
 		initialFormElement=pHead(aktpoly);
 		while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
 		{
@@ -1518,7 +1613,6 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 			if (isParallel(*check,fNormal)) //pass *check when 
 			{
 				//Found a parallel vector. Add it
-// 				initialFormElement[ii] = pAdd(pCopy(initialFormElement[ii]),(poly)pHead(aktpoly));
 				initialFormElement = pAdd((initialFormElement),(poly)pHead(aktpoly));
 			}
 			omFree(v);
@@ -1530,12 +1624,9 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 //  		cout << "---" << endl;
 #endif
 		/*Now initialFormElement must be added to (ideal)initialForm */
-// 		initialForm->m[ii]=pCopy(initialFormElement[ii]);
-// 		pDelete(&initialFormElement[ii]);
 		initialForm->m[ii]=pCopy(initialFormElement);
 		pDelete(&initialFormElement);
 		omFree(leadExpV);
-// 		delete check;
 	}//for
 #ifdef gfanp
 	gettimeofday(&end, 0);
@@ -1559,18 +1650,13 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 //NOTE: use kNF or kNF2 instead of restOfDivision
 inline ideal gcone::ffG(const ideal &H, const ideal &G)
 {
-// 			cout << "Entering ffG" << endl;
 	int size=IDELEMS(H);
 	ideal res=idInit(size,1);
-// 	poly temp1;//=pInit();
-// 	poly temp2;//=pInit();
-// 	poly temp3;//=pInit();	//polys to temporarily store values for pSub
 	for (int ii=0;ii<size;ii++)
 	{
 		poly temp1=pInit();
 		poly temp2=pInit();
-		poly temp3=pInit();
-// 		res->m[ii]=restOfDiv(H->m[ii],G);
+		poly temp3=pInit();//polys to temporarily store values for pSub
 // 		res->m[ii]=pCopy(kNF(G, NULL,H->m[ii],0,0));
 		temp1=pCopy(H->m[ii]);
 // 		temp2=pCopy(res->m[ii]);
@@ -1763,7 +1849,6 @@ inline void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M her
 	}
 	dd_MatrixAppendTo(&M,posRestr);
 	dd_FreeMatrix(posRestr);
-// 	dd_MatrixCanonicalizeLinearity(&M, &ddlinset, &ddnewpos, &err);
 	lp=dd_Matrix2LP(M, &err);
 	if (err!=dd_NoError){WerrorS("Error during dd_Matrix2LP in gcone::interiorPoint");}
 	if (lp==NULL){WerrorS("LP is NULL");}
@@ -1776,17 +1861,14 @@ inline void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M her
 #ifdef gfan_DEBUG
 // 			dd_WriteLP(stdout,lpInt);
 #endif			
-
 // 	dd_FindRelativeInterior(M,&ddlinset,&ddredrows,&lpSol,&err);
 	if (err!=dd_NoError)
 	{
 		WerrorS("Error during dd_FindRelativeInterior in gcone::interiorPoint");
 		dd_WriteErrorMessages(stdout, err);
-	}
-			
+	}			
 	dd_LPSolve(lpInt,solver,&err);	//This will not result in a point from the relative interior
-// 	if (err!=dd_NoError){WerrorS("Error during dd_LPSolve");}
-									
+// 	if (err!=dd_NoError){WerrorS("Error during dd_LPSolve");}									
 	lpSol=dd_CopyLPSolution(lpInt);
 // 	if (err!=dd_NoError){WerrorS("Error during dd_CopyLPSolution");}
 #ifdef gfan_DEBUG
@@ -1796,8 +1878,7 @@ inline void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M her
 		dd_WriteNumber(stdout,lpSol->sol[ii]);
 	}
 	cout << endl;
-#endif
-			
+#endif			
 	//NOTE The following strongly resembles parts of makeInt. 
 	//Maybe merge sometimes
 	mpz_t kgV; mpz_init(kgV);
@@ -1964,7 +2045,114 @@ inline bool gcone::areEqual(const intvec &a, const intvec &b)
 /** \brief The reverse search algorithm
  */
 //removed with r12286
+/** \brief Compute the lineality/homogeneity space
+* It is the kernel of the inequality matrix Ax=0
+*/
+dd_MatrixPtr gcone::computeLinealitySpace()
+{
+	dd_MatrixPtr res;
+	dd_MatrixPtr ddineq;
+	ddineq=dd_CopyMatrix(this->ddFacets);	
+	//Add a row of 0s in 0th place
+	dd_MatrixPtr ddAppendRowOfZeroes=dd_CreateMatrix(1,this->numVars+1);
+	dd_MatrixPtr ddFoo=dd_AppendMatrix(ddAppendRowOfZeroes,ddineq);
+	dd_FreeMatrix(ddAppendRowOfZeroes);
+	dd_FreeMatrix(ddineq);
+	ddineq=dd_CopyMatrix(ddFoo);
+	dd_FreeMatrix(ddFoo);
+	//Cohen starts here
+	int dimKer=0;//Cohen calls this r
+	int m=ddineq->rowsize;//Rows
+	int n=ddineq->colsize;//Cols
+	int c[m+1];
+	int d[n+1];
+	for(int ii=0;ii<m;ii++)
+		c[ii]=0;
+	for(int ii=0;ii<n;ii++)
+		d[ii]=0;	
+	
+	for(int k=1;k<n;k++)
+	{
+		//Let's find a j s.t. m[j][k]!=0 && c[j]=0		
+		int condCtr=0;//Check each row for zeroness
+		for(int j=1;j<m;j++)
+		{
+			if(mpq_sgn(ddineq->matrix[j][k])!=0 && c[j]==0)
+			{
+				mpq_t quot; mpq_init(quot);
+				mpq_t one; mpq_init(one); mpq_set_str(one,"-1",10);
+				mpq_t ratd; mpq_init(ratd);
+				if((int)mpq_get_d(ddineq->matrix[j][k])!=0)
+					mpq_div(quot,one,ddineq->matrix[j][k]);
+				mpq_set(ratd,quot);
+				mpq_canonicalize(ratd);
 		
+				mpq_set_str(ddineq->matrix[j][k],"-1",10);
+				for(int ss=k+1;ss<n;ss++)
+				{
+					mpq_t prod; mpq_init(prod);
+					mpq_mul(prod, ratd, ddineq->matrix[j][ss]);				
+					mpq_set(ddineq->matrix[j][ss],prod);
+					mpq_canonicalize(ddineq->matrix[j][ss]);
+					mpq_clear(prod);
+				}		
+				for(int ii=1;ii<m;ii++)
+				{
+					if(ii!=j)
+					{
+						mpq_set(ratd,ddineq->matrix[ii][k]);
+						mpq_set_str(ddineq->matrix[ii][k],"0",10);			
+						for(int ss=k+1;ss<m;ss++)
+						{
+							mpq_t prod; mpq_init(prod);
+							mpq_mul(prod, ratd, ddineq->matrix[j][ss]);
+							mpq_t sum; mpq_init(sum);
+							mpq_add(sum, ddineq->matrix[ii][ss], prod);
+							mpq_set(ddineq->matrix[ii][ss],	sum);
+							mpq_canonicalize(ddineq->matrix[ii][ss]);
+							mpq_clear(prod);
+							mpq_clear(sum);
+						}
+					}
+				}
+				c[j]=k;		
+				d[k]=j;
+				mpq_clear(quot); mpq_clear(ratd); mpq_clear(one);	
+			}
+			else
+				condCtr++;
+		}			
+		if(condCtr==m-1)	//Why -1 ???
+		{
+			dimKer++;
+			d[k]=0;
+// 			break;//goto _4;
+		}//else{
+		/*Eliminate*/
+	}//for(k
+	/*Output kernel, i.e. set gcone::dd_LinealitySpace here*/	
+	gcone::dd_LinealitySpace = dd_CreateMatrix(dimKer,this->numVars+1);
+	int row=-1;
+	for(int kk=1;kk<n;kk++)
+	{
+		if(d[kk]==0)
+		{
+			row++;
+			for(int ii=1;ii<n;ii++)
+			{
+				if(d[ii]>0)
+					mpq_set(dd_LinealitySpace->matrix[row][ii],ddineq->matrix[d[ii]][kk]);
+				else if(ii==kk)				
+					mpq_set_str(dd_LinealitySpace->matrix[row][ii],"1",10);
+				mpq_canonicalize(dd_LinealitySpace->matrix[row][ii]);
+			}
+		}
+	}
+	dd_FreeMatrix(ddineq);
+	//Better safe than sorry:
+	//NOTE dd_LinealitySpace contains RATIONAL ENTRIES
+	//Therefore if you need integer ones: CALL gcone::makeInt(...) method
+}	
 /** \brief The new method of Markwig and Jensen
  * Compute gcBasis and facets for the arbitrary starting cone. Store \f$(codim-1)\f$-facets as normals.
  * In order to represent a facet uniquely compute also the \f$(codim-2)\f$-facets and norm by the gcd of the components.
@@ -1975,6 +2163,7 @@ inline bool gcone::areEqual(const intvec &a, const intvec &b)
 void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 {	
 	facet *SearchListRoot = new facet(); //The list containing ALL facets we come across
+// 	vector<facet> stlRoot;
 	facet *SearchListAct;
 	SearchListAct = NULL;
 	//SearchListAct = SearchListRoot;
@@ -2009,8 +2198,13 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 	cout << "Facets are:" << endl;
 	gcAct->showFacets();
 #endif			
-			
-	gcAct->getCodim2Normals(*gcAct);
+	/*Compute lineality space here
+	* Afterwards static dd_MatrixPtr gcone::dd_LinealitySpace is set
+	*/
+	gcAct->computeLinealitySpace();
+	/*End of lineality space computation*/		
+// 	gcAct->getCodim2Normals(*gcAct);
+	gcAct->getExtremalRays(*gcAct);
 				
 	//Compute unique representation of codim-2-facets
 	gcAct->normalize();
@@ -2122,8 +2316,9 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			rDelete(fAct->flipRing);
 			
 			gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);	
-			gcTmp->getCodim2Normals(*gcTmp);
-			gcTmp->normalize();
+// 			gcTmp->getCodim2Normals(*gcTmp);
+			gcTmp->getExtremalRays(*gcTmp);
+			gcTmp->normalize();// will be done in g2c 
 			//gcTmp->ddFacets should not be needed anymore, so
 			dd_FreeMatrix(gcTmp->ddFacets);
 #ifdef gfan_DEBUG
@@ -2187,6 +2382,8 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 					//implant the GB into gcAct
 					readConeFromFile(gcAct->getUCN(), gcAct);
 // 					rAct=rCopy(gcAct->baseRing);
+					/*The ring change occurs in readConeFromFile, so as to 
+					assure that gcAct->gcBasis belongs to the right ring*/
 					rAct=gcAct->baseRing;
 					rComplete(rAct);
 					rChangeCurrRing(rAct);
@@ -2266,6 +2463,7 @@ inline void gcone::makeInt(const dd_MatrixPtr &M, const int line, intvec &n)
  * For all codim-2-facets we compute the gcd of the components of the facet normal and 
  * divide it out. Thus we get a normalized representation of each
  * (codim-2)-facet normal, i.e. a primitive vector
+ * Actually we now also normalize the facet normals.
  */
 inline void gcone::normalize()
 {
@@ -2275,11 +2473,19 @@ inline void gcone::normalize()
 	facet *codim2Act;
 	fAct = this->facetPtr;
 	codim2Act = fAct->codim2Ptr;
-//  	intvec *n = new intvec(this->numVars);
-			
-	//while(codim2Act->next!=NULL)
 	while(fAct!=NULL)
 	{
+		intvec *fNormal;
+		fNormal = fAct->getFacetNormal();
+		for(int ii=0;ii<this->numVars;ii++)
+		{
+			*ggT=intgcd((*ggT),(*fNormal)[ii]);
+		}
+		for(int ii=0;ii<this->numVars;ii++)
+			(*fNormal)[ii] = ((*fNormal)[ii])/(*ggT);
+		fAct->setFacetNormal(fNormal);
+		delete fNormal;
+		/*And now for the codim2*/
 		while(codim2Act!=NULL)
 		{				
 			intvec *n;
@@ -2298,10 +2504,9 @@ inline void gcone::normalize()
 		}
 		fAct = fAct->next;
 	}
-	delete ggT;
-//  	delete n;
-				
+	delete ggT;				
 }
+
 /** \brief Enqueue new facets into the searchlist 
  * The searchlist (SLA for short) is implemented as a FIFO
  * Checks are done as follows:
@@ -2354,14 +2559,14 @@ facet * gcone::enqueueNewFacets(facet *f)
 	volatile bool removalOccured=FALSE;
 	int ctr=0;	//encountered equalities in SLA
 	int notParallelCtr=0;
-	int lengthOfSearchList=1;
+// 	gcone::lengthOfSearchList=1;
 	while(slEnd->next!=NULL)
 	{
 		slEnd=slEnd->next;
-		lengthOfSearchList++;
+// 		gcone::lengthOfSearchList++;
 	}
 	/*1st step: compare facetNormals*/
-//  	intvec *fNormal=NULL;
+//  	intvec *fNormal=NULL;gcone::
 //  	intvec *slNormal=NULL;
 			
 	while(fAct!=NULL)
@@ -2429,7 +2634,9 @@ facet * gcone::enqueueNewFacets(facet *f)
 						slAct->next->prev = slAct->prev;						
 					}
 					removalOccured=TRUE;
-					lengthOfSearchList--;
+// 					cout << gcone::lengthOfSearchList << endl;
+					gcone::lengthOfSearchList--;
+// 					cout << gcone::lengthOfSearchList << endl;
 					if(deleteMarker!=NULL)
 					{
 // 						delete deleteMarker;
@@ -2459,15 +2666,13 @@ facet * gcone::enqueueNewFacets(facet *f)
 						//if slAct was marked as to be deleted, delete it here!
 			}//while(slAct!=NULL)
 			if(removalOccured==FALSE)
-// 			if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) || (doNotAdd==FALSE) )
-					//if( (notParallelCtr==lengthOfSearchList ) || doNotAdd==FALSE ) 
 			{
 #ifdef gfan_DEBUG
 				cout << "Adding facet (";
 				fNormal->show(1,0);
 				cout << ") to SLA " << endl;
 #endif
-						//Add fAct to SLA
+				//Add fAct to SLA
 				facet *marker;
 				marker = slEnd;
 				facet *f2Act;
@@ -2506,7 +2711,8 @@ facet * gcone::enqueueNewFacets(facet *f)
 					f2Act = f2Act->next;
 					delete f2Normal;
 				}
-				lengthOfSearchList++;				
+				gcone::lengthOfSearchList++;							
+// 				cout << gcone::lengthOfSearchList << endl;
 			}//if( (notParallelCtr==lengthOfSearchList && removalOccured==FALSE) ||
 			fAct = fAct->next;
  			delete fNormal;
@@ -2516,6 +2722,8 @@ facet * gcone::enqueueNewFacets(facet *f)
 		{
 			fAct = fAct->next;
 		}
+		if(gcone::maxSize<gcone::lengthOfSearchList)
+			gcone::maxSize= gcone::lengthOfSearchList;
 	}//while(fAct!=NULL)
 #ifdef gfanp
 	gettimeofday(&end, 0);
@@ -2523,7 +2731,24 @@ facet * gcone::enqueueNewFacets(facet *f)
 #endif						
 	return slHead;
 }//addC2N
-		
+
+//A try with the STL
+facet * gcone::enqueue2(facet *f)
+{
+// 	vector<facet> searchList;
+// 	facet fAct;
+// 	fAct=this->facetPtr;
+// 	facet *slAct;
+// 	slAct = f;
+// 	while(fAct!=NULL)
+// 	{
+// 		if(fAct->isFlippable==TRUE)
+// 		{
+// 			if(slAct==NULL)
+// 		}
+// 	}
+}
+
 /** \brief Compute the gcd of two ints
  */
 inline int gcone::intgcd(const int a, const int b)
@@ -2754,6 +2979,8 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 // 			delete iv;
 //  			rComplete(newRing);
 // 			gc->baseRing=rCopy(newRing);
+// // 			rDelete(newRing);
+// 			rComplete(gc->baseRing);
 // 			if(currRing!=gc->baseRing)
 // 				rChangeCurrRing(gc->baseRing);
 		}
@@ -2987,18 +3214,24 @@ inline intvec gcone::f2M(gcone *gc, facet *f, int n)
 
 int gcone::counter=0;
 int gfanHeuristic;
+int gcone::lengthOfSearchList;
+int gcone::maxSize;
+dd_MatrixPtr gcone::dd_LinealitySpace;
 #ifdef gfanp
+// int gcone::lengthOfSearchList=0;
 float gcone::time_getConeNormals;
 float gcone::time_getCodim2Normals;
 float gcone::time_flip;
 float gcone::t_markings;
 float gcone::t_dd;
+float gcone::t_kStd;
 float gcone::time_enqueue;
 float gcone::time_computeInv;
 float gcone::t_ddMC;
 float gcone::t_mI;
 float gcone::t_iP;
 #endif
+bool gcone::hasHomInput=FALSE;
 // ideal gfan(ideal inputIdeal, int h)
 lists gfan(ideal inputIdeal, int h)
 {
@@ -3028,7 +3261,13 @@ lists gfan(ideal inputIdeal, int h)
 		gcone *gcAct;
 		gcAct = gcRoot;
 		gcAct->numVars=pVariables;
-		gcAct->getGB(inputIdeal);		
+		gcAct->getGB(inputIdeal);
+		/*Check whether input is homogeneous
+		if TRUE each facet intersects the positive orthant, so we don't need the
+		flippability test in getConeNormals
+		*/
+		if(idHomIdeal(gcAct->gcBasis,NULL))
+			gcone::hasHomInput=TRUE;
 #ifndef NDEBUG
 		cout << "GB of input ideal is:" << endl;
 // 		idShow(gcAct->gcBasis);
@@ -3062,6 +3301,7 @@ lists gfan(ideal inputIdeal, int h)
 			delete gcDel;
 		}
 	}
+	dd_FreeMatrix(gcone::dd_LinealitySpace);
 	dd_free_global_constants();
 	}//rHasGlobalOrdering
 	else
@@ -3083,9 +3323,12 @@ lists gfan(ideal inputIdeal, int h)
 	cout << "t_Flip:" << gcone::time_flip << endl;
 	cout << "  t_markings:" << gcone::t_markings << endl;
 	cout << "  t_dd:" << gcone::t_dd << endl;
+	cout << " t_kStd:" << gcone::t_kStd << endl;
 	cout << "t_computeInv:" << gcone::time_computeInv << endl;
 	cout << "t_enqueue:" << gcone::time_enqueue << endl;
 #endif
+	cout << "Maximum lenght of list of facets: " << gcone::maxSize << endl;
+
 	return lResList;
 }
 

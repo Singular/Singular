@@ -20,6 +20,7 @@ $Id$
 #include "../../cddlib/include/cddmp.h"
 #endif
 extern int gfanHeuristic;
+// extern dd_MatrixPtr ddLinealitySpace;
 #define gfanp
 // #ifdef gfanp
 // extern	static float time_getConeNormals;
@@ -150,7 +151,13 @@ class gcone
 		static float t_mI;
 		static float t_iP;
 #endif
-
+		/** Matrix to contain the homogeneity/lineality space */
+		static dd_MatrixPtr dd_LinealitySpace;
+		static int lengthOfSearchList;
+		/** Maximum size of the searchlist*/
+		static int maxSize;
+		/** is the ideal homogeneous? */
+		static bool hasHomInput;
 		/** # of variables in the ring */
 		int numVars;		//#of variables in the ring
 		
@@ -202,6 +209,7 @@ class gcone
 		//The real stuff
 		inline void getConeNormals(const ideal &I, bool compIntPoint=FALSE);
 		inline void getCodim2Normals(const gcone &gc);
+		inline void getExtremalRays(const gcone &gc);
 		inline void flip(ideal gb, facet *f);
 		inline void computeInv(ideal &gb, ideal &inv, intvec &f);
 // 		poly restOfDiv(poly const &f, ideal const &I); removed with r12286
@@ -218,7 +226,10 @@ class gcone
 		inline void makeInt(const dd_MatrixPtr &M, const int line, intvec &n);
 		inline void normalize();
 		facet * enqueueNewFacets(facet *f);
-		dd_MatrixPtr facets2Matrix(const gcone &gc);		
+		facet * enqueue2(facet *f);
+		dd_MatrixPtr facets2Matrix(const gcone &gc);
+		/** Compute the lineality space Ax=0 and return it as dd_MatrixPtr dd_LinealitySpace*/
+		inline dd_MatrixPtr computeLinealitySpace();		
 // 		static void gcone::idPrint(ideal &I);		
 		friend class facet;	
 };
