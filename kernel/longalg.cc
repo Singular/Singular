@@ -91,7 +91,9 @@ void naSetChar(int i, ring r)
   if (r->minpoly!=NULL)
   {
     naMinimalPoly=((lnumber)r->minpoly)->z;
+    #ifdef LDEBUG
     omCheckAddr(naMinimalPoly);
+    #endif
   }
   else
     naMinimalPoly = NULL;
@@ -1003,25 +1005,28 @@ number na_Copy(number p, const ring r)
 */
 number naAdd(number la, number lb)
 {
+  if (la==NULL) return naCopy(lb);
+  if (lb==NULL) return naCopy(la);
+
   napoly x, y;
   lnumber lu;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  if (a==NULL) return naCopy(lb);
-  if (b==NULL) return naCopy(la);
+  #ifdef LDEBUG
   omCheckAddrSize(a,sizeof(snumber));
   omCheckAddrSize(b,sizeof(snumber));
-  lu = (lnumber)omAllocBin(rnumber_bin);
+  #endif
   if (b->n!=NULL) x = pp_Mult_qq(a->z, b->n,nacRing);
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = pp_Mult_qq(b->z, a->n,nacRing);
   else            y = napCopy(b->z);
-  lu->z = napAdd(x, y);
-  if (lu->z==NULL)
+  napoly res = napAdd(x, y);
+  if (res==NULL)
   {
-    omFreeBin((ADDRESS)lu,  rnumber_bin);
     return (number)NULL;
   }
+  lu = (lnumber)omAllocBin(rnumber_bin);
+  lu->z=res;
   if (a->n!=NULL)
   {
     if (b->n!=NULL) x = pp_Mult_qq(a->n, b->n,nacRing);
@@ -1044,14 +1049,15 @@ number naAdd(number la, number lb)
   //}
   lu->n = x;
   lu->s = FALSE;
-  if (lu->n!=NULL)
+  if (/*lu->n*/ x!=NULL)
   {
      number luu=(number)lu;
      //if (p_IsConstant(lu->n,nacRing)) naCoefNormalize(luu);
-     //else            
+     //else
                 naNormalize(luu);
      lu=(lnumber)luu;
   }
+  //else lu->s=2;
   naTest((number)lu);
   return (number)lu;
 }
@@ -1074,21 +1080,23 @@ number naSub(number la, number lb)
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
 
+  #ifdef LDEBUG
   omCheckAddrSize(a,sizeof(snumber));
   omCheckAddrSize(b,sizeof(snumber));
+  #endif
 
   napoly x, y;
-  lu = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL) x = pp_Mult_qq(a->z, b->n,nacRing);
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = p_Mult_q(napCopy(b->z), napCopyNeg(a->n),nacRing);
   else            y = napCopyNeg(b->z);
-  lu->z = napAdd(x, y);
-  if (lu->z==NULL)
+  napoly res = napAdd(x, y);
+  if (res==NULL)
   {
-    omFreeBin((ADDRESS)lu,  rnumber_bin);
     return (number)NULL;
   }
+  lu = (lnumber)omAllocBin(rnumber_bin);
+  lu->z=res;
   if (a->n!=NULL)
   {
     if (b->n!=NULL) x = pp_Mult_qq(a->n, b->n,nacRing);
@@ -1101,14 +1109,15 @@ number naSub(number la, number lb)
   }
   lu->n = x;
   lu->s = FALSE;
-  if (lu->n!=NULL)
+  if (/*lu->n*/ x!=NULL)
   {
      number luu=(number)lu;
      //if (p_IsConstant(lu->n,nacRing)) naCoefNormalize(luu);
-     //else   
+     //else
                          naNormalize(luu);
      lu=(lnumber)luu;
   }
+  //else lu->s=2;
   naTest((number)lu);
   return (number)lu;
 }
@@ -1126,8 +1135,10 @@ number naMult(number la, number lb)
   lnumber lo;
   napoly x;
 
+  #ifdef LDEBUG
   omCheckAddrSize(a,sizeof(snumber));
   omCheckAddrSize(b,sizeof(snumber));
+  #endif
   naTest(la);
   naTest(lb);
 
@@ -1174,6 +1185,7 @@ number naMult(number la, number lb)
   if ((x!=NULL) && (p_LmIsConstant(x,nacRing)) && nacIsOne(pGetCoeff(x)))
     p_Delete(&x,nacRing);
   lo->n = x;
+  lo->s = 0;
   if(lo->z==NULL)
   {
     omFreeBin((ADDRESS)lo, rnumber_bin);
@@ -1181,13 +1193,13 @@ number naMult(number la, number lb)
   }
   else if (lo->n!=NULL)
   {
-    lo->s = 0;
     number luu=(number)lo;
     // if (p_IsConstant(lo->n,nacRing)) naCoefNormalize(luu);
-    // else      
+    // else
                       naNormalize(luu);
     lo=(lnumber)luu;
   }
+  //if (naMinimalPoly==NULL) lo->s=2;
   naTest((number)lo);
   return (number)lo;
 }
@@ -1238,8 +1250,10 @@ number naDiv(number la, number lb)
     WerrorS(nDivBy0);
     return NULL;
   }
+  #ifdef LDEBUG
   omCheckAddrSize(a,sizeof(snumber));
   omCheckAddrSize(b,sizeof(snumber));
+  #endif
   lo = (lnumber)omAllocBin(rnumber_bin);
   if (b->n!=NULL)
     lo->z = pp_Mult_qq(a->z, b->n,nacRing);
@@ -1271,21 +1285,22 @@ number naDiv(number la, number lb)
   if ((p_LmIsConstant(x,nacRing)) && nacIsOne(pGetCoeff(x)))
     p_Delete(&x,nacRing);
   lo->n = x;
+  lo->s = 0;
   if (lo->n!=NULL)
   {
-    lo->s = 0;
     number luu=(number)lo;
      //if (p_IsConstant(lo->n,nacRing)) naCoefNormalize(luu);
-     //else   
+     //else
                          naNormalize(luu);
     lo=(lnumber)luu;
   }
+  //else lo->s=2;
   naTest((number)lo);
   return (number)lo;
 }
 
 /*2
-*  za:= - za
+*  za:= - za, inplace
 */
 number naNeg(number za)
 {
@@ -1312,7 +1327,9 @@ number naInvers(number a)
     WerrorS(nDivBy0);
     return NULL;
   }
+  #ifdef LDEBUG
   omCheckAddrSize(b,sizeof(snumber));
+  #endif
   lo = (lnumber)omAlloc0Bin(rnumber_bin);
   lo->s = b->s;
   if (b->n!=NULL)
@@ -1348,7 +1365,7 @@ number naInvers(number a)
   {
      number luu=(number)lo;
      //if (p_IsConstant(lo->n,nacRing)) naCoefNormalize(luu);
-     //else  
+     //else
                            naNormalize(luu);
      lo=(lnumber)luu;
   }
@@ -1536,8 +1553,8 @@ BOOLEAN naIsOne(number za)
   napoly x, y;
   number t;
   if (a==NULL) return FALSE;
-  omCheckAddrSize(a,sizeof(snumber));
 #ifdef LDEBUG
+  omCheckAddrSize(a,sizeof(snumber));
   if (a->z==NULL)
   {
     WerrorS("internal zero error(4)");
@@ -1594,8 +1611,8 @@ BOOLEAN naIsMOne(number za)
   napoly x, y;
   number t;
   if (a==NULL) return FALSE;
-  omCheckAddrSize(a,sizeof(snumber));
 #ifdef LDEBUG
+  omCheckAddrSize(a,sizeof(snumber));
   if (a->z==NULL)
   {
     WerrorS("internal zero error(5)");
@@ -1747,7 +1764,7 @@ void naCoefNormalize(number pp)
     nz=n_Copy(pGetCoeff(pp),nacRing);
     pIter(pp);
     while(pp!=NULL)
-    { 
+    {
       if (n_IsOne(nz,nacRing)) break;
       number d=n_Gcd(nz,pGetCoeff(pp),nacRing);
       n_Delete(&nz,nacRing); nz=d;
@@ -1759,7 +1776,7 @@ void naCoefNormalize(number pp)
       nn=n_Copy(pGetCoeff(pp),nacRing);
       pIter(pp);
       while(pp!=NULL)
-      { 
+      {
         if (n_IsOne(nn,nacRing)) break;
         number d=n_Gcd(nn,pGetCoeff(pp),nacRing);
         n_Delete(&nn,nacRing); nn=d;
@@ -1797,6 +1814,7 @@ void naCoefNormalize(number pp)
     }
   }
 }
+
 void naNormalize(number &pp)
 {
 
@@ -2299,7 +2317,7 @@ number naMapQaQb(number c)
     {
       if (p_GetExp(erg->n,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
         erg->n = napRemainder(erg->n, naMinimalPoly);
-      if ((p_LmIsConstant(erg->n,nacRing)) && nacIsOne(pGetCoeff(erg->n)))
+      if ((p_IsConstant(erg->n,nacRing)) && nacIsOne(pGetCoeff(erg->n)))
         p_Delete(&(erg->n),nacRing);
     }
   }
@@ -2505,7 +2523,9 @@ BOOLEAN naDBTest(number a, const char *f,const int l)
   lnumber x=(lnumber)a;
   if (x == NULL)
     return TRUE;
+  #ifdef LDEBUG
   omCheckAddrSize(a, sizeof(snumber));
+  #endif
   napoly p = x->z;
   if (p==NULL)
   {
