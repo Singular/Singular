@@ -140,6 +140,7 @@ class gcone
 #ifdef gfanp
 		static float time_getConeNormals;
 		static float time_getCodim2Normals;
+		static float t_getExtremalRays;
 		static float time_flip;
 		static float t_ffG;
 		static float t_markings;
@@ -150,6 +151,8 @@ class gcone
 		static float t_ddMC;
 		static float t_mI;
 		static float t_iP;
+		static unsigned parallelButNotEqual;
+		static unsigned numberOfFacetChecks;
 #endif
 		/** Matrix to contain the homogeneity/lineality space */
 		static dd_MatrixPtr dd_LinealitySpace;
@@ -168,8 +171,8 @@ class gcone
 		
 		/**
 		 * At least as a workaround we store the irredundant facets of a matrix here.
-		 * Otherwise, since we throw away non-flippable facets, facets2Matrix will not 
-		 * yield all the necessary information
+		 * This is needed to compute an interior points of a cone. Note that there 
+		 * will be non-flippable facets in it!		 
 		 */
 		dd_MatrixPtr ddFacets;	//Matrix to store irredundant facets of the cone
 		
