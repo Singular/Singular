@@ -16,52 +16,10 @@ BigInt::BigInt()
   mpz_init(value);
 }
 
-BigInt::BigInt(long int a)
-{
-  mpz_init(value);
-  mpz_set_si(value,a);
-}
-
-BigInt::BigInt(unsigned long int a)
-{
-  mpz_init(value);
-  mpz_set_ui(value,a);
-}
-
 BigInt::BigInt(int a)
 {
   mpz_init(value);
-  mpz_set_si(value,(long int)a);
-}
-
-BigInt::BigInt(unsigned int a)
-{
-  mpz_init(value);
-  mpz_set_ui(value,(unsigned long)a);
-}
-
-BigInt::BigInt(short int a)
-{
-  mpz_init(value);
-  mpz_set_si(value,(long int)a);
-}
-
-BigInt::BigInt(unsigned short int a)
-{
-  mpz_init(value);
-  mpz_set_ui(value,(unsigned long int)a);
-}
-
-BigInt::BigInt(char a)
-{
-  mpz_init(value);
-  mpz_set_si(value,(long int)a);
-}
-
-BigInt::BigInt(unsigned char a)
-{
-  mpz_init(value);
-  mpz_set_ui(value,(unsigned long int)a);
+  mpz_set_si(value,(long)a);
 }
 
 // Copy-Konstruktor
@@ -82,51 +40,9 @@ BigInt::~BigInt()
 // Zuweisungsoperatoren
 //
 
-BigInt& BigInt::operator=(long int a)
-{
-  mpz_set_si(value,a);
-  return *this;
-}
-
-BigInt& BigInt::operator=(unsigned long int a)
-{
-  mpz_set_ui(value,a);
-  return *this;
-}
-
 BigInt& BigInt::operator=(int a)
 {
-  mpz_set_si(value,(long int) a);
-  return *this;
-}
-
-BigInt& BigInt::operator=(unsigned int a)
-{
-  mpz_set_ui(value,(unsigned long int) a);
-  return *this;
-}
-
-BigInt& BigInt::operator=(short int a)
-{
-  mpz_set_si(value,(long int) a);
-  return *this;
-}
-
-BigInt& BigInt::operator=(unsigned short int a)
-{
-  mpz_set_ui(value,(unsigned long int) a);
-  return *this;
-}
-
-BigInt& BigInt::operator=(char a)
-{
-  mpz_set_si(value,(long int) a);
-  return *this;
-}
-
-BigInt& BigInt::operator=(unsigned char a)
-{
-  mpz_set_ui(value,(unsigned long int) a);
+  mpz_set_si(value,(long)a);
   return *this;
 }
 
@@ -146,54 +62,18 @@ BigInt::operator bool()
   return false;
 }
 
-BigInt::operator long int()
+BigInt::operator int()
 {
   long int ret_val;
   ret_val=mpz_get_si(value);
-  return ret_val;
+  return (int)ret_val;
 }
 
-BigInt::operator unsigned long int()
+BigInt::operator short()
 {
   long int ret_val;
-  ret_val=mpz_get_ui(value);
-  return ret_val;
-}
-
-BigInt::operator int()
-{
-  int ret_val=operator long int();
-  return ret_val;
-}
-
-BigInt::operator unsigned int()
-{
-  unsigned int ret_val=operator unsigned long int();
-  return ret_val;
-}
-
-BigInt::operator short int()
-{
-  short int ret_val=operator long int();
-  return ret_val;
-}
-
-BigInt::operator unsigned short int()
-{
-  unsigned short int ret_val=operator unsigned long int();
-  return ret_val;
-}
-
-BigInt::operator char()
-{
-  char ret_val=operator long int();
-  return ret_val;
-}
-
-BigInt::operator unsigned char()
-{
-  unsigned char ret_val=operator unsigned long int();
-  return ret_val;
+  ret_val=mpz_get_si(value);
+  return (short)ret_val;
 }
 
 //
@@ -325,73 +205,73 @@ bool operator!=(const BigInt& a,const BigInt& b)
   return true;
 }
 
-bool operator<(const long int& a,const BigInt& b)
+bool operator<(const int& a,const BigInt& b)
 {
   if (mpz_cmp(BigInt(a).value,b.value)<0) return true;
   return false;
 }
 
-bool operator<=(const long int& a,const BigInt& b)
+bool operator<=(const int& a,const BigInt& b)
 {
   if (mpz_cmp(BigInt(a).value,b.value)>0) return false;
   return true;
 }
 
-bool operator>(const long int& a,const BigInt& b)
+bool operator>(const int& a,const BigInt& b)
 {
   if (mpz_cmp(BigInt(a).value,b.value)>0) return true;
   return false;
 }
 
-bool operator>=(const long int& a,const BigInt& b)
+bool operator>=(const int& a,const BigInt& b)
 {
   if (mpz_cmp(BigInt(a).value,b.value)<0) return false;
   return true;
 }
 
-bool operator==(const long int& a,const BigInt& b)
+bool operator==(const int& a,const BigInt& b)
 {
   if (!mpz_cmp(BigInt(a).value,b.value)) return true;
   return false;
 }
 
-bool operator!=(const long int& a,const BigInt& b)
+bool operator!=(const int& a,const BigInt& b)
 {
   if (!mpz_cmp(BigInt(a).value,b.value)) return false;
   return true;
 }
 
-bool operator<(const BigInt& a,const long int& b)
+bool operator<(const BigInt& a,const int& b)
 {
   if (mpz_cmp(a.value,BigInt(b).value)<0) return true;
   return false;
 }
 
-bool operator<=(const BigInt& a,const long int& b)
+bool operator<=(const BigInt& a,const int& b)
 {
   if (mpz_cmp(a.value,BigInt(b).value)>0) return false;
   return true;
 }
 
-bool operator>(const BigInt& a,const long int& b)
+bool operator>(const BigInt& a,const int& b)
 {
   if (mpz_cmp(a.value,BigInt(b).value)>0) return true;
   return false;
 }
 
-bool operator>=(const BigInt& a,const long int& b)
+bool operator>=(const BigInt& a,const int& b)
 {
   if (mpz_cmp(a.value,BigInt(b).value)<0) return false;
   return true;
 }
 
-bool operator==(const BigInt& a,const long int& b)
+bool operator==(const BigInt& a,const int& b)
 {
   if (!mpz_cmp(a.value,BigInt(b).value)) return true;
   return false;
 }
 
-bool operator!=(const BigInt& a,const long int& b)
+bool operator!=(const BigInt& a,const int& b)
 {
   if (!mpz_cmp(a.value,BigInt(b).value)) return false;
   return true;
@@ -425,49 +305,49 @@ BigInt operator/(const BigInt& a,const BigInt &b)
   return erg/=b;
 }
 
-BigInt operator+(const long int& a,const BigInt &b)
+BigInt operator+(const int& a,const BigInt &b)
 {
   BigInt erg(a);
   return erg+=b;
 }
 
-BigInt operator-(const long int& a,const BigInt &b)
+BigInt operator-(const int& a,const BigInt &b)
 {
   BigInt erg(a);
   return erg-=b;
 }
 
-BigInt operator*(const long int& a,const BigInt &b)
+BigInt operator*(const int& a,const BigInt &b)
 {
   BigInt erg(a);
   return erg*=b;
 }
 
-BigInt operator/(const long int& a,const BigInt &b)
+BigInt operator/(const int& a,const BigInt &b)
 {
   BigInt erg(a);
   return erg/=b;
 }
 
-BigInt operator+(const BigInt& a,const long int &b)
+BigInt operator+(const BigInt& a,const int &b)
 {
   BigInt erg(a);
   return erg+=BigInt(b);
 }
 
-BigInt operator-(const BigInt& a,const long int &b)
+BigInt operator-(const BigInt& a,const int &b)
 {
   BigInt erg(a);
   return erg-=BigInt(b);
 }
 
-BigInt operator*(const BigInt& a,const long int &b)
+BigInt operator*(const BigInt& a,const int &b)
 {
   BigInt erg(a);
   return erg*=BigInt(b);
 }
 
-BigInt operator/(const BigInt& a,const long int &b)
+BigInt operator/(const BigInt& a,const int &b)
 {
   BigInt erg(a);
   return erg/=BigInt(b);

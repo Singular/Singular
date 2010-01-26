@@ -20,36 +20,16 @@ class BigInt
     public:
 
     BigInt( );
-    BigInt( long int );
-    BigInt( unsigned long int );
     BigInt( int );
-    BigInt( unsigned int );
-    BigInt( short int );
-    BigInt( unsigned short int );
-    BigInt( char );
-    BigInt( unsigned char );
     BigInt( const BigInt& );
     ~BigInt( );
 
-    BigInt& operator = ( long int );
-    BigInt& operator = ( unsigned long int );
     BigInt& operator = ( int );
-    BigInt& operator = ( unsigned int );
-    BigInt& operator = ( short int );
-    BigInt& operator = ( unsigned short int );
-    BigInt& operator = ( char );
-    BigInt& operator = ( unsigned char );
     BigInt& operator = ( const BigInt& );
 
     operator bool( );
-    operator long int( );
-    operator unsigned long int( );
     operator int( );
-    operator unsigned int( );
-    operator short int( );
-    operator unsigned short int( );
-    operator char( );
-    operator unsigned char( );
+    operator short( );
 
     BigInt  operator - ( );
     BigInt& operator += ( const BigInt& );
@@ -69,18 +49,18 @@ class BigInt
     friend bool operator >= ( const BigInt&, const BigInt& );
     friend bool operator == ( const BigInt&, const BigInt& );
     friend bool operator != ( const BigInt&, const BigInt& );
-    friend bool operator <  ( const long int&, const BigInt& );
-    friend bool operator <= ( const long int&, const BigInt& );
-    friend bool operator >  ( const long int&, const BigInt& );
-    friend bool operator >= ( const long int&, const BigInt& );
-    friend bool operator == ( const long int&, const BigInt& );
-    friend bool operator != ( const long int&, const BigInt& );
-    friend bool operator <  ( const BigInt&, const long int& );
-    friend bool operator <= ( const BigInt&, const long int& );
-    friend bool operator >  ( const BigInt&, const long int& );
-    friend bool operator >= ( const BigInt&, const long int& );
-    friend bool operator == ( const BigInt&, const long int& );
-    friend bool operator != ( const BigInt&, const long int& );
+    friend bool operator <  ( const int&, const BigInt& );
+    friend bool operator <= ( const int&, const BigInt& );
+    friend bool operator >  ( const int&, const BigInt& );
+    friend bool operator >= ( const int&, const BigInt& );
+    friend bool operator == ( const int&, const BigInt& );
+    friend bool operator != ( const int&, const BigInt& );
+    friend bool operator <  ( const BigInt&, const int& );
+    friend bool operator <= ( const BigInt&, const int& );
+    friend bool operator >  ( const BigInt&, const int& );
+    friend bool operator >= ( const BigInt&, const int& );
+    friend bool operator == ( const BigInt&, const int& );
+    friend bool operator != ( const BigInt&, const int& );
   
     friend int    sgn ( const BigInt& );
     friend BigInt abs ( const BigInt& );
@@ -90,13 +70,13 @@ BigInt operator + ( const BigInt&, const BigInt& );
 BigInt operator - ( const BigInt&, const BigInt& );
 BigInt operator * ( const BigInt&, const BigInt& );
 BigInt operator / ( const BigInt&, const BigInt& );
-BigInt operator + ( const long int&, const BigInt& );
-BigInt operator - ( const long int&, const BigInt& );
-BigInt operator * ( const long int&, const BigInt& );
-BigInt operator / ( const long int&, const BigInt& );
-BigInt operator + ( const BigInt&, const long int& );
-BigInt operator - ( const BigInt&, const long int& );
-BigInt operator * ( const BigInt&, const long int& );
-BigInt operator / ( const BigInt&, const long int& );
+BigInt operator + ( const int&, const BigInt& );
+BigInt operator - ( const int&, const BigInt& );
+BigInt operator * ( const int&, const BigInt& );
+BigInt operator / ( const int&, const BigInt& );
+BigInt operator + ( const BigInt&, const int& );
+BigInt operator - ( const BigInt&, const int& );
+BigInt operator * ( const BigInt&, const int& );
+BigInt operator / ( const BigInt&, const int& );
 
 #endif  // BIG_INT_H
