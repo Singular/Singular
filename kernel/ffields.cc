@@ -19,7 +19,7 @@ int nfCharQ=0;  /* the number of elemts: q*/
 int nfM1;       /*representation of -1*/
 int nfCharP=0;  /* the characteristic: p*/
 static int nfCharQ1=0; /* q-1 */
-CARDINAL *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
+unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
 /* the q's from the table 'fftable' */
 unsigned short fftable[]={
     4,  8, 16, 32, 64, 128, 256, 512,1024,2048,4096,8192,16384, 32768,
@@ -165,7 +165,7 @@ number nfInit (int i, const ring r)
   while (i <  0)    i += nfCharP;
   while (i >= nfCharP) i -= nfCharP;
   if (i==0) return (number)(long)nfCharQ;
-  CARDINAL c=0;
+  unsigned short c=0;
   while (i>1)
   {
     c=nfPlus1Table[c];
@@ -591,7 +591,7 @@ void nfSetChar(int c, char **param)
     return;
   if (nfCharQ > 1)
   {
-    omFreeSize( (ADDRESS)nfPlus1Table,nfCharQ*sizeof(CARDINAL) );
+    omFreeSize( (ADDRESS)nfPlus1Table,nfCharQ*sizeof(unsigned short) );
     nfPlus1Table=NULL;
   }
   if ((c>1) || (c<0))
@@ -619,7 +619,7 @@ void nfSetChar(int c, char **param)
     nfReadMipo(buf);
     nfCharQ1=nfCharQ-1;
     //Print("nfCharQ=%d,nfCharQ1=%d,mipo=>>%s<<\n",nfCharQ,nfCharQ1,buf);
-    nfPlus1Table= (CARDINAL *)omAlloc( (nfCharQ)*sizeof(CARDINAL) );
+    nfPlus1Table= (unsigned short *)omAlloc( (nfCharQ)*sizeof(unsigned short) );
     int digs = gf_tab_numdigits62( nfCharQ );
     char * bufptr;
     int i = 1;

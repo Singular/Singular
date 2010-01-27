@@ -27,12 +27,12 @@ long npPminus1M=0;
 long npMapPrime;
 
 #ifdef HAVE_DIV_MOD
-CARDINAL *npInvTable=NULL;
+unsigned short *npInvTable=NULL;
 #endif
 
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-CARDINAL *npExpTable=NULL;
-CARDINAL *npLogTable=NULL;
+unsigned short *npExpTable=NULL;
+unsigned short *npLogTable=NULL;
 #endif
 
 
@@ -349,8 +349,8 @@ void npInitChar(int c, ring r)
 #endif
     {
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-      r->cf->npExpTable=(CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
-      r->cf->npLogTable=(CARDINAL *)omAlloc( r->cf->npPrimeM*sizeof(CARDINAL) );
+      r->cf->npExpTable=(unsigned short *)omAlloc( r->cf->npPrimeM*sizeof(unsigned short) );
+      r->cf->npLogTable=(unsigned short *)omAlloc( r->cf->npPrimeM*sizeof(unsigned short) );
       r->cf->npExpTable[0] = 1;
       r->cf->npLogTable[0] = 0;
       if (r->cf->npPrimeM > 2)
@@ -381,7 +381,7 @@ void npInitChar(int c, ring r)
       }
 #endif
 #ifdef HAVE_DIV_MOD
-      r->cf->npInvTable=(CARDINAL*)omAlloc0( r->cf->npPrimeM*sizeof(CARDINAL) );
+      r->cf->npInvTable=(unsigned short*)omAlloc0( r->cf->npPrimeM*sizeof(unsigned short) );
 #endif
     }
   }

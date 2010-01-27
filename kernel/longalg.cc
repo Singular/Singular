@@ -27,6 +27,8 @@
 
 naIdeal naI=NULL;
 
+omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
+
 int naNumbOfPar;
 napoly naMinimalPoly;
 #define naParNames (currRing->parameter)

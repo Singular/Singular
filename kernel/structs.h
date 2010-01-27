@@ -18,7 +18,6 @@
 #endif
 
 /* standard types */
-typedef unsigned short CARDINAL;
 #ifdef HAVE_RINGS
 typedef MP_INT *int_number;
 #endif
@@ -196,15 +195,6 @@ typedef kBucket*           kBucket_pt;
 typedef sBucket*           sBucket_pt;
 typedef struct p_Procs_s p_Procs_s;
 
-// for hdegree.cc
-typedef struct sindlist indlist;
-typedef indlist * indset;
-struct sindlist
-{
-  indset nx;
-  intvec * set;
-};
-
 // for longalg.cc
 struct snaIdeal
 {
@@ -234,11 +224,11 @@ struct n_Procs_s
    int npPrimeM;
    int npPminus1M;
    #ifdef HAVE_DIV_MOD
-   CARDINAL *npInvTable;
+   unsigned short *npInvTable;
    #endif
    #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-   CARDINAL *npExpTable;
-   CARDINAL *npLogTable;
+   unsigned short *npExpTable;
+   unsigned short *npLogTable;
    #endif
    // Zp_a, Q_a
 
@@ -614,7 +604,7 @@ struct sip_sring
   /* number of long vars in exp vector:
      long vars are those longs in the exponent vector which are
      occupied by variables, only */
-  short     VarL_Size;
+  short      VarL_Size;
   short      BitsPerExp; /* number of bits per exponent */
   short      ExpPerLong; /* maximal number of Exponents per long */
   short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
@@ -827,9 +817,6 @@ typedef libstack *  libstackv;
 #endif /* HAVE_LIBPARSER */
 
 extern struct omBin_s* char_ptr_bin;
-extern struct omBin_s* indlist_bin;
-extern struct omBin_s* naIdeal_bin;
-extern struct omBin_s* snaIdeal_bin;
 extern struct omBin_s* smprec_bin;
 extern struct omBin_s* sip_sring_bin;
 extern struct omBin_s* sleftv_bin;

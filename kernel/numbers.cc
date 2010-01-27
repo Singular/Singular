@@ -716,14 +716,14 @@ void nKillChar(ring r)
                  #ifdef HAVE_DIV_MOD
                  if (r->cf->npInvTable!=NULL)
                  omFreeSize( (ADDRESS)r->cf->npInvTable,
-                             r->cf->npPrimeM*sizeof(CARDINAL) );
+                             r->cf->npPrimeM*sizeof(unsigned short) );
                  #else
                  if (r->cf->npExpTable!=NULL)
                  {
                    omFreeSize( (ADDRESS)r->cf->npExpTable,
-                               r->cf->npPrimeM*sizeof(CARDINAL) );
+                               r->cf->npPrimeM*sizeof(unsigned short) );
                    omFreeSize( (ADDRESS)r->cf->npLogTable,
-                               r->cf->npPrimeM*sizeof(CARDINAL) );
+                               r->cf->npPrimeM*sizeof(unsigned short) );
                  }
                  #endif
                  break;
