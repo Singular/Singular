@@ -16,6 +16,7 @@
 #include <mylimits.h>
 #include "omalloc.h"
 #include "structs.h"
+#include "options.h"
 #include "febase.h"
 //#include "cntrlc.h"
 #include "kstd1.h"

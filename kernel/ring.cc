@@ -17,7 +17,7 @@
 # define MYTEST 0
 #endif /* ifndef NDEBUG */
 
-#include "structs.h"
+#include "options.h"
 #include "omalloc.h"
 #include "polys.h"
 #include "numbers.h"

@@ -7,8 +7,8 @@
 */
 
 #include "mod2.h"
-#include "structs.h"
 #include "omalloc.h"
+#include "options.h"
 #include "polys.h"
 #include "ideals.h"
 #include "febase.h"

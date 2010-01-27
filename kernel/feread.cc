@@ -21,6 +21,7 @@
 #endif
 #include "febase.h"
 #include "omalloc.h"
+#include "options.h"
 
 #include "../Singular/static.h"
 

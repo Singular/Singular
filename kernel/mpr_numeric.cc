@@ -15,7 +15,7 @@
 //#define mprDEBUG_ALL
 
 //-> includes
-#include "structs.h"
+#include "options.h"
 #include "febase.h"
 #include "omalloc.h"
 #include "numbers.h"

@@ -8,8 +8,8 @@
 #ifndef INTVEC_CC
 #define INTVEC_CC
 #include "mod2.h"
-#include "structs.h"
 #include "febase.h"
+#include "options.h"
 #include "intvec.h"
 #include "omalloc.h"
 

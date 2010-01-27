@@ -11,7 +11,7 @@
 /* includes */
 #include <string.h>
 #include "mod2.h"
-#include "structs.h"
+#include "options.h"
 #include "numbers.h"
 #include "ffields.h"
 #include "omalloc.h"
@@ -129,23 +129,23 @@ static void pnFreeBin(number *bin, int exp)
 * the power m^exp, exp > 1
 * destroys p
 */
-static poly pMonPower(poly p, int exp)
+static poly p_MonPower(poly p, int exp, const ring r)
 {
   int i;
 
-  if(!nIsOne(pGetCoeff(p)))
+  if(!n_IsOne(pGetCoeff(p),r))
   {
     number x, y;
     y = pGetCoeff(p);
-    nPower(y,exp,&x);
-    nDelete(&y);
+    n_Power(y,exp,&x,r);
+    n_Delete(&y,r);
     pSetCoeff0(p,x);
   }
-  for (i=pVariables; i!=0; i--)
+  for (i=rVar(r); i!=0; i--)
   {
-    pMultExp(p,i, exp);
+    p_MultExp(p,i, exp,r);
   }
-  pSetm(p);
+  p_Setm(p,r);
   return p;
 }
 
@@ -153,36 +153,36 @@ static poly pMonPower(poly p, int exp)
 * compute for monomials p*q
 * destroys p, keeps q
 */
-static void pMonMult(poly p, poly q)
+static void p_MonMult(poly p, poly q, const ring r)
 {
   number x, y;
   int i;
 
   y = pGetCoeff(p);
-  x = nMult(y,pGetCoeff(q));
-  nDelete(&y);
+  x = n_Mult(y,pGetCoeff(q),r);
+  n_Delete(&y,r);
   pSetCoeff0(p,x);
   //for (i=pVariables; i!=0; i--)
   //{
   //  pAddExp(p,i, pGetExp(q,i));
   //}
   //p->Order += q->Order;
-  pExpVectorAdd(p,q);
+  p_ExpVectorAdd(p,q,r);
 }
 
 /*3
 * compute for monomials p*q
 * keeps p, q
 */
-static poly pMonMultC(poly p, poly q)
+static poly p_MonMultC(poly p, poly q, const ring rr)
 {
   number x;
   int i;
-  poly r = pInit();
+  poly r = p_Init(rr);
 
-  x = nMult(pGetCoeff(p),pGetCoeff(q));
+  x = n_Mult(pGetCoeff(p),pGetCoeff(q),rr);
   pSetCoeff0(r,x);
-  pExpVectorSum(r,p, q);
+  p_ExpVectorSum(r,p, q, rr);
   return r;
 }
 
@@ -191,7 +191,7 @@ static poly pMonMultC(poly p, poly q)
 *          (head + tail)^exp, exp > 1
 *          with binomial coef.
 */
-static poly pTwoMonPower(poly p, int exp)
+static poly p_TwoMonPower(poly p, int exp, const ring r)
 {
   int eh, e;
   long al;
@@ -203,10 +203,10 @@ static poly pTwoMonPower(poly p, int exp)
   tail = pNext(p);
   if (bin == NULL)
   {
-    pMonPower(p,exp);
-    pMonPower(tail,exp);
+    p_MonPower(p,exp,r);
+    p_MonPower(tail,exp,r);
 #ifdef PDEBUG
-    pTest(p);
+    p_Test(p,r);
 #endif
     return p;
   }
@@ -216,29 +216,29 @@ static poly pTwoMonPower(poly p, int exp)
   a[1] = p;
   for (e=1; e<exp; e++)
   {
-    a[e+1] = pMonMultC(a[e],p);
+    a[e+1] = p_MonMultC(a[e],p,r);
   }
   res = a[exp];
-  b = pHead(tail);
+  b = p_Head(tail,r);
   for (e=exp-1; e>eh; e--)
   {
     h = a[e];
-    x = nMult(bin[exp-e],pGetCoeff(h));
-    pSetCoeff(h,x);
-    pMonMult(h,b);
+    x = n_Mult(bin[exp-e],pGetCoeff(h),r);
+    p_SetCoeff(h,x,r);
+    p_MonMult(h,b,r);
     res = pNext(res) = h;
-    pMonMult(b,tail);
+    p_MonMult(b,tail,r);
   }
   for (e=eh; e!=0; e--)
   {
     h = a[e];
-    x = nMult(bin[e],pGetCoeff(h));
-    pSetCoeff(h,x);
-    pMonMult(h,b);
+    x = n_Mult(bin[e],pGetCoeff(h),r);
+    p_SetCoeff(h,x,r);
+    p_MonMult(h,b,r);
     res = pNext(res) = h;
-    pMonMult(b,tail);
+    p_MonMult(b,tail,r);
   }
-  pDeleteLm(&tail);
+  p_DeleteLm(&tail,r);
   pNext(res) = b;
   pNext(b) = NULL;
   res = a[exp];
@@ -255,44 +255,44 @@ static poly pTwoMonPower(poly p, int exp)
 //     pIter(tail);
 // }
 #ifdef PDEBUG
-  pTest(res);
+  p_Test(res,r);
 #endif
   return res;
 }
 
-static poly pPow(poly p, int i)
+static poly p_Pow(poly p, int i, const ring r)
 {
-  poly rc = pCopy(p);
+  poly rc = p_Copy(p,r);
   i -= 2;
   do
   {
-    rc = pMult(rc,pCopy(p));
-    pNormalize(rc);
+    rc = p_Mult_q(rc,p_Copy(p,r),r);
+    p_Normalize(rc,r);
     i--;
   }
   while (i != 0);
-  return pMult(rc,p);
+  return p_Mult_q(rc,p,r);
 }
 
 /*2
 * returns the i-th power of p
 * p will be destroyed
 */
-poly pPower(poly p, int i)
+poly p_Power(poly p, int i, const ring r)
 {
   poly rc=NULL;
 
   if (i==0)
   {
-    pDelete(&p);
-    return pOne();
+    p_Delete(&p,r);
+    return p_One(r);
   }
 
   if(p!=NULL)
   {
-    if ( (i > 0) && ((unsigned long ) i > (currRing->bitmask)))
+    if ( (i > 0) && ((unsigned long ) i > (r->bitmask)))
     {
-      Werror("exponent %d is too large, max. is %ld",i,currRing->bitmask);
+      Werror("exponent %d is too large, max. is %ld",i,r->bitmask);
       return NULL;
     }
     switch (i)
@@ -308,45 +308,45 @@ poly pPower(poly p, int i)
         rc=p;
         break;
       case 2:
-        rc=pMult(pCopy(p),p);
+        rc=p_Mult_q(p_Copy(p,r),p,r);
         break;
       default:
         if (i < 0)
         {
-          pDelete(&p);
+          p_Delete(&p,r);
           return NULL;
         }
         else
         {
 #ifdef HAVE_PLURAL
-	  if (rIsPluralRing(currRing)) /* in the NC case nothing helps :-( */
-	  {
-	    int j=i;
-	    rc = pCopy(p);
-	    while (j>1)
-	    {
-	      rc = pMult(pCopy(p),rc);
-	      j--;
-	    }
-	    pDelete(&p);
-	    return rc;
-	  }
+          if (rIsPluralRing(r)) /* in the NC case nothing helps :-( */
+          {
+            int j=i;
+            rc = p_Copy(p,r);
+            while (j>1)
+            {
+              rc = p_Mult_q(p_Copy(p,r),rc,r);
+              j--;
+            }
+            p_Delete(&p,r);
+            return rc;
+          }
 #endif
           rc = pNext(p);
           if (rc == NULL)
-            return pMonPower(p,i);
+            return p_MonPower(p,i,r);
           /* else: binom ?*/
-          int char_p=rChar(currRing);
+          int char_p=rChar(r);
           if ((pNext(rc) != NULL)
 #ifdef HAVE_RINGS
-             || rField_is_Ring(currRing)
+             || rField_is_Ring(r)
 #endif
              )
-            return pPow(p,i);
+            return p_Pow(p,i,r);
           if ((char_p==0) || (i<=char_p))
-            return pTwoMonPower(p,i);
-          poly p_p=pTwoMonPower(pCopy(p),char_p);
-          return pMult(pPower(p,i-char_p),p_p);
+            return p_TwoMonPower(p,i,r);
+          poly p_p=p_TwoMonPower(p_Copy(p,r),char_p,r);
+          return p_Mult_q(p_Power(p,i-char_p,r),p_p,r);
         }
       /*end default:*/
     }
@@ -632,7 +632,7 @@ void pContent(poly ph)
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
-	  c_n=c_n_n->n;
+          c_n=c_n_n->n;
           while (c_n!=NULL)
           { // each monom: coeff in Q
             d=nlMult(h,pGetCoeff(c_n));

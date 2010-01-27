@@ -21,7 +21,7 @@
 #include "mod2.h"
 
 #ifdef HAVE_FGLM
-#include "structs.h"
+#include "options.h"
 #include "polys.h"
 #include "ideals.h"
 #include "ring.h"

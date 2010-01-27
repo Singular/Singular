@@ -204,6 +204,7 @@ extern poly pHeadProc(poly p);
 #define ppMult_mm(p, m)             pp_Mult_mm(p, m, currRing)
 #define pMult_mm(p, m)              p_Mult_mm(p, m, currRing)
 #define pAdd(p, q)                  p_Add_q(p, q, currRing)
+#define pPower(p, q)                p_Power(p, q, currRing)
 #define pMinus_mm_Mult_qq(p, m, q)  p_Minus_mm_Mult_qq(p, m, q, currRing)
 #define pPlus_mm_Mult_qq(p, m, q)   p_Plus_mm_Mult_qq(p, m, q, currRing)
 #define pMult(p, q)                 p_Mult_q(p, q, currRing)
@@ -330,7 +331,7 @@ void      ppDelete(poly * a,const ring r);
 
 /*-------------operations on polynomials:------------*/
 poly      pSub(poly a, poly b);
-poly      pPower(poly p, int i);
+poly      p_Power(poly p, int i, const ring r);
 
 // ----------------- define to enable new p_procs -----*/
 

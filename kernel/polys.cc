@@ -12,7 +12,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "mod2.h"
-#include "structs.h"
+#include "options.h"
 #include "omalloc.h"
 #include "febase.h"
 #include "numbers.h"
@@ -280,6 +280,7 @@ finish:
   return s;
 }
 
+BOOLEAN _p_Test(poly p, ring r, int level);
 poly pmInit(const char *st, BOOLEAN &ok)
 {
   poly p;
@@ -294,6 +295,9 @@ poly pmInit(const char *st, BOOLEAN &ok)
     pDelete(&p);
     return NULL;
   }
+  #ifdef PDEBUG
+  _p_Test(p,currRing,PDEBUG);
+  #endif
   ok=!errorreported;
   return p;
 }

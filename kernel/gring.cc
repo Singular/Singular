@@ -23,6 +23,7 @@
 #define PLURAL_INTERNAL_DECLARATIONS
 
 #include "febase.h"
+#include "options.h"
 #include "ring.h"
 #include "polys.h"
 #include "numbers.h"

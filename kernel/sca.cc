@@ -29,6 +29,7 @@
 
 
 #include "febase.h"
+#include "options.h"
 
 #include "p_polys.h"
 #include "kutil.h"

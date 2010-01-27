@@ -8,7 +8,7 @@
 */
 #include <string.h>
 #include "mod2.h"
-#include "structs.h"
+#include "options.h"
 #include "intvec.h"
 #include "int64vec.h"
 #include "polys.h"

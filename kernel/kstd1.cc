@@ -15,6 +15,7 @@
 #define MORA_USE_BUCKETS
 
 #include "mod2.h"
+#include "omalloc.h"
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -28,8 +29,7 @@
 #endif /* ifdef HAVE_TAIL_RING */
 #endif /* if MYTEST */
 
-#include "structs.h"
-#include "omalloc.h"
+#include "options.h"
 #include "kutil.h"
 #include "kInline.cc"
 #include "polys.h"

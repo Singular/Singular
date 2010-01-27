@@ -16,6 +16,7 @@
  * Destroys: if !copy then p, q
  * Assumes: pLength(p) >= 2 pLength(q) >=2
  ***************************************************************/
+#include "options.h"
 #include "p_polys.h"
 #include "p_Procs.h"
 #include "p_Numbers.h"

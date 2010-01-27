@@ -8,9 +8,8 @@
 */
 
 #include "mod2.h"
-#include "structs.h"
+#include "options.h"
 #include "febase.h"
-#include "structs.h"
 #include "intvec.h"
 #include "ring.h"
 #include "polys.h"

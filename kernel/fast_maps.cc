@@ -10,6 +10,7 @@
  *******************************************************************/
 #include "mod2.h"
 #include <omalloc.h>
+#include "options.h"
 #include "p_polys.h"
 #include "prCopy.h"
 #include "ideals.h"

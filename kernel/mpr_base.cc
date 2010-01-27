@@ -16,7 +16,7 @@
 #include "omalloc.h"
 
 //-> includes
-#include "structs.h"
+#include "options.h"
 #include "polys.h"
 #include "ideals.h"
 #include "febase.h"

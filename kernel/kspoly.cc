@@ -8,6 +8,7 @@
 
 // #define PDEBUG 2
 #include "mod2.h"
+#include "options.h"
 #include "kutil.h"
 #include "numbers.h"
 #include "p_polys.h"

@@ -25,6 +25,7 @@
 #include "febase.h"
 #include "omalloc.h"
 #include "dError.h"
+#include "options.h"
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
 /*0 implementation */

@@ -7,8 +7,8 @@
 */
 
 #include "mod2.h"
-#include "structs.h"
 #include "febase.h"
+#include "options.h"
 #include "polys.h"
 #include "intvec.h"
 #include "kutil.h"

@@ -21,6 +21,7 @@
 #include "mod2.h"
 #ifdef HAVE_PLURAL
 #include "summator.h" // for CPolynomialSummator class
+#include "options.h"
 #include "ring.h"
 #include "p_polys.h"
 #include "sbuckets.h"

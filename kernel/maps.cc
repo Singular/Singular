@@ -7,7 +7,7 @@
 */
 
 #include "mod2.h"
-#include "structs.h"
+#include "options.h"
 #include "febase.h"
 #include "polys.h"
 #include "numbers.h"

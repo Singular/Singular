@@ -16,6 +16,7 @@
 ///@TODO: grade aus ecartS, setze dazu strat->honey; und nutze p.ecart
 ///@TODO: no tail reductions in syz comp
 #include "mod2.h"
+#include "options.h"
 #include "tgb.h"
 #include "tgb_internal.h"
 #include "tgbgauss.h"

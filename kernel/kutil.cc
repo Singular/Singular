@@ -21,7 +21,7 @@
 
 
 #include <mylimits.h>
-#include "structs.h"
+#include "options.h"
 #include "gring.h"
 #include "sca.h"
 #ifdef KDEBUG
