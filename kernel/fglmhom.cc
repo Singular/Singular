@@ -337,7 +337,7 @@ gaussreduce( homogData & dat, int maxnum, int BS )
 
 
 BOOLEAN
-fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & destIdeal )
+fglmhomog( ring sourceRing, ideal sourceIdeal, ring destRing, ideal & destIdeal )
 {
 #define groebnerBS 16
     int numGBelems;
@@ -346,19 +346,18 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
     homogData dat;
 
     // get the hilbert series and the leading monomials of the sourceIdeal:
-    rSetHdl( sourceRingHdl, TRUE );
-    ring sourceRing = currRing;
+    rChangeCurrRing( sourceRing );
 
     intvec * hilb = hHstdSeries( sourceIdeal, NULL, currQuotient );
     int s;
     dat.sourceIdeal= sourceIdeal;
     dat.sourceHeads= (doublepoly *)omAlloc( IDELEMS( sourceIdeal ) * sizeof( doublepoly ) );
-    for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- ) {
+    for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- )
+    {
         dat.sourceHeads[s].sm= pHead( (sourceIdeal->m)[s] );
     }
     dat.numSourceHeads= IDELEMS( sourceIdeal );
-    rSetHdl( destRingHdl, TRUE );
-    ring destRing = currRing;
+    rChangeCurrRing( destRing );
 
     // Map the sourceHeads to the destRing
     int * vperm = (int *)omAlloc( (sourceRing->N + 1)*sizeof(int) );
@@ -366,14 +365,16 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
                 currRing->N, NULL, 0, vperm, NULL, currRing->ch);
     //nSetMap( sourceRing->ch, sourceRing->parameter, sourceRing->P, sourceRing->minpoly );
     nSetMap( sourceRing );
-    for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- ) {
+    for ( s= IDELEMS( sourceIdeal ) - 1; s >= 0; s-- )
+    {
         dat.sourceHeads[s].dm= pPermPoly( dat.sourceHeads[s].sm, vperm, sourceRing, NULL, 0 );
     }
 
     dat.destIdeal= idInit( groebnerBS, 1 );
     dat.numDestPolys= 0;
 
-    while ( (numGBelems= hfglmNextdegree( hilb, dat.destIdeal, deg )) != 0 ) {
+    while ( (numGBelems= hfglmNextdegree( hilb, dat.destIdeal, deg )) != 0 )
+    {
         int num = 0;  // the number of monoms of degree deg
         PROT2( "deg= %i ", deg );
         PROT2( "num= %i\ngen>", numGBelems );
@@ -398,12 +399,12 @@ fglmhomog( idhdl sourceRingHdl, ideal sourceIdeal, idhdl destRingHdl, ideal & de
         PROT2( "(%i/", dat.basisSize );
         PROT2( "%i)\nvec>", dat.overall );
         // switch to sourceRing and map monoms
-        rSetHdl( sourceRingHdl, TRUE );
+        rChangeCurrRing( sourceRing );
         mapMonoms( destRing, dat );
         getVectorRep( dat );
 
         // switch to destination Ring and remap the vectors
-        rSetHdl( destRingHdl, TRUE );
+        rChangeCurrRing( destRing );
         remapVectors( sourceRing, dat );
 
         PROT( "<\nred>" );
@@ -435,7 +436,7 @@ fglmhomProc(leftv first, leftv second)
     rSetHdl( dest, TRUE );
 
     ideal i= IDIDEAL(ih);
-    fglmhomog( (idhdl)first->data, i, dest, result );
+    fglmhomog( IDRING((idhdl)first->data), i, IDRING(dest), result );
 
     return( result );
 }
