@@ -17,6 +17,7 @@
 #include "omalloc.h"
 #include "structs.h"
 #include "tok.h"
+#include "options.h"
 #include "febase.h"
 #include "cntrlc.h"
 #include "page.h"
@@ -365,6 +366,8 @@ BOOLEAN setOption(leftv res, leftv v)
         verbose &= verboseStruct[i].resetval;
         #ifdef YYDEBUG
         #if YYDEBUG
+        /*debugging the bison grammar --> grammar.cc*/
+        extern int    yydebug;
         if (BVERBOSE(V_YACC)) yydebug=1;
         else                  yydebug=0;
         #endif

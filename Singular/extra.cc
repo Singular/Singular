@@ -34,6 +34,7 @@
 #include <unistd.h>
 
 #include "tok.h"
+#include "options.h"
 #include "ipid.h"
 #include "polys.h"
 #include "lists.h"

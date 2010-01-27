@@ -10,6 +10,7 @@
 #include <sys/wait.h> // for wait
 #include "mod2.h"
 #include "tok.h"
+#include "options.h"
 #include "omalloc.h"
 #include "febase.h"
 #include "ipshell.h"

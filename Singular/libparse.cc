@@ -1068,6 +1068,7 @@ char *yytext;
   #include "ipshell.h"
   #include "ipid.h"
   #include "tok.h"
+  #include "options.h"
   #include "febase.h"
   #include "omalloc.h"
 #endif

@@ -4,7 +4,7 @@
 /* $Id$ */
 
 #include "mod2.h"
-#include "structs.h"
+#include "options.h"
 #include "febase.h"
 #include "ideals.h"
 #include "intvec.h"

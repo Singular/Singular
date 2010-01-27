@@ -15,6 +15,7 @@
 #include "mod2.h"
 #include "static.h"
 #include "tok.h"
+#include "options.h"
 #include "ipid.h"
 #include "omalloc.h"
 #include "febase.h"

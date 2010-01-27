@@ -15,6 +15,7 @@
 
 #include "mod2.h"
 #include "tok.h"
+#include "options.h"
 #include <omalloc.h>
 #include "febase.h"
 #include "subexpr.h"

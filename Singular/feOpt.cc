@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "mod2.h"
+#include "options.h"
 #include "feOpt.h"
 
 // Define here which cmd-line options are recognized

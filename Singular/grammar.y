@@ -17,6 +17,7 @@
 #include <mylimits.h>
 #include "omalloc.h"
 #include "tok.h"
+#include "options.h"
 #include "stype.h"
 #include "ipid.h"
 #include "intvec.h"

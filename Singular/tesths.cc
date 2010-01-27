@@ -16,6 +16,7 @@
 #include <errno.h>
 #include "mod2.h"
 #include "tok.h"
+#include "options.h"
 #include "ipshell.h"
 #include "febase.h"
 #include "cntrlc.h"

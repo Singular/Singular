@@ -20,7 +20,7 @@
 
 #ifdef HAVE_FGLM
 #include "tok.h"
-#include "structs.h"
+#include "options.h"
 #include "polys.h"
 #include "ideals.h"
 #include "ring.h"

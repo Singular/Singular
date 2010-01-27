@@ -15,6 +15,7 @@
 
 #include "mod2.h"
 #include "omalloc.h"
+#include "options.h"
 #include "tok.h"
 #include "ipid.h"
 #include "intvec.h"

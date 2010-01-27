@@ -13,6 +13,7 @@
 #include "static.h"
 #include "omalloc.h"
 #include "tok.h"
+#include "options.h"
 #include "ipshell.h"
 #include "intvec.h"
 #include "febase.h"
