@@ -46,6 +46,7 @@ int     pagelength = 24;
 int     colmax = 80;
 char    prompt_char = '>'; /*1 either '>' or '.'*/
 extern "C" {
+BITSET  test=(BITSET)0;
 BITSET  verbose = 1
                   | Sy_bit(V_REDEFINE)
                   | Sy_bit(V_LOAD_LIB)

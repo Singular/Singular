@@ -682,18 +682,13 @@ int siRand();
 #endif
 
 /*the general set of std-options --> kutil.cc */
-extern BITSET test;
 /*the general set of verbose-options --> febase.cc */
 #ifdef __cplusplus
+extern "C" BITSET test;
 extern "C" BITSET verbose;
 #else
+extern BITSET test;
 extern BITSET verbose;
-#endif
-/*debugging the bison grammar --> grammar.cc*/
-#ifdef YYDEBUG
-#if YYDEBUG
-extern int    yydebug;
-#endif
 #endif
 
 #define loop for(;;)
@@ -817,8 +812,6 @@ typedef libstack *  libstackv;
 #endif /* HAVE_LIBPARSER */
 
 extern struct omBin_s* char_ptr_bin;
-extern struct omBin_s* smprec_bin;
-extern struct omBin_s* sip_sring_bin;
 extern struct omBin_s* sleftv_bin;
 
 #ifdef __cplusplus

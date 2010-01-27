@@ -47,8 +47,6 @@
 /* init bins from structs.h */
 
 omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr));
-omBin smprec_bin = omGetSpecBin(sizeof(smprec));
-omBin sip_sring_bin = omGetSpecBin(sizeof(sip_sring));
 
 /*0 implementation*/
 

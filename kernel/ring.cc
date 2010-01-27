@@ -42,6 +42,8 @@
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
+omBin sip_sring_bin = omGetSpecBin(sizeof(sip_sring));
+
 static const char * const ringorder_name[] =
 {
   " ?", ///< ringorder_no = 0,

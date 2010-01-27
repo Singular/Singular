@@ -214,7 +214,6 @@ static inline int pDivComp(poly p, poly q)
 }
 
 
-BITSET  test=(BITSET)0;
 int     HCord;
 int     Kstd1_deg;
 int     mu=32000;
@@ -6642,7 +6641,35 @@ void kDebugPrint(kStrategy strat)
          strat->honey,strat->sugarCrit,strat->Gebauer,strat->noTailReduction,strat->use_buckets);
   Print("posInLDependsOnLength=%d, use_buckets=%d\n",
          strat->posInLDependsOnLength,strat->use_buckets);
-   PrintS(showOption());PrintLn();
+  PrintS(showOption());PrintLn();
+  PrintS("LDeg: ");
+    if (currRing->pLDeg==pLDeg0) PrintS("pLDeg0");
+    else if (currRing->pLDeg==pLDeg0c) PrintS("pLDeg0c");
+    else if (currRing->pLDeg==pLDegb) PrintS("pLDegb");
+    else if (currRing->pLDeg==pLDeg1) PrintS("pLDeg1");
+    else if (currRing->pLDeg==pLDeg1c) PrintS("pLDeg1c");
+    else if (currRing->pLDeg==pLDeg1_Deg) PrintS("pLDeg1_Deg");
+    else if (currRing->pLDeg==pLDeg1c_Deg) PrintS("pLDeg1c_Deg");
+    else if (currRing->pLDeg==pLDeg1_Totaldegree) PrintS("pLDeg1_Totaldegree");
+    else if (currRing->pLDeg==pLDeg1c_Totaldegree) PrintS("pLDeg1c_Totaldegree");
+    else if (currRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
+    else if (currRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
+    else Print("? (%lx)", (long)currRing->pLDeg);
+    PrintS(" / ");
+    if (strat->tailRing->pLDeg==pLDeg0) PrintS("pLDeg0");
+    else if (strat->tailRing->pLDeg==pLDeg0c) PrintS("pLDeg0c");
+    else if (strat->tailRing->pLDeg==pLDegb) PrintS("pLDegb");
+    else if (strat->tailRing->pLDeg==pLDeg1) PrintS("pLDeg1");
+    else if (strat->tailRing->pLDeg==pLDeg1c) PrintS("pLDeg1c");
+    else if (strat->tailRing->pLDeg==pLDeg1_Deg) PrintS("pLDeg1_Deg");
+    else if (strat->tailRing->pLDeg==pLDeg1c_Deg) PrintS("pLDeg1c_Deg");
+    else if (strat->tailRing->pLDeg==pLDeg1_Totaldegree) PrintS("pLDeg1_Totaldegree");
+    else if (strat->tailRing->pLDeg==pLDeg1c_Totaldegree) PrintS("pLDeg1c_Totaldegree");
+    else if (strat->tailRing->pLDeg==pLDeg1_WFirstTotalDegree) PrintS("pLDeg1_WFirstTotalDegree");
+    else if (strat->tailRing->pLDeg==pLDeg1c_WFirstTotalDegree) PrintS("pLDeg1c_WFirstTotalDegree");
+    else Print("? (%lx)", (long)strat->tailRing->pLDeg);
+    Print(" syzring:%d, syzComp(strat):%d syzComb(ring)\n",rIsSyzIndexRing(currRing),strat->syzComp,rGetCurrSyzLimit());
+
 }
 
 
