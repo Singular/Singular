@@ -8,7 +8,7 @@
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
 
-#include <structs.h>
+#include "options.h"
 #include <ring.h>
 #include <summator.h> // for CPolynomialSummator class
 #include <febase.h> // for Print!

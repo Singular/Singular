@@ -14,7 +14,7 @@
 #include "ideals.h"
 #include "ring.h"
 #include "febase.h"
-#include "structs.h"
+#include "options.h"
 #include "polys.h"
 #include "stdlib.h"
 #include <modulop.h>
