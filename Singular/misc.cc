@@ -351,6 +351,8 @@ BOOLEAN setOption(leftv res, leftv v)
         verbose |= verboseStruct[i].setval;
         #ifdef YYDEBUG
         #if YYDEBUG
+        /*debugging the bison grammar --> grammar.cc*/
+        extern int    yydebug;
         if (BVERBOSE(V_YACC)) yydebug=1;
         else                  yydebug=0;
         #endif
