@@ -804,12 +804,6 @@ static inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 #define TEST_V_COEFSTRAT           BVERBOSE(V_COEFSTRAT)
 #define TEST_V_UPTORADICAL         BVERBOSE(V_UPTORADICAL)
 #define TEST_V_FINDMONOM           BVERBOSE(V_FINDMONOM)
-#ifdef HAVE_LIBPARSER
-#ifdef __cplusplus
-class libstack;
-typedef libstack *  libstackv;
-#endif
-#endif /* HAVE_LIBPARSER */
 
 extern struct omBin_s* char_ptr_bin;
 extern struct omBin_s* sleftv_bin;

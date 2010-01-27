@@ -110,6 +110,9 @@ BOOLEAN piKill(procinfov l);
 const char *piProcinfo(procinfov pi, const char *request);
 void piShowProcinfo(procinfov pi, char *txt);
 #ifdef HAVE_LIBPARSER
+class libstack;
+typedef libstack *  libstackv;
+
 class libstack
 {
  public:
