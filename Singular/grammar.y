@@ -1363,30 +1363,26 @@ setringcmd:
                   {
                     if (iiExport(&$2,myynest-1)) YYERROR;
 #if 1
-                    //if (TEST_OPT_KEEPVARS)
-                    //{
-                      idhdl p=IDRING(h)->idroot;
-                      idhdl root=p;
-                      int prevlev=myynest-1;
-                      while (p!=NULL)
+                    idhdl p=IDRING(h)->idroot;
+                    idhdl root=p;
+                    int prevlev=myynest-1;
+                    while (p!=NULL)
+                    {
+                      if (IDLEV(p)==myynest)
                       {
-                        if (IDLEV(p)==myynest)
+                        idhdl old=root->get(IDID(p),prevlev);
+                        if (old!=NULL)
                         {
-                          idhdl old=root->get(IDID(p),prevlev);
-                          if (old!=NULL)
-                          {
-                            if (BVERBOSE(V_REDEFINE))
-                              Warn("redefining %s",IDID(p));
-                            killhdl2(old,&root,IDRING(h));
-                            IDRING(h)->idroot=root;
-                          }
-                          IDLEV(p)=prevlev;
+                          if (BVERBOSE(V_REDEFINE))
+                            Warn("redefining %s",IDID(p));
+                          killhdl2(old,&root,IDRING(h));
+                          IDRING(h)->idroot=root;
                         }
-                        p=IDNEXT(p);
+                        IDLEV(p)=prevlev;
                       }
-                      //IDRING(h)->idroot=root;
+                      p=IDNEXT(p);
+                    }
 #endif
-                    //}
                   }
 #ifdef USE_IILOCALRING
                   iiLocalRing[myynest-1]=IDRING(h);
