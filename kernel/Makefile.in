@@ -322,10 +322,10 @@ endif
 ##
 mostlyclean: 
 	-rm -f p_Procs_*.inc
-	-rm -f *.o *.og core *.op p_Procs *.dl_o* *.so*
+	-rm -f *.o *.og core *.op p_Procs *.dl_o*
 
 clean: mostlyclean
-	-rm -f *.bak *.d *.dd depend
+	-rm -f *.bak *.d *.dd depend *.a *.so*
 
 distclean: clean
 	-rm -f *~ .\#* kversion.h
