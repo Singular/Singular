@@ -60,7 +60,6 @@ BITSET kOptions=Sy_bit(OPT_PROT)           /*  0 */
                 |Sy_bit(OPT_REDTHROUGH)
                 |Sy_bit(OPT_OLDSTD)
                 |Sy_bit(OPT_FASTHC)        /* 10 */
-                |Sy_bit(OPT_KEEPVARS)      /* 21 */
                 |Sy_bit(OPT_INTSTRATEGY)   /* 26 */
                 |Sy_bit(OPT_INFREDTAIL)    /* 28 */
                 |Sy_bit(OPT_NOTREGULARITY) /* 30 */
@@ -89,7 +88,7 @@ BITSET validOpts=Sy_bit(0)
                 |Sy_bit(18)
                 |Sy_bit(19)
 //                |Sy_bit(20) obachman 11/00 tossed: 12/00 used for redOldStd
-  |Sy_bit(OPT_OLDSTD)
+                |Sy_bit(OPT_OLDSTD)
                 |Sy_bit(21)
                 |Sy_bit(22)
                 /*|Sy_bit(23)*/

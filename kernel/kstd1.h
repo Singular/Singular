@@ -75,7 +75,7 @@ extern intvec * kHomW;
 10 fastHC
 11-19 sort in L/T
 20 redBest: obachman 11/00 tossed
-21 keep local variable with keepring of a loacal ring
+
 22 staircaseBound: in NF create a HC x1^degBound+1
 23 multBound
 24 degBound

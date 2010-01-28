@@ -41,11 +41,11 @@ extern BITSET verbose;
 #define V_DEBUG_LIB   7
 #define V_LOAD_PROC   8
 #define V_DEF_RES     9
-#define V_DEBUG_MEM  10
+
 #define V_SHOW_USE   11
 #define V_IMAP       12
 #define V_PROMPT     13
-#define V_NSB        14
+
 #define V_CONTENTSB  15
 #define V_CANCELUNIT 16
 #define V_MODPSOLVSB 17
@@ -71,7 +71,7 @@ extern BITSET verbose;
 #define OPT_RETURN_SB      9
 #define OPT_FASTHC        10
 #define OPT_OLDSTD        20
-#define OPT_KEEPVARS      21
+
 #define OPT_STAIRCASEBOUND 22
 #define OPT_MULTBOUND     23
 #define OPT_DEGBOUND      24
@@ -97,7 +97,6 @@ extern BITSET verbose;
 #define TEST_OPT_INTSTRATEGY       BTEST1(OPT_INTSTRATEGY)
 #define TEST_OPT_FINDET            BTEST1(OPT_FINDET)
 #define TEST_OPT_RETURN_SB         BTEST1(OPT_RETURN_SB)
-#define TEST_OPT_KEEPVARS          BTEST1(OPT_KEEPVARS)
 #define TEST_OPT_DEGBOUND          BTEST1(OPT_DEGBOUND)
 #define TEST_OPT_MULTBOUND         BTEST1(OPT_MULTBOUND)
 #define TEST_OPT_STAIRCASEBOUND    BTEST1(OPT_STAIRCASEBOUND)
