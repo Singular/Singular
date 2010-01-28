@@ -4737,6 +4737,9 @@ shows loading of procedures from libraries.
 @item @code{mem}
 @cindex mem, option
 shows memory usage in square brackets (see @ref{memory}).
+@item @code{notWarnSB}
+@cindex notWarnSB, option
+do not warn about using a generating set instead of a standard basis.
 @item @code{prompt}
 @cindex prompt, option
 shows prompt (@code{>}, resp.@: @code{.}) if ready for input (default).
