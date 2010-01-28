@@ -232,6 +232,7 @@ struct soptionStruct verboseStruct[]=
   {"Imap",     Sy_bit(V_IMAP),      ~Sy_bit(V_IMAP)       },
   {"prompt",   Sy_bit(V_PROMPT),    ~Sy_bit(V_PROMPT)     },
   {"length",   Sy_bit(V_LENGTH),    ~Sy_bit(V_LENGTH)     },
+  {"notWarnSB",Sy_bit(V_NSB),       ~Sy_bit(V_NSB)        },
   {"contentSB",Sy_bit(V_CONTENTSB), ~Sy_bit(V_CONTENTSB)  },
   {"cancelunit",Sy_bit(V_CANCELUNIT),~Sy_bit(V_CANCELUNIT)},
   {"modpsolve",Sy_bit(V_MODPSOLVSB),~Sy_bit(V_MODPSOLVSB)},

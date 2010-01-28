@@ -45,7 +45,7 @@ extern BITSET verbose;
 #define V_SHOW_USE   11
 #define V_IMAP       12
 #define V_PROMPT     13
-
+#define V_NSB        14
 #define V_CONTENTSB  15
 #define V_CANCELUNIT 16
 #define V_MODPSOLVSB 17
@@ -112,6 +112,7 @@ extern BITSET verbose;
 #define TEST_OPT_IDLIFT            BVERBOSE(V_IDLIFT)
 #define TEST_OPT_LENGTH            BVERBOSE(V_LENGTH)
 #define TEST_V_QRING               BVERBOSE(V_QRING)
+#define TEST_V_NSB                 BVERBOSE(V_NSB)
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)
