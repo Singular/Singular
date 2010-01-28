@@ -8,6 +8,17 @@
  * ABSTRACT: macros for global options
  */
 
+#include "structs.h" /*for BITSET */
+/*the general set of std-options : test */
+/*the general set of verbose-options : verbose */
+#ifdef __cplusplus
+extern "C" BITSET test;
+extern "C" BITSET verbose;
+#else
+extern BITSET test;
+extern BITSET verbose;
+#endif
+
 /*
 **  Set operations (small sets only)
 */
@@ -109,5 +120,6 @@
 #define TEST_V_COEFSTRAT           BVERBOSE(V_COEFSTRAT)
 #define TEST_V_UPTORADICAL         BVERBOSE(V_UPTORADICAL)
 #define TEST_V_FINDMONOM           BVERBOSE(V_FINDMONOM)
+
 
 #endif

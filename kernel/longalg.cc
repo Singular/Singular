@@ -25,6 +25,13 @@
 #endif
 #include "longalg.h"
 
+struct snaIdeal
+{
+  int anz;
+  napoly *liste;
+};
+typedef struct snaIdeal * naIdeal;
+
 naIdeal naI=NULL;
 
 omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));

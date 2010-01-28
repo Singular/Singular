@@ -78,18 +78,18 @@ static BOOLEAN jjMAXDEG(leftv res, leftv a)
 {
   Kstd1_deg=(int)((long)(a->Data()));
   if (Kstd1_deg!=0)
-    test |=Sy_bit(24);
+    test |=Sy_bit(OPT_DEGBOUND);
   else
-    test &=(~Sy_bit(24));
+    test &=(~Sy_bit(OPT_DEGBOUND));
   return FALSE;
 }
 static BOOLEAN jjMAXMULT(leftv res, leftv a)
 {
   Kstd1_mu=(int)((long)(a->Data()));
   if (Kstd1_mu!=0)
-    test |=Sy_bit(23);
+    test |=Sy_bit(OPT_MULTBOUND);
   else
-    test &=(~Sy_bit(23));
+    test &=(~Sy_bit(OPT_MULTBOUND));
   return FALSE;
 }
 static BOOLEAN jjTRACE(leftv res, leftv a)

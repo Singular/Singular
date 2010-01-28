@@ -240,7 +240,8 @@ struct soptionStruct verboseStruct[]=
   {"modpsolve",Sy_bit(V_MODPSOLVSB),~Sy_bit(V_MODPSOLVSB)},
   {"geometricSB",Sy_bit(V_UPTORADICAL),~Sy_bit(V_UPTORADICAL)},
   {"findMonomials",Sy_bit(V_FINDMONOM),~Sy_bit(V_FINDMONOM)},
-  {"coefStrat",Sy_bit(V_COEFSTRAT),~Sy_bit(V_COEFSTRAT)},
+  {"coefStrat",Sy_bit(V_COEFSTRAT), ~Sy_bit(V_COEFSTRAT)},
+  {"qringNF",  Sy_bit(V_QRING),     ~Sy_bit(V_QRING)},
 /*special for "none" and also end marker for showOption:*/
   {"ne",         0,          0 }
 };

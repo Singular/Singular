@@ -195,15 +195,6 @@ typedef kBucket*           kBucket_pt;
 typedef sBucket*           sBucket_pt;
 typedef struct p_Procs_s p_Procs_s;
 
-// for longalg.cc
-struct snaIdeal
-{
-  int anz;
-  napoly *liste;
-};
-typedef struct snaIdeal * naIdeal;
-
-
 // for sparsemat.cc
 typedef struct smprec sm_prec;
 typedef sm_prec * smpoly;
@@ -679,16 +670,6 @@ int   IsPrime(int i);
 extern int siSeed;
 int siRand();
 #endif
-#endif
-
-/*the general set of std-options --> kutil.cc */
-/*the general set of verbose-options --> febase.cc */
-#ifdef __cplusplus
-extern "C" BITSET test;
-extern "C" BITSET verbose;
-#else
-extern BITSET test;
-extern BITSET verbose;
 #endif
 
 #define loop for(;;)
