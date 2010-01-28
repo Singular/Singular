@@ -4581,6 +4581,13 @@ orderings).
 @c @item @code{interrupt}
 @c allows fast interruption of standard basis computation
 @c ---------
+@item @code{infRedTail}
+@cindex infRedTail, option
+local normal form computations will not use the ecart
+to avoid possibly infinite tail reductions: should only be used
+with extreme care.
+@*By default, it is only set in the case of a zero-dimoensional ideal.
+@c ---------
 @item @code{intStrategy}
 @cindex intStrategy, option
 avoids division of coefficients during standard basis
@@ -4595,11 +4602,6 @@ which was used in @sc{Singular} version before 2-0
 @item @code{length}
 @cindex length, option
 select shorter reduceers in std computations,
-@c ---------
-@c @item @code{minRes}
-@c @cindex minRes, option
-@c special (additional) minimizing during computations (@code{res}, @code{mres}),
-@c @*assumes homogeneous case and degree-compatible ordering.
 @c ---------
 @item @code{notRegularity}
 @cindex notRegularity, option
@@ -4617,12 +4619,6 @@ disables the bucket representation of polynomials during standard basis
 computations. This option usually decreases the memory usage but
 increases the computation time. It should only be set for
 memory-critical standard basis computations.
-@c ---------
-@item @code{oldStd}
-@cindex oldStd, option
-uses a more lazy approach in std computations,
-which was used in @sc{Singular} version before 2-0
-(and which may lead to faster or slower computations, depending on the example)
 @c ---------
 @item @code{prot}
 @cindex prot, option
@@ -4646,6 +4642,10 @@ progress during the following computations:
 @code{syz}.
 @anchor{option(redSB)}
 See below for more details.
+@c ---------
+@item @code{qringNF}
+@cindex qringNF, option
+simplifies always modulo the current @code{qring}.
 @c ---------
 @item @code{redSB}
 @cindex redSB, option
@@ -4674,6 +4674,35 @@ uses criteria similar to the homogeneous case to keep more useless pairs.
 automatically computes suitable weights for the weighted ecart and the
 weighted sugar method.
 @c ---------
+@item @code{cancelunit}
+@cindex cancelunit, option
+avoids to divide polynomials by non-constant units in @code{std} in the local case. Should usually not be used.
+@c ---------
+@item @code{contentSB}
+@cindex contentSB, option
+avoids to divide by the content of a polynomial in @code{std} and related
+algorithms. Should usually not be used.
+@c ---------
+@item @code{modpsolve}
+@cindex modpsolve, option
+used by @code{slimgb}. undocumented.
+Should usually not be used.
+@c ---------
+@item @code{geometricSB}
+@cindex geometricSB, option
+used by @code{slimgb}. undocumented.
+Should usually not be used.
+@c ---------
+@item @code{findMonomials}
+@cindex findMonomials, option
+used by @code{slimgb}. undocumented.
+Should usually not be used.
+@c ---------
+@item @code{coefStrat}
+@cindex coefStrat, option
+used by @code{slimgb}. undocumented.
+Should usually not be used.
+@c ---------
 @end table
 @*
 The following options, which also control computations, are special,
@@ -4693,12 +4722,15 @@ The last set of options controls the output of @sc{Singular}:
 @item @code{Imap}
 @cindex Imap, option
 shows the mapping of variables with the fetch and imap commands.
-@item @code{loadLib}
-@cindex loadLib, option
-shows loading of libraries (set by default).
 @item @code{debugLib}
 @cindex debugLib, option
 warns about syntax errors during loading of libraries.
+@item @code{defRes}
+@cindex defRes, option
+shows the names of the syzygy modules while converting @code{resolution} to @code{list}
+@item @code{loadLib}
+@cindex loadLib, option
+shows loading of libraries (set by default).
 @item @code{loadProc}
 @cindex loadProc, option
 shows loading of procedures from libraries.
