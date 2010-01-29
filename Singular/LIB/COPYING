@@ -71,7 +71,7 @@ elim.lib        Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 Hans Schoenemann                hannes@mathematik.uni-kl.de
 equising.lib    Andrea Mindnich                 mindnich@mathematik.uni-kl.de
 finvar.lib      Agnes E. Heydtmann
-                Simon King                      king@mfo.de
+                Simon King                      simon.king@nuigalway.ie
 freegb.lib      Viktor Levandovskyy             levandov@math.rwth-aachen.de
 gaussman.lib    Mathias Schulze                 mschulze@mathematik.uni-kl.de
 general.lib     Gert-Martin Greuel              greuel@mathematik.uni-kl.de
@@ -139,7 +139,7 @@ poly.lib        Olaf Bachmann                   obachman@mathematik.uni-kl.de
 polymake.lib    Thomas Markwig                  keilen@mathematik.uni-kl.de
 presolve.lib    Gert-Martin Greuel              greuel@mathematik.uni-kl.de
 primdec.lib     Gerhard Pfister                 pfister@mathematik.uni-kl.de
-                Wolfram Decker                  decker@math.uni-sb.de
+                Wolfram Decker                  decker@mathematik.uni-kl.de
                 Hans Schoenemann                hannes@mathematik.uni-kl.de
                 Santiago Laplagne               slaplagn@dm.uba.ar
 primitiv.lib    Martin Lamm                     lamm@mathematik.uni-kl.de
@@ -163,7 +163,7 @@ rootsmr.lib     Enrique A. Tobis                etobis@dc.uba.ar
 rootsur.lib     Enrique A. Tobis                etobis@dc.uba.ar
 sagbi.lib       Gerhard Pfister                 pfister@mathematik.uni-kl.de
                 Anen Lakhal                     alakhal@mathematik.uni-kl.de
-sheafcoh.lib    Wolfram Decker                  decker@math.uni-sb.de
+sheafcoh.lib    Wolfram Decker                  decker@mathematik.uni-kl.de
                 Christoph Lossen                lossen@mathematik.uni-kl.de
                 Gerhard Pfister                 pfister@mathematik.uni-kl.de
 signcond.lib    Enrique A. Tobis                etobis@dc.uba.ar
