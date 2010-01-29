@@ -4,7 +4,7 @@ category="Commutative Algebra";
 info="
 LIBRARY: primdec.lib   Primary Decomposition and Radical of Ideals
 AUTHORS:  Gerhard Pfister, pfister@mathematik.uni-kl.de (GTZ)@*
-          Wolfram Decker, decker@math.uni-sb.de         (SY)@*
+          Wolfram Decker, decker@mathematik.uni-kl.de   (SY)@*
           Hans Schoenemann, hannes@mathematik.uni-kl.de (SY)@*
           Santiago Laplagne, slaplagn@dm.uba.ar         (GTZ)
 
