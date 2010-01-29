@@ -18,7 +18,7 @@ documentation:
 
 The latest version of NTL is available at http://www.shoup.net.
 
-The sources have been modified for Singular-3-1-0
+The sources (5.5.2) have been modified for Singular-3-x-x
 - for errors blame singular@mathematik.uni-kl.de,
 not Victor Shoup (victor@shoup.net)
 

@@ -296,6 +296,8 @@ install: singular.hlp html singular.idx standalone
 	test -r ${htmldir} || ln -s `pwd`/${HTML_SUBDIR} ${htmldir}
 	test -r ${exdir} || ln -s `pwd`/${EX_SUBDIR} ${exdir}
 
+install_all: install
+
 uninstall:
 	rm -f ${infodir}/singular.hlp
 	- rmdir ${infodir}

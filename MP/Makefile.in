@@ -61,6 +61,8 @@ all install uninstall: Makefile
 		fi; \
 	done
 
+install_all: install
+
 clean distclean mostlyclean maintainer-clean:
 	for SUBDIR in ${SUBDIRS}; \
 	do \

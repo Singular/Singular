@@ -193,21 +193,23 @@ install-libsingular:
 	$(MKINSTALLDIRS) $(includedir)/singular
 	$(INSTALL) omalloc.h $(includedir)/singular
 
-install: all libomalloc_p.a
+install: all
 	$(MKINSTALLDIRS) $(libdir)
 	$(MKINSTALLDIRS) $(includedir)
 	$(INSTALL_DATA) libomalloc.a $(libdir)
 	$(RANLIB) $(libdir)/libomalloc.a
 	$(INSTALL_DATA) libomalloc_ndebug.a $(libdir)
 	$(RANLIB) $(libdir)/libomalloc_ndebug.a
-	$(INSTALL_DATA) libomalloc_p.a $(libdir)
-	$(RANLIB) $(libdir)/libomalloc_p.a
 	$(INSTALL_DATA) omalloc.o $(libdir)
 	$(INSTALL_DATA) omalloc_debug.o $(libdir)
 	$(INSTALL_DATA) omalloc.h $(includedir)
 	$(INSTALL_DATA) omalloc.c $(includedir)
 	$(INSTALL_DATA) omlimits.h $(includedir)
 	$(INSTALL_DATA) mylimits.h $(includedir)
+
+install_all: install libomalloc_p.a
+	$(INSTALL_DATA) libomalloc_p.a $(libdir)
+	$(RANLIB) $(libdir)/libomalloc_p.a
 
 install_min: libomalloc_ndebug.a omalloc.o
 	$(MKINSTALLDIRS) $(libdir)

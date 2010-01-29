@@ -81,7 +81,7 @@ PROFOBJ = $(OPTFACTOROBJ1:%.o=%.op) $(OPTCHARSETOBJ:%.o=%.op)
 
 .SUFFIXES:      .cc .h .o .op .og
 
-all: OPTOBJ ${TARGETNAME} libsingfac_p.a libsingfac_g.a
+all: OPTOBJ ${TARGETNAME} libsingfac_g.a
 
 OPTOBJ:
 	${MKINSTALLDIRS} OPTOBJ
@@ -152,9 +152,11 @@ install:	all
 	${INSTALL_DATA} ${LIBFACINCLUDE} ${includedir}
 	${INSTALL_DATA} ${TARGETNAME}.a ${libdir}
 	-${INSTALL_DATA} libsingfac_g.a ${libdir}
-	-${INSTALL_DATA} libsingfac_p.a ${libdir}
 	$(RANLIB) ${libdir}/${TARGETNAME}.a
 	-$(RANLIB) ${libdir}/libsingfac_g.a
+
+install_all: install libsingfac_p.a
+	-${INSTALL_DATA} libsingfac_p.a ${libdir}
 	-$(RANLIB) ${libdir}/libsingfac_p.a
 
 uninstall: 

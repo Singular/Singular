@@ -8,17 +8,16 @@
 * ABSTRACT
 */
 
-#include <string.h> /* for memset */
+/* for memset: */
+#include <string.h>
 #ifdef HAVE_RINGS
 #include <si_gmp.h>
 #endif
 
-#ifndef NATNUMBER
-#define NATNUMBER unsigned long
-#endif
 
 /* standard types */
 #ifdef HAVE_RINGS
+typedef unsigned long NATNUMBER;
 typedef MP_INT *int_number;
 #endif
 #if (SIZEOF_LONG == 8)

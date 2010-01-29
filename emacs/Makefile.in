@@ -22,6 +22,8 @@ SINGULAR_HLP	= ${docdir}/singular.hlp
 
 all install: cmd-cmpl.el hlp-cmpl.el lib-cmpl.el ex-cmpl.el
 
+install_all: install
+
 cmd-cmpl.el: ${SINGULAR} cmpl.pl
 	${PERL} cmpl.pl -Singular ${SINGULAR} -cmpl cmd > cmd-cmpl.el
 

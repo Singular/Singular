@@ -30,11 +30,11 @@ ${SINGULAR}:
 ##############################################################
 # general targets
 # simply descend for these targets
-.PHONY: all install uninstall
+.PHONY: all install uninstall install_all
 
 TEXINFO_TEX_FILES = epsf.tex texinfo.tex txi-cs.tex txi-de.tex txi-no.tex
 TEXINFO_TEX_DIR = Texinfo/doc
-all install:
+all install install_all:
 	@ for SUBDIR in ${BUILD1_SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \

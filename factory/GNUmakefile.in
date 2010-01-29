@@ -463,7 +463,7 @@ distfiles :=	\
 #
 all:		$(alltargets)
 
-cf:		factoryconf.h factory.h $(libfactory) libsingcf_g.a libsingcf_p.a
+cf:		factoryconf.h factory.h $(libfactory) libsingcf_g.a
 
 mem:		libcfmem.a
 
@@ -605,6 +605,9 @@ installtest:	test_install
 #
 install:	$(installtargets)
 
+install_all:	install libsingcf_p.a
+		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a
+
 install-nolns: install
 
 installcf:	cf
@@ -613,7 +616,6 @@ installcf:	cf
 		$(MKINSTALLDIRS) $(templatedir)
 		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
 		-$(INSTALL_DATA) libsingcf_g.a $(libdir)/libsingcf_g.a
-		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a
 		$(INSTALL_DATA) factory.h $(includedir)/factory.h
 		$(INSTALL_DATA) cf_gmp.h $(includedir)/cf_gmp.h
 		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h

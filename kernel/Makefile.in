@@ -250,7 +250,7 @@ DL_LIBSG=
 DL_LIBSP=
 endif
 
-all:	kversion.h libkernel.a libkernel_g.a libkernel_p.a mmalloc.o ${DL_LIBS} ${DL_LIBSG} ${OBJS2} ${DL_LIBSP}
+all:	kversion.h libkernel.a libkernel_g.a mmalloc.o ${DL_LIBS} ${DL_LIBSG} ${OBJS2}
 
 libkernel.a: ${OBJS}
 	-rm -f libkernel.a
@@ -295,17 +295,27 @@ install-libsingular:
 
 install: all installbin
 
-installbin: ${DL_LIBS} ${DL_LIBSG} ${DL_LIBSP}
+install_all: install libkernel_p.a ${DL_LIBSP}
+	- ranlib libkernel_p.a
+ifeq (,${DL_LIBS})
+else
+ifeq (,${DL_LIBSG})
+else
+	-for file in ${DL_LIBSP}; do ${INSTALL_PROGRAM} $$file ../Singular; done
+endif
+endif
+
+
+installbin: ${DL_LIBS} ${DL_LIBSG}
 	${MKINSTALLDIRS} ${bindir}
 	- ranlib libkernel.a
 	- ranlib libkernel_g.a
-	- ranlib libkernel_p.a
 ifeq (,${DL_LIBS})
 else
 	-${INSTALL_PROGRAM} ${DL_LIBS} ${bindir}
 ifeq (,${DL_LIBSG})
 else
-	-for file in ${DL_LIBS} ${DL_LIBSG} ${DL_LIBSP}; do ${INSTALL_PROGRAM} $$file ../Singular; done
+	-for file in ${DL_LIBS} ${DL_LIBSG}; do ${INSTALL_PROGRAM} $$file ../Singular; done
 endif
 endif
 

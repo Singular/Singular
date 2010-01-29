@@ -142,6 +142,8 @@ install bindist: all
 		( cd $${SUBDIR} && ${MAKE} $@;) || true; \
 	done
 
+install_all: install
+
 install-bindist: all
 	(cd modgen; ${MAKE} install_bindir=${install_bindir} $@)
 	for SUBDIR in ${MOD_DIRS} ${MOD_FILES}; \

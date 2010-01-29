@@ -488,6 +488,8 @@ endif
 ##
 install: all installbin installslib
 
+install_all: install
+
 install-nolns: all installbin-nolns installslib-nolns
 
 installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}

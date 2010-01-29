@@ -24,6 +24,8 @@ setup4:
 install:	all
 	(cd src;$(MAKE) install || exit 1;cd ..)
 
+install_all: install
+
 clean:
 	cd src;$(MAKE) clean;cd ..
 	-rm setup1 setup2 setup3 setup4
