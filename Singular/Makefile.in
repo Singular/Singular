@@ -387,6 +387,9 @@ libparse: libparse_main.o utils.o
 libparse_main.o: libparse.cc
 	${CXX} ${CPPFLAGS} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
 
+utils.o: utils.cc
+	${CXX} ${CPPFLAGS} -c -o utils.o utils.cc  -DSTANDALONE_PARSER
+
 libparse.cc: libparse.l
 	@if test "x${LEX}" = x; then \
 		echo Error: no lex given, could not rebuilt libparse.cc;\

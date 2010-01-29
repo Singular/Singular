@@ -2,10 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "mod2.h"
 #include "fegetopt.h"
-#include "libparse.h"
 #include "utils.h"
+#include "libparse.h"
 
 extern FILE *yylpin;
 extern char *optarg;
@@ -37,8 +36,10 @@ void main_init(int argc, char *argv[])
 {
   char c;
 
-  while((c=fe_getopt(argc, argv, "ihdc:sf:"))>=0) {
-    switch(c) {
+  while((c=fe_getopt(argc, argv, "ihdc:sf:"))>=0)
+  {
+    switch(c)
+    {
         case 'd':
           lpverbose = 1;
           if(isdigit(argv[fe_optind-1][0])) sscanf(optarg, "%d", &lpverbose);
@@ -68,14 +69,18 @@ void main_init(int argc, char *argv[])
   }
   if (texinfo_out || category_out) lpverbose = 0;
 
-  if(lib_file!=NULL) {
+  if(lib_file!=NULL)
+  {
     yylpin = fopen( lib_file, "rb" );
     if (! (texinfo_out || category_out))
       printf("Checking library '%s'\n", lib_file);
     else if (! category_out)
       printf("$library = \"%s\";\n", lib_file);
-  } else {
-    while(argc>fe_optind && yylpin==NULL) {
+  }
+  else
+  {
+    while(argc>fe_optind && yylpin==NULL)
+    {
       yylpin = fopen( argv[fe_optind], "rb" );
       if(yylpin!=NULL)
       {
@@ -88,7 +93,8 @@ void main_init(int argc, char *argv[])
       else fe_optind++;
     }
   }
-  if(yylpin == NULL) {
+  if(yylpin == NULL)
+  {
     printf("No library found to parse.\n");
     usage(argv[0]);
   }
@@ -107,7 +113,7 @@ void main_result(char *libname)
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 
-procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
+procinfo *iiInitSingularProcinfo(procinfo* pi, const char *libname,
                                  const char *procname, int line, long pos,
                                  BOOLEAN pstatic /*= FALSE*/)
 {
@@ -205,7 +211,7 @@ void printpi(procinfov pi)
         PrintOut(fp, pi->data.s.example_start, pi->data.s.proc_end);
         printf("\nEOT\n");
       }
-      printf("$chksum{\"%s\"} = %d;\n", pi->procname, pi->data.s.help_chksum);
+      printf("$chksum{\"%s\"} = %ld;\n", pi->procname, pi->data.s.help_chksum);
     }
   }
   else if (! category_out)
@@ -232,45 +238,6 @@ void printpi(procinfov pi)
 
   if (fp != NULL) fclose(fp);
 
-#if 0
-  if( fp != NULL) { // loading body
-    len1 = pi->data.s.def_end - pi->data.s.proc_start;
-    if(pi->data.s.body_end==0)
-      len2 = pi->data.s.proc_end - pi->data.s.body_start;
-    else len2 = pi->data.s.body_end - pi->data.s.body_start;
-    buf = (char *)malloc(len1 + len2 + 1);
-    fseek(fp, pi->data.s.proc_start, SEEK_SET);
-    fread( buf, len1, 1, fp);
-    *(buf+len1) = '\n';
-    fseek(fp, pi->data.s.body_start, SEEK_SET);
-    fread( buf+len1+1, len2, 1, fp);
-    *(buf+len1+len2+1)='\0';
-    printf("##BODY:'%s'##\n", buf);
-    free(buf);
-
-    // loading help
-    len1 = pi->data.s.body_start - pi->data.s.proc_start;
-    printf("len1=%d;\n", len1);
-    buf = (char *)malloc(len1+1);
-    fseek(fp, pi->data.s.proc_start, SEEK_SET);
-    fread( buf, len1, 1, fp);
-    *(buf+len1)='\0';
-    printf("##HELP:'%s'##\n", buf);
-    free(buf);
-
-    if(pi->data.s.example_start>0) { // loading example
-      fseek(fp, pi->data.s.example_start, SEEK_SET);
-      len2 = pi->data.s.proc_end - pi->data.s.example_start;
-      buf = (char *)malloc(len2+1);
-      fread( buf, len2, 1, fp);
-      *(buf+len2)='\0';
-      printf("##EXAMPLE:'%s'##\n", buf);
-      free(buf);
-    }
-
-    //getchar();
-  }
-#endif
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/

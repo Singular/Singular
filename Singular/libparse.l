@@ -12,7 +12,6 @@
   #include "utils.h"
   #define HAVE_LIBPARSER
   #define YYLPDEBUG 1
-  #include "../kernel/febase.cc"
 #else
   #include "subexpr.h"
   #include "grammar.h"
