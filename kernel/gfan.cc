@@ -31,8 +31,10 @@ $Id$
 #include <sstream>
 #include <time.h>
 #include <sys/time.h>
+#include <stdlib.h>
 //#include <gmpxx.h>
-#include <vector>
+// #include <vector>
+
 
 /*DO NOT REMOVE THIS*/
 #ifndef GMPRATIONAL
@@ -92,6 +94,7 @@ facet::facet()
 	this->codim2Ptr=NULL;
 	this->codim=1;		//default for (codim-1)-facets
 	this->numCodim2Facets=0;
+	this->numRays=0;
 	this->flipGB=NULL;
 	this->isIncoming=FALSE;
 	this->next=NULL;
@@ -115,6 +118,7 @@ facet::facet(int const &n)
 		this->codim=n;
 	}//NOTE Handle exception here!			
 	this->numCodim2Facets=0;
+	this->numRays=0;
 	this->flipGB=NULL;
 	this->isIncoming=FALSE;
 	this->next=NULL;
@@ -502,18 +506,21 @@ inline void gcone::showIntPoint()
 /** \brief Print facets
  * This is mainly for debugging purposes. Usually called from within gdb
  */
-inline void gcone::showFacets(const short codim)
+volatile void gcone::showFacets(const short codim)
 {
-	facet *f;
-	switch(codim)
+	facet *f=this->facetPtr;
+	facet *f2=NULL;
+	if(codim==2)
+		f2=this->facetPtr->codim2Ptr;
+	/*switch(codim)
 	{
 		case 1:
 			f = this->facetPtr;
 			break;
 		case 2:
-			f = this->facetPtr->codim2Ptr;
+			f2 = this->facetPtr->codim2Ptr;
 			break;
-	}	
+	}*/	
 	while(f!=NULL)
 	{
 		intvec *iv;
@@ -525,6 +532,18 @@ inline void gcone::showFacets(const short codim)
 		else
 			cout << ") ";
 		delete iv;
+		if(codim==2)
+		{
+			f2=f->codim2Ptr;
+			while(f2!=NULL)
+			{
+				cout << "[";
+				f2->getFacetNormal()->show(1,0);
+				cout << "]";
+				f2 = f2->next;
+			}
+			cout << endl;
+		}
 		f=f->next;
 	}
 	cout << endl;
@@ -1181,7 +1200,7 @@ void gcone::getExtremalRays(const gcone &gc)
 	ddPolyh = dd_DDMatrix2Poly(ddineq, &err);
 	dd_MatrixPtr P;
 	P=dd_CopyGenerators(ddPolyh);
-	dd_FreePolyhedra(ddPolyh);
+	dd_FreePolyhedra(ddPolyh);	
 	//Loop through the rows of P and check whether fNormal*row[i]=0 => row[i] belongs to fNormal
 	int rows=P->rowsize;
 	facet *fAct=gc.facetPtr;
@@ -1208,15 +1227,54 @@ void gcone::getExtremalRays(const gcone &gc)
 					codim2Act = codim2Act->next;
 				}
 				codim2Act->setFacetNormal(rowvec);
-				//Check flippability				
+				fAct->numRays++;			
 			}
 			delete(rowvec);
-		}		
+		}
+		//Now (if we have at least 3 variables) do a bubblesort on the rays
+		/*if(this->numVars>2)
+		{
+			facet *A[fAct->numRays-1];
+			facet *f2Act=fAct->codim2Ptr;
+			for(unsigned ii=0;ii<fAct->numRays;ii++)
+			{
+				A[ii]=f2Act;
+				f2Act=f2Act->next;
+			}
+			bool exchanged=FALSE;
+			unsigned n=fAct->numRays-1;
+			do
+			{
+				exchanged=FALSE;//n=fAct->numRays-1;				
+				for(unsigned ii=0;ii<=n-1;ii++)
+				{					
+					if((A[ii]->fNormal)->compare((A[ii+1]->fNormal))==1)
+					{
+						//Swap rays
+						cout << "Swapping ";
+						A[ii]->fNormal->show(1,0); cout << " with "; A[ii+1]->fNormal->show(1,0); cout << endl;
+						A[ii]->next=A[ii+1]->next;
+						if(ii>0)
+							A[ii-1]->next=A[ii+1];
+						A[ii+1]->next=A[ii];
+						if(ii==0)
+							fAct->codim2Ptr=A[ii+1];
+						//end swap
+						facet *tmp=A[ii];//swap in list
+						A[ii+1]=A[ii];
+						A[ii]=tmp;
+// 						tmp=NULL;			
+					}					
+				}
+				n--;			
+			}while(exchanged==TRUE && n>=0);
+		}*///if pVariables>2
 		delete fNormal;		
 		fAct = fAct->next;
 	}
 	//Now all extremal rays should be set w.r.t their respective fNormal
 	//TODO Not sufficient -> vol2 II/125&127
+	//NOTE Sufficient according to cddlibs doc. These ARE rays
 	fAct=gc.facetPtr;
 	while(fAct!=NULL)
 	{
@@ -1249,6 +1307,8 @@ void gcone::getExtremalRays(const gcone &gc)
 			fAct->isFlippable=FALSE;
 		fAct = fAct->next;
 	}
+	
+	
 #ifdef gfanp
 	gettimeofday(&end, 0);
 	t_getExtremalRays += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
@@ -1647,6 +1707,7 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 				(*check)[jj]=v[jj+1]-leadExpV[jj+1];
 			}
 			if (isParallel(*check,fNormal)) //pass *check when 
+// 			if(fNormal.compare(check)==0)
 			{
 				//Found a parallel vector. Add it
 				initialFormElement = pAdd((initialFormElement),(poly)pHead(aktpoly));
@@ -2289,6 +2350,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			sl2Act = sl2Root;
 					//while(codim2Act!=NULL)
 			for(int jj=0;jj<fAct->numCodim2Facets;jj++)
+// 			for(int jj=0;jj<fAct->numRays-1;jj++)
 			{
 				intvec *f2Normal;
 				f2Normal = codim2Act->getFacetNormal();
@@ -3146,6 +3208,18 @@ ring gcone::getBaseRing()
 {
 	return rCopy(this->baseRing);
 }
+/** \brief Sort the rays of a facet lexicographically
+*/
+void gcone::sortRays(gcone *gc)
+{
+	facet *fAct;
+	fAct = this->facetPtr->codim2Ptr;
+// 	while(fAct->next!=NULL)
+// 	{
+// 		if(fAct->fNormal->compare(fAct->fNormal->next)==-1
+// 	}
+}
+
 /** \brief Gather the output
 * List of lists
 *\param *gc Pointer to gcone, preferably gcRoot ;-)

@@ -75,7 +75,7 @@ class facet
 		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
 		int numCodim2Facets;	//#of (codim-2)-facets of this facet. Set in getCodim2Normals()
 		ring flipRing;		//the ring on the other side of the facet
-					
+		unsigned numRays;	//Number of spanning rays of the cone			
 		/** The default constructor. */
 		facet();
 		/** Constructor for lower dimensional faces*/
@@ -194,7 +194,7 @@ class gcone
 		inline int getNumFacets();
 		inline int getUCN();
 		inline int getPredUCN();		
-		inline void showFacets(short codim=1);
+		volatile void showFacets(short codim=1);
 		inline volatile void showSLA(facet &f);
 		inline void idDebugPrint(const ideal &I);
 		inline void invPrint(const ideal &I);
@@ -208,7 +208,7 @@ class gcone
 		inline void writeConeToFile(const gcone &gc, bool usingIntPoints=FALSE);
 		inline void readConeFromFile(int gcNum, gcone *gc);
 		inline intvec f2M(gcone *gc, facet *f, int n=1);
-		
+		inline void sortRays(gcone *gc);
 		//The real stuff
 		inline void getConeNormals(const ideal &I, bool compIntPoint=FALSE);
 		inline void getCodim2Normals(const gcone &gc);
