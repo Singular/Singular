@@ -4574,7 +4574,7 @@ the functions @code{syz}, @code{intersect}, @code{quotient},
 @c ---------
 @item @code{fastHC}
 @cindex fastHC, option
-tries to the find the highest corner of the staircase (HC) as fast as
+tries to find the highest corner of the staircase (HC) as fast as
 possible during a standard basis computation (only used for local
 orderings).
 @c ---------
@@ -4586,7 +4586,7 @@ orderings).
 local normal form computations will not use the ecart
 to avoid possibly infinite tail reductions: should only be used
 with extreme care.
-@*By default, it is only set in the case of a zero-dimoensional ideal.
+@*By default, it is only set in the case of a zero-dimensional ideal.
 @c ---------
 @item @code{intStrategy}
 @cindex intStrategy, option
@@ -4616,7 +4616,7 @@ disables the sugar strategy during standard basis computation.
 @item @code{notBuckets}
 @cindex notBuckets, option
 disables the bucket representation of polynomials during standard basis
-computations. This option usually decreases the memory usage but
+computations. This option usually decreases the memory consumption but
 increases the computation time. It should only be set for
 memory-critical standard basis computations.
 @c ---------
@@ -4724,7 +4724,7 @@ The last set of options controls the output of @sc{Singular}:
 shows the mapping of variables with the fetch and imap commands.
 @item @code{debugLib}
 @cindex debugLib, option
-warns about syntax errors during loading of libraries.
+warns about syntax errors when loading a library.
 @item @code{defRes}
 @cindex defRes, option
 shows the names of the syzygy modules while converting @code{resolution} to @code{list}
