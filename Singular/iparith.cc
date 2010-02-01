@@ -5987,71 +5987,92 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
        the cache may have at most, and how many cached monomials there are at
        most. (Cached monomials are counted over all cached polynomials.)
   */
-  const matrix m = (const matrix)v->Data();
-  const int mk = (const int)(long)v->next->Data();
+  matrix m;
+  leftv u=v->next;
+  v->next=NULL;
+  if (v->Typ()==MATRIX_CMD)
+  {
+     m = (const matrix)v->Data();
+  }
+  else
+  {
+    // try to convert to MATRIX:
+    int ii=iiTestConvert(v->Typ(),MATRIX_CMD);
+    BOOLEAN bo;
+    sleftv tmp;
+    if (ii>0) bo=iiConvert(v->Typ(),MATRIX_CMD,ii,v,&tmp);
+    else bo=TRUE;
+    if (bo)
+    { 
+      Werror("cannot convert %s to matrix",Tok2Cmdname(v->Typ()));
+      return TRUE;
+    }
+    m=(matrix)tmp.data;
+  }
+  const int mk = (const int)(long)u->Data();
   bool noIdeal = true; bool noK = true; bool noAlgorithm = true;
   bool noCacheMinors = true; bool noCacheMonomials = true;
   ideal IasSB; int k; char* algorithm; int cacheMinors; int cacheMonomials;
   
   /* here come the different cases of correct argument sets */
-  if ((v->next->next != NULL) && (v->next->next->Typ() == IDEAL_CMD))
+  if ((u->next != NULL) && (u->next->Typ() == IDEAL_CMD))
   {
-    IasSB = (ideal)v->next->next->Data();
+    IasSB = (ideal)u->next->Data();
     noIdeal = false;
-    if ((v->next->next->next != NULL) && (v->next->next->next->Typ() == INT_CMD))
+    if ((u->next->next != NULL) && (u->next->next->Typ() == INT_CMD))
     {
-      k = (int)(long)v->next->next->next->Data();
+      k = (int)(long)u->next->next->Data();
       noK = false;
       assume(k != 0);
-      if ((v->next->next->next->next != NULL) && (v->next->next->next->next->Typ() == STRING_CMD))
+      if ((u->next->next->next != NULL) && (u->next->next->next->Typ() == STRING_CMD))
       {
-        algorithm = (char*)v->next->next->next->next->Data();
+        algorithm = (char*)u->next->next->next->Data();
         noAlgorithm = false;
-        if ((v->next->next->next->next->next != NULL) && (v->next->next->next->next->next->Typ() == INT_CMD))
+        if ((u->next->next->next->next != NULL) && (u->next->next->next->next->Typ() == INT_CMD))
         {
-          cacheMinors = (int)(long)v->next->next->next->next->next->Data();
+          cacheMinors = (int)(long)u->next->next->next->next->Data();
           noCacheMinors = false;
-          if ((v->next->next->next->next->next->next != NULL) && (v->next->next->next->next->next->next->Typ() == INT_CMD))
+          if ((u->next->next->next->next->next != NULL) && (u->next->next->next->next->next->Typ() == INT_CMD))
           {
-            cacheMonomials = (int)(long)v->next->next->next->next->next->next->Data();
+            cacheMonomials = (int)(long)u->next->next->next->next->next->Data();
             noCacheMonomials = false;
           }
         }
       }
     }
   }
-  else if ((v->next->next != NULL) && (v->next->next->Typ() == INT_CMD))
+  else if ((u->next != NULL) && (u->next->Typ() == INT_CMD))
   {
-    k = (int)(long)v->next->next->Data();
+    k = (int)(long)u->next->Data();
     noK = false;
     assume(k != 0);
-    if ((v->next->next->next != NULL) && (v->next->next->next->Typ() == STRING_CMD))
+    if ((u->next->next != NULL) && (u->next->next->Typ() == STRING_CMD))
     {
-      algorithm = (char*)v->next->next->next->Data();
+      algorithm = (char*)u->next->next->Data();
       noAlgorithm = false;
-      if ((v->next->next->next->next != NULL) && (v->next->next->next->next->Typ() == INT_CMD))
+      if ((u->next->next->next != NULL) && (u->next->next->next->Typ() == INT_CMD))
       {
-        cacheMinors = (int)(long)v->next->next->next->next->Data();
+        cacheMinors = (int)(long)u->next->next->next->Data();
         noCacheMinors = false;
-        if ((v->next->next->next->next->next != NULL) && (v->next->next->next->next->next->Typ() == INT_CMD))
+        if ((u->next->next->next->next != NULL) && (u->next->next->next->next->Typ() == INT_CMD))
         {
-          cacheMonomials = (int)(long)v->next->next->next->next->next->Data();
+          cacheMonomials = (int)(long)u->next->next->next->next->Data();
           noCacheMonomials = false;
         }
       }
     }
   }
-  else if ((v->next->next != NULL) && (v->next->next->Typ() == STRING_CMD))
+  else if ((u->next != NULL) && (u->next->Typ() == STRING_CMD))
   {
-    algorithm = (char*)v->next->next->Data();
+    algorithm = (char*)u->next->Data();
     noAlgorithm = false;
-    if ((v->next->next->next != NULL) && (v->next->next->next->Typ() == INT_CMD))
+    if ((u->next->next != NULL) && (u->next->next->Typ() == INT_CMD))
     {
-      cacheMinors = (int)(long)v->next->next->next->Data();
+      cacheMinors = (int)(long)u->next->next->Data();
       noCacheMinors = false;
-      if ((v->next->next->next->next != NULL) && (v->next->next->next->next->Typ() == INT_CMD))
+      if ((u->next->next->next != NULL) && (u->next->next->next->Typ() == INT_CMD))
       {
-        cacheMonomials = (int)(long)v->next->next->next->next->Data();
+        cacheMonomials = (int)(long)u->next->next->next->Data();
         noCacheMonomials = false;
       }
     }
@@ -6061,18 +6082,18 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   if (!noAlgorithm)
   {
     if (strcmp(algorithm, "bareiss") == 0)
-      algorithm = "Bareiss";
+      algorithm = (char*)"Bareiss";
     if (strcmp(algorithm, "laplace") == 0)
-      algorithm = "Laplace";
+      algorithm = (char*)"Laplace";
     if (strcmp(algorithm, "cache") == 0)
-      algorithm = "Cache";
+      algorithm = (char*)"Cache";
   }
 
+  v->next=u;
   /* here come some tests */
-  if ((!noIdeal) && (!hasFlag(v->next->next, FLAG_STD)))
+  if (!noIdeal)
   {
-    WerrorS("Provided ideal is not a standard basis.");
-    return TRUE;
+    assumeStdFlag(u->next);
   }
   if ((!noK) && (k == 0))
   {
