@@ -255,5 +255,16 @@ template void noro_step<tgb_uint8>(poly*p,int &pn,slimgb_alg* c);
 template void noro_step<tgb_uint16>(poly*p,int &pn,slimgb_alg* c);
 template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 //std::priority_queue<MonRedRes>
+//
+/* next lines are templates used in new minor code */
+#include <list>
+#include "Minor.h"
+#include "Cache.h"
+template class std::list<int>;
+template class std::list<MinorKey>;
+template class std::list<IntMinorValue>;
+template class std::list<PolyMinorValue>;
+template class Cache<MinorKey, IntMinorValue>;
+template class Cache<MinorKey, PolyMinorValue>;
 #endif
 //template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);
