@@ -174,7 +174,10 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     gms.cc pcv.cc maps_ip.cc\
     walk.cc walk_ip.cc \
     cntrlc.cc misc.cc \
-    calcSVD.cc
+    calcSVD.cc \
+    Minor.cc \
+    MinorProcessor.cc \
+    MinorInterface.cc
 
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
