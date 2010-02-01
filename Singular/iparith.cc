@@ -55,6 +55,7 @@
 #include "tgb.h"
 #include "walkProc.h"
 #include "mod_raw.h"
+#include "MinorInterface.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -316,7 +317,7 @@ cmdnames cmds[] =
   { "maxideal",    0, MAXID_CMD ,         CMD_1},
   { "memory",      0, MEMORY_CMD ,        CMD_1},
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
-  { "minor",       0, MINOR_CMD ,         CMD_23},
+  { "minor",       0, MINOR_CMD ,         CMD_M},
   { "minres",      0, MINRES_CMD ,        CMD_1},
   { "mod",         0, INTMOD_CMD ,        MULDIV_OP},
   { "module",      0, MODUL_CMD ,         MODUL_CMD},
@@ -2552,11 +2553,6 @@ static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
   WerrorS("load(\"libname\" [,\"with\"]);");
   return TRUE;
 }
-static BOOLEAN jjMINOR(leftv res, leftv u, leftv v)
-{
-  res->data = (char *)idMinors((matrix)u->Data(),(int)(long)v->Data());
-  return (res->data==NULL);
-}
 static BOOLEAN jjMODULO(leftv res, leftv u, leftv v)
 {
   intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
@@ -3599,7 +3595,6 @@ struct sValCmd2 dArith2[]=
 ,{jjCALL2MANY, LIST_CMD,       LIST_CMD,       DEF_CMD,    DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjLOAD_E,    LOAD_CMD,       NONE,           STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjRES,       LRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
-,{jjMINOR,     MINOR_CMD,      IDEAL_CMD,      MATRIX_CMD, INT_CMD, NO_PLURAL |ALLOW_RING}
 ,{jjCALL2MANY, MODUL_CMD,      MODUL_CMD,      DEF_CMD,    DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjMODULO,    MODULO_CMD,     MODUL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -5958,11 +5953,159 @@ static BOOLEAN jjJET_ID_M(leftv res, leftv u, leftv v, leftv w)
                                (matrix)v->CopyD());
   return FALSE;
 }
-static BOOLEAN jjMINOR3(leftv res, leftv u, leftv v, leftv w)
+static BOOLEAN currRingIsOverIntegralDomain ()
 {
-  assumeStdFlag(w);
-  res->data = (char *)idMinors(
-                        (matrix)u->Data(),(int)(long)v->Data(),(ideal)w->Data());
+  /* true for fields and Z, false otherwise */
+  if (rField_is_Ring_PtoM()) return FALSE;
+  if (rField_is_Ring_2toM()) return FALSE;
+  if (rField_is_Ring_ModN()) return FALSE;
+  return TRUE;
+}
+static BOOLEAN jjMINOR_M(leftv res, leftv v)
+{
+  /* Here's the use pattern for the minor command:
+        minor ( matrix_expression m, int_expression minorSize,
+                optional ideal_expression IasSB, optional int_expression k,
+                optional string_expression algorithm,
+                optional int_expression cachedMinors,
+                optional int_expression cachedMonomials )
+     This method here assumes that there are at least two arguments.
+     - If IasSB is present, it must be a std basis. All minors will be
+       reduced w.r.t. IasSB.
+     - If k is absent, all non-zero minors will be computed.
+       If k is present and k > 0, the first k non-zero minors will be
+       computed.
+       If k is present and k < 0, the first |k| minors (some of which
+       may be zero) will be computed.
+       If k is present and k = 0, an error is reported.
+     - If algorithm is absent, all the following arguments must be absent too.
+       In this case, a heuristic picks the best-suited algorithm (among
+       Bareiss, Laplace, and Laplace with caching).
+       If algorithm is present, it must be one of "Bareiss", "bareiss",
+       "Laplace", "laplace", "Cache", "cache". In the cases "Cache" and
+       "cache" two more arguments are expected, determining how many entries
+       the cache may have at most, and how many cached monomials there are at
+       most. (Cached monomials are counted over all cached polynomials.)
+  */
+  const matrix m = (const matrix)v->Data();
+  const int mk = (const int)(long)v->next->Data();
+  bool noIdeal = true; bool noK = true; bool noAlgorithm = true;
+  bool noCacheMinors = true; bool noCacheMonomials = true;
+  ideal IasSB; int k; char* algorithm; int cacheMinors; int cacheMonomials;
+  
+  /* here come the different cases of correct argument sets */
+  if ((v->next->next != NULL) && (v->next->next->Typ() == IDEAL_CMD))
+  {
+    IasSB = (ideal)v->next->next->Data();
+    noIdeal = false;
+    if ((v->next->next->next != NULL) && (v->next->next->next->Typ() == INT_CMD))
+    {
+      k = (int)(long)v->next->next->next->Data();
+      noK = false;
+      assume(k != 0);
+      if ((v->next->next->next->next != NULL) && (v->next->next->next->next->Typ() == STRING_CMD))
+      {
+        algorithm = (char*)v->next->next->next->next->Data();
+        noAlgorithm = false;
+        if ((v->next->next->next->next->next != NULL) && (v->next->next->next->next->next->Typ() == INT_CMD))
+        {
+          cacheMinors = (int)(long)v->next->next->next->next->next->Data();
+          noCacheMinors = false;
+          if ((v->next->next->next->next->next->next != NULL) && (v->next->next->next->next->next->next->Typ() == INT_CMD))
+          {
+            cacheMonomials = (int)(long)v->next->next->next->next->next->next->Data();
+            noCacheMonomials = false;
+          }
+        }
+      }
+    }
+  }
+  else if ((v->next->next != NULL) && (v->next->next->Typ() == INT_CMD))
+  {
+    k = (int)(long)v->next->next->Data();
+    noK = false;
+    assume(k != 0);
+    if ((v->next->next->next != NULL) && (v->next->next->next->Typ() == STRING_CMD))
+    {
+      algorithm = (char*)v->next->next->next->Data();
+      noAlgorithm = false;
+      if ((v->next->next->next->next != NULL) && (v->next->next->next->next->Typ() == INT_CMD))
+      {
+        cacheMinors = (int)(long)v->next->next->next->next->Data();
+        noCacheMinors = false;
+        if ((v->next->next->next->next->next != NULL) && (v->next->next->next->next->next->Typ() == INT_CMD))
+        {
+          cacheMonomials = (int)(long)v->next->next->next->next->next->Data();
+          noCacheMonomials = false;
+        }
+      }
+    }
+  }
+  else if ((v->next->next != NULL) && (v->next->next->Typ() == STRING_CMD))
+  {
+    algorithm = (char*)v->next->next->Data();
+    noAlgorithm = false;
+    if ((v->next->next->next != NULL) && (v->next->next->next->Typ() == INT_CMD))
+    {
+      cacheMinors = (int)(long)v->next->next->next->Data();
+      noCacheMinors = false;
+      if ((v->next->next->next->next != NULL) && (v->next->next->next->next->Typ() == INT_CMD))
+      {
+        cacheMonomials = (int)(long)v->next->next->next->next->Data();
+        noCacheMonomials = false;
+      }
+    }
+  }
+  
+  /* upper case conversion for the algorithm if present */
+  if (!noAlgorithm)
+  {
+    if (strcmp(algorithm, "bareiss") == 0)
+      algorithm = "Bareiss";
+    if (strcmp(algorithm, "laplace") == 0)
+      algorithm = "Laplace";
+    if (strcmp(algorithm, "cache") == 0)
+      algorithm = "Cache";
+  }
+
+  /* here come some tests */
+  if ((!noIdeal) && (!hasFlag(v->next->next, FLAG_STD)))
+  {
+    WerrorS("Provided ideal is not a standard basis.");
+    return TRUE;
+  }
+  if ((!noK) && (k == 0))
+  {
+    WerrorS("Provided number of minors to be computed is zero.");
+    return TRUE;
+  }
+  if ((!noAlgorithm) && (strcmp(algorithm, "Bareiss") != 0)
+      && (strcmp(algorithm, "Laplace") != 0) && (strcmp(algorithm, "Cache") != 0))
+  {
+    WerrorS("Expected as algorithm one of 'B/bareiss', 'L/laplace', or 'C/cache'.");
+    return TRUE;
+  }
+  if ((!noAlgorithm) && (strcmp(algorithm, "Bareiss") == 0)
+      && (!currRingIsOverIntegralDomain()))
+  {
+    WerrorS("Bareiss algorithm not defined over coefficient rings with zero divisors.");
+    return TRUE;
+  }
+  if ((!noAlgorithm) && (strcmp(algorithm, "Cache") == 0)
+      && (noCacheMinors || noCacheMonomials))
+  {
+    WerrorS("Expected two more int arguments after algorithm 'C/cache' .");
+    return TRUE;
+  }
+
+  /* here come the actual procedure calls */
+  if (noAlgorithm)
+    res->data = getMinorIdealHeuristic(m, mk, (noK ? 0 : k), (noIdeal ? 0 : IasSB), false);
+  else if (strcmp(algorithm, "Cache") == 0)
+    res->data = getMinorIdealCache(m, mk, (noK ? 0 : k), (noIdeal ? 0 : IasSB), 3, cacheMinors, cacheMonomials, false);
+  else
+    res->data = getMinorIdeal(m, mk, (noK ? 0 : k), algorithm, (noIdeal ? 0 : IasSB), false);
+  res->rtyp = IDEAL_CMD;
   return FALSE;
 }
 static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
@@ -6407,7 +6550,6 @@ struct sValCmd3 dArith3[]=
 ,{jjMATRIX_Id,      MATRIX_CMD, MATRIX_CMD, IDEAL_CMD,  INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjMATRIX_Mo,      MATRIX_CMD, MATRIX_CMD, MODUL_CMD,  INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjMATRIX_Ma,      MATRIX_CMD, MATRIX_CMD, MATRIX_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{jjMINOR3,         MINOR_CMD,  IDEAL_CMD,  MATRIX_CMD, INT_CMD,    IDEAL_CMD, NO_PLURAL |ALLOW_RING}
 ,{jjCALL3MANY,      MODUL_CMD,  MODUL_CMD,  DEF_CMD,    DEF_CMD,    DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
 #ifdef OLD_RES
 ,{jjRES3,           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
@@ -7266,6 +7408,8 @@ struct sValCmdM dArithM[]=
 ,{jjCALL3ARG,  JET_CMD,         POLY_CMD,/*or set by p*/ 3  , ALLOW_PLURAL |ALLOW_RING}
 ,{jjJET4,      JET_CMD,         POLY_CMD,/*or set by p*/ 4  , ALLOW_PLURAL |ALLOW_RING}
 ,{jjLIST_PL,   LIST_CMD,        LIST_CMD,           -1      , ALLOW_PLURAL |ALLOW_RING}
+,{jjWRONG,     MINOR_CMD,       NONE,               1       , ALLOW_PLURAL |ALLOW_RING}
+,{jjMINOR_M,   MINOR_CMD,       IDEAL_CMD,          -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{jjCALL1ARG,  MODUL_CMD,       MODUL_CMD,          1       , ALLOW_PLURAL |ALLOW_RING}
 ,{jjIDEAL_PL,  MODUL_CMD,       MODUL_CMD,          -1      , ALLOW_PLURAL |ALLOW_RING}
 ,{jjCALL1ARG,  NAMES_CMD,       LIST_CMD,            1      , ALLOW_PLURAL |ALLOW_RING}
