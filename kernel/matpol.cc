@@ -50,12 +50,6 @@ static void mpSwapRow(matrix, int, int, int);
 static void mpSwapCol(matrix, int, int, int);
 static void mpElimBar(matrix, matrix, poly, int, int);
 
-#ifdef HAVE_MINOR
-unsigned long SM_MULT_Counter = 0;
-unsigned long SM_DIV_Counter = 0;
-int recursionLevel = 0;
-#endif // HAVE_MINOR
-
 /*2
 * create a r x c zero-matrix
 */
@@ -457,14 +451,6 @@ void mpRecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,
   int kr=lr-1,kc=lc-1;
   matrix nextLevel=mpNew(kr,kc);
 
-#ifdef HAVE_MINOR
-  if (recursionLevel == 0)
-  {
-    SM_MULT_Counter = 0;  // for counting basic operations
-    SM_DIV_Counter = 0;   // for counting basic operations
-  }
-#endif // HAVE_MINOR
-
   loop
   {
 /*--- look for an optimal row and bring it to last position ------------*/
@@ -478,13 +464,7 @@ void mpRecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,
       k--;
       if (ar>1)
       {
-#ifdef HAVE_MINOR
-        recursionLevel++;
-#endif // HAVE_MINOR
         mpRecMin(ar-1,result,elems,nextLevel,kr,k,a->m[kr*a->ncols+k],R);
-#ifdef HAVE_MINOR
-        recursionLevel--;
-#endif // HAVE_MINOR
         mpPartClean(nextLevel,kr,k);
       }
       else mpMinorToResult(result,elems,nextLevel,kr,k,R);
@@ -495,16 +475,6 @@ void mpRecMin(int ar,ideal result,int &elems,matrix a,int lr,int lc,
     lr = kr;
     kr--;
   }
-#ifdef HAVE_MINOR
-  if (recursionLevel == 0)
-  {
-    char h[100];
-    sprintf(h, "%s%lu", "total number of calls to 'SM_MULT': ", SM_MULT_Counter);
-    PrintLn(); PrintS(h);
-    sprintf(h, "%s%lu", "total number of calls to 'SM_DIV': ", SM_DIV_Counter);
-    PrintLn(); PrintS(h); PrintLn();
-  }
-#endif // HAVE_MINOR
   mpFinalClean(nextLevel);
 }
 
@@ -1856,30 +1826,18 @@ static void mpElimBar(matrix a0, matrix re, poly div, int lr, int lc)
         if (a[j] != NULL)
         {
           q1 = SM_MULT(a[j], piv, div);
-#ifdef HAVE_MINOR
-          SM_MULT_Counter++;
-#endif // HAVE_MINOR
           if (ap[j] != NULL)
           {
-            q2 = SM_MULT(ap[j], elim, div);                 
-#ifdef HAVE_MINOR
-          SM_MULT_Counter++;
-#endif // HAVE_MINOR
+            q2 = SM_MULT(ap[j], elim, div);
             q1 = pAdd(q1,q2);
           }
         }
         else if (ap[j] != NULL)
-          q1 = SM_MULT(ap[j], elim, div);                   
-#ifdef HAVE_MINOR
-          SM_MULT_Counter++;
-#endif // HAVE_MINOR
+          q1 = SM_MULT(ap[j], elim, div);
         if (q1 != NULL)
         {
           if (div)
             SM_DIV(q1, div);                                
-#ifdef HAVE_MINOR
-          SM_DIV_Counter++;
-#endif // HAVE_MINOR
           q[j] = q1;
         }
       }
@@ -1890,15 +1848,9 @@ static void mpElimBar(matrix a0, matrix re, poly div, int lr, int lc)
       {
         if (a[j] != NULL)
         {
-          q1 = SM_MULT(a[j], piv, div);                    
-#ifdef HAVE_MINOR
-          SM_MULT_Counter++;
-#endif // HAVE_MINOR
+          q1 = SM_MULT(a[j], piv, div);
           if (div)
             SM_DIV(q1, div);                                
-#ifdef HAVE_MINOR
-          SM_DIV_Counter++;
-#endif // HAVE_MINOR
           q[j] = q1;
         }
       }
