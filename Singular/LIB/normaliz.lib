@@ -3,18 +3,33 @@
 version="$Id$"
 category="Commutative algebra"
 info="
-LIBRARY: normaliz.lib  Provides an interface for the use of Normaliz 2.1 within Singular.
+LIBRARY: normaliz.lib  Provides an interface for the use of Normaliz 2.2 within SINGULAR.
 AUTHORS:  Winfried Bruns, Winfried.Bruns@Uni-Osnabrueck.de
           Christof Soeger, Christof.Soeger@Uni-Osnabrueck.de
 
 OVERVIEW:
-The library normaliz.lib provides an interface for the use of Normaliz 2.1 within Singular. The exchange of data is via files, the only possibility offered by Normaliz in its present version. In addition to the top level functions that aim at objects of type ideal or ring, several other auxiliary functions allow the user to apply Normaliz to data of type intmat. Therefore Singular can be used as a comfortable environment for the work with Normaliz.
-@* Using this library requires the program @code{normliz} to be installed.
- You can download @code{normliz} from
- @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}.
+The library normaliz.lib provides an interface for the use of Normaliz 2.2 within SINGULAR. The exchange of data is via files, the only possibility offered by Normaliz in its present version. In addition to the top level functions that aim at objects of type ideal or ring, several other auxiliary functions allow the user to apply Normaliz to data of type intmat. Therefore SINGULAR can be used as a comfortable environment for the work with Normaliz.
+@* Please see the @code{Normaliz2.2Documentation.pdf} and @code{nmz_sing.pdf} (both are included in the Normaliz distribution) for a more extensive documentation of Normaliz.
+@*
+@*Singular and Normaliz exchange data via files. These files are
+automatically created and erased behind the scenes. As long as one
+wants to use only the ring-theoretic functions there is no need for
+file management.
+@*
+@*Note that the numerical invariants computed by Normaliz can be
+accessed in this \"automatic file mode\".
+@*
+@*However, if Singular is used as a frontend for Normaliz or the user
+wants to inspect data not automatically returned to Singular, then
+an explicit filename and a path can be specified for the exchange of
+data. Moreover, the library provides functions for access to these files.
+Deletion of the files is left to the user.
+@*
+@* Use of this library requires the program Normaliz to be installed.
+You can download it from
+@uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}. Please make sure that the executables are in the search path or use setNmzExecPath (@ref{setNmzExecPath}).
 
-
-NOTE:    These library functions use @code{sed} to transfer the @code{normaliz} output into a SINGULAR compliant format.
+NOTE:    These library functions use @code{sed} to transfer the Normaliz output into a SINGULAR compliant format.
 
 
 KEYWORDS: integral closure; normalization
@@ -35,13 +50,13 @@ PROCEDURES:
   setNmzOption(string s, int onoff) sets the option s to onoff
   showNmzOptions()               prints the enabled options to the standard output
 
-
   normaliz(intmat sgr,int nmz_mode) applies Normaliz
+  setNmzVersion(string nmz_version_name) sets the version of the Normaliz executable
+  setNmzExecPath(string nmz_exec_path_name) sets the path to the Normaliz executable
+
   writeNmzData(intmat sgr, int n_mode) creates an input file for Normaliz
   readNmzData(string nmz_suffix) reads the Normaliz output file with the specified suffix
 
-  setNmzExecPath(string nmz_exec_path_name) sets the path to the Normaliz executable
-  setNmzVersion(string nmz_version_name) sets the version of the Normaliz executable
   setNmzFilename(string nmz_filename_name) sets the filename for the exchange of data
   setNmzDataPath(string nmz_data_path_name) sets the directory for the exchange of data
   writeNmzPaths()                writes the path names into two files
@@ -128,6 +143,7 @@ static proc appendSlash(string s)
 proc setNmzExecPath(string nmz_exec_path_name)
 "USAGE:   setNmzExecPath(string s);   @code{s} path to the Normaliz executable
 CREATE:   @code{Normaliz::nmz_exec_path} to save the given path @code{s}
+NOTE:     It is not necessary to use this function if the Normaliz executable is in the search path of the system.
 SEE ALSO: setNmzVersion
 EXAMPLE:  example setNmzExecPath; shows an example"
 {
@@ -163,7 +179,7 @@ proc setNmzFilename(string nmz_filename_name)
 CREATE:   @code{Normaliz::nmz_filename} to save the given filename @code{s}
 NOTE:     The function sets the filename for the exchange of data. Unless a path is set by setNmzDataPath,
           files will be created in the current directory.
-          @* If a non-empty filename is set, the files created for and by Normaliz are kept. This is mandatory for @ref{writeNmzData} and @ref{readNmzData}.
+          @* If a non-empty filename is set, the files created for and by Normaliz are kept. This is mandatory for the data access functions (see @ref{writeNmzData} and @ref{readNmzData}).
           @* Resetting the filename by setNmzFilename(\"\") forces the library to return to deletion of temporary files, but the files created while the filename had been set will not be erased.
 SEE ALSO: writeNmzData, readNmzData, setNmzDataPath, rmNmzFiles
 EXAMPLE:  example setNmzFilename; shows an example"
@@ -334,7 +350,7 @@ static proc setNmzExec()
 proc rmNmzFiles()
 "USAGE:   rmNmzFiles();
 PURPOSE: This function removes the files created for and by Normaliz, using the last filename specified.
-It needs an explicit filename set by @ref{setNmzFilename}.
+It needs an explicit filename set (see @ref{setNmzFilename}).
 SEE ALSO: writeNmzData, readNmzData, setNmzFilename, setNmzDataPath
 EXAMPLE:  example rmNmzFiles; shows an example
 "{
@@ -344,7 +360,7 @@ EXAMPLE:  example rmNmzFiles; shows an example
         ERROR("rmNmzFiles: no filename specified");
     }
 
-    list suffixes="in","gen","out","sup","typ","egn","esp","inv","tri","hom","ext";
+    list suffixes="in","gen","out","sup","typ","egn","esp","inv","tri","ht1","ext";
     int i,dummy;
     string f;
 
@@ -546,8 +562,8 @@ static proc doWriteNmzData(intmat sgr, int num_cols, n_mode)
 
 proc writeNmzData(intmat sgr, int n_mode)
 "USAGE:   writeNmzData(intmat M, int mode);
-CREATE:   Creates an input file for Normaliz. The rows of @code{M} are considered as the generators of the semigroup. The parameter @code{mode} sets the mode.
-NOTE:     Needs an explicit filename set by @ref{setNmzFilename}. The filename is created from the current  filename and the suffix given to the function.
+CREATE:   Creates an input file for Normaliz from the matrix M. The second parameter sets the mode. How the matrix is interpreted depends on the mode. See the Normaliz documentation for more information.
+NOTE:     Needs an explicit filename set. The filename is created from the current  filename and the suffix given to the function.
    @*     Note that all functions in normaliz.lib write and read their data automatically to and from the hard disk so that writeNmzData will hardly ever be used explicitly.
 SEE ALSO: readNmzData, rmNmzFiles, setNmzFilename, setNmzDataPath
 EXAMPLE:  example writeNmzData; shows an example"
@@ -567,12 +583,12 @@ example
 }
 
 
-proc readNmzData(string nmz_suffix)     //TODO debugoutput wieder rausnehmen
+proc readNmzData(string nmz_suffix)
 "USAGE:   readNmzData(string suffix);
 RETURN:   Reads an output file of Normaliz containing an integer matrix and returns it as an intmat. For example, this function is useful if one wants to inspect the support hyperplanes. The filename is created from the current  filename and the suffix given to the function.
 NOTE:     Needs an explicit filename set by setNmzFilename.
    @*     Note that all functions in normaliz.lib write and read their data automatically so that readNmzData will usually not be used explicitly.
-   @*     This function uses the command sed to transfer the normaliz output into a singular conform format.
+   @*     This function uses the command @code{sed} to transfer the normaliz output into a singular conform format.
 SEE ALSO: writeNmzData, rmNmzFiles, setNmzFilename, setNmzDataPath
 EXAMPLE:  example readNmzData; shows an example"
 {
@@ -588,7 +604,7 @@ EXAMPLE:  example readNmzData; shows an example"
 
     string filename = getNmzFile() + "."+ nmz_suffix;
     string tmpfilename = filename+".tmp";
-//"// ** readNmzData: initialisiert";
+//"// ** readNmzData: initialisiert";    //TODO debugoutput wieder rausnehmen
     returnvalue = system("sh","sed 's/ /,/g' < "+filename+" > "+tmpfilename);
 //"// ** readNmzData: sed ausgefuehrt";
     link in_f=":r "+ tmpfilename;
@@ -643,7 +659,8 @@ static proc defNmzOptions()
         list("dual",0,"-d",1),
         list("control",0,"-c",2),
         list("allf",0,"-a",2),
-        list("ignore",1,"-i",2);
+        list("ignore",1,"-i",2),
+        list("errorcheck",0,"-e",2);
         export(nmz_options);
     }
 }
@@ -661,6 +678,7 @@ The Normaliz options are accessible via the following names:
 @* @code{-a:  allf}
 @* @code{-c:  control}
 @* @code{-i:  ignore}
+@* @code{-e:  errorcheck}
 SEE ALSO: showNmzOptions
 EXAMPLE:  example setNmzOption; shows an example
 "
@@ -769,7 +787,7 @@ proc normaliz(intmat sgr,int nmz_mode)
 "USAGE:   normaliz(intmat sgr,int nmz_mode);
 RETURN:   The function applies Normaliz to the parameter sgr in the mode set by nmz_mode. The
 function returns the intmat defined by the file with suffix gen.
-NOTE:     You will find procedures for many applications in this library, so the explicit call of this procedure may not be necessary.
+NOTE:     You will find procedures for many applications of Normaliz in this library, so the explicit call of this procedure may not be necessary.
 SEE ALSO: intclToricRing, normalToricRing, ehrhartRing, intclMonIdeal, torusInvariants, valRing, valRingIdeal
 EXAMPLE:  example normaliz; shows an example
 "
@@ -890,7 +908,7 @@ example
 
 proc exportNuminvs()
 "USAGE:   exportNuminvs();
-CREATE:   Creates top-level variables which contain the numerical invariants. Depending on the options of normaliz different invariants are calculated. Use @ref{showNuminvs} to see which invariants are available.
+CREATE:   Creates top-level variables which contain the numerical invariants. Depending on the options of normaliz different invariants are calculated. Use showNuminvs (@ref{showNuminvs}) to see which invariants are available.
 SEE ALSO: showNuminvs
 EXAMPLE:  example exportNuminvs; shows an example
 "
@@ -962,7 +980,7 @@ example
 proc intmat2mons(intmat expo_vecs)
 "USAGE:   intmat2mons(intmat M);
 RETURN:   an ideal generated by the monomials which correspond to the exponent vectors given by the rows of @code{M}
-NOTE:     The number of variables in the basering @code{nvars(basering)} has to be at least the number of columns @code{ncols(M)}, otherwise an @ref{ERROR} is omitted
+NOTE:     The number of variables in the basering @code{nvars(basering)} has to be at least the number of columns @code{ncols(M)}, otherwise an error is omitted (see  @ref{ERROR}).
 SEE ALSO: mons2intmat
 EXAMPLE:  example intmat2mons; shows an example
 "
@@ -1044,9 +1062,7 @@ static proc runIntclToricRing(ideal I, int nmz_mode)
 
 proc intclToricRing(ideal I)
 "USAGE:    intclToricRing(ideal I);
-RETURN:    Computes the integral closure of the toric ring generated by the leading monomials of the
-elements of @code{I} in the basering. The function returns an ideal listing the generators of the
-integral closure.
+RETURN:    Let S be the toric ring generated by the leading monomials of the elements of I. The function computes the integral closure of S in the basering and returns an ideal listing the generators.
 @*         The function returns nothing if one of the options @code{supp}, @code{triang}, or @code{hvect} has been activated. However, in this case some numerical invariants are computed, and some other data may be contained in files that you can read into Singular (see @ref{showNuminvs}, @ref{exportNuminvs}).
 NOTE:     A mathematical remark: the toric ring depends on the list of monomials given, and not only on the ideal they generate!
 SEE ALSO:  normalToricRing, ehrhartRing, intclMonIdeal
@@ -1064,7 +1080,7 @@ example
 
 proc normalToricRing(ideal I)
 "USAGE:    normalToricRing(ideal I);
-RETURN:    Computes the normalization of the toric ring generated by the leading monomials of the elements of @code{I}. The function returns an ideal listing the generators of the normalization.
+RETURN:    Computes the normalization of the toric ring generated by the leading monomials of the elements of I. The function returns an ideal listing the generators of the normalization.
 @*         The function returns nothing if one of the options @code{supp}, @code{triang}, or @code{hvect} has been activated. However, in this case some numerical invariants are computed, and some other data may be contained in files that you can read into Singular (see @ref{showNuminvs}, @ref{exportNuminvs}).
 NOTE:     A mathematical remark: the toric ring depends on the list of monomials given, and not only on the ideal they generate!
 SEE ALSO: intclToricRing, ehrhartRing, intclMonIdeal
@@ -1120,7 +1136,7 @@ static proc runIntclMonIdeal(ideal I, int nmz_mode)
 
 proc ehrhartRing(ideal I)
 "USAGE:    ehrhartRing(ideal I);
-RETURN:    The exponent vectors of the leading monomials of the elements of @code{I} are considered as generators of a lattice polytope. The function returns a list of ideals:
+RETURN:    The exponent vectors of the leading monomials of the elements of I are considered as verices of a lattice polytope. The function returns a list of ideals:
 @*         (i) If the last ring variable is not used by the monomials, it is treated as the auxiliary variable
 of the Ehrhart ring. The function returns two ideals, the first containing the monomials representing the lattice points of the polytope, the second containing the generators of the Ehrhart ring.
 @*         (ii) If the last ring variable is used by the monomials, the list returned contains only one ideal,
@@ -1143,16 +1159,12 @@ example
 
 proc intclMonIdeal(ideal I)
 "USAGE:   intclMonIdeal(ideal I);
-RETURN:   The exponent vectors of the leading monomials of the elements of @code{I} are considered as generators of a monomial ideal whose Rees algebra is computed. The function returns a list of
+RETURN:   The exponent vectors of the leading monomials of the elements of I are considered as generators of a monomial ideal for which the normalization of its Rees algebra is computed. The function returns a list of
 ideals:
-@* (i) If the last ring variable is not used by the monomials, it is treated as the auxiliary variable of
-the Rees algebra. The function returns two ideals, the first containing the monomials generating
-the integral closure of the monomial ideal, the second containing the generators of the Rees
-algebra.
-@* (ii) If the last ring variable is used by the monomials, the list returned contains only one ideal,
-namely the monomials generating the integral closure of the ideal.
+@* (i) If the last ring variable is not used by the monomials, it is treated as the auxiliary variable of the Rees algebra. The function returns two ideals, the first containing the monomials generating the integral closure of the monomial ideal, the second containing the generators of the normalization Rees algebra.
+@* (ii) If the last ring variable is used by the monomials, the list returned contains only one ideal, namely the monomials generating the integral closure of the ideal.
 @*         The function returns nothing if one of the options @code{supp}, @code{triang}, or @code{hvect} has been activated. However, in this case some numerical invariants are computed, and some other data may be contained in files that you can read into Singular (see @ref{showNuminvs}, @ref{exportNuminvs}).
-NOTE:     A mathematical remark: the toric ring depends on the list of monomials given, and not only on the ideal they generate!
+NOTE:     A mathematical remark: the Rees algebra depends on the list of monomials given, and not only on the ideal they generate!
 SEE ALSO: intclToricRing, normalToricRing, ehrhartRing
 EXAMPLE:  example intclMonIdeal; shows an example
 "
@@ -1343,3 +1355,5 @@ example
  intmat V[2][5]=0,1,2,3,4, -1,1,2,1,3;
  valRingIdeal(V);
 }
+
+
