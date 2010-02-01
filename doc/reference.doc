@@ -4610,7 +4610,7 @@ disables the regularity bound for @code{res} and @code{mres} (see
 @c ---------
 @item @code{notSugar}
 @cindex notSugar, option
-disables the sugar strategy during standard basis computation.
+turns off sugar strategy during standard basis computation and reduction.
 @anchor{option(prot)}
 @c ---------
 @item @code{notBuckets}
@@ -4667,7 +4667,8 @@ orderings and not set for all other rings.
 @c ---------
 @item @code{sugarCrit}
 @cindex sugarCrit, option
-uses criteria similar to the homogeneous case to keep more useless pairs.
+uses criteria similar to the homogeneous case to keep more pairs which would be
+excluded by other criteria but which may be useful for downstream computations.
 @c ---------
 @item @code{weightM}
 @cindex weightM, option
@@ -4683,25 +4684,25 @@ avoids to divide polynomials by non-constant units in @code{std} in the local ca
 avoids to divide by the content of a polynomial in @code{std} and related
 algorithms. Should usually not be used.
 @c ---------
-@item @code{modpsolve}
-@cindex modpsolve, option
-used by @code{slimgb}. undocumented.
-Should usually not be used.
+@c @item @code{modpsolve}
+@c @cindex modpsolve, option
+@c used by @code{slimgb}. undocumented.
+@c Should usually not be used.
 @c ---------
-@item @code{geometricSB}
-@cindex geometricSB, option
-used by @code{slimgb}. undocumented.
-Should usually not be used.
+@c @item @code{geometricSB}
+@c @cindex geometricSB, option
+@c used by @code{slimgb}. undocumented.
+@c Should usually not be used.
 @c ---------
-@item @code{findMonomials}
-@cindex findMonomials, option
-used by @code{slimgb}. undocumented.
-Should usually not be used.
+@c @item @code{findMonomials}
+@c @cindex findMonomials, option
+@c used by @code{slimgb}. undocumented.
+@c Should usually not be used.
 @c ---------
-@item @code{coefStrat}
-@cindex coefStrat, option
-used by @code{slimgb}. undocumented.
-Should usually not be used.
+@c @item @code{coefStrat}
+@c @cindex coefStrat, option
+@c used by @code{slimgb}. undocumented.
+@c Should usually not be used.
 @c ---------
 @end table
 @*
