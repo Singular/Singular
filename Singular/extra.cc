@@ -2108,6 +2108,29 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
 #endif
+/*==================== changeRing ========================*/
+      /* The following code changes the names of the variables in the
+         current ring to "x1", "x2", ..., "xN", where N is the number
+         of variables in the current ring.
+         The purpose of this rewriting is to eliminate indexed variables,
+         as they may cause problems when generating scripts for Magma,
+         Maple, or Macaulay2. */
+      if(strcmp(sys_cmd,"changeRing")==0)
+      {
+        int varN = currRing->N;
+        char h[10];
+        for (int i = 1; i <= varN; i++)
+        {
+          omFree(currRing->names[i - 1]);
+          sprintf(h, "x%d", i);
+          currRing->names[i - 1] = omStrDup(h);
+        }
+        rComplete(currRing);
+        res->rtyp = INT_CMD;
+        res->data = 0;
+        return FALSE;
+      }
+      else
 /*==================== generic debug ==================================*/
 #ifdef PDEBUG
       if(strcmp(sys_cmd,"DetailedPrint")==0)
