@@ -125,9 +125,7 @@ struct omBin_s;
 #endif
 
 extern omBin_s* sip_command_bin;
-extern omBin_s* ip_command_bin;
 extern omBin_s* sip_package_bin;
-//extern omBin_s* ip_package_bin;
 extern omBin_s* idrec_bin;
 #endif
 

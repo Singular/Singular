@@ -329,7 +329,7 @@ void sleftv::CleanUp(ring r)
         if (cmd->arg1.rtyp!=0) cmd->arg1.CleanUp();
         if (cmd->arg2.rtyp!=0) cmd->arg2.CleanUp();
         if (cmd->arg3.rtyp!=0) cmd->arg3.CleanUp();
-        omFreeBin((ADDRESS)data, ip_command_bin);
+        omFreeBin((ADDRESS)data, sip_command_bin);
         break;
       }
       case RESOLUTION_CMD:
