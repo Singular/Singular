@@ -5990,21 +5990,27 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   matrix m;
   leftv u=v->next;
   v->next=NULL;
-  if (v->Typ()==MATRIX_CMD)
+  int v_typ=v->Typ();
+  if (v_typ==MATRIX_CMD)
   {
      m = (const matrix)v->Data();
   }
   else
   {
+    if (v_typ==0)
+    {
+      Werror("`%s` is undefined",v->Fullname());
+      return TRUE;
+    }
     // try to convert to MATRIX:
-    int ii=iiTestConvert(v->Typ(),MATRIX_CMD);
+    int ii=iiTestConvert(v_typ,MATRIX_CMD);
     BOOLEAN bo;
     sleftv tmp;
-    if (ii>0) bo=iiConvert(v->Typ(),MATRIX_CMD,ii,v,&tmp);
+    if (ii>0) bo=iiConvert(v_typ,MATRIX_CMD,ii,v,&tmp);
     else bo=TRUE;
     if (bo)
     { 
-      Werror("cannot convert %s to matrix",Tok2Cmdname(v->Typ()));
+      Werror("cannot convert %s to matrix",Tok2Cmdname(v_typ));
       return TRUE;
     }
     m=(matrix)tmp.data;
@@ -6126,6 +6132,7 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     res->data = getMinorIdealCache(m, mk, (noK ? 0 : k), (noIdeal ? 0 : IasSB), 3, cacheMinors, cacheMonomials, false);
   else
     res->data = getMinorIdeal(m, mk, (noK ? 0 : k), algorithm, (noIdeal ? 0 : IasSB), false);
+  if (v_typ!=MATRIX_CMD) idDelete((ideal *)&m);
   res->rtyp = IDEAL_CMD;
   return FALSE;
 }
