@@ -8085,7 +8085,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
     if (siq>0)
     {
       //Print("siq:%d\n",siq);
-      command d=(command)omAlloc0Bin(ip_command_bin);
+      command d=(command)omAlloc0Bin(sip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
       //a->Init();
       memcpy(&d->arg2,b,sizeof(sleftv));
@@ -8295,7 +8295,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     if (siq>0)
     {
       //Print("siq:%d\n",siq);
-      command d=(command)omAlloc0Bin(ip_command_bin);
+      command d=(command)omAlloc0Bin(sip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
       //a->Init();
       d->op=op;
@@ -8472,7 +8472,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
     if (siq>0)
     {
       //Print("siq:%d\n",siq);
-      command d=(command)omAlloc0Bin(ip_command_bin);
+      command d=(command)omAlloc0Bin(sip_command_bin);
       memcpy(&d->arg1,a,sizeof(sleftv));
       //a->Init();
       memcpy(&d->arg2,b,sizeof(sleftv));
@@ -8679,7 +8679,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
     if (siq>0)
     {
       //Print("siq:%d\n",siq);
-      command d=(command)omAlloc0Bin(ip_command_bin);
+      command d=(command)omAlloc0Bin(sip_command_bin);
       d->op=op;
       res->data=(char *)d;
       if (a!=NULL)
