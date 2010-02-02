@@ -1,4 +1,4 @@
-#####################################################################
+####################################################################
 ###
 ### Makefile for Singular documentation
 ### $Id$
@@ -134,7 +134,9 @@ dvi: manual.dvi usercard.dvi
 
 singular.dvi: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
 	tex singular.tex
+	texindex singular.cp
 	tex singular.tex
+	texindex singular.cp
 	tex singular.tex
 
 singular.pdf: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
@@ -142,7 +144,9 @@ singular.pdf: ${MANUAL_FILES} singular.tex s-plural.tex s-plulibs.tex
 
 manual.dvi: ${MANUAL_FILES} manual.tex s-plural.tex s-plulibs.tex
 	tex manual.tex
+	texindex manual.cp
 	tex manual.tex
+	texindex manual.cp
 	tex manual.tex
 
 tutor.dvi: ${TUTOR_FILES}
