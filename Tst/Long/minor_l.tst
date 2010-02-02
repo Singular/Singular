@@ -17,7 +17,6 @@ ideal j=v2x2+xyz2w,vx2y+y2z2w,v2yz+z2w2x,v2zw+wx2y2;
 matrix A=jacob(j);
 ideal i=minor(A,3);
 i;
-ideal B[1][1];
-minor(B,1);
-minor(B,2);
+minor(A,1);
+minor(A,2);
 tst_status(1);$
