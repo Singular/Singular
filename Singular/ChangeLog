@@ -1,3 +1,10 @@
+Changes w.r.t 3-1-0-9:
+- options reorganized, defines moved to new file options.h
+- new minor code
+- new install target: install_all
+  (install does not include profiling stuff any more)
+- updated: doc w.r.t. option(...)
+
 Changes w.r.t 3-1-0-8:
 - 3-1-0-9: Mon Jan 25 13:47:50 CET 2010
 - NTL 5.5.2

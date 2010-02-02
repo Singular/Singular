@@ -8,6 +8,7 @@ AUTHORS:  Winfried Bruns, Winfried.Bruns@Uni-Osnabrueck.de
           Christof Soeger, Christof.Soeger@Uni-Osnabrueck.de
 
 OVERVIEW:
+@texinfo
 The library normaliz.lib provides an interface for the use of Normaliz 2.2 within SINGULAR. The exchange of data is via files, the only possibility offered by Normaliz in its present version. In addition to the top level functions that aim at objects of type ideal or ring, several other auxiliary functions allow the user to apply Normaliz to data of type intmat. Therefore SINGULAR can be used as a comfortable environment for the work with Normaliz.
 @* Please see the @code{Normaliz2.2Documentation.pdf} and @code{nmz_sing.pdf} (both are included in the Normaliz distribution) for a more extensive documentation of Normaliz.
 @*
@@ -25,9 +26,12 @@ an explicit filename and a path can be specified for the exchange of
 data. Moreover, the library provides functions for access to these files.
 Deletion of the files is left to the user.
 @*
-@* Use of this library requires the program Normaliz to be installed.
+@*
+Use of this library requires the program Normaliz to be installed.
 You can download it from
-@uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}. Please make sure that the executables are in the search path or use setNmzExecPath (@ref{setNmzExecPath}).
+@uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}.
+Please make sure that the executables are in the search path or use setNmzExecPath (@ref{setNmzExecPath}).
+@end texinfo
 
 NOTE:    These library functions use @code{sed} to transfer the Normaliz output into a SINGULAR compliant format.
 
