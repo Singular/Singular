@@ -87,7 +87,7 @@ bool arrayIsNumberArray (const poly* polyArray, const ideal& iSB, const int leng
    declared */
 ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount, const int columnCount,
                          const int minorSize, const int k, const char* algorithm,
-                         const ideal& i, const bool allDifferent)
+                         const ideal i, const bool allDifferent)
 {
   /* setting up a MinorProcessor for matrices with integer entries: */
   IntMinorProcessor mp;
@@ -135,7 +135,7 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount, const int col
    and the poly matrix is assumed to be already reduced w.r.t. i */
 ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount, const int columnCount,
                           const int minorSize, const int k, const char* algorithm,
-                          const ideal& i, const bool allDifferent)
+                          const ideal i, const bool allDifferent)
 {
   /* setting up a MinorProcessor for matrices with polynomial entries: */
   PolyMinorProcessor mp;
@@ -176,7 +176,7 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount, const int 
 }
 
 ideal getMinorIdeal_toBeDone (const matrix& mat, const int minorSize, const int k,
-                              const char* algorithm, const ideal& i, const bool allDifferent)
+                              const char* algorithm, const ideal i, const bool allDifferent)
 {
   int rowCount = mat->nrows;
   int columnCount = mat->ncols;
@@ -221,8 +221,8 @@ ideal getMinorIdeal_toBeDone (const matrix& mat, const int minorSize, const int 
    (other than 0).
    E.g. Bareiss may be used over fields or over Z but not over
         Z/6 (which has non-zero zero divisors, namely 2 and 3). */
-ideal getMinorIdeal (const matrix& mat, const int minorSize, const int k,
-                     const char* algorithm, const ideal& iSB, const bool allDifferent)
+ideal getMinorIdeal (const matrix mat, const int minorSize, const int k,
+                     const char* algorithm, const ideal iSB, const bool allDifferent)
 {
   /* Note that this method should be replaced by getMinorIdeal_toBeDone,
      to enable faster computations in the case of matrices which contain
@@ -369,7 +369,7 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount, const 
   return jjj;
 }
 
-ideal getMinorIdealCache_toBeDone (const matrix& mat, const int minorSize, const int k,
+ideal getMinorIdealCache_toBeDone (const matrix mat, const int minorSize, const int k,
                                    const ideal& iSB, const int cacheStrategy,
                                    const int cacheN, const int cacheW,
                                    const bool allDifferent)
@@ -396,8 +396,8 @@ ideal getMinorIdealCache_toBeDone (const matrix& mat, const int minorSize, const
   return iii;
 }
 
-ideal getMinorIdealCache (const matrix& mat, const int minorSize, const int k,
-                          const ideal& iSB, const int cacheStrategy,
+ideal getMinorIdealCache (const matrix mat, const int minorSize, const int k,
+                          const ideal iSB, const int cacheStrategy,
                           const int cacheN, const int cacheW,
                           const bool allDifferent)
 {
@@ -430,8 +430,8 @@ ideal getMinorIdealCache (const matrix& mat, const int minorSize, const int k,
   return iii;
 }
 
-ideal getMinorIdealHeuristic (const matrix& mat, const int minorSize, const int k,
-                              const ideal& iSB, const bool allDifferent)
+ideal getMinorIdealHeuristic (const matrix mat, const int minorSize, const int k,
+                              const ideal iSB, const bool allDifferent)
 {
   int vars = 0; if (currRing != 0) vars = currRing->N;
   int rowCount = mat->nrows;

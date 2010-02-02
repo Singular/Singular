@@ -18,15 +18,15 @@
    if an algorithm is provided, it must be one of "Bareiss" or
    "Laplace"; when a cache is used, the underlying algorithm
    is automatically Laplace */
-ideal getMinorIdeal          (const matrix& m, const int minorSize, const int k,
-                              const char* algorithm, const ideal& i,
+ideal getMinorIdeal          (const matrix m, const int minorSize, const int k,
+                              const char* algorithm, const ideal i,
                               const bool allDifferent);
-ideal getMinorIdealCache     (const matrix& m, const int minorSize, const int k,
-                              const ideal& i, const int cacheStrategy,
+ideal getMinorIdealCache     (const matrix m, const int minorSize, const int k,
+                              const ideal i, const int cacheStrategy,
                               const int cacheN, const int cacheW,
                               const bool allDifferent);
-ideal getMinorIdealHeuristic (const matrix& m, const int minorSize, const int k,
-                              const ideal& i, const bool allDifferent);
+ideal getMinorIdealHeuristic (const matrix m, const int minorSize, const int k,
+                              const ideal i, const bool allDifferent);
 
 #endif
 /* MINOR_INTERFACE_H */
