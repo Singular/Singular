@@ -1061,6 +1061,7 @@ char *yytext;
   #include "utils.h"
   #define HAVE_LIBPARSER
   #define YYLPDEBUG 1
+  #define myfread fread
 #else
   #include "subexpr.h"
   #include "grammar.h"
