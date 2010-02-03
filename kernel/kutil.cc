@@ -693,7 +693,8 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
     pFalseReturn(p_Test(T->p, currRing));
   }
 
-  if (i >= 0 && T->pLength != 0 && T->pLength != pLength(p))
+  if (i >= 0 && T->pLength != 0 
+  && ! rIsSyzIndexRing(currRing) && T->pLength != pLength(p))
   {
     int l=T->pLength;
     T->pLength=pLength(p);
@@ -5645,7 +5646,7 @@ void enterT(LObject p, kStrategy strat, int atT)
   assume(strat->tailRing == p.tailRing);
   // redMoraNF complains about this -- but, we don't really
   // neeed this so far
-  assume(p.pLength == 0 || pLength(p.p) == p.pLength);
+  assume(p.pLength == 0 || pLength(p.p) == p.pLength || rIsSyzIndexRing(currRing)); // modulo syzring
   assume(p.FDeg == p.pFDeg());
   assume(!p.is_normalized || nIsOne(pGetCoeff(p.p)));
 
