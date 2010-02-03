@@ -75,11 +75,8 @@ FILE *myfopen(const char *path, const char *mode);
 #else
 #define myfopen fopen
 #endif
-#ifdef STANDALONE_PARSER
-#define myfread fread
-#else
+
 size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-#endif
 
 enum noeof_t
 {
