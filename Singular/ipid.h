@@ -88,9 +88,12 @@ lists ipNameList(idhdl root);
 void  ipMoveId(idhdl h);
 BOOLEAN checkPackage(package pack);
 idhdl packFindHdl(package r);
+void jjNormalizeQRingId(leftv I);
+void jjNormalizeQRingP(leftv I);
 
 #define FLAG_STD   0
 #define FLAG_TWOSTD  3
+#define FLAG_QRING   4
 #define hasFlag(A,F) Sy_inset((F),(A)->flag)
 #define setFlag(A,F) (A)->flag|=Sy_bit(F)
 #define resetFlag(A,F) (A)->flag&=~Sy_bit(F)

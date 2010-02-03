@@ -261,7 +261,12 @@ BOOLEAN atATTRIB1(leftv res,leftv a)
     PrintS("attr:isSB, type int\n");
     haveNoAttribute=FALSE;
   }
-  else if (((t=v->Typ())==RING_CMD)||(t==QRING_CMD))
+  if (hasFlag(v,FLAG_QRING))
+  {
+    PrintS("attr:qringNF, type int\n");
+    haveNoAttribute=FALSE;
+  }
+  if (((t=v->Typ())==RING_CMD)||(t==QRING_CMD))
   {
     PrintS("attr:global, type int\n");
     haveNoAttribute=FALSE;
@@ -295,6 +300,11 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(((ring)v->Data())->OrdSgn==1);
+  }
+  else if (strcmp(name,"qringNF")==0)
+  {
+    res->rtyp=INT_CMD;
+    res->data=(void *)(long)hasFlag(v,FLAG_QRING);
   }
 #ifdef HAVE_SHIFTBBA
   else if ((strcmp(name,"isLPring")==0)
@@ -349,6 +359,24 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
     {
       if (h!=NULL) resetFlag(h,FLAG_STD);
       resetFlag(v,FLAG_STD);
+    }
+  }
+  else if (strcmp(name,"qringNF")==0)
+  {
+    if (c->Typ()!=INT_CMD)
+    {
+      WerrorS("attribute qringNF must be int");
+      return TRUE;
+    }
+    if (((long)c->Data())!=0L)
+    {
+      if (h!=NULL) setFlag(h,FLAG_QRING);
+      setFlag(v,FLAG_QRING);
+    }
+    else
+    {
+      if (h!=NULL) resetFlag(h,FLAG_QRING);
+      resetFlag(v,FLAG_QRING);
     }
   }
   else if ((strcmp(name,"rank")==0)&&(v->Typ()==MODUL_CMD))

@@ -209,7 +209,7 @@ int main(          /* main entry to Singular */
     currPackHdl=h;
     basePackHdl=h;
   }
-  if (BVERBOSE(0))
+  if (TEST_V_QUIET)
   {
     (printf)(
 "                     SINGULAR                             /"

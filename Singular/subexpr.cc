@@ -121,13 +121,24 @@ void sleftv::Print(leftv store, int spaces)
         case MATRIX_CMD:
           iiWriteMatrix((matrix)d,n,2,spaces);
           break;
-        case MAP_CMD:
         case MODUL_CMD:
         case IDEAL_CMD:
+          if ((TEST_V_QRING)  &&(currQuotient!=NULL))
+          {
+            jjNormalizeQRingId(this);
+            d=Data();
+          }
+          // no break:
+        case MAP_CMD:
           iiWriteMatrix((matrix)d,n,1,spaces);
           break;
         case POLY_CMD:
         case VECTOR_CMD:
+          if ((TEST_V_QRING)  &&(currQuotient!=NULL))
+          {
+            jjNormalizeQRingP(this);
+            d=Data();
+          }
           PrintNSpaces(spaces);
           pWrite0((poly)d);
           break;

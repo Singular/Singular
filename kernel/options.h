@@ -32,6 +32,7 @@ extern BITSET verbose;
 ** defines for BITSETs
 */
 
+#define V_QUIET       0
 #define V_QRING       1
 #define V_SHOW_MEM    2
 #define V_YACC        3
@@ -113,6 +114,7 @@ extern BITSET verbose;
 #define TEST_OPT_LENGTH            BVERBOSE(V_LENGTH)
 #define TEST_V_QRING               BVERBOSE(V_QRING)
 #define TEST_V_NSB                 BVERBOSE(V_NSB)
+#define TEST_V_QUIET               BVERBOSE(V_QUIET)
 
 #define TEST_VERB_NSB              BVERBOSE(V_NSB)
 #define TEST_V_DEG_STOP            BVERBOSE(V_DEG_STOP)

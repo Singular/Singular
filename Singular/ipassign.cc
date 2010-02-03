@@ -358,6 +358,7 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
       m->rank=si_max(m->rank,pMaxComp(p));
     }
   }
+  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingP(res);
   return FALSE;
 }
 static BOOLEAN jiA_1x1MATRIX(leftv res, leftv a,Subexpr e)
@@ -461,6 +462,7 @@ static BOOLEAN jiA_IDEAL(leftv res, leftv a, Subexpr e)
   {
     setFlag(res,FLAG_STD);
   }
+  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingId(res);
   return FALSE;
 }
 static BOOLEAN jiA_RESOLUTION(leftv res, leftv a, Subexpr e)
@@ -478,6 +480,7 @@ static BOOLEAN jiA_MODUL_P(leftv res, leftv a, Subexpr e)
   if (I->m[0]!=NULL) pSetCompP(I->m[0],1);
   pNormalize(I->m[0]);
   res->data=(void *)I;
+  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingId(res);
   return FALSE;
 }
 static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
@@ -489,6 +492,7 @@ static BOOLEAN jiA_IDEAL_M(leftv res, leftv a, Subexpr e)
   MATROWS(m)=1;
   idNormalize((ideal)m);
   res->data=(void *)m;
+  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingId(res);
   return FALSE;
 }
 static BOOLEAN jiA_LINK(leftv res, leftv a, Subexpr e)
@@ -967,6 +971,7 @@ static BOOLEAN jiA_VECTOR_L(leftv l,leftv r)
   idDelete(&I);
   l1->CleanUp();
   r->CleanUp();
+  //if ((TEST_V_QRING) && (currQuotient!=NULL)) jjNormalizeQRingP(l);
   return FALSE;
 }
 static BOOLEAN jjA_L_LIST(leftv l, leftv r)
@@ -1615,6 +1620,68 @@ BOOLEAN iiAssign(leftv l, leftv r)
   if (nok && (!errorreported)) WerrorS("incompatible type in list assignment");
   r->CleanUp();
   return nok;
+}
+void jjNormalizeQRingId(leftv I)
+{
+  if ((currQuotient!=NULL) && (!hasFlag(I,FLAG_QRING)))
+  {
+    if (I->e==NULL)
+    {
+      ideal F=idInit(1,1);
+      ideal I0=(ideal)I->Data();
+      ideal II=kNF(F,currQuotient,I0);
+      idDelete(&F);
+      if ((I->rtyp==IDEAL_CMD) 
+      || (I->rtyp==MODUL_CMD)
+      )
+      {
+        idDelete((ideal*)&(I0));
+        I->data=II;
+      }
+      else if (I->rtyp==IDHDL)
+      {
+        idhdl h=(idhdl)I->data;
+        idDelete((ideal*)&IDIDEAL(h));
+        IDIDEAL(h)=II;
+        setFlag(h,FLAG_QRING);
+      }
+      else
+      {
+        idDelete(&II);
+      }
+      setFlag(I,FLAG_QRING);
+    }
+  }
+}
+void jjNormalizeQRingP(leftv I)
+{
+  if ((currQuotient!=NULL) && (!hasFlag(I,FLAG_QRING)))
+  {
+    if (I->e==NULL)
+    {
+      ideal F=idInit(1,1);
+      poly II=kNF(F,currQuotient,(poly)I->Data());
+      idDelete(&F);
+      if ((I->rtyp==POLY_CMD) 
+      || (I->rtyp==VECTOR_CMD))
+      {
+        pDelete((poly*)&(I->data));
+        I->data=II;
+      }
+      else if (I->rtyp==IDHDL)
+      {
+        idhdl h=(idhdl)I->data;
+        pDelete((poly*)&IDPOLY(h));
+	IDPOLY(h)=II;
+        setFlag(h,FLAG_QRING);
+      }
+      else
+      {
+        pDelete(&II);
+      }
+      setFlag(I,FLAG_QRING);
+    }
+  }
 }
 BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v)
 {

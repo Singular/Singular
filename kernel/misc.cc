@@ -77,7 +77,7 @@ void m2_end(int i)
     #ifdef HAVE_TCL
     if (!tclmode)
     #endif
-      if (BVERBOSE(0))
+      if (TEST_V_QUIET)
       {
         if (i==0)
           printf("Auf Wiedersehen.\n");
