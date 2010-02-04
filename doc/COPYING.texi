@@ -14,13 +14,15 @@
 @cindex libfac
 @cindex surfex
 @cindex surfer
+@cindex graphviz
+@cindex normaliz
 
 @center @sc{Singular} version @value{VERSION}
 @center @uref{http://www.uni-kl.de/,,University of Kaiserslautern}
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
 @center Authors: @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
-@center Copyright @copyright{} 1986-2009
+@center Copyright @copyright{} 1986-2010
 @sp 2
 @center @strong{NOTICE}
 
@@ -99,14 +101,6 @@ anonymous ftp through the following addresses:
 @item Singular-libfac
 @copyright{}  Messollen, University of Saarbr@"ucken:
 @* @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/Libfac}
-@item surfex
-@copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
-@* @uref{http://surfex.AlgebraicSurface.net}
-@item surf
-@copyright{} Stephan Endrass
-@* @uref{http://surf.sf.net}
-@item surfer
-@* @uref{http://www.imaginary2008.de/surfer.php}
 @item @sc{Singular} binaries and sources
 @uref{ftp://www.mathematik.uni-kl.de/pub/Math/Singular/} or via a
 WWW brow@-ser from
@@ -115,6 +109,24 @@ WWW brow@-ser from
 @uref{http://www.cygwin.com/}
 @item Xemacs
 @uref{http://www.xemacs.org}
+@end table
+Some external programs are optional:
+@table @asis
+@item surfex (used by surfex.lib, @pxref{surfex_lib})
+@copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
+@* @uref{http://surfex.AlgebraicSurface.net}
+@item surf (used by surf.lib, @pxref{surf_lib})
+@copyright{} Stephan Endrass
+@* @uref{http://surf.sf.net}
+@item surfer (used by surf.lib, @pxref{surf_lib})
+@uref{http://www.imaginary2008.de/surfer.php}
+@item graphviz (used by resgraph.lib, @pxref{resgraph_lib})
+@uref{http://www.graphviz.org/}
+@item normaliz (used by normaliz.lib, @pxref{normaliz_lib})
+@copyright{} Winfried Bruns and Bogdan Ichim
+@* @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}
+@item 4ti2 (used by sing4ti2.lib, @pxref{sing4ti2_lib})
+@uref{http://www.4ti2.de/}
 @end table
 @end ifset
 
