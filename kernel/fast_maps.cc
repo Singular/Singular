@@ -452,11 +452,13 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
   int e;
   poly p=NULL;
   poly pp;
+  BOOLEAN is_const=TRUE; // to check for zero-div in p_Mult_q
   for(i=1;i<=src_r->N;i++)
   {
     e=p_GetExp(src,i,src_r);
     if (e>0)
     {
+      is_const=FALSE;
       pp=dest_id[i-1];
       if (pp==NULL)
       {
@@ -475,7 +477,11 @@ static poly maPoly_EvalMon(poly src, ring src_r, poly* dest_id, ring dest_r)
       }
     }
   }
-  if (p==NULL) p=p_ISet(1,dest_r);
+  if (is_const)
+  { 
+    assume(p==NULL);
+    p=p_ISet(1,dest_r);
+  }
   return p;
 }
 
