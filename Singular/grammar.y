@@ -260,6 +260,7 @@ void yyerror(const char * fmt)
 %token <i> MINOR_CMD
 %token <i> MINRES_CMD
 %token <i> MODULO_CMD
+%token <i> MONOM_CMD
 %token <i> MRES_CMD
 %token <i> MULTIPLICITY_CMD
 %token <i> ORD_CMD

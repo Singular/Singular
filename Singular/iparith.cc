@@ -323,6 +323,7 @@ cmdnames cmds[] =
   { "module",      0, MODUL_CMD ,         MODUL_CMD},
   { "modulo",      0, MODULO_CMD ,        CMD_2},
   { "monitor",     0, MONITOR_CMD ,       CMD_12},
+  { "monom",       0, MONOM_CMD ,         CMD_1},
   { "mpresmat",    0, MPRES_CMD,          CMD_2},
   { "mult",        0, MULTIPLICITY_CMD ,  CMD_1},
   #ifdef OLD_RES
@@ -2668,6 +2669,24 @@ static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
     monitor(NULL,0);
   return FALSE;
 #endif
+}
+static BOOLEAN jjMONOM(leftv res, leftv v)
+{
+  intvec *iv=(intvec *)v->Data();
+  poly p=pOne();
+  int i;
+  for(i=si_min(pVariables,iv->length()); i>0; i--)
+  {
+    pSetExp(p,i,(*iv)[i-1]);
+  }
+  if (iv->length()==(pVariables+1))
+  {
+    res->rtyp=VECTOR_CMD;
+    pSetComp(p,(*iv)[pVariables]);
+  }
+  pSetm(p);
+  res->data=(char*)p;
+  return FALSE;
 }
 static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 {
@@ -5388,6 +5407,7 @@ struct sValCmd1 dArith1[]=
 ,{jjMINRES_R,   MINRES_CMD,      RESOLUTION_CMD, RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjDUMMY,      MODUL_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{jjMONITOR1,   MONITOR_CMD,     NONE,           LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
+,{jjMONOM,      MONOM_CMD,       POLY_CMD,       INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{jjMULT,       MULTIPLICITY_CMD,  INT_CMD,      IDEAL_CMD     , NO_PLURAL |ALLOW_RING}
 ,{jjMULT,       MULTIPLICITY_CMD,  INT_CMD,      MODUL_CMD     , NO_PLURAL |ALLOW_RING}
 ,{jjMSTD,       MSTD_CMD,        LIST_CMD,       IDEAL_CMD     , NO_PLURAL |ALLOW_RING}

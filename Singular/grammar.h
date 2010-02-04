@@ -98,71 +98,72 @@
      MINOR_CMD = 314,
      MINRES_CMD = 315,
      MODULO_CMD = 316,
-     MRES_CMD = 317,
-     MULTIPLICITY_CMD = 318,
-     ORD_CMD = 319,
-     PAR_CMD = 320,
-     PARDEG_CMD = 321,
-     PREIMAGE_CMD = 322,
-     QUOTIENT_CMD = 323,
-     QHWEIGHT_CMD = 324,
-     REDUCE_CMD = 325,
-     REGULARITY_CMD = 326,
-     RES_CMD = 327,
-     SIMPLIFY_CMD = 328,
-     SORTVEC_CMD = 329,
-     SRES_CMD = 330,
-     STD_CMD = 331,
-     SUBST_CMD = 332,
-     SYZYGY_CMD = 333,
-     VAR_CMD = 334,
-     VDIM_CMD = 335,
-     WEDGE_CMD = 336,
-     WEIGHT_CMD = 337,
-     VALTVARS = 338,
-     VMAXDEG = 339,
-     VMAXMULT = 340,
-     VNOETHER = 341,
-     VMINPOLY = 342,
-     END_RING = 343,
-     CMD_1 = 344,
-     CMD_2 = 345,
-     CMD_3 = 346,
-     CMD_12 = 347,
-     CMD_13 = 348,
-     CMD_23 = 349,
-     CMD_123 = 350,
-     CMD_M = 351,
-     ROOT_DECL = 352,
-     ROOT_DECL_LIST = 353,
-     RING_DECL = 354,
-     EXAMPLE_CMD = 355,
-     EXPORT_CMD = 356,
-     HELP_CMD = 357,
-     KILL_CMD = 358,
-     LIB_CMD = 359,
-     LISTVAR_CMD = 360,
-     SETRING_CMD = 361,
-     TYPE_CMD = 362,
-     STRINGTOK = 363,
-     BLOCKTOK = 364,
-     INT_CONST = 365,
-     UNKNOWN_IDENT = 366,
-     RINGVAR = 367,
-     PROC_DEF = 368,
-     BREAK_CMD = 369,
-     CONTINUE_CMD = 370,
-     ELSE_CMD = 371,
-     EVAL = 372,
-     QUOTE = 373,
-     FOR_CMD = 374,
-     IF_CMD = 375,
-     SYS_BREAK = 376,
-     WHILE_CMD = 377,
-     RETURN = 378,
-     PARAMETER = 379,
-     SYSVAR = 380,
-     UMINUS = 381
+     MONOM_CMD = 317,
+     MRES_CMD = 318,
+     MULTIPLICITY_CMD = 319,
+     ORD_CMD = 320,
+     PAR_CMD = 321,
+     PARDEG_CMD = 322,
+     PREIMAGE_CMD = 323,
+     QUOTIENT_CMD = 324,
+     QHWEIGHT_CMD = 325,
+     REDUCE_CMD = 326,
+     REGULARITY_CMD = 327,
+     RES_CMD = 328,
+     SIMPLIFY_CMD = 329,
+     SORTVEC_CMD = 330,
+     SRES_CMD = 331,
+     STD_CMD = 332,
+     SUBST_CMD = 333,
+     SYZYGY_CMD = 334,
+     VAR_CMD = 335,
+     VDIM_CMD = 336,
+     WEDGE_CMD = 337,
+     WEIGHT_CMD = 338,
+     VALTVARS = 339,
+     VMAXDEG = 340,
+     VMAXMULT = 341,
+     VNOETHER = 342,
+     VMINPOLY = 343,
+     END_RING = 344,
+     CMD_1 = 345,
+     CMD_2 = 346,
+     CMD_3 = 347,
+     CMD_12 = 348,
+     CMD_13 = 349,
+     CMD_23 = 350,
+     CMD_123 = 351,
+     CMD_M = 352,
+     ROOT_DECL = 353,
+     ROOT_DECL_LIST = 354,
+     RING_DECL = 355,
+     EXAMPLE_CMD = 356,
+     EXPORT_CMD = 357,
+     HELP_CMD = 358,
+     KILL_CMD = 359,
+     LIB_CMD = 360,
+     LISTVAR_CMD = 361,
+     SETRING_CMD = 362,
+     TYPE_CMD = 363,
+     STRINGTOK = 364,
+     BLOCKTOK = 365,
+     INT_CONST = 366,
+     UNKNOWN_IDENT = 367,
+     RINGVAR = 368,
+     PROC_DEF = 369,
+     BREAK_CMD = 370,
+     CONTINUE_CMD = 371,
+     ELSE_CMD = 372,
+     EVAL = 373,
+     QUOTE = 374,
+     FOR_CMD = 375,
+     IF_CMD = 376,
+     SYS_BREAK = 377,
+     WHILE_CMD = 378,
+     RETURN = 379,
+     PARAMETER = 380,
+     SYSVAR = 381,
+     UMINUS = 382
    };
 #endif
 /* Tokens.  */
@@ -225,71 +226,72 @@
 #define MINOR_CMD 314
 #define MINRES_CMD 315
 #define MODULO_CMD 316
-#define MRES_CMD 317
-#define MULTIPLICITY_CMD 318
-#define ORD_CMD 319
-#define PAR_CMD 320
-#define PARDEG_CMD 321
-#define PREIMAGE_CMD 322
-#define QUOTIENT_CMD 323
-#define QHWEIGHT_CMD 324
-#define REDUCE_CMD 325
-#define REGULARITY_CMD 326
-#define RES_CMD 327
-#define SIMPLIFY_CMD 328
-#define SORTVEC_CMD 329
-#define SRES_CMD 330
-#define STD_CMD 331
-#define SUBST_CMD 332
-#define SYZYGY_CMD 333
-#define VAR_CMD 334
-#define VDIM_CMD 335
-#define WEDGE_CMD 336
-#define WEIGHT_CMD 337
-#define VALTVARS 338
-#define VMAXDEG 339
-#define VMAXMULT 340
-#define VNOETHER 341
-#define VMINPOLY 342
-#define END_RING 343
-#define CMD_1 344
-#define CMD_2 345
-#define CMD_3 346
-#define CMD_12 347
-#define CMD_13 348
-#define CMD_23 349
-#define CMD_123 350
-#define CMD_M 351
-#define ROOT_DECL 352
-#define ROOT_DECL_LIST 353
-#define RING_DECL 354
-#define EXAMPLE_CMD 355
-#define EXPORT_CMD 356
-#define HELP_CMD 357
-#define KILL_CMD 358
-#define LIB_CMD 359
-#define LISTVAR_CMD 360
-#define SETRING_CMD 361
-#define TYPE_CMD 362
-#define STRINGTOK 363
-#define BLOCKTOK 364
-#define INT_CONST 365
-#define UNKNOWN_IDENT 366
-#define RINGVAR 367
-#define PROC_DEF 368
-#define BREAK_CMD 369
-#define CONTINUE_CMD 370
-#define ELSE_CMD 371
-#define EVAL 372
-#define QUOTE 373
-#define FOR_CMD 374
-#define IF_CMD 375
-#define SYS_BREAK 376
-#define WHILE_CMD 377
-#define RETURN 378
-#define PARAMETER 379
-#define SYSVAR 380
-#define UMINUS 381
+#define MONOM_CMD 317
+#define MRES_CMD 318
+#define MULTIPLICITY_CMD 319
+#define ORD_CMD 320
+#define PAR_CMD 321
+#define PARDEG_CMD 322
+#define PREIMAGE_CMD 323
+#define QUOTIENT_CMD 324
+#define QHWEIGHT_CMD 325
+#define REDUCE_CMD 326
+#define REGULARITY_CMD 327
+#define RES_CMD 328
+#define SIMPLIFY_CMD 329
+#define SORTVEC_CMD 330
+#define SRES_CMD 331
+#define STD_CMD 332
+#define SUBST_CMD 333
+#define SYZYGY_CMD 334
+#define VAR_CMD 335
+#define VDIM_CMD 336
+#define WEDGE_CMD 337
+#define WEIGHT_CMD 338
+#define VALTVARS 339
+#define VMAXDEG 340
+#define VMAXMULT 341
+#define VNOETHER 342
+#define VMINPOLY 343
+#define END_RING 344
+#define CMD_1 345
+#define CMD_2 346
+#define CMD_3 347
+#define CMD_12 348
+#define CMD_13 349
+#define CMD_23 350
+#define CMD_123 351
+#define CMD_M 352
+#define ROOT_DECL 353
+#define ROOT_DECL_LIST 354
+#define RING_DECL 355
+#define EXAMPLE_CMD 356
+#define EXPORT_CMD 357
+#define HELP_CMD 358
+#define KILL_CMD 359
+#define LIB_CMD 360
+#define LISTVAR_CMD 361
+#define SETRING_CMD 362
+#define TYPE_CMD 363
+#define STRINGTOK 364
+#define BLOCKTOK 365
+#define INT_CONST 366
+#define UNKNOWN_IDENT 367
+#define RINGVAR 368
+#define PROC_DEF 369
+#define BREAK_CMD 370
+#define CONTINUE_CMD 371
+#define ELSE_CMD 372
+#define EVAL 373
+#define QUOTE 374
+#define FOR_CMD 375
+#define IF_CMD 376
+#define SYS_BREAK 377
+#define WHILE_CMD 378
+#define RETURN 379
+#define PARAMETER 380
+#define SYSVAR 381
+#define UMINUS 382
 
 
 
