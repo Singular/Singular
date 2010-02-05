@@ -12,7 +12,7 @@ $Id$
 
 #include "kstd1.h"
 #include "kutil.h"	//ksCreateSpoly
-// #include "intvec.h"
+// #include "int64vec.h"
 #include "polys.h"
 #include "ideals.h"
 #include "kmatrix.h"
@@ -132,7 +132,7 @@ facet::facet(int const &n)
 */
 facet::facet(const facet& f)
 {
-	this->fNormal=ivCopy(f.fNormal);
+	this->fNormal=iv64Copy(f.fNormal);
 	this->UCN=f.UCN;
 	this->isFlippable=f.isFlippable;
 	facet* f2Copy;
@@ -154,7 +154,7 @@ facet::facet(const facet& f)
 			f2Act = f2Act->next;
 			f2Act->prev = marker;
 		}
-		intvec *f2Normal;
+		int64vec *f2Normal;
 		f2Normal = f2Copy->getFacetNormal();
 // 		f2Act->setFacetNormal(f2Copy->getFacetNormal());
 		f2Act->setFacetNormal(f2Normal);
@@ -207,14 +207,14 @@ inline bool gcone::areEqual(facet *f, facet *s)
 	bool res = TRUE;
 	int notParallelCtr=0;
 	int ctr=0;
-	intvec* fNormal; //No new since ivCopy and therefore getFacetNormal return a new
-	intvec* sNormal;
+	int64vec* fNormal; //No new since iv64Copy and therefore getFacetNormal return a new
+	int64vec* sNormal;
 	fNormal = f->getFacetNormal();
 	sNormal = s->getFacetNormal();
 	//Do not need parallelity. Too time consuming
-	if(!isParallel(fNormal,sNormal))
+	if(!isParallel(*fNormal,*sNormal))
 		notParallelCtr++;
-// 	intvec *foo=ivNeg(sNormal);
+// 	int64vec *foo=ivNeg(sNormal);
 // 	if(fNormal->compare(foo)!=0) //facet normals
 // 		return TRUE;	
 	else//parallelity, so we check the codim2-facets
@@ -225,12 +225,12 @@ inline bool gcone::areEqual(facet *f, facet *s)
 		ctr=0;
 		while(f2Act!=NULL)
 		{
-			intvec* f2Normal;
+			int64vec* f2Normal;
 			f2Normal = f2Act->getFacetNormal();
 			s2Act = s->codim2Ptr;
 			while(s2Act!=NULL)
 			{
-				intvec* s2Normal;
+				int64vec* s2Normal;
 				s2Normal = s2Act->getFacetNormal();
 // 				bool foo=areEqual(f2Normal,s2Normal);
 				int foo=f2Normal->compare(s2Normal);
@@ -257,22 +257,22 @@ inline bool gcone::areEqual(facet *f, facet *s)
 	return res;
 }	
 		
-/** Stores the facet normal \param intvec*/
-inline void facet::setFacetNormal(intvec *iv)
+/** Stores the facet normal \param int64vec*/
+inline void facet::setFacetNormal(int64vec *iv)
 {
-	this->fNormal = ivCopy(iv);			
+	this->fNormal = iv64Copy(iv);			
 }
 		
 /** Hopefully returns the facet normal 
-* Mind: ivCopy returns a new intvec, so use this in the following way:
-* intvec *iv;
+* Mind: iv64Copy returns a new int64vec, so use this in the following way:
+* int64vec *iv;
 * iv = this->getFacetNormal();
 * [...]
 * delete(iv);
 */
-inline intvec *facet::getFacetNormal()
+inline int64vec *facet::getFacetNormal()
 {				
-	return ivCopy(this->fNormal);
+	return iv64Copy(this->fNormal);
 // 	return this->fNormal;
 }
 		
@@ -317,25 +317,25 @@ inline void facet::setUCN(int n)
 inline int facet::getUCN()
 {
 	if(this!=NULL)//  && this!=(facet *)0xfbfbfbfbfbfbfbfb)// || this!=(facet *)0xfbfbfbfb) )
-// 	if(this!=NULL && ( this->fNormal!=(intvec *)0xfbfbfbfb || this->fNormal!=(intvec *)0xfbfbfbfbfbfbfbfb) )
+// 	if(this!=NULL && ( this->fNormal!=(int64vec *)0xfbfbfbfb || this->fNormal!=(int64vec *)0xfbfbfbfbfbfbfbfb) )
 		return this->UCN;
 	else
 		return -1;
 }
 		
 /** Store an interior point of the facet */
-inline void facet::setInteriorPoint(intvec *iv)
+inline void facet::setInteriorPoint(int64vec *iv)
 {
-	this->interiorPoint = ivCopy(iv);
+	this->interiorPoint = iv64Copy(iv);
 }
 		
 /** Returns a pointer to this->interiorPoint
-* MIND: ivCopy returns a new intvec
+* MIND: iv64Copy returns a new int64vec
 * @see facet::getFacetNormal
 */
-inline intvec *facet::getInteriorPoint()
+inline int64vec *facet::getInteriorPoint()
 {
-	return ivCopy(this->interiorPoint);
+	return iv64Copy(this->interiorPoint);
 }	
 		
 /** \brief Debugging function
@@ -345,7 +345,7 @@ inline void facet::fDebugPrint()
 {			
 	facet *codim2Act;			
 	codim2Act = this->codim2Ptr;
-	intvec *fNormal;
+	int64vec *fNormal;
 	fNormal = this->getFacetNormal();	
 	cout << "=======================" << endl;
 	cout << "Facet normal = (";
@@ -355,7 +355,7 @@ inline void facet::fDebugPrint()
 	cout << "Codim2 facets:" << endl;
 	while(codim2Act!=NULL)
 	{
-		intvec *f2Normal;
+		int64vec *f2Normal;
 		f2Normal = codim2Act->getFacetNormal();
 		cout << "(";
 		f2Normal->show(1,0);
@@ -486,15 +486,15 @@ inline int gcone::getCounter()
 }
 	
 /** \brief Set the interior point of a cone */
-inline void gcone::setIntPoint(intvec *iv)
+inline void gcone::setIntPoint(int64vec *iv)
 {
-	this->ivIntPt=ivCopy(iv);
+	this->ivIntPt=iv64Copy(iv);
 }
 		
 /** \brief Return the interior point */
-inline intvec *gcone::getIntPoint()
+inline int64vec *gcone::getIntPoint()
 {
-	return ivCopy(this->ivIntPt);
+	return iv64Copy(this->ivIntPt);
 }
 		
 /** \brief Print the interior point */
@@ -523,7 +523,7 @@ volatile void gcone::showFacets(const short codim)
 	}*/	
 	while(f!=NULL)
 	{
-		intvec *iv;
+		int64vec *iv;
 		iv = f->getFacetNormal();
 		cout << "(";
 		iv->show(1,0);				
@@ -560,7 +560,7 @@ inline volatile void gcone::showSLA(facet &f)
 	cout << endl;
 	while(fAct!=NULL)
 	{
-		intvec *fNormal;		
+		int64vec *fNormal;		
 		fNormal=fAct->getFacetNormal();
 		cout << "(";
 		fNormal->show(1,0);
@@ -573,7 +573,7 @@ inline volatile void gcone::showSLA(facet &f)
 		cout << " Codim2: ";
 		while(codim2Act!=NULL)
 		{
-			intvec *f2Normal;
+			int64vec *f2Normal;
 			f2Normal = codim2Act->getFacetNormal();
 			cout << "(";
 			f2Normal->show(1,0);
@@ -720,7 +720,7 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	* Quote: [...] every non-zero spoly should have at least one of its terms in inv(G)
 	*/
 // 	ideal initialForm=idInit(IDELEMS(I),1);
-// 	intvec *gamma=new intvec(this->numVars);
+// 	int64vec *gamma=new int64vec(this->numVars);
 	int falseGammaCounter=0;
 	int *redRowsArray=NULL;
 	int num_alloc=0;
@@ -730,7 +730,7 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		ideal initialForm=idInit(IDELEMS(I),1);
 		//read row ii into gamma
 		double tmp;
-		intvec *gamma=new intvec(this->numVars);
+		int64vec *gamma=new int64vec(this->numVars);
 		for(int jj=1;jj<=this->numVars;jj++)
 		{
 			tmp=mpq_get_d(ddineq->matrix[ii][jj]);
@@ -832,14 +832,14 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	num_elts=0;
 	for(int ii=0;ii<ddineq->rowsize;ii++)
 	{
-		intvec *ivPos = new intvec(this->numVars);
+		int64vec *ivPos = new int64vec(this->numVars);
 		for(int jj=0;jj<this->numVars;jj++)
 			(*ivPos)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
 		bool isStrictlyPos=FALSE;
 		int posCtr=0;		
 		for(int jj=0;jj<this->numVars;jj++)
 		{
-			intvec *ivCanonical = new intvec(this->numVars);
+			int64vec *ivCanonical = new int64vec(this->numVars);
 			jj==0 ? (*ivCanonical)[ivPos->length()-1]=1 : (*ivCanonical)[jj-1]=1;
 			if(dotProduct(*ivCanonical,*ivPos)!=0)
 			{
@@ -890,7 +890,7 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	int numNonFlip=0;
 	for (int kk = 0; kk<ddrows; kk++)
 	{
-		intvec *load = new intvec(this->numVars);//intvec to store a single facet normal that will then be stored via setFacetNormal
+		int64vec *load = new int64vec(this->numVars);//int64vec to store a single facet normal that will then be stored via setFacetNormal
 		for (int jj = 1; jj <ddcols; jj++)
 		{
 			double foo;
@@ -907,7 +907,7 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 			bool isFlip=FALSE;
 			for(int jj = 0; jj<load->length(); jj++)
 			{
-				intvec *ivCanonical = new intvec(load->length());
+				int64vec *ivCanonical = new int64vec(load->length());
 				(*ivCanonical)[jj]=1;
 				if (dotProduct(*load,*ivCanonical)<0)	
 				{
@@ -995,7 +995,7 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	*/			
 	if (compIntPoint==TRUE)
 	{
-		intvec *iv = new intvec(this->numVars);
+		int64vec *iv = new int64vec(this->numVars);
 		dd_MatrixPtr posRestr=dd_CreateMatrix(this->numVars,this->numVars+1);
 		int jj=1;
 		for (int ii=0;ii<=this->numVars;ii++)
@@ -1083,7 +1083,7 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 				codim2Act->next = new facet(2);
 				codim2Act = codim2Act->next;
 			}
-			intvec *n = new intvec(this->numVars);
+			int64vec *n = new int64vec(this->numVars);
 #ifdef gfanp
 			timeval t_mI_start, t_mI_end;
 			gettimeofday(&t_mI_start,0);
@@ -1108,7 +1108,7 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 		* linearity for ddakt above.
 		*/
 		//TODO It might be faster to compute jus the implied equations instead of a relative interior point
-// 		intvec *iv_intPoint = new intvec(this->numVars);
+// 		int64vec *iv_intPoint = new int64vec(this->numVars);
 // 		dd_MatrixPtr shiftMatrix;
 // 		dd_MatrixPtr intPointMatrix;
 // 		shiftMatrix = dd_CreateMatrix(this->numVars,this->numVars+1);
@@ -1206,11 +1206,11 @@ void gcone::getExtremalRays(const gcone &gc)
 	facet *fAct=gc.facetPtr;
 	while(fAct!=NULL)
 	{
-		intvec *fNormal;// = new intvec(this->numVars);
+		int64vec *fNormal;// = new int64vec(this->numVars);
 		fNormal = fAct->getFacetNormal();
 		for(int ii=0;ii<rows;ii++)
 		{
-			intvec *rowvec = new intvec(this->numVars);
+			int64vec *rowvec = new int64vec(this->numVars);
 			makeInt(P,ii+1,*rowvec);//get an integer entry instead of rational
 			if(dotProduct(*fNormal,*rowvec)==0)
 			{
@@ -1284,7 +1284,7 @@ void gcone::getExtremalRays(const gcone &gc)
 		while(codim2Act!=NULL)
 		{
 			containsStrictlyPosRay==TRUE;
-			intvec *rayvec;
+			int64vec *rayvec;
 			rayvec = codim2Act->getFacetNormal();//Mind this is no normal but a ray!
 			int negCtr=0;
 			for(int ii=0;ii<rayvec->length();ii++)
@@ -1334,7 +1334,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	timeval start, end;
 	gettimeofday(&start, 0);
 #endif		
-	intvec *fNormal;// = new intvec(this->numVars);	//facet normal, check for parallelity			
+	int64vec *fNormal;// = new int64vec(this->numVars);	//facet normal, check for parallelity			
 	fNormal = f->getFacetNormal();	//read this->fNormal;
 
 // 	std::cout << "running gcone::flip" << std::endl;
@@ -1372,7 +1372,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 			
 	if( (srcRing->order[0]!=ringorder_a))
 	{
-		intvec *iv = new intvec(this->numVars);
+		int64vec *iv = new int64vec(this->numVars);
 		iv = ivNeg(fNormal);
 // 		tmpRing=rCopyAndAddWeight(srcRing,ivNeg(fNormal));
 		tmpRing=rCopyAndAddWeight(srcRing,iv);
@@ -1579,7 +1579,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	dd_MatrixAppendTo(&intPointMatrix,posRestr);
 	dd_FreeMatrix(posRestr);
 
-	intvec *iv_weight = new intvec(this->numVars);
+	int64vec *iv_weight = new int64vec(this->numVars);
 #ifdef gfanp
 	timeval t_dd_start, t_dd_end;
 	gettimeofday(&t_dd_start, 0);
@@ -1602,7 +1602,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	dd_FreePolyhedra(ddpolyh);
 	for(int ii=0;ii<P->rowsize;ii++)
 	{
- 		intvec *iv_row=new intvec(this->numVars);
+ 		int64vec *iv_row=new int64vec(this->numVars);
 		makeInt(P,ii+1,*iv_row);
 		iv_weight =ivAdd(iv_weight, iv_row);
 		delete iv_row;
@@ -1681,7 +1681,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
  * used in gcone::getFacetNormal in order to preprocess possible facet normals
  * and in gcone::flip for obvious reasons.
 */
-inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
+inline void gcone::computeInv(ideal &gb, ideal &initialForm, int64vec &fNormal)
 {
 #ifdef gfanp
 	timeval start, end;
@@ -1696,12 +1696,12 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 		initialFormElement=pHead(aktpoly);
 		while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
 		{
-			intvec *check = new intvec(this->numVars);
+			int64vec *check = new int64vec(this->numVars);
 			aktpoly=pNext(aktpoly);	//next term
 // 			pSetm(aktpoly);
 			int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 			pGetExpV(aktpoly,v);		
-			/* Convert (int)v into (intvec)check */			
+			/* Convert (int)v into (int64vec)check */			
 			for (int jj=0;jj<this->numVars;jj++)
 			{
 				(*check)[jj]=v[jj+1]-leadExpV[jj+1];
@@ -1785,7 +1785,8 @@ void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
 	//Remove zeroes (and strictly pos rows?)
 	for(int ii=0;ii<ddineq->rowsize;ii++)
 	{
-		intvec *iv = new intvec(this->numVars);
+		int64vec *iv = new int64vec(this->numVars);
+		int64vec *ivNull = new int64vec(this->numVars);//Needed for intvec64::compare(*intvec)
 		int posCtr=0;
 		for(int jj=0;jj<this->numVars;jj++)
 		{
@@ -1795,7 +1796,7 @@ void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
 			//Behold! This will delete the row for the standard simplex!
 		}
 // 		if( (iv->compare(0)==0) || (posCtr==iv->length()) )
-		if( (posCtr==iv->length()) || (iv->compare(0)==0) )		
+		if( (posCtr==iv->length()) || (iv->compare(ivNull)==0) )		
 		{
 			dd_MatrixRowRemove(&ddineq,ii+1);
 			ii--;//Yes. This is on purpose
@@ -1811,12 +1812,12 @@ void gcone::preprocessInequalities(dd_MatrixPtr &ddineq)
 // 	for(int ii=0;ii<ddineq->rowsize-1;ii++)
 // 	for(int ii=0;ii<num_newRows-1;ii++)
 // 	{
-// 		intvec *iv = new intvec(this->numVars);//1st vector to check against
+// 		int64vec *iv = new int64vec(this->numVars);//1st vector to check against
 // 		for(int jj=0;jj<this->numVars;jj++)
 // 			(*iv)[jj]=(int)mpq_get_d(ddineq->matrix[ii][jj+1]);
 // 		for(int jj=ii+1;jj</*ddineq->rowsize*/num_newRows;jj++)
 // 		{
-// 			intvec *ivCheck = new intvec(this->numVars);//Checked against iv
+// 			int64vec *ivCheck = new int64vec(this->numVars);//Checked against iv
 // 			for(int kk=0;kk<this->numVars;kk++)
 // 				(*ivCheck)[kk]=(int)mpq_get_d(ddineq->matrix[jj][kk+1]);
 // 			if (iv->compare(ivCheck)==0)
@@ -1867,13 +1868,13 @@ inline void gcone::getGB(const ideal &inputIdeal)
 	test=save;
 }//void getGB
 		
-/** \brief Compute the negative of a given intvec
+/** \brief Compute the negative of a given int64vec
 	*/		
-inline intvec *gcone::ivNeg(const intvec *iv)
-{
+inline int64vec *gcone::ivNeg(int64vec *iv)
+{	//Hm, switching to int64vec const int64vec does no longer work
 	//NOTE: Can't this be done without new?
-	intvec *res;// = new intvec(iv->length());
-	res=ivCopy(iv);
+	int64vec *res;// = new int64vec(iv->length());
+	res=iv64Copy(iv);
 	*res *= (int)-1;						
 	return res;
 }
@@ -1882,7 +1883,7 @@ inline intvec *gcone::ivNeg(const intvec *iv)
 /** \brief Compute the dot product of two intvecs
 *
 */
-inline int gcone::dotProduct(const intvec &iva, const intvec &ivb)				
+inline int gcone::dotProduct(int64vec &iva, int64vec &ivb)				
 {			
 	int res=0;
 	for (int i=0;i<this->numVars;i++)
@@ -1896,7 +1897,7 @@ inline int gcone::dotProduct(const intvec &iva, const intvec &ivb)
  *
  * \f$ \alpha\parallel\beta\Leftrightarrow\langle\alpha,\beta\rangle^2=\langle\alpha,\alpha\rangle\langle\beta,\beta\rangle \f$
  */
-inline bool gcone::isParallel(const intvec &a, const intvec &b)
+inline bool gcone::isParallel(int64vec &a, int64vec &b)
 {			
 	int lhs,rhs;
 	bool res;
@@ -1915,10 +1916,10 @@ inline bool gcone::isParallel(const intvec &a, const intvec &b)
 }//bool isParallel
 		
 /** \brief Compute an interior point of a given cone
- * Result will be written into intvec iv. 
+ * Result will be written into int64vec iv. 
  * Any rational point is automatically converted into an integer.
  */
-inline void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M here since we want to remove redundant rows
+inline void gcone::interiorPoint( dd_MatrixPtr &M, int64vec &iv) //no const &M here since we want to remove redundant rows
 {
 	dd_LPPtr lp,lpInt;
 	dd_ErrorType err=dd_NoError;
@@ -2017,7 +2018,7 @@ inline void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M her
 			
 }//void interiorPoint(dd_MatrixPtr const &M)
 
-inline void gcone::interiorPoint2(const dd_MatrixPtr &M, intvec &iv)
+inline void gcone::interiorPoint2(const dd_MatrixPtr &M, int64vec &iv)
 {
 	KMatrix<Rational> mMat(M->rowsize+1,M->colsize);
 	for(int ii=0;ii<M->rowsize;ii++)
@@ -2069,7 +2070,7 @@ inline void gcone::interiorPoint2(const dd_MatrixPtr &M, intvec &iv)
 /** \brief Copy a ring and add a weighted ordering in first place
  * 
  */
-ring gcone::rCopyAndAddWeight(const ring &r, const intvec *ivw)				
+ring gcone::rCopyAndAddWeight(const ring &r, int64vec *ivw)				
 {
 	ring res=rCopy0(r);
 	int jj;
@@ -2104,7 +2105,7 @@ ring gcone::rCopyAndAddWeight(const ring &r, const intvec *ivw)
 	return res;
 }//rCopyAndAdd
 		
-ring rCopyAndChangeWeight(ring const &r, intvec *ivw)
+ring rCopyAndChangeWeight(ring const &r, int64vec *ivw)
 {
 	ring res=rCopy0(currRing);
 	rComplete(res);
@@ -2125,7 +2126,7 @@ ring rCopyAndChangeWeight(ring const &r, intvec *ivw)
 		
 /** \brief Check for equality of two intvecs
  */
-inline bool gcone::areEqual(const intvec &a, const intvec &b)
+inline bool gcone::areEqual(int64vec &a, int64vec &b)
 {
 	bool res=TRUE;
 	for(int ii=0;ii<this->numVars;ii++)
@@ -2261,7 +2262,7 @@ dd_MatrixPtr gcone::computeLinealitySpace()
 /** \brief The new method of Markwig and Jensen
  * Compute gcBasis and facets for the arbitrary starting cone. Store \f$(codim-1)\f$-facets as normals.
  * In order to represent a facet uniquely compute also the \f$(codim-2)\f$-facets and norm by the gcd of the components.
- * Keep a list of facets as a linked list containing an intvec and an integer matrix.
+ * Keep a list of facets as a linked list containing an int64vec and an integer matrix.
  * Since a \f$(codim-1)\f$-facet belongs to exactly two full dimensional cones, we remove a facet from the list as
  * soon as we compute this facet again. Comparison of facets is done by...
  */
@@ -2328,7 +2329,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 		//only copy flippable facets! NOTE: We do not need flipRing or any such information.
 		if(fAct->isFlippable==TRUE)
 		{
-			intvec *fNormal;
+			int64vec *fNormal;
 			fNormal = fAct->getFacetNormal();
 			if( ii==0 || (ii>0 && SearchListAct==NULL) ) //1st facet may be non-flippable
 			{						
@@ -2352,7 +2353,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			for(int jj=0;jj<fAct->numCodim2Facets;jj++)
 // 			for(int jj=0;jj<fAct->numRays-1;jj++)
 			{
-				intvec *f2Normal;
+				int64vec *f2Normal;
 				f2Normal = codim2Act->getFacetNormal();
 				if(jj==0)
 				{						
@@ -2510,9 +2511,9 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 /** \brief Make a set of rational vectors into integers
  *
  * We compute the lcm of the denominators and multiply with this to get integer values.		
- * \param dd_MatrixPtr,intvec
+ * \param dd_MatrixPtr,int64vec
  */
-inline void gcone::makeInt(const dd_MatrixPtr &M, const int line, intvec &n)
+inline void gcone::makeInt(const dd_MatrixPtr &M, const int line, int64vec &n)
 {			
 // 	mpz_t denom[this->numVars];
 	mpz_t *denom = new mpz_t[this->numVars];
@@ -2581,7 +2582,7 @@ inline void gcone::normalize()
 	codim2Act = fAct->codim2Ptr;
 	while(fAct!=NULL)
 	{
-		intvec *fNormal;
+		int64vec *fNormal;
 		fNormal = fAct->getFacetNormal();
 		for(int ii=0;ii<this->numVars;ii++)
 		{
@@ -2594,7 +2595,7 @@ inline void gcone::normalize()
 		/*And now for the codim2*/
 		while(codim2Act!=NULL)
 		{				
-			intvec *n;
+			int64vec *n;
 			n=codim2Act->getFacetNormal();
 			for(int ii=0;ii<this->numVars;ii++)
 			{
@@ -2672,15 +2673,15 @@ facet * gcone::enqueueNewFacets(facet *f)
 // 		gcone::lengthOfSearchList++;
 	}
 	/*1st step: compare facetNormals*/
-//  	intvec *fNormal=NULL;gcone::
-//  	intvec *slNormal=NULL;
+//  	int64vec *fNormal=NULL;gcone::
+//  	int64vec *slNormal=NULL;
 			
 	while(fAct!=NULL)
 	{						
 		if(fAct->isFlippable==TRUE)
 		{
-			intvec *fNormal=NULL;
-// 			intvec *slNormal=NULL;
+			int64vec *fNormal=NULL;
+// 			int64vec *slNormal=NULL;
 			fNormal=fAct->getFacetNormal();
 			slAct = slHead;
 			notParallelCtr=0;
@@ -2710,7 +2711,7 @@ facet * gcone::enqueueNewFacets(facet *f)
 			while(slAct!=NULL)
 			//while(slAct!=slEndStatic->next)
 			{
-				intvec *slNormal=NULL;
+				int64vec *slNormal=NULL;
 				removalOccured=FALSE;
 				slNormal = slAct->getFacetNormal();
 #ifdef gfan_DEBUG
@@ -2796,10 +2797,10 @@ facet * gcone::enqueueNewFacets(facet *f)
 				slEnd->setFacetNormal(fNormal);
 				slEnd->prev = marker;
 				//Copy codim2-facets
-// 				intvec *f2Normal=new intvec(this->numVars);
+// 				int64vec *f2Normal=new int64vec(this->numVars);
 				while(f2Act!=NULL)
 				{
-					intvec *f2Normal;
+					int64vec *f2Normal;
 					f2Normal=f2Act->getFacetNormal();
 					if(slEndCodim2Root==NULL)
 					{
@@ -2893,7 +2894,7 @@ inline dd_MatrixPtr gcone::facets2Matrix(const gcone &gc)
 	
 	while(fAct!=NULL)
 	{
-		intvec *comp;
+		int64vec *comp;
 		comp = fAct->getFacetNormal();
 		for(int ii=0;ii<this->numVars;ii++)
 		{
@@ -2968,7 +2969,7 @@ inline void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 		
 		while(fAct!=NULL)
 		{	
-			intvec *iv;
+			int64vec *iv;
 			iv=fAct->getFacetNormal();
 			f2Act=fAct->codim2Ptr;
 			for (int ii=0;ii<iv->length();ii++)
@@ -2985,7 +2986,7 @@ inline void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 			delete iv;
 			while(f2Act!=NULL)
 			{
-				intvec *iv2;
+				int64vec *iv2;
 				iv2=f2Act->getFacetNormal();	
 				for(int jj=0;jj<iv2->length();jj++)
 				{
@@ -3056,7 +3057,7 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 // 			line.erase(0,found+2);
 // 			string strweight;
 // 			strweight=line.substr(0,line.find_first_of(")"));
-// 			intvec *iv=new intvec(this->numVars);
+// 			int64vec *iv=new int64vec(this->numVars);
 // 			for(int ii=0;ii<this->numVars;ii++)
 // 			{
 // 				string weight;
@@ -3258,8 +3259,8 @@ lists lprepareResult(gcone *gc, int n)
 // 		rChangeCurrRing(saveRing);
 
 		l->m[2].rtyp=INTVEC_CMD;
-		intvec iv=(gcAct->f2M(gcAct,gcAct->facetPtr));
-		l->m[2].data=(void*)ivCopy(&iv);
+		int64vec iv=(gcAct->f2M(gcAct,gcAct->facetPtr));
+		l->m[2].data=(void*)iv64Copy(&iv);
 		
 		l->m[3].rtyp=LIST_CMD;
 			lists lCodim2List = (lists)omAllocBin(slists_bin);
@@ -3269,8 +3270,8 @@ lists lprepareResult(gcone *gc, int n)
 			while(fAct!=NULL && jj<gcAct->numFacets)
 			{
 				lCodim2List->m[jj].rtyp=INTVEC_CMD;
-				intvec ivC2=(gcAct->f2M(gcAct,fAct,2));
-				lCodim2List->m[jj].data=(void*)ivCopy(&ivC2);
+				int64vec ivC2=(gcAct->f2M(gcAct,fAct,2));
+				lCodim2List->m[jj].data=(void*)iv64Copy(&ivC2);
 				jj++;
 				fAct = fAct->next;
 			} 		
@@ -3290,17 +3291,17 @@ lists lprepareResult(gcone *gc, int n)
 * param n is used to determine whether it operates in codim 1 or 2
 *
 */
-inline intvec gcone::f2M(gcone *gc, facet *f, int n)
+inline int64vec gcone::f2M(gcone *gc, facet *f, int n)
 {
 	facet *fAct;
-	intvec *res;//=new intvec(this->numVars);	
+	int64vec *res;//=new int64vec(this->numVars);	
 // 	int codim=n;
 // 	int bound;
 // 	if(f==gc->facetPtr)
 	if(n==1)
 	{
-		intvec *m1Res=new intvec(gc->numFacets,gc->numVars,0);
-		res = ivCopy(m1Res);
+		int64vec *m1Res=new int64vec(gc->numFacets,gc->numVars,0);
+		res = iv64Copy(m1Res);
 		fAct = gc->facetPtr;
 		delete m1Res;
 // 		bound = gc->numFacets*(this->numVars);		
@@ -3308,8 +3309,8 @@ inline intvec gcone::f2M(gcone *gc, facet *f, int n)
 	else
 	{
 		fAct = f->codim2Ptr;
-		intvec *m2Res = new intvec(f->numCodim2Facets,gc->numVars,0);
-		res = ivCopy(m2Res);
+		int64vec *m2Res = new int64vec(f->numCodim2Facets,gc->numVars,0);
+		res = iv64Copy(m2Res);
 		delete m2Res;	
 // 		bound = fAct->numCodim2Facets*(this->numVars);
 
@@ -3317,7 +3318,7 @@ inline intvec gcone::f2M(gcone *gc, facet *f, int n)
 	int ii=0;
 	while(fAct!=NULL )//&& ii < bound )
 	{
-		intvec *fNormal;
+		int64vec *fNormal;
 		fNormal = fAct->getFacetNormal();
 		for(int jj=0;jj<this->numVars;jj++)
 		{

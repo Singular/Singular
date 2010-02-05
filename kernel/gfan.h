@@ -12,6 +12,7 @@ $Id$
 #define GFAN_H
 
 #include "intvec.h"
+#include "int64vec.h"
 
 #define p800
 #ifdef p800
@@ -33,17 +34,17 @@ extern int gfanHeuristic;
 // ideal gfan(ideal inputIdeal, int heuristic);
 lists gfan(ideal inputIdeal, int heuristic);
 
-//int dotProduct(intvec a, intvec b);
-//bool isParallel(intvec a, intvec b);
+//int dotProduct(int64vec a, int64vec b);
+//bool isParallel(int64vec a, int64vec b);
 
 class facet
 {
 	private:
 		/** \brief Inner normal of the facet, describing it uniquely up to isomorphism */
-		intvec *fNormal;
+		int64vec *fNormal;
 		
 		/** \brief An interior point of the facet*/
-		intvec *interiorPoint;
+		int64vec *interiorPoint;
 		
 		/** \brief Universal Cone Number
 		 * The number of the cone the facet belongs to, Set in getConeNormals()
@@ -88,10 +89,10 @@ class facet
 				
 		/** \brief Comparison of facets*/
 		inline bool areEqual(facet *f, facet *g);
-		/** Stores the facet normal \param intvec*/
-		inline void setFacetNormal(intvec *iv);
+		/** Stores the facet normal \param int64vec*/
+		inline void setFacetNormal(int64vec *iv);
 		/** Hopefully returns the facet normal */
-		inline intvec *getFacetNormal();
+		inline int64vec *getFacetNormal();
 		/** Method to print the facet normal*/
 		inline void printNormal();
 		/** Store the flipped GB*/
@@ -107,8 +108,8 @@ class facet
 		 */
 		inline int getUCN();
 		/** Store an interior point of the facet */
-		inline void setInteriorPoint(intvec *iv);
-		inline intvec *getInteriorPoint();
+		inline void setInteriorPoint(int64vec *iv);
+		inline int64vec *getInteriorPoint();
 		/** \brief Debugging function
 		 * prints the facet normal an all (codim-2)-facets that belong to it
 		 */
@@ -129,7 +130,7 @@ class gcone
 // 		ring rootRing;		//good to know this -> generic walk
 		ideal inputIdeal;	//the original
 		ring baseRing;		//the basering of the cone				
-		intvec *ivIntPt;	//an interior point of the cone
+		int64vec *ivIntPt;	//an interior point of the cone
 		int UCN;		//unique number of the cone
 		int pred;		//UCN of the cone this one is derived from
  		static int counter;
@@ -187,8 +188,8 @@ class gcone
 		~gcone();
 		inline int getCounter();
 		inline ring getBaseRing();
-		inline void setIntPoint(intvec *iv);
-		inline intvec *getIntPoint();
+		inline void setIntPoint(int64vec *iv);
+		inline int64vec *getIntPoint();
 		inline void showIntPoint();
 		inline void setNumFacets();
 		inline int getNumFacets();
@@ -199,34 +200,34 @@ class gcone
 		inline void idDebugPrint(const ideal &I);
 		inline void invPrint(const ideal &I);
 		inline bool isMonomial(const ideal &I);
-		inline intvec *ivNeg(const intvec *iv);
-		inline int dotProduct(const intvec &iva, const intvec &ivb);
-		inline bool isParallel(const intvec &a, const intvec &b);
-		inline bool areEqual(const intvec &a, const intvec &b);
+		inline int64vec *ivNeg(int64vec *iv);
+		inline int dotProduct(int64vec &iva, int64vec &ivb);
+		inline bool isParallel(int64vec &a, int64vec &b);
+		inline bool areEqual(int64vec &a, int64vec &b);
 		inline bool areEqual(facet *f, facet *g);
 		inline int intgcd(int a, int b);
 		inline void writeConeToFile(const gcone &gc, bool usingIntPoints=FALSE);
 		inline void readConeFromFile(int gcNum, gcone *gc);
-		inline intvec f2M(gcone *gc, facet *f, int n=1);
+		inline int64vec f2M(gcone *gc, facet *f, int n=1);
 		inline void sortRays(gcone *gc);
 		//The real stuff
 		inline void getConeNormals(const ideal &I, bool compIntPoint=FALSE);
 		inline void getCodim2Normals(const gcone &gc);
 		inline void getExtremalRays(const gcone &gc);
 		inline void flip(ideal gb, facet *f);
-		inline void computeInv(ideal &gb, ideal &inv, intvec &f);
+		inline void computeInv(ideal &gb, ideal &inv, int64vec &f);
 // 		poly restOfDiv(poly const &f, ideal const &I); removed with r12286
 		inline ideal ffG(const ideal &H, const ideal &G);
 		inline void getGB(ideal const &inputIdeal);		
-		inline void interiorPoint( dd_MatrixPtr &M, intvec &iv);
-		inline void interiorPoint2(const dd_MatrixPtr &M, intvec &iv);
+		inline void interiorPoint( dd_MatrixPtr &M, int64vec &iv);
+		inline void interiorPoint2(const dd_MatrixPtr &M, int64vec &iv);
 		inline void preprocessInequalities(dd_MatrixPtr &M);
-		ring rCopyAndAddWeight(const ring &r, const intvec *ivw);
-		ring rCopyAndChangeWeight(const ring &r, intvec *ivw);		
+		ring rCopyAndAddWeight(const ring &r, int64vec *ivw);
+		ring rCopyAndChangeWeight(const ring &r, int64vec *ivw);		
 // 		void reverseSearch(gcone *gcAct); //NOTE both removed from r12286
 // 		bool isSearchFacet(gcone &gcTmp, facet *testfacet);
 		void noRevS(gcone &gcRoot, bool usingIntPoint=FALSE);
-		inline void makeInt(const dd_MatrixPtr &M, const int line, intvec &n);
+		inline void makeInt(const dd_MatrixPtr &M, const int line, int64vec &n);
 		inline void normalize();
 		facet * enqueueNewFacets(facet *f);
 		facet * enqueue2(facet *f);
