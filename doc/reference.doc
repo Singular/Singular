@@ -136,6 +136,7 @@ and @code{LIB} no brackets are allowed.
 * minres::
 * modulo::
 * monitor::
+* monom::
 * mpresmat::
 * mres::
 * mstd::
@@ -3394,6 +3395,7 @@ intvec
 @item @strong{Purpose:}
 returns the exponent vector of the leading monomial of a polynomial or a vector.
 In the case of a vector the last component is the index in the vector.
+(The inverse to @code{monom}.)
 @item @strong{Example:}
 @smallexample
 @c example
@@ -3412,6 +3414,7 @@ See
 @ref{leadcoef};
 @ref{leadmonom};
 @ref{intvec};
+@ref{monom};
 @ref{poly};
 @ref{vector}.
 @c ref
@@ -4025,7 +4028,7 @@ See
 @ref{hom_kernel}.
 @c ref
 @c ---------------------------------------
-@node monitor, mpresmat, modulo, Functions
+@node monitor, monom, modulo, Functions
 @subsection monitor
 @cindex monitor
 @table @code
@@ -4060,7 +4063,35 @@ See
 @ref{link expressions}.
 @c ref
 @c ---------------------------------------
-@node mpresmat, mres, monitor, Functions
+@node monom, mpresmat, monitor, Functions
+@subsection monom
+@cindex monom
+@table @code
+@item @strong{Syntax:}
+@code{monom (} intvec_expression @code{)}
+@item @strong{Type:}
+poly resp. vector
+@item @strong{Purpose:}
+converts an integer vector to a power product
+(the inverse to @code{leadexp}).
+@*Returns a @code{vector} iff the length of the argument is number of variables +1.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x,y,z),dp;
+  monom(intvec(2,3));
+  monom(intvec(2,3,0,1));
+  leadexp(monom(intvec(2,3,0,1)));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{leadexp};
+@ref{intvec}.
+@c ref
+@c ---------------------------------------
+@node mpresmat, mres, monom, Functions
 @subsection mpresmat
 @cindex mpresmat
 @table @code

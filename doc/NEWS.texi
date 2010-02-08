@@ -24,6 +24,58 @@
 
 @itemize @bullet
 @item
+new option @code{qringNF}, see @nref{option}.
+@item
+new system command @code{system("cpu")}, see @nref{system}.
+@end itemize
+
+@heading New @sc{Singular} functions
+@itemize @bullet
+@item
+new command: @code{farey}: lifting to Q  (see @nref{farey})
+@item
+new command: @code{monom} (see @nref{monom})
+@item
+command extended: @code{liftstd} also computes syzygies.  (see @nref{liftstd})
+@item
+command extended: @code{minor} has more options.  (see @nref{minor})
+@item
+command extended: @code{opposite} (see @nref{opposite})
+@end itemize
+
+@heading Internal Changes
+@itemize @bullet
+@item
+new minor code
+@item
+removed @code{EXTGCD} (use @code{extgcd})
+@item
+moved mp_set_memory_functions-call from kernel/mminit.cc to tesths.cc:main
+  (in order not to call it for libsingular)
+@end itemize
+
+@heading New @sc{Singular} libraries
+@itemize @bullet
+@item
+new library: normaliz.lib (see @nref{normaliz_lib}: Interface to Normaliz 2.2)
+@c @item
+@c new library: binresol.lib (see @nref{binresol_lib}: binomial ideals)
+@c @item
+@c new library: findiff.lib (see @nref{findiff_lib}: finite difference schemes)
+@end itemize
+
+@heading Changed @sc{Singular} libraries
+@itemize
+@item
+homolog.lib (@nref{homolog_lib}): canonMap
+@item
+dmod.lib (@nref{dmod_lib}): peratorModulo
+@end itemize
+
+@heading News for version 3-1-0
+
+@itemize @bullet
+@item
 new coefficients: Z, Z/m, Z/(2^n) (see @nref{Rings and orderings})
 @item
 new handling of the default argument in libraries (see @nref{Parameter list})

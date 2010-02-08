@@ -1322,6 +1322,8 @@ Hilbert series as intvec (see @ref{hilb})
 sets of independent variables of an ideal (see @ref{indepSet})
 @item leadexp
 the exponent vector of the leading monomial (see @ref{leadexp})
+@item monom
+the power product corresponding to the exponent vector (see @ref{monom})
 @item nrows
 number of rows (see @ref{nrows})
 @item qhweight
