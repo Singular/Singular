@@ -137,7 +137,7 @@ static proc pidbasis(module M0,module M)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc vfilt(matrix B,int d)
+static proc vfiltTuple(matrix B,int d)
 {
   int mu=ncols(B);
 
@@ -526,7 +526,7 @@ EXAMPLE:  example goodBasis; shows examples
 
     setring(@S);
 
-    e0,s0,V,B=vfilt(imap(@XS,A),d);
+    e0,s0,V,B=vfiltTuple(imap(@XS,A),d);
     a,e0,e,s,V,B,G=spec(e0,s0,V,B);
 
     a0=leadcoef(a[1]);

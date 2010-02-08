@@ -2076,12 +2076,12 @@ example
   code(s);
 }
 
-proc decode(string g)
-"USAGE:  decode(s); s a string
+proc decodeString(string g)
+"USAGE:  decodeString(s); s a string
 ASSUME:  s is a string of a number, the output of code
 COMPUTE: a string, RSA-decoding of the string s
 RETURN:  return RSA-decoding of the string s as string
-EXAMPLE: decode;  shows an example
+EXAMPLE: decodeString;  shows an example
 "
 {
    ring r=0,x,dp;
@@ -2103,7 +2103,7 @@ example
 {"EXAMPLE:";  echo = 2;
   string
 s="78638618599886548153321853785991541374544958648147340831959482696082179852616053583234149080198937632782579537867262780982185252913122030800897193851413140758915381848932565";
-  string t=decode(s);
+  string t=decodeString(s);
   t;
 }
 

@@ -507,7 +507,7 @@ static proc closed_points_deg (poly f,int d,ideal SL)
   return(LP);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static proc subset (ideal I,ideal J)
+static proc idealSubset (ideal I,ideal J)
 {
   // checks wether I is contained in J and returns a boolean
   // remark : J is assumed to be given by a standard basis
@@ -529,7 +529,7 @@ static proc belongs (list P,ideal I)
   // remark : P[1] is assumed to be an ideal given by a standard basis
   if (typeof(P[1])=="ideal")
   {
-    return(subset(I,P[1]));
+    return(idealSubset(I,P[1]));
   }
   else
   {
@@ -542,9 +542,9 @@ static proc equals (ideal I,ideal J)
   // checks if I is equal to J and returns a boolean
   // remark : I and J are assumed to be given by a standard basis
   int answer=0;
-  if (subset(I,J)==1)
+  if (idealSubset(I,J)==1)
   {
-    if (subset(J,I)==1)
+    if (idealSubset(J,I)==1)
     {
       answer=1;
     }

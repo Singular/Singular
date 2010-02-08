@@ -67,7 +67,7 @@ EXAMPE: example realrad; shows an example"
     return(id);
   }
   //sub are the subsets of {x_1,...,x_n}
-  sub=subset(n);
+  sub=subsets(n);
   siz=size(sub)-1;//we dont want to localize on all variables
 
   //for the empty set
@@ -581,7 +581,7 @@ EXAMPLE: decision shows an example
    //trailing coefficient of p
    p=subst(p,@t,0);
    p=realpoly(p);
-   @s=subset(n-1);
+   @s=subsets(n-1);
    ideal jacs;
    for (@z=1;@z<=size(@s);@z++)
    {
@@ -1074,10 +1074,10 @@ EXAMPLE:   example norm; shows no example"
  return(k);
 }
 
-static proc subset(int n)
-"USAGE :subset(n); n>=0 in Z
+static proc subsets(int n)
+"USAGE :subsets(n); n>=0 in Z
 RETURN :l a list of all non-empty subsets of {1,..,n}
-EXAMPLE:subset(n) shows an example;
+EXAMPLE:subsets(n) shows an example;
 "
 {
  list l,buffer;
@@ -1105,8 +1105,8 @@ EXAMPLE:subset(n) shows an example;
 }
 example
 { "EXAMPLE:"; echo = 2;
-  subset(3);
-  subset(4);
+  subsets(3);
+  subsets(4);
 }
 
 proc permutation(list L)
