@@ -323,7 +323,7 @@ cmdnames cmds[] =
   { "module",      0, MODUL_CMD ,         MODUL_CMD},
   { "modulo",      0, MODULO_CMD ,        CMD_2},
   { "monitor",     0, MONITOR_CMD ,       CMD_12},
-  { "monom",       0, MONOM_CMD ,         CMD_1},
+  { "monomial",    0, MONOM_CMD ,         CMD_1},
   { "mpresmat",    0, MPRES_CMD,          CMD_2},
   { "mult",        0, MULTIPLICITY_CMD ,  CMD_1},
   #ifdef OLD_RES
