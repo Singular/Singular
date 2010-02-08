@@ -3858,10 +3858,12 @@ absent. @*
 If the argument algorithm is present it must be one of @code{B/bareiss},
 @code{L/laplace}, and @code{C/cache}. For, @code{B/bareiss} and
 @code{L/laplace} the optional arguments cacheP and cacheM must again
-be absent, whereas for @code{C/cache}, they must be provided: cachedP
+be absent, whereas for @code{C/cache}, they may be provided: cachedP
 determines the maximum number of cached subdeterminantes (=polynomials),
 and cachedM the total number of cached monomials (counted over all cached
-polynomials). A typical parametrisation would be @code{Cache, 200, 100000}.
+polynomials). If, for algorithm = @code{C/cache} cachedP and cachedM are
+not provided by the user, the values 200 and 100000, respectively, will
+be used as defaults.
 @item @strong{Example:}
 @smallexample
 @c example

@@ -6003,9 +6003,11 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
        Bareiss, Laplace, and Laplace with caching).
        If algorithm is present, it must be one of "Bareiss", "bareiss",
        "Laplace", "laplace", "Cache", "cache". In the cases "Cache" and
-       "cache" two more arguments are expected, determining how many entries
+       "cache" two more arguments may be given, determining how many entries
        the cache may have at most, and how many cached monomials there are at
        most. (Cached monomials are counted over all cached polynomials.)
+       If these two additional arguments are not provided, 200 and 100000
+       will be used as defaults.
   */
   matrix m;
   leftv u=v->next;
@@ -6141,8 +6143,8 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   if ((!noAlgorithm) && (strcmp(algorithm, "Cache") == 0)
       && (noCacheMinors || noCacheMonomials))
   {
-    WerrorS("Expected two more int arguments after algorithm 'C/cache' .");
-    return TRUE;
+    cacheMinors = 200;
+    cacheMonomials = 100000;
   }
 
   /* here come the actual procedure calls */
