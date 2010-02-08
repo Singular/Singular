@@ -2115,8 +2115,8 @@ example
    write(":w /tmp/conic.tex",conic[8]);
    system("sh","cd /tmp; latex /tmp/conic.tex; dvips /tmp/conic.dvi -o;
             kghostview conic.ps &");
-// with an optional argument the same information for the dual conic is computed
-//         and saved in conic[9]
+// with an optional argument the same information
+// for the dual conic is computed and saved in conic[9]
    conic=conicWithTangents(points,1);
    conic[9][2]; // the equation of the dual conic
 }
