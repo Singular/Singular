@@ -321,7 +321,7 @@ inline int facet::getUCN()
 #ifndef NDEBUG
   #if SIZEOF_LONG==8
 	if((this!=NULL && this!=(facet * const)0xfbfbfbfbfbfbfbfb))
-  #elif
+  #elif SIZEOF_LONG==4
 	if((this!=NULL && this!=(facet * const)0xfbfbfbfb))
   #endif
 #endif
@@ -2467,7 +2467,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 #ifndef NDEBUG
   #if SIZEOF_LONG==8	//64 bit
 		while(gcNext!=(gcone * const)0xfbfbfbfbfbfbfbfb && SearchListRoot!=NULL)
-  #elif
+  #elif SIZEOF_LONG==4
 		while(gcNext!=(gcone * const)0xfbfbfbfb && SearchListRoot!=NULL)
   #endif
 #endif
