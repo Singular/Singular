@@ -53,6 +53,7 @@ LIB "mprimdec.lib";
 LIB "mregular.lib";
 LIB "noether.lib";
 LIB "normal.lib";
+LIB "normaliz.lib";
 LIB "ntsolve.lib";
 LIB "phindex.lib";
 LIB "pointid.lib";
