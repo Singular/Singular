@@ -3849,7 +3849,9 @@ minors. (To understand the ordering, run the below example, type
 @code{minor(m,2,i,18);} and inspect the ordering among the returned 18
 minors. Note that this ordering is only enforced
 when some k <> 0 is provided. Otherwise, no ordering among the returned
-minors can be guaranteed.) @*
+minors can be guaranteed. This is due to the fact that in this case,
+@code{minor} may call a specially tuned implementation of Bareiss's
+algorithm.) @*
 If no algorithm is given, a heuristic will pick the best-suited algorithm
 among Bareiss's algorithm (which is only applicable over integral domains),
 Laplace's algorithm, and Laplace's algorithm combined with caching of
