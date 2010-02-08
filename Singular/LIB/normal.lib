@@ -2069,6 +2069,8 @@ NOTE:    delta is the sum of all local delta-invariants of the singularities,
 EXAMPLE: example genus; shows an example
 "
 {
+   if(char(basering)>0)
+   {ERROR("the genus is only implemented for characteristic 0");
    int w = printlevel-voice+2;  // w=printlevel (default: w=0)
 
    def R0=basering;
