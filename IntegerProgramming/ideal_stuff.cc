@@ -64,7 +64,7 @@ ideal& ideal::eliminate()
 // show that elimination time is really negligible.
 
   // elimination
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     iter.set_to_list(generators[i]);
 
@@ -124,7 +124,7 @@ ideal& ideal::pseudo_eliminate()
 
   list_iterator iter;
 
-  short last_weighted_variable=w.number_of_weighted_variables()-1;
+  int last_weighted_variable=w.number_of_weighted_variables()-1;
 
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
@@ -166,7 +166,7 @@ ideal& ideal::pseudo_eliminate()
 // The last weight variable is dropped while reinserting.
 // For the time needed by this function see the remarks for ideal::eliminate().
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     iter.set_to_list(generators[i]);
 
@@ -259,7 +259,7 @@ ideal& ideal::change_term_ordering_to(const term_ordering& _w)
 // As head and tail might have to be exchanged, the elements are first moved to
 // the aux_list and then reinserted according to their new head.
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     iter.set_to_list(generators[i]);
 
@@ -313,14 +313,14 @@ ideal& ideal::change_term_ordering_to(const term_ordering& _w)
 
 
 
-ideal& ideal::swap_variables_unsafe(const short& i, const short& j)
+ideal& ideal::swap_variables_unsafe(const int& i, const int& j)
 {
   // first check arguments
   if((i<0) || (i>=w.number_of_weighted_variables())
      || (j<0) || (j>=w.number_of_weighted_variables()))
   {
-    cout<<"WARNING: ideal::swap_variables(const short&, const short&)\n "
-      "or ideal::swap_variables_unsafe(const short&, const short&):\n"
+    cout<<"WARNING: ideal::swap_variables(const int&, const int&)\n "
+      "or ideal::swap_variables_unsafe(const int&, const int&):\n"
       "index out of range"<<endl;
     return *this;
   }
@@ -352,9 +352,9 @@ ideal& ideal::swap_variables_unsafe(const short& i, const short& j)
 // moved to the aux_list and then reinserted according to their new head.
 // But head and tail are not adapted to the new term ordering induced by
 // the change of the variable order - this is only done in the "safe"
-// routine swap_variables(const short&, const short&).
+// routine swap_variables(const int&, const int&).
 
-  for(short l=0;l<Number_of_Lists;l++)
+  for(int l=0;l<Number_of_Lists;l++)
   {
     iter.set_to_list(generators[l]);
 
@@ -392,7 +392,7 @@ ideal& ideal::swap_variables_unsafe(const short& i, const short& j)
 
 
 
-ideal& ideal::swap_variables(const short& i, const short& j)
+ideal& ideal::swap_variables(const int& i, const int& j)
 {
 
   swap_variables_unsafe(i,j);
@@ -406,12 +406,12 @@ ideal& ideal::swap_variables(const short& i, const short& j)
 
 
 
-ideal& ideal::flip_variable_unsafe(const short& i)
+ideal& ideal::flip_variable_unsafe(const int& i)
 {
   // first check argument
   if((i<0) || (i>=w.number_of_weighted_variables()))
   {
-    cout<<"WARNING: ideal::flip_variables(const short&):\n"
+    cout<<"WARNING: ideal::flip_variables(const int&):\n"
       "argument out of range, nothing done"<<endl;
     return *this;
   }
@@ -438,7 +438,7 @@ ideal& ideal::flip_variable_unsafe(const short& i)
 // As head_support and tail_support can change, the elements are first moved
 // to the aux_list and then reinserted according to their new head.
 
-  for(short l=0;l<Number_of_Lists;l++)
+  for(int l=0;l<Number_of_Lists;l++)
   {
     iter.set_to_list(generators[l]);
 

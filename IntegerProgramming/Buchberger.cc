@@ -62,17 +62,17 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
     // second_iter.get_element() are tested, we can stop iteraton as soon as
     // we reach this element.
 
-    short supp2=bin2.head_support%Number_of_Lists;
-    short supp_union=(bin1.head_support%Number_of_Lists)|supp2;
+    int supp2=bin2.head_support%Number_of_Lists;
+    int supp_union=(bin1.head_support%Number_of_Lists)|supp2;
     // supp_union (read as binary vector) is the union of the supports of
     // first_iter.get_element() and second_iter.get_element()
     // (restricted to List_Support_Variables variables).
 
-    for(short i=0;i<S.number_of_subsets[supp_union];i++)
+    for(int i=0;i<S.number_of_subsets[supp_union];i++)
       // Go through the lists that contain elements whose support is a
       // subset of supp_union.
     {
-      short actual_list=S.subsets_of_support[supp_union][i];
+      int actual_list=S.subsets_of_support[supp_union][i];
       iter.set_to_list(generators[actual_list]);
       // This is the i-th list among the generator list with elements
       // whose support is a subset of supp_union.
@@ -135,18 +135,18 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
     // (second_iter.get_element()).head_support.
     // Additionally,we can override lists whose support is to small.
 
-    short supp1=bin1.head_support%Number_of_Lists;
-    short supp2=bin2.head_support%Number_of_Lists;
-    short supp_union=supp1|supp2;
+    int supp1=bin1.head_support%Number_of_Lists;
+    int supp2=bin2.head_support%Number_of_Lists;
+    int supp_union=supp1|supp2;
     // supp_union (read as binary vector) is the union of the supports of
     // first_iter.get_element() and second_iter.get_element()
     // (restricted to List_Support_Variables variables).
 
-    for(short i=0;i<S.number_of_subsets[supp_union];i++)
+    for(int i=0;i<S.number_of_subsets[supp_union];i++)
       // Go through the lists that contain elements whose support is a
       // subset of supp_union.
     {
-      short actual_list=S.subsets_of_support[supp_union][i];
+      int actual_list=S.subsets_of_support[supp_union][i];
 
       if((actual_list|supp2) != supp_union)
         continue;
@@ -220,8 +220,8 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
     // union of (first_iter.get_element()).head_support and
     // (second_iter.get_element()).head_support.
 
-    short supp2=bin2.head_support%Number_of_Lists;
-    short supp_union=(bin1.head_support%Number_of_Lists)|supp2;
+    int supp2=bin2.head_support%Number_of_Lists;
+    int supp_union=(bin1.head_support%Number_of_Lists)|supp2;
     // supp_union (read as binary vector) is the union of the supports of
     // first_iter.get_element() and second_iter.get_element()
     // (restricted to List_Support_Variables variables).
@@ -230,7 +230,7 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
       // Go through the lists that contain elements whose support is a
       // subset of supp_union.
     {
-      short actual_list=S.subsets_of_support[supp_union][i];
+      int actual_list=S.subsets_of_support[supp_union][i];
 
       if(actual_list<=supp2)
         continue;
@@ -290,18 +290,18 @@ BOOLEAN ideal::unnecessary_S_pair(list_iterator& first_iter,
     // the union of (first_iter.get_element()).head_support
     // and (second_iter.get_element()).head_support.
 
-    short supp1=bin1.head_support%Number_of_Lists;
-    short supp2=bin2.head_support%Number_of_Lists;
-    short supp_union=supp1|supp2;
+    int supp1=bin1.head_support%Number_of_Lists;
+    int supp2=bin2.head_support%Number_of_Lists;
+    int supp_union=supp1|supp2;
     // supp_union (read as binary vector) is the union of the supports of
     // first_iter.get_element() and second_iter.get_element()
     // (restricted to List_Support_Variables variables)
 
-    for(short i=0;i<S.number_of_subsets[supp_union];i++)
+    for(int i=0;i<S.number_of_subsets[supp_union];i++)
       // Go through the lists that contain elements whose support is a
       // subset of supp_union.
     {
-      short actual_list=S.subsets_of_support[supp_union][i];
+      int actual_list=S.subsets_of_support[supp_union][i];
 
       if((actual_list==supp1) || (actual_list==supp2))
         continue;
@@ -433,7 +433,7 @@ ideal& ideal::compute_actual_S_pairs_1()
 
   list_iterator first_iter;
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     first_iter.set_to_list(generators[i]);
 
@@ -459,7 +459,7 @@ ideal& ideal::compute_actual_S_pairs_1()
 
       // Then search over the remaining lists.
 
-      for(short j=i+1;j<Number_of_Lists;j++)
+      for(int j=i+1;j<Number_of_Lists;j++)
       {
         second_iter.set_to_list(generators[j]);
 
@@ -484,7 +484,7 @@ ideal& ideal::compute_actual_S_pairs_1()
 
       list_iterator second_iter;
 
-      for(short j=i+1;j<Number_of_Lists;j++)
+      for(int j=i+1;j<Number_of_Lists;j++)
         // search over remaining lists
       {
         second_iter.set_to_list(generators[j]);
@@ -547,7 +547,7 @@ ideal& ideal::compute_actual_S_pairs_1a()
 
   list_iterator first_iter;
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     first_iter.set_to_list(generators[i]);
 
@@ -574,7 +574,7 @@ ideal& ideal::compute_actual_S_pairs_1a()
 
       // Then search over the remaining lists.
 
-      for(short j=i+1;j<Number_of_Lists;j++)
+      for(int j=i+1;j<Number_of_Lists;j++)
       {
         second_iter.set_to_list(generators[j]);
 
@@ -600,7 +600,7 @@ ideal& ideal::compute_actual_S_pairs_1a()
 
       list_iterator second_iter;
 
-      for(short j=i+1;j<Number_of_Lists;j++)
+      for(int j=i+1;j<Number_of_Lists;j++)
         // search over remaining lists
       {
         second_iter.set_to_list(generators[j]);
@@ -730,7 +730,7 @@ ideal& ideal::compute_actual_S_pairs_2()
   // freed memory in such a case. These two flags help us with this task.
 
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     first_iter.set_to_list(generators[i]);
 
@@ -783,7 +783,7 @@ ideal& ideal::compute_actual_S_pairs_2()
 
       // Then search over the remaining lists.
 
-      for(short j=i+1;(j<Number_of_Lists) && (first_reduced<=0);j++)
+      for(int j=i+1;(j<Number_of_Lists) && (first_reduced<=0);j++)
       {
         second_iter.set_to_list(generators[j]);
 
@@ -840,7 +840,7 @@ ideal& ideal::compute_actual_S_pairs_2()
       list_iterator second_iter(first_iter);
       second_iter.next();
 
-     for(short j=i+1;(j<Number_of_Lists) && (first_reduced<=0);j++)
+     for(int j=i+1;(j<Number_of_Lists) && (first_reduced<=0);j++)
       {
         second_iter.set_to_list(generators[j]);
 
@@ -994,7 +994,7 @@ ideal& ideal::compute_actual_S_pairs_3()
   // freed memory in such a case. These two flags help us with this task.
 
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     first_iter.set_to_list(generators[i]);
 
@@ -1047,7 +1047,7 @@ ideal& ideal::compute_actual_S_pairs_3()
 
       // Then search over the remaining lists.
 
-      for(short j=i+1;(j<Number_of_Lists) && (first_reduced<=0);j++)
+      for(int j=i+1;(j<Number_of_Lists) && (first_reduced<=0);j++)
       {
         second_iter.set_to_list(generators[j]);
 
@@ -1104,7 +1104,7 @@ ideal& ideal::compute_actual_S_pairs_3()
       list_iterator second_iter(first_iter);
       second_iter.next();
 
-     for(short j=i+1;(j<Number_of_Lists) && (first_reduced<=0);j++)
+     for(int j=i+1;(j<Number_of_Lists) && (first_reduced<=0);j++)
       {
         second_iter.set_to_list(generators[j]);
 
@@ -1257,8 +1257,8 @@ ideal& ideal::reduce_by(const binomial& bin, list_iterator& first_iter,
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  short supp1=(first_iter.get_element()).head_support%Number_of_Lists;
-  short supp2=(second_iter.get_element()).head_support%Number_of_Lists;
+  int supp1=(first_iter.get_element()).head_support%Number_of_Lists;
+  int supp2=(second_iter.get_element()).head_support%Number_of_Lists;
 
   // Determine the lists over which we have to iterate.
   // These are the lists with elements whose support contains the support
@@ -1269,8 +1269,8 @@ ideal& ideal::reduce_by(const binomial& bin, list_iterator& first_iter,
   // that are 0 is contained in the set of bits of supp that are 0.
   // With this formulation, we can use the subset tree as follows:
 
-  short supp=bin.head_support%Number_of_Lists;
-  short inv_supp=Number_of_Lists-supp-1;
+  int supp=bin.head_support%Number_of_Lists;
+  int inv_supp=Number_of_Lists-supp-1;
   // This bit vector is the bitwise inverse of bin.head_support (restricted
   // to the variables considered in the list indices.
 
@@ -1278,9 +1278,9 @@ ideal& ideal::reduce_by(const binomial& bin, list_iterator& first_iter,
   Integer reduced;
 
 
-  for(short i=0;i<S.number_of_subsets[inv_supp];i++)
+  for(int i=0;i<S.number_of_subsets[inv_supp];i++)
   {
-    short actual_list=Number_of_Lists-S.subsets_of_support[inv_supp][i]-1;
+    int actual_list=Number_of_Lists-S.subsets_of_support[inv_supp][i]-1;
     // the actual list for iteration
     // The support of S.subsets_of_support[inv_supp][i] as a bit vector
     // is contained in that of inv_supp.
@@ -1482,7 +1482,7 @@ ideal& ideal::minimalize_S_pairs()
 // flags. The iteration is repeated as long as some interreduction is done.
 
   list_iterator first_iter;
-  short found;
+  int found;
   // to control if a reduction has occurred during the actual iteration
 
   do
@@ -1496,7 +1496,7 @@ ideal& ideal::minimalize_S_pairs()
     {
 
       binomial& bin1=first_iter.get_element();
-      short first_changed=0;
+      int first_changed=0;
       // to control if the first element has been reduced
 
       // look at all following binomials
@@ -1507,7 +1507,7 @@ ideal& ideal::minimalize_S_pairs()
       while(second_iter.is_at_end()==FALSE)
       {
         binomial& bin2=second_iter.get_element();
-        short second_changed=0;
+        int second_changed=0;
 
         if(bin1.reduce_head_by(bin2,w)!=0)
           // head of first binomial can be reduced by second
@@ -1599,7 +1599,7 @@ ideal& ideal::minimalize_new_generators()
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
   list_iterator first_iter;
-  short found;
+  int found;
   // to control if a reduction has occurred during the actual iteration
 
   do
@@ -1613,7 +1613,7 @@ ideal& ideal::minimalize_new_generators()
       // the second may be an old one
     {
       binomial& bin1=first_iter.get_element();
-      short first_changed=0;
+      int first_changed=0;
       // to control if the first element has been reduced
 
       // look at all following binomials
@@ -1753,7 +1753,7 @@ ideal& ideal::minimalize_new_generators()
 
   list_iterator first_iter;
   list_iterator second_iter;
-  short found;
+  int found;
   // to control if a reduction has occurred during the actual iteration
 
   do
@@ -1761,7 +1761,7 @@ ideal& ideal::minimalize_new_generators()
     found=0;
     // no reduction occurred yet
 
-    for(short i=0;i<Number_of_Lists;i++)
+    for(int i=0;i<Number_of_Lists;i++)
     {
       first_iter.set_to_list(new_generators[i]);
 
@@ -1781,7 +1781,7 @@ ideal& ideal::minimalize_new_generators()
 // of a binomial by itself respectively unnecessary checks for this when the
 // two iterators reference different lists.
 
-        for(short j=0;(j<S.number_of_subsets[i]-1)&&(changed==0);j++)
+        for(int j=0;(j<S.number_of_subsets[i]-1)&&(changed==0);j++)
         {
           second_iter.set_to_list(new_generators[S.subsets_of_support[i][j]]);
           // This is the j-th list among the new_generator lists with elements
@@ -1879,7 +1879,7 @@ ideal& ideal::minimalize_new_generators()
 // of a binomial by itself respectively unnecessary checks for this when the
 // two iterators reference different lists.
 
-        for(short j=0;(j<S.number_of_subsets[i]-1)&&(changed==0);j++)
+        for(int j=0;(j<S.number_of_subsets[i]-1)&&(changed==0);j++)
         {
           second_iter.set_to_list(new_generators[S.subsets_of_support[i][j]]);
           // This is the j-th list among the new_generators lists with elements
@@ -2049,7 +2049,7 @@ ideal& ideal::minimalize()
 //   interreduction during the whole algorithm.
 
   list_iterator first_iter;
-  short found;
+  int found;
   // to control if a reduction has occurred during the actual iteration
 
   do
@@ -2063,7 +2063,7 @@ ideal& ideal::minimalize()
       // the second may be an old one
     {
       binomial& bin1=first_iter.get_element();
-      short first_changed=0;
+      int first_changed=0;
       // to control if the first element has been reduced
 
       // look at all following binomials
@@ -2226,7 +2226,7 @@ ideal& ideal::minimalize()
 
   list_iterator first_iter;
   list_iterator second_iter;
-  short found;
+  int found;
   // to control if a reduction has occurred during the actual iteration
 
   do
@@ -2234,7 +2234,7 @@ ideal& ideal::minimalize()
     found=0;
     // no reduction occurred yet
 
-    for(short i=0;i<Number_of_Lists;i++)
+    for(int i=0;i<Number_of_Lists;i++)
     {
       first_iter.set_to_list(generators[i]);
 
@@ -2254,7 +2254,7 @@ ideal& ideal::minimalize()
 // of a binomial by itself respectively unnecessary checks for this when the
 // two iterators reference different lists.
 
-        for(short j=0;(j<S.number_of_subsets[i]-1)&&(changed==0);j++)
+        for(int j=0;(j<S.number_of_subsets[i]-1)&&(changed==0);j++)
         {
           second_iter.set_to_list(generators[S.subsets_of_support[i][j]]);
           // This is the j-th list among the generator lists with elements
@@ -2356,7 +2356,7 @@ ideal& ideal::minimalize()
 // of a binomial by itself respectively unnecessary checks for this when the
 // two iterators reference different lists.
 
-        for(short j=0;(j<S.number_of_subsets[i]-1)&&(changed==0);j++)
+        for(int j=0;(j<S.number_of_subsets[i]-1)&&(changed==0);j++)
         {
           second_iter.set_to_list(generators[S.subsets_of_support[i][j]]);
           // This is the j-th list among the generator lists with elements
@@ -2559,7 +2559,7 @@ ideal& ideal::final_reduce()
   while(first_iter.is_at_end()==FALSE)
   {
     binomial& bin=first_iter.get_element();
-    short changed;
+    int changed;
     // to control if bin has been reduced
 
     do
@@ -2593,14 +2593,14 @@ ideal& ideal::final_reduce()
 
   list_iterator first_iter;
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     first_iter.set_to_list(generators[i]);
 
     while(first_iter.is_at_end()==FALSE)
     {
       binomial& bin=first_iter.get_element();
-      short changed;
+      int changed;
       // to control if bin has been reduced
 
       do
@@ -2608,10 +2608,10 @@ ideal& ideal::final_reduce()
         changed=0;
         list_iterator second_iter;
 
-        short supp=bin.tail_support%Number_of_Lists;
+        int supp=bin.tail_support%Number_of_Lists;
         // determine the lists over which we have to iterate
 
-        for(short j=0;(j<S.number_of_subsets[supp]) && (changed==0);j++)
+        for(int j=0;(j<S.number_of_subsets[supp]) && (changed==0);j++)
         {
           second_iter.set_to_list(generators[S.subsets_of_support[supp][j]]);
           // This is the j-th list among the generator lists with elements
@@ -2651,7 +2651,7 @@ ideal& ideal::final_reduce()
 
 
 
-short ideal::add_new_generators()
+int ideal::add_new_generators()
 {
 // Reduces the binomials in the "new_generators" list(s) by the generators
 // and moves them to the "generators" list(s).
@@ -2659,7 +2659,7 @@ short ideal::add_new_generators()
 
 #ifdef NO_SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  short result=0;
+  int result=0;
   // element inserted?
 
   list_iterator iter(new_generators);
@@ -2685,12 +2685,12 @@ short ideal::add_new_generators()
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  short result=0;
+  int result=0;
   // element inserted?
 
   list_iterator iter;
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     iter.set_to_list(new_generators[i]);
 
@@ -2784,14 +2784,14 @@ binomial& ideal::reduce(binomial& bin, BOOLEAN complete) const
     reduced=0;
     // not yet reduced
 
-    short supp=bin.head_support%Number_of_Lists;
+    int supp=bin.head_support%Number_of_Lists;
     // determine the lists over which we have to iterate
 
     // As soon as some reduction is done, the iteration is started with
     // the new support information; so we do not finish iterations over lists
     // that cannot contain reducers any more.
 
-    for(short i=0;(i<S.number_of_subsets[supp]) && (reduced==0);i++)
+    for(int i=0;(i<S.number_of_subsets[supp]) && (reduced==0);i++)
     {
       iter.set_to_list(generators[S.subsets_of_support[supp][i]]);
       // This is the i-th list among the generator lists with elements
@@ -2815,14 +2815,14 @@ binomial& ideal::reduce(binomial& bin, BOOLEAN complete) const
       reduced=0;
       // not yet reduced
 
-      short supp=bin.tail_support%Number_of_Lists;
+      int supp=bin.tail_support%Number_of_Lists;
       // determine the lists over which we have to iterate
 
       // As soon as some reduction is done, the iteration is started with
       // the new support information; so we do not finish iterations over
       // lists that cannot contain reducers any more.
 
-      for(short i=0;(i<S.number_of_subsets[supp]) && (reduced==0);i++)
+      for(int i=0;(i<S.number_of_subsets[supp]) && (reduced==0);i++)
       {
         iter.set_to_list(generators[S.subsets_of_support[supp][i]]);
         // This is the i-th list among the generator lists with elements
@@ -2858,7 +2858,7 @@ binomial& ideal::reduce(binomial& bin, BOOLEAN complete) const
 
 
 
-ideal& ideal::reduced_Groebner_basis_1(const short& S_pair_criteria,
+ideal& ideal::reduced_Groebner_basis_1(const int& S_pair_criteria,
                                        const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
@@ -2871,7 +2871,7 @@ ideal& ideal::reduced_Groebner_basis_1(const short& S_pair_criteria,
 
   interreduction_percentage=interred_percentage;
 
-  short done;
+  int done;
   // control variable for recognizing when Buchberger's algorithm has reached
   // his end
 
@@ -2939,7 +2939,7 @@ ideal& ideal::reduced_Groebner_basis_1(const short& S_pair_criteria,
 
 
 
-ideal& ideal::reduced_Groebner_basis_1a(const short& S_pair_criteria,
+ideal& ideal::reduced_Groebner_basis_1a(const int& S_pair_criteria,
                                         const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
@@ -2952,7 +2952,7 @@ ideal& ideal::reduced_Groebner_basis_1a(const short& S_pair_criteria,
 
   interreduction_percentage=interred_percentage;
 
-  short done;
+  int done;
   // control variable for recognizing when Buchberger's algorithm has reached
   // his end
 
@@ -3020,7 +3020,7 @@ ideal& ideal::reduced_Groebner_basis_1a(const short& S_pair_criteria,
 
 
 
-ideal& ideal::reduced_Groebner_basis_2(const short& S_pair_criteria,
+ideal& ideal::reduced_Groebner_basis_2(const int& S_pair_criteria,
                                        const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
@@ -3033,7 +3033,7 @@ ideal& ideal::reduced_Groebner_basis_2(const short& S_pair_criteria,
 
   interreduction_percentage=interred_percentage;
 
-  short done;
+  int done;
   // control variable for recognizing when Buchberger's algorithm has reached
   // his end
 
@@ -3101,7 +3101,7 @@ ideal& ideal::reduced_Groebner_basis_2(const short& S_pair_criteria,
 
 
 
-ideal& ideal::reduced_Groebner_basis_3(const short& S_pair_criteria,
+ideal& ideal::reduced_Groebner_basis_3(const int& S_pair_criteria,
                                        const float& interred_percentage)
 {
   // set flags for the use of the S-pair criteria
@@ -3114,7 +3114,7 @@ ideal& ideal::reduced_Groebner_basis_3(const short& S_pair_criteria,
 
   interreduction_percentage=interred_percentage;
 
-  short not_done;
+  int not_done;
   // control variable for recognizing when Buchberger's algorithm has reached
   // his end
 
@@ -3167,8 +3167,8 @@ ideal& ideal::reduced_Groebner_basis_3(const short& S_pair_criteria,
 
 
 
-ideal& ideal::reduced_Groebner_basis(const short& version,
-                                     const short& S_pair_criteria,
+ideal& ideal::reduced_Groebner_basis(const int& version,
+                                     const int& S_pair_criteria,
                                      const float& interred_percentage)
 {
   switch(version)
@@ -3182,8 +3182,8 @@ ideal& ideal::reduced_Groebner_basis(const short& version,
       case 3:
         return reduced_Groebner_basis_3(S_pair_criteria, interred_percentage);
       default:
-        cerr<<"WARNING: ideal& ideal::reduced_Groebner_basis(const short&, "
-          "const short&, const float&):\n"
+        cerr<<"WARNING: ideal& ideal::reduced_Groebner_basis(const int&, "
+          "const int&, const float&):\n"
           "version argument out of range, nothing done"<<endl;
         return*this;
   }

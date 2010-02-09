@@ -59,7 +59,7 @@ typedef long BigInt;
 typedef short Integer;
 // The general data type to deal with can be short, long or int...
 
-#define _SHORT_
+//#define _SHORT_
 // For an overflow control for thE result of the LLL algorithm, we have to
 // know the data type used.
 

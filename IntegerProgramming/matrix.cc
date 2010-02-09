@@ -11,7 +11,7 @@
 typedef Integer* IntegerP;
 typedef BigInt* BigIntP;
 
-matrix::matrix(const short& row_number, const short& column_number)
+matrix::matrix(const int& row_number, const int& column_number)
     :rows(row_number),columns(column_number)
 {
   _kernel_dimension=-2;
@@ -21,7 +21,7 @@ matrix::matrix(const short& row_number, const short& column_number)
   if((rows<=0)||(columns<=0))
     // bad input, set "error flag"
   {
-    cerr<<"\nWARNING: matrix::matrix(const short&, const short&):\n"
+    cerr<<"\nWARNING: matrix::matrix(const int&, const int&):\n"
       "argument out of range"<<endl;
     columns=-1;
     return;
@@ -30,14 +30,14 @@ matrix::matrix(const short& row_number, const short& column_number)
   // memory allocation and initialization
 
   coefficients=new IntegerP[rows];
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
-  for(short i=0;i<rows;i++)
-    for(short j=0;j<columns;j++)
+  for(int i=0;i<rows;i++)
+    for(int j=0;j<columns;j++)
       coefficients[i][j]=0;
 }
 
-matrix::matrix(const short& row_number, const short& column_number,
+matrix::matrix(const int& row_number, const int& column_number,
                Integer** entries)
     :rows(row_number),columns(column_number)
 {
@@ -48,7 +48,7 @@ matrix::matrix(const short& row_number, const short& column_number,
   if((rows<=0)||(columns<=0))
     // bad input, set "error flag"
   {
-    cerr<<"\nWARNING: matrix::matrix(const short&, const short&, Integr**):\n"
+    cerr<<"\nWARNING: matrix::matrix(const int&, const int&, Integr**):\n"
       "argument out of range"<<endl;
     columns=-1;
     return;
@@ -57,10 +57,10 @@ matrix::matrix(const short& row_number, const short& column_number,
   // memory allocation and initialization
 
   coefficients=new IntegerP[rows];
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
-  for(short i=0;i<rows;i++)
-    for(short j=0;j<columns;j++)
+  for(int i=0;i<rows;i++)
+    for(int j=0;j<columns;j++)
       coefficients[i][j]=entries[i][j];
   // coefficients[i] is the i-th row vector
 }
@@ -100,10 +100,10 @@ matrix::matrix(ifstream& input)
   }
 
   coefficients=new IntegerP[rows];
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
-  for(short i=0;i<rows;i++)
-    for(short j=0;j<columns;j++)
+  for(int i=0;i<rows;i++)
+    for(int j=0;j<columns;j++)
     {
       input>>coefficients[i][j];
       if(!input)
@@ -119,7 +119,7 @@ matrix::matrix(ifstream& input)
 
 
 
-matrix::matrix(const short& m, const short& n, ifstream& input)
+matrix::matrix(const int& m, const int& n, ifstream& input)
 {
   _kernel_dimension=-2;
   // LLL-algorithm not yet performed
@@ -128,7 +128,7 @@ matrix::matrix(const short& m, const short& n, ifstream& input)
   if((m<=0) || (n<=0))
     // bad input, set "error flag"
   {
-    cerr<<"\nWARNING: matrix::matrix(const short&, const short&, ifstream&):\n"
+    cerr<<"\nWARNING: matrix::matrix(const int&, const int&, ifstream&):\n"
       "argument out of range"<<endl;
     columns=-1;
     return;
@@ -140,10 +140,10 @@ matrix::matrix(const short& m, const short& n, ifstream& input)
   // memory allocation and initialization
 
   coefficients=new IntegerP[rows];
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
-  for(short i=0;i<rows;i++)
-    for(short j=0;j<columns;j++)
+  for(int i=0;i<rows;i++)
+    for(int j=0;j<columns;j++)
     {
       input>>coefficients[i][j];
       if(!input)
@@ -172,19 +172,19 @@ matrix::matrix(const matrix& A)
   // memory allocation and initialization (also for H)
 
   coefficients=new IntegerP[rows];
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
     coefficients[i]=new Integer[columns];
-  for(short i=0;i<rows;i++)
-    for(short j=0;j<columns;j++)
+  for(int i=0;i<rows;i++)
+    for(int j=0;j<columns;j++)
       coefficients[i][j]=A.coefficients[i][j];
 
   if(_kernel_dimension>0)
   {
     H=new BigIntP[_kernel_dimension];
-    for(short k=0;k<_kernel_dimension;k++)
+    for(int k=0;k<_kernel_dimension;k++)
       H[k]=new BigInt[columns];
-    for(short k=0;k<_kernel_dimension;k++)
-      for(short j=0;j<columns;j++)
+    for(int k=0;k<_kernel_dimension;k++)
+      for(int j=0;j<columns;j++)
         H[k][j]=(A.H)[k][j];
   }
 }
@@ -194,14 +194,14 @@ matrix::matrix(const matrix& A)
 
 matrix::~matrix()
 {
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
     delete[] coefficients[i];
   delete[] coefficients;
 
   if(_kernel_dimension>0)
     // LLL-algorithm performed
   {
-    for(short i=0;i<_kernel_dimension;i++)
+    for(int i=0;i<_kernel_dimension;i++)
       delete[] H[i];
     delete[] H;
   }
@@ -217,8 +217,8 @@ matrix::~matrix()
 
 BOOLEAN matrix::is_nonnegative() const
 {
-  for(short i=0;i<rows;i++)
-    for(short j=0;j<columns;j++)
+  for(int i=0;i<rows;i++)
+    for(int j=0;j<columns;j++)
       if(coefficients[i][j]<0)
         return FALSE;
   return TRUE;
@@ -226,7 +226,7 @@ BOOLEAN matrix::is_nonnegative() const
 
 
 
-short matrix::error_status() const
+int matrix::error_status() const
 {
   if(columns<0)
     return columns;
@@ -236,14 +236,14 @@ short matrix::error_status() const
 
 
 
-short matrix::row_number() const
+int matrix::row_number() const
 {
   return rows;
 }
 
 
 
-short matrix::column_number() const
+int matrix::column_number() const
 {
   return columns;
 }
@@ -256,16 +256,16 @@ short matrix::column_number() const
 
 
 
-short matrix::LLL_kernel_basis()
+int matrix::LLL_kernel_basis()
 {
 
   // copy the column vectors of the actual matrix
   // (They are modified by the LLL-algorithm!)
   BigInt** b=new BigIntP[columns];
-  for(short n=0;n<columns;n++)
+  for(int n=0;n<columns;n++)
     b[n]=new BigInt[rows];
-  for(short n=0;n<columns;n++)
-    for(short m=0;m<rows;m++)
+  for(int n=0;n<columns;n++)
+    for(int m=0;m<rows;m++)
       b[n][m]=coefficients[m][n];
 
   // compute a LLL-reduced basis of the relations of b[0],...,b[columns-1]
@@ -275,7 +275,7 @@ short matrix::LLL_kernel_basis()
   // H[0],...,H[_kernel_dimension-1]).
 
   // delete auxiliary vectors
-  for(short n=0;n<columns;n++)
+  for(int n=0;n<columns;n++)
     delete[] b[n];
   delete[] b;
 
@@ -285,7 +285,7 @@ short matrix::LLL_kernel_basis()
 
 
 
-short matrix::compute_nonzero_kernel_vector()
+int matrix::compute_nonzero_kernel_vector()
 {
 
   if(_kernel_dimension==-2)
@@ -294,14 +294,14 @@ short matrix::compute_nonzero_kernel_vector()
 
   if(_kernel_dimension==-1)
   {
-    cerr<<"\nWARNING: short matrix::compute_non_zero_kernel_vector(BigInt*&):"
+    cerr<<"\nWARNING: int matrix::compute_non_zero_kernel_vector(BigInt*&):"
       "\nerror in kernel basis, cannot compute the desired vector"<<endl;
     return 0;
   }
 
   if(_kernel_dimension==0)
   {
-    cerr<<"\nWARNING: short matrix::compute_non_zero_kernel_vector(BigInt*&): "
+    cerr<<"\nWARNING: int matrix::compute_non_zero_kernel_vector(BigInt*&): "
       "\nkernel dimension is zero"<<endl;
     return 0;
   }
@@ -317,10 +317,10 @@ short matrix::compute_nonzero_kernel_vector()
 // unique, choose the smallest).
 
   // determine number of zero components
-  for(short i=0;i<_kernel_dimension;i++)
+  for(int i=0;i<_kernel_dimension;i++)
   {
     M[i]=0;
-    for(short j=0;j<columns;j++)
+    for(int j=0;j<columns;j++)
       if(H[i][j]==BigInt(0))
         M[i]++;
   }
@@ -329,26 +329,26 @@ short matrix::compute_nonzero_kernel_vector()
   BigInt min=columns;
   // columns is an upper bound (not reached because the kernel basis cannot
   // contain the zero vector)
-  for(short i=0;i<_kernel_dimension;i++)
+  for(int i=0;i<_kernel_dimension;i++)
     if(M[i]<min)
       min=M[i];
 
   // add the square of the norm to the vectors with the least zero components
   // and discard the others (the norm computation is why we have chosen the
   // M[i] to be BigInts)
-  for(short i=0;i<_kernel_dimension;i++)
+  for(int i=0;i<_kernel_dimension;i++)
     if(M[i]!=min)
       M[i]=-1;
     else
-      for(short j=0;j<columns;j++)
+      for(int j=0;j<columns;j++)
         M[i]+=H[i][j]*H[i][j];
   // As the lattice basis does not contain the zero vector, at least one M[i]
   // is positive!
 
   // determine the start vector, i.e. the one with least zero components, but
   // smallest possible (euclidian) norm
-  short min_index=-1;
-  for(short i=0;i<_kernel_dimension;i++)
+  int min_index=-1;
+  for(int i=0;i<_kernel_dimension;i++)
     if(M[i]>BigInt(0))
       if(min_index==-1)
         min_index=i;
@@ -376,7 +376,7 @@ short matrix::compute_nonzero_kernel_vector()
 // (to make sure that it is together with H[1],...,H[_kernel_dimension]
 // still a  l a t t i c e   basis).
 
-  for(short current_position=1;current_position<columns;current_position++)
+  for(int current_position=1;current_position<columns;current_position++)
     // in fact, this loop will terminate before the condition in the
     // for-statement is satisfied...
   {
@@ -385,7 +385,7 @@ short matrix::compute_nonzero_kernel_vector()
 // STEP 2: Nonnegative vector already found?
 
     BOOLEAN found=TRUE;
-    for(short j=0;j<columns;j++)
+    for(int j=0;j<columns;j++)
       if(H[0][j]==BigInt(0))
         found=FALSE;
 
@@ -400,16 +400,16 @@ short matrix::compute_nonzero_kernel_vector()
 
     // determine number of components in each remaining vector that are zero
     // in the vector itself as well as in the already constructed vector
-    for(short i=current_position;i<_kernel_dimension;i++)
+    for(int i=current_position;i<_kernel_dimension;i++)
       M[i]=0;
 
-    short remaining_zero_components=0;
+    int remaining_zero_components=0;
 
-    for(short j=0;j<columns;j++)
+    for(int j=0;j<columns;j++)
       if(H[0][j]==BigInt(0))
       {
         remaining_zero_components++;
-        for(short i=current_position;i<_kernel_dimension;i++)
+        for(int i=current_position;i<_kernel_dimension;i++)
           if(H[i][j]==BigInt(0))
             M[i]++;
       }
@@ -418,7 +418,7 @@ short matrix::compute_nonzero_kernel_vector()
     min=remaining_zero_components;
     // this is the number of zero components in H[0] and an upper bound
     // for the M[i]
-    for(short i=current_position;i<_kernel_dimension;i++)
+    for(int i=current_position;i<_kernel_dimension;i++)
       if(M[i]<min)
         min=M[i];
 
@@ -430,19 +430,19 @@ short matrix::compute_nonzero_kernel_vector()
     // add the square of the norm to the vectors with the least common zero
     // components
     // discard the others
-    for(short i=current_position;i<_kernel_dimension;i++)
+    for(int i=current_position;i<_kernel_dimension;i++)
       if(M[i]!=min)
         M[i]=-1;
       else
-        for(short j=0;j<columns;j++)
+        for(int j=0;j<columns;j++)
           M[i]+=H[i][j]*H[i][j];
     //  Again, at least one M[i] is positive!
 
     // determine vector to proceed with
     // This is the vector with the least common zero components with respect
     // to H[0], but the smallest possible norm.
-    short min_index=0;
-    for(short i=current_position;i<_kernel_dimension;i++)
+    int min_index=0;
+    for(int i=current_position;i<_kernel_dimension;i++)
       if(M[i]>BigInt(0))
         if(min_index==0)
           min_index=i;
@@ -471,20 +471,20 @@ short matrix::compute_nonzero_kernel_vector()
 
     found=FALSE;
 
-    for(short mult=1;found==FALSE;mult++)
+    for(int mult=1;found==FALSE;mult++)
     {
       found=TRUE;
 
       // check if any component !=0 of H[0] becomes zero by adding
       // mult*H[current_position]
-      for(short j=0;j<columns;j++)
+      for(int j=0;j<columns;j++)
         if(H[0][j]!=BigInt(0))
           if(H[0][j]+(const BigInt&)mult*H[current_position][j]
             ==BigInt(0))
             found=FALSE;
 
       if(found==TRUE)
-        for(short j=0;j<columns;j++)
+        for(int j=0;j<columns;j++)
           H[0][j]+=(const BigInt&)mult*H[current_position][j];
       else
         // try -mult
@@ -494,32 +494,32 @@ short matrix::compute_nonzero_kernel_vector()
 
         // check if any component !=0 of H[0] becomes zero by subtracting
         // mult*H[current_position]
-        for(short j=0;j<columns;j++)
+        for(int j=0;j<columns;j++)
           if(H[0][j]!=BigInt(0))
             if(H[0][j]-(const BigInt&)mult*H[current_position][j]
               ==BigInt(0))
               found=FALSE;
 
         if(found==TRUE)
-          for(short j=0;j<columns;j++)
+          for(int j=0;j<columns;j++)
             H[0][j]-=(const BigInt&)mult*H[current_position][j];
       }
     }
   }
 
 // When reaching this line, an error must have occurred.
-  cerr<<"FATAL ERROR in short matrix::compute_nonnegative_vector()"<<endl;
+  cerr<<"FATAL ERROR in int matrix::compute_nonnegative_vector()"<<endl;
   abort();
 }
 
-short matrix::compute_flip_variables(short*& F)
+int matrix::compute_flip_variables(int*& F)
 {
   // first compute nonzero vector
   int okay=compute_nonzero_kernel_vector();
 
   if(!okay)
   {
-    cout<<"\nWARNING: short matrix::compute_flip_variables(short*&):\n"
+    cout<<"\nWARNING: int matrix::compute_flip_variables(int*&):\n"
       "kernel of the matrix contains no vector with nonzero components,\n"
       "no flip variables computed"<<endl;
     return -1;
@@ -529,10 +529,10 @@ short matrix::compute_flip_variables(short*& F)
   // to the positive components of the kernel vector without zero components
   // or those corresponding to the negative ones
 
-  short r=0;
+  int r=0;
   // number of flip variables
 
-  for(short j=0;j<columns;j++)
+  for(int j=0;j<columns;j++)
     if(H[0][j]<BigInt(0))
       r++;
   // remember that all components of H[0] are !=0
@@ -546,10 +546,10 @@ short matrix::compute_flip_variables(short*& F)
     // all variables corresponding to positive components will be flipped
   {
     r=columns-r;
-    F=new short[r];
-    memset(F,0,r*sizeof(short));
-    short counter=0;
-    for(short j=0;j<columns;j++)
+    F=new int[r];
+    memset(F,0,r*sizeof(int));
+    int counter=0;
+    for(int j=0;j<columns;j++)
       if(H[0][j]> BigInt(0))
       {
         F[counter]=j;
@@ -560,10 +560,10 @@ short matrix::compute_flip_variables(short*& F)
     // more (or as many) positive than negative components in v
     // all variables corresponding to negative components will be flipped
   {
-    F=new short[r];
-    memset(F,0,r*sizeof(short));
-    short counter=0;
-    for(short j=0;j<columns;j++)
+    F=new int[r];
+    memset(F,0,r*sizeof(int));
+    int counter=0;
+    for(int j=0;j<columns;j++)
       if(H[0][j]< BigInt(0))
       {
         F[counter]=j;
@@ -577,7 +577,7 @@ short matrix::compute_flip_variables(short*& F)
 
 
 
-short matrix::hosten_shapiro(short*& sat_var)
+int matrix::hosten_shapiro(int*& sat_var)
 {
 
   if(_kernel_dimension==-2)
@@ -586,7 +586,7 @@ short matrix::hosten_shapiro(short*& sat_var)
 
   if(_kernel_dimension==-1)
   {
-    cerr<<"\nWARNING: short matrix::hosten_shapiro(short*&):\n"
+    cerr<<"\nWARNING: int matrix::hosten_shapiro(int*&):\n"
       "error in kernel basis, cannot compute the saturation variables"<<endl;
     return 0;
   }
@@ -603,24 +603,24 @@ short matrix::hosten_shapiro(short*& sat_var)
     // (1) corresponding to the toric ideal <x-1> which is already staurated
     return 0;
 
-  short number_of_sat_var=0;
-  sat_var=new short[columns/2];
-  memset(sat_var,0,sizeof(short)*(columns/2));
+  int number_of_sat_var=0;
+  sat_var=new int[columns/2];
+  memset(sat_var,0,sizeof(int)*(columns/2));
 
   BOOLEAN* ideal_saturated_by_var=new BOOLEAN[columns];
   // auxiliary array used to remember by which variables the ideal has still to
   // be saturated
-  for(short j=0;j<columns;j++)
+  for(int j=0;j<columns;j++)
     ideal_saturated_by_var[j]=FALSE;
 
-  for(short k=0;k<_kernel_dimension;k++)
+  for(int k=0;k<_kernel_dimension;k++)
   {
     // determine number of positive and negative components in H[k]
     // corresponding to variables by which the ideal has still to be saturated
-    short pos_sat_var=0;
-    short neg_sat_var=0;
+    int pos_sat_var=0;
+    int neg_sat_var=0;
 
-    for(short j=0;j<columns;j++)
+    for(int j=0;j<columns;j++)
     {
       if(ideal_saturated_by_var[j]==FALSE)
       {
@@ -636,7 +636,7 @@ short matrix::hosten_shapiro(short*& sat_var)
     // now add the smaller set to the saturation variables
     if(pos_sat_var<=neg_sat_var)
     {
-      for(short j=0;j<columns;j++)
+      for(int j=0;j<columns;j++)
         if(ideal_saturated_by_var[j]==FALSE)
           if(H[k][j]> BigInt(0))
             // ideal has to be saturated by the variables corresponding
@@ -654,7 +654,7 @@ short matrix::hosten_shapiro(short*& sat_var)
     }
     else
     {
-      for(short j=0;j<columns;j++)
+      for(int j=0;j<columns;j++)
         if(ideal_saturated_by_var[j]==FALSE)
           if(H[k][j]< BigInt(0))
             // ideal has to be saturated by the variables corresponding
@@ -690,9 +690,9 @@ void matrix::print() const
 {
   printf("\n%3d x %3d\n",rows,columns);
 
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
   {
-    for(short j=0;j<columns;j++)
+    for(int j=0;j<columns;j++)
       printf("%6d",coefficients[i][j]);
     printf("\n");
   }
@@ -703,9 +703,9 @@ void matrix::print(FILE *output) const
 {
   fprintf(output,"\n%3d x %3d\n",rows,columns);
 
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
   {
-    for(short j=0;j<columns;j++)
+    for(int j=0;j<columns;j++)
       fprintf(output,"%6d",coefficients[i][j]);
     fprintf(output,"\n");
   }
@@ -716,9 +716,9 @@ void matrix::print(ofstream& output) const
 {
   output<<endl<<setw(3)<<rows<<" x "<<setw(3)<<columns<<endl;
 
-  for(short i=0;i<rows;i++)
+  for(int i=0;i<rows;i++)
   {
-    for(short j=0;j<columns;j++)
+    for(int j=0;j<columns;j++)
       output<<setw(6)<<coefficients[i][j];
     output<<endl;
   }

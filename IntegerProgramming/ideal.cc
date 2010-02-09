@@ -18,7 +18,7 @@
 
 void ideal::create_subset_tree()
 {
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
 
 // First determine the number of binary vectors whose support is a subset
@@ -26,9 +26,9 @@ void ideal::create_subset_tree()
 // The support of i is a set of cardinality s, where s is the number of
 // bits in i that are 1. Hence the desired number is 2^s.
 
-    short s=0;
+    int s=0;
 
-    for(short k=0;k<List_Support_Variables;k++)
+    for(int k=0;k<List_Support_Variables;k++)
       if( (i&(1<<k)) == (1<<k) )
         // bit k of i is 1
         s++;
@@ -42,11 +42,11 @@ void ideal::create_subset_tree()
 // with that of i. (Efficiency considerations are absolutely unimportant
 // in this function.)
 
-    S.subsets_of_support[i]=new short[S.number_of_subsets[i]];
+    S.subsets_of_support[i]=new int[S.number_of_subsets[i]];
     // memory allocation for subsets_of_support[i]
 
-    short index=0;
-    for(short j=0;j<Number_of_Lists;j++)
+    int index=0;
+    for(int j=0;j<Number_of_Lists;j++)
       if((i&j)==j)
         // If the support of j as a bit vector is contained in the support of
         // i as a bit vector, j is saved in the list subsets_of_support[i].
@@ -59,9 +59,9 @@ void ideal::create_subset_tree()
 
 void ideal::destroy_subset_tree()
 {
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
     delete[] S.subsets_of_support[i];
-  // The arrays number_of_subsets and subsets_of_support (the (short*)-array)
+  // The arrays number_of_subsets and subsets_of_support (the (int*)-array)
   // are not dynamically allocated and do not have to be deleted.
 }
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
@@ -133,16 +133,16 @@ ideal& ideal::Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
   // algorithm with "inversion variable".
 
   // build initial ideal generators
-  for(short j=0;j<A.columns;j++)
+  for(int j=0;j<A.columns;j++)
   {
-    for(short k=0;k<A.columns;k++)
+    for(int k=0;k<A.columns;k++)
       // original variables
       if(j==k)
         generator[k]=-1;
       else
         generator[k]=0;
 
-    for(short i=0;i<A.rows;i++)
+    for(int i=0;i<A.rows;i++)
       // elimination variables
       generator[A.columns+i]=A.coefficients[i][j];
 
@@ -158,9 +158,9 @@ ideal& ideal::Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
   }
 
   // now add the "inversion generator"
-  for(short j=0;j<A.columns;j++)
+  for(int j=0;j<A.columns;j++)
     generator[j]=0;
-  for(short i=0;i<A.rows+1;i++)
+  for(int i=0;i<A.rows+1;i++)
     generator[A.columns+i]=1;
   binomial* bin=new binomial(A.rows+1+A.columns,generator,w);
   add_generator(*bin);
@@ -187,16 +187,16 @@ ideal& ideal::Positive_Conti_Traverso_ideal(matrix& A,const term_ordering& _w)
   // algorithm without "inversion variable".
 
   // build the initial ideal generators
-  for(short j=0;j<A.columns;j++)
+  for(int j=0;j<A.columns;j++)
   {
-    for(short k=0;k<A.columns;k++)
+    for(int k=0;k<A.columns;k++)
       // original variables
       if(j==k)
         generator[k]=-1;
       else
         generator[k]=0;
 
-    for(short i=0;i<A.rows;i++)
+    for(int i=0;i<A.rows;i++)
       // elimination variables
       generator[A.columns+i]=A.coefficients[i][j];
 
@@ -238,10 +238,10 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
 
 
   // compute initial generating system from the kernel of A
-  for(short j=0;j<A._kernel_dimension;j++)
+  for(int j=0;j<A._kernel_dimension;j++)
   {
 
-    for(short k=0;k<A.columns;k++)
+    for(int k=0;k<A.columns;k++)
     {
 
       // We should first verifie if the components of the LLL-reduced lattice
@@ -256,7 +256,7 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
         cerr<<"\nWARNING: ideal& ideal::Pottier_ideal(matrix&, const "
           "term_ordering&):\n"
           "LLL-reduced kernel basis does not fit into the used "
-          "basic data type short."<<endl;
+          "basic data type int."<<endl;
         size=-3;
         delete[] generator;
         return *this;
@@ -314,18 +314,18 @@ ideal& ideal::Pottier_ideal(matrix& A, const term_ordering& _w)
   // The use of the hosten_shapiro procedure is useful here because the head
   // of the computed saturation generator is smaller if less variables are
   // involved.
-  short* sat_var = NULL;  
-  short number_of_sat_var = A.hosten_shapiro(sat_var);
+  int* sat_var = NULL;  
+  int number_of_sat_var = A.hosten_shapiro(sat_var);
   if( (number_of_sat_var == 0) || (sat_var == NULL) )
   {
     delete[] generator;
     return *this;
   }
 
-  for(short j=0;j<A.columns;j++)
+  for(int j=0;j<A.columns;j++)
     generator[j]=0;
 
-  for(short k=0;k<number_of_sat_var;k++)
+  for(int k=0;k<number_of_sat_var;k++)
     generator[sat_var[k]]=1;
 
   generator[A.columns]=1;
@@ -372,10 +372,10 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
 
 
   // compute initial generating system from the kernel of A
-  for(short j=0;j<A._kernel_dimension;j++)
+  for(int j=0;j<A._kernel_dimension;j++)
   {
 
-    for(short k=0;k<A.columns;k++)
+    for(int k=0;k<A.columns;k++)
     {
 
       // We should first verifie if the components of the LLL-reduced lattice
@@ -389,7 +389,7 @@ ideal& ideal::Hosten_Sturmfels_ideal(matrix& A, const term_ordering& _w)
       {
         cerr<<"\nWARNING: ideal& ideal::Hosten_Sturmfels_ideal(matrix&, const "
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
-          "into the used basic data type short."<<endl;
+          "into the used basic data type int."<<endl;
         size=-3;
         delete[] generator;
         return *this;
@@ -461,11 +461,11 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
 
   // now compute flip variables
 
-  short* F;
+  int* F;
   // set of flip variables
   // If F[i]==j, x_j will be flipped.
 
-  short r=A.compute_flip_variables(F);
+  int r=A.compute_flip_variables(F);
   // number of flip variables
 
   if(r<0)
@@ -484,7 +484,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
 
   if(r>0)
   {
-    for(short i=0;i<_w.number_of_weighted_variables();i++)
+    for(int i=0;i<_w.number_of_weighted_variables();i++)
       if((_w[i]!=0) && (i!=F[0]))
         ordering_okay=FALSE;
   }
@@ -498,10 +498,10 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
   // variables.
 
   // compute initial generating system from the kernel of A
-  for(short j=0;j<A._kernel_dimension;j++)
+  for(int j=0;j<A._kernel_dimension;j++)
   {
 
-    for(short k=0;k<A.columns;k++)
+    for(int k=0;k<A.columns;k++)
     {
 
       // We should first verifie if the components of the LLL-reduced lattice
@@ -515,7 +515,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
       {
         cerr<<"\nWARNING: ideal& ideal::DiBiase_Urbanke_ideal(matrix&, const "
           "term_ordering&):\nLLL-reduced kernel basis does not fit "
-          "into the used basic data type short."<<endl;
+          "into the used basic data type int."<<endl;
         size=-3;
         delete[] generator;
         return *this;
@@ -554,7 +554,7 @@ ideal& ideal::DiBiase_Urbanke_ideal(matrix& A, const term_ordering& _w)
     }
 
     // flip variables
-    for(short l=0;l<r;l++)
+    for(int l=0;l<r;l++)
       generator[F[l]]*=-1;
 
     binomial* bin=new binomial(A.columns,generator,w);
@@ -598,11 +598,11 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
   // - The head of the saturation generator involves less variables, is
   //   smaller in term ordering.
   // - The weight of the pseudo-elimination variable is smaller.
-  short* sat_var;
-  short number_of_sat_var=A.hosten_shapiro(sat_var);
+  int* sat_var;
+  int number_of_sat_var=A.hosten_shapiro(sat_var);
 
   float weight=0;
-  for(short i=0;i<number_of_sat_var;i++)
+  for(int i=0;i<number_of_sat_var;i++)
     weight+=w[sat_var[i]];
 
   w.append_weighted_variable(weight);
@@ -613,9 +613,9 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
   // weighted variable.
 
   // first build "saturation generator"
-  for(short k=0;k<A.columns;k++)
+  for(int k=0;k<A.columns;k++)
     generator[k]=0;
-  for(short i=0;i<number_of_sat_var;i++)
+  for(int i=0;i<number_of_sat_var;i++)
     generator[sat_var[i]]=1;
   generator[A.columns]=-1;
 
@@ -625,9 +625,9 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
   add_generator(*bin);
 
   // compute initial generating system from the kernel of A
-  for(short j=0;j<A._kernel_dimension;j++)
+  for(int j=0;j<A._kernel_dimension;j++)
   {
-    for(short k=0;k<A.columns;k++)
+    for(int k=0;k<A.columns;k++)
     {
       // We should first verifie if the components of the LLL-reduced lattice
       // basis fit into the basic data type (Integer as defined in globals.h).
@@ -640,7 +640,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
       {
         cerr<<"\nWARNING: ideal& ideal::Bigatti_LaScala_Robbiano_ideal"
           "(matrix&, const term_ordering&):\nLLL-reduced kernel basis does "
-          "not fit into the used basic data type short."<<endl;
+          "not fit into the used basic data type int."<<endl;
         size=-3;
         delete[] generator;
         return *this;
@@ -700,7 +700,7 @@ ideal& ideal::Bigatti_LaScala_Robbiano_ideal(matrix& A,const term_ordering& _w)
 
 /////////////////// constructors and destructor /////////////////////////////
 
-ideal::ideal(matrix& A, const term_ordering& _w, const short& algorithm)
+ideal::ideal(matrix& A, const term_ordering& _w, const int& algorithm)
 {
 
   // check arguments as far as possible
@@ -708,7 +708,7 @@ ideal::ideal(matrix& A, const term_ordering& _w, const short& algorithm)
   if(A.error_status()<0)
   {
     cerr<<"\nWARNING: ideal::ideal(matrix&, const term_ordering&, const "
-      "short&):\ncannot create ideal from a corrupt input matrix"<<endl;
+      "int&):\ncannot create ideal from a corrupt input matrix"<<endl;
     size=-1;
     return;
   }
@@ -716,7 +716,7 @@ ideal::ideal(matrix& A, const term_ordering& _w, const short& algorithm)
   if(_w.error_status()<0)
   {
     cerr<<"\nWARNING: ideal::ideal(matrix&, const term_ordering&, const "
-      "short&):\ncannot create ideal with a corrupt input ordering"<<endl;
+      "int&):\ncannot create ideal with a corrupt input ordering"<<endl;
     size=-1;
     return;
   }
@@ -768,7 +768,7 @@ ideal::ideal(matrix& A, const term_ordering& _w, const short& algorithm)
         break;
       default:
         cerr<<"\nWARNING: ideal::ideal(matrix&, const term_ordering&, const "
-          "short&):\nunknown algorithm for ideal construction"<<endl;
+          "int&):\nunknown algorithm for ideal construction"<<endl;
         size=-1;
         return;
   }
@@ -827,7 +827,7 @@ ideal::ideal(const ideal& I)
 
   create_subset_tree();
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     iter.set_to_list(I.generators[i]);
 
@@ -839,7 +839,7 @@ ideal::ideal(const ideal& I)
     }
   }
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
   {
     iter.set_to_list(I.new_generators[i]);
 
@@ -864,13 +864,13 @@ ideal::ideal(const ideal& I)
   number_of_new_binomials=size;
 }
 
-ideal::ideal(ifstream& input, const term_ordering& _w, const short&
+ideal::ideal(ifstream& input, const term_ordering& _w, const int&
              number_of_generators)
 {
   if(_w.error_status()<0)
   {
     cerr<<"\nWARNING: ideal::ideal(ifstream&, const term_ordering&, const "
-      "short&):\ncannot create ideal with a corrupt input ordering"<<endl;
+      "int&):\ncannot create ideal with a corrupt input ordering"<<endl;
     size=-1;
     return;
   }
@@ -894,13 +894,13 @@ ideal::ideal(ifstream& input, const term_ordering& _w, const short&
 
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  short number_of_variables=
+  int number_of_variables=
     w.number_of_elimination_variables()+w.number_of_weighted_variables();
   Integer* generator=new Integer[number_of_variables];
 
   for(long i=0;i<number_of_generators;i++)
   {
-    for(short j=0;j<number_of_variables;j++)
+    for(int j=0;j<number_of_variables;j++)
     {
       input>>generator[j];
 
@@ -908,7 +908,7 @@ ideal::ideal(ifstream& input, const term_ordering& _w, const short&
         // input failure, set "error flag"
       {
         cerr<<"\nWARNING: ideal::ideal(ifstream&, const term_ordering&, "
-          "const short&): \ninput failure when reading generator "<<i<<endl;
+          "const int&): \ninput failure when reading generator "<<i<<endl;
         size=-2;
         delete[] generator;
         return;
@@ -941,7 +941,7 @@ long ideal::number_of_generators() const
   return size;
 }
 
-short ideal::error_status() const
+int ideal::error_status() const
 {
   if(size<0)
     return -1;
@@ -960,7 +960,7 @@ void ideal::print() const
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
     generators[i].ordered_print(w);
 
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
@@ -1001,7 +1001,7 @@ void ideal::print(FILE *output) const
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
     generators[i].ordered_print(output,w);
 
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
@@ -1042,7 +1042,7 @@ void ideal::print(ofstream& output) const
 
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
     generators[i].ordered_print(output,w);
 
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED
@@ -1078,7 +1078,7 @@ void ideal::format_print(ofstream& output) const
 {
 #ifdef SUPPORT_DRIVEN_METHODS_EXTENDED
 
-  for(short i=0;i<Number_of_Lists;i++)
+  for(int i=0;i<Number_of_Lists;i++)
     generators[i].ordered_format_print(output,w);
 
 #endif  // SUPPORT_DRIVEN_METHODS_EXTENDED

@@ -60,8 +60,8 @@ void print_flags(ofstream& output)
 
 
 int Conti_Traverso(INPUT_FILE MATRIX,
-                   const short& version,
-                   const short& S_pair_criteria,
+                   const int& version,
+                   const int& S_pair_criteria,
                    const float& interred_percentage,
                    const BOOLEAN& verbose)
 {
@@ -70,8 +70,8 @@ int Conti_Traverso(INPUT_FILE MATRIX,
 /////////////////////////// input /////////////////////////////////////////
 
   char format_string[128]; // to verifie file format
-  short constraints;       // number of equality constraints
-  short variables;         // number of variables (without auxiliary variables)
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables (without auxiliary variables)
 
   ifstream input(MATRIX);
 
@@ -264,7 +264,7 @@ int Conti_Traverso(INPUT_FILE MATRIX,
   // create output file
 
   char GROEBNER[128];
-  short i=0;
+  int i=0;
   while(MATRIX[i]!='\0' && MATRIX[i]!='.')
   {
     GROEBNER[i]=MATRIX[i];
@@ -348,8 +348,8 @@ int Conti_Traverso(INPUT_FILE MATRIX,
 
 
 int Positive_Conti_Traverso(INPUT_FILE MATRIX,
-                            const short& version,
-                            const short& S_pair_criteria,
+                            const int& version,
+                            const int& S_pair_criteria,
                             const float& interred_percentage,
                             const BOOLEAN& verbose)
 {
@@ -358,8 +358,8 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
 /////////////////////////// input /////////////////////////////////////////
 
   char format_string[128]; // to verifie file format
-  short constraints;       // number of equality constraints
-  short variables;         // number of variables (without auxiliary variables)
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables (without auxiliary variables)
 
   ifstream input(MATRIX);
 
@@ -560,7 +560,7 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
   // create output file
 
   char GROEBNER[128];
-  short i=0;
+  int i=0;
   while(MATRIX[i]!='\0' && MATRIX[i]!='.')
   {
     GROEBNER[i]=MATRIX[i];
@@ -645,8 +645,8 @@ int Positive_Conti_Traverso(INPUT_FILE MATRIX,
 
 
 int Elim_Conti_Traverso(INPUT_FILE MATRIX,
-                        const short& version,
-                        const short& S_pair_criteria,
+                        const int& version,
+                        const int& S_pair_criteria,
                         const float& interred_percentage,
                         const BOOLEAN& verbose)
 {
@@ -655,8 +655,8 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 /////////////////////////// input /////////////////////////////////////////
 
   char format_string[128]; // to verifie file format
-  short constraints;       // number of equality constraints
-  short variables;         // number of variables (without auxiliary variables)
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables (without auxiliary variables)
 
   ifstream input(MATRIX);
 
@@ -851,7 +851,7 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
   // create output file
 
   char GROEBNER[128];
-  short i=0;
+  int i=0;
   while(MATRIX[i]!='\0' && MATRIX[i]!='.')
   {
     GROEBNER[i]=MATRIX[i];
@@ -934,8 +934,8 @@ int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 
 
 int Pottier(INPUT_FILE MATRIX,
-            const short& version,
-            const short& S_pair_criteria,
+            const int& version,
+            const int& S_pair_criteria,
             const float& interred_percentage,
             const BOOLEAN& verbose)
 {
@@ -944,8 +944,8 @@ int Pottier(INPUT_FILE MATRIX,
 /////////////////////////// input /////////////////////////////////////////
 
   char format_string[128]; // to verifie file format
-  short constraints;       // number of equality constraints
-  short variables;         // number of variables (without auxiliary variables)
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables (without auxiliary variables)
 
   ifstream input(MATRIX);
 
@@ -1139,7 +1139,7 @@ int Pottier(INPUT_FILE MATRIX,
   // create output file
 
   char GROEBNER[128];
-  short i=0;
+  int i=0;
   while(MATRIX[i]!='\0' && MATRIX[i]!='.')
   {
     GROEBNER[i]=MATRIX[i];
@@ -1222,8 +1222,8 @@ int Pottier(INPUT_FILE MATRIX,
 
 
 int Hosten_Sturmfels(INPUT_FILE MATRIX,
-                     const short& version,
-                     const short& S_pair_criteria,
+                     const int& version,
+                     const int& S_pair_criteria,
                      const float& interred_percentage,
                      const BOOLEAN& verbose)
 {
@@ -1232,8 +1232,8 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 /////////////////////////// input /////////////////////////////////////////
 
   char format_string[128]; // to verifie file format
-  short constraints;       // number of equality constraints
-  short variables;         // number of variables
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables
 
   ifstream input(MATRIX);
 
@@ -1464,7 +1464,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 
   float *hom_grad=new float[variables];
 
-  for(short i=0;i<variables;i++)
+  for(int i=0;i<variables;i++)
   {
     input>>hom_grad[i];
 
@@ -1505,12 +1505,12 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
   start=clock();
 
   // determine saturation variables
-  short *sat_var;
-  short number_of_sat_var=A.hosten_shapiro(sat_var);
+  int *sat_var;
+  int number_of_sat_var=A.hosten_shapiro(sat_var);
   // memory for sat_var is allocated in the hosten_shapiro procedure
 
   // saturate the ideal
-  for(short i=0;i<number_of_sat_var;i++)
+  for(int i=0;i<number_of_sat_var;i++)
   {
     I.swap_variables(sat_var[i],variables-1);
     // This operation simply makes the i-th saturation variable the cheapest.
@@ -1550,7 +1550,7 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
   // create output file
 
   char GROEBNER[128];
-  short i=0;
+  int i=0;
   while(MATRIX[i]!='\0' && MATRIX[i]!='.')
   {
     GROEBNER[i]=MATRIX[i];
@@ -1633,8 +1633,8 @@ int Hosten_Sturmfels(INPUT_FILE MATRIX,
 
 
 int DiBiase_Urbanke(INPUT_FILE MATRIX,
-                    const short& version,
-                    const short& S_pair_criteria,
+                    const int& version,
+                    const int& S_pair_criteria,
                     const float& interred_percentage,
                     const BOOLEAN& verbose)
 {
@@ -1643,8 +1643,8 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 /////////////////////////// input /////////////////////////////////////////
 
   char format_string[128]; // to verify file format
-  short constraints;       // number of equality constraints
-  short variables;         // number of variables
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables
 
   ifstream input(MATRIX);
 
@@ -1821,8 +1821,8 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
   clock_t start, end;
 
   // compute flip variables (also to check the suitability of the algorithm)
-  short* F;
-  short r=A.compute_flip_variables(F);
+  int* F;
+  int r=A.compute_flip_variables(F);
 
   if(r<0)
     // algorithm not suitable
@@ -1861,7 +1861,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
     // refining ordering).
 
     float* weights=new float[variables];
-    for(short j=0;j<variables;j++)
+    for(int j=0;j<variables;j++)
       weights[j]=0;
     weights[F[0]]=1;
 
@@ -1879,7 +1879,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
     // ideal::swap_variables_unsafe(...) )
     // But the following change of the term ordering will correct this.
 
-    for(short l=1;l<r;l++)
+    for(int l=1;l<r;l++)
     {
       w.swap_weights(F[l-1],F[l]);
       // This means concretely:
@@ -1909,7 +1909,7 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
   // create output file
 
   char GROEBNER[128];
-  short i=0;
+  int i=0;
   while(MATRIX[i]!='\0' && MATRIX[i]!='.')
   {
     GROEBNER[i]=MATRIX[i];
@@ -1999,8 +1999,8 @@ int DiBiase_Urbanke(INPUT_FILE MATRIX,
 
 
 int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
-                             const short& version,
-                             const short& S_pair_criteria,
+                             const int& version,
+                             const int& S_pair_criteria,
                              const float& interred_percentage,
                              const BOOLEAN& verbose)
 {
@@ -2009,8 +2009,8 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 /////////////////////////// input /////////////////////////////////////////
 
   char format_string[128];     // to verifie file format
-  short constraints;       // number of equality constraints
-  short variables;         // number of variables
+  int constraints;       // number of equality constraints
+  int variables;         // number of variables
 
   ifstream input(MATRIX);
 
@@ -2252,7 +2252,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
 
   float *hom_grad=new float[variables];
   
-  for(short _i=0;_i<variables;_i++)
+  for(int _i=0;_i<variables;_i++)
   {
     input>>hom_grad[_i];
 
@@ -2323,7 +2323,7 @@ int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
   // create output file
 
   char GROEBNER[128];
-  short i=0;
+  int i=0;
   while(MATRIX[i]!='\0' && MATRIX[i]!='.')
   {
     GROEBNER[i]=MATRIX[i];
@@ -2409,9 +2409,9 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 {
 
   char format_string[128];
-  short problem_variables;
-  short elimination_variables;
-  short weighted_variables;
+  int problem_variables;
+  int elimination_variables;
+  int weighted_variables;
   char elimination_refinement[128];
   char weighted_refinement[128];
   char algorithm[128];
@@ -2682,7 +2682,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
     return 0;
   }
 
-  short weighted_ref;
+  int weighted_ref;
   if(!strcmp(weighted_refinement,"W_LEX"))
     weighted_ref=W_LEX;
   if(!strcmp(weighted_refinement,"W_REV_LEX"))
@@ -2711,7 +2711,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
   if(elimination_variables>0)
   {
-    short elimination_ref;
+    int elimination_ref;
     if(!strcmp(elimination_refinement,"LEX"))
       elimination_ref=LEX;
     if(!strcmp(elimination_refinement,"DEG_LEX"))
@@ -3036,7 +3036,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
   char SOLUTION[128];
 
-  short i=0;
+  int i=0;
   while(GROEBNER[i]!='\0' && GROEBNER[i]!='.')
   {
     SOLUTION[i]=GROEBNER[i];
@@ -3082,7 +3082,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
     Integer right_hand[weighted_variables+elimination_variables];
 
-    for(short k=0;k<instances;k++)
+    for(int k=0;k<instances;k++)
     {
       // at the beginning, the variables of interest are zero
       for(i=0;i<weighted_variables;i++)
@@ -3189,7 +3189,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
       Integer right_hand[weighted_variables+elimination_variables];
       BOOLEAN error=FALSE;    // to test legality of right hand vectors
 
-      for(short k=0;k<instances;k++)
+      for(int k=0;k<instances;k++)
       {
         // at the beginning, the variables of interest are zero
         for(i=0;i<weighted_variables;i++)
@@ -3294,7 +3294,7 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
       Integer initial_solution[weighted_variables];
 
-      for(short k=0;k<instances;k++)
+      for(int k=0;k<instances;k++)
       {
         // initial solution vector is read from the input stream into the
         // elimination variables
@@ -3362,18 +3362,18 @@ int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER)
 
 
 int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
-                const short& version,
-                const short& S_pair_criteria,
+                const int& version,
+                const int& S_pair_criteria,
                 const float& interred_percentage,
                 const BOOLEAN& verbose)
 {
 
   char format_string[128];
-  short elimination_variables;
-  short weighted_variables;
+  int elimination_variables;
+  int weighted_variables;
   char elimination_refinement[128];
   char weighted_refinement[128];
-  short new_variables;
+  int new_variables;
   char algorithm[128];
   long old_size;
 
@@ -3757,7 +3757,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
 
   // the term ordering to refine the weight is taken to be the same as that
   // for the old Groebner basis
-  short weighted_ref;
+  int weighted_ref;
   if(!strcmp(weighted_refinement,"W_LEX"))
     weighted_ref=W_LEX;
   if(!strcmp(weighted_refinement,"W_REV_LEX"))
@@ -3786,7 +3786,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
 
   if(elimination_variables>0)
   {
-    short elimination_ref;
+    int elimination_ref;
     if(!strcmp(elimination_refinement,"LEX"))
       elimination_ref=LEX;
     if(!strcmp(elimination_refinement,"DEG_LEX"))
@@ -3913,7 +3913,7 @@ int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
 
   char NEW_GROEBNER[128];
 
-  short i=0;
+  int i=0;
   while(NEW_COST[i]!='\0' && NEW_COST[i]!='.')
   {
     NEW_GROEBNER[i]=NEW_COST[i];

@@ -31,9 +31,9 @@ class matrix
 
 private:
 
-  short rows;
+  int rows;
 
-  short columns;
+  int columns;
   // Also used as error flag (values <0):
   // -1 indicates a "semantic" error (which occurs e.g. if some constructor
   //    argument is out of range)
@@ -47,7 +47,7 @@ private:
   // Memory allocation is done in the LLL-routines, so the array is only
   // allocated if such a basis is really computed.
 
-  short _kernel_dimension;
+  int _kernel_dimension;
   // the number of vectors stored in H (the size of these vectors is columns)
   // If _kernel_dimension==-2, no kernel basis has been computed yet.
   // If _kernel_dimension==-1, an error has occured during the kernel basis
@@ -61,10 +61,10 @@ public:
 
 // constructors and destructor
 
-  matrix(const short& row_number, const short& column_number);
+  matrix(const int& row_number, const int& column_number);
   // Creates a zero matrix of the specified size.
 
-  matrix(const short& row_number, const short& column_number,
+  matrix(const int& row_number, const int& column_number,
          Integer** entries);
   // Builds a matrix from its coefficient array.
 
@@ -79,7 +79,7 @@ public:
   //            ...
   //    coefficients 0..n-1 of row m
 
-  matrix(const short& m, const short& n, ifstream& input);
+  matrix(const int& m, const int& n, ifstream& input);
   // Reads a (m x n)-matrix from the given ifstream.
   // The input stream must have the following format:
   //
@@ -101,34 +101,34 @@ public:
   BOOLEAN is_nonnegative() const;
   // Returns TRUE, if all entries of the matrix are >=0, else FALSE.
 
-  short error_status() const;
+  int error_status() const;
   // Returns columns iff columns<0 (this is the "error flag"), else 0.
 
-  short row_number() const;
+  int row_number() const;
   // Retuns the row number.
 
-  short column_number() const;
+  int column_number() const;
   // Returns the column number.
 
-  short kernel_dimension() const;
+  int kernel_dimension() const;
   // Returns the kernel dimension.
 
 
 
 // special routines for the IP-algorithms
 
-  short LLL_kernel_basis();
+  int LLL_kernel_basis();
   // Computes a LLL-reduced integer basis of the matrix kernel and returns
   // the kernel dimension (-1 if an error has occurred).
   // This dimension is also stored in the member kernel_dimension.
 
-  short compute_nonzero_kernel_vector();
+  int compute_nonzero_kernel_vector();
   // Transforms the kernel lattice basis stored in H so that it contains
   // a vector whose components are all !=0;
   // returns 0 if no such vector exists, else 1.
   // If no such basis has been computed before, this is done now.
 
-  short compute_flip_variables(short*&);
+  int compute_flip_variables(int*&);
   // Computes a set of flip variables for the algorithm of DiBiase and
   // Urbanke from a kernel vector with no zero components.
   // Returns the size of that set if such a kernel vector exists, else -1.
@@ -136,7 +136,7 @@ public:
   // The computed set is copied to the argument pointer (memory allocation
   // is done in the routine) to be accessible for the calling function.
 
-  short hosten_shapiro(short*& sat_var);
+  int hosten_shapiro(int*& sat_var);
   // Computes a set of saturation variables for the ideal defined by the
   // kernel lattice and returns the size of that set.
   // If no lattice basis has been computed before, this is done now.

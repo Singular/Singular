@@ -48,8 +48,8 @@ typedef char* OUTPUT_FILE;
 //        blr     for Bigatti_LaScala_Robbiano(...)
 
 extern int Conti_Traverso(INPUT_FILE MATRIX,
-                          const short& version=1,
-                          const short& S_pair_criteria=11,
+                          const int& version=1,
+                          const int& S_pair_criteria=11,
                           const float& interred_percentage=12.0,
                           const BOOLEAN& verbose=FALSE);
 // The complete algorithm of Conti and Traverso which computes the toric
@@ -57,16 +57,16 @@ extern int Conti_Traverso(INPUT_FILE MATRIX,
 // integer programs without initial solution.
 
 extern int Positive_Conti_Traverso(INPUT_FILE MATRIX,
-                                   const short& version=1,
-                                   const short& S_pair_criteria=11,
+                                   const int& version=1,
+                                   const int& S_pair_criteria=11,
                                    const float& interred_percentage=12.0,
                                    const BOOLEAN& verbose=FALSE);
 // The variant of the above algorithm for matrices and right hand vector
 // with only nonnegative entries using one elimination variable less.
 
 extern int Elim_Conti_Traverso(INPUT_FILE MATRIX,
-                               const short& version=1,
-                               const short& S_pair_criteria=11,
+                               const int& version=1,
+                               const int& S_pair_criteria=11,
                                const float& interred_percentage=12.0,
                                const BOOLEAN& verbose=FALSE);
 // A version of the Conti-Traverso-algorithm which really computes the toric
@@ -74,16 +74,16 @@ extern int Elim_Conti_Traverso(INPUT_FILE MATRIX,
 // other algorithms). Nonnegativity is ignored.
 
 extern int Pottier(INPUT_FILE MATRIX,
-                   const short& version=1,
-                   const short& S_pair_criteria=11,
+                   const int& version=1,
+                   const int& S_pair_criteria=11,
                    const float& interred_percentage=12.0,
                    const BOOLEAN& verbose=FALSE);
 // The algorithm proposed by Pottier using one elimination variable and
 // a lattice basis of the matrix kernel to compute the toric ideal A.
 
 extern int Hosten_Sturmfels(INPUT_FILE MATRIX,
-                            const short& version=1,
-                            const short& S_pair_criteria=11,
+                            const int& version=1,
+                            const int& S_pair_criteria=11,
                             const float& interred_percentage=12.0,
                             const BOOLEAN& verbose=FALSE);
 // The algorithm proposed by Hosten and Sturmfels which computes the toric
@@ -91,16 +91,16 @@ extern int Hosten_Sturmfels(INPUT_FILE MATRIX,
 // variables, but with various Groebner basis calculations.
 
 extern int DiBiase_Urbanke(INPUT_FILE MATRIX,
-                           const short& version=1,
-                           const short& S_pair_criteria=11,
+                           const int& version=1,
+                           const int& S_pair_criteria=11,
                            const float& interred_percentage=12.0,
                            const BOOLEAN& verbose=FALSE);
 // The algorithm proposed by DiBiase and Urbanke which computes the toric
 // ideal of A from its kernel lattice basis using "variable flips".
 
 extern int Bigatti_LaScala_Robbiano(INPUT_FILE MATRIX,
-                                    const short& version=1,
-                                    const short& S_pair_criteria=11,
+                                    const int& version=1,
+                                    const int& S_pair_criteria=11,
                                     const float& interred_percentage=12.0,
                                     const BOOLEAN& verbose=FALSE);
 // A modified version of the algorithm called EATI using "pseudo-elimination".
@@ -127,8 +127,8 @@ extern int solve(INPUT_FILE PROBLEM, INPUT_FILE GROEBNER);
 // another cost function:
 
 extern int change_cost(INPUT_FILE GROEBNER, INPUT_FILE NEW_COST,
-                       const short& version=1,
-                       const short& S_pair_criteria=11,
+                       const int& version=1,
+                       const int& S_pair_criteria=11,
                        const float& interred_percentage=12.0,
                        const BOOLEAN& verbose=FALSE);
 

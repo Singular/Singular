@@ -15,13 +15,13 @@ int main(int argc, char *argv[])
   // initialize arguments for the IP-algorithms (Buchberger)
   // with default settings
   BOOLEAN verbose=FALSE;
-  short version=1;
-  short S_pair_criteria=11;
+  int version=1;
+  int S_pair_criteria=11;
   double interreduction_percentage=12.0;
 
 ///////////////////////// parse options /////////////////////////////////////
 
-  short alg_option=0;
+  int alg_option=0;
   // no algorithm specified yet
 
   if(argc>=3)
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     // program name, (MATRIX or) GROEBNER file, PROBLEM file
   {
 
-    for(short i=1;i<argc-2;i++)
+    for(int i=1;i<argc-2;i++)
       // these are the input options
     {
 
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
 
       char* GROEBNER=new char[128];
       memset(GROEBNER,0,128);
-      short i=0;
+      int i=0;
       while(argv[argc-2][i]!='\0' && argv[argc-2][i]!='.' && argv[argc-2][i]>' ')
       {
         GROEBNER[i]=argv[argc-2][i];

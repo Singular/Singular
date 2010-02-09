@@ -32,7 +32,7 @@
 
 
 
-const short Number_of_Lists=1<<List_Support_Variables;
+const int Number_of_Lists=1<<List_Support_Variables;
 
 
 
@@ -41,8 +41,8 @@ const short Number_of_Lists=1<<List_Support_Variables;
 
 typedef struct
 {
-  short* subsets_of_support[Number_of_Lists];
-  short number_of_subsets[Number_of_Lists];
+  int* subsets_of_support[Number_of_Lists];
+  int number_of_subsets[Number_of_Lists];
 } subset_tree;
 
 //////////////////////// class ideal /////////////////////////////////////////
@@ -79,11 +79,11 @@ private:
 
 // flags for the use of the S-pair criteria and the autoreduction
 
-  short rel_primeness;
-  short M_criterion;
-  short F_criterion;
-  short B_criterion;
-  short second_criterion;
+  int rel_primeness;
+  int M_criterion;
+  int F_criterion;
+  int B_criterion;
+  int second_criterion;
   // When Buchberger´s algorithm is called, we only use one argument which
   // describes the combination of the criteria to be used (see in globals.h).
   // But we use five flags instead of one here because this is a little more
@@ -149,7 +149,7 @@ private:
   ideal& add_generator(binomial& bin);
   // Inserts a (new) generator in the appropriate list.
 
-  short add_new_generators();
+  int add_new_generators();
   // Moves the new generators to the generator lists.
 
 // S-pair computation
@@ -220,7 +220,7 @@ public:
 
 // constructors and destructor (implemented in ideal.cc)
 
-  ideal(matrix&, const term_ordering&, const short& algorithm);
+  ideal(matrix&, const term_ordering&, const int& algorithm);
   // Creates a binomial ideal from the given matrix using the given algorithm
   // (see in globals.h).
   // The arguments are checked for consistency as far as possible.
@@ -238,7 +238,7 @@ public:
   // It might be useful to keep several Groebner bases of the same ideal
   // (or of an ideal and its elimination ideal).
 
-  ideal(ifstream&, const term_ordering&, const short& number_of_generators);
+  ideal(ifstream&, const term_ordering&, const int& number_of_generators);
   // Reads an ideal from a given ifstream in the following way:
   // A block of integers is converted into a binomial
   // that is stored in the generator list(s) with respect to the given
@@ -254,18 +254,18 @@ public:
   long number_of_generators() const;
   // Returns the actual number of generators.
 
-  short error_status() const;
+  int error_status() const;
   // Returns -1 if an error has occurred (i.e. size<0), else 0.
 
 // Buchberger stuff (implemented in Buchberger.cc)
 
-  ideal& reduced_Groebner_basis_1(const short& S_pair_criteria=11,
+  ideal& reduced_Groebner_basis_1(const int& S_pair_criteria=11,
                                   const float& interred_percentage=12.0);
-  ideal& reduced_Groebner_basis_1a(const short& S_pair_criteria=11,
+  ideal& reduced_Groebner_basis_1a(const int& S_pair_criteria=11,
                                    const float& interred_percentage=12.0);
-  ideal& reduced_Groebner_basis_2(const short& S_pair_criteria=11,
+  ideal& reduced_Groebner_basis_2(const int& S_pair_criteria=11,
                                   const float& interred_percentage=12.0);
-  ideal& reduced_Groebner_basis_3(const short& S_pair_criteria=11,
+  ideal& reduced_Groebner_basis_3(const int& S_pair_criteria=11,
                                   const float& interred_percentage=12.0);
   // Several different versions of Buchberger´s algorithm for computing
   // the reduced Groebner basis of the actual ideal. They differ in the
@@ -293,8 +293,8 @@ public:
   // Groebner basis is not that of the input ideal, but that of an ideal
   // "between" the input ideal and its saturation.
 
-  ideal& reduced_Groebner_basis(const short& version=1,
-                                const short& S_pair_criteria=11,
+  ideal& reduced_Groebner_basis(const int& version=1,
+                                const int& S_pair_criteria=11,
                                 const float& interred_percentage=12.0);
   // Takes the version of Buchberger´s algorithm as above as an argument
   // (to allow a call of different versions of our IP-algorithms from the
@@ -330,18 +330,18 @@ public:
   // This may especially involve a rebuilding of the list structure if
   // SUPPORT_DRIVEN_METHODS_EXTENDED are enabled.
 
-  ideal& swap_variables(const short& i, const short& j);
+  ideal& swap_variables(const int& i, const int& j);
   // Swaps the i-th and the j-th variable in all generators as well as the
   // corresponding components of the term ordering's weight vector.
   // If SUPPORT_DRIVEN_METHODS are enabled, the list structure is rebuilt
   // according to the new order on the variables.
 
-  ideal& swap_variables_unsafe(const short& i, const short& j);
+  ideal& swap_variables_unsafe(const int& i, const int& j);
   // Swaps the i-th and the j-th variable in all generators as well as the
   // corresponding components of the term ordering's weight vector.
   // DANGER: The head/tail structure is not rebuilt!
 
-  ideal& flip_variable_unsafe(const short& i);
+  ideal& flip_variable_unsafe(const int& i);
   // Inverts the sign of the i-th variable in all generators.
   // DANGER: The list structure is not rebuilt!
 
