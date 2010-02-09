@@ -14,7 +14,6 @@ PROCEDURES:
  showrecursive(id,p);   display id recursively with respect to variables in p
  split(string,n);       split given string into lines of length n
  tab(n);                string of n space tabs
- writelist(...);        write a list into a file and keep the list structure
  pause([prompt]);       stop the computation until user input
            (parameters in square brackets [] are optional)
 ";
@@ -661,73 +660,6 @@ example
 {  "EXAMPLE:"; echo = 2;
    for(int n=0; n<=5; n=n+1)
    { tab(5-n)+"*"+tab(n)+"+"+tab(n)+"*"; }
-}
-///////////////////////////////////////////////////////////////////////////////
-
-proc writelist (string fil, string nam, list L)
-"USAGE:   writelist(file,name,L);  file,name strings (file-name, list-name),
-          L a list.
-CREATE:  a file with name `file`, write the content of the list L into it and
-         call the list `name`, keeping the list structure
-RETURN:  no return value
-NOTE:    The syntax of writelist is similar to the syntax of the
-         write command of @sc{Singular} which does not manage lists properly.
-         If (file,name) = (\"listfile\",\"L1\"),  writelist creates (resp.
-         appends if listfile exists) a file with name listfile and stores
-         there the list L under the name L1. The @sc{Singular} command
-         @code{execute(read(\"listfile\"))}; assigns the content of L (stored in
-         listfile) to a list L1.
-@*       On a UNIX system, write(\">file\",...) overwrites an existing file
-         `file` while write(\"file\",...) and write(\">>file\",...) append.
-EXAMPLE: example writelist; shows an example
-"
-{
-   int i;
-   write(fil,"list "+nam+";");
-   if( fil[1]==">" ) { fil=fil[2..size(fil)]; }
-   if( fil[1]==">" ) { fil=fil[2..size(fil)]; }
-    for( i=1;i<=size(L);i=i+1 )
-    {
-      if (typeof(L[i]) == "intmat")
-      {
-        write(fil,"   "+nam+"["+string(i)+"]="+
-        "intmat(intvec("+string(L[i])+
-        "),"+string(nrows(L[i]))+","+string(ncols(L[i]))+");");
-      }
-      else
-      {
-        if ( typeof(L[i])== "matrix")
-        {
-          write(fil,"   "+nam+"["+string(i)+"]="+
-          "matrix(ideal("+string(L[i])+
-          "),"+string(nrows(L[i]))+","+string(ncols(L[i]))+");");
-        }
-        else
-        {
-          write(fil,"   "+nam+"["+string(i)+"]="+typeof(L[i])+"(",string(L[i])+");");
-        }
-      }
-    }
-   return();
-}
-example
-{  "EXAMPLE:"; echo = 2;
-   ring r;
-   ideal i=x,y,z;
-   list k="Hi",nameof(basering),i,37;
-   writelist("zumSpass","lustig",k);
-   read("zumSpass");
-   list L=res(i,0);                    //resolution of the ideal i
-   writelist("res_list","res-name",L); "";
-   read("res_list");
-   // execute(read("res_list")); would create a list with name res-name,
-   // which is the resolution of i (the same content as L)
-
-   system("sh","/bin/rm res_list zumSpass");
-   // Under UNIX, this removes the files 'res_list' and 'zumSpass'
-   // Type help system; to get more information about the shell escape
-   // If your operating system does not accept the shell escape, you
-   // must remove the just created files 'zumSpass' and 'res_list' directly
 }
 ///////////////////////////////////////////////////////////////////////////////
 
