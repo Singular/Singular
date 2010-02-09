@@ -208,7 +208,7 @@ class gcone
 		inline int intgcd(int a, int b);
 		inline void writeConeToFile(const gcone &gc, bool usingIntPoints=FALSE);
 		inline void readConeFromFile(int gcNum, gcone *gc);
-		inline int64vec f2M(gcone *gc, facet *f, int n=1);
+		inline intvec f2M(gcone *gc, facet *f, int n=1);
 		inline void sortRays(gcone *gc);
 		//The real stuff
 		inline void getConeNormals(const ideal &I, bool compIntPoint=FALSE);
@@ -220,7 +220,7 @@ class gcone
 		inline ideal ffG(const ideal &H, const ideal &G);
 		inline void getGB(ideal const &inputIdeal);		
 		inline void interiorPoint( dd_MatrixPtr &M, int64vec &iv);
-		inline void interiorPoint2(const dd_MatrixPtr &M, int64vec &iv);
+// 		inline void interiorPoint2(const dd_MatrixPtr &M, int64vec &iv);//removed Feb 8th, 2010
 		inline void preprocessInequalities(dd_MatrixPtr &M);
 		ring rCopyAndAddWeight(const ring &r, int64vec *ivw);
 		ring rCopyAndChangeWeight(const ring &r, int64vec *ivw);		
