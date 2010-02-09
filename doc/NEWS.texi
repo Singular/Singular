@@ -34,7 +34,7 @@ new system command @code{system("cpu")}, see @nref{system}.
 @item
 new command: @code{farey}: lifting to Q  (see @nref{farey})
 @item
-new command: @code{monom} (see @nref{monom})
+new command: @code{monomial} (see @nref{monomial})
 @item
 command extended: @code{liftstd} also computes syzygies.  (see @nref{liftstd})
 @item
