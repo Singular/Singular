@@ -2674,19 +2674,25 @@ static BOOLEAN jjMONOM(leftv res, leftv v)
 {
   intvec *iv=(intvec *)v->Data();
   poly p=pOne();
-  int i;
+  int i,e;
+  BOOLEAN err=FALSE;
   for(i=si_min(pVariables,iv->length()); i>0; i--)
   {
-    pSetExp(p,i,(*iv)[i-1]);
+    e=(*iv)[i-1];
+    if (e>=0) pSetExp(p,i,e);
+    else err=TRUE;
   }
   if (iv->length()==(pVariables+1))
   {
     res->rtyp=VECTOR_CMD;
-    pSetComp(p,(*iv)[pVariables]);
+    e=(*iv)[pVariables];
+    if (e>=0) pSetComp(p,e);
+    else err=TRUE;
   }
   pSetm(p);
   res->data=(char*)p;
-  return FALSE;
+  if(err) { pDelete(&p); WerrorS("no negative exponent allowed"); }
+  return err;
 }
 static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 {
