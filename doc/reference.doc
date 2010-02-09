@@ -1819,17 +1819,12 @@ See
 
 @table @code
 @item @strong{Syntax:}
-@code{farey (} poly_expression @code{)}
-@*@code{farey (} poly_expression@code{, 0 )}
-@*@code{farey (} poly_expression@code{, 2 )}
+@code{farey (} bigint_expression @code{,} bigint_expression @code{)}
+@*@code{farey (} ideal_expression @code{,} bigint_expression @code{)}
+@*@code{farey (} module_expression @code{,} bigint_expression @code{)}
+@*@code{farey (} matrix_expression @code{,} bigint_expression @code{)}
 @item @strong{Type:}
-list of ideal and intvec
-@*
-@item @strong{Syntax:}
-@code{farey (} bigint_expression@code{,} bigint_expression @code{)}
-@*@code{farey (} ideal_expression@code{,} bigint_expression @code{)}
-@item @strong{Type:}
-number/ideal
+type of the first argument
 @item @strong{Purpose:}
 lift the first argument modulo the second to the rationals
 @item @strong{Note:}
