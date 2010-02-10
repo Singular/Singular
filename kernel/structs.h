@@ -92,6 +92,12 @@ enum n_coeffType
   n_Zp_a,
   n_Q_a,
   n_long_C
+#ifdef HAVE_RINGS
+  ,n_Z,
+  n_Zm,
+  n_Zpn,
+  n_Z2n
+#endif
 };
 
 // #ifdef HAVE_PLURAL
