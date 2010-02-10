@@ -9,6 +9,7 @@ AUTHORS:  Winfried Bruns, Winfried.Bruns@Uni-Osnabrueck.de
           Christof Soeger, Christof.Soeger@Uni-Osnabrueck.de
 
 OVERVIEW:
+@texinfo
 The library normaliz.lib provides an interface for the use of Normaliz 2.2
 within SINGULAR. The exchange of data is via files, the only possibility
 offered by Normaliz in its present version. In addition to the top level
@@ -37,7 +38,7 @@ You can download it from
 @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}. Please make sure
 that the executables are in the search path or use setNmzExecPath
 (@ref{setNmzExecPath}).
-
+@end texinfo
 NOTE:    These library functions use @code{sed} to transfer the Normaliz
 output into a SINGULAR compliant format.
 
