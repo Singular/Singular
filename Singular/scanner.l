@@ -300,13 +300,13 @@ newline                  {
 \$                        {
                            m2_end(-1);
                          }
-(quit|exit)[ \t\n]*[\.;]?  {
+(quit|exit)[ \t\n]*;     {
                            #ifdef MM_STAT
                            mmStat(-500);
                            #endif
                            #ifdef OM_TRACK
 			   #ifndef NDEBUG
-                             omPrintUsedTrackAddrs(stdout, 1);
+                             omPrintUsedTrackAddrs(stdout, 10);
                            #endif
                            #endif
                            m2_end(0);
