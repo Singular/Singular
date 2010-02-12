@@ -60,7 +60,7 @@ void sdb_show_bp()
 
 BOOLEAN sdb_set_breakpoint(const char *pp, int given_lineno)
 {
-  idhdl h=ggetid(pp,TRUE);
+  idhdl h=ggetid(pp);
   if ((h==NULL)||(IDTYP(h)!=PROC_CMD))
   {
     PrintS(" not found\n");
@@ -275,7 +275,7 @@ void sdb(Voice * currentVoice, const char * currLine, int len)
         {
           p=sdb_find_arg(p);
           Print("variable `%s`",p);
-          idhdl h=ggetid(p,TRUE);
+          idhdl h=ggetid(p);
           if (h==NULL)
             PrintS(" not found\n");
           else

@@ -5128,7 +5128,7 @@ ideal kGroebner(ideal F, ideal Q)
     IDRING(currRingHdl)=currRing;
   }
   sleftv v; memset(&v,0,sizeof(v)); v.rtyp=IDEAL_CMD; v.data=(char *) F;
-  idhdl h=ggetid("groebner",FALSE);
+  idhdl h=ggetid("groebner");
   sleftv u; memset(&u,0,sizeof(u)); u.rtyp=IDHDL; u.data=(char *) h;
             u.name=IDID(h);
 

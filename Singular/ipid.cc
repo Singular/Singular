@@ -522,7 +522,7 @@ idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl)
   return h2;
 }
 
-idhdl ggetid(const char *n, BOOLEAN local)
+idhdl ggetid(const char *n)
 {
   idhdl h = IDROOT->get(n,myynest);
   if ((h!=NULL)&&(IDLEV(h)==myynest)) return h;
