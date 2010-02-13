@@ -8,6 +8,7 @@
 * ABSTRACT
 */
 #include "structs.h"
+#include "ring.h" // for currRing
 
 // THIS IS REALLY DIRTY: ip_smatrix HAS TO BE IDENTICAL TO ip_sideal
 // SO, DON'T CHANGE THE DECLARATION OF ip_smatrix
