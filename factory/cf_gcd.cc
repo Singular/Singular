@@ -3,6 +3,9 @@
 
 #include <config.h>
 
+#define OM_NO_MALLOC_MACROS
+
+
 #include "assert.h"
 #include "debug.h"
 
@@ -17,6 +20,7 @@
 #include "ffreval.h"
 #include "algext.h"
 #include "fieldGCD.h"
+
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
@@ -1215,4 +1219,6 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
   }
 }
+
 #include "algext.cc"
+
