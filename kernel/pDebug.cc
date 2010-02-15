@@ -248,18 +248,27 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) > 0), "mixed poly/vector");
 
     // special check for ringorder_s/S
-    if ((r->order!=NULL) &&(r->order[1] == ringorder_S))
+    if ((r->typ!=NULL) && (r->typ[0].ord_typ == ro_syzcomp))
     {
       long c1, cc1, ccc1, ec1;
-      sro_ord* o = &(r->typ[1]);
+      sro_ord* o = &(r->typ[0]);
 
       c1 = p_GetComp(p, r);
-      cc1 = o->data.syzcomp.Components[c1];
-      ccc1 = o->data.syzcomp.ShiftedComponents[cc1];
+      if (o->data.syzcomp.Components!=NULL)
+      {
+        cc1 = o->data.syzcomp.Components[c1];
+        ccc1 = o->data.syzcomp.ShiftedComponents[cc1];
+      }
+      else { cc1=0; ccc1=0; }
       pPolyAssumeReturnMsg(c1 == 0 || cc1 != 0, "Component <-> TrueComponent zero mismatch");
       pPolyAssumeReturnMsg(c1 == 0 || ccc1 != 0,"Component <-> ShiftedComponent zero mismatch");
-      ec1 = p->exp[r->typ[1].data.syzcomp.place];
-      pPolyAssumeReturnMsg(ec1 == ccc1, "Shifted comp out of sync. should %d, is %d");
+      ec1 = p->exp[o->data.syzcomp.place];
+      //pPolyAssumeReturnMsg(ec1 == ccc1, "Shifted comp out of sync. should %d, is %d");
+      if (ec1 != ccc1)
+      {
+        dPolyReportError(p,r,"Shifted comp out of sync. should %d, is %d",ccc1,ec1);
+        return FALSE;
+      }
     }
 
     // check that p_Setm works ok
