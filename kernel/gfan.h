@@ -94,7 +94,7 @@ class facet
 		/** Hopefully returns the facet normal */
 		inline intvec *getFacetNormal();
 		/** Return a reference to the facet normal*/
-		inline intvec *getRef2FacetNormal();
+		inline const intvec *getRef2FacetNormal();
 		/** Method to print the facet normal*/
 		inline void printNormal();
 		/** Store the flipped GB*/
@@ -205,7 +205,10 @@ class gcone
 		inline bool isMonomial(const ideal &I);
 		inline intvec *ivNeg(intvec *iv);
 		inline int dotProduct(intvec &iva, intvec &ivb);
+		inline int dotProduct(const intvec &iva, const intvec &ivb);
 		inline bool isParallel(intvec &a, intvec &b);
+// 		inline int dotProduct(const intvec* a, const intvec *b);
+// 		inline bool isParallel(const intvec* a, const intvec* b);
 		inline bool areEqual(intvec &a, intvec &b);
 		inline bool areEqual( facet *f,  facet *g);
 		inline int intgcd(int a, int b);

@@ -198,7 +198,7 @@ facet::~facet()
 	this->next=NULL;
 }
 		
-inline intvec *facet::getRef2FacetNormal()
+inline const intvec *facet::getRef2FacetNormal()
 {
 	return(this->fNormal);
 }		
@@ -221,8 +221,8 @@ inline bool gcone::areEqual(facet *f, facet *s)
 	bool res = TRUE;
 	int notParallelCtr=0;
 	int ctr=0;
-	intvec* fNormal; //No new since ivCopy and therefore getFacetNormal return a new
-	intvec* sNormal;
+	const intvec* fNormal; //No new since ivCopy and therefore getFacetNormal return a new
+	const intvec* sNormal;
 	fNormal = f->getRef2FacetNormal();//->getFacetNormal();
 	sNormal = s->getRef2FacetNormal();//->getFacetNormal();
 	//Do not need parallelity. Too time consuming
@@ -230,7 +230,10 @@ inline bool gcone::areEqual(facet *f, facet *s)
 // 	if(fNormal->compare(ivNeg(sNormal))!=0)//This results in a Mandelbug
  // 		notParallelCtr++;
 // 	else//parallelity, so we check the codim2-facets
-	if(isParallel(*fNormal,*sNormal))
+	intvec *fNRef=const_cast<intvec*>(fNormal);
+	intvec *sNRef=const_cast<intvec*>(sNormal);
+// 	if(isParallel(*fNormal,*sNormal))	
+	if(isParallel(*fNRef,*sNRef))
 // 	if(fNormal->compare((sNormal))!=0)//Behold! Teh definitive Mandelbug
 	{
 		facet* f2Act;
@@ -239,14 +242,16 @@ inline bool gcone::areEqual(facet *f, facet *s)
 		ctr=0;
 		while(f2Act!=NULL)
 		{
-			intvec* f2Normal;
+			const intvec* f2Normal;
 			f2Normal = f2Act->getRef2FacetNormal();//->getFacetNormal();
+// 			intvec *f2Ref=const_cast<intvec*>(f2Normal);
 			s2Act = s->codim2Ptr;
 			while(s2Act!=NULL)
 			{
-				intvec* s2Normal;
+				const intvec* s2Normal;
 				s2Normal = s2Act->getRef2FacetNormal();//->getFacetNormal();
 // 				bool foo=areEqual(f2Normal,s2Normal);
+// 				intvec *s2Ref=const_cast<intvec*>(s2Normal);
 				int foo=f2Normal->compare(s2Normal);
 				if(foo==0)
 					ctr++;
@@ -1272,13 +1277,13 @@ void gcone::getExtremalRays(const gcone &gc)
 	facet *fAct=gc.facetPtr;
 	while(fAct!=NULL)
 	{
-		intvec *fNormal;// = new intvec(this->numVars);
-		fNormal = fAct->getFacetNormal();
+		const intvec *fNormal;// = new intvec(this->numVars);
+		fNormal = fAct->getRef2FacetNormal();//->getFacetNormal();
 		for(int ii=0;ii<rows;ii++)
 		{
 			intvec *rowvec = new intvec(this->numVars);
 			makeInt(P,ii+1,*rowvec);//get an integer entry instead of rational
-			if(dotProduct(*fNormal,*rowvec)==0)
+ 			if(dotProduct(*fNormal,*rowvec)==0)
 			{
 				fAct->numCodim2Facets++;
 				facet *codim2Act;
@@ -1335,7 +1340,7 @@ void gcone::getExtremalRays(const gcone &gc)
 				n--;			
 			}while(exchanged==TRUE && n>=0);
 		}*///if pVariables>2
-		delete fNormal;		
+// 		delete fNormal;		
 		fAct = fAct->next;
 	}
 	//Now all extremal rays should be set w.r.t their respective fNormal
@@ -1343,44 +1348,44 @@ void gcone::getExtremalRays(const gcone &gc)
 	//NOTE Sufficient according to cddlibs doc. These ARE rays
 	if(gcone::hasHomInput==FALSE)
 	{
-	fAct=gc.facetPtr;
-	while(fAct!=NULL)
-	{
-		bool containsStrictlyPosRay=FALSE;
-		facet *codim2Act;
-		codim2Act = fAct->codim2Ptr;
-		while(codim2Act!=NULL)
+		fAct=gc.facetPtr;
+		while(fAct!=NULL)
 		{
-// 			containsStrictlyPosRay=TRUE;
-			intvec *rayvec;
-			rayvec = codim2Act->getFacetNormal();//Mind this is no normal but a ray!
-			//int negCtr=0;
-			if(iv64isStrictlyPositive(rayvec))
+			bool containsStrictlyPosRay=FALSE;
+			facet *codim2Act;
+			codim2Act = fAct->codim2Ptr;
+			while(codim2Act!=NULL)
 			{
-				containsStrictlyPosRay=TRUE;
-				delete(rayvec);
-				break;
-			}
-			/*for(int ii=0;ii<rayvec->length();ii++)
-			{
-				if( (*rayvec)[ii] < 0 )
+	// 			containsStrictlyPosRay=TRUE;
+				intvec *rayvec;
+				rayvec = codim2Act->getFacetNormal();//Mind this is no normal but a ray!
+				//int negCtr=0;
+				if(iv64isStrictlyPositive(rayvec))
 				{
-					containsStrictlyPosRay=FALSE;					
+					containsStrictlyPosRay=TRUE;
+	// 				delete(rayvec);
 					break;
 				}
+				/*for(int ii=0;ii<rayvec->length();ii++)
+				{
+					if( (*rayvec)[ii] < 0 )
+					{
+						containsStrictlyPosRay=FALSE;					
+						break;
+					}
+				}
+				if(containsStrictlyPosRay==TRUE)
+				{
+					delete(rayvec);
+					break;
+				}*/			
+	// 			delete(rayvec);
+				codim2Act = codim2Act->next;
 			}
-			if(containsStrictlyPosRay==TRUE)
-			{
-				delete(rayvec);
-				break;
-			}*/			
-			delete(rayvec);
-			codim2Act = codim2Act->next;
+			if(containsStrictlyPosRay==FALSE)
+				fAct->isFlippable=FALSE;
+			fAct = fAct->next;
 		}
-		if(containsStrictlyPosRay==FALSE)
-			fAct->isFlippable=FALSE;
-		fAct = fAct->next;
-	}
 	}//hasHomInput?	
 #ifdef gfanp
 	gettimeofday(&end, 0);
@@ -1796,6 +1801,7 @@ inline void gcone::computeInv(ideal &gb, ideal &initialForm, intvec &fNormal)
 				(*check)[jj]=v[jj+1]-leadExpV[jj+1];
 			}
 			if (isParallel(*check,fNormal)) //pass *check when 
+// 			if(isParallel((const intvec*)&check,(const intvec*)&fNormal))
 // 			if(fNormal.compare(check)==0)
 			{
 				//Found a parallel vector. Add it
@@ -1982,7 +1988,15 @@ inline int gcone::dotProduct(intvec &iva, intvec &ivb)
 	}
 	return res;
 }//int dotProduct
-
+inline int gcone::dotProduct(const intvec &iva, const intvec &ivb)				
+{			
+	int res=0;
+	for (int i=0;i<this->numVars;i++)
+	{
+		res = res+(iva[i]*ivb[i]);
+	}
+	return res;
+}
 /** \brief Check whether two intvecs are parallel
  *
  * \f$ \alpha\parallel\beta\Leftrightarrow\langle\alpha,\beta\rangle^2=\langle\alpha,\alpha\rangle\langle\beta,\beta\rangle \f$
@@ -2004,7 +2018,32 @@ inline bool gcone::isParallel(intvec &a, intvec &b)
 	}
 	return res;
 }//bool isParallel
-		
+// inline int gcone::dotProduct(const intvec *a, const intvec *b)				
+// {			
+// 	int res=0;
+// 	for (int i=0;i<this->numVars;i++)
+// 	{
+// 		res = res+((*a)[i]*(*b)[i]);
+// 	}
+// 	return res;
+// }//int dotProduct
+// inline bool gcone::isParallel(const intvec* a, const intvec* b)
+// {
+// 	int lhs,rhs;
+// 	bool res;
+// 	lhs=dotProduct(a,b)*dotProduct(a,b);
+// 	rhs=dotProduct(a,a)*dotProduct(b,b);
+// 			//cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
+// 	if (lhs==rhs)
+// 	{
+// 		res = TRUE;
+// 	}
+// 	else
+// 	{
+// 		res = FALSE;
+// 	}
+// 	return res;
+// }
 /** \brief Compute an interior point of a given cone
  * Result will be written into intvec iv. 
  * Any rational point is automatically converted into an integer.
@@ -3026,8 +3065,8 @@ inline void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 		
 		while(fAct!=NULL)
 		{	
-			intvec *iv;
-			iv=fAct->getFacetNormal();
+			const intvec *iv;
+			iv=fAct->getRef2FacetNormal();//->getFacetNormal();
 			f2Act=fAct->codim2Ptr;
 			for (int ii=0;ii<iv->length();ii++)
 			{
@@ -3040,11 +3079,11 @@ inline void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 					gcOutputFile << (*iv)[ii] << " ";
 				}
 			}
-			delete iv;
+// 			delete iv;
 			while(f2Act!=NULL)
 			{
-				intvec *iv2;
-				iv2=f2Act->getFacetNormal();	
+				const intvec *iv2;
+				iv2=f2Act->getRef2FacetNormal();//->getFacetNormal();	
 				for(int jj=0;jj<iv2->length();jj++)
 				{
 					if (jj<iv2->length()-1)
@@ -3056,7 +3095,7 @@ inline void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 						gcOutputFile << (*iv2)[jj] << " ";
 					}
 				}
-				delete iv2;
+// 				delete iv2;
 				f2Act = f2Act->next;
 			}
 			gcOutputFile << endl;
@@ -3370,15 +3409,15 @@ inline intvec gcone::f2M(gcone *gc, facet *f, int n)
 	int ii=0;
 	while(fAct!=NULL )//&& ii < bound )
 	{
-		intvec *fNormal;
-		fNormal = fAct->getFacetNormal();
+		const intvec *fNormal;
+		fNormal = fAct->getRef2FacetNormal();//->getFacetNormal();
 		for(int jj=0;jj<this->numVars;jj++)
 		{
 			(*res)[ii]=(int)(*fNormal)[jj];//This is ugly and prone to overflow
 			ii++;
 		}
 		fAct = fAct->next;
-		delete fNormal;
+// 		delete fNormal;
 	}	
 	return *res;
 }
