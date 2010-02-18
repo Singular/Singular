@@ -63,7 +63,8 @@ Rational::Rational( )
 Rational::Rational( int a )
 {
     p = new rep;
-    mpq_init_set_si( p->rat,(long)a,1 );
+    mpq_init( p->rat );
+    mpq_set_si( p->rat,(long)a,1 );
 }
 
 Rational::Rational( const Rational& a )
@@ -87,7 +88,8 @@ Rational::Rational(int a, int b)
 {
     if (b<0) a=-a;
     p=new rep;
-    mpq_init_set_si(p->rat,(long) a,(unsigned long) abs(b));
+    mpq_init(p->rat);
+    mpq_set_si(p->rat,(long) a,(unsigned long) abs(b));
     mpq_canonicalize(p->rat);
 }
 
