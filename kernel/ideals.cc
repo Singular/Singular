@@ -1690,11 +1690,15 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
   if (w!=NULL) delete w;
   i = 0;
 
+  // now sort the result, SB : leave in s_h3
+  //                      T:  put in s_h2
+  //                      syz: put in *syz
   for (j=0; j<IDELEMS(s_h3); j++)
   {
     if (s_h3->m[j] != NULL)
     {
-      if (p_MinComp(s_h3->m[j],syz_ring) <= k)
+      //if (p_MinComp(s_h3->m[j],syz_ring) <= k)
+      if (pGetComp(s_h3->m[j]) <= k) // syz_ring == currRing
       {
         i++;
         q = s_h3->m[j];
@@ -1714,6 +1718,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
       }
       else
       {
+        // we a syzygy here:
         if (lift3)
         {
           pShift(&s_h3->m[j], -k);
@@ -1725,8 +1730,15 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
       }
     }
   }
-
   idSkipZeroes(s_h3);
+  //extern char * iiStringMatrix(matrix im, int dim,char ch);
+  //PrintS("SB: ----------------------------------------\n");
+  //PrintS(iiStringMatrix((matrix)s_h3,k,'\n'));
+  //PrintLn();
+  //PrintS("T: ----------------------------------------\n");
+  //PrintS(iiStringMatrix((matrix)s_h2,h1->rank,'\n'));
+  //PrintLn();
+
   if (lift3) idSkipZeroes(*syz);
 
   j = IDELEMS(s_h1);
