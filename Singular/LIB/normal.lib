@@ -2069,11 +2069,24 @@ NOTE:    delta is the sum of all local delta-invariants of the singularities,
 EXAMPLE: example genus; shows an example
 "
 {
-   if(char(basering)>0)
-   {ERROR("the genus is only implemented for characteristic 0");}
    int w = printlevel-voice+2;  // w=printlevel (default: w=0)
 
    def R0=basering;
+   if(char(basering)>0)
+   {
+     def R1=changeord("dp");
+     setring R1;
+     ideal J=std(imap(R0,I));
+     if(dim(J)!=1){ERROR("ideal defines not a curve");}
+     def S=changevar(varstr(R)+",@t");
+     setring S;
+     ideal J=imap(R1,J);
+     J=std(homog(J,@t));
+     int pa=1-hilbPoly(J)[1];
+     setring R0;
+     list nor=normalP(I);
+     return(pa-nor[2][2]);
+   }
    I=std(I);
    if(dim(I)!=1)
    {
