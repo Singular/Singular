@@ -63,8 +63,7 @@ Rational::Rational( )
 Rational::Rational( int a )
 {
     p = new rep;
-    mpq_init( p->rat );
-    mpq_set_si( p->rat,(long int)a,1 );
+    mpq_init_set_si( p->rat,(long)a,1 );
 }
 
 Rational::Rational( const Rational& a )
@@ -88,8 +87,7 @@ Rational::Rational(int a, int b)
 {
     if (b<0) a=-a;
     p=new rep;
-    mpq_init(p->rat);
-    mpq_set_si(p->rat,(long int) a,(unsigned long int) abs(b));
+    mpq_init_set_si(p->rat,(long) a,(unsigned long) abs(b));
     mpq_canonicalize(p->rat);
 }
 
@@ -99,7 +97,8 @@ Rational::Rational(int a, int b)
 
 Rational::~Rational()
 {
-  if (--p->n==0){
+  if (--(p->n)==0)
+  {
     mpq_clear(p->rat);
     delete p;
   }
@@ -112,14 +111,15 @@ Rational::~Rational()
 Rational& Rational::operator=(int a)
 {
   disconnect();
-  mpq_set_si(p->rat,(long int) a,1);
+  mpq_set_si(p->rat,(long) a,1);
   return *this;
 }
 
 Rational& Rational::operator=(const Rational& a)
 {
   a.p->n++;
-  if (--p->n==0){
+  if (--(p->n)==0)
+  {
     mpq_clear(p->rat);
     delete p;
   }
@@ -165,10 +165,8 @@ int Rational::get_den_si( )
 
 Rational::operator int()
 {
-  mpz_t
-    h;
-  long int
-    ret_val;
+  mpz_t h;
+  long ret_val;
 
   mpz_init(h);
   mpz_tdiv_q(h,mpq_numref(p->rat),mpq_denref(p->rat));
@@ -185,8 +183,7 @@ Rational::operator int()
 Rational
 Rational::operator-()
 {
-  Rational
-    erg;
+  Rational erg;
 
   mpq_neg(erg.p->rat,p->rat);
   return erg;
@@ -194,8 +191,7 @@ Rational::operator-()
 
 Rational operator - ( const Rational &r )
 {
-  Rational
-    erg;
+  Rational erg;
 
   mpq_neg(erg.p->rat,r.p->rat);
   return erg;
@@ -208,8 +204,7 @@ Rational operator - ( const Rational &r )
 Rational
 Rational::operator~()
 {
-  Rational
-    erg;
+  Rational erg;
 
   mpq_inv(erg.p->rat,p->rat);
   return erg;
@@ -271,8 +266,7 @@ Rational::operator++()
 Rational
 Rational::operator++(int)
 {
-  Rational
-    erg(*this);
+  Rational erg(*this);
 
   mpq_set(save.p->rat,p->rat);
   *this=1;
@@ -292,8 +286,7 @@ Rational::operator--()
 Rational
 Rational::operator--(int)
 {
-  Rational
-    erg(*this);
+  Rational erg(*this);
 
   mpq_set(save.p->rat,p->rat);
   *this=1;
