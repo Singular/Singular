@@ -4033,7 +4033,10 @@ void rDebugPrint(ring r)
 
 //      for( int k = 0; k <= r->N; k++) if (r->typ[j].data.is.pVarOffset[k] != -1) Print("[%2d]: %04x; ", k, r->typ[j].data.is.pVarOffset[k]);
 
-      Print("  limit %d\n  F: ",r->typ[j].data.is.limit); idShow(r->typ[j].data.is.F, r, r, 1);
+      Print("  limit %d\n",r->typ[j].data.is.limit); 
+      #ifndef NDEBUG
+      PrintS("  F: ");idShow(r->typ[j].data.is.F, r, r, 1);
+      #endif
 
       PrintS("weights: ");
 
