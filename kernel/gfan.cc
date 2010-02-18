@@ -23,6 +23,7 @@ $Id$
 // #include "structs.h"
 #include "../Singular/lists.h"
 #include "prCopy.h"	//Needed for idrCopyR
+#include "stairc.h"	//For Hilbert series
 #include <iostream>
 // #include <bitset>
 #include <fstream>	//read-write cones to files
@@ -30,7 +31,6 @@ $Id$
 #include <string>
 #include <sstream>
 #include <time.h>
-#include <sys/time.h>
 #include <stdlib.h>
 //#include <gmpxx.h>
 // #include <vector>
@@ -72,7 +72,12 @@ $Id$
 #define gfan_DEBUGLEVEL 1
 #endif
 #endif
+
 #define gfanp
+#ifdef gfanp
+#include <sys/time.h>
+#endif
+
 #include <gfan.h>
 using namespace std;
 
@@ -320,6 +325,8 @@ inline bool gcone::areEqual(facet *f, facet *s)
 /** Stores the facet normal \param intvec*/
 inline void facet::setFacetNormal(intvec *iv)
 {
+	if(this->fNormal!=NULL)
+		delete this->fNormal;
 	this->fNormal = ivCopy(iv);			
 }
 		
@@ -394,6 +401,8 @@ inline int facet::getUCN()
 /** Store an interior point of the facet */
 inline void facet::setInteriorPoint(intvec *iv)
 {
+	if(this->interiorPoint!=NULL)
+		delete this->interiorPoint;
 	this->interiorPoint = ivCopy(iv);
 }
 		
@@ -546,6 +555,8 @@ inline int gcone::getCounter()
 /** \brief Set the interior point of a cone */
 inline void gcone::setIntPoint(intvec *iv)
 {
+	if(this->ivIntPt!=NULL)
+		delete this->ivIntPt;
 	this->ivIntPt=ivCopy(iv);
 }
 		
@@ -1253,6 +1264,11 @@ inline void gcone::getCodim2Normals(const gcone &gc)
 * into ddineq. Next we compute the extremal rays of the so given subspace.
 * Figuring out whether a ray belongs to a given facet(normal) is done by
 * checking whether the inner product of the ray with the normal is zero.
+* We use ivAdd here which returns a new intvec. Therefore we need to avoid
+* a memory leak which would be cause by the line 
+* iv=ivAdd(iv,b)
+* So we keep pointer tmp to iv and delete(tmp), so there should not occur a 
+* memleak
 */
 void gcone::getExtremalRays(const gcone &gc)
 {
@@ -1279,12 +1295,14 @@ void gcone::getExtremalRays(const gcone &gc)
 	{
 		const intvec *fNormal;// = new intvec(this->numVars);
 		fNormal = fAct->getRef2FacetNormal();//->getFacetNormal();
+		intvec *ivIntPointOfFacet = new intvec(this->numVars);
 		for(int ii=0;ii<rows;ii++)
-		{
+		{			
 			intvec *rowvec = new intvec(this->numVars);
-			makeInt(P,ii+1,*rowvec);//get an integer entry instead of rational
+			makeInt(P,ii+1,*rowvec);//get an integer entry instead of rational			
  			if(dotProduct(*fNormal,*rowvec)==0)
 			{
+				intvec *tmp = ivIntPointOfFacet;
 				fAct->numCodim2Facets++;
 				facet *codim2Act;
 				if(fAct->numCodim2Facets==1)					
@@ -1298,10 +1316,16 @@ void gcone::getExtremalRays(const gcone &gc)
 					codim2Act = codim2Act->next;
 				}
 				codim2Act->setFacetNormal(rowvec);
-				fAct->numRays++;			
+				fAct->numRays++;
+				//TODO Add up to interior point here!
+				ivIntPointOfFacet=ivAdd(ivIntPointOfFacet,rowvec);
+				delete(tmp);
+					
 			}
 			delete(rowvec);
 		}
+		fAct->setInteriorPoint(ivIntPointOfFacet);
+		delete(ivIntPointOfFacet);
 		//Now (if we have at least 3 variables) do a bubblesort on the rays
 		/*if(this->numVars>2)
 		{
@@ -1497,7 +1521,10 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	timeval t_kStd_start, t_kStd_end;
 	gettimeofday(&t_kStd_start,0);
 #endif
-	H=kStd(ina,NULL,testHomog,NULL);	//This is \mathcal(G)_{>_-\alpha}(in_v(I))
+	if(gcone::hasHomInput==TRUE)
+		H=kStd(ina,NULL,isHomog,NULL/*,gcone::hilbertFunction*/);
+	else
+		H=kStd(ina,NULL,isNotHomog,NULL);	//This is \mathcal(G)_{>_-\alpha}(in_v(I))
 #ifdef gfanp
 	gettimeofday(&t_kStd_end, 0);
 	t_kStd += (t_kStd_end.tv_sec - t_kStd_start.tv_sec + 1e-6*(t_kStd_end.tv_usec - t_kStd_start.tv_usec));
@@ -1680,6 +1707,8 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	dd_rowset implLin, redrows;
 	dd_rowindex newpos;
 
+	//NOTE Here we should remove interiorPoint and instead
+	// create and ordering like (a(omega),a(fNormal),dp)
 	interiorPoint(intPointMatrix, *iv_weight);	//iv_weight now contains the interior point
 	dd_FreeMatrix(intPointMatrix);
 	/*Crude attempt for interior point */
@@ -1740,7 +1769,10 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 #ifdef gfanp
 	gettimeofday(&t_kStd_start,0);
 #endif
-	dstRing_I=kStd(tmpI,NULL,testHomog,NULL);
+	if(gcone::hasHomInput==TRUE)
+		dstRing_I=kStd(tmpI,NULL,isHomog,NULL/*,gcone::hilbertFunction*/);
+	else
+		dstRing_I=kStd(tmpI,NULL,isNotHomog,NULL);
 #ifdef gfanp
 	gettimeofday(&t_kStd_end, 0);
 	t_kStd += (t_kStd_end.tv_sec - t_kStd_start.tv_sec + 1e-6*(t_kStd_end.tv_usec - t_kStd_start.tv_usec));
@@ -2682,6 +2714,7 @@ inline void gcone::normalize()
 		}
 		if(*ggT>1)//We only need to do this if the ggT is non-trivial
 		{
+// 			intvec *fCopy = fAct->getFacetNormal();
 			for(int ii=0;ii<this->numVars;ii++)
 				(*fNormal)[ii] = ((*fNormal)[ii])/(*ggT);
 			fAct->setFacetNormal(fNormal);
@@ -3427,6 +3460,7 @@ int gfanHeuristic;
 int gcone::lengthOfSearchList;
 int gcone::maxSize;
 dd_MatrixPtr gcone::dd_LinealitySpace;
+intvec *gcone::hilbertFunction;
 #ifdef gfanp
 // int gcone::lengthOfSearchList=0;
 float gcone::time_getConeNormals;
@@ -3480,7 +3514,10 @@ lists gfan(ideal inputIdeal, int h)
 			flippability test in getConeNormals & getExtremalRays
 			*/
 			if(idHomIdeal(gcAct->gcBasis,NULL))//disabled for tests
+			{
 				gcone::hasHomInput=TRUE;
+				gcone::hilbertFunction=hHstdSeries(inputIdeal,NULL,NULL,NULL,currRing);
+			}
 	#ifndef NDEBUG
 	// 		cout << "GB of input ideal is:" << endl;
 	// 		idShow(gcAct->gcBasis);

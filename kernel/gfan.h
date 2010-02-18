@@ -33,7 +33,6 @@ extern int gfanHeuristic;
 //ideal getGB(ideal inputIdeal);
 // ideal gfan(ideal inputIdeal, int heuristic);
 lists gfan(ideal inputIdeal, int heuristic);
-
 //int dotProduct(intvec a, intvec b);
 //bool isParallel(intvec a, intvec b);
 
@@ -167,6 +166,8 @@ class gcone
 		static bool hasHomInput;
 		/** # of variables in the ring */
 		int numVars;		//#of variables in the ring
+		/** The hilbert function - for the homogeneous case*/
+		static intvec *hilbertFunction;
 		
 		/** # of facets of the cone
 		 * This value is set by gcone::getConeNormals
