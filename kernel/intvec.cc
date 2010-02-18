@@ -179,7 +179,7 @@ void intvec::operator%=(int intop)
   }
 }
 
-int intvec::compare(intvec* op)
+int intvec::compare(const intvec* op) const
 {
   if ((col!=1) ||(op->cols()!=1))
   {
@@ -212,7 +212,7 @@ int intvec::compare(intvec* op)
   }
   return 0;
 }
-int intvec::compare(int o)
+int intvec::compare(int o) const
 {
   for (int i=0; i<row*col; i++)
   {

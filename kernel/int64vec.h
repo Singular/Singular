@@ -40,10 +40,20 @@ public:
 #endif
       return v[i];
     }
+  inline const int& operator[](int i) const
+    {
+#ifndef NDEBUG
+      if((i<0)||(i>=row*col))
+      {
+        Werror("wrong int64vec index:%d\n",i);
+      }
+#endif
+      return v[i];
+    }
   void operator*=(int64 intop);
   void operator/=(int64 intop);
   // -2: not compatible, -1: <, 0:=, 1: >
-  int compare(int64vec* o);
+  int compare(const int64vec* o) const;
   int  length() const { return col*row; }
   int  cols() const { return col; }
   int  rows() const { return row; }

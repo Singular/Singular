@@ -130,7 +130,7 @@ void int64vec::operator/=(int64 intop)
   }
 }
 
-int int64vec::compare(int64vec* op)
+int int64vec::compare(const int64vec* op) const
 {
   if ((col!=1) ||(op->cols()!=1))
   {

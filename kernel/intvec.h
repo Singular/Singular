@@ -78,8 +78,8 @@ public:
   void operator/=(int intop);
   void operator%=(int intop);
   // -2: not compatible, -1: <, 0:=, 1: >
-  int compare(intvec* o);
-  int compare(int o);
+  int compare(const intvec* o) const;
+  int compare(int o) const;
   inline int  length() const { return col*row; }
   inline int  cols() const { return col; }
   inline int  rows() const { return row; }
