@@ -613,6 +613,7 @@ BOOLEAN iiEStart(char* example, procinfo *pi)
     printf("entering example (level %d)\n",myynest);
   }
   myynest++;
+  iiRETURNEXPR[myynest].Init();
   err=yyparse();
   if (sLastPrinted.rtyp!=0)
   {
