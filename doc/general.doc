@@ -1481,6 +1481,16 @@ ring r = 32003,(x,y,z),dp;
 @end smallexample
 
 @item
+similar examples with indexed variables. The ring variables of
+r1 are going to be x(1)..x(10); in r2 they will be x(1)(1),
+x(1)(2), ..., x(1)(8), x(2)(1), ..., x(5)(8):
+
+@smallexample
+ring r1 = 32003,(x(1..10)),dp;
+ring r2 = 32003,(x(1..5)(1..8)),dp;
+@end smallexample
+
+@item
 the ring @math{Q[a,b,c,d]} with lexicographical ordering:
 
 @smallexample
