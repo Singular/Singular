@@ -340,29 +340,37 @@ IntMinorValue IntMinorProcessor::getMinor(const int dimension,
                                           const ideal& iSB,
                                           const char* algorithm)
 {
-    defineSubMatrix(dimension, rowIndices, dimension, columnIndices);
-    _minorSize = dimension;
+  defineSubMatrix(dimension, rowIndices, dimension, columnIndices);
+  _minorSize = dimension;
 
-    /* call a helper method which computes the minor (without a cache): */
-    if (strcmp(algorithm, "Laplace") == 0)
-      return getMinorPrivateLaplace(_minorSize, _container, characteristic,
-                                    iSB);
-    else if (strcmp(algorithm, "Bareiss") == 0)
-      return getMinorPrivateBareiss(_minorSize, _container, characteristic,
-                                    iSB);
-    else assume(false);
+  /* call a helper method which computes the minor (without a cache): */
+  if (strcmp(algorithm, "Laplace") == 0)
+    return getMinorPrivateLaplace(_minorSize, _container, characteristic,
+                                  iSB);
+  else if (strcmp(algorithm, "Bareiss") == 0)
+    return getMinorPrivateBareiss(_minorSize, _container, characteristic,
+                                  iSB);
+  else assume(false);
+
+  /* The following code is never reached and just there to make the
+     compiler happy: */
+  return IntMinorValue();
 }
 
 IntMinorValue IntMinorProcessor::getNextMinor(const int characteristic,
                                               const ideal& iSB,
                                               const char* algorithm)
 {
-    /* call a helper method which computes the minor (without a cache): */
-    if (strcmp(algorithm, "Laplace") == 0)
-      return getMinorPrivateLaplace(_minorSize, _minor, characteristic, iSB);
-    else if (strcmp(algorithm, "Bareiss") == 0)
-      return getMinorPrivateBareiss(_minorSize, _minor, characteristic, iSB);
-    else assume(false);
+  /* call a helper method which computes the minor (without a cache): */
+  if (strcmp(algorithm, "Laplace") == 0)
+    return getMinorPrivateLaplace(_minorSize, _minor, characteristic, iSB);
+  else if (strcmp(algorithm, "Bareiss") == 0)
+    return getMinorPrivateBareiss(_minorSize, _minor, characteristic, iSB);
+  else assume(false);
+  
+  /* The following code is never reached and just there to make the
+     compiler happy: */
+  return IntMinorValue();
 }
 
 IntMinorValue IntMinorProcessor::getNextMinor(Cache<MinorKey,
@@ -843,18 +851,26 @@ PolyMinorValue PolyMinorProcessor::getMinor(const int dimension,
   else if (strcmp(algorithm, "Bareiss") == 0)
     return getMinorPrivateBareiss(_minorSize, _container, iSB);
   else assume(false);
+
+  /* The following code is never reached and just there to make the
+     compiler happy: */
+  return PolyMinorValue();
 }
 
 PolyMinorValue PolyMinorProcessor::getNextMinor(const char* algorithm, 
                                                 const ideal& iSB)
 {
-    /* call a helper method which computes the minor (without using a
-       cache): */
-    if (strcmp(algorithm, "Laplace") == 0)
-      return getMinorPrivateLaplace(_minorSize, _minor, iSB);
-    else if (strcmp(algorithm, "Bareiss") == 0)
-      return getMinorPrivateBareiss(_minorSize, _minor, iSB);
-    else assume(false);
+  /* call a helper method which computes the minor (without using a
+     cache): */
+  if (strcmp(algorithm, "Laplace") == 0)
+    return getMinorPrivateLaplace(_minorSize, _minor, iSB);
+  else if (strcmp(algorithm, "Bareiss") == 0)
+    return getMinorPrivateBareiss(_minorSize, _minor, iSB);
+  else assume(false);
+    
+  /* The following code is never reached and just there to make the
+     compiler happy: */
+  return PolyMinorValue();
 }
 
 PolyMinorValue PolyMinorProcessor::getNextMinor(Cache<MinorKey,
