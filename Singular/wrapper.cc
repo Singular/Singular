@@ -51,7 +51,6 @@ BOOLEAN jInitBasis(ideal v, jList **TT,jList **QQ)
 BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
 {
   ideal result;
-  int dpO;
 
   jList *T;
   jList *Q;
@@ -70,7 +69,7 @@ BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
     goto zero;
   if (!jInitBasis(I,&T,&Q))
   {
-    dpO=(strstr(rOrdStr(currRing),"dp")!=NULL);
+    int dpO=(strstr(rOrdStr(currRing),"dp")!=NULL);
     int ideal_length;
     if (flag==1)
       ideal_length= dpO ? GB_length() : CountList(T);
@@ -110,21 +109,21 @@ BOOLEAN jjStdJanetBasis(leftv res, leftv v, int flag)
       }
       iT=iT->next;
     }
+
+    if ((flag==1) && (dpO==0))
+    {
+      //Print ("interred\n");
+      result=kInterRedOld(result);
+      idSkipZeroes(result);
+    }
+    res->data = (char *)result;
+    res->rtyp = IDEAL_CMD;
+    DestroyList(Q);
+    DestroyList(T);
+    return FALSE;
   }
-
-  if ((flag==1) && (!dpO))
-  {
-    //Print ("interred\n");
-    result=kInterRedOld(result);
-    idSkipZeroes(result);
-  }
-  res->data = (char *)result;
-  res->rtyp = IDEAL_CMD;
-
-  DestroyList(Q);
-  DestroyList(T);
-
-  return FALSE;
+  else
+    return TRUE;
 
 zero:
   result=idInit(1,1);

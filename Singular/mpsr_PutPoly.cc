@@ -317,7 +317,7 @@ int mpsr_GetNumOfRingAnnots(ring r, BOOLEAN mv)
   if (mv) annots++;
   if (r->qideal != NULL) annots++;
   // we sent the minpoly with the coefficient ring
-  if (r->minpoly != NULL & r->parameter == NULL) annots++;
+  if ((r->minpoly != NULL) && (r->parameter == NULL)) annots++;
 
   return annots;
 }
