@@ -69,7 +69,7 @@ new library: normaliz.lib (see @nref{normaliz_lib}: Interface to Normaliz 2.2)
 @item
 homolog.lib (@nref{homolog_lib}): canonMap
 @item
-dmod.lib (@nref{dmod_lib}): peratorModulo
+dmod.lib (@nref{dmod_lib}): operatorModulo
 @end itemize
 
 @heading News for version 3-1-0
