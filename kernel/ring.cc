@@ -297,7 +297,7 @@ void rWrite(ring r)
   {
     PrintS("//   coeff. ring is : ");
     if (rField_is_Ring_Z(r)) PrintS("Integers\n");
-    int l = mpz_sizeinbase(r->ringflaga, 10) + 2;
+    long l = (long)mpz_sizeinbase(r->ringflaga, 10) + 2;
     char* s = (char*) omAlloc(l);
     mpz_get_str(s,10,r->ringflaga);
     if (rField_is_Ring_ModN(r)) Print("Z/%s\n", s);
@@ -644,7 +644,7 @@ char * rVarStr(ring r)
   {
     l+=strlen(r->names[i])+1;
   }
-  s=(char *)omAlloc(l);
+  s=(char *)omAlloc((long)l);
   s[0]='\0';
   for (i=0; i<r->N-1; i++)
   {
@@ -702,7 +702,7 @@ char * rCharStr(ring r)
   {
     l+=(strlen(r->parameter[i])+1);
   }
-  s=(char *)omAlloc(l+MAX_INT_LEN+1);
+  s=(char *)omAlloc((long)(l+MAX_INT_LEN+1));
   s[0]='\0';
   if (r->ch<0)       sprintf(s,"%d",-r->ch); /* Fp(a) */
   else if (r->ch==1) sprintf(s,"0");         /* Q(a)  */
@@ -733,7 +733,7 @@ char * rParStr(ring r)
   {
     l+=strlen(r->parameter[i])+1;
   }
-  char *s=(char *)omAlloc(l);
+  char *s=(char *)omAlloc((long)l);
   s[0]='\0';
   for (i=0; i<rPar(r)-1; i++)
   {
