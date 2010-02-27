@@ -572,7 +572,7 @@ int _fe_getopt_internal (
 
   {
     char c = *nextchar++;
-    char *temp = my_index (optstring, c);
+    const char *temp = my_index (optstring, c);
 
     /* Increment `fe_optind' when we start to process its last character.  */
     if (*nextchar == '\0')
