@@ -3,6 +3,7 @@ version="$Id$";
 category=" ";
 info="
 LIBRARY : phindex.lib Procedures to compute the index of real analytic vector fields
+AUTHOR: Victor Castellanos
 
 NOTE: To compute the Poincare-Hopf index of a real analytic vector field
       with an algebraically isolated singularity at 0 (w. an a. i. s),
