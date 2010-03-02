@@ -48,6 +48,14 @@ SEE ALSO: control_lib
   LIB "dmodapp.lib"; // engine
   LIB "qhmoduli.lib"; // Min
 
+proc tstjacobson()
+{
+  /* tests all procs for consistency */
+  example divideUnits;
+  example smith;
+  example jacobson;
+}
+
 proc divideUnits(list L)
 "USAGE: divideUnits(L); list L
 RETURN: matrix or list of matrices
@@ -677,10 +685,11 @@ proc jacobson(matrix MA, list #)
  "USAGE:  jacobson(M, eng);  M matrix, eng an optional int
 RETURN: list
 ASSUME: Basering is a (non-commutative) ring in two variables.
-PURPOSE: compute a weak Jacobson Normal Form of M over the basering
+PURPOSE: compute a weak Jacobson normal form of M over the basering
 THEORY: Groebner bases and involutions are used, following [3]
-NOTE: A list L of matrices {U,D,V} is returned. That is L[1]*M*L[3]=L[2], where
-@*      L[2] is a diagonal matrix and L[1], L[3] square invertible (unimodular) matrices.
+NOTE: A list L of matrices {U,D,V} is returned. That is L[1]*M*L[3]=L[2], 
+@*      where L[2] is a diagonal matrix and 
+@*      L[1], L[3] are square invertible polynomial (unimodular) matrices.
 @*      Note, that M can be rectangular.
 @* The optional integer @code{eng2} determines the Groebner basis engine:
 @* 0 (default) ensures the use of 'slimgb' , otherwise 'std' is used.
