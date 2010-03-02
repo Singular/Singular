@@ -18,13 +18,21 @@ THEORY: We work over a ring R, that is an Euclidean principal ideal domain.
 @* Given a rectangular matrix M over R, one can compute unimodular (that is
 @* invertible) square matrices U and V, such that U*M*V=D is a diagonal matrix.
 @* Depending on the ring, the diagonal entries of D have certain properties.
+@*
+@* We call a square matrix D as before 'a weak Jacobson normal form of M'.
+@* It is known, that over the first rational Weyl algebra K(x)<d>, D can be further
+@* transformed into a diagonal matrix (1,1,...,1,f,0,..,0), where f is in K(x)<d>. We call
+@* such a form of D the strong Jacobson normal form. The existence of strong form
+@* in not guaranteed if one works with algebra, which is not rational Weyl algebra.
+
 
 REFERENCES:
-@* (1) N. Jacobson, 'The theory of rings', AMS, 1943.
-@* (2) Manuel Avelino Insua Hermo, 'Varias perspectives sobre las bases de Groebner :
+@* [1] N. Jacobson, 'The theory of rings', AMS, 1943.
+@* [2] Manuel Avelino Insua Hermo, 'Varias perspectives sobre las bases de Groebner :
 @* Forma normal de Smith, Algorithme de Berlekamp y algebras de Leibniz'.
 @* PhD thesis, Universidad de Santiago de Compostela, 2005.
-
+@* [3] V. Levandovskyy, K. Schindelar 'Computing Jacobson normal form using Groebner bases',
+@* to appear in Journal of Symbolic Computation, 2010.
 
 PROCEDURES:
 smith(M[,eng1,eng2]);  compute the Smith Normal Form of M over commutative ring
@@ -123,7 +131,7 @@ proc smith(matrix MA, list #)
 RETURN: matrix or list of matrices, depending on arguments
 ASSUME: Basering is a commutative polynomial ring in one variable
 PURPOSE: compute the Smith Normal Form of M with (optionally) transformation matrices
-THEORY: Groebner bases are used for the Smith form like in (2).
+THEORY: Groebner bases are used for the Smith form like in [2] and [3].
 NOTE: By default, just the Smith normal form of M is returned.
 @* If the optional integer @code{eng1} is non-zero, the list {U,D,V} is returned
 @* where U*M*V = D and the diagonal field entries of D are not normalized.
@@ -670,7 +678,7 @@ proc jacobson(matrix MA, list #)
 RETURN: list
 ASSUME: Basering is a (non-commutative) ring in two variables.
 PURPOSE: compute a weak Jacobson Normal Form of M over the basering
-THEORY: Groebner bases and involutions are used, generalizing an idea of (2)
+THEORY: Groebner bases and involutions are used, following [3]
 NOTE: A list L of matrices {U,D,V} is returned. That is L[1]*M*L[3]=L[2], where
 @*      L[2] is a diagonal matrix and L[1], L[3] square invertible (unimodular) matrices.
 @*      Note, that M can be rectangular.
@@ -1128,5 +1136,41 @@ matrix m[3][4] = s,x^2*s,x^3*s,s*x^2,s*x+1,(x+1)^3, (x+s)^2, x*s;
 // this one is quite nasty and time consuming
 matrix m[3][4] = s,x^2*s,x^3*s,s*x^2,s*x+1,(x+1)^3, (x+s)^2, x*s,x,x^2,x^3,s;
 
-*/
+// example from the paper:
+    ring w = 0,(x,d),Dp;
+    def W=nc_algebra(1,1);
+    setring W;
+    matrix m[2][2]=d^2-1,d+1,d^2+1,d-x;
+    list J=jacobson(m,0);
+    print(J[1]*m*J[3]);     print(J[2]);     print(J[1]);     print(J[3]);
+    print(J[1]*m*J[3]-J[2]);
 
+    ring w2 = 0,(x,s),Dp;
+    def W2=nc_algebra(1,s);
+    setring W2;
+    poly d = s;
+    matrix m[2][2]=d^2-1,d+1,d^2+1,d-x;
+    list J=jacobson(m,0);
+    print(J[1]*m*J[3]);     print(J[2]);     print(J[1]);     print(J[3]);
+    print(J[1]*m*J[3]-J[2]);
+// here, both JNFs are cyclic
+
+// another example from the paper:
+    ring w = 0,(x,d),Dp;
+    def W=nc_algebra(1,1);
+    setring W;
+   matrix m[2][2]=-x*d+1, x^2*d, -d, x*d+1;
+    list J=jacobson(m,0);
+    print(J[1]*m*J[3]);     print(J[2]);     print(J[1]);     print(J[3]);
+    print(J[1]*m*J[3]-J[2]);
+
+    ring w2 = 0,(x,s),Dp;
+    def W2=nc_algebra(1,s);
+    setring W2;
+    poly d = s;
+   matrix m[2][2]=-x*d+1, x^2*d, -d, x*d+1;
+    list J=jacobson(m,0);
+    print(J[1]*m*J[3]);     print(J[2]);     print(J[1]);     print(J[3]);
+    print(J[1]*m*J[3]-J[2]); 
+
+*/
