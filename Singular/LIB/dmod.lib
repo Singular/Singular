@@ -64,23 +64,16 @@ annfspecial(I, F, m, n);  compute Ann F^n from Ann F^s for a polynomial F and a 
 Sannfs(F[,S,eng]);      compute Ann F^s in D[s] for a polynomial F
 Sannfslog(F[,eng]);     compute Ann^(1) F^s in D[s] for a polynomial F
 bernsteinBM(F[,eng]);   compute global Bernstein polynomial for a polynomial F (algorithm of Briancon-Maisonobe)
+bernsteinLift(I,F [,eng]);  compute a possible multiple of Bernstein polynomial via lift-like procedure
 operatorBM(F[,eng]);    compute Ann F^s, Ann F^s0, BS and PS for a polynomial F (algorithm of Briancon-Maisonobe)
 operatorModulo(F, I, b); compute PS via the modulo approach
 annfsParamBM(F[,eng]);  compute the generic Ann F^s (algorithm by Briancon and Maisonobe) and exceptional parametric constellations for a polynomial F with parametric coefficients
 annfsBMI(F[,eng]);      compute Ann F^s and Bernstein ideal for a polynomial F=f1*..*fP (multivariate algorithm of Briancon-Maisonobe)
 checkRoot(F,a[,S,eng]); check if a given rational is a root of the global Bernstein polynomial of F and compute its multiplicity
-annfsBM(F[,eng]);          compute Ann F^s0 in D and Bernstein polynomial for a polynomial F (algorithm of Briancon-Maisonobe)
-annfsLOT(F[,eng]);         compute Ann F^s0 in D and Bernstein polynomial for a polynomial F (Levandovskyy modification of the Oaku-Takayama algorithm)
-annfsOT(F[,eng]);          compute Ann F^s0 in D and Bernstein polynomial for a polynomial F (algorithm of Oaku-Takayama)
-SannfsBM(F[,eng]);         compute Ann F^s in D[s] for a polynomial F (algorithm of Briancon-Maisonobe)
 SannfsBFCT(F[,eng]);      compute Ann F^s in D[s] for a polynomial F (algorithm of Briancon-Maisonobe, other output ordering)
-SannfsLOT(F[,eng]);        compute Ann F^s in D[s] for a polynomial F (Levandovskyy modification of the Oaku-Takayama algorithm)
-SannfsOT(F[,eng]);         compute Ann F^s in D[s] for a polynomial F (algorithm of Oaku-Takayama)
 annfs0(I,F [,eng]);          compute Ann F^s0 in D and Bernstein polynomial from the known Ann F^s in D[s]
 annfs2(I,F [,eng]);           compute Ann F^s0 in D and Bernstein polynomial from the known Ann F^s in D[s] by using a trick of Noro
-annfsRB(I,F [,eng]);          compute Ann F^s0 in D and Bernstein polynomial from the known Ann F^s in D[s] by reduceB strategy of Macaulay
-checkRoot1(I,F,a[,eng]);   check whether a rational is a root of the global Bernstein polynomial of F from the known Ann F^s in D[s]
-checkRoot2(I,F,a[,eng]);   check whether a rational is a root of the global Bernstein polynomial of F and compute its multiplicity from the known Ann F^s in D[s]
+annfsRB(I,F [,eng]);          compute Ann F^s0 in D and Bernstein polynomial from the known Ann F^s in D[s] by using Jacobian ideal 
 checkFactor(I,F,q[,eng]); check whether a polynomial q in K[s] is a factor of the global Bernstein polynomial of F from the known Ann F^s in D[s]
 
 AUXILIARY PROCEDURES:
@@ -95,6 +88,17 @@ isRational(n);  check whether n is a rational number
 
 SEE ALSO: gmssing_lib, bfun_lib, dmodapp_lib
 ";
+
+// added by VL on 2.3.2010: bernsteinLift
+// ****** commented out for better readability by VL on 2.3.2010
+// annfsBM(F[,eng]);          compute Ann F^s0 in D and Bernstein polynomial for a polynomial F (algorithm of Briancon-Maisonobe)
+// annfsLOT(F[,eng]);         compute Ann F^s0 in D and Bernstein polynomial for a polynomial F (Levandovskyy modification of the Oaku-Takayama algorithm)
+// annfsOT(F[,eng]);          compute Ann F^s0 in D and Bernstein polynomial for a polynomial F (algorithm of Oaku-Takayama)
+// SannfsBM(F[,eng]);         compute Ann F^s in D[s] for a polynomial F (algorithm of Briancon-Maisonobe)
+// SannfsLOT(F[,eng]);        compute Ann F^s in D[s] for a polynomial F (Levandovskyy modification of the Oaku-Takayama algorithm)
+// SannfsOT(F[,eng]);         compute Ann F^s in D[s] for a polynomial F (algorithm of Oaku-Takayama)
+// checkRoot1(I,F,a[,eng]);   check whether a rational is a root of the global Bernstein polynomial of F from the known Ann F^s in D[s]
+// checkRoot2(I,F,a[,eng]);   check whether a rational is a root of the global Bernstein polynomial of F and compute its multiplicity from the known Ann F^s in D[s]
 
 LIB "matrix.lib"; // for submat
 LIB "nctools.lib"; // makeModElimRing etc.
@@ -1408,8 +1412,8 @@ example
 }
 
 // try to replace s with -s-1 => data is shorter as in annfs2
-// and use Macaulay's reduceB strategy, that is add
-// not F but <F,dF/dx1,...,dF/dxN>; the resulting B-function
+// and use what Macaulay2 people call reduceB strategy, that is add
+// not F but Tjurina ideal <F,dF/dx1,...,dF/dxN>; the resulting B-function
 // has to be multiplied with (s+1) at the very end
 proc annfsRB(ideal I, poly F, list #)
 "USAGE:  annfsRB(I, F [,eng]);  I an ideal, F a poly, eng an optional int
@@ -1421,7 +1425,7 @@ NOTE:    activate the output ring with the @code{setring} command. In this ring,
 @*       - the list BS contains the roots with multiplicities of a Bernstein polynomial of f.
 @*       If eng <>0, @code{std} is used for Groebner basis computations,
 @*       otherwise and by default @code{slimgb} is used.
-@*       This procedure follows the 'reduceB' strategy, used in Macaulay2.
+@*       This procedure uses in addition to F its Jacobian ideal.
 DISPLAY: If @code{printlevel}=1, progress debug messages will be printed,
 @*       if @code{printlevel}>=2, all the debug messages will be printed.
 EXAMPLE: example annfsRB; shows examples
@@ -5927,6 +5931,184 @@ example
   isRational(n1);
   number n2 = (11*a+3)/72;
   isRational(n2);
+}
+
+proc bernsteinLift(ideal I, poly F, list #)
+"USAGE:  bernsteinLift(I, F [,eng]);  I an ideal, F a poly, eng an optional int
+RETURN:  list
+PURPOSE: compute the (multiple of) Bernstein-Sato polynomial with lift-like method, 
+@* based on the output of Sannfs-like procedure
+NOTE:  the output list contains the roots with multiplicities of the candidate 
+@* for being Bernstein-Sato polynomial of f.
+@*  If eng <>0, @code{std} is used for Groebner basis computations,
+@*  otherwise and by default @code{slimgb} is used.
+@*  If printlevel=1, progress debug messages will be printed,
+@*  if printlevel>=2, all the debug messages will be printed.
+EXAMPLE: example bernsteinLift; shows examples
+"
+{
+  // assume: s is the last variable! check in the code
+  int eng = 0;
+  if ( size(#)>0 )
+  {
+    if ( typeof(#[1]) == "int" )
+    {
+      eng = int(#[1]);
+    }
+  }
+  def @R2 = basering;
+  int Nnew = nvars(@R2);
+  int N = Nnew/2;
+  int ppl = printlevel-voice+2;
+  // we're in D_n[s], where the elim ord for s is set
+  // create D_n(s)
+  // create the ordinary Weyl algebra and put the result into it,
+  // keep: N, i,j,s, tmp, RL
+  Nnew = Nnew - 1; // former 2*N;
+  list L = 0;
+  list Lord, tmp;
+  intvec iv; int i;
+  list RL = ringlist(basering);
+  // if we work over alg. extension => problem!
+  if (size(RL[1]) > 1)
+  {
+    ERROR("cannot work over algebraic field extension");
+  }
+  tmp[1] = RL[1]; // char
+  tmp[2] = list("s");
+  tmp[3] = list(list("lp",int(1)));
+  tmp[4] = ideal(0);
+  L[1] = tmp; // field
+  tmp = 0;
+  L[4] = RL[4];  // factor ideal
+
+  // check whether vars have admissible names -> done earlier
+  // list Name = RL[2]M
+  // DName is defined earlier
+  list NName; // = RL[2]; // skip the last var 's'
+  for (i=1; i<=Nnew; i++)
+  {
+    NName[i] =  RL[2][i];
+  }
+  L[2] = NName;
+  // (c, ) ordering:
+  tmp[1]  = "c";
+  iv = 0;
+  tmp[2]  = iv;
+  Lord[1] = tmp;
+  tmp=0;
+  // dp ordering;
+  string s = "iv=";
+  for (i=1; i<=Nnew; i++)
+  {
+    s = s+"1,";
+  }
+  s[size(s)] = ";";
+  execute(s);
+  tmp     = 0;
+  tmp[1]  = "dp";  // string
+  tmp[2]  = iv;  // intvec
+  Lord[2] = tmp;
+  kill s;
+  tmp     = 0;
+  L[3]    = Lord;
+  // we are done with the list
+  // Add: Plural part
+  def @R4@ = ring(L);
+  setring @R4@;
+  matrix @D[Nnew][Nnew];
+  for (i=1; i<=N; i++)
+  {
+    @D[i,N+i]=1;
+  }
+  def @R4 = nc_algebra(1,@D);
+  setring @R4;
+  kill @R4@;
+  dbprint(ppl,"// -3-1- the ring K(s)<x,dx> is ready");
+  dbprint(ppl-1, @R4);
+  // map things correctly, using names
+  ideal J = imap(@R2, I), imap(@R2,F);
+  module M;
+  // make leadcoeffs positive
+  for (i=1; i<= ncols(J); i++)
+  {
+    if (J[i]!=0) 
+    {
+      M[i] = J[i]*gen(1) + gen(1+i);
+    }
+  }
+  dbprint(ppl,"// -3-2- starting GB of the assoc. module M");
+  M = engine(M,eng);
+  dbprint(ppl,"// -3-3- finished GB of the assoc. module M");
+  dbprint(ppl-1, M);
+  // now look for (1) entry with 1st comp nonzero
+  // determine whether there are several 1st comps nonzero
+  module M2;
+  for (i=1; i<= ncols(M); i++)
+  {
+    if (M[1,i]!=0) 
+    {
+      M2 = M2, M[i];
+    }
+  }
+  M2 = simplify(M2,2); // skip 0s
+  if (ncols(M2) > 1)
+  {
+    dbprint(ppl,"// -*- more than 1 element with nonzero leading component");
+    option(redSB);    option(redTail); // set them back?
+    M2 = interred(M2); 
+    if (ncols(M2) > 1)
+    {
+      ERROR("more than one leading component after interred: assume violation!");
+    }
+    if (leadexp(M2[1]) != 0)
+    {
+      ERROR("nonconstant entry after interred: assume violation!");
+    }
+  }
+  // now there's only one el-t with leadcomp<>0
+  vector V = M2[1];
+  number bcand = leadcoef(V[1]); // 1st component
+  V[1]=0;
+  number ct = content(V); // content of the cofactors
+  poly CF = ct*V[ncols(J)]; // polynomial in K[s]<x,dx>, cofactor to F
+  dbprint(ppl,"// -3-4- the cofactor candidate found");
+  dbprint(ppl-1,CF);
+  dbprint(ppl,"// -3-5- the entry as it is");
+  dbprint(ppl-1,bcand);
+  bcand = bcand*ct; // a product of both
+  dbprint(ppl,"// -3-6- the content of the rest vector");
+  dbprint(ppl-1,ct);
+  ring @R3 = 0,s,dp;
+  dbprint(ppl,"// -4-1- the ring @R3 i.e. K[s] is ready");
+  poly bcand = imap(@R4,bcand);
+  dbprint(ppl,"// -4-2- factorization");
+  list P = factorize(bcand);          //with constants and multiplicities
+  ideal bs; intvec m;             //the Bernstein polynomial is monic, so we are not interested in constants
+  for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
+  {
+    bs[i-1] = P[1][i];
+    m[i-1]  = P[2][i];
+  }
+  bs = normalize(bs); bs = -subst(bs,s,0); // to get roots only
+  setring @R2; // the ring the story started with
+  ideal bs = imap(@R3,bs); // intvec m is global
+  intvec mm = m; m = 0;
+  kill @R3; // kills m as well....
+  list @L = list(bs, mm); 
+  // look for (2) return the GB of syzygies?
+  return(@L);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),Dp;
+  poly F = x^3+y^3+z^3;
+  printlevel = 0;
+  def A = Sannfs(F);   setring A;
+  LD;
+  poly F = imap(r,F);
+  list L  = bernsteinLift(LD,F); L;
+  poly bs = fl2poly(L,"s"); bs; // the candidate for Bernstein-Sato polynomial
 }
 
 /// ****** EXAMPLES ************
