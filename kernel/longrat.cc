@@ -1136,11 +1136,6 @@ number nlGcd(number a, number b, const ring r)
   }
   if (((!(SR_HDL(a) & SR_INT))&&(a->s<2))
   ||  ((!(SR_HDL(b) & SR_INT))&&(b->s<2))) return INT_TO_SR(1);
-  result=(number)omAllocBin(rnumber_bin);
-#if defined(LDEBUG)
-  result->debug=123456;
-#endif
-  mpz_init(&result->z);
   if (SR_HDL(a) & SR_INT)
   {
     unsigned long t=mpz_gcd_ui(NULL,&b->z,ABS(SR_TO_INT(a)));
@@ -1154,23 +1149,26 @@ number nlGcd(number a, number b, const ring r)
   }
   else
   {
+    result=(number)omAllocBin(rnumber_bin);
+    mpz_init(&result->z);
     mpz_gcd(&result->z,&a->z,&b->z);
-  }
-  result->s = 3;
-  if (mpz_size1(&result->z)<=MP_SMALL)
-  {
-    int ui=(int)mpz_get_si(&result->z);
-    if ((((ui<<3)>>3)==ui)
-    && (mpz_cmp_si(&result->z,(long)ui)==0))
+    if (mpz_size1(&result->z)<=MP_SMALL)
     {
-      mpz_clear(&result->z);
-      omFreeBin((ADDRESS)result, rnumber_bin);
-      result=INT_TO_SR(ui);
+      int ui=(int)mpz_get_si(&result->z);
+      if ((((ui<<3)>>3)==ui)
+      && (mpz_cmp_si(&result->z,(long)ui)==0))
+      {
+        mpz_clear(&result->z);
+        omFreeBin((ADDRESS)result, rnumber_bin);
+        return INT_TO_SR(ui);
+      }
     }
+    result->s = 3;
+  #ifdef LDEBUG
+    result->debug=123456;
+    nlTest(result);
+  #endif
   }
-#ifdef LDEBUG
-  nlTest(result);
-#endif
   return result;
 }
 
