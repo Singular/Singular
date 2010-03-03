@@ -82,10 +82,11 @@ class facet
 		facet(int const &n);
 		/**  The copy constructor */
 		facet(const facet& f);
-		
+		facet(const facet& f, bool shallow);
 		/** The default destructor */
 		~facet();
-				
+		/** Comparison operator*/
+// 		inline bool operator==(const facet *f,const facet *g);			
 		/** \brief Comparison of facets*/
 		inline bool areEqual(facet *f, facet *g);
 		/** Stores the facet normal \param intvec*/
@@ -114,7 +115,7 @@ class facet
 		/** \brief Debugging function
 		 * prints the facet normal an all (codim-2)-facets that belong to it
 		 */
-		inline void fDebugPrint();
+		volatile void fDebugPrint();
 		friend class gcone;		
 };
 
@@ -144,6 +145,7 @@ class gcone
 		static float time_getCodim2Normals;
 		static float t_getExtremalRays;
 		static float time_flip;
+		static float time_flip2;
 		static float t_areEqual;
 		static float t_ffG;
 		static float t_markings;
@@ -204,14 +206,15 @@ class gcone
 		inline void idDebugPrint(const ideal &I);
 		inline void invPrint(const ideal &I);
 		inline bool isMonomial(const ideal &I);
-		inline intvec *ivNeg(intvec *iv);
-		inline int dotProduct(intvec &iva, intvec &ivb);
+		inline intvec *ivNeg(const intvec *iv);
+// 		inline int dotProduct(intvec &iva, intvec &ivb);
 		inline int dotProduct(const intvec &iva, const intvec &ivb);
-		inline bool isParallel(intvec &a, intvec &b);
+		inline bool isParallel(const intvec &a, const intvec &b);
 // 		inline int dotProduct(const intvec* a, const intvec *b);
 // 		inline bool isParallel(const intvec* a, const intvec* b);
 		inline bool areEqual(intvec &a, intvec &b);
 		inline bool areEqual( facet *f,  facet *g);
+		inline bool areEqual2(facet* f, facet *g);
 		inline int intgcd(int a, int b);
 		inline void writeConeToFile(const gcone &gc, bool usingIntPoints=FALSE);
 		inline void readConeFromFile(int gcNum, gcone *gc);
@@ -222,14 +225,15 @@ class gcone
 		inline void getCodim2Normals(const gcone &gc);
 		inline void getExtremalRays(const gcone &gc);
 		inline void flip(ideal gb, facet *f);
-		inline void computeInv(ideal &gb, ideal &inv, intvec &f);
-// 		poly restOfDiv(poly const &f, ideal const &I); removed with r12286
+		inline void flip2(const ideal gb, facet *f);
+		inline void computeInv(const ideal &gb, ideal &inv, const intvec &f);// 		poly restOfDiv(poly const &f, ideal const &I); removed with r12286
 		inline ideal ffG(const ideal &H, const ideal &G);
 		inline void getGB(ideal const &inputIdeal);		
 		inline void interiorPoint( dd_MatrixPtr &M, intvec &iv);
-// 		inline void interiorPoint2(const dd_MatrixPtr &M, intvec &iv);//removed Feb 8th, 2010
+		inline void interiorPoint2(); //removed Feb 8th, 2010, new method Feb 19th, 2010
 		inline void preprocessInequalities(dd_MatrixPtr &M);
 		ring rCopyAndAddWeight(const ring &r, intvec *ivw);
+		ring rCopyAndAddWeight2(const ring &, const intvec *, const intvec *);
 		ring rCopyAndChangeWeight(const ring &r, intvec *ivw);		
 // 		void reverseSearch(gcone *gcAct); //NOTE both removed from r12286
 // 		bool isSearchFacet(gcone &gcTmp, facet *testfacet);
@@ -241,7 +245,9 @@ class gcone
 		dd_MatrixPtr facets2Matrix(const gcone &gc);
 		/** Compute the lineality space Ax=0 and return it as dd_MatrixPtr dd_LinealitySpace*/
 		inline dd_MatrixPtr computeLinealitySpace();
-		inline bool iv64isStrictlyPositive(intvec *);
+		inline bool iv64isStrictlyPositive(const intvec *);
+		/** Exchange 2 ordertype_a by just 1 */
+		inline void replaceDouble_ringorder_a_ByASingleOne();
 // 		static void gcone::idPrint(ideal &I);		
 		friend class facet;	
 };
