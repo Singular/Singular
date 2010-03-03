@@ -1,3 +1,5 @@
+
+- memory leaks fixed: nlGcd, nc_ReduceSpolyNew
 - new lib: dmodvar.lib
 
 -  Fri Feb 26 11:55:05 MEZ 2010
