@@ -40,7 +40,8 @@ LIB "algebra.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc normal(ideal id, list #)
-"USAGE:  normal(id [,choose]); id = radical ideal, choose = optional string. @*
+"USAGE:  normal(id [,choose]); id = radical ideal, choose = list of optional
+         strings. @*
          Optional parameters in list choose (can be entered in any order):@*
          Decomposition:@*
          - \"equidim\" -> computes first an equidimensional decomposition,
@@ -61,8 +62,8 @@ proc normal(ideal id, list #)
          If this option is not set, normal changes to dp ordering and performs
          all computations with respect to this ordering.@*
          - \"withDelta\" (or \"wd\") -> returns also the delta invariants.@*
-         If choose is not given or empty, only \"equidim\" but no other option
-         is used.
+         If the optional parameter choose is not given or empty, only
+         \"equidim\" but no other option is used.
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
          be wrong (id=radical(id); makes id radical). However, when using the
          \"prim\" option the minimal associated primes of id are computed first
@@ -3328,10 +3329,10 @@ proc closureGenerators(list L);
 ///////////////////////////////////////////////////////////////////////////////
 
 proc normalP(ideal id,list #)
-"USAGE:   normalP(id [,choose]); id = radical ideal, = optional string.
+"USAGE:  normalP(id [,choose]); id = radical ideal, choose = optional list of
+         strings.
          Optional parameters in list choose (can be entered in any order):@*
-         list of optional strings \"withRing\", \"isPrim\", \"noFac\",
-         \"noRed\", where@*
+         \"withRing\", \"isPrim\", \"noFac\", \"noRed\", where@*
          - \"noFac\" -> factorization is avoided during the computation
          of the minimal associated primes.@*
          - \"isPrim\" -> assumes that the ideal is prime. If the assumption
@@ -3344,7 +3345,7 @@ proc normalP(ideal id,list #)
          new module generator of the integral closure in the quotient field.@*
 ASSUME:  The characteristic of the ground field must be positive. If the
          option \"isPrim\" is not set, the minimal associated primes of id
-         are computed first and hence normal computes the normalization of
+         are computed first and hence normalP computes the normalization of
          the radical of id. If option \"isPrim\" is set, the ideal must be
          a prime ideal otherwise the result may be wrong.
 RETURN:  a list, say 'nor' of size 2 (resp. 3 if \"withRing\" is set).@*
@@ -3389,7 +3390,7 @@ NOTE:    To use the i-th ring type: @code{def R=nor[1][i]; setring R;}.
          For local or mixed orderings use proc 'normal'.
 @*       If the input ideal id is weighted homogeneous a weighted ordering may
          be used (qhweight(id); computes weights).
-@*       Works only in characteristic p > 0, use proc normal in char 0.
+@*       Works only in characteristic p > 0; use proc normal in char 0.
 KEYWORDS: normalization; integral closure; delta invariant.
 SEE ALSO: normal, normalC
 EXAMPLE: example normalP; shows an example
@@ -3685,7 +3686,7 @@ static proc normalityTest(list mstdid)
       if ( y >= 1)
       { "iteration", ii; }
       L = U*Dp + I;
-      //### L=interred(L) oder msdt(L)[2]?
+      //### L=interred(L) oder mstd(L)[2]?
       //Wird dadurch kleiner aber string(L) wird groesser
       K = preimage(Q,phi,L);    //### Improvement by block ordering?
       option(returnSB);
@@ -3905,15 +3906,22 @@ static proc computeRing(ideal J, ideal I, list #)
 
   if(c==1)
   {
-    if( defined(norid) )  { kill norid; }
-    if( defined(normap) ) { kill normap; }
-    ideal norid = I;
-    ideal normap =  maxid;
+/*    if( defined(norid) )  { kill norid; }
+      if( defined(normap) ) { kill normap; }
+      ideal norid = I;
+      ideal normap =  maxid;  */
+
+    list gnirlist = ringlist(R);
+    def R1 = ring(gnirlist);
+    setring R1;
+    ideal norid = imap(R, I);
+    ideal normap = imap(R, maxid);
     export norid;
     export normap;
+
     if(noRed == 1){
       setring R;
-      return(R);
+      return(R1);
     } else {
       list L = substpartSpecial(norid,normap);
       def lastRing = L[1];
@@ -5144,7 +5152,8 @@ EXAMPLE: no example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc normalC(ideal id, list #)
-"USAGE:   normalC(id [,choose]);  id = radical ideal, choose = optional string.
+"USAGE:  normalC(id [,choose]);  id = radical ideal, choose = optional list
+         of string.
          Optional parameters in list choose (can be entered in any order):@*
          Decomposition:@*
          - \"equidim\" -> computes first an equidimensional decomposition,
