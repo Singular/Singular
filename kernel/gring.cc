@@ -2670,9 +2670,9 @@ inline void nc_CleanUp(ring r)
 void nc_rKill(ring r)
 // kills the nc extension of ring r
 {
+  r->GetNC()->ref--;
   if (r->GetNC()->ref >= 1) /* in use by somebody else */
   {
-    r->GetNC()->ref--;
     r->GetNC() = NULL; // don't cleanup, just dereference
     return;
   }
@@ -2938,10 +2938,7 @@ BOOLEAN nc_CallPlural(
            ( (DDD != NULL) && (MATCOLS(DDD) == 1) && (MATROWS(DDD) == 1) && (MATELEM(DDD,1,1) == NULL) ) ||
            ( (DDN == NULL) )
           );
-
-
   }
-
 
   // there must be:
   assume( (CCC != NULL) != (CCN != NULL) ); // exactly one data about coeffs (C).
