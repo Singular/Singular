@@ -2027,16 +2027,18 @@ See
 @item @strong{Syntax:}
 @code{liftstd (} ideal_expression@code{,} matrix_name @code{)}
 @*@code{liftstd (} module_expression@code{,} matrix_name @code{)}
+@*@code{liftstd (} ideal_expression@code{,} matrix_name@code{,} module_name @code{)}
+@*@code{liftstd (} module_expression@code{,} matrix_name@code{,} module_name @code{)}
 @item @strong{Type:}
 ideal or module
 @item @strong{Purpose:}
-returns a Groebner basis of an ideal or module and the transformation
+returns a left Groebner basis of an ideal or module and a left transformation
 matrix from the given ideal, resp.@: module, to the Groebner basis.
-@*That is, if @code{m} is the ideal or module, @code{sm} is the Groebner
-basis of  @code{m}, returned by @code{liftstd}, and @code{T} is the transformation matrix,
+@*That is, if @code{m} is the ideal or module, @code{sm} is the left Groebner
+basis of  @code{m}, returned by @code{liftstd}, and @code{T} is a left transformation matrix,
 then @code{sm=module(transpose(transpose(T)*transpose(matrix(m))))}.
-
-If @code{m} is an ideal, @code{sm=ideal(transpose(T)*transpose(matrix(m)))}.
+@* If @code{m} is an ideal, @code{sm=ideal(transpose(T)*transpose(matrix(m)))}.
+@*In an optional third argument the left syzygy module will be returned.
 @item @strong{Example:}
 @smallexample
 @c example
@@ -2053,6 +2055,8 @@ print(matrix(j));
 print(T);  // the transformation matrix
 ideal tj = ideal(transpose(T)*transpose(matrix(i)));
 size(ideal(matrix(j)-matrix(tj))); // test for 0
+module S; ideal k = liftstd(i,T,S); // the third argument
+S = std(S); print(S); // the syzygy module
 @c example
 @end smallexample
 @end table
