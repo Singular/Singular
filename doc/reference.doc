@@ -6562,6 +6562,10 @@ sent literally to the shell.
 @cindex pid
 @cindex system, pid
 returns the process number as int (for creating unique names).
+@item @code{system("cpu")}
+@cindex cpu
+@cindex system, cpu
+returns the number of cpu cores as int (for using multiple cores).
 @item @code{system("uname")}
 @cindex uname
 @cindex system, uname
