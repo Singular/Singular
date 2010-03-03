@@ -1464,8 +1464,9 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
 
   if (!n_IsOne(cG, r))
   {
-    cF = n_Div(cF, cG, r);
-    C  = n_Div(C,  cG, r);
+    number n_tmp;
+    n_tmp = n_Div(cF, cG, r); n_Delete(&cF,r); cF=n_tmp;
+    n_tmp  = n_Div(C,  cG, r); n_Delete(&C,r); C=n_tmp;
   }
 
   p2 = p_Mult_nn(p2, C, r); // p2 !!!
@@ -1484,11 +1485,11 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
     N  = p_Mult_nn(N, cF, r);
     p_Test(N,r);
   }
+  n_Delete(&cF,r);
 
   out = p_Add_q(p2,N,r); // delete N, p2
   p_Test(out,r);
   if ( out!=NULL ) pContent(out);
-  n_Delete(&cF,r);
   return(out);
 }
 
