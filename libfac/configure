@@ -533,13 +533,13 @@ fi
 
 libfac_name="\"Factorization and characteristic sets library\""
 
-libfac_version="3.1.0"
+libfac_version="3.1.1"
 cat >> confdefs.h <<EOF
 #define LIBFAC_VERSION "$libfac_version"
 EOF
 
 
-libfac_date="\"Aug 2008\""
+libfac_date="\"Feb 2010\""
 cat >> confdefs.h <<EOF
 #define LIBFAC_DATE $libfac_date
 EOF
