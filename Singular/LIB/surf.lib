@@ -71,7 +71,7 @@ EXAMPLE: example plot; shows an example
 "
 {
   string extra_surf_opts=" -x --auto-resize "; // remove this line for surf 0.9
-  string l = "/tmp/surf"+string(system("pid"));
+  string l = "/tmp/surf" + string(system("pid"));
   string err_mes; // string containing error messages
   def base=basering;
   intvec v=num_of_vars(I);
@@ -104,7 +104,8 @@ EXAMPLE: example plot; shows an example
   {
     write(":w "+l,"clip=none;");
       write(l, "width=500; height=500; set_size; do_background=yes;
-background_red=255; background_green=255; background_blue=255;");
+               background_red=255; background_green=255;
+               background_blue=255;");
     write(l,
     "root_finder=d_chain_bisection;epsilon=0.0000000001;iterations=20000;");
     write(l, "curve_green=0; curve_blue=0; curve_width=1.5;");
@@ -137,34 +138,52 @@ background_red=255; background_green=255; background_blue=255;");
       ERROR(err_mes);
     }
   }
-  string surf_call;
-  surf_call = "surf ";
-  if (defined(extra_surf_opts))
-  {
-    surf_call = surf_call + " " + extra_surf_opts;
-  }
-  surf_call =surf_call + l + " >/dev/null 2>&1";
 
-  "Press q to exit from 'surf'";
-  if ("ppcMac-darwin" != system("uname"))
+  string surf_call;
+
+  if (isWindows())
   {
-     i=system("sh", surf_call);
+    surf_call = "((xwin -multiwindow -clipboard -silent-dup-error";
+    surf_call = surf_call + " >/dev/null 2>&1 &) && sleep 5 && (surf";
+    if (defined(extra_surf_opts))
+    {
+      surf_call = surf_call + " " + extra_surf_opts;
+    }
+    surf_call = surf_call + l + ">/dev/null 2>&1))";
+    surf_call = surf_call + "&& /bin/rm " + l;
+    "Press q to exit from 'surf'.";
+    "(You may leave the XServer running for further invocations"
+    + " of 'plot'.)";
+    i = system("sh", surf_call);
   }
   else
   {
-     surf_call = surf_call + " || " + "singularsurf "
-                 + extra_surf_opts + " " + l +" >/dev/null 2>&1";
-     i = system("sh", surf_call);
+    surf_call = "surf ";
+    if (defined(extra_surf_opts))
+    {
+      surf_call = surf_call + " " + extra_surf_opts;
+    }
+    surf_call = surf_call + l + " >/dev/null 2>&1";
+  
+    if ("ppcMac-darwin" == system("uname"))
+    {
+       surf_call = surf_call + " || " + "singularsurf "
+                   + extra_surf_opts + " " + l + " >/dev/null 2>&1";
+    }
+
+    "Press q to exit from 'surf'";
+    i = system("sh", surf_call);
+    system("sh", "/bin/rm " + l);
   }
 
   if (i != 0)
   {
-    err_mes = "calling `surf` failed. (the shell return the error code "
-          + string(i) + ")." + newline +
-          "probably the executable `surf` is not found.";
+    err_mes = "calling `surf` failed" + newline
+              + " (The shell returned the error code "
+              + string(i) + "." + newline
+              + "Probably, the executable `surf` was not found.)";
     ERROR(err_mes);
   }
-  i = system("sh", "/bin/rm "+l);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -205,7 +224,7 @@ NOTE: requires the external program 'surfer' to be installed,
 EXAMPLE: example surfer; shows an example
 "
 {
-  string l = "/tmp/surf"+string(system("pid"));
+  string l = "./surfer" + string(system("pid"));
   string err_mes; // string containing error messages
   def base=basering;
   intvec v=num_of_vars(I);
@@ -236,7 +255,7 @@ EXAMPLE: example surfer; shows an example
   if (leadcoef(I[1]) <0) { I[1]=-I[1]; }
   if (ncols(I)==1 and (n==3 or nvars(base)==3)) // surface
   {
-    write(":w " + l, "surface=",I[1],";");
+    write(":w " + l, "surface=" + string(I[1]) + ";");
   }
   else
   {
@@ -245,19 +264,25 @@ EXAMPLE: example surfer; shows an example
     ERROR(err_mes);
   }
   string surf_call;
-  surf_call ="surfer " + l + " >/dev/null 2>&1";
-
+  
+  surf_call = "surfer";
+  if (isWindows())
+  {
+    surf_call = surf_call + ".exe";
+  }
+  surf_call = surf_call + " " + l; // + " >/dev/null 2>&1";
   "Close window to exit from 'surfer'";
-  i=system("sh", surf_call);
+  i = system("sh", surf_call);
+  system("sh", "/bin/rm " + l);
 
   if (i != 0)
   {
-    err_mes = "calling `surfer` failed. (the shell return the error code "
-          + string(i) + ")." + newline +
-          "probably the executable `surfer` is not found.";
+    err_mes = "calling `surfer` failed" + newline
+              + " (The shell returned the error code "
+              + string(i) + "." + newline
+              + "Probably, the executable `surfer` was not found.)";
     ERROR(err_mes);
   }
-  i = system("sh", "/bin/rm "+l);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -275,5 +300,25 @@ example
   // Whitney umbrella
   surfer(z^2-x^2*y);
 
+}
+proc isWindows()
+"returns 1 if this SINGULAR instance runs under (some) Windows OS;
+0 otherwise"
+{
+  string s = system("uname");
+  for (int i = 1; i <= size(s)-2; i = i + 1)
+  {
+    if (s[i] == "W")
+    {
+      if (s[i+1] == "i")
+      {
+        if (s[i+2] == "n")
+        {
+          return (1);
+        }
+      }
+    }
+  }
+  return (0);
 }
 ///////////////////////////////////////////////////////////////////////////////
