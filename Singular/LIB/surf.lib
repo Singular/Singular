@@ -264,13 +264,9 @@ EXAMPLE: example surfer; shows an example
     ERROR(err_mes);
   }
   string surf_call;
-  
+
   surf_call = "surfer";
-  if (isWindows())
-  {
-    surf_call = surf_call + ".exe";
-  }
-  surf_call = surf_call + " " + l; // + " >/dev/null 2>&1";
+  surf_call = surf_call + " " + l + " >/dev/null 2>&1";
   "Close window to exit from 'surfer'";
   i = system("sh", surf_call);
   system("sh", "/bin/rm " + l);
