@@ -1,6 +1,9 @@
 #
 # Singular libraries which go into distribution
 # MAKE SURE THAT THIS IS UP_TO_DATE
+# and use:
+# svn propset svn:keywords "Id" yourlib.lib
+# for new libs
 #
 
 SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
