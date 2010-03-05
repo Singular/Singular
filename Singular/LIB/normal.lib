@@ -2079,7 +2079,7 @@ EXAMPLE: example genus; shows an example
      setring R1;
      ideal J=std(imap(R0,I));
      if(dim(J)!=1){ERROR("ideal defines not a curve");}
-     def S=changevar(varstr(R)+",@t");
+     def S=changevar(varstr(R1)+",@t");
      setring S;
      ideal J=imap(R1,J);
      J=std(homog(J,@t));
