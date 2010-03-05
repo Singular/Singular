@@ -2670,16 +2670,6 @@ inline void nc_CleanUp(ring r)
 void nc_rKill(ring r)
 // kills the nc extension of ring r
 {
-  r->GetNC()->ref--;
-  if (r->GetNC()->ref >= 1) /* in use by somebody else */
-  {
-    r->GetNC() = NULL; // don't cleanup, just dereference
-    return;
-  }
-  /* otherwise kill the previous nc data */
-
-  assume( r->GetNC()->ref == 0 );
-
   if( r->GetNC()->GetGlobalMultiplier() != NULL )
   {
     delete r->GetNC()->GetGlobalMultiplier();
@@ -2701,29 +2691,21 @@ void nc_rKill(ring r)
     {
       for(j=i+1;j<=rN;j++)
       {
-        id_Delete((ideal *)&(r->GetNC()->MT[UPMATELEM(i,j,rN)]),r->GetNC()->basering);
+        id_Delete((ideal *)&(r->GetNC()->MT[UPMATELEM(i,j,rN)]),r);
       }
     }
     omFreeSize((ADDRESS)r->GetNC()->MT,rN*(rN-1)/2*sizeof(matrix));
     omFreeSize((ADDRESS)r->GetNC()->MTsize,rN*(rN-1)/2*sizeof(int));
-    id_Delete((ideal *)&(r->GetNC()->COM),r->GetNC()->basering);
+    id_Delete((ideal *)&(r->GetNC()->COM),r);
   }
-  id_Delete((ideal *)&(r->GetNC()->C),r->GetNC()->basering);
-  id_Delete((ideal *)&(r->GetNC()->D),r->GetNC()->basering);
+  id_Delete((ideal *)&(r->GetNC()->C),r);
+  id_Delete((ideal *)&(r->GetNC()->D),r);
 
   if( rIsSCA(r) && (r->GetNC()->SCAQuotient() != NULL) )
   {
-    id_Delete(&r->GetNC()->SCAQuotient(), r->GetNC()->basering); // Custom SCA destructor!!!
+    id_Delete(&r->GetNC()->SCAQuotient(), r); // Custom SCA destructor!!!
   }
 
-  r->GetNC()->basering->ref--;
-
-  if ((r->GetNC()->basering->ref<=0)&&(r->GetNC()->basering->GetNC()==NULL))
-  {
-    WarnS("Killing a base ring!");
-//    rWrite(r->GetNC()->basering);
-    rKill(r->GetNC()->basering);
-  }
 
   nc_CleanUp(r);
 }
@@ -2731,33 +2713,6 @@ void nc_rKill(ring r)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-// share the same nc-structure with a new copy ``res'' of ``r''.
-// used by rCopy only.
-// additionally inits multipication on ``res''!
-// NOTE: update nc structure on res: share NC structure of r with res since they are the same!!!
-// i.e. no data copy!!! Multiplications will be setuped as well!
-inline
-void nc_rCopy0(ring res, const ring r)
-{
-  assume(rIsPluralRing(r));
-  assume( res != r );
-
-  res->GetNC() = r->GetNC();
-  res->GetNC()->ref++;
-  nc_p_ProcsSet(res, res->p_Procs);
-}
-
-
-
-
-inline void nc_rClean0(ring r) // inverse to nc_rCopy0! ps: no real deletion!
-{
-  assume(rIsPluralRing(r));
-
-  r->GetNC()->ref--;
-  r->GetNC() = NULL;
-// p_ProcsSet(res, r->p_Procs); // ???
-}
 
 poly nc_p_CopyGet(poly a, const ring r)
 /* for use in getting the mult. matrix elements*/
@@ -2772,12 +2727,7 @@ poly nc_p_CopyGet(poly a, const ring r)
 #endif
     return(NULL);
   }
-  if (!rIsPluralRing(r)) return(p_Copy(a,r));
-  if (r==r->GetNC()->basering) return(p_Copy(a,r));
-  else
-  {
-    return(prCopyR_NoSort(a,r->GetNC()->basering,r));
-  }
+  return(p_Copy(a,r));
 }
 
 poly nc_p_CopyPut(poly a, const ring r)
@@ -2794,12 +2744,7 @@ poly nc_p_CopyPut(poly a, const ring r)
     return(NULL);
   }
 
-  if (!rIsPluralRing(r)) return(p_Copy(a,r));
-  if (r==r->GetNC()->basering) return(p_Copy(a,r));
-  else
-  {
-    return(prCopyR_NoSort(a,r,r->GetNC()->basering));
-  }
+  return(p_Copy(a,r));
 }
 
 BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r)
@@ -2922,7 +2867,7 @@ BOOLEAN nc_CallPlural(
 // we change r which may be the same ring, and must have the same representation!
 {
   assume( r->qideal == NULL ); // The basering must NOT be a qring!
-  
+
 //  assume( curr != r );
   assume( rSamePolyRep(r, curr) );
 
@@ -3207,9 +3152,6 @@ BOOLEAN nc_CallPlural(
 
   nc_new->IsSkewConstant = (IsSkewConstant?1:0);
 
-  nc_new->ref = 1;
-  nc_new->basering = r; // !?
-
   // Setup new NC structure!!!
   if (r->GetNC() != NULL)
     nc_rKill(r);
@@ -3258,8 +3200,8 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
     rChangeCurrRing(r);
     WeChangeRing = 1;
   }
-  assume( (currRing == r->GetNC()->basering)
-       || ((currRing->GetNC()!=NULL) && (currRing->GetNC()->basering==r->GetNC()->basering)) );   // otherwise we cannot work with all these matrices!
+  assume( (currRing == r)
+       && (currRing->GetNC()!=NULL) );   // otherwise we cannot work with all these matrices!
 
   int i,j;
   r->GetNC()->MT = (matrix *)omAlloc0((r->N*(r->N-1))/2*sizeof(matrix));
@@ -3297,7 +3239,7 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
       p_SetExp(p,i,1,r);
       p_SetExp(p,j,1,r);
       p_Setm(p,r);
-      p_Test(MATELEM(r->GetNC()->D,i,j),r->GetNC()->basering);
+      p_Test(MATELEM(r->GetNC()->D,i,j),r);
       q =  nc_p_CopyGet(MATELEM(r->GetNC()->D,i,j),r);
       p = p_Add_q(p,q,r);
       MATELEM(r->GetNC()->MT[UPMATELEM(i,j,r->N)],1,1) = nc_p_CopyPut(p,r);

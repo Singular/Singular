@@ -445,9 +445,8 @@ public:
 
 struct nc_struct
 {
-  short ref;
   nc_type type;
-  ring basering; // the ring C,D,.. live in (commutative ring with this NC structure!)
+  //ring basering; // the ring C,D,.. live in (commutative ring with this NC structure!)
 
   // initial data: square matrices rVar() x rVar()
   // logically: upper triangular!!!

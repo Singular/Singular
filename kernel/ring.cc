@@ -380,7 +380,7 @@ void rWrite(ring r)
     {
 #ifndef NDEBUG
       if(r->block0[l] == 0 )
-        Print("::prefix");
+        PrintS("::prefix");
       else
         Print("::suffix (sign: %d)", r->block0[l]);
 #endif
@@ -444,7 +444,7 @@ void rWrite(ring r)
           {
             Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
             pl = MATELEM(r->GetNC()->MT[UPMATELEM(i,j,r->N)],1,1);
-            p_Write0(pl, r->GetNC()->basering, r->GetNC()->basering);
+            p_Write0(pl, r, r);
           }
         }
       }
@@ -453,9 +453,6 @@ void rWrite(ring r)
 #ifdef PDEBUG
     Print("\n//   noncommutative type:%d", (int)ncRingType(r));
     Print("\n//      is skew constant:%d",r->GetNC()->IsSkewConstant);
-    Print("\n//                 ncref:%d",r->GetNC()->ref);
-    Print("\n//               commref:%d",r->ref);
-    Print("\n//               baseref:%d",r->GetNC()->basering->ref);
     if( rIsSCA(r) )
     {
       Print("\n//   alternating variables: [%d, %d]", scaFirstAltVar(r), scaLastAltVar(r));
@@ -1699,11 +1696,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
     //memset: else res->qideal = NULL;
   }
   //memset: else res->qideal = NULL;
-#ifdef HAVE_PLURAL
   //memset: res->GetNC() = NULL; // copy is purely commutative!!!
-//  if (rIsPluralRing(r))
-//    nc_rCopy0(res, r); // is this correct??? imho: no!
-#endif
   return res;
 }
 
@@ -4033,7 +4026,7 @@ void rDebugPrint(ring r)
 
 //      for( int k = 0; k <= r->N; k++) if (r->typ[j].data.is.pVarOffset[k] != -1) Print("[%2d]: %04x; ", k, r->typ[j].data.is.pVarOffset[k]);
 
-      Print("  limit %d\n",r->typ[j].data.is.limit); 
+      Print("  limit %d\n",r->typ[j].data.is.limit);
       #ifndef NDEBUG
       PrintS("  F: ");idShow(r->typ[j].data.is.F, r, r, 1);
       #endif
@@ -4213,21 +4206,21 @@ void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ri
     Print("F[%d]:", j);
     p_DebugPrint(F->m[j], r, r, 0);
 #endif
-    
+
     for( poly p = F->m[j]; p != NULL; pIter(p) )
-    {      
+    {
       int c = p_GetComp(p, r);
 
       if( c > MIN )
       {
-#ifdef PDEBUG    
+#ifdef PDEBUG
         Print("gen[%d] -> gen(%d)\n", c, MIN + (*V)[ c - MIN - 1 ]);
 #endif
-        
+
         p_SetComp( p, MIN + (*V)[ c - MIN - 1 ], r );
       }
     }
-#ifdef PDEBUG    
+#ifdef PDEBUG
     Print("new F[%d]:", j);
     p_Test(F->m[j], r);
     p_DebugPrint(F->m[j], r, r, 0);
@@ -4300,7 +4293,7 @@ ring rCurrRingAssure_SyzComp()
 #ifdef RDEBUG
   rDebugPrint(currRing);
 #endif
-  PrintS("\n");
+  PrintLn();
 #endif
 
   ring r = rAssure_SyzComp(currRing, TRUE);
@@ -4316,7 +4309,7 @@ ring rCurrRingAssure_SyzComp()
 #ifdef RDEBUG
   rDebugPrint(currRing);
 #endif
-  PrintS("\n");
+  PrintLn();
 #endif
   }
 
@@ -4382,7 +4375,7 @@ static ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 #ifdef RDEBUG
     rDebugPrint(r);
 #endif
-    PrintS("\n");
+    PrintLn();
 #endif
 #endif
 
@@ -4417,7 +4410,7 @@ static ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 #ifdef RDEBUG
     rDebugPrint(r);
 #endif
-    PrintS("\n");
+    PrintLn();
 #endif
 
   }
@@ -4747,6 +4740,17 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   // HANNES: This sould be set in rComplete
   res->OrdSgn = 1;
   rComplete(res, 1);
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    if ( nc_rComplete(r, res, false) ) // no qideal!
+    {
+#ifndef NDEBUG
+      WarnS("error in nc_rComplete");
+#endif
+    }
+  }
+#endif
   rChangeCurrRing(res);
   return res;
 }
@@ -4761,7 +4765,7 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
 #ifdef RDEBUG
     rDebugPrint(r);
 #endif
-    PrintS("\n");
+    PrintLn();
 #endif
 
 
@@ -4823,10 +4827,8 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
 #ifdef RDEBUG
     rDebugPrint(res);
 #endif
-    PrintS("\n");
+    PrintLn();
 #endif
-
-
 
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
@@ -4851,10 +4853,9 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
 #ifdef RDEBUG
     rDebugPrint(res);
 #endif
-    PrintS("\n");
+    PrintLn();
 #endif
 #endif
-
 
     if (r->qideal!=NULL)
     {
@@ -4883,10 +4884,6 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
 
   return res;
 }
-
-
-
-
 
 ring rCurrRingAssure_dp_S()
 {
@@ -5109,7 +5106,7 @@ n_coeffType rFieldType(ring r)
    if (rField_is_Ring_ModN(r)) return n_Zm;
    if (rField_is_Ring_PtoM(r)) return n_Zpn;
    if (rField_is_Ring_2toM(r)) return  n_Z2n;
-  #endif	  
+  #endif
 
   return n_unknown;
 }
@@ -5540,7 +5537,7 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
   if (dest != save)
     rChangeCurrRing(dest);
 
-  const ring srcBase = src->GetNC()->basering;
+  const ring srcBase = src;
 
   assume( nSetMap(srcBase) == nSetMap(currRing) ); // currRing is important here!
 
