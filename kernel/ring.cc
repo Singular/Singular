@@ -4741,9 +4741,9 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   res->OrdSgn = 1;
   rComplete(res, 1);
 #ifdef HAVE_PLURAL
-  if (rIsPluralRing(r))
+  if (rIsPluralRing(currRing))
   {
-    if ( nc_rComplete(r, res, false) ) // no qideal!
+    if ( nc_rComplete(currRing, res, false) ) // no qideal!
     {
 #ifndef NDEBUG
       WarnS("error in nc_rComplete");
