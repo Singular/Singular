@@ -11,25 +11,25 @@ SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
 and V. Levandovskyy), University of Kaiserslautern
 
 MAIN PROCEDURES:
-  control(R)     analysis of controllability-related properties of R (using Ext modules)
-  controlDim(R)  analysis of controllability-related properties of R (using dimension)
-  autonom(R)     analysis of autonomy-related properties of R (using Ext modules)
-  autonomDim(R)  analysis of autonomy-related properties of R (using dimension)
+  control(R);     analysis of controllability-related properties of R (using Ext modules)
+  controlDim(R);  analysis of controllability-related properties of R (using dimension)
+  autonom(R);     analysis of autonomy-related properties of R (using Ext modules)
+  autonomDim(R);  analysis of autonomy-related properties of R (using dimension)
 
 COMPONENT PROCEDURES:
-  leftKernel(R)       a left kernel of R
-  rightKernel(R)      a right kernel of R
-  leftInverse(R)      a left inverse of R
-  rightInverse(R)     a right inverse of R
-  colrank(M)          a column rank of M as of matrix
-  genericity(M)       analysis of the genericity of parameters
-  canonize(L)         Groebnerification for modules in the output of control or autonomy procs
-  iostruct(R)         computes an IO-structure of behavior given by a module R
-  findTorsion(R, I)   generators of the submodule of a module R, annihilated by the ideal I
+  leftKernel(R);       a left kernel of R
+  rightKernel(R);      a right kernel of R
+  leftInverse(R);      a left inverse of R
+  rightInverse(R);     a right inverse of R
+  colrank(M);          a column rank of M as of matrix
+  genericity(M);       analysis of the genericity of parameters
+  canonize(L);         Groebnerification for modules in the output of control or autonomy procs
+  iostruct(R);         computes an IO-structure of behavior given by a module R
+  findTorsion(R, I);   generators of the submodule of a module R, annihilated by the ideal I
 
 AUXILIARY PROCEDURES:
-  controlExample(s)   set up an example from the mini database inside of the library
-  view()              well-formatted output of lists, modules and matrices
+  controlExample(s);   set up an example from the mini database inside of the library
+  view();              well-formatted output of lists, modules and matrices
 ";
 
 LIB "homolog.lib";
@@ -245,7 +245,19 @@ EXAMPLE: example rightInverse; shows an example
 NOTE: exists only in the case when M is free submodule
 "
 {
-  return(transpose(leftInverse(transpose(R))));
+  // for comm case it suffices
+  if (isCommutative())
+  {
+    return(transpose(leftInverse(transpose(R))));
+  }
+  // for noncomm
+  def save = basering; def sop = opposite(save);
+  setring sop; module Mop = oppose(save,R); 
+  Mop = transpose(Mop);
+  module L = leftInverse(Mop);
+  setring save; module L = oppose(sop,L);
+  L = transpose(L);
+  return(matrix(L));
 }
 example
 { "EXAMPLE:";echo =2;
@@ -1603,3 +1615,31 @@ static proc exWindTunnel()
   export R;
   return(@r);
 }
+
+/* noncomm examples for leftInverse/rightInverse: 
+
+LIB "jacobson.lib";
+    ring w = 0,(x,d),Dp;
+    def W=nc_algebra(1,1);
+    setring W;
+    matrix m[3][3]=[d2,d+1,0],[d+1,0,d3-x2*d],[2d+1, d3+d2, d2];
+    list J=jacobson(m,0);
+
+leftInverse(J[3]); // exist
+rightInverse(J[3]);
+
+leftInverse(J[1]); // zero
+rightInverse(J[1]);
+
+list JJ = jacobson(J[1],0);
+
+leftInverse(JJ[3]); // exist
+rightInverse(JJ[3]);
+
+leftInverse(JJ[1]); // exist
+rightInverse(JJ[1]);
+
+leftInverse(JJ[2]); // zero
+rightInverse(JJ[2]);
+
+*/
