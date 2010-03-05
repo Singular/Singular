@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-version="$Id: dmod.lib,v 1.22 2007/11/27 11:08:51 Singular Exp $";
+version="$Id$";
 category="Noncommutative";
 info="
 LIBRARY: dmodvar.lib     Algebraic D-modules for varieties
