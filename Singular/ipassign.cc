@@ -563,15 +563,6 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
   idhdl h=(idhdl)res->data; // we have res->rtyp==IDHDL
   IDRING(h)=qr;
 
-#ifdef HAVE_PLURAL
-  // we must correct the above dirty hack...
-  if(rIsPluralRing(qr))
-  {
-    qr->GetNC()->basering = qr;
-  }
-#endif
-
-
   ideal id=(ideal)a->CopyD(IDEAL_CMD);
 
   if ((idElem(id)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))
