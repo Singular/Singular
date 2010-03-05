@@ -2085,6 +2085,12 @@ EXAMPLE: example genus; shows an example
      J=std(homog(J,@t));
      int pa=1-hilbPoly(J)[1];
      setring R0;
+     if (char(basering)>7)
+     {
+       list nor=normal(I,"withDelta");
+       return(pa-nor[3][2]);
+     }
+     // only for very small char.:
      list nor=normalP(I);
      return(pa-nor[2][2]);
    }
