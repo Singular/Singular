@@ -74,7 +74,7 @@ class facet
 		facet *prev;		//Pointer to predecessor. Needed for the SearchList in noRevS
 		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
 		int numCodim2Facets;	//#of (codim-2)-facets of this facet. Set in getCodim2Normals()
-		unsigned numRays;	//Number of spanning rays of the cone
+		unsigned numRays;	//Number of spanning rays of the facet
 		ring flipRing;		//the ring on the other side of the facet
 					
 		/** The default constructor. */
@@ -83,6 +83,7 @@ class facet
 		facet(const int &n);
 		/**  The copy constructor */
 		facet(const facet& f);
+		/** A shallow copy of facets*/
 		facet* shallowCopy(const facet& f);
 		void shallowDelete();
 		/** The default destructor */
@@ -93,7 +94,7 @@ class facet
 		inline bool areEqual(facet *f, facet *g);
 		/** Stores the facet normal \param intvec*/
 		inline void setFacetNormal(intvec *iv);
-		/** Hopefully returns the facet normal */
+		/** Returns the facet normal */
 		inline intvec *getFacetNormal();
 		/** Return a reference to the facet normal*/
 		inline const intvec *getRef2FacetNormal();
@@ -188,6 +189,9 @@ class gcone
 		 */
 		dd_MatrixPtr ddFacets;	//Matrix to store irredundant facets of the cone
 		
+		/** Array of intvecs representing the rays of the cone*/
+		intvec **gcRays;
+		unsigned numRays;	//#rays of the cone
 		/** Contains the Groebner basis of the cone. Is set by gcone::getGB(ideal I)*/
 		ideal gcBasis;		//GB of the cone, set by gcone::getGB();
 		gcone *next;		//Pointer to next cone

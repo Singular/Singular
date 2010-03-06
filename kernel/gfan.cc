@@ -76,7 +76,7 @@ $Id$
 
 //NOTE Defining this will slow things down!
 //Only good for very coarse profiling
-#define gfanp
+// #define gfanp
 #ifdef gfanp
 #include <sys/time.h>
 #endif
@@ -205,7 +205,7 @@ void facet::shallowDelete()
 	this->prev=NULL;
 	this->next=NULL;
 	this->flipGB=NULL;
-// 	delete this;
+// 	delete(this);
 }
 		
 /** The default destructor */
@@ -225,14 +225,15 @@ facet::~facet()
 		{
 			if(codim2Ptr->fNormal!=NULL)
 			{
-				delete codim2Ptr->fNormal;
+				delete codim2Ptr->fNormal;//NOTE Do not want this anymore since the rays are now in gcone!
 				codim2Ptr = codim2Ptr->next;
 			}
 		}
 // 		delete this->codim2Ptr;
 	}
-	if(this->codim2Ptr!=NULL)
-		delete this->codim2Ptr;
+	//The rays are stored in the cone!
+// 	if(this->codim2Ptr!=NULL)
+// 		delete this->codim2Ptr;
 	if(this->flipGB!=NULL)
 		idDelete((ideal *)&this->flipGB);
 	if(this->flipRing!=NULL && this->flipRing->idroot!=(idhdl)0xfbfbfbfbfbfbfbfb)
@@ -561,6 +562,7 @@ gcone::gcone()
 	this->UCN=this->counter;			
 	this->numFacets=0;
 	this->ivIntPt=NULL;
+	this->gcRays=NULL;
 }
 		
 /** \brief Constructor with ring and ideal
@@ -586,6 +588,7 @@ gcone::gcone(ring r, ideal I)
 	this->pred=1;
 	this->numFacets=0;
 	this->ivIntPt=NULL;
+	this->gcRays=NULL;
 }
 		
 /** \brief Copy constructor 
@@ -608,6 +611,7 @@ gcone::gcone(const gcone& gc, const facet &f)
 	this->baseRing=rCopy(f.flipRing);
 	this->numFacets=0;
 	this->ivIntPt=NULL;
+	this->gcRays=NULL;
 }
 		
 /** \brief Default destructor 
@@ -648,6 +652,9 @@ gcone::~gcone()
 	//should be deleted in noRevS
 // 	dd_FreeMatrix(this->ddFacets);
 	//dd_FreeMatrix(this->ddFacets);
+	for(int ii=0;ii<this->numRays;ii++)
+		delete(gcRays[ii]);
+	omFree(gcRays);
 }			
 
 /** Returns the number of cones existing at the time*/
@@ -1434,8 +1441,6 @@ void gcone::getExtremalRays(const gcone &gc)
 #endif
 	/* Compute interior point on the fly*/
 	intvec *ivIntPointOfCone = new intvec(this->numVars);
-// 	for(int ii=0;ii<P->rowsize;ii++)
-// 	{}
 	mpq_t *colSum = new mpq_t[this->numVars];
 	int denom[this->numVars];//denominators of colSum
 	//NOTE TODO need to gcd of rows and factor out! -> makeInt
@@ -1527,6 +1532,17 @@ void gcone::getExtremalRays(const gcone &gc)
 	//Loop through the rows of P and check whether fNormal*row[i]=0 => row[i] belongs to fNormal
 	int rows=P->rowsize;
 	facet *fAct=gc.facetPtr;
+	//Construct an array to hold the extremal rays of the cone
+	this->gcRays = (intvec**)omAlloc0(sizeof(intvec*)*P->rowsize);
+	for(int ii=0;ii<P->rowsize;ii++)
+	{
+		intvec *rowvec = new intvec(this->numVars);
+		makeInt(P,ii+1,*rowvec);//get an integer entry instead of rational, rowvec is primitve
+		this->gcRays[ii] = ivCopy(rowvec);
+		delete rowvec;
+	}
+	this->numRays=P->rowsize;
+	//Check which rays belong to which facet
 	while(fAct!=NULL)
 	{
 		const intvec *fNormal;// = new intvec(this->numVars);
@@ -1534,9 +1550,7 @@ void gcone::getExtremalRays(const gcone &gc)
 		intvec *ivIntPointOfFacet = new intvec(this->numVars);
 		for(int ii=0;ii<rows;ii++)
 		{			
-			intvec *rowvec = new intvec(this->numVars);
-			makeInt(P,ii+1,*rowvec);//get an integer entry instead of rational, rowvec is primitve			
- 			if(dotProduct(*fNormal,*rowvec)==0)
+ 			if(dotProduct(*fNormal,this->gcRays[ii])==0)
 			{
 				intvec *tmp = ivIntPointOfFacet;//Prevent memleak
 				fAct->numCodim2Facets++;
@@ -1551,16 +1565,16 @@ void gcone::getExtremalRays(const gcone &gc)
 					codim2Act->next = new facet(2);
 					codim2Act = codim2Act->next;
 				}
-				codim2Act->setFacetNormal(rowvec);
-				fAct->numRays++;
-				//TODO Add up to interior point here! 
-				//Memleak sinve ivAdd returns a new intvec
-				ivIntPointOfFacet=ivAdd(ivIntPointOfFacet,rowvec);
-				//Now tmp still points to the OLD address of ivIntPt
+				//codim2Act->setFacetNormal(rowvec);
+				//Rather just let codim2Act point to the corresponding intvec of gcRays
+				codim2Act->fNormal=this->gcRays[ii];
+				fAct->numRays++;				 
+				//Memleak avoided via tmp
+				ivIntPointOfFacet=ivAdd(ivIntPointOfFacet,this->gcRays[ii]);
+				//Now tmp still points to the OLD address of ivIntPointOfFacet
 				delete(tmp);
 					
 			}
-			delete(rowvec);
 		}//For non-homog input ivIntPointOfFacet should already be >0 here
 		if(!hasHomInput) {assert(iv64isStrictlyPositive(ivIntPointOfFacet));}
 		//if we have no strictly pos ray but the input is homogeneous
@@ -1570,23 +1584,18 @@ void gcone::getExtremalRays(const gcone &gc)
 			intvec *ivOne = new intvec(this->numVars);
 			for(int ii=0;ii<this->numVars;ii++)
 				(*ivOne)[ii]=1;
-// 			intvec *diff = new intvec(this->numVars);
-// 			diff=ivSub(ivIntPointOfFacet,ivOne);
 			while( !iv64isStrictlyPositive(ivIntPointOfFacet) )
 			{
 				intvec *tmp = ivIntPointOfFacet;
 				for(int jj=0;jj<this->numVars;jj++)
 				{
 					(*ivOne)[jj] = (*ivOne)[jj] << 1; //times 2
-// 					(*diff)[jj]= (*diff)[jj] << 1;
 				}
 				ivIntPointOfFacet = ivAdd(ivIntPointOfFacet/*diff*/,ivOne);
 				delete tmp;				
 			}
-			//fAct->setInteriorPoint(ivIntPointOfFacet);
 			delete ivOne;
 		}
-		//else
 		int ggT=(*ivIntPointOfFacet)[0];
 		for(int ii=0;ii<this->numVars;ii++)
 			ggT=intgcd(ggT,(*ivIntPointOfFacet)[ii]);
@@ -1638,7 +1647,7 @@ void gcone::getExtremalRays(const gcone &gc)
 		}*///if pVariables>2
 // 		delete fNormal;		
 		fAct = fAct->next;
-	}
+	}//end of facet checking
 	dd_FreeMatrix(P);
 	//Now all extremal rays should be set w.r.t their respective fNormal
 	//TODO Not sufficient -> vol2 II/125&127
@@ -2448,15 +2457,6 @@ inline intvec *gcone::ivNeg(const intvec *iv)
 /** \brief Compute the dot product of two intvecs
 *
 */
-// inline int gcone::dotProduct(intvec &iva, intvec &ivb)				
-// {			
-// 	int res=0;
-// 	for (int i=0;i<this->numVars;i++)
-// 	{
-// 		res = res+(iva[i]*ivb[i]);
-// 	}
-// 	return res;
-// }//int dotProduct
 inline int gcone::dotProduct(const intvec &iva, const intvec &ivb)				
 {			
 	int res=0;	
@@ -2498,32 +2498,7 @@ inline bool gcone::isParallel(const intvec &a,const intvec &b)
 // #endif	
 	return res;
 }//bool isParallel
-// inline int gcone::dotProduct(const intvec *a, const intvec *b)				
-// {			
-// 	int res=0;
-// 	for (int i=0;i<this->numVars;i++)
-// 	{
-// 		res = res+((*a)[i]*(*b)[i]);
-// 	}
-// 	return res;
-// }//int dotProduct
-// inline bool gcone::isParallel(const intvec* a, const intvec* b)
-// {
-// 	int lhs,rhs;
-// 	bool res;
-// 	lhs=dotProduct(a,b)*dotProduct(a,b);
-// 	rhs=dotProduct(a,a)*dotProduct(b,b);
-// 			//cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
-// 	if (lhs==rhs)
-// 	{
-// 		res = TRUE;
-// 	}
-// 	else
-// 	{
-// 		res = FALSE;
-// 	}
-// 	return res;
-// }
+
 /** \brief Compute an interior point of a given cone
  * Result will be written into intvec iv. 
  * Any rational point is automatically converted into an integer.
@@ -2791,207 +2766,6 @@ inline void gcone::interiorPoint2()
 	delete [] qIntPt;
 	mpz_clear(kgV);
 	mpq_clear(qkgV); mpq_clear(res);
-	
-/***************************************************/
-// 	//We need to find out if there are at least two pos rays
-// 	facet *f1 = this->facetPtr;
-// 	facet *f2 = NULL;
-// 	intvec *intF1=NULL;
-// 	intvec *intF2=NULL;
-// 	while(f1!=NULL)
-// 	{
-// 		if(f1->isFlippable)
-// 		{
-// 			facet *f1Ray=f1->codim2Ptr;
-// 			while(f1Ray!=NULL)
-// 			{
-// 				intvec *check = f1Ray->getFacetNormal();
-// 				if(iv64isStrictlyPositive(check))
-// 				{
-// 					intF1=ivCopy(check);
-// 					delete check;
-// 					break;
-// 				}
-// 				delete check;
-// 				f1Ray = f1Ray->next;
-// 			}	
-// 		}
-// 		if(intF1!=NULL)//We have found the first strictly positive ray
-// 			break;
-// 		f1 = f1->next;
-// 	}
-// 	if(f1->next!=NULL)
-// 		f2=f1->next;
-// 	while(f2!=NULL)
-// 	{
-// 		if(f2->isFlippable)
-// 		{
-// 			facet *f2Ray=f2->codim2Ptr;
-// 			while(f2Ray!=NULL)
-// 			{
-// 				intvec *check = f2Ray->getFacetNormal();
-// 				if(iv64isStrictlyPositive(check))
-// 				{
-// 					//and not equal to intF1
-// 					if(check->compare(intF1)!=0)//we found a distinct 2nd ray
-// 					{
-// 						intF2=ivCopy(check);
-// 						delete check;
-// 					}
-// 					break;
-// 				}
-// 				delete check;
-// 				f2Ray = f2Ray->next; 
-// 			}
-// 		}
-// 		if(intF2!=NULL)
-// 			break;
-// 		f2=f2->next;
-// 	}
-// 	if(intF2==NULL)//do some linear algebra
-// 	{
-// 		f2=f1->next;
-// 		intvec *arbitraryRay = f2->codim2Ptr->getFacetNormal();
-// 		//Now add
-// 		intvec *ivSum = ivAdd(intF1, arbitraryRay);
-// 		while(iv64isStrictlyPositive(ivSum)==FALSE)
-// 		{
-// 			intvec *tmp = intF1;
-// 			for(int ii=0;ii<this->numVars;ii++)
-// 				(*intF1)[ii] = (*intF1)[ii] << 1;	//times 2
-// 			intF1 = ivAdd(intF1,ivSum);
-// 			delete tmp;
-// 			
-// 		}
-// 		this->setIntPoint(ivSum);
-// 
-// 	}
-// 	else	//just add intF1+intF2
-// 	{
-// 		intvec *sum = ivAdd(intF1, intF2);
-// 		this->setIntPoint(sum);
-// 		delete sum;
-// 	}
-/***************************************************/
-// 	//Find 1st flippable facet
-// 	facet *f1 = this->facetPtr;
-// 	facet *f2 = NULL; //idPrint(this->gcBasis);
-// 	intvec *intF1=NULL;
-// 	intvec *intF2=NULL;
-// 	while(f1->isFlippable==FALSE && f1!=NULL)
-// 		f1=f1->next;
-// 	if(f1!=NULL)
-// 	{
-// 		intF1 = f1->getInteriorPoint();
-// 		f2 = f1->next;
-// 	}
-// 	while(f2!=NULL && f2->isFlippable==FALSE)
-// 		f2=f2->next;
-// 	if(f1==NULL || f2==NULL) //Is there only one flippable facet?
-// 	{	//f1==NULL would mean there ain't any flippable facet...
-// 		/*If f2==NULL we ignore f2 and try to find an int point
-// 		* using f1 and linear algebra
-// 		*/
-// 		bool foundIntPoint=FALSE;
-// 		intvec *f1Ray=f1->codim2Ptr->getFacetNormal();
-// 		const intvec *fNormal=f1->getRef2FacetNormal();
-// 		while(foundIntPoint==FALSE)
-// 		{			
-// 			intvec *res;// = new intvec(this->numVars);
-// 			res = ivAdd(const_cast<intvec*>(fNormal), f1Ray);
-// 			int posCtr=0;	//Count the pos entries of res
-// 			for(int ii=0;ii<this->numVars;ii++)
-// 			{
-// 				if( (*res)[ii]>0)
-// 					posCtr++;			
-// 			}			
-// 			if(posCtr==this->numVars)
-// 			{
-// 				foundIntPoint=TRUE;
-// 				this->setIntPoint(res);
-// 			}
-// 			else
-// 			{
-// 				for(int ii=0;ii<this->numVars;ii++)
-// 					(*f1Ray)[ii] = ((*f1Ray)[ii]) << 1;
-// 			}
-// 			delete res;
-// 		}
-// 		//Now we should have an int point
-// 		delete f1Ray;
-// 	}
-// 	else	//ok, we have two flippable facets
-// 	{		
-// 		intF2=f2->getInteriorPoint();
-// 		mpq_t *ratIntPt = new mpq_t[this->numVars];
-// 		for(int ii=0;ii<this->numVars;ii++)
-// 			mpq_init(ratIntPt[ii]);	
-// 		for(int ii=0;ii<this->numVars;ii++)
-// 		{
-// 			mpq_t a,b;
-// 			mpq_init(a); mpq_init(b);
-// 			mpq_set_si(a,(*intF1)[ii],1);
-// 			mpq_set_si(b,(*intF2)[ii],1);
-// 			mpq_t diff;
-// 			mpq_init(diff);
-// 			mpq_sub(diff,a,b);	//diff=a-b
-// 			mpq_t quot;
-// 			mpq_init(quot);
-// 			mpq_div_2exp(quot,diff,1);	//quot=diff/2=(a-b)/2
-// 			mpq_clear(diff);
-// 			//Don't be clever and reuse diff here
-// 			mpq_t sum; mpq_init(sum);
-// 			mpq_add(sum,b,quot);	//sum=b+quot=b+(a-b)/2
-// 			mpq_set(ratIntPt[ii],sum);
-// 			mpq_clear(sum);
-// 			mpq_clear(quot);
-// 			mpq_clear(a); mpq_clear(b);
-// 		}	
-// 		/*Compute lcm of the denominators*/
-// 		mpz_t *denom = new mpz_t[this->numVars];
-// 		mpz_t tmp,kgV;
-// 		mpz_init(tmp); mpz_init(kgV);
-// 		for (int ii=0;ii<this->numVars;ii++)
-// 		{
-// 			mpz_t z;
-// 			mpz_init(z);
-// 			mpq_get_den(z,ratIntPt[ii]);
-// 			mpz_init(denom[ii]);
-// 			mpz_set( denom[ii], z);
-// 			mpz_clear(z);				
-// 		}
-// 		
-// 		mpz_set(tmp,denom[0]);
-// 		for (int ii=0;ii<this->numVars;ii++)
-// 		{
-// 			mpz_lcm(kgV,tmp,denom[ii]);
-// 			mpz_set(tmp,kgV);				
-// 		}
-// 		mpz_clear(tmp);	
-// 		/*Multiply the nominators by kgV*/
-// 		mpq_t qkgV,res;
-// 		mpq_init(qkgV);
-// 		/*mpq_set_str(qkgV,"1",10);*/
-// 		mpq_canonicalize(qkgV);
-// 				
-// 		mpq_init(res);
-// 		/*mpq_set_str(res,"1",10);*/
-// 		mpq_canonicalize(res);
-// 				
-// 		mpq_set_num(qkgV,kgV);
-// 		intvec *n=new intvec(this->numVars);
-// 		for (int ii=0;ii<this->numVars;ii++)
-// 		{
-// 			mpq_canonicalize(ratIntPt[ii]);mpq_mul(res,qkgV,ratIntPt[ii]);
-// 			(*n)[ii]=(int)mpz_get_d(mpq_numref(res));
-// 		}
-// 		this->setIntPoint(n);
-// 		delete n;
-// 		delete [] ratIntPt;
-// 		delete [] denom;
-// 		mpz_clear(kgV);
-// 		mpq_clear(qkgV); mpq_clear(res);
-// 	}
 }
 	
 /** \brief Copy a ring and add a weighted ordering in first place
@@ -3961,7 +3735,7 @@ cout << "Checking facet (";fAct->fNormal->show(1,1);cout << ") against (";slAct-
 #ifdef gfan_DEBUG
 					cout << "Removing (";fAct->fNormal->show(1,1);cout << ") from list" << endl;
 #endif
-					marker->shallowDelete();
+// 					marker->shallowDelete();
 // 					delete(marker);
 					break;
 				}
