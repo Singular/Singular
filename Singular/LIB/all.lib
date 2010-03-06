@@ -96,6 +96,7 @@ LIB "bfun.lib";
 LIB "central.lib";
 LIB "dmod.lib";
 LIB "dmodapp.lib";
+LIB "dmodvar.lib";
 LIB "freegb.lib";
 LIB "gkdim.lib";
 LIB "involut.lib";
