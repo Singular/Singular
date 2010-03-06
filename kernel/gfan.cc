@@ -3578,13 +3578,16 @@ inline void gcone::makeInt(const dd_MatrixPtr &M, const int line, intvec &n)
 	mpq_set_num(qkgV,kgV);
 			
 // 			mpq_canonicalize(qkgV);
-	int ggT=1;
+// 	int ggT=1;
 	for (int ii=0;ii<(M->colsize)-1;ii++)
 	{
 		mpq_mul(res,qkgV,M->matrix[line-1][ii+1]);
 		n[ii]=(int)mpz_get_d(mpq_numref(res));
-		ggT=intgcd(ggT,n[ii]);
+// 		ggT=intgcd(ggT,n[ii]);
 	}
+	int ggT=n[0];
+	for(int ii=0;ii<this->numVars;ii++)
+		ggT=intgcd(ggT,n[ii]);	
 	//Normalization
 	if(ggT>1)
 	{
