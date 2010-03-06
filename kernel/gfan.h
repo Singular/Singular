@@ -22,7 +22,7 @@ $Id$
 #endif
 extern int gfanHeuristic;
 // extern dd_MatrixPtr ddLinealitySpace;
-#define gfanp
+
 // #ifdef gfanp
 // extern	static float time_getConeNormals;
 // extern	static float time_getCodim2Normals;
@@ -74,15 +74,17 @@ class facet
 		facet *prev;		//Pointer to predecessor. Needed for the SearchList in noRevS
 		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
 		int numCodim2Facets;	//#of (codim-2)-facets of this facet. Set in getCodim2Normals()
+		unsigned numRays;	//Number of spanning rays of the cone
 		ring flipRing;		//the ring on the other side of the facet
-		unsigned numRays;	//Number of spanning rays of the cone			
+					
 		/** The default constructor. */
 		facet();
 		/** Constructor for lower dimensional faces*/
-		facet(int const &n);
+		facet(const int &n);
 		/**  The copy constructor */
 		facet(const facet& f);
-		facet(const facet& f, bool shallow);
+		facet* shallowCopy(const facet& f);
+		void shallowDelete();
 		/** The default destructor */
 		~facet();
 		/** Comparison operator*/
@@ -112,6 +114,7 @@ class facet
 		/** Store an interior point of the facet */
 		inline void setInteriorPoint(intvec *iv);
 		inline intvec *getInteriorPoint();
+		inline const intvec *getRef2InteriorPoint();
 		/** \brief Debugging function
 		 * prints the facet normal an all (codim-2)-facets that belong to it
 		 */
@@ -144,6 +147,7 @@ class gcone
 		static float time_getConeNormals;
 		static float time_getCodim2Normals;
 		static float t_getExtremalRays;
+		static float t_ddPolyh;
 		static float time_flip;
 		static float time_flip2;
 		static float t_areEqual;
@@ -156,6 +160,7 @@ class gcone
 		static float t_ddMC;
 		static float t_mI;
 		static float t_iP;
+		static float t_isParallel;
 		static unsigned parallelButNotEqual;
 		static unsigned numberOfFacetChecks;
 #endif
@@ -195,7 +200,7 @@ class gcone
 		inline int getCounter();
 		inline ring getBaseRing();
 		inline void setIntPoint(intvec *iv);
-		inline intvec *getIntPoint();
+		inline intvec *getIntPoint(bool shallow=FALSE);
 		inline void showIntPoint();
 		inline void setNumFacets();
 		inline int getNumFacets();
@@ -212,10 +217,10 @@ class gcone
 		inline bool isParallel(const intvec &a, const intvec &b);
 // 		inline int dotProduct(const intvec* a, const intvec *b);
 // 		inline bool isParallel(const intvec* a, const intvec* b);
-		inline bool areEqual(intvec &a, intvec &b);
+		inline bool ivAreEqual(intvec &a, intvec &b);
 		inline bool areEqual( facet *f,  facet *g);
 		inline bool areEqual2(facet* f, facet *g);
-		inline int intgcd(int a, int b);
+		inline int intgcd(const int &a, const int &b);
 		inline void writeConeToFile(const gcone &gc, bool usingIntPoints=FALSE);
 		inline void readConeFromFile(int gcNum, gcone *gc);
 		inline intvec f2M(gcone *gc, facet *f, int n=1);
@@ -251,7 +256,7 @@ class gcone
 // 		static void gcone::idPrint(ideal &I);		
 		friend class facet;	
 };
-lists lprepareResult(gcone *gc, int n);
+lists lprepareResult(gcone *gc, const int n);
 // bool iv64isStrictlyPositive(intvec *);
 #endif
 #endif
