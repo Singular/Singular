@@ -26,7 +26,7 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	tropical.lib weierstr.lib  zeroset.lib
 
 
-PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib \
+PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib dmodvar.lib \
 	freegb.lib  gkdim.lib  involut.lib  ncalg.lib  ncdecomp.lib \
 	nctools.lib  perron.lib  qmatrix.lib
 
