@@ -42,7 +42,7 @@ computes incrementally gbs of subsets of the input
 gb{f_m} -> gb{f_m,f_(m-1)} -> gb{f_m,...,f_1}  
 ==================================================
 */
-LList* F5inc(int i, poly f_i, LList* gPrev,LList* reducers, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag,int termination);
+LList* F5inc(int i, poly f_i, LList* gPrev,LList* reducers, ideal gbPrev, poly ONE, LTagList* lTag, RList* rules, RTagList* rTag, int plus ,int termination);
 
 /*
 ================================================================
@@ -54,7 +54,21 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* RuleOlds);
+void criticalPair(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* RuleOlds, PList* rejectedGBList, int plus);
+
+
+bool checkDGB(LList* gPrev);
+
+
+/*
+ * Arris Check if we are finished after the current degree step:
+ * Checks all remaining critical pairs, i.e. those of higher degree,
+ * by the two Buchberger criteria.
+ * return value: 0, if all remaining critical pairs are deleted by 
+ *                  Buchberger's criteria
+ *               1, otherwise
+ */
+bool arrisCheck(CNode* first,LNode* firstGCurr, long arrisdeg); 
 
 /*
 ================================================================
@@ -65,7 +79,7 @@ first element in gPrev is always the newest element which must
 build critical pairs with all other elements in gPrev
 ================================================================
 */
-void criticalPair2(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* RuleOlds);
+void criticalPair2(LList* gPrev, CListOld* critPairs, LTagList* lTag, RTagList* rTag, RList* RuleOlds, PList* rejectedGBList);
 
 /*
 ========================================
@@ -89,11 +103,16 @@ Criterion 2, i.e. Rewritten Criterion, for its second call in sPols(), with adde
 inline bool criterion2(poly t, LPolyOld* l, RList* RuleOlds, RuleOld* testedRuleOld);
 
 /*
+ * check for useful pairs in the given subset of critical pairs
+ */
+int computeUsefulMinDeg(CNode* first);
+
+/*
 ==================================
 Computation of S-Polynomials in F5
 ==================================
 */
-inline void computeSPols(CNode* first, RTagList* rTag, RList* RuleOlds, LList* sPolyList);
+inline void computeSPols(CNode* first, RTagList* rTag, RList* RuleOlds, LList* sPolyList, PList* rejectedGBList);
 
 /*
 ========================================================================
@@ -101,14 +120,14 @@ reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
 inline void reduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, RList* RuleOlds, LTagList* lTag, RTagList* rTag,
-                 ideal gbPrev);
+                 ideal gbPrev, PList* rejectedGBList, int plus);
 
 /*
 ========================================================================
 reduction including subalgorithm topReduction() using Faugere's criteria
 ========================================================================
 */
-inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, LList* reducers, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev, int termination);
+inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, LList* reducers, RList* rules, LTagList* lTag, RTagList* rTag, ideal gbPrev, int termination, PList* rejectedGBList, int plus);
 
 /*!
  * ================================================================================
@@ -122,7 +141,7 @@ inline void newReduction(LList* sPolyList, CListOld* critPairs, LList* gPrev, LL
  * later on for possible new RuleOlds and S-polynomials to be added to the algorithm
  * ================================================================================
  */
-void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, LList* reducers, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, int termination); 
+void findReducers(LNode* l, LList* sPolyList, ideal gbPrev, LList* gPrev, LList* reducers, CListOld* critPairs, RList* rules, LTagList* lTag, RTagList* rTag, int termination, PList* rejectedGBList, int plus); 
 
 /*
 =====================================================================================
@@ -130,7 +149,7 @@ top reduction in F5, i.e. reduction of a given S-polynomial by labeled polynomia
 the same index whereas the labels are taken into account
 =====================================================================================
 */
-inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs, RList* RuleOlds, LTagList* lTag, RTagList* rTag, ideal gbPrev); 
+inline void topReduction(LNode* l, LList* sPolyList, LList* gPrev, CListOld* critPairs, RList* RuleOlds, LTagList* lTag, RTagList* rTag, ideal gbPrev, PList* rejectedGBList, int plus); 
 
 /*
 =======================================================================================
@@ -153,7 +172,7 @@ inline LNode* findReductor(LNode* l, LList* sPolyList, LNode* gPrevRedCheck, LLi
 main function of our F5 implementation
 ======================================
 */
-ideal F5main(ideal i, ring r, int opt, int termination);
+ideal F5main(ideal i, ring r, int opt, int plus, int termination);
 
 #endif
 #endif

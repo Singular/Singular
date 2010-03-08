@@ -35,6 +35,7 @@ class LPolyOld {
         bool    del;
     public:
         inline          LPolyOld(poly t, int i, poly p, RuleOld* r=NULL);
+ //       inline          LPolyOld(poly t, int i, poly p, RuleOld* r=NULL, bool b=0);
         inline  void    setPoly(poly p);
         inline  poly    getPoly();
         inline  void    setTerm(poly t);
@@ -54,6 +55,11 @@ LPolyOld::LPolyOld(poly t,int i,poly p, RuleOld* r) {
     del =   0;
 }
 
+/*LPolyOld::LPolyOld(poly t,int i,poly p, RuleOld* r, bool b) {
+    set(t,i,p,r);
+    del =   b;
+}
+*/
 void LPolyOld::setPoly(poly p)  {
     //poly _p     =   pInit();
     //_p          =   pCopy(p);

@@ -18,6 +18,106 @@
 #include "f5data.h"
 #include "f5lists.h"
 
+/**
+ * functions working on the class PNode
+ */
+PNode::PNode(poly p, PNode* n) {
+  data  = p;
+  next  = n;
+}
+
+poly PNode::getPoly() {
+  return this->data;
+}
+
+PNode* PNode::getNext() {
+  return this->next;
+}
+PNode* PNode::insert(poly p) {
+  poly q = pOne();
+  q = pCopy(p); 
+  PNode* temp = this;
+  if(NULL == temp) {
+    PNode* pn = new PNode(q,temp);
+    return pn;
+  }
+  if(1 == pLmCmp(q,temp->getPoly())) {
+    PNode* pn = new PNode(q,temp);
+    return pn;
+  }
+  if(0 == pLmCmp(q,temp->getPoly())) {
+    return this;
+  }
+  if(-1 == pLmCmp(q,temp->getPoly())) {
+    while(NULL != temp->getNext() && -1 == pLmCmp(q,temp->getNext()->getPoly())) {
+      temp = temp->getNext();
+    }
+    if(NULL == temp->getNext() || 1 == pLmCmp(q,temp->getNext()->getPoly())) {
+      PNode* pn = new PNode(q,temp->getNext());
+      temp->next = pn;
+      return this;
+    }
+    if(0 == pLmCmp(q,temp->getNext()->getPoly())) {
+      return this;
+    }
+  }
+}
+/*
+PNode* PNode::insert(poly p) {
+  PNode* pn = new PNode(p,this);
+  return pn;
+}
+*/
+/**
+ * functions working on the class PList
+ */
+PList::PList() {
+  first = NULL;
+}
+
+
+void PList::insert(poly p) {
+  first = first->insert(p);
+}
+  
+
+/*
+PNode* PList::insert(poly p) {
+  PNode* temp = first;
+  PNode* pn   = new PNode(p,temp);
+  first       = pn;
+  return first;
+}
+*/
+bool PList::check(poly p) {
+  PNode* temp = first;
+  //Print("\nCHECK: \n");
+  //pWrite(p);
+  //Print("-----\n");
+  while(NULL != temp) {
+    //pWrite(temp->getPoly());
+    //pWrite(p);
+    //Print("COMAPRE: %d\n",pLmEqual(p,temp->getPoly()));
+    if(1 == pLmEqual(p,temp->getPoly())) {
+      //Print("YES!\n");
+      //pWrite(pHead(temp->getPoly()));
+      //Print("YES!\n");
+      return 1;
+    }
+    temp = temp->getNext();
+  }
+  //Print("NOTHING!\n");
+  return 0;
+}
+
+void PList::print() {
+  Print("-----LIST-----\n");
+  PNode* temp = first;
+  while(NULL != temp) {
+    pWrite(temp->getPoly());
+    temp = temp->getNext();
+  }
+}
 /*
 ====================================
 functions working on the class LNode
@@ -292,15 +392,12 @@ LNode* LNode::getNext(LNode* l) {
 void LNode::print() {
     LNode* temp = this;
     Print("___________________List of S-polynomials______________________:\n");
-    Print("%p\n",this);
     while(NULL != temp && NULL != temp->data) {
         Print("Index: %d\n",temp->getIndex());
         Print("Term: ");
         pWrite(temp->getTerm());
         Print("Poly: ");
         pWrite(temp->getPoly());
-        Print("%p\n",temp->getPoly());
-        Print("DELETE? %d\n",temp->getDel());
         temp = temp->next;
     }
     Print("_______________________________________________________________\n");
@@ -694,6 +791,14 @@ CNode* CNode::insert(CPairOld* c) {
     }
 }
 
+
+CNode* CNode::insertWithoutSort(CPairOld* cp) {
+    CNode* newElement = new CNode(cp);
+    newElement->next  = this;
+    return newElement;
+}
+
+
 // get the first elements from CListOld which by the above sorting have minimal degree
 CNode* CNode::getMinDeg() {
     CNode* temp = this;
@@ -828,6 +933,10 @@ CListOld::~CListOld() {
 // note: as all critical pairs have the same index here, the second sort is done on the terms of the labels
 void CListOld::insert(CPairOld* c) {
     first = first->insert(c);
+}
+
+void CListOld::insertWithoutSort(CPairOld* c) {
+    first = first->insertWithoutSort(c);
 }
 
 CNode* CListOld::getFirst() {

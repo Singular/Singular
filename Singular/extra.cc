@@ -2717,8 +2717,24 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else {
         opt = 2;
       }
+      h = h->next;
+      int plus;
+      if(h != NULL) {
+        plus = (int) (long) h->Data();
+      }
+      else {
+        plus = 0;
+      }
+      h = h->next;
+      int termination;
+      if(h != NULL) {
+        termination = (int) (long) h->Data();
+      }
+      else {
+        termination = 0;
+      }
       res->rtyp=IDEAL_CMD;
-      res->data=(ideal) F5main(G,r,opt);
+      res->data=(ideal) F5main(G,r,opt,plus,termination);
       return FALSE;
     }
     else

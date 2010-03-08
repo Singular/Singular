@@ -17,6 +17,8 @@ classes for lists used in F5
 ============================
 ============================
 */
+class PNode;
+class PList;
 class LNode;
 class LList;
 class LTagNode;
@@ -29,6 +31,33 @@ class RTagNode;
 class RTagList;
 
 
+/**
+ * class PNode of nodes of polynomials
+ */
+class PNode {
+  private: 
+    poly   data;
+    PNode*  next;
+  public:
+    PNode(poly p, PNode* n);
+    poly getPoly();
+    PNode* getNext();
+    PNode* insert(poly p);
+};
+
+/**
+ * class PList of lists of PNodes
+ */
+class PList {
+  private:
+    PNode* first;
+  public:
+    PList();
+    void insert(poly p);
+    bool check(poly p);
+    void print();
+}; 
+    
 /*
 =======================================
 class LNode (nodes for lists of LPolyOlds)
@@ -211,6 +240,7 @@ class CNode {
                 CNode(CPairOld* c, CNode* n);
                 ~CNode(); 
         CNode*  insert(CPairOld* c); 
+        CNode*  insertWithoutSort(CPairOld* cp); 
         CNode*  getMinDeg();
         CPairOld*  getData();
         CNode*  getNext();
@@ -247,6 +277,7 @@ class CListOld {
                 ~CListOld(); 
         CNode*  getFirst();
         void    insert(CPairOld* c);
+        void    insertWithoutSort(CPairOld* c);
         CNode*  getMinDeg();
         void    print();
 };
