@@ -1,26 +1,33 @@
-///////////////////////////////////////////////////////////////
-
 version="$Id$";
 category="Commutative Algebra";
-
 info="
-LIBRARY: swalk.lib   Sagbi Walk Conversion Algorithm
-AUTHOR: Junaid Alam Khan
+LIBRARY: swalk.lib               Sagbi Walk Conversion Algorithm
+AUTHOR:  Junaid Alam Khan        junaidalamkhan@gmail.com
+
+OVERVIEW:
+ A library for computing the Sagbi basis of subalgebra through Sagbi walk
+ algorithm.
+
+THEORY: The concept of SAGBI ( Subalgebra Analog to Groebner Basis for Ideals)
+ is defined in [L. Robbiano, M. Sweedler: Subalgebra Bases, volume 42, volume
+ 1430 of Lectures Note in Mathematics series, Springer-Verlag (1988),61-87].
+ The Sagbi Walk algorithm is the subalgebra analogue to the Groebner Walk
+ algorithm which has been proposed in [S. Collart, M. Kalkbrener and D.Mall:
+ Converting bases with the Grobner Walk. J. Symbolic Computation 24 (1997),
+ 465-469].
 
 PROCEDURE:
-  swalk(ideal[,intvec]);   Sagbi basis of subalgebra via Sagbiwalk algorithm
+ swalk(ideal[,intvec]);   Sagbi basis of subalgebra via Sagbi walk algorithm
 ";
 
-LIB "algebra.lib";
 LIB "sagbi.lib";
 //////////////////////////////////////////////////////////////////////////////
 proc swalk(ideal Gox, list #)
-"USAGE:  swalk(i); ideal;
-         swalk( i,v,w); i ideal, v,w integer vectors;
-RETURN:  If list #= v,w (resp empty) then it compute the sagbi basis of
-         the subalgebra defined by the generators of ideal,
-         calculated via the Sagbi walk algorithm from the ordering
-         (a(v),lp) (resp dp) tothe ordering (a(w),lp) ( resp lp).
+"USAGE:  swalk(i[,v,w]); i ideal, v,w int vectors
+RETURN: The sagbi basis of the subalgebra defined by the generators of i,
+        calculated via the Sagbi walk algorithm from the ordering dp to lp
+        if v,w are not given (resp. from the ordering (a(v),lp) to the
+        ordering (a(w),lp) if v and w are given).
 EXAMPLE: example swalk; shows an example
 "
 {
@@ -32,13 +39,16 @@ EXAMPLE: example swalk; shows an example
   kill OSCTW;
   option(redSB);
   def xR = basering;
-  execute("ring ostR = ("+charstr(xR)+"),("+varstr(xR)+"),"+ord_str+";");
+  list rl=ringlist(xR);
+  rl[3][1][1]="dp";
+  def ostR=ring(rl);
+  setring ostR;
   def new_ring = basering;
   ideal Gnew = fetch(xR, Gox);
   Gnew=sagbi(Gnew,1);
   Gnew=interreduceSd(Gnew);
-  vector curr_weight=Ctv(icurr_weight);
-  vector target_weight=Ctv(itarget_weight);
+  vector curr_weight=changeTypeInt(icurr_weight);
+  vector target_weight=changeTypeInt(itarget_weight);
   ideal Gold;
   list l;
   intvec v;
@@ -52,11 +62,11 @@ EXAMPLE: example swalk; shows an example
        kill new_ring;
        if(curr_weight==target_weight){n=1;}
        else {
-              l=Df(Gold);
+              l=collectDiffExpo(Gold);
               ulast=last(curr_weight, target_weight, l);
-              vector new_weight=newvec(curr_weight,target_weight,ulast);
+              vector new_weight=(1-ulast)*curr_weight+ulast*target_weight;
               vector w=cleardenom(new_weight);
-              v=CT(w);
+              v=changeType(w);
               list p= ringlist(old_ring);
               p[3][1][2]= v;
               def new_ring=ring(p);
@@ -76,16 +86,14 @@ EXAMPLE: example swalk; shows an example
 }
 example
 {
-  "EXAMPLE:";
-  //** compute a Sagbi basis of I w.r.t. lp.
+  "EXAMPLE:";echo = 2;
   ring r = 0,(x,y), lp;
   ideal I =x2,y2,xy+y,2xy2+y3;
-  intvec v=1,1;
-  intvec w=1,0;
-  swalk(I,v,w);
+  swalk(I);
 }
 
-proc inprod(vector v,vector w)
+//////////////////////////////////////////////////////////////////////////////
+static proc inprod(vector v,vector w)
 "USAGE:  inprod(v,w); v,w vectors
 RETURN:  inner product of vector v and w
 EXAMPLE: example inprod; shows an example
@@ -107,22 +115,22 @@ example
    inprod(v,w);
 }
 
-
-proc df(poly f)
-"USAGE:  df(f); f polynomial
-RETURN:  a list of integers vectors which are the differnce of exponent vector
-         of leading monomial of f with the exponent vector of
-         of other monmials in f.
-EXAMPLE: example df; shows an example
+//////////////////////////////////////////////////////////////////////////////
+static proc diffExpo(poly f)
+"USAGE:  diffExpo(f); f polynomial
+RETURN:  a list of integers vectors which are the difference of exponent
+         vector of leading monomial of f with the exponent vector of of other
+         monmials in f.
+EXAMPLE: example diffExpo; shows an example
 "
 {
   list l;
   int i;
   intvec v;
-  for(i=2;i<=size(f);i++)
+  for(i=size(f);i>=2;i--)
    {
      v=leadexp(f[1])-leadexp(f[i]);
-     l[size(l)+1]=v;
+     l[i-1]=v;
    }
  return(l);
 }
@@ -130,55 +138,38 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),lp;
    poly f = xy+z2 ;
-   df(f);
+   diffExpo(f);
 }
 
-
-proc Df( ideal i)
-"USAGE:  Df(i); i ideal
-RETURN:  a list which contain df(f), for all generators f of ideal i
-EXAMPLE: example Df; shows an example
+//////////////////////////////////////////////////////////////////////////////
+static proc collectDiffExpo( ideal i)
+"USAGE:  collectDiffExpo(i); i ideal
+RETURN:  a list which contains diffExpo(f), for all generators f of ideal i
+EXAMPLE: example collectDiffExpo; shows an example
 "
 {
  list l;
  int j;
- for(j=1;j<=size(i);j++)
+ for(j=ncols(i); j>=1;j--)
   {
-   l[size(l)+1]=df(i[j]);
+   l[j]=diffExpo(i[j]);
   }
-return(l);
-  }
+  return(l);
+}
 example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),lp;
    ideal I = xy+z2,y3+x2y2;
-   Df(I);
+   collectDiffExpo(I);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+static proc changeType(vector v)
+"USAGE:  changeType(v); v  vector
+RETURN:  change the type of  vector
+         v into integer vector.
 
-proc newvec(vector v, vector w, number u)
-"USAGE:  newvec(v,w,u); v,w vectors, u number
- RETURN: the vector (1-u)v+(u)w.
- EXAMPLE: example newvec; shows an example
-"
-{
-  vector wnew ;
-  wnew=(1-u)*v+(u)*w ;
-  return(wnew);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y,z),lp;
-   vector v=[0,0,1];
-   vector w=[1,0,0];
-   number u=2/3;
-   newvec(v,w,u);
-}
-
-proc CT(vector v)
-"USAGE:  CT(v); v  vector
-RETURN:  change the type of  vector v into integer vector.
-EXAMPLE: example CT; shows an example
+EXAMPLE: example changeType; shows an example
 "
 {
   intvec w ;
@@ -193,36 +184,36 @@ example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),lp;
    vector v = [2,1,3];
-   CT(v);
+   changeType(v);
 }
-
-
-proc Ctv( intvec v)
-"USAGE:  Ctv(v); v integer vector
+//////////////////////////////////////////////////////////////////////////////
+static proc changeTypeInt( intvec v)
+"USAGE:  changeTypeInt(v); v integer vector
 RETURN:  change the type of integer vector v into vector.
-EXAMPLE: example Ctv; shows an example
+EXAMPLE: example changeTypeInt; shows an example
 "
 {
-vector w;
-int j ;
-for(j=1;j<=size(v);j++)
- {
-   w=w+v[j]*gen(j);
- }
-return(w);
+   vector w;
+   int j ;
+   for(j=1;j<=size(v);j++)
+   {
+     w=w+v[j]*gen(j);
+   }
+   return(w);
 }
 example
 { "EXAMPLE:"; echo = 2;
    ring r=0,(x,y,z),lp;
    intvec v = 4,2,3;
-   Ctv(v);
+   changeTypeInt(v);
 }
 
-proc last( vector c, vector t,list l)
+//////////////////////////////////////////////////////////////////////////////
+static proc last( vector c, vector t,list l)
 "USAGE: last(c,t,l); c,t vectors, l list
-RETURN: a  parametric value which corresponds to vector lies along
-        the path between c and t using list l of integer
-        vectors. This vector is the last vector on old Sagbi cone
+RETURN: a  parametric value which corresponds to vector lies along the path
+        between c and t using list l of integer vectors. This vector is the
+        last vector on old Sagbi cone
 EXAMPLE: example last; shows an example
 "
 {
@@ -231,28 +222,28 @@ EXAMPLE: example last; shows an example
  number u;
  vector v;
  for(i=1;i<=size(l);i++)
-  {
+ {
     for(j=1;j<=size(l[i]);j++)
-      {
+    {
         v=0;
         for(k=1;k<=size(l[i][j]);k++)
-          {
+        {
             v=v+l[i][j][k]*gen(k);
-          }
+        }
         poly n= inprod(c,v);
         poly q= inprod(t,v);
         number a=leadcoef(n);
         number b=leadcoef(q);
         number z=a-b;
         if(b<0)
-          {
+        {
             u=a/z;
             if(u<ul) {ul=u;}
-          }
+        }
         kill a,b,z,n,q ;
-       }
-   }
-return(ul);
+    }
+ }
+ return(ul);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -260,11 +251,12 @@ example
    vector v= [0,0,1];
    vector w=[1,0,0];
    ideal i=z2+xy,x2y2+y3;
-    list l=Df(i);
+    list l=collectDiffExpo(i);
     last(v,w,l)
 }
 
-proc initialForm(poly P)
+//////////////////////////////////////////////////////////////////////////////
+static proc initialForm(poly P)
 "USAGE:  initialForm(P); P polynomial
 RETURN:  sum of monomials of P with maximum w-degree
          where w is first row of matrix of a given monomial ordering
@@ -274,12 +266,12 @@ EXAMPLE: example initialForm; shows an example
  poly q;
  int i=1;
  while(deg(P[i])==deg(P[1]))
-   {
+ {
      q=q+P[i];
      i++;
      if(i>size(P)) {break;}
-   }
-  return(q);
+ }
+ return(q);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -288,18 +280,20 @@ example
    initialForm(f);
 }
 
-proc Initial(ideal I)
+//////////////////////////////////////////////////////////////////////////////
+static proc Initial(ideal I)
 "USAGE:  Initial(I); I ideal
-RETURN:  an ideal which is generate by the InitialForm of the generators of I.
+RETURN:  an ideal which is generate by the InitialForm
+         of the generators of I.
 EXAMPLE: example Initial; shows an example
 "
 {
  ideal J;
  int i;
- for(i=1;i<=size(I);i++)
-   {
+ for(i=1;i<=ncols(I);i++)
+ {
      J[i]=initialForm(I[i]);
-   }
+ }
  return(J);
 }
 example
@@ -309,19 +303,21 @@ example
    Initial(I);
 }
 
-proc Lift(ideal In,ideal InG,ideal Gold)
-"USAGE:  Lift(In, InG, Gold); In,InG, Gold ideals
-         Gold given by Sagbi basis {g_1,...,g_t}
-         In given by tne initial forms In(g_1),...,In(g_t)
-         InG={h_1,...,h_s} a Sagbi basis of In
-RETURN:  P_j, a polynomial in K[y_1,..,y_t] such that
-         h_j=P_j(In(g_1),...,In_(g_t)) and return f_j=P_j(g_1,...,g_t)
+//////////////////////////////////////////////////////////////////////////////
+static proc Lift(ideal In,ideal InG,ideal Gold)
+"USAGE:  Lift(In, InG, Gold); In, InG, Gold ideals;
+         Gold given by Sagbi basis {g_1,...,g_t},
+         In given by tne initial forms In(g_1),...,In(g_t),
+         InG = {h_1,...,h_s} a Sagbi basis of In
+RETURN:  P_j, a polynomial in K[y_1,..,y_t] such that h_j =
+         P_j(In(g_1),...,In_(g_t))
+         and return f_j = P_j(g_1,...,g_t)
 EXAMPLE: example Lift; shows an example
 "
 {
   int i;
   ideal J;
-  for(i=1;i<=size(InG);i++)
+  for(i=1;i<=ncols(InG);i++)
   {
     poly f=InG[i];
     list l=algebra_containment(f,In,1);
@@ -343,8 +339,8 @@ example
    Lift(In,InG,Gold);
 }
 
-
-proc Convert( ideal Gold )
+//////////////////////////////////////////////////////////////////////////////
+static proc Convert( ideal Gold )
 "USAGE: Convert(I); I ideal
 RETURN: Convert old Sagbi basis into new Sagbi basis
 EXAMPLE: example Convert; shows an example
@@ -362,7 +358,8 @@ example
    Convert(I);
 }
 
-proc interreduceSd(ideal I)
+//////////////////////////////////////////////////////////////////////////////
+static proc interreduceSd(ideal I)
 "USAGE:  interreduceSd(I); I ideal
 RETURN:  interreduceSd the set of generators if I with
          respect to a given term ordering
@@ -373,17 +370,17 @@ EXAMPLE: example interreduceSd; shows an example
   ideal J,B;
   int i,j,k;
   poly f;
-  for(k=1;k<=size(I);k++)
-    {l[k]=I[k];}
+  for(k=1;k<=ncols(I);k++)
+  {l[k]=I[k];}
   for(j=1;j<=size(l);j++)
-   {
+  {
      f=l[j];
      M=delete(l,j);
      for(i=1;i<=size(M);i++)
-       { B[i]=M[i];}
+     { B[i]=M[i];}
      f=sagbiNF(f,B,1);
      J=J+f;
-   }
+  }
   return(J);
 }
 example
@@ -393,6 +390,7 @@ example
    interreduceSd(I);
 }
 
+//////////////////////////////////////////////////////////////////////////////
 static proc OrderStringalp(string Wpal,list #)
 {
   int n= nvars(basering);
@@ -477,6 +475,7 @@ static proc OrderStringalp(string Wpal,list #)
    return(result);
 }
 
+//////////////////////////////////////////////////////////////////////////////
 static proc OrderStringalp_NP(string Wpal,list #)
 {
   int n= nvars(basering);
@@ -488,21 +487,26 @@ static proc OrderStringalp_NP(string Wpal,list #)
   {
     if(size(#) == 1)
     {
-      if(typeof(#[1]) == "intvec") {
+      if(typeof(#[1]) == "intvec")
+      {
         curr_weight = #[1];
 
-        if(Wpal == "al"){
+        if(Wpal == "al")
+        {
           order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
         }
-        else {
+        else
+        {
           order_str = "(Wp("+string(#[1])+"),C)";
         }
       }
       else {
-        if(typeof(#[1]) == "int"){
+        if(typeof(#[1]) == "int")
+        {
           nP = #[1];
         }
-        else {
+        else
+        {
           print("// ** the input must be \"(ideal, int)\" or ");
           print("// **                   \"(ideal, intvec)\"");
           print("// ** a lex. GB will be computed from \"dp\" to \"lp\"");
@@ -513,29 +517,37 @@ static proc OrderStringalp_NP(string Wpal,list #)
     {
      if(size(#) == 2)
      {
-       if(typeof(#[1]) == "intvec" and typeof(#[2]) == "int"){
+       if(typeof(#[1]) == "intvec" and typeof(#[2]) == "int")
+       {
          curr_weight = #[1];
 
-         if(Wpal == "al"){
+         if(Wpal == "al")
+         {
            order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
          }
-         else {
+         else
+         {
            order_str = "(Wp("+string(#[1])+"),C)";
          }
        }
-       else{
-         if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec"){
+       else
+       {
+         if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec")
+         {
            curr_weight = #[1];
            target_weight = #[2];
 
-           if(Wpal == "al"){
+           if(Wpal == "al")
+           {
              order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
            }
-           else {
+           else
+           {
              order_str = "(Wp("+string(#[1])+"),C)";
            }
          }
-         else{
+         else
+         {
            print("// ** the input  must be \"(ideal,intvec,int)\" or ");
            print("// **                    \"(ideal,intvec,intvec)\"");
            print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
@@ -543,27 +555,32 @@ static proc OrderStringalp_NP(string Wpal,list #)
        }
      }
      else {
-       if(size(#) == 3) {
+       if(size(#) == 3)
+       {
          if(typeof(#[1]) == "intvec" and typeof(#[2]) == "intvec" and
             typeof(#[3]) == "int")
          {
            curr_weight = #[1];
            target_weight = #[2];
            nP = #[3];
-           if(Wpal == "al"){
+           if(Wpal == "al")
+           {
              order_str = "(a("+string(#[1])+"),lp("+string(n) + "),C)";
            }
-           else {
+           else
+           {
              order_str = "(Wp("+string(#[1])+"),C)";
            }
          }
-         else{
+         else
+         {
            print("// ** the input must be \"(ideal,intvec,intvec,int)\"");
            print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
 
          }
        }
-       else{
+       else
+       {
          print("// ** The given input is wrong");
          print("// ** and a lex. GB will be computed from \"dp\" to \"lp\"");
        }
@@ -577,4 +594,20 @@ static proc OrderStringalp_NP(string Wpal,list #)
   result[4] = target_weight;
   return(result);
 }
+
+///////////////////////////////////////////////////////////////////////////////*
+Further examples
+ring r=0,(x,y,z),lp;
+
+ideal I=x2y4, y4z2, xy4z+y2z, xy6z2+y10z5;
+
+ideal Q=x2y4, y4z2, xy4z+y2z, xy6z2+y14z7;
+
+ideal J=x2y4, y4z2, xy4z+y2z, xy6z2+y18z9;
+
+ideal K=x2,y2,xy+y,2xy2+y5,z3+x;
+
+ideal L=x2+y,y2+z,x+z2;
+*/
+
 
