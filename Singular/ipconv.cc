@@ -416,6 +416,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       }
       output->next=input->next;
       input->next=NULL;
+  //if (outputType==MATRIX_CMD) Print("convert %d -> matrix\n",inputType);
       return FALSE;
     }
   }

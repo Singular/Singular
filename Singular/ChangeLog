@@ -1,4 +1,5 @@
-
+- documentation updates: primdec.lib, PLURAL
+- new lib: surfsig.lib (renamed from signature.lib)
 - memory leaks fixed: nlGcd, nc_ReduceSpolyNew
 - new lib: dmodvar.lib
 
