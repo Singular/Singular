@@ -4271,8 +4271,8 @@ lists lprepareResult(gcone *gc, const int n)
 				fAct = fAct->next;
 			} 		
 		l->m[3].data=(void*)lCodim2List;		
-		l->m[4].rtyp=RING_CMD;
-		l->m[4].data=(void*)(gcAct->getBaseRing()); 		
+		l->m[4].rtyp=INTVEC_CMD/*RING_CMD*/;
+		l->m[4].data=(void*)(gcAct->getIntPoint/*BaseRing*/()); 		
 		l->m[5].rtyp=INT_CMD;
 		l->m[5].data=(void*)gcAct->getPredUCN();
 		res->m[ii].data=(void*)l;
