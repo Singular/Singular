@@ -182,7 +182,7 @@ const char SHORT_OPTS_STRING[] = "bdhqstvxec:r:u:";
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-main()
+void main()
 {
   FILE* fd;
 #ifdef ESINGULAR
