@@ -199,6 +199,23 @@ matrix mpMultP(matrix a, poly p)
   return a;
 }
 
+/*2
+* multiply a poly 'p' by a matrix 'a', destroy the args
+*/
+matrix pMultMp(poly p, matrix a)
+{
+  int k, n = a->nrows, m = a->ncols;
+
+  pNormalize(p);
+  for (k=m*n-1; k>0; k--)
+  {
+    if (a->m[k]!=NULL)
+      a->m[k] = pMult(pCopy(p), a->m[k]);
+  }
+  a->m[0] = pMult(p, a->m[0]);
+  return a;
+}
+
 matrix mpAdd(matrix a, matrix b)
 {
   int k, n = a->nrows, m = a->ncols;

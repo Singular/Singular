@@ -1130,7 +1130,13 @@ static BOOLEAN jjTIMES_MA_P1(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjTIMES_MA_P2(leftv res, leftv u, leftv v)
 {
-  return jjTIMES_MA_P1(res,v,u);
+  poly p=(poly)u->CopyD(POLY_CMD);
+  int r=pMaxComp(p);/* recompute the rank for the case ideal*vector*/
+  ideal I= (ideal)pMultMp(p,(matrix)v->CopyD(MATRIX_CMD));
+  if (r>0) I->rank=r;
+  idNormalize(I);
+  res->data = (char *)I;
+  return FALSE;
 }
 static BOOLEAN jjTIMES_MA_N1(leftv res, leftv u, leftv v)
 {
@@ -3374,14 +3380,14 @@ struct sValCmd2 dArith2[]=
 ,{jjTIMES_P,   '*',            VECTOR_CMD,     POLY_CMD,   VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_P,   '*',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_P1,'*',           IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{jjTIMES_MA_P2,'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD, NO_PLURAL | ALLOW_RING}
+,{jjTIMES_MA_P2,'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_ID,  '*',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_P1,'*',           MODUL_CMD,      IDEAL_CMD,  VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{jjTIMES_MA_P2,'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD, NO_PLURAL | ALLOW_RING}
+,{jjTIMES_MA_P2,'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_ID,  '*',            MODUL_CMD,      IDEAL_CMD,  MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_ID,  '*',            MODUL_CMD,      MODUL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_P1,'*',           MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{jjTIMES_MA_P2,'*',           MATRIX_CMD,     POLY_CMD,   MATRIX_CMD, NO_PLURAL | ALLOW_RING}
+,{jjTIMES_MA_P2,'*',           MATRIX_CMD,     POLY_CMD,   MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_N1,'*',           MATRIX_CMD,     MATRIX_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_N2,'*',           MATRIX_CMD,     NUMBER_CMD, MATRIX_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_I1,'*',           MATRIX_CMD,     MATRIX_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}

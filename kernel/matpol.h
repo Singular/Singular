@@ -37,6 +37,7 @@ matrix mpInitP(int r, int c, poly p);
 matrix mpInitI(int r, int c, int v);
 matrix mpMultI(matrix a, int f);
 matrix mpMultP(matrix a, poly p);
+matrix pMultMp(poly p, matrix a);
 matrix mpAdd(matrix a, matrix b);
 matrix mpSub(matrix a, matrix b);
 matrix mpMult(matrix a, matrix b);
