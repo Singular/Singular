@@ -49,7 +49,6 @@ LIB "inout.lib";
 LIB "matrix.lib";
 LIB "triang.lib";
 LIB "absfact.lib";
-LIB "ring.lib";
 ///////////////////////////////////////////////////////////////////////////////
 //
 //                      Gianni/Trager/Zacharias
@@ -2336,7 +2335,7 @@ EXAMPLE:example equidim; shows an example
   if(attrib(basering,"global")!=1)
   {
       ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
+      "Not implemented for this ordering, please change to global ordering."
       );
   }
   intvec op ;
@@ -2442,7 +2441,7 @@ EXAMPLE: example equidimMax; shows an example
   if(attrib(basering,"global")!=1)
   {
       ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
+      "Not implemented for this ordering, please change to global ordering."
       );
   }
   def  P = basering;
@@ -3709,7 +3708,7 @@ proc sep(poly f,int i, list #)
    poly h=gcd(f,diff(f,var(i)));
    if((reduce(f,std(h))!=0)||(reduce(diff(f,var(i)),std(h))!=0))
    {
-      ERROR("FEHLER IN GCD");
+      ERROR("ERROR in GCD");
    }
    poly g1=lift(h,f)[1][1];    //  f/h
    poly h1;
@@ -3843,7 +3842,7 @@ EXAMPLE: example radicalEHV; shows an example
    if(attrib(basering,"global")!=1)
    {
       ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
+      "Not implemented for this ordering, please change to global ordering."
       );
    }
    if((char(basering)<100)&&(char(basering)!=0))
@@ -4350,7 +4349,7 @@ static proc prim_dec(ideal I, int choose)
 {
   if((choose<0) or (choose>3))
   {
-    ERROR("ERROR: <int> must be 0 or 1 or 2 or 3");
+    ERROR("<int> must be 0 or 1 or 2 or 3");
   }
   option(notWarnSB);
   ideal H=1; // The intersection of the primary components
@@ -5100,60 +5099,30 @@ static proc reconvList(list l)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-proc primdecGTZ(ideal i, list #)
+proc primdecGTZ(ideal i)
 "USAGE:   primdecGTZ(i); i ideal
 RETURN:  a list pr of primary ideals and their associated primes:
 @format
    pr[i][1]   the i-th primary component,
    pr[i][2]   the i-th prime component.
 @end format
-NOTE:    - Algorithm of Gianni/Trager/Zacharias.
-         - Designed for characteristic 0, works also in char k > 0, if it
-           terminates (may result in an infinite loop in small characteristic!)
-         - For local orderings, the result is considered in the localization 
-           of the polynomial ring, not in the power series ring
-         - For local and mixed orderings, the decomposition in the 
-           corresponding global ring is returned if the string 'global'
-           is specified as second argument
+NOTE:    Algorithm of Gianni/Trager/Zacharias.
+         Designed for characteristic 0, works also in char k > 0, if it
+         terminates (may result in an infinite loop in small characteristic!)
 EXAMPLE: example primdecGTZ; shows an example
 "
 {
-   if(size(#)>0)
-   {
-      int keep_comp=1;
-   }
    if(attrib(basering,"global")!=1)
    {
-// algorithms only work in global case!
-// pass to appropriate global ring
-      def r=basering;
-      def s=changeord("dp");
-      setring s;
-      ideal i=imap(r,i);
-// decompose and go back 
-      list li=primdecGTZ(i);
-      setring r;
-      def li=imap(s,li);
-// clean up
-      if(!defined(keep_comp))
-      {
-         for(int k=size(li);k>=1;k--)
-         {
-            if(mindeg(std(lead(li[k][2]))[1])==0)
-            { 
-// 1 contained in ideal, i.e. component does not meet origin in local ordering
-               li=delete(li,k);
-            }
-         }
-      }
-      return(li);
+      ERROR(
+      "Not implemented for this ordering, please change to global ordering."
+      );
    }
-
    if(minpoly!=0)
    {
       return(algeDeco(i,0));
       ERROR(
-      "// Not implemented yet for algebraic extensions.Simulate the ring extension by adding the minpoly to the ideal"
+      "Not implemented yet for algebraic extensions.Simulate the ring extension by adding the minpoly to the ideal"
       );
    }
   return(convList(decomp(i)));
@@ -5168,12 +5137,12 @@ example
    pr;
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc absPrimdecGTZ(ideal I, list #)
+proc absPrimdecGTZ(ideal I)
 "USAGE:   absPrimdecGTZ(I); I ideal
 ASSUME:  Ground field has characteristic 0.
-RETURN:  a ring containing two lists: @code{absolute_primes}, the absolute
-         prime components of I, and @code{primary_decomp}, the output of
-         @code{primdecGTZ(I)}.
+RETURN:  a ring containing two lists: @code{absolute_primes} (the absolute
+         prime components of I) and @code{primary_decomp} (the output of
+         @code{primdecGTZ(I)}).
          The list absolute_primes has to be interpreted as follows:
          each entry describes a class of conjugated absolute primes,
 @format
@@ -5183,11 +5152,6 @@ RETURN:  a ring containing two lists: @code{absolute_primes}, the absolute
          The first entry of @code{absolute_primes[i][1]} is the minimal
          polynomial of a minimal finite field extension over which the
          absolute prime component is defined.
-         For local orderings, the result is considered in the localization 
-         of the polynomial ring, not in the power series ring.
-         For local and mixed orderings, the decomposition in the 
-         corresponding global ring is returned if the string 'global'
-         is specified as second argument
 NOTE:    Algorithm of Gianni/Trager/Zacharias combined with the
          @code{absFactorize} command.
 SEE ALSO: primdecGTZ; absFactorize
@@ -5200,62 +5164,17 @@ EXAMPLE: example absPrimdecGTZ; shows an example
            +"characteristic 0");
   }
 
-  if(size(#)>0)
-  {
-     int keep_comp=1;
-  }
-
   if(attrib(basering,"global")!=1)
   {
-// algorithm automatically passes to the global case
-// hence prepare to go back to an appropriate new ring
-      def r=basering;
-      ideal max_of_r=maxideal(1);
-      def s=changeord("dp");
-      setring s;
-      def I=imap(r,I);
-      def S=absPrimdecGTZ(I);
-      setring S;
-      ring r1=char(basering),var(nvars(r)+1),dp;
-      def rS=r+r1;
-// move objects to appropriate ring and clean up
-      setring rS;
-      def max_of_r=imap(r,max_of_r);
-      attrib(max_of_r,"isSB",1);
-      def absolute_primes=imap(S,absolute_primes);
-      def primary_decomp=imap(S,primary_decomp);
-      if(!defined(keep_comp))
-      {
-         ideal tempid;
-         for(int k=size(absolute_primes);k>=1;k--)
-         {
-            tempid=absolute_primes[k][1];
-            tempid[1]=0;                  // ignore minimal polynomial
-            if(size(reduce(lead(tempid),max_of_r))!=0)
-            { 
-// 1 contained in ideal, i.e. component does not meet origin in local ordering
-               absolute_primes=delete(absolute_primes,k);
-            }
-         }      
-         for(k=size(primary_decomp);k>=1;k--)
-         {
-            if(mindeg(std(lead(primary_decomp[k][2]))[1])==0)
-            { 
-// 1 contained in ideal, i.e. component does not meet origin in local ordering
-               primary_decomp=delete(primary_decomp,k);
-            }
-         }
-         kill tempid;
-      }
-      export(primary_decomp);
-      export(absolute_primes);
-      return(rS);
+    ERROR(
+      "Not implemented for this ordering, please change to global ordering."
+    );
   }
   if(minpoly!=0)
   {
     //return(algeDeco(i,0));
     ERROR(
-      "// Not implemented yet for algebraic extensions.Simulate the ring extension by adding the minpoly to the ideal"
+      "Not implemented yet for algebraic extensions.Simulate the ring extension by adding the minpoly to the ideal"
     );
   }
   def R=basering;
@@ -5314,17 +5233,22 @@ EXAMPLE: example absPrimdecGTZ; shows an example
     absolute_primes[i]=list(psi(I),de);
     primary_decomp[i]=list(L[i][1],L[i][2]);
   }
+  for(ii=1;ii<=size(absolute_primes);ii++)
+  {
+     absolute_primes[ii][1]=interred(absolute_primes[ii][1]);
+  }
   export(primary_decomp);
   export(absolute_primes);
   setring R;
-  dbprint( printlevel-voice+3,"
-// 'absPrimdecGTZ' created a ring, in which two lists absolute_primes (the
-// absolute prime components) and primary_decomp (the primary and prime
-// components over the current basering) are stored.
-// To access the list of absolute prime components, type (if the name S was
-// assigned to the return value):
-        setring S; absolute_primes; ");
-
+dbprint( printlevel-voice+3,"
+// def S = absPrimdecGTZ(i); creates a ring,
+// which comes with two lists:
+// absolute_primes -- the absolute prime components,
+// and primary_decomp -- the primary and prime
+// components over the current basering).
+// Type setring S; absolute_primes;
+// to access the data.
+");
   return(Rz);
 }
 example
@@ -5354,43 +5278,14 @@ NOTE:    Algorithm of Shimoyama/Yokoyama.
    if c=2,  minAssGTZ is used,
    if c=3,  minAssGTZ and facstd are used.
 @end format
-         For local orderings, the result is considered in the localization 
-         of the polynomial ring, not in the power series ring.
-         For local and mixed orderings, the decomposition in the 
-         corresponding global ring is returned if the string 'global'
-         is specified as third argument 
 EXAMPLE: example primdecSY; shows an example
 "
 {
-   if(size(#)>1)
-   {
-      int keep_comp=1;
-   }
    if(attrib(basering,"global")!=1)
    {
-// algorithms only work in global case!
-// pass to appropriate global ring
-      def r=basering;
-      def s=changeord("dp");
-      setring s;
-      ideal i=imap(r,i);
-// decompose and go back 
-      list li=primdecSY(i);
-      setring r;
-      def li=imap(s,li);
-// clean up
-      if(!defined(keep_comp))
-      {
-         for(int k=size(li);k>=1;k--)
-         { 
-            if(mindeg(std(lead(li[k][2]))[1])==0)
-            { 
-// 1 contained in ideal, i.e. component does not meet origin in local ordering
-               li=delete(li,k);
-            }
-         }
-      }
-      return(li);
+      ERROR(
+      "Not implemented for this ordering, please change to global ordering."
+      );
    }
    i=simplify(i,2);
    if ((i[1]==0)||(i[1]==1))
@@ -5398,12 +5293,11 @@ EXAMPLE: example primdecSY; shows an example
      list L=list(ideal(i[1]),ideal(i[1]));
      return(list(L));
    }
-
    if(minpoly!=0)
    {
       return(algeDeco(i,1));
    }
-   if (size(#)!=0)
+   if (size(#)==1)
    { return(prim_dec(i,#[1])); }
    else
    { return(prim_dec(i,1)); }
@@ -5427,48 +5321,11 @@ proc minAssGTZ(ideal i,list #)
    @* \"SL\" -> GTZ algorithm with modificiations by Laplagne is used (default)
 
 RETURN:  a list, the minimal associated prime ideals of I.
-NOTE:    - Designed for characteristic 0, works also in char k > 0 based
-           on an algorithm of Yokoyama
-         - For local orderings, the result is considered in the localization 
-           of the polynomial ring, not in the power series ring
-         - For local and mixed orderings, the decomposition in the 
-           corresponding global ring is returned if the string 'global'
-           is specified as second argument
+NOTE:    Designed for characteristic 0, works also in char k > 0 based
+         on an algorithm of Yokoyama
 EXAMPLE: example minAssGTZ; shows an example
 "
 {
-   if(size(#)>0)
-   {
-      int keep_comp=1;
-   }
-
-  if(attrib(basering,"global")!=1)
-  {
-  // algorithms only work in global case!
-// pass to appropriate global ring
-      def r=basering;
-      def s=changeord("dp");
-      setring s;
-      ideal i=imap(r,i);
-// decompose and go back 
-      list li=minAssGTZ(i);
-      setring r;
-      def li=imap(s,li);
-// clean up
-      if(!defined(keep_comp))
-      {
-         for(int k=size(li);k>=1;k--)
-         {
-            if(mindeg(std(lead(li[k]))[1])==0)
-            { 
-// 1 contained in ideal, i.e. component does not meet origin in local ordering
-               li=delete(li,k);
-            }
-         }
-      }
-      return(li);
-  }
-
   int j;
   string algorithm;
   string facstdOption;
@@ -5508,6 +5365,12 @@ EXAMPLE: example minAssGTZ; shows an example
     }
   }
 
+  if(attrib(basering,"global")!=1)
+  {
+    ERROR(
+      "Not implemented for this ordering, please change to global ordering."
+    );
+  }
   if(minpoly!=0)
   {
     return(algeDeco(i,2));
@@ -5533,45 +5396,16 @@ RETURN:  list, the minimal associated prime ideals of i.
 NOTE:    If c=0, the given ordering of the variables is used. @*
          Otherwise, the system tries to find an optimal ordering,
          which in some cases may considerably speed up the algorithm. @*
-         For local orderings, the result is considered in the localization 
-         of the polynomial ring, not in the power series ring
-         For local and mixed orderings, the decomposition in the 
-         corresponding global ring is returned if the string 'global'
-         is specified as third argument
 EXAMPLE: example minAssChar; shows an example
 "
 {
-   if(size(#)>1)
-   {
-      int keep_comp=1;
-   }
    if(attrib(basering,"global")!=1)
    {
-// algorithms only work in global case!
-// pass to appropriate global ring
-      def r=basering;
-      def s=changeord("dp");
-      setring s;
-      ideal i=imap(r,i);
-// decompose and go back 
-      list li=minAssChar(i);
-      setring r;
-      def li=imap(s,li);
-// clean up
-      if(!defined(keep_comp))
-      {
-         for(int k=size(li);k>=1;k--)
-         {
-            if(mindeg(std(lead(li[k]))[1])==0)
-            { 
-// 1 contained in ideal, i.e. component does not meet origin in local ordering
-               li=delete(li,k);
-            }
-         }
-      }
-      return(li);
+      ERROR(
+      "Not implemented for this ordering, please change to global ordering."
+      );
    }
-   if (size(#)>0)
+   if (size(#)==1)
    { return(min_ass_prim_charsets(i,#[1])); }
    else
    { return(min_ass_prim_charsets(i,1)); }
@@ -5597,7 +5431,7 @@ EXAMPLE: example equiRadical; shows an example
   if(attrib(basering,"global")!=1)
   {
      ERROR(
-     "// Not implemented for this ordering, please change to global ordering."
+     "Not implemented for this ordering, please change to global ordering."
      );
   }
   return(radical(i, 1));
@@ -5631,17 +5465,9 @@ EXAMPLE: example radical; shows an example
   dbprint(printlevel - voice, "Radical, version 2006.05.08");
   if(attrib(basering,"global")!=1)
   {
-// algorithms only work in global case!
-// pass to appropriate global ring
-      def r=basering;
-      def s=changeord("dp");
-      setring s;
-      ideal i=imap(r,i);
-// compute radical and go back 
-      def j=radical(i);
-      setring r;
-      def j=imap(s,j);
-      return(j);
+    ERROR(
+     "Not implemented for this ordering, please change to global ordering."
+    );
   }
   if(size(i) == 0){return(ideal(0));}
   int j;
@@ -6410,7 +6236,7 @@ EXAMPLE: example prepareAss; shows an example
   if(attrib(basering,"global")!=1)
   {
       ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
+      "Not implemented for this ordering, please change to global ordering."
       );
   }
   ideal j=std(i);
@@ -6458,7 +6284,7 @@ EXAMPLE: example equidimMaxEHV; shows an example
   if(attrib(basering,"global")!=1)
   {
       ERROR(
-      "// Not implemented for this ordering, please change to global ordering."
+      "Not implemented for this ordering, please change to global ordering."
       );
   }
   ideal j=groebner(i);
@@ -6526,7 +6352,7 @@ EXAMPLE: example zerodec; shows an example
   if(attrib(basering,"global")!=1)
   {
     ERROR(
-    "// Not implemented for this ordering, please change to global ordering."
+    "Not implemented for this ordering, please change to global ordering."
     );
   }
   def R=basering;
