@@ -1,33 +1,41 @@
 version="$Id$";
 category="Singularities";
 info="
-LIBRARY:  signature.lib        signature of surface singularity
-AUTHORS:  Gerhard Pfister,     pfister@mathematik.uni-kl.de
-          Muhammad Ahsan,      ahsanbanyamin@gmail.com
+LIBRARY:  surfsig.lib                 signature of surface singularity
+AUTHORS:  Gerhard Pfister,            pfister@mathematik.uni-kl.de
+          Muhammad Ahsan Banyamin,    ahsanbanyamin@gmail.com
 
 OVERVIEW:
  A library for computing the signature of irreducible surface singularity.
- The library contains also procedure for computing the newton pairs of surface singularity.
+ It contains also a procedure for computing the newton pairs of a surface
+ singularity.
 
- PROCEDURES:
+THEORY: The signature of a surface singularity is defined in
+        [Durfee,A.:The Signature of Smoothings of Complex Surface
+        Singularities, Math. Ann.,232,85-98 (1978)].
+        The algorithm we use has been proposed in
+        [Nemethi,A.:The signature of f(x,y)+z^n, Proceedings of Singularity
+        Conference (C.T.C Wall's 60th birthday meeting),Liverpool 1996,
+        London Math.Soc. LN 263(1999),131-149].
+
+PROCEDURES:
  brieskornSign(a,b,c);   signature of Brieskorn singularity x^a+y^b+z^c=0
  newtonpairs(f);         newton pairs of surface singularity
  signature(N,f);         signature of singularity z^+f(x,y)=0,f irreducible
-
 ";
 
 LIB "hnoether.lib";
 ///////////////////////////////////////////////////////////////////////////////
 proc signature(int N,poly f)
-"USAGE:signature(N,f);N=integer,f=irreducible poly in x,y
- RETURN:signature of surface singularity defined by z^N+f=0
- EXAMPLE:example signature; shows an example
+"
+USAGE:   signature(N,f); N=integer, f=irreducible poly in 2 variables
+RETURN:  signature of surface singularity defined by z^N+f=0
+EXAMPLE: example signature; shows an example
 "
 {
    def R=basering;
    ring S=0,(x,y),dp;
-   map phi =R,x,y;
-   poly f=phi(f);
+   poly f = fetch(R,f);
    list L=newtonpairs(f);
    setring R;
    if(size(L)>2)
@@ -42,27 +50,23 @@ proc signature(int N,poly f)
  }
  example
 { "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y),dp;
-   int N=2;
-   poly f=y8+2x6y3+x10+x9y;
-   signature(N,f);
-   f=y4+2x3y2+x6+x5y;
-   signature(N,f);
-   N=3;
-   f=x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2+24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
+   ring r = 0,(x,y),dp;
+   int N  = 3;
+   poly f= x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
+      +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
    signature(N,f);
 }
 
+///////////////////////////////////////////////////////////////////////////
 proc newtonpairs(poly f)
-"USAGE:newtonpairs(f);f= irreducible bivariate poly
- RETURN:newton pairs of curve singularity f(x,y)=0
- EXAMPLE:example newtonpairs; shows an example
+"USAGE:   newtonpairs(f); f= irreducible bivariate poly
+ RETURN:  newton pairs of curve singularity f(x,y)=0
+ EXAMPLE: example newtonpairs; shows an example
 "
 {
  def R=basering;
  ring S=0,(x,y),dp;
- map phi =R,x,y;
- poly f=phi(f);
+ poly f = fetch(R,f);
  list M=invariants(f);
  setring R;
  list L=M[1][3];
@@ -92,10 +96,11 @@ example
    newtonpairs(y4+2x3y2+x6+x5y);
 }
 
+///////////////////////////////////////////////////////////////////////////
 proc brieskornSign(a,b,c)
-"USAGE:brieskornSign(a,b,c);a,b,c=integers
- RETURN:signature of Brieskorn singularity x^a+y^b+z^c
- EXAMPLE:example brieskornSign; shows an example
+"USAGE:   brieskornSign(a,b,c);a,b,c=integers
+ RETURN:  signature of Brieskorn singularity x^a+y^b+z^c
+ EXAMPLE: example brieskornSign; shows an example
 "
 {
    int i,j,k,d;
@@ -116,11 +121,11 @@ example
    ring R=0,x,dp;
    brieskornSign(11,3,5);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc signsin(number n)
-"USAGE:signsin(n);n=number
- RETURN:the signature of value of sine corresponding to n
- EXAMPLE:example signSin; shows an example
+"USAGE:   signsin(n); n=number
+ RETURN:  the sign of sin(n) (sin(n) = the value of the sine of n)
+ EXAMPLE: example signSin; shows an example
 "
 {
    def r=basering;
@@ -142,11 +147,11 @@ example
    ring r=0,x,dp;
    signsin(11/3);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc split1(number n)
-"USAGE:split1(n);n=number
- RETURN:integral and fractional parts of number n
- EXAMPLE:example split1; shows an example
+"USAGE:   split1(n); n=number
+ RETURN:  integral and fractional parts of number n
+ EXAMPLE: example split1; shows an example
  "
 {
    number a,b;
@@ -167,11 +172,11 @@ example
      ring r=0,x,dp;
      split1(11/3);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc sin( int n)
-"USAGE:sin(n);n=integer
- RETURN:approximate value of sine by using maclaurin series corresponding to n
- EXAMPLE:example sin; shows an example
+"USAGE:   sin(n); n=integer
+ RETURN:  approximate value of the sine of n by using maclaurin series
+ EXAMPLE:  example sin; shows an example
  "
 {
    def R=basering;
@@ -181,7 +186,7 @@ static proc sin( int n)
    int z;
    for(i=1;i<=n;i=i+2)
    {
-     f=f+(-1)^z*x^i/factorial(i,0) ;
+     f=f+(-1)^z*x^i/factorial(i) ;
      z++;
    }
    setring R;
@@ -194,11 +199,11 @@ example
    ring r=0,x,dp;
    sin(10);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc cos(int n)
-"USAGE:cos(n);n=integer
- RETURN:approximate value of cosine by using maclaurin series corresponding to n
- EXAMPLE:example cos; shows an example
+"USAGE:   cos(n); n=integer
+ RETURN:  approximate value of the cosine of n by using maclaurin series
+ EXAMPLE: example cos; shows an example
  "
 {
    def R=basering;
@@ -208,8 +213,9 @@ static proc cos(int n)
    int z;
    for(i=0;i<=n;i=i+2)
    {
-      f=f+(-1)^z*x^i/factorial(i,0);
-      z++;
+     // f=f+(-1)^z*x^i/factorial(i,0);
+     f=f+(-1)^z*x^i/factorial(i) ;
+     z++;
    }
    setring R;
    map phi=S,var(1);
@@ -221,11 +227,11 @@ example
    ring r=0,x,dp;
    cos(10);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc signcos(number n)
-"USAGE:signcos(n);n=number
- RETURN:the signature of value of cosine corresponding to n
- EXAMPLE:example signcos; shows an example
+"USAGE:   signcos(n); n=number
+ RETURN:  the sign of cosin(n) (cosin(n) = the value of the cosine of n)
+ EXAMPLE: example signcos; shows an example
 "
 {
    def r=basering;
@@ -247,11 +253,11 @@ example
    ring r=0,x,dp;
    signcos(11/3);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc  signa( number u)
-"USAGE:signa(u);u=number
- RETURN:the signa of a number
- EXAMPLE:example signa; shows an example
+"USAGE:   signa(u); u=number
+ RETURN:  the signa of a number
+ EXAMPLE: example signa; shows an example
 "
 {
    list l=split1(u);
@@ -267,11 +273,11 @@ example
    ring r=0,x,dp;
    signa(11/3);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc prods(list L)
-"USAGE:product(L);L=list of intvec
- RETURN:product of first components of Newton pairs in L
- EXAMPLE:example product; shows an example
+"USAGE:   product(L); L=list of intvec
+ RETURN:  product of first components of Newton pairs in L
+ EXAMPLE: example product; shows an example
 "
 {
    int a=L[2][1];
@@ -287,12 +293,12 @@ example
    list L=intvec(2,3),intvec(2,1);
    prods(L);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc Generalcase(int N, list L)
-"USAGE:Generalcase(N,f);N=integer,list L of intvec
- RETURN:signature of surface singularity with Newton pairs in L
- ASSUME:number of newton pairs greater than 2
- EXAMPLE:example Generalcase; shows an example
+"USAGE:   Generalcase(N,f);N=integer,list L of intvec
+ RETURN:  signature of surface singularity with Newton pairs in L
+ ASSUME:  number of newton pairs greater than 2
+ EXAMPLE: example Generalcase; shows an example
 "
 {
    int i,j,k,n,m,t,p;
@@ -338,14 +344,13 @@ example
    int N=2;
    list L=intvec(2,3),intvec(2,1),intvec(2,1);
    Generalcase(N,L);
-
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc signtwopairs(int N,list L)
-"USAGE:signtwopairs(N,f);N=integer,L=list of intvec
- RETURN:signature of surface singularity with Newton pairs in L
- ASSUME:number of newton pairs equal to 2
- EXAMPLE:example signtwopairs; shows an example
+"USAGE:   signtwopairs(N,f);N=integer,L=list of intvec
+ RETURN:  signature of surface singularity with Newton pairs in L
+ ASSUME:  number of newton pairs equal to 2
+ EXAMPLE: example signtwopairs; shows an example
 "
 {
   int a1,a2,b,d1,q,t;
@@ -363,7 +368,7 @@ example
    list L=intvec(2,3),intvec(2,1);
    signtwopairs(N,L);
 }
-
+///////////////////////////////////////////////////////////////////////////
 static proc DedekindSum(number b, number c, int a)
 {
    number s,d,e;
@@ -379,4 +384,21 @@ static proc DedekindSum(number b, number c, int a)
    }
    return(s);
 }
+///////////////////////////////////////////////////////////////////////////
 
+/*
+Further examples
+
+   ring r = 0,(x,y),dp;
+   int N;
+   poly f;
+
+   N  = 5;
+   poly f= x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2    //3 characteristic pairs
+      +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
+
+   N=6;
+   f= y4+2x3y2+x6+x5y;                                             //2 characteristic pairs
+
+   N=7;
+   f=x5+y11;                                                       //1 characteristc pair
