@@ -4353,6 +4353,7 @@ float gcone::t_isParallel;
 unsigned gcone::parallelButNotEqual=0;
 unsigned gcone::numberOfFacetChecks=0;
 #endif
+int gcone::numVars;
 bool gcone::hasHomInput=FALSE;
 // ideal gfan(ideal inputIdeal, int h)
 lists gfan(ideal inputIdeal, int h)
@@ -4361,7 +4362,7 @@ lists gfan(ideal inputIdeal, int h)
 	
 	if(rHasGlobalOrdering(currRing))
 	{	
-		int numvar = pVariables; 
+// 		int numvar = pVariables; 
 		gfanHeuristic = h;
 		
 		enum searchMethod {
@@ -4381,7 +4382,8 @@ lists gfan(ideal inputIdeal, int h)
 			gcone *gcRoot = new gcone(currRing,inputIdeal);
 			gcone *gcAct;
 			gcAct = gcRoot;
-			gcAct->numVars=pVariables;
+			gcone::numVars=pVariables;
+// 			gcAct->numVars=pVariables;//NOTE is now static
 			gcAct->getGB(inputIdeal);
 			/*Check whether input is homogeneous
 			if TRUE each facet intersects the positive orthant, so we don't need the

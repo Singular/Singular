@@ -173,7 +173,7 @@ class gcone
 		/** is the ideal homogeneous? */
 		static bool hasHomInput;
 		/** # of variables in the ring */
-		int numVars;		//#of variables in the ring
+		static int numVars;		//#of variables in the ring
 		/** The hilbert function - for the homogeneous case*/
 		static intvec *hilbertFunction;
 		
