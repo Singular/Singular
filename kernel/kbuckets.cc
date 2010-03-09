@@ -584,6 +584,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
     {
 #ifdef USE_COEF_BUCKETS
       if (i<coef_start)
+      {
         bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
 #ifdef HAVE_RINGS
         if (rField_is_Ring(r) && !(rField_is_Domain(r))) {
@@ -591,6 +592,7 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
           kBucketAdjust(bucket, i);
         }
 #endif
+      }
       else
       if (bucket->coef[i]!=NULL)
       {
@@ -1104,9 +1106,15 @@ number kBucketPolyRed(kBucket_pt bucket,
   if (! nIsOne(pGetCoeff(p1)))
   {
     number an = pGetCoeff(p1), bn = pGetCoeff(lm);
+//StringSetS("##### an = "); nWrite(an); PrintS(StringAppend("\n"));
+//StringSetS("##### bn = "); nWrite(bn); PrintS(StringAppend("\n"));
     int ct = ksCheckCoeff(&an, &bn);
     p_SetCoeff(lm, bn, bucket->bucket_ring);
-    if ((ct == 0) || (ct == 2)) kBucket_Mult_n(bucket, an);
+    if ((ct == 0) || (ct == 2))
+    {
+      kBucket_Mult_n(bucket, an);
+      lm = p_Mult_nn(lm, an, bucket->bucket_ring);
+    }
     rn = an;
   }
   else
@@ -1145,7 +1153,6 @@ number kBucketPolyRed(kBucket_pt bucket,
     //}
   }
   #endif
-
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
 
   if (backuped)
