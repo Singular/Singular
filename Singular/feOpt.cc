@@ -182,7 +182,7 @@ const char SHORT_OPTS_STRING[] = "bdhqstvxec:r:u:";
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-void main()
+int main()
 {
   FILE* fd;
 #ifdef ESINGULAR
@@ -229,7 +229,7 @@ void main()
 
   fprintf(fd, "FE_OPT_UNDEF\n} feOptIndex;\n");
   fclose(fd);
-  exit(0);
+  return(0);
 }
 
 #else // ! GENERATE_OPTION_INDEX
