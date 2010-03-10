@@ -24,6 +24,7 @@
 #include "prCopy.h"
 #include "p_Mult_q.h"
 #include "clapsing.h"
+#include "options.h"
 
 void pLcmRat(poly a, poly b, poly m, int rat_shift)
 {
