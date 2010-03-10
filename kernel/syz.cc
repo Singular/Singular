@@ -472,6 +472,11 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       hom = isHomog;
     }
   }
+  if (rIsPluralRing(currRing) && !rIsSCA(currRing) )
+  { 
+// quick solution; need theory to apply homog GB stuff for G-Algebras
+    hom = isNotHomog;
+  }
   if (hom==isHomog)
   {
     intvec *w1 = syPrepareModComp(res[0],&w);
