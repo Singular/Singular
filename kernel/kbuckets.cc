@@ -584,15 +584,20 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
     {
 #ifdef USE_COEF_BUCKETS
       if (i<coef_start)
-      {
         bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
 #ifdef HAVE_RINGS
+        /* Frank Seelisch on March 11, 2010:
+           This looks a bit strange: The following "if" is indented
+           like the previous line of code. But coded as it is,
+           it should actually be two spaces less indented.
+           Question: Should the following "if" also only be
+           performed when "(i<coef_start)" is true?
+           For the time being, I leave it as it is. */
         if (rField_is_Ring(r) && !(rField_is_Domain(r))) {
           bucket->buckets_length[i] = pLength(bucket->buckets[i]);
           kBucketAdjust(bucket, i);
         }
 #endif
-      }
       else
       if (bucket->coef[i]!=NULL)
       {
@@ -1113,7 +1118,9 @@ number kBucketPolyRed(kBucket_pt bucket,
     if ((ct == 0) || (ct == 2))
     {
       kBucket_Mult_n(bucket, an);
+#ifdef HAVE_RINGS
       lm = p_Mult_nn(lm, an, bucket->bucket_ring);
+#endif
     }
     rn = an;
   }
