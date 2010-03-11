@@ -133,7 +133,7 @@ class facet
 class gcone
 {
 	private:		
-// 		ring rootRing;		//good to know this -> generic walk
+		//ring rootRing;		//good to know this -> generic walk
 		ideal inputIdeal;	//the original
 		ring baseRing;		//the basering of the cone				
 		intvec *ivIntPt;	//an interior point of the cone
@@ -203,6 +203,7 @@ class gcone
 		~gcone();
 		inline int getCounter();
 		inline ring getBaseRing();
+		inline ring getRef2BaseRing();
 		inline void setIntPoint(intvec *iv);
 		inline intvec *getIntPoint(bool shallow=FALSE);
 		inline void showIntPoint();
@@ -221,7 +222,7 @@ class gcone
 		inline bool isParallel(const intvec &a, const intvec &b);
 // 		inline int dotProduct(const intvec* a, const intvec *b);
 // 		inline bool isParallel(const intvec* a, const intvec* b);
-		inline bool ivAreEqual(intvec &a, intvec &b);
+		inline bool ivAreEqual(const intvec &a, const intvec &b);
 		inline bool areEqual( facet *f,  facet *g);
 		inline bool areEqual2(facet* f, facet *g);
 		inline int intgcd(const int &a, const int &b);
