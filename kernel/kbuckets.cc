@@ -1119,7 +1119,8 @@ number kBucketPolyRed(kBucket_pt bucket,
     {
       kBucket_Mult_n(bucket, an);
 #ifdef HAVE_RINGS
-      lm = p_Mult_nn(lm, an, bucket->bucket_ring);
+      if (rField_is_Ring(bucket->bucket_ring))
+        lm = p_Mult_nn(lm, an, bucket->bucket_ring);
 #endif
     }
     rn = an;
