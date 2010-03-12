@@ -3910,7 +3910,7 @@ inline void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 	ss << UCN;
 	string UCNstr = ss.str();		
 			
- 	string prefix="/tmp/cone";
+ 	string prefix="/tmp/Singular/cone";
 // 	string prefix="./";	//crude hack -> run tests in separate directories
 	string suffix=".sg";
 	string filename;
@@ -4011,7 +4011,7 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 	int gcBasisLength=0;
 	size_t found;			//used for find_first_(not)_of
 
-	string prefix="/tmp/cone";
+	string prefix="/tmp/Singular/cone";
 	string suffix=".sg";
 	string filename;
 	filename.append(prefix);
