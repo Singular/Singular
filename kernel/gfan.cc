@@ -117,7 +117,7 @@ facet::facet()
 	this->isFlippable=FALSE;
 }
 		
-/** \brief Constructor for facets of codim >= 2
+/** \brief Constructor for facets of codim == 2
 * Note that as of now the code of the constructors is only for facets and codim2-faces. One
 * could easily change that by renaming numCodim2Facets to numCodimNminusOneFacets or similar
 */
@@ -127,7 +127,7 @@ facet::facet(const int &n)
 	this->interiorPoint=NULL;			
 	this->UCN=0;
 	this->codim2Ptr=NULL;
-	if(n>1)
+	if(n==2)
 	{
 		this->codim=n;
 	}//NOTE Handle exception here!			
@@ -260,7 +260,7 @@ inline const intvec *facet::getRef2FacetNormal()
 }	
 
 /** Equality check for facets based on unique interior points*/
-inline bool gcone::areEqual2(facet* f, facet *g)
+static bool areEqual2(facet* f, facet *g)
 {
 #ifdef gfanp
 	gcone::numberOfFacetChecks++;
@@ -268,30 +268,9 @@ inline bool gcone::areEqual2(facet* f, facet *g)
 	gettimeofday(&start, 0);
 #endif
 	bool res = TRUE;
-// 	const intvec *fNormal;
-// 	const intvec *gNormal;
-// 	fNormal = f->getRef2FacetNormal();
-// 	gNormal = g->getRef2FacetNormal();
-// 	intvec *fNRef=const_cast<intvec*>(fNormal);
-// 	intvec *gNRef=const_cast<intvec*>(gNormal);
-	/*if(isParallel(fNRef,*gNRef))
-	{
-		const intvec *fIntP = f->getRef2InteriorPoint();
-		const intvec *gIntP = g->getRef2InteriorPoint();
-		for(int ii=0;ii<this->numVars;ii++)
-		{
-			if( (*fIntP)[ii] != (*gIntP)[ii] )
-			{
-				res=FALSE;
-				break;
-			}
-		}
-	}
-	else
-		res=FALSE;*/
 	const intvec *fIntP = f->getRef2InteriorPoint();
 	const intvec *gIntP = g->getRef2InteriorPoint();
-	for(int ii=0;ii<this->numVars;ii++)
+	for(int ii=0;ii<pVariables;ii++)
 	{
 		if( (*fIntP)[ii] != (*gIntP)[ii] )
 		{
@@ -315,7 +294,7 @@ inline bool gcone::areEqual2(facet* f, facet *g)
 * BEWARE: It would be better to use const intvec* but that will lead to call something like
 * int foo=((intvec*)f2Normal)->compare((intvec*)s2Normal) resulting in much higher memory usage
 */
-inline bool gcone::areEqual(facet *f, facet *s)
+static bool areEqual(facet *f, facet *s)
 {
 #ifdef gfanp
 	gcone::numberOfFacetChecks++;
@@ -705,15 +684,6 @@ volatile void gcone::showFacets(const short codim)
 	facet *f2=NULL;
 	if(codim==2)
 		f2=this->facetPtr->codim2Ptr;
-	/*switch(codim)
-	{
-		case 1:
-			f = this->facetPtr;
-			break;
-		case 2:
-			f2 = this->facetPtr->codim2Ptr;
-			break;
-	}*/	
 	while(f!=NULL)
 	{
 		intvec *iv;
@@ -743,7 +713,7 @@ volatile void gcone::showFacets(const short codim)
 }
 		
 /** For debugging purposes only */
-inline volatile void gcone::showSLA(facet &f)
+static volatile void showSLA(facet &f)
 {
 	facet *fAct;
 	fAct = &f;
@@ -782,7 +752,7 @@ inline volatile void gcone::showSLA(facet &f)
 	}
 }
 		
-inline void gcone::idDebugPrint(const ideal &I)
+static void idDebugPrint(const ideal &I)
 {
 	int numElts=IDELEMS(I);
 	cout << "Ideal with " << numElts << " generators" << endl;
@@ -795,7 +765,7 @@ inline void gcone::idDebugPrint(const ideal &I)
 	cout << endl;
 }
 
-inline void gcone::invPrint(const ideal &I)
+static void invPrint(const ideal &I)
 {
 // 	int numElts=IDELEMS(I);
 // 	cout << "inv = ";
@@ -807,7 +777,7 @@ inline void gcone::invPrint(const ideal &I)
 // 	cout << endl;
 }
 
-inline bool gcone::isMonomial(const ideal &I)
+static bool isMonomial(const ideal &I)
 {
 	bool res = TRUE;
 	for(int ii=0;ii<IDELEMS(I);ii++)
@@ -868,7 +838,7 @@ inline ring gcone::getRef2BaseRing()
  * Optionally, if the parameter bool compIntPoint is set to TRUE the method will also compute
  * an interior point of the cone.
 		 */
-inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
+void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 {
 #ifdef gfanp
 	timeval start, end;
@@ -1246,7 +1216,7 @@ inline void gcone::getConeNormals(const ideal &I, bool compIntPoint)
  * Additionally we check whether the codim2-facet normal is strictly positive. Otherwise
  * the facet is marked as non-flippable.
  */
-inline void gcone::getCodim2Normals(const gcone &gc)
+void gcone::getCodim2Normals(const gcone &gc)
 {
 #ifdef gfanp
 	timeval start, end;
@@ -1519,16 +1489,27 @@ void gcone::getExtremalRays(const gcone &gc)
 	if(hasHomInput==TRUE && iv64isStrictlyPositive(ivIntPointOfCone)==FALSE)
 	{
 		intvec *ivOne = new intvec(this->numVars);
+		int maxNegEntry=0;
 		for(int ii=0;ii<this->numVars;ii++)
-			(*ivOne)[ii]=1;
-		while( !iv64isStrictlyPositive(ivIntPointOfCone) )
 		{
-			intvec *tmp = ivIntPointOfCone;
-			for(int jj=0;jj<this->numVars;jj++)
-				(*ivOne)[jj] = (*ivOne)[jj] << 1; //times 2
-			ivIntPointOfCone = ivAdd(ivIntPointOfCone,ivOne);
-			delete tmp;				
+// 			(*ivOne)[ii]=1;
+			if ((*ivIntPointOfCone)[ii]<maxNegEntry) maxNegEntry=(*ivIntPointOfCone)[ii];
 		}
+		maxNegEntry *= -1;
+		maxNegEntry++;//To be on the safe side
+		for(int ii=0;ii<this->numVars;ii++)
+			(*ivOne)[ii]=maxNegEntry;
+		intvec *tmp=ivIntPointOfCone;
+		ivIntPointOfCone=ivAdd(ivIntPointOfCone,ivOne);
+		delete(tmp);
+// 		while( !iv64isStrictlyPositive(ivIntPointOfCone) )
+// 		{
+// 			intvec *tmp = ivIntPointOfCone;
+// 			for(int jj=0;jj<this->numVars;jj++)
+// 				(*ivOne)[jj] = (*ivOne)[jj] << 1; //times 2
+// 			ivIntPointOfCone = ivAdd(ivIntPointOfCone,ivOne);
+// 			delete tmp;				
+// 		}
 		delete ivOne;
 		int ggT=(*ivIntPointOfCone)[0];
 		for(int ii=0;ii<this->numVars;ii++)
@@ -2461,7 +2442,7 @@ inline void gcone::getGB(const ideal &inputIdeal)
 		
 /** \brief Compute the negative of a given intvec
 	*/		
-inline intvec *gcone::ivNeg(const intvec *iv)
+static intvec* ivNeg(const intvec *iv)
 {	//Hm, switching to intvec const intvec does no longer work
 	intvec *res;// = new intvec(iv->length());
 	res=ivCopy(iv);
@@ -2473,10 +2454,10 @@ inline intvec *gcone::ivNeg(const intvec *iv)
 /** \brief Compute the dot product of two intvecs
 *
 */
-inline int gcone::dotProduct(const intvec &iva, const intvec &ivb)				
+static int dotProduct(const intvec &iva, const intvec &ivb)				
 {			
 	int res=0;	
-	for (int i=0;i<this->numVars;i++)
+	for (int i=0;i<pVariables;i++)
 	{
 // #ifndef NDEBUG
 // 	(const_cast<intvec*>(&iva))->show(1,0); (const_cast<intvec*>(&ivb))->show(1,0);
@@ -2489,7 +2470,7 @@ inline int gcone::dotProduct(const intvec &iva, const intvec &ivb)
  *
  * \f$ \alpha\parallel\beta\Leftrightarrow\langle\alpha,\beta\rangle^2=\langle\alpha,\alpha\rangle\langle\beta,\beta\rangle \f$
  */
-inline bool gcone::isParallel(const intvec &a,const intvec &b)
+static bool isParallel(const intvec &a,const intvec &b)
 {	
 /*#ifdef gfanp	
 	timeval start, end;
@@ -2519,7 +2500,7 @@ inline bool gcone::isParallel(const intvec &a,const intvec &b)
  * Result will be written into intvec iv. 
  * Any rational point is automatically converted into an integer.
  */
-inline void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M here since we want to remove redundant rows
+void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M here since we want to remove redundant rows
 {
 	dd_LPPtr lp,lpInt;
 	dd_ErrorType err=dd_NoError;
@@ -2634,7 +2615,7 @@ inline void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M her
 * Used by noRevS
 *NOTE no longer used nor maintained. MM Mar 9, 2010
 */
-inline void gcone::interiorPoint2()
+void gcone::interiorPoint2()
 {//idPrint(this->gcBasis);
 #ifdef gfan_DEBUG
 	if(this->ivIntPt!=NULL)
@@ -2887,10 +2868,10 @@ ring rCopyAndChangeWeight(ring const &r, intvec *ivw)
 		
 /** \brief Check for equality of two intvecs
  */
-inline bool gcone::ivAreEqual(const intvec &a, const intvec &b)
+static bool ivAreEqual(const intvec &a, const intvec &b)
 {
 	bool res=TRUE;
-	for(int ii=0;ii<this->numVars;ii++)
+	for(int ii=0;ii<pVariables;ii++)
 	{
 		if(a[ii]!=b[ii])
 		{
@@ -3327,7 +3308,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
  * Expects a new intvec as 3rd parameter
  * \param dd_MatrixPtr,intvec
  */
-inline void gcone::makeInt(const dd_MatrixPtr &M, const int line, intvec &n)
+void gcone::makeInt(const dd_MatrixPtr &M, const int line, intvec &n)
 {			
 // 	mpz_t denom[this->numVars];
 	mpz_t *denom = new mpz_t[this->numVars];
@@ -3397,7 +3378,7 @@ inline void gcone::makeInt(const dd_MatrixPtr &M, const int line, intvec &n)
  * (codim-2)-facet normal, i.e. a primitive vector
  * Actually we now also normalize the facet normals.
  */
-inline void gcone::normalize()
+void gcone::normalize()
 {
 // 	int *ggT = new int;
 // 		*ggT=1;
@@ -3795,7 +3776,7 @@ cout << "Removing (";fAct->fNormal->show(1,1);cout << ") from list" << endl;
 * But first we will try to just do an inplace exchange and copying only the
 * gc->gcBasis
 */
-inline void gcone::replaceDouble_ringorder_a_ByASingleOne()
+void gcone::replaceDouble_ringorder_a_ByASingleOne()
 {
 	ring srcRing=currRing;
 	ring replacementRing=rCopy0((ring)this->baseRing);
@@ -3903,7 +3884,7 @@ inline dd_MatrixPtr gcone::facets2Matrix(const gcone &gc)
  * Each line contains exactly one date
  * Each section starts with its name in CAPITALS
  */
-inline void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
+void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 {
 	int UCN=gc.UCN;
 	stringstream ss;
@@ -4002,7 +3983,7 @@ inline void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 * ||defaults to 0 => flip
 * ||1 => flip2
 */
-inline void gcone::readConeFromFile(int UCN, gcone *gc)
+void gcone::readConeFromFile(int UCN, gcone *gc)
 {
 	//int UCN=gc.UCN;
 	stringstream ss;
@@ -4227,15 +4208,15 @@ inline void gcone::readConeFromFile(int UCN, gcone *gc)
 
 /** \brief Sort the rays of a facet lexicographically
 */
-void gcone::sortRays(gcone *gc)
-{
-	facet *fAct;
-	fAct = this->facetPtr->codim2Ptr;
+// void gcone::sortRays(gcone *gc)
+// {
+// 	facet *fAct;
+// 	fAct = this->facetPtr->codim2Ptr;
 // 	while(fAct->next!=NULL)
 // 	{
 // 		if(fAct->fNormal->compare(fAct->fNormal->next)==-1
 // 	}
-}
+// }
 
 /** \brief Gather the output
 * List of lists
@@ -4389,8 +4370,8 @@ intvec *gcone::ivZeroVector;
 // ideal gfan(ideal inputIdeal, int h)
 lists gfan(ideal inputIdeal, int h)
 {
-	lists lResList; //this is the object we return
-	
+	lists lResList; //this is the object we return	
+
 	if(rHasGlobalOrdering(currRing))
 	{	
 // 		int numvar = pVariables; 
@@ -4435,7 +4416,7 @@ lists gfan(ideal inputIdeal, int h)
 	// 		cout << "GB of input ideal is:" << endl;
 	// 		idShow(gcAct->gcBasis);
 	#endif
-			if(gcAct->isMonomial(gcAct->gcBasis))
+			if(isMonomial(gcAct->gcBasis))
 			{//FIXME
 				WerrorS("Monomial input - terminating");
 				lResList->Init(1);
