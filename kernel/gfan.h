@@ -76,6 +76,7 @@ class facet
 		int numCodim2Facets;	//#of (codim-2)-facets of this facet. Set in getCodim2Normals()
 		unsigned numRays;	//Number of spanning rays of the facet
 		ring flipRing;		//the ring on the other side of the facet
+		intvec **fRays;
 					
 		/** The default constructor. */
 		facet();
@@ -176,6 +177,8 @@ class gcone
 		static int numVars;		//#of variables in the ring
 		/** The hilbert function - for the homogeneous case*/
 		static intvec *hilbertFunction;
+		/** The zero vector. Needed in case of fNormal mismatch*/
+		static intvec *ivZeroVector;
 		
 		/** # of facets of the cone
 		 * This value is set by gcone::getConeNormals
@@ -225,7 +228,7 @@ class gcone
 		inline bool ivAreEqual(const intvec &a, const intvec &b);
 		inline bool areEqual( facet *f,  facet *g);
 		inline bool areEqual2(facet* f, facet *g);
-		inline int intgcd(const int &a, const int &b);
+// 		inline int intgcd(const int &a, const int &b);
 		inline void writeConeToFile(const gcone &gc, bool usingIntPoints=FALSE);
 		inline void readConeFromFile(int gcNum, gcone *gc);
 		inline intvec f2M(gcone *gc, facet *f, int n=1);
@@ -262,6 +265,7 @@ class gcone
 		friend class facet;	
 };
 lists lprepareResult(gcone *gc, const int n);
+static int intgcd(const int &a, const int &b);
 // bool iv64isStrictlyPositive(intvec *);
 #endif
 #endif

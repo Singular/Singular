@@ -1592,7 +1592,7 @@ void gcone::getExtremalRays(const gcone &gc)
 					
 			}
 		}//For non-homog input ivIntPointOfFacet should already be >0 here
-		if(!hasHomInput) {assert(iv64isStrictlyPositive(ivIntPointOfFacet));}
+// 		if(!hasHomInput) {assert(iv64isStrictlyPositive(ivIntPointOfFacet));}
 		//if we have no strictly pos ray but the input is homogeneous
 		//then add a suitable multiple of (1,...,1)
 		if( !iv64isStrictlyPositive(ivIntPointOfFacet) && hasHomInput==TRUE)
@@ -3844,7 +3844,7 @@ inline void gcone::replaceDouble_ringorder_a_ByASingleOne()
 
 /** \brief Compute the gcd of two ints
  */
-inline int gcone::intgcd(const int &a, const int &b)
+static int intgcd(const int &a, const int &b)
 {
 	int r, p=a, q=b;
 	if(p < 0)
@@ -4385,6 +4385,7 @@ unsigned gcone::numberOfFacetChecks=0;
 #endif
 int gcone::numVars;
 bool gcone::hasHomInput=FALSE;
+intvec *gcone::ivZeroVector;
 // ideal gfan(ideal inputIdeal, int h)
 lists gfan(ideal inputIdeal, int h)
 {
@@ -4424,6 +4425,12 @@ lists gfan(ideal inputIdeal, int h)
 				gcone::hasHomInput=TRUE;
 				gcone::hilbertFunction=hHstdSeries(inputIdeal,NULL,NULL,NULL,currRing);
 			}
+			else
+			{
+				gcone::ivZeroVector = new intvec(pVariables);
+				for(int ii=0;ii<pVariables;ii++)
+					(*gcone::ivZeroVector)[ii]=0;
+			}
 	#ifndef NDEBUG
 	// 		cout << "GB of input ideal is:" << endl;
 	// 		idShow(gcAct->gcBasis);
@@ -4435,7 +4442,7 @@ lists gfan(ideal inputIdeal, int h)
 // 				exit(-1);
 // 				gcAct->getConeNormals(gcAct->gcBasis);
 // 				lResList=lprepareResult(gcAct,1);
-				dd_free_global_constants;
+				dd_free_global_constants();
 				//This is filthy
 				return lResList;
 			}			
