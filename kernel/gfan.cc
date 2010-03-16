@@ -24,7 +24,6 @@ $Id$
 #include "../Singular/lists.h"
 #include "prCopy.h"	//Needed for idrCopyR
 #include "stairc.h"	//For Hilbert series
-#include <iostream>
 // #include <bitset>
 #include <fstream>	//read-write cones to files
 // #include <gmp.h>
@@ -76,9 +75,10 @@ $Id$
 
 //NOTE Defining this will slow things down!
 //Only good for very coarse profiling
-// #define gfanp
+#define gfanp
 #ifdef gfanp
 #include <sys/time.h>
+#include <iostream>
 #endif
 
 #ifndef SHALLOW
@@ -200,7 +200,7 @@ facet* facet::shallowCopy(const facet& f)
 void facet::shallowDelete()
 {
 #ifdef gfan_DEBUG
-	cout << "shallowdel@UCN " << this->getUCN() << endl;
+	printf("shallowdel@UCN %i\n", this->getUCN());
 #endif
 	this->fNormal=NULL;
 // 	this->UCN=0;
@@ -218,7 +218,7 @@ void facet::shallowDelete()
 facet::~facet()
 {
 #ifdef gfan_DEBUG
-	cout << "~facet@UCN " << this->getUCN() << endl;
+	printf("~facet@UCN %i\n",this->getUCN());
 #endif
 	if(this->fNormal!=NULL)
 		delete this->fNormal;
@@ -278,7 +278,7 @@ static bool areEqual2(facet* f, facet *g)
 	}
 #ifdef gfanp
 	gettimeofday(&end, 0);
-	t_areEqual += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
+	gcone::t_areEqual += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
 #endif	
 	return res;
 }
@@ -356,7 +356,7 @@ static bool areEqual(facet *f, facet *s)
 	}
 #ifdef gfanp
 	gettimeofday(&end, 0);
-	t_areEqual += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
+	gcone::t_areEqual += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
 #endif
 	return res;
 // 	intvec *foo=ivNeg(sNormal);
@@ -505,23 +505,19 @@ volatile void facet::fDebugPrint()
 	codim2Act = this->codim2Ptr;
 	intvec *fNormal;
 	fNormal = this->getFacetNormal();	
-	cout << "=======================" << endl;
-	cout << "Facet normal = (";
-	fNormal->show(1,1);
-	cout << ")"<<endl;	
-	cout << "-----------------------" << endl;
-	cout << "Codim2 facets:" << endl;
+	printf("=======================\n");
+	printf("Facet normal = (");fNormal->show(1,1);printf(")\n");
+	printf("-----------------------\n");
+	printf("Codim2 facets:\n");
 	while(codim2Act!=NULL)
 	{
 		intvec *f2Normal;
 		f2Normal = codim2Act->getFacetNormal();
-		cout << "(";
-		f2Normal->show(1,0);
-		cout << ")" << endl;
+		printf("(");f2Normal->show(1,0);printf(")\n");
 		codim2Act = codim2Act->next;
 		delete f2Normal;
 	}
-	cout << "=======================" << endl;
+	printf("=======================\n");
  	delete fNormal;	
 }		
 		
@@ -686,28 +682,25 @@ volatile void gcone::showFacets(const short codim)
 	{
 		intvec *iv;
 		iv = f->getFacetNormal();
-		cout << "(";
-		iv->show(1,0);				
+		printf("(");iv->show(1,0);
 		if(f->isFlippable==FALSE)
-			cout << ")* ";
+			printf(")* ");
 		else
-			cout << ") ";
+			printf(") ");
 		delete iv;
 		if(codim==2)
 		{
 			f2=f->codim2Ptr;
 			while(f2!=NULL)
 			{
-				cout << "[";
-				f2->getFacetNormal()->show(1,0);
-				cout << "]";
+				printf("[");f2->getFacetNormal()->show(1,0);printf("]");
 				f2 = f2->next;
 			}
-			cout << endl;
+			printf("\n");
 		}
 		f=f->next;
 	}
-	cout << endl;
+	printf("\n");
 }
 		
 /** For debugging purposes only */
@@ -720,31 +713,28 @@ static volatile void showSLA(facet &f)
 		facet *codim2Act;
 		codim2Act = fAct->codim2Ptr;
 		
-		cout << endl;
+		printf("\n");
 		while(fAct!=NULL)
 		{
 			intvec *fNormal;		
 			fNormal=fAct->getFacetNormal();
-			cout << "(";
-			fNormal->show(1,0);
+			printf("(");fNormal->show(1,0);
 			if(fAct->isFlippable==TRUE)
-				cout << ") ";
+				printf(") ");
 			else
-				cout << ")* ";
+				printf(")* ");
 			delete fNormal;
 			codim2Act = fAct->codim2Ptr;
-			cout << " Codim2: ";
+			printf(" Codim2: ");
 			while(codim2Act!=NULL)
 			{
 				intvec *f2Normal;
 				f2Normal = codim2Act->getFacetNormal();
-				cout << "(";
-				f2Normal->show(1,0);
-				cout << ") ";
+				printf("(");f2Normal->show(1,0);printf(") ");
 				delete f2Normal;
 				codim2Act = codim2Act->next;
 			}
-			cout << "UCN = " << fAct->getUCN() << endl;				
+			printf("UCN = %i",fAct->getUCN());
 			fAct = fAct->next;
 		}
 	}
@@ -753,14 +743,14 @@ static volatile void showSLA(facet &f)
 static void idDebugPrint(const ideal &I)
 {
 	int numElts=IDELEMS(I);
-	cout << "Ideal with " << numElts << " generators" << endl;
-	cout << "Leading terms: ";
+	printf("Ideal with %i generators\n", numElts);
+	printf("Leading terms: ");
 	for (int ii=0;ii<numElts;ii++)
 	{
 		pWrite0(pHead(I->m[ii]));
-		cout << ",";
+		printf(",");
 	}
-	cout << endl;
+	printf("\n");
 }
 
 static void invPrint(const ideal &I)
@@ -1123,9 +1113,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 				fAct->setFacetNormal(load);
 				fAct->setUCN(this->getUCN());
 #ifdef gfan_DEBUG
-				cout << "Marking facet (";
-				load->show(1,0);
-				cout << ") as non flippable" << endl;				
+				printf("Marking facet (");load->show(1,0);printf(") as non flippable\n");		
 #endif
 			}
 			else
@@ -1720,11 +1708,9 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	fNormal = f->getFacetNormal();	//read this->fNormal;
 #ifdef gfan_DEBUG
 // 	std::cout << "running gcone::flip" << std::endl;
-	std::cout << "flipping UCN " << this->getUCN();
-	cout << " over facet (";
+	printf("flipping UCN %i over facet",this->getUCN());
 	fNormal->show(1,0);
-	cout << ") with UCN " << f->getUCN();
-	std::cout << std::endl;
+	printf(") with UCN %i\n",f->getUCN() );	
 #endif
 	if(this->getUCN() != f->getUCN())
 	{
@@ -2057,10 +2043,9 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 // 	idDelete(&dstRing_I);
 	f->flipRing=rCopy(dstRing);	//store the ring on the other side
 #ifdef gfan_DEBUG
- 	cout << "Flipped GB is UCN " << counter+1 << ":" << endl;
- 	this->idDebugPrint(dstRing_I);
-// 	idPrint(dstRing_I);
-	cout << endl;
+ 	printf("Flipped GB is UCN %i:\n",counter+1);
+ 	idDebugPrint(dstRing_I);
+	printf("\n");
 #endif	
 	idDelete(&dstRing_I);	
 	rChangeCurrRing(srcRing);	//return to the ring we started the computation of flipGB in
@@ -2086,7 +2071,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 * Pro: No messing around with readConeFromFile()
 * Is there a way to construct a vector from \f$ \omega \f$ and the facet normal?
 */
-inline void gcone::flip2(const ideal gb, facet *f)
+inline void gcone::flip2(const ideal &gb, facet *f)
 {
 #ifdef gfanp
 	timeval start, end;
@@ -2095,14 +2080,12 @@ inline void gcone::flip2(const ideal gb, facet *f)
 	const intvec *fNormal;
 	fNormal = f->getRef2FacetNormal();/*->getFacetNormal();*/	//read this->fNormal;
 #ifdef gfan_DEBUG
-	std::cout << "flipping UCN " << this->getUCN();
-	cout << " over facet (";
+	printf("flipping UCN %i over facet(",this->getUCN());
 	fNormal->show(1,0);
-	cout << ") with UCN " << f->getUCN();
-	std::cout << std::endl;
+	printf(") with UCN %i\n",f->getUCN());	
 #endif
 	if(this->getUCN() != f->getUCN())
-	{	cout << this->getUCN() << " vs " << f->getUCN() << endl;
+	{	printf("%i vs %i\n",this->getUCN(), f->getUCN() );
 		WerrorS("Uh oh... Trying to flip over facet with incompatible UCN");
 		exit(-1);
 	}
@@ -2549,12 +2532,12 @@ void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M here since
 	lpSol=dd_CopyLPSolution(lpInt);
 // 	if (err!=dd_NoError){WerrorS("Error during dd_CopyLPSolution");}
 #ifdef gfan_DEBUG
-	cout << "Interior point: ";
+	printf("Interior point: ");
 	for (int ii=1; ii<(lpSol->d)-1;ii++)
 	{
 		dd_WriteNumber(stdout,lpSol->sol[ii]);
 	}
-	cout << endl;
+	printf("\n");
 #endif			
 	//NOTE The following strongly resembles parts of makeInt. 
 	//Maybe merge sometimes
@@ -2613,156 +2596,156 @@ void gcone::interiorPoint( dd_MatrixPtr &M, intvec &iv) //no const &M here since
 * Used by noRevS
 *NOTE no longer used nor maintained. MM Mar 9, 2010
 */
-void gcone::interiorPoint2()
-{//idPrint(this->gcBasis);
-#ifdef gfan_DEBUG
-	if(this->ivIntPt!=NULL)
-		WarnS("Interior point already exists - ovrewriting!");
-#endif
-	facet *f1 = this->facetPtr;
-	facet *f2 = NULL;
-	intvec *intF1=NULL;
-	while(f1!=NULL)
-	{
-		if(f1->isFlippable)
-		{
-			facet *f1Ray = f1->codim2Ptr;
-			while(f1Ray!=NULL)
-			{
-				const intvec *check=f1Ray->getRef2FacetNormal();
-				if(iv64isStrictlyPositive(check))
-				{
-					intF1=ivCopy(check);
-					break;
-				}				
-				f1Ray=f1Ray->next;
-			}
-		}
-		if(intF1!=NULL)
-			break;
-		f1=f1->next;
-	}
-	if(f1!=NULL && f1->next!=NULL)//Choose another facet, different from f1
-		f2=f1->next;
-	else
-		f2=this->facetPtr;
-	if(intF1==NULL && hasHomInput==TRUE)
-	{
-		intF1 = new intvec(this->numVars);
-		for(int ii=0;ii<this->numVars;ii++)
-			(*intF1)[ii]=1;
-	}
-	assert(f1); assert(f2);
-	intvec *intF2=f2->getInteriorPoint();
-	mpq_t *qPosRay = new mpq_t[this->numVars];//The positive ray from above
-	mpq_t *qIntPt = new mpq_t[this->numVars];//starting vector a+((b-a)/2)
-	mpq_t *qPosIntPt = new mpq_t[this->numVars];//This should be >0 eventually
-	for(int ii=0;ii<this->numVars;ii++)
-	{
-		mpq_init(qPosRay[ii]);
-		mpq_init(qIntPt[ii]);
-		mpq_init(qPosIntPt[ii]);
-	}	
-	//Compute a+((b-a)/2) && Convert intF1 to mpq
-	for(int ii=0;ii<this->numVars;ii++)
-	{
-		mpq_t a,b;
-		mpq_init(a); mpq_init(b);
-		mpq_set_si(a,(*intF1)[ii],1);
-		mpq_set_si(b,(*intF2)[ii],1);
-		mpq_t diff;
-		mpq_init(diff);
-		mpq_sub(diff,b,a);	//diff=b-a
-		mpq_t quot;
-		mpq_init(quot);
-		mpq_div_2exp(quot,diff,1);	//quot=diff/2=(b-a)/2
-		mpq_clear(diff);
-		//Don't be clever and reuse diff here
-		mpq_t sum; mpq_init(sum);
-		mpq_add(sum,b,quot);	//sum=b+quot=a+(b-a)/2
-		mpq_set(qIntPt[ii],sum);
-		mpq_clear(sum);
-		mpq_clear(quot);
-		mpq_clear(a); mpq_clear(b);
-		//Now for intF1
-		mpq_set_si(qPosRay[ii],(*intF1)[ii],1);
-	}
-	//Now add: qPosIntPt=qPosRay+qIntPt until qPosIntPt >0
-	while(TRUE)
-	{	
-		bool success=FALSE;
-		int posCtr=0;	
-		for(int ii=0;ii<this->numVars;ii++)
-		{
-			mpq_t sum; mpq_init(sum);
-			mpq_add(sum,qPosRay[ii],qIntPt[ii]);
-			mpq_set(qPosIntPt[ii],sum);
-			mpq_clear(sum);
-			if(mpq_sgn(qPosIntPt[ii])==1)
-				posCtr++;
-		}
-		if(posCtr==this->numVars)//qPosIntPt > 0 
-			break;
-		else
-		{
-			mpq_t qTwo; mpq_init(qTwo);
-			mpq_set_ui(qTwo,2,1);
-			for(int jj=0;jj<this->numVars;jj++)
-			{
-				mpq_t tmp; mpq_init(tmp);
-				mpq_mul(tmp,qPosRay[jj],qTwo);
-				mpq_set( qPosRay[jj], tmp);
-				mpq_clear(tmp);
-			}
-			mpq_clear(qTwo);
-		}
-	}//while
-	//Now qPosIntPt ought to be >0, so convert back to int :D
-	/*Compute lcm of the denominators*/
-	mpz_t *denom = new mpz_t[this->numVars];
-	mpz_t tmp,kgV;
-	mpz_init(tmp); mpz_init(kgV);
-	for (int ii=0;ii<this->numVars;ii++)
-	{
-		mpz_t z;
-		mpz_init(z);
-		mpq_get_den(z,qPosIntPt[ii]);
-		mpz_init(denom[ii]);
-		mpz_set( denom[ii], z);
-		mpz_clear(z);				
-	}
-		
-	mpz_set(tmp,denom[0]);
-	for (int ii=0;ii<this->numVars;ii++)
-	{
-		mpz_lcm(kgV,tmp,denom[ii]);
-		mpz_set(tmp,kgV);				
-	}
-	mpz_clear(tmp);	
-	/*Multiply the nominators by kgV*/
-	mpq_t qkgV,res;
-	mpq_init(qkgV);
-	mpq_canonicalize(qkgV);		
-	mpq_init(res);
-	mpq_canonicalize(res);
-				
-	mpq_set_num(qkgV,kgV);
-	intvec *n=new intvec(this->numVars);
-	for (int ii=0;ii<this->numVars;ii++)
-	{
-		mpq_canonicalize(qPosIntPt[ii]);
-		mpq_mul(res,qkgV,qPosIntPt[ii]);
-		(*n)[ii]=(int)mpz_get_d(mpq_numref(res));
-	}
-	this->setIntPoint(n);
-	delete n;
-	delete [] qPosIntPt;
-	delete [] denom;
-	delete [] qPosRay;
-	delete [] qIntPt;
-	mpz_clear(kgV);
-	mpq_clear(qkgV); mpq_clear(res);
-}
+// void gcone::interiorPoint2()
+// {//idPrint(this->gcBasis);
+// #ifdef gfan_DEBUG
+// 	if(this->ivIntPt!=NULL)
+// 		WarnS("Interior point already exists - ovrewriting!");
+// #endif
+// 	facet *f1 = this->facetPtr;
+// 	facet *f2 = NULL;
+// 	intvec *intF1=NULL;
+// 	while(f1!=NULL)
+// 	{
+// 		if(f1->isFlippable)
+// 		{
+// 			facet *f1Ray = f1->codim2Ptr;
+// 			while(f1Ray!=NULL)
+// 			{
+// 				const intvec *check=f1Ray->getRef2FacetNormal();
+// 				if(iv64isStrictlyPositive(check))
+// 				{
+// 					intF1=ivCopy(check);
+// 					break;
+// 				}				
+// 				f1Ray=f1Ray->next;
+// 			}
+// 		}
+// 		if(intF1!=NULL)
+// 			break;
+// 		f1=f1->next;
+// 	}
+// 	if(f1!=NULL && f1->next!=NULL)//Choose another facet, different from f1
+// 		f2=f1->next;
+// 	else
+// 		f2=this->facetPtr;
+// 	if(intF1==NULL && hasHomInput==TRUE)
+// 	{
+// 		intF1 = new intvec(this->numVars);
+// 		for(int ii=0;ii<this->numVars;ii++)
+// 			(*intF1)[ii]=1;
+// 	}
+// 	assert(f1); assert(f2);
+// 	intvec *intF2=f2->getInteriorPoint();
+// 	mpq_t *qPosRay = new mpq_t[this->numVars];//The positive ray from above
+// 	mpq_t *qIntPt = new mpq_t[this->numVars];//starting vector a+((b-a)/2)
+// 	mpq_t *qPosIntPt = new mpq_t[this->numVars];//This should be >0 eventually
+// 	for(int ii=0;ii<this->numVars;ii++)
+// 	{
+// 		mpq_init(qPosRay[ii]);
+// 		mpq_init(qIntPt[ii]);
+// 		mpq_init(qPosIntPt[ii]);
+// 	}	
+// 	//Compute a+((b-a)/2) && Convert intF1 to mpq
+// 	for(int ii=0;ii<this->numVars;ii++)
+// 	{
+// 		mpq_t a,b;
+// 		mpq_init(a); mpq_init(b);
+// 		mpq_set_si(a,(*intF1)[ii],1);
+// 		mpq_set_si(b,(*intF2)[ii],1);
+// 		mpq_t diff;
+// 		mpq_init(diff);
+// 		mpq_sub(diff,b,a);	//diff=b-a
+// 		mpq_t quot;
+// 		mpq_init(quot);
+// 		mpq_div_2exp(quot,diff,1);	//quot=diff/2=(b-a)/2
+// 		mpq_clear(diff);
+// 		//Don't be clever and reuse diff here
+// 		mpq_t sum; mpq_init(sum);
+// 		mpq_add(sum,b,quot);	//sum=b+quot=a+(b-a)/2
+// 		mpq_set(qIntPt[ii],sum);
+// 		mpq_clear(sum);
+// 		mpq_clear(quot);
+// 		mpq_clear(a); mpq_clear(b);
+// 		//Now for intF1
+// 		mpq_set_si(qPosRay[ii],(*intF1)[ii],1);
+// 	}
+// 	//Now add: qPosIntPt=qPosRay+qIntPt until qPosIntPt >0
+// 	while(TRUE)
+// 	{	
+// 		bool success=FALSE;
+// 		int posCtr=0;	
+// 		for(int ii=0;ii<this->numVars;ii++)
+// 		{
+// 			mpq_t sum; mpq_init(sum);
+// 			mpq_add(sum,qPosRay[ii],qIntPt[ii]);
+// 			mpq_set(qPosIntPt[ii],sum);
+// 			mpq_clear(sum);
+// 			if(mpq_sgn(qPosIntPt[ii])==1)
+// 				posCtr++;
+// 		}
+// 		if(posCtr==this->numVars)//qPosIntPt > 0 
+// 			break;
+// 		else
+// 		{
+// 			mpq_t qTwo; mpq_init(qTwo);
+// 			mpq_set_ui(qTwo,2,1);
+// 			for(int jj=0;jj<this->numVars;jj++)
+// 			{
+// 				mpq_t tmp; mpq_init(tmp);
+// 				mpq_mul(tmp,qPosRay[jj],qTwo);
+// 				mpq_set( qPosRay[jj], tmp);
+// 				mpq_clear(tmp);
+// 			}
+// 			mpq_clear(qTwo);
+// 		}
+// 	}//while
+// 	//Now qPosIntPt ought to be >0, so convert back to int :D
+// 	/*Compute lcm of the denominators*/
+// 	mpz_t *denom = new mpz_t[this->numVars];
+// 	mpz_t tmp,kgV;
+// 	mpz_init(tmp); mpz_init(kgV);
+// 	for (int ii=0;ii<this->numVars;ii++)
+// 	{
+// 		mpz_t z;
+// 		mpz_init(z);
+// 		mpq_get_den(z,qPosIntPt[ii]);
+// 		mpz_init(denom[ii]);
+// 		mpz_set( denom[ii], z);
+// 		mpz_clear(z);				
+// 	}
+// 		
+// 	mpz_set(tmp,denom[0]);
+// 	for (int ii=0;ii<this->numVars;ii++)
+// 	{
+// 		mpz_lcm(kgV,tmp,denom[ii]);
+// 		mpz_set(tmp,kgV);				
+// 	}
+// 	mpz_clear(tmp);	
+// 	/*Multiply the nominators by kgV*/
+// 	mpq_t qkgV,res;
+// 	mpq_init(qkgV);
+// 	mpq_canonicalize(qkgV);		
+// 	mpq_init(res);
+// 	mpq_canonicalize(res);
+// 				
+// 	mpq_set_num(qkgV,kgV);
+// 	intvec *n=new intvec(this->numVars);
+// 	for (int ii=0;ii<this->numVars;ii++)
+// 	{
+// 		mpq_canonicalize(qPosIntPt[ii]);
+// 		mpq_mul(res,qkgV,qPosIntPt[ii]);
+// 		(*n)[ii]=(int)mpz_get_d(mpq_numref(res));
+// 	}
+// 	this->setIntPoint(n);
+// 	delete n;
+// 	delete [] qPosIntPt;
+// 	delete [] denom;
+// 	delete [] qPosRay;
+// 	delete [] qIntPt;
+// 	mpz_clear(kgV);
+// 	mpq_clear(qkgV); mpq_clear(res);
+// }
 	
 /** \brief Copy a ring and add a weighted ordering in first place
  * 
@@ -2845,14 +2828,14 @@ ring gcone::rCopyAndAddWeight2(const ring &r,const intvec *ivw, const intvec *fN
 }
 		
 //NOTE not needed anywhere
-ring rCopyAndChangeWeight(ring const &r, intvec *ivw)
-{
-	ring res=rCopy0(currRing);
-	rComplete(res);
-	rSetWeightVec(res,(int64*)ivw);
-	//rChangeCurrRing(rnew);
-	return res;
-}
+// ring rCopyAndChangeWeight(ring const &r, intvec *ivw)
+// {
+// 	ring res=rCopy0(currRing);
+// 	rComplete(res);
+// 	rSetWeightVec(res,(int64*)ivw);
+// 	//rChangeCurrRing(rnew);
+// 	return res;
+// }
 		
 /** \brief Checks whether a given facet is a search facet
  * Determines whether a given facet of a cone is the search facet of a neighbouring cone
@@ -3029,8 +3012,8 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 	int UCNcounter=gcAct->getUCN();
 	
 #ifdef gfan_DEBUG
-	cout << "NoRevs" << endl;
-	cout << "Facets are:" << endl;
+	printf("NoRevs\n");
+	printf("Facets are:\n");
 	gcAct->showFacets();
 #endif			
 	/*Compute lineality space here
@@ -3218,7 +3201,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
  			}			
 #ifdef gfan_DEBUG
 			if(SearchListRoot!=NULL)
-				gcTmp->showSLA(*SearchListRoot);
+				showSLA(*SearchListRoot);
 #endif			
 			rChangeCurrRing(gcAct->baseRing);
 			rDelete(rTmp);
@@ -3300,7 +3283,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 		UCNcounter++;
 		SearchListAct = SearchListRoot;
 	}
-	cout << endl << "Found " << counter << " cones - terminating" << endl;
+	printf("\nFound %i cones - terminating\n", counter);
 }//void noRevS(gcone &gc)	
 		
 		
@@ -3532,7 +3515,7 @@ facet * gcone::enqueueNewFacets(facet *f)
 				removalOccured=FALSE;
 				slNormal = slAct->getFacetNormal();
 #ifdef gfan_DEBUG
-				cout << "Checking facet (";fNormal->show(1,1);cout << ") against (";slNormal->show(1,1);cout << ")" << endl;
+				printf("Checking facet (");fNormal->show(1,1);printf(") against (");slNormal->show(1,1);printf(")\n");
 #endif				
 // 				if( (areEqual(fAct,slAct) && (!areEqual2(fAct,slAct)) ))
 // 					exit(-1);
@@ -3563,7 +3546,7 @@ facet * gcone::enqueueNewFacets(facet *f)
 // 						deleteMarker=NULL;
 					}
 #ifdef gfan_DEBUG
-					cout << "Removing (";fNormal->show(1,1);cout << ") from list" << endl;
+					printf("Removing (");fNormal->show(1,1);printf(") from list\n");
 #endif
 					delete slNormal;
 					break;//leave the while loop, since we found fAct=slAct thus delete slAct and do not add fAct
@@ -3713,7 +3696,7 @@ facet * gcone::enqueue2(facet *f)
 			{
 				removalOccured=FALSE;
 #ifdef gfan_DEBUG
-cout << "Checking facet (";fAct->fNormal->show(1,1);cout << ") against (";slAct->fNormal->show(1,1);cout << ")" << endl;
+	printf("Checking facet (");fAct->fNormal->show(1,1);printf(") against (");slAct->fNormal->show(1,1);printf(")\n");
 #endif	
 				if(areEqual2(fAct,slAct))
 				{
@@ -3737,7 +3720,7 @@ cout << "Checking facet (";fAct->fNormal->show(1,1);cout << ") against (";slAct-
 					removalOccured=TRUE;
 					gcone::lengthOfSearchList--;
 #ifdef gfan_DEBUG
-cout << "Removing (";fAct->fNormal->show(1,1);cout << ") from list" << endl;
+printf("Removing (");fAct->fNormal->show(1,1);printf(") from list");
 #endif
 					fDeleteMarker->shallowDelete();//Sets everything to NULL
 // 					delete(marker);
@@ -3847,35 +3830,35 @@ static int intgcd(const int &a, const int &b)
 /** \brief Construct a dd_MatrixPtr from a cone's list of facets
  * NO LONGER USED
  */
-inline dd_MatrixPtr gcone::facets2Matrix(const gcone &gc)
-{
-	facet *fAct;
-	fAct = gc.facetPtr;
-	
-	dd_MatrixPtr M;
-	dd_rowrange ddrows;
-	dd_colrange ddcols;
-	ddcols=(this->numVars)+1;
-	ddrows=this->numFacets;
-	dd_NumberType numb = dd_Integer;
-	M=dd_CreateMatrix(ddrows,ddcols);			
-			
-	int jj=0;
-	
-	while(fAct!=NULL)
-	{
-		intvec *comp;
-		comp = fAct->getFacetNormal();
-		for(int ii=0;ii<this->numVars;ii++)
-		{
-			dd_set_si(M->matrix[jj][ii+1],(*comp)[ii]);
-		}
-		jj++;
-		delete comp;
-		fAct=fAct->next;				
-	}			
-	return M;
-}
+// inline dd_MatrixPtr gcone::facets2Matrix(const gcone &gc)
+// {
+// 	facet *fAct;
+// 	fAct = gc.facetPtr;
+// 	
+// 	dd_MatrixPtr M;
+// 	dd_rowrange ddrows;
+// 	dd_colrange ddcols;
+// 	ddcols=(this->numVars)+1;
+// 	ddrows=this->numFacets;
+// 	dd_NumberType numb = dd_Integer;
+// 	M=dd_CreateMatrix(ddrows,ddcols);			
+// 			
+// 	int jj=0;
+// 	
+// 	while(fAct!=NULL)
+// 	{
+// 		intvec *comp;
+// 		comp = fAct->getFacetNormal();
+// 		for(int ii=0;ii<this->numVars;ii++)
+// 		{
+// 			dd_set_si(M->matrix[jj][ii+1],(*comp)[ii]);
+// 		}
+// 		jj++;
+// 		delete comp;
+// 		fAct=fAct->next;				
+// 	}			
+// 	return M;
+// }
 		
 /** \brief Write information about a cone into a file on disk
  *
@@ -3919,7 +3902,7 @@ void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 			
 	if (!gcOutputFile)
 	{
-		cout << "Error opening file for writing in writeConeToFile" << endl;
+		WerrorS("Error opening file for writing in writeConeToFile\n");
 	}
 	else
 	{	
@@ -4343,7 +4326,7 @@ float gcone::time_flip2;
 float gcone::t_areEqual;
 float gcone::t_markings;
 float gcone::t_dd;
-float gcone::t_kStd;
+float gcone::t_kStd=0;
 float gcone::time_enqueue;
 float gcone::time_computeInv;
 float gcone::t_ddMC;
@@ -4408,23 +4391,19 @@ lists gfan(ideal inputIdeal, int h)
 			if(isMonomial(gcAct->gcBasis))
 			{//FIXME
 				WerrorS("Monomial input - terminating");
-				lResList->Init(1);
-// 				exit(-1);
-// 				gcAct->getConeNormals(gcAct->gcBasis);
-// 				lResList=lprepareResult(gcAct,1);
 				dd_free_global_constants();
 				//This is filthy
-				return lResList;
+				goto pointOfNoReturn;
+				//return lResList;
 			}			
 			gcAct->getConeNormals(gcAct->gcBasis);
 			gcone::dd_LinealitySpace = gcAct->computeLinealitySpace();
 			gcAct->getExtremalRays(*gcAct);
 			gcAct->noRevS(*gcAct);	//Here we go!
 			//Switch back to the ring the computation was started in
-// 			rChangeCurrRing(inputRing);
+			//rChangeCurrRing(inputRing);
 			//res=gcAct->gcBasis;
-			//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS
-// 			res = inputIdeal; 
+			//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS			
 			lResList=lprepareResult(gcRoot,gcRoot->getCounter());
 			/*Cleanup*/
 			gcone *gcDel;	
@@ -4443,13 +4422,9 @@ lists gfan(ideal inputIdeal, int h)
 	else
 	{
 		//Simply return an empty list
-		WerrorS("Ring has non-global ordering - terminating");
-		lResList->Init(1);
-// 		lResList->m[0].rtyp=INT_CMD;
-// 		int ires=0;
-// 		lResList->m[0].data=(void*)&ires;
+		WerrorS("Ring has non-global ordering.\nThis function requires your current ring to be endowed with a global ordering.\n Now terminating!");
+		goto pointOfNoReturn;
 	}
-	//gcone::counter=0;
 	/*Return result*/
 #ifdef gfanp
 	cout << endl << "t_getConeNormals:" << gcone::time_getConeNormals << endl;
@@ -4474,8 +4449,8 @@ lists gfan(ideal inputIdeal, int h)
 	cout << "Checked " << gcone::numberOfFacetChecks << " Facets" << endl;
 	cout << " out of which there were " << gcone::parallelButNotEqual << " parallel but not equal." << endl;
 #endif
-	cout << "Maximum lenght of list of facets: " << gcone::maxSize << endl;
-
+	printf("Maximum lenght of list of facets: %i", gcone::maxSize);
+pointOfNoReturn:
 	return lResList;
 }
 

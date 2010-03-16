@@ -64,7 +64,7 @@ class facet
 		int numCodim2Facets;	//#of (codim-2)-facets of this facet. Set in getCodim2Normals()
 		unsigned numRays;	//Number of spanning rays of the facet
 		ring flipRing;		//the ring on the other side of the facet
-		intvec **fRays;
+// 		intvec **fRays;
 				
 		/** The default constructor. */
 		facet();
@@ -222,25 +222,24 @@ class gcone
 		void getCodim2Normals(const gcone &gc);
 		void getExtremalRays(const gcone &gc);
 		void flip(ideal gb, facet *f);
-		void flip2(const ideal gb, facet *f);
+		void flip2(const ideal &gb, facet *f);
 		void computeInv(const ideal &gb, ideal &inv, const intvec &f);
 		//poly restOfDiv(poly const &f, ideal const &I); removed with r12286
 		inline ideal ffG(const ideal &H, const ideal &G);
 		inline void getGB(ideal const &inputIdeal);		
-		void interiorPoint( dd_MatrixPtr &M, intvec &iv);
-		void interiorPoint2(); //removed Feb 8th, 2010, new method Feb 19th, 2010
+		void interiorPoint( dd_MatrixPtr &M, intvec &iv);//used from flip and optionally from getConeNormals
+// 		void interiorPoint2(); //removed Feb 8th, 2010, new method Feb 19th, 2010, again removed Mar 16th, 2010
 		void preprocessInequalities(dd_MatrixPtr &M);
 		ring rCopyAndAddWeight(const ring &r, intvec *ivw);
 		ring rCopyAndAddWeight2(const ring &, const intvec *, const intvec *);
-		ring rCopyAndChangeWeight(const ring &r, intvec *ivw);		
+// 		ring rCopyAndChangeWeight(const ring &r, intvec *ivw);	//NOTE remove	
 // 		void reverseSearch(gcone *gcAct); //NOTE both removed from r12286
-// 		bool isSearchFacet(gcone &gcTmp, facet *testfacet);
-// 		void noRevS(gcone &gcRoot, bool usingIntPoint=FALSE);
+// 		bool isSearchFacet(gcone &gcTmp, facet *testfacet); //NOTE remove
 		void makeInt(const dd_MatrixPtr &M, const int line, intvec &n);
-// 		void normalize();
+// 		void normalize();//NOTE REMOVE
 		facet * enqueueNewFacets(facet *f);
 		facet * enqueue2(facet *f);
-		dd_MatrixPtr facets2Matrix(const gcone &gc);
+// 		dd_MatrixPtr facets2Matrix(const gcone &gc);//NOTE remove
 		/** Compute the lineality space Ax=0 and return it as dd_MatrixPtr dd_LinealitySpace*/
 		dd_MatrixPtr computeLinealitySpace();
 		inline bool iv64isStrictlyPositive(const intvec *);
