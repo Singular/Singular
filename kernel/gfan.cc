@@ -3187,17 +3187,18 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			*/
  			idDelete((ideal *)&fAct->flipGB);
 			rDelete(fAct->flipRing);
-			
-			gcTmp->getConeNormals(gcTmp->gcBasis, FALSE);	//TODO FALSE is default, so should not be needed here
+
+			gcTmp->getConeNormals(gcTmp->gcBasis/*, FALSE*/);	//TODO FALSE is default, so should not be needed here
 // 			gcTmp->getCodim2Normals(*gcTmp);
 			gcTmp->getExtremalRays(*gcTmp);
-// 			gcTmp->normalize();// will be done in g2c 
-			//gcTmp->ddFacets should not be needed anymore, so
+
+
 // 			//NOTE If flip2 is used we need to get an interior point of gcTmp
 // 			// and replace gcTmp->baseRing with an appropriate ring with only
 // 			// one weight
 // 			gcTmp->interiorPoint2();
 			gcTmp->replaceDouble_ringorder_a_ByASingleOne();
+			//gcTmp->ddFacets should not be needed anymore, so
 			dd_FreeMatrix(gcTmp->ddFacets);
 #ifdef gfan_DEBUG
 // 			gcTmp->showFacets(1);
@@ -3208,9 +3209,10 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 #else
 			SearchListRoot=gcTmp->enqueueNewFacets(SearchListRoot);
 #endif
+			gcTmp->writeConeToFile(*gcTmp);
  			if(gfanHeuristic==1)
  			{
-				gcTmp->writeConeToFile(*gcTmp);
+// 				gcTmp->writeConeToFile(*gcTmp);
  				idDelete((ideal*)&gcTmp->gcBasis);//Whonder why?
 				rDelete(gcTmp->baseRing);
  			}			
@@ -3278,6 +3280,11 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 					break;
 				}				
 			}
+// 			else if(gcNext->getUCN() < SearchListRoot->getUCN() )
+// 			{
+// 				idDelete( (ideal*)&gcNext->gcBasis );
+// 				rDelete(gcNext->baseRing);
+// 			}
 			/*else
 			{
 				if(gfanHeuristic==1)
@@ -3291,8 +3298,6 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
  			gcNext = gcNext->next;
 		}
 		UCNcounter++;
-		//SearchListAct = SearchListAct->next;
-		//SearchListAct = fAct->next;
 		SearchListAct = SearchListRoot;
 	}
 	cout << endl << "Found " << counter << " cones - terminating" << endl;
@@ -3376,59 +3381,59 @@ void gcone::makeInt(const dd_MatrixPtr &M, const int line, intvec &n)
  * (codim-2)-facet normal, i.e. a primitive vector
  * Actually we now also normalize the facet normals.
  */
-void gcone::normalize()
-{
+// void gcone::normalize()
+// {
 // 	int *ggT = new int;
 // 		*ggT=1;
-	facet *fAct;
-	facet *codim2Act;
-	fAct = this->facetPtr;
-	codim2Act = fAct->codim2Ptr;
-	while(fAct!=NULL)
-	{
-		intvec *fNormal;
-		fNormal = fAct->getFacetNormal();
-		int *ggT = new int;
-		*ggT=1;
-		for(int ii=0;ii<this->numVars;ii++)
-		{
-			*ggT=intgcd((*ggT),(*fNormal)[ii]);
-		}
-		if(*ggT>1)//We only need to do this if the ggT is non-trivial
-		{
-// 			intvec *fCopy = fAct->getFacetNormal();
-			for(int ii=0;ii<this->numVars;ii++)
-				(*fNormal)[ii] = ((*fNormal)[ii])/(*ggT);
-			fAct->setFacetNormal(fNormal);
-		}		
-		delete fNormal;
-		delete ggT;
-		/*And now for the codim2*/
-		while(codim2Act!=NULL)
-		{				
-			intvec *n;
-			n=codim2Act->getFacetNormal();
-			int *ggT=new int;
-			*ggT=1;
-			for(int ii=0;ii<this->numVars;ii++)
-			{
-				*ggT = intgcd((*ggT),(*n)[ii]);
-			}
-			if(*ggT>1)
-			{
-				for(int ii=0;ii<this->numVars;ii++)
-				{
-					(*n)[ii] = ((*n)[ii])/(*ggT);
-				}
-				codim2Act->setFacetNormal(n);
-			}
-			codim2Act = codim2Act->next;
-			delete n;
-			delete ggT;
-		}
-		fAct = fAct->next;
-	}
-}
+// 	facet *fAct;
+// 	facet *codim2Act;
+// 	fAct = this->facetPtr;
+// 	codim2Act = fAct->codim2Ptr;
+// 	while(fAct!=NULL)
+// 	{
+// 		intvec *fNormal;
+// 		fNormal = fAct->getFacetNormal();
+// 		int *ggT = new int;
+// 		*ggT=1;
+// 		for(int ii=0;ii<this->numVars;ii++)
+// 		{
+// 			*ggT=intgcd((*ggT),(*fNormal)[ii]);
+// 		}
+// 		if(*ggT>1)//We only need to do this if the ggT is non-trivial
+// 		{
+// // 			intvec *fCopy = fAct->getFacetNormal();
+// 			for(int ii=0;ii<this->numVars;ii++)
+// 				(*fNormal)[ii] = ((*fNormal)[ii])/(*ggT);
+// 			fAct->setFacetNormal(fNormal);
+// 		}		
+// 		delete fNormal;
+// 		delete ggT;
+// 		/*And now for the codim2*/
+// 		while(codim2Act!=NULL)
+// 		{				
+// 			intvec *n;
+// 			n=codim2Act->getFacetNormal();
+// 			int *ggT=new int;
+// 			*ggT=1;
+// 			for(int ii=0;ii<this->numVars;ii++)
+// 			{
+// 				*ggT = intgcd((*ggT),(*n)[ii]);
+// 			}
+// 			if(*ggT>1)
+// 			{
+// 				for(int ii=0;ii<this->numVars;ii++)
+// 				{
+// 					(*n)[ii] = ((*n)[ii])/(*ggT);
+// 				}
+// 				codim2Act->setFacetNormal(n);
+// 			}
+// 			codim2Act = codim2Act->next;
+// 			delete n;
+// 			delete ggT;
+// 		}
+// 		fAct = fAct->next;
+// 	}
+// }
 
 /** \brief Enqueue new facets into the searchlist 
  * The searchlist (SLA for short) is implemented as a FIFO
@@ -4158,8 +4163,32 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 				pDelete(&resPoly);	//reset
 // 				pDelete(&strPoly);	//NOTE Crashes - already deleted by pAdd				
 			}
-			break;
-		}//if(line=="GCBASIS")		
+// 			break;
+		}//if(line=="GCBASIS")	
+		if(line=="FACETS")
+		{
+			facet *fAct=gc->facetPtr;
+			for(int ll=0;ll<this->numFacets;ll++)
+			{
+				getline(gcInputFile,line);
+				found = line.find("\t");
+				string normalString=line.substr(0,found);
+				intvec *fN = new intvec(this->numVars);
+				for(int ii=0;ii<this->numVars;ii++)
+				{
+					string component;
+					found = normalString.find(",");
+					component=normalString.substr(0,found);
+					(*fN)[ii]=atol(component.c_str());
+					normalString.erase(0,found+1);
+				}
+				/*Only the following line needs to be commented out if you decide not to delete fNormals*/
+// 				fAct->setFacetNormal(fN);
+				delete(fN);
+				fAct = fAct->next;	//Booh, this is ugly
+			}			
+			break; //NOTE Must always be in the last if-block!
+		}
 	}//while(!gcInputFile.eof())	
 	gcInputFile.close();
 	rChangeCurrRing(saveRing);

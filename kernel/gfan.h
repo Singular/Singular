@@ -237,7 +237,7 @@ class gcone
 // 		bool isSearchFacet(gcone &gcTmp, facet *testfacet);
 // 		void noRevS(gcone &gcRoot, bool usingIntPoint=FALSE);
 		void makeInt(const dd_MatrixPtr &M, const int line, intvec &n);
-		void normalize();
+// 		void normalize();
 		facet * enqueueNewFacets(facet *f);
 		facet * enqueue2(facet *f);
 		dd_MatrixPtr facets2Matrix(const gcone &gc);
