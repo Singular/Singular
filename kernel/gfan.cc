@@ -110,7 +110,6 @@ facet::facet()
 	this->numCodim2Facets=0;
 	this->numRays=0;
 	this->flipGB=NULL;
-	this->isIncoming=FALSE;
 	this->next=NULL;
 	this->prev=NULL;		
 	this->flipRing=NULL;	//the ring on the other side
@@ -134,7 +133,6 @@ facet::facet(const int &n)
 	this->numCodim2Facets=0;
 	this->numRays=0;
 	this->flipGB=NULL;
-	this->isIncoming=FALSE;
 	this->next=NULL;
 	this->prev=NULL;
 	this->flipRing=NULL;
@@ -254,7 +252,7 @@ facet::~facet()
 	this->next=NULL;
 }
 		
-inline const intvec *facet::getRef2FacetNormal()
+inline const intvec *facet::getRef2FacetNormal() const
 {
 	return(this->fNormal);
 }	
@@ -415,14 +413,14 @@ inline void facet::setFacetNormal(intvec *iv)
 * [...]
 * delete(iv);
 */
-inline intvec *facet::getFacetNormal()
+inline intvec *facet::getFacetNormal() const
 {				
 	return ivCopy(this->fNormal);
 // 	return this->fNormal;
 }
 
 /** Method to print the facet normal*/
-inline void facet::printNormal()
+inline void facet::printNormal() const
 {
 	fNormal->show();
 }
@@ -4026,32 +4024,14 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 				line.erase(0,line.find_first_of(",)")+1);
 			}
 			found = line.find("a(");
-// 			intvec *iv2=new intvec(this->numVars);
-// 			if(found!=string::npos)
-// 			{
-// 				line.erase(0,found+2);
-// 				string strweight2=line.substr(0,line.find_first_of(")"));	
-// 				for(int ii=0;ii<this->numVars;ii++)
-// 				{
-// 					string weight;
-// 					weight=line.substr(0,line.find_first_of(",)"));
-// 					(*iv2)[ii]=atol(weight.c_str());
-// 					line.erase(0,line.find_first_of(",)")+1);
-// 				}
-// 			}
 			
 			ring newRing;
 			if(currRing->order[0]!=ringorder_a)
 			{
-// 				if(iv2!=NULL)
-// 					newRing=rCopyAndAddWeight2(currRing,iv,iv2);
-// 				else
 					newRing=rCopyAndAddWeight(currRing,iv);
 			}
 			else
 			{ 	
-// 				if(iv2==NULL)
-// 				{
 					newRing=rCopy0(currRing);
 					int length=this->numVars;
 					int *A=(int *)omAlloc0(length*sizeof(int));
@@ -4062,28 +4042,8 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 					omFree(newRing->wvhdl[0]);
 					newRing->wvhdl[0]=(int*)A;
 					newRing->block1[0]=length;
-// 				}
-// 				else
-// 				{
-// 					newRing=rCopy0(currRing);
-// 					int length=this->numVars;
-// 					int *A1=(int *)omAlloc0(length*sizeof(int));
-// 					int *A2=(int *)omAlloc0(length*sizeof(int));
-// 					for(int jj=0;jj<length;jj++)
-// 					{
-// 						A1[jj]=(*iv2)[jj];
-// 						A2[jj]=(*iv)[jj];								
-// 					}
-// 					omFree(newRing->wvhdl[0]);
-// 					newRing->wvhdl[0]=(int*)A1;
-// 					newRing->block1[0]=length;
-// 					if(newRing->wvhdl[1]!=NULL)
-// 						omFree(newRing->wvhdl[0]);
-// 					newRing->block1[1]=length;
-// 				}
 			}
 			delete iv;
-// 			delete iv2;
  			rComplete(newRing);
 			gc->baseRing=rCopy(newRing);
 			rDelete(newRing);

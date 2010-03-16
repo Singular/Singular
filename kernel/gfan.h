@@ -21,20 +21,8 @@ $Id$
 #include "../../cddlib/include/cddmp.h"
 #endif
 extern int gfanHeuristic;
-// extern dd_MatrixPtr ddLinealitySpace;
 
-// #ifdef gfanp
-// extern	static float time_getConeNormals;
-// extern	static float time_getCodim2Normals;
-// extern	static float time_flip;
-// extern	static float time_enqueue;
-// extern	static float time_computeInv;
-// #endif
-//ideal getGB(ideal inputIdeal);
-// ideal gfan(ideal inputIdeal, int heuristic);
 lists gfan(ideal inputIdeal, int heuristic);
-//int dotProduct(intvec a, intvec b);
-//bool isParallel(intvec a, intvec b);
 
 class facet
 {
@@ -69,7 +57,7 @@ class facet
 	 	* not intersect with the positive orthant. This check is done in gcone::getCodim2Normals
 		 */	
 		bool isFlippable;	//**flippable facet? */
-		bool isIncoming;	//Is the facet incoming or outgoing in the reverse search?
+		//bool isIncoming;	//Is the facet incoming or outgoing in the reverse search? No longer in use
 		facet *next;		//Pointer to next facet
 		facet *prev;		//Pointer to predecessor. Needed for the SearchList in noRevS
 		facet *codim2Ptr;	//Pointer to (codim-2)-facet. Bit of recursion here ;-)
@@ -92,15 +80,15 @@ class facet
 		/** Comparison operator*/
 // 		inline bool operator==(const facet *f,const facet *g);			
 		/** \brief Comparison of facets*/
-		inline bool areEqual(facet *f, facet *g);
+// 		inline bool areEqual(facet *f, facet *g);//Now static
 		/** Stores the facet normal \param intvec*/
 		inline void setFacetNormal(intvec *iv);
 		/** Returns the facet normal */
-		inline intvec *getFacetNormal();
+		inline intvec *getFacetNormal() const;
 		/** Return a reference to the facet normal*/
-		inline const intvec *getRef2FacetNormal();
+		inline const intvec *getRef2FacetNormal() const;
 		/** Method to print the facet normal*/
-		inline void printNormal();
+		inline void printNormal() const;
 		/** Store the flipped GB*/
 		inline void setFlipGB(ideal I);
 		/** Return the flipped GB*/
@@ -135,7 +123,6 @@ class facet
 class gcone
 {
 	private:		
-		//ring rootRing;		//good to know this -> generic walk
 		ideal inputIdeal;	//the original
 		ring baseRing;		//the basering of the cone				
 		intvec *ivIntPt;	//an interior point of the cone
@@ -271,8 +258,8 @@ static void idDebugPrint(const ideal &I);
 static volatile void showSLA(facet &f);
 static bool isMonomial(const ideal &I);
 static bool ivAreEqual(const intvec &a, const intvec &b);
-static bool areEqual2(facet* f, facet *g);
-static bool areEqual( facet *f,  facet *g);
+static bool areEqual2(facet *f, facet *g);
+static bool areEqual( facet *f, facet *g);
 // bool iv64isStrictlyPositive(intvec *);
 #endif
 #endif
