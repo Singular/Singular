@@ -1,3 +1,4 @@
+- memory leaks fixed for nc rings (trac 213)
 - documentation updates: primdec.lib, PLURAL
 - new lib: surfsig.lib (renamed from signature.lib)
 - memory leaks fixed: nlGcd, nc_ReduceSpolyNew
