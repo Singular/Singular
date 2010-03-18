@@ -426,6 +426,7 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
       v = gnc_mm_Mult_nn(M, P, r);
     }
     v = p_Mult_nn(v,cOut,r);
+    n_Delete(&cOut,r);
     p_SetCompP(v,expOut,r);
 
     sum += v;
