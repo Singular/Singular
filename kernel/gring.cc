@@ -3157,7 +3157,6 @@ BOOLEAN nc_CallPlural(
   if (r->GetNC() != NULL)
     nc_rKill(r);
 
-  r->ref++; // ?
   r->GetNC() = nc_new;
 
   if( currRing != save )
