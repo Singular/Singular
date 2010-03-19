@@ -1963,18 +1963,20 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
   poly pp= nc_mm_Mult_pp(m,p,currRing);
   assume(pp!=NULL);
   pDelete(&m);
-  number n=nCopy(pGetCoeff(pp));
+  number n=pGetCoeff(pp);
   number nn;
   if (!n_IsMOne(n,currRing))
   {
     nn=nNeg(nInvers(n));
+    n=nMult(nn,pGetCoeff(kBucketGetLm(b)));
+    nDelete(&nn);
+    pp=p_Mult_nn(pp,n,currRing);
+    nDelete(&n);
   }
-  else nn=nInit(1);
-  nDelete(&n);
-  n=nMult(nn,pGetCoeff(kBucketGetLm(b)));
-  nDelete(&nn);
-  pp=p_Mult_nn(pp,n,currRing);
-  nDelete(&n);
+  else
+  {
+    pp=p_Mult_nn(pp,pGetCoeff(kBucketGetLm(b)),currRing);
+  }
   int l=pLength(pp);
   kBucket_Add_q(b,pp,&l);
 }
@@ -2129,7 +2131,7 @@ inline void nc_PolyPolyRedOld(poly &b, poly p, number *c)
 {
   // b will not by multiplied by any constant in this impl.
   // ==> *c=1
-  *c=nInit(1);
+  if (c!=NULL) *c=nInit(1);
   poly m=pOne();
   pExpVectorDiff(m,pHead(b),p);
   //pSetm(m);
@@ -2140,20 +2142,20 @@ inline void nc_PolyPolyRedOld(poly &b, poly p, number *c)
   assume(pp!=NULL);
 
   pDelete(&m);
-  number n=nCopy(pGetCoeff(pp));
-  number MinusOne=nInit(-1);
+  number n=pGetCoeff(pp);
   number nn;
-  if (!nEqual(n,MinusOne))
+  if (!nIsMOne(n))
   {
     nn=nNeg(nInvers(n));
+    n=nMult(nn,pGetCoeff(b));
+    nDelete(&nn);
+    pp=p_Mult_nn(pp,n,currRing);
+    nDelete(&n);
   }
-  else nn=nInit(1);
-  nDelete(&n);
-  n=nMult(nn,pGetCoeff(b));
-  nDelete(&nn);
-  pp=p_Mult_nn(pp,n,currRing);
-  nDelete(&n);
-  nDelete(&MinusOne);
+  else
+  {
+    pp=p_Mult_nn(pp,pGetCoeff(b),currRing);
+  }
   b=p_Add_q(b,pp,currRing);
 }
 
@@ -2242,15 +2244,17 @@ inline void nc_PolyPolyRedNew(poly &b, poly p, number *c)
 
   if (!n_IsMOne(n, currRing)) // TODO: as above.
   {
-    nn=nNeg(nInvers(nCopy(n)));
+    nn=nNeg(nInvers(n));
+    number t = nMult(nn, pGetCoeff(b));
+    nDelete(&nn);
+    pp=p_Mult_nn(pp, t, currRing);
+    nDelete(&t);
   }
-  else nn=nInit(1);
+  else
+  {
+    pp=p_Mult_nn(pp, pGetCoeff(b), currRing);
+  }
 
-  number t = nMult(nn, pGetCoeff(b));
-  nDelete(&nn);
-
-  pp=p_Mult_nn(pp, t, currRing);
-  nDelete(&t);
 
   b=p_Add_q(b,pp,currRing);
 

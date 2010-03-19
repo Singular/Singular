@@ -1094,8 +1094,9 @@ BOOLEAN nlIsMOne (number a)
   if (a==NULL) return FALSE;
   nlTest(a);
 #endif
-  if (SR_HDL(a) & SR_INT) return (a==INT_TO_SR(-1));
-  return FALSE;
+  //if (SR_HDL(a) & SR_INT) return (a==INT_TO_SR(-1));
+  //return FALSE;
+  return  ((SR_HDL(a) & SR_INT) && (a==INT_TO_SR(-1)));
 }
 
 /*2
