@@ -21,7 +21,9 @@ vector W2 = [s^2,s^2]; NF(W2,B); //!=0
 // matrix to matrix
 matrix M2[2][2] = 1,s^2,s^2,1;
 list LW2 = division(M2,A);
+kill M,N;
 matrix M = matrix(M2); matrix N = matrix(A);
+kill T,R,U;
 matrix T = matrix(LW2[1]); matrix R = matrix(LW2[2]); matrix U  = matrix(LW2[3]);
 transpose(U)*transpose(M) - transpose(T)*transpose(N) - transpose(R); // must be 0
 tst_status(1);$
