@@ -311,10 +311,8 @@ inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
         {
           return NULL;
         }
-
         tpower ^= cpower; // compute degree of (-1).
       }
-
       cpower ^= iExp1;
     }
 
@@ -605,8 +603,7 @@ poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing)
   p_Test(pMonom, rRing);
 #endif
 
-  if( ( pPoly == NULL ) || ( pMonom == NULL ) )
-    return NULL;
+  assume( (pPoly != NULL) && (pMonom !=NULL));
 
   const int iComponentMonomM = p_GetComp(pMonom, rRing);
 
@@ -2044,7 +2041,8 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
   /* complete reduction of the standard basis--------- */
 
-  if (TEST_OPT_REDSB){
+  if (TEST_OPT_REDSB)
+  {
     completeReduce(strat);
   }
 

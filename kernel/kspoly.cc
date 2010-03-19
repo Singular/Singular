@@ -75,18 +75,15 @@ int ksReducePoly(LObject* PR,
     // for the time being: we know currRing==strat->tailRing
     // no exp-bound checking needed 
     // (only needed if exp-bound(tailring)<exp-b(currRing))
-    number c;
-    if (PR->bucket!=NULL)  nc_kBucketPolyRed(PR->bucket, p2,&c);
+    if (PR->bucket!=NULL)  nc_kBucketPolyRed(PR->bucket, p2,coef);
     else 
     {
       poly _p = (PR->t_p != NULL ? PR->t_p : PR->p);
       assume(_p != NULL);
-      nc_PolyPolyRed(_p, p2,&c);
+      nc_PolyPolyRed(_p, p2,coef);
       if (PR->t_p!=NULL) PR->t_p=_p; else PR->p=_p;
-      PR->pLength=pLength(_p);
+      PR->pLength=0; // usaully not used, GetpLength re-comoutes it if needed
     }
-    if (coef!=NULL) *coef=c;
-    else nDelete(&c);
     return 0;
   }
 #endif

@@ -1953,7 +1953,7 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
 {
   // b will not be multiplied by any constant in this impl.
   // ==> *c=1
-  *c=nInit(1);
+  if (c!=NULL) *c=nInit(1);
   poly m=pOne();
   pExpVectorDiff(m,kBucketGetLm(b),p);
   //pSetm(m);
@@ -1964,9 +1964,8 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
   assume(pp!=NULL);
   pDelete(&m);
   number n=nCopy(pGetCoeff(pp));
-  number MinusOne=nInit(-1);
   number nn;
-  if (!nEqual(n,MinusOne))
+  if (!n_IsMOne(n,currRing))
   {
     nn=nNeg(nInvers(n));
   }
@@ -1976,7 +1975,6 @@ void gnc_kBucketPolyRedOld(kBucket_pt b, poly p, number *c)
   nDelete(&nn);
   pp=p_Mult_nn(pp,n,currRing);
   nDelete(&n);
-  nDelete(&MinusOne);
   int l=pLength(pp);
   kBucket_Add_q(b,pp,&l);
 }
@@ -2000,7 +1998,7 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 
   // b will not be multiplied by any constant in this impl.
   // ==> *c=1
-  *c=nInit(1);
+  if (c!=NULL) *c=nInit(1);
   poly m = pOne();
   const poly pLmB = kBucketGetLm(b); // no new copy!
 
@@ -2029,19 +2027,20 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 
   assume( pp != NULL );
   const number n = pGetCoeff(pp); // bug!
-  number nn;
 
   if (!n_IsMOne(n,currRing) ) // does this improve performance??!? also see below... // TODO: check later on.
+  // if n == -1 => nn = 1 and -1/n
   {
-    nn=nNeg(nInvers(nCopy(n)));
+    number nn=nNeg(nInvers(n));
+    number t = nMult(nn,pGetCoeff(pLmB));
+    nDelete(&nn);
+    pp = p_Mult_nn(pp,t,currRing);
+    nDelete(&t);
   }
-  else nn=nInit(1);           // if n == -1 => nn = 1 and -1/n otherwise
-
-  number t = nMult(nn,pGetCoeff(pLmB));
-  nDelete(&nn);
-
-  pp = p_Mult_nn(pp,t,currRing);
-  nDelete(&t);
+  else
+  {
+    pp = p_Mult_nn(pp,pGetCoeff(pLmB),currRing);
+  }
 
   int l = pLength(pp);
 
@@ -2062,33 +2061,39 @@ void gnc_kBucketPolyRedNew(kBucket_pt b, poly p, number *c)
 void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
 {
   // b is multiplied by a constant in this impl.
+  number ctmp;
   poly m=pOne();
   pExpVectorDiff(m,kBucketGetLm(b),p);
   //pSetm(m);
 #ifdef PDEBUG
   pTest(m);
 #endif
-  if(p_IsConstant(m,currRing)){
+  if(p_IsConstant(m,currRing))
+  {
     pDelete(&m);
-    *c = kBucketPolyRed(b,p,pLength(p),NULL);
-    return;
+    ctmp = kBucketPolyRed(b,p,pLength(p),NULL);
   }
-  poly pp = nc_mm_Mult_pp(m,p,currRing);
-  number c2,cc;
-  pCleardenom_n(pp,c2);
-  pDelete(&m);
-  *c = kBucketPolyRed(b,pp,pLength(pp),NULL);
-  //cc=*c;
-  //*c=nMult(*c,c2);
-  nDelete(&c2);
-  //nDelete(&cc);
-  pDelete(&pp);
-
+  else
+  {
+    poly pp = nc_mm_Mult_pp(m,p,currRing);
+    number c2,cc;
+    pCleardenom_n(pp,c2);
+    pDelete(&m);
+    ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
+    //cc=*c;
+    //*c=nMult(*c,c2);
+    nDelete(&c2);
+    //nDelete(&cc);
+    pDelete(&pp);
+  }
+  if (c!=NULL) *c=ctmp;
+  else nDelete(&ctmp);
 }
 
 void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
 {
   // b is multiplied by a constant in this impl.
+  number ctmp;
   poly m=pOne();
   pExpVectorDiff(m,kBucketGetLm(b),p);
   //pSetm(m);
@@ -2099,20 +2104,23 @@ void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
   if(p_IsConstant(m,currRing))
   {
     pDelete(&m);
-    *c = kBucketPolyRed(b,p,pLength(p),NULL);
-    return;
+    ctmp = kBucketPolyRed(b,p,pLength(p),NULL);
   }
-  poly pp = nc_mm_Mult_pp(m,p,currRing);
-  number c2,cc;
-  pCleardenom_n(pp,c2);
-  pDelete(&m);
-  *c = kBucketPolyRed(b,pp,pLength(pp),NULL);
-  //cc=*c;
-  //*c=nMult(*c,c2);
-  nDelete(&c2);
-  //nDelete(&cc);
-  pDelete(&pp);
-
+  else
+  {
+    poly pp = nc_mm_Mult_pp(m,p,currRing);
+    number c2,cc;
+    pCleardenom_n(pp,c2);
+    pDelete(&m);
+    ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
+    //cc=*c;
+    //*c=nMult(*c,c2);
+    nDelete(&c2);
+    //nDelete(&cc);
+    pDelete(&pp);
+  }
+  if (c!=NULL) *c=ctmp;
+  else nDelete(&ctmp);
 }
 
 
@@ -2168,7 +2176,7 @@ inline void nc_PolyPolyRedNew(poly &b, poly p, number *c)
 
   // b will not by multiplied by any constant in this impl.
   // ==> *c=1
-  *c=nInit(1);
+  if (c!=NULL) *c=nInit(1);
 
   poly pp = NULL;
 
