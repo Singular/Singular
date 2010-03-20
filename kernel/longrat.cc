@@ -1096,7 +1096,7 @@ BOOLEAN nlIsMOne (number a)
 #endif
   //if (SR_HDL(a) & SR_INT) return (a==INT_TO_SR(-1));
   //return FALSE;
-  return  ((SR_HDL(a) & SR_INT) && (a==INT_TO_SR(-1)));
+  return  (a==INT_TO_SR(-1));
 }
 
 /*2
@@ -2270,8 +2270,7 @@ LINLINE BOOLEAN nlIsOne (number a)
   if (a==NULL) return FALSE;
   nlTest(a);
 #endif
-  if (SR_HDL(a) & SR_INT) return (a==INT_TO_SR(1));
-  return FALSE;
+  return (a==INT_TO_SR(1));
 }
 
 LINLINE BOOLEAN nlIsZero (number a)
