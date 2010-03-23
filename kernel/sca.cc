@@ -59,13 +59,13 @@
 poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly &);
 
 // return pMonom * pPoly; preserve pPoly and pMonom.
-poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing);
+static poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing);
 
 // return pPoly * pMonom; preserve pMonom, destroy or reuse pPoly.
 poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing);
 
 // return pMonom * pPoly; preserve pMonom, destroy or reuse pPoly.
-poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing);
+static poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing);
 
 
 // compute the spolynomial of p1 and p2
@@ -88,7 +88,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-inline ring assureCurrentRing(ring r)
+static inline ring assureCurrentRing(ring r)
 {
   ring save = currRing;
 
@@ -102,7 +102,7 @@ inline ring assureCurrentRing(ring r)
 
 // returns the sign of: lm(pMonomM) * lm(pMonomMM),
 // preserves input, may return +/-1, 0
-inline int sca_Sign_mm_Mult_mm( const poly pMonomM, const poly pMonomMM, const ring rRing )
+static inline int sca_Sign_mm_Mult_mm( const poly pMonomM, const poly pMonomMM, const ring rRing )
 {
 #ifdef PDEBUG
     p_Test(pMonomM,  rRing);
@@ -153,7 +153,7 @@ inline int sca_Sign_mm_Mult_mm( const poly pMonomM, const poly pMonomMM, const r
 // preserves pMonomMM. may return NULL!
 // if result != NULL => next(result) = next(pMonomM), lt(result) = lt(pMonomM) * lt(pMonomMM)
 // if result == NULL => pMonomM MUST BE deleted manually!
-inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring rRing )
+static inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring rRing )
 {
 #ifdef PDEBUG
     p_Test(pMonomM,  rRing);
@@ -217,7 +217,7 @@ inline poly sca_m_Mult_mm( poly pMonomM, const poly pMonomMM, const ring rRing )
 // preserves pMonomMM. may return NULL!
 // if result != NULL => next(result) = next(pMonomM), lt(result) = lt(pMonomMM) * lt(pMonomM)
 // if result == NULL => pMonomM MUST BE deleted manually!
-inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring rRing )
+static inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring rRing )
 {
 #ifdef PDEBUG
     p_Test(pMonomM,  rRing);
@@ -282,7 +282,7 @@ inline poly sca_mm_Mult_m( const poly pMonomMM, poly pMonomM, const ring rRing )
 // returns: result = lt(pMonom1) * lt(pMonom2),
 // preserves pMonom1, pMonom2. may return NULL!
 // if result != NULL => next(result) = NULL, lt(result) = lt(pMonom1) * lt(pMonom2)
-inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
+static inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
 {
 #ifdef PDEBUG
     p_Test(pMonom1, rRing);
@@ -321,8 +321,7 @@ inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
 #endif
 
     poly pResult;
-    omTypeAllocBin(poly, pResult, rRing->PolyBin);
-    p_SetRingOfLm(pResult, rRing);
+    p_AllocBin(pResult,rRing->PolyBin,rRing);
 
     p_ExpVectorSum(pResult, pMonom1, pMonom2, rRing); // "exponents" are additive!!!
 
@@ -348,7 +347,7 @@ inline poly sca_mm_Mult_mm( poly pMonom1, const poly pMonom2, const ring rRing )
 // returns: result =  x_i * lt(pMonom),
 // preserves pMonom. may return NULL!
 // if result != NULL => next(result) = NULL, lt(result) = x_i * lt(pMonom)
-inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring rRing)
+static inline poly sca_xi_Mult_mm(unsigned int i, const poly pMonom, const ring rRing)
 {
 #ifdef PDEBUG
     p_Test(pMonom, rRing);
@@ -407,13 +406,13 @@ poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing)
   if( pPoly == NULL )
     return NULL;
 
-  if( pMonom == NULL )
-  {
-    // pPoly != NULL =>
-    p_Delete( &pPoly, rRing );
-
-    return NULL;
-  }
+  assume(pMonom !=NULL);
+  //if( pMonom == NULL )
+  //{
+  //  // pPoly != NULL =>
+  //  p_Delete( &pPoly, rRing );
+  //  return NULL;
+  //}
 
   const int iComponentMonomM = p_GetComp(pMonom, rRing);
 
@@ -469,8 +468,6 @@ poly sca_p_Mult_mm(poly pPoly, const poly pMonom, const ring rRing)
       if( p == NULL )
         break;
     }
-
-
   }
 
 #ifdef PDEBUG
@@ -492,7 +489,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly 
   p_Test(pMonom, rRing);
 #endif
 
-  if( ( pPoly == NULL ) || ( pMonom == NULL ) )
+  if( ( pPoly == NULL ) /*|| ( pMonom == NULL )*/ )
     return NULL;
 
   const int iComponentMonomM = p_GetComp(pMonom, rRing);
@@ -535,7 +532,6 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly 
       *ppPrev = v;
       ppPrev = &pNext(v);
     }
-
   }
 
 #ifdef PDEBUG
@@ -548,7 +544,7 @@ poly sca_pp_Mult_mm(const poly pPoly, const poly pMonom, const ring rRing, poly 
 //-----------------------------------------------------------------------------------//
 
 // return x_i * pPoly; preserve pPoly.
-inline poly sca_xi_Mult_pp(unsigned int i, const poly pPoly, const ring rRing)
+static inline poly sca_xi_Mult_pp(unsigned int i, const poly pPoly, const ring rRing)
 {
   assume( rIsSCA(rRing) );
 
@@ -592,7 +588,7 @@ inline poly sca_xi_Mult_pp(unsigned int i, const poly pPoly, const ring rRing)
 
 
 // return new poly = pMonom * pPoly; preserve pPoly and pMonom.
-poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing)
+static poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing)
 {
   assume( rIsSCA(rRing) );
 
@@ -658,7 +654,7 @@ poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing)
 
 
 // return poly = pMonom * pPoly; preserve pMonom, destroy or reuse pPoly.
-poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the MOST used procedure !!!!!
+static poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the MOST used procedure !!!!!
 {
   assume( rIsSCA(rRing) );
 
@@ -670,12 +666,13 @@ poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing) // !!!!! the
   if( pPoly == NULL )
     return NULL;
 
-  if( pMonom == NULL )
-  {
-    // pPoly != NULL =>
-    p_Delete( &pPoly, rRing );
-    return NULL;
-  }
+  assume(pMonom!=NULL);
+  //if( pMonom == NULL )
+  //{
+  //  // pPoly != NULL =>
+  //  p_Delete( &pPoly, rRing );
+  //  return NULL;
+  //}
 
   const int iComponentMonomM = p_GetComp(pMonom, rRing);
 
@@ -2548,7 +2545,7 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 // bi-Degree (x, y) of monomial "m"
 // x-es and y-s are weighted by wx and wy resp.
 // [optional] components have weights by wCx and wCy.
-inline void m_GetBiDegree(const poly m,
+static inline void m_GetBiDegree(const poly m,
   const intvec *wx, const intvec *wy,
   const intvec *wCx, const intvec *wCy,
   int& dx, int& dy, const ring r)
@@ -2712,7 +2709,7 @@ intvec *ivGetSCAYVarWeights(const ring r)
 
 // reduce term lt(m) modulo <y_i^2> , i = iFirstAltVar .. iLastAltVar:
 // either create a copy of m or return NULL
-inline poly m_KillSquares(const poly m,
+static inline poly m_KillSquares(const poly m,
   const unsigned int iFirstAltVar, const unsigned int iLastAltVar,
   const ring r)
 {
