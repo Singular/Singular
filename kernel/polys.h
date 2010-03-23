@@ -131,7 +131,7 @@ extern poly pHeadProc(poly p);
 #define pExpVectorQuerSum(p)        p_ExpVectorQuerSum(p, currRing)
 
 // Gets a copy of (resp. set) the exponent vector, where e is assumed
-// to point to (r->N +1)*sizeof(Exponent_t) memory. Exponents are
+// to point to (r->N +1)*sizeof(long) memory. Exponents are
 // filled in as follows: comp, e_1, .., e_n
 #define pGetExpV(p, e)      p_GetExpV(p, e, currRing)
 #define pSetExpV(p, e)      p_SetExpV(p, e, currRing)
@@ -398,12 +398,12 @@ poly      pTakeOutComp1(poly * p, int k);
 // Splits *p into two polys: *q which consists of all monoms with
 // component == comp and *p of all other monoms *lq == pLength(*q)
 // On return all components pf *q == 0
-void pTakeOutComp(poly *p, Exponent_t comp, poly *q, int *lq);
+void pTakeOutComp(poly *p, long comp, poly *q, int *lq);
 // Similar to pTakeOutComp, except that only those components are
 // taken out whose Order == order
 // ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
 //         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
-void pDecrOrdTakeOutComp(poly *p, Exponent_t comp, long order,
+void pDecrOrdTakeOutComp(poly *p, long comp, long order,
                          poly *q, int *lq);
 // This is something weird -- Don't use it, unless you know what you are doing
 poly      pTakeOutComp(poly * p, int k);

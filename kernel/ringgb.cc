@@ -61,7 +61,7 @@ BOOLEAN ring2toM_GetLeadTerms(const poly p1, const poly p2, const ring p_r,
                                poly &m1, poly &m2, const ring m_r)
 {
   int i;
-  Exponent_t x;
+  int x;
   m1 = p_Init(m_r);
   m2 = p_Init(m_r);
 

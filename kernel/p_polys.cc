@@ -548,7 +548,7 @@ long pWDegree(poly p, const ring r)
 long pLDeg0(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  Exponent_t k= p_GetComp(p, r);
+  long k= p_GetComp(p, r);
   int ll=1;
 
   if (k > 0)
@@ -624,7 +624,7 @@ long pLDeg0c(poly p,int *l, const ring r)
 long pLDegb(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  Exponent_t k= p_GetComp(p, r);
+  long k= p_GetComp(p, r);
   long o = r->pFDeg(p, r);
   int ll=1;
 
@@ -654,7 +654,7 @@ long pLDegb(poly p,int *l, const ring r)
 long pLDeg1(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  Exponent_t k= p_GetComp(p, r);
+  long k= p_GetComp(p, r);
   int ll=1;
   long  t,max;
 
@@ -724,7 +724,7 @@ long pLDeg1_Deg(poly p,int *l, const ring r)
 {
   assume(r->pFDeg == pDeg);
   p_CheckPolyRing(p, r);
-  Exponent_t k= p_GetComp(p, r);
+  long k= p_GetComp(p, r);
   int ll=1;
   long  t,max;
 
@@ -788,7 +788,7 @@ long pLDeg1c_Deg(poly p,int *l, const ring r)
 long pLDeg1_Totaldegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  Exponent_t k= p_GetComp(p, r);
+  long k= p_GetComp(p, r);
   int ll=1;
   long  t,max;
 
@@ -851,7 +851,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
 long pLDeg1_WFirstTotalDegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
-  Exponent_t k= p_GetComp(p, r);
+  long k= p_GetComp(p, r);
   int ll=1;
   long  t,max;
 

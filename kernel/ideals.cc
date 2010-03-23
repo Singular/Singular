@@ -2831,7 +2831,7 @@ ideal idMinors(matrix a, int ar, ideal R)
   ideal result,h;
   ring origR;
   sip_sring tmpR;
-  Exponent_t bound;
+  long bound;
 
   if((ar<=0) || (ar>r) || (ar>c))
   {

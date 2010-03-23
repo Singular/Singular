@@ -30,8 +30,8 @@ void smCallBareiss(ideal smat, int x, int y, ideal & M, intvec ** iv);
 void smCallNewBareiss(ideal smat, int x, int y, ideal & M, intvec ** iv);
 ideal smCallSolv(ideal I);
 
-void smRingChange(ring *, sip_sring &, Exponent_t);
+void smRingChange(ring *, sip_sring &, long);
 void smRingClean(ring, ip_sring &);
-Exponent_t smExpBound(ideal, int, int, int);
+long smExpBound(ideal, int, int, int);
 BOOLEAN smCheckDet(ideal, int, BOOLEAN);
 #endif

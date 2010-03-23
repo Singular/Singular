@@ -6359,7 +6359,7 @@ void kStratInitChangeTailRing(kStrategy strat)
 {
   unsigned long l = 0;
   int i;
-  Exponent_t e;
+  long e;
 
   assume(strat->tailRing == currRing);
 

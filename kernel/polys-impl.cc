@@ -61,7 +61,7 @@ poly pHeadProc(poly p)
 }
 
 
-static inline unsigned long GetBitFields(Exponent_t e,
+static inline unsigned long GetBitFields(long e,
                                          unsigned int s, unsigned int n)
 {
 #define Sy_bit_L(x)     (((unsigned long)1L)<<(x))
@@ -71,7 +71,7 @@ static inline unsigned long GetBitFields(Exponent_t e,
   do
   {
     assume(s+i < BIT_SIZEOF_LONG);
-    if (e > (Exponent_t) i) ev |= Sy_bit_L(s+i);
+    if (e > (long) i) ev |= Sy_bit_L(s+i);
     else break;
     i++;
   }

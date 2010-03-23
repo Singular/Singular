@@ -402,8 +402,8 @@ int ksCheckCoeff(number *a, number *b)
 poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing)
 {
   poly a1 = pNext(p1), a2 = pNext(p2);
-  Exponent_t c1=p_GetComp(p1, currRing),c2=p_GetComp(p2, currRing);
-  Exponent_t c;
+  long c1=p_GetComp(p1, currRing),c2=p_GetComp(p2, currRing);
+  long c;
   poly m1,m2;
   number t1 = NULL,t2 = NULL;
   int cm,i;

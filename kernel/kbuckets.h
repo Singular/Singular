@@ -96,7 +96,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 // and components of monomials of *p are all 0
 
 void kBucketTakeOutComp(kBucket_pt bucket,
-                        Exponent_t comp,
+                        long comp,
                         poly *p, int *l);
 
 // Here we only extract such monoms which have component == comp and
@@ -104,7 +104,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 // ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
 //         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
 void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
-                               Exponent_t comp, long order,
+                               long comp, long order,
                                poly *p, int *l);
 
 //////////////////////////////////////////////////////////////////////////

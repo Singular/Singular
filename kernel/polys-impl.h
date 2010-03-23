@@ -34,7 +34,6 @@
 #endif
 #endif
 
-typedef Exponent_t* Exponent_pt;
 struct  spolyrec
 {
   poly      next;           // next needs to be the first field

@@ -241,7 +241,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
         p_DeleteLm(&rc,r);
         return s_save;
       }
-      p_AddExp(rc,1+j, (Exponent_t)i, r);
+      p_AddExp(rc,1+j, (long)i, r);
     }
     else
     {
@@ -339,7 +339,7 @@ poly pHomogen (poly p, int varnum)
       ii = o-deg(q,currRing);
       if (ii!=0)
       {
-        pAddExp(q,varnum, (Exponent_t)ii);
+        pAddExp(q,varnum, (long)ii);
         pSetm(q);
       }
       qn = pNext(q);
@@ -530,7 +530,7 @@ poly pTakeOutComp(poly * p, int k)
 
 // Splits *p into two polys: *q which consists of all monoms with
 // component == comp and *p of all other monoms *lq == pLength(*q)
-void pTakeOutComp(poly *r_p, Exponent_t comp, poly *r_q, int *lq)
+void pTakeOutComp(poly *r_p, long comp, poly *r_q, int *lq)
 {
   spolyrec pp, qq;
   poly p, q, p_prev;
@@ -578,7 +578,7 @@ void pTakeOutComp(poly *r_p, Exponent_t comp, poly *r_q, int *lq)
   pTest(*r_q);
 }
 
-void pDecrOrdTakeOutComp(poly *r_p, Exponent_t comp, long order,
+void pDecrOrdTakeOutComp(poly *r_p, long comp, long order,
                          poly *r_q, int *lq)
 {
   spolyrec pp, qq;

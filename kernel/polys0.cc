@@ -53,7 +53,7 @@ static void writemon(poly p, int ko, ring r)
   for (i=0; i<r->N; i++)
   {
     {
-      Exponent_t ee = p_GetExp(p,i+1,r);
+      int ee = p_GetExp(p,i+1,r);
       if (ee!=0)
       {
         if (wroteCoef)
@@ -71,7 +71,7 @@ static void writemon(poly p, int ko, ring r)
     }
   }
   //StringAppend("{%d}",p->Order);
-  if (p_GetComp(p, r) != (Exponent_t)ko)
+  if (p_GetComp(p, r) != (long)ko)
   {
     if (writeGen) StringAppendS("*");
     StringAppend("gen(%d)", p_GetComp(p, r));
@@ -98,7 +98,7 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
     return StringAppendS("");
   }
 
-  Exponent_t k = 1;
+  long k = 1;
   StringAppendS("[");
   loop
   {

@@ -1012,12 +1012,12 @@ poly kBucket_ExtractLarger(kBucket_pt bucket, poly q, poly append)
 
 // Hmm... for now I'm too lazy to implement those independent of currRing
 // But better declare it extern than including polys.h
-extern void pTakeOutComp(poly *p, Exponent_t comp, poly *q, int *lq);
-void pDecrOrdTakeOutComp(poly *p, Exponent_t comp, long order,
+extern void pTakeOutComp(poly *p, long comp, poly *q, int *lq);
+void pDecrOrdTakeOutComp(poly *p, long comp, long order,
                          poly *q, int *lq);
 
 void kBucketTakeOutComp(kBucket_pt bucket,
-                        Exponent_t comp,
+                        long comp,
                         poly *r_p, int *l)
 {
   poly p = NULL, q;
@@ -1052,7 +1052,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
 }
 
 void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
-                               Exponent_t comp, long order,
+                               long comp, long order,
                                poly *r_p, int *l)
 {
   poly p = NULL, q;
