@@ -33,6 +33,17 @@
 #define SM_MIN_LENGTH_BUCKET    INT_MAX
 #endif
 
+typedef struct smprec sm_prec;
+typedef sm_prec * smpoly;
+struct smprec
+{
+  smpoly n;            // the next element
+  int pos;             // position
+  int e;               // level
+  poly m;              // the element
+  float f;             // complexity of the element
+};
+
 
 /* declare internal 'C' stuff */
 static void smExactPolyDiv(poly, poly);
@@ -163,19 +174,19 @@ public:
 * estimate yields for the tXt minors,
 * we have di,ra >= t
 */
-static void smMinSelect(Exponent_t *, int, int);
-Exponent_t smExpBound( ideal m, int di, int ra, int t)
+static void smMinSelect(long *, int, int);
+long smExpBound( ideal m, int di, int ra, int t)
 {
   poly p;
-  Exponent_t kr, kc;
-  Exponent_t *r, *c;
+  long kr, kc;
+  long *r, *c;
   int al, bl, i, j, k;
 
   if (ra==0) ra=1;
-  al = di*sizeof(Exponent_t);
-  c = (Exponent_t *)omAlloc(al);
-  bl = ra*sizeof(Exponent_t);
-  r = (Exponent_t *)omAlloc0(bl);
+  al = di*sizeof(long);
+  c = (long *)omAlloc(al);
+  bl = ra*sizeof(long);
+  r = (long *)omAlloc0(bl);
   for (i=di-1;i>=0;i--)
   {
     kc = 0;
@@ -211,9 +222,9 @@ Exponent_t smExpBound( ideal m, int di, int ra, int t)
   return kr;
 }
 
-static void smMinSelect(Exponent_t *c, int t, int d)
+static void smMinSelect(long *c, int t, int d)
 {
-  Exponent_t m;
+  long m;
   int pos, i;
   do
   {
@@ -233,7 +244,7 @@ static void smMinSelect(Exponent_t *c, int t, int d)
 }
 
 /* ----------------- ops with rings ------------------ */
-void smRingChange(ring *origR, sip_sring &tmpR, Exponent_t bound)
+void smRingChange(ring *origR, sip_sring &tmpR, long bound)
 {
   *origR =currRing;
   tmpR=*currRing;
@@ -338,7 +349,7 @@ poly smCallDet(ideal I)
   {
     return NULL;
   }
-  Exponent_t bound=smExpBound(I,r,r,r);
+  long bound=smExpBound(I,r,r,r);
   number diag,h=nInit(1);
   poly res;
   ring origR;
@@ -378,7 +389,7 @@ void smCallBareiss(ideal I, int x, int y, ideal &M, intvec ** iv)
 {
   int r=idRankFreeModule(I),t=r;
   int c=IDELEMS(I),s=c;
-  Exponent_t bound;
+  long bound;
   ring origR;
   sip_sring tmpR;
   sparse_mat *bareiss;
@@ -417,7 +428,7 @@ void smCallNewBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
 {
   int r=idRankFreeModule(I),t=r;
   int c=IDELEMS(I),s=c;
-  Exponent_t bound;
+  long bound;
   ring origR;
   sip_sring tmpR;
   sparse_mat *bareiss;
@@ -2350,7 +2361,7 @@ static smpoly smPoly2Smpoly(poly q)
 {
   poly pp;
   smpoly res, a;
-  Exponent_t x;
+  long x;
 
   if (q == NULL)
     return NULL;
@@ -2387,7 +2398,7 @@ static poly smSmpoly2Poly(smpoly a)
 {
   smpoly b;
   poly res, pp, q;
-  Exponent_t x;
+  long x;
 
   if (a == NULL)
     return NULL;

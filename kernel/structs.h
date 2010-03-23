@@ -72,8 +72,6 @@ typedef long int64;
 #endif
 
 
-typedef long Exponent_t;
-
 enum tHomog
 {
    isNotHomog = FALSE,
@@ -199,18 +197,6 @@ typedef procinfo *         procinfov;
 typedef kBucket*           kBucket_pt;
 typedef sBucket*           sBucket_pt;
 typedef struct p_Procs_s p_Procs_s;
-
-// for sparsemat.cc
-typedef struct smprec sm_prec;
-typedef sm_prec * smpoly;
-struct smprec
-{
-  smpoly n;            // the next element
-  int pos;             // position
-  int e;               // level
-  poly m;              // the element
-  float f;             // complexity of the element
-};
 
 struct n_Procs_s
 {
