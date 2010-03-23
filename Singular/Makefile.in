@@ -747,7 +747,7 @@ CCP		= ${CC}
 CXXP		= ${CXX}
 
 CFLAGSP		= -g -pg -O -Wall -Wno-unused ${PIPE}
-CXXFLAGSG	= -g -pg -O -Wall -Wno-unused ${PIPE}
+CXXFLAGSP	= -g -pg -O -Wall -Wno-unused ${PIPE}
 CXXTEMPLFLAGSP	= -fno-implicit-templates
 DEFSP		= -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILP)
 
