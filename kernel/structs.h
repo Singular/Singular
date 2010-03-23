@@ -72,13 +72,6 @@ typedef long int64;
 #endif
 
 
-enum tHomog
-{
-   isNotHomog = FALSE,
-   isHomog    = TRUE,
-   testHomog
-};
-
 enum n_coeffType
 {
   n_unknown=0,

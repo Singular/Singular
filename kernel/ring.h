@@ -47,6 +47,12 @@ enum nc_type
 #endif
 // #endif
 
+enum tHomog
+{
+   isNotHomog = FALSE,
+   isHomog    = TRUE,
+   testHomog
+};
 
 extern ring      currRing;
 extern ideal     currQuotient;

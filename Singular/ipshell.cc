@@ -982,7 +982,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   hMu = 0;
   hwork = (scfmon)omAlloc(hNexist * sizeof(scmon));
   hvar = (varset)omAlloc((pVariables + 1) * sizeof(int));
-  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  hpure = (scmon)omAlloc((1 + (pVariables * pVariables)) * sizeof(long));
   hrad = hexist;
   hNrad = hNexist;
   radmem = hCreate(pVariables - 1);
@@ -993,7 +993,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   if (hNvar)
   {
     hCo = hNvar;
-    memset(hpure, 0, (pVariables + 1) * sizeof(Exponent_t));
+    memset(hpure, 0, (pVariables + 1) * sizeof(long));
     hPure(hrad, 0, &hNrad, hvar, hNvar, hpure, &hNpure);
     hLexR(hrad, hNrad, hvar, hNvar);
     hDimSolve(hpure, hNpure, hrad, hNrad, hvar, hNvar);
@@ -1050,7 +1050,7 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
     omFreeBin((ADDRESS)ISet,  indlist_bin);
   }
   hKill(radmem, pVariables - 1);
-  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(Exponent_t));
+  omFreeSize((ADDRESS)hpure, (1 + (pVariables * pVariables)) * sizeof(long));
   omFreeSize((ADDRESS)hvar, (pVariables + 1) * sizeof(int));
   omFreeSize((ADDRESS)hwork, hNexist * sizeof(scmon));
   hDelete(hexist, hNexist);
