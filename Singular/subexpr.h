@@ -54,7 +54,6 @@ class sleftv
                   * ....
                   */
     Subexpr e;    /* holds the indices for indexed values */
-    package     packhdl;
     package     req_packhdl;
     inline void Init() { memset(this,0,sizeof(*this)); }
     void Print(leftv store=NULL,int spaces=0);

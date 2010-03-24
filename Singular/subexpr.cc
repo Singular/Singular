@@ -1255,7 +1255,6 @@ void syMake(leftv v,const char * id, idhdl packhdl)
   }
 #endif
   v->Init();
-  v->packhdl = NULL;
   if(packhdl != NULL)
   {
   //  Print("setting req_packhdl to %s\n",IDID(packhdl));

@@ -856,7 +856,6 @@ static BOOLEAN jjCOLCOL(leftv res, leftv u, leftv v)
           v->name = omStrDup(v->name);
         }
         v->req_packhdl=IDPACKAGE(packhdl);
-        v->packhdl=IDPACKAGE(packhdl);
         syMake(v, v->name, packhdl);
         memcpy(res, v, sizeof(sleftv));
         memset(v, 0, sizeof(sleftv));
