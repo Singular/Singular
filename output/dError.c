@@ -12,8 +12,11 @@
 #define DERROR_C
 #include <stdarg.h>
 #include <stdio.h>
-#include <kernel/mod2.h>
-#include <Singular/distrib.h>
+#include "config.h"
+//#include "distrib.h": for MAKE_DISTRIBUTION
+#ifdef p_Procs_Static
+#include "kversion.h"
+#endif
 #ifdef HAVE_CONFIG_H
 #include <omalloc/omalloc.h>
 #endif
@@ -21,6 +24,13 @@
 #ifdef __cplusplus
 extern "C" 
 {
+#endif
+
+#ifndef MAKE_DISTRIBUTION
+// dummy procedure for setting a breakpoint
+// within the debugger
+void dErrorBreak()
+{}
 #endif
 
 int dReportError(const char* fmt, ...)
@@ -47,13 +57,6 @@ int dReportError(const char* fmt, ...)
   return 0;
 }
 
-
-#ifndef MAKE_DISTRIBUTION
-// dummy procedure for setting a breakpoint
-// within the debugger
-void dErrorBreak()
-{}
-#endif
 
 #ifdef __cplusplus
 }

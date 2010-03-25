@@ -10,6 +10,25 @@
 #include <stdio.h>
 #include <string.h>
 
+#if (SIZEOF_LONG == 8)
+typedef int BOOLEAN;
+/* testet on x86_64, gcc 3.4.6: 2 % */
+/* testet on IA64, gcc 3.4.6: 1 % */
+#else
+/* testet on athlon, gcc 2.95.4: 1 % */
+typedef short BOOLEAN;
+#endif
+
+#ifndef FALSE
+#define FALSE       0
+#endif
+
+#ifndef TRUE
+#define TRUE        1
+#endif
+
+
+
 extern char*  feErrors;
 extern int    feErrorsLen;
 extern FILE*  feProtFile;
