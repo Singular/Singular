@@ -278,7 +278,7 @@ install_all: install libkernel_p.a ${DL_LIBSP}
 	- ranlib libkernel_p.a
 ifeq (,${DL_LIBS})
 else
-ifeq (,${DL_LIBSG})
+ifeq (,${DL_LIBSP})
 else
 	-for file in ${DL_LIBSP}; do ${INSTALL_PROGRAM} $$file ../Singular; done
 endif
