@@ -198,27 +198,6 @@ OBJS := $(OBJS) $(STATIC_SOURCES:.cc=.o)
 DL_LIBS=
 endif
 
-#
-# Singular libraries which go into distribution
-# MAKE SURE THAT THIS IS UP_TO_DATE
-#
-SLIBS = COPYING \
-	ainvar.lib   algebra.lib   all.lib       brnoeth.lib    classify.lib \
-        deform.lib   elim.lib      equising.lib  finvar.lib     gaussman.lib \
-        general.lib  graphics.lib  groups.lib    hnoether.lib   homolog.lib  \
-	inout.lib    intprog.lib   latex.lib     linalg.lib     makedbm.lib  \
-	matrix.lib   mondromy.lib  mprimdec.lib \
-        mregular.lib normal.lib    ntsolve.lib   paramet.lib \
-        poly.lib     presolve.lib  primdec.lib   primitiv.lib   qhmoduli.lib \
-        random.lib   reesclos.lib  ring.lib      rinvar.lib     sing.lib \
-        solve.lib    spcurve.lib   spectrum.lib  standard.lib   stratify.lib \
-        surf.lib     teachstd.lib  template.lib  toric.lib      triang.lib \
-	weierst.lib  zeroset.lib   help.cnf
-
-SLIBS_FILES = $(addprefix LIB/,${SLIBS})
-
-GFTABLES = $(wildcard LIB/gftables/[1-9]*)
-
 ##
 ## Build Targets
 ##
@@ -360,9 +339,6 @@ TAGS:   ${SOURCES} ${ESOURCES} ${HEADERS}
 
 tags:   
 	ctags *.c *.h *.cc *.inc
-
-echoLIBS:
-	@echo ${SLIBS}
 
 ##
 ## Below here is stuff for developpers
