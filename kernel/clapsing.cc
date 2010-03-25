@@ -722,6 +722,7 @@ int singclap_factorize_retry;
 extern int libfac_interruptflag;
 
 ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
+/* destroys f, sets *v */
 {
   pTest(f);
 #ifdef FACTORIZE2_DEBUG
@@ -772,21 +773,24 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     {
       res->m[0]=pOne();
       // (**v)[0]=1; is already done
-      return res;
     }
-    for(i=pVariables;i>0;i--)
+    else
     {
-      e=pGetExp(f,i);
-      if(e!=0)
+      for(i=pVariables;i>0;i--)
       {
-        n--;
-        poly p=pOne();
-        pSetExp(p,i,1);
-        pSetm(p);
-        res->m[n]=p;
-        if (with_exps!=1) (**v)[n]=e;
+        e=pGetExp(f,i);
+        if(e!=0)
+        {
+          n--;
+          poly p=pOne();
+          pSetExp(p,i,1);
+          pSetm(p);
+          res->m[n]=p;
+          if (with_exps!=1) (**v)[n]=e;
+        }
       }
     }
+    pDelete(&f);
     return res;
   }
   //PrintS("S:");pWrite(f);PrintLn();
@@ -1115,7 +1119,7 @@ notImpl:
   {
     nDelete(&N);
   }
-  //if (f!=NULL) pDelete(&f);
+  if (f!=NULL) pDelete(&f);
   //PrintS("......S\n");
   return res;
 }
