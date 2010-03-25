@@ -1,0 +1,80 @@
+#################################################################
+###
+### Makefile for Singular
+###
+#################################################################
+
+SHELL		= /bin/sh
+
+##
+## various paths
+##
+srcdir		= .
+prefix 		= @prefix@
+exec_prefix 	= @exec_prefix@
+libdir 		= @libdir@
+# includes are taken from here
+includedir	= @includedir@
+
+##
+## various programs
+##
+
+CXX		= g++
+INSTALL		= /usr/bin/install -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ./mkinstalldirs
+LN_S		= ln -s
+
+##
+## compiler and linker options
+##
+PIPE		= -pipe
+CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
+CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE}
+CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
+CPPFLAGS	= -I${srcdir} -I${includedir}
+DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
+
+## End configuration dependend stuff
+#################################################################
+
+###
+### file sets
+###
+
+# normal C++ source files
+CXXSOURCES=output.cc
+
+# normal C source files
+CSOURCES=dError.c
+
+SOURCES=${CSOURCES} ${CXXSOURCES}
+
+HEADERS=output.h dError.h
+
+DISTFILES=${SOURCES} ${HEADERS}
+
+OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
+
+.cc.o:	
+	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+.c.o:
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+
+output.a: ${OBJS}
+	-rm -f output.a
+	ar cr $@ $^
+
+##
+## clean targest
+##
+mostlyclean: 
+	-rm -f *.o *.og core *.op
+
+clean: mostlyclean
+	-rm -f *.bak *.d *.dd depend *.a *.so*
+
+tags:   
+	ctags *.c *.h *.cc *.inc
