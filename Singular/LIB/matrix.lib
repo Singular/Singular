@@ -292,7 +292,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc power ( A, int n)
-"USAGE:   power(A,n);  A a square-matrix of type intmat or matrix, n=integer
+"USAGE:   power(A,n);  A a square-matrix of type intmat or matrix, n=integer>=0
 RETURN:  intmat resp. matrix, the n-th power of A
 NOTE:    for A=intmat and big n the result may be wrong because of int overflow
 EXAMPLE: example power; shows an example
