@@ -777,7 +777,7 @@ Singularp${S_EXT}: scanner.cc  $(OBJP)  $(DL_LIBSP)\
            iparith.op mpsr_Tok.op claptmpl.op tesths.cc version.h 
 	(cd ../kernel;make libkernel_p.a;make install;cd ../Singular)
 	$(CXXP) ${CXXFLAGSP} ${CXXTEMPLFLAGSP} ${CPPFLAGS} ${DEFSP} -o Singularp${S_EXT} \
-	tesths.cc iparith.op mpsr_Tok.op claptmpl.op $(OBJP) ${LDFLAGSP} ${LIBSP} -lomalloc_p ../kernel/mmalloc.op \
+	tesths.cc iparith.op mpsr_Tok.op claptmpl.op $(OBJP) ${LDFLAGSP} ${LIBSP} -lomalloc ../kernel/mmalloc.op \
 	${LD_DYN_FLAGS} ${LD_LIBC}
 
 iparith.op: iparith.inc iparith.cc
