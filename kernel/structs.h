@@ -105,8 +105,6 @@ enum nc_type
 };
 // #endif
 
-typedef enum { LT_NONE, LT_NOTFOUND, LT_SINGULAR, LT_ELF, LT_HPUX, LT_MACH_O} lib_types;
-
 struct snumber;
 typedef struct snumber *   number;
 typedef number (*numberfunc)(number a,number b);
