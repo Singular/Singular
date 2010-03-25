@@ -382,7 +382,7 @@ MinorKey MinorKey::getSubMinorKey (const int absoluteEraseRowIndex,
 
   /* let's check that the number of selected rows and columns are equal;
      (this check is only performed in the debug version) */
-  assume(result.getSetBits(1) != result.getSetBits(2));
+  assume(result.getSetBits(1) == result.getSetBits(2));
 
   return result;
 }
