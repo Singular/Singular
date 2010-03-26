@@ -26,6 +26,8 @@
 
 #if SIZEOF_LONG == 8
 #define SI_MAX_NEST 500
+#elif defined(ix86_Win)
+#define SI_MAX_NEST 480
 #else
 #define SI_MAX_NEST 1000
 #endif
