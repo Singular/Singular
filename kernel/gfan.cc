@@ -75,7 +75,7 @@ $Id$
 
 //NOTE Defining this will slow things down!
 //Only good for very coarse profiling
-#define gfanp
+//#define gfanp
 #ifdef gfanp
 #include <sys/time.h>
 #include <iostream>
@@ -200,7 +200,7 @@ facet* facet::shallowCopy(const facet& f)
 void facet::shallowDelete()
 {
 #ifdef gfan_DEBUG
-	printf("shallowdel@UCN %i\n", this->getUCN());
+// 	printf("shallowdel@UCN %i\n", this->getUCN());
 #endif
 	this->fNormal=NULL;
 // 	this->UCN=0;
@@ -218,34 +218,30 @@ void facet::shallowDelete()
 facet::~facet()
 {
 #ifdef gfan_DEBUG
-	printf("~facet@UCN %i\n",this->getUCN());
+// 	printf("~facet@UCN %i\n",this->getUCN());
 #endif
 	if(this->fNormal!=NULL)
 		delete this->fNormal;
 	if(this->interiorPoint!=NULL)
 		delete this->interiorPoint;
 	/* Cleanup the codim2-structure */
-	if(this->codim==2)
-// 	if(this->codim2Ptr!=NULL)
-	{
-		facet *codim2Ptr;
-		codim2Ptr = this->codim2Ptr;
-		while(codim2Ptr!=NULL)
-		{
-			if(codim2Ptr->fNormal!=NULL)
-			{
-				delete codim2Ptr->fNormal;//NOTE Do not want this anymore since the rays are now in gcone!
-				codim2Ptr = codim2Ptr->next;
-			}
-		}
-// 		delete this->codim2Ptr;
-	}
+// 	if(this->codim==2)
+// 	{
+// 		facet *codim2Ptr;
+// 		codim2Ptr = this->codim2Ptr;
+// 		while(codim2Ptr!=NULL)
+// 		{
+// 			if(codim2Ptr->fNormal!=NULL)
+// 			{
+// 				delete codim2Ptr->fNormal;//NOTE Do not want this anymore since the rays are now in gcone!
+// 				codim2Ptr = codim2Ptr->next;
+// 			}
+// 		}
+// 	}
 	//The rays are stored in the cone!
-// 	if(this->codim2Ptr!=NULL)
-// 		delete this->codim2Ptr;
 	if(this->flipGB!=NULL)
 		idDelete((ideal *)&this->flipGB);
-	if(this->flipRing!=NULL && this->flipRing->idroot!=(idhdl)0xfbfbfbfbfbfbfbfb)
+// 	if(this->flipRing!=NULL && this->flipRing->idroot!=(idhdl)0xfbfbfbfbfbfbfbfb)
 // 		rDelete(this->flipRing); //See vol II/134
 // 	this->flipRing=NULL;
 	this->prev=NULL;
@@ -734,7 +730,7 @@ static volatile void showSLA(facet &f)
 				delete f2Normal;
 				codim2Act = codim2Act->next;
 			}
-			printf("UCN = %i",fAct->getUCN());
+			printf("UCN = %i\n",fAct->getUCN());
 			fAct = fAct->next;
 		}
 	}
@@ -808,6 +804,11 @@ inline ring gcone::getBaseRing()
 	return rCopy(this->baseRing);
 }
 
+inline void gcone::setBaseRing(ring r)
+{
+	this->baseRing=rCopy(r);
+}
+
 inline ring gcone::getRef2BaseRing()
 {
 	return this->baseRing;
@@ -862,13 +863,13 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		aktpoly=(poly)I->m[i];		//get aktpoly as i-th component of I
 		//simpler version of storing expvect diffs
 		int *leadexpv=(int*)omAlloc(((this->numVars)+1)*sizeof(int));
-// 		int *tailexpv=(int*)omAlloc(((this->numVars)+1)*sizeof(int));
 		pGetExpV(aktpoly,leadexpv);
-		while(pNext(aktpoly)!=NULL)
+		poly pNextTerm=aktpoly;
+		while(pNext(pNextTerm)/*pNext(aktpoly)*/!=NULL)
 		{
-			aktpoly=pNext(aktpoly);
+			pNextTerm/*aktpoly*/=pNext(pNextTerm);
 			int *tailexpv=(int*)omAlloc(((this->numVars)+1)*sizeof(int));
-			pGetExpV(aktpoly,tailexpv);			
+			pGetExpV(pNextTerm,tailexpv);			
 			for(int kk=1;kk<=this->numVars;kk++)
 			{				
 				dd_set_si(ddineq->matrix[(dd_rowrange)aktmatrixrow][kk],leadexpv[kk]-tailexpv[kk]);
@@ -923,21 +924,17 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 				ksCreateSpoly(P);							
 				if(P->p!=NULL)	//spoly non zero=?
 				{	
-					poly p=pInit();			
-					poly q=pInit();
+					poly p;//=pInit(); NOTE Evil memleak if pInit is used			
+					poly q;//=pInit();
 					p=pCopy(P->p);
 					q=pHead(p);	//Monomial q
 					isMaybeFacet=FALSE;
 					//TODO: Suffices to check LTs here
 					while(p!=NULL)
 					{
-						q=pHead(p);						
-// 						unsigned long sevSpoly=pGetShortExpVector(q);
-// 						unsigned long not_sevL;						
+						q=pHead(p);
 						for(int ll=0;ll<IDELEMS(L);ll++)
 						{
-// 							not_sevL=~pGetShortExpVector(L->m[ll]);// 					
-							//if(!(sevSpoly & not_sevL) && pLmDivisibleBy(L->m[ll],q) )//i.e. spoly is in L	
 							if(pLmEqual(L->m[ll],q) || pDivisibleBy(L->m[ll],q))
 							{							
 								isMaybeFacet=TRUE;
@@ -1506,7 +1503,7 @@ void gcone::getExtremalRays(const gcone &gc)
 				(*ivIntPointOfCone)[jj] /= ggT;
 		}
 	}
-	assert(iv64isStrictlyPositive(ivIntPointOfCone));
+// 	assert(iv64isStrictlyPositive(ivIntPointOfCone));
 	
 	this->setIntPoint(ivIntPointOfCone);
 	delete(ivIntPointOfCone);
@@ -1516,14 +1513,14 @@ void gcone::getExtremalRays(const gcone &gc)
 	int rows=P->rowsize;
 	facet *fAct=gc.facetPtr;
 	//Construct an array to hold the extremal rays of the cone
-	this->gcRays = (intvec**)omAlloc0(sizeof(intvec*)*P->rowsize);
+	this->gcRays = (intvec**)omAlloc0(sizeof(intvec*)*P->rowsize);	
 	for(int ii=0;ii<P->rowsize;ii++)
 	{
 		intvec *rowvec = new intvec(this->numVars);
 		makeInt(P,ii+1,*rowvec);//get an integer entry instead of rational, rowvec is primitve
 		this->gcRays[ii] = ivCopy(rowvec);
 		delete rowvec;
-	}
+	}	
 	this->numRays=P->rowsize;
 	//Check which rays belong to which facet
 	while(fAct!=NULL)
@@ -3145,11 +3142,10 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 	/*2nd step
 	  Choose a facet from SearchList, flip it and forget the previous cone
 	  We always choose the first facet from SearchList as facet to be flipped
-	*/			
+	*/	
 	while( (SearchListAct!=NULL))//&& counter<490)
 	{//NOTE See to it that the cone is only changed after ALL facets have been flipped!				
-		fAct = SearchListAct;
-				
+		fAct = SearchListAct;		
  		while(fAct!=NULL)
 // 		while( (fAct->getUCN() == fAct->next->getUCN()) )		
 		{	//Since SLA should only contain flippables there should be no need to check for that			
@@ -3157,7 +3153,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			//NOTE rCopy needed?
 			ring rTmp=rCopy(fAct->flipRing);
 // 			ring rTmp=fAct->flipRing; //segfaults
-			rComplete(rTmp);			
+			rComplete(rTmp);
 			rChangeCurrRing(rTmp);
 			gcone *gcTmp = new gcone::gcone(*gcAct,*fAct);//copy constructor!
 			/* Now gcTmp->gcBasis and gcTmp->baseRing are set from fAct->flipGB and fAct->flipRing.
@@ -3170,12 +3166,11 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			*/
  			idDelete((ideal *)&fAct->flipGB);
 			rDelete(fAct->flipRing);
-
+			
 			gcTmp->getConeNormals(gcTmp->gcBasis/*, FALSE*/);	//TODO FALSE is default, so should not be needed here
 // 			gcTmp->getCodim2Normals(*gcTmp);
 			gcTmp->getExtremalRays(*gcTmp);
-
-
+			
 // 			//NOTE If flip2 is used we need to get an interior point of gcTmp
 // 			// and replace gcTmp->baseRing with an appropriate ring with only
 // 			// one weight
@@ -3188,7 +3183,12 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 #endif
 			/*add facets to SLA here*/
 #ifdef SHALLOW
-			SearchListRoot=gcTmp->enqueue2/*NewFacets*/(SearchListRoot);
+// 			printf("fActUCN before enq2: %i\n",fAct->getUCN());
+			facet *tmp; tmp=gcTmp->enqueue2(SearchListRoot);
+// 			printf("\nheadUCN=%i\n",tmp->getUCN());
+// 			printf("fActUCN after enq2: %i\n",fAct->getUCN());			
+			SearchListRoot=tmp;
+// 			SearchListRoot=gcTmp->enqueue2/*NewFacets*/(SearchListRoot);
 #else
 			SearchListRoot=gcTmp->enqueueNewFacets(SearchListRoot);
 #endif
@@ -3212,14 +3212,18 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			//Cleverly disguised exit condition follows
 			if(fAct->getUCN() == fAct->next->getUCN())
 			{
-				fAct=fAct->next;
+				printf("Switching UCN from %i to %i\n",fAct->getUCN(),fAct->next->getUCN());
+				fAct=fAct->next;				
 			}
 			else
+			{
+				//rDelete(gcAct->baseRing);
+// 				printf("break\n");
 				break;
+			}
 // 			fAct=fAct->next;
 		}//while( ( (fAct->next!=NULL) && (fAct->getUCN()==fAct->next->getUCN() ) ) );		
 		//Search for cone with smallest UCN
-		gcNext = gcHead;
 #ifndef NDEBUG
   #if SIZEOF_LONG==8	//64 bit
 		while(gcNext!=(gcone * const)0xfbfbfbfbfbfbfbfb && SearchListRoot!=NULL)
@@ -3263,11 +3267,11 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 					break;
 				}				
 			}
-// 			else if(gcNext->getUCN() < SearchListRoot->getUCN() )
-// 			{
-// 				idDelete( (ideal*)&gcNext->gcBasis );
-// 				rDelete(gcNext->baseRing);
-// 			}
+			else if(gcNext->getUCN() < SearchListRoot->getUCN() )
+			{
+				idDelete( (ideal*)&gcNext->gcBasis );				
+// 				rDelete(gcNext->baseRing);//TODO Why does this crash?
+			}
 			/*else
 			{
 				if(gfanHeuristic==1)
@@ -3281,7 +3285,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
  			gcNext = gcNext->next;
 		}
 		UCNcounter++;
-		SearchListAct = SearchListRoot;
+		SearchListAct = SearchListRoot;		
 	}
 	printf("\nFound %i cones - terminating\n", counter);
 }//void noRevS(gcone &gc)	
@@ -3670,6 +3674,7 @@ facet * gcone::enqueue2(facet *f)
 			slAct = slHead;
 			if(slAct==NULL)
 			{
+				printf("Zero length SLA\n");
 				facet *fCopy;
 				fCopy = fAct;				
 				while(fCopy!=NULL)
@@ -3702,31 +3707,43 @@ facet * gcone::enqueue2(facet *f)
 				{
 					fDeleteMarker=slAct;
 					if(slAct==slHead)
-					{						
+					{
+// 						fDeleteMarker=slHead;
+// 						printf("headUCN@enq=%i\n",slHead->getUCN());
 						slHead = slAct->next;						
+// 						printf("headUCN@enq=%i\n",slHead->getUCN());
 						if(slHead!=NULL)
+						{
 							slHead->prev = NULL;
+						}
+						fDeleteMarker->shallowDelete();
+// 						delete fDeleteMarker;//NOTE this messes up fAct in noRevS!
+// 						printf("headUCN@enq=%i\n",slHead->getUCN());
 					}
 					else if (slAct==slEnd)
 					{
 						slEnd=slEnd->prev;
 						slEnd->next = NULL;
+						fDeleteMarker->shallowDelete();
+// 						delete(fDeleteMarker);
 					}								
 					else
 					{
 						slAct->prev->next = slAct->next;
 						slAct->next->prev = slAct->prev;
+						fDeleteMarker->shallowDelete();
+// 						delete(fDeleteMarker);
 					}
 					removalOccured=TRUE;
 					gcone::lengthOfSearchList--;
 #ifdef gfan_DEBUG
-printf("Removing (");fAct->fNormal->show(1,1);printf(") from list");
+printf("Removing (");fAct->fNormal->show(1,1);printf(") from list\n");
 #endif
-					fDeleteMarker->shallowDelete();//Sets everything to NULL
-// 					delete(marker);
-					break;
+					/*fDeleteMarker->shallowDelete();*///Sets everything to NULL
+// 					delete(fDeleteMarker);
+					break;//leave the while loop, since we found fAct=slAct thus delete slAct and do not add fAct
 				}
-				slAct = slAct->next;
+				slAct = slAct->next;				
 			}//while(slAct!=NULL)
 			if(removalOccured==FALSE)
 			{
@@ -3739,7 +3756,8 @@ printf("Removing (");fAct->fNormal->show(1,1);printf(") from list");
 			fAct = fAct->next;
 // 			if(fDeleteMarker!=NULL)
 // 			{
-// 				delete fDeleteMarker;
+// 				fDeleteMarker->shallowDelete();
+// 				delete(fDeleteMarker);
 // 				fDeleteMarker=NULL;
 // 			}
 		}
@@ -3751,6 +3769,7 @@ printf("Removing (");fAct->fNormal->show(1,1);printf(") from list");
 	gettimeofday(&end, 0);
 	time_enqueue += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
 #endif	
+// 	printf("headUCN@enq=%i\n",slHead->getUCN());
 	return slHead;
 }
 
@@ -3802,7 +3821,7 @@ void gcone::replaceDouble_ringorder_a_ByASingleOne()
 	rDelete(this->baseRing);
 	this->baseRing=rCopy(replacementRing);
 	this->gcBasis=idCopy(temporaryGroebnerBasis);
-	//FIXME idDelete & rDelete!!! MEMLEAK
+	//FIXME idDelete & rDelete!!! DONE!
 	/*And back to where we came from*/
 	rChangeCurrRing(srcRing);
 	idDelete( (ideal*)&temporaryGroebnerBasis );
@@ -4137,7 +4156,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 						resPoly=pCopy(strPoly);							
 					else
 						resPoly=pAdd(resPoly,strPoly);//pAdd = p_Add_q, destroys args
-					nDelete(&nCoeff);
+// 					nDelete(&nCoeff);
 					nDelete(&nCoeffNom);
 					nDelete(&nCoeffDenom);
 // 					pDelete(&strPoly);
@@ -4151,7 +4170,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 		if(line=="FACETS")
 		{
 			facet *fAct=gc->facetPtr;
-			for(int ll=0;ll<this->numFacets;ll++)
+			while(fAct!=NULL)
 			{
 				getline(gcInputFile,line);
 				found = line.find("\t");
@@ -4401,7 +4420,7 @@ lists gfan(ideal inputIdeal, int h)
 			gcAct->getExtremalRays(*gcAct);
 			gcAct->noRevS(*gcAct);	//Here we go!
 			//Switch back to the ring the computation was started in
-			//rChangeCurrRing(inputRing);
+// 			rChangeCurrRing(inputRing);
 			//res=gcAct->gcBasis;
 			//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS			
 			lResList=lprepareResult(gcRoot,gcRoot->getCounter());
@@ -4423,6 +4442,30 @@ lists gfan(ideal inputIdeal, int h)
 	{
 		//Simply return an empty list
 		WerrorS("Ring has non-global ordering.\nThis function requires your current ring to be endowed with a global ordering.\n Now terminating!");
+		gcone *gcRoot=new gcone();
+		gcone *gcPtr = gcRoot;
+		for(int ii=0;ii<10000;ii++)
+		{
+			gcPtr->setBaseRing(currRing);
+			facet *fPtr=gcPtr->facetPtr=new facet();
+			for(int jj=0;jj<5;jj++)
+			{
+				intvec *iv=new intvec(pVariables);
+				fPtr->setFacetNormal(iv);				
+				delete(iv);
+				fPtr->next=new facet();
+				fPtr=fPtr->next;
+			}
+			gcPtr->next=new gcone();
+			gcPtr->next->prev=gcPtr;
+			gcPtr=gcPtr->next;			
+		}
+		gcPtr=gcRoot;
+		while(gcPtr!=NULL)
+		{
+			gcPtr=gcPtr->next;
+// 			delete(gcPtr->prev);
+		}
 		goto pointOfNoReturn;
 	}
 	/*Return result*/
