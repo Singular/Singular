@@ -63,7 +63,7 @@ int nrnSize(number a)
 }
 
 /*
- * convert a number to int (-p/2 .. p/2)
+ * convert a number to int
  */
 int nrnInt(number &n, const ring r)
 {

@@ -124,7 +124,7 @@ int nrzSize(number a)
  */
 int nrzInt(number &n, const ring r)
 {
-  return (int) mpz_get_si( (int_number) &n);
+  return (int) mpz_get_si( (int_number)n);
 }
 
 number nrzAdd (number a, number b)
