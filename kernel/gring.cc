@@ -2896,6 +2896,8 @@ BOOLEAN nc_CallPlural(
            ( (DDD != NULL) && (MATCOLS(DDD) == 1) && (MATROWS(DDD) == 1) && (MATELEM(DDD,1,1) == NULL) ) ||
            ( (DDN == NULL) )
           );
+    WarnS("commutative ring with 1 variable");
+    return FALSE;
   }
 
   // there must be:
