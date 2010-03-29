@@ -1,0 +1,12 @@
+#ifndef OUTPUT_CONFIG_H
+#define OUTPUT_CONFIG_H
+/* Define if you have unistd.h */
+#undef HAVE_UNISTD_H
+/* Define if you have stdlib.h */
+#undef HAVE_STDLIB_H
+/* Define if you have unistd.h */
+#undef HAVE_UNISTD_H
+/* Define if you have vprintf */
+#undef HAVE_VPRINTF
+
+#endif
