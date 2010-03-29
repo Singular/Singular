@@ -2871,7 +2871,7 @@ BOOLEAN nc_CallPlural(
                       poly CCN, poly DDN,
                       ring r,
                       bool bSetupQuotient, bool bCopyInput, bool bBeQuiet,
-                      ring curr)
+                      ring curr, BOOLEAN dummy_ring /*=FALSE*/)
   /* returns TRUE if there were errors */
   /* analyze inputs, check them for consistency */
   /* detects nc_type, DO NOT initialize multiplication but call for it at the end*/
@@ -2896,8 +2896,11 @@ BOOLEAN nc_CallPlural(
            ( (DDD != NULL) && (MATCOLS(DDD) == 1) && (MATROWS(DDD) == 1) && (MATELEM(DDD,1,1) == NULL) ) ||
            ( (DDN == NULL) )
           );
-    WarnS("commutative ring with 1 variable");
-    return FALSE;
+    if(!dummy_ring)
+    {
+      WarnS("commutative ring with 1 variable");
+      return FALSE;
+    }
   }
 
   // there must be:
@@ -3659,7 +3662,7 @@ ring nc_rCreateNCcomm(ring r)
     for(int j=i+1; j<=r->N; j++)
       MATELEM(C,i,j) = p_One( r);
 
-  if (nc_CallPlural(C, D, NULL, NULL, r)) // TODO: what about quotient ideal?
+  if (nc_CallPlural(C, D, NULL, NULL, r, false, true, false, currRing, TRUE)) // TODO: what about quotient ideal?
     WarnS("Error initializing multiplication!"); // No reaction!???
 
   return r;
