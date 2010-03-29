@@ -1299,7 +1299,7 @@ For a detailed description of the concept of rings see
 @end ifclear
 
 @*@strong{Note:} @sc{Plural} usually works with global orderings (@pxref{PLURAL}) but one can use
-certain local once when super-commutative rings are being used.
+certain local once when graded commutative rings are being used.
 
 @menu
 * ring declarations BR_PLURAL_BR::
@@ -1359,7 +1359,7 @@ weight vector given as an intvec_expression in parentheses.
 @code{c} or @code{C}.
 @end enumerate
 
-As long as all non-commuting variables are global, any ordering may be used. In super-commutative
+As long as all non-commuting variables are global, any ordering may be used. In graded commutative
 algebras, one may also use @code{ls, ds, Ds, ws}, and @code{Ws}.
 
 If one of coefficient_field, names_of_ring_variables, and ordering
@@ -3040,7 +3040,7 @@ The protocol messages of @code{slimgb} mean the following:
 @* @code{b} notices an exchange trick described in the thesis and
 @* @code{e} adds a reductor with non-minimal leading term.
 
-@code{slimgb} works for super-commutative algebras but mot for general GR-algebras. Please use @code{qslimgb} instead.
+@code{slimgb} works for grade commutative algebras but mot for general GR-algebras. Please use @code{qslimgb} instead.
 
 For a detailed commutative example see @ref{slim Groebner bases}.
 
@@ -3321,7 +3321,7 @@ See also
 @c ref
 @c -------------------------------------------------------------------------
 
-@node Mathematical background BR_PLURAL_BR, Super-commutative algebras, Functions BR_PLURAL_BR, Non-commutative subsystem
+@node Mathematical background BR_PLURAL_BR, Graded commutative algebras (SCA), Functions BR_PLURAL_BR, Non-commutative subsystem
 
 @section Mathematical background BR_PLURAL_BR
 @cindex Mathematical background BR_PLURAL_BR
@@ -3653,7 +3653,7 @@ LM(f) = x^b e_i with b_j <= a_j, 1<= j <= n.
 
 
 @*@strong{Remark:} In general non-commutative algorithms are working with well-orderings
-only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}), unless we deal with super-commutative algebras.
+only (see @ref{PLURAL}, @ref{Monomial orderings} and @ref{Term orderings}), unless we deal with grade commutative algebras.
 
 @tex
 A Groebner basis $G\subset A^r$ is called {\bf minimal} (or {\bf reduced}) if $0\notin G$ and if

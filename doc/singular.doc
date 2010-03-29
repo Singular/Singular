@@ -173,7 +173,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 * Data types (plural)::
 * Functions  (plural)::
 * Mathematical background (plural)::
-* Super-commutative algebras::
+* Graded commutative algebras (SCA)::
 * LETTERPLACE::
 * Non-commutative libraries::
 @end menu

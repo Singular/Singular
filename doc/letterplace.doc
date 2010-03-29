@@ -11,7 +11,7 @@
 %**start
 @end ignore
 
-@node LETTERPLACE,Non-commutative libraries,Super-commutative algebras,Non-commutative subsystem
+@node LETTERPLACE,Non-commutative libraries,Graded commutative algebras (SCA),Non-commutative subsystem
 @section LETTERPLACE
 @cindex LETTERPLACE
 @cindex Letterplace
