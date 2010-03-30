@@ -1305,8 +1305,9 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
     res->data=NULL;
     return FALSE;
   }
-  if (pNext(q)!=NULL)
-  {
+  if ((pNext(q)!=NULL) && (!rField_is_Ring()))
+  { /* This means that q != 0 consists of at least two terms.
+       Moreover, currRing is over a field. */
 #ifdef HAVE_FACTORY
     if(pGetComp(p)==0)
     {
@@ -1351,7 +1352,20 @@ static BOOLEAN jjDIV_P(leftv res, leftv u, leftv v)
 #endif /* HAVE_FACTORY */
   }
   else
-  {
+  { /* This means that q != 0 consists of just one term,
+       or that currRing is over a coefficient ring. */
+#ifdef HAVE_RINGS
+    if (!rField_is_Domain())
+    {
+      WerrorS("division only defined over coefficient domains");
+      return TRUE;
+    }
+    if (pNext(q)!=NULL)
+    {
+      WerrorS("division over a coefficient domain only implemented for terms");
+      return TRUE;
+    }
+#endif
     res->data = (char *)pDivideM(pCopy(p),pHead(q));
   }
   pNormalize((poly)res->data);
@@ -3402,8 +3416,8 @@ struct sValCmd2 dArith2[]=
 ,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_IV,  '*',            INTMAT_CMD,     INTVEC_CMD, INTMAT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjDIV_N,     '/',            NUMBER_CMD,     NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | NO_RING}
-,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | NO_RING}
+,{jjDIV_P,     '/',            POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{jjDIV_P,     '/',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjDIV_Ma,    '/',            MATRIX_CMD,     MATRIX_CMD, POLY_CMD, ALLOW_PLURAL | NO_RING}
 ,{jjDIVMOD_I,  '/',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjDIV_BI,    '/',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
