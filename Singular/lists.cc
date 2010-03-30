@@ -60,10 +60,10 @@ BOOLEAN lAdd(leftv res, leftv u, leftv v)
     l->m[i+ul->nr+1].rtyp=vl->m[i].rtyp;
     l->m[i+ul->nr+1].data=vl->m[i].data;
   }
-  if (ul->m != NULL) // OB: ???
+  if (ul->m != NULL)
     omFreeSize((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
   omFreeBin((ADDRESS)ul, slists_bin);
-  if (vl->m != NULL) // OB: ????
+  if (vl->m != NULL)
     omFreeSize((ADDRESS)vl->m,(vl->nr+1)*sizeof(sleftv));
   omFreeBin((ADDRESS)vl, slists_bin);
   memset(u,0,sizeof(*u));
@@ -96,7 +96,7 @@ lists lInsert0(lists ul, leftv v, int pos)
   l->m[pos].data=v->CopyD();
   l->m[pos].flag=v->flag;
   l->m[pos].attribute=v->CopyA();
-  if (ul->m != NULL) // OB: ?????
+  if (ul->m != NULL)
     omFreeSize((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
   omFreeBin((ADDRESS)ul, slists_bin);
   return l;
@@ -153,16 +153,17 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
 
   if((0<=VIndex)&&(VIndex<=ul->nr))
   {
+    ul=(lists)u->CopyD();
     int i,j;
     lists l=(lists) omAllocBin(slists_bin);
     l->Init(ul->nr);
 
-    ul=(lists)u->CopyD();
     for(i=j=0;i<=ul->nr;i++,j++)
     {
       if (i!=VIndex)
       {
-        l->m[j].Copy(&(ul->m[i]));
+        l->m[j]=ul->m[i];
+	memset(&ul->m[i],0,sizeof(ul->m[i]));
       }
       else
       {
@@ -170,7 +171,8 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
         ul->m[i].CleanUp();
       }
     }
-    ul->Clean();
+    omFreeSize((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
+    omFreeBin((ADDRESS)ul, slists_bin);
     res->data = (char *)l;
     return FALSE;
   }
