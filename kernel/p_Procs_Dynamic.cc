@@ -75,8 +75,6 @@ static inline void* p_ProcGetHandle(p_Proc proc, p_Field field)
 }
 
 
-#define InitSetProcs(f, l, o) ((void)0)
-
 static void* GetGeneralProc(p_Proc proc)
 {
   switch(proc)

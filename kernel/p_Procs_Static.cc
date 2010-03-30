@@ -52,8 +52,6 @@ while(0)
 #define DoSetProc SetStaticProcFromFuncsArray
 #endif
 
-#define InitSetProcs(f, l, o) ((void)0)
-
 // include routines for setting p_ProcsSet
 
 #include "p_Procs_Set.h"

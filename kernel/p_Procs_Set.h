@@ -150,7 +150,6 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   _p_procs = p_Procs;
   assume(IsValidSpec(field, length, ord));
 
-  InitSetProcs(field, length, ord);
   SetProcs(field, length, ord);
   #ifdef NV_OPS
   if ((field==FieldZp) && (r->ch>NV_MAX_PRIME))
