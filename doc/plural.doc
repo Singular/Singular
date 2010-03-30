@@ -3040,7 +3040,8 @@ The protocol messages of @code{slimgb} mean the following:
 @* @code{b} notices an exchange trick described in the thesis and
 @* @code{e} adds a reductor with non-minimal leading term.
 
-@code{slimgb} works for grade commutative algebras but mot for general GR-algebras. Please use @code{qslimgb} instead.
+@code{slimgb} works for grade commutative algebras but not for general GR-algebras.
+Please use @code{qslimgb} instead.
 
 For a detailed commutative example see @ref{slim Groebner bases}.
 
