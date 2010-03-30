@@ -3036,7 +3036,7 @@ matrix idModule2Matrix(ideal mod)
 
   for(i=0;i<IDELEMS(mod);i++)
   {
-    p=mod->m[i];
+    p=pReverse(mod->m[i]);
     mod->m[i]=NULL;
     while (p!=NULL)
     {
