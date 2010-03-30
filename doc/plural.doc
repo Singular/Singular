@@ -1615,7 +1615,7 @@ print(betti(R),"betti");
 
 
 @c -----------------------------
-@node bracket, eliminate BR_PLURAL_BR, betti BR_PLURAL_BR, Functions BR_PLURAL_BR
+@node bracket, dim BR_PLURAL_BR, betti BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection bracket
 @cindex bracket
 
@@ -1653,7 +1653,7 @@ bracket(x+Q*y+Q^2*z,z);
 
 
 @c -----------------------------
-@node dim BR_PLURAL_BR, division BR_PLURAL_BR, betti BR_PLURAL_BR, Functions BR_PLURAL_BR
+@node dim BR_PLURAL_BR, division BR_PLURAL_BR, bracket, Functions BR_PLURAL_BR
 @subsection dim BR_PLURAL_BR
 @cindex dim BR_PLURAL_BR
 @table @code
@@ -1680,7 +1680,7 @@ the presentation via given submodule.
   setring R;
   dim(std(0)); // the GK dimension of the ring itself
   ideal I=x*Dy^2-2*y*Dy^2+2*Dy, Dx^3+3*Dy^2;
-  dim(std(I)); // the GK dimension of the module R/I 
+  dim(std(I)); // the GK dimension of the module R/I
   module T = (x*Dx -2)*gen(1), Dx^3*gen(1), (y*Dy +3)*gen(2);
   dim(std(T)); // the GK dimension of the module  R^2/T
 @c example
@@ -1692,11 +1692,10 @@ See
 @ref{module};
 @ref{std};
 @ref{vdim}.
-@c ref 
-
+@c ref
 
 @c -----------------------------
-@node division BR_PLURAL_BR, dim BR_PLURAL_BR, eliminate BR_PLURAL_BR, Functions BR_PLURAL_BR
+@node division BR_PLURAL_BR, eliminate BR_PLURAL_BR, dim BR_PLURAL_BR, Functions BR_PLURAL_BR
 @subsection division BR_PLURAL_BR
 @cindex division BR_PLURAL_BR
 @table @code
