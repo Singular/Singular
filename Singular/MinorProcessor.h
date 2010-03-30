@@ -18,7 +18,7 @@
    x = 3: print also all intermediate matrices with the
           numbers of monomials in each entry;
           this will be much much more information */
-#define COUNT_AND_PRINT_OPERATIONS 2
+//#define COUNT_AND_PRINT_OPERATIONS 2
 
 void printCounters (char* prefix, bool resetToZero);
 
