@@ -560,11 +560,18 @@ nMapFunc npSetMap(const ring src, const ring dst)
 
 number nvMult (number a,number b)
 {
-  if (((long)a == 0) || ((long)b == 0))
-    return (number)0;
-  else
+  //if (((long)a == 0) || ((long)b == 0))
+  //  return (number)0;
+  //else
     return nvMultM(a,b);
 }
+
+void   nvInpMult(number &a, number b, const ring r)
+{
+  number n=nvMultM(a,b);
+  a=n;
+}
+
 
 long nvInvMod(long a)
 {

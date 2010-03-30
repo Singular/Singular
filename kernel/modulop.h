@@ -184,6 +184,7 @@ number  nvMult        (number a, number b);
 number  nvDiv         (number a, number b);
 number  nvInvers      (number c);
 void    nvPower       (number a, int i, number * result);
+void    nvInpMult     (number &a, number b, const ring r);
 #endif
 
 #endif

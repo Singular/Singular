@@ -545,6 +545,7 @@ void nInitChar(ring r)
       n->nExactDiv= nvDiv;
       n->nInvers= nvInvers;
       n->nPower= nvPower;
+      n->nInpMult= nvInpMult;
     }
 #endif
   }
