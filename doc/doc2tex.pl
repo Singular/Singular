@@ -193,6 +193,14 @@ while (<DOC>)
   {
     $section = $';
     $section =~ s/^\s*(.*)\s*$/$1/;
+    if ($section =~ /\(/)
+    {
+      $section =~ s/\(/_/g
+    }
+    if ($section =~ /\)/)
+    {
+      $section =~ s/\)/_/g
+    }
     if ($section =~ /\w/)
     {
       $section =~ s/\s/_/g
