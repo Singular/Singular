@@ -3,28 +3,8 @@
 #include "polys.h"
 #include "ideals.h"
 #include "kstd1.h"
-#include <MinorProcessor.h>
 #include <MinorInterface.h>
-
-#ifdef COUNT_AND_PRINT_OPERATIONS
-int addsPoly  = 0;   /* for the number of additions of two polynomials */
-int multsPoly = 0;   /* for the number of multiplications of two polynomials */
-int addsMon   = 0;   /* for the number of additions of two monomials */
-int multsMon  = 0;   /* for the number of multiplications of two monomials */
-void printCounters ()
-{
-  printf("\n");
-  printf("\n   ~~~> performed %d monomial-monomial-additions,",
-         addsMon);
-  printf("\n   ~~~> performed %d monomial-monomial-multiplications",
-         multsMon);
-  printf("\n   ~~~> performed %d polynomial-polynomial-additions,",
-         addsPoly);
-  printf("\n   ~~~> performed %d polynomial-polynomial-multiplications",
-         multsPoly);
-  printf("\n");
-}
-#endif
+#include <MinorProcessor.h>
 
 bool currRingIsOverIntegralDomain ()
 {
@@ -172,17 +152,28 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
                                              requested, omitting zero minors */
   bool duplicatesOk = (allDifferent ? false : true);
   int kk = ((k < 0) ? -k : k); /* absolute value of k */
-
+#ifdef COUNT_AND_PRINT_OPERATIONS
+  printCounters ("starting", true);
+  int qqq = 0;
+#endif
   /* looping over all minors: */
   while (mp.hasNextMinor() && ((kk == 0) || (collectedMinors < kk)))
   {
     /* retrieving the next minor: */
     theMinor = mp.getNextMinor(algorithm, i);
+#if (defined COUNT_AND_PRINT_OPERATIONS) && (COUNT_AND_PRINT_OPERATIONS > 1)
+    qqq++;
+    printf("after %d", qqq);
+    printCounters ("-th minor", false);
+#endif
     f = theMinor.getResult();
     if (idInsertPolyWithTests(iii, collectedMinors, pCopy(f),
                               zeroOk, duplicatesOk))
       collectedMinors++;
   }
+#ifdef COUNT_AND_PRINT_OPERATIONS
+  printCounters ("ending", true);
+#endif
 
   /* before we return the result, let's omit zero generators
      in iii which come after the computed minors */
@@ -386,17 +377,28 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
                                              requested, omitting zero minors */
   bool duplicatesOk = (allDifferent ? false : true);
   int kk = ((k < 0) ? -k : k); /* absolute value of k */
-
+#ifdef COUNT_AND_PRINT_OPERATIONS
+  printCounters ("starting", true);
+  int qqq = 0;
+#endif
   /* looping over all minors: */
   while (mp.hasNextMinor() && ((kk == 0) || (collectedMinors < kk)))
   {
     /* retrieving the next minor: */
     theMinor = mp.getNextMinor(cch, i);
+#if (defined COUNT_AND_PRINT_OPERATIONS) && (COUNT_AND_PRINT_OPERATIONS > 1)
+    qqq++;
+    printf("after %d", qqq);
+    printCounters ("-th minor", false);
+#endif
     f = theMinor.getResult();
     if (idInsertPolyWithTests(iii, collectedMinors, pCopy(f), zeroOk,
                               duplicatesOk))
       collectedMinors++;
   }
+#ifdef COUNT_AND_PRINT_OPERATIONS
+  printCounters ("ending", true);
+#endif
 
   /* before we return the result, let's omit zero generators
      in iii which come after the computed minors */

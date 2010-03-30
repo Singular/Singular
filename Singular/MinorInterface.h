@@ -1,11 +1,6 @@
 #ifndef MINOR_INTERFACE_H
 #define MINOR_INTERFACE_H
 
-/* activate the next define if you want all basic operations
-   counted and printed when one of the methods documented
-   herein will be invoked (not fully implemented yet) */
-/* #define COUNT_AND_PRINT_OPERATIONS 1 */
-
 /* all computations are module char, if char <> 0;
    if additionally, an ideal i != NULL is given, then computations are
    modulo i (in this case, i is assumed to be a standard basis);

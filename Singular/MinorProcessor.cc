@@ -6,6 +6,40 @@
 #include "kstd1.h"
 #include "kbuckets.h"
 
+#ifdef COUNT_AND_PRINT_OPERATIONS
+long addsPoly        = 0;    /* for the number of additions of two polynomials */
+long multsPoly       = 0;    /* for the number of multiplications of two polynomials */
+long addsPolyForDiv  = 0;    /* for the number of additions of two polynomials for
+                                polynomial division part */
+long multsPolyForDiv = 0;    /* for the number of multiplications of two polynomials
+                                for polynomial division part */
+long multsMon        = 0;    /* for the number of multiplications of two monomials */
+long multsMonForDiv  = 0;    /* for the number of m-m-multiplications for polynomial
+                                division part */
+long savedMultsMFD   = 0;    /* number of m-m-multiplications that could be saved
+                                when polynomial division would be optimal
+                                (if p / t1 = t2 + ..., then t1 * t2 = LT(p), i.e.,
+                                this multiplication need not be performed which
+                                would save one m-m-multiplication) */
+long divsMon         = 0;    /* for the number of divisions of two monomials;
+                                these are all guaranteed to work, i.e., m1/m2 only
+                                when exponentVector(m1) >= exponentVector(m2) */
+void printCounters (char* prefix, bool resetToZero)
+{
+  printf("%s [p+p(div) | p*p(div) | m*m(div, -save) | m/m ]", prefix);
+  printf(" = [%ld(%ld) | %ld(%ld) | %ld(%d, -%ld) | %ld]\n",
+         addsPoly, addsPolyForDiv, multsPoly, multsPolyForDiv,
+         multsMon, multsMonForDiv, savedMultsMFD, divsMon);
+  if (resetToZero)
+  {
+    multsMon = 0; addsPoly = 0; multsPoly = 0; divsMon = 0;
+    savedMultsMFD = 0; multsMonForDiv = 0; addsPolyForDiv = 0;
+    multsPolyForDiv = 0;
+  }
+}
+#endif
+/* COUNT_AND_PRINT_OPERATIONS */
+
 void MinorProcessor::print() const
 {
   PrintS(this->toString().c_str());
@@ -429,6 +463,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
                                                      multiplications, ..."a*"
                                                      for accumulated operation
                                                      counters */
+    bool hadNonZeroEntry = false;
     if (b >= 0)
     {
       /* This means that the best line is the row with absolute (0-based)
@@ -442,6 +477,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
         if (getEntry(b, absoluteC) != 0) /* Only then do we have to consider
                                             this sub-determinante. */
         {
+          hadNonZeroEntry = true;
           /* Next MinorKey is mk with row b and column absoluteC omitted: */
           MinorKey subMk = mk.getSubMinorKey(b, absoluteC);
           IntMinorValue mv = getMinorPrivateLaplace(k - 1, subMk,
@@ -476,6 +512,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
         if (getEntry(absoluteR, b) != 0) /* Only then do we have to consider
                                             this sub-determinante. */
         {
+          hadNonZeroEntry = true;
           /* Next MinorKey is mk with row absoluteR and column b omitted. */
           MinorKey subMk = mk.getSubMinorKey(absoluteR, b);
           IntMinorValue mv = getMinorPrivateLaplace(k - 1, subMk, characteristic, iSB); /* recursive call */
@@ -493,16 +530,19 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
         sign = - sign; /* alternating the sign */
       }
     }
+    if (hadNonZeroEntry)
+    {
       s--; as--; /* first addition was 0 + ..., so we do not count it */
-      if (s < 0) s = 0; /* may happen when all subminors are zero and no
+    }
+    if (s < 0) s = 0; /* may happen when all subminors are zero and no
+                         addition needs to be performed */
+    if (as < 0) as = 0; /* may happen when all subminors are zero and no
                            addition needs to be performed */
-      if (as < 0) as = 0; /* may happen when all subminors are zero and no
-                             addition needs to be performed */
-      if (iSB != 0) result = getReduction(result, iSB);
-      IntMinorValue newMV(result, m, s, am, as, -1, -1);
-      /* "-1" is to signal that any statistics about the number of retrievals
-         does not make sense, as we do not use a cache. */
-      return newMV;
+    if (iSB != 0) result = getReduction(result, iSB);
+    IntMinorValue newMV(result, m, s, am, as, -1, -1);
+    /* "-1" is to signal that any statistics about the number of retrievals
+       does not make sense, as we do not use a cache. */
+    return newMV;
   }
 }
 
@@ -625,6 +665,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
                                                      counters */
     IntMinorValue mv(0, 0, 0, 0, 0, 0, 0);        /* for storing all
                                                      intermediate minors */
+    bool hadNonZeroEntry = false;
     if (b >= 0)
     {
       /* This means that the best line is the row with absolute (0-based)
@@ -640,6 +681,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
         if (getEntry(b, absoluteC) != 0) /* Only then do we have to consider
                                             this sub-determinante. */
         {
+          hadNonZeroEntry = true;
           /* Next MinorKey is mk with row b and column absoluteC omitted. */
           MinorKey subMk = mk.getSubMinorKey(b, absoluteC);
           if (cch.hasKey(subMk))
@@ -691,6 +733,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
         if (getEntry(absoluteR, b) != 0) /* Only then do we have to consider
                                             this sub-determinante. */
         {
+          hadNonZeroEntry = true;
           /* Next MinorKey is mk with row absoluteR and column b omitted. */
           MinorKey subMk = mk.getSubMinorKey(absoluteR, b);
           if (cch.hasKey(subMk))
@@ -730,7 +773,10 @@ IntMinorValue IntMinorProcessor::getMinorPrivateLaplace(
                                                  _containerColumns,
                                                  _minorSize, k,
                                                  multipleMinors);
-    s--; as--; /* first addition was 0 + ..., so we do not count it */
+    if (hadNonZeroEntry)
+    {
+      s--; as--; /* first addition was 0 + ..., so we do not count it */
+    }
     if (s < 0) s = 0; /* may happen when all subminors are zero and no
                          addition needs to be performed */
     if (as < 0) as = 0; /* may happen when all subminors are zero and no
@@ -910,6 +956,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
                                                      and multiplications,
                                                      ..."a*" for accumulated
                                                      operation counters */
+    bool hadNonZeroEntry = false;
     if (b >= 0)
     {
       /* This means that the best line is the row with absolute (0-based)
@@ -924,6 +971,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
         if (!isEntryZero(b, absoluteC)) /* Only then do we have to consider
                                            this sub-determinante. */
         {
+          hadNonZeroEntry = true;
           /* Next MinorKey is mk with row b and column absoluteC omitted. */
           MinorKey subMk = mk.getSubMinorKey(b, absoluteC);
           /* recursive call: */
@@ -938,6 +986,11 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
                                  currRing);
           temp = p_Mult_q(signPoly, temp, currRing);
           result = p_Add_q(result, temp, currRing);
+#ifdef COUNT_AND_PRINT_OPERATIONS
+          multsPoly++;
+          addsPoly++;
+          multsMon += pLength(mv.getResult()) * pLength(getEntry(b, absoluteC));
+#endif
           signPoly = NULL;
           s++; m++; as++, am++; /* This is for the addition and multiplication
                                    in the previous lines of code. */
@@ -961,6 +1014,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
         if (!isEntryZero(absoluteR, b)) /* Only then do we have to consider
                                            this sub-determinante. */
         {
+          hadNonZeroEntry = true;
           /* This is mk with row absoluteR and column b omitted. */
           MinorKey subMk = mk.getSubMinorKey(absoluteR, b);
           /* recursive call: */
@@ -975,6 +1029,11 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
                                  currRing);
           temp = p_Mult_q(signPoly, temp, currRing);
           result = p_Add_q(result, temp, currRing);
+#ifdef COUNT_AND_PRINT_OPERATIONS
+          multsPoly++;
+          addsPoly++;
+          multsMon += pLength(mv.getResult()) * pLength(getEntry(absoluteR, b));
+#endif
           signPoly = NULL;
           s++; m++; as++, am++; /* This is for the addition and multiplication
                                    in the previous lines of code. */
@@ -982,7 +1041,13 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(const int k,
         sign = - sign; /* alternating the sign */
       }
     }
-    s--; as--; /* first addition was 0 + ..., so we do not count it */
+    if (hadNonZeroEntry)
+    {
+      s--; as--; /* first addition was 0 + ..., so we do not count it */
+#ifdef COUNT_AND_PRINT_OPERATIONS
+      addsPoly--;
+#endif
+    }
     if (s < 0) s = 0; /* may happen when all subminors are zero and no
                          addition needs to be performed */
     if (as < 0) as = 0; /* may happen when all subminors are zero and no
@@ -1026,6 +1091,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
                                                      and multiplications,
                                                      ..."a*" for accumulated
                                                      operation counters */
+    bool hadNonZeroEntry = false;
     if (b >= 0)
     {
       /* This means that the best line is the row with absolute (0-based)
@@ -1041,6 +1107,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
         if (!isEntryZero(b, absoluteC)) /* Only then do we have to consider
                                            this sub-determinante. */
         {
+          hadNonZeroEntry = true;
           PolyMinorValue mv; /* for storing all intermediate minors */
           /* Next MinorKey is mk with row b and column absoluteC omitted. */
           MinorKey subMk = mk.getSubMinorKey(b, absoluteC);
@@ -1074,6 +1141,11 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
                                  currRing);
           temp = p_Mult_q(signPoly, temp, currRing);
           result = p_Add_q(result, temp, currRing);
+#ifdef COUNT_AND_PRINT_OPERATIONS
+          multsPoly++;
+          addsPoly++;
+          multsMon += pLength(mv.getResult()) * pLength(getEntry(b, absoluteC));
+#endif
           signPoly = NULL;
           s++; m++; as++; am++; /* This is for the addition and multiplication
                                    in the previous lines of code. */
@@ -1097,6 +1169,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
         if (!isEntryZero(absoluteR, b)) /* Only then do we have to consider
                                            this sub-determinante. */
         {
+          hadNonZeroEntry = true;
           PolyMinorValue mv; /* for storing all intermediate minors */
           /* Next MinorKey is mk with row absoluteR and column b omitted. */
           MinorKey subMk = mk.getSubMinorKey(absoluteR, b);
@@ -1129,6 +1202,11 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
                                  currRing);
           temp = p_Mult_q(signPoly, temp, currRing);
           result = p_Add_q(result, temp, currRing);
+#ifdef COUNT_AND_PRINT_OPERATIONS
+          multsPoly++;
+          addsPoly++;
+          multsMon += pLength(mv.getResult()) * pLength(getEntry(absoluteR, b));
+#endif
           signPoly = NULL;
           s++; m++; as++; am++; /* This is for the addition and multiplication
                                    in the previous lines of code. */
@@ -1142,7 +1220,13 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateLaplace(
                                                  _minorSize,
                                                  k,
                                                  multipleMinors);
-    s--; as--; /* first addition was 0 + ..., so we do not count it */
+    if (hadNonZeroEntry)
+    {
+      s--; as--; /* first addition was 0 + ..., so we do not count it */
+#ifdef COUNT_AND_PRINT_OPERATIONS
+      addsPoly--;
+#endif
+    }
     if (s < 0) s = 0; /* may happen when all subminors are zero and no
                          addition needs to be performed */
     if (as < 0) as = 0; /* may happen when all subminors are zero and no
@@ -1180,9 +1264,25 @@ void addOperationBucket(poly& f1, poly& f2, kBucket_pt& bucket)
    the method destroys the old value of p1;
    p2, p3, and p4 may be pNormalize-d but must, apart from that,
    not be changed;
-   This can only be used in the case of coefficients coming from a field!!! */
+   This can only be used in the case of coefficients coming from a field
+   or at least an integral domain. */
 void elimOperationBucketNoDiv(poly &p1, poly &p2, poly &p3, poly &p4)
 {
+#ifdef COUNT_AND_PRINT_OPERATIONS
+  if ((pLength(p1) != 0) && (pLength(p2) != 0))
+  {
+    multsPoly++;
+    multsMon += pLength(p1) * pLength(p2);
+  }
+  if ((pLength(p3) != 0) && (pLength(p4) != 0))
+  {
+    multsPoly++;
+    multsMon += pLength(p3) * pLength(p4);
+  }
+  if ((pLength(p1) != 0) && (pLength(p2) != 0) &&
+      (pLength(p3) != 0) && (pLength(p4) != 0))
+    addsPoly++;
+#endif
   kBucket_pt myBucket = kBucketCreate();
   addOperationBucket(p1, p2, myBucket);
   poly p3Neg = pNeg(pCopy(p3));
@@ -1199,10 +1299,26 @@ void elimOperationBucketNoDiv(poly &p1, poly &p2, poly &p3, poly &p4)
    not be changed;
    c5 is assumed to be the leading coefficient of p5;
    p5Len is assumed to be the length of p5;
-   This can only be used in the case of coefficients coming from a field!!! */
+   This can only be used in the case of coefficients coming from a field
+   or at least an integral domain. */
 void elimOperationBucket(poly &p1, poly &p2, poly &p3, poly &p4, poly &p5,
                          number &c5, int p5Len)
 {
+#ifdef COUNT_AND_PRINT_OPERATIONS
+  if ((pLength(p1) != 0) && (pLength(p2) != 0))
+  {
+    multsPoly++;
+    multsMon += pLength(p1) * pLength(p2);
+  }
+  if ((pLength(p3) != 0) && (pLength(p4) != 0))
+  {
+    multsPoly++;
+    multsMon += pLength(p3) * pLength(p4);
+  }
+  if ((pLength(p1) != 0) && (pLength(p2) != 0) &&
+      (pLength(p3) != 0) && (pLength(p4) != 0))
+    addsPoly++;
+#endif
   kBucket_pt myBucket = kBucketCreate();
   addOperationBucket(p1, p2, myBucket);
   poly p3Neg = pNeg(pCopy(p3));
@@ -1226,6 +1342,16 @@ void elimOperationBucket(poly &p1, poly &p2, poly &p3, poly &p4, poly &p5,
     /* subtract exponent vector of p5 from that of quotient; modifies
        quotient */
     p_ExpVectorSub(bucketLm, p5, currRing);
+#ifdef COUNT_AND_PRINT_OPERATIONS
+    divsMon++;
+    multsMonForDiv += p5Len;
+    multsMon += p5Len;
+    savedMultsMFD++;
+    multsPoly++;
+    multsPolyForDiv++;
+    addsPoly++;
+    addsPolyForDiv++;
+#endif
     kBucket_Minus_m_Mult_p(myBucket, bucketLm, p5, &p5Len);
     /* The following lines make bucketLm the new leading term of p1,
        i.e., put bucketLm in front of everything which is already in p1.
@@ -1323,6 +1449,26 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
            number of row transpositions to swap two given rows of a matrix. */
         sign = -sign;
       }
+#if (defined COUNT_AND_PRINT_OPERATIONS) && (COUNT_AND_PRINT_OPERATIONS > 2)
+      poly w = NULL; int wl = 0;
+      printf("matrix after %d steps:\n", r);
+      for (int u = 0; u < k; u++)
+      {
+        for (int v = 0; v < k; v++)
+        {
+          if ((v < r) && (u > v))
+            wl = 0;
+          else
+          {
+            w = tempMatrix[rowPermutation[u] * k + v];
+            wl = pLength(w);
+          }
+          printf("%5d  ", wl);
+        }
+        printf("\n");
+      }
+      printCounters ("", false);
+#endif
       if (r != 0)
       {
         divisor = tempMatrix[rowPermutation[r - 1] * k + r - 1];
@@ -1346,6 +1492,25 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
                                 divisor, divisorLC, divisorLength);
         }
     }
+#if (defined COUNT_AND_PRINT_OPERATIONS) && (COUNT_AND_PRINT_OPERATIONS > 2)
+    poly w = NULL; int wl = 0;
+    printf("matrix after %d steps:\n", k - 1);
+    for (int u = 0; u < k; u++)
+    {
+      for (int v = 0; v < k; v++)
+      {
+        if ((v < k - 1) && (u > v))
+          wl = 0;
+        else
+        {
+          w = tempMatrix[rowPermutation[u] * k + v];
+          wl = pLength(w);
+        }
+        printf("%5d  ", wl);
+      }
+      printf("\n");
+    }
+#endif
     poly result = tempMatrix[rowPermutation[k - 1] * k + k - 1];
     if (sign == -1) result = pNeg(result);
     if (iSB != 0) result = kNF(iSB, currRing->qideal, result);

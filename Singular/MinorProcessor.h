@@ -6,6 +6,22 @@
 #include <assert.h>
 #include <string>
 
+/* write "##define COUNT_AND_PRINT_OPERATIONS x" if you want
+   to count all basic operations and have them printed when
+   one of the methods documented herein will be invoked;
+   otherwise, comment this line;
+   x = 1: only final counters (after computing ALL
+          specified minors) will be printed, i.e., no
+          intermediate results;
+   x = 2: print counters after the computation of each
+          minor; this will be much more information
+   x = 3: print also all intermediate matrices with the
+          numbers of monomials in each entry;
+          this will be much much more information */
+#define COUNT_AND_PRINT_OPERATIONS 2
+
+void printCounters (char* prefix, bool resetToZero);
+
 /*! \class MinorProcessor
     \brief Class MinorProcessor implements the key methods for computing one
     or all sub-determinantes of a given size in a pre-defined matrix; either
