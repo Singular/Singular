@@ -3084,7 +3084,7 @@ matrix idModule2formatedMatrix(ideal mod,int rows, int cols)
   if (c>cols) c = cols;
   for(i=0;i<c;i++)
   {
-    p=mod->m[i];
+    p=pReverse(mod->m[i]);
     mod->m[i]=NULL;
     while (p!=NULL)
     {
