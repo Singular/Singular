@@ -903,6 +903,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 			(*gamma)[jj-1]=(int64)tmp;
 		}
 		computeInv((ideal&)I,initialForm,*gamma);
+		delete gamma;
 		//Create leading ideal
 		ideal L=idInit(IDELEMS(initialForm),1);
 		for(int jj=0;jj<IDELEMS(initialForm);jj++)
@@ -910,7 +911,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 			L->m[jj]=pCopy(pHead(initialForm->m[jj]));
 		}		
 		
-		LObject *P = new sLObject();
+		LObject *P = new sLObject();//TODO What's the difference between sLObject and LObject?
 		memset(P,0,sizeof(LObject));
 
 		for(int jj=0;jj<=IDELEMS(initialForm)-2;jj++)
@@ -924,14 +925,17 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 				ksCreateSpoly(P);							
 				if(P->p!=NULL)	//spoly non zero=?
 				{	
-					poly p;//=pInit(); NOTE Evil memleak if pInit is used			
-					poly q;//=pInit();
+					poly p;//NOTE Don't use pInit here. Evil memleak will follow
+					poly q;
+					poly pDel,qDel;
 					p=pCopy(P->p);
 					q=pHead(p);	//Monomial q
+					pDelete(&q);
+					pDel=p; qDel=q;
 					isMaybeFacet=FALSE;
 					//TODO: Suffices to check LTs here
 					while(p!=NULL)
-					{
+					{						
 						q=pHead(p);
 						for(int ll=0;ll<IDELEMS(L);ll++)
 						{
@@ -945,10 +949,13 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 						{ 							
 							break;//while(p!=NULL)
 						}
-						p=pNext(p);						
+						p=pNext(p);
+						pDelete(&q);						
 					}//while
-					pDelete(&p);
+// 					pDelete(&p);//NOTE Better to use pDel and qDel. Commenting in this line will not work!
 					pDelete(&q);
+					pDelete(&pDel);
+					pDelete(&qDel);
 					if(isMaybeFacet==FALSE)
 					{
 						dd_set_si(ddineq->matrix[ii][0],1);						
@@ -968,15 +975,14 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 						//break;//for(int kk, since we have found one that is not in L	
 						goto _start;	//mea culpa, mea culpa, mea maxima culpa
 					}
-				}//if(P->p!=NULL)				
+				}//if(P->p!=NULL)
+				pDelete(&(P->p));
 			}//for k
 		}//for jj
 		_start:;
 		idDelete(&L);
 		delete P;
 		idDelete(&initialForm);
-		//idDelete(L);
-		delete gamma;
 	}//for(ii<ddineq-rowsize
 // 	delete gamma;
 	int offset=0;//needed for correction of redRowsArray[ii]
@@ -1409,8 +1415,8 @@ void gcone::getExtremalRays(const gcone &gc)
 #endif
 	/* Compute interior point on the fly*/
 	int64vec *ivIntPointOfCone = new int64vec(this->numVars);
-	mpq_t *colSum = new mpq_t[this->numVars];
-	int denom[this->numVars];//denominators of colSum
+// 	mpq_t *colSum = new mpq_t[this->numVars];
+// 	int denom[this->numVars];//denominators of colSum
 	//NOTE TODO need to gcd of rows and factor out! -> makeInt
 	/*for(int jj=0;jj<this->numVars;jj++)
 	{
@@ -1449,15 +1455,17 @@ void gcone::getExtremalRays(const gcone &gc)
 	mpz_clear(kgV);
 	mpz_clear(den);
 	mpz_clear(tmp);*/
+	int64vec *foo = new int64vec(this->numVars);
 	for(int ii=0;ii<P->rowsize;ii++)
 	{
-		int64vec *foo = new int64vec(this->numVars);
+// 		int64vec *foo = new int64vec(this->numVars);
 		int64vec *tmp = ivIntPointOfCone;
 		makeInt(P,ii+1,*foo);
 		ivIntPointOfCone = iv64Add(ivIntPointOfCone,foo);
 		delete tmp;
-		delete foo;
+// 		delete foo;
 	}
+	delete foo;
 	int64 ggT=(*ivIntPointOfCone)[0];
 	for (int ii=0;ii<(this->numVars);ii++)
 	{
@@ -1482,7 +1490,7 @@ void gcone::getExtremalRays(const gcone &gc)
 		}
 	}
 // 	mpq_clear(qkgV);
-	delete [] colSum;
+// 	delete [] colSum;
 	/*For homogeneous input (like Det3,3,5) the int points may be negative. So add a suitable multiple of (1,_,1)*/
 	if(hasHomInput==TRUE && iv64isStrictlyPositive(ivIntPointOfCone)==FALSE)
 	{
@@ -2273,7 +2281,7 @@ inline void gcone::computeInv(const ideal &gb, ideal &initialForm, const int64ve
 // 			if(fNormal.compare(check)==0)
 			{
 				//Found a parallel vector. Add it
-				initialFormElement = pAdd((initialFormElement),(poly)pHead(aktpoly));
+				initialFormElement = pAdd((initialFormElement),(poly)pHead(aktpoly));//pAdd = p_Add_q destroys args
 			}
 			omFree(v);
 			delete check;
@@ -2499,8 +2507,8 @@ void gcone::interiorPoint( dd_MatrixPtr &M, int64vec &iv) //no const &M here sin
 	dd_ErrorType err=dd_NoError;
 	dd_LPSolverType solver=dd_DualSimplex;
 	dd_LPSolutionPtr lpSol=NULL;
-	dd_rowset ddlinset,ddredrows;	//needed for dd_FindRelativeInterior
- 	dd_rowindex ddnewpos;
+// 	dd_rowset ddlinset,ddredrows;	//needed for dd_FindRelativeInterior
+//  	dd_rowindex ddnewpos;
 	dd_NumberType numb;	
 	//M->representation=dd_Inequality;
 			
@@ -2789,7 +2797,7 @@ ring gcone::rCopyAndAddWeight(const ring &r, int64vec *ivw)
 	for (jj=0;jj<length;jj++)
 	{				
 		A[jj]=(*ivw)[jj];
-		if(A[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::rCopyAndAddWeight!\n");
+		if((*ivw)[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::rCopyAndAddWeight!\n");
 	}			
 	res->wvhdl[0]=(int *)A;
 	res->block1[0]=length;
@@ -2831,7 +2839,7 @@ ring gcone::rCopyAndAddWeight2(const ring &r,const int64vec *ivw, const int64vec
 	{				
 		A1[jj]=(*ivw)[jj];
 		A2[jj]=-(*fNormal)[jj];
-		if(A1[jj]>=INT_MAX || A2[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::rCopyAndAddWeight2!\n");
+		if((*ivw)[jj]>=INT_MAX || (*fNormal)[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::rCopyAndAddWeight2!\n");
 	}			
 	res->wvhdl[0]=(int *)A1;
 	res->block1[0]=length;
@@ -3822,16 +3830,16 @@ void gcone::replaceDouble_ringorder_a_ByASingleOne()
 	
 	replacementRing->order[2]=ringorder_C;
 
-	int64vec *ivw = this->getIntPoint();
+	int64vec *ivw = this->getIntPoint(TRUE);
 // 	assert(this->ivIntPt);	
 	int length=ivw->length();	
 	int/*64*/ *A=(int/*64*/ *)omAlloc0(length*sizeof(int/*64*/));
 	for (int jj=0;jj<length;jj++)
 	{
 		A[jj]=(*ivw)[jj];
-		if(A[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::replaceDouble_ringorder_a_ByASingleOne!\n");
+		if((*ivw)[jj]>=INT_MAX) WarnS("A[jj] exceeds INT_MAX in gcone::replaceDouble_ringorder_a_ByASingleOne!\n");
 	}	
-	delete ivw;
+// 	delete ivw;
 	replacementRing->wvhdl[0]=(int *)A;
 	replacementRing->block1[0]=length;
 	/*Finish*/
@@ -4046,8 +4054,11 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 			for(int ii=0;ii<this->numVars;ii++)
 			{
 				string weight;
-				weight=line.substr(0,line.find_first_of(",)"));				
-				(*iv)[ii]=atol(weight.c_str());//Better to long. Weight bound in Singular:2147483647
+				weight=line.substr(0,line.find_first_of(",)"));
+				char *w=new char[weight.size()+1];
+				strcpy(w,weight.c_str());
+				(*iv)[ii]=atol(w/*weight.c_str()*/);//Better to long. Weight bound in Singular:2147483647
+				delete[] w;
 				line.erase(0,line.find_first_of(",)")+1);
 			}
 			found = line.find("a(");
@@ -4084,7 +4095,10 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 			string strGcBasisLength;
 			getline(gcInputFile, line);
 			strGcBasisLength = line;
-			int size=atoi(strGcBasisLength.c_str());
+			char *s=new char[strGcBasisLength.size()+1];
+			strcpy(s,strGcBasisLength.c_str());
+			int size=atoi(s/*strGcBasisLength.c_str()*/);
+			delete[] s;
 			gcBasisLength=size;		
 			gc->gcBasis=idInit(size,1);
 		}
@@ -4102,9 +4116,7 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 				while(!line.empty())
 				{
 					poly strPoly;//=pInit();
-					number nCoeff=nInit(1);
-					number nCoeffNom=nInit(1);
-					number nCoeffDenom=nInit(1);
+					
 					string strMonom, strCoeff, strCoeffNom, strCoeffDenom;
 					bool hasCoeffInQ = FALSE;	//does the polynomial have rational coeff?
 					bool hasNegCoeff = FALSE;	//or a negative one?
@@ -4122,6 +4134,9 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 					}
 					strMonom = line.substr(0,found);
 					line.erase(0,found);
+					number nCoeff=nInit(1);
+					number nCoeffNom=nInit(1);
+					number nCoeffDenom=nInit(1);
 					found = strMonom.find_first_of("/");
 					if(found!=string::npos)	//i.e. "/" exists in strMonom
 					{
@@ -4129,28 +4144,32 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 						strCoeffNom=strMonom.substr(0,found);						
 						strCoeffDenom=strMonom.substr(found+1,strMonom.find_first_not_of("1234567890",found+1));
 						strMonom.erase(0,found);
-						strMonom.erase(0,strMonom.find_first_not_of("1234567890/"));			
-						nRead(strCoeffNom.c_str(), &nCoeffNom);
-						nRead(strCoeffDenom.c_str(), &nCoeffDenom);
+						strMonom.erase(0,strMonom.find_first_not_of("1234567890/"));	
+						char *Nom=new char[strCoeffNom.size()+1];
+						char *Denom=new char[strCoeffDenom.size()+1];
+						strcpy(Nom,strCoeffNom.c_str());
+						strcpy(Denom,strCoeffDenom.c_str());		
+						nRead(Nom/*strCoeffNom.c_str()*/, &nCoeffNom);
+						nRead(Denom/*strCoeffDenom.c_str()*/, &nCoeffDenom);
+						delete[] Nom;
+						delete[] Denom;
 					}
 					else
 					{
 						found = strMonom.find_first_not_of("1234567890");
-						strCoeff = strMonom.substr(0,found);
+						strCoeff = strMonom.substr(0,found);						
 						if(!strCoeff.empty())
 						{
- 							nRead(strCoeff.c_str(),&nCoeff);
+							char *coeff = new char[strCoeff.size()+1];
+							strcpy(coeff, strCoeff.c_str());
+ 							nRead(coeff/*strCoeff.c_str()*/,&nCoeff);
+							delete[] coeff;
 						}
-						else
-						{
-// 							intCoeff = 1;
-							nCoeff = nInit(1);
-						}
-												
 					}
-					const char* monom = strMonom.c_str();					
-						
-					p_Read(monom,strPoly,currRing);	//strPoly:=monom				
+					char* monom = new char[strMonom.size()+1];
+					strcpy(monom, strMonom.c_str());						
+					p_Read(monom,strPoly,currRing);	//strPoly:=monom
+					delete[] monom;	
 					switch (hasCoeffInQ)
 					{
 						case TRUE:
@@ -4163,27 +4182,31 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 								nCoeff=nNeg(nCoeff);							
 							if(!nIsOne(nCoeff))
 							{
-// 								if(hasNegCoeff)
-// 									intCoeff *= -1;
-// 								pSetCoeff(strPoly,(number) intCoeff);
 								pSetCoeff(strPoly, nCoeff );
 							}
 							break;
-													
 					}
 						//pSetCoeff(strPoly, (number) intCoeff);//Why is this set to zero instead of 1???
 					if(pIsConstantComp(resPoly))
-						resPoly=pCopy(strPoly);							
+					{
+						resPoly=pCopy(strPoly);
+						pDelete(&strPoly);
+					}
 					else
+					{
+// 						poly tmp=pAdd(pCopy(resPoly),strPoly);//foo is destroyed
+// 						pDelete(&resPoly);
+// 						resPoly=tmp;
+// 						pDelete(&tmp);
 						resPoly=pAdd(resPoly,strPoly);//pAdd = p_Add_q, destroys args
-// 					nDelete(&nCoeff);
+					}
+					/*if(nCoeff!=NULL)					
+						nDelete(&nCoeff);*/ //NOTE This may cause a crash on certain examples...
 					nDelete(&nCoeffNom);
 					nDelete(&nCoeffDenom);
-// 					pDelete(&strPoly);
 				}//while(!line.empty())			
 				gc->gcBasis->m[jj]=pCopy(resPoly);
 				pDelete(&resPoly);	//reset
-// 				pDelete(&strPoly);	//NOTE Crashes - already deleted by pAdd				
 			}
 // 			break;
 		}//if(line=="GCBASIS")	
@@ -4201,7 +4224,10 @@ void gcone::readConeFromFile(int UCN, gcone *gc)
 					string component;
 					found = normalString.find(",");
 					component=normalString.substr(0,found);
-					(*fN)[ii]=atol(component.c_str());
+					char *sComp = new char[component.size()+1];
+					strcpy(sComp,component.c_str());
+					(*fN)[ii]=atol(sComp/*component.c_str()*/);
+					delete[] sComp;
 					normalString.erase(0,found+1);
 				}
 				/*Only the following line needs to be commented out if you decide not to delete fNormals*/
