@@ -389,10 +389,11 @@ lines:
 #endif
             if(siCntrlc)
             {
-              siCntrlc=FALSE;
-              MYYERROR("abort...");
+              WerrorS("abort...");
+	      while((currentVoice!=NULL) && (currentVoice->prev!=NULL)) exitVoice();
+	      if (currentVoice!=NULL) currentVoice->ifsw=0;
             }
-            if (errorreported)
+            if (errorreported) /* also catches abort... */
             {
               yyerror("");
             }
