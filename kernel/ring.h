@@ -10,7 +10,6 @@
 
 /* includes */
 #include "structs.h"
-#include "structs.h"  // we need ABS
 #include "polys-impl.h"
 
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits

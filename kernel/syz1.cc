@@ -25,6 +25,7 @@
 #include "syz.h"
 #include "kbuckets.h"
 #include "prCopy.h"
+#include "idrec.h"
 
 extern void p_Setm_Syz(poly p, ring r,
                        int* Components, long* ShiftedComponents);

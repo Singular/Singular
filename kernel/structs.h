@@ -29,8 +29,7 @@ typedef int BOOLEAN;
 typedef short BOOLEAN;
 #endif
 
-typedef void * Sy_reference;
-#define ADDRESS Sy_reference
+typedef void * ADDRESS;
 #define BITSET  unsigned int
 
 #if defined(SI_CPU_I386) || defined(SI_CPU_X86_64)
@@ -113,7 +112,6 @@ typedef number (*nMapFunc)(number a);
 /* C++-part */
 #ifdef __cplusplus
 class ip_smatrix;
-class idrec;
 class intvec;
 class sleftv;
 class slists;
@@ -163,9 +161,7 @@ typedef struct sip_package ip_package;
 /* the pointer types */
 typedef char *             char_ptr;
 typedef int  *             int_ptr;
-typedef short *            short_ptr;
 typedef ip_sring *         ring;
-typedef int                idtyp;
 typedef polyrec *          poly;
 typedef poly *             polyset;
 typedef union uutypes      utypes;
@@ -174,7 +170,6 @@ typedef struct s_si_link_extension *si_link_extension;
 typedef polyrec *   napoly;
 
 #ifdef __cplusplus
-typedef idrec *            idhdl;
 typedef ip_smatrix *       matrix;
 typedef ip_link *          si_link;
 typedef sleftv *           leftv;
@@ -499,6 +494,9 @@ struct nc_struct
 };
 #endif
 
+class idrec;
+typedef idrec *   idhdl;
+
 struct sip_sring
 {
 // each entry must have a description and a procedure defining it,
@@ -688,28 +686,6 @@ union uutypes
   si_link       li;
   package       pack;
   procinfo *    pinf;
-};
-
-class idrec
-{
-  public:
-  /* !! do not change the first 6 entries !! (see subexpr.h: sleftv) */
-  idhdl      next;
-  const char *id;
-  utypes     data;
-  attr       attribute;
-  BITSET     flag;
-  idtyp      typ;
-
-  short      lev;
-  short      ref;
-  int        id_i;
-
-  idrec() { memset(this,0,sizeof(*this)); }
-  idhdl get(const char * s, int lev);
-  idhdl set(const char * s, int lev, idtyp t, BOOLEAN init=TRUE);
-  char * String();
-//  ~idrec();
 };
 
 #endif
