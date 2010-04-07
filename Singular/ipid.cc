@@ -115,7 +115,7 @@ idhdl idrec::get(const char * s, int lev)
 //  /* much more !! */
 //}
 
-idhdl idrec::set(const char * s, int lev, idtyp t, BOOLEAN init)
+idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
 {
   //printf("define %s, %x, lev: %d, typ: %d\n", s,s,lev,t);
   idhdl h = (idrec *)omAlloc0Bin(idrec_bin);
@@ -214,7 +214,7 @@ char * idrec::String()
 }
 
 //#define KAI
-idhdl enterid(const char * s, int lev, idtyp t, idhdl* root, BOOLEAN init)
+idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init)
 {
   idhdl h;
   s=omStrDup(s);

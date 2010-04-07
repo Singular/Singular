@@ -605,7 +605,7 @@ static BOOLEAN DumpAsciiMaps(FILE *fd, idhdl h, idhdl rhdl)
 static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
 {
   const char *type_str = GetIdString(h);
-  idtyp type_id = IDTYP(h);
+  int type_id = IDTYP(h);
 
   if ((type_id == PACKAGE_CMD) &&(strcmp(IDID(h), "Top") == 0))
     return FALSE;
@@ -652,7 +652,7 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
 
 static const char* GetIdString(idhdl h)
 {
-  idtyp type = IDTYP(h);
+  int type = IDTYP(h);
 
   switch(type)
   {
@@ -713,7 +713,7 @@ static BOOLEAN DumpQring(FILE *fd, idhdl h, const char *type_str)
 
 static int DumpRhs(FILE *fd, idhdl h)
 {
-  idtyp type_id = IDTYP(h);
+  int type_id = IDTYP(h);
 
   if (type_id == LIST_CMD)
   {

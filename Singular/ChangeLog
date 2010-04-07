@@ -1,6 +1,11 @@
+- bug in NF fixed (see Tst/Short/bug_reduce.tst (was somehow wrong in 310..311)
+- cntrl-c hadling in interpreter fixed (was somehow lost in 310..311)
 - structs.h: smpoly moved to sparsemat.cc, 
              tHomog moved to ring.h, 
 	     Exponent_t removed
+	     idtyp -> int
+	     Sy_refrence removed
+	     idrec -> idrec.h
 - memory leaks fixed for nc rings (trac 214)
 - documentation updates: primdec.lib, PLURAL
 - new lib: surfsig.lib (renamed from signature.lib)

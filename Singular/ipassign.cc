@@ -16,6 +16,7 @@
 #include "tok.h"
 #include "options.h"
 #include "ipid.h"
+#include "idrec.h"
 #include "intvec.h"
 #include "omalloc.h"
 #include "febase.h"

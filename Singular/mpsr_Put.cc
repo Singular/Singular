@@ -69,7 +69,7 @@ mpsr_Status_t mpsr_PutMsg(MP_Link_pt l, leftv v)
 // This already depends on the ring
 mpsr_Status_t mpsr_PutLeftv(MP_Link_pt link, leftv v, ring cring)
 {
-  idtyp type = v->Typ();
+  int type = v->Typ();
 
   switch(type)
   {
