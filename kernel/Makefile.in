@@ -149,7 +149,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 	p_kBucketSetLm__T.cc \
 	kInline.cc
 
-HEADERS=hutil.h stairc.h ideals.h \
+HEADERS=hutil.h idrec.h stairc.h ideals.h \
 	longalg.h structs.h intvec.h int64vec.h longrat.h \
 	numbers.h stype.h clapconv.h maps.h \
 	clapsing.h matpol.h polys.h p_polys.h syz.h \
