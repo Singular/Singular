@@ -2138,7 +2138,10 @@ ideal kNF(ideal F, ideal Q, ideal p,int syzComp,int lazyReduce)
   kStrategy strat=new skStrategy;
   strat->syzComp = syzComp;
   strat->ak = si_max(idRankFreeModule(F),idRankFreeModule(p));
-  strat->ak = si_max(strat->ak,(int)F->rank);
+  if (strat->ak>0) // only for module case, see Tst/Short/bug_reduce.tst
+  {
+    strat->ak = si_max(strat->ak,(int)F->rank);
+  }
 
   if (pOrdSgn==-1)
     res=kNF1(F,Q,pp,strat,lazyReduce);
