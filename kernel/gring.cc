@@ -2788,7 +2788,7 @@ BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r)
       {
     if (ExpVar[j]==0)
     {
-      test = nc_p_CopyGet(MATELEM(r->GetNC()->D,i,j),r);
+      test = MATELEM(r->GetNC()->D,i,j);
       while (test!=NULL)
       {
             p_GetExpV(test, ExpTmp, r);
@@ -2807,7 +2807,6 @@ BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r)
       }
     }
   }
-  p_Delete(&test,r);
   freeT(ExpVar,rN);
   freeT(ExpTmp,rN);
   if ( WeChangeRing )
