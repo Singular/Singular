@@ -1003,7 +1003,7 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 
   for (k=2;k<=a;k++)
   {
-     t = nc_p_CopyGet(MATELEM(cMT,k,1),r);
+     t = MATELEM(cMT,k,1);
 
      if (t==NULL)   /* not computed yet */
      {
@@ -1019,7 +1019,7 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 
   for (m=2;m<=b;m++)
   {
-    t = nc_p_CopyGet(MATELEM(cMT,a,m),r);
+    t = MATELEM(cMT,a,m);
     //     t=MATELEM(cMT,a,m);
     if (t==NULL)   //not computed yet
     {
@@ -2786,24 +2786,29 @@ BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r)
     {
       for (j=i+1; j<=rN; j++)
       {
-    if (ExpVar[j]==0)
-    {
-      test = MATELEM(r->GetNC()->D,i,j);
-      while (test!=NULL)
-      {
-            p_GetExpV(test, ExpTmp, r);
-        OK=1;
-        for (k=1;k<=rN;k++)
-            {
-          if (ExpTmp[k]!=0)
+        if (ExpVar[j]==0)
+        {
+          test = MATELEM(r->GetNC()->D,i,j);
+          while (test!=NULL)
           {
-        if (ExpVar[k]!=0) OK=0;
-          }
+            p_GetExpV(test, ExpTmp, r);
+            OK=1;
+            for (k=1;k<=rN;k++)
+            {
+              if (ExpTmp[k]!=0)
+              {
+                if (ExpVar[k]!=0) OK=0;
+              }
             }
-        if (!OK) return(TRUE);
-        pIter(test);
+            if (!OK)
+            {
+              if ( WeChangeRing )
+                rChangeCurrRing(save);
+              return(TRUE);
+            }
+            pIter(test);
           }
-    }
+        }
       }
     }
   }
