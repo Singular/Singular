@@ -719,6 +719,7 @@ matrix mpCoeffs (ideal I, int var)
   for (i=IDELEMS(I)-1; i>=0; i--)
   {
     f=I->m[i];
+    I->m[i]=NULL;
     while (f!=NULL)
     {
       l=pGetExp(f,var);
@@ -737,6 +738,7 @@ matrix mpCoeffs (ideal I, int var)
       f=h;
     }
   }
+  idDelete(&I);
   return co;
 }
 
