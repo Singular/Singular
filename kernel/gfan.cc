@@ -75,7 +75,7 @@ $Id$
 
 //NOTE Defining this will slow things down!
 //Only good for very coarse profiling
-//#define gfanp
+// #define gfanp
 #ifdef gfanp
 #include <sys/time.h>
 #include <iostream>
@@ -156,7 +156,15 @@ facet::facet(const facet& f)
 	f2Act=this->codim2Ptr;
 	while(f2Copy!=NULL)
 	{
-		if(f2Act==NULL || f2Act==(facet*)0xfefefefefefefefe)
+		if(f2Act==NULL
+#ifndef NDEBUG
+  #if SIZEOF_LONG==8
+				 || f2Act==(facet*)0xfefefefefefefefe
+  #elif SIZEOF_LONG==4
+				 || f2Act==(facet*)0xfefefefe
+  #endif
+#endif
+		  )
 		{
 			f2Act=new facet(2);
 			this->codim2Ptr=f2Act;			
@@ -272,6 +280,7 @@ static bool areEqual2(facet* f, facet *g)
 			break;
 		}
 	}
+// 	if( fIntP->compare(gIntP)!=0) res=FALSE;
 #ifdef gfanp
 	gettimeofday(&end, 0);
 	gcone::t_areEqual += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
@@ -839,7 +848,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	dd_colrange ddcols;
 	dd_rowset ddredrows;		// # of redundant rows in ddineq
 	dd_rowset ddlinset;		// the opposite
-	dd_rowindex ddnewpos;		  // all to make dd_Canonicalize happy
+	dd_rowindex ddnewpos=NULL;		  // all to make dd_Canonicalize happy
 	dd_NumberType ddnumb=dd_Integer; //Number type
 	dd_ErrorType dderr=dd_NoError;		
 	//Compute the # inequalities i.e. rows of the matrix
@@ -893,12 +902,13 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	int num_elts=0;	
 	for(int ii=0;ii<ddineq->rowsize;ii++)
 	{
-		ideal initialForm=idInit(IDELEMS(I),1);
+		ideal initialForm=idInit(IDELEMS(I),I->rank);
 		//read row ii into gamma
-		int64 tmp;
+// 		int64 tmp;
 		int64vec *gamma=new int64vec(this->numVars);
 		for(int jj=1;jj<=this->numVars;jj++)
 		{
+			int64 tmp;
 			tmp=(int64)mpq_get_d(ddineq->matrix[ii][jj]);
 			(*gamma)[jj-1]=(int64)tmp;
 		}
@@ -908,7 +918,9 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		ideal L=idInit(IDELEMS(initialForm),1);
 		for(int jj=0;jj<IDELEMS(initialForm);jj++)
 		{
-			L->m[jj]=pCopy(pHead(initialForm->m[jj]));
+			poly p=pHead(initialForm->m[jj]);
+			L->m[jj]=pCopy(/*pHead(initialForm->m[jj]))*/p);
+			pDelete(&p);
 		}		
 		
 		LObject *P = new sLObject();//TODO What's the difference between sLObject and LObject?
@@ -945,24 +957,26 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
  								break;//for
 							}
 						}
+						pDelete(&q);
 						if(isMaybeFacet==TRUE)
-						{ 							
+						{
 							break;//while(p!=NULL)
 						}
 						p=pNext(p);
-						pDelete(&q);						
 					}//while
 // 					pDelete(&p);//NOTE Better to use pDel and qDel. Commenting in this line will not work!
-					pDelete(&q);
+					if(q!=NULL) pDelete(&q);
 					pDelete(&pDel);
 					pDelete(&qDel);
 					if(isMaybeFacet==FALSE)
 					{
 						dd_set_si(ddineq->matrix[ii][0],1);						
-						if(num_alloc==0)
-							num_alloc += 1;
-						else
-							num_alloc += 1;
+// 						if(num_alloc==0)
+// 							num_alloc += 1;
+// 						else						
+// 							num_alloc += 1;
+						if(num_alloc==num_elts)	num_alloc==0 ? num_alloc=1 : num_alloc*=2;
+						
 						void *tmp = realloc(redRowsArray,(num_alloc*sizeof(int)));
 						if(!tmp)
 						{
@@ -986,12 +1000,15 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	}//for(ii<ddineq-rowsize
 // 	delete gamma;
 	int offset=0;//needed for correction of redRowsArray[ii]
+#ifdef gfan_DEBUG
+	printf("Removed %i of %i in preprocessing step\n",num_elts,ddineq->rowsize);
+#endif
 	for( int ii=0;ii<num_elts;ii++ )
 	{
 		dd_MatrixRowRemove(&ddineq,redRowsArray[ii]+1-offset);//cddlib sucks at enumeration
 		offset++;
-	}
-	free(redRowsArray);
+	}	
+	free(redRowsArray);//NOTE May crash on some machines.
 	/*And now for the strictly positive rows
 	* Doesn't gain significant speedup
 	*/
@@ -1062,10 +1079,10 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		int64vec *load = new int64vec(this->numVars);//int64vec to store a single facet normal that will then be stored via setFacetNormal
 		for (int jj = 1; jj <ddcols; jj++)
 		{
-			double foo;
-			foo = mpq_get_d(ddineq->matrix[kk][jj]);
-			(*load)[jj-1] = (int64)foo;	//store typecasted entry at pos jj-1 of load
-			ggT = intgcd(ggT,(int64&)foo);
+			int64 val;
+			val = (int64)mpq_get_d(ddineq->matrix[kk][jj]);
+			(*load)[jj-1] = val;	//store typecasted entry at pos jj-1 of load
+			ggT = int64gcd(ggT,/*(int64&)foo*/val);
 		}//for (int jj = 1; jj <ddcols; jj++)
 		if(ggT>1)
 		{
@@ -1189,10 +1206,10 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		dd_FreeMatrix(posRestr);
 	}	
 	//Clean up but don't delete the return value!	
-	dd_FreeMatrix(ddineq);
-	set_free(ddredrows);
-	set_free(ddlinset);
-	free(ddnewpos);
+	dd_FreeMatrix(ddineq);	
+	set_free(ddredrows);//check
+	set_free(ddlinset);//check
+	free(ddnewpos);//<-- NOTE Here the crash occurs omAlloc issue?
 #ifdef gfanp
 	gettimeofday(&end, 0);
 	time_getConeNormals += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
@@ -1477,7 +1494,7 @@ void gcone::getExtremalRays(const gcone &gc)
 			WarnS("Interior point exceeds INT_MAX!\n");
 // 		mpq_clear(product);
 		//Compute intgcd
-		ggT=intgcd(ggT,(*ivIntPointOfCone)[ii]);
+		ggT=int64gcd(ggT,(*ivIntPointOfCone)[ii]);
 	}
 	
 	//Divide out a common gcd > 1
@@ -1519,7 +1536,7 @@ void gcone::getExtremalRays(const gcone &gc)
 		delete ivOne;
 		int64 ggT=(*ivIntPointOfCone)[0];
 		for(int ii=0;ii<this->numVars;ii++)
-			ggT=intgcd( ggT, (*ivIntPointOfCone)[ii]);
+			ggT=int64gcd( ggT, (*ivIntPointOfCone)[ii]);
 		if(ggT>1)
 		{
 			for(int jj=0;jj<this->numVars;jj++)
@@ -1601,7 +1618,7 @@ void gcone::getExtremalRays(const gcone &gc)
 		}
 		int64 ggT=(*ivIntPointOfFacet)[0];
 		for(int ii=0;ii<this->numVars;ii++)
-			ggT=intgcd(ggT,(*ivIntPointOfFacet)[ii]);
+			ggT=int64gcd(ggT,(*ivIntPointOfFacet)[ii]);
 		if(ggT>1)
 		{
 			for(int ii=0;ii<this->numVars;ii++)
@@ -1854,7 +1871,9 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 			int *dst_ExpV = (int *)omAlloc((this->numVars+1)*sizeof(int));
 			pGetExpV(aktpoly,src_ExpV);
 			rChangeCurrRing(tmpRing);	//this ring change is crucial!
-			pGetExpV(pCopy(H->m[ii]),dst_ExpV);
+			poly p=pCopy(H->m[ii]);
+			pGetExpV(p/*pCopy(H->m[ii])*/,dst_ExpV);
+			pDelete(&p);
 			rChangeCurrRing(srcRing);
 			bool expVAreEqual=TRUE;
 			for (int kk=1;kk<=this->numVars;kk++)
@@ -2251,7 +2270,7 @@ inline void gcone::flip2(const ideal &gb, facet *f)
  * used in gcone::getFacetNormal in order to preprocess possible facet normals
  * and in gcone::flip for obvious reasons.
 */
-inline void gcone::computeInv(const ideal &gb, ideal &initialForm, const int64vec &fNormal)
+/*inline*/ void gcone::computeInv(const ideal &gb, ideal &initialForm, const int64vec &fNormal)
 {
 #ifdef gfanp
 	timeval start, end;
@@ -2264,28 +2283,35 @@ inline void gcone::computeInv(const ideal &gb, ideal &initialForm, const int64ve
 		int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		pGetExpV(aktpoly,leadExpV);	//find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
 		initialFormElement=pHead(aktpoly);
+// 		int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		while(pNext(aktpoly)!=NULL)	/*loop trough terms and check for parallelity*/
 		{
 			int64vec *check = new int64vec(this->numVars);
 			aktpoly=pNext(aktpoly);	//next term
-// 			pSetm(aktpoly);
 			int *v=(int *)omAlloc((this->numVars+1)*sizeof(int));
 			pGetExpV(aktpoly,v);		
-			/* Convert (int)v into (int64vec)check */			
+			/* Convert (int)v into (int64vec)check */
+// 			bool notPar=FALSE;
 			for (int jj=0;jj<this->numVars;jj++)
 			{
 				(*check)[jj]=v[jj+1]-leadExpV[jj+1];
-			}
-			if (isParallel(*check,fNormal)) //pass *check when 
-// 			if(isParallel((const int64vec*)&check,(const int64vec*)&fNormal))
-// 			if(fNormal.compare(check)==0)
-			{
-				//Found a parallel vector. Add it
-				initialFormElement = pAdd((initialFormElement),(poly)pHead(aktpoly));//pAdd = p_Add_q destroys args
+// 				register int64 foo=(fNormal)[jj];
+// 				if( ( (*check)[jj]  == /*fNormal[jj]*/foo ) 
+// 				 || ( (/*fNormal[jj]*/foo!=0) && ( ( (*check)[jj] % /*fNormal[jj]*/foo ) !=0 ) ) ) 
+// 				{
+// 					notPar=TRUE;
+// 					break;
+// 				}
 			}
 			omFree(v);
+			if (isParallel(*check,fNormal))//Found a parallel vector. Add it
+//  			if(notPar==FALSE)
+			{
+				initialFormElement = pAdd((initialFormElement),(poly)pHead(aktpoly));//pAdd = p_Add_q destroys args
+			}
 			delete check;
 		}//while
+// 		omFree(v);
 #ifdef gfan_DEBUG
 //  		cout << "Initial Form=";				
 //  		pWrite(initialFormElement[ii]);
@@ -2477,11 +2503,9 @@ static bool isParallel(const int64vec &a,const int64vec &b)
 	timeval start, end;
 	gettimeofday(&start, 0);
 #endif*/		
-	int lhs,rhs;
 	bool res;
-	lhs=dotProduct(a,b)*dotProduct(a,b);
-	rhs=dotProduct(a,a)*dotProduct(b,b);
-			//cout << "LHS="<<lhs<<", RHS="<<rhs<<endl;
+	int lhs=dotProduct(a,b)*dotProduct(a,b);
+	int rhs=dotProduct(a,a)*dotProduct(b,b);	
 	if (lhs==rhs)
 	{
 		res = TRUE;
@@ -3371,11 +3395,11 @@ void gcone::makeInt(const dd_MatrixPtr &M, const int line, int64vec &n)
 	{
 		mpq_mul(res,qkgV,M->matrix[line-1][ii+1]);
 		n[ii]=(int64)mpz_get_d(mpq_numref(res));
-// 		ggT=intgcd(ggT,n[ii]);
+// 		ggT=int64gcd(ggT,n[ii]);
 	}
 	int64 ggT=n[0];
 	for(int ii=0;ii<this->numVars;ii++)
-		ggT=intgcd(ggT,n[ii]);	
+		ggT=int64gcd(ggT,n[ii]);	
 	//Normalization
 	if(ggT>1)
 	{
@@ -3858,7 +3882,23 @@ void gcone::replaceDouble_ringorder_a_ByASingleOne()
 
 /** \brief Compute the gcd of two ints
  */
-static int intgcd(const int64 &a, const int64 &b)
+static int64 int64gcd(const int64 &a, const int64 &b)
+{
+	int64 r, p=a, q=b;
+	if(p < 0)
+		p = -p;
+	if(q < 0)
+		q = -q;
+	while(q != 0)
+	{
+		r = p % q;
+		p = q;
+		q = r;
+	}
+	return p;
+}
+	
+static int intgcd(const int &a, const int &b)
 {
 	int r, p=a, q=b;
 	if(p < 0)
@@ -3872,7 +3912,7 @@ static int intgcd(const int64 &a, const int64 &b)
 		q = r;
 	}
 	return p;
-}		
+}
 		
 /** \brief Construct a dd_MatrixPtr from a cone's list of facets
  * NO LONGER USED
@@ -3970,8 +4010,8 @@ void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 		
 		while(fAct!=NULL)
 		{	
-			const int64vec *iv;
-			iv=fAct->getRef2FacetNormal();//->getFacetNormal();
+			const int64vec *iv=fAct->getRef2FacetNormal();
+// 			iv=fAct->getRef2FacetNormal();//->getFacetNormal();
 			f2Act=fAct->codim2Ptr;
 			for (int ii=0;ii<iv->length();ii++)
 			{
@@ -4008,6 +4048,7 @@ void gcone::writeConeToFile(const gcone &gc, bool usingIntPoints)
 		}			
 	gcOutputFile.close();
 	}
+	delete [] ringString;
 			
 }//writeConeToFile(gcone const &gc)
 		
