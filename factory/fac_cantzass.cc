@@ -235,8 +235,9 @@ CanonicalForm powerMod( const CanonicalForm & f, int p, int s, const CanonicalFo
 
     mpz_init( &m );
     mpz_mypow_ui( &m, p, s );
-    while ( mpz_cmp_si( &m, 0 ) != 0 ) {
-        odd = mpz_mdivmod_ui( &m, 0, &m, 2 );
+    while ( mpz_cmp_si( &m, 0 ) != 0 )
+    {
+        odd = mpz_fdiv_q_ui( &m, &m, 2 );
         if ( odd != 0 )
             prod = (prod * b) % d;
         if ( mpz_cmp_si( &m, 0 ) != 0 )
@@ -257,9 +258,10 @@ CanonicalForm powerMod2( const CanonicalForm & f, int p, int s, const CanonicalF
     mpz_init( &m );
     mpz_mypow_ui( &m, p, s );
     mpz_sub_ui( &m, &m, 1 );
-    mpz_div_ui( &m, &m, 2 );
-    while ( mpz_cmp_si( &m, 0 ) != 0 ) {
-        odd = mpz_mdivmod_ui( &m, 0, &m, 2 );
+    mpz_fdiv_q_ui( &m, &m, 2 );
+    while ( mpz_cmp_si( &m, 0 ) != 0 )
+    {
+        odd = mpz_fdiv_q_ui( &m, &m, 2 );
         if ( odd != 0 )
             prod = (prod * b) % d;
         if ( mpz_cmp_si( &m, 0 ) != 0 )
@@ -280,9 +282,10 @@ CanonicalForm powerMod2( const CanonicalForm & f, MP_INT * q, int s, const Canon
     mpz_init( &m );
     mpz_mypow( &m, q, s );
     mpz_sub_ui( &m, &m, 1 );
-    mpz_div_ui( &m, &m, 2 );
-    while ( mpz_cmp_si( &m, 0 ) != 0 ) {
-        odd = mpz_mdivmod_ui( &m, 0, &m, 2 );
+    mpz_fdiv_q_ui( &m, &m, 2 );
+    while ( mpz_cmp_si( &m, 0 ) != 0 )
+    {
+        odd = mpz_fdiv_q_ui( &m, &m, 2 );
         if ( odd != 0 )
             prod = (prod * b) % d;
         if ( mpz_cmp_si( &m, 0 ) != 0 )

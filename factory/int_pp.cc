@@ -90,7 +90,7 @@ InternalPrimePower::setPrimePower( int p, int k )
     if ( p != prime || k != exp ) {
 	mpz_set_si( &primepow, p );
 	mpz_pow_ui( &primepow, &primepow, (unsigned int)k );
-	mpz_div_ui( &primepowhalf, &primepow, 2 );
+	mpz_fdiv_q_ui( &primepowhalf, &primepow, 2 );
 	prime = p;
 	exp = k;
     }
@@ -403,7 +403,7 @@ InternalPrimePower::intval () const
 int
 InternalPrimePower::intmod( int p ) const
 {
-  return (int)mpz_mmod_ui( 0, &thempi, (unsigned long)p );
+  return (int)mpz_fdiv_ui( &thempi, (unsigned long)p );
 }
 
 //{{{ int InternalPrimePower::sign () const

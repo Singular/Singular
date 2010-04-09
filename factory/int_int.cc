@@ -520,7 +520,7 @@ int InternalInteger::intval() const
 
 int InternalInteger::intmod( int p ) const
 {
-  return (int)mpz_mmod_ui( 0, &thempi, (unsigned long)p );
+  return (int)mpz_fdiv_ui( &thempi, (unsigned long)p );
 }
 
 //{{{ int InternalInteger::sign () const
