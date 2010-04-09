@@ -3354,7 +3354,7 @@ ipshell()");
 /*
  WILL HAVE TO CHANGE RETURN TYPE TO LIST_CMD
 */
-if (strcmp(sys_cmd,"gfan")==0)
+if (strcmp(sys_cmd,"grfan")==0)
 {
 	/*
 	heuristic:
@@ -3373,7 +3373,7 @@ if (strcmp(sys_cmd,"gfan")==0)
 	  }
 	  else
 	  {
-		  WerrorS("Usage: system(\"gfan\",I,int)");
+		  WerrorS("Usage: system(\"grfan\",I,int)");
 		  return TRUE;
 	  }
 }
