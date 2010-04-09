@@ -3356,21 +3356,6 @@ ipshell()");
 */
 if (strcmp(sys_cmd,"gfan")==0)
 {
-//         if ((h==NULL) || (h!=NULL && h->Typ()!=IDEAL_CMD))
-//         {
-//                 Werror("system(\"gfan\"...) Ideal expected");
-//                 return TRUE; //Ooooops
-//         }
-// 	else if(h->next==NULL)
-// 	{
-// 		Werror("gfan expects an integer parameter");
-// 		return TRUE;
-// 	}
-// 	else if(h->next!=NULL && h->next->Typ()!=INT_CMD)
-// 	{
-// 		Werror("1st parameter ist no integer");
-// 		return TRUE;
-// 	}
 	/*
 	heuristic:
 	  0 = keep all Gröbner bases in memory
@@ -3382,8 +3367,6 @@ if (strcmp(sys_cmd,"gfan")==0)
 		  int heuristic;
 		  heuristic=(int)(long)h->next->Data();
 		  ideal I=((ideal)h->Data());
-// 		  res->rtyp=IDEAL_CMD;
-// 		  res->data=(ideal) gfan(I,heuristic);
 		  res->rtyp=LIST_CMD;
 		  res->data=(lists) gfan(I,heuristic);
 		  return FALSE;
@@ -3393,10 +3376,6 @@ if (strcmp(sys_cmd,"gfan")==0)
 		  WerrorS("Usage: system(\"gfan\",I,int)");
 		  return TRUE;
 	  }
-//res->rtyp=LIST_CMD;
-//res->data= ???
-
-// return FALSE; //Everything went fine
 }
 else
 #endif
