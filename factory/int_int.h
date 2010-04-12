@@ -126,8 +126,8 @@ public:
 
     friend class InternalRational;
 #ifdef SINGULAR
-    friend MP_INT gmp_numerator ( const CanonicalForm & f );
-    friend MP_INT gmp_denominator ( const CanonicalForm & f );
+    friend void gmp_numerator ( const CanonicalForm & f, mpz_ptr result);
+    friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
 #endif /* SINGULAR */
     friend MP_INT getmpi ( InternalCF * value, bool symmetric );
 };

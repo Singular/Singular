@@ -27,9 +27,9 @@ extern FILE * feFopen ( const char * path, const char * mode, char *where = 0, i
 
 /*BEGINPUBLIC*/
 
-MP_INT gmp_numerator ( const CanonicalForm & f );
+void gmp_numerator ( const CanonicalForm & f, mpz_ptr result );
 
-MP_INT gmp_denominator ( const CanonicalForm & f );
+void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
 
 int gf_value (const CanonicalForm & f );
 

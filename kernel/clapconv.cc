@@ -82,12 +82,12 @@ number convFactoryNSingN( const CanonicalForm & n)
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
-    z->z = gmp_numerator( n );
+    gmp_numerator( n, &z->z );
     if ( n.den().isOne() )
       z->s = 3;
     else
     {
-      z->n = gmp_denominator( n );
+      gmp_denominator( n, &z->n );
       z->s = 0;
     }
     return z;
@@ -137,12 +137,12 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
 #if defined(LDEBUG)
       z->debug=123456;
 #endif
-      z->z = gmp_numerator( f );
+      gmp_numerator( f, &z->z );
       if ( f.den().isOne() )
         z->s = 3;
       else
       {
-        z->n = gmp_denominator( f );
+        gmp_denominator( f, &z->n );
         z->s = 0;
         nlNormalize(z);
       }
@@ -351,14 +351,14 @@ static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
-    z->z = gmp_numerator( f );
+    gmp_numerator( f, &z->z );
     if ( f.den().isOne() )
     {
       z->s = 3;
     }
     else
     {
-      z->n = gmp_denominator( f );
+      gmp_denominator( f, &z->n );
       z->s = 0;
       nlNormalize(z);
     }

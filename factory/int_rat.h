@@ -99,8 +99,8 @@ public:
 
     friend class InternalInteger;
 #ifdef SINGULAR
-    friend MP_INT gmp_numerator ( const CanonicalForm & f );
-    friend MP_INT gmp_denominator ( const CanonicalForm & f );
+    friend void gmp_numerator ( const CanonicalForm & f, mpz_ptr result );
+    friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
 #endif /* SINGULAR */
     friend CanonicalForm make_cf ( const MP_INT & n, const MP_INT & d );
 };

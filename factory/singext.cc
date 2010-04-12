@@ -13,50 +13,50 @@
 #include "imm.h"
 #include "cf_factory.h"
 
-MP_INT
-gmp_numerator ( const CanonicalForm & f )
+void gmp_numerator ( const CanonicalForm & f, mpz_ptr result )
 {
     InternalCF * ff = f.getval();
     ASSERT( ! is_imm( ff ), "illegal type" );
-    MP_INT result;
-    if ( ff->levelcoeff() == IntegerDomain ) {
-	mpz_init_set( &result, &(InternalInteger::MPI( ff )) );
-	ff->deleteObject();
+    if ( ff->levelcoeff() == IntegerDomain )
+    {
+        mpz_init_set( result, &(InternalInteger::MPI( ff )) );
+        ff->deleteObject();
     }
-    else  if ( ff->levelcoeff() == RationalDomain ) {
-	mpz_init_set( &result, &(InternalRational::MPQNUM( ff )) );
-	ff->deleteObject();
+    else  if ( ff->levelcoeff() == RationalDomain )
+    {
+        mpz_init_set( result, &(InternalRational::MPQNUM( ff )) );
+        ff->deleteObject();
     }
-    else {
-	ASSERT( 0, "illegal type" );
+    else
+    {
+        ASSERT( 0, "illegal type" );
     }
-    return result;
 }
 
-MP_INT
-gmp_denominator ( const CanonicalForm & f )
+void gmp_denominator ( const CanonicalForm & f, mpz_ptr result )
 {
     InternalCF * ff = f.getval();
     ASSERT( ! is_imm( ff ), "illegal type" );
-    MP_INT result;
-    if ( ff->levelcoeff() == IntegerDomain ) {
-	mpz_init_set_si( &result, 1 );
-	ff->deleteObject();
+    if ( ff->levelcoeff() == IntegerDomain )
+    {
+        mpz_init_set_si( result, 1 );
+        ff->deleteObject();
     }
-    else  if ( ff->levelcoeff() == RationalDomain ) {
-	mpz_init_set( &result, &(InternalRational::MPQDEN( ff )) );
-	ff->deleteObject();
+    else  if ( ff->levelcoeff() == RationalDomain )
+    {
+        mpz_init_set( result, &(InternalRational::MPQDEN( ff )) );
+        ff->deleteObject();
     }
-    else {
-	ASSERT( 0, "illegal type" );
+    else
+    {
+        ASSERT( 0, "illegal type" );
     }
-    return result;
 }
 
 int gf_value (const CanonicalForm & f )
 {
     InternalCF * ff = f.getval();
-    return ((long)ff) >>2; 
+    return ((long)ff) >>2;
 }
 
 CanonicalForm
