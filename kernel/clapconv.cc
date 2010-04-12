@@ -471,6 +471,7 @@ number   nlChineseRemainder(number *x, number *q,int rl)
 // elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
 {
 #ifdef HAVE_FACTORY
+  setCharacteristic( 0 ); // only in char 0
   CFArray X(rl), Q(rl);
   int i;
   for(i=rl-1;i>=0;i--)
