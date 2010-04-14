@@ -153,7 +153,7 @@ void p_ExpVectorDiffRat(poly pr, poly p1, poly p2, int ishift, ring r)
   p_LmCheckPolyRing1(pr, r); 
   int i;
   poly t=pr;
-  Exponent_t e1,e2;
+  int e1,e2;
   for (i=ishift+1; i<=r->N; i++)
   {
     e1 = p_GetExp(p1, i, r);
