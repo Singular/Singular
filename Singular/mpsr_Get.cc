@@ -70,7 +70,7 @@ static mpsr_Status_t GetCopCommandLeftv(MP_Link_pt link, MPT_Node_pt node,
 //
 #define fr(cond)    if (! (cond)) return FALSE
 
-inline BOOLEAN IsIntVecNode(MPT_Node_pt node)
+static inline BOOLEAN IsIntVecNode(MPT_Node_pt node)
 {
   fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseVector));
 
@@ -79,7 +79,7 @@ inline BOOLEAN IsIntVecNode(MPT_Node_pt node)
                                    MP_ProtoDict, MP_CmtProtoIMP_Sint32);
 }
 
-inline BOOLEAN IsIntMatNode(MPT_Node_pt node)
+static inline BOOLEAN IsIntMatNode(MPT_Node_pt node)
 {
   fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseMatrix));
 
@@ -88,7 +88,7 @@ inline BOOLEAN IsIntMatNode(MPT_Node_pt node)
                                    MP_ProtoDict, MP_CmtProtoIMP_Sint32);
 }
 
-inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
+static inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   BOOLEAN mv;
   return
@@ -96,7 +96,7 @@ inline BOOLEAN IsRingNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
     mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == mpsr_Success;
 }
 
-inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
+static inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   BOOLEAN mv;
 
@@ -107,7 +107,7 @@ inline BOOLEAN IsPolyNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
     mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == mpsr_Success;
 }
 
-inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r,
+static inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r,
                                 BOOLEAN &IsUnOrdered)
 {
   BOOLEAN mv;
@@ -119,7 +119,7 @@ inline BOOLEAN IsPolyVectorNode(MPT_Node_pt node, ring &r,
     mpsr_GetRingAnnots(node, r, mv, IsUnOrdered) == mpsr_Success;
 }
 
-inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r,
+static inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r,
                            BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_PolyDict, MP_CopPolyIdeal));
@@ -132,7 +132,7 @@ inline BOOLEAN IsIdealNode(MPT_Node_pt node, ring &r,
     IsPolyNode(node, r, IsUnOrdered);
 }
 
-inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
+static inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_PolyDict, MP_CopPolyModule));
   MPT_Tree_pt tree = MPT_ProtoAnnotValue(node);
@@ -144,7 +144,7 @@ inline BOOLEAN IsModuleNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
     IsPolyVectorNode(node, r, IsUnOrdered);
 }
 
-inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
+static inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
 {
   fr(NodeCheck(node, MP_MatrixDict, MP_CopMatrixDenseMatrix));
   MPT_Tree_pt tree = MPT_ProtoAnnotValue(node);
@@ -156,7 +156,7 @@ inline BOOLEAN IsMatrixNode(MPT_Node_pt node, ring &r, BOOLEAN &IsUnOrdered)
     IsPolyNode(node, r, IsUnOrdered);
 }
 
-inline BOOLEAN IsQuitNode(MPT_Node_pt node)
+static inline BOOLEAN IsQuitNode(MPT_Node_pt node)
 {
   return NodeCheck(node, MP_MpDict, MP_CopMpEndSession);
 }
@@ -164,12 +164,12 @@ inline BOOLEAN IsQuitNode(MPT_Node_pt node)
 //
 // Init*Leftv functions
 //
-inline void InitIntLeftv(mpsr_leftv mlv, int i)
+static inline void InitIntLeftv(mpsr_leftv mlv, int i)
 {
   mlv->lv = mpsr_InitLeftv(INT_CMD, (void *) i);
 }
 
-inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
+static inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
 {
   number n = (number) omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
@@ -183,7 +183,7 @@ inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
   mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
 }
 
-inline void InitReal32Leftv(mpsr_leftv mlv, MPT_Arg_t r32)
+static inline void InitReal32Leftv(mpsr_leftv mlv, MPT_Arg_t r32)
 {
   number n = (number) r32;
 //  n = Real32_2_Number(r32);
@@ -192,7 +192,7 @@ inline void InitReal32Leftv(mpsr_leftv mlv, MPT_Arg_t r32)
   mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
 }
 
-inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
+static inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
 {
   int pos;
 
@@ -232,28 +232,28 @@ inline void InitIdentifierLeftv(mpsr_leftv mlv, char *name, short quote)
 
 /* primitive mpsr_Get*Leftv functions */
 
-inline mpsr_Status_t mpsr_GetIntLeftv(MPT_Node_pt node, mpsr_leftv mlv)
+static inline mpsr_Status_t mpsr_GetIntLeftv(MPT_Node_pt node, mpsr_leftv mlv)
 {
   mpsr_assume(MP_IsFixedIntegerType(node->type));
   mlv->lv = mpsr_InitLeftv(INT_CMD, node->nvalue);
   return mpsr_Success;
 }
 
-inline mpsr_Status_t mpsr_GetReal32Leftv(MPT_Node_pt node, mpsr_leftv mlv)
+static inline mpsr_Status_t mpsr_GetReal32Leftv(MPT_Node_pt node, mpsr_leftv mlv)
 {
   mpsr_assume(node->type == MP_Real32Type);
   InitReal32Leftv(mlv, node->nvalue);
   return mpsr_Success;
 }
 
-inline mpsr_Status_t mpsr_GetApIntLeftv(MPT_Node_pt node, mpsr_leftv mlv)
+static inline mpsr_Status_t mpsr_GetApIntLeftv(MPT_Node_pt node, mpsr_leftv mlv)
 {
   InitApIntLeftv(mlv, (mpz_ptr)  node->nvalue);
   node->nvalue = NULL;
   return mpsr_Success;
 }
 
-inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
+static inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
                                              short quote)
 {
   mpsr_assume(MP_IsIdType(node->type));
@@ -281,7 +281,7 @@ inline mpsr_Status_t mpsr_GetIdentifierLeftv(MPT_Node_pt node, mpsr_leftv mlv,
   return mpsr_Success;
 }
 
-inline mpsr_Status_t mpsr_GetStringLeftv(MPT_Node_pt node, mpsr_leftv mlv)
+static inline mpsr_Status_t mpsr_GetStringLeftv(MPT_Node_pt node, mpsr_leftv mlv)
 {
   mpsr_assume(node->type == MP_StringType);
   mlv->lv = mpsr_InitLeftv(STRING_CMD, MP_STRING_T(node->nvalue));
@@ -289,7 +289,7 @@ inline mpsr_Status_t mpsr_GetStringLeftv(MPT_Node_pt node, mpsr_leftv mlv)
   return mpsr_Success;
 }
 
-inline mpsr_Status_t GetQuitLeftv(mpsr_leftv mlv)
+static inline mpsr_Status_t GetQuitLeftv(mpsr_leftv mlv)
 {
   mlv->lv = mpsr_InitLeftv(STRING_CMD, (void *) omStrDup(MPSR_QUIT_STRING));
   return mpsr_Success;

@@ -176,7 +176,7 @@ static mpsr_Status_t PutRationalNumber(MP_Link_pt link, number a)
  * Algebraic Numbers (a la Singular)
  *
  ***************************************************************/
-inline MP_Uint32_t GetPlength(napoly a)
+static inline MP_Uint32_t GetPlength(napoly a)
 {
   MP_Uint32_t i = napLength(a);
   return i;

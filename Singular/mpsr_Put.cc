@@ -255,7 +255,7 @@ mpsr_Status_t mpsr_PutProc(MP_Link_pt link, const char* pname, procinfov proc)
  *
  ***************************************************************/
 
-inline mpsr_Status_t PutLeftvChain(MP_Link_pt link, leftv lv, ring r)
+static inline mpsr_Status_t PutLeftvChain(MP_Link_pt link, leftv lv, ring r)
 {
   while (lv != NULL)
   {

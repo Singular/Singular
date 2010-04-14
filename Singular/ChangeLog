@@ -1,3 +1,4 @@
+- renamed some old gmp functions (for compatibility with MPIR-2)
 - bug in NF fixed (see Tst/Short/bug_reduce.tst (was somehow wrong in 310..311)
 - cntrl-c hadling in interpreter fixed (was somehow lost in 310..311)
 - structs.h: smpoly moved to sparsemat.cc, 

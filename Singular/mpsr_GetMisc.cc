@@ -101,7 +101,7 @@ static ring mpsr_rDefault(short ch, const char *name)
 // returns TRUE, if r1 less or equals r2
 // FALSE, otherwise
 // Less or equal means that r1 is a strong subring of r2
-inline BOOLEAN RingLessEqual(ring r1, ring r2)
+static inline BOOLEAN RingLessEqual(ring r1, ring r2)
 {
   int i, j;
 
