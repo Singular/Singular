@@ -148,7 +148,7 @@ long InvMod(long a)
 }
 #endif
 
-inline number npInversM (number c)
+static inline number npInversM (number c)
 {
 #ifndef HAVE_DIV_MOD
   return (number)(long)npExpTable[npPminus1M - npLogTable[(long)c]];
@@ -605,7 +605,7 @@ long nvInvMod(long a)
       return s;
 }
 
-inline number nvInversM (number c)
+static inline number nvInversM (number c)
 {
   long inv=nvInvMod((long)c);
   return (number)inv;

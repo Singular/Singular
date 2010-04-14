@@ -75,7 +75,7 @@ sBucket_pt    sBucketCopy(const sBucket_pt bucket)
 // internal routines
 //
 // returns floor(log_2(i))
-inline int LOG2(int i)
+static inline int LOG2(int i)
 {
   assume (i > 0);
   int j = 0;

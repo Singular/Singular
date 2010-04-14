@@ -129,9 +129,9 @@ static inline poly pOne_Special(const ring r=currRing)
 
 #ifdef LEN_VAR1
 // erste Variante: Laenge: Anzahl der Monome
-inline int pSLength(poly p, int l) {
-  return l; }
-inline int kSBucketLength(kBucket* bucket, poly lm) {return bucket_guess(bucket);}
+static inline int pSLength(poly p, int l) { return l; }
+static inline int kSBucketLength(kBucket* bucket, poly lm)
+  {return bucket_guess(bucket);}
 #endif
 
 #ifdef LEN_VAR2
@@ -181,7 +181,7 @@ int QlogSize(number n){
 
 
 #ifdef LEN_VAR3
-inline wlen_type pSLength(poly p,int l)
+static inline wlen_type pSLength(poly p,int l)
 {
   wlen_type c;
   number coef=pGetCoeff(p);
@@ -248,7 +248,7 @@ wlen_type kSBucketLength(kBucket* b, poly lm=NULL)
 }
 #endif
 #ifdef LEN_VAR5
-inline wlen_type pSLength(poly p,int l)
+static inline wlen_type pSLength(poly p,int l)
 {
   int c;
   number coef=pGetCoeff(p);

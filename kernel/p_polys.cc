@@ -413,7 +413,7 @@ long pTotaldegree(poly p, const ring r)
 
 // pWTotalDegree for weighted orderings
 // whose first block covers all variables
-inline long _pWFirstTotalDegree(poly p, const ring r)
+static inline long _pWFirstTotalDegree(poly p, const ring r)
 {
   int i;
   long sum = 0;

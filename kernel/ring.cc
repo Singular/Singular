@@ -4142,7 +4142,7 @@ void pDebugPrint(poly p)
 #endif // RDEBUG
 
 /// debug-print monomial poly/vector p, assuming that it lives in the ring R
-inline void m_DebugPrint(const poly p, const ring R)
+static inline void m_DebugPrint(const poly p, const ring R)
 {
   Print("\nexp[0..%d]\n", R->ExpL_Size - 1);
   for(int i = 0; i < R->ExpL_Size; i++)
