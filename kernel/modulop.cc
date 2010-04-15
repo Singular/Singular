@@ -468,7 +468,7 @@ static number npMapLongR(number from)
     ndest->_mp_d = nn;
     ndest->_mp_alloc = ndest->_mp_size = bl;
     res->s = 0;
-    in=mpz_mmod_ui(NULL,ndest,npPrimeM);
+    in=mpz_fdiv_ui(ndest,npPrimeM);
     mpz_clear(ndest);
   }
   else
@@ -483,7 +483,7 @@ static number npMapLongR(number from)
 
   dest->_mp_d = dd;
   dest->_mp_alloc = al;
-  iz=mpz_mmod_ui(NULL,dest,npPrimeM);
+  iz=mpz_fdiv_ui(dest,npPrimeM);
   mpz_clear(dest);
   omFreeBin((ADDRESS)res, rnumber_bin);
   if(res->s==0)

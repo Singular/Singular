@@ -1360,10 +1360,10 @@ int nlModP(number n, int p)
     if (i<0) return (p-((-i)%p));
     return i%p;
   }
-  int iz=(int)mpz_mmod_ui(NULL,&n->z,(unsigned long)p);
+  int iz=(int)mpz_fdiv_ui(&n->z,(unsigned long)p);
   if (n->s!=3)
   {
-    int in=mpz_mmod_ui(NULL,&n->n,(unsigned long)p);
+    int in=mpz_fdiv_ui(&n->n,(unsigned long)p);
     #ifdef NV_OPS
     if (npPrimeM>NV_MAX_PRIME)
     return (int)((long)nvDiv((number)iz,(number)in));
