@@ -60,15 +60,15 @@ int gf_value (const CanonicalForm & f )
 }
 
 CanonicalForm
-make_cf ( const mpz_ptr n )
+make_cf ( const MP_INT & n )
 {
-    return CanonicalForm( CFFactory::basic( *n ) );
+    return CanonicalForm( CFFactory::basic( n ) );
 }
 
 CanonicalForm
-make_cf ( const mpz_ptr n, const mpz_ptr d, bool normalize )
+make_cf ( const MP_INT & n, const MP_INT & d, bool normalize )
 {
-    return CanonicalForm( CFFactory::rational( *n, *d, normalize ) );
+    return CanonicalForm( CFFactory::rational( n, d, normalize ) );
 }
 
 CanonicalForm make_cf_from_gf ( const int z )
