@@ -1836,7 +1836,7 @@ void rComposeRing(lists L, ring R)
   // ----------------------------------------
   // 0: string: integer
   // no further entries --> Z
-  R->ringflaga = (int_number) omAlloc(sizeof(MP_INT));
+  R->ringflaga = (int_number) omAlloc(sizeof(mpz_t));
   if (L->nr == 0)
   {
     mpz_init_set_ui(R->ringflaga,0);
@@ -4603,7 +4603,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
 #ifdef HAVE_RINGS
   else if ((pn->name != NULL) && (strcmp(pn->name, "integer") == 0))
   {
-    ringflaga = (int_number) omAlloc(sizeof(MP_INT));
+    ringflaga = (int_number) omAlloc(sizeof(mpz_t));
     mpz_init_set_si(ringflaga, 0);
     if ((pn->next!=NULL) && (pn->next->Typ()==INT_CMD))
     {

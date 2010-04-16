@@ -1469,13 +1469,13 @@ void ResolveCoeff (mpq_t c, number m)
      {
         if (m->s<2)
         {
-           mpz_set(mpq_numref(c),&m->z);
-           mpz_set(mpq_denref(c),&m->n);
+           mpz_set(mpq_numref(c),m->z);
+           mpz_set(mpq_denref(c),m->n);
            mpq_canonicalize(c);
         }
         else
         {
-           mpq_set_z(c,&m->z);
+           mpq_set_z(c,m->z);
         }
      }
 }
@@ -1747,7 +1747,7 @@ ideal interpolation(lists L, intvec *v)
 #ifdef LDEBUG
              n->debug=123456;
 #endif
-             mpz_init_set(&n->z,temp->polycoef[a]);
+             mpz_init_set(n->z,temp->polycoef[a]);
              n->s=3;
              nlNormalize(n);
              p=pNSet(n); //a monomial

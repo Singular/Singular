@@ -177,9 +177,9 @@ static inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
 #endif
   mlv->r = mpsr_rDefault(0);
   n->s = 3;
-  memcpy(&(n->z), apint, sizeof(MP_INT));
+  memcpy(&(n->z), apint, sizeof(mpz_t));
   nlNormalize(n);
-  omFreeSize(apint, sizeof(MP_INT));
+  omFreeSize(apint, sizeof(mpz_t));
   mlv->lv = mpsr_InitLeftv(NUMBER_CMD, n);
 }
 

@@ -234,7 +234,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     y->debug = 123456;
 #endif
     y->s = 3;
-    gnum = &(y->z);
+    gnum = y->z;
     mpz_init(gnum);
     mp_failr(IMP_MyGetApInt(link, (MP_ApInt_t *) &gnum));
     nlNormalize(y);
@@ -256,8 +256,8 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     y->debug = 123456;
 #endif
     y->s = 1;
-    failr(GetApInt(link, &(y->z)));
-    return GetApInt(link, &(y->n));
+    failr(GetApInt(link, y->z));
+    return GetApInt(link, y->n);
   }
   // check for some more esoteric cases
   else if (node == MP_Uint8Type)
@@ -280,7 +280,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
 #if defined(LDEBUG)
       y->debug = 123456;
 #endif
-      mpz_init_set_ui(&(y->z), ui);
+      mpz_init_set_ui(y->z, ui);
       y->s = 3;
     }
   }
