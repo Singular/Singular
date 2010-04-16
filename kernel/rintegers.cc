@@ -21,7 +21,7 @@
 
 #ifdef HAVE_RINGS
 
-omBin gmp_nrz_bin = omGetSpecBin(sizeof(MP_INT));
+omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
 
 /*
  * Multiply two numbers
@@ -116,7 +116,7 @@ number cfrzCopy(number a, const ring r)
 int nrzSize(number a)
 {
   if (a == NULL) return 0;
-  return sizeof(MP_INT);
+  return sizeof(mpz_t);
 }
 
 /*
@@ -333,7 +333,7 @@ void nrzWrite (number &a, const ring r)
 /*2
 * extracts a long integer from s, returns the rest    (COPY FROM longrat0.cc)
 */
-static const char * nlEatLongC(char *s, MP_INT *i)
+static const char * nlEatLongC(char *s, mpz_ptr i)
 {
   const char * start=s;
 

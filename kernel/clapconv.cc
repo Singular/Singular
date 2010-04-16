@@ -22,6 +22,9 @@
 #include "ring.h"
 #include "sbuckets.h"
 #include "ffields.h"
+
+typedef __mpz_struct lint;
+
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 static void convRec( const CanonicalForm & f, int * exp, poly & result );
@@ -54,17 +57,17 @@ CanonicalForm convSingNFactoryN( number n, const ring r )
     {
       if ( n->s == 3 )
       {
-        MP_INT dummy;
-        mpz_init_set( &dummy, &(n->z) );
+        lint dummy;
+        mpz_init_set( &dummy,n->z );
         term = make_cf( dummy );
       }
       else
       {
         // assume s==0 or s==1
-        MP_INT num, den;
+        lint num, den;
         On(SW_RATIONAL);
-        mpz_init_set( &num, &(n->z) );
-        mpz_init_set( &den, &(n->n) );
+        mpz_init_set( &num, n->z );
+        mpz_init_set( &den, n->n );
         term = make_cf( num, den, ( n->s != 1 ));
       }
     }
@@ -82,12 +85,12 @@ number convFactoryNSingN( const CanonicalForm & n)
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
-    gmp_numerator( n, &z->z );
+    gmp_numerator( n, z->z );
     if ( n.den().isOne() )
       z->s = 3;
     else
     {
-      gmp_denominator( n, &z->n );
+      gmp_denominator( n, z->n );
       z->s = 0;
     }
     return z;
@@ -137,12 +140,12 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
 #if defined(LDEBUG)
       z->debug=123456;
 #endif
-      gmp_numerator( f, &z->z );
+      gmp_numerator( f, z->z );
       if ( f.den().isOne() )
         z->s = 3;
       else
       {
-        gmp_denominator( f, &z->n );
+        gmp_denominator( f, z->n );
         z->s = 0;
         nlNormalize(z);
       }
@@ -182,17 +185,17 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
       {
         if ( pGetCoeff( p )->s == 3 )
         {
-          MP_INT dummy;
-          mpz_init_set( &dummy, &(pGetCoeff( p )->z) );
+          lint dummy;
+          mpz_init_set( &dummy, (pGetCoeff( p )->z) );
           term = make_cf( dummy );
         }
         else
         {
           // assume s==0 or s==1
-          MP_INT num, den;
+          lint num, den;
           On(SW_RATIONAL);
-          mpz_init_set( &num, &(pGetCoeff( p )->z) );
-          mpz_init_set( &den, &(pGetCoeff( p )->n) );
+          mpz_init_set( &num, (pGetCoeff( p )->z) );
+          mpz_init_set( &den, (pGetCoeff( p )->n) );
           term = make_cf( num, den, ( pGetCoeff( p )->s != 1 ));
         }
       }
@@ -318,17 +321,17 @@ CanonicalForm convSingAFactoryA ( napoly p , const Variable & a, const ring r )
       {
         if ( napGetCoeff( p )->s == 3 )
         {
-          MP_INT dummy;
-          mpz_init_set( &dummy, &(napGetCoeff( p )->z) );
+          lint dummy;
+          mpz_init_set( &dummy, (napGetCoeff( p )->z) );
           term = make_cf( dummy );
         }
         else
         {
           // assume s==0 or s==1
-          MP_INT num, den;
+          lint num, den;
           On(SW_RATIONAL);
-          mpz_init_set( &num, &(napGetCoeff( p )->z) );
-          mpz_init_set( &den, &(napGetCoeff( p )->n) );
+          mpz_init_set( &num, (napGetCoeff( p )->z) );
+          mpz_init_set( &den, (napGetCoeff( p )->n) );
           term = make_cf( num, den, ( napGetCoeff( p )->s != 1 ));
         }
       }
@@ -351,14 +354,14 @@ static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
-    gmp_numerator( f, &z->z );
+    gmp_numerator( f, z->z );
     if ( f.den().isOne() )
     {
       z->s = 3;
     }
     else
     {
-      gmp_denominator( f, &z->n );
+      gmp_denominator( f, z->n );
       z->s = 0;
       nlNormalize(z);
     }

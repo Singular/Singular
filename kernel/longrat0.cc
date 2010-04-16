@@ -25,7 +25,7 @@
 /*2
 * extracts a long integer from s, returns the rest
 */
-static const char * nlEatLong(char *s, MP_INT *i)
+static const char * nlEatLong(char *s, mpz_ptr i)
 {
   const char * start=s;
 
@@ -60,8 +60,8 @@ const char * nlRead (const char *s, number *a)
 #if defined(LDEBUG)
     (*a)->debug=123456;
 #endif
-    MP_INT *z=&((*a)->z);
-    MP_INT *n=&((*a)->n);
+    mpz_ptr z=(*a)->z;
+    mpz_ptr n=(*a)->n;
     mpz_init(z);
     s = nlEatLong((char *)s, z);
     if (*s == '/')
@@ -89,11 +89,11 @@ const char * nlRead (const char *s, number *a)
     else
     if ((*a)->s==3)
     {
-      int ui=(int)mpz_get_si(&(*a)->z);
+      int ui=(int)mpz_get_si((*a)->z);
       if ((((ui<<3)>>3)==ui)
-      && (mpz_cmp_si(&(*a)->z,(long)ui)==0))
+      && (mpz_cmp_si((*a)->z,(long)ui)==0))
       {
-        mpz_clear(&(*a)->z);
+        mpz_clear((*a)->z);
         omFreeBin((ADDRESS)(*a), rnumber_bin);
         (*a)=INT_TO_SR(ui);
       }
@@ -126,16 +126,16 @@ void nlWrite (number &a, const ring r)
       nlWrite(a,r);
       return;
     }
-    int l=mpz_sizeinbase(&a->z,10);
-    if (a->s<2) l=si_max(l,mpz_sizeinbase(&a->n,10));
+    int l=mpz_sizeinbase(a->z,10);
+    if (a->s<2) l=si_max(l,mpz_sizeinbase(a->n,10));
     l+=2;
     s=(char*)omAlloc(l);
-    z=mpz_get_str(s,10,&a->z);
+    z=mpz_get_str(s,10,a->z);
     StringAppendS(z);
     if (a->s!=3)
     {
       StringAppendS("/");
-      z=mpz_get_str(s,10,&a->n);
+      z=mpz_get_str(s,10,a->n);
       StringAppendS(z);
     }
     omFreeSize((ADDRESS)s,l);

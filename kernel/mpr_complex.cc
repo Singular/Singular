@@ -398,12 +398,12 @@ gmp_float numberToFloat( number num )
         {
           if ( num->s != 3 )
           {
-            r= &num->z;
-            r/= (gmp_float)&num->n;
+            r= num->z;
+            r/= (gmp_float)num->n;
           }
           else
           {
-            r= &num->z;
+            r= num->z;
           }
         }
       }
@@ -457,12 +457,12 @@ gmp_float numberFieldToFloat( number num, int k )
         {
           if ( num->s != 3 )
           {
-            r= &num->z;
-            r/= (gmp_float)&num->n;
+            r= num->z;
+            r/= (gmp_float)num->n;
           }
           else
           {
-            r= &num->z;
+            r= num->z;
           }
         }
       }

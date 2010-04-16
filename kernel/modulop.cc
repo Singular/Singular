@@ -425,7 +425,7 @@ static number npMapLongR(number from)
   gmp_float *ff=(gmp_float*)from;
   mpf_t *f=ff->_mpfp();
   number res;
-  lint *dest,*ndest;
+  mpz_ptr dest,ndest;
   int size,i;
   int e,al,bl,in;
   long iz;
@@ -452,7 +452,7 @@ static number npMapLongR(number from)
 #if defined(LDEBUG)
   res->debug=123456;
 #endif
-  dest = &(res->z);
+  dest = res->z;
 
   if (e<0)
   {
@@ -464,7 +464,7 @@ static number npMapLongR(number from)
     nn = (mp_ptr)omAlloc(sizeof(mp_limb_t)*bl);
     nn[bl-1] = 1;
     for (i=bl-2;i>=0;i--) nn[i] = 0;
-    ndest = &(res->n);
+    ndest = res->n;
     ndest->_mp_d = nn;
     ndest->_mp_alloc = ndest->_mp_size = bl;
     res->s = 0;
@@ -497,7 +497,7 @@ static number npMapLongR(number from)
 */
 number npMapGMP(number from)
 {
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
   mpz_init(erg);
 
   mpz_mod_ui(erg, (int_number) from, npPrimeM);

@@ -1555,13 +1555,13 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->ringtype=r->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
   if (r->ringflaga!=NULL)
   {
-    res->ringflaga = (int_number) omAlloc(sizeof(MP_INT));
+    res->ringflaga = (int_number) omAlloc(sizeof(mpz_t));
     mpz_init_set(res->ringflaga,r->ringflaga);
   }
   res->ringflagb=r->ringflagb;
   if (r->nrnModul!=NULL)
   {
-    res->nrnModul = (int_number) omAlloc(sizeof(MP_INT));
+    res->nrnModul = (int_number) omAlloc(sizeof(mpz_t));
     mpz_init_set(res->nrnModul,r->nrnModul);
   }
 #endif

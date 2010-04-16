@@ -302,7 +302,6 @@ int nrGetChar()
 #endif
 
 /* in longrat.h
-typedef MP_INT lint;
 #define SR_INT    1
 #define mpz_size1(A) (ABS((A)->_mp_size))
 */
@@ -313,14 +312,15 @@ typedef MP_INT lint;
 #define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
 #define IS_INT(A) ((A)->s==3)
 #define IS_IMM(A) (SR_HDL(A)&SR_INT)
-#define GET_NOM(A) &((A)->z)
-#define GET_DENOM(A) &((A)->n)
+#define GET_NOM(A) ((A)->z)
+#define GET_DENOM(A) ((A)->n)
 #define MPZ_INIT mpz_init
 #define MPZ_CLEAR mpz_clear
 
 number nrMapQ(number from)
 {
-  lint h,*g,*z,*n;
+  mpz_t h;
+  mpz_ptr g,z,n;
   int i,j,t,s;
   float ba,rr,rn,y;
 
@@ -367,7 +367,7 @@ number nrMapQ(number from)
   }
   if(t>1)
   {
-    g=&h;
+    g=h;
     MPZ_INIT(g);
     MPZ_DIV(g,z,n);
     t=mpz_size1(g);

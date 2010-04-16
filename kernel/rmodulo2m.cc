@@ -431,7 +431,7 @@ number nr2mMapZp(number from)
 
 number nr2mMapQ(number from)
 {
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
   mpz_init(erg);
 
   nlGMP(from, (number) erg);
@@ -445,7 +445,7 @@ number nr2mMapQ(number from)
 
 number nr2mMapGMP(number from)
 {
-  int_number erg = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+  int_number erg = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
   mpz_init(erg);
 
   mpz_mod_ui(erg, (int_number) from, currRing->nr2mModul );
@@ -480,7 +480,7 @@ nMapFunc nr2mSetMap(const ring src, const ring dst)
   if (rField_is_Ring_PtoM(src) || rField_is_Ring_ModN(src))
   {
     // Computing the n of Z/n
-    int_number modul = (int_number) omAlloc(sizeof(MP_INT)); // evtl. spaeter mit bin
+    int_number modul = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
     mpz_init(modul);
     mpz_set(modul, src->ringflaga);
     mpz_pow_ui(modul, modul, src->ringflagb);

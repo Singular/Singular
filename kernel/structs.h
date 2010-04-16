@@ -18,7 +18,7 @@
 /* standard types */
 #ifdef HAVE_RINGS
 typedef unsigned long NATNUMBER;
-typedef MP_INT *int_number;
+typedef mpz_ptr int_number;
 #endif
 #if (SIZEOF_LONG == 8)
 typedef int BOOLEAN;

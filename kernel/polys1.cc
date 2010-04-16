@@ -756,7 +756,7 @@ number pInitContent(poly ph)
 {
   number d=pGetCoeff(ph);
   if(SR_HDL(d)&SR_INT) return d;
-  int s=mpz_size1(&d->z);
+  int s=mpz_size1(d->z);
   int s2=-1;
   number d2;
   loop
@@ -776,12 +776,12 @@ number pInitContent(poly ph)
       if (s2==0) break;
     }
     else
-    if (mpz_size1(&(pGetCoeff(ph)->z))<=s)
+    if (mpz_size1((pGetCoeff(ph)->z))<=s)
     {
       s2=s;
       d2=d;
       d=pGetCoeff(ph);
-      s=mpz_size1(&d->z);
+      s=mpz_size1(d->z);
     }
   }
   return nlGcd(d,d2,currRing);

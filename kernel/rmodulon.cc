@@ -59,7 +59,7 @@ number cfrnCopy(number a, const ring r)
 int nrnSize(number a)
 {
   if (a == NULL) return 0;
-  return sizeof(MP_INT);
+  return sizeof(mpz_t);
 }
 
 /*
@@ -535,7 +535,7 @@ BOOLEAN nrnDBTest (number a, const char *f, const int l)
 /*2
 * extracts a long integer from s, returns the rest    (COPY FROM longrat0.cc)
 */
-static const char * nlCPEatLongC(char *s, MP_INT *i)
+static const char * nlCPEatLongC(char *s, mpz_ptr i)
 {
   const char * start=s;
   if (!(*s >= '0' && *s <= '9'))

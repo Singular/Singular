@@ -176,7 +176,7 @@ int QlogSize(number n){
        return r+1;
     }
     //assume denominator is 0
-    return mpz_sizeinbase(&n->z,2);
+    return mpz_sizeinbase(n->z,2);
 }
 
 
