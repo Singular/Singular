@@ -23,6 +23,8 @@
 #include "sbuckets.h"
 #include "ffields.h"
 
+typedef __mpz_struct lint;
+
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
 static void convRec( const CanonicalForm & f, int * exp, poly & result );
@@ -55,13 +57,18 @@ CanonicalForm convSingNFactoryN( number n, const ring r )
     {
       if ( n->s == 3 )
       {
-        term = make_cf( n->z );
+        lint dummy;
+        mpz_init_set( &dummy,n->z );
+        term = make_cf( dummy );
       }
       else
       {
         // assume s==0 or s==1
+        lint num, den;
         On(SW_RATIONAL);
-        term = make_cf(  n->z,  n->n, ( n->s != 1 ));
+        mpz_init_set( &num, n->z );
+        mpz_init_set( &den, n->n );
+        term = make_cf( num, den, ( n->s != 1 ));
       }
     }
   }
@@ -178,14 +185,18 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
       {
         if ( pGetCoeff( p )->s == 3 )
         {
-          term = make_cf( pGetCoeff( p )->z );
+          lint dummy;
+          mpz_init_set( &dummy, (pGetCoeff( p )->z) );
+          term = make_cf( dummy );
         }
         else
         {
           // assume s==0 or s==1
+          lint num, den;
           On(SW_RATIONAL);
-          term = make_cf( pGetCoeff( p )->z, pGetCoeff( p )->n,
-	                  ( pGetCoeff( p )->s != 1 ));
+          mpz_init_set( &num, (pGetCoeff( p )->z) );
+          mpz_init_set( &den, (pGetCoeff( p )->n) );
+          term = make_cf( num, den, ( pGetCoeff( p )->s != 1 ));
         }
       }
     }
@@ -310,14 +321,18 @@ CanonicalForm convSingAFactoryA ( napoly p , const Variable & a, const ring r )
       {
         if ( napGetCoeff( p )->s == 3 )
         {
-          term = make_cf( napGetCoeff( p )->z );
+          lint dummy;
+          mpz_init_set( &dummy, (napGetCoeff( p )->z) );
+          term = make_cf( dummy );
         }
         else
         {
           // assume s==0 or s==1
+          lint num, den;
           On(SW_RATIONAL);
-          term = make_cf( napGetCoeff( p )->z, napGetCoeff( p )->n,
-	                  (napGetCoeff( p )->s != 1 ));
+          mpz_init_set( &num, (napGetCoeff( p )->z) );
+          mpz_init_set( &den, (napGetCoeff( p )->n) );
+          term = make_cf( num, den, ( napGetCoeff( p )->s != 1 ));
         }
       }
     }
