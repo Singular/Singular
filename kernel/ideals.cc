@@ -73,7 +73,7 @@ ideal idInit(int idsize, int rank)
 void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint)
 {
   assume( debugPrint >= 0 );
-  
+
   if( id == NULL )
     PrintS("(NULL)");
   else
@@ -1379,7 +1379,7 @@ static ideal idPrepare (ideal  h1, tHomog hom, int syzcomp, intvec **w)
     rSetSyzComp(k);
   }
   h2->rank = syzcomp+i+1;
-  
+
   //if (hom==testHomog)
   //{
   //  if(idHomIdeal(h1,currQuotient))
@@ -1724,7 +1724,7 @@ ideal idLiftStd (ideal  h1, matrix* ma, tHomog hi, ideal * syz)
           pShift(&s_h3->m[j], -k);
           (*syz)->m[j]=s_h3->m[j];
           s_h3->m[j]=NULL;
-        } 
+        }
         else
           pDelete(&(s_h3->m[j]));
       }
@@ -1845,8 +1845,10 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     }
     return idInit(1,mod->rank);
   }
-  if (idIs0(mod))
+  if (idIs0(mod)) /* and not idIs0(submod) */
   {
+    WerrorS("2nd module does not lie in the first");
+    #if 0
     if (unit!=NULL)
     {
       i=IDELEMS(submod);
@@ -1861,6 +1863,8 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
       *rest=idCopy(submod);
     }
     return idInit(1,mod->rank);
+    #endif
+    return idInit(IDELEMS(submod),submod->rank);
   }
   if (unit!=NULL)
   {
@@ -1868,9 +1872,10 @@ ideal idLift(ideal mod, ideal submod,ideal *rest, BOOLEAN goodShape,
     while ((comps_to_add>0) && (submod->m[comps_to_add-1]==NULL))
       comps_to_add--;
   }
-  k=idRankFreeModule(mod);
+  k=si_max(idRankFreeModule(mod),idRankFreeModule(submod));
   if  ((k!=0) && (lsmod==0)) lsmod=1;
   k=si_max(k,(int)mod->rank);
+  if (k<submod->rank) { WarnS("rk(submod) > rk(mod) ?");k=submod->rank; }
 
   ring orig_ring=currRing;
   ring syz_ring=rCurrRingAssure_SyzComp();
@@ -3142,7 +3147,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   pFDegProc d;
   if (pLexOrder && (currRing->order[0]==ringorder_lp))
      d=pTotaldegree;
-  else 
+  else
      d=pFDeg;
   int length=IDELEMS(m);
   polyset P=m->m;
