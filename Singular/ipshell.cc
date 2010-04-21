@@ -4408,9 +4408,15 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             if (iv->length() == 3) last+=(*iv)[2];
             else last += (*iv)[0];
             R->block1[n] = last;
-            if (R->block0[n]>R->block1[n]) return TRUE;
+            //if ((R->block0[n]>R->block1[n])
+	    //|| (R->block1[n]>rVar(R)))
+	    //{
+	    //  R->block1[n]=rVar(R);
+	    //  //WerrorS("ordering larger than number of variables");
+	    //  break;
+	    //}
             if (rCheckIV(iv)) return TRUE;
-            for(i=R->block0[n];i<=R->block1[n];i++)
+            for(i=si_min(rVar(R),R->block1[n]);i>=R->block0[n];i--)
             {
               if (weights[i]==0) weights[i]=typ;
             }
@@ -4423,7 +4429,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_aa:
           case ringorder_a:
             R->block0[n] = last+1;
-            R->block1[n] = si_min(last+iv->length()-2 , R->N);
+            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int));
             for (i=2; i<iv->length(); i++)
             {
@@ -4436,7 +4442,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
           case ringorder_a64:
           {
             R->block0[n] = last+1;
-            R->block1[n] = si_min(last+iv->length()-2 , R->N);
+            R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int64));
             int64 *w=(int64 *)R->wvhdl[n];
             for (i=2; i<iv->length(); i++)
@@ -4461,7 +4467,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             R->block0[n] = last+1;
             last += (int)sqrt((double)(iv->length()-2));
             R->block1[n] = last;
-            for(i=R->block0[n];i<=R->block1[n];i++)
+            for(i=si_min(rVar(R),R->block1[n]);i>=R->block0[n];i--)
             {
               if (weights[i]==0) weights[i]=typ;
             }

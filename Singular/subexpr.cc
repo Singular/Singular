@@ -1312,7 +1312,8 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       }
     }
     /* 4. local ring: ringvar */
-    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
+    if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
+    && (!yyInRingConstruction))
     {
       int vnr;
       if ((vnr=rIsRingVar(id))>=0)
