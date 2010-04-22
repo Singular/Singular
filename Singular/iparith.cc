@@ -3286,6 +3286,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
     i0=(ideal)v->CopyD(); // TODO: memory leak? !
   }
   int ii0=idElem(i0); /* size of i0 */
+  int ii1=idElem(i1); /* size of i1 */
   i1=idSimpleAdd(i1,i0); //
   memset(i0->m,0,sizeof(poly)*IDELEMS(i0)); // TODO: memory leak? !!
   idDelete(&i0);
@@ -3308,9 +3309,9 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   }
   BITSET save_test=test;
   test|=Sy_bit(OPT_SB_1);
-  /* IDELEMS(il)-ii0 appears to be the position of the first element of il that
-     does not belong to the input ideal */
-  result=kStd(i1,currQuotient,hom,&w,NULL,0,IDELEMS(i1)-ii0);
+  /* ii0 appears to be the position of the first element of il that
+     does not belong to the old SB ideal */
+  result=kStd(i1,currQuotient,hom,&w,NULL,0,ii0);
   test=save_test;
   idDelete(&i1);
   idSkipZeroes(result);
@@ -3394,6 +3395,8 @@ struct sValCmd2 dArith2[]=
 ,{jjTIMES_P,   '*',            VECTOR_CMD,     VECTOR_CMD, POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_P1,'*',           IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_P2,'*',           IDEAL_CMD,      POLY_CMD,   IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{jjTIMES_MA_P1,'*',           MODUL_CMD,      MODUL_CMD,  POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{jjTIMES_MA_P2,'*',           MODUL_CMD,      POLY_CMD,   MODUL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_ID,  '*',            IDEAL_CMD,      IDEAL_CMD,  IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_P1,'*',           MODUL_CMD,      IDEAL_CMD,  VECTOR_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{jjTIMES_MA_P2,'*',           MODUL_CMD,      VECTOR_CMD, IDEAL_CMD, ALLOW_PLURAL | ALLOW_RING}
