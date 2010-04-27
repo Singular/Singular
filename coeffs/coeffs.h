@@ -78,13 +78,27 @@ struct n_Procs_s;
 typedef struct  n_Procs_s  n_Procs_s;
 typedef struct  n_Procs_s  *coeffs;
 
+
+
 struct snumber;
 typedef struct snumber *   number;
 typedef number (*numberfunc)(number a,number b, const coeffs r);
 typedef number (*nMapFunc)(number a, const coeffs r);
 
+#define _TRY
+
+#ifdef _TRY
+typedef coeffs ring;
+
+extern ring currRing;
+#endif
+
 struct n_Procs_s
 {
+#ifdef _TRY
+  ring cf; // this
+#endif
+
    coeffs next;
    // the union stuff
 

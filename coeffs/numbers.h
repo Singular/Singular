@@ -104,6 +104,15 @@ static inline BOOLEAN nField_has_Units(const coeffs r)
 #define nField_is_Ring(A) (0)
 #endif
 
+
+#ifdef _TRY
+#ifndef ABS
+#define ABS(x) ((x)<0?(-(x)):(x))
+#endif
+#endif
+
+
+
 #ifdef HAVE_RINGS
 static inline BOOLEAN nField_is_Zp(const coeffs r)
 { return (r->ringtype == 0) && (r->ch > 1) && (r->parameter==NULL); }
