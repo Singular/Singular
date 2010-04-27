@@ -10,6 +10,24 @@
 
 #include "structs.h"
 
+typedef union uutypes      utypes;
+union uutypes
+{
+  int           i;
+  ring          uring;
+  poly          p;
+  number        n;
+  ideal         uideal;
+  map           umap;
+  matrix        umatrix;
+  char *        ustring;
+  intvec *      iv;
+  lists         l;
+  si_link       li;
+  package       pack;
+  procinfo *    pinf;
+};
+
 class idrec
 {
   public:

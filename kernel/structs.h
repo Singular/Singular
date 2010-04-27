@@ -130,11 +130,10 @@ struct n_Procs_s;
 struct sip_sring;
 struct sip_link;
 struct spolynom;
-struct _ssubexpr;
-struct _sssym;
-struct sip_command;
+
 struct sip_package;
-struct s_si_link_extension;
+typedef struct sip_package ip_package;
+typedef ip_package *       package;
 
 // forward for ideals.h:
 struct sip_sideal;
@@ -150,13 +149,9 @@ struct nc_struct;
 typedef struct nc_struct   nc_struct;
 // #endif
 
-typedef struct _ssubexpr   sSubexpr;
-typedef struct _sssym      ssym;
 typedef struct spolyrec    polyrec;
 typedef struct sip_sring   ip_sring;
 typedef struct sip_link    ip_link;
-typedef struct sip_command ip_command;
-typedef struct sip_package ip_package;
 
 /* the pointer types */
 typedef char *             char_ptr;
@@ -164,20 +159,14 @@ typedef int  *             int_ptr;
 typedef ip_sring *         ring;
 typedef polyrec *          poly;
 typedef poly *             polyset;
-typedef union uutypes      utypes;
-typedef ip_command *       command;
-typedef struct s_si_link_extension *si_link_extension;
-typedef polyrec *   napoly;
 
 #ifdef __cplusplus
 typedef ip_smatrix *       matrix;
 typedef ip_link *          si_link;
 typedef sleftv *           leftv;
 typedef slists *           lists;
-typedef sSubexpr *         Subexpr;
 typedef sattr *            attr;
 typedef skStrategy *       kStrategy;
-typedef ip_package *       package;
 typedef ssyStrategy *      syStrategy;
 typedef procinfo *         procinfov;
 typedef kBucket*           kBucket_pt;
@@ -669,26 +658,6 @@ static inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
 
 extern struct omBin_s* char_ptr_bin;
 extern struct omBin_s* sleftv_bin;
-
-#ifdef __cplusplus
-union uutypes
-{
-  int           i;
-  ring          uring;
-  poly          p;
-  number        n;
-  ideal         uideal;
-  map           umap;
-  matrix        umatrix;
-  char *        ustring;
-  intvec *      iv;
-  lists         l;
-  si_link       li;
-  package       pack;
-  procinfo *    pinf;
-};
-
-#endif
 
 #endif
 

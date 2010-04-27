@@ -159,7 +159,7 @@ HEADERS=hutil.h idrec.h stairc.h ideals.h \
 	walkProc.h walkMain.h walkSupport.h\
 	ffields.h khstd.h sparsmat.h gnumpfl.h gnumpc.h \
 	fglm.h kstd1.h \
-	rmodulo2m.h rmodulon.h rintegers.h modulop.h sing_dbm.h weight.h \
+	rmodulo2m.h rmodulon.h rintegers.h modulop.h weight.h \
 	fglmgauss.h fglmvec.h \
 	kstdfac.h kmatrix.h\
 	kutil.h \

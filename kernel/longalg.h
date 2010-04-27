@@ -11,6 +11,8 @@
 #include "longrat.h"
 #include "polys-impl.h"
 
+typedef polyrec *   napoly;
+
 struct slnumber;
 typedef struct slnumber * lnumber;
 
