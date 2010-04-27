@@ -9,6 +9,7 @@
 */
 
 #include "structs.h"
+#include "sing_dbm.h"
 
 // extension links:
 typedef BOOLEAN    (*slOpenProc)(si_link l, short flag);

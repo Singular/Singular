@@ -21,8 +21,7 @@ struct _ssubexpr
   int start;
 };
 
-typedef struct _ssubexpr sSubexpr;
-typedef sSubexpr * Subexpr;
+typedef struct _ssubexpr *Subexpr;
 
 extern const char sNoName[];
 extern BOOLEAN siq;
@@ -88,14 +87,6 @@ class sleftv
 
 inline BOOLEAN RingDependend(int t) { return (BEGIN_RING<t)&&(t<END_RING); }
 extern sleftv sLastPrinted;
-
-struct _sssym
-{
-  idhdl   h;
-  Subexpr e;
-};
-typedef struct _sssym ssym;
-typedef ssym * sym;
 
 void syMake(leftv v,const char * name, idhdl packhdl = NULL);
 BOOLEAN assumeStdFlag(leftv h);

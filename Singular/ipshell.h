@@ -11,6 +11,9 @@
 #include "structs.h"
 #include "ideals.h"
 
+struct _ssubexpr;
+typedef struct _ssubexpr *Subexpr;
+
 
 extern leftv iiCurrArgs;
 extern idhdl iiCurrProc;

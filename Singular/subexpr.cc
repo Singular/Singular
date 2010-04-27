@@ -38,8 +38,7 @@
 #include "attrib.h"
 #include "subexpr.h"
 
-
-omBin sSubexpr_bin = omGetSpecBin(sizeof(sSubexpr));
+omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
 omBin procinfo_bin = omGetSpecBin(sizeof(procinfo));
 omBin libstack_bin = omGetSpecBin(sizeof(libstack));
@@ -1254,6 +1253,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     Print("wrong id :%s:\n",id);
   }
 #endif
+  idhdl save_ring=currRingHdl;
   v->Init();
   if(packhdl != NULL)
   {
@@ -1311,9 +1311,13 @@ void syMake(leftv v,const char * id, idhdl packhdl)
         goto id_found;
       }
     }
+    if (yyInRingConstruction)
+    {
+      currRingHdl=NULL;
+    }
     /* 4. local ring: ringvar */
     if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest)
-    && (!yyInRingConstruction))
+    /*&& (!yyInRingConstruction)*/)
     {
       int vnr;
       if ((vnr=rIsRingVar(id))>=0)
@@ -1337,7 +1341,8 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     if ((currRingHdl!=NULL) && (IDLEV(currRingHdl)==myynest))
     {
       BOOLEAN ok=FALSE;
-      poly p = (!yyInRingConstruction) ? pmInit(id,ok) : (poly)NULL;
+      /*poly p = (!yyInRingConstruction) ? pmInit(id,ok) : (poly)NULL;*/
+      poly p = pmInit(id,ok);
       if (ok)
       {
         if (p==NULL)
@@ -1351,8 +1356,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
           omFree((ADDRESS)id);
           #endif
         }
-        else
-        if (pIsConstant(p))
+        else if (pIsConstant(p))
         {
           v->data = pGetCoeff(p);
           pGetCoeff(p)=NULL;
@@ -1374,7 +1378,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
       BOOLEAN ok=FALSE;
       poly p = ((currRing!=NULL)     /* ring required */
                && (currRingHdl!=NULL)
-               && (!yyInRingConstruction) /* not in decl */
+               /*&& (!yyInRingConstruction) - not in decl */
                && (IDLEV(currRingHdl)!=myynest)) /* already in case 4/6 */
                      ? pmInit(id,ok) : (poly)NULL;
       if (ok)
@@ -1445,6 +1449,7 @@ void syMake(leftv v,const char * id, idhdl packhdl)
     /* v->rtyp = UNKNOWN;*/
     v->name = id;
   }
+  currRingHdl=save_ring;
   return;
 id_found: // we have an id (in h) found, to set the data in from h
   v->rtyp = IDHDL;
@@ -1452,6 +1457,7 @@ id_found: // we have an id (in h) found, to set the data in from h
   v->flag = IDFLAG(h);
   v->name = IDID(h);
   v->attribute=IDATTR(h);
+  currRingHdl=save_ring;
 }
 
 int sleftv::Eval()

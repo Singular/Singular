@@ -18,6 +18,10 @@ extern package currPack;
 extern package basePack;
 #define IDROOT (currPack->idroot)
 
+struct sip_command;
+typedef struct sip_command ip_command;
+typedef ip_command *       command;
+
 struct sip_command
 {
   sleftv arg1; /*arg1 to build_in, proc to proc_call*/
