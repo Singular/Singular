@@ -92,6 +92,7 @@ bug_sres_cyc5
 classify_s
 dbm_s
 deform_s
+decodegb
 div_lift_s
 ecyclic_5_32003_lp
 ecyclic_6_32003_lp
