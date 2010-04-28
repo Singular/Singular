@@ -129,7 +129,6 @@ struct n_Procs_s
 #endif
    number  (*nNeg)(number a, const coeffs r);
    number  (*nInvers)(number a, const coeffs r);
-   number  (*nCopy)(number a);
    number  (*cfCopy)(number a, const coeffs r);
    number  (*nRePart)(number a, const coeffs r);
    number  (*nImPart)(number a, const coeffs r);
