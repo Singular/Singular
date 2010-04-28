@@ -45,7 +45,7 @@ DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
 ###
 
 # normal C++ source files
-CXXSOURCES= gnumpc.cc gnumpfl.cc longalg.cc longrat.cc longrat0.cc \
+CXXSOURCES= gnumpc.cc gnumpfl.cc longrat.cc longrat0.cc \
             modulop.cc mpr_complex.cc \
             numbers.cc rmodulo2m.cc rmodulon.cc shortfl.cc
 
@@ -54,7 +54,7 @@ CSOURCES=
 
 SOURCES=${CSOURCES} ${CXXSOURCES}
 
-HEADERS= gnumpc.h gnumpfl.h longalg.h longrat.h modulop.h \
+HEADERS= gnumpc.h gnumpfl.h longrat.h modulop.h \
          mpr_complex.h mpr_global.h numbers.h \
          rmodulo2m.h rmodulon.h shortfl.h
 
