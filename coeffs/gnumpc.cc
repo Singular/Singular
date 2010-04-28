@@ -15,11 +15,13 @@
 #include "gnumpc.h"
 #include "gnumpfl.h"
 #include "mpr_complex.h"
+#include "output.h"
+#include "omalloc.h"
 
 extern size_t gmp_output_digits;
 
 
-number ngcMapQ(number from)
+number ngcMapQ(number from, const coeffs)
 {
   if ( from != NULL )
   {
@@ -38,7 +40,7 @@ union nf
   float F() const {return _f;}
   number N() const {return _n;}
 };
-static number ngcMapLongR(number from)
+static number ngcMapLongR(number from, const coeffs)
 {
   if ( from != NULL )
   {
@@ -48,7 +50,7 @@ static number ngcMapLongR(number from)
   else
     return NULL;
 }
-static number ngcMapR(number from)
+static number ngcMapR(number from, const coeffs)
 {
   if ( from != NULL )
   {
@@ -59,7 +61,7 @@ static number ngcMapR(number from)
     return NULL;
 }
 extern ring ngfMapRing;
-static number ngcMapP(number from)
+static number ngcMapP(number from, const coeffs)
 {
   if ( from != NULL)
     return ngcInit(npInt(from,ngfMapRing), currRing);
@@ -144,9 +146,9 @@ void ngcDelete (number * a, const coeffs r)
 }
 
 /*2
-* copy a to b
+ * copy a to b
 */
-number ngcCopy(number a)
+number ngcCopy(number a, const coeffs)
 {
   gmp_complex* b= new gmp_complex( *(gmp_complex*)a );
   return (number)b;
@@ -162,7 +164,7 @@ number ngc_Copy(number a, const coeffs r)
 */
 gmp_complex ngc_m1(-1);
 
-number ngcNeg (number a)
+number ngcNeg (number a, const coeffs)
 {
   gmp_complex* r=(gmp_complex*)a;
   (*r) *= ngc_m1;
@@ -172,7 +174,7 @@ number ngcNeg (number a)
 /*
 * 1/a
 */
-number ngcInvers(number a)
+number ngcInvers(number a, const coeffs)
 {
   gmp_complex* r = NULL;
   if (((gmp_complex*)a)->isZero())
@@ -189,7 +191,7 @@ number ngcInvers(number a)
 /*2
 * u:= a + b
 */
-number ngcAdd (number a, number b)
+number ngcAdd (number a, number b, const coeffs)
 {
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) + (*(gmp_complex*)b) );
   return (number)r;
@@ -198,7 +200,7 @@ number ngcAdd (number a, number b)
 /*2
 * u:= a - b
 */
-number ngcSub (number a, number b)
+number ngcSub (number a, number b, const coeffs R)
 {
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) - (*(gmp_complex*)b) );
   return (number)r;
@@ -216,7 +218,7 @@ number ngcMult (number a, number b)
 /*2
 * u := a / b
 */
-number ngcDiv (number a, number b)
+number ngcDiv (number a, number b, const coeffs)
 {
   if (((gmp_complex*)b)->isZero())
   {
@@ -231,7 +233,7 @@ number ngcDiv (number a, number b)
 /*2
 * u:= x ^ exp
 */
-void ngcPower ( number x, int exp, number * u )
+void ngcPower ( number x, int exp, number * u, const coeffs R)
 {
   if ( exp == 0 )
   {
@@ -258,7 +260,7 @@ void ngcPower ( number x, int exp, number * u )
   }
   if (exp&1==1)
   {
-    ngcPower(x,exp-1,u);
+    ngcPower(x,exp-1,u, R);
     gmp_complex *n=new gmp_complex();
     *n=*(gmp_complex*)x;
     *(gmp_complex*)(*u) *= *(gmp_complex*)n;
@@ -268,24 +270,24 @@ void ngcPower ( number x, int exp, number * u )
   {
     number w;
     nNew(&w);
-    ngcPower(x,exp/2,&w);
-    ngcPower(w,2,u);
+    ngcPower(x,exp/2,&w, R);
+    ngcPower(w,2,u, R);
     nDelete(&w);
   }
 }
 
-BOOLEAN ngcIsZero (number a)
+BOOLEAN ngcIsZero (number a, const coeffs)
 {
   return ( ((gmp_complex*)a)->real().isZero() && ((gmp_complex*)a)->imag().isZero());
 }
 
-number ngcRePart(number a)
+number ngcRePart(number a, const coeffs)
 {
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->real());
   return (number)n;
 }
 
-number ngcImPart(number a)
+number ngcImPart(number a, const coeffs)
 {
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->imag());
   return (number)n;
@@ -294,7 +296,7 @@ number ngcImPart(number a)
 /*2
 * za >= 0 ?
 */
-BOOLEAN ngcGreaterZero (number a)
+BOOLEAN ngcGreaterZero (number a, const coeffs)
 {
   if ( ! ((gmp_complex*)a)->imag().isZero() )
     return ( abs( *(gmp_complex*)a).sign() >= 0 );
@@ -305,7 +307,7 @@ BOOLEAN ngcGreaterZero (number a)
 /*2
 * a > b ?
 */
-BOOLEAN ngcGreater (number a, number b)
+BOOLEAN ngcGreater (number a, number b, const coeffs)
 {
   gmp_complex *aa=(gmp_complex*)a;
   gmp_complex *bb=(gmp_complex*)b;
@@ -315,7 +317,7 @@ BOOLEAN ngcGreater (number a, number b)
 /*2
 * a = b ?
 */
-BOOLEAN ngcEqual (number a, number b)
+BOOLEAN ngcEqual (number a, number b, const coeffs)
 {
   gmp_complex *aa=(gmp_complex*)a;
   gmp_complex *bb=(gmp_complex*)b;
@@ -325,7 +327,7 @@ BOOLEAN ngcEqual (number a, number b)
 /*2
 * a == 1 ?
 */
-BOOLEAN ngcIsOne (number a)
+BOOLEAN ngcIsOne (number a, const coeffs)
 {
   return (((gmp_complex*)a)->real().isOne() && ((gmp_complex*)a)->imag().isZero());
   //return (((gmp_complex*)a)->real().isOne());
@@ -334,7 +336,7 @@ BOOLEAN ngcIsOne (number a)
 /*2
 * a == -1 ?
 */
-BOOLEAN ngcIsMOne (number a)
+BOOLEAN ngcIsMOne (number a, const coeffs)
 {
   return (((gmp_complex*)a)->real().isMOne() && ((gmp_complex*)a)->imag().isZero());
   //return (((gmp_complex*)a)->real().isMOne());
@@ -343,12 +345,12 @@ BOOLEAN ngcIsMOne (number a)
 /*2
 * extracts the number a from s, returns the rest
 */
-const char * ngcRead (const char * s, number * a)
+const char * ngcRead (const char * s, number * a, const coeffs R)
 {
   if ((*s >= '0') && (*s <= '9'))
   {
     gmp_float *re=NULL;
-    s=ngfRead(s,(number *)&re);
+    s=ngfRead(s,(number *)&re, R);
     gmp_complex *aa=new gmp_complex(*re);
     *a=(number)aa;
     delete re;

@@ -25,7 +25,7 @@ number   ngcSub(number la, number li, const coeffs r);
 number   ngcMult(number a, number b, const coeffs r);
 number   ngcDiv(number a, number b, const coeffs r);
 void     ngcPower(number x, int exp, number *lu, const coeffs r);
-number   ngcCopy(number a);
+number   ngcCopy(number a, const coeffs);
 number   ngc_Copy(number a, coeffs r);
 const char * ngcRead (const char *s, number *a, const coeffs r);
 void     ngcWrite(number &a, const coeffs r);
@@ -34,7 +34,7 @@ number   ngcImPart(number a, const coeffs r);
 
 
 #ifdef LDEBUG
-BOOLEAN  ngcDBTest(number a, const char *f, const int l);
+BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs);
 #endif
 void     ngcDelete(number *a, const coeffs r);
 

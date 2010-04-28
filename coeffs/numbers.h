@@ -113,6 +113,15 @@ static inline BOOLEAN nField_has_Units(const coeffs r)
 
 
 
+#ifdef _TRY
+#define rField_is_Q(r) nField_is_Q(r)
+#define rField_is_long_R(r) nField_is_long_R(r) 
+#define rField_is_long_C(r) nField_is_long_C(r)
+#define rField_is_R(r) nField_is_R(r)
+#define rField_is_Zp(r) nField_is_Zp(r)
+#endif
+
+
 #ifdef HAVE_RINGS
 static inline BOOLEAN nField_is_Zp(const coeffs r)
 { return (r->ringtype == 0) && (r->ch > 1) && (r->parameter==NULL); }
@@ -122,6 +131,7 @@ static inline BOOLEAN nField_is_Zp(const coeffs r, int p)
 
 static inline BOOLEAN nField_is_Q(const coeffs r)
 { return (r->ringtype == 0) && (r->ch == 0) && (r->parameter==NULL); }
+
 
 static inline BOOLEAN nField_is_numeric(const coeffs r) /* R, long R, long C */
 { return (r->ringtype == 0) && (r->ch ==  -1); }
@@ -161,7 +171,10 @@ static inline BOOLEAN nField_is_long_C(const coeffs r)
     return (r->ringtype == 0) && (r->parameter!=NULL);
   return FALSE;
 }
+
 #else
+
+
 static inline BOOLEAN nField_is_Zp(const coeffs r)
 { return (r->ch > 1) && (r->parameter==NULL); }
 
