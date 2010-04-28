@@ -125,10 +125,10 @@ struct n_Procs_s
    /// convertion, 0 if impossible
    int     (*n_Int)(number &n, const coeffs r);
 #ifdef HAVE_RINGS
-   int     (*nDivComp)(number a,number b);
-   BOOLEAN (*nIsUnit)(number a);
-   number  (*nGetUnit)(number a);
-   number  (*nExtGcd)(number a, number b, number *s, number *t);
+   int     (*nDivComp)(number a,number b,const coeffs r);
+   BOOLEAN (*nIsUnit)(number a,const coeffs r);
+   number  (*nGetUnit)(number a,const coeffs r);
+   number  (*nExtGcd)(number a, number b, number *s, number *t,const coeffs r);
 #endif
    /// changes argument  inline: a:= -a
    number  (*nNeg)(number a, const coeffs r);
@@ -143,7 +143,7 @@ struct n_Procs_s
    void    (*nNormalize)(number &a, const coeffs r);
    BOOLEAN (*nGreater)(number a,number b, const coeffs r),
 #ifdef HAVE_RINGS
-           (*nDivBy)(number a, number b),
+           (*nDivBy)(number a, number b, const coeffs r),
 #endif
             /// tests
            (*nEqual)(number a,number b, const coeffs r),
@@ -167,8 +167,8 @@ struct n_Procs_s
    number  (*nInit_bigint)(number i, const coeffs r);
 
 #ifdef LDEBUG
-   /// Test: is "a" a coorect number?
-   BOOLEAN (*nDBTest)(number a, const char *f,const int l);
+   /// Test: is "a" a correct number?
+   BOOLEAN (*nDBTest)(number a, const char *f,const int l,const coeffs r);
 #endif
 
    number nNULL; /* the 0 as constant */
