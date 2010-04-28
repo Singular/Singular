@@ -9,12 +9,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/longrat.h>
-#include <kernel/numbers.h>
+#include "config.h"
+#include "coeffs.h"
+#include "omalloc.h"
+#include "output.h"
+#include "longrat.h"
+#include "numbers.h"
 
 #define SR_HDL(A) ((long)(A))
 //#define SR_INT    1 // already in longrat.h
@@ -47,7 +47,7 @@ static const char * nlEatLong(char *s, mpz_ptr i)
 /*2
 * extracts the number a from s, returns the rest
 */
-const char * nlRead (const char *s, number *a)
+const char * nlRead (const char *s, number *a, const coeffs r)
 {
   if (*s<'0' || *s>'9')
   {
@@ -107,7 +107,7 @@ const char * nlRead (const char *s, number *a)
 /*2
 * write a rational number
 */
-void nlWrite (number &a, const ring r)
+void nlWrite (number &a, const coeffs r)
 {
   char *s,*z;
   if (SR_HDL(a) & SR_INT)
@@ -122,7 +122,7 @@ void nlWrite (number &a, const ring r)
   {
     if (a->s==0)
     {
-      nlNormalize(a);
+      nlNormalize(a,r);
       nlWrite(a,r);
       return;
     }
