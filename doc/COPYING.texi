@@ -62,18 +62,20 @@ Please send any comments or bug reports to
 @email{singular@@mathematik.uni-kl.de}.
 
 If you want to be informed of new releases,
- please register as a @sc{Singular} user by using the
-registration form on the @sc{Singular} homepage
-              @uref{http://www.singular.uni-kl.de}.
-If for some reason you cannot access the registration form, you
-can also register by sending an email to
+please register as a @sc{Singular} user by 
+@c using the
+@c registration form on the @sc{Singular} homepage
+@c               @uref{http://www.singular.uni-kl.de}.
+@c If for some reason you cannot access the registration form, you
+@c can also register by 
+sending an email to
               @email{singular@@mathematik.uni-kl.de}
 with subject line @code{register} and body containing the following data:
      your name, email address, organisation, country and platform(s).
 
 
 For information on how to cite @sc{Singular} see
-@uref{http://www.singular.uni-kl.de/how_to_cite.html}.
+@uref{http://www.singular.uni-kl.de/index.php/how-to-cite-singular}.
 
 You can also support @sc{Singular} by informing us about
 your result obtained by using @sc{Singular}.
@@ -112,197 +114,170 @@ WWW brow@-ser from
 @end table
 Some external programs are optional:
 @table @asis
-@item surfex (used by surfex.lib, @pxref{surfex_lib})
-@copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
-@* @uref{http://surfex.AlgebraicSurface.net}
-@item surf (used by surf.lib, @pxref{surf_lib})
-@copyright{} Stephan Endrass
-@* @uref{http://surf.sf.net}
-@item surfer (used by surf.lib, @pxref{surf_lib})
-@uref{http://www.imaginary2008.de/surfer.php}
+@item 4ti2 (used by sing4ti2.lib, @pxref{sing4ti2_lib})
+@uref{http://www.4ti2.de/}
+@item gfan (used by tropical.lib, @pxref{tropical_lib})
+@uref{http://www.math.tu-berlin.de/~jensen/software/gfan/gfan.html}
 @item graphviz (used by resgraph.lib, @pxref{resgraph_lib})
 @uref{http://www.graphviz.org/}
 @item normaliz (used by normaliz.lib, @pxref{normaliz_lib})
 @copyright{} Winfried Bruns and Bogdan Ichim
 @* @uref{http://www.mathematik.uni-osnabrueck.de/normaliz/}
-@item 4ti2 (used by sing4ti2.lib, @pxref{sing4ti2_lib})
-@uref{http://www.4ti2.de/}
+@item polymake (used by polymake.lib, @pxref{polymake_lib})
+@copyright{} Ewgenij Gawrilow and Michael Joswig
+@* @uref{http://www.polymake.de/}
+@item surf (used by surf.lib, @pxref{surf_lib})
+@copyright{} Stephan Endrass
+@* @uref{http://surf.sf.net}
+@item surfer (used by surf.lib, @pxref{surf_lib})
+@uref{http://www.imaginary2008.de/surfer.php}
+@item surfex (used by surfex.lib, @pxref{surfex_lib})
+@copyright{} Oliver Labs (2001-2008), Stephan Holzer (2004-2005)
+@* @uref{http://surfex.AlgebraicSurface.net}
+@item TOPCOM (used by polymake.lib, @pxref{polymake_lib})
+@copyright{} J@"org Rambau
+@* @uref{http://www.rambau.wm.uni-bayreuth.de/TOPCOM/}
 @end table
 @end ifset
 
 @heading Acknowledgements
 
 The development of @sc{Singular} is directed and coordinated by
-Gert-Martin Greuel, Gerhard Pfister, and Hans Sch@"onemann.
+Wolfram Decker, Gert-Martin Greuel, Gerhard Pfister, and Hans Sch@"onemann.
 
 @cindex Contributors
 @cindex Authors
+@cindex Decker, Wolfram
 @cindex Greuel, Gert-Martin
 @cindex Pfister, Gerhard
 @cindex Sch@"onemann, Hans
 
-Currently, the @sc{Singular} team has the following members:
-Michael Brickenstein,
+Current devteams:
+Abdus Salam School of Mathematical Sciences in Lahore,
+BTU Cottbus,
+Center for Advanced Security Research Darmstadt (CASED),
+FU Berlin,
+Isfahan University of Technology,
+Mathematisches Forschunginstitut Oberwolfach,
+Oklahoma State University,
+RWTH Aachen,
+Universidad de Buenos Aires,
+Université de Versailles Saint-Quentin-en-Yvelines,
+University of G@"ottingen,
+University of Hannover,
+University of La Laguna
+and
+University of Valladolid.
+ 
+Current @sc{Singular} developers:
 Wolfram Decker,
-Alexander Dreyer,
 Gert-Martin Greuel,
-Anne Fr@"uhbis-Kr@"uger,
-Viktor Levandovskyy,
-Oleksandr Motsak,
 Gerhard Pfister,
 Hans Sch@"onemann,
-Mathias Schulze,
-and
-Frank Seelisch.
-@cindex Brickenstein, Michael
-@cindex Decker, Wolfram
-@cindex Dreyer, Alexander
-@cindex Fr@"uhbis-Kr@"uger, Anne
-@cindex Levandovskyy, Viktor
-@cindex Motsak, Oleksandr 
-@cindex Schulze, Mathias
-@cindex Seelisch, Frank
-
-Former members of the @sc{Singular} team are:
-Olaf Bachmann,
-Kai Kr@"uger,
-Christoph Lossen,
-Wolfgang Neumann,
-Markus Perling,
-Wilfred Pohl,
-Jens Schmidt,
-Thomas Siebert,
-R@"udiger Stobbe,
-Eric Westenberger,
-Tim Wichmann,
-and
-Oliver Wienand.
-@cindex Bachmann, Olaf
-@cindex Kr@"uger, Kai
-@cindex Lossen, Christoph
-@cindex Neumann, Wolfgang
-@cindex Perling, Markus
-@cindex Pohl, Wilfred
-@cindex Schmidt, Jens
-@cindex Schulze, Mathias
-@cindex Siebert, Thomas
-@cindex Stobbe, R@"udiger
-@cindex Westenberger, Eric
-@cindex Wichmann, Tim
-@cindex Wienand, Oliver
-
-Further contributions to @sc{Singular} have been made by:
+  
+Shawki Al-Rashed,
 Daniel Andres,
-Thomas Bayer,
-Isabelle Bermejo,
-Markus Becker,
+Mohamed Barakat,
+Isabel Bermejo,
+Muhammad Asan Binyamin,
+Ren@'e Birkner,
+Rocio Blanco,
+Xenia Bogomolec,
+Michael Brickenstein,
 Stanislav Bulygin,
-Nadine Cremer,
+Antonio Campillo,
+Raza Choudery,
+Alexander Dreyer,
+Christian Eder,
+Santiago Encinas,
+Jose Ignacio Farran,
+Anne Fr@"uhbis-Kr@"uger,
+Rosa de Frutos,
+Eva Garcia-Llorente,
+Ignacio Garcia-Marco,
+Christian Haase,
+Amir Hashemi,
+Fernando Hernando,
+Bradford Hovinen,
+Nazeran Idress,
+Anders Jensen,
+Lars Kastner,
+Junaid Alan Khan,
+Kai Kr@"uger,
+Santiago Laplagne,
+Grégoire Lecerf,
+Martin Lee,
+Viktor Levandovskyy,
+Benjamin Lorenz,
+Christoph Lossen,
+Thomas Markwig,
+Hannah Markwig,
+Irene Marquez,
+Bernd Martin,
+Edgar Martinez,
+Martin Monerjan,
+Francisco Monserrat,
+Oleksandr Motsak,
+Andreas Paffenholz,
+Maria Jesus Pisabarro,
+Diego Ruano,
+Afshan Sadiq,
+Kristina Schindelar,
+Mathias Schulze,
+Frank Seelisch,
+Andreas Steenpa@ss{},
+Stefan Steidel,
+Grischa Studzinski,
+Katharina Werner
+and
+Eva Zerz.
+  
+Further contributions to @sc{Singular} have been made by:
+Olaf Bachmann,
+Thomas Bauer,
+Markus Becker,
 Michael Cuntz,
 Kai Dehmann,
 Marcin Dumnicki,
 Stephan Endra@ss{},
-Jose Ignacio Farran,
-I. Garcia-Marco,
 Vladimir Gerdt,
 Philippe Gimenez,
 Christian Gorzel,
 Hubert Grassmann,
-Amir Hashemi,
-Fernando Hernando,
 Agnes Heydtmann,
 Dietmar Hillebrand,
 Tobias Hirsch,
-Markus Hochstetter,
 Manuel Kauers,
 Simon King,
 Anen Lakhal,
 Martin Lamm,
-Santiago Laplagne,
-Gregoire Lecerf,
 Francisco Javier Lobillo,
-Christoph Mang,
-Thomas Markwig,
-Bernd Martin,
 Michael Me@ss{}ollen,
 Andrea Mindnich,
 Jorge Martin Morales,
 Thomas N@"u@ss{}ler,
-Tetyana Povalyaeva,
+Wolfgang Neumann,
+Markus Perling,
+Wilfried Pohl,
 Carlos Rabelo,
-J.-J. Salazar-Gonzalez,
 Alfredo Sanchez-Navarro,
-Ivor Saynisch,
-Kristina Schindelar,
-Silke Spang,
-Stefan Steidel,
+Jens Schmidt,
+Thomas Siebert,
+R@"udiger Stobbe,
 Henrik Strohmayer,
 Christian Stussak,
 Imade Sulandra,
-Akira Suzuki,
 Christine Theis,
 Enrique Tobis,
-Maryna Viazovska,
 Alberto Vigneron-Tenorio,
 Moritz Wenk,
-Denis Yanovich,
-Oleksandr Iena.
-@cindex Andres, Daniel
-@cindex Bayer, Thomas
-@cindex Bermejo, Isabelle
-@cindex Becker, Markus 
-@cindex Bulygin, Stanislav
-@cindex Cremer, Nadine
-@cindex Cuntz, Michael
-@cindex Dehmann, Kai
-@cindex Dumnicki, Marcin
-@cindex Endra@ss{}, Stephan
-@cindex Farran, Jose Ignacio
-@cindex Garcia-Marco, I.
-@cindex Gerdt, Vladimir 
-@cindex Gimenez, Philippe
-@cindex Gorzel, Christian
-@cindex Grassmann, Hubert
-@cindex Hashemi, Amir
-@cindex Hernando, Fernando 
-@cindex Heydtmann, Agnes
-@cindex Hillebrand, Dietmar
-@cindex Hirsch, Tobias
-@cindex Hochstetter, Markus
-@cindex Iena, Oleksandr
-@cindex Kauers, Manuel
-@cindex King, Simon
-@cindex Lakhal, Anen
-@cindex Lamm, Martin
-@cindex Laplagne, Santiago
-@cindex Lecerf, Gregoire
-@cindex Lobillo, Javier
-@cindex Mang, Christoph
-@cindex Markwig, Thomas
-@cindex Martin, Bernd
-@cindex Me@ss{}ollen, Michael
-@cindex Mindnich, Andrea
-@cindex Morales, Jorge Martin
-@cindex N@"u@ss{}ler, Thomas
-@cindex Povalyaeva, Tetyana
-@cindex Rabelo, Carlos
-@cindex Salazar-Gonzalez, J.-J.
-@cindex Sanchez-Navarro, Alfredo 
-@cindex Saynisch, Ivor
-@cindex Schindelar, Kristina
-@cindex Spang, Silke
-@cindex Steidel, Stefan
-@cindex Strohmayer, Henrik
-@cindex Stussak, Christian
-@cindex Sulandra, Imade
-@cindex Suzuki, Akira
-@cindex Tobis, Enrique
-@cindex Theis, Christine 
-@cindex Viazovska, Maryna
-@cindex Vigneron-Tenorio, Alberto
-@cindex Wenk, Moritz
-@cindex Yanovich, Denis
-
+Eric Westenberger,
+Tim Wichmann,
+Oliver Wienand,
+Denis Yanovich
+and
+Oleksandr Yena.
+						   
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft
 and the Stiftung f@"ur Innovation des Landes Rheinland-Pfalz
