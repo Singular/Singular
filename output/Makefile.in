@@ -67,6 +67,14 @@ output.a: ${OBJS}
 	-rm -f output.a
 	ar cr $@ $^
 
+all: output.a
+
+install: all
+	${MKINSTALLDIRS} $(includedir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(INSTALL_DATA) output.a $(libdir)/liboutput.a
+	$(INSTALL_DATA) output.h $(includedir)/output.h
+
 ##
 ## clean targest
 ##
