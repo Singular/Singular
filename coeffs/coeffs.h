@@ -116,10 +116,13 @@ struct n_Procs_s
 
    // general stuff
    numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
+   /// init with an integer 
    number  (*cfInit)(int i,const coeffs r);
    number  (*nPar)(int i, const coeffs r);
    int     (*nParDeg)(number n, const coeffs r);
+   /// how complicated, (0) => 0, or positive
    int     (*nSize)(number n, const coeffs r);
+   /// convertion, 0 if impossible
    int     (*n_Int)(number &n, const coeffs r);
 #ifdef HAVE_RINGS
    int     (*nDivComp)(number a,number b);
@@ -127,6 +130,7 @@ struct n_Procs_s
    number  (*nGetUnit)(number a);
    number  (*nExtGcd)(number a, number b, number *s, number *t);
 #endif
+   ///  changes argument  inline 
    number  (*nNeg)(number a, const coeffs r);
    number  (*nInvers)(number a, const coeffs r);
    number  (*cfCopy)(number a, const coeffs r);
@@ -139,6 +143,7 @@ struct n_Procs_s
 #ifdef HAVE_RINGS
            (*nDivBy)(number a, number b),
 #endif
+            /// tests
            (*nEqual)(number a,number b, const coeffs r),
            (*nIsZero)(number a, const coeffs r),
            (*nIsOne)(number a, const coeffs r),
@@ -151,10 +156,16 @@ struct n_Procs_s
    number  (*nLcm)(number a, number b, const coeffs r);
    void    (*cfDelete)(number * a, const coeffs r);
    nMapFunc (*cfSetMap)(const coeffs src, const coeffs dst);
+
+   /// For extensions (writes into global string buffer)
    char *  (*nName)(number n, const coeffs r);
+
+   /// Inline: a := b
    void    (*nInpMult)(number &a, number b, const coeffs r);
    number  (*nInit_bigint)(number i, const coeffs r);
+
 #ifdef LDEBUG
+   /// Test: is "a" a coorect number?
    BOOLEAN (*nDBTest)(number a, const char *f,const int l);
 #endif
 
