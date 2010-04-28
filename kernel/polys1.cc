@@ -1779,10 +1779,15 @@ int p_Var(poly m,const ring r)
   int i,e=0;
   for (i=r->N; i>0; i--)
   {
-    if (p_GetExp(m,i,r)==1)
+    int exp=p_GetExp(m,i,r);
+    if (exp==1)
     {
       if (e==0) e=i;
       else return 0;
+    }
+    else if (exp!=0)
+    {
+      return 0;
     }
   }
   return e;
