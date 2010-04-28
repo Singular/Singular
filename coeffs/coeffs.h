@@ -130,9 +130,11 @@ struct n_Procs_s
    number  (*nGetUnit)(number a);
    number  (*nExtGcd)(number a, number b, number *s, number *t);
 #endif
-   ///  changes argument  inline 
+   /// changes argument  inline: a:= -a
    number  (*nNeg)(number a, const coeffs r);
+   /// return 1/a
    number  (*nInvers)(number a, const coeffs r);
+   /// return a copy of a
    number  (*cfCopy)(number a, const coeffs r);
    number  (*nRePart)(number a, const coeffs r);
    number  (*nImPart)(number a, const coeffs r);
