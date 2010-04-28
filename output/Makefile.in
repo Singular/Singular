@@ -70,10 +70,10 @@ output.a: ${OBJS}
 all: output.a
 
 install: all
-	${MKINSTALLDIRS} $(includedir)
-	$(MKINSTALLDIRS) $(libdir)
-	$(INSTALL_DATA) output.a $(libdir)/liboutput.a
-	$(INSTALL_DATA) output.h $(includedir)/output.h
+	${MKINSTALLDIRS} ${includedir}
+	${MKINSTALLDIRS} ${libdir}
+	${INSTALL_DATA} output.a ${libdir}/liboutput.a
+	${INSTALL_DATA} output.h ${includedir}/output.h
 
 ##
 ## clean targest
