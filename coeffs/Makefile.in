@@ -82,3 +82,11 @@ clean: mostlyclean
 
 tags:   
 	ctags *.c *.h *.cc *.inc
+
+all: libcoeffs.a
+
+install: all
+	${MKINSTALLDIRS} ${includedir}
+	${MKINSTALLDIRS} ${libdir}
+	${INSTALL_DATA} libcoeffs.a ${libdir}/libcoeffs.a
+#	$(INSTALL_DATA) output.h $(includedir)/output.h
