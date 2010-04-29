@@ -3,6 +3,7 @@
 *.[oa]
 *.o_ndebug
 *.og
+*.exe
 depend
 Makefile
 GNUMakefile
@@ -10,6 +11,7 @@ config.status
 config.log
 stamp-h
 ix86-Linux/*
+ix86-Win/*
 omalloc/omTables
 omalloc/omTables.h
 omalloc/omTables.inc
