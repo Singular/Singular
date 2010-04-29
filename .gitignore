@@ -13,10 +13,12 @@ stamp-h
 ix86-Linux/*
 ix86-Win/*
 x86_64-Linux/*
+ix86Mac-darwin/*
 omalloc/omTables
 omalloc/omTables.h
 omalloc/omTables.inc
 omalloc/omalloc.h
+omalloc/omTables.dSYM/*
 MP/MP/MP_Config.h
 MP/MP/h/values.h
 Singular/mod2.h
