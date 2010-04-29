@@ -12,6 +12,7 @@ config.log
 stamp-h
 ix86-Linux/*
 ix86-Win/*
+x86_64-Linux/*
 omalloc/omTables
 omalloc/omTables.h
 omalloc/omTables.inc

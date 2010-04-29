@@ -10,7 +10,7 @@
 #include <string.h>
 #include "coeffs.h"
 #include <mylimits.h>
-#include "febase.h"
+#include "output.h"
 #include "numbers.h"
 #include "longrat.h"
 #include "mpr_complex.h"
