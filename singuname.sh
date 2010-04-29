@@ -47,6 +47,10 @@ then
     then
         echo ${prefix}-Win
         exit 0
+    elif (echo $uname_a | $egrep "MINGW" > $devnull)
+    then
+        echo ${prefix}-Win
+        exit 0
     # FreeBSD ###############
     elif (echo $uname_a | $egrep "FreeBSD" > $devnull)
     then
