@@ -106,6 +106,7 @@ EXAMPLE: example actionIsProper; shows an example
   ideal id=imap(bsr,id);
   matrix @m[size(id)+1][1];
   @m=imap(bsr,m),0;
+  int auxv;
 
   //computes the exp(@t*m)(var(i)) for all i
   for(i=1;i<=nvars(basering)-1;i++)
@@ -113,11 +114,13 @@ EXAMPLE: example actionIsProper; shows an example
      inv=var(i);
      delta=derivate(@m,inv);
      j=1;
+     auxv=1;
      tee=@t;
      while(delta!=0)
      {
         inv=inv+1/j*delta*tee;
-        j=j*(j+1);
+        auxv=auxv+1;
+        j=j*auxv;
         tee=tee*@t;
         delta=derivate(@m,delta);
      }
