@@ -15,7 +15,10 @@ omalloc/omTables.h
 omalloc/omTables.inc
 omalloc/omalloc.h
 MP/MP/MP_Config.h
+MP/MP/h/values.h
 Singular/mod2.h
+Singular/confdefs.h
+Singular/Singular.rc
 config.cache
 doc/uname.texi
 doc/version.texi
