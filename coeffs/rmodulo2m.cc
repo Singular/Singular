@@ -22,10 +22,50 @@
 
 int nr2mExp;
 
+/* for initializing function pointers */
+void nr2mCoeffInit (n_Procs_s *n, int c, const coeffs r)
+{
+     nr2mInitExp(c, r);
+     n->cfInit  = nr2mInit;
+     n->cfCopy = nr2mCopy;
+     n->n_Int  = nr2mInt;
+     n->nAdd   = nr2mAdd;
+     n->nSub   = nr2mSub;
+     n->nMult  = nr2mMult;
+     n->nDiv   = nr2mDiv;
+     n->nIntDiv       = nr2mIntDiv;
+     n->nIntMod=nr2mMod;
+     n->nExactDiv= nr2mDiv;
+     n->nNeg   = nr2mNeg;
+     n->nInvers= nr2mInvers;
+     n->nDivBy = nr2mDivBy;
+     n->nDivComp = nr2mDivComp;
+     n->nGreater = nr2mGreater;
+     n->nEqual = nr2mEqual;
+     n->nIsZero = nr2mIsZero;
+     n->nIsOne = nr2mIsOne;
+     n->nIsMOne = nr2mIsMOne;
+     n->nGreaterZero = nr2mGreaterZero;
+     n->cfWrite = nr2mWrite;
+     n->nRead = nr2mRead;
+     n->nPower = nr2mPower;
+     n->cfSetMap = nr2mSetMap;
+     n->nNormalize = nDummy2;
+     n->nLcm          = nr2mLcm;
+     n->nGcd          = nr2mGcd;
+     n->nIsUnit = nr2mIsUnit;
+     n->nGetUnit = nr2mGetUnit;
+     n->nExtGcd = nr2mExtGcd;
+     n->nName= ndName;
+#ifdef LDEBUG
+     n->nDBTest=nr2mDBTest;
+#endif
+}
+
 /*
  * Multiply two numbers
  */
-number nr2mMult (number a, number b)
+number nr2mMult (number a, number b, const coeffs r)
 {
   if (((NATNUMBER)a == 0) || ((NATNUMBER)b == 0))
     return (number)0;
@@ -36,7 +76,7 @@ number nr2mMult (number a, number b)
 /*
  * Give the smallest non unit k, such that a * x = k = b * y has a solution
  */
-number nr2mLcm (number a,number b,ring r)
+number nr2mLcm (number a, number b, const coeffs r)
 {
   NATNUMBER res = 0;
   if ((NATNUMBER) a == 0) a = (number) 1;
@@ -59,7 +99,7 @@ number nr2mLcm (number a,number b,ring r)
  * Give the largest non unit k, such that a = x * k, b = y * k has
  * a solution.
  */
-number nr2mGcd (number a,number b,ring r)
+number nr2mGcd (number a, number b, const coeffs r)
 {
   NATNUMBER res = 0;
   if ((NATNUMBER) a == 0 && (NATNUMBER) b == 0) return (number) 1;
@@ -83,7 +123,7 @@ number nr2mGcd (number a,number b,ring r)
  * Give the largest non unit k, such that a = x * k, b = y * k has
  * a solution.
  */
-number nr2mExtGcd (number a, number b, number *s, number *t)
+number nr2mExtGcd (number a, number b, number *s, number *t, const coeffs r)
 {
   NATNUMBER res = 0;
   if ((NATNUMBER) a == 0 && (NATNUMBER) b == 0) return (number) 1;
@@ -107,7 +147,7 @@ number nr2mExtGcd (number a, number b, number *s, number *t)
   }
 }
 
-void nr2mPower (number a, int i, number * result)
+void nr2mPower (number a, int i, number * result, const coeffs r)
 {
   if (i==0)
   {
@@ -127,15 +167,15 @@ void nr2mPower (number a, int i, number * result)
 /*
  * create a number from int
  */
-number nr2mInit (int i, const ring r)
+number nr2mInit (int i, const coeffs r)
 {
   if (i == 0) return (number)(NATNUMBER)i;
 
   long ii = i;
   NATNUMBER j = (NATNUMBER)1;
-  if (ii < 0) { j = currRing->nr2mModul; ii = -ii; }
+  if (ii < 0) { j = r->nr2mModul; ii = -ii; }
   NATNUMBER k = (NATNUMBER)ii;
-  k = k & currRing->nr2mModul;
+  k = k & r->nr2mModul;
   /* now we have: from = j * k mod 2^m */
   return (number)nr2mMult((number)j, (number)k);
 }
@@ -146,7 +186,7 @@ number nr2mInit (int i, const ring r)
  * note that the code computes a long which will then
  * automatically casted to int
  */
-int nr2mInt(number &n, const ring r)
+int nr2mInt(number &n, const coeffs r)
 {
   NATNUMBER nn = (unsigned long)(NATNUMBER)n & r->nr2mModul;
   unsigned long l = r->nr2mModul >> 1; l++; /* now: l = 2^(m-1) */
@@ -156,22 +196,22 @@ int nr2mInt(number &n, const ring r)
     return (int)((NATNUMBER)nn);
 }
 
-number nr2mAdd (number a, number b)
+number nr2mAdd (number a, number b, const coeffs r)
 {
   return nr2mAddM(a,b);
 }
 
-number nr2mSub (number a, number b)
+number nr2mSub (number a, number b, const coeffs r)
 {
   return nr2mSubM(a,b);
 }
 
-BOOLEAN nr2mIsUnit (number a)
+BOOLEAN nr2mIsUnit (number a, const coeffs r)
 {
   return ((NATNUMBER) a % 2 == 1);
 }
 
-number  nr2mGetUnit (number k)
+number  nr2mGetUnit (number k, const coeffs r)
 {
   if (k == NULL)
     return (number) 1;
@@ -181,27 +221,28 @@ number  nr2mGetUnit (number k)
   return (number) tmp;
 }
 
-BOOLEAN nr2mIsZero (number  a)
+BOOLEAN nr2mIsZero (number a, const coeffs r)
 {
   return 0 == (NATNUMBER)a;
 }
 
-BOOLEAN nr2mIsOne (number a)
+BOOLEAN nr2mIsOne (number a, const coeffs r)
 {
   return 1 == (NATNUMBER)a;
 }
 
-BOOLEAN nr2mIsMOne (number a)
+BOOLEAN nr2mIsMOne (number a, const coeffs r)
 {
-  return (currRing->nr2mModul == (NATNUMBER)a);
+  return (r->nr2mModul  == (NATNUMBER)a) 
+        && (r->nr2mModul != 2);
 }
 
-BOOLEAN nr2mEqual (number a, number b)
+BOOLEAN nr2mEqual (number a, number b, const coeffs r)
 {
   return nr2mEqualM(a,b);
 }
 
-BOOLEAN nr2mGreater (number a, number b)
+BOOLEAN nr2mGreater (number a, number b, const coeffs r)
 {
   return nr2mDivBy(a, b);
 }
@@ -210,11 +251,11 @@ BOOLEAN nr2mGreater (number a, number b)
    1) a = 0 mod 2^m; then TRUE iff b = 0 or b is a power of 2
    2) a, b <> 0; then TRUE iff b/gcd(a, b) is a unit mod 2^m
    TRUE iff b(gcd(a, b) is a unit */
-BOOLEAN nr2mDivBy (number a, number b)
+BOOLEAN nr2mDivBy (number a, number b, const coeffs r)
 {
   if (a == NULL)
   {
-    NATNUMBER c = currRing->nr2mModul + 1;
+    NATNUMBER c = r->nr2mModul + 1;
     if (c != 0) /* i.e., if no overflow */
       return (c % (NATNUMBER)b) == 0;
     else
@@ -232,13 +273,13 @@ BOOLEAN nr2mDivBy (number a, number b)
   }
   else
   {
-    number n = nr2mGcd(a, b, currRing);
-    n = nr2mDiv(b, n);
-    return nr2mIsUnit(n);
+    number n = nr2mGcd(a, b, r);
+    n = nr2mDiv(b, n, r);
+    return nr2mIsUnit(n, r);
   }
 }
 
-int nr2mDivComp(number as, number bs)
+int nr2mDivComp(number as, number bs, const coeffs r)
 {
   NATNUMBER a = (NATNUMBER) as;
   NATNUMBER b = (NATNUMBER) bs;
@@ -266,10 +307,10 @@ int nr2mDivComp(number as, number bs)
 }
 
 /* TRUE iff 0 < k <= 2^m / 2 */
-BOOLEAN nr2mGreaterZero (number k)
+BOOLEAN nr2mGreaterZero (number k, const coeffs r)
 {
   if ((NATNUMBER)k == 0) return FALSE;
-  if ((NATNUMBER)k > ((currRing->nr2mModul >> 1) + 1)) return FALSE;
+  if ((NATNUMBER)k > ((r->nr2mModul >> 1) + 1)) return FALSE;
   return TRUE;
 }
 
@@ -277,7 +318,7 @@ BOOLEAN nr2mGreaterZero (number k)
    the extended gcd of 'a' and 2^m, in order to find some 's'
    and 't' such that a * s + 2^m * t = gcd(a, 2^m) = 1;
    this code will always find a positive 's' */
-void specialXGCD(unsigned long& s, unsigned long a)
+void specialXGCD(unsigned long& s, unsigned long a, const coeffs R)
 {
   int_number u = (int_number)omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(u, a);
@@ -288,7 +329,7 @@ void specialXGCD(unsigned long& s, unsigned long a)
   int_number u2 = (int_number)omAlloc(sizeof(mpz_t));
   mpz_init(u2);
   int_number v = (int_number)omAlloc(sizeof(mpz_t));
-  mpz_init_set_ui(v, currRing->nr2mModul);
+  mpz_init_set_ui(v, R->nr2mModul);
   mpz_add_ui(v, v, 1); /* now: v = 2^m */
   int_number v0 = (int_number)omAlloc(sizeof(mpz_t));
   mpz_init(v0);
@@ -318,7 +359,7 @@ void specialXGCD(unsigned long& s, unsigned long a)
   while (mpz_cmp_ui(u1, 0) < 0) /* i.e., while u1 < 0 */
   {
     /* we add 2^m = (2^m - 1) + 1 to u1: */
-    mpz_add_ui(u1, u1, currRing->nr2mModul);
+    mpz_add_ui(u1, u1, R->nr2mModul);
     mpz_add_ui(u1, u1, 1);
   }
   s = mpz_get_ui(u1); /* now: 0 <= s <= 2^m - 1 */
@@ -335,22 +376,22 @@ void specialXGCD(unsigned long& s, unsigned long a)
   mpz_clear(r); omFree((ADDRESS)r);
 }
 
-NATNUMBER InvMod(NATNUMBER a)
+NATNUMBER InvMod(NATNUMBER a, const coeffs r)
 {
   assume((NATNUMBER)a % 2 != 0);
   unsigned long s;
-  specialXGCD(s, a);
+  specialXGCD(s, a, r);
   return s;
 }
 //#endif
 
-inline number nr2mInversM (number c)
+inline number nr2mInversM (number c, const coeffs r)
 {
   assume((NATNUMBER)c % 2 != 0);
   return (number)InvMod((NATNUMBER)c);
 }
 
-number nr2mDiv (number a,number b)
+number nr2mDiv (number a, number b, const coeffs r)
 {
   if ((NATNUMBER)a==0)
     return (number)0;
@@ -374,7 +415,7 @@ number nr2mDiv (number a,number b)
   return (number) nr2mMult(a, nr2mInversM(b));
 }
 
-number nr2mMod (number a, number b)
+number nr2mMod (number a, number b, const coeffs R)
 {
   /*
     We need to return the number r which is uniquely determined by the
@@ -402,7 +443,7 @@ number nr2mMod (number a, number b)
   NATNUMBER b_div = (NATNUMBER)b;
   if (b_div < 0) b_div = -b_div; // b_div now represents |b|
   NATNUMBER r = 0;
-  while ((g < currRing->nr2mModul) && (b_div > 0) && (b_div % 2 == 0))
+  while ((g < R->nr2mModul ) && (b_div > 0) && (b_div % 2 == 0))
   {
     b_div = b_div >> 1;
     g = g << 1;
@@ -412,7 +453,7 @@ number nr2mMod (number a, number b)
   return (number)r;
 }
 
-number nr2mIntDiv (number a, number b)
+number nr2mIntDiv (number a, number b, const coeffs r)
 {
   if ((NATNUMBER)a == 0)
   {
@@ -420,14 +461,14 @@ number nr2mIntDiv (number a, number b)
       return (number)1;
     if ((NATNUMBER)b == 1)
       return (number)0;
-    NATNUMBER c = currRing->nr2mModul + 1;
+    NATNUMBER c = r->nr2mModul + 1;
     if (c != 0) /* i.e., if no overflow */
       return (number)(c / (NATNUMBER)b);
     else
     {
       /* overflow: c = 2^32 resp. 2^64, depending on platform */
       int_number cc = (int_number)omAlloc(sizeof(mpz_t));
-      mpz_init_set_ui(cc, currRing->nr2mModul); mpz_add_ui(cc, cc, 1);
+      mpz_init_set_ui(cc, r->nr2mModul); mpz_add_ui(cc, cc, 1);
       mpz_div_ui(cc, cc, (unsigned long)(NATNUMBER)b);
       unsigned long s = mpz_get_ui(cc);
       mpz_clear(cc); omFree((ADDRESS)cc);
@@ -442,7 +483,7 @@ number nr2mIntDiv (number a, number b)
   }
 }
 
-number  nr2mInvers (number c)
+number  nr2mInvers (number c, const coeffs r)
 {
   if ((NATNUMBER)c%2==0)
   {
@@ -452,65 +493,65 @@ number  nr2mInvers (number c)
   return nr2mInversM(c);
 }
 
-number nr2mNeg (number c)
+number nr2mNeg (number c, const coeffs r)
 {
   if ((NATNUMBER)c==0) return c;
   return nr2mNegM(c);
 }
 
-number nr2mMapMachineInt(number from)
+number nr2mMapMachineInt(number from, const coeffs r)
 {
-  NATNUMBER i = ((NATNUMBER) from) & currRing->nr2mModul;
+  NATNUMBER i = ((NATNUMBER) from) % r->nr2mModul ;
   return (number) i;
 }
 
-number nr2mCopy(number a)
+number nr2mCopy(number a, const coeffs)
 {
   return a;
 }
 
-number nr2mMapZp(number from)
+number nr2mMapZp(number from, const coeffs r)
 {
   long ii = (long)from;
   NATNUMBER j = (NATNUMBER)1;
-  if (ii < 0) { j = currRing->nr2mModul; ii = -ii; }
+  if (ii < 0) { j = r->nr2mModul; ii = -ii; }
   NATNUMBER i = (NATNUMBER)ii;
-  i = i & currRing->nr2mModul;
+  i = i & r->nr2mModul;
   /* now we have: from = j * i mod 2^m */
   return (number)nr2mMult((number)i, (number)j);
 }
 
-number nr2mMapQ(number from)
+number nr2mMapQ(number from, const coeffs r)
 {
   int_number erg = (int_number) omAlloc(sizeof(mpz_t));
   mpz_init(erg);
   int_number k = (int_number) omAlloc(sizeof(mpz_t));
-  mpz_init_set_ui(k, currRing->nr2mModul);
+  mpz_init_set_ui(k, r->nr2mModul);
 
   nlGMP(from, (number)erg);
   mpz_and(erg, erg, k);
-  number r = (number)mpz_get_ui(erg);
+  number res = (number)mpz_get_ui(erg);
 
   mpz_clear(erg); omFree((ADDRESS)erg);
   mpz_clear(k);   omFree((ADDRESS)k);
 
-  return (number) r;
+  return (number) res;
 }
 
-number nr2mMapGMP(number from)
+number nr2mMapGMP(number from, const coeffs r)
 {
   int_number erg = (int_number) omAlloc(sizeof(mpz_t));
   mpz_init(erg);
   int_number k = (int_number) omAlloc(sizeof(mpz_t));
-  mpz_init_set_ui(k, currRing->nr2mModul);
+  mpz_init_set_ui(k, r->nr2mModul);
 
   mpz_and(erg, (int_number)from, k);
-  number r = (number) mpz_get_ui(erg);
+  number res = (number) mpz_get_ui(erg);
 
   mpz_clear(erg); omFree((ADDRESS)erg);
   mpz_clear(k);   omFree((ADDRESS)k);
 
-  return (number) r;
+  return (number) res;
 }
 
 nMapFunc nr2mSetMap(const ring src, const ring dst)
@@ -567,7 +608,7 @@ nMapFunc nr2mSetMap(const ring src, const ring dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
-void nr2mSetExp(int m, const ring r)
+void nr2mSetExp(int m, const coeffs r)
 {
   if (m > 1)
   {
@@ -584,28 +625,28 @@ void nr2mSetExp(int m, const ring r)
   }
 }
 
-void nr2mInitExp(int m, const ring r)
+void nr2mInitExp(int m, const coeffs r)
 {
   nr2mSetExp(m, r);
   if (m < 2) WarnS("nr2mInitExp failed: we go on with Z/2^2");
 }
 
 #ifdef LDEBUG
-BOOLEAN nr2mDBTest (number a, const char *f, const int l)
+BOOLEAN nr2mDBTest (number a, const char *f, const int l, const coeffs r)
 {
   if ((NATNUMBER)a < 0) return FALSE;
-  if (((NATNUMBER)a & currRing->nr2mModul) != (NATNUMBER)a) return FALSE;
+  if (((NATNUMBER)a & r->nr2mModul) != (NATNUMBER)a) return FALSE;
   return TRUE;
 }
 #endif
 
-void nr2mWrite (number &a, const ring r)
+void nr2mWrite (number &a, const coeffs r)
 {
   int i = nr2mInt(a, r);
   StringAppend("%d", i);
 }
 
-static const char* nr2mEati(const char *s, int *i)
+static const char* nr2mEati(const char *s, int *i, const coeffs r)
 {
 
   if (((*s) >= '0') && ((*s) <= '9'))
@@ -615,16 +656,16 @@ static const char* nr2mEati(const char *s, int *i)
     {
       (*i) *= 10;
       (*i) += *s++ - '0';
-      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) & currRing->nr2mModul;
+      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) & r->nr2mModul;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    (*i) = (*i) & currRing->nr2mModul;
+    (*i) = (*i) & r->nr2mModul;
   }
   else (*i) = 1;
   return s;
 }
 
-const char * nr2mRead (const char *s, number *a)
+const char * nr2mRead (const char *s, number *a, const coeffs r)
 {
   int z;
   int n=1;

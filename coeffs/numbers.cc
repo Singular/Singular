@@ -79,7 +79,7 @@ number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
 int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
 
 number ndCopy(number a) { return a; }
-number nd_Copy(number a,const coeffs r) { return r->cfCopy(a,r); }
+number nd_Copy(number a,const coeffs r) { return r->nCopy(a); }
 
 #ifdef HAVE_RINGS
 BOOLEAN ndDivBy(number a, number b) { return TRUE; } // assume a,b !=0
@@ -290,89 +290,19 @@ void nInitChar(coeffs r)
   /* -------------- Z/2^m ----------------------- */
   else if (nField_is_Ring_2toM(r))
   {
-     nr2mInitExp(c,r);
-     n->cfInit = nr2mInit;
-     //n->nCopy  = nr2mCopy;
-     n->n_Int  = nr2mInt;
-     n->nAdd   = nr2mAdd;
-     n->nSub   = nr2mSub;
-     n->nMult  = nr2mMult;
-     n->nDiv   = nr2mDiv;
-     n->nIntDiv       = nr2mIntDiv;
-     n->nIntMod=nr2mMod;
-     n->nExactDiv= nr2mDiv;
-     n->nNeg   = nr2mNeg;
-     n->nInvers= nr2mInvers;
-     n->nDivBy = nr2mDivBy;
-     n->nDivComp = nr2mDivComp;
-     n->nGreater = nr2mGreater;
-     n->nEqual = nr2mEqual;
-     n->nIsZero = nr2mIsZero;
-     n->nIsOne = nr2mIsOne;
-     n->nIsMOne = nr2mIsMOne;
-     n->nGreaterZero = nr2mGreaterZero;
-     n->cfWrite = nr2mWrite;
-     n->nRead = nr2mRead;
-     n->nPower = nr2mPower;
-     n->cfSetMap = nr2mSetMap;
-     n->nNormalize = nDummy2;
-     n->nLcm          = nr2mLcm;
-     n->nGcd          = nr2mGcd;
-     n->nIsUnit = nr2mIsUnit;
-     n->nGetUnit = nr2mGetUnit;
-     n->nExtGcd = nr2mExtGcd;
-     n->nName= ndName;
-#ifdef LDEBUG
-     n->nDBTest=nr2mDBTest;
-#endif
+    nr2mCoeffInit(n, c, r->cf);
   }
   /* -------------- Z/n ----------------------- */
-  else if (nField_is_Ring_ModN(r) || nField_is_Ring_PtoM(r)
-  )
+  else if (nField_is_Ring_ModN(r) || nField_is_Ring_PtoM(r))
   {
-     nrnInitExp(c,r);
-     n->cfInit  = nrnInit;
-     n->cfDelete= nrnDelete;
-     n->cfCopy = cfrnCopy;
-     n->nSize  = nrnSize;
-     n->n_Int  = nrnInt;
-     n->nAdd   = nrnAdd;
-     n->nSub   = nrnSub;
-     n->nMult  = nrnMult;
-     n->nDiv   = nrnDiv;
-     n->nIntDiv= nrnIntDiv;
-     n->nIntMod= nrnMod;
-     n->nExactDiv= nrnDiv;
-     n->nNeg   = nrnNeg;
-     n->nInvers= nrnInvers;
-     n->nDivBy = nrnDivBy;
-     n->nDivComp = nrnDivComp;
-     n->nGreater = nrnGreater;
-     n->nEqual = nrnEqual;
-     n->nIsZero = nrnIsZero;
-     n->nIsOne = nrnIsOne;
-     n->nIsMOne = nrnIsMOne;
-     n->nGreaterZero = nrnGreaterZero;
-     n->cfWrite = nrnWrite;
-     n->nRead = nrnRead;
-     n->nPower = nrnPower;
-     n->cfSetMap = nrnSetMap;
-     n->nNormalize = nDummy2;
-     n->nLcm          = nrnLcm;
-     n->nGcd          = nrnGcd;
-     n->nIsUnit = nrnIsUnit;
-     n->nGetUnit = nrnGetUnit;
-     n->nExtGcd = nrnExtGcd;
-     n->nName= nrnName;
-#ifdef LDEBUG
-     n->nDBTest=nrnDBTest;
-#endif
+    nrnCoeffInit(n, c, r->cf);
   }
   /* -------------- Z ----------------------- */
   else if (nField_is_Ring_Z(r))
   {
      n->cfInit  = nrzInit;
      n->cfDelete= nrzDelete;
+     n->nCopy  = nrzCopy;
      n->cfCopy = cfrzCopy;
      n->nSize  = nrzSize;
      n->n_Int  = nrzInt;
@@ -425,7 +355,7 @@ void nInitChar(coeffs r)
     n->nIntMod= nlIntMod;
     n->nNeg   = nlNeg;
     n->nInvers= nlInvers;
-    //n->nCopy  = nlCopy;
+    n->nCopy  = nlCopy;
     n->nGreater = nlGreater;
     n->nEqual = nlEqual;
     n->nIsZero = nlIsZero;
@@ -458,7 +388,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= npDiv;
     n->nNeg   = npNeg;
     n->nInvers= npInvers;
-    //n->nCopy  = ndCopy;
+    n->nCopy  = ndCopy;
     n->nGreater = npGreater;
     n->nEqual = npEqual;
     n->nIsZero = npIsZero;
@@ -501,7 +431,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= nfDiv;
     n->nNeg   = nfNeg;
     n->nInvers= nfInvers;
-    //n->nCopy  = ndCopy;
+    n->nCopy  = ndCopy;
     n->nGreater = nfGreater;
     n->nEqual = nfEqual;
     n->nIsZero = nfIsZero;
@@ -531,7 +461,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= nrDiv;
     n->nNeg   = nrNeg;
     n->nInvers= nrInvers;
-    //n->nCopy  = ndCopy;
+    n->nCopy  = ndCopy;
     n->nGreater = nrGreater;
     n->nEqual = nrEqual;
     n->nIsZero = nrIsZero;
@@ -561,7 +491,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= ngfDiv;
     n->nNeg   = ngfNeg;
     n->nInvers= ngfInvers;
-    //n->nCopy  = ngfCopy;
+    n->nCopy  = ngfCopy;
     n->nGreater = ngfGreater;
     n->nEqual = ngfEqual;
     n->nIsZero = ngfIsZero;
@@ -592,7 +522,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= ngcDiv;
     n->nNeg   = ngcNeg;
     n->nInvers= ngcInvers;
-    //n->nCopy  = ngcCopy;
+    n->nCopy  = ngcCopy;
     n->nGreater = ngcGreater;
     n->nEqual = ngcEqual;
     n->nIsZero = ngcIsZero;
@@ -618,7 +548,7 @@ void nInitChar(coeffs r)
   }
 #endif
 #ifdef HAVE_RINGS
-  if (n->nGetUnit==(nMapFunc)NULL) n->nGetUnit=n->cfCopy;
+  if (n->nGetUnit==(nMapFunc)NULL) n->nGetUnit=n->nCopy;
 #endif
   if (!errorreported)
   {
