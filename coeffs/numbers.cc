@@ -363,7 +363,7 @@ void nInitChar(coeffs r)
      n->nIsUnit = nrnIsUnit;
      n->nGetUnit = nrnGetUnit;
      n->nExtGcd = nrnExtGcd;
-     n->nName= ndName;
+     n->nName= nrnName;
 #ifdef LDEBUG
      n->nDBTest=nrnDBTest;
 #endif

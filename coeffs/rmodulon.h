@@ -14,45 +14,42 @@
 #define NATNUMBER unsigned long
 #endif
 
-number  nrnCopy        (number a);
 number  cfrnCopy       (number a, const ring r);
-int     nrnSize        (number a);
+int     nrnSize        (number a, const ring r);
 void    nrnDelete      (number *a, const ring r);
-BOOLEAN nrnGreaterZero (number k);
-number  nrnMult        (number a, number b);
+BOOLEAN nrnGreaterZero (number k, const ring r);
+number  nrnMult        (number a, number b, const ring r);
 number  nrnInit        (int i, const ring r);
 int     nrnInt         (number &n, const ring r);
-number  nrnAdd         (number a, number b);
-number  nrnSub         (number a, number b);
-void    nrnPower       (number a, int i, number * result);
-BOOLEAN nrnIsZero      (number a);
-BOOLEAN nrnIsOne       (number a);
-BOOLEAN nrnIsMOne      (number a);
-BOOLEAN nrnIsUnit      (number a);
-number  nrnGetUnit     (number a);
-number  nrnDiv         (number a, number b);
-number  nrnMod         (number a,number b);
-number  nrnIntDiv      (number a,number b);
-number  nrnNeg         (number c);
-number  nrnInvers      (number c);
-BOOLEAN nrnGreater     (number a, number b);
-BOOLEAN nrnDivBy       (number a, number b);
-int     nrnDivComp     (number a, number b);
-BOOLEAN nrnEqual       (number a, number b);
-number  nrnLcm         (number a,number b, ring r);
-number  nrnGcd         (number a,number b,ring r);
-number  nrnExtGcd      (number a, number b, number *s, number *t);
+number  nrnAdd         (number a, number b, const ring r);
+number  nrnSub         (number a, number b, const ring r);
+void    nrnPower       (number a, int i, number * result, const ring r);
+BOOLEAN nrnIsZero      (number a, const ring r);
+BOOLEAN nrnIsOne       (number a, const ring r);
+BOOLEAN nrnIsMOne      (number a, const ring r);
+BOOLEAN nrnIsUnit      (number a, const ring r);
+number  nrnGetUnit     (number a, const ring r);
+number  nrnDiv         (number a, number b, const ring r);
+number  nrnMod         (number a,number b, const ring r);
+number  nrnIntDiv      (number a,number b, const ring r);
+number  nrnNeg         (number c, const ring r);
+number  nrnInvers      (number c, const ring r);
+BOOLEAN nrnGreater     (number a, number b, const ring r);
+BOOLEAN nrnDivBy       (number a, number b, const ring r);
+int     nrnDivComp     (number a, number b, const ring r);
+BOOLEAN nrnEqual       (number a, number b, const ring r);
+number  nrnLcm         (number a,number b, const ring r);
+number  nrnGcd         (number a,number b, const ring r);
+number  nrnExtGcd      (number a, number b, number *s, number *t, const ring r);
 nMapFunc nrnSetMap     (const ring src, const ring dst);
 #define  nrnWrite      nrzWrite
-const char *  nrnRead  (const char *s, number *a);
-char *  nrnName        (number n);
+const char *  nrnRead  (const char *s, number *a, const ring r);
+char *  nrnName        (number n, const ring r);
 #ifdef LDEBUG
-BOOLEAN nrnDBTest      (number a, const char *f, const int l);
+BOOLEAN nrnDBTest      (number a, const char *f, const int l, const ring r);
 #endif
-void    nrnSetExp(int c, ring r);
-void    nrnInitExp(int c, ring r);
+void    nrnSetExp(int c, const ring r);
+void    nrnInitExp(int c, const ring r);
 
-number nrnMapQ(number from);
-number nrnMapGMP(number from);
 #endif
 #endif
