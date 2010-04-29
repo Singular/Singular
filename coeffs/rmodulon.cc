@@ -7,20 +7,20 @@
 */
 
 #include <string.h>
-#include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/longrat.h>
-#include <kernel/mpr_complex.h>
-#include <kernel/ring.h>
-#include <kernel/rmodulon.h>
-#include <kernel/si_gmp.h>
+#include "config.h"
 
 #ifdef HAVE_RINGS
-  extern omBin gmp_nrz_bin;
+#include <mylimits.h>
+#include "coeffs.h"
+#include "output.h"
+#include "omalloc.h"
+#include "numbers.h"
+#include "longrat.h"
+#include "mpr_complex.h"
+#include "rmodulon.h"
+#include "si_gmp.h"
+
+extern omBin gmp_nrz_bin;
 
 int_number nrnMinusOne = NULL;
 unsigned long nrnExponent = 0;
@@ -569,3 +569,4 @@ const char * nrnRead (const char *s, number *a)
   return s;
 }
 #endif
+/* #ifdef HAVE_RINGS */

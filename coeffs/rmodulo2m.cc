@@ -7,19 +7,18 @@
 */
 
 #include <string.h>
-#include <kernel/mod2.h>
+#include "config.h"
 
 #ifdef HAVE_RINGS
-#include <omalloc/mylimits.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/longrat.h>
-#include <kernel/mpr_complex.h>
-#include <kernel/ring.h>
-#include <kernel/rmodulo2m.h>
-#include <kernel/si_gmp.h>
+#include <mylimits.h>
+#include "coeffs.h"
+#include "output.h"
+#include "omalloc.h"
+#include "numbers.h"
+#include "longrat.h"
+#include "mpr_complex.h"
+#include "rmodulo2m.h"
+#include "si_gmp.h"
 
 int nr2mExp;
 
@@ -643,3 +642,4 @@ const char * nr2mRead (const char *s, number *a)
   return s;
 }
 #endif
+/* #ifdef HAVE_RINGS */
