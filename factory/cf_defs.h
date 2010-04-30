@@ -43,6 +43,7 @@ const int SW_USE_CHINREM_GCD=13;
 const int SW_USE_GCD_P=14;
 const int SW_USE_QGCD=15;
 const int SW_USE_fieldGCD=16;
+const int SW_USE_FF_MOD_GCD=17;
 //}}}
 
 /*ENDPUBLIC*/

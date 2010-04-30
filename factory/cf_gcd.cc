@@ -20,6 +20,7 @@
 #include "ffreval.h"
 #include "algext.h"
 #include "fieldGCD.h"
+#include "cf_gcd_smallp.h"
 
 
 #ifdef HAVE_NTL
@@ -583,6 +584,19 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     else if (isOn(SW_USE_GCD_P))
     {
       fc=newGCD(fc,gc);
+    }
+    else if (isOn(SW_USE_FF_MOD_GCD) && !fc_and_gc_Univariate)
+    {
+      Variable a;
+      if (hasFirstAlgVar (fc, a) || hasFirstAlgVar (gc, a))
+      {
+        fc=GCD_Fp_extension (fc, gc, a);
+      }
+      if (CFFactory::gettype() == GaloisFieldDomain)
+      {
+        fc=GCD_GF (fc, gc);
+      }
+      fc=GCD_small_p (fc, gc);
     }
     else if ( p1 == fc.level() )
       fc = gcd_poly_p( fc, gc );
