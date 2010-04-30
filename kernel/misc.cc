@@ -23,7 +23,6 @@
 #include "timer.h"
 #include "intvec.h"
 #include "ring.h"
-#include "omSingularConfig.h"
 #include "p_Procs.h"
 #include "kversion.h"
 
