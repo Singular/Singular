@@ -42,6 +42,8 @@
     template class Matrix<CanonicalForm>;
     template class SubMatrix<CanonicalForm>;
     template class Array<REvaluation>;
+    template bool find ( const List<CanonicalForm> &, const CanonicalForm&);
+
     //template class vector<poly>;
     #ifndef NOSTREAMIO
     template ostream & operator<<(ostream &, const List<Factor<CanonicalForm> > &);
