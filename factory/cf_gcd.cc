@@ -828,10 +828,11 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
         if (isOn(SW_USE_QGCD))
         {
           Variable m;
-          if ((hasFirstAlgVar(f,m) || hasFirstAlgVar(g,m))
+          if (
+          (getCharacteristic() == 0) &&
+	  (hasFirstAlgVar(f,m) || hasFirstAlgVar(g,m))
           //&& f.isUnivariate()
           //&& g.isUnivariate()
-          && (getCharacteristic() == 0)
           )
           {
             //if ((f.level()==g.level()) && f.isUnivariate() && g.isUnivariate())

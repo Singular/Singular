@@ -777,7 +777,6 @@ CanonicalForm
 randomIrredpoly (int i, const Variable & x, 
                  CFList & list) 
 {
-  factoryseed (time (NULL)); 
   int random;
   int p= getCharacteristic();
   ZZ NTLp= to_ZZ (p);
