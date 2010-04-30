@@ -8,7 +8,7 @@
 * ABSTRACT: computation with long rational numbers
 */
 #include "coeffs.h"
-
+#include "config.h"
 #include "si_gmp.h"
 
 typedef MP_INT lint;
@@ -50,7 +50,7 @@ LINLINE number   nlInit(int i, const coeffs r);
 number nlRInit (int i);
 LINLINE BOOLEAN  nlIsOne(number a, const coeffs r);
 LINLINE BOOLEAN  nlIsZero(number za, const coeffs r);
-LINLINE number   nlCopy(number a);
+LINLINE number   nlCopy(number a, const coeffs r);
 LINLINE number   nl_Copy(number a, const coeffs r);
 LINLINE void     nlDelete(number *a, const coeffs r);
 LINLINE number   nlNeg(number za, const coeffs r);
@@ -58,7 +58,7 @@ LINLINE number   nlAdd(number la, number li, const coeffs r);
 LINLINE number   nlSub(number la, number li, const coeffs r);
 LINLINE number   nlMult(number a, number b, const coeffs r);
 
-number   nlInit2 (int i, int j);
+number   nlInit2 (int i, int j, const coeffs r);
 number   nlInit2gmp (mpz_t i, mpz_t j);
 number   nlGcd(number a, number b, const coeffs r);
 number   nlLcm(number a, number b, const coeffs r);   /*special routine !*/

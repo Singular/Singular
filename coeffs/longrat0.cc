@@ -9,10 +9,11 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "output.h"
 #include "config.h"
 #include "coeffs.h"
+#include "utils.h"
 #include "omalloc.h"
-#include "output.h"
 #include "longrat.h"
 #include "numbers.h"
 
@@ -97,7 +98,7 @@ const char * nlRead (const char *s, number *a, const coeffs r)
     else
     {
       number aa=*a;
-      nlNormalize(aa);
+      nlNormalize(aa,r);
       *a=aa;
     }
   }
