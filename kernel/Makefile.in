@@ -167,7 +167,7 @@ HEADERS=hutil.h idrec.h stairc.h ideals.h \
         GMPrat.h multicnt.h npolygon.h semic.h spectrum.h splist.h multicnt.h \
 	eigenval.h units.h mod_raw.h kbuckets.h sbuckets.h\
 	mpr_global.h mpr_inout.h mpr_base.h mpr_numeric.h \
-	fegetopt.h distrib.h options.h \
+	fegetopt.h options.h \
 	ratgring.h shiftgb.h prCopy.h prCopyMacros.h \
         p_MemAdd.h p_MemCopy.h p_MemCmp.h p_Numbers.h \
         pInline2.h pInline1.h pInline0.h mmalloc.h \
