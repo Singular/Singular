@@ -50,9 +50,12 @@ void           nNew(number * a);
 #define nWrite(A) n_Write(A,currRing)
 
 #define nTest(a) (1)
-#define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
-#define nGetDenom(N) (currRing->cf->cfGetDenom((N),currRing))
-#define nGetNumerator(N) (currRing->cf->cfGetNumerator((N),currRing))
+
+// please use n_* counterparts instead!!!
+// #define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
+// #define nGetDenom(N) (currRing->cf->cfGetDenom((N),currRing))
+// #define nGetNumerator(N) (currRing->cf->cfGetNumerator((N),currRing))
+
 
 #define nSetMap(R) (currRing->cf->cfSetMap(R,currRing))
 
@@ -103,14 +106,6 @@ static inline BOOLEAN nField_has_Units(const coeffs r)
 #else
 #define nField_is_Ring(A) (0)
 #endif
-
-
-#ifdef _TRY
-#ifndef ABS
-#define ABS(x) ((x)<0?(-(x)):(x))
-#endif
-#endif
-
 
 
 #ifdef _TRY

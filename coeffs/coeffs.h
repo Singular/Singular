@@ -15,6 +15,14 @@
 #define NULL        (0)
 #endif
 
+// #ifdef _TRY
+#ifndef ABS
+#define ABS(x) ((x)<0?(-(x)):(x))
+#endif
+// #endif
+
+
+
 #if (SIZEOF_LONG == 8)
 typedef int BOOLEAN;
 /* testet on x86_64, gcc 3.4.6: 2 % */
@@ -82,10 +90,12 @@ typedef struct  n_Procs_s  *coeffs;
 
 struct snumber;
 typedef struct snumber *   number;
-typedef number (*numberfunc)(number a,number b, const coeffs r);
-typedef number (*nMapFunc)(number a, const coeffs r);
+typedef number (*numberfunc)(number a, number b, const coeffs r);
 
-#define _TRY
+/// maps "a" from aRing into r
+typedef number (*nMapFunc)(number a, const coeffs r, const coeffs aRing);
+
+// #define _TRY
 
 #ifdef _TRY
 typedef coeffs ring;
@@ -113,6 +123,7 @@ struct n_Procs_s
    unsigned short *npLogTable;
    #endif
    // Zp_a, Q_a
+   // ?
 
    // general stuff
    numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
@@ -191,8 +202,13 @@ struct n_Procs_s
 
   short      float_len; /* additional char-flags, rInit */
   short      float_len2; /* additional char-flags, rInit */
-
 };
+
+/// Returns the type of coeffs domain
+static inline n_coeffType getCoeffType(const coeffs r)
+{
+  return r->type;
+}
 
 #define  nInternalChar(r) ((r)->ch)
 
