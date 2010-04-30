@@ -13,7 +13,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "mod2.h"
-#include "distrib.h"
+#include "../Singular/distrib.h"
 #ifdef p_Procs_Static
 #include "kversion.h"
 #endif
