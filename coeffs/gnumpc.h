@@ -38,9 +38,8 @@ void     ngcDelete(number *a, const coeffs r);
 BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);
 #endif
 
-/// Get a mapping function from src into this domain: long_C
-/// no need in dst!?
-nMapFunc  ngcSetMap(const coeffs src/*, const coeffs dst*/);
+/// Get a mapping function from src into the domain of this type: long_C!
+nMapFunc  ngcSetMap(const coeffs src, const coeffs dst);
 
 // Why is this here? who needs it?
 // number ngcMapQ(number from, const coeffs r, const coeffs aRing);

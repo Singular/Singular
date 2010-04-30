@@ -114,9 +114,9 @@ static number ngcCopyMap(number from, const coeffs r, const coeffs aRing)
   return (number)b;  
 }
 
-nMapFunc ngcSetMap(const coeffs src/*, const coeffs dst */)
+nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
 {
-//  assume( getCoeffType(dst) == ID );
+  assume( getCoeffType(dst) == ID );
   
   if(nField_is_Q(src))
   {
