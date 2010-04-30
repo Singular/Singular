@@ -18,11 +18,28 @@
 #include "output.h"
 #include "omalloc.h"
 
-extern size_t gmp_output_digits;
 
-
-number ngcMapQ(number from, const coeffs)
+#ifdef LDEBUG
+// not yet implemented
+BOOLEAN ngcDBTest(number a, const char *f, const int l, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
+  return TRUE;
+}
+#endif
+
+#ifndef assume
+#  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
+#endif
+
+const n_coeffType ID = n_long_C;
+
+number ngcMapQ(number from, const coeffs r, const coeffs aRing)
+{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_Q );
+
   if ( from != NULL )
   {
     gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF));
@@ -31,17 +48,12 @@ number ngcMapQ(number from, const coeffs)
   else
     return NULL;
 }
-union nf
+
+static number ngcMapLongR(number from, const coeffs r, const coeffs aRing)
 {
-  float _f;
-  number _n;
-  nf(float f) {_f = f;}
-  nf(number n) {_n = n;}
-  float F() const {return _f;}
-  number N() const {return _n;}
-};
-static number ngcMapLongR(number from, const coeffs)
-{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_long_R );
+  
   if ( from != NULL )
   {
     gmp_complex *res=new gmp_complex(*((gmp_float *)from));
@@ -50,8 +62,22 @@ static number ngcMapLongR(number from, const coeffs)
   else
     return NULL;
 }
-static number ngcMapR(number from, const coeffs)
+
+static number ngcMapR(number from, const coeffs r, const coeffs aRing)
 {
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_R );
+
+  union nf
+  {
+    float _f;
+    number _n;
+    nf(float f) {_f = f;}
+    nf(number n) {_n = n;}
+    float F() const {return _f;}
+    number N() const {return _n;}
+  };
+
   if ( from != NULL )
   {
     gmp_complex *res=new gmp_complex((double)nf(from).F());
@@ -60,43 +86,67 @@ static number ngcMapR(number from, const coeffs)
   else
     return NULL;
 }
-extern ring ngfMapRing;
-static number ngcMapP(number from, const coeffs)
+
+static number ngcMapP(number from, const coeffs r, const coeffs aRing)
 {
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) ==  n_Zp );
+  
   if ( from != NULL)
-    return ngcInit(npInt(from,ngfMapRing), currRing);
+    return ngcInit(npInt(from, aRing), r);
   else
     return NULL;
 }
 
-nMapFunc ngcSetMap(const coeffs src,const coeffs dst)
+
+
+static number ngcCopyMap(number from, const coeffs r, const coeffs aRing)
 {
-  if(rField_is_Q(src))
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) ==  ID );
+
+  gmp_complex* b = NULL;
+  
+  if ( from !=  NULL )
+  { 
+    b = new gmp_complex( *(gmp_complex*)from );
+  }
+  return (number)b;  
+}
+
+nMapFunc ngcSetMap(const coeffs src/*, const coeffs dst */)
+{
+//  assume( getCoeffType(dst) == ID );
+  
+  if(nField_is_Q(src))
   {
     return ngcMapQ;
   }
-  if (rField_is_long_R(src))
+  if (nField_is_long_R(src))
   {
     return ngcMapLongR;
   }
-  if (rField_is_long_C(src))
+  if (nField_is_long_C(src))
   {
-    return ngcCopy;
+    return ngcCopyMap;
   }
-  if(rField_is_R(src))
+  if(nField_is_R(src))
   {
     return ngcMapR;
   }
-  if (rField_is_Zp(src))
+  if (nField_is_Zp(src))
   {
-    ngfMapRing=src;
     return ngcMapP;
   }
   return NULL;
 }
 
-number   ngcPar(int i)
+
+
+number   ngcPar(int i, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   gmp_complex* n= new gmp_complex( (long)0, (long)1 );
   return (number)n;
 }
@@ -106,7 +156,10 @@ number   ngcPar(int i)
 */
 number ngcInit (int i, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+  
   gmp_complex* n= new gmp_complex( (long)i, (long)0 );
+  
   return (number)n;
 }
 
@@ -115,6 +168,8 @@ number ngcInit (int i, const coeffs r)
 */
 int ngcInt(number &i, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+  
   return (int)((gmp_complex*)i)->real();
 }
 
@@ -138,6 +193,8 @@ int ngcSize(number n)
 */
 void ngcDelete (number * a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   if ( *a != NULL )
   {
     delete *(gmp_complex**)a;
@@ -148,24 +205,22 @@ void ngcDelete (number * a, const coeffs r)
 /*2
  * copy a to b
 */
-number ngcCopy(number a, const coeffs)
+number ngcCopy(number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+  
   gmp_complex* b= new gmp_complex( *(gmp_complex*)a );
   return (number)b;
 }
-number ngc_Copy(number a, const coeffs r)
-{
-  gmp_complex* b=new gmp_complex( *(gmp_complex*)a );
-  return (number)b;
-}
+
 
 /*2
 * za:= - za
 */
-gmp_complex ngc_m1(-1);
-
-number ngcNeg (number a, const coeffs)
+number ngcNeg (number a, const coeffs R)
 {
+  assume( getCoeffType(R) == ID );
+
   gmp_complex* r=(gmp_complex*)a;
   (*r) *= ngc_m1;
   return (number)a;
@@ -174,8 +229,10 @@ number ngcNeg (number a, const coeffs)
 /*
 * 1/a
 */
-number ngcInvers(number a, const coeffs)
+number ngcInvers(number a, const coeffs R)
 {
+  assume( getCoeffType(R) == ID );
+
   gmp_complex* r = NULL;
   if (((gmp_complex*)a)->isZero())
   {
@@ -183,16 +240,18 @@ number ngcInvers(number a, const coeffs)
   }
   else
   {
-    r= new gmp_complex( (gmp_complex)1 / (*(gmp_complex*)a) );
+    b = new gmp_complex( (gmp_complex)1 / (*(gmp_complex*)a) );
   }
-  return (number)r;
+  return (number)b;
 }
 
 /*2
 * u:= a + b
 */
-number ngcAdd (number a, number b, const coeffs)
+number ngcAdd (number a, number b, const coeffs R)
 {
+  assume( getCoeffType(R) == ID );
+
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) + (*(gmp_complex*)b) );
   return (number)r;
 }
@@ -202,6 +261,8 @@ number ngcAdd (number a, number b, const coeffs)
 */
 number ngcSub (number a, number b, const coeffs R)
 {
+  assume( getCoeffType(R) == ID );
+
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) - (*(gmp_complex*)b) );
   return (number)r;
 }
@@ -209,8 +270,10 @@ number ngcSub (number a, number b, const coeffs R)
 /*2
 * u := a * b
 */
-number ngcMult (number a, number b)
+number ngcMult (number a, number b, const coeffs R)
 {
+  assume( getCoeffType(R) == ID );
+  
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) * (*(gmp_complex*)b) );
   return (number)r;
 }
@@ -218,23 +281,27 @@ number ngcMult (number a, number b)
 /*2
 * u := a / b
 */
-number ngcDiv (number a, number b, const coeffs)
+number ngcDiv (number a, number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   if (((gmp_complex*)b)->isZero())
   {
     // a/0 = error
     WerrorS(nDivBy0);
     return NULL;
   }
-  gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) / (*(gmp_complex*)b) );
-  return (number)r;
+  gmp_complex* res = new gmp_complex( (*(gmp_complex*)a) / (*(gmp_complex*)b) );
+  return (number)res;
 }
 
 /*2
 * u:= x ^ exp
 */
-void ngcPower ( number x, int exp, number * u, const coeffs R)
+void ngcPower ( number x, int exp, number * u, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   if ( exp == 0 )
   {
     gmp_complex* n = new gmp_complex(1);
@@ -243,7 +310,7 @@ void ngcPower ( number x, int exp, number * u, const coeffs R)
   }
   else if ( exp == 1 )
   {
-    nNew(u);
+    n_New(u, r);
     gmp_complex* n = new gmp_complex();
     *n= *(gmp_complex*)x;
     *u=(number)n;
@@ -251,7 +318,7 @@ void ngcPower ( number x, int exp, number * u, const coeffs R)
   }
   else if (exp == 2)
   {
-    nNew(u);
+    n_New(u, r);
     gmp_complex* n = new gmp_complex();
     *n= *(gmp_complex*)x;
     *u=(number)n;
@@ -260,8 +327,8 @@ void ngcPower ( number x, int exp, number * u, const coeffs R)
   }
   if (exp&1==1)
   {
-    ngcPower(x,exp-1,u, R);
-    gmp_complex *n=new gmp_complex();
+    ngcPower(x,exp-1,u, r);
+    gmp_complex *n = new gmp_complex();
     *n=*(gmp_complex*)x;
     *(gmp_complex*)(*u) *= *(gmp_complex*)n;
     delete n;
@@ -269,26 +336,32 @@ void ngcPower ( number x, int exp, number * u, const coeffs R)
   else
   {
     number w;
-    nNew(&w);
-    ngcPower(x,exp/2,&w, R);
-    ngcPower(w,2,u, R);
-    nDelete(&w);
+    n_New(&w, r);
+    ngcPower(x,exp/2,&w, r);
+    ngcPower(w,2,u, r);
+    n_Delete(&w, r);
   }
 }
 
-BOOLEAN ngcIsZero (number a, const coeffs)
+BOOLEAN ngcIsZero (number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   return ( ((gmp_complex*)a)->real().isZero() && ((gmp_complex*)a)->imag().isZero());
 }
 
-number ngcRePart(number a, const coeffs)
+number ngcRePart(number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->real());
   return (number)n;
 }
 
-number ngcImPart(number a, const coeffs)
+number ngcImPart(number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   gmp_complex* n = new gmp_complex(((gmp_complex*)a)->imag());
   return (number)n;
 }
@@ -296,8 +369,10 @@ number ngcImPart(number a, const coeffs)
 /*2
 * za >= 0 ?
 */
-BOOLEAN ngcGreaterZero (number a, const coeffs)
+BOOLEAN ngcGreaterZero (number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   if ( ! ((gmp_complex*)a)->imag().isZero() )
     return ( abs( *(gmp_complex*)a).sign() >= 0 );
   else
@@ -307,8 +382,10 @@ BOOLEAN ngcGreaterZero (number a, const coeffs)
 /*2
 * a > b ?
 */
-BOOLEAN ngcGreater (number a, number b, const coeffs)
+BOOLEAN ngcGreater (number a, number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   gmp_complex *aa=(gmp_complex*)a;
   gmp_complex *bb=(gmp_complex*)b;
   return (*aa) > (*bb);
@@ -317,8 +394,10 @@ BOOLEAN ngcGreater (number a, number b, const coeffs)
 /*2
 * a = b ?
 */
-BOOLEAN ngcEqual (number a, number b, const coeffs)
+BOOLEAN ngcEqual (number a, number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   gmp_complex *aa=(gmp_complex*)a;
   gmp_complex *bb=(gmp_complex*)b;
   return (*aa) == (*bb);
@@ -327,8 +406,10 @@ BOOLEAN ngcEqual (number a, number b, const coeffs)
 /*2
 * a == 1 ?
 */
-BOOLEAN ngcIsOne (number a, const coeffs)
+BOOLEAN ngcIsOne (number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   return (((gmp_complex*)a)->real().isOne() && ((gmp_complex*)a)->imag().isZero());
   //return (((gmp_complex*)a)->real().isOne());
 }
@@ -336,8 +417,10 @@ BOOLEAN ngcIsOne (number a, const coeffs)
 /*2
 * a == -1 ?
 */
-BOOLEAN ngcIsMOne (number a, const coeffs)
+BOOLEAN ngcIsMOne (number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   return (((gmp_complex*)a)->real().isMOne() && ((gmp_complex*)a)->imag().isZero());
   //return (((gmp_complex*)a)->real().isMOne());
 }
@@ -345,19 +428,21 @@ BOOLEAN ngcIsMOne (number a, const coeffs)
 /*2
 * extracts the number a from s, returns the rest
 */
-const char * ngcRead (const char * s, number * a, const coeffs R)
+const char * ngcRead (const char * s, number * a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+  
   if ((*s >= '0') && (*s <= '9'))
   {
     gmp_float *re=NULL;
-    s=ngfRead(s,(number *)&re, R);
+    s=ngfRead(s,(number *)&re, r);
     gmp_complex *aa=new gmp_complex(*re);
     *a=(number)aa;
     delete re;
   }
-  else if (strncmp(s,currRing->parameter[0],strlen(currRing->parameter[0]))==0)
+  else if (strncmp(s, r->parameter[0],strlen(r->parameter[0]))==0)
   {
-    s+=strlen(currRing->parameter[0]);
+    s+=strlen(r->parameter[0]);
     gmp_complex *aa=new gmp_complex((long)0,(long)1);
     *a=(number)aa;
   }
@@ -368,30 +453,28 @@ const char * ngcRead (const char * s, number * a, const coeffs R)
   return s;
 }
 
+
+
 /*2
 * write a floating point number
 */
 void ngcWrite (number &a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
+  extern size_t gmp_output_digits; /// comes from mpr_complex.cc
+
   if (a==NULL)
     StringAppendS("0");
   else
   {
     char *out;
-    out= complexToStr(*(gmp_complex*)a,gmp_output_digits);
+    out= complexToStr(*(gmp_complex*)a, gmp_output_digits);
     StringAppendS(out);
     //    omFreeSize((void *)out, (strlen(out)+1)* sizeof(char) );
     omFree( (void *)out );
   }
 }
-
-#ifdef LDEBUG
-// not yet implemented
-//BOOLEAN ngcDBTest(number a, const char *f, const int l)
-//{
-//  return TRUE;
-//}
-#endif
 
 // local Variables: ***
 // folded-file: t ***

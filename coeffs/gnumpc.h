@@ -25,22 +25,25 @@ number   ngcSub(number la, number li, const coeffs r);
 number   ngcMult(number a, number b, const coeffs r);
 number   ngcDiv(number a, number b, const coeffs r);
 void     ngcPower(number x, int exp, number *lu, const coeffs r);
-number   ngcCopy(number a, const coeffs);
+number   ngcCopy(number a, const coeffs r);
 number   ngc_Copy(number a, coeffs r);
 const char * ngcRead (const char *s, number *a, const coeffs r);
 void     ngcWrite(number &a, const coeffs r);
 number   ngcRePart(number a, const coeffs r);
 number   ngcImPart(number a, const coeffs r);
 
-
-#ifdef LDEBUG
-BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs);
-#endif
 void     ngcDelete(number *a, const coeffs r);
 
-nMapFunc  ngcSetMap(const coeffs src, const coeffs dst);
+#ifdef LDEBUG
+BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);
+#endif
 
-number ngcMapQ(number from, const coeffs r);
+/// Get a mapping function from src into this domain: long_C
+/// no need in dst!?
+nMapFunc  ngcSetMap(const coeffs src/*, const coeffs dst*/);
+
+// Why is this here? who needs it?
+// number ngcMapQ(number from, const coeffs r, const coeffs aRing);
 #endif
 
 
