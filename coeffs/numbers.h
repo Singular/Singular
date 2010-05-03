@@ -72,9 +72,9 @@ void nDBDummy1(number* d,char *f, int l);
 #endif
 #define nGetChar() n_GetChar(currRing)
 
-void nInitChar(coeffs r);
-void nKillChar(coeffs r);
-void nSetChar(coeffs r);
+void nInitChar(coeffs r); // do one-time initialisations
+void nKillChar(coeffs r); // undo all initialisations
+void nSetChar(coeffs r); // initialisations after each ring chage
 
 #define nDivBy0 "div by 0"
 
@@ -82,7 +82,6 @@ void nSetChar(coeffs r);
 void   nDummy2(number& d); // nNormalize...
 
 // Tests:
-#ifdef HAVE_RINGS
 static inline BOOLEAN nField_is_Ring_2toM(const coeffs r)
 { return (r->ringtype == 1); }
 
@@ -103,9 +102,6 @@ static inline BOOLEAN nField_is_Domain(const coeffs r)
 
 static inline BOOLEAN nField_has_Units(const coeffs r)
 { return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
-#else
-#define nField_is_Ring(A) (0)
-#endif
 
 
 #ifdef _TRY
@@ -117,32 +113,28 @@ static inline BOOLEAN nField_has_Units(const coeffs r)
 #endif
 
 
-#ifdef HAVE_RINGS
+static inline n_coeffType nField_is(const coeffs r)
+{ return r->fieldtype; }
 static inline BOOLEAN nField_is_Zp(const coeffs r)
-{ return (r->ringtype == 0) && (r->ch > 1) && (r->parameter==NULL); }
+{ return nField_is(r)==n_Zp; }
 
 static inline BOOLEAN nField_is_Zp(const coeffs r, int p)
-{ return (r->ringtype == 0) && (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
+{ return (nField_is_Zp(r)  && (r->ch == ABS(p))); }
 
 static inline BOOLEAN nField_is_Q(const coeffs r)
-{ return (r->ringtype == 0) && (r->ch == 0) && (r->parameter==NULL); }
-
+{ return nField_is(r)==n_Q; }
 
 static inline BOOLEAN nField_is_numeric(const coeffs r) /* R, long R, long C */
-{ return (r->ringtype == 0) && (r->ch ==  -1); }
+{  return (nField_is(r)==n_R) || (nField_is(r)==n_long_R) || (nField_is(r)==n_long_C); }
 
 static inline BOOLEAN nField_is_R(const coeffs r)
-{
-  if (nField_is_numeric(r) && (r->float_len <= (short)SHORT_REAL_LENGTH))
-      return (r->ringtype == 0) && (r->parameter==NULL);
-  return FALSE;
-}
+{ return nField_is(r)==n_R; }
 
 static inline BOOLEAN nField_is_GF(const coeffs r)
-{ return (r->ringtype == 0) && (r->ch > 1) && (r->parameter!=NULL); }
+{ return nField_is(r)==n_GF; }
 
 static inline BOOLEAN nField_is_GF(const coeffs r, int q)
-{ return (r->ringtype == 0) && (r->ch == q); }
+{ return (nField_is(r)==n_GF) && (r->ch == q); }
 
 static inline BOOLEAN nField_is_Zp_a(const coeffs r)
 { return (r->ringtype == 0) && (r->ch < -1); }
@@ -154,70 +146,10 @@ static inline BOOLEAN nField_is_Q_a(const coeffs r)
 { return (r->ringtype == 0) && (r->ch == 1); }
 
 static inline BOOLEAN nField_is_long_R(const coeffs r)
-{
-  if (nField_is_numeric(r) && (r->float_len >(short)SHORT_REAL_LENGTH))
-    return (r->ringtype == 0) && (r->parameter==NULL);
-  return FALSE;
-}
+{ return nField_is(r)==n_long_R; }
 
 static inline BOOLEAN nField_is_long_C(const coeffs r)
-{
-  if (nField_is_numeric(r))
-    return (r->ringtype == 0) && (r->parameter!=NULL);
-  return FALSE;
-}
-
-#else
-
-
-static inline BOOLEAN nField_is_Zp(const coeffs r)
-{ return (r->ch > 1) && (r->parameter==NULL); }
-
-static inline BOOLEAN nField_is_Zp(const coeffs r, int p)
-{ return (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
-
-static inline BOOLEAN nField_is_Q(const coeffs r)
-{ return (r->ch == 0) && (r->parameter==NULL); }
-
-static inline BOOLEAN nField_is_numeric(const coeffs r) /* R, long R, long C */
-{ return (r->ch ==  -1); }
-
-static inline BOOLEAN nField_is_R(const coeffs r)
-{
-  if (nField_is_numeric(r) && (r->float_len <= (short)SHORT_REAL_LENGTH))
-    return (r->parameter==NULL);
-  return FALSE;
-}
-
-static inline BOOLEAN nField_is_GF(const coeffs r)
-{ return (r->ch > 1) && (r->parameter!=NULL); }
-
-static inline BOOLEAN nField_is_GF(const coeffs r, int q)
-{ return (r->ch == q); }
-
-static inline BOOLEAN nField_is_Zp_a(const coeffs r)
-{ return (r->ch < -1); }
-
-static inline BOOLEAN nField_is_Zp_a(const coeffs r, int p)
-{ return (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
-
-static inline BOOLEAN nField_is_Q_a(const coeffs r)
-{ return (r->ch == 1); }
-
-static inline BOOLEAN nField_is_long_R(const coeffs r)
-{
-  if (nField_is_numeric(r) && (r->float_len >(short)SHORT_REAL_LENGTH))
-    return (r->parameter==NULL);
-  return FALSE;
-}
-
-static inline BOOLEAN nField_is_long_C(const coeffs r)
-{
-  if (nField_is_numeric(r))
-    return (r->parameter!=NULL);
-  return FALSE;
-}
-#endif
+{ return nField_is(r)==n_long_C; }
 
 static inline BOOLEAN nField_has_simple_inverse(const coeffs r)
 /* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/

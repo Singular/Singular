@@ -14,7 +14,6 @@
 //-> include & define stuff
 // must have gmp version >= 2
 #include "si_gmp.h"
-#include "numbers.h"
 #include "mpr_global.h"
 
 #define ZTOF 1
