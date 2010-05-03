@@ -27,6 +27,11 @@
 extern omBin gmp_nrz_bin;
 #endif
 
+#ifndef assume
+#  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
+#endif
+
+
 //static int characteristic = 0;
 extern int IsPrime(int p);
 
@@ -78,8 +83,16 @@ number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
 
 int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
 
-number ndCopy(number a) { return a; }
-number nd_Copy(number a,const coeffs r) { return r->nCopy(a); }
+number ndCopy(number a, const coeffs) { return a; }
+number ndCopyMap(number a, const coeffs r, const coeffs aRing)
+{
+  assume( getCoeffType(r) == getCoeffType(aRing) );
+  assume( nField_has_simple_Alloc(r) && nField_has_simple_Alloc(aRing) );
+  
+  return a;
+}
+
+number nd_Copy(number a, const coeffs r) { return n_Copy(a, r); }
 
 #ifdef HAVE_RINGS
 BOOLEAN ndDivBy(number a, number b) { return TRUE; } // assume a,b !=0

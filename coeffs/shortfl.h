@@ -26,14 +26,20 @@ BOOLEAN nrGreater     (number a, number b, const coeffs r);
 BOOLEAN nrEqual       (number a, number b, const coeffs r);
 void    nrWrite       (number &a, const coeffs r);
 const char *  nrRead  (const char *s, number *a, const coeffs r);
-int     nrGetChar();
 #ifdef LDEBUG
-BOOLEAN nrDBTest(number a, const coeffs, rconst char *f, const int l);
+BOOLEAN nrDBTest(number a, const coeffs r, const char *f, const int l);
 #endif
 
+/// Get a mapping function from src into the domain of this type: n_R
 nMapFunc nrSetMap(const coeffs src, const coeffs dst);
 
-float   nrFloat(number n);
-number nrMapQ(number from, const coeffs r);
+// Where are the following used?
+// int     nrGetChar();
+// number nrMapQ(number from, const coeffs r, const coeffs aRing);
+
+
+/// Converts a n_R number into a float. Needed by Maps
+float   nrFloat(number n); 
+
 #endif
 

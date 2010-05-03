@@ -7,59 +7,88 @@
 * ABSTRACT:
 */
 
+#include "shortfl.h"
+
 #include <string.h>
 #include "coeffs.h"
-#include <mylimits.h>
 #include "output.h"
 #include "numbers.h"
 #include "longrat.h"
 #include "mpr_complex.h"
-#include "shortfl.h"
 
-static float nrEps = 1.0e-3;
+
+#include <mylimits.h>
+// #include "limits.h"
+#define MAX_INT_VAL INT_MAX
+
+#ifndef assume
+#  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
+#endif
+
+
+
+static const n_coeffType ID = n_R;
+
+static const float nrEps = 1.0e-3;
+
 union nf
 {
   float _f;
   number _n;
-  nf(float f) {_f = f;}
-  nf(number n) {_n = n;}
-  float F() const {return _f;}
-  number N() const {return _n;}
+
+  nf(float f): _f(f){};
+
+  nf(number n): _n(n){};
+
+  inline float F() const {return _f;}
+  inline number N() const {return _n;}
 };
+
+
+
 
 float nrFloat(number n)
 {
   return nf(n).F();
 }
 
+
 BOOLEAN nrGreaterZero (number k, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   return nf(k).F() >= 0.0;
 }
 
 number nrMult (number a,number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   return nf(nf(a).F() * nf(b).F()).N();
 }
 
 /*2
 * create a number from int
 */
-number nrInit (int i, const coeffs R)
+number nrInit (int i, const coeffs r)
 {
-  float r = (float)i;
-  return nf(nf(r).F()).N();
+  assume( getCoeffType(r) == ID );
+
+  float f = (float)i;
+  return nf(nf(f).F()).N();
 }
 
 /*2
 * convert a number to int
 */
-int nrInt(number &n, const coeffs R)
+int nrInt(number &n, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   int i;
-  float r = nf(n).F();
-  if (((float)INT_MIN <= r) || ((float)MAX_INT_VAL >= r))
-    i = (int)r;
+  float f = nf(n).F();
+  if (((float)INT_MIN <= f) || ((float)MAX_INT_VAL >= f))
+    i = (int)f;
   else
     i = 0;
   return i;
@@ -77,73 +106,81 @@ int nrSize(number n, const coeffs R)
   return i;
 }
 
-number nrAdd (number a, number b, const coeffs R)
+number nrAdd (number a, number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   float x = nf(a).F();
   float y = nf(b).F();
-  float r = x + y;
+  float f = x + y;
   if (x > 0.0)
   {
     if (y < 0.0)
     {
-      x = r / (x - y);
+      x = f / (x - y);
       if (x < 0.0)
         x = -x;
       if (x < nrEps)
-        r = 0.0;
+        f = 0.0;
     }
   }
   else
   {
     if (y > 0.0)
     {
-      x = r / (y - x);
+      x = f / (y - x);
       if (x < 0.0)
         x = -x;
       if (x < nrEps)
-        r = 0.0;
+        f = 0.0;
     }
   }
-  return nf(r).N();
+  return nf(f).N();
 }
 
-number nrSub (number a, number b, const coeffs R)
+number nrSub (number a, number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   float x = nf(a).F();
   float y = nf(b).F();
-  float r = x - y;
+  float f = x - y;
   if (x > 0.0)
   {
     if (y > 0.0)
     {
-      x = r / (x + y);
+      x = f / (x + y);
       if (x < 0.0)
         x = -x;
       if (x < nrEps)
-        r = 0.0;
+        f = 0.0;
     }
   }
   else
   {
     if (y < 0.0)
     {
-      x = r / (x + y);
+      x = f / (x + y);
       if (x < 0.0)
         x = -x;
       if (x < nrEps)
-        r = 0.0;
+        f = 0.0;
     }
   }
-  return nf(r).N();
+  return nf(f).N();
 }
 
 BOOLEAN nrIsZero (number  a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   return (0.0 == nf(a).F());
 }
 
 BOOLEAN nrIsOne (number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   float aa=nf(a).F()-1.0;
   if (aa<0.0) aa=-aa;
   return (aa<nrEps);
@@ -151,6 +188,8 @@ BOOLEAN nrIsOne (number a, const coeffs r)
 
 BOOLEAN nrIsMOne (number a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   float aa=nf(a).F()+1.0;
   if (aa<0.0) aa=-aa;
   return (aa<nrEps);
@@ -158,6 +197,8 @@ BOOLEAN nrIsMOne (number a, const coeffs r)
 
 number nrDiv (number a,number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   float n = nf(b).F();
   if (n == 0.0)
   {
@@ -170,6 +211,8 @@ number nrDiv (number a,number b, const coeffs r)
 
 number  nrInvers (number c, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   float n = nf(c).F();
   if (n == 0.0)
   {
@@ -181,27 +224,37 @@ number  nrInvers (number c, const coeffs r)
 
 number nrNeg (number c, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   return nf(-nf(c).F()).N();
 }
 
 BOOLEAN nrGreater (number a,number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   return nf(a).F() > nf(b).F();
 }
 
 BOOLEAN nrEqual (number a,number b, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   number x = nrSub(a,b,r);
   return nf(x).F() == nf((float)0.0).F();
 }
 
 void nrWrite (number &a, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   StringAppend("%9.3e", nf(a).F());
 }
 
 void nrPower (number a, int i, number * result, const coeffs r)
 {
+  assume( getCoeffType(r) == ID );
+
   if (i==0)
   {
     *result = nf(nf(1.0).F()).N();
@@ -216,6 +269,7 @@ void nrPower (number a, int i, number * result, const coeffs r)
   *result = nf(nf(a).F() * nf(*result).F()).N();
 }
 
+namespace {
 static const char* nrEatr(const char *s, float *r)
 {
   int i;
@@ -234,11 +288,15 @@ static const char* nrEatr(const char *s, float *r)
   else *r = 1.0;
   return s;
 }
-
-const char *nIllegalChar="illegal character in number";
+};
 
 const char * nrRead (const char *s, number *a, const coeffs r)
 {
+
+  assume( getCoeffType(r) == ID );
+
+  static const char *nIllegalChar="illegal character in number";
+
   const char *t;
   const char *start=s;
   float z1,z2;
@@ -293,24 +351,55 @@ const char * nrRead (const char *s, number *a, const coeffs r)
   return s;
 }
 
-/*2
-* the last used charcteristic
-*/
-int nrGetChar()
-{
-  return 0;
-}
+
+// the last used charcteristic
+// int nrGetChar(){ return 0; }
+
 
 #ifdef LDEBUG
 /*2
 * test valid numbers: not implemented yet
 */
-//BOOLEAN nrDBTest(number a, const char *f, const int l)
-//{
-//  return TRUE;
-//}
+BOOLEAN  nrDBTest(number a, const char *f, const int l, const coeffs r);
+{
+  assume( getCoeffType(r) == ID );
+
+  return TRUE;
+}
 #endif
 
+static number nrMapP(number from, const coeffs r, const coeffs aRing)
+{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) ==  n_Zp );
+  
+  int i = (int)((long)from);
+  float f = (float)i;
+  return nf(f).N();
+}
+
+static number nrMapLongR(number from, const coeffs r, const coeffs aRing)
+{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_long_R );
+
+  float t =(float)mpf_get_d((mpf_srcptr)from);
+  return nf(t).N();
+}
+
+static number nrMapC(number from, const coeffs r, const coeffs aRing)
+{  
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_long_C );
+  
+  gmp_float h = ((gmp_complex*)from)->real();
+  float t =(float)mpf_get_d((mpf_srcptr)&h);
+  return nf(t).N();
+}
+
+
+number nrMapQ(number from, const coeffs r, const coeffs aRing)
+{
 /* in longrat.h
 #define SR_INT    1
 #define mpz_size1(A) (ABS((A)->_mp_size))
@@ -327,8 +416,9 @@ int nrGetChar()
 #define MPZ_INIT mpz_init
 #define MPZ_CLEAR mpz_clear
 
-number nrMapQ(number from)
-{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_Q );
+
   mpz_t h;
   mpz_ptr g,z,n;
   int i,j,t,s;
@@ -422,27 +512,11 @@ number nrMapQ(number from)
   return nf(rr).N();
 }
 
-static number nrMapP(number from, const coeffs R)
-{
-  int i = (int)((long)from);
-  float r = (float)i;
-  return nf(r).N();
-}
-
-static number nrMapLongR(number from, const coeffs R)
-{
-  float t =(float)mpf_get_d((mpf_srcptr)from);
-  return nf(t).N();
-}
-static number nrMapC(number from, const coeffs r)
-{
-  gmp_float h = ((gmp_complex*)from)->real();
-  float t =(float)mpf_get_d((mpf_srcptr)&h);
-  return nf(t).N();
-}
 
 nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 {
+  assume( getCoeffType(dst) == ID );
+
   if (nField_is_Q(src))
   {
     return nrMapQ;
@@ -453,7 +527,7 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
   }
   if (nField_is_R(src))
   {
-    return ndCopy;
+    return ndCopyMap;
   }
   if(nField_is_Zp(src))
   {
