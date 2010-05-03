@@ -19,11 +19,12 @@
 #include <kernel/options.h>
 #include <kernel/febase.h>
 //#include "cntrlc.h"
-#include <kernel/kstd1.h>
-#include <kernel/timer.h>
-#include <kernel/intvec.h>
-#include <kernel/ring.h>
-#include <kernel/p_Procs.h>
+#include "kstd1.h"
+#include "timer.h"
+#include "intvec.h"
+#include "ring.h"
+#include "p_Procs.h"
+#include "kversion.h"
 
 //#ifdef HAVE_LIBPARSER
 //#  include "libparse.h"

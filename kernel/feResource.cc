@@ -20,8 +20,8 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
 
-#include <Singular/distrib.h>
-#include <kernel/dError.h>
+#include "../Singular/distrib.h"
+#include "dError.h"
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <kernel/febase.h>
 #include <omalloc/omalloc.h>
