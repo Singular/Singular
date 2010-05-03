@@ -19,6 +19,9 @@
 #include "omalloc.h"
 
 
+#include "shortfl.h"
+
+
 #ifdef LDEBUG
 // not yet implemented
 BOOLEAN ngcDBTest(number a, const char *f, const int l, const coeffs r)
@@ -33,7 +36,7 @@ BOOLEAN ngcDBTest(number a, const char *f, const int l, const coeffs r)
 #  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
 #endif
 
-const n_coeffType ID = n_long_C;
+static const n_coeffType ID = n_long_C;
 
 number ngcMapQ(number from, const coeffs r, const coeffs aRing)
 {
@@ -68,19 +71,9 @@ static number ngcMapR(number from, const coeffs r, const coeffs aRing)
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) == n_R );
 
-  union nf
-  {
-    float _f;
-    number _n;
-    nf(float f) {_f = f;}
-    nf(number n) {_n = n;}
-    float F() const {return _f;}
-    number N() const {return _n;}
-  };
-
   if ( from != NULL )
   {
-    gmp_complex *res=new gmp_complex((double)nf(from).F());
+    gmp_complex *res=new gmp_complex((double)nrFloat(from));
     return (number)res;
   }
   else

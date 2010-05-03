@@ -64,6 +64,8 @@ void ndDelete(number* d, const coeffs r);
 void nDummy2(number &d);
 number ndGcd(number a, number b, const coeffs);
 number ndCopy(number a, const coeffs r);
+number ndCopyMap(number a, const coeffs r, const coeffs aRing);
+
 void   ndInpMult(number &a, number b, const coeffs r);
 number ndInpAdd(number &a, number b, const coeffs r);
 
