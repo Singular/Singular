@@ -73,13 +73,12 @@ enum n_coeffType
   n_long_R,
   n_Zp_a,
   n_Q_a,
-  n_long_C
-#ifdef HAVE_RINGS
-  ,n_Z,
+  n_long_C,
+  // only used if HAVE_RINGS is defined
+  n_Z,
   n_Zm,
   n_Zpn,
   n_Z2n
-#endif
 };
 
 struct n_Procs_s;
@@ -110,6 +109,9 @@ struct n_Procs_s
 #endif
 
    coeffs next;
+   n_coeffType fieldtype;
+   unsigned int  ringtype;  /* 0 => coefficient field, 1 => coeffs from Z/2^m */
+
    // the union stuff
 
    // Zp:
@@ -127,7 +129,7 @@ struct n_Procs_s
 
    // general stuff
    numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
-   /// init with an integer 
+   /// init with an integer
    number  (*cfInit)(int i,const coeffs r);
    number  (*nPar)(int i, const coeffs r);
    int     (*nParDeg)(number n, const coeffs r);
@@ -192,7 +194,6 @@ struct n_Procs_s
   number     minpoly;  /* for Q_a/Zp_a, rInit */
 
 #ifdef HAVE_RINGS
-  unsigned int  ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
   int_number    ringflaga; /* Z/(ringflag^ringflagb)=Z/nrnModul*/
   unsigned long ringflagb;
   unsigned long nr2mModul;  /* Z/nr2mModul */
