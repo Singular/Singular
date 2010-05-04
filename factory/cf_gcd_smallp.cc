@@ -448,7 +448,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
 
       fail= false;
       random_element= randomElement (m, V_buf, l, fail );
-
+      DEBOUTLN (cerr, "fail= " << fail);
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element= 
@@ -682,7 +682,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
       ppB= GFMapUp (ppB, kk);
       gcdlcAlcB= GFMapUp (gcdlcAlcB, kk);
       random_element= GFRandomElement (m, l, fail);
-
+      DEBOUTLN (cerr, "fail= " << fail);
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element= GCD_GF (ppA(random_element, x), ppB(random_element, x), 
@@ -974,11 +974,16 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       source= CFList();
       dest= CFList();
       CFList list;
-      CanonicalForm mipo= randomIrredpoly (3, x, list); 
-      alpha= rootOf (mipo);
-      inextension= true;
-      fail= false;
-      random_element= randomElement (m, alpha, l, fail);
+      CanonicalForm mipo;
+      int deg= 3;
+      do {
+        mipo= randomIrredpoly (deg, x, list); 
+        alpha= rootOf (mipo);
+        inextension= true;
+        fail= false;
+        random_element= randomElement (m, alpha, l, fail); 
+        deg++;
+      } while (fail); 
       list= CFList();
       TIMING_START (gcd_recursion);
       G_random_element= 
@@ -1024,6 +1029,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
                          source, dest);
       fail= false;
       random_element= randomElement (m, V_buf, l, fail );
+      DEBOUTLN (cerr, "fail= " << fail);
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element= 
