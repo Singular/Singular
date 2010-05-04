@@ -462,7 +462,7 @@ KEYWORDS: Castelnuovo-Mumford regularity
     }
   }
 
-  if( attrib(CM_regularity,"Algorithm") != "mres" )
+  if( attrib(CM_regularity,"Algorithm") == "minres_res" )
   {
     def L = minres( res(M,0) ); // let's try it out!
   } else
