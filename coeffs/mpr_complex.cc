@@ -372,11 +372,11 @@ gmp_float max( const gmp_float & a, const gmp_float & b )
 // number to float, number = Q, R, C
 // makes a COPY of num! (Ist das gut?)
 //
-gmp_float numberToFloat( number num )
+gmp_float numberToFloat( number num, const coeffs src)
 {
   gmp_float r;
 
-  if ( rField_is_Q() )
+  if ( nField_is_Q(src) )
   {
     if ( num != NULL )
     {
@@ -388,7 +388,7 @@ gmp_float numberToFloat( number num )
       {
         if ( num->s == 0 )
         {
-          nlNormalize( num );
+          nlNormalize( num, src );
         }
         if (SR_HDL(num) & SR_INT)
         {
@@ -413,11 +413,11 @@ gmp_float numberToFloat( number num )
       r= 0.0;
     }
   }
-  else if (rField_is_long_R() || rField_is_long_C())
+  else if (nField_is_long_R(src) || nField_is_long_C(src))
   {
     r= *(gmp_float*)num;
   }
-  else if ( rField_is_R() )
+  else if ( nField_is_R(src) )
   {
     // Add some code here :-)
     WerrorS("Ground field not implemented!");
@@ -430,7 +430,7 @@ gmp_float numberToFloat( number num )
   return r;
 }
 
-gmp_float numberFieldToFloat( number num, int k )
+gmp_float numberFieldToFloat( number num, int k, const coeffs src)
 {
   gmp_float r;
 
@@ -447,7 +447,7 @@ gmp_float numberFieldToFloat( number num, int k )
       {
         if ( num->s == 0 )
         {
-          nlNormalize( num );
+          nlNormalize( num, src );
         }
         if (SR_HDL(num) & SR_INT)
         {
@@ -701,7 +701,7 @@ gmp_complex sqrt( const gmp_complex & x )
 
 // converts a gmp_complex to a string ( <real part> + I * <imaginary part> )
 //
-char *complexToStr( gmp_complex & c, const unsigned int oprec )
+char *complexToStr( gmp_complex & c, const unsigned int oprec, const coeffs src )
 {
   char *out,*in_imag,*in_real;
 
@@ -712,21 +712,21 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec )
     in_real=floatToStr( c.real(), oprec );         // get real part
     in_imag=floatToStr( abs(c.imag()), oprec );    // get imaginary part
 
-    if (rField_is_long_C())
+    if (nField_is_long_C(src))
     {
-      int len=(strlen(in_real)+strlen(in_imag)+7+strlen(currRing->parameter[0]))*sizeof(char);
+      int len=(strlen(in_real)+strlen(in_imag)+7+strlen(src->parameter[0]))*sizeof(char);
       out=(char*)omAlloc(len);
       memset(out,0,len);
       if (  !c.real().isZero() )  // (-23-i*5.43) or (15.1+i*5.3)
-        sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",currRing->parameter[0],in_imag);
+        sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",src->parameter[0],in_imag);
       else // (-i*43) or (i*34)
       {
         if (c.imag().isOne())
-          sprintf(out,"%s",currRing->parameter[0]);
+          sprintf(out,"%s",src->parameter[0]);
         else if (c.imag().isMOne())
-          sprintf(out,"-%s",currRing->parameter[0]);
+          sprintf(out,"-%s",src->parameter[0]);
         else
-          sprintf(out,"(%s%s*%s)",c.imag().sign()>=0?"":"-",currRing->parameter[0],in_imag);
+          sprintf(out,"(%s%s*%s)",c.imag().sign()>=0?"":"-",src->parameter[0],in_imag);
       }
     }
     else
