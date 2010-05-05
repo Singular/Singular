@@ -106,6 +106,24 @@ void    Warn(const char *fmt, ...);
 void SPrintStart();
 char* SPrintEnd();
 
+/* error reporting */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+extern int dReportError(const char* fmt, ...);
+#define dReportBug(s) \
+  dReportError("Bug reported: %s\n occured at %s,%d\n", s, __FILE__, __LINE__)
+#endif
+
+// this is just a dummy procedure which is called after the error
+// has been reported. Within the debugger, set a breakpoint on this
+// proc.
+extern void dErrorBreak();
+#ifdef __cplusplus
+}
+#endif
+
 #ifndef HAVE_ASSUME
 #define assume(x) ((void) 0)
 #define r_assume(x) ((void) 0)

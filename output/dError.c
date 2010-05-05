@@ -13,17 +13,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "config.h"
-//#include "distrib.h": for MAKE_DISTRIBUTION
-#ifdef p_Procs_Static
-#include "kversion.h"
-#endif
+#include "output.h"
 #ifdef HAVE_CONFIG_H
 #include <omalloc/omalloc.h>
-#endif
-
-#ifdef __cplusplus
-extern "C" 
-{
 #endif
 
 #ifndef MAKE_DISTRIBUTION
@@ -50,17 +42,12 @@ int dReportError(const char* fmt, ...)
   dErrorBreak();
 #else
   fprintf(stderr, "\n// !!! YOU HAVE FOUND A BUG IN SINGULAR.");
-  fprintf(stderr, "// !!! Please, email the following output to singular@mathematik.uni-kl.de");
-  fprintf(stderr, "// !!! Singular Version: " S_UNAME S_VERSION1 "\n");
+  fprintf(stderr, "// !!! Please, email the input\n// and the following error message to singular@mathematik.uni-kl.de");
   vfprintf(stderr, fmt, ap);
 #endif
   return 0;
 }
 
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
   
