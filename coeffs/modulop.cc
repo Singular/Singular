@@ -360,10 +360,11 @@ void npInitChar(coeffs r, int c)
       r->npInvTable=(unsigned short*)omAlloc0( r->npPrimeM*sizeof(unsigned short) );
 #endif
     }
+    r->type=n_Zp;
+    r->cfInitChar=npInitChar;
     r->cfKillChar=npKillChar;
     r->cfSetChar=npSetChar;
     npSetChar(r);
-    r->cfSetChar=NULL;
     r->cfInit = npInit;
     r->nInit_bigint=npMap0;
     r->n_Int  = npInt;

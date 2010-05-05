@@ -109,7 +109,6 @@ struct n_Procs_s
 #endif
 
    coeffs next;
-   n_coeffType fieldtype;
    unsigned int  ringtype;  /* 0 => coefficient field, 1 => coeffs from Z/2^m */
 
    // the union stuff

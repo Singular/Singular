@@ -117,28 +117,26 @@ static inline BOOLEAN nField_has_Units(const coeffs r)
 #endif
 
 
-static inline n_coeffType nField_is(const coeffs r)
-{ return r->fieldtype; }
 static inline BOOLEAN nField_is_Zp(const coeffs r)
-{ return nField_is(r)==n_Zp; }
+{ return getCoeffType(r)==n_Zp; }
 
 static inline BOOLEAN nField_is_Zp(const coeffs r, int p)
-{ return (nField_is_Zp(r)  && (r->ch == ABS(p))); }
+{ return (getCoeffType(r)  && (r->ch == ABS(p))); }
 
 static inline BOOLEAN nField_is_Q(const coeffs r)
-{ return nField_is(r)==n_Q; }
+{ return getCoeffType(r)==n_Q; }
 
 static inline BOOLEAN nField_is_numeric(const coeffs r) /* R, long R, long C */
-{  return (nField_is(r)==n_R) || (nField_is(r)==n_long_R) || (nField_is(r)==n_long_C); }
+{  return (getCoeffType(r)==n_R) || (getCoeffType(r)==n_long_R) || (getCoeffType(r)==n_long_C); }
 
 static inline BOOLEAN nField_is_R(const coeffs r)
-{ return nField_is(r)==n_R; }
+{ return getCoeffType(r)==n_R; }
 
 static inline BOOLEAN nField_is_GF(const coeffs r)
-{ return nField_is(r)==n_GF; }
+{ return getCoeffType(r)==n_GF; }
 
 static inline BOOLEAN nField_is_GF(const coeffs r, int q)
-{ return (nField_is(r)==n_GF) && (r->ch == q); }
+{ return (getCoeffType(r)==n_GF) && (r->ch == q); }
 
 static inline BOOLEAN nField_is_Zp_a(const coeffs r)
 { return (r->ringtype == 0) && (r->ch < -1); }
@@ -150,10 +148,10 @@ static inline BOOLEAN nField_is_Q_a(const coeffs r)
 { return (r->ringtype == 0) && (r->ch == 1); }
 
 static inline BOOLEAN nField_is_long_R(const coeffs r)
-{ return nField_is(r)==n_long_R; }
+{ return getCoeffType(r)==n_long_R; }
 
 static inline BOOLEAN nField_is_long_C(const coeffs r)
-{ return nField_is(r)==n_long_C; }
+{ return getCoeffType(r)==n_long_C; }
 
 static inline BOOLEAN nField_has_simple_inverse(const coeffs r)
 /* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/

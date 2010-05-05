@@ -265,6 +265,7 @@ void nInitChar(coeffs r)
   n->nExtGcd = ndExtGcd;
   n->nGetUnit = (nMapFunc)NULL;
 #endif
+  #if 0 /*vertagt*/
   if (nField_is_Extension(r))
   {
     //ntInitChar(c,TRUE,r);
@@ -304,6 +305,7 @@ void nInitChar(coeffs r)
     n->nDBTest        = naDBTest;
 #endif
   }
+  #endif
 #ifdef HAVE_RINGS
   /* -------------- Z/2^m ----------------------- */
   else if (nField_is_Ring_2toM(r))
@@ -320,7 +322,7 @@ void nInitChar(coeffs r)
   {
      n->cfInit  = nrzInit;
      n->cfDelete= nrzDelete;
-     n->nCopy  = nrzCopy;
+     n->cfCopy  = nrzCopy;
      n->cfCopy = cfrzCopy;
      n->nSize  = nrzSize;
      n->n_Int  = nrzInt;
@@ -373,7 +375,7 @@ void nInitChar(coeffs r)
     n->nIntMod= nlIntMod;
     n->nNeg   = nlNeg;
     n->nInvers= nlInvers;
-    n->nCopy  = nlCopy;
+    n->cfCopy  = nlCopy;
     n->nGreater = nlGreater;
     n->nEqual = nlEqual;
     n->nIsZero = nlIsZero;
@@ -453,7 +455,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= nfDiv;
     n->nNeg   = nfNeg;
     n->nInvers= nfInvers;
-    n->nCopy  = ndCopy;
+    n->cfCopy  = ndCopy;
     n->nGreater = nfGreater;
     n->nEqual = nfEqual;
     n->nIsZero = nfIsZero;
@@ -483,7 +485,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= nrDiv;
     n->nNeg   = nrNeg;
     n->nInvers= nrInvers;
-    n->nCopy  = ndCopy;
+    n->cfCopy  = ndCopy;
     n->nGreater = nrGreater;
     n->nEqual = nrEqual;
     n->nIsZero = nrIsZero;
@@ -513,7 +515,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= ngfDiv;
     n->nNeg   = ngfNeg;
     n->nInvers= ngfInvers;
-    n->nCopy  = ngfCopy;
+    n->cfCopy  = ngfCopy;
     n->nGreater = ngfGreater;
     n->nEqual = ngfEqual;
     n->nIsZero = ngfIsZero;
@@ -544,7 +546,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= ngcDiv;
     n->nNeg   = ngcNeg;
     n->nInvers= ngcInvers;
-    n->nCopy  = ngcCopy;
+    n->cfCopy  = ngcCopy;
     n->nGreater = ngcGreater;
     n->nEqual = ngcEqual;
     n->nIsZero = ngcIsZero;
@@ -570,7 +572,7 @@ void nInitChar(coeffs r)
   }
 #endif
 #ifdef HAVE_RINGS
-  if (n->nGetUnit==(nMapFunc)NULL) n->nGetUnit=n->nCopy;
+  if (n->nGetUnit==(nMapFunc)NULL) n->nGetUnit=n->cfCopy;
 #endif
   if (!errorreported)
   {
