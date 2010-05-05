@@ -139,11 +139,10 @@ void mpz_mul_si (mpz_ptr r, mpz_srcptr s, long int si)
 }
 #endif
 
-static coeffs nlMapRing;
-static number nlMapP(number from, const coeffs r)
+static number nlMapP(number from, const coeffs src, const coeffs r)
 {
   number to;
-  to = nlInit(npInt(from,nlMapRing), r);
+  to = nlInit(npInt(from,src), r);
   return to;
 }
 
@@ -183,37 +182,6 @@ number nlMapMachineInt(number from)
 }
 #endif
 
-nMapFunc nlSetMap(const coeffs src, const coeffs dst)
-{
-  if (rField_is_Q(src))
-  {
-    return nlCopy;
-  }
-  nlMapRing=src;
-  if (rField_is_Zp(src))
-  {
-    return nlMapP;
-  }
-  if (rField_is_R(src))
-  {
-    return nlMapR;
-  }
-  if (rField_is_long_R(src))
-  {
-    return nlMapLongR; /* long R -> Q */
-  }
-#ifdef HAVE_RINGS
-  if (rField_is_Ring_Z(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_ModN(src))
-  {
-    return nlMapGMP;
-  }
-  if (rField_is_Ring_2toM(src))
-  {
-    return nlMapMachineInt;
-  }
-#endif
-  return NULL;
-}
 
 #ifdef LDEBUG
 BOOLEAN nlDBTest(number a, const char *f,const int l)
@@ -296,7 +264,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l)
 
 number nlRInit (long i);
 
-static number nlMapR(number from, const coeffs r)
+static number nlMapR(number from, const coeffs src, const coeffs dst)
 {
   double f=nrFloat(from);
   if (f==0.0) return INT_TO_SR(0);
@@ -319,12 +287,12 @@ static number nlMapR(number from, const coeffs r)
   mpz_set_d(&(re->z),f);
   memcpy(&(re->n),&h1,sizeof(h1));
   re->s=0; /* not normalized */
-  if(f_sign==-1) re=nlNeg(re,r);
-  nlNormalize(re,r);
+  if(f_sign==-1) re=nlNeg(re,dst);
+  nlNormalize(re,dst);
   return re;
 }
 
-static number nlMapLongR(number from, const coeffs r) 
+static number nlMapLongR(number from, const coeffs src, const coeffs dst) 
 {
   gmp_float *ff=(gmp_float*)from;
   mpf_t *f=ff->_mpfp();
@@ -389,7 +357,7 @@ static number nlMapLongR(number from, const coeffs r)
   if (negative) dest->_mp_size = -dest->_mp_size;
 
   if (res->s==0)
-    nlNormalize(res,r);
+    nlNormalize(res,dst);
   else if (mpz_size1(&res->z)<=MP_SMALL)
   {
     // res is new, res->ref is 1
@@ -1220,7 +1188,7 @@ int nlModP(number n, int p, const coeffs r)
   {
     int in=mpz_fdiv_ui(n->n,(unsigned long)p);
     #ifdef NV_OPS
-    if (npPrimeM>NV_MAX_PRIME)
+    if (p>NV_MAX_PRIME)
     return (int)((long)nvDiv((number)iz,(number)in,(const coeffs)r));
     #endif
     return (int)((long)npDiv((number)iz,(number)in,(const coeffs)r));
@@ -1921,6 +1889,47 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
   return u;
 }
 
+/*2
+* copy a to b for ampping
+*/
+number nlCopyMap(number a, const coeffs rc, const coeffs r)
+{
+  if ((SR_HDL(a) & SR_INT)||(a==NULL))
+  {
+    return a;
+  }
+  return _nlCopy_NoImm(a);
+}
+nMapFunc nlSetMap(const coeffs src, const coeffs dst)
+{
+  if (nField_is_Q(src))
+  {
+    return nlCopyMap;
+  }
+  if (nField_is_Zp(src))
+  {
+    return nlMapP;
+  }
+  if (nField_is_R(src))
+  {
+    return nlMapR;
+  }
+  if (nField_is_long_R(src))
+  {
+    return nlMapLongR; /* long R -> Q */
+  }
+#ifdef HAVE_RINGS
+  if (nField_is_Ring_Z(src) || nField_is_Ring_PtoM(src) || nField_is_Ring_ModN(src))
+  {
+    return nlMapGMP;
+  }
+  if (nField_is_Ring_2toM(src))
+  {
+    return nlMapMachineInt;
+  }
+#endif
+  return NULL;
+}
 /*2
 * z := i
 */
