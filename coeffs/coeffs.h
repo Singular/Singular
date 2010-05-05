@@ -41,20 +41,8 @@ typedef number (*numberfunc)(number a, number b, const coeffs r);
 /// maps "a", which lives in src, into dst
 typedef number (*nMapFunc)(number a, const coeffs src, const coeffs dst);
 
-// #define _TRY
-
-#ifdef _TRY
-typedef coeffs ring;
-
-extern ring currRing;
-#endif
-
 struct n_Procs_s
 {
-#ifdef _TRY
-  ring cf; // this
-#endif
-
    coeffs next;
    unsigned int  ringtype;  /* 0 => coefficient field, 1 => coeffs from Z/2^m */
 
