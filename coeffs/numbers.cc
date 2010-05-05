@@ -395,6 +395,7 @@ void nInitChar(coeffs r)
   else if (nField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
+    /* never again:
     npInitChar(c,r);
     n->cfInit = npInit;
     n->n_Int  = npInt;
@@ -416,8 +417,8 @@ void nInitChar(coeffs r)
     n->nRead = npRead;
     n->nPower = npPower;
     n->cfSetMap = npSetMap;
-    /* nName= ndName; */
-    /*nSize  = ndSize;*/
+    // nName= ndName;
+    // nSize  = ndSize;
 #ifdef LDEBUG
     n->nDBTest=npDBTest;
 #endif
@@ -432,6 +433,9 @@ void nInitChar(coeffs r)
       n->nInpMult= nvInpMult;
     }
 #endif
+    */
+    r->cfInitChar=npInitChar;
+    npInitChar(r,c);
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (nField_is_GF(r))
@@ -593,23 +597,10 @@ void nKillChar(coeffs r)
         n->next=n->next->next;
         if (cf_root==r) cf_root=n->next;
         r->cfDelete(&(r->nNULL),r);
+	if (r->cfKillChar!=NULL) r->cfKillChar(r);
+	/* was:
         switch(r->type)
         {
-          case n_Zp:
-               #ifdef HAVE_DIV_MOD
-               if (r->npInvTable!=NULL)
-               omFreeSize( (void *)r->npInvTable,
-                           r->npPrimeM*sizeof(unsigned short) );
-               #else
-               if (r->npExpTable!=NULL)
-               {
-                 omFreeSize( (void *)r->npExpTable,
-                             r->npPrimeM*sizeof(unsigned short) );
-                 omFreeSize( (void *)r->npLogTable,
-                             r->npPrimeM*sizeof(unsigned short) );
-               }
-               #endif
-               break;
           case n_Zp_a:
           case n_Q_a:
                {
@@ -625,6 +616,7 @@ void nKillChar(coeffs r)
             default:
                  break;
           }
+	  */
           omFreeSize((void *)r, sizeof(n_Procs_s));
           r=NULL;
         }

@@ -127,7 +127,7 @@ struct n_Procs_s
    // Zp_a, Q_a
    // ?
    // initialisation:
-   void (*cfInitChar)(coeffs r); // do one-time initialisations
+   void (*cfInitChar)(coeffs r, int parameter); // do one-time initialisations
    void (*cfKillChar)(coeffs r); //  undo all initialisations
                                 // or NULL
    void (*cfSetChar)(coeffs r); // initialisations after each ring change
