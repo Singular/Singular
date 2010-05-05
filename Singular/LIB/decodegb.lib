@@ -8,7 +8,7 @@ AUTHOR:  Stanislav Bulygin,   bulygin@mathematik.uni-kl.de
 OVERVIEW:
  In this library we generate several systems used for decoding cyclic codes and
  finding their minimum distance. Namely, we work with the Cooper's philosophy
- and generalized Newton identities. The original method of quadratic equations
+ and generalized Newton identities. The origindeal method of quadratic equations
  is worked out here as well. We also (for comparison) enable to work with the
  system of Fitzgerald-Lax. We provide some auxiliary functions for further
  manipulations and decoding. For an overview of the methods mentioned above @ref{Decoding codes with Groebner bases}.
@@ -722,11 +722,9 @@ EXAMPLE:  example sysQE; shows an example
   c[i]=tmp;
  }
 
- int tim=rtimer;
  matrix transf=inverse(transpose(h_full));
 
  //------ expression matrix of check vectors w.r.t. the MDS basis -----------
- tim=rtimer;
  for (i=1; i<=red ; i++)
  {
   a[i]=transpose(submat(check,i..i,1..n));
@@ -734,7 +732,6 @@ EXAMPLE:  example sysQE; shows an example
  }
 
  //----------- compute the structure constants ------------------------
- tim=rtimer;
  matrix te[n][1];
  for (i=1; i<=n; i++)
  {
@@ -758,7 +755,6 @@ EXAMPLE:  example sysQE; shows an example
  }
 
 
- tim=rtimer;
  if (formal==0)
  {
   matrix s[red][1]=syndrome(check,y);
@@ -1053,8 +1049,7 @@ proc mindist (matrix check)
         - check is a check matrix,
         - q is the field size
 @end format
-RETURN:  minimum distance of the code together with the time needed for its
-         calculation
+RETURN:  minimum distance of the code 
 EXAMPLE: example mindist; shows an example
 "
 {
@@ -1073,7 +1068,7 @@ EXAMPLE: example mindist; shows an example
  int count=1;
  int flag=1;
  int flag2;
- int i, tim, timsolve;
+ int i;
  matrix z[1][n];
  option(redSB);
  def A=sysQE(check,z,count);
@@ -1085,9 +1080,7 @@ EXAMPLE: example mindist; shows an example
     A=sysQE(check,z,count);
     setring A;
     ideal temp=qe;
-    tim=rtimer;
     temp=std(temp);
-    timsolve=timsolve+rtimer-tim;
     flag2=1;
     setring work;
     temp=imap(A,temp);
@@ -1108,7 +1101,7 @@ EXAMPLE: example mindist; shows an example
       count++;
     }
  }
- list result=list(count,timsolve);
+ int result=count;
 
  option(set,vopt);
  return(result);
@@ -1123,10 +1116,8 @@ example
      //generate random check matrix
      matrix h=randomCheck(redun,n,1);
      print(h);
-     list l=mindist(h);
-     print(l[1]);
-     //time for the comutation in secs
-     print(l[2]);
+     int l=mindist(h);
+     l;     
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1239,9 +1230,9 @@ EXAMPLE:   example decodeRandom; shows an example
 
  int i,j;
  matrix h;
- int dist, t, tim, tim2, tim3, timdist, timdec, timdist2, timdec2, timdec3;
+ int dist, t;
  ideal sys;
- list tmp;
+ int tmp;
  int e;
  if (size(#)>0)
  {
@@ -1264,16 +1255,11 @@ EXAMPLE:   example decodeRandom; shows an example
   {
      t=e;
   } else {
-     tim=rtimer;
      tmp=mindist(h);
-     timdist=timdist+rtimer-tim;
-     timdist2=timdist2+tmp[2];
-     dist=tmp[1];
+     dist=tmp;
      printf("d= %p",dist);
      t=(dist-1) div 2;
   }
-  tim2=rtimer;
-  tim3=rtimer;
 
   //------------- generate the template system ----------------------
   def A=sysQE(h,z,t);
@@ -1284,29 +1270,26 @@ EXAMPLE:   example decodeRandom; shows an example
   matrix g=dual_code(h);
   ideal sys=qe;
   print("The system is generated");
-  timdec3=timdec3+rtimer-tim3;
 
   //------ modify the template according to every received word --------------
   for (j=1; j<=ntrials; j++)
   {
    word=randomvector(n-redun,1);
    y=encode(transpose(word),g);
+   print("Codeword:");
+   print(y);
    rec=errorRand(y,t,1);
+   print("Received word:");
+   print(rec);
    sys2=add_synd(rec,h,redun,sys);
-
-   tim=rtimer;
+   option(redSB);
    sys3=std(sys2);
-   timdec=timdec+rtimer-tim;
+   print("The Groebenr basis of the QE system:");
+   print(sys3);
   }
-  timdec2=timdec2+rtimer-tim2;
   kill A;
   option(set,vopt);
  }
- printf("Time for mindist: %p", timdist);
- printf("Time for GB in mindist: %p", timdist);
- printf("Time for decoding: %p", timdec2);
- printf("Time for GB in decoding: %p", timdec);
- printf("Time for sysQE in decoding: %p", timdec3);
 }
 example
 {
@@ -1314,8 +1297,8 @@ example
      int q=32; int n=25; int redun=n-11; int t=redun+1;
      ring r=(q,a),x,dp;
 
-     // correct 2 errors in 5 random binary codes, 50 trials each
-     decodeRandom(n,redun,5,50,2);
+     // correct 2 errors in 2 random binary codes, 3 trials each
+     decodeRandom(n,redun,2,3,2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1342,9 +1325,9 @@ EXAMPLE:    example decodeCode; shows an example
  int redun=nrows(check);
  int i,j;
  matrix h;
- int dist, t, tim, tim2, tim3, timdist, timdec, timdist2, timdec2, timdec3;
+ int dist, t;
  ideal sys;
- list tmp;
+ int tmp;
  int e;
  if (size(#)>0)
  {
@@ -1365,16 +1348,11 @@ EXAMPLE:    example decodeCode; shows an example
  {
     t=e;
  } else {
-   tim=rtimer;
    tmp=mindist(h);
-   timdist=timdist+rtimer-tim;
-   timdist2=timdist2+tmp[2];
-   dist=tmp[1];
+   dist=tmp;
    printf("d= %p",dist);
    t=(dist-1) div 2;
  }
- tim2=rtimer;
- tim3=rtimer;
 
  //------------- generate the template system ----------------------
  def A=sysQE(h,z,t);
@@ -1385,27 +1363,23 @@ EXAMPLE:    example decodeCode; shows an example
  matrix g=dual_code(h);
  ideal sys=qe;
  print("The system is generated");
- timdec3=timdec3+rtimer-tim3;
 
  //--- modify the template according to every received word ---------------
  for (j=1; j<=ntrials; j++)
  {
    word=randomvector(n-redun,1);
    y=encode(transpose(word),g);
+   print("Codeword:");
+   print(y);
    rec=errorRand(y,t,1);
+   print("Received word:");
+   print(rec);
    sys2=add_synd(rec,h,redun,sys);
-
-   tim=rtimer;
+   option(redSB);
    sys3=std(sys2);
-   timdec=timdec+rtimer-tim;
+   print("Groebner basis of the QE system:");
+   print(sys3);
  }
- timdec2=timdec2+rtimer-tim2;
-
- printf("Time for mindist: %p", timdist);
- printf("Time for GB in mindist: %p", timdist);
- printf("Time for decoding: %p", timdec2);
- printf("Time for GB in decoding: %p", timdec);
- printf("Time for sysQE in decoding: %p", timdec3);
 
  option(set,vopt);
 }
@@ -1416,8 +1390,8 @@ example
      ring r=(q,a),x,dp;
      matrix check=randomCheck(redun,n,1);
 
-     // correct 2 errors in using the code above, 50 trials
-     decodeCode(check,50,2);
+     // correct 2 errors in using the code above, 3 trials
+     decodeCode(check,3,2);
 }
 
 
@@ -1444,7 +1418,7 @@ static proc ev (poly f, matrix p)
      poly temp=f;
      for (int i=1; i<=m; i++)
      {
-          temp=subst(temp,x(i),p[i,1]);
+          temp=subst(temp,var(i),p[i,1]);
      }
      return(number(temp));
 }
@@ -1534,10 +1508,10 @@ EXAMPLE: example vanishId; shows an example
           G=list2ideal(temp);
           for (j=1; j<=m; j++)
           {
-               if (!divisible(x(j)*leadmonom(cur),G))
+               if (!divisible(var(j)*leadmonom(cur),G))
                {
                     attrib(G,"isSB",1);
-                    h=NF((x(j)-points[k][j,1])*cur,G);
+                    h=NF((var(j)-points[k][j,1])*cur,G);
                     temp=ideal2list(G);
                     temp=insert(temp,h);
                     G=list2ideal(temp);
@@ -1695,7 +1669,7 @@ static proc xi_gen (matrix p, int e, int s)
      int l;
      for (l=1; l<=s; l++)
      {
-          prod=prod*(1-(x(l)-p[l,1])^(charac^e-1));
+          prod=prod*(1-(var(l)-p[l,1])^(charac^e-1));
      }
      return(prod);
 }
@@ -1768,7 +1742,7 @@ EXAMPLE:   example sysFL; shows an example
                temp=id[j];
                for (k=1; k<=s; k++)
                {
-                    temp=subst(temp,x(k),x_var(i,k,s));
+                    temp=subst(temp,var(k),x_var(i,k,s));
                }
                result=result,temp;
           }
@@ -1800,7 +1774,7 @@ EXAMPLE:   example sysFL; shows an example
                temp=funcs[i];
                for (k=1; k<=s; k++)
                {
-                    temp=subst(temp,x(k),x_var(j,k,s));
+                    temp=subst(temp,var(k),x_var(j,k,s));
                }
                sum=sum+temp*e(j);
           }
@@ -2019,9 +1993,8 @@ EXAMPLE:   example decodeRandomFL; shows an example
 
  int i,j;
  matrix h, g, word, y, rec;
- int dist, tim, tim2, tim3, timdist, timdec, timdist2, timdec2, timdec3;
  ideal sys, sys2, sys3;
- list tmp;
+
 
  option(redSB);
  matrix z[1][n];
@@ -2030,30 +2003,26 @@ EXAMPLE:   example decodeRandomFL; shows an example
  {
      h=randomCheck(redun,n,e);
      g=dual_code(h);
-     tim2=rtimer;
-     tim3=rtimer;
-
+     
      //---------------- generate the template system -----------------------
      sys=sysFL(h,z,t,e,s_work);
-     timdec3=timdec3+rtimer-tim3;
-
+     
      //------ modifying the template according to the received word ---------
      for (j=1; j<=ntrials; j++)
      {
           word=randomvector(n-redun,1);
           y=encode(transpose(word),g);
+          print("Codeword:");
+	  print(y);
           rec=errorRand(y,t,e);
+	  print("Received word");
+	  print(rec);
           sys2=LF_add_synd(rec,h,sys);
-          tim=rtimer;
           sys3=std(sys2);
-          timdec=timdec+rtimer-tim;
-     }
-     timdec2=timdec2+rtimer-tim2;
+	  print("Groebner basis of the FL system:");
+	  print(sys3);
+     }     
  }
-
- printf("Time for decoding: %p", timdec2);
- printf("Time for GB in decoding: %p", timdec);
- printf("Time for generating Fitzgerald-Lax system during decoding: %p", timdec3);
 
  option(set,vopt);
 }
@@ -2062,8 +2031,8 @@ example
      "EXAMPLE:";  echo = 2;
 
      // correcting one error for one random binary code of length 25,
-     //redundancy 14; 300 words are processed
-     decodeRandomFL(25,14,2,1,1,1,300,"");
+     // redundancy 14; 10 words are processed
+     decodeRandomFL(25,14,2,1,1,1,10,"");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
