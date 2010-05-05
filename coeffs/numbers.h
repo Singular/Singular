@@ -124,16 +124,6 @@ static inline BOOLEAN nField_is_Domain(const coeffs r)
 static inline BOOLEAN nField_has_Units(const coeffs r)
 { return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
 
-
-#ifdef _TRY
-#define rField_is_Q(r) nField_is_Q(r)
-#define rField_is_long_R(r) nField_is_long_R(r) 
-#define rField_is_long_C(r) nField_is_long_C(r)
-#define rField_is_R(r) nField_is_R(r)
-#define rField_is_Zp(r) nField_is_Zp(r)
-#endif
-
-
 static inline BOOLEAN nField_is_Zp(const coeffs r)
 { return getCoeffType(r)==n_Zp; }
 
