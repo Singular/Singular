@@ -126,7 +126,12 @@ struct n_Procs_s
    #endif
    // Zp_a, Q_a
    // ?
-
+   // initialisation:
+   void (*cfInitChar)(coeffs r); // do one-time initialisations
+   void (*cfKillChar)(coeffs r); //  undo all initialisations
+                                // or NULL
+   void (*cfSetChar)(coeffs r); // initialisations after each ring change
+                                // or NULL
    // general stuff
    numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
    /// init with an integer
