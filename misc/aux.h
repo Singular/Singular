@@ -13,7 +13,7 @@
 
 
 #ifndef _MISC_AUX_H
-
+#define _MISC_AUX_H
 
 #define TRUE 1
 #define FALSE 0
