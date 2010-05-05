@@ -22,7 +22,6 @@
 #define NV_MAX_PRIME 32003
 
 extern int npGen;
-extern long npMapPrime;
 
 void npInitChar(coeffs r, int ch);
 
@@ -49,14 +48,12 @@ BOOLEAN npDBTest      (number a,const coeffs r, const char *f, const int l);
 #else
 #define npTest(A,r)     (0)
 #endif
-void    npSetChar(int c, coeffs r);
-void    npInitChar(int c, coeffs r);
 
 //int     npGetChar();
 
 nMapFunc npSetMap(const coeffs src, const coeffs dst);
-number  npMapP(number from, const coeffs r);
-number  npMap0(number from, const coeffs r);
+number  npMapP(number from, const coeffs src, const coeffs r);
+number  npMap0(number from, const coeffs src, const coeffs r);
 /*-------specials for spolys, do NOT use otherwise--------------------------*/
 /* for npMultM, npSubM, npNegM, npEqualM : */
 #ifdef HAVE_DIV_MOD

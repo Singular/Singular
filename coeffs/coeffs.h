@@ -130,7 +130,7 @@ struct n_Procs_s
    void (*cfInitChar)(coeffs r, int parameter); // do one-time initialisations
    void (*cfKillChar)(coeffs r); //  undo all initialisations
                                 // or NULL
-   void (*cfSetChar)(coeffs r); // initialisations after each ring change
+   void (*cfSetChar)(const coeffs r); // initialisations after each ring change
                                 // or NULL
    // general stuff
    numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
@@ -182,7 +182,7 @@ struct n_Procs_s
 
    /// Inline: a := b
    void    (*nInpMult)(number &a, number b, const coeffs r);
-   number  (*nInit_bigint)(number i, const coeffs r);
+   number  (*nInit_bigint)(number i, const coeffs src, const coeffs dummy);
 
 #ifdef LDEBUG
    /// Test: is "a" a correct number?

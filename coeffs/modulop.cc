@@ -288,22 +288,11 @@ const char * npRead (const char *s, number *a, const coeffs r)
 * set the charcteristic (allocate and init tables)
 */
 
-void npSetChar(int c, coeffs r)
+void npSetChar(const coeffs r)
 {
-
-//  if (c==npPrimeM) return;
-  if ((c>1) || (c<(-1)))
-  {
-    if (c>1) r->npPrimeM = c;
-    else     r->npPrimeM = -c;
-    r->npPminus1M = r->npPrimeM - 1;
-#ifdef NV_OPS
-    if (r->npPrimeM >NV_MAX_PRIME) return;
-#endif
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
     npGen = npExpTable[1];
 #endif
-  }
 }
 
 void npKillChar(coeffs r)
@@ -372,8 +361,11 @@ void npInitChar(coeffs r, int c)
 #endif
     }
     r->cfKillChar=npKillChar;
+    r->cfSetChar=npSetChar;
+    npSetChar(r);
     r->cfSetChar=NULL;
     r->cfInit = npInit;
+    r->nInit_bigint=npMap0;
     r->n_Int  = npInt;
     r->nAdd   = npAdd;
     r->nSub   = npSub;
