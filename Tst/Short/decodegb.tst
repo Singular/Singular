@@ -15,10 +15,10 @@ example randomCheck;
 example genMDSMat;
 example mindist;
 example decode;
-//example decodeRandom; // no timings allowed in tst files
-//example decodeCode; // no timings allowed in tst files
+example decodeRandom;
+example decodeCode;
 example vanishId;
 example sysFL;
-//example decodeRandomFL; // no timings allowed in tst files
+example decodeRandomFL;
 
 tst_status(1);$
