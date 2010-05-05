@@ -7,13 +7,12 @@
 */
 
 #include <string.h>
-#include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/ring.h>
-#include <kernel/ffields.h>
+#include "coeffs.h"
+#include <mylimits.h>
+#include <output.h>
+#include <omalloc.h>
+#include "numbers.h"
+#include "ffields.h"
 
 int nfCharQ=0;  /* the number of elemts: q*/
 int nfM1;       /*representation of -1*/
@@ -90,6 +89,31 @@ unsigned short fftable[]={
   63001, /*251^2*/
   0 };
 
+const char* eati(const char *s, int *i)
+{
+  int l=0;
+
+  if    (*s >= '0' && *s <= '9')
+  {
+    *i = 0;
+    while (*s >= '0' && *s <= '9')
+    {
+      *i *= 10;
+      *i += *s++ - '0';
+      l++;
+      if ((l>=MAX_INT_LEN)||((*i) <0))
+      {
+        s-=l;
+        Werror("`%s` greater than %d(max. integer representation)",
+                s,MAX_INT_VAL);
+        return s;
+      }
+    }
+  }
+  else *i = 1;
+  return s;
+}
+
 /*1
 * numbers in GF(p^n):
 * let nfCharQ=q=nfCharP^n=p^n
@@ -126,18 +150,18 @@ BOOLEAN nfDBTest (number a, const char *f, const int l)
 /*2
 * k >= 0 ?
 */
-BOOLEAN nfGreaterZero (number k)
+BOOLEAN nfGreaterZero (number k, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(k);
 #endif
-  return !nfIsZero(k) && !nfIsMOne(k);
+  return !nfIsZero(k, r) && !nfIsMOne(k, r);
 }
 
 /*2
 * a*b
 */
-number nfMult (number a,number b)
+number nfMult (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
@@ -157,7 +181,7 @@ number nfMult (number a,number b)
 /*2
 * int -> number
 */
-number nfInit (int i, const ring r)
+number nfInit (int i, const coeffs r)
 {
   // Hmm .. this is just to prevent initialization
   // from nfInitChar to go into an infinite loop
@@ -180,7 +204,7 @@ number nfInit (int i, const ring r)
 /*
 * the generating element `z`
 */
-number nfPar (int i)
+number nfPar (int i, const coeffs r)
 {
   return (number)1;
 }
@@ -188,7 +212,7 @@ number nfPar (int i)
 /*2
 * the degree of the "alg. number"
 */
-int nfParDeg(number n)
+int nfParDeg(number n, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(n);
@@ -200,7 +224,7 @@ int nfParDeg(number n)
 /*2
 * number -> int
 */
-int nfInt (number &n, const ring r)
+int nfInt (number &n, const coeffs r)
 {
   return 0;
 }
@@ -208,7 +232,7 @@ int nfInt (number &n, const ring r)
 /*2
 * a + b
 */
-number nfAdd (number a, number b)
+number nfAdd (number a, number b, const coeffs R)
 {
 /*4 z^a+z^b=z^b*(z^(a-b)+1), if a>=b; *
 *          =z^a*(z^(b-a)+1)  if a<b  */
@@ -247,16 +271,16 @@ number nfAdd (number a, number b)
 /*2
 * a - b
 */
-number nfSub (number a, number b)
+number nfSub (number a, number b, const coeffs r)
 {
-  number mb = nfNeg(b);
-  return nfAdd(a,mb);
+  number mb = nfNeg(b, r);
+  return nfAdd(a,mb,r);
 }
 
 /*2
 * a == 0 ?
 */
-BOOLEAN nfIsZero (number  a)
+BOOLEAN nfIsZero (number  a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
@@ -267,7 +291,7 @@ BOOLEAN nfIsZero (number  a)
 /*2
 * a == 1 ?
 */
-BOOLEAN nfIsOne (number a)
+BOOLEAN nfIsOne (number a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
@@ -278,7 +302,7 @@ BOOLEAN nfIsOne (number a)
 /*2
 * a == -1 ?
 */
-BOOLEAN nfIsMOne (number a)
+BOOLEAN nfIsMOne (number a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
@@ -290,7 +314,7 @@ BOOLEAN nfIsMOne (number a)
 /*2
 * a / b
 */
-number nfDiv (number a,number b)
+number nfDiv (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(b);
@@ -318,7 +342,7 @@ number nfDiv (number a,number b)
 /*2
 * 1 / c
 */
-number  nfInvers (number c)
+number  nfInvers (number c, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(c);
@@ -337,7 +361,7 @@ number  nfInvers (number c)
 /*2
 * -c
 */
-number nfNeg (number c)
+number nfNeg (number c, const coeffs r)
 {
 /*4 -z^c=z^c*(-1)=z^c*nfM1*/
 #ifdef LDEBUG
@@ -355,7 +379,7 @@ number nfNeg (number c)
 /*2
 * a > b ?
 */
-BOOLEAN nfGreater (number a,number b)
+BOOLEAN nfGreater (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
@@ -367,7 +391,7 @@ BOOLEAN nfGreater (number a,number b)
 /*2
 * a == b ?
 */
-BOOLEAN nfEqual (number a,number b)
+BOOLEAN nfEqual (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
@@ -379,14 +403,14 @@ BOOLEAN nfEqual (number a,number b)
 /*2
 * write via StringAppend
 */
-void nfWrite (number &a, const ring r)
+void nfWrite (number &a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
 #endif
   if ((long)a==(long)nfCharQ)  StringAppendS("0");
   else if ((long)a==0L)   StringAppendS("1");
-  else if (nfIsMOne(a))   StringAppendS("-1");
+  else if (nfIsMOne(a, r))   StringAppendS("-1");
   else
   {
     StringAppendS(r->parameter[0]);
@@ -401,13 +425,13 @@ void nfWrite (number &a, const ring r)
 /*2
 *
 */
-char * nfName(number a)
+char * nfName(number a, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
 #endif
   char *s;
-  char *nfParameter=currRing->parameter[0];
+  char *nfParameter=r->parameter[0];
   if (((long)a==(long)nfCharQ) || ((long)a==0L)) return NULL;
   else if ((long)a==1L)
   {
@@ -423,7 +447,7 @@ char * nfName(number a)
 /*2
 * c ^ i with i>=0
 */
-void nfPower (number a, int i, number * result)
+void nfPower (number a, int i, number * result, const coeffs r)
 {
 #ifdef LDEBUG
   nfTest(a);
@@ -439,8 +463,8 @@ void nfPower (number a, int i, number * result)
   }
   else
   {
-    nfPower(a,i-1,result);
-    *result = nfMult(a,*result);
+    nfPower(a,i-1,result, r);
+    *result = nfMult(a,*result, r);
   }
 #ifdef LDEBUG
   nfTest(*result);
@@ -471,23 +495,23 @@ static const char* nfEati(const char *s, int *i)
 /*2
 * read a number
 */
-const char * nfRead (const char *s, number *a)
+const char * nfRead (const char *s, number *a, const coeffs r)
 {
   int i;
   number z;
   number n;
 
   s = nfEati(s, &i);
-  z=nfInit(i, currRing);
+  z=nfInit(i, r);
   *a=z;
   if (*s == '/')
   {
     s++;
     s = nfEati(s, &i);
-    n=nfInit(i, currRing);
-    *a = nfDiv(z,n);
+    n=nfInit(i, r);
+    *a = nfDiv(z,n,r);
   }
-  char *nfParameter=currRing->parameter[0];
+  char *nfParameter=r->parameter[0];
   if (strncmp(s,nfParameter,strlen(nfParameter))==0)
   {
     s+=strlen(nfParameter);
@@ -499,7 +523,7 @@ const char * nfRead (const char *s, number *a)
     else
       i=1;
     z=(number)(long)i;
-    *a=nfMult(*a,z);
+    *a=nfMult(*a,z,r);
   }
 #ifdef LDEBUG
   nfTest(*a);
@@ -700,11 +724,11 @@ number nfMapGGrev(number c)
 */
 nMapFunc nfSetMap(const ring src, const ring dst)
 {
-  if (rField_is_GF(src,nfCharQ))
+  if (nField_is_GF(src,nfCharQ))
   {
     return ndCopy;   /* GF(p,n) -> GF(p,n) */
   }
-  if (rField_is_GF(src))
+  if (nField_is_GF(src))
   {
     int q=src->ch;
     if ((nfCharQ % q)==0) /* GF(p,n1) -> GF(p,n2), n2 > n1 */
@@ -737,7 +761,7 @@ nMapFunc nfSetMap(const ring src, const ring dst)
         return NULL;
     }
   }
-  if (rField_is_Zp(src,nfCharP))
+  if (nField_is_Zp(src,nfCharP))
   {
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
