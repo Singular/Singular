@@ -10,9 +10,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include "coeffs.h"
+#include "output.h"
+#include "omalloc.h"
 #include "numbers.h"
 #include "longrat.h"
-#include "longalg.h"
 #include "modulop.h"
 #include "gnumpfl.h"
 #include "gnumpc.h"
