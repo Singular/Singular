@@ -22,7 +22,6 @@
 
 #include "output.h"
 #include "omalloc.h"
-#include "dError.h"
 //#include "options.h"
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)

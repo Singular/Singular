@@ -52,7 +52,7 @@ CSOURCES=dError.c
 
 SOURCES=${CSOURCES} ${CXXSOURCES}
 
-HEADERS=output.h dError.h
+HEADERS=output.h
 
 DISTFILES=${SOURCES} ${HEADERS}
 
