@@ -108,7 +108,7 @@ number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 */
 void nSetChar(coeffs r)
 {
-  int c=rInternalChar(r);
+  int c=r->ch;
 
   /*--------------------- Q -----------------*/
   if (nField_is_Q(r))
@@ -201,7 +201,7 @@ void nSetChar(coeffs r)
 void nInitChar(coeffs r)
 {
   int c=nInternalChar(r);
-  n_coeffType t=nFieldType(r);
+  n_coeffType t=getCoeffType(r);
 
   #if 0 /* vertagt*/
   if (nField_is_Extension(r))
@@ -357,42 +357,12 @@ void nInitChar(coeffs r)
      n->nDBTest=ndDBTest; // not yet implemented: nrzDBTest;
 #endif
   }
+  else
 #endif
-  else if (nField_is_Q(r))
+  if (nField_is_Q(r))
   {
-    n->cfDelete= nlDelete;
-    n->nNormalize=nlNormalize;
-    n->cfInit = nlInit;
-    n->n_Int  = nlInt;
-    n->nAdd   = nlAdd;
-    n->nSub   = nlSub;
-    n->nMult  = nlMult;
-    n->nInpMult=nlInpMult;
-    n->nDiv   = nlDiv;
-    n->nExactDiv= nlExactDiv;
-    n->nIntDiv= nlIntDiv;
-    n->nIntMod= nlIntMod;
-    n->nNeg   = nlNeg;
-    n->nInvers= nlInvers;
-    n->cfCopy  = nlCopy;
-    n->nGreater = nlGreater;
-    n->nEqual = nlEqual;
-    n->nIsZero = nlIsZero;
-    n->nIsOne = nlIsOne;
-    n->nIsMOne = nlIsMOne;
-    n->nGreaterZero = nlGreaterZero;
-    n->cfWrite = nlWrite;
-    n->nRead = nlRead;
-    n->nPower = nlPower;
-    n->nGcd  = nlGcd;
-    n->nLcm  = nlLcm;
-    n->cfSetMap = nlSetMap;
-    n->nSize  = nlSize;
-    n->cfGetDenom = nlGetDenom;
-    n->cfGetNumerator = nlGetNumerator;
-#ifdef LDEBUG
-    n->nDBTest=nlDBTest;
-#endif
+    r->cfInitChar=nlInitChar;
+    nlInitChar();
   }
   else if (nField_is_Zp(r))
   /*----------------------char. p----------------*/
