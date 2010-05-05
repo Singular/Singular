@@ -5,6 +5,7 @@
 *.og
 *.exe
 depend
+tags
 Makefile
 GNUMakefile
 config.status
