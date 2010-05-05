@@ -58,6 +58,7 @@ LINLINE number   nlAdd(number la, number li, const coeffs r);
 LINLINE number   nlSub(number la, number li, const coeffs r);
 LINLINE number   nlMult(number a, number b, const coeffs r);
 
+void     nlInitChar(coeffs r, int ch);
 number   nlInit2 (int i, int j, const coeffs r);
 number   nlInit2gmp (mpz_t i, mpz_t j);
 number   nlGcd(number a, number b, const coeffs r);

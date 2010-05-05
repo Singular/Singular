@@ -2438,6 +2438,46 @@ number nlFarey(number nN, number nP, const coeffs r)
   mpz_clear(P);
   return z;
 }
+void nlInitChar(coeffs r, int ch)
+{
+  r->cfInitChar=nlInitChar;
+  r->cfKillChar=NULL;
+  r->cfSetChar=NULL;
+
+  r->cfDelete= nlDelete;
+  r->nNormalize=nlNormalize;
+  r->cfInit = nlInit;
+  r->n_Int  = nlInt;
+  r->nAdd   = nlAdd;
+  r->nSub   = nlSub;
+  r->nMult  = nlMult;
+  r->nInpMult=nlInpMult;
+  r->nDiv   = nlDiv;
+  r->nExactDiv= nlExactDiv;
+  r->nIntDiv= nlIntDiv;
+  r->nIntMod= nlIntMod;
+  r->nNeg   = nlNeg;
+  r->nInvers= nlInvers;
+  r->cfCopy  = nlCopy;
+  r->nGreater = nlGreater;
+  r->nEqual = nlEqual;
+  r->nIsZero = nlIsZero;
+  r->nIsOne = nlIsOne;
+  r->nIsMOne = nlIsMOne;
+  r->nGreaterZero = nlGreaterZero;
+  r->cfWrite = nlWrite;
+  r->nRead = nlRead;
+  r->nPower = nlPower;
+  r->nGcd  = nlGcd;
+  r->nLcm  = nlLcm;
+  r->cfSetMap = nlSetMap;
+  r->nSize  = nlSize;
+  r->cfGetDenom = nlGetDenom;
+  r->cfGetNumerator = nlGetNumerator;
+#ifdef LDEBUG
+  r->nDBTest=nlDBTest;
+#endif
+}
 #if 0
 number nlMod(number a, number b)
 {
