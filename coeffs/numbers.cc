@@ -114,6 +114,7 @@ void nSetChar(coeffs r)
   {
     r->nInit_bigint=nl_Copy;
   }
+  #if 0 /* vertagt*/
   /*--------------------- Q_a/ Zp_a -----------------*/
   else if (nField_is_Extension(r))
   {
@@ -130,6 +131,7 @@ void nSetChar(coeffs r)
       if (rField_is_Zp_a(r)) r->nInit_bigint=ntMap0P;
     }
   }
+  #endif
 #ifdef HAVE_RINGS
   /*----------------------ring Z / 2^m----------------*/
   else if (nField_is_Ring_2toM(r))
@@ -160,7 +162,6 @@ void nSetChar(coeffs r)
   /*----------------------char. p----------------*/
   {
     npSetChar(c, r);
-    r->nInit_bigint=npMap0;
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (nField_is_GF(r))
