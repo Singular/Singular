@@ -9,6 +9,7 @@
 */
 #include "coeffs.h"
 
+// #define MAX_INT_VAL 0x7fffffff
 
 BOOLEAN nfGreaterZero (number k, const coeffs r);
 number  nfMult        (number a, number b, const coeffs r);
