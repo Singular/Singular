@@ -28,6 +28,8 @@
 #endif
 // #endif
 
+static const int MAX_INT_LEN= 11;
+typedef void* ADDRESS;
 
 #if (SIZEOF_LONG == 8)
 typedef int BOOLEAN;
@@ -68,6 +70,7 @@ typedef short BOOLEAN;
   // #define HAVE_DIV_MOD
   // #endif
 #endif
+
 
 #endif /* _MISC_AUX_H */
 
