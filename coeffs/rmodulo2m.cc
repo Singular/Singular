@@ -50,7 +50,7 @@ void nr2mCoeffInit (n_Procs_s *n, int c, const coeffs r)
      n->nRead = nr2mRead;
      n->nPower = nr2mPower;
      n->cfSetMap = nr2mSetMap;
-     n->nNormalize = nDummy2;
+     n->nNormalize = ndNormalize;
      n->nLcm          = nr2mLcm;
      n->nGcd          = nr2mGcd;
      n->nIsUnit = nr2mIsUnit;

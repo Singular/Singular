@@ -55,7 +55,7 @@ void nrnCoeffInit (n_Procs_s *n, int c, const coeffs r)
      n->nRead = nrnRead;
      n->nPower = nrnPower;
      n->cfSetMap = nrnSetMap;
-     n->nNormalize = nDummy2;
+     n->nNormalize = ndNormalize;
      n->nLcm          = nrnLcm;
      n->nGcd          = nrnGcd;
      n->nIsUnit = nrnIsUnit;

@@ -363,6 +363,18 @@ void npInitChar(coeffs r, int c)
     r->cfKillChar=npKillChar;
     r->cfSetChar=npSetChar;
     npSetChar(r);
+    // dummy stuff
+    r->nPar  = ndPar;
+    r->nParDeg=ndParDeg;
+    r->cfGetDenom= ndGetDenom;
+    r->cfGetNumerator= ndGetNumerator;
+    r->nImPart=ndReturn0;
+    r->nInpMult=ndInpMult;
+    r->nIntMod=ndIntMod;
+    r->nNormalize=ndNormalize;
+    r->nGcd  = ndGcd;
+    r->nLcm  = ndGcd; /* tricky, isn't it ?*/
+    // the real stuff
     r->cfInit = npInit;
     r->nInit_bigint=npMap0;
     r->n_Int  = npInt;
