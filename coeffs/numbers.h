@@ -9,6 +9,17 @@
 */
 #include "coeffs.h"
 
+/// Returns the type of coeffs domain
+static inline n_coeffType getCoeffType(const coeffs r)
+{
+  return r->type;
+}
+
+static inline int nInternalChar(const coeffs r)
+{
+  return r->ch;
+}
+
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 
 #define n_Copy(n, r)          (r)->cfCopy(n,r)
@@ -64,7 +75,7 @@ void nDummy1(number* d);
 void ndDelete(number* d, const coeffs r);
 number ndGcd(number a, number b, const coeffs);
 number ndCopy(number a, const coeffs r);
-number ndCopyMap(number a, const coeffs r, const coeffs aRing);
+number ndCopyMap(number a, const coeffs src, const coeffs dst);
 int ndSize(number a, const coeffs r);
 char * ndName(number n, const coeffs r);
 number ndPar(int i, const coeffs r);
@@ -179,5 +190,8 @@ static inline BOOLEAN nField_has_simple_Alloc(const coeffs r)
 
 static inline BOOLEAN nField_is_Extension(const coeffs r)
 { return (nField_is_Q_a(r)) || (nField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
+
+
+
 
 #endif

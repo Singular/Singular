@@ -16,14 +16,12 @@
 #include "longrat.h"
 #include "mpr_complex.h"
 
-
 #include <mylimits.h>
 // #include "limits.h"
-#define MAX_INT_VAL INT_MAX
 
-#ifndef assume
-#  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
-#endif
+// #ifndef assume
+// #  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
+// #endif
 
 
 
@@ -87,7 +85,7 @@ int nrInt(number &n, const coeffs r)
 
   int i;
   float f = nf(n).F();
-  if (((float)INT_MIN <= f) || ((float)MAX_INT_VAL >= f))
+  if (((float)INT_MIN <= f) || ((float)INT_MAX >= f))
     i = (int)f;
   else
     i = 0;
@@ -368,7 +366,7 @@ BOOLEAN  nrDBTest(number a, const char *f, const int l, const coeffs r);
 }
 #endif
 
-static number nrMapP(number from, const coeffs r, const coeffs aRing)
+static number nrMapP(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) ==  n_Zp );
@@ -378,7 +376,7 @@ static number nrMapP(number from, const coeffs r, const coeffs aRing)
   return nf(f).N();
 }
 
-static number nrMapLongR(number from, const coeffs r, const coeffs aRing)
+static number nrMapLongR(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) == n_long_R );
@@ -387,7 +385,7 @@ static number nrMapLongR(number from, const coeffs r, const coeffs aRing)
   return nf(t).N();
 }
 
-static number nrMapC(number from, const coeffs r, const coeffs aRing)
+static number nrMapC(number from, const coeffs aRing, const coeffs r)
 {  
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) == n_long_C );
@@ -398,7 +396,7 @@ static number nrMapC(number from, const coeffs r, const coeffs aRing)
 }
 
 
-number nrMapQ(number from, const coeffs r, const coeffs aRing)
+number nrMapQ(number from, const coeffs aRing, const coeffs r)
 {
 /* in longrat.h
 #define SR_INT    1
