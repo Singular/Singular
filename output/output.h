@@ -106,5 +106,37 @@ void    Warn(const char *fmt, ...);
 void SPrintStart();
 char* SPrintEnd();
 
+#ifndef HAVE_ASSUME
+#define assume(x) ((void) 0)
+#define r_assume(x) ((void) 0)
+#else /* ! HAVE_ASSUME */
+
+#define assume_violation(s,f,l) \
+  dReportError("assume violation at %s:%d condition: %s", f,l,s)
+
+#define assume(x)   _assume(x, __FILE__, __LINE__)
+#define r_assume(x) _r_assume(x, __FILE__, __LINE__)
+
+#define _assume(x, f, l)                        \
+do                                              \
+{                                               \
+  if (! (x))                                    \
+  {                                             \
+    assume_violation(#x, f, l);                 \
+  }                                             \
+}                                               \
+while (0)
+
+#define _r_assume(x, f, l)                      \
+do                                              \
+{                                               \
+  if (! (x))                                    \
+  {                                             \
+    assume_violation(#x, f, l);                 \
+    return 0;                                   \
+  }                                             \
+}                                               \
+while (0)
+#endif /* HAVE_ASSUME */
 
 #endif /* ifndef OUTPUT_H */
