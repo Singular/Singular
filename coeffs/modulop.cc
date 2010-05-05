@@ -7,14 +7,17 @@
 */
 
 #include <string.h>
+#include "config.h"
+#include <omalloc.h>
 #include "coeffs.h"
+#include "output.h"
 #include "numbers.h"
 #include "longrat.h"
 #include "mpr_complex.h"
+#include "mylimits.h"
 #include "modulop.h"
 
 int npGen=0;
-long npMapPrime;
 
 #ifdef HAVE_DIV_MOD
 unsigned short *npInvTable=NULL;
@@ -241,7 +244,7 @@ static const char* npEati(const char *s, int *i, const coeffs r)
     {
       (*i) *= 10;
       (*i) += *s++ - '0';
-      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % r->npPrimeM;
+      if ((*i) >= (INT_MAX / 10)) (*i) = (*i) % r->npPrimeM;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
     if ((*i) >= r->npPrimeM) (*i) = (*i) % r->npPrimeM;
@@ -301,7 +304,23 @@ void npSetChar(int c, coeffs r)
   }
 }
 
-void npInitChar(int c, coeffs r)
+void npKillChar(coeffs r)
+{
+  #ifdef HAVE_DIV_MOD
+  if (r->npInvTable!=NULL)
+  omFreeSize( (void *)r->npInvTable, r->npPrimeM*sizeof(unsigned short) );
+  r->npInvTable=NULL;
+  #else
+  if (r->npExpTable!=NULL)
+  {
+    omFreeSize( (void *)r->npExpTable, r->npPrimeM*sizeof(unsigned short) );
+    omFreeSize( (void *)r->npLogTable, r->npPrimeM*sizeof(unsigned short) );
+    r->npExpTable=NULL; r->npLogTable=NULL;
+  }
+  #endif
+}
+
+void npInitChar(coeffs r, int c)
 {
   int i, w;
 
@@ -350,6 +369,43 @@ void npInitChar(int c, coeffs r)
       r->npInvTable=(unsigned short*)omAlloc0( r->npPrimeM*sizeof(unsigned short) );
 #endif
     }
+    r->cfKillChar=npKillChar;
+    r->cfSetChar=NULL;
+    r->cfInit = npInit;
+    r->n_Int  = npInt;
+    r->nAdd   = npAdd;
+    r->nSub   = npSub;
+    r->nMult  = npMult;
+    r->nDiv   = npDiv;
+    r->nExactDiv= npDiv;
+    r->nNeg   = npNeg;
+    r->nInvers= npInvers;
+    r->cfCopy  = ndCopy;
+    r->nGreater = npGreater;
+    r->nEqual = npEqual;
+    r->nIsZero = npIsZero;
+    r->nIsOne = npIsOne;
+    r->nIsMOne = npIsMOne;
+    r->nGreaterZero = npGreaterZero;
+    r->cfWrite = npWrite;
+    r->nRead = npRead;
+    r->nPower = npPower;
+    r->cfSetMap = npSetMap;
+    r->nName= ndName; 
+    r->nSize  = ndSize;
+#ifdef LDEBUG
+    r->nDBTest=npDBTest;
+#endif
+#ifdef NV_OPS
+    if (c>NV_MAX_PRIME)
+    {
+      r->nMult  = nvMult;
+      r->nDiv   = nvDiv;
+      r->nExactDiv= nvDiv;
+      r->nInvers= nvInvers;
+      r->nPower= nvPower;
+    }
+#endif
   }
   else
   {
@@ -369,24 +425,24 @@ BOOLEAN npDBTest (number a, const coeffs r, const char *f, const int l)
 }
 #endif
 
-number npMap0(number from, const coeffs dst_r)
+number npMap0(number from, const coeffs src, const coeffs dst_r)
 {
   return npInit(nlModP(from,dst_r->npPrimeM),dst_r);
 }
 
-number npMapP(number from, const coeffs dst_r)
+number npMapP(number from, const coeffs src, const coeffs dst_r)
 {
   long i = (long)from;
-  if (i>npMapPrime/2)
+  if (i>src->npPrimeM/2)
   {
-    i-=npMapPrime;
+    i-=src->npPrimeM;
     while (i < 0) i+=dst_r->npPrimeM;
   }
   i%=dst_r->npPrimeM;
   return (number)i;
 }
 
-static number npMapLongR(number from, const coeffs dst_r)
+static number npMapLongR(number from, const coeffs src, const coeffs dst_r)
 {
   gmp_float *ff=(gmp_float*)from;
   mpf_t *f=ff->_mpfp();
@@ -452,7 +508,7 @@ static number npMapLongR(number from, const coeffs dst_r)
   iz=mpz_fdiv_ui(dest,npPrimeM);
   mpz_clear(dest);
   if(res->s==0)
-    iz=(long)npDiv((number)iz,(number)in);
+    iz=(long)npDiv((number)iz,(number)in,dst_r);
   omFreeBin((void *)res, rnumber_bin);
   return (number)iz;
 }
@@ -504,11 +560,10 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
   {
     if (n_GetChar(src) == n_GetChar(dst))
     {
-      return ndCopy;
+      return ndCopyMap;
     }
     else
     {
-      npMapPrime=n_GetChar(src);
       return npMapP;
     }
   }

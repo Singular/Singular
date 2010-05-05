@@ -24,6 +24,8 @@
 extern int npGen;
 extern long npMapPrime;
 
+void npInitChar(coeffs r, int ch);
+
 BOOLEAN npGreaterZero (number k, const coeffs r);
 number  npMult        (number a, number b, const coeffs r);
 number  npInit        (int i, const coeffs r);
