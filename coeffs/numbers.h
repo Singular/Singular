@@ -59,14 +59,20 @@ void           nNew(number * a);
 
 #define nSetMap(R) (currRing->cf->cfSetMap(R,currRing))
 
+/* the dummy routines: */
 void nDummy1(number* d);
 void ndDelete(number* d, const coeffs r);
-void nDummy2(number &d);
 number ndGcd(number a, number b, const coeffs);
 number ndCopy(number a, const coeffs r);
 number ndCopyMap(number a, const coeffs r, const coeffs aRing);
 int ndSize(number a, const coeffs r);
 char * ndName(number n, const coeffs r);
+number ndPar(int i, const coeffs r);
+int    ndParDeg(number n, const coeffs r);
+number ndGetDenom(number &n, const coeffs r);
+number ndGetNumerator(number &a,const coeffs r);
+number ndReturn0(number n, const coeffs r);
+number ndIntMod(number a, number b, const coeffs r);
 
 void   ndInpMult(number &a, number b, const coeffs r);
 number ndInpAdd(number &a, number b, const coeffs r);
@@ -83,7 +89,7 @@ void nSetChar(coeffs r); // initialisations after each ring chage
 #define nDivBy0 "div by 0"
 
 // dummy routines
-void   nDummy2(number& d); // nNormalize...
+void   ndNormalize(number& d, const coeffs); // nNormalize...
 
 // Tests:
 static inline BOOLEAN nField_is_Ring_2toM(const coeffs r)

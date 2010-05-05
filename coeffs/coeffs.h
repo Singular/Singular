@@ -192,7 +192,6 @@ struct n_Procs_s
    int     char_flag;
    int     ref;
    n_coeffType type;
-   short   nChar;
 ////-----------------------------------------
   char**     parameter; /* names of parameters, rInit */
   number     minpoly;  /* for Q_a/Zp_a, rInit */

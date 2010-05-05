@@ -64,7 +64,7 @@ BOOLEAN ndDBTest(number a, const char *f, const int l)
 }
 #endif
 
-void   nDummy2(number& d, const coeffs r) { }
+void   ndNormalize(number& d, const coeffs r) { }
 
 char * ndName(number n, const coeffs r) { return NULL; }
 
@@ -202,6 +202,7 @@ void nInitChar(coeffs r)
   int c=nInternalChar(r);
   n_coeffType t=nFieldType(r);
 
+  #if 0 /* vertagt*/
   if (nField_is_Extension(r))
   {
     if (r->algring==NULL)
@@ -213,6 +214,7 @@ void nInitChar(coeffs r)
       // includes: nInitChar(r->algring);
     }
   }
+  #endif
 
   n_coeffType t=rFieldType(r);
   if ((r->cf!=NULL) && (r->cf->nChar==c) && (r->cf->type==t))
@@ -220,18 +222,18 @@ void nInitChar(coeffs r)
 
   n_Procs_s *n=cf_root;
   while((n!=NULL)
-    && ((n->nChar!=c) || (n->type!=t)))
+    && ((n->ch!=c) || (n->type!=t)))
       n=n->next;
   if (n==NULL)
   {
     n=(n_Procs_s*)omAlloc0(sizeof(n_Procs_s));
     n->next=cf_root;
     n->ref=1;
-    n->nChar=c;
+    n->ch=c;
     n->type=t;
     cf_root=n;
   }
-  else if ((n->nChar==c) && (n->type==t))
+  else if ((n->ch==c) && (n->type==t))
   {
     n->ref++;
     r=n;
@@ -243,7 +245,7 @@ void nInitChar(coeffs r)
     return;
   }
   r=n;
-  n->nChar = c;
+  n->ch = c;
   n->nPar  = ndPar;
   n->nParDeg=ndParDeg;
   n->nSize = ndSize;
@@ -255,7 +257,7 @@ void nInitChar(coeffs r)
   n->nInpMult=ndInpMult;
   n->cfCopy=nd_Copy;
   n->nIntMod=ndIntMod; /* dummy !! */
-  n->nNormalize=nDummy2;
+  n->nNormalize=ndNormalize;
   n->nGcd  = ndGcd;
   n->nLcm  = ndGcd; /* tricky, isn't it ?*/
 #ifdef HAVE_RINGS
@@ -347,7 +349,7 @@ void nInitChar(coeffs r)
      n->nRead = nrzRead;
      n->nPower = nrzPower;
      n->cfSetMap = nrzSetMap;
-     n->nNormalize = nDummy2;
+     n->nNormalize = ndNormalize;
      n->nLcm          = nrzLcm;
      n->nGcd          = nrzGcd;
      n->nIsUnit = nrzIsUnit;
@@ -536,7 +538,7 @@ void nInitChar(coeffs r)
   else if (nField_is_long_C(r))
   {
     n->cfDelete= ngcDelete;
-    n->nNormalize=nDummy2;
+    n->nNormalize=ndNormalize;
     n->cfInit = ngcInit;
     n->n_Int  = ngcInt;
     n->nAdd   = ngcAdd;
