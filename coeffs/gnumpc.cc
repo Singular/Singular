@@ -32,13 +32,13 @@ BOOLEAN ngcDBTest(number a, const char *f, const int l, const coeffs r)
 }
 #endif
 
-#ifndef assume
-#  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
-#endif
+// #ifndef assume
+// #  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
+// #endif
 
 static const n_coeffType ID = n_long_C;
 
-number ngcMapQ(number from, const coeffs r, const coeffs aRing)
+number ngcMapQ(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) == n_Q );
@@ -52,7 +52,7 @@ number ngcMapQ(number from, const coeffs r, const coeffs aRing)
     return NULL;
 }
 
-static number ngcMapLongR(number from, const coeffs r, const coeffs aRing)
+static number ngcMapLongR(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) == n_long_R );
@@ -66,7 +66,7 @@ static number ngcMapLongR(number from, const coeffs r, const coeffs aRing)
     return NULL;
 }
 
-static number ngcMapR(number from, const coeffs r, const coeffs aRing)
+static number ngcMapR(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) == n_R );
@@ -80,7 +80,7 @@ static number ngcMapR(number from, const coeffs r, const coeffs aRing)
     return NULL;
 }
 
-static number ngcMapP(number from, const coeffs r, const coeffs aRing)
+static number ngcMapP(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) ==  n_Zp );
@@ -93,7 +93,7 @@ static number ngcMapP(number from, const coeffs r, const coeffs aRing)
 
 
 
-static number ngcCopyMap(number from, const coeffs r, const coeffs aRing)
+static number ngcCopyMap(number from, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) ==  ID );

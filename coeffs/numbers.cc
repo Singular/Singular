@@ -84,7 +84,7 @@ number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
 int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
 
 number ndCopy(number a, const coeffs) { return a; }
-number ndCopyMap(number a, const coeffs r, const coeffs aRing)
+number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == getCoeffType(aRing) );
   assume( nField_has_simple_Alloc(r) && nField_has_simple_Alloc(aRing) );
