@@ -12,9 +12,19 @@
 * (will result in "redefining warnings")
 */
 
+#ifndef _MYLIMITS_H
+
 #ifdef IRIX
 #include "omlimits.h"
 #else
 #include <limits.h>
+
 #endif
 
+
+
+static const int MAX_INT_VAL = INT_MAX;
+
+
+
+#endif /* _MYLIMITS_H */
