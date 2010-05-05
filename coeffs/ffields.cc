@@ -13,11 +13,8 @@
 #include <omalloc.h>
 #include "numbers.h"
 #include "ffields.h"
-
-
-typedef void* ADDRESS;
-
-#define MAX_INT_LEN 11
+#include <aux.h>
+#include <feFopen.h>
 
 int nfCharQ=0;  /* the number of elemts: q*/
 int nfM1;       /*representation of -1*/
