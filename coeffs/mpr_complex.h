@@ -158,8 +158,8 @@ gmp_float exp( const gmp_float & );
 
 gmp_float max( const gmp_float &, const gmp_float & );
 
-gmp_float numberToFloat( number num );
-gmp_float numberFieldToFloat( number num, int k );
+gmp_float numberToFloat( number num, const coeffs src );
+gmp_float numberFieldToFloat( number num, int k, const coeffs src );
 //char *floatToStr( const gmp_float & r, const unsigned int oprec );
 //<-
 
@@ -307,11 +307,11 @@ inline gmp_complex numberToComplex( number num, const coeffs r )
   }
   else
   {
-    return gmp_complex( numberToFloat(num) );
+    return gmp_complex( numberToFloat(num, r) );
   }
 }
 
-char *complexToStr( gmp_complex & c, const  unsigned int oprec );
+char *complexToStr( gmp_complex & c, const  unsigned int oprec, const coeffs src );
 //<-
 
 bool complexNearZero( gmp_complex * c, int digits );

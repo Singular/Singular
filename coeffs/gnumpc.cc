@@ -45,7 +45,7 @@ number ngcMapQ(number from, const coeffs aRing, const coeffs r)
 
   if ( from != NULL )
   {
-    gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF));
+    gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF,aRing));
     return (number)res;
   }
   else
@@ -462,7 +462,7 @@ void ngcWrite (number &a, const coeffs r)
   else
   {
     char *out;
-    out= complexToStr(*(gmp_complex*)a, gmp_output_digits);
+    out= complexToStr(*(gmp_complex*)a, gmp_output_digits, r);
     StringAppendS(out);
     //    omFreeSize((void *)out, (strlen(out)+1)* sizeof(char) );
     omFree( (void *)out );
