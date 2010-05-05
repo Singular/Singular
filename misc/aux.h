@@ -1,7 +1,5 @@
 /* -*-c++-*- */
 
-// MAX, MIN, BOOLEAN
-
 /*******************************************************************
  *  File:    aux.h
  *  Purpose: 
@@ -9,6 +7,10 @@
  *  Created: 
  *  Version: $Id$
  *******************************************************************/
+
+// BOOLEAN
+// max, min?
+
 
 #ifndef _MISC_AUX_H
 
@@ -66,8 +68,6 @@ typedef short BOOLEAN;
   // #define HAVE_DIV_MOD
   // #endif
 #endif
-
-// static const int MAX_INT_VAL = ;
 
 #endif /* _MISC_AUX_H */
 
