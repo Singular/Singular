@@ -62,22 +62,6 @@ extern "C"
   #undef HAVE_FEREAD
 #endif
 
-/*
-// These are our versions of fopen and fread They are very similar to
-// the usual fopen and fread, except that on reading, they always
-// convert "\r\n" into " \n" and "\r" into "\n".
-//
-// IMPORTANT: do only use myfopen and myfread when reading text,
-// do never use fopen and fread
-*/
-#ifdef ix86_Win
-FILE *myfopen(const char *path, const char *mode);
-#else
-#define myfopen fopen
-#endif
-
-size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
-
 enum noeof_t
 {
   noeof_brace = 1,
@@ -229,26 +213,6 @@ enum   feBufferInputs
 
 /*****************************************************************
  *
- * Resource management (feResources.cc)
- *
- *****************************************************************/
-// returns value of Resource as read-only string, or NULL
-// if Resource not found
-// issues warning, if explicitely requested (warn > 0), or
-// if warn < 0 and Resource is gotten for the first time
-// Always quiet if warn == 0
-char* feResource(const char id, int warn = -1);
-char* feResource(const char* key, int warn = -1);
-// This needs to be called before the first call to feResource
-// Initializes Resources, SearchPath, and extends PATH
-void feInitResources(char* argv0);
-// Re-inits resources, should be called after changing env. variables
-void feReInitResources();
-// Prints resources into string with StringAppend, etc
-void feStringAppendResources(int warn = -1);
-
-/*****************************************************************
- *
  * help system (fehelp.cc)
  *
  *****************************************************************/
@@ -271,14 +235,6 @@ void feStringAppendBrowsers(int warn = -1);
  *
  *****************************************************************/
 /* extern unsigned long feVersionId; */
-
-/*****************************************************************
- *
- * File Stuff
- *
- *****************************************************************/
-FILE *  feFopen(const char *path, const char *mode, char *where=NULL,
-                int useWerror=FALSE, int path_only=FALSE);
 
 char *  StringAppend(const char *fmt, ...);
 char *  StringAppendS(const char *s);
