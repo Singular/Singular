@@ -153,6 +153,9 @@ struct n_Procs_s
 
   short      float_len; /* additional char-flags, rInit */
   short      float_len2; /* additional char-flags, rInit */
+
+  BOOLEAN   ShortOut; /// ffields need this. 
+
 };
 
 #endif

@@ -14,6 +14,11 @@
 #include "numbers.h"
 #include "ffields.h"
 
+
+typedef void* ADDRESS;
+
+#define MAX_INT_LEN 11
+
 int nfCharQ=0;  /* the number of elemts: q*/
 int nfM1;       /*representation of -1*/
 int nfCharP=0;  /* the characteristic: p*/
@@ -105,7 +110,7 @@ const char* eati(const char *s, int *i)
       {
         s-=l;
         Werror("`%s` greater than %d(max. integer representation)",
-                s,MAX_INT_VAL);
+                s,INT_MAX);
         return s;
       }
     }
@@ -483,7 +488,7 @@ static const char* nfEati(const char *s, int *i)
     {
       *i *= 10;
       *i += *s++ - '0';
-      if (*i > (MAX_INT_VAL / 10)) *i = *i % nfCharP;
+      if (*i > (INT_MAX / 10)) *i = *i % nfCharP;
     }
     while (*s >= '0' && *s <= '9');
     if (*i >= nfCharP) *i = *i % nfCharP;
@@ -563,7 +568,7 @@ static int convertback62 ( char * p, int n )
 
 int nfMinPoly[16];
 
-void nfShowMipo()
+void nfShowMipo(const coeffs r)
 {
   int i=nfMinPoly[0];
   int j=0;
@@ -571,7 +576,7 @@ void nfShowMipo()
   {
     j++;
     if (nfMinPoly[j]!=0)
-      StringAppend("%d*%s^%d",nfMinPoly[j],currRing->parameter[0],i);
+      StringAppend("%d*%s^%d",nfMinPoly[j],r->parameter[0],i);
     i--;
     if(i<0) break;
     if (nfMinPoly[j]!=0)
@@ -691,16 +696,16 @@ err:
 /*2
 * map Z/p -> GF(p,n)
 */
-number nfMapP(number c)
+number nfMapP(number c, const coeffs src, const coeffs dst)
 {
-  return nfInit((int)((long)c), currRing);
+  return nfInit((int)((long)c), dst);
 }
 
 /*2
 * map GF(p,n1) -> GF(p,n2), n1 < n2, n1 | n2
 */
 int nfMapGG_factor;
-number nfMapGG(number c)
+number nfMapGG(number c, const coeffs src, const coeffs dst)
 {
   int i=(long)c;
   i*= nfMapGG_factor;
@@ -710,7 +715,7 @@ number nfMapGG(number c)
 /*2
 * map GF(p,n1) -> GF(p,n2), n1 > n2, n2 | n1
 */
-number nfMapGGrev(number c)
+number nfMapGGrev(number c, const coeffs src, const coeffs dst)
 {
   int ex=(int)((long)c);
   if ((ex % nfMapGG_factor)==0)
@@ -722,11 +727,11 @@ number nfMapGGrev(number c)
 /*2
 * set map function nMap ... -> GF(p,n)
 */
-nMapFunc nfSetMap(const ring src, const ring dst)
+nMapFunc nfSetMap(const coeffs r, const coeffs src, const coeffs dst)
 {
   if (nField_is_GF(src,nfCharQ))
   {
-    return ndCopy;   /* GF(p,n) -> GF(p,n) */
+    return ndCopyMap;   /* GF(p,n) -> GF(p,n) */
   }
   if (nField_is_GF(src))
   {
@@ -743,8 +748,8 @@ nMapFunc nfSetMap(const ring src, const ring dst)
       Print("map %d^%d -> %d^%d\n",nfCharP,n1,nfCharP,n2);
       if ((n2 % n1)==0)
       {
-        int save_ch=currRing->ch;
-        char **save_par=currRing->parameter;
+        int save_ch=r->ch;
+        char **save_par=r->parameter;
         nfSetChar(src->ch,src->parameter);
         int nn=nfPlus1Table[0];
         nfSetChar(save_ch,save_par);
