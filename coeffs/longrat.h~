@@ -10,7 +10,6 @@
 #include "coeffs.h"
 #include "config.h"
 #include "si_gmp.h"
-#include <aux.h>
 
 typedef MP_INT lint;
 
@@ -19,6 +18,7 @@ typedef MP_INT lint;
 #define SR_INT    1L
 #define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))
 #define SR_TO_INT(SR)   (((long)SR) >> 2)
+
 
 #define MP_SMALL 1
 
@@ -101,16 +101,12 @@ struct omBin_s;
 #endif
 extern omBin_s* rnumber_bin;
 
-
-#define FREE_RNUMBER(x) omFreeBin((void *)x, rnumber_bin)
-#define ALLOC_RNUMBER() (number)omAllocBin(rnumber_bin)
-#define ALLOC0_RNUMBER() (number)omAlloc0Bin(rnumber_bin)
-
 // in-place operations
 void nlInpGcd(number &a, number b, const coeffs r);
 void nlInpIntDiv(number &a, number b, const coeffs r);
-LINLINE number nlInpAdd(number la, number li, const coeffs r);
-LINLINE void nlInpMult(number &a, number b, const coeffs r);
+void nlInpAdd_(number &a, number b, const coeffs r);
+LINLINE number   nlInpAdd(number la, number li, const coeffs r);
+void nlInpMult(number &a, number b, coeffs r);
 
 number nlFarey(number nP, number nN);
 
