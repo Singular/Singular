@@ -1,3 +1,5 @@
+#ifndef CF_GCD_SMALL_H
+#define CF_GCD_SMALL_H
 // -*- c++ -*-
 //*****************************************************************************
 /** @file cf_gcd_smallp.h
@@ -59,4 +61,4 @@ CanonicalForm GCD_GF (const CanonicalForm& A, const CanonicalForm& B)
   bool top_level= true;
   return GCD_GF (A, B, list, top_level);
 }
-
+#endif
