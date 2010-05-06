@@ -318,7 +318,7 @@ void choose_extension (const int& d, const int& num_vars, Variable& beta)
   ZZ_p::init (NTLp);
   ZZ_pX NTLirredpoly;
   //TODO: replace d by max_{i} (deg_x{i}(f))
-  int i= (int) (log ((double) ::pow (d + 1, num_vars))/log ((double) p)); 
+  int i= (int) (log ((double) ::pow ((double)d + 1, (double)num_vars))/log ((double) p)); 
   int m= degree (getMipo (beta));
   if (i <= 1)
     i= 2;
@@ -663,7 +663,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
       if (expon < 2)
         expon= 2;
       kk= getGFDegree(); 
-      if (::pow (p, kk*expon) < (1 << 16)) 
+      if (::pow ((double)p, (double)kk*expon) < (1 << 16)) 
         setCharacteristic (p, kk*(int)expon, 'b');
       else 
       {
