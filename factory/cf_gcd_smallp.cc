@@ -667,7 +667,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
         setCharacteristic (p, kk*(int)expon, 'b');
       else 
       {
-        expon= floor((log ((1<<16) - 1))/(log(p)*kk));
+        expon= floor((log ((double)((1<<16) - 1)))/(log((double)p)*kk));
         ASSERT (expon >= 2, "not enough points in GCD_GF");
         setCharacteristic (p, (int)(kk*expon), 'b');
       }
