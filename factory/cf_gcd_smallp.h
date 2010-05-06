@@ -22,10 +22,12 @@
 
 #include <config.h>
 #include "assert.h" 
-#include "cf_gcd_smallp.cc"
+
+CanonicalForm GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
+                  Variable & alpha, CFList& l, bool& top_level);
 
 /// GCD of A and B over \f$ F_{p}(\alpha ) \f$ 
-CanonicalForm GCD_Fp_extension (const CanonicalForm& A, const CanonicalForm& B, 
+static inline CanonicalForm GCD_Fp_extension (const CanonicalForm& A, const CanonicalForm& B, 
                                 Variable & alpha) 
 {
   CFList list;
@@ -33,13 +35,20 @@ CanonicalForm GCD_Fp_extension (const CanonicalForm& A, const CanonicalForm& B,
   return GCD_Fp_extension (A, B, alpha, list, top_level);
 }
 
+
+CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
+                           bool& top_level, CFList& l);
+
 ///GCD of A and B over \f$ F_{p} \f$
-CanonicalForm GCD_small_p (const CanonicalForm& A, const CanonicalForm& B)
+static inline CanonicalForm GCD_small_p (const CanonicalForm& A, const CanonicalForm& B)
 {
   CFList list;
   bool top_level= true;
   return GCD_small_p (A, B, top_level, list);
 }
+
+CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
+        bool& top_level);
 
 /// GCD of A and B over GF
 CanonicalForm GCD_GF (const CanonicalForm& A, const CanonicalForm& B) 
