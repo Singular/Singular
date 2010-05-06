@@ -6,39 +6,6 @@
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
 
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/longrat.h>
-
-// 64 bit version:
-#if 0
-#define MAX_NUM_SIZE 60
-#define POW_2_28 0x10000000000000L
-#define LONG long
-#else
-#define MAX_NUM_SIZE 28
-#define POW_2_28 (1L<<28)
-#define LONG int
-#endif
-
-static inline number nlShort3(number x) // assume x->s==3
-{
-  assume(x->s==3);
-  if ((mpz_cmp_ui(x->z,(long)0)==0)
-  || (mpz_size1(x->z)<=MP_SMALL))
-  {
-    LONG ui=mpz_get_si(x->z);
-    if ((((ui<<3)>>3)==ui)
-    && (mpz_cmp_si(x->z,(long)ui)==0))
-    {
-      mpz_clear(x->z);
-      FREE_RNUMBER(x);
-      return INT_TO_SR(ui);
-    }
-  }
-  return x;
-}
-
 #ifndef LONGRAT_CC
 #define LONGRAT_CC
 
@@ -117,14 +84,7 @@ static const n_coeffType ID = n_long_R;
  *******************************************************************/
 #ifndef P_NUMBERS_H
 
-number nlShort3_noinline(number x) // assume x->s==3
-{
-  return nlShort3(x);
-}
-
-//#ifndef SI_THREADS
 omBin rnumber_bin = omGetSpecBin(sizeof(snumber));
-//#endif
 
 number nlOne=INT_TO_SR(1);
 
@@ -160,14 +120,25 @@ static number nlMapR(number from, const coeffs src, const coeffs dst);
 */
 number nlMapGMP(number from)
 {
-  number z=ALLOC_RNUMBER();
+  number z=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   z->debug=123456;
 #endif
-  mpz_init_set(z->z,(mpz_ptr) from);
+  mpz_init_set(&z->z,(MP_INT*) from);
   //mpz_init_set_ui(&z->n,1);
   z->s = 3;
-  z=nlShort3(z);
+  if ((mpz_cmp_ui(&z->z,(long)0)==0)
+  || (mpz_size1(&z->z)<=MP_SMALL))
+  {
+    int ui=(int)mpz_get_si(&z->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&z->z,(long)ui)==0))
+    {
+      mpz_clear(&z->z);
+      omFreeBin((void *)z, rnumber_bin);
+      return INT_TO_SR(ui);
+    }
+  }
   return z;
 }
 
@@ -176,13 +147,24 @@ number nlMapGMP(number from)
 */
 number nlMapMachineInt(number from)
 {
-  number z=ALLOC_RNUMBER();
+  number z=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   z->debug=123456;
 #endif
-  mpz_init_set_ui(z->z,(unsigned long) from);
+  mpz_init_set_ui(&z->z,(unsigned long) from);
   z->s = 3;
-  z=nlShort3(z);
+  if ((mpz_cmp_ui(&z->z,(long)0)==0)
+  || (mpz_size1(&z->z)<=MP_SMALL))
+  {
+    int ui=(int)mpz_get_si(&z->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&z->z,(long)ui)==0))
+    {
+      mpz_clear(&z->z);
+      omFreeBin((void *)z, rnumber_bin);
+      return INT_TO_SR(ui);
+    }
+  }
   return z;
 }
 #endif
@@ -204,7 +186,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l)
   }
   if ((((long)a)&3L)==1L)
   {
-    if (((((LONG)(long)a)<<1)>>1)!=((LONG)(long)a))
+    if (((((long)a)<<1)>>1)!=((long)a))
     {
       Print(" !!longrat:arith:%lx in %s:%d\n",(long)a, f,l);
       return FALSE;
@@ -223,41 +205,38 @@ BOOLEAN nlDBTest(number a, const char *f,const int l)
     Print("!!longrat:s=%d in %s:%d\n",a->s,f,l);
     return FALSE;
   }
-  // only, if gmp memeory routine are from omalloc:
-  //omCheckAddrSize(a->z[0]._mp_d,a->z[0]._mp_alloc*BYTES_PER_MP_LIMB);
-  if (a->z[0]._mp_alloc==0)
+  omCheckAddrSize(a->z._mp_d,a->z._mp_alloc*BYTES_PER_MP_LIMB);
+  if (a->z._mp_alloc==0)
     Print("!!longrat:z->alloc=0 in %s:%d\n",f,l);
 
   if (a->s<2)
   {
-    // only, if gmp memeory routine are from omalloc:
-    //omCheckIf(omCheckAddrSize(a->n[0]._mp_d,a->n[0]._mp_alloc*BYTES_PER_MP_LIMB), return FALSE);
-    if (a->z[0]._mp_alloc==0)
+    omCheckIf(omCheckAddrSize(a->n._mp_d,a->n._mp_alloc*BYTES_PER_MP_LIMB), return FALSE);
+    if (a->z._mp_alloc==0)
       Print("!!longrat:n->alloc=0 in %s:%d\n",f,l);
-    if ((mpz_size1(a->n) ==1) && (mpz_cmp_si(a->n,(long)1)==0))
+    if ((mpz_size1(&a->n) ==1) && (mpz_cmp_si(&a->n,(long)1)==0))
     {
       Print("!!longrat:integer as rational in %s:%d\n",f,l);
-      mpz_clear(a->n); a->s=3;
       return FALSE;
     }
-    else if (mpz_isNeg(a->n))
+    else if (mpz_isNeg(&a->n))
     {
       Print("!!longrat:div. by negative in %s:%d\n",f,l);
-      mpz_neg(a->z,a->z);
-      mpz_neg(a->n,a->n);
+      mpz_neg(&a->z,&a->z);
+      mpz_neg(&a->n,&a->n);
       return FALSE;
     }
     return TRUE;
   }
-  //if (a->s==2)
-  //{
-  //  Print("!!longrat:s=2 in %s:%d\n",f,l);
-  //  return FALSE;
-  //}
-  if (mpz_size1(a->z)>MP_SMALL) return TRUE;
-  LONG ui=(int)mpz_get_si(a->z);
+  if (a->s==2)
+  {
+    Print("!!longrat:s=2 in %s:%d\n",f,l);
+    return FALSE;
+  }
+  if (mpz_size1(&a->z)>MP_SMALL) return TRUE;
+  int ui=(int)mpz_get_si(&a->z);
   if ((((ui<<3)>>3)==ui)
-  && (mpz_cmp_si(a->z,(long)ui)==0))
+  && (mpz_cmp_si(&a->z,(long)ui)==0))
   {
     Print("!!longrat:im int %d in %s:%d\n",ui,f,l);
     f=NULL;
@@ -267,7 +246,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l)
 }
 #endif
 
-number nlRInit (long i);
+number nlRInit (int i);
 
 static number nlMapR(number from, const coeffs src, const coeffs dst)
 {
@@ -308,7 +287,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
   gmp_float *ff=(gmp_float*)from;
   mpf_t *f=ff->_mpfp();
   number res;
-  mpz_ptr dest,ndest;
+  lint *dest,*ndest;
   int size, i,negative;
   int e,al,bl;
   mp_ptr qp,dd,nn;
@@ -332,11 +311,11 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
   }
 
   e=(*f)[0]._mp_exp-size;
-  res = ALLOC_RNUMBER();
+  res = (number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   res->debug=123456;
 #endif
-  dest = res->z;
+  dest = &(res->z);
 
   if (e<0)
   {
@@ -348,7 +327,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
     nn = (mp_ptr)omAlloc(sizeof(mp_limb_t)*bl);
     nn[bl-1] = 1;
     for (i=bl-2;i>=0;i--) nn[i] = 0;
-    ndest = res->n;
+    ndest = &(res->n);
     ndest->_mp_d = nn;
     ndest->_mp_alloc = ndest->_mp_size = bl;
     res->s = 0;
@@ -372,9 +351,21 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
   else if (mpz_size1(&res->z)<=MP_SMALL)
   {
     // res is new, res->ref is 1
-    res=nlShort3(res);
+    int ui=(int)mpz_get_si(&res->z);
+    if ((((ui<<3)>>3)==ui)
+       && (mpz_cmp_si(&res->z,(long)ui)==0))
+    {
+       mpz_clear(&res->z);
+#if defined(LDEBUG)
+       res->debug=654324;
+#endif
+       omFreeBin((void *)res, rnumber_bin);
+       return INT_TO_SR(ui);
+    }
   }
+#if defined(LDEBUG)
   nlTest(res);
+#endif
   return res;
 }
 
@@ -403,7 +394,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 //  }
 //  number r=nlRInit(1);
 //  mpz_set_d(&(r->z),f);
-//  memcpy(&(r->n),&h1,sizeof(h1));
+//  memcpy4(&(r->n),&h1,sizeof(h1));
 //  r->s=0; /* not normalized */
 //  nlNormalize(r);
 //  return r;
@@ -418,7 +409,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 //    mpz_setbit(&r->n,f_shift*BYTES_PER_MP_LIMB*8);
 //    mpz_setbit(&r->z,f_size*BYTES_PER_MP_LIMB*8-1);
 //    // now r->z has enough space
-//    memcpy(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
+//    memcpy4(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
 //    nlNormalize(r);
 //  }
 //  else
@@ -428,13 +419,13 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 //    {
 //      mpz_setbit(&r->z,f_size*BYTES_PER_MP_LIMB*8-1);
 //      // now r->z has enough space
-//      memcpy(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
+//      memcpy4(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
 //    }
 //    else /* f_shift < 0 */
 //    {
 //      mpz_setbit(&r->z,(f_size-f_shift)*BYTES_PER_MP_LIMB*8-1);
 //      // now r->z has enough space
-//      memcpy(mpz_limb_d(&r->z)-f_shift,((*f)[0]._mp_d),
+//      memcpy4(mpz_limb_d(&r->z)-f_shift,((*f)[0]._mp_d),
 //        f_size*BYTES_PER_MP_LIMB);
 //    }
 //  }
@@ -449,7 +440,7 @@ int nlSize(number a, const coeffs r)
      return 0; /* rational 0*/
   if (SR_HDL(a) & SR_INT)
      return 1; /* immidiate int */
-  int s=a->z[0]._mp_alloc;
+  int s=a->z._mp_alloc;
 //  while ((s>0) &&(a->z._mp_d[s]==0L)) s--; 
 //#if SIZEOF_LONG == 8
 //  if (a->z._mp_d[s] < (unsigned long)0x100000000L) s=s*2-1;
@@ -458,7 +449,7 @@ int nlSize(number a, const coeffs r)
 //  s++;
   if (a->s<2)
   {
-    int d=a->n[0]._mp_alloc;
+    int d=a->n._mp_alloc;
 //    while ((d>0) && (a->n._mp_d[d]==0L)) d--; 
 //#if SIZEOF_LONG == 8
 //    if (a->n._mp_d[d] < (unsigned long)0x100000000L) d=d*2-1;
@@ -474,27 +465,29 @@ int nlSize(number a, const coeffs r)
 */
 int nlInt(number &i, const coeffs r)
 {
+#ifdef LDEBUG
   nlTest(i);
+#endif
   nlNormalize(i,r);
   if (SR_HDL(i) &SR_INT) return SR_TO_INT(i);
   if (i->s==3)
   {
-    if(mpz_size1(i->z)>MP_SMALL) return 0;
-    int ul=(int)mpz_get_si(i->z);
-    if (mpz_cmp_si(i->z,(long)ul)!=0) return 0;
+    if(mpz_size1(&i->z)>MP_SMALL) return 0;
+    int ul=(int)mpz_get_si(&i->z);
+    if (mpz_cmp_si(&i->z,(long)ul)!=0) return 0;
     return ul;
   }
-  mpz_t tmp;
+  lint tmp;
   int ul;
-  mpz_init(tmp);
-  MPZ_DIV(tmp,i->z,i->n);
-  if(mpz_size1(tmp)>MP_SMALL) ul=0;
+  mpz_init(&tmp);
+  MPZ_DIV(&tmp,&i->z,&i->n);
+  if(mpz_size1(&tmp)>MP_SMALL) ul=0;
   else
   {
-    ul=(int)mpz_get_si(tmp);
-    if (mpz_cmp_si(tmp,(long)ul)!=0) ul=0;
+    ul=(int)mpz_get_si(&tmp);
+    if (mpz_cmp_si(&tmp,(long)ul)!=0) ul=0;
   }
-  mpz_clear(tmp);
+  mpz_clear(&tmp);
   return ul;
 }
 
@@ -503,7 +496,9 @@ int nlInt(number &i, const coeffs r)
 */
 number nlBigInt(number &i, const coeffs r)
 {
+#ifdef LDEBUG
   nlTest(i);
+#endif
   nlNormalize(i,r);
   if (SR_HDL(i) &SR_INT) return (i);
   if (i->s==3)
@@ -511,8 +506,8 @@ number nlBigInt(number &i, const coeffs r)
     return nlCopy(i,r);
   }
   number tmp=nlRInit(1);
-  MPZ_DIV(tmp->z,i->z,i->n);
-  tmp=nlShort3(tmp);
+  MPZ_DIV(&tmp->z,&i->z,&i->n);
+  nlNormalize(tmp,r);
   return tmp;
 }
 
@@ -521,11 +516,13 @@ number nlBigInt(number &i, const coeffs r)
 */
 number nlInvers(number a, const coeffs r)
 {
+#ifdef LDEBUG
   nlTest(a);
+#endif
   number n;
   if (SR_HDL(a) & SR_INT)
   {
-    if ((a==INT_TO_SR(1L)) || (a==INT_TO_SR(-1L)))
+    if ((a==INT_TO_SR(1)) || (a==INT_TO_SR(-1)))
     {
       return a;
     }
@@ -534,63 +531,80 @@ number nlInvers(number a, const coeffs r)
       WerrorS(nDivBy0);
       return INT_TO_SR(0);
     }
-    n=ALLOC_RNUMBER();
+    n=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
     n->debug=123456;
 #endif
     n->s=1;
     if ((long)a>0L)
     {
-      mpz_init_set_si(n->z,(long)1);
-      mpz_init_set_si(n->n,(long)SR_TO_INT(a));
+      mpz_init_set_si(&n->z,(long)1);
+      mpz_init_set_si(&n->n,(long)SR_TO_INT(a));
     }
     else
     {
-      mpz_init_set_si(n->z,(long)-1);
-      mpz_init_set_si(n->n,(long)-SR_TO_INT(a));
+      mpz_init_set_si(&n->z,(long)-1);
+      mpz_init_set_si(&n->n,(long)-SR_TO_INT(a));
     }
+#ifdef LDEBUG
     nlTest(n);
+#endif
     return n;
   }
-  n=ALLOC_RNUMBER();
+  n=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   n->debug=123456;
 #endif
   {
     n->s=a->s;
-    mpz_init_set(n->n,a->z);
+    mpz_init_set(&n->n,&a->z);
     switch (a->s)
     {
       case 0:
       case 1:
-              mpz_init_set(n->z,a->n);
-              if (mpz_isNeg(n->n)) /* && n->s<2*/
+              mpz_init_set(&n->z,&a->n);
+              if (mpz_isNeg(&n->n)) /* && n->s<2*/
               {
-                mpz_neg(n->z,n->z);
-                mpz_neg(n->n,n->n);
+                mpz_neg(&n->z,&n->z);
+                mpz_neg(&n->n,&n->n);
               }
-              if (mpz_cmp_si(n->n,(long)1)==0)
+              if (mpz_cmp_si(&n->n,(long)1)==0)
               {
-                mpz_clear(n->n);
+                mpz_clear(&n->n);
                 n->s=3;
-                n=nlShort3(n);
+                if (mpz_size1(&n->z)<=MP_SMALL)
+                {
+                  int ui=(int)mpz_get_si(&n->z);
+                  if ((((ui<<3)>>3)==ui)
+                  && (mpz_cmp_si(&n->z,(long)ui)==0))
+                  {
+                    mpz_clear(&n->z);
+#if defined(LDEBUG)
+                    n->debug=654324;
+#endif
+                    omFreeBin((void *)n, rnumber_bin);
+                    n=INT_TO_SR(ui);
+                  }
+                }
               }
               break;
       case 3:
               n->s=1;
-              if (mpz_isNeg(n->n)) /* && n->s<2*/
+              if (mpz_isNeg(&n->n)) /* && n->s<2*/
               {
-                mpz_neg(n->n,n->n);
-                mpz_init_set_si(n->z,(long)-1);
+                mpz_neg(&n->n,&n->n);
+                mpz_init_set_si(&n->z,(long)-1);
               }
               else
               {
-                mpz_init_set_si(n->z,(long)1);
+                mpz_init_set_si(&n->z,(long)1);
               }
               break;
     }
   }
+#ifdef LDEBUG
   nlTest(n);
+#endif
   return n;
 }
 
@@ -611,12 +625,12 @@ number   nlExactDiv(number a, number b)
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     /* the small int -(1<<28) divided by -1 is the large int (1<<28)   */
-    if ((a==INT_TO_SR(-(POW_2_28)))&&(b==INT_TO_SR(-1L)))
+    if ((a==INT_TO_SR(-(1<<28)))&&(b==INT_TO_SR(-1)))
     {
-      return nlRInit(POW_2_28);
+      return nlRInit(1<<28);
     }
-    long aa=SR_TO_INT(a);
-    long bb=SR_TO_INT(b);
+    int aa=SR_TO_INT(a);
+    int bb=SR_TO_INT(b);
     return INT_TO_SR(aa/bb);
   }
   number bb=NULL;
@@ -625,24 +639,39 @@ number   nlExactDiv(number a, number b)
     bb=nlRInit(SR_TO_INT(b));
     b=bb;
   }
-  u=ALLOC_RNUMBER();
+  u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
-  mpz_init(u->z);
+  mpz_init(&u->z);
   /* u=a/b */
   u->s = 3;
-  MPZ_EXACTDIV(u->z,a->z,b->z);
+  MPZ_EXACTDIV(&u->z,&a->z,&b->z);
   if (bb!=NULL)
   {
-    mpz_clear(bb->z);
+    mpz_clear(&bb->z);
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
     omFreeBin((void *)bb, rnumber_bin);
   }
-  u=nlShort3(u);
+  if (mpz_size1(&u->z)<=MP_SMALL)
+  {
+    int ui=(int)mpz_get_si(&u->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&u->z,(long)ui)==0))
+    {
+      mpz_clear(&u->z);
+#if defined(LDEBUG)
+      u->debug=654324;
+#endif
+      omFreeBin((void *)u, rnumber_bin);
+      u=INT_TO_SR(ui);
+    }
+  }
+#ifdef LDEBUG
   nlTest(u);
+#endif
   return u;
 }
 
@@ -662,20 +691,20 @@ number nlIntDiv (number a, number b)
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     /* the small int -(1<<28) divided by -1 is the large int (1<<28)   */
-    if ((a==INT_TO_SR(-(POW_2_28)))&&(b==INT_TO_SR(-1L)))
+    if ((a==INT_TO_SR(-(1<<28)))&&(b==INT_TO_SR(-1)))
     {
-      return nlRInit(POW_2_28);
+      return nlRInit(1<<28);
     }
-    long aa=SR_TO_INT(a);
-    long bb=SR_TO_INT(b);
+    int aa=SR_TO_INT(a);
+    int bb=SR_TO_INT(b);
     return INT_TO_SR(aa/bb);
   }
   if (SR_HDL(a) & SR_INT)
   {
     /* the small int -(1<<28) divided by 2^28 is 1   */
-    if (a==INT_TO_SR(-(POW_2_28)))
+    if (a==INT_TO_SR(-(1<<28)))
     {
-      if(mpz_cmp_si(b->z,(POW_2_28))==0)
+      if(mpz_cmp_si(&b->z,(long)(1<<28))==0)
       {
         return INT_TO_SR(-1);
       }
@@ -689,26 +718,41 @@ number nlIntDiv (number a, number b)
     bb=nlRInit(SR_TO_INT(b));
     b=bb;
   }
-  u=ALLOC_RNUMBER();
+  u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
   assume(a->s==3);
   assume(b->s==3);
-  mpz_init_set(u->z,a->z);
+  mpz_init_set(&u->z,&a->z);
   /* u=u/b */
   u->s = 3;
-  MPZ_DIV(u->z,u->z,b->z);
+  MPZ_DIV(&u->z,&u->z,&b->z);
   if (bb!=NULL)
   {
-    mpz_clear(bb->z);
+    mpz_clear(&bb->z);
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
     omFreeBin((void *)bb, rnumber_bin);
   }
-  u=nlShort3(u);
+  if (mpz_size1(&u->z)<=MP_SMALL)
+  {
+    int ui=(int)mpz_get_si(&u->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&u->z,(long)ui)==0))
+    {
+      mpz_clear(&u->z);
+#if defined(LDEBUG)
+      u->debug=654324;
+#endif
+      omFreeBin((void *)u, rnumber_bin);
+      u=INT_TO_SR(ui);
+    }
+  }
+#ifdef LDEBUG
   nlTest(u);
+#endif
   return u;
 }
 
@@ -738,14 +782,14 @@ number nlIntMod (number a, number b, const coeffs r)
     {
       if ((long)b>0L)
       {
-        long i=(-SR_TO_INT(a))%SR_TO_INT(b);
-        if ( i != 0L ) i = (SR_TO_INT(b))-i;
+        int i=(-SR_TO_INT(a))%SR_TO_INT(b);
+        if ( i != 0 ) i = (SR_TO_INT(b))-i;
         return INT_TO_SR(i);
       }
       else
       {
-        long i=(-SR_TO_INT(a))%(-SR_TO_INT(b));
-        if ( i != 0L ) i = (-SR_TO_INT(b))-i;
+        int i=(-SR_TO_INT(a))%(-SR_TO_INT(b));
+        if ( i != 0 ) i = (-SR_TO_INT(b))-i;
         return INT_TO_SR(i);
       }
     }
@@ -755,7 +799,7 @@ number nlIntMod (number a, number b, const coeffs r)
     /* a is a small and b is a large int: -> a or (a+b) or (a-b) */
     if ((long)a<0L)
     {
-      if (mpz_isNeg(b->z))
+      if (mpz_isNeg(&b->z))
         return nlSub(a,b,r);
       /*else*/
         return nlAdd(a,b,r);
@@ -769,30 +813,45 @@ number nlIntMod (number a, number b, const coeffs r)
     bb=nlRInit(SR_TO_INT(b));
     b=bb;
   }
-  u=ALLOC_RNUMBER();
+  u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
-  mpz_init(u->z);
+  mpz_init(&u->z);
   u->s = 3;
-  mpz_mod(u->z,a->z,b->z);
+  mpz_mod(&u->z,&a->z,&b->z);
   if (bb!=NULL)
   {
-    mpz_clear(bb->z);
+    mpz_clear(&bb->z);
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
     omFreeBin((void *)bb, rnumber_bin);
   }
-  if (mpz_isNeg(u->z))
+  if (mpz_isNeg(&u->z))
   {
-    if (mpz_isNeg(b->z))
-      mpz_sub(u->z,u->z,b->z);
+    if (mpz_isNeg(&b->z))
+      mpz_sub(&u->z,&u->z,&b->z);
     else
-      mpz_add(u->z,u->z,b->z);
+      mpz_add(&u->z,&u->z,&b->z);
   }
-  u=nlShort3(u);
+  if (mpz_size1(&u->z)<=MP_SMALL)
+  {
+    int ui=(int)mpz_get_si(&u->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&u->z,(long)ui)==0))
+    {
+      mpz_clear(&u->z);
+#if defined(LDEBUG)
+      u->debug=654324;
+#endif
+      omFreeBin((void *)u, rnumber_bin);
+      u=INT_TO_SR(ui);
+    }
+  }
+#ifdef LDEBUG
   nlTest(u);
+#endif
   return u;
 }
 
@@ -807,7 +866,7 @@ number nlDiv (number a, number b, const coeffs r)
     WerrorS(nDivBy0);
     return INT_TO_SR(0);
   }
-  u=ALLOC_RNUMBER();
+  u=(number)omAllocBin(rnumber_bin);
   u->s=0;
 #if defined(LDEBUG)
   u->debug=123456;
@@ -815,90 +874,97 @@ number nlDiv (number a, number b, const coeffs r)
 // ---------- short / short ------------------------------------
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    long i=SR_TO_INT(a);
-    long j=SR_TO_INT(b);
-    if ((i==-POW_2_28) && (j== -1L))
-    {  
-      FREE_RNUMBER(u);
-      return nlRInit(POW_2_28);
-    }
-    long r=i%j;
+    int i=SR_TO_INT(a);
+    int j=SR_TO_INT(b);
+    int r=i%j;
     if (r==0)
     {
       omFreeBin((void *)u, rnumber_bin);
       return INT_TO_SR(i/j);
     }
-    mpz_init_set_si(u->z,(long)i);
-    mpz_init_set_si(u->n,(long)j);
+    mpz_init_set_si(&u->z,(long)i);
+    mpz_init_set_si(&u->n,(long)j);
   }
   else
   {
-    mpz_init(u->z);
+    mpz_init(&u->z);
 // ---------- short / long ------------------------------------
     if (SR_HDL(a) & SR_INT)
     {
       // short a / (z/n) -> (a*n)/z
       if (b->s<2)
       {
-        mpz_mul_si(u->z,b->n,SR_TO_INT(a));
+        mpz_mul_si(&u->z,&b->n,SR_TO_INT(a));
       }
       else
       // short a / long z -> a/z
       {
-        mpz_set_si(u->z,SR_TO_INT(a));
+        mpz_set_si(&u->z,SR_TO_INT(a));
       }
-      if (mpz_cmp(u->z,b->z)==0)
+      if (mpz_cmp(&u->z,&b->z)==0)
       {
-        mpz_clear(u->z);
-        FREE_RNUMBER(u);
+        mpz_clear(&u->z);
+        omFreeBin((void *)u, rnumber_bin);
         return INT_TO_SR(1);
       }
-      mpz_init_set(u->n,b->z);
+      mpz_init_set(&u->n,&b->z);
     }
 // ---------- long / short ------------------------------------
     else if (SR_HDL(b) & SR_INT)
     {
-      mpz_set(u->z,a->z);
+      mpz_set(&u->z,&a->z);
       // (z/n) / b -> z/(n*b)
       if (a->s<2)
       {
-        mpz_init_set(u->n,a->n);
+        mpz_init_set(&u->n,&a->n);
         if ((long)b>0L)
-          mpz_mul_ui(u->n,u->n,SR_TO_INT(b));
+          mpz_mul_ui(&u->n,&u->n,SR_TO_INT(b));
         else
         {
-          mpz_mul_ui(u->n,u->n,-SR_TO_INT(b));
-          mpz_neg(u->z,u->z);
+          mpz_mul_ui(&u->n,&u->n,-SR_TO_INT(b));
+          mpz_neg(&u->z,&u->z);
         }
       }
       else
       // long z / short b -> z/b
       {
-        //mpz_set(u->z,a->z);
-        mpz_init_set_si(u->n,SR_TO_INT(b));
+        //mpz_set(&u->z,&a->z);
+        mpz_init_set_si(&u->n,SR_TO_INT(b));
       }
     }
 // ---------- long / long ------------------------------------
     else
     {
-      mpz_set(u->z,a->z);
-      mpz_init_set(u->n,b->z);
-      if (a->s<2) mpz_mul(u->n,u->n,a->n);
-      if (b->s<2) mpz_mul(u->z,u->z,b->n);
+      mpz_set(&u->z,&a->z);
+      mpz_init_set(&u->n,&b->z);
+      if (a->s<2) mpz_mul(&u->n,&u->n,&a->n);
+      if (b->s<2) mpz_mul(&u->z,&u->z,&b->n);
     }
   }
-  if (mpz_isNeg(u->n))
+  if (mpz_isNeg(&u->n))
   {
-    mpz_neg(u->z,u->z);
-    mpz_neg(u->n,u->n);
+    mpz_neg(&u->z,&u->z);
+    mpz_neg(&u->n,&u->n);
   }
-  if (mpz_cmp_si(u->n,(long)1)==0)
+  if (mpz_cmp_si(&u->n,(long)1)==0)
   {
-    mpz_clear(u->n);
+    mpz_clear(&u->n);
+    if (mpz_size1(&u->z)<=MP_SMALL)
+    {
+      int ui=(int)mpz_get_si(&u->z);
+      if ((((ui<<3)>>3)==ui)
+      && (mpz_cmp_si(&u->z,(long)ui)==0))
+      {
+        mpz_clear(&u->z);
+        omFreeBin((void *)u, rnumber_bin);
+        return INT_TO_SR(ui);
+      }
+    }
     u->s=3;
-    u=nlShort3(u);
   }
+#ifdef LDEBUG
   nlTest(u);
+#endif
   return u;
 }
 
@@ -910,7 +976,9 @@ void nlPower (number x,int exp,number * u, const coeffs r)
   *u = INT_TO_SR(0); // 0^e, e!=0
   if (!nlIsZero(x,r))
   {
+#ifdef LDEBUG
     nlTest(x);
+#endif
     number aa=NULL;
     if (SR_HDL(x) & SR_INT)
     {
@@ -919,31 +987,41 @@ void nlPower (number x,int exp,number * u, const coeffs r)
     }
     else if (x->s==0)
       nlNormalize(x,r);
-    *u=ALLOC_RNUMBER();
+    *u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
     (*u)->debug=123456;
 #endif
-    mpz_init((*u)->z);
-    mpz_pow_ui((*u)->z,x->z,(unsigned long)exp);
+    mpz_init(&(*u)->z);
+    mpz_pow_ui(&(*u)->z,&x->z,(unsigned long)exp);
     if (x->s<2)
     {
-      if (mpz_cmp_si(x->n,(long)1)==0)
+      if (mpz_cmp_si(&x->n,(long)1)==0)
       {
         x->s=3;
-        mpz_clear(x->n);
+        mpz_clear(&x->n);
       }
       else
       {
-        mpz_init((*u)->n);
-        mpz_pow_ui((*u)->n,x->n,(unsigned long)exp);
+        mpz_init(&(*u)->n);
+        mpz_pow_ui(&(*u)->n,&x->n,(unsigned long)exp);
       }
     }
     (*u)->s = x->s;
-    if ((*u)->s==3) *u=nlShort3(*u);
+    if (((*u)->s==3) && (mpz_size1(&(*u)->z)<=MP_SMALL))
+    {
+      int ui=(int)mpz_get_si(&(*u)->z);
+      if ((((ui<<3)>>3)==ui)
+      && (mpz_cmp_si(&(*u)->z,(long)ui)==0))
+      {
+        mpz_clear(&(*u)->z);
+        omFreeBin((void *)*u, rnumber_bin);
+        *u=INT_TO_SR(ui);
+      }
+    }
     if (aa!=NULL)
     {
-      mpz_clear(aa->z);
-      FREE_RNUMBER(aa);
+      mpz_clear(&aa->z);
+      omFreeBin((void *)aa, rnumber_bin);
     }
   }
   else if (exp==0)
@@ -960,9 +1038,11 @@ void nlPower (number x,int exp,number * u, const coeffs r)
 */
 BOOLEAN nlGreaterZero (number a)
 {
+#ifdef LDEBUG
   nlTest(a);
-  if (SR_HDL(a) & SR_INT) return SR_HDL(a)>1L /* represents number(0) */;
-  return (!mpz_isNeg(a->z));
+#endif
+  if (SR_HDL(a) & SR_INT) return SR_HDL(a)>1 /* represents number(0) */;
+  return (!mpz_isNeg(&a->z));
 }
 
 /*2
@@ -970,8 +1050,10 @@ BOOLEAN nlGreaterZero (number a)
 */
 BOOLEAN nlGreater (number a, number b, const coeffs r)
 {
+#ifdef LDEBUG
   nlTest(a);
   nlTest(b);
+#endif
   number re;
   BOOLEAN rr;
   re=nlSub(a,b,r);
@@ -989,9 +1071,9 @@ BOOLEAN nlIsMOne (number a)
   if (a==NULL) return FALSE;
   nlTest(a);
 #endif
-  //if (SR_HDL(a) & SR_INT) return (a==INT_TO_SR(-1L));
+  //if (SR_HDL(a) & SR_INT) return (a==INT_TO_SR(-1));
   //return FALSE;
-  return  (a==INT_TO_SR(-1L));
+  return  (a==INT_TO_SR(-1));
 }
 
 /*2
@@ -1000,24 +1082,26 @@ BOOLEAN nlIsMOne (number a)
 number nlGcd(number a, number b, const coeffs r)
 {
   number result;
+#ifdef LDEBUG
   nlTest(a);
   nlTest(b);
+#endif
   //nlNormalize(a);
   //nlNormalize(b);
-  if ((a==INT_TO_SR(1L))||(a==INT_TO_SR(-1L))
-  ||  (b==INT_TO_SR(1L))||(b==INT_TO_SR(-1L)))
-    return INT_TO_SR(1L);
+  if ((a==INT_TO_SR(1))||(a==INT_TO_SR(-1))
+  ||  (b==INT_TO_SR(1))||(b==INT_TO_SR(-1)))
+    return INT_TO_SR(1);
   if (a==INT_TO_SR(0)) /* gcd(0,b) ->b */
     return nlCopy(b,r);
   if (b==INT_TO_SR(0)) /* gcd(a,0) -> a */
     return nlCopy(a,r);
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    long i=SR_TO_INT(a);
-    long j=SR_TO_INT(b);
-    if((i==0L)||(j==0L))
+    int i=SR_TO_INT(a);
+    int j=SR_TO_INT(b);
+    if((i==0)||(j==0))
       return INT_TO_SR(1);
-    long l;
+    int l;
     i=ABS(i);
     j=ABS(j);
     do
@@ -1025,48 +1109,43 @@ number nlGcd(number a, number b, const coeffs r)
       l=i%j;
       i=j;
       j=l;
-    } while (l!=0L);
-    if (i==POW_2_28)
-      result=nlRInit(POW_2_28);
-    else
-     result=INT_TO_SR(i);
-    nlTest(result);
-    return result;
+    } while (l!=0);
+    return INT_TO_SR(i);
   }
   if (((!(SR_HDL(a) & SR_INT))&&(a->s<2))
   ||  ((!(SR_HDL(b) & SR_INT))&&(b->s<2))) return INT_TO_SR(1);
   if (SR_HDL(a) & SR_INT)
   {
-    LONG aa=ABS(SR_TO_INT(a));
-    unsigned long t=mpz_gcd_ui(NULL,b->z,(long)aa);
-    if (t==POW_2_28)
-      result=nlRInit(POW_2_28);
-    else
-     result=INT_TO_SR(t);
-    nlTest(result);
+    unsigned long t=mpz_gcd_ui(NULL,&b->z,ABS(SR_TO_INT(a)));
+    return INT_TO_SR((int)t);
   }
   else
   if (SR_HDL(b) & SR_INT)
   {
-    LONG bb=ABS(SR_TO_INT(b));
-    unsigned long t=mpz_gcd_ui(NULL,a->z,(long)bb);
-    if (t==POW_2_28)
-      result=nlRInit(POW_2_28);
-    else
-     result=INT_TO_SR(t);
-    nlTest(result);
+    unsigned long t=mpz_gcd_ui(NULL,&a->z,ABS(SR_TO_INT(b)));
+    return INT_TO_SR((int)t);
   }
   else
   {
-    result=ALLOC_RNUMBER();
-    mpz_init(result->z);
-    mpz_gcd(result->z,a->z,b->z);
+    result=(number)omAllocBin(rnumber_bin);
+    mpz_init(&result->z);
+    mpz_gcd(&result->z,&a->z,&b->z);
+    if (mpz_size1(&result->z)<=MP_SMALL)
+    {
+      int ui=(int)mpz_get_si(&result->z);
+      if ((((ui<<3)>>3)==ui)
+      && (mpz_cmp_si(&result->z,(long)ui)==0))
+      {
+        mpz_clear(&result->z);
+        omFreeBin((void *)result, rnumber_bin);
+        return INT_TO_SR(ui);
+      }
+    }
     result->s = 3;
   #ifdef LDEBUG
     result->debug=123456;
-  #endif
-    result=nlShort3(result);
     nlTest(result);
+  #endif
   }
   return result;
 }
@@ -1074,17 +1153,34 @@ number nlGcd(number a, number b, const coeffs r)
 number nlShort1(number x) // assume x->s==0/1
 {
   assume(x->s<2);
-  if (mpz_cmp_ui(x->z,(long)0)==0)
+  if (mpz_cmp_ui(&x->z,(long)0)==0)
   {
     _nlDelete_NoImm(&x);
     return INT_TO_SR(0);
   }
   if (x->s<2)
   {
-    if (mpz_cmp(x->z,x->n)==0)
+    if (mpz_cmp(&x->z,&x->n)==0)
     {
       _nlDelete_NoImm(&x);
       return INT_TO_SR(1);
+    }
+  }
+  return x;
+}
+number nlShort3(number x) // assume x->s==3
+{
+  assume(x->s==3);
+  if ((mpz_cmp_ui(&x->z,(long)0)==0)
+  || (mpz_size1(&x->z)<=MP_SMALL))
+  {
+    int ui=(int)mpz_get_si(&x->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&x->z,(long)ui)==0))
+    {
+      mpz_clear(&x->z);
+      omFreeBin((void *)x, rnumber_bin);
+      return INT_TO_SR(ui);
     }
   }
   return x;
@@ -1096,46 +1192,79 @@ void nlNormalize (number &x, const coeffs r)
 {
   if ((SR_HDL(x) & SR_INT) ||(x==NULL))
     return;
+#ifdef LDEBUG
+  if (!nlTest(x)) { if (x->s!=3) x->s=1; return; }
+#endif
   if (x->s==3)
   {
-    x=nlShort3_noinline(x);
-    nlTest(x);
+    x=nlShort3(x);
     return;
   }
   else if (x->s==0)
   {
-    if (mpz_cmp_si(x->n,(long)1)==0)
+    if (mpz_cmp_si(&x->n,(long)1)==0)
     {
-      mpz_clear(x->n);
+      mpz_clear(&x->n);
+      if (mpz_size1(&x->z)<=MP_SMALL)
+      {
+        int ui=(int)mpz_get_si(&x->z);
+        if ((((ui<<3)>>3)==ui)
+        && (mpz_cmp_si(&x->z,(long)ui)==0))
+        {
+          mpz_clear(&x->z);
+#if defined(LDEBUG)
+          x->debug=654324;
+#endif
+          omFreeBin((void *)x, rnumber_bin);
+          x=INT_TO_SR(ui);
+          return;
+        }
+      }
       x->s=3;
-      x=nlShort3(x);
     }
     else
     {
-      mpz_t gcd;
-      mpz_init(gcd);
-      mpz_gcd(gcd,x->z,x->n);
+      MP_INT gcd;
+      mpz_init(&gcd);
+      mpz_gcd(&gcd,&x->z,&x->n);
       x->s=1;
-      if (mpz_cmp_si(gcd,(long)1)!=0)
+      if (mpz_cmp_si(&gcd,(long)1)!=0)
       {
-        mpz_t r;
-        mpz_init(r);
-        MPZ_EXACTDIV(r,x->z,gcd);
-        mpz_set(x->z,r);
-        MPZ_EXACTDIV(r,x->n,gcd);
-        mpz_set(x->n,r);
-        mpz_clear(r);
-        if (mpz_cmp_si(x->n,(long)1)==0)
+        MP_INT r;
+        mpz_init(&r);
+        MPZ_EXACTDIV(&r,&x->z,&gcd);
+        mpz_set(&x->z,&r);
+        MPZ_EXACTDIV(&r,&x->n,&gcd);
+        mpz_set(&x->n,&r);
+        mpz_clear(&r);
+        if (mpz_cmp_si(&x->n,(long)1)==0)
         {
-          mpz_clear(x->n);
+          mpz_clear(&x->n);
+          if (mpz_size1(&x->z)<=MP_SMALL)
+          {
+            int ui=(int)mpz_get_si(&x->z);
+            if ((((ui<<3)>>3)==ui)
+            && (mpz_cmp_si(&x->z,(long)ui)==0))
+            {
+              mpz_clear(&x->z);
+              mpz_clear(&gcd);
+#if defined(LDEBUG)
+              x->debug=654324;
+#endif
+              omFreeBin((void *)x, rnumber_bin);
+              x=INT_TO_SR(ui);
+              return;
+            }
+          }
           x->s=3;
-          x=nlShort3_noinline(x);
         }
       }
-      mpz_clear(gcd);
+      mpz_clear(&gcd);
     }
   }
+#ifdef LDEBUG
   nlTest(x);
+#endif
 }
 
 /*2
@@ -1144,45 +1273,59 @@ void nlNormalize (number &x, const coeffs r)
 number nlLcm(number a, number b, const coeffs r)
 {
   number result;
+#ifdef LDEBUG
   nlTest(a);
   nlTest(b);
+#endif
   if ((SR_HDL(b) & SR_INT)
   || (b->s==3))
   {
     // b is 1/(b->n) => b->n is 1 => result is a
     return nlCopy(a,r);
   }
-  result=ALLOC_RNUMBER();
+  result=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   result->debug=123456;
 #endif
   result->s=3;
-  mpz_t gcd;
-  mpz_init(gcd);
-  mpz_init(result->z);
+  MP_INT gcd;
+  mpz_init(&gcd);
+  mpz_init(&result->z);
   if (SR_HDL(a) & SR_INT)
-    mpz_gcd_ui(gcd,b->n,ABS(SR_TO_INT(a)));
+    mpz_gcd_ui(&gcd,&b->n,ABS(SR_TO_INT(a)));
   else
-    mpz_gcd(gcd,a->z,b->n);
-  if (mpz_cmp_si(gcd,(long)1)!=0)
+    mpz_gcd(&gcd,&a->z,&b->n);
+  if (mpz_cmp_si(&gcd,(long)1)!=0)
   {
-    mpz_t bt;
-    mpz_init_set(bt,b->n);
-    MPZ_EXACTDIV(bt,bt,gcd);
+    MP_INT bt;
+    mpz_init_set(&bt,&b->n);
+    MPZ_EXACTDIV(&bt,&bt,&gcd);
     if (SR_HDL(a) & SR_INT)
-      mpz_mul_si(result->z,bt,SR_TO_INT(a));
+      mpz_mul_si(&result->z,&bt,SR_TO_INT(a));
     else
-      mpz_mul(result->z,bt,a->z);
-    mpz_clear(bt);
+      mpz_mul(&result->z,&bt,&a->z);
+    mpz_clear(&bt);
   }
   else
     if (SR_HDL(a) & SR_INT)
-      mpz_mul_si(result->z,b->n,SR_TO_INT(a));
+      mpz_mul_si(&result->z,&b->n,SR_TO_INT(a));
     else
-      mpz_mul(result->z,b->n,a->z);
-  mpz_clear(gcd);
-  result=nlShort3(result);
+      mpz_mul(&result->z,&b->n,&a->z);
+  mpz_clear(&gcd);
+  if (mpz_size1(&result->z)<=MP_SMALL)
+  {
+    int ui=(int)mpz_get_si(&result->z);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(&result->z,(long)ui)==0))
+    {
+      mpz_clear(&result->z);
+      omFreeBin((void *)result, rnumber_bin);
+      return INT_TO_SR(ui);
+    }
+  }
+#ifdef LDEBUG
   nlTest(result);
+#endif
   return result;
 }
 
@@ -1190,14 +1333,14 @@ int nlModP(number n, int p, const coeffs r)
 {
   if (SR_HDL(n) & SR_INT)
   {
-    long i=SR_TO_INT(n);
-    if (i<0L) return (((long)p)-((-i)%((long)p)));
-    return i%((long)p);
+    int i=SR_TO_INT(n);
+    if (i<0) return (p-((-i)%p));
+    return i%p;
   }
-  int iz=(int)mpz_fdiv_ui(n->z,(unsigned long)p);
+  int iz=(int)mpz_mmod_ui(NULL,&n->z,(unsigned long)p);
   if (n->s!=3)
   {
-    int in=mpz_fdiv_ui(n->n,(unsigned long)p);
+    int in=mpz_mmod_ui(NULL,&n->n,(unsigned long)p);
     #ifdef NV_OPS
     if (p>NV_MAX_PRIME)
     return (int)((long)nvDiv((number)iz,(number)in,(const coeffs)r));
@@ -1209,23 +1352,25 @@ int nlModP(number n, int p, const coeffs r)
 
 #ifdef HAVE_RINGS
 /*2
-* convert number i (from Q) to GMP and warn if denom != 1
+* convert number to GMP and warn if denom != 1
 */
 void nlGMP(number &i, number n)
 {
   // Hier brauche ich einfach die GMP Zahl
+#ifdef LDEBUG
   nlTest(i);
+#endif
   nlNormalize(i);
   if (SR_HDL(i) & SR_INT)
   {
-    mpz_set_si((mpz_ptr) n, SR_TO_INT(i));
+    mpz_set_si((MP_INT*) n, (long) SR_TO_INT(i));
     return;
   }
   if (i->s!=3)
   {
      WarnS("Omitted denominator during coefficient mapping !");
   }
-  mpz_set((mpz_ptr) n, i->z);
+  mpz_set((MP_INT*) n, &i->z);
 }
 #endif
 
@@ -1244,13 +1389,22 @@ number   nlGetDenom(number &n, const coeffs r)
     {
       if (n->s!=3)
       {
-        number u=ALLOC_RNUMBER();
+        number u=(number)omAllocBin(rnumber_bin);
         u->s=3;
 #if defined(LDEBUG)
         u->debug=123456;
 #endif
-        mpz_init_set(u->z,n->n);
-        u=nlShort3_noinline(u);
+        mpz_init_set(&u->z,&n->n);
+        {
+          int ui=(int)mpz_get_si(&u->z);
+          if ((((ui<<3)>>3)==ui)
+          && (mpz_cmp_si(&u->z,(long)ui)==0))
+          {
+            mpz_clear(&u->z);
+            omFreeBin((void *)u, rnumber_bin);
+            return INT_TO_SR(ui);
+          }
+        }
         return u;
       }
     }
@@ -1271,15 +1425,22 @@ number   nlGetNumerator(number &n, const coeffs r)
     }
     if (!(SR_HDL(n) & SR_INT))
     {
-      number u=ALLOC_RNUMBER();
+      number u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
       u->debug=123456;
 #endif
       u->s=3;
-      mpz_init_set(u->z,n->z);
+      mpz_init_set(&u->z,&n->z);
       if (n->s!=3)
       {
-        u=nlShort3_noinline(u);
+        int ui=(int)mpz_get_si(&u->z);
+        if ((((ui<<3)>>3)==ui)
+        && (mpz_cmp_si(&u->z,(long)ui)==0))
+        {
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
+          return INT_TO_SR(ui);
+        }
       }
       return u;
     }
@@ -1307,34 +1468,34 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b)
   {
     if (b->s!=0)
       return FALSE;
-    if (((long)a > 0L) && (mpz_isNeg(b->z)))
+    if (((long)a > 0L) && (mpz_isNeg(&b->z)))
       return FALSE;
-    if (((long)a < 0L) && (!mpz_isNeg(b->z)))
+    if (((long)a < 0L) && (!mpz_isNeg(&b->z)))
       return FALSE;
-    mpz_t  bb;
-    mpz_init_set(bb,b->n);
-    mpz_mul_si(bb,bb,(long)SR_TO_INT(a));
-    bo=(mpz_cmp(bb,b->z)==0);
-    mpz_clear(bb);
+    MP_INT  bb;
+    mpz_init_set(&bb,&b->n);
+    mpz_mul_si(&bb,&bb,(long)SR_TO_INT(a));
+    bo=(mpz_cmp(&bb,&b->z)==0);
+    mpz_clear(&bb);
     return bo;
   }
 // long - long
   if (((a->s==1) && (b->s==3))
   ||  ((b->s==1) && (a->s==3)))
     return FALSE;
-  if (mpz_isNeg(a->z)&&(!mpz_isNeg(b->z)))
+  if (mpz_isNeg(&a->z)&&(!mpz_isNeg(&b->z)))
     return FALSE;
-  if (mpz_isNeg(b->z)&&(!mpz_isNeg(a->z)))
+  if (mpz_isNeg(&b->z)&&(!mpz_isNeg(&a->z)))
     return FALSE;
-  mpz_t  aa;
-  mpz_t  bb;
-  mpz_init_set(aa,a->z);
-  mpz_init_set(bb,b->z);
-  if (a->s<2) mpz_mul(bb,bb,a->n);
-  if (b->s<2) mpz_mul(aa,aa,b->n);
-  bo=(mpz_cmp(aa,bb)==0);
-  mpz_clear(aa);
-  mpz_clear(bb);
+  MP_INT  aa;
+  MP_INT  bb;
+  mpz_init_set(&aa,&a->z);
+  mpz_init_set(&bb,&b->z);
+  if (a->s<2) mpz_mul(&bb,&bb,&a->n);
+  if (b->s<2) mpz_mul(&aa,&aa,&b->n);
+  bo=(mpz_cmp(&aa,&bb)==0);
+  mpz_clear(&aa);
+  mpz_clear(&bb);
   return bo;
 }
 
@@ -1342,8 +1503,10 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b)
 number _nlCopy_NoImm(number a)
 {
   assume(!((SR_HDL(a) & SR_INT)||(a==NULL)));
+#ifdef LDEBUG
   nlTest(a);
-  number b=ALLOC_RNUMBER();
+#endif
+  number b=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   b->debug=123456;
 #endif
@@ -1351,13 +1514,15 @@ number _nlCopy_NoImm(number a)
   {
     case 0:
     case 1:
-            mpz_init_set(b->n,a->n);
+            mpz_init_set(&b->n,&a->n);
     case 3:
-            mpz_init_set(b->z,a->z);
+            mpz_init_set(&b->z,&a->z);
             break;
   }
   b->s = a->s;
+#ifdef LDEBUG
   nlTest(b);
+#endif
   return b;
 }
 
@@ -1368,9 +1533,9 @@ void _nlDelete_NoImm(number *a)
     {
       case 0:
       case 1:
-        mpz_clear((*a)->n);
+        mpz_clear(&(*a)->n);
       case 3:
-        mpz_clear((*a)->z);
+        mpz_clear(&(*a)->z);
 #ifdef LDEBUG
         (*a)->s=2;
 #endif
@@ -1382,23 +1547,32 @@ void _nlDelete_NoImm(number *a)
 number _nlNeg_NoImm(number a)
 {
   {
-    mpz_neg(a->z,a->z);
-    if (a->s==3)
+    mpz_neg(&a->z,&a->z);
+    if ((a->s==3) && (mpz_size1(&a->z)<=MP_SMALL))
     {
-      a=nlShort3(a);
+      int ui=(int)mpz_get_si(&a->z);
+      if ((((ui<<3)>>3)==ui)
+        && (mpz_cmp_si(&a->z,(long)ui)==0))
+      {
+        mpz_clear(&a->z);
+        omFreeBin((void *)a, rnumber_bin);
+        a=INT_TO_SR(ui);
+      }
     }
   }
+#ifdef LDEBUG
   nlTest(a);
+#endif
   return a;
 }
 
 number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
 {
-  number u=ALLOC_RNUMBER();
+  number u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
-  mpz_init(u->z);
+  mpz_init(&u->z);
   if (SR_HDL(b) & SR_INT)
   {
     number x=a;
@@ -1412,41 +1586,52 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
       case 0:
       case 1:/* a:short, b:1 */
       {
-        mpz_t x;
-        mpz_init(x);
-        mpz_mul_si(x,b->n,SR_TO_INT(a));
-        mpz_add(u->z,b->z,x);
-        mpz_clear(x);
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+        MP_INT x;
+        mpz_init(&x);
+        mpz_mul_si(&x,&b->n,SR_TO_INT(a));
+        mpz_add(&u->z,&b->z,&x);
+        mpz_clear(&x);
+        if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(0);
         }
-        if (mpz_cmp(u->z,b->n)==0)
+        if (mpz_cmp(&u->z,&b->n)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(1);
         }
-        mpz_init_set(u->n,b->n);
+        mpz_init_set(&u->n,&b->n);
         u->s = 0;
         break;
       }
       case 3:
       {
         if ((long)a>0L)
-          mpz_add_ui(u->z,b->z,SR_TO_INT(a));
+          mpz_add_ui(&u->z,&b->z,SR_TO_INT(a));
         else
-          mpz_sub_ui(u->z,b->z,-SR_TO_INT(a));
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+          mpz_sub_ui(&u->z,&b->z,-SR_TO_INT(a));
+        if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(0);
         }
+        //u->s = 3;
+        if (mpz_size1(&u->z)<=MP_SMALL)
+        {
+          int ui=(int)mpz_get_si(&u->z);
+          if ((((ui<<3)>>3)==ui)
+          && (mpz_cmp_si(&u->z,(long)ui)==0))
+          {
+            mpz_clear(&u->z);
+            omFreeBin((void *)u, rnumber_bin);
+            return INT_TO_SR(ui);
+          }
+        }
         u->s = 3;
-        u=nlShort3(u);
         break;
       }
     }
@@ -1463,27 +1648,27 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           case 0:
           case 1:
           {
-            mpz_t x;
-            mpz_init(x);
+            MP_INT x;
+            mpz_init(&x);
 
-            mpz_mul(x,b->z,a->n);
-            mpz_mul(u->z,a->z,b->n);
-            mpz_add(u->z,u->z,x);
-            mpz_clear(x);
+            mpz_mul(&x,&b->z,&a->n);
+            mpz_mul(&u->z,&a->z,&b->n);
+            mpz_add(&u->z,&u->z,&x);
+            mpz_clear(&x);
 
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(0);
             }
-            mpz_init(u->n);
-            mpz_mul(u->n,a->n,b->n);
-            if (mpz_cmp(u->z,u->n)==0)
+            mpz_init(&u->n);
+            mpz_mul(&u->n,&a->n,&b->n);
+            if (mpz_cmp(&u->z,&u->n)==0)
             {
-               mpz_clear(u->z);
-               mpz_clear(u->n);
-               FREE_RNUMBER(u);
+               mpz_clear(&u->z);
+               mpz_clear(&u->n);
+               omFreeBin((void *)u, rnumber_bin);
                return INT_TO_SR(1);
             }
             u->s = 0;
@@ -1491,21 +1676,21 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           }
           case 3: /* a:1 b:3 */
           {
-            mpz_mul(u->z,b->z,a->n);
-            mpz_add(u->z,u->z,a->z);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            mpz_mul(&u->z,&b->z,&a->n);
+            mpz_add(&u->z,&u->z,&a->z);
+            if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(0);
             }
-            if (mpz_cmp(u->z,a->n)==0)
+            if (mpz_cmp(&u->z,&a->n)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(1);
             }
-            mpz_init_set(u->n,a->n);
+            mpz_init_set(&u->n,&a->n);
             u->s = 0;
             break;
           }
@@ -1519,35 +1704,45 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
           case 0:
           case 1:/* a:3, b:1 */
           {
-            mpz_mul(u->z,a->z,b->n);
-            mpz_add(u->z,u->z,b->z);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            mpz_mul(&u->z,&a->z,&b->n);
+            mpz_add(&u->z,&u->z,&b->z);
+            if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(0);
             }
-            if (mpz_cmp(u->z,b->n)==0)
+            if (mpz_cmp(&u->z,&b->n)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(1);
             }
-            mpz_init_set(u->n,b->n);
+            mpz_init_set(&u->n,&b->n);
             u->s = 0;
             break;
           }
           case 3:
           {
-            mpz_add(u->z,a->z,b->z);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            mpz_add(&u->z,&a->z,&b->z);
+            if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(0);
             }
+            if (mpz_size1(&u->z)<=MP_SMALL)
+            {
+              int ui=(int)mpz_get_si(&u->z);
+              if ((((ui<<3)>>3)==ui)
+              && (mpz_cmp_si(&u->z,(long)ui)==0))
+              {
+                mpz_clear(&u->z);
+                omFreeBin((void *)u, rnumber_bin);
+                return INT_TO_SR(ui);
+              }
+            }
             u->s = 3;
-            u=nlShort3(u);
             break;
           }
         }
@@ -1555,17 +1750,19 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
+#ifdef LDEBUG
   nlTest(u);
+#endif
   return u;
 }
 
 number _nlSub_aNoImm_OR_bNoImm(number a, number b)
 {
-  number u=ALLOC_RNUMBER();
+  number u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
-  mpz_init(u->z);
+  mpz_init(&u->z);
   if (SR_HDL(a) & SR_INT)
   {
     switch (b->s)
@@ -1573,24 +1770,24 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       case 0:
       case 1:/* a:short, b:1 */
       {
-        mpz_t x;
-        mpz_init(x);
-        mpz_mul_si(x,b->n,SR_TO_INT(a));
-        mpz_sub(u->z,x,b->z);
-        mpz_clear(x);
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+        MP_INT x;
+        mpz_init(&x);
+        mpz_mul_si(&x,&b->n,SR_TO_INT(a));
+        mpz_sub(&u->z,&x,&b->z);
+        mpz_clear(&x);
+        if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(0);
         }
-        if (mpz_cmp(u->z,b->n)==0)
+        if (mpz_cmp(&u->z,&b->n)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(1);
         }
-        mpz_init_set(u->n,b->n);
+        mpz_init_set(&u->n,&b->n);
         u->s = 0;
         break;
       }
@@ -1598,22 +1795,32 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       {
         if ((long)a>0L)
         {
-          mpz_sub_ui(u->z,b->z,SR_TO_INT(a));
-          mpz_neg(u->z,u->z);
+          mpz_sub_ui(&u->z,&b->z,SR_TO_INT(a));
+          mpz_neg(&u->z,&u->z);
         }
         else
         {
-          mpz_add_ui(u->z,b->z,-SR_TO_INT(a));
-          mpz_neg(u->z,u->z);
+          mpz_add_ui(&u->z,&b->z,-SR_TO_INT(a));
+          mpz_neg(&u->z,&u->z);
         }
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+        if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(0);
         }
+        if (mpz_size1(&u->z)<=MP_SMALL)
+        {
+          int ui=(int)mpz_get_si(&u->z);
+          if ((((ui<<3)>>3)==ui)
+          && (mpz_cmp_si(&u->z,(long)ui)==0))
+          {
+            mpz_clear(&u->z);
+            omFreeBin((void *)u, rnumber_bin);
+            return INT_TO_SR(ui);
+          }
+        }
         u->s = 3;
-        u=nlShort3(u);
         break;
       }
     }
@@ -1625,24 +1832,24 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       case 0:
       case 1:/* b:short, a:1 */
       {
-        mpz_t x;
-        mpz_init(x);
-        mpz_mul_si(x,a->n,SR_TO_INT(b));
-        mpz_sub(u->z,a->z,x);
-        mpz_clear(x);
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+        MP_INT x;
+        mpz_init(&x);
+        mpz_mul_si(&x,&a->n,SR_TO_INT(b));
+        mpz_sub(&u->z,&a->z,&x);
+        mpz_clear(&x);
+        if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(0);
         }
-        if (mpz_cmp(u->z,a->n)==0)
+        if (mpz_cmp(&u->z,&a->n)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(1);
         }
-        mpz_init_set(u->n,a->n);
+        mpz_init_set(&u->n,&a->n);
         u->s = 0;
         break;
       }
@@ -1650,20 +1857,31 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       {
         if ((long)b>0L)
         {
-          mpz_sub_ui(u->z,a->z,SR_TO_INT(b));
+          mpz_sub_ui(&u->z,&a->z,SR_TO_INT(b));
         }
         else
         {
-          mpz_add_ui(u->z,a->z,-SR_TO_INT(b));
+          mpz_add_ui(&u->z,&a->z,-SR_TO_INT(b));
         }
-        if (mpz_cmp_ui(u->z,(long)0)==0)
+        if (mpz_cmp_ui(&u->z,(long)0)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(0);
         }
+        //u->s = 3;
+        if (mpz_size1(&u->z)<=MP_SMALL)
+        {
+          int ui=(int)mpz_get_si(&u->z);
+          if ((((ui<<3)>>3)==ui)
+          && (mpz_cmp_si(&u->z,(long)ui)==0))
+          {
+            mpz_clear(&u->z);
+            omFreeBin((void *)u, rnumber_bin);
+            return INT_TO_SR(ui);
+          }
+        }
         u->s = 3;
-        u=nlShort3(u);
         break;
       }
     }
@@ -1680,28 +1898,28 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           case 0:
           case 1:
           {
-            mpz_t x;
-            mpz_t y;
-            mpz_init(x);
-            mpz_init(y);
-            mpz_mul(x,b->z,a->n);
-            mpz_mul(y,a->z,b->n);
-            mpz_sub(u->z,y,x);
-            mpz_clear(x);
-            mpz_clear(y);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            MP_INT x;
+            MP_INT y;
+            mpz_init(&x);
+            mpz_init(&y);
+            mpz_mul(&x,&b->z,&a->n);
+            mpz_mul(&y,&a->z,&b->n);
+            mpz_sub(&u->z,&y,&x);
+            mpz_clear(&x);
+            mpz_clear(&y);
+            if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(0);
             }
-            mpz_init(u->n);
-            mpz_mul(u->n,a->n,b->n);
-            if (mpz_cmp(u->z,u->n)==0)
+            mpz_init(&u->n);
+            mpz_mul(&u->n,&a->n,&b->n);
+            if (mpz_cmp(&u->z,&u->n)==0)
             {
-              mpz_clear(u->z);
-              mpz_clear(u->n);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              mpz_clear(&u->n);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(1);
             }
             u->s = 0;
@@ -1709,24 +1927,24 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           }
           case 3: /* a:1, b:3 */
           {
-            mpz_t x;
-            mpz_init(x);
-            mpz_mul(x,b->z,a->n);
-            mpz_sub(u->z,a->z,x);
-            mpz_clear(x);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            MP_INT x;
+            mpz_init(&x);
+            mpz_mul(&x,&b->z,&a->n);
+            mpz_sub(&u->z,&a->z,&x);
+            mpz_clear(&x);
+            if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(0);
             }
-            if (mpz_cmp(u->z,a->n)==0)
+            if (mpz_cmp(&u->z,&a->n)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(1);
             }
-            mpz_init_set(u->n,a->n);
+            mpz_init_set(&u->n,&a->n);
             u->s = 0;
             break;
           }
@@ -1740,38 +1958,49 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
           case 0:
           case 1: /* a:3, b:1 */
           {
-            mpz_t x;
-            mpz_init(x);
-            mpz_mul(x,a->z,b->n);
-            mpz_sub(u->z,x,b->z);
-            mpz_clear(x);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            MP_INT x;
+            mpz_init(&x);
+            mpz_mul(&x,&a->z,&b->n);
+            mpz_sub(&u->z,&x,&b->z);
+            mpz_clear(&x);
+            if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(0);
             }
-            if (mpz_cmp(u->z,b->n)==0)
+            if (mpz_cmp(&u->z,&b->n)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(1);
             }
-            mpz_init_set(u->n,b->n);
+            mpz_init_set(&u->n,&b->n);
             u->s = 0;
             break;
           }
           case 3: /* a:3 , b:3 */
           {
-            mpz_sub(u->z,a->z,b->z);
-            if (mpz_cmp_ui(u->z,(long)0)==0)
+            mpz_sub(&u->z,&a->z,&b->z);
+            if (mpz_cmp_ui(&u->z,(long)0)==0)
             {
-              mpz_clear(u->z);
-              FREE_RNUMBER(u);
+              mpz_clear(&u->z);
+              omFreeBin((void *)u, rnumber_bin);
               return INT_TO_SR(0);
             }
+            //u->s = 3;
+            if (mpz_size1(&u->z)<=MP_SMALL)
+            {
+              int ui=(int)mpz_get_si(&u->z);
+              if ((((ui<<3)>>3)==ui)
+              && (mpz_cmp_si(&u->z,(long)ui)==0))
+              {
+                mpz_clear(&u->z);
+                omFreeBin((void *)u, rnumber_bin);
+                return INT_TO_SR(ui);
+              }
+            }
             u->s = 3;
-            u=nlShort3(u);
             break;
           }
         }
@@ -1779,21 +2008,25 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
+#ifdef LDEBUG
   nlTest(u);
+#endif
   return u;
 }
 
 // a and b are intermediate, but a*b not
 number _nlMult_aImm_bImm_rNoImm(number a, number b)
 {
-  number u=ALLOC_RNUMBER();
+  number u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
   u->s=3;
-  mpz_init_set_si(u->z,SR_TO_INT(a));
-  mpz_mul_si(u->z,u->z,SR_TO_INT(b));
+  mpz_init_set_si(&u->z,(long)SR_TO_INT(a));
+  mpz_mul_si(&u->z,&u->z,(long)SR_TO_INT(b));
+#ifdef LDEBUG
   nlTest(u);
+#endif
   return u;
 }
 
@@ -1801,11 +2034,11 @@ number _nlMult_aImm_bImm_rNoImm(number a, number b)
 number _nlMult_aNoImm_OR_bNoImm(number a, number b)
 {
   assume(! (SR_HDL(a) & SR_HDL(b) & SR_INT));
-  number u=ALLOC_RNUMBER();
+  number u=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   u->debug=123456;
 #endif
-  mpz_init(u->z);
+  mpz_init(&u->z);
   if (SR_HDL(b) & SR_INT)
   {
     number x=a;
@@ -1818,40 +2051,50 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
     if (u->s==1) u->s=0;
     if ((long)a>0L)
     {
-      mpz_mul_ui(u->z,b->z,(unsigned long)SR_TO_INT(a));
+      mpz_mul_ui(&u->z,&b->z,(unsigned long)SR_TO_INT(a));
     }
     else
     {
       if (a==INT_TO_SR(-1))
       {
-        mpz_set(u->z,b->z);
-        mpz_neg(u->z,u->z);
+        mpz_set(&u->z,&b->z);
+        mpz_neg(&u->z,&u->z);
         u->s=b->s;
       }
       else
       {
-        mpz_mul_ui(u->z,b->z,(unsigned long)-SR_TO_INT(a));
-        mpz_neg(u->z,u->z);
+        mpz_mul_ui(&u->z,&b->z,(unsigned long)-SR_TO_INT(a));
+        mpz_neg(&u->z,&u->z);
       }
     }
     if (u->s<2)
     {
-      if (mpz_cmp(u->z,b->n)==0)
+      if (mpz_cmp(&u->z,&b->n)==0)
       {
-        mpz_clear(u->z);
-        FREE_RNUMBER(u);
+        mpz_clear(&u->z);
+        omFreeBin((void *)u, rnumber_bin);
         return INT_TO_SR(1);
       }
-      mpz_init_set(u->n,b->n);
+      mpz_init_set(&u->n,&b->n);
     }
     else //u->s==3
     {
-      u=nlShort3(u);
+      if (mpz_size1(&u->z)<=MP_SMALL)
+      {
+        int ui=(int)mpz_get_si(&u->z);
+        if ((((ui<<3)>>3)==ui)
+            && (mpz_cmp_si(&u->z,(long)ui)==0))
+        {
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
+          return INT_TO_SR(ui);
+        }
+      }
     }
   }
   else
   {
-    mpz_mul(u->z,a->z,b->z);
+    mpz_mul(&u->z,&a->z,&b->z);
     u->s = 0;
     if(a->s==3)
     {
@@ -1861,42 +2104,44 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
       }
       else
       {
-        if (mpz_cmp(u->z,b->n)==0)
+        if (mpz_cmp(&u->z,&b->n)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(1);
         }
-        mpz_init_set(u->n,b->n);
+        mpz_init_set(&u->n,&b->n);
       }
     }
     else
     {
       if(b->s==3)
       {
-        if (mpz_cmp(u->z,a->n)==0)
+        if (mpz_cmp(&u->z,&a->n)==0)
         {
-          mpz_clear(u->z);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(1);
         }
-        mpz_init_set(u->n,a->n);
+        mpz_init_set(&u->n,&a->n);
       }
       else
       {
-        mpz_init(u->n);
-        mpz_mul(u->n,a->n,b->n);
-        if (mpz_cmp(u->z,u->n)==0)
+        mpz_init(&u->n);
+        mpz_mul(&u->n,&a->n,&b->n);
+        if (mpz_cmp(&u->z,&u->n)==0)
         {
-          mpz_clear(u->z);
-          mpz_clear(u->n);
-          FREE_RNUMBER(u);
+          mpz_clear(&u->z);
+          mpz_clear(&u->n);
+          omFreeBin((void *)u, rnumber_bin);
           return INT_TO_SR(1);
         }
       }
     }
   }
+#ifdef LDEBUG
   nlTest(u);
+#endif
   return u;
 }
 
@@ -1950,13 +2195,13 @@ nMapFunc nlSetMap(const coeffs src, const coeffs dst)
 /*2
 * z := i
 */
-number nlRInit (long i)
+number nlRInit (int i)
 {
-  number z=ALLOC_RNUMBER();
+  number z=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   z->debug=123456;
 #endif
-  mpz_init_set_si(z->z,i);
+  mpz_init_set_si(&z->z,(long)i);
   z->s = 3;
   return z;
 }
@@ -1966,12 +2211,12 @@ number nlRInit (long i)
 */
 number nlInit2 (int i, int j, const coeffs r)
 {
-  number z=ALLOC_RNUMBER();
+  number z=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   z->debug=123456;
 #endif
-  mpz_init_set_si(z->z,(long)i);
-  mpz_init_set_si(z->n,(long)j);
+  mpz_init_set_si(&z->z,(long)i);
+  mpz_init_set_si(&z->n,(long)j);
   z->s = 0;
   nlNormalize(z,r);
   return z;
@@ -1979,12 +2224,12 @@ number nlInit2 (int i, int j, const coeffs r)
 
 number nlInit2gmp (mpz_t i, mpz_t j, const coeffs r)
 {
-  number z=ALLOC_RNUMBER();
+  number z=(number)omAllocBin(rnumber_bin);
 #if defined(LDEBUG)
   z->debug=123456;
 #endif
-  mpz_init_set(z->z,i);
-  mpz_init_set(z->n,j);
+  mpz_init_set(&z->z,i);
+  mpz_init_set(&z->n,j);
   z->s = 0;
   nlNormalize(z,r);
   return z;
@@ -2018,8 +2263,10 @@ number  _nlMult_aImm_bImm_rNoImm(number a, number b);
 */
 LINLINE BOOLEAN nlEqual (number a, number b)
 {
+#ifdef LDEBUG
   nlTest(a);
   nlTest(b);
+#endif
 // short - short
   if (SR_HDL(a) & SR_HDL(b) & SR_INT) return a==b;
   return _nlEqual_aNoImm_OR_bNoImm(a, b);
@@ -2029,10 +2276,11 @@ LINLINE BOOLEAN nlEqual (number a, number b)
 LINLINE number nlInit (int i, const coeffs r)
 {
   number n;
-  LONG ii=(LONG)i;
-  if ( ((ii << 3) >> 3) == ii ) n=INT_TO_SR(ii);
-  else                          n=nlRInit(ii);
+  if ( ((i << 3) >> 3) == i ) n=INT_TO_SR(i);
+  else                        n=nlRInit(i);
+#ifdef LDEBUG
   nlTest(n);
+#endif
   return n;
 }
 
@@ -2052,7 +2300,7 @@ LINLINE BOOLEAN nlIsOne (number a)
 LINLINE BOOLEAN nlIsZero (number a, const coeffs r)
 {
   return (a==INT_TO_SR(0));
-  //return (mpz_cmp_si(a->z,(long)0)==0);
+  //return (mpz_cmp_si(&a->z,(long)0)==0);
 }
 
 /*2
@@ -2075,7 +2323,9 @@ LINLINE void nlDelete (number * a, const coeffs r)
 {
   if (*a!=NULL)
   {
+#ifdef LDEBUG
     nlTest(*a);
+#endif
     if ((SR_HDL(*a) & SR_INT)==0)
     {
       _nlDelete_NoImm(a);
@@ -2089,11 +2339,13 @@ LINLINE void nlDelete (number * a, const coeffs r)
 */
 LINLINE number nlNeg (number a, const coeffs r)
 {
+#ifdef LDEBUG
   nlTest(a);
+#endif
   if(SR_HDL(a) &SR_INT)
   {
     int r=SR_TO_INT(a);
-    if (r==(-(POW_2_28))) a=nlRInit(POW_2_28);
+    if (r==(-(1<<28))) a=nlRInit(1<<28);
     else               a=INT_TO_SR(-r);
     return a;
   }
@@ -2108,7 +2360,7 @@ LINLINE number nlAdd (number a, number b, const coeffs r)
   number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    LONG r=SR_HDL(a)+SR_HDL(b)-1L;
+    int r=SR_HDL(a)+SR_HDL(b)-1;
     if ( ((r << 1) >> 1) == r )
       return (number)(long)r;
     else
@@ -2118,13 +2370,13 @@ LINLINE number nlAdd (number a, number b, const coeffs r)
 }
 
 number nlShort1(number a);
-number nlShort3_noinline(number x);
+number nlShort3(number a);
 
 LINLINE number nlInpAdd (number a, number b, const coeffs r)
 {
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    LONG r=SR_HDL(a)+SR_HDL(b)-1L;
+    int r=SR_HDL(a)+SR_HDL(b)-1;
     if ( ((r << 1) >> 1) == r )
       return (number)(long)r;
     else
@@ -2138,11 +2390,11 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
       case 0:
       case 1:/* b:short, a:1 */
       {
-        mpz_t x;
-        mpz_init(x);
-        mpz_mul_si(x,a->n,SR_TO_INT(b));
-        mpz_add(a->z,a->z,x);
-        mpz_clear(x);
+        MP_INT x;
+        mpz_init(&x);
+        mpz_mul_si(&x,&a->n,SR_TO_INT(b));
+        mpz_add(&a->z,&a->z,&x);
+        mpz_clear(&x);
         a->s = 0;
         a=nlShort1(a);
         break;
@@ -2150,11 +2402,12 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
       case 3:
       {
         if ((long)b>0L)
-          mpz_add_ui(a->z,a->z,SR_TO_INT(b));
+          mpz_add_ui(&a->z,&a->z,SR_TO_INT(b));
         else
-          mpz_sub_ui(a->z,a->z,-SR_TO_INT(b));
+          mpz_sub_ui(&a->z,&a->z,-SR_TO_INT(b));
         a->s = 3;
-        a=nlShort3_noinline(a);
+        a=nlShort3(a);
+        //nlNormalize(a);
         break;
       }
     }
@@ -2162,24 +2415,24 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
   }
   if (SR_HDL(a) & SR_INT)
   {
-    number u=ALLOC_RNUMBER();
+    number u=(number)omAllocBin(rnumber_bin);
     #if defined(LDEBUG)
     u->debug=123456;
     #endif
-    mpz_init(u->z);
+    mpz_init(&u->z);
     switch (b->s)
     {
       case 0:
       case 1:/* a:short, b:1 */
       {
-        mpz_t x;
-        mpz_init(x);
+        MP_INT x;
+        mpz_init(&x);
 
-        mpz_mul_si(x,b->n,SR_TO_INT(a));
-        mpz_add(u->z,b->z,x);
-        mpz_clear(x);
+        mpz_mul_si(&x,&b->n,SR_TO_INT(a));
+        mpz_add(&u->z,&b->z,&x);
+        mpz_clear(&x);
         // result cannot be 0, if coeffs are normalized
-        mpz_init_set(u->n,b->n);
+        mpz_init_set(&u->n,&b->n);
         u->s = 0;
         u=nlShort1(u);
         break;
@@ -2187,16 +2440,18 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
       case 3:
       {
         if ((long)a>0L)
-          mpz_add_ui(u->z,b->z,SR_TO_INT(a));
+          mpz_add_ui(&u->z,&b->z,SR_TO_INT(a));
         else
-          mpz_sub_ui(u->z,b->z,-SR_TO_INT(a));
+          mpz_sub_ui(&u->z,&b->z,-SR_TO_INT(a));
         // result cannot be 0, if coeffs are normalized
         u->s = 3;
-        u=nlShort3_noinline(u);
+        u=nlShort3(u);
         break;
       }
     }
+    #ifdef LDEBUG
     nlTest(u);
+    #endif
     return u;
   }
   else
@@ -2211,26 +2466,26 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
           case 0:
           case 1: /* a:1 b:1 */
           {
-            mpz_t x;
-            mpz_t y;
-            mpz_init(x);
-            mpz_init(y);
-            mpz_mul(x,b->z,a->n);
-            mpz_mul(y,a->z,b->n);
-            mpz_add(a->z,x,y);
-            mpz_clear(x);
-            mpz_clear(y);
-            mpz_mul(a->n,a->n,b->n);
+            MP_INT x;
+            MP_INT y;
+            mpz_init(&x);
+            mpz_init(&y);
+            mpz_mul(&x,&b->z,&a->n);
+            mpz_mul(&y,&a->z,&b->n);
+            mpz_add(&a->z,&x,&y);
+            mpz_clear(&x);
+            mpz_clear(&y);
+            mpz_mul(&a->n,&a->n,&b->n);
             a->s = 0;
             break;
           }
           case 3: /* a:1 b:3 */
           {
-            mpz_t x;
-            mpz_init(x);
-            mpz_mul(x,b->z,a->n);
-            mpz_add(a->z,a->z,x);
-            mpz_clear(x);
+            MP_INT x;
+            mpz_init(&x);
+            mpz_mul(&x,&b->z,&a->n);
+            mpz_add(&a->z,&a->z,&x);
+            mpz_clear(&x);
             a->s = 0;
             break;
           }
@@ -2245,46 +2500,49 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
           case 0:
           case 1:/* a:3, b:1 */
           {
-            mpz_t x;
-            mpz_init(x);
-            mpz_mul(x,a->z,b->n);
-            mpz_add(a->z,b->z,x);
-            mpz_clear(x);
-            mpz_init_set(a->n,b->n);
+            MP_INT x;
+            mpz_init(&x);
+            mpz_mul(&x,&a->z,&b->n);
+            mpz_add(&a->z,&b->z,&x);
+            mpz_clear(&x);
+            mpz_init_set(&a->n,&b->n);
             a->s = 0;
             a=nlShort1(a);
             break;
           }
           case 3:
           {
-            mpz_add(a->z,a->z,b->z);
+            mpz_add(&a->z,&a->z,&b->z);
             a->s = 3;
-            a=nlShort3_noinline(a);
+            a=nlShort3(a);
             break;
           }
         }
         break;
       }
     }
+    #ifdef LDEBUG
     nlTest(a);
+    #endif
     return a;
   }
 }
 
 LINLINE number nlMult (number a, number b, const coeffs r)
 {
+#ifdef LDEBUG
   nlTest(a);
   nlTest(b);
-
+#endif
   if (a==INT_TO_SR(0)) return INT_TO_SR(0);
   if (b==INT_TO_SR(0)) return INT_TO_SR(0);
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    LONG r=(SR_HDL(a)-1L)*(SR_HDL(b)>>1);
-    if ((r/(SR_HDL(b)>>1))==(SR_HDL(a)-1L))
+    int r=(SR_HDL(a)-1)*(SR_HDL(b)>>1);
+    if ((r/(SR_HDL(b)>>1))==(SR_HDL(a)-1))
     {
       number u=((number) ((r>>1)+SR_INT));
-      if (((((LONG)SR_HDL(u))<<1)>>1)==SR_HDL(u)) return (u);
+      if (((SR_HDL(u)<<1)>>1)==SR_HDL(u)) return (u);
       return nlRInit(SR_HDL(u)>>2);
     }
     return _nlMult_aImm_bImm_rNoImm(a, b);
@@ -2300,10 +2558,10 @@ LINLINE number nlSub (number a, number b, const coeffs r)
 {
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
-    LONG r=SR_HDL(a)-SR_HDL(b)+1;
+    int r=SR_HDL(a)-SR_HDL(b)+1;
     if ( ((r << 1) >> 1) == r )
     {
-      return (number)(long)r;
+      return (number)r;
     }
     else
       return nlRInit(SR_TO_INT(r));
@@ -2311,36 +2569,6 @@ LINLINE number nlSub (number a, number b, const coeffs r)
   return _nlSub_aNoImm_OR_bNoImm(a, b);
 }
 
-LINLINE void nlInpMult(number &a, number b, const coeffs r)
-{
-  number aa=a;
-  if (((SR_HDL(b)|SR_HDL(aa))&SR_INT))
-  {
-    number n=nlMult(aa,b,r);
-    nlDelete(&a,r);
-    a=n;
-  }
-  else
-  {
-    mpz_mul(aa->z,a->z,b->z);
-    if (aa->s==3)
-    {
-      if(b->s!=3)
-      {
-        mpz_init_set(a->n,b->n);
-        a->s=0;
-      }
-    }
-    else
-    {
-      if(b->s!=3)
-      {
-        mpz_mul(a->n,a->n,b->n);
-      }
-      a->s=0;
-    }
-  }
-}
 #endif // DO_LINLINE
 
 #ifndef P_NUMBERS_H
@@ -2355,8 +2583,18 @@ void nlInpGcd(number &a, number b, const coeffs r)
   }
   else
   {
-    mpz_gcd(a->z,a->z,b->z);
-    a=nlShort3_noinline(a);
+    mpz_gcd(&a->z,&a->z,&b->z);
+    if (mpz_size1(&a->z)<=MP_SMALL)
+    {
+      int ui=(int)mpz_get_si(&a->z);
+      if ((((ui<<3)>>3)==ui)
+      && (mpz_cmp_si(&a->z,(long)ui)==0))
+      {
+        mpz_clear(&a->z);
+        omFreeBin((void *)a, rnumber_bin);
+        a=INT_TO_SR(ui);
+      }
+    }
   }
 }
 void nlInpIntDiv(number &a, number b, const coeffs r)
@@ -2369,90 +2607,127 @@ void nlInpIntDiv(number &a, number b, const coeffs r)
   }
   else
   {
-    if (mpz_isNeg(a->z))
+    if (mpz_isNeg(&a->z))
     {
-      if (mpz_isNeg(b->z))
+      if (mpz_isNeg(&b->z))
       {
-        mpz_add(a->z,a->z,b->z);
+        mpz_add(&a->z,&a->z,&b->z);
       }
       else
       {
-        mpz_sub(a->z,a->z,b->z);
+        mpz_sub(&a->z,&a->z,&b->z);
       }
-      mpz_add_ui(a->z,a->z,1);
+      mpz_add_ui(&a->z,&a->z,1);
     }
     else
     {
-      if (mpz_isNeg(b->z))
+      if (mpz_isNeg(&b->z))
       {
-        mpz_sub(a->z,a->z,b->z);
+        mpz_sub(&a->z,&a->z,&b->z);
       }
       else
       {
-        mpz_add(a->z,a->z,b->z);
+        mpz_add(&a->z,&a->z,&b->z);
       }
-      mpz_sub_ui(a->z,a->z,1);
+      mpz_sub_ui(&a->z,&a->z,1);
     }
-    MPZ_DIV(a->z,a->z,b->z);
-    a=nlShort3_noinline(a);
+    MPZ_DIV(&a->z,&a->z,&b->z);
+    if (mpz_size1(&a->z)<=MP_SMALL)
+    {
+      int ui=(int)mpz_get_si(&a->z);
+      if ((((ui<<3)>>3)==ui)
+      && (mpz_cmp_si(&a->z,(long)ui)==0))
+      {
+        mpz_clear(&a->z);
+        omFreeBin((void *)a, rnumber_bin);
+        a=INT_TO_SR(ui);
+      }
+    }
+  }
+}
+void nlInpMult(number &a, number b, const coeffs r)
+{
+  if (((SR_HDL(b)|SR_HDL(a))&SR_INT)
+  )
+  {
+    number n=nlMult(a,b,r);
+    nlDelete(&a,r);
+    a=n;
+  }
+  else
+  {
+    mpz_mul(&a->z,&a->z,&b->z);
+    if (a->s==3)
+    {
+      if(b->s!=3)
+      {
+        mpz_init_set(&a->n,&b->n);
+        a->s=0;
+      }
+    }
+    else
+    {
+      if(b->s!=3)
+      {
+        mpz_mul(&a->n,&a->n,&b->n);
+      }
+      a->s=0;
+    }
   }
 }
 
 number nlFarey(number nN, number nP, const coeffs r)
 {
-  mpz_t tmp; mpz_init(tmp);
-  mpz_t A,B,C,D,E,N,P;
-  if (SR_HDL(nN) & SR_INT) mpz_init_set_si(N,SR_TO_INT(nN));
-  else                     mpz_init_set(N,nN->z);
-  if (SR_HDL(nP) & SR_INT) mpz_init_set_si(P,SR_TO_INT(nP));
-  else                     mpz_init_set(P,nP->z);
-  assume(!mpz_isNeg(P));
-  if (mpz_isNeg(N))  mpz_add(N,N,P);
-  mpz_init_set_si(A,(long)0);
-  mpz_init_set_ui(B,(unsigned long)1);
-  mpz_init_set_si(C,(long)0);
-  mpz_init(D);
-  mpz_init_set(E,P);
+  MP_INT tmp; mpz_init(&tmp);
+  MP_INT A,B,C,D,E,N,P;
+  if (SR_HDL(nN) & SR_INT) mpz_init_set_si(&N,SR_TO_INT(nN));
+  else                     mpz_init_set(&N,&(nN->z));
+  if (SR_HDL(nP) & SR_INT) mpz_init_set_si(&P,SR_TO_INT(nP));
+  else                     mpz_init_set(&P,&(nP->z));
+  assume(!mpz_isNeg(&P));
+  if (mpz_isNeg(&N))  mpz_add(&N,&N,&P);
+  mpz_init_set_si(&A,(long)0);
+  mpz_init_set_ui(&B,(unsigned long)1);
+  mpz_init_set_si(&C,(long)0);
+  mpz_init(&D);
+  mpz_init_set(&E,&P);
   number z=INT_TO_SR(0);
-  while(mpz_cmp_si(N,(long)0)!=0)
+  while(mpz_cmp_si(&N,(long)0)!=0)
   {
-    mpz_mul(tmp,N,N);
-    mpz_add(tmp,tmp,tmp);
-    if (mpz_cmp(tmp,P)<0)
+    mpz_mul(&tmp,&N,&N);
+    mpz_add(&tmp,&tmp,&tmp);
+    if (mpz_cmp(&tmp,&P)<0)
     {
        // return N/B
-       z=ALLOC_RNUMBER();
-       #ifdef LDEBUG
-       z->debug=123456;
-       #endif
-       if (mpz_isNeg(B))
+       z=(number)omAllocBin(rnumber_bin);
+       if (mpz_isNeg(&B))
        {
-         mpz_neg(B,B);
-         mpz_neg(N,N);
+         mpz_neg(&B,&B);
+         mpz_neg(&N,&N);
        }
-       mpz_init_set(z->z,N);
-       mpz_init_set(z->n,B);
+       mpz_init_set(&z->z,&N);
+       mpz_init_set(&z->n,&B);
        z->s = 0;
        nlNormalize(z,r);
        break;
     }
-    mpz_mod(D,E,N);
-    mpz_div(tmp,E,N);
-    mpz_mul(tmp,tmp,B);
-    mpz_sub(C,A,tmp);
-    mpz_set(E,N);
-    mpz_set(N,D);
-    mpz_set(A,B);
-    mpz_set(B,C);
+    mpz_mod(&D,&E,&N);
+    mpz_div(&tmp,&E,&N);
+    mpz_mul(&tmp,&tmp,&B);
+    mpz_sub(&C,&A,&tmp);
+    mpz_set(&E,&N);
+    mpz_set(&N,&D);
+    mpz_set(&A,&B);
+    mpz_set(&B,&C);
   }
-  mpz_clear(tmp);
-  mpz_clear(A);
-  mpz_clear(B);
-  mpz_clear(C);
-  mpz_clear(D);
-  mpz_clear(E);
-  mpz_clear(N);
-  mpz_clear(P);
+  mpz_clear(&tmp);
+  mpz_clear(&A);
+  mpz_clear(&B);
+  mpz_clear(&C);
+  mpz_clear(&D);
+  mpz_clear(&E);
+  mpz_clear(&N);
+  mpz_clear(&P);
   return z;
 }
 void nlInitChar(coeffs r, int ch)
@@ -2523,9 +2798,9 @@ number nlMod(number a, number b)
   nlDelete(&bl);
   if (mpz_size1(&r->z)<=MP_SMALL)
   {
-    LONG ui=(int)mpz_get_si(&r->z);
+    int ui=(int)mpz_get_si(&r->z);
     if ((((ui<<3)>>3)==ui)
-    && (mpz_cmp_si(x->z,(long)ui)==0))
+    && (mpz_cmp_si(&x->z,(long)ui)==0))
     {
       mpz_clear(&r->z);
       omFreeBin((void *)r, rnumber_bin);

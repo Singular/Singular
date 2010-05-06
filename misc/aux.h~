@@ -41,9 +41,6 @@ typedef short BOOLEAN;
 #endif
 #define loop for(;;)
 
-static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
-
-
 #if defined(SI_CPU_I386) || defined(SI_CPU_X86_64)
   // the following settings seems to be better on i386 and x86_64 processors
   // define if a*b is with mod instead of tables
