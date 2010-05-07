@@ -26,6 +26,7 @@
 
 #include "canonicalform.h"
 #include "cf_map.h"
+#include "cf_util.h"
 #include "ftmpl_functions.h"
 #include "cf_map_ext.cc"
 #include "cf_random.h"
@@ -278,7 +279,7 @@ randomElement (const CanonicalForm & F, const Variable & alpha, CFList & list,
   mipo= getMipo (alpha);
   int p= getCharacteristic ();
   int d= degree (mipo);
-  double bound= pow ((double) p, (double) d);
+  int bound= ipower (p, d);
   do 
   {
     if (list.length() == bound)
@@ -318,7 +319,7 @@ void choose_extension (const int& d, const int& num_vars, Variable& beta)
   ZZ_p::init (NTLp);
   ZZ_pX NTLirredpoly;
   //TODO: replace d by max_{i} (deg_x{i}(f))
-  int i= (int) (log ((double) ::pow ((double)d + 1, (double)num_vars))/log ((double) p)); 
+  int i= (int) (log ((double) ipower (d + 1, num_vars))/log ((double) p)); 
   int m= degree (getMipo (beta));
   if (i <= 1)
     i= 2;
@@ -540,7 +541,7 @@ GFRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   CanonicalForm random;
   int p= getCharacteristic();
   int d= getGFDegree();
-  double bound= pow ((double) p, (double) d);
+  int bound= ipower (p, d);
   do 
   {
     if (list.length() == bound)
@@ -649,7 +650,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
   int p;
   int k= getGFDegree();
   int kk;
-  double expon;
+  int expon;
   char gf_name_buf= gf_name;
   do 
   {
@@ -659,11 +660,11 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
       int num_vars= tmin (getNumVars(A), getNumVars(B));
       num_vars--;
       p= getCharacteristic();
-      expon= floor ((log ((double) ::pow (d + 1, num_vars))/log ((double) p)));
+      expon= floor ((log ((double) ipower (d + 1, num_vars))/log ((double) p)));
       if (expon < 2)
         expon= 2;
       kk= getGFDegree(); 
-      if (::pow ((double)p, (double)kk*expon) < (1 << 16)) 
+      if (ipower (p, kk*expon) < (1 << 16)) 
         setCharacteristic (p, kk*(int)expon, 'b');
       else 
       {
@@ -783,13 +784,12 @@ randomIrredpoly (int i, const Variable & x,
   ZZ_p::init (NTLp);
   ZZ_pX NTLirredpoly; 
   CanonicalForm CFirredpoly;
-  double buf= ceil((log((double) i) / log((double) p)));
+  int buf= ceil((log((double) i) / log((double) p)));
   buf= buf + 1;
-  double bound= 0;
+  int bound= 0;
   //lower bound on the number of monic irreducibles of degree less than buf
   for (int j= 2; j < buf; j++) 
-    bound += ((pow ((double)p, (double) j) - 2*pow((double) p, 
-              (double) (j/2))) / j);
+    bound += ((ipower (p, j) - 2*ipower(p, j/2)) / j);
   if (list.length() > bound) 
   {
     if (buf > 1)
@@ -797,9 +797,8 @@ randomIrredpoly (int i, const Variable & x,
     buf *= 2;
     buf++;
   }
-  for (int j= ((int) (buf - 1)/2) + 1; j < buf; j++) 
-    bound += ((pow ((double)p, (double) j) - 2*pow((double) p, 
-              (double) (j/2))) / j);
+  for (int j=  ((buf - 1)/2) + 1; j < buf; j++) 
+    bound += ((ipower (p, j) - 2*ipower(p, j/2)) / j);
   do 
   {
     if (list.length() <= bound) 
@@ -815,8 +814,7 @@ randomIrredpoly (int i, const Variable & x,
       buf *= 2;
       buf++;
       for (int j= ((int) (buf - 1)/2) + 1; j < buf; j++) 
-        bound += ((pow ((double)p, (double) j) - 2*pow((double) p, 
-                  (double) (j/2))) / j);
+        bound += ((ipower (p, j) - 2*ipower(p, j/2)) / j);
       random= factoryrandom ((int) buf);
       if (random <= 1)
         random= 2;
@@ -835,7 +833,7 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   FFRandom genFF;
   CanonicalForm random;
   int p= getCharacteristic();
-  double bound= p;
+  int bound= p;
   do 
   {
     if (list.length() == bound)
@@ -931,7 +929,6 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   H= 0;
   G_m= 0;
   Variable alpha, V_buf;
-  double expon;
   int p, k;
   bool fail= false;
   bool inextension= false;
