@@ -20,6 +20,7 @@
 
 #include "canonicalform.h"
 #include "cf_primes.h"
+#include "cf_util.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ.h>
@@ -145,7 +146,7 @@ bool isPrimitive (const Variable& alpha, bool& fail)
 {
   int p= getCharacteristic();
   CanonicalForm mipo= getMipo (alpha);
-  int order= int (pow((double) p, (double) degree(mipo))) - 1;
+  int order= ipower(p, degree(mipo)) - 1;
   CanonicalForm cyclo= cyclotomicPoly (order, fail);
   if (fail)
     return false;

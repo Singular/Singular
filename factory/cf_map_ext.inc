@@ -1,6 +1,6 @@
 // -*- c++ -*-
 //*****************************************************************************
-/** @file cf_map_ext.cc
+/** @file cf_map_ext.inc
  *
  * @author Martin Lee	
  * @date   16.11.2009
@@ -22,7 +22,8 @@
 #include "debug.h"
 
 #include "canonicalform.h"
-#include "cf_cyclo.cc"
+#include "cf_cyclo.h"
+#include "cf_util.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ_pEXFactoring.h>
@@ -85,7 +86,7 @@ mapDown (const CanonicalForm& F, const Variable& alpha, const
   int pos;
   int p= getCharacteristic();
   int d= degree(getMipo(alpha));
-  int bound= (int) pow((double) p, (double) d);
+  int bound= ipower(p, d);
   CanonicalForm result= 0;
   CanonicalForm remainder;
   CanonicalForm alpha_power;
@@ -205,8 +206,8 @@ CanonicalForm GFMapUp (const CanonicalForm & F, int k)
   int d= getGFDegree();
   ASSERT (d%k == 0, "multiple of GF degree expected");
   int p= getCharacteristic();
-  int ext_field_size= (int) pow ((double) p, d);
-  int field_size= (int) pow ((double) p, k);
+  int ext_field_size= ipower (p, d);
+  int field_size= ipower ( p, k);
   int diff= (ext_field_size - 1)/(field_size - 1);
   return GFPowUp (F, diff);
 }
@@ -244,8 +245,8 @@ CanonicalForm GFMapDown (const CanonicalForm & F, int k)
   int d= getGFDegree();
   ASSERT (d % k == 0, "multiple of GF degree expected");
   int p= getCharacteristic();
-  int ext_field_size= (int) pow ((double) p, d);
-  int field_size= (int) pow ((double) p, k);
+  int ext_field_size= ipower (p, d);
+  int field_size= ipower ( p, k);
   int diff= (ext_field_size - 1)/(field_size - 1);
   return GFPowDown (F, diff);
 }
@@ -260,7 +261,7 @@ CanonicalForm mapUp (const CanonicalForm& F, const CanonicalForm& G,
   int pos;
   int p= getCharacteristic();
   int d= degree (getMipo(alpha));
-  int bound= (int) pow((double) p, (double) d);
+  int bound= ipower(p, d);
   CanonicalForm result= 0;
   CanonicalForm remainder;
   CanonicalForm H_power;

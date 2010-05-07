@@ -147,7 +147,7 @@ basefactorysrc := \
 		cf_iter_inline.cc \
 		cf_linsys.cc \
 		cf_map.cc \
-                cf_map_ext.cc \
+                cf_map_ext.inc \
 		cf_ops.cc \
 		cf_primes.cc \
 		cf_random.cc \
@@ -214,6 +214,7 @@ basefactoryincl := \
 		canonicalform.h \
 		cf_algorithm.h \
 		cf_binom.h \
+		cf_cyclo.h \
 		cf_defs.h \
 		cf_eval.h \
 		cf_factory.h \

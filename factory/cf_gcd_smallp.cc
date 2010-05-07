@@ -28,8 +28,10 @@
 #include "cf_map.h"
 #include "cf_util.h"
 #include "ftmpl_functions.h"
-#include "cf_map_ext.cc"
 #include "cf_random.h"
+
+// iinline helper functions:
+#include "cf_map_ext.inc"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ_pEX.h>

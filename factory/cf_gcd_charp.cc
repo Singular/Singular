@@ -25,6 +25,7 @@
 #include <cf_random.h>
 #include <cf_algorithm.h>
 #include <cf_map.h>
+#include <cf_util.h>
 
 static CanonicalForm contentWRT(const CanonicalForm & F, const int lev);
 static int degWRT(CanonicalForm F, const int lev);
@@ -231,7 +232,7 @@ static CanonicalForm GFPowDown(const CanonicalForm & A, int k)
 {
   CanonicalForm result = 0;
   int i, j;
-  int fieldSize = (int) ::pow(getCharacteristic(), getGFDegree());
+  int fieldSize = ipower(getCharacteristic(), getGFDegree());
   CanonicalForm g;
   for(i = 0; i <= degree(A); i++)
   {
@@ -352,7 +353,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
   if (CFFactory::gettype() == GaloisFieldDomain)
   {
     k=getGFDegree();
-    fieldSize = (int) ::pow(p, k);
+    fieldSize = ipower(p, k);
   }
 
   //if(debug)
@@ -360,7 +361,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
   //  cout << "p: " << p << endl;
   //  cout << "k: " << k << endl;
   //  cout << "fieldSize: " << fieldSize << endl;
-  //  cout << "pow: " << pow(p, k) << endl;
+  //  cout << "pow: " << ipower(p, k) << endl;
   //}
   
   CFMap M,N;
@@ -509,14 +510,14 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
         degMax = totaldegree(B);
       }
       int expon = 2; // expon <= will not extend the field
-      while(::pow(fieldSize, expon) < degMax)
+      while(ipower(fieldSize, expon) < degMax)
       {
         expon++;
       }
       //if(debug)cout << "Not enough elements in the base field. An extension to " << p << "^" << k*expon << " is needed." << endl;
       if(k > 1)
       {
-        if(::pow(p,k * expon) < (1<<16))
+        if(ipower(p,k * expon) < (1<<16))
         {
           setCharacteristic(p, k * expon, 'b');
           CanonicalForm P1 = GFMapUp(A, k);
@@ -540,7 +541,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
       }
       else
       {
-        if(::pow(p,k * expon) < (1<<16))
+        if(ipower(p,k * expon) < (1<<16))
         {
           setCharacteristic(p, k * expon, 'a');
           CanonicalForm P1 = A.mapinto();
@@ -626,7 +627,7 @@ main()
 
   int k = getGFDegree();
   int p = getCharacteristic();
-  int fieldSize = pow(p, k);
+  int fieldSize = ipower(p, k);
   cout << "p: " << p << endl;
   cout << "GFDegree: " << k << endl;
   cout << "fieldSize: " << fieldSize << endl << endl;

@@ -25,7 +25,8 @@ ipower ( int b, int m )
 {
     int prod = 1;
 
-    while ( m != 0 ) {
+    while ( m != 0 )
+    {
 	if ( m % 2 != 0 )
 	    prod *= b;
 	m /= 2;
