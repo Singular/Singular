@@ -132,7 +132,7 @@ basefactorysrc := \
 		cf_binom.cc \
 		cf_char.cc \
 		cf_chinese.cc \
-                cf_cyclo.cc\
+                cf_cyclo.inc\
 		cf_eval.cc \
 		cf_factor.cc \
 		cf_factory.cc \
@@ -214,7 +214,6 @@ basefactoryincl := \
 		canonicalform.h \
 		cf_algorithm.h \
 		cf_binom.h \
-		cf_cyclo.h \
 		cf_defs.h \
 		cf_eval.h \
 		cf_factory.h \

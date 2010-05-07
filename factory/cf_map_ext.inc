@@ -22,13 +22,15 @@
 #include "debug.h"
 
 #include "canonicalform.h"
-#include "cf_cyclo.h"
 #include "cf_util.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ_pEXFactoring.h>
 #include "NTLconvert.h"
 #endif
+
+// cyclotomoic polys:
+#include "cf_cyclo.inc"
 
 #ifdef HAVE_NTL 
 
