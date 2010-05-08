@@ -1,3 +1,8 @@
+Sat May  8 15:26:00 CEST 2010
+- release 3-1-1-1
+- new gcd for alg.extension of Z/p
+- decodegb.lib is now indep. of the names opf the variables
+- fixed minor bugs (rvar, ainvar.lib, ...)
 - renamed some old gmp functions (for compatibility with MPIR-2)
 - bug in NF fixed (see Tst/Short/bug_reduce.tst (was somehow wrong in 310..311)
 - cntrl-c hadling in interpreter fixed (was somehow lost in 310..311)
