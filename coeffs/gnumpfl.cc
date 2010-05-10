@@ -209,7 +209,7 @@ number ngfPower (number x, int exp, const coeffs r)
     *u=(number)n;
     return;
   }
-  else if ( ngfIsZero(x) ) // 0^e, e>0
+  else if ( ngfIsZero(x, r) ) // 0^e, e>0
   {
     *u=ngfInit(0, r);
     return;
@@ -222,9 +222,7 @@ number ngfPower (number x, int exp, const coeffs r)
     *u=(number)n;
     return;
   }
-  f = new gmp_float();
-  f = (*(gmp_float*)x)^exp;
-  return (number)f;
+  return (number) ( new gmp_float( (*(gmp_float*)x)^exp ) );
 }
 
 /* kept for compatibility reasons, to be deleted */
