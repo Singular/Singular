@@ -8,25 +8,25 @@
 * ngf == number gnu floats
 */
 
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/modulop.h>
-#include <kernel/longrat.h>
+#include "config.h"
+#include "coeffs.h"
+#include <output.h>
+#include <omalloc.h>
+#include "numbers.h"
+#include "modulop.h"
+#include "longrat.h"
 
-#include <kernel/gnumpfl.h>
-#include <kernel/mpr_complex.h>
+#include <gnumpfl.h>
+#include <mpr_complex.h>
 
 extern size_t gmp_output_digits;
-ring ngfMapRing; // to be used also in gnumpc.cc
+//ring ngfMapRing; // to be used also in gnumpc.cc
 
-static number ngfMapP(number from)
+static number ngfMapP(number from, const coeffs src, const coeffs dst)
 {
-  return ngfInit(npInt(from,ngfMapRing), currRing);
+  return ngfInit(npInt(from,src), dst);
 }
-number ngfMapQ(number from)
+number ngfMapQ(number from, const coeffs src, const coeffs dst)
 {
   gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
   return (number)res;
@@ -40,12 +40,12 @@ union nf
   float F() const {return _f;}
   number N() const {return _n;}
 };
-static number ngfMapR(number from)
+static number ngfMapR(number from, const coeffs src, const coeffs dst)
 {
   gmp_float *res=new gmp_float((double)nf(from).F());
   return (number)res;
 }
-static number ngfMapC(number from)
+static number ngfMapC(number from, const coeffs src, const coeffs dst)
 {
   gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
   return (number)res;
@@ -80,7 +80,7 @@ nMapFunc ngfSetMap(const ring src, const ring dst)
 /*2
 * n := i
 */
-number ngfInit (int i, const ring r)
+number ngfInit (int i, const coeffs r)
 {
   gmp_float* n= new gmp_float( (double)i );
   return (number)n;
@@ -89,7 +89,7 @@ number ngfInit (int i, const ring r)
 /*2
 * convert number to int
 */
-int ngfInt(number &i, const ring r)
+int ngfInt(number &i, const coeffs r)
 {
   double d=(double)*(gmp_float*)i;
   if (d<0.0)
@@ -98,9 +98,9 @@ int ngfInt(number &i, const ring r)
     return (int)(d+0.5);
 }
 
-int ngfSize(number n)
+int ngfSize(number n, const coeffs r)
 {
-  int i = ngfInt(n, currRing);
+  int i = ngfInt(n, r);
   /* basically return the largest integer in n;
      only if this happens to be zero although n != 0,
      return 1;
@@ -112,7 +112,7 @@ int ngfSize(number n)
 /*2
 * delete a
 */
-void ngfDelete (number * a, const ring r)
+void ngfDelete (number * a, const coeffs r)
 {
   if ( *a != NULL )
   {
@@ -124,13 +124,7 @@ void ngfDelete (number * a, const ring r)
 /*2
 * copy a to b
 */
-number ngfCopy(number a)
-{
-  gmp_float* b= new gmp_float( *(gmp_float*)a );
-  return (number)b;
-}
-
-number ngf_Copy(number a, ring r)
+number ngfCopy(number a, const coeffs r)
 {
   gmp_float* b= new gmp_float( *(gmp_float*)a );
   return (number)b;
@@ -139,7 +133,7 @@ number ngf_Copy(number a, ring r)
 /*2
 * za:= - za
 */
-number ngfNeg (number a)
+number ngfNeg (number a, const coeffs r)
 {
   *(gmp_float*)a= -(*(gmp_float*)a);
   return (number)a;
@@ -148,7 +142,7 @@ number ngfNeg (number a)
 /*
 * 1/a
 */
-number ngfInvers(number a)
+number ngfInvers(number a, const coeffs R)
 {
   gmp_float* r= NULL;
   if (((gmp_float*)a)->isZero() )
@@ -157,15 +151,15 @@ number ngfInvers(number a)
   }
   else
   {
-    r= new gmp_float( (gmp_float)1 / (*(gmp_float*)a) );
+    f= new gmp_float( gmp_float(1) / (*(gmp_float*)a) );
   }
-  return (number)r;
+  return (number)f;
 }
 
 /*2
 * u:= a + b
 */
-number ngfAdd (number a, number b)
+number ngfAdd (number a, number b, const coeffs R)
 {
   gmp_float* r= new gmp_float( (*(gmp_float*)a) + (*(gmp_float*)b) );
   return (number)r;
@@ -174,7 +168,7 @@ number ngfAdd (number a, number b)
 /*2
 * u:= a - b
 */
-number ngfSub (number a, number b)
+number ngfSub (number a, number b, const coeffs R)
 {
   gmp_float* r= new gmp_float( (*(gmp_float*)a) - (*(gmp_float*)b) );
   return (number)r;
@@ -183,7 +177,7 @@ number ngfSub (number a, number b)
 /*2
 * u := a * b
 */
-number ngfMult (number a, number b)
+number ngfMult (number a, number b, const coeffs R)
 {
   gmp_float* r= new gmp_float( (*(gmp_float*)a) * (*(gmp_float*)b) );
   return (number)r;
@@ -192,7 +186,7 @@ number ngfMult (number a, number b)
 /*2
 * u := a / b
 */
-number ngfDiv (number a, number b)
+number ngfDiv (number a, number b, const coeffs r)
 {
   if ( ((gmp_float*)b)->isZero() )
   {
@@ -200,14 +194,14 @@ number ngfDiv (number a, number b)
     WerrorS(nDivBy0);
     return NULL;
   }
-  gmp_float* r= new gmp_float( (*(gmp_float*)a) / (*(gmp_float*)b) );
-  return (number)r;
+  gmp_float* f= new gmp_float( (*(gmp_float*)a) / (*(gmp_float*)b) );
+  return (number)f;
 }
 
 /*2
 * u:= x ^ exp
 */
-void ngfPower ( number x, int exp, number * u )
+number ngfPower (number x, int exp, const coeffs r)
 {
   if ( exp == 0 )
   {
@@ -217,42 +211,45 @@ void ngfPower ( number x, int exp, number * u )
   }
   else if ( ngfIsZero(x) ) // 0^e, e>0
   {
-    *u=ngfInit(0, currRing);
+    *u=ngfInit(0, r);
     return;
   }
   else if ( exp == 1 )
   {
-    nNew(u);
+    n_New(u, r);
     gmp_float* n = new gmp_float();
     *n= *(gmp_float*)x;
     *u=(number)n;
     return;
   }
-  ngfPower(x,exp-1,u);
-
-  gmp_float *n=new gmp_float();
-  *n=*(gmp_float*)x;
-  *(gmp_float*)(*u) *= *(gmp_float*)n;
-  delete (gmp_float*)n;
+  f = new gmp_float();
+  f = (*(gmp_float*)x)^exp;
+  return (number)f;
 }
 
-BOOLEAN ngfIsZero (number a)
+/* kept for compatibility reasons, to be deleted */
+void ngfPower ( number x, int exp, number * u, const coeffs r )
+{
+  *u = ngfPower(x, exp, r);
+} 
+
+BOOLEAN ngfIsZero (number a, const coeffs r)
 {
   return ( ((gmp_float*)a)->isZero() );
 }
 
 /*2
-* za >= 0 ?
+* za > 0 ?
 */
-BOOLEAN ngfGreaterZero (number a)
+BOOLEAN ngfGreaterZero (number a, const coeffs r)
 {
-  return ( (*(gmp_float*)a) >= (gmp_float)0.0 );
+  return (((gmp_float*)a)->sign() > 0);
 }
 
 /*2
 * a > b ?
 */
-BOOLEAN ngfGreater (number a, number b)
+BOOLEAN ngfGreater (number a, number b, const coeffs r)
 {
   return ( (*(gmp_float*)a) > (*(gmp_float*)b) );
 }
@@ -260,7 +257,7 @@ BOOLEAN ngfGreater (number a, number b)
 /*2
 * a = b ?
 */
-BOOLEAN ngfEqual (number a, number b)
+BOOLEAN ngfEqual (number a, number b, const coeffs r)
 {
   return ( (*(gmp_float*)a) == (*(gmp_float*)b) );
 }
@@ -268,7 +265,7 @@ BOOLEAN ngfEqual (number a, number b)
 /*2
 * a == 1 ?
 */
-BOOLEAN ngfIsOne (number a)
+BOOLEAN ngfIsOne (number a, const coeffs r)
 {
   return ((gmp_float*)a)->isOne();
 }
@@ -276,19 +273,9 @@ BOOLEAN ngfIsOne (number a)
 /*2
 * a == -1 ?
 */
-BOOLEAN ngfIsMOne (number a)
+BOOLEAN ngfIsMOne (number a, const coeffs r)
 {
   return ((gmp_float*)a)->isMOne();
-}
-
-/*2
-* result =gcd(a,b)
-* dummy, returns 1
-*/
-number ngfGcd(number a, number b)
-{
-  gmp_float *result= new gmp_float( 1 );
-  return (number)result;
 }
 
 static char * ngfEatFloatNExp(char * s )
@@ -317,7 +304,7 @@ static char * ngfEatFloatNExp(char * s )
 /*2
 * extracts the number a from s, returns the rest
 */
-const char * ngfRead (const char * start, number * a)
+const char * ngfRead (const char * start, number * a, const coeffs r)
 {
   char *s= (char *)start;
 
@@ -374,7 +361,7 @@ const char * ngfRead (const char * start, number * a)
 /*2
 * write a floating point number
 */
-void ngfWrite (number &a, const ring r)
+void ngfWrite (number &a, const coeffs r)
 {
   char *out;
   if ( a != NULL )
@@ -390,14 +377,3 @@ void ngfWrite (number &a, const ring r)
   }
 }
 
-#ifdef LDEBUG
-//BOOLEAN ngfDBTest(number a, const char *f, const int l)
-//{
-//  return TRUE;
-//}
-#endif
-
-// local Variables: ***
-// folded-file: t ***
-// compile-command: "make installg" ***
-// End: ***

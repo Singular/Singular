@@ -104,6 +104,14 @@ public:
   friend gmp_float operator * ( const gmp_float & a, const gmp_float & b );
   friend gmp_float operator / ( const gmp_float & a, const gmp_float & b );
 
+  inline gmp_float operator ^ ( const gmp_float & a, const int exp )
+  {
+    mpf_t b;
+    mpf_init(b);
+    mpf_pow( b, a.t, (unsigned long)exp );
+    return (gmp_float)b; 
+  };
+
   friend bool operator == ( const gmp_float & a, const gmp_float & b );
   friend bool operator  > ( const gmp_float & a, const gmp_float & b );
   friend bool operator  < ( const gmp_float & a, const gmp_float & b );

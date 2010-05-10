@@ -4,12 +4,14 @@
 *.o_ndebug
 *.og
 *.exe
+*.swp
 depend
 tags
 Makefile
 GNUMakefile
 config.status
 config.log
+tags
 stamp-h
 ix86-Linux/*
 ix86-Win/*

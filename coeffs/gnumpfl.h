@@ -29,9 +29,6 @@ number   ngf_Copy(number a, coeffs r);
 const char *   ngfRead (const char *s, number *a, const coeffs r);
 void     ngfWrite(number &a, const coeffs r);
 
-#ifdef LDEBUG
-BOOLEAN  ngfDBTest(number a, const char *f, const int l);
-#endif
 void     ngfDelete(number *a, const coeffs r);
 
 nMapFunc  ngfSetMap(const coeffs src, const coeffs dst);
