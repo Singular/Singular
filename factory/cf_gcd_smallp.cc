@@ -30,8 +30,8 @@
 #include "ftmpl_functions.h"
 #include "cf_random.h"
 
-// iinline helper functions:
-#include "cf_map_ext.inc"
+// inline helper functions:
+#include "cf_map_ext.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ_pEX.h>

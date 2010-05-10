@@ -1,6 +1,6 @@
 // -*- c++ -*-
 //*****************************************************************************
-/** @file cf_map_ext.inc
+/** @file cf_map_ext.cc
  *
  * @author Martin Lee	
  * @date   16.11.2009
@@ -30,7 +30,7 @@
 #endif
 
 // cyclotomoic polys:
-#include "cf_cyclo.inc"
+#include "cf_cyclo.h"
 
 #ifdef HAVE_NTL 
 
@@ -79,6 +79,7 @@ CanonicalForm mapUp (const Variable& alpha, const Variable& beta)
 /// element over \f$ F_{p}(\alpha ) \f$, WARNING: make sure coefficients of F
 /// are really elements of a subfield of \f$ F_{p}(\beta ) \f$ which is
 /// isomorphic to \f$ F_{p}(\alpha ) \f$ 
+static inline
 CanonicalForm 
 mapDown (const CanonicalForm& F, const Variable& alpha, const
           CanonicalForm& G, CFList& source, CFList& dest) 
@@ -153,7 +154,6 @@ CanonicalForm GF2FalphaHelper (const CanonicalForm& F, const Variable& alpha)
 
 /// changes representation by primitive element to representation by residue 
 /// classes modulo a Conway polynomial 
-static inline
 CanonicalForm GF2FalphaRep (const CanonicalForm& F, const Variable& alpha) 
 {
   Variable beta= rootOf (gf_mipo);
@@ -162,7 +162,6 @@ CanonicalForm GF2FalphaRep (const CanonicalForm& F, const Variable& alpha)
 
 /// change representation by residue classes modulo a Conway polynomial 
 /// to representation by primitive element
-static inline
 CanonicalForm Falpha2GFRep (const CanonicalForm& F) 
 {
   CanonicalForm result= 0;
@@ -202,7 +201,6 @@ CanonicalForm GFPowUp (const CanonicalForm & F, int k)
 
 /// maps a polynomial over \f$ GF(p^{k}) \f$ to a polynomial over 
 /// \f$ GF(p^{d}) \f$ , d needs to be a multiple of k
-static inline
 CanonicalForm GFMapUp (const CanonicalForm & F, int k) 
 { 
   int d= getGFDegree();
@@ -241,7 +239,6 @@ CanonicalForm GFPowDown (const CanonicalForm & F, int k)
 
 /// maps a polynomial over \f$ GF(p^{d}) \f$ to a polynomial over 
 /// \f$ GF(p^{k})\f$ , d needs to be a multiple of k
-static inline
 CanonicalForm GFMapDown (const CanonicalForm & F, int k) 
 {
   int d= getGFDegree();
@@ -308,7 +305,6 @@ CanonicalForm mapUp (const CanonicalForm& F, const CanonicalForm& G,
 /// determine a primitive element of \f$ F_{p} (\alpha ) \f$, 
 /// \f$ \beta \f$ is a primitive element of a field which is isomorphic to 
 /// \f$ F_{p}(\alpha ) \f$
-static inline
 CanonicalForm 
 primitiveElement (const Variable& alpha, Variable& beta, bool fail) 
 {
@@ -347,7 +343,6 @@ primitiveElement (const Variable& alpha, Variable& beta, bool fail)
   return convertNTLzzpE2CF (root, alpha);
 }
 
-static inline 
 CanonicalForm
 mapDown (const CanonicalForm& F, const CanonicalForm& prim_elem, const
           CanonicalForm& im_prim_elem, const Variable& alpha, CFList& source, 
@@ -356,7 +351,6 @@ mapDown (const CanonicalForm& F, const CanonicalForm& prim_elem, const
   return mapUp (F, im_prim_elem, alpha, prim_elem, dest, source);
 }
 
-static inline 
 CanonicalForm
 mapUp (const CanonicalForm& F, const Variable& alpha, const Variable& beta, 
         const CanonicalForm& prim_elem, const CanonicalForm& im_prim_elem, 
@@ -367,9 +361,9 @@ mapUp (const CanonicalForm& F, const Variable& alpha, const Variable& beta,
   return mapUp (F, prim_elem, alpha, im_prim_elem, source, dest);
 }
 
-static inline
 CanonicalForm 
-mapPrimElem (const CanonicalForm& prim_elem, const Variable& alpha, const Variable& beta)
+mapPrimElem (const CanonicalForm& prim_elem, const Variable& alpha, 
+             const Variable& beta)
 {
   if (prim_elem == alpha)
     return mapUp (alpha, beta);

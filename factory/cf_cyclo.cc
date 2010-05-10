@@ -112,7 +112,6 @@ int* makeDistinct (int* factors, const int factors_length, int& length)
 
 /// compute the n-th cyclotomic polynomial,
 /// function may fail if integer_factorizer fails to factorize n
-static inline
 CanonicalForm cyclotomicPoly (int n, bool& fail) 
 {
   fail= false;
@@ -141,7 +140,6 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
 #ifdef HAVE_NTL
 /// checks if alpha is a primitive element, alpha is assumed to be an algebraic
 /// variable over some finite prime field 
-static inline
 bool isPrimitive (const Variable& alpha, bool& fail) 
 {
   int p= getCharacteristic();
