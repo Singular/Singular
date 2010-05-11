@@ -573,8 +573,8 @@ void nKillChar(coeffs r)
         n->next=n->next->next;
         if (cf_root==r) cf_root=n->next;
         r->cfDelete(&(r->nNULL),r);
-	if (r->cfKillChar!=NULL) r->cfKillChar(r);
-	/* was:
+        if (r->cfKillChar!=NULL) r->cfKillChar(r);
+        /* was:
         switch(r->type)
         {
           case n_Zp_a:
@@ -588,18 +588,16 @@ void nKillChar(coeffs r)
                  }
                }
                break;
-
             default:
                  break;
-          }
-	  */
-          omFreeSize((void *)r, sizeof(n_Procs_s));
-          r=NULL;
         }
-        else
-        {
-          WarnS("cf_root list destroyed");
-        }
+        */
+        omFreeSize((void *)r, sizeof(n_Procs_s));
+        r=NULL;
+      }
+      else
+      {
+        WarnS("cf_root list destroyed");
       }
       r->cf=NULL;
     }
