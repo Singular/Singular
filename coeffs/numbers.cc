@@ -603,3 +603,38 @@ void nKillChar(coeffs r)
     //}
   }
 }
+
+static n_coeffType nLastCoeffs=n_Z2n;
+static cfInitCharProc *nInitCharTable=NULL;
+n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
+{
+  if (n==n_unknown)
+  {
+    nLastCoeffs=(n_coeffType)(int(nLastCoeffs)+1);
+    if (nInitCharTable==NULL)
+    {
+      nInitCharTable=(cfInitCharProc*)omAlloc0(
+                                          nLastCoeffs*sizeof(cfInitCharProc));
+    }
+    else
+    {
+      nInitCharTable=(cfInitCharProc*)omReallocSize(nInitCharTable,
+                                          (((int)nLastCoeffs)-1)*sizeof(cfInitCharProc),
+                                          ((int)nLastCoeffs)*sizeof(cfInitCharProc));
+    }
+
+    nInitCharTable[nLastCoeffs]=p;
+    return nLastCoeffs;
+  }
+  else
+  {
+    if (nInitCharTable==NULL)
+    {
+      nInitCharTable=(cfInitCharProc*)omAlloc0(
+                                         ((int) nLastCoeffs)*sizeof(cfInitCharProc));
+    }
+    nInitCharTable[n]=p;
+    return n;
+  }
+}
+
