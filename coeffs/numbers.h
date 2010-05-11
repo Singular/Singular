@@ -52,9 +52,6 @@ static inline int nInternalChar(const coeffs r)
 
 #define n_New(n, r)           nNew(n)
 
-/* variables */
-extern unsigned short fftable[];
-
 /* prototypes */
 void           nNew(number * a);
 #define        nInit(i) n_Init(i,currRing)
@@ -161,27 +158,18 @@ static inline BOOLEAN nField_is_long_C(const coeffs r)
 { return getCoeffType(r)==n_long_C; }
 
 static inline BOOLEAN nField_has_simple_inverse(const coeffs r)
-/* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
-#ifdef HAVE_RINGS
-{ return (r->ringtype > 0) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
-#else
-{ return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
-#endif
+{ return r->has_simple_Inverse; }
+/* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
 
 static inline BOOLEAN nField_has_simple_Alloc(const coeffs r)
-{ return (nField_is_Zp(r)
-       || nField_is_GF(r)
-#ifdef HAVE_RINGS
-       || nField_is_Ring_2toM(r)
-#endif
-       || nField_is_R(r));
-}
-/* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
+{ return r->has_simple_Alloc; }
+/* Z/p, GF(p,n), R, Ring_2toM: nCopy, nNew, nDelete are dummies*/
 
 static inline BOOLEAN nField_is_Extension(const coeffs r)
 { return (nField_is_Q_a(r)) || (nField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
-
+typedef void (*cfInitCharProc)(coeffs, int);
+n_coeffType nRegister(n_coeffType n, cfInitCharProc p);
 
 
 #endif

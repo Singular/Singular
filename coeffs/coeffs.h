@@ -46,6 +46,13 @@ struct n_Procs_s
    coeffs next;
    unsigned int  ringtype;  /* 0 => coefficient field, 1 => coeffs from Z/2^m */
 
+   // general properties:
+   BOOLEAN has_simple_Alloc; /* TRUE, if nNew/nDelete are dummies */
+   BOOLEAN has_simple_Inverse; /* TRUE, if nInvers is cheap */
+
+   // tests for numbers.cc:
+   BOOLEAN (*nCoeffIsEqual)(const coeffs r, n_coeffType n, int parameter);
+
    // the union stuff
 
    // Zp:
