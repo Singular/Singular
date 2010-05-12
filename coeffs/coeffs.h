@@ -47,8 +47,11 @@ struct n_Procs_s
    unsigned int  ringtype;  /* 0 => coefficient field, 1 => coeffs from Z/2^m */
 
    // general properties:
-   BOOLEAN has_simple_Alloc; /* TRUE, if nNew/nDelete are dummies */
-   BOOLEAN has_simple_Inverse; /* TRUE, if nInvers is cheap */
+   /// TRUE, if nNew/nDelete/nCopy are dummies
+   BOOLEAN has_simple_Alloc;
+   /// TRUE, if std should make polynomials monic (if nInvers is cheap)
+   /// if false, then a gcd routine is required for a content computation
+   BOOLEAN has_simple_Inverse;
 
    // tests for numbers.cc:
    BOOLEAN (*nCoeffIsEqual)(const coeffs r, n_coeffType n, int parameter);

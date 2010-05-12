@@ -168,7 +168,7 @@ static inline BOOLEAN nField_has_simple_Alloc(const coeffs r)
 static inline BOOLEAN nField_is_Extension(const coeffs r)
 { return (nField_is_Q_a(r)) || (nField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
-typedef void (*cfInitCharProc)(coeffs, int);
+typedef void (*cfInitCharProc)(coeffs, void *);
 n_coeffType nRegister(n_coeffType n, cfInitCharProc p);
 
 
