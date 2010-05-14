@@ -1,9 +1,17 @@
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/
-/* $Id$ */
+/* $Id: AlgebraicExt.cc 12469 2010-05-14 10:39:49Z frank $ */
 /*
-* ABSTRACT:   algebraic numbers
+* ABSTRACT: elements of an algebraic extension field
+*
+* This field has the form K(a), where K is itself a field,
+* and a is algebraic over K. The elements in K(a) can be
+* treated as a specific type of number, see numbers.h.
+* This implementation declares a global variable 'nacRing'
+* which is a valid SINGULAR ring representing K[a]. Like-
+* wise, the minimal polynomial of a over K is stored in
+* the global variable 'naMinimalPoly'.
 */
 
 #include <stdio.h>
@@ -18,21 +26,25 @@
 #include "polys.h"
 #include "ideals.h"
 #include "ring.h"
+
 #ifdef HAVE_FACTORY
 #include "factory.h"
 #include "clapsing.h"
 #include "clapconv.h"
 #endif
-#include "longalg.h"
+/* HAVE_FACTORY */
+
+#include "AlgebraicExt.h"
 
 struct snaIdeal
 {
   int anz;
   napoly *liste;
 };
-typedef struct snaIdeal * naIdeal;
 
-naIdeal naI=NULL;
+typedef struct snaIdeal* naIdeal;
+
+naIdeal naI = NULL;
 
 omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
 
@@ -99,7 +111,7 @@ void naSetChar(int i, ring r)
 
   if (r->minpoly!=NULL)
   {
-    naMinimalPoly=((lnumber)r->minpoly)->z;
+    naMinimalPoly=r->minpoly;
     #ifdef LDEBUG
     omCheckAddr(naMinimalPoly);
     #endif
@@ -231,7 +243,7 @@ napoly napRemainder(napoly f, const napoly  g)
   a = f;
   do
   {
-    napSetExp(qq,1, p_GetExp(a,1,nacRing) - p_GetExp(g,1,nacRing));
+    napSetExp(qq,p_GetExp(a,1,nacRing) - p_GetExp(g,1,nacRing));
     napSetm(qq);
     pGetCoeff(qq) = nacDiv(pGetCoeff(a), pGetCoeff(g));
     pGetCoeff(qq) = nacNeg(pGetCoeff(qq));
@@ -261,7 +273,7 @@ static void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
   a = f;
   do
   {
-    napSetExp(qq,1, p_GetExp(a,1,nacRing) - p_GetExp(g,1,nacRing));
+    napSetExp(qq, p_GetExp(a,1,nacRing) - p_GetExp(g,1,nacRing));
     p_Setm(qq,nacRing);
     pGetCoeff(qq) = nacDiv(pGetCoeff(a), pGetCoeff(g));
     nacNormalize(pGetCoeff(qq));
@@ -497,10 +509,10 @@ static const char *napHandleMons(const char *s, int i, napoly ex)
     if ((*s >= '0') && (*s <= '9'))
     {
       s = eati(s, &j);
-      napAddExp(ex,i+1,j);
+      napAddExp(ex,j);
     }
     else
-      napAddExp(ex,i+1,1);
+      napAddExp(ex,1);
   }
   return s;
 }
@@ -510,7 +522,7 @@ static const char *napHandlePars(const char *s, int i, napoly ex)
   if (strcmp(s,naParNames[i])==0)
   {
     s+=strlen(naParNames[i]);
-    napSetExp(ex,i+1,1);
+    napSetExp(ex,1);
   }
   return s;
 }
@@ -744,7 +756,7 @@ static napoly napGcd(napoly a, napoly b)
     else            g = napGcd0(x, y);
     if (pNext(y)==NULL)
     {
-      napSetExp(g,1, napExp(x, y));
+      napSetExp(g,napExp(x, y));
       p_Setm(g,nacRing);
       return g;
     }
@@ -768,7 +780,7 @@ static napoly napGcd(napoly a, napoly b)
     }
     p_Delete(&y,nacRing);
     p_LmDelete(&h,nacRing);
-    napSetExp(g,1, napExp(a, b));
+    napSetExp(g,napExp(a, b));
     p_Setm(g,nacRing);
     return g;
   }
@@ -780,7 +792,7 @@ static napoly napGcd(napoly a, napoly b)
   else            x = napGcd0(g,h);
   for (i=(naNumbOfPar-1); i>=0; i--)
   {
-    napSetExp(x,i+1, napExpi(i,a,b));
+    napSetExp(x,napExpi(i,a,b));
     p_Setm(x,nacRing);
   }
   return x;
@@ -844,7 +856,7 @@ napoly napRedp (napoly q)
       /* h = lt(q)/lt(naI->liste[i])*/
       pGetCoeff(h) = nacCopy(pGetCoeff(q));
       for (j=naNumbOfPar; j>0; j--)
-        napSetExp(h,j, p_GetExp(q,j,nacRing) - p_GetExp(naI->liste[i],j,nacRing));
+        napSetExp(h,p_GetExp(q,j,nacRing) - p_GetExp(naI->liste[i],j,nacRing));
       p_Setm(h,nacRing);
       h = p_Mult_q(h, napCopy(naI->liste[i]),nacRing);
       h = napNeg (h);
@@ -923,7 +935,7 @@ number  naPar(int i)
   lnumber l = (lnumber)omAllocBin(rnumber_bin);
   l->s = 2;
   l->z = p_ISet(1,nacRing);
-  napSetExp(l->z,i,1);
+  napSetExp(l->z,1);
   p_Setm(l->z,nacRing);
   l->n = NULL;
   return (number)l;
@@ -971,7 +983,7 @@ int naInt(number &n, const ring r)
 */
 void naDelete(number *p, const ring r)
 {
-  if ((*p)!=r->minpoly)
+  if (((napoly)(*p))!=r->minpoly)
   {
     lnumber l = (lnumber) * p;
     if (l==NULL) return;
@@ -1860,7 +1872,7 @@ void naNormalize(number &pp)
     norm=naIsChar0;
   }
   /* normalize all coefficients in n and z (if in Q) */
-  if (norm) 
+  if (norm)
   {
     naCoefNormalize(pp);
     x = p->z;
@@ -1880,12 +1892,12 @@ void naNormalize(number &pp)
       {
         while (xx != NULL)
         {
-          napAddExp(xx,i+1, -m);
+          napAddExp(xx, -m);
           pIter(xx);
         }
         while (yy != NULL)
         {
-          napAddExp(yy,i+1, -m);
+          napAddExp(yy, -m);
           pIter(yy);
         }
       }
@@ -2235,7 +2247,7 @@ static napoly napMap(napoly p)
   a = w = (napoly)p_Init(nacRing);
   int i;
   for(i=1;i<=naParsToCopy;i++)
-    napSetExp(a,i,napGetExpFrom(p,i,naMapRing));
+    napSetExp(a,napGetExpFrom(p,naMapRing));
   p_Setm(a,nacRing);
   pGetCoeff(w) = nacMap(pGetCoeff(p));
   loop
@@ -2245,7 +2257,7 @@ static napoly napMap(napoly p)
     pNext(a) = (napoly)p_Init(nacRing);
     pIter(a);
     for(i=1;i<=naParsToCopy;i++)
-      napSetExp(a,i,napGetExpFrom(p,i,naMapRing));
+      napSetExp(a,napGetExpFrom(p,naMapRing));
     p_Setm(a,nacRing);
     pGetCoeff(a) = nacMap(pGetCoeff(p));
   }
@@ -2268,9 +2280,9 @@ static napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMa
       int e;
       if (par_perm!=NULL) e=par_perm[i-1];
       else                e=-i;
-      int ee=napGetExpFrom(p,i,src_ring);
+      int ee=napGetExpFrom(p,src_ring);
       if (e<0)
-        napSetExp(w,-e,ee);
+        napSetExp(w,ee);
       else if (ee>0)
         not_null=FALSE;
     }
@@ -2451,13 +2463,13 @@ poly naPermNumber(number z, int * par_perm, int P, ring oldRing)
     }
     for(i=0;i<P;i++)
     {
-      if(napGetExpFrom(za,i+1,oldRing)!=0)
+      if(napGetExpFrom(za,oldRing)!=0)
       {
         if(par_perm==NULL)
         {
           if ((rPar(currRing)>=i) && (pa!=NULL))
           {
-            napSetExp(pa,i+1,napGetExpFrom(za,i+1,oldRing));
+            napSetExp(pa,napGetExpFrom(za,oldRing));
             p_Setm(pa,nacRing);
           }
           else
@@ -2467,10 +2479,10 @@ poly naPermNumber(number z, int * par_perm, int P, ring oldRing)
           }
         }
         else if(par_perm[i]>0)
-          pSetExp(p,par_perm[i],napGetExpFrom(za,i+1,oldRing));
+          pSetExp(p,par_perm[i],napGetExpFrom(za,oldRing));
         else if((par_perm[i]<0)&&(pa!=NULL))
         {
-          napSetExp(pa,-par_perm[i], napGetExpFrom(za,i+1,oldRing));
+          napSetExp(pa,napGetExpFrom(za,oldRing));
           p_Setm(pa,nacRing);
         }
         else
@@ -2527,7 +2539,7 @@ number   naGetNumerator(number &n, const ring r)
 }
 
 #ifdef LDEBUG
-BOOLEAN naDBTest(number a, const char *f,const int l)
+BOOLEAN naDBTest(number a, const char *f, const int l)
 {
   lnumber x=(lnumber)a;
   if (x == NULL)
