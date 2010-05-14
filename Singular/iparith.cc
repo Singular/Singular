@@ -23,7 +23,7 @@
 #include "polys.h"
 #include "febase.h"
 #include "sdb.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "ideals.h"
 #include "matpol.h"
 #include "kstd1.h"
@@ -31,7 +31,7 @@
 #include "ring.h"
 #include "subexpr.h"
 #include "lists.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "modulop.h"
 #ifdef HAVE_RINGS
 #include "rmodulon.h"

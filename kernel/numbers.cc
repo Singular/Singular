@@ -15,7 +15,7 @@
 #include "kstd1.h"
 #include "numbers.h"
 #include "longrat.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "modulop.h"
 #include "gnumpfl.h"
 #include "gnumpc.h"

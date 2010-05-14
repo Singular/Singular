@@ -23,7 +23,7 @@
 #include "numbers.h"
 #include "febase.h"
 #include "intvec.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "ffields.h"
 #include "ideals.h"
 #include "ring.h"

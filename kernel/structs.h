@@ -496,7 +496,7 @@ struct sip_sring
   int*       block0; /* starting pos., rInit/rSleftvOrdering2Ordering*/
   int*       block1; /* ending pos., rInit/rSleftvOrdering2Ordering*/
   char**     parameter; /* names of parameters, rInit */
-  poly       minpoly;  /* for Q_a/Zp_a, rInit */
+  number     minpoly;  /* for Q_a/Zp_a, rInit */
   ideal      minideal;
   int**      wvhdl;  /* array of weight vectors, rInit/rSleftvOrdering2Ordering */
   char **    names;  /* array of variable names, rInit */

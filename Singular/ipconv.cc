@@ -18,7 +18,7 @@
 #include "numbers.h"
 #include "modulop.h"
 #include "longrat.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #ifdef HAVE_RINGS
 #include "rmodulon.h"
 #include "rmodulo2m.h"

@@ -546,9 +546,7 @@ BOOLEAN slDumpAscii(si_link l)
   if (! status ) status = DumpAsciiMaps(fd, h, NULL);
 
   if (currRingHdl != rh) rSetHdl(rh);
-  // save current options:
-  fprintf(fd,"option (set,intvec(%d,%d));\n",test,verbose);
-  // end of dump:
+  fprintf(fd, "option(set, intvec(%d, %d));\n", test, verbose);
   fprintf(fd, "RETURN();\n");
   fflush(fd);
 

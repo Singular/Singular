@@ -16,7 +16,7 @@
 #include "matpol.h"
 #include "omalloc.h"
 #include "kstd1.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "lists.h"
 #include "maps.h"
 #include "maps_ip.h"

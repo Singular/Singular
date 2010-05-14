@@ -24,7 +24,7 @@
 #include "tok.h"
 #include "ipid.h"
 #include "ring.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "maps.h"
 #include "ideals.h"
 #include "grammar.h"

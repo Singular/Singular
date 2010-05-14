@@ -21,7 +21,7 @@
 
 #include "mpsr_Put.h"
 #include "mpsr_Tok.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "omalloc.h"
 #include "ring.h"
 #include "polys.h"

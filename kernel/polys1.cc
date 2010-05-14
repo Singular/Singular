@@ -18,7 +18,7 @@
 #include "febase.h"
 #include "weight.h"
 #include "intvec.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "ring.h"
 #include "ideals.h"
 #include "polys.h"

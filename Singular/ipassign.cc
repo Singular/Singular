@@ -29,7 +29,7 @@
 #include "subexpr.h"
 #include "lists.h"
 #include "numbers.h"
-#include "AlgebraicExt.h"
+#include "longalg.h"
 #include "stairc.h"
 #include "maps.h"
 #include "syz.h"
