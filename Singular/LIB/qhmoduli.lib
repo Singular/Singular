@@ -953,7 +953,7 @@ GLOBAL:  'computedPowers'
       if((i > maxPrecomputedPower) && !truncated)
       {
         if(maxPrecomputedPower == 0)
-	{  // init computedPowers
+        {  // init computedPowers
           computedPowers[varIndex] = list(i, list(g));
         }
         computedPowers[varIndex][1] = i;  // new degree
@@ -1079,9 +1079,9 @@ GLOBAL:  'computedPowers'
         // to the result and cannot be omitted
 
         for(k = 1; k <= size(substitution[j]); k++)
-	{
+        {
           if(degOfSubs[j][k] + (degVec[j] - 1) * wt[j] + minDeg[j]  < ub)
-	  {
+          {
             subsPoly = subsPoly + substitution[j][k];
           }
         }
@@ -1364,7 +1364,7 @@ RETURN:  list
       {
         newP = temp + decP[j];        // new partition
         if(!containedQ(parts, newP, 1))
-	{
+        {
           k = k + 1;
           parts[k] = newP;
         }

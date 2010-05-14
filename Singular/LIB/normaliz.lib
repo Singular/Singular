@@ -1246,7 +1246,7 @@ RETURN:    The exponent vectors of the leading monomials of the elements of I
 @*
 @*        The function returns the a list containing the input ideal I if one
           of the options @code{supp}, @code{triang}, or @code{hvect} has been
-			 activated.
+          activated.
           However, in this case some numerical invariants are computed, and
           some other data may be contained in files that you can read into
           Singular (see @ref{showNuminvs}, @ref{exportNuminvs}).
@@ -1283,7 +1283,7 @@ RETURN:   The exponent vectors of the leading monomials of the elements of I
         closure of the ideal.
 @*        The function returns the a list containing the input ideal I if one
           of the options @code{supp}, @code{triang}, or @code{hvect} has been
-			 activated.
+          activated.
           However, in this case some numerical invariants are computed, and
           some other data may be contained in files that you can read into
           Singular (see @ref{showNuminvs}, @ref{exportNuminvs}).
@@ -1314,9 +1314,9 @@ invariants as an algebra over the coefficient field.
 @tex
 $R^T$.
 @end tex
-@*        The function returns the ideal given by the input matrix T if one of 
+@*        The function returns the ideal given by the input matrix T if one of
           the options @code{supp}, @code{triang}, or @code{hvect} has been
-			 activated.
+          activated.
           However, in this case some numerical invariants are computed, and
           some other data may be contained in files that you can read into
           Singular (see @ref{showNuminvs}, @ref{exportNuminvs}).
@@ -1380,9 +1380,9 @@ such valuations $v_i$, $i=1,\ldots,r$. It needs the matrix $V = (v_i(X_j))$ as
 its input.
 @end tex
 @end texinfo
-@*        The function returns the ideal given by the input matrix V if one of 
-          the options @code{supp}, @code{triang}, or @code{hvect} has been 
-			 activated.
+@*        The function returns the ideal given by the input matrix V if one of
+          the options @code{supp}, @code{triang}, or @code{hvect} has been
+          activated.
           However, in this case some numerical invariants are computed, and
           some other data may be contained in files that you can read into
           Singular (see @ref{showNuminvs}, @ref{exportNuminvs}).
@@ -1443,9 +1443,9 @@ RETURN:   The function returns two ideals, both to be considered as lists of
           monomials which generate an algebra over the coefficient field. The
           first is the system of monomial generators of @math{S}, the second
           the system of generators of @math{M}.
-@*        The function returns a list consisting of the ideal given by the 
+@*        The function returns a list consisting of the ideal given by the
           input matrix T if one of the options @code{supp}, @code{triang}, or
-			 @code{hvect} has been activated.
+          @code{hvect} has been activated.
           However, in this case some numerical invariants are computed, and
           some other data may be contained in files that you can read into
           Singular (see @ref{showNuminvs}, @ref{exportNuminvs}).

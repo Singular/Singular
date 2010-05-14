@@ -1514,18 +1514,18 @@ EXAMPLE: example initialIdealW; shows examples
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="intvec")
-	{
-	  if (size(#[3])==2*n && allPositive(#[3])==1)
-	  {
-	    homogweights = #[3];
-	  }
-	  else
-	  {
-	    print("// Homogenization weight vector must consist of positive entries and be");
-	    print("// of size " + string(n) + ". Using no weights.");
-	  }
-	}
+        if (typeof(#[3])=="intvec")
+        {
+          if (size(#[3])==2*n && allPositive(#[3])==1)
+          {
+            homogweights = #[3];
+          }
+          else
+          {
+            print("// Homogenization weight vector must consist of positive entries and be");
+            print("// of size " + string(n) + ". Using no weights.");
+          }
+        }
       }
     }
   }
@@ -1570,7 +1570,7 @@ EXAMPLE: example initialIdealW; shows examples
   matrix @relD[N][N];
   for (i=1; i<=n; i++) { @relD[i,n+i] = var(N)^(homogweights[i]+homogweights[n+i]); }
   def Dh = nc_algebra(1,@relD);
-  setring Dh; kill @Dh;	
+  setring Dh; kill @Dh;        
   dbprint(ppl-1,"// computing in ring",Dh);
   // 2. Compute the initial ideal
   ideal I = imap(save,I);
@@ -1656,10 +1656,10 @@ EXAMPLE: example initialMalgrange; shows examples
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="intvec" && size(#[3])==n && allPositive(#[3])==1)
+        if (typeof(#[3])=="intvec" && size(#[3])==n && allPositive(#[3])==1)
         {
-	  u0 = #[3];
-	}
+          u0 = #[3];
+        }
       }
     }
   }

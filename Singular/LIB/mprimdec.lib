@@ -4,7 +4,7 @@
 // algorithms for primary decomposition for modules based on
 // the algorithms of Gianni, Trager and Zacharias and
 // Shimoyama and Yokoyama (generalization of the latter
-// suggested by Hans-Gert Gräbe, Leipzig  )
+// suggested by Hans-Gert Graebe, Leipzig  )
 // using elments of primdec.lib
 // written by Alexander Dreyer
 //
@@ -328,7 +328,7 @@ EXAMPLE: example PrimdecB; shows an example
     {
       if (deg(polys[@k])<degf)
       {
-        //Wählt das poly mit dem geringsten Grad.
+        //Waehlt das poly mit dem geringsten Grad.
         @f=polys[@k];
         degf=deg(@f);
       }

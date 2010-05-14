@@ -404,7 +404,7 @@ EXAMPLE: example bfctVarAnn; shows examples
     {
       if (typeof(#[2])=="int" || typeof(#[2])=="number")
       {
-	eng = int(#[2]);
+        eng = int(#[2]);
       }
     }
   }
@@ -649,14 +649,14 @@ EXAMPLE: example bfctVarIn; shows examples
     {
       if (typeof(#[2])=="int" || typeof(#[2])=="number")
       {
-	whicheng = int(#[2]);
+        whicheng = int(#[2]);
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="int" || typeof(#[3])=="number")
-	{
-	  whichord = int(#[3]);
-	}
+        if (typeof(#[3])=="int" || typeof(#[3])=="number")
+        {
+          whichord = int(#[3]);
+        }
       }
     }
   }

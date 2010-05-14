@@ -480,11 +480,11 @@ static proc mono2word(poly p, int d)
 proc freeGBasis(list LM, int d)
 "USAGE:  freeGBasis(L, d);  L a list of modules, d an integer
 RETURN:  ring
-ASSUME: L has a special form. Namely, it is a list of modules, where 
-@* each generator of every module stands for a monomial times coefficient in free algebra. 
+ASSUME: L has a special form. Namely, it is a list of modules, where
+@* each generator of every module stands for a monomial times coefficient in free algebra.
 @* In such a vector generator, the 1st entry is a nonzero coefficient from the ground field
 @* and each next entry hosts a variable from the basering.
-PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L 
+PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L
 @* in the free associative algebra, up to degree d
 NOTE: Apply @code{lst2str} to the output in order to obtain a better readable presentation
 EXAMPLE: example freeGBasis; shows examples
@@ -949,7 +949,7 @@ example
 proc makeLetterplaceRing1(int d)
 "USAGE:  makeLetterplaceRing1(d); d an integer
 RETURN:  ring
-PURPOSE: creates a ring with a special ordering, suitable for 
+PURPOSE: creates a ring with a special ordering, suitable for
 @* the use of homogeneous letterplace (d blocks of shifted original variables)
 EXAMPLE: example makeLetterplaceRing1; shows examples
 "
@@ -1035,7 +1035,7 @@ example
 proc makeLetterplaceRing2(int d)
 "USAGE:  makeLetterplaceRing2(d); d an integer
 RETURN:  ring
-PURPOSE: creates a ring with a special ordering, suitable for 
+PURPOSE: creates a ring with a special ordering, suitable for
 @* the use of non-homogeneous letterplace
 NOTE: the matrix for the ordering looks as follows: first row is 1,1,...,1
 @* then there come 'd' blocks of shifted original variables
@@ -1106,7 +1106,7 @@ EXAMPLE: example makeLetterplaceRing2; shows examples
 //     {
 //       for (j=1; j<=nb; j++)
 //       {
-// 	//        LR[3][i*nb+j+1]= LR[3][j];
+//         //        LR[3][i*nb+j+1]= LR[3][j];
 //         LR[3][i*nb+j+1]= tmp2[j];
 //       }
 //     }
@@ -2386,7 +2386,7 @@ proc fullSerreRelations(intmat A, ideal rNegative, ideal rCartan, ideal rPositiv
 RETURN:  ring (and ideal)
 PURPOSE: compute the inhomogeneous Serre's relations associated to A in given variable names
 ASSUME: three ideals in the input are of the same sizes and contain merely variables
-@* which are interpreted as follows: N resp. P stand for negative resp. positive roots, 
+@* which are interpreted as follows: N resp. P stand for negative resp. positive roots,
 @* C stand for Cartan elements. d is the degree bound for letterplace ring, which will be returned.
 @* The matrix A is a generalized Cartan matrix with integer entries
 @* The result is the ideal called 'fsRel' in the returned ring.
@@ -2434,7 +2434,7 @@ EXAMPLE: example fullSerreRelations; shows examples
   list LNEG = L; list tmp;
   /* L[1] field as is; L[2] vars: a subset; L[3] ordering: dp, L[4] as is */
   for (i=1; i<=size(iNeg); i++)
-  {  
+  {
     tmp[i] = string(var(iNeg[i]));
   }
   LNEG[2] = tmp; LNEG[3] = list(list("dp",intvec(1:size(iNeg))), list("C",0));
@@ -2452,7 +2452,7 @@ EXAMPLE: example fullSerreRelations; shows examples
   list LPOS = L; list tmp;
   /* L[1] field as is; L[2] vars: a subset; L[3] ordering: dp, L[4] as is */
   for (i=1; i<=size(iPos); i++)
-  {  
+  {
     tmp[i] = string(var(iPos[i]));
   }
   LPOS[2] = tmp; LPOS[3] = list(list("dp",intvec(1:size(iPos))), list("C",0));
@@ -2467,7 +2467,7 @@ EXAMPLE: example fullSerreRelations; shows examples
   setring save; kill L,tmp,RRPOS,RPOS, LPOS;
   string sMap = "ideal Mmap =";
   for (i=1; i<=nvars(save); i++)
-  { 
+  {
     sMap = sMap + string(var(i)) +"(1),";
   }
   sMap[size(sMap)] = ";";
@@ -2475,37 +2475,37 @@ EXAMPLE: example fullSerreRelations; shows examples
   setring LPsave;
   ideal ComCartan;
   for (i=1; i<size(iCartan); i++)
-  { 
+  {
     for (j=i+1; j<=size(iCartan); j++)
-    { 
+    {
       ComCartan =  ComCartan + lieBracket(var(iCartan[j]),var(iCartan[i]));
-    } 
+    }
   }
   ComCartan = simplify(ComCartan,1+2+8);
   execute(sMap); // defines an ideal Mmap
   map F = save, Mmap;
   dbprint(ppl,"1. commuting Cartans: ");
   dbprint(ppl-1,ComCartan);
-  /* [e_i, f_j] =0 if i<>j */ 
+  /* [e_i, f_j] =0 if i<>j */
   ideal ComPosNeg; // assume: #Neg=#Pos
   for (i=1; i<size(iPos); i++)
-  { 
+  {
     for (j=1; j<=size(iPos); j++)
-    { 
+    {
       if (j !=i)
       {
         ComPosNeg =  ComPosNeg + lieBracket(var(iPos[i]),var(iNeg[j]));
         ComPosNeg =  ComPosNeg + lieBracket(var(iPos[j]),var(iNeg[i]));
       }
-    } 
+    }
   }
   ComPosNeg = simplify(ComPosNeg,1+2+8);
   dbprint(ppl,"2. commuting Positive and Negative:");
   dbprint(ppl-1,ComPosNeg);
-  /* [e_i, f_i] = h_i */ 
+  /* [e_i, f_i] = h_i */
   poly tempo;
   for (i=1; i<=size(iCartan); i++)
-  { 
+  {
     tempo = lieBracket(var(iPos[i]),var(iNeg[i])) - var(iCartan[i]);
     ComPosNeg =  ComPosNeg + tempo;
   }
@@ -2513,23 +2513,23 @@ EXAMPLE: example fullSerreRelations; shows examples
   dbprint(ppl,"3. added sl2 triples [e_i,f_i]=h_i");
   dbprint(ppl-1,ComPosNeg);
 
-  /* [h_i, e_j] = A_ij e_j */ 
-  /* [h_i, f_j] = -A_ij f_j */ 
+  /* [h_i, e_j] = A_ij e_j */
+  /* [h_i, f_j] = -A_ij f_j */
   ideal ActCartan; // assume: #Neg=#Pos
   for (i=1; i<=size(iCartan); i++)
-  { 
+  {
     for (j=1; j<=size(iCartan); j++)
-    { 
+    {
       tempo = lieBracket(var(iCartan[i]),var(iPos[j])) - A[i,j]*var(iPos[j]);
       ActCartan = ActCartan + tempo;
       tempo = lieBracket(var(iCartan[i]),var(iNeg[j])) + A[i,j]*var(iNeg[j]);
       ActCartan = ActCartan + tempo;
-    } 
+    }
   }
   ActCartan = simplify(ActCartan,1+2+8);
   dbprint(ppl,"4. actions of Cartan:");
   dbprint(ppl-1, ActCartan);
-  
+
   /* final part: prepare the output */
   setring LPsave;
   ideal fsRel = srNeg, srPos, ComPosNeg, ComCartan, ActCartan;
@@ -2546,7 +2546,7 @@ example
   ring r = 0,(f1,f2,h1,h2,e1,e2),dp;
   ideal negroots = f1,f2; ideal cartans = h1,h2; ideal posroots = e1,e2;
   int uptodeg = 5;
-  def RS = fullSerreRelations(A,negroots,cartans,posroots,uptodeg); 
+  def RS = fullSerreRelations(A,negroots,cartans,posroots,uptodeg);
   setring RS; fsRel;
 }
 
@@ -2562,7 +2562,7 @@ proc varIdeal2intvec(ideal I)
       ERROR("input ideal must contain only variables");
     }
     V[i] = j;
-  } 
+  }
   dbprint(printlevel-voice+2,V);
   /* now we make a smaller list of non-repeating entries */
   ideal iW = simplify(ideal(V),2+4); // no zeros, no repetitions
@@ -2980,7 +2980,6 @@ proc isLinearVector(vector v)
 // return(i);
 // }
 
-	
 
 // LIB "qhmoduli.lib";
 // proc polyshift(poly p,  int numvars)
@@ -2990,7 +2989,7 @@ proc isLinearVector(vector v)
 //   {
 //     i = Max(i, whichshift(q,numvars));
 //     q = q - lead(q);
-//   } 
+//   }
 //   return(q);
 // }
 

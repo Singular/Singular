@@ -1377,7 +1377,7 @@ See also
      p_opt = 1;
    }
 
-   if( (size(ideal(basering)) > 0) || (size(ringlist(P)) > 4) ) 
+   if( (size(ideal(basering)) > 0) || (size(ringlist(P)) > 4) )
    {
      // the quick hack for qrings - seems to fit most needs
      // (lres is not implemented for qrings, sres is not so efficient)

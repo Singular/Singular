@@ -164,7 +164,7 @@ EXAMPLE: example plot; shows an example
       surf_call = surf_call + " " + extra_surf_opts;
     }
     surf_call = surf_call + l + " >/dev/null 2>&1";
-  
+
     if ("ppcMac-darwin" == system("uname"))
     {
        surf_call = surf_call + " || " + "singularsurf "

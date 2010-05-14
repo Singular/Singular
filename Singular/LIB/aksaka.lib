@@ -147,8 +147,8 @@ EXAMPLE: example log2; shows an example
 
   //bringen x zunaechst zwischen 1/sqrt(2) und sqrt(2), so dass Reihe schnell
   //konvergiert, berechnen dann Reihe bis 30. Summanden und letztendlich
-  //log2(x)=log(x)/log(2)=(log(x/2^j)+j*log(2))/log(2)  für große x
-  //log2(x)=log(x)/log(2)=(log(x*2^j)-j*log(2))/log(2)  für kleine x
+  //log2(x)=log(x)/log(2)=(log(x/2^j)+j*log(2))/log(2)  fuer grosse x
+  //log2(x)=log(x)/log(2)=(log(x*2^j)-j*log(2))/log(2)  fuer kleine x
 
   number j=0;
   if(x<(b/c))
@@ -197,7 +197,7 @@ EXAMPLE:example wurzel; shows an example
 "
 {
   poly f=var(1)^2-r;             //Wurzel wird als Nullstelle eines Polys
-                                 //mit proc nt_solve genähert
+                                 //mit proc nt_solve genaehert
   def B=basering;
   ring R=(real,40),var(1),dp;
   poly g=imap(B,f);
@@ -331,8 +331,8 @@ EXAMPLE:example ask; shows an example
     if(printlevel>=1){"Zahl r gefunden mit r|n";"r=";r;pause();}
     return(c);
   }
-  if(r==n-1)              // falls diese Bedingung erfüllt ist, ist
-                         // ggT(a,n)=1 für 0<a<=r, schritt 4 des ASK-Alg.
+  if(r==n-1)              // falls diese Bedingung erfuellt ist, ist
+                         // ggT(a,n)=1 fuer 0<a<=r, schritt 4 des ASK-Alg.
   {
     if(printlevel>=1){"ggt(r,n)=1 fuer alle 1<r<n";pause();}
     return(p);
@@ -340,42 +340,42 @@ EXAMPLE:example ask; shows an example
   k=1;
   b=1;
 
-  while(k<=M2)         //Beginn des Ordnungstests für aktuelles r
+  while(k<=M2)         //Beginn des Ordnungstests fuer aktuelles r
   {
     b=((b*n) mod r);
-    if(b==1)   //tritt Bedingung ein so gilt für aktuelles r,k:
+    if(b==1)   //tritt Bedingung ein so gilt fuer aktuelles r,k:
                //n^k=1 mod r
                //tritt Bedingung ein, wird wegen k<=M2=intPart(log2(n)^2)
-               //r erhöht,k=0 gesetzt und Ordnung erneut untersucht
-               //tritt diese Bedingung beim größten k=intPart(log2(n)^2)
+               //r erhoeht,k=0 gesetzt und Ordnung erneut untersucht
+               //tritt diese Bedingung beim groessten k=intPart(log2(n)^2)
                //nicht ein, so ist ord_r_(n)>log2(n)^2 und Schleife
-               //wird nicht mehr ausgeführt
+               //wird nicht mehr ausgefuehrt
     {
       if(r==2147483647)
       {
-        string e="error: r überschreitet integer Bereich und darf
+        string e="error: r ueberschreitet integer Bereich und darf
                   nicht als Grad eines Polynoms verwendet werden";
         return(e);
       }
       r=r+1;
       if(gcdN(n,r)!=1)   //falls ggt ungleich eins, Teiler von n gefunden,
-                         //wird aufgrund von Schritt 3 des ASK-Alg. für
+                         //wird aufgrund von Schritt 3 des ASK-Alg. fuer
                          //jeden Kandidaten r getestet
       {
         if(printlevel>=1){"Zahl r gefunden mit r|n";"r=";r;pause();}
         return(c);
       }
-      if(r==n-1)         //falls diese Bedingung erfüllt ist,
+      if(r==n-1)         //falls diese Bedingung erfuellt ist,
                          //ist n wegen Zeile 571 prim
-                         //wird aufgrund von Schritt 4 des ASK-Alg. für
+                         //wird aufgrund von Schritt 4 des ASK-Alg. fuer
                          //jeden Kandidaten r getestet
       {
         if(printlevel>=1){"ggt(r,n)=1 fuer alle 1<r<n";pause();}
         return(p);
       }
 
-      k=0;               //für neuen Kandidaten r, muss k für den
-                         //Ordnungstest zurückgesetzt werden
+      k=0;               //fuer neuen Kandidaten r, muss k fuer den
+                         //Ordnungstest zurueckgesetzt werden
     }
     k=k+1;
   }
@@ -385,7 +385,7 @@ EXAMPLE:example ask; shows an example
     "r=";r;pause();
   }
   number l=1;                         // Zeile 603-628: Schritt 5
-  poly f,g;                           // Zeile 618 überprüft Gleichungen für
+  poly f,g;                           // Zeile 618 ueberprueft Gleichungen fuer
                                       // das jeweilige a
   g=var(1)^r-1;
   number grenze=intPart(wurzel(euler(r))*M);

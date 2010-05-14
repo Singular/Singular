@@ -208,7 +208,7 @@ EXAMPLE: example elimlinearpart; shows an example
 // which do not contain elements not to be eliminated
 
    //ideal id = interred(i);
-   //## gmg, geŠndert 9/2008: interred sehr lange z.B. bei Leonard1 in normal,
+   //## gmg, geaendert 9/2008: interred sehr lange z.B. bei Leonard1 in normal,
    //daher interred ersetzt durch: std nur auf linearpart angewendet
    //Wechsel zu dp Ordnung (da Lin affin linear)
 
@@ -469,7 +469,7 @@ Da interred oder NF aber die Laenge der polys vergroessern kann, nicht gemacht
                   eva = eva+var(ii); //var(ii) added to list of elimin. vars
                   neva[ii] = 0;
                   sub = sub+kip;     //polynomial defining substituion
-                  //## gmg: geŠndert 08/2008, map durch subst ersetzt
+                  //## gmg: geaendert 08/2008, map durch subst ersetzt
                   //(viel schneller)
                   vip = var(ii) - kip;  //polynomial to be substituted
                   lin = subst(lin, var(ii), vip);  //subst in rest

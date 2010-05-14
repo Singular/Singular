@@ -113,7 +113,7 @@ static proc OrderStringalp_NP(string Wpal,list #)
   int nP = 1;// call LatsGB to compute the wanted GB  by pwalk
 
   //Default:
-  // if size(#)=0, the Gröbnerwalk algorithm and its developments compute
+  // if size(#)=0, the Groebnerwalk algorithm and its developments compute
   // a Groebner basis from "dp" to "lp"
 
   intvec curr_weight = system("Mivdp",n); //define (1,1,...,1)
@@ -258,7 +258,7 @@ EXAMPLE: example gwalk; shows an example"
 example
 {
   "EXAMPLE:"; echo = 2;
-  //** compute a Gröbner basis of I w.r.t. lp.
+  //** compute a Groebner basis of I w.r.t. lp.
   ring r = 32003,(z,y,x), lp;
   ideal I = y3+xyz+y2z+xz3, 3+xy+x2y+y2z;
   gwalk(I);

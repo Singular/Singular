@@ -424,7 +424,7 @@ EXAMPLE: example IntersectWithSub; shows an example
       if (p!=0)
       {
         ERROR("generators of the subalgebra do not commute.");
-	//        return(ideal(0));
+        //        return(ideal(0));
       }
     }
   }

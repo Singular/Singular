@@ -1,15 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////
 version="$Id$";
-category="Noncommutative";                             
+category="Noncommutative";
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations of noncommutative G-algebras
 AUTHOR: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 
-THEORY: Let A be an operator algebra with R = K[x1,.,xN] as subring. 
-The operators are usually denoted by {d1,..,dM}. 
-@* Assume, that A is a G-algebra, then the set S=R-{0} is multiplicatively closed Ore set in A. 
-@* That is, for any s in S and a in A, there exist t in S and b in A, such that sa=bt. 
-@* In other words, one can transform any left fraction into the right fraction. The algebra A_S is called an Ore localization of A with respect to S. 
+THEORY: Let A be an operator algebra with R = K[x1,.,xN] as subring.
+The operators are usually denoted by {d1,..,dM}.
+@* Assume, that A is a G-algebra, then the set S=R-{0} is multiplicatively closed Ore set in A.
+@* That is, for any s in S and a in A, there exist t in S and b in A, such that sa=bt.
+@* In other words, one can transform any left fraction into the right fraction. The algebra A_S is called an Ore localization of A with respect to S.
 
 This library provides Groebner basis procedure for A_S, performing polynomial (that is fraction-free) computations only.
 
@@ -17,7 +17,7 @@ PROCEDURES:
 ratstd(ideal I, int n);   compute Groebner basis and dimensions in Ore localization of the basering w.r.t. first n variables
 
 SUPPORT: SpezialForschungsBereich F1301 of the Austrian FWF and
-@* Transnational Access Program of RISC Linz, Austria 
+@* Transnational Access Program of RISC Linz, Austria
 "
 
 LIB "poly.lib";

@@ -6,10 +6,10 @@ AUTHORS:  Oleksandr Iena,       yena@mathematik.uni-kl.de,
 @*        Markus Becker,        mbecker@mathematik.uni-kl.de,
 @*        Viktor Levandovskyy,  levandov@mathematik.uni-kl.de
 
-THEORY: Involution is an anti-isomorphism of a non-commutative K-algebra 
-@* with the property that applied an involution twice, one gets an identity. 
-@* Involution is linear with respect to the ground field. In this library we compute 
-@* linear involutions, distinguishing the case of a diagonal matrix (such involutions 
+THEORY: Involution is an anti-isomorphism of a non-commutative K-algebra
+@* with the property that applied an involution twice, one gets an identity.
+@* Involution is linear with respect to the ground field. In this library we compute
+@* linear involutions, distinguishing the case of a diagonal matrix (such involutions
 @* are called homothetic) and a general one. Also, linear automorphisms of different
 @* order can be computed.
 
@@ -283,7 +283,7 @@ proc involution(m, map theta)
 "USAGE:  involution(m, theta); m is a poly/vector/ideal/matrix/module, theta is a map
 RETURN:  object of the same type as m
 PURPOSE: applies the involution, presented by theta to the object m
-THEORY: for an involution theta and two polynomials a,b from the algebra, 
+THEORY: for an involution theta and two polynomials a,b from the algebra,
 @*  theta(ab) = theta(b) theta(a); theta is linear with respect to the ground field
 NOTE: This is generalized ''theta(m)'' for data types unsupported by ''map''.
 EXAMPLE: example involution; shows an example
@@ -691,12 +691,12 @@ proc findAuto(int n)
 RETURN: a ring together with a list of pairs L, where
 @*        L[i][1]  =  ideal; a Groebner Basis of an i-th associated prime,
 @*        L[i][2]  =  matrix, defining a linear map, with entries, reduced with respect to L[i][1]
-PURPOSE: compute the ideal of linear automorphisms of the basering, 
+PURPOSE: compute the ideal of linear automorphisms of the basering,
 @*  given by a matrix, n-th power of which gives identity (i.e. unipotent matrix)
-NOTE: if n=0, a matrix, defining an automorphism is not assumed to be unipotent 
-@* but just non-degenerate. A nonzero parameter @code{@@p} is introduced as the value of 
+NOTE: if n=0, a matrix, defining an automorphism is not assumed to be unipotent
+@* but just non-degenerate. A nonzero parameter @code{@@p} is introduced as the value of
 @* the determinant of the matrix above.
-@* For convenience, the full ideal of relations @code{idJ} and the initial matrix with indeterminates 
+@* For convenience, the full ideal of relations @code{idJ} and the initial matrix with indeterminates
 @* @code{matD} are mutually exported in the output ring
 SEE ALSO: findInvo
 EXAMPLE: example findAuto; shows examples

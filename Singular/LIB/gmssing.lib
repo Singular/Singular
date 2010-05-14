@@ -524,7 +524,7 @@ static proc transform(matrix A,matrix A0,ideal r,module H,module H0,ideal e,
                 A[i,j]=A[i,j]/var(1);
               }
             }
-	  }
+          }
         }
       }
 

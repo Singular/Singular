@@ -674,7 +674,7 @@ LIB"reesclos.lib";
 
 
 // 2. x^i,y^i,z^i in k[x,y,z]
-//    ähnlich wie 1., funktioniert aber nur bis i=5 und dauert dort
+//    aehnlich wie 1., funktioniert aber nur bis i=5 und dauert dort
 //    >1 h
 
 

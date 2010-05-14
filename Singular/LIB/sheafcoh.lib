@@ -902,7 +902,7 @@ example
    echo = 2;
    int pl = printlevel;
    int l,h, t;
-   
+
    //-------------------------------------------
    // cohomology of structure sheaf on P^4:
    //-------------------------------------------
@@ -912,29 +912,29 @@ example
 
    l = -12; h = 12; // range of twists: l..h
 
-   printlevel = 0; 
+   printlevel = 0;
    //////////////////////////////////////////////
-   t = timer; 
-   
+   t = timer;
+
    def A = sheafCoh(M, l, h); // global Ext method:
-   
+
    "Time: ", timer - t;
    //////////////////////////////////////////////
-   t = timer; 
+   t = timer;
 
    A = sheafCohBGG(M, l, h);  // BGG method (without optimization):
 
    "Time: ", timer - t;
    //////////////////////////////////////////////
-   t = timer; 
-   
+   t = timer;
+
    A = sheafCohBGG2(M, l, h); // BGG method (with optimization)
-   
+
    "Time: ", timer - t;
    //////////////////////////////////////////////
    printlevel = pl;
-   
-   kill A, r; 
+
+   kill A, r;
 
    //-------------------------------------------
    // cohomology of cotangential bundle on P^3:
@@ -947,23 +947,23 @@ example
 
 
    //////////////////////////////////////////////
-   printlevel = 0; 
-   t = timer; 
-   
+   printlevel = 0;
+   t = timer;
+
    def B = sheafCoh(M, l, h); // global Ext method:
-   
+
    "Time: ", timer - t;
    //////////////////////////////////////////////
-   t = timer; 
+   t = timer;
 
    B = sheafCohBGG(M, l, h);  // BGG method (without optimization):
 
    "Time: ", timer - t;
    //////////////////////////////////////////////
-   t = timer; 
-   
+   t = timer;
+
    B = sheafCohBGG2(M, l, h); // BGG method (with optimization)
-   
+
    "Time: ", timer - t;
    //////////////////////////////////////////////
    printlevel = pl;
@@ -1323,7 +1323,7 @@ proc getCotangentialBundle()
   module M=T1[3];
 //  attrib(M,"isHomog");
 //  homog(M);
-  attrib(M, "isCoker", 1);  
+  attrib(M, "isCoker", 1);
   // attrib(M);
   return (M);
 };

@@ -1049,7 +1049,7 @@ proc mindist (matrix check)
         - check is a check matrix,
         - q is the field size
 @end format
-RETURN:  minimum distance of the code 
+RETURN:  minimum distance of the code
 EXAMPLE: example mindist; shows an example
 "
 {
@@ -1117,7 +1117,7 @@ example
      matrix h=randomCheck(redun,n,1);
      print(h);
      int l=mindist(h);
-     l;     
+     l;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2003,25 +2003,25 @@ EXAMPLE:   example decodeRandomFL; shows an example
  {
      h=randomCheck(redun,n,e);
      g=dual_code(h);
-     
+
      //---------------- generate the template system -----------------------
      sys=sysFL(h,z,t,e,s_work);
-     
+
      //------ modifying the template according to the received word ---------
      for (j=1; j<=ntrials; j++)
      {
           word=randomvector(n-redun,1);
           y=encode(transpose(word),g);
           print("Codeword:");
-	  print(y);
+          print(y);
           rec=errorRand(y,t,e);
-	  print("Received word");
-	  print(rec);
+          print("Received word");
+          print(rec);
           sys2=LF_add_synd(rec,h,sys);
           sys3=std(sys2);
-	  print("Groebner basis of the FL system:");
-	  print(sys3);
-     }     
+          print("Groebner basis of the FL system:");
+          print(sys3);
+     }
  }
 
  option(set,vopt);
