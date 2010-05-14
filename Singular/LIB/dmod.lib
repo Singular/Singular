@@ -5492,8 +5492,8 @@ example
 proc checkRoot(poly F, number a, list #)
 "USAGE:  checkRoot(f,alpha [,S,eng]);  poly f, number alpha, string S, int eng
 RETURN:  int
-ASSUME: Basering is a commutative ring, alpha is a rational number.
-PURPOSE: check whether a rational number alpha is a root of the global
+ASSUME: Basering is a commutative ring, alpha is a positive rational number.
+PURPOSE: check whether a negative rational number -alpha is a root of the global
 @* Bernstein-Sato polynomial of f and compute its multiplicity,
 @* with the algorithm given by S and with the Groebner basis engine given by eng.
 NOTE:  The annihilator of f^s in D[s] is needed and hence it is computed with the
@@ -5574,6 +5574,18 @@ EXAMPLE: example checkRoot; shows examples
   // size(#)=0, i.e. there is no algorithm and no engine given
   //  eng = 0; algo = "alg1";  //are already set
   // int ppl = printlevel-voice+2;
+// check assume: a is positive rational number
+  if (!isRational(a))
+  {
+    ERROR("rational root expected for checking");
+  }
+  if (numerator(a) < 0 )
+  {
+    ERROR("expected positive -alpha");
+    // the following is more user-friendly but less correct
+    //    print("proceeding with the negated root");
+    //    a = -a;
+  }
   printlevel=printlevel+1;
   def save = basering;
   def @A = SannfsBM(F);
