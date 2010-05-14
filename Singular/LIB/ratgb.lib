@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 version="$Id$";
-category="Noncommutative";
+category="Noncommutative";                             
 info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations of noncommutative G-algebras
 AUTHOR: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
