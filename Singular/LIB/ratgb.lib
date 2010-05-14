@@ -5,18 +5,19 @@ info="
 LIBRARY: ratgb.lib  Groebner bases in Ore localizations of noncommutative G-algebras
 AUTHOR: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
 
-THEORY: Let A be an operator algebra with R = K[x1,.,xN] as subring. The operators
-are usually denoted by {d1,..,dM}. Assume, that A is a G-algebra, then the set S=R-{0}
-is multiplicatively closed and is an Ore set in A. That is, for any s in S and a in A,
-there exist t in S and b in A, such that sa=bt. In other words one can transform
-any left fraction into the right fraction. The algebra A_S is entermed an Ore
-localization of A with respect to S. This library provides Groebner basis
-procedure for A_S, performing polynomial computations only.
+THEORY: Let A be an operator algebra with R = K[x1,.,xN] as subring. 
+The operators are usually denoted by {d1,..,dM}. 
+@* Assume, that A is a G-algebra, then the set S=R-{0} is multiplicatively closed Ore set in A. 
+@* That is, for any s in S and a in A, there exist t in S and b in A, such that sa=bt. 
+@* In other words, one can transform any left fraction into the right fraction. The algebra A_S is called an Ore localization of A with respect to S. 
+
+This library provides Groebner basis procedure for A_S, performing polynomial (that is fraction-free) computations only.
 
 PROCEDURES:
-ratstd(ideal I, int n);   compute Groebner basis in Ore localization of the basering w.r.t. first n variables
+ratstd(ideal I, int n);   compute Groebner basis and dimensions in Ore localization of the basering w.r.t. first n variables
 
-SUPPORT: SpezialForschungsBereich F1301 of the Austrian FWF
+SUPPORT: SpezialForschungsBereich F1301 of the Austrian FWF and
+@* Transnational Access Program of RISC Linz, Austria 
 "
 
 LIB "poly.lib";
@@ -63,10 +64,10 @@ ASSUME: the variables are organized in two blocks and
 @*     with respect to which one localizes,
 @* the basering is equipped with the elimination block ordering
 @*     for the variables in the second block
-NOTE: the output ring O is commutative. The ideal rGBid in O
+NOTE: the output ring C is commutative. The ideal rGBid in C
 represents the rational form of the output ideal pGBid in the basering.
 @* During the computation, the D-dimension of I and the corresponding
-vector space D-dimension of I are computed and printed out.
+dimension as K(x)-vector space of I are computed and printed out.
 @* Setting optional integer eng to 1, slimgb is taken as Groebner engine
 DISPLAY: In order to see the steps of the computation, set printlevel to >=2
 EXAMPLE: example ratstd; shows examples
@@ -330,11 +331,12 @@ example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(k,n,K,N),(a(0,0,1,1),a(0,0,1,0),dp);
+  // note, that the ordering must be an antiblock ordering
   matrix D[4][4]; D[1,3] = K; D[2,4] = N;
   def S = nc_algebra(1,D);
   setring S; // S is the 2nd shift algebra
   ideal I = (k+1)*K - (n-k), (n-k+1)*N - (n+1);
-  int is = 2; // hence 1st and 2nd variables treated as units
+  int is = 2; // hence 1..2 variables will be treated as invertible
   def A  = ratstd(I,is);
   pGBid; // polynomial form
   setring A;
