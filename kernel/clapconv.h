@@ -12,7 +12,7 @@
 #define INCL_SINGCONV_H
 
 #include "structs.h"
-#include "longalg.h"
+#include "AlgebraicExt.h"
 #include "ring.h"
 #include <factory.h>
 

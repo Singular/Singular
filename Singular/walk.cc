@@ -54,7 +54,7 @@
 #include "febase.h"
 #include "ipshell.h"
 #include "ipconv.h"
-#include "longalg.h"
+#include "AlgebraicExt.h"
 #include "ffields.h"
 #include "subexpr.h"
 #include "p_Procs.h"
@@ -85,7 +85,7 @@
 #include "lists.h"
 #include "prCopy.h"
 #include "string.h"
-#include "longalg.h"
+#include "AlgebraicExt.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #endif

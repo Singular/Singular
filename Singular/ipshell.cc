@@ -30,7 +30,7 @@
 #include "syz.h"
 #include "numbers.h"
 #include "modulop.h"
-#include "longalg.h"
+#include "AlgebraicExt.h"
 #include "lists.h"
 #include "attrib.h"
 #include "ipconv.h"

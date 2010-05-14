@@ -45,7 +45,7 @@
 #include "modulop.h"
 #include "febase.h"
 #include "matpol.h"
-#include "longalg.h"
+#include "AlgebraicExt.h"
 #include "ideals.h"
 #include "kstd1.h"
 #include "syz.h"
@@ -2248,18 +2248,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
     else
 #endif
-/*==================== naIdeal ==================================*/
-    if(strcmp(sys_cmd,"naIdeal")==0)
-    {
-      if ((h!=NULL) &&(h->Typ()==IDEAL_CMD))
-      {
-        naSetIdeal((ideal)h->Data());
-        return FALSE;
-      }
-      else
-         WerrorS("ideal expected");
-    }
-    else
 /*==================== isSqrFree =============================*/
 #ifdef HAVE_FACTORY
     if(strcmp(sys_cmd,"isSqrFree")==0)

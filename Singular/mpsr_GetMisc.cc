@@ -18,7 +18,7 @@
 #ifdef HAVE_MPSR
 
 #include "mpsr_Get.h"
-#include "longalg.h"
+#include "AlgebraicExt.h"
 #include "tok.h"
 #include "maps.h"
 #include "lists.h"
