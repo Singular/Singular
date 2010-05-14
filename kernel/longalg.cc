@@ -62,7 +62,6 @@ static void     (*nacDelete)(number *a, const ring r);
 #define n_Delete(A,R) nacDelete(A,R)
        void     (*nacNormalize)(number &a);
 static number   (*nacNeg)(number a);
-#define nacWrite(A) n_Write(A,nacRing)
        number   (*nacCopy)(number a);
 static number   (*nacInvers)(number a);
        BOOLEAN  (*nacIsZero)(number a);

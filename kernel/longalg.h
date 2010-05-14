@@ -80,7 +80,6 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napSetm(p)             p_Setm(p,currRing->algring)
 #define nanumber               lnumber
 napoly napRemainder(napoly f, const napoly  g);
-//void napWrite(napoly l,const BOOLEAN denom=TRUE);
 number   naGetDenom(number &n, const ring r);
 number   naGetNumerator(number &n, const ring r);
 #endif
