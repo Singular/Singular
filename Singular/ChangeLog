@@ -1,4 +1,9 @@
+Changes since 3-1-1-1:
+- factory: windows port improved
+- fixed trac 226 (for ascii links)
+
 Sat May  8 15:26:00 CEST 2010
+Changes since 3-1-1:
 - release 3-1-1-1
 - new gcd for alg.extension of Z/p
 - decodegb.lib is now indep. of the names opf the variables
