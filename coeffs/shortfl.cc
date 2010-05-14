@@ -409,8 +409,8 @@ number nrMapQ(number from, const coeffs aRing, const coeffs r)
 #define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
 #define IS_INT(A) ((A)->s==3)
 #define IS_IMM(A) (SR_HDL(A)&SR_INT)
-#define GET_NOM(A) (&(A)->z)
-#define GET_DENOM(A) (&(A)->n)
+#define GET_NOM(A) ((A)->z)
+#define GET_DENOM(A) ((A)->n)
 #define MPZ_INIT mpz_init
 #define MPZ_CLEAR mpz_clear
 

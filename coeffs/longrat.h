@@ -12,8 +12,6 @@
 #include "si_gmp.h"
 #include <aux.h>
 
-typedef MP_INT lint;
-
 #define SR_HDL(A) ((long)(A))
 
 #define SR_INT    1L
@@ -29,8 +27,8 @@ struct snumber;
 typedef struct snumber  *number;
 struct snumber
 {
-  lint z;
-  lint n;
+  mpz_t z;
+  mpz_t n;
 #if defined(LDEBUG)
   int debug;
 #endif

@@ -488,7 +488,7 @@ void nInitChar(coeffs r)
     n->nExactDiv= ngfDiv;
     n->nNeg   = ngfNeg;
     n->nInvers= ngfInvers;
-    n->cfCopy  = ngfCopy;
+    n->cfCopy  = ngf_Copy;
     n->nGreater = ngfGreater;
     n->nEqual = ngfEqual;
     n->nIsZero = ngfIsZero;
