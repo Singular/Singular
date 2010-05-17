@@ -361,7 +361,7 @@ void npInitChar(coeffs r, int c)
 #endif
     }
     r->type=n_Zp;
-    r->cfInitChar=npInitChar;
+    //r->cfInitChar=npInitChar;
     r->cfKillChar=npKillChar;
     r->cfSetChar=npSetChar;
     npSetChar(r);
@@ -497,7 +497,7 @@ static number npMapLongR(number from, const coeffs src, const coeffs dst_r)
     ndest->_mp_d = nn;
     ndest->_mp_alloc = ndest->_mp_size = bl;
     res->s = 0;
-    in=mpz_fdiv_ui(ndest,npPrimeM);
+    in=mpz_fdiv_ui(ndest,dst_r->npPrimeM);
     mpz_clear(ndest);
   }
   else
@@ -512,7 +512,7 @@ static number npMapLongR(number from, const coeffs src, const coeffs dst_r)
 
   dest->_mp_d = dd;
   dest->_mp_alloc = al;
-  iz=mpz_fdiv_ui(dest,npPrimeM);
+  iz=mpz_fdiv_ui(dest,dst_r->npPrimeM);
   mpz_clear(dest);
   if(res->s==0)
     iz=(long)npDiv((number)iz,(number)in,dst_r);
@@ -591,17 +591,17 @@ number nvMult (number a,number b, const coeffs r)
   //if (((long)a == 0) || ((long)b == 0))
   //  return (number)0;
   //else
-    return nvMultM(a,b);
+    return nvMultM(a,b,r);
 }
 
-void   nvInpMult(number &a, number b, const ring r)
+void   nvInpMult(number &a, number b, const coeffs r)
 {
-  number n=nvMultM(a,b);
+  number n=nvMultM(a,b,r);
   a=n;
 }
 
 
-long nvInvMod(long a)
+long nvInvMod(long a, const coeffs R)
 {
    long  s, t;
 
