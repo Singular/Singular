@@ -1188,9 +1188,8 @@ static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
 {
-  number h=nSub((number)u->Data(),(number)v->Data());
-  res->data = (char *) (nGreaterZero(h)||(nIsZero(h)));
-  nDelete(&h);
+  res->data = (char *) (nGreater((number)u->Data(),(number)v->Data()) 
+                       || nEqual((number)u->Data(),(number)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjGT_BI(leftv res, leftv u, leftv v)
@@ -1207,9 +1206,7 @@ static BOOLEAN jjGT_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGT_N(leftv res, leftv u, leftv v)
 {
-  number h=nSub((number)u->Data(),(number)v->Data());
-  res->data = (char *) (nGreaterZero(h)&&(!nIsZero(h)));
-  nDelete(&h);
+  res->data = (char *) (nGreater((number)u->Data(),(number)v->Data()));
   return FALSE;
 }
 static BOOLEAN jjLE_BI(leftv res, leftv u, leftv v)
