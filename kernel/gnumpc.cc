@@ -381,9 +381,13 @@ BOOLEAN ngcGreater (number a, number b)
   {
     return (((gmp_complex*)b)->real().sign() < 0);
   }
-  if ( b==NULL )
+  else if ( b==NULL )
   {
     return (((gmp_complex*)a)->real().sign() < 0);
+  }
+  else
+  {
+    return ((gmp_complex*)a) > ((gmp_complex*)b);
   }
   return FALSE;
 }

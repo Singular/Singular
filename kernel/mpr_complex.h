@@ -214,6 +214,10 @@ public:
   gmp_complex & operator /= ( const gmp_complex & a );
 
   inline friend bool operator == ( const gmp_complex & a, const gmp_complex & b );
+  inline friend bool operator  > ( const gmp_complex & a, const gmp_complex & b );
+  inline friend bool operator  < ( const gmp_complex & a, const gmp_complex & b );
+  inline friend bool operator >= ( const gmp_complex & a, const gmp_complex & b );
+  inline friend bool operator <= ( const gmp_complex & a, const gmp_complex & b );
 
   inline gmp_complex & operator = ( const gmp_complex & a );
   inline gmp_complex & operator = ( const gmp_float & f );
@@ -254,6 +258,23 @@ inline bool operator == ( const gmp_complex & a, const gmp_complex & b )
 {
   return ( b.real() == a.real() ) && ( b.imag() == a.imag() );
 }
+inline bool operator  > ( const gmp_complex & a, const gmp_complex & b )
+{
+  return ( a.real() > b.real() );
+}
+inline bool operator  < ( const gmp_complex & a, const gmp_complex & b )
+{
+  return ( a.real() < b.real() );
+}
+inline bool operator >= ( const gmp_complex & a, const gmp_complex & b )
+{
+  return ( a.real() >= b.real() );
+}
+inline bool operator <= ( const gmp_complex & a, const gmp_complex & b )
+{
+  return ( a.real() <= b.real() );
+}
+
 
 // <gmp_complex> = <gmp_complex>
 inline gmp_complex & gmp_complex::operator = ( const gmp_complex & a )
