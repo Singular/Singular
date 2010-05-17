@@ -108,8 +108,10 @@ number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 */
 void nSetChar(coeffs r)
 {
-  int c=r->ch;
+  /*----------------------generic ----------------*/
+    if ( r->cfSetChar!=NULL) r->cfSetChar(r);
 
+  // not yet ready:
   /*--------------------- Q -----------------*/
   if (nField_is_Q(r))
   {
@@ -159,11 +161,6 @@ void nSetChar(coeffs r)
     r->nInit_bigint=nrnMapQ;
   }
 #endif
-  else if (nField_is_Zp(r))
-  /*----------------------char. p----------------*/
-  {
-    npSetChar(c, r);
-  }
   /* -------------- GF(p^m) -----------------------*/
   else if (nField_is_GF(r))
   {
