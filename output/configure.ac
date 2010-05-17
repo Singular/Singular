@@ -16,7 +16,7 @@ AC_PROG_INSTALL
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -24,6 +24,8 @@ AC_C_INLINE
 
 # Checks for library functions.
 AC_FUNC_VPRINTF
+AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1],
+                               [Define if vsnprintf exists.])])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

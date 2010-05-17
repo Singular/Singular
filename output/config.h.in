@@ -8,5 +8,7 @@
 #undef HAVE_UNISTD_H
 /* Define if you have vprintf */
 #undef HAVE_VPRINTF
+/* Define if you have vsnprintf */
+#undef HAVE_VSNPRINTF
 
 #endif
