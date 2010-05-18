@@ -112,11 +112,6 @@ void nSetChar(coeffs r)
     if ( r->cfSetChar!=NULL) r->cfSetChar(r);
 
   // not yet ready:
-  /*--------------------- Q -----------------*/
-  if (nField_is_Q(r))
-  {
-    r->nInit_bigint=nl_Copy;
-  }
   #if 0 /* vertagt*/
   /*--------------------- Q_a/ Zp_a -----------------*/
   else if (nField_is_Extension(r))

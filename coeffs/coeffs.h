@@ -126,7 +126,8 @@ struct n_Procs_s
 
    /// Inline: a := b
    void    (*nInpMult)(number &a, number b, const coeffs r);
-   number  (*nInit_bigint)(number i, const coeffs src, const coeffs dummy);
+   /// maps the bigint i into the coeffs dst
+   number  (*nInit_bigint)(number i, const coeffs dst);
 
 #ifdef LDEBUG
    /// Test: is "a" a correct number?

@@ -292,7 +292,7 @@ static number nlMapR(number from, const coeffs src, const coeffs dst)
     i++;
   }
   number re=nlRInit(1);
-  mpz_set_d(&(re->z),f);
+  mpz_set_d(re->z,f);
   memcpy(&(re->n),&h1,sizeof(h1));
   re->s=0; /* not normalized */
   if(f_sign==-1) re=nlNeg(re,dst);
@@ -369,7 +369,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 
   if (res->s==0)
     nlNormalize(res,dst);
-  else if (mpz_size1(&res->z)<=MP_SMALL)
+  else if (mpz_size1(res->z)<=MP_SMALL)
   {
     // res is new, res->ref is 1
     res=nlShort3(res);
@@ -2455,45 +2455,76 @@ number nlFarey(number nN, number nP, const coeffs r)
   mpz_clear(P);
   return z;
 }
+
+static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, int parameter)
+{
+  /* test, if r is an instance of nInitCoeffs(n,parameter) */
+  return (n==n_Q);
+}
+
 void nlInitChar(coeffs r, int ch)
 {
-  r->cfInitChar=nlInitChar;
+  //r->cfInitChar=nlInitChar;
   r->cfKillChar=NULL;
   r->cfSetChar=NULL;
+  r->nCoeffIsEqual=nlCoeffsEqual;
 
-  r->cfDelete= nlDelete;
-  r->nNormalize=nlNormalize;
-  r->cfInit = nlInit;
-  r->n_Int  = nlInt;
-  r->nAdd   = nlAdd;
-  r->nSub   = nlSub;
   r->nMult  = nlMult;
-  r->nInpMult=nlInpMult;
+  r->nSub   = nlSub;
+  r->nAdd   = nlAdd;
   r->nDiv   = nlDiv;
-  r->nExactDiv= nlExactDiv;
   r->nIntDiv= nlIntDiv;
   r->nIntMod= nlIntMod;
+  r->nExactDiv= nlExactDiv;
+  r->cfInit = nlInit;
+  r->nPar = ndPar;
+  r->nParDeg = ndParDeg;
+  r->nSize  = nlSize;
+  r->n_Int  = nlInt;
+  #ifdef HAVE_RINGS
+  r->nDivComp = NULL; // only for ring stuff
+  r->nIsUnit = NULL; // only for ring stuff
+  r->nGetUnit = NULL; // only for ring stuff
+  r->nExtGcd = NULL; // only for ring stuff
+  #endif
   r->nNeg   = nlNeg;
   r->nInvers= nlInvers;
-  r->cfCopy  = nlCopy;
+  r->cfCopy  = nl_Copy;
+  r->nRePart = nl_Copy;
+  r->nImPart = ndReturn0;
+  r->cfWrite = nlWrite;
+  r->nRead = nlRead;
+  r->nNormalize=nlNormalize;
   r->nGreater = nlGreater;
+  #ifdef HAVE_RINGS
+  r->nDivBy = NULL; // only for ring stuff
+  #endif
   r->nEqual = nlEqual;
   r->nIsZero = nlIsZero;
   r->nIsOne = nlIsOne;
   r->nIsMOne = nlIsMOne;
   r->nGreaterZero = nlGreaterZero;
-  r->cfWrite = nlWrite;
-  r->nRead = nlRead;
   r->nPower = nlPower;
-  r->nGcd  = nlGcd;
-  r->nLcm  = nlLcm;
-  r->cfSetMap = nlSetMap;
-  r->nSize  = nlSize;
   r->cfGetDenom = nlGetDenom;
   r->cfGetNumerator = nlGetNumerator;
+  r->nGcd  = nlGcd;
+  r->nLcm  = nlLcm;
+  r->cfDelete= nlDelete;
+  r->cfSetMap = nlSetMap;
+  r->nName = ndName;
+  r->nInpMult=nlInpMult;
+  r->nInit_bigint=nl_Copy;
 #ifdef LDEBUG
+  // debug stuff
   r->nDBTest=nlDBTest;
 #endif
+  
+  // the variables:
+  r->nNULL = INT_TO_SR(0);
+  r->type = n_Q;
+  r->ch = 0;
+  r->has_simple_Alloc=FALSE;
+  r->has_simple_Inverse=FALSE;
 }
 #if 0
 number nlMod(number a, number b)
