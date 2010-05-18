@@ -2513,7 +2513,7 @@ void nlInitChar(coeffs r, int ch)
   r->cfSetMap = nlSetMap;
   r->nName = ndName;
   r->nInpMult=nlInpMult;
-  r->nInit_bigint=nl_Copy;
+  r->nInit_bigint=nlCopyMap;
 #ifdef LDEBUG
   // debug stuff
   r->nDBTest=nlDBTest;

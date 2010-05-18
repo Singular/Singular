@@ -12,7 +12,6 @@
 #include "output.h"
 #include "config.h"
 #include "coeffs.h"
-#include "utils.h"
 #include "omalloc.h"
 #include "longrat.h"
 #include "numbers.h"
