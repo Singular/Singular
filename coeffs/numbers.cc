@@ -357,8 +357,10 @@ void nInitChar(coeffs r)
   if (nField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
+    npInitChar(r, c); // r?
+
     /* never again:
-    npInitChar(c,r);
+     
     n->cfInit = npInit;
     n->n_Int  = npInt;
     n->nAdd   = npAdd;
@@ -434,31 +436,7 @@ void nInitChar(coeffs r)
   //if (c==(-1))
   else if (nField_is_R(r))
   {
-    n->cfInit = nrInit;
-    n->n_Int  = nrInt;
-    n->nAdd   = nrAdd;
-    n->nSub   = nrSub;
-    n->nMult  = nrMult;
-    n->nDiv   = nrDiv;
-    n->nExactDiv= nrDiv;
-    n->nNeg   = nrNeg;
-    n->nInvers= nrInvers;
-    n->cfCopy  = ndCopy;
-    n->nGreater = nrGreater;
-    n->nEqual = nrEqual;
-    n->nIsZero = nrIsZero;
-    n->nIsOne = nrIsOne;
-    n->nIsMOne = nrIsMOne;
-    n->nGreaterZero = nrGreaterZero;
-    n->cfWrite = nrWrite;
-    n->nRead = nrRead;
-    n->nPower = nrPower;
-    n->cfSetMap=nrSetMap;
-    /* nName= ndName; */
-    n->nSize = nrSize;
-#ifdef LDEBUG
-    n->nDBTest=ndDBTest; // not yet implemented: nrDBTest;
-#endif
+    nrInitChar(r, 0); // n/r? 0?
   }
   /* -------------- long R -----------------------*/
   else if (nField_is_long_R(r))
@@ -493,35 +471,7 @@ void nInitChar(coeffs r)
   /* -------------- long C -----------------------*/
   else if (nField_is_long_C(r))
   {
-    n->cfDelete= ngcDelete;
-    n->nNormalize=ndNormalize;
-    n->cfInit = ngcInit;
-    n->n_Int  = ngcInt;
-    n->nAdd   = ngcAdd;
-    n->nSub   = ngcSub;
-    n->nMult  = ngcMult;
-    n->nDiv   = ngcDiv;
-    n->nExactDiv= ngcDiv;
-    n->nNeg   = ngcNeg;
-    n->nInvers= ngcInvers;
-    n->cfCopy  = ngcCopy;
-    n->nGreater = ngcGreater;
-    n->nEqual = ngcEqual;
-    n->nIsZero = ngcIsZero;
-    n->nIsOne = ngcIsOne;
-    n->nIsMOne = ngcIsMOne;
-    n->nGreaterZero = ngcGreaterZero;
-    n->cfWrite = ngcWrite;
-    n->nRead = ngcRead;
-    n->nPower = ngcPower;
-    n->cfSetMap=ngcSetMap;
-    n->nPar=ngcPar;
-    n->nRePart=ngcRePart;
-    n->nImPart=ngcImPart;
-    n->nSize = ngcSize;
-#ifdef LDEBUG
-    n->nDBTest=ndDBTest; // not yet implemented: ngcDBTest
-#endif
+    ngcInitChar(r, 0); // n/r? 0?
   }
 #ifdef TEST
   else

@@ -9,6 +9,19 @@
 /* $Id$ */
 #include "coeffs.h"
 
+
+/// Get a mapping function from src into the domain of this type: n_R
+nMapFunc nrSetMap(const coeffs src, const coeffs dst);
+
+/// Initialize r
+void nrInitChar(coeffs r, int);
+
+/// test, whether r is an instance of nInitCoeffs(n, parameter) */
+static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, int parameter);
+
+
+/* // Private interface should be hidden!!!
+
 BOOLEAN nrGreaterZero (number k, const coeffs r);
 number  nrMult        (number a, number b, const coeffs r);
 number  nrInit        (int i, const coeffs r);
@@ -29,9 +42,9 @@ const char *  nrRead  (const char *s, number *a, const coeffs r);
 #ifdef LDEBUG
 BOOLEAN nrDBTest(number a, const coeffs r, const char *f, const int l);
 #endif
+*/
 
-/// Get a mapping function from src into the domain of this type: n_R
-nMapFunc nrSetMap(const coeffs src, const coeffs dst);
+
 
 // Where are the following used?
 // int     nrGetChar();
@@ -39,7 +52,8 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst);
 
 
 /// Converts a n_R number into a float. Needed by Maps
-float   nrFloat(number n); 
+float   nrFloat(number n);
+
 
 #endif
 

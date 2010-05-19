@@ -17,14 +17,8 @@
 #include "mpr_complex.h"
 
 #include <mylimits.h>
-// #include "limits.h"
 
-// #ifndef assume
-// #  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
-// #endif
-
-
-
+/// Our Type!
 static const n_coeffType ID = n_R;
 
 static const float nrEps = 1.0e-3;
@@ -536,4 +530,54 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
     return nrMapC;
   }
   return NULL;
+}
+
+
+
+
+
+/// test, whether r is an instance of nInitCoeffs(n, parameter) */
+static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, int parameter)
+{
+  assume( getCoeffType(r) == ID );
+
+  return (n == ID);
+};
+
+
+
+void nrInitChar(coeffs n, int)
+{
+  assume( getCoeffType(n) == ID );
+
+  n->cfInit = nrInit;
+  n->n_Int  = nrInt;
+  n->nAdd   = nrAdd;
+  n->nSub   = nrSub;
+  n->nMult  = nrMult;
+  n->nDiv   = nrDiv;
+  n->nExactDiv= nrDiv;
+  n->nNeg   = nrNeg;
+  n->nInvers= nrInvers;
+  n->cfCopy  = ndCopy;
+  n->nGreater = nrGreater;
+  n->nEqual = nrEqual;
+  n->nIsZero = nrIsZero;
+  n->nIsOne = nrIsOne;
+  n->nIsMOne = nrIsMOne;
+  n->nGreaterZero = nrGreaterZero;
+  n->cfWrite = nrWrite;
+  n->nRead = nrRead;
+  n->nPower = nrPower;
+  n->cfSetMap=nrSetMap;
+    /* nName= ndName; */
+    /*nSize  = ndSize;*/
+#ifdef LDEBUG
+  n->nDBTest=ndDBTest; // not yet implemented: nrDBTest;
+#endif
+  
+
+
+/// TODO: Any variables?
+  
 }
