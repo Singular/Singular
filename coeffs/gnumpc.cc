@@ -21,6 +21,9 @@
 
 #include "shortfl.h"
 
+/// Our Type!
+static const n_coeffType ID = n_long_C;
+
 
 #ifdef LDEBUG
 // not yet implemented
@@ -31,109 +34,6 @@ BOOLEAN ngcDBTest(number a, const char *f, const int l, const coeffs r)
   return TRUE;
 }
 #endif
-
-// #ifndef assume
-// #  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
-// #endif
-
-static const n_coeffType ID = n_long_C;
-
-number ngcMapQ(number from, const coeffs aRing, const coeffs r)
-{
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) == n_Q );
-
-  if ( from != NULL )
-  {
-    gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF,aRing));
-    return (number)res;
-  }
-  else
-    return NULL;
-}
-
-static number ngcMapLongR(number from, const coeffs aRing, const coeffs r)
-{
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) == n_long_R );
-  
-  if ( from != NULL )
-  {
-    gmp_complex *res=new gmp_complex(*((gmp_float *)from));
-    return (number)res;
-  }
-  else
-    return NULL;
-}
-
-static number ngcMapR(number from, const coeffs aRing, const coeffs r)
-{
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) == n_R );
-
-  if ( from != NULL )
-  {
-    gmp_complex *res=new gmp_complex((double)nrFloat(from));
-    return (number)res;
-  }
-  else
-    return NULL;
-}
-
-static number ngcMapP(number from, const coeffs aRing, const coeffs r)
-{
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) ==  n_Zp );
-  
-  if ( from != NULL)
-    return ngcInit(npInt(from, aRing), r);
-  else
-    return NULL;
-}
-
-
-
-static number ngcCopyMap(number from, const coeffs aRing, const coeffs r)
-{
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) ==  ID );
-
-  gmp_complex* b = NULL;
-  
-  if ( from !=  NULL )
-  { 
-    b = new gmp_complex( *(gmp_complex*)from );
-  }
-  return (number)b;  
-}
-
-nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
-{
-  assume( getCoeffType(dst) == ID );
-  
-  if(nField_is_Q(src))
-  {
-    return ngcMapQ;
-  }
-  if (nField_is_long_R(src))
-  {
-    return ngcMapLongR;
-  }
-  if (nField_is_long_C(src))
-  {
-    return ngcCopyMap;
-  }
-  if(nField_is_R(src))
-  {
-    return ngcMapR;
-  }
-  if (nField_is_Zp(src))
-  {
-    return ngcMapP;
-  }
-  return NULL;
-}
-
 
 
 number   ngcPar(int i, const coeffs r)
@@ -469,7 +369,219 @@ void ngcWrite (number &a, const coeffs r)
   }
 }
 
-// local Variables: ***
-// folded-file: t ***
-// compile-command: "make installg" ***
-// End: ***
+
+
+
+static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, int)
+{
+  assume( getCoeffType(r) == ID );
+  
+  return (n == ID);
+};
+
+void ngcInitChar(coeffs n, int)
+{
+  assume( getCoeffType(n) == ID );
+
+  n->cfDelete  = ngcDelete;
+  n->nNormalize=ndNormalize;
+  n->cfInit   = ngcInit;
+  n->n_Int    = ngcInt;
+  n->nAdd     = ngcAdd;
+  n->nSub     = ngcSub;
+  n->nMult    = ngcMult;
+  n->nDiv     = ngcDiv;
+  n->nExactDiv= ngcDiv;
+  n->nNeg     = ngcNeg;
+  n->nInvers  = ngcInvers;
+  n->cfCopy   = ngcCopy;
+  n->nGreater = ngcGreater;
+  n->nEqual   = ngcEqual;
+  n->nIsZero  = ngcIsZero;
+  n->nIsOne   = ngcIsOne;
+  n->nIsMOne  = ngcIsMOne;
+  n->nGreaterZero = ngcGreaterZero;
+  n->cfWrite  = ngcWrite;
+  n->nRead    = ngcRead;
+  n->nPower   = ngcPower;
+  n->cfSetMap = ngcSetMap;
+  n->nPar     = ngcPar;
+  n->nRePart  = ngcRePart;
+  n->nImPart  = ngcImPart;
+    // nSize  = ndSize;
+#ifdef LDEBUG
+  n->nDBTest  = ndDBTest; // not yet implemented: ngcDBTest
+#endif
+
+
+  
+/*  
+  //r->cfInitChar=nlInitChar;
+  r->cfKillChar=NULL;
+  r->cfSetChar=NULL;
+  r->nCoeffIsEqual=nlCoeffsEqual;
+
+  r->nMult  = nlMult;
+  r->nSub   = nlSub;
+  r->nAdd   = nlAdd;
+  r->nDiv   = nlDiv;
+  r->nIntDiv= nlIntDiv;
+  r->nIntMod= nlIntMod;
+  r->nExactDiv= nlExactDiv;
+  r->cfInit = nlInit;
+  r->nPar = ndPar;
+  r->nParDeg = ndParDeg;
+  r->nSize  = nlSize;
+  r->n_Int  = nlInt;
+#ifdef HAVE_RINGS
+  r->nDivComp = NULL; // only for ring stuff
+  r->nIsUnit = NULL; // only for ring stuff
+  r->nGetUnit = NULL; // only for ring stuff
+  r->nExtGcd = NULL; // only for ring stuff
+#endif
+  r->nNeg   = nlNeg;
+  r->nInvers= nlInvers;
+  r->cfCopy  = nl_Copy;
+  r->nRePart = nl_Copy;
+  r->nImPart = ndReturn0;
+  r->cfWrite = nlWrite;
+  r->nRead = nlRead;
+  r->nNormalize=nlNormalize;
+  r->nGreater = nlGreater;
+#ifdef HAVE_RINGS
+  r->nDivBy = NULL; // only for ring stuff
+#endif
+  r->nEqual = nlEqual;
+  r->nIsZero = nlIsZero;
+  r->nIsOne = nlIsOne;
+  r->nIsMOne = nlIsMOne;
+  r->nGreaterZero = nlGreaterZero;
+  r->nPower = nlPower;
+  r->cfGetDenom = nlGetDenom;
+  r->cfGetNumerator = nlGetNumerator;
+  r->nGcd  = nlGcd;
+  r->nLcm  = nlLcm;
+  r->cfDelete= nlDelete;
+  r->cfSetMap = nlSetMap;
+  r->nName = ndName;
+  r->nInpMult=nlInpMult;
+  r->nInit_bigint=nlCopyMap;
+#ifdef LDEBUG
+  // debug stuff
+  r->nDBTest=nlDBTest;
+#endif
+
+  // the variables:
+  r->nNULL = INT_TO_SR(0);
+  r->type = n_Q;
+  r->ch = 0;
+  r->has_simple_Alloc=FALSE;
+  r->has_simple_Inverse=FALSE;
+*/
+
+/// TODO: Any variables?
+  
+}
+
+
+
+
+
+number ngcMapQ(number from, const coeffs aRing, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_Q );
+
+  if ( from != NULL )
+  {
+    gmp_complex *res=new gmp_complex(numberFieldToFloat(from,QTOF,aRing));
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+
+static number ngcMapLongR(number from, const coeffs aRing, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_long_R );
+
+  if ( from != NULL )
+  {
+    gmp_complex *res=new gmp_complex(*((gmp_float *)from));
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+
+static number ngcMapR(number from, const coeffs aRing, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) == n_R );
+
+  if ( from != NULL )
+  {
+    gmp_complex *res=new gmp_complex((double)nrFloat(from));
+    return (number)res;
+  }
+  else
+    return NULL;
+}
+
+static number ngcMapP(number from, const coeffs aRing, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) ==  n_Zp );
+
+  if ( from != NULL)
+    return ngcInit(npInt(from, aRing), r);
+  else
+    return NULL;
+}
+
+
+
+static number ngcCopyMap(number from, const coeffs aRing, const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  assume( getCoeffType(aRing) ==  ID );
+
+  gmp_complex* b = NULL;
+
+  if ( from !=  NULL )
+  { 
+    b = new gmp_complex( *(gmp_complex*)from );
+  }
+  return (number)b;  
+}
+
+
+nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
+{
+  assume( getCoeffType(dst) == ID );
+
+  if(nField_is_Q(src))
+  {
+    return ngcMapQ;
+  }
+  if (nField_is_long_R(src))
+  {
+    return ngcMapLongR;
+  }
+  if (nField_is_long_C(src))
+  {
+    return ngcCopyMap;
+  }
+  if(nField_is_R(src))
+  {
+    return ngcMapR;
+  }
+  if (nField_is_Zp(src))
+  {
+    return ngcMapP;
+  }
+  return NULL;
+}
+
+
