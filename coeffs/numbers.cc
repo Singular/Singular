@@ -134,48 +134,47 @@ void nSetChar(coeffs r)
   /*----------------------ring Z / 2^m----------------*/
   else if (nField_is_Ring_2toM(r))
   {
-    nr2mSetExp(c, r);
-    r->nInit_bigint=nr2mMapQ;
+  //  nr2mSetExp(c, r);
+  //  r->nInit_bigint=nr2mMapQ;
   }
   /*----------------------ring Z ----------------*/
   else if (nField_is_Ring_Z(r))
   {
-    nrzSetExp(c, r);
-    r->nInit_bigint=nrzMapQ;
+  //  nrzSetExp(c, r);
+  //  r->nInit_bigint=nrzMapQ;
   }
   /*----------------------ring Z / n----------------*/
   else if (nField_is_Ring_ModN(r))
   {
-    nrnSetExp(c, r);
-    r->nInit_bigint=nrnMapQ;
+  //  nrnSetExp(c, r);
+  //  r->nInit_bigint=nrnMapQ;
   }
   /*----------------------ring Z / n----------------*/
   else if (nField_is_Ring_PtoM(r))
   {
-    nrnSetExp(c, r);
-    r->nInit_bigint=nrnMapQ;
+  //  nrnSetExp(c, r);
+  //  r->nInit_bigint=nrnMapQ;
   }
 #endif
   /* -------------- GF(p^m) -----------------------*/
   else if (nField_is_GF(r))
   {
-    nfSetChar(c,r->parameter);
-    r->nInit_bigint=ndReturn0; // not impl.
+  //  nfSetChar(c,r->parameter);
   }
   /* -------------- R -----------------------*/
   //if (c==(-1))
   else if (nField_is_R(r))
   {
-    r->nInit_bigint=nrMapQ;
+  //  r->nInit_bigint=nrMapQ;
   }
   /* -------------- long R -----------------------*/
   /* -------------- long C -----------------------*/
   else if ((nField_is_long_R(r))
   || (nField_is_long_C(r)))
   {
-    setGMPFloatDigits(r->float_len,r->float_len2);
-    if (nField_is_long_R(r)) r->nInit_bigint=ngfMapQ;
-    else                     r->nInit_bigint=ngcMapQ;
+   // setGMPFloatDigits(r->float_len,r->float_len2);
+   // if (nField_is_long_R(r)) r->nInit_bigint=ngfMapQ;
+   // else                     r->nInit_bigint=ngcMapQ;
   }
 #ifdef TEST
   /* -------------- R -----------------------*/
@@ -351,12 +350,7 @@ void nInitChar(coeffs r)
   }
   else
 #endif
-  if (nField_is_Q(r))
-  {
-    r->cfInitChar=nlInitChar;
-    nlInitChar();
-  }
-  else if (nField_is_Zp(r))
+  if (nField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
     /* never again:
@@ -398,8 +392,7 @@ void nInitChar(coeffs r)
     }
 #endif
     */
-    r->cfInitChar=npInitChar;
-    npInitChar(r,c);
+    //r->cfInitChar=npInitChar;
   }
   /* -------------- GF(p^m) -----------------------*/
   else if (nField_is_GF(r))
