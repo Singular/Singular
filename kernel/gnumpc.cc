@@ -295,7 +295,9 @@ BOOLEAN ngcGreaterZero (number a)
 */
 BOOLEAN ngcGreater (number a, number b)
 {
-  return ((gmp_complex*)a) > ((gmp_complex*)b);
+  gmp_complex *aa=(gmp_complex*)a;
+  gmp_complex *bb=(gmp_complex*)b;
+  return (*aa) > (*bb);
 }
 
 /*2
@@ -303,7 +305,9 @@ BOOLEAN ngcGreater (number a, number b)
 */
 BOOLEAN ngcEqual (number a, number b)
 {
-  return ( (*(gmp_complex*)a) == (*(gmp_complex*)b) );
+  gmp_complex *aa=(gmp_complex*)a;
+  gmp_complex *bb=(gmp_complex*)b;
+  return (*aa) == (*bb);
 }
 
 /*2
