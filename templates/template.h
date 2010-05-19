@@ -66,18 +66,17 @@ public:
    *
    * Long: [detailed method description]
    *
-   * @param
+   * @param [in] a some int
+   * @param [in] b another int
+   * @param [out] result integer result
+   *
    * @return [information about return value]
    * @sa [see also section]
    * @note This will be hilighted in the documentation as a special note.
    * @warning [any warning if necessary]
    * @exception std::exception Some explanation of what causes this exception.
    */
-  void MethodTemplate(
-         const int a, ///< [in] some int
-         const int b, ///< [in] another int
-         int & result ///< [out] integer result
-                     );
+  void MethodTemplate( const int a, const int b, int & result );
 
   ///
   /// Brief: Example of Copy a string method.
@@ -89,7 +88,6 @@ public:
   /// The behavior of @a strcpy is undefined if the source
   /// and destination strings overlap.
   ///
-  /// @param
   /// @return @a strcpy returns the destination string.
   /// No return value is reserved to indicate an error.
   /// @sa wcscpy(), _mbscpy(), strncpy()
