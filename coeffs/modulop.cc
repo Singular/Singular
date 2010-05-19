@@ -311,17 +311,94 @@ void npKillChar(coeffs r)
   #endif
 }
 
+static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, int parameter)
+{
+  /* test, if r is an instance of nInitCoeffs(n,parameter) */
+  return (n==n_Zp) && (r->ch==parameter);
+}
+
 void npInitChar(coeffs r, int c)
 {
   int i, w;
 
-  if ((c>1) || (c<(-1)))
-  {
-    if (c>1) r->npPrimeM = c;
-    else     r->npPrimeM = -c;
-    r->npPminus1M = r->npPrimeM - 1;
+  r->npPrimeM = c;
+  r->npPminus1M = c /*r->npPrimeM*/ - 1;
+
+  //r->cfInitChar=npInitChar;
+  r->cfKillChar=npKillChar;
+  r->cfSetChar=npSetChar;
+  r->nCoeffIsEqual=npCoeffsEqual;
+
+  r->nMult  = npMult;
+  r->nSub   = npSub;
+  r->nAdd   = npAdd;
+  r->nDiv   = npDiv;
+  r->nIntDiv= npDiv;
+  r->nIntMod= ndIntMod;
+  r->nExactDiv= npDiv;
+  r->cfInit = npInit;
+  r->nPar = ndPar;
+  r->nParDeg = ndParDeg;
+  r->nSize  = ndSize;
+  r->n_Int  = npInt;
+  #ifdef HAVE_RINGS
+  r->nDivComp = NULL; // only for ring stuff
+  r->nIsUnit = NULL; // only for ring stuff
+  r->nGetUnit = NULL; // only for ring stuff
+  r->nExtGcd = NULL; // only for ring stuff
+  #endif
+  r->nNeg   = npNeg;
+  r->nInvers= npInvers;
+  r->cfCopy  = ndCopy;
+  r->nRePart = ndCopy;
+  r->nImPart = ndReturn0;
+  r->cfWrite = npWrite;
+  r->nRead = npRead;
+  r->nNormalize=ndNormalize;
+  r->nGreater = npGreater;
+  #ifdef HAVE_RINGS
+  r->nDivBy = NULL; // only for ring stuff
+  #endif
+  r->nEqual = npEqual;
+  r->nIsZero = npIsZero;
+  r->nIsOne = npIsOne;
+  r->nIsMOne = npIsMOne;
+  r->nGreaterZero = npGreaterZero;
+  r->nPower = npPower;
+  r->cfGetDenom = ndGetDenom;
+  r->cfGetNumerator = ndGetNumerator;
+  r->nGcd  = ndGcd;
+  r->nLcm  = ndGcd;
+  r->cfDelete= ndDelete;
+  r->cfSetMap = npSetMap;
+  r->nName = ndName;
+  r->nInpMult=ndInpMult;
+  r->nInit_bigint= npMap0;
 #ifdef NV_OPS
-    if (r->npPrimeM <=NV_MAX_PRIME)
+  if (c>NV_MAX_PRIME)
+  {
+    r->nMult  = nvMult;
+    r->nDiv   = nvDiv;
+    r->nExactDiv= nvDiv;
+    r->nInvers= nvInvers;
+    r->nPower= nvPower;
+  }
+#endif
+#ifdef LDEBUG
+  // debug stuff
+  r->nDBTest=npDBTest;
+#endif
+  
+  // the variables:
+  r->nNULL = (number)0;
+  r->type = n_Zp;
+  r->ch = c;
+  r->has_simple_Alloc=TRUE;
+  r->has_simple_Inverse=TRUE;
+
+  // the tables
+#ifdef NV_OPS
+  if (r->npPrimeM <=NV_MAX_PRIME)
 #endif
     {
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
@@ -360,64 +437,6 @@ void npInitChar(coeffs r, int c)
       r->npInvTable=(unsigned short*)omAlloc0( r->npPrimeM*sizeof(unsigned short) );
 #endif
     }
-    r->type=n_Zp;
-    //r->cfInitChar=npInitChar;
-    r->cfKillChar=npKillChar;
-    r->cfSetChar=npSetChar;
-    npSetChar(r);
-    // dummy stuff
-    r->nPar  = ndPar;
-    r->nParDeg=ndParDeg;
-    r->cfGetDenom= ndGetDenom;
-    r->cfGetNumerator= ndGetNumerator;
-    r->nImPart=ndReturn0;
-    r->nInpMult=ndInpMult;
-    r->nIntMod=ndIntMod;
-    r->nNormalize=ndNormalize;
-    r->nGcd  = ndGcd;
-    r->nLcm  = ndGcd; /* tricky, isn't it ?*/
-    // the real stuff
-    r->cfInit = npInit;
-    r->nInit_bigint=npMap0;
-    r->n_Int  = npInt;
-    r->nAdd   = npAdd;
-    r->nSub   = npSub;
-    r->nMult  = npMult;
-    r->nDiv   = npDiv;
-    r->nExactDiv= npDiv;
-    r->nNeg   = npNeg;
-    r->nInvers= npInvers;
-    r->cfCopy  = ndCopy;
-    r->nGreater = npGreater;
-    r->nEqual = npEqual;
-    r->nIsZero = npIsZero;
-    r->nIsOne = npIsOne;
-    r->nIsMOne = npIsMOne;
-    r->nGreaterZero = npGreaterZero;
-    r->cfWrite = npWrite;
-    r->nRead = npRead;
-    r->nPower = npPower;
-    r->cfSetMap = npSetMap;
-    r->nName= ndName; 
-    r->nSize  = ndSize;
-#ifdef LDEBUG
-    r->nDBTest=npDBTest;
-#endif
-#ifdef NV_OPS
-    if (c>NV_MAX_PRIME)
-    {
-      r->nMult  = nvMult;
-      r->nDiv   = nvDiv;
-      r->nExactDiv= nvDiv;
-      r->nInvers= nvInvers;
-      r->nPower= nvPower;
-    }
-#endif
-  }
-  else
-  {
-    WarnS("nInitChar failed");
-  }
 }
 
 #ifdef LDEBUG
