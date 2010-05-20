@@ -102,90 +102,6 @@ BOOLEAN ndIsUnit(number a) { return !nIsZero(a); }
 number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 #endif
 
-/*2
-* init operations for characteristic c (complete==TRUE)
-* init nDelete    for characteristic c (complete==FALSE)
-*/
-void nSetChar(coeffs r)
-{
-  /*----------------------generic ----------------*/
-    if ( r->cfSetChar!=NULL) r->cfSetChar(r);
-
-  // not yet ready:
-  #if 0 /* vertagt*/
-  /*--------------------- Q_a/ Zp_a -----------------*/
-  else if (nField_is_Extension(r))
-  {
-    if (r->minpoly != NULL)
-    {
-      naSetChar(c,r);
-      if (rField_is_Q_a(r)) r->nInit_bigint=naMap00;
-      if (rField_is_Zp_a(r)) r->nInit_bigint=naMap0P;
-    }
-    else
-    {
-      ntSetChar(c,r);
-      if (rField_is_Q_a(r)) r->nInit_bigint=ntMap00;
-      if (rField_is_Zp_a(r)) r->nInit_bigint=ntMap0P;
-    }
-  }
-  #endif
-#ifdef HAVE_RINGS
-  /*----------------------ring Z / 2^m----------------*/
-  else if (nField_is_Ring_2toM(r))
-  {
-  //  nr2mSetExp(c, r);
-  //  r->nInit_bigint=nr2mMapQ;
-  }
-  /*----------------------ring Z ----------------*/
-  else if (nField_is_Ring_Z(r))
-  {
-  //  nrzSetExp(c, r);
-  //  r->nInit_bigint=nrzMapQ;
-  }
-  /*----------------------ring Z / n----------------*/
-  else if (nField_is_Ring_ModN(r))
-  {
-  //  nrnSetExp(c, r);
-  //  r->nInit_bigint=nrnMapQ;
-  }
-  /*----------------------ring Z / n----------------*/
-  else if (nField_is_Ring_PtoM(r))
-  {
-  //  nrnSetExp(c, r);
-  //  r->nInit_bigint=nrnMapQ;
-  }
-#endif
-  /* -------------- GF(p^m) -----------------------*/
-  else if (nField_is_GF(r))
-  {
-  //  nfSetChar(c,r->parameter);
-  }
-  /* -------------- R -----------------------*/
-  //if (c==(-1))
-  else if (nField_is_R(r))
-  {
-  //  r->nInit_bigint=nrMapQ;
-  }
-  /* -------------- long R -----------------------*/
-  /* -------------- long C -----------------------*/
-  else if ((nField_is_long_R(r))
-  || (nField_is_long_C(r)))
-  {
-   // setGMPFloatDigits(r->float_len,r->float_len2);
-   // if (nField_is_long_R(r)) r->nInit_bigint=ngfMapQ;
-   // else                     r->nInit_bigint=ngcMapQ;
-  }
-#ifdef TEST
-  /* -------------- R -----------------------*/
-  //if (c==(-1))
-  else if (!nField_is_R(r) && !nField_is_Q(r))
-  {
-    WerrorS("unknown field");
-  }
-#endif
-}
-
 static n_coeffType nLastCoeffs=n_Z2n;
 static cfInitCharProc *nInitCharTable=NULL;
 /*2
@@ -303,24 +219,6 @@ void nKillChar(coeffs r)
         if (cf_root==r) cf_root=n->next;
         r->cfDelete(&(r->nNULL),r);
         if (r->cfKillChar!=NULL) r->cfKillChar(r);
-        /* was:
-        switch(r->type)
-        {
-          case n_Zp_a:
-          case n_Q_a:
-               {
-                 number n=r->minpoly;
-                 if (n!=NULL)
-                 {
-                   r->minpoly=NULL;
-                   naDelete(&n,r);
-                 }
-               }
-               break;
-            default:
-                 break;
-        }
-        */
         omFreeSize((void *)r, sizeof(n_Procs_s));
         r=NULL;
       }
@@ -329,11 +227,6 @@ void nKillChar(coeffs r)
         WarnS("cf_root list destroyed");
       }
     }
-    //if (r->algring!=NULL)
-    //{
-    //  rKill(r->algring);
-    //  r->algring=NULL;
-    //}
   }
 }
 
