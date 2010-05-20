@@ -189,7 +189,7 @@ void nSetChar(coeffs r)
 /*2
 * init operations for coeffs r
 */
-void nInitChar(coeffs r)
+coeffs nInitChar(n_CoeffType n, int parameter)
 {
   int c=nInternalChar(r);
   n_coeffType t=getCoeffType(r);
