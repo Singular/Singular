@@ -311,10 +311,10 @@ void npKillChar(coeffs r)
   #endif
 }
 
-static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, int parameter)
+static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
-  return (n==n_Zp) && (r->ch==parameter);
+  return (n==n_Zp) && (r->ch==(int)(long)parameter);
 }
 
 void npInitChar(coeffs r, int c)
@@ -334,27 +334,27 @@ void npInitChar(coeffs r, int c)
   r->nAdd   = npAdd;
   r->nDiv   = npDiv;
   r->nIntDiv= npDiv;
-  r->nIntMod= ndIntMod;
+  //r->nIntMod= ndIntMod;
   r->nExactDiv= npDiv;
   r->cfInit = npInit;
-  r->nPar = ndPar;
-  r->nParDeg = ndParDeg;
-  r->nSize  = ndSize;
+  //r->nPar = ndPar;
+  //r->nParDeg = ndParDeg;
+  //r->nSize  = ndSize;
   r->n_Int  = npInt;
   #ifdef HAVE_RINGS
-  r->nDivComp = NULL; // only for ring stuff
-  r->nIsUnit = NULL; // only for ring stuff
-  r->nGetUnit = NULL; // only for ring stuff
-  r->nExtGcd = NULL; // only for ring stuff
+  //r->nDivComp = NULL; // only for ring stuff
+  //r->nIsUnit = NULL; // only for ring stuff
+  //r->nGetUnit = NULL; // only for ring stuff
+  //r->nExtGcd = NULL; // only for ring stuff
   #endif
   r->nNeg   = npNeg;
   r->nInvers= npInvers;
-  r->cfCopy  = ndCopy;
-  r->nRePart = ndCopy;
-  r->nImPart = ndReturn0;
+  //r->cfCopy  = ndCopy;
+  //r->nRePart = ndCopy;
+  //r->nImPart = ndReturn0;
   r->cfWrite = npWrite;
   r->nRead = npRead;
-  r->nNormalize=ndNormalize;
+  //r->nNormalize=ndNormalize;
   r->nGreater = npGreater;
   #ifdef HAVE_RINGS
   r->nDivBy = NULL; // only for ring stuff
@@ -367,11 +367,11 @@ void npInitChar(coeffs r, int c)
   r->nPower = npPower;
   r->cfGetDenom = ndGetDenom;
   r->cfGetNumerator = ndGetNumerator;
-  r->nGcd  = ndGcd;
-  r->nLcm  = ndGcd;
-  r->cfDelete= ndDelete;
+  //r->nGcd  = ndGcd;
+  //r->nLcm  = ndGcd;
+  //r->cfDelete= ndDelete;
   r->cfSetMap = npSetMap;
-  r->nName = ndName;
+  //r->nName = ndName;
   r->nInpMult=ndInpMult;
   r->nInit_bigint= npMap0;
 #ifdef NV_OPS
@@ -391,7 +391,7 @@ void npInitChar(coeffs r, int c)
   
   // the variables:
   r->nNULL = (number)0;
-  r->type = n_Zp;
+  //r->type = n_Zp;
   r->ch = c;
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
@@ -400,43 +400,43 @@ void npInitChar(coeffs r, int c)
 #ifdef NV_OPS
   if (r->npPrimeM <=NV_MAX_PRIME)
 #endif
-    {
+  {
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-      r->npExpTable=(unsigned short *)omAlloc( r->npPrimeM*sizeof(unsigned short) );
-      r->npLogTable=(unsigned short *)omAlloc( r->npPrimeM*sizeof(unsigned short) );
-      r->npExpTable[0] = 1;
-      r->npLogTable[0] = 0;
-      if (r->npPrimeM > 2)
+    r->npExpTable=(unsigned short *)omAlloc( r->npPrimeM*sizeof(unsigned short) );
+    r->npLogTable=(unsigned short *)omAlloc( r->npPrimeM*sizeof(unsigned short) );
+    r->npExpTable[0] = 1;
+    r->npLogTable[0] = 0;
+    if (r->npPrimeM > 2)
+    {
+      w = 1;
+      loop
       {
-        w = 1;
+        r->npLogTable[1] = 0;
+        w++;
+        i = 0;
         loop
         {
-          r->npLogTable[1] = 0;
-          w++;
-          i = 0;
-          loop
-          {
-            i++;
-            r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1])
-                                 % r->npPrimeM);
-            r->npLogTable[r->npExpTable[i]] = i;
-            if (/*(i == npPrimeM - 1 ) ||*/ (r->npExpTable[i] == 1))
-              break;
-          }
-          if (i == r->npPrimeM - 1)
+          i++;
+          r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1])
+                               % r->npPrimeM);
+          r->npLogTable[r->npExpTable[i]] = i;
+          if (/*(i == npPrimeM - 1 ) ||*/ (r->npExpTable[i] == 1))
             break;
         }
+        if (i == r->npPrimeM - 1)
+          break;
       }
-      else
-      {
-        r->npExpTable[1] = 1;
-        r->npLogTable[1] = 0;
-      }
+    }
+    else
+    {
+      r->npExpTable[1] = 1;
+      r->npLogTable[1] = 0;
+    }
 #endif
 #ifdef HAVE_DIV_MOD
-      r->npInvTable=(unsigned short*)omAlloc0( r->npPrimeM*sizeof(unsigned short) );
+    r->npInvTable=(unsigned short*)omAlloc0( r->npPrimeM*sizeof(unsigned short) );
 #endif
-    }
+  }
 }
 
 #ifdef LDEBUG
