@@ -2519,12 +2519,15 @@ void nlInitChar(coeffs r, int ch)
   r->nDBTest=nlDBTest;
 #endif
   
-  // the variables:
+  // the variables: general stuff (required)
   r->nNULL = INT_TO_SR(0);
   r->type = n_Q;
   r->ch = 0;
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;
+  
+  // variables for this type of coeffs:
+  // (none)
 }
 #if 0
 number nlMod(number a, number b)
