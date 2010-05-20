@@ -2456,7 +2456,7 @@ number nlFarey(number nN, number nP, const coeffs r)
   return z;
 }
 
-static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, int parameter)
+static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 {
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
   return (n==n_Q);
@@ -2464,7 +2464,6 @@ static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, int parameter)
 
 void nlInitChar(coeffs r, int ch)
 {
-  //r->cfInitChar=nlInitChar;
   r->cfKillChar=NULL;
   r->cfSetChar=NULL;
   r->nCoeffIsEqual=nlCoeffsEqual;
@@ -2477,27 +2476,27 @@ void nlInitChar(coeffs r, int ch)
   r->nIntMod= nlIntMod;
   r->nExactDiv= nlExactDiv;
   r->cfInit = nlInit;
-  r->nPar = ndPar;
-  r->nParDeg = ndParDeg;
+  //r->nPar = ndPar;
+  //r->nParDeg = ndParDeg;
   r->nSize  = nlSize;
   r->n_Int  = nlInt;
   #ifdef HAVE_RINGS
-  r->nDivComp = NULL; // only for ring stuff
-  r->nIsUnit = NULL; // only for ring stuff
-  r->nGetUnit = NULL; // only for ring stuff
-  r->nExtGcd = NULL; // only for ring stuff
+  //r->nDivComp = NULL; // only for ring stuff
+  //r->nIsUnit = NULL; // only for ring stuff
+  //r->nGetUnit = NULL; // only for ring stuff
+  //r->nExtGcd = NULL; // only for ring stuff
   #endif
   r->nNeg   = nlNeg;
   r->nInvers= nlInvers;
   r->cfCopy  = nl_Copy;
   r->nRePart = nl_Copy;
-  r->nImPart = ndReturn0;
+  //r->nImPart = ndReturn0;
   r->cfWrite = nlWrite;
   r->nRead = nlRead;
   r->nNormalize=nlNormalize;
   r->nGreater = nlGreater;
   #ifdef HAVE_RINGS
-  r->nDivBy = NULL; // only for ring stuff
+  //r->nDivBy = NULL; // only for ring stuff
   #endif
   r->nEqual = nlEqual;
   r->nIsZero = nlIsZero;
@@ -2511,7 +2510,7 @@ void nlInitChar(coeffs r, int ch)
   r->nLcm  = nlLcm;
   r->cfDelete= nlDelete;
   r->cfSetMap = nlSetMap;
-  r->nName = ndName;
+  //r->nName = ndName;
   r->nInpMult=nlInpMult;
   r->nInit_bigint=nlCopyMap;
 #ifdef LDEBUG
@@ -2521,7 +2520,7 @@ void nlInitChar(coeffs r, int ch)
   
   // the variables: general stuff (required)
   r->nNULL = INT_TO_SR(0);
-  r->type = n_Q;
+  //r->type = n_Q;
   r->ch = 0;
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;

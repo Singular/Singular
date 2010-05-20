@@ -186,74 +186,44 @@ void nSetChar(coeffs r)
 #endif
 }
 
+static n_coeffType nLastCoeffs=n_Z2n;
+static cfInitCharProc *nInitCharTable=NULL;
 /*2
 * init operations for coeffs r
 */
-coeffs nInitChar(n_CoeffType n, int parameter)
+coeffs nInitChar(n_coeffType t, void * parameter)
 {
-  int c=nInternalChar(r);
-  n_coeffType t=getCoeffType(r);
-
-  #if 0 /* vertagt*/
-  if (nField_is_Extension(r))
-  {
-    if (r->algring==NULL)
-    {
-      int ch=-c;
-      if (c==1) ch=0;
-      r->algring=(ring) rDefault(ch,r->P,r->parameter);
-      //r->algring->ShortOut=r->ShortOut;
-      // includes: nInitChar(r->algring);
-    }
-  }
-  #endif
-
   n_Procs_s *n=cf_root;
-  while((n!=NULL)
-    && ((n->ch!=c) || (n->type!=t)))
+  while((n!=NULL) && (!n->nCoeffIsEqual(n,t,parameter)))
       n=n->next;
   if (n==NULL)
   {
     n=(n_Procs_s*)omAlloc0(sizeof(n_Procs_s));
     n->next=cf_root;
     n->ref=1;
-    n->ch=c;
     n->type=t;
-    cf_root=n;
-  }
-  else if ((n->ch==c) && (n->type==t))
-  {
-    n->ref++;
-    r=n;
-    return;
-  }
-  else
-  {
-    WerrorS("nInitChar failed");
-    return;
-  }
-  r=n;
-  n->ch = c;
-  n->nPar  = ndPar;
-  n->nParDeg=ndParDeg;
-  n->nSize = ndSize;
-  n->cfGetDenom= ndGetDenom;
-  n->cfGetNumerator= ndGetNumerator;
-  n->nName =  ndName;
-  n->nImPart=ndReturn0;
-  n->cfDelete= ndDelete;
-  n->nInpMult=ndInpMult;
-  n->cfCopy=nd_Copy;
-  n->nIntMod=ndIntMod; /* dummy !! */
-  n->nNormalize=ndNormalize;
-  n->nGcd  = ndGcd;
-  n->nLcm  = ndGcd; /* tricky, isn't it ?*/
+
+    // default entries (different from NULL) for some routines:
+    n->nPar  = ndPar;
+    n->nParDeg=ndParDeg;
+    n->nSize = ndSize;
+    n->cfGetDenom= ndGetDenom;
+    n->cfGetNumerator= ndGetNumerator;
+    n->nName =  ndName;
+    n->nImPart=ndReturn0;
+    n->cfDelete= ndDelete;
+    n->nInpMult=ndInpMult;
+    n->cfCopy=nd_Copy;
+    n->nIntMod=ndIntMod; /* dummy !! */
+    n->nNormalize=ndNormalize;
+    n->nGcd  = ndGcd;
+    n->nLcm  = ndGcd; /* tricky, isn't it ?*/
 #ifdef HAVE_RINGS
-  n->nDivComp = ndDivComp;
-  n->nDivBy = ndDivBy;
-  n->nIsUnit = ndIsUnit;
-  n->nExtGcd = ndExtGcd;
-  n->nGetUnit = (nMapFunc)NULL;
+    n->nDivComp = ndDivComp;
+    n->nDivBy = ndDivBy;
+    n->nIsUnit = ndIsUnit;
+    n->nExtGcd = ndExtGcd;
+    //n->nGetUnit = (nMapFunc)NULL;
 #endif
   #if 0 /*vertagt*/
   if (nField_is_Extension(r))
@@ -296,196 +266,24 @@ coeffs nInitChar(n_CoeffType n, int parameter)
 #endif
   }
   #endif
+    cf_root=n;
+    // init
+    if ((nInitCharTable!=NULL) && (t<=nLastCoeffs))
+       (nInitCharTable[t])(n,parameter);
+     else
+       Werror("coeff init missing for %d",(int)t);
+    // post init settings:
+    if (n->nRePart==NULL) n->nRePart=n->cfCopy;
+    if (n->nIntDiv==NULL) n->nIntDiv=n->nDiv;
 #ifdef HAVE_RINGS
-  /* -------------- Z/2^m ----------------------- */
-  else if (nField_is_Ring_2toM(r))
-  {
-    nr2mCoeffInit(n, c, r->cf);
-  }
-  /* -------------- Z/n ----------------------- */
-  else if (nField_is_Ring_ModN(r) || nField_is_Ring_PtoM(r))
-  {
-    nrnCoeffInit(n, c, r->cf);
-  }
-  /* -------------- Z ----------------------- */
-  else if (nField_is_Ring_Z(r))
-  {
-     n->cfInit  = nrzInit;
-     n->cfDelete= nrzDelete;
-     n->cfCopy  = nrzCopy;
-     n->cfCopy = cfrzCopy;
-     n->nSize  = nrzSize;
-     n->n_Int  = nrzInt;
-     n->nAdd   = nrzAdd;
-     n->nSub   = nrzSub;
-     n->nMult  = nrzMult;
-     n->nDiv   = nrzDiv;
-     n->nIntDiv = nrzIntDiv;
-     n->nIntMod = nrzIntMod;
-     n->nExactDiv= nrzDiv;
-     n->nNeg   = nrzNeg;
-     n->nInvers= nrzInvers;
-     n->nDivBy = nrzDivBy;
-     n->nDivComp = nrzDivComp;
-     n->nGreater = nrzGreater;
-     n->nEqual = nrzEqual;
-     n->nIsZero = nrzIsZero;
-     n->nIsOne = nrzIsOne;
-     n->nIsMOne = nrzIsMOne;
-     n->nGreaterZero = nrzGreaterZero;
-     n->cfWrite = nrzWrite;
-     n->nRead = nrzRead;
-     n->nPower = nrzPower;
-     n->cfSetMap = nrzSetMap;
-     n->nNormalize = ndNormalize;
-     n->nLcm          = nrzLcm;
-     n->nGcd          = nrzGcd;
-     n->nIsUnit = nrzIsUnit;
-     n->nGetUnit = nrzGetUnit;
-     n->nExtGcd = nrzExtGcd;
-     n->nName= ndName;
-#ifdef LDEBUG
-     n->nDBTest=ndDBTest; // not yet implemented: nrzDBTest;
+   if (n->nGetUnit==(nMapFunc)NULL) n->nGetUnit=n->cfCopy;
 #endif
   }
   else
-#endif
-  if (nField_is_Zp(r))
-  /*----------------------char. p----------------*/
   {
-    npInitChar(r, c); // r?
-
-    /* never again:
-     
-    n->cfInit = npInit;
-    n->n_Int  = npInt;
-    n->nAdd   = npAdd;
-    n->nSub   = npSub;
-    n->nMult  = npMult;
-    n->nDiv   = npDiv;
-    n->nExactDiv= npDiv;
-    n->nNeg   = npNeg;
-    n->nInvers= npInvers;
-    n->nCopy  = ndCopy;
-    n->nGreater = npGreater;
-    n->nEqual = npEqual;
-    n->nIsZero = npIsZero;
-    n->nIsOne = npIsOne;
-    n->nIsMOne = npIsMOne;
-    n->nGreaterZero = npGreaterZero;
-    n->cfWrite = npWrite;
-    n->nRead = npRead;
-    n->nPower = npPower;
-    n->cfSetMap = npSetMap;
-    // nName= ndName;
-    // nSize  = ndSize;
-#ifdef LDEBUG
-    n->nDBTest=npDBTest;
-#endif
-#ifdef NV_OPS
-    if (c>NV_MAX_PRIME)
-    {
-      n->nMult  = nvMult;
-      n->nDiv   = nvDiv;
-      n->nExactDiv= nvDiv;
-      n->nInvers= nvInvers;
-      n->nPower= nvPower;
-      n->nInpMult= nvInpMult;
-    }
-#endif
-    */
-    //r->cfInitChar=npInitChar;
+    n->ref++;
   }
-  /* -------------- GF(p^m) -----------------------*/
-  else if (nField_is_GF(r))
-  {
-    //nfSetChar(c,r->parameter);
-    n->cfInit = nfInit;
-    n->nPar   = nfPar;
-    n->nParDeg= nfParDeg;
-    n->n_Int  = nfInt;
-    n->nAdd   = nfAdd;
-    n->nSub   = nfSub;
-    n->nMult  = nfMult;
-    n->nDiv   = nfDiv;
-    n->nExactDiv= nfDiv;
-    n->nNeg   = nfNeg;
-    n->nInvers= nfInvers;
-    n->cfCopy  = ndCopy;
-    n->nGreater = nfGreater;
-    n->nEqual = nfEqual;
-    n->nIsZero = nfIsZero;
-    n->nIsOne = nfIsOne;
-    n->nIsMOne = nfIsMOne;
-    n->nGreaterZero = nfGreaterZero;
-    n->cfWrite = nfWrite;
-    n->nRead = nfRead;
-    n->nPower = nfPower;
-    n->cfSetMap = nfSetMap;
-    n->nName= nfName;
-    /*nSize  = ndSize;*/
-#ifdef LDEBUG
-    n->nDBTest=nfDBTest;
-#endif
-  }
-  /* -------------- R -----------------------*/
-  //if (c==(-1))
-  else if (nField_is_R(r))
-  {
-    nrInitChar(r, 0); // n/r? 0?
-  }
-  /* -------------- long R -----------------------*/
-  else if (nField_is_long_R(r))
-  {
-    n->cfDelete= ngfDelete;
-    n->cfInit = ngfInit;
-    n->n_Int  = ngfInt;
-    n->nAdd   = ngfAdd;
-    n->nSub   = ngfSub;
-    n->nMult  = ngfMult;
-    n->nDiv   = ngfDiv;
-    n->nExactDiv= ngfDiv;
-    n->nNeg   = ngfNeg;
-    n->nInvers= ngfInvers;
-    n->cfCopy  = ngf_Copy;
-    n->nGreater = ngfGreater;
-    n->nEqual = ngfEqual;
-    n->nIsZero = ngfIsZero;
-    n->nIsOne = ngfIsOne;
-    n->nIsMOne = ngfIsMOne;
-    n->nGreaterZero = ngfGreaterZero;
-    n->cfWrite = ngfWrite;
-    n->nRead = ngfRead;
-    n->nPower = ngfPower;
-    n->cfSetMap=ngfSetMap;
-    n->nName= ndName;
-    n->nSize  = ngfSize;
-#ifdef LDEBUG
-    n->nDBTest=ndDBTest; // not yet implemented: ngfDBTest
-#endif
-  }
-  /* -------------- long C -----------------------*/
-  else if (nField_is_long_C(r))
-  {
-    ngcInitChar(r, 0); // n/r? 0?
-  }
-#ifdef TEST
-  else
-  {
-    WerrorS("unknown field");
-  }
-#endif
-#ifdef HAVE_RINGS
-  if (n->nGetUnit==(nMapFunc)NULL) n->nGetUnit=n->cfCopy;
-#endif
-  if (!errorreported)
-  {
-    n->nNULL=n->cfInit(0,r);
-    if (n->nRePart==NULL)
-      n->nRePart=n->cfCopy;
-    if (n->nIntDiv==NULL)
-      n->nIntDiv=n->nDiv;
-  }
+  return n;
 }
 
 void nKillChar(coeffs r)
@@ -539,8 +337,6 @@ void nKillChar(coeffs r)
   }
 }
 
-static n_coeffType nLastCoeffs=n_Z2n;
-static cfInitCharProc *nInitCharTable=NULL;
 n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
 {
   if (n==n_unknown)

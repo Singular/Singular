@@ -54,7 +54,7 @@ struct n_Procs_s
    BOOLEAN has_simple_Inverse;
 
    // tests for numbers.cc:
-   BOOLEAN (*nCoeffIsEqual)(const coeffs r, n_coeffType n, int parameter);
+   BOOLEAN (*nCoeffIsEqual)(const coeffs r, n_coeffType n, void * parameter);
 
    // the union stuff
 
