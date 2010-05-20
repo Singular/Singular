@@ -836,6 +836,8 @@ BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
   extern int lpverbose;
   if (BVERBOSE(V_DEBUG_LIB)) lpverbose=1;
   else lpverbose=0;
+  // yylplex sets also text_buffer
+  if (text_buffer!=NULL) *text_buffer='\0';
   yylplex(newlib, libnamebuf, &lib_style, pl, autoexport);
   if(yylp_errno)
   {
