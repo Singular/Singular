@@ -24,20 +24,12 @@ ring ngfMapRing; // to be used also in gnumpc.cc
 
 static number ngfMapP(number from)
 {
-  if ( from != NULL)
-    return ngfInit(npInt(from,ngfMapRing), currRing);
-  else
-    return NULL;
+  return ngfInit(npInt(from,ngfMapRing), currRing);
 }
 number ngfMapQ(number from)
 {
-  if ( from != NULL )
-  {
-    gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
-    return (number)res;
-  }
-  else
-    return NULL;
+  gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
+  return (number)res;
 }
 union nf
 {
@@ -50,23 +42,13 @@ union nf
 };
 static number ngfMapR(number from)
 {
-  if ( from != NULL )
-  {
-    gmp_float *res=new gmp_float((double)nf(from).F());
-    return (number)res;
-  }
-  else
-    return NULL;
+  gmp_float *res=new gmp_float((double)nf(from).F());
+  return (number)res;
 }
 static number ngfMapC(number from)
 {
-  if ( (from != NULL) || ((gmp_complex*)from)->real().isZero() )
-  {
-    gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
-    return (number)res;
-  }
-  else
-    return NULL;
+  gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
+  return (number)res;
 }
 
 nMapFunc ngfSetMap(const ring src, const ring dst)
@@ -100,11 +82,7 @@ nMapFunc ngfSetMap(const ring src, const ring dst)
 */
 number ngfInit (int i, const ring r)
 {
-  gmp_float* n= NULL;
-  if ( i != 0 )
-  {
-    n= new gmp_float( (double)i );
-  }
+  gmp_float* n= new gmp_float( (double)i );
   return (number)n;
 }
 
@@ -113,7 +91,6 @@ number ngfInit (int i, const ring r)
 */
 int ngfInt(number &i, const ring r)
 {
-  if ( i == NULL ) return 0;
   double d=(double)*(gmp_float*)i;
   if (d<0.0)
     return (int)(d-0.5);
@@ -138,21 +115,13 @@ void ngfDelete (number * a, const ring r)
 */
 number ngfCopy(number a)
 {
-  gmp_float* b= NULL;
-  if ( a !=  NULL )
-  {
-    b= new gmp_float( *(gmp_float*)a );
-  }
+  gmp_float* b= new gmp_float( *(gmp_float*)a );
   return (number)b;
 }
 
 number ngf_Copy(number a, ring r)
 {
-  gmp_float* b= NULL;
-  if ( a !=  NULL )
-  {
-    b= new gmp_float( *(gmp_float*)a );
-  }
+  gmp_float* b= new gmp_float( *(gmp_float*)a );
   return (number)b;
 }
 
@@ -161,7 +130,6 @@ number ngf_Copy(number a, ring r)
 */
 number ngfNeg (number a)
 {
-  if ( a == NULL ) return NULL;
   *(gmp_float*)a= -(*(gmp_float*)a);
   return (number)a;
 }
@@ -172,7 +140,7 @@ number ngfNeg (number a)
 number ngfInvers(number a)
 {
   gmp_float* r= NULL;
-  if ( (a==NULL) || ((gmp_float*)a)->isZero() )
+  if (((gmp_float*)a)->isZero() )
   {
     WerrorS(nDivBy0);
   }
@@ -188,23 +156,7 @@ number ngfInvers(number a)
 */
 number ngfAdd (number a, number b)
 {
-  gmp_float* r= NULL;
-  if ( a==NULL && b==NULL )
-  {
-    return NULL;
-  }
-  else if ( a == NULL )
-  {
-    r= new gmp_float( *(gmp_float*)b );
-  }
-  else if ( b == NULL )
-  {
-    r= new gmp_float( *(gmp_float*)a );
-  }
-  else
-  {
-    r= new gmp_float( (*(gmp_float*)a) + (*(gmp_float*)b) );
-  }
+  gmp_float* r= new gmp_float( (*(gmp_float*)a) + (*(gmp_float*)b) );
   return (number)r;
 }
 
@@ -213,23 +165,7 @@ number ngfAdd (number a, number b)
 */
 number ngfSub (number a, number b)
 {
-  gmp_float* r= NULL;
-  if ( a==NULL && b==NULL )
-  {
-    return NULL;
-  }
-  else if ( a == NULL )
-  {
-    r= new gmp_float( -(*(gmp_float*)b) );
-  }
-  else if ( b == NULL )
-  {
-    r= new gmp_float( *(gmp_float*)a );
-  }
-  else
-  {
-    r= new gmp_float( (*(gmp_float*)a) - (*(gmp_float*)b) );
-  }
+  gmp_float* r= new gmp_float( (*(gmp_float*)a) - (*(gmp_float*)b) );
   return (number)r;
 }
 
@@ -238,15 +174,7 @@ number ngfSub (number a, number b)
 */
 number ngfMult (number a, number b)
 {
-  gmp_float* r= NULL;
-  if ( a==NULL || b==NULL )
-  {
-    return NULL;
-  }
-  else
-  {
-    r= new gmp_float( (*(gmp_float*)a) * (*(gmp_float*)b) );
-  }
+  gmp_float* r= new gmp_float( (*(gmp_float*)a) * (*(gmp_float*)b) );
   return (number)r;
 }
 
@@ -255,12 +183,7 @@ number ngfMult (number a, number b)
 */
 number ngfDiv (number a, number b)
 {
-  if ( a==NULL )
-  {
-    // 0/b = 0
-    return NULL;
-  }
-  else if ( b==NULL || ((gmp_float*)b)->isZero() )
+  if ( ((gmp_float*)b)->isZero() )
   {
     // a/0 = error
     WerrorS(nDivBy0);
@@ -283,24 +206,15 @@ void ngfPower ( number x, int exp, number * u )
   }
   else if ( ngfIsZero(x) ) // 0^e, e>0
   {
-    gmp_float* n = NULL;
-    *u=(number)n;
+    *u=ngfInit(0, currRing);
     return;
   }
   else if ( exp == 1 )
   {
     nNew(u);
-    if ( x == NULL )
-    {
-      gmp_float* n = new gmp_float();
-      *u=(number)n;
-    }
-    else
-    {
-      gmp_float* n = new gmp_float();
-      *n= *(gmp_float*)x;
-      *u=(number)n;
-    }
+    gmp_float* n = new gmp_float();
+    *n= *(gmp_float*)x;
+    *u=(number)n;
     return;
   }
   ngfPower(x,exp-1,u);
@@ -313,7 +227,6 @@ void ngfPower ( number x, int exp, number * u )
 
 BOOLEAN ngfIsZero (number a)
 {
-  if ( a == NULL ) return TRUE;
   return ( ((gmp_float*)a)->isZero() );
 }
 
@@ -322,7 +235,6 @@ BOOLEAN ngfIsZero (number a)
 */
 BOOLEAN ngfGreaterZero (number a)
 {
-  if ( a == NULL ) return TRUE;
   return ( (*(gmp_float*)a) >= (gmp_float)0.0 );
 }
 
@@ -331,14 +243,6 @@ BOOLEAN ngfGreaterZero (number a)
 */
 BOOLEAN ngfGreater (number a, number b)
 {
-  if ( a==NULL )
-  {
-    return (((gmp_float*)b)->sign() < 0);
-  }
-  if ( b==NULL )
-  {
-    return (((gmp_float*)a)->sign() > 0);
-  }
   return ( (*(gmp_float*)a) > (*(gmp_float*)b) );
 }
 
@@ -347,14 +251,6 @@ BOOLEAN ngfGreater (number a, number b)
 */
 BOOLEAN ngfEqual (number a, number b)
 {
-  if ( a == NULL && b == NULL )
-  {
-    return TRUE;
-  }
-  else if ( a == NULL || b == NULL )
-  {
-    return FALSE;
-  }
   return ( (*(gmp_float*)a) == (*(gmp_float*)b) );
 }
 
@@ -363,7 +259,6 @@ BOOLEAN ngfEqual (number a, number b)
 */
 BOOLEAN ngfIsOne (number a)
 {
-  if ( a == NULL ) return FALSE;
   return ((gmp_float*)a)->isOne();
 }
 
@@ -372,7 +267,6 @@ BOOLEAN ngfIsOne (number a)
 */
 BOOLEAN ngfIsMOne (number a)
 {
-  if ( a == NULL ) return FALSE;
   return ((gmp_float*)a)->isMOne();
 }
 
