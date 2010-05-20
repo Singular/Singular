@@ -63,7 +63,11 @@ proc normal(ideal id, list #)
          all computations with respect to this ordering.@*
          - \"withDelta\" (or \"wd\") -> returns also the delta invariants.@*
          If the optional parameter choose is not given or empty, only
-         \"equidim\" but no other option is used.
+         \"equidim\" but no other option is used.@*
+         The following options can be used when the ring has two variables.
+         They are needed for computing integral basis.@*
+         - \"var1\" -> uses a polynomial in the first variable as conductor.@*
+         - \"var2\" -> uses a polynomial in the second variable as conductor.@*
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
          be wrong (id=radical(id); makes id radical). However, when using the
          \"prim\" option the minimal associated primes of id are computed first
@@ -124,7 +128,7 @@ SEE ALSO: normalC, normalP.
 EXAMPLE: example normal; shows an example
 "
 {
-   intvec opt = option(get);     // Save current options
+  intvec opt = option(get);     // Save current options
 
   int i,j;
   int decomp;   // Preliminary decomposition:
@@ -137,7 +141,8 @@ EXAMPLE: example normal; shows an example
   int dbg = printlevel - voice + 2;
   int nvar = nvars(basering);
   int chara  = char(basering);
-  list result;
+  int conduOption;   // Method for choosing the conductor
+  list result, resultNew;
   list keepresult;
   list ringStruc;
   ideal U;
@@ -196,6 +201,13 @@ EXAMPLE: example normal; shows an example
     }
   }
 
+  conduOption = 0;     // The default is the smallest degree polynomial
+  if ( find(method,"var1") )
+  {conduOption = 1;}
+  if ( find(method,"var2") )
+  {conduOption = 2;}
+
+
   kill #;
   list #;
 
@@ -237,22 +249,24 @@ EXAMPLE: example normal; shows an example
     list lR = ringlist(origR);
     def ROut = ring(lR);
     setring ROut;
-    ideal norid = 0;
+    ideal norid = fetch(origR, id);
     ideal normap = maxideal(1);
     export norid;
     export normap;
     setring origR;
     if(withDelta)
     {
-      result = list(list(ideal(1), poly(1), ROut), 0);
+      result = list(list(ROut), list(ideal(1)), list(intvec(0), 0));
     }
     else
     {
-      result = list(list(ideal(1), poly(1), ROut));
+      result = list(list(ROut), list(ideal(1)));
     }
+    sp = 1;      // number of rings in the output
+    option(set, opt);
+    normalOutputText(dbg, withDelta, sp);
     return(result);
   }
-
 //------------------------ preliminary decomposition-----------------------
   list prim;
   if(decomp == 2)
@@ -329,7 +343,7 @@ EXAMPLE: example normal; shows an example
         "We compute the normalization in the ring"; basering;
       }
       printlevel = printlevel + 1;
-      norComp = normalM(prim[i], decomp, withDelta);
+      norComp = normalM(prim[i], decomp, withDelta, conduOption);
       printlevel = printlevel - 1;
       for(j = 1; j <= size(norComp); j++)
       {
@@ -433,8 +447,6 @@ EXAMPLE: example normal; shows an example
       DV[i] = result[i][4];
     }
   }
-  list resultNew;
-
   if(withDelta)
   {
     resultNew = list(RL, MG, list(DV, deltI));
@@ -443,10 +455,52 @@ EXAMPLE: example normal; shows an example
   {
     resultNew = list(RL, MG);
   }
-
   sp = size(RL);              //RL = list of rings
-  option(set, opt);
 
+  option(set, opt);
+  normalOutputText(dbg, withDelta, sp);
+  return(resultNew);
+}
+
+example
+{ "EXAMPLE:";
+  printlevel = printlevel+1;
+  echo = 2;
+  ring s = 0,(x,y),dp;
+  ideal i = (x2-y3)*(x2+y2)*x;
+  list nor = normal(i, "withDelta", "prim");
+  nor;
+
+  // 2 branches have delta = 1, and 1 branch has delta = 0
+  // the total delta invariant is 13
+
+  def R2 = nor[1][2];  setring R2;
+  norid; normap;
+
+  echo = 0;
+  printlevel = printlevel-1;
+  pause("   hit return to continue"); echo=2;
+
+  ring r = 2,(x,y,z),dp;
+  ideal i = z3-xy4;
+  list nor = normal(i, "withDelta", "prim");  nor;
+  // the delta invariant is infinite
+  // xy2z/z2 and xy3/z2 generate the integral closure of r/i as r/i-module
+  // in its quotient field Quot(r/i)
+
+  // the normalization as affine algebra over the ground field:
+  def R = nor[1][1]; setring R;
+  norid; normap;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Prints the output text in proc normal.
+//
+static proc normalOutputText(int dbg, int withDelta, int sp)
+// int dbg: printlevel
+// int withDelta: output contains information about the delta invariant
+// int sp: number of output rings.
+{
   if ( dbg >= 0 )
   {
     "";
@@ -483,39 +537,8 @@ EXAMPLE: example normal; shows an example
       "// of R/id (-1 means infinite, and 0 that R/P_i resp. R/id is normal).";
     }
   }
-  return(resultNew);
 }
 
-example
-{ "EXAMPLE:";
-  printlevel = printlevel+1;
-  echo = 2;
-  ring s = 0,(x,y),dp;
-  ideal i = (x2-y3)*(x2+y2)*x;
-  list nor = normal(i, "withDelta", "prim");
-  nor;
-
-  // 2 branches have delta = 1, and 1 branch has delta = 0
-  // the total delta invariant is 13
-
-  def R2 = nor[1][2];  setring R2;
-  norid; normap;
-
-  echo = 0;
-  printlevel = printlevel-1;
-  pause("   hit return to continue"); echo=2;
-
-  ring r = 2,(x,y,z),dp;
-  ideal i = z3-xy4;
-  list nor = normal(i, "withDelta", "prim");  nor;
-  // the delta invariant is infinite
-  // xy2z/z2 and xy3/z2 generate the integral closure of r/i as r/i-module
-  // in its quotient field Quot(r/i)
-
-  // the normalization as affine algebra over the ground field:
-  def R = nor[1][1]; setring R;
-  norid; normap;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -3522,7 +3545,9 @@ EXAMPLE: example normalP; shows an example
          //------ 2-nd main subprocedure: compute ring structure -----------
            if(noRed == 0){
              resu = list(computeRing(II,prim[i])) + resu;
-           } else {
+           }
+           else
+           {
              resu = list(computeRing(II,prim[i], "noRed")) + resu;
            }
          }
@@ -3931,7 +3956,9 @@ static proc computeRing(ideal J, ideal I, list #)
     if(noRed == 1){
       setring R;
       return(R1);
-    } else {
+    }
+    else
+    {
       list L = substpartSpecial(norid,normap);
       def lastRing = L[1];
       setring R;
@@ -4040,7 +4067,9 @@ static proc computeRing(ideal J, ideal I, list #)
       if(ord_test(basering) != 1){
         A = lift(pf, ff, u);
         Quad = Quad,ideal(newT[jj-1]*newT[ii-1] * u[1, 1]- T*A);
-      } else {
+      }
+      else
+      {
         A = lift(pf,ff);              // ff lin. comb. of elts of pf mod I
         Quad = Quad,ideal(newT[jj-1]*newT[ii-1] - T*A);
       }
@@ -4082,7 +4111,9 @@ static proc computeRing(ideal J, ideal I, list #)
       pause();"";
     }
     return(lastRing);
-  } else {
+  }
+  else
+  {
     ideal norid = endid;
     ideal normap = endphi;
     export(norid);
@@ -4098,7 +4129,7 @@ static proc computeRing(ideal J, ideal I, list #)
 ///////////////////////////////////////////////////////////////////////////////
 //                From here: subprocedures for normal
 
-static proc normalM(ideal I, int decomp, int withDelta){
+static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
 // Computes the normalization of a ring R / I using the module structure as far
 // as possible.
 // The ring R is the basering.
@@ -4136,6 +4167,9 @@ static proc normalM(ideal I, int decomp, int withDelta){
 // The delta invariant is only computed if withDelta = 1, and decomp = 0 or
 // decomp = 3 (meaning that the ideal is prime).
 
+// conduOption = 0      -> Uses the smallest degree polynomial
+// conduOption = i > 0  -> Uses a polynomial in the i-th variable
+
   option("redSB");
   option("returnSB");
   int step = 0;                       // Number of steps. (for debugging)
@@ -4152,7 +4186,9 @@ static proc normalM(ideal I, int decomp, int withDelta){
     list IM = mstd(I);
     I = IM[1];
     ideal IMin = IM[2];   // A minimal set of generators in the groebner basis.
-  } else {
+  }
+  else
+  {
     // The minimal set of generators is not computed by mstd for
     // non-global orderings.
     I = groebner(I);
@@ -4190,7 +4226,9 @@ static proc normalM(ideal I, int decomp, int withDelta){
     setring R;
     if(withDelta){
       list output = ideal(1), poly(1), ROut, 0;
-    } else {
+    }
+    else
+    {
       list output = ideal(1), poly(1), ROut;
     }
     return(list(output));
@@ -4198,8 +4236,14 @@ static proc normalM(ideal I, int decomp, int withDelta){
 
 
   // -------------------- election of the conductor -------------------------
-  poly condu = getSmallest(J);   // Choses the polynomial of smallest degree
-                                 // of J as universal denominator.
+  if(conduOption == 0){
+    poly condu = getSmallest(J);   // Choses the polynomial of smallest degree
+                                   // of J as universal denominator.
+  }
+  else
+  {
+    poly condu = getOnevar(J, conduOption);
+  }
   if(dbg >= 1){
     "";
     "The universal denominator is ", condu;
@@ -4222,8 +4266,8 @@ static proc normalM(ideal I, int decomp, int withDelta){
       ideal Id2 = quotient(I, Id1);
       // I = I1 \cap I2
       printlevel = printlevel + 1;
-      list nor1 = normalM(Id1, decomp, withDelta)[1];
-      list nor2 = normalM(Id2, decomp, withDelta)[1];
+      list nor1 = normalM(Id1, decomp, withDelta, conduOption)[1];
+      list nor2 = normalM(Id2, decomp, withDelta, conduOption)[1];
       printlevel = printlevel - 1;
       return(list(nor1, nor2));
     }
@@ -4248,10 +4292,14 @@ static proc normalM(ideal I, int decomp, int withDelta){
     J = groebner(J);
     if(locAtZero(J)){
       J = maxideal(1);
-    } else {
+    }
+    else
+    {
       J = radical(J);
     }
-  } else {
+  }
+  else
+  {
     // We change to global dp ordering.
     list rl = ringlist(R);
     list origOrd = rl[3];
@@ -4283,8 +4331,14 @@ static proc normalM(ideal I, int decomp, int withDelta){
   setring Q;
   J = fetch(R, J);
   J = interred(J);
-  poly D = getSmallest(J);    // Chooses the polynomial of smallest degree as
-                              // non-zerodivisor.
+  if(conduOption == 0){
+    poly D = getSmallest(J);    // Chooses the polynomial of smallest degree as
+                                // non-zerodivisor.
+  }
+  else
+  {
+    poly D = getOnevar(J, conduOption);
+  }
   if(dbg >= 1){
     "The non zero divisor is ", D;
     "";
@@ -4310,8 +4364,8 @@ static proc normalM(ideal I, int decomp, int withDelta){
       // I = Id1 \cap Id2
       printlevel = printlevel + 1;
 
-      list nor1 = normalM(Id1, decomp, withDelta)[1];
-      list nor2 = normalM(Id2, decomp, withDelta)[1];
+      list nor1 = normalM(Id1, decomp, withDelta, conduOption)[1];
+      list nor2 = normalM(Id2, decomp, withDelta, conduOption)[1];
       printlevel = printlevel - 1;
       return(list(nor1, nor2));
     }
@@ -4324,7 +4378,7 @@ static proc normalM(ideal I, int decomp, int withDelta){
   poly condu = fetch(Q, condu);
   J = fetch(Q, J);
   printlevel = printlevel + 1;
-  list result = normalMEqui(I, J, condu, D, withDelta);
+  list result = normalMEqui(I, J, condu, D, withDelta, conduOption);
   printlevel = printlevel - 1;
   return(list(result));
 }
@@ -4542,6 +4596,25 @@ static proc lineUp(ideal U, poly c)
     }
   }
   return(newU);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+//WARNING - elim is not working here!! Check!!
+//It is now replace by computing an eliminating groebner basis.
+static proc getOnevar(ideal J, int vari)
+{
+// Computes the polynomial of smallest degree of J.
+// If there are more than one, it chooses the one with smallest number
+// of monomials.
+  def R = basering;
+  ring RR = 0, (var(3-vari), var(vari)), lp;
+  ideal J = imap(R, J);
+  J = groebner(J);
+  poly D = J[1];
+  setring R;
+  poly D = imap(RR, D);
+  return(D);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
