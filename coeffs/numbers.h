@@ -54,8 +54,6 @@ static inline int nInternalChar(const coeffs r)
 
 /* prototypes */
 void           nNew(number * a);
-#define        nInit(i) n_Init(i,currRing)
-#define nWrite(A) n_Write(A,currRing)
 
 #define nTest(a) (1)
 
@@ -90,9 +88,15 @@ void nDBDummy1(number* d,char *f, int l);
 #endif
 #define nGetChar() n_GetChar(currRing)
 
-void nInitChar(coeffs r); // do one-time initialisations
-void nKillChar(coeffs r); // undo all initialisations
-void nSetChar(coeffs r); // initialisations after each ring chage
+/// one-time initialisations for new coeffs
+coeffs nInitChar(n_coeffType t, void * parameter);
+/// undo all initialisations
+void nKillChar(coeffs r);
+/// initialisations after each ring change
+inline void nSetChar(coeffs r)
+{
+  if ((r!=NULL) && (r->cfSetChar!=NULL)) r->cfSetChar(r);
+}
 
 #define nDivBy0 "div by 0"
 
