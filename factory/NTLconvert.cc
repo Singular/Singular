@@ -36,6 +36,7 @@
 #include <NTL/lzz_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
 #include <NTL/tools.h>
+#include <NTL/mat_ZZ.h>
 #include "int_int.h"
 #include <limits.h>
 #include "NTLconvert.h"
@@ -654,6 +655,27 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
 // OUTPUT: The converted NTL-polynom of type ZZX                              //
 ////////////////////////////////////////////////////////////////////////////////
 
+ZZ convertFacCF2NTLZZ(const CanonicalForm f)
+{
+  ZZ temp;
+  if (f.isImm()) temp=f.intval();
+  else
+  {
+    //Coefficient is a gmp-number
+    mpz_t gmp_val;
+    char* stringtemp;
+
+    gmp_val[0]=getmpi(f.getval());
+    int l=mpz_sizeinbase(gmp_val,10)+2;
+    stringtemp=(char*)Alloc(l);
+    stringtemp=mpz_get_str(stringtemp,10,gmp_val);
+    mpz_clear(gmp_val);
+    conv(temp,stringtemp);
+    Free(stringtemp,l);
+  }
+  return temp;
+}
+
 ZZX convertFacCF2NTLZZX(CanonicalForm f)
 {
     ZZX ntl_poly;
@@ -677,29 +699,11 @@ ZZX convertFacCF2NTLZZX(CanonicalForm f)
       }
       NTLcurrentExp=i.exp();
 
-      if (!i.coeff().isImm())
-      {
-        //Coefficient is a gmp-number
-        mpz_t gmp_val;
-        ZZ temp;
-        char* stringtemp;
+      //Coefficient is a gmp-number
+      ZZ temp=convertFacCF2NTLZZ(i.coeff());
 
-        gmp_val[0]=getmpi(i.coeff().getval());
-        int l=mpz_sizeinbase(gmp_val,10)+2;
-        stringtemp=(char*)Alloc(l);
-        stringtemp=mpz_get_str(stringtemp,10,gmp_val);
-        mpz_clear(gmp_val);
-        conv(temp,stringtemp);
-        Free(stringtemp,l);
-
-        //set the computed coefficient
-        SetCoeff(ntl_poly,NTLcurrentExp,temp);
-      }
-      else
-      {
-        //Coefficient is immediate --> use its value
-        SetCoeff(ntl_poly,NTLcurrentExp,i.coeff().intval());
-      }
+      //set the computed coefficient
+      SetCoeff(ntl_poly,NTLcurrentExp,temp);
 
       NTLcurrentExp--;
     }
@@ -1087,4 +1091,34 @@ CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
       }
   }
 }
+//----------------------------------------------------------------------
+mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(CFMatrix &m)
+{
+  mat_ZZ *res=new mat_ZZ;
+  res->SetDims(m.rows(),m.columns());
+
+  int i,j;
+  for(i=m.rows();i>0;i--)
+  {
+    for(j=m.columns();j>0;j--)
+    {
+      (*res)(i,j)=convertFacCF2NTLZZ(m(i,j));
+    }
+  }
+  return res;
+}
+CFMatrix* convertNTLmat_ZZ2FacCFMatrix(mat_ZZ &m)
+{
+  CFMatrix *res=new CFMatrix(m.NumRows(),m.NumCols());
+  int i,j;
+  for(i=res->rows();i>0;i--)
+  {
+    for(j=res->columns();j>0;j--)
+    {
+      (*res)(i,j)=convertZZ2CF(m(i,j));
+    }
+  }
+  return res;
+}
+
 #endif

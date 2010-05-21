@@ -59,6 +59,8 @@ CanonicalForm convertNTLzzpE2CF(zz_pE f, Variable x);
 CFFList convertNTLvec_pair_zzpEX_long2FacCFFList(vec_pair_zz_pEX_long e,zz_pE multi,Variable x,Variable alpha);
 CanonicalForm convertNTLzz_pEX2CF(zz_pEX f, Variable x, Variable alpha);
 
+mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(CFMatrix &m);
+CFMatrix* convertNTLmat_ZZ2FacCFMatrix(mat_ZZ &m);
 extern int fac_NTL_char;
 #endif
 #endif
