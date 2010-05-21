@@ -36,6 +36,6 @@ W2:	Smith form			N/A
 X:	gcd(Galousfield, minpoly)	very long
 Y:	det(Galousfield, minpoly)	ok
 
-For the original stuff tey used ot benchmark singular, see 'singall'.
+For the original stuff they used to benchmark singular, see 'singall'.
 For mupad and maple sources, see 'mupadall', 'mapleall'.
 For more details, see also www.fordham.edu/lewis/cacomp.html

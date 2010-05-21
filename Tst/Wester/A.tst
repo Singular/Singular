@@ -9,7 +9,7 @@ tst_InitTimer();
 
 for (i=1; i<=100; i++)
 {
-  p = factorial(1000+i,0)/factorial(900+i, 0);
+  p = factorial(1000+i)/factorial(900+i);
 }
 
 tst_ReportTimer("A");
