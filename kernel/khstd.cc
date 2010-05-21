@@ -48,6 +48,24 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
   eledeg--;
   if (eledeg == 0)
   {
+    if (strat->ak>0)
+    {
+      char *used_comp=(char*)omAlloc0(strat->ak+1);
+      int i;
+      for(i=strat->sl;i>0;i--)
+      {
+        used_comp[pGetComp(strat->S[i])]='\1';
+      }
+      for(i=strat->ak;i>0;i--)
+      {
+        if(used_comp[i]=='\0')
+        {
+          omFree((ADDRESS)used_comp);
+          return;
+        }
+      }
+      omFree((ADDRESS)used_comp);
+    }
     degp=pFDeg;
     // if weights for variables were given to std computations,
     // then pFDeg == degp == kHomModDeg (see kStd)
@@ -73,23 +91,6 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
           eledeg = -(*hilb)[deg];
         else // we have newhilb = hilb
         {
-          if (strat->ak>0)
-          {
-            char *used_comp=(char*)omAlloc0(strat->ak+1);
-            int i;
-            for(i=strat->sl;i>0;i--)
-              used_comp[pGetComp(strat->S[i])]='\1';
-            for(i=strat->ak;i>0;i--)
-            {
-              if(used_comp[i]=='\0')
-              {
-                omFree((ADDRESS)used_comp);
-                delete newhilb;
-                return;
-              }
-            }
-            omFree((ADDRESS)used_comp);
-          }
           while (strat->Ll>=0)
           {
             count++;
