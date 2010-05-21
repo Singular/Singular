@@ -56,6 +56,7 @@
 #include "walkProc.h"
 #include "mod_raw.h"
 #include "MinorInterface.h"
+#include "LinearAlgebra.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -312,6 +313,8 @@ cmdnames cmds[] =
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},
   { "load",        0, LOAD_CMD ,          CMD_12},
   { "lres",        0, LRES_CMD ,          CMD_2},
+  { "ludecomp",    0, LU_CMD ,            CMD_1},
+  { "luinverse",   0, LUI_CMD ,           CMD_M},
   { "map",         0, MAP_CMD ,           RING_DECL},
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
   { "maxideal",    0, MAXID_CMD ,         CMD_1},
@@ -4438,6 +4441,39 @@ static number jjLONG2N(long d)
 #else
 #define jjLONG2N(D) nlInit((int)D, NULL)
 #endif
+static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
+{
+  /* computes the LU-decomposition of a matrix M;
+     i.e., M = P * L * U, where
+        - P is a row permutation matrix,
+        - L is in lower triangular form,
+        - U is in upper row echelon form
+     Then, we also have P * M = L * U.
+     A list [P, L, U] is returned. */
+  matrix mat = (const matrix)v->Data();
+  int rr = mat->rows();
+  int cc = mat->cols();
+  matrix pMat;
+  matrix lMat;
+  matrix uMat = mpNew(rr, cc);
+
+  /* make initial settings: */
+  for (int r = 1; r <= rr; r++)
+    for (int c = 1; c <= cc; c++)
+      /* 'rMat' is a copy of 'mat': */
+      MATELEM(uMat, r, c) = pCopy(mat->m[c - 1 + (r - 1) * cc]);
+
+  luDecomp(pMat, lMat, uMat);
+
+  lists ll = (lists)omAllocBin(slists_bin);
+  ll->Init(3);
+  ll->m[0].rtyp=MATRIX_CMD; ll->m[0].data=(void *)pMat;
+  ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)lMat;
+  ll->m[2].rtyp=MATRIX_CMD; ll->m[2].data=(void *)uMat;
+  res->data=(char*)ll;
+
+  return FALSE;
+}
 static BOOLEAN jjMEMORY(leftv res, leftv v)
 {
   omUpdateInfo();
@@ -5400,6 +5436,7 @@ struct sValCmd1 dArith1[]=
 ,{jjJanetBasis, JANET_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |NO_RING}
 ,{jjKBASE,      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{jjKBASE,      KBASE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{jjLU_DECOMP,  LU_CMD,          LIST_CMD,       MATRIX_CMD    , NO_PLURAL |NO_RING}
 ,{atKILLATTR1,  KILLATTR_CMD,    NONE,           IDHDL         , ALLOW_PLURAL |ALLOW_RING}
 #ifdef MDEBUG
 ,{jjpHead,      LEAD_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
@@ -7001,6 +7038,84 @@ static BOOLEAN jjINTERSECT_PL(leftv res, leftv v)
   omFreeSize((ADDRESS)r,l*sizeof(ideal));
   return FALSE;
 }
+static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
+{
+  /* computation of the inverse of a quadratic matrix A
+     using the L-U-decomposition of A;
+     There are two valid parametrisations:
+     1) exactly one argument which is just the matrix A,
+     2) exactly three arguments P, L, U which already
+        realise the L-U-decomposition of A, that is,
+        P * A = L * U, and P, L, and U satisfy the
+        properties decribed in method 'jjLU_DECOMP';
+        see there;
+     If A is invertible, the list [1, A^(-1)] is returned,
+     otherwise the list [0] is returned. Thus, the user may
+     inspect the first entry of the returned list to see
+     whether A is invertible. */
+  matrix iMat; int invertible;
+  if (v->next == NULL)
+  {
+    if (v->Typ() != MATRIX_CMD)
+    {
+      Werror("expected either one or three matrices");
+      return TRUE;
+    }
+    else
+    {
+      matrix aMat = (matrix)v->Data();
+      int rr = aMat->rows();
+      int cc = aMat->cols();
+      if (rr != cc)
+      {
+        Werror("given matrix (%d x %d) is not quadratic, hence not invertible", rr, cc);
+        return TRUE;
+      }
+      invertible = luInverse(aMat, iMat);
+    }
+  }
+  else if ((v->Typ() == MATRIX_CMD) &&
+           (v->next->Typ() == MATRIX_CMD) &&
+           (v->next->next != NULL) &&
+           (v->next->next->Typ() == MATRIX_CMD) &&
+           (v->next->next->next == NULL))
+  {
+     matrix pMat = (matrix)v->Data();
+     matrix lMat = (matrix)v->next->Data();
+     matrix uMat = (matrix)v->next->next->Data();
+     int rr = uMat->rows();
+     int cc = uMat->cols();
+     if (rr != cc)
+     {
+       Werror("third matrix (%d x %d) is not quadratic, hence not invertible",
+              rr, cc);
+       return TRUE;
+     }
+     invertible = luInverseFromLUDecomp(pMat, lMat, uMat, iMat);
+  }
+  else
+  {
+    Werror("expected either one or three matrices");
+    return TRUE;
+  }
+
+  /* build the return structure; a list with either one or two entries */
+  lists ll = (lists)omAllocBin(slists_bin);
+  if (invertible)
+  {
+    ll->Init(2);
+    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)invertible;
+    ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)iMat;
+  }
+  else
+  {
+    ll->Init(1);
+    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)invertible;
+  }
+
+  res->data=(char*)ll;
+  return FALSE;
+}
 static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
 {
   int i=0;
@@ -7483,6 +7598,7 @@ struct sValCmdM dArithM[]=
 ,{jjCALL3ARG,  JET_CMD,         POLY_CMD,/*or set by p*/ 3  , ALLOW_PLURAL |ALLOW_RING}
 ,{jjJET4,      JET_CMD,         POLY_CMD,/*or set by p*/ 4  , ALLOW_PLURAL |ALLOW_RING}
 ,{jjLIST_PL,   LIST_CMD,        LIST_CMD,           -1      , ALLOW_PLURAL |ALLOW_RING}
+,{jjLU_INVERSE,LUI_CMD,         LIST_CMD,           -2      , NO_PLURAL |NO_RING}
 ,{jjWRONG,     MINOR_CMD,       NONE,               1       , ALLOW_PLURAL |ALLOW_RING}
 ,{jjMINOR_M,   MINOR_CMD,       IDEAL_CMD,          -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{jjCALL1ARG,  MODUL_CMD,       MODUL_CMD,          1       , ALLOW_PLURAL |ALLOW_RING}
