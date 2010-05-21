@@ -63,6 +63,7 @@ bug_chinrem_mat
 bug_charseries
 bug_diff
 bug_factorize
+bug_hilbstd
 bug_homog
 bug_interpol
 bug_mres

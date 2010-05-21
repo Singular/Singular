@@ -1,5 +1,6 @@
 Changes since 3-1-1-1:
-- factory: windows port improved
+- stdhilb fixed (Tst/Short/bug_stdhilb.tst)
+- factory: windows port improved (.h files instead of .inc)
 - fixed trac 226 (for ascii links)
 
 Sat May  8 15:26:00 CEST 2010
