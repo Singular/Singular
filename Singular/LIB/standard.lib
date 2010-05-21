@@ -888,9 +888,6 @@ EXAMPLE: example groebner;  shows an example"
 //   std oder slimgb verwendet. Zu Variablen konvertierte Parameter haben
 //   extra letzten Block und Gewichte 1.
 
-// Anmerkung: hilbstd im Modul-Fall nicht verwenden
-
-
   def P=basering;
   if ((typeof(i_par)=="vector")||(typeof(i_par)=="module")||(typeof(i_par)=="matrix")) {module i=i_par;}
   else {ideal i=i_par; } // int, poly, number, ideal
@@ -1100,7 +1097,7 @@ EXAMPLE: example groebner;  shows an example"
 
   //define direct:
   if ( (order=="simple" && (size(method)==0)) ||
-       (size(BRlist)>4) || (typeof(i)=="module") ||
+       (size(BRlist)>4) ||
         (order=="simple" && (method==",par2var" && npars_P==0 )) ||
          (conversion=="no" && partovar=="no" &&
            (algorithm=="std" || algorithm=="slimgb" ||
