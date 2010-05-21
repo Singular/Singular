@@ -2271,7 +2271,7 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
   }
 }
 
-LINLINE number nlMult (number a, number b, const coeffs r)
+LINLINE number nlMult (number a, number b, const coeffs R)
 {
   nlTest(a);
   nlTest(b);
