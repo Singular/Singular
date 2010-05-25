@@ -18,7 +18,7 @@ void    killid(const char * id, idhdl * ih)
 void    killhdl(idhdl h, package proot)
 void    killhdl2(idhdl h, idhdl * ih, ring r)
 idhdl   ggetid(const char *n, BOOLEAN local, idhdl *packhdl)
-idhdl   ggetid(const char *n, BOOLEAN local)
+idhdl   ggetid(const char *n)
 void    ipListFlag(idhdl h)
 lists   ipNameList(idhdl root)
 static int ipSwapId(idhdl tomove, idhdl &root1, idhdl &root2)
@@ -84,7 +84,7 @@ void IpIdTest::test_enterid() {
     char s[64];
     snprintf(s, sizeof(s), "dummy%06d", i);
     rh = enterid(s, 0, INT_CMD, &IDROOT, TRUE);
-    CPPUNIT_ASSERT_EQUAL(rh, ggetid(s, TRUE));
+    CPPUNIT_ASSERT_EQUAL(rh, ggetid(s));
   }
   fEnd   = Time();
   printf("Find sizeof enterid Time: for %d : %f\n", nMax, fEnd-fStart);
@@ -94,10 +94,10 @@ void IpIdTest::test_enterid() {
     char s[64];
     snprintf(s, sizeof(s), "ZDummy%06d", i);
     rh = enterid(s, 0, INT_CMD, &IDROOT, TRUE);
-    CPPUNIT_ASSERT_EQUAL(rh, ggetid(s, TRUE));
+    CPPUNIT_ASSERT_EQUAL(rh, ggetid(s));
     //snprintf(s, sizeof(s), "dummy%06d", i);
     killid(s, &IDROOT);
-    CPPUNIT_ASSERT_EQUAL((idhdl)0, ggetid(s, TRUE));
+    CPPUNIT_ASSERT_EQUAL((idhdl)0, ggetid(s));
   }
   fEnd   = Time();
   printf("Find sizeof enterid and killid Time: for %d : %f\n", nMax, fEnd-fStart);
