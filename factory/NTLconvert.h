@@ -29,6 +29,8 @@
 #include <NTL/ZZ_pEXFactoring.h>
 #include <NTL/lzz_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
+#include <NTL/mat_ZZ.h>
+
 
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT
