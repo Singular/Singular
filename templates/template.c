@@ -1,25 +1,19 @@
-// -*- c++ -*-
-/***************************************************************************//**
- * @file template.c
+//*****************************************************************************
+// Computer Algebra System SINGULAR    
+// Copyright: See COPYING file that comes with this distribution
+//*****************************************************************************
+/** @file template.c
  * 
- * This file implements the class TEMPLATE. AAA. BBB.
- * CCC.
+ * This file implements the class TEMPLATE. 
  *
- * DDDD.
+ * ABSTRACT: We need this for something...
  *
  * @author Oleksandr Motsak
  *
- * @par Copyright:
- *   (C) by The SINGULAR Team, see COPYING file
- * EEE.
+ * @internal @version \$Id$
  *
- * FFFFFFFF.
- * 
- * FFFFFFFFFFFFFFFFFFFFFFFFF.
- * @internal 
- * @version \$Id$
- *
- ******************************************************************************/
+ **/
+//*****************************************************************************
 
 // include header file
 #include "template.h"
@@ -27,7 +21,6 @@
 BEGIN_NAMESPACE_SINGULARXX
 
 // compiled stuff of the class TEMPLATE
-
 
 
 END_NAMESPACE_SINGULARXX
