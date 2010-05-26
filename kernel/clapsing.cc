@@ -53,39 +53,24 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
       res=convFactoryPSingP( gcd( F, G ) , r);
   }
   // and over Q(a) / Fp(a)
-  else if (( n_GetChar(r)==1 ) /* Q(a) */
-  || (n_GetChar(r) <-1))       /* Fp(a) */
+  else if ( rField_is_Extension(r))
   {
-    if (n_GetChar(r)==1) setCharacteristic( 0 );
-    else                 setCharacteristic( -n_GetChar(r) );
+    if ( rField_is_Q_a(r)) setCharacteristic( 0 );
+    else                   setCharacteristic( -n_GetChar(r) );
     if (r->minpoly!=NULL)
     {
-    #if 0
-      if (( n_GetChar(r)==1 ) /* Q(a) */ && (!isOn(SW_USE_QGCD)))
-      {
-      //  WerrorS( feNotImplemented );
-        CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,r->algring);
-        //Varlist ord;
-        //ord.append(mipo.mvar());
-        CFList as(mipo);
-        Variable a=rootOf(mipo);
-        //CanonicalForm F( convSingAPFactoryAP( f,a,r ) ), G( convSingAPFactoryAP( g,a,r ) );
-        CanonicalForm F( convSingTrPFactoryP(f,r) ), G( convSingTrPFactoryP(g,r) );
-        res= convFactoryAPSingAP( alg_gcd( F, G, as),r );
-      }
-      else
-      #endif
-      {
-        bool b=isOn(SW_USE_QGCD);
-        if ( rField_is_Q_a() ) On(SW_USE_QGCD);
-        CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
+      bool b1=isOn(SW_USE_QGCD);
+      bool b2=isOn(SW_USE_fieldGCD);
+      if ( rField_is_Q_a() ) On(SW_USE_QGCD);
+      else                   On(SW_USE_fieldGCD);
+      CanonicalForm mipo=convSingPFactoryP(((lnumber)r->minpoly)->z,
                                            r->algring);
-        Variable a=rootOf(mipo);
-        CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
-                      G( convSingAPFactoryAP( g,a,r ) );
-        res= convFactoryAPSingAP( gcd( F, G ),currRing );
-        if (!b) Off(SW_USE_QGCD);
-      }
+      Variable a=rootOf(mipo);
+      CanonicalForm F( convSingAPFactoryAP( f,a,r ) ),
+                    G( convSingAPFactoryAP( g,a,r ) );
+      res= convFactoryAPSingAP( gcd( F, G ),currRing );
+      if (!b1) Off(SW_USE_QGCD);
+      if (!b2) Off(SW_USE_fieldGCD);
     }
     else
     {
@@ -372,8 +357,7 @@ BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const
   // Q and Fp ...
   res=NULL;pa=NULL;pb=NULL;
   On(SW_SYMMETRIC_FF);
-  if (( n_GetChar(r) == 0 || n_GetChar(r) > 1 )
-  && (r->parameter==NULL))
+  if ( rField_is_Q(r) || rField_is_Zp(r) )
   {
     setCharacteristic( n_GetChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g,r) );
@@ -393,10 +377,9 @@ BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const
     Off(SW_RATIONAL);
   }
   // and over Q(a) / Fp(a)
-  else if (( n_GetChar(r)==1 ) /* Q(a) */
-  || (n_GetChar(r) <-1))       /* Fp(a) */
+  else if ( rField_is_Extension(r)) 
   {
-    if (n_GetChar(r)==1) setCharacteristic( 0 );
+    if (rField_is_Q_a(r)) setCharacteristic( 0 );
     else                 setCharacteristic( -n_GetChar(r) );
     CanonicalForm Fa,Gb;
     if (r->minpoly!=NULL)
