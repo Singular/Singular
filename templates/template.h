@@ -1,10 +1,9 @@
-//*****************************************************************************
-// Computer Algebra System SINGULAR    
-// Copyright: See COPYING file that comes with this distribution
-//*****************************************************************************
+/*****************************************************************************\
+ * Computer Algebra System SINGULAR    
+\*****************************************************************************/
 /** @file template.h
  * 
- * This file defines the class TEMPLATE. 
+ * This file defines the class Template. 
  *
  * ABSTRACT: We need this for something...
  *
@@ -13,32 +12,32 @@
  * @internal @version \$Id$
  *
  **/
-//*****************************************************************************
+/*****************************************************************************/
 
-#ifndef SINGULAR_TEMPLATE_CLASS_h_
-#define SINGULAR_TEMPLATE_CLASS_h_
+#ifndef TEMPLATE_H
+#define TEMPLATE_H
 
 // include basic definitions
 #include "singularxx_defs.h"
 
 BEGIN_NAMESPACE_SINGULARXX
 
-/** @class TEMPLATE template.h "someRootDirectory/template.h"
+/** @class Template template.h "someRootDirectory/template.h"
  * 
- * Brief description of class TEMPLATE.
+ * Brief description of class Template.
  *
- * Detailed description of class TEMPLATE. 
+ * Detailed description of class Template. 
  *
  * @sa some other classes
  */
-class TEMPLATE: public TEMPLATE_BASE_CLASS
+class Template: public TemplateBaseClass
 {
 public:
   /// Name type of *this.  
-  typedef TEMPLATE self;
+  typedef Template Self;
 
   /// My enum. Or yours, if you want!
-  enum My 
+  enum MyEnum 
   {
     int EVal1, ///< Enum value 1
     int EVal2  ///< Enum value 2
@@ -46,52 +45,49 @@ public:
 
   /// Default constructor. 
   /// And now goes the detailed description....
-  TEMPLATE();
+  Template();
 
   /// Default destructor. 
-  /// And now goes its detailed description....
-  ~TEMPLATE();
+  ~Template();
   
 
-  /** Brief method description.
-   *
-   * Detailed method description.
-   *
-   * @param [in] a some int
-   * @param [out] o integer result
-   * @return information about return value
-   * @sa strcpy2
-   */
-  int Method( int a, int &o );
+  /// Brief method description.
+  ///
+  /// Detailed method description.
+  ///
+  /// @return information about return value
+  /// @sa strcpy2
+  ///
+  int someMethod( 
+	     int a, ///< [in] some int
+	     int &o ///< [out] integer result
+	    );
 
   /// Example of Copy a string method.
   ///
-  /// The strcpy function copies @a strSource, including
+  /// The strcpy2 function copies @a strSource, including
   /// the terminating null character, to the location
   /// specified by @a strDestination. No overflow checking
   /// is performed when strings are copied or appended.
-  /// The behavior of @a strcpy is undefined if the source
+  /// The behavior of @a strcpy2 is undefined if the source
   /// and destination strings overlap.
   ///
-  /// @return @a strcpy returns the destination string.
+  /// @return @a strcpy2 returns the destination string.
   /// No return value is reserved to indicate an error.
-  /// @sa Method(), wcscpy(), _mbscpy(), strncpy()
+  /// @sa someMethod(), wcscpy(), _mbscpy(), strncpy()
   char* strcpy2(
-            char* strDestination,  ///< [out] pointer to source null terminated 
-                                   ///< string ...
+            char* strDestination,  ///< [out] pointer to source null terminated.
                                    ///< continue ...
-            const char* strSource  ///< [in] pointer to destination memory ....
-                                   ///< continue ...
+            const char* strSource  ///< [in] pointer to destination memory.
                );
 
-
 protected:
-  /// Short description of some flag. Long description: use this format to document a variable or
-  /// method
+  /// Short description of some flag till first dot. Everything after that will 
+  /// be considered as a detaiiled description.
   bool m_bSomeFlag;
 };
 
 END_NAMESPACE_SINGULARXX
 
 #endif 
-/* #ifndef SINGULAR_TEMPLATE_CLASS_h_ */
+/* #ifndef TEMPLATE_H */
