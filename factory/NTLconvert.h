@@ -30,6 +30,8 @@
 #include <NTL/lzz_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
 #include <NTL/mat_ZZ.h>
+#include <NTL/mat_lzz_p.h>
+#include <NTL/mat_lzz_pE.h>
 
 
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
@@ -63,6 +65,11 @@ CanonicalForm convertNTLzz_pEX2CF(zz_pEX f, Variable x, Variable alpha);
 
 mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(CFMatrix &m);
 CFMatrix* convertNTLmat_ZZ2FacCFMatrix(mat_ZZ &m);
+mat_zz_p* convertFacCFMatrix2NTLmat_zz_p(CFMatrix &m);
+CFMatrix* convertNTLmat_zz_p2FacCFMatrix(mat_zz_p &m);
+mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(CFMatrix &m);
+CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(mat_zz_pE &m, Variable alpha);
+
 extern int fac_NTL_char;
 #endif
 #endif

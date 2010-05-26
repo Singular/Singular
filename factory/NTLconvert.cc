@@ -1121,4 +1121,62 @@ CFMatrix* convertNTLmat_ZZ2FacCFMatrix(mat_ZZ &m)
   return res;
 }
 
+mat_zz_p* convertFacCFMatrix2NTLmat_zz_p(CFMatrix &m)
+{
+  mat_zz_p *res=new mat_zz_p;
+  res->SetDims(m.rows(),m.columns());
+
+  int i,j;
+  for(i=m.rows();i>0;i--)
+  {
+    for(j=m.columns();j>0;j--)
+    {
+      if(!(m(i,j)).isImm()) printf("convertFacCFMatrix2NTLmat_zz_p: not imm.\n");
+      (*res)(i,j)=(m(i,j)).intval();
+    }
+  }
+  return res;
+}
+CFMatrix* convertNTLmat_zz_p2FacCFMatrix(mat_zz_p &m)
+{
+  CFMatrix *res=new CFMatrix(m.NumRows(),m.NumCols());
+  int i,j;
+  for(i=res->rows();i>0;i--)
+  {
+    for(j=res->columns();j>0;j--)
+    {
+      (*res)(i,j)=CanonicalForm(to_long(rep(m(i,j))));
+    }
+  }
+  return res;
+}
+mat_zz_pE* convertFacCFMatrix2NTLmat_zz_pE(CFMatrix &m)
+{
+  mat_zz_pE *res=new mat_zz_pE;
+  res->SetDims(m.rows(),m.columns());
+
+  int i,j;
+  for(i=m.rows();i>0;i--)
+  {
+    for(j=m.columns();j>0;j--)
+    {
+      zz_pX cc=convertFacCF2NTLzzpX(m(i,j));
+      (*res)(i,j)=to_zz_pE(cc);
+    }
+  }
+  return res;
+}
+CFMatrix* convertNTLmat_zz_pE2FacCFMatrix(mat_zz_pE &m, Variable alpha)
+{
+  CFMatrix *res=new CFMatrix(m.NumRows(),m.NumCols());
+  int i,j;
+  for(i=res->rows();i>0;i--)
+  {
+    for(j=res->columns();j>0;j--)
+    {
+      (*res)(i,j)=convertNTLzzpE2CF(m(i,j), alpha);
+    }
+  }
+  return res;
+}
 #endif
