@@ -1,13 +1,23 @@
-/***************************************************************************//**
- * @file test.h
+//*****************************************************************************
+// Computer Algebra System SINGULAR    
+// Copyright: See COPYING file that comes with this distribution
+//*****************************************************************************
+/** @file test.h
+ * 
+ * Let's try to put parameters where they should be, compare F1 and F2.
  *
- * Let's try to put parameters where they should be in F2...
+ * ABSTRACT: Issue reported: https://bugzilla.gnome.org/show_bug.cgi?id=316311
  *
- * Issue reported: https://bugzilla.gnome.org/show_bug.cgi?id=316311
+ * @author Oleksandr Motsak
  *
- ******************************************************************************/
+ * @internal @version \$Id$
+ *
+ **/
+//*****************************************************************************
 
   /** F1. 
+   *
+   * This is function 1.
    *
    * @param [in] a1 some int
    * @param [out] r1 integer result
@@ -20,6 +30,8 @@
          );
 
   /** F2. 
+   *
+   * This is function 2.
    *
    * @params <- We would prefere all parameters to be here...
    *
