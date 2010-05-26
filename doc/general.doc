@@ -3992,9 +3992,11 @@ of each procedure. Therefore, parameters may be omitted or abbreviated if
 necessary. If this description consists of only upper-case characters,
 then it will be typeset in all lowercase characters in the manual.
 
+Please note, that the section @code{PROCEDURES:} must be the last section
+and the only section to list procedures.
+
 For more information, see @ref{Typesetting of help strings}. For an
 example, see @ref{template_lib}.
-
 
 @c ----------------------------------------
 @node The help string of procedures, template_lib, The help string of a library, Guidelines for writing a library
