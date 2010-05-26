@@ -1,7 +1,7 @@
 /*****************************************************************************\
  * Computer Algebra System SINGULAR    
 \*****************************************************************************/
-/** @file template_c.h
+/** @file templateForC.h
  * 
  * This is our template for C headers.
  *
@@ -14,8 +14,8 @@
  **/
 /*****************************************************************************/
 
-#ifndef TEMPLATE_C_H
-#define TEMPLATE_C_H
+#ifndef TEMPLATEFORC_H
+#define TEMPLATEFORC_H
 
 /** New type name for int. */
 typedef int name;
@@ -42,4 +42,4 @@ void F1(
        );
 
 #endif
-/* TEMPLATE_C_H */
+/* TEMPLATEFORC_H */
