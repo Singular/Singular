@@ -557,8 +557,8 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       return d1;
   if ( getCharacteristic() != 0 )
   {
-    if (isOn(SW_USE_fieldGCD)
-    && (!fc_and_gc_Univariate)
+    if ((!fc_and_gc_Univariate)
+    && isOn(SW_USE_fieldGCD)
     && (getCharacteristic() >100))
     {
       return fieldGCD(f,g);
@@ -629,7 +629,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       fc = chinrem_gcd( fc, gc);
     #endif
     }
-    if ( isOn( SW_USE_EZGCD ) )
+    else if ( isOn( SW_USE_EZGCD ) )
     {
       if ( pe == 1 )
         fc = ezgcd( fc, gc );
@@ -830,7 +830,7 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
           Variable m;
           if (
           (getCharacteristic() == 0) &&
-	  (hasFirstAlgVar(f,m) || hasFirstAlgVar(g,m))
+          (hasFirstAlgVar(f,m) || hasFirstAlgVar(g,m))
           //&& f.isUnivariate()
           //&& g.isUnivariate()
           )
