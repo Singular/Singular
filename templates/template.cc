@@ -24,9 +24,9 @@ USING_NAMESPACE_SINGULARXX
 /// We use Algorithm ABC from Book...
 int Template::someMethod( int a, int &o )
 {
-  int b;
+  int t = o;
 
   // return something
-  o = 2;
-  return -1;
+  o = a;
+  return t;
 };

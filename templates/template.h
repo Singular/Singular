@@ -60,7 +60,7 @@ public:
   ///
   int someMethod( 
 	     int a, ///< [in] some int
-	     int &o ///< [out] integer result
+	     int &o ///< [in,out] integer input and resulting value
 	    );
 
   /// Example of Copy a string method.
