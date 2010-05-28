@@ -67,6 +67,18 @@ int nrInt(number &n, const ring R)
   return i;
 }
 
+int nrSize(number n)
+{
+  float f = nf(n).F();
+  int i = (int)f;
+  /* basically return the largest integer in n;
+     only if this happens to be zero although n != 0,
+     return 1;
+     (this code ensures that zero has the size zero) */
+  if ((f != 0.0) & (i == 0)) i = 1;
+  return i;
+}
+
 number nrAdd (number a, number b)
 {
   float x = nf(a).F();

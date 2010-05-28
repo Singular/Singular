@@ -98,6 +98,17 @@ int ngfInt(number &i, const ring r)
     return (int)(d+0.5);
 }
 
+int ngfSize(number n)
+{
+  int i = ngfInt(n, currRing);
+  /* basically return the largest integer in n;
+     only if this happens to be zero although n != 0,
+     return 1;
+     (this code ensures that zero has the size zero) */
+  if ((i == 0) && (ngfIsZero(n) == FALSE)) i = 1;
+  return i;
+}
+
 /*2
 * delete a
 */

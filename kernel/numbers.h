@@ -50,6 +50,8 @@ extern number  (*nInit_bigint)(number i);
 #define        nInit(i) n_Init(i,currRing)
 extern number  (*nPar)(int i);
 extern int     (*nParDeg)(number n);
+/* size: a measure for the complexity of the represented number n;
+         zero should have size zero; larger size means more complex */
 extern int     (*nSize)(number n);
 extern int     (*n_Int)(number &n, const ring r);
 #ifdef HAVE_RINGS

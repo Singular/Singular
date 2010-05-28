@@ -4455,15 +4455,9 @@ static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
   int cc = mat->cols();
   matrix pMat;
   matrix lMat;
-  matrix uMat = mpNew(rr, cc);
+  matrix uMat;
 
-  /* make initial settings: */
-  for (int r = 1; r <= rr; r++)
-    for (int c = 1; c <= cc; c++)
-      /* 'rMat' is a copy of 'mat': */
-      MATELEM(uMat, r, c) = pCopy(mat->m[c - 1 + (r - 1) * cc]);
-
-  luDecomp(pMat, lMat, uMat);
+  luDecomp(mat, pMat, lMat, uMat);
 
   lists ll = (lists)omAllocBin(slists_bin);
   ll->Init(3);

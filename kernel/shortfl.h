@@ -22,6 +22,7 @@ BOOLEAN nrIsMOne      (number a);
 number  nrDiv         (number a, number b);
 number  nrNeg         (number c);
 number  nrInvers      (number c);
+int     nrSize        (number n);
 BOOLEAN nrGreater     (number a, number b);
 BOOLEAN nrEqual       (number a, number b);
 void    nrWrite       (number &a, const ring r);

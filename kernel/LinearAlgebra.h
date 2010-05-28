@@ -1,169 +1,202 @@
+/*****************************************************************************\
+ * Computer Algebra System SINGULAR    
+\*****************************************************************************/
+/** @file lineareAlgebra.h
+ * 
+ * This file provides basic linear algebra functionality.
+ *
+ * ABSTRACT: This file provides basic algorithms from linear algebra over
+ * any SINGULAR-supported field.
+ * For the time being, the procedures defined in this file expect matrices
+ * containing objects of the SINGULAR type 'number'. This means that, when
+ * 'currentRing' represents some polynomial ring K[x_1, x_2, ..., x_n], then
+ * the entries of the matrices are 'numbers' representing elements of K (and
+ * NOT 'polys' in K[x_1, x_2, ..., x_n]).
+ * This restriction may become obselete in the future.
+ *
+ * @author Frank Seelisch
+ *
+ * @internal @version \$Id$
+ *
+ **/
+/*****************************************************************************/
+
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 
-/****************************************
-*  Computer Algebra System SINGULAR     *
-****************************************/
-/* $Id: LineareAlgebra.h$ */
-/*
- * ABSTRACT: linear algebra over any SINGULAR-supported field
- *
- * Use 'K' in all method documentations to denote the field.
- * All matrices herein are assumed to have 'number' entries,
- * representing elements of K.
- * Use 'r' and 'c' as canonical row and column indices to ease
- * readability of the code.
- */
-
+// include basic SINGULAR structures
 #include <structs.h>
 
 /**
-  * LU-decomposition of a given (m x n)-matrix.
-  *
-  * Given an (m x n) matrix A, the method computes its LU-decomposition,
-  * that is, it computes matrices P, L, and U such that
-  * - A = P * L * U,
-  * - P is an (m x m) permutation matrix, i.e., its row/columns are the
-  *   standard basis vectors of K^m
-  * - L is an (m x m) matrix in lower triangular form,
-  * - U is an (m x n) matrix in upper row echelon form
-  * From these conditions, it easily follows that also
-  * P * A = L * U, as P is self-inverse.
-  * The method assumes that U contains the matrix A for which the
-  * decomposition is being sought.
-  * The method will modify all agument matrices so that they will
-  * finally contain the matrices P, L, and U with the above properties.
-  *
-  * @param pMat afterwards the row permutation matrix P
-  * @param lMat afterwards the lower triangular matrix L
-  * @param uMat afterwards the upper row echelon matrix U, initially A
-  */
-void luDecomp(matrix &pMat, matrix &lMat, matrix uMat);
+ * LU-decomposition of a given (m x n)-matrix.
+ *
+ * Given an (m x n) matrix A, the method computes its LU-decomposition,
+ * that is, it computes matrices P, L, and U such that<br>
+ * - P * A = L * U,<br>
+ * - P is an (m x m) permutation matrix, i.e., its row/columns form the
+ *   standard basis of K^m,<br>
+ * - L is an (m x m) matrix in lower triangular form with all diagonal
+ *   entries equal to 1,<br>
+ * - U is an (m x n) matrix in upper row echelon form.<br>
+ * From these conditions, it easily follows that also A = P * L * U,
+ * since P is self-inverse.<br>
+ * The method will modify all argument matrices except aMat, so that
+ * they will finally contain the matrices P, L, and U as specified
+ * above.
+ **/
+void luDecomp(
+       const matrix aMat, /**< [in]  the initial matrix A,          */
+       matrix &pMat,      /**< [out] the row permutation matrix P   */
+       matrix &lMat,      /**< [out] the lower triangular matrix L  */
+       matrix &uMat       /**< [out] the upper row echelon matrix U */
+             );
 
 /**
-  * Finds the best pivot element in some part of a given matrix.
-  *
-  * Given any matrix A with valid row indices r1..r2 and valid column
-  * indices c1..c2, this method finds the best pivot element for
-  * continuing Gauss elimination in A. "Best" here means best according
-  * to the implemented pivotStrategy; see there.
-  * In case all elements in A[r1..r2, c1..c2] are zero, the method returns
-  * false, otherwise true.
-  *
-  * @param aMat any matrix
-  * @param r1 the lower row index, determines the relevant part of aMat
-  * @param r2 the upper row index, determines the relevant part of aMat
-  * @param c1 the lower column index, determines the relevant part of aMat
-  * @param c2 the upper column index, determines the relevant part of aMat
-  * @param bestR afterwards address of the row index of the best pivot element
-  * @param bestC afterwards address of the col index of the best pivot element
-  * @return false if all relevant matrix entries are zero, false otherwise
-  */
-bool pivot(const matrix aMat, const int r1, const int r2, const int c1,
-           const int c2, int* bestR, int* bestC);
+ * Returns a pivot score for any non-zero matrix entry.
+ *
+ * The smaller the score the better will n serve as a pivot element
+ * in subsequent Gauss elimination steps.
+ *
+ * @return the pivot score of n
+ **/
+int pivotScore(
+               number n  /**< [in] a non-zero matrix entry */
+              );
 
 /**
-  * Computes an estimate for how well a given non-zero number can serve as
-  * pivot element for the next Gauss elimination step.
-  *
-  * This method expects a non-zero number. The following rules must be obeyed:
-  * - return a non-negative int
-  * - the higher the value, the better will n serve as pivot element
-  *
-  * @param n a number representing a non-zero element of the ground field K
-  * @return estimate for how well n will serve as pivot element
-  */
-int pivotStrategy(const number n);
+ * Finds the best pivot element in some part of a given matrix.
+ *
+ * Given any matrix A with valid row indices r1..r2 and valid column
+ * indices c1..c2, this method finds the best pivot element for
+ * subsequent Gauss elimination steps in A[r1..r2, c1..c2]. "Best"
+ * here means best with respect to the implementation of the method
+ * 'pivotScore(number n)'.<br>
+ * In the case that all elements in A[r1..r2, c1..c2] are zero, the
+ * method returns false, otherwise true.
+ *
+ * @return false if all relevant matrix entries are zero, true otherwise
+ * @sa pivotScore(number n)
+ **/
+bool pivot(
+           const matrix aMat, /**< [in]  any matrix with number entries */
+           const int r1,      /**< [in]  lower row index                */
+           const int r2,      /**< [in]  upper row index                */
+           const int c1,      /**< [in]  lower column index             */
+           const int c2,      /**< [in]  upper column index             */
+           int* bestR,        /**< [out] address of row index of best
+                                         pivot element                  */
+           int* bestC         /**< [out] address of column index of
+                                         best pivot element             */
+          );
 
 /**
-  * Computes the inverse of a quadratic matrix.
-  *
-  * This method expects a quadratic matrix, that is, it must have as many rows
-  * as columns. Inversion of the first argument is attempted via the
-  * LU-decomposition. There are two cases:
-  * 1) The matrix is not invertible. Then the method returns false, and the
-  *    content of iMat is useless.
-  * 2) The matrix is invertible. Then the method returns true, and the
-  *    content of iMat is the inverse of aMat.
-  *
-  * @param aMat the quadratic matrix to be inverted
-  * @param afterwards iMat the inverse of aMat in case that aMat is invertible
-  * @return true iff aMat is invertible, false otherwise
-  */
-bool luInverse(const matrix aMat, matrix &iMat);
+ * Computes the inverse of a given (n x n)-matrix.
+ *
+ * This method expects an (n x n)-matrix, that is, it must have as many
+ * rows as columns. Inversion of the first argument is attempted via the
+ * LU-decomposition. There are two cases:<br>
+ * 1) The matrix is not invertible. Then the method returns false, and
+ *    &iMat remains unchanged.<br>
+ * 2) The matrix is invertible. Then the method returns true, and the
+ *    content of iMat is the inverse of aMat.
+ *
+ * @return true iff aMat is invertible, false otherwise
+ * @sa luInverseFromLUDecomp(const matrix pMat, const matrix lMat,
+ *                           const matrix uMat, matrix &iMat)
+ **/
+bool luInverse(
+               const matrix aMat, /**< [in]  matrix to be inverted */
+               matrix &iMat       /**< [out] inverse of aMat if
+                                             invertible            */
+              );
 
 /**
-  * Computes the inverse of a quadratic matrix in upper right row echelon form.
-  *
-  * This method expects a quadratic matrix, that is, it must have as many rows
-  * as columns. Moreover, uMat[i,j] = 0, at least for all i > j.
-  * If the argument diagonalIsOne is true, then we know additionally, that
-  * uMat[i,i] = 1, for all i. In this case uMat is invertible. If diagonalIsOne
-  * is false, we do not know anything about the diagonal entries. (Note that
-  * they may still all be 1.)
-  * In general, there are two cases:
-  * 1) The matrix is not invertible. Then the method returns false, and the
-  *    content of iMat is useless.
-  * 2) The matrix is invertible. Then the method returns true, and the
-  *    content of iMat is the inverse of aMat.
-  *
-  * @param uMat a quadratic matrix in upper right row echelon form
-  * @param iMat afterwards the inverse of uMat in case that uMat is invertible
-  * @param diagonalIsOne if true all diagonal entries of uMat are 1
-  * @return true iff uMat is invertible, false otherwise
-  */
-bool upperRightTriangleInverse(const matrix uMat, matrix &iMat,
-                               bool diagonalIsOne);
+ * Computes the inverse of a given (n x n)-matrix in upper right
+ * triangular form.
+ *
+ * This method expects a quadratic matrix, that is, it must have as
+ * many rows as columns. Moreover, uMat[i, j] = 0, at least for all
+ * i > j, that is, u is in upper right triangular form.<br>
+ * If the argument diagonalIsOne is true, then we know additionally,
+ * that uMat[i, i] = 1, for all i. In this case uMat is invertible.
+ * Contrariwise, if diagonalIsOne is false, we do not know anything
+ * about the diagonal entries. (Note that they may still all be
+ * 1.)<br>
+ * In general, there are two cases:<br>
+ * 1) The matrix is not invertible. Then the method returns false,
+ *    and &iMat remains unchanged.<br>
+ * 2) The matrix is invertible. Then the method returns true, and
+ *    the content of iMat is the inverse of uMat.
+ *
+ * @return true iff uMat is invertible, false otherwise
+ **/
+bool upperRightTriangleInverse(
+       const matrix uMat, /**< [in]  (n x n)-matrix in upper right
+                                     triangular form               */
+       matrix &iMat,      /**< [out] inverse of uMat if invertible */
+       bool diagonalIsOne /**< [in]  if true, then all diagonal
+                                     entries of uMat are 1         */
+                              );
 
 /**
-  * Computes the inverse of a quadratic matrix in lower left row echelon form.
-  *
-  * This method expects a quadratic matrix, that is, it must have as many rows
-  * as columns. Moreover, lMat[i,j] = 0, at least for all j > i.
-  * If the argument diagonalIsOne is true, then we know additionally, that
-  * lMat[i,i] = 1, for all i. In this case lMat is invertible. If diagonalIsOne
-  * is false, we do not know anything about the diagonal entries. (Note that
-  * they may still all be 1.)
-  * In general, there are two cases:
-  * 1) The matrix is not invertible. Then the method returns false, and the
-  *    content of iMat is useless.
-  * 2) The matrix is invertible. Then the method returns true, and the
-  *    content of iMat is the inverse of aMat.
-  *
-  * @param lMat a quadratic matrix in lower left row echelon form
-  * @param iMat afterwards the inverse of lMat in case that lMat is invertible
-  * @param diagonalIsOne if true all diagonal entries of lMat are 1
-  * @return true iff lMat is invertible, false otherwise
-  */
-bool lowerLeftTriangleInverse(const matrix uMat, matrix &iMat,
-                              bool diagonalIsOne);
+ * Computes the inverse of a given (n x n)-matrix in lower left
+ * triangular form.
+ *
+ * This method expects an (n x n)-matrix, that is, it must have as
+ * many rows as columns. Moreover, lMat[i,j] = 0, at least for all
+ * j > i, that ism lMat is in lower left triangular form.<br>
+ * If the argument diagonalIsOne is true, then we know additionally,
+ * that lMat[i, i] = 1, for all i. In this case lMat is invertible.
+ * Contrariwise, if diagonalIsOne is false, we do not know anything
+ * about the diagonal entries. (Note that they may still all be
+ * 1.)<br>
+ * In general, there are two cases:<br>
+ * 1) The matrix is not invertible. Then the method returns false,
+ *    and &iMat remains unchanged.<br>
+ * 2) The matrix is invertible. Then the method returns true, and
+ *    the content of iMat is the inverse of lMat.
+ *
+ * @return true iff lMat is invertible, false otherwise
+ **/
+bool lowerLeftTriangleInverse(
+       const matrix lMat, /**< [in]  (n x n)-matrix in lower left
+                                     triangular form               */
+       matrix &iMat,      /**< [out] inverse of lMat if invertible */
+       bool diagonalIsOne /**< [in]  if true, then all diagonal
+                                     entries of lMat are 1         */
+                              );
 
 /**
-  * Computes the inverse of a quadratic matrix which is given by its LU-
-  * decomposition.
-  *
-  * With A denoting the matrix to be inverted, the method expects the
-  * LU-decomposition of A, that is, pMat * A = lMat * uMat, where
-  * the argument matrices have the appropriate proteries.
-  * Furthermore, uMat is expected to be quadratic. Then A^(-1) is computed
-  * as A^(-1) = uMat^(-1) * lMat^(-1) * pMat, since pMat is self-inverse.
-  * This will work if and only if uMat is invertible, as lMat and pMat are
-  * in any case invertible.
-  *
-  * There are two cases:
-  * 1) A is not invertible. Then the method returns false, and the
-  *    content of iMat is useless.
-  * 2) A is invertible. Then the method returns true, and the content
-  *    of iMat is the inverse of A.
-  *
-  * @param pMat the permutation matrix of the LU-decomposition of A
-  * @param lMat the lower triangle matrix of the LU-decomposition of A
-  * @param uMat the upper row echelon matrix of the LU-decomposition of A
-  * @param iMat afterwards the inverse of A in case that A is invertible
-  * @return true iff A is invertible, false otherwise
-  */
-bool luInverseFromLUDecomp(const matrix pMat, const matrix lMat,
-                           const matrix uMat, matrix &iMat);
+ * Computes the inverse of an (n x n)-matrix which is given by its LU-
+ * decomposition.
+ *
+ * With A denoting the matrix to be inverted, the method expects the
+ * LU-decomposition of A, that is, pMat * A = lMat * uMat, where
+ * the argument matrices have the appropriate proteries; see method
+ * 'luDecomp(const matrix aMat, matrix &pMat, matrix &lMat,
+ * matrix &uMat)'.<br>
+ * Furthermore, uMat is expected to be an (n x n)-matrix. Then A^(-1)
+ * is computed according to A^(-1) = uMat^(-1) * lMat^(-1) * pMat,
+ * since pMat is self-inverse. This will work if and only if uMat is
+ * invertible, because lMat and pMat are in any case invertible.<br>
+ * In general, there are two cases:<br>
+ * 1) uMat and hence A is not invertible. Then the method returns
+ *    false, and &iMat remains unchanged.<br>
+ * 2) uMat and hence A is invertible. Then the method returns true,
+ *    and the content of iMat is the inverse of A.
+ *
+ * @return true if A is invertible, false otherwise
+ * @sa luInverse(const matrix aMat, matrix &iMat)
+ **/
+bool luInverseFromLUDecomp(
+       const matrix pMat, /**< [in]  permutation matrix of an LU-
+                                     decomposition                */
+       const matrix lMat, /**< [in]  lower left matrix of an LU-
+                                     decomposition                */
+       const matrix uMat, /**< [in]  upper right matrix of an LU-
+                                     decomposition                */
+       matrix &iMat       /**< [out] inverse of A if invertible   */
+                          );
 
 #endif
 /* LINEAR_ALGEBRA_H */

@@ -114,7 +114,7 @@ CXXSOURCES=clapconv.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
     pShallowCopyDelete.cc fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc \
-    f5c.cc F5cLists.cc ratgring.cc shiftgb.cc gfan.cc LinearAlgebra.cc
+    f5c.cc F5cLists.cc ratgring.cc shiftgb.cc gfan.cc linearAlgebra.cc
 
 # normal C source files
 CSOURCES=weight0.c fegetopt.c fereadl.c dError.c mmstd.c

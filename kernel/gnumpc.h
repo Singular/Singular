@@ -24,6 +24,7 @@ number   ngcAdd(number la, number li);
 number   ngcSub(number la, number li);
 number   ngcMult(number a, number b);
 number   ngcDiv(number a, number b);
+int      ngcSize(number n);
 void     ngcPower(number x, int exp, number *lu);
 number   ngcCopy(number a);
 number   ngc_Copy(number a, ring r);

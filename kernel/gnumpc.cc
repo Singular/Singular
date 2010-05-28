@@ -119,6 +119,21 @@ int ngcInt(number &i, const ring r)
   return (int)((gmp_complex*)i)->real();
 }
 
+int ngcSize(number n)
+{
+  int r = (int)((gmp_complex*)n)->real();
+  if (r < 0) r = -r;
+  int i = (int)((gmp_complex*)n)->imag();
+  if (i < 0) i = -i;
+  int oneNorm = r + i;
+  /* basically return the 1-norm of n;
+     only if this happens to be zero although n != 0,
+     return 1;
+     (this code ensures that zero has the size zero) */
+  if ((oneNorm == 0.0) & (ngcIsZero(n) == FALSE)) oneNorm = 1;
+  return oneNorm;
+}
+
 /*2
 * delete a
 */

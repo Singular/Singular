@@ -606,7 +606,7 @@ void nInitChar(ring r)
     n->nPower = nrPower;
     n->cfSetMap=nrSetMap;
     /* nName= ndName; */
-    /*nSize  = ndSize;*/
+    n->nSize = nrSize;
 #ifdef LDEBUG
     n->nDBTest=ndDBTest; // not yet implemented: nrDBTest;
 #endif
@@ -636,7 +636,7 @@ void nInitChar(ring r)
     n->nPower = ngfPower;
     n->cfSetMap=ngfSetMap;
     n->nName= ndName;
-    n->nSize  = ndSize;
+    n->nSize  = ngfSize;
 #ifdef LDEBUG
     n->nDBTest=ndDBTest; // not yet implemented: ngfDBTest
 #endif
@@ -669,7 +669,7 @@ void nInitChar(ring r)
     n->nPar=ngcPar;
     n->nRePart=ngcRePart;
     n->nImPart=ngcImPart;
-    /*nSize  = ndSize;*/
+    n->nSize = ngcSize;
 #ifdef LDEBUG
     n->nDBTest=ndDBTest; // not yet implemented: ngcDBTest
 #endif

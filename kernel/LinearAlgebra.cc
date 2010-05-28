@@ -1,49 +1,99 @@
+/*****************************************************************************\
+ * Computer Algebra System SINGULAR    
+\*****************************************************************************/
+/** @file lineareAlgebra.cc
+ *
+ * This file implements basic linear algebra functionality.
+ *
+ * For more general information, see the documentation in
+ * lineareAlgebra.h.
+ *
+ * @author Frank Seelisch
+ *
+ * @internal @version \$Id$
+ *
+ **/
+/*****************************************************************************/
+
+// include header files
 #include "mod2.h"
 #include "structs.h"
 #include "polys.h"
 #include "ideals.h"
 #include "numbers.h"
 #include "matpol.h"
-#include "LinearAlgebra.h"
+#include "linearAlgebra.h"
 
-int pivotStrategy(const number n)
-{ /* bear in mind that n is guaranteed to be non-zero */
-  return 0;
-  
-  /* in K(x): degree(denominator) - degree(numerator) -> maximal!
-     in Q:    abs(n) -> maximal
-     sonst:   0 */
+/**
+ * The returned score is based on the implementation of 'nSize' for
+ * numbers (, see numbers.h): nSize(n) provides a measure for the
+ * complexity of n. Thus, less complex pivot elements will be
+ * prefered, and get therefore a smaller pivot score. Consequently,
+ * we simply return the value of nSize.
+ * An exception to this rule are the ground fields R, long R, and
+ * long C: In these, the result of nSize relates to |n|. And since
+ * a larger modulus of the pivot element ensures a numerically more
+ * stable Gauss elimination, we would like to have a smaller score
+ * for larger values of |n|. Therefore, in R, long R, and long C,
+ * the negative of nSize will be returned.
+ **/
+int pivotScore(number n)
+{
+  int s = nSize(n);
+  if (rField_is_long_C(currRing) ||
+      rField_is_long_R(currRing) ||
+      rField_is_R(currRing))
+    return -s;
+  else
+    return s;
 }
 
+/**
+ * This code computes a score for each non-zero matrix entry in
+ * aMat[r1..r2, c1..c2]. If all entries are zero, false is returned,
+ * otherwise true. In the latter case, the minimum of all scores
+ * is sought, and the row and column indices of the corresponding
+ * matrix entry are stored in bestR and bestC.
+ **/
 bool pivot(const matrix aMat, const int r1, const int r2, const int c1,
            const int c2, int* bestR, int* bestC)
 {
-  int bestScore = -1; int score; poly matEntry;
+  int bestScore; int score; bool foundBestScore = false; poly matEntry;
 
   for (int c = c1; c <= c2; c++)
   {
     for (int r = r1; r <= r2; r++)
     {
       matEntry = MATELEM(aMat, r, c);
-      score = (matEntry == NULL) ? -1 : pivotStrategy(pGetCoeff(matEntry));
-      if (score > bestScore)
+      if (matEntry != NULL)
       {
-        bestScore = score;
-        *bestR = r;
-        *bestC = c;
+        score = pivotScore(pGetCoeff(matEntry));
+        if ((!foundBestScore) || (score < bestScore))
+        {
+          bestScore = score;
+          *bestR = r;
+          *bestC = c;
+        }
+        foundBestScore = true;
       }
     }
   }
 
-  return (bestScore != -1);
+  return foundBestScore;
 }
 
-void luDecomp(matrix &pMat, matrix &lMat, matrix uMat)
+void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
 {
-  int rr = uMat->rows();
-  int cc = uMat->cols();
+  int rr = aMat->rows();
+  int cc = aMat->cols();
   pMat = mpNew(rr, rr);
   lMat = mpNew(rr, rr);
+  uMat = mpNew(rr, cc);
+  /* copy aMat into uMat: */
+  for (int r = 1; r <= rr; r++)
+    for (int c = 1; c <= cc; c++)
+      MATELEM(uMat, r, c) = pCopy(aMat->m[c - 1 + (r - 1) * cc]);
+
   /* we use an int array to store all row permutations;
      note that we only make use of the entries [1..rr] */
   int* permut = new int[rr + 1];
@@ -72,7 +122,7 @@ void luDecomp(matrix &pMat, matrix &lMat, matrix uMat)
       }
 
       /* swap rows with indices r and bestR in lMat;
-         we must do this for columns < r */
+         we must do this only for columns < r */
       for (int c = 1; c < r; c++)
       {
         pSwap = MATELEM(lMat, r, c);
@@ -81,8 +131,9 @@ void luDecomp(matrix &pMat, matrix &lMat, matrix uMat)
       }
 
       /* perform next Gauss elimination step, i.e., below the
-         row with index r; we need to adjust lMat and uMat;
-         we know that the matrix entry at [r, r] is non-zero: */
+         row with index r;
+         we need to adjust lMat and uMat;
+         we are certain that the matrix entry at [r, r] is non-zero: */
       number pivotElement = pGetCoeff(MATELEM(uMat, r, r));
       poly p; number n;
       for (int rGauss = r + 1; rGauss <= rr; rGauss++)
@@ -100,9 +151,9 @@ void luDecomp(matrix &pMat, matrix &lMat, matrix uMat)
           MATELEM(uMat, rGauss, r) = NULL; pDelete(&p);
           n = nNeg(n);
           for (int cGauss = r + 1; cGauss <= cc; cGauss++)
-            MATELEM(uMat, rGauss, cGauss) = pAdd(MATELEM(uMat, rGauss, cGauss),
-                                                     ppMult_nn(MATELEM(uMat, r,
-                                                                  cGauss), n));
+            MATELEM(uMat, rGauss, cGauss)
+              = pAdd(MATELEM(uMat, rGauss, cGauss),
+                     ppMult_nn(MATELEM(uMat, r, cGauss), n));
 
           nDelete(&n); /* clean up n */
         }
@@ -118,20 +169,19 @@ void luDecomp(matrix &pMat, matrix &lMat, matrix uMat)
   return;
 }
 
+/**
+ * This code first computes the LU-decomposition of aMat,
+ * and then calls the method for inverting a matrix which
+ * is given by its LU-decomposition.
+ **/
 bool luInverse(const matrix aMat, matrix &iMat)
-{ /* aMat is guaranteed to be quadratic */
+{ /* aMat is guaranteed to be an (n x n)-matrix */
   int d = aMat->rows();
 
-  /* preparing to call luInverseFromLUDecomp */
-  matrix pMat = mpNew(d, d);
-  matrix lMat = mpNew(d, d);
-  matrix uMat = mpNew(d, d);
-  /* copy aMat to uMat: */
-  for (int r = 1; r <= d; r++)
-    for (int c = 1; c <= d; c++)
-      MATELEM(uMat, r, c) = pCopy(aMat->m[c - 1 + (r - 1) * d]);
-
-  luDecomp(pMat, lMat, uMat);
+  matrix pMat;
+  matrix lMat;
+  matrix uMat;
+  luDecomp(aMat, pMat, lMat, uMat);
   bool result = luInverseFromLUDecomp(pMat, lMat, uMat, iMat);
 
   /* clean-up */
@@ -237,22 +287,30 @@ bool lowerLeftTriangleInverse(const matrix lMat, matrix &iMat,
   return invertible;
 }
 
-bool luInverseFromLUDecomp(const matrix pMat, const matrix lMat, const matrix uMat, matrix &iMat)
+/**
+ * This code computes the inverse by inverting lMat and uMat, and
+ * then performing two matrix multiplications.
+ **/
+bool luInverseFromLUDecomp(const matrix pMat, const matrix lMat,
+                           const matrix uMat, matrix &iMat)
 { /* uMat is guaranteed to be quadratic */
   int d = uMat->rows();
 
-  matrix lMinus1Mat; /* for storing the inverse of lMat */
-  matrix uMinus1Mat; /* for storing the inverse of uMat, if existing */
+  matrix lMatInverse; /* for storing the inverse of lMat;
+                         this inversion will always work                */
+  matrix uMatInverse; /* for storing the inverse of uMat, if invertible */
 
-  bool result = upperRightTriangleInverse(uMat, uMinus1Mat, false);
+  bool result = upperRightTriangleInverse(uMat, uMatInverse, false);
   if (result)
   {
-    lowerLeftTriangleInverse(lMat, lMinus1Mat, true);
-    iMat = mpMult(mpMult(uMinus1Mat, lMinus1Mat), pMat);
+    /* next will always work, since lMat is known to have all diagonal
+       entries equal to 1 */
+    lowerLeftTriangleInverse(lMat, lMatInverse, true);
+    iMat = mpMult(mpMult(uMatInverse, lMatInverse), pMat);
     
     /* clean-up */
-    idDelete((ideal*)&lMinus1Mat);
-    idDelete((ideal*)&uMinus1Mat);
+    idDelete((ideal*)&lMatInverse);
+    idDelete((ideal*)&uMatInverse);
   }
 
   return result;

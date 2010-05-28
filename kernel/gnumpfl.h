@@ -22,6 +22,7 @@ number   ngfInvers(number a);
 number   ngfAdd(number la, number li);
 number   ngfSub(number la, number li);
 number   ngfMult(number a, number b);
+int      ngfSize(number n);
 number   ngfDiv(number a, number b);
 void     ngfPower(number x, int exp, number *lu);
 number   ngfCopy(number a);
