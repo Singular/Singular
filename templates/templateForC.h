@@ -14,8 +14,8 @@
  **/
 /*****************************************************************************/
 
-#ifndef TEMPLATEFORC_H
-#define TEMPLATEFORC_H
+#ifndef TEMPLATE_FOR_C_H
+#define TEMPLATE_FOR_C_H
 
 /** New type name for int. */
 typedef int name;
@@ -31,15 +31,20 @@ enum myEnum
  *
  * This is function 1.
  *
+ * @return information about return value
+ * @sa strcpy
+ *
  * The end!
  */
-void F1(
+int F1(
 	int a1,  /**< [in] some int. 
 		  * aasas.
 		  * bbbb.
 		  */
-	int & r1 /**< [out] integer result */
+  int & r1 /**< [in,out] integer input and some resulting value */        
        );
 
+
+
 #endif
-/* TEMPLATEFORC_H */
+/* TEMPLATE_FOR_C_H */
