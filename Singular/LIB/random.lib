@@ -125,9 +125,9 @@ EXAMPLE: example sparseid; shows an example
 {
 //----------------------------- set defaults ----------------------------------
    if( size(#)>=3 ) { int o=#[1]; int p=#[2]; int b=#[3]; }
-   if( size(#)==2 ) { int o=#[1]; int p=#[2]; int b=30000; }
-   if( size(#)==1 ) { int o=#[1]; int p=75; int b=30000; }
-   if( size(#)==0 ) { int o=u; int p=75; int b=30000; }
+   else {if( size(#)==2 ) { int o=#[1]; int p=#[2]; int b=30000; }
+   else {if( size(#)==1 ) { int o=#[1]; int p=75; int b=30000; }
+   else {if( size(#)==0 ) { int o=u; int p=75; int b=30000; }}}}
 //------------------ use sparsemat for creation of sparseid -------------------
    int ii; matrix i[1][k]; intmat m;
    if( u <=0 )
@@ -136,7 +136,7 @@ EXAMPLE: example sparseid; shows an example
       i = m;
       u=1;
    }
-   for ( ii=u; ii<=o; ii=ii+1)
+   for ( ii=u; ii<=o; ii++)
    {
        m = sparsemat(size(maxideal(ii)),k,p,b);
        i = i+matrix(maxideal(ii))*m;
@@ -168,7 +168,7 @@ EXAMPLE: example sparseid; shows an example
 //------------------ use sparsemat for creation of sparseid -------------------
    int ii; ideal i; intmat m; ideal id;
 
-   for ( ii=k; ii>0; ii=ii-1)
+   for ( ii=k; ii>0; ii--)
    {
        id = maxideal(random(u, o)); // monomial basis of some degree
        m = sparsemat(size(id),1,p,b); // random coefficients
@@ -206,7 +206,7 @@ EXAMPLE: example sparsemat; shows an example
 //--------------- this is faster for not very sparse matrices ----------------
    if( p<40 )
    {
-      for( ii=1; ii<=t; ii=ii+1 )
+      for( ii=1; ii<=t; ii++ )
       { r=( random(1,100)>p ); v[1,ii]=r*random(1,b); h=h+r; }
    }
   int bb = t*(100-p);
@@ -247,15 +247,15 @@ EXAMPLE: example sparsematrix; shows an example
 //----------------------------- set defaults ----------------------------------
    int pe=50;int u=0;int pp=75;int b=100;
    if( size(#)==4 ) { u=#[1]; pe=#[2]; pp=#[3]; b=#[4]; }
-   if( size(#)==3 ) { u=#[1]; pe=#[2]; pp=#[3]; }
-   if( size(#)==2 ) { u=#[1]; pe=#[2]; }
-   if( size(#)==1 ) { u=#[1]; }
+   else { if( size(#)==3 ) { u=#[1]; pe=#[2]; pp=#[3]; }
+   else { if( size(#)==2 ) { u=#[1]; pe=#[2]; }
+   else {if( size(#)==1 ) { u=#[1]; }}}}
 //------------------- use sparsemat and sparseid  -----------------------------
    intmat I = sparsemat(n,m,pe,1);
-   for(ii=1; ii<=n;ii++)
+   for(ii=n; ii>0;ii--)
    {
      id = sparseid(m,u,o,pp,b);
-     for(jj=1; jj<=m; jj++)
+     for(jj=m; jj>0; jj--)
      {
         if( I[ii,jj] !=0)
         {
@@ -285,12 +285,12 @@ EXAMPLE:  example sparsepoly; shows an example
 {
 //----------------------------- set defaults ----------------------------------
    if( size(#)>=3 ) { int o=#[1]; int p=#[2]; int b=#[3]; }
-   if( size(#)==2 ) { int o=#[1]; int p=#[2]; int b=30000; }
-   if( size(#)==1 ) { int o=#[1]; int p=75; int b=30000; }
-   if( size(#)==0 ) { int o=u; int p=75; int b=30000; }
+   else {if( size(#)==2 ) { int o=#[1]; int p=#[2]; int b=30000; }
+   else {if( size(#)==1 ) { int o=#[1]; int p=75; int b=30000; }
+   else {if( size(#)==0 ) { int o=u; int p=75; int b=30000; }}}}
    int ii; poly f;
 //----------------- use sparseid for creation of sparsepoly -------------------
-   for( ii=u; ii<=o; ii=ii+1 ) { f=f+sparseid(1,ii,ii,p,b)[1]; }
+   for( ii=u; ii<=o; ii++ ) { f=f+sparseid(1,ii,ii,p,b)[1]; }
    return(f);
 }
 example
@@ -319,7 +319,7 @@ EXAMPLE: example sparsetriag; shows an example
    intmat v[1][t]=sparsemat(1,t,p,b);
    if( n<=m ) { min=n-1; M[n,n]=1; }
    else { min=m; }
-   for( ii=1; ii<=min; ii=ii+1 )
+   for( ii=1; ii<=min; ii++ )
    {
       l=r+1; r=r+n-ii;
       M[ii..n,ii]=1,v[1,l..r];
