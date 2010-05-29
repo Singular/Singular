@@ -56,7 +56,7 @@
 #include "walkProc.h"
 #include "mod_raw.h"
 #include "MinorInterface.h"
-#include "LinearAlgebra.h"
+#include "linearAlgebra.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
