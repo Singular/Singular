@@ -534,13 +534,11 @@ static number ngcMapP(number from, const coeffs aRing, const coeffs r)
   assume( getCoeffType(r) == ID );
   assume( getCoeffType(aRing) ==  n_Zp );
 
-  if ( from != NULL)
+  if ( from != NULL )
     return ngcInit(npInt(from, aRing), r);
   else
     return NULL;
 }
-
-
 
 static number ngcCopyMap(number from, const coeffs aRing, const coeffs r)
 {
@@ -556,12 +554,11 @@ static number ngcCopyMap(number from, const coeffs aRing, const coeffs r)
   return (number)b;  
 }
 
-
 nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
 
-  if(nField_is_Q(src))
+  if (nField_is_Q(src))
   {
     return ngcMapQ;
   }
@@ -573,7 +570,7 @@ nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
   {
     return ngcCopyMap;
   }
-  if(nField_is_R(src))
+  if (nField_is_R(src))
   {
     return ngcMapR;
   }
@@ -583,5 +580,4 @@ nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
   }
   return NULL;
 }
-
 
