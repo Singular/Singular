@@ -327,64 +327,62 @@ void npInitChar(coeffs r, int c)
   r->cfSetChar=npSetChar;
   r->nCoeffIsEqual=npCoeffsEqual;
 
-  r->nMult  = npMult;
-  r->nSub   = npSub;
-  r->nAdd   = npAdd;
-  r->nDiv   = npDiv;
-  r->nIntDiv= npDiv;
-  //r->nIntMod= ndIntMod;
-  r->nExactDiv= npDiv;
+  r->cfMult  = npMult;
+  r->cfSub   = npSub;
+  r->cfAdd   = npAdd;
+  r->cfDiv   = npDiv;
+  r->cfIntDiv= npDiv;
+  //r->cfIntMod= ndIntMod;
+  r->cfExactDiv= npDiv;
   r->cfInit = npInit;
-  //r->nPar = ndPar;
-  //r->nParDeg = ndParDeg;
-  //r->nSize  = ndSize;
-  r->n_Int  = npInt;
+  //r->cfPar = ndPar;
+  //r->cfParDeg = ndParDeg;
+  //r->cfSize  = ndSize;
+  r->cfInt  = npInt;
   #ifdef HAVE_RINGS
-  //r->nDivComp = NULL; // only for ring stuff
-  //r->nIsUnit = NULL; // only for ring stuff
-  //r->nGetUnit = NULL; // only for ring stuff
-  //r->nExtGcd = NULL; // only for ring stuff
+  //r->cfDivComp = NULL; // only for ring stuff
+  //r->cfIsUnit = NULL; // only for ring stuff
+  //r->cfGetUnit = NULL; // only for ring stuff
+  //r->cfExtGcd = NULL; // only for ring stuff
+  // r->cfDivBy = NULL; // only for ring stuff
   #endif
-  r->nNeg   = npNeg;
-  r->nInvers= npInvers;
+  r->cfNeg   = npNeg;
+  r->cfInvers= npInvers;
   //r->cfCopy  = ndCopy;
-  //r->nRePart = ndCopy;
-  //r->nImPart = ndReturn0;
+  //r->cfRePart = ndCopy;
+  //r->cfImPart = ndReturn0;
   r->cfWrite = npWrite;
-  r->nRead = npRead;
-  //r->nNormalize=ndNormalize;
-  r->nGreater = npGreater;
-  #ifdef HAVE_RINGS
-  r->nDivBy = NULL; // only for ring stuff
-  #endif
-  r->nEqual = npEqual;
-  r->nIsZero = npIsZero;
-  r->nIsOne = npIsOne;
-  r->nIsMOne = npIsMOne;
-  r->nGreaterZero = npGreaterZero;
-  r->nPower = npPower;
+  r->cfRead = npRead;
+  //r->cfNormalize=ndNormalize;
+  r->cfGreater = npGreater;
+  r->cfEqual = npEqual;
+  r->cfIsZero = npIsZero;
+  r->cfIsOne = npIsOne;
+  r->cfIsMOne = npIsMOne;
+  r->cfGreaterZero = npGreaterZero;
+  r->cfPower = npPower;
   r->cfGetDenom = ndGetDenom;
   r->cfGetNumerator = ndGetNumerator;
-  //r->nGcd  = ndGcd;
-  //r->nLcm  = ndGcd;
+  //r->cfGcd  = ndGcd;
+  //r->cfLcm  = ndGcd;
   //r->cfDelete= ndDelete;
   r->cfSetMap = npSetMap;
-  //r->nName = ndName;
-  r->nInpMult=ndInpMult;
-  r->nInit_bigint= npMap0;
+  //r->cfName = ndName;
+  r->cfInpMult=ndInpMult;
+  r->cfInit_bigint= npMap0;
 #ifdef NV_OPS
   if (c>NV_MAX_PRIME)
   {
-    r->nMult  = nvMult;
-    r->nDiv   = nvDiv;
-    r->nExactDiv= nvDiv;
-    r->nInvers= nvInvers;
-    r->nPower= nvPower;
+    r->cfMult  = nvMult;
+    r->cfDiv   = nvDiv;
+    r->cfExactDiv= nvDiv;
+    r->cfInvers= nvInvers;
+    r->cfPower= nvPower;
   }
 #endif
 #ifdef LDEBUG
   // debug stuff
-  r->nDBTest=npDBTest;
+  r->cfDBTest=npDBTest;
 #endif
   
   // the variables:

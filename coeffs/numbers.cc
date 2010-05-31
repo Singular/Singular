@@ -120,26 +120,26 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->type=t;
 
     // default entries (different from NULL) for some routines:
-    n->nPar  = ndPar;
-    n->nParDeg=ndParDeg;
-    n->nSize = ndSize;
+    n->cfPar  = ndPar;
+    n->cfParDeg=ndParDeg;
+    n->cfSize = ndSize;
     n->cfGetDenom= ndGetDenom;
     n->cfGetNumerator= ndGetNumerator;
-    n->nName =  ndName;
-    n->nImPart=ndReturn0;
+    n->cfName =  ndName;
+    n->cfImPart=ndReturn0;
     n->cfDelete= ndDelete;
-    n->nInpMult=ndInpMult;
+    n->cfInpMult=ndInpMult;
     n->cfCopy=nd_Copy;
-    n->nIntMod=ndIntMod; /* dummy !! */
-    n->nNormalize=ndNormalize;
-    n->nGcd  = ndGcd;
-    n->nLcm  = ndGcd; /* tricky, isn't it ?*/
+    n->cfIntMod=ndIntMod; /* dummy !! */
+    n->cfNormalize=ndNormalize;
+    n->cfGcd  = ndGcd;
+    n->cfLcm  = ndGcd; /* tricky, isn't it ?*/
 #ifdef HAVE_RINGS
-    n->nDivComp = ndDivComp;
-    n->nDivBy = ndDivBy;
-    n->nIsUnit = ndIsUnit;
-    n->nExtGcd = ndExtGcd;
-    //n->nGetUnit = (nMapFunc)NULL;
+    n->cfDivComp = ndDivComp;
+    n->cfDivBy = ndDivBy;
+    n->cfIsUnit = ndIsUnit;
+    n->cfExtGcd = ndExtGcd;
+    //n->cfGetUnit = (nMapFunc)NULL;
 #endif
   #if 0 /*vertagt*/
   if (nField_is_Extension(r))
@@ -189,10 +189,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
      else
        Werror("coeff init missing for %d",(int)t);
     // post init settings:
-    if (n->nRePart==NULL) n->nRePart=n->cfCopy;
-    if (n->nIntDiv==NULL) n->nIntDiv=n->nDiv;
+    if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
+    if (n->cfIntDiv==NULL) n->cfIntDiv=n->cfDiv;
 #ifdef HAVE_RINGS
-   if (n->nGetUnit==(nMapFunc)NULL) n->nGetUnit=n->cfCopy;
+   if (n->cfGetUnit==(nMapFunc)NULL) n->cfGetUnit=n->cfCopy;
 #endif
   }
   else

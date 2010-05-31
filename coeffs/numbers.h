@@ -9,61 +9,7 @@
 */
 #include "coeffs.h"
 
-/// Returns the type of coeffs domain
-static inline n_coeffType getCoeffType(const coeffs r)
-{
-  return r->type;
-}
-
-static inline int nInternalChar(const coeffs r)
-{
-  return r->ch;
-}
-
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
-
-#define n_Copy(n, r)          (r)->cfCopy(n,r)
-#define n_Delete(n, r)        (r)->cfDelete(n,r)
-#define n_Mult(n1, n2, r)     (r)->nMult(n1, n2,r)
-#define n_Add(n1, n2, r)      (r)->nAdd(n1, n2,r)
-#define n_IsZero(n, r)        (r)->nIsZero(n,r)
-#define n_Equal(n1, n2, r)    (r)->nEqual(n1, n2,r)
-#define n_Neg(n, r)           (r)->nNeg(n,r)
-#define n_Sub(n1, n2, r)      (r)->nSub(n1, n2,r)
-#define n_GetChar(r)          ((r)->ch)
-#define n_Init(i, r)          (r)->cfInit(i,r)
-#define n_IsOne(n, r)         (r)->nIsOne(n,r)
-#define n_IsMOne(n, r)        (r)->nIsMOne(n,r)
-#define n_GreaterZero(n, r)   (r)->nGreaterZero(n,r)
-#define n_Write(n, r)         (r)->cfWrite(n,r)
-#define n_Normalize(n, r)     (r)->nNormalize(n,r)
-#define n_Gcd(a, b, r)        (r)->nGcd(a,b,r)
-#define n_IntDiv(a, b, r)     (r)->nIntDiv(a,b,r)
-#define n_Div(a, b, r)        (r)->nDiv(a,b,r)
-#define n_Invers(a, r)        (r)->nInvers(a,r)
-#define n_ExactDiv(a, b, r)   (r)->nExactDiv(a,b,r)
-#define n_Test(a,r)           (r)->nDBTest(a,r,__FILE__,__LINE__)
-
-#define n_InpMult(a, b, r)    (r)->nInpMult(a,b,r)
-#define n_Power(a, b, res, r) (r)->nPower(a,b,res,r)
-#define n_Size(n,r)           (r)->nSize(n,r)
-#define n_GetDenom(N,r)       (r)->cfGetDenom((N),r)
-#define n_GetNumerator(N,r)   (r)->cfGetNumerator((N),r)
-
-#define n_New(n, r)           nNew(n)
-
-/* prototypes */
-void           nNew(number * a);
-
-#define nTest(a) (1)
-
-// please use n_* counterparts instead!!!
-// #define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
-// #define nGetDenom(N) (currRing->cf->cfGetDenom((N),currRing))
-// #define nGetNumerator(N) (currRing->cf->cfGetNumerator((N),currRing))
-
-
-#define nSetMap(R) (currRing->cf->cfSetMap(R,currRing))
 
 /* the dummy routines: */
 void nDummy1(number* d);
@@ -86,17 +32,6 @@ number ndInpAdd(number &a, number b, const coeffs r);
 #ifdef LDEBUG
 void nDBDummy1(number* d,char *f, int l);
 #endif
-#define nGetChar() n_GetChar(currRing)
-
-/// one-time initialisations for new coeffs
-coeffs nInitChar(n_coeffType t, void * parameter);
-/// undo all initialisations
-void nKillChar(coeffs r);
-/// initialisations after each ring change
-inline void nSetChar(coeffs r)
-{
-  if ((r!=NULL) && (r->cfSetChar!=NULL)) r->cfSetChar(r);
-}
 
 #define nDivBy0 "div by 0"
 

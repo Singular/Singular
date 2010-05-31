@@ -551,29 +551,29 @@ void nrInitChar(coeffs n, int)
   assume( getCoeffType(n) == ID );
 
   n->cfInit = nrInit;
-  n->n_Int  = nrInt;
-  n->nAdd   = nrAdd;
-  n->nSub   = nrSub;
-  n->nMult  = nrMult;
-  n->nDiv   = nrDiv;
-  n->nExactDiv= nrDiv;
-  n->nNeg   = nrNeg;
-  n->nInvers= nrInvers;
+  n->cfInt  = nrInt;
+  n->cfAdd   = nrAdd;
+  n->cfSub   = nrSub;
+  n->cfMult  = nrMult;
+  n->cfDiv   = nrDiv;
+  n->cfExactDiv= nrDiv;
+  n->cfNeg   = nrNeg;
+  n->cfInvers= nrInvers;
   n->cfCopy  = ndCopy;
-  n->nGreater = nrGreater;
-  n->nEqual = nrEqual;
-  n->nIsZero = nrIsZero;
-  n->nIsOne = nrIsOne;
-  n->nIsMOne = nrIsMOne;
-  n->nGreaterZero = nrGreaterZero;
+  n->cfGreater = nrGreater;
+  n->cfEqual = nrEqual;
+  n->cfIsZero = nrIsZero;
+  n->cfIsOne = nrIsOne;
+  n->cfIsMOne = nrIsMOne;
+  n->cfGreaterZero = nrGreaterZero;
   n->cfWrite = nrWrite;
-  n->nRead = nrRead;
-  n->nPower = nrPower;
+  n->cfRead = nrRead;
+  n->cfPower = nrPower;
   n->cfSetMap=nrSetMap;
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG
-  n->nDBTest=ndDBTest; // not yet implemented: nrDBTest;
+  n->cfDBTest=ndDBTest; // not yet implemented: nrDBTest;
 #endif
   
 
