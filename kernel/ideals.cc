@@ -30,6 +30,8 @@
 #include "sparsmat.h"
 #include "ideals.h"
 #include "prCopy.h"
+#include "gring.h"
+
 
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 
