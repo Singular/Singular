@@ -3727,10 +3727,10 @@ See
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
-Computes the LU-decomposition of an (m x n) matrix A.
+Computes the LU-decomposition of an (m x n) matrix.
 
-A must consist of numbers, only. This means that when the basering
-represents some
+The matrix, A say, must consist of numbers, only. This means that
+when the basering represents some
 @tex
 $K[x_1,x_2,\ldots,x_r]$,
 @end tex
@@ -3740,15 +3740,15 @@ K[x1,x2,...,xr],
 then all entries of A must come from the ground field K.
 @*The LU-decomposition of A is a triple of matrices P, L, and U such that
 @*- P * A = L * U,
-@*- P is an (m x m) permutation matrix, i.e., its row/columns form the
+@*- P is an (m x m) permutation matrix, i.e., its rows/columns form the
 standard basis of K^m,
 @*- L is an (m x m) matrix in lower triangular form with all diagonal
 entries equal to 1, and
 @*- U is an (m x n) matrix in upper row echelon form.
-@*From these conditions, it easily follows that also A = P * L * U, since
-P is self-inverse.
+@*From these conditions, it easily follows that also A = P * L * U holds,
+since P is self-inverse.
 
-@code{list L=ludecomp(A);} returns a list L with the three above entries
+@code{list L=ludecomp(A);} fills a list L with the three above entries
 P, L, and U.
 
 @item @strong{Example:}
@@ -3757,7 +3757,7 @@ P, L, and U.
   ring r=0,(x),dp;
   matrix A[3][4]=1,2,3,4,1,1,1,1,2,2,1,1;
   list plu = ludecomp(A);
-  print(plu[3]);                   // U in P * A = L * U
+  print(plu[3]);                   // the matrix U of the decomposition
   print(plu[1]*A-plu[2]*plu[3]);   // should be the zero matrix
 @c example
 @end smallexample
@@ -3782,13 +3782,13 @@ matrix
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
-Computes the inverse of a matrix, A if A is invertible.
+Computes the inverse of a matrix A, if A is invertible.
 
 The matrix A must be given either directly, or by its LU-decomposition.
 In the latter case, three matrices P, L, and U are expected, in this order,
 which satisfy
 @*- P * A = L * U,
-@*- P is an (m x m) permutation matrix, i.e., its row/columns form the
+@*- P is an (m x m) permutation matrix, i.e., its rows/columns form the
 standard basis of K^m,
 @*- L is an (m x m) matrix in lower triangular form with all diagonal
 entries equal to 1, and
@@ -3801,12 +3801,12 @@ $A^{-1}=U^{-1}\cdot L^{-1}\cdot P$,
 A^(-1)=U^(-1) * L^(-1) * P,
 @end ifinfo
 since P is self-inverse.
-@*In the case of A being given directly, luinverse first computes its
+@*In the case of A being given directly, @code{luinverse} first computes its
 LU-decomposition, and then proceeds as in the case when P, L, and U are
 provided.
 
-@code{list L=luinverse(A);} returns a list L with either one entry = 0
-(signaling that A is not invertible), or a list L with the two entries
+@code{list L=luinverse(A);} fills the list L with either one entry = 0
+(signaling that A is not invertible), or with the two entries
 @tex
 $1, A^{-1}$.
 @end tex
@@ -3827,7 +3827,8 @@ The method will give a warning for any non-quadratic matrix A.
   if (L[1] == 1)
   {
     print(L[2]);
-    print(A*L[2]); // should be the (3 x 3)-unit matrix
+    "----- next should be the (3 x 3)-unit matrix:";
+    print(A*L[2]);
   }
 @c example
 @end smallexample
