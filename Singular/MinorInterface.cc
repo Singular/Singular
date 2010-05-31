@@ -3,6 +3,7 @@
 #include "polys.h"
 #include "ideals.h"
 #include "kstd1.h"
+#include "matpol.h"
 #include <MinorInterface.h>
 #include <MinorProcessor.h>
 
