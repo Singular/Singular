@@ -19,6 +19,8 @@ void ngfInitChar(coeffs r, int);
 static BOOLEAN ngfCoeffsEqual(const coeffs r, n_coeffType n, int parameter);
 
 
+const char *   ngfRead (const char *s, number *a, const coeffs r);
+
 /* // Private interface should be hidden!!!
 /// Note: MAY NOT WORK AS EXPECTED!
 BOOLEAN  ngfGreaterZero(number za, const coeffs r);
@@ -38,7 +40,6 @@ number   ngfDiv(number a, number b, const coeffs r);
 void     ngfPower(number x, int exp, number *lu, const coeffs r);
 number   ngfCopy(number a, const coeffs r);
 number   ngf_Copy(number a, coeffs r);
-const char *   ngfRead (const char *s, number *a, const coeffs r);
 void     ngfWrite(number &a, const coeffs r);
 
 void     ngfDelete(number *a, const coeffs r);
