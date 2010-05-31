@@ -45,6 +45,7 @@
 #include "ffields.h"
 #include "clapsing.h"
 #include "hutil.h"
+#include "gring.h"
 #include "ipshell.h"
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
