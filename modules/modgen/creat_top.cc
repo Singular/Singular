@@ -47,6 +47,7 @@ void  mod_copy_tmp(
 /*========================================================================*/
 void write_enter_id(FILE *fp)
 {
+  fprintf(fp, "\ntypedef int idtyp;\n");
   fprintf(fp, "\nidhdl enter_id(char *name, char *value, idtyp t)\n");
   fprintf(fp, "{\n");
   fprintf(fp, "  idhdl h;\n");
