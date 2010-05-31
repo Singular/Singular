@@ -279,7 +279,7 @@ matrix mpMult(matrix a, matrix b)
           poly bkj;
           if ((bkj=MATELEM(b,k,j))!=NULL)
           {
-	    poly *cij=&(MATELEM(c,i,j));
+            poly *cij=&(MATELEM(c,i,j));
             poly s = ppMult_qq(aik /*MATELEM(a,i,k)*/, bkj/*MATELEM(b,k,j)*/);
             if (/*MATELEM(c,i,j)*/ (*cij)==NULL) (*cij)=s;
             else (*cij) = pAdd((*cij) /*MATELEM(c,i,j)*/ ,s);

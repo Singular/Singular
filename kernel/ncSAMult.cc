@@ -30,6 +30,7 @@
 
 
 #include "options.h"
+#include "p_Procs.h"
 #include <ncSAMult.h> // for CMultiplier etc classes
 #include <sca.h> // for SCA
 #include <polys.h> // for p_One

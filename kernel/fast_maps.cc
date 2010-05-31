@@ -16,6 +16,7 @@
 #include "ideals.h"
 #include "ring.h"
 #include "febase.h"
+#include "sbuckets.h"
 #include "fast_maps.h"
 
 // define if you want to use special dest_ring

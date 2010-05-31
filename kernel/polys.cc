@@ -18,6 +18,7 @@
 #include "numbers.h"
 #include "polys.h"
 #include "ring.h"
+#include "sbuckets.h"
 
 #ifdef HAVE_PLURAL
 #include "gring.h"
