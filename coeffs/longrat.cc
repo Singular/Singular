@@ -2468,54 +2468,52 @@ void nlInitChar(coeffs r, int ch)
   r->cfSetChar=NULL;
   r->nCoeffIsEqual=nlCoeffsEqual;
 
-  r->nMult  = nlMult;
-  r->nSub   = nlSub;
-  r->nAdd   = nlAdd;
-  r->nDiv   = nlDiv;
-  r->nIntDiv= nlIntDiv;
-  r->nIntMod= nlIntMod;
-  r->nExactDiv= nlExactDiv;
+  r->cfMult  = nlMult;
+  r->cfSub   = nlSub;
+  r->cfAdd   = nlAdd;
+  r->cfDiv   = nlDiv;
+  r->cfIntDiv= nlIntDiv;
+  r->cfIntMod= nlIntMod;
+  r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
-  //r->nPar = ndPar;
-  //r->nParDeg = ndParDeg;
-  r->nSize  = nlSize;
-  r->n_Int  = nlInt;
+  //r->cfPar = ndPar;
+  //r->cfParDeg = ndParDeg;
+  r->cfSize  = nlSize;
+  r->cfInt  = nlInt;
   #ifdef HAVE_RINGS
-  //r->nDivComp = NULL; // only for ring stuff
-  //r->nIsUnit = NULL; // only for ring stuff
-  //r->nGetUnit = NULL; // only for ring stuff
-  //r->nExtGcd = NULL; // only for ring stuff
+  //r->cfDivComp = NULL; // only for ring stuff
+  //r->cfIsUnit = NULL; // only for ring stuff
+  //r->cfGetUnit = NULL; // only for ring stuff
+  //r->cfExtGcd = NULL; // only for ring stuff
+  //r->cfDivBy = NULL; // only for ring stuff
   #endif
-  r->nNeg   = nlNeg;
-  r->nInvers= nlInvers;
+  r->cfNeg   = nlNeg;
+  r->cfInvers= nlInvers;
   r->cfCopy  = nl_Copy;
-  r->nRePart = nl_Copy;
-  //r->nImPart = ndReturn0;
+  r->cfRePart = nl_Copy;
+  //r->cfImPart = ndReturn0;
   r->cfWrite = nlWrite;
-  r->nRead = nlRead;
-  r->nNormalize=nlNormalize;
-  r->nGreater = nlGreater;
-  #ifdef HAVE_RINGS
-  //r->nDivBy = NULL; // only for ring stuff
-  #endif
-  r->nEqual = nlEqual;
-  r->nIsZero = nlIsZero;
-  r->nIsOne = nlIsOne;
-  r->nIsMOne = nlIsMOne;
-  r->nGreaterZero = nlGreaterZero;
-  r->nPower = nlPower;
+  r->cfRead = nlRead;
+  r->cfNormalize=nlNormalize;
+  r->cfGreater = nlGreater;
+  r->cfEqual = nlEqual;
+  r->cfIsZero = nlIsZero;
+  r->cfIsOne = nlIsOne;
+  r->cfIsMOne = nlIsMOne;
+  r->cfGreaterZero = nlGreaterZero;
+  r->cfPower = nlPower;
   r->cfGetDenom = nlGetDenom;
   r->cfGetNumerator = nlGetNumerator;
-  r->nGcd  = nlGcd;
-  r->nLcm  = nlLcm;
+  r->cfGcd  = nlGcd;
+  r->cfLcm  = nlLcm;
   r->cfDelete= nlDelete;
   r->cfSetMap = nlSetMap;
-  //r->nName = ndName;
-  r->nInpMult=nlInpMult;
-  r->nInit_bigint=nlCopyMap;
+  //r->cfName = ndName;
+  r->cfInpMult=nlInpMult;
+  r->cfInit_bigint=nlCopyMap;
 #ifdef LDEBUG
   // debug stuff
-  r->nDBTest=nlDBTest;
+  r->cfDBTest=nlDBTest;
 #endif
   
   // the variables: general stuff (required)

@@ -417,29 +417,29 @@ void ngfInitChar(coeffs n, int)
   assume( getCoeffType(n) == ID );
 
   n->cfDelete  = ngfDelete;
-  n->nNormalize=ndNormalize;
+  n->cfNormalize=ndNormalize;
   n->cfInit   = ngfInit;
-  n->n_Int    = ngfInt;
-  n->nAdd     = ngfAdd;
-  n->nSub     = ngfSub;
-  n->nMult    = ngfMult;
-  n->nDiv     = ngfDiv;
-  n->nExactDiv= ngfDiv;
-  n->nNeg     = ngfNeg;
-  n->nInvers  = ngfInvers;
+  n->cfInt    = ngfInt;
+  n->cfAdd     = ngfAdd;
+  n->cfSub     = ngfSub;
+  n->cfMult    = ngfMult;
+  n->cfDiv     = ngfDiv;
+  n->cfExactDiv= ngfDiv;
+  n->cfNeg     = ngfNeg;
+  n->cfInvers  = ngfInvers;
   n->cfCopy   = ngfCopy;
-  n->nGreater = ngfGreater;
-  n->nEqual   = ngfEqual;
-  n->nIsZero  = ngfIsZero;
-  n->nIsOne   = ngfIsOne;
-  n->nIsMOne  = ngfIsMOne;
-  n->nGreaterZero = ngfGreaterZero;
+  n->cfGreater = ngfGreater;
+  n->cfEqual   = ngfEqual;
+  n->cfIsZero  = ngfIsZero;
+  n->cfIsOne   = ngfIsOne;
+  n->cfIsMOne  = ngfIsMOne;
+  n->cfGreaterZero = ngfGreaterZero;
   n->cfWrite  = ngfWrite;
-  n->nRead    = ngfRead;
-  n->nPower   = ngfPower;
+  n->cfRead    = ngfRead;
+  n->cfPower   = ngfPower;
   n->cfSetMap = ngfSetMap;
 #ifdef LDEBUG
-  n->nDBTest  = ndDBTest; // not yet implemented: ngfDBTest
+  n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif
 }
 

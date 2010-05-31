@@ -384,33 +384,33 @@ void ngcInitChar(coeffs n, int)
   assume( getCoeffType(n) == ID );
 
   n->cfDelete  = ngcDelete;
-  n->nNormalize=ndNormalize;
+  n->cfNormalize=ndNormalize;
   n->cfInit   = ngcInit;
-  n->n_Int    = ngcInt;
-  n->nAdd     = ngcAdd;
-  n->nSub     = ngcSub;
-  n->nMult    = ngcMult;
-  n->nDiv     = ngcDiv;
-  n->nExactDiv= ngcDiv;
-  n->nNeg     = ngcNeg;
-  n->nInvers  = ngcInvers;
+  n->cfInt    = ngcInt;
+  n->cfAdd     = ngcAdd;
+  n->cfSub     = ngcSub;
+  n->cfMult    = ngcMult;
+  n->cfDiv     = ngcDiv;
+  n->cfExactDiv= ngcDiv;
+  n->cfNeg     = ngcNeg;
+  n->cfInvers  = ngcInvers;
   n->cfCopy   = ngcCopy;
-  n->nGreater = ngcGreater;
-  n->nEqual   = ngcEqual;
-  n->nIsZero  = ngcIsZero;
-  n->nIsOne   = ngcIsOne;
-  n->nIsMOne  = ngcIsMOne;
-  n->nGreaterZero = ngcGreaterZero;
+  n->cfGreater = ngcGreater;
+  n->cfEqual   = ngcEqual;
+  n->cfIsZero  = ngcIsZero;
+  n->cfIsOne   = ngcIsOne;
+  n->cfIsMOne  = ngcIsMOne;
+  n->cfGreaterZero = ngcGreaterZero;
   n->cfWrite  = ngcWrite;
-  n->nRead    = ngcRead;
-  n->nPower   = ngcPower;
+  n->cfRead    = ngcRead;
+  n->cfPower   = ngcPower;
   n->cfSetMap = ngcSetMap;
-  n->nPar     = ngcPar;
-  n->nRePart  = ngcRePart;
-  n->nImPart  = ngcImPart;
-    // nSize  = ndSize;
+  n->cfPar     = ngcPar;
+  n->cfRePart  = ngcRePart;
+  n->cfImPart  = ngcImPart;
+    // cfSize  = ndSize;
 #ifdef LDEBUG
-  n->nDBTest  = ndDBTest; // not yet implemented: ngcDBTest
+  n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest
 #endif
 
 
@@ -421,54 +421,54 @@ void ngcInitChar(coeffs n, int)
   r->cfSetChar=NULL;
   r->nCoeffIsEqual=nlCoeffsEqual;
 
-  r->nMult  = nlMult;
-  r->nSub   = nlSub;
-  r->nAdd   = nlAdd;
-  r->nDiv   = nlDiv;
-  r->nIntDiv= nlIntDiv;
-  r->nIntMod= nlIntMod;
-  r->nExactDiv= nlExactDiv;
+  r->cfMult  = nlMult;
+  r->cfSub   = nlSub;
+  r->cfAdd   = nlAdd;
+  r->cfDiv   = nlDiv;
+  r->cfIntDiv= nlIntDiv;
+  r->cfIntMod= nlIntMod;
+  r->cfExactDiv= nlExactDiv;
   r->cfInit = nlInit;
-  r->nPar = ndPar;
-  r->nParDeg = ndParDeg;
-  r->nSize  = nlSize;
-  r->n_Int  = nlInt;
+  r->cfPar = ndPar;
+  r->cfParDeg = ndParDeg;
+  r->cfSize  = nlSize;
+  r->cfInt  = nlInt;
 #ifdef HAVE_RINGS
-  r->nDivComp = NULL; // only for ring stuff
-  r->nIsUnit = NULL; // only for ring stuff
-  r->nGetUnit = NULL; // only for ring stuff
-  r->nExtGcd = NULL; // only for ring stuff
+  r->cfDivComp = NULL; // only for ring stuff
+  r->cfIsUnit = NULL; // only for ring stuff
+  r->cfGetUnit = NULL; // only for ring stuff
+  r->cfExtGcd = NULL; // only for ring stuff
 #endif
-  r->nNeg   = nlNeg;
-  r->nInvers= nlInvers;
+  r->cfNeg   = nlNeg;
+  r->cfInvers= nlInvers;
   r->cfCopy  = nl_Copy;
-  r->nRePart = nl_Copy;
-  r->nImPart = ndReturn0;
+  r->cfRePart = nl_Copy;
+  r->cfImPart = ndReturn0;
   r->cfWrite = nlWrite;
-  r->nRead = nlRead;
-  r->nNormalize=nlNormalize;
-  r->nGreater = nlGreater;
+  r->cfRead = nlRead;
+  r->cfNormalize=nlNormalize;
+  r->cfGreater = nlGreater;
 #ifdef HAVE_RINGS
-  r->nDivBy = NULL; // only for ring stuff
+  r->cfDivBy = NULL; // only for ring stuff
 #endif
-  r->nEqual = nlEqual;
-  r->nIsZero = nlIsZero;
-  r->nIsOne = nlIsOne;
-  r->nIsMOne = nlIsMOne;
-  r->nGreaterZero = nlGreaterZero;
-  r->nPower = nlPower;
+  r->cfEqual = nlEqual;
+  r->cfIsZero = nlIsZero;
+  r->cfIsOne = nlIsOne;
+  r->cfIsMOne = nlIsMOne;
+  r->cfGreaterZero = nlGreaterZero;
+  r->cfPower = nlPower;
   r->cfGetDenom = nlGetDenom;
   r->cfGetNumerator = nlGetNumerator;
-  r->nGcd  = nlGcd;
-  r->nLcm  = nlLcm;
+  r->cfGcd  = nlGcd;
+  r->cfLcm  = nlLcm;
   r->cfDelete= nlDelete;
   r->cfSetMap = nlSetMap;
-  r->nName = ndName;
-  r->nInpMult=nlInpMult;
-  r->nInit_bigint=nlCopyMap;
+  r->cfName = ndName;
+  r->cfInpMult=nlInpMult;
+  r->cfInit_bigint=nlCopyMap;
 #ifdef LDEBUG
   // debug stuff
-  r->nDBTest=nlDBTest;
+  r->cfDBTest=nlDBTest;
 #endif
 
   // the variables:
