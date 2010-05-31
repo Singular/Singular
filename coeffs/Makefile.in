@@ -21,10 +21,9 @@ includedir	= @includedir@
 ##
 
 CXX		= g++
-INSTALL		= /usr/bin/install -c
-INSTALL_PROGRAM	= ${INSTALL}
-INSTALL_DATA	= ${INSTALL} -m 644
-MKINSTALLDIRS   = ./mkinstalldirs
+INSTALL_PROGRAM	= @INSTALL@
+INSTALL_DATA	= @INSTALL@ -m 644
+MKINSTALLDIRS   = ../mkinstalldirs
 LN_S		= ln -s
 
 ##
@@ -89,4 +88,4 @@ install: all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
 	${INSTALL_DATA} libcoeffs.a ${libdir}/libcoeffs.a
-#	$(INSTALL_DATA) output.h $(includedir)/output.h
+	$(INSTALL_DATA) coeffs.h $(includedir)/coeffs.h
