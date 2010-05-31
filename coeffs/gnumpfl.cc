@@ -15,6 +15,7 @@
 #include "numbers.h"
 #include "modulop.h"
 #include "longrat.h"
+#include "shortfl.h"
 
 #include <gnumpfl.h>
 #include <mpr_complex.h>
@@ -23,7 +24,7 @@ extern size_t gmp_output_digits;
 //ring ngfMapRing; // to be used also in gnumpc.cc
 
 /// Our Type!
-static const n_coeffType ID = n_gnump_R;
+static const n_coeffType ID = n_long_R;
 
 static number ngfMapP(number from, const coeffs src, const coeffs dst)
 {
@@ -112,6 +113,19 @@ number ngfCopy(number a, const coeffs r)
   assume( getCoeffType(r) == ID );
   
   gmp_float* b= new gmp_float( *(gmp_float*)a );
+  return (number)b;
+}
+
+static number ngfCopyMap(number a, const coeffs r1, const coeffs r2)
+{
+  assume( getCoeffType(r1) == ID );
+  assume( getCoeffType(r2) == ID );
+  
+  gmp_float* b= NULL;
+  if ( a !=  NULL )
+  {
+    b= new gmp_float( *(gmp_float*)a );
+  }
   return (number)b;
 }
 
@@ -380,7 +394,7 @@ void ngfWrite (number &a, const coeffs r)
   char *out;
   if ( a != NULL )
   {
-    out= floatToStr(*(gmp_float*)a, gmp_output_digits, r);
+    out= floatToStr(*(gmp_float*)a, gmp_output_digits);
     StringAppendS(out);
     //omFreeSize((void *)out, (strlen(out)+1)* sizeof(char) );
     omFree( (void *)out );
@@ -427,6 +441,7 @@ void ngfInitChar(coeffs n, int)
 #ifdef LDEBUG
   n->nDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif
+}
 
 number ngfMapQ(number from, const coeffs aRing, const coeffs r)
 {
@@ -435,7 +450,7 @@ number ngfMapQ(number from, const coeffs aRing, const coeffs r)
   
   if ( from != NULL )
   {
-    gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
+    gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF,r));
     return (number)res;
   }
   else
@@ -462,7 +477,7 @@ static number ngfMapP(number from, const coeffs aRing, const coeffs r)
   assume( getCoeffType(aRing) ==  n_Zp );
   
   if ( from != NULL )
-    return ngfInit(npInt(from,src), dst);
+    return ngfInit(npInt(from,aRing), r);
   else
     return NULL;
 }
@@ -491,7 +506,7 @@ nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
   }
   if (nField_is_long_R(src))
   {
-    return ngfCopy;
+    return ngfCopyMap;
   }
   if (nField_is_R(src))
   {
