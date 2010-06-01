@@ -319,26 +319,8 @@ int redRing (LObject* h,kStrategy strat)
   {
     j = kFindDivisibleByInT(strat->T, strat->sevT, strat->tl, h);
     if (j < 0) return 1;
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS("T red:");
-      h->wrp();
-      PrintS(" with ");
-      strat->T[j].wrp();
-    }
-#endif
 
-    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat);
-
-#ifdef KDEBUG
-    if (TEST_OPT_DEBUG)
-    {
-      PrintS("\nto ");
-      h->wrp();
-      PrintLn();
-    }
-#endif
+    ksReducePoly(h, &(strat->T[j]), NULL, NULL, strat); // with debug output
 
     if (h->GetLmTailRing() == NULL)
     {
@@ -1005,18 +987,12 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     // rWrite(currRing);PrintLn();
     rDebugPrint(currRing);
     PrintLn();
-
-    if(strat->tailRing != NULL && strat->tailRing != currRing)
-    {
-      PrintS("// **** bba start GB: tailRing: ");
-      rWrite(strat->tailRing);PrintLn(); rDebugPrint(strat->tailRing);
-    }
   }
 #endif /* MYTEST */
 #endif /* KDEBUG */
 
 #ifdef HAVE_TAIL_RING
-  if(!idIs0(F))
+  if(!idIs0(F) &&(!rField_is_Ring()))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
     kStratInitChangeTailRing(strat);
 #endif
   if (BVERBOSE(23))
