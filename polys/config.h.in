@@ -1,0 +1,2 @@
+#define assume(x) ((void) 0)
+#define memcpy4 memcpy
