@@ -1,0 +1,89 @@
+Audience and their wishes:
+A) Developer
+A1  - several independent versions of Singular
+A2  - developer version: additional commands, main sources in the current 
+    directory or "nearby"
+B) User
+B1   - binaries installable without administrator privileges
+B2   - sources installable without administrator privileges
+C) Administrator
+C1   - installable without conflicts
+C2   - installable for several binary architectures
+C3   - few dependencies
+   
+What to install ?
+- sub-projects
+  - have:
+     - libraries
+     - public headers
+     - private headers
+  - can be
+     - also used outside of Singular (factory etc.)
+     - or: relatively useless outside of Singular (liboutput etc.)
+- support files for Singular
+  - gftables
+    (currently: $SINGULARPATH/gftables:%b/LIB/gftables:%b/../LIB/gftables:%b/../../LIB/gftables)
+  - libraries 
+    (currently: $SINGULARPATH:%b/LIB:%b/../LIB:%b/../../LIB)
+  - system modules
+    (currently %b)
+  - user modules
+    (currently: $SINGULARPATH:%b/MOD:%b/../MOD:%b/../../MOD)
+  - index file
+    (currently: %b/../doc/singular.idx)
+  - info file
+    (currently: %b/../info/singular.hlp)
+  - HTML
+    (currently: %b/../html)
+  - examples (planned)
+    (currently: %b/../examples)
+  - emacs
+    (currently: %b/../emacs)
+
+Current layout
+- compile everything inside the current working directory (A1, B2, C1)
+- install into this tree (A2, C1)
+- grammar.cc, scanner.cc etc can be build,
+  but are usually included in the sources (C3: no need for flex/bison)
+- all directories are relative to
+   - the main binary location (A1,B1,C2)
+   - or /usr/local/Singular/bin
+
+ <version>/<arch>     directory for binaries (%b)
+ <version>/<arch>/MOD directory for user modules (%b/MOD)
+ <version>/emacs      directory for emacs scripts
+ <version>/html, <version>/doc, <version>/info, <version>/examples
+                      directories for help stuff
+ <version>/LIB        directory for libraries
+ <version>/LIB/gftables   directory for gftables
+ <Build-dir>/<arch>/include directory for public headers
+ <Build-dir>/<arch>/lib     directory for libraries
+ <Build-dir>/Singular     directory for development version
+                          LIB: <Build-dir>/Singular/LIB
+                          everything else <Build-dir>/emacs,html,info,doc,...
+ for examples: /usr/local/Singular on wawa:
+ ./3-1-0/ix86-Linux/MOD
+ ./3-1-0/ix86-Linux
+ ./3-1-0/x86_64-Linux/MOD
+ ./3-1-0/x86_64-Linux
+ ./3-1-0/emacs
+ ./3-1-0/html
+ ./3-1-0/doc
+ ./3-1-0/examples
+ ./3-1-0/info
+ ./3-1-0/LIB/gftables
+ ./3-1-0/LIB/surfex
+ ./3-1-0/LIB
+ ./3-1-1/ix86-Linux/MOD
+ ./3-1-1/ix86-Linux
+ ./3-1-1/emacs
+ ./3-1-1/html
+ ./3-1-1/doc
+ ./3-1-1/x86_64-Linux/MOD
+ ./3-1-1/x86_64-Linux
+ ./3-1-1/examples
+ ./3-1-1/info
+ ./3-1-1/LIB/gftables
+ ./3-1-1/LIB/surfex
+ ./3-1-1/LIB
+
