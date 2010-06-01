@@ -224,7 +224,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     pFalseReturn(omTestList(p, level) == omError_NoError);
   #endif
 
-  int ismod = p_GetComp(p, r) > 0;
+  int ismod = p_GetComp(p, r) != 0;
 
   while (p != NULL)
   {
@@ -245,7 +245,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     // check for valid comp
     pPolyAssumeReturnMsg(p_GetComp(p, r) >= 0 && (p_GetComp(p, r)<65000), "component out of range ?");
     // check for mix poly/vec representation
-    pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) > 0), "mixed poly/vector");
+    pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) != 0), "mixed poly/vector");
 
     // special check for ringorder_s/S
     if ((r->typ!=NULL) && (r->typ[0].ord_typ == ro_syzcomp))
