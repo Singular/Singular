@@ -1,0 +1,93 @@
+#################################################################
+###
+### Makefile for Singular
+###
+#################################################################
+
+SHELL		= /bin/sh
+
+##
+## various paths
+##
+srcdir		= .
+prefix 		= @prefix@
+exec_prefix 	= @exec_prefix@
+libdir 		= @libdir@
+# includes are taken from here
+includedir	= @includedir@
+
+##
+## various programs
+##
+
+CXX		= g++
+INSTALL_PROGRAM	= @INSTALL@
+INSTALL_DATA	= @INSTALL@ -m 644
+MKINSTALLDIRS   = ../mkinstalldirs
+LN_S		= ln -s
+
+##
+## compiler and linker options
+##
+PIPE		= -pipe
+CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
+CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE}
+CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
+CPPFLAGS	= -I${srcdir} -I${includedir} -I${srcdir}../misc/
+DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
+
+## End configuration dependend stuff
+#################################################################
+
+###
+### file sets
+###
+
+# normal C++ source files
+CXXSOURCES= pDebug.cc pInline0.cc pInline1.cc pInline2.cc \
+     pShallowCopyDelete.cc p_Mult_q.cc p_Procs_Dynamic.cc p_Procs_Generate.cc \
+     p_Procs_Lib.cc p_Procs_Static.cc p_polys.cc polys-impl.cc polys.cc \
+     polys0.cc polys1.cc prCopy.cc prCopyTemplate.cc
+
+# normal C source files
+CSOURCES=
+
+SOURCES=${CSOURCES} ${CXXSOURCES}
+
+HEADERS= pInline0.h pInline1.h pInline2.h pShallowCopyDelete.h \
+    p_MemAdd.h p_MemCmp.h p_MemCopy.h p_Mult_q.h p_Numbers.h p_Procs.h \
+    p_Procs_Dynamic.h p_Procs_Impl.h p_Procs_Set.h p_Procs_Static.h \
+    p_polys.h polys-impl.h polys.h prCopy.h prCopyMacros.h
+
+DISTFILES=${SOURCES} ${HEADERS}
+
+OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
+
+.cc.o:	
+	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+.c.o:
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+
+libcoeffs.a: ${OBJS}
+	-rm -f libcoeffs.a
+	ar cr $@ $^
+
+##
+## clean targest
+##
+mostlyclean: 
+	-rm -f *.o *.og core *.op
+
+clean: mostlyclean
+	-rm -f *.bak *.d *.dd depend *.a *.so*
+
+tags:   
+	ctags *.c *.h *.cc *.inc
+
+all: libcoeffs.a
+
+install: all
+	${MKINSTALLDIRS} ${includedir}
+	${MKINSTALLDIRS} ${libdir}
+	${INSTALL_DATA} libcoeffs.a ${libdir}/libcoeffs.a
+	$(INSTALL_DATA) coeffs.h $(includedir)/coeffs.h
