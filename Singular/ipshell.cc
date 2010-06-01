@@ -974,7 +974,16 @@ lists scIndIndset(ideal S, BOOLEAN all, ideal Q)
   lists res=(lists)omAlloc0Bin(slists_bin);
 
   hexist = hInit(S, Q, &hNexist);
-  if ((hNexist == 0) || (hisModule!=0))
+  if (hNexist == 0)
+  {
+    intvec *iv=new intvec(pVariables);
+    for(i=0; i<pVariables; i++) (*iv)[i]=1;
+    res->Init(1);
+    res->m[0].rtyp=INTVEC_CMD;
+    res->m[0].data=(intvec*)iv;
+    return res;
+  }
+  else if (hisModule!=0)
   {
     res->Init(0);
     return res;

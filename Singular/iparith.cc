@@ -515,7 +515,7 @@ static BOOLEAN jjCOLON(leftv res, leftv u, leftv v)
     int d=(int)(long)u->Data();
     intvec *vv=new intvec(l);
     int i;
-    for(i=0;i<l;i++) { (*vv)[i]=d; }
+    for(i=l-1;i>=0;i--) { (*vv)[i]=d; }
     res->data=(char *)vv;
   }
   return (l<=0);
