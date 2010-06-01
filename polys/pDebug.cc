@@ -15,18 +15,18 @@
 #include <stdio.h>
 
 
-#include <kernel/mod2.h>
+#include "config.h"
 #ifdef PDEBUG
 
 // do the following to always enforce checking of pSetm
 // #undef PDEBUG
 // #define PDEBUG 2
 
-#include <kernel/p_polys.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/ring.h>
-#include <kernel/numbers.h>
+#include "p_polys.h"
+#include <output.h>
+#include <omalloc.h>
+#include "ring.h"
+#include <coeffs.h>
 
 /***************************************************************
  *
