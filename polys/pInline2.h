@@ -18,14 +18,14 @@
  ***************************************************************/
 #if !defined(NO_PINLINE2) || defined(PINLINE2_CC)
 
-#include <kernel/structs.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/p_Procs.h>
-#include <kernel/sbuckets.h>
+#include "structs.h"
+#include <omalloc.h>
+#include <coeffs.h>
+#include "p_Procs.h"
+#include "sbuckets.h"
 #ifdef HAVE_PLURAL
-#include <kernel/gring.h>
-#include <kernel/ring.h>
+#include <gring.h>
+#include <ring.h>
 #endif
 
 PINLINE2 number p_SetCoeff(poly p, number n, ring r)
