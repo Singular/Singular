@@ -211,6 +211,7 @@ int iiOp; /* the current operation*/
 cmdnames cmds[] =
 {  // name-string alias tokval          toktype
   { "$INVALID$",   0, -1,                 0},
+  { "alias",       0, ALIAS_CMD ,         PARAMETER},
   { "and",         0, '&' ,               LOGIC_OP},
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
   { "bareiss",     0, BAREISS_CMD ,       CMD_123},
@@ -754,7 +755,7 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   poly u_p=(poly)u->CopyD(POLY_CMD);
   int dummy;
   if ((u_p!=NULL)
-  && (pLDeg(u_p,&dummy,currRing)*(signed long)v_i >= (signed long)currRing->bitmask))
+  && (pTotaldegree(u_p)*(signed long)v_i >= (signed long)currRing->bitmask))
   {
     pDelete(&u_p);
     Werror("OVERFLOW");
