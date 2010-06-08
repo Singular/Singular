@@ -16,6 +16,7 @@
  *
  ***************************************************************/
 #include <omalloc.h>
+#include <coeffs.h>
 
 /***************************************************************
  *
@@ -29,6 +30,8 @@ struct  spolyrec
   number    coef;           // and coef the second --- do not change this !!!
   unsigned long exp[1];     // make sure that exp is aligned
 };
+typedef struct spolyrec *          poly;
+
 #define POLYSIZE (sizeof(poly) + sizeof(number))
 #define POLYSIZEW (POLYSIZE / sizeof(long))
 #if SIZEOF_LONG == 8
@@ -211,7 +214,7 @@ void p_SetRingOfLeftv(leftv l, ring r);
  ***************************************************************/
 
 #define __p_GetComp(p, r)   (p)->exp[r->pCompIndex]
-#define _p_GetComp(p, r)    ((long) (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0))
+#define p_GetComp(p, r)    ((long) (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0))
 
 /***************************************************************
  *
