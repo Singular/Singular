@@ -20,7 +20,7 @@ static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, int parameter);
 
 
 
-/* // Private interface should be hidden!!!
+// Private interface should be hidden!!!
      
 /// Note: MAY NOT WORK AS EXPECTED!
 BOOLEAN  ngcGreaterZero(number za, const coeffs r); 
@@ -51,16 +51,9 @@ void     ngcDelete(number *a, const coeffs r);
 #ifdef LDEBUG
 BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);
 #endif
-*/
-
 
 
 // Why is this here? who needs it?
 // number ngcMapQ(number from, const coeffs r, const coeffs aRing);
 #endif
-
-
-// local Variables: ***
-// folded-file: t ***
-// compile-command: "make installg" ***
-// End: ***
+/* GMPCOMPLEX_H */

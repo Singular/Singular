@@ -8,6 +8,8 @@
 * ngc == number gnu complex
 */
 
+#include "config.h"
+
 #include "coeffs.h"
 #include "numbers.h"
 #include "longrat.h"
