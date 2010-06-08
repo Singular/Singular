@@ -43,8 +43,8 @@ BOOLEAN npEqual       (number a, number b,const coeffs r);
 void    npWrite       (number &a, const coeffs r);
 const char *  npRead  (const char *s, number *a,const coeffs r);
 #ifdef LDEBUG
-BOOLEAN npDBTest      (number a,const coeffs r, const char *f, const int l);
-#define npTest(A,r)     npDBTest(A,r,__FILE__,__LINE__)
+BOOLEAN npDBTest      (number a, const char *f, const int l, const coeffs r);
+#define npTest(A,r)     npDBTest(A,__FILE__,__LINE__, r)
 #else
 #define npTest(A,r)     (0)
 #endif

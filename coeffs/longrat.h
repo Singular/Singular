@@ -57,7 +57,8 @@ LINLINE number   nlAdd(number la, number li, const coeffs r);
 LINLINE number   nlSub(number la, number li, const coeffs r);
 LINLINE number   nlMult(number a, number b, const coeffs r);
 
-void     nlInitChar(coeffs r, int ch);
+void     nlInitChar(coeffs r, void*);
+static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, void * parameter);
 
 number   nlInit2 (int i, int j, const coeffs r);
 number   nlInit2gmp (mpz_t i, mpz_t j);
@@ -114,10 +115,10 @@ LINLINE void nlInpMult(number &a, number b, const coeffs r);
 number nlFarey(number nP, number nN);
 
 #ifdef LDEBUG
-#define nlTest(a) nlDBTest(a,__FILE__,__LINE__)
-BOOLEAN nlDBTest(number a, char *f,int l);
+#define nlTest(a, r) nlDBTest(a,__FILE__,__LINE__, r)
+BOOLEAN nlDBTest(number a, char *f,int l, const coeffs r);
 #else
-#define nlTest(a) ((void)0)
+#define nlTest(a, r) ((void)0)
 #endif
 
 #endif

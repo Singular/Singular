@@ -190,7 +190,7 @@ number nlMapMachineInt(number from)
 
 
 #ifdef LDEBUG
-BOOLEAN nlDBTest(number a, const char *f,const int l)
+BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs r)
 {
   if (a==NULL)
   {
@@ -375,7 +375,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
     // res is new, res->ref is 1
     res=nlShort3(res);
   }
-  nlTest(res);
+  nlTest(res, dst);
   return res;
 }
 
@@ -475,7 +475,7 @@ int nlSize(number a, const coeffs r)
 */
 int nlInt(number &i, const coeffs r)
 {
-  nlTest(i);
+  nlTest(i, r);
   nlNormalize(i,r);
   if (SR_HDL(i) &SR_INT) return SR_TO_INT(i);
   if (i->s==3)
@@ -504,7 +504,7 @@ int nlInt(number &i, const coeffs r)
 */
 number nlBigInt(number &i, const coeffs r)
 {
-  nlTest(i);
+  nlTest(i, r);
   nlNormalize(i,r);
   if (SR_HDL(i) &SR_INT) return (i);
   if (i->s==3)
@@ -522,7 +522,7 @@ number nlBigInt(number &i, const coeffs r)
 */
 number nlInvers(number a, const coeffs r)
 {
-  nlTest(a);
+  nlTest(a, r);
   number n;
   if (SR_HDL(a) & SR_INT)
   {
@@ -550,7 +550,7 @@ number nlInvers(number a, const coeffs r)
       mpz_init_set_si(n->z,(long)-1);
       mpz_init_set_si(n->n,(long)-SR_TO_INT(a));
     }
-    nlTest(n);
+    nlTest(n, r);
     return n;
   }
   n=ALLOC_RNUMBER();
@@ -591,7 +591,7 @@ number nlInvers(number a, const coeffs r)
               break;
     }
   }
-  nlTest(n);
+  nlTest(n, r);
   return n;
 }
 
@@ -599,7 +599,7 @@ number nlInvers(number a, const coeffs r)
 /*2
 * u := a / b in Z, if b | a (else undefined)
 */
-number   nlExactDiv(number a, number b)
+number   nlExactDiv(number a, number b, const coeffs r)
 {
   if (b==INT_TO_SR(0))
   {
@@ -643,14 +643,14 @@ number   nlExactDiv(number a, number b)
     omFreeBin((void *)bb, rnumber_bin);
   }
   u=nlShort3(u);
-  nlTest(u);
+  nlTest(u, r);
   return u;
 }
 
 /*2
 * u := a / b in Z
 */
-number nlIntDiv (number a, number b)
+number nlIntDiv (number a, number b, const coeffs r)
 {
   if (b==INT_TO_SR(0))
   {
@@ -709,7 +709,7 @@ number nlIntDiv (number a, number b)
     omFreeBin((void *)bb, rnumber_bin);
   }
   u=nlShort3(u);
-  nlTest(u);
+  nlTest(u, r);
   return u;
 }
 
@@ -793,7 +793,7 @@ number nlIntMod (number a, number b, const coeffs r)
       mpz_add(u->z,u->z,b->z);
   }
   u=nlShort3(u);
-  nlTest(u);
+  nlTest(u, r);
   return u;
 }
 
@@ -899,7 +899,7 @@ number nlDiv (number a, number b, const coeffs r)
     u->s=3;
     u=nlShort3(u);
   }
-  nlTest(u);
+  nlTest(u, r);
   return u;
 }
 
@@ -911,7 +911,7 @@ void nlPower (number x,int exp,number * u, const coeffs r)
   *u = INT_TO_SR(0); // 0^e, e!=0
   if (!nlIsZero(x,r))
   {
-    nlTest(x);
+    nlTest(x, r);
     number aa=NULL;
     if (SR_HDL(x) & SR_INT)
     {
@@ -951,7 +951,7 @@ void nlPower (number x,int exp,number * u, const coeffs r)
     *u = INT_TO_SR(1); // 0^0
 #ifdef LDEBUG
   if (exp<0) Print("nlPower: neg. exp. %d\n",exp);
-  nlTest(*u);
+  nlTest(*u, r);
 #endif
 }
 
@@ -959,9 +959,9 @@ void nlPower (number x,int exp,number * u, const coeffs r)
 /*2
 * za >= 0 ?
 */
-BOOLEAN nlGreaterZero (number a)
+BOOLEAN nlGreaterZero (number a, const coeffs r)
 {
-  nlTest(a);
+  nlTest(a, r);
   if (SR_HDL(a) & SR_INT) return SR_HDL(a)>1L /* represents number(0) */;
   return (!mpz_isNeg(a->z));
 }
@@ -971,8 +971,8 @@ BOOLEAN nlGreaterZero (number a)
 */
 BOOLEAN nlGreater (number a, number b, const coeffs r)
 {
-  nlTest(a);
-  nlTest(b);
+  nlTest(a, r);
+  nlTest(b, r);
   number re;
   BOOLEAN rr;
   re=nlSub(a,b,r);
@@ -984,11 +984,11 @@ BOOLEAN nlGreater (number a, number b, const coeffs r)
 /*2
 * a == -1 ?
 */
-BOOLEAN nlIsMOne (number a)
+BOOLEAN nlIsMOne (number a, const coeffs r)
 {
 #ifdef LDEBUG
   if (a==NULL) return FALSE;
-  nlTest(a);
+  nlTest(a, r);
 #endif
   //if (SR_HDL(a) & SR_INT) return (a==INT_TO_SR(-1L));
   //return FALSE;
@@ -1001,8 +1001,8 @@ BOOLEAN nlIsMOne (number a)
 number nlGcd(number a, number b, const coeffs r)
 {
   number result;
-  nlTest(a);
-  nlTest(b);
+  nlTest(a, r);
+  nlTest(b, r);
   //nlNormalize(a);
   //nlNormalize(b);
   if ((a==INT_TO_SR(1L))||(a==INT_TO_SR(-1L))
@@ -1031,7 +1031,7 @@ number nlGcd(number a, number b, const coeffs r)
       result=nlRInit(POW_2_28);
     else
      result=INT_TO_SR(i);
-    nlTest(result);
+    nlTest(result,r);
     return result;
   }
   if (((!(SR_HDL(a) & SR_INT))&&(a->s<2))
@@ -1044,7 +1044,6 @@ number nlGcd(number a, number b, const coeffs r)
       result=nlRInit(POW_2_28);
     else
      result=INT_TO_SR(t);
-    nlTest(result);
   }
   else
   if (SR_HDL(b) & SR_INT)
@@ -1055,7 +1054,6 @@ number nlGcd(number a, number b, const coeffs r)
       result=nlRInit(POW_2_28);
     else
      result=INT_TO_SR(t);
-    nlTest(result);
   }
   else
   {
@@ -1067,8 +1065,8 @@ number nlGcd(number a, number b, const coeffs r)
     result->debug=123456;
   #endif
     result=nlShort3(result);
-    nlTest(result);
   }
+  nlTest(result, r);
   return result;
 }
 
@@ -1100,7 +1098,7 @@ void nlNormalize (number &x, const coeffs r)
   if (x->s==3)
   {
     x=nlShort3_noinline(x);
-    nlTest(x);
+    nlTest(x,r);
     return;
   }
   else if (x->s==0)
@@ -1136,7 +1134,7 @@ void nlNormalize (number &x, const coeffs r)
       mpz_clear(gcd);
     }
   }
-  nlTest(x);
+  nlTest(x, r);
 }
 
 /*2
@@ -1145,8 +1143,8 @@ void nlNormalize (number &x, const coeffs r)
 number nlLcm(number a, number b, const coeffs r)
 {
   number result;
-  nlTest(a);
-  nlTest(b);
+  nlTest(a, r);
+  nlTest(b, r);
   if ((SR_HDL(b) & SR_INT)
   || (b->s==3))
   {
@@ -1183,7 +1181,7 @@ number nlLcm(number a, number b, const coeffs r)
       mpz_mul(result->z,b->n,a->z);
   mpz_clear(gcd);
   result=nlShort3(result);
-  nlTest(result);
+  nlTest(result, r);
   return result;
 }
 
@@ -1215,7 +1213,7 @@ int nlModP(number n, int p, const coeffs r)
 void nlGMP(number &i, number n)
 {
   // Hier brauche ich einfach die GMP Zahl
-  nlTest(i);
+  nlTest(i, r);
   nlNormalize(i);
   if (SR_HDL(i) & SR_INT)
   {
@@ -1340,10 +1338,10 @@ BOOLEAN _nlEqual_aNoImm_OR_bNoImm(number a, number b)
 }
 
 // copy not immediate number a
-number _nlCopy_NoImm(number a)
+number _nlCopy_NoImm(number a, const coeffs r)
 {
   assume(!((SR_HDL(a) & SR_INT)||(a==NULL)));
-  nlTest(a);
+  nlTest(a, r);
   number b=ALLOC_RNUMBER();
 #if defined(LDEBUG)
   b->debug=123456;
@@ -1358,7 +1356,7 @@ number _nlCopy_NoImm(number a)
             break;
   }
   b->s = a->s;
-  nlTest(b);
+  nlTest(b, r);
   return b;
 }
 
@@ -1380,7 +1378,7 @@ void _nlDelete_NoImm(number *a)
   }
 }
 
-number _nlNeg_NoImm(number a)
+number _nlNeg_NoImm(number a, const coeffs r)
 {
   {
     mpz_neg(a->z,a->z);
@@ -1389,11 +1387,11 @@ number _nlNeg_NoImm(number a)
       a=nlShort3(a);
     }
   }
-  nlTest(a);
+  nlTest(a, r);
   return a;
 }
 
-number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
+number _nlAdd_aNoImm_OR_bNoImm(number a, number b, const coeffs r)
 {
   number u=ALLOC_RNUMBER();
 #if defined(LDEBUG)
@@ -1556,11 +1554,11 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
-  nlTest(u);
+  nlTest(u, r);
   return u;
 }
 
-number _nlSub_aNoImm_OR_bNoImm(number a, number b)
+number _nlSub_aNoImm_OR_bNoImm(number a, number b, const coeffs r)
 {
   number u=ALLOC_RNUMBER();
 #if defined(LDEBUG)
@@ -1780,12 +1778,12 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
-  nlTest(u);
+  nlTest(u, r);
   return u;
 }
 
 // a and b are intermediate, but a*b not
-number _nlMult_aImm_bImm_rNoImm(number a, number b)
+number _nlMult_aImm_bImm_rNoImm(number a, number b, const coeffs r)
 {
   number u=ALLOC_RNUMBER();
 #if defined(LDEBUG)
@@ -1794,12 +1792,12 @@ number _nlMult_aImm_bImm_rNoImm(number a, number b)
   u->s=3;
   mpz_init_set_si(u->z,SR_TO_INT(a));
   mpz_mul_si(u->z,u->z,SR_TO_INT(b));
-  nlTest(u);
+  nlTest(u, r);
   return u;
 }
 
 // a or b are not immediate
-number _nlMult_aNoImm_OR_bNoImm(number a, number b)
+number _nlMult_aNoImm_OR_bNoImm(number a, number b, const coeffs r)
 {
   assume(! (SR_HDL(a) & SR_HDL(b) & SR_INT));
   number u=ALLOC_RNUMBER();
@@ -1897,7 +1895,7 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
-  nlTest(u);
+  nlTest(u, r);
   return u;
 }
 
@@ -1913,12 +1911,13 @@ number nlCopyMap(number a, const coeffs src, const coeffs dst)
   {
     return a;
   }
-  return _nlCopy_NoImm(a);
+  return _nlCopy_NoImm(a, src); // dst?
 }
+
 nMapFunc nlSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
-  assume( getCoeffType(src) == ID );
+//  assume( getCoeffType(src) == ID );
   
   if (nField_is_Q(src))
   {
@@ -2017,10 +2016,10 @@ number  _nlMult_aImm_bImm_rNoImm(number a, number b);
 /*2
 * a = b ?
 */
-LINLINE BOOLEAN nlEqual (number a, number b)
+LINLINE BOOLEAN nlEqual (number a, number b, const coeffs r)
 {
-  nlTest(a);
-  nlTest(b);
+  nlTest(a, r);
+  nlTest(b, r);
 // short - short
   if (SR_HDL(a) & SR_HDL(b) & SR_INT) return a==b;
   return _nlEqual_aNoImm_OR_bNoImm(a, b);
@@ -2033,7 +2032,7 @@ LINLINE number nlInit (int i, const coeffs r)
   LONG ii=(LONG)i;
   if ( ((ii << 3) >> 3) == ii ) n=INT_TO_SR(ii);
   else                          n=nlRInit(ii);
-  nlTest(n);
+  nlTest(n, r);
   return n;
 }
 
@@ -2041,11 +2040,11 @@ LINLINE number nlInit (int i, const coeffs r)
 /*2
 * a == 1 ?
 */
-LINLINE BOOLEAN nlIsOne (number a)
+LINLINE BOOLEAN nlIsOne (number a, const coeffs r)
 {
 #ifdef LDEBUG
   if (a==NULL) return FALSE;
-  nlTest(a);
+  nlTest(a, r);
 #endif
   return (a==INT_TO_SR(1));
 }
@@ -2065,7 +2064,7 @@ LINLINE number nlCopy(number a, const coeffs r)
   {
     return a;
   }
-  return _nlCopy_NoImm(a);
+  return _nlCopy_NoImm(a, r);
 }
 
 
@@ -2076,7 +2075,7 @@ LINLINE void nlDelete (number * a, const coeffs r)
 {
   if (*a!=NULL)
   {
-    nlTest(*a);
+    nlTest(*a, r);
     if ((SR_HDL(*a) & SR_INT)==0)
     {
       _nlDelete_NoImm(a);
@@ -2090,7 +2089,7 @@ LINLINE void nlDelete (number * a, const coeffs r)
 */
 LINLINE number nlNeg (number a, const coeffs r)
 {
-  nlTest(a);
+  nlTest(a, r);
   if(SR_HDL(a) &SR_INT)
   {
     int r=SR_TO_INT(a);
@@ -2098,7 +2097,7 @@ LINLINE number nlNeg (number a, const coeffs r)
     else               a=INT_TO_SR(-r);
     return a;
   }
-  return _nlNeg_NoImm(a);
+  return _nlNeg_NoImm(a, r);
 }
 
 /*2
@@ -2115,7 +2114,7 @@ LINLINE number nlAdd (number a, number b, const coeffs r)
     else
       return nlRInit(SR_TO_INT(r));
   }
-  return _nlAdd_aNoImm_OR_bNoImm(a, b);
+  return _nlAdd_aNoImm_OR_bNoImm(a, b, r);
 }
 
 number nlShort1(number a);
@@ -2197,7 +2196,7 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
         break;
       }
     }
-    nlTest(u);
+    nlTest(u, r);
     return u;
   }
   else
@@ -2267,16 +2266,15 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
         break;
       }
     }
-    nlTest(a);
+    nlTest(a, r);
     return a;
   }
 }
 
 LINLINE number nlMult (number a, number b, const coeffs R)
 {
-  nlTest(a);
-  nlTest(b);
-
+  nlTest(a, R);
+  nlTest(b, R);
   if (a==INT_TO_SR(0)) return INT_TO_SR(0);
   if (b==INT_TO_SR(0)) return INT_TO_SR(0);
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
@@ -2288,9 +2286,9 @@ LINLINE number nlMult (number a, number b, const coeffs R)
       if (((((LONG)SR_HDL(u))<<1)>>1)==SR_HDL(u)) return (u);
       return nlRInit(SR_HDL(u)>>2);
     }
-    return _nlMult_aImm_bImm_rNoImm(a, b);
+    return _nlMult_aImm_bImm_rNoImm(a, b, R);
   }
-  return _nlMult_aNoImm_OR_bNoImm(a, b);
+  return _nlMult_aNoImm_OR_bNoImm(a, b, R);
 }
 
 
@@ -2309,7 +2307,7 @@ LINLINE number nlSub (number a, number b, const coeffs r)
     else
       return nlRInit(SR_TO_INT(r));
   }
-  return _nlSub_aNoImm_OR_bNoImm(a, b);
+  return _nlSub_aNoImm_OR_bNoImm(a, b, r);
 }
 
 LINLINE void nlInpMult(number &a, number b, const coeffs r)
@@ -2364,7 +2362,7 @@ void nlInpIntDiv(number &a, number b, const coeffs r)
 {
   if ((SR_HDL(b)|SR_HDL(a))&SR_INT)
   {
-    number n=nlIntDiv(a,b);
+    number n=nlIntDiv(a,b, r);
     nlDelete(&a,r);
     a=n;
   }
@@ -2463,8 +2461,10 @@ static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   return (n==n_Q);
 }
 
-void nlInitChar(coeffs r, int ch)
+void nlInitChar(coeffs r, void* p)
 {
+  const int ch = (int)(long)(p);
+  
   r->cfKillChar=NULL;
   r->cfSetChar=NULL;
   r->nCoeffIsEqual=nlCoeffsEqual;
@@ -2490,8 +2490,8 @@ void nlInitChar(coeffs r, int ch)
   #endif
   r->cfNeg   = nlNeg;
   r->cfInvers= nlInvers;
-  r->cfCopy  = nl_Copy;
-  r->cfRePart = nl_Copy;
+  r->cfCopy  = nlCopy;
+  r->cfRePart = nlCopy;
   //r->cfImPart = ndReturn0;
   r->cfWrite = nlWrite;
   r->cfRead = nlRead;

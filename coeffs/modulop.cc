@@ -438,7 +438,7 @@ void npInitChar(coeffs r, int c)
 }
 
 #ifdef LDEBUG
-BOOLEAN npDBTest (number a, const coeffs r, const char *f, const int l)
+BOOLEAN npDBTest (number a, const char *f, const int l, const coeffs r)
 {
   if (((long)a<0) || ((long)a>r->npPrimeM))
   {
@@ -451,7 +451,9 @@ BOOLEAN npDBTest (number a, const coeffs r, const char *f, const int l)
 
 number npMap0(number from, const coeffs src, const coeffs dst_r)
 {
-  return npInit(nlModP(from,dst_r->npPrimeM),dst_r);
+  int nlModP(number n, int p, const coeffs r);
+
+  return npInit(nlModP(from, dst_r->npPrimeM, src),dst_r);
 }
 
 number npMapP(number from, const coeffs src, const coeffs dst_r)
