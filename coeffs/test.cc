@@ -69,8 +69,8 @@ int main()
   number a = r->cfInit(666, r); 
   number b = r->cfAdd( a, a, r);
 
-  r->cfWrite( a, r );
-  r->cfWrite( b, r );
+  PrintS("a: "); r->cfWrite( a, r );
+  PrintS("b: "); r->cfWrite( b, r );
   
   r->cfDelete( &a, r);
   r->cfDelete( &b, r);
