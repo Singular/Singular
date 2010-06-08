@@ -352,7 +352,7 @@ const char * nrRead (const char *s, number *a, const coeffs r)
 /*2
 * test valid numbers: not implemented yet
 */
-BOOLEAN  nrDBTest(number a, const char *f, const int l, const coeffs r);
+BOOLEAN  nrDBTest(number a, const char *f, const int l, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
@@ -537,7 +537,7 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 
 
 /// test, whether r is an instance of nInitCoeffs(n, parameter) */
-static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, int parameter)
+static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, void* parameter)
 {
   assume( getCoeffType(r) == ID );
 
@@ -546,7 +546,7 @@ static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, int parameter)
 
 
 
-void nrInitChar(coeffs n, int)
+void nrInitChar(coeffs n, void*)
 {
   assume( getCoeffType(n) == ID );
 

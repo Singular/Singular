@@ -59,7 +59,7 @@ number ndInpAdd(number &a, number b, const coeffs r)
 
 #ifdef LDEBUG
 void   nDBDummy1(number* d,char *f, int l) { *d=NULL; }
-BOOLEAN ndDBTest(number a, const char *f, const int l)
+BOOLEAN ndDBTest(number a, const char *f, const int l, const coeffs r)
 {
   return TRUE;
 }

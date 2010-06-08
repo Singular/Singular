@@ -13,10 +13,10 @@
 nMapFunc  ngcSetMap(const coeffs src, const coeffs dst);
 
 /// Initialize r
-void ngcInitChar(coeffs r, int);
+void ngcInitChar(coeffs r, void*);
 
 /// test, whether r is an instance of nInitCoeffs(n, parameter) */
-static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, int parameter);
+static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, void* parameter);
 
 
 

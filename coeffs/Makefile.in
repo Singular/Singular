@@ -34,7 +34,9 @@ CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
 CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} -g
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I${includedir} -I${srcdir}/../misc/ -I${srcdir}/../resource/ -I${srcdir}/../output/ -L${srcdir}/../output/ -L${libdir} -lgmp
-DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
+DEFS		= -Dix86_Linux -DHAVE_CONFIG_H -DLDEBUG -DDEBUG -DOM_DEBUG -DHAVE_ASSUME
+
+# -DNDEBUG -DOM_NDEBUG 
 
 ## End configuration dependend stuff
 #################################################################
@@ -91,5 +93,5 @@ install: all
 	${INSTALL_DATA} libcoeffs.a ${libdir}/libcoeffs.a
 	$(INSTALL_DATA) coeffs.h $(includedir)/coeffs.h
 
-test: libcoeffs.a
+test: test.cc libcoeffs.a
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} test.cc -L. -I. -lcoeffs -o test -lomalloc -loutput 

@@ -374,14 +374,14 @@ void ngcWrite (number &a, const coeffs r)
 
 
 
-static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, int)
+static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, void*)
 {
   assume( getCoeffType(r) == ID );
   
   return (n == ID);
 };
 
-void ngcInitChar(coeffs n, int)
+void ngcInitChar(coeffs n, void*)
 {
   assume( getCoeffType(n) == ID );
 
