@@ -159,7 +159,6 @@ typedef struct sip_link    ip_link;
 typedef char *             char_ptr;
 typedef int  *             int_ptr;
 typedef ip_sring *         ring;
-typedef polyrec *          poly;
 typedef poly *             polyset;
 
 #ifdef __cplusplus

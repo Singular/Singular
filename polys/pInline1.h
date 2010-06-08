@@ -308,7 +308,7 @@ PINLINE1 void p_GetExpV(poly p, int *ev, const ring r)
   for (int j = r->N; j; j--)
       ev[j] = p_GetExp(p, j, r);
 
-  ev[0] = _p_GetComp(p, r);
+  ev[0] = p_GetComp(p, r);
 }
 PINLINE1 void p_SetExpV(poly p, int *ev, const ring r)
 {
