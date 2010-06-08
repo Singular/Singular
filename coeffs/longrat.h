@@ -8,7 +8,7 @@
 * ABSTRACT: computation with long rational numbers
 */
 #include "coeffs.h"
-#include "config.h"
+// #include "config.h"
 #include "si_gmp.h"
 #include <aux.h>
 

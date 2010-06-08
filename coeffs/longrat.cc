@@ -44,6 +44,7 @@ static inline number nlShort3(number x) // assume x->s==3
 
 #include <string.h>
 #include <float.h>
+#include "config.h"
 #include "coeffs.h"
 #include "output.h"
 #include "omalloc.h"
