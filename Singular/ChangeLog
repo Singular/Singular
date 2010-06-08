@@ -1,4 +1,5 @@
 Changes since 3-1-1-1:
+- new lib assprime.lib
 - new lib: resbin.lib
 - new commands: ludecomp(mat) and luinverse(mat [, mat, mat]) 
 - stdhilb fixed (Tst/Short/bug_stdhilb.tst)
