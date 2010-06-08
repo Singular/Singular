@@ -15,8 +15,7 @@
  * encapsulations in polys.h should be used, instead.
  *
  ***************************************************************/
-#include <kernel/structs.h>
-#include <omalloc/omalloc.h>
+#include <omalloc.h>
 
 /***************************************************************
  *
@@ -24,21 +23,11 @@
  *
  ***************************************************************/
 
-#ifndef NDEBUG
-#define VARS (10)   /*max. number of variables as constant*/
-#else
-#ifdef __GNUC__
-#define VARS (0)
-#else
-#define VARS (1)
-#endif
-#endif
-
 struct  spolyrec
 {
   poly      next;           // next needs to be the first field
   number    coef;           // and coef the second --- do not change this !!!
-  unsigned long exp[VARS];  // make sure that exp is aligned
+  unsigned long exp[1];     // make sure that exp is aligned
 };
 #define POLYSIZE (sizeof(poly) + sizeof(number))
 #define POLYSIZEW (POLYSIZE / sizeof(long))
