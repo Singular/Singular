@@ -1042,32 +1042,28 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     if (u->next==NULL)
     {
       b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
-      #if 0
       if ((a!=NULL) && (b!=NULL)
-      && (pLDeg(a,&dummy,currRing)+pLDeg(b,&dummy,currRing)>=currRing->bitmask))
+      && (pTotalDegree(a)+pTotalDegree(b)>=currRing->bitmask))
       {
         pDelete(&a);
         pDelete(&b);
         WerrorS("OVERFLOW");
         return TRUE;
       }
-      #endif
       res->data = (char *)(pMult( a, b));
       pNormalize((poly)res->data);
       return FALSE;
     }
     // u->next exists: copy v
     b=pCopy((poly)v->Data());
-    #if 0
     if ((a!=NULL) && (b!=NULL)
-    && (pLDeg(a,&dummy,currRing)+pLDeg(b,&dummy,currRing)>=currRing->bitmask))
+    && (pTotalDegree(a)+TotalDegree(b)>=currRing->bitmask))
     {
       pDelete(&a);
       pDelete(&b);
       WerrorS("OVERFLOW");
       return TRUE;
     }
-    #endif
     res->data = (char *)(pMult( a, b));
     pNormalize((poly)res->data);
     return jjOP_REST(res,u,v);
@@ -1075,16 +1071,14 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   // v->next exists: copy u
   a=pCopy((poly)u->Data());
   b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
-  #if 0
   if ((a!=NULL) && (b!=NULL)
-  && (pLDeg(a,&dummy,currRing)+pLDeg(b,&dummy,currRing)>=currRing->bitmask))
+  && (pTotalDegree(a)+pTotalDegree(b)>=currRing->bitmask))
   {
     pDelete(&a);
     pDelete(&b);
     WerrorS("OVERFLOW");
     return TRUE;
   }
-  #endif
   res->data = (char *)(pMult( a, b));
   pNormalize((poly)res->data);
   return jjOP_REST(res,u,v);
