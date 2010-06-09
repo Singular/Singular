@@ -12,14 +12,8 @@
 #include <shortfl.h>
 
 
-#include <iostream>
-using namespace std;
-
-
 int main()
 {
-  SPrintStart();
-  
   const n_coeffType type = nRegister( n_Q, nlInitChar); assume( type == n_Q );
 //  const n_coeffType type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
 //  const n_coeffType type = nRegister( n_R, nrInitChar); assume( type == n_R );
@@ -69,15 +63,13 @@ int main()
   number a = r->cfInit(666, r); 
   number b = r->cfAdd( a, a, r);
 
-  PrintS("a: "); r->cfWrite( a, r );
-  PrintS("b: "); r->cfWrite( b, r );
+  StringSetS("a: ");r->cfWrite( a, r );PrintS(StringAppend("\n"));
+  StringSetS("b: "); r->cfWrite( b, r );PrintS(StringAppend("\n"));
   
   r->cfDelete( &a, r);
   r->cfDelete( &b, r);
 
   nKillChar( r );
 
-  cout << "OUTPUT BUFFER: " << SPrintEnd();
-  
   return 0;
 }
