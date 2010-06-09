@@ -10,8 +10,8 @@
 
 #include "config.h"
 #include "coeffs.h"
-#include <output.h>
 #include <omalloc.h>
+#include <reporter.h>
 #include "numbers.h"
 #include "modulop.h"
 #include "longrat.h"

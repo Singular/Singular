@@ -3,7 +3,7 @@
 #include <auxiliary.h>
 #include <coeffs.h>
 #include <numbers.h>
-#include <output.h>
+#include <reporter.h>
 #include <omalloc.h>
 
 

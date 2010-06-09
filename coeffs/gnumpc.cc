@@ -17,7 +17,7 @@
 #include "gnumpc.h"
 #include "gnumpfl.h"
 #include "mpr_complex.h"
-#include "output.h"
+#include "reporter.h"
 #include "omalloc.h"
 
 

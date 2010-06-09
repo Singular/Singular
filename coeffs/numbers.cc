@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "coeffs.h"
-#include "output.h"
+#include "reporter.h"
 #include "omalloc.h"
 #include "numbers.h"
 #include "longrat.h"
