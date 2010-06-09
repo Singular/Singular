@@ -102,6 +102,8 @@ void    Warn(const char *fmt, ...);
 
 /* everything in between calls to these procedures is printed into a string
  * which is returned by SprintEnd()
+ * Shall ONLY be used for a temporary redirection of the standard output
+ * (i.e. if Singular runs as a server)
  */
 void SPrintStart();
 char* SPrintEnd();
