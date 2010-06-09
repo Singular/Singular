@@ -45,14 +45,14 @@ DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
 ###
 
 # normal C++ source files
-CXXSOURCES=output.cc
+CXXSOURCES=reporter.cc
 
 # normal C source files
 CSOURCES=dError.c
 
 SOURCES=${CSOURCES} ${CXXSOURCES}
 
-HEADERS=output.h
+HEADERS=reporter.h
 
 DISTFILES=${SOURCES} ${HEADERS}
 
@@ -63,17 +63,17 @@ OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
-output.a: ${OBJS}
-	-rm -f output.a
+reporter.a: ${OBJS}
+	-rm -f reporter.a
 	ar cr $@ $^
 
-all: output.a
+all: reporter.a
 
 install: all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
-	${INSTALL_DATA} output.a ${libdir}/liboutput.a
-	${INSTALL_DATA} output.h ${includedir}/output.h
+	${INSTALL_DATA} reporter.a ${libdir}/libreporter.a
+	${INSTALL_DATA} reporter.h ${includedir}/reporter.h
 
 ##
 ## clean targest

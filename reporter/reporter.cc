@@ -20,7 +20,7 @@
 #include "pwd.h"
 #endif
 
-#include "output.h"
+#include "reporter.h"
 #include "omalloc.h"
 //#include "options.h"
 

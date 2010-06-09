@@ -1,7 +1,7 @@
 /* -*-c++-*- */
 
 /*******************************************************************
- *  File:    aux.h
+ *  File:    auxiliary.h
  *  Purpose: 
  *  Author:  
  *  Created: 
@@ -9,17 +9,29 @@
  *******************************************************************/
 
 // BOOLEAN
-// max, min?
-
 
 #ifndef _MISC_AUX_H
 #define _MISC_AUX_H
 
-#define TRUE 1
-#define FALSE 0
+#if (SIZEOF_LONG == 8)
+typedef int BOOLEAN;
+/* testet on x86_64, gcc 3.4.6: 2 % */
+/* testet on IA64, gcc 3.4.6: 1 % */
+#else
+/* testet on athlon, gcc 2.95.4: 1 % */
+typedef short BOOLEAN;
+#endif
+
+#ifndef FALSE
+#define FALSE       0
+#endif
+
+#ifndef TRUE
+#define TRUE        1
+#endif
 
 #ifndef NULL
-#define NULL        (0)
+#define NULL        ((void *)(0))
 #endif
 
 // #ifdef _TRY
@@ -31,14 +43,6 @@
 static const int MAX_INT_LEN= 11;
 typedef void* ADDRESS;
 
-#if (SIZEOF_LONG == 8)
-typedef int BOOLEAN;
-/* testet on x86_64, gcc 3.4.6: 2 % */
-/* testet on IA64, gcc 3.4.6: 1 % */
-#else
-/* testet on athlon, gcc 2.95.4: 1 % */
-typedef short BOOLEAN;
-#endif
 #define loop for(;;)
 
 static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
