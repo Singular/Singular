@@ -37,11 +37,6 @@
 #define DEFPREC        20         // minimum number of digits (output operations)
 size_t gmp_output_digits= DEFPREC;
 
-// extern int mmInit(void); // TODO: From Factory???
-//{ return 0; }; // 
-// int dummy=mmInit();
-
-
 static gmp_float *gmpRel=NULL;
 static gmp_float *diff=NULL;
 
