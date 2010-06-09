@@ -1043,7 +1043,7 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     {
       b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
       if ((a!=NULL) && (b!=NULL)
-      && (pTotalDegree(a)+pTotalDegree(b)>=currRing->bitmask))
+      && (pTotaldegree(a)+pTotaldegree(b)>=currRing->bitmask))
       {
         pDelete(&a);
         pDelete(&b);
@@ -1057,7 +1057,7 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     // u->next exists: copy v
     b=pCopy((poly)v->Data());
     if ((a!=NULL) && (b!=NULL)
-    && (pTotalDegree(a)+TotalDegree(b)>=currRing->bitmask))
+    && (pTotaldegree(a)+pTotaldegree(b)>=currRing->bitmask))
     {
       pDelete(&a);
       pDelete(&b);
@@ -1072,7 +1072,7 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   a=pCopy((poly)u->Data());
   b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
   if ((a!=NULL) && (b!=NULL)
-  && (pTotalDegree(a)+pTotalDegree(b)>=currRing->bitmask))
+  && (pTotaldegree(a)+pTotaldegree(b)>=currRing->bitmask))
   {
     pDelete(&a);
     pDelete(&b);
