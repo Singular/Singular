@@ -12,17 +12,35 @@
 #include <shortfl.h>
 
 
-int main()
+#include <iostream>
+using namespace std;
+
+
+bool Test(const coeffs r)
 {
-  const n_coeffType type = nRegister( n_Q, nlInitChar); assume( type == n_Q );
-//  const n_coeffType type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
-//  const n_coeffType type = nRegister( n_R, nrInitChar); assume( type == n_R );
-  
+  number a = r->cfInit(666, r); 
+  number b = r->cfAdd( a, a, r);
+
+  StringSetS("a: ");r->cfWrite( a, r );PrintS(StringAppend("\n"));
+  StringSetS("b: "); r->cfWrite( b, r );PrintS(StringAppend("\n"));
+
+  r->cfDelete( &a, r);
+  r->cfDelete( &b, r);
+
+  return false;
+}
+
+
+
+bool Test(const n_coeffType type)
+{
+
+  cout << "Testing coeffs: [" << type << "]: " << endl;
 
   const coeffs r = nInitChar( type, NULL );
 
   assume( r != NULL );
-  
+
   nSetChar( r );
 
   assume( getCoeffType(r) == type );
@@ -31,7 +49,7 @@ int main()
   assume( r->cfWrite != NULL );
   assume( r->cfAdd != NULL );
   assume( r->cfDelete != NULL );
-  
+
 
   if( type == n_Q )
   {
@@ -58,18 +76,35 @@ int main()
     // ...
   }
 
-
-  
-  number a = r->cfInit(666, r); 
-  number b = r->cfAdd( a, a, r);
-
-  StringSetS("a: ");r->cfWrite( a, r );PrintS(StringAppend("\n"));
-  StringSetS("b: "); r->cfWrite( b, r );PrintS(StringAppend("\n"));
-  
-  r->cfDelete( &a, r);
-  r->cfDelete( &b, r);
+  bool ret = Test( r );
 
   nKillChar( r );
 
-  return 0;
+  return ret;
+}
+
+
+
+
+int main()
+{
+  int c = 0;
+  
+  n_coeffType type;
+  
+  type = nRegister( n_Q, nlInitChar); assume( type == n_Q );
+
+  if( Test(type) )
+    c ++;
+
+  type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
+  if( Test(type) )
+    c ++;
+  
+  type = nRegister( n_R, nrInitChar); assume( type == n_R );
+  if( Test(type) )
+    c ++;
+
+  return c;
+
 }
