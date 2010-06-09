@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(FULL-PACKAGE-NAME, VERSION, BUG-REPORT-ADDRESS)
-AC_CONFIG_SRCDIR([output.h])
+AC_CONFIG_SRCDIR([reporter.h])
 AC_CONFIG_HEADER([config.h])
 
 # Checks for programs.

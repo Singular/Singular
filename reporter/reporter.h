@@ -9,25 +9,7 @@
 */
 #include <stdio.h>
 #include <string.h>
-
-#if (SIZEOF_LONG == 8)
-typedef int BOOLEAN;
-/* testet on x86_64, gcc 3.4.6: 2 % */
-/* testet on IA64, gcc 3.4.6: 1 % */
-#else
-/* testet on athlon, gcc 2.95.4: 1 % */
-typedef short BOOLEAN;
-#endif
-
-#ifndef FALSE
-#define FALSE       0
-#endif
-
-#ifndef TRUE
-#define TRUE        1
-#endif
-
-
+#include <auxiliary.h>
 
 extern char*  feErrors;
 extern int    feErrorsLen;
@@ -69,29 +51,11 @@ void    Print(const char* fmt, ...) __attribute__((format(printf,1,2)));
 
 void    PrintNSpaces(const int n);
 void    PrintLn();
-#ifdef HAVE_TCL
-void    PrintTCLS(const char c, const char * s);
-#else
-#define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
-#endif
 void    PrintS(const char* s);
 
 #ifdef __cplusplus
 }
 /* the C++-part: */
-
-#ifdef HAVE_TCL
-
-inline void PrintTCL(const char c, int l,const char *s)
-{
-  if (s!=NULL) printf("%c:%d:%s",c,l,s);
-  else if(l==0) printf("%c:0:",c);
-  else printf("%c:1:%c",c,'0'+l);
-  fflush(stdout);
-}
-#else
-#define PrintTCL(A,B,C) Print("TCL-Err:%s",C)
-#endif /* HAVE_TCL */
 
 char *  StringAppend(const char *fmt, ...);
 char *  StringAppendS(const char *s);
