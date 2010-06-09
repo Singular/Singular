@@ -28,14 +28,76 @@ enum n_coeffType
   n_Z2n
 };
 
+struct snumber;
+typedef struct snumber *   number;
+
+//
+// the access macros:
+
+#define n_Copy(n, r)          (r)->cfCopy(n,r)
+#define n_Delete(n, r)        (r)->cfDelete(n,r)
+#define n_Mult(n1, n2, r)     (r)->cfMult(n1, n2,r)
+#define n_Add(n1, n2, r)      (r)->cfAdd(n1, n2,r)
+#define n_IsZero(n, r)        (r)->cfIsZero(n,r)
+#define n_Equal(n1, n2, r)    (r)->cfEqual(n1, n2,r)
+#define n_Neg(n, r)           (r)->cfNeg(n,r)
+#define n_Sub(n1, n2, r)      (r)->cfSub(n1, n2,r)
+#define n_GetChar(r)          nInternalChar(r)
+#define n_Init(i, r)          (r)->cfInit(i,r)
+#define n_IsOne(n, r)         (r)->cfIsOne(n,r)
+#define n_IsMOne(n, r)        (r)->cfIsMOne(n,r)
+#define n_GreaterZero(n, r)   (r)->cfGreaterZero(n,r)
+#define n_Write(n, r)         (r)->cfWrite(n,r)
+#define n_Normalize(n, r)     (r)->cfNormalize(n,r)
+#define n_Gcd(a, b, r)        (r)->cfGcd(a,b,r)
+#define n_IntDiv(a, b, r)     (r)->cfIntDiv(a,b,r)
+#define n_Div(a, b, r)        (r)->cfDiv(a,b,r)
+#define n_Invers(a, r)        (r)->cfInvers(a,r)
+#define n_ExactDiv(a, b, r)   (r)->cfExactDiv(a,b,r)
+#define n_Test(a,r)           (r)->cfDBTest(a,r,__FILE__,__LINE__)
+
+#define n_InpMult(a, b, r)    (r)->cfInpMult(a,b,r)
+#define n_Power(a, b, res, r) (r)->cfPower(a,b,res,r)
+#define n_Size(n,r)           (r)->cfSize(n,r)
+#define n_GetDenom(N,r)       (r)->cfGetDenom((N),r)
+#define n_GetNumerator(N,r)   (r)->cfGetNumerator((N),r)
+
+// and the routines w.r.t. currRing:
+// (should only be used in the context of currRing, i.e. in the interpreter)
+#define nCopy(n)          n_Copy(n, currRing->cf)
+#define nDelete(n)        n_Delete(n, currRing->cf)
+#define nMult(n1, n2)     n_Mult(n1, n2, currRing->cf)
+#define nAdd(n1, n2)      n_Add(n1, n2, currRing->cf)
+#define nIsZero(n)        n_IsZero(m, currRing->cf)
+#define nEqual(n1, n2)    n_Equal(n1, n2, currRing->cf)
+#define nNeg(n)           n_Neg(n, currRing->cf)
+#define nSub(n1, n2)      n_Sub(n1, n2, currRing->cf)
+#define nGetChar()        nInternalChar(currRing->cf)
+#define nInit(i)          n_Init(i, currRing->cf)
+#define nIsOne(n)         n_IsOne(n, currRing->cf)
+#define nIsMOne(n)        n_IsMOne(n, currRing->cf)
+#define nGreaterZero(n)   n_GreaterZero(n, currRing->cf)
+#define nWrite(n)         n_Write(n,currRing->cf)
+#define nNormalize(n)     n_Normalize(n,currRing->cf)
+#define nGcd(a, b)        n_Gcd(a,b,currRing->cf)
+#define nIntDiv(a, b)     n_IntDiv(a,b,currRing->cf)
+#define nDiv(a, b)        n_Div(a,b,currRing->cf)
+#define nInvers(a)        n_Invers(a,currRing->cf)
+#define nExactDiv(a, b)   n_ExactDiv(a,b,currRing->cf)
+#define nTest(a)          n_Test(a,currRing->cf)
+
+#define nInpMult(a, b)    n_InpMult(a,b,currRing->cf)
+#define nPower(a, b, res) n_Power(a,b,res,currRing->cf)
+#define nSize(n)          n_Size(n,currRing->cf)
+#define nGetDenom(N)      n_GetDenom((N),currRing->cf)
+#define nGetNumerator(N)  n_GetNumerator((N),currRing->cf)
+
+#define nSetMap(R)        n_SetMap(R,currRing->cf)
+
 struct n_Procs_s;
 typedef struct  n_Procs_s  n_Procs_s;
 typedef struct  n_Procs_s  *coeffs;
 
-
-
-struct snumber;
-typedef struct snumber *   number;
 typedef number (*numberfunc)(number a, number b, const coeffs r);
 
 /// maps "a", which lives in src, into dst
@@ -179,72 +241,9 @@ inline void nSetChar(coeffs r)
   if ((r!=NULL) && (r->cfSetChar!=NULL)) r->cfSetChar(r);
 }
 
-//
-// the access macros:
-
-#define n_Copy(n, r)          (r)->cfCopy(n,r)
-#define n_Delete(n, r)        (r)->cfDelete(n,r)
-#define n_Mult(n1, n2, r)     (r)->cfMult(n1, n2,r)
-#define n_Add(n1, n2, r)      (r)->cfAdd(n1, n2,r)
-#define n_IsZero(n, r)        (r)->cfIsZero(n,r)
-#define n_Equal(n1, n2, r)    (r)->cfEqual(n1, n2,r)
-#define n_Neg(n, r)           (r)->cfNeg(n,r)
-#define n_Sub(n1, n2, r)      (r)->cfSub(n1, n2,r)
-#define n_GetChar(r)          nInternalChar(r)
-#define n_Init(i, r)          (r)->cfInit(i,r)
-#define n_IsOne(n, r)         (r)->cfIsOne(n,r)
-#define n_IsMOne(n, r)        (r)->cfIsMOne(n,r)
-#define n_GreaterZero(n, r)   (r)->cfGreaterZero(n,r)
-#define n_Write(n, r)         (r)->cfWrite(n,r)
-#define n_Normalize(n, r)     (r)->cfNormalize(n,r)
-#define n_Gcd(a, b, r)        (r)->cfGcd(a,b,r)
-#define n_IntDiv(a, b, r)     (r)->cfIntDiv(a,b,r)
-#define n_Div(a, b, r)        (r)->cfDiv(a,b,r)
-#define n_Invers(a, r)        (r)->cfInvers(a,r)
-#define n_ExactDiv(a, b, r)   (r)->cfExactDiv(a,b,r)
-#define n_Test(a,r)           (r)->cfDBTest(a,r,__FILE__,__LINE__)
-
-#define n_InpMult(a, b, r)    (r)->cfInpMult(a,b,r)
-#define n_Power(a, b, res, r) (r)->cfPower(a,b,res,r)
-#define n_Size(n,r)           (r)->cfSize(n,r)
-#define n_GetDenom(N,r)       (r)->cfGetDenom((N),r)
-#define n_GetNumerator(N,r)   (r)->cfGetNumerator((N),r)
-
-#define n_New(n, r)           nNew(n)
-
-
-// and the routines w.r.t. currRing:
-// (should only be used in the context of currRing, i.e. in the interpreter)
+// nach einer heissen Diskussion
 void           nNew(number * a);
-#define nCopy(n)          n_Copy(n, currRing->cf)
-#define nDelete(n)        n_Delete(n, currRing->cf)
-#define nMult(n1, n2)     n_Mult(n1, n2, currRing->cf)
-#define nAdd(n1, n2)      n_Add(n1, n2, currRing->cf)
-#define nIsZero(n)        n_IsZero(m, currRing->cf)
-#define nEqual(n1, n2)    n_Equal(n1, n2, currRing->cf)
-#define nNeg(n)           n_Neg(n, currRing->cf)
-#define nSub(n1, n2)      n_Sub(n1, n2, currRing->cf)
-#define nGetChar()        nInternalChar(currRing->cf)
-#define nInit(i)          n_Init(i, currRing->cf)
-#define nIsOne(n)         n_IsOne(n, currRing->cf)
-#define nIsMOne(n)        n_IsMOne(n, currRing->cf)
-#define nGreaterZero(n)   n_GreaterZero(n, currRing->cf)
-#define nWrite(n)         n_Write(n,currRing->cf)
-#define nNormalize(n)     n_Normalize(n,currRing->cf)
-#define nGcd(a, b)        n_Gcd(a,b,currRing->cf)
-#define nIntDiv(a, b)     n_IntDiv(a,b,currRing->cf)
-#define nDiv(a, b)        n_Div(a,b,currRing->cf)
-#define nInvers(a)        n_Invers(a,currRing->cf)
-#define nExactDiv(a, b)   n_ExactDiv(a,b,currRing->cf)
-#define nTest(a)          n_Test(a,currRing->cf)
-
-#define nInpMult(a, b)    n_InpMult(a,b,currRing->cf)
-#define nPower(a, b, res) n_Power(a,b,res,currRing->cf)
-#define nSize(n)          n_Size(n,currRing->cf)
-#define nGetDenom(N)      n_GetDenom((N),currRing->cf)
-#define nGetNumerator(N)  n_GetNumerator((N),currRing->cf)
-
-#define nSetMap(R)        n_SetMap(R,currRing->cf)
+#define n_New(n, r)           nNew(n)
 
 #endif
 
