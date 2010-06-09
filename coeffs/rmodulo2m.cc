@@ -12,7 +12,7 @@
 #ifdef HAVE_RINGS
 #include <mylimits.h>
 #include "coeffs.h"
-#include "output.h"
+#include "reporter.h"
 #include "omalloc.h"
 #include "numbers.h"
 #include "longrat.h"

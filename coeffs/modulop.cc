@@ -10,7 +10,7 @@
 #include "config.h"
 #include <omalloc.h>
 #include "coeffs.h"
-#include "output.h"
+#include "reporter.h"
 #include "numbers.h"
 #include "longrat.h"
 #include "mpr_complex.h"

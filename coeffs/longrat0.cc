@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "config.h"
-#include "output.h"
+#include "reporter.h"
 #include "coeffs.h"
 #include "omalloc.h"
 #include "longrat.h"

@@ -14,7 +14,7 @@
 #include "config.h"
 //#ifdef HAVE_MPR
 #include "coeffs.h"
-#include "output.h"
+#include "reporter.h"
 #include "omalloc.h"
 #include "numbers.h"
 #include "longrat.h"
