@@ -34,8 +34,8 @@ CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
 CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} -g
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I${includedir} -I${srcdir}/../misc/ -I${srcdir}/../resource/ -I${srcdir}/../reporter/ -L${srcdir}/../reporter/ -L${libdir} -lgmp
-DEFS		= -Dix86_Linux -DHAVE_CONFIG_H -DLDEBUG -DDEBUG -DOM_DEBUG -DHAVE_ASSUME
-
+DEFS		= -Dix86_Linux -DHAVE_CONFIG_H -DLDEBUG -DDEBUG -DOM_DEBUG -DHAVE_ASSUME -DHAVE_RINGS 
+# -DHAVE_RINGS # Doesn't work :(
 # -DNDEBUG -DOM_NDEBUG 
 
 ## End configuration dependend stuff
