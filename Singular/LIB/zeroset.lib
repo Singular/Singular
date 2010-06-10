@@ -97,9 +97,6 @@ EXAMPLE: example roots; shows an example
 {
   int dbPrt = printlevel-voice+3;
 
-  ideal fff=sqrfree(f);
-  f=fff[1];
-  for(int iii=2;iii<ncols(fff);iii++) { f=f*fff[iii]; }
   // create a new ring where par(1) is replaced by the variable
   // with the same name or, if basering does not contain a parameter,
   // with a new variable 'a'.
