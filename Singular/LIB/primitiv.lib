@@ -164,16 +164,20 @@ EXAMPLE: example primitive_extra;  shows an example
 "
 {
  def altring=basering;
- int grad1,grad2=deg(i[1]),deg(jet(i[2],0,intvec(1,0)));
+ int grad1=deg(i[1]);
+ int grad2=deg(jet(i[2],0,intvec(1,0)));
+ if (grad2==0) { ERROR("i[2] is not monic"); }
  int countx,countz;
+  if (size(variables(i[1]))!=1) { ERROR("i[1] must be poly in x"); }
+  if (size(variables(i[2]))!=2) { ERROR("i[2] must be poly in x,a"); }
+  if (variables(i[2])[2]!=a) { ERROR("i[2] must be poly in x,a"); }
  ring deglexring=char(altring),(x,y,z),dp;
  map transfer=altring,x,z;
  ideal i=transfer(i);
- if (size(i)!=2) {
-   "//** Error -- either wrong number of given minimal polynomials";
-   "//**          or wrong choice of ring variables (must use the first two)";
-   setring altring;
-   return(ideal(0));
+ if (size(i)!=2)
+ {
+   ERROR("either wrong number of given minimal polynomials"+newline+
+   "or wrong choice of ring variables (must use the first two)");
  }
  matrix mat;
  ring lexring=char(altring),(x,y),lp;
@@ -188,43 +192,50 @@ EXAMPLE: example primitive_extra;  shows an example
 
  //---------------- Schleife zum Finden des primitiven Elements ---------------
  //--- Schleife ist so angordnet, dass g in Charakteristik 0 linear bleibt ----
- while (found==0) {
+ while (found==0)
+ {
    j=eliminate(i+ideal(g-y),z);
    setring deglex2ring;
    j=std(imap(deglexring,j));
    setring lexring;
    j=fglm(deglex2ring,j);
-   if (size(j)==2) {
-     if (deg(j[1])==grad1*grad2) {
+   if (size(j)==2)
+   {
+     if (deg(j[1])==grad1*grad2)
+     {
        j[2]=j[2]/leadcoef(j[2]);    // Normierung
-       if (lead(j[2])==x) {         // Alles ok
+       if (lead(j[2])==x)
+       {         // Alles ok
           found=1;
        }
      }
    }
    setring deglexring;
-   if (found==0) {
+   if (found==0)
+   {
  //------------------ waehle ein neues Polynom g ------------------------------
      dbprint("Still searching for primitive element...");
      countx=0;
      countz=0;
-     while (found==0) {
+     while (found==0)
+     {
       countx++;
-      if (countx>=grad1) {
+      if (countx>=grad1)
+      {
         countx=0;
         countz++;
-        if (countz>=grad2) {
-         "//** Error: No primitive element found!! This should NEVER happen!";
-         setring altring;
-         return(ideal(0));
-        }
+        if (countz>=grad2)
+	{ ERROR("No primitive element found!! This should NEVER happen!"); }
       }
       g = g +x^countx *z^countz;
       mat=coeffs(g,z);
-      if (size(mat)>countz) {
+      if (size(mat)>countz)
+      {
         mat=coeffs(mat[countz+1,1],x);
-        if (size(mat)>countx) {
-          if (mat[countx+1,1] != 0) {
+        if (size(mat)>countx)
+	{
+          if (mat[countx+1,1] != 0)
+	  {
             found=1;         // d.h. hier: neues g gefunden
       }}}
      }

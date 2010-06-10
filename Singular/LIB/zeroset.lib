@@ -97,6 +97,9 @@ EXAMPLE: example roots; shows an example
 {
   int dbPrt = printlevel-voice+3;
 
+  ideal fff=sqrfree(f);
+  f=fff[1];
+  for(int iii=2;iii<ncols(fff);iii++) { f=f*fff[iii]; }
   // create a new ring where par(1) is replaced by the variable
   // with the same name or, if basering does not contain a parameter,
   // with a new variable 'a'.
@@ -224,17 +227,21 @@ EXAMPLE: example rootsMain; shows an example
   Xchange[1] = var(2);      // the variables have to be exchanged
   Xchange[2] = var(1);      // for the use of 'primitive'
 
-  if(nlinFactors == 1) {            // one nl factor
-
+  if(nlinFactors == 1)             // one nl factor
+  {
     // compute the roots of the nonlinear (irreducible, monic) factor f1 of f
     // by extending the basefield by a' with minimal polynomial f1
     // Then call roots(f1) to find the roots of f1 over the new base field
 
     f1 = nlFactors[1];
-    if(mpoly[1] != 0) {
+    if(mpoly[1] != 0)
+    {
       mp = mpoly[1];
       minPolys = Xchange(mp), Xchange(f1);
-      primElem = primitive_extra(minPolys);  // no random coord. change
+      if (deg(jet(minPolys[2],0,intvec(1,0)))==0)
+      { primElem = primitive(minPolys); } // random coord. change
+      else
+      { primElem = primitive_extra(minPolys); } // no random coord. change
       mpoly = std(primElem[1]);
       F = basering, maxideal(1);
       F[2] = primElem[2];      // transfer all to the new representation
