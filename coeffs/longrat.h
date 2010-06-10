@@ -92,9 +92,6 @@ BOOLEAN  nlDBTest(number a, const char *f, const int l);
 extern number nlOne;
 
 nMapFunc nlSetMap(const coeffs src, const coeffs dst);
-#ifdef HAVE_RINGS
-number nlMapGMP(number from);
-#endif
 
 #ifndef OM_ALLOC_H
 struct omBin_s;
