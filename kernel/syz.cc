@@ -175,7 +175,7 @@ static void syMinStep(ideal mod,ideal syz,BOOLEAN final=FALSE,ideal up=NULL,
 //--takes out the founded syzygy--
       if (TEST_OPT_PROT) PrintS("f");
       actWith = syz->m[i];
-      if (!rField_has_simple_inverse()) pCleardenom(actWith);
+      if (!rField_has_simple_inverse()) p_Cleardenom(actWith, currRing);
 //Print("actWith: ");pWrite(actWith);
       syz->m[i] = NULL;
       for (k=i;k<j-1;k++)  syz->m[k] = syz->m[k+1];
@@ -241,7 +241,7 @@ void syGaussForOne(ideal syz, int elnum, int ModComp,int from,int till)
   if (from<0) from = 0;
   if ((till<=0) || (till>IDELEMS(syz))) till = IDELEMS(syz);
   syz->m[elnum] = NULL;
-  if (!rField_has_simple_inverse()) pCleardenom(actWith);
+  if (!rField_has_simple_inverse()) p_Cleardenom(actWith, currRing);
 /*--makes Gauss alg. for the column ModComp--*/
   pTakeOutComp(&(actWith), ModComp, &unit1, &lu);
   while (from<till)

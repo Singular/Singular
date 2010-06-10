@@ -40,12 +40,13 @@ int QlogSize(number n);
 #if 1
 static omBin lm_bin=NULL;
 
-static void simplify_poly(poly p, ring r) {
+static void simplify_poly(poly p, ring r)
+{
      assume(r==currRing);
      if (!rField_is_Zp(r))
      {
-        pCleardenom(p);
-        pContent(p); //is a duplicate call, but belongs here
+        p_Cleardenom(p,r);
+        //p_Content(p,r); //is a duplicate call, but belongs here
      }
      else
        pNorm(p);
@@ -853,7 +854,8 @@ static int bucket_guess(kBucket* bucket){
 
 
 
-static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified){
+static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified)
+{
   //inDebug(h);
   assume(lenS_correct(c->strat));
   assume(len==pLength(h));
@@ -868,10 +870,12 @@ static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN s
   P.p=h; /*p_Copy(h,c->r);*/
   P.ecart=ecart;
   P.FDeg=pFDeg(P.p,c->r);
-  if (!(simplified)){
-      if (!rField_is_Zp(c->r)){
-        pCleardenom(P.p);
-        pContent(P.p); //is a duplicate call, but belongs here
+  if (!(simplified))
+  {
+      if (!rField_is_Zp(c->r))
+      {
+        p_Cleardenom(P.p,c->r);
+        //p_Content(P.p,c->r ); //is a duplicate call, but belongs here
 
       }
       else
@@ -1307,7 +1311,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
   i=c->n-1;
   sorted_pair_node** nodes=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*i);
   int spc=0;
-  if(c->n>c->array_lengths){
+  if(c->n>c->array_lengths)
+  {
     c->array_lengths=c->array_lengths*2;
     assume(c->array_lengths>=c->n);
     ENLARGE(c->T_deg, int);
@@ -1333,7 +1338,8 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
   if (c->T_deg_full)
     ENLARGE(c->T_deg_full,int);
   sugar=c->T_deg[i]=c->pTotaldegree(h);
-  if(c->T_deg_full){
+  if(c->T_deg_full)
+  {
     sugar=c->T_deg_full[i]=c->pTotaldegree_full(h);
     ecart=sugar-c->T_deg[i];
     assume(ecart>=0);
@@ -1350,9 +1356,10 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
 
   //necessary for correct weighted length
 
-   if (!rField_is_Zp(c->r)){
-    pCleardenom(h);
-    pContent(h); //is a duplicate call, but belongs here
+  if (!rField_is_Zp(c->r))
+  {
+    p_Cleardenom(h, c->r);
+    //p_Content(h,c->r); //is a duplicate call, but belongs here
 
   }
   else
@@ -2477,11 +2484,12 @@ static void go_on (slimgb_alg* c){
     if(s->i>=0)
     {
 #ifdef HAVE_PLURAL
-      if (c->nc){
+      if (c->nc)
+      {
         h= nc_CreateSpoly(c->S->m[s->i], c->S->m[s->j]/*, NULL*/, c->r);
 
         if (h!=NULL)
-          pCleardenom(h);
+          p_Cleardenom(h, c->r);
       }
       else
 #endif
@@ -2837,9 +2845,10 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
         si->expected_length=pQuality(p,this,pLength(p));
         p_Test(p,r);
         si->deg=this->pTotaldegree_full(p);
-        /*if (!rField_is_Zp(r)){
-          pContent(p);
-          pCleardenom(p);
+        /*if (!rField_is_Zp(r))
+       {
+          p_Content(p,r);
+          p_Cleardenom(p,r);
         }*/
 
         si->lcm_of_lm=p;
@@ -3001,8 +3010,9 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
       si->j=-2;
       si->expected_length=pQuality(I->m[i],this,pLength(I->m[i]));
       si->deg=pTotaldegree(I->m[i]);
-      if (!rField_is_Zp(r)){
-        pCleardenom(I->m[i]);
+      if (!rField_is_Zp(r))
+      {
+        p_Cleardenom(I->m[i], r);
       }
       si->lcm_of_lm=I->m[i];
 
@@ -3456,10 +3466,11 @@ void slimgb_alg::cleanDegs(int lower, int upper){
           h=redNFTail(h,strat->sl,strat,lengths[i]);
           if (!rField_is_Zp(r))
           {
-            pCleardenom(h);
-            pContent(h);
+            p_Cleardenom(h,r);
+            //p_Content(h,r);
 
-          } else pNorm(h);
+          }
+          else pNorm(h);
           //TODO:GCD of TERMS
           poly got=::gcd_of_terms(h,r);
           p_Delete(&gcd_of_terms[i],r);
@@ -3964,9 +3975,8 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
       c->strat->lenSw[j]=qal;
     if (!rField_is_Zp(c->r))
     {
-      pCleardenom(clear_into);//should be unnecessary
-      pContent(clear_into);
-
+      p_Cleardenom(clear_into,c->r);//should be unnecessary
+      //p_Content(clear_into, c->r);
     }
     else
       pNorm(clear_into);
@@ -4370,8 +4380,8 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
        if (!rField_is_Zp(c->r)){
         if (!c->nc)
             p=redTailShort(p, c->strat);
-        pCleardenom(p);
-        pContent(p);
+        p_Cleardenom(p, c->r);
+        p_Content(p, c->r);
       }
       si->expected_length=pQuality(p,c,pLength(p));
       si->deg=pTotaldegree(p);
@@ -4483,21 +4493,21 @@ void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c){
 
     if (!rField_is_Zp(c->r))
     {
-      pCleardenom(red);//should be unnecessary
-      pContent(red);
-
-
+      p_Cleardenom(red, c->r);//should be unnecessary
+      //p_Content(red, c->r);
     }
     pNormalize(red);
-    if (c->eliminationProblem){
+    if (c->eliminationProblem)
+    {
         r[rn].sugar=c->pTotaldegree_full(red);
     }
 
-    if ((!(erg.fromS))&&(TEST_V_UPTORADICAL)){
-
+    if ((!(erg.fromS))&&(TEST_V_UPTORADICAL))
+    {
          if (polynomial_root(red,c->r))
             lt_changed=TRUE;
-            sev=p_GetShortExpVector(red,c->r);}
+            sev=p_GetShortExpVector(red,c->r);
+    }
     red_len=pLength(red);
   }
   if (((TEST_V_MODPSOLVSB)&&(red_len>1))||((c->nc)||(erg.to_reduce_u-erg.to_reduce_l>5))){

@@ -1423,7 +1423,7 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
   }
   out = p_Add_q(p2,N,r);
   p_Test(out,r);
-  if ( out!=NULL ) pContent(out);
+  if ( out!=NULL ) p_Content(out,r);
   p_Delete(&m,r);
   n_Delete(&cF,r);
   n_Delete(&C,r);
@@ -1490,7 +1490,7 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
 
   out = p_Add_q(p2,N,r); // delete N, p2
   p_Test(out,r);
-  if ( out!=NULL ) pContent(out);
+  if ( out!=NULL ) p_Content(out,r);
   return(out);
 }
 
@@ -1578,8 +1578,8 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #ifdef PDEBUG
   p_Test(M2,r);
 #endif
-  if (M2!=NULL) M2=pCleardenom(M2);
-  //if (M2!=NULL) pContent(M2); // done by pCleardenom
+  if (M2!=NULL) M2=p_Cleardenom(M2,r);
+  //if (M2!=NULL) p_Content(M2); // done by pCleardenom
   return(M2);
 }
 
@@ -1854,8 +1854,8 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   p_Test(M2,r);
 #endif
 
-  if (M2!=NULL) pCleardenom(M2); //?
-//  if (M2!=NULL) pContent(M2);
+  if (M2!=NULL) p_Cleardenom(M2,r);
+//  if (M2!=NULL) p_Content(M2);
 
   return(M2);
 }
@@ -2079,7 +2079,7 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
   {
     poly pp = nc_mm_Mult_pp(m,p,currRing);
     number c2,cc;
-    pCleardenom_n(pp,c2);
+    p_Cleardenom_n(pp,currRing,c2);
     pDelete(&m);
     ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
     //cc=*c;
@@ -2112,7 +2112,7 @@ void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
   {
     poly pp = nc_mm_Mult_pp(m,p,currRing);
     number c2,cc;
-    pCleardenom_n(pp,c2);
+    p_Cleardenom_n(pp,currRing,c2);
     pDelete(&m);
     ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
     //cc=*c;

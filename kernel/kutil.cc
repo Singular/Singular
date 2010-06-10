@@ -5401,7 +5401,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             if (TEST_OPT_INTSTRATEGY)
             {
               //pContent(strat->S[i]);
-              strat->S[i]=pCleardenom(strat->S[i]);// also does a pContent
+              strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
             }
             else
             {
@@ -5470,7 +5470,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             strat->ecartS[i] = h.ecart;
             if (TEST_OPT_INTSTRATEGY)
             {
-              strat->S[i]=pCleardenom(strat->S[i]);// also does a pContent
+              strat->S[i]=p_Cleardenom(strat->S[i], currRing);// also does a pContent
             }
             else
             {
@@ -6121,7 +6121,7 @@ void completeReduce (kStrategy strat, BOOLEAN withT)
       else
         strat->S[i] = redtail(strat->S[i], strat->sl, strat);
       if (TEST_OPT_INTSTRATEGY)
-        strat->S[i]=pCleardenom(strat->S[i]);
+        strat->S[i]=p_Cleardenom(strat->S[i], currRing);
     }
     if (TEST_OPT_PROT)
       PrintS("-");

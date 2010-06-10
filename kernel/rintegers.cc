@@ -160,12 +160,12 @@ BOOLEAN nrzIsZero (number  a)
 
 BOOLEAN nrzIsOne (number a)
 {
-  return 0 == mpz_cmp_si((int_number) a, 1);
+  return (a!=NULL) && (0 == mpz_cmp_si((int_number) a, 1));
 }
 
 BOOLEAN nrzIsMOne (number a)
 {
-  return 0 == mpz_cmp_si((int_number) a, -1);
+  return (a!=NULL) && (0 == mpz_cmp_si((int_number) a, -1));
 }
 
 BOOLEAN nrzEqual (number a,number b)

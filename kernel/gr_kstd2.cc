@@ -101,8 +101,8 @@ int redGrFirst (LObject* h,kStrategy strat)
       }
       if (TEST_OPT_INTSTRATEGY)
       {
-        if (rField_is_Zp_a()) pContent(h->p);
-        else h->pCleardenom();// also does a pContent
+        if (rField_is_Zp_a()) p_Content(h->p,currRing);
+        else h->pCleardenom();// also does a p_Content
       }
       /*computes the ecart*/
       d = pLDeg((*h).p,&((*h).length),currRing);
@@ -231,7 +231,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
   reddeg = strat->LazyDegree+d;
   if (!TEST_OPT_INTSTRATEGY)
   {
-    if (rField_is_Zp_a()) pContent(h->p);
+    if (rField_is_Zp_a()) p_Content(h->p,currRing);
     else h->pCleardenom();// also does a pContentRat
   }
   loop
@@ -268,8 +268,8 @@ int redGrRatGB (LObject* h,kStrategy strat)
         (*h).p=c_p;
         if (!TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a()) pContent(h->p);
-          else h->pCleardenom();// also does a pContent
+          if (rField_is_Zp_a()) p_Content(h->p,currRing);
+          else h->pCleardenom();// also does a p_Content
         }
 
 #ifdef KDEBUG
@@ -467,7 +467,7 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a()) pContent(h->p);
+          if (rField_is_Zp_a()) p_Content(h->p,currRing);
           else h->pCleardenom();// also does a pContent
         }
         if (strat->syzComp!=0)
@@ -491,8 +491,8 @@ static int nc_redHomog0 (LObject* h,kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a()) pContent(h->p);
-          else h->pCleardenom();// also does a pContent
+          if (rField_is_Zp_a()) p_Content(h->p,currRing);
+          else h->pCleardenom();// also does a p_Content
         }
 /*
 *       (*h).length=pLength0((*h).p);
@@ -552,7 +552,7 @@ static int nc_redLazy (LObject* h,kStrategy strat)
 //        if ((strat->syzComp>0) && (pMinComp((*h).p) > strat->syzComp))
 //        {
 //          if (TEST_OPT_DEBUG) PrintS(" > syzComp\n");
-//          if (TEST_OPT_INTSTRATEGY) pContent(h->p);
+//          if (TEST_OPT_INTSTRATEGY) p_Content(h->p,currRing);
 //          enterTBba((*h),strat->tl+1,strat);
 //          return;
 //        }
@@ -567,8 +567,8 @@ static int nc_redLazy (LObject* h,kStrategy strat)
         }
         if (TEST_OPT_INTSTRATEGY)
         {
-          pContent(h->p);
-          //pCleardenom(h->p);// also does a pContent
+          p_Content(h->p,currRing);
+          //pCleardenom(h->p);// also does a p_Content
         }
       }
       /*- try to reduce the s-polynomial -*/
@@ -611,8 +611,8 @@ static int nc_redLazy (LObject* h,kStrategy strat)
         if (TEST_OPT_DEBUG) PrintLn();
         if (TEST_OPT_INTSTRATEGY)
         {
-          if (rField_is_Zp_a()) pContent(h->p);
-          else h->pCleardenom();// also does a pContent
+          if (rField_is_Zp_a()) p_Content(h->p,currRing);
+          else h->pCleardenom();// also does a p_Content
         }
         enterT((*h),strat);
         return 0;
@@ -728,8 +728,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
       }
       if (TEST_OPT_INTSTRATEGY)
       {
-        //pContent(h->p);
-        h->pCleardenom();// also does a pContent
+        h->pCleardenom();// also does a p_Content
       }
       /* compute the ecart */
       if (ei <= (*h).ecart)
@@ -742,7 +741,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
 //        {
 //          if (TEST_OPT_DEBUG)
 //            PrintS("  >syzComp\n");
-//          if (TEST_OPT_INTSTRATEGY) pContent(h->p);
+//          if (TEST_OPT_INTSTRATEGY) p_Content(h->p,currRing);
 //          at=strat->posInT(strat->T,strat->tl,(*h));
 //          enterTBba((*h),at,strat);
 //          return;
@@ -794,8 +793,7 @@ static int nc_redHoney (LObject*  h,kStrategy strat)
         if (TEST_OPT_DEBUG) PrintLn();
         if (TEST_OPT_INTSTRATEGY)
         {
-          //pContent(h->p);
-          h->pCleardenom();// also does a pContent
+          h->pCleardenom();// also does a p_Content
         }
         enterT((*h),strat);
         return 0;
@@ -912,7 +910,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
 //        {
 //          if (TEST_OPT_DEBUG)
 //            PrintS(" >syzComp\n");
-//          if (TEST_OPT_INTSTRATEGY) pContent(h->p);
+//          if (TEST_OPT_INTSTRATEGY) p_Content(h->p,currRing);
 //          at=strat->posInT(strat->T,strat->tl,(*h));
 //          enterTBba((*h),at,strat);
 //          return;
@@ -949,8 +947,7 @@ static int nc_redBest (LObject*  h,kStrategy strat)
       {
         if (TEST_OPT_INTSTRATEGY)
         {
-          //pContent(h->p);
-          h->pCleardenom();// also does a pContent
+          h->pCleardenom();// also does a p_Content
         }
         enterT((*h),strat);
         return 0;
@@ -1217,7 +1214,7 @@ ideal gnc_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
                 strat->P.p = redtailBba(strat->P.p,pos-1,strat);
             }
 
-            strat->P.p=pCleardenom(strat->P.p);
+            strat->P.p=p_Cleardenom(strat->P.p, currRing);
           }
           else
           {

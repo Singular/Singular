@@ -422,13 +422,19 @@ extern void pNorm(poly p);
 KINLINE void  sTObject::pCleardenom()
 {
   assume(p != NULL);
-  #ifdef HAVE_RATGRING
-  p= ::pCleardenom(p);
-  #else
-  ::pCleardenom(p);
-  #endif
   if (t_p != NULL)
-    pSetCoeff0(t_p, pGetCoeff(p));
+  {
+    p_Cleardenom(t_p, tailRing);
+    pSetCoeff0(p, pGetCoeff(t_p));
+  }
+  else
+  {
+    #ifdef HAVE_RATGRING
+    p= p_Cleardenom(p, currRing);
+    #else
+    p_Cleardenom(p, currRing);
+    #endif
+  }
 }
 
 KINLINE void  sTObject::pNorm()
@@ -978,18 +984,15 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
   p_LmCheckPolyRing(p2, leadRing);
 
   int i;
-  long x;
-  long e1;
-  long e2;
-  long s;
+  int x;
+  int e1;
+  int e2;
+  int s;
   m1 = p_Init(tailRing);
   m2 = p_Init(tailRing);
   lcm = p_Init(leadRing);
 
-  int small_index=1;
-  if ((pGetComp(p1)!=0)||(pGetComp(p2)!=0)) small_index=0;
-
-  for (i = leadRing->N; i>=small_index; i--)
+  for (i = leadRing->N; i>=1; i--)
   {
     e1 = p_GetExp(p1,i,leadRing);
     e2 = p_GetExp(p2,i,leadRing);
@@ -997,17 +1000,26 @@ KINLINE void k_GetStrongLeadTerms(const poly p1, const poly p2, const ring leadR
     if (x > 0)
     {
       p_SetExp(m2,i,x, tailRing);
-      p_SetExp(m1,i,0, tailRing);
+      //p_SetExp(m1,i,0, tailRing); // done by p_Init
       s = e1;
     }
     else
     {
       p_SetExp(m1,i,-x, tailRing);
-      p_SetExp(m2,i,0, tailRing);
+      //p_SetExp(m2,i,0, tailRing); // done by p_Init
       s = e2;
     }
     p_SetExp(lcm,i,s, leadRing);
   }
+  if ((s=pGetComp(p1))!=0)
+  {
+    p_SetComp(lcm,s, leadRing);
+  } 
+  else if ((s=pGetComp(p2))!=0)
+  {
+    p_SetComp(lcm,s, leadRing);
+  } 
+  // else p_SetComp(lcm,0,tailRing); // done by p_Init
 
   p_Setm(m1, tailRing);
   p_Setm(m2, tailRing);

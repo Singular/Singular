@@ -362,10 +362,10 @@ void      pEnlargeSet(polyset *p, int length, int increment);
 poly p_One(const ring r);
 #define   pOne()   p_One(currRing)
 
-void      pContent(poly p);
+void      p_Content(poly p, const ring r);
 void      pSimpleContent(poly p, int s);
-poly      pCleardenom(poly p);
-void      pCleardenom_n(poly p,number &c);
+poly      p_Cleardenom(poly p, const ring r);
+void      p_Cleardenom_n(poly p, const ring r,number &c);
 void      p_Normalize(poly p,const ring r);
 number    p_GetAllDenom(poly ph, const ring r);
 #define   pNormalize(p) p_Normalize(p,currRing)

@@ -833,8 +833,8 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
 
   poly spoly = p_Add_q (tmp1, tmp2, r); // spoly = spoly(lt(p1), lt(p2)) + m1 * tail(p1), delete tmp1,2
 
-  if (spoly!=NULL) pCleardenom (spoly); // r?
-//  if (spoly!=NULL) pContent (spoly); // r?
+  if (spoly!=NULL) p_Cleardenom (spoly, r);
+//  if (spoly!=NULL) p_Content (spoly); // r?
 
 #ifdef PDEBUG
   p_Test (spoly, r);
@@ -909,7 +909,7 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
 
   p2 = p_Add_q(p2, T, r);
 
-  if ( p2!=NULL ) pContent(p2); // r?
+  if ( p2!=NULL ) p_Content(p2,r);
 
 #ifdef PDEBUG
   p_Test(p2,r);
@@ -938,12 +938,12 @@ void addLObject(LObject& h, kStrategy& strat)
   {
     if (TEST_OPT_INTSTRATEGY)
     {
-      pCleardenom(h.p);
+      p_Cleardenom(h.p, currRing);
     }
     else
     {
       pNorm(h.p);
-      pContent(h.p);
+      p_Content(h.p,currRing);
     }
 
     if ((strat->syzComp==0)||(!strat->homog))
@@ -953,7 +953,7 @@ void addLObject(LObject& h, kStrategy& strat)
       if (TEST_OPT_INTSTRATEGY)
       {
 //        pCleardenom(h.p);
-        pContent(h.p);
+        p_Content(h.p,currRing);
       }
       else
       {
@@ -1175,8 +1175,8 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 
         if (TEST_OPT_INTSTRATEGY)
         {
-//           h.pCleardenom(); // also does a pContent
-          pContent(h.p);
+//           h.pCleardenom(); // also does a p_Content
+          p_Content(h.p,currRing);
         }
         else
         {
@@ -1767,7 +1767,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
               LObject h(p_new); // h = x_i * strat->P
 
               if (TEST_OPT_INTSTRATEGY)
-                h.pCleardenom(); // also does a pContent
+                h.pCleardenom(); // also does a p_Content
               else
                 h.pNorm();
 
@@ -1949,8 +1949,8 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 
         if (TEST_OPT_INTSTRATEGY)
         {
-//          pContent(h.p);
-          h.pCleardenom(); // also does a pContent
+//          p_Content(h.p);
+          h.pCleardenom(); // also does a p_Content
         }
         else
         {
@@ -2243,7 +2243,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
               LObject h(p_new); // h = x_i * strat->P
 
               if (TEST_OPT_INTSTRATEGY)
-                h.pCleardenom(); // also does a pContent
+                h.pCleardenom(); // also does a p_Content
               else
                 h.pNorm();
 
@@ -2395,7 +2395,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
         LObject h(p_new); // h = x_i * strat->P
 
         if (TEST_OPT_INTSTRATEGY)
-           h.pCleardenom(); // also does a pContent
+           h.pCleardenom(); // also does a p_Content
         else
           h.pNorm();
 

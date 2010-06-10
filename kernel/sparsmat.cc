@@ -2504,7 +2504,7 @@ static number smCleardenom(ideal id)
     if (a!=NULL)
     {
       x = nCopy(pGetCoeff(a));
-      pCleardenom(a);
+      p_Cleardenom(a, currRing);
       y = nDiv(x,pGetCoeff(a));
       nDelete(&x);
       x = nMult(res,y);

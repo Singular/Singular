@@ -27,7 +27,7 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
 poly singclap_gcd_r ( poly f, poly g, const ring r )
 {
-  // assume pCleardenom is done
+  // assume p_Cleardenom is done
   // assume f!=0, g!=0
   poly res=NULL;
 
@@ -101,10 +101,10 @@ poly singclap_gcd ( poly f, poly g )
 {
   poly res=NULL;
 
-  if (f!=NULL) pCleardenom(f);
-  if (g!=NULL) pCleardenom(g);
-  else         return f; // g==0 => gcd=f (but do a pCleardenom)
-  if (f==NULL) return g; // f==0 => gcd=g (but do a pCleardenom)
+  if (f!=NULL) p_Cleardenom(f, currRing);
+  if (g!=NULL) p_Cleardenom(g, currRing);
+  else         return f; // g==0 => gcd=f (but do a p_Cleardenom)
+  if (f==NULL) return g; // f==0 => gcd=g (but do a p_Cleardenom)
 
   res=singclap_gcd_r(f,g,currRing);
   pDelete(&f);
@@ -168,7 +168,7 @@ poly singclap_resultant ( poly f, poly g , poly x)
     {
       //Variable X(i+rPar(currRing));
       number nf,ng;
-      pCleardenom_n(f,nf);pCleardenom_n(g,ng);
+      p_Cleardenom_n(f, currRing,nf);p_Cleardenom_n(g, currRing,ng);
       int ef,eg;
       ef=pGetExp_Var(f,i);
       eg=pGetExp_Var(g,i);
@@ -796,7 +796,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       number n0=nCopy(pGetCoeff(f));
       if (with_exps==0)
         N=nCopy(n0);
-      pCleardenom(f);
+      p_Cleardenom(f, currRing);
       NN=nDiv(n0,pGetCoeff(f));
       nDelete(&n0);
       if (with_exps==0)
@@ -815,7 +815,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       if (with_exps==0)
         N=nCopy(n0);
       pNorm(f);
-      pCleardenom(f);
+      p_Cleardenom(f, currRing);
       NN=nDiv(n0,pGetCoeff(f));
       nDelete(&n0);
       if (with_exps==0)
@@ -1169,7 +1169,7 @@ ideal singclap_sqrfree ( poly f)
   {
     //if (f!=NULL) // already tested at start of routine
     {
-      pCleardenom(f);
+      p_Cleardenom(f, currRing);
     }
   }
   else if (rField_is_Zp_a())
@@ -1178,7 +1178,7 @@ ideal singclap_sqrfree ( poly f)
     if (singclap_factorize_retry==0)
     {
       pNorm(f);
-      pCleardenom(f);
+      p_Cleardenom(f, currRing);
     }
   }
   if (rField_is_Q() || rField_is_Zp())
@@ -1289,7 +1289,7 @@ matrix singclap_irrCharSeries ( ideal I)
       if (p!=NULL)
       {
         p=pCopy(p);
-        pCleardenom(p);
+        p_Cleardenom(p, currRing);
         L.append(convSingPFactoryP(p));
       }
     }
@@ -1306,7 +1306,7 @@ matrix singclap_irrCharSeries ( ideal I)
       if (p!=NULL)
       {
         p=pCopy(p);
-        pCleardenom(p);
+        p_Cleardenom(p, currRing);
         L.append(convSingTrPFactoryP(p));
       }
     }

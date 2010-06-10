@@ -330,7 +330,7 @@ static void completeReduceFac (kStrategy strat, ideal_list FL)
     strat->S[si] = redtailBba(strat->S[si],si-1,strat);
     if (TEST_OPT_INTSTRATEGY)
     {
-      strat->S[si]=pCleardenom(strat->S[si]);
+      strat->S[si]=p_Cleardenom(strat->S[si], currRing);
     }
     if (TEST_OPT_PROT)
     {

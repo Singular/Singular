@@ -376,7 +376,7 @@ fglmNewLinearCombination( ideal source, poly monset )
                 pSetCoeff( sum, nCopy( temp.getconstelem( k ) ) );
             }
         }
-        pContent( result );
+        p_Content( result, currRing );
         if ( ! nGreaterZero( pGetCoeff( result ) ) ) result= pNeg( result );
     }
     // Free Memory

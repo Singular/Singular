@@ -483,12 +483,12 @@ void pEnlargeSet(polyset *p, int l, int increment)
 number pInitContent(poly ph);
 number pInitContent_a(poly ph);
 
-void pContent(poly ph)
+void p_Content(poly ph, const ring r)
 {
 #ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
+  if (rField_is_Ring(r))
   {
-    if ((ph!=NULL) && rField_has_Units(currRing))
+    if ((ph!=NULL) && rField_has_Units(r))
     {
       number k = nGetUnit(pGetCoeff(ph));
       if (!nIsOne(k))
@@ -526,8 +526,8 @@ void pContent(poly ph)
       h=pInitContent(ph);
       p=ph;
     }
-    else if ((rField_is_Extension())
-    && ((rPar(currRing)>1)||(currRing->minpoly==NULL)))
+    else if ((rField_is_Extension(r))
+    && ((rPar(r)>1)||(r->minpoly==NULL)))
     {
       h=pInitContent_a(ph);
       p=ph;
@@ -540,7 +540,7 @@ void pContent(poly ph)
     while (p!=NULL)
     {
       nNormalize(pGetCoeff(p));
-      d=nGcd(h,pGetCoeff(p),currRing);
+      d=nGcd(h,pGetCoeff(p),r);
       nDelete(&h);
       h = d;
       if(nIsOne(h))
@@ -577,10 +577,10 @@ void pContent(poly ph)
       if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
     }
 #endif
-    if (rField_is_Q_a())
+    if (rField_is_Q_a(r))
     {
-      number hzz = nlInit(1, currRing);
-      h = nlInit(1, currRing);
+      number hzz = nlInit(1, r);
+      h = nlInit(1, r);
       p=ph;
       while (p!=NULL)
       { // each monom: coeff in Q_a
@@ -588,16 +588,16 @@ void pContent(poly ph)
         napoly c_n=c_n_n->z;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(hzz,pGetCoeff(c_n),currRing->algring);
-          n_Delete(&hzz,currRing->algring);
+          d=nlLcm(hzz,pGetCoeff(c_n),r->algring);
+          n_Delete(&hzz,r->algring);
           hzz=d;
           pIter(c_n);
         }
         c_n=c_n_n->n;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(h,pGetCoeff(c_n),currRing->algring);
-          n_Delete(&h,currRing->algring);
+          d=nlLcm(h,pGetCoeff(c_n),r->algring);
+          n_Delete(&h,r->algring);
           h=d;
           pIter(c_n);
         }
@@ -608,14 +608,14 @@ void pContent(poly ph)
       number htmp=nlInvers(h);
       number hzztmp=nlInvers(hzz);
       number hh=nlMult(hzz,h);
-      nlDelete(&hzz,currRing->algring);
-      nlDelete(&h,currRing->algring);
-      number hg=nlGcd(hzztmp,htmp,currRing->algring);
-      nlDelete(&hzztmp,currRing->algring);
-      nlDelete(&htmp,currRing->algring);
+      nlDelete(&hzz,r->algring);
+      nlDelete(&h,r->algring);
+      number hg=nlGcd(hzztmp,htmp,r->algring);
+      nlDelete(&hzztmp,r->algring);
+      nlDelete(&htmp,r->algring);
       h=nlMult(hh,hg);
-      nlDelete(&hg,currRing->algring);
-      nlDelete(&hh,currRing->algring);
+      nlDelete(&hg,r->algring);
+      nlDelete(&hh,r->algring);
       nlNormalize(h);
       if(!nlIsOne(h))
       {
@@ -628,7 +628,7 @@ void pContent(poly ph)
           { // each monom: coeff in Q
             d=nlMult(h,pGetCoeff(c_n));
             nlNormalize(d);
-            nlDelete(&pGetCoeff(c_n),currRing->algring);
+            nlDelete(&pGetCoeff(c_n),r->algring);
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
@@ -637,14 +637,14 @@ void pContent(poly ph)
           { // each monom: coeff in Q
             d=nlMult(h,pGetCoeff(c_n));
             nlNormalize(d);
-            nlDelete(&pGetCoeff(c_n),currRing->algring);
+            nlDelete(&pGetCoeff(c_n),r->algring);
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
           pIter(p);
         }
       }
-      nlDelete(&h,currRing->algring);
+      nlDelete(&h,r->algring);
     }
   }
 }
@@ -942,20 +942,20 @@ void p_Content(poly ph, ring r)
 }
 #endif
 
-poly pCleardenom(poly ph)
+poly p_Cleardenom(poly ph, const ring r)
 {
   poly start=ph;
   number d, h;
   poly p;
 
 #ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
+  if (rField_is_Ring(r))
   {
-    pContent(ph);
+    p_Content(ph,r);
     return start;
   }
 #endif
-  if (rField_is_Zp() && TEST_OPT_INTSTRATEGY) return start;
+  if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY) return start;
   p = ph;
   if(pNext(p)==NULL)
   {
@@ -1054,9 +1054,9 @@ poly pCleardenom(poly ph)
     }
     if (h!=NULL) nDelete(&h);
   
-    pContent(ph);
+    p_Content(ph,r);
 #ifdef HAVE_RATGRING
-    if (rIsRatGRing(currRing))
+    if (rIsRatGRing(r))
     {
       /* quick unit detection in the rational case is done in gr_nc_bba */
       pContentRat(ph);
@@ -1067,7 +1067,7 @@ poly pCleardenom(poly ph)
   return start;
 }
 
-void pCleardenom_n(poly ph,number &c)
+void p_Cleardenom_n(poly ph,const ring r,number &c)
 {
   number d, h;
   poly p;
@@ -1084,7 +1084,7 @@ void pCleardenom_n(poly ph,number &c)
     while (p!=NULL)
     {
       nNormalize(pGetCoeff(p));
-      d=nLcm(h,pGetCoeff(p),currRing);
+      d=nLcm(h,pGetCoeff(p),r);
       nDelete(&h);
       h=d;
       pIter(p);
@@ -1120,7 +1120,7 @@ void pCleardenom_n(poly ph,number &c)
           p=ph;
           while (p!=NULL)
           {
-            d=nLcm(h,pGetCoeff(p),currRing);
+            d=nLcm(h,pGetCoeff(p),r);
             nDelete(&h);
             h=d;
             pIter(p);
