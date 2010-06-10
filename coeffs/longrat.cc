@@ -159,7 +159,7 @@ static number nlMapR(number from, const coeffs src, const coeffs dst);
 /*2
 * convert from a GMP integer
 */
-number nlMapGMP(number from)
+number nlMapGMP(number from, const coeffs src, const coeffs dst)
 {
   number z=ALLOC_RNUMBER();
 #if defined(LDEBUG)
@@ -175,7 +175,7 @@ number nlMapGMP(number from)
 /*2
 * convert from an machine long
 */
-number nlMapMachineInt(number from)
+number nlMapMachineInt(number from, const coeffs src, const coeffs dst)
 {
   number z=ALLOC_RNUMBER();
 #if defined(LDEBUG)
@@ -1210,11 +1210,11 @@ int nlModP(number n, int p, const coeffs r)
 /*2
 * convert number i (from Q) to GMP and warn if denom != 1
 */
-void nlGMP(number &i, number n)
+void nlGMP(number &i, number n, const coeffs r)
 {
   // Hier brauche ich einfach die GMP Zahl
   nlTest(i, r);
-  nlNormalize(i);
+  nlNormalize(i, r);
   if (SR_HDL(i) & SR_INT)
   {
     mpz_set_si((mpz_ptr) n, SR_TO_INT(i));
