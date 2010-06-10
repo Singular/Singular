@@ -557,7 +557,7 @@ PACKAGE_STRING='FULL-PACKAGE-NAME VERSION'
 PACKAGE_BUGREPORT='BUG-REPORT-ADDRESS'
 PACKAGE_URL=''
 
-ac_unique_file="output.h"
+ac_unique_file="repoter.h"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
