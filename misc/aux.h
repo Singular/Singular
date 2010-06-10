@@ -1,17 +1,39 @@
-/* -*-c++-*- */
+/* auxiliary.h.  Generated from auxiliary.h.in by configure.  */
+/*****************************************************************************\
+ * Computer Algebra System SINGULAR    
+\*****************************************************************************/
+/** @file auxiliary.h
+ * 
+ * All the auxiliary stuff.
+ *
+ * ABSTRACT: we shall put here everything that does not have its own place.
+ *
+ * @author Oleksandr Motsak
+ *
+ * @internal @version \$Id$
+ *
+ **/
+/*****************************************************************************/
 
-/*******************************************************************
- *  File:    auxiliary.h
- *  Purpose: 
- *  Author:  
- *  Created: 
- *  Version: $Id$
- *******************************************************************/
+#ifndef MISC_AUXILIARY_H
+#define MISC_AUXILIARY_H
+     
+// -----------------  configure stuff
+
+/* CPU type: i[3456]86: */
+#define SI_CPU_I386 1
+/* CPU type: sparc: */
+/* #undef SI_CPU_SPARC */
+/* CPU type: ppc: */
+/* #undef SI_CPU_PPC */
+/* CPU type: IA64: */
+/* #undef SI_CPU_IA64 */
+/* CPU type: x86_64: */
+/* #undef SI_CPU_X86_64 */
+
+// ----------------- end of configure stuff
 
 // BOOLEAN
-
-#ifndef _MISC_AUX_H
-#define _MISC_AUX_H
 
 #if (SIZEOF_LONG == 8)
 typedef int BOOLEAN;
@@ -79,5 +101,6 @@ static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
 #endif
 
 
-#endif /* _MISC_AUX_H */
+#endif
+/* _MISC_AUXILIARY_H */
 
