@@ -3884,7 +3884,7 @@ static BOOLEAN jjCONTENT(leftv res, leftv v)
 {
   // CopyD for POLY_CMD and VECTOR_CMD are identical:
   poly p=(poly)v->CopyD(POLY_CMD);
-  if (p!=NULL) pCleardenom(p);
+  if (p!=NULL) p_Cleardenom(p, currRing);
   res->data = (char *)p;
   return FALSE;
 }

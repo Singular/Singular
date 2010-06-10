@@ -106,7 +106,7 @@ int ReducePolyLead(Poly *x,Poly *y)
 #else
   x->root=ksOldSpolyRed(y->root,x->root,NULL);
 #endif
-//  if (x->root) pContent(x->root);
+//  if (x->root) p_Content(x->root,currRing);
 //  if (x->root) pSimpleContent(x->root,5);
 
   return 1;
@@ -164,7 +164,7 @@ void PNF(Poly *p, TreeM *F)
         )
         {
            //pSimpleContent(pp,2);
-           pContent(pp);
+           p_Content(pp,currRing);
            count=0;
          //  old_size=nSize(pGetCoeff(pp));
         }
@@ -175,7 +175,7 @@ void PNF(Poly *p, TreeM *F)
       temp=temp->next;
    }
 
-  if (done) pContent(p->root);
+  if (done) p_Content(p->root,currRing);
   //if (done) pSimpleContent(p->root,-1);
   pTest(p->root);
 }
@@ -286,7 +286,7 @@ void NFL(Poly *p, TreeM *F)
   InitLead(p);
   p->changed=1;
 
-  pContent(p->root);
+  p_Content(p->root,currRing);
   //pSimpleContent(p->root,-1);
   pTest(p->root);
 }
