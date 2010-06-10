@@ -7166,7 +7166,7 @@ See
 @item @strong{Type:}
 ideal
 @item @strong{Purpose:}
-@code{var(p)} returns the list of all ring variables the argument depends on.
+@code{variables(p)} returns the list of all ring variables the argument depends on.
 @item @strong{Example:}
 @smallexample
 @c example

@@ -220,6 +220,10 @@ described in the following subsections.
 Use the @code{LIB} command (see @ref{LIB}) for loading of single libraries,
 and the command @code{LIB "all.lib";} for loading all libraries.
 
+@ifset withplural
+See also @ref{Non-commutative libraries}.
+@end ifset
+
 @menu
 * standard_lib:: extensions of Singular kernel
 * General purpose::
