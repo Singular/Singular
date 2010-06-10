@@ -77,9 +77,16 @@ libcoeffs.a: ${OBJS}
 ##
 mostlyclean: 
 	-rm -f *.o *.og core *.op
+	
 
-clean: mostlyclean
-	-rm -f *.bak *.d *.dd depend *.a *.so* test
+
+cleantest: 
+	-rm -Rf test test.dSYM/
+	
+
+clean: mostlyclean cleantest
+	-rm -f *.bak *.d *.dd depend *.a *.so*
+	
 
 
 tags:   
