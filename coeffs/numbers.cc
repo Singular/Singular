@@ -194,6 +194,55 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 #ifdef HAVE_RINGS
    if (n->cfGetUnit==(nMapFunc)NULL) n->cfGetUnit=n->cfCopy;
 #endif
+#ifndef NDEBUG
+   assume(n->nCoeffIsEqual!=NULL);
+   if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
+   if(n->cfSetChar!=NULL) Warn("cfSetChar is NOT NULL for coeff %d",t);
+   assume(n->cfMult!=NULL);
+   assume(n->cfSub!=NULL);
+   assume(n->cfAdd!=NULL);
+   assume(n->cfDiv!=NULL);
+   assume(n->cfIntDiv!=NULL);
+   assume(n->cfIntMod!=NULL);
+   assume(n->cfExactDiv!=NULL);
+   assume(n->cfInit!=NULL);
+   assume(n->cfPar!=NULL);
+   assume(n->cfParDeg!=NULL);
+   assume(n->cfSize!=NULL);
+   assume(n->cfInt!=NULL);
+   //assume(n->n->cfDivComp!=NULL);
+   //assume(n->cfIsUnit!=NULL);
+   //assume(n->cfGetUnit!=NULL);
+   //assume(n->cfExtGcd!=NULL);
+   assume(n->cfNeg!=NULL);
+   assume(n->cfCopy!=NULL);
+   assume(n->cfRePart!=NULL);
+   assume(n->cfImPart!=NULL);
+   assume(n->cfWrite!=NULL);
+   assume(n->cfRead!=NULL);
+   assume(n->cfNormalize!=NULL);
+   assume(n->cfGreater!=NULL);
+   //assume(n->cfDivBy!=NULL);
+   assume(n->cfEqual!=NULL);
+   assume(n->cfIsZero!=NULL);
+   assume(n->cfIsOne!=NULL);
+   assume(n->cfIsMOne!=NULL);
+   assume(n->cfGreaterZero!=NULL);
+   assume(n->cfPower!=NULL);
+   assume(n->cfGetDenom!=NULL);
+   assume(n->cfGetNumerator!=NULL);
+   assume(n->cfGcd!=NULL);
+   assume(n->cfLcm!=NULL);
+   assume(n->cfDelete!=NULL);
+   assume(n->cfSetMap!=NULL);
+   assume(n->cfName!=NULL);
+   assume(n->cfInpMult!=NULL);
+   assume(n->cfInit_bigint!=NULL);
+   #ifdef LDEBUG
+   assume(n->cfDBTest!=NULL);
+   #endif
+   assume(n->type==t);
+#endif
   }
   else
   {
