@@ -1074,22 +1074,27 @@ zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f, zz_pX mipo)
   return result;
 }
 
-CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
+CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha) 
 {
-  CanonicalForm bigone= 0;
-  for (int j=0;j<=deg(f);j++)
+  CanonicalForm bigone;
+  if (deg (f) > 0)
   {
-    if (IsOne(coeff(f,j)))
-      bigone+=power(x,j);
-      else
+    bigone= 0;
+    bigone.mapinto();
+    for (int j=0;j<deg(f)+1;j++) 
+    {
+      if (coeff(f,j)!=0)
       {
-        //cout << "hier doof" << "\n";
-        CanonicalForm coefficient=convertNTLzzpE2CF(coeff(f,j),alpha);
-        //cout << "ja" << "\n";
-        if (coeff(f,j)!=0)
-          bigone += (power(x,j)*coefficient);
+        bigone+=(power(x,j)*convertNTLzzpE2CF(coeff(f,j),alpha));
       }
+    }
   }
+  else
+  {
+    bigone= convertNTLzzpE2CF(coeff(f,0),alpha);
+    bigone.mapinto();
+  }
+  return bigone;
 }
 //----------------------------------------------------------------------
 mat_ZZ* convertFacCFMatrix2NTLmat_ZZ(CFMatrix &m)
