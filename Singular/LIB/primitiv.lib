@@ -169,8 +169,8 @@ EXAMPLE: example primitive_extra;  shows an example
  if (grad2==0) { ERROR("i[2] is not monic"); }
  int countx,countz;
   if (size(variables(i[1]))!=1) { ERROR("i[1] must be poly in x"); }
-  if (size(variables(i[2]))!=2) { ERROR("i[2] must be poly in x,a"); }
-  if (variables(i[2])[2]!=a) { ERROR("i[2] must be poly in x,a"); }
+  if (size(variables(i[2]))>2) { ERROR("i[2] must be poly in x,a"); }
+  //if (variables(i[2])[2]!=a) { ERROR("i[2] must be poly in x,a"); }
  ring deglexring=char(altring),(x,y,z),dp;
  map transfer=altring,x,z;
  ideal i=transfer(i);
