@@ -56,5 +56,14 @@ def RR=splitring(c2-2j,list(a2+ja,j,erg[5]));
 setring RR;
 erg[3]^2;
 kill R1,r,RR;
+// example by Bernd Martin
+LIB"zeroset.lib";
+ring R=(0,a),x,lp;
+poly f=x4+2;
+def T=roots(f);
+setring T;
+map F;
+F[1] = theRoots[1];
+F(f);
 tst_status(1);$
 
