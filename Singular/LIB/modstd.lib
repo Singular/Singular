@@ -407,7 +407,7 @@ example
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc liftstd1(ideal I)
+static proc liftstd1(ideal I)
 {
    def R = basering;
    list rl = ringlist(R);
@@ -452,9 +452,9 @@ proc liftstd1(ideal I)
    }
    else
    {
-      "==========================================================";
-      "WARNING: Algorithm is not applicable if ordering is mixed.";
-      "==========================================================";
+      //"==========================================================";
+      //"WARNING: Algorithm is not applicable if ordering is mixed.";
+      //"==========================================================";
       for(i = 1; i <= size(sM)-size(I); i++)
       {
          sI[size(sI)+1] = sM[i][1];
@@ -477,8 +477,8 @@ example
    matrix(sm) - matrix(i)*T;
 
 
-   ring S = 32003, x(1..6), lp;
-   ideal I = cyclic(6);
+   ring S = 32003, x(1..5), lp;
+   ideal I = cyclic(5);
    ideal sI;
    matrix T;
    sI,T = liftstd1(I);

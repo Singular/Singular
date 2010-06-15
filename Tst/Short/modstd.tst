@@ -10,7 +10,6 @@ example modS;
 example modHenselStd;
 example deleteUnluckyPrimes;
 example isIncluded;
-example liftstd1;
 ring r = 0, x(1..5), dp;
 ideal I = cyclic(5);
 ideal I2 = modStd(I);
