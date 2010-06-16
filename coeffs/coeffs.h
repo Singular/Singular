@@ -219,7 +219,7 @@ coeffs nInitChar(n_coeffType t, void * parameter);
 /// undo all initialisations
 void nKillChar(coeffs r);
 /// initialisations after each ring change
-inline void nSetChar(coeffs r)
+static inline void nSetChar(const coeffs r)
 {
   assume(r!=NULL); // r==NULL is an error
   if (r->cfSetChar!=NULL) r->cfSetChar(r);
