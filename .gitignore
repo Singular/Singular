@@ -17,6 +17,7 @@ ix86-Linux/*
 ix86-Win/*
 x86_64-Linux/*
 ix86Mac-darwin/*
+misc/auxiliary.h
 omalloc/omTables
 omalloc/omTables.h
 omalloc/omTables.inc
