@@ -34,7 +34,7 @@ CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
 CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} -g
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I${includedir} -I${srcdir}/../misc/ -I${srcdir}/../resource/ -I${srcdir}/../reporter/ -L${srcdir}/../reporter/ -L${libdir} -lgmp
-DEFS		= -Dix86_Linux -DHAVE_CONFIG_H -DLDEBUG -DDEBUG -DOM_DEBUG -DHAVE_ASSUME
+DEFS		= -DNDEBUG -DOM_NDEBUG @DEFS@
 
 #-DHAVE_RINGS 
 # -DHAVE_RINGS # Doesn't work :(
@@ -74,6 +74,23 @@ libcoeffs.a: ${OBJS}
 	-rm -f libcoeffs.a
 	ar cr $@ $^
 
+## ----------------------------------------------------------------------------
+## debug version:
+FLAGSG         = -g ${PIPE}
+CXXFLAGSG       = -g ${PIPE}
+DEFSG           = @DEFS@
+
+CCG             = ${CC}
+CXXG            = ${CXX}
+OBJSG1 := $(CXXSOURCES:.cc=.og)
+
+libcoeffs_g.a: ${OBJSG1}
+	-rm -f libcoeffs_g.a
+	ar cr $@ $^
+
+%.og: %.cc
+	$(CXXG) ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} -c $< -o $@
+
 ##
 ## clean targest
 ##
@@ -89,12 +106,13 @@ clean: mostlyclean cleantest
 tags:   
 	ctags *.c *.h *.cc *.inc
 
-all: libcoeffs.a
+all: libcoeffs.a libcoeffs_g.a
 
 install: all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
 	${INSTALL_DATA} libcoeffs.a ${libdir}/libcoeffs.a
+	${INSTALL_DATA} libcoeffs_g.a ${libdir}/libcoeffs_g.a
 	$(INSTALL_DATA) coeffs.h $(includedir)/coeffs.h
 
 test: test.cc libcoeffs.a

@@ -9,6 +9,8 @@
 */
 
 #include <auxiliary.h>
+/* for assume: */
+#include <reporter.h>
 #include <si_gmp.h>
 
 enum n_coeffType
@@ -38,7 +40,9 @@ typedef unsigned long NATNUMBER;
 typedef mpz_ptr int_number;
 #endif
 
-// and the routines w.r.t. currRing:
+// the access methods (part 1) (see also part2 below):
+//
+// the routines w.r.t. currRing:
 // (should only be used in the context of currRing, i.e. in the interpreter)
 #define nCopy(n)          n_Copy(n, currRing->cf)
 #define nDelete(n)        n_Delete(n, currRing->cf)
@@ -217,7 +221,8 @@ void nKillChar(coeffs r);
 /// initialisations after each ring change
 inline void nSetChar(coeffs r)
 {
-  if ((r!=NULL) && (r->cfSetChar!=NULL)) r->cfSetChar(r);
+  assume(r!=NULL); // r==NULL is an error
+  if (r->cfSetChar!=NULL) r->cfSetChar(r);
 }
 
 // nach einer heissen Diskussion
@@ -225,17 +230,17 @@ void           nNew(number * a);
 #define n_New(n, r)           nNew(n)
 
 
-// the access methods:
+// the access methods (part 2):
 
 /// return a copy of a
 static inline number n_Copy(number n,    const coeffs r){ return (r)->cfCopy(n, r); }
 static inline void   n_Delete(number* p, const coeffs r){ return (r)->cfDelete(p, r); }
 
-static inline BOOLEAN n_AreEqual(number a, number b, const coeffs r){ return (r)->cfEqual(a, b, r); }
+static inline BOOLEAN n_Equal(number a, number b, const coeffs r){ return (r)->cfEqual(a, b, r); }
 static inline BOOLEAN n_IsZero(number n, const coeffs r){ return (r)->cfIsZero(n,r); }
 static inline BOOLEAN n_IsOne(number n,  const coeffs r){ return (r)->cfIsOne(n,r); }
 static inline BOOLEAN n_IsMOne(number n, const coeffs r){ return (r)->cfIsMOne(n,r); }
-static inline BOOLEAN n_IsGreaterZero(number n, const coeffs r){ return (r)->cfGreaterZero(n,r); }
+static inline BOOLEAN n_GreaterZero(number n, const coeffs r){ return (r)->cfGreaterZero(n,r); }
 // cfGreater?
 
 /// init with an integer
@@ -247,13 +252,13 @@ static inline number n_Neg(number n,     const coeffs r){ return (r)->cfNeg(n,r)
 /// return 1/a
 static inline number n_Invers(number a,  const coeffs r){ return (r)->cfInvers(a,r); }
 
-/// how complicated, (0) => 0, otherwise positive
+/// use for pivot strategies, (0) => 0, otherwise positive
 static inline int    n_Size(number n,    const coeffs r){ return (r)->cfSize(n,r); }
 
 /// normalize the number. i.e. go to some canonnical representation (inplace)
 static inline void   n_Normalize(number& n, const coeffs r){ return (r)->cfNormalize(n,r); }
 
-/// Normalize and Write
+/// Normalize and Write to the output buffer of reporter
 static inline void   n_Write(number& n,  const coeffs r){ return (r)->cfWrite(n,r); }
 
 /// Normalize and get denomerator
@@ -266,6 +271,7 @@ static inline void   n_Power(number a, int b, number *res, const coeffs r){ retu
 
 
 static inline number n_Mult(number a, number b, const coeffs r){ return (r)->cfMult(a, b, r); }
+
 /// Inplace multiplication: a := a * b
 static inline void n_InpMult(number &a, number b, const coeffs r){ return (r)->cfInpMult(a,b,r); }
 
@@ -278,26 +284,22 @@ static inline number n_ExactDiv(number a, number b, const coeffs r){ return (r)-
 
 static inline number n_Gcd(number a, number b, const coeffs r){ return (r)->cfGcd(a,b,r); }
 
-/// Tests whether n is a correct number.
+#ifdef LDEBUG
+/// Tests whether n is a correct number: only used if LDEBUG is defined
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 {
-#ifdef LDEBUG
   return (r)->cfDBTest(n, filename, linenumber, r);
-#else
-  return TRUE;
-#endif
 }
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
+#else
+#define n_Test(a,r)  (1)
+#endif
 
 // Missing wrappers for:
 // cfIntMod, cfPar, cfParDeg, cfInt, cfRePart, cfImPart, cfRead, cfLcm, cfSetMap, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfIsUnit, cfGetUnit, cfExtGcd... cfDivBy
 
-
-// Deprecated:
-static inline BOOLEAN n_GreaterZero(number n, const coeffs r){ return n_IsGreaterZero(n,r); }
-static inline BOOLEAN n_Equal(number a, number b, const coeffs r){ return n_AreEqual(a, b, r); }
 
 // Deprecated:
 static inline int n_GetChar(const coeffs r){ return nInternalChar(r); }
