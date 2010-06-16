@@ -259,10 +259,6 @@ extern poly pHeadProc(poly p);
  *
  ***************************************************************/
 
-#define pFetchCopy(r,p)     _pFetchCopy(r,p)
-// Similar to pFetchCopy, except that poly p is deleted
-#define pFetchCopyDelete(r, p) _pFetchCopyDelete(r, p)
-
 typedef poly*   polyset;
 extern int      pVariables;
 extern int      pOrdSgn;
