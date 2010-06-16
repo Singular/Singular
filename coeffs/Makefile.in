@@ -115,5 +115,5 @@ install: all
 	${INSTALL_DATA} libcoeffs_g.a ${libdir}/libcoeffs_g.a
 	$(INSTALL_DATA) coeffs.h $(includedir)/coeffs.h
 
-test: test.cc libcoeffs.a
-	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} test.cc -L. -I. -lcoeffs -o test -lomalloc -lreporter
+test: test.cc libcoeffs_g.a
+	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} test.cc -L. -I. -lcoeffs_g -o test -lomalloc -lreporter
