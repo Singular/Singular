@@ -62,8 +62,6 @@
 // Component
 #define pGetComp(p)         _p_GetComp(p, currRing)
 #define pSetComp(p,v)       p_SetComp(p,v, currRing)
-#define pAddComp(p,v)       p_AddComp(p,v,currRing)
-#define pSubComp(p,v)       p_SubComp(p,v,currRing)
 
 // Exponent
 #define pGetExp(p,i)        p_GetExp(p, i, currRing)
@@ -103,7 +101,7 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 #define pLmDelete(p)    p_LmDelete(p, currRing)
 // like pLmDelete, returns pNext(p)
 #define pLmDeleteAndNext(p) p_LmDeleteAndNext(p, currRing)
-// used by iparith.cc
+// used by iparith.cc (pHead as proc)
 extern poly pHeadProc(poly p);
 
 /***************************************************************
@@ -270,7 +268,6 @@ void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 
 
 /*-------------ring management:----------------------*/
-//extern void pChangeRing(ring newRing);
 extern void pSetGlobals(const ring r, BOOLEAN complete = TRUE);
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which
@@ -318,7 +315,7 @@ void pSetModDeg(intvec *w);
 
 
 
-poly      pmInit(const char *s, BOOLEAN &ok); /* monom -> poly, interpreter */
+poly      pmInit(const char *s, BOOLEAN &ok); /* monom s -> poly, interpreter */
 const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
 
 /*-------------operations on polynomials:------------*/
