@@ -19,9 +19,9 @@ using namespace std;
 bool Test(const coeffs r)
 {
   number a = r->cfInit(666, r); 
-  number b = r->cfAdd( a, a, r);
-  
   n_Test(a,r);
+  
+  number b = r->cfAdd( a, a, r);
   n_Test(b,r);
   
   StringSetS("a: ");r->cfWrite( a, r );PrintS(StringAppend("\n"));

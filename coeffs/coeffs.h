@@ -254,8 +254,8 @@ void           nNew(number * a);
 static inline BOOLEAN n_DBTest(number a, const char *filename, const int linenumber, const coeffs r)
 {
 #ifdef LDEBUG
-  //return (r)->cfDBTest(a, filename, linenumber, r);
-  return (r)->cfDBTest(a,r,filename,linenumber);
+  return (r)->cfDBTest(a, filename, linenumber, r);
+//  return (r)->cfDBTest(a,r,filename,linenumber); // testing error message
 #else
   return TRUE;
 #endif
