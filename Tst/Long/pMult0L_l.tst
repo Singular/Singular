@@ -9,7 +9,7 @@ intvec tst_rgen_extra_weights = intvec(0);
 intvec tst_rgen_nvars = 4..10;
 list tst_rgen_comp_orderings = list("", "cc");
 list tst_rgen_charstrs = list("0");
-list tst_rgen_exp_bounds = list(31);
+list tst_rgen_exp_bounds = list(63);
 
 tst_rgen_init();
 
