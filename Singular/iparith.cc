@@ -758,7 +758,8 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   && (pTotaldegree(u_p)*(signed long)v_i >= (signed long)currRing->bitmask))
   {
     pDelete(&u_p);
-    Werror("OVERFLOW");
+    Werror("OVERFLOW in power(d=%ld, e=%d, max=%ld)",
+                                    pTotaldegree(u_p),v_i,currRing->bitmask);
     return TRUE;
   }
   res->data = (char *)pPower(u_p,v_i);
@@ -1043,11 +1044,12 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     {
       b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
       if ((a!=NULL) && (b!=NULL)
-      && (pTotaldegree(a)+pTotaldegree(b)>=si_max(255,currRing->bitmask)))
+      && (pTotaldegree(a)+pTotaldegree(b)>=si_max((long)rVar(currRing),currRing->bitmask)))
       {
+        Werror("OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
+          pTotaldegree(a),pTotaldegree(b),currRing->bitmask);
         pDelete(&a);
         pDelete(&b);
-        WerrorS("OVERFLOW");
         return TRUE;
       }
       res->data = (char *)(pMult( a, b));
@@ -1057,11 +1059,12 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
     // u->next exists: copy v
     b=pCopy((poly)v->Data());
     if ((a!=NULL) && (b!=NULL)
-    && (pTotaldegree(a)+pTotaldegree(b)>=si_max(255,currRing->bitmask)))
+    && (pTotaldegree(a)+pTotaldegree(b)>=si_max((long)rVar(currRing),currRing->bitmask)))
     {
+      Werror("OVERFLOW in mult(d=%ld, d=%ld, max=%ld)",
+          pTotaldegree(a),pTotaldegree(b),currRing->bitmask);
       pDelete(&a);
       pDelete(&b);
-      WerrorS("OVERFLOW");
       return TRUE;
     }
     res->data = (char *)(pMult( a, b));
