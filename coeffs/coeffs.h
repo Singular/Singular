@@ -8,7 +8,8 @@
 * ABSTRACT
 */
 
-#include <aux.h>
+#include <auxiliary.h>
+#include <si_gmp.h>
 
 enum n_coeffType
 {
@@ -30,6 +31,12 @@ enum n_coeffType
 
 struct snumber;
 typedef struct snumber *   number;
+
+/* standard types */
+#ifdef HAVE_RINGS
+typedef unsigned long NATNUMBER;
+typedef mpz_ptr int_number;
+#endif
 
 //
 // the access macros:
@@ -54,8 +61,7 @@ typedef struct snumber *   number;
 #define n_Div(a, b, r)        (r)->cfDiv(a,b,r)
 #define n_Invers(a, r)        (r)->cfInvers(a,r)
 #define n_ExactDiv(a, b, r)   (r)->cfExactDiv(a,b,r)
-#define n_Test(a,r)           (r)->cfDBTest(a,r,__FILE__,__LINE__)
-
+// #define n_Test(a,r)           (r)->cfDBTest(a,r,__FILE__,__LINE__)
 #define n_InpMult(a, b, r)    (r)->cfInpMult(a,b,r)
 #define n_Power(a, b, res, r) (r)->cfPower(a,b,res,r)
 #define n_Size(n,r)           (r)->cfSize(n,r)
@@ -244,6 +250,18 @@ inline void nSetChar(coeffs r)
 // nach einer heissen Diskussion
 void           nNew(number * a);
 #define n_New(n, r)           nNew(n)
+
+static inline BOOLEAN n_DBTest(number a, const char *filename, const int linenumber, const coeffs r)
+{
+#ifdef LDEBUG
+  //return (r)->cfDBTest(a, filename, linenumber, r);
+  return (r)->cfDBTest(a,r,filename,linenumber);
+#else
+  return TRUE;
+#endif
+}
+/// BOOLEAN n_Test(number a, const coeffs r)
+#define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
 #endif
 
