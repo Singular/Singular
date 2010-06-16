@@ -596,6 +596,7 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+PIPE
 EGREP
 GREP
 CPP
@@ -3855,6 +3856,49 @@ if test "x$ac_cv_func_vsnprintf" = x""yes; then :
 
 $as_echo "#define HAVE_VSNPRINTF 1" >>confdefs.h
 
+fi
+
+
+# check whether the compiler accepts -pipe
+if test x$ac_cv_c_cpp = xgcc2 -o  x$ac_cv_c_cpp = xgcc3
+then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiler accepts -pipe" >&5
+$as_echo_n "checking whether compiler accepts -pipe... " >&6; }
+  temp_cflags="${CFLAGS}"
+  CFLAGS="${CFLAGS} -pipe"
+  if test "${ac_cv_cxx_have_pipe+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_cxx_have_pipe=yes
+else
+  ac_cv_cxx_have_pipe=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${ac_cv_cxx_have_pipe}" >&5
+$as_echo "${ac_cv_cxx_have_pipe}" >&6; }
+  CFLAGS=${temp_cflags}
+else
+  ac_cv_cxx_have_pipe="no"
+fi
+
+if test "${ac_cv_cxx_have_pipe}" != yes; then
+  PIPE=
+else
+  PIPE="-pipe"
 fi
 
 
