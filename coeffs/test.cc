@@ -18,17 +18,17 @@ using namespace std;
 
 bool Test(const coeffs r)
 {
-  number a = r->cfInit(666, r); 
+  number a = n_Init(666, r); 
   n_Test(a,r);
   
-  number b = r->cfAdd( a, a, r);
+  number b = n_Add(a, a, r);
   n_Test(b,r);
   
-  StringSetS("a: ");r->cfWrite( a, r );PrintS(StringAppend("\n"));
-  StringSetS("b: "); r->cfWrite( b, r );PrintS(StringAppend("\n"));
+  StringSetS("a: "); n_Write(a, r);PrintS(StringAppend("\n"));
+  StringSetS("b: "); n_Write(b, r);PrintS(StringAppend("\n"));
 
-  r->cfDelete( &a, r);
-  r->cfDelete( &b, r);
+  n_Delete(&a, r);
+  n_Delete(&b, r);
 
   return false;
 }

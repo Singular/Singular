@@ -38,36 +38,6 @@ typedef unsigned long NATNUMBER;
 typedef mpz_ptr int_number;
 #endif
 
-//
-// the access macros:
-
-#define n_Copy(n, r)          (r)->cfCopy(n,r)
-#define n_Delete(n, r)        (r)->cfDelete(n,r)
-#define n_Mult(n1, n2, r)     (r)->cfMult(n1, n2,r)
-#define n_Add(n1, n2, r)      (r)->cfAdd(n1, n2,r)
-#define n_IsZero(n, r)        (r)->cfIsZero(n,r)
-#define n_Equal(n1, n2, r)    (r)->cfEqual(n1, n2,r)
-#define n_Neg(n, r)           (r)->cfNeg(n,r)
-#define n_Sub(n1, n2, r)      (r)->cfSub(n1, n2,r)
-#define n_GetChar(r)          nInternalChar(r)
-#define n_Init(i, r)          (r)->cfInit(i,r)
-#define n_IsOne(n, r)         (r)->cfIsOne(n,r)
-#define n_IsMOne(n, r)        (r)->cfIsMOne(n,r)
-#define n_GreaterZero(n, r)   (r)->cfGreaterZero(n,r)
-#define n_Write(n, r)         (r)->cfWrite(n,r)
-#define n_Normalize(n, r)     (r)->cfNormalize(n,r)
-#define n_Gcd(a, b, r)        (r)->cfGcd(a,b,r)
-#define n_IntDiv(a, b, r)     (r)->cfIntDiv(a,b,r)
-#define n_Div(a, b, r)        (r)->cfDiv(a,b,r)
-#define n_Invers(a, r)        (r)->cfInvers(a,r)
-#define n_ExactDiv(a, b, r)   (r)->cfExactDiv(a,b,r)
-// #define n_Test(a,r)           (r)->cfDBTest(a,r,__FILE__,__LINE__)
-#define n_InpMult(a, b, r)    (r)->cfInpMult(a,b,r)
-#define n_Power(a, b, res, r) (r)->cfPower(a,b,res,r)
-#define n_Size(n,r)           (r)->cfSize(n,r)
-#define n_GetDenom(N,r)       (r)->cfGetDenom((N),r)
-#define n_GetNumerator(N,r)   (r)->cfGetNumerator((N),r)
-
 // and the routines w.r.t. currRing:
 // (should only be used in the context of currRing, i.e. in the interpreter)
 #define nCopy(n)          n_Copy(n, currRing->cf)
@@ -154,12 +124,14 @@ struct n_Procs_s
    int     (*cfSize)(number n, const coeffs r);
    /// convertion, 0 if impossible
    int     (*cfInt)(number &n, const coeffs r);
+
 #ifdef HAVE_RINGS
    int     (*cfDivComp)(number a,number b,const coeffs r);
    BOOLEAN (*cfIsUnit)(number a,const coeffs r);
    number  (*cfGetUnit)(number a,const coeffs r);
    number  (*cfExtGcd)(number a, number b, number *s, number *t,const coeffs r);
 #endif
+
    /// changes argument  inline: a:= -a
    number  (*cfNeg)(number a, const coeffs r);
    /// return 1/a
@@ -181,6 +153,7 @@ struct n_Procs_s
            (*cfIsOne)(number a, const coeffs r),
            (*cfIsMOne)(number a, const coeffs r),
            (*cfGreaterZero)(number a, const coeffs r);
+   
    void    (*cfPower)(number a, int i, number * result, const coeffs r);
    number  (*cfGetDenom)(number &n, const coeffs r);
    number  (*cfGetNumerator)(number &n, const coeffs r);
@@ -199,7 +172,7 @@ struct n_Procs_s
 
 #ifdef LDEBUG
    /// Test: is "a" a correct number?
-   BOOLEAN (*cfDBTest)(number a, const char *f,const int l,const coeffs r);
+   BOOLEAN (*cfDBTest)(number a, const char *f, const int l, const coeffs r);
 #endif
 
    number nNULL; /* the 0 as constant */
@@ -251,17 +224,83 @@ inline void nSetChar(coeffs r)
 void           nNew(number * a);
 #define n_New(n, r)           nNew(n)
 
-static inline BOOLEAN n_DBTest(number a, const char *filename, const int linenumber, const coeffs r)
+
+// the access methods:
+
+/// return a copy of a
+static inline number n_Copy(number n,    const coeffs r){ return (r)->cfCopy(n, r); }
+static inline void   n_Delete(number* p, const coeffs r){ return (r)->cfDelete(p, r); }
+
+static inline BOOLEAN n_AreEqual(number a, number b, const coeffs r){ return (r)->cfEqual(a, b, r); }
+static inline BOOLEAN n_IsZero(number n, const coeffs r){ return (r)->cfIsZero(n,r); }
+static inline BOOLEAN n_IsOne(number n,  const coeffs r){ return (r)->cfIsOne(n,r); }
+static inline BOOLEAN n_IsMOne(number n, const coeffs r){ return (r)->cfIsMOne(n,r); }
+static inline BOOLEAN n_IsGreaterZero(number n, const coeffs r){ return (r)->cfGreaterZero(n,r); }
+// cfGreater?
+
+/// init with an integer
+static inline number n_Init(int i,       const coeffs r){ return (r)->cfInit(i,r); }
+
+/// changes argument  inline: a:= -a
+static inline number n_Neg(number n,     const coeffs r){ return (r)->cfNeg(n,r); }
+
+/// return 1/a
+static inline number n_Invers(number a,  const coeffs r){ return (r)->cfInvers(a,r); }
+
+/// how complicated, (0) => 0, otherwise positive
+static inline int    n_Size(number n,    const coeffs r){ return (r)->cfSize(n,r); }
+
+/// normalize the number. i.e. go to some canonnical representation (inplace)
+static inline void   n_Normalize(number& n, const coeffs r){ return (r)->cfNormalize(n,r); }
+
+/// Normalize and Write
+static inline void   n_Write(number& n,  const coeffs r){ return (r)->cfWrite(n,r); }
+
+/// Normalize and get denomerator
+static inline number n_GetDenom(number& n, const coeffs r){ return (r)->cfGetDenom(n, r); }
+
+/// Normalize and get numerator
+static inline number n_GetNumerator(number& n, const coeffs r){ return (r)->cfGetNumerator(n, r); }
+
+static inline void   n_Power(number a, int b, number *res, const coeffs r){ return (r)->cfPower(a,b,res,r); }
+
+
+static inline number n_Mult(number a, number b, const coeffs r){ return (r)->cfMult(a, b, r); }
+/// Inplace multiplication: a := a * b
+static inline void n_InpMult(number &a, number b, const coeffs r){ return (r)->cfInpMult(a,b,r); }
+
+static inline number n_Sub(number a, number b, const coeffs r){ return (r)->cfSub(a, b, r); }
+static inline number n_Add(number a, number b, const coeffs r){ return (r)->cfAdd(a, b, r); }
+
+static inline number n_Div(number a, number b, const coeffs r){ return (r)->cfDiv(a,b,r); }
+static inline number n_IntDiv(number a, number b, const coeffs r){ return (r)->cfIntDiv(a,b,r); }
+static inline number n_ExactDiv(number a, number b, const coeffs r){ return (r)->cfExactDiv(a,b,r); }
+
+static inline number n_Gcd(number a, number b, const coeffs r){ return (r)->cfGcd(a,b,r); }
+
+/// Tests whether n is a correct number.
+static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 {
 #ifdef LDEBUG
-  return (r)->cfDBTest(a, filename, linenumber, r);
-//  return (r)->cfDBTest(a,r,filename,linenumber); // testing error message
+  return (r)->cfDBTest(n, filename, linenumber, r);
 #else
   return TRUE;
 #endif
 }
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
+
+// Missing wrappers for:
+// cfIntMod, cfPar, cfParDeg, cfInt, cfRePart, cfImPart, cfRead, cfLcm, cfSetMap, cfName, cfInit_bigint
+// HAVE_RINGS: cfDivComp, cfIsUnit, cfGetUnit, cfExtGcd... cfDivBy
+
+
+// Deprecated:
+static inline BOOLEAN n_GreaterZero(number n, const coeffs r){ return n_IsGreaterZero(n,r); }
+static inline BOOLEAN n_Equal(number a, number b, const coeffs r){ return n_AreEqual(a, b, r); }
+
+// Deprecated:
+static inline int n_GetChar(const coeffs r){ return nInternalChar(r); }
 
 #endif
 
