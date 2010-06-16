@@ -1099,17 +1099,19 @@ example
    ideal I = jacob(x5+y6+z7+xyz);
    ideal J1 = modStd(I,1,1);
    J1;
-   ideal J2 = modStd(I,3);
-   J2;
-   size(reduce(J1,J2));
-   size(reduce(J2,J1));
+   // requires MP
+   //ideal J2 = modStd(I,3);
+   //J2;
+   //size(reduce(J1,J2));
+   //size(reduce(J2,J1));
 
    ring rr = 0,x(1..4),lp;
    ideal I = cyclic(4);
-   ideal J1 = modStd(I,2);
-   ideal J2 = modStd(I,2,1);
-   size(reduce(J1,J2));
-   size(reduce(J2,J1));
+   ideal J1 = modStd(I,1);
+   // requires MP
+   //ideal J2 = modStd(I,2,1);
+   //size(reduce(J1,J2));
+   //size(reduce(J2,J1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
