@@ -4,7 +4,6 @@ tst_init();
 LIB"modstd.lib";
 
 example pTestSB;
-example primList;
 example modStd;
 example modS;
 example modHenselStd;
