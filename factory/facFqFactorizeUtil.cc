@@ -18,16 +18,6 @@
 #include "cf_map.h"
 
 static inline 
-void decompressAppend (CFList& factors1, const CFList& factors2, const CFMap& N) 
-{
-  for (CFListIterator i= factors1; i.hasItem(); i++) 
-    i.getItem()= N (i.getItem());
-  for (CFListIterator i= factors2; i.hasItem(); i++)
-    factors1.append (N (i.getItem()));
-  return; 
-}
-
-static inline 
 void appendSwap (CFList& factors1, const CFList& factors2, const int
                   swapLevel1, const int swapLevel2, const Variable& x) 
 {
@@ -52,7 +42,7 @@ void appendSwap (CFList& factors1, const CFList& factors2, const int
   return;
 }
 
-static inline 
+
 void swap (CFList& factors, const int swapLevel1, const int swapLevel2, const
            Variable& x) 
 {
@@ -75,7 +65,6 @@ void swap (CFList& factors, const int swapLevel1, const int swapLevel2, const
   return;
 }
 
-static inline 
 void appendSwapDecompress (CFList& factors1, const CFList& factors2, 
                              const CFMap& N, const int swapLevel, const
                              Variable& x) 
@@ -94,7 +83,6 @@ void appendSwapDecompress (CFList& factors1, const CFList& factors2,
   return;
 }
 
-static inline 
 void appendSwapDecompress (CFList& factors1, const CFList& factors2, 
                              const CFMap& N, const int swapLevel1, 
                              const int swapLevel2, const Variable& x) 
@@ -126,7 +114,6 @@ void appendSwapDecompress (CFList& factors1, const CFList& factors2,
   return;
 }
 
-static inline
 int* liftingBounds (const CanonicalForm& A, const int& bivarLiftBound) 
 {
   int j= A.level() - 1;
@@ -140,9 +127,7 @@ int* liftingBounds (const CanonicalForm& A, const int& bivarLiftBound)
   return liftBounds;
 }
 
-static inline
-CanonicalForm
-shift2Zero (const CanonicalForm& F, CFList& Feval, const CFList& evaluation)
+CanonicalForm shift2Zero (const CanonicalForm& F, CFList& Feval, const CFList& evaluation)
 {
   CanonicalForm A= F;
   int k= A.level();
@@ -159,7 +144,6 @@ shift2Zero (const CanonicalForm& F, CFList& Feval, const CFList& evaluation)
   return A;
 }
 
-static inline
 CanonicalForm reverseShift (const CanonicalForm& F, const CFList& evaluation)
 {
   int l= evaluation.length() + 1;

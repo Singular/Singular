@@ -22,13 +22,21 @@
 
 /// append @a factors2 to @a factors1 and decompress
 ///
+static inline 
 void decompressAppend (CFList& factors1,       ///< [in,out] a list of polys,
                                                ///< returns @a factors2 appended
                                                ///< to it and everything is 
                                                ///< decompressed
                        const CFList& factors2, ///< [in] a list of polys
                        const CFMap& N          ///< [in] a map
-                      );
+                      )
+{
+  for (CFListIterator i= factors1; i.hasItem(); i++) 
+    i.getItem()= N (i.getItem());
+  for (CFListIterator i= factors2; i.hasItem(); i++)
+    factors1.append (N (i.getItem()));
+}
+
 
 /// swap elements in @a factors2 and append them to @a factors1
 /// 

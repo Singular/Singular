@@ -19,7 +19,7 @@
 #include "ftmpl_functions.h"
 #include "gfops.h"
 
-inline
+
 DegreePattern::DegreePattern (const CFList& l) 
 { 
   m_data = NULL;
@@ -59,17 +59,7 @@ DegreePattern::DegreePattern (const CFList& l)
 }
 
 
-inline int
-DegreePattern::find (const int x) const
-{
-  if (getLength() == 0) return 0;
-  for (int i= 0; i < getLength(); i++) 
-    if ((*this)[i] == x) return i + 1;
-  return 0;
-}
-
-inline void
-DegreePattern::intersect (const DegreePattern& degPat)
+void DegreePattern::intersect (const DegreePattern& degPat)
 {
   if (degPat.getLength() < getLength()) 
   {
@@ -106,8 +96,7 @@ DegreePattern::intersect (const DegreePattern& degPat)
   delete[] buf;
 }
    
-inline void
-DegreePattern::refine ()
+void DegreePattern::refine ()
 {
   if (getLength() <= 1)
     return;

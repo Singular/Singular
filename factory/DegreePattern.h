@@ -158,17 +158,23 @@ public:
   ///
   /// @return @a find returns the index + 1 of @a x, if @a x is an element of 
   ///         the degree pattern, 0 otherwise
-  inline int find (const int x ///< [in] some int
-           ) const;
+  int find (const int x ///< [in] some int
+           ) const
+  {
+    if (getLength() == 0) return 0;
+    for (int i= 0; i < getLength(); i++)
+      if ((*this)[i] == x) return i + 1;
+    return 0;
+  };
   
   /// intersect two degree patterns 
-  inline void intersect (const DegreePattern& degPat ///< [in] some degree pattern
+  void intersect (const DegreePattern& degPat ///< [in] some degree pattern
                  );
   /// Refine a degree pattern. Assumes that (*this)[0]:= @a d is the degree
   /// of the poly to be factored. Now for every other entry @a a there should be
   /// some entry @a b such that @a a+b= d. Elements which do not satisfy this 
   /// relation are removed.
-  inline void refine ();
+  void refine ();
 };
 
 #endif
