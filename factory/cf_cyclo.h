@@ -20,8 +20,6 @@
 
 #include <config.h>
 
-#include "cf_cyclo.cc"
-
 int* integerFactorizer (const long integer, int& length, bool& fail);
 CanonicalForm cyclotomicPoly (int n, bool& fail);
 bool isPrimitive (const Variable& alpha, bool& fail);

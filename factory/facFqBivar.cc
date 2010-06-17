@@ -36,6 +36,7 @@
 
 
 #ifdef HAVE_NTL
+#include "NTLconvert.h"
 
 TIMING_DEFINE_PRINT(fac_uni_factorizer);
 TIMING_DEFINE_PRINT(fac_hensel_lift);

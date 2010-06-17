@@ -18,7 +18,6 @@
 #include <config.h>
 
 #include "canonicalform.h"
-#include "facFqFactorizeUtil.cc"
 
 /// append @a factors2 to @a factors1 and decompress
 ///
