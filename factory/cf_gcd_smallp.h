@@ -61,4 +61,7 @@ CanonicalForm GCD_GF (const CanonicalForm& A, const CanonicalForm& B)
   bool top_level= true;
   return GCD_GF (A, B, list, top_level);
 }
+
+CanonicalForm 
+randomIrredpoly (int i, const Variable & x) ;
 #endif

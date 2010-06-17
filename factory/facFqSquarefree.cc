@@ -20,6 +20,7 @@
 #include "cf_iter.h"
 #include "cf_map.h"
 #include "cf_util.h"
+#include "cf_factory.h"
 #include "facFqSquarefree.h"
 
 static inline 

@@ -18,6 +18,10 @@
 #include "cf_map_ext.h"
 #include "ftmpl_functions.h"
 #include "ExtensionInfo.h"
+#include "cf_algorithm.h"
+#include "cf_factory.h"
+#include "imm.h"
+#include "cf_iter.h"
 #include "facFqBivarUtil.h"
 
 

@@ -780,7 +780,6 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
 /// F is assumed to be an univariate polynomial in x,
 /// computes a random monic irreducible univariate polynomial of random 
 /// degree < i in x which does not divide F
-static inline
 CanonicalForm 
 randomIrredpoly (int i, const Variable & x) 
 {

@@ -27,6 +27,7 @@
 #include "cf_random.h"
 #include "facHensel.h"
 #include "cf_gcd_smallp.h"
+#include "cf_map_ext.h"
 #include "DegreePattern.cc"
 #include "algext.h"
 
