@@ -30,11 +30,12 @@
 #include "ftmpl_functions.h"
 #include "cf_random.h"
 
-// inline helper functions:
+// iinline helper functions:
 #include "cf_map_ext.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZ_pEX.h>
+#include <NTLconvert.h>
 #endif
 
 #ifdef HAVE_NTL
@@ -44,6 +45,7 @@ TIMING_DEFINE_PRINT(newton_interpolation);
 
 /// compressing two polynomials F and G, M is used for compressing, 
 /// N to reverse the compression
+static inline
 int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                 CFMap & N, bool& top_level) 
 { 
@@ -334,7 +336,7 @@ void choose_extension (const int& d, const int& num_vars, Variable& beta)
 /// l and top_level are only used internally, output is monic
 /// based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
-CanonicalForm 
+static inline CanonicalForm 
 GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G, 
                   Variable & alpha, CFList& l, bool& top_level) 
 { 
@@ -435,7 +437,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
         im_prim_elem= mapPrimElem (prim_elem, alpha, V_buf);
 
       DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (alpha));
-      DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (V_buf2));
+      DEBOUTLN (cerr, "getMipo (V_buf2)= " << getMipo (V_buf2));
       inextension= true;
       for (CFListIterator i= l; i.hasItem(); i++) 
         i.getItem()= mapUp (i.getItem(), alpha, V_buf, prim_elem, 
@@ -534,6 +536,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
 /// compute a random element a of GF, s.t. F(a) \f$ \neq 0 \f$ , F is a 
 /// univariate polynomial, returns fail if there are no field elements left
 /// which have not been used before
+static inline
 CanonicalForm
 GFRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
 {
@@ -573,6 +576,7 @@ GFRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
 /// Usually this algorithm will be faster than GCD_Fp_extension since GF has
 /// faster field arithmetics, however it might fail if the input is large since
 /// the size of the base field is bounded by 2^16, output is monic
+inline
 CanonicalForm 
 GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l, 
         bool& top_level) 
@@ -662,7 +666,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
       int num_vars= tmin (getNumVars(A), getNumVars(B));
       num_vars--;
       p= getCharacteristic();
-      expon= floor ((log ((double) ipower (d + 1, num_vars))/log ((double) p)));
+      expon= (int) floor ((log ((double) ipower (d + 1, num_vars))/log ((double) p)));
       if (expon < 2)
         expon= 2;
       kk= getGFDegree(); 
@@ -670,7 +674,7 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
         setCharacteristic (p, kk*(int)expon, 'b');
       else 
       {
-        expon= floor((log ((double)((1<<16) - 1)))/(log((double)p)*kk));
+        expon= (int) floor((log ((double)((1<<16) - 1)))/(log((double)p)*kk));
         ASSERT (expon >= 2, "not enough points in GCD_GF");
         setCharacteristic (p, (int)(kk*expon), 'b');
       }
@@ -776,57 +780,21 @@ GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
 /// F is assumed to be an univariate polynomial in x,
 /// computes a random monic irreducible univariate polynomial of random 
 /// degree < i in x which does not divide F
+static inline
 CanonicalForm 
-randomIrredpoly (int i, const Variable & x, 
-                 CFList & list) 
+randomIrredpoly (int i, const Variable & x) 
 {
-  int random;
   int p= getCharacteristic();
   ZZ NTLp= to_ZZ (p);
   ZZ_p::init (NTLp);
   ZZ_pX NTLirredpoly; 
   CanonicalForm CFirredpoly;
-  int buf= ceil((log((double) i) / log((double) p)));
-  buf= buf + 1;
-  int bound= 0;
-  //lower bound on the number of monic irreducibles of degree less than buf
-  for (int j= 2; j < buf; j++) 
-    bound += ((ipower (p, j) - 2*ipower(p, j/2)) / j);
-  if (list.length() > bound) 
-  {
-    if (buf > 1)
-      buf--;
-    buf *= 2;
-    buf++;
-  }
-  for (int j=  ((buf - 1)/2) + 1; j < buf; j++) 
-    bound += ((ipower (p, j) - 2*ipower(p, j/2)) / j);
-  do 
-  {
-    if (list.length() <= bound) 
-    {
-      random= factoryrandom ((int) buf);  
-      if (random <= 1)
-        random= 2;
-    }
-    else 
-    {
-      if (buf > 1) 
-        buf--;
-      buf *= 2;
-      buf++;
-      for (int j= ((int) (buf - 1)/2) + 1; j < buf; j++) 
-        bound += ((ipower (p, j) - 2*ipower(p, j/2)) / j);
-      random= factoryrandom ((int) buf);
-      if (random <= 1)
-        random= 2;
-    } 
-    BuildIrred (NTLirredpoly, random);
-    CFirredpoly= convertNTLZZpX2CF (NTLirredpoly, x);
-  } while (find (list, CFirredpoly));
+  BuildIrred (NTLirredpoly, i + 1);
+  CFirredpoly= convertNTLZZpX2CF (NTLirredpoly, x);
   return CFirredpoly;
 } 
 
+static inline
 CanonicalForm
 FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
 {
@@ -860,6 +828,7 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   return random;
 }
 
+static inline
 CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G, 
                            bool& top_level, CFList& l) 
 {
@@ -976,7 +945,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       CanonicalForm mipo;
       int deg= 3;
       do {
-        mipo= randomIrredpoly (deg, x, list); 
+        mipo= randomIrredpoly (deg, x); 
         alpha= rootOf (mipo);
         inextension= true;
         fail= false;
@@ -1068,7 +1037,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       G_m= 0;
       d= d0;
     }
-   
+     
     TIMING_START (newton_interpolation);
     H= newtonInterp (random_element, G_random_element, newtonPoly, G_m, x);
     TIMING_END_AND_PRINT (newton_interpolation, 
