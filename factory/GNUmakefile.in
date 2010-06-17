@@ -132,7 +132,7 @@ basefactorysrc := \
 		cf_binom.cc \
 		cf_char.cc \
 		cf_chinese.cc \
-		cf_cyclo.cc\
+                cf_cyclo.cc \
 		cf_eval.cc \
 		cf_factor.cc \
 		cf_factory.cc \
@@ -156,6 +156,8 @@ basefactorysrc := \
 		cf_switches.cc \
 		cf_util.cc \
 		debug.cc \
+                DegreePattern.cc \
+                ExtensionInfo.cc \
 		fac_berlekamp.cc \
 		fac_cantzass.cc \
 		fac_distrib.cc \
@@ -166,6 +168,12 @@ basefactorysrc := \
 		fac_sqrfree.cc \
 		fac_univar.cc \
 		fac_util.cc \
+                facFqBivar.cc \
+                facFqBivarUtil.cc \
+                facFqFactorize.cc \
+                facFqFactorizeUtil.cc \
+                facFqSquarefree.cc \
+                facHensel.cc \
 		fieldGCD.cc \
 		ffops.cc \
 		ffreval.cc \
@@ -201,8 +209,7 @@ doxysrc :=	\
 		parseutil.cc
 
 # factory object files and dependencies
-factoryobj1 :=  $(factorysrc:%.cc=%.o)
-factoryobj :=   $(factoryobj1:%.y=%.o)
+factoryobj :=   $(factorysrc:%.cc=%.o) $(factorysrc:%.y=%.o)
 factorygobj :=  $(factorysrc:%.cc=%.og)
 factorypobj :=  $(factorysrc:%.cc=%.op)
 factorydep :=	$(factorysrc:%.cc=%.d)
@@ -214,17 +221,15 @@ basefactoryincl := \
 		canonicalform.h \
 		cf_algorithm.h \
 		cf_binom.h \
-		cf_cyclo.h\
 		cf_defs.h \
 		cf_eval.h \
 		cf_factory.h \
-                cf_gcd_smallp.h \
 		cf_generator.h \
 		cf_globals.h \
+                cf_gcd_smallp.h \
 		cf_irred.h \
 		cf_iter.h \
 		cf_map.h \
-                cf_map_ext.h \
 		cf_primes.h \
 		cf_primetab.h \
 		cf_random.h \
@@ -232,6 +237,8 @@ basefactoryincl := \
 		cf_switches.h \
 		cf_util.h \
 		debug.h \
+                DegreePattern.h \
+                ExtensionInfo.h \
 		fac_berlekamp.h \
 		fac_cantzass.h \
 		fac_distrib.h \
@@ -240,6 +247,12 @@ basefactoryincl := \
 		fac_sqrfree.h \
 		fac_univar.h \
 		fac_util.h \
+                facFqBivar.h \
+                facFqBivarUtil.h \
+                facFqFactorize.h \
+                facFqFactorizeUtil.h \
+                facFqSquarefree.h \
+                facHensel.h \
 		fieldGCD.h \
 		ffops.h \
 		ffreval.h \
@@ -469,7 +482,7 @@ distfiles :=	\
 #
 all:		$(alltargets)
 
-cf:		factoryconf.h factory.h $(libfactory) libsingcf_g.a
+cf:		factoryconf.h factory.h $(libfactory) libsingcf_g.a libsingcf_p.a
 
 mem:		libcfmem.a
 
@@ -611,9 +624,6 @@ installtest:	test_install
 #
 install:	$(installtargets)
 
-install_all:	install libsingcf_p.a
-		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a
-
 install-nolns: install
 
 installcf:	cf
@@ -622,6 +632,7 @@ installcf:	cf
 		$(MKINSTALLDIRS) $(templatedir)
 		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
 		-$(INSTALL_DATA) libsingcf_g.a $(libdir)/libsingcf_g.a
+		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a
 		$(INSTALL_DATA) factory.h $(includedir)/factory.h
 		$(INSTALL_DATA) cf_gmp.h $(includedir)/cf_gmp.h
 		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h
