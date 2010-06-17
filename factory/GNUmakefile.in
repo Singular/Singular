@@ -209,7 +209,8 @@ doxysrc :=	\
 		parseutil.cc
 
 # factory object files and dependencies
-factoryobj :=   $(factorysrc:%.cc=%.o) $(factorysrc:%.y=%.o)
+factoryobj1 :=  $(factorysrc:%.cc=%.o)
+factoryobj :=   $(factoryobj1:%.y=%.o)
 factorygobj :=  $(factorysrc:%.cc=%.og)
 factorypobj :=  $(factorysrc:%.cc=%.op)
 factorydep :=	$(factorysrc:%.cc=%.d)
@@ -482,7 +483,7 @@ distfiles :=	\
 #
 all:		$(alltargets)
 
-cf:		factoryconf.h factory.h $(libfactory) libsingcf_g.a libsingcf_p.a
+cf:		factoryconf.h factory.h $(libfactory) libsingcf_g.a
 
 mem:		libcfmem.a
 
@@ -623,6 +624,9 @@ installtest:	test_install
 # - install targets.
 #
 install:	$(installtargets)
+
+install_all:    install libsingcf_p.a 
+		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a 
 
 install-nolns: install
 
