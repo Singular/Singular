@@ -300,7 +300,6 @@ factorRecombination (
 ///
 /// @return @a chooseExtension returns an extension specified by @a beta of
 ///         appropiate size
-inline
 Variable chooseExtension (
                       const CanonicalForm & A, ///< [in] some bivariate poly
                       const Variable & beta    ///< [in] some algebraic
