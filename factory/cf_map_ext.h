@@ -18,8 +18,6 @@
 **/
 //*****************************************************************************
 
-#include "cf_map_ext.cc"
-
 CanonicalForm GFMapUp (const CanonicalForm & F, int k);
 
 CanonicalForm GFMapDown (const CanonicalForm & F, int k);

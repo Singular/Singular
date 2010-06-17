@@ -53,7 +53,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l,
         bool& top_level);
 
 /// GCD of A and B over GF
-CanonicalForm GCD_GF (const CanonicalForm& A, const CanonicalForm& B) 
+static inline CanonicalForm GCD_GF (const CanonicalForm& A, const CanonicalForm& B) 
 {
   ASSERT (CFFactory::gettype() == GaloisFieldDomain, 
           "GF as base field expected");

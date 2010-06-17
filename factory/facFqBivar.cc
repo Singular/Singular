@@ -32,8 +32,6 @@
 #include "facHensel.h"
 #include "cf_map.h"
 #include "cf_gcd_smallp.h"
-#include "DegreePattern.cc"
-#include "facFqBivarUtil.cc"
 #include "facFqBivar.h"
 
 

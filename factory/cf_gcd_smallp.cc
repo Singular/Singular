@@ -38,6 +38,8 @@
 #include <NTLconvert.h>
 #endif
 
+#include "cf_gcd_smallp.h"
+
 #ifdef HAVE_NTL
 
 TIMING_DEFINE_PRINT(gcd_recursion);
@@ -336,7 +338,7 @@ void choose_extension (const int& d, const int& num_vars, Variable& beta)
 /// l and top_level are only used internally, output is monic
 /// based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
-static inline CanonicalForm 
+CanonicalForm 
 GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G, 
                   Variable & alpha, CFList& l, bool& top_level) 
 { 
@@ -576,10 +578,8 @@ GFRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
 /// Usually this algorithm will be faster than GCD_Fp_extension since GF has
 /// faster field arithmetics, however it might fail if the input is large since
 /// the size of the base field is bounded by 2^16, output is monic
-inline
-CanonicalForm 
-GCD_GF (const CanonicalForm& F, const CanonicalForm& G, CFList& l, 
-        bool& top_level) 
+CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
+        CFList& l, bool& top_level) 
 { 
   CanonicalForm A= F;
   CanonicalForm B= G;
@@ -827,7 +827,6 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
   return random;
 }
 
-static inline
 CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G, 
                            bool& top_level, CFList& l) 
 {
