@@ -280,6 +280,28 @@ static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
 #endif 
 /* end of debugging option (ifndef NDEBUG) */
 
+
+
+#ifdef _DEBUG
+#      define FORCEINLINE inline
+#else
+#ifdef NDEBUG
+#if   defined(_MSC_VER)
+#      define FORCEINLINE __forceinline
+#elif defined(__GNUC__) && __GNUC__ > 3
+#      define FORCEINLINE inline __attribute__ ((always_inline))
+#else
+#      define FORCEINLINE inline
+#endif
+#else
+#      define FORCEINLINE inline
+#endif
+/* NDEBUG */
+#endif
+/* _DEBUG */
+
+
+
 #endif 
 /* MISC_AUXILIARY_H */
 
