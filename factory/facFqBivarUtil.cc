@@ -20,6 +20,7 @@
 #include "ExtensionInfo.h"
 #include "cf_algorithm.h"
 #include "cf_factory.h"
+#include "cf_util.h"
 #include "imm.h"
 #include "cf_iter.h"
 #include "facFqBivarUtil.h"
