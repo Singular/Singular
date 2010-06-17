@@ -18,6 +18,7 @@
 #include <config.h>
 
 #include "canonicalform.h"
+#include "cf_map.h"
 
 /// append @a factors2 to @a factors1 and decompress
 ///
