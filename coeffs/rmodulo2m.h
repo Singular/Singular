@@ -40,7 +40,7 @@ BOOLEAN nr2mEqual       (number a, number b, const coeffs r);
 number  nr2mLcm         (number a, number b, const coeffs r);
 number  nr2mGcd         (number a, number b, const coeffs r);
 number  nr2mExtGcd      (number a, number b, number *s, number *t, const coeffs r);
-nMapFunc nr2mSetMap     (const ring src, const ring dst);
+nMapFunc nr2mSetMap     (const coeffs src, const coeffs dst);
 void    nr2mWrite       (number &a, const coeffs r);
 const char *  nr2mRead  (const char *s, number *a, const coeffs r);
 char *  nr2mName        (number n, const coeffs r);
