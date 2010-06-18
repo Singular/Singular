@@ -96,10 +96,10 @@ number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 number nd_Copy(number a, const coeffs r) { return n_Copy(a, r); }
 
 #ifdef HAVE_RINGS
-BOOLEAN ndDivBy(number a, number b) { return TRUE; } // assume a,b !=0
-int ndDivComp(number a, number b) { return 2; }
-BOOLEAN ndIsUnit(number a) { return !nIsZero(a); }
-number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
+BOOLEAN ndDivBy(number a, number b, const coeffs r) { return TRUE; } // assume a,b !=0
+int ndDivComp(number a, number b, const coeffs r) { return 2; }
+BOOLEAN ndIsUnit(number a, const coeffs r) { return !n_IsZero(a,r); }
+number  ndExtGcd (number a, number b, number *s, number *t, const coeffs r) { return n_Init(1,r); }
 #endif
 
 static n_coeffType nLastCoeffs=n_Z2m;
@@ -192,7 +192,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
     if (n->cfIntDiv==NULL) n->cfIntDiv=n->cfDiv;
 #ifdef HAVE_RINGS
-   if (n->cfGetUnit==(nMapFunc)NULL) n->cfGetUnit=n->cfCopy;
+   if (n->cfGetUnit==NULL) n->cfGetUnit=n->cfCopy;
 #endif
 #ifndef NDEBUG
    assume(n->nCoeffIsEqual!=NULL);

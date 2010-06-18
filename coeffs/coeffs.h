@@ -48,7 +48,7 @@ typedef mpz_ptr int_number;
 #define nDelete(n)        n_Delete(n, currRing->cf)
 #define nMult(n1, n2)     n_Mult(n1, n2, currRing->cf)
 #define nAdd(n1, n2)      n_Add(n1, n2, currRing->cf)
-#define nIsZero(n)        n_IsZero(m, currRing->cf)
+#define nIsZero(n)        n_IsZero(n, currRing->cf)
 #define nEqual(n1, n2)    n_Equal(n1, n2, currRing->cf)
 #define nNeg(n)           n_Neg(n, currRing->cf)
 #define nSub(n1, n2)      n_Sub(n1, n2, currRing->cf)
