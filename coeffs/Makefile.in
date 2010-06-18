@@ -50,7 +50,7 @@ DEFS		= -DNDEBUG -DOM_NDEBUG @DEFS@
 # normal C++ source files
 CXXSOURCES= gnumpc.cc gnumpfl.cc longrat.cc longrat0.cc ffields.cc \
             modulop.cc mpr_complex.cc \
-            numbers.cc rmodulo2m.cc rmodulon.cc shortfl.cc
+            numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc
 
 # normal C source files
 CSOURCES=
@@ -59,7 +59,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES}
 
 HEADERS= gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h \
          mpr_complex.h mpr_global.h numbers.h \
-         rmodulo2m.h rmodulon.h shortfl.h
+         rintegers.h rmodulo2m.h rmodulon.h shortfl.h
 
 DISTFILES=${SOURCES} ${HEADERS}
 
