@@ -541,12 +541,12 @@ static number npMapLongR(number from, const coeffs src, const coeffs dst_r)
 /*2
 * convert from a GMP integer
 */
-number npMapGMP(number from)
+number npMapGMP(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
   mpz_init(erg);
 
-  mpz_mod_ui(erg, (int_number) from, npPrimeM);
+  mpz_mod_ui(erg, (int_number) from, dst->npPrimeM);
   number r = (number) mpz_get_si(erg);
 
   mpz_clear(erg);
@@ -557,9 +557,9 @@ number npMapGMP(number from)
 /*2
 * convert from an machine long
 */
-number npMapMachineInt(number from)
+number npMapMachineInt(number from, const coeffs src,const coeffs dst)
 {
-  long i = (long) (((unsigned long) from) % npPrimeM);
+  long i = (long) (((unsigned long) from) % dst->npPrimeM);
   return (number) i;
 }
 #endif
