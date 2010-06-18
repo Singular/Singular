@@ -7,17 +7,16 @@
 */
 
 #include <string.h>
-#include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/longrat.h>
-#include <kernel/mpr_complex.h>
-#include <kernel/ring.h>
-#include <kernel/rintegers.h>
-#include <kernel/si_gmp.h>
+#include <auxiliary.h>
+#include <mylimits.h>
+#include "coeffs.h"
+#include <reporter.h>
+#include <omalloc.h>
+#include "numbers.h"
+#include "longrat.h"
+#include "mpr_complex.h"
+#include "rintegers.h"
+#include <si_gmp.h>
 
 #ifdef HAVE_RINGS
 
@@ -37,7 +36,7 @@ number nrzMult (number a, number b)
 /*
  * Give the smallest non unit k, such that a * x = k = b * y has a solution
  */
-number nrzLcm (number a,number b,ring r)
+number nrzLcm (number a,number b,const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -49,7 +48,7 @@ number nrzLcm (number a,number b,ring r)
  * Give the largest non unit k, such that a = x * k, b = y * k has
  * a solution.
  */
-number nrzGcd (number a,number b,ring r)
+number nrzGcd (number a,number b,const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -86,14 +85,14 @@ void nrzPower (number a, int i, number * result)
 /*
  * create a number from int
  */
-number nrzInit (int i, const ring r)
+number nrzInit (int i, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, i);
   return (number) erg;
 }
 
-void nrzDelete(number *a, const ring r)
+void nrzDelete(number *a, const coeffs r)
 {
   if (*a == NULL) return;
   mpz_clear((int_number) *a);
@@ -101,16 +100,16 @@ void nrzDelete(number *a, const ring r)
   *a = NULL;
 }
 
-number nrzCopy(number a)
+number nrzCopy(number a, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, (int_number) a);
   return (number) erg;
 }
 
-number cfrzCopy(number a, const ring r)
+number nrzCopyMap(number a, const coeffs src, const coeffs dst)
 {
-  return nrzCopy(a);
+  return nrzCopy(a,dst);
 }
 
 int nrzSize(number a)
@@ -122,7 +121,7 @@ int nrzSize(number a)
 /*
  * convert a number to int
  */
-int nrzInt(number &n, const ring r)
+int nrzInt(number &n, const coeffs r)
 {
   return (int) mpz_get_si( (int_number)n);
 }
@@ -143,9 +142,9 @@ number nrzSub (number a, number b)
   return (number) erg;
 }
 
-number  nrzGetUnit (number a)
+number  nrzGetUnit (number a, const coeffs r)
 {
-  return nrzInit(1, currRing);
+  return nrzInit(1, r);
 }
 
 BOOLEAN nrzIsUnit (number a)
@@ -252,21 +251,21 @@ number nrzNeg (number c)
   return c;
 }
 
-number nrzMapMachineInt(number from)
+number nrzMapMachineInt(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_ui(erg, (NATNUMBER) from);
   return (number) erg;
 }
 
-number nrzMapZp(number from)
+number nrzMapZp(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, (long) from);
   return (number) erg;
 }
 
-number nrzMapQ(number from)
+number nrzMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -274,22 +273,22 @@ number nrzMapQ(number from)
   return (number) erg;
 }
 
-nMapFunc nrzSetMap(const ring src, const ring dst)
+nMapFunc nrzSetMap(const coeffs src, const coeffs dst)
 {
   /* dst = currRing */
-  if (rField_is_Ring_Z(src) || rField_is_Ring_ModN(src) || rField_is_Ring_PtoM(src))
+  if (nField_is_Ring_Z(src) || nField_is_Ring_ModN(src) || nField_is_Ring_PtoM(src))
   {
-    return nrzCopy;
+    return nrzCopyMap;
   }
-  if (rField_is_Ring_2toM(src))
+  if (nField_is_Ring_2toM(src))
   {
     return nrzMapMachineInt;
   }
-  if (rField_is_Zp(src))
+  if (nField_is_Zp(src))
   {
     return nrzMapZp;
   }
-  if (rField_is_Q(src))
+  if (nField_is_Q(src))
   {
     return nrzMapQ;
   }
@@ -301,11 +300,11 @@ nMapFunc nrzSetMap(const ring src, const ring dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
-void nrzSetExp(int m, ring r)
+void nrzSetExp(int m, coeffs r)
 {
 }
 
-void nrzInitExp(int m, ring r)
+void nrzInitExp(int m, coeffs r)
 {
 }
 
@@ -316,7 +315,7 @@ void nrzInitExp(int m, ring r)
 //}
 #endif
 
-void nrzWrite (number &a, const ring r)
+void nrzWrite (number &a, const coeffs r)
 {
   char *s,*z;
   if (a==NULL)
