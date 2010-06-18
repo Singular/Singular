@@ -26,44 +26,44 @@ int_number nrnMinusOne = NULL;
 unsigned long nrnExponent = 0;
 
 /* for initializing function pointers */
-void nrnCoeffInit (n_Procs_s *n, int c, const coeffs r)
+void nrnInitChar (coeffs r, void*)
 {
      nrnInitExp(c, r);
-     n->cfInit  = nrnInit;
-     n->cfDelete= nrnDelete;
-     n->cfCopy = nrnCopy;
-     n->nSize  = nrnSize;
-     n->n_Int  = nrnInt;
-     n->nAdd   = nrnAdd;
-     n->nSub   = nrnSub;
-     n->nMult  = nrnMult;
-     n->nDiv   = nrnDiv;
-     n->nIntDiv= nrnIntDiv;
-     n->nIntMod= nrnMod;
-     n->nExactDiv= nrnDiv;
-     n->nNeg   = nrnNeg;
-     n->nInvers= nrnInvers;
-     n->nDivBy = nrnDivBy;
-     n->nDivComp = nrnDivComp;
-     n->nGreater = nrnGreater;
-     n->nEqual = nrnEqual;
-     n->nIsZero = nrnIsZero;
-     n->nIsOne = nrnIsOne;
-     n->nIsMOne = nrnIsMOne;
+     n->cfInit       = nrnInit;
+     n->cfDelete     = nrnDelete;
+     n->cfCopy       = nrnCopy;
+     n->nSize        = nrnSize;
+     n->n_Int        = nrnInt;
+     n->nAdd         = nrnAdd;
+     n->nSub         = nrnSub;
+     n->nMult        = nrnMult;
+     n->nDiv         = nrnDiv;
+     n->nIntDiv      = nrnIntDiv;
+     n->nIntMod      = nrnMod;
+     n->nExactDiv    = nrnDiv;
+     n->nNeg         = nrnNeg;
+     n->nInvers      = nrnInvers;
+     n->nDivBy       = nrnDivBy;
+     n->nDivComp     = nrnDivComp;
+     n->nGreater     = nrnGreater;
+     n->nEqual       = nrnEqual;
+     n->nIsZero      = nrnIsZero;
+     n->nIsOne       = nrnIsOne;
+     n->nIsMOne      = nrnIsMOne;
      n->nGreaterZero = nrnGreaterZero;
-     n->cfWrite = nrnWrite;
-     n->nRead = nrnRead;
-     n->nPower = nrnPower;
-     n->cfSetMap = nrnSetMap;
-     n->nNormalize = ndNormalize;
-     n->nLcm          = nrnLcm;
-     n->nGcd          = nrnGcd;
-     n->nIsUnit = nrnIsUnit;
-     n->nGetUnit = nrnGetUnit;
-     n->nExtGcd = nrnExtGcd;
-     n->nName= nrnName;
+     n->cfWrite      = nrnWrite;
+     n->nRead        = nrnRead;
+     n->nPower       = nrnPower;
+     n->cfSetMap     = nrnSetMap;
+     n->nNormalize   = ndNormalize;
+     n->nLcm         = nrnLcm;
+     n->nGcd         = nrnGcd;
+     n->nIsUnit      = nrnIsUnit;
+     n->nGetUnit     = nrnGetUnit;
+     n->nExtGcd      = nrnExtGcd;
+     n->nName        = nrnName;
 #ifdef LDEBUG
-     n->nDBTest=nrnDBTest;
+     n->nDBTest      = nrnDBTest;
 #endif
 }
 

@@ -14,9 +14,7 @@ extern int nr2mExp;
 extern NATNUMBER nr2mModul; /* for storing 2^m - 1, i.e., the
                                bit pattern '11..1' of length m */
 
-/* next method is for initializing function pointers */
-void    nr2mCoeffInit   (n_Procs_s *n, int c, const coeffs r);
-
+void    nr2mInitChar    (coeffs r, void*);
 number  nr2mCopy        (number a, const coeffs r);
 BOOLEAN nr2mGreaterZero (number k, const coeffs r);
 number  nr2mMult        (number a, number b, const coeffs r);

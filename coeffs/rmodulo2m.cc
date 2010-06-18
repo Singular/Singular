@@ -23,42 +23,42 @@
 int nr2mExp;
 
 /* for initializing function pointers */
-void nr2mCoeffInit (n_Procs_s *n, int c, const coeffs r)
+void nr2mInitChar (coeffs r, void*)
 {
      nr2mInitExp(c, r);
-     n->cfInit  = nr2mInit;
-     n->cfCopy = nr2mCopy;
-     n->n_Int  = nr2mInt;
-     n->nAdd   = nr2mAdd;
-     n->nSub   = nr2mSub;
-     n->nMult  = nr2mMult;
-     n->nDiv   = nr2mDiv;
-     n->nIntDiv       = nr2mIntDiv;
-     n->nIntMod=nr2mMod;
-     n->nExactDiv= nr2mDiv;
-     n->nNeg   = nr2mNeg;
-     n->nInvers= nr2mInvers;
-     n->nDivBy = nr2mDivBy;
-     n->nDivComp = nr2mDivComp;
-     n->nGreater = nr2mGreater;
-     n->nEqual = nr2mEqual;
-     n->nIsZero = nr2mIsZero;
-     n->nIsOne = nr2mIsOne;
-     n->nIsMOne = nr2mIsMOne;
+     n->cfInit       = nr2mInit;
+     n->cfCopy       = nr2mCopy;
+     n->n_Int        = nr2mInt;
+     n->nAdd         = nr2mAdd;
+     n->nSub         = nr2mSub;
+     n->nMult        = nr2mMult;
+     n->nDiv         = nr2mDiv;
+     n->nIntDiv      = nr2mIntDiv;
+     n->nIntMod      = nr2mMod;
+     n->nExactDiv    = nr2mDiv;
+     n->nNeg         = nr2mNeg;
+     n->nInvers      = nr2mInvers;
+     n->nDivBy       = nr2mDivBy;
+     n->nDivComp     = nr2mDivComp;
+     n->nGreater     = nr2mGreater;
+     n->nEqual       = nr2mEqual;
+     n->nIsZero      = nr2mIsZero;
+     n->nIsOne       = nr2mIsOne;
+     n->nIsMOne      = nr2mIsMOne;
      n->nGreaterZero = nr2mGreaterZero;
-     n->cfWrite = nr2mWrite;
-     n->nRead = nr2mRead;
-     n->nPower = nr2mPower;
-     n->cfSetMap = nr2mSetMap;
-     n->nNormalize = ndNormalize;
-     n->nLcm          = nr2mLcm;
-     n->nGcd          = nr2mGcd;
-     n->nIsUnit = nr2mIsUnit;
-     n->nGetUnit = nr2mGetUnit;
-     n->nExtGcd = nr2mExtGcd;
-     n->nName= ndName;
+     n->cfWrite      = nr2mWrite;
+     n->nRead        = nr2mRead;
+     n->nPower       = nr2mPower;
+     n->cfSetMap     = nr2mSetMap;
+     n->nNormalize   = ndNormalize;
+     n->nLcm         = nr2mLcm;
+     n->nGcd         = nr2mGcd;
+     n->nIsUnit      = nr2mIsUnit;
+     n->nGetUnit     = nr2mGetUnit;
+     n->nExtGcd      = nr2mExtGcd;
+     n->nName        = ndName;
 #ifdef LDEBUG
-     n->nDBTest=nr2mDBTest;
+     n->nDBTest      = nr2mDBTest;
 #endif
 }
 

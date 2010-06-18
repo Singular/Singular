@@ -102,7 +102,7 @@ BOOLEAN ndIsUnit(number a) { return !nIsZero(a); }
 number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 #endif
 
-static n_coeffType nLastCoeffs=n_Z2n;
+static n_coeffType nLastCoeffs=n_Z2m;
 static cfInitCharProc *nInitCharTable=NULL;
 /*2
 * init operations for coeffs r
