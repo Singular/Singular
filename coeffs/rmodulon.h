@@ -9,6 +9,7 @@
 */
 #ifdef HAVE_RINGS
 #include "coeffs.h"
+#include "rintegers.h"
 
 #ifndef NATNUMBER
 #define NATNUMBER unsigned long
