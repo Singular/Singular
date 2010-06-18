@@ -80,14 +80,14 @@ bool Test(const n_coeffType type)
     assume( r->cfInit == nr2mInit );
     assume( r->cfWrite == nr2mWrite );
     assume( r->cfAdd == nr2mAdd );
-    assume( r->cfDelete == nr2mDelete );
+    assume( r->cfDelete == ndDelete );
   }
   else if( type == n_Zn )
   {
     assume( r->cfInit == nrnInit );
-    assume( r->cfWrite == nnrWrite );
-    assume( r->cfAdd == nnrAdd );
-    assume( r->cfDelete == nnrDelete );
+    assume( r->cfWrite == nrnWrite );
+    assume( r->cfAdd == nrnAdd );
+    assume( r->cfDelete == nrnDelete );
   }
   else
   {
