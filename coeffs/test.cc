@@ -6,11 +6,11 @@
 #include <reporter.h>
 #include <omalloc.h>
 
-
 #include <longrat.h>
 #include <gnumpc.h>
 #include <shortfl.h>
-
+#include <rmodulon.h>
+#include <rmodulo2m.h>
 
 #include <iostream>
 using namespace std;
@@ -23,7 +23,7 @@ bool Test(const coeffs r)
   
   number b = n_Add(a, a, r);
   n_Test(b,r);
-  
+
   StringSetS("a: "); n_Write(a, r);PrintS(StringAppend("\n"));
   StringSetS("b: "); n_Write(b, r);PrintS(StringAppend("\n"));
 
@@ -74,7 +74,22 @@ bool Test(const n_coeffType type)
     assume( r->cfWrite == nrWrite );
     assume( r->cfAdd == nrAdd );
 //    assume( r->cfDelete == nrDelete ); // No?
-  } else
+  }
+  else if( type == n_Z2m )
+  {
+    assume( r->cfInit == nr2mInit );
+    assume( r->cfWrite == nr2mWrite );
+    assume( r->cfAdd == nr2mAdd );
+    assume( r->cfDelete == nr2mDelete );
+  }
+  else if( type == n_Zn )
+  {
+    assume( r->cfInit == nrnInit );
+    assume( r->cfWrite == nnrWrite );
+    assume( r->cfAdd == nnrAdd );
+    assume( r->cfDelete == nnrDelete );
+  }
+  else
   {
     // ...
   }
@@ -105,6 +120,14 @@ int main()
     c ++;
   
   type = nRegister( n_R, nrInitChar); assume( type == n_R );
+  if( Test(type) )
+    c ++;
+
+  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
+  if( Test(type) )
+    c ++;
+  
+  type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
   if( Test(type) )
     c ++;
 

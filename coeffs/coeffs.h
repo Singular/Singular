@@ -26,9 +26,9 @@ enum n_coeffType
   n_long_C,
   // only used if HAVE_RINGS is defined
   n_Z,
-  n_Zm,
-  n_Zpn,
-  n_Z2n
+  n_Zn,
+  n_Zpn, // does no longer exist?
+  n_Z2m
 };
 
 struct snumber;

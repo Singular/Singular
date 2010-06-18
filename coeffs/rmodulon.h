@@ -14,9 +14,7 @@
 #define NATNUMBER unsigned long
 #endif
 
-/* next method is for initializing function pointers */
-void    nrnCoeffInit   (n_Procs_s *n, int c, const coeffs r);
-
+void    nrnInitChar    (coeffs r, void*);
 number  nrnCopy        (number a, const coeffs r);
 int     nrnSize        (number a, const coeffs r);
 void    nrnDelete      (number *a, const coeffs r);
