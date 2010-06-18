@@ -17,6 +17,9 @@
 #ifndef MISC_AUXILIARY_H
 #define MISC_AUXILIARY_H
      
+// ----------------- which parts/extensions of Singular to build
+#define HAVE_RINGS
+// ----------------  end of parts/extensions
 // -----------------  configure stuff
 
 /* CPU type: i[3456]86: */
@@ -35,6 +38,7 @@
 
 // ----------------- end of configure stuff
 
+// ---------------- Singular standard types etc.
 // BOOLEAN
 
 #if (SIZEOF_LONG == 8)
@@ -71,6 +75,8 @@ typedef void* ADDRESS;
 
 static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
 
+// ---------------- end of Singular standard types etc.
+// ---------------- defines which depend on the settings above
 
 #if defined(SI_CPU_I386) || defined(SI_CPU_X86_64)
   // the following settings seems to be better on i386 and x86_64 processors
