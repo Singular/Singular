@@ -37,9 +37,9 @@
 void    spectrumPolyNode::copy_zero( void )
 {
     next   = (spectrumPolyNode*)NULL;
-    mon    = (poly)NULL;
+    mon    = NULL;
     weight = (Rational)0;
-    nf     = (poly)NULL;
+    nf     = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -92,8 +92,8 @@ spectrumPolyNode::spectrumPolyNode(
 
 spectrumPolyNode::~spectrumPolyNode( )
 {
-    if( mon!=(poly)NULL ) pDelete( &mon );
-    if( nf !=(poly)NULL ) pDelete( &nf );
+    if( mon!=NULL ) pDelete( &mon );
+    if( nf !=NULL ) pDelete( &nf );
     copy_zero( );
 }
 
@@ -273,23 +273,23 @@ void    spectrumPolyList::delete_monomial( poly m )
         {
             delete_node( node );
         }
-        else if( (*node)->nf!=(poly)NULL )
+        else if( (*node)->nf!=NULL )
         {
             f = &((*node)->nf);
 
-            while( *f!=(poly)NULL )
+            while( *f!=NULL )
             {
                 if( pCmp( m,*f )>=0 && pLmDivisibleByNoComp( m,*f ) )
                 {
-                    pDeleteLm(f);
+                    pLmDelete(f);
                 }
                 else
-                    {
+                {
                     f = &(pNext( *f ));
                 }
             }
 
-            if( (*node)->nf==(poly)NULL )
+            if( (*node)->nf==NULL )
             {
                 delete_node( node );
             }
