@@ -234,14 +234,14 @@ number nrzIntMod (number a,number b)
   return (number) r;
 }
 
-number  nrzInvers (number c)
+number  nrzInvers (number c, const coeffs r)
 {
   if (!nrzIsUnit((number) c))
   {
     WerrorS("Non invertible element.");
     return (number)0; //TODO
   }
-  return nrzCopy(c);
+  return nrzCopy(c,r);
 }
 
 number nrzNeg (number c)
@@ -269,7 +269,7 @@ number nrzMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  nlGMP(from, (number) erg);
+  nlGMP(from, (number) erg, src);
   return (number) erg;
 }
 

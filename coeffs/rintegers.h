@@ -13,8 +13,7 @@
 extern int nrzExp;
 extern NATNUMBER nrzModul;
 
-number  nrzCopy        (number a);
-number  cfrzCopy       (number a, const coeffs r);
+number  nrzCopy       (number a, const coeffs r);
 int     nrzSize        (number a);
 void    nrzDelete      (number *a, const coeffs r);
 BOOLEAN nrzGreaterZero (number k);
