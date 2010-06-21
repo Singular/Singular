@@ -6,11 +6,11 @@
 * ABSTRACT: numbers modulo n
 */
 
-#include <string.h>
 #include "config.h"
 #include <auxiliary.h>
 
 #ifdef HAVE_RINGS
+
 #include <mylimits.h>
 #include "coeffs.h"
 #include "reporter.h"
@@ -20,6 +20,8 @@
 #include "mpr_complex.h"
 #include "rmodulon.h"
 #include "si_gmp.h"
+
+#include <string.h>
 
 extern omBin gmp_nrz_bin;
 
@@ -445,8 +447,8 @@ number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  nlGMP(from, (number) erg, dst);
-  mpz_mod(erg, erg, dst->nrnModul);
+  nlGMP(from, (number) erg, src);
+  mpz_mod(erg, erg, src->nrnModul);
   return (number) erg;
 }
 

@@ -5,6 +5,9 @@
 /*
 * ABSTRACT: numbers modulo n
 */
+#include "config.h"
+
+#ifdef HAVE_RINGS
 
 #include <string.h>
 #include <auxiliary.h>
@@ -18,7 +21,6 @@
 #include "rintegers.h"
 #include <si_gmp.h>
 
-#ifdef HAVE_RINGS
 
 omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
 

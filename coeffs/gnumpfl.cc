@@ -405,7 +405,7 @@ void ngfWrite (number &a, const coeffs r)
   }
 }
 
-static BOOLEAN ngfCoeffsEqual(const coeffs r, n_coeffType n, int)
+static BOOLEAN ngfCoeffsEqual(const coeffs r, n_coeffType n, void*)
 {
   assume( getCoeffType(r) == ID );
   
