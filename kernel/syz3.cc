@@ -694,14 +694,14 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       poly pp;
       pp = pMult_mm(pCopy(old_repr->m[tso.ind2]),p);
       kBucketInit(syzstr->syz_bucket,pp,-1);
-      pDeleteLm(&p);
+      pLmDelete(&p);
       p = pNeg(p);
       pp = pCopy(old_repr->m[tso.ind2]);
       int il=-1;
       while (p!=NULL)
       {
         kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,pp,&il,NULL);
-        pDeleteLm(&p);
+        pLmDelete(&p);
       }
       pDelete(&pp);
       p = pCopy(tso.p2);
@@ -711,7 +711,7 @@ static void redOnePair(SSet resPairs,int itso,int l, ideal syzygies,
       while (p!=NULL)
       {
         kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,pp,&il,NULL);
-        pDeleteLm(&p);
+        pLmDelete(&p);
       }
       pDelete(&pp);
       kBucketClear(syzstr->syz_bucket,&tso.syz,&j);
