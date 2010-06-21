@@ -139,16 +139,49 @@ int main()
   if( Test(type) )
     c ++;
 
-#ifdef HAVE_RINGS
-  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
-  if( Test(type) )
-    c ++;
 
-  
+#ifdef HAVE_RINGS
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
   if( Test(type) )
     c ++;
 #endif
+
+
+#ifdef HAVE_RINGS
+  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
+  if( Test(type) )
+    c ++;
+/* BUG: 
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff7b91f1b in __gmpz_set () from /usr/lib/libgmp.so.10
+(gdb) bt
+#0  0x00007ffff7b91f1b in __gmpz_set () from /usr/lib/libgmp.so.10
+#1  0x00000000004177a5 in nrnSetExp (m=0, r=0x7ffff7f44ae8) at rmodulon.cc:549
+#2  0x0000000000417814 in nrnInitExp (m=0, r=0x7ffff7f44ae8) at rmodulon.cc:556
+#3  0x0000000000416122 in nrnInitChar (r=0x7ffff7f44ae8) at rmodulon.cc:34
+#4  0x0000000000413278 in nInitChar (t=n_Zn, parameter=0x0) at numbers.cc:146
+#5  0x0000000000402f10 in Test (type=n_Zn) at test.cc:47
+rmodulon.cc:549       mpz_set(r->nrnModul, r->ringflaga);
+(gdb) l
+544         r->nrnModul = (int_number) omAllocBin(gmp_nrz_bin);
+545         mpz_init(r->nrnModul);
+546         nrnMinusOne = (int_number) omAllocBin(gmp_nrz_bin);
+547         mpz_init(nrnMinusOne);
+548       }
+rmodulon.cc:549       mpz_set(r->nrnModul, r->ringflaga);
+550       mpz_pow_ui(r->nrnModul, r->nrnModul, nrnExponent);
+551       mpz_sub_ui(nrnMinusOne, r->nrnModul, 1);
+552     }
+553
+(gdb) p r->nrnModul
+$1 = (int_number) 0x7ffff7f461a8
+(gdb) p r->ringflaga
+$2 = (int_number) 0x0
+*/  
+
+#endif
+
+  
   
   return c;
 
