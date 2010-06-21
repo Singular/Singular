@@ -96,6 +96,7 @@ enum {
   LRES_CMD,
   LU_CMD,
   LUI_CMD,
+  LUS_CMD,
   MEMORY_CMD,
   MONITOR_CMD,
   MPRES_CMD,

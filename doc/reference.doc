@@ -131,6 +131,7 @@ and @code{LIB} no brackets are allowed.
 * lres::
 * ludecomp::
 * luinverse::
+* lusolve::
 * maxideal::
 * memory::
 * minbase::
@@ -3767,7 +3768,7 @@ See
 @ref{luinverse}.
 @c ref
 @c ---------------------------------------
-@node luinverse, maxideal, listvar, Functions
+@node luinverse, lusolve, listvar, Functions
 @subsection luinverse
 @cindex luinverse
 @cindex inverse of a matrix via its LU-decomposition
@@ -3829,6 +3830,62 @@ The method will give a warning for any non-quadratic matrix A.
     print(L[2]);
     "----- next should be the (3 x 3)-unit matrix:";
     print(A*L[2]);
+  }
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ludecomp}.
+@c ref
+@c ---------------------------------------
+@node lusolve, maxideal, listvar, Functions
+@subsection lusolve
+@cindex lusolve
+@cindex solve a linear equation system A*x = b via the LU-decomposition of A
+
+@table @code
+@item @strong{Syntax:}
+@code{lusolve (} matrix_expression@code{,} matrix_expression@code{,}
+      matrix_expression@code{,} matrix_expression @code{)}
+@item @strong{Type:}
+matrix
+@item @strong{Purpose:}
+Computes a solution of a linear equation system A*x = b, if solvable
+
+The (m x n matrix A must be given by its LU-decomposition, that is, by three
+matrices P, L, and U, in this order, which satisfy
+@*- P * A = L * U,
+@*- P is an (m x m) permutation matrix, i.e., its rows/columns form the
+standard basis of K^m,
+@*- L is an (m x m) matrix in lower triangular form with all diagonal
+entries equal to 1, and
+@*- U is an (m x n) matrix in upper row echelon form.
+@*The fourth argument, b, is expected to be an (m x 1) matrix, i.e., a vector.
+
+@code{list L=lusolve(P,L,U,b);} fills the list L with either one entry = 0
+(signaling that A*x=b has no solution), or with the three entries 1, x, d,
+where x is any (n x 1) solution and d the dimension of the affine solution
+space.
+@item @strong{Note:}
+The method will give a warning if the matrices violate the above conditions
+regarding row and column numbers, or if the number of rows of the vector b
+does not equal m.
+
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=0,(x),dp;
+  matrix A[4][3]=1,1,3,2,1,4,3,0,3,4,0,4;
+  matrix b[4][1]=5,7,6,8;
+  list L=ludecomp(A);
+  list Q=lusolve(L[1],L[2],L[3],b);
+  if (Q[1] == 1)
+  {
+    print(Q[2]);
+    "----- next should be the zero vector:";
+    print(A*Q[2]-b);
+    print "solution space has dimension", Q[3];
   }
 @c example
 @end smallexample

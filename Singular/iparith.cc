@@ -316,6 +316,7 @@ cmdnames cmds[] =
   { "lres",        0, LRES_CMD ,          CMD_2},
   { "ludecomp",    0, LU_CMD ,            CMD_1},
   { "luinverse",   0, LUI_CMD ,           CMD_M},
+  { "lusolve",     0, LUS_CMD ,           CMD_M},
   { "map",         0, MAP_CMD ,           RING_DECL},
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
   { "maxideal",    0, MAXID_CMD ,         CMD_1},
@@ -7108,6 +7109,82 @@ static BOOLEAN jjLU_INVERSE(leftv res, leftv v)
   res->data=(char*)ll;
   return FALSE;
 }
+static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
+{
+  /* for solving a linear equation system A * x = b, via the
+     given LU-decomposition of the matrix A;
+     There is one valid parametrisation:
+     1) exactly four arguments P, L, U, b;
+        P, L, and U realise the L-U-decomposition of A, that is,
+        P * A = L * U, and P, L, and U satisfy the
+        properties decribed in method 'jjLU_DECOMP';
+        see there;
+        b is the right-hand side vector of the equation system;
+     The method will return a list of either 1 entry or three entries:
+     1) [0] if there is no solution to the system;
+     2) [1, x, dim] if there is at least one solution;
+        x is any solution, dim is the dimension of the affine solution
+        space.
+     The method produces an error if matrix and vector sizes do not fit. */
+  if ((v == NULL) || (v->Typ() != MATRIX_CMD) ||
+      (v->next == NULL) || (v->next->Typ() != MATRIX_CMD) ||
+      (v->next->next == NULL) || (v->next->next->Typ() != MATRIX_CMD) ||
+      (v->next->next->next == NULL) ||
+      (v->next->next->next->Typ() != MATRIX_CMD) ||
+      (v->next->next->next->next != NULL))
+  {
+    Werror("expected exactly three matrices and one vector as input");
+    return TRUE;
+  }
+  matrix pMat = (matrix)v->Data();
+  matrix lMat = (matrix)v->next->Data();
+  matrix uMat = (matrix)v->next->next->Data();
+  matrix bVec = (matrix)v->next->next->next->Data();
+  matrix xVec; int solvable; int dim;
+  if (pMat->rows() != pMat->cols())
+  {
+    Werror("first matrix (%d x %d) is not quadratic",
+           pMat->rows(), pMat->cols());
+    return TRUE;
+  }
+  if (lMat->rows() != lMat->cols())
+  {
+    Werror("second matrix (%d x %d) is not quadratic",
+           lMat->rows(), lMat->cols());
+    return TRUE;
+  }
+  if (lMat->rows() != uMat->rows())
+  {
+    Werror("second matrix (%d x %d) and third matrix (%d x %d) do not fit",
+           lMat->rows(), lMat->cols(), uMat->rows(), uMat->cols());
+    return TRUE;
+  }
+  if (uMat->rows() != bVec->rows())
+  {
+    Werror("third matrix (%d x %d) and vector (%d x 1) do not fit",
+           uMat->rows(), uMat->cols(), bVec->rows());
+    return TRUE;
+  }
+  solvable = luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, &dim);
+
+  /* build the return structure; a list with either one or three entries */
+  lists ll = (lists)omAllocBin(slists_bin);
+  if (solvable)
+  {
+    ll->Init(3);
+    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+    ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)xVec;
+    ll->m[2].rtyp=INT_CMD;    ll->m[2].data=(void *)dim;
+  }
+  else
+  {
+    ll->Init(1);
+    ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+  }
+
+  res->data=(char*)ll;
+  return FALSE;
+}
 static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
 {
   int i=0;
@@ -7591,6 +7668,7 @@ struct sValCmdM dArithM[]=
 ,{jjJET4,      JET_CMD,         POLY_CMD,/*or set by p*/ 4  , ALLOW_PLURAL |ALLOW_RING}
 ,{jjLIST_PL,   LIST_CMD,        LIST_CMD,           -1      , ALLOW_PLURAL |ALLOW_RING}
 ,{jjLU_INVERSE,LUI_CMD,         LIST_CMD,           -2      , NO_PLURAL |NO_RING}
+,{jjLU_SOLVE,  LUS_CMD,         LIST_CMD,           -2      , NO_PLURAL |NO_RING}
 ,{jjWRONG,     MINOR_CMD,       NONE,               1       , ALLOW_PLURAL |ALLOW_RING}
 ,{jjMINOR_M,   MINOR_CMD,       IDEAL_CMD,          -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{jjCALL1ARG,  MODUL_CMD,       MODUL_CMD,          1       , ALLOW_PLURAL |ALLOW_RING}

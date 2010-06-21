@@ -102,10 +102,14 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
   /* fill lMat with the (rr x rr) unit matrix */
   for (int r = 1; r <= rr; r++) MATELEM(lMat, r, r) = pOne();
 
-  int bestR; int bestC; int intSwap; poly pSwap;
+  int bestR; int bestC; int intSwap; poly pSwap; int cOffset = 0;
   for (int r = 1; r < rr; r++)
   {
-    if ((r <= cc) && (pivot(uMat, r, rr, r, r, &bestR, &bestC)))
+    if (r > cc) break;
+    while ((r + cOffset <= cc) &&
+           (!pivot(uMat, r, rr, r + cOffset, r + cOffset, &bestR, &bestC)))
+      cOffset++;
+    if (r + cOffset <= cc)
     {
       /* swap rows with indices r and bestR in permut */
       intSwap = permut[r];
@@ -113,8 +117,8 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
       permut[bestR] = intSwap;
 
       /* swap rows with indices r and bestR in uMat;
-         it is sufficient to do this for columns >= r */
-      for (int c = r; c <= cc; c++)
+         it is sufficient to do this for columns >= r + cOffset*/
+      for (int c = r + cOffset; c <= cc; c++)
       {
         pSwap = MATELEM(uMat, r, c);
         MATELEM(uMat, r, c) = MATELEM(uMat, bestR, c);
@@ -133,12 +137,13 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
       /* perform next Gauss elimination step, i.e., below the
          row with index r;
          we need to adjust lMat and uMat;
-         we are certain that the matrix entry at [r, r] is non-zero: */
-      number pivotElement = pGetCoeff(MATELEM(uMat, r, r));
+         we are certain that the matrix entry at [r, r + cOffset]
+         is non-zero: */
+      number pivotElement = pGetCoeff(MATELEM(uMat, r, r + cOffset));
       poly p; number n;
       for (int rGauss = r + 1; rGauss <= rr; rGauss++)
       {
-        p = MATELEM(uMat, rGauss, r);
+        p = MATELEM(uMat, rGauss, r + cOffset);
         if (p != NULL)
         {
           n = nDiv(pGetCoeff(p), pivotElement);
@@ -148,9 +153,9 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
           MATELEM(lMat, rGauss, r) = pNSet(nCopy(n));
 
           /* adjusting uMat: */
-          MATELEM(uMat, rGauss, r) = NULL; pDelete(&p);
+          MATELEM(uMat, rGauss, r + cOffset) = NULL; pDelete(&p);
           n = nNeg(n);
-          for (int cGauss = r + 1; cGauss <= cc; cGauss++)
+          for (int cGauss = r + cOffset + 1; cGauss <= cc; cGauss++)
             MATELEM(uMat, rGauss, cGauss)
               = pAdd(MATELEM(uMat, rGauss, cGauss),
                      ppMult_nn(MATELEM(uMat, r, cGauss), n));
@@ -314,4 +319,75 @@ bool luInverseFromLUDecomp(const matrix pMat, const matrix lMat,
   }
 
   return result;
+}
+
+bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
+                        const matrix uMat, const matrix bVec,
+                        matrix &xVec, int* dim)
+{
+  int m = uMat->rows(); int n = uMat->cols();
+  matrix cVec = mpNew(m, 1);  /* for storing pMat * bVec */
+  matrix yVec = mpNew(m, 1);  /* for storing the unique solution of
+                                 lMat * yVec = cVec */
+
+  /* compute cVec = pMat * bVec but without actual multiplications */
+  for (int r = 1; r <= m; r++)
+  {
+    for (int c = 1; c <= m; c++)
+    {
+      if (MATELEM(pMat, r, c) != NULL)
+        { MATELEM(cVec, r, 1) = pCopy(MATELEM(bVec, c, 1)); break; }
+    }
+  }
+
+  /* solve lMat * yVec = cVec; this will always work as lMat is invertible;
+     moreover, no divisions are needed, since lMat[i, i] = 1, for all i */
+  for (int r = 1; r <= m; r++)
+  {
+    poly p = pNeg(pCopy(MATELEM(cVec, r, 1)));
+    for (int c = 1; c < r; c++)
+      p = pAdd(p, ppMult_qq(MATELEM(lMat, r, c), MATELEM(yVec, c, 1) ));
+    MATELEM(yVec, r, 1) = pNeg(p);
+  }
+  
+  /* determine whether uMat * xVec = yVec is solvable */
+  bool isSolvable = true;
+  bool isZeroRow; int nonZeroRowIndex;
+  for (int r = m; r >= 1; r--)
+  {
+    isZeroRow = true;
+    for (int c = 1; c <= n; c++)
+      if (MATELEM(uMat, r, c) != NULL) { isZeroRow = false; break; }
+    if (isZeroRow)
+    {
+      if (MATELEM(yVec, r, 1) != NULL) { isSolvable = false; break; }
+    }
+    else { nonZeroRowIndex = r; break; }
+  }
+  
+  if (isSolvable)
+  {
+    xVec = mpNew(n, 1); *dim = 0;
+    /* solve uMat * xVec = yVec and determine the dimension of the affine
+       solution space */
+    int nonZeroC; int lastNonZeroC = n + 1;
+    for (int r = nonZeroRowIndex; r >= 1; r--)
+    {
+      for (nonZeroC = 1; nonZeroC <= n; nonZeroC++)
+        if (MATELEM(uMat, r, nonZeroC) != NULL) break;
+      *dim = *dim + lastNonZeroC - nonZeroC - 1;
+      poly p = pNeg(pCopy(MATELEM(yVec, r, 1)));
+      for (int c = nonZeroC + 1; c <= n; c++)
+        if (MATELEM(xVec, c, 1) != NULL)
+          p = pAdd(p, ppMult_qq(MATELEM(uMat, r, c), MATELEM(xVec, c, 1)));
+      poly q = pNSet(nInvers(pGetCoeff(MATELEM(uMat, r, nonZeroC))));
+      MATELEM(xVec, nonZeroC, 1) = pMult(pNeg(p), q);
+      lastNonZeroC = nonZeroC;
+    }
+  }
+
+  idDelete((ideal*)&cVec);
+  idDelete((ideal*)&yVec);
+
+  return isSolvable;
 }

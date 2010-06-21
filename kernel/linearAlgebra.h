@@ -197,6 +197,49 @@ bool luInverseFromLUDecomp(
                                      decomposition                */
        matrix &iMat       /**< [out] inverse of A if invertible   */
                           );
+                          
+/**
+ * Solves the linear system A*x = b, where A is an (n x n)-matrix
+ * which is given by its LU-decomposition.
+ *
+ * The method expects the LU-decomposition of A, that is,
+ * pMat * A = lMat * uMat, where the argument matrices have the
+ * appropriate proteries; see method
+ * 'luDecomp(const matrix aMat, matrix &pMat, matrix &lMat,
+ * matrix &uMat)'.<br>
+ * Instead of trying to invert A and return x = A^(-1)*b, this
+ * method
+ * 1) computes b' = pMat * b,
+ * 2) solves the easy system L * y = b', and then
+ * 3) solves the easy system U * x = y.
+ * Note that steps 1) and 2) will always work, as L is in any case
+ * invertible. Moreover, y is uniquely determined. Step 3) will only
+ * work if and only if y is in the column span of U. In that case,
+ * there may be infinitely many solutions.
+ * Thus, there are three cases:<br>
+ * 1) There is no solution. Then the method returns false, and &xVec
+      as well as &dim remain unchanged.<br>
+ * 2) There is a unique solution. Then the method returns true and
+ *    the dimension of the affine solution space is zero.<br>
+ * 3) There are infinitely many solutions. Then the method returns
+ *    true and some solution. Furthermore, the dimension of the
+      affine solution space is set accordingly.
+ *
+ * @return true if there is at least one solution, false otherwise
+ **/
+bool luSolveViaLUDecomp(
+       const matrix pMat, /**< [in]  permutation matrix of an LU-
+                                     decomposition                */
+       const matrix lMat, /**< [in]  lower left matrix of an LU-
+                                     decomposition                */
+       const matrix uMat, /**< [in]  upper right matrix of an LU-
+                                     decomposition                */
+       const matrix bVec, /**< [in]  right-hand side of the linear
+                                     system to be solved          */
+       matrix &xVec,      /**< [out] solution of A*x = b          */
+       int* dim           /**< [out] dimension of affine solution
+                                     space                        */
+                          );
 
 #endif
 /* LINEAR_ALGEBRA_H */
