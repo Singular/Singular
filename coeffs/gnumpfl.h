@@ -21,7 +21,7 @@ static BOOLEAN ngfCoeffsEqual(const coeffs r, n_coeffType n, int parameter);
 
 const char *   ngfRead (const char *s, number *a, const coeffs r);
 
-/* // Private interface should be hidden!!!
+ // Private interface should be hidden!!!
 /// Note: MAY NOT WORK AS EXPECTED!
 BOOLEAN  ngfGreaterZero(number za, const coeffs r);
 BOOLEAN  ngfGreater(number a, number b, const coeffs r);
@@ -46,5 +46,5 @@ void     ngfDelete(number *a, const coeffs r);
 
 void setGMPFloatDigits( size_t digits, size_t rest );
 number ngfMapQ(number from, const coeffs r);
-*/
+
 #endif

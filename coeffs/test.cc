@@ -7,6 +7,7 @@
 #include <omalloc.h>
 
 #include <longrat.h>
+#include <gnumpfl.h>
 #include <gnumpc.h>
 #include <shortfl.h>
 #include <rmodulon.h>
@@ -61,6 +62,13 @@ bool Test(const n_coeffType type)
     assume( r->cfAdd == nlAdd );
     assume( r->cfDelete == nlDelete );    
   }
+  else if( type == n_long_R )
+  {
+    assume( r->cfInit == ngfInit );
+    assume( r->cfWrite == ngfWrite );
+    assume( r->cfAdd == ngfAdd );
+    assume( r->cfDelete == ngfDelete );
+  }
   else if( type == n_long_C )
   {
     assume( r->cfInit == ngcInit );
@@ -111,7 +119,10 @@ int main()
   n_coeffType type;
   
   type = nRegister( n_Q, nlInitChar); assume( type == n_Q );
+  if( Test(type) )
+    c ++;
 
+  type = nRegister( n_long_R, ngfInitChar); assume( type == n_long_R );
   if( Test(type) )
     c ++;
 
