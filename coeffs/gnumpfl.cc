@@ -412,7 +412,7 @@ static BOOLEAN ngfCoeffsEqual(const coeffs r, n_coeffType n, int)
   return (n == ID);
 };
 
-void ngfInitChar(coeffs n, int)
+void ngfInitChar(coeffs n, void *)
 {
   assume( getCoeffType(n) == ID );
 
