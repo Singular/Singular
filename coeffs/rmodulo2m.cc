@@ -63,6 +63,7 @@ void nr2mInitChar (coeffs r, void*)
 #ifdef LDEBUG
      r->cfDBTest      = nr2mDBTest;
 #endif
+     r->has_simple_Alloc=TRUE;
 }
 
 /*
@@ -529,7 +530,7 @@ number nr2mMapQ(number from, const coeffs src, const coeffs dst)
   int_number k = (int_number) omAlloc(sizeof(mpz_t));
   mpz_init_set_ui(k, dst->nr2mModul);
 
-  nlGMP(from, (number)erg);
+  nlGMP(from, (number)erg, dst);
   mpz_and(erg, erg, k);
   number res = (number)mpz_get_ui(erg);
 

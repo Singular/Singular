@@ -69,7 +69,7 @@ BOOLEAN  nlIsMOne(number a, const coeffs r);
 int      nlInt(number &n, const coeffs r);
 number   nlBigInt(number &n);
 #ifdef HAVE_RINGS
-void     nlGMP(number &i, number n);
+void     nlGMP(number &i, number n, const coeffs r);
 #endif
 BOOLEAN  nlGreaterZero(number za, const coeffs r);
 number   nlInvers(number a, const coeffs r);

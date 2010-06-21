@@ -8,6 +8,7 @@
 
 #include <string.h>
 #include "config.h"
+#include <auxiliary.h>
 
 #ifdef HAVE_RINGS
 #include <mylimits.h>
@@ -28,42 +29,42 @@ unsigned long nrnExponent = 0;
 /* for initializing function pointers */
 void nrnInitChar (coeffs r, void*)
 {
-     nrnInitExp(c, r);
-     n->cfInit       = nrnInit;
-     n->cfDelete     = nrnDelete;
-     n->cfCopy       = nrnCopy;
-     n->nSize        = nrnSize;
-     n->n_Int        = nrnInt;
-     n->nAdd         = nrnAdd;
-     n->nSub         = nrnSub;
-     n->nMult        = nrnMult;
-     n->nDiv         = nrnDiv;
-     n->nIntDiv      = nrnIntDiv;
-     n->nIntMod      = nrnMod;
-     n->nExactDiv    = nrnDiv;
-     n->nNeg         = nrnNeg;
-     n->nInvers      = nrnInvers;
-     n->nDivBy       = nrnDivBy;
-     n->nDivComp     = nrnDivComp;
-     n->nGreater     = nrnGreater;
-     n->nEqual       = nrnEqual;
-     n->nIsZero      = nrnIsZero;
-     n->nIsOne       = nrnIsOne;
-     n->nIsMOne      = nrnIsMOne;
-     n->nGreaterZero = nrnGreaterZero;
-     n->cfWrite      = nrnWrite;
-     n->nRead        = nrnRead;
-     n->nPower       = nrnPower;
-     n->cfSetMap     = nrnSetMap;
-     n->nNormalize   = ndNormalize;
-     n->nLcm         = nrnLcm;
-     n->nGcd         = nrnGcd;
-     n->nIsUnit      = nrnIsUnit;
-     n->nGetUnit     = nrnGetUnit;
-     n->nExtGcd      = nrnExtGcd;
-     n->nName        = nrnName;
+     nrnInitExp(r->ch, r);
+     r->cfInit       = nrnInit;
+     r->cfDelete     = nrnDelete;
+     r->cfCopy       = nrnCopy;
+     r->cfSize        = nrnSize;
+     r->cfInt        = nrnInt;
+     r->cfAdd         = nrnAdd;
+     r->cfSub         = nrnSub;
+     r->cfMult        = nrnMult;
+     r->cfDiv         = nrnDiv;
+     r->cfIntDiv      = nrnIntDiv;
+     r->cfIntMod      = nrnMod;
+     r->cfExactDiv    = nrnDiv;
+     r->cfNeg         = nrnNeg;
+     r->cfInvers      = nrnInvers;
+     r->cfDivBy       = nrnDivBy;
+     r->cfDivComp     = nrnDivComp;
+     r->cfGreater     = nrnGreater;
+     r->cfEqual       = nrnEqual;
+     r->cfIsZero      = nrnIsZero;
+     r->cfIsOne       = nrnIsOne;
+     r->cfIsMOne      = nrnIsMOne;
+     r->cfGreaterZero = nrnGreaterZero;
+     r->cfWrite      = nrnWrite;
+     r->cfRead        = nrnRead;
+     r->cfPower       = nrnPower;
+     r->cfSetMap     = nrnSetMap;
+     r->cfNormalize   = ndNormalize;
+     r->cfLcm         = nrnLcm;
+     r->cfGcd         = nrnGcd;
+     r->cfIsUnit      = nrnIsUnit;
+     r->cfGetUnit     = nrnGetUnit;
+     r->cfExtGcd      = nrnExtGcd;
+     r->cfName        = ndName;
 #ifdef LDEBUG
-     n->nDBTest      = nrnDBTest;
+     r->cfDBTest      = nrnDBTest;
 #endif
 }
 
@@ -264,7 +265,7 @@ BOOLEAN nrnGreaterZero (number k, const coeffs r)
 BOOLEAN nrnIsUnit (number a, const coeffs r)
 {
   number tmp = nrnGcd(a, (number) r->nrnModul, r);
-  bool res = nrnIsOne(tmp);
+  bool res = nrnIsOne(tmp,r);
   nrnDelete(&tmp, NULL);
   return res;
 }
@@ -276,14 +277,14 @@ number  nrnGetUnit (number k, const coeffs r)
   int_number unit = (int_number) nrnGcd(k, 0, r);
   mpz_tdiv_q(unit, (int_number) k, unit);
   int_number gcd = (int_number) nrnGcd((number) unit, 0, r);
-  if (!nrnIsOne((number) gcd))
+  if (!nrnIsOne((number) gcd,r))
   {
     int_number ctmp;
     // tmp := unit^2
-    int_number tmp = (int_number) nrnMult((number) unit,(number) unit);
+    int_number tmp = (int_number) nrnMult((number) unit,(number) unit,r);
     // gcd_new := gcd(tmp, 0)
     int_number gcd_new = (int_number) nrnGcd((number) tmp, 0, r);
-    while (!nrnEqual((number) gcd_new,(number) gcd))
+    while (!nrnEqual((number) gcd_new,(number) gcd,r))
     {
       // gcd := gcd_new
       ctmp = gcd;
@@ -322,10 +323,10 @@ BOOLEAN nrnDivBy (number a, number b, const coeffs r)
 
 int nrnDivComp(number a, number b, const coeffs r)
 {
-  if (nrnEqual(a, b)) return 2;
+  if (nrnEqual(a, b,r)) return 2;
   if (mpz_divisible_p((int_number) a, (int_number) b)) return -1;
   if (mpz_divisible_p((int_number) b, (int_number) a)) return 1;
-  return 0;
+  return 2;
 }
 
 number nrnDiv (number a, number b, const coeffs r)
@@ -342,7 +343,7 @@ number nrnDiv (number a, number b, const coeffs r)
   {
     int_number gcd = (int_number) nrnGcd(a, b, r);
     mpz_divexact(erg, (int_number) b, gcd);
-    if (!nrnIsUnit((number) erg))
+    if (!nrnIsUnit((number) erg,r))
     {
       WerrorS("Division not possible, even by cancelling zero divisors.");
       WerrorS("Result is integer division without remainder.");
@@ -351,7 +352,7 @@ number nrnDiv (number a, number b, const coeffs r)
       return (number) erg;
     }
     // a / gcd(a,b) * [b / gcd (a,b)]^(-1)
-    int_number tmp = (int_number) nrnInvers((number) erg);
+    int_number tmp = (int_number) nrnInvers((number) erg,r);
     mpz_divexact(erg, (int_number) a, gcd);
     mpz_mul(erg, erg, tmp);
     nrnDelete((number*) &gcd, NULL);
@@ -361,7 +362,7 @@ number nrnDiv (number a, number b, const coeffs r)
   }
 }
 
-number nrnMod (number a, number b, const coeffs r)
+number nrnMod (number a, number b, const coeffs R)
 {
   /*
     We need to return the number r which is uniquely determined by the
@@ -386,7 +387,7 @@ number nrnMod (number a, number b, const coeffs r)
   int_number r = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(g);
   mpz_init_set_si(r,(long)0);
-  mpz_gcd(g, (int_number) r->nrnModul, (int_number)b); // g is now as above
+  mpz_gcd(g, (int_number) R->nrnModul, (int_number)b); // g is now as above
   if (mpz_cmp_si(g, (long)1) != 0) mpz_mod(r, (int_number)a, g); // the case g <> 1
   mpz_clear(g);
   omFreeBin(g, gmp_nrz_bin);
@@ -408,59 +409,60 @@ number nrnIntDiv (number a, number b, const coeffs r)
 
 int_number nrnMapCoef = NULL;
 
-number nrnMapModN(number from, const coeffs r)
+number nrnMapModN(number from, const coeffs src, const coeffs dst)
 {
-  return nrnMult(from, (number) nrnMapCoef);
+  return nrnMult(from, (number) nrnMapCoef, dst);
 }
 
-number nrnMap2toM(number from, const coeffs r)
+number nrnMap2toM(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   mpz_mul_ui(erg, nrnMapCoef, (NATNUMBER) from);
-  mpz_mod(erg, erg, r->nrnModul);
+  mpz_mod(erg, erg, dst->nrnModul);
   return (number) erg;
 }
 
-number nrnMapZp(number from, const coeffs r)
+number nrnMapZp(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
+  // TODO: use npInt(...)
   mpz_mul_si(erg, nrnMapCoef, (NATNUMBER) from);
-  mpz_mod(erg, erg, r->nrnModul);
+  mpz_mod(erg, erg, dst->nrnModul);
   return (number) erg;
 }
 
-number nrnMapGMP(number from, const coeffs r)
+number nrnMapGMP(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  mpz_mod(erg, (int_number) from, r->nrnModul);
+  mpz_mod(erg, (int_number) from, dst->nrnModul);
   return (number) erg;
 }
 
-number nrnMapQ(number from, const coeffs r)
+number nrnMapQ(number from, const coeffs src, const coeffs dst)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
-  nlGMP(from, (number) erg);
-  mpz_mod(erg, erg, r->nrnModul);
+  nlGMP(from, (number) erg, dst);
+  mpz_mod(erg, erg, dst->nrnModul);
   return (number) erg;
 }
 
-nMapFunc nrnSetMap(const ring src, const ring dst)
+nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
 {
   /* dst = currRing->cf */
-  if (rField_is_Ring_Z(src))
+  if (nField_is_Ring_Z(src))
   {
     return nrnMapGMP;
   }
-  if (rField_is_Q(src))
+  if (nField_is_Q(src))
   {
     return nrnMapQ;
   }
   // Some type of Z/n ring / field
-  if (rField_is_Ring_ModN(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_2toM(src) || rField_is_Zp(src))
+  if (nField_is_Ring_ModN(src) || nField_is_Ring_PtoM(src) || nField_is_Ring_2toM(src) || nField_is_Zp(src))
   {
     if (   (src->ringtype > 0)
         && (mpz_cmp(src->ringflaga, dst->ringflaga) == 0)
@@ -469,7 +471,7 @@ nMapFunc nrnSetMap(const ring src, const ring dst)
     {
       int_number nrnMapModul = (int_number) omAllocBin(gmp_nrz_bin);
       // Computing the n of Z/n
-      if (rField_is_Zp(src))
+      if (nField_is_Zp(src))
       {
         mpz_init_set_si(nrnMapModul, src->ch);
       }
@@ -486,37 +488,37 @@ nMapFunc nrnSetMap(const ring src, const ring dst)
         nrnMapCoef = (int_number) omAllocBin(gmp_nrz_bin);
         mpz_init(nrnMapCoef);
       }
-      if (mpz_divisible_p(nrnMapModul, r->nrnModul))
+      if (mpz_divisible_p(nrnMapModul, dst->nrnModul))
       {
         mpz_set_si(nrnMapCoef, 1);
       }
       else
-      if (nrnDivBy(NULL, (number) nrnMapModul))
+      if (nrnDivBy(NULL, (number) nrnMapModul,dst))
       {
-        mpz_divexact(nrnMapCoef, r->nrnModul, nrnMapModul);
-        int_number tmp = r->nrnModul;
-        r->nrnModul = nrnMapModul;
-        if (!nrnIsUnit((number) nrnMapCoef))
+        mpz_divexact(nrnMapCoef, dst->nrnModul, nrnMapModul);
+        int_number tmp = dst->nrnModul;
+        dst->nrnModul = nrnMapModul;
+        if (!nrnIsUnit((number) nrnMapCoef,dst))
         {
-          r->nrnModul = tmp;
-          nrnDelete((number*) &nrnMapModul, r);
+          dst->nrnModul = tmp;
+          nrnDelete((number*) &nrnMapModul, dst);
           return NULL;
         }
-        int_number inv = (int_number) nrnInvers((number) nrnMapCoef);
-        r->nrnModul = tmp;
+        int_number inv = (int_number) nrnInvers((number) nrnMapCoef,dst);
+        dst->nrnModul = tmp;
         mpz_mul(nrnMapCoef, nrnMapCoef, inv);
-        mpz_mod(nrnMapCoef, nrnMapCoef, r->nrnModul);
-        nrnDelete((number*) &inv, r);
+        mpz_mod(nrnMapCoef, nrnMapCoef, dst->nrnModul);
+        nrnDelete((number*) &inv, dst);
       }
       else
       {
-        nrnDelete((number*) &nrnMapModul, r);
+        nrnDelete((number*) &nrnMapModul, dst);
         return NULL;
       }
-      nrnDelete((number*) &nrnMapModul, r);
-      if (rField_is_Ring_2toM(src))
+      nrnDelete((number*) &nrnMapModul, dst);
+      if (nField_is_Ring_2toM(src))
         return nrnMap2toM;
-      else if (rField_is_Zp(src))
+      else if (nField_is_Zp(src))
         return nrnMapZp;
       else
         return nrnMapModN;
