@@ -23,43 +23,45 @@
 
 int nr2mExp;
 
+extern omBin gmp_nrz_bin; /* init in rintegers*/
+
 /* for initializing function pointers */
 void nr2mInitChar (coeffs r, void*)
 {
-     nr2mInitExp(c, r);
-     n->cfInit       = nr2mInit;
-     n->cfCopy       = nr2mCopy;
-     n->n_Int        = nr2mInt;
-     n->nAdd         = nr2mAdd;
-     n->nSub         = nr2mSub;
-     n->nMult        = nr2mMult;
-     n->nDiv         = nr2mDiv;
-     n->nIntDiv      = nr2mIntDiv;
-     n->nIntMod      = nr2mMod;
-     n->nExactDiv    = nr2mDiv;
-     n->nNeg         = nr2mNeg;
-     n->nInvers      = nr2mInvers;
-     n->nDivBy       = nr2mDivBy;
-     n->nDivComp     = nr2mDivComp;
-     n->nGreater     = nr2mGreater;
-     n->nEqual       = nr2mEqual;
-     n->nIsZero      = nr2mIsZero;
-     n->nIsOne       = nr2mIsOne;
-     n->nIsMOne      = nr2mIsMOne;
-     n->nGreaterZero = nr2mGreaterZero;
-     n->cfWrite      = nr2mWrite;
-     n->nRead        = nr2mRead;
-     n->nPower       = nr2mPower;
-     n->cfSetMap     = nr2mSetMap;
-     n->nNormalize   = ndNormalize;
-     n->nLcm         = nr2mLcm;
-     n->nGcd         = nr2mGcd;
-     n->nIsUnit      = nr2mIsUnit;
-     n->nGetUnit     = nr2mGetUnit;
-     n->nExtGcd      = nr2mExtGcd;
-     n->nName        = ndName;
+     nr2mInitExp(r->ch, r);
+     r->cfInit       = nr2mInit;
+     r->cfCopy       = ndCopy;
+     r->cfInt        = nr2mInt;
+     r->cfAdd         = nr2mAdd;
+     r->cfSub         = nr2mSub;
+     r->cfMult        = nr2mMult;
+     r->cfDiv         = nr2mDiv;
+     r->cfIntDiv      = nr2mIntDiv;
+     r->cfIntMod      = nr2mMod;
+     r->cfExactDiv    = nr2mDiv;
+     r->cfNeg         = nr2mNeg;
+     r->cfInvers      = nr2mInvers;
+     r->cfDivBy       = nr2mDivBy;
+     r->cfDivComp     = nr2mDivComp;
+     r->cfGreater     = nr2mGreater;
+     r->cfEqual       = nr2mEqual;
+     r->cfIsZero      = nr2mIsZero;
+     r->cfIsOne       = nr2mIsOne;
+     r->cfIsMOne      = nr2mIsMOne;
+     r->cfGreaterZero = nr2mGreaterZero;
+     r->cfWrite      = nr2mWrite;
+     r->cfRead        = nr2mRead;
+     r->cfPower       = nr2mPower;
+     r->cfSetMap     = nr2mSetMap;
+     r->cfNormalize   = ndNormalize;
+     r->cfLcm         = nr2mLcm;
+     r->cfGcd         = nr2mGcd;
+     r->cfIsUnit      = nr2mIsUnit;
+     r->cfGetUnit     = nr2mGetUnit;
+     r->cfExtGcd      = nr2mExtGcd;
+     r->cfName        = ndName;
 #ifdef LDEBUG
-     n->nDBTest      = nr2mDBTest;
+     r->cfDBTest      = nr2mDBTest;
 #endif
 }
 
@@ -71,7 +73,7 @@ number nr2mMult (number a, number b, const coeffs r)
   if (((NATNUMBER)a == 0) || ((NATNUMBER)b == 0))
     return (number)0;
   else
-    return nr2mMultM(a,b);
+    return nr2mMultM(a,b,r);
 }
 
 /*
@@ -137,13 +139,13 @@ number nr2mExtGcd (number a, number b, number *s, number *t, const coeffs r)
   if ((NATNUMBER) b % 2 == 0)
   {
     *t = NULL;
-    *s = nr2mInvers(a);
+    *s = nr2mInvers(a,r);
     return (number) ((1L << res));// * (NATNUMBER) a);  // (2**res)*a    a ist Einheit
   }
   else
   {
     *s = NULL;
-    *t = nr2mInvers(b);
+    *t = nr2mInvers(b,r);
     return (number) ((1L << res));// * (NATNUMBER) b);  // (2**res)*b    b ist Einheit
   }
 }
@@ -160,8 +162,8 @@ void nr2mPower (number a, int i, number * result, const coeffs r)
   }
   else
   {
-    nr2mPower(a,i-1,result);
-    *result = nr2mMultM(a,*result);
+    nr2mPower(a,i-1,result,r);
+    *result = nr2mMultM(a,*result,r);
   }
 }
 
@@ -199,12 +201,12 @@ int nr2mInt(number &n, const coeffs r)
 
 number nr2mAdd (number a, number b, const coeffs r)
 {
-  return nr2mAddM(a,b);
+  return nr2mAddM(a,b,r);
 }
 
 number nr2mSub (number a, number b, const coeffs r)
 {
-  return nr2mSubM(a,b);
+  return nr2mSubM(a,b,r);
 }
 
 BOOLEAN nr2mIsUnit (number a, const coeffs r)
@@ -240,12 +242,12 @@ BOOLEAN nr2mIsMOne (number a, const coeffs r)
 
 BOOLEAN nr2mEqual (number a, number b, const coeffs r)
 {
-  return nr2mEqualM(a,b);
+  return a==b;
 }
 
 BOOLEAN nr2mGreater (number a, number b, const coeffs r)
 {
-  return nr2mDivBy(a, b);
+  return nr2mDivBy(a, b,r);
 }
 
 /* Is a divisible by b? There are two cases:
@@ -389,7 +391,10 @@ NATNUMBER InvMod(NATNUMBER a, const coeffs r)
 inline number nr2mInversM (number c, const coeffs r)
 {
   assume((NATNUMBER)c % 2 != 0);
-  return (number)InvMod((NATNUMBER)c);
+  // Table !!!
+  NATNUMBER inv;
+  inv = InvMod((NATNUMBER)c,r);
+  return (number) inv;
 }
 
 number nr2mDiv (number a, number b, const coeffs r)
@@ -413,7 +418,7 @@ number nr2mDiv (number a, number b, const coeffs r)
       return (number) ((NATNUMBER) a / (NATNUMBER) b);
     }
   }
-  return (number) nr2mMult(a, nr2mInversM(b));
+  return (number) nr2mMult(a, nr2mInversM(b,r),r);
 }
 
 number nr2mMod (number a, number b, const coeffs R)
@@ -491,43 +496,38 @@ number  nr2mInvers (number c, const coeffs r)
     WerrorS("division by zero divisor");
     return (number)0;
   }
-  return nr2mInversM(c);
+  return nr2mInversM(c,r);
 }
 
 number nr2mNeg (number c, const coeffs r)
 {
   if ((NATNUMBER)c==0) return c;
-  return nr2mNegM(c);
+  return nr2mNegM(c,r);
 }
 
-number nr2mMapMachineInt(number from, const coeffs r)
+number nr2mMapMachineInt(number from, const coeffs src, const coeffs dst)
 {
-  NATNUMBER i = ((NATNUMBER) from) % r->nr2mModul ;
+  NATNUMBER i = ((NATNUMBER) from) % dst->nr2mModul ;
   return (number) i;
 }
 
-number nr2mCopy(number a, const coeffs)
+number nr2mMapZp(number from, const coeffs src, const coeffs dst)
 {
-  return a;
-}
-
-number nr2mMapZp(number from, const coeffs r)
-{
-  long ii = (long)from;
   NATNUMBER j = (NATNUMBER)1;
-  if (ii < 0) { j = r->nr2mModul; ii = -ii; }
+  long ii = (long) from;
+  if (ii < 0) { j = dst->nr2mModul; ii = -ii; }
   NATNUMBER i = (NATNUMBER)ii;
-  i = i & r->nr2mModul;
+  i = i & dst->nr2mModul;
   /* now we have: from = j * i mod 2^m */
-  return (number)nr2mMult((number)i, (number)j);
+  return (number)nr2mMult((number)i, (number)j, dst);
 }
 
-number nr2mMapQ(number from, const coeffs r)
+number nr2mMapQ(number from, const coeffs src, const coeffs dst)
 {
-  int_number erg = (int_number) omAlloc(sizeof(mpz_t));
+  int_number erg = (int_number)  omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   int_number k = (int_number) omAlloc(sizeof(mpz_t));
-  mpz_init_set_ui(k, r->nr2mModul);
+  mpz_init_set_ui(k, dst->nr2mModul);
 
   nlGMP(from, (number)erg);
   mpz_and(erg, erg, k);
@@ -539,12 +539,12 @@ number nr2mMapQ(number from, const coeffs r)
   return (number) res;
 }
 
-number nr2mMapGMP(number from, const coeffs r)
+number nr2mMapGMP(number from, const coeffs src, const coeffs dst)
 {
-  int_number erg = (int_number) omAlloc(sizeof(mpz_t));
+  int_number erg = (int_number)  omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   int_number k = (int_number) omAlloc(sizeof(mpz_t));
-  mpz_init_set_ui(k, r->nr2mModul);
+  mpz_init_set_ui(k, dst->nr2mModul);
 
   mpz_and(erg, (int_number)from, k);
   number res = (number) mpz_get_ui(erg);
@@ -555,41 +555,41 @@ number nr2mMapGMP(number from, const coeffs r)
   return (number) res;
 }
 
-nMapFunc nr2mSetMap(const ring src, const ring dst)
+nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
 {
-  if (rField_is_Ring_2toM(src)
+  if (nField_is_Ring_2toM(src)
      && (src->ringflagb == dst->ringflagb))
   {
-    return nr2mCopy;
+    return ndCopyMap;
   }
-  if (rField_is_Ring_2toM(src)
+  if (nField_is_Ring_2toM(src)
      && (src->ringflagb < dst->ringflagb))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t < s */
     return nr2mMapMachineInt;
   }
-  if (rField_is_Ring_2toM(src)
+  if (nField_is_Ring_2toM(src)
      && (src->ringflagb > dst->ringflagb))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t > s */
     // to be done
   }
-  if (rField_is_Ring_Z(src))
+  if (nField_is_Ring_Z(src))
   {
     return nr2mMapGMP;
   }
-  if (rField_is_Q(src))
+  if (nField_is_Q(src))
   {
     return nr2mMapQ;
   }
-  if (rField_is_Zp(src)
+  if (nField_is_Zp(src)
      && (src->ch == 2)
      && (dst->ringflagb == 1))
   {
     return nr2mMapZp;
   }
-  if (rField_is_Ring_PtoM(src) || rField_is_Ring_ModN(src))
+  if (nField_is_Ring_PtoM(src) || nField_is_Ring_ModN(src))
   {
     // Computing the n of Z/n
-    int_number modul = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
+    int_number modul = (int_number)  omAllocBin(gmp_nrz_bin);
     mpz_init(modul);
     mpz_set(modul, src->ringflaga);
     mpz_pow_ui(modul, modul, src->ringflagb);
@@ -671,16 +671,16 @@ const char * nr2mRead (const char *s, number *a, const coeffs r)
   int z;
   int n=1;
 
-  s = nr2mEati(s, &z);
+  s = nr2mEati(s, &z,r);
   if ((*s) == '/')
   {
     s++;
-    s = nr2mEati(s, &n);
+    s = nr2mEati(s, &n,r);
   }
   if (n == 1)
     *a = (number)z;
   else
-      *a = nr2mDiv((number)z,(number)n);
+      *a = nr2mDiv((number)z,(number)n,r);
   return s;
 }
 #endif

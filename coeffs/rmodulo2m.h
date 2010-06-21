@@ -15,7 +15,6 @@ extern NATNUMBER nr2mModul; /* for storing 2^m - 1, i.e., the
                                bit pattern '11..1' of length m */
 
 void    nr2mInitChar    (coeffs r, void*);
-number  nr2mCopy        (number a, const coeffs r);
 BOOLEAN nr2mGreaterZero (number k, const coeffs r);
 number  nr2mMult        (number a, number b, const coeffs r);
 number  nr2mInit        (int i, const coeffs r);
