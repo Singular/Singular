@@ -16,7 +16,7 @@ nMapFunc  ngfSetMap(const coeffs src, const coeffs dst);
 void ngfInitChar(coeffs r, void *);
 
 /// test, whether r is an instance of nInitCoeffs(n, parameter) */
-static BOOLEAN ngfCoeffsEqual(const coeffs r, n_coeffType n, int parameter);
+static BOOLEAN ngfCoeffsEqual(const coeffs r, n_coeffType n, void*);
 
 
 const char *   ngfRead (const char *s, number *a, const coeffs r);

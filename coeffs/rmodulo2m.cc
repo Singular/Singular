@@ -6,11 +6,11 @@
 * ABSTRACT: numbers modulo 2^m
 */
 
-#include <string.h>
 #include "config.h"
 #include <auxiliary.h>
 
 #ifdef HAVE_RINGS
+
 #include <mylimits.h>
 #include "coeffs.h"
 #include "reporter.h"
@@ -20,6 +20,8 @@
 #include "mpr_complex.h"
 #include "rmodulo2m.h"
 #include "si_gmp.h"
+
+#include <string.h>
 
 int nr2mExp;
 

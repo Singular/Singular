@@ -10,6 +10,8 @@
 #include <gnumpfl.h>
 #include <gnumpc.h>
 #include <shortfl.h>
+
+
 #include <rmodulon.h>
 #include <rmodulo2m.h>
 
@@ -39,7 +41,8 @@ bool Test(const coeffs r)
 bool Test(const n_coeffType type)
 {
 
-  cout << "Testing coeffs: [" << type << "]: " << endl;
+  cout  << endl << "----------------------- Testing coeffs: [" << type <<
+                "]: -----------------------" << endl;
 
   const coeffs r = nInitChar( type, NULL );
 
@@ -83,6 +86,7 @@ bool Test(const n_coeffType type)
     assume( r->cfAdd == nrAdd );
 //    assume( r->cfDelete == nrDelete ); // No?
   }
+#ifdef HAVE_RINGS
   else if( type == n_Z2m )
   {
     assume( r->cfInit == nr2mInit );
@@ -97,6 +101,7 @@ bool Test(const n_coeffType type)
     assume( r->cfAdd == nrnAdd );
     assume( r->cfDelete == nrnDelete );
   }
+#endif  
   else
   {
     // ...
@@ -134,14 +139,17 @@ int main()
   if( Test(type) )
     c ++;
 
+#ifdef HAVE_RINGS
   type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
   if( Test(type) )
     c ++;
+
   
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
   if( Test(type) )
     c ++;
-
+#endif
+  
   return c;
 
 }
