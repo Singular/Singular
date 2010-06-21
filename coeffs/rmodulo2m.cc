@@ -8,6 +8,7 @@
 
 #include <string.h>
 #include "config.h"
+#include <auxiliary.h>
 
 #ifdef HAVE_RINGS
 #include <mylimits.h>

@@ -2461,7 +2461,7 @@ static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   return (n==n_Q);
 }
 
-int nlInitChar(coeffs r, void* p)
+void nlInitChar(coeffs r, void* p)
 {
   const int ch = (int)(long)(p);
   
@@ -2526,7 +2526,6 @@ int nlInitChar(coeffs r, void* p)
   
   // variables for this type of coeffs:
   // (none)
-  return 0;
 }
 #if 0
 number nlMod(number a, number b)
