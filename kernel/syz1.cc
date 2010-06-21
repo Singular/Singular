@@ -2121,14 +2121,14 @@ static poly syStripOut(poly p,intvec * toStrip)
   poly pp=p;
 
   while ((pp!=NULL) && ((*toStrip)[pGetComp(pp)]!=0))
-    pDeleteLm(&pp);
+    pLmDelete(&pp);
   p = pp;
   if (pp!=NULL)
   {
     while (pNext(pp)!=NULL)
     {
       if ((*toStrip)[pGetComp(pNext(pp))]!=0)
-        pDeleteLm(&pNext(pp));
+        pLmDelete(&pNext(pp));
       else
         pIter(pp);
     }
@@ -2605,7 +2605,7 @@ syStrategy syLaScala3(ideal arg,int * length)
   kBucketDestroy(&(syzstr->bucket));
   if (origR != syzstr->syRing)
     rChangeCurrRing(origR);
-  pDeleteLm(&redpol);
+  pLmDelete(&redpol);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }
@@ -2733,7 +2733,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   kBucketDestroy(&(syzstr->bucket));
   if (origR != syzstr->syRing)
     rChangeCurrRing(origR);
-  pDeleteLm(&redpol);
+  pLmDelete(&redpol);
   if (TEST_OPT_PROT) PrintLn();
   return syzstr;
 }
