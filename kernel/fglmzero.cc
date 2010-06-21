@@ -294,7 +294,7 @@ public:
     fglmVector nf;
     borderElem() : monom(NULL), nf() {}
     borderElem( poly p, fglmVector n ) : monom( p ), nf( n ) {}
-    ~borderElem() { pDeleteLm(&monom); }
+    ~borderElem() { if (monom!=NULL) pLmDelete(&monom); }
 #ifndef HAVE_EXPLICIT_CONSTR
     void insertElem( poly p, fglmVector n )
     {
@@ -395,7 +395,7 @@ fglmSdata::~fglmSdata()
 {
     omFreeSize( (ADDRESS)varpermutation, (pVariables+1)*sizeof(int) );
     for ( int k = basisSize; k > 0; k-- )
-        pDeleteLm( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
+        pLmDelete( basis + k );  //. rem: basis runs from basis[1]..basis[basisSize]
     omFreeSize( (ADDRESS)basis, basisMax*sizeof( poly ) );
 #ifndef HAVE_EXPLICIT_CONSTR
     delete [] border;
@@ -476,30 +476,36 @@ fglmSdata::updateCandidates()
     int k = pVariables;
     BOOLEAN done = FALSE;
     int state = 0;
-    while ( k >= 1 ) {
+    while ( k >= 1 )
+    {
         newmonom = pCopy( m );
         pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
         done= FALSE;
-        while ( list.hasItem() && (done == FALSE) ) {
+        while ( list.hasItem() && (!done) )
+        {
             if ( (state= pCmp( list.getItem().monom, newmonom )) < 0 )
                 list++;
             else done= TRUE;
         }
-        if ( done == FALSE ) {
+        if ( !done )
+        {
             nlist.append( fglmSelem( newmonom, varpermutation[k] ) );
             break;
         }
-        if ( state == 0 ) {
+        if ( state == 0 )
+        {
             list.getItem().newDivisor( varpermutation[k] );
-            pDeleteLm(&newmonom);
+            pLmDelete(&newmonom);
         }
-        else {
+        else
+        {
             list.insert( fglmSelem( newmonom, varpermutation[k] ) );
         }
         k--;
     }
-    while ( --k >= 1 ) {
+    while ( --k >= 1 )
+    {
         newmonom= pCopy( m ); // HIER
         pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
@@ -605,12 +611,13 @@ internalCalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
         fglmSelem candidate = data.nextCandidate();
         if ( candidate.isBasisOrEdge() == TRUE ) {
             int edge = data.getEdgeNumber( candidate.monom );
-            if ( edge != 0 ) {
+            if ( edge != 0 )
+            {
                 // now candidate is an edge, i.e. we know its normalform:
                 // NF(p) = - ( tail(p)/LC(p) )
                 poly nf = data.getSpanPoly( edge );
                 pNorm( nf );
-                pDeleteLm(&nf);  //. deletes the leadingmonomial
+                pLmDelete(&nf);  //. deletes the leadingmonomial
                 nf= pNeg( nf );
                 fglmVector nfv = data.getVectorRep( nf );
                 l.insertCols( candidate.divisors, nfv );
@@ -618,7 +625,8 @@ internalCalculateFunctionals( const ideal & theIdeal, idealFunctionals & l,
                 pDelete( &nf );
                 STICKYPROT( "+" );
             }
-            else {
+            else
+            {
                 int basis= data.newBasisElem( candidate.monom );
                 data.updateCandidates();
                 l.insertCols( candidate.divisors, basis );
@@ -695,8 +703,9 @@ fglmDelem::fglmDelem( poly & m, fglmVector mv, int v ) : v( mv ), insertions( 0 
 void
 fglmDelem::cleanup()
 {
-    if ( monom != NULL ) {
-        pDeleteLm(&monom);
+    if ( monom != NULL )
+    {
+        pLmDelete(&monom);
     }
 }
 
@@ -877,30 +886,36 @@ fglmDdata::updateCandidates( poly m, const fglmVector v )
     int k = pVariables;
     BOOLEAN done = FALSE;
     int state = 0;
-    while ( k >= 1 ) {
+    while ( k >= 1 )
+    {
         newmonom = pCopy( m );
         pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
         done= FALSE;
-        while ( list.hasItem() && (done == FALSE) ) {
+        while ( list.hasItem() && (!done) )
+        {
             if ( (state= pCmp( list.getItem().monom, newmonom )) < 0 )
                 list++;
             else done= TRUE;
         }
-        if ( done == FALSE ) {
+        if ( !done )
+        {
             nlist.append( fglmDelem( newmonom, v, k ) );
             break;
         }
-        if ( state == 0 ) {
+        if ( state == 0 )
+        {
             list.getItem().newDivisor();
-            pDeleteLm( & newmonom );
+            pLmDelete( & newmonom );
         }
-        else {
+        else
+        {
             list.insert( fglmDelem( newmonom, v, k ) );
         }
         k--;
     }
-    while ( --k >= 1 ) {
+    while ( --k >= 1 )
+    {
         newmonom= pCopy( m );
         pIncrExp( newmonom, varpermutation[k] );
         pSetm( newmonom );
@@ -1111,12 +1126,15 @@ FindUnivariatePolys( const idealFunctionals & l )
         gaussReducer gauss( l.dimen() );
         isZero= FALSE;
         v= fglmVector( l.dimen(), 1 );
-        while ( isZero == FALSE ) {
-            if ( (isZero= gauss.reduce( v )) == TRUE ) {
+        while ( !isZero )
+        {
+            if ( (isZero= gauss.reduce( v )))
+            {
                 STICKYPROT( "+" );
                 p= gauss.getDependence();
                 number gcd= p.gcd();
-                if ( ! nIsOne( gcd ) ) {
+                if ( ! nIsOne( gcd ) )
+                {
                     p /= gcd;
                 }
                 nDelete( & gcd );
