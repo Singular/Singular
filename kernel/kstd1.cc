@@ -504,7 +504,7 @@ static poly redMoraNF (poly h,kStrategy strat, int flag)
     }
     if (TEST_V_DEG_STOP)
     {
-      if (kModDeg(H.p)>Kstd1_deg) pDeleteLm(&H.p);
+      if (kModDeg(H.p)>Kstd1_deg) pLmDelete(&H.p);
       if (H.p==NULL) return NULL;
     }
     if (p_LmShortDivisibleBy(strat->T[j].GetLmTailRing(), strat->sevT[j], H.GetLmTailRing(), not_sev, strat->tailRing))
