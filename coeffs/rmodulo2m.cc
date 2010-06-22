@@ -28,9 +28,11 @@ int nr2mExp;
 extern omBin gmp_nrz_bin; /* init in rintegers*/
 
 /* for initializing function pointers */
-void nr2mInitChar (coeffs r, void*)
+void nr2mInitChar (coeffs r, void* p)
 {
-     nr2mInitExp(r->ch, r);
+  
+  nr2mInitExp((int)(long)(p), r);
+
      r->cfInit       = nr2mInit;
      r->cfCopy       = ndCopy;
      r->cfInt        = nr2mInt;
@@ -612,7 +614,7 @@ nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
-void nr2mSetExp(int m, const coeffs r)
+void nr2mSetExp(int m, coeffs r)
 {
   if (m > 1)
   {
@@ -629,7 +631,7 @@ void nr2mSetExp(int m, const coeffs r)
   }
 }
 
-void nr2mInitExp(int m, const coeffs r)
+void nr2mInitExp(int m, coeffs r)
 {
   nr2mSetExp(m, r);
   if (m < 2) WarnS("nr2mInitExp failed: we go on with Z/2^2");

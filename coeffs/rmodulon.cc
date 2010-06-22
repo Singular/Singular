@@ -29,9 +29,11 @@ int_number nrnMinusOne = NULL;
 unsigned long nrnExponent = 0;
 
 /* for initializing function pointers */
-void nrnInitChar (coeffs r, void*)
+void nrnInitChar (coeffs r, void* p)
 {
-     nrnInitExp(r->ch, r);
+  
+  nrnInitExp((int)(long)(p), r);
+  
      r->cfInit       = nrnInit;
      r->cfDelete     = nrnDelete;
      r->cfCopy       = nrnCopy;
@@ -533,7 +535,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
-void nrnSetExp(int m, const coeffs r)
+void nrnSetExp(int m, coeffs r)
 {
   if ((r->nrnModul != NULL) && (mpz_cmp(r->nrnModul, r->ringflaga) == 0) && (nrnExponent == r->ringflagb)) return;
 
@@ -545,19 +547,22 @@ void nrnSetExp(int m, const coeffs r)
     nrnMinusOne = (int_number) omAllocBin(gmp_nrz_bin);
     mpz_init(nrnMinusOne);
   }
+  // BUG:  r->ringflaga is undefined!
   mpz_set(r->nrnModul, r->ringflaga);
   mpz_pow_ui(r->nrnModul, r->nrnModul, nrnExponent);
   mpz_sub_ui(nrnMinusOne, r->nrnModul, 1);
 }
 
-void nrnInitExp(int m, const coeffs r)
+void nrnInitExp(int m, coeffs r)
 {
   nrnSetExp(m, r);
 
-  if (mpz_cmp_ui(r->nrnModul,2) <= 0)
+  if (mpz_cmp_ui(r->nrnModul, 2) <= 0) // ???
   {
     WarnS("nrnInitExp failed");
   }
+  
+  r->ch = m; // ???
 }
 
 #ifdef LDEBUG

@@ -7,11 +7,17 @@
 * ABSTRACT: interface to coefficient aritmetics
 */
 
-#include <string.h>
-#include <stdlib.h>
+#include "config.h"
+#include <auxiliary.h>
+
+
+
 #include "coeffs.h"
-#include "reporter.h"
-#include "omalloc.h"
+
+#include "numbers.h"
+
+#include <reporter.h>
+#include <omalloc.h>
 #include "numbers.h"
 #include "longrat.h"
 #include "modulop.h"
@@ -21,16 +27,13 @@
 #include "shortfl.h"
 #include "longtrans.h"
 #ifdef HAVE_RINGS
-#include <kernel/rmodulo2m.h>
-#include <kernel/rmodulon.h>
-#include <kernel/rintegers.h>
-
-extern omBin gmp_nrz_bin;
+#include <rmodulo2m.h>
+#include <rmodulon.h>
+#include <rintegers.h>
 #endif
+#include <string.h>
+#include <stdlib.h>
 
-#ifndef assume
-#  define assume(a) if(!(a)){ Werror( "Assumption: is wrong: %s\n", #a ); };
-#endif
 
 
 //static int characteristic = 0;
@@ -110,8 +113,10 @@ static cfInitCharProc *nInitCharTable=NULL;
 coeffs nInitChar(n_coeffType t, void * parameter)
 {
   n_Procs_s *n=cf_root;
-  while((n!=NULL) && (!n->nCoeffIsEqual(n,t,parameter)))
+
+  while((n!=NULL) && (n->nCoeffIsEqual!=NULL) && (!n->nCoeffIsEqual(n,t,parameter)))
       n=n->next;
+
   if (n==NULL)
   {
     n=(n_Procs_s*)omAlloc0(sizeof(n_Procs_s));
@@ -134,6 +139,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfNormalize=ndNormalize;
     n->cfGcd  = ndGcd;
     n->cfLcm  = ndGcd; /* tricky, isn't it ?*/
+
 #ifdef HAVE_RINGS
     n->cfDivComp = ndDivComp;
     n->cfDivBy = ndDivBy;
@@ -188,12 +194,15 @@ coeffs nInitChar(n_coeffType t, void * parameter)
        (nInitCharTable[t])(n,parameter);
      else
        Werror("coeff init missing for %d",(int)t);
+    
     // post init settings:
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
     if (n->cfIntDiv==NULL) n->cfIntDiv=n->cfDiv;
+    
 #ifdef HAVE_RINGS
    if (n->cfGetUnit==NULL) n->cfGetUnit=n->cfCopy;
 #endif
+   
 #ifndef NDEBUG
    assume(n->nCoeffIsEqual!=NULL);
    if(n->cfKillChar==NULL) Warn("cfKillChar is NULL for coeff %d",t);
@@ -238,9 +247,9 @@ coeffs nInitChar(n_coeffType t, void * parameter)
    assume(n->cfName!=NULL);
    assume(n->cfInpMult!=NULL);
    assume(n->cfInit_bigint!=NULL);
-   #ifdef LDEBUG
+#ifdef LDEBUG
    assume(n->cfDBTest!=NULL);
-   #endif
+#endif
    assume(n->type==t);
 #endif
   }
