@@ -3885,7 +3885,7 @@ does not equal m.
     print(Q[2]);
     "----- next should be the zero vector:";
     print(A*Q[2]-b);
-    print "solution space has dimension", Q[3];
+    "solution space has dimension", Q[3];
   }
 @c example
 @end smallexample

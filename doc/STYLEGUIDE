@@ -282,7 +282,7 @@ i;  // mit Leerzeichen beginnen.
 + Innerhalb einer @tex-Umgebeung keine texinfo-Befehle (wie @ref) verwenden.
 
 + neuere latex2html-Versionen erfordern das Aendern von
-  /usr/lib/latex2html/l2hconf.pm
+  /usr/lib/latex2html/l2hconf.pm (und cfgcache.pm)
   $DVIPSOPT = ' -Ppdf -E -r0'; -> $DVIPSOPT = ' -E -r0';
   da sonst die PDF-Fonts benutzt werden, die fuer schware Unterstriche in den
   Formal sorgen.
