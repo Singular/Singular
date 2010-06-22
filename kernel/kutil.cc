@@ -5390,7 +5390,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
               mflush();
             }
           }
-          pDeleteLm(&redSi);
+          pLmDelete(&redSi);
           if (strat->S[i]==NULL)
           {
             deleteInS(i,strat);
@@ -5479,7 +5479,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
             h.sev =  pGetShortExpVector(h.p);
             strat->sevS[i] = h.sev;
           }
-          pDeleteLm(&redSi);
+          pLmDelete(&redSi);
           kTest(strat);
         }
         i++;
@@ -5955,7 +5955,7 @@ void exitBuchMora (kStrategy strat)
   omFreeSize(strat->L,(strat->Lmax)*sizeof(LObject));
   /*- set B: should be empty -*/
   omFreeSize(strat->B,(strat->Bmax)*sizeof(LObject));
-  pDeleteLm(&strat->tail);
+  pLmDelete(&strat->tail);
   strat->syzComp=0;
   if (strat->kIdeal!=NULL)
   {
