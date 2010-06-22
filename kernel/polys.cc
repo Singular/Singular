@@ -239,7 +239,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
       if (((unsigned long)i) >  r->bitmask)
       {
         // exponent to large: it is not a monomial
-        p_DeleteLm(&rc,r);
+        p_LmDelete(&rc,r);
         return s_save;
       }
       p_AddExp(rc,1+j, (long)i, r);
@@ -247,13 +247,13 @@ const char * p_Read(const char *st, poly &rc, const ring r)
     else
     {
       // 1st char of is not a varname
-      p_DeleteLm(&rc,r);
+      p_LmDelete(&rc,r);
       s--;
       return s;
     }
   }
 done:
-  if (r->cf->nIsZero(pGetCoeff(rc))) p_DeleteLm(&rc,r);
+  if (r->cf->nIsZero(pGetCoeff(rc))) p_LmDelete(&rc,r);
   else
   {
 #ifdef HAVE_PLURAL
@@ -269,7 +269,7 @@ done:
       for(unsigned int k = iFirstAltVar; k <= iLastAltVar; k++)
         if( p_GetExp(rc, k, r) > 1 )
         {
-          p_DeleteLm(&rc, r);
+          p_LmDelete(&rc, r);
           goto finish;
         }
     }
@@ -690,7 +690,7 @@ void pDeleteComp(poly * p,int k)
 {
   poly q;
 
-  while ((*p!=NULL) && (pGetComp(*p)==k)) pDeleteLm(p);
+  while ((*p!=NULL) && (pGetComp(*p)==k)) pLmDelete(p);
   if (*p==NULL) return;
   q = *p;
   if (pGetComp(q)>k)
@@ -701,7 +701,7 @@ void pDeleteComp(poly * p,int k)
   while (pNext(q)!=NULL)
   {
     if (pGetComp(pNext(q))==k)
-      pDeleteLm(&(pNext(q)));
+      pLmDelete(&(pNext(q)));
     else
     {
       pIter(q);
@@ -921,7 +921,7 @@ poly pSubst0(poly p, int n)
   {
     if (pGetExp(pNext(h),n)!=0)
     {
-      pDeleteLm(&pNext(h));
+      pLmDelete(&pNext(h));
     }
     else
     {
@@ -983,7 +983,7 @@ poly pSubst(poly p, int n, poly e)
       }
       res=pAdd(res,m);
     }
-    pDeleteLm(&h);
+    pLmDelete(&h);
   }
   omFreeSize((ADDRESS)me,(pVariables+1)*sizeof(int));
   omFreeSize((ADDRESS)ee,(pVariables+1)*sizeof(int));

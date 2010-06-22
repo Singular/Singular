@@ -47,7 +47,7 @@ BOOLEAN hasTermOfDegree( poly h, int d )
       return  TRUE;
     pIter(h);
   }
-  while( h!=(poly)NULL );
+  while( h!=NULL );
 
   return  FALSE;
 }
@@ -105,7 +105,7 @@ int     hasOne( ideal J )
 
 int     isMultiple( poly f,poly m )
 {
-  while( f!=(poly)NULL )
+  while( f!=NULL )
   {
     // ---------------------------------------------------
     //  for a local order  f|m  is only possible if  f>=m
@@ -138,7 +138,7 @@ int     isMultiple( poly f,poly m )
 poly    computeWC( const newtonPolygon &np,Rational max_weight )
 {
   poly m  = pOne();
-  poly wc = (poly)NULL;
+  poly wc = NULL;
   int  mdegree;
 
   for( int i=1; i<=pVariables; i++ )
@@ -179,7 +179,7 @@ static inline  poly    normalFormHC( poly f,poly hc )
 {
   poly    *ptr = &f;
 
-  while( (*ptr)!=(poly)NULL )
+  while( (*ptr)!=NULL )
   {
     if( pLmCmp( *ptr,hc )>=0 )
     {
@@ -203,7 +203,7 @@ static inline  poly    normalFormZ( poly f,poly Z )
 {
   poly    *ptr = &f;
 
-  while( (*ptr)!=(poly)NULL )
+  while( (*ptr)!=NULL )
   {
     if( !isMultiple( Z,*ptr ) )
     {
@@ -211,7 +211,7 @@ static inline  poly    normalFormZ( poly f,poly Z )
     }
     else
     {
-      pDeleteLm(ptr);
+      pLmDelete(ptr);
     }
   }
 
@@ -306,7 +306,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
 {
   int         carry,k;
   multiCnt    C( pVariables,0 );
-  poly        Z = (poly)NULL;
+  poly        Z = NULL;
 
   int         well = isWell( );
 
@@ -325,7 +325,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
       //  m  is not a lead monomial
       // ---------------------------
 
-      NF->insert_node( m,(poly)NULL );
+      NF->insert_node( m,NULL );
     }
     else if( isMultiple( Z,m ) )
     {
@@ -360,7 +360,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
 
       nf = normalFormHC( nf,hc );
 
-      if( pNext( nf )==(poly)NULL )
+      if( pNext( nf )==NULL )
       {
         // ----------------------------------
         //  normal form of  m  is  m  itself
@@ -375,7 +375,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
       {
         nf = normalFormZ( nf,Z );
 
-        if( pNext( nf )==(poly)NULL )
+        if( pNext( nf )==NULL )
         {
           // ----------------------------------
           //  normal form of  m  is  m  itself
@@ -403,7 +403,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
             nfhard = normalFormHC( nfhard,hc );
             nfhard = normalFormZ ( nfhard,Z );
 
-            if( nfhard==(poly)NULL )
+            if( nfhard==NULL )
             {
               NF->delete_monomial( m );
               Z = pAdd( Z,m );
@@ -434,7 +434,7 @@ void    computeNF( ideal stdJ,poly hc,poly wc,spectrumPolyList *NF )
 
     while( node!=(spectrumPolyNode*)NULL )
     {
-      if( node->nf!=(poly)NULL && pNext( node->nf )==(poly)NULL )
+      if( node->nf!=NULL && pNext( node->nf )==NULL )
       {
         NF->delete_monomial( node->nf );
         not_finished = TRUE;
