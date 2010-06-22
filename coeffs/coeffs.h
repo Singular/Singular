@@ -312,11 +312,9 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
 #endif
 
 }
+
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
-#else
-#define n_Test(a,r)  (1)
-#endif
 
 // Missing wrappers for:
 // cfIntMod, cfPar, cfParDeg, cfInt, cfRePart, cfImPart, cfRead, cfLcm, cfSetMap, cfName, cfInit_bigint

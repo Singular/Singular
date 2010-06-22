@@ -155,7 +155,7 @@ int main()
 //  n_Zpn, // no longer exists?
 #endif
 
-  type = nRegister( n_GF, nfInit); assume( type == n_GF );
+  type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
   if( Test(type) )
     c ++;
 

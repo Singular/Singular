@@ -722,7 +722,7 @@ number nfMapGGrev(number c, const coeffs src, const coeffs dst)
 /*2
 * set map function nMap ... -> GF(p,n)
 */
-nMapFunc nfSetMap(const coeffs r, const coeffs src, const coeffs dst)
+nMapFunc nfSetMap(const coeffs src, const coeffs dst)
 {
   if (nField_is_GF(src,src->m_nfCharQ))
   {
@@ -730,6 +730,7 @@ nMapFunc nfSetMap(const coeffs r, const coeffs src, const coeffs dst)
   }
   if (nField_is_GF(src))
   {
+    const coeffs r = dst;
     int q=src->ch;
     if ((src->m_nfCharQ % q)==0) /* GF(p,n1) -> GF(p,n2), n2 > n1 */
     {
@@ -817,11 +818,14 @@ void nfInitChar(coeffs r,  void * parameter)
   r->cfSetMap = nfSetMap;
   //r->cfName = ndName;
   // debug stuff
+
+#ifdef LDEBUG
   r->cfDBTest=nfDBTest;
+#endif
   
   // the variables:
   r->nNULL = (number)0;
-  r->type = n_GF;
+  assume( r->type == n_GF );
 
 
   r->m_nfCharQ = 0;
