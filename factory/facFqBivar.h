@@ -27,7 +27,6 @@
 #include "facFqBivarUtil.h"
 #include "DegreePattern.h"
 #include "ExtensionInfo.h"
-#include "ExtensionInfo.cc"
 #include "cf_util.h"
 #include "facFqSquarefree.h"
 

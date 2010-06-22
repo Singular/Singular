@@ -143,7 +143,7 @@ CanonicalForm
 extgcd ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & a, CanonicalForm & b )
 {
 #ifdef HAVE_NTL
-  if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 )
+  if (isOn(SW_USE_NTL_GCD_P) && ( getCharacteristic() > 0 ) && (CFFactory::gettype() != GaloisFieldDomain)
   &&  (f.level()==g.level()) && isPurePoly(f) && isPurePoly(g))
   {
     if (fac_NTL_char!=getCharacteristic())
@@ -405,7 +405,7 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
     {
         bpure = isPurePoly(pi) && isPurePoly(pi1);
 #ifdef HAVE_NTL
-        if ( isOn(SW_USE_NTL_GCD_P) && bpure )
+        if ( isOn(SW_USE_NTL_GCD_P) && bpure && (CFFactory::gettype() != GaloisFieldDomain))
             return gcd_univar_ntlp(pi, pi1 ) * C;
 #endif
     }

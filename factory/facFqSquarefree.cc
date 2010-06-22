@@ -14,6 +14,8 @@
  **/
 /*****************************************************************************/
 
+#include <config.h>
+
 #include "canonicalform.h"
 
 #include "cf_gcd_smallp.h"

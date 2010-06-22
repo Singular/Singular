@@ -16,7 +16,6 @@
 
 #include "ExtensionInfo.h"
 
-inline
 ExtensionInfo::ExtensionInfo (const bool extension)
 {
   m_alpha= Variable (1);
@@ -28,7 +27,6 @@ ExtensionInfo::ExtensionInfo (const bool extension)
   m_extension= extension;
 }
 
-inline
 ExtensionInfo::ExtensionInfo (const Variable& alpha, const Variable& beta, 
                               const CanonicalForm& gamma, const CanonicalForm& 
                               delta, const int nGFDegree, const char cGFName,
@@ -43,7 +41,6 @@ ExtensionInfo::ExtensionInfo (const Variable& alpha, const Variable& beta,
   m_extension= extension;
 }
 
-inline
 ExtensionInfo::ExtensionInfo (const Variable& alpha, const Variable& beta, 
                               const CanonicalForm& gamma, const CanonicalForm& 
                               delta)
@@ -57,7 +54,6 @@ ExtensionInfo::ExtensionInfo (const Variable& alpha, const Variable& beta,
   m_extension= true;
 }
 
-inline
 ExtensionInfo::ExtensionInfo (const Variable& alpha, const bool extension)
 {
   m_alpha= alpha;
@@ -69,7 +65,6 @@ ExtensionInfo::ExtensionInfo (const Variable& alpha, const bool extension)
   m_extension= extension;
 }
 
-inline
 ExtensionInfo::ExtensionInfo (const Variable& alpha)
 {
   m_alpha= alpha;
@@ -81,7 +76,6 @@ ExtensionInfo::ExtensionInfo (const Variable& alpha)
   m_extension= true;
 }
 
-inline
 ExtensionInfo::ExtensionInfo (const int nGFDegree, const char cGFName, const
                               bool extension)
 {

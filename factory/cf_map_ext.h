@@ -18,6 +18,8 @@
 **/
 //*****************************************************************************
 
+#include <config.h>
+
 CanonicalForm GFMapUp (const CanonicalForm & F, int k);
 
 CanonicalForm GFMapDown (const CanonicalForm & F, int k);

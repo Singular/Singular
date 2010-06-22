@@ -32,6 +32,8 @@
 // cyclotomoic polys:
 #include "cf_cyclo.h"
 
+#include "cf_map_ext.h"
+
 #ifdef HAVE_NTL 
 
 /// helper function
