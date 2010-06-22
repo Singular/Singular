@@ -3,7 +3,7 @@ Changes since 3-1-1-1:
 - new lib assprime.lib
 - new lib: resbin.lib
 - lib extended: modstd.lib
-- new commands: ludecomp(mat) and luinverse(mat [, mat, mat]) 
+- new commands: lusolve, ludecomp(mat) and luinverse(mat [, mat, mat]) 
 - stdhilb fixed (Tst/Short/bug_stdhilb.tst)
 - factory: windows port improved (.h files instead of .inc)
 - fixed trac 226 (for ascii links)
