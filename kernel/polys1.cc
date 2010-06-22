@@ -249,7 +249,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
 // {
 //   if(nIsZero(pGetCoeff(pNext(tail))))
 //   {
-//     pDeleteLm(&pNext(tail));
+//     pLmDelete(&pNext(tail));
 //   }
 //   else
 //     pIter(tail);
@@ -373,7 +373,7 @@ poly pDiff(poly a, int k)
       pSetCoeff0(f,nMult(t,pGetCoeff(a)));
       nDelete(&t);
       if (nIsZero(pGetCoeff(f)))
-        pDeleteLm(&f);
+        pLmDelete(&f);
       else
       {
         pDecrExp(f,k);
@@ -406,7 +406,7 @@ static poly pDiffOpM(poly a, poly b,BOOLEAN multiply)
     if (s<pGetExp(a,i))
     {
       nDelete(&n);
-      pDeleteLm(&p);
+      pLmDelete(&p);
       return NULL;
     }
     if (multiply)
@@ -1323,7 +1323,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
     if (rRing_has_Comp(currRing)) pSetComp(qq, p_GetComp(p,oldRing));
     if (nIsZero(pGetCoeff(qq)))
     {
-      pDeleteLm(&qq);
+      pLmDelete(&qq);
     }
     else
     {
@@ -1371,7 +1371,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
           else
           {
             /* this variable maps to 0 !*/
-            pDeleteLm(&qq);
+            pLmDelete(&qq);
             break;
           }
         }
