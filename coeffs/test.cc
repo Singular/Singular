@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include <auxiliary.h>
+
 #include <coeffs.h>
 #include <numbers.h>
 #include <reporter.h>
@@ -38,13 +39,13 @@ bool Test(const coeffs r)
 
 
 
-bool Test(const n_coeffType type)
+bool Test(const n_coeffType type, void* p = NULL)
 {
 
   cout  << endl << "----------------------- Testing coeffs: [" << type <<
                 "]: -----------------------" << endl;
 
-  const coeffs r = nInitChar( type, NULL );
+  const coeffs r = nInitChar( type, p );
 
   assume( r != NULL );
 
@@ -142,14 +143,14 @@ int main()
 
 #ifdef HAVE_RINGS
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
-  if( Test(type) )
+  if( Test(type, (void*) 2) )
     c ++;
 #endif
 
 
 #ifdef HAVE_RINGS
   type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
-  if( Test(type) )
+  if( Test(type, (void*) 3) )
     c ++;
 /* BUG: 
 Program received signal SIGSEGV, Segmentation fault.
@@ -157,7 +158,9 @@ Program received signal SIGSEGV, Segmentation fault.
 (gdb) bt
 #0  0x00007ffff7b91f1b in __gmpz_set () from /usr/lib/libgmp.so.10
 #1  0x00000000004177a5 in nrnSetExp (m=0, r=0x7ffff7f44ae8) at rmodulon.cc:549
+
 #2  0x0000000000417814 in nrnInitExp (m=0, r=0x7ffff7f44ae8) at rmodulon.cc:556
+
 #3  0x0000000000416122 in nrnInitChar (r=0x7ffff7f44ae8) at rmodulon.cc:34
 #4  0x0000000000413278 in nInitChar (t=n_Zn, parameter=0x0) at numbers.cc:146
 #5  0x0000000000402f10 in Test (type=n_Zn) at test.cc:47
