@@ -200,6 +200,24 @@ struct n_Procs_s
 
   BOOLEAN   ShortOut; /// ffields need this. 
 
+// ---------------------------------------------------
+  // for n_GF
+
+  int m_nfCharQ;  ///< the number of elemts: q
+  int m_nfM1;       ///< representation of -1
+  int m_nfCharP;  ///< the characteristic: p
+  int m_nfCharQ1; ///< q-1
+  unsigned short *m_nfPlus1Table;
+  int *m_nfMinPoly;
+
+  /// the characteristic: 
+  //int m_nfCharP; // ch?
+
+  /// the ???: 
+  //int m_nfCharN;
+  
+  /// p^n = number of el. = repr. of 0
+  //int m_nfCharQ;
 };
 //
 // test properties and type
@@ -284,11 +302,15 @@ static inline number n_ExactDiv(number a, number b, const coeffs r){ return (r)-
 
 static inline number n_Gcd(number a, number b, const coeffs r){ return (r)->cfGcd(a,b,r); }
 
-#ifdef LDEBUG
 /// Tests whether n is a correct number: only used if LDEBUG is defined
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 {
+#ifdef LDEBUG  
   return (r)->cfDBTest(n, filename, linenumber, r);
+#else
+  return TRUE;
+#endif
+
 }
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)

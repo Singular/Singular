@@ -16,11 +16,9 @@
 #include "ffields.h"
 #include <feFopen.h>
 
-int nfCharQ=0;  /* the number of elemts: q*/
-int nfM1;       /*representation of -1*/
-int nfCharP=0;  /* the characteristic: p*/
-static int nfCharQ1=0; /* q-1 */
-unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
+
+//unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
+
 /* the q's from the table 'fftable' */
 unsigned short fftable[]={
     4,  8, 16, 32, 64, 128, 256, 512,1024,2048,4096,8192,16384, 32768,
@@ -127,9 +125,9 @@ const char* eati(const char *s, int *i)
 /*2
 * debugging: is a a valid representation of a number ?
 */
-BOOLEAN nfDBTest (number a, const char *f, const int l)
+BOOLEAN nfDBTest (number a, const char *f, const int l, const coeffs r)
 {
-  if (((long)a<0L) || ((long)a>(long)nfCharQ))
+  if (((long)a<0L) || ((long)a>(long)r->m_nfCharQ))
   {
     Print("wrong %d in %s:%d\n",(int)((long)a),f,l);
     return FALSE;
@@ -137,16 +135,16 @@ BOOLEAN nfDBTest (number a, const char *f, const int l)
   int i=0;
   do
   {
-    if (nfPlus1Table[i]>nfCharQ)
+    if (r->m_nfPlus1Table[i]>r->m_nfCharQ)
     {
-      Print("wrong table %d=%d in %s:%d\n",i,nfPlus1Table[i],f,l);
+      Print("wrong table %d=%d in %s:%d\n",i,r->m_nfPlus1Table[i],f,l);
       return FALSE;
     }
     i++;
-  } while (i<nfCharQ);
+  } while (i<r->m_nfCharQ);
   return TRUE;
 }
-#define nfTest(N) nfDBTest(N,__FILE__,__LINE__)
+#define nfTest(N, R) nfDBTest(N,__FILE__,__LINE__, R)
 #endif
 
 /*2
@@ -155,7 +153,7 @@ BOOLEAN nfDBTest (number a, const char *f, const int l)
 BOOLEAN nfGreaterZero (number k, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(k);
+  nfTest(k, r);
 #endif
   return !nfIsZero(k, r) && !nfIsMOne(k, r);
 }
@@ -166,16 +164,16 @@ BOOLEAN nfGreaterZero (number k, const coeffs r)
 number nfMult (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
-  nfTest(b);
+  nfTest(a, r);
+  nfTest(b, r);
 #endif
-  if (((long)a == (long)nfCharQ) || ((long)b == (long)nfCharQ))
-    return (number)(long)nfCharQ;
+  if (((long)a == (long)r->m_nfCharQ) || ((long)b == (long)r->m_nfCharQ))
+    return (number)(long)r->m_nfCharQ;
   /*else*/
   int i=(int)((long)a+(long)b);
-  if (i>=nfCharQ1) i-=nfCharQ1;
+  if (i>=r->m_nfCharQ1) i-=r->m_nfCharQ1;
 #ifdef LDEBUG
-  nfTest((number)(long)i);
+  nfTest((number)(long)i, r);
 #endif
   return (number)(long)i;
 }
@@ -187,18 +185,18 @@ number nfInit (int i, const coeffs r)
 {
   // Hmm .. this is just to prevent initialization
   // from nfInitChar to go into an infinite loop
-  if (i==0) return (number)(long)nfCharQ;
-  while (i <  0)    i += nfCharP;
-  while (i >= nfCharP) i -= nfCharP;
-  if (i==0) return (number)(long)nfCharQ;
+  if (i==0) return (number)(long)r->m_nfCharQ;
+  while (i <  0)    i += r->m_nfCharP;
+  while (i >= r->m_nfCharP) i -= r->m_nfCharP;
+  if (i==0) return (number)(long)r->m_nfCharQ;
   unsigned short c=0;
   while (i>1)
   {
-    c=nfPlus1Table[c];
+    c=r->m_nfPlus1Table[c];
     i--;
   }
 #ifdef LDEBUG
-  nfTest((number)(long)c);
+  nfTest((number)(long)c, r);
 #endif
   return (number)(long)c;
 }
@@ -217,9 +215,9 @@ number nfPar (int i, const coeffs r)
 int nfParDeg(number n, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(n);
+  nfTest(n, r);
 #endif
-  if((long)nfCharQ == (long)n) return -1;
+  if((long)r->m_nfCharQ == (long)n) return -1;
   return (int)((long)n);
 }
 
@@ -239,11 +237,11 @@ number nfAdd (number a, number b, const coeffs R)
 /*4 z^a+z^b=z^b*(z^(a-b)+1), if a>=b; *
 *          =z^a*(z^(b-a)+1)  if a<b  */
 #ifdef LDEBUG
-  nfTest(a);
-  nfTest(b);
+  nfTest(a, R);
+  nfTest(b, R);
 #endif
-  if ((long)nfCharQ == (long)a) return b;
-  if ((long)nfCharQ == (long)b) return a;
+  if ((long)R->m_nfCharQ == (long)a) return b;
+  if ((long)R->m_nfCharQ == (long)b) return a;
   long zb,zab,r;
   if ((long)a >= (long)b)
   {
@@ -256,16 +254,16 @@ number nfAdd (number a, number b, const coeffs R)
     zab = (long)b-(long)a;
   }
 #ifdef LDEBUG
-  nfTest((number)zab);
+  nfTest((number)zab, R);
 #endif
-  if (nfPlus1Table[zab]==nfCharQ) r=(long)nfCharQ; /*if z^(a-b)+1 =0*/
+  if (R->m_nfPlus1Table[zab]==R->m_nfCharQ) r=(long)R->m_nfCharQ; /*if z^(a-b)+1 =0*/
   else
   {
-    r= zb+(long)nfPlus1Table[zab];
-    if(r>=(long)nfCharQ1) r-=(long)nfCharQ1;
+    r= zb+(long)R->m_nfPlus1Table[zab];
+    if(r>=(long)R->m_nfCharQ1) r-=(long)R->m_nfCharQ1;
   }
 #ifdef LDEBUG
-  nfTest((number)r);
+  nfTest((number)r, R);
 #endif
   return (number)r;
 }
@@ -285,9 +283,9 @@ number nfSub (number a, number b, const coeffs r)
 BOOLEAN nfIsZero (number  a, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
+  nfTest(a, r);
 #endif
-  return (long)nfCharQ == (long)a;
+  return (long)r->m_nfCharQ == (long)a;
 }
 
 /*2
@@ -296,7 +294,7 @@ BOOLEAN nfIsZero (number  a, const coeffs r)
 BOOLEAN nfIsOne (number a, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
+  nfTest(a, r);
 #endif
   return 0L == (long)a;
 }
@@ -307,10 +305,10 @@ BOOLEAN nfIsOne (number a, const coeffs r)
 BOOLEAN nfIsMOne (number a, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
+  nfTest(a, r);
 #endif
   if (0L == (long)a) return FALSE; /* special handling of char 2*/
-  return (long)nfM1 == (long)a;
+  return (long)r->m_nfM1 == (long)a;
 }
 
 /*2
@@ -319,24 +317,24 @@ BOOLEAN nfIsMOne (number a, const coeffs r)
 number nfDiv (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(b);
+  nfTest(b, r);
 #endif
-  if ((long)b==(long)nfCharQ)
+  if ((long)b==(long)r->m_nfCharQ)
   {
     WerrorS(nDivBy0);
-    return (number)((long)nfCharQ);
+    return (number)((long)r->m_nfCharQ);
   }
 #ifdef LDEBUG
-  nfTest(a);
+  nfTest(a, r);
 #endif
-  if ((long)a==(long)nfCharQ)
-    return (number)((long)nfCharQ);
+  if ((long)a==(long)r->m_nfCharQ)
+    return (number)((long)r->m_nfCharQ);
   /*else*/
   long s = (long)a - (long)b;
   if (s < 0L)
-    s += (long)nfCharQ1;
+    s += (long)r->m_nfCharQ1;
 #ifdef LDEBUG
-  nfTest((number)s);
+  nfTest((number)s, r);
 #endif
   return (number)s;
 }
@@ -347,17 +345,17 @@ number nfDiv (number a,number b, const coeffs r)
 number  nfInvers (number c, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(c);
+  nfTest(c, r);
 #endif
-  if ((long)c==(long)nfCharQ)
+  if ((long)c==(long)r->m_nfCharQ)
   {
     WerrorS(nDivBy0);
-    return (number)((long)nfCharQ);
+    return (number)((long)r->m_nfCharQ);
   }
 #ifdef LDEBUG
-  nfTest(((number)((long)nfCharQ1-(long)c)));
+  nfTest(((number)((long)r->m_nfCharQ1-(long)c)), r);
 #endif
-  return (number)((long)nfCharQ1-(long)c);
+  return (number)((long)r->m_nfCharQ1-(long)c);
 }
 
 /*2
@@ -367,13 +365,13 @@ number nfNeg (number c, const coeffs r)
 {
 /*4 -z^c=z^c*(-1)=z^c*nfM1*/
 #ifdef LDEBUG
-  nfTest(c);
+  nfTest(c, r);
 #endif
-  if ((long)nfCharQ == (long)c) return c;
-  long i=(long)c+(long)nfM1;
-  if (i>=(long)nfCharQ1) i-=(long)nfCharQ1;
+  if ((long)r->m_nfCharQ == (long)c) return c;
+  long i=(long)c+(long)r->m_nfM1;
+  if (i>=(long)r->m_nfCharQ1) i-=(long)r->m_nfCharQ1;
 #ifdef LDEBUG
-  nfTest((number)i);
+  nfTest((number)i, r);
 #endif
   return (number)i;
 }
@@ -384,8 +382,8 @@ number nfNeg (number c, const coeffs r)
 BOOLEAN nfGreater (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
-  nfTest(b);
+  nfTest(a, r);
+  nfTest(b, r);
 #endif
   return (long)a != (long)b;
 }
@@ -396,8 +394,8 @@ BOOLEAN nfGreater (number a,number b, const coeffs r)
 BOOLEAN nfEqual (number a,number b, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
-  nfTest(b);
+  nfTest(a, r);
+  nfTest(b, r);
 #endif
   return (long)a == (long)b;
 }
@@ -408,9 +406,9 @@ BOOLEAN nfEqual (number a,number b, const coeffs r)
 void nfWrite (number &a, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
+  nfTest(a, r);
 #endif
-  if ((long)a==(long)nfCharQ)  StringAppendS("0");
+  if ((long)a==(long)r->m_nfCharQ)  StringAppendS("0");
   else if ((long)a==0L)   StringAppendS("1");
   else if (nfIsMOne(a, r))   StringAppendS("-1");
   else
@@ -430,11 +428,11 @@ void nfWrite (number &a, const coeffs r)
 char * nfName(number a, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
+  nfTest(a, r);
 #endif
   char *s;
   char *nfParameter=r->parameter[0];
-  if (((long)a==(long)nfCharQ) || ((long)a==0L)) return NULL;
+  if (((long)a==(long)r->m_nfCharQ) || ((long)a==0L)) return NULL;
   else if ((long)a==1L)
   {
     return omStrDup(nfParameter);
@@ -452,7 +450,7 @@ char * nfName(number a, const coeffs r)
 void nfPower (number a, int i, number * result, const coeffs r)
 {
 #ifdef LDEBUG
-  nfTest(a);
+  nfTest(a, r);
 #endif
   if (i==0)
   {
@@ -469,14 +467,14 @@ void nfPower (number a, int i, number * result, const coeffs r)
     *result = nfMult(a,*result, r);
   }
 #ifdef LDEBUG
-  nfTest(*result);
+  nfTest(*result, r);
 #endif
 }
 
 /*4
 * read an integer (with reduction mod p)
 */
-static const char* nfEati(const char *s, int *i)
+static const char* nfEati(const char *s, int *i, const coeffs r)
 {
   if (*s >= '0' && *s <= '9')
   {
@@ -485,10 +483,10 @@ static const char* nfEati(const char *s, int *i)
     {
       *i *= 10;
       *i += *s++ - '0';
-      if (*i > (INT_MAX / 10)) *i = *i % nfCharP;
+      if (*i > (INT_MAX / 10)) *i = *i % r->m_nfCharP;
     }
     while (*s >= '0' && *s <= '9');
-    if (*i >= nfCharP) *i = *i % nfCharP;
+    if (*i >= r->m_nfCharP) *i = *i % r->m_nfCharP;
   }
   else *i = 1;
   return s;
@@ -503,13 +501,13 @@ const char * nfRead (const char *s, number *a, const coeffs r)
   number z;
   number n;
 
-  s = nfEati(s, &i);
+  s = nfEati(s, &i, r);
   z=nfInit(i, r);
   *a=z;
   if (*s == '/')
   {
     s++;
-    s = nfEati(s, &i);
+    s = nfEati(s, &i, r);
     n=nfInit(i, r);
     *a = nfDiv(z,n,r);
   }
@@ -520,7 +518,7 @@ const char * nfRead (const char *s, number *a, const coeffs r)
     if ((*s >= '0') && (*s <= '9'))
     {
       s=eati(s,&i);
-      while (i>=nfCharQ1) i-=nfCharQ1;
+      while (i>=r->m_nfCharQ1) i-=r->m_nfCharQ1;
     }
     else
       i=1;
@@ -528,7 +526,7 @@ const char * nfRead (const char *s, number *a, const coeffs r)
     *a=nfMult(*a,z,r);
   }
 #ifdef LDEBUG
-  nfTest(*a);
+  nfTest(*a, r);
 #endif
   return s;
 }
@@ -606,26 +604,26 @@ static void nfReadMipo(char *s)
 /*2
 * init global variables from files 'gftables/%d'
 */
-void nfSetChar(int c, char **param)
+void nfReadTable(const int c, const coeffs r)
 {
   //Print("GF(%d)\n",c);
-  if ((c==nfCharQ)||(c==-nfCharQ))
+  if ((c==r->m_nfCharQ)||(c==-r->m_nfCharQ))
     /*this field is already set*/  return;
   int i=0;
   while ((fftable[i]!=c) && (fftable[i]!=0)) i++;
   if (fftable[i]==0)
     return;
-  if (nfCharQ > 1)
+  if (r->m_nfCharQ > 1)
   {
-    omFreeSize( (ADDRESS)nfPlus1Table,nfCharQ*sizeof(unsigned short) );
-    nfPlus1Table=NULL;
+    omFreeSize( (ADDRESS)r->m_nfPlus1Table,r->m_nfCharQ*sizeof(unsigned short) );
+    r->m_nfPlus1Table=NULL;
   }
   if ((c>1) || (c<0))
   {
-    if (c>1) nfCharQ = c;
-    else     nfCharQ = -c;
+    if (c>1) r->m_nfCharQ = c;
+    else     r->m_nfCharQ = -c;
     char buf[100];
-    sprintf(buf,"gftables/%d",nfCharQ);
+    sprintf(buf,"gftables/%d",r->m_nfCharQ);
     FILE * fp = feFopen(buf,"r",NULL,TRUE);
     if (fp==NULL)
     {
@@ -641,53 +639,53 @@ void nfSetChar(int c, char **param)
       goto err;
     }
     int q;
-    sscanf(buf,"%d %d",&nfCharP,&q);
+    sscanf(buf,"%d %d",&r->m_nfCharP,&q);
     nfReadMipo(buf);
-    nfCharQ1=nfCharQ-1;
+    r->m_nfCharQ1=r->m_nfCharQ-1;
     //Print("nfCharQ=%d,nfCharQ1=%d,mipo=>>%s<<\n",nfCharQ,nfCharQ1,buf);
-    nfPlus1Table= (unsigned short *)omAlloc( (nfCharQ)*sizeof(unsigned short) );
-    int digs = gf_tab_numdigits62( nfCharQ );
+    r->m_nfPlus1Table= (unsigned short *)omAlloc( (r->m_nfCharQ)*sizeof(unsigned short) );
+    int digs = gf_tab_numdigits62( r->m_nfCharQ );
     char * bufptr;
     int i = 1;
     int k;
-    while ( i < nfCharQ )
+    while ( i < r->m_nfCharQ )
     {
       fgets( buf, sizeof(buf), fp);
       //( strlen( buffer ) == (size_t)digs * 30, "illegal table" );
       bufptr = buf;
       k = 0;
-      while ( (i < nfCharQ) && (k < 30) )
+      while ( (i < r->m_nfCharQ) && (k < 30) )
       {
-        nfPlus1Table[i] = convertback62( bufptr, digs );
-        if(nfPlus1Table[i]>nfCharQ)
+        r->m_nfPlus1Table[i] = convertback62( bufptr, digs );
+        if(r->m_nfPlus1Table[i]>r->m_nfCharQ)
         {
-          Print("wrong entry %d: %d(%c%c%c)\n",i,nfPlus1Table[i],bufptr[0],bufptr[1],bufptr[2]);
+          Print("wrong entry %d: %d(%c%c%c)\n",i,r->m_nfPlus1Table[i],bufptr[0],bufptr[1],bufptr[2]);
         }
         bufptr += digs;
-        if (nfPlus1Table[i]==nfCharQ)
+        if (r->m_nfPlus1Table[i]==r->m_nfCharQ)
         {
-          if(i==nfCharQ1)
+          if(i==r->m_nfCharQ1)
           {
-            nfM1=0;
+            r->m_nfM1=0;
           }
           else
           {
-            nfM1=i;
+            r->m_nfM1=i;
           }
         }
         i++; k++;
       }
     }
-    nfPlus1Table[0]=nfPlus1Table[nfCharQ1];
+    r->m_nfPlus1Table[0]=r->m_nfPlus1Table[r->m_nfCharQ1];
   }
   else
-    nfCharQ=0;
+    r->m_nfCharQ=0;
 #ifdef LDEBUG
-  nfTest((number)0);
+  nfTest((number)0, r);
 #endif
   return;
 err:
-  Werror("illegal GF-table %d",nfCharQ);
+  Werror("illegal GF-table %d",r->m_nfCharQ);
 }
 
 /*2
@@ -706,7 +704,7 @@ number nfMapGG(number c, const coeffs src, const coeffs dst)
 {
   int i=(long)c;
   i*= nfMapGG_factor;
-  while (i >nfCharQ1) i-=nfCharQ1;
+  while (i >src->m_nfCharQ1) i-=src->m_nfCharQ1;
   return (number)((long)i);
 }
 /*2
@@ -718,7 +716,7 @@ number nfMapGGrev(number c, const coeffs src, const coeffs dst)
   if ((ex % nfMapGG_factor)==0)
     return (number)(((long)ex) / ((long)nfMapGG_factor));
   else
-    return (number)(long)nfCharQ; /* 0 */
+    return (number)(long)src->m_nfCharQ; /* 0 */
 }
 
 /*2
@@ -726,32 +724,32 @@ number nfMapGGrev(number c, const coeffs src, const coeffs dst)
 */
 nMapFunc nfSetMap(const coeffs r, const coeffs src, const coeffs dst)
 {
-  if (nField_is_GF(src,nfCharQ))
+  if (nField_is_GF(src,src->m_nfCharQ))
   {
     return ndCopyMap;   /* GF(p,n) -> GF(p,n) */
   }
   if (nField_is_GF(src))
   {
     int q=src->ch;
-    if ((nfCharQ % q)==0) /* GF(p,n1) -> GF(p,n2), n2 > n1 */
+    if ((src->m_nfCharQ % q)==0) /* GF(p,n1) -> GF(p,n2), n2 > n1 */
     {
       // check if n2 is a multiple of n1
       int n1=1;
-      int qq=nfCharP;
-      while(qq!=q) { qq *= nfCharP; n1++; }
+      int qq=r->m_nfCharP;
+      while(qq!=q) { qq *= r->m_nfCharP; n1++; }
       int n2=1;
-      qq=nfCharP;
-      while(qq!=nfCharQ) { qq *= nfCharP; n2++; }
-      Print("map %d^%d -> %d^%d\n",nfCharP,n1,nfCharP,n2);
+      qq=r->m_nfCharP;
+      while(qq!=src->m_nfCharQ) { qq *= r->m_nfCharP; n2++; }
+      Print("map %d^%d -> %d^%d\n",r->m_nfCharP,n1,r->m_nfCharP,n2);
       if ((n2 % n1)==0)
       {
         int save_ch=r->ch;
         char **save_par=r->parameter;
-        nfSetChar(src->ch,src->parameter);
-        int nn=nfPlus1Table[0];
-        nfSetChar(save_ch,save_par);
-        nfMapGG_factor= nfPlus1Table[0] / nn;
-        Print("nfMapGG_factor=%d (%d / %d)\n",nfMapGG_factor, nfPlus1Table[0], nn);
+        nfReadTable(src->ch, r);
+        int nn=r->m_nfPlus1Table[0];
+        nfReadTable(save_ch, r);
+        nfMapGG_factor= r->m_nfPlus1Table[0] / nn;
+        Print("nfMapGG_factor=%d (%d / %d)\n",nfMapGG_factor, r->m_nfPlus1Table[0], nn);
         return nfMapGG;
       }
       else if ((n1 % n2)==0)
@@ -763,9 +761,77 @@ nMapFunc nfSetMap(const coeffs r, const coeffs src, const coeffs dst)
         return NULL;
     }
   }
-  if (nField_is_Zp(src,nfCharP))
+  if (nField_is_Zp(src,src->m_nfCharP))
   {
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
   return NULL;     /* default */
 }
+
+void nfInitChar(coeffs r,  void * parameter)
+{
+
+
+  //r->cfInitChar=npInitChar;
+  //r->cfKillChar=nfKillChar;
+  r->cfSetChar= NULL;
+  //r->nCoeffIsEqual=nfCoeffsEqual;
+
+  r->cfMult  = nfMult;
+  r->cfSub   = nfSub;
+  r->cfAdd   = nfAdd;
+  r->cfDiv   = nfDiv;
+  r->cfIntDiv= nfDiv;
+  //r->cfIntMod= ndIntMod;
+  r->cfExactDiv= nfDiv;
+  r->cfInit = nfInit;
+  //r->cfPar = ndPar;
+  //r->cfParDeg = ndParDeg;
+  //r->cfSize  = ndSize;
+  r->cfInt  = nfInt;
+  #ifdef HAVE_RINGS
+  //r->cfDivComp = NULL; // only for ring stuff
+  //r->cfIsUnit = NULL; // only for ring stuff
+  //r->cfGetUnit = NULL; // only for ring stuff
+  //r->cfExtGcd = NULL; // only for ring stuff
+  // r->cfDivBy = NULL; // only for ring stuff
+  #endif
+  r->cfNeg   = nfNeg;
+  r->cfInvers= nfInvers;
+  //r->cfCopy  = ndCopy;
+  //r->cfRePart = ndCopy;
+  //r->cfImPart = ndReturn0;
+  r->cfWrite = nfWrite;
+  r->cfRead = nfRead;
+  //r->cfNormalize=ndNormalize;
+  r->cfGreater = nfGreater;
+  r->cfEqual = nfEqual;
+  r->cfIsZero = nfIsZero;
+  r->cfIsOne = nfIsOne;
+  r->cfIsMOne = nfIsMOne;
+  r->cfGreaterZero = nfGreaterZero;
+  r->cfPower = nfPower;
+  //r->cfGcd  = ndGcd;
+  //r->cfLcm  = ndGcd;
+  //r->cfDelete= ndDelete;
+  r->cfSetMap = nfSetMap;
+  //r->cfName = ndName;
+  // debug stuff
+  r->cfDBTest=nfDBTest;
+  
+  // the variables:
+  r->nNULL = (number)0;
+  r->type = n_GF;
+
+
+  r->m_nfCharQ = 0;
+ 
+
+  r->has_simple_Alloc=TRUE;
+  r->has_simple_Inverse=TRUE;
+  const int c = (int)(long)(parameter);
+  nfReadTable(c, r);
+  r->ch = r->m_nfCharP; 
+
+}
+

@@ -11,7 +11,7 @@
 #include <gnumpfl.h>
 #include <gnumpc.h>
 #include <shortfl.h>
-
+#include <ffields.h>
 
 #include <rmodulon.h>
 #include <rmodulo2m.h>
@@ -142,7 +142,6 @@ int main()
   if( Test(type) )
     c ++;
 
-
 #ifdef HAVE_RINGS
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
   if( Test(type, (void*) 2) )
@@ -156,8 +155,10 @@ int main()
 //  n_Zpn, // no longer exists?
 #endif
 
-  
-  
+  type = nRegister( n_GF, nfInit); assume( type == n_GF );
+  if( Test(type) )
+    c ++;
+
   return c;
 
 }

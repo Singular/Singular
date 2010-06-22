@@ -11,6 +11,10 @@
 
 // #define MAX_INT_VAL 0x7fffffff
 
+void nfInitChar(coeffs r, void*);
+
+//static BOOLEAN nfCoeffsEqual(const coeffs r, n_coeffType n, void* parameter);
+
 BOOLEAN nfGreaterZero (number k, const coeffs r);
 number  nfMult        (number a, number b, const coeffs r);
 number  nfInit        (int i, const coeffs r);
@@ -31,15 +35,14 @@ BOOLEAN nfEqual       (number a, number b, const coeffs r);
 void    nfWrite       (number &a, const coeffs r);
 const char *  nfRead  (const char *s, number *a, const coeffs r);
 #ifdef LDEBUG
-BOOLEAN nfDBTest      (number a, const char *f, const int l);
+BOOLEAN nfDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
-void    nfSetChar     (int c, char ** param);
+//void    nfSetChar     (const coeffs r);
 
 nMapFunc nfSetMap     (const coeffs src, const coeffs dst);
 char *  nfName        (number n, const coeffs r);
-extern  int nfMinPoly[];
-extern  int nfCharP;  /* the characteristic: p*/
-extern  int nfCharQ;  /* p^n = number of el. = repr. of 0 */
+void    nfReadTable   (const int c, const coeffs r);
+
 void    nfShowMipo();
 #endif
 
