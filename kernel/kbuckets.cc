@@ -1104,7 +1104,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 
   if(a1==NULL)
   {
-    p_DeleteLm(&lm, bucket->bucket_ring);
+    p_LmDelete(&lm, bucket->bucket_ring);
     return nInit(1);
   }
 
@@ -1165,7 +1165,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 
   if (backuped)
     p_SetCoeff0(a1,coef,bucket->bucket_ring);
-  p_DeleteLm(&lm, bucket->bucket_ring);
+  p_LmDelete(&lm, bucket->bucket_ring);
   if (reset_vec) p_SetCompP(a1, 0, bucket->bucket_ring);
   kbTest(bucket);
   return rn;

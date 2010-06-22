@@ -431,7 +431,7 @@ poly gnc_p_Mult_mm_Common(poly p, const poly m, int side, const ring r)
 
     sum += v;
 
-    p_DeleteLm(&p,r);
+    p_LmDelete(&p,r);
   }
   freeT(P,rN);
   freeT(M,rN);
@@ -652,7 +652,7 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
      w=gnc_mm_Mult_uu(Op,t,On[t],r);
      c[cnt]=n_Mult(c[cnt-1],p_GetCoeff(w,r),r);
      D = pNext(w);  /* getting coef and rest D */
-     p_DeleteLm(&w,r);
+     p_LmDelete(&w,r);
      w=NULL;
 
      Op[t] += On[t];   /* update exp_vectors */
@@ -896,7 +896,7 @@ poly gnc_mm_Mult_uu(int *F,int jG,int bG, const ring r)
      poly w=gnc_uu_Mult_ww(t,Op[t],jG,bG,r);
      c[cnt]=n_Copy(p_GetCoeff(w,r),r);
      D = pNext(w);  /* getting coef and rest D */
-     p_DeleteLm(&w,r);
+     p_LmDelete(&w,r);
      w=NULL;
 
      Op[t]= 0;

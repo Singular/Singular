@@ -970,14 +970,14 @@ void pShift (poly * p,int i)
       if (qp2 == *p)
       {
         pIter(*p);
-        pDeleteLm(&qp2);
+        pLmDelete(&qp2);
         qp2 = *p;
         qp1 = *p;
       }
       else
       {
         qp2->next = qp1->next;
-        pDeleteLm(&qp1);
+        if (qp1!=NULL) pLmDelete(&qp1);
         qp1 = qp2->next;
       }
     }

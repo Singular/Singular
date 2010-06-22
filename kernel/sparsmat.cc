@@ -2255,10 +2255,10 @@ static void smCombineChain(poly *px, poly r)
       if (i == 0)
       {
         x = nAdd(pGetCoeff(pb), pGetCoeff(r));
-        pDeleteLm(&r);
+        pLmDelete(&r);
         if (nIsZero(x))
         {
-          pDeleteLm(&pb);
+          pLmDelete(&pb);
           pNext(pa) = pAdd(pb,r);
         }
         else
@@ -2304,10 +2304,10 @@ static void smFindRef(poly *ref, poly *px, poly r)
       if (i == 0)
       {
         x = nAdd(pGetCoeff(pa), pGetCoeff(r));
-        pDeleteLm(&r);
+        pLmDelete(&r);
         if (nIsZero(x))
         {
-          pDeleteLm(&pa);
+          pLmDelete(&pa);
           if (pp!=NULL)
             pNext(pp) = pAdd(pa,r);
           else

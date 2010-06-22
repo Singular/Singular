@@ -1114,7 +1114,7 @@ poly p_ISet(int i, const ring r)
     rc = p_Init(r);
     pSetCoeff0(rc,n_Init(i,r));
     if (r->cf->nIsZero(p_GetCoeff(rc,r)))
-      p_DeleteLm(&rc,r);
+      p_LmDelete(&rc,r);
   }
   return rc;
 }

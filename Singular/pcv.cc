@@ -243,7 +243,7 @@ poly pcvN2M(int n)
   }
   else
   {
-    pDeleteLm(&m);
+    pLmDelete(&m);
     return NULL;
   }
 }
@@ -437,7 +437,7 @@ lists pcvBasis(int d0,int d1)
   poly m=pOne();
   for(int d=d0,i=0;d<d1;d++)
     i=pcvBasis(b,i,m,d,1);
-  pDeleteLm(&m);
+  pLmDelete(&m);
   return b;
 }
 

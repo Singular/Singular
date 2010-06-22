@@ -83,7 +83,7 @@
 /***************************************************************
  *
  * Allocation/Initalization/Deletion
- * except for pDeleteLm and pHead, all polys must be != NULL
+ * except for pHead, all polys must be != NULL
  *
  ***************************************************************/
 // allocates the space for a new monomial -- no initialization !!!
@@ -96,11 +96,6 @@
 // returns newly allocated copy of Lm(p), coef is copied, next=NULL,
 // p might be NULL
 #define pHead(p)        p_Head(p, currRing)
-// if *p_ptr != NULL, delete p_ptr->coef, *p_ptr, and set *p_ptr to
-// pNext(*p_ptr)
-static inline void pDeleteLm(poly *p) {p_DeleteLm(p, currRing);}
-// if (p!=NULL) delete p-coef and p
-static inline void pDeleteLm(poly p)  {p_DeleteLm(p, currRing);}
 // frees the space of the monomial m, assumes m != NULL
 // coef is not freed, m is not advanced
 static inline void pLmFree(poly p)    {p_LmFree(p, currRing);}

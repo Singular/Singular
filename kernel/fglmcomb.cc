@@ -95,7 +95,8 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         int i, diff;
 
         poly m = pOne();
-        for ( i= pVariables; i > 0; i-- ) {
+        for ( i= pVariables; i > 0; i-- )
+	{
             diff= pGetExp( *pptr, i ) - pGetExp( p2, i );
             pSetExp( m, i, diff );
         }
@@ -104,8 +105,8 @@ fglmReductionStep( poly * pptr, ideal source, int * w )
         number n2 = pGetCoeff( p2 );
 
         p2= pCopy( p2 );
-        pDeleteLm(pptr);
-        pDeleteLm( & p2 );
+        pLmDelete(pptr);
+        pLmDelete( & p2 );
         p2= pMult( m, p2 );
 
         number temp = nDiv( n1, n2 );

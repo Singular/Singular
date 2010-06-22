@@ -238,7 +238,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
     res = pNext(res) = h;
     p_MonMult(b,tail,r);
   }
-  p_DeleteLm(&tail,r);
+  p_LmDelete(&tail,r);
   pNext(res) = b;
   pNext(b) = NULL;
   res = a[exp];

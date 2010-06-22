@@ -92,7 +92,7 @@ PINLINE2 int p_GetExpDiff(poly p1, poly p2, int i, ring r);
 /***************************************************************
  *
  * Allocation/Initalization/Deletion
- * except for pDeleteLm and pHead, all polys must be != NULL
+ * except for pHead, all polys must be != NULL
  *
  ***************************************************************/
 PINLINE2 poly p_New(ring r);
@@ -103,8 +103,6 @@ PINLINE1 poly p_LmInit(poly p, ring r);
 PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_p);
 PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_p, omBin d_bin);
 PINLINE1 poly p_Head(poly p, ring r);
-PINLINE2 void p_DeleteLm(poly *p, ring r);
-PINLINE2 void p_DeleteLm(poly p, ring r);
 PINLINE2 void p_LmFree(poly p, ring r);
 PINLINE2 void p_LmFree(poly *p, ring r);
 PINLINE2 poly p_LmFreeAndNext(poly p, ring r);

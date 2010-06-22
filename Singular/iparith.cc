@@ -1572,11 +1572,11 @@ static BOOLEAN jjINDEX_V(leftv res, leftv u, leftv v)
       if (r==p) r=pNext(p);
       if (o!=NULL)
       {
-        pDeleteLm(&pNext(o));
+        if (pNext(o)!=NULL) pLmDelete(&pNext(o));
         p=pNext(o);
       }
       else
-        pDeleteLm(&p);
+        pLmDelete(&p);
     }
     else
     {
@@ -1615,11 +1615,11 @@ static BOOLEAN jjINDEX_V_IV(leftv res, leftv u, leftv v)
       if (p==NULL) break;
       if (i==iv->length())
       {
-        pDeleteLm(&p);
+        pLmDelete(&p);
         if (p==NULL) break;
       }
     }
-    pDeleteLm(&r);
+    pLmDelete(&r);
     res->data=(char *)r;
   }
   return FALSE;

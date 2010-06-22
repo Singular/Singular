@@ -1597,7 +1597,7 @@ static poly pInsert(poly p1, poly p2)
     }
     else
     {
-      pDeleteLm(&a2);
+      pLmDelete(&a2);
       a = pNext(a) = a1;
       pIter(a1);
       if (a1==NULL)
@@ -1612,7 +1612,7 @@ static poly pInsert(poly p1, poly p2)
       }
     }
   }
-  pDeleteLm(&p);
+  pLmDelete(&p);
   return p;
 }
 

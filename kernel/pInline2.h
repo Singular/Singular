@@ -346,26 +346,6 @@ PINLINE2 poly p_New(ring r)
   return p_New(r, r->PolyBin);
 }
 
-PINLINE2 void p_DeleteLm(poly *p, ring r)
-{
-  pIfThen2(*p != NULL, p_LmCheckPolyRing2(*p, r));
-  poly h = *p;
-  if (h != NULL)
-  {
-    n_Delete(&_pGetCoeff(h), r);
-    *p = _pNext(h);
-    omFreeBinAddr(h);
-  }
-}
-PINLINE2 void p_DeleteLm(poly p, ring r)
-{
-  pIfThen2(p != NULL, p_LmCheckPolyRing2(p, r));
-  if (p != NULL)
-  {
-    n_Delete(&_pGetCoeff(p), r);
-    omFreeBinAddr(p);
-  }
-}
 PINLINE2 void p_LmFree(poly p, ring r)
 {
   p_LmCheckPolyRing2(p, r);

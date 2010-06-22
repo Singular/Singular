@@ -1352,7 +1352,7 @@ ende:
   hDelete(hexist, hNexist);
   omFreeSize((ADDRESS)act, (pVariables + 1) * sizeof(int));
   hKill(stcmem, pVariables - 1);
-  pDeleteLm(&p);
+  pLmDelete(&p);
   if (p == NULL)
     return idInit(1,s->rank);
   else

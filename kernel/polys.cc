@@ -163,12 +163,12 @@ poly pDivideM(poly a, poly b)
     {
       if (prev==NULL)
       {
-        pDeleteLm(&result);
+        pLmDelete(&result);
         a=result;
       }
       else
       {
-        pDeleteLm(&pNext(prev));
+        pLmDelete(&pNext(prev));
         a=pNext(prev);
       }
     }
