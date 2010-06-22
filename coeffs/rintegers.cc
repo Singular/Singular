@@ -6,11 +6,11 @@
 * ABSTRACT: numbers modulo n
 */
 #include "config.h"
+#include <auxiliary.h>
 
 #ifdef HAVE_RINGS
 
 #include <string.h>
-#include <auxiliary.h>
 #include <mylimits.h>
 #include "coeffs.h"
 #include <reporter.h>
