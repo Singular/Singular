@@ -17,7 +17,8 @@
 #include "mylimits.h"
 #include "modulop.h"
 
-int npGen=0;
+// int npGen=0;
+
 
 #ifdef HAVE_DIV_MOD
 unsigned short *npInvTable=NULL;
@@ -291,7 +292,7 @@ const char * npRead (const char *s, number *a, const coeffs r)
 void npSetChar(const coeffs r)
 {
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-    npGen = npExpTable[1];
+//    npGen = npExpTable[1];
 #endif
 }
 
@@ -319,7 +320,10 @@ static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 
 void npInitChar(coeffs r, void* p)
 {
-  int c= (int) (long) p;
+  const int c = (int) (long) p;
+
+  assume( c > 0 );
+  
   int i, w;
 
   r->npPrimeM = c;
