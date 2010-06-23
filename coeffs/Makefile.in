@@ -33,8 +33,11 @@ PIPE		= -pipe
 CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
 CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} -g
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-CPPFLAGS	= -I${srcdir} -I${includedir} -I${srcdir}/../misc/ -I${srcdir}/../resource/ -I${srcdir}/../reporter/ -L${srcdir}/../reporter/ -L${libdir} -lgmp
+CPPFLAGS	= -I${srcdir} -I${includedir} 
+LDFLAGS		= -L${libdir}
 DEFS		= -DNDEBUG -DOM_NDEBUG @DEFS@
+
+LIBS		=  @LIBPREFIX@ -lgmp -lomalloc_g -lreporter
 
 #-DHAVE_RINGS 
 # -DHAVE_RINGS # Doesn't work :(
@@ -116,4 +119,4 @@ install: all
 	$(INSTALL_DATA) coeffs.h $(includedir)/coeffs.h
 
 test: test.cc libcoeffs_g.a
-	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} test.cc -L. -I. -lcoeffs_g -o test -lomalloc -lreporter
+	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} test.cc $LDFLAGS} ${LIBSG} -o test
