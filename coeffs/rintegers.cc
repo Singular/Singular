@@ -114,7 +114,7 @@ number nrzCopyMap(number a, const coeffs src, const coeffs dst)
   return nrzCopy(a,dst);
 }
 
-int nrzSize(number a)
+int nrzSize(number a, const coeffs r)
 {
   if (a == NULL) return 0;
   return sizeof(mpz_t);
@@ -311,10 +311,10 @@ void nrzInitExp(int m, coeffs r)
 }
 
 #ifdef LDEBUG
-//BOOLEAN nrzDBTest (number a, const char *f, const int l)
-//{
-//  return TRUE;//TODO
-//}
+BOOLEAN nrzDBTest (number a, const char *f, const int l, const coeffs r)
+{
+  return TRUE;//TODO
+}
 #endif
 
 void nrzWrite (number &a, const coeffs r)
@@ -361,7 +361,7 @@ static const char * nlEatLongC(char *s, mpz_ptr i)
   return s;
 }
 
-const char * nrzRead (const char *s, number *a)
+const char * nrzRead (const char *s, number *a, const coeffs r)
 {
   int_number z = (int_number) omAllocBin(gmp_nrz_bin);
   {
@@ -371,4 +371,55 @@ const char * nrzRead (const char *s, number *a)
   *a = (number) z;
   return s;
 }
+
+void nrzInitChar(coeffs r,  void * parameter)
+{
+  r->cfSetChar= NULL;
+  r->cfMult  = nrzMult;
+  r->cfSub   = nrzSub;
+  r->cfAdd   = nrzAdd;
+  r->cfDiv   = nrzDiv;
+  r->cfIntDiv= nrzDiv;
+  r->cfIntMod= nrzIntMod;
+  r->cfExactDiv= nrzDiv;
+  r->cfInit = nrzInit;
+  r->cfSize  = nrzSize;
+  r->cfInt  = nrzInt;
+  #ifdef HAVE_RINGS
+  r->cfDivComp = nrzDivComp; // only for ring stuff
+  r->cfIsUnit = nrzIsUnit; // only for ring stuff
+  r->cfGetUnit = nrzGetUnit; // only for ring stuff
+  r->cfExtGcd = nrzExtGcd; // only for ring stuff
+  r->cfDivBy = nrzDivBy; // only for ring stuff
+  #endif
+  r->cfNeg   = nrzNeg;
+  r->cfInvers= nrzInvers;
+  r->cfCopy  = nrzCopy;
+  //r->cfRePart = ndCopy;
+  //r->cfImPart = ndReturn0;
+  r->cfWrite = nrzWrite;
+  r->cfRead = nrzRead;
+  //r->cfNormalize=ndNormalize;
+  r->cfGreater = nrzGreater;
+  r->cfEqual = nrzEqual;
+  r->cfIsZero = nrzIsZero;
+  r->cfIsOne = nrzIsOne;
+  r->cfIsMOne = nrzIsMOne;
+  r->cfGreaterZero = nrzGreaterZero;
+  r->cfPower = nrzPower;
+  r->cfGcd  = nrzGcd;
+  r->cfLcm  = nrzGcd;
+  r->cfDelete= nrzDelete;
+  r->cfSetMap = nrzSetMap;
+  //r->cfName = nrzName;
+  // debug stuff
+
+#ifdef LDEBUG
+  r->cfDBTest=nrzDBTest;
+#endif
+ 
+  r->has_simple_Alloc=TRUE;
+  r->has_simple_Inverse=TRUE; 
+}
+
 #endif
