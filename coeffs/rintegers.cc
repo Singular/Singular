@@ -27,7 +27,7 @@ omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
 /*
  * Multiply two numbers
  */
-number nrzMult (number a, number b)
+number nrzMult (number a, number b, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -62,7 +62,7 @@ number nrzGcd (number a,number b,const coeffs r)
  * Give the largest non unit k, such that a = x * k, b = y * k has
  * a solution and r, s, s.t. k = s*a + t*b
  */
-number  nrzExtGcd (number a, number b, number *s, number *t)
+number  nrzExtGcd (number a, number b, number *s, number *t, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   int_number bs = (int_number) omAllocBin(gmp_nrz_bin);
@@ -76,7 +76,7 @@ number  nrzExtGcd (number a, number b, number *s, number *t)
   return (number) erg;
 }
 
-void nrzPower (number a, int i, number * result)
+void nrzPower (number a, int i, number * result, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -128,7 +128,7 @@ int nrzInt(number &n, const coeffs r)
   return (int) mpz_get_si( (int_number)n);
 }
 
-number nrzAdd (number a, number b)
+number nrzAdd (number a, number b, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -136,7 +136,7 @@ number nrzAdd (number a, number b)
   return (number) erg;
 }
 
-number nrzSub (number a, number b)
+number nrzSub (number a, number b, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -149,65 +149,65 @@ number  nrzGetUnit (number a, const coeffs r)
   return nrzInit(1, r);
 }
 
-BOOLEAN nrzIsUnit (number a)
+BOOLEAN nrzIsUnit (number a, const coeffs r)
 {
   return 0 == mpz_cmpabs_ui((int_number) a, 1);
 }
 
-BOOLEAN nrzIsZero (number  a)
+BOOLEAN nrzIsZero (number  a, const coeffs r)
 {
   return 0 == mpz_cmpabs_ui((int_number) a, 0);
 }
 
-BOOLEAN nrzIsOne (number a)
+BOOLEAN nrzIsOne (number a, const coeffs r)
 {
   return (a!=NULL) && (0 == mpz_cmp_si((int_number) a, 1));
 }
 
-BOOLEAN nrzIsMOne (number a)
+BOOLEAN nrzIsMOne (number a, const coeffs r)
 {
   return (a!=NULL) && (0 == mpz_cmp_si((int_number) a, -1));
 }
 
-BOOLEAN nrzEqual (number a,number b)
+BOOLEAN nrzEqual (number a,number b, const coeffs r)
 {
   return 0 == mpz_cmp((int_number) a, (int_number) b);
 }
 
-BOOLEAN nrzGreater (number a,number b)
+BOOLEAN nrzGreater (number a,number b, const coeffs r)
 {
   return 0 < mpz_cmp((int_number) a, (int_number) b);
 }
 
-BOOLEAN nrzGreaterZero (number k)
+BOOLEAN nrzGreaterZero (number k, const coeffs r)
 {
   return 0 < mpz_cmp_si((int_number) k, 0);
 }
 
-int nrzDivComp(number a, number b)
+int nrzDivComp(number a, number b, const coeffs r)
 {
-  if (nrzDivBy(a, b))
+  if (nrzDivBy(a, b, r))
   {
-    if (nrzDivBy(b, a)) return 2;
+    if (nrzDivBy(b, a, r)) return 2;
     return -1;
   }
-  if (nrzDivBy(b, a)) return 1;
+  if (nrzDivBy(b, a, r)) return 1;
   return 0;
 }
 
-BOOLEAN nrzDivBy (number a,number b)
+BOOLEAN nrzDivBy (number a,number b, const coeffs r)
 {
   return mpz_divisible_p((int_number) a, (int_number) b) != 0;
 }
 
-number nrzDiv (number a,number b)
+number nrzDiv (number a,number b, const coeffs R)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
   int_number r = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(r);
   mpz_tdiv_qr(erg, r, (int_number) a, (int_number) b);
-  if (!nrzIsZero((number) r))
+  if (!nrzIsZero((number) r, R))
   {
     WerrorS("Division by non divisible element.");
     WerrorS("Result is without remainder.");
@@ -217,7 +217,7 @@ number nrzDiv (number a,number b)
   return (number) erg;
 }
 
-number nrzIntDiv (number a,number b)
+number nrzIntDiv (number a,number b, const coeffs r)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -225,7 +225,7 @@ number nrzIntDiv (number a,number b)
   return (number) erg;
 }
 
-number nrzIntMod (number a,number b)
+number nrzIntMod (number a,number b, const coeffs R)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -238,7 +238,7 @@ number nrzIntMod (number a,number b)
 
 number  nrzInvers (number c, const coeffs r)
 {
-  if (!nrzIsUnit((number) c))
+  if (!nrzIsUnit((number) c, r))
   {
     WerrorS("Non invertible element.");
     return (number)0; //TODO
@@ -246,7 +246,7 @@ number  nrzInvers (number c, const coeffs r)
   return nrzCopy(c,r);
 }
 
-number nrzNeg (number c)
+number nrzNeg (number c, const coeffs r)
 {
 // nNeg inplace !!!
   mpz_mul_si((int_number) c, (int_number) c, -1);
