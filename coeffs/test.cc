@@ -126,8 +126,17 @@ int main()
   n_coeffType type;
 
   // rings needed for: n_Zp_a, n_Q_a ?
+
+  type = nRegister( n_Zp, npInitChar); assume( type == n_Zp );
+  if( Test(type, (void*) 11) )
+    c ++;
+
   
   type = nRegister( n_Q, nlInitChar); assume( type == n_Q );
+  if( Test(type) )
+    c ++;
+
+  type = nRegister( n_R, nrInitChar); assume( type == n_R );
   if( Test(type) )
     c ++;
 
@@ -138,34 +147,34 @@ int main()
   type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
   if( Test(type) )
     c ++;
-  
-  type = nRegister( n_R, nrInitChar); assume( type == n_R );
-  if( Test(type) )
-    c ++;
 
-  type = nRegister( n_Zp, npInitChar); assume( type == n_Zp );
-  if( Test(type) )
-    c ++;
 
 #ifdef HAVE_RINGS
+  type = nRegister( n_Z, nrzInitChar); assume( type == n_Z );
+  if( Test(type) )
+    c ++;
+
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
   if( Test(type, (void*) 2) )
     c ++;
 
   type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
+
+  // BUG here!
+  // TODO: Frank (cmp. with the previous code)
+  // Note: the parameter 'm' is ignored now in nrnSetExp!!!
   if( Test(type, (void*) 3) )
     c ++;
 
 #endif
 
-  /*type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
-  if( Test(type) )
-    c ++;*/
-
-  type = nRegister( n_Z, nrzInitChar); assume( type == n_Z );
+/*  
+  // TODO: Hans (the following needs resources, e.g. feFopen)
+  type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
   if( Test(type) )
     c ++;
-
+*/
+  
   return c;
 
 }
