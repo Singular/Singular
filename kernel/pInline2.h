@@ -86,7 +86,7 @@ PINLINE2 unsigned long p_DecrComp(poly p, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
-  pPolyAssume2(__p_GetComp(p,r) > 0);
+  pPolyAssume2(__p_GetComp(p,r) > 0,p,r);
   return --(__p_GetComp(p,r));
 }
 PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, ring r)
@@ -99,7 +99,7 @@ PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(rRing_has_Comp(r));
-  pPolyAssume2(__p_GetComp(p,r) >= v);
+  pPolyAssume2(__p_GetComp(p,r) >= v,p,r);
   return __p_GetComp(p,r) -= v;
 }
 PINLINE2 int p_Comp_k_n(poly a, poly b, int k, ring r)
@@ -343,7 +343,7 @@ PINLINE2 poly p_LmFreeAndNext(poly p, ring r)
 PINLINE2 void p_LmDelete(poly p, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  n_Delete(&_pGetCoeff(p), r);
+  n_Delete(&pGetCoeff(p), r);
   omFreeBinAddr(p);
 }
 PINLINE2 void p_LmDelete(poly *p, ring r)
@@ -357,8 +357,8 @@ PINLINE2 void p_LmDelete(poly *p, ring r)
 PINLINE2 poly p_LmDeleteAndNext(poly p, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  poly pnext = _pNext(p);
-  n_Delete(&_pGetCoeff(p), r);
+  poly pnext = pNext(p);
+  n_Delete(&pGetCoeff(p), r);
   omFreeBinAddr(p);
   return pnext;
 }

@@ -114,8 +114,8 @@ PINLINE1 poly p_LmInit(poly p, const ring r)
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
   p_ExpVectorCopy(np, p, r);
-  _pNext(np) = NULL;
-  _pSetCoeff0(np, NULL);
+  pNext(np) = NULL;
+  pSetCoeff0(np, NULL);
   return np;
 }
 PINLINE1 poly p_LmInit(poly s_p, const ring s_r, const ring d_r)
@@ -148,8 +148,8 @@ PINLINE1 poly p_Head(poly p, const ring r)
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
   p_ExpVectorCopy(np, p, r);
-  _pNext(np) = NULL;
-  _pSetCoeff0(np, n_Copy(_pGetCoeff(p), r));
+  pNext(np) = NULL;
+  pSetCoeff0(np, n_Copy(pGetCoeff(p), r));
   return np;
 }
 // set all exponents l..k to 0, assume exp. k+1..n and 1..l-1 are in 
@@ -163,8 +163,8 @@ PINLINE1 poly p_GetExp_k_n(poly p, int l, int k, const ring r)
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
   p_ExpVectorCopy(np, p, r);
-  _pNext(np) = NULL;
-  _pSetCoeff0(np, n_Init(1, r));
+  pNext(np) = NULL;
+  pSetCoeff0(np, n_Init(1, r));
   int i;
   for(i=l;i<=k;i++)
   {
@@ -506,8 +506,8 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
   p_LmCheckPolyRing1(a, r);
   p_LmCheckPolyRing1(b, r);
 #ifndef PDIV_DEBUG
-  _pPolyAssume2(p_GetShortExpVector(a, r) == sev_a, a, r);
-  _pPolyAssume2(p_GetShortExpVector(b, r) == ~ not_sev_b, b, r);
+  pPolyAssume2(p_GetShortExpVector(a, r) == sev_a, a, r);
+  pPolyAssume2(p_GetShortExpVector(b, r) == ~ not_sev_b, b, r);
 
   if (sev_a & not_sev_b)
   {
@@ -526,8 +526,8 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, const ring r_
   p_LmCheckPolyRing1(a, r_a);
   p_LmCheckPolyRing1(b, r_b);
 #ifndef PDIV_DEBUG
-  _pPolyAssume2(p_GetShortExpVector(a, r_a) == sev_a, a, r_a);
-  _pPolyAssume2(p_GetShortExpVector(b, r_b) == ~ not_sev_b, b, r_b);
+  pPolyAssume2(p_GetShortExpVector(a, r_a) == sev_a, a, r_a);
+  pPolyAssume2(p_GetShortExpVector(b, r_b) == ~ not_sev_b, b, r_b);
 
   if (sev_a & not_sev_b)
   {

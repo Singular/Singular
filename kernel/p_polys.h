@@ -53,15 +53,15 @@
  *
  ***************************************************************/
 // next
-#define pNext(p)            _pNext(p)
-#define pIter(p)            _pIter(p)
+#define pNext(p)            ((p)->next)
+#define pIter(p)            ((p) = (p)->next)
 
 // coeff
-#define pGetCoeff(p)        _pGetCoeff(p)
+#define pGetCoeff(p)        ((p)->coef)
 // deletes old coeff before setting the new one
-#define pSetCoeff0(p,n)     _pSetCoeff0(p,n)
-#define p_GetCoeff(p,r)     _pGetCoeff(p)
-#define p_SetCoeff0(p,n,r)  _pSetCoeff0(p,n)
+#define pSetCoeff0(p,n)     (p)->coef=(n)
+#define p_GetCoeff(p,r)     pGetCoeff(p)
+#define p_SetCoeff0(p,n,r)  pSetCoeff0(p,n)
 // deletes old p->coef and sets new one
 PINLINE2 number p_SetCoeff(poly p, number n, ring r);
 

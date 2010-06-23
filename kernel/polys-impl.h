@@ -126,7 +126,7 @@ do                                                          \
 }                                                           \
 while (0)
 
-#define _pPolyAssumeReturn(cond, p, r)                       \
+#define pPolyAssumeReturn(cond, p, r)                       \
 do                                                          \
 {                                                           \
   if (! (cond))                                             \
@@ -138,7 +138,7 @@ do                                                          \
 }                                                           \
 while (0)
 
-#define _pPolyAssume(cond,p,r)                                   \
+#define pPolyAssume(cond,p,r)                                   \
 do                                                              \
 {                                                               \
   if (! (cond))                                                 \
@@ -149,7 +149,7 @@ do                                                              \
 }                                                               \
 while (0)
 
-#define _pPolyAssumeReturnMsg(cond, msg, p, r)   \
+#define pPolyAssumeReturnMsg(cond, msg, p, r)   \
 do                                              \
 {                                               \
   if (! (cond))                                 \
@@ -159,10 +159,6 @@ do                                              \
   }                                             \
 }                                               \
 while (0)
-
-#define pPolyAssume(cond)        _pPolyAssume(cond, p, r)
-#define pPolyAssumeReturn(cond)  _pPolyAssumeReturn(cond, p, r)
-#define pPolyAssumeReturnMsg(cond, msg)  _pPolyAssumeReturnMsg(cond, msg, p, r)
 
 #define pFalseReturn(cond)  do {if (! (cond)) return FALSE;} while (0)
 #if (OM_TRACK > 2) && defined(OM_TRACK_CUSTOM)
@@ -176,11 +172,9 @@ void p_SetRingOfLeftv(leftv l, ring r);
 #else // ! defined(PDEBUG)
 #define pFalseReturn(cond)           ((void)0)
 #define pAssume(cond)                ((void)0)
-#define pPolyAssume(cond)            ((void)0)
-#define _pPolyAssume(cond, p,r)      ((void)0)
-#define pAssumeReturn(cond)          ((void)0)
+#define pPolyAssume(cond, p,r)      ((void)0)
 #define pPolyAssumeReturn(cond)      ((void)0)
-#define _pPolyAssumeReturn(cond,p,r) ((void)0)
+#define pPolyAssumeReturn(cond,p,r) ((void)0)
 #define p_SetRingOfLm(p, r)          ((void)0)
 #define p_SetRingOfLeftv(l, r)       ((void)0)
 #endif // defined(PDEBUG)
@@ -188,7 +182,6 @@ void p_SetRingOfLeftv(leftv l, ring r);
 #if PDEBUG >= 1
 #define pAssume1             pAssume
 #define pPolyAssume1         pPolyAssume
-#define _pPolyAssume1        _pPolyAssume
 #define pAssumeReturn1       pAssumeReturn
 #define pPolyAssumeReturn1   pPolyAssumeReturn
 #define _pPolyAssumeReturn1  _pPolyAssumeReturn
@@ -198,10 +191,8 @@ void p_SetRingOfLeftv(leftv l, ring r);
 #else
 #define pAssume1(cond)               ((void)0)
 #define pPolyAssume1(cond)           ((void)0)
-#define _pPolyAssume1(cond,p,r)      ((void)0)
 #define pAssumeReturn1(cond)         ((void)0)
 #define pPolyAssumeReturn1(cond)     ((void)0)
-#define _pPolyAssumeReturn1(cond,p,r)((void)0)
 #define p_LmCheckPolyRing1(p,r)       ((void)0)
 #define p_CheckRing1(r)             ((void)0)
 #define pIfThen1(cond, check)     ((void)0)
@@ -210,23 +201,19 @@ void p_SetRingOfLeftv(leftv l, ring r);
 #if PDEBUG >= 2
 #define pAssume2             pAssume
 #define pPolyAssume2         pPolyAssume
-#define _pPolyAssume2        _pPolyAssume
 #define pAssumeReturn2       pAssumeReturn
 #define pPolyAssumeReturn2   pPolyAssumeReturn
-#define _pPolyAssumeReturn2  _pPolyAssumeReturn
 #define p_LmCheckPolyRing2    p_LmCheckPolyRing
 #define p_CheckRing2        p_CheckRing
 #define pIfThen2          pIfThen
 #else
-#define pAssume2(cond)               ((void)0)
-#define pPolyAssume2(cond)           ((void)0)
-#define _pPolyAssume2(cond,p,r)      ((void)0)
-#define pAssumeReturn2(cond)         ((void)0)
-#define pPolyAssumeReturn2(cond)     ((void)0)
-#define _pPolyAssumeReturn2(cond,p,r)((void)0)
-#define p_LmCheckPolyRing2(p,r)       ((void)0)
-#define p_CheckRing2(r)             ((void)0)
-#define pIfThen2(cond, check)     ((void)0)
+#define pAssume2(cond)                   ((void)0)
+#define pPolyAssume2(cond,p,r)           ((void)0)
+#define pAssumeReturn2(cond,p,r)         ((void)0)
+#define pPolyAssumeReturn2(cond,p,r)     ((void)0)
+#define p_LmCheckPolyRing2(p,r)          ((void)0)
+#define p_CheckRing2(r)                  ((void)0)
+#define pIfThen2(cond, check)            ((void)0)
 #endif // PDEBUG >= 2
 
 /***************************************************************
@@ -234,12 +221,7 @@ void p_SetRingOfLeftv(leftv l, ring r);
  * Macros for access/iteration
  *
  ***************************************************************/
-#define _pNext(p)           ((p)->next)
-#define _pIter(p)           ((p) = (p)->next)
 
-// coeff
-#define _pGetCoeff(p)       ((p)->coef)
-#define _pSetCoeff0(p,n)    (p)->coef=n
 #define __p_GetComp(p, r)   (p)->exp[r->pCompIndex]
 #define _p_GetComp(p, r)    ((long) (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0))
 
