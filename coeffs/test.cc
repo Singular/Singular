@@ -15,6 +15,7 @@
 #include <modulop.h>
 #include <rmodulon.h>
 #include <rmodulo2m.h>
+#include <rintegers.h>
 
 #include <iostream>
 using namespace std;
@@ -155,10 +156,13 @@ int main()
   if( Test(type, (void*) 3) )
     c ++;
 
-//  n_Z, // TODO?
 #endif
 
-  type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
+  /*type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
+  if( Test(type) )
+    c ++;*/
+
+  type = nRegister( n_Z, nrzInitChar); assume( type == n_Z );
   if( Test(type) )
     c ++;
 
