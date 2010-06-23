@@ -386,20 +386,17 @@ void nrzInitChar(coeffs r,  void * parameter)
   r->cfSize  = nrzSize;
   r->cfInt  = nrzInt;
   #ifdef HAVE_RINGS
-  r->cfDivComp = nrzDivComp; // only for ring stuff
-  r->cfIsUnit = nrzIsUnit; // only for ring stuff
-  r->cfGetUnit = nrzGetUnit; // only for ring stuff
-  r->cfExtGcd = nrzExtGcd; // only for ring stuff
-  r->cfDivBy = nrzDivBy; // only for ring stuff
+  //r->cfDivComp = nrzDivComp; // only for ring stuff
+  //r->cfIsUnit = nrzIsUnit; // only for ring stuff
+  //r->cfGetUnit = nrzGetUnit; // only for ring stuff
+  //r->cfExtGcd = nrzExtGcd; // only for ring stuff
+  //r->cfDivBy = nrzDivBy; // only for ring stuff
   #endif
   r->cfNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
   r->cfCopy  = nrzCopy;
-  //r->cfRePart = ndCopy;
-  //r->cfImPart = ndReturn0;
   r->cfWrite = nrzWrite;
   r->cfRead = nrzRead;
-  //r->cfNormalize=ndNormalize;
   r->cfGreater = nrzGreater;
   r->cfEqual = nrzEqual;
   r->cfIsZero = nrzIsZero;
@@ -411,15 +408,17 @@ void nrzInitChar(coeffs r,  void * parameter)
   r->cfLcm  = nrzGcd;
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
-  //r->cfName = nrzName;
   // debug stuff
 
 #ifdef LDEBUG
   r->cfDBTest=nrzDBTest;
 #endif
  
-  r->has_simple_Alloc=TRUE;
-  r->has_simple_Inverse=TRUE; 
+  r->nNULL = 0;
+  r->type = n_Z;
+  r->ch = 0;
+  r->has_simple_Alloc=FALSE;
+  r->has_simple_Inverse=FALSE; 
 }
 
 #endif
