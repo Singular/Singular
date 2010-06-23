@@ -13,8 +13,9 @@
 extern int nrzExp;
 extern NATNUMBER nrzModul;
 
-number  nrzCopy       (number a, const coeffs r);
-int     nrzSize        (number a);
+void    nrzInitChar    (coeffs r,  void * parameter);
+number  nrzCopy        (number a, const coeffs r);
+int     nrzSize        (number a, const coeffs r);
 void    nrzDelete      (number *a, const coeffs r);
 BOOLEAN nrzGreaterZero (number k, const coeffs r);
 number  nrzMult        (number a, number b, const coeffs r);
@@ -42,10 +43,10 @@ number  nrzGcd         (number a,number b, const coeffs r);
 number  nrzExtGcd      (number a, number b, number *s, number *t, const coeffs r);
 nMapFunc nrzSetMap     (const coeffs src, const coeffs dst);
 void    nrzWrite       (number &a, const coeffs r);
-const char *  nrzRead  (const char *s, number *a);
-char *  nrzName        (number n);
+const char *  nrzRead  (const char *s, number *a, const coeffs r);
+char *  nrzName        (number n, const coeffs r);
 #ifdef LDEBUG
-BOOLEAN nrzDBTest      (number a, const char *f, const int l);
+BOOLEAN nrzDBTest      (number a, const char *f, const int l, const coeffs r);
 #endif
 void    nrzSetExp(int c, coeffs r);
 void    nrzInitExp(int c, coeffs r);
