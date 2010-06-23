@@ -6,6 +6,15 @@ AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
 AC_CONFIG_SRCDIR([rmodulon.h])
 AC_CONFIG_HEADERS([config.h])
 
+#check for host:
+AC_CANONICAL_HOST
+case $host_os in
+  *cygwin* ) LIBPREFIX="-Xlinker -Bdynamic";;
+  * ) LIBPREFIX="";;
+esac
+
+
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
@@ -25,6 +34,8 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([memmove memset pow sqrt strchr])
+
+AC_SUBST(LIBPREFIX)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
