@@ -23,7 +23,7 @@
 
 extern int npGen;
 
-void npInitChar(coeffs r, int ch);
+void npInitChar(coeffs r, void* p);
 
 BOOLEAN npGreaterZero (number k, const coeffs r);
 number  npMult        (number a, number b, const coeffs r);

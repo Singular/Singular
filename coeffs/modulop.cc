@@ -315,8 +315,9 @@ static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   return (n==n_Zp) && (r->ch==(int)(long)parameter);
 }
 
-void npInitChar(coeffs r, int c)
+void npInitChar(coeffs r, void* p)
 {
+  int c= (int) (long) p;
   int i, w;
 
   r->npPrimeM = c;

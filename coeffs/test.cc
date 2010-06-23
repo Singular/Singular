@@ -12,7 +12,7 @@
 #include <gnumpc.h>
 #include <shortfl.h>
 #include <ffields.h>
-
+#include <modulop.h>
 #include <rmodulon.h>
 #include <rmodulo2m.h>
 
@@ -124,7 +124,7 @@ int main()
   
   n_coeffType type;
 
-  // TODO: n_Zp, n_GF, n_Zp_a, n_Q_a ?
+  // rings needed for: n_Zp_a, n_Q_a ?
   
   type = nRegister( n_Q, nlInitChar); assume( type == n_Q );
   if( Test(type) )
@@ -142,6 +142,10 @@ int main()
   if( Test(type) )
     c ++;
 
+  type = nRegister( n_Zp, npInitChar); assume( type == n_Zp );
+  if( Test(type) )
+    c ++;
+
 #ifdef HAVE_RINGS
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
   if( Test(type, (void*) 2) )
@@ -152,7 +156,6 @@ int main()
     c ++;
 
 //  n_Z, // TODO?
-//  n_Zpn, // no longer exists?
 #endif
 
   type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
