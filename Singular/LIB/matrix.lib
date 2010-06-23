@@ -674,7 +674,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc addrow (matrix A, int r1, poly p, int r2)
-"USAGE:   addcol(A,r1,p,r2);  A matrix, p poly, r1, r2 positive integers
+"USAGE:   addrow(A,r1,p,r2);  A matrix, p poly, r1, r2 positive integers
 RETURN:  matrix,  A being modified by adding p times row r1 to row r2
 EXAMPLE: example addrow; shows an example
 "
@@ -693,7 +693,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc multcol (matrix A, int c, poly p)
-"USAGE:   addcol(A,c,p);  A matrix, p poly, c positive integer
+"USAGE:   multcol(A,c,p);  A matrix, p poly, c positive integer
 RETURN:  matrix,  A being modified by multiplying column c by p
 EXAMPLE: example multcol; shows an example
 "
