@@ -61,31 +61,6 @@ PINLINE2 long p_GetOrder(poly p, ring r)
   }
 }
 
-PINLINE2 long p_SetOrder(poly p, long o, ring r)
-{
-  p_LmCheckPolyRing2(p, r);
-  pAssume2(o >= 0);
-  if (r->typ==NULL) return ((p)->exp[r->pOrdIndex]=o);
-  int i=0;
-  loop
-  {
-    switch(r->typ[i].ord_typ)
-    {
-      case ro_wp_neg:
-        return (p)->exp[r->pOrdIndex]=o+POLY_NEGWEIGHT_OFFSET;
-      case ro_syzcomp:
-      case ro_syz:  case ro_isTemp: case ro_is:
-      case ro_cp:
-        i++;
-        break;
-      //case ro_dp:
-      //case ro_wp:
-      default:
-        return (p)->exp[r->pOrdIndex] = o;
-    }
-  }
-}
-
 // Setm
 PINLINE2 void p_Setm(poly p, const ring r)
 {

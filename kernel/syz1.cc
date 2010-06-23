@@ -1237,13 +1237,7 @@ static void syCreateNewPairs(syStrategy syzstr, int index, int newEl)
         }
         tso.lcm = p = nPm[ii];
         nPm[ii] = NULL;
-        //#ifdef HAVE_SHIFTED_EXPONENTS
-        //tso.order = pTotaldegree(p);
-        //p->exp[currRing->pOrdIndex]=tso.order+0x40000000;
-        //#else
         tso.order = pTotaldegree(p);
-        pSetOrder(p, tso.order);
-        //#endif
         if ((syzstr->cw!=NULL) && (index>0) && (pGetComp(q)>0))
         {
           int ii=index-1,jj=pGetComp(q);

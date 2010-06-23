@@ -58,8 +58,6 @@
 
 // Order
 #define pGetOrder(p)        p_GetOrder(p, currRing)
-// don't use this
-#define pSetOrder(p, o)     p_SetOrder(p, o, currRing)
 
 // Component
 #define pGetComp(p)         _p_GetComp(p, currRing)

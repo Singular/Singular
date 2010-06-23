@@ -67,8 +67,6 @@ PINLINE2 number p_SetCoeff(poly p, number n, ring r);
 
 // get Order
 PINLINE2 long p_GetOrder(poly p, ring r);
-// don't use this
-PINLINE2 long p_SetOrder(poly p, long order, ring r);
 
 // Component
 #define p_GetComp(p, r)     _p_GetComp(p, r)
