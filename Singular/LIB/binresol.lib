@@ -1457,7 +1457,7 @@ if (EordJ<0) {print("ERROR in J in chart"); print(idchart); break;}
 //-------------------------------------------------------------
 // CASE J=1, if we reset c, can happen Eord=c=0
 
-// or if there are hyperbolic equations at the beginning!!! AÑADIR!!!!
+// or if there are hyperbolic equations at the beginning!!!
 
 // if (EordJ==0){auxfchart[1]=chart[idchart];       // WE HAVE FINISHED
 //              finalchart=finalchart+auxfchart;
