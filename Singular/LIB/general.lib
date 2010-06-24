@@ -26,7 +26,6 @@ PROCEDURES:
  watchdog(i,cmd);       only wait for result of command cmd for i seconds
  which(command);        search for command and return absolute path, if found
  primecoeffs(J[,q]);    primefactors <= min(p,32003) of coeffs of J
- primefactors(n[,p]);  primefactors <= min(p,32003) of n
  timeStd(i,d)           std(i) if the standard basis computation finished
                         after d-1 seconds and i otherwhise
  timeFactorize(p,d)     factorize(p) if the factorization finished after d-1
@@ -1169,186 +1168,6 @@ example
    l=deleteSublist(v,l);
    l;
 }
-///////////////////////////////////////////////////////////////////////////////
-proc primefactors (n, list #)
-"USAGE:   primefactors(n [,p]); n = int or number, p = integer
-COMPUTE: primefactors <= min(p,32003) of n (default p = 32003)
-RETURN:  a list, say l,
-         l[1] : primefactors <= min(p,32003) of n
-         l[2] : l[2][i] = multiplicity of l[1][i]
-         l[3] : remaining factor ( n=product{ (l[1][i]^l[2][i])*l[3]} )
-                type(l[3])=typeof(n)
-NOTE:    If n is a long integer (of type number) then the procedure
-         finds primefactors <= min(p,32003) but n may be as larger as
-         2147483647 (max. integer representation)
-WARNING: the procedure works for small integers only, just by testing all
-         primes (not to be considerd as serious prime factorization!)
-EXAMPLE: example primefactors; shows an example
-"
-{
-   int ii,jj,z,p,num,w3,q;
-   intvec w1,w2,v;
-   list l;
-   if (size(#) == 0)
-   {
-      p=32003;
-   }
-   else
-   {
-     if( typeof(#[1]) != "int")
-     {
-       ERROR("2nd parameter must be of type int"+newline);
-     }
-     p=#[1];
-   }
-   if( n<0) { n=-n;};
-
-// ----------------- case: 1st parameter is a number --------------------
-   if (typeof(n) =="number")
-   {
-     kill w3;
-     number w3;
-     if( n > 2147483647 )           //2147483647 max. integer representation
-     {
-        v = primes(2,p);
-        number m;
-        for( ii=1; ii<=size(v); ii++)
-        {
-          jj=0;
-          while(1)
-          {
-            q  = v[ii];
-            jj = jj+1;
-            m  = n/q;                  //divide n as often as possible
-            if (denominator(m)!=1) { break;  }
-            n=m;
-          }
-          if( jj>1 )
-          {
-             w1 = w1,v[ii];          //primes
-             w2 = w2,jj-1;           //powers
-          }
-          if( n <= 2147483647 ) { break;  }
-        }
-     }
-
-     if( n >  2147483647 )            //n is still too big
-     {
-       if( size(w1) >1 )               //at least 1 primefactor was found
-       {
-         w1 = w1[2..size(w1)];
-         w2 = w2[2..size(w2)];
-       }
-       else                           //no primefactor was found
-       {
-         w1 = 1; w2 = 1;
-       }
-       l  = w1,w2,n;
-       return(l);
-     }
-
-     if( n <= 2147483647 )          //n is in inter range
-     {
-       num = int(n);
-       kill n;
-       int n = num;
-     }
-   }
-
-// --------------------------- trivial cases --------------------
-   if( n==0 )
-   {
-     w1=1; w2=1; w3=0; l=w1,w2,w3;
-     return(l);
-   }
-
-   if( n==1 )
-   {
-       w3=1;
-       if( size(w1) >1 )               //at least 1 primefactor was found
-       {
-         w1 = w1[2..size(w1)];
-         w2 = w2[2..size(w2)];
-       }
-       else                           //no primefactor was found
-       {
-         w1 = 1; w2 = 1;
-       }
-      l=w1,w2,w3;
-      return(l);
-   }
-   if ( prime(n)==n )         //note: prime(n) <= 32003 in Singular
-   {                          //case n is a prime
-      if (p > n)
-      {
-        w1=w1,n; w2=w2,1; w3=1;
-        w1 = w1[2..size(w1)];
-        w2 = w2[2..size(w2)];
-        l=w1,w2,w3;
-        return(l);
-      }
-      else
-      {
-        w3=n;
-        if( size(w1) >1 )               //at least 1 primefactor was found
-        {
-           w1 = w1[2..size(w1)];
-           w2 = w2[2..size(w2)];
-         }
-         else                           //no primefactor was found
-         {
-           w1 = 1; w2 = 1;
-         }
-         l=w1,w2,w3;
-        return(l);
-      }
-   }
-   else
-   {
-      if ( p >= n)
-      {
-         v = primes(q,n div 2 + 1);
-      }
-      else
-      {
-         v = primes(q,p);
-      }
-//------------- search for primfactors <= last entry of v ------------
-      for(ii=1; ii<=size(v); ii++)
-      {
-         z=0;
-         while( (n mod v[ii]) == 0 )
-         {
-            z=z+1;
-            n = n div v[ii];
-         }
-         if (z!=0)
-         {
-            w1 = w1,v[ii];        //primes
-            w2 = w2,z;            //multiplicities
-         }
-      }
-   }
-//--------------- case:at least 1 primefactor was found ---------------
-   if( size(w1) >1 )               //at least 1 primefactor was found
-   {
-      w1 = w1[2..size(w1)];
-      w2 = w2[2..size(w2)];
-   }
-   else                           //no primefactor was found
-   {
-     w1 = 1; w2 = 1;
-   }
-   w3 = n;
-   l  = w1,w2,w3;
-   return(l);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   primefactors(7*8*121);
-   ring r = 0,x,dp;
-   primefactors(123456789100);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 proc primecoeffs(J, list #)
@@ -1376,6 +1195,7 @@ EXAMPLE: example primecoeffs; shows an example
        ERROR("2nd parameter must be of type int"+newline);
      }
      q=#[1];
+     if (q > 32003) { q = 32003; }
    }
 
    if (defined(basering) == 0)
