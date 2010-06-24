@@ -37,7 +37,7 @@ CPPFLAGS	= -I${srcdir} -I${includedir}
 LDFLAGS		= -L${libdir}
 DEFS		= -DNDEBUG -DOM_NDEBUG @DEFS@
 
-LIBS		=  @LIBPREFIX@ -lgmp -lomalloc_g -lreporter
+LIBSG		=  @LIBPREFIX@ -lcoeffs_g -lreporter -lresource -lomalloc -lgmp
 
 #-DHAVE_RINGS 
 # -DHAVE_RINGS # Doesn't work :(
