@@ -74,7 +74,7 @@ OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
 libcoeffs.a: ${OBJS}
-	-rm -f libcoeffs.a
+	-rm -f $@
 	ar cr $@ $^
 
 ## ----------------------------------------------------------------------------
