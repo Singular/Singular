@@ -20,9 +20,6 @@ CFFList Factorize( const CanonicalForm & F, int is_SqrFree=0 ) ;
 CFFList Factorize( const CanonicalForm & F, const CanonicalForm & mipo, int is_SqrFree=0 ) ;
 CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly );
 CFFList newfactoras( const CanonicalForm & f, const CFList & as, int &success);
-CFFList factorize2 ( const CanonicalForm & f,
-                     const Variable & alpha, const CanonicalForm & mipo );
-
 
 //// Note: InternalSqrFree does only the work needed for factorization.
 // CFFList SqrFree( const CanonicalForm & f ) ;

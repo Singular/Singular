@@ -829,19 +829,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
   {
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPFactoryP( f ) );
-    if (rField_is_Q())
-    {
-      L = factorize( F );
-    }
-    else /* Fp */
-    {
-      do
-      {
-        libfac_interruptflag=0;
-        L = Factorize( F );
-      }
-      while ((libfac_interruptflag!=0) ||(L.isEmpty()));
-    }
+    L = factorize( F );
   }
   #if 0
   else if (rField_is_GF())
@@ -870,14 +858,14 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
                    currRing->algring);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingAPFactoryAP( f,a,currRing ) );
-      if (rField_is_Zp_a() && F.isUnivariate())
+      if (rField_is_Zp_a())
       {
         L = factorize( F, a );
       }
       else
       {
         CanonicalForm G( convSingTrPFactoryP( f ) );
-        //  over Q(a) / multivariate over Fp(a)
+        //  over Q(a)
         do
         {
           libfac_interruptflag=0;
@@ -893,14 +881,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     else
     {
       CanonicalForm F( convSingTrPFactoryP( f ) );
-      if (rField_is_Q_a())
-      {
-        L = factorize( F );
-      }
-      else /* Fp(a) */
-      {
-        L = Factorize( F );
-      }
+      L = factorize( F );
     }
   }
   else
