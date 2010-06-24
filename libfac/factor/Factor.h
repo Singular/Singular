@@ -14,22 +14,3 @@ CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly );
 
 #endif /* FACTOR_H */
 
-////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.6  2008/05/31 17:20:10  Singular
-hannes: minor irras changes
-
-Revision 1.5  2002/08/19 11:11:33  Singular
-* hannes/pfister: alg_gcd etc.
-
-Revision 1.4  2002/07/30 15:05:38  Singular
-*hannes: added Factorize for alg. ext.
-
-Revision 1.3  1997/09/12 07:19:47  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.3  1997/04/25 22:11:35  michael
-version for libfac-0.2.1
-
-*/

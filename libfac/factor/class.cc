@@ -39,19 +39,3 @@ void Substitution<T>::print ( OSTREAM& s ) const
 }
 #endif
 
-////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.5  2008/03/18 17:46:15  Singular
-*hannes: gcc 4.2
-
-Revision 1.4  2006/05/16 14:58:54  hannes
-*hannes: gcc-4.1 fixes
-
-Revision 1.3  1997/09/12 07:19:53  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.3  1997/04/25 22:38:04  michael
-Version for libfac-0.2.1
-
-*/

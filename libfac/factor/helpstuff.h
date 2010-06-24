@@ -28,16 +28,3 @@ inline int max ( const int a, const int b ){
 
 #endif /* HELPSTUFF_H */
 
-///////////////////////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.6  2008/03/17 17:44:17  Singular
-*hannes: fact.tst
-
-Revision 1.3  1997/09/12 07:19:57  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.2  1997/04/25 22:23:49  michael
-Version for libfac-0.2.1
-
-*/

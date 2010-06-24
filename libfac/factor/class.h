@@ -56,19 +56,3 @@ int operator== ( const Substitution<T>&, const Substitution<T>& );
 
 #endif /* INCL_CLASS_H */
 
-////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.6  2006/05/16 14:46:50  Singular
-*hannes: gcc 4.1 fixes
-
-Revision 1.5  2000/05/29 08:06:47  pohl
-no artificial friend
-
-Revision 1.4  1997/09/12 07:19:54  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.2  1997/04/25 22:21:26  michael
-Version for libfac-0.2.1
-
-*/

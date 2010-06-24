@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////
 // emacs edit mode for this file is -*- C++ -*-
-// static char * rcsid = "$Id$";
+// $Id$
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of TIMING (but now this isn't used)
@@ -40,18 +40,3 @@ void timing_print_ ## t ( char * msg ) { CERR.setf( ios::fixed, ios::floatfield)
 #define TIMING_DEFINE_PRINTPROTO(t)
 #endif /* TIMING */
 
-/*
-$Log: not supported by cvs2svn $
-Revision 1.4  2006/05/16 14:46:50  Singular
-*hannes: gcc 4.1 fixes
-
-Revision 1.3  1997/09/12 07:19:59  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.2  1997/04/25 22:13:56  michael
-Version for libfac-0.2.1
-
-Revision 1.1  1996/01/17 06:22:05  michael
-Initial revision
-
-*/

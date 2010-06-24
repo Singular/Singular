@@ -444,37 +444,3 @@ cfactor(const CanonicalForm & f, const CFList & as, int success ){
 //  factor(f,alpha); // faktorisierung in char=0
 // x^2*z^2-6909*x*z^2-3537*z^2-14344*x^2
 
-
-/*
-$Log: not supported by cvs2svn $
-Revision 1.12  2008/04/08 16:19:09  Singular
-*hannes: removed rcsid
-
-Revision 1.11  2008/03/18 17:46:14  Singular
-*hannes: gcc 4.2
-
-Revision 1.10  2008/03/17 17:44:16  Singular
-*hannes: fact.tst
-
-Revision 1.8  2006/06/19 13:37:46  Singular
-*hannes: more CS renamed
-
-Revision 1.7  2006/05/16 14:46:48  Singular
-*hannes: gcc 4.1 fixes
-
-Revision 1.6  2002/08/19 11:11:30  Singular
-* hannes/pfister: alg_gcd etc.
-
-Revision 1.5  2001/06/27 13:58:05  Singular
-*hannes/GP: debug newfactoras, char_series, ...
-
-Revision 1.4  2001/06/21 14:57:04  Singular
-*hannes/GP: Factorize, newfactoras, ...
-
-Revision 1.3  2001/06/18 08:44:40  pfister
-* hannes/GP/michael: factory debug, Factorize
-
-Revision 1.2  1997/09/12 07:19:38  Singular
-* hannes/michael: libfac-0.3.0
-
-*/

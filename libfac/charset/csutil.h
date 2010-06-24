@@ -76,19 +76,3 @@ ListCFList     MyDifference( const ListCFList & a, const CFList &b);
 ListCFList     Minus( const ListCFList & a, const ListCFList &b);
 #endif /* INCL_CSUTIL_H */
 
-////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.5  2006/06/14 15:35:08  Singular
-*hannes: CS renamed
-
-Revision 1.4  2002/08/19 11:11:32  Singular
-* hannes/pfister: alg_gcd etc.
-
-Revision 1.3  1997/09/12 07:19:42  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.3  1997/04/25 22:51:48  michael
-Version for libfac-0.2.1
-
-*/

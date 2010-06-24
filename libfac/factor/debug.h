@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////
-// static char * rcsid = "$Id$" ;
+// $Id$
 ////////////////////////////////////////////////////////////
 // It is possible to include this file multiple times for different 
 // settings of FACDEBUG and/or DEBUGOUTPUT
@@ -60,21 +60,3 @@ extern char * deb_level_msg; // from factory
 #define DEBOUTNL(stream)
 #endif
 
-/*
-$Log: not supported by cvs2svn $
-Revision 1.5  2007/10/10 17:52:39  Singular
-*hannes: use debug stuf from factory
-
-Revision 1.4  2006/05/16 14:46:50  Singular
-*hannes: gcc 4.1 fixes
-
-Revision 1.3  1997/09/12 07:19:55  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.2  1997/04/25 22:15:33  michael
-Version for libfac-0.2.1
-
-Revision 1.1  1996/01/17 05:19:43  michael
-Initial revision
-
-*/

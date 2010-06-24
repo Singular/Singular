@@ -403,26 +403,4 @@ reorder(const Varlist & betterorder, const ListCFList & Q){
     Q1.append(reorder(betterorder, i.getItem()));
   return Q1;
 }
-/*
-$Log: not supported by cvs2svn $
-Revision 1.6  2008/04/08 16:19:10  Singular
-*hannes: removed rcsid
-
-Revision 1.5  2008/03/18 17:46:15  Singular
-*hannes: gcc 4.2
-
-Revision 1.4  2006/05/16 14:46:49  Singular
-*hannes: gcc 4.1 fixes
-
-Revision 1.3  1997/09/12 07:19:44  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.2  1997/04/25 22:53:25  michael
-changed cerr and cout messages for use with Singular
-Version for libfac-0.2.1
-
-Revision 1.1  1996/12/19 03:46:05  michael
-Initial revision
-
-*/   
 

@@ -169,23 +169,3 @@ change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int d
 
   return F;
 }
-
-////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.8  2008/03/18 17:46:16  Singular
-*hannes: gcc 4.2
-
-Revision 1.7  2008/03/17 17:44:17  Singular
-*hannes: fact.tst
-
-Revision 1.4  2001/06/19 15:29:04  Singular
-*hannes: optim.
-
-Revision 1.3  1997/09/12 07:19:56  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.3  1997/04/25 22:20:45  michael
-Version for libfac-0.2.1
-
-*/

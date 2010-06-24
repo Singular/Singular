@@ -91,26 +91,3 @@ template class Array<REvaluation>;
 template class List<CFFList>;
 template class ListIterator<CFFList>;
 #endif /* HAVE_DATABASE */
-////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.7  2006/05/16 14:58:54  hannes
-*hannes: gcc-4.1 fixes
-
-Revision 1.6  2003/04/09 13:39:12  Singular
-* hannes/Cornelsen: integrated stand-allone fixes
-
-Revision 1.5  2001/08/08 11:59:13  Singular
-*hannes: Dan's NOSTREAMIO changes
-
-Revision 1.4  1998/02/27 10:34:02  schmidt
-        * factor/tmpl_inst.cc: template names adapted (`*.cc' ->
-          `ftmpl_*.cc')
-
-Revision 1.3  1997/09/12 07:20:00  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.2  1997/04/25 22:34:36  michael
-Version for libfac-0.2.1
-
-*/

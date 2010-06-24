@@ -45,14 +45,4 @@ typedef ListIterator<CFFList> ListCFFListIterator;
 
 #endif /* TMPL_INST_H */
 
-////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.3  1997/09/12 07:20:01  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.2  1997/04/25 22:16:31  michael
-Version for libfac-0.2.1
-
-*/
 

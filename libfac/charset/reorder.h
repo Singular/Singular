@@ -41,14 +41,3 @@ ListCFList reorder(const Varlist & betterorder, const ListCFList & Q);
 /*ENDPUBLIC*/
 
 #endif /* INCL_REORDER_H */
-
-////////////////////////////////////////////////////////////
-/*
-$Log: not supported by cvs2svn $
-Revision 1.3  1997/09/12 07:19:45  Singular
-* hannes/michael: libfac-0.3.0
-
-Revision 1.1  1997/04/25 22:50:41  michael
-Initial revision
-
-*/
