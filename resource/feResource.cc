@@ -10,7 +10,9 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <kernel/mod2.h>
+#include <auxiliary.h>
+
+#include "config.h"
 #ifdef AIX_4
 #define HAVE_PUTENV 1
 #endif
@@ -20,15 +22,12 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
 
-#include "../Singular/distrib.h"
-#include "dError.h"
+#include <reporter.h>
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
+#include <omalloc.h>
 #else
 char* feResource(const char id, int warn = -1);
 char* feResource(const char* key, int warn = -1);
-#include <kernel/dError.c>
 #endif
 
 // define RESOURCE_DEBUG for chattering about resource management

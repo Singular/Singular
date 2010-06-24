@@ -14,8 +14,21 @@ AC_PROG_INSTALL
 
 # Checks for libraries.
 
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([sys/param.h])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
+
+AC_MSG_RESULT($ac_cv_singuname)
+if test "$ac_cv_singuname" = unknown; then
+  AC_MSG_WARN(Unknown architecture: Check singuname.sh)
+  ac_cv_singuname="unknown"
+fi
+AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname")
+SINGUNAME=$ac_cv_singuname
+AC_SUBST(SINGUNAME)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

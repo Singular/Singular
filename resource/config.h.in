@@ -1,3 +1,13 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+/* Define if you have sys/param.h */
+#undef HAVE_SYS_PARAM_H
+
+/* Define uname identifier as a string */
+#define S_UNAME ""
+
 // #define assume(x) ((void) 0)
 #define memcpy4 memcpy
 
+#endif
