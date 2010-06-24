@@ -13,6 +13,20 @@
 #include <auxiliary.h>
 
 #include "config.h"
+#include "feResource.h"
+
+/* define MAXPATHLEN */
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+
+#define  DIR_SEP '/'
+#define  DIR_SEPP "/"
+
+
 #ifdef AIX_4
 #define HAVE_PUTENV 1
 #endif
