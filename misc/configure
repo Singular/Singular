@@ -3859,6 +3859,7 @@ _ACEOF
 
 
 
+# UNAME and PATH
 ac_cv_singcpuname=`uname -m`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_singcpuname" >&5
 $as_echo "$ac_cv_singcpuname" >&6; }
@@ -3927,6 +3928,18 @@ if test "$ac_cv_singcpuname" = ppc; then
 
 fi
 
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+if test "${with_rootdir+set}" != set; then
+  cat >>confdefs.h <<_ACEOF
+#define S_ROOT_DIR "${prefix}"
+_ACEOF
+
+else
+  cat >>confdefs.h <<_ACEOF
+#define S_ROOT_DIR "${with_rootdir}"
+_ACEOF
+
+fi
 
 ac_config_files="$ac_config_files Makefile"
 

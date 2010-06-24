@@ -26,6 +26,7 @@ AC_MSG_CHECKING(CPU for singular)
 # check for cpu properties:
 AC_CHECK_SIZEOF(long,4)
 
+# UNAME and PATH
 ac_cv_singcpuname=`uname -m`
 AC_MSG_RESULT($ac_cv_singcpuname)
 
@@ -81,6 +82,12 @@ if test "$ac_cv_singcpuname" = ppc; then
   AC_SUBST(SI_CPU_PPC)
 fi
 
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+if test "${with_rootdir+set}" != set; then
+  AC_DEFINE_UNQUOTED(S_ROOT_DIR, "${prefix}")
+else
+  AC_DEFINE_UNQUOTED(S_ROOT_DIR, "${with_rootdir}")
+fi
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

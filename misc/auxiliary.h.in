@@ -36,6 +36,13 @@
 /* Define sizeof(long) */
 #define SIZEOF_LONG 4
 
+/* Define version as a string */
+#define S_VERSION1 "spielwiese"
+
+/* Absolute pathname of root directory of Singular source */
+#define S_ROOT_DIR ""
+
+
 // ----------------- end of configure stuff
 
 // ---------------- Singular standard types etc.
