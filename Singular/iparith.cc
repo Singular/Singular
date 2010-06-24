@@ -57,6 +57,7 @@
 #include "mod_raw.h"
 #include "MinorInterface.h"
 #include "linearAlgebra.h"
+#include "misc.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
@@ -371,6 +372,7 @@ cmdnames cmds[] =
   { "poly",        0, POLY_CMD ,          RING_DECL},
   { "preimage",    0, PREIMAGE_CMD ,      CMD_13},
   { "prime",       0, PRIME_CMD ,         CMD_1},
+  { "primefactors",0, PFAC_CMD ,          CMD_12},
   { "print",       0, PRINT_CMD ,         CMD_12},
   { "prune",       0, PRUNE_CMD ,         CMD_1},
   { "proc",        0, PROC_CMD ,          PROC_CMD},
@@ -3180,6 +3182,23 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   return FALSE;
 }
 #endif
+static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
+{
+  number m = (number)u->Data();
+  int bound = (int)(long)v->Data();
+  number n;
+  if (u->Typ() == BIGINT_CMD) n = m;
+  else
+  {
+    /* then, we expect some other type of number inside m;
+       it needs to be converted to bigint; we do this via 'int' */
+    int i = n_Int(m, currRing);
+    n = nlInit(i, NULL);
+  }
+  lists l = primeFactorisation(n, bound);
+  res->data=(char*)l;
+  return FALSE;
+}
 static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
 {
   ring r;
@@ -3651,6 +3670,8 @@ struct sValCmd2 dArith2[]=
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{nuMPResMat,  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
+,{jjPFAC2,     PFAC_CMD,       LIST_CMD,       BIGINT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{jjPFAC2,     PFAC_CMD,       LIST_CMD,       NUMBER_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_PLURAL
 ,{jjPlural_num_poly, NCALGEBRA_CMD,NONE,       POLY_CMD,   POLY_CMD  , NO_PLURAL |NO_RING}
 ,{jjPlural_num_mat,  NCALGEBRA_CMD,NONE,       POLY_CMD,   MATRIX_CMD, NO_PLURAL |NO_RING}
@@ -4440,6 +4461,22 @@ static number jjLONG2N(long d)
 #else
 #define jjLONG2N(D) nlInit((int)D, NULL)
 #endif
+static BOOLEAN jjPFAC1(leftv res, leftv v)
+{
+  number m = (number)v->Data();
+  number n;
+  if (v->Typ() == BIGINT_CMD) n = m;
+  else
+  {
+    /* then, we expect some other type of number inside m;
+       it needs to be converted to bigint; we do this via 'int' */
+    int i = n_Int(m, currRing);
+    n = nlInit(i, NULL);
+  }
+  lists l = primeFactorisation(n, 0);
+  res->data=(char*)l;
+  return FALSE;
+}
 static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
 {
   /* computes the LU-decomposition of a matrix M;
@@ -5430,6 +5467,8 @@ struct sValCmd1 dArith1[]=
 ,{jjKBASE,      KBASE_CMD,       IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{jjKBASE,      KBASE_CMD,       MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{jjLU_DECOMP,  LU_CMD,          LIST_CMD,       MATRIX_CMD    , NO_PLURAL |NO_RING}
+,{jjPFAC1,      PFAC_CMD,        LIST_CMD,       BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{jjPFAC1,      PFAC_CMD,        LIST_CMD,       NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{atKILLATTR1,  KILLATTR_CMD,    NONE,           IDHDL         , ALLOW_PLURAL |ALLOW_RING}
 #ifdef MDEBUG
 ,{jjpHead,      LEAD_CMD,        POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
