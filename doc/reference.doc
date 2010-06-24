@@ -3718,7 +3718,7 @@ See
 @ref{sres}.
 @c ref
 @c ---------------------------------------
-@node ludecomp, luinverse, listvar, Functions
+@node ludecomp, luinverse, lres, Functions
 @subsection ludecomp
 @cindex ludecomp
 @cindex LU-decomposition of a matrix of numbers
@@ -3769,7 +3769,7 @@ See
 @ref{luinverse}.
 @c ref
 @c ---------------------------------------
-@node luinverse, lusolve, listvar, Functions
+@node luinverse, lusolve, ludecomp, Functions
 @subsection luinverse
 @cindex luinverse
 @cindex inverse of a matrix via its LU-decomposition
@@ -3840,7 +3840,7 @@ See
 @ref{ludecomp}.
 @c ref
 @c ---------------------------------------
-@node lusolve, maxideal, listvar, Functions
+@node lusolve, maxideal, luinverse, Functions
 @subsection lusolve
 @cindex lusolve
 @cindex solve a linear equation system A*x = b via the LU-decomposition of A
@@ -3896,7 +3896,7 @@ See
 @ref{ludecomp}.
 @c ref
 @c ---------------------------------------
-@node maxideal, memory, lres, Functions
+@node maxideal, memory, lusolve, Functions
 @subsection maxideal
 @cindex maxideal
 @table @code
@@ -5350,7 +5350,7 @@ returns the prime factorisation up to an optionally given bound, b, on the
 prime factors
 @*When called with a bigint, no ring needs to be active.
 @*The method is capable of finding all prime factors <= 2^31 - 1, i.e., it
-finds all prime factors <= min{2^31-1, b}. The quotient, q, arising by
+finds all prime factors <= min(2^31-1, b). The quotient, q, arising by
 dividing out all found prime factors will also be returned. More concretely,
 a list L with three entries is returned:
 @*L[1] = q,
