@@ -1,0 +1,89 @@
+#################################################################
+###
+### Makefile for Singular
+###
+#################################################################
+
+SHELL		= /bin/sh
+
+##
+## various paths
+##
+srcdir		= .
+prefix 		= @prefix@
+exec_prefix 	= @exec_prefix@
+libdir 		= @libdir@
+# includes are taken from here
+includedir	= @includedir@
+
+##
+## various programs
+##
+
+CXX		= @CXX@
+CC		= @CC@
+INSTALL		= /usr/bin/install -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+MKINSTALLDIRS   = ../mkinstalldirs
+LN_S		= ln -s
+
+##
+## compiler and linker options
+##
+PIPE		= -pipe
+CFLAGS		= @CFLAGS@ ${PIPE}
+CXXFLAGS	= @CXXFLAGS@ ${PIPE}
+CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
+CPPFLAGS	= -I${srcdir} -I${includedir}
+DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
+
+## End configuration dependend stuff
+#################################################################
+
+###
+### file sets
+###
+
+# normal C++ source files
+CXXSOURCES=feFopen.cc feResource.cc
+
+# normal C source files
+CSOURCES=
+
+SOURCES=${CSOURCES} ${CXXSOURCES}
+
+HEADERS=feFopen.h feResource.h
+
+DISTFILES=${SOURCES} ${HEADERS}
+
+OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
+
+.cc.o:	
+	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+.c.o:
+	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
+
+libresource.a: ${OBJS}
+	 -rm -f $@
+	 ar cr $@ $^
+
+all:  libresource.a
+
+install: all
+	${MKINSTALLDIRS} ${includedir}
+	${MKINSTALLDIRS} ${libdir}
+	${INSTALL_DATA} feFopen.h ${includedir}/feFopen.h
+	${INSTALL_DATA} libresource.a ${libdir}/libresource.a
+
+##
+## clean targest
+##
+mostlyclean: 
+	-rm -f *.o *.og core *.op
+
+clean: mostlyclean
+	-rm -f *.bak *.d *.dd depend *.a *.so*
+
+tags:   
+	ctags *.c *.h *.cc *.inc
