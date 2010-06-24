@@ -1078,7 +1078,7 @@ static BOOLEAN jjTIMES_P(leftv res, leftv u, leftv v)
   a=pCopy((poly)u->Data());
   b=(poly)v->CopyD(POLY_CMD); // works also for VECTOR_CMD
   if ((a!=NULL) && (b!=NULL)
-  && (pTotaldegree(a)+pTotaldegree(b)>=currRing->bitmask))
+  && ((unsigned long)(pTotaldegree(a)+pTotaldegree(b))>=currRing->bitmask))
   {
     pDelete(&a);
     pDelete(&b);
