@@ -2432,7 +2432,7 @@ poly naPermNumber(number z, int * par_perm, int P, ring oldRing)
     int i;
     for(i=pVariables;i;i--)
        pSetExp(p,i, 0);
-    pSetComp(p, 0);
+    if (rRing_has_Comp(currRing) pSetComp(p, 0);
     napoly pa=NULL;
     lnumber pan;
     if (currRing->parameter!=NULL)
