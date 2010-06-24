@@ -20,7 +20,7 @@ includedir	= @includedir@
 ## various programs
 ##
 
-CXX		= g++
+CXX		= @CXX@
 INSTALL_PROGRAM	= @INSTALL@
 INSTALL_DATA	= @INSTALL@ -m 644
 MKINSTALLDIRS   = ../mkinstalldirs
@@ -30,8 +30,8 @@ LN_S		= ln -s
 ## compiler and linker options
 ##
 PIPE		= -pipe
-CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
-CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} -g
+CFLAGS		= @CFLAGS@ ${PIPE}
+CXXFLAGS	= @CXXFLAGS@ ${PIPE} -g
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I${includedir} 
 LDFLAGS		= -L${libdir}

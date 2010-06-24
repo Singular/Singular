@@ -20,7 +20,7 @@ includedir	= @includedir@
 ## various programs
 ##
 
-CXX		= g++
+CXX		= @CXX@
 INSTALL		= /usr/bin/install -c
 INSTALL_PROGRAM	= ${INSTALL}
 INSTALL_DATA	= ${INSTALL} -m 644
@@ -31,8 +31,8 @@ LN_S		= ln -s
 ## compiler and linker options
 ##
 PIPE		= -pipe
-CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
-CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE}
+CFLAGS		= @CFLAGS@ ${PIPE}
+CXXFLAGS	= @CXXFLAGS@ ${PIPE}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I${includedir}
 DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
