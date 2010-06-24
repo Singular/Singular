@@ -119,4 +119,4 @@ install: all
 	$(INSTALL_DATA) coeffs.h $(includedir)/coeffs.h
 
 test: test.cc libcoeffs_g.a
-	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} test.cc $LDFLAGS} ${LIBSG} -o test
+	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} test.cc ${LDFLAGS} ${LIBSG} -o test
