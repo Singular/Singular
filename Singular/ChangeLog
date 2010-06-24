@@ -1,8 +1,10 @@
 Changes since 3-1-1-1:
+- factorize for Z/p, Z/p(a) improved
 - new lib monomial.lib
 - new lib assprime.lib
 - new lib: resbin.lib
 - lib extended: modstd.lib
+- new command: primefactors (was: General::primefactors)
 - new commands: lusolve, ludecomp(mat) and luinverse(mat [, mat, mat]) 
 - stdhilb fixed (Tst/Short/bug_stdhilb.tst)
 - factory: windows port improved (.h files instead of .inc)
