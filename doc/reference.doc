@@ -160,6 +160,7 @@ and @code{LIB} no brackets are allowed.
 * parstr::
 * preimage::
 * prime::
+* primefactors::
 * print::
 * printf::
 * prune::
@@ -5307,7 +5308,7 @@ See
 @ref{ring}.
 @c ref
 @c ---------------------------------------
-@node prime, print, preimage, Functions
+@node prime, primefactors, preimage, Functions
 @subsection prime
 @cindex prime
 @table @code
@@ -5334,7 +5335,42 @@ See
 @ref{general_lib}.
 @c ref
 @c ---------------------------------------
-@node print, printf, prime, Functions
+@node primefactors, print, prime, Functions
+@subsection primefactors
+@cindex primefactors
+@table @code
+@item @strong{Syntax:}
+@code{primefactors (} bigint_expression @code{, [} int_expression @code{] )}
+@item @strong{Syntax:}
+@code{primefactors (} number_expression @code{, [} int_expression @code{] )}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+returns the prime factorisation up to an optionally given bound, b, on the
+prime factors
+@*When called with a bigint, no ring needs to be active.
+@*The method is capable of finding all prime factors <= 2^31 - 1, i.e., it
+finds all prime factors <= min{2^31-1, b}. The quotient, q, arising by
+dividing out all found prime factors will also be returned. More concretely,
+a list L with three entries is returned:
+@*L[1] = q,
+@*L[2][i] = i-th prime factor (in ascending order),
+@*L[3][i] = multiplicity of L[2][i].
+@item @strong{Example:}
+@smallexample
+@c example
+  bigint n = bigint(7)^12 * bigint(37)^6 * 121;
+  primefactors(n);
+  primefactors(n, 15); /* only prime factors <= 15 */
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{prime}.
+@c ref
+@c ---------------------------------------
+@node print, printf, primefactors, Functions
 @subsection print
 @cindex print
 @table @code
