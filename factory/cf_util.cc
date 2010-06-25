@@ -39,7 +39,7 @@ int ipower ( int b, int m )
 int ilog2 (int a)
 {
   int n = -1;
-  while ( a != 0 )
+  while ( a > 0 )
   {
     n++;
     a /=2;
