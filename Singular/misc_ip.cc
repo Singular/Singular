@@ -1,12 +1,12 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR
+ * Computer Algebra System SINGULAR    
 \*****************************************************************************/
-/** @file misc.cc
+/** @file misc_ip.cc
  *
  * This file provides miscellaneous functionality.
  *
  * For more general information, see the documentation in
- * misc.h.
+ * misc_ip.h.
  *
  * @author Frank Seelisch
  *
@@ -19,7 +19,7 @@
 #include "mod2.h"
 #include "lists.h"
 #include "longrat.h" /* We only need bigints. */
-#include "misc.h"
+#include "misc_ip.h"
 
 /* This works by Newton iteration, i.e.,
       a(1)   = n;
@@ -29,7 +29,7 @@
    All used numbers are bigints. */
 number approximateSqrt(const number n)
 {
-  if (nlIsZero(n)) { return nlInit(0, NULL); }
+  if (nlIsZero(n)) { number zero = nlInit(0, NULL); return zero; }
   number temp1; number temp2;
   number one = nlInit(1, NULL);
   number two = nlInit(2, NULL);
@@ -41,7 +41,6 @@ number approximateSqrt(const number n)
   {
     temp1 = nlIntDiv(m, two);
     temp2 = nlIntDiv(nHalf, m);
-    nlDelete(&mOld, NULL);
     mOld = m;
     m = nlAdd(temp1, temp2);
     nlDelete(&temp1, NULL); nlDelete(&temp2, NULL);
@@ -62,7 +61,8 @@ number approximateSqrt(const number n)
   temp1 = nlSub(m, one);
   nlDelete(&m, NULL);
   nlDelete(&one, NULL);
-  return temp1;
+  m = temp1;
+  return m;
 }
 
 /* returns the quotient resulting from division of n by the prime as many
@@ -123,8 +123,10 @@ void setValue(const int i, bool value, unsigned int* ii)
   int index = i / 32;
   int offset = i % 32;
   unsigned int v = 1 << offset;
-  if (value) ii[index] |= v;
-  else       ii[index] &= (~v);
+  if (value && ((ii[index] & v) != 0)) return;
+  if ((!value) && ((ii[index] & v) == 0)) return;
+  if (value && ((ii[index] & v) == 0)) { ii[index] += v; return; }
+  if ((!value) && ((ii[index] & v) != 0)) { ii[index] -= v; return; }
 }
 
 /* returns whether i is less than or equal to the bigint number n */
@@ -171,7 +173,9 @@ lists primeFactorisation(const number n, const int pBound)
      -1 or +1 mod 6. */
   for (i = 0; i < s; i++) isPrime[i] = 4294967295; /* all 32 bits set */
   int p = 5; bool add2 = true;
-  while ((p <= maxP) && (isLeq(p, nn)))
+  /* due to possible overflows, we need to check whether p > 0, and
+     likewise i > 0 below */
+  while ((0 < p) && (p <= maxP) && (isLeq(p, nn)))
   {
     /* at this point, p is guaranteed to be a prime;
        we divide nn by the highest power of p and store p
@@ -181,12 +185,12 @@ lists primeFactorisation(const number n, const int pBound)
     if (e > 0) { primes[pCounter] = p; multiplicities[pCounter++] = e; }
     /* invalidate all multiples of p, starting with 2*p */
     i = 2 * p;
-    while (i <= s) { setValue(i, false, isPrime); i += p; }
+    while ((0 < i) && (i <= s)) { setValue(i, false, isPrime); i += p; }
     /* move on to the next prime in the sieve; we either add 2 or 4
        in order to visit just the numbers equal to -1/+1 mod 6 */
     if (add2) { p += 2; add2 = false; }
     else      { p += 4; add2 = true;  }
-    while ((p <= maxP) && (isLeq(p, nn)) && (!getValue(p, isPrime)))
+    while ((0 < p) && (p <= maxP) && (isLeq(p, nn)) && (!getValue(p, isPrime)))
     {
       if (add2) { p += 2; add2 = false; }
       else      { p += 4; add2 = true;  }
