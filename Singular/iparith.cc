@@ -57,7 +57,7 @@
 #include "mod_raw.h"
 #include "MinorInterface.h"
 #include "linearAlgebra.h"
-#include "misc.h"
+#include "misc_ip.h"
 #ifdef HAVE_FACTORY
 #include "clapsing.h"
 #include "kstdfac.h"
