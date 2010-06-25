@@ -1203,16 +1203,12 @@ CanonicalForm::sqrt () const
 int
 CanonicalForm::ilog2 () const
 {
-    if ( is_imm( value ) ) {
+    if ( is_imm( value ) )
+    {
         ASSERT( is_imm( value ) == INTMARK, "ilog2() not implemented" );
         int a = imm2int( value );
         ASSERT( a > 0, "arg to ilog2() less or equal zero" );
-        int n = -1;
-        while ( a != 0 ) {
-            n++;
-            a /= 2;
-        }
-        return n;
+        return ::ilog2(a);
     }
     else
         return value->ilog2();

@@ -33,14 +33,14 @@ sortCFFList( CFFList & F )
 
     // join elements with the same degree
     while ( I.hasItem() ) {
-	f = I.getItem().factor();
-	exp = I.getItem().exp();
-	I++;
-	while ( I.hasItem() && I.getItem().exp() == exp ) {
-	    f *= I.getItem().factor();
-	    I++;
-	}
-	result.append( CFFactor( f, exp ) );
+        f = I.getItem().factor();
+        exp = I.getItem().exp();
+        I++;
+        while ( I.hasItem() && I.getItem().exp() == exp ) {
+            f *= I.getItem().factor();
+            I++;
+        }
+        result.append( CFFactor( f, exp ) );
     }
 
     return result;
@@ -56,40 +56,40 @@ CFFList sqrFreeFp ( const CanonicalForm & f )
     int k, e = 1;
 
     if ( ! leadcf.isOne() )
-	t0 /= leadcf;
+        t0 /= leadcf;
 
     divexp = p;
     while ( t0.degree(x) > 0 )
     {
-	t = gcd( t0, t0.deriv() );
-	v = t0 / t;
-	k = 0;
-	while ( v.degree(x) > 0 )
+        t = gcd( t0, t0.deriv() );
+        v = t0 / t;
+        k = 0;
+        while ( v.degree(x) > 0 )
         {
-	    k = k+1;
-	    if ( k % p == 0 )
+            k = k+1;
+            if ( k % p == 0 )
             {
-		t /= v;
-		k = k+1;
-	    }
-	    w = gcd( t, v );
-	    h = v / w;
-	    v = w;
-	    t /= v;
-	    if ( h.degree(x) > 0 )
-		F.append( CFFactor( h/h.lc(), e*k ) );
-	}
-	t0 = apply( t, divexpfunc );
-	e = p * e;
+                t /= v;
+                k = k+1;
+            }
+            w = gcd( t, v );
+            h = v / w;
+            v = w;
+            t /= v;
+            if ( h.degree(x) > 0 )
+                F.append( CFFactor( h/h.lc(), e*k ) );
+        }
+        t0 = apply( t, divexpfunc );
+        e = p * e;
     }
     if ( ! leadcf.isOne() )
     {
-	if ( !F.isEmpty() && (F.getFirst().exp() == 1) )
+        if ( !F.isEmpty() && (F.getFirst().exp() == 1) )
         {
-	    leadcf = F.getFirst().factor() * leadcf;
-	    F.removeFirst();
-	}
-	F.insert( CFFactor( leadcf, 1 ) );
+            leadcf = F.getFirst().factor() * leadcf;
+            F.removeFirst();
+        }
+        F.insert( CFFactor( leadcf, 1 ) );
     }
     return F;
 }
@@ -116,20 +116,20 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
 
     while ( ! c.degree() == 0 )
     {
-	y = gcd( w, c ); z = w / y;
-	if ( degree( z ) > 0 )
-	    if ( lc( z ).sign() < 0 )
-		F.append( CFFactor( -z, i ) );
-	    else
-		F.append( CFFactor( z, i ) );
-	i++;
-	w = y; c = c / y;
+        y = gcd( w, c ); z = w / y;
+        if ( degree( z ) > 0 )
+            if ( lc( z ).sign() < 0 )
+                F.append( CFFactor( -z, i ) );
+            else
+                F.append( CFFactor( z, i ) );
+        i++;
+        w = y; c = c / y;
     }
     if ( degree( w ) > 0 )
-	if ( lc( w ).sign() < 0 )
-	    F.append( CFFactor( -w, i ) );
-	else
-	    F.append( CFFactor( w, i ) );
+        if ( lc( w ).sign() < 0 )
+            F.append( CFFactor( -w, i ) );
+        else
+            F.append( CFFactor( w, i ) );
     return F;
 }
 */
@@ -137,7 +137,7 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
 CFFList sqrFreeZ ( const CanonicalForm & a )
 {
     if ( a.inCoeffDomain() )
-	return CFFactor( a, 1 );
+        return CFFactor( a, 1 );
     CanonicalForm cont = content( a );
     CanonicalForm aa = a / cont;
     CanonicalForm b = aa.deriv(), c = gcd( aa, b );
@@ -147,31 +147,31 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     Variable v = aa.mvar();
     while ( ! c.degree(v) == 0 )
     {
-	y = gcd( w, c ); z = w / y;
-	if ( degree( z, v ) > 0 )
-	    if ( lc( z ).sign() < 0 )
-		F.append( CFFactor( -z, i ) );
-	    else
-		F.append( CFFactor( z, i ) );
-	i++;
-	w = y; c = c / y;
+        y = gcd( w, c ); z = w / y;
+        if ( degree( z, v ) > 0 )
+            if ( lc( z ).sign() < 0 )
+                F.append( CFFactor( -z, i ) );
+            else
+                F.append( CFFactor( z, i ) );
+        i++;
+        w = y; c = c / y;
     }
     if ( degree( w,v ) > 0 )
-	if ( lc( w ).sign() < 0 )
-	    F.append( CFFactor( -w, i ) );
-	else
-	    F.append( CFFactor( w, i ) );
+        if ( lc( w ).sign() < 0 )
+            F.append( CFFactor( -w, i ) );
+        else
+            F.append( CFFactor( w, i ) );
     if ( ! cont.isOne() )
-	F = Union( F, sqrFreeZ( cont ) );
+        F = Union( F, sqrFreeZ( cont ) );
     if ( lc( a ).sign() < 0 )
     {
-	if ( F.getFirst().exp() == 1 )
+        if ( F.getFirst().exp() == 1 )
         {
-	    CanonicalForm f = F.getFirst().factor();
-	    CFFListIterator(F).getItem() = CFFactor( -f, 1 );
-	}
-	else
-	    F.insert( CFFactor( -1, 1 ) );
+            CanonicalForm f = F.getFirst().factor();
+            CFFListIterator(F).getItem() = CFFactor( -f, 1 );
+        }
+        else
+            F.insert( CFFactor( -1, 1 ) );
     }
     return F;
 }

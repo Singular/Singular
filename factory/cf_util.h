@@ -13,5 +13,7 @@
 #include <config.h>
 
 int ipower ( int b, int n );
+int ilog2 (int a);
+
 
 #endif /* ! INCL_CF_UTIL_H */
