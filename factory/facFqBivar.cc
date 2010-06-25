@@ -931,8 +931,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   // degree pattern therefore usually less combinations have to be tried during
   // the recombination process
   int factorNums= 5;
-  if (factorNums < (int) ceil (log (totaldegree (A)))) 
-    factorNums= (int) ceil (log (totaldegree (A)));
+  if (factorNums < (int) ilog2 (totaldegree (A))) 
+    factorNums= (int) ilog2 (totaldegree (A));
   for (int i= 0; i < factorNums; i++) 
   {
     bufAeval= A; 
