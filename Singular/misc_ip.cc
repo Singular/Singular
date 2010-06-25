@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file misc.cc
  *
@@ -29,7 +29,7 @@
    All used numbers are bigints. */
 number approximateSqrt(const number n)
 {
-  if (nlIsZero(n)) { number zero = nlInit(0, NULL); return zero; }
+  if (nlIsZero(n)) { return nlInit(0, NULL); }
   number temp1; number temp2;
   number one = nlInit(1, NULL);
   number two = nlInit(2, NULL);
@@ -41,6 +41,7 @@ number approximateSqrt(const number n)
   {
     temp1 = nlIntDiv(m, two);
     temp2 = nlIntDiv(nHalf, m);
+    nlDelete(&mOld, NULL);
     mOld = m;
     m = nlAdd(temp1, temp2);
     nlDelete(&temp1, NULL); nlDelete(&temp2, NULL);
@@ -61,8 +62,7 @@ number approximateSqrt(const number n)
   temp1 = nlSub(m, one);
   nlDelete(&m, NULL);
   nlDelete(&one, NULL);
-  m = temp1;
-  return m;
+  return temp1;
 }
 
 /* returns the quotient resulting from division of n by the prime as many
@@ -123,10 +123,8 @@ void setValue(const int i, bool value, unsigned int* ii)
   int index = i / 32;
   int offset = i % 32;
   unsigned int v = 1 << offset;
-  if (value && ((ii[index] & v) != 0)) return;
-  if ((!value) && ((ii[index] & v) == 0)) return;
-  if (value && ((ii[index] & v) == 0)) { ii[index] += v; return; }
-  if ((!value) && ((ii[index] & v) != 0)) { ii[index] -= v; return; }
+  if (value) ii[index] |= v;
+  else       ii[index] &= (~v);
 }
 
 /* returns whether i is less than or equal to the bigint number n */
