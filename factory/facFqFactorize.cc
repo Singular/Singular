@@ -504,8 +504,11 @@ CFList biFactorizer (const CanonicalForm& F, const Variable& alpha,
   DegreePattern bufDegs;
 
   int factorNums= 5;
-  if (factorNums < (int) ilog2 (totaldegree (A)))
-    factorNums= (int) ilog2 (totaldegree (A));
+  double logarithm= (double) ilog2 (totaldegree (A));
+  logarithm /= log2exp;
+  logarithm= ceil (logarithm);
+  if (factorNums < (int) logarithm)
+    factorNums= (int) logarithm;
   for (int i= 0; i < factorNums; i++)
   {
     if (i == 0)
@@ -1773,8 +1776,11 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   CFList biFactors, bufBiFactors;
   CanonicalForm evalPoly;
   int lift, bufLift;
-  if (factorNums < (int) ilog2 (totaldegree (A)))
-    factorNums= (int) ilog2 (totaldegree (A));
+  double logarithm= (double) ilog2 (totaldegree (A));
+  logarithm /= log2exp;
+  logarithm= ceil (logarithm);
+  if (factorNums < (int) logarithm)
+    factorNums= (int) logarithm;
   // several bivariate factorizations
   for (int i= 0; i < factorNums; i++)
   {
