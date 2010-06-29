@@ -27,8 +27,6 @@
 #include "facFqSquarefree.h"
 #include "facFqBivarUtil.h"
 
-extern const double log2exp;
-
 /// Factorization over a finite field
 ///  
 /// @return @a multiFactorize returns a factorization of F

@@ -30,7 +30,7 @@
 #include "cf_util.h"
 #include "facFqSquarefree.h"
 
-extern const double log2exp;
+static const double log2exp= 1.442695041;
 
 /// Factorization of a squarefree bivariate polynomials over an arbitrary finite 
 /// field, information on the current field we work over is in @a info. @a info

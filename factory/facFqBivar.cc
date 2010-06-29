@@ -42,8 +42,6 @@ TIMING_DEFINE_PRINT(fac_uni_factorizer);
 TIMING_DEFINE_PRINT(fac_hensel_lift);
 TIMING_DEFINE_PRINT(fac_factor_recombination);
 
-const double log2exp= 1.442695041;
-
 CanonicalForm prodMod0 (const CFList& L, const CanonicalForm& M) 
 {
   if (L.isEmpty())
