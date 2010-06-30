@@ -662,7 +662,7 @@ proc rootsModp(int p, poly P)
 RETURN: list of roots of the polynomial P modulo p with p prime
 ASSUME: p>=3
 NOTE:   this algorithm will be called recursively, and it is understood
-        that all the operations are done in Z/pZ (excepting sqareRoot(d,p))
+        that all the operations are done in Z/pZ (excepting squareRoot(d,p))
 EXAMPLE:example rootsModp; shows an example
 "
 {

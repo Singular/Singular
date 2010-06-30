@@ -16,7 +16,7 @@ fastExpt(a,m,n)         a^m for numbers a,m; if a^k>n n+1 is returned
 log2(n)                    logarithm to basis 2 of n
 PerfectPowerTest(n)        checks if there are a,b>1, so that a^b=n
 wurzel(r)                  square root of number r
-euler(r)                   phi-function of euler
+euler(r)                   phi-function of Euler
 coeffmod(f,n)              polynomial f modulo number n (coefficients mod n)
 powerpolyX(q,n,a,r)        (polynomial a)^q modulo (poly r,number n)
 ask(n)                     ASK-Algorithm; deterministic Primality test
@@ -214,7 +214,7 @@ example
 //////////////////////////////////////////////////////////////////////////
 proc euler(number r)
 "USAGE: euler(r);
-RETURN: number phi(r), where phi is eulers phi-function
+RETURN: number phi(r), where phi is Eulers phi-function
 NOTE:   first r is factorized with proc PollardRho, then phi(r) is
         calculated with the help of phi(p) of every factor p;
 EXAMPLE:example euler; shows an example
