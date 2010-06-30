@@ -638,8 +638,24 @@ static proc showResult( def R, int l, int h )
   int row   = nrows(Betti);
   int shift = attrib(Betti,"rowShift") + (k + ell - 1);
 
-  intmat newBetti[ n + 1 ][ h - l + 1 ];
+  int iWTH = h-l+1;
 
+  int d = k - h + ell - 1;
+
+  if( PL > 1 )
+  {
+    "// l: ", l;
+    "// h: ", h;
+    "// n: ", n;
+    "// ell: ", ell;
+    "// k: ", k;
+    "// row: ", row;
+    "// shift: ", shift;
+    "// iWTH: ", iWTH;
+    "// d: ", d;
+  }
+
+  intmat newBetti[ n + 1 ][ iWTH ];
   int i, j;
 
   for (j=1; j<=row; j++) {
@@ -655,16 +671,15 @@ static proc showResult( def R, int l, int h )
     }
   }
 
-  int iWTH = h-l+1;
   for (j=2; j<=n+1; j++) {
     for (i=1; i<min(j, iWTH); i++) {
-      newBetti[j,i]=-1;
+      newBetti[j,i]= -1;
     }
   }
-  int d = k - h + ell - 1;
+
   for (j=1; j<=n; j++) {
     for (i=iWTH; i>=k+j; i--) {
-      newBetti[j,i]=-1;
+      newBetti[j,i]=0; // -1;
     }
   }
 
@@ -846,7 +861,7 @@ EXAMPLE: example sheafCohBGG2; shows an example
   dbprint(PL-1, "// weighting(EM): ["+ string(attrib(EM, "isHomog")) + "]");
 
   int tResulutionBegin=timer;
-  resolution RE = nres(EM, maxbound);
+  resolution RE = nres(EM, maxbound); // TODO: Plural computes one too many syzygies...?!
   int tMinResBegin=timer;
   RE = minres(RE);
   int tBettiBegin=timer;
@@ -857,9 +872,10 @@ EXAMPLE: example sheafCohBGG2; shows an example
 
   if( PL > 0 )
   {
+    //    list L = RE; // TODO: size(L/RE) is wrong!
     "
         ----      RESULTS  ----
-        Tate Resolution (Length: ", size(RE), "):
+        Tate Resolution:
     ";
     RE;
     "Betti numbers for Tate resolution (diagonal cohomology table):";
@@ -1340,10 +1356,11 @@ proc getIdealSheafPullback(ideal I, ideal pi)
 
 proc getIdealSheaf(ideal I)
 {
+  int i = homog(I);
   resolution FI = mres(I,2); // Syz + grading...
   module M = FI[2];
   attrib(M, "isCoker", 1);
-  attrib(M);
+  //  attrib(M);
   return(M);
 };
 
