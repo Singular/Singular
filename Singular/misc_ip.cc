@@ -141,6 +141,7 @@ bool isLeq(const int i, const number n)
   return result;
 }
 
+#if 0
 lists primeFactorisation(const number n, const int pBound)
 {
   number nn = nlCopy(n); int i;
@@ -177,7 +178,8 @@ lists primeFactorisation(const number n, const int pBound)
      intended usage is: isPrime[0] = ...
      We shall make use only of bits which correspond to numbers =
      -1 or +1 mod 6. */
-  for (i = 0; i < s; i++) isPrime[i] = ~0;/*4294967295*/; /* all 32 bits set */
+  //for (i = 0; i < s; i++) isPrime[i] = ~0;/*4294967295*/; /* all 32 bits set */
+  memset(isPrime,0xff,s*sizeof(unsigned int));
   int p=9; while((p<maxP) && (p>0)) { setValue(p,false,isPrime); p+=6; }
   p = 5; bool add2 = true;
   /* due to possible overflows, we need to check whether p > 0, and
@@ -221,6 +223,285 @@ lists primeFactorisation(const number n, const int pBound)
   L->m[2].rtyp = LIST_CMD; L->m[2].data = (void *)multiplicitiesL;
   return L;
 }
+#else
+/* Factoring , from gmp-demos
+
+Copyright 1995, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005 Free Software
+Foundation, Inc.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see http://www.gnu.org/licenses/.  */
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <si_gmp.h>
+
+static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
+
+void factor_using_division (mpz_t t, unsigned int limit, int *L, int &L_ind, int *ex)
+{
+  mpz_t q, r;
+  unsigned long int f;
+  int ai;
+  unsigned *addv = add;
+  unsigned int failures;
+
+  mpz_init (q);
+  mpz_init (r);
+
+  f = mpz_scan1 (t, 0);
+  mpz_div_2exp (t, t, f);
+  while (f)
+  {
+    if ((L_ind>0) && (L[L_ind-1]==2)) ex[L_ind-1]++;
+    else
+    {
+      L[L_ind]=2;
+      L_ind++;
+    }
+    --f;
+  }
+
+  for (;;)
+  {
+    mpz_tdiv_qr_ui (q, r, t, 3);
+    if (mpz_cmp_ui (r, 0) != 0) break;
+    mpz_set (t, q);
+    if ((L_ind>0) && (L[L_ind-1]==3)) ex[L_ind-1]++;
+    else
+    {
+      L[L_ind]=3;
+      L_ind++;
+    }
+  }
+
+  for (;;)
+  {
+    mpz_tdiv_qr_ui (q, r, t, 5);
+    if (mpz_cmp_ui (r, 0) != 0) break;
+    mpz_set (t, q);
+    if ((L_ind>0) && (L[L_ind-1]==5)) ex[L_ind-1]++;
+    else
+    {
+      L[L_ind]=5;
+      L_ind++;
+    }
+  }
+
+  failures = 0;
+  f = 7;
+  ai = 0;
+  while (mpz_cmp_ui (t, 1) != 0)
+  {
+    mpz_tdiv_qr_ui (q, r, t, f);
+    if (mpz_cmp_ui (r, 0) != 0)
+    {
+        f += addv[ai];
+        if (mpz_cmp_ui (q, f) < 0) break;
+        ai = (ai + 1) & 7;
+        failures++;
+        if (failures > limit) break;
+    }
+    else
+    {
+      mpz_swap (t, q);
+      if ((L_ind>0) && (L[L_ind-1]==f)) ex[L_ind-1]++;
+      else
+      {
+        L[L_ind]=f;
+        L_ind++;
+      }
+      failures = 0;
+    }
+  }
+
+  mpz_clear (q);
+  mpz_clear (r);
+}
+
+void factor_using_pollard_rho (mpz_t n, int a_int, int *L, int &L_ind, int *ex)
+{
+  mpz_t x, x1, y, P;
+  mpz_t a;
+  mpz_t g;
+  mpz_t t1, t2;
+  int k, l, c, i;
+
+  mpz_init (g);
+  mpz_init (t1);
+  mpz_init (t2);
+
+  mpz_init_set_si (a, a_int);
+  mpz_init_set_si (y, 2);
+  mpz_init_set_si (x, 2);
+  mpz_init_set_si (x1, 2);
+  k = 1;
+  l = 1;
+  mpz_init_set_ui (P, 1);
+  c = 0;
+
+  while (mpz_cmp_ui (n, 1) != 0)
+  {
+S2:
+    mpz_mul (x, x, x); mpz_add (x, x, a); mpz_mod (x, x, n);
+    mpz_sub (t1, x1, x); mpz_mul (t2, P, t1); mpz_mod (P, t2, n);
+    c++;
+    if (c == 20)
+    {
+      c = 0;
+      mpz_gcd (g, P, n);
+      if (mpz_cmp_ui (g, 1) != 0) goto S4;
+      mpz_set (y, x);
+    }
+S3:
+    k--;
+    if (k > 0) goto S2;
+
+    mpz_gcd (g, P, n);
+    if (mpz_cmp_ui (g, 1) != 0) goto S4;
+
+    mpz_set (x1, x);
+    k = l;
+    l = 2 * l;
+    for (i = 0; i < k; i++)
+    {
+      mpz_mul (x, x, x); mpz_add (x, x, a); mpz_mod (x, x, n);
+    }
+    mpz_set (y, x);
+    c = 0;
+    goto S2;
+S4:
+    do
+    {
+      mpz_mul (y, y, y); mpz_add (y, y, a); mpz_mod (y, y, n);
+      mpz_sub (t1, x1, y); mpz_gcd (g, t1, n);
+    }
+    while (mpz_cmp_ui (g, 1) == 0);
+
+    mpz_div (n, n, g);        /* divide by g, before g is overwritten */
+
+    if (!mpz_probab_prime_p (g, 3))
+    {
+      do
+      {
+        mp_limb_t a_limb;
+        mpn_random (&a_limb, (mp_size_t) 1);
+        a_int = (int) a_limb;
+      }
+      while (a_int == -2 || a_int == 0);
+
+      factor_using_pollard_rho (g, a_int,L,L_ind,ex);
+    }
+    else
+    {
+      if ((L_ind>0) && (mpz_cmp_si(g,L[L_ind-1])==0)) ex[L_ind-1]++;
+      else
+      {
+        L[L_ind]=mpz_get_si(g);
+        L_ind++;
+      }
+    }
+    mpz_mod (x, x, n);
+    mpz_mod (x1, x1, n);
+    mpz_mod (y, y, n);
+    if (mpz_probab_prime_p (n, 3))
+    {
+      if ((L_ind>0) && (mpz_cmp_si(n,L[L_ind-1])==0)) ex[L_ind-1]++;
+      else
+      {
+        L[L_ind]=mpz_get_si(n);
+        L_ind++;
+      }
+      break;
+    }
+  }
+
+  mpz_clear (g);
+  mpz_clear (P);
+  mpz_clear (t2);
+  mpz_clear (t1);
+  mpz_clear (a);
+  mpz_clear (x1);
+  mpz_clear (x);
+  mpz_clear (y);
+}
+
+void mpz_factor (mpz_t t, int *L, int & L_ind, int *ex)
+{
+  unsigned int division_limit;
+
+  if (mpz_sgn (t) == 0)
+    return;
+
+  /* Set the trial division limit according the size of t.  */
+  division_limit = mpz_sizeinbase (t, 2);
+  if (division_limit > 1000)
+    division_limit = 1000 * 1000;
+  else
+    division_limit = division_limit * division_limit;
+
+  factor_using_division (t, division_limit, L, L_ind, ex);
+
+  if (mpz_cmp_ui (t, 1) != 0)
+  {
+    if (mpz_probab_prime_p (t, 3))
+    {
+      if ((L_ind>0) && (mpz_cmp_si(t,L[L_ind-1])==0)) ex[L_ind-1]++;
+      else
+      {
+        L[L_ind]=mpz_get_si(t);
+        L_ind++;
+      }
+    }
+    else
+      factor_using_pollard_rho (t, 1, L,L_ind,ex);
+  }
+}
+
+lists primeFactorisation(const number n, const int pBound)
+{
+  mpz_t t;
+  number nn = nlCopy(n);
+  lists L=(lists)omAllocBin(slists_bin);
+  L->Init(3);
+  L->m[0].rtyp = BIGINT_CMD; L->m[0].data = (void *)nn;
+  /* try to fit nn into an int: */
+  int nnAsInt = nlInt(nn, NULL);
+  if (nlIsZero(nn) || (nnAsInt != 0))
+  {
+    nlDelete(&nn,NULL);
+    L->m[0].rtyp = INT_CMD;
+    L->m[0].data = (void *)nnAsInt;
+    mpz_init_set_si(t,nnAsInt);
+  }
+  else
+  {
+    mpz_init_set(t,(mpz_ptr)nn);
+  }
+  int *LL=(int*)omAlloc0(1000*sizeof(int));
+  int *ex=(int*)omAlloc0(1000*sizeof(int));
+  int L_ind=0;
+  mpz_factor (t,LL,L_ind,ex);
+
+  int i;
+  for(i=0;i<L_ind;i++) ex[i]++;
+  L->m[1].rtyp = LIST_CMD; L->m[1].data = (void *)makeListsObject(LL,L_ind);
+  L->m[2].rtyp = LIST_CMD; L->m[2].data = (void *)makeListsObject(ex,L_ind);
+  return L;
+}
+#endif
 
 #include <string.h>
 #include <unistd.h>
