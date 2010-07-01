@@ -349,6 +349,7 @@ LIB "all.lib";
 @menu
 * absfact_lib:: absolute factorization for characteristic 0
 * algebra_lib:: procedures for computing with algebras and maps
+* assprime_lib:: associated primes of a zero-dimensional ideal
 * cimonom_lib:: is the toric ideal of an affine monomial curve a complete intersection ?
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
@@ -356,6 +357,7 @@ LIB "all.lib";
 * intprog_lib:: Integer Programming
 * lll_lib:: Integral LLL-Algorithm
 * modstd_lib:: Groebner basis of ideals via modular computations
+* monomial_lib:: Primary and irreducible decompositions of monomial ideals
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * noether_lib:: Noether normalization of an ideal
@@ -366,6 +368,7 @@ LIB "all.lib";
 * primitiv_lib:: procedures for finding a primitive element
 * realrad_lib:: procedures for finding the real radical
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
+* resbin_lib:: Resolution of singularities of binomial ideals
 * resolve_lib:: Resolution of Singularities
 * reszeta_lib:: Applications of Resolution of Singularities
 * sagbi_lib:: Subalgebras bases Analogous to Groebner bases for ideals
@@ -379,11 +382,15 @@ LIB "all.lib";
 @subsection absfact_lib
 @c lib absfact.lib
 @c ---------------------------------------------------------
-@node algebra_lib, cimonom_lib, absfact_lib, Commutative algebra
+@node algebra_lib, assprime_lib, absfact_lib, Commutative algebra
 @subsection algebra_lib
 @c lib algebra.lib
 @c ---------------------------------------------------------
-@node cimonom_lib, elim_lib, algebra_lib, Commutative algebra
+@node assprime_lib, cimonom_lib, algebra_lib, Commutative algebra
+@subsection assprime_lib
+@c lib assprime.lib
+@c ---------------------------------------------------------
+@node cimonom_lib, elim_lib, assprime_lib, Commutative algebra
 @subsection cimonom_lib
 @c lib cimonom.lib
 @c ----------------------------------------------------------
@@ -407,11 +414,15 @@ LIB "all.lib";
 @subsection lll_lib
 @c lib lll.lib
 @c ---------------------------------------------------------
-@node modstd_lib, mprimdec_lib, lll_lib, Commutative algebra
+@node modstd_lib, monomial_lib, lll_lib, Commutative algebra
 @subsection modstd_lib
 @c lib modstd.lib
 @c ---------------------------------------------------------
-@node mprimdec_lib, mregular_lib, modstd_lib, Commutative algebra
+@node monomial_lib, mprimdec_lib, modstd_lib, Commutative algebra
+@subsection monomial_lib
+@c lib monomial.lib
+@c ---------------------------------------------------------
+@node mprimdec_lib, mregular_lib, monomial_lib, Commutative algebra
 @subsection mprimdec_lib
 @c lib mprimdec.lib
 @c ----------------------------------------------------------
@@ -447,11 +458,15 @@ LIB "all.lib";
 @subsection realrad_lib
 @c lib realrad.lib
 @c ---------------------------------------------------------
-@node reesclos_lib, resolve_lib, realrad_lib, Commutative algebra
+@node reesclos_lib, resbin_lib, realrad_lib, Commutative algebra
 @subsection reesclos_lib
 @c lib reesclos.lib
 @c ---------------------------------------------------------
-@node resolve_lib, reszeta_lib, reesclos_lib, Commutative algebra
+@node resbin_lib, resolve_lib, reesclos_lib, Commutative algebra
+@subsection resbin_lib
+@c lib resbin.lib
+@c ---------------------------------------------------------
+@node resolve_lib, reszeta_lib, resbin_lib, Commutative algebra
 @subsection resolve_lib
 @c lib resolve.lib
 @c ---------------------------------------------------------
