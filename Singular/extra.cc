@@ -261,6 +261,64 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       return FALSE;
     }
     else
+    #if 0
+    if(strcmp(sys_cmd,"power1")==0)
+    {
+      res->rtyp=POLY_CMD;
+      poly f=(poly)h->CopyD();
+      poly g=pPower(f,2000);
+      res->data=(void *)g;
+      return FALSE;
+    }
+    else
+    if(strcmp(sys_cmd,"power2")==0)
+    {
+      res->rtyp=POLY_CMD;
+      poly f=(poly)h->Data();
+      poly g=pOne();
+      for(int i=0;i<2000;i++)
+        g=pMult(g,pCopy(f));
+      res->data=(void *)g;
+      return FALSE;
+    }
+    if(strcmp(sys_cmd,"power3")==0)
+    {
+      res->rtyp=POLY_CMD;
+      poly f=(poly)h->Data();
+      poly p2=pMult(pCopy(f),pCopy(f));
+      poly p4=pMult(pCopy(p2),pCopy(p2));
+      poly p8=pMult(pCopy(p4),pCopy(p4));
+      poly p16=pMult(pCopy(p8),pCopy(p8));
+      poly p32=pMult(pCopy(p16),pCopy(p16));
+      poly p64=pMult(pCopy(p32),pCopy(p32));
+      poly p128=pMult(pCopy(p64),pCopy(p64));
+      poly p256=pMult(pCopy(p128),pCopy(p128));
+      poly p512=pMult(pCopy(p256),pCopy(p256));
+      poly p1024=pMult(pCopy(p512),pCopy(p512));
+      poly p1536=pMult(p1024,p512);
+      poly p1792=pMult(p1536,p256);
+      poly p1920=pMult(p1792,p128);
+      poly p1984=pMult(p1920,p64);
+      poly p2000=pMult(p1984,p16);
+      res->data=(void *)p2000;
+      pDelete(&p2);
+      pDelete(&p4);
+      pDelete(&p8);
+      //pDelete(&p16);
+      pDelete(&p32);
+      //pDelete(&p64);
+      //pDelete(&p128);
+      //pDelete(&p256);
+      //pDelete(&p512);
+      //pDelete(&p1024);
+      //pDelete(&p1536);
+      //pDelete(&p1792);
+      //pDelete(&p1920);
+      //pDelete(&p1984);
+      return FALSE;
+    }
+    else
+    #endif
 /*==================== uname ==================================*/
     if(strcmp(sys_cmd,"uname")==0)
     {
