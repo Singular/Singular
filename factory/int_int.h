@@ -22,7 +22,7 @@
 #include "cf_gmp.h"
 #include "gmpext.h"
 
-#ifdef HAVE_SINGULAR
+#ifdef SINGULAR
 #ifndef OM_NDEBUG
 #define OM_NDEBUG
 #endif

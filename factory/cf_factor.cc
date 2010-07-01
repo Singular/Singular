@@ -797,7 +797,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   }
   else // Q(a)-
   {
-  #ifdef HAVE_SINGULAR
+  #ifdef SINGULAR
       WerrorS("not implemented");
   #else
       abort();
