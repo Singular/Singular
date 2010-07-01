@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 version="$Id$";
-category = "Commutative Algebra";
+category = "Commutative algebra";
 info="
 LIBRARY:  assPrimes.lib    associated primes of a zero-dimensional ideal
 
@@ -13,6 +13,8 @@ OVERVIEW:
   A library for computing the associated primes  and the radical of a
   zero-dimensional ideal in the polynomial ring over the rational numbers,
   Q[x_1,...,x_n] using modular computations.
+
+SEE ALSO: primdec_lib
 
 PROCEDURES:
  assPrimes(I);         computes the associated primes of I
