@@ -167,6 +167,7 @@ struct sValAssign
 };
 
 BOOLEAN iiParameter(leftv p);
+BOOLEAN iiAlias(leftv p);
 /* ================================================================== */
 int     iiDeclCommand(leftv sy, leftv name, int lev, int t, idhdl* root,
   BOOLEAN isring = FALSE, BOOLEAN init_b=TRUE);

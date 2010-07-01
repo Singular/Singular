@@ -382,6 +382,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
       if (h!=NULL)
       {
         if (iterate) list1(prefix,h,TRUE,fullname);
+	if (IDTYP(h)==ALIAS_CMD) PrintS("A");
         if ((IDTYP(h)==RING_CMD)
             || (IDTYP(h)==QRING_CMD)
             //|| (IDTYP(h)==PACKE_CMD)
@@ -1142,6 +1143,75 @@ BOOLEAN iiParameter(leftv p)
   h->CleanUp();
   omFreeBin((ADDRESS)h, sleftv_bin);
   return res;
+}
+BOOLEAN iiAlias(leftv p)
+{
+  if (iiCurrArgs==NULL)
+  {
+    Werror("not enough arguments for proc %s",VoiceName());
+    p->CleanUp();
+    return TRUE;
+  }
+  leftv h=iiCurrArgs;
+  iiCurrArgs=h->next;
+  h->next=NULL;
+  if (h->rtyp!=IDHDL)
+  {
+    WerrorS("identifier required");
+    return TRUE;
+  }
+  if (h->Typ()!=p->Typ())
+  {
+    WerrorS("type mismatch");
+    return TRUE;
+  }
+  idhdl pp=(idhdl)p->data;
+  switch(pp->typ)
+  {
+      case INT_CMD:
+        break;
+      case INTVEC_CMD:
+      case INTMAT_CMD:
+         delete IDINTVEC(pp);
+         break;
+      case NUMBER_CMD:
+         nDelete(&IDNUMBER(pp));
+         break;
+      case BIGINT_CMD:
+         nlDelete(&IDNUMBER(pp),currRing);
+         break;
+      case MAP_CMD:
+         {
+           map im = IDMAP(pp);
+           omFree((ADDRESS)im->preimage);
+         }
+         // continue as ideal:
+      case IDEAL_CMD:
+      case MODUL_CMD:
+      case MATRIX_CMD:
+          idDelete(&IDIDEAL(pp));
+         break;
+      case PROC_CMD:
+      case RESOLUTION_CMD:
+      case STRING_CMD:
+         omFree((ADDRESS)IDSTRING(pp));
+         break;
+      case LIST_CMD:
+         IDLIST(pp)->Clean();
+         break;
+      case LINK_CMD:
+         omFreeBin(IDLINK(pp),sip_link_bin);
+         break;
+       // case ring: cannot happen
+       default:
+         Werror("unknown type %d",p->Typ());
+         return TRUE;
+  }
+  pp->typ=ALIAS_CMD;
+  IDDATA(pp)=(char*)h->data;
+  h->CleanUp();
+  omFreeBin((ADDRESS)h, sleftv_bin);
+  return FALSE;
 }
 
 static BOOLEAN iiInternalExport (leftv v, int toLev)
@@ -4419,12 +4489,12 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             else last += (*iv)[0];
             R->block1[n] = last;
             //if ((R->block0[n]>R->block1[n])
-	    //|| (R->block1[n]>rVar(R)))
-	    //{
-	    //  R->block1[n]=rVar(R);
-	    //  //WerrorS("ordering larger than number of variables");
-	    //  break;
-	    //}
+            //|| (R->block1[n]>rVar(R)))
+            //{
+            //  R->block1[n]=rVar(R);
+            //  //WerrorS("ordering larger than number of variables");
+            //  break;
+            //}
             if (rCheckIV(iv)) return TRUE;
             for(i=si_min(rVar(R),R->block1[n]);i>=R->block0[n];i--)
             {

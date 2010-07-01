@@ -280,7 +280,7 @@ void sleftv::Print(leftv store, int spaces)
 
 void sleftv::CleanUp(ring r)
 {
-  if ((name!=NULL) && (name!=sNoName) && (rtyp!=IDHDL))
+  if ((name!=NULL) && (name!=sNoName) && (rtyp!=IDHDL) && (rtyp!=ALIAS_CMD))
   {
     //::Print("free %x (%s)\n",name,name);
     omFree((ADDRESS)name);
@@ -829,6 +829,11 @@ int  sleftv::Typ()
   {
     switch (rtyp)
     {
+      case ALIAS_CMD:
+         {
+           idhdl h=(idhdl)data;
+           return  ((idhdl)h->data.ustring)->typ;
+         }
       case IDHDL:
         return IDTYP((idhdl)data);
       case VECHO:
@@ -859,7 +864,8 @@ int  sleftv::Typ()
   }
   int r=0;
   int t=rtyp;
-  if (t==IDHDL) t=IDTYP((idhdl)data);
+  if (t==ALIAS_CMD) { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h); }
+  else if (t==IDHDL) t=IDTYP((idhdl)data);
   switch (t)
   {
     case INTVEC_CMD:
@@ -949,6 +955,11 @@ void sleftv::SetData(void* what)
 
 void * sleftv::Data()
 {
+  if(rtyp==ALIAS_CMD)
+  {
+    idhdl h=(idhdl)data;
+    return  ((idhdl)h->data.ustring)->data.ustring;
+  }
   if ((rtyp!=IDHDL) && iiCheckRing(rtyp))
      return NULL;
   if (e==NULL)
@@ -1452,11 +1463,18 @@ void syMake(leftv v,const char * id, idhdl packhdl)
   currRingHdl=save_ring;
   return;
 id_found: // we have an id (in h) found, to set the data in from h
-  v->rtyp = IDHDL;
-  v->data = (char *)h;
-  v->flag = IDFLAG(h);
+  if (IDTYP(h)!=ALIAS_CMD)
+  {
+    v->rtyp = IDHDL;
+    v->flag = IDFLAG(h);
+    v->attribute=IDATTR(h);
+  }
+  else
+  {
+    v->rtyp = ALIAS_CMD;
+  }
   v->name = IDID(h);
-  v->attribute=IDATTR(h);
+  v->data = (char *)h;
   currRingHdl=save_ring;
 }
 

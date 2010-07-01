@@ -1593,15 +1593,15 @@ proccmd:
 parametercmd:
         PARAMETER declare_ip_variable
           {
-            //Print("par:%s, %d\n",$2.Name(),$2.Typ());
-            //yylineno--;
-            if (iiParameter(&$2)) YYERROR;
+	    // decl. of type proc p(int i)
+            if ($1==PARAMETER)  { if (iiParameter(&$2)) YYERROR; }
+	    else                { if (iiAlias(&$2)) YYERROR; } 
           }
         | PARAMETER expr
           {
-            //Print("par:%s, %d\n",$2.Name(),$2.Typ());
+	    // decl. of type proc p(i)
             sleftv tmp_expr;
-            //yylineno--;
+	    if ($1==ALIAS_CMD) MYYERROR("alias requires a type");
             if ((iiDeclCommand(&tmp_expr,&$2,myynest,DEF_CMD,&IDROOT))
             || (iiParameter(&tmp_expr)))
               YYERROR;

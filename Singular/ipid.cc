@@ -151,7 +151,7 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
         IDMAP(h)->preimage = omStrDup(IDID(currRingHdl));
         break;
       case STRING_CMD:
-        IDSTRING(h) = omStrDup("");
+        len=1;
         break;
       case LIST_CMD:
         IDLIST(h)=(lists)omAllocBin(slists_bin);
@@ -464,7 +464,10 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
       syKillComputation((syStrategy)IDDATA(h),r);
   }
 #ifdef TEST
-  else if ((IDTYP(h)!= INT_CMD)&&(IDTYP(h)!=DEF_CMD) && (IDTYP(h)!=NONE))
+  else if ((IDTYP(h)!= INT_CMD)
+  &&(IDTYP(h)!=DEF_CMD) 
+  &&(IDTYP(h)!=ALIAS_CMD) 
+  &&(IDTYP(h)!=NONE))
     Warn("unknown type to kill: %s(%d)",Tok2Cmdname(IDTYP(h)),IDTYP(h));
 #endif
 

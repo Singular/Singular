@@ -3864,18 +3864,18 @@ yyreduce:
   case 164:
 #line 1595 "grammar.y"
     {
-            //Print("par:%s, %d\n",$2.Name(),$2.Typ());
-            //yylineno--;
-            if (iiParameter(&(yyvsp[(2) - (2)].lv))) YYERROR;
+	    // decl. of type proc p(int i)
+            if ((yyvsp[(1) - (2)].i)==PARAMETER)  { if (iiParameter(&(yyvsp[(2) - (2)].lv))) YYERROR; }
+	    else                { if (iiAlias(&(yyvsp[(2) - (2)].lv))) YYERROR; } 
           ;}
     break;
 
   case 165:
 #line 1601 "grammar.y"
     {
-            //Print("par:%s, %d\n",$2.Name(),$2.Typ());
+	    // decl. of type proc p(i)
             sleftv tmp_expr;
-            //yylineno--;
+	    if ((yyvsp[(1) - (2)].i)==ALIAS_CMD) MYYERROR("alias requires a type");
             if ((iiDeclCommand(&tmp_expr,&(yyvsp[(2) - (2)].lv),myynest,DEF_CMD,&IDROOT))
             || (iiParameter(&tmp_expr)))
               YYERROR;

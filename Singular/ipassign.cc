@@ -1322,6 +1322,10 @@ BOOLEAN iiAssign(leftv l, leftv r)
   int lt=l->Typ();
   int rt=NONE;
   BOOLEAN b;
+  if (l->rtyp==ALIAS_CMD)
+  {
+    Werror("`%s` is read-only",l->Name());
+  }
 
   if(l->attribute!=NULL)
   {

@@ -161,7 +161,10 @@ char * iiProcArgs(char *e,BOOLEAN withParenth)
         argstr=a;
       }
       // copy the result to argstr
-      strcat(argstr,"parameter ");
+      if(strncmp(s,"alias ",6)!=0)
+      {
+        strcat(argstr,"parameter ");
+      }
       strcat(argstr,s);
       strcat(argstr,"; ");
       e++; // e was pointing to ','
