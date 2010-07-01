@@ -419,8 +419,7 @@ findUniProc( leftv result, leftv first )
     ideal destIdeal = NULL;
     FglmState state;
 
-    idhdl sourceIdealHdl = (idhdl)first->data;
-    sourceIdeal= IDIDEAL(sourceIdealHdl);
+    sourceIdeal = (ideal)first->Data();
 
     assumeStdFlag( first );
     state= fglmIdealcheck( sourceIdeal );
