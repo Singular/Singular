@@ -105,10 +105,13 @@ lists makeListsObject(const int* theInts, int length)
    where array[0] contains the 32 lowest bits etc.;
    i is assumed to be small enough to address a valid index
    in the given array */
-bool getValue(const int i, const unsigned int* ii)
+bool getValue(const unsigned i, const unsigned int* ii)
 {
-  int index = i / 32;
-  int offset = i % 32;
+  if (i==2) return true;
+  if ((i & 1)==0) return false;
+  unsigned I= i/2;
+  unsigned index = I / 32;
+  unsigned offset = I % 32;
   unsigned int v = 1 << offset;
   return ((ii[index] & v) != 0);
 }
@@ -118,15 +121,15 @@ bool getValue(const int i, const unsigned int* ii)
    where array[0] contains the 32 lowest bits etc.;
    i is assumed to be small enough to address a valid index
    in the given array */
-void setValue(const int i, bool value, unsigned int* ii)
+void setValue(const unsigned i, bool value, unsigned int* ii)
 {
-  int index = i / 32;
-  int offset = i % 32;
+  if ((i&1)==0) return; // ignore odd numbers
+  unsigned I=i/2;
+  unsigned index = I / 32;
+  unsigned offset = I % 32;
   unsigned int v = 1 << offset;
-  if (value && ((ii[index] & v) != 0)) return;
-  if ((!value) && ((ii[index] & v) == 0)) return;
-  if (value && ((ii[index] & v) == 0)) { ii[index] += v; return; }
-  if ((!value) && ((ii[index] & v) != 0)) { ii[index] -= v; return; }
+  if (value) { ii[index] |= v;  }
+  else       { ii[index] &= ~v; }
 }
 
 /* returns whether i is less than or equal to the bigint number n */
@@ -160,19 +163,23 @@ lists primeFactorisation(const number n, const int pBound)
      - divide out each prime factor of nn that we find along the way
        (This may result in an earlier termination.) */
 
-  int s = 67108864;       /* = 2^26 */
+  int s = 1<<25;       /* = 2^25 */
   int maxP = 2147483647; /* = 2^31 - 1, by the way a Mersenne prime */
-  if ((pBound != 0) && (pBound < maxP)) maxP = pBound;
+  if ((pBound != 0) && (pBound < maxP))
+  {
+    maxP = pBound;
+  }
+  if (maxP< (2147483647-63) ) s=(maxP+63)/64;
+  else                        s=2147483647/64+1;
   unsigned int* isPrime = new unsigned int[s];
-  /* the lowest bit of isPrime[0] stores whether 0 is a prime,
-     next bit is for 1, next for 2, etc. i.e.
-     intended usage is: isPrime[0] = 10100000100010100010100010101100.
-     This goes on up to isPrime[67108863]; the highest bit of this
-     unsigned int corresponds to 67108863*32+31 = 2^31-1.
+  /* the lowest bit of isPrime[0] stores whether 1 is a prime,
+     next bit is for 3, next for 5, etc. i.e.
+     intended usage is: isPrime[0] = ...
      We shall make use only of bits which correspond to numbers =
      -1 or +1 mod 6. */
-  for (i = 0; i < s; i++) isPrime[i] = 4294967295; /* all 32 bits set */
-  int p = 5; bool add2 = true;
+  for (i = 0; i < s; i++) isPrime[i] = ~0;/*4294967295*/; /* all 32 bits set */
+  int p=9; while((p<maxP) && (p>0)) { setValue(p,false,isPrime); p+=6; }
+  p = 5; bool add2 = true;
   /* due to possible overflows, we need to check whether p > 0, and
      likewise i > 0 below */
   while ((0 < p) && (p <= maxP) && (isLeq(p, nn)))
@@ -182,10 +189,11 @@ lists primeFactorisation(const number n, const int pBound)
        if nn is at all divisible by p */
     temp = divTimes(nn, p, &e);
     nlDelete(&nn, NULL); nn = temp;
-    if (e > 0) { primes[pCounter] = p; multiplicities[pCounter++] = e; }
+    if (e > 0)
+    { primes[pCounter] = p; multiplicities[pCounter++] = e; }
     /* invalidate all multiples of p, starting with 2*p */
     i = 2 * p;
-    while ((0 < i) && (i <= s)) { setValue(i, false, isPrime); i += p; }
+    while ((0 < i) && (i < maxP)) { setValue(i, false, isPrime); i += p; }
     /* move on to the next prime in the sieve; we either add 2 or 4
        in order to visit just the numbers equal to -1/+1 mod 6 */
     if (add2) { p += 2; add2 = false; }
