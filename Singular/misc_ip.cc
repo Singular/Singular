@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file misc_ip.cc
  *
@@ -218,7 +218,11 @@ lists primeFactorisation(const number n, const int pBound)
   /* try to fit nn into an int: */
   int nnAsInt = nlInt(nn, NULL);
   if (nlIsZero(nn) || (nnAsInt != 0))
-  { L->m[0].rtyp = INT_CMD; L->m[0].data = (void *)nnAsInt; }
+  {
+    nlDelete(&nn,NULL):
+    L->m[0].rtyp = INT_CMD;
+    L->m[0].data = (void *)nnAsInt;
+  }
   L->m[1].rtyp = LIST_CMD; L->m[1].data = (void *)primesL;
   L->m[2].rtyp = LIST_CMD; L->m[2].data = (void *)multiplicitiesL;
   return L;
