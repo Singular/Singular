@@ -7,18 +7,21 @@
 #
 
 SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
-	arcpoint.lib  atkins.lib  brnoeth.lib  cimonom.lib  classify.lib \
+	arcpoint.lib  assprime.lib atkins.lib  brnoeth.lib \
+	cimonom.lib  classify.lib \
 	compregb.lib  control.lib  crypto.lib  curvepar.lib  decodegb.lib \
 	deform.lib elim.lib  equising.lib  finvar.lib  general.lib gmspoly.lib \
 	gmssing.lib  graphics.lib  groups.lib  grwalk.lib  hnoether.lib \
 	homolog.lib  hyperel.lib  inout.lib  intprog.lib  jacobson.lib \
 	kskernel.lib  latex.lib  linalg.lib  lll.lib  makedbm.lib \
-	matrix.lib  modstd.lib  mondromy.lib  mprimdec.lib  mregular.lib \
+	matrix.lib  modstd.lib  mondromy.lib  monomial.lib \
+	mprimdec.lib  mregular.lib \
 	noether.lib normal.lib normaliz.lib   ntsolve.lib phindex.lib \
 	pointid.lib poly.lib \
 	polymake.lib presolve.lib  primdec.lib  primitiv.lib  qhmoduli.lib \
         random.lib \
-	realrad.lib  redcgs.lib  reesclos.lib  resgraph.lib  resolve.lib \
+	realrad.lib  redcgs.lib  reesclos.lib  resbin.lib \
+	resgraph.lib  resolve.lib \
 	reszeta.lib  ring.lib  rinvar.lib  rootsmr.lib  rootsur.lib \
 	sagbi.lib  sheafcoh.lib  sing.lib  sing4ti2.lib  signcond.lib \
 	solve.lib  spcurve.lib  spectrum.lib  standard.lib  stratify.lib \

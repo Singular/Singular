@@ -8,12 +8,14 @@ LIBRARY: monomial.lib   Primary and irreducible decompositions of monomial
 AUTHORS: I.Bermejo,           ibermejo@ull.es
 @*       E.Garcia-Llorente,   evgarcia@ull.es
 @*       Ph.Gimenez,          pgimenez@agt.uva.es
+
 OVERVIEW:
  A library for computing a primary and the irreducible decompositions of a
  monomial ideal using several methods.
  In this library we also take advantage of the fact that the ideal is
  monomial to make some computations that are Grobner free in this case
  (radical, intersection, quotient...).
+
 PROCEDURES:
  isMonomial(id);       checks whether an ideal id is monomial
  minbaseMon(id);       computes the minimal monomial generating set of a
