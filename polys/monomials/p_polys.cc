@@ -10,13 +10,13 @@
  *******************************************************************/
 
 
-#include <kernel/mod2.h>
+#include <auxialiary.h>
 
-#include <kernel/structs.h>
-#include <kernel/p_polys.h>
-#include <kernel/ring.h>
-#include <kernel/ideals.h>
-#include <kernel/int64vec.h>
+#include "ring.h"
+#include "p_polys.h"
+#include "ring.h"
+#include "ideals.h"
+#include "int64vec.h"
 #ifndef NDEBUG
 #include <kernel/febase.h>
 #endif
@@ -229,11 +229,11 @@ void p_Setm_General(poly p, const ring r)
               assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
             }
           }
-#endif
-	   
-#ifndef NDEBUG
 #if MYTEST
-          PrintS("Initial Value: "); p_DebugPrint(p, r, r, 1);
+//          if( p->exp[o->data.isTemp.start] > 0 )
+//          {
+//            PrintS("Initial Value: "); p_DebugPrint(p, r, r, 1);
+//          }
 #endif
 #endif
           break;
@@ -271,7 +271,6 @@ void p_Setm_General(poly p, const ring r)
             assume( c < IDELEMS(F) ); // What about others???
 
             const poly pp = F->m[c]; // get reference monomial!!!
-
 
 #ifndef NDEBUG
 #if MYTEST
@@ -325,13 +324,6 @@ void p_Setm_General(poly p, const ring r)
             }
             // TODO: how to check this for computed values???
 #endif
-#ifndef NDEBUG
-#if MYTEST
-            PrintS("IS::Suffix::Result: "); // p_Write(p, r, r);
-            p_DebugPrint(p, r, r, 1);
-#endif
-#endif
-
           } else
           {
             const int* const pVarOffset = o->data.is.pVarOffset;

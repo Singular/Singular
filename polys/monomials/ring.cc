@@ -9,30 +9,29 @@
 
 /* includes */
 #include <math.h>
-#include <kernel/mod2.h>
-
-#include <kernel/options.h>
-#include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/numbers.h>
-#include <kernel/febase.h>
-#include <kernel/intvec.h>
-#include <kernel/longtrans.h>
-#include <kernel/ffields.h>
-#include <kernel/ideals.h>
-#include <kernel/ring.h>
-#include <kernel/prCopy.h>
-#include <Singular/ipshell.h>
-#include <kernel/p_Procs.h>
+#include "options.h"
+#include "omalloc.h"
+#include "polys.h"
+#include "numbers.h"
+#include "febase.h"
+#include "intvec.h"
+#include "longalg.h"
+#include "longtrans.h"
+#include "ffields.h"
+#include "ideals.h"
+#include "ring.h"
+#include "prCopy.h"
+#include "../Singular/ipshell.h"
+#include "p_Procs.h"
 #ifdef HAVE_PLURAL
-#include <kernel/gring.h>
-#include <kernel/sca.h>
+#include <gring.h>
+#include <sca.h>
 #endif
-#include <kernel/maps.h>
-#include <kernel/matpol.h>
+#include <maps.h>
+#include <matpol.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#  include <factory/factory.h>
+#  include <factory.h>
 #endif
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
@@ -2499,22 +2498,10 @@ static void rO_ISPrefix(int &place, int &bitplace, int &prev_ord,
   o[place]= -1;
   prev_ord=-1;
   place++;
-
-#if MYTEST
-  Print("rO_ISPrefix: place = %d, v: {", ord_struct.data.isTemp.start);
-
-  for( int i = 0; i <= N; i++ )
-    Print("v[%d]: %09x", i, ord_struct.data.isTemp.pVarOffset[i]);
-
-  PrintS("}!\n");
-#endif
 }
 static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
   int N, int *v, sro_ord *tmp_typ, int &typ_i, int sgn)
 {
-#if MYTEST
-  Print("rO_ISSuffix: place = %d\n", place);
-#endif
 
   // Let's find previous prefix:
   int typ_j = typ_i - 1;
@@ -2552,10 +2539,6 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
   typ_i++; // Just for now...
 
 
-#if MYTEST
-  PrintS("Changes in v: { ");
-#endif
-
   for( int i = 0; i <= N; i++ ) // Note [0] == component !!! No Skip?
   {
     // Was i-th variable allocated inbetween?
@@ -2564,9 +2547,6 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
       pVarOffset[i] = v[i]; // Save for later...
       v[i] = -1; // Undo!
       assume( pVarOffset[i] != -1 );
-#if MYTEST
-      Print("v[%d]: %010x; ", i, pVarOffset[i]);
-#endif
     }
     else
       pVarOffset[i] = -1; // No change here...
@@ -2575,9 +2555,6 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
   if( pVarOffset[0] != -1 )
     pVarOffset[0] &= 0x0fff;
 
-#if MYTEST
-  PrintS(" }!\n");
-#endif
   sro_ord &ord_struct = tmp_typ[typ_j];
 
 
@@ -4120,11 +4097,6 @@ void rDebugPrint(ring r)
     {
       Print("  start (level) %d, suffixpos: %d, VO: ",r->typ[j].data.isTemp.start, r->typ[j].data.isTemp.suffixpos);
 
-#ifndef NDEBUG
-      for( int k = 0; k <= r->N; k++)
-        if (r->typ[j].data.isTemp.pVarOffset[k] != -1)
-          Print("[%2d]: %09x; ", k, r->typ[j].data.isTemp.pVarOffset[k]);
-#endif
     }
     else if (r->typ[j].ord_typ==ro_is)
     {
@@ -4413,30 +4385,12 @@ static ring rAssure_SyzComp(const ring r, BOOLEAN complete = TRUE);
 
 ring rCurrRingAssure_SyzComp()
 {
-#if MYTEST
-  PrintS("rCurrRingAssure_SyzComp(), currRing:  \n");
-  rWrite(currRing);
-#ifdef RDEBUG
-  rDebugPrint(currRing);
-#endif
-  PrintLn();
-#endif
-
   ring r = rAssure_SyzComp(currRing, TRUE);
 
   if( r != currRing )
   {
     rChangeCurrRing(r);
     assume(currRing == r);
-
-#if MYTEST
-  PrintS("\nrCurrRingAssure_SyzComp(): new currRing: \n");
-  rWrite(currRing);
-#ifdef RDEBUG
-  rDebugPrint(currRing);
-#endif
-  PrintLn();
-#endif
   }
 
   return r;
@@ -4495,17 +4449,7 @@ static ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 
 #ifdef HAVE_PLURAL
     ring old_ring = r;
-
-#if MYTEST
-    PrintS("rCurrRingAssure_SyzComp(): temp r': ");
-    rWrite(r);
-#ifdef RDEBUG
-    rDebugPrint(r);
 #endif
-    PrintLn();
-#endif
-#endif
-
 
     if (r->qideal!=NULL)
     {
@@ -4530,16 +4474,6 @@ static ring rAssure_SyzComp(const ring r, BOOLEAN complete)
     assume(rIsSCA(res) == rIsSCA(old_ring));
     assume(ncRingType(res) == ncRingType(old_ring));
 #endif
-
-#if MYTEST
-    PrintS("rCurrRingAssure_SyzComp(): res: ");
-    rWrite(r);
-#ifdef RDEBUG
-    rDebugPrint(r);
-#endif
-    PrintLn();
-#endif
-
   }
 
   return res;
@@ -4946,15 +4880,6 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
   {
     rComplete(res, 1);
 
-#if MYTEST
-    PrintS("rAssure_InducedSchreyerOrdering(): temp res: ");
-    rWrite(res);
-#ifdef RDEBUG
-    rDebugPrint(res);
-#endif
-    PrintLn();
-#endif
-
 #ifdef HAVE_PLURAL
     if (rIsPluralRing(r))
     {
@@ -4971,15 +4896,6 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
 
 #ifdef HAVE_PLURAL
     ring old_ring = r;
-
-#if MYTEST
-    PrintS("rAssure_InducedSchreyerOrdering(): temp nc res: ");
-    rWrite(res);
-#ifdef RDEBUG
-    rDebugPrint(res);
-#endif
-    PrintLn();
-#endif
 #endif
 
     if (r->qideal!=NULL)
@@ -5066,16 +4982,6 @@ int rGetISPos(const int p = 0, const ring r = currRing)
 bool rSetISReference(const ideal F, const int i = 0, const int p = 0, const intvec * componentWeights = NULL, const ring r = currRing)
 {
   // Put the reference set F into the ring -ordering -recor
-#if MYTEST
-  Print("rSetISReference(F, i: %d, p: %d, w)\nF:", i, p);
-  idShow(F, r, r, 1); // currRing!
-  PrintLn();
-  PrintS("w: ");
-  if(componentWeights == NULL)
-    PrintS("NULL\n");
-  else
-    componentWeights->show();
-#endif
 
   // TEST THAT THERE ARE DEGs!!!
   // assume( componentWeights == NULL  ); // ???

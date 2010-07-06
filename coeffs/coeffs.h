@@ -260,6 +260,9 @@ static inline BOOLEAN n_IsOne(number n,  const coeffs r){ return (r)->cfIsOne(n,
 static inline BOOLEAN n_IsMOne(number n, const coeffs r){ return (r)->cfIsMOne(n,r); }
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r){ return (r)->cfGreaterZero(n,r); }
 // cfGreater?
+#ifdef HAVE_RINGS
+static inline BOOLEAN n_IsUnit(number n, const coeffs r) { return r->cfIsUnit(n,r); }
+#endif
 
 /// init with an integer
 static inline number n_Init(int i,       const coeffs r){ return (r)->cfInit(i,r); }
