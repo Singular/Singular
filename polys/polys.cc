@@ -11,18 +11,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <kernel/mod2.h>
-#include <kernel/options.h>
-#include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ring.h>
-#include <kernel/sbuckets.h>
+#include <auxiliary.h>
+#include "options.h"
+#include "omalloc.h"
+#include "reporter.h"
+#include "numbers.h"
+#include "polys.h"
+#include "ring.h"
 
 #ifdef HAVE_PLURAL
-#include <kernel/gring.h>
-#include <kernel/sca.h>
+#include <gring.h>
+#include <sca.h>
 #endif
 
 /* ----------- global variables, set by pSetGlobals --------------------- */
@@ -32,8 +31,6 @@ pLDegProc pLDeg;
 pFDegProc pFDeg;
 /* the monomial ordering of the head monomials a and b */
 /* returns -1 if a comes before b, 0 if a=b, 1 otherwise */
-
-int pVariables;     // number of variables
 
 /* 1 for polynomial ring, -1 otherwise */
 int     pOrdSgn;
@@ -54,11 +51,11 @@ poly      ppNoether = NULL;
 void pSetGlobals(const ring r, BOOLEAN complete)
 {
   if (ppNoether!=NULL) pDelete(&ppNoether);
-  pVariables = r->N;
-  pOrdSgn = r->OrdSgn;
-  pFDeg=r->pFDeg;
-  pLDeg=r->pLDeg;
-  pLexOrder=r->LexOrder;
+  //pVariables = r->N;
+  //pOrdSgn = r->OrdSgn;
+  //pFDeg=r->pFDeg;
+  //pLDeg=r->pLDeg;
+  //pLexOrder=r->LexOrder;
 
   if (complete)
   {
@@ -101,16 +98,17 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg)
 * negative(!) exponents in the below loop. I suspect that the correct
 * comment should be "assumes that LM(a) = LM(b)*m, for some monomial m..."
 */
-poly pDivide(poly a, poly b)
+#define pDivide(a,b) p_Divide(a,b,currRing)
+poly p_Divide(poly a, poly b, cont ring r)
 {
   assume((pGetComp(a)==pGetComp(b)) || (pGetComp(b)==0));
   int i;
   poly result = pInit();
 
-  for(i=(int)pVariables; i; i--)
-    pSetExp(result,i, pGetExp(a,i)- pGetExp(b,i));
-  pSetComp(result, pGetComp(a) - pGetComp(b));
-  pSetm(result);
+  for(i=(int)r->N; i; i--)
+    p_SetExp(result,i, p_GetExp(a,i,r)- p_GetExp(b,i,r),r);
+  p_SetComp(result, p_GetComp(a,r) - p_GetComp(b,r),r);
+  p_Setm(result,r);
   return result;
 }
 
@@ -153,7 +151,7 @@ BOOLEAN pDivisibleByRingCase(poly f, poly g)
 * divides a by the monomial b, ignores monomials which are not divisible
 * assumes that b is not NULL, destroys b
 */
-poly pDivideM(poly a, poly b)
+poly p_DivideM(poly a, poly b, const ring r)
 {
   if (a==NULL) { pDelete(&b); return NULL; }
   poly result=a;
@@ -167,13 +165,13 @@ poly pDivideM(poly a, poly b)
 
   while (a!=NULL)
   {
-    if (pDivisibleBy(b,a))
+    if (p_DivisibleBy(b,a,r))
     {
-      assume((pGetComp(a)==pGetComp(b)) || (pGetComp(b)==0));
-      for(i=(int)pVariables; i; i--)
-         pSubExp(a,i, pGetExp(b,i));
-      pSubComp(a, pGetComp(b));
-      pSetm(a);
+      assume((p_GetComp(a,r)==p_GetComp(b,r)) || (p_GetComp(b,r)==0));
+      for(i=(int)r->N; i; i--)
+         p_SubExp(a,i, p_GetExp(b,i,r),r);
+      p_SubComp(a, p_GetComp(b,r),r);
+      p_Setm(a,r);
       prev=a;
       pIter(a);
     }
@@ -181,12 +179,12 @@ poly pDivideM(poly a, poly b)
     {
       if (prev==NULL)
       {
-        pLmDelete(&result);
+        p_DeleteLm(&result,r);
         a=result;
       }
       else
       {
-        pLmDelete(&pNext(prev));
+        p_DeleteLm(&pNext(prev),r);
         a=pNext(prev);
       }
     }
