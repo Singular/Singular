@@ -18,22 +18,22 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <kernel/mod2.h>
+#include <auxialiary.h>
 
 #include <omalloc/omalloc.h>
 #ifdef PDEBUG
 #undef NO_INLINE3
 #define NO_INLINE3
 #endif
-#include <kernel/polys-impl.h>
+#include <polys-impl.h>
 
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <kernel/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ring.h>
-#include <kernel/p_Procs.h>
-#include <kernel/dError.h>
+#include "ring.h"
+#include <reporter.h>
+#include <numbers.h>
+#include "polys.h"
+#include "ring.h"
+#include "p_Procs.h"
+#include <dError.h>
 
 #ifdef PDEBUG
 int pDBsyzComp=0;
@@ -44,12 +44,6 @@ int pDBsyzComp=0;
  * Storage Managament Routines
  *
  ***************************************************************/
-
-
-poly pHeadProc(poly p)
-{
-  return pHead(p);
-}
 
 
 static inline unsigned long GetBitFields(long e,
