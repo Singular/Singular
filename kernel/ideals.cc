@@ -2520,7 +2520,7 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   {
     return idCopy(h1);
   }
-  if (currQuotient!=NULL)
+  if ((currQuotient!=NULL) && rIsPluralRing(origR))
   {
     WerrorS("cannot eliminate in a qring");
     return idCopy(h1);
@@ -2634,6 +2634,15 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
   // fetch data from the old ring
   //for (k=0;k<IDELEMS(h1);k++) h->m[k] = prCopyR( h1->m[k], origR);
   h=idrCopyR(h1,origR,currRing);
+  if (origR->qideal!=NULL)
+  {
+    WarnS("eliminate in q-ring: experimental");
+    ideal q=idrCopyR(origR->qideal,origR,currRing);
+    ideal s=idSimpleAdd(h,q);
+    idDelete(&h);
+    idDelete(&q);
+    h=s;
+  }
   // compute kStd
 #if 1
   //rWrite(tmpR);PrintLn();
