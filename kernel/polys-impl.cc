@@ -46,15 +46,6 @@ int pDBsyzComp=0;
  ***************************************************************/
 
 
-void ppDelete(poly* p, const ring rg)
-{
-  ring origRing = currRing;
-  rChangeCurrRing(rg);
-  pDelete(p);
-  rChangeCurrRing(origRing);
-}
-
-
 poly pHeadProc(poly p)
 {
   return pHead(p);

@@ -316,7 +316,6 @@ void pSetModDeg(intvec *w);
 
 poly      pmInit(const char *s, BOOLEAN &ok); /* monom -> poly, interpreter */
 const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
-void      ppDelete(poly * a,const ring r);
 
 /*-------------operations on polynomials:------------*/
 poly      pSub(poly a, poly b);
