@@ -136,39 +136,4 @@ unsigned long p_GetShortExpVector(poly p, ring r)
   return ev;
 }
 
-
-int rComp0_Func(poly p1,poly p2)
-{
-  int i;
-  for(i=0; i< currRing->CmpL_Size;i++)
-  {
-    if (p1->exp[i] != p2->exp[i])
-    {
-      if (p1->exp[i] > p2->exp[i])
-        return currRing->ordsgn[i];
-      else
-        return -currRing->ordsgn[i];
-    }
-  }
-  return 0;
-}
-
-#ifdef PDEBUG
-int rComp0(poly p1,poly p2)
-{
-  int i;
-  for(i=0; i<currRing->CmpL_Size;i++)
-  {
-    if (p1->exp[i] != p2->exp[i])
-    {
-      if (p1->exp[i] > p2->exp[i])
-        return currRing->ordsgn[i];
-      else
-        return -currRing->ordsgn[i];
-    }
-  }
-  return 0;
-}
-#endif
-
 #endif // POLYS_IMPL_CC
