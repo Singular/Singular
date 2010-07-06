@@ -493,7 +493,7 @@ poly pTakeOutComp(poly * p, int k)
   if (q==NULL) return result;
   if (pGetComp(q) > k)
   {
-    pDecrComp(q);
+    pSubComp(q,1);
     if (use_setmcomp) pSetmComp(q);
   }
   poly pNext_q;
@@ -521,7 +521,7 @@ poly pTakeOutComp(poly * p, int k)
       /*pIter(q);*/ q=pNext_q;
       if (pGetComp(q) > k)
       {
-        pDecrComp(q);
+        pSubComp(q,1);
         if (use_setmcomp) pSetmComp(q);
       }
     }
@@ -695,7 +695,7 @@ void pDeleteComp(poly * p,int k)
   q = *p;
   if (pGetComp(q)>k)
   {
-    pDecrComp(q);
+    pSubComp(q,1);
     pSetmComp(q);
   }
   while (pNext(q)!=NULL)
@@ -707,7 +707,7 @@ void pDeleteComp(poly * p,int k)
       pIter(q);
       if (pGetComp(q)>k)
       {
-        pDecrComp(q);
+        pSubComp(q,1);
         pSetmComp(q);
       }
     }

@@ -960,7 +960,7 @@ void pShift (poly * p,int i)
   {
     if ((pGetComp(qp1)+i > 0) || ((j == -i) && (j == k)))
     {
-      pSetComp(qp1,pGetComp(qp1)+i);
+      pAddComp(qp1,i);
       pSetmComp(qp1);
       qp2 = qp1;
       pIter(qp1);

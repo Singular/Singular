@@ -62,8 +62,6 @@
 // Component
 #define pGetComp(p)         _p_GetComp(p, currRing)
 #define pSetComp(p,v)       p_SetComp(p,v, currRing)
-#define pIncrComp(p)        p_IncrComp(p,currRing)
-#define pDecrComp(p)        p_DecrComp(p,currRing)
 #define pAddComp(p,v)       p_AddComp(p,v,currRing)
 #define pSubComp(p,v)       p_SubComp(p,v,currRing)
 

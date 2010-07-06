@@ -76,19 +76,6 @@ PINLINE2  unsigned long p_SetComp(poly p, unsigned long c, ring r)
   __p_GetComp(p,r) = c;
   return c;
 }
-PINLINE2 unsigned long p_IncrComp(poly p, ring r)
-{
-  p_LmCheckPolyRing2(p, r);
-  pAssume2(rRing_has_Comp(r));
-  return ++(__p_GetComp(p,r));
-}
-PINLINE2 unsigned long p_DecrComp(poly p, ring r)
-{
-  p_LmCheckPolyRing2(p, r);
-  pAssume2(rRing_has_Comp(r));
-  pPolyAssume2(__p_GetComp(p,r) > 0,p,r);
-  return --(__p_GetComp(p,r));
-}
 PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, ring r)
 {
   p_LmCheckPolyRing2(p, r);

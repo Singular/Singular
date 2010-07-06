@@ -71,8 +71,6 @@ PINLINE2 long p_GetOrder(poly p, ring r);
 // Component
 #define p_GetComp(p, r)     _p_GetComp(p, r)
 PINLINE2 unsigned long p_SetComp(poly p, unsigned long c, ring r);
-PINLINE2 unsigned long p_IncrComp(poly p, ring r);
-PINLINE2 unsigned long p_DecrComp(poly p, ring r);
 PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, ring r);
 PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r);
 
