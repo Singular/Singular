@@ -190,21 +190,21 @@ poly p_DivideM(poly a, poly b, const ring r)
     }
   }
 #ifdef HAVE_RINGS
-  if (nIsUnit(inv))
+  if (n_IsUnit(inv,r->cf))
   {
-    inv = nInvers(inv);
-    pMult_nn(result,inv);
-    nDelete(&inv);
+    inv = n_Invers(inv,r->cf);
+    p_Mult_nn(result,inv,r);
+    n_Delete(&inv, r->cf);
   }
   else
   {
-    pDiv_nn(result,inv);
+    p_Div_nn(result,inv,r);
   }
 #else
-  pMult_nn(result,inv);
-  nDelete(&inv);
+  p_Mult_nn(result,inv,r);
+  n_Delete(&inv, r->cf);
 #endif
-  pDelete(&b);
+  p_Delete(&b, r);
   return result;
 }
 
