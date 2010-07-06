@@ -212,7 +212,7 @@ void mpsr_MapLeftv(leftv l, ring from_ring, ring to_ring)
           poly p = (poly) l->data;
           mpsr_SetCurrRing(to_ring, TRUE);
           l->data = (void *) maIMap(from_ring, (poly) l->data);
-          ppDelete(&p, from_ring);
+          p_Delete(&p, from_ring);
           break;
         }
 
