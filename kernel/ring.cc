@@ -665,15 +665,24 @@ char * rCharStr(ring r)
   }
   if(rField_is_Ring_2toM(r))
   {
-    return omStrDup("coefficient ring");
+    char* s = (char*) omAlloc(7+10+2);
+    sprintf(s,"integer,%lu",r->ringflagb);
+    return s;
   }
   if(rField_is_Ring_ModN(r))
   {
-    return omStrDup("coefficient ring");
+    long l = (long)mpz_sizeinbase(r->ringflaga, 10) + 2+7;
+    char* s = (char*) omAlloc(l);
+    gmp_sprintf(s,"integer,%Zd",r->ringflaga);
+    return s;
   }
   if(rField_is_Ring_PtoM(r))
   {
-    return omStrDup("coefficient ring");
+    long l = (long)mpz_sizeinbase(r->ringflaga, 10) + 2+7+10;
+    char* s = (char*) omAlloc(l);
+    gmp_sprintf(s,"integer,%Zd^%lu",r->ringflaga,r->ringflagb);
+    return s;
+    
   }
 #endif
   if (r->parameter==NULL)
