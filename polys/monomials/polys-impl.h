@@ -46,10 +46,6 @@ typedef struct spolyrec *          poly;
  * What should be inlined and debugged?
  *
  ***************************************************************/
-#ifdef NO_PDEBUG
-#undef PDEBUG
-#endif
-
 // determines inlining of poly procs which iter through polys
 #if defined(DO_PINLINE0) && !defined(PDEBUG)
 #define PINLINE0 static inline
@@ -241,8 +237,5 @@ while (0)
  *
  ***************************************************************/
 #define rRing_has_Comp(r)   (r->pCompIndex >= 0)
-
-// number of Variables
-extern int pVariables;
 
 #endif // POLYS_IMPL_H

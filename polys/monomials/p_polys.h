@@ -12,8 +12,8 @@
 #ifndef P_POLYS_H
 #define P_POLYS_H
 
-#include <kernel/structs.h>
-#include <kernel/polys-impl.h>
+#include "ring.h"
+#include "polys-impl.h"
 /*
  Some general remarks:
  We divide poly operations into roughly 4 categories:
