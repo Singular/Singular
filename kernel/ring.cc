@@ -128,37 +128,6 @@ void rChangeCurrRing(ring r)
   }
 }
 
-void rNameCheck(ring R)
-{
-  int i,j;
-  for(i=0;i<R->N-1;i++)
-  {
-    for(j=i+1;j<R->N;j++)
-    {
-      if (strcmp(R->names[i],R->names[j])==0)
-      {
-        Warn("name conflict var(%d) and var(%d): `%s`, rename to `@(%d)`",i+1,j+1,R->names[i],j+1);
-        omFree(R->names[j]);
-        R->names[j]=(char *)omAlloc(10);
-        sprintf(R->names[j],"@(%d)",j+1);
-      }
-    }
-  }
-  for(i=0;i<R->P; i++)
-  {
-    for(j=0;j<R->N;j++)
-    {
-      if (strcmp(R->parameter[i],R->names[j])==0)
-      {
-        Warn("name conflict par(%d) and var(%d): `%s`, rename to `@@(%d)`",i+1,j+1,R->names[j],i+1);
-        omFree(R->parameter[i]);
-        R->parameter[i]=(char *)omAlloc(10);
-        sprintf(R->parameter[i],"@@(%d)",i+1);
-      }
-    }
-  }
-}
-
 ring rDefault(int ch, int N, char **n)
 {
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
@@ -822,7 +791,7 @@ int rChar(ring r)
 /*
 * dp_dp: for comm. rings: use block order dp + dp/ds/wp
 */
-int rTensor(ring r1, ring r2, ring &sum, BOOLEAN dp_dp)
+int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN dp_dp)
 {
   ring save=currRing;
   ip_sring tmpR;

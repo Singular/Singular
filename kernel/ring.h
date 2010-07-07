@@ -70,7 +70,6 @@ void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
 ring   rCopy0(const ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
-void   rNameCheck(ring R);
 ring   rOpposite(ring r);
 ring   rEnvelope(ring r);
 
