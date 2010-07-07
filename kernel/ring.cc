@@ -819,10 +819,10 @@ int rChar(ring r)
  *returns -1 for not compatible, (sum is undefined)
  *         1 for compatible (and sum)
  */
-/* vartest: test for variable/paramter names
+/*
 * dp_dp: for comm. rings: use block order dp + dp/ds/wp
 */
-int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
+int rTensor(ring r1, ring r2, ring &sum, BOOLEAN dp_dp)
 {
   ring save=currRing;
   ip_sring tmpR;
@@ -835,17 +835,9 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     {
       if (r1->parameter!=NULL)
       {
-        if (!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
-        {
           tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
           tmpR.parameter[0]=omStrDup(r1->parameter[0]);
           tmpR.P=1;
-        }
-        else
-        {
-          WerrorS("GF(p,n)+GF(p,n)");
-          return -1;
-        }
       }
     }
     else if ((r1->ch==1)||(r1->ch<-1)) /* Q(a),Z/p(a) */
@@ -856,8 +848,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         {
           // HANNES: TODO: delete nSetChar
           rChangeCurrRing(r1);
-          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
-              && n_Equal(r1->minpoly,r2->minpoly, r1))
+          if (n_Equal(r1->minpoly,r2->minpoly, r1))
           {
             tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
@@ -876,8 +867,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         }
         else
         {
-          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
-              && (rPar(r2)==1))
+          if (rPar(r2)==1)
           {
             tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
@@ -895,8 +885,7 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       {
         if (r2->minpoly!=NULL)
         {
-          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
-              && (rPar(r1)==1))
+          if (rPar(r1)==1)
           {
             tmpR.parameter=(char **)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
@@ -921,21 +910,9 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           int j,l;
           for(j=0;j<rPar(r2);j++)
           {
-            if (vartest)
-            {
-              for(l=0;l<i;l++)
-              {
-                if(strcmp(tmpR.parameter[l],r2->parameter[j])==0)
-                  break;
-              }
-            }
-            else
-              l=i;
-            if (l==i)
-            {
-              tmpR.parameter[i]=omStrDup(r2->parameter[j]);
-              i++;
-            }
+            l=i;
+            tmpR.parameter[i]=omStrDup(r2->parameter[j]);
+            i++;
           }
           if (i!=len)
           {
@@ -1075,20 +1052,6 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
     if (*(r1->names[i]) == '\0')
       b = FALSE;
-    else if ((r2->parameter!=NULL) && (strlen(r1->names[i])==1))
-    {
-      if (vartest)
-      {
-        for(j=0;j<rPar(r2);j++)
-        {
-          if (strcmp(r1->names[i],r2->parameter[j])==0)
-          {
-            b=FALSE;
-            break;
-          }
-        }
-      }
-    }
 
     if (b)
     {
@@ -1107,42 +1070,12 @@ int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
     if (*(r2->names[i]) == '\0')
       b = FALSE;
-    else if ((r1->parameter!=NULL) && (strlen(r2->names[i])==1))
-    {
-      if (vartest)
-      {
-        for(j=0;j<rPar(r1);j++)
-        {
-          if (strcmp(r2->names[i],r1->parameter[j])==0)
-          {
-            b=FALSE;
-            break;
-          }
-        }
-      }
-    }
 
     if (b)
     {
-      if (vartest)
-      {
-        for(j=0;j<r1->N;j++)
-        {
-          if (strcmp(r1->names[j],r2->names[i])==0)
-          {
-            b=FALSE;
-            break;
-          }
-        }
-      }
-      if (b)
-      {
-        //Print("name : %d : %s\n",k,r2->names[i]);
-        names[k]=omStrDup(r2->names[i]);
-        k++;
-      }
-      //else
-      //  Print("no name (var): %s\n",r2->names[i]);
+      //Print("name : %d : %s\n",k,r2->names[i]);
+      names[k]=omStrDup(r2->names[i]);
+      k++;
     }
     //else
     //  Print("no name (par): %s\n",r2->names[i]);
@@ -1531,7 +1464,7 @@ int rSum(ring r1, ring r2, ring &sum)
     r1->ref++;
     return 0;
   }
-  return rTensor(r1,r2,sum,TRUE,FALSE);
+  return rSumInternal(r1,r2,sum,TRUE,FALSE);
 }
 
 /*2

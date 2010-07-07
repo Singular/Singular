@@ -222,9 +222,9 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
   int N = pVariables+imagepvariables;
 
   ring tmpR;
-  if (rTensor(theImageRing,sourcering,tmpR,FALSE,TRUE)!=1)
+  if (rSumInternal(theImageRing,sourcering,tmpR,FALSE,TRUE)!=1)
   {
-     WerrorS("rTensor error");
+     WerrorS("error in rSumInternal");
      return NULL;
   }
 

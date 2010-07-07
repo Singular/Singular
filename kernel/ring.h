@@ -133,7 +133,7 @@ char * rParStr(ring r);
 int    rIsExtension(ring r);
 int    rIsExtension();
 int    rSum(ring r1, ring r2, ring &sum);
-int rTensor(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp);
+int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp);
 
 BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = 1);
 BOOLEAN rSamePolyRep(ring r1, ring r2);
