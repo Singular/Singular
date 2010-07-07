@@ -1991,6 +1991,37 @@ void rComposeRing(lists L, ring R)
 }
 #endif
 
+static void rRenameVars(ring R)
+{
+  int i,j;
+  for(i=0;i<R->N-1;i++)
+  {
+    for(j=i+1;j<R->N;j++)
+    {
+      if (strcmp(R->names[i],R->names[j])==0)
+      {
+        Warn("name conflict var(%d) and var(%d): `%s`, rename to `@(%d)`",i+1,j+1,R->names[i],j+1);
+        omFree(R->names[j]);
+        R->names[j]=(char *)omAlloc(10);
+        sprintf(R->names[j],"@(%d)",j+1);
+      }
+    }
+  }
+  for(i=0;i<R->P; i++)
+  {
+    for(j=0;j<R->N;j++)
+    {
+      if (strcmp(R->parameter[i],R->names[j])==0)
+      {
+        Warn("name conflict par(%d) and var(%d): `%s`, rename to `@@(%d)`",i+1,j+1,R->names[j],i+1);
+        omFree(R->parameter[i]);
+        R->parameter[i]=(char *)omAlloc(10);
+        sprintf(R->parameter[i],"@@(%d)",i+1);
+      }
+    }
+  }
+}
+
 ring rCompose(const lists  L)
 {
   if ((L->nr!=3)
@@ -2262,7 +2293,7 @@ ring rCompose(const lists  L)
     WerrorS("coefficient field must be described by `int` or `list`");
     goto rCompose_err;
   }
-  rNameCheck(R);
+  rRenameVars(R);
   // ------------------------ Q-IDEAL ------------------------
   rComplete(R);
 
@@ -4884,7 +4915,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   }
 
   /* check names and parameters for conflicts ------------------------- */
-  rNameCheck(R); // conflicting variables will be renamed
+  rRenameVars(R); // conflicting variables will be renamed
   /* ordering -------------------------------------------------------------*/
   if (rSleftvOrdering2Ordering(ord, R))
     goto rInitError;
