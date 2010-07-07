@@ -22,10 +22,10 @@
 // #undef PDEBUG
 // #define PDEBUG 2
 
-#include "p_polys.h"
+//#include "p_polys.h"
 #include <output.h>
 #include <omalloc.h>
-#include "ring.h"
+#include "monomials/ring.h"
 #include <coeffs.h>
 
 /***************************************************************
@@ -344,8 +344,6 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
 }
 
 #endif // PDEBUG
-
-#include <kernel/pInline1.h>
 
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
 static unsigned long pDivisibleBy_number = 1;

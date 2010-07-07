@@ -10,7 +10,7 @@
  *******************************************************************/
 #ifndef PINLINE0_CC
 
-#include <kernel/mod2.h>
+#include "config.h"
 
 #define PINLINE0_CC
 #undef DO_PINLINE0

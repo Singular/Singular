@@ -10,25 +10,7 @@
 
 /* includes */
 #include <coeffs.h>
-#include "polys-impl.h"
-
-#define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
-
-// #ifdef HAVE_PLURAL
-#if 0
-enum nc_type
-{
-  nc_error = -1, // Something's gone wrong!
-  nc_general = 0, /* yx=q xy+... */
-  nc_skew, /*1*/ /* yx=q xy */
-  nc_comm, /*2*/ /* yx= xy */
-  nc_lie,  /*3*/ /* yx=xy+... */
-  nc_undef, /*4*/  /* for internal reasons */
-
-  nc_exterior /*5*/ // Exterior Algebra(SCA): yx= -xy & (!:) x^2 = 0
-};
-#endif
-// #endif
+//#include "polys-impl.h"
 
 enum tHomog
 {
@@ -37,14 +19,9 @@ enum tHomog
    testHomog
 };
 
-//extern ring      currRing;
-//extern ideal     currQuotient;
-//extern idhdl      currRingHdl;
-
-
 void   rChangeCurrRing(ring r);
-void   rSetHdl(idhdl h);
-ring   rInit(sleftv* pn, sleftv* rv, sleftv* ord);
+//void   rSetHdl(idhdl h);
+//ring   rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(const char *s);
 ring   rDefault(int ch, int N, char **n);
 ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1);
@@ -52,7 +29,7 @@ ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *
 #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);
 void   rWrite(ring r);
-void   rKill(idhdl h);
+//void   rKill(idhdl h);
 void   rKill(ring r);
 ring   rCopy(ring r);
 ring   rCopy0(const ring r, BOOLEAN copy_qideal = TRUE, BOOLEAN copy_ordering = TRUE);
@@ -104,15 +81,15 @@ void rDBGetSComps(int** currComponents,
 void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r = currRing);
 void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r = currRing);
 
-idhdl  rFindHdl(ring r, idhdl n, idhdl w);
-idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n);
+//idhdl  rFindHdl(ring r, idhdl n, idhdl w);
+//idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n);
 const char * rSimpleOrdStr(int ord);
 int rOrderName(char * ordername);
 char * rOrdStr(ring r);
 char * rVarStr(ring r);
 char * rCharStr(ring r);
 char * rString(ring r);
-int    rChar(ring r=currRing);
+int    rChar(ring r);
 #define rPar(r) (r->P)
 #define rVar(r) (r->N)
 char * rParStr(ring r);
@@ -124,31 +101,29 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr = 1);
 BOOLEAN rSamePolyRep(ring r1, ring r2);
 void   rUnComplete(ring r);
 
-#define  rInternalChar(r) ((r)->ch)
-
-BOOLEAN rRing_is_Homog(ring r=currRing);
-BOOLEAN rRing_has_CompLastBlock(ring r=currRing);
+BOOLEAN rRing_is_Homog(ring r);
+BOOLEAN rRing_has_CompLastBlock(ring r);
 
 #ifdef HAVE_RINGS
-static inline BOOLEAN rField_is_Ring_2toM(ring r=currRing)
+static inline BOOLEAN rField_is_Ring_2toM(ring r)
 { return (r->ringtype == 1); }
 
-static inline BOOLEAN rField_is_Ring_ModN(ring r=currRing)
+static inline BOOLEAN rField_is_Ring_ModN(ring r)
 { return (r->ringtype == 2); }
 
-static inline BOOLEAN rField_is_Ring_PtoM(ring r=currRing)
+static inline BOOLEAN rField_is_Ring_PtoM(ring r)
 { return (r->ringtype == 3); }
 
-static inline BOOLEAN rField_is_Ring_Z(ring r=currRing)
+static inline BOOLEAN rField_is_Ring_Z(ring r)
 { return (r->ringtype == 4); }
 
-static inline BOOLEAN rField_is_Ring(ring r=currRing)
+static inline BOOLEAN rField_is_Ring(ring r)
 { return (r->ringtype != 0); }
 
-static inline BOOLEAN rField_is_Domain(ring r=currRing)
+static inline BOOLEAN rField_is_Domain(ring r)
 { return (r->ringtype == 4 || r->ringtype == 0); }
 
-static inline BOOLEAN rField_has_Units(ring r=currRing)
+static inline BOOLEAN rField_has_Units(ring r)
 { return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
 #else
 #define rField_is_Ring(A) (0)
@@ -161,96 +136,96 @@ static inline BOOLEAN rField_has_Units(ring r=currRing)
 #endif
 
 #ifdef HAVE_RINGS
-static inline BOOLEAN rField_is_Zp(ring r=currRing)
+static inline BOOLEAN rField_is_Zp(ring r)
 { return (r->ringtype == 0) && (r->ch > 1) && (r->parameter==NULL); }
 
 static inline BOOLEAN rField_is_Zp(ring r, int p)
 { return (r->ringtype == 0) && (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
 
-static inline BOOLEAN rField_is_Q(ring r=currRing)
+static inline BOOLEAN rField_is_Q(ring r)
 { return (r->ringtype == 0) && (r->ch == 0) && (r->parameter==NULL); }
 
-static inline BOOLEAN rField_is_numeric(ring r=currRing) /* R, long R, long C */
+static inline BOOLEAN rField_is_numeric(ring r) /* R, long R, long C */
 { return (r->ringtype == 0) && (r->ch ==  -1); }
 
-static inline BOOLEAN rField_is_R(ring r=currRing)
+static inline BOOLEAN rField_is_R(ring r)
 {
   if (rField_is_numeric(r) && (r->float_len <= (short)SHORT_REAL_LENGTH))
     return (r->ringtype == 0) && (r->parameter==NULL);
   return FALSE;
 }
 
-static inline BOOLEAN rField_is_GF(ring r=currRing)
+static inline BOOLEAN rField_is_GF(ring r)
 { return (r->ringtype == 0) && (r->ch > 1) && (r->parameter!=NULL); }
 
 static inline BOOLEAN rField_is_GF(ring r, int q)
 { return (r->ringtype == 0) && (r->ch == q); }
 
-static inline BOOLEAN rField_is_Zp_a(ring r=currRing)
+static inline BOOLEAN rField_is_Zp_a(ring r)
 { return (r->ringtype == 0) && (r->ch < -1); }
 
 static inline BOOLEAN rField_is_Zp_a(ring r, int p)
 { return (r->ringtype == 0) && (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
 
-static inline BOOLEAN rField_is_Q_a(ring r=currRing)
+static inline BOOLEAN rField_is_Q_a(ring r)
 { return (r->ringtype == 0) && (r->ch == 1); }
 
-static inline BOOLEAN rField_is_long_R(ring r=currRing)
+static inline BOOLEAN rField_is_long_R(ring r)
 {
   if (rField_is_numeric(r) && (r->float_len >(short)SHORT_REAL_LENGTH))
     return (r->ringtype == 0) && (r->parameter==NULL);
   return FALSE;
 }
 
-static inline BOOLEAN rField_is_long_C(ring r=currRing)
+static inline BOOLEAN rField_is_long_C(ring r)
 {
   if (rField_is_numeric(r))
     return (r->ringtype == 0) && (r->parameter!=NULL);
   return FALSE;
 }
 #else
-static inline BOOLEAN rField_is_Zp(ring r=currRing)
+static inline BOOLEAN rField_is_Zp(ring r)
 { return (r->ch > 1) && (r->parameter==NULL); }
 
 static inline BOOLEAN rField_is_Zp(ring r, int p)
 { return (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
 
-static inline BOOLEAN rField_is_Q(ring r=currRing)
+static inline BOOLEAN rField_is_Q(ring r)
 { return (r->ch == 0) && (r->parameter==NULL); }
 
-static inline BOOLEAN rField_is_numeric(ring r=currRing) /* R, long R, long C */
+static inline BOOLEAN rField_is_numeric(ring r) /* R, long R, long C */
 { return (r->ch ==  -1); }
 
-static inline BOOLEAN rField_is_R(ring r=currRing)
+static inline BOOLEAN rField_is_R(ring r)
 {
   if (rField_is_numeric(r) && (r->float_len <= (short)SHORT_REAL_LENGTH))
     return (r->parameter==NULL);
   return FALSE;
 }
 
-static inline BOOLEAN rField_is_GF(ring r=currRing)
+static inline BOOLEAN rField_is_GF(ring r)
 { return (r->ch > 1) && (r->parameter!=NULL); }
 
 static inline BOOLEAN rField_is_GF(ring r, int q)
 { return (r->ch == q); }
 
-static inline BOOLEAN rField_is_Zp_a(ring r=currRing)
+static inline BOOLEAN rField_is_Zp_a(ring r)
 { return (r->ch < -1); }
 
 static inline BOOLEAN rField_is_Zp_a(ring r, int p)
 { return (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
 
-static inline BOOLEAN rField_is_Q_a(ring r=currRing)
+static inline BOOLEAN rField_is_Q_a(ring r)
 { return (r->ch == 1); }
 
-static inline BOOLEAN rField_is_long_R(ring r=currRing)
+static inline BOOLEAN rField_is_long_R(ring r)
 {
   if (rField_is_numeric(r) && (r->float_len >(short)SHORT_REAL_LENGTH))
     return (r->parameter==NULL);
   return FALSE;
 }
 
-static inline BOOLEAN rField_is_long_C(ring r=currRing)
+static inline BOOLEAN rField_is_long_C(ring r)
 {
   if (rField_is_numeric(r))
     return (r->parameter!=NULL);
@@ -258,7 +233,7 @@ static inline BOOLEAN rField_is_long_C(ring r=currRing)
 }
 #endif
 
-static inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
+static inline BOOLEAN rField_has_simple_inverse(ring r)
 /* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
 #ifdef HAVE_RINGS
 { return (r->ringtype > 0) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
@@ -266,7 +241,7 @@ static inline BOOLEAN rField_has_simple_inverse(ring r=currRing)
 { return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
 #endif
 
-static inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
+static inline BOOLEAN rField_has_simple_Alloc(ring r)
 { return (rField_is_Zp(r)
        || rField_is_GF(r)
 #ifdef HAVE_RINGS
@@ -275,7 +250,7 @@ static inline BOOLEAN rField_has_simple_Alloc(ring r=currRing)
        || rField_is_R(r)); }
 
 /* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
-static inline BOOLEAN rField_is_Extension(ring r=currRing)
+static inline BOOLEAN rField_is_Extension(ring r)
 { return (rField_is_Q_a(r)) || (rField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
 n_coeffType rFieldType(ring r);
@@ -384,15 +359,15 @@ BOOLEAN rHasSimpleOrder(const ring r);
 BOOLEAN rHasSimpleLexOrder(const ring r);
 
 // return TRUE if p->exp[r->pOrdIndex] holds total degree of p */
-//inline BOOLEAN rHasGlobalOrdering(const ring r=currRing)
+//inline BOOLEAN rHasGlobalOrdering(const ring r)
 //{ return (r->OrdSgn==1); }
 #define rHasGlobalOrdering(R) ((R)->OrdSgn==1)
 #define rHasGlobalOrdering_currRing() (pOrdSgn==1)
-//inline BOOLEAN rHasLocalOrMixedOrdering(const ring r=currRing)
+//inline BOOLEAN rHasLocalOrMixedOrdering(const ring r)
 //{ return (r->OrdSgn==-1); }
 #define rHasLocalOrMixedOrdering(R) ((R)->OrdSgn==-1)
 #define rHasLocalOrMixedOrdering_currRing() (pOrdSgn==-1)
-BOOLEAN rOrd_is_Totaldegree_Ordering(ring r =currRing);
+BOOLEAN rOrd_is_Totaldegree_Ordering(ring r );
 
 /// return TRUE if p_SetComp requires p_Setm
 BOOLEAN rOrd_SetCompRequiresSetm(ring r);
