@@ -75,7 +75,7 @@ with subject line @code{register} and body containing the following data:
 
 
 For information on how to cite @sc{Singular} see
-@uref{http://www.singular.uni-kl.de/index.php/how-to-cite-singular}.
+@*@uref{http://www.singular.uni-kl.de/index.php/how-to-cite-singular}.
 
 You can also support @sc{Singular} by informing us about
 your result obtained by using @sc{Singular}.
