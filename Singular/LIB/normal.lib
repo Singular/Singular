@@ -2080,6 +2080,42 @@ Versuch: subst statt phi
    return(L);
 }
 ///////////////////////////////////////////////////////////////////////////////
+static proc deltaP(ideal I)
+{
+   def R=basering;
+   int c,d,i;
+   int n=nvars(R);
+   list nor;
+   if(size(I)>1){ERROR("no hypersurface");}
+   ideal J=std(slocus(I));
+   if(dim(J)<=0){return(0);}
+   poly h;
+   d=1;
+   while((d)&&(i<n))
+   {
+      i++;
+      h=var(i);
+      d=dim(std(J+ideal(h)));
+   }
+   i=0;
+   while(d)
+   {
+      i++;
+      if(i>10){ERROR("delta not found, please inform the authors")};
+      h=randomLast(100)[n];
+      d=dim(std(J+ideal(h)));
+   }
+   I=I,h-1;
+   if(char(R)<=19)
+   {
+      nor=normalP(I);
+   }
+   else
+   {
+      nor=normal(I);
+   }
+   return(nor[2][2]);
+}
 
 proc genus(ideal I,list #)
 "USAGE:   genus(i) or genus(i,1); I a 1-dimensional ideal
@@ -2100,22 +2136,34 @@ EXAMPLE: example genus; shows an example
    {
      def R1=changeord("dp");
      setring R1;
-     ideal J=std(imap(R0,I));
-     if(dim(J)!=1){ERROR("ideal defines not a curve");}
-     def S=changevar(varstr(R1)+",@t");
-     setring S;
-     ideal J=imap(R1,J);
-     J=std(homog(J,@t));
-     int pa=1-hilbPoly(J)[1];
-     setring R0;
-     if (char(basering)>7)
+     ideal I=imap(R0,I);
+     I=radical(I);
+     I=std(I);
+     if(dim(I)!=1)
      {
-       list nor=normal(I,"withDelta");
-       return(pa-nor[3][2]);
+       if(((homog(I))&&(dim(I)!=2))||(!homog(I)))
+       {
+         ERROR("This is not a curve");
+       }
      }
-     // only for very small char.:
-     list nor=normalP(I);
-     return(pa-nor[2][2]);
+     if(homog(I)&&(dim(I)==2))
+     {
+       def S=R0;
+       setring S;
+       ideal J=I;
+     }
+     else
+     {
+       def S=changevar(varstr(R0)+",@t");
+       setring S;
+       ideal J=imap(R1,I);
+       J=homog(J,@t);
+       J=std(J);
+     }
+     int pa=1-hilbPoly(J)[1];
+     pa=pa-deltaP(J);
+     setring R0;
+     return(pa);
    }
    I=std(I);
    if(dim(I)!=1)
