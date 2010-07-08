@@ -5176,7 +5176,7 @@ void jjInitTab1()
         case (int)jjrOrdStr:      dArith1[i].p=(proc1)rOrdStr; break;
         case (int)jjrVarStr:      dArith1[i].p=(proc1)rVarStr; break;
         case (int)jjrParStr:      dArith1[i].p=(proc1)rParStr; break;
-        case (int)jjCOUNT_RES:    dArith1[i].p=(proc1)syLength; break;
+        case (int)jjCOUNT_RES:    dArith1[i].p=(proc1)sySize; break;
         case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
         case (int)jjidTransp:     dArith1[i].p=(proc1)idTransp; break;
 #ifdef GENTABLE
@@ -5318,7 +5318,7 @@ static BOOLEAN jjidTransp(leftv res, leftv v)
 #define jjrOrdStr      (proc1)rOrdStr
 #define jjrVarStr      (proc1)rVarStr
 #define jjrParStr      (proc1)rParStr
-#define jjCOUNT_RES    (proc1)syLength
+#define jjCOUNT_RES    (proc1)sySize
 #define jjDIM_R        (proc1)syDim
 #define jjidTransp     (proc1)idTransp
 #endif
