@@ -1887,6 +1887,38 @@ static proc cleanPrimary(list l)
    return(lh);
 }
 ///////////////////////////////////////////////////////////////////////////////
+static proc cleanPrimaryS(list l)
+{
+   int i;
+   list lh;
+   for(i=1;i<=size(l);i++)
+   {
+      l[i][2]=std(l[i][2]);
+      if(deg(l[i][2][1])>0)
+      {
+         lh[size(lh)+1]=l[i];
+      }
+   }
+   return(lh);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc cleanPrimeS(list l)
+{
+   int i;
+   list lh;
+   for(i=1;i<=size(l);i++)
+   {
+      l[i]=std(l[i]);
+      if(deg(l[i][1])>0)
+      {
+         lh[size(lh)+1]=l[i];
+      }
+   }
+   return(lh);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 
 proc minAssPrimesold(ideal i, list #)
@@ -2332,14 +2364,19 @@ NOTE:    An embedded component q (primary ideal) of i can be replaced in the
 EXAMPLE:example equidim; shows an example
 "
 {
-  if(attrib(basering,"global")!=1)
-  {
-      ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-      );
-  }
   intvec op ;
   def  P = basering;
+  if(attrib(basering,"global")!=1)
+  {
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     list L=equidim(i,#);
+     setring P;
+     list L=imap(PG,L);
+     L=cleanPrimeS(L);
+     return(L);
+  }
   list eq;
   intvec w;
   int n,m;
@@ -2438,13 +2475,18 @@ RETURN:  ideal of equidimensional locus (of maximal dimension) of i.
 EXAMPLE: example equidimMax; shows an example
 "
 {
+  def  P = basering;
   if(attrib(basering,"global")!=1)
   {
-      ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-      );
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     ideal L=equidimMax(i);
+     setring P;
+     ideal L=imap(PG,L);
+     L=std(L);
+     return(L);
   }
-  def  P = basering;
   ideal eq;
   intvec w;
   int n;
@@ -3839,16 +3881,23 @@ NOTE:    Uses the algorithm of Eisenbud/Huneke/Vasconcelos, which
 EXAMPLE: example radicalEHV; shows an example
 "
 {
-   if(attrib(basering,"global")!=1)
-   {
-      ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-      );
-   }
    if((char(basering)<100)&&(char(basering)!=0))
    {
       "WARNING: The characteristic is too small, the result may be wrong";
    }
+   if(attrib(basering,"global")!=1)
+   {
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     ideal L=radicalEHV(i);
+     setring P;
+     ideal L=imap(PG,L);
+     L=std(L);
+     return(L);
+   }
+
    ideal J,I,I0,radI0,L,radI1,I2,radI2;
    int l,n;
    intvec op=option(get);
@@ -5114,9 +5163,15 @@ EXAMPLE: example primdecGTZ; shows an example
 {
    if(attrib(basering,"global")!=1)
    {
-      ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-      );
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     list L=primdecGTZ(i);
+     setring P;
+     list L=imap(PG,L);
+     L=cleanPrimaryS(L);
+     return(L);
    }
    if(minpoly!=0)
    {
@@ -5283,10 +5338,17 @@ EXAMPLE: example primdecSY; shows an example
 {
    if(attrib(basering,"global")!=1)
    {
-      ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-      );
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     list L=primdecSY(i,#);
+     setring P;
+     list L=imap(PG,L);
+     L=cleanPrimaryS(L);
+     return(L);
    }
+
    i=simplify(i,2);
    if ((i[1]==0)||(i[1]==1))
    {
@@ -5364,13 +5426,19 @@ EXAMPLE: example minAssGTZ; shows an example
       }
     }
   }
-
   if(attrib(basering,"global")!=1)
   {
-    ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-    );
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     list L=minAssGTZ(i,#);
+     setring P;
+     list L=imap(PG,L);
+     L=cleanPrimeS(L);
+     return(L);
   }
+
   if(minpoly!=0)
   {
     return(algeDeco(i,2));
@@ -5401,10 +5469,17 @@ EXAMPLE: example minAssChar; shows an example
 {
    if(attrib(basering,"global")!=1)
    {
-      ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-      );
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     list L=minAssChar(i,#);
+     setring P;
+     list L=imap(PG,L);
+     L=cleanPrimeS(L);
+     return(L);
    }
+
    if (size(#)==1)
    { return(min_ass_prim_charsets(i,#[1])); }
    else
@@ -5428,12 +5503,19 @@ NOTE:    A combination of the algorithms of Krick/Logar (with modifications by L
 EXAMPLE: example equiRadical; shows an example
 "
 {
-  if(attrib(basering,"global")!=1)
-  {
-     ERROR(
-     "Not implemented for this ordering, please change to global ordering."
-     );
-  }
+   if(attrib(basering,"global")!=1)
+   {
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     ideal L=equiRadical(i);
+     setring P;
+     ideal L=imap(PG,L);
+     L=std(L);
+     return(L);
+   }
+
   return(radical(i, 1));
 }
 example
@@ -5462,13 +5544,20 @@ NOTE:    A combination of the algorithms of Krick/Logar (with modifications by L
 EXAMPLE: example radical; shows an example
 "
 {
-  dbprint(printlevel - voice, "Radical, version 2006.05.08");
-  if(attrib(basering,"global")!=1)
-  {
-    ERROR(
-     "Not implemented for this ordering, please change to global ordering."
-    );
-  }
+   dbprint(printlevel - voice, "Radical, version 2006.05.08");
+   if(attrib(basering,"global")!=1)
+   {
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     ideal L=radical(i,#);
+     setring P;
+     ideal L=imap(PG,L);
+     L=std(L);
+     return(L);
+   }
+
   if(size(i) == 0){return(ideal(0));}
   int j;
   def P0 = basering;
@@ -6235,10 +6324,17 @@ EXAMPLE: example prepareAss; shows an example
 {
   if(attrib(basering,"global")!=1)
   {
-      ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-      );
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     list L=prepareAss(i);
+     setring P;
+     list L=imap(PG,L);
+     L=cleanPrimeS(L);
+     return(L);
   }
+
   ideal j=std(i);
   int cod=nvars(basering)-dim(j);
   int e;
@@ -6281,12 +6377,19 @@ NOTE:    Uses algorithm of Eisenbud, Huneke and Vasconcelos.
 EXAMPLE: example equidimMaxEHV; shows an example
 "
 {
-  if(attrib(basering,"global")!=1)
-  {
-      ERROR(
-      "Not implemented for this ordering, please change to global ordering."
-      );
-  }
+   if(attrib(basering,"global")!=1)
+   {
+     def P=basering;
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(P,i);
+     ideal L=equidimMaxEHV(i);
+     setring P;
+     ideal L=imap(PG,L);
+     L=std(L);
+     return(L);
+   }
+
   ideal j=groebner(i);
   int cod=nvars(basering)-dim(j);
   int e;
@@ -6349,13 +6452,19 @@ NOTE:    The algorithm (of Monico), works well only for a small total number
 EXAMPLE: example zerodec; shows an example
 "
 {
+  def R=basering;
   if(attrib(basering,"global")!=1)
   {
-    ERROR(
-    "Not implemented for this ordering, please change to global ordering."
-    );
+     def PG=changeord("dp");
+     setring PG;
+     ideal i=imap(R,I);
+     list L=zerodec(i);
+     setring R;
+     list L=imap(PG,L);
+     L=cleanPrimeS(L);
+     return(L);
   }
-  def R=basering;
+
   poly q;
   int j,time;
   matrix m;
