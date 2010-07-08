@@ -1893,14 +1893,6 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift,
 }
 
 /*3
-* computes the allocated length of the resolution
-*/
-int syLength(syStrategy syzstr)
-{
-  return syzstr->length;
-}
-
-/*3
 * computes the real length of the resolution
 */
 int sySize(syStrategy syzstr)

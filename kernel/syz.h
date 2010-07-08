@@ -106,7 +106,6 @@ void syKillComputation(syStrategy syzstr, ring r=currRing);
 intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim=TRUE,int * row_shift=NULL, intvec *weights=NULL);
 BOOLEAN syBetti1(leftv res, leftv u);
 BOOLEAN syBetti2(leftv res, leftv u, leftv w);
-int syLength(syStrategy syzstr);
 int sySize(syStrategy syzstr);
 int syDim(syStrategy syzstr);
 syStrategy syCopy(syStrategy syzstr);
