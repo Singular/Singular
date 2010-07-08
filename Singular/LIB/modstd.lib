@@ -1,4 +1,3 @@
-//GP, last modified 23.10.06
 ////////////////////////////////////////////////////////////////////////////////
 version="$Id$";
 category = "Commutative Algebra";
@@ -501,7 +500,7 @@ NOTE:    The procedure computes a standard basis of the ideal I modulo p and
 @*       - variant = 2: groebner,
 @*       - variant = 3: homogenize - std(.,#[1]) resp. groebner - dehomogenize,
 @*       - variant = 4: std(.,#[1]) resp. groebner,
-@*       - variant = 5: liftstd.
+@*       - variant = 5: liftstd1.
 EXAMPLE: example modpStd; shows an example
 "
 {
@@ -800,7 +799,10 @@ EXAMPLE: example modStd; shows an example
       if(exactness == 1)
       {
          variant = 5;
-         if(printlevel >= 10) { "variant = 2"; }
+         if(printlevel >= 10) { "variant = 5"; }
+         "=============================================================";
+         "WARNING: This variant is not applicable if ordering is mixed.";
+         "=============================================================";
          matrix trans;
       }
    }
@@ -1099,7 +1101,7 @@ example
    ideal I = jacob(x5+y6+z7+xyz);
    ideal J1 = modStd(I,1,1);
    J1;
-   // requires MP
+   //requires MP
    //ideal J2 = modStd(I,3);
    //J2;
    //size(reduce(J1,J2));
@@ -1108,10 +1110,9 @@ example
    ring rr = 0,x(1..4),lp;
    ideal I = cyclic(4);
    ideal J1 = modStd(I,1);
-   // requires MP
-   //ideal J2 = modStd(I,2,1);
-   //size(reduce(J1,J2));
-   //size(reduce(J2,J1));
+   ideal J2 = modStd(I,1,1);
+   size(reduce(J1,J2));
+   size(reduce(J2,J1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
