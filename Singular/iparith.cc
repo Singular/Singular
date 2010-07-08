@@ -5283,7 +5283,7 @@ static BOOLEAN jjrParStr(leftv res, leftv v)
 }
 static BOOLEAN jjCOUNT_RES(leftv res, leftv v)
 {
-  res->data=(char *)syLength((syStrategy)v->Data());
+  res->data=(char *)sySize((syStrategy)v->Data());
   return FALSE;
 }
 static BOOLEAN jjDIM_R(leftv res, leftv v)
