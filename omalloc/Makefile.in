@@ -137,10 +137,10 @@ omalloc_debug.o: omalloc_debug.c
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $< -o $@
 
 omTables.inc: omTables
-	./omTables > $@
+	./omTables > omTables.xx && mv omTables.xx  $@
 
 omTables.h: omTables
-	./omTables 1 >$@
+	./omTables 1 >omTables.yy 77 mv omTables.yy $@
 
 omTables: omAllocPrivate.h omConfig.h omTables.c omlimits.h mylimits.h
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_GENERATE_INC omTables.c -o omTables
