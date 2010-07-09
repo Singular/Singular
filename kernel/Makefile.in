@@ -244,7 +244,7 @@ p_Procs_Lib.o: p_Procs_Lib.inc
 prCopy.o: prCopy.inc
 
 prCopy.inc : prCopyMacros.h prCopyTemplate.cc prCopy.pl
-	$(PERL) prCopy.pl > prCopy.inc
+	$(PERL) prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
 
 # additional dependencies for p_Procs_[Static|Dynamic|Lib].cc
 p_Procs_Static.o p_Procs_Static.og p_Procs_Static.op: p_Procs_Static.inc
@@ -256,7 +256,7 @@ p_Procs_Dynamic.inc p_Procs_Lib.inc: p_Procs_Dynamic.h
 # here is how p_Procs_[Static|Dynamic].inc is generated
 p_Procs_%.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
 	$(CXX) -g -Dp_Procs_$* p_Procs_Generate.cc -o p_Procs_$*
-	./p_Procs_$* > p_Procs_$*.inc
+	./p_Procs_$* > p_Procs.xx && mv p_Procs.xx p_Procs_$*.inc
 	-rm -f p_Procs_$* p_Procs_$*.exe
 
 p_Procs_%.so: p_Procs_Lib_%.dl_o
