@@ -142,11 +142,12 @@ int main(          /* main entry to Singular */
   extern void ttGen2b();
   extern void ttGen4();
   extern void mpsr_ttGen(); // For initialization of (CMD, MP_COP) tables
+  extern char *iparith_inc;
   mpsr_ttGen();
   ttGen4();
   ttGen1();
   ttGen2b();
-  rename("iparith.xx","iparith.inc");
+  rename(iparith_inc,"iparith.inc");
   rename("plural_cmd.xx","plural_cmd.inc");
   rename("mpsr_Tok.xx","mpsr_Tok.inc");
 #else

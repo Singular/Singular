@@ -7757,9 +7757,19 @@ struct sValCmdTab dArithTab1[]={ {0,0}};
 #define JJTAB1LEN 0
 struct sValCmdTab dArithTab2[]={ {0,0}};
 #define JJTAB2LEN 0
+
+char *iparith_inc;
 void ttGen1()
 {
-  FILE *outfile = myfopen("iparith.xx","w");
+  iparith_inc=omStrDup("iparith.xxxxxx");
+  int pid=getpid();
+  iparith_inc[8]=(pid %10)+'0'; pid/=10;
+  iparith_inc[9]=(pid %10)+'0'; pid/=10;
+  iparith_inc[10]=(pid %10)+'0'; pid/=10;
+  iparith_inc[11]=(pid %10)+'0'; pid/=10;
+  iparith_inc[12]=(pid %10)+'0'; pid/=10;
+  iparith_inc[13]=(pid %10)+'0';
+  FILE *outfile = myfopen(iparith_inc,"w");
   int i,j,l1=0,l2=0;
   currRing=(ring)omAllocBin(sip_sring_bin);
   fprintf(outfile,
@@ -7918,7 +7928,7 @@ void ttGen1()
 #if 0
 void ttGen2()
 {
-  FILE *outfile = myfopen("iparith.inc","a");
+  FILE *outfile = myfopen(iparith_inc,"a");
   fprintf(outfile,
   "/****************************************\n"
   "*  Computer Algebra System SINGULAR     *\n"
@@ -8053,7 +8063,7 @@ void ttGen2b()
 {
   int cmd_size = (sizeof(cmds)/sizeof(cmdnames))-1;
 
-  FILE *outfile = myfopen("iparith.inc","a");
+  FILE *outfile = myfopen(iparith_inc,"a");
   fprintf(outfile,
   "/****************************************\n"
   "*  Computer Algebra System SINGULAR     *\n"

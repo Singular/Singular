@@ -416,14 +416,14 @@ TSingular: mod2.h feOpt.cc version.h emacs.cc \
 feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
 extra.o: feOpt.inc
 
-feOpt.inc feOptES.inc feOptTS.inc: feOpt.cc mod2.h
-	$(CXX) -DGENERATE_OPTION_INDEX -I../kernel feOpt.cc -o feOpt
+feOptTS.inc feOptES.inc feOpt.inc: feOpt.cc mod2.h
+	$(CXX) -DGENERATE_OPTION_INDEX -I../kernel feOpt.cc -o feOpt.xx && mv feOpt.xx feOpt
 	./feOpt
 	/bin/rm -f feOpt feOpt.exe
-	$(CXX) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOptES
+	$(CXX) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOptES.xx && mv feOptES.xx feOptES
 	./feOptES
 	rm -f feOptES feOptES.exe
-	$(CXX) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
+	$(CXX) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOptTS.xx && mv feOptTS.xx feOptTS
 	./feOptTS
 	rm -f feOptTS feOptTS.exe
 
