@@ -186,11 +186,11 @@ int main()
 {
   FILE* fd;
 #ifdef ESINGULAR
-  fd = fopen("feOptES.inc", "w");
+  fd = fopen("feOptES.xx", "w");
 #elif defined(TSINGULAR)
-  fd = fopen("feOptTS.inc", "w");
+  fd = fopen("feOptTS.xx", "w");
 #else
-  fd = fopen("feOpt.inc", "w");
+  fd = fopen("feOpt.xxx "w");
 #endif
 
   if (fd == NULL) exit(1);
@@ -229,6 +229,13 @@ int main()
 
   fprintf(fd, "FE_OPT_UNDEF\n} feOptIndex;\n");
   fclose(fd);
+#ifdef ESINGULAR
+  rename("feOptES.xx", "feOptES.inc");
+#elif defined(TSINGULAR)
+  rename("feOptTS.xx", "feOptTS.inc");
+#else
+  rename("feOpt.xx", "feOpt.inc");
+#endif
   return(0);
 }
 
