@@ -452,7 +452,7 @@ void mpsr_ttGen()
   }
 
   // Generate the template file
-  outfile = myfopen("mpsr_Tok.inc", "w");
+  outfile = myfopen("mpsr_Tok.xx", "w");
   if (outfile == NULL)
   {
     fprintf(stderr, "Error: mpsr_ttGen: Cannot open file mpsr_Tok.inc\n");
@@ -535,7 +535,7 @@ extern "C" int system(char *);
 
 void mpsr_ttGen()
 {
-  system("touch mpsr_Tok.inc");
+  system("touch mpsr_Tok.xx");
 }
 #endif
 

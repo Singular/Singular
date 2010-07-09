@@ -146,6 +146,9 @@ int main(          /* main entry to Singular */
   ttGen4();
   ttGen1();
   ttGen2b();
+  rename("iparith.xx","iparith.inc");
+  rename("plural_cmd.xx","plural_cmd.inc");
+  rename("mpsr_Tok.xx","mpsr_Tok.inc");
 #else
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   omInitRet_2_Info(argv[0]);

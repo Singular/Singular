@@ -416,17 +416,13 @@ TSingular: mod2.h feOpt.cc version.h emacs.cc \
 feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
 extra.o: feOpt.inc
 
-feOpt.inc: feOpt.cc mod2.h
+feOpt.inc feOptES.inc feOptTS.inc: feOpt.cc mod2.h
 	$(CXX) -DGENERATE_OPTION_INDEX -I../kernel feOpt.cc -o feOpt
 	./feOpt
 	/bin/rm -f feOpt feOpt.exe
-
-feOptES.inc: feOpt.cc mod2.h 
 	$(CXX) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOptES
 	./feOptES
 	rm -f feOptES feOptES.exe
-
-feOptTS.inc: feOpt.cc mod2.h
 	$(CXX) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
 	./feOptTS
 	rm -f feOptTS feOptTS.exe
@@ -588,6 +584,8 @@ maintainer-clean: distclean srcclean
 ##
 ## miscellanous targets
 ##
+fehelp.o fehelp.og fehelp.op: feOpt.inc
+
 LIB/all.lib:	LIB/all.lib.tmpl
 	./make_alllib.sh LIB/all.lib.tmpl ${SLIB0} ${PLIBS}
 

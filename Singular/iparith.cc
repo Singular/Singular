@@ -7759,7 +7759,7 @@ struct sValCmdTab dArithTab2[]={ {0,0}};
 #define JJTAB2LEN 0
 void ttGen1()
 {
-  FILE *outfile = myfopen("iparith.inc","w");
+  FILE *outfile = myfopen("iparith.xx","w");
   int i,j,l1=0,l2=0;
   currRing=(ring)omAllocBin(sip_sring_bin);
   fprintf(outfile,
@@ -8208,7 +8208,7 @@ void ttGen3()
 #endif
 void ttGen4()
 {
-  FILE *outfile = myfopen("plural_cmd.inc","w");
+  FILE *outfile = myfopen("plural_cmd.xx","w");
   int i;
   const char *old_s="";
   fprintf(outfile,
