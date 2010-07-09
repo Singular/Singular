@@ -190,7 +190,7 @@ int main()
 #elif defined(TSINGULAR)
   fd = fopen("feOptTS.xx", "w");
 #else
-  fd = fopen("feOpt.xxx "w");
+  fd = fopen("feOpt.xx", "w");
 #endif
 
   if (fd == NULL) exit(1);
