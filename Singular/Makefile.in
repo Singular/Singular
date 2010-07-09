@@ -422,14 +422,14 @@ feOpt.inc: feOpt.cc mod2.h
 	/bin/rm -f feOpt feOpt.exe
 
 feOptES.inc: feOpt.cc mod2.h 
-	$(CXX) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOpt
-	./feOpt
-	rm -f feOpt feOpt.exe
+	$(CXX) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOptES
+	./feOptES
+	rm -f feOptES feOptES.exe
 
 feOptTS.inc: feOpt.cc mod2.h
-	$(CXX) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOpt
-	./feOpt
-	rm -f feOpt feOpt.exe
+	$(CXX) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
+	./feOptTS
+	rm -f feOptTS feOptTS.exe
 
 mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
 	$(LD) ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS} ${GLIBC_DYN_FIX}
