@@ -14,14 +14,8 @@
 #include <stdio.h>
 #include "mod2.h"
 #include "../Singular/distrib.h"
-#ifdef p_Procs_Static
-#include "kversion.h"
-#endif
 #ifdef HAVE_CONFIG_H
 #include "omalloc.h"
-#endif
-#ifdef MAKE_DISTRIBUTION
-#include "kversion.h"
 #endif
 
 #ifdef __cplusplus
@@ -47,8 +41,7 @@ int dReportError(const char* fmt, ...)
 #else
   fprintf(stderr, "\n// !!! YOU HAVE FOUND A BUG IN SINGULAR.");
   fprintf(stderr, "// !!! Please, email the following output to singular@mathematik.uni-kl.de");
-  fprintf(stderr, "// !!! Singular Version: " S_UNAME S_VERSION1 " (%d)\n",
-          feVersionId0);
+  fprintf(stderr, "// !!! Singular Version: " S_UNAME S_VERSION1 "\n");
   vfprintf(stderr, fmt, ap);
 #endif
   return 0;

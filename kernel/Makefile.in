@@ -231,16 +231,13 @@ DL_LIBSG=
 DL_LIBSP=
 endif
 
-all:	kversion.h libkernel.a libkernel_g.a mmalloc.o ${DL_LIBS} ${DL_LIBSG} ${OBJS2}
+all:	libkernel.a libkernel_g.a mmalloc.o ${DL_LIBS} ${DL_LIBSG} ${OBJS2}
 
 libkernel.a: ${OBJS}
 	-rm -f libkernel.a
 	ar cr $@ $^
 
 p_Procs_Lib.o: p_Procs_Lib.inc
-
-kversion.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in
-	echo "#define feVersionId0 "  `date '+%Y%m%d%H'` >kversion.h
 
 # Hmm compiling with -fomit-frame-pointer resulted in access violation
 # under cygwin
@@ -319,7 +316,7 @@ clean: mostlyclean
 	-rm -f *.bak *.d *.dd depend *.a *.so*
 
 distclean: clean
-	-rm -f *~ .\#* kversion.h
+	-rm -f *~ .\#* 
 	-rm -f mod2.h Makefile TAGS* tags config.status config.cache config.log
 
 srcclean:

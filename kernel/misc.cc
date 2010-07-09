@@ -24,7 +24,6 @@
 #include "intvec.h"
 #include "ring.h"
 #include "p_Procs.h"
-#include "kversion.h"
 
 #define SI_DONT_HAVE_GLOBAL_VARS
 
