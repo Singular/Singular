@@ -485,9 +485,6 @@ lists primeFactorisation(const number n, const int pBound)
   int nnAsInt = nlInt(nn, NULL);
   if (nlIsZero(nn) || (nnAsInt != 0))
   {
-    nlDelete(&nn,NULL);
-    L->m[0].rtyp = INT_CMD;
-    L->m[0].data = (void *)nnAsInt;
     mpz_init_set_si(t,nnAsInt);
   }
   else
@@ -499,6 +496,18 @@ lists primeFactorisation(const number n, const int pBound)
   int L_ind=0;
   mpz_factor (t,LL,L_ind,ex);
 
+  nnAsInt = mpz_get_si(t);
+  nlDelete(&nn,NULL);
+  if (mpz_cmp_si(t,nnAsInt)==0)
+  {
+    L->m[0].rtyp = INT_CMD;
+    L->m[0].data = (void *)nnAsInt;
+  }
+  else
+  {
+    L->m[0].rtyp = BIGINT_CMD;
+    L->m[0].data = (void *)t;
+  }
   int i;
   for(i=0;i<L_ind;i++) ex[i]++;
   L->m[1].rtyp = LIST_CMD; L->m[1].data = (void *)makeListsObject(LL,L_ind);
