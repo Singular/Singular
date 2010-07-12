@@ -4071,9 +4071,13 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
       {
         x[j]=NULL; // nlInit(0...) takes no memory
       }
-      pSetCoeff(h,n);
-      //Print("new mon:");pWrite(h);
-      res_p=pAdd(res_p,h);
+      if (nlIsZero(n)) pDelete(&h);
+      else
+      {
+        pSetCoeff(h,n);
+        //Print("new mon:");pWrite(h);
+        res_p=pAdd(res_p,h);
+      }
     }
     result->m[i]=res_p;
   }
