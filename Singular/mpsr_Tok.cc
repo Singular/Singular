@@ -15,6 +15,9 @@
  *
  ***************************************************************/
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include"mod2.h"
 
 #ifdef HAVE_MPSR
