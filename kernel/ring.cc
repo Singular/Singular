@@ -1607,7 +1607,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->minideal=NULL;
   if (r->parameter!=NULL)
   {
-    res->minpoly=nCopy(r->minpoly);
+    if (r->minpoly!=NULL) res->minpoly=nCopy(r->minpoly);
     int l=rPar(r);
     res->parameter=(char **)omAlloc(l*sizeof(char_ptr));
     int i;
