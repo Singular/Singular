@@ -1212,7 +1212,6 @@ ideal singclap_sqrfree ( poly f)
     goto notImpl;
   }
   {
-    poly ff=pCopy(f); // a copy for the retry stuff
     // convert into ideal
     int n = L.length();
     if (n==0) n=1;
@@ -1242,6 +1241,7 @@ ideal singclap_sqrfree ( poly f)
       res->m[0]=pOne();
     }
   }
+  pDelete(&f);
   errorreported=save_errorreported;
 notImpl:
   if (res==NULL)
