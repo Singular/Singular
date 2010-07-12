@@ -309,11 +309,12 @@ void factor_using_division (mpz_t t, unsigned int limit, int *L, int &L_ind, int
   ai = 0;
   while (mpz_cmp_ui (t, 1) != 0)
   {
+    if (f>=((unsigned long)1 <<28)) break;
+    if (mpz_cmp_ui (t, f) < 0) break;
     mpz_tdiv_qr_ui (q, r, t, f);
     if (mpz_cmp_ui (r, 0) != 0)
     {
         f += addv[ai];
-        if (mpz_cmp_ui (q, f) < 0) break;
         ai = (ai + 1) & 7;
         failures++;
         if (failures > limit) break;
@@ -321,7 +322,8 @@ void factor_using_division (mpz_t t, unsigned int limit, int *L, int &L_ind, int
     else
     {
       mpz_swap (t, q);
-      if ((L_ind>0) && (L[L_ind-1]==f)) ex[L_ind-1]++;
+      // here: f in 0,,2^28-1:
+      if ((L_ind>0) && (L[L_ind-1]==(int)f)) ex[L_ind-1]++;
       else
       {
         L[L_ind]=f;
