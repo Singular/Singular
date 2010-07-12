@@ -3187,7 +3187,11 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
   number m = (number)u->Data();
   int bound = (int)(long)v->Data();
   number n;
-  if (u->Typ() == BIGINT_CMD) n = m;
+  if ((u->Typ() == BIGINT_CMD)
+  || ((u->Typ()==NUMBER_CMD) && rField_is_Q()))
+  {
+    n = nlCopy(m);
+  }
   else
   {
     /* then, we expect some other type of number inside m;
@@ -3196,6 +3200,7 @@ static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
     n = nlInit(i, NULL);
   }
   lists l = primeFactorisation(n, bound);
+  nlDelete(&n,NULL);
   res->data=(char*)l;
   return FALSE;
 }
@@ -4463,19 +4468,10 @@ static number jjLONG2N(long d)
 #endif
 static BOOLEAN jjPFAC1(leftv res, leftv v)
 {
-  number m = (number)v->Data();
-  number n;
-  if (v->Typ() == BIGINT_CMD) n = m;
-  else
-  {
-    /* then, we expect some other type of number inside m;
-       it needs to be converted to bigint; we do this via 'int' */
-    int i = n_Int(m, currRing);
-    n = nlInit(i, NULL);
-  }
-  lists l = primeFactorisation(n, 0);
-  res->data=(char*)l;
-  return FALSE;
+  sleftv tmp;
+  memset(&tmp,0,sizeof(tmp));
+  tmp.rtyp=INT_CMD;
+  return jjPFAC2(res,v,&tmp);
 }
 static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
 {
