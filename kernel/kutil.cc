@@ -356,6 +356,7 @@ void cancelunit (LObject* L,BOOLEAN inNF)
         //if (L->pLength > 0)
         L->pLength = 1;
         if (L->last != NULL) L->last = p;
+        L->max = NULL;
 
         if (L->t_p != NULL && pNext(L->t_p) != NULL)
           pNext(L->t_p) = NULL;
