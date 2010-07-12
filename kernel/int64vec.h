@@ -40,7 +40,7 @@ public:
 #endif
       return v[i];
     }
-  inline const int& operator[](int i) const
+  inline const int64& operator[](int i) const
     {
 #ifndef NDEBUG
       if((i<0)||(i>=row*col))
