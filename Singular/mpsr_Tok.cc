@@ -408,6 +408,7 @@ static short GetMPDictTok(short tok, MP_DictTag_t *dict, MP_Common_t *cop)
 
 
 // This actually generates the tables of mpsr_tok.inc
+char *mpsr_Tok_inc;
 void mpsr_ttGen()
 {
   mpsr_cmd mpsrcmds[MAX_TOK];
@@ -452,7 +453,16 @@ void mpsr_ttGen()
   }
 
   // Generate the template file
-  outfile = myfopen("mpsr_Tok.xx", "w");
+  mpsr_Tok_inc=omStrDup("mpsr_Tok.xxxxxxxx");
+  int pid=getpid();
+  mpsr_Tok_inc[8]=(pid %10)+'0'; pid/=10;
+  mpsr_Tok_inc[9]=(pid %10)+'0'; pid/=10;
+  mpsr_Tok_inc[10]=(pid %10)+'0'; pid/=10;
+  mpsr_Tok_inc[11]=(pid %10)+'0'; pid/=10;
+  mpsr_Tok_inc[12]=(pid %10)+'0'; pid/=10;
+  mpsr_Tok_inc[13]=(pid %10)+'0';
+
+  outfile = myfopen(mpsr_Tok_inc, "w");
   if (outfile == NULL)
   {
     fprintf(stderr, "Error: mpsr_ttGen: Cannot open file mpsr_Tok.inc\n");
