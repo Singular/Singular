@@ -465,6 +465,7 @@ long pWTotaldegree(poly p, const ring r)
         break;
       case ringorder_lp:
       case ringorder_ls:
+      case ringorder_rs:
       case ringorder_dp:
       case ringorder_ds:
       case ringorder_Dp:
