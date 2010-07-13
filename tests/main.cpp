@@ -41,7 +41,7 @@
 #include <cppunit/Exception.h>
 #include <cppunit/Message.h>
 
-#include <tests/Singular/Suite.hpp>
+#include <tests/Suite.hpp>
 
 int main(int /* argc */, char ** /*argv*/)
 {

@@ -24,14 +24,14 @@ file(GLOB test_hdrs "*.hpp")
 add_library(Singular-test ${test_hdrs} ${test_srcs} utils.cpp)
 target_link_libraries(Singular-test
   cppunit
-  singular.a
+  ${${PROJECT_NAME}_SOURCE_DIR}/Singular/libsingular.a
   ${${PROJECT_NAME}_SOURCE_DIR}/Singular/libsingular-tesths.o
   gmp readline
   ${CPPUNIT_STATIC_LIBRARIES}
   )
 
-add_executable(Singular_test_suite ${CMAKE_CURRENT_SOURCE_DIR}/../main.cpp)
-target_link_libraries(Singular_test_suite Singular-test)
+#add_executable(Singular_test_suite ${CMAKE_CURRENT_SOURCE_DIR}/../main.cpp)
+#target_link_libraries(Singular_test_suite Singular-test)
 
 # adding the tests
-add_test(Singular_test_suite ${CMAKE_CURRENT_BINARY_DIR}/Singular_test_suite)
+#add_test(Singular_test_suite ${CMAKE_CURRENT_BINARY_DIR}/Singular_test_suite)

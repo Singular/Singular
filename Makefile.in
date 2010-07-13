@@ -172,6 +172,9 @@ Tst-Long:  ${SINGULAR} Tst/Long/ok_l.lst Tst/regress.cmd
 
 ##############################################################
 test:
+	@echo "make Tst for the official Singular test suite"
+	@echo "this part here are unittest and still under development"
+	(cd Singular; make libsingular.a)
 	mkdir -p build
 	(cd build && cmake .. && make && make test)
 
