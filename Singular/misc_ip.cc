@@ -464,12 +464,16 @@ void mpz_factor (mpz_t t, int *L, int & L_ind, int *ex)
   {
     if (mpz_probab_prime_p (t, 3))
     {
-      if ((L_ind>0) && (mpz_cmp_si(t,L[L_ind-1])==0)) ex[L_ind-1]++;
+      if ((L_ind>0) && (mpz_cmp_si(t,L[L_ind-1])==0))
+      {
+        ex[L_ind-1]++;
+      }
       else
       {
         L[L_ind]=mpz_get_si(t);
         L_ind++;
       }
+      mpz_set_si(t,1);
     }
     else
       factor_using_pollard_rho (t, 1, L,L_ind,ex);
