@@ -281,7 +281,7 @@ void factor_using_division (mpz_t t, unsigned int limit, int *L, int &L_ind, int
   for (;;)
   {
     mpz_tdiv_qr_ui (q, r, t, 3);
-    if (mpz_cmp_ui (r, 0) != 0) break;
+    if (mpz_cmp_ui (r, 0) != 0)  break;
     mpz_set (t, q);
     if ((L_ind>0) && (L[L_ind-1]==3)) ex[L_ind-1]++;
     else
@@ -322,6 +322,7 @@ void factor_using_division (mpz_t t, unsigned int limit, int *L, int &L_ind, int
     else
     {
       mpz_swap (t, q);
+      //gmp_printf("%d: %Zd\n",f,t);
       // here: f in 0,,2^28-1:
       if ((L_ind>0) && (L[L_ind-1]==(int)f)) ex[L_ind-1]++;
       else
@@ -462,18 +463,16 @@ void mpz_factor (mpz_t t, int *L, int & L_ind, int *ex)
 
   if (mpz_cmp_ui (t, 1) != 0)
   {
-    if (mpz_probab_prime_p (t, 3))
+    if (mpz_probab_prime_p (t, 10))
     {
-      if ((L_ind>0) && (mpz_cmp_si(t,L[L_ind-1])==0))
-      {
-        ex[L_ind-1]++;
-      }
-      else
+      int tt=mpz_get_si(t);
+      // check if t fits into int:
+      if ((mpz_size1(t)==1)&&(mpz_cmp_si(t,tt)==0))
       {
         L[L_ind]=mpz_get_si(t);
         L_ind++;
+        mpz_set_si(t,1);
       }
-      mpz_set_si(t,1);
     }
     else
       factor_using_pollard_rho (t, 1, L,L_ind,ex);
@@ -495,7 +494,7 @@ lists primeFactorisation(const number n, const int pBound)
   }
   else
   {
-    mpz_init_set(t,(mpz_ptr)nn);
+    mpz_init_set(t,(mpz_ptr)nn->z);
   }
   int *LL=(int*)omAlloc0(1000*sizeof(int));
   int *ex=(int*)omAlloc0(1000*sizeof(int));
@@ -503,17 +502,19 @@ lists primeFactorisation(const number n, const int pBound)
   mpz_factor (t,LL,L_ind,ex);
 
   nnAsInt = mpz_get_si(t);
-  nlDelete(&nn,NULL);
-  if (mpz_cmp_si(t,nnAsInt)==0)
+  if ((mpz_size1(t)==1) && (mpz_cmp_si(t,nnAsInt)==0))
   {
+    nlDelete(&nn,NULL);
     L->m[0].rtyp = INT_CMD;
     L->m[0].data = (void *)nnAsInt;
   }
   else
   {
+    mpz_set(nn->z,t);
     L->m[0].rtyp = BIGINT_CMD;
-    L->m[0].data = (void *)t;
+    L->m[0].data = (void *)nn;
   }
+  mpz_clear(t);
   int i;
   for(i=0;i<L_ind;i++) ex[i]++;
   L->m[1].rtyp = LIST_CMD; L->m[1].data = (void *)makeListsObject(LL,L_ind);
