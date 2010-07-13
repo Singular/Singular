@@ -143,14 +143,18 @@ int main(          /* main entry to Singular */
   extern void ttGen4();
   extern void mpsr_ttGen(); // For initialization of (CMD, MP_COP) tables
   extern char *iparith_inc;
+  #ifdef HAVE_MPSR
   extern char *mpsr_Tok_inc;
+  #endif
   mpsr_ttGen();
   ttGen4();
   ttGen1();
   ttGen2b();
   rename(iparith_inc,"iparith.inc");
   rename("plural_cmd.xx","plural_cmd.inc");
+  #ifdef HAVE_MPSR
   rename(mpsr_Tok_inc,"mpsr_Tok.inc");
+  #endif
 #else
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   omInitRet_2_Info(argv[0]);
