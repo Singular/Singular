@@ -8,5 +8,5 @@ x^2+y^2+z^2-1;
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
     

@@ -12,5 +12,5 @@ a^2+2*d*e+2*c*f+2*b*g+a;
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
     

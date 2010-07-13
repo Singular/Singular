@@ -11,5 +11,5 @@ x1*x2*x3*x4*x5*x6-1;
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
     

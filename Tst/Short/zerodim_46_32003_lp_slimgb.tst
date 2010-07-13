@@ -9,5 +9,5 @@ t^2*x+x*y^2+x*z^2+x-1;
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
     

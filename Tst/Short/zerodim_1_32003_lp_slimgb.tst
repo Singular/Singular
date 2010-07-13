@@ -7,5 +7,5 @@ x1^2+x1*x2+2*x2^2-16;
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
     

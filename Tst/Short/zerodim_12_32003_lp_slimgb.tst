@@ -8,5 +8,5 @@ x^3+x^2*y+2*y^3+3*x*y*z+6*y^2*z+5*x*y+y*z+3*x+1,
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
     

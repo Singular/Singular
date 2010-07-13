@@ -7,5 +7,5 @@ x^2+6*x+3*y-4;
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
     
