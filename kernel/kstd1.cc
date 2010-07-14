@@ -1359,7 +1359,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     if (strat->kHEdgeFound)
     {
       if ((TEST_OPT_FINDET)
-      || ((TEST_OPT_MULTBOUND) && (scMult0Int((strat->Shdl)) < mu)))
+      || ((TEST_OPT_MULTBOUND) && (scMult0Int((strat->Shdl)) < Kstd1_mu)))
       {
         // obachman: is this still used ???
         /*

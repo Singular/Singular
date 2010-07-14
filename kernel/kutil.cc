@@ -216,7 +216,7 @@ static inline int pDivComp(poly p, poly q)
 
 int     HCord;
 int     Kstd1_deg;
-int     mu=32000;
+int     Kstd1_mu=32000;
 
 /*2
 *deletes higher monomial of p, re-compute ecart and length

@@ -35,8 +35,7 @@ ideal kStdShift(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp
 /* the following global data are defined in kutil.cc */
 //extern int syzComp;
   /*stop building pairs after that component --> ideals.cc, syz.cc */
-extern int LazyPass,LazyDegree,mu,Kstd1_deg;
-#define Kstd1_mu mu
+extern int LazyPass,LazyDegree,Kstd1_mu,Kstd1_deg;
   /*parameters for Lazy or global stops --> ipshell.cc, grammar.y*/
 extern BITSET kOptions;
   /*the known test options (a constant)*/
