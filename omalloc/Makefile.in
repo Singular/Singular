@@ -127,7 +127,7 @@ libomalloc_ndebug.a: $(OBJS_NDEBUG) Makefile omConfig.h omlimits.h mylimits.h
 	$(AR) cr $@ $(OBJS_NDEBUG)
 	$(RANLIB) $@
 
-omalloc.h: $(HEADERS)
+omalloc.h: $(HEADERS) omTables.h
 	./makeheader om_Alloc.h $@
 
 omalloc.o: omalloc.c omalloc.h
