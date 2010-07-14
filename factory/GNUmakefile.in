@@ -446,15 +446,15 @@ distfiles :=	\
 #
 
 # how to create library objets
-%.o: %.cc config.h
+%.o: %.cc config.h factoryconf.h
 	$(CXX) -c $< $(LIBCXXFLAGS) -o $@
 %.o: %.c config.h
 	$(CC) -c $< $(LIBCFLAGS) -o $@
 # the debug version:
-%.og: %.cc config.h
+%.og: %.cc config.h factoryconf.h
 	$(CXX) -g -c $< $(LIBCGGFLAGS) -o $@
 # the profiling version:
-%.op: %.cc config.h
+%.op: %.cc config.h factoryconf.h
 	$(CXX) -O -pg -c $< $(LIBCGGFLAGS) -o $@
 
 # how to create dependency files.  To avoid broken dependency files
