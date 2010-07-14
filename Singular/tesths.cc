@@ -49,7 +49,7 @@ extern "C"
 {
   void omSingOutOfMemoryFunc()
   {
-    fprintf(stderr, "\nerror: no more memory\n");
+    fprintf(stderr, "\nSingular error: no more memory\n");
     omPrintStats(stderr);
     m2_end(14);
     /* should never get here */

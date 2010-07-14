@@ -77,7 +77,7 @@ mmGetBlock( void )
     memBlock * dummy = (memBlock*)malloc( sizeof( memBlock ) );
 
     if ( dummy == NULL ) {
-	(void)fprintf( stderr, "\nerror: no more memory\n" );
+	(void)fprintf( stderr, "\nSingular-Factory error: no more memory\n" );
 	exit(14);
     }
     dummy->next = mm_theBlocks;
