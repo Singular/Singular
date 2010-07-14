@@ -364,7 +364,9 @@ libsingular-tesths.o: tesths.cc
 
 iparith.o mpsr_Tok.o : iparith.inc mpsr_Tok.inc
 
-cntrlc.o cntrlc.og : feOptES.inc feOptTS.inc feOpt.inc
+cntrlc.o cntrlc.og : feOptES.inc feOptTS.inc feOpt.inc version.h
+
+misc_ip.o emacs.o tesths.o: version.h
 
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<
