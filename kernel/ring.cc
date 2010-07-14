@@ -4105,7 +4105,7 @@ void p_DebugPrint(poly p, const ring r)
       Print("%ld ",p->exp[i]);
     PrintLn();
     Print("v0:%ld ",p_GetComp(p, r));
-    for(i=1;i<=r->N;i++) Print(" v%d:%d",i,p_GetExp(p,i, r));
+    for(i=1;i<=r->N;i++) Print(" v%d:%ld",i,p_GetExp(p,i, r));
     PrintLn();
     pIter(p);
     j--;
@@ -4127,7 +4127,7 @@ static inline void m_DebugPrint(const poly p, const ring R)
     Print("%09lx ", p->exp[i]);
   PrintLn();
   Print("v0:%9ld ", p_GetComp(p, R));
-  for(int i = 1; i <= R->N; i++) Print(" v%d:%5d",i, p_GetExp(p, i, R));
+  for(int i = 1; i <= R->N; i++) Print(" v%d:%5ld",i, p_GetExp(p, i, R));
   PrintLn();
 }
 

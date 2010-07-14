@@ -650,7 +650,9 @@ int siRand();
 static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
 static inline int si_min(const int a, const int b)  { return (a<b) ? a : b; }
 static inline long si_max(const long a, const long b)  { return (a>b) ? a : b; }
+static inline unsigned long si_max(const unsigned long a, const unsigned long b)  { return (a>b) ? a : b; }
 static inline long si_min(const long a, const long b)  { return (a<b) ? a : b; }
+static inline unsigned long si_min(const unsigned long a, const unsigned long b)  { return (a<b) ? a : b; }
 #else
 #define si_max(A,B) ((A) > (B) ? (A) : (B))
 #define si_min(A,B) ((A) < (B) ? (A) : (B))

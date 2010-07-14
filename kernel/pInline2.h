@@ -112,16 +112,16 @@ PINLINE2 int p_Comp_k_n(poly a, poly b, int k, ring r)
 /// 1. the position of a variable in the exponent vector p->exp (lower 24 bits)
 /// 2. number of bits to shift to the right in the upper 8 bits (which takes at most 6 bits for 64 bit)
 /// Thus VarOffset always has 2 zero higher bits!
-PINLINE2 int p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
+PINLINE2 long p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
 {
   pAssume2((VarOffset >> (24 + 6)) == 0);
 #if 0
   int pos=(VarOffset & 0xffffff);
   int bitpos=(VarOffset >> 24);
-  int exp=(p->exp[pos] >> bitmask) & iBitmask;
+  unsigned long exp=(p->exp[pos] >> bitmask) & iBitmask;
   return exp;
 #else
-  return (int)
+  return (long)
          ((p->exp[(VarOffset & 0xffffff)] >> (VarOffset >> 24))
           & iBitmask);
 #endif
@@ -131,15 +131,15 @@ PINLINE2 int p_GetExp(const poly p, const unsigned long iBitmask, const int VarO
 /// set a single variable exponent
 /// @Note:
 /// VarOffset encodes the position in p->exp @see p_GetExp
-PINLINE2 int p_SetExp(poly p, const int e, const unsigned long iBitmask, const int VarOffset)
+PINLINE2 unsigned long p_SetExp(poly p, const unsigned long e, const unsigned long iBitmask, const int VarOffset)
 {
   pAssume2(e>=0);
-  pAssume2((unsigned long) e<=iBitmask);
+  pAssume2(e<=iBitmask);
   pAssume2((VarOffset >> (24 + 6)) == 0);
 
   // shift e to the left:
   register int shift = VarOffset >> 24;
-  unsigned long ee = ((unsigned long)e) << shift /*(VarOffset >> 24)*/;
+  unsigned long ee = e << shift /*(VarOffset >> 24)*/;
   // find the bits in the exponent vector
   register int offset = (VarOffset & 0xffffff);
   // clear the bits in the exponent vector:
@@ -164,28 +164,28 @@ PINLINE2 unsigned long BitMask(unsigned long bitmask, int twobits)
 
 
 /// @Note: we may add some more info (6 ) into VarOffset and thus encode
-PINLINE2 int p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
+PINLINE2 long p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
 {
   int pos  =(VarOffset & 0xffffff);
   int hbyte= (VarOffset >> 24); // the highest byte
   int bitpos = hbyte & 0x3f; // last 6 bits
-  int bitmask = BitMask(iBitmask, hbyte >> 6);
+  long bitmask = BitMask(iBitmask, hbyte >> 6);
 
-  int exp=(p->exp[pos] >> bitpos) & bitmask;
+  long exp=(p->exp[pos] >> bitpos) & bitmask;
   return exp;
 
 }
 
-PINLINE2 int p_SetExp(poly p, const int e, const unsigned long iBitmask, const int VarOffset)
+PINLINE2 long p_SetExp(poly p, const long e, const unsigned long iBitmask, const int VarOffset)
 {
   pAssume2(e>=0);
-  pAssume2((unsigned long) e <= BitMask(iBitmask, VarOffset >> 30));
+  pAssume2(e <= BitMask(iBitmask, VarOffset >> 30));
 
   // shift e to the left:
   register int hbyte = VarOffset >> 24;
   int bitmask = BitMask(iBitmask, hbyte >> 6);
   register int shift = hbyte & 0x3f;
-  unsigned long ee = ((unsigned long)e) << shift;
+  long ee = e << shift;
   // find the bits in the exponent vector
   register int offset = (VarOffset & 0xffffff);
   // clear the bits in the exponent vector:
@@ -198,14 +198,14 @@ PINLINE2 int p_SetExp(poly p, const int e, const unsigned long iBitmask, const i
 #endif // #ifndef HAVE_EXPSIZES
 
 
-PINLINE2 int p_GetExp(const poly p, const ring r, const int VarOffset)
+PINLINE2 long p_GetExp(const poly p, const ring r, const int VarOffset)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(VarOffset != -1);
   return p_GetExp(p, r->bitmask, VarOffset);
 }
 
-PINLINE2 int p_SetExp(poly p, const int e, const ring r, const int VarOffset)
+PINLINE2 long p_SetExp(poly p, const long e, const ring r, const int VarOffset)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(VarOffset != -1);
@@ -215,7 +215,7 @@ PINLINE2 int p_SetExp(poly p, const int e, const ring r, const int VarOffset)
 
 
 /// get v^th exponent for a monomial
-PINLINE2 int p_GetExp(const poly p, const int v, const ring r)
+PINLINE2 long p_GetExp(const poly p, const int v, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(v>0 && v <= r->N);
@@ -225,7 +225,7 @@ PINLINE2 int p_GetExp(const poly p, const int v, const ring r)
 
 
 /// set v^th exponent for a monomial
-PINLINE2 int p_SetExp(poly p, const int v, const int e, const ring r)
+PINLINE2 long p_SetExp(poly p, const int v, const long e, const ring r)
 {
   p_LmCheckPolyRing2(p, r);
   pAssume2(v>0 && v <= r->N);
@@ -238,14 +238,14 @@ PINLINE2 int p_SetExp(poly p, const int v, const int e, const ring r)
 
 
 // the following should be implemented more efficiently
-PINLINE2  int p_IncrExp(poly p, int v, ring r)
+PINLINE2  long p_IncrExp(poly p, int v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   int e = p_GetExp(p,v,r);
   e++;
   return p_SetExp(p,v,e,r);
 }
-PINLINE2  int p_DecrExp(poly p, int v, ring r)
+PINLINE2  long p_DecrExp(poly p, int v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   int e = p_GetExp(p,v,r);
@@ -253,36 +253,36 @@ PINLINE2  int p_DecrExp(poly p, int v, ring r)
   e--;
   return p_SetExp(p,v,e,r);
 }
-PINLINE2  int p_AddExp(poly p, int v, int ee, ring r)
+PINLINE2  long p_AddExp(poly p, int v, long ee, ring r)
 {
   p_LmCheckPolyRing2(p, r);
   int e = p_GetExp(p,v,r);
   e += ee;
   return p_SetExp(p,v,e,r);
 }
-PINLINE2  int p_SubExp(poly p, int v, int ee, ring r)
+PINLINE2  long p_SubExp(poly p, int v, long ee, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  int e = p_GetExp(p,v,r);
+  long e = p_GetExp(p,v,r);
   pAssume2(e >= ee);
   e -= ee;
   return p_SetExp(p,v,e,r);
 }
-PINLINE2  int p_MultExp(poly p, int v, int ee, ring r)
+PINLINE2  long p_MultExp(poly p, int v, long ee, ring r)
 {
   p_LmCheckPolyRing2(p, r);
-  int e = p_GetExp(p,v,r);
+  long e = p_GetExp(p,v,r);
   e *= ee;
   return p_SetExp(p,v,e,r);
 }
 
-PINLINE2 int p_GetExpSum(poly p1, poly p2, int i, ring r)
+PINLINE2 long p_GetExpSum(poly p1, poly p2, int i, ring r)
 {
   p_LmCheckPolyRing2(p1, r);
   p_LmCheckPolyRing2(p2, r);
   return p_GetExp(p1,i,r) + p_GetExp(p2,i,r);
 }
-PINLINE2 int p_GetExpDiff(poly p1, poly p2, int i, ring r)
+PINLINE2 long p_GetExpDiff(poly p1, poly p2, int i, ring r)
 {
   return p_GetExp(p1,i,r) - p_GetExp(p2,i,r);
 }

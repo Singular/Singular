@@ -408,7 +408,7 @@ long pDeg(poly a, const ring r)
 long pTotaldegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
-  return (long) p_ExpVectorQuerSum(p, r);
+  return (long)p_ExpVectorQuerSum(p, r);
 }
 
 // pWTotalDegree for weighted orderings

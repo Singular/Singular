@@ -408,7 +408,7 @@ int maMaxDeg_Ma(ideal a,ring preimage_r)
     {
       for(j=N-1;j>=0;j--)
       {
-        m[j]=si_max(m[j],p_GetExp( p,j+1,preimage_r));
+        m[j]=si_max(m[j],(int)p_GetExp( p,j+1,preimage_r));
         if (m[j]>=MAX_MAP_DEG)
         {
           i=MAX_MAP_DEG;
@@ -442,7 +442,7 @@ int maMaxDeg_P(poly p,ring preimage_r)
   {
     for(j=N-1;j>=0;j--)
     {
-      m[j]=si_max(m[j],p_GetExp(p,j+1,preimage_r));
+      m[j]=si_max(m[j],(int)p_GetExp(p,j+1,preimage_r));
       if (m[j]>=MAX_MAP_DEG)
       {
         i=MAX_MAP_DEG;

@@ -75,15 +75,15 @@ PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, ring r);
 PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r);
 
 // Exponent
-PINLINE2 int p_GetExp(poly p, int v, ring r);
-PINLINE2 int p_SetExp(poly p, int v, int e, ring r);
-PINLINE2 int p_IncrExp(poly p, int v, ring r);
-PINLINE2 int p_DecrExp(poly p, int v, ring r);
-PINLINE2 int p_AddExp(poly p, int v, int ee, ring r);
-PINLINE2 int p_SubExp(poly p, int v, int ee, ring r);
-PINLINE2 int p_MultExp(poly p, int v, int ee, ring r);
-PINLINE2 int p_GetExpSum(poly p1, poly p2, int i, ring r);
-PINLINE2 int p_GetExpDiff(poly p1, poly p2, int i, ring r);
+PINLINE2 long p_GetExp(poly p, int v, ring r);
+PINLINE2 long p_SetExp(poly p, int v, long e, ring r);
+PINLINE2 long p_IncrExp(poly p, int v, ring r);
+PINLINE2 long p_DecrExp(poly p, int v, ring r);
+PINLINE2 long p_AddExp(poly p, int v, long ee, ring r);
+PINLINE2 long p_SubExp(poly p, int v, long ee, ring r);
+PINLINE2 long p_MultExp(poly p, int v, long ee, ring r);
+PINLINE2 long p_GetExpSum(poly p1, poly p2, int i, ring r);
+PINLINE2 long p_GetExpDiff(poly p1, poly p2, int i, ring r);
 
 /***************************************************************
  *
