@@ -127,7 +127,7 @@ void nlWrite (number &a, const ring r)
       return;
     }
     int l=mpz_sizeinbase(a->z,10);
-    if (a->s<2) l=si_max(l,mpz_sizeinbase(a->n,10));
+    if (a->s<2) l=si_max(l,(int)mpz_sizeinbase(a->n,10));
     l+=2;
     s=(char*)omAlloc(l);
     z=mpz_get_str(s,10,a->z);

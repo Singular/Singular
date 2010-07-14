@@ -68,7 +68,7 @@ static void ipPrint_MA0(matrix m, const char *name)
     /* make enough space for the "largest" name*/
     ss=(char *)omAlloc(14+strlen(name));
     sprintf(ss,"%s[%d,%d]",name,MATCOLS(m),MATROWS(m));
-    vl=si_max(vl,strlen(ss));
+    vl=si_max(vl,(int)strlen(ss));
     omFree(ss);
 
     /* convert all polys to string */
@@ -98,7 +98,7 @@ static void ipPrint_MA0(matrix m, const char *name)
           if ((i!=MATROWS(m)-1) || (j!=MATCOLS(m)-1))
           {
             strcat(ss,",");
-            vl=si_max(vl,strlen(ss));
+            vl=si_max(vl,(int)strlen(ss));
           }
         }
         k=strlen(s[i*MATCOLS(m)+j]);
