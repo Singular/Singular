@@ -130,13 +130,13 @@ libomalloc_ndebug.a: $(OBJS_NDEBUG) Makefile omConfig.h omlimits.h mylimits.h
 omalloc.h: $(HEADERS)
 	./makeheader om_Alloc.h $@
 
-omalloc.o: omalloc.c
+omalloc.o: omalloc.c omalloc.h
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_NDEBUG -c $< -o $@
 
-omalloc_debug.o: omalloc_debug.c
+omalloc_debug.o: omalloc_debug.c omalloc.h
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $< -o $@
 
-omTables.inc: omTables
+omTables.inc: omTables omalloc.h
 	./omTables > omTables.xx && mv omTables.xx  $@
 
 omTables.h: omTables
