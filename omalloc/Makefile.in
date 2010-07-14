@@ -83,7 +83,8 @@ omAllocPrivate.h       omError.h              omPage.h		\
 omAllocSystem.h        omFindExec.h           omStats.h		\
 omBin.h                omDefaultConfig.h      omStructs.h	\
 omBinPage.h            omInline.h             omGetBackTrace.h  \
-omReturn.h	       omRet2Info.h	      omAllocFunc.h		
+omReturn.h	       omRet2Info.h	      omAllocFunc.h     \
+omTables.h
 
 OBJS := $(CSOURCES:.c=.o)  $(GSOURCES:.c=.o)
 OBJS_NDEBUG := $(CSOURCES:.c=.o_ndebug) $(GSOURCES:.c=.o_ndebug)
