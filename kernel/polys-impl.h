@@ -173,7 +173,6 @@ void p_SetRingOfLeftv(leftv l, ring r);
 #define pFalseReturn(cond)           ((void)0)
 #define pAssume(cond)                ((void)0)
 #define pPolyAssume(cond, p,r)      ((void)0)
-#define pPolyAssumeReturn(cond)      ((void)0)
 #define pPolyAssumeReturn(cond,p,r) ((void)0)
 #define p_SetRingOfLm(p, r)          ((void)0)
 #define p_SetRingOfLeftv(l, r)       ((void)0)
