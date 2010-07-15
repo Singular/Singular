@@ -1973,8 +1973,11 @@ void rComposeRing(lists L, ring R)
   else if (R->ringflagb > 1)
   {
     R->ch = R->ringflagb;
-    if ((mpz_cmp_ui(R->ringflaga, 2) == 0) && (R->ringflagb + 2 <= 8*sizeof(NATNUMBER)))
+    if ((mpz_cmp_ui(R->ringflaga, 2) == 0) && (R->ringflagb < 8*sizeof(NATNUMBER)))
     {
+      /* this branch should be active for ringflagb = 2..31 resp. 2..63;
+         note that 2^31 resp 2^63 is the largest power of 2 that fits into
+         an unsigned long */
       R->ringtype = 1;       // Use Z/2^ch
     }
     else
@@ -4757,8 +4760,11 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     else if (ringflagb > 1)
     {
       ch = ringflagb;
-      if ((mpz_cmp_ui(ringflaga, 2) == 0) && (ringflagb + 2 <= 8*sizeof(NATNUMBER)))
+      if ((mpz_cmp_ui(ringflaga, 2) == 0) && (ringflagb < 8*sizeof(NATNUMBER)))
       {
+        /* this branch should be active for ringflagb = 2..31 resp. 2..63;
+           note that 2^31 resp 2^63 is the largest power of 2 that fits into
+           an unsigned long */
         ringtype = 1;       // Use Z/2^ch
       }
       else
