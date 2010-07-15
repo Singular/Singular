@@ -1102,6 +1102,9 @@ number kBucketPolyRed(kBucket_pt bucket,
   BOOLEAN reset_vec=FALSE;
   number rn;
 
+  /* we shall reduce bucket=bn*lm+... by p1=an*t+a1 where t=lm(p1)
+     and an,bn shall be defined further down only if lc(p1)!=1
+     we already know: an|bn and t|lm */
   if(a1==NULL)
   {
     p_LmDelete(&lm, bucket->bucket_ring);
@@ -1113,15 +1116,22 @@ number kBucketPolyRed(kBucket_pt bucket,
     number an = pGetCoeff(p1), bn = pGetCoeff(lm);
 //StringSetS("##### an = "); nWrite(an); PrintS(StringAppend("\n"));
 //StringSetS("##### bn = "); nWrite(bn); PrintS(StringAppend("\n"));
+    /* ksCheckCoeff: divide out gcd from an and bn: */
     int ct = ksCheckCoeff(&an, &bn);
+    /* the previous command returns ct=0 or ct=2 iff an!=1
+       note: an is now 1 or -1 */
+
+    /* setup factor for p1 which cancels leading terms */
     p_SetCoeff(lm, bn, bucket->bucket_ring);
     if ((ct == 0) || (ct == 2))
     {
-      kBucket_Mult_n(bucket, an);
-#ifdef HAVE_RINGS
-      if (rField_is_Ring(bucket->bucket_ring))
-        lm = p_Mult_nn(lm, an, bucket->bucket_ring);
-#endif
+      /* next line used to be here before but is WRONG:
+      kBucket_Mult_n(bucket, an); 
+        its use would result in a wrong sign for the tail of bucket
+        in the reduction */
+
+      /* correct factor for cancelation by changing sign if an=-1 */
+      lm = p_Mult_nn(lm, an, bucket->bucket_ring);
     }
     rn = an;
   }
@@ -1161,6 +1171,7 @@ number kBucketPolyRed(kBucket_pt bucket,
     //}
   }
   #endif
+
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
 
   if (backuped)
