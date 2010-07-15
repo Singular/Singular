@@ -30,7 +30,7 @@ ${SINGULAR}:
 ##############################################################
 # general targets
 # simply descend for these targets
-.PHONY: all install uninstall install_all
+.PHONY: all install uninstall install_all depend
 
 TEXINFO_TEX_FILES = epsf.tex texinfo.tex txi-cs.tex txi-de.tex txi-no.tex
 TEXINFO_TEX_DIR = Texinfo/doc
@@ -103,6 +103,14 @@ maintainer-install uninstall:
 
 install-doc:
 	cd doc; ${MAKE} install
+
+depend:
+	@ for SUBDIR in ${SUBDIRS}; \
+	do \
+	echo ${MAKE} $@ in $${SUBDIR}; \
+	cd $${SUBDIR} && ${MAKE} $@;\
+	cd ..;\
+	done
 
 ##############################################################
 # cleaning up

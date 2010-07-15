@@ -151,3 +151,6 @@ install-bindist: all
 		echo ${MAKE} install_bindir=${install_bindir} $@ in $${SUBDIR}; \
 		( cd $${SUBDIR} && ${MAKE} install_bindir=${install_bindir} $@;)|| true ;\
 	done
+
+depend:
+	@echo "No make depend available!"

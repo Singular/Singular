@@ -81,7 +81,7 @@ clean distclean mostlyclean maintainer-clean:
                rm -rf Makefile config.status config.log config.cache TAGS* \
                       *.gz *.tar *.tgz lib include info;;\
 	esac
-	
+
 libMP.a MP: force
 	cd MP; $(MAKE) all
 
@@ -113,7 +113,7 @@ mp-pvm3: force
 
 force:
 .PNONY: install uninstall 
-.PHONY: clean distclean force 
+.PHONY: clean distclean force depend
 
 dist: 
 	rm -rf ${DISTNAME}.tar* ${TEMPDIR}/${DISTNAME}*
@@ -143,4 +143,5 @@ configure: configure.in
 	touch configure
 #	autoconf 
 
-
+depend:
+	@echo "No make depend available!"

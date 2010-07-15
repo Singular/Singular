@@ -179,6 +179,9 @@ dist:	distclean
 	$(RM) ../libfac-${LIBFACVERSION}.tgz
 	(cd .. ; gtar -zcvf libfac-${LIBFACVERSION}.tgz libfac-${LIBFACVERSION})
 
+depend:
+	@echo "No make depend available!"
+
 ########## From here on: Only for internal use!
 #################################################
 

@@ -75,6 +75,9 @@ install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 clean: 
 	rm -f *.o *~  $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL) si_gcc_v.h
 
+depend:
+	@echo "No make depend available!"
+
 distclean: clean
 	-rm -f ${bindir}/$(MAIN1)
 	-rm -f ${bindir}/$(MAIN2)

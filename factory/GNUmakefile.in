@@ -460,19 +460,21 @@ distfiles :=	\
 # how to create dependency files.  To avoid broken dependency files
 # (which in turn break this GNUmakefile) we first generate them in
 # a temporary file which we then move to the destination file.
-%.d: %.cc factoryconf.h config.h
-	echo $@ "\\" > $@tmp
-	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@tmp
-	mv $@tmp $@
-%.d: %.c factoryconf.h config.h
-	echo $@ "\\" > $@tmp
-	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@tmp
-	mv $@tmp $@
-%.d: %.template
-	echo $@ $(@:.d=.h) : "\\" > $@tmp
-	sed -n '/^\/\*MAKEHEADER/!d; n; s/^#include "//; s/"//; p;' $< | tr '\012' ' ' >> $@tmp
-	echo >> $@tmp
-	mv $@tmp $@
+%.dtmp: %.cc factoryconf.h config.h
+	echo $*.d "\\" > $@
+	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@
+%.dtmp: %.c factoryconf.h config.h
+	echo $*.d "\\" > $@
+	$(CXX) -MM $< $(DEPCXXFLAGS) >> $@
+%.dtmp: %.template
+	echo $*.d $(@:.dtmp=.h) : "\\" > $@
+	sed -n '/^\/\*MAKEHEADER/!d; n; s/^#include "//; s/"//; p;' $< | tr '\012' ' ' >> $@
+	echo >> $@
+
+%d: %.dtmp
+	mv $< $@
+
+$(factorydep): $(factorydep:.d=.dtmp)
 
 # how to create header files from header templates
 %.h: %.template
@@ -754,6 +756,7 @@ maintainer-clean: distclean
 #
 depend:		$(factorydep) $(memmandep) $(hdrtempldep)
 
+	echo "WILDCARD"  ($(wildcard *.d),)
 ifneq ($(wildcard *.d),)
   include $(factorydep) $(memmandep) $(hdrtempldep)
 endif

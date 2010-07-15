@@ -820,9 +820,11 @@ installp: Singularp
 	echo $(@:.d=.og) $(@:.d=.op)" " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
+#Note: rewriting path because factory.h and omalloc.h are not in place before install
 depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h claptmpl.dd
-	-cat *.dd >depend
-
+	-cat *.dd | \
+	sed -e "s@\([^/]\)\(factory.h\)\|\(omalloc.h\)@\1$(includedir)/\2\3@g"\
+	 > depend
 ifeq (depend,$(wildcard depend))
 include depend
 endif

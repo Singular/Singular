@@ -29,3 +29,5 @@ install_all: install
 clean:
 	cd src;$(MAKE) clean;cd ..
 	-rm setup1 setup2 setup3 setup4
+depend:
+	@echo "No make depend available!"

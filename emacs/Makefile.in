@@ -55,3 +55,5 @@ install-sharedist: all
 	${INSTALL_DATA} .emacs-singular ${emacsdir}
 	${INSTALL_DATA} .emacs-general ${emacsdir}
 
+depend:
+	@echo "No make depend available!"

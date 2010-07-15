@@ -389,6 +389,9 @@ distclean: clean
 
 maintainer-clean: distclean
 
+depend:
+	@echo "No make depend available!"
+
 ${SINGULAR}:
 #	cd ..; ${MAKE} ${SINGULAR}
 
