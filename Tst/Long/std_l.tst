@@ -322,7 +322,7 @@ proc std_range(int from, int to, int charac, list orderings)
 int global_char = 32003;
 string global_ordering = "dp";
 
-option(prot);
+//option(prot);
 option(noredefine);
 
 list global_orderings = "dp", "lp", "Dp", "ls", "ds", "Ds";
