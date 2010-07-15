@@ -1131,7 +1131,10 @@ number kBucketPolyRed(kBucket_pt bucket,
         in the reduction */
 
       /* correct factor for cancelation by changing sign if an=-1 */
-      lm = p_Mult_nn(lm, an, bucket->bucket_ring);
+      if (rField_is_Ring())
+        lm = p_Mult_nn(lm, an, bucket->bucket_ring);
+      else
+        kBucket_Mult_n(bucket, an); 
     }
     rn = an;
   }
