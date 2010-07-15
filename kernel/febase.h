@@ -132,6 +132,9 @@ extern char     my_yylinebuf[80];
 extern "C" {
 #endif
 
+
+extern void (*WerrorS_callback)(const char *s);
+
 void    Werror(const char *fmt, ...) __attribute__((format(printf,1,2)));
 void    WerrorS(const char *s);
 void    WarnS(const char *s);
