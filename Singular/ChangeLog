@@ -1,6 +1,7 @@
 Thu Jul 15 17:12:09 CEST 2010 
 - ambigous overload of si_max resolved
 - added dependencies (enable parallel build)
+- at toplevel make depend possible (optional)
 Do 15. Jul 14:01:09 CEST 2010
 - release 3-1-1-4
 - SAGE patches from SAGE days 23.5
