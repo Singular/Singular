@@ -50,61 +50,6 @@ omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr));
 /*0 implementation*/
 
 /*2
-* the global exit routine of Singular
-*/
-#ifdef HAVE_MPSR
-void (*MP_Exit_Env_Ptr)()=NULL;
-#endif
-extern "C" {
-
-void m2_end(int i)
-{
-  fe_reset_input_mode();
-  #ifdef PAGE_TEST
-  mmEndStat();
-  #endif
-  #ifdef HAVE_TCL
-  if (tclmode)
-  {
-    PrintTCL('Q',0,NULL);
-  }
-  #endif
-  fe_reset_input_mode();
-  if (i<=0)
-  {
-    #ifdef HAVE_TCL
-    if (!tclmode)
-    #endif
-      if (TEST_V_QUIET)
-      {
-        if (i==0)
-          printf("Auf Wiedersehen.\n");
-        else
-          printf("\n$Bye.\n");
-      }
-    //#ifdef sun
-    //  #ifndef __svr4__
-    //    _cleanup();
-    //    _exit(0);
-    //  #endif
-    //#endif
-    exit(0);
-  }
-  else
-  {
-    #ifdef HAVE_TCL
-    if (!tclmode)
-    #endif
-      printf("\nhalt %d\n",i);
-  }
-  #ifdef HAVE_MPSR
-  if (MP_Exit_Env_Ptr!=NULL) (*MP_Exit_Env_Ptr)();
-  #endif
-  exit(i);
-}
-}
-
-/*2
 * the renice routine for very large jobs
 * works only on unix machines,
 * testet on : linux, HP 9.0
