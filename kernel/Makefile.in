@@ -448,11 +448,8 @@ libkernel_p.a: ${OBJP} ${DL_LIBSP} ${OBJSP2}
 	echo $(@:.d=.og) $(@:.d=.op) " " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-#Note: rewriting path because factory.h and omalloc.h are not in place before install
 depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h
-	cat *.d *.dd | \
-	sed -e "s@\([^/]\)\(factory.h\)\|\(omalloc.h\)@\1$(includedir)/\2\3@g"\
-	 > depend
+	cat *.d *.dd >depend
 
 ifeq (depend,$(wildcard depend))
 include depend
