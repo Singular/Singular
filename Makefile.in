@@ -30,7 +30,7 @@ ${SINGULAR}:
 ##############################################################
 # general targets
 # simply descend for these targets
-.PHONY: all install uninstall install_all depend
+.PHONY: all install uninstall install_all prepare-depend
 
 TEXINFO_TEX_FILES = epsf.tex texinfo.tex txi-cs.tex txi-de.tex txi-no.tex
 TEXINFO_TEX_DIR = Texinfo/doc
@@ -104,13 +104,19 @@ maintainer-install uninstall:
 install-doc:
 	cd doc; ${MAKE} install
 
-depend:
+prepare-depend:
 	@ for SUBDIR in ${SUBDIRS}; \
 	do \
 	echo ${MAKE} $@ in $${SUBDIR}; \
-	cd $${SUBDIR} && ${MAKE} $@;\
+	cd $${SUBDIR} && ${MAKE} depend;\
 	cd ..;\
-	done
+	done; \
+	for SUBDIR in kernel Singular; \
+	do \
+	sed -e "s@\([^/]\)\(omalloc.h\|omalloc.h\)@\1\$(includedir)/\2@g" \
+	  $${SUBDIR}/depend > $${SUBDIR}/depend.tmp; \
+	mv $${SUBDIR}/depend.tmp $${SUBDIR}/depend; \
+	done;
 
 ##############################################################
 # cleaning up
