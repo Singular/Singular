@@ -8278,6 +8278,7 @@ and its multiplicity (@code{mult}) is lower than @code{multBound}.
 @*Reset this bound by setting @code{multBound} to 0.
 @item @strong{Example:}
 @smallexample
+@c example
 ring r=0,(x,y,z),ds;
 ideal i,j;
 i=x7+y7+z6,x6+y8+z7,x7+y5+z8,
@@ -8288,6 +8289,7 @@ degree(j);
 multBound=0;  //disables multBound
 j=std(i);
 degree(j);
+@c example
 @end smallexample
 @end table
 @c ref
