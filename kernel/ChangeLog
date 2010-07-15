@@ -1,3 +1,5 @@
+Thu Jul 15 17:10:09 CEST 2010 dreyer:
+* ambigous overload of si_max resolved
 Fri Jan 19 17:56:20 CET 2001 hannes:
 * mod, div for intvec fixed
 * highcorner for global case fixed
