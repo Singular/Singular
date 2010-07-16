@@ -113,7 +113,7 @@ prepare-depend:
 	done; \
 	for SUBDIR in kernel Singular; \
 	do \
-	sed -e "s@\([^/]\)\(omalloc.h\|omalloc.h\)@\1\$(includedir)/\2@g" \
+	sed -e 's@\([^/]\)\(omalloc.h\|factory.h\)@\1$$(includedir)/\2@g' \
 	  $${SUBDIR}/depend > $${SUBDIR}/depend.tmp; \
 	mv $${SUBDIR}/depend.tmp $${SUBDIR}/depend; \
 	done;
