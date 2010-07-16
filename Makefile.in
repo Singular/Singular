@@ -107,7 +107,7 @@ install-doc:
 prepare-depend:
 	@ for SUBDIR in ${SUBDIRS}; \
 	do \
-	echo ${MAKE} $@ in $${SUBDIR}; \
+	echo ${MAKE} depend in $${SUBDIR}; \
 	cd $${SUBDIR} && ${MAKE} depend;\
 	cd ..;\
 	done; \
