@@ -217,7 +217,7 @@ CYGWIN_SINGULAR_BIN   = /usr/lib/${CYGWIN_SINGULAR_DIR}
 CYGWIN_SINGULAR_DOC   = /usr/share/doc/${CYGWIN_SINGULAR_DIR}-${CYGWIN_SING_VER}
 
 
-BINDIST_DIRS        = kernel Singular doc IntegerProgramming modules
+BINDIST_DIRS        = kernel Singular doc IntegerProgramming dyn_modules
 
 SHAREDIST_DIRS      = Singular doc emacs
 

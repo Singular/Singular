@@ -847,19 +847,19 @@ fi
 dnl if test -d rpm; then
 dnl  SUBDIRS="$SUBDIRS rpm"
 dnl fi
-if test -d modules; then
-  SUBDIRS="$SUBDIRS modules"
+if test -d dyn_modules; then
+  SUBDIRS="$SUBDIRS dyn_modules"
 fi
-if test -d "modules"; then
-dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/Makefile"
-   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" modules"
-   BUILD_SUBDIRS=$BUILD_SUBDIRS" modules"
+if test -d "dyn_modules"; then
+dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" dyn_modules/Makefile"
+   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" dyn_modules"
+   BUILD_SUBDIRS=$BUILD_SUBDIRS" dyn_modules"
 fi
   
 AC_MSG_CHECKING(whether to use libsvd)
 if test "$with_svd" = yes; then
   AC_MSG_RESULT(yes)
-dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" modules/Makefile"
+dnl    OUTPUT_MAKEFILES=$OUTPUT_MAKEFILES" dyn_modules/Makefile"
    CONFIG_SUBDIRS=$CONFIG_SUBDIRS" svd"
    BUILD_SUBDIRS=$BUILD_SUBDIRS" svd"
 else

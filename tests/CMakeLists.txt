@@ -16,7 +16,7 @@ add_subdirectory(Singular)
 add_subdirectory(kernel)
 
 set(test_srcs main.cpp
-	Singleton.cpp
+#	Singleton.cpp
   )
 
 add_executable(Singular_test_suite ${test_srcs})

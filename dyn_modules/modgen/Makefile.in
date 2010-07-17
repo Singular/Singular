@@ -45,7 +45,7 @@ MODGEN		= $(bindir)/modgen
 ## compiler and linker options
 ##
 CFLAGS	+= --no-rtti --no-exceptions -O3 -w -fomit-frame-pointer -pipe -fno-implicit-templates \
-	-g -I${includedir} -I../include -I../../kernel -I../../Singular -DNDEBUG -DMODULE_GENERATOR \
+	-g -I${includedir} -I../include -I${topsrcdir}/.. -DNDEBUG -DMODULE_GENERATOR \
 	-D${SING_UNAME}
 LIBS	+= -L/usr/local/lib
 

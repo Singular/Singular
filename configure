@@ -3006,12 +3006,12 @@ fi
 if test -d emacs; then
   SUBDIRS="$SUBDIRS emacs"
 fi
-if test -d modules; then
-  SUBDIRS="$SUBDIRS modules"
+if test -d dyn_modules; then
+  SUBDIRS="$SUBDIRS dyn_modules"
 fi
-if test -d "modules"; then
-   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" modules"
-   BUILD_SUBDIRS=$BUILD_SUBDIRS" modules"
+if test -d "dyn_modules"; then
+   CONFIG_SUBDIRS=$CONFIG_SUBDIRS" dyn_modules"
+   BUILD_SUBDIRS=$BUILD_SUBDIRS" dyn_modules"
 fi
   
 echo $ac_n "checking whether to use libsvd""... $ac_c" 1>&6

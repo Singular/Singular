@@ -7,7 +7,7 @@
 
 /* MYYSTYPE avoids including of Singular's struct.h, which is not needed. */
 #define MYYSTYPE
-#include <tok.h>
+#include <Singular/tok.h>
 #undef MYYSTYPE
 
 extern char type_conv[MAX_TOK][32];
