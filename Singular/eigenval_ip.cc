@@ -6,22 +6,22 @@
 * ABSTRACT: eigenvalues of constant square matrices
 */
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_EIGENVAL
 
-#include "febase.h"
-#include "tok.h"
-#include "ipid.h"
-#include "intvec.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ideals.h"
-#include "lists.h"
-#include "matpol.h"
-#include "clapsing.h"
-#include "eigenval.h"
-#include "eigenval_ip.h"
+#include <kernel/febase.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <kernel/intvec.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <Singular/lists.h>
+#include <kernel/matpol.h>
+#include <Singular/clapsing.h>
+#include <Singular/eigenval.h>
+#include <Singular/eigenval_ip.h>
 
 
 BOOLEAN evSwap(leftv res,leftv h)

@@ -9,28 +9,28 @@
 
 #include <string.h>
 
-#include "mod2.h"
-#include "static.h"
-#include "omalloc.h"
-#include "tok.h"
-#include "options.h"
-#include "ipshell.h"
-#include "intvec.h"
-#include "febase.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "polys.h"
-#include "ring.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "lists.h"
-#include "attrib.h"
-#include "silink.h"
-#include "syz.h"
-#include "ipid.h"
+#include <Singular/mod2.h>
+#include <Singular/static.h>
+#include <omalloc.h>
+#include <Singular/tok.h>
+#include <kernel/options.h>
+#include <Singular/ipshell.h>
+#include <kernel/intvec.h>
+#include <kernel/febase.h>
+#include <kernel/numbers.h>
+#include <kernel/longrat.h>
+#include <kernel/polys.h>
+#include <kernel/ring.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <Singular/lists.h>
+#include <Singular/attrib.h>
+#include <Singular/silink.h>
+#include <kernel/syz.h>
+#include <Singular/ipid.h>
 
 #ifdef HAVE_DYNAMIC_LOADING
-#include "mod_raw.h"
+#include <kernel/mod_raw.h>
 #endif /* HAVE_DYNAMIC_LOADING */
 
 omBin sip_command_bin = omGetSpecBin(sizeof(sip_command));
@@ -40,7 +40,7 @@ omBin idrec_bin = omGetSpecBin(sizeof(idrec));
 
 proclevel *procstack=NULL;
 #define TEST
-idhdl idroot = NULL;
+//idhdl idroot = NULL;
 
 idhdl currPackHdl = NULL;
 idhdl basePackHdl = NULL;

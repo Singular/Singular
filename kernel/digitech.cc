@@ -2,12 +2,12 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Id$ */
-#include "mod2.h"
-#include "ring.h"
+#include <kernel/mod2.h>
+#include <kernel/ring.h>
 
-#include "digitech.h"
-#include "kbuckets.h"
-#include "ideals.h"
+#include <kernel/digitech.h>
+#include <kernel/kbuckets.h>
+#include <kernel/ideals.h>
 static ideal zero_ideal;
 #if 1
 void bit_reduce(poly & f,ring r)

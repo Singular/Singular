@@ -8,22 +8,22 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "mod2.h"
-#include "structs.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "longrat.h"
-#include "modulop.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ideals.h"
-#include "ring.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/longrat.h>
+#include <kernel/modulop.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
 #ifdef HAVE_FACTORY
-#include "factory.h"
-#include "clapsing.h"
-#include "clapconv.h"
+#include <factory.h>
+#include <kernel/clapsing.h>
+#include <kernel/clapconv.h>
 #endif
-#include "longalg.h"
+#include <kernel/longalg.h>
 
 struct snaIdeal
 {

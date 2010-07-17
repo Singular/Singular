@@ -8,10 +8,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "mod2.h"
-#include "feOpt.h"
+#include <kernel/mod2.h>
+#include <Singular/feOpt.h>
 #if !defined(GENERATE_OPTION_INDEX) && !defined(ESINGULAR) && !defined(TSINGULAR)
-#include "options.h"
+#include <kernel/options.h>
 #endif
 
 // Define here which cmd-line options are recognized
@@ -288,13 +288,13 @@ static void feOptHelp(const char* name);
 // Return: NULL -- everything ok
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include "omalloc.h"
-#include "febase.h"
-#include "ipshell.h"
-#include "tok.h"
-#include "sdb.h"
-#include "cntrlc.h"
-#include "timer.h"
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <Singular/ipshell.h>
+#include <Singular/tok.h>
+#include <Singular/sdb.h>
+#include <Singular/cntrlc.h>
+#include <kernel/timer.h>
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS

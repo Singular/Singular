@@ -46,51 +46,51 @@
 #include <sys/types.h>
 
 
-#include "mod2.h"
-#include "intvec.h"
-#include "cntrlc.h"
-#include "options.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "ipshell.h"
-#include "ipconv.h"
-#include "longalg.h"
-#include "ffields.h"
-#include "subexpr.h"
-#include "p_Procs.h"
+#include <Singular/mod2.h>
+#include <kernel/intvec.h>
+#include <Singular/cntrlc.h>
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <Singular/ipshell.h>
+#include <Singular/ipconv.h>
+#include <kernel/longalg.h>
+#include <kernel/ffields.h>
+#include <Singular/subexpr.h>
+#include <kernel/p_Procs.h>
 
-#include "maps.h"
+#include <kernel/maps.h>
 
 /* include Hilbert-function */
-#include "stairc.h"
+#include <kernel/stairc.h>
 
 /** kstd2.cc */
-#include "kutil.h"
-#include "khstd.h"
+#include <kernel/kutil.h>
+#include <kernel/khstd.h>
 
-#include "walk.h"
-#include "polys.h"
-#include "ideals.h"
-#include "ipid.h"
-#include "tok.h"
-#include "febase.h"
-#include "numbers.h"
-#include "ipid.h"
-#include "ring.h"
-#include "kstd1.h"
-#include "matpol.h"
-#include "weight.h"
-#include "intvec.h"
-#include "syz.h"
-#include "lists.h"
-#include "prCopy.h"
-#include "string.h"
-#include "longalg.h"
+#include <Singular/walk.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <Singular/ipid.h>
+#include <Singular/tok.h>
+#include <kernel/febase.h>
+#include <kernel/numbers.h>
+#include <Singular/ipid.h>
+#include <kernel/ring.h>
+#include <kernel/kstd1.h>
+#include <kernel/matpol.h>
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
+#include <kernel/syz.h>
+#include <Singular/lists.h>
+#include <kernel/prCopy.h>
+#include <kernel/ring.h>
+#include <kernel/longalg.h>
 #ifdef HAVE_FACTORY
-#include "clapsing.h"
+#include <kernel/clapsing.h>
 #endif
 
-#include "mpr_complex.h"
+#include <kernel/mpr_complex.h>
 
 int nstep;
 

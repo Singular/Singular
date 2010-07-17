@@ -6,25 +6,25 @@
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
 
-#include "mod2.h"
-#include "omalloc.h"
-#include "options.h"
-#include "polys.h"
-#include "ideals.h"
-#include "febase.h"
-#include "kutil.h"
-#include "kstd1.h"
-#include "khstd.h"
+#include <kernel/mod2.h>
+#include <omalloc.h>
+#include <kernel/options.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/febase.h>
+#include <kernel/kutil.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
 //#include "cntrlc.h"
-#include "weight.h"
+#include <kernel/weight.h>
 //#include "ipshell.h"
-#include "intvec.h"
+#include <kernel/intvec.h>
 #ifdef HAVE_FACTORY
-#include "clapsing.h"
+#include <kernel/clapsing.h>
 #endif
-#include "ideals.h"
-#include "timer.h"
-#include "kstdfac.h"
+#include <kernel/ideals.h>
+#include <kernel/timer.h>
+#include <kernel/kstdfac.h>
 
 #ifdef HAVE_FACTORY
 

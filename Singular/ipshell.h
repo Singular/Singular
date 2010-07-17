@@ -8,8 +8,8 @@
 * ABSTRACT
 */
 #include <stdio.h>
-#include "structs.h"
-#include "ideals.h"
+#include <kernel/structs.h>
+#include <kernel/ideals.h>
 
 struct _ssubexpr;
 typedef struct _ssubexpr *Subexpr;

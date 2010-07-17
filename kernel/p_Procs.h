@@ -11,7 +11,7 @@
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
-#include "structs.h"
+#include <kernel/structs.h>
 
 /*------------- p_Proc stuff ----------------------*/
 typedef poly (*p_Copy_Proc_Ptr)(poly p, const ring r);

@@ -8,7 +8,7 @@
 
 /* I need myfread in standalone_parser */
 #ifndef STANDALONE_PARSER
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,13 +19,13 @@
 #include <unistd.h>
 
 #ifdef HAVE_PWD_H
-#include "pwd.h"
+#include <pwd.h>
 #endif
 
-#include "febase.h"
-#include "omalloc.h"
-#include "dError.h"
-#include "options.h"
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/dError.h>
+#include <kernel/options.h>
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
 /*0 implementation */

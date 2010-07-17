@@ -6,22 +6,22 @@
 * ABSTRACT - the mapping of polynomials to other rings
 */
 
-#include "mod2.h"
-#include "options.h"
-#include "febase.h"
-#include "polys.h"
-#include "numbers.h"
-#include "ring.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "omalloc.h"
-#include "kstd1.h"
-#include "longalg.h"
-#include "maps.h"
-#include "prCopy.h"
+#include <kernel/mod2.h>
+#include <kernel/options.h>
+#include <kernel/febase.h>
+#include <kernel/polys.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <omalloc.h>
+#include <kernel/kstd1.h>
+#include <kernel/longalg.h>
+#include <kernel/maps.h>
+#include <kernel/prCopy.h>
 
 #ifdef HAVE_PLURAL
-#include "gring.h"
+#include <kernel/gring.h>
 #endif
 
 // This is a very dirty way to "normalize" numbers w.r.t. a

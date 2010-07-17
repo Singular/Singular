@@ -4,13 +4,13 @@
 
 #ifndef POLYCPP_HEADER
 #define POLYCPP_HEADER
-#include "mod2.h"
-#include "IIntvec.h"
-#include "numbers.h"
-#include "Number.h"
-#include "febase.h"
-#include "polys.h"
-#include "ring.h"
+#include <kernel/mod2.h>
+#include <kernel/IIntvec.h>
+#include <kernel/numbers.h>
+#include <kernel/Number.h>
+#include <kernel/febase.h>
+#include <kernel/polys.h>
+#include <kernel/ring.h>
 
 
 #include <boost/shared_ptr.hpp>

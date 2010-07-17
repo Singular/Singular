@@ -7,7 +7,7 @@
 
 #define  NPOLYGON_CC
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_SPECTRUM
 
@@ -18,10 +18,10 @@
 #endif
 #endif
 
-#include "polys.h"
-#include "GMPrat.h"
-#include "kmatrix.h"
-#include "npolygon.h"
+#include <kernel/polys.h>
+#include <kernel/GMPrat.h>
+#include <kernel/kmatrix.h>
+#include <kernel/npolygon.h>
 
 // ----------------------------------------------------------------------------
 //  Allocate memory for a linear form of  k  terms

@@ -8,8 +8,8 @@
 * ABSTRACT: flex/bison interface
 */
 
-#include "structs.h"
-#include "subexpr.h"
+#include <kernel/structs.h>
+#include <Singular/subexpr.h>
 
 typedef union
 {

@@ -7,18 +7,18 @@
 */
 
 // #define PDEBUG 2
-#include "mod2.h"
-#include "options.h"
-#include "kutil.h"
-#include "numbers.h"
-#include "p_polys.h"
-#include "p_Procs.h"
-#include "gring.h"
+#include <kernel/mod2.h>
+#include <kernel/options.h>
+#include <kernel/kutil.h>
+#include <kernel/numbers.h>
+#include <kernel/p_polys.h>
+#include <kernel/p_Procs.h>
+#include <kernel/gring.h>
 #ifdef KDEBUG
-#include "febase.h"
+#include <kernel/febase.h>
 #endif
 #ifdef HAVE_RINGS
-#include "polys.h"
+#include <kernel/polys.h>
 #endif
 
 #ifdef KDEBUG

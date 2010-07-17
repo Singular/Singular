@@ -18,7 +18,7 @@
 #endif
 
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifndef NDEBUG
 #define OUTPUT 1

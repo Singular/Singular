@@ -11,7 +11,7 @@
 #define KUTIL_CC
 #include <stdlib.h>
 #include <string.h>
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -21,16 +21,16 @@
 
 
 #include <mylimits.h>
-#include "options.h"
-#include "gring.h"
-#include "sca.h"
+#include <kernel/options.h>
+#include <kernel/gring.h>
+#include <kernel/sca.h>
 #ifdef KDEBUG
 #undef KDEBUG
 #define KDEBUG 2
 #endif
 
 #ifdef HAVE_RINGS
-#include "ideals.h"
+#include <kernel/ideals.h>
 #endif
 
 // define if enterL, enterT should use memmove instead of doing it manually
@@ -43,26 +43,26 @@
 // system memmove -- it does not seem to pay off, though
 // #define ENTER_USE_MYMEMMOVE
 
-#include "kutil.h"
-#include "kbuckets.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ring.h"
-#include "ideals.h"
-#include "timer.h"
+#include <kernel/kutil.h>
+#include <kernel/kbuckets.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ring.h>
+#include <kernel/ideals.h>
+#include <kernel/timer.h>
 //#include "cntrlc.h"
-#include "stairc.h"
-#include "kstd1.h"
-#include "pShallowCopyDelete.h"
+#include <kernel/stairc.h>
+#include <kernel/kstd1.h>
+#include <kernel/pShallowCopyDelete.h>
 
 /* shiftgb stuff */
-#include "shiftgb.h"
-#include "prCopy.h"
+#include <kernel/shiftgb.h>
+#include <kernel/prCopy.h>
 
 #ifdef HAVE_RATGRING
-#include "ratgring.h"
+#include <kernel/ratgring.h>
 #endif
 
 #ifdef KDEBUG

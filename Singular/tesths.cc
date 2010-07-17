@@ -14,22 +14,22 @@
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
-#include "mod2.h"
-#include "tok.h"
-#include "options.h"
-#include "ipshell.h"
-#include "febase.h"
-#include "cntrlc.h"
-#include "omalloc.h"
-#include "silink.h"
-#include "ipid.h"
-#include "timer.h"
-#include "sdb.h"
-#include "fegetopt.h"
-#include "feOpt.h"
-#include "distrib.h"
-#include "version.h"
-#include "slInit.h"
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <kernel/options.h>
+#include <Singular/ipshell.h>
+#include <kernel/febase.h>
+#include <Singular/cntrlc.h>
+#include <omalloc.h>
+#include <Singular/silink.h>
+#include <Singular/ipid.h>
+#include <kernel/timer.h>
+#include <Singular/sdb.h>
+#include <kernel/fegetopt.h>
+#include <Singular/feOpt.h>
+#include <Singular/distrib.h>
+#include <Singular/version.h>
+#include <Singular/slInit.h>
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -40,7 +40,7 @@ extern int iiInitArithmetic();
 
 const char *singular_date=__DATE__ " " __TIME__;
 
-#include <si_gmp.h>
+#include <kernel/si_gmp.h>
 
 int mmInit( void );
 int mmIsInitialized=mmInit();
@@ -66,7 +66,7 @@ int mmInit( void )
 #if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
     /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
     /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
-    /* solution: correctly check OMALLOC_USES_MALLOC from omalloc.h, */
+#include <omalloc.h>
     /* do not rely on the default in Singular as libsingular may be different */
     mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
 #else
@@ -93,6 +93,9 @@ int siInit(char *name)
   feInitResources(name);
   iiInitArithmetic();
 
+#if 0
+  SingularBuilder::Ptr SingularInstance = SingularBuilder::instance();
+#else
   basePack=(package)omAlloc0(sizeof(*basePack));
   currPack=basePack;
   idhdl h;
@@ -104,6 +107,7 @@ int siInit(char *name)
 
   slStandardInit();
   myynest=0;
+#endif
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {
     int vv=verbose;
@@ -208,6 +212,9 @@ int main(          /* main entry to Singular */
   }
 
   /* say hello */
+#if 0
+  SingularBuilder::Ptr SingularInstance = SingularBuilder::instance();
+#else
   {
     basePack=(package)omAlloc0(sizeof(*basePack));
     currPack=basePack;
@@ -218,6 +225,7 @@ int main(          /* main entry to Singular */
     currPackHdl=h;
     basePackHdl=h;
   }
+#endif
   if (TEST_V_QUIET)
   {
     (printf)(

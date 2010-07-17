@@ -9,23 +9,23 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "mod2.h"
-#include "structs.h"
-#include "febase.h"
-#include "kstd1.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "longalg.h"
-#include "modulop.h"
-#include "gnumpfl.h"
-#include "gnumpc.h"
-#include "ring.h"
-#include "ffields.h"
-#include "shortfl.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/numbers.h>
+#include <kernel/longrat.h>
+#include <kernel/longalg.h>
+#include <kernel/modulop.h>
+#include <kernel/gnumpfl.h>
+#include <kernel/gnumpc.h>
+#include <kernel/ring.h>
+#include <kernel/ffields.h>
+#include <kernel/shortfl.h>
 #ifdef HAVE_RINGS
-#include "rmodulo2m.h"
-#include "rmodulon.h"
-#include "rintegers.h"
+#include <kernel/rmodulo2m.h>
+#include <kernel/rmodulon.h>
+#include <kernel/rintegers.h>
 
 extern omBin gmp_nrz_bin;
 #endif

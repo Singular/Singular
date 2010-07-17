@@ -6,34 +6,34 @@
 * ABSTRACT: kernel: utils for shift GB and free GB
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_SHIFTBBA
-#include "febase.h"
-#include "ring.h"
-#include "polys.h"
-#include "numbers.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "kbuckets.h"
-#include "kstd1.h"
-#include "sbuckets.h"
-#include "p_Mult_q.h"
-#include "kutil.h"
-#include "structs.h"
-#include "omalloc.h"
-#include "khstd.h"
-#include "kbuckets.h"
-#include "weight.h"
-#include "intvec.h"
-#include "structs.h"
-#include "kInline.cc"
-#include "stairc.h"
-#include "weight.h"
-#include "intvec.h"
-#include "timer.h"
-#include "shiftgb.h"
-#include "sca.h"
+#include <kernel/febase.h>
+#include <kernel/ring.h>
+#include <kernel/polys.h>
+#include <kernel/numbers.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <kernel/kbuckets.h>
+#include <kernel/kstd1.h>
+#include <kernel/sbuckets.h>
+#include <kernel/p_Mult_q.h>
+#include <kernel/kutil.h>
+#include <kernel/structs.h>
+#include <omalloc.h>
+#include <kernel/khstd.h>
+#include <kernel/kbuckets.h>
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
+#include <kernel/structs.h>
+#include <kernel/kInline.cc>
+#include <kernel/stairc.h>
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
+#include <kernel/timer.h>
+#include <kernel/shiftgb.h>
+#include <kernel/sca.h>
 
 
 #define freeT(A,v) omFreeSize((ADDRESS)A,(v+1)*sizeof(int))

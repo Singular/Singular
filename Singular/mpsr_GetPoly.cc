@@ -12,29 +12,29 @@
  *
  *
  ***************************************************************/
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_MPSR
-#include "mylimits.h"
+#include <Singular/mylimits.h>
 
-#include "mpsr_Get.h"
+#include <Singular/mpsr_Get.h>
 
-#include "si_gmp.h"
-#include "omalloc.h"
-#include "tok.h"
-#include "ipid.h"
-#include "ring.h"
-#include "longalg.h"
-#include "maps.h"
-#include "ideals.h"
-#include "grammar.h"
-#include "febase.h"
-#include "modulop.h"
+#include <Singular/si_gmp.h>
+#include <omalloc.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <kernel/ring.h>
+#include <Singular/longalg.h>
+#include <kernel/maps.h>
+#include <kernel/ideals.h>
+#include <Singular/grammar.h>
+#include <kernel/febase.h>
+#include <Singular/modulop.h>
 
-#include "mpsr_Tok.h"
+#include <Singular/mpsr_Tok.h>
 
 #ifdef PARI_BIGINT_TEST
-#include "MP_PariBigInt.h"
+#include <Singular/MP_PariBigInt.h>
 
 MP_Status_t IMP_MyGetApInt(MP_Link_pt link, MP_ApInt_t *apint)
 {

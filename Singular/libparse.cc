@@ -1056,23 +1056,23 @@ char *yytext;
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "mod2.h"
+#include <Singular/mod2.h>
 #ifdef STANDALONE_PARSER
   #include "utils.h"
   #define HAVE_LIBPARSER
   #define YYLPDEBUG 1
   #define myfread fread
 #else
-  #include "subexpr.h"
-  #include "grammar.h"
-  #include "ipshell.h"
-  #include "ipid.h"
-  #include "tok.h"
-  #include "options.h"
-  #include "febase.h"
-  #include "omalloc.h"
+  #include <Singular/subexpr.h>
+  #include <Singular/grammar.h>
+  #include <Singular/ipshell.h>
+  #include <Singular/ipid.h>
+  #include <Singular/tok.h>
+  #include <kernel/options.h>
+  #include <kernel/febase.h>
+#include <omalloc.h>
 #endif
-#include "libparse.h"
+#include <Singular/libparse.h>
 
 #ifdef HAVE_LIBPARSER
 #define YY_SKIP_YYWRAP

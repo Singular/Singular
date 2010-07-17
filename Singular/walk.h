@@ -9,7 +9,7 @@
 #ifndef WALK_H
 #define WALK_H
 
-#include "structs.h"
+#include <kernel/structs.h>
 
 ideal  MwalkInitialForm(ideal G, intvec* curr_weight);
 

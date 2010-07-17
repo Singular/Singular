@@ -15,18 +15,18 @@
 #include <stdio.h>
 
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 #ifdef PDEBUG
 
 // do the following to always enforce checking of pSetm
 // #undef PDEBUG
 // #define PDEBUG 2
 
-#include "p_polys.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "ring.h"
-#include "numbers.h"
+#include <kernel/p_polys.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/ring.h>
+#include <kernel/numbers.h>
 
 /***************************************************************
  *
@@ -345,7 +345,7 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level)
 
 #endif // PDEBUG
 
-#include "pInline1.h"
+#include <kernel/pInline1.h>
 
 #if defined(PDEBUG) || defined(PDIV_DEBUG)
 static unsigned long pDivisibleBy_number = 1;

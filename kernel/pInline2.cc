@@ -10,7 +10,7 @@
  *******************************************************************/
 #ifndef PINLINE2_CC
 #define PINLINE2_CC
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef PDEBUG
 
@@ -24,6 +24,6 @@
 
 #endif // PDEBUG
 
-#include "p_polys.h"
+#include <kernel/p_polys.h>
 
 #endif

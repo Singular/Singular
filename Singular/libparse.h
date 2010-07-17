@@ -72,7 +72,7 @@ public:
   procinfodata  data;
 };
 #else
-#include "febase.h"
+#include <kernel/febase.h>
 #endif
 
 procinfo *iiInitSingularProcinfo(procinfo* pi, const char *libname,

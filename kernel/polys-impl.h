@@ -15,8 +15,8 @@
  * encapsulations in polys.h should be used, instead.
  *
  ***************************************************************/
-#include "structs.h"
-#include "omalloc.h"
+#include <kernel/structs.h>
+#include <omalloc.h>
 
 /***************************************************************
  *

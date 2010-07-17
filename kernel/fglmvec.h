@@ -12,7 +12,7 @@
 #ifndef FGLMVEC_H
 #define FGLMVEC_H
 
-#include "numbers.h"
+#include <kernel/numbers.h>
 
 class fglmVectorRep;
 

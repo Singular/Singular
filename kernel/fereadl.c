@@ -7,11 +7,11 @@
 */
 
 
-#include "mod2.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "structs.h"
-#include "febase.h"
+#include <kernel/mod2.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/structs.h>
+#include <kernel/febase.h>
 
 #ifdef HAVE_FEREAD
   #include <unistd.h>
@@ -789,7 +789,7 @@ char * fe_fgets_stdin_fe(char *pr,char *s, int size)
 //#include <sys/stat.h>
 //#include <sys/errno.h>
 //#include <dlfcn.h>
-#include "mod_raw.h"
+#include <kernel/mod_raw.h>
 
   typedef char **CPPFunction ();
 

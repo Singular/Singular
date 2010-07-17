@@ -9,7 +9,7 @@
              currRing
 */
 
-#include "p_polys.h"
+#include <kernel/p_polys.h>
 /*
  Some general remarks:
  We divide poly operations into roughly 4 categories:

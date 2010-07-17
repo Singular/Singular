@@ -7,7 +7,7 @@
 
 #define MULTICNT_CC
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_SPECTRUM
 
@@ -20,7 +20,7 @@
 #endif
 #endif
 
-#include "multicnt.h"
+#include <kernel/multicnt.h>
 
 // ----------------------------------------------------------------------------
 //  allocate counter memory

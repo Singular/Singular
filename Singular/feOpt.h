@@ -8,7 +8,7 @@
 * ABSTRACT: Declarations for working with Options
 */
 
-#include "fegetopt.h"
+#include <kernel/fegetopt.h>
 
 extern const char SHORT_OPTS_STRING[];
 #define LONG_OPTION_RETURN 13
@@ -21,11 +21,11 @@ extern struct fe_option feOptSpec[];
 /* provides feOptIndex enum type for fast accesses to feOptSpec */
 #if ! defined(GENTABLE) && ! defined(GENERATE_DEPEND)
 #ifdef ESINGULAR
-#include "feOptES.inc"
+#include <Singular/feOptES.inc>
 #elif defined(TSINGULAR)
-#include "feOptTS.inc"
+#include <Singular/feOptTS.inc>
 #else
-#include "feOpt.inc"
+#include <Singular/feOpt.inc>
 #endif
 #else
 typedef enum {FE_OPT_UNDEF}  feOptIndex;

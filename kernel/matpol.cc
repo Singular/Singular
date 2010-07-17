@@ -10,20 +10,20 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include <mylimits.h>
-#include "structs.h"
-#include "kstd1.h"
-#include "polys.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "numbers.h"
-#include "ideals.h"
-#include "intvec.h"
-#include "ring.h"
-#include "sparsmat.h"
-#include "matpol.h"
-#include "prCopy.h"
+#include <kernel/structs.h>
+#include <kernel/kstd1.h>
+#include <kernel/polys.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/numbers.h>
+#include <kernel/ideals.h>
+#include <kernel/intvec.h>
+#include <kernel/ring.h>
+#include <kernel/sparsmat.h>
+#include <kernel/matpol.h>
+#include <kernel/prCopy.h>
 
 //omBin ip_smatrix_bin = omGetSpecBin(sizeof(ip_smatrix));
 #define ip_smatrix_bin sip_sideal_bin

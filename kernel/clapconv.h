@@ -11,9 +11,9 @@
 #ifndef INCL_SINGCONV_H
 #define INCL_SINGCONV_H
 
-#include "structs.h"
-#include "longalg.h"
-#include "ring.h"
+#include <kernel/structs.h>
+#include <kernel/longalg.h>
+#include <kernel/ring.h>
 #include <factory.h>
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r=currRing );

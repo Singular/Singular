@@ -7,19 +7,19 @@
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
 */
 
-#include "mod2.h"
-#include "options.h"
-#include "febase.h"
-#include "intvec.h"
-#include "ring.h"
-#include "polys.h"
-#include "ideals.h"
-#include "numbers.h"
-#include "sparsmat.h"
-#include "prCopy.h"
-#include "p_Procs.h"
-#include "kbuckets.h"
-#include "p_Mult_q.h"
+#include <kernel/mod2.h>
+#include <kernel/options.h>
+#include <kernel/febase.h>
+#include <kernel/intvec.h>
+#include <kernel/ring.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/numbers.h>
+#include <kernel/sparsmat.h>
+#include <kernel/prCopy.h>
+#include <kernel/p_Procs.h>
+#include <kernel/kbuckets.h>
+#include <kernel/p_Mult_q.h>
 
 // define SM_NO_BUCKETS, if sparsemat stuff should not use buckets
 // #define SM_NO_BUCKETS

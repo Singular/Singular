@@ -8,10 +8,10 @@
 * ABSTRACT: class intvec: lists/vectors of int64
 */
 #include <string.h>
-#include "structs.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "intvec.h"
+#include <kernel/structs.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/intvec.h>
 
 class int64vec
 {

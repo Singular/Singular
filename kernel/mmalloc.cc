@@ -7,7 +7,7 @@
 */
 #include <stdlib.h>
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #include <omalloc.h>
 #include <new>

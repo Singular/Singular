@@ -5,7 +5,7 @@
 /*
 * ABSTRACT: list interface
 */
-#include "lpolynomial.h"
+#include <kernel/lpolynomial.h>
 #ifndef LPLIST_HEADER
 #define LPLIST_HEADER
 

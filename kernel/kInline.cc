@@ -13,11 +13,11 @@
 
 #if !defined(NO_KINLINE) || defined(KUTIL_CC)
 
-#include "p_polys.h"
-#include "polys.h"
-#include "p_Procs.h"
-#include "kbuckets.h"
-#include "omalloc.h"
+#include <kernel/p_polys.h>
+#include <kernel/polys.h>
+#include <kernel/p_Procs.h>
+#include <kernel/kbuckets.h>
+#include <omalloc.h>
 
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary

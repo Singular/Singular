@@ -7,7 +7,7 @@
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
-#include "structs.h"
+#include <kernel/structs.h>
 
 poly pSubstPoly(poly p, int var, poly image);
 poly pSubstPar(poly p, int par, poly image);

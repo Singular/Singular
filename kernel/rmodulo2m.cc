@@ -7,19 +7,19 @@
 */
 
 #include <string.h>
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_RINGS
 #include <mylimits.h>
-#include "structs.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "mpr_complex.h"
-#include "ring.h"
-#include "rmodulo2m.h"
-#include "si_gmp.h"
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/longrat.h>
+#include <kernel/mpr_complex.h>
+#include <kernel/ring.h>
+#include <kernel/rmodulo2m.h>
+#include <kernel/si_gmp.h>
 
 int nr2mExp;
 

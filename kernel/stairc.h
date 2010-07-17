@@ -8,7 +8,7 @@
 * ABSTRACT
 */
 
-#include "structs.h"
+#include <kernel/structs.h>
 
 void scComputeHC(ideal s,ideal Q, int  k,poly &hEdge, ring tailRing = currRing);
 #if 0 // - alternative implementation for tests

@@ -8,8 +8,8 @@
 * ABSTRACT: general interface to links
 */
 
-#include "structs.h"
-#include "sing_dbm.h"
+#include <kernel/structs.h>
+#include <Singular/sing_dbm.h>
 
 // extension links:
 typedef BOOLEAN    (*slOpenProc)(si_link l, short flag);
@@ -84,7 +84,7 @@ inline si_link slCopy(si_link l)
   return l;
 }
 
-#include "omalloc.h"
+#include <omalloc.h>
 inline char* slString(si_link l)
 {
   if (l->name != NULL)

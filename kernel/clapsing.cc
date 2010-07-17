@@ -8,20 +8,20 @@
 */
 
 //#define FACTORIZE2_DEBUG
-#include "mod2.h"
-#include "omalloc.h"
+#include <kernel/mod2.h>
+#include <omalloc.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include "structs.h"
-#include "clapsing.h"
-#include "numbers.h"
-#include "ring.h"
-#include "ideals.h"
-#include "ffields.h"
+#include <kernel/structs.h>
+#include <kernel/clapsing.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
+#include <kernel/ideals.h>
+#include <kernel/ffields.h>
 #include <factory.h>
-#include "clapconv.h"
+#include <kernel/clapconv.h>
 #include <factor.h>
-#include "ring.h"
+#include <kernel/ring.h>
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 

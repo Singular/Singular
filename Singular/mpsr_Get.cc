@@ -13,7 +13,7 @@
  *
  ***************************************************************/
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_MPSR
 
@@ -21,12 +21,12 @@
 #include"mpsr_Get.h"
 #include"mpsr_Tok.h"
 
-#include "tok.h"
-#include "longrat.h"
-#include "intvec.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "lists.h"
+#include <Singular/tok.h>
+#include <kernel/longrat.h>
+#include <kernel/intvec.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <Singular/lists.h>
 
 #include <mylimits.h>
 

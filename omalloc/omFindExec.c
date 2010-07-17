@@ -7,7 +7,7 @@
  *******************************************************************/
 
 #ifdef HAVE_CONFIG_H
-#include "omConfig.h"
+#include <omalloc/omConfig.h>
 #endif
 
 #if defined(HAVE_UNISTD_H) && defined(STDC_HEADERS)
@@ -18,14 +18,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "omFindExec.h"
+#include <omalloc/omFindExec.h>
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
 
 #ifdef WINNT
-#include "om_Alloc.h"
+#include <omalloc/om_Alloc.h>
 #endif
 
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */

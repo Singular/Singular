@@ -11,7 +11,7 @@
 #ifndef SL_INIT_H
 #define SL_INIT_H
 
-#include "silink.h"
+#include <Singular/silink.h>
 
 #ifdef HAVE_MPSR
 si_link_extension slInitMPFileExtension(si_link_extension s);

@@ -10,25 +10,25 @@
 
 /* includes */
 #include <string.h>
-#include "mod2.h"
-#include "options.h"
-#include "numbers.h"
-#include "ffields.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "weight.h"
-#include "intvec.h"
-#include "longalg.h"
-#include "ring.h"
-#include "ideals.h"
-#include "polys.h"
+#include <kernel/mod2.h>
+#include <kernel/options.h>
+#include <kernel/numbers.h>
+#include <kernel/ffields.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
+#include <kernel/longalg.h>
+#include <kernel/ring.h>
+#include <kernel/ideals.h>
+#include <kernel/polys.h>
 //#include "ipid.h"
 #ifdef HAVE_FACTORY
-#include "clapsing.h"
+#include <kernel/clapsing.h>
 #endif
 
 #ifdef HAVE_RATGRING
-#include "ratgring.h"
+#include <kernel/ratgring.h>
 #endif
 
 /*-------- several access procedures to monomials -------------------- */

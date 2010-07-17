@@ -8,7 +8,7 @@
 * ABSTRACT: numbers modulo 2^m
 */
 #ifdef HAVE_RINGS
-#include "structs.h"
+#include <kernel/structs.h>
 
 extern int nr2mExp;
 extern NATNUMBER nr2mModul;

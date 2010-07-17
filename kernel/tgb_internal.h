@@ -8,16 +8,16 @@
 /*
  * ABSTRACT: tgb internal .h file
 */
-#include <omalloc.h>
-#include "p_polys.h"
+#include <omalloc/omalloc.h>
+#include <kernel/p_polys.h>
 
-#include "ideals.h"
-#include "ring.h"
-#include "febase.h"
-#include "options.h"
-#include "polys.h"
-#include "stdlib.h"
-#include <modulop.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/febase.h>
+#include <kernel/options.h>
+#include <kernel/polys.h>
+#include <stdlib.h>
+#include <kernel/modulop.h>
 #define USE_NORO 1
 
 
@@ -37,7 +37,7 @@
 //#define HAVE_BOOST 1
 //#define USE_STDVECBOOL 1
 #ifdef HAVE_BOOST
-#include "boost/dynamic_bitset.hpp"
+#include <omalloc.h>
 #include <vector>
 using boost::dynamic_bitset;
 using std::vector;
@@ -46,10 +46,10 @@ using std::vector;
 #include <vector>
 using std::vector;
 #endif
-#include "kutil.h"
-#include "kInline.cc"
-#include "kstd1.h"
-#include "kbuckets.h"
+#include <kernel/kutil.h>
+#include <kernel/kInline.cc>
+#include <kernel/kstd1.h>
+#include <kernel/kbuckets.h>
 
 
 

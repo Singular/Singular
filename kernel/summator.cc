@@ -18,13 +18,13 @@
 #define OM_TRACK 5
 #endif
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 #ifdef HAVE_PLURAL
-#include "summator.h" // for CPolynomialSummator class
-#include "options.h"
-#include "ring.h"
-#include "p_polys.h"
-#include "sbuckets.h"
+#include <kernel/summator.h>
+#include <kernel/options.h>
+#include <kernel/ring.h>
+#include <kernel/p_polys.h>
+#include <kernel/sbuckets.h>
 
 
 CPolynomialSummator::CPolynomialSummator(ring rBaseRing, bool bUsePolynomial):

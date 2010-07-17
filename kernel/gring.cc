@@ -17,37 +17,37 @@
 #define OM_TRACK 5
 #endif
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_PLURAL
 #define PLURAL_INTERNAL_DECLARATIONS
 
-#include "febase.h"
-#include "options.h"
-#include "ring.h"
-#include "polys.h"
-#include "numbers.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "kbuckets.h"
-#include "kstd1.h"
-#include "sbuckets.h"
-#include "prCopy.h"
-#include "p_Mult_q.h"
-#include "pInline1.h"
+#include <kernel/febase.h>
+#include <kernel/options.h>
+#include <kernel/ring.h>
+#include <kernel/polys.h>
+#include <kernel/numbers.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <kernel/kbuckets.h>
+#include <kernel/kstd1.h>
+#include <kernel/sbuckets.h>
+#include <kernel/prCopy.h>
+#include <kernel/p_Mult_q.h>
+#include <kernel/pInline1.h>
 
 // dirty tricks:
-#include "p_MemAdd.h"
+#include <kernel/p_MemAdd.h>
 
-#include "gring.h"
-#include "sca.h"
+#include <kernel/gring.h>
+#include <kernel/sca.h>
 #include <summator.h>
 
-#include <ncSAMult.h> // for CMultiplier etc classes
-#include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
+#include <kernel/ncSAMult.h> // for CMultiplier etc classes
+#include <kernel/ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
 #ifdef HAVE_RATGRING
-#include "ratgring.h"
+#include <kernel/ratgring.h>
 #endif
 
 

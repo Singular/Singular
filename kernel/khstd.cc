@@ -6,15 +6,15 @@
 * ABSTRACT:utils for hilbert driven kStd
 */
 
-#include "mod2.h"
-#include "febase.h"
-#include "options.h"
-#include "polys.h"
-#include "intvec.h"
-#include "kutil.h"
-#include "stairc.h"
-#include "kstd1.h"
-#include "khstd.h"
+#include <kernel/mod2.h>
+#include <kernel/febase.h>
+#include <kernel/options.h>
+#include <kernel/polys.h>
+#include <kernel/intvec.h>
+#include <kernel/kutil.h>
+#include <kernel/stairc.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
 
 
 /*2

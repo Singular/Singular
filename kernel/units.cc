@@ -6,16 +6,16 @@
 * ABSTRACT: procedures to compute with units
 */
 
-#include "mod2.h"
-#include "structs.h"
-#include "febase.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ideals.h"
-#include "intvec.h"
-#include "matpol.h"
-#include "kstd1.h"
-#include "units.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/intvec.h>
+#include <kernel/matpol.h>
+#include <kernel/kstd1.h>
+#include <kernel/units.h>
 
 ideal redNF(ideal N,ideal M,matrix U,int d,intvec *w)
 {

@@ -4,9 +4,9 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Id$ */
-#include "structs.h"
-#include "p_Procs.h"
-#include "pShallowCopyDelete.h"
+#include <kernel/structs.h>
+#include <kernel/p_Procs.h>
+#include <kernel/pShallowCopyDelete.h>
 
 //#define HAVE_COEF_BUCKETS
 

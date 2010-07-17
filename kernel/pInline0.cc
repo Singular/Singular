@@ -10,13 +10,13 @@
  *******************************************************************/
 #ifndef PINLINE0_CC
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #define PINLINE0_CC
 #undef DO_PINLINE0
 
 
-#include "pInline0.h"
+#include <kernel/pInline0.h>
 
 #endif // PINLINE_CC
 

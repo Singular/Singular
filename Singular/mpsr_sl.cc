@@ -9,7 +9,7 @@
  *  Version: $Id$
  *******************************************************************/
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_MPSR
 
@@ -20,14 +20,14 @@
 #include <signal.h>
 #endif
 #include <sys/wait.h>
-#include "mpsr.h"
-#include "tok.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "subexpr.h"
-#include "ipid.h"
-#include "silink.h"
-#include "feOpt.h"
+#include <Singular/mpsr.h>
+#include <Singular/tok.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <Singular/subexpr.h>
+#include <Singular/ipid.h>
+#include <Singular/silink.h>
+#include <Singular/feOpt.h>
 
 
 static int Batch_ReadEval(si_link silink);

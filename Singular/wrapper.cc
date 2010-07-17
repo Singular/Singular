@@ -1,12 +1,12 @@
 #include <string.h>
-#include "mod2.h"
-#include "febase.h"
-#include "polys.h"
-#include "kstd1.h"
-#include "subexpr.h"
-#include "ideals.h"
-#include "ring.h"
-#include "janet.h"
+#include <Singular/mod2.h>
+#include <kernel/febase.h>
+#include <kernel/polys.h>
+#include <kernel/kstd1.h>
+#include <Singular/subexpr.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <Singular/janet.h>
 
 //extern int (*ListGreatMove)(jList *,jList *,poly);
 extern int ComputeBasis(jList *,jList *);

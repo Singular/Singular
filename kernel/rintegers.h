@@ -8,7 +8,7 @@
 * ABSTRACT: numbers modulo n
 */
 #ifdef HAVE_RINGS
-#include "structs.h"
+#include <kernel/structs.h>
 
 extern int nrzExp;
 extern NATNUMBER nrzModul;

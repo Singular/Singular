@@ -4,7 +4,7 @@
  *           Linux kernel version 5
  *  Version: $Id$
  *******************************************************************/
-#include "omMalloc.h"
+#include <omalloc/omMalloc.h>
 
 #define __USE_XOPEN
 #define __USE_XOPEN_EXTENDED
@@ -334,7 +334,7 @@ Cambridge, MA 02139, USA.
 /* extern size_t __getpagesize __P ((void)); */
 #else
 #if 0 /* obachman: pasted in getpagesize.h manually */
-#include "getpagesize.h"
+#include <omalloc/getpagesize.h>
 #else
 
 #ifdef VMS

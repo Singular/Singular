@@ -6,14 +6,14 @@
 *  ABSTRACT -  Hilbert series
 */
 
-#include "mod2.h"
-#include "structs.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "intvec.h"
-#include "hutil.h"
-#include "stairc.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/intvec.h>
+#include <kernel/hutil.h>
+#include <kernel/stairc.h>
 
 static int  **Qpol;
 static int  *Q0, *Ql;

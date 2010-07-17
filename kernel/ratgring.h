@@ -10,8 +10,8 @@
 // #define HAVE_RATGRING to activate
 
 #ifdef HAVE_RATGRING
-#include "structs.h"
-#include "gring.h"
+#include <kernel/structs.h>
+#include <kernel/gring.h>
 
 /* MACROS */
 

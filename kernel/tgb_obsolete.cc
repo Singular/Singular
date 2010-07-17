@@ -1,4 +1,4 @@
-#include "tgb_internal.h"
+#include <kernel/tgb_internal.h>
 #if 0
 static void notice_miss(int i, int j, slimgb_alg* c){
   if (TEST_OPT_PROT)

@@ -8,20 +8,20 @@
 */
 
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 #ifdef HAVE_FACTORY
-#include "omalloc.h"
-#include "structs.h"
+#include <omalloc.h>
+#include <kernel/structs.h>
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include "clapconv.h"
-#include "numbers.h"
-#include "modulop.h"
-#include "longalg.h"
-#include "polys.h"
-#include "febase.h"
-#include "ring.h"
-#include "sbuckets.h"
-#include "ffields.h"
+#include <kernel/clapconv.h>
+#include <kernel/numbers.h>
+#include <kernel/modulop.h>
+#include <kernel/longalg.h>
+#include <kernel/polys.h>
+#include <kernel/febase.h>
+#include <kernel/ring.h>
+#include <kernel/sbuckets.h>
+#include <kernel/ffields.h>
 
 typedef __mpz_struct lint;
 

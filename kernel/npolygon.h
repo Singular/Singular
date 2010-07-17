@@ -8,7 +8,7 @@
 #ifndef NPOLYGON_H
 #define NPOLYGON_H
 
-#include "GMPrat.h"
+#include <kernel/GMPrat.h>
 
 // ----------------------------------------------------------------------------
 //  Class representing a linear form QQ^N-->QQ

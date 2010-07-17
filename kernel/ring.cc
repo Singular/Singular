@@ -9,7 +9,7 @@
 
 /* includes */
 #include <math.h>
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -17,27 +17,27 @@
 # define MYTEST 0
 #endif /* ifndef NDEBUG */
 
-#include "options.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "numbers.h"
-#include "febase.h"
-#include "intvec.h"
-#include "longalg.h"
-#include "ffields.h"
-#include "ideals.h"
-#include "ring.h"
-#include "prCopy.h"
-#include "../Singular/ipshell.h"
-#include "p_Procs.h"
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/numbers.h>
+#include <kernel/febase.h>
+#include <kernel/intvec.h>
+#include <kernel/longalg.h>
+#include <kernel/ffields.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/prCopy.h>
+#include <Singular/ipshell.h>
+#include <kernel/p_Procs.h>
 #ifdef HAVE_PLURAL
-#include "gring.h"
-#include "sca.h"
+#include <kernel/gring.h>
+#include <kernel/sca.h>
 #endif
-#include "maps.h"
-#include "matpol.h"
+#include <kernel/maps.h>
+#include <kernel/matpol.h>
 #ifdef HAVE_FACTORY
-#include "factory.h"
+#include <factory.h>
 #endif
 
 #define BITS_PER_LONG 8*SIZEOF_LONG

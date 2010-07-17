@@ -13,7 +13,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <signal.h>
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
@@ -33,85 +33,85 @@
 
 #include <unistd.h>
 
-#include "tok.h"
-#include "options.h"
-#include "ipid.h"
-#include "polys.h"
-#include "lists.h"
-#include "kutil.h"
-#include "cntrlc.h"
-#include "stairc.h"
-#include "ipshell.h"
-#include "modulop.h"
-#include "febase.h"
-#include "matpol.h"
-#include "longalg.h"
-#include "ideals.h"
-#include "kstd1.h"
-#include "syz.h"
-#include "sdb.h"
-#include "feOpt.h"
-#include "distrib.h"
-#include "prCopy.h"
-#include "mpr_complex.h"
-#include "ffields.h" // test GF only
+#include <Singular/tok.h>
+#include <kernel/options.h>
+#include <Singular/ipid.h>
+#include <kernel/polys.h>
+#include <Singular/lists.h>
+#include <kernel/kutil.h>
+#include <Singular/cntrlc.h>
+#include <kernel/stairc.h>
+#include <Singular/ipshell.h>
+#include <kernel/modulop.h>
+#include <kernel/febase.h>
+#include <kernel/matpol.h>
+#include <kernel/longalg.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include <kernel/syz.h>
+#include <Singular/sdb.h>
+#include <Singular/feOpt.h>
+#include <Singular/distrib.h>
+#include <kernel/prCopy.h>
+#include <kernel/mpr_complex.h>
+#include <kernel/ffields.h>
 
 #ifdef HAVE_RINGS
-#include "ringgb.h"
+#include <kernel/ringgb.h>
 #endif
 
 #ifdef HAVE_GFAN
-#include "gfan.h"
+#include <Singular/gfan.h>
 #endif
 
 #ifdef HAVE_F5
-#include "f5gb.h"
+#include <Singular/f5gb.h>
 #endif
 
 #ifdef HAVE_F5C
-#include "f5c.h"
+#include <Singular/f5c.h>
 #endif
 
 #ifdef HAVE_WALK
-#include "walk.h"
+#include <Singular/walk.h>
 #endif
 
-#include "weight.h"
-#include "fast_mult.h"
-#include "digitech.h"
+#include <kernel/weight.h>
+#include <kernel/fast_mult.h>
+#include <kernel/digitech.h>
 
 #ifdef HAVE_SPECTRUM
-#include "spectrum.h"
+#include <kernel/spectrum.h>
 #endif
 
 #ifdef HAVE_BIFAC
 #include <bifac.h>
 #endif
 
-#include "attrib.h"
+#include <Singular/attrib.h>
 
 #if defined(HPUX_10) || defined(HPUX_9)
 extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
 #ifdef HAVE_PLURAL
-#include "ring.h"
-#include "gring.h"
-#include "sca.h"
-#include <ncSAMult.h> // for CMultiplier etc classes
-#include "ipconv.h"
-#include "ratgring.h"
+#include <kernel/ring.h>
+#include <kernel/ring.h>
+#include <kernel/sca.h>
+#include <kernel/ncSAMult.h> // for CMultiplier etc classes
+#include <Singular/ipconv.h>
+#include <kernel/ring.h>
 #endif
 
 #ifdef ix86_Win /* only for the DLLTest */
 /* #include "WinDllTest.h" */
 #ifdef HAVE_DL
-#include "mod_raw.h"
+#include <Singular/mod_raw.h>
 #endif
 #endif
 
 // for tests of t-rep-GB
-#include "tgb.h"
+#include <kernel/tgb.h>
 
 // Define to enable many more system commands
 #undef MAKE_DISTRIBUTION
@@ -121,24 +121,24 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include "clapsing.h"
-#include "clapconv.h"
-#include "kstdfac.h"
+#include <kernel/clapsing.h>
+#include <kernel/clapconv.h>
+#include <kernel/kstdfac.h>
 #endif
 
-#include "silink.h"
-#include "walk.h"
+#include <Singular/silink.h>
+#include <Singular/walk.h>
 
-#include "fast_maps.h"
+#include <kernel/maps.h>
 
-#include "shiftgb.h"
+#include <kernel/shiftgb.h>
 
 #ifdef HAVE_EIGENVAL
-#include "eigenval_ip.h"
+#include <Singular/eigenval_ip.h>
 #endif
 
 #ifdef HAVE_GMS
-#include "gms.h"
+#include <Singular/gms.h>
 #endif
 
 /*
@@ -150,7 +150,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 //#ifndef HAVE_DYNAMIC_LOADING
 
 #ifdef HAVE_PCV
-#include "pcv.h"
+#include <Singular/pcv.h>
 #endif
 
 //#endif /* not HAVE_DYNAMIC_LOADING */
@@ -1979,15 +1979,15 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
 #ifdef HAVE_EXTENDED_SYSTEM
 // You can put your own system calls here
-#include "../kernel/fglmcomb.cc"
-#include "fglm.h"
+#include <kernel/fglmcomb.cc>
+#include <kernel/fglm.h>
 #ifdef HAVE_NEWTON
 #include <hc_newton.h>
 #endif
-#include "mpsr.h"
-#include "mod_raw.h"
-#include "ratgring.h"
-#include "shiftgb.h"
+#include <Singular/mpsr.h>
+#include <kernel/mod_raw.h>
+#include <kernel/ring.h>
+#include <kernel/shiftgb.h>
 
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 {

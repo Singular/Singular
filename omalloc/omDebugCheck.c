@@ -8,8 +8,8 @@
 #include <mylimits.h>
 #include <stdarg.h>
 
-#include "om_Alloc.h"
-#include "omDebug.h"
+#include <omalloc/om_Alloc.h>
+#include <omalloc/omDebug.h>
 
 #ifndef OM_NDEBUG
 /*******************************************************************

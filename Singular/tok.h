@@ -9,10 +9,10 @@
 /* $Id$ */
 
 #ifndef MYYSTYPE
-#include "structs.h"
+#include <kernel/structs.h>
 #endif
 #ifndef UMINUS
-#include "grammar.h"
+#include <Singular/grammar.h>
 #endif
 
 extern int      yylineno;

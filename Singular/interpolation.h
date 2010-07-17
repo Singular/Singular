@@ -9,7 +9,7 @@
 #ifndef INTERPOLATION_H
 #define INTERPOLATION_H
 
-#include "structs.h"
+#include <kernel/structs.h>
 
 BOOLEAN jjINTERPOLATION(leftv res, leftv l, leftv v);
 

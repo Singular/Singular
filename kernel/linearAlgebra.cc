@@ -16,13 +16,13 @@
 /*****************************************************************************/
 
 // include header files
-#include "mod2.h"
-#include "structs.h"
-#include "polys.h"
-#include "ideals.h"
-#include "numbers.h"
-#include "matpol.h"
-#include "linearAlgebra.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/numbers.h>
+#include <kernel/matpol.h>
+#include <kernel/linearAlgebra.h>
 
 /**
  * The returned score is based on the implementation of 'nSize' for

@@ -6,12 +6,12 @@
  *  Created: 11/99
  *  Version: $Id$
  *******************************************************************/
-#include "omConfig.h"
+#include <omalloc/omConfig.h>
 
 #if OM_PROVIDE_MALLOC > 0
 #if OM_PROVIDE_MALLOC > 1
-#include "omalloc_debug.c"
+#include <omalloc/omalloc_debug.c>
 #else
-#include "omalloc.c"
+#include <omalloc/omalloc.c>
 #endif
 #endif

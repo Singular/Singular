@@ -17,15 +17,15 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "mod2.h"
-#include "omalloc.h"
-#include "tok.h"
-#include "ipshell.h"
-#include "febase.h"
-#include "cntrlc.h"
-#include "polys.h"
-#include "feOpt.h"
-#include "version.h"
+#include <Singular/mod2.h>
+#include <omalloc.h>
+#include <Singular/tok.h>
+#include <Singular/ipshell.h>
+#include <kernel/febase.h>
+#include <Singular/cntrlc.h>
+#include <kernel/polys.h>
+#include <Singular/feOpt.h>
+#include <Singular/version.h>
 
 /* undef, if you don't want GDB to come up on error */
 

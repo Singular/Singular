@@ -8,8 +8,8 @@
 */
 /* $Id$ */
 
-#include "structs.h"
-#include "ring.h"
+#include <kernel/structs.h>
+#include <kernel/ring.h>
 
 extern short * ecartWeights;
 extern pFDegProc pFDegOld;

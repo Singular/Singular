@@ -23,10 +23,10 @@
   the global om_Opts struct.
 ********************************************************************/
 #include <mylimits.h>
-#include "omConfig.h"
+#include <omalloc/omConfig.h>
 /* if external config was provided, 'make' makes links from it to omExternalConfig.h */
 #ifdef OM_HAVE_EXTERNAL_CONFIG_H
-#include "omExternalConfig.h"
+#include <omalloc/omExternalConfig.h>
 #endif
 
 /* If this is larger than the track parameter given to the omDebug routines,

@@ -1,10 +1,10 @@
 #ifndef NUMBERCPP_HEADER
 #define NUMBERCPP_HEADER
 #include <boost/intrusive_ptr.hpp>
-#include "mod2.h"
-#include "numbers.h"
-#include "febase.h"
-#include "ring.h"
+#include <kernel/mod2.h>
+#include <kernel/numbers.h>
+#include <kernel/febase.h>
+#include <kernel/ring.h>
 using namespace boost;
 inline void intrusive_ptr_add_ref(ring r){
     r->ref++;

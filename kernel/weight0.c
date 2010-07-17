@@ -9,9 +9,9 @@
 
 #include <math.h>
 #include <string.h>
-#include "mod2.h"
-#include "omalloc.h"
-#include "structs.h"
+#include <kernel/mod2.h>
+#include <omalloc.h>
+#include <kernel/structs.h>
 
 double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx, double wwNsqr);

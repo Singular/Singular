@@ -14,8 +14,8 @@
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H
 
-#include "structs.h"
-#include "ring.h"
+#include <kernel/structs.h>
+#include <kernel/ring.h>
 
 
 

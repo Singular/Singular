@@ -8,16 +8,16 @@
  *  Created: 02/01
  *  Version: $Id$
  *******************************************************************/
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include <omalloc.h>
-#include "options.h"
-#include "p_polys.h"
-#include "prCopy.h"
-#include "ideals.h"
-#include "ring.h"
-#include "febase.h"
-#include "sbuckets.h"
-#include "fast_maps.h"
+#include <kernel/options.h>
+#include <kernel/p_polys.h>
+#include <kernel/prCopy.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/febase.h>
+#include <kernel/sbuckets.h>
+#include <kernel/fast_maps.h>
 
 // define if you want to use special dest_ring
 #define HAVE_DEST_R 1

@@ -7,8 +7,8 @@
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
-#include "structs.h"
-#include "ring.h"
+#include <kernel/structs.h>
+#include <kernel/ring.h>
 
 struct sip_sideal
 {

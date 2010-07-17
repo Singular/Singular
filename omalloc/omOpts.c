@@ -6,8 +6,8 @@
  *  Version: $Id$
  *******************************************************************/
 
-#include "om_Alloc.h"
-#include "omDefaultConfig.h"
+#include <omalloc/om_Alloc.h>
+#include <omalloc/omDefaultConfig.h>
 
 omOpts_t om_Opts =
 {

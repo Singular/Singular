@@ -8,16 +8,16 @@
 // to produce a non-inline version from lists.h
 #define LISTS_CC
 
-#include "mod2.h"
-#include "tok.h"
-#include "febase.h"
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <kernel/febase.h>
 //#include "ipid.h"
-#include "polys.h"
-#include "ideals.h"
-#include "attrib.h"
-#include "ipshell.h"
-#include "intvec.h"
-#include "lists.h"
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <Singular/attrib.h>
+#include <Singular/ipshell.h>
+#include <kernel/intvec.h>
+#include <Singular/lists.h>
 
 omBin slists_bin = omGetSpecBin(sizeof(slists));
 

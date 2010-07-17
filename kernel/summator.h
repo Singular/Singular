@@ -7,7 +7,7 @@
 
 // #include <summator.h> // for CPolynomialSummator class
 
-#include <structs.h>
+#include <kernel/structs.h>
 // #include <p_polys.h> // due to p_Copy :(
 
 

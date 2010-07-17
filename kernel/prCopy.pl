@@ -29,8 +29,8 @@ sub Generate
   {
     print "#undef PR_NAME\n";
     print "#define PR_NAME $prefix\n";
-    print "#include \"prCopyMacros.h\"\n";
-    print "#include \"prCopyTemplate.cc\"\n";
+    print "#include <kernel/prCopyMacros.h>\n";
+    print "#include <kernel/prCopyTemplate.cc>\n";
   }
   print "\n";
 }

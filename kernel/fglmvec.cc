@@ -12,14 +12,14 @@
 *   specialized for this purpose.
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_FGLM
-#include "omalloc.h"
-#include "structs.h"
-#include "numbers.h"
-#include "fglm.h"
-#include "fglmvec.h"
+#include <omalloc.h>
+#include <kernel/structs.h>
+#include <kernel/numbers.h>
+#include <kernel/fglm.h>
+#include <kernel/fglmvec.h>
 
 #define PROT(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)

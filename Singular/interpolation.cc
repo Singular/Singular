@@ -3,16 +3,16 @@
 ****************************************/
 /* $Id$ */
 
-#include "mod2.h"
-#include "options.h"
-#include "febase.h"
-#include "ideals.h"
-#include "intvec.h"
-#include "polys.h"
-#include "lists.h"
-#include "longrat.h"
-#include "ipid.h"
-#include "ring.h"
+#include <Singular/mod2.h>
+#include <kernel/options.h>
+#include <kernel/febase.h>
+#include <kernel/ideals.h>
+#include <kernel/intvec.h>
+#include <kernel/polys.h>
+#include <Singular/lists.h>
+#include <kernel/longrat.h>
+#include <Singular/ipid.h>
+#include <kernel/ring.h>
 #include <factory.h>
 
 //memory management

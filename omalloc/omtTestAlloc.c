@@ -5,7 +5,7 @@
  *  Created: 11/99
  *  Version: $Id$
  *******************************************************************/
-#include "omtTest.h"
+#include <omalloc/omtTest.h>
 
 #ifdef TEST_CHECK
 #define OM_CHECK CHECK_LEVEL
@@ -24,7 +24,7 @@
 #define omtTestDup     omtTestDupKeep
 #endif
 
-#include "omalloc.h"
+#include <omalloc/omalloc.h>
 
 #ifndef OM_ALIGNMENT_NEEDS_WORK
 #define omSmallSize2AlignedBin omSmallSize2Bin

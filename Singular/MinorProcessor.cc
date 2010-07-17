@@ -1,10 +1,10 @@
-#include "mod2.h"
-#include "structs.h"
-#include "polys.h"
+#include <Singular/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/polys.h>
 #include <MinorProcessor.h>
-#include "febase.h"
-#include "kstd1.h"
-#include "kbuckets.h"
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/kbuckets.h>
 
 #ifdef COUNT_AND_PRINT_OPERATIONS
 long addsPoly        = 0;    /* for the number of additions of two polynomials */

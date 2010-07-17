@@ -9,8 +9,8 @@
 /* $Id$ */
 
 /* includes */
-#include "structs.h"
-#include "polys-impl.h"
+#include <kernel/structs.h>
+#include <kernel/polys-impl.h>
 
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 

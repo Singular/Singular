@@ -12,18 +12,18 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include <mylimits.h>
-#include "omalloc.h"
-#include "structs.h"
-#include "options.h"
-#include "febase.h"
+#include <omalloc.h>
+#include <kernel/structs.h>
+#include <kernel/options.h>
+#include <kernel/febase.h>
 //#include "cntrlc.h"
-#include "kstd1.h"
-#include "timer.h"
-#include "intvec.h"
-#include "ring.h"
-#include "p_Procs.h"
+#include <kernel/kstd1.h>
+#include <kernel/timer.h>
+#include <kernel/intvec.h>
+#include <kernel/ring.h>
+#include <kernel/p_Procs.h>
 
 #define SI_DONT_HAVE_GLOBAL_VARS
 

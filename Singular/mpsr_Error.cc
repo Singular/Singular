@@ -12,12 +12,12 @@
  * Change History (most recent first):
  *
  ***************************************************************/
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_MPSR
 
-#include "febase.h"
-#include "mpsr.h"
+#include <kernel/febase.h>
+#include <Singular/mpsr.h>
 
 const char *mpsr_errlist[] =
 {

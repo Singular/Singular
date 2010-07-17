@@ -1,9 +1,9 @@
 #ifndef CCRING_WRAP_HEADER
 #define CCRING_WRAP_HEADER
-#include "ring.h"
-#include "grammar.h"
-#include "subexpr.h"
-#include "ipid.h"
+#include <kernel/ring.h>
+#include <kernel/grammar.h>
+#include <kernel/subexpr.h>
+#include <kernel/ipid.h>
 class Ring{
   public:
     ring pimpl;

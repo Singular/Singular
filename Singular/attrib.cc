@@ -13,17 +13,17 @@
 #include <ctype.h>
 #include <unistd.h>
 
-#include "mod2.h"
-#include "omalloc.h"
-#include "options.h"
-#include "tok.h"
-#include "ipid.h"
-#include "intvec.h"
-#include "polys.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "ipshell.h"
-#include "attrib.h"
+#include <Singular/mod2.h>
+#include <omalloc.h>
+#include <kernel/options.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <kernel/intvec.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <Singular/ipshell.h>
+#include <Singular/attrib.h>
 
 static omBin sattr_bin = omGetSpecBin(sizeof(sattr));
 

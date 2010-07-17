@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "omMalloc.h"
+#include <omalloc/omMalloc.h>
 
 void* omEmulateAlloc0(size_t size)
 {

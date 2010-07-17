@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: interpreter: converting types
 */
-#include "structs.h"
+#include <kernel/structs.h>
 
 int iiTestConvert (int inputType, int outputType);
 BOOLEAN iiConvert (int inputType, int outputType, int index,

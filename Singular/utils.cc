@@ -2,9 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "fegetopt.h"
-#include "utils.h"
-#include "libparse.h"
+#include <kernel/fegetopt.h>
+#include <Singular/utils.h>
+#include <Singular/libparse.h>
 
 extern FILE *yylpin;
 extern char *optarg;

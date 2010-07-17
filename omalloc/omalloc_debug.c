@@ -6,7 +6,7 @@
  *  Created: 11/99
  *  Version: $Id$
  *******************************************************************/
-#include "omDefaultConfig.h"
+#include <omalloc/omDefaultConfig.h>
 
 #define OM_TRACK OM_DEFAULT_MIN_TRACK
 #define OM_CHECK OM_DEFAULT_MIN_CHECK
@@ -16,4 +16,4 @@
 #define OM_CHECK 1
 #endif
 
-#include "omalloc.c"
+#include <omalloc/omalloc.c>

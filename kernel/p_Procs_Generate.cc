@@ -15,16 +15,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mod2.h"
-#include "dError.c"
+#include <kernel/mod2.h>
+#include <kernel/dError.c>
 
 #ifdef p_Procs_Static
-#include "p_Procs_Static.h"
+#include <kernel/p_Procs_Static.h>
 #else
-#include "p_Procs_Dynamic.h"
+#include <kernel/p_Procs_Dynamic.h>
 #endif
 
-#include "p_Procs_Impl.h"
+#include <kernel/p_Procs_Impl.h>
 
 #ifndef p_Procs_Static
 int FieldGeneralProcs = 0,
@@ -193,7 +193,7 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   }
 
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
-  printf("#include \"%s__T.cc\"\n", s_what);
+  printf("#include <kernel/%s__T.cc>\n", s_what);
   printf("#undef %s\n", s_what);
 #ifdef HAVE_RINGS
   if (strcmp(s_field, "RingGeneral") == 0)

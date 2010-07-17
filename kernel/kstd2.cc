@@ -13,7 +13,7 @@
 // define to enable tailRings
 #define HAVE_TAIL_RING
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -33,25 +33,25 @@
 #ifdef HAVE_PLURAL
 #define PLURAL_INTERNAL_DECLARATIONS 1
 #endif
-#include "kutil.h"
-#include "options.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "ideals.h"
-#include "febase.h"
-#include "kstd1.h"
-#include "khstd.h"
-#include "kbuckets.h"
+#include <kernel/kutil.h>
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
+#include <kernel/kbuckets.h>
 //#include "cntrlc.h"
-#include "weight.h"
-#include "intvec.h"
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
 #ifdef HAVE_PLURAL
-#include "gring.h"
+#include <kernel/gring.h>
 #endif
 // #include "timer.h"
 
 /* shiftgb stuff */
-#include "shiftgb.h"
+#include <kernel/shiftgb.h>
 
   int (*test_PosInT)(const TSet T,const int tl,LObject &h);
   int (*test_PosInL)(const LSet set, const int length,

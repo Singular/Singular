@@ -6,27 +6,27 @@
 * ABSTRACT - the mapping of polynomials to other rings
 */
 
-#include "mod2.h"
-#include "tok.h"
-#include "febase.h"
-#include "polys.h"
-#include "numbers.h"
-#include "ring.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "omalloc.h"
-#include "kstd1.h"
-#include "longalg.h"
-#include "lists.h"
-#include "maps.h"
-#include "maps_ip.h"
-#include "prCopy.h"
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <kernel/febase.h>
+#include <kernel/polys.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <omalloc.h>
+#include <kernel/kstd1.h>
+#include <kernel/longalg.h>
+#include <Singular/lists.h>
+#include <kernel/maps.h>
+#include <Singular/maps_ip.h>
+#include <kernel/prCopy.h>
 
 // define this if you want to use the fast_map routine for mapping ideals
 //#define FAST_MAP
 
 #ifdef FAST_MAP
-#include "fast_maps.h"
+#include <kernel/maps.h>
 #endif
 
 

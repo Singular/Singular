@@ -6,24 +6,24 @@ $Header: /usr/local/Singular/cvsroot/kernel/gfan.cc,v 1.103 2009/11/03 06:57:32 
 $Id$
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_GFAN
-#include "options.h"
-#include "kstd1.h"
-#include "kutil.h"	//ksCreateSpoly
+#include <kernel/options.h>
+#include <kernel/kstd1.h>
+#include <kernel/kutil.h>
 // #include "int64vec.h"
-#include "polys.h"
-#include "ideals.h"
-#include "kmatrix.h"
-#include "GMPrat.h"
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/kmatrix.h>
+#include <kernel/GMPrat.h>
 //#include "fast_maps.h"	//Mapping of ideals
 // #include "maps.h"
 // #include "ring.h"	//apparently not needed
 // #include "structs.h"
-#include "../Singular/lists.h"
-#include "prCopy.h"	//Needed for idrCopyR
-#include "stairc.h"	//For Hilbert series
+#include <Singular/lists.h>
+#include <kernel/prCopy.h>
+#include <kernel/stairc.h>
 // #include <bitset>
 #include <fstream>	//read-write cones to files
 // #include <gmp.h>
@@ -45,25 +45,25 @@ $Id$
 #define p800
 
 #ifdef UNI
-#include "/users/urmel/alggeom/monerjan/cddlib/include/setoper.h" //Support for cddlib. Dirty hack
-#include "/users/urmel/alggeom/monerjan/cddlib/include/cdd.h"
+#include <ers/urmel/alggeom/monerjan/cddlib/include/setoper.h>
+#include <ers/urmel/alggeom/monerjan/cddlib/include/cdd.h>
 #endif
 
 #ifdef HOME
-#include "/home/momo/studium/diplomarbeit/cddlib/include/setoper.h"
-#include "/home/momo/studium/diplomarbeit/cddlib/include/cdd.h"
+#include <me/momo/studium/diplomarbeit/cddlib/include/setoper.h>
+#include <me/momo/studium/diplomarbeit/cddlib/include/cdd.h>
 #endif
 
 #ifdef ITWM
-#include "/u/slg/monerjan/cddlib/include/setoper.h"
-#include "/u/slg/monerjan/cddlib/include/cdd.h"
-#include "/u/slg/monerjan/cddlib/include/cddmp.h"
+#include <slg/monerjan/cddlib/include/setoper.h>
+#include <slg/monerjan/cddlib/include/cdd.h>
+#include <slg/monerjan/cddlib/include/cddmp.h>
 #endif
 
 #ifdef p800
-#include "../../cddlib/include/setoper.h"
-#include "../../cddlib/include/cdd.h"
-#include "../../cddlib/include/cddmp.h"
+#include <../cddlib/include/setoper.h>
+#include <../cddlib/include/cdd.h>
+#include <../cddlib/include/cddmp.h>
 #endif
 
 #ifndef gfan_DEBUG

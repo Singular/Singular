@@ -8,15 +8,15 @@
 */
 
 #include <math.h>
-#include "mod2.h"
-#include "options.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "intvec.h"
-#include "febase.h"
-#include "ideals.h"
-#include "ring.h"
-#include "weight.h"
+#include <kernel/mod2.h>
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/intvec.h>
+#include <kernel/febase.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/weight.h>
 
 /*0 implementation*/
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,

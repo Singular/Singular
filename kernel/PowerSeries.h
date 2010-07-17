@@ -1,7 +1,7 @@
 #ifndef POWER_SERIES_HEADER
 #define POWER_SERIES_HEADER
-#include "mod2.h"
-#include "Poly.h"
+#include <kernel/mod2.h>
+#include <kernel/Poly.h>
 template <class traits> class PowerSeriesInputIterator:
 public std::
 iterator<

@@ -9,8 +9,8 @@
 #define F5_HEADER
 
 #ifdef HAVE_F5
-#include "f5data.h"
-#include "f5lists.h"
+#include <kernel/f5data.h>
+#include <kernel/f5lists.h>
 
 
 /*

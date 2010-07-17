@@ -32,7 +32,7 @@
 */
 
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifndef __STDC__
 #  ifndef const
@@ -83,7 +83,7 @@
    GNU application programs can use a third alternative mode in which
    they can distinguish the relative order of options and other arguments.  */
 
-#include "fegetopt.h"
+#include <kernel/fegetopt.h>
 
 /* For communication from `getopt' to the caller.
    When `getopt' finds an option that takes an argument,

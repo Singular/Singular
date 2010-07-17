@@ -12,9 +12,9 @@
 */
 
 //-> include & define stuff
-#include "numbers.h"
-#include "mpr_global.h"
-#include "mpr_complex.h"
+#include <kernel/numbers.h>
+#include <kernel/mpr_global.h>
+#include <kernel/mpr_complex.h>
 
 // define polish mode when finding roots
 #define PM_NONE    0

@@ -11,9 +11,9 @@
 #ifdef HAVE_PLURAL
 
 
-#include <structs.h>
-#include <ring.h>
-#include <matpol.h>
+#include <kernel/structs.h>
+#include <kernel/ring.h>
+#include <kernel/matpol.h>
 
 // the part, related to the interface
 // Changes r, Assumes that all other input belongs to curr

@@ -12,11 +12,11 @@
 #include <string.h>
 #include <mylimits.h>
 
-#include "structs.h"
-#include "omalloc.h"
-#include "ring.h"
-#include "structs.h"
-#include "pShallowCopyDelete.h"
+#include <kernel/structs.h>
+#include <omalloc.h>
+#include <kernel/ring.h>
+#include <kernel/structs.h>
+#include <kernel/pShallowCopyDelete.h>
 
 #if 1
 #define setmax 16
@@ -645,10 +645,10 @@ void kStratInitChangeTailRing(kStrategy strat);
 
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);
-#include "kInline.cc"
+#include <kernel/kInline.cc>
 
 /* shiftgb stuff */
-#include "shiftgb.h"
+#include <kernel/shiftgb.h>
 
 poly pMove2CurrTail(poly p, kStrategy strat);
 

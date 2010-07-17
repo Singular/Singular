@@ -8,14 +8,14 @@
 
 #include <unistd.h>   // for unlink,fork,execlp,getpid
 #include <sys/wait.h> // for wait
-#include "mod2.h"
-#include "tok.h"
-#include "options.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "ipshell.h"
-#include "ipid.h"
-#include "sdb.h"
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <Singular/ipshell.h>
+#include <Singular/ipid.h>
+#include <Singular/sdb.h>
 
 #ifdef HAVE_SDB
 // We use 8 breakpoints - corresponding to a bit in a char variable in procinfo

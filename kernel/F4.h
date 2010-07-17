@@ -18,6 +18,6 @@
 /*
 * ABSTRACT: interface for F4 only routines
 */
-#include "tgb_internal.h"
+#include <kernel/tgb_internal.h>
 void go_on_F4 (slimgb_alg* c);
 #endif

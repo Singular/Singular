@@ -8,16 +8,16 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
-#include "mod2.h"
-#include "structs.h"
-#include "p_polys.h"
-#include "ring.h"
-#include "p_Procs.h"
-#include "p_Numbers.h"
-#include "p_MemCmp.h"
-#include "p_MemAdd.h"
-#include "p_MemCopy.h"
-#include "kbuckets.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/p_polys.h>
+#include <kernel/ring.h>
+#include <kernel/p_Procs.h>
+#include <kernel/p_Numbers.h>
+#include <kernel/p_MemCmp.h>
+#include <kernel/p_MemAdd.h>
+#include <kernel/p_MemCopy.h>
+#include <kernel/kbuckets.h>
 
-#include "p_Procs_Dynamic.inc"
+#include <kernel/p_Procs_Dynamic.inc>
 

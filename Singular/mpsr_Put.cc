@@ -14,17 +14,17 @@
  *    Updated putting routines to MP and MPP v1.1
  *
  ***************************************************************/
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_MPSR
 
-#include "structs.h"
-#include "mpsr_Put.h"
-#include "mpsr_Tok.h"
-#include "intvec.h"
-#include "lists.h"
-#include "numbers.h"
-#include "polys.h"
+#include <kernel/structs.h>
+#include <Singular/mpsr_Put.h>
+#include <Singular/mpsr_Tok.h>
+#include <kernel/intvec.h>
+#include <Singular/lists.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
 
 /***************************************************************
  *

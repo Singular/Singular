@@ -11,12 +11,12 @@
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
 
-#include "structs.h"
-#include "polys.h"
-#include "ideals.h"
-#include "intvec.h"
-#include "matpol.h"
-#include "longalg.h"
+#include <kernel/structs.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/intvec.h>
+#include <kernel/matpol.h>
+#include <kernel/longalg.h>
 
 poly singclap_gcd ( poly f, poly g );
 poly singclap_gcd_r ( poly f, poly g, const ring r );

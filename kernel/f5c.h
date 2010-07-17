@@ -2,8 +2,8 @@
 #define F5C_HEADER
 
 #ifdef HAVE_F5C
-#include "F5cData.h"
-#include "F5cLists.h"
+#include <kernel/F5cData.h>
+#include <kernel/F5cLists.h>
 
 /*!
  * main function of the F5C implementation in SINGULAR

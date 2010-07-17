@@ -16,10 +16,10 @@
 /*****************************************************************************/
 
 // include header files
-#include "mod2.h"
-#include "lists.h"
-#include "longrat.h" /* We only need bigints. */
-#include "misc_ip.h"
+#include <Singular/mod2.h>
+#include <Singular/lists.h>
+#include <kernel/longrat.h>
+#include <Singular/misc_ip.h>
 
 /* This works by Newton iteration, i.e.,
       a(1)   = n;
@@ -250,7 +250,7 @@ this program.  If not, see http://www.gnu.org/licenses/.  */
 #include <stdio.h>
 #include <string.h>
 
-#include <si_gmp.h>
+#include <kernel/si_gmp.h>
 
 static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
 
@@ -531,27 +531,27 @@ lists primeFactorisation(const number n, const int pBound)
 #include <time.h>
 
 #include <mylimits.h>
-#include "omalloc.h"
-#include "options.h"
-#include "febase.h"
-#include "cntrlc.h"
-#include "page.h"
-#include "ipid.h"
-#include "ipshell.h"
-#include "kstd1.h"
-#include "subexpr.h"
-#include "timer.h"
-#include "intvec.h"
-#include "ring.h"
-#include "omSingularConfig.h"
-#include "p_Procs.h"
+#include <omalloc.h>
+#include <kernel/options.h>
+#include <kernel/febase.h>
+#include <Singular/cntrlc.h>
+#include <kernel/page.h>
+#include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <kernel/kstd1.h>
+#include <Singular/subexpr.h>
+#include <kernel/timer.h>
+#include <kernel/intvec.h>
+#include <kernel/ring.h>
+#include <Singular/omSingularConfig.h>
+#include <kernel/p_Procs.h>
 /* Needed for debug Version of p_SetRingOfLeftv, Oliver */
 #ifdef PDEBUG
-#include "p_polys.h"
+#include <kernel/polys.h>
 #endif
-#include "version.h"
+#include <Singular/version.h>
 
-#include "static.h"
+#include <Singular/static.h>
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL
 #endif
@@ -570,7 +570,7 @@ lists primeFactorisation(const number n, const int pBound)
 #endif
 
 /* version strings */
-#include <si_gmp.h>
+#include <kernel/si_gmp.h>
 #ifdef HAVE_MPSR
 #include <MP_Config.h>
 #endif
@@ -1006,7 +1006,7 @@ char * versionString()
               StringAppendS("GMP(1.3),");
 #endif
 #ifdef HAVE_NTL
-#include "NTL/version.h"
+#include <NTL/version.h>
               StringAppend("NTL(%s),",NTL_VERSION);
 #endif
 #ifdef HAVE_MPSR

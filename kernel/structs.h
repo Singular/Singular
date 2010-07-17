@@ -11,7 +11,7 @@
 /* for memset: */
 #include <string.h>
 #ifdef HAVE_RINGS
-#include <si_gmp.h>
+#include <kernel/si_gmp.h>
 #endif
 
 

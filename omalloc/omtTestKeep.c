@@ -1,2 +1,2 @@
 #define TEST_KEEP
-#include "omtTestAlloc.c"
+#include <omalloc/omtTestAlloc.c>

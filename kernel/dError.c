@@ -12,10 +12,10 @@
 #define DERROR_C
 #include <stdarg.h>
 #include <stdio.h>
-#include "mod2.h"
-#include "../Singular/distrib.h"
+#include <kernel/mod2.h>
+#include <Singular/distrib.h>
 #ifdef HAVE_CONFIG_H
-#include "omalloc.h"
+#include <omalloc.h>
 #endif
 
 #ifdef __cplusplus

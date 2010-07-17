@@ -9,16 +9,16 @@
 *  to find linear dependecies of fglmVectors.
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef  HAVE_FACTORY
-#include "structs.h"
-#include "numbers.h"
-#include "ring.h"
-#include "omalloc.h"
+#include <kernel/structs.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
+#include <omalloc.h>
 
-#include "fglmvec.h"
-#include "fglmgauss.h"
+#include <kernel/fglmvec.h>
+#include <kernel/fglmgauss.h>
 
 class gaussElem
 {

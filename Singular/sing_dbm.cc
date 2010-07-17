@@ -16,16 +16,16 @@
 #  include <fcntl.h>
 #  include <errno.h>
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_DBM
 
-#  include "tok.h"
-#  include "febase.h"
-#  include <omalloc.h>
-#  include "ipid.h"
-#  include "silink.h"
-#  include "sing_dbm.h"
+#  include <Singular/tok.h>
+#  include <kernel/febase.h>
+#include <omalloc.h>
+#  include <Singular/ipid.h>
+#  include <Singular/silink.h>
+#  include <Singular/sing_dbm.h>
 
 // #ifdef ix86_Win
 // #  define USE_GDBM

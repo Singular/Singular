@@ -25,7 +25,7 @@
 #define LINEAR_ALGEBRA_H
 
 // include basic SINGULAR structures
-#include <structs.h>
+#include <kernel/structs.h>
 
 /**
  * LU-decomposition of a given (m x n)-matrix.

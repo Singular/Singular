@@ -8,12 +8,12 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "mod2.h"
-#include "omalloc.h"
-#include "tok.h"
-#include "stype.h"
-#include "ipshell.h"
-#include "febase.h"
+#include <Singular/mod2.h>
+#include <omalloc.h>
+#include <Singular/tok.h>
+#include <Singular/stype.h>
+#include <Singular/ipshell.h?
+#include <kernel/febase.h>
 
 int feReadLine(char* b, int l);
 #define ALLOC(a) omAlloc((a))

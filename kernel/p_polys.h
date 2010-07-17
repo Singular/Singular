@@ -12,8 +12,8 @@
 #ifndef P_POLYS_H
 #define P_POLYS_H
 
-#include "structs.h"
-#include "polys-impl.h"
+#include <kernel/structs.h>
+#include <kernel/polys-impl.h>
 /*
  Some general remarks:
  We divide poly operations into roughly 4 categories:
@@ -447,8 +447,8 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 
 #endif
 
-#include "pInline2.h"
-#include "pInline1.h"
+#include <kernel/pInline2.h>
+#include <kernel/pInline1.h>
 
 #endif // P_POLYS_H
 

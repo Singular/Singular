@@ -5,28 +5,28 @@
 * ABSTRACT: f5gb interface
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 #ifdef HAVE_F5
 #include <unistd.h>
 #include <omp.h>
-#include "structs.h"
-#include "kutil.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "p_polys.h"
-#include "p_Procs.h"
-#include "ideals.h"
-#include "febase.h"
-#include "kstd1.h"
-#include "khstd.h"
-#include "kbuckets.h"
-#include "weight.h"
-#include "intvec.h"
-#include "pInline1.h"
-#include "f5gb.h"
-#include "f5data.h"
-#include "f5lists.h"
-#include "timer.h"
+#include <kernel/structs.h>
+#include <kernel/kutil.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/p_polys.h>
+#include <kernel/p_Procs.h>
+#include <kernel/ideals.h>
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
+#include <kernel/kbuckets.h>
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
+#include <kernel/pInline1.h>
+#include <kernel/f5gb.h>
+#include <kernel/f5data.h>
+#include <kernel/f5lists.h>
+#include <kernel/timer.h>
 int notInG              =   0;
 int numberOfRules       =   0;
 int reductionsToZero    =   0;

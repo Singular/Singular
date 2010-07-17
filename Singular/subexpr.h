@@ -9,11 +9,11 @@
 */
 
 #include <string.h>
-#include "grammar.h"
-#include "tok.h"
-#include "structs.h"
-#include "febase.h"
-#include "ring.h"
+#include <Singular/grammar.h>
+#include <Singular/tok.h>
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <kernel/ring.h>
 
 struct _ssubexpr
 {

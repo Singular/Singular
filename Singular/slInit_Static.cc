@@ -14,14 +14,14 @@
  * MP link Extension inits
  *
  ***************************************************************/
-#include "mod2.h"
-#include "silink.h"
-#include "slInit.h"
+#include <Singular/mod2.h>
+#include <Singular/silink.h>
+#include <Singular/slInit.h>
 
 #ifdef HAVE_MPSR
 
-#include "MP.h"
-#include "mpsr_sl.h"
+#include <Singular/MP.h>
+#include <Singular/mpsr_sl.h>
 
 extern void mpsr_Init();
 
@@ -64,9 +64,9 @@ BatchDoProc slInitMPBatchDo()
 
 #ifdef HAVE_DBM
 #ifndef USE_GDBM
-#include "dbm_sl.h"
+#include <Singular/dbm_sl.h>
 #else
-#include "sing_dbm.h"
+#include <Singular/sing_dbm.h>
 #endif
 si_link_extension slInitDBMExtension(si_link_extension s)
 {

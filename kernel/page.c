@@ -1,4 +1,4 @@
-#include "mod2.h"
+#include <kernel/mod2.h>
 #ifdef PAGE_TEST
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,8 +11,8 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/times.h>
-#include "tok.h"
-#include "page.h"
+#include <kernel/tok.h>
+#include <kernel/page.h>
 
 unsigned long mmPage_tab[MAX_PAGE_TAB];
 char          mmUse_tab [MAX_PAGE_TAB];

@@ -8,9 +8,9 @@
 * ABSTRACT: identfier handling
 */
 #include <string.h>
-#include "structs.h"
-#include "idrec.h"
-#include "subexpr.h"
+#include <kernel/structs.h>
+#include <kernel/idrec.h>
+#include <Singular/subexpr.h>
 
 extern idhdl currPackHdl;
 extern idhdl basePackHdl;

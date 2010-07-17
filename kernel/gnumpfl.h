@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
-#include "structs.h"
+#include <kernel/structs.h>
 
 BOOLEAN  ngfGreaterZero(number za);
 BOOLEAN  ngfGreater(number a, number b);

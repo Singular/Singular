@@ -1,7 +1,7 @@
 #ifndef fast_mult_header
 #define fast_mult_header
-#include "mod2.h"
-#include "polys.h"
+#include <kernel/mod2.h>
+#include <kernel/polys.h>
 poly unifastmult(poly f,poly g, ring r);
 poly multifastmult(poly f, poly g, ring r);
 int Mults();

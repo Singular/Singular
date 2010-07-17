@@ -6,9 +6,9 @@
  *  Version: $Id$
  *******************************************************************/
 #ifdef HAVE_CONFIG_H
-#include "omMalloc.h"
+#include <omalloc/omMalloc.h>
 #else
-#include "dlmalloc.h"
+#include <omalloc/dlmalloc.h>
 #endif
 
 /*

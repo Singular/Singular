@@ -2,11 +2,11 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Id$ */
-#include "mod2.h"
-#include "ring.h"
-#include "fast_mult.h"
-#include "kbuckets.h"
-#include "febase.h"
+#include <kernel/mod2.h>
+#include <kernel/ring.h>
+#include <kernel/fast_mult.h>
+#include <kernel/kbuckets.h>
+#include <kernel/febase.h>
 
 typedef poly fastmultrec(poly f, poly g, ring r);
 static const int pass_option=1;

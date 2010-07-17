@@ -9,8 +9,8 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#include "mod2.h"
-#include "structs.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
 
 // Use buckets if min(pLength(p), pLength(q)) >= MIN_LENGTH_BUCKET
 // Not thoroughly tested what is best

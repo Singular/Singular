@@ -12,17 +12,17 @@
 #include <ctype.h>
 #include <sys/stat.h>
 
-#include "mod2.h"
-#include "static.h"
-#include "tok.h"
-#include "options.h"
-#include "ipid.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "ring.h"
-#include "subexpr.h"
-#include "ipshell.h"
-#include "lists.h"
+#include <Singular/mod2.h>
+#include <Singular/static.h>
+#include <Singular/tok.h>
+#include <kernel/options.h>
+#include <Singular/ipid.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/ring.h>
+#include <Singular/subexpr.h>
+#include <Singular/ipshell.h>
+#include <Singular/lists.h>
 
 #if SIZEOF_LONG == 8
 #define SI_MAX_NEST 500
@@ -47,7 +47,7 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
 extern int iiArithAddCmd(const char *szName, short nAlias, short nTokval,
                          short nToktype, short nPos);
 
-#include "mod_raw.h"
+#include <kernel/mod_raw.h>
 
 #ifdef HAVE_LIBPARSER
 void yylprestart (FILE *input_file );

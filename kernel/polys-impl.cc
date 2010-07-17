@@ -18,22 +18,22 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "mod2.h"
+#include <kernel/mod2.h>
 
-#include "omalloc.h"
+#include <omalloc.h>
 #ifdef PDEBUG
 #undef NO_INLINE3
 #define NO_INLINE3
 #endif
-#include "polys-impl.h"
+#include <kernel/polys-impl.h>
 
-#include "structs.h"
-#include "febase.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ring.h"
-#include "p_Procs.h"
-#include "dError.h"
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ring.h>
+#include <kernel/p_Procs.h>
+#include <kernel/dError.h>
 
 #ifdef PDEBUG
 int pDBsyzComp=0;

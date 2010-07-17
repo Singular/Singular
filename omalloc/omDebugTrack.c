@@ -7,12 +7,12 @@
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
-#include "omConfig.h"
-#include "omDerivedConfig.h"
+#include <omalloc/omConfig.h>
+#include <omalloc/omDerivedConfig.h>
 
 #ifdef OM_HAVE_TRACK
-#include "omDefaultConfig.h"
-#include "om_Alloc.h"
+#include <omalloc/omDefaultConfig.h>
+#include <omalloc/om_Alloc.h>
 
 /*******************************************************************
  *
@@ -732,7 +732,7 @@ void* omGetCustomOfTrackAddr(void* addr)
 #ifndef OM_NDEBUG
 
 #ifndef OM_HAVE_TRACK
-#include "om_Alloc.h"
+#include <omalloc/om_Alloc.h>
 #endif
 
 int omIsInKeptAddrList(void* addr)

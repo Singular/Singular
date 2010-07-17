@@ -10,7 +10,7 @@
 *            ( sparse, dense, u-resultant solver )
 */
 
-#include "mpr_numeric.h"
+#include <kernel/mpr_numeric.h>
 
 #define SNONE -1
 #define SFREE -2

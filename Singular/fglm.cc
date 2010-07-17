@@ -16,21 +16,21 @@
 *   lying in a 0-dimensional ideal.
 */
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_FGLM
-#include "tok.h"
-#include "options.h"
-#include "polys.h"
-#include "ideals.h"
-#include "ring.h"
-#include "ipid.h"
-#include "ipshell.h"
-#include "febase.h"
-#include "maps.h"
-#include "omalloc.h"
-#include "kstd1.h"
-#include "fglm.h"
+#include <Singular/tok.h>
+#include <kernel/options.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <Singular/ipid.h>
+#include <Singular/ipshell.h>
+#include <kernel/febase.h>
+#include <kernel/maps.h>
+#include <omalloc.h>
+#include <kernel/kstd1.h>
+#include <kernel/fglm.h>
 
 // internal Version: 1.18.1.6
 //     enumeration to handle the various errors to occour.

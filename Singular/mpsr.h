@@ -22,7 +22,7 @@
 #include"MPT.h"
 #include"structs.h"
 #include"subexpr.h"
-#include"omalloc.h"
+#include <omalloc.h>
 #include"polys.h"
 #include"numbers.h"
 #include"ring.h"

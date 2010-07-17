@@ -16,11 +16,11 @@
 #ifndef __MPSR_GET__
 #define __MPSR_GET__
 
-#include "tok.h"
-#include "numbers.h"
-#include "polys.h"
-#include "febase.h"
-#include "ipid.h"
+#include <Singular/tok.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/febase.h>
+#include <Singular/ipid.h>
 
 #include"mpsr.h"
 

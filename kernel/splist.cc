@@ -7,7 +7,7 @@
 
 #define SPLIST_CC
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_SPECTRUM
 
@@ -18,13 +18,13 @@
 #endif
 #endif
 
-#include "structs.h"
-#include "GMPrat.h"
-#include "numbers.h"
-#include "polys.h"
-#include "npolygon.h"
-#include "splist.h"
-#include "intvec.h"
+#include <kernel/structs.h>
+#include <kernel/GMPrat.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/npolygon.h>
+#include <kernel/splist.h>
+#include <kernel/intvec.h>
 
 // ------------------------
 //  class spectrumPolyNode

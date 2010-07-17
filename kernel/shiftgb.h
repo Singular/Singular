@@ -8,9 +8,9 @@
 * ABSTRACT: kernel: utils for kStd
 */
 
-#include "structs.h"
+#include <kernel/structs.h>
 #ifdef HAVE_SHIFTBBA
-#include "gring.h"
+#include <kernel/gring.h>
 
 poly p_LPshiftT(poly p, int sh, int uptodeg, int lV, kStrategy strat, const ring r);
 int p_LastVblockT(poly p, int lV, kStrategy strat, const ring r);

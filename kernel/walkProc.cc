@@ -3,21 +3,21 @@
 ****************************************/
 /* $Id$ */
 
-#include "mod2.h"
-#include "structs.h"
-#include "structs.h"
-#include "polys.h"
-#include "ideals.h"
-#include "ring.h"
-#include "febase.h"
-#include "maps.h"
-#include "omalloc.h"
-#include "kstd1.h"
-#include "fglm.h"
-#include "walkMain.h"
-#include "walkSupport.h"
-#include "walkProc.h"
-#include "prCopy.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/structs.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/febase.h>
+#include <kernel/maps.h>
+#include <omalloc.h>
+#include <kernel/kstd1.h>
+#include <kernel/fglm.h>
+#include <kernel/walkMain.h>
+#include <kernel/walkSupport.h>
+#include <kernel/walkProc.h>
+#include <kernel/prCopy.h>
 
 ///////////////////////////////////////////////////////////////////
 //Frame procedures for Groebner Walk and Fractal Walk

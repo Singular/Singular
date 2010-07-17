@@ -11,14 +11,14 @@ $Id$
 #ifndef GFAN_H
 #define GFAN_H
 
-#include "int64vec.h"
+#include <kernel/int64vec.h>
 // #include "int64vec.h"
 
 #define p800
 #ifdef p800
-#include "../../cddlib/include/setoper.h"
-#include "../../cddlib/include/cdd.h"
-#include "../../cddlib/include/cddmp.h"
+#include <kernel/../../cddlib/include/setoper.h>
+#include <kernel/../../cddlib/include/cdd.h>
+#include <kernel/../../cddlib/include/cddmp.h>
 #endif
 extern int gfanHeuristic;
 

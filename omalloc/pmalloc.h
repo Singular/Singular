@@ -8,7 +8,7 @@
 #ifndef OM_MALLOC_SYSTEM_H
 #define OM_MALLOC_SYSTEM_H
 
-#include "omConfig.h"
+#include <omalloc/omConfig.h>
 
 /* define to -1 if you want that this implementation provides
    malloc/calloc/realloc/free funcs */

@@ -1,10 +1,10 @@
-#include "omtTest.h"
+#include <omalloc/omtTest.h>
 
 #if CHECK_LEVEL > 0
 #define OM_CHECK CHECK_LEVEL
 #endif
 
-#include "om_Alloc.h"
+#include <omalloc/om_Alloc.h>
 
 omMemCell_t cells[MAX_CELLS];
 int errors = 0;

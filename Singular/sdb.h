@@ -11,8 +11,8 @@
 #define HAVE_SDB
 
 #ifdef HAVE_SDB
-#include "febase.h"
-#include "structs.h"
+#include <kernel/febase.h>
+#include <kernel/structs.h>
 
 extern int    sdb_lines[];
 extern char * sdb_files[];

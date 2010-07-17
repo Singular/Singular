@@ -7,7 +7,7 @@
 * ABSTRACT
 */
 /* $Id$ */
-#include "structs.h"
+#include <kernel/structs.h>
 
 BOOLEAN nrGreaterZero (number k);
 number  nrMult        (number a, number b);

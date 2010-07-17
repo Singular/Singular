@@ -8,12 +8,12 @@
 */
 
 /* includes */
-#include "mod2.h"
-#include "structs.h"
-#include "numbers.h"
-#include "ring.h"
-#include "p_polys.h"
-#include "febase.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
+#include <kernel/p_polys.h>
+#include <kernel/febase.h>
 
 /*2
 * writes a monomial (p),

@@ -1,7 +1,7 @@
 #ifndef __JANET_INTERFACE__
 #define __JANET_INTERFACE__
 
-#include "structs.h"
+#include <kernel/structs.h>
 
 #define GCM(sz) omAlloc((sz))
 #define GCMA(sz) omAlloc((sz))

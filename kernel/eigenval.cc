@@ -6,21 +6,21 @@
 * ABSTRACT: eigenvalues of constant square matrices
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_EIGENVAL
 
-#include "febase.h"
-#include "structs.h"
+#include <kernel/febase.h>
+#include <kernel/structs.h>
 //#include "ipid.h"
-#include "intvec.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ideals.h"
+#include <kernel/intvec.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
 //#include "lists.h"
-#include "matpol.h"
-#include "clapsing.h"
-#include "eigenval.h"
+#include <kernel/matpol.h>
+#include <kernel/clapsing.h>
+#include <kernel/eigenval.h>
 
 
 matrix evSwap(matrix M,int i,int j)

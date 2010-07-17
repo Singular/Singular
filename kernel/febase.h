@@ -9,7 +9,7 @@
 */
 #include <stdio.h>
 #include <string.h>
-#include "structs.h"
+#include <kernel/structs.h>
 
 /* define DIR_SEPP, etc */
 /* unix , WINNT */

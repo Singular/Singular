@@ -7,17 +7,17 @@
 */
 
 #include <string.h>
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include <mylimits.h>
-#include "structs.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "mpr_complex.h"
-#include "ring.h"
-#include "rmodulon.h"
-#include "si_gmp.h"
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/longrat.h>
+#include <kernel/mpr_complex.h>
+#include <kernel/ring.h>
+#include <kernel/rmodulon.h>
+#include <kernel/si_gmp.h>
 
 #ifdef HAVE_RINGS
   extern omBin gmp_nrz_bin;

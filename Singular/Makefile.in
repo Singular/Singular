@@ -51,26 +51,26 @@ LN_S		= @LN_S@
 ##
 PIPE		= @PIPE@
 CFLAGS		= @CFLAGS@ ${PIPE}
-CXXFLAGS	= @CXXFLAGS@ ${PIPE}
-CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
+CXXFLAGS	= @CXXFLAGS@ -I@prefix@ ${PIPE}
+CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@ -I@prefix@
 ifneq ($(SINGUNAME),ix86-Win)
-CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@
+CPPFLAGS	= -I${srcdir} -I@prefix@ @CPPFLAGS@
 else
 ## Dirs after @CPPFLAGS@ are for PySingular
-CPPFLAGS	= -I${srcdir} -I../kernel @CPPFLAGS@ 
+CPPFLAGS	= -I${srcdir} -I@prefix@ @CPPFLAGS@ 
 ## -I/usr/include/python2.4 -I/usr/local/include -I../modules/python
 endif
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
-LDFLAGS		= -L../kernel -lkernel @LDFLAGS@
-LDFLAGSG	= -L../kernel -lkernel_g @LDFLAGS@
-LDFLAGSP	= -L../kernel -lkernel_p @LDFLAGS@
+LDFLAGS		= -L@prefix@/kernel -lkernel @LDFLAGS@
+LDFLAGSG	= -L@prefix@/kernel -lkernel_g @LDFLAGS@
+LDFLAGSP	= -L@prefix@/kernel -lkernel_p @LDFLAGS@
 else
-## -L/usr/local/lib -L../modules/python --> PySingular
-LDFLAGS		= -L../kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python
-LDFLAGSG	= -L../kernel -L/bin -lkernel_g @LDFLAGS@
-LDFLAGSP	= -L../kernel -L/bin -lkernel_p @LDFLAGS@
+## -L/usr/local/lib -L@prefix@/modules/python --> PySingular
+LDFLAGS		= -L@prefix@/kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python
+LDFLAGSG	= -L@prefix@/kernel -L/bin -lkernel_g @LDFLAGS@
+LDFLAGSP	= -L@prefix@/kernel -L/bin -lkernel_p @LDFLAGS@
 endif
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
 SFLAGS		= @SFLAGS@
@@ -433,17 +433,17 @@ feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
 extra.o: feOpt.inc
 
 feOpt.inc: feOpt.cc mod2.h
-	$(CXX) -DGENERATE_OPTION_INDEX -I../kernel feOpt.cc -o feOpt
+	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX ${CPPFLAGS} feOpt.cc -o feOpt
 	./feOpt
 	/bin/rm -f feOpt feOpt.exe
 
 feOptES.inc: feOpt.cc mod2.h
-	$(CXX) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOptES
+	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX  -DESINGULAR -I../kernel feOpt.cc -o feOptES
 	./feOptES
 	rm -f feOptES feOptES.exe
 
 feOptTS.inc: feOpt.cc mod2.h
-	$(CXX) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
+	$(CXX) $(CXXFLAGS) -DGENERATE_OPTION_INDEX  -DTSINGULAR -I../kernel feOpt.cc -o feOptTS
 	./feOptTS
 	rm -f feOptTS feOptTS.exe
 

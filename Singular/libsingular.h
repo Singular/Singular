@@ -2,32 +2,32 @@
 #define SINGULAR__H
 
 #include <math.h>
-#include "singular/mod2.h"
-#include "singular/structs.h"
-#include "singular/polys.h"
-#include "singular/longrat.h"
-#include "singular/longalg.h"
-#include "singular/numbers.h"
-#include "singular/febase.h"
-#include "singular/ring.h"
-#include "singular/omalloc.h"
-#include "singular/clapsing.h"
-#include "singular/fast_maps.h"
-#include "singular/kutil.h"
-#include "singular/kstd1.h"
-#include "singular/tgb.h"
-#include "singular/sparsmat.h"
-#include "singular/rintegers.h"
-#include "singular/rmodulo2m.h"
-#include "singular/rmodulon.h"
+#include <Singular/singular/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/polys.h>
+#include <kernel/longrat.h>
+#include <Singular/singular/longalg.h>
+#include <kernel/numbers.h>
+#include <kernel/febase.h>
+#include <kernel/ring.h>
+#include <omalloc.h>
+#include <Singular/singular/clapsing.h>
+#include <kernel/maps.h>
+#include <Singular/singular/kutil.h>
+#include <kernel/kstd1.h>
+#include <Singular/singular/tgb.h>
+#include <Singular/singular/sparsmat.h>
+#include <Singular/singular/rintegers.h>
+#include <Singular/singular/rmodulo2m.h>
+#include <Singular/singular/rmodulon.h>
 
-#include "singular/subexpr.h"
-#include "singular/tok.h"
-#include "singular/grammar.h"
-#include "singular/ipid.h"
-#include "singular/ipshell.h"
-#include "singular/attrib.h"
-#include "singular/options.h"
+#include <Singular/singular/subexpr.h>
+#include <Singular/singular/tok.h>
+#include <Singular/singular/grammar.h>
+#include <Singular/singular/ipid.h>
+#include <Singular/singular/ipshell.h>
+#include <Singular/singular/attrib.h>
+#include <kernel/options.h>
 
 int siInit(char *);
 

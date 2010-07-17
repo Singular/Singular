@@ -14,68 +14,67 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "mod2.h"
-#include "tok.h"
-#include "options.h"
-#include "ipid.h"
-#include "intvec.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "febase.h"
-#include "sdb.h"
-#include "longalg.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "kstd1.h"
-#include "timer.h"
-#include "ring.h"
-#include "subexpr.h"
-#include "lists.h"
-#include "longalg.h"
-#include "modulop.h"
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <kernel/options.h>
+#include <Singular/ipid.h>
+#include <kernel/intvec.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/febase.h>
+#include <Singular/sdb.h>
+#include <kernel/longalg.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <kernel/kstd1.h>
+#include <kernel/timer.h>
+#include <kernel/ring.h>
+#include <Singular/subexpr.h>
+#include <Singular/lists.h>
+#include <kernel/modulop.h>
 #ifdef HAVE_RINGS
-#include "rmodulon.h"
-#include "rmodulo2m.h"
-#include "rintegers.h"
+#include <kernel/rmodulon.h>
+#include <kernel/rmodulo2m.h>
+#include <kernel/rintegers.h>
 #endif
-#include "numbers.h"
-#include "stairc.h"
-#include "maps.h"
-#include "maps_ip.h"
-#include "syz.h"
-#include "weight.h"
-#include "ipconv.h"
-#include "ipprint.h"
-#include "attrib.h"
-#include "silink.h"
-#include "sparsmat.h"
-#include "units.h"
-#include "janet.h"
-#include "GMPrat.h"
-#include "tgb.h"
-#include "walkProc.h"
-#include "mod_raw.h"
-#include "MinorInterface.h"
-#include "linearAlgebra.h"
-#include "misc_ip.h"
+#include <kernel/numbers.h>
+#include <kernel/stairc.h>
+#include <kernel/maps.h>
+#include <Singular/maps_ip.h>
+#include <kernel/syz.h>
+#include <kernel/weight.h>
+#include <Singular/ipconv.h>
+#include <Singular/ipprint.h>
+#include <Singular/attrib.h>
+#include <Singular/silink.h>
+#include <kernel/sparsmat.h>
+#include <kernel/units.h>
+#include <Singular/janet.h>
+#include <kernel/GMPrat.h>
+#include <kernel/tgb.h>
+#include <kernel/walkProc.h>
+#include <kernel/mod_raw.h>
+#include <Singular/MinorInterface.h>
+#include <kernel/linearAlgebra.h>
+#include <Singular/misc_ip.h>
 #ifdef HAVE_FACTORY
-#include "clapsing.h"
-#include "kstdfac.h"
+#include <kernel/clapsing.h>
+#include <kernel/kstdfac.h>
 #endif /* HAVE_FACTORY */
 #ifdef HAVE_FGLM
-#include "fglm.h"
+#include <kernel/fglm.h>
 #endif /* HAVE_FGLM */
 #define HAVE_INTERPOLATION
 #ifdef HAVE_INTERPOLATION
-#include "interpolation.h"
+#include <Singular/interpolation.h>
 #endif
 
-#include "ipshell.h"
-#include "mpr_inout.h"
+#include <Singular/ipshell.h>
+#include <kernel/mpr_inout.h>
 
 #ifdef HAVE_PLURAL
-  #include "gring.h"
-  #include "sca.h"
+  #include <kernel/gring.h>
+  #include <kernel/sca.h>
   #define ALLOW_PLURAL     1
   #define NO_PLURAL        0
   #define COMM_PLURAL      2
@@ -8346,7 +8345,7 @@ void ttGen4()
 }
 /*-------------------------------------------------------------------*/
 #else
-#include "iparith.inc"
+#include <Singular/iparith.inc>
 #endif
 
 /*=================== operations with 2 args. ============================*/

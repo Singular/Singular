@@ -8,7 +8,7 @@
 * ABSTRACT
 */
 
-#include "structs.h"
+#include <kernel/structs.h>
 
 typedef union uutypes      utypes;
 union uutypes

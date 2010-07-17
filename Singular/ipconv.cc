@@ -6,30 +6,30 @@
 * ABSTRACT: automatic type conversions
 */
 
-#include "mod2.h"
-#include "tok.h"
-#include "ipid.h"
-#include "intvec.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "polys.h"
-#include "ideals.h"
-#include "subexpr.h"
-#include "numbers.h"
-#include "modulop.h"
-#include "longrat.h"
-#include "longalg.h"
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <kernel/intvec.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <Singular/subexpr.h>
+#include <kernel/numbers.h>
+#include <kernel/modulop.h>
+#include <kernel/longrat.h>
+#include <kernel/longalg.h>
 #ifdef HAVE_RINGS
-#include "rmodulon.h"
-#include "rmodulo2m.h"
-#include "rintegers.h"
+#include <kernel/rmodulon.h>
+#include <kernel/rmodulo2m.h>
+#include <kernel/rintegers.h>
 #endif
-#include "matpol.h"
-#include "silink.h"
-#include "syz.h"
-#include "attrib.h"
-#include "ring.h"
-#include "ipconv.h"
+#include <kernel/matpol.h>
+#include <Singular/silink.h>
+#include <kernel/syz.h>
+#include <Singular/attrib.h>
+#include <kernel/ring.h>
+#include <Singular/ipconv.h>
 
 typedef void *   (*iiConvertProc)(void * data);
 typedef void    (*iiConvertProcL)(leftv out,leftv in);

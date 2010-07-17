@@ -7,11 +7,11 @@
 */
 #ifndef INTVEC_CC
 #define INTVEC_CC
-#include "mod2.h"
-#include "febase.h"
-#include "options.h"
-#include "intvec.h"
-#include "omalloc.h"
+#include <kernel/mod2.h>
+#include <kernel/febase.h>
+#include <kernel/options.h>
+#include <kernel/intvec.h>
+#include <omalloc.h>
 
 /*0 implementation*/
 

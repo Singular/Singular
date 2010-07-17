@@ -17,11 +17,11 @@
 #include <sys/stat.h>
 
 
-#include "mod2.h"
-#include "../Singular/static.h"
+#include <kernel/mod2.h>
+#include <Singular/static.h>
 
-#include "mod_raw.h"
-#include "febase.h"
+#include <kernel/mod_raw.h>
+#include <kernel/febase.h>
 
 #ifdef HAVE_STATIC
 #undef HAVE_DL

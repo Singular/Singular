@@ -8,16 +8,16 @@
 * ngc == number gnu complex
 */
 
-#include "mod2.h"
-#include "structs.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "modulop.h"
-#include "gnumpc.h"
-#include "gnumpfl.h"
-#include "mpr_complex.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/longrat.h>
+#include <kernel/modulop.h>
+#include <kernel/gnumpc.h>
+#include <kernel/gnumpfl.h>
+#include <kernel/mpr_complex.h>
 
 extern size_t gmp_output_digits;
 

@@ -7,7 +7,7 @@
 */
 
 /* includes */
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -15,22 +15,22 @@
 # define MYTEST 0
 #endif /* ifndef NDEBUG */
 
-#include "options.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "polys.h"
-#include "ring.h"
-#include "kstd1.h"
-#include "matpol.h"
-#include "weight.h"
-#include "intvec.h"
-#include "syz.h"
-#include "sparsmat.h"
-#include "ideals.h"
-#include "prCopy.h"
-#include "gring.h"
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/numbers.h>
+#include <kernel/longrat.h>
+#include <kernel/polys.h>
+#include <kernel/ring.h>
+#include <kernel/kstd1.h>
+#include <kernel/matpol.h>
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
+#include <kernel/syz.h>
+#include <kernel/sparsmat.h>
+#include <kernel/ideals.h>
+#include <kernel/prCopy.h>
+#include <kernel/gring.h>
 
 
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
@@ -3005,7 +3005,7 @@ ideal idMatrix2Module(matrix mat)
 }
 #else
 
-#include "sbuckets.h"
+#include <kernel/sbuckets.h>
 
 // converts mat to module, destroys mat
 ideal idMatrix2Module(matrix mat)
@@ -4005,7 +4005,7 @@ void idNormalize(ideal I)
   }
 }
 
-#include "clapsing.h"
+#include <kernel/clapsing.h>
 
 poly id_GCD(poly f, poly g, const ring r)
 {

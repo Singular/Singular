@@ -5,7 +5,7 @@
  *  Created: 11/99
  *  Version: $Id$
  *******************************************************************/
-#include "omConfig.h"
+#include <omalloc/omConfig.h>
 
 #ifndef NULL
 #define NULL ((void*) 0)
@@ -171,8 +171,8 @@ void* _omInsertInSortedList(void* list, int next, int long_field, void* addr)
 
 
 #ifndef OM_NDEBUG
-#include "om_Alloc.h"
-#include "omDebug.h"
+#include <omalloc/om_Alloc.h>
+#include <omalloc/omDebug.h>
 
 omError_t _omCheckList(void* list, int next, int level, omError_t report, OM_FLR_DECL)
 {

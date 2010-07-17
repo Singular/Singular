@@ -12,31 +12,31 @@
 #include <ctype.h>
 #include <unistd.h>
 
-#include "mod2.h"
-#include "intvec.h"
-#include "tok.h"
-#include "options.h"
-#include "ipid.h"
-#include "intvec.h"
+#include <Singular/mod2.h>
+#include <kernel/intvec.h>
+#include <Singular/tok.h>
+#include <kernel/options.h>
+#include <Singular/ipid.h>
+#include <kernel/intvec.h>
 #include <omalloc.h>
-#include "febase.h"
-#include "polys.h"
-#include "ideals.h"
-#include "maps.h"
-#include "matpol.h"
-#include "kstd1.h"
-#include "timer.h"
-#include "ring.h"
-#include "ffields.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "ipshell.h"
-#include "lists.h"
-#include "attrib.h"
-#include "silink.h"
-#include "syz.h"
-#include "attrib.h"
-#include "subexpr.h"
+#include <kernel/febase.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/maps.h>
+#include <kernel/matpol.h>
+#include <kernel/kstd1.h>
+#include <kernel/timer.h>
+#include <kernel/ring.h>
+#include <kernel/ffields.h>
+#include <kernel/numbers.h>
+#include <kernel/longrat.h>
+#include <Singular/ipshell.h>
+#include <Singular/lists.h>
+#include <Singular/attrib.h>
+#include <Singular/silink.h>
+#include <kernel/syz.h>
+#include <Singular/attrib.h>
+#include <Singular/subexpr.h>
 
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));

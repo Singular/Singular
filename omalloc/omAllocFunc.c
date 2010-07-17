@@ -19,4 +19,4 @@
 #define valloc      omVallocFunc
 
 #define OMALLOC_FUNC
-#include "omalloc.c"
+#include <omalloc/omalloc.c>

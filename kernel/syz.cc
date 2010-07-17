@@ -8,24 +8,24 @@
 */
 
 
-#include "mod2.h"
-#include "options.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "febase.h"
-#include "kstd1.h"
-#include "kutil.h"
-#include "stairc.h"
-#include "intvec.h"
-#include "numbers.h"
-#include "ideals.h"
-#include "intvec.h"
-#include "ring.h"
-#include "syz.h"
-#include "prCopy.h"
+#include <kernel/mod2.h>
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/kutil.h>
+#include <kernel/stairc.h>
+#include <kernel/intvec.h>
+#include <kernel/numbers.h>
+#include <kernel/ideals.h>
+#include <kernel/intvec.h>
+#include <kernel/ring.h>
+#include <kernel/syz.h>
+#include <kernel/prCopy.h>
 
 #ifdef HAVE_PLURAL
-#include "sca.h"
+#include <kernel/sca.h>
 #endif // HAVE_PLURAL
 
 void syDeleteRes(resolvente * res,int length)

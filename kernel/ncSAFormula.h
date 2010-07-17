@@ -10,8 +10,8 @@
 
 // //////////////////////////////////////////////////////////////////////// //
 
-#include <structs.h>
-#include <ring.h>
+#include <kernel/structs.h>
+#include <kernel/ring.h>
 
 bool ncInitSpecialPowersMultiplication(ring r);
 

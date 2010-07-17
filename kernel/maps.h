@@ -7,8 +7,8 @@
 /*
 * ABSTRACT - the mapping of polynomials to other rings
 */
-#include "structs.h"
-#include "ideals.h"
+#include <kernel/structs.h>
+#include <kernel/ideals.h>
 
 poly maEval(map theMap, poly p, ring preimage_r, nMapFunc nMap,matrix s=NULL);
 map maCopy(map theMap);

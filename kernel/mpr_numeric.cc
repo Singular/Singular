@@ -9,25 +9,25 @@
 *            ( root finder, vandermonde system solver, simplex )
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 //#ifdef HAVE_MPR
 
 //#define mprDEBUG_ALL
 
 //-> includes
-#include "options.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ideals.h"
-#include "intvec.h"
-#include "matpol.h"
-#include "ring.h"
+#include <kernel/options.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/intvec.h>
+#include <kernel/matpol.h>
+#include <kernel/ring.h>
 //#include "longrat.h"
 
 #include <math.h>
-#include "mpr_numeric.h"
+#include <kernel/mpr_numeric.h>
 
 extern size_t gmp_output_digits;
 //<-

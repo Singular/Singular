@@ -5,7 +5,7 @@
  *  Version: $Id$
  *******************************************************************/
 
-#include "omMalloc.h"
+#include <omalloc/omMalloc.h>
 
 
 /*    malloc.c

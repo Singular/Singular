@@ -8,7 +8,7 @@
 #ifndef OM_ALLOC_C
 #define OM_ALLOC_C
 
-#include "om_Alloc.h"
+#include <omalloc/om_Alloc.h>
 /*******************************************************************
  *
  *  global variables
@@ -18,7 +18,7 @@
 omBinPage_t om_ZeroPage[] = {{0, NULL, NULL, NULL, NULL}};
 omSpecBin om_SpecBin = NULL;
 
-#include "omTables.inc"
+#include <omalloc/omTables.inc>
 
 
 /*******************************************************************

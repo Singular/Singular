@@ -10,27 +10,27 @@
 
 #include <math.h>
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #include <mylimits.h>
-#include "omalloc.h"
+#include <omalloc.h>
 
 //-> includes
-#include "options.h"
-#include "polys.h"
-#include "ideals.h"
-#include "febase.h"
-#include "intvec.h"
-#include "matpol.h"
-#include "numbers.h"
+#include <kernel/options.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/febase.h>
+#include <kernel/intvec.h>
+#include <kernel/matpol.h>
+#include <kernel/numbers.h>
 #ifdef HAVE_FACTORY
-#include "clapsing.h"
+#include <kernel/clapsing.h>
 #endif
-#include "sparsmat.h"
+#include <kernel/sparsmat.h>
 
-#include "mpr_global.h"
-#include "mpr_base.h"
-#include "mpr_numeric.h"
+#include <kernel/mpr_global.h>
+#include <kernel/mpr_base.h>
+#include <kernel/mpr_numeric.h>
 //<-
 
 extern void nPrint(number n);  // for debugging output

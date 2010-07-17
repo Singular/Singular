@@ -7,8 +7,8 @@
 
 // #include <ncSACache.h> // for CCacheHash etc classes
 
-#include <structs.h>
-#include <febase.h> // for Print!
+#include <kernel/structs.h>
+#include <kernel/febase.h> // for Print!
 // //////////////////////////////////////////////////////////////////////// //
 //
 

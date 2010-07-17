@@ -6,27 +6,27 @@
 * ABSTRACT: resolutions
 */
  
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include <mylimits.h>
-#include "options.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "febase.h"
-#include "kstd1.h"
-#include "kutil.h"
-#include "stairc.h"
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/kutil.h>
+#include <kernel/stairc.h>
 //#include "cntrlc.h"
-#include "intvec.h"
-#include "numbers.h"
-#include "modulop.h"
-#include "ideals.h"
-#include "intvec.h"
-#include "ring.h"
-#include "syz.h"
-#include "kbuckets.h"
-#include "prCopy.h"
-#include "timer.h"
-#include "matpol.h"
+#include <kernel/intvec.h>
+#include <kernel/numbers.h>
+#include <kernel/modulop.h>
+#include <kernel/ideals.h>
+#include <kernel/intvec.h>
+#include <kernel/ring.h>
+#include <kernel/syz.h>
+#include <kernel/kbuckets.h>
+#include <kernel/prCopy.h>
+#include <kernel/timer.h>
+#include <kernel/matpol.h>
  
 //#define SHOW_PROT
 //#define SHOW_RED

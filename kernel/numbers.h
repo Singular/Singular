@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
-#include "structs.h"
+#include <kernel/structs.h>
 
 #define n_Copy(n, r)          (r)->cf->cfCopy(n,r)
 #define n_Delete(n, r)        (r)->cf->cfDelete(n,r)

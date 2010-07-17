@@ -7,7 +7,7 @@
 /*
 *  ABSTRACT -  Kernel: factorizing alg. of Buchberger
 */
-#include "structs.h"
+#include <kernel/structs.h>
 
 ideal_list kStdfac(ideal F, ideal Q, tHomog h,intvec ** w, ideal D=NULL);
 #endif

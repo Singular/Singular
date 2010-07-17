@@ -14,15 +14,15 @@
  * MP link Extension inits
  *
  ***************************************************************/
-#include "mod2.h"
-#include "silink.h"
-#include "slInit.h"
-#include "mod_raw.h"
+#include <Singular/mod2.h>
+#include <Singular/silink.h>
+#include <Singular/slInit.h>
+#include <kernel/mod_raw.h>
 
 #ifdef HAVE_DL
 #ifdef HAVE_MPSR
-#include "MP.h"
-#include "mpsr_sl.h"
+#include <Singular/MP.h>
+#include <Singular/mpsr_sl.h>
 
 static void* mpsr_so_handle = NULL;
 typedef void (*voidProc)();
@@ -102,7 +102,7 @@ BatchDoProc slInitMPBatchDo()
 #endif
 
 #ifdef HAVE_DBM
-#include "dbm_sl.h"
+#include <Singular/dbm_sl.h>
 
 static void* dbm_so_handle = NULL;
 static void* slInitDBMHandle()

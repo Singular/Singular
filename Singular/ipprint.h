@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: interpreter: printing
 */
-#include "structs.h"
+#include <kernel/structs.h>
 
 BOOLEAN jjPRINT(leftv res, leftv u);
 BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v);

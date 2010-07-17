@@ -7,7 +7,7 @@
 * ABSTRACT - instantiation of all templates
 */
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 //#include <vector>
 //using namespace std;
 #ifdef HAVE_FACTORY
@@ -18,7 +18,7 @@
 #if defined(HAVE_FACTORY) || defined(HAVE_FGLM)
   #include <templates/ftmpl_list.cc>
   #ifdef HAVE_FGLM
-    #include "fglm.h"
+    #include <kernel/fglm.h>
   #endif
 
   #ifdef HAVE_FACTORY
@@ -187,8 +187,8 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
 #endif
 #endif
 
-#include "GMPrat.h"
-#include "kmatrix.h"
+#include <kernel/GMPrat.h>
+#include <kernel/kmatrix.h>
 
 template    class   KMatrix<Rational>;
 
@@ -205,8 +205,8 @@ template    static  void    print_rational( ostream&,int,const Rational& );
 
 #ifdef HAVE_PLURAL
 
-#include <ncSACache.h> // for CCacheHash etc classes
-#include <ncSAMult.h> // for CMultiplier etc classes
+#include <kernel/ncSACache.h> // for CCacheHash etc classes
+#include <kernel/ncSAMult.h> // for CMultiplier etc classes
 
 template class CMultiplier<int>;
 template class CMultiplier<poly>;
@@ -217,7 +217,7 @@ template class CCacheHash<int>;
 
 #endif
 
-#include "tgb_internal.h"
+#include <kernel/tgb_internal.h>
 #ifdef HAVE_BOOST
 #include <boost/dynamic_bitset.hpp>
 #include <vector>
@@ -260,8 +260,8 @@ template void noro_step<tgb_uint32>(poly*p,int &pn,slimgb_alg* c);
 //
 /* next lines are templates used in new minor code */
 #include <list>
-#include "Minor.h"
-#include "Cache.h"
+#include <Singular/Minor.h>
+#include <Singular/Cache.h>
 template class std::list<int>;
 template class std::list<MinorKey>;
 template class std::list<IntMinorValue>;

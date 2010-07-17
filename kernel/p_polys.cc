@@ -10,7 +10,7 @@
  *******************************************************************/
 
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -18,14 +18,14 @@
 # define MYTEST 0
 #endif /* ifndef NDEBUG */
 
-#include "structs.h"
-#include "structs.h"
-#include "p_polys.h"
-#include "ring.h"
-#include "ideals.h"
-#include "int64vec.h"
+#include <kernel/structs.h>
+#include <kernel/structs.h>
+#include <kernel/p_polys.h>
+#include <kernel/ring.h>
+#include <kernel/ideals.h>
+#include <kernel/int64vec.h>
 #ifndef NDEBUG
-#include "febase.h"
+#include <kernel/febase.h>
 #endif
 
 /***************************************************************
@@ -1161,5 +1161,5 @@ poly p_NSet(number n, const ring r)
 #undef n_Delete
 #define n_Delete(n, r) ((void)0)
 
-#include "p_Delete__T.cc"
+#include <kernel/p_Delete__T.cc>
 

@@ -7,7 +7,7 @@
 
 #define SPECTRUM_CC
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_SPECTRUM
 
@@ -20,20 +20,20 @@
 
 #include <mylimits.h>
 
-#include "numbers.h"
-#include "polys.h"
-#include "ideals.h"
-#include "kstd1.h"
-#include "stairc.h"
-#include "intvec.h"
-#include "ring.h"
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include <kernel/stairc.h>
+#include <kernel/intvec.h>
+#include <kernel/ring.h>
 
-#include "multicnt.h"
-#include "GMPrat.h"
-#include "kmatrix.h"
-#include "npolygon.h"
-#include "splist.h"
-#include "semic.h"
+#include <kernel/multicnt.h>
+#include <kernel/GMPrat.h>
+#include <kernel/kmatrix.h>
+#include <kernel/npolygon.h>
+#include <kernel/splist.h>
+#include <kernel/semic.h>
 
 // ----------------------------------------------------------------------------
 //  test if the polynomial  h  has a term of total degree d

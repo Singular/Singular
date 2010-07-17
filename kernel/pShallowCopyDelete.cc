@@ -8,10 +8,10 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#include "mod2.h"
-#include "p_polys.h"
-#include "ring.h"
-#include "pShallowCopyDelete.h"
+#include <kernel/mod2.h>
+#include <kernel/p_polys.h>
+#include <kernel/ring.h>
+#include <kernel/pShallowCopyDelete.h>
 
 // a simple implementations
 poly pShallowCopyDelete_General(poly s_p, ring s_r, ring d_r, omBin d_bin)

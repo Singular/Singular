@@ -13,10 +13,10 @@
 
 //-> include & define stuff
 // must have gmp version >= 2
-#include "si_gmp.h"
-#include "numbers.h"
-#include "ring.h"
-#include "mpr_global.h"
+#include <kernel/si_gmp.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
+#include <kernel/mpr_global.h>
 
 #define ZTOF 1
 #define QTOF 2

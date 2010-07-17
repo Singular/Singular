@@ -17,8 +17,8 @@
 #define PINLINE0
 #endif
 
-#include "p_polys.h"
-#include "ring.h"
+#include <kernel/p_polys.h>
+#include <kernel/ring.h>
 
 PINLINE0 int p_SetCompP(poly p, int i, ring r)
 {

@@ -6,20 +6,20 @@
 * ABSTRACT: conversion between polys and coef vectors
 */
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_PCV
 //#if !defined(HAVE_DYNAMIC_LOADING) || defined(BUILD_MODULE)
 
-#include "tok.h"
-#include "ipid.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ideals.h"
-#include "lists.h"
-#include "matpol.h"
-#include "febase.h"
-#include "pcv.h"
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <Singular/lists.h>
+#include <kernel/matpol.h>
+#include <kernel/febase.h>
+#include <Singular/pcv.h>
 
 static int pcvMaxDegree;
 static int pcvTableSize;

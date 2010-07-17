@@ -1,2 +1,2 @@
 #define TEST_CHECK
-#include "omtTestAlloc.c"
+#include <omalloc/omtTestAlloc.c>

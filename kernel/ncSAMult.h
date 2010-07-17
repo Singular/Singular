@@ -8,15 +8,15 @@
 
 // #include <ncSAMult.h> // for CMultiplier etc classes
 
-#include "options.h"
-#include <ring.h>
-#include <summator.h> // for CPolynomialSummator class
-#include <febase.h> // for Print!
-#include <p_polys.h>
-#include <p_Mult_q.h>
+#include <kernel/options.h>
+#include <kernel/ring.h>
+#include <kernel/summator.h> // for CPolynomialSummator class
+#include <kernel/febase.h> // for Print!
+#include <kernel/p_polys.h>
+#include <kernel/p_Mult_q.h>
 
-#include <ncSACache.h> // for CCacheHash etc classes
-#include <ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
+#include <kernel/ncSACache.h> // for CCacheHash etc classes
+#include <kernel/ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
 // //////////////////////////////////////////////////////////////////////// //
 //

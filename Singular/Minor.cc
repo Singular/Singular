@@ -1,8 +1,8 @@
-#include "mod2.h"
-#include "structs.h"
-#include "polys.h"
+#include <Singular/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/polys.h>
 #include <Minor.h>
-#include "febase.h"
+#include <kernel/febase.h>
 
 void MinorKey::reset()
 {

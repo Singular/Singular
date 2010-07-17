@@ -1,9 +1,9 @@
-#include "mod2.h"
-#include "structs.h"
-#include "polys.h"
-#include "ideals.h"
-#include "kstd1.h"
-#include "matpol.h"
+#include <Singular/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/kstd1.h>
+#include <kernel/matpol.h>
 #include <MinorInterface.h>
 #include <MinorProcessor.h>
 

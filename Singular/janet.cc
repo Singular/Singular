@@ -3,24 +3,24 @@
 #include <string.h>
 #include <time.h>
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 #include <omalloc.h>
-#include "polys.h"
-#include "numbers.h"
-#include "ring.h"
-#include "ideals.h"
-#include "subexpr.h"
-#include "kbuckets.h"
-#include "longrat.h"
+#include <kernel/polys.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
+#include <kernel/ideals.h>
+#include <Singular/subexpr.h>
+#include <kernel/kbuckets.h>
+#include <kernel/longrat.h>
 
 #if (defined(__CYGWIN__))
 #include <ctype.h>
 #endif
 #include <stdarg.h>
 
-#include "febase.h"
-#include "janet.h"
-#include "kutil.h"
+#include <kernel/febase.h>
+#include <Singular/janet.h>
+#include <kernel/kutil.h>
 
 //------GLOBALS-------
 static int m_s,v_s,vectorized,VarN1,offset;

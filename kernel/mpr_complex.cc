@@ -11,15 +11,15 @@
 
 // WARNING! ALWAYS use omAlloc and FreeL when alloc. memory for some char* !!
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 //#ifdef HAVE_MPR
-#include "structs.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "numbers.h"
-#include "longrat.h"
+#include <kernel/structs.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/longrat.h>
 #include <math.h>
-#include "mpr_complex.h"
+#include <kernel/mpr_complex.h>
 
 //%s
 // this was copied form longrat0.cc

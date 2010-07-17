@@ -6,18 +6,18 @@
 * ABSTRACT: Gauss-Manin system normal form
 */
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_GMS
 
-#include "febase.h"
-#include "structs.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ideals.h"
-#include "lists.h"
-#include "matpol.h"
-#include "gms.h"
+#include <kernel/febase.h>
+#include <kernel/structs.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <Singular/lists.h>
+#include <kernel/matpol.h>
+#include <Singular/gms.h>
 
 
 lists gmsNF(ideal p,ideal g,matrix B,int D,int K)

@@ -8,25 +8,25 @@
 //#define HAVE_TAIL_RING
 #define NO_BUCKETS
 
-#include "mod2.h"
-#include "kutil.h"
-#include "structs.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "p_polys.h"
-#include "ideals.h"
-#include "febase.h"
-#include "kstd1.h"
-#include "khstd.h"
-#include "kbuckets.h"
-#include "weight.h"
-#include "intvec.h"
-#include "pInline1.h"
+#include <kernel/mod2.h>
+#include <kernel/kutil.h>
+#include <kernel/structs.h>
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/p_polys.h>
+#include <kernel/ideals.h>
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
+#include <kernel/kbuckets.h>
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
+#include <kernel/pInline1.h>
 #ifdef HAVE_PLURAL
-#include "gring.h"
+#include <kernel/gring.h>
 #endif
 
-#include "ringgb.h"
+#include <kernel/ringgb.h>
 
 #ifdef HAVE_RINGS
 poly reduce_poly_fct(poly p, ring r)

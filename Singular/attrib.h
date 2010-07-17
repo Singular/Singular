@@ -8,7 +8,7 @@
 * ABSTRACT: attributes to leftv and idhdl
 */
 #include <string.h>
-#include "structs.h"
+#include <kernel/structs.h>
 
 class sattr;
 typedef sattr * attr;

@@ -13,15 +13,15 @@
  *
  ***************************************************************/
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_MPSR
 
-#include "mpsr_Get.h"
-#include "longalg.h"
-#include "tok.h"
-#include "maps.h"
-#include "lists.h"
+#include <Singular/mpsr_Get.h>
+#include <Singular/longalg.h>
+#include <Singular/tok.h>
+#include <kernel/maps.h>
+#include <Singular/lists.h>
 
 BOOLEAN currComplete = FALSE;
 
@@ -435,7 +435,7 @@ void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
 #undef free
 #undef freeSize
 
-#include "mmalloc.h"
+#include <Singular/mmalloc.h>
 
 static int mpsr_is_initialized = 0;
 

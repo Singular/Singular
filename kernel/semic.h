@@ -12,7 +12,7 @@
 #ifndef SEMIC_H
 #define SEMIC_H
 
-#include "GMPrat.h"
+#include <kernel/GMPrat.h>
 
 typedef enum
 {

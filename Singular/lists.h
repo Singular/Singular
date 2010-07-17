@@ -7,11 +7,11 @@
 /*
 * ABSTRACT: handling of the list type
 */
-#include "omalloc.h"
-#include "structs.h"
-#include "ideals.h"
-#include "subexpr.h"
-#include "tok.h"
+#include <omalloc.h>
+#include <kernel/structs.h>
+#include <kernel/ideals.h>
+#include <Singular/subexpr.h>
+#include <Singular/tok.h>
 
 #ifdef MDEBUG
 #define INLINE_THIS

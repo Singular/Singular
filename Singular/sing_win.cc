@@ -7,7 +7,7 @@
 * ABSTRACT: Windows specific routines
 */
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 #ifdef ix86_Win
 #include <windows.h>
 #include <winuser.h>

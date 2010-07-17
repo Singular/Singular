@@ -1,6 +1,6 @@
-#include "omtTest.h"
+#include <omalloc/omtTest.h>
 #define OM_CHECK 1
-#include "om_Alloc.h"
+#include <omalloc/om_Alloc.h>
 
 struct LongSpec
 {

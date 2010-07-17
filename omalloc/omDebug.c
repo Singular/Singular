@@ -7,10 +7,10 @@
  *******************************************************************/
 #include <mylimits.h>
 #include <string.h>
-#include "omConfig.h"
-#include "om_Alloc.h"
-#include "omDebug.h"
-#include "omReturn.h"
+#include <omalloc/omConfig.h>
+#include <omalloc/om_Alloc.h>
+#include <omalloc/omDebug.h>
+#include <omalloc/omReturn.h>
 
 #ifndef OM_NDEBUG
 /*******************************************************************

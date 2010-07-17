@@ -8,23 +8,23 @@
 * ABSTRACT -
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_FGLM
-#include "options.h"
-#include "polys.h"
-#include "ideals.h"
-#include "ring.h"
-#include "febase.h"
-#include "maps.h"
-#include "omalloc.h"
-#include "fglmvec.h"
-#include "fglmgauss.h"
-#include "kstd1.h"
+#include <kernel/options.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/febase.h>
+#include <kernel/maps.h>
+#include <omalloc.h>
+#include <kernel/fglmvec.h>
+#include <kernel/fglmgauss.h>
+#include <kernel/kstd1.h>
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory.h>
 
-#include "fglm.h"
+#include <kernel/fglm.h>
 #include <templates/ftmpl_list.h>
 
 #ifndef NOSTREAMIO

@@ -7,9 +7,9 @@
 /*
 * ABSTRACT: computation with long rational numbers
 */
-#include "structs.h"
+#include <kernel/structs.h>
 
-#include "si_gmp.h"
+#include <kernel/si_gmp.h>
 
 #define SR_HDL(A) ((long)(A))
 

@@ -15,20 +15,20 @@
  *    Updated routines to MP and MPP v1.1
  *
  ***************************************************************/
-#include "mod2.h"
+#include <Singular/mod2.h>
 
 #ifdef HAVE_MPSR
 
-#include "mpsr_Put.h"
-#include "mpsr_Tok.h"
-#include "longalg.h"
-#include "omalloc.h"
-#include "ring.h"
-#include "polys.h"
+#include <Singular/mpsr_Put.h>
+#include <Singular/mpsr_Tok.h>
+#include <Singular/longalg.h>
+#include <omalloc.h>
+#include <kernel/ring.h>
+#include <kernel/polys.h>
 //#include "ipid.h"
 
 #ifdef PARI_BIGINT_TEST
-#include "MP_PariBigInt.h"
+#include <Singular/MP_PariBigInt.h>
 MP_Status_t MP_MyPutApIntPacket(MP_Link_pt link, MP_ApInt_t mp_apint,
                                 MP_NumAnnot_t num_annots)
 {

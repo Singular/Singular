@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
-#include "structs.h"
+#include <kernel/structs.h>
 
 
 BOOLEAN nfGreaterZero (number k);

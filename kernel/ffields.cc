@@ -7,13 +7,13 @@
 */
 
 #include <string.h>
-#include "mod2.h"
+#include <kernel/mod2.h>
 #include <mylimits.h>
-#include "febase.h"
-#include "omalloc.h"
-#include "numbers.h"
-#include "ring.h"
-#include "ffields.h"
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
+#include <kernel/ffields.h>
 
 int nfCharQ=0;  /* the number of elemts: q*/
 int nfM1;       /*representation of -1*/

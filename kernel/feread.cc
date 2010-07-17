@@ -6,7 +6,7 @@
 * ABSTRACT: input from ttys, simulating fgets
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 // ----------------------------------------
 // system settings:
@@ -19,11 +19,11 @@
 #ifdef ix86_Win
 #define READLINE_STATIC
 #endif
-#include "febase.h"
-#include "omalloc.h"
-#include "options.h"
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/options.h>
 
-#include "../Singular/static.h"
+#include <Singular/static.h>
 
 #ifdef HAVE_STATIC
 #undef HAVE_DYN_RL

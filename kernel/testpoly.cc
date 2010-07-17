@@ -1,4 +1,4 @@
-#include "Poly.h"
+#include <kernel/Poly.h>
 
 void testPoly(){
   Poly p(1,currRing);

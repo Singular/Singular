@@ -297,7 +297,7 @@
  *
  *******************************************************************/
 
-#include "omMalloc.h"
+#include <omalloc/omMalloc.h>
 
 extern void* omEmulateCalloc(size_t size);
 extern void* omEmulateRealloc0Size(void* o_addr, size_t o_size, size_t n_size);

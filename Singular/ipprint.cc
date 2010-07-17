@@ -6,19 +6,19 @@
 * ABSTRACT: interpreter: printing
 */
 
-#include "mod2.h"
-#include "tok.h"
-#include "ipid.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "polys.h"
-#include "matpol.h"
-#include "subexpr.h"
-#include "intvec.h"
-#include "ipshell.h"
-#include "ipprint.h"
-#include "ideals.h"
-#include "attrib.h"
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/polys.h>
+#include <kernel/matpol.h>
+#include <Singular/subexpr.h>
+#include <kernel/intvec.h>
+#include <Singular/ipshell.h>
+#include <Singular/ipprint.h>
+#include <kernel/ideals.h>
+#include <Singular/attrib.h>
 
 /*2
 * print for: int, string, poly, vector, ideal

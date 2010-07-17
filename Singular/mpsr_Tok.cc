@@ -25,8 +25,8 @@
 #include"febase.h"
 #include"tok.h"
 
-#include "mpsr.h"
-#include "mpsr_Tok.h"
+#include <Singular/mpsr.h>
+#include <Singular/mpsr_Tok.h>
 
 
 #define MAX_COP 256 // there may be at most 256 cops

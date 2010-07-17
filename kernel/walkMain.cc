@@ -7,19 +7,19 @@
  *
 */
 #include <string.h>
-#include "mod2.h"
-#include "options.h"
-#include "intvec.h"
-#include "int64vec.h"
-#include "polys.h"
-#include "ideals.h"
-#include "ring.h"
-#include "walkMain.h"
-#include "walkSupport.h"
-#include "prCopy.h"
-#include "kstd1.h"
-#include "matpol.h"
-#include "ring.h"
+#include <kernel/mod2.h>
+#include <kernel/options.h>
+#include <kernel/intvec.h>
+#include <kernel/int64vec.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/walkMain.h>
+#include <kernel/walkSupport.h>
+#include <kernel/prCopy.h>
+#include <kernel/kstd1.h>
+#include <kernel/matpol.h>
+#include <kernel/ring.h>
 
 
 ///////////////////////////////////////////////////////////////////

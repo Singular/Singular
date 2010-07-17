@@ -17,47 +17,47 @@ extern "C" {
 #endif
 
 /*MAKEHEADER*/
-#include "omConfig.h"
+#include <omalloc/omConfig.h>
 /*MAKEHEADER*/
-#include "omDerivedConfig.h"
+#include <omalloc/omDerivedConfig.h>
 /*MAKEHEADER*/
-#include "omError.h"
+#include <omalloc/omError.h>
 /*MAKEHEADER*/
-#include "omStructs.h"
+#include <omalloc/omStructs.h>
 /*MAKEHEADER*/
-#include "omAllocDecl.h"
+#include <omalloc/omAllocDecl.h>
 /*MAKEHEADER*/
-#include "omInlineDecl.h"
+#include <omalloc/omInlineDecl.h>
 /*MAKEHEADER*/
-#include "omBin.h"
+#include <omalloc/omBin.h>
 /*MAKEHEADER*/
-#include "omMemOps.h"
+#include <omalloc/omMemOps.h>
 /*MAKEHEADER*/
-#include "omList.h"
+#include <omalloc/omList.h>
 /*MAKEHEADER*/
-#include "omFindExec.h"
+#include <omalloc/omFindExec.h>
 /*MAKEHEADER*/
-#include "omGetBackTrace.h"
+#include <omalloc/omGetBackTrace.h>
 /*MAKEHEADER*/
-#include "omRet2Info.h"
+#include <omalloc/omRet2Info.h>
 /*MAKEHEADER*/
-#include "omStats.h"
+#include <omalloc/omStats.h>
 /*MAKEHEADER*/
-#include "omOpts.h"
+#include <omalloc/omOpts.h>
 /*MAKEHEADER*/
-#include "omBinPage.h"
+#include <omalloc/omBinPage.h>
 /*MAKEHEADER*/
-#include "omAllocSystem.h"
+#include <omalloc/omAllocSystem.h>
 /*MAKEHEADER*/
-#include "omTables.h"
+#include <omalloc/omTables.h>
 /*MAKEHEADER*/
-#include "omAllocPrivate.h"
+#include <omalloc/omAllocPrivate.h>
 /*MAKEHEADER*/
-#include "omDebug.h"
+#include <omalloc/omDebug.h>
 /*MAKEHEADER*/
-#include "omInline.h"
+#include <omalloc/omInline.h>
 /*MAKEHEADER*/
-#include "omAllocFunc.h"
+#include <omalloc/omAllocFunc.h>
 
 #ifdef __cplusplus
 }

@@ -7,8 +7,8 @@
 /*
 * ABSTRACT: gauss implementation for F4 header
 */
-#include "mod2.h"
-#include "numbers.h"
+#include <kernel/mod2.h>
+#include <kernel/numbers.h>
 //#include "tgb_internal.h"
 
 struct slimgb_alg;

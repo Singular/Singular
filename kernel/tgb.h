@@ -12,9 +12,9 @@
 //#define OM_CHECK 3
 //#define OM_TRACK 5
 
-#include "ring.h"
+#include <kernel/ring.h>
 
-#include "structs.h"
+#include <kernel/structs.h>
 
 
 

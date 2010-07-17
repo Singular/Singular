@@ -16,10 +16,10 @@
 // #define PDIV_DEBUG
 #endif
 #include <mylimits.h>
-#include "p_MemCmp.h"
-#include "structs.h"
-#include "ring.h"
-#include "numbers.h"
+#include <kernel/p_MemCmp.h>
+#include <kernel/structs.h>
+#include <kernel/ring.h>
+#include <kernel/numbers.h>
 
 #if PDEBUG > 0 || defined(NO_PINLINE1)
 
@@ -52,11 +52,11 @@ BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, const ring r);
 
 #if !defined(NO_PINLINE1) || defined(PINLINE1_CC)
 
-#include "omalloc.h"
-#include "numbers.h"
-#include "p_polys.h"
-#include "p_MemAdd.h"
-#include "p_MemCopy.h"
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/p_polys.h>
+#include <kernel/p_MemAdd.h>
+#include <kernel/p_MemCopy.h>
 
 /***************************************************************
  *

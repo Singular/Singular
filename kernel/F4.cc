@@ -1,7 +1,7 @@
-#include "mod2.h"
-#include "F4.h"
-#include "tgb_internal.h"
-#include "tgbgauss.h"
+#include <kernel/mod2.h>
+#include <kernel/F4.h>
+#include <kernel/tgb_internal.h>
+#include <kernel/tgbgauss.h>
 /****************************************
 *  Computer Algebra System SINGULAR     *
 ****************************************/

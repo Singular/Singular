@@ -13,11 +13,11 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
-#include "modulop.h"
+#include <kernel/modulop.h>
 
 #ifdef HAVE_PLURAL
 // for nc_p_ProcsSet:
-#include "gring.h"
+#include <kernel/gring.h>
 #endif
 
 

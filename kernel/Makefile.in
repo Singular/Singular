@@ -45,10 +45,10 @@ LN_S		= @LN_S@
 ## compiler and linker options
 ##
 PIPE		= @PIPE@
-CFLAGS		= @CFLAGS@ ${PIPE}
-CXXFLAGS	= @CXXFLAGS@ ${PIPE}
+CFLAGS		= @CFLAGS@ ${PIPE} 
+CXXFLAGS	= @CXXFLAGS@ ${PIPE} 
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
-CPPFLAGS	= -I${srcdir} @CPPFLAGS@
+CPPFLAGS	= -I${srcdir} -I@prefix@  @CPPFLAGS@ 
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS		= @LDFLAGS@
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
@@ -115,6 +115,7 @@ CXXSOURCES=clapconv.cc \
     pShallowCopyDelete.cc fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc \
     f5c.cc F5cLists.cc ratgring.cc shiftgb.cc gfan.cc linearAlgebra.cc
+CXXSOURCES2	= SingularBuilder.cpp
 
 # normal C source files
 CSOURCES=weight0.c fegetopt.c fereadl.c dError.c mmstd.c
@@ -180,7 +181,7 @@ DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
 	mod2.h.in testgh install-sh mkinstalldirs \
 	check_aso.pl prCopy.pl
 
-OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
+OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o) #$(CXXSOURCES2:.cpp=.o)
 OBJS2 := $(ESOURCES:.cc=.o)
 OBJSG2 := $(ESOURCES:.cc=.og)
 OBJSP2 := $(ESOURCES:.cc=.op)
@@ -255,7 +256,7 @@ p_Procs_Dynamic.inc p_Procs_Lib.inc: p_Procs_Dynamic.h
 
 # here is how p_Procs_[Static|Dynamic].inc is generated
 p_Procs_%.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
-	$(CXX) -g -Dp_Procs_$* p_Procs_Generate.cc -o p_Procs_$*
+	$(CXX) $(CPPFLAGS) -g -Dp_Procs_$* p_Procs_Generate.cc -o p_Procs_$*
 	./p_Procs_$* > p_Procs_$*.xx && mv p_Procs_$*.xx p_Procs_$*.inc
 	-rm -f p_Procs_$* p_Procs_$*.exe
 

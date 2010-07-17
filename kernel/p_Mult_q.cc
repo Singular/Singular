@@ -8,7 +8,7 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 /***************************************************************
  *
@@ -16,13 +16,13 @@
  * Destroys: if !copy then p, q
  * Assumes: pLength(p) >= 2 pLength(q) >=2
  ***************************************************************/
-#include "options.h"
-#include "p_polys.h"
-#include "p_Procs.h"
-#include "p_Numbers.h"
-#include "kbuckets.h"
+#include <kernel/options.h>
+#include <kernel/p_polys.h>
+#include <kernel/p_Procs.h>
+#include <kernel/p_Numbers.h>
+#include <kernel/kbuckets.h>
 
-#include "p_Mult_q.h"
+#include <kernel/p_Mult_q.h>
 
 BOOLEAN pqLength(poly p, poly q, int &lp, int &lq, const int min)
 {

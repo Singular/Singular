@@ -8,23 +8,23 @@
  *  Created: 8/00 - 11/00
  *  Version: $Id$
  *******************************************************************/
-#include "mod2.h"
-#include "ratgring.h"
+#include <kernel/mod2.h>
+#include <kernel/ratgring.h>
 #ifdef HAVE_RATGRING
-#include "gring.h"
-#include "febase.h"
-#include "ring.h"
-#include "polys.h"
-#include "numbers.h"
-#include "ideals.h"
-#include "matpol.h"
-#include "kbuckets.h"
-#include "kstd1.h"
-#include "sbuckets.h"
-#include "prCopy.h"
-#include "p_Mult_q.h"
-#include "clapsing.h"
-#include "options.h"
+#include <kernel/gring.h>
+#include <kernel/febase.h>
+#include <kernel/ring.h>
+#include <kernel/polys.h>
+#include <kernel/numbers.h>
+#include <kernel/ideals.h>
+#include <kernel/matpol.h>
+#include <kernel/kbuckets.h>
+#include <kernel/kstd1.h>
+#include <kernel/sbuckets.h>
+#include <kernel/prCopy.h>
+#include <kernel/p_Mult_q.h>
+#include <kernel/clapsing.h>
+#include <kernel/options.h>
 
 void pLcmRat(poly a, poly b, poly m, int rat_shift)
 {

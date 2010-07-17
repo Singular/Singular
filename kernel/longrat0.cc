@@ -9,12 +9,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "mod2.h"
-#include "structs.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "longrat.h"
-#include "numbers.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/longrat.h>
+#include <kernel/numbers.h>
 
 #define SR_HDL(A) ((long)(A))
 //#define SR_INT    1 // already in longrat.h

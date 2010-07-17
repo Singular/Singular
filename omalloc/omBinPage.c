@@ -6,8 +6,8 @@
  *  Version: $Id$
  *******************************************************************/
 #include <mylimits.h>
-#include "om_Alloc.h"
-#include "omDefaultConfig.h"
+#include <omalloc/om_Alloc.h>
+#include <omalloc/omDefaultConfig.h>
 
 /*******************************************************************
  *
@@ -477,7 +477,7 @@ static void omUnregisterBinPages(void* low_addr, int pages)
  *
  *******************************************************************/
 #ifndef OM_NDEBUG
-#include "omDebug.h"
+#include <omalloc/omDebug.h>
 
 int omIsKnownMemoryRegion(omBinPageRegion region)
 {

@@ -8,27 +8,27 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
-#include "mod2.h"
-#include "structs.h"
-#include "p_polys.h"
-#include "ring.h"
-#include "p_Procs.h"
-#include "p_Numbers.h"
-#include "p_MemCmp.h"
-#include "p_MemAdd.h"
-#include "p_MemCopy.h"
-#include "kbuckets.h"
-#include "dError.h"
+#include <kernel/mod2.h>
+#include <kernel/structs.h>
+#include <kernel/p_polys.h>
+#include <kernel/ring.h>
+#include <kernel/p_Procs.h>
+#include <kernel/p_Numbers.h>
+#include <kernel/p_MemCmp.h>
+#include <kernel/p_MemAdd.h>
+#include <kernel/p_MemCopy.h>
+#include <kernel/kbuckets.h>
+#include <kernel/dError.h>
 
 BOOLEAN p_procs_dynamic = FALSE;
 
 #define p_Procs_Static
-#include "p_Procs_Static.inc"
+#include <kernel/p_Procs_Static.inc>
 
 // include generated configuration
-#include "p_Procs_Static.h"
+#include <kernel/p_Procs_Static.h>
 // include general p_Proc stuff
-#include "p_Procs_Impl.h"
+#include <kernel/p_Procs_Impl.h>
 
 // define DoSetProc and InitSetProcs
 #define SetStaticProcFromArray(what, type, field, length, ord) \
@@ -54,7 +54,7 @@ while(0)
 
 // include routines for setting p_ProcsSet
 
-#include "p_Procs_Set.h"
+#include <kernel/p_Procs_Set.h>
 
 
 

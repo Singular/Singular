@@ -8,31 +8,31 @@
 * ABSTRACT - multipolynomial resultant
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 //#ifdef HAVE_MPR
 
 //-> includes
-#include "structs.h"
-#include "polys.h"
-#include "ideals.h"
-#include "ring.h"
-#include "febase.h"
-#include "omalloc.h"
-#include "numbers.h"
-#include "matpol.h"
+#include <kernel/structs.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/febase.h>
+#include <omalloc.h>
+#include <kernel/numbers.h>
+#include <kernel/matpol.h>
 
 #include <math.h>
 
-#include "mpr_global.h"
-#include "mpr_inout.h"
-#include "mpr_base.h"
-#include "mpr_numeric.h"
+#include <kernel/mpr_global.h>
+#include <kernel/mpr_inout.h>
+#include <kernel/mpr_base.h>
+#include <kernel/mpr_numeric.h>
 
 // to get detailed timigs, define MPR_TIMING
 #ifdef MPR_TIMING
 #define TIMING
 #endif
-#include "../factory/timing.h"
+#include <factory/timing.h>
 TIMING_DEFINE_PRINT(mpr_overall)
 TIMING_DEFINE_PRINT(mpr_check)
 TIMING_DEFINE_PRINT(mpr_constr)

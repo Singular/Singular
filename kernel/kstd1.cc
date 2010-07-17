@@ -14,8 +14,8 @@
 // define if buckets should be used
 #define MORA_USE_BUCKETS
 
-#include "mod2.h"
-#include "omalloc.h"
+#include <kernel/mod2.h>
+#include <omalloc.h>
 
 #ifndef NDEBUG
 # define MYTEST 0
@@ -29,25 +29,25 @@
 #endif /* ifdef HAVE_TAIL_RING */
 #endif /* if MYTEST */
 
-#include "options.h"
-#include "kutil.h"
-#include "kInline.cc"
-#include "polys.h"
-#include "febase.h"
-#include "kstd1.h"
-#include "khstd.h"
-#include "stairc.h"
-#include "weight.h"
+#include <kernel/options.h>
+#include <kernel/kutil.h>
+#include <kernel/kInline.cc>
+#include <kernel/polys.h>
+#include <kernel/febase.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
+#include <kernel/stairc.h>
+#include <kernel/weight.h>
 //#include "cntrlc.h"
-#include "intvec.h"
-#include "ideals.h"
+#include <kernel/intvec.h>
+#include <kernel/ideals.h>
 //#include "../Singular/ipid.h"
-#include "timer.h"
+#include <kernel/timer.h>
 
 //#include "ipprint.h"
 
 #ifdef HAVE_PLURAL
-#include "sca.h"
+#include <kernel/sca.h>
 #endif
 
 

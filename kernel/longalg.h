@@ -7,9 +7,9 @@
 /*
 * ABSTRACT:   algebraic numbers
 */
-#include "structs.h"
-#include "longrat.h"
-#include "polys-impl.h"
+#include <kernel/structs.h>
+#include <kernel/longrat.h>
+#include <kernel/polys-impl.h>
 
 typedef polyrec *   napoly;
 

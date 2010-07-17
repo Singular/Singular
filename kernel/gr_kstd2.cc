@@ -6,28 +6,28 @@
 *  ABSTRACT -  Kernel: noncomm. alg. of Buchberger
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_PLURAL
 
 #define PLURAL_INTERNAL_DECLARATIONS
 
-#include "omalloc.h"
-#include "polys.h"
-#include "ideals.h"
-#include "febase.h"
-#include "options.h"
-#include "kutil.h"
-#include "kstd1.h"
-#include "khstd.h"
-#include "kutil.h"
+#include <omalloc.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/febase.h>
+#include <kernel/options.h>
+#include <kernel/kutil.h>
+#include <kernel/kstd1.h>
+#include <kernel/khstd.h>
+#include <kernel/kutil.h>
 //#include "spolys.h"
 //#include "cntrlc.h"
-#include "weight.h"
-#include "intvec.h"
-#include "gring.h"
-#include "sca.h"
-#include "ratgring.h"
+#include <kernel/weight.h>
+#include <kernel/intvec.h>
+#include <kernel/gring.h>
+#include <kernel/sca.h>
+#include <kernel/ratgring.h>
 
 #if 0
 /*3

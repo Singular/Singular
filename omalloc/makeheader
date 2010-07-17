@@ -100,11 +100,11 @@ while read line; do
 
     # get include file from next line
     read line
-    if echo "$line" | grep -v '^#include ".*"$' > /dev/null 2> /dev/null; then
+    if echo "$line" | grep -v '^#include <omalloc/.*>$' > /dev/null 2> /dev/null; then
     	echo "makeheader: Invalid include statement $line" 1>&2
 	exit 1
     fi
-    includefile=`echo "$line" | sed 's/^#include "//; s/"$//'`
+    includefile=`echo "$line" | sed 's/^#include <omalloc\///; s/>$//'`
 
     # search for includefile
     found=0

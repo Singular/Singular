@@ -6,10 +6,10 @@
 ****************************************/
 /* $Id$ */
 
-#include <ring.h>
-#include <gring.h>
-#include <structs.h>
-#include <intvec.h>
+#include <kernel/ring.h>
+#include <kernel/gring.h>
+#include <kernel/structs.h>
+#include <kernel/intvec.h>
 
 
 // we must always have this test!
@@ -31,7 +31,7 @@ inline ideal SCAQuotient(const ring r)
   return r->GetNC()->SCAQuotient();
 }
 
-#include <gring.h>
+#include <kernel/gring.h>
 
 
 inline unsigned int scaFirstAltVar(ring r)

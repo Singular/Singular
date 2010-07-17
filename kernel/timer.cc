@@ -7,7 +7,7 @@
 *  ABSTRACT - get the computing time
 */
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 // undef GETRUSAGE to get the original timer code (w.r.t. CLOCK_TICKS)
 #define GETRUSAGE
 #ifdef GETRUSAGE
@@ -82,8 +82,8 @@ void SetMinDisplayTime(double mtime)
   #endif
 #endif
 
-#include "timer.h"
-#include "febase.h"
+#include <kernel/timer.h>
+#include <kernel/febase.h>
 /*3
 * the start time of the timer
 */

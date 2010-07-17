@@ -18,7 +18,7 @@
 #endif
 
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_PLURAL
 
@@ -29,11 +29,11 @@
 #endif
 
 
-#include "options.h"
-#include "p_Procs.h"
-#include <ncSAMult.h> // for CMultiplier etc classes
-#include <sca.h> // for SCA
-#include <polys.h> // for p_One
+#include <kernel/options.h>
+#include <kernel/p_Procs.h>
+#include <kernel/ncSAMult.h> // for CMultiplier etc classes
+#include <kernel/sca.h> // for SCA
+#include <kernel/polys.h> // for p_One
 
 
 

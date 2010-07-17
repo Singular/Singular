@@ -10,32 +10,32 @@
 */
 
 
-#include "mod2.h"
+#include <kernel/mod2.h>
 #ifdef HAVE_FGLM_HOM
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif
-#include "tok.h"
-#include "structs.h"
-#include "subexpr.h"
-#include "polys.h"
-#include "ideals.h"
-#include "ring.h"
-#include "ipid.h"
-#include "ipshell.h"
-#include "febase.h"
-#include "maps.h"
-#include "omalloc.h"
-#include "fglm.h"
-#include "fglmvec.h"
-#include "fglmgauss.h"
-#include "intvec.h"
-#include "kstd1.h"
-#include "stairc.h"  // -> hHStdSeries, hFirstSeries usw.
+#include <kernel/tok.h>
+#include <kernel/structs.h>
+#include <kernel/subexpr.h>
+#include <kernel/polys.h>
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/ipid.h>
+#include <kernel/ipshell.h>
+#include <kernel/febase.h>
+#include <kernel/maps.h>
+#include <omalloc.h>
+#include <kernel/fglm.h>
+#include <kernel/fglmvec.h>
+#include <kernel/fglmgauss.h>
+#include <kernel/intvec.h>
+#include <kernel/kstd1.h>
+#include <kernel/stairc.h>
 #include <templates/ftmpl_list.h>
 
 // obachman: Got rid off those "redefiende messages by includeing fglm.h
-#include "fglm.h"
+#include <kernel/fglm.h>
 #if 0
 #define PROT(msg) if (BTEST1(OPT_PROT)) Print(msg)
 #define STICKYPROT(msg) if (BTEST1(OPT_PROT)) Print(msg)

@@ -9,13 +9,13 @@
  *  Created: 9/00
  *  Version: $Id$
  *******************************************************************/
-#include "mod2.h"
+#include <kernel/mod2.h>
 
-#include "sbuckets.h"
-#include "omalloc.h"
-#include "ring.h"
-#include "p_Procs.h"
-#include "p_polys.h"
+#include <kernel/sbuckets.h>
+#include <omalloc.h>
+#include <kernel/ring.h>
+#include <kernel/p_Procs.h>
+#include <kernel/p_polys.h>
 
 
 

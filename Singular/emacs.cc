@@ -18,8 +18,8 @@
 #ifdef ix86_Win
 #include <windows.h>
 #endif
-#include "mod2.h"
-#include "version.h"
+#include <Singular/mod2.h>
+#include <Singular/version.h>
 #include <omalloc.h>
 
 #if !defined(TSINGULAR) && !defined(ESINGULAR)
@@ -86,8 +86,8 @@ void fePrintReportBug(char* msg, char* file, int line)
 
 }
 
-#include "../kernel/feResource.cc"
-#include "feOpt.cc"
+#include <Singular/../kernel/feResource.cc>
+#include <Singular/feOpt.cc>
 
 void mainUsage()
 {

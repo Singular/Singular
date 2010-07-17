@@ -7,10 +7,10 @@
  *******************************************************************/
 #include <unistd.h>
 #define OM_NO_MALLOC_MACROS
-#include "omConfig.h"
-#include "omDefaultConfig.h"
-#include "omMalloc.h"
-#include "om_Alloc.h"
+#include <omalloc/omConfig.h>
+#include <omalloc/omDefaultConfig.h>
+#include <omalloc/omMalloc.h>
+#include <omalloc/om_Alloc.h>
 
 omInfo_t om_Info = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 

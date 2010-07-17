@@ -13,21 +13,21 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "mod2.h"
-#include "tok.h"
-#include "options.h"
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <kernel/options.h>
 #include <omalloc.h>
-#include "febase.h"
-#include "subexpr.h"
-#include "ipid.h"
-#include "silink.h"
-#include "ipshell.h"
-#include "matpol.h"
-#include "ring.h"
-#include "lists.h"
-#include "ideals.h"
-#include "numbers.h"
-#include "intvec.h"
+#include <kernel/febase.h>
+#include <Singular/subexpr.h>
+#include <Singular/ipid.h>
+#include <Singular/silink.h>
+#include <Singular/ipshell.h>
+#include <kernel/matpol.h>
+#include <kernel/ring.h>
+#include <Singular/lists.h>
+#include <kernel/ideals.h>
+#include <kernel/numbers.h>
+#include <kernel/intvec.h>
 
 // #ifdef HAVE_DBM
 // #ifdef ix86_Win
@@ -821,7 +821,7 @@ BOOLEAN slGetDumpAscii(si_link l)
 
 /*------------Initialization at Start-up time------------------------*/
 
-#include "slInit.h"
+#include <Singular/slInit.h>
 
 static si_link_extension slTypeInit(si_link_extension s, const char* type)
 {

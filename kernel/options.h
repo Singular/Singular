@@ -8,7 +8,7 @@
  * ABSTRACT: macros for global options
  */
 
-#include "structs.h" /*for BITSET */
+#include <kernel/structs.h>
 /*the general set of std-options : test */
 /*the general set of verbose-options : verbose */
 #ifdef __cplusplus

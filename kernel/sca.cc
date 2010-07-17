@@ -19,38 +19,38 @@
 #endif
 
 // #define PDEBUG 2
-#include "mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_PLURAL
 // for
 #define PLURAL_INTERNAL_DECLARATIONS
-#include "sca.h"
-#include "gring.h"
+#include <kernel/sca.h>
+#include <kernel/gring.h>
 
 
-#include "febase.h"
-#include "options.h"
+#include <kernel/febase.h>
+#include <kernel/options.h>
 
-#include "p_polys.h"
-#include "kutil.h"
-#include "ideals.h"
-#include "intvec.h"
-#include "polys.h"
+#include <kernel/p_polys.h>
+#include <kernel/kutil.h>
+#include <kernel/ideals.h>
+#include <kernel/intvec.h>
+#include <kernel/polys.h>
 
-#include "ring.h"
-#include "numbers.h"
-#include "matpol.h"
-#include "kbuckets.h"
-#include "kstd1.h"
-#include "sbuckets.h"
-#include "prCopy.h"
-#include "p_Mult_q.h"
-#include "p_MemAdd.h"
+#include <kernel/ring.h>
+#include <kernel/numbers.h>
+#include <kernel/matpol.h>
+#include <kernel/kbuckets.h>
+#include <kernel/kstd1.h>
+#include <kernel/sbuckets.h>
+#include <kernel/prCopy.h>
+#include <kernel/p_Mult_q.h>
+#include <kernel/p_MemAdd.h>
 
-#include "kutil.h"
-#include "kstd1.h"
+#include <kernel/kutil.h>
+#include <kernel/kstd1.h>
 
-#include "weight.h"
+#include <kernel/weight.h>
 
 
 // poly functions defined in p_Procs :

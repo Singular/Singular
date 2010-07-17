@@ -14,7 +14,7 @@
 //
 //**************************************************************************/
 
-#include "mod2.h"
+#include <Singular/mod2.h>
 #ifdef HAVE_DBM
 #ifndef HPUX_9
 #include <strings.h>
@@ -50,7 +50,7 @@ static char sccsid[] = "@(#)ndbm.c        5.3 (Berkeley) 3/9/86";
 #ifndef HAVE_BCOPY
 #   define bcopy(a,b,c) memmove(b,a,c)
 #endif /* not HAVE_BCOPY */
-#include "ndbm.h"
+#include <Singular/ndbm.h>
 
 #define BYTESIZ 8
 #undef setbit

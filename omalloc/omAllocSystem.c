@@ -14,10 +14,10 @@
 
 /* disable our malloc macros */
 #define OM_NO_MALLOC_MACROS
-#include "omConfig.h"
-#include "omDefaultConfig.h"
-#include "omMalloc.h"
-#include "om_Alloc.h"
+#include <omalloc/omConfig.h>
+#include <omalloc/omDefaultConfig.h>
+#include <omalloc/omMalloc.h>
+#include <omalloc/om_Alloc.h>
 /* include after omMalloc.h */
 #include <string.h>
 
@@ -128,7 +128,7 @@ size_t omSizeWOfAddr(void* addr)
  *******************************************************************/
 #ifdef OM_HAVE_VALLOC_MMAP
 
-#include "omMmap.c"
+#include <omalloc/omMmap.c>
 #define OM_VALLOC_FROM_SYSTEM   omVallocMmap
 #define OM_VFREE_TO_SYSTEM      omVfreeMmap
 

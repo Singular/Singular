@@ -9,13 +9,14 @@ include_directories(${${PROJECT_NAME}_SOURCE_DIR}/factory)
 # include directories should be solved
 #include_directories(${${PROJECT_NAME}_SOURCE_DIR}/Singular)
 include_directories(${${PROJECT_NAME}_SOURCE_DIR}/omalloc)
+include_directories(${${PROJECT_NAME}_SOURCE_DIR}/x86_64-Linux/include )
 
 
 add_subdirectory(Singular)
 add_subdirectory(kernel)
 
 set(test_srcs main.cpp
-#	Singleton.cpp
+	Singleton.cpp
   )
 
 add_executable(Singular_test_suite ${test_srcs})

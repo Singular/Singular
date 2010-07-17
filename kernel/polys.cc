@@ -11,18 +11,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "mod2.h"
-#include "options.h"
-#include "omalloc.h"
-#include "febase.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ring.h"
-#include "sbuckets.h"
+#include <kernel/mod2.h>
+#include <kernel/options.h>
+#include <omalloc.h>
+#include <kernel/febase.h>
+#include <kernel/numbers.h>
+#include <kernel/polys.h>
+#include <kernel/ring.h>
+#include <kernel/sbuckets.h>
 
 #ifdef HAVE_PLURAL
-#include "gring.h"
-#include "sca.h"
+#include <kernel/gring.h>
+#include <kernel/sca.h>
 #endif
 
 /* ----------- global variables, set by pSetGlobals --------------------- */
