@@ -15,21 +15,21 @@
 #include <Singular/mod2.h>
 
 #ifdef HAVE_MPSR
-#include <Singular/mylimits.h>
+#include "mylimits.h"
 
 #include <Singular/mpsr_Get.h>
 
-#include <Singular/si_gmp.h>
+#include <si_gmp.h>
 #include <omalloc.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <kernel/ring.h>
-#include <Singular/longalg.h>
+#include "longalg.h"
 #include <kernel/maps.h>
 #include <kernel/ideals.h>
 #include <Singular/grammar.h>
 #include <kernel/febase.h>
-#include <Singular/modulop.h>
+#include "modulop.h"
 
 #include <Singular/mpsr_Tok.h>
 

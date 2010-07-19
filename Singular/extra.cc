@@ -1984,7 +1984,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #ifdef HAVE_NEWTON
 #include <hc_newton.h>
 #endif
-#include <Singular/mpsr.h>
+#include <mpsr.h>
 #include <kernel/mod_raw.h>
 #include <kernel/ring.h>
 #include <kernel/shiftgb.h>

@@ -18,7 +18,7 @@
 #ifdef HAVE_MPSR
 
 #include <Singular/mpsr_Get.h>
-#include <Singular/longalg.h>
+#include "longalg.h"
 #include <Singular/tok.h>
 #include <kernel/maps.h>
 #include <Singular/lists.h>
@@ -435,7 +435,7 @@ void mpsr_CopyExternalData(MPT_ExternalData_t *dest,
 #undef free
 #undef freeSize
 
-#include <Singular/mmalloc.h>
+#include "mmalloc.h"
 
 static int mpsr_is_initialized = 0;
 

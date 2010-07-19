@@ -21,8 +21,8 @@
 
 #ifdef HAVE_DL
 #ifdef HAVE_MPSR
-#include <Singular/MP.h>
-#include <Singular/mpsr_sl.h>
+#include <MP.h>
+#include "mpsr_sl.h"
 
 static void* mpsr_so_handle = NULL;
 typedef void (*voidProc)();

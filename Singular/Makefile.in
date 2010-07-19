@@ -54,7 +54,7 @@ CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ -I@prefix@ ${PIPE}
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@ -I@prefix@
 ifneq ($(SINGUNAME),ix86-Win)
-CPPFLAGS	= -I${srcdir} -I@prefix@ @CPPFLAGS@
+CPPFLAGS	= -I${srcdir} -I../kernel -I@prefix@ @CPPFLAGS@
 else
 ## Dirs after @CPPFLAGS@ are for PySingular
 CPPFLAGS	= -I${srcdir} -I@prefix@ @CPPFLAGS@ 
