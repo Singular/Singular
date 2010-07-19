@@ -1,0 +1,8 @@
+- factory needs omalloc, ntl
+- libfac needs factory, omalloc, ntl
+- misc: -
+- reporter needs misc,omalloc
+- resource needs misc, reporter,omalloc
+- coeffs needs misc,repoter, resource,omalloc
+- polys needs coeffs
+
