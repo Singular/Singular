@@ -53,8 +53,8 @@ static void writemon(poly p, int ko, ring r)
   for (i=0; i<r->N; i++)
   {
     {
-      int ee = p_GetExp(p,i+1,r);
-      if (ee!=0)
+      long ee = p_GetExp(p,i+1,r);
+      if (ee!=0L)
       {
         if (wroteCoef)
           StringAppendS("*");
@@ -62,10 +62,10 @@ static void writemon(poly p, int ko, ring r)
           wroteCoef=(rShortOut(r) == FALSE);
         writeGen=TRUE;
         StringAppendS(rRingVar(i, r));
-        if (ee != 1)
+        if (ee != 1L)
         {
           if (rShortOut(r)==0) StringAppendS("^");
-          StringAppend("%d", ee);
+          StringAppend("%ld", ee);
         }
       }
     }
