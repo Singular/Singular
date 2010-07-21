@@ -1648,7 +1648,7 @@ static proc intveclist(intvec v)
 {
   list l;
   int i;
-  for(i=size(l);i>=1;i--)
+  for(i=size(v);i>=1;i--)
   {
     l[i]=v[i];
   }
