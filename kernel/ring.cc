@@ -128,7 +128,7 @@ void rChangeCurrRing(ring r)
   }
 }
 
-ring rDefault(int ch, int N, char **n)
+ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
 {
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
   r->ch    = ch;
@@ -142,23 +142,32 @@ ring rDefault(int ch, int N, char **n)
     r->names[i]  = omStrDup(n[i]);
   }
   /*weights: entries for 2 blocks: NULL*/
-  r->wvhdl = (int **)omAlloc0(2 * sizeof(int_ptr));
-  /*order: lp,0*/
-  r->order = (int *) omAlloc(2* sizeof(int *));
-  r->block0 = (int *)omAlloc0(2 * sizeof(int *));
-  r->block1 = (int *)omAlloc0(2 * sizeof(int *));
-  /* ringorder dp for the first block: var 1..N */
-  r->order[0]  = ringorder_lp;
-  r->block0[0] = 1;
-  r->block1[0] = N;
-  /* the last block: everything is 0 */
-  r->order[1]  = 0;
+  r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int_ptr));
+  r->order = ord;
+  r->block0 = block0;
+  r->block1 = block1;
   /*polynomial ring*/
   r->OrdSgn    = 1;
 
   /* complete ring intializations */
   rComplete(r);
   return r;
+}
+
+ring rDefault(int ch, int N, char **n)
+{
+  /*order: lp,0*/
+  int *order = (int *) omAlloc(2* sizeof(int));
+  int *block0 = (int *)omAlloc0(2 * sizeof(int));
+  int *block1 = (int *)omAlloc0(2 * sizeof(int));
+  /* ringorder dp for the first block: var 1..N */
+  order[0]  = ringorder_lp;
+  block0[0] = 1;
+  block1[0] = N;
+  /* the last block: everything is 0 */
+  order[1]  = 0;
+
+  return rDefault(ch,N,n,2,order,block0,block1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
