@@ -1066,8 +1066,8 @@ RETURN:   type list; gives back some constraints that are equivalent to f<1 (com
 EXAMPLE:  example qepcad; shows an example
 "
 {
-  system("sh","rm QEPCAD-out");
-  system("sh","rm QEPCAD-in");
+  system("sh","rm -f QEPCAD-out");
+  system("sh","rm -f QEPCAD-in");
   if(denominator(content(f))==1)
   {
     poly g=f-1;
@@ -1100,7 +1100,7 @@ EXAMPLE:  example qepcad; shows an example
   string s7=choice();
   string s8=solution();
   write(l1,s1,s2,s3,s4,s5,s6,s7,s8);
-  system("sh","$qepcad < QEPCAD-in | ${qe}/bin/qepcadfilter.pl > QEPCAD-out");
+  system("sh","qepcad < QEPCAD-in | qepcadfilter.pl > QEPCAD-out");
   string output=read(out);
   print(output,"%s");
   if(size(output)==0)
@@ -1121,8 +1121,8 @@ EXAMPLE:  example qepcad; shows an example
     list lpolys=listpolynew(strpolys);
     return(lpolys);
   }
-  system("sh","rm QEPCAD-out");
-  system("sh","rm QEPCAD-in");
+  system("sh","rm -f QEPCAD-out");
+  system("sh","rm -f QEPCAD-in");
 
 }
 example
@@ -1146,8 +1146,8 @@ RETURN:   type list; gives back some constraints that are equivalent to the eige
 EXAMPLE:  example qepcadsystem; shows an example
 "
 {
-  system("sh","rm QEPCAD-out");
-  system("sh","rm QEPCAD-in");
+  system("sh","rm -f QEPCAD-out");
+  system("sh","rm -f QEPCAD-in");
   string in="QEPCAD-in";
   string out="QEPCAD-out";
   link l1=in;
@@ -1201,7 +1201,7 @@ EXAMPLE:  example qepcadsystem; shows an example
   string s7=choice();
   string s8=solution();
   write(l1,s1,s2,s3,s4,s5,s6,s7,s8);
-  system("sh","$qepcad < QEPCAD-in | ${qe}/bin/qepcadfilter.pl > QEPCAD-out");
+  system("sh","qepcad < QEPCAD-in | qepcadfilter.pl > QEPCAD-out");
   string output=read(out);
   print(output,"%s");
   if(size(output)==0)
@@ -1222,8 +1222,8 @@ EXAMPLE:  example qepcadsystem; shows an example
     list llpolys=listpolynew(strpolys);
     return(llpolys);
   }
-  system("sh","rm QEPCAD-out");
-  system("sh","rm QEPCAD-in");
+  system("sh","rm -f QEPCAD-out");
+  system("sh","rm -f QEPCAD-in");
 }
 example
 {
@@ -1453,8 +1453,8 @@ static proc rel()
 /////////////////////////////////////////////////////////
 static proc rm()
 {
-  system("sh","rm dummy");
-  system("sh","rm QEPCAD-in.");
+  system("sh","rm -f dummy");
+  system("sh","rm -f QEPCAD-in");
 }
 ////////////////////////////////////////////////////////
 static proc findthepoly(string word)
