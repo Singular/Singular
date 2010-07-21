@@ -1,16 +1,17 @@
 /*
  * $Id$
+ * part of modgen
  */
 
-#include <mod2.h>
-#include <tok.h>
-#include <ipid.h>
+#include <Singular/mod2.h>
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
 //#include <mmemory.h>
-#include <febase.h>
-#include <subexpr.h>
+#include <kernel/febase.h>
+#include <Singular/subexpr.h>
 //#include <utils.h>
-#include <structs.h>
-#include <ipconv.h>
+#include <kernel/structs.h>
+#include <Singular/ipconv.h>
 
 BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt);
 
