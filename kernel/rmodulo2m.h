@@ -11,7 +11,8 @@
 #include <kernel/structs.h>
 
 extern int nr2mExp;
-extern NATNUMBER nr2mModul;
+extern NATNUMBER nr2mModul; /* for storing 2^m - 1, i.e., the
+                               bit pattern '11..1' of length m */
 
 BOOLEAN nr2mGreaterZero (number k);
 number  nr2mMult        (number a, number b);
@@ -50,23 +51,24 @@ void    nr2mInitExp(int c, const ring r);
 
 static inline number nr2mMultM(number a, number b)
 {
-  return (number) 
-    ((((NATNUMBER) a)*((NATNUMBER) b)) % ((NATNUMBER) currRing->nr2mModul));
+  return (number)
+    ((((NATNUMBER) a) * ((NATNUMBER) b)) & ((NATNUMBER) currRing->nr2mModul));
 }
 
 static inline number nr2mAddM(number a, number b)
 {
-  NATNUMBER r = (NATNUMBER)a + (NATNUMBER)b;
-  return (number) (r >= currRing->nr2mModul ? r - currRing->nr2mModul : r);
+  return (number)
+    ((((NATNUMBER) a) + ((NATNUMBER) b)) & ((NATNUMBER) currRing->nr2mModul));
 }
 
 static inline number nr2mSubM(number a, number b)
 {
-  return (number)((NATNUMBER)a<(NATNUMBER)b ?
-                       currRing->nr2mModul-(NATNUMBER)b+(NATNUMBER)a : (NATNUMBER)a-(NATNUMBER)b);
+  return (number)((NATNUMBER)a < (NATNUMBER)b ?
+                     currRing->nr2mModul - (NATNUMBER)b + (NATNUMBER)a + 1 :
+                     (NATNUMBER)a - (NATNUMBER)b);
 }
 
-#define nr2mNegM(A) (number)(currRing->nr2mModul-(NATNUMBER)(A))
+#define nr2mNegM(A) (number)(currRing->nr2mModul - (NATNUMBER)(A) + 1)
 #define nr2mEqualM(A,B)  ((A)==(B))
 
 number nr2mMapQ(number from);
