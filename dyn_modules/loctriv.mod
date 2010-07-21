@@ -7,10 +7,10 @@
  *  by a Groebner basis computation similar to the syzygies
  *
  */
-#include "ideals.h"
-#include "ring.h"
-#include "kstd1.h"
-#include "prCopy.h"
+#include <kernel/ideals.h>
+#include <kernel/ring.h>
+#include <kernel/kstd1.h>
+#include <kernel/prCopy.h>
 %}
 
 //#package="loctriv";

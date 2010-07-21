@@ -545,11 +545,11 @@ void  mod_write_header(FILE *fp, char *module, char what)
     fprintf(fp, "#include <unistd.h>\n");
     fprintf(fp, "#include <sys/stat.h>");
     fprintf(fp, "\n");
-    fprintf(fp, "#include <mod2.h>\n");
-    fprintf(fp, "#include <tok.h>\n");
-    fprintf(fp, "#include <structs.h>\n");
-    fprintf(fp, "#include <ipid.h>\n\n");
-    fprintf(fp, "#include <locals.h>\n");
+    fprintf(fp, "#include <Singular/mod2.h>\n");
+    fprintf(fp, "#include <Singular/tok.h>\n");
+    fprintf(fp, "#include <kernel/structs.h>\n");
+    fprintf(fp, "#include <Singular/ipid.h>\n\n");
+    fprintf(fp, "#include <Singular/locals.h>\n");
     fprintf(fp, "#include <omalloc.h>\n");
     fprintf(fp, "#include \"%s.h\"\n", module);
     modlineno+=8;

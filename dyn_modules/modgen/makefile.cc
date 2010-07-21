@@ -91,12 +91,12 @@ void build_head_section(
   fprintf(fp, "SINGULARROOT\t= ../..\n");
   fprintf(fp, "SINGUNAME\t= %s\n",SINGUNAME);
 #warning "PROBLEM: nice place for include file has to be found"
-  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULARROOT}/kernel -I${SINGULARROOT}/Singular -I${SINGULARROOT}/${SINGUNAME}/include\n");
-  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I${SINGULARROOT}/kernel -I${SINGULARROOT}/Singular -I${SINGULARROOT}/${SINGUNAME}/include\n");
+  fprintf(fp, "CFLAGS\t= -DNDEBUG -DBUILD_MODULE -I. -I${SINGULARROOT} -I${SINGULARROOT}/${SINGUNAME}/include\n");
+  fprintf(fp, "DCFLAGS\t= -DBUILD_MODULE -I. -I${SINGULARROOT} -I${SINGULARROOT}/${SINGUNAME}/include\n");
   fprintf(fp, "#LD\t=\n");
   fprintf(fp, "\n");
   fprintf(fp, "instdir          = %s\n", inst_dir );
-  fprintf(fp, "MKINSTALLDIRS\t\t= ${SINGULARROOT}/modules/mkinstalldirs\n");
+  fprintf(fp, "MKINSTALLDIRS\t\t= ${SINGULARROOT}/dyn_modules/mkinstalldirs\n");
 #warning "PROBLEM: do we also install install-sh when installing Singular?"
   fprintf(fp, "INSTALL\t\t= ${SINGULARROOT}/Singular/install-sh -c\n");
   fprintf(fp, "INSTALL_PROGRAM\t= ${INSTALL}\n");
