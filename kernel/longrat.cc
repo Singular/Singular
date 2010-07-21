@@ -1375,7 +1375,7 @@ int nlModP(number n, int p)
 
 #ifdef HAVE_RINGS
 /*2
-* convert number to GMP and warn if denom != 1
+* convert number i (from Q) to GMP and warn if denom != 1
 */
 void nlGMP(number &i, number n)
 {
