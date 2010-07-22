@@ -19,5 +19,5 @@
 #include <kernel/p_MemCopy.h>
 #include <kernel/kbuckets.h>
 
-#include <kernel/p_Procs_Dynamic.inc>
+#include "p_Procs_Dynamic.inc"
 
