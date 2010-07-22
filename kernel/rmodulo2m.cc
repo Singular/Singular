@@ -150,10 +150,8 @@ number nr2mInit (int i, const ring r)
 int nr2mInt(number &n, const ring r)
 {
   NATNUMBER nn = (unsigned long)(NATNUMBER)n & r->nr2mModul;
-  unsigned long l = r->nr2mModul >> 1; l++;
-  if (l == 0)
-    return (int)(signed long)(NATNUMBER)nn;
-  else if ((NATNUMBER)nn > l)
+  unsigned long l = r->nr2mModul >> 1; l++; /* now: l = 2^(m-1) */
+  if ((NATNUMBER)nn > l)
     return (int)((NATNUMBER)nn - r->nr2mModul - 1);
   else
     return (int)((NATNUMBER)nn);
@@ -209,11 +207,31 @@ BOOLEAN nr2mGreater (number a, number b)
   return nr2mDivBy(a, b);
 }
 
+/* This does not seem to be the predicate whether a
+   is divisible by b in Z/2^m: if a is NULL then
+   the answer is not necessarily TRUE. */
 BOOLEAN nr2mDivBy (number a, number b)
 {
-  if ((NATNUMBER)a == 0) return TRUE;
-  if ((NATNUMBER)b == 0) return FALSE;
-  return ((NATNUMBER)a % (NATNUMBER)b) == 0;
+  if (a == NULL)
+  {
+    NATNUMBER c = currRing->nr2mModul + 1;
+    if (c != 0) /* i.e., if no overflow */
+      return (c % (NATNUMBER)b) == 0;
+    else
+    {
+      /* overflow: we need to check whether b
+         is a power of 2: */
+      c = (NATNUMBER)b;
+      while (c != 0)
+      {
+        if ((c % 2) != 0) return FALSE;
+        c = c >> 1;
+      }
+      return TRUE;
+    }
+  }
+  else
+    return ((NATNUMBER)a % (NATNUMBER)b) == 0;
 }
 
 int nr2mDivComp(number as, number bs)
@@ -390,10 +408,34 @@ number nr2mMod (number a, number b)
   return (number)r;
 }
 
-number nr2mIntDiv (number a,number b)
+number nr2mIntDiv (number a, number b)
 {
-  assume((NATNUMBER)b != 0);
-  return (number) ((NATNUMBER) a / (NATNUMBER) b);
+  if ((NATNUMBER)a == 0)
+  {
+    if ((NATNUMBER)b == 0)
+      return (number)1;
+    if ((NATNUMBER)b == 1)
+      return (number)0;
+    NATNUMBER c = currRing->nr2mModul + 1;
+    if (c != 0) /* i.e., if no overflow */
+      return (number)(c / (NATNUMBER)b);
+    else
+    {
+      /* overflow: c = 2^32 resp. 2^64, depending on platform */
+      int_number cc = (int_number)omAlloc(sizeof(mpz_t));
+      mpz_init_set_ui(cc, currRing->nr2mModul); mpz_add_ui(cc, cc, 1);
+      mpz_div_ui(cc, cc, (unsigned long)(NATNUMBER)b);
+      unsigned long s = mpz_get_ui(cc);
+      mpz_clear(cc); omFree((ADDRESS)cc);
+      return (number)(NATNUMBER)s;
+    }
+  }
+  else
+  {
+    if ((NATNUMBER)b == 0)
+      return (number)0;
+    return (number)((NATNUMBER) a / (NATNUMBER) b);
+  }
 }
 
 number  nr2mInvers (number c)
