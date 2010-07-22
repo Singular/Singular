@@ -277,9 +277,9 @@ endif
 include singular-libs
 
 ifdef HAVE_PLURAL
-SLIBS = COPYING ${SLIB0} ${PLIBS} all.lib help.cnf
+SLIBS = COPYING ${SLIB0} ${SLIB1} ${PLIBS} all.lib help.cnf
 else
-SLIBS = COPYING ${SLIB0} all.lib help.cnf
+SLIBS = COPYING ${SLIB0} ${SLIB1} all.lib help.cnf
 endif
 
 SLIBS_FILES = $(addprefix LIB/,${SLIBS})

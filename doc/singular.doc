@@ -238,6 +238,7 @@ See also @ref{Non-commutative libraries}.
 * Teaching::
 * Tropical Geometry::
 * Contributed::
+* Submitted::
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
@@ -843,7 +844,7 @@ but not for serious computations.
 @c lib tropical.lib no_ex
 
 @c ----------------------------------------------------------------------------
-@node Contributed,,Tropical Geometry, SINGULAR libraries
+@node Contributed,Submitted,Tropical Geometry, SINGULAR libraries
 @section Contributed
 @cindex Contributed libraries
 
@@ -856,6 +857,34 @@ but not for serious computations.
 @cindex phindex_lib
 
 @c lib phindex.lib
+
+@c ----------------------------------------------------------------------------
+@node Submitted,,Contributed, SINGULAR libraries
+@section Submitted
+@cindex Submitted libraries
+
+This sections collect libraries in the btea test phase.
+Everything in  these libraries may change.
+
+@menu
+* findiff_lib::
+@end menu
+@c ----------------------------------------------------------
+@node findiff_lib,,, Submitted
+@subsection findiff_lib
+@cindex findiff_lib
+
+Issues:
+@itemize
+@item installation of qepcadfilter.pl needs to be solved
+@item tests for (nearly) all procedures are missing
+@item global variables needs to be cleaned
+@item temporay files needs to be cleaned
+@item temporay file names need to be unique (think about multiple instances)
+@item pollution of global Top namespace muts be solved
+@end itemize
+
+@c lib findiff.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
