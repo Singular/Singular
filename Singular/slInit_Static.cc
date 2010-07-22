@@ -20,7 +20,7 @@
 
 #ifdef HAVE_MPSR
 
-#include <Singular/MP.h>
+#include <MP.h>
 #include <Singular/mpsr_sl.h>
 
 extern void mpsr_Init();
