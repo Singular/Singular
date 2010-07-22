@@ -269,6 +269,7 @@ static-bindist ${BINDIST_NAME}-static.tar.gz:
 	${MAKE} install-bindist localdir=${SI_TMPDIR} LD_STATIC=1
 	chmod -R a+rX ${SI_TMPDIR}
 	-rm -f ${SI_TMPDIR}/Singular/*/*/*.so
+	-rm -f ${SI_TMPDIR}/Singular/*/*/modgen*
 	cd ${SI_TMPDIR}; tar cf - Singular| ${MYGZIP} > ${BINDIST_NAME}-static.tar.gz
 	mv ${SI_TMPDIR}/${BINDIST_NAME}-static.tar.gz .
 	rm -rf ${SI_TMPDIR}
