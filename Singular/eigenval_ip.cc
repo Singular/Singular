@@ -19,8 +19,8 @@
 #include <kernel/ideals.h>
 #include <Singular/lists.h>
 #include <kernel/matpol.h>
-#include <Singular/clapsing.h>
-#include <Singular/eigenval.h>
+#include <kernel/clapsing.h>
+#include <kernel/eigenval.h>
 #include <Singular/eigenval_ip.h>
 
 
