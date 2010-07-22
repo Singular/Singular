@@ -10,8 +10,9 @@
 #include <kernel/febase.h>
 #include <Singular/subexpr.h>
 //#include <utils.h>
+
 #include <kernel/structs.h>
-#include <Singular/ipconv.h>
+#include <ipconv.h>
 
 BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt);
 

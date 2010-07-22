@@ -19,7 +19,7 @@
 
 #include"mpsr.h"
 
-#include"structs.h"
+#include <kernel/structs.h>
 #include"febase.h"
 #include"tok.h"
 #include"ipid.h"

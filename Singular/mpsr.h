@@ -20,12 +20,12 @@
 #include"MP.h"
 
 #include"MPT.h"
-#include"structs.h"
+#include <kernel/structs.h>
 #include"subexpr.h"
 #include <omalloc.h>
-#include"polys.h"
-#include"numbers.h"
-#include"ring.h"
+#include <kernel/polys.h>
+#include <kernel/numbers.h>
+#include <kernel/ring.h>
 
 /***************************************************************
  *
