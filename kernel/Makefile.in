@@ -255,10 +255,15 @@ p_Procs_Dynamic.o p_Procs_Lib.o p_Procs_Dynamic.og p_Procs_Lib.og\
 p_Procs_Dynamic.inc p_Procs_Lib.inc: p_Procs_Dynamic.h
 
 # here is how p_Procs_[Static|Dynamic].inc is generated
-p_Procs_%.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
-	$(CXX) $(CPPFLAGS) -g -Dp_Procs_$* p_Procs_Generate.cc -o p_Procs_$*
-	./p_Procs_$* > p_Procs_$*.xx && mv p_Procs_$*.xx p_Procs_$*.inc
-	-rm -f p_Procs_$* p_Procs_$*.exe
+p_Procs_Static.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
+	$(CXX) $(CPPFLAGS) -g -Dp_Procs_Static p_Procs_Generate.cc -o p_Procs_Static
+	./p_Procs_Static > p_Procs_Static.xx && mv p_Procs_Static.xx p_Procs_Static.inc
+	-rm -f p_Procs_Static p_Procs_Static.exe
+
+p_Procs_Dynamic.inc: p_Procs_Generate.cc p_Procs_Impl.h mod2.h
+	$(CXX) $(CPPFLAGS) -g -Dp_Procs_Dynamic p_Procs_Generate.cc -o p_Procs_Dynamic
+	./p_Procs_Dynamic > p_Procs_Dynamic.xx && mv p_Procs_Dynamic.xx p_Procs_Dynamic.inc
+	-rm -f p_Procs_Dynamic p_Procs_Dynamic.exe
 
 p_Procs_%.so: p_Procs_Lib_%.dl_o
 	$(LD) ${SLDFLAGS} -o $@ $^
