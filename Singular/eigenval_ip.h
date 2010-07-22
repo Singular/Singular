@@ -9,7 +9,7 @@
 #ifndef EIGENVAL_IP_H
 #define EIGENVAL_IP_H
 #ifdef HAVE_EIGENVAL
-#include <Singular/eigenval.h>
+#include <kwernel/eigenval.h>
 
 BOOLEAN evSwap(leftv res,leftv h);
 BOOLEAN evRowElim(leftv res,leftv h);
