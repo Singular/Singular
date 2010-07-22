@@ -29,7 +29,7 @@ BOOLEAN p_procs_dynamic = TRUE;
 #undef LINKAGE
 #define LINKAGE extern "C"
 #define p_Procs_Kernel
-#include <kernel/p_Procs_Dynamic.inc>
+#include "p_Procs_Dynamic.inc"
 
 #include <kernel/p_Procs_Dynamic.h>
 // include general p_Proc stuff

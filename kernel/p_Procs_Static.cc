@@ -23,7 +23,7 @@
 BOOLEAN p_procs_dynamic = FALSE;
 
 #define p_Procs_Static
-#include <kernel/p_Procs_Static.inc>
+#include "p_Procs_Static.inc"
 
 // include generated configuration
 #include <kernel/p_Procs_Static.h>
