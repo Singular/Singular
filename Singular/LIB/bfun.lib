@@ -56,7 +56,11 @@ allPositive(v);  checks whether all entries of an intvec are positive
 scalarProd(v,w); computes the standard scalar product of two intvecs
 vec2poly(v[,i]); constructs an univariate polynomial with given coefficients
 
-SEE ALSO: dmod_lib, dmodapp_lib, gmssing_lib
+SEE ALSO: dmod_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
+
+KEYWORDS: D-module; global Bernstein-Sato polynomial; Bernstein-Sato polynomial; b-function; 
+graded Weyl algebra; initial ideal; initial form; principal intersection; linear interreduction;
+initial ideal approach;
 ";
 
 

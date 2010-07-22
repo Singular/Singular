@@ -56,7 +56,10 @@ insertGenerator(id,p[,k]); insert an element into an ideal/module
 deleteGenerator(id,k); delete the k-th element from an ideal/module
 
 
-SEE ALSO: dmod_lib, gmssing_lib, bfun_lib
+SEE ALSO: bfun_lib, dmod_lib, dmodvar_lib, gmssing_lib
+
+KEYWORDS: D-module; annihilator of polynomial; annihilator of rational function; D-localization;
+localization of D-module; Appel function; Appel hypergeometric function;
 ";
 
 LIB "poly.lib";

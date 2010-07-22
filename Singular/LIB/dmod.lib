@@ -86,7 +86,11 @@ minIntRoot(P,fact); minimal integer root among the roots of a maximal ideal P
 varNum(s);          the number of the variable with the name s
 isRational(n);  check whether n is a rational number
 
-SEE ALSO: gmssing_lib, bfun_lib, dmodapp_lib
+SEE ALSO: bfun_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
+
+KEYWORDS: D-module; D-module structure; left annihilator ideal; Bernstein-Sato polynomial; global Bernstein-Sato polynomial;
+Weyl algebra; Bernstein operator; logarithmic annihilator ideal; parametric annihilator; root of Bernstein-Sato polynomial; 
+hyperplane arrangement; Oaku-Takayama algorithm; Briancon-Maisonobe algorithm; LOT algorithm;
 ";
 
 // reworked by JM+VL on 9.3.2010: Sannfslog
