@@ -17,6 +17,7 @@ Use the @code{LIB} command for loading of single libraries.
 * central_lib::
 * dmod_lib::
 * dmodapp_lib::
+* dmodvar_lib::
 * freegb_lib::
 * involut_lib::
 * gkdim_lib::
@@ -55,7 +56,7 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib dmod.lib
 
 @c ----------------------------------------------------------
-@node dmodapp_lib, freegb_lib, dmod_lib, Non-commutative libraries
+@node dmodapp_lib, dmodvar_lib, dmod_lib, Non-commutative libraries
 @section dmodapp_lib
 @cindex dmodapp_lib
 @cindex dmodapp.lib
@@ -63,7 +64,15 @@ Use the @code{LIB} command for loading of single libraries.
 @c lib dmodapp.lib
 
 @c ----------------------------------------------------------
-@node freegb_lib, involut_lib, dmodapp_lib, Non-commutative libraries
+@node dmodvar_lib, freegb_lib, dmodapp_lib, Non-commutative libraries
+@section dmodvar_lib
+@cindex dmodvar_lib
+@cindex dmodvar.lib
+
+@c lib dmodvar.lib
+
+@c ----------------------------------------------------------
+@node freegb_lib, involut_lib, dmodvar_lib, Non-commutative libraries
 @section freegb_lib
 @cindex freegb_lib
 @cindex freegb.lib
