@@ -12,7 +12,7 @@
 //#include <utils.h>
 
 #include <kernel/structs.h>
-#include <ipconv.h>
+#include <Singular/ipconv.h>
 
 BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt);
 
