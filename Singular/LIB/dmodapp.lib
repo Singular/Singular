@@ -30,7 +30,7 @@ REFERENCES:
 @*         Differential Equations', Springer, 2000
 @* (ONW) Oaku, Takayama, Walther 'A Localization Algorithm for D-modules', 2000
 
-MAIN PROCEDURES:
+PROCEDURES:
 
 annPoly(f);   annihilator of a polynomial f in the corr. Weyl algebra
 annRat(f,g);  annihilator of a rational function f/g in the corr. Weyl algebra
@@ -43,24 +43,23 @@ initialIdealW(I,u,v[,s,t]); initial ideal of a given ideal w.r.t. given weights
 inForm(f,w);     initial form of a poly/ideal w.r.t. a given weight
 isFsat(I, F);       check whether the ideal I is F-saturated
 
-AUXILIARY PROCEDURES:
-
-bFactor(F);  computes the roots of irreducible factors of an univariate poly
-appelF1();      create an ideal annihilating Appel F1 function
-appelF2();      create an ideal annihilating Appel F2 function
-appelF4();      create an ideal annihilating Appel F4 function
-engine(I,i);     computes a Groebner basis with the algorithm given by i
-poly2list(f);   decompose a polynomial into a list of terms and exponents
-fl2poly(L,s);  reconstruct a monic univariate polynomial from its factorization
-insertGenerator(id,p[,k]); insert an element into an ideal/module
-deleteGenerator(id,k); delete the k-th element from an ideal/module
-
-
 SEE ALSO: bfun_lib, dmod_lib, dmodvar_lib, gmssing_lib
 
 KEYWORDS: D-module; annihilator of polynomial; annihilator of rational function; D-localization;
-localization of D-module; Appel function; Appel hypergeometric function;
+localization of D-module; Appel function; Appel hypergeometric function
 ";
+//AUXILIARY PROCEDURES:
+//
+//bFactor(F);  computes the roots of irreducible factors of an univariate poly
+//appelF1();      create an ideal annihilating Appel F1 function
+//appelF2();      create an ideal annihilating Appel F2 function
+//appelF4();      create an ideal annihilating Appel F4 function
+//engine(I,i);     computes a Groebner basis with the algorithm given by i
+//poly2list(f);   decompose a polynomial into a list of terms and exponents
+//fl2poly(L,s);  reconstruct a monic univariate polynomial from its factorization
+//insertGenerator(id,p[,k]); insert an element into an ideal/module
+//deleteGenerator(id,k); delete the k-th element from an ideal/module
+
 
 LIB "poly.lib";
 LIB "sing.lib";

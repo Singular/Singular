@@ -37,8 +37,7 @@ THEORY: Given a polynomial ring R = K[x_1,...,x_n] and a polynomial F in R,
 @*      (2002).
 
 
-MAIN PROCEDURES:
-
+PROCEDURES:
 bfct(f[,s,t,v]);            compute the BS polynomial of f with linear reductions
 bfctSyz(f[,r,s,t,u,v]);  compute the BS polynomial of f with syzygy-solver
 bfctAnn(f[,s]);           compute the BS polynomial of f via Ann f^s + f
@@ -50,18 +49,18 @@ linReduce(f,I[,s]);         reduce a polynomial by linear reductions w.r.t. idea
 linReduceIdeal(I,[s,t]);  interreduce generators of ideal by linear reductions
 linSyzSolve(I[,s]);         compute a linear dependency of elements of ideal I
 
-AUXILIARY PROCEDURES:
-
-allPositive(v);  checks whether all entries of an intvec are positive
-scalarProd(v,w); computes the standard scalar product of two intvecs
-vec2poly(v[,i]); constructs an univariate polynomial with given coefficients
-
 SEE ALSO: dmod_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
 
 KEYWORDS: D-module; global Bernstein-Sato polynomial; Bernstein-Sato polynomial; b-function; 
 graded Weyl algebra; initial ideal; initial form; principal intersection; linear interreduction;
-initial ideal approach;
+initial ideal approach
 ";
+
+//AUXILIARY PROCEDURES:
+//
+//allPositive(v);  checks whether all entries of an intvec are positive
+//scalarProd(v,w); computes the standard scalar product of two intvecs
+//vec2poly(v[,i]); constructs an univariate polynomial with given coefficients
 
 
 LIB "qhmoduli.lib"; // for Max

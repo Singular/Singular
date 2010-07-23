@@ -41,14 +41,14 @@ divideUnits(L);     create ones out of units in the output of smith or jacobson
 
 SEE ALSO: control_lib
 
-KEYWORDS: Jacobson form; Jacobson normal form; Smith form; Smith normal form; matrix diagonalization;
+KEYWORDS: Jacobson form; Jacobson normal form; Smith form; Smith normal form; matrix diagonalization
 
 ";
 
-  LIB "poly.lib";
-  LIB "involut.lib"; // involution
-  LIB "dmodapp.lib"; // engine
-  LIB "qhmoduli.lib"; // Min
+LIB "poly.lib";
+LIB "involut.lib"; // involution
+LIB "dmodapp.lib"; // engine
+LIB "qhmoduli.lib"; // Min
 
 proc tstjacobson()
 {

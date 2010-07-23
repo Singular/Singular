@@ -26,19 +26,19 @@ REFERENCES:
   (BMS06) Budur, Mustata, Saito: Bernstein-Sato polynomials of arbitrary varieties (2006).
   (ALM09) Andres, Levandovskyy, Martin-Morales : Principal Intersection and Bernstein-Sato Polynomial of an Affine Variety (2009).
 
-MAIN PROCEDURES:
+PROCEDURES:
 bfctVarIn(F[,L]);     compute the roots of the Bernstein-Sato polynomial b(s) of the variety V(F) using initial ideal approach
 bfctVarAnn(F[,L]);  compute the roots of the Bernstein-Sato polynomial b(s) of the variety V(F) using Sannfs approach
 SannfsVar(F[,O,e]); compute the annihilator of F^s in the ring D<S>
 
-AUXILIARY PROCEDURES:
-makeIF(F[,ORD]);    create the Malgrange ideal, associated with F = F[1],..,F[P]
-
 SEE ALSO: bfun_lib, dmod_lib, dmodapp_lib, gmssing_lib
 
 KEYWORDS: D-module; D-module structure; Bernstein-Sato polynomial for variety; global Bernstein-Sato polynomial for variety;
-Weyl algebra; parametric annihilator for variety; Budur-Mustata-Saito approach; initial ideal approach;
+Weyl algebra; parametric annihilator for variety; Budur-Mustata-Saito approach; initial ideal approach
 ";
+//AUXILIARY PROCEDURES:
+//makeIF(F[,ORD]);    create the Malgrange ideal, associated with F = F[1],..,F[P]
+
 
 // Static procs:
 //coDim(I);           compute the codimension of the leading ideal of I
