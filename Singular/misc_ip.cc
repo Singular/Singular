@@ -399,7 +399,7 @@ S4:
 
     mpz_div (n, n, g);        /* divide by g, before g is overwritten */
 
-    if (!mpz_probab_prime_p (g, 3))
+    if (!mpz_probab_prime_p (g, 10))
     {
       do
       {
@@ -423,13 +423,18 @@ S4:
     mpz_mod (x, x, n);
     mpz_mod (x1, x1, n);
     mpz_mod (y, y, n);
-    if (mpz_probab_prime_p (n, 3))
+    if (mpz_probab_prime_p (n, 10))
     {
-      if ((L_ind>0) && (mpz_cmp_si(n,L[L_ind-1])==0)) ex[L_ind-1]++;
-      else
+      int te=mpz_get_si(n);
+      if (mpz_cmp_si(n,te)==0) /* does it fit into an int ? */
       {
-        L[L_ind]=mpz_get_si(n);
-        L_ind++;
+        if ((L_ind>0) && (mpz_cmp_si(n,L[L_ind-1])==0)) ex[L_ind-1]++;
+        else
+        {
+          L[L_ind]=mpz_get_si(n);
+          L_ind++;
+        }
+        mpz_set_si(n,1); // add n itself the list of divisors, rest is 1
       }
       break;
     }
