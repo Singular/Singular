@@ -759,9 +759,9 @@ static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
   if ((u_p!=NULL)
   && (pTotaldegree(u_p)*(signed long)v_i > (signed long)currRing->bitmask))
   {
-    pDelete(&u_p);
     Werror("OVERFLOW in power(d=%ld, e=%d, max=%ld)",
                                     pTotaldegree(u_p),v_i,currRing->bitmask);
+    pDelete(&u_p);
     return TRUE;
   }
   res->data = (char *)pPower(u_p,v_i);
