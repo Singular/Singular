@@ -1119,7 +1119,6 @@ void p_SetRingOfLeftv(leftv l, ring r)
     case BIGINT_CMD:
     case IDHDL:
     case DEF_CMD:
-    case BIGINT_CMD:
       break;
     case POLY_CMD:
     case VECTOR_CMD:
