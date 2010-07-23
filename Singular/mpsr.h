@@ -17,11 +17,11 @@
 #define __MPSR__
 
 // now the MP include stuff (is surrounded by ifndef there)
-#include"MP.h"
+#include <MP.h>
 
-#include"MPT.h"
+#include <MPT.h>
 #include <kernel/structs.h>
-#include"subexpr.h"
+#include "subexpr.h"
 #include <omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/numbers.h>
