@@ -291,6 +291,7 @@ LINKAGE MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
       SI_LINK_SET_RW_OPEN_P(l);
       l->data = (void *) link;
       fe_fgets_stdin=fe_fgets_dummy;
+      myynest=0;
       _exit(Batch_ReadEval(slCopy(l)));
     }
   }
