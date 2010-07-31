@@ -8593,21 +8593,35 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       if (at==dArith1[i].arg)
       {
         int r=res->rtyp=dArith1[i].res;
-        #ifdef HAVE_PLURAL
-        if ((currRing!=NULL) && (rIsPluralRing(currRing)))
-        {
-          if ((dArith1[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
+	if (currRing!=NULL)
+	{
+          #ifdef HAVE_PLURAL
+          if ((currRing!=NULL) && (rIsPluralRing(currRing)))
           {
-            WerrorS(ii_not_for_plural);
-            break;
+            if ((dArith1[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
+            {
+              WerrorS(ii_not_for_plural);
+              break;
+            }
+            else if ((dArith1[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
+            {
+              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
+            }
+            /* else, ALLOW_PLURAL */
           }
-          else if ((dArith1[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
+          #endif
+          #ifdef HAVE_RINGS
+          if (rField_is_Ring(currRing))
           {
-            Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
+            if ((dArith1[i].valid_for & RING_MASK)==0 /*NO_RING*/)
+            {
+              WerrorS(ii_not_for_ring);
+              break;
+            }
+            /* else ALLOW_RING */
           }
-          /* else, ALLOW_PLURAL */
-        }
-        #endif
+          #endif
+	}
         if (r<0)
         {
           res->rtyp=-r;
@@ -8777,9 +8791,11 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       && (ct==dArith3[i].arg3))
       {
         res->rtyp=dArith3[i].res;
-        #ifdef HAVE_PLURAL
-        if ((currRing!=NULL) && (rIsPluralRing(currRing)))
-        {
+        if (currRing!=NULL)
+	{
+          #ifdef HAVE_PLURAL
+          if (rIsPluralRing(currRing))
+          {
             if ((dArith3[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
             {
               WerrorS(ii_not_for_plural);
@@ -8790,8 +8806,20 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
               Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
             }
             /* else, ALLOW_PLURAL */
-        }
-        #endif
+          }
+          #endif
+          #ifdef HAVE_RINGS
+          if (rField_is_Ring(currRing))
+          {
+            if ((dArith3[i].valid_for & RING_MASK)==0 /*NO_RING*/)
+            {
+              WerrorS(ii_not_for_ring);
+              break;
+            }
+            /* else ALLOW_RING */
+          }
+          #endif
+	}
         if ((call_failed=dArith3[i].p(res,a,b,c)))
         {
           break;// leave loop, goto error handling
@@ -9007,22 +9035,35 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       || ((dArithM[i].number_of_args==-2)&&(args>0)))
       {
         res->rtyp=dArithM[i].res;
-        #ifdef HAVE_PLURAL
-        if ((currRing!=NULL)
-        && (rIsPluralRing(currRing)))
-        {
-          if ((dArithM[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
+	if (currRing!=NULL)
+	{
+          #ifdef HAVE_PLURAL
+          if (rIsPluralRing(currRing))
           {
-            WerrorS(ii_not_for_plural);
-            break;
+            if ((dArithM[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
+            {
+              WerrorS(ii_not_for_plural);
+              break;
+            }
+            else if ((dArithM[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
+            {
+              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
+            }
+            /* else ALLOW_PLURAL */
           }
-          else if ((dArithM[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
+          #endif
+          #ifdef HAVE_RINGS
+          if (rField_is_Ring(currRing))
           {
-            Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
+            if ((dArithM[i].valid_for & RING_MASK)==0 /*NO_RING*/)
+            {
+              WerrorS(ii_not_for_ring);
+              break;
+            }
+            /* else ALLOW_RING */
           }
-          /* else ALLOW_PLURAL */
-        }
-        #endif
+          #endif
+	}
         if (dArithM[i].p(res,a))
         {
           break;// leave loop, goto error handling
