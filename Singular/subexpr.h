@@ -116,12 +116,8 @@ class libstack
 };
 #endif /* HAVE_LIBPARSER */
 
-#ifndef OM_ALLOC_H
-struct omBin_s;
-#endif
-
-extern omBin_s* sSubexpr_bin;
-extern omBin_s* procinfo_bin;
-extern omBin_s* libstack_bin;
+extern omBin sSubexpr_bin;
+extern omBin procinfo_bin;
+extern omBin libstack_bin;
 
 #endif

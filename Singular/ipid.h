@@ -128,13 +128,9 @@ void ipListFlag(idhdl h);
 #define IDPACKAGE(a) ((a)->data.pack)
 #define IDPROC(a)   ((a)->data.pinf)
 
-#ifndef OM_ALLOC_H
-struct omBin_s;
-#endif
-
-extern omBin_s* sip_command_bin;
-extern omBin_s* sip_package_bin;
-extern omBin_s* idrec_bin;
+extern omBin sip_command_bin;
+extern omBin sip_package_bin;
+extern omBin idrec_bin;
 #endif
 
 
