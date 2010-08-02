@@ -62,7 +62,7 @@ static poly smSmpoly2Poly(smpoly);
 static BOOLEAN smHaveDenom(poly);
 static number smCleardenom(ideal);
 
-struct omBin_s* smprec_bin = omGetSpecBin(sizeof(smprec));
+omBin smprec_bin = omGetSpecBin(sizeof(smprec));
 
 static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m,
                                                poly a, poly b)

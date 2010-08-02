@@ -29,7 +29,7 @@ struct sindlist
 
 #define LEN_MON (sizeof(scfmon) + sizeof(int))
 
-extern struct omBin_s* indlist_bin;
+extern omBin indlist_bin;
 
 extern scfmon hexist, hstc, hrad, hwork;
 extern scmon hpure, hpur0;

@@ -465,5 +465,5 @@ BOOLEAN rCheckIV(intvec *iv);
 int rTypeOfMatrixOrder(intvec * order);
 void rDelete(ring r);
 
-extern struct omBin_s* sip_sring_bin;
+extern omBin sip_sring_bin;
 #endif

@@ -16,7 +16,7 @@
 /*------------- p_Proc stuff ----------------------*/
 typedef poly (*p_Copy_Proc_Ptr)(poly p, const ring r);
 typedef void (*p_Delete_Proc_Ptr)(poly *p, const ring r);
-typedef poly (*p_ShallowCopyDelete_Proc_Ptr)(poly p, const ring r, omBin_s* dest_bin);
+typedef poly (*p_ShallowCopyDelete_Proc_Ptr)(poly p, const ring r, omBin dest_bin);
 typedef poly (*p_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
 typedef poly (*pp_Mult_nn_Proc_Ptr)(poly p, const number n, const ring r);
 typedef poly (*p_Mult_mm_Proc_Ptr)(poly p, const poly m, const ring r);

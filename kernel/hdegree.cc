@@ -20,7 +20,7 @@
 #include <kernel/stairc.h>
 
 int  hCo, hMu, hMu2;
-struct omBin_s* indlist_bin = omGetSpecBin(sizeof(indlist));
+omBin indlist_bin = omGetSpecBin(sizeof(indlist));
 
 /*0 implementation*/
 

@@ -1535,7 +1535,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->VarOffset=NULL;
   //memset: res->firstwv=NULL;
 
-  //struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
+  //struct omBin   PolyBin; /* Bin from where monoms are allocated */
   //memset: res->PolyBin=NULL; // rComplete
   res->ch=r->ch;     /* characteristic */
 #ifdef HAVE_RINGS

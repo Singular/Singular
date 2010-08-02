@@ -238,7 +238,7 @@ class slimgb_alg
 
   //end for F4
 #ifdef HEAD_BIN
-  struct omBin_s*   HeadBin;
+  omBin   HeadBin;
 #endif
   unsigned int reduction_steps;
   int n;

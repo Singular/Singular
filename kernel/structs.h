@@ -10,6 +10,8 @@
 
 /* for memset: */
 #include <string.h>
+/* for omBin */
+#include <omalloc.h>
 #ifdef HAVE_RINGS
 #include <kernel/si_gmp.h>
 #endif
@@ -353,10 +355,6 @@ struct sro_IS
 typedef struct sro_IS sro_IS;
 typedef struct sro_ISTemp sro_ISTemp;
 
-#ifndef OM_ALLOC_H
-struct omBin_s;
-#endif
-
 struct sro_ord
 {
   ro_typ  ord_typ;
@@ -518,7 +516,7 @@ struct sip_sring
 
   int*     firstwv;
 
-  struct omBin_s*   PolyBin; /* Bin from where monoms are allocated */
+  omBin    PolyBin; /* Bin from where monoms are allocated */
 #ifdef HAVE_RINGS
   unsigned int  ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
   int_number    ringflaga; /* Z/(ringflag^ringflagb)=Z/nrnModul*/
@@ -658,8 +656,8 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 #define si_min(A,B) ((A) < (B) ? (A) : (B))
 #endif
 
-extern struct omBin_s* char_ptr_bin;
-extern struct omBin_s* sleftv_bin;
+extern omBin char_ptr_bin;
+extern omBin sleftv_bin;
 
 #endif
 
