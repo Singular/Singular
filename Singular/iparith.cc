@@ -1191,7 +1191,7 @@ static BOOLEAN jjGE_I(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjGE_N(leftv res, leftv u, leftv v)
 {
-  res->data = (char *) (nGreater((number)u->Data(),(number)v->Data()) 
+  res->data = (char *) (nGreater((number)u->Data(),(number)v->Data())
                        || nEqual((number)u->Data(),(number)v->Data()));
   return FALSE;
 }
@@ -6120,7 +6120,7 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     if (ii>0) bo=iiConvert(v_typ,MATRIX_CMD,ii,v,&tmp);
     else bo=TRUE;
     if (bo)
-    { 
+    {
       Werror("cannot convert %s to matrix",Tok2Cmdname(v_typ));
       return TRUE;
     }
@@ -6130,7 +6130,7 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   bool noIdeal = true; bool noK = true; bool noAlgorithm = true;
   bool noCacheMinors = true; bool noCacheMonomials = true;
   ideal IasSB; int k; char* algorithm; int cacheMinors; int cacheMonomials;
-  
+
   /* here come the different cases of correct argument sets */
   if ((u->next != NULL) && (u->next->Typ() == IDEAL_CMD))
   {
@@ -6194,7 +6194,7 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
       }
     }
   }
-  
+
   /* upper case conversion for the algorithm if present */
   if (!noAlgorithm)
   {
@@ -6386,14 +6386,14 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
   poly p=(poly)u->Data();
-  if ((monomexpr!=NULL)
-  &&((long)pTotaldegree(monomexpr)> (currRing->bitmask / (long)pTotaldegree(p))))
-  {
-    Werror("OVERFLOW in subst, max exponent is %ld",currRing->bitmask);
-    return TRUE;
-  }
   if (ringvar>0)
   {
+    if ((monomexpr!=NULL)
+    &&((long)pTotaldegree(monomexpr)> (currRing->bitmask / (long)pTotaldegree(p))))
+    {
+      Werror("OVERFLOW in subst, max exponent is %ld",currRing->bitmask);
+      return TRUE;
+    }
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
       res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
     else
@@ -8600,8 +8600,8 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
       if (at==dArith1[i].arg)
       {
         int r=res->rtyp=dArith1[i].res;
-	if (currRing!=NULL)
-	{
+        if (currRing!=NULL)
+        {
           #ifdef HAVE_PLURAL
           if ((currRing!=NULL) && (rIsPluralRing(currRing)))
           {
@@ -8628,7 +8628,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
             /* else ALLOW_RING */
           }
           #endif
-	}
+        }
         if (r<0)
         {
           res->rtyp=-r;
@@ -8799,7 +8799,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
       {
         res->rtyp=dArith3[i].res;
         if (currRing!=NULL)
-	{
+        {
           #ifdef HAVE_PLURAL
           if (rIsPluralRing(currRing))
           {
@@ -8826,7 +8826,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
             /* else ALLOW_RING */
           }
           #endif
-	}
+        }
         if ((call_failed=dArith3[i].p(res,a,b,c)))
         {
           break;// leave loop, goto error handling
@@ -9042,8 +9042,8 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       || ((dArithM[i].number_of_args==-2)&&(args>0)))
       {
         res->rtyp=dArithM[i].res;
-	if (currRing!=NULL)
-	{
+        if (currRing!=NULL)
+        {
           #ifdef HAVE_PLURAL
           if (rIsPluralRing(currRing))
           {
@@ -9070,7 +9070,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
             /* else ALLOW_RING */
           }
           #endif
-	}
+        }
         if (dArithM[i].p(res,a))
         {
           break;// leave loop, goto error handling
