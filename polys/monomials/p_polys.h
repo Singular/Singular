@@ -124,11 +124,13 @@ PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r);
 PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r);
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
 PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r);
-// ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
+/// ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
 PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r);
-// returns TRUE if ExpVector(p1) == ExpVector(p2), FALSE, otherwise
+/// returns TRUE if ExpVector(p1) == ExpVector(p2), FALSE, otherwise
 PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r);
-// returns sum of all exponents of p
+/// compute the degree of the leading monomial of p
+/// with respect to weigths 1
+/// the ordering may not be compatible with degree so do not use p->Order
 PINLINE1 long p_Totaldegree(poly p, ring r);
 
 PINLINE1 void p_GetExpV(poly p, int *ev, ring r);
