@@ -317,6 +317,7 @@ poly ssiReadPoly(ssiInfo *D)
   int j;
   j=0;
   poly ret=NULL;
+  poly prev=NULL;
   for(l=0;l<n;l++) // read n terms
   {
 // coef,comp.exp1,..exp N
@@ -332,7 +333,9 @@ poly ssiReadPoly(ssiInfo *D)
     }
     p_Setm(p,D->r);
     p_Test(p,D->r);
-    ret=p_Add_q(ret,p,D->r);
+    if (ret==NULL) ret=p;
+    else           pNext(prev)=p;
+    prev=p;
  }
  return ret;
 }
@@ -467,17 +470,17 @@ BOOLEAN ssiOpen(si_link l, short flag)
         loop
         {
           leftv h=ssiRead1(l); /*contains an exit.... */
-	  if (feErrors != NULL && *feErrors != '\0')
-	  {
-	    // handle errors:
-	    PrintS(feErrors); /* currently quite simple */
-	    *feErrors = '\0';
-	  }
+          if (feErrors != NULL && *feErrors != '\0')
+          {
+            // handle errors:
+            PrintS(feErrors); /* currently quite simple */
+            *feErrors = '\0';
+          }
           ssiWrite(l,h);
           h->CleanUp();
           omFreeBin(h, sleftv_bin);
         }
-	/* never reached*/
+        /* never reached*/
       }
       else if (pid>0)
       {
