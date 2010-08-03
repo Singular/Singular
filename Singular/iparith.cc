@@ -6386,8 +6386,8 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
   poly p=(poly)u->Data();
-  if ((monomexpr==NULL)
-  ||((long)pTotaldegree(monomexpr)> (currRing->bitmask / (long)pTotaldegree(p))))
+  if ((monomexpr!=NULL)
+  &&((long)pTotaldegree(monomexpr)> (currRing->bitmask / (long)pTotaldegree(p))))
   {
     Werror("OVERFLOW in subst, max exponent is %ld",currRing->bitmask);
     return TRUE;
