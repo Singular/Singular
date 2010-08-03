@@ -6397,11 +6397,11 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
       res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
     else
-      res->data= pSubstPoly((poly)u->Data(),ringvar,monomexpr);
+      res->data= pSubstPoly(p,ringvar,monomexpr);
   }
   else
   {
-    res->data=pSubstPar((poly)u->Data(),-ringvar,monomexpr);
+    res->data=pSubstPar(p,-ringvar,monomexpr);
   }
   return FALSE;
 }
