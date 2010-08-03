@@ -382,7 +382,7 @@ void p_Setm_TotalDegree(poly p, const ring r)
 void p_Setm_WFirstTotalDegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
-  p->exp[r->pOrdIndex] = pWFirstTotalDegree(p, r);
+  p->exp[r->pOrdIndex] = p_WFirstTotalDegree(p, r);
 }
 
 p_SetmProc p_GetSetmProc(ring r)
@@ -415,12 +415,13 @@ p_SetmProc p_GetSetmProc(ring r)
 long pDeg(poly a, const ring r)
 {
   p_LmCheckPolyRing(a, r);
+  assume(p_GetOrder(a, r) == p_WTotaldegree(a, r));
   return p_GetOrder(a, r);
 }
 
-// pWTotalDegree for weighted orderings
+// p_WTotalDegree for weighted orderings
 // whose first block covers all variables
-static inline long _pWFirstTotalDegree(poly p, const ring r)
+long p_WFirstTotalDegree(poly p, const ring r)
 {
   int i;
   long sum = 0;
@@ -432,17 +433,12 @@ static inline long _pWFirstTotalDegree(poly p, const ring r)
   return sum;
 }
 
-long pWFirstTotalDegree(poly p, const ring r)
-{
-  return (long) _pWFirstTotalDegree(p, r);
-}
-
 /*2
 * compute the degree of the leading monomial of p
 * with respect to weigths from the ordering
 * the ordering is not compatible with degree so do not use p->Order
 */
-long pWTotaldegree(poly p, const ring r)
+long p_WTotaldegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
   int i, k;
@@ -511,7 +507,7 @@ long pWTotaldegree(poly p, const ring r)
 
 #ifndef NDEBUG
       default:
-        Print("missing order %d in pWTotaldegree\n",r->order[i]);
+        Print("missing order %d in p_WTotaldegree\n",r->order[i]);
         break;
 #endif
     }
@@ -855,7 +851,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
   return max;
 }
 
-// like pLDeg1, only pFDeg == pWFirstTotalDegree
+// like pLDeg1, only pFDeg == p_WFirstTotalDegree
 long pLDeg1_WFirstTotalDegree(poly p,int *l, const ring r)
 {
   p_CheckPolyRing(p, r);
@@ -863,12 +859,12 @@ long pLDeg1_WFirstTotalDegree(poly p,int *l, const ring r)
   int ll=1;
   long  t,max;
 
-  max=_pWFirstTotalDegree(p, r);
+  max=p_WFirstTotalDegree(p, r);
   if (k > 0)
   {
     while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
     {
-      t=_pWFirstTotalDegree(p, r);
+      t=p_WFirstTotalDegree(p, r);
       if (t>max) max=t;
       ll++;
     }
@@ -877,7 +873,7 @@ long pLDeg1_WFirstTotalDegree(poly p,int *l, const ring r)
   {
     while ((p=pNext(p))!=NULL)
     {
-      t=_pWFirstTotalDegree(p, r);
+      t=p_WFirstTotalDegree(p, r);
       if (t>max) max=t;
       ll++;
     }
@@ -892,7 +888,7 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, const ring r)
   int ll=1;
   long  t,max;
 
-  max=_pWFirstTotalDegree(p, r);
+  max=p_WFirstTotalDegree(p, r);
   if (rIsSyzIndexRing(r))
   {
     long limit = rGetCurrSyzLimit(r);
