@@ -829,13 +829,13 @@ int  sleftv::Typ()
   {
     switch (rtyp)
     {
+      case IDHDL:
+        return IDTYP((idhdl)data);
       case ALIAS_CMD:
          {
            idhdl h=(idhdl)data;
            return  ((idhdl)h->data.ustring)->typ;
          }
-      case IDHDL:
-        return IDTYP((idhdl)data);
       case VECHO:
       case VPAGELENGTH:
       case VPRINTLEVEL:
@@ -864,8 +864,8 @@ int  sleftv::Typ()
   }
   int r=0;
   int t=rtyp;
-  if (t==ALIAS_CMD) { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h); }
-  else if (t==IDHDL) t=IDTYP((idhdl)data);
+  if (t==IDHDL) t=IDTYP((idhdl)data);
+  else if (t==ALIAS_CMD) { idhdl h=(idhdl)IDDATA((idhdl)data); t=IDTYP(h); }
   switch (t)
   {
     case INTVEC_CMD:
@@ -955,17 +955,17 @@ void sleftv::SetData(void* what)
 
 void * sleftv::Data()
 {
-  if(rtyp==ALIAS_CMD)
-  {
-    idhdl h=(idhdl)data;
-    return  ((idhdl)h->data.ustring)->data.ustring;
-  }
   if ((rtyp!=IDHDL) && iiCheckRing(rtyp))
      return NULL;
   if (e==NULL)
   {
     switch (rtyp)
     {
+      case ALIAS_CMD:
+      {
+        idhdl h=(idhdl)data;
+        return  ((idhdl)h->data.ustring)->data.ustring;
+      }
       case VECHO:      return (void *)si_echo;
       case VPAGELENGTH:return (void *)pagelength;
       case VPRINTLEVEL:return (void *)printlevel;
@@ -1006,6 +1006,12 @@ void * sleftv::Data()
   {
     t=((idhdl)data)->typ;
     d=IDDATA((idhdl)data);
+  }
+  else if (t==ALIAS_CMD)
+  {
+    idhdl h=(idhdl)IDDATA((idhdl)data);
+    t=IDTYP(h);
+    d=IDDATA(h);
   }
   if (iiCheckRing(t))
     return NULL;
