@@ -177,7 +177,7 @@ static void napTest(napoly p)
 #define napSetCoeff(p,n) {n_Delete(&pGetCoeff(p),nacRing);pGetCoeff(p)=n;}
 #define napComp(p,q)     p_LmCmp((poly)p,(poly)q, nacRing)
 #define napMultT(A,E)    A=(napoly)p_Mult_mm((poly)A,(poly)E,nacRing)
-#define napDeg(p)        (int)p_ExpVectorQuerSum(p, nacRing)
+#define napDeg(p)        (int)p_Totaldegree(p, nacRing)
 
 /*3
 * creates  an napoly

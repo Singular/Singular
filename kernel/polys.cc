@@ -311,7 +311,7 @@ poly pHomogen (poly p, int varnum)
 {
   pFDegProc deg;
   if (pLexOrder && (currRing->order[0]==ringorder_lp))
-    deg=pTotaldegree;
+    deg=p_Totaldegree;
   else
     deg=pFDeg;
 

@@ -272,8 +272,8 @@ class slimgb_alg
   unsigned long pTotaldegree(poly p)
   {
       pTest(p);
-      //assume(pDeg(p,r)==::pTotaldegree(p,r));
-      assume(((unsigned long)::pTotaldegree(p,r))==p->exp[deg_pos]);
+      //assume(pDeg(p,r)==::p_Totaldegree(p,r));
+      assume(((unsigned long)::p_Totaldegree(p,r))==p->exp[deg_pos]);
       return p->exp[deg_pos];
       //return ::pTotaldegree(p,this->r);
   }

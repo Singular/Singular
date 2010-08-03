@@ -289,7 +289,7 @@ PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, const ring r)
   return TRUE;
 }
 
-PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, const ring r)
+PINLINE1 long p_Totaldegree(poly p, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   unsigned long s = p_GetTotalDegree(p->exp[r->VarL_Offset[0]],
@@ -299,7 +299,7 @@ PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, const ring r)
   {
     s += p_GetTotalDegree(p->exp[r->VarL_Offset[i]], r);
   }
-  return s;
+  return (long)s;
 }
 
 PINLINE1 void p_GetExpV(poly p, int *ev, const ring r)

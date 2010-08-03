@@ -672,7 +672,7 @@ static mapoly maFindBestggT(mapoly mp, mapoly & choice, mapoly & fp, mapoly & fq
   }
   if(ggT!=NULL)
   {
-    int dq =pTotaldegree(fq_p,r);
+    int dq =p_Totaldegree(fq_p,r);
     if (dq!=0)
     {
       fq=maPoly_InsertMonomial(mp, fq_p, r, NULL);

@@ -34,7 +34,7 @@ extern BOOLEAN overflow_error;
 int tdeg(poly p)
 {
   int res=0;
-  if(p!=NULL) res=pTotaldegree(p, currRing);
+  if(p!=NULL) res=pTotaldegree(p);
   return(res);
 }
 
@@ -58,7 +58,7 @@ int getMaxTdeg(ideal I)
   {
     if ((I->m)[j]!=NULL)
     {
-      int temp=pTotaldegree((I->m)[j], currRing);
+      int temp=pTotaldegree((I->m)[j]);
       if(temp>res) {res=temp;}
     }
   }

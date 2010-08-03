@@ -954,7 +954,7 @@ void Initialization(char *Ord)
   else
   {
     degree_compatible=0;
-    jDeg=pTotaldegree;
+    jDeg=p_Totaldegree;
     ListGreatMove=ListGreatMoveOrder;
   }
 

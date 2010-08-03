@@ -129,7 +129,7 @@ PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r);
 // returns TRUE if ExpVector(p1) == ExpVector(p2), FALSE, otherwise
 PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r);
 // returns sum of all exponents of p
-PINLINE1 unsigned long p_ExpVectorQuerSum(poly p, ring r);
+PINLINE1 long p_Totaldegree(poly p, ring r);
 
 PINLINE1 void p_GetExpV(poly p, int *ev, ring r);
 PINLINE1 void p_SetExpV(poly p, int *ev, ring r);
@@ -377,7 +377,6 @@ extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
 int  pWeight(int i, ring r);
 long pDeg(poly p, ring r);
-long pTotaldegree(poly p, ring r);
 long pWFirstTotalDegree(poly p, ring r);
 long pWTotaldegree(poly p, ring r);
 long pWDegree(poly p, ring r);

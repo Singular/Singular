@@ -2455,7 +2455,7 @@ static BOOLEAN jjHOMOG_ID(leftv res, leftv u, leftv v)
   }
   pFDegProc deg;
   if (pLexOrder && (currRing->order[0]==ringorder_lp))
-    deg=pTotaldegree;
+    deg=p_Totaldegree;
    else
     deg=pFDeg;
   poly p=pOne(); pSetExp(p,i,1); pSetm(p);

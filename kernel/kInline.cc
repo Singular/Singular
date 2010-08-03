@@ -391,8 +391,8 @@ KINLINE long sTObject::pFDeg() const
 }
 KINLINE long sTObject::pTotalDeg() const
 {
-  if (p != NULL) return pTotaldegree(p, currRing);
-  return pTotaldegree(t_p,tailRing);
+  if (p != NULL) return p_Totaldegree(p, currRing);
+  return p_Totaldegree(t_p,tailRing);
 }
 KINLINE long sTObject::SetpFDeg()
 {

@@ -69,7 +69,7 @@ void khCheck( ideal Q, intvec *w, intvec *hilb, int &eledeg, int &count,
     degp=pFDeg;
     // if weights for variables were given to std computations,
     // then pFDeg == degp == kHomModDeg (see kStd)
-    if ((degp!=kModDeg) && (degp!=kHomModDeg)) degp=pTotaldegree;
+    if ((degp!=kModDeg) && (degp!=kHomModDeg)) degp=p_Totaldegree;
     // degp = pWDegree;
     l = hilb->length()-1;
     mw = (*hilb)[l];

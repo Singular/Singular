@@ -119,7 +119,6 @@ extern poly pHeadProc(poly p);
 #define pExpVectorSum(pr, p1, p2)   p_ExpVectorSum(pr, p1, p2, currRing)
 #define pExpVectorDiff(pr, p1, p2)  p_ExpVectorDiff(pr, p1, p2, currRing)
 #define pExpVectorEqual(p1, p2)     p_ExpVectorEqual(p1, p2, currRing)
-#define pExpVectorQuerSum(p)        p_ExpVectorQuerSum(p, currRing)
 
 // Gets a copy of (resp. set) the exponent vector, where e is assumed
 // to point to (r->N +1)*sizeof(long) memory. Exponents are
@@ -290,7 +289,7 @@ extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
 int  pWeight(int c, const ring r = currRing);
 long pDeg(poly p,const ring r = currRing);
-long pTotaldegree(poly p,const ring r = currRing);
+static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 long pWTotaldegree(poly p,const ring r = currRing);
 long pWDegree(poly p,const ring r = currRing);
 long pLDeg0(poly p,int *l,const ring r = currRing);

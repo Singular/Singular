@@ -3157,7 +3157,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   poly p=NULL;
   pFDegProc d;
   if (pLexOrder && (currRing->order[0]==ringorder_lp))
-     d=pTotaldegree;
+     d=p_Totaldegree;
   else
      d=pFDeg;
   int length=IDELEMS(m);

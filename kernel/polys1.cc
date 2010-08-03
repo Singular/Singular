@@ -1193,7 +1193,7 @@ BOOLEAN pIsHomogeneous (poly p)
   if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
   pFDegProc d;
   if (pLexOrder && (currRing->order[0]==ringorder_lp))
-    d=pTotaldegree;
+    d=p_Totaldegree;
   else 
     d=pFDeg;
   o = d(p,currRing);
@@ -1568,7 +1568,7 @@ poly ppJet(poly p, int m)
 
   while (p!=NULL)
   {
-    if (pTotaldegree(p)<=m)
+    if (p_Totaldegree(p,currRing)<=m)
     {
       if (r==NULL)
         r=pHead(p);
@@ -1593,12 +1593,12 @@ poly pJet(poly p, int m)
 {
   poly t=NULL;
 
-  while((p!=NULL) && (pTotaldegree(p)>m)) pLmDelete(&p);
+  while((p!=NULL) && (p_Totaldegree(p,currRing)>m)) pLmDelete(&p);
   if (p==NULL) return NULL;
   poly r=p;
   while (pNext(p)!=NULL)
   {
-    if (pTotaldegree(pNext(p))>m)
+    if (p_Totaldegree(pNext(p),currRing)>m)
     {
       pLmDelete(&pNext(p));
     }

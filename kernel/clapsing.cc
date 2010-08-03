@@ -709,7 +709,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
 {
   pTest(f);
 #ifdef FACTORIZE2_DEBUG
-  printf("singclap_factorize, degree %d\n",pTotaldegree(f));
+  printf("singclap_factorize, degree %ld\n",pTotaldegree(f));
 #endif
   // with_exps: 3,1 return only true factors, no exponents
   //            2 return true factors and exponents

@@ -133,9 +133,3 @@ C/C++-Style guide for Singular
   - to avoid confusion: "struct" should be a C object,
     if you really need C++ extensions, use "class".
   - "and"/"or"/"not" are not recognized by all compilers, use &&, &, ||, |, !
-  - TODO: What about namespaces!?
-
-  ? Classes - with starts capital letter (better no "C" at the beginning) 
-    and Camel style further (no "_")
-  ? member Methods - small letters with "_" 
-  ? member Variables - start with "m_" or "_" and Camel style further 

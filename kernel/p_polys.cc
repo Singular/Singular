@@ -355,7 +355,7 @@ void p_Setm_Dummy(poly p, const ring r)
 void p_Setm_TotalDegree(poly p, const ring r)
 {
   p_LmCheckPolyRing(p, r);
-  p->exp[r->pOrdIndex] = p_ExpVectorQuerSum(p, r);
+  p->exp[r->pOrdIndex] = p_Totaldegree(p, r);
 }
 
 // for wp, Wp, ws, etc
@@ -397,18 +397,6 @@ long pDeg(poly a, const ring r)
   p_LmCheckPolyRing(a, r);
   assume(p_GetOrder(a, r) == pWTotaldegree(a, r));
   return p_GetOrder(a, r);
-}
-
-/*2
-* compute the degree of the leading monomial of p
-* with respect to weigths 1
-* (all are 1 so save multiplications or they are of different signs)
-* the ordering is not compatible with degree so do not use p->Order
-*/
-long pTotaldegree(poly p, const ring r)
-{
-  p_LmCheckPolyRing(p, r);
-  return (long)p_ExpVectorQuerSum(p, r);
 }
 
 // pWTotalDegree for weighted orderings
@@ -523,7 +511,7 @@ int pWeight(int i, const ring r)
 
 long pWDegree(poly p, const ring r)
 {
-  if (r->firstwv==NULL) return pTotaldegree(p, r);
+  if (r->firstwv==NULL) return p_Totaldegree(p, r);
   p_LmCheckPolyRing(p, r);
   int i, k;
   long j =0;
@@ -793,12 +781,12 @@ long pLDeg1_Totaldegree(poly p,int *l, const ring r)
   int ll=1;
   long  t,max;
 
-  max=p_ExpVectorQuerSum(p, r);
+  max=p_Totaldegree(p, r);
   if (k > 0)
   {
     while (((p=pNext(p))!=NULL) && (p_GetComp(p, r)==k))
     {
-      t=p_ExpVectorQuerSum(p, r);
+      t=p_Totaldegree(p, r);
       if (t>max) max=t;
       ll++;
     }
@@ -807,7 +795,7 @@ long pLDeg1_Totaldegree(poly p,int *l, const ring r)
   {
     while ((p=pNext(p))!=NULL)
     {
-      t=p_ExpVectorQuerSum(p, r);
+      t=p_Totaldegree(p, r);
       if (t>max) max=t;
       ll++;
     }
@@ -822,7 +810,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
   int ll=1;
   long  t,max;
 
-  max=p_ExpVectorQuerSum(p, r);
+  max=p_Totaldegree(p, r);
   if (rIsSyzIndexRing(r))
   {
     long limit = rGetCurrSyzLimit(r);
@@ -830,7 +818,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
     {
       if (p_GetComp(p, r)<=limit)
       {
-        if ((t=p_ExpVectorQuerSum(p, r))>max) max=t;
+        if ((t=p_Totaldegree(p, r))>max) max=t;
         ll++;
       }
       else break;
@@ -840,7 +828,7 @@ long pLDeg1c_Totaldegree(poly p,int *l, const ring r)
   {
     while ((p=pNext(p))!=NULL)
     {
-      if ((t=p_ExpVectorQuerSum(p, r))>max) max=t;
+      if ((t=p_Totaldegree(p, r))>max) max=t;
       ll++;
     }
   }
@@ -893,7 +881,7 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, const ring r)
     {
       if (p_GetComp(p, r)<=limit)
       {
-        if ((t=p_ExpVectorQuerSum(p, r))>max) max=t;
+        if ((t=p_Totaldegree(p, r))>max) max=t;
         ll++;
       }
       else break;
@@ -903,7 +891,7 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, const ring r)
   {
     while ((p=pNext(p))!=NULL)
     {
-      if ((t=p_ExpVectorQuerSum(p, r))>max) max=t;
+      if ((t=p_Totaldegree(p, r))>max) max=t;
       ll++;
     }
   }
