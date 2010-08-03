@@ -2898,7 +2898,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     // and omit_degree
     res->firstwv = r->firstwv;
     res->firstBlockEnds = r->firstBlockEnds;
-    res->pFDeg = res->pFDegOrig = pWFirstTotalDegree;
+    res->pFDeg = res->pFDegOrig = p_WFirstTotalDegree;
   }
   if (omitted_degree)
     res->pLDeg = res->pLDegOrig = r->pLDegOrig;
@@ -3264,7 +3264,7 @@ static void rOptimizeLDeg(ring r)
     if (r->pLDeg == pLDeg1c)
       r->pLDeg = pLDeg1c_Totaldegree;
   }
-  else if (r->pFDeg == pWFirstTotalDegree)
+  else if (r->pFDeg == p_WFirstTotalDegree)
   {
     if (r->pLDeg == pLDeg1)
       r->pLDeg = pLDeg1_WFirstTotalDegree;
@@ -3323,7 +3323,7 @@ static void rSetDegStuff(ring r)
     || (order[0] == ringorder_Wp)
     || (order[0] == ringorder_ws)
     || (order[0] == ringorder_Ws))
-      r->pFDeg = pWFirstTotalDegree;
+      r->pFDeg = p_WFirstTotalDegree;
     r->firstBlockEnds=block1[0];
     r->firstwv = wvhdl[0];
   }
@@ -3354,7 +3354,7 @@ static void rSetDegStuff(ring r)
     || (order[1] == ringorder_Wp)
     || (order[1] == ringorder_ws)
     || (order[1] == ringorder_Ws))
-      r->pFDeg = pWFirstTotalDegree;
+      r->pFDeg = p_WFirstTotalDegree;
   }
   /*------- more than one block ----------------------*/
   else
