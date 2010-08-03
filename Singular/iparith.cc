@@ -6385,7 +6385,7 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   poly monomexpr;
   BOOLEAN nok=jjSUBST_Test(v,w,ringvar,monomexpr);
   if (nok) return TRUE;
-  poly up=(poly)u->Data();
+  poly p=(poly)u->Data();
   if ((monomexpr==NULL)
   ||((long)pTotaldegree(monomexpr)> (currRing->bitmask / (long)pTotaldegree(p))))
   {
