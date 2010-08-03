@@ -6388,11 +6388,11 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
   poly p=(poly)u->Data();
   if (ringvar>0)
   {
-    if ((monomexpr!=NULL) && (p!=NULL)
-    &&((long)pTotaldegree(monomexpr)> (currRing->bitmask / (long)pTotaldegree(p))))
+    if ((monomexpr!=NULL) && (p!=NULL) && (pTotaldegree(p)!=0) &&
+    ((unsigned long)pTotaldegree(monomexpr) > (currRing->bitmask / (unsigned long)pTotaldegree(p))))
     {
-      Werror("OVERFLOW in subst, max exponent is %ld",currRing->bitmask);
-      return TRUE;
+      Warn("possible OVERFLOW in subst, max exponent is %ld",currRing->bitmask);
+      //return TRUE;
     }
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
       res->data = pSubst((poly)u->CopyD(res->rtyp),ringvar,monomexpr);
