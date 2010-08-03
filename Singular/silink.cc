@@ -28,6 +28,7 @@
 #include <kernel/ideals.h>
 #include <kernel/numbers.h>
 #include <kernel/intvec.h>
+#include <Singular/ssiLink.h>
 
 // #ifdef HAVE_DBM
 // #ifdef ix86_Win
@@ -829,22 +830,22 @@ static si_link_extension slTypeInit(si_link_extension s, const char* type)
   s->next = NULL;
   si_link_extension ns = (si_link_extension)omAlloc0Bin(s_si_link_extension_bin);
 
+  if (0) 0;
 #ifdef HAVE_MPSR
-  if (strcmp(type, "MPfile") == 0)
+  else if (strcmp(type, "MPfile") == 0)
     s->next = slInitMPFileExtension(ns);
   else if (strcmp(type, "MPtcp") == 0)
     s->next = slInitMPTcpExtension(ns);
-#ifdef HAVE_DBM
-  else
-#endif
 #endif
 #ifdef HAVE_DBM
-  if (strcmp(type, "DBM") == 0)
+  else if (strcmp(type, "DBM") == 0)
     s->next = slInitDBMExtension(ns);
 #endif
-#if defined(HAVE_DBM) || defined(HAVE_MPSR)
-  else
+#if 1
+  else if (strcmp(type, "ssi") == 0)
+    s->next = slInitSsiExtension(ns);
 #endif
+  else
   {
     Warn("Found unknown link type: %s", type);
     Warn("Use default link type: %s", si_link_root->type);
