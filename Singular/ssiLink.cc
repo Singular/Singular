@@ -281,6 +281,7 @@ number ssiReadNumber(ssiInfo *d)
     return (number)dd;
   }
   else Werror("coeffs not implemented");
+  return NULL;
 }
 
 ring ssiReadRing(ssiInfo *d)
