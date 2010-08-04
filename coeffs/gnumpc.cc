@@ -68,7 +68,7 @@ int ngcInt(number &i, const coeffs r)
   return (int)((gmp_complex*)i)->real();
 }
 
-int ngcSize(number n)
+int ngcSize(number n, const coeffs R)
 {
   int r = (int)((gmp_complex*)n)->real();
   if (r < 0) r = -r;
@@ -79,7 +79,7 @@ int ngcSize(number n)
      only if this happens to be zero although n != 0,
      return 1;
      (this code ensures that zero has the size zero) */
-  if ((oneNorm == 0.0) & (ngcIsZero(n) == FALSE)) oneNorm = 1;
+  if ((oneNorm == 0.0) & (ngcIsZero(n,R) == FALSE)) oneNorm = 1;
   return oneNorm;
 }
 
@@ -117,7 +117,7 @@ number ngcNeg (number a, const coeffs R)
   assume( getCoeffType(R) == ID );
 
   gmp_complex* r=(gmp_complex*)a;
-  (*r) *= ngc_m1;
+  (*r).neg();
   return (number)a;
 }
 
@@ -135,9 +135,9 @@ number ngcInvers(number a, const coeffs R)
   }
   else
   {
-    b = new gmp_complex( (gmp_complex)1 / (*(gmp_complex*)a) );
+    r = new gmp_complex( (gmp_complex)1 / (*(gmp_complex*)a) );
   }
-  return (number)b;
+  return (number)r;
 }
 
 /*2

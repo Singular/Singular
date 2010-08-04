@@ -99,6 +99,8 @@ public:
     return *this;
   };
 
+  inline gmp_float & neg ( ) { mpf_neg(t,t); return *this; };
+
   friend gmp_float operator + ( const gmp_float & a, const gmp_float & b );
   friend gmp_float operator - ( const gmp_float & a, const gmp_float & b );
   friend gmp_float operator * ( const gmp_float & a, const gmp_float & b );
@@ -203,6 +205,8 @@ public:
   }
   ~gmp_complex() {}
 
+  gmp_complex & neg ( );
+  
   friend gmp_complex operator + ( const gmp_complex & a, const gmp_complex & b );
   friend gmp_complex operator - ( const gmp_complex & a, const gmp_complex & b );
   friend gmp_complex operator * ( const gmp_complex & a, const gmp_complex & b );

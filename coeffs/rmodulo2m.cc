@@ -185,7 +185,7 @@ number nr2mInit (int i, const coeffs r)
   NATNUMBER k = (NATNUMBER)ii;
   k = k & r->nr2mModul;
   /* now we have: from = j * k mod 2^m */
-  return (number)nr2mMult((number)j, (number)k);
+  return (number)nr2mMult((number)j, (number)k,r);
 }
 
 /*

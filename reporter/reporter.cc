@@ -192,8 +192,8 @@ void WerrorS(const char *s)
   errorreported = TRUE;
 #ifdef HAVE_FACTORY
   // libfac:
-  extern int libfac_interruptflag;
-  libfac_interruptflag=1;
+  //extern int libfac_interruptflag;
+  //libfac_interruptflag=1;
 #endif
 }
 
