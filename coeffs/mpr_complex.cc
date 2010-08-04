@@ -661,6 +661,12 @@ gmp_complex & gmp_complex::operator *= ( const gmp_complex & b )
   r = f;
   return *this;
 }
+gmp_complex & gmp_complex::neg ( )
+{
+  i.neg();
+  r.neg();
+  return *this;
+}
 gmp_complex & gmp_complex::operator /= ( const gmp_complex & b )
 {
   gmp_float d = b.r*b.r + b.i*b.i;

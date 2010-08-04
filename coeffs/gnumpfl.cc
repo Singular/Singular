@@ -26,15 +26,6 @@ extern size_t gmp_output_digits;
 /// Our Type!
 static const n_coeffType ID = n_long_R;
 
-static number ngfMapP(number from, const coeffs src, const coeffs dst)
-{
-  return ngfInit(npInt(from,src), dst);
-}
-number ngfMapQ(number from, const coeffs src, const coeffs dst)
-{
-  gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF));
-  return (number)res;
-}
 union nf
 {
   float _f;
@@ -44,16 +35,6 @@ union nf
   float F() const {return _f;}
   number N() const {return _n;}
 };
-static number ngfMapR(number from, const coeffs src, const coeffs dst)
-{
-  gmp_float *res=new gmp_float((double)nf(from).F());
-  return (number)res;
-}
-static number ngfMapC(number from, const coeffs src, const coeffs dst)
-{
-  gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
-  return (number)res;
-}
 
 /*2
 * n := i
@@ -87,7 +68,7 @@ int ngfSize(number n, const coeffs r)
      only if this happens to be zero although n != 0,
      return 1;
      (this code ensures that zero has the size zero) */
-  if ((i == 0) && (ngfIsZero(n) == FALSE)) i = 1;
+  if ((i == 0) && (ngfIsZero(n,r) == FALSE)) i = 1;
   return i;
 }
 
@@ -219,21 +200,15 @@ number ngfPower (number x, int exp, const coeffs r)
   if ( exp == 0 )
   {
     gmp_float* n = new gmp_float(1);
-    *u=(number)n;
-    return;
+    return (number)n;
   }
   else if ( ngfIsZero(x, r) ) // 0^e, e>0
   {
-    *u=ngfInit(0, r);
-    return;
+    return ngfInit(0, r);
   }
   else if ( exp == 1 )
   {
-    n_New(u, r);
-    gmp_float* n = new gmp_float();
-    *n= *(gmp_float*)x;
-    *u=(number)n;
-    return;
+    return ngfCopy(x,r);
   }
   return (number) ( new gmp_float( (*(gmp_float*)x)^exp ) );
 }
@@ -443,57 +418,39 @@ void ngfInitChar(coeffs n, void *)
 #endif
 }
 
-number ngfMapQ(number from, const coeffs aRing, const coeffs r)
+number ngfMapQ(number from, const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) == n_Q );
+  assume( getCoeffType(dst) == ID );
+  assume( getCoeffType(src) == n_Q );
   
-  if ( from != NULL )
-  {
-    gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF,r));
-    return (number)res;
-  }
-  else
-    return NULL;
+  gmp_float *res=new gmp_float(numberFieldToFloat(from,QTOF,dst));
+  return (number)res;
 }
 
-static number ngfMapR(number from, const coeffs aRing, const coeffs r)
+static number ngfMapR(number from, const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) == n_R );
+  assume( getCoeffType(dst) == ID );
+  assume( getCoeffType(src) == n_R );
   
-  if ( from != NULL )
-  {
-    gmp_float *res=new gmp_float((double)nrFloat(from));
-    return (number)res;
-  }
-  else
-    return NULL;
+  gmp_float *res=new gmp_float((double)nf(from).F());
+  return (number)res;
 }
 
-static number ngfMapP(number from, const coeffs aRing, const coeffs r)
+static number ngfMapP(number from, const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) ==  n_Zp );
+  assume( getCoeffType(dst) == ID );
+  assume( getCoeffType(src) ==  n_Zp );
   
-  if ( from != NULL )
-    return ngfInit(npInt(from,aRing), r);
-  else
-    return NULL;
+  return ngfInit(npInt(from,src), dst);
 }
 
-static number ngfMapC(number from, const coeffs aRing, const coeffs r)
+static number ngfMapC(number from, const coeffs src, const coeffs dst)
 {
-  assume( getCoeffType(r) == ID );
-  assume( getCoeffType(aRing) ==  n_long_C );
+  assume( getCoeffType(dst) == ID );
+  assume( getCoeffType(src) ==  n_long_C );
   
-  if ( (from != NULL) || ((gmp_complex*)from)->real().isZero() )
-  {
-    gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
-    return (number)res;
-  }
-  else
-    return NULL;
+  gmp_float *res=new gmp_float(((gmp_complex*)from)->real());
+  return (number)res;
 }
 
 nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
