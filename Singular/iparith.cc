@@ -3291,6 +3291,48 @@ static BOOLEAN jjSTD_HILB(leftv res, leftv u, leftv v)
   if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
 }
+static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v);
+static void jjSTD_1_ID(leftv res, ideal i0, int t0, ideal p0, attr a)
+/* destroys i0, p0 */
+/* result (with attributes) in res */
+/* i0: SB*/
+/* t0: type of p0*/
+/* p0 new elements*/
+/* a attributes of i0*/
+{
+  int tp;
+  if (t0==IDEAL_CMD) tp=POLY_CMD;
+  else               tp=VECTOR_CMD;
+  for (int i=IDELEMS(p0)-1; i>=0; i--)
+  {
+    poly p=p0->m[i];
+    p0->m[i]=NULL;
+    if (p!=NULL)
+    {
+      sleftv u0,v0;
+      memset(&u0,0,sizeof(sleftv));
+      memset(&v0,0,sizeof(sleftv));
+      v0.rtyp=tp;
+      v0.data=(void*)p;
+      u0.rtyp=t0;
+      u0.data=i0;
+      u0.attribute=a;
+      setFlag(&u0,FLAG_STD);
+      jjSTD_1(res,&u0,&v0);
+      i0=(ideal)res->data;
+      res->data=NULL;
+      a=res->attribute;
+      res->attribute=NULL;
+      u0.CleanUp();
+      v0.CleanUp();
+      res->CleanUp();
+    }
+  }
+  idDelete(&p0);
+  res->attribute=a;
+  res->data=(void *)i0;
+  res->rtyp=t0;
+}
 static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
 {
   ideal result;
@@ -3302,44 +3344,45 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   {
     i0=idInit(1,i1->rank); // TODO: rank is wrong (if v is a vector!)
     i0->m[0]=(poly)v->Data();
-  }
-  else /*IDEAL*/
-  {
-    i0=(ideal)v->CopyD(); // TODO: memory leak? !
-  }
-  int ii0=idElem(i0); /* size of i0 */
-  int ii1=idElem(i1); /* size of i1 */
-  i1=idSimpleAdd(i1,i0); //
-  memset(i0->m,0,sizeof(poly)*IDELEMS(i0)); // TODO: memory leak? !!
-  idDelete(&i0);
-  intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
-  tHomog hom=testHomog;
+    int ii0=idElem(i0); /* size of i0 */
+    i1=idSimpleAdd(i1,i0); //
+    memset(i0->m,0,sizeof(poly)*IDELEMS(i0));
+    idDelete(&i0);
+    intvec *w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
+    tHomog hom=testHomog;
 
-  if (w!=NULL)
-  {
-    if (!idTestHomModule(i1,currQuotient,w))
+    if (w!=NULL)
     {
-      // no warnung: this is legal, if i in std(i,p)
-      // is homogeneous, but p not
-      w=NULL;
+      if (!idTestHomModule(i1,currQuotient,w))
+      {
+        // no warnung: this is legal, if i in std(i,p)
+        // is homogeneous, but p not
+        w=NULL;
+      }
+      else
+      {
+        w=ivCopy(w);
+        hom=isHomog;
+      }
     }
-    else
-    {
-      w=ivCopy(w);
-      hom=isHomog;
-    }
+    BITSET save_test=test;
+    test|=Sy_bit(OPT_SB_1);
+    /* ii0 appears to be the position of the first element of il that
+       does not belong to the old SB ideal */
+    result=kStd(i1,currQuotient,hom,&w,NULL,0,ii0);
+    test=save_test;
+    idDelete(&i1);
+    idSkipZeroes(result);
+    if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
+    res->data = (char *)result;
   }
-  BITSET save_test=test;
-  test|=Sy_bit(OPT_SB_1);
-  /* ii0 appears to be the position of the first element of il that
-     does not belong to the old SB ideal */
-  result=kStd(i1,currQuotient,hom,&w,NULL,0,ii0);
-  test=save_test;
-  idDelete(&i1);
-  idSkipZeroes(result);
-  res->data = (char *)result;
+  else /*IDEAL/MODULE*/
+  {
+    attr a=NULL;
+    if (u->attribute!=NULL) a=u->attribute->Copy();
+    jjSTD_1_ID(res,(ideal)u->CopyD(),r,(ideal)v->CopyD(),a);
+  }
   if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);
-  if (w!=NULL) atSet(res,omStrDup("isHomog"),w,INTVEC_CMD);
   return FALSE;
 }
 static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
