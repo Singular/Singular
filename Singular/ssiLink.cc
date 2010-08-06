@@ -6,10 +6,10 @@
  *  Purpose: declaration of sl_link routines for ssi
  *  Version: $Id$
  ***************************************************************/
-#  include <stdio.h>
-#  include <fcntl.h>
-#  include <errno.h>
-#  include <unistd.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <sys/select.h>
@@ -60,12 +60,14 @@ void ssiSetCurrRing(const ring r)
 // the implementation of the functions:
 void ssiWriteInt(ssiInfo *d,const int i)
 {
-  fprintf(d->f_write,"%d",i);
+  fprintf(d->f_write,"%d ",i);
+  //if (d->f_debug!=NULL) fprintf(d->f_debug,"int: %d ",i);
 }
 
 void ssiWriteString(ssiInfo *d,const char *s)
 {
-  fprintf(d->f_write,"%d %s",strlen(s),s);
+  fprintf(d->f_write,"%d %s ",strlen(s),s);
+  //if (d->f_debug!=NULL) fprintf(d->f_debug,"stringi: %d \"%s\" ",strlen(s),s);
 }
 
 
@@ -77,10 +79,12 @@ void ssiWriteBigInt(const ssiInfo *d, const number n)
   if(SR_HDL(n) & SR_INT)
   {
     fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
+    //if (d->f_debug!=NULL) fprintf(d->f_debug,"bigint: short \"%ld\" ",SR_TO_INT(n));
   }
   else if (n->s==3)
   {
     gmp_fprintf(d->f_write,"3 %Zd ",n->z);
+    //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"bigint: gmp \"%Zd\" ",n->z);
   }
   else Werror("illiegal bigint");
 }
@@ -96,20 +100,24 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
   if(rField_is_Zp(d->r))
   {
     fprintf(d->f_write,"%d ",(int)(long)n);
+    //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: \"%ld\" ",(int)(long)n);
   }
   else if (rField_is_Q(d->r))
   {
     if(SR_HDL(n) & SR_INT)
     {
       fprintf(d->f_write,"4 %ld ",SR_TO_INT(n));
+      //if (d->f_debug!=NULL) fprintf(d->f_debug,"number: short \"%ld\" ",SR_TO_INT(n));
     }
     else if (n->s<2)
     {
       gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
+      //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
     }
     else /*n->s==3*/
     {
       gmp_fprintf(d->f_write,"3 %Zd ",n->z);
+      //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
     }
   }
   else WerrorS("coeff field not implemented");
@@ -186,8 +194,11 @@ void ssiWriteCommand(si_link l, command D)
   // syntax: <num ops> <operation> <op1> <op2> ....
   fprintf(d->f_write,"%d %d ",D->argc,D->op);
   if (D->argc >0) ssiWrite(l, &(D->arg1));
-  if (D->argc >1) ssiWrite(l, &(D->arg2));
-  if (D->argc >2) ssiWrite(l, &(D->arg3));
+  if (D->argc < 4)
+  {
+    if (D->argc >1) ssiWrite(l, &(D->arg2));
+    if (D->argc >2) ssiWrite(l, &(D->arg3));
+  }
 }
 
 void ssiWriteProc(ssiInfo *d,procinfov p)
@@ -384,17 +395,32 @@ command ssiReadCommand(si_link l)
     memcpy(&(D->arg1),v,sizeof(*v));
     omFreeBin(v,sleftv_bin);
   }
-  if (D->argc >1)
+  if (argc <4)
   {
-    v=ssiRead1(l);
-    memcpy(&(D->arg2),v,sizeof(*v));
-    omFreeBin(v,sleftv_bin);
+    if (D->argc >1)
+    {
+      v=ssiRead1(l);
+      memcpy(&(D->arg2),v,sizeof(*v));
+      omFreeBin(v,sleftv_bin);
+    }
+    if (D->argc >2)
+    {
+      v=ssiRead1(l);
+      memcpy(&(D->arg3),v,sizeof(*v));
+      omFreeBin(v,sleftv_bin);
+    }
   }
-  if (D->argc >2)
+  else
   {
-    v=ssiRead1(l);
-    memcpy(&(D->arg3),v,sizeof(*v));
-    omFreeBin(v,sleftv_bin);
+    leftv prev=&(D->arg1);
+    argc--;
+    while(argc >0)
+    {
+      v=ssiRead1(l);
+      prev->next=v;
+      prev=v;
+      argc--;
+    }
   }
   return D;
 }
@@ -529,7 +555,10 @@ BOOLEAN ssiOpen(si_link l, short flag)
     }
     outfile=myfopen(filename,mode);
     if (outfile!=NULL)
-      d->f_write = outfile;
+    {
+      if (strcmp(l->mode,"r")==0) d->f_read = outfile;
+      else d->f_write = outfile;
+    }
     else
     {
       omFree(d);
@@ -584,6 +613,7 @@ LINKAGE leftv ssiRead1(si_link l)
     case 4:res->rtyp=BIGINT_CMD;
            res->data=(char *)ssiReadBigInt(d);
            break;
+    case 15:
     case 5:{
              d->r=ssiReadRing(d);
              d->r->ref++;
@@ -591,6 +621,7 @@ LINKAGE leftv ssiRead1(si_link l)
              res->data=(char*)d->r;
              // we are in the top-level, so set the basering to d->r:
              ssiSetCurrRing(d->r);
+             if (t==15) return ssiRead1(l);
            }
            break;
     case 6:res->rtyp=POLY_CMD;
@@ -621,7 +652,7 @@ LINKAGE leftv ssiRead1(si_link l)
              if (nok) WerrorS("error in eval");
              break;
            }
-    case 12:
+    case 12: /*DEF_CMD*/
            {
              res->rtyp=0;
              res->name=(char *)ssiReadString(d);
@@ -677,7 +708,7 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
           case NUMBER_CMD:
                           if (d->r!=currRing)
                           {
-                            fprintf(d->f_write,"5 ");
+                            fprintf(d->f_write,"15 ");
                             ssiWriteRing(d,currRing);
                             if (d->level<=1) fprintf(d->f_write,"\n");
                           }
@@ -691,7 +722,7 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
           case VECTOR_CMD:
                         if (d->r!=currRing)
                         {
-                          fprintf(d->f_write,"5 ");
+                          fprintf(d->f_write,"15 ");
                           ssiWriteRing(d,currRing);
                           if (d->level<=1) fprintf(d->f_write,"\n");
                         }
@@ -704,7 +735,7 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
           case MATRIX_CMD:
                         if (d->r!=currRing)
                         {
-                          fprintf(d->f_write,"5 ");
+                          fprintf(d->f_write,"15 ");
                           ssiWriteRing(d,currRing);
                           if (d->level<=1) fprintf(d->f_write,"\n");
                         }
@@ -719,23 +750,17 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
                    break;
           case DEF_CMD: /* not evaluated stuff in quotes */
                    fprintf(d->f_write,"12 ");
-                 ssiWriteString(d,data->Name());
+                   ssiWriteString(d,data->Name());
                    break;
           case PROC_CMD:
                    fprintf(d->f_write,"13 ");
-                 ssiWriteProc(d,(procinfov)dd);
-                 break;
+                   ssiWriteProc(d,(procinfov)dd);
+                   break;
           case LIST_CMD:
-                        if (lRingDependend((lists)dd) && (d->r!=currRing))
-                        {
-                          fprintf(d->f_write,"5 ");
-                          ssiWriteRing(d,currRing);
-                          if (d->level<=1) fprintf(d->f_write,"\n");
-                        }
-                        fprintf(d->f_write,"14 ");
-                        ssiWriteList(l,(lists)dd);
-                        break;
-          default: Werror("not implemented (t:%d)",tt);
+                   fprintf(d->f_write,"14 ");
+                   ssiWriteList(l,(lists)dd);
+                   break;
+          default: Werror("not implemented (t:%d, rtyp:%d)",tt, data->rtyp);
                    d->level=0;
                    return TRUE;
     }
@@ -833,4 +858,5 @@ const char* slStatusSsi(si_link l, const char* request)
 // 12 def <len> %s
 // 13 proc <len> %s
 // 14 list %d <elem1> ....
+// 15 setring .......
 //
