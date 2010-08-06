@@ -237,7 +237,7 @@ int redEcart (LObject* h,kStrategy strat)
       // if possible h goes to the lazy-set L,i.e
       // if its position in L would be not the last one
       strat->fromT = TRUE;
-      if (!K_TEST_OPT_REDTHROUGH && strat->Ll >= 0) /*- L is not empty -*/
+      if (!TEST_OPT_REDTHROUGH && strat->Ll >= 0) /*- L is not empty -*/
       {
         h->SetLmCurrRing();
         if (strat->honey && strat->posInLDependsOnLength)
@@ -305,7 +305,7 @@ int redEcart (LObject* h,kStrategy strat)
      *-if the degree jumps
      *-if the number of pre-defined reductions jumps
      */
-    if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
+    if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
         && ((d >= reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
@@ -422,7 +422,7 @@ int redFirst (LObject* h,kStrategy strat)
 #endif
     if (!strat->homog)
     {
-      if (!K_TEST_OPT_OLDSTD && strat->honey)
+      if (!TEST_OPT_OLDSTD && strat->honey)
       {
         h->SetpFDeg();
         if (strat->T[j].ecart <= h->ecart)
@@ -441,7 +441,7 @@ int redFirst (LObject* h,kStrategy strat)
        *-if the degree jumps
        *-if the number of pre-defined reductions jumps
        */
-      if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
+      if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
           && ((d >= reddeg) || (pass > strat->LazyPass)))
       {
         h->SetLmCurrRing();
@@ -2317,7 +2317,7 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
 #endif
 
   // redtailBBa against T for inhomogenous input
-  if (!K_TEST_OPT_OLDSTD)
+  if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;

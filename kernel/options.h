@@ -55,8 +55,8 @@ extern BITSET verbose;
 #define V_COEFSTRAT  20
 #define V_IDLIFT     21
 #define V_LENGTH     22
-#define V_LENGTH     22
 /*23: kDebugPrint */
+#define V_ALLWARN    24
 /* for tests: 25-30 */
 #define V_DEG_STOP   31
 
@@ -122,6 +122,7 @@ extern BITSET verbose;
 #define TEST_V_COEFSTRAT           BVERBOSE(V_COEFSTRAT)
 #define TEST_V_UPTORADICAL         BVERBOSE(V_UPTORADICAL)
 #define TEST_V_FINDMONOM           BVERBOSE(V_FINDMONOM)
+#define TEST_V_ALLWARN             BVERBOSE(V_ALLWARN)
 
 
 #endif

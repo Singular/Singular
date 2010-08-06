@@ -2195,7 +2195,7 @@ MonRedRes noro_red_mon(poly t, BOOLEAN force_unique, NoroCache* cache,slimgb_alg
       //poly t_copy_mon=p_Copy(t,c->r);
     poly exp_diff=cache->temp_term;
     p_ExpVectorDiff(exp_diff,t,c->strat->S[i],c->r);
-    p_SetCoeff(exp_diff,npNeg(nInvers(coefstrat)),c->r); 
+    p_SetCoeff(exp_diff,npNeg(nInvers(coefstrat)),c->r);
       // nInvers may be npInvers or nvInvers
     p_Setm(exp_diff,c->r);
     assume(c->strat->S[i]!=NULL);
@@ -4301,8 +4301,10 @@ static void multi_reduction(red_object* los, int & losl, slimgb_alg* c)
     multi_reduce_step(erg,los,c);
 
 
-    if(!K_TEST_OPT_REDTHROUGH){
-  for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++){
+    if(!TEST_OPT_REDTHROUGH)
+    {
+     for(i=erg.to_reduce_l;i<=erg.to_reduce_u;i++)
+     {
      if  (los[i].p!=NULL)  //the check (los[i].p!=NULL) might be invalid
      {
          //

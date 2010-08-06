@@ -1718,7 +1718,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 #endif
 
   // redtailBBa against T for inhomogenous input
-  if (!K_TEST_OPT_OLDSTD)
+  if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;

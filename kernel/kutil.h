@@ -33,19 +33,10 @@
 #define setmaxTinc 16
 #endif
 
-// define if you want std computations as in Singular version < 2
-// This disbales RedThrough, tailReductions against T (bba),
+// if you want std computations as in Singular version < 2:
+// This disables RedThrough, tailReductions against T (bba),
 // sets posInT = posInT15 (bba, strat->honey), and enables redFirst with LDeg
-// NOTE: the same effect can be achieved with option(oldStd)
-// #define HAVE_OLD_STD
-
-#ifdef HAVE_OLD_STD
-#define K_TEST_OPT_REDTHROUGH 0
-#define K_TEST_OPT_OLDSTD 1
-#else
-#define K_TEST_OPT_REDTHROUGH TEST_OPT_REDTHROUGH
-#define K_TEST_OPT_OLDSTD     TEST_OPT_OLDSTD
-#endif
+// NOTE: can be achieved with option(oldStd)
 
 #undef NO_KINLINE
 #if !defined(KDEBUG) && !defined(NO_INLINE)

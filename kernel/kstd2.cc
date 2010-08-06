@@ -335,7 +335,7 @@ int redRing (LObject* h,kStrategy strat)
     d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
-    if (!K_TEST_OPT_REDTHROUGH &&
+    if (!TEST_OPT_REDTHROUGH &&
         (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
@@ -477,7 +477,7 @@ int redHomog (LObject* h,kStrategy strat)
      *-if the number of pre-defined reductions jumps
      */
     pass++;
-    if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && (pass > strat->LazyPass))
+    if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && (pass > strat->LazyPass))
     {
       h->SetLmCurrRing();
       at = strat->posInL(strat->L,strat->Ll,h,strat);
@@ -608,7 +608,7 @@ int redLazy (LObject* h,kStrategy strat)
     d = h->SetpFDeg();
     /*- try to reduce the s-polynomial -*/
     pass++;
-    if (//!K_TEST_OPT_REDTHROUGH &&
+    if (//!TEST_OPT_REDTHROUGH &&
         (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->SetLmCurrRing();
@@ -716,7 +716,7 @@ int redHoney (LObject* h, kStrategy strat)
     /*
      * end of search: have to reduce with pi
      */
-    if (!K_TEST_OPT_REDTHROUGH && (pass!=0) && (ei > h->ecart))
+    if (!TEST_OPT_REDTHROUGH && (pass!=0) && (ei > h->ecart))
     {
       h->GetTP(); // clears bucket
       h->SetLmCurrRing();
@@ -787,7 +787,7 @@ int redHoney (LObject* h, kStrategy strat)
      */
     pass++;
     d = h_d + h->ecart;
-    if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
+    if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0) && ((d > reddeg) || (pass > strat->LazyPass)))
     {
       h->GetTP(); // clear bucket
       h->SetLmCurrRing();
@@ -973,7 +973,7 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
 #endif
 
   // redtailBBa against T for inhomogenous input
-  if (!K_TEST_OPT_OLDSTD)
+  if (!TEST_OPT_OLDSTD)
     withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
@@ -1454,7 +1454,7 @@ ideal bbaShift(ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat, int upto
 #endif
 
   // redtailBBa against T for inhomogenous input
-  //  if (!K_TEST_OPT_OLDSTD)
+  //  if (!TEST_OPT_OLDSTD)
   //    withT = ! strat->homog;
 
   // strat->posInT = posInT_pLength;
@@ -1884,7 +1884,7 @@ int redFirstShift (LObject* h,kStrategy strat)
 #endif
     if (!strat->homog)
     {
-      if (!K_TEST_OPT_OLDSTD && strat->honey)
+      if (!TEST_OPT_OLDSTD && strat->honey)
       {
         h->SetpFDeg();
         if (strat->T[j].ecart <= h->ecart)
@@ -1903,7 +1903,7 @@ int redFirstShift (LObject* h,kStrategy strat)
        *-if the degree jumps
        *-if the number of pre-defined reductions jumps
        */
-      if (!K_TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
+      if (!TEST_OPT_REDTHROUGH && (strat->Ll >= 0)
           && ((d >= reddeg) || (pass > strat->LazyPass)))
       {
         h->SetLmCurrRing();

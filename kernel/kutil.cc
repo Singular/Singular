@@ -4731,7 +4731,7 @@ void message (int i,int* reduc,int* olddeg,kStrategy strat, int red_result)
     Print("%d",i);
     *olddeg = i;
   }
-  if (K_TEST_OPT_OLDSTD)
+  if (TEST_OPT_OLDSTD)
   {
     if (strat->Ll != *reduc)
     {
@@ -5795,7 +5795,7 @@ void initBuchMoraPos (kStrategy strat)
       // I conclude that that posInT_EcartpLength is the best of
       // posInT15, posInT_EcartFDegpLength, posInT_FDegLength, posInT_pLength
       // see the table at the end of this file
-      if (K_TEST_OPT_OLDSTD)
+      if (TEST_OPT_OLDSTD)
         strat->posInT = posInT15;
       else
         strat->posInT = posInT_EcartpLength;
