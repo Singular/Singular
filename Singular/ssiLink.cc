@@ -514,7 +514,9 @@ BOOLEAN ssiOpen(si_link l, short flag)
         d->pid=pid;
         close(pc[0]); close(cp[1]);
         d->f_read=fdopen(cp[0],"r");
+        d->fd_read=cp[0];
         d->f_write=fdopen(pc[1],"w");
+        d->fd_write=pc[1];
         l->flags|=SI_LINK_READ|SI_LINK_WRITE;
       }
       else
@@ -787,6 +789,7 @@ si_link_extension slInitSsiExtension(si_link_extension s)
 const char* slStatusSsi(si_link l, const char* request)
 {
   ssiInfo *d=(ssiInfo*)l->data;
+  if (d==NULL) return "not open";
   if ((strcmp(l->mode,"fork")==0) && (strcmp(request, "read") == 0))
   {
     fd_set  mask, fdmask;
@@ -799,6 +802,7 @@ const char* slStatusSsi(si_link l, const char* request)
 
       FD_ZERO(&mask);
       FD_SET(d->fd_read, &mask);
+      //Print("test fd %d\n",d->fd_read);
     /* check with select: chars waiting: no -> not ready */
       switch (select(d->fd_read+1, &mask, NULL, NULL, &wt))
       {
@@ -809,6 +813,7 @@ const char* slStatusSsi(si_link l, const char* request)
     /* yes: read 1 char*/
     /* if \n, check again with select else ungetc(c), ready*/
       int c=fgetc(d->f_read);
+      //Print("try c=%d\n",c);
       switch(c)
       {
         case -1: return "eof";
