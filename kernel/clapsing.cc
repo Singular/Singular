@@ -31,9 +31,16 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   // assume f!=0, g!=0
   poly res=NULL;
 
-  if (p_IsConstantPoly(f,r) || p_IsConstantPoly(g,r))
+  assume(f!=NULL);
+  assume(g!=NULL);
+
+  if((pNext(f)==NULL) && (pNext(g)==NULL))
   {
-    return p_One(r);
+    poly p=pOne();
+    for(int i=rVar(r);i>0;i--)
+      p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
+    p_Setm(p,r);
+    return p;
   }
 
   // for now there is only the possibility to handle polynomials over
