@@ -233,6 +233,7 @@ and
 Eva Zerz.
   
 Further contributions to @sc{Singular} have been made by:
+Martin Albrecht,
 Olaf Bachmann,
 Thomas Bauer,
 Markus Becker,
@@ -263,6 +264,7 @@ Carlos Rabelo,
 Alfredo Sanchez-Navarro,
 Jens Schmidt,
 Thomas Siebert,
+William Stein,
 R@"udiger Stobbe,
 Henrik Strohmayer,
 Christian Stussak,
