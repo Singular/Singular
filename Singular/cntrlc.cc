@@ -209,6 +209,7 @@ void sigsegv_handler(int sig, sigcontext s)
   //  SuSe 9.x reports -1 always
   //  Redhat 9.x/FC x reports sometimes -1
   // see also: hpux_system
+  // also needed by getrusage (timer etc.)
 
  @param[in] sig
 **/
