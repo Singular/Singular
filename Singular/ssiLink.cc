@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <sys/select.h>
+#include <ctype.h>   /*for isdigit*/
 
 
 #include "mod2.h"
@@ -814,24 +815,15 @@ const char* slStatusSsi(si_link l, const char* request)
     /* if \n, check again with select else ungetc(c), ready*/
       int c=fgetc(d->f_read);
       //Print("try c=%d\n",c);
-      switch(c)
+      if (c== -1) return "eof";
+      else if (isdigit(c))
+      { ungetc(c,d->f_read); return "ready"; }
+      else if ((c!=' ') && (c!='\n'))
       {
-        case -1: return "eof";
-        case ' ':
-        case '\n': break;
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9': ungetc(c,d->f_read);
-                  return "ready";
-        default: Werror("unknown char in ssiLink(%d)",c);
-                 return "error";
+        Werror("unknown char in ssiLink(%d)",c);
+        return "error";
       }
+      /* else: next char */
     }
   }
   else if (strcmp(request, "read") == 0)
