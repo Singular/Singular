@@ -185,6 +185,13 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
     nNormalize(p);
     currRing->minpoly=p;
     naMinimalPoly=((lnumber)currRing->minpoly)->z;
+    if (p_GetExp(((lnumber)currRing->minpoly)->z,1,currRing->algring)==0)
+    {
+      Werror("minpoly must not be constant");
+      currRing->minpoly=NULL;
+      naMinimalPoly=NULL;
+      nDelete(&p);
+    }
     // and now, normalize all already defined objects in this ring
     idhdl h=currRing->idroot;
     while(h!=NULL)
@@ -1627,7 +1634,7 @@ void jjNormalizeQRingId(leftv I)
       ideal I0=(ideal)I->Data();
       ideal II=kNF(F,currQuotient,I0);
       idDelete(&F);
-      if ((I->rtyp==IDEAL_CMD) 
+      if ((I->rtyp==IDEAL_CMD)
       || (I->rtyp==MODUL_CMD)
       )
       {
@@ -1658,7 +1665,7 @@ void jjNormalizeQRingP(leftv I)
       ideal F=idInit(1,1);
       poly II=kNF(F,currQuotient,(poly)I->Data());
       idDelete(&F);
-      if ((I->rtyp==POLY_CMD) 
+      if ((I->rtyp==POLY_CMD)
       || (I->rtyp==VECTOR_CMD))
       {
         pDelete((poly*)&(I->data));
@@ -1668,7 +1675,7 @@ void jjNormalizeQRingP(leftv I)
       {
         idhdl h=(idhdl)I->data;
         pDelete((poly*)&IDPOLY(h));
-	IDPOLY(h)=II;
+        IDPOLY(h)=II;
         setFlag(h,FLAG_QRING);
       }
       else
