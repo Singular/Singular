@@ -474,7 +474,7 @@ poly pMinPolyNormalize(poly p)
   {
     // this returns 0, if p == MinPoly
     number product = nMult(pGetCoeff(p), one);
-    if (product == NULL)
+    if ((product == NULL)||(nIsZero(product)))
     {
       pLmDelete(&p);
     }
