@@ -48,16 +48,9 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   Off(SW_RATIONAL);
   if (rField_is_Q(r) || (rField_is_Zp(r)))
   {
-    CanonicalForm newGCD(const CanonicalForm & A, const CanonicalForm & B);
     setCharacteristic( n_GetChar(r) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
-    //if (nGetChar() > 1 )
-    //{
-    //  res=convFactoryPSingP( newGCD( F,G ));
-    //  if (!nGreaterZero(pGetCoeff(res))) res=pNeg(res);
-    //}
-    //else
-      res=convFactoryPSingP( gcd( F, G ) , r);
+    res=convFactoryPSingP( gcd( F, G ) , r);
   }
   // and over Q(a) / Fp(a)
   else if ( rField_is_Extension(r))
