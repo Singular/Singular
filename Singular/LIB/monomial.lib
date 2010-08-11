@@ -1,6 +1,6 @@
 // last modified:  10.06.2010
 //////////////////////////////////////////////////////////////////////////////
-version = "$Id: monomial.lib$";
+version = "$Id$";
 category = "Commutative algebra";
 info = "
 LIBRARY: monomial.lib   Primary and irreducible decompositions of monomial
