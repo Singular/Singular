@@ -470,11 +470,13 @@ BOOLEAN ssiOpen(si_link l, short flag)
   if (flag == SI_LINK_READ) mode = "r";
   else if (strcmp(l->mode, "w") == 0) mode = "w";
   else if (strcmp(l->mode, "fork") == 0) mode = "fork";
+  else if (strcmp(l->mode, "tcp") == 0) mode = "tcp";
   else mode = "a";
 
 
   if (l->name[0] == '\0')
   {
+    // ==============================================================
     if (strcmp(mode,"fork")==0)
     {
       int pc[2];
@@ -525,6 +527,13 @@ BOOLEAN ssiOpen(si_link l, short flag)
         Werror("fork failed (%d)",errno);
       }
     }
+    // ==============================================================
+    else if (strcmp(mode,"tcp")==0)
+    {
+      Print("name:>%s<\n",l->name);
+      l->flags|=SI_LINK_READ|SI_LINK_WRITE;
+    }
+    // ==============================================================
     // stdin or stdout
     else if (flag == SI_LINK_READ)
     {
