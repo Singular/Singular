@@ -141,6 +141,7 @@ basefactorysrc := \
                 cf_gcd_smallp.cc \
 		cf_generator.cc \
 		cf_globals.cc \
+		cf_hnf.cc \
 		cf_inline.cc \
 		cf_irred.cc \
 		cf_iter.cc \
@@ -228,6 +229,7 @@ basefactoryincl := \
 		cf_generator.h \
 		cf_globals.h \
                 cf_gcd_smallp.h \
+		cf_hnf.h \
 		cf_irred.h \
 		cf_iter.h \
 		cf_map.h \

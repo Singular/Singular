@@ -50,6 +50,7 @@ CFFList convertNTLvec_pair_zzpX_long2FacCFFList(vec_pair_zz_pX_long e,zz_p multi
 
 CFFList convertNTLvec_pair_GF2X_long2FacCFFList(vec_pair_GF2X_long e,GF2 multi,Variable x);
 CanonicalForm convertZZ2CF(ZZ coefficient);
+ZZ convertFacCF2NTLZZ(const CanonicalForm f);
 ZZX convertFacCF2NTLZZX(CanonicalForm f);
 CFFList convertNTLvec_pair_ZZX_long2FacCFFList(vec_pair_ZZX_long e,ZZ multi,Variable x);
 CanonicalForm convertNTLZZpE2CF(ZZ_pE coefficient,Variable x);

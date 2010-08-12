@@ -107,6 +107,9 @@
 #include "gfops.h"
 
 /*MAKEHEADER PUBLIC ONLY*/
+#include "cf_hnf.h"
+
+/*MAKEHEADER PUBLIC ONLY*/
 #include "singext.h"
 
 #endif /* SINGULAR */
