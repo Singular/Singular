@@ -39,6 +39,9 @@ ideal singclap_sqrfree ( poly f );
 
 matrix singclap_irrCharSeries ( ideal I);
 
+matrix singntl_HNF(matrix A);
+intvec* singntl_HNF(intvec* A);
+
 BOOLEAN singclap_isSqrFree(poly f);
 
 char* singclap_neworder ( ideal I);

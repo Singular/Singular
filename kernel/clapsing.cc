@@ -1548,6 +1548,77 @@ int singclap_det_i( intvec * m )
   Off(SW_RATIONAL);
   return res;
 }
+matrix singntl_HNF(matrix  m )
+{  
+  int r=m->rows();
+  if (r!=m->cols())
+  {
+    Werror("HNF of %d x %d matrix",r,m->cols());
+    return NULL;
+  }
+  matrix res=mpNew(r,r);
+  if (rField_is_Q(currRing))
+  {
+   
+    CFMatrix M(r,r);
+    int i,j;
+    for(i=r;i>0;i--)
+    {
+      for(j=r;j>0;j--)
+      {
+        M(i,j)=convSingPFactoryP(MATELEM(m,i,j));
+      }
+    }
+    for(i=r;i>0;i--)
+    {
+      for(j=r;j>0;j--)
+      {
+        M(i,j)=convSingPFactoryP(MATELEM(m,i,j));
+      }
+    }
+    CFMatrix *MM=cf_HNF(M);
+    for(i=r;i>0;i--)
+    {
+      for(j=r;j>0;j--)
+      {  
+        MATELEM(res,i,j)=convFactoryPSingP((*MM)(i,j));
+      }
+    }
+    delete MM;
+  }
+  return res;
+}
+intvec* singntl_HNF(intvec*  m )
+{
+  int r=m->rows();
+  if (r!=m->cols())
+  {
+    Werror("HNF of %d x %d matrix",r,m->cols());
+    return NULL;
+  }
+  setCharacteristic( 0 );
+  CFMatrix M(r,r);
+  int i,j;
+  for(i=r;i>0;i--)
+  {
+    for(j=r;j>0;j--)
+    {
+      M(i,j)=IMATELEM(*m,i,j);
+    }
+  }
+  CFMatrix *MM=cf_HNF(M);
+  intvec *mm=ivCopy(m);
+  for(i=r;i>0;i--)
+  {
+    for(j=r;j>0;j--)
+    {
+      IMATELEM(*mm,i,j)=convFactoryISingI((*MM)(i,j));
+    }
+  }
+  delete MM;
+  return mm;
+}
+
 napoly singclap_alglcm ( napoly f, napoly g )
 {
 
