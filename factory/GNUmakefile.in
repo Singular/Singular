@@ -471,10 +471,10 @@ distfiles :=	\
 	sed -n '/^\/\*MAKEHEADER/!d; n; s/^#include "//; s/"//; p;' $< | tr '\012' ' ' >> $@
 	echo >> $@
 
-%d: %.dtmp
+%.d: %.dtmp
 	mv $< $@
 
-$(factorydep): $(factorydep:.d=.dtmp)
+$(factorydep):= $(factorydep:.d=.dtmp)
 
 # how to create header files from header templates
 %.h: %.template
@@ -756,7 +756,7 @@ maintainer-clean: distclean
 #
 depend:		$(factorydep) $(memmandep) $(hdrtempldep)
 
-	echo "WILDCARD"  ($(wildcard *.d),)
+	@echo "WILDCARD"  $(wildcard *.d)
 ifneq ($(wildcard *.d),)
   include $(factorydep) $(memmandep) $(hdrtempldep)
 endif
