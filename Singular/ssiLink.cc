@@ -12,7 +12,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <sys/types.h>          /* for portability */
 #include <sys/select.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <ctype.h>   /*for isdigit*/
 
 
@@ -476,7 +479,6 @@ BOOLEAN ssiOpen(si_link l, short flag)
 
   if (l->name[0] == '\0')
   {
-    // ==============================================================
     if (strcmp(mode,"fork")==0)
     {
       int pc[2];
@@ -494,7 +496,7 @@ BOOLEAN ssiOpen(si_link l, short flag)
         l->data=d;
         omFree(l->mode);
         l->mode = omStrDup(mode);
-        SI_LINK_SET_OPEN_P(l, flag);
+        SI_LINK_SET_RW_OPEN_P(l);
         myynest=0;
         fe_fgets_stdin=fe_fgets_dummy;
         loop
@@ -520,20 +522,13 @@ BOOLEAN ssiOpen(si_link l, short flag)
         d->fd_read=cp[0];
         d->f_write=fdopen(pc[1],"w");
         d->fd_write=pc[1];
-        l->flags|=SI_LINK_READ|SI_LINK_WRITE;
+        SI_LINK_SET_RW_OPEN_P(l);
       }
       else
       {
         Werror("fork failed (%d)",errno);
       }
     }
-    // ==============================================================
-    else if (strcmp(mode,"tcp")==0)
-    {
-      Print("name:>%s<\n",l->name);
-      l->flags|=SI_LINK_READ|SI_LINK_WRITE;
-    }
-    // ==============================================================
     // stdin or stdout
     else if (flag == SI_LINK_READ)
     {
@@ -548,33 +543,79 @@ BOOLEAN ssiOpen(si_link l, short flag)
   }
   else
   {
-    // normal ascii link to a file
-    FILE *outfile;
-    char *filename=l->name;
-
-    if(filename[0]=='>')
+    // tcp mode
+    if(strcmp(mode,"tcp")==0)
     {
-      if (filename[1]=='>')
+      int sockfd, newsockfd, portno, clilen;
+      struct sockaddr_in serv_addr, cli_addr;
+      int n;
+      sockfd = socket(AF_INET, SOCK_STREAM, 0);
+      if(sockfd < 0)
       {
-        filename+=2;
-        mode = "a";
+        WerrorS("ERROR opening socket");
+        return TRUE;
       }
-      else
+      memset((char *) &serv_addr,0, sizeof(serv_addr));
+      portno = 1024;
+      serv_addr.sin_family = AF_INET;
+      serv_addr.sin_addr.s_addr = INADDR_ANY;
+      do
       {
-        filename++;
-        mode="w";
+        portno++;
+        serv_addr.sin_port = htons(portno);
+        if(portno > 50000)
+        {
+          WerrorS("ERROR on binding (no free port available?)");
+          return TRUE;
+        }
       }
-    }
-    outfile=myfopen(filename,mode);
-    if (outfile!=NULL)
-    {
-      if (strcmp(l->mode,"r")==0) d->f_read = outfile;
-      else d->f_write = outfile;
+      while(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0);
+      Print("waiting on port %d\n", portno);mflush();
+      listen(sockfd,5);
+      clilen = sizeof(cli_addr);
+      newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, (socklen_t *)&clilen);
+      if(newsockfd < 0)
+      {
+        WerrorS("ERROR on accept");
+        return TRUE;
+      }
+      d->fd_read = newsockfd;
+      d->fd_write = newsockfd;
+      d->f_read = fdopen(newsockfd, "r");
+      d->f_write = fdopen(newsockfd, "w");
+      SI_LINK_SET_RW_OPEN_P(l);
+      close(sockfd);
     }
     else
     {
-      omFree(d);
-      return TRUE;
+      // normal ascii link to a file
+      FILE *outfile;
+      char *filename=l->name;
+
+      if(filename[0]=='>')
+      {
+        if (filename[1]=='>')
+        {
+          filename+=2;
+          mode = "a";
+        }
+        else
+        {
+          filename++;
+          mode="w";
+        }
+      }
+      outfile=myfopen(filename,mode);
+      if (outfile!=NULL)
+      {
+        if (strcmp(l->mode,"r")==0) d->f_read = outfile;
+        else d->f_write = outfile;
+      }
+      else
+      {
+        omFree(d);
+        return TRUE;
+      }
     }
   }
   l->data=d;
@@ -685,7 +726,7 @@ LINKAGE leftv ssiRead1(si_link l)
               res->rtyp=DEF_CMD;
               break;
             }
-    default: WerrorS("not implemented");
+    default: Werror("not implemented (t:%d)",t);
              omFreeSize(res,sizeof(sleftv));
              res=NULL;
              break;
@@ -800,7 +841,8 @@ const char* slStatusSsi(si_link l, const char* request)
 {
   ssiInfo *d=(ssiInfo*)l->data;
   if (d==NULL) return "not open";
-  if ((strcmp(l->mode,"fork")==0) && (strcmp(request, "read") == 0))
+  if (((strcmp(l->mode,"fork")==0)||(strcmp(l->mode,"tcp")==0))
+  && (strcmp(request, "read") == 0))
   {
     fd_set  mask, fdmask;
     struct timeval wt;
@@ -827,7 +869,7 @@ const char* slStatusSsi(si_link l, const char* request)
       if (c== -1) return "eof";
       else if (isdigit(c))
       { ungetc(c,d->f_read); return "ready"; }
-      else if ((c!=' ') && (c!='\n'))
+      else if (c>' ')
       {
         Werror("unknown char in ssiLink(%d)",c);
         return "error";
