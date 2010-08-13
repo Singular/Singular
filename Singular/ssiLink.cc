@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <ctype.h>   /*for isdigit*/
+#include <unistd.h>
 
 
 #include "mod2.h"
@@ -572,6 +573,26 @@ BOOLEAN ssiOpen(si_link l, short flag)
       while(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0);
       Print("waiting on port %d\n", portno);mflush();
       listen(sockfd,5);
+      char* cli_host = (char*)omAlloc(256);
+      char* path = (char*)omAlloc(1024);
+      int r = sscanf(l->name,"%255[^:]:%s",cli_host,path);
+      if(r == 0)
+      {
+        WerrorS("ERROR: no host specified");
+        return TRUE;
+      }
+      else if(r == 1)
+      {
+        path = "Singular";
+      }
+      Print("host: %s\n",cli_host);
+      Print("path: %s\n",path);
+      Print("%d\n",r);
+      char* ssh_command = (char*)omAlloc(256);
+      char* ser_host = (char*)omAlloc(64);
+      gethostname(ser_host,64);
+      sprintf(ssh_command,"ssh %s %s --batch --link=ssi--MPhost=%s --MPport=%d &",cli_host,path,ser_host,portno);
+      system(ssh_command);
       clilen = sizeof(cli_addr);
       newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, (socklen_t *)&clilen);
       if(newsockfd < 0)
@@ -585,6 +606,22 @@ BOOLEAN ssiOpen(si_link l, short flag)
       d->f_write = fdopen(newsockfd, "w");
       SI_LINK_SET_RW_OPEN_P(l);
       close(sockfd);
+      myynest=0;
+      fe_fgets_stdin=fe_fgets_dummy;
+      loop
+      {
+        leftv h=ssiRead1(l); /*contains an exit.... */
+        if (feErrors != NULL && *feErrors != '\0')
+        {
+          // handle errors:
+          PrintS(feErrors); /* currently quite simple */
+          *feErrors = '\0';
+        }
+        ssiWrite(l,h);
+        h->CleanUp();
+        omFreeBin(h, sleftv_bin);
+      }
+      /* never reached*/
     }
     else
     {
@@ -888,6 +925,15 @@ const char* slStatusSsi(si_link l, const char* request)
     else return "not ready";
   }
   else return "unknown status request";
+}
+
+int ssiBatch(const char *host, const char * port)
+/* return 0 on success, >0 else*/
+{
+  printf(host);
+  printf(port);
+  mflush();
+  return(0);
 }
 
 // ----------------------------------------------------------------

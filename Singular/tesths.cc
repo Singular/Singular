@@ -30,6 +30,7 @@
 #include <Singular/distrib.h>
 #include <Singular/version.h>
 #include <Singular/slInit.h>
+#include <Singular/ssiLink.h>
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
