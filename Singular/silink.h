@@ -61,10 +61,10 @@ struct sip_link
 #define SI_LINK_RW_OPEN_P(l) (SI_LINK_W_OPEN_P(l) && SI_LINK_R_OPEN_P(l))
 
 #define SI_LINK_SET_CLOSE_P(l)  ((l)->flags = SI_LINK_CLOSE)
-#define SI_LINK_SET_OPEN_P(l, flag)   ((l)->flags = (l)->flags |SI_LINK_OPEN |flag)
-#define SI_LINK_SET_W_OPEN_P(l) ((l)->flags = (l)->flags | SI_LINK_OPEN | SI_LINK_WRITE)
-#define SI_LINK_SET_R_OPEN_P(l) ((l)->flags = (l)->flags | SI_LINK_OPEN | SI_LINK_READ)
-#define SI_LINK_SET_RW_OPEN_P(l) ((l)->flags = (l)->flags | SI_LINK_OPEN | SI_LINK_READ | SI_LINK_WRITE)
+#define SI_LINK_SET_OPEN_P(l, flag)   ((l)->flags |= SI_LINK_OPEN |flag)
+#define SI_LINK_SET_W_OPEN_P(l) ((l)->flags |= (SI_LINK_OPEN | SI_LINK_WRITE))
+#define SI_LINK_SET_R_OPEN_P(l) ((l)->flags |= (SI_LINK_OPEN | SI_LINK_READ))
+#define SI_LINK_SET_RW_OPEN_P(l) ((l)->flags |= (SI_LINK_OPEN | SI_LINK_READ | SI_LINK_WRITE))
 
 BOOLEAN slOpen(si_link l, short flag);
 BOOLEAN slClose(si_link l);
