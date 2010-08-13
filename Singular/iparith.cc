@@ -5373,7 +5373,6 @@ static BOOLEAN jjnlInt(leftv res, leftv u)
   res->data=(char *)(long)nlInt(n,NULL /*dummy for nlInt*/);
   return FALSE;
 }
-#define s short
 struct sValCmd1 dArith1[]=
 {
 // operations:
@@ -5635,7 +5634,6 @@ struct sValCmd1 dArith1[]=
 ,{loNewtonP,    NEWTONPOLY_CMD,  IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{NULL,         0,               0,              0             , NO_PLURAL |NO_RING}
 };
-#undef s
 /*=================== operations with 3 args.: static proc =================*/
 static BOOLEAN jjBRACK_S(leftv res, leftv u, leftv v,leftv w)
 {
