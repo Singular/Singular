@@ -69,20 +69,18 @@ struct fe_option feOptSpec[] =
    "FILE",      "Load FILE on emacs start-up, instead of default",     feOptString, 0,   0},
 #else
   {"xterm",         required_argument,      LONG_OPTION_RETURN,
-   "XTERM",     "Use XTERM as terminal program to run Singular",          feOptString, 0,   0},
+   "XTERM",     "Use XTERM as terminal program to run Singular",       feOptString, 0,   0},
 #endif
 
   {"singular",          required_argument,  LONG_OPTION_RETURN,
    "PROG",      "Start PROG as Singular program within emacs",         feOptString, 0,   0},
 
   {"no-call",     no_argument,        LONG_OPTION_RETURN,
-   0,          "Do not start program. Print call to stdout",       feOptBool,   0,   0},
+   0,          "Do not start program. Print call to stdout",           feOptBool,   0,   0},
 #endif
 
-#ifdef HAVE_MPSR
   {"batch",             no_argument,        'b',
-   0,          "Run in MP batch mode",                                 feOptBool,    0,     0},
-#endif
+   0,          "Run in batch mode",                                    feOptBool,    0,     0},
 
   {"execute",           required_argument,  'c',
    "STRING",   "Execute STRING on start-up",                           feOptString, 0,   0},
