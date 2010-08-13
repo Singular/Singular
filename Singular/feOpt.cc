@@ -144,15 +144,18 @@ struct fe_option feOptSpec[] =
   {"min-time",          required_argument,  LONG_OPTION_RETURN,
   "SECS",     "Do not display times smaller than SECS (in seconds)",   feOptString, (void*) "0.5",  0},
 
-#ifdef HAVE_MPSR
   {"MPport",           required_argument,   LONG_OPTION_RETURN,
-   "PORT",     "Use PORT number for MP conections",                    feOptString,    0,      0},
+   "PORT",     "Use PORT number for conections",                       feOptString,    0,      0},
 
   {"MPhost",           required_argument,   LONG_OPTION_RETURN,
-   "HOST",     "Use HOST for MP connections",                          feOptString,    0,   0},
+   "HOST",     "Use HOST for connections",                             feOptString,    0,   0},
 
+  {"link",           required_argument,   LONG_OPTION_RETURN,
+   "LINK",     "Use LINK for connections",                             feOptString,    0,   0},
+
+#ifdef HAVE_MPSR
   {"MPrsh",           required_argument,   LONG_OPTION_RETURN,
-   "RSH",     "Use RSH for MP connections",                          feOptString,    0,   0},
+   "RSH",     "Use RSH for MP connections",                            feOptString,    0,   0},
 #endif
 
   {"ticks-per-sec",     required_argument,  LONG_OPTION_RETURN,
@@ -356,12 +359,10 @@ static const char* feOptAction(feOptIndex opt)
   // do some special actions
   switch(opt)
   {
-#ifdef HAVE_MPSR
       case FE_OPT_BATCH:
         if (feOptSpec[FE_OPT_BATCH].value)
           fe_fgets_stdin=fe_fgets_dummy;
         return NULL;
-#endif
 
       case FE_OPT_HELP:
         feOptHelp(feArgv0);

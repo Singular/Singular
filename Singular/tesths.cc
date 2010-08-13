@@ -321,16 +321,26 @@ int main(          /* main entry to Singular */
   /* start shell */
   if (fe_fgets_stdin==fe_fgets_dummy)
   {
-#ifdef HAVE_MPSR
-    BatchDoProc batch_do = slInitMPBatchDo();
-    if (batch_do != NULL)
-      return (*batch_do)((char*) feOptValue(FE_OPT_MPPORT),
-                         (char*) feOptValue(FE_OPT_MPHOST));
+    char *linkname=(char*) feOptValue(FE_OPT_LINK);
+    if((linkname!=NULL)&&(strcmp(linkname,"ssi")==0))
+    {
+      return ssiBatch((char*) feOptValue(FE_OPT_MPHOST),(char*) feOptValue(FE_OPT_MPPORT));
+      //Print("batch: p:%s, h:%s\n",(char*) feOptValue(FE_OPT_MPPORT),(char*) feOptValue(FE_OPT_MPHOST));
+      //exit(0);
+    }
     else
-      return 1;
-#else
-    assume(0);
-#endif
+    {
+    #ifdef HAVE_MPSR
+      BatchDoProc batch_do = slInitMPBatchDo();
+      if (batch_do != NULL)
+        return (*batch_do)((char*) feOptValue(FE_OPT_MPPORT),
+                         (char*) feOptValue(FE_OPT_MPHOST));
+      else
+        return 1;
+    #else
+      assume(0);
+    #endif
+    }
   }
   setjmp(si_start_jmpbuf);
   yyparse();
