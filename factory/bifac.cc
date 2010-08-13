@@ -1,4 +1,4 @@
-#include "factory.h"
+#include "canonicalform.h"
 #ifdef HAVE_BIFAC
 #include "lgs.h"
 #include "bifacConfig.h"

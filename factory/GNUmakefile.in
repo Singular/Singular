@@ -494,7 +494,6 @@ mem:		libcfmem.a
 #
 # - explicit targets.
 #
-$(basefactorysrc:.cc=.o):	factory.h
 $(libfactory):	$(factoryobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
@@ -606,12 +605,12 @@ gftables:	gengftables
 # header files in current directory or in $(srcdir), but use
 # the header files from the directory where they should be
 # after installation.
-test_install.o: test_install.cc
+test_install.o: test_install.cc factory.h
 		$(CXX) -c $< $(TESTCXXFLAGS) -I- -I$(includedir) -o $@
 
 # the same we do for ftmpl_inst.o which for this reason is named
 # iftmpl_inst.o
-iftmpl_inst.o:
+iftmpl_inst.o: factory.h
 		$(CXX) -c $(templatedir)/ftmpl_inst.cc $(TMPLCXXFLAGS) -I- -I$(includedir) -o $@
 
 # link installation test program

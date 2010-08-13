@@ -1,5 +1,5 @@
 
-#include "factory.h"
+#include "canonicalform.h"
 #ifdef HAVE_BIFAC
 #ifndef NOSTREAMIO
 #include<fstream>

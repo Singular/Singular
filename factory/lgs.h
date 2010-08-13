@@ -10,7 +10,7 @@
 
  
 
-#include "factory.h"
+#include "cf_factory.h"
 #ifdef HAVE_BIFAC
 
   
