@@ -8,7 +8,7 @@
 /*
  * ABSTRACT: tgb internal .h file
 */
-#include <omalloc/omalloc.h>
+#include <omalloc.h>
 #include <kernel/p_polys.h>
 
 #include <kernel/ideals.h>

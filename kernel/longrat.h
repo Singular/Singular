@@ -92,10 +92,7 @@ nMapFunc nlSetMap(const ring src, const ring dst);
 number nlMapGMP(number from);
 #endif
 
-#ifndef OM_ALLOC_H
-struct omBin_s;
-#endif
-extern omBin_s* rnumber_bin;
+extern omBin rnumber_bin;
 
 // in-place operations
 void nlInpGcd(number &a, number b, const ring r);
