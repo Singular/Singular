@@ -1,4 +1,5 @@
 Do 19. Aug 16:48:35 CEST 2010
+- code cleanup: HAVE_TCL removed, HAVE_FGLM: substituted by HAVE_FACTORY
 - system("HNF",...) computes the Hermite-Normalform for square matrices over Q
    and intmat (only development version) - to be evaluated
 - new link: ssi with modi:
