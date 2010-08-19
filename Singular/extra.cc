@@ -357,9 +357,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           #ifdef HAVE_READLINE
             TEST_FOR("readline")
           #endif
-          #ifdef HAVE_TCL
-            TEST_FOR("tcl")
-          #endif
           #ifdef TEST_MAC_ORDER
             TEST_FOR("MAC_ORDER");
           #endif

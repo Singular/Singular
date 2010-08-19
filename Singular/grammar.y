@@ -131,19 +131,6 @@ void yyerror(const char * fmt)
   }
   if(inerror==0)
   {
-    #ifdef HAVE_TCL
-    if (tclmode)
-    { /* omit output of line number if tclmode and stdin */
-      const char *n=VoiceName();
-      if (strcmp(n,"STDIN")==0)
-        Werror( "error occurred in or before %s: `%s`"
-               ,n, my_yylinebuf);
-      else
-        Werror( "error occurred in or before %s line %d: `%s`"
-               ,n, yylineno, my_yylinebuf);
-    }
-    else
-    #endif
     {
       if ((strlen(fmt)>1)
       && (strncmp(fmt,"parse",5)!=0)

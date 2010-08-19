@@ -902,50 +902,9 @@ BOOLEAN setOption(leftv res, leftv v)
     omFree((ADDRESS)n);
     v=v->next;
   } while (v!=NULL);
-  #ifdef HAVE_TCL
-    if (tclmode)
-    {
-      BITSET tmp;
-      int i;
-      StringSetS("");
-      if ((test!=0)||(verbose!=0))
-      {
-        tmp=test;
-        if(tmp)
-        {
-          for (i=0; optionStruct[i].setval!=0; i++)
-          {
-            if (optionStruct[i].setval & test)
-            {
-              StringAppend(" %s",optionStruct[i].name);
-              tmp &=optionStruct[i].resetval;
-            }
-          }
-        }
-        tmp=verbose;
-        if (tmp)
-        {
-          for (i=0; verboseStruct[i].setval!=0; i++)
-          {
-            if (verboseStruct[i].setval & tmp)
-            {
-              StringAppend(" %s",verboseStruct[i].name);
-              tmp &=verboseStruct[i].resetval;
-            }
-          }
-        }
-        PrintTCLS('O',StringAppendS(""));
-        StringSetS("");
-      }
-      else
-      {
-        PrintTCLS('O'," ");
-      }
-    }
-  #endif
-    // set global variable to show memory usage
-    if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
-    else om_sing_opt_show_mem = 0;
+  // set global variable to show memory usage
+  if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
+  else om_sing_opt_show_mem = 0;
   return FALSE;
 }
 
@@ -1266,12 +1225,6 @@ void m2_end(int i)
   #ifdef PAGE_TEST
   mmEndStat();
   #endif
-  #ifdef HAVE_TCL
-  if (tclmode)
-  {
-    PrintTCL('Q',0,NULL);
-  }
-  #endif
   fe_reset_input_mode();
   idhdl h = IDROOT;
   while(h != NULL)
@@ -1289,9 +1242,6 @@ void m2_end(int i)
   }
   if (i<=0)
   {
-    #ifdef HAVE_TCL
-    if (!tclmode)
-    #endif
       if (TEST_V_QUIET)
       {
         if (i==0)
@@ -1309,9 +1259,6 @@ void m2_end(int i)
   }
   else
   {
-    #ifdef HAVE_TCL
-    if (!tclmode)
-    #endif
       printf("\nhalt %d\n",i);
   }
   #ifdef HAVE_MPSR

@@ -171,9 +171,6 @@
 /* Undefine to disable the quote/eval of expressions */
 #define SIQ 1
 
-/* Define to enable TCL interface */
-#undef HAVE_TCL 
-
 /* Undefine to disable Gerhard's and Wilfried's fast and dirty std computations */
 #define FAST_AND_DIRTY
 
@@ -223,16 +220,6 @@
 /*******************************************************************
  * Evaluate the set defines
  ******************************************************************/
-/* FGLM needs factory */
-#ifdef HAVE_FACTORY
-#define HAVE_FGLM
-#endif
-
-/* Define if you want fglm for homogeneous case */
-#ifdef HAVE_FGLM
-#undef HAVE_FGLM_HOME
-#endif
-
 /* Spectrum needs GMP */
 #define HAVE_SPECTRUM 1
 

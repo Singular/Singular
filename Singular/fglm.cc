@@ -18,7 +18,7 @@
 
 #include <Singular/mod2.h>
 
-#ifdef HAVE_FGLM
+#ifdef HAVE_FACTORY
 #include <Singular/tok.h>
 #include <kernel/options.h>
 #include <kernel/polys.h>

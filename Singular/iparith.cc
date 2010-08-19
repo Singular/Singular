@@ -61,9 +61,9 @@
 #include <kernel/clapsing.h>
 #include <kernel/kstdfac.h>
 #endif /* HAVE_FACTORY */
-#ifdef HAVE_FGLM
+#ifdef HAVE_FACTORY
 #include <kernel/fglm.h>
-#endif /* HAVE_FGLM */
+#endif /* HAVE_FACTORY */
 #define HAVE_INTERPOLATION
 #ifdef HAVE_INTERPOLATION
 #include <Singular/interpolation.h>
@@ -3647,7 +3647,7 @@ struct sValCmd2 dArith2[]=
 ,{jjFAREY_ID,   FAREY_CMD,     ANY_TYPE/*set by p*/,MATRIX_CMD,BIGINT_CMD, ALLOW_PLURAL |NO_RING}
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,RING_CMD,  ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 ,{jjFETCH,     FETCH_CMD,      ANY_TYPE/*set by p*/,QRING_CMD, ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
-#ifdef HAVE_FGLM
+#ifdef HAVE_FACTORY
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      RING_CMD,   DEF_CMD, NO_PLURAL |NO_RING}
 ,{fglmProc,    FGLM_CMD,       IDEAL_CMD,      QRING_CMD,  DEF_CMD, NO_PLURAL |NO_RING}
 ,{fglmQuotProc,FGLMQUOT_CMD,   IDEAL_CMD,      IDEAL_CMD,  POLY_CMD, NO_PLURAL |NO_RING}
@@ -5458,7 +5458,7 @@ struct sValCmd1 dArith1[]=
 #else
 ,{jjWRONG,      FAC_CMD,         LIST_CMD,       POLY_CMD      , NO_PLURAL |NO_RING}
 #endif
-#ifdef HAVE_FGLM
+#ifdef HAVE_FACTORY
 ,{findUniProc,  FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD     , NO_PLURAL |NO_RING}
 #else
 ,{jjWRONG,      FINDUNI_CMD,     IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}

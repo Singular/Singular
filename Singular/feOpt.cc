@@ -111,10 +111,6 @@ struct fe_option feOptSpec[] =
   {"version",           no_argument,        'v',
    0,          "Print extended version and configuration info",        feOptUntyped,    0,      0},
 
-#ifdef HAVE_TCL
-  {"tclmode",           no_argument,        'x',
-   0,          "Run in TCL mode, i.e., with TCL user interface",       feOptBool,    0,      0},
-#endif
 
   {"allow-net",         no_argument,        LONG_OPTION_RETURN,
    0,          "Allow to fetch (html) help pages from the net",                feOptBool,    0,      0},
@@ -392,17 +388,6 @@ static const char* feOptAction(feOptIndex opt)
       case FE_OPT_VERSION:
         printf("%s",versionString());
         return NULL;
-
-#ifdef HAVE_TCL
-      case FE_OPT_TCLMODE:
-        if (feOptSpec[FE_OPT_TCLMODE].value)
-        {
-          tclmode = TRUE;
-          fe_fgets_stdin=fe_fgets_tcl;
-          verbose|=Sy_bit(V_SHOW_MEM);
-        }
-        return NULL;
-#endif
 
       case FE_OPT_ECHO:
         si_echo = (int) ((long)(feOptSpec[FE_OPT_ECHO].value));

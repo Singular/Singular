@@ -460,25 +460,15 @@ leftv slReadAscii2(si_link l, leftv pr)
   }
   else
   {
-  #ifdef HAVE_TCL
-    if(tclmode)
+    if (pr->Typ()==STRING_CMD)
     {
-      WerrorS("reading from STDIN in TCL-mode not implemented");
-      buf=omStrDup("");
+      buf=(char *)omAlloc(80);
+      fe_fgets_stdin((char *)pr->Data(),buf,80);
     }
     else
-  #endif
     {
-      if (pr->Typ()==STRING_CMD)
-      {
-        buf=(char *)omAlloc(80);
-        fe_fgets_stdin((char *)pr->Data(),buf,80);
-      }
-      else
-      {
-        WerrorS("read(<link>,<string>) expected");
-        buf=omStrDup("");
-      }
+      WerrorS("read(<link>,<string>) expected");
+      buf=omStrDup("");
     }
   }
   leftv v=(leftv)omAlloc0Bin(sleftv_bin);

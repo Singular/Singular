@@ -761,12 +761,6 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
   {
     return TRUE;
   }
-#ifdef HAVE_TCL
-  if (tclmode)
-  {
-    PrintTCLS('L',newlib);
-  }
-#endif
   pl = basePack->idroot->get(plib,0);
   if (pl==NULL)
   {

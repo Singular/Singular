@@ -1,3 +1,18 @@
+Do 19. Aug 16:48:35 CEST 2010
+- system("HNF",...) computes the Hermite-Normalform for square matrices over Q
+   and intmat (only development version) - to be evaluated
+- new link: ssi with modi:
+    "ssi:tcp"     : waits on a free port xx, two-side communition
+                  (port will be printed)
+   "ssi:connect  <host>:<port>": to connect to a "ssi:tcp" link
+   "ssi:fork"   : create a new process via fork, while lestens in a
+                  read-eval-loop
+   "ssi:tcp <host>:<program>": create a new instance of <program> via ssh
+                  on <host> and connects to via ssi:tcp/ssi:connect".
+                  The new program will execute an read-eval-loop.
+- many small bug fixed(#253, #254, ....)
+- new functionality for dim: dim(I,J), dim(res)
+
 Thu Jul 15 17:12:09 CEST 2010 
 - ambigous overload of si_max resolved
 - added dependencies (enable parallel build)

@@ -21,8 +21,6 @@ extern "C"
 {
   void   Print(char* fmt, ...);
   void   PrintLn();
-  void   PrintTCLS(const char c, const char * s);
-#define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
   void   PrintS(char* s);
 
   void   Werror(char *fmt, ...);

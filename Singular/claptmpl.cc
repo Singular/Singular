@@ -13,66 +13,60 @@
 #ifdef HAVE_FACTORY
   #define SINGULAR 1
   #include <factory.h>
-#endif
-
-#if defined(HAVE_FACTORY) || defined(HAVE_FGLM)
   #include <templates/ftmpl_list.cc>
-  #ifdef HAVE_FGLM
-    #include <kernel/fglm.h>
+  #include <kernel/fglm.h>
+
+  #include <templates/ftmpl_array.cc>
+  #include <templates/ftmpl_factor.cc>
+  #include <templates/ftmpl_functions.h>
+  #include <templates/ftmpl_matrix.cc>
+
+  template class Factor<CanonicalForm>;
+  template class List<CFFactor>;
+  template class ListItem<CFFactor>;
+  template class ListItem<CanonicalForm>;
+  template class ListIterator<CFFactor>;
+  template class List<CanonicalForm>;
+  template class List<List<CanonicalForm> >;
+  template class ListIterator<CanonicalForm>;
+  template class Array<CanonicalForm>;
+  template class List<MapPair>;
+  template class ListItem<MapPair>;
+  template class ListIterator<MapPair>;
+  template class Matrix<CanonicalForm>;
+  template class SubMatrix<CanonicalForm>;
+  template class Array<REvaluation>;
+  template bool find ( const List<CanonicalForm> &, const CanonicalForm&);
+
+  //template class vector<poly>;
+  #ifndef NOSTREAMIO
+  template ostream & operator<<(ostream &, const List<Factor<CanonicalForm> > &);
+  template ostream & operator<<(ostream &, const List<List<CanonicalForm> > &);
+  template ostream & operator<<(ostream &, const List<Variable> &);
+  template ostream & operator<<(ostream &, const Matrix<Variable> &);
   #endif
 
-  #ifdef HAVE_FACTORY
-    #include <templates/ftmpl_array.cc>
-    #include <templates/ftmpl_factor.cc>
-    #include <templates/ftmpl_functions.h>
-    #include <templates/ftmpl_matrix.cc>
+  template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
+  template int operator == ( const Factor<CanonicalForm>&, const Factor<CanonicalForm>& );
 
-    template class Factor<CanonicalForm>;
-    template class List<CFFactor>;
-    template class ListItem<CFFactor>;
-    template class ListItem<CanonicalForm>;
-    template class ListIterator<CFFactor>;
-    template class List<CanonicalForm>;
-    template class List<List<CanonicalForm> >;
-    template class ListIterator<CanonicalForm>;
-    template class Array<CanonicalForm>;
-    template class List<MapPair>;
-    template class ListItem<MapPair>;
-    template class ListIterator<MapPair>;
-    template class Matrix<CanonicalForm>;
-    template class SubMatrix<CanonicalForm>;
-    template class Array<REvaluation>;
-    template bool find ( const List<CanonicalForm> &, const CanonicalForm&);
+  template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
+  template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
 
-    //template class vector<poly>;
-    #ifndef NOSTREAMIO
-    template ostream & operator<<(ostream &, const List<Factor<CanonicalForm> > &);
-    template ostream & operator<<(ostream &, const List<List<CanonicalForm> > &);
-    template ostream & operator<<(ostream &, const List<Variable> &);
-    template ostream & operator<<(ostream &, const Matrix<Variable> &);
-    #endif
+  template Variable tmax ( const Variable&, const Variable& );
+  template Variable tmin ( const Variable&, const Variable& );
 
-    template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
-    template int operator == ( const Factor<CanonicalForm>&, const Factor<CanonicalForm>& );
+  template int tmax ( const int&, const int& );
+  template int tmin ( const int&, const int& );
+  template int tabs ( const int& );
 
-    template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
-    template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
-
-    template Variable tmax ( const Variable&, const Variable& );
-    template Variable tmin ( const Variable&, const Variable& );
-
-    template int tmax ( const int&, const int& );
-    template int tmin ( const int&, const int& );
-    template int tabs ( const int& );
-
-  #endif
 // place here your own template stuff, not instantiated by factory
   // libfac:
     #include <factor.h>
 
 // class.h:
 template <class T>
-class Substitution {
+class Substitution
+{
 private:
     T _factor;
     T _exp;
@@ -159,9 +153,6 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
 // for charsets:
     template class ListIterator<CFList>;
 
-#endif
-
-#ifdef HAVE_FGLM
 // templates for fglm:
 
   template class List<fglmSelem>;
