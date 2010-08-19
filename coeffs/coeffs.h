@@ -28,7 +28,8 @@ enum n_coeffType
   n_Z,
   n_Zn,
   n_Zpn, // does no longer exist?
-  n_Z2m
+  n_Z2m,
+  n_CF
 };
 
 struct snumber;
@@ -209,15 +210,6 @@ struct n_Procs_s
   int m_nfCharQ1; ///< q-1
   unsigned short *m_nfPlus1Table;
   int *m_nfMinPoly;
-
-  /// the characteristic: 
-  //int m_nfCharP; // ch?
-
-  /// the ???: 
-  //int m_nfCharN;
-  
-  /// p^n = number of el. = repr. of 0
-  //int m_nfCharQ;
 };
 //
 // test properties and type
