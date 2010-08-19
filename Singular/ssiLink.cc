@@ -821,7 +821,7 @@ LINKAGE leftv ssiRead1(si_link l)
     case 14: res->rtyp=LIST_CMD;
              res->data=ssiReadList(l);
              break;
-    case 16: res->rtyp=END_RING; res->data=NULL;
+    case 16: res->rtyp=NONE; res->data=NULL;
              break;
     case 99: ssiClose(l); exit(0);
     case 0: if (feof(d->f_read))
@@ -853,7 +853,7 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
 
     switch(tt /*data->Typ()*/)
     {
-          case END_RING/* nothing*/:fprintf(d->f_write,"16 ");
+          case NONE/* nothing*/:fprintf(d->f_write,"16 ");
 	                  break;
           case STRING_CMD: fprintf(d->f_write,"2 ");
                            ssiWriteString(d,(char *)dd);
