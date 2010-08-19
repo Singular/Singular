@@ -10,6 +10,7 @@
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <kernel/intvec.h>
+#include <kernel/options.h>
 #include <omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
@@ -29,6 +30,7 @@
 #include <kernel/syz.h>
 #include <Singular/attrib.h>
 #include <kernel/ring.h>
+#include <Singular/ipshell.h>
 #include <Singular/ipconv.h>
 
 typedef void *   (*iiConvertProc)(void * data);
@@ -394,6 +396,11 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
     if((dConvertTypes[index].i_typ==inputType)
     &&(dConvertTypes[index].o_typ==outputType))
     {
+      if(TEST_V_ALLWARN)
+      {
+        Print("automatic  conversion %s -> %s\n",
+	Tok2Cmdname(inputType),Tok2Cmdname(outputType));
+      }
       if ((currRing==NULL) && (outputType>BEGIN_RING) && (outputType<END_RING))
         return TRUE;
       output->rtyp=outputType;
