@@ -586,7 +586,7 @@ BOOLEAN ssiOpen(si_link l, short flag)
       mode = "a";
     }
   }
-  else
+  else /*l->name=NULL*/
   {
     // tcp mode
     if(strcmp(mode,"tcp")==0)
@@ -615,7 +615,7 @@ BOOLEAN ssiOpen(si_link l, short flag)
         }
       }
       while(bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0);
-      Print("waiting on port %d\n", portno);mflush();
+      //Print("waiting on port %d\n", portno);mflush();
       listen(sockfd,5);
       char* cli_host = (char*)omAlloc(256);
       char* path = (char*)omAlloc(1024);
@@ -634,7 +634,7 @@ BOOLEAN ssiOpen(si_link l, short flag)
       gethostname(ser_host,64);
       sprintf(ssh_command,"ssh %s %s -q --batch --link=ssi --MPhost=%s --MPport=%d &",cli_host,path,ser_host,portno);
       system(ssh_command);
-      Print("client on %s started:%s\n",cli_host,path);
+      //Print("client on %s started:%s\n",cli_host,path);
       clilen = sizeof(cli_addr);
       newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, (socklen_t *)&clilen);
       if(newsockfd < 0)
@@ -642,7 +642,7 @@ BOOLEAN ssiOpen(si_link l, short flag)
         WerrorS("ERROR on accept");
         return TRUE;
       }
-      PrintS("client accepted\n");
+      //PrintS("client accepted\n");
       d->fd_read = newsockfd;
       d->fd_write = newsockfd;
       d->f_read = fdopen(newsockfd, "r");
@@ -658,7 +658,7 @@ BOOLEAN ssiOpen(si_link l, short flag)
       struct hostent *server;
   
       sscanf(l->name,"%255[^:]:%d",host,&portno);
-      Print("connect to host %s, port %d\n",host,portno);mflush();
+      //Print("connect to host %s, port %d\n",host,portno);mflush();
       if (portno!=0)
       {
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -667,13 +667,13 @@ BOOLEAN ssiOpen(si_link l, short flag)
         if (server == NULL) {  WerrorS("ERROR, no such host");  return TRUE; }
         memset((char *) &serv_addr, 0, sizeof(serv_addr));
         serv_addr.sin_family = AF_INET;
-        bcopy((char *)server->h_addr,
-              (char *)&serv_addr.sin_addr.s_addr,
+        memcpy((char *)&serv_addr.sin_addr.s_addr,
+	      (char *)server->h_addr,
               server->h_length);
         serv_addr.sin_port = htons(portno);
         if (connect(sockfd,(sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
         { WerrorS("ERROR connecting"); return TRUE; }
-	PrintS("connected\n");mflush();
+	//PrintS("connected\n");mflush();
         d->f_read=fdopen(sockfd,"r");
         d->fd_read=sockfd;
         d->f_write=fdopen(sockfd,"w");
@@ -730,7 +730,11 @@ LINKAGE BOOLEAN ssiClose(si_link l)
   ssiInfo *d = (ssiInfo *)l->data;
   if (d!=NULL)
   {
-    if (d->pid!=0) { fprintf(d->f_write,"99\n");fflush(d->f_write); }
+    if ((strcmp(l->mode,"tcp")==0)
+    || (strcmp(l->mode,"fork")==0))
+    {
+      fprintf(d->f_write,"99\n");fflush(d->f_write);
+    }
     if (d->f_read!=NULL) fclose(d->f_read);
     if (d->f_write!=NULL) fclose(d->f_write);
     if (d->r!=NULL) rKill(d->r);
@@ -991,52 +995,26 @@ const char* slStatusSsi(si_link l, const char* request)
 int ssiBatch(const char *host, const char * port)
 /* return 0 on success, >0 else*/
 {
-  int sockfd, portno, n;
-  struct sockaddr_in serv_addr;
-  struct hostent *server;
-  
-  portno = atoi(port);
-  if (portno!=0)
+  si_link l=(si_link) omAlloc0Bin(sip_link_bin);
+  char *buf=(char*)omAlloc(256);
+  sprintf(buf,"ssi:connect %s:%s",host,port);
+  slInit(l, buf);
+  slOpen(l,SI_LINK_OPEN);
+  SI_LINK_SET_RW_OPEN_P(l);
+  loop
   {
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) { WerrorS("ERROR opening socket"); exit(0); }
-    server = gethostbyname(host);
-    if (server == NULL) {  WerrorS("ERROR, no such host");  exit(0); }
-    memset((char *) &serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    memcpy((char *)&serv_addr.sin_addr.s_addr,
-          (char *)server->h_addr,
-          server->h_length);
-    serv_addr.sin_port = htons(portno);
-    if (connect(sockfd,(sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
-    { WerrorS("ERROR connecting"); exit(0); }
-    si_link l;
-    if (slInit(l,"ssi:tcp")) WerrorS("error slInit");
-    ssiInfo *d=(ssiInfo*)omAlloc0(sizeof(ssiInfo));
-    d->f_read=fdopen(sockfd,"r");
-    d->fd_read=sockfd;
-    d->f_write=fdopen(sockfd,"w");
-    d->fd_write=sockfd;
-    l->data=d;
-    SI_LINK_SET_RW_OPEN_P(l);
-    loop
+    leftv h=ssiRead1(l); /*contains an exit.... */
+    if (feErrors != NULL && *feErrors != '\0')
     {
-      PrintS("start read\n");
-      leftv h=ssiRead1(l); /*contains an exit.... */
-      if (feErrors != NULL && *feErrors != '\0')
-      {
-        // handle errors:
-        PrintS(feErrors); /* currently quite simple */
-        *feErrors = '\0';
-      }
-      PrintS("start write\n");
-      ssiWrite(l,h);
-      h->CleanUp();
-      omFreeBin(h, sleftv_bin);
+      // handle errors:
+      PrintS(feErrors); /* currently quite simple */
+      *feErrors = '\0';
     }
-    /* never reached*/
-    exit(0);
+    ssiWrite(l,h);
+    h->CleanUp();
+    omFreeBin(h, sleftv_bin);
   }
+  /* never reached*/
   exit(0);
 }
 
