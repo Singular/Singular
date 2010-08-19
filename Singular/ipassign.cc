@@ -371,8 +371,11 @@ static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
 }
 static BOOLEAN jiA_1x1INTMAT(leftv res, leftv a,Subexpr e)
 {
-  if ((res->rtyp!=INTMAT_CMD) /*|| (e!=NULL) - TRUE because of type poly */)
-     return TRUE;
+  if ((res->rtyp!=INTMAT_CMD) /*|| (e!=NULL) - TRUE because of type int */)
+  {
+    WerrorS("can not insert intmat");
+    return TRUE;
+  }
   intvec* am=(intvec*)a->CopyD(INTMAT_CMD);
   if ((am->rows()!=1) || (am->cols()!=1))
   {
@@ -391,7 +394,10 @@ static BOOLEAN jiA_1x1INTMAT(leftv res, leftv a,Subexpr e)
 static BOOLEAN jiA_1x1MATRIX(leftv res, leftv a,Subexpr e)
 {
   if ((res->rtyp!=MATRIX_CMD) /*|| (e!=NULL) - TRUE because of type poly */)
-     return TRUE;
+  {
+    WerrorS("can not insert matrix");
+    return TRUE;
+  }
   matrix am=(matrix)a->CopyD(MATRIX_CMD);
   if ((MATROWS(am)!=1) || (MATCOLS(am)!=1))
   {
