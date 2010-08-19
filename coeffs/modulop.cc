@@ -16,6 +16,9 @@
 #include "mpr_complex.h"
 #include "mylimits.h"
 #include "modulop.h"
+#ifdef HAVE_FACTORY
+#include <factory.h>
+#endif
 
 // int npGen=0;
 
@@ -571,6 +574,15 @@ number npMapMachineInt(number from, const coeffs src,const coeffs dst)
 }
 #endif
 
+#ifdef HAVE_FACTORY
+number npMapCanonicalForm (number a, const coeffs src, const coeffs dst)
+{
+  setCharacteristic (dst ->npPrimeM);
+  CanonicalForm f= CanonicalForm ((InternalCF*)(a));
+  return (number) (f.intval());
+}
+#endif
+
 nMapFunc npSetMap(const coeffs src, const coeffs dst)
 {
 #ifdef HAVE_RINGS
@@ -602,6 +614,12 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
   {
     return npMapLongR;
   }
+#ifdef HAVE_FACTORY
+  if (nField_is_CF (src))
+  {
+    return npMapCanonicalForm;
+  }
+#endif
   return NULL;      /* default */
 }
 

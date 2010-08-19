@@ -97,6 +97,9 @@ static inline BOOLEAN nField_is_long_R(const coeffs r)
 static inline BOOLEAN nField_is_long_C(const coeffs r)
 { return getCoeffType(r)==n_long_C; }
 
+static inline BOOLEAN nField_is_CF(const coeffs r)
+{ return getCoeffType(r)==n_CF; }
+
 static inline BOOLEAN nField_has_simple_inverse(const coeffs r)
 { return r->has_simple_Inverse; }
 /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
@@ -110,6 +113,5 @@ static inline BOOLEAN nField_is_Extension(const coeffs r)
 
 typedef void (*cfInitCharProc)(coeffs, void *);
 n_coeffType nRegister(n_coeffType n, cfInitCharProc p);
-
 
 #endif
