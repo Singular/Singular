@@ -358,7 +358,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
               char *tmp=(char *)omAlloc(4);
               sprintf(tmp,"%c%d",*(currRing->names[nr-1]),
                 (int)pGetExp((poly)input->data,nr));
-	      output->name=tmp;
+              output->name=tmp;
             }
           }
           else if(pIsConstant((poly)input->data))
@@ -399,7 +399,7 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
       if(TEST_V_ALLWARN)
       {
         Print("automatic  conversion %s -> %s\n",
-	Tok2Cmdname(inputType),Tok2Cmdname(outputType));
+        Tok2Cmdname(inputType),Tok2Cmdname(outputType));
       }
       if ((currRing==NULL) && (outputType>BEGIN_RING) && (outputType<END_RING))
         return TRUE;
@@ -413,11 +413,10 @@ BOOLEAN iiConvert (int inputType, int outputType, int index, leftv input, leftv 
         dConvertTypes[index].pl(output,input);
       }
       if ((output->data==NULL)
-      && ((outputType==IDEAL_CMD)
-        ||(outputType==MODUL_CMD)
-        ||(outputType==MATRIX_CMD)
-        ||(outputType==INTMAT_CMD)
-        ||(outputType==INTVEC_CMD)))
+      && ((outputType!=INT_CMD)
+        &&(outputType!=POLY_CMD)
+        &&(outputType!=VECTOR_CMD)
+        &&(outputType!=NUMBER_CMD)))
       {
         return TRUE;
       }
