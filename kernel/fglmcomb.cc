@@ -10,7 +10,7 @@
 
 #include <kernel/mod2.h>
 
-#ifdef HAVE_FGLM
+#ifdef HAVE_FACTORY
 #include <kernel/options.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

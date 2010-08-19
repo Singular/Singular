@@ -13,7 +13,7 @@
 #ifndef FGLM_H
 #define FGLM_H
 
-#ifdef HAVE_FGLM
+#ifdef HAVE_FACTORY
 #include <factory.h>
 
 #include <kernel/polys.h>
@@ -83,8 +83,7 @@ inline ostream & operator <<(ostream & os, fglmDelem) { return os;};
 BOOLEAN
 fglmzero( ring sourceRing, ideal & sourceIdeal, idhdl destRingHdl, ideal & destideal, BOOLEAN switchBack = TRUE, BOOLEAN deleteIdeal = FALSE );
 
-BOOLEAN
-fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal );
+BOOLEAN fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal );
 
 // fglmproc(...):
 // The procedure which has to be called from the interpreter for fglm.
@@ -92,8 +91,7 @@ fglmquot( ideal sourceIdeal, poly quot, ideal & destIdeal );
 // Returns the groebnerbasis of the sourceIdeal in the currentRing.
 // Checks, if the ideal is really a reduced groebner basis of a
 // 0-dimensional Ideal. Returns TRUE if an error occoured.
-BOOLEAN
-fglmProc( leftv result, leftv first, leftv second );
+BOOLEAN fglmProc( leftv result, leftv first, leftv second );
 
 // fglmquotproc(...):
 // The procedure which has to be called from the interpreter for fglmquot.
@@ -103,19 +101,15 @@ fglmProc( leftv result, leftv first, leftv second );
 // Checks, if the ideal is really a reduced groebner basis of a
 // 0-dimensional Ideal and if q is really reduced.
 //  Returns TRUE if an error occoured.
-BOOLEAN
-fglmQuotProc( leftv result, leftv first, leftv second );
+BOOLEAN fglmQuotProc( leftv result, leftv first, leftv second );
 
 // FindUnivariatePolys (test)
-BOOLEAN
-FindUnivariateWrapper( ideal source, ideal & dest );
+BOOLEAN FindUnivariateWrapper( ideal source, ideal & dest );
 
 // wrapper for FindUnivariatePolys (test)
-BOOLEAN
-findUniProc( leftv result, leftv first);
+BOOLEAN findUniProc( leftv result, leftv first);
 
 // homogeneous FGLM
-ideal
-fglmhomProc(leftv first, leftv second);
+ideal fglmhomProc(leftv first, leftv second);
 #endif
 #endif

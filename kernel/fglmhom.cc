@@ -11,11 +11,12 @@
 
 
 #include <kernel/mod2.h>
-#ifdef HAVE_FGLM_HOM
+#if 0
+#include <factoryconf.h>
 #ifndef NOSTREAMIO
 #include <iostream.h>
 #endif
-#include <kernel/tok.h>
+#include <Singular/tok.h>
 #include <kernel/structs.h>
 #include <kernel/subexpr.h>
 #include <kernel/polys.h>

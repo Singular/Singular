@@ -402,21 +402,6 @@ static char * fe_fgets_stdin_init(const char *pr,char *s, int size)
 }
 
 /* ===================================================================*/
-/* =                          TCL                                   = */
-/* ===================================================================*/
-#ifdef HAVE_TCL
-/* tcl: */
-char * fe_fgets_tcl(const char *pr,char *s, int size)
-{
-  if(currRing!=NULL) PrintTCLS('P',pr);
-  else               PrintTCLS('U',pr);
-  mflush();
-  return fgets(s,size,stdin);
-}
-
-#endif
-
-/* ===================================================================*/
 /* =                      batch mode                                = */
 /* ===================================================================*/
 /* dummy (for batch mode): */

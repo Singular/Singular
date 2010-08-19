@@ -3071,13 +3071,6 @@ static void rSetOutParams(ring r)
 {
   r->VectorOut = (r->order[0] == ringorder_c);
   r->ShortOut = TRUE;
-#ifdef HAVE_TCL
-  if (tcllmode)
-  {
-    r->ShortOut = FALSE;
-  }
-  else
-#endif
   {
     int i;
     if ((r->parameter!=NULL) && (r->ch<2))

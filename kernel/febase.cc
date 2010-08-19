@@ -68,20 +68,6 @@ void (*WerrorS_callback)(const char *s) = NULL;
 
 int feProt = FALSE;
 FILE*   feProtFile;
-BOOLEAN tclmode=FALSE;
-/* TCL-Protocoll (Singular -x): <char type>:<int length>:<string> \n
-*  E:l:s  error
-*  W:l:s  warning
-*  N:l:s  stdout
-*  Q:0:   quit
-*  P:l:   prompt > (ring defined)
-*  U:l:   prompt > (no ring defined)
-*  P:l:   prompt .
-*  R:l:<ring-name> ring change
-*  L:l:<lib name> library loaded
-*  O:l:<list of options(space seperated)> option change
-*  M:l:<mem-usage> output from "option(mem)"
-*/
 
 
 /**************************************************************************
@@ -484,22 +470,12 @@ static int fePrintEcho(char *anf, char *b)
       else
         Print("%s %3d%c ",currentVoice->filename,yylineno,prompt_char);
      }
-    #ifdef HAVE_TCL
-    if(tclmode)
-    {
-      PrintTCL('N',len_s,anf);
-    }
-    else
-    #endif
     {
       fwrite(anf,1,len_s,stdout);
       mflush();
     }
     if (traceit&TRACE_SHOW_LINE)
     {
-      #ifdef HAVE_TCL
-      if(!tclmode)
-      #endif
       while(fgetc(stdin)!='\n');
     }
   }
@@ -686,11 +662,7 @@ Voice * feInitStdin(Voice *pp)
 {
   Voice *p = new Voice;
   p->files = stdin;
-  #ifdef HAVE_TCL
-  p->sw = (tclmode || isatty(STDIN_FILENO)) ? BI_stdin : BI_file;
-  #else
   p->sw = (isatty(STDIN_FILENO)) ? BI_stdin : BI_file;
-  #endif
   if ((pp!=NULL) && (pp->files==stdin))
   {
     p->files=freopen("/dev/tty","r",stdin);
@@ -893,16 +865,6 @@ char * StringSetS(const char *st)
   return feBuffer;
 }
 
-#ifdef HAVE_TCL
-extern "C" {
-void PrintTCLS(const char c, const char *s)
-{
-  int l=strlen(s);
-  if (l>0) PrintTCL(c,l,s);
-}
-}
-#endif
-
 extern "C" {
 void WerrorS(const char *s)
 {
@@ -929,14 +891,6 @@ void WerrorS(const char *s)
   else
 #endif
   {
-#ifdef HAVE_TCL
-    if (tclmode)
-    {
-      PrintTCLS('E',(char *)s);
-      PrintTCLS('E',"\n");
-    }
-    else
-#endif
     {
       if (WerrorS_callback == NULL) {
         fwrite("   ? ",1,5,stderr);
@@ -976,15 +930,6 @@ void Werror(const char *fmt, ...)
 void WarnS(const char *s)
 {
   #define warn_str "// ** "
-#ifdef HAVE_TCL
-  if (tclmode)
-  {
-    PrintTCLS('W',warn_str);
-    PrintTCLS('W',s);
-    PrintTCLS('W',"\n");
-  }
-  else
-#endif
   if (feWarn) /* ignore warnings if option --no-warn was given */
   {
     fwrite(warn_str,1,6,stdout);
@@ -1056,14 +1001,6 @@ void PrintS(const char *s)
   }
   else if (feOut) /* do not print when option --no-out was given */
   {
-
-#ifdef HAVE_TCL
-    if (tclmode)
-    {
-      PrintTCLS('N',s);
-    }
-    else
-#endif
     {
       fwrite(s,1,strlen(s),stdout);
       fflush(stdout);

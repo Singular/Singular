@@ -101,9 +101,6 @@ extern int    yy_blocklineno;
 extern int    yy_noeof;
 extern char   prompt_char;
 extern const char feNotImplemented[];
-#ifdef HAVE_TCL
-extern BOOLEAN tclmode;
-#endif
 extern BOOLEAN errorreported;
 extern int     feProt;
 extern BOOLEAN feWarn;
@@ -143,11 +140,6 @@ void    Print(const char* fmt, ...) __attribute__((format(printf,1,2)));
 
 void    PrintNSpaces(const int n);
 void    PrintLn();
-#ifdef HAVE_TCL
-void    PrintTCLS(const char c, const char * s);
-#else
-#define PrintTCLS(A,B) Print("TCL-ErrS:%s",B)
-#endif
 void    PrintS(const char* s);
 char*   feGetResource(const char id);
 
@@ -285,19 +277,6 @@ void feStringAppendBrowsers(int warn = -1);
 FILE *  feFopen(const char *path, const char *mode, char *where=NULL,
                 int useWerror=FALSE, int path_only=FALSE);
 
-#ifdef HAVE_TCL
-
-inline void PrintTCL(const char c, int l,const char *s)
-{
-  if (s!=NULL) printf("%c:%d:%s",c,l,s);
-  else if(l==0) printf("%c:0:",c);
-  else printf("%c:1:%c",c,'0'+l);
-  fflush(stdout);
-}
-#else
-#define PrintTCL(A,B,C) Print("TCL-Err:%s",C)
-#endif /* HAVE_TCL */
-
 char *  StringAppend(const char *fmt, ...);
 char *  StringAppendS(const char *s);
 char *  StringSetS(const char* s);
@@ -382,11 +361,6 @@ extern "C"
 
   /* fgets: */
   char * fe_fgets(const char *pr,char *s, int size);
-
-  #ifdef HAVE_TCL
-  /* tcl: */
-  char * fe_fgets_tcl(const char *pr,char *s, int size);
-  #endif
 
   /* dummy (for batch mode): */
   char * fe_fgets_dummy(const char *pr,char *s, int size);
