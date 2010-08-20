@@ -172,7 +172,7 @@ typedef struct sigcontext_struct sigcontext;
 /*---------------------------------------------------------------------*/
 void sigsegv_handler(int sig, sigcontext s)
 {
-  fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",sig,SINGULAR_VERSION,feVersionId);
+  fprintf(stderr,"Singular : signal %d (v: %d/%s):\n",sig,SINGULAR_VERSION,feVersionId);
   if (sig!=SIGINT)
   {
     fprintf(stderr,"current line:>>%s<<\n",my_yylinebuf);
@@ -255,7 +255,7 @@ void init_signals()
 */
 void sigsegv_handler(int sig, int code, struct sigcontext *scp, char *addr)
 {
-  fprintf(stderr,"Singular : signal %d, code %d (v: %d/%u):\n",
+  fprintf(stderr,"Singular : signal %d, code %d (v: %d/%s):\n",
     sig,code,SINGULAR_VERSION,feVersionId);
   if ((sig!=SIGINT)&&(sig!=SIGABRT))
   {
@@ -301,7 +301,7 @@ void init_signals()
 */
 void sigsegv_handler(int sig)
 {
-  fprintf(stderr,"Singular : signal %d (v: %d/%u):\n",
+  fprintf(stderr,"Singular : signal %d (v: %d/%s):\n",
     sig,SINGULAR_VERSION,feVersionId);
   if (sig!=SIGINT)
   {

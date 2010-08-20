@@ -394,9 +394,12 @@ mpsr_Tok.inc: ${OBJS} claptmpl.o iparith.cc \
 	/bin/rm -f gentable2 gentable2.exe
 
 
+svnver: 
+	svnversion >svnver
+
 version.h: ${SOURCES} ${HEADERS} Makefile.in mod2.h.in \
-           configure.in
-	echo "#define feVersionId "  `date '+%Y%m%d%H'` >version.h
+           configure.in svnver
+	echo "#define feVersionId \""  `cat svnver` "\"" >version.h
 	echo "#define CC \"" ${CC} ${CFLAGS} ${DEFS}"\"" >>version.h
 	echo "#define CXX \"" ${CXX} ${CXXFLAGS} ${DEFS} "\"" >>version.h
 
