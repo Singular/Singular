@@ -2441,7 +2441,7 @@ esac
 
 
 
-LIBS=${SAVE_LIBS}
+LIBS="${SAVE_LIBS} ${MP_LIBS}"
 
 
 # heder file checks
