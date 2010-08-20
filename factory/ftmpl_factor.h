@@ -13,10 +13,6 @@
 //
 //}}}
 
-#ifdef macintosh
-#include <:templates:ftmpl_factor.h>
-#else
 #include "templates/ftmpl_factor.h"
-#endif
 
 #endif /* ! INCL_FACTOR_H */

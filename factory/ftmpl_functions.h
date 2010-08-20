@@ -13,10 +13,6 @@
 //
 //}}}
 
-#ifdef macintosh
-#include <:templates:ftmpl_functions.h>
-#else
 #include "templates/ftmpl_functions.h"
-#endif
 
 #endif /* ! INCL_FUNCTIONS_H */

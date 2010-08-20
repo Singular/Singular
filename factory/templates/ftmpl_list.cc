@@ -3,11 +3,7 @@
 
 #include <factoryconf.h>
 
-#ifdef macintosh
-#include <:templates:ftmpl_list.h>
-#else
 #include <templates/ftmpl_list.h>
-#endif
 
 template <class T>
 ListItem<T>::ListItem( const ListItem<T>& i )

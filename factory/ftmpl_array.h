@@ -13,10 +13,6 @@
 //
 //}}}
 
-#ifdef macintosh
-#include <:templates:ftmpl_array.h>
-#else
 #include "templates/ftmpl_array.h"
-#endif
 
 #endif /* ! INCL_ARRAY_H */

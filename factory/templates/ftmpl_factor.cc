@@ -3,11 +3,7 @@
 
 #include <factoryconf.h>
 
-#ifdef macintosh
-#include <:templates:ftmpl_factor.h>
-#else
 #include <templates/ftmpl_factor.h>
-#endif
 
 template <class T>
 Factor<T>& Factor<T>::operator= ( const Factor<T>& f )

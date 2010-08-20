@@ -3,11 +3,7 @@
 
 #include <factoryconf.h>
 
-#ifdef macintosh
-#include <:templates:ftmpl_array.h>
-#else
 #include <templates/ftmpl_array.h>
-#endif
 
 template <class T>
 Array<T>::Array() : data(0), _min(0), _max(-1), _size(0)

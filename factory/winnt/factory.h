@@ -42,17 +42,10 @@
 #include <gmp.h>
 #endif /* SINGULAR */
 
-#ifdef macintosh
-#include <:templates:ftmpl_array.h>
-#include <:templates:ftmpl_factor.h>
-#include <:templates:ftmpl_list.h>
-#include <:templates:ftmpl_matrix.h>
-#else
 #include <templates/ftmpl_array.h>
 #include <templates/ftmpl_factor.h>
 #include <templates/ftmpl_list.h>
 #include <templates/ftmpl_matrix.h>
-#endif
 
 /* stuff included from ./cf_globals.h */
 

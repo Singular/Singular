@@ -3,11 +3,7 @@
 
 #include <factoryconf.h>
 
-#ifdef macintosh
-#include <:templates:ftmpl_matrix.h>
-#else
 #include <templates/ftmpl_matrix.h>
-#endif
 
 template <class T>
 Matrix<T>::Matrix( int nr, int nc ) : NR(nr), NC(nc)
