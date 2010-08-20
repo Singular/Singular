@@ -1,5 +1,7 @@
-Do 19. Aug 16:48:35 CEST 2010
+Fr 20. Aug 13:36:49 CEST 2010
+- release 3-1-1-5
 - code cleanup: HAVE_TCL removed, HAVE_FGLM: substituted by HAVE_FACTORY
+                removed macos 9 stuff in factory
 - system("HNF",...) computes the Hermite-Normalform for square matrices over Q
    and intmat (only development version) - to be evaluated
 - new link: ssi with modi:
@@ -12,12 +14,14 @@ Do 19. Aug 16:48:35 CEST 2010
                   on <host> and connects to via ssi:tcp/ssi:connect".
                   The new program will execute an read-eval-loop.
 - many small bug fixed(#253, #254, ....)
+- fixed timing problem in make (#252)
 - new functionality for dim: dim(I,J), dim(res)
 
 Thu Jul 15 17:12:09 CEST 2010 
 - ambigous overload of si_max resolved
 - added dependencies (enable parallel build)
 - at toplevel make depend possible (optional)
+
 Do 15. Jul 14:01:09 CEST 2010
 - release 3-1-1-4
 - SAGE patches from SAGE days 23.5
