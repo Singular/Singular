@@ -20,7 +20,7 @@
 #include"mpsr.h"
 
 #include <kernel/structs.h>
-#include"febase.h"
+#include"kernel/febase.h"
 #include"tok.h"
 #include"ipid.h"
 

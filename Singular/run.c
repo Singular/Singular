@@ -38,7 +38,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <Singular/run.h>
+#include <run.h>
 
 #if defined(__CYGWIN__)
  #include <sys/types.h>

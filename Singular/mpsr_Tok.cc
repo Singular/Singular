@@ -22,7 +22,7 @@
 
 #ifdef HAVE_MPSR
 
-#include"febase.h"
+#include"kernel/febase.h"
 #include"tok.h"
 
 #include <Singular/mpsr.h>
