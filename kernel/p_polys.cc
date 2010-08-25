@@ -217,8 +217,10 @@ void p_Setm_General(poly p, const ring r)
             const int vo = pVarOffset[i];
             if( vo != -1) // TODO: optimize: can be done once!
             {
-              p_SetExp(p, p_GetExp(p, i, r), vo, r); // copy put them verbatim
-              assume( p_GetExp(p, vo, r) == p_GetExp(p, i, r) ); // copy put them verbatim
+              // Hans! Please don't break it again! p_SetExp(p, ..., r, vo) is correct:
+              p_SetExp(p, p_GetExp(p, i, r), r, vo); // copy put them verbatim
+              // Hans! Please don't break it again! p_GetExp(p, r, vo) is correct:
+              assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
             }
           }
 
@@ -230,7 +232,8 @@ void p_Setm_General(poly p, const ring r)
             const int vo = pVarOffset[i];
             if( vo != -1) // TODO: optimize: can be done once!
             {
-              assume( p_GetExp(p, vo, r) == p_GetExp(p, i, r) ); // copy put them verbatim
+              // Hans! Please don't break it again! p_GetExp(p, r, vo) is correct:
+              assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
             }
           }
 
@@ -301,7 +304,8 @@ void p_Setm_General(poly p, const ring r)
             {
               const int vo = pVarOffset[i];
               if( vo != -1) // TODO: optimize: can be done once!
-                assume( p_GetExp(p, vo, r) == (p_GetExp(p, i, r) + p_GetExp(pp, vo, r)) );
+                // Hans! Please don't break it again! p_GetExp(p/pp, r, vo) is correct:
+                assume( p_GetExp(p, r, vo) == (p_GetExp(p, i, r) + p_GetExp(pp, r, vo)) );
             }
             // TODO: how to check this for computed values???
 #endif
