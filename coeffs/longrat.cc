@@ -2516,6 +2516,8 @@ void nlInitChar(coeffs r, void* p)
   // debug stuff
   r->cfDBTest=nlDBTest;
 #endif
+
+  r->nCoeffIsEqual = nlCoeffsEqual;
   
   // the variables: general stuff (required)
   r->nNULL = INT_TO_SR(0);

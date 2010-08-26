@@ -220,7 +220,7 @@ void ngcPower ( number x, int exp, number * u, const coeffs r)
     *(gmp_complex*)(*u) *= *(gmp_complex*)n;
     return;
   }
-  if (exp&1==1)
+  if ( (exp & 1) == 1 )
   {
     ngcPower(x,exp-1,u, r);
     gmp_complex *n = new gmp_complex();
@@ -373,13 +373,13 @@ void ngcWrite (number &a, const coeffs r)
 
 
 
-
+/// test, whether r is an instance of nInitCoeffs(n, parameter)
 static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, void*)
 {
   assume( getCoeffType(r) == ID );
   
   return (n == ID);
-};
+}
 
 void ngcInitChar(coeffs n, void*)
 {
@@ -414,6 +414,8 @@ void ngcInitChar(coeffs n, void*)
 #ifdef LDEBUG
   n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest
 #endif
+
+  n->nCoeffIsEqual = ngcCoeffsEqual;
 
 
   

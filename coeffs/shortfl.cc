@@ -86,7 +86,7 @@ int nrInt(number &n, const coeffs r)
   return i;
 }
 
-int nrSize(number n, const coeffs R)
+int nrSize(number n, const coeffs)
 {
   float f = nf(n).F();
   int i = (int)f;
@@ -262,25 +262,25 @@ void nrPower (number a, int i, number * result, const coeffs r)
 }
 
 namespace {
-static const char* nrEatr(const char *s, float *r)
-{
-  int i;
-
-  if    (*s >= '0' && *s <= '9')
+  static const char* nrEatr(const char *s, float *r)
   {
-    *r = 0.0;
-    do
+    int i;
+
+    if    (*s >= '0' && *s <= '9')
     {
-      *r *= 10.0;
-      i = *s++ - '0';
-      *r += (float)i;
+      *r = 0.0;
+      do
+      {
+        *r *= 10.0;
+        i = *s++ - '0';
+        *r += (float)i;
+      }
+      while (*s >= '0' && *s <= '9');
     }
-    while (*s >= '0' && *s <= '9');
+    else *r = 1.0;
+    return s;
   }
-  else *r = 1.0;
-  return s;
 }
-};
 
 const char * nrRead (const char *s, number *a, const coeffs r)
 {
@@ -352,6 +352,7 @@ const char * nrRead (const char *s, number *a, const coeffs r)
 /*2
 * test valid numbers: not implemented yet
 */
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 BOOLEAN  nrDBTest(number a, const char *f, const int l, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
@@ -536,14 +537,13 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 
 
 
-/// test, whether r is an instance of nInitCoeffs(n, parameter) */
-static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, void* parameter)
+/// test, whether r is an instance of nInitCoeffs(n, parameter)
+static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, void*)
 {
   assume( getCoeffType(r) == ID );
 
   return (n == ID);
-};
-
+}
 
 
 void nrInitChar(coeffs n, void*)
@@ -576,8 +576,7 @@ void nrInitChar(coeffs n, void*)
   n->cfDBTest=ndDBTest; // not yet implemented: nrDBTest;
 #endif
   
+  n->nCoeffIsEqual = nrCoeffsEqual;
 
-
-/// TODO: Any variables?
-  
+  // TODO: Any variables?
 }

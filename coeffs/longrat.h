@@ -58,7 +58,6 @@ LINLINE number   nlSub(number la, number li, const coeffs r);
 LINLINE number   nlMult(number a, number b, const coeffs r);
 
 void     nlInitChar(coeffs r, void*);
-static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, void * parameter);
 
 number   nlInit2 (int i, int j, const coeffs r);
 number   nlInit2gmp (mpz_t i, mpz_t j);
