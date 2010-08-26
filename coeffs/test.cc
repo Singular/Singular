@@ -70,6 +70,44 @@ bool Test(const coeffs r)
   n_Delete(&a, r);
   n_Delete(&two, r);
 
+
+  a = n_Sub( aa, aa1, r );
+  
+  StringSetS("a = aa - aa1: ");
+  n_Test(a,r); n_Write(a, r);
+  PrintS(StringAppend("\n"));
+
+  if( !n_IsZero(a, r) )
+    WarnS("ERROR: a != 0 !!!\n");
+
+  n_Delete(&a, r);
+
+
+
+  a = n_Sub( aa, aa2, r );
+
+  StringSetS("a = aa - aa2: ");
+  n_Test(a,r); n_Write(a, r);
+  PrintS(StringAppend("\n"));
+
+  if( !n_IsZero(a, r) )
+    WarnS("ERROR: a != 0 !!!\n");
+
+  n_Delete(&a, r);
+
+
+  a = n_Sub( aa1, aa2, r );
+
+  StringSetS("a = aa1 - aa2: ");
+  n_Test(a,r); n_Write(a, r);
+  PrintS(StringAppend("\n"));
+
+  if( !n_IsZero(a, r) )
+    WarnS("ERROR: a != 0 !!!\n");
+
+  n_Delete(&a, r);
+
+
   
   if( !n_Equal(aa, aa1, r) )
     WarnS("ERROR: aa != aa1  !!!\n");
@@ -117,8 +155,8 @@ namespace
     }   
 #undef CASE
     return o;
-  };
-};
+  }
+}
   
 
 bool Test(const n_coeffType type, void* p = NULL)
@@ -237,39 +275,40 @@ int main()
 #endif
 
 
-
-
-  // the following leads to the error: "multiple definition of `fePathSep'"
-  // TODO: Oleksandr/Martin
    type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
+
    GFInfo param;
 
    param.GFChar= 5;
    param.GFSize= 25;
    param.GFPar_name= "Z";
+
    if( Test(type, (void*) &param) )
      c ++;
   
 
-  // BUG: in n_Equal!
-  // TODO: Oleksandr/Christian
-//   type = nRegister( n_long_R, ngfInitChar); assume( type == n_long_R );
-//   if( Test(type) )
-//     c ++;
-//
-//   type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
-//   if( Test(type) )
-//     c ++;
+ 
+  TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Fix it!);
   
+  setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's...
+      
+  type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
+  if( Test(type) )
+    c ++;
+
+  type = nRegister( n_long_R, ngfInitChar); assume( type == n_long_R );
+  if( Test(type) )
+    c ++;
   
 
-
-
+  type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
+  if( Test(type) )
+    c ++;
+  
 #ifdef HAVE_RINGS
   type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
 
-  // trivial BUG here: the parameter 'm' is ignored now in nrnSetExp!!!
-  // TODO: Frank
+  TODO(Frank, this seems to be a trivial BUG: the parameter 'm' is ignored now in nrnSetExp. Please fix someday!!!)
   if( Test(type, (void*) 3) )
     c ++;
 #endif
