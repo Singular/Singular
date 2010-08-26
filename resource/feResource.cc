@@ -10,21 +10,12 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "config.h"
+
 #include <auxiliary.h>
 
-#include "config.h"
 #include "feResource.h"
 
-/* define MAXPATHLEN */
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024
-#endif
-
-#define  DIR_SEP '/'
-#define  DIR_SEPP "/"
 
 
 #ifdef AIX_4
@@ -134,14 +125,6 @@ static feResourceConfig_s feResourceConfigs[] =
  *****************************************************************/
 char* feArgv0=NULL;
 #define MAXRESOURCELEN 5*MAXPATHLEN
-
-char fePathSep =
-#if defined(ix86_Win)
-';'
-#else
-':'
-#endif
-;
 
 static feResourceConfig feGetResourceConfig(const char id);
 static feResourceConfig feGetResourceConfig(const char* key);
