@@ -10,6 +10,13 @@
 #include "coeffs.h"
 
 // #define MAX_INT_VAL 0x7fffffff
+typedef struct 
+{
+  int GFChar;
+  int GFSize;
+  char* GFPar_name;
+} GFInfo;
+
 
 void nfInitChar(coeffs r, void*);
 

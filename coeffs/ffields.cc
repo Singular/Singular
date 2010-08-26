@@ -413,7 +413,7 @@ void nfWrite (number &a, const coeffs r)
   else if (nfIsMOne(a, r))   StringAppendS("-1");
   else
   {
-    StringAppendS(r->parameter[0]);
+    StringAppendS(r->m_nfParameter);
     if ((long)a!=1L)
     {
       if(r->ShortOut==0)  StringAppendS("^");
@@ -431,7 +431,7 @@ char * nfName(number a, const coeffs r)
   nfTest(a, r);
 #endif
   char *s;
-  char *nfParameter=r->parameter[0];
+  char *nfParameter=r->m_nfParameter;
   if (((long)a==(long)r->m_nfCharQ) || ((long)a==0L)) return NULL;
   else if ((long)a==1L)
   {
@@ -511,7 +511,7 @@ const char * nfRead (const char *s, number *a, const coeffs r)
     n=nfInit(i, r);
     *a = nfDiv(z,n,r);
   }
-  char *nfParameter=r->parameter[0];
+  char *nfParameter=r->m_nfParameter;
   if (strncmp(s,nfParameter,strlen(nfParameter))==0)
   {
     s+=strlen(nfParameter);
@@ -571,7 +571,7 @@ void nfShowMipo(const coeffs r)
   {
     j++;
     if (nfMinPoly[j]!=0)
-      StringAppend("%d*%s^%d",nfMinPoly[j],r->parameter[0],i);
+      StringAppend("%d*%s^%d",nfMinPoly[j],r->m_nfParameter,i);
     i--;
     if(i<0) break;
     if (nfMinPoly[j]!=0)
@@ -827,13 +827,17 @@ void nfInitChar(coeffs r,  void * parameter)
   r->nNULL = (number)0;
   assume( r->type == n_GF );
 
-
+  GFInfo* p = (GFInfo *)(parameter); 
+  const char * name = p->GFPar_name;
   r->m_nfCharQ = 0;
- 
+  r->m_nfCharP = p->GFChar;
+  r->m_nfCharQ1 = 0;
+  r->m_nfParameter= strdup(name); //TODO use omAlloc for allocating memory and use strcpy?
+  r->m_nfPlus1Table= NULL;
 
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
-  const int c = (int)(long)(parameter);
+  const int c = p->GFSize;
   nfReadTable(c, r);
   r->ch = r->m_nfCharP; 
 

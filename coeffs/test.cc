@@ -24,8 +24,8 @@ using namespace std;
 
 bool Test(const coeffs r)
 {
-  number a = n_Init(666, r); 
-  
+  number a = n_Init(666, r);
+   
   StringSetS("a: ");
   n_Test(a,r);
   n_Write(a, r);
@@ -38,7 +38,14 @@ bool Test(const coeffs r)
   n_Write(two, r);
   PrintS(StringAppend("\n"));
 
-
+  if (getCoeffType(r) == n_GF) //some special test for GF
+  {
+    number z= nfPar (2, r);
+    StringSetS("z: ");
+    n_Test(z,r); n_Write (z,r);
+    PrintS(StringAppend("\n"));
+  }
+  
   number aa = n_Add(a, a, r);
 
   StringSetS("aa = a + a: ");
@@ -124,14 +131,12 @@ bool Test(const n_coeffType type, void* p = NULL)
   assume( r != NULL );
 
   nSetChar( r );
-
   assume( getCoeffType(r) == type );
 
   assume( r->cfInit != NULL );
   assume( r->cfWrite != NULL );
   assume( r->cfAdd != NULL );
   assume( r->cfDelete != NULL );
-
 
   if( type == n_Q )
   {
@@ -176,7 +181,14 @@ bool Test(const n_coeffType type, void* p = NULL)
     assume( r->cfAdd == nrnAdd );
     assume( r->cfDelete == nrnDelete );
   }
-#endif  
+#endif
+  else if( type == n_GF )
+  {
+    assume( r->cfInit == nfInit );
+    assume( r->cfWrite == nfWrite );
+    assume( r->cfAdd == nfAdd );
+    //assume( r->cfDelete == nfDelete );
+  }
   else
   {
     // ...
@@ -230,7 +242,12 @@ int main()
   // the following leads to the error: "multiple definition of `fePathSep'"
   // TODO: Oleksandr/Martin
    type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
-   if( Test(type) )
+   GFInfo param;
+
+   param.GFChar= 5;
+   param.GFSize= 25;
+   param.GFPar_name= "Z";
+   if( Test(type, (void*) &param) )
      c ++;
   
 
