@@ -22,9 +22,11 @@
 using namespace std;
 
 
+#pragma GCC diagnostic ignored "-Wwrite-strings"
+
 bool Test(const coeffs r)
 {
-  number a = n_Init(666, r);
+  number a = n_Init(66666, r);
    
   StringSetS("a: ");
   n_Test(a,r);
@@ -40,10 +42,11 @@ bool Test(const coeffs r)
 
   if (getCoeffType(r) == n_GF) //some special test for GF
   {
-    number z= nfPar (2, r);
-    StringSetS("z: ");
+    number z = nfPar (0, r); // also any integer instead of 0
+    StringSetS("Generator: ");
     n_Test(z,r); n_Write (z,r);
     PrintS(StringAppend("\n"));
+    n_Delete(&z, r);    
   }
   
   number aa = n_Add(a, a, r);
@@ -51,7 +54,6 @@ bool Test(const coeffs r)
   StringSetS("aa = a + a: ");
   n_Test(aa,r); n_Write(aa, r);
   PrintS(StringAppend("\n"));
-
   
   number aa2 = n_Mult(a, two, r);
 
@@ -60,7 +62,6 @@ bool Test(const coeffs r)
   PrintS(StringAppend("\n"));
 
   number aa1 = n_Mult(two, a, r);
-
  
   StringSetS("aa1 = 2 * a: ");
   n_Test(aa1,r); n_Write(aa1, r);
@@ -281,12 +282,12 @@ int main()
 
    param.GFChar= 5;
    param.GFSize= 25;
-   param.GFPar_name= "Z";
+
+   param.GFPar_name= (const char*)"q";
 
    if( Test(type, (void*) &param) )
      c ++;
   
-
  
   TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Fix it!);
   
@@ -300,10 +301,6 @@ int main()
   if( Test(type) )
     c ++;
   
-
-  type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
-  if( Test(type) )
-    c ++;
   
 #ifdef HAVE_RINGS
   type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
