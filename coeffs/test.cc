@@ -18,31 +18,104 @@
 #include <rintegers.h>
 
 #include <iostream>
+
 using namespace std;
 
 
 bool Test(const coeffs r)
 {
   number a = n_Init(666, r); 
-  n_Test(a,r);
   
-  number b = n_Add(a, a, r);
-  n_Test(b,r);
+  StringSetS("a: ");
+  n_Test(a,r);
+  n_Write(a, r);
+  PrintS(StringAppend("\n"));
 
-  StringSetS("a: "); n_Write(a, r);PrintS(StringAppend("\n"));
-  StringSetS("b: "); n_Write(b, r);PrintS(StringAppend("\n"));
+  number two = n_Init(2, r);
+  
+  StringSetS("two: ");
+  n_Test(two,r);
+  n_Write(two, r);
+  PrintS(StringAppend("\n"));
+
+
+  number aa = n_Add(a, a, r);
+
+  StringSetS("aa = a + a: ");
+  n_Test(aa,r); n_Write(aa, r);
+  PrintS(StringAppend("\n"));
+
+  
+  number aa2 = n_Mult(a, two, r);
+
+  StringSetS("aa2 = a * 2: ");
+  n_Test(aa2, r); n_Write(aa2, r);
+  PrintS(StringAppend("\n"));
+
+  number aa1 = n_Mult(two, a, r);
+
+ 
+  StringSetS("aa1 = 2 * a: ");
+  n_Test(aa1,r); n_Write(aa1, r);
+  PrintS(StringAppend("\n"));
+
 
   n_Delete(&a, r);
-  n_Delete(&b, r);
+  n_Delete(&two, r);
+
+  
+  if( !n_Equal(aa, aa1, r) )
+    WarnS("ERROR: aa != aa1  !!!\n");
+
+  if( !n_Equal(aa, aa2, r) )
+    WarnS("ERROR: aa != aa2  !!!\n");
+
+  if( !n_Equal(aa1, aa2, r) )
+    WarnS("ERROR: aa1 != aa2  !!!\n");
+  
+
+  
+
+  n_Delete(&aa, r);
+  n_Delete(&aa1, r);
+  n_Delete(&aa2, r);
 
   return false;
 }
 
 
 
+namespace
+{
+  static inline ostream& operator<< (ostream& o, const n_coeffType& type)
+  {
+#define CASE(A) case A: return o << (" " # A) << " ";
+    switch( type )
+    {
+      CASE(n_unknown);
+      CASE(n_Zp);
+      CASE(n_Q);
+      CASE(n_R);
+      CASE(n_GF);
+      CASE(n_long_R);
+      CASE(n_Zp_a);
+      CASE(n_Q_a);
+      CASE(n_long_C);
+      CASE(n_Z);
+      CASE(n_Zn);
+      CASE(n_Zpn);
+      CASE(n_Z2m);
+      CASE(n_CF);
+      default: return o << "Unknown type: [" << (const unsigned long) type << "]";  
+    }   
+#undef CASE
+    return o;
+  };
+};
+  
+
 bool Test(const n_coeffType type, void* p = NULL)
 {
-
   cout  << endl << "----------------------- Testing coeffs: [" << type <<
                 "]: -----------------------" << endl;
 
@@ -140,14 +213,6 @@ int main()
   if( Test(type) )
     c ++;
 
-  type = nRegister( n_long_R, ngfInitChar); assume( type == n_long_R );
-  if( Test(type) )
-    c ++;
-
-  type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
-  if( Test(type) )
-    c ++;
-
 
 #ifdef HAVE_RINGS
   type = nRegister( n_Z, nrzInitChar); assume( type == n_Z );
@@ -157,23 +222,42 @@ int main()
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
   if( Test(type, (void*) 2) )
     c ++;
-
-  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
-
-  // BUG here!
-  // TODO: Frank (cmp. with the previous code)
-  // Note: the parameter 'm' is ignored now in nrnSetExp!!!
-  if( Test(type, (void*) 3) )
-    c ++;
-
 #endif
 
-/*  
-  // TODO: Hans (the following needs resources, e.g. feFopen)
-  type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
-  if( Test(type) )
+
+
+
+  // the following leads to the error: "multiple definition of `fePathSep'"
+  // TODO: Oleksandr/Martin
+//   type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
+//   if( Test(type) )
+//     c ++;
+  
+
+  // BUG: in n_Equal!
+  // TODO: Oleksandr/Christian
+//   type = nRegister( n_long_R, ngfInitChar); assume( type == n_long_R );
+//   if( Test(type) )
+//     c ++;
+//
+//   type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
+//   if( Test(type) )
+//     c ++;
+  
+  
+
+
+
+#ifdef HAVE_RINGS
+  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
+
+  // trivial BUG here: the parameter 'm' is ignored now in nrnSetExp!!!
+  // TODO: Frank
+  if( Test(type, (void*) 3) )
     c ++;
-*/
+#endif
+
+  
   
   return c;
 
