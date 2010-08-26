@@ -85,7 +85,7 @@ CXXFLAGSG       = -g ${PIPE}
 DEFSG           = @DEFS@
 
 CCG             = ${CC}
-CXXG            = ${CXX}
+CXXG            = ${CXX} -Wextra -Wall -pedantic -fdiagnostics-show-option
 OBJSG1 := $(CXXSOURCES:.cc=.og)
 
 libcoeffs_g.a: ${OBJSG1}

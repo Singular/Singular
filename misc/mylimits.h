@@ -15,7 +15,7 @@
 #ifndef _MYLIMITS_H
 
 #ifdef IRIX
-#include "omlimits.h"
+#include <omlimits.h>
 #else
 #include <limits.h>
 

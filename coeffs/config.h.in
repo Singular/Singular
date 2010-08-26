@@ -1,3 +1,6 @@
 // #define assume(x) ((void) 0)
 #define memcpy4 memcpy
 
+
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"

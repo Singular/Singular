@@ -319,6 +319,12 @@ static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
 /* _DEBUG */
 
 
+#define DO_PRAGMA(x) _Pragma (#x)
+#define TODO(who, msg) DO_PRAGMA(message ("TODO [for " #who "]: " #msg))
+
+
+
+
 
 #endif 
 /* MISC_AUXILIARY_H */
