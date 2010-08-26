@@ -19,7 +19,11 @@
      
 // ----------------- which parts/extensions of Singular to build
 #define HAVE_RINGS
-#define HAVE_FACTORY
+
+// no factory yet...
+// #define HAVE_FACTORY
+
+
 // ----------------  end of parts/extensions
 // -----------------  configure stuff
 
