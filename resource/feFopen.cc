@@ -5,33 +5,16 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "config.h"
+
 #include <auxiliary.h>
 
 #include <omalloc.h>
 #include <reporter.h>
+
 #include "feFopen.h"
 #include "feResource.h"
 
-/* define MAXPATHLEN */
-#ifdef HAVE_SYS_PARAM_H
-#include <sys/param.h>
-#endif
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024
-#endif
-
-
-#define  DIR_SEP '/'
-#define  DIR_SEPP "/"
-
-char fePathSep =
-/* not reallay cygwin, applies to all windows systems:*/
-#if defined(CYGWIN)
-';'
-#else
-':'
-#endif
-;
 
 
 /*****************************************************************

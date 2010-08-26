@@ -16,11 +16,16 @@ FILE *  feFopen(const char *path, const char *mode, char *where=NULL,
 // IMPORTANT: do only use myfopen and myfread when reading text,
 // do never use fopen and fread
 */
-#ifdef ix86_Win
+#if (defined(CYGWIN) || defined(ix86_Win))
+
 FILE *myfopen(const char *path, const char *mode);
+
 #else
+
 #define myfopen fopen
+
 #endif
 
 size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+
 #endif

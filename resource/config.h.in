@@ -10,4 +10,16 @@
 // #define assume(x) ((void) 0)
 #define memcpy4 memcpy
 
+/* define MAXPATHLEN */
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+
+#define  DIR_SEP '/'
+#define  DIR_SEPP "/"
+
+
 #endif

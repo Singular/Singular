@@ -19,4 +19,18 @@ void feInitResources(char* argv0);
 void feReInitResources();
 // Prints resources into string with StringAppend, etc
 void feStringAppendResources(int warn = -1);
+
+
+
+const char fePathSep =
+// not really cygwin, applies to all windows systems:
+#if (defined(CYGWIN) || defined(ix86_Win))
+                ';'
+#else
+                ':'
+#endif
+                ;
+
+
+
 #endif
