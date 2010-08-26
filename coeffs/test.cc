@@ -229,9 +229,9 @@ int main()
 
   // the following leads to the error: "multiple definition of `fePathSep'"
   // TODO: Oleksandr/Martin
-//   type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
-//   if( Test(type) )
-//     c ++;
+   type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
+   if( Test(type) )
+     c ++;
   
 
   // BUG: in n_Equal!
