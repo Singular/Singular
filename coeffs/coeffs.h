@@ -210,6 +210,7 @@ struct n_Procs_s
   int m_nfCharQ1; ///< q-1
   unsigned short *m_nfPlus1Table;
   int *m_nfMinPoly;
+  char * m_nfParameter;
 };
 //
 // test properties and type
