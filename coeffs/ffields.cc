@@ -20,6 +20,7 @@
 
 //unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
 
+const double sixteenlog2= 11.09035489;
 /* the q's from the table 'fftable' */
 unsigned short fftable[]={
     4,  8, 16, 32, 64, 128, 256, 512,1024,2048,4096,8192,16384, 32768,
@@ -611,9 +612,16 @@ void nfReadTable(const int c, const coeffs r)
   if ((c==r->m_nfCharQ)||(c==-r->m_nfCharQ))
     /*this field is already set*/  return;
   int i=0;
-  while ((fftable[i]!=c) && (fftable[i]!=0)) i++;
+  
+  while ((fftable[i]!=c) && (fftable[i]!=0)) 
+    i++;
+  
   if (fftable[i]==0)
+  {
+    Werror("illegal GF-table size: %d", c);
     return;
+  }
+
   if (r->m_nfCharQ > 1)
   {
     omFreeSize( (ADDRESS)r->m_nfPlus1Table,r->m_nfCharQ*sizeof(unsigned short) );
@@ -838,8 +846,30 @@ void nfInitChar(coeffs r,  void * parameter)
 
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
-  const int c = pow (p->GFChar, p->GFDegree);
+
+  assume (p->GFChar > 0);
+  assume (p->GFDegree > 0);
+
+  if(p->GFChar > (2<<15))
+  {
+    Werror("illegal characteristic"); // no exceptions :(((
+    return;
+  }
+
+  const double check= log ((double) (p->GFChar)); 
+
+  if( (p->GFDegree * check) > sixteenlog2 )
+  {
+    Werror("illegal size");
+    return;
+  }
+
+  int c = pow (p->GFChar, p->GFDegree);
+
   nfReadTable(c, r);
+
+  assume (r -> m_nfCharQ > 0);
+
   r->ch = r->m_nfCharP; 
 
 }

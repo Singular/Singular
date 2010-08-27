@@ -281,7 +281,7 @@ int main()
    GFInfo param;
 
    param.GFChar= 5;
-   param.GFDegree= 2;
+   param.GFDegree= 12;
 
    param.GFPar_name= (const char*)"q";
 
