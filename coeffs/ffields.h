@@ -13,7 +13,7 @@
 typedef struct 
 {
   int GFChar;
-  int GFSize;
+  int GFDegree;
   char* GFPar_name;
 } GFInfo;
 

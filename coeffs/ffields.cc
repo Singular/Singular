@@ -15,6 +15,7 @@
 #include "numbers.h"
 #include "ffields.h"
 #include <feFopen.h>
+#include <math.h>
 
 
 //unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
@@ -837,7 +838,7 @@ void nfInitChar(coeffs r,  void * parameter)
 
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;
-  const int c = p->GFSize;
+  const int c = pow (p->GFChar, p->GFDegree);
   nfReadTable(c, r);
   r->ch = r->m_nfCharP; 
 
