@@ -11,6 +11,7 @@
 extern int timerv;
 void startTimer(void);
 void writeTime(const char* s);
+char* dateTime(); // (local) date and local time as a string
 
 int initTimer();
 int  getTimer();

@@ -65,7 +65,8 @@ and @code{LIB} no brackets are allowed.
 * close::
 * coef::
 * coeffs::
-* contract::
+* contract:: 
+* datetime::
 * dbprint::
 * defined::
 * deg::
@@ -794,7 +795,7 @@ See
 @ref{coeffs}.
 @c ref
 @c ---------------------------------------
-@node coeffs, contract, coef, Functions
+@node coeffs, datetime, coef, Functions
 @subsection coeffs
 @cindex coeffs
 
@@ -1048,7 +1049,7 @@ See
 @ref{kbase}.
 @c ref
 @c ---------------------------------------
-@node contract, dbprint, coeffs, Functions
+@node contract, datetime, coeffs, Functions
 @subsection contract
 @cindex contract
 
@@ -1102,8 +1103,28 @@ x.
 See
 @ref{diff}.
 @c ref
+
 @c ---------------------------------------
-@node dbprint, defined, contract, Functions
+@node datetime, dbprint, contract, Functions
+@subsection datetime
+@cindex datetime
+
+@table @code
+@item @strong{Syntax:}
+@code{datetime}
+@item @strong{Type:}
+string
+@item @strong{Purpose:}
+return the current local date and time as a string;
+@*This string has the format 'DAY MMM DD HH:MM:SS YYYY\n',
+where DAY is a three character string representing the day
+of the week, MMM a three character string representing the
+month, DD a two digit string representing the day, HH:MM:SS
+the current local time, and YYYY the year.
+@*Note that the returned string ends with a linefeed.
+
+@c ---------------------------------------
+@node dbprint, defined, datetime, Functions
 @subsection dbprint
 @cindex dbprint
 @table @code

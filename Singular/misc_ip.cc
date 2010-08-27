@@ -219,7 +219,7 @@ lists primeFactorisation(const number n, const int pBound)
   int nnAsInt = nlInt(nn, NULL);
   if (nlIsZero(nn) || (nnAsInt != 0))
   {
-    nlDelete(&nn,NULL):
+    nlDelete(&nn,NULL);
     L->m[0].rtyp = INT_CMD;
     L->m[0].data = (void *)nnAsInt;
   }

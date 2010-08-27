@@ -175,6 +175,28 @@ int getTimer()
 #ifdef EXTEND_TIMER_D
 extern int iiOp;
 #endif
+
+char* dateTime()
+{
+#ifdef GETRUSAGE
+  time_t rawtime;
+  time(&rawtime);
+  char* s = ctime(&rawtime);     // s: with linefeed at the end
+  int l = strlen(s);
+  char* ss = (char*)omAlloc(l);
+  strncpy(ss, s, l - 1);
+  ss[l - 1] = '\0';              // ss: without linefeed at the end
+  return ss;
+#else
+  char* s = "Warning: date/time not available on your system";
+  int l = strlen(s) + 1;
+  char* ss = (char*)omAlloc(l);
+  strncpy(ss, s, l - 1);
+  ss[l - 1] = '\0';
+  return ss;
+#endif
+}
+
 void writeTime(const char* v)
 {
 

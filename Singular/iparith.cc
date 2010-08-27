@@ -72,6 +72,8 @@
 #include <Singular/ipshell.h>
 #include <kernel/mpr_inout.h>
 
+#include <kernel/timer.h>
+
 #ifdef HAVE_PLURAL
   #include <kernel/gring.h>
   #include <kernel/sca.h>
@@ -441,6 +443,7 @@ cmdnames cmds[] =
 //  { "Up",          0, -1 ,                SYSVAR},
 
 /* set sys vars*/
+  { "datetime",    0, DATETIME ,          SYSVAR},
   { "degBound",    0, VMAXDEG ,           SYSVAR},
   { "echo",        0, VECHO ,             SYSVAR},
   { "minpoly",     0, VMINPOLY ,          SYSVAR},
