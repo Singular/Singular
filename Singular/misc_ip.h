@@ -28,40 +28,57 @@
 /* So far nothing is required. */
 
 /**
- * Computes an approximation of the square root of a bigint number.
+ * Converts a non-negative bigint number into a GMP number.
  *
- * Expects a non-negative bigint number n and returns the bigint
- * number m which satisfies m*m <= n < (m+1)*(m+1). This implementation
- * does not require a valid currRing.
- *
- * @return an approximation of the square root of n
  **/
-number approximateSqrt(const number n   /**< [in]  a number   */
-                      );
+void number2mpz(number n,   /**< [in]  a bigint number >= 0  */
+                mpz_t m     /**< [out] the GMP equivalent    */
+               );
+               
+/**
+ * Converts a non-negative GMP number into a bigint number.
+ *
+ * @return the bigint number representing the given GMP number
+ **/
+number mpz2number(mpz_t m   /**< [in]  a GMP number >= 0  */
+                 );
+
+/**
+ * Divides 'n' as many times as possible by 'd' and returns the number
+ * of divisions (without remainder) in 'times',
+ * e.g., n = 48, d = 4, divTimes(n, d, t) = 3 produces n = 3, t = 2,
+ *       since 48 = 4*4*3;
+ * assumes that d is positive
+ **/
+void divTimes(mpz_t n,   /**< [in]  a GMP number >= 0                      */
+              mpz_t d,   /**< [in]  the divisor, a GMP number >= 0         */
+              int* times /**< [out] number of divisions without remainder  */
+             );
 
 /**
  * Factorises a given positive bigint number n into its prime factors less
  * than or equal to a given bound, with corresponding multiplicities.
  *
- * The method is capable of finding only prime factors < 2^31, and it looks
- * only for those less than or equal the given bound, if this bound is not 0.
- * Therefore, after dividing out all prime factors which have been found,
- * some number m > 1 may survive.
- * The method returns a list L filled with three entries:
- * L[1] contains m as int or bigint, depending on the size,
- * L[2] a list; L[2][i] contains the i-th prime factor as int
+ * The method finds all prime factors with multiplicities. If a non-zero
+ * bound is given, then only the prime factors <= pBound are being found.
+ * In this case, there may remain an unfactored portion m of n.
+ * The method returns a list L filled with four entries:
+ * L[1] contains the remainder m as int or bigint, depending on the size,
+ * L[2] a list; L[2][i] contains the i-th prime factor as int or bigint
  *                     (sorted in ascending order),
  * L[3] a list; L[3][i] contains the multiplicity of L[2, i] in n as int
+ * L[4] 1 iff the remainder m is probably a prime, 0 otherwise
  *
  * We thus have: n = L[1] * L[2][1]^L[3][1] * ... * L[2][k]^L[3][k], where
- * k is the number of mutually distinct prime factors < 2^31 and <= the
- * provided bound (if this is not zero).
+ * k is the number of mutually distinct prime factors (<= a provided non-
+ * zero bound).
  *
- * @return the factorisation data in a list
+ * @return the factorisation data in a SINGULAR-internal list
  **/
 lists primeFactorisation(
-       const number n,    /**< [in]  the bigint to be factorised       */
-       const int pBound   /**< [in]  bound on the prime factors seeked */
+       const number n,     /**< [in]  the bigint > 0 to be factorised   */
+       const number pBound /**< [in]  bigint bound on the prime factors
+                                      seeked                            */
                         );
 
 #endif

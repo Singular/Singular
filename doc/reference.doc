@@ -5366,22 +5366,24 @@ See
 @cindex primefactors
 @table @code
 @item @strong{Syntax:}
-@code{primefactors (} bigint_expression @code{, [} int_expression @code{] )}
-@item @strong{Syntax:}
-@code{primefactors (} number_expression @code{, [} int_expression @code{] )}
+@code{primefactors (} int/bigint/number_expression @code{, [} int/bigint/number_expression @code{] )}
 @item @strong{Type:}
 list
 @item @strong{Purpose:}
 returns the prime factorisation up to an optionally given bound, b, on the
 prime factors
-@*When called with a bigint, no ring needs to be active.
-@*The method is capable of finding all prime factors <= 2^31 - 1, i.e., it
-finds all prime factors <= min(2^31-1, b). The quotient, q, arising by
-dividing out all found prime factors will also be returned. More concretely,
-a list L with three entries is returned:
-@*L[1] = q,
+@*When called with int(s)/bigint(s), no ring needs to be active.
+@*When called with numbers these are assumed to be integers in a polynomial
+ring over Q.
+@*The method finds all prime factors of a positive integer n. When a bound b
+is given then it is expected to be at least 2. In this case, the implementation
+finds only all prime factors <= b. Then, there may remain a non-factored
+portion n' of n arising by dividing out all found prime factors.
+The returned list contains the following information:
+@*L[1] = n',
 @*L[2][i] = i-th prime factor (in ascending order),
-@*L[3][i] = multiplicity of L[2][i].
+@*L[3][i] = multiplicity of L[2][i],
+@*L[4] = 1 if probabilistic test says that n' is a prime, 0 otherwise.
 @item @strong{Example:}
 @smallexample
 @c example

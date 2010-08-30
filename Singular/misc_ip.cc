@@ -21,76 +21,44 @@
 #include <kernel/longrat.h>
 #include <Singular/misc_ip.h>
 
-/* This works by Newton iteration, i.e.,
-      a(1)   = n;
-      a(i+1) = a(i)/2 + n/2/a(i), i > 0.
-   This sequence is guaranteed to decrease monotonously and
-   it is known to converge fast.
-   All used numbers are bigints. */
-number approximateSqrt(const number n)
+void number2mpz(number n, mpz_t m)
 {
-  if (nlIsZero(n)) { number zero = nlInit(0, NULL); return zero; }
-  number temp1; number temp2;
-  number one = nlInit(1, NULL);
-  number two = nlInit(2, NULL);
-  number m = nlCopy(n);
-  number mOld = nlSub(m, one); /* initially required to be different from m */
-  number nHalf = nlIntDiv(n, two);
-  bool check = true;
-  while (!nlEqual(m, mOld) && check)
+  if (nlIsZero(n)) mpz_init_set_si(m, 0);
+  else
   {
-    temp1 = nlIntDiv(m, two);
-    temp2 = nlIntDiv(nHalf, m);
-    mOld = m;
-    m = nlAdd(temp1, temp2);
-    nlDelete(&temp1, NULL); nlDelete(&temp2, NULL);
-    temp1 = nlMult(m, m);
-    check = nlGreater(temp1, n);
-    nlDelete(&temp1, NULL);
+    int nAsInt = nlInt(n, NULL);
+    if (nAsInt != 0) mpz_init_set_si(m, nAsInt);     /* n fits in an int */
+    else             mpz_init_set(m, (mpz_ptr)n->z);
   }
-  nlDelete(&mOld, NULL); nlDelete(&two, NULL); nlDelete(&nHalf, NULL);
-  while (!check)
-  {
-    temp1 = nlAdd(m, one);
-    nlDelete(&m, NULL);
-    m = temp1;
-    temp1 = nlMult(m, m);
-    check = nlGreater(temp1, n);
-    nlDelete(&temp1, NULL);
-  }
-  temp1 = nlSub(m, one);
-  nlDelete(&m, NULL);
-  nlDelete(&one, NULL);
-  m = temp1;
-  return m;
 }
 
-/* returns the quotient resulting from division of n by the prime as many
-   times as possible without remainder; afterwards, the parameter times
-   will contain the highest exponent e of p such that p^e divides n
-   e.g., divTimes(48, 4, t) = 3 with t = 2, since 48 = 4*4*3;
-   n is expected to be a bigint; returned type is also bigint */
-number divTimes(const number n, const int p, int* times)
+number mpz2number(mpz_t m)
 {
-  number nn = nlCopy(n);
-  number dd = nlInit(p, NULL);
-  number rr = nlIntMod(nn, dd);
+  number z = (number)omAllocBin(rnumber_bin);
+  mpz_init_set(z->z, m);
+  mpz_init_set_ui(z->n, 1);
+  z->s = 3;
+  return z;
+}
+
+void divTimes(mpz_t n, mpz_t d, int* times)
+{
   *times = 0;
-  while (nlIsZero(rr))
+  mpz_t r; mpz_init(r);
+  mpz_t q; mpz_init(q);
+  mpz_fdiv_qr(q, r, n, d);
+  while (mpz_cmp_ui(r, 0) == 0)
   {
     (*times)++;
-    number temp = nlIntDiv(nn, dd);
-    nlDelete(&nn, NULL);
-    nn = temp;
-    nlDelete(&rr, NULL);
-    rr = nlIntMod(nn, dd);
+    mpz_set(n, q);
+    mpz_fdiv_qr(q, r, n, d);
   }
-  nlDelete(&rr, NULL); nlDelete(&dd, NULL);
-  return nn;
+  mpz_clear(r);
+  mpz_clear(q);
 }
 
 /* returns an object of type lists which contains the entries
-   theInts[0..(length-1)] as INT_CMDs*/
+   theInts[0..(length-1)] as INT_CMDs */
 lists makeListsObject(const int* theInts, int length)
 {
   lists L=(lists)omAllocBin(slists_bin);
@@ -100,433 +68,166 @@ lists makeListsObject(const int* theInts, int length)
   return L;
 }
 
-/* returns the i-th bit of the binary number which arises by
-   concatenating array[length-1], ..., array[1], array[0],
-   where array[0] contains the 32 lowest bits etc.;
-   i is assumed to be small enough to address a valid index
-   in the given array */
-bool getValue(const unsigned i, const unsigned int* ii)
-{
-  if (i==2) return true;
-  if ((i & 1)==0) return false;
-  unsigned I= i/2;
-  unsigned index = I / 32;
-  unsigned offset = I % 32;
-  unsigned int v = 1 << offset;
-  return ((ii[index] & v) != 0);
-}
-
-/* sets the i-th bit of the binary number which arises by
-   concatenating array[length-1], ..., array[1], array[0],
-   where array[0] contains the 32 lowest bits etc.;
-   i is assumed to be small enough to address a valid index
-   in the given array */
-void setValue(const unsigned i, bool value, unsigned int* ii)
-{
-  if ((i&1)==0) return; // ignore odd numbers
-  unsigned I=i/2;
-  unsigned index = I / 32;
-  unsigned offset = I % 32;
-  unsigned int v = 1 << offset;
-  if (value) { ii[index] |= v;  }
-  else       { ii[index] &= ~v; }
-}
-
-/* returns whether i is less than or equal to the bigint number n */
-bool isLeq(const int i, const number n)
-{
-  number iN = nlInit(i - 1, NULL);
-  bool result = nlGreater(n, iN);
-  nlDelete(&iN, NULL);
-  return result;
-}
-
-#if 0
-lists primeFactorisation(const number n, const int pBound)
-{
-  number nn = nlCopy(n); int i;
-  int pCounter = 0; /* for counting the number of mutually distinct
-                       prime factors in n */
-  /* we assume that there are at most 1000 mutually distinct prime
-     factors in n */
-  int* primes = new int[1000]; int* multiplicities = new int[1000];
-
-  /* extra treatment for the primes 2 and 3;
-     all other primes are equal to +1/-1 mod 6 */
-  int e; number temp;
-  temp = divTimes(nn, 2, &e); nlDelete(&nn, NULL); nn = temp;
-  if (e > 0) { primes[pCounter] = 2; multiplicities[pCounter++] = e; }
-  temp = divTimes(nn, 3, &e); nlDelete(&nn, NULL); nn = temp;
-  if (e > 0) { primes[pCounter] = 3; multiplicities[pCounter++] = e; }
-
-  /* now we simultaneously:
-     - build the sieve of Erathostenes up to s,
-     - divide out each prime factor of nn that we find along the way
-       (This may result in an earlier termination.) */
-
-  int s = 1<<25;       /* = 2^25 */
-  int maxP = 2147483647; /* = 2^31 - 1, by the way a Mersenne prime */
-  if ((pBound != 0) && (pBound < maxP))
-  {
-    maxP = pBound;
-  }
-  if (maxP< (2147483647-63) ) s=(maxP+63)/64;
-  else                        s=2147483647/64+1;
-  unsigned int* isPrime = new unsigned int[s];
-  /* the lowest bit of isPrime[0] stores whether 1 is a prime,
-     next bit is for 3, next for 5, etc. i.e.
-     intended usage is: isPrime[0] = ...
-     We shall make use only of bits which correspond to numbers =
-     -1 or +1 mod 6. */
-  //for (i = 0; i < s; i++) isPrime[i] = ~0;/*4294967295*/; /* all 32 bits set */
-  memset(isPrime,0xff,s*sizeof(unsigned int));
-  int p=9; while((p<maxP) && (p>0)) { setValue(p,false,isPrime); p+=6; }
-  p = 5; bool add2 = true;
-  /* due to possible overflows, we need to check whether p > 0, and
-     likewise i > 0 below */
-  while ((0 < p) && (p <= maxP) && (isLeq(p, nn)))
-  {
-    /* at this point, p is guaranteed to be a prime;
-       we divide nn by the highest power of p and store p
-       if nn is at all divisible by p */
-    temp = divTimes(nn, p, &e);
-    nlDelete(&nn, NULL); nn = temp;
-    if (e > 0)
-    { primes[pCounter] = p; multiplicities[pCounter++] = e; }
-    /* invalidate all multiples of p, starting with 2*p */
-    i = 2 * p;
-    while ((0 < i) && (i < maxP)) { setValue(i, false, isPrime); i += p; }
-    /* move on to the next prime in the sieve; we either add 2 or 4
-       in order to visit just the numbers equal to -1/+1 mod 6 */
-    if (add2) { p += 2; add2 = false; }
-    else      { p += 4; add2 = true;  }
-    while ((0 < p) && (p <= maxP) && (isLeq(p, nn)) && (!getValue(p, isPrime)))
-    {
-      if (add2) { p += 2; add2 = false; }
-      else      { p += 4; add2 = true;  }
-    }
-  }
-
-  /* build return structure and clean up */
-  delete [] isPrime;
-  lists primesL = makeListsObject(primes, pCounter);
-  lists multiplicitiesL = makeListsObject(multiplicities, pCounter);
-  delete [] primes; delete [] multiplicities;
-  lists L=(lists)omAllocBin(slists_bin);
-  L->Init(3);
-  L->m[0].rtyp = BIGINT_CMD; L->m[0].data = (void *)nn;
+void setListEntry(lists L, int index, mpz_t n)
+{ /* assumes n > 0 */
+  number nn = mpz2number(n);
+  L->m[index].rtyp = BIGINT_CMD; L->m[index].data = (void*)nn;
   /* try to fit nn into an int: */
   int nnAsInt = nlInt(nn, NULL);
-  if (nlIsZero(nn) || (nnAsInt != 0))
+  if (nnAsInt != 0)
   {
-    nlDelete(&nn,NULL);
-    L->m[0].rtyp = INT_CMD;
-    L->m[0].data = (void *)nnAsInt;
-  }
-  L->m[1].rtyp = LIST_CMD; L->m[1].data = (void *)primesL;
-  L->m[2].rtyp = LIST_CMD; L->m[2].data = (void *)multiplicitiesL;
-  return L;
-}
-#else
-/* Factoring , from gmp-demos
-
-Copyright 1995, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005 Free Software
-Foundation, Inc.
-
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 3 of the License, or (at your option) any later
-version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see http://www.gnu.org/licenses/.  */
-
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <kernel/si_gmp.h>
-
-static unsigned add[] = {4, 2, 4, 2, 4, 6, 2, 6};
-
-void factor_using_division (mpz_t t, unsigned int limit, int *L, int &L_ind, int *ex)
-{
-  mpz_t q, r;
-  unsigned long int f;
-  int ai;
-  unsigned *addv = add;
-  unsigned int failures;
-
-  mpz_init (q);
-  mpz_init (r);
-
-  f = mpz_scan1 (t, 0);
-  mpz_div_2exp (t, t, f);
-  while (f)
-  {
-    if ((L_ind>0) && (L[L_ind-1]==2)) ex[L_ind-1]++;
-    else
-    {
-      L[L_ind]=2;
-      L_ind++;
-    }
-    --f;
-  }
-
-  for (;;)
-  {
-    mpz_tdiv_qr_ui (q, r, t, 3);
-    if (mpz_cmp_ui (r, 0) != 0)  break;
-    mpz_set (t, q);
-    if ((L_ind>0) && (L[L_ind-1]==3)) ex[L_ind-1]++;
-    else
-    {
-      L[L_ind]=3;
-      L_ind++;
-    }
-  }
-
-  for (;;)
-  {
-    mpz_tdiv_qr_ui (q, r, t, 5);
-    if (mpz_cmp_ui (r, 0) != 0) break;
-    mpz_set (t, q);
-    if ((L_ind>0) && (L[L_ind-1]==5)) ex[L_ind-1]++;
-    else
-    {
-      L[L_ind]=5;
-      L_ind++;
-    }
-  }
-
-  failures = 0;
-  f = 7;
-  ai = 0;
-  while (mpz_cmp_ui (t, 1) != 0)
-  {
-    if (f>=((unsigned long)1 <<28)) break;
-    if (mpz_cmp_ui (t, f) < 0) break;
-    mpz_tdiv_qr_ui (q, r, t, f);
-    if (mpz_cmp_ui (r, 0) != 0)
-    {
-        f += addv[ai];
-        ai = (ai + 1) & 7;
-        failures++;
-        if (failures > limit) break;
-    }
-    else
-    {
-      mpz_swap (t, q);
-      //gmp_printf("%d: %Zd\n",f,t);
-      // here: f in 0,,2^28-1:
-      if ((L_ind>0) && (L[L_ind-1]==(int)f)) ex[L_ind-1]++;
-      else
-      {
-        L[L_ind]=f;
-        L_ind++;
-      }
-      failures = 0;
-    }
-  }
-
-  mpz_clear (q);
-  mpz_clear (r);
-}
-
-void factor_using_pollard_rho (mpz_t n, int a_int, int *L, int &L_ind, int *ex)
-{
-  mpz_t x, x1, y, P;
-  mpz_t a;
-  mpz_t g;
-  mpz_t t1, t2;
-  int k, l, c, i;
-
-  mpz_init (g);
-  mpz_init (t1);
-  mpz_init (t2);
-
-  mpz_init_set_si (a, a_int);
-  mpz_init_set_si (y, 2);
-  mpz_init_set_si (x, 2);
-  mpz_init_set_si (x1, 2);
-  k = 1;
-  l = 1;
-  mpz_init_set_ui (P, 1);
-  c = 0;
-
-  while (mpz_cmp_ui (n, 1) != 0)
-  {
-S2:
-    mpz_mul (x, x, x); mpz_add (x, x, a); mpz_mod (x, x, n);
-    mpz_sub (t1, x1, x); mpz_mul (t2, P, t1); mpz_mod (P, t2, n);
-    c++;
-    if (c == 20)
-    {
-      c = 0;
-      mpz_gcd (g, P, n);
-      if (mpz_cmp_ui (g, 1) != 0) goto S4;
-      mpz_set (y, x);
-    }
-S3:
-    k--;
-    if (k > 0) goto S2;
-
-    mpz_gcd (g, P, n);
-    if (mpz_cmp_ui (g, 1) != 0) goto S4;
-
-    mpz_set (x1, x);
-    k = l;
-    l = 2 * l;
-    for (i = 0; i < k; i++)
-    {
-      mpz_mul (x, x, x); mpz_add (x, x, a); mpz_mod (x, x, n);
-    }
-    mpz_set (y, x);
-    c = 0;
-    goto S2;
-S4:
-    do
-    {
-      mpz_mul (y, y, y); mpz_add (y, y, a); mpz_mod (y, y, n);
-      mpz_sub (t1, x1, y); mpz_gcd (g, t1, n);
-    }
-    while (mpz_cmp_ui (g, 1) == 0);
-
-    mpz_div (n, n, g);        /* divide by g, before g is overwritten */
-
-    if (!mpz_probab_prime_p (g, 10))
-    {
-      do
-      {
-        mp_limb_t a_limb;
-        mpn_random (&a_limb, (mp_size_t) 1);
-        a_int = (int) a_limb;
-      }
-      while (a_int == -2 || a_int == 0);
-
-      factor_using_pollard_rho (g, a_int,L,L_ind,ex);
-    }
-    else
-    {
-      if ((L_ind>0) && (mpz_cmp_si(g,L[L_ind-1])==0)) ex[L_ind-1]++;
-      else
-      {
-        L[L_ind]=mpz_get_si(g);
-        L_ind++;
-      }
-    }
-    mpz_mod (x, x, n);
-    mpz_mod (x1, x1, n);
-    mpz_mod (y, y, n);
-    if (mpz_probab_prime_p (n, 10))
-    {
-      int te=mpz_get_si(n);
-      if (mpz_cmp_si(n,te)==0) /* does it fit into an int ? */
-      {
-        if ((L_ind>0) && (mpz_cmp_si(n,L[L_ind-1])==0)) ex[L_ind-1]++;
-        else
-        {
-          L[L_ind]=mpz_get_si(n);
-          L_ind++;
-        }
-        mpz_set_si(n,1); // add n itself the list of divisors, rest is 1
-      }
-      break;
-    }
-  }
-
-  mpz_clear (g);
-  mpz_clear (P);
-  mpz_clear (t2);
-  mpz_clear (t1);
-  mpz_clear (a);
-  mpz_clear (x1);
-  mpz_clear (x);
-  mpz_clear (y);
-}
-
-void mpz_factor (mpz_t t, int *L, int & L_ind, int *ex)
-{
-  unsigned int division_limit;
-
-  if (mpz_sgn (t) == 0)
-    return;
-
-  /* Set the trial division limit according the size of t.  */
-  division_limit = mpz_sizeinbase (t, 2);
-  if (division_limit > 1000)
-    division_limit = 1000 * 1000;
-  else
-    division_limit = division_limit * division_limit;
-
-  factor_using_division (t, division_limit, L, L_ind, ex);
-
-  if (mpz_cmp_ui (t, 1) != 0)
-  {
-    if (mpz_probab_prime_p (t, 10))
-    {
-      int tt=mpz_get_si(t);
-      // check if t fits into int:
-      if ((mpz_size1(t)==1)&&(mpz_cmp_si(t,tt)==0))
-      {
-        L[L_ind]=mpz_get_si(t);
-        L_ind++;
-        mpz_set_si(t,1);
-      }
-    }
-    else
-      factor_using_pollard_rho (t, 1, L,L_ind,ex);
+    nlDelete(&nn, NULL);
+    L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)nnAsInt;
   }
 }
 
-lists primeFactorisation(const number n, const int pBound)
+/* true iff p is prime */
+/*
+bool isPrime(mpz_t p)
 {
-  mpz_t t;
-  number nn = nlCopy(n);
+  if (mpz_cmp_ui(p, 2) == 0) return true;
+  if (mpz_cmp_ui(p, 3) == 0) return true;
+  if (mpz_cmp_ui(p, 5) < 0)  return false;
+
+  mpz_t d; mpz_init_set_ui(d, 5); int add = 2;
+  mpz_t sr; mpz_init(sr); mpz_sqrt(sr, p);
+  mpz_t r; mpz_init(r);
+  while (mpz_cmp(d, sr) <= 0)
+  {
+    mpz_cdiv_r(r, p, d);
+    if (mpz_cmp_ui(r, 0) == 0)
+    {
+      mpz_clear(d); mpz_clear(sr); mpz_clear(r);
+      return false;
+    }
+    mpz_add_ui(d, d, add);
+    add += 2; if (add == 6) add = 2;
+  }
+  mpz_clear(d); mpz_clear(sr); mpz_clear(r);
+  return true;
+}
+*/
+
+/* finds the next prime q, bound >= q >= p;
+   in case of success, puts q into p;
+   otherwise sets q = bound + 1;
+   e.g. p = 24; nextPrime(p, 30) produces p = 29 (success),
+        p = 24; nextPrime(p, 29) produces p = 29 (success),
+        p = 24; nextPrime(p, 28) produces p = 29 (no success),
+        p = 24; nextPrime(p, 27) produces p = 28 (no success) */
+/*
+void nextPrime(mpz_t p, mpz_t bound)
+{
+  int add;
+  mpz_t r; mpz_init(r); mpz_cdiv_r_ui(r, p, 6); // r = p mod 6, 0 <= r <= 5
+  if (mpz_cmp_ui(r, 0) == 0) { mpz_add_ui(p, p, 1); add = 4; }
+  if (mpz_cmp_ui(r, 1) == 0) {                      add = 4; }
+  if (mpz_cmp_ui(r, 2) == 0) { mpz_add_ui(p, p, 3); add = 2; }
+  if (mpz_cmp_ui(r, 3) == 0) { mpz_add_ui(p, p, 2); add = 2; }
+  if (mpz_cmp_ui(r, 4) == 0) { mpz_add_ui(p, p, 1); add = 2; }
+  if (mpz_cmp_ui(r, 5) == 0) {                      add = 2; }
+
+  while (mpz_cmp(p, bound) <= 0)
+  {
+    if (isPrime(p)) { mpz_clear(r); return; }
+    mpz_add_ui(p, p, add);
+    add += 2; if (add == 6) add = 2;
+  }
+  mpz_set(p, bound);
+  mpz_add_ui(p, p, 1);
+  mpz_clear(r);
+  return;
+}
+*/
+
+/* n and pBound are assumed to be bigint numbers */
+lists primeFactorisation(const number n, const number pBound)
+{
+  mpz_t nn; number2mpz(n, nn);
+  mpz_t pb; number2mpz(pBound, pb);
+  mpz_t b; number2mpz(pBound, b);
+  mpz_t p; mpz_init(p); int tt;
+  mpz_t sr; mpz_init(sr); int index = 0; int add;
+  lists primes = (lists)omAllocBin(slists_bin); primes->Init(1000);
+  int* multiplicities = new int[1000];
+
+  mpz_set_ui(p, 2);
+  if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(p, b) <= 0))
+  {
+    divTimes(nn, p, &tt);
+    if (tt > 0)
+    {
+      setListEntry(primes, index, p);
+      multiplicities[index++] = tt;
+    }
+  }
+
+  mpz_set_ui(p, 3);
+  if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(p, b) <= 0))
+  {
+    divTimes(nn, p, &tt);
+    if (tt > 0)
+    {
+      setListEntry(primes, index, p);
+      multiplicities[index++] = tt;
+    }
+  }
+
+  mpz_set_ui(p, 5); add = 2;
+  mpz_sqrt(sr, nn);
+  if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+  while (mpz_cmp(pb, p) >= 0)
+  {
+    divTimes(nn, p, &tt);
+    if (tt > 0)
+    {
+      setListEntry(primes, index, p);
+      multiplicities[index++] = tt;
+      mpz_sqrt(sr, nn);
+      if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+    }
+    mpz_add_ui(p, p, add);
+    add += 2; if (add == 6) add = 2;
+  }
+  if ((mpz_cmp_ui(nn, 1) > 0) &&
+      ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(nn, b) <= 0)))
+  {
+    setListEntry(primes, index, nn);
+    multiplicities[index++] = 1;
+    mpz_set_ui(nn, 1);
+  }
+
+  lists primesL = (lists)omAllocBin(slists_bin);
+  primesL->Init(index);
+  for (int i = 0; i < index; i++)
+  {
+    primesL->m[i].rtyp = primes->m[i].rtyp;
+    primesL->m[i].data = primes->m[i].data;
+  }
+  omFreeSize((ADDRESS)primes->m, (primes->nr + 1) * sizeof(sleftv));
+  omFreeBin((ADDRESS)primes, slists_bin);
+
+  lists multiplicitiesL = (lists)omAllocBin(slists_bin);
+  multiplicitiesL->Init(index);
+  for (int i = 0; i < index; i++)
+  {
+    multiplicitiesL->m[i].rtyp = INT_CMD;
+    multiplicitiesL->m[i].data = (void*)multiplicities[i];
+  }
+  delete[] multiplicities;
+
   lists L=(lists)omAllocBin(slists_bin);
-  L->Init(3);
-  L->m[0].rtyp = BIGINT_CMD; L->m[0].data = (void *)nn;
-  /* try to fit nn into an int: */
-  int nnAsInt = nlInt(nn, NULL);
-  if (nlIsZero(nn) || (nnAsInt != 0))
-  {
-    mpz_init_set_si(t,nnAsInt);
-  }
-  else
-  {
-    mpz_init_set(t,(mpz_ptr)nn->z);
-  }
-  int *LL=(int*)omAlloc0(1000*sizeof(int));
-  int *ex=(int*)omAlloc0(1000*sizeof(int));
-  int L_ind=0;
-  mpz_factor (t,LL,L_ind,ex);
+  L->Init(4);
+  setListEntry(L, 0, nn);
+  L->m[1].rtyp = LIST_CMD; L->m[1].data = (void*)primesL;
+  L->m[2].rtyp = LIST_CMD; L->m[2].data = (void*)multiplicitiesL;
+  int probTest = 0;
+  if (mpz_probab_prime_p(nn, 25) != 0) probTest = 1;
+  L->m[3].rtyp =  INT_CMD; L->m[3].data = (void*)probTest;
+  mpz_clear(nn); mpz_clear(pb); mpz_clear(b); mpz_clear(p); mpz_clear(sr);
 
-  nnAsInt = mpz_get_si(t);
-  if ((mpz_size1(t)==1) && (mpz_cmp_si(t,nnAsInt)==0))
-  {
-    nlDelete(&nn,NULL);
-    L->m[0].rtyp = INT_CMD;
-    L->m[0].data = (void *)nnAsInt;
-  }
-  else
-  {
-    mpz_set(nn->z,t);
-    L->m[0].rtyp = BIGINT_CMD;
-    L->m[0].data = (void *)nn;
-  }
-  mpz_clear(t);
-  int i;
-  for(i=0;i<L_ind;i++) ex[i]++;
-  L->m[1].rtyp = LIST_CMD; L->m[1].data = (void *)makeListsObject(LL,L_ind);
-  L->m[2].rtyp = LIST_CMD; L->m[2].data = (void *)makeListsObject(ex,L_ind);
   return L;
 }
-#endif
 
 #include <string.h>
 #include <unistd.h>

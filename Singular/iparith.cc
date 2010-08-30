@@ -3186,24 +3186,45 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
 #endif
 static BOOLEAN jjPFAC2(leftv res, leftv u, leftv v)
 {
-  number m = (number)u->Data();
-  int bound = (int)(long)v->Data();
-  number n;
-  if ((u->Typ() == BIGINT_CMD)
-  || ((u->Typ()==NUMBER_CMD) && rField_is_Q()))
+  number n1; number n2; number temp; int i;
+
+  if ((u->Typ() == BIGINT_CMD) ||
+     ((u->Typ() == NUMBER_CMD) && rField_is_Q()))
   {
-    n = nlCopy(m);
+    temp = (number)u->Data();
+    n1 = nlCopy(temp);
+  }
+  else if (u->Typ() == INT_CMD)
+  {
+    i = (int)(long)u->Data();
+    n1 = nlInit(i, NULL);
   }
   else
   {
-    /* then, we expect some other type of number inside m;
-       it needs to be converted to bigint; we do this via 'int' */
-    int i = n_Int(m, currRing);
-    n = nlInit(i, NULL);
+    WerrorS("wrong type: expected int, bigint, or number as 1st argument");
+    return TRUE;
   }
-  lists l = primeFactorisation(n, bound);
-  nlDelete(&n,NULL);
-  res->data=(char*)l;
+
+  if ((v->Typ() == BIGINT_CMD) ||
+     ((v->Typ() == NUMBER_CMD) && rField_is_Q()))
+  {
+    temp = (number)v->Data();
+    n2 = nlCopy(temp);
+  }
+  else if (v->Typ() == INT_CMD)
+  {
+    i = (int)(long)v->Data();
+    n2 = nlInit(i, NULL);
+  }
+  else
+  {
+    WerrorS("wrong type: expected int, bigint, or number as 2nd argument");
+    return TRUE;
+  }
+
+  lists l = primeFactorisation(n1, n2);
+  nlDelete(&n1, NULL); nlDelete(&n2, NULL);
+  res->data = (char*)l;
   return FALSE;
 }
 static BOOLEAN jjRSUM(leftv res, leftv u, leftv v)
@@ -3720,8 +3741,10 @@ struct sValCmd2 dArith2[]=
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjRES,       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{nuMPResMat,  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
-,{jjPFAC2,     PFAC_CMD,       LIST_CMD,       BIGINT_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{jjPFAC2,     PFAC_CMD,       LIST_CMD,       NUMBER_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{jjPFAC2,     PFAC_CMD,       LIST_CMD,       BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{jjPFAC2,     PFAC_CMD,       LIST_CMD,       NUMBER_CMD, BIGINT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{jjPFAC2,     PFAC_CMD,       LIST_CMD,       BIGINT_CMD, NUMBER_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{jjPFAC2,     PFAC_CMD,       LIST_CMD,       NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_PLURAL
 ,{jjPlural_num_poly, NCALGEBRA_CMD,NONE,       POLY_CMD,   POLY_CMD  , NO_PLURAL |NO_RING}
 ,{jjPlural_num_mat,  NCALGEBRA_CMD,NONE,       POLY_CMD,   MATRIX_CMD, NO_PLURAL |NO_RING}
@@ -4513,10 +4536,12 @@ static number jjLONG2N(long d)
 #endif
 static BOOLEAN jjPFAC1(leftv res, leftv v)
 {
+  /* call method jjPFAC2 with second argument = 0 (meaning that no
+     valid bound for the prime factors has been given) */
   sleftv tmp;
-  memset(&tmp,0,sizeof(tmp));
-  tmp.rtyp=INT_CMD;
-  return jjPFAC2(res,v,&tmp);
+  memset(&tmp, 0, sizeof(tmp));
+  tmp.rtyp = INT_CMD;
+  return jjPFAC2(res, v, &tmp);
 }
 static BOOLEAN jjLU_DECOMP(leftv res, leftv v)
 {
