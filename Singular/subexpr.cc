@@ -357,7 +357,6 @@ void sleftv::CleanUp(ring r)
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
-      case DATETIME:
 #ifdef HAVE_RTIMER
       case VRTIMER:
 #endif
