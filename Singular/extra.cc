@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include <signal.h>
 #include <Singular/mod2.h>
+#include <misc_ip.h>
 
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
@@ -604,6 +605,32 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         res->rtyp=INT_CMD;
         res->data=(void*)getGMPFloatDigits();
         return FALSE;
+      }
+  /*==================== mpz_t loader ======================*/
+      if(strcmp(sys_cmd, "GNUmpLoad")==0)
+      {
+        if ((h != NULL) && (h->Typ() == STRING_CMD))
+        {
+          char* filename = (char*)h->Data();
+          FILE* f = fopen(filename, "r");                         printf("check 1\n");
+          if (f == NULL)
+          {
+            Werror( "invalid file name (in paths use '/')");
+            return FALSE;
+          }                                                       printf("check 2\n");
+          mpz_t m; mpz_init(m);                                   printf("check 3\n");
+          mpz_inp_str(m, f, 10);                                  printf("check 4\n");
+          fclose(f);                                              printf("check 5\n");
+          number n = mpz2number(m);                               printf("check 6\n");
+          res->rtyp = BIGINT_CMD;
+          res->data = (void*)n;
+          return FALSE;
+        }
+        else
+        {
+          Werror( "expected valid file name as a string");
+          return FALSE;
+        }
       }
   /*==================== neworder =============================*/
   // should go below

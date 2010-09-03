@@ -24,6 +24,8 @@
 #ifndef MISC_H
 #define MISC_H
 
+#include <kernel/structs.h>
+
 // include basic SINGULAR structures
 /* So far nothing is required. */
 
