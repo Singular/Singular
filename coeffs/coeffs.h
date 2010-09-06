@@ -189,10 +189,29 @@ struct n_Procs_s
   number     minpoly;  /* for Q_a/Zp_a, rInit */
 
 #ifdef HAVE_RINGS
-  int_number    ringflaga; /* Z/(ringflag^ringflagb)=Z/nrnModul*/
-  unsigned long ringflagb;
-  unsigned long nr2mModul;  /* Z/nr2mModul */
-  int_number    nrnModul;
+  /* The following members are for representing the ring Z/n,
+     where n is not a prime. We distinguish three cases:
+     1.) n has at least two distinct prime factors. Then
+         modBase stores n, modExponent stores 1, modNumber
+         stores n, and mod2mMask is not used;
+     2.) n = p^k for some odd prime p and k > 1. Then
+         modBase stores p, modExponent stores k, modNumber
+         stores n, and mod2mMask is not used;
+     3.) n = 2^k for some k > 1; moreover, 2^k - 1 fits in
+         an unsigned long. Then modBase stores 2, modExponent
+         stores k, modNumber is not used, and mod2mMask stores
+         2^k - 1, i.e., the bit mask '111..1' of length k.
+     4.) n = 2^k for some k > 1; but 2^k - 1 does not fit in
+         an unsigned long. Then modBase stores 2, modExponent
+         stores k, modNumber stores n, and mod2mMask is not
+         used;
+     Cases 1.), 2.), and 4.) are covered by the implementation
+     in the files rmodulon.h and rmodulon.cc, whereas case 3.)
+     is implemented in the files rmodulo2m.h and rmodulo2m.cc. */
+  int_number    modBase;
+  unsigned long modExponent;
+  int_number    modNumber;
+  unsigned long mod2mMask;
 #endif
   int        ch;  /* characteristic, rInit */
 
