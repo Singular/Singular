@@ -5,7 +5,8 @@
 ****************************************/
 /* $Id$ */
 /*
-* ABSTRACT: numbers modulo 2^m
+* ABSTRACT: numbers modulo 2^m such that 2^m - 1
+*           fits in an unsigned long
 */
 #ifdef HAVE_RINGS
 #include "coeffs.h"
@@ -15,12 +16,7 @@
 #define NATNUMBER unsigned long
 #endif
 
-
 BOOLEAN nr2mInitChar    (coeffs r, void*);
-
-extern int nr2mExp;
-extern NATNUMBER nr2mModul; /* for storing 2^m - 1, i.e., the
-                               bit pattern '11..1' of length m */
 
 number  nr2mCopy        (number a, const coeffs r);
 BOOLEAN nr2mGreaterZero (number k, const coeffs r);
@@ -61,22 +57,23 @@ void    nr2mInitExp(int c, const coeffs r);
 static inline number nr2mMultM(number a, number b, const coeffs r)
 {
   return (number)
-    ((((NATNUMBER) a) * ((NATNUMBER) b)) & ((NATNUMBER) r->nr2mModul));
+    ((((NATNUMBER) a) * ((NATNUMBER) b)) & ((NATNUMBER)r->mod2mMask));
 }
 
 static inline number nr2mAddM(number a, number b, const coeffs r)
 {
   return (number)
-    ((((NATNUMBER) a) + ((NATNUMBER) b)) & ((NATNUMBER) r->nr2mModul));
+    ((((NATNUMBER) a) + ((NATNUMBER) b)) & ((NATNUMBER)r->mod2mMask));
 }
 
 static inline number nr2mSubM(number a, number b, const coeffs r)
 {
-  return (number)((NATNUMBER)a<(NATNUMBER)b ?
-                       r->nr2mModul-(NATNUMBER)b+(NATNUMBER)a + 1: (NATNUMBER)a-(NATNUMBER)b);
+  return (number)((NATNUMBER)a < (NATNUMBER)b ?
+                       r->mod2mMask - (NATNUMBER)b + (NATNUMBER)a + 1:
+                       (NATNUMBER)a - (NATNUMBER)b);
 }
 
-#define nr2mNegM(A,r) (number)(r->nr2mModul-(NATNUMBER)(A) + 1)
+#define nr2mNegM(A,r) (number)((r->mod2mMask - (NATNUMBER)(A) + 1) & r->mod2mMask)
 #define nr2mEqualM(A,B)  ((A)==(B))
 
 #endif
