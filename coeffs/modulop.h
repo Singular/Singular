@@ -168,6 +168,7 @@ static inline BOOLEAN npIsZeroM (number  a, const coeffs r)
 
 
 #ifdef NV_OPS
+#pragma GCC diagnostic ignored "-Wlong-long"
 static inline number nvMultM(number a, number b, const coeffs r)
 {
 #if SIZEOF_LONG == 4

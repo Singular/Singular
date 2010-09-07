@@ -129,6 +129,7 @@ const char* eati(const char *s, int *i)
 */
 BOOLEAN nfDBTest (number a, const char *f, const int l, const coeffs r)
 {
+  assume( r->m_nfPlus1Table != NULL );
   if (((long)a<0L) || ((long)a>(long)r->m_nfCharQ))
   {
     Print("wrong %d in %s:%d\n",(int)((long)a),f,l);
@@ -185,6 +186,7 @@ number nfMult (number a,number b, const coeffs r)
 */
 number nfInit (int i, const coeffs r)
 {
+  assume( r->m_nfPlus1Table != NULL );
   // Hmm .. this is just to prevent initialization
   // from nfInitChar to go into an infinite loop
   if (i==0) return (number)(long)r->m_nfCharQ;
@@ -860,17 +862,24 @@ void nfInitChar(coeffs r,  void * parameter)
 
   if( (p->GFDegree * check) > sixteenlog2 )
   {
-    Werror("illegal size");
-    return;
+    Werror("Sorry: illegal size: %u ^ %u", p->GFChar, p->GFDegree );
+    return; // EXCEPTION? OR RETURN AN ERROR!???
   }
 
   int c = pow (p->GFChar, p->GFDegree);
 
   nfReadTable(c, r);
-
+  
+  if( r->m_nfPlus1Table == NULL )
+  {
+    Werror("Sorry: cannot init lookup table!");
+    return;
+  }
+  
+  
   assume (r -> m_nfCharQ > 0);
 
   r->ch = r->m_nfCharP; 
+  assume( r->m_nfPlus1Table != NULL );
 
 }
-
