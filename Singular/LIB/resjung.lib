@@ -43,24 +43,23 @@ EXAMPLE: example clocus;  shows an example
   def A = basering;
   int n = nvars(A);
   list l = equidim(id);
+  int i,j;
   int k = size(l);
   ideal LastTwo = var(n-1),var(n);
   ideal lowdim = 1;   //the components of id with dimension smaller 2
   if(k>1){
-    for(int j=1;j<k;j++){
+    for(j=1;j<k;j++){
       lowdim = intersect(lowdim,l[j]);
     }
-    kill j;
   } 
-  kill k;
   //lowdim = radical(lowdim);  // affects performance
   ideal I = l[size(l)];  
   poly product=1;
   kill l;  
-  for(int i=1; i < n-1; i++){ 
+  for(i=1; i < n-1; i++){ 
   //elimination of all variables exept var(i),var(n-1),var(n)
     intvec v;
-    for(int j=1; j < n-1; j++){
+    for(j=1; j < n-1; j++){
       if(j<>i){
         v[j]=1;
       }
@@ -70,6 +69,7 @@ EXAMPLE: example clocus;  shows an example
     }
     v[size(v)+1]=0;
     v[size(v)+1]=0;
+    if(defined(ringl)) {kill ringl;}
     list ringl = ringlist(A);
     list l;
     l[1] = "a";
@@ -89,23 +89,22 @@ EXAMPLE: example clocus;  shows an example
     int index = 1;
     if(attrib(J,"isPrincipal")==0){
       setring R;
-      for(int j = 1;j<=size(J);j++){   //determines the monic polynomial in var(i) with coefficents in C2
+      for(j = 1;j<=size(J);j++){   //determines the monic polynomial in var(i) with coefficents in C2
+        if(defined(w)) {kill w;}
         intvec w = leadexp(J[j]);
         attrib(w,"isMonic",1);
-        for(int k = 1;k<=size(w);k++){
+        for(k = 1;k<=size(w);k++){
           if(w[k] <> 0 && k <> i){
             attrib(w,"isMonic",0);
             break;
           }
         }
-        kill k;
         if(attrib(w,"isMonic")==1){
           index = j;
           break;
         }
         kill w;
       }
-      kill j;
       setring A;
     }
     product = product*resultant(J[index],diff(J[index],var(i)),var(i));   //Product of the discriminants, which lies in C2
@@ -137,15 +136,17 @@ example
 static 
 proc buildFP(list embR,ideal NoetherN, map phi){
   def A = basering;
+  int i,j,k;
   list fibreP;
   int n = nvars(A);
-  for(int i=1;i<=size(embR);i++){
+  for(i=1;i<=size(embR);i++){
+    if(defined(R)) {kill R;}
     def R = embR[i];
     setring R;
     list temp = ringlist(A);
 // create data for the new ring 
 // e.g. if A=K[x_1,..,x_n] and R=K[y_1,..,y_m], K[x_1,..,x_n-2,y_1,..,y_m]
-    for(int j = 1; j<= nvars(R);j++){
+    for(j = 1; j<= nvars(R);j++){
        string st = string(var(j));
        temp[2][n-2+j] = st;
        kill st;
@@ -158,13 +159,13 @@ proc buildFP(list embR,ideal NoetherN, map phi){
     kill temp; 
     setring R2;
     ideal Temp=0;           //defines map from R to R2 which is the inclusion
-    for(int k=n-1;k<n-1+nvars(R);k++){
+    for(k=n-1;k<n-1+nvars(R);k++){
       Temp = Temp + ideal(var(k));
     }
     map f = R,Temp;
-    kill Temp,k;
+    kill Temp;
     ideal FibPMI = ideal(0);       //defines the map from A to R2
-    for(int k=1;k<=nvars(A)-m;k++){
+    for(k=1;k<=nvars(A)-m;k++){
       FibPMI=FibPMI+var(k);
     }
     FibPMI= FibPMI+ideal(f(J));
@@ -178,7 +179,7 @@ proc buildFP(list embR,ideal NoetherN, map phi){
     export(BMap);
     fibreP[i] = R2;
     setring R;
-    kill J,R,R2,k,j,m;
+    kill J,R,R2,m;
   }
   return(fibreP);
 };
@@ -218,6 +219,7 @@ EXAMPLE: example embR; shows an example
   if(defined(Lowdim)){
     for(int i = 1;i<=size(result);i++){        
 // had zero dimensional components which are now added to the end result
+      if(defined(R)) {kill R;}
       def R = result[i];
       setring R; 
       map f = R2,BO[5];
@@ -244,6 +246,7 @@ proc resolve2(list BO){
 // and returns a list of rings with BO -- specifically optimized 
 // to our situation 
   def H = basering;
+  int i,j,k;
   setring H;  attrib(BO[2],"smoothC",0);
   export(BO);
   list result;
@@ -254,7 +257,7 @@ proc resolve2(list BO){
   while(1){
     int count2 = 0;         // counts the number of smooth charts
     int p = size(result);
-    for(int j = 1;j<=p;j++){
+    for(j = 1;j<=p;j++){
       if(attrib(result[j],"isResolved")==0){
         if(defined(R)){kill R;}
         def R = result[j];
@@ -263,7 +266,7 @@ proc resolve2(list BO){
 // has possibly singular components so choose a singular point and blow up
           list primdecPC = primdecGTZ(BO[2]);
           attrib(result[j],"smoothC",1);
-          for(int i = 1;i<=size(primdecPC);i++){
+          for(i = 1;i<=size(primdecPC);i++){
             ideal Sl = groebner(slocus(primdecPC[i][2]));
             if(deg(NF(1,Sl))!=-1){
               list primdecSL = primdecGTZ(Sl);
@@ -279,7 +282,7 @@ proc resolve2(list BO){
               if(attrib(primdecSL[1],"isRational")==0){  
 // if we blew up a non rational singularity, the exeptional divisors 
 // are reduzible, so we need to separate them
-                for(int k=1;k<=size(blowup);k++){
+                for(k=1;k<=size(blowup);k++){
                   def R2=blowup[k];
                   setring R2;
                   list L;
@@ -293,29 +296,26 @@ proc resolve2(list BO){
                   blowup[k]=R2;
                   kill L,R2;
                 }
-                kill k;
               }
               kill primdecSL;
               list hlp;
-              for(int k = 1;k<j;k++){
+              for(k = 1;k<j;k++){
                 hlp[k]=result[k];
                 attrib(hlp[k],"isResolved",attrib(result[k],"isResolved"));
                 attrib(hlp[k],"smoothC",attrib(result[k],"smoothC"));
               }
-              kill k;
-              for(int k =1;k<=size(blowup);k++){
+              for(k =1;k<=size(blowup);k++){
                 hlp[size(hlp)+1]=blowup[k];
                 attrib(hlp[size(hlp)],"isResolved",0);
                 attrib(hlp[size(hlp)],"smoothC",0);
               }
-              kill k;
-              for(int k = j+1;k<=size(result);k++){
+              for(k = j+1;k<=size(result);k++){
                 hlp[size(hlp)+1]=result[k];
                 attrib(hlp[size(hlp)],"isResolved",attrib(result[k],"isResolved"));
                 attrib(hlp[size(hlp)],"smoothC",attrib(result[k],"smoothC"));
               }
               result = hlp;
-              kill hlp,k;
+              kill hlp;
               i=size(primdecPC);
             }
             else{
@@ -323,7 +323,7 @@ proc resolve2(list BO){
             }
             kill Sl;
           }
-          kill i,primdecPC;
+          kill primdecPC;
           j=p;
           break; 
         }
@@ -332,18 +332,17 @@ proc resolve2(list BO){
 // and check whether they are snc or not
           int count = 0;
           ideal Collect = BO[2];
-          for(int i = 1;i<=size(BO[4]);i++){
+          for(i = 1;i<=size(BO[4]);i++){
             Collect = Collect*BO[4][i];
           }
           list primdecSL = primdecGTZ(slocus(Collect));
-          for(int k = 1;k<=size(primdecSL);k++){
+          for(k = 1;k<=size(primdecSL);k++){
              attrib(primdecSL[k],"isRational",1);
           }
-          kill k;
           if(defined(blowup)){kill blowup;}
           list blowup = blowUpBO(BO,primdecSL[1][2],3);
           if(attrib(primdecSL[1],"isRational")==0){
-            for(int k=1;k<=size(blowup);k++){
+            for(k=1;k<=size(blowup);k++){
               def R2=blowup[k];
               setring R2;
               list L;
@@ -357,10 +356,9 @@ proc resolve2(list BO){
               blowup[k]=R2;
               kill L,R2;
             }
-            kill k;
           }
-          kill Collect,i;
-          for(int i=1;i<=size(primdecSL);i++){
+          kill Collect;
+          for(i=1;i<=size(primdecSL);i++){
             list L = BO[4];
             L[size(L)+1]=BO[2];
             for(int l = 1;l<=size(L);l++){
@@ -371,25 +369,23 @@ proc resolve2(list BO){
               if(defined(blowup)){kill blowup;}
               list blowup = blowUpBO(BO,primdecSL[i][2],3);
               list hlp;
-              for(int k = 1;k<j;k++){
+              for(k = 1;k<j;k++){
                 hlp[k]=result[k];
                 attrib(hlp[k],"isResolved",attrib(result[k],"isResolved"));
                 attrib(hlp[k],"smoothC",attrib(result[k],"smoothC"));
               }
-              kill k;
-              for(int k =1;k<=size(blowup);k++){
+              for(k =1;k<=size(blowup);k++){
                 hlp[size(hlp)+1]=blowup[k];
                 attrib(hlp[size(hlp)],"isResolved",0);
                 attrib(hlp[size(hlp)],"smoothC",1);
               }
-              kill k;
-              for(int k = j+1;k<=size(result);k++){
+              for(k = j+1;k<=size(result);k++){
                 hlp[size(hlp)+1]=result[k];
                 attrib(hlp[size(hlp)],"isResolved",attrib(result[k],"isResolved"));
                 attrib(hlp[size(hlp)],"smoothC",attrib(result[k],"smoothC"));
               }
               result = hlp;
-              kill hlp,k;
+              kill hlp;
               j = p;
               break;
             }
@@ -398,7 +394,6 @@ proc resolve2(list BO){
             }
             kill L;
           }
-          kill i;
           if(count == size(primdecSL)){
             attrib(result[j],"isResolved",1);
           }
@@ -413,7 +408,7 @@ proc resolve2(list BO){
     if(count2==size(result)){
       break;
     }
-    kill count2,j,p;
+    kill count2,p;
     safety++;
   }
   return(result);
@@ -436,6 +431,7 @@ RETURN:  a list l of rings
 EXAMPLE: none, as it is a static procedure
 "
 {
+  int i;
   if(!defined(noeth)){
     int noeth = 0;
   }
@@ -471,7 +467,7 @@ EXAMPLE: none, as it is a static procedure
       }
       else{
         ideal NoetherPos = var(pos);
-        for(int i = 1;i<=3;i++){
+        for(i = 1;i<=3;i++){
           if(i<>pos){
             NoetherPos = NoetherPos + var(i);
           }
@@ -500,8 +496,8 @@ EXAMPLE: none, as it is a static procedure
     setring A;
     list nor = normal(NoetherN);
     list result;
-    for(int i = 1;i<=size(nor);i++){
-      def R = nor[i];
+    for(i = 1;i<=size(nor[1]);i++){
+      def R = nor[1][i];
       setring R;
       ideal QIdeal = norid;
       ideal BMap = BMap;
@@ -546,13 +542,14 @@ EXAMPLE: example jungnormal; shows an example
   def A = basering;
   list fibreP = jungfib(id,noeth);
   list result;
-  for(int i =1;i<=size(fibreP);i++){
+  int i,j;
+  for(i =1;i<=size(fibreP);i++){
     def R1 = fibreP[i];
     setring R1;
     map f1 = A,BMap;
-    list nor = normal(QIdeal);
-    for(int j = 1;j<=size(nor);j++){
-      def R2 = nor[j];
+    def nor = normal(QIdeal);
+    for(j = 1;j<=size(nor[1]);j++){
+      def R2 = nor[1][j];
       setring R2;
       map f2 = R1,normap;
       ideal BMap = ideal(f2(f1));
@@ -560,9 +557,10 @@ EXAMPLE: example jungnormal; shows an example
       export(BMap);
       export(QIdeal);
       result[size(result)+1] = R2;
-      kill R2,f2;
+      setring R1;
+      kill R2;
     }
-    kill j,nor,R1;
+    kill R1;
   }
   return(result);
 }
@@ -601,8 +599,9 @@ EXAMPLE: none
 {
   def A = basering;
   list result;
+  int i,j;
   list nor = jungnormal(id,noeth);
-  for(int i = 1;i<=size(nor);i++){
+  for(i = 1;i<=size(nor);i++){
     if(defined(R)){kill R;}
     def R3 = nor[i];
     setring R3;
@@ -613,7 +612,7 @@ EXAMPLE: none
     map f = A,BMap;
     if(QIdeal <> 0){
       list res = resolve(QIdeal);
-      for(int j =1;j<=size(res[1]);j++){
+      for(j =1;j<=size(res[1]);j++){
         def R2 = res[1][j];
         setring R2;
         if(defined(QIdeal)){kill QIdeal;}
@@ -627,7 +626,7 @@ EXAMPLE: none
         result[size(result)+1] = R2;
         kill R2;
       }
-      kill j,res;
+      kill res;
     }
     else{
       result[size(result)+1] = nor[i];
@@ -653,6 +652,7 @@ static
 proc NoetherP_test(ideal id){
   def A = basering;
   list ringA=ringlist(A);
+  int i,j,k;
   int index = 0;
   if(size(id)==1 && nvars(A)){  // test if V(id) = C[x,y,z]/<f>
     list L;
@@ -661,8 +661,7 @@ proc NoetherP_test(ideal id){
     L[2] = v;
     kill v;
     poly f = id[1];
-    int j = 0;
-    for(int i = 1;i<=3;i++){
+    for(i = 1;i<=3;i++){
       setring A;
       list l = ringA;  //change ordering to lp and var(i)>var(j) j!=i
       list vari = ringA[2];
@@ -679,8 +678,7 @@ proc NoetherP_test(ideal id){
       if(defined(v)){kill v;}
       intvec v = leadexp(I[1]);
       attrib(v,"isMonic",1);
-      if(defined(k)){kill k;}
-      for(int k = 2;k<=3;k++){  
+      for(k = 2;k<=3;k++){  
 // checks whether f is monic in var(i)
         if(v[k] <> 0 || v[1] == 0){ 
           attrib(v,"isMonic",0);
@@ -688,7 +686,6 @@ proc NoetherP_test(ideal id){
           break;
         }
       }
-      kill k;
       if(attrib(v,"isMonic")==1){
         index = i;
         return(index);
@@ -790,6 +787,7 @@ proc zariski(ideal id){
   ideal QIdeal = std(id);
   ideal BMap= maxideal(1);
   export(BMap);
+  int i,j;
   export(QIdeal);
   if(dim(QIdeal)<>2){
      print("wrong dimension");
@@ -802,7 +800,7 @@ proc zariski(ideal id){
   while(1){
     if(defined(count)){kill count;}
     int count =0;
-    for(int i = 1;i<= size(result);i++){
+    for(i = 1;i<= size(result);i++){
       attrib(result[i],"isSmooth",1);
       def R = result[i];
       setring R;
@@ -822,11 +820,10 @@ proc zariski(ideal id){
       }
       kill R;
     }
-    kill i;
     if(count == size(result)){return(result);}
     count = 0;
     list hlp;
-    for(int i = 1;i<=size(result);i++){
+    for(i = 1;i<=size(result);i++){
       if(attrib(result[i],"isSmooth")==1){
         hlp[size(hlp)+1] = result[i];
         attrib(hlp[size(hlp)],"isSmooth",attrib(result[i],"isSmooth"));
@@ -839,8 +836,8 @@ proc zariski(ideal id){
       //print(N1);
       list nor = normal(QIdeal);
       //print(N2);
-      for(int j = 1;j<= size(nor);j++){
-        def R3 = nor[j];
+      for(j = 1;j<= size(nor[1]);j++){
+        def R3 = nor[1][j];
         setring R3;
         def R2 = changeord("dp");
         setring R2;
