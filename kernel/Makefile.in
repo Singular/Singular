@@ -290,7 +290,7 @@ endif
 endif
 
 
-installbin: ${DL_LIBS} ${DL_LIBSG}
+installbin: ${DL_LIBS} ${DL_LIBSG} libkernel.a libkernel_g.a
 	${MKINSTALLDIRS} ${bindir}
 	- ranlib libkernel.a
 	- ranlib libkernel_g.a
