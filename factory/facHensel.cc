@@ -923,10 +923,9 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
 
 void 
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi, 
-              CFList& diophant, CFMatrix& M, bool sort) 
+              CFList& diophant, CFMatrix& M) 
 {
-  if (sort)
-    sortList (factors, Variable (1));
+  sortList (factors, Variable (1));
   Pi= CFArray (factors.length() - 1);
   CFListIterator j= factors;
   diophant= diophantine (F[0], factors);

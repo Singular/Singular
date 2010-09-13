@@ -63,5 +63,40 @@ static inline CanonicalForm GCD_GF (const CanonicalForm& A, const CanonicalForm&
 }
 
 CanonicalForm 
-randomIrredpoly (int i, const Variable & x) ;
+randomIrredpoly (int i, const Variable & x);
+
+CanonicalForm 
+sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
+             bool& topLevel, CFList& l);
+             
+static inline CanonicalForm sparseGCDFp (const CanonicalForm& A, const CanonicalForm& B)
+{
+  CFList list;
+  bool top_level= true;
+  return sparseGCDFp (A, B, top_level, list);
+}
+
+CanonicalForm 
+sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G, const Variable& alpha, CFList& l,
+             bool& topLevel);
+             
+static inline CanonicalForm sparseGCDFq (const CanonicalForm& A, const CanonicalForm& B, const Variable& alpha)
+{
+  CFList list;
+  bool top_level= true;
+  return sparseGCDFq (A, B, alpha, list, top_level);
+}
+
+/// Extended Zassenhaus GCD over finite fields described in "Algorithms for 
+/// Computer Algebra" by Geddes, Czapor & Labahn
+CanonicalForm EZGCD_P (const CanonicalForm& F, const CanonicalForm& G);
+
+/// pseudo remainder GCD over finite fields
+CanonicalForm
+gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g);
+
+CanonicalForm
+gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G );
+
+
 #endif

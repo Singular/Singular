@@ -30,12 +30,12 @@ CFSwitches::CFSwitches ()
 #ifdef HAVE_NTL
   On(SW_USE_NTL);
   On(SW_USE_CHINREM_GCD);
+  On(SW_USE_EZGCD_P);
   //Off(SW_USE_NTL_GCD_0);
   //Off(SW_USE_NTL_GCD_P);
   //Off(SW_USE_NTL_SORT);
 #endif
   On(SW_USE_EZGCD);
-  //On(SW_USE_EZGCD_P); // still testing
   On(SW_USE_QGCD);
   //On(SW_USE_fieldGCD);
 }
