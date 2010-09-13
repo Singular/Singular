@@ -2433,6 +2433,6 @@ example par2varRing;
 */
 static proc mod_init()
 {
-  int pagelength=24;
-  exportto(Top,pagelength);
+  //int pagelength=24;
+  //exportto(Top,pagelength);
 }
