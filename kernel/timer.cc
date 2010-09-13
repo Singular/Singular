@@ -6,15 +6,10 @@
 /*
 *  ABSTRACT - get the computing time
 */
+#include <sys/resource.h>
+#include <unistd.h>
 
 #include <kernel/mod2.h>
-// undef GETRUSAGE to get the original timer code (w.r.t. CLOCK_TICKS)
-#define GETRUSAGE
-#ifdef GETRUSAGE
-       #include <sys/time.h>
-       #include <sys/resource.h>
-       #include <unistd.h>
-#endif
 
 int        timerv = 0;
 static double timer_resolution = TIMER_RESOLUTION;
@@ -32,11 +27,6 @@ void SetMinDisplayTime(double mtime)
 }
 
 #include <stdio.h>
-#include <math.h>
-#include <unistd.h>
-#include <float.h>
-#include <mylimits.h>
-#include <sys/types.h>
 
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
@@ -56,88 +46,44 @@ void SetMinDisplayTime(double mtime)
 #endif
 
 
-// need to be adjusted on your machine: the number of ticks per second: HZ
-#ifndef HZ
-#include <sys/param.h>
-#endif
-
-#if !defined(HZ) && defined(CLOCKS_PER_SEC)
-#define HZ CLOCKS_PER_SEC
-#endif
-
-#if !defined(HZ) && defined(CLK_TCK)
-#define HZ CLK_TCK
-#endif
-
-#if !defined(HZ) && defined(HAVE_SYSCONF)
-#define HZ sysconf(_SC_CLK_TCK)
-#endif
-
-#ifndef HZ
-  // last resort
-  #ifdef sun
-  #define HZ 60.0
-  #else
-  #define HZ 100.0
-  #endif
-#endif
-
 #include <kernel/timer.h>
 #include <kernel/febase.h>
+
 /*3
 * the start time of the timer
 */
-#ifdef GETRUSAGE
 static int64 siStartTime;
 static int64 startl;
-#else
-static clock_t siStartTime;
-static clock_t startl;
-#endif
 
 /*3
 * temp structure to get the time
 */
-#ifdef GETRUSAGE
 static struct rusage t_rec;
-#else
-static struct tms t_rec;
-#endif
 /*0 implementation*/
 
 int initTimer()
 {
-#ifdef GETRUSAGE
-  getrusage(RUSAGE_SELF,&t_rec); 
+  getrusage(RUSAGE_SELF,&t_rec);
   siStartTime = (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
                +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +5000)/10000; // unit is 1/100 sec
-  getrusage(RUSAGE_CHILDREN,&t_rec); 
+  getrusage(RUSAGE_CHILDREN,&t_rec);
   siStartTime += (t_rec.ru_utime.tv_sec*1000000+t_rec.ru_utime.tv_usec
                +t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +5000)/10000; // unit is 1/100 sec
-#else
-  times(&t_rec);
-  siStartTime = t_rec.tms_utime+t_rec.tms_stime;
-#endif
   return (int)time(NULL);
 }
 
 void startTimer()
 {
-#ifdef GETRUSAGE
-  getrusage(RUSAGE_SELF,&t_rec); 
+  getrusage(RUSAGE_SELF,&t_rec);
   startl = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
-  getrusage(RUSAGE_CHILDREN,&t_rec); 
+  getrusage(RUSAGE_CHILDREN,&t_rec);
   startl += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
-#else
-  times(&t_rec);
-  startl = t_rec.tms_utime+t_rec.tms_stime;
-#endif
 }
 
 /*2
@@ -145,26 +91,17 @@ void startTimer()
 */
 int getTimer()
 {
-#ifdef GETRUSAGE
   int64 curr;
-  getrusage(RUSAGE_SELF,&t_rec); 
+  getrusage(RUSAGE_SELF,&t_rec);
   curr = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
          +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
          +(int64)5000)/(int64)10000; // unit is 1/100 sec
-  getrusage(RUSAGE_CHILDREN,&t_rec); 
+  getrusage(RUSAGE_CHILDREN,&t_rec);
   curr += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
          +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
          +(int64)5000)/(int64)10000; // unit is 1/100 sec
   curr -= siStartTime;
   double f =  ((double)curr) * timer_resolution / (double)100;
-#else
-  clock_t curr;
-
-  times(&t_rec);
-  curr = t_rec.tms_utime+t_rec.tms_stime - siStartTime;
-
-  double f =  ((double)curr) * timer_resolution / (double)HZ;
-#endif
   return (int)(f+0.5);
 }
 
@@ -176,49 +113,19 @@ int getTimer()
 extern int iiOp;
 #endif
 
-char* dateTime()
-{
-#ifdef GETRUSAGE
-  time_t rawtime;
-  time(&rawtime);
-  char* s = ctime(&rawtime);     // s: with linefeed at the end
-  int l = strlen(s);
-  char* ss = (char*)omAlloc(l);
-  strncpy(ss, s, l - 1);
-  ss[l - 1] = '\0';              // ss: without linefeed at the end
-  return ss;
-#else
-  char* s = "Warning: date/time not available on your system";
-  int l = strlen(s) + 1;
-  char* ss = (char*)omAlloc(l);
-  strncpy(ss, s, l - 1);
-  ss[l - 1] = '\0';
-  return ss;
-#endif
-}
-
 void writeTime(const char* v)
 {
-
-#ifdef GETRUSAGE
   int64 curr;
-  getrusage(RUSAGE_SELF,&t_rec); 
+  getrusage(RUSAGE_SELF,&t_rec);
   curr = ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
-  getrusage(RUSAGE_CHILDREN,&t_rec); 
+  getrusage(RUSAGE_CHILDREN,&t_rec);
   curr += ((int64)t_rec.ru_utime.tv_sec*1000000+(int64)t_rec.ru_utime.tv_usec
                +(int64)t_rec.ru_stime.tv_sec*1000000+(int64)t_rec.ru_stime.tv_usec
                +(int64)5000)/(int64)10000; // unit is 1/100 sec
   curr -= startl;
   double f =  ((double)curr) * timer_resolution / (double)100;
-#else
-  clock_t curr;
-  times(&t_rec);
-  curr = t_rec.tms_utime+t_rec.tms_stime - startl;
-
-  double f =  ((double)curr) / (double)HZ;
-#endif
   if (f/timer_resolution > mintime)
   {
 #ifdef EXTEND_TIMER_D
