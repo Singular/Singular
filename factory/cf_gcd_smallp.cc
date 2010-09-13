@@ -903,9 +903,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   bool inextension= false;
   bool inextensionextension= false;
   top_level= false;
-  CanonicalForm CF_buf;
   CFList source, dest;
-  CanonicalForm gcdcheck;
   do 
   {
     if (inextension)
@@ -941,7 +939,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       dest= CFList();
       CFList list;
       CanonicalForm mipo;
-      int deg= 3;
+      int deg= 2;
       do {
         mipo= randomIrredpoly (deg, x); 
         alpha= rootOf (mipo);

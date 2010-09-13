@@ -339,9 +339,11 @@ primitiveElement (const Variable& alpha, Variable& beta, bool fail)
     if (fail)
       return 0;
   } while (1);
-  zz_pE::init (NTL_mipo);
-  zz_pEX NTL_alpha_mipo= convertFacCF2NTLzz_pEX (mipo, NTL_mipo);
-  zz_pE root= FindRoot (NTL_alpha_mipo);
+  
+  zz_pX alpha_mipo= convertFacCF2NTLzzpX (mipo);
+  zz_pE::init (alpha_mipo);
+  zz_pEX NTL_beta_mipo= to_zz_pEX (NTL_mipo);
+  zz_pE root= FindRoot (NTL_beta_mipo);
   return convertNTLzzpE2CF (root, alpha);
 }
 
