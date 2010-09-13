@@ -245,16 +245,19 @@ fglmIdealcheck( const ideal theIdeal )
     for ( k= IDELEMS( theIdeal ) - 1; (state == FglmOk) && (k >= 0); k-- )
     {
         poly p = (theIdeal->m)[k];
-        if ( pIsConstant( p ) ) state= FglmHasOne;
-        else if ( (power= pIsPurePower( p )) > 0 )
+        if (p!=NULL)
         {
+          if( pIsConstant( p ) ) state= FglmHasOne;
+          else if ( (power= pIsPurePower( p )) > 0 )
+          {
             fglmASSERT( 0 < power && power <= pVariables, "illegal power" );
             if ( purePowers[power-1] == TRUE  ) state= FglmNotReduced;
             else purePowers[power-1]= TRUE;
-        }
-        for ( int l = IDELEMS( theIdeal ) - 1; state == FglmOk && l >= 0; l-- )
+          }
+          for ( int l = IDELEMS( theIdeal ) - 1; state == FglmOk && l >= 0; l-- )
             if ( (k != l) && pDivisibleBy( p, (theIdeal->m)[l] ) )
                 state= FglmNotReduced;
+        }
     }
     if ( state == FglmOk )
     {
@@ -287,7 +290,8 @@ fglmProc( leftv result, leftv first, leftv second )
     if ( state == FglmOk )
     {
         idhdl ih = currRing->idroot->get( second->Name(), myynest );
-        if ( (ih != NULL) && (IDTYP(ih)==IDEAL_CMD) ) {
+        if ( (ih != NULL) && (IDTYP(ih)==IDEAL_CMD) )
+        {
             ideal sourceIdeal;
             if ( currQuotient != NULL )
                 sourceIdeal= fglmUpdatesource( IDIDEAL( ih ) );
@@ -433,7 +437,7 @@ findUniProc( leftv result, leftv first )
       for ( k= IDELEMS( sourceIdeal ) - 1; k >= 0; k-- )
       {
         if((i=pIsUnivariate(sourceIdeal->m[k]))>0)
-        { 
+        {
           if (purePowers[i-1]==0)
           {
             purePowers[i-1]=k;
@@ -449,7 +453,7 @@ findUniProc( leftv result, leftv first )
       }
       omFreeSize((ADDRESS)purePowers, pVariables*sizeof( BOOLEAN ) );
       if (destIdeal!=NULL)
-            state = FglmOk; 
+            state = FglmOk;
       else if ( FindUnivariateWrapper( sourceIdeal, destIdeal ) == FALSE )
             state = FglmNotReduced;
     }
