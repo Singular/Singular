@@ -401,9 +401,9 @@ This function is called at mode initialization time."
 
 (eval-when-compile
   (setq singular-font-lock-singular-types
-	'("def" "ideal" "int" "intmat" "intvec" "link" "list" "map" "matrix"
-	  "module" "number" "poly" "proc" "qring" "resolution" "ring" "string"
-	  "vector")))
+	'("def" "bigint" "ideal" "int" "intmat" "intvec" "link" "list" "map"
+	  "matrix" "module" "number" "poly" "proc" "qring" "resolution" "ring"
+	  "string" "vector")))
 
 (defconst singular-interactive-font-lock-keywords-1
   '(
