@@ -3,7 +3,6 @@ tst_init();
 //
 // test script for liftstd command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),(c,ls);
 r1;
 

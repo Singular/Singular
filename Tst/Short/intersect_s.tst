@@ -3,7 +3,6 @@ tst_init();
 //
 // test script for intersect command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),(c,ds);
 r1;
 "-------------------------------";
@@ -45,7 +44,6 @@ kill r1;
 //
 // test script for intersect command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),(c,ds);
 r1;
 "-------------------------------";

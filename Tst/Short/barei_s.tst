@@ -4,7 +4,6 @@
 LIB "tst.lib";
 tst_init();
 
-pagelength = 10000;
 ring r = 32003,(x,y,z),dp;
 r;
 matrix m1[3][3]=x,2,3,2,3x,4,1,3,2x;

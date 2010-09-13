@@ -9,5 +9,5 @@ u0^2+2*u1^2+2*u2^2+2*u3^2-u0;
     option(redSB);
     slimgb(MYIDEALNAME);
     kill MYRINGNAME;
-    tst_status(1);exit;
+    tst_status(1);$
     

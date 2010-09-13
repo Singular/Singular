@@ -3,7 +3,6 @@ tst_init();
 //
 // test script for sres command
 //
-pagelength = 10000;
 //option(prot);
 ring r1=32003,(a,b,x,y,z),ls;
 r1;

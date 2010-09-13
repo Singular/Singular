@@ -3,7 +3,6 @@ tst_init();
 //
 // test script for lift command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),(c,dp);
 r1;
 "-------------------------------";
