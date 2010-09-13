@@ -71,6 +71,18 @@
  #endif
 #endif
 
+si_link pipeLastLink=NULL;
+
+void sig_pipe_hdl(int sig)
+{
+ if (pipeLastLink!=NULL)
+ {
+   slClose(pipeLastLink);
+   pipeLastLink=NULL;
+   WerrorS("pipe failed");
+ }
+}
+
 /*---------------------------------------------------------------------*
  * File scope Variables (Variables share by several functions in
  *                       the same file )
@@ -104,10 +116,7 @@ si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler);
  @return value of signal()
 **/
 /*---------------------------------------------------------------------*/
-si_hdl_typ si_set_signal (
-  int sig,
-  si_hdl_typ signal_handler
-  )
+si_hdl_typ si_set_signal ( int sig, si_hdl_typ signal_handler)
 {
   si_hdl_typ retval=signal (sig, (si_hdl_typ)signal_handler);
   if (retval == SIG_ERR)
@@ -220,18 +229,6 @@ void sig_ign_hdl(int sig)
  waitpid(-1,NULL,WNOHANG);  
 }
 
-si_link pipeLastLink=NULL;
-
-void sig_pipe_hdl(int sig)
-{
- if (pipeLastLink!=NULL)
- {
-   slClose(pipeLastLink);
-   pipeLastLink=NULL;
-   WerrorS("pipe failed");
- }
-}
-
 /*2
 * init signal handlers, linux/i386 version
 */
@@ -306,6 +303,7 @@ void init_signals()
   si_set_signal(SIGIOT, sigsegv_handler);
   si_set_signal(SIGINT ,sigint_handler);
   si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
+  si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
 }
 #else
 
@@ -368,6 +366,7 @@ void init_signals()
   #if defined(HPUX_9) || defined(HPUX_10)
   si_set_signal(SIGCHLD, (void (*)(int))SIG_IGN);
   #endif
+  si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
 }
 #endif
 
