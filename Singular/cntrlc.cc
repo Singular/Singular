@@ -26,6 +26,7 @@
 #include <kernel/polys.h>
 #include <Singular/feOpt.h>
 #include <Singular/version.h>
+#include <Singular/silink.h>
 
 /* undef, if you don't want GDB to come up on error */
 
@@ -219,6 +220,18 @@ void sig_ign_hdl(int sig)
  waitpid(-1,NULL,WNOHANG);  
 }
 
+si_link pipeLastLink=NULL;
+
+void sig_pipe_hdl(int sig)
+{
+ if (pipeLastLink!=NULL)
+ {
+   slClose(pipeLastLink);
+   pipeLastLink=NULL;
+   WerrorS("pipe failed");
+ }
+}
+
 /*2
 * init signal handlers, linux/i386 version
 */
@@ -246,6 +259,7 @@ void init_signals()
     PrintS("cannot set signal handler for INT\n");
   }
   si_set_signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
+  si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
 }
 
 /*---------------------------------------------------------------------*/
