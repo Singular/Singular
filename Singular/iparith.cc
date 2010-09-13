@@ -443,7 +443,6 @@ cmdnames cmds[] =
 //  { "Up",          0, -1 ,                SYSVAR},
 
 /* set sys vars*/
-  { "datetime",    0, DATETIME ,          SYSVAR},
   { "degBound",    0, VMAXDEG ,           SYSVAR},
   { "echo",        0, VECHO ,             SYSVAR},
   { "minpoly",     0, VMINPOLY ,          SYSVAR},

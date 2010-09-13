@@ -307,7 +307,6 @@ void sleftv::CleanUp(ring r)
           if(r!=NULL) id_Delete((ideal *)(&data),r);
         }
         break;
-      case DATETIME:  
       case STRING_CMD:
         omFree((ADDRESS)data);
         break;
@@ -390,7 +389,6 @@ void sleftv::CleanUp(ring r)
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
-      case DATETIME:
 #ifdef HAVE_RTIMER
       case VRTIMER:
 #endif
@@ -569,8 +567,6 @@ void * sleftv::CopyD(int t)
     void *x=data;
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
     else if (rtyp==LIB_CMD)
-      x=(void *)omStrDup((char *)Data());
-    else if (rtyp==DATETIME)
       x=(void *)omStrDup((char *)Data());
     else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(!rField_is_GF()))
       x=(void *)nCopy(currRing->minpoly);
@@ -855,7 +851,6 @@ int  sleftv::Typ()
       case VSHORTOUT:
         return INT_CMD;
       case LIB_CMD:
-      case DATETIME:
         return STRING_CMD;
       case VMINPOLY:
         return NUMBER_CMD;
@@ -976,7 +971,6 @@ void * sleftv::Data()
       case VPRINTLEVEL:return (void *)printlevel;
       case VCOLMAX:    return (void *)colmax;
       case VTIMER:     return (void *)getTimer();
-      case DATETIME:   return (void *)dateTime();
 #ifdef HAVE_RTIMER
       case VRTIMER:    return (void *)getRTimer();
 #endif
