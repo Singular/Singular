@@ -23,13 +23,8 @@
 
 void number2mpz(number n, mpz_t m)
 {
-  if (nlIsZero(n)) mpz_init_set_si(m, 0);
-  else
-  {
-    int nAsInt = nlInt(n, NULL);
-    if (nAsInt != 0) mpz_init_set_si(m, nAsInt);     /* n fits in an int */
-    else             mpz_init_set(m, (mpz_ptr)n->z);
-  }
+  if (SR_HDL(n) & SR_INT) mpz_init_set_si(m, SR_TO_INT(n));     /* n fits in an int */
+  else             mpz_init_set(m, (mpz_ptr)n->z);
 }
 
 number mpz2number(mpz_t m)
@@ -57,6 +52,22 @@ void divTimes(mpz_t n, mpz_t d, int* times)
   mpz_clear(q);
 }
 
+void divTimes_ui(mpz_t n, long d, int* times)
+{
+  *times = 0;
+  mpz_t r; mpz_init(r);
+  mpz_t q; mpz_init(q);
+  mpz_fdiv_qr_ui(q, r, n, d);
+  while (mpz_cmp_ui(r, 0) == 0)
+  {
+    (*times)++;
+    mpz_set(n, q);
+    mpz_fdiv_qr_ui(q, r, n, d);
+  }
+  mpz_clear(r);
+  mpz_clear(q);
+}
+
 /* returns an object of type lists which contains the entries
    theInts[0..(length-1)] as INT_CMDs */
 lists makeListsObject(const int* theInts, int length)
@@ -70,14 +81,32 @@ lists makeListsObject(const int* theInts, int length)
 
 void setListEntry(lists L, int index, mpz_t n)
 { /* assumes n > 0 */
+  /* try to fit nn into an int: */
+  if (mpz_size1(n)<=1)
+  {
+    int ui=(int)mpz_get_si(n);
+    if ((((ui<<3)>>3)==ui)
+    && (mpz_cmp_si(n,(long)ui)==0))
+    {
+      L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)ui;
+      return;
+    }
+  }
   number nn = mpz2number(n);
   L->m[index].rtyp = BIGINT_CMD; L->m[index].data = (void*)nn;
+}
+
+void setListEntry_ui(lists L, int index, long ui)
+{ /* assumes n > 0 */
   /* try to fit nn into an int: */
-  int nnAsInt = nlInt(nn, NULL);
-  if (nnAsInt != 0)
+  if (((ui<<3)>>3)==ui)
   {
-    nlDelete(&nn, NULL);
-    L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)nnAsInt;
+    L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)ui;
+  }
+  else
+  {
+    number nn = nlInit(ui,NULL);
+    L->m[index].rtyp = BIGINT_CMD; L->m[index].data = (void*)nn;
   }
 }
 
@@ -151,29 +180,46 @@ lists primeFactorisation(const number n, const number pBound)
   lists primes = (lists)omAllocBin(slists_bin); primes->Init(1000);
   int* multiplicities = new int[1000];
 
-  mpz_set_ui(p, 2);
-  if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(p, b) <= 0))
+  divTimes_ui(nn, 2, &tt);
+  if (tt > 0)
   {
-    divTimes(nn, p, &tt);
-    if (tt > 0)
-    {
-      setListEntry(primes, index, p);
-      multiplicities[index++] = tt;
-    }
+    setListEntry_ui(primes, index, 2);
+    multiplicities[index++] = tt;
   }
 
-  mpz_set_ui(p, 3);
-  if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(p, b) <= 0))
+  divTimes_ui(nn, 3, &tt);
+  if (tt > 0)
   {
-    divTimes(nn, p, &tt);
-    if (tt > 0)
-    {
-      setListEntry(primes, index, p);
-      multiplicities[index++] = tt;
-    }
+    setListEntry_ui(primes, index, 3);
+    multiplicities[index++] = tt;
   }
 
-  mpz_set_ui(p, 5); add = 2;
+  unsigned long p_ui=5; add = 2;
+  mpz_sqrt(sr, nn);
+  if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+  int limit=mpz_get_ui(pb);
+  if ((limit==0)||(mpz_cmp_ui(pb,limit)!=0)) limit=1<<31;
+  while (p_ui <=limit)
+  {
+    divTimes_ui(nn, p_ui, &tt);
+    if (tt > 0)
+    {
+      setListEntry_ui(primes, index, p_ui);
+      multiplicities[index++] = tt;
+      //mpz_sqrt(sr, nn);
+      //if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+      if (mpz_size1(nn)<=2) 
+      {
+        mpz_sqrt(sr, nn);
+        if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+        unsigned long l=mpz_get_ui(sr);
+        if (l<limit) limit=l;
+      }
+    }
+    p_ui +=add;
+    add += 2; if (add == 6) add = 2;
+  }
+  mpz_set_ui(p, p_ui);
   mpz_sqrt(sr, nn);
   if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
   while (mpz_cmp(pb, p) >= 0)
