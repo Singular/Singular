@@ -96,7 +96,7 @@ extern FILE*  feProtFile;
 extern FILE*  feFilePending; /*temp. storage for grammar.y */
 extern char   fe_promptstr[];
 extern int    si_echo, printlevel;
-extern int    pagelength, colmax;
+extern int    colmax;
 extern int    yy_blocklineno;
 extern int    yy_noeof;
 extern char   prompt_char;
