@@ -62,7 +62,7 @@
 #endif
 
 #ifdef HAVE_GFAN
-#include <Singular/gfan.h>
+#include <kernel/gfan.h>
 #endif
 
 #ifdef HAVE_F5
