@@ -448,7 +448,6 @@ cmdnames cmds[] =
   { "minpoly",     0, VMINPOLY ,          SYSVAR},
   { "multBound",   0, VMAXMULT ,          SYSVAR},
   { "noether",     0, VNOETHER ,          SYSVAR},
-  { "pagelength",  0, VPAGELENGTH ,       SYSVAR},
   { "pagewidth",   0, VCOLMAX ,           SYSVAR},
   { "printlevel",  0, VPRINTLEVEL ,       SYSVAR},
   { "short",       0, VSHORTOUT ,         SYSVAR},

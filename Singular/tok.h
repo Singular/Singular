@@ -148,7 +148,6 @@ enum {
   WRITE_CMD,
   /* start system var section: VECHO */
   VECHO,
-  VPAGELENGTH,
   VCOLMAX,
   VTIMER,
   VRTIMER,

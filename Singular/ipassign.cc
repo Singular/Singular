@@ -708,7 +708,6 @@ struct sValAssign_sys dAssign_sys[]=
 {
 // sysvars:
  {jjECHO,       VECHO,          INT_CMD }
-,{jjPAGELENGTH, VPAGELENGTH,    INT_CMD }
 ,{jjPRINTLEVEL, VPRINTLEVEL,    INT_CMD }
 ,{jjCOLMAX,     VCOLMAX,        INT_CMD }
 ,{jjTIMER,      VTIMER,         INT_CMD }

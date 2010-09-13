@@ -352,7 +352,6 @@ void sleftv::CleanUp(ring r)
       case PACKAGE_CMD:
       case ANY_TYPE:
       case VECHO:
-      case VPAGELENGTH:
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
@@ -385,7 +384,6 @@ void sleftv::CleanUp(ring r)
       case IDHDL:
       case ANY_TYPE:
       case VECHO:
-      case VPAGELENGTH:
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
@@ -837,7 +835,6 @@ int  sleftv::Typ()
            return  ((idhdl)h->data.ustring)->typ;
          }
       case VECHO:
-      case VPAGELENGTH:
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
@@ -967,7 +964,6 @@ void * sleftv::Data()
         return  ((idhdl)h->data.ustring)->data.ustring;
       }
       case VECHO:      return (void *)si_echo;
-      case VPAGELENGTH:return (void *)pagelength;
       case VPRINTLEVEL:return (void *)printlevel;
       case VCOLMAX:    return (void *)colmax;
       case VTIMER:     return (void *)getTimer();
