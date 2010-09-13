@@ -5,6 +5,7 @@
 
 #include "canonicalform.h"
 #include "cf_eval.h"
+#include "cf_reval.h"
 
 
 class FFREvaluation : public REvaluation
@@ -16,9 +17,17 @@ class FFREvaluation : public REvaluation
     FFREvaluation( int min, int max, const FFRandom & sample ) : REvaluation( min, max, sample ), start( min, max )
     {
       for( int i=min; i<=max; i++ )
-        values[i] = start[i] = gen->generate();  //generate random point
-
-      nextpoint();
+        values[i] = start[i] = 0;   
+    }
+    FFREvaluation( int min, int max, const AlgExtRandomF & sample ) : REvaluation( min, max, sample ), start( min, max )
+    {
+      for( int i=min; i<=max; i++ )
+        values[i] = start[i] = 0;
+    }
+    FFREvaluation( int min, int max, const GFRandom & sample ) : REvaluation( min, max, sample ), start( min, max )
+    {
+      for( int i=min; i<=max; i++ )
+        values[i] = start[i] = 0;
     }
     FFREvaluation& operator= ( const FFREvaluation & e );
     void nextpoint();
