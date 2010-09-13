@@ -46,11 +46,6 @@ static BOOLEAN jjECHO(leftv res, leftv a)
   si_echo=(int)((long)(a->Data()));
   return FALSE;
 }
-static BOOLEAN jjPAGELENGTH(leftv res, leftv a)
-{
-  pagelength=(int)((long)(a->Data()));
-  return FALSE;
-}
 static BOOLEAN jjPRINTLEVEL(leftv res, leftv a)
 {
   printlevel=(int)((long)(a->Data()));

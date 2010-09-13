@@ -497,7 +497,7 @@ sleftv * iiMake_proc(idhdl pn, package pack, sleftv* sl)
   if (iiLocalRing[myynest] != currRing)
   {
     if (currRing!=NULL)
-    {  
+    {
       if (((iiRETURNEXPR[myynest+1].Typ()>BEGIN_RING)
         && (iiRETURNEXPR[myynest+1].Typ()<END_RING))
       || ((iiRETURNEXPR[myynest+1].Typ()==LIST_CMD)
@@ -787,7 +787,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
  return LoadResult;
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-static void iiCleanProcs(idhdl root)
+static void iiCleanProcs(idhdl &root)
 {
   idhdl prev=NULL;
   loop
@@ -818,30 +818,18 @@ static void iiCleanProcs(idhdl root)
 }
 static void iiRunInit(package p)
 {
-  idhdl h=p->idroot;
-  idhdl prev=NULL;
-  myynest++;
-  loop
+  idhdl h=p->idroot->get("mod_init",0);
+  if (h==NULL) return;
+  if (IDTYP(h)==PROC_CMD)
   {
-    if (h==NULL) return;
-    if (IDTYP(h)==PROC_CMD)
-    {
-      procinfo *pi=(procinfo*)IDDATA(h);
-      if ((strcmp(IDID(h),"mod_init")==0)
-      && (pi->language == LANG_SINGULAR))
-      {
-        //PrintS("mod_init found\n");
-	iiMake_proc(h,p,NULL);
-	idhdl hh=IDNEXT(h);
-        killhdl(h);
-        if (prev==NULL)
-          p->idroot=hh;
-      }
-    }
-    prev=h;
-    h=IDNEXT(h);
+    int save=yylineno;
+    myynest++;
+    procinfo *pi=(procinfo*)IDDATA(h);
+    //PrintS("mod_init found\n");
+    iiMake_proc(h,p,NULL);
+    myynest--;
+    yylineno=save;
   }
-  myynest--;
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
@@ -1045,7 +1033,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   else
   {
     SModulFunctions sModulFunctions;
-    
+
     package s=currPack;
     currPack=IDPACKAGE(pl);
     fktn = (fktn2_t)dynl_sym(IDPACKAGE(pl)->handle, "mod_init");
@@ -1065,7 +1053,7 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
 
   load_modules_end:
   return RET;
-#endif /*STATIC */  
+#endif /*STATIC */
 }
 #endif /* HAVE_DYNAMIC_LOADING */
 
