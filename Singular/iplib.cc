@@ -71,12 +71,11 @@ BOOLEAN iiGetLibStatus(char *lib)
 
   char *plib = iiConvName(lib);
   hl = basePack->idroot->get(plib,0);
+  omFree(plib);
   if((hl==NULL) ||(IDTYP(hl)!=PACKAGE_CMD))
   {
-    omFree(plib);
     return FALSE;
   }
-  omFree(plib);
   return (strcmp(lib,IDPACKAGE(hl)->libname)==0);
 }
 
@@ -291,10 +290,10 @@ char* iiGetLibProcBuffer(procinfo *pi, int part )
 */
 BOOLEAN iiPStart(idhdl pn, sleftv  * v)
 {
-  BOOLEAN err=FALSE;
-  int old_echo=si_echo;
-  char save_flags=0;
   procinfov pi=NULL;
+  int old_echo=si_echo;
+  BOOLEAN err=FALSE;
+  char save_flags=0;
 
   /* init febase ======================================== */
   /* we do not enter this case if filename != NULL !! */
@@ -746,17 +745,17 @@ BOOLEAN iiLocateLib(const char* lib, char* where)
 
 BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN force )
 {
-  char buf[256];
   char libnamebuf[128];
+  procinfov pi;
   idhdl h;
-  BOOLEAN LoadResult = TRUE;
   idhdl pl;
   idhdl hl;
-  int lines = 1;
   long pos = 0L;
-  procinfov pi;
   char *plib = iiConvName(newlib);
   FILE * fp = feFopen( newlib, "r", libnamebuf, tellerror );
+  int lines = 1;
+  BOOLEAN LoadResult = TRUE;
+
   if (fp==NULL)
   {
     return TRUE;
@@ -788,7 +787,7 @@ BOOLEAN iiLibCmd( char *newlib, BOOLEAN autoexport, BOOLEAN tellerror, BOOLEAN f
  return LoadResult;
 }
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-static void iiCleanProcs(idhdl &root)
+static void iiCleanProcs(idhdl root)
 {
   idhdl prev=NULL;
   loop
@@ -817,11 +816,37 @@ static void iiCleanProcs(idhdl &root)
     root=IDNEXT(root);
   }
 }
+static void iiRunInit(package p)
+{
+  idhdl h=p->idroot;
+  idhdl prev=NULL;
+  myynest++;
+  loop
+  {
+    if (h==NULL) return;
+    if (IDTYP(h)==PROC_CMD)
+    {
+      procinfo *pi=(procinfo*)IDDATA(h);
+      if ((strcmp(IDID(h),"mod_init")==0)
+      && (pi->language == LANG_SINGULAR))
+      {
+        //PrintS("mod_init found\n");
+	iiMake_proc(h,p,NULL);
+	idhdl hh=IDNEXT(h);
+        killhdl(h);
+        if (prev==NULL)
+          p->idroot=hh;
+      }
+    }
+    prev=h;
+    h=IDNEXT(h);
+  }
+  myynest--;
+}
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
              idhdl pl, BOOLEAN autoexport, BOOLEAN tellerror)
 {
-  char buf[256];
   extern FILE *yylpin;
   libstackv ls_start = library_stack;
   lib_style_types lib_style;
@@ -865,6 +890,7 @@ BOOLEAN iiLoadLIB(FILE *fp, char *libnamebuf, char*newlib,
   reinit_yylp();
   fclose( yylpin );
   fp = NULL;
+  iiRunInit(IDPACKAGE(pl));
 
   {
     libstackv ls;
