@@ -37,7 +37,7 @@ MAIN PROCEDURES:
 
 
 KEYWORDS:  Cyclic code; Linear code; Decoding;
-           Minimum distance; Groebner bases
+           Minimum distance; Groebner bases, decodeGB
 ";
 
 LIB "linalg.lib";
