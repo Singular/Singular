@@ -17,7 +17,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <ctype.h>   /*for isdigit*/
-#include <unistd.h>
 #include <netdb.h>
 
 
@@ -89,7 +88,10 @@ void ssiWriteBigInt(const ssiInfo *d, const number n)
   }
   else if (n->s==3)
   {
-    gmp_fprintf(d->f_write,"3 %Zd ",n->z);
+    fprintf(d->f_write,"3 ");
+    mpz_out_str(d->f_write,10,n->z);
+    fprintf(d->f_write," ");
+    //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
     //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"bigint: gmp \"%Zd\" ",n->z);
   }
   else Werror("illiegal bigint");
@@ -250,7 +252,7 @@ number ssiReadBigInt(ssiInfo *d)
    case 3:
      {// read int or mpz_t or mpz_t, mpz_t
        number n=nlRInit(0);
-       gmp_fscanf(d->f_read,"%Zd",n->z);
+       mpz_inp_str(n->z,d->f_read,0);
        n->s=sub_type;
        return n;
      }
