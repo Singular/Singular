@@ -1,4 +1,3 @@
-pagelength = 30000;
 ring r= 32003,(x,y,z),lp;
 
 proc printid

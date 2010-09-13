@@ -1,7 +1,6 @@
 //
 // test script for reduce command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),(c,ds);
 r1;
 "-------------------------------";

@@ -1,7 +1,6 @@
 //
 // test script for diff command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),(c,dp);
 r1;
 poly s1=3x2y4-5xyz3;

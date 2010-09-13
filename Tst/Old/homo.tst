@@ -1,7 +1,6 @@
 //
 // test script for homog command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),(c,ds);
 r1;
 "-------------------------------";

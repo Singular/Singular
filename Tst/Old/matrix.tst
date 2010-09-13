@@ -1,4 +1,3 @@
-pagelength = -1;
 LIB "lib";
 ring r;
 poly p1 = 1x2yz;

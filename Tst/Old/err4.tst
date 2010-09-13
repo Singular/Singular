@@ -47,7 +47,6 @@ mult(i);
 //
 // test script for var command
 //
-pagelength = 10000;
 ring r4=0,(x(1..10),y(1..9),z(1..8)),dp;
 r4;
 varstr(r4,28);

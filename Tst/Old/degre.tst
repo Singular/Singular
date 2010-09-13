@@ -1,7 +1,6 @@
 //
 // test script for degree command
 //
-pagelength = 10000;
 ring r1=32003,(x,y,z),ds;
 "------------------------------";
 poly s1=x11+y12+z13+x8y6+x4y6z8;

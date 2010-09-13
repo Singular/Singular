@@ -1,7 +1,6 @@
 //
 // test script for ord command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),wp(2,3,2);
 r1;
 poly s1=x2+y2+z2;

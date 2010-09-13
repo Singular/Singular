@@ -1,7 +1,6 @@
 //
 // test script for map command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),dp;
 r1;
 ideal i=x,y,z;

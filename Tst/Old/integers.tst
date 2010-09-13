@@ -49,7 +49,6 @@ i = size(p); "size p 3",i;
 i = size("aaaaaaaaaaaaaaaaaaa"); "size ...19", i;
 i = size(st); "size st 11", i;
 i = echo; "echo",i;
-i = pagelength; "pagelength",i;
 i = pagewidth; "pagewidth", i;
 i = timer; "timer";
 i = TRACE;"TRACE", i;

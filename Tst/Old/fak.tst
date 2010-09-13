@@ -1,4 +1,3 @@
-pagelength = 1000;
 proc sum
 {
   if (#[1] <= 1) { return(#[1]); }

@@ -1,7 +1,6 @@
 //
 // test script for mres command
 //
-pagelength = 10000;
 option(prot);
 ring r1=32003,(x,y,z),dp;
 r1;

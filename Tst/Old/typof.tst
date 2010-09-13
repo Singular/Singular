@@ -1,7 +1,6 @@
 //
 // test script for typeof command
 //
-pagelength = 10000;
 ring r1 = 0,(x,y,z),dp;
 r1;
 "--------------------------------";

@@ -1,7 +1,6 @@
 //
 // test script for string command
 //
-pagelength = 10000;
 ring r1 = 0,(x,y,z),ds;
 r1;
 "------------------------------";

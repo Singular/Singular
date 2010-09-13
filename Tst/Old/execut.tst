@@ -1,7 +1,6 @@
 //
 // test script for execute command
 //
-pagelength = 10000;
 ring r1=32003,(x,y,z),dp;
 r1;
 "-------------------------------";

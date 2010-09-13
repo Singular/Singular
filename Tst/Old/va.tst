@@ -1,7 +1,6 @@
 //
 // test script for var command
 //
-pagelength = 10000;
 ring r1 = 0,(x,y,z),dp;
 r1;
 varstr(r1,3);

@@ -1,4 +1,3 @@
-pagelength = 1000;
 pagewidth=80;
 ring r= 32003,(x,y,z),lp;
 ideal i = x,y,z,x2z,yxz;

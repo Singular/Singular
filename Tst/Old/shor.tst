@@ -1,7 +1,6 @@
 //
 // test script for short command
 //
-pagelength = 10000;
 ring r = 13,x,dp;
 r;
 "---------------------------";

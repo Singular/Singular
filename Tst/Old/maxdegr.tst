@@ -1,7 +1,6 @@
 //
 // test script for maxdeg command
 //
-pagelength = 10000;
 ring r = 0,(x,y,z),dp;
 r;
 "---------------------------";

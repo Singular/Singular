@@ -1,4 +1,3 @@
-pagelength = -1;
 ring r = 0,L,lp;
 poly q;
 for (int i = 2; i<1000; i=i+50)

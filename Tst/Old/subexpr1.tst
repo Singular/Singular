@@ -2,7 +2,6 @@
 // examples for subexpr notation in matrices and ideals
 //
 LIB "lib";
-pagelength = 1000;
 ring r = 33,(x,y,z),lp;
 matrix mm[5][5] = x1,x2,x3,x4,x5;
      mm[1,1..5];

@@ -1,7 +1,6 @@
 //
 // test script for timer command
 //
-pagelength = 10000;
 ring r = 13,(x,y),dp;
 r;
 "--------------------------";

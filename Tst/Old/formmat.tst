@@ -1,4 +1,3 @@
-pagelength = 1000;
 proc mrows
 {
   string @rc;

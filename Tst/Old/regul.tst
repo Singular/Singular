@@ -1,7 +1,6 @@
 //
 // test script for regularity command
 //
-pagelength = 10000;
 ring r1 = 31991,(t,x,y,z,w),(c,ls);
 r1;
 "-------------------------------";

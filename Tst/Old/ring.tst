@@ -1,7 +1,6 @@
 //
 // test script for ring command
 //
-pagelength = 10000;
 
 ring r = 32003,(x,y,z),lp;
 r;

@@ -1,7 +1,6 @@
 //
 // test script for preimage command
 //
-pagelength = 10000;
 ring r1 = 32003,(x,y,z),dp;
 r1;
 ideal i1=x,y,z;
