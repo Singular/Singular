@@ -40,10 +40,10 @@
 
   //template class vector<poly>;
   #ifndef NOSTREAMIO
-  template ostream & operator<<(ostream &, const List<Factor<CanonicalForm> > &);
-  template ostream & operator<<(ostream &, const List<List<CanonicalForm> > &);
-  template ostream & operator<<(ostream &, const List<Variable> &);
-  template ostream & operator<<(ostream &, const Matrix<Variable> &);
+  template OSTREAM & operator<<(OSTREAM &, const List<Factor<CanonicalForm> > &);
+  template OSTREAM & operator<<(OSTREAM &, const List<List<CanonicalForm> > &);
+  template OSTREAM & operator<<(OSTREAM &, const List<Variable> &);
+  template OSTREAM & operator<<(OSTREAM &, const Matrix<Variable> &);
   #endif
 
   template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
@@ -81,8 +81,8 @@ public:
     T factor() const { return _factor; }
     T exp() const { return _exp; }
 #ifndef NOSTREAMIO
-    //friend ostream & operator <<<>(ostream &, Substitution<T> &);
-    void print ( ostream& s ) const
+    //friend OSTREAM & operator <<<>(OSTREAM &, Substitution<T> &);
+    void print ( OSTREAM& s ) const
     {
       s << "("  << factor() << ")^" << exp();
     }
@@ -112,15 +112,15 @@ Substitution<T>& Substitution<T>::operator= ( const T & f )
 
 #ifndef NOSTREAMIO
 template <class T>
-ostream & operator <<(ostream & os, Substitution<T> &a)
+OSTREAM & operator <<(OSTREAM & os, Substitution<T> &a)
 {
   a.print(os);
   return os;
 }
-template ostream & operator <<(ostream &, Substitution<CanonicalForm> &);
-template ostream & operator <<(ostream &, const List<CanonicalForm> &);
-template ostream & operator <<(ostream &, const Array<CanonicalForm> &);
-template ostream & operator<<(ostream &, const List<Substitution<CanonicalForm> > &);
+template OSTREAM & operator <<(OSTREAM &, Substitution<CanonicalForm> &);
+template OSTREAM & operator <<(OSTREAM &, const List<CanonicalForm> &);
+template OSTREAM & operator <<(OSTREAM &, const Array<CanonicalForm> &);
+template OSTREAM & operator<<(OSTREAM &, const List<Substitution<CanonicalForm> > &);
 #endif
 
 template <class T>
@@ -184,8 +184,8 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
 template    class   KMatrix<Rational>;
 
 #ifdef   KMATRIX_PRINT
-template    ostream &   operator << ( ostream&,const KMatrix<Rational>& );
-template    static  void    print_rational( ostream&,int,const Rational& );
+template    OSTREAM &   operator << ( OSTREAM&,const KMatrix<Rational>& );
+template    static  void    print_rational( OSTREAM&,int,const Rational& );
 #endif
 
 #endif /* HAVE_SPECTRUM */

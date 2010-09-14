@@ -39,11 +39,11 @@ public:
     BOOLEAN isBasisOrEdge() const { return ( (divisors[0] == numVars) ? TRUE : FALSE ); }
     void newDivisor( int var ) { divisors[ ++divisors[0] ]= var; }
 #ifndef NOSTREAMIO
-friend ostream & operator <<(ostream &, fglmSelem);
+friend OSTREAM & operator <<(OSTREAM &, fglmSelem);
 #endif
 };
 #ifndef NOSTREAMIO
-inline ostream & operator <<(ostream & os, fglmSelem) { return os;};
+inline OSTREAM & operator <<(OSTREAM & os, fglmSelem) { return os;};
 #endif
 
 class fglmDelem
@@ -59,11 +59,11 @@ public:
     BOOLEAN isBasisOrEdge() const { return ( (insertions == 0) ? TRUE : FALSE ); }
     void newDivisor() { insertions--; }
 #ifndef NOSTREAMIO
-friend ostream & operator <<(ostream &, fglmDelem);
+friend OSTREAM & operator <<(OSTREAM &, fglmDelem);
 #endif
 };
 #ifndef NOSTREAMIO
-inline ostream & operator <<(ostream & os, fglmDelem) { return os;};
+inline OSTREAM & operator <<(OSTREAM & os, fglmDelem) { return os;};
 #endif
 
 // fglmzero(...):

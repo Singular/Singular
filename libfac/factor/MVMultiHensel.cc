@@ -28,7 +28,7 @@
 #ifdef SINGULAR
 #define HAVE_SINGULAR_ERROR
 #ifndef NOSTREAMIO
-void out_cf(char *s1,const CanonicalForm &f,char *s2);
+void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 #endif
 #endif
 

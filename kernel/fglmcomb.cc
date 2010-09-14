@@ -28,7 +28,11 @@
 #include <templates/ftmpl_list.h>
 
 #ifndef NOSTREAMIO
+#ifdef HAVE_IOSTREAM
+#include <iostream>
+#else
 #include <iostream.h>
+#endif
 #endif
 
 static void
