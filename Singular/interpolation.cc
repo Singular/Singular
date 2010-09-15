@@ -14,7 +14,7 @@
 #include <Singular/ipid.h>
 #include <kernel/ring.h>
 #ifdef HAVE_FACTORY
-//#include <factory.h>
+#include <factory.h>
 #endif
 
 //memory management
