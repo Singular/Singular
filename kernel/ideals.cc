@@ -4007,6 +4007,7 @@ void idNormalize(ideal I)
 
 #include <kernel/clapsing.h>
 
+#ifdef HAVE_FACTORY
 poly id_GCD(poly f, poly g, const ring r)
 {
   ring save_r=currRing;
@@ -4022,6 +4023,7 @@ poly id_GCD(poly f, poly g, const ring r)
   rChangeCurrRing(save_r);
   return gcd_p;
 }
+#endif
 
 /*2
 * xx,q: arrays of length 0..rl-1
@@ -4030,6 +4032,7 @@ poly id_GCD(poly f, poly g, const ring r)
 * assume: q[i]!=0
 * destroys xx
 */
+#ifdef HAVE_FACTORY
 ideal idChineseRemainder(ideal *xx, number *q, int rl)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
@@ -4086,6 +4089,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
   omFree(xx);
   return result;
 }
+#endif
 /* currently unsed:
 ideal idChineseRemainder(ideal *xx, intvec *iv)
 {

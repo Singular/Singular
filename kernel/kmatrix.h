@@ -7,6 +7,7 @@
 
 #ifndef KMATRIX_H
 #define KMATRIX_H
+#include <stdlib.h>
 
 // ----------------------------------------------------------------------------
 //  template class for matrices with coefficients in the field  K
