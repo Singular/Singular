@@ -202,11 +202,6 @@
 /* procedures to compute with units */
 #define HAVE_UNITS
 
-/* Define to use old mechanismen for saving currRing with procedures
- */
-#undef USE_IILOCALRING
-
-
 /* Define to use scanner when loading libraries */
 #define HAVE_LIBPARSER
 
