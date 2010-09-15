@@ -168,6 +168,12 @@ static inline BOOLEAN rField_has_Units(ring r=currRing)
 { return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
 #else
 #define rField_is_Ring(A) (0)
+#define rField_is_Ring_2toM(A) (0)
+#define rField_is_Ring_ModN(A) (0)
+#define rField_is_Ring_PtoM(A) (0)
+#define rField_is_Ring_Z(A) (0)
+#define rField_is_Domain(A) (1)
+#define rField_has_Units(A) (1)
 #endif
 
 #ifdef HAVE_RINGS

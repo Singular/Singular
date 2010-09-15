@@ -769,6 +769,7 @@ int binaryPower (const int a, const int b)
 
 int rChar(ring r)
 {
+#ifdef HAVE_RINGS
   if (rField_is_Ring_2toM(r))
     return binaryPower(2, (int)(unsigned long)r->ringflagb);
   if (rField_is_Ring_ModN(r))
@@ -776,6 +777,7 @@ int rChar(ring r)
   if (rField_is_Ring_PtoM(r))
     return binaryPower((int)mpz_get_ui(r->ringflaga),
                        (int)(unsigned long)r->ringflagb);
+#endif
   if (rField_is_numeric(r))
     return 0;
   if (!rIsExtension(r)) /* Q, Fp */
