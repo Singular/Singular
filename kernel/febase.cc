@@ -43,7 +43,6 @@ static char * feBuffer=(char *)omAlloc(INITIAL_PRINT_BUFFER);
 
 int     si_echo = 0;
 int     printlevel = 0;
-int     pagelength = 24;
 int     colmax = 80;
 char    prompt_char = '>'; /*1 either '>' or '.'*/
 extern "C" {
