@@ -13,7 +13,9 @@
 #include <kernel/longrat.h>
 #include <Singular/ipid.h>
 #include <kernel/ring.h>
-#include <factory.h>
+#ifdef HAVE_FACTORY
+//#include <factory.h>
+#endif
 
 //memory management
 #define mdmALLOC(x) omAlloc0(x)
@@ -1037,9 +1039,12 @@ void PresentGenerator (int i)  // only for debuging, writes a generator in its f
 
 modp_number TakePrime (modp_number p)  // takes "previous" (smaller) prime
 {
-    modp_number d;
+#ifdef HAVE_FACTORY
     myp_index--;
     return cf_getSmallPrime(myp_index);
+#else
+    return IsPrime(p-1);
+#endif
 }
 
 void PrepareChinese (int n) // initialization for CRA
@@ -1620,7 +1625,9 @@ ideal interpolation(lists L, intvec *v)
   int modp_cycles=10;
   bool correct_gen=false;
   if (only_modp) modp_cycles=1;
+  #ifdef HAVE_FACTORY
   myp_index=cf_getNumSmallPrimes ();
+  #endif
 
   while ((!correct_gen)&&(myp_index>1))
   {

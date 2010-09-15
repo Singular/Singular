@@ -2673,6 +2673,7 @@ BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
 }
 #endif
 
+#ifdef HAVE_FACTORY
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
 {
   res->data=singclap_resultant((poly)u->Data(),(poly)v->Data(), (poly)w->Data());
@@ -2683,6 +2684,7 @@ BOOLEAN jjCHARSERIES(leftv res, leftv u)
   res->data=singclap_irrCharSeries((ideal)u->Data());
   return (res->data==NULL);
 }
+#endif
 
 // from semic.cc
 #ifdef HAVE_SPECTRUM

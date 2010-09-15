@@ -1753,6 +1753,7 @@ static BOOLEAN jjCALL2MANY(leftv res, leftv u, leftv v)
   // iiExprArithM did the CleanUp
   return r;
 }
+#ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
 {
   if (rField_is_Q())
@@ -1780,6 +1781,7 @@ static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
   }
   else return TRUE;
 }
+#endif
 #if 0
 static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 {
@@ -1843,6 +1845,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
   return FALSE;
 }
 #endif
+#ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
   if (rField_is_Q())
@@ -1921,6 +1924,7 @@ static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
   }
   else return TRUE;
 }
+#endif
 static BOOLEAN jjCOEF(leftv res, leftv u, leftv v)
 {
   poly p=(poly)v->Data();
@@ -3624,10 +3628,14 @@ struct sValCmd2 dArith2[]=
 #ifdef HAVE_PLURAL
 ,{jjBRACKET,   BRACKET_CMD,    POLY_CMD,       POLY_CMD,   POLY_CMD, ALLOW_PLURAL | NO_RING}
 #endif
+#ifdef HAVE_FACTORY
 ,{jjCHINREM_BI,CHINREM_CMD,    BIGINT_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{jjCHINREM_P, CHINREM_CMD,    POLY_CMD,       LIST_CMD,   INTVEC_CMD, ALLOW_PLURAL}
 ,{jjCHINREM_ID,CHINREM_CMD,    ANY_TYPE/*set by p*/,LIST_CMD,INTVEC_CMD, ALLOW_PLURAL |NO_RING}
 ,{jjCHINREM_ID,CHINREM_CMD,    ANY_TYPE/*set by p*/,LIST_CMD,LIST_CMD, ALLOW_PLURAL |NO_RING}
+#else
+,{jjWRONG2,    CHINREM_CMD,    BIGINT_CMD,     INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
+#endif
 ,{jjCOEF,      COEF_CMD,       MATRIX_CMD,     POLY_CMD,   POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     IDEAL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjCOEFFS_Id, COEFFS_CMD,     MATRIX_CMD,     MODUL_CMD,  POLY_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -5620,7 +5628,11 @@ struct sValCmd1 dArith1[]=
 ,{jjSLIM_GB,    SLIM_GB_CMD,     MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL }
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{jjSort_Id,    SORTVEC_CMD,     INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+#ifdef HAVE_FACTORY
 ,{jjSQR_FREE,   SQR_FREE_CMD,    IDEAL_CMD,      POLY_CMD      , NO_PLURAL |ALLOW_RING}
+#else
+,{jjWRONG,      SQR_FREE_CMD,    IDEAL_CMD,      POLY_CMD      , NO_PLURAL |ALLOW_RING}
+#endif
 ,{jjSTD,        STD_CMD,         IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{jjSTD,        STD_CMD,         MODUL_CMD,      MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{jjDUMMY,      STRING_CMD,      STRING_CMD,     STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}

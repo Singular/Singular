@@ -3290,6 +3290,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       else
   #endif
   /*==================== gcd-varianten =================*/
+  #ifdef HAVE_FACTORY
       if (strcmp(sys_cmd, "gcd") == 0)
       {
         if (h==NULL)
@@ -3326,6 +3327,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         else return TRUE;
       }
       else
+  #endif
   /*==================== subring =================*/
       if (strcmp(sys_cmd, "subring") == 0)
       {
@@ -3340,6 +3342,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
       else
   /*==================== HNF =================*/
+  #ifdef HAVE_FACTORY
       if (strcmp(sys_cmd, "HNF") == 0)
       {
         if (h!=NULL)
@@ -3360,6 +3363,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         else return TRUE;
       }
       else
+  #endif
   #ifdef ix86_Win
   /*==================== Python Singular =================*/
       if (strcmp(sys_cmd, "python") == 0)
