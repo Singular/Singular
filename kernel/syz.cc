@@ -24,9 +24,7 @@
 #include <kernel/syz.h>
 #include <kernel/prCopy.h>
 
-#ifdef HAVE_PLURAL
 #include <kernel/sca.h>
-#endif // HAVE_PLURAL
 
 void syDeleteRes(resolvente * res,int length)
 {
