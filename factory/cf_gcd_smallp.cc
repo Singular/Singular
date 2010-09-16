@@ -4176,7 +4176,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   int degF, degG, delta, count;
   int maxeval;
   // bound on the number of eval. to use
-  maxeval = (int) ceil (getCharacteristic()/log (getCharacteristic()))*2; 
+  maxeval = (getCharacteristic()/ilog (getCharacteristic()))*2; 
   count = 0; // number of eval. used
   FFREvaluation b, bt;
   bool gcdfound = false;
