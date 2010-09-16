@@ -28,6 +28,7 @@
 #include "NTLconvert.h"
 bool isPurePoly(const CanonicalForm & );
 static CanonicalForm gcd_univar_ntl0( const CanonicalForm &, const CanonicalForm & );
+static CanonicalForm gcd_univar_ntlp( const CanonicalForm &, const CanonicalForm & );
 #endif
 
 static CanonicalForm cf_content ( const CanonicalForm &, const CanonicalForm & );
@@ -365,6 +366,85 @@ static CanonicalForm gcd_poly_univar0( const CanonicalForm & F, const CanonicalF
 }
 
 static CanonicalForm
+gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
+{
+    CanonicalForm pi, pi1;
+    CanonicalForm C, Ci, Ci1, Hi, bi, pi2;
+    bool bpure;
+    int delta = degree( f ) - degree( g );
+
+    if ( delta >= 0 )
+    {
+        pi = f; pi1 = g;
+    }
+    else
+    {
+        pi = g; pi1 = f; delta = -delta;
+    }
+    Ci = content( pi ); Ci1 = content( pi1 );
+    pi1 = pi1 / Ci1; pi = pi / Ci;
+    C = gcd( Ci, Ci1 );
+    if ( !( pi.isUnivariate() && pi1.isUnivariate() ) )
+    {
+        //out_cf("F:",f,"\n");
+        //out_cf("G:",g,"\n");
+        //out_cf("newGCD:",newGCD(f,g),"\n");
+        if (isOn(SW_USE_GCD_P) && (getCharacteristic()>0))
+        {
+          return newGCD(f,g);
+        }
+        if ( gcd_test_one( pi1, pi, true ) )
+        {
+          C=abs(C);
+          //out_cf("GCD:",C,"\n");
+          return C;
+        }
+        bpure = false;
+    }
+    else
+    {
+        bpure = isPurePoly(pi) && isPurePoly(pi1);
+#ifdef HAVE_NTL
+        if ( isOn(SW_USE_NTL_GCD_P) && bpure && (CFFactory::gettype() != GaloisFieldDomain))
+            return gcd_univar_ntlp(pi, pi1 ) * C;
+#endif
+    }
+    Variable v = f.mvar();
+    Hi = power( LC( pi1, v ), delta );
+    if ( (delta+1) % 2 )
+        bi = 1;
+    else
+        bi = -1;
+    while ( degree( pi1, v ) > 0 )
+    {
+        pi2 = psr( pi, pi1, v );
+        pi2 = pi2 / bi;
+        pi = pi1; pi1 = pi2;
+        if ( degree( pi1, v ) > 0 )
+        {
+            delta = degree( pi, v ) - degree( pi1, v );
+            if ( (delta+1) % 2 )
+                bi = LC( pi, v ) * power( Hi, delta );
+            else
+                bi = -LC( pi, v ) * power( Hi, delta );
+            Hi = power( LC( pi1, v ), delta ) / power( Hi, delta-1 );
+        }
+    }
+    if ( degree( pi1, v ) == 0 )
+    {
+      C=abs(C);
+      //out_cf("GCD:",C,"\n");
+      return C;
+    }
+    pi /= content( pi );
+    if ( bpure )
+        pi /= pi.lc();
+    C=abs(C*pi);
+    //out_cf("GCD:",C,"\n");
+    return C;
+}
+
+static CanonicalForm
 gcd_poly_0( const CanonicalForm & f, const CanonicalForm & g )
 {
     CanonicalForm pi, pi1;
@@ -485,7 +565,21 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     }
     else if (isOn( SW_USE_EZGCD_P ) && (!fc_and_gc_Univariate))
     {
-      fc= EZGCD_P (fc, gc);
+      if ( pe == 1 )
+        fc = fin_ezgcd( fc, gc );
+      else if ( pe > 0 )// no variable at position 1
+      {
+        fc = replacevar( fc, Variable(pe), Variable(1) );
+        gc = replacevar( gc, Variable(pe), Variable(1) );
+        fc = replacevar( fin_ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }
+      else
+      {
+        pe = -pe;
+        fc = swapvar( fc, Variable(pe), Variable(1) );
+        gc = swapvar( gc, Variable(pe), Variable(1) );
+        fc = swapvar( fin_ezgcd( fc, gc ), Variable(1), Variable(pe) );
+      }
     }
     else if (isOn(SW_USE_GCD_P))
     {
@@ -829,6 +923,39 @@ gcd_univar_ntl0( const CanonicalForm & F, const CanonicalForm & G )
     ZZX G1=convertFacCF2NTLZZX(G);
     ZZX R=GCD(F1,G1);
     return convertNTLZZX2CF(R,F.mvar());
+}
+
+static CanonicalForm
+gcd_univar_ntlp( const CanonicalForm & F, const CanonicalForm & G )
+{
+  if (fac_NTL_char!=getCharacteristic())
+  {
+    fac_NTL_char=getCharacteristic();
+    #ifdef NTL_ZZ
+    ZZ r;
+    r=getCharacteristic();
+    ZZ_pContext ccc(r);
+    #else
+    zz_pContext ccc(getCharacteristic());
+    #endif
+    ccc.restore();
+    #ifdef NTL_ZZ
+    ZZ_p::init(r);
+    #else
+    zz_p::init(getCharacteristic());
+    #endif
+  }
+  #ifdef NTL_ZZ
+  ZZ_pX F1=convertFacCF2NTLZZpX(F);
+  ZZ_pX G1=convertFacCF2NTLZZpX(G);
+  ZZ_pX R=GCD(F1,G1);
+  return  convertNTLZZpX2CF(R,F.mvar());
+  #else
+  zz_pX F1=convertFacCF2NTLzzpX(F);
+  zz_pX G1=convertFacCF2NTLzzpX(G);
+  zz_pX R=GCD(F1,G1);
+  return  convertNTLzzpX2CF(R,F.mvar());
+  #endif
 }
 
 #endif
