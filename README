@@ -114,17 +114,18 @@ follow these steps.
 
        3.   NTL (optional, but strongly recommended)
 
-       4.   factory (optional, but strongly recommended)
+       4.   factory and libfac 
+            (optional, but strongly recommended:
+	    some functionality will be lost if they are missing)
 
-       5.   libfac (optional, but strongly recommended)
+       5.   kernel, Singular (Kernel, required)
 
-       6.   kernel, Singular (Kernel, required)
+       6.   only for share-dist: doc
+            (only possible, if all optional packages are included)
 
-       7.   only for share-dist: doc (only possible, if all optional packages are included)
+       7.   only for share-dist: emacs (only possible, if doc was build)
 
-       8.   only for share-dist: emacs (only possible, if doc was build)
-
-       9.   IntegerProgramming
+       8.   IntegerProgramming
 
   9. if you want to make any change in the directory Singular, run make
      depend there
