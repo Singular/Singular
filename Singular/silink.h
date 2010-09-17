@@ -101,4 +101,5 @@ extern omBin s_si_link_extension_bin;
 extern omBin sip_link_bin;
 extern omBin ip_link_bin;
 
+int slStatusSsiL(lists L, int timeout);
 #endif // SILINK_H
