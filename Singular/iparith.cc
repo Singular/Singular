@@ -3311,6 +3311,12 @@ static BOOLEAN jjSTATUS2(leftv res, leftv u, leftv v)
   res->data = omStrDup(slStatus((si_link) u->Data(), (char *) v->Data()));
   return FALSE;
 }
+static BOOLEAN jjSTATUS2L(leftv res, leftv u, leftv v)
+{
+  res->data = (void *)(long)slStatusSsiL((lists) u->Data(), (int)(long) v->Data());
+  //return (res->data== (void*)(long)-2);
+  return FALSE;
+}
 static BOOLEAN jjSIMPL_P(leftv res, leftv u, leftv v)
 {
   int sw = (int)(long)v->Data();
@@ -3982,6 +3988,7 @@ struct sValCmd2 dArith2[]=
 ,{jjRES,       RES_CMD,        RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjRES,       RES_CMD,        RESOLUTION_CMD, MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjSTATUS2,   STATUS_CMD,     STRING_CMD,     LINK_CMD,   STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{jjSTATUS2L,  STATUS_CMD,     INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   POLY_CMD,       POLY_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjSIMPL_P,   SIMPLIFY_CMD,   VECTOR_CMD,     VECTOR_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjSIMPL_ID,  SIMPLIFY_CMD,   IDEAL_CMD,      IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
