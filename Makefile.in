@@ -34,7 +34,11 @@ ${SINGULAR}:
 
 TEXINFO_TEX_FILES = epsf.tex texinfo.tex txi-cs.tex txi-de.tex txi-no.tex
 TEXINFO_TEX_DIR = Texinfo/doc
-all install install_all:
+all:
+	echo For everybody who did not read the README: use make install
+	exit 1
+
+install install_all:
 	@ for SUBDIR in ${BUILD1_SUBDIRS}; \
 	do \
 	  echo ${MAKE} $@ in $${SUBDIR}; \
