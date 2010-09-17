@@ -494,6 +494,7 @@ mem:		libcfmem.a
 #
 # - explicit targets.
 #
+$(basefactorysrc:.cc=.o) $(basefactorysrc:.cc=.og): factory.h
 $(libfactory):	$(factoryobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
