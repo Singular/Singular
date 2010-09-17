@@ -183,7 +183,9 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     calcSVD.cc pipeLink.cc \
     Minor.cc \
     MinorProcessor.cc \
-    MinorInterface.cc
+    MinorInterface.cc \
+    Fan.cc \
+    Cone.cc
 
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\

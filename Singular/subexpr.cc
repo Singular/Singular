@@ -37,6 +37,8 @@
 #include <kernel/syz.h>
 #include <Singular/attrib.h>
 #include <Singular/subexpr.h>
+#include <Singular/Fan.h>
+#include <Singular/Cone.h>
 
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
@@ -152,6 +154,17 @@ void sleftv::Print(leftv store, int spaces)
           PrintNSpaces(spaces);
           ::Print("%d",(int)(long)d);
           break;
+#ifdef HAVE_FANS
+       case CONE_CMD:
+       case FAN_CMD:
+          PrintNSpaces(spaces);
+          {
+            char *s = String();
+            ::PrintS(s);
+            omFree(s);
+          }
+          break;
+#endif /* HAVE_FANS */
        case PROC_CMD:
          {
            procinfov pi=(procinfov)d;
@@ -489,6 +502,20 @@ static inline void * s_internalCopy(const int t,  void *d)
         r->ref++;
         return d;
       }
+#ifdef HAVE_FANS
+    case FAN_CMD:
+      {
+        Fan* fff = (Fan*)d;
+        Fan* ggg = new Fan(*fff);
+        return ggg;
+      }
+    case CONE_CMD:
+      {
+        Cone* ccc = (Cone*)d;
+        Cone* ggg = new Cone(*ccc);
+        return ggg;
+      }
+#endif /* HAVE_FANS */
     case RESOLUTION_CMD:
       return (void*)syCopy((syStrategy)d);
 #ifdef TEST
@@ -775,7 +802,28 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return ns;
           }
           return s;
-
+#ifdef HAVE_FANS
+        case FAN_CMD:
+        {
+          Fan* fff = (Fan*)d;
+          s = fff->toString();
+          char* ns = (char*) omAlloc(strlen(s) + 10);
+          sprintf(ns, "%s", s);
+          omCheckAddr(ns);
+          omFree(s);
+          return ns;
+        }
+        case CONE_CMD:
+        {
+          Cone* ccc = (Cone*)d;
+          s = ccc->toString();
+          char* ns = (char*) omAlloc(strlen(s) + 10);
+          sprintf(ns, "%s", s);
+          omCheckAddr(ns);
+          omFree(s);
+          return ns;
+        }
+#endif /* HAVE_FANS */
         case RESOLUTION_CMD:
         {
           lists l = syConvRes((syStrategy)d);

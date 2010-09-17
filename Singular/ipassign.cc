@@ -39,6 +39,8 @@
 #include <Singular/silink.h>
 #include <Singular/ipshell.h>
 #include <kernel/sca.h>
+#include <Singular/Fan.h>
+#include <Singular/Cone.h>
 
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv res, leftv a)
@@ -318,6 +320,42 @@ static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr e)
   jiAssignAttr(res,a);
   return FALSE;
 }
+#ifdef HAVE_FANS
+static BOOLEAN jiA_FAN(leftv res, leftv a, Subexpr e)
+{
+  if (e != NULL)
+  {
+    WerrorS("unexpectedly encountered subexpression in jiA_FAN");
+    return TRUE;
+  }
+  if (res->data!=NULL)
+  {
+    Fan* fff = (Fan*)res->data;
+    res->data = NULL;
+    delete fff;
+  }
+  Fan* fff = (Fan*)a->CopyD(FAN_CMD);
+  res->data=(void*)fff;
+  return FALSE;
+}
+static BOOLEAN jiA_CONE(leftv res, leftv a, Subexpr e)
+{
+  if (e != NULL)
+  {
+    WerrorS("unexpectedly encountered subexpression in jiA_CONE");
+    return TRUE;
+  }
+  if (res->data!=NULL)
+  {
+    Cone* ccc = (Cone*)res->data;
+    res->data = NULL;
+    delete ccc;
+  }
+  Cone* ccc = (Cone*)a->CopyD(CONE_CMD);
+  res->data=(void*)ccc;
+  return FALSE;
+}
+#endif /* HAVE_FANS */
 static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
 {
   poly p=(poly)a->CopyD(POLY_CMD);
@@ -696,6 +734,10 @@ struct sValAssign dAssign[]=
 ,{jiA_LIST,     LIST_CMD,       LIST_CMD }
 ,{jiA_LINK,     LINK_CMD,       STRING_CMD }
 ,{jiA_LINK,     LINK_CMD,       LINK_CMD }
+#ifdef HAVE_FANS
+,{jiA_FAN,      FAN_CMD,        FAN_CMD }
+,{jiA_CONE,     CONE_CMD,       CONE_CMD }
+#endif /* HAVE_FANS */
 ,{jiA_PACKAGE,  PACKAGE_CMD,    PACKAGE_CMD }
 ,{NULL,         0,              0 }
 };
@@ -1345,6 +1387,154 @@ static BOOLEAN jiAssign_rec(leftv l, leftv r)
   r1->CleanUp();
   return b;
 }
+#ifdef HAVE_FANS
+BOOLEAN jjAssignFan(leftv l, leftv r)
+{
+  /* method for generating a fan;
+     valid parametrizations: (intmat or 0, intmat or 0, intmat or 0),
+     The intmat's capture the maximal rays, facet normals and the
+     lineality space of the new fan.
+     Any of the arguments may be the int 0. But either the 1st or
+     2nd argument must be an intmat, thus not both simultaneously
+     the int 0.
+     Errors will be invoked in the following cases:
+     - 1st and 2nd argument simultaneously the int 0,
+     - numbers of rows in 1st, 2nd, and/or 3rd argument intmat
+       disagree */
+  intvec* maxRays = NULL;    /* maximal rays */
+  intvec* facetNs = NULL;    /* facet normals */
+  intvec* linSpace = NULL;   /* lineality space */
+
+  leftv x = r;
+  if (x->Typ() == INTMAT_CMD) maxRays = (intvec*)x->Data();
+  else if ((x->Typ() != INT_CMD) ||
+           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
+  {
+    WerrorS("expected '0' or an intmat as 1st argument");
+    return TRUE;
+  }
+  x = x->next;
+  if (x->Typ() == INTMAT_CMD) facetNs = (intvec*)x->Data();
+  else if ((x->Typ() != INT_CMD) ||
+           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
+  {
+    WerrorS("expected '0' or an intmat as 2nd argument");
+    return TRUE;
+  }
+  if ((maxRays == NULL) && (facetNs == NULL))
+  {
+    WerrorS("expected 1st or 2nd argument to be a valid intmat");
+    return TRUE;
+  }
+  x = x->next;
+  if (x->Typ() == INTMAT_CMD) linSpace = (intvec*)x->Data();
+  else if ((x->Typ() != INT_CMD) ||
+           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
+  {
+    WerrorS("expected '0' or an intmat as 3rd argument");
+    return TRUE;
+  }
+  if ((maxRays != NULL) && (facetNs != NULL) &&
+      (maxRays->rows() != facetNs->rows()))
+  {
+    WerrorS("vector space dims do not agree (1st vs. 2nd argument)");
+    return TRUE;
+  }
+  if ((maxRays != NULL) && (linSpace != NULL) &&
+      (maxRays->rows() != linSpace->rows()))
+  {
+    WerrorS("vector space dims do not agree (1st vs. 3rd argument)");
+    return TRUE;
+  }
+  if ((facetNs != NULL) && (linSpace != NULL) &&
+      (facetNs->rows() != linSpace->rows()))
+  {
+    WerrorS("vector space dims do not agree (2nd vs. 3rd argument)");
+    return TRUE;
+  }
+
+  if (IDDATA((idhdl)l->data) != NULL)
+  {
+    Fan* fff = (Fan*)IDDATA((idhdl)l->data);
+    delete fff;
+  }
+  Fan* fff = new Fan(maxRays, facetNs, linSpace);
+  IDDATA((idhdl)l->data) = (char*)fff;
+  return FALSE;
+}
+BOOLEAN jjAssignCone(leftv l, leftv r)
+{
+  /* method for generating a cone;
+     valid parametrizations: (fan, intvec or 0, intvec or 0),
+     The intvec's capture indices of the maximal rays resp.
+     facet normals of the given fan.
+     2nd and 3rd argument may be the int 0, but not simultaneously.
+     Errors will be invoked in the following cases:
+     - 2nd and 3rd argument simultaneously the int 0,
+     - invalid index for maximal row or facet normal */
+  Fan* fff = NULL;           /* the Fan where maximal rays and/or
+                                facet normals are stored */
+  intvec* maxRays = NULL;    /* indices of maximal rays */
+  intvec* facetNs = NULL;    /* indices of facet normals */
+
+  leftv x = r;
+  if (x->Typ() != FAN_CMD)
+  {
+    WerrorS("expected a fan as 1st argument");
+    return TRUE;
+  }
+  else
+  {
+    fff = (Fan*)x->Data();
+  }
+  x = x->next;
+  if (x->Typ() == INTVEC_CMD) maxRays = (intvec*)x->Data();
+  else if ((x->Typ() != INT_CMD) ||
+           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
+  {
+    WerrorS("expected '0' or an intvec as 2nd argument");
+    return TRUE;
+  }
+  x = x->next;
+  if (x->Typ() == INTVEC_CMD) facetNs = (intvec*)x->Data();
+  else if ((x->Typ() != INT_CMD) ||
+           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
+  {
+    WerrorS("expected '0' or an intvec as 3rd argument");
+    return TRUE;
+  }
+  if ((maxRays == NULL) && (facetNs == NULL))
+  {
+    WerrorS("expected 2nd or 3rd argument to be a valid intvec");
+    return TRUE;
+  }
+  
+  int check = Cone::checkConeData(fff, maxRays, facetNs);
+  if (check > 0)
+  {
+    Werror("invalid index %d for maximal ray at position %d",
+           (int)(long)((*maxRays)[check - 1]), check);
+    return TRUE;
+  }
+  else if (check < 0)
+  {
+    char h[150];
+    sprintf(h, "invalid index %d for facet normal at position %d",
+               (int)(long)((*facetNs)[-check - 1]), -check);
+    WerrorS(h);
+    return TRUE;
+  }
+
+  if (IDDATA((idhdl)l->data) != NULL)
+  {
+    Cone* ccc = (Cone*)IDDATA((idhdl)l->data);
+    delete ccc;
+  }
+  Cone* ccc = new Cone(fff, maxRays, facetNs);
+  IDDATA((idhdl)l->data) = (char*)ccc;
+  return FALSE;
+}
+#endif /* HAVE_FANS */
 BOOLEAN iiAssign(leftv l, leftv r)
 {
   if (errorreported) return TRUE;
@@ -1465,6 +1655,16 @@ BOOLEAN iiAssign(leftv l, leftv r)
         return b;
       }
     }
+#ifdef HAVE_FANS
+    else if ((lt == FAN_CMD) && (rl == 3))
+    {
+      return jjAssignFan(l, r);
+    }
+    else if ((lt == CONE_CMD) && (rl == 3))
+    {
+      return jjAssignCone(l, r);
+    }
+#endif /* HAVE_FANS */
     if (rt==NONE) rt=r->Typ();
   }
   else if (ll==(rl=r->listLength()))

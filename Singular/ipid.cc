@@ -28,6 +28,8 @@
 #include <Singular/silink.h>
 #include <kernel/syz.h>
 #include <Singular/ipid.h>
+#include <Singular/Fan.h>
+#include <Singular/Cone.h>
 
 #ifdef HAVE_DYNAMIC_LOADING
 #include <kernel/mod_raw.h>
@@ -463,6 +465,22 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     if (IDDATA(h)!=NULL)
       syKillComputation((syStrategy)IDDATA(h),r);
   }
+#ifdef HAVE_FANS
+  // fan -------------------------------------------------------------
+  else if (IDTYP(h) == FAN_CMD)
+  {
+    Fan* fff = (Fan*)IDDATA(h);
+    delete fff;
+    IDDATA(h) = NULL;
+  }
+  // cone ------------------------------------------------------------
+  else if (IDTYP(h) == CONE_CMD)
+  {
+    Cone* ccc = (Cone*)IDDATA(h);
+    delete ccc;
+    IDDATA(h) = NULL;
+  }
+#endif /* HAVE_FANS */
 #ifdef TEST
   else if ((IDTYP(h)!= INT_CMD)
   &&(IDTYP(h)!=DEF_CMD) 
