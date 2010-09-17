@@ -9,7 +9,7 @@
 
 #include <kernel/mod2.h>
 
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <new>
 
 /* We define those, so that our values of

@@ -14,12 +14,12 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
 #include <Singular/ipid.h>
 #include <kernel/intvec.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <Singular/sdb.h>
@@ -58,15 +58,15 @@
 #include <kernel/linearAlgebra.h>
 #include <Singular/misc_ip.h>
 #ifdef HAVE_FACTORY
-#include <kernel/clapsing.h>
-#include <kernel/kstdfac.h>
+#  include <kernel/clapsing.h>
+#  include <kernel/kstdfac.h>
 #endif /* HAVE_FACTORY */
 #ifdef HAVE_FACTORY
-#include <kernel/fglm.h>
+#  include <kernel/fglm.h>
 #endif /* HAVE_FACTORY */
 #define HAVE_INTERPOLATION
 #ifdef HAVE_INTERPOLATION
-#include <Singular/interpolation.h>
+#  include <Singular/interpolation.h>
 #endif
 
 #include <Singular/ipshell.h>
@@ -9029,7 +9029,7 @@ void ttGen4()
 }
 /*-------------------------------------------------------------------*/
 #else
-#include <Singular/iparith.inc>
+#include <iparith.inc>
 #endif
 
 /*=================== operations with 2 args. ============================*/

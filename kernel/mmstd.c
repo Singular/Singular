@@ -10,7 +10,7 @@
 #include <kernel/mod2.h>
 
 #define OM_NO_MALLOC_MACROS
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <Singular/static.h>
 
 // we provide these functions, so that the settings of OM_CHECK
@@ -27,7 +27,7 @@
 // as static, i.e. not metioned by omPrintUsedAddr
 #define OM_MALLOC_MARK_AS_STATIC
 #define strdup_ strdup__
-#include <omalloc.c>
+#include <omalloc/omalloc.c>
 #else
 #include <stdlib.h>
 void freeSize(void* addr, size_t size)

@@ -14,7 +14,7 @@
 //
 //**************************************************************************/
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #ifdef HAVE_DBM
 #ifndef HPUX_9
 #include <strings.h>

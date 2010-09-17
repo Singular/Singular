@@ -35,7 +35,7 @@
 #endif
 #include <kernel/kutil.h>
 #include <kernel/options.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/febase.h>

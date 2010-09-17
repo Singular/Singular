@@ -21,7 +21,7 @@
 
 #include "tok.h"
 #include "ipid.h"
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include "subexpr.h"
 #include "silink.h"
 #include "lists.h"

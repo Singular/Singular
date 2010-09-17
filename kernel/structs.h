@@ -11,7 +11,7 @@
 /* for memset: */
 #include <string.h>
 /* for omBin */
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #ifdef HAVE_RINGS
 #include <kernel/si_gmp.h>
 #endif

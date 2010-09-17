@@ -8,7 +8,7 @@
 // to produce a non-inline version from lists.h
 #define LISTS_CC
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/febase.h>
 //#include "ipid.h"

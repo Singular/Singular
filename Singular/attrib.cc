@@ -13,8 +13,8 @@
 #include <ctype.h>
 #include <unistd.h>
 
-#include <Singular/mod2.h>
-#include <omalloc.h>
+#include <kernel/mod2.h>
+#include <omalloc/omalloc.h>
 #include <kernel/options.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>

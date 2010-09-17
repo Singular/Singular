@@ -3,8 +3,8 @@
 #include <string.h>
 #include <time.h>
 
-#include <Singular/mod2.h>
-#include <omalloc.h>
+#include <kernel/mod2.h>
+#include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/numbers.h>
 #include <kernel/ring.h>

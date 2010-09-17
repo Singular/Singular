@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #ifdef HAVE_SVD
 

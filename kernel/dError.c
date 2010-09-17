@@ -15,7 +15,7 @@
 #include <kernel/mod2.h>
 #include <Singular/distrib.h>
 #ifdef HAVE_CONFIG_H
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #endif
 
 #ifdef __cplusplus

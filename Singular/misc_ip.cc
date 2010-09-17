@@ -16,7 +16,7 @@
 /*****************************************************************************/
 
 // include header files
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/lists.h>
 #include <kernel/longrat.h>
 #include <Singular/misc_ip.h>
@@ -282,8 +282,8 @@ lists primeFactorisation(const number n, const number pBound)
 #include <stdlib.h>
 #include <time.h>
 
-#include <mylimits.h>
-#include <omalloc.h>
+#include <omalloc/mylimits.h>
+#include <omalloc/omalloc.h>
 #include <kernel/options.h>
 #include <kernel/febase.h>
 #include <Singular/cntrlc.h>
@@ -315,7 +315,7 @@ lists primeFactorisation(const number n, const number pBound)
 //#endif /* HAVE_LIBPARSER */
 
 #ifdef HAVE_FACTORY
-#include <factory.h>
+#include <factory/factory.h>
 // libfac:
   extern const char * libfac_version;
   extern const char * libfac_date;

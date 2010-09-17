@@ -4,7 +4,7 @@
 #ifndef INCL_ARRAY_H
 #define INCL_ARRAY_H
 
-#include <factoryconf.h>
+#include <factory/factoryconf.h>
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

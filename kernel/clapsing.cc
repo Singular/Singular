@@ -9,7 +9,7 @@
 
 //#define FACTORIZE2_DEBUG
 #include <kernel/mod2.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <kernel/structs.h>
@@ -18,9 +18,9 @@
 #include <kernel/ring.h>
 #include <kernel/ideals.h>
 #include <kernel/ffields.h>
-#include <factory.h>
+#include <factory/factory.h>
 #include <kernel/clapconv.h>
-#include <factor.h>
+#include <libfac/factor.h>
 #include <kernel/ring.h>
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);

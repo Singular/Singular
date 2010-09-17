@@ -10,7 +10,7 @@
 #include <kernel/febase.h>
 #include <kernel/int64vec.h>
 #include <kernel/intvec.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 
 /*0 implementation*/
 

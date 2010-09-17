@@ -14,13 +14,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include <errno.h>
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
 #include <Singular/ipshell.h>
 #include <kernel/febase.h>
 #include <Singular/cntrlc.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <Singular/silink.h>
 #include <Singular/ipid.h>
 #include <kernel/timer.h>
@@ -34,7 +34,7 @@
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory.h>
+#include <factory/factory.h>
 #endif
 
 extern int iiInitArithmetic();
@@ -67,7 +67,7 @@ int mmInit( void )
 #if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
     /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
     /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
     /* do not rely on the default in Singular as libsingular may be different */
     mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
 #else

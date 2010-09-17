@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: handling of the list type
 */
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/structs.h>
 #include <kernel/ideals.h>
 #include <Singular/subexpr.h>

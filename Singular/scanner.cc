@@ -561,8 +561,8 @@ char *yytext;
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <Singular/mod2.h>
-#include <omalloc.h>
+#include <kernel/mod2.h>
+#include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <Singular/stype.h>
 #include <Singular/ipshell.h>

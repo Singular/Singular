@@ -14,7 +14,7 @@
 #include <kernel/ring.h>
 #include <kernel/ideals.h>
 #include <kernel/matpol.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <kernel/longalg.h>
 #include <kernel/maps.h>

@@ -27,7 +27,7 @@ extern char fePathSep;
 /* the are versions of limits.h with incorrect values (IRIX_6)
 * let's include our own */
 
-#include <mylimits.h>
+#include <omalloc/mylimits.h>
 
 /* OSF/1 and AIX_4 are missing the header for setenv, but the proc exists */
 #if defined(DecAlpha_OSF1) || defined(AIX_4)

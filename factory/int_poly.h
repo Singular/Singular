@@ -28,7 +28,7 @@
 #endif
 
 #ifdef HAVE_OMALLOC
-#include <omalloc.h>
+#  include <omalloc/omalloc.h>
 #endif
 
 class term {

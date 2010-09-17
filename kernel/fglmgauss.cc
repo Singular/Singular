@@ -15,7 +15,7 @@
 #include <kernel/structs.h>
 #include <kernel/numbers.h>
 #include <kernel/ring.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>

@@ -16,13 +16,13 @@
 #  include <fcntl.h>
 #  include <errno.h>
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #ifdef HAVE_DBM
 
 #  include <Singular/tok.h>
 #  include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #  include <Singular/ipid.h>
 #  include <Singular/silink.h>
 #  include <Singular/sing_dbm.h>

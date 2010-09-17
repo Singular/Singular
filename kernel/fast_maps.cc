@@ -9,7 +9,7 @@
  *  Version: $Id$
  *******************************************************************/
 #include <kernel/mod2.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/options.h>
 #include <kernel/p_polys.h>
 #include <kernel/prCopy.h>

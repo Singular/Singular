@@ -11,7 +11,7 @@
 #include <kernel/febase.h>
 #include <kernel/options.h>
 #include <kernel/intvec.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 
 /*0 implementation*/
 

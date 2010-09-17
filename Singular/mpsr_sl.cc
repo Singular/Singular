@@ -9,7 +9,7 @@
  *  Version: $Id$
  *******************************************************************/
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #ifdef HAVE_MPSR
 
@@ -22,7 +22,7 @@
 #include <sys/wait.h>
 #include <Singular/mpsr.h>
 #include <Singular/tok.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipid.h>

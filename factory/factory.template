@@ -21,30 +21,30 @@
 //
 //}}}
 
-#include <factoryconf.h>
+#include <factory/factoryconf.h>
 
 #ifndef NOSTREAMIO
-#ifdef HAVE_IOSTREAM
-#include <iostream>
-#define OSTREAM std::ostream
-#define ISTREAM std::istream
-#elif defined(HAVE_IOSTREAM_H)
-#include <iostream.h>
-#define OSTREAM ostream
-#define ISTREAM istream
-#endif
+#  ifdef HAVE_IOSTREAM
+#    include <iostream>
+#    define OSTREAM std::ostream
+#    define ISTREAM std::istream
+#  elif defined(HAVE_IOSTREAM_H)
+#    include <iostream.h>
+#    define OSTREAM ostream
+#    define ISTREAM istream
+#  endif
 #endif /* ! NOSTREAMIO */
 
 #ifdef SINGULAR
-#include "cf_gmp.h"
+#  include <factory/cf_gmp.h>
 #else
-#include <gmp.h>
+#  include <gmp.h>
 #endif /* SINGULAR */
 
-#include <templates/ftmpl_array.h>
-#include <templates/ftmpl_factor.h>
-#include <templates/ftmpl_list.h>
-#include <templates/ftmpl_matrix.h>
+#include <factory/templates/ftmpl_array.h>
+#include <factory/templates/ftmpl_factor.h>
+#include <factory/templates/ftmpl_list.h>
+#include <factory/templates/ftmpl_matrix.h>
 
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_globals.h"

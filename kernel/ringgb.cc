@@ -11,7 +11,7 @@
 #include <kernel/mod2.h>
 #include <kernel/kutil.h>
 #include <kernel/structs.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/p_polys.h>
 #include <kernel/ideals.h>

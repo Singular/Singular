@@ -12,7 +12,7 @@
  *
  *
  ***************************************************************/
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #ifdef HAVE_MPSR
 #include "mylimits.h"
@@ -20,7 +20,7 @@
 #include <Singular/mpsr_Get.h>
 
 #include <kernel/si_gmp.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <kernel/ring.h>

@@ -1,9 +1,7 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 /* $Id$ */
 
-#include <factoryconf.h>
-
-#include <templates/ftmpl_array.h>
+#include <factory/templates/ftmpl_array.h>
 
 template <class T>
 Array<T>::Array() : data(0), _min(0), _max(-1), _size(0)

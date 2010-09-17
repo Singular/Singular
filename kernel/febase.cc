@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mylimits.h>
+#include <omalloc/mylimits.h>
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <ctype.h>
@@ -23,7 +23,7 @@
 #endif
 
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/dError.h>
 #include <kernel/options.h>
 

@@ -84,7 +84,7 @@ inline si_link slCopy(si_link l)
   return l;
 }
 
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 inline char* slString(si_link l)
 {
   if (l->name != NULL)

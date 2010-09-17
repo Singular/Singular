@@ -19,7 +19,7 @@
 #if !defined(NO_PINLINE2) || defined(PINLINE2_CC)
 
 #include <kernel/structs.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/p_Procs.h>
 #include <kernel/sbuckets.h>

@@ -24,7 +24,7 @@
 
 #include "tok.h"
 #include "ipid.h"
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/ring.h>
 #include <kernel/matpol.h>
 #include <kernel/ideals.h>

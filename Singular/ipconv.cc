@@ -6,12 +6,12 @@
 * ABSTRACT: automatic type conversions
 */
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <kernel/intvec.h>
 #include <kernel/options.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

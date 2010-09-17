@@ -13,7 +13,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <signal.h>
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <misc_ip.h>
 
 #ifdef TIME_WITH_SYS_TIME
@@ -95,10 +95,9 @@
 extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
+#include <kernel/sca.h>
 #ifdef HAVE_PLURAL
 #include <kernel/ring.h>
-#include <kernel/ring.h>
-#include <kernel/sca.h>
 #include <kernel/ncSAMult.h> // for CMultiplier etc classes
 #include <Singular/ipconv.h>
 #include <kernel/ring.h>
@@ -122,10 +121,10 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <kernel/clapsing.h>
 #include <kernel/clapconv.h>
 #include <kernel/kstdfac.h>
 #endif
+#include <kernel/clapsing.h>
 
 #include <Singular/silink.h>
 #include <Singular/walk.h>
@@ -1998,17 +1997,17 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   }
 
 
-  #ifdef HAVE_EXTENDED_SYSTEM
+#ifdef HAVE_EXTENDED_SYSTEM
   // You can put your own system calls here
-  #include <kernel/fglmcomb.cc>
-  #include <kernel/fglm.h>
-  #ifdef HAVE_NEWTON
-  #include <hc_newton.h>
-  #endif
-  #include <mpsr.h>
-  #include <kernel/mod_raw.h>
-  #include <kernel/ring.h>
-  #include <kernel/shiftgb.h>
+#  include <kernel/fglmcomb.cc>
+#  include <kernel/fglm.h>
+#  ifdef HAVE_NEWTON
+#    include <hc_newton.h>
+#  endif
+#  include <mpsr.h>
+#  include <kernel/mod_raw.h>
+#  include <kernel/ring.h>
+#  include <kernel/shiftgb.h>
 
   static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
@@ -3295,6 +3294,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       {
         if (h==NULL)
         {
+#ifdef HAVE_PLURAL
           Print("NTL_0:%d (use NTL for gcd of polynomials in char 0)\n",isOn(SW_USE_NTL_GCD_0));
           Print("NTL_p:%d (use NTL for gcd of polynomials in char p)\n",isOn(SW_USE_NTL_GCD_P));
           Print("EZGCD:%d (use EZGCD for gcd of polynomials in char 0)\n",isOn(SW_USE_EZGCD));
@@ -3303,6 +3303,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           Print("SPARSEMOD:%d (use SPARSEMOD for gcd of polynomials in char 0)\n",isOn(SW_USE_SPARSEMOD));
           Print("QGCD:%d (use QGCD for gcd of polynomials in alg. ext.)\n",isOn(SW_USE_QGCD));
           Print("FGCD:%d (use fieldGCD for gcd of polynomials in Z/p)\n",isOn(SW_USE_fieldGCD));
+#endif
           Print("homog:%d (use homog. test for factorization of polynomials)\n",singular_homog_flag);
           return FALSE;
         }
@@ -3312,6 +3313,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         {
           int d=(int)(long)h->next->Data();
           char *s=(char *)h->Data();
+#ifdef HAVE_PLURAL
           if (strcmp(s,"NTL_0")==0) { if (d) On(SW_USE_NTL_GCD_0); else Off(SW_USE_NTL_GCD_0); } else
           if (strcmp(s,"NTL_p")==0) { if (d) On(SW_USE_NTL_GCD_P); else Off(SW_USE_NTL_GCD_P); } else
           if (strcmp(s,"EZGCD")==0) { if (d) On(SW_USE_EZGCD); else Off(SW_USE_EZGCD); } else
@@ -3320,6 +3322,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           if (strcmp(s,"SPARSEMOD")==0) { if (d) On(SW_USE_SPARSEMOD); else Off(SW_USE_SPARSEMOD); } else
           if (strcmp(s,"QGCD")==0) { if (d) On(SW_USE_QGCD); else Off(SW_USE_QGCD); } else
           if (strcmp(s,"FGCD")==0) { if (d) On(SW_USE_fieldGCD); else Off(SW_USE_fieldGCD); } else
+#endif
           if (strcmp(s,"homog")==0) { if (d) singular_homog_flag=1; else singular_homog_flag=0; } else
           return TRUE;
           return FALSE;

@@ -96,16 +96,16 @@ WARNFLAGS =	-w
 
 # flags to translate library c files
 LIBCFLAGS =	$(WARNFLAGS) \
-		-I. -I$(srcdir) -I$(includedir) \
+		-I. -I.. -I$(srcdir) -I${prefix} -I$(includedir) \
 		$(DEFS) $(CPPFLAGS) $(CFLAGS)
 
 # flags to translate library c++ files
 LIBCXXFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
-		-I. -I$(srcdir) -I$(includedir) \
+		-I. -I.. -I$(srcdir) -I${prefix} -I$(includedir) \
 		$(DEFS) $(CPPFLAGS) $(CXXFLAGS)
 
 LIBCGGFLAGS =	$(WARNFLAGS) -fno-implicit-templates \
-		-I. -I$(srcdir) -I$(includedir) \
+		-I. -I.. -I$(srcdir) -I${prefix} -I$(includedir) \
 		$(DEFS) $(CPPFLAGS)
 
 # flags to translate ftmpl_inst.cc
@@ -118,7 +118,7 @@ TESTCXXFLAGS =	$(LIBCXXFLAGS)
 TESTLDFLAGS = 	$(LIBS) $(LDFLAGS)
 
 # flags to create dependency lists
-DEPCXXFLAGS =	-I. -I$(srcdir) -I$(includedir) \
+DEPCXXFLAGS =	-I. -I.. -I$(srcdir) -I${prefix} -I$(includedir) \
 		$(DEFS) $(CPPFLAGS)
 
 #
@@ -607,12 +607,12 @@ gftables:	gengftables
 # the header files from the directory where they should be
 # after installation.
 test_install.o: test_install.cc factory.h
-		$(CXX) -c $< $(TESTCXXFLAGS) -I- -I$(includedir) -o $@
+		$(CXX) -c $< $(TESTCXXFLAGS) -I- -I${prefix} -I$(includedir) -o $@
 
 # the same we do for ftmpl_inst.o which for this reason is named
 # iftmpl_inst.o
 iftmpl_inst.o: factory.h
-		$(CXX) -c $(templatedir)/ftmpl_inst.cc $(TMPLCXXFLAGS) -I- -I$(includedir) -o $@
+		$(CXX) -c $(templatedir)/ftmpl_inst.cc $(TMPLCXXFLAGS) -I- -I${prefix} -I$(includedir) -o $@
 
 # link installation test program
 test_install:	test_install.o iftmpl_inst.o

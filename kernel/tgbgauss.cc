@@ -8,7 +8,7 @@
 #include <kernel/mod2.h>
 #include <kernel/options.h>
 #include <kernel/tgbgauss.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <stdlib.h>
 #include <kernel/kutil.h>
 #include <kernel/febase.h>

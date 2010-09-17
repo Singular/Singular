@@ -14,7 +14,7 @@
 #include <kernel/options.h>
 #include <kernel/numbers.h>
 #include <kernel/ffields.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/weight.h>
 #include <kernel/intvec.h>

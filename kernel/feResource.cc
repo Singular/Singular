@@ -24,7 +24,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include <kernel/dError.h>
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #else
 char* feResource(const char id, int warn = -1);
 char* feResource(const char* key, int warn = -1);

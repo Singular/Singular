@@ -20,7 +20,7 @@
 #define READLINE_STATIC
 #endif
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/options.h>
 
 #include <Singular/static.h>

@@ -17,7 +17,7 @@
 //-> includes
 #include <kernel/options.h>
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

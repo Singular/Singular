@@ -8,9 +8,9 @@
 
 #include <string.h>
 #include <kernel/mod2.h>
-#include <mylimits.h>
+#include <omalloc/mylimits.h>
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/ring.h>
 #include <kernel/ffields.h>

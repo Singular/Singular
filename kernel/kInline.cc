@@ -17,7 +17,7 @@
 #include <kernel/polys.h>
 #include <kernel/p_Procs.h>
 #include <kernel/kbuckets.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary

@@ -11,7 +11,7 @@
 #include <kernel/ring.h>
 #include <kernel/febase.h>
 #include <kernel/maps.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <kernel/fglm.h>
 #include <kernel/walkMain.h>

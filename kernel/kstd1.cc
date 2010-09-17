@@ -15,7 +15,7 @@
 #define MORA_USE_BUCKETS
 
 #include <kernel/mod2.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 
 #ifndef NDEBUG
 # define MYTEST 0

@@ -15,7 +15,7 @@
 // define to enable debugging/statistics of pLmShortDivisibleBy
 // #define PDIV_DEBUG
 #endif
-#include <mylimits.h>
+#include <omalloc/mylimits.h>
 #include <kernel/p_MemCmp.h>
 #include <kernel/structs.h>
 #include <kernel/ring.h>
@@ -52,7 +52,7 @@ BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, const ring r);
 
 #if !defined(NO_PINLINE1) || defined(PINLINE1_CC)
 
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/p_polys.h>
 #include <kernel/p_MemAdd.h>

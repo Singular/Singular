@@ -13,9 +13,9 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include <Singular/mod2.h>
-#include <mylimits.h>
-#include <omalloc.h>
+#include <kernel/mod2.h>
+#include <omalloc/mylimits.h>
+#include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
 #include <Singular/stype.h>
@@ -417,6 +417,7 @@ pprompt:
             currentVoice->ifsw=0;
             if (inerror)
             {
+/*  bison failed here
               if ((inerror!=3) && ($1.i<UMINUS) && ($1.i>' '))
               {
                 // 1: yyerror called
@@ -425,6 +426,7 @@ pprompt:
                 inerror=3;
                 Print(" error at token `%s`\n",iiTwoOps($1.i));
               }
+*/
             }
             if (!errorreported) WerrorS("...parse error");
             yyerror("");

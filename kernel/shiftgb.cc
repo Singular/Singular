@@ -21,7 +21,7 @@
 #include <kernel/p_Mult_q.h>
 #include <kernel/kutil.h>
 #include <kernel/structs.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/khstd.h>
 #include <kernel/kbuckets.h>
 #include <kernel/weight.h>

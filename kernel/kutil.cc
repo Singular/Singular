@@ -20,7 +20,7 @@
 #endif /* ifndef NDEBUG */
 
 
-#include <mylimits.h>
+#include <omalloc/mylimits.h>
 #include <kernel/options.h>
 #include <kernel/gring.h>
 #include <kernel/sca.h>
@@ -46,7 +46,7 @@
 #include <kernel/kutil.h>
 #include <kernel/kbuckets.h>
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/polys.h>
 #include <kernel/ring.h>

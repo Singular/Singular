@@ -10,7 +10,7 @@
 
 #include <kernel/mod2.h>
 #include <kernel/options.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/kstd1.h>
@@ -470,11 +470,15 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       hom = isHomog;
     }
   }
+
+#ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing) && !rIsSCA(currRing) )
   { 
 // quick solution; need theory to apply homog GB stuff for G-Algebras
     hom = isNotHomog;
   }
+#endif // HAVE_PLURAL
+
   if (hom==isHomog)
   {
     intvec *w1 = syPrepareModComp(res[0],&w);

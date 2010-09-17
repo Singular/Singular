@@ -17,22 +17,22 @@
 #include <kernel/ring.h>
 #include <kernel/febase.h>
 #include <kernel/maps.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/fglmvec.h>
 #include <kernel/fglmgauss.h>
 #include <kernel/kstd1.h>
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory.h>
+#include <factory/factory.h>
 
 #include <kernel/fglm.h>
-#include <templates/ftmpl_list.h>
+#include <factory/templates/ftmpl_list.h>
 
 #ifndef NOSTREAMIO
-#ifdef HAVE_IOSTREAM
-#include <iostream>
-#else
-#include <iostream.h>
-#endif
+#  ifdef HAVE_IOSTREAM
+#    include <iostream>
+#  else
+#    include <iostream.h>
+#  endif
 #endif
 
 static void

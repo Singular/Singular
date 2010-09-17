@@ -8,10 +8,10 @@
 
 #include <unistd.h>   // for unlink,fork,execlp,getpid
 #include <sys/wait.h> // for wait
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <Singular/ipshell.h>
 #include <Singular/ipid.h>

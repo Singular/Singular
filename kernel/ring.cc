@@ -18,7 +18,7 @@
 #endif /* ifndef NDEBUG */
 
 #include <kernel/options.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/polys.h>
 #include <kernel/numbers.h>
 #include <kernel/febase.h>
@@ -37,7 +37,7 @@
 #include <kernel/maps.h>
 #include <kernel/matpol.h>
 #ifdef HAVE_FACTORY
-#include <factory.h>
+#  include <factory/factory.h>
 #endif
 
 #define BITS_PER_LONG 8*SIZEOF_LONG

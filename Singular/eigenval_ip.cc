@@ -6,7 +6,7 @@
 * ABSTRACT: eigenvalues of constant square matrices
 */
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #ifdef HAVE_EIGENVAL
 

@@ -11,7 +11,7 @@
 
 #include <kernel/structs.h>
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
 #include <kernel/intvec.h>

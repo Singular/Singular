@@ -13,8 +13,8 @@
 #include <time.h>
 
 #include <kernel/mod2.h>
-#include <mylimits.h>
-#include <omalloc.h>
+#include <omalloc/mylimits.h>
+#include <omalloc/omalloc.h>
 #include <kernel/structs.h>
 #include <kernel/options.h>
 #include <kernel/febase.h>
@@ -32,7 +32,7 @@
 //#endif /* HAVE_LIBPARSER */
 
 #ifdef HAVE_FACTORY
-#include <factory.h>
+#  include <factory/factory.h>
 /* libfac version strings */
   extern const char * libfac_version;
   extern const char * libfac_date;

@@ -10,7 +10,7 @@
 
 #include <kernel/mod2.h>
 #ifdef HAVE_FACTORY
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/structs.h>
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <kernel/clapconv.h>

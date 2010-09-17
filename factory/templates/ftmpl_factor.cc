@@ -1,9 +1,7 @@
 /* emacs edit mode for this file is -*- C++ -*- */
 /* $Id$ */
 
-#include <factoryconf.h>
-
-#include <templates/ftmpl_factor.h>
+#include <factory/templates/ftmpl_factor.h>
 
 template <class T>
 Factor<T>& Factor<T>::operator= ( const Factor<T>& f )

@@ -1,9 +1,9 @@
 /*******************************************************************
  *  File:    omSingularConfig.h
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
  *           This file is inlcuded by omDefaultConfig.h, i.e., at the the time
-#include <omalloc.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
+#include <omalloc/omalloc.h>
  *           rebuilt the library).
  *  Author:  obachman@mathematik.uni-kl.de (Olaf Bachmann)
  *  Created: 8/00

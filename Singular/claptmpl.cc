@@ -7,19 +7,19 @@
 * ABSTRACT - instantiation of all templates
 */
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 //#include <vector>
 //using namespace std;
 #ifdef HAVE_FACTORY
   #define SINGULAR 1
-  #include <factory.h>
-  #include <templates/ftmpl_list.cc>
+  #include <factory/factory.h>
+  #include <factory/templates/ftmpl_list.cc>
   #include <kernel/fglm.h>
 
-  #include <templates/ftmpl_array.cc>
-  #include <templates/ftmpl_factor.cc>
-  #include <templates/ftmpl_functions.h>
-  #include <templates/ftmpl_matrix.cc>
+  #include <factory/templates/ftmpl_array.cc>
+  #include <factory/templates/ftmpl_factor.cc>
+  #include <factory/templates/ftmpl_functions.h>
+  #include <factory/templates/ftmpl_matrix.cc>
 
   template class Factor<CanonicalForm>;
   template class List<CFFactor>;
@@ -61,7 +61,7 @@
 
 // place here your own template stuff, not instantiated by factory
   // libfac:
-    #include <factor.h>
+#include <libfac/factor.h>
 
 // class.h:
 template <class T>

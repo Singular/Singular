@@ -285,7 +285,7 @@ static void feOptHelp(const char* name);
 // Return: NULL -- everything ok
 //         "error-string" on error
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <Singular/ipshell.h>
 #include <Singular/tok.h>
@@ -295,7 +295,7 @@ static void feOptHelp(const char* name);
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory.h>
+#include <factory/factory.h>
 #endif
 #include <errno.h>
 

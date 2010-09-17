@@ -1,5 +1,5 @@
 #include <string.h>
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/kstd1.h>

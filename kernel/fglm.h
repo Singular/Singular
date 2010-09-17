@@ -14,7 +14,7 @@
 #define FGLM_H
 
 #ifdef HAVE_FACTORY
-#include <factory.h>
+#include <factory/factory.h>
 
 #include <kernel/polys.h>
 #include <kernel/fglmvec.h>

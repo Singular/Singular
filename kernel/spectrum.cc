@@ -18,7 +18,7 @@
 #endif
 #endif
 
-#include <mylimits.h>
+#include <omalloc/mylimits.h>
 
 #include <kernel/numbers.h>
 #include <kernel/polys.h>

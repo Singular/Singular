@@ -12,8 +12,8 @@
 
 #include <kernel/mod2.h>
 
-#include <mylimits.h>
-#include <omalloc.h>
+#include <omalloc/mylimits.h>
+#include <omalloc/omalloc.h>
 
 //-> includes
 #include <kernel/options.h>

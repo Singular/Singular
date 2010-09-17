@@ -18,12 +18,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include"mod2.h"
+#include <kernel/mod2.h>
 
 #ifdef HAVE_MPSR
 
-#include"kernel/febase.h"
-#include"tok.h"
+#include <kernel/febase.h>
+#include <tok.h>
 
 #include <Singular/mpsr.h>
 #include <Singular/mpsr_Tok.h>

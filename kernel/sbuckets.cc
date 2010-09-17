@@ -12,7 +12,7 @@
 #include <kernel/mod2.h>
 
 #include <kernel/sbuckets.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/ring.h>
 #include <kernel/p_Procs.h>
 #include <kernel/p_polys.h>

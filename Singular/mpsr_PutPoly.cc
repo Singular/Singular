@@ -15,14 +15,14 @@
  *    Updated routines to MP and MPP v1.1
  *
  ***************************************************************/
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #ifdef HAVE_MPSR
 
 #include <Singular/mpsr_Put.h>
 #include <Singular/mpsr_Tok.h>
 #include "kernel/longalg.h"
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/ring.h>
 #include <kernel/polys.h>
 //#include "ipid.h"

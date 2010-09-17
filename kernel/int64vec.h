@@ -9,7 +9,7 @@
 */
 #include <string.h>
 #include <kernel/structs.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/intvec.h>
 

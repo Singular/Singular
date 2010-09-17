@@ -185,3 +185,11 @@ This is a non-trivial task. Please contact us directly.
 (`mailto:Singular@mathematik.uni-kl.de')
 
 GOOD LUCK and ENJOY!  Your SINGULAR team.
+
+
+Compiling SINGULAR with cmake
+=============================
+
+compiling SINGULAR with cmake is currently experimental and 
+under development.
+Use it at your own risk! Parents are liable for their children! 

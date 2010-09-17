@@ -12,12 +12,12 @@
 #include <ctype.h>
 #include <math.h>
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
 #include <Singular/ipid.h>
 #include <kernel/intvec.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

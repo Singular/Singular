@@ -17,6 +17,7 @@ HAVE_PLURAL             = @PLURAL@
 ##
 ## various paths
 ##
+top_srcdir	= @top_srcdir@
 srcdir		= @srcdir@
 prefix 		= @prefix@
 exec_prefix 	= @exec_prefix@
@@ -51,21 +52,21 @@ LN_S		= @LN_S@
 ##
 PIPE		= @PIPE@
 CFLAGS		= @CFLAGS@ ${PIPE}
-CXXFLAGS	= @CXXFLAGS@ -I@prefix@ ${PIPE}
-CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@ -I@prefix@
+CXXFLAGS	= @CXXFLAGS@ -I.. -I@prefix@ ${PIPE}
+CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@ -I.. -I@prefix@
 ifneq ($(SINGUNAME),ix86-Win)
-CPPFLAGS	= -I${srcdir} -I../kernel -I@prefix@ @CPPFLAGS@
+CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@
 else
 ## Dirs after @CPPFLAGS@ are for PySingular
-CPPFLAGS	= -I${srcdir} -I@prefix@ @CPPFLAGS@ 
+CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ 
 ## -I/usr/include/python2.4 -I/usr/local/include -I../modules/python
 endif
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
-LDFLAGS		= -L@prefix@/kernel -lkernel @LDFLAGS@
-LDFLAGSG	= -L@prefix@/kernel -lkernel_g @LDFLAGS@
-LDFLAGSP	= -L@prefix@/kernel -lkernel_p @LDFLAGS@
+LDFLAGS		= -L@prefix@/kernel -L../kernel -lkernel @LDFLAGS@
+LDFLAGSG	= -L@prefix@/kernel -L../kernel -lkernel_g @LDFLAGS@
+LDFLAGSP	= -L@prefix@/kernel -L../kernel -lkernel_p @LDFLAGS@
 else
 ## -L/usr/local/lib -L@prefix@/modules/python --> PySingular
 LDFLAGS		= -L@prefix@/kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python

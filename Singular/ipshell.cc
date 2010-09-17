@@ -12,12 +12,12 @@
 #include <ctype.h>
 #include <math.h>
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
 #include <Singular/ipid.h>
 #include <kernel/intvec.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
 #include <kernel/prCopy.h>
@@ -49,7 +49,7 @@
 #include <Singular/ipshell.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <factory.h>
+#include <factory/factory.h>
 #endif
 
 // define this if you want to use the fast_map routine for mapping ideals

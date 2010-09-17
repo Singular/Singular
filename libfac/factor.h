@@ -5,7 +5,7 @@
 #ifndef FACTOR_H
 #define FACTOR_H
 
-#include <factory.h>
+#include <factory/factory.h>
 
 // Set this to a nonzero value to interrupt the computation
 extern int libfac_interruptflag;

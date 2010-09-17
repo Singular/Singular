@@ -10,10 +10,10 @@
 #include <kernel/mod2.h>
 
 #ifdef HAVE_RINGS
-#include <mylimits.h>
+#include <omalloc/mylimits.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/longrat.h>
 #include <kernel/mpr_complex.h>

@@ -12,6 +12,8 @@ VERSION 	= @VERSION@
 ##
 ## various paths
 ##
+top_srcdir	= @top_srcdir@
+srcdir		= @srcdir@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 
@@ -37,7 +39,7 @@ MKINSTALLDIRS   = ./mkinstalldirs
 ## compiler and linker options
 ##
 CFLAGS		= @CFLAGS@
-CPPFLAGS	= -I. @CPPFLAGS@ -I@prefix@
+CPPFLAGS	= -I. @CPPFLAGS@ -I@prefix@ -I..
 DEFS		= @DEFS@
 
 ##

@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #ifdef STANDALONE_PARSER
   #include <Singular/utils.h>
   #define HAVE_LIBPARSER
@@ -21,7 +21,7 @@
   #include <Singular/tok.h>
   #include <kernel/options.h>
   #include <kernel/febase.h>
-  #include <omalloc.h>
+  #include <omalloc/omalloc.h>
 #endif
 #include <Singular/libparse.h>
 
@@ -51,7 +51,9 @@ char *text_buffer=NULL;
 long string_start;
 
 char *yylp_buffer_start;
+#ifndef NEW_FLEX
 int yylplineno = 1;
+#endif /* NEW_FLEX */
 int lpverbose = 0, check = 0;
 int texinfo_out = 0;
 int found_info=0,
@@ -844,7 +846,7 @@ void reinit_yylp()
    brace3 = 0;
    quote  = 0;
    yy_init=1;
-   yy_delete_buffer(yy_current_buffer);
+   yy_delete_buffer(YY_CURRENT_BUFFER);
 }
 
 void make_version(char *p,int what)

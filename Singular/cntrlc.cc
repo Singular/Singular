@@ -17,8 +17,8 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <Singular/mod2.h>
-#include <omalloc.h>
+#include <kernel/mod2.h>
+#include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <Singular/ipshell.h>
 #include <kernel/febase.h>

@@ -8,7 +8,7 @@
 * ABSTRACT: class intvec: lists/vectors of integers
 */
 #include <string.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 
 

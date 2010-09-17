@@ -12,12 +12,12 @@
 #include <ctype.h>
 #include <sys/stat.h>
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/static.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
 #include <Singular/ipid.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/ring.h>
 #include <Singular/subexpr.h>

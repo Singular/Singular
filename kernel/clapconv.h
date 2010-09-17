@@ -14,7 +14,9 @@
 #include <kernel/structs.h>
 #include <kernel/longalg.h>
 #include <kernel/ring.h>
-#include <factory.h>
+#ifdef HAVE_FACTORY
+#  include <factory/factory.h>
+#endif /* HAVE_FACTORY */
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r=currRing );
 CanonicalForm convSingPFactoryP( poly p, const ring r=currRing );

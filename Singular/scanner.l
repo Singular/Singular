@@ -8,16 +8,18 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <Singular/mod2.h>
-#include <omalloc.h>
+#include <kernel/mod2.h>
+#include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <Singular/stype.h>
-#include <Singular/ipshell.h?
+#include <Singular/ipshell.h>
 #include <kernel/febase.h>
 
 int feReadLine(char* b, int l);
 #define ALLOC(a) omAlloc((a))
+#ifndef NEW_FLEX
 int yylineno  = 0;
+#endif /* NEW_LEX */
 int blocknest = 0;
 extern char * yytext;
 //extern unsigned char * yytext;
@@ -366,14 +368,14 @@ newline                  {
 
 void * myynewbuffer()
 {
-  void * oldb = yy_current_buffer;
+  void * oldb = YY_CURRENT_BUFFER;
   yy_switch_to_buffer(yy_create_buffer(NULL, YY_BUF_SIZE));
   return oldb;
 }
 
 void myyoldbuffer(void * oldb)
 {
-  yy_delete_buffer(yy_current_buffer);
+  yy_delete_buffer(YY_CURRENT_BUFFER);
   yy_switch_to_buffer((YY_BUFFER_STATE)oldb);
   //yy_flush_buffer((YY_BUFFER_STATE)oldb);
 }

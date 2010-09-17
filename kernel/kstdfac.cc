@@ -7,7 +7,7 @@
 */
 
 #include <kernel/mod2.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/options.h>
 #include <kernel/polys.h>
 #include <kernel/ideals.h>

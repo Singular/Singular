@@ -17,7 +17,7 @@
 #include <kernel/ideals.h>
 #include <kernel/ring.h>
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/matpol.h>
 

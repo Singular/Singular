@@ -1,4 +1,4 @@
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/polys.h>
 #include <MinorProcessor.h>
@@ -208,7 +208,7 @@ string MinorProcessor::toString () const
 int MinorProcessor::IOverJ(const int i, const int j)
 {
   /* This is a non-recursive implementation. */
-  assert(i >= 0 && j >= 0 && i >= j);
+  assert( (i >= 0) && (j >= 0) && (i >= j));
   if (j == 0 || i == j) return 1;
   int result = 1;
   for (int k = i - j + 1; k <= i; k++) result *= k;

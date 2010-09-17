@@ -6,7 +6,7 @@
 * ABSTRACT - the mapping of polynomials to other rings
 */
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/febase.h>
 #include <kernel/polys.h>
@@ -14,7 +14,7 @@
 #include <kernel/ring.h>
 #include <kernel/ideals.h>
 #include <kernel/matpol.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <kernel/longalg.h>
 #include <Singular/lists.h>

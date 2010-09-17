@@ -10,7 +10,7 @@
 #include <string.h>
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/longrat.h>
 #include <kernel/modulop.h>
@@ -19,7 +19,7 @@
 #include <kernel/ideals.h>
 #include <kernel/ring.h>
 #ifdef HAVE_FACTORY
-#include <factory.h>
+#include <factory/factory.h>
 #include <kernel/clapsing.h>
 #include <kernel/clapconv.h>
 #endif

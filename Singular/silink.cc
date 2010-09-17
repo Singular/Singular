@@ -13,10 +13,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <Singular/subexpr.h>
 #include <Singular/ipid.h>

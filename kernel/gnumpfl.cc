@@ -11,7 +11,7 @@
 #include <kernel/mod2.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/modulop.h>
 #include <kernel/longrat.h>

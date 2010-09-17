@@ -3,7 +3,7 @@
 ****************************************/
 /* $Id$ */
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <kernel/options.h>
 #include <kernel/febase.h>
 #include <kernel/ideals.h>
@@ -14,8 +14,8 @@
 #include <Singular/ipid.h>
 #include <kernel/ring.h>
 #ifdef HAVE_FACTORY
-#include <factory.h>
-#endif
+#  include <factory/factory.h>
+#endif /* HAVE_FACTORY */
 
 //memory management
 #define mdmALLOC(x) omAlloc0(x)

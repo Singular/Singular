@@ -4,7 +4,7 @@
 #ifndef INCL_FACTOR_H
 #define INCL_FACTOR_H
 
-#include <factoryconf.h>
+#include <factory/factoryconf.h>
 
 #ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM

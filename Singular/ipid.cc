@@ -9,9 +9,9 @@
 
 #include <string.h>
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/static.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
 #include <Singular/ipshell.h>

@@ -16,7 +16,7 @@
 #endif /* ifndef NDEBUG */
 
 #include <kernel/options.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/numbers.h>
 #include <kernel/longrat.h>

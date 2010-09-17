@@ -10,7 +10,7 @@
 #include <math.h>
 #include <string.h>
 #include <kernel/mod2.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/structs.h>
 
 double wFunctionalMora(int *degw, int *lpol, int npol,

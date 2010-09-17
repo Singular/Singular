@@ -20,7 +20,7 @@
 #include <string.h>
 #include <kernel/mod2.h>
 
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #ifdef PDEBUG
 #undef NO_INLINE3
 #define NO_INLINE3

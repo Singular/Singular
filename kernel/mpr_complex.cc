@@ -15,7 +15,7 @@
 //#ifdef HAVE_MPR
 #include <kernel/structs.h>
 #include <kernel/febase.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/numbers.h>
 #include <kernel/longrat.h>
 #include <math.h>

@@ -1,0 +1,6 @@
+/*
+
+*/
+
+/* define this if we pack a distribution */
+#cmakedefine MAKE_DISTRIBUTION @MAKE_DISTRIBUTION@

@@ -18,9 +18,9 @@
 #ifdef ix86_Win
 #include <windows.h>
 #endif
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 #include <Singular/version.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 
 #if !defined(TSINGULAR) && !defined(ESINGULAR)
 #define ESINGULAR

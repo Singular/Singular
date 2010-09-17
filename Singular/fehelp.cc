@@ -13,10 +13,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <Singular/mod2.h>
-#include <mylimits.h>
+#include <kernel/mod2.h>
+#include <omalloc/mylimits.h>
 #include <Singular/tok.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <Singular/ipid.h>
 #include <Singular/ipshell.h>

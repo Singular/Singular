@@ -16,7 +16,7 @@
 *   lying in a 0-dimensional ideal.
 */
 
-#include <Singular/mod2.h>
+#include <kernel/mod2.h>
 
 #ifdef HAVE_FACTORY
 #include <Singular/tok.h>
@@ -28,7 +28,7 @@
 #include <Singular/ipshell.h>
 #include <kernel/febase.h>
 #include <kernel/maps.h>
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
 #include <kernel/fglm.h>
 
