@@ -616,6 +616,7 @@ EXAMPLE: example GKZsystem; shows examples
   string sord2 = "(a(0:" + string(n) + ")," + sord + ")";
   execute("ring GR = (0,b(1..@d)),(x(1..n),d(1..n)),"+sord2+";");
   def W=Weyl(); setring W;
+  kill GR;
   int i,j;
   poly p;
   ideal I;
@@ -631,8 +632,8 @@ EXAMPLE: example GKZsystem; shows examples
   I = I, imap(r1,I0);
   I = simplify(I,2);
   ideal GKZid = I;
-  export GKZid;
-  return(GR);
+  export(GKZid);
+  return(W);
 }
 example
 {"EXAMPLE:"; echo = 2;
