@@ -42,11 +42,11 @@ extern int  yyparse(void);
 enum {
   ALIAS_CMD     = UMINUS + 15,
   ATTRIB_CMD,
-#ifdef HAVE_FANS
+//#ifdef HAVE_FANS
   ADDADJ_CMD,
   ADDMCONE_CMD,
   ADJACENCY_CMD,
-#endif /* HAVE_FANS */
+//#endif /* HAVE_FANS */
   BAREISS_CMD,
   BIGINT_CMD,
   BRACKET_CMD,
@@ -56,9 +56,9 @@ enum {
   CHAR_SERIES_CMD,
   CLOSE_CMD,
   COLS_CMD,
-#ifdef HAVE_FANS
+//#ifdef HAVE_FANS
   CONE_CMD,
-#endif /* HAVE_FANS */
+//#endif /* HAVE_FANS */
   CONTENT_CMD,
   COUNT_CMD,
   DBPRINT_CMD,
@@ -77,10 +77,10 @@ enum {
   EXPORTTO_CMD,
   EXTGCD_CMD,
   FAC_CMD,
-#ifdef HAVE_FANS
+//#ifdef HAVE_FANS
   FACETNS_CMD,
   FAN_CMD,
-#endif /* HAVE_FANS */
+//#endif /* HAVE_FANS */
   FIND_CMD,
   FACSTD_CMD,
   FWALK_CMD,
@@ -89,9 +89,9 @@ enum {
   FINDUNI_CMD,
   GCD_CMD,
   GETDUMP_CMD,
-#ifdef HAVE_FANS
+//#ifdef HAVE_FANS
   GETPROP_CMD,
-#endif /* HAVE_FANS */
+//#endif /* HAVE_FANS */
   HIGHCORNER_CMD,
   HRES_CMD,
   IMPART_CMD,
@@ -109,19 +109,19 @@ enum {
   KRES_CMD,
   LAGSOLVE_CMD,
   LINK_CMD,
-#ifdef HAVE_FANS
+//#ifdef HAVE_FANS
   LINSPACE_CMD,
-#endif /* HAVE_FANS */
+//#endif /* HAVE_FANS */
   LIST_CMD,
   LOAD_CMD,
   LRES_CMD,
   LU_CMD,
   LUI_CMD,
   LUS_CMD,
-#ifdef HAVE_FANS
+//#ifdef HAVE_FANS
   MAXCONE_CMD,
   MAXRAYS_CMD,
-#endif /* HAVE_FANS */
+//#endif /* HAVE_FANS */
   MEMORY_CMD,
   MONITOR_CMD,
   MPRES_CMD,
@@ -153,9 +153,9 @@ enum {
   RESULTANT_CMD,
   RINGLIST_CMD,
   ROWS_CMD,
-#ifdef HAVE_FANS
+//#ifdef HAVE_FANS
   SETPROP_CMD,
-#endif /* HAVE_FANS */
+//#endif /* HAVE_FANS */
   SIMPLEX_CMD,
   SLIM_GB_CMD,
   SQR_FREE_CMD,
