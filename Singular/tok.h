@@ -65,9 +65,9 @@ enum {
   DEF_CMD,
   DEFINED_CMD,
   DELETE_CMD,
-#ifdef HAVE_FANS
+//#ifdef HAVE_FANS
   DELMCONE_CMD,
-#endif /* HAVE_FANS */
+//#endif /* HAVE_FANS */
   DET_CMD,
   DUMP_CMD,
   END_GRAMMAR,
