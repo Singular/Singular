@@ -1399,10 +1399,11 @@ void gcone::getExtremalRays(const gcone &gc)
 	//Add lineality space - dd_LinealitySpace
 	dd_MatrixPtr ddineq;
 	dd_ErrorType err;	
-	if(dd_LinealitySpace->rowsize>0)//The linspace might be 0
-		ddineq = dd_AppendMatrix(gc.ddFacets,gcone::dd_LinealitySpace);
-	else
-		ddineq = dd_CopyMatrix(gc.ddFacets);
+// 	if(dd_LinealitySpace->rowsize>0)//The linspace might be 0
+// 		ddineq = dd_AppendMatrix(gc.ddFacets,gcone::dd_LinealitySpace);
+// 	else
+// 		ddineq = dd_CopyMatrix(gc.ddFacets);
+	ddineq = (dd_LinealitySpace->rowsize>0) ? dd_AppendMatrix(gc.ddFacets,gcone::dd_LinealitySpace) : dd_CopyMatrix(gc.ddFacets);
 	/* In case the input is non-homogeneous we add constrains for the positive orthant.
 	* This is justified by the fact that for non-homog ideals we only consider the 
 	* restricted fan. This way we can be sure to find strictly positive interior points.
