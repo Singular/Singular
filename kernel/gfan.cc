@@ -2506,20 +2506,13 @@ static bool isParallel(const int64vec &a,const int64vec &b)
 #endif*/		
 	bool res;
 	int lhs=dotProduct(a,b)*dotProduct(a,b);
-	int rhs=dotProduct(a,a)*dotProduct(b,b);	
-	if (lhs==rhs)
-	{
-		res = TRUE;
-	}
-	else
-	{
-		res = FALSE;
-	}
+	int rhs=dotProduct(a,a)*dotProduct(b,b);
 // #ifdef gfanp
 // 	gettimeofday(&end, 0);
 // 	t_isParallel += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
 // #endif	
-	return res;
+// 	return res;
+	return res = (lhs==rhs)?TRUE:FALSE;
 }//bool isParallel
 
 /** \brief Compute an interior point of a given cone
