@@ -956,9 +956,11 @@ example
 
 proc puiseuxExpansion (poly f,int n,list #)
 "USAGE:  puiseuxExpansion(f,n,#); f poly, n int, # list
-ASSUME:  f is a polynomial in two variables and the base field is either
-         the field of rational numbers or a finite extension thereof;
-         monomial ordering is assumed to be local;
+ASSUME:  f is a non-constant polynomial in two variables which is not 
+         divisible by the first variable and which is squarefree
+         as a power series over the complex numbers;
+         the base field is either the field of rational numbers or a finite extension thereof;
+         monomial ordering is assumed to be local; 
          the optional parameter # can be the string 'subst'
 RETURN:  list, where each entry of the list l describes the Newton-Puiseux 
 @*             parametrisations of one branch of the plane curve singularity 
@@ -966,7 +968,7 @@ RETURN:  list, where each entry of the list l describes the Newton-Puiseux
 @*             parametetrisation are computed
 @*             l[i][1] = is a ring
 @*             l[i][2] = int
-@*             l[i][3] = list
+@*             l[i][3] = string
 @*
 @*       WE NOW DESCRIBE THE LIST ENTRIES l[i] IN MORE DETAIL: 
 @*       - the ring l[i][1] contains an ideal LIFT and the Newton-Puiseux
@@ -976,13 +978,18 @@ RETURN:  list, where each entry of the list l describes the Newton-Puiseux
            the new base field will have a parameter and a new minimal polynomial,
            and LIFT[2] describes how the old parameter can be computed from the new one
 @*       - if the option subst was set l[i][3] contains the polynomial where
-           y has been substituted by y(t^{1/N})
+           y has been substituted by y(t^{1/N}) as a string
 REMARK:  - it is best to use the procedure displayPuiseuxExpansion to 
            display the result
 @*       - the procedure requires the @sc{Singular} procedure absPrimdecGTZ to be
            present in the package primdec.lib
+@*       - if f is not squarefree it will be replaced by its squarefree part
 EXAMPLE:   example puiseuxExpansion;   shows an example"
 {
+  if (deg(f)<=0)
+  {
+    ERROR("The input polynomial is not allowed to be constant!");
+  }
   if (char(basering)!=0)
   {
     ERROR("In positive characteristic a Puiseux expansion will not in general exist!");
@@ -995,12 +1002,18 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
   {
     ERROR("The base ring should depend on exactly two variables.");
   }
+  if (f==(f / var(1))*var(1))
+  {
+    ERROR("The input polynomial is not allowed to be divisible by the first variable.");
+  }
   // if the ordering is not local, change to a local ordering
   if ((1<var(1)) or (1<var(2)))
   {
     def GLOBALRING=basering;
+    number mp=minpoly;
     execute("ring LOCALRING=("+charstr(basering)+"),("+varstr(basering)+"),ds;");
     poly f=imap(GLOBALRING,f);
+    minpoly=imap(GLOBALRING,mp);
   }
   // check if a substitution is necessary
   int noResubst;
@@ -1011,65 +1024,128 @@ EXAMPLE:   example puiseuxExpansion;   shows an example"
       noResubst=0;
     }
   }
-  // compute the Newton polygon 
-  int jj,zw;
-  intvec w;
-  int ggteiler;
-  list NewtP=newtonpoly(f);
-  list tls;
-  list pexp;
-  // if the base field has a minimal polynomial change the base ring and the ideal
-  if (minpoly!=0)
+  // replace f by its squarefree part
+  f=squarefree(f);
+  // check if var(1) or var(2) divide f
+  int coordinatebranchtwo;
+  if (f==(f / var(2))*var(2))
   {
-    poly mp=minpoly;
-    def OLDRING=basering;
-    execute("ring NEWRING=0,("+varstr(basering)+","+parstr(basering)+"),ds;");
-    ideal I=imap(OLDRING,mp),imap(OLDRING,f);
+    coordinatebranchtwo=1;
+    f=f/var(2);
   }
-  else
+  int jj;
+  // if f is now constant then we should skip the next part
+  if (deg(f)!=0)
   {
-    ideal I=f;
-  }
-  // for each facet of the Newton polygon compute the corresponding parametrisations
-  // using tropicalLifting with the option "puiseux" which avoids gfan
-  for (jj=1;jj<=size(NewtP)-1;jj++)
-  {
-    w=NewtP[jj]-NewtP[jj+1];
-    ggteiler=gcd(w[1],w[2]);
-    zw=w[1]/ggteiler;
-    w[1]=w[2]/ggteiler;
-    w[2]=zw;
-    // if we have introduced a third variable for the parameter, then w needs a third component
-    if (nvars(basering)==3)
+    // compute the Newton polygon 
+    int zw;
+    intvec w;
+    int ggteiler;
+    list NewtP=newtonpoly(f);
+    list tls;
+    list pexp;
+    // if the base field has a minimal polynomial change the base ring and the ideal
+    if (minpoly!=0)
     {
-      w[3]=0;
-    }
-    if (noResubst==0)
-    {
-      tls=tropicalLifting(I,w,n,"findAll","puiseux");
+      poly mp=minpoly;
+      def OLDRING=basering;
+      execute("ring NEWRING=0,("+varstr(basering)+","+parstr(basering)+"),ds;");
+      ideal I=imap(OLDRING,mp),imap(OLDRING,f);
     }
     else
     {
-      tls=tropicalLifting(I,w,n,"findAll","puiseux","noResubst");
+      ideal I=f;
     }
-    pexp=pexp+tls;
+    // for each facet of the Newton polygon compute the corresponding parametrisations
+    // using tropicalLifting with the option "puiseux" which avoids gfan
+    for (jj=1;jj<=size(NewtP)-1;jj++)
+    {
+      w=NewtP[jj]-NewtP[jj+1];
+      ggteiler=gcd(w[1],w[2]);
+      zw=w[1]/ggteiler;
+      w[1]=w[2]/ggteiler;
+      w[2]=zw;
+      // if we have introduced a third variable for the parameter, then w needs a third component
+      if (nvars(basering)==3)
+      {
+        w[3]=0;
+      }
+      if (noResubst==0)
+      {
+        tls=tropicalLifting(I,w,n,"findAll","puiseux");
+      }
+      else
+      {
+        tls=tropicalLifting(I,w,n,"findAll","puiseux","noResubst");
+      }
+      pexp=pexp+tls;
+    }
+    // kill rings that are no longer needed
+    if (defined(NEWRING))
+    {
+      setring OLDRING;
+      kill NEWRING;
+    }  
+    if (defined(GLOBALRING))
+    {
+      setring GLOBALRING;
+      kill LOCALRING;
+    }  
+    // remove the third entry in the list of parametrisations since we know
+    // that none of the exponents in the parametrisation will be negative
+    for (jj=1;jj<=size(pexp);jj++)
+    {
+      pexp[jj]=delete(pexp[jj],3);
+      pexp[jj][3]=pexp[jj][3][size(pexp[jj][3])]; // replace the list in pexp[jj][3] by its first entry
+    }
   }
-  // kill rings that are no longer needed
-  if (defined(NEWRING))
+  else // if f was reduced to a constant we still have to introduce the list pexp
   {
-    setring OLDRING;
-    kill NEWRING;
-  }  
-  if (defined(GLOBALRING))
+    list pexp;
+  }
+  // we have to add the parametrisations for the branches var(1) resp. var(2) if
+  // we removed them
+  def BASERING=basering;
+  if (coordinatebranchtwo==1)
   {
-    setring GLOBALRING;
-    kill LOCALRING;
-  }  
-  // remove the third entry in the list of parametrisations since we know
-  // that none of the exponents in the parametrisation will be negative
+    ring brring=0,t,ds;
+    ideal LIFT=0;
+    export(LIFT);
+    setring BASERING;
+    list pexpentry;
+    pexpentry[1]=brring;
+    pexpentry[2]=1;
+    pexpentry[3]="0";
+    pexp[size(pexp)+1]=pexpentry;
+    kill brring;
+  }
+  // check if all branches have been found
+  int numberofbranchesfound;
   for (jj=1;jj<=size(pexp);jj++)
   {
-    pexp[jj]=delete(pexp[jj],3);
+    def countring=pexp[jj][1];
+    setring countring;
+    if (minpoly==0)
+    {
+      numberofbranchesfound=numberofbranchesfound+1;
+    }
+    else
+    {
+      poly mp=minpoly;
+      ring degreering=0,a,dp;
+      poly mp=imap(countring,mp);
+      numberofbranchesfound=numberofbranchesfound+deg(mp);
+      setring countring;
+      kill degreering;
+    }
+    setring BASERING;
+    kill countring;
+  }  
+  // give a warning if not all branches have been found
+  if (numberofbranchesfound!=ord(subst(f,x,0))+coordinatebranchtwo)
+  {
+    "!!!! WARNING: The number of terms computed in the Puiseux expansion were";
+    "!!!!          not enough to find all branches of the curve singularity!";
   }
   return(pexp);
 }
@@ -1117,6 +1193,7 @@ EXAMPLE:   example displayPuiseuxExpansion;   shows an example"
     {
       variablen[j-1]=string(var(j));
     }
+    def BASERING=basering;
     def LIFTRing=puiseux[1];
     int N=puiseux[2];
     string LIFTpar=parstr(LIFTRing);
@@ -1141,24 +1218,33 @@ EXAMPLE:   example displayPuiseuxExpansion;   shows an example"
     }
     "";
     "The expansion has the form:";
-    for (j=1;j<=size(LIFT);j++)
+    // treat the case LIFT==0 separately
+    if (size(LIFT)==0)
     {
-      if (ncols(LIFT)==size(variablen))
+      variablen[1]+"=0";
+    }
+    else
+    {
+      for (j=1;j<=size(LIFT);j++)
       {
-        variablen[j]+"="+displaypoly(LIFT[j],N,0,1);
-      }
-      else
-      {
-        "var("+string(j)+")="+displaypoly(LIFT[j],N,0,1);
+        if (ncols(LIFT)==size(variablen))
+        {
+          variablen[j]+"="+displaypoly(LIFT[j],N,0,1);
+        }
+        else
+        {
+          "var("+string(j)+")="+displaypoly(LIFT[j],N,0,1);
+        }
       }
     }
     if (size(#)>0)
     {
       if (#[1]=="subst")
       {
+        setring BASERING;
         "";
         "Substituting the expansion into the polynomial gives:";
-        "f="+puiseux[3][size(puiseux[3])];
+        "f="+puiseux[3];
       }
     }
   }      
@@ -5627,7 +5713,7 @@ NOTE:    - the procedure is also called recursively by itself, and
             if (nvars(basering)>2) // if the basering has a parameter
             { // we have to pass to a ring with two variables to compute the newtonpoly
               def PRENPRing=basering;
-              poly NPpoly=i[size(i)];
+              poly NPpoly=i[1];
               ring NPRING=(0,@a),(x(1),t),ds;
               poly NPpoly=imap(PRENPRing,NPpoly);
               list NewtP=newtonpoly(NPpoly);
@@ -5859,6 +5945,9 @@ NOTE:    - the procedure is called from inside the recursive
     // the result lives in the maximal 
     // ideal <t,x_1,...,[no x_lastvar],...,x_n> so that 
     // there is a solution which has strictly positive valuation
+    // ADDENDUM:
+    // if i (without m) has only one polynomial, then we can divide
+    // i by t as long as possible to compute the saturation with respect to t
 /*
     // DER NACHFOLGENDE TEIL IST MUELL UND WIRD NICHT MEHR GAMACHT
     // for the test we simply compute the leading ideal 
@@ -5895,8 +5984,20 @@ NOTE:    - the procedure is called from inside the recursive
     }
     if (size(LI)==0) // if no power of t is in lead(I) (where @a is considered as a field element)
 */
-    I=reduce(sat(ideal(var(lastvar)+i),t)[1],std(m)); // get rid of the minimal 
-                                                      // polynomial for the test
+    if (size(i)-size(m)!=1)
+    {
+      I=reduce(sat(std(ideal(var(lastvar)+i)),t)[1],std(m)); // get rid of the minimal 
+                                                             // polynomial for the test
+    }
+    else
+    {
+      I=subst(i,var(lastvar),0);
+      while (subst(I[1],t,0)==0)
+      {
+        I[1]=I[1]/t;
+      }
+      I=reduce(I,std(m));
+    }
     LI=subst(I,var(nvars(basering)),0);
     //size(deletedvariables)=anzahlvariablen(before elimination)
     for (j=1;j<=anzahlvariablen-1;j++) 
@@ -5948,7 +6049,20 @@ NOTE:    - the procedure is called from inside the recursive
     // the ideal is zero dimensional, this really removes  
     // all solutions with that component zero;
     // the checking is then done as above
-    i=std(sat(i,var(lastvar))[1]);
+    // ADDENDUM
+    // if the ideal i (without m) is generated by a single polynomial
+    // then we saturate by successively dividing by the variable
+    if (size(i)-size(m)==1)
+    {
+      while (subst(i[1],var(lastvar),0)==0)
+      {
+        i[1]=i[1]/var(lastvar);
+      }
+    }
+    else
+    {
+      i=std(sat(i,var(lastvar))[1]);
+    }
     I=reduce(i,std(m)); // "remove" m from i
     // test first, if i still is in the ideal <t,x_1,...,x_n> -- if not, then 
     // we know that i has no longer a point in the tropical 
@@ -5958,7 +6072,7 @@ NOTE:    - the procedure is called from inside the recursive
     { // t,x_1,...,x_n equal to zero
       LI=subst(LI,var(j),0);
     }
-    if (size(LI)==0) // the entries of i have not constant part
+    if (size(LI)==0) // the entries of i have no constant part
     {      
       // check now, if the leading ideal of i contains an element 
       // which only depends on t
@@ -6003,7 +6117,7 @@ NOTE:    - the procedure is called from inside the recursive
     ideal variablen; // will contain the variables which are not eliminated
     for (j=anzahlvariablen-1;j>=1;j--)  // the variable t is the last one !!!
     {
-      I=sat(ideal(var(j)+i),t)[1];
+      I=sat(ideal(std(var(j)+i)),t)[1];
       LI=subst(I,var(nvars(basering)),0);
       //size(deletedvariables)=anzahlvariablen-1(before elimination)
       for (k=1;k<=size(deletedvariables);k++) 
@@ -6224,12 +6338,12 @@ NOTE:     -  the procedure is called from inside the recursive procedure
       for (k=1;k<=size(i);k++)
       {
         if (l!=1) // corresponds to  x_(l-1) --  note t is the last variable
-        {        
-          i[k]=substitute(i[k],var(l-1),(zeroneu[l]+var(l-1))*t^(-w[l]));
+        {
+          i[k]=subst(i[k],var(l-1),(zeroneu[l]+var(l-1))*t^(-w[l]));
         }
         else // corresponds to t
         {
-          i[k]=substitute(i[k],var(nvars(basering)),var(nvars(basering))^(-w[l]));
+          i[k]=subst(i[k],var(nvars(basering)),var(nvars(basering))^(-w[l]));
         }
       }
     }
