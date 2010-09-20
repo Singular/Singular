@@ -237,7 +237,7 @@ See also @ref{Non-commutative libraries}.
 * System and Control theory::
 * Teaching::
 * Tropical Geometry::
-* Contributed::
+* Miscellaneous libraries::
 * Submitted::
 @end menu
 @c ----------------------------------------------------------
@@ -822,7 +822,7 @@ but not for serious computations.
 @c lib rootsur.lib
 
 @c ----------------------------------------------------------------------------
-@node Tropical Geometry, Contributed, Teaching, SINGULAR libraries
+@node Tropical Geometry, Miscellaneous libraries, Teaching, SINGULAR libraries
 @section Tropical Geometry
 @cindex Tropical Geometry
 
@@ -844,22 +844,22 @@ but not for serious computations.
 @c lib tropical.lib no_ex
 
 @c ----------------------------------------------------------------------------
-@node Contributed,Submitted,Tropical Geometry, SINGULAR libraries
-@section Contributed
-@cindex Contributed libraries
+@node  Miscellaneous libraries,Submitted,Tropical Geometry, SINGULAR libraries
+@section  Miscellaneous libraries
+@cindex  Miscellaneous libraries
 
 @menu
 * phindex_lib::
 @end menu
 @c ----------------------------------------------------------
-@node phindex_lib,,, Contributed
+@node phindex_lib,,, Miscellaneous libraries
 @subsection phindex_lib
 @cindex phindex_lib
 
 @c lib phindex.lib
 
 @c ----------------------------------------------------------------------------
-@node Submitted,,Contributed, SINGULAR libraries
+@node Submitted,,Miscellaneous libraries, SINGULAR libraries
 @section Submitted
 @cindex Submitted libraries
 
