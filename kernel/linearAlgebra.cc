@@ -147,6 +147,7 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
         if (p != NULL)
         {
           n = nDiv(pGetCoeff(p), pivotElement);
+          nNormalize(n);
 
           /* filling lMat;
              old entry was zero, so no need to call pDelete(.) */
@@ -156,9 +157,12 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
           MATELEM(uMat, rGauss, r + cOffset) = NULL; pDelete(&p);
           n = nNeg(n);
           for (int cGauss = r + cOffset + 1; cGauss <= cc; cGauss++)
+          {
             MATELEM(uMat, rGauss, cGauss)
               = pAdd(MATELEM(uMat, rGauss, cGauss),
                      ppMult_nn(MATELEM(uMat, r, cGauss), n));
+            pNormalize(MATELEM(uMat, rGauss, cGauss));
+          }
 
           nDelete(&n); /* clean up n */
         }
@@ -181,8 +185,6 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
  **/
 bool luInverse(const matrix aMat, matrix &iMat)
 { /* aMat is guaranteed to be an (n x n)-matrix */
-  int d = aMat->rows();
-
   matrix pMat;
   matrix lMat;
   matrix uMat;
@@ -195,6 +197,41 @@ bool luInverse(const matrix aMat, matrix &iMat)
   idDelete((ideal*)&uMat);
 
   return result;
+}
+
+/* Assumes that aMat is already in row echelon form */
+int rankFromRowEchelonForm(const matrix aMat)
+{
+  int rank = 0;
+  int rr = aMat->rows(); int cc = aMat->cols();
+  int r = 1; int c = 1;
+  while ((r <= rr) && (c <= cc))
+  {
+    if (MATELEM(aMat, r, c) == NULL) c++;
+    else { rank++; r++; }
+  }
+  return rank;
+}
+
+int luRank(const matrix aMat, const bool isRowEchelon)
+{
+  if (isRowEchelon) return rankFromRowEchelonForm(aMat);
+  else
+  { /* compute the LU-decomposition and read off the rank from
+       the upper triangular matrix of that decomposition */
+    matrix pMat;
+    matrix lMat;
+    matrix uMat;
+    luDecomp(aMat, pMat, lMat, uMat);
+    int result = rankFromRowEchelonForm(uMat);
+  
+    /* clean-up */
+    idDelete((ideal*)&pMat);
+    idDelete((ideal*)&lMat);
+    idDelete((ideal*)&uMat);
+  
+    return result;
+  }
 }
 
 bool upperRightTriangleInverse(const matrix uMat, matrix &iMat,
@@ -237,6 +274,7 @@ bool upperRightTriangleInverse(const matrix uMat, matrix &iMat,
         }
         p = pNeg(p);
         p = pMult(p, pCopy(MATELEM(iMat, r, r)));
+        pNormalize(p);
         MATELEM(iMat, r, c) = p;
       }
     }
@@ -284,6 +322,7 @@ bool lowerLeftTriangleInverse(const matrix lMat, matrix &iMat,
         }
         p = pNeg(p);
         p = pMult(p, pCopy(MATELEM(iMat, c, c)));
+        pNormalize(p);
         MATELEM(iMat, r, c) = p;
       }
     }
@@ -348,6 +387,7 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
     for (int c = 1; c < r; c++)
       p = pAdd(p, ppMult_qq(MATELEM(lMat, r, c), MATELEM(yVec, c, 1) ));
     MATELEM(yVec, r, 1) = pNeg(p);
+    pNormalize(MATELEM(yVec, r, 1));
   }
   
   /* determine whether uMat * xVec = yVec is solvable */
@@ -382,6 +422,7 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
           p = pAdd(p, ppMult_qq(MATELEM(uMat, r, c), MATELEM(xVec, c, 1)));
       poly q = pNSet(nInvers(pGetCoeff(MATELEM(uMat, r, nonZeroC))));
       MATELEM(xVec, nonZeroC, 1) = pMult(pNeg(p), q);
+      pNormalize(MATELEM(xVec, nonZeroC, 1));
       lastNonZeroC = nonZeroC;
     }
   }

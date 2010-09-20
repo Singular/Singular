@@ -411,6 +411,7 @@ cmdnames cmds[] =
   { "quote",       0, QUOTE ,             QUOTE},
   { "quotient",    0, QUOTIENT_CMD ,      CMD_2},
   { "random",      0, RANDOM_CMD ,        CMD_23},
+  { "rank",        0, RANK_CMD ,          CMD_12},
   { "read",        0, READ_CMD ,          CMD_12},
   { "reduce",      0, REDUCE_CMD ,        CMD_M},
   { "regularity",  0, REGULARITY_CMD ,    CMD_1},
@@ -2961,6 +2962,15 @@ static BOOLEAN jjRANDOM(leftv res, leftv u, leftv v)
 #endif /* buildin_rand */
   return FALSE;
 }
+static BOOLEAN jjRANK2(leftv res, leftv u, leftv v)
+{
+  matrix m =(matrix)u->Data();
+  int isRowEchelon = (int)(long)v->Data();
+  if (isRowEchelon != 1) isRowEchelon = 0;
+  int rank = luRank(m, isRowEchelon);
+  res->data =(char *)(long)rank;
+  return FALSE;
+}
 static BOOLEAN jjREAD2(leftv res, leftv u, leftv v)
 {
   si_link l=(si_link)u->Data();
@@ -3976,6 +3986,7 @@ struct sValCmd2 dArith2[]=
 ,{jjQUOT,      QUOTIENT_CMD,   MODUL_CMD,      MODUL_CMD,  IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjQUOT,      QUOTIENT_CMD,   IDEAL_CMD,      MODUL_CMD,  MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjRANDOM,    RANDOM_CMD,     INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{jjRANK2,     RANK_CMD,       INT_CMD,        MATRIX_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjREAD2,     READ_CMD,       STRING_CMD,     LINK_CMD,   STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjREDUCE_P,  REDUCE_CMD,     POLY_CMD,       POLY_CMD,   IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjREDUCE_P,  REDUCE_CMD,     VECTOR_CMD,     VECTOR_CMD, IDEAL_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -5044,6 +5055,13 @@ static BOOLEAN jjRESERVEDNAME(leftv res, leftv v)
   //res->data = (char *)0;
   return FALSE;
 }
+static BOOLEAN jjRANK1(leftv res, leftv v)
+{
+  matrix m =(matrix)v->Data();
+  int rank = luRank(m, 0);
+  res->data =(char *)(long)rank;
+  return FALSE;
+}
 static BOOLEAN jjREAD(leftv res, leftv v)
 {
   return jjREAD2(res,v,NULL);
@@ -5970,6 +5988,7 @@ struct sValCmd1 dArith1[]=
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{kQHWeight,    QHWEIGHT_CMD,    INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{jjWRONG,      QRING_CMD,       0,              ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
+,{jjRANK1,      RANK_CMD,        INT_CMD,        MATRIX_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{jjREAD,       READ_CMD,        STRING_CMD,     LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{jjREGULARITY, REGULARITY_CMD,  INT_CMD,        LIST_CMD      , NO_PLURAL |ALLOW_RING}
 ,{jjREPART,     REPART_CMD,      NUMBER_CMD,     NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}

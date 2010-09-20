@@ -197,7 +197,26 @@ bool luInverseFromLUDecomp(
                                      decomposition                */
        matrix &iMat       /**< [out] inverse of A if invertible   */
                           );
-                          
+
+/**
+ * Computes the rank of a given (m x n)-matrix.
+ *
+ * The matrix may already be given in row echelon form, e.g., when
+ * the user has before called luDecomp and passes the upper triangular
+ * matrix U to luRank. In this case, the second argument can be set to
+ * true in order to pass this piece of information to the method.
+ * Otherwise, luDecomp will be called first to compute the matrix U.
+ * The rank is then read off the matrix U.
+ *
+ * @return the rank as an int
+ * @sa luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
+ **/
+int luRank(
+       const matrix aMat,      /**< [in]  input matrix */
+       const bool isRowEchelon /**< [in]  if true then aMat is assumed to be
+                                          already in row echelon form */
+          );
+
 /**
  * Solves the linear system A*x = b, where A is an (n x n)-matrix
  * which is given by its LU-decomposition.
