@@ -169,6 +169,7 @@ and @code{LIB} no brackets are allowed.
 * quote::
 * quotient::
 * random::
+* rank::
 * read::
 * reduce::
 * regularity::
@@ -5673,7 +5674,7 @@ See
 @ref{module}.
 @c ref
 @c ---------------------------------------
-@node random, read, quotient, Functions
+@node random, rank, quotient, Functions
 @subsection random
 @cindex random
 @table @code
@@ -5718,7 +5719,43 @@ See
 @ref{system}.
 @c ref
 @c ---------------------------------------
-@node read, reduce, random, Functions
+@node rank, read, random, Functions
+@subsection rank
+@cindex rank
+@table @code
+@item @strong{Syntax:}
+@code{rank (} matrix_expression @code{)}
+@item @strong{Type:}
+int
+@item @strong{Purpose:}
+returns the rank of a given matrix which is filled with elements
+of the ground field
+@item @strong{Note:}
+The function works by computing the row echelon form of the matrix using
+the same algorithm as for @code{ludecomp}.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring s = 0, x, dp;
+  matrix A[100][100];
+  int i; int j; int r;
+  for (i = 1; i <= 100; i++)
+  {
+    for (j = 1; j <= 100; j++)
+    {
+      A[i, j] = random(-10, 10);
+    }
+  }
+  r = rank(A); r;
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{ludecomp}.
+@c ref
+@c ---------------------------------------
+@node read, reduce, rank, Functions
 @subsection read
 @cindex read
 @table @code
