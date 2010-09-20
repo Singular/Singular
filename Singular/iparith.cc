@@ -7741,9 +7741,10 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
         b is the right-hand side vector of the equation system;
      The method will return a list of either 1 entry or three entries:
      1) [0] if there is no solution to the system;
-     2) [1, x, dim] if there is at least one solution;
-        x is any solution, dim is the dimension of the affine solution
-        space.
+     2) [1, x, H] if there is at least one solution;
+        x is any solution of the given linear system,
+        H is the matrix with column vectors spanning the homogeneous
+        solution space.
      The method produces an error if matrix and vector sizes do not fit. */
   if ((v == NULL) || (v->Typ() != MATRIX_CMD) ||
       (v->next == NULL) || (v->next->Typ() != MATRIX_CMD) ||
@@ -7759,7 +7760,7 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
   matrix lMat = (matrix)v->next->Data();
   matrix uMat = (matrix)v->next->next->Data();
   matrix bVec = (matrix)v->next->next->next->Data();
-  matrix xVec; int solvable; int dim;
+  matrix xVec; int solvable; matrix homogSolSpace;
   if (pMat->rows() != pMat->cols())
   {
     Werror("first matrix (%d x %d) is not quadratic",
@@ -7784,7 +7785,7 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
            uMat->rows(), uMat->cols(), bVec->rows());
     return TRUE;
   }
-  solvable = luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, &dim);
+  solvable = luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, homogSolSpace);
 
   /* build the return structure; a list with either one or three entries */
   lists ll = (lists)omAllocBin(slists_bin);
@@ -7793,7 +7794,7 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
     ll->Init(3);
     ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
     ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)xVec;
-    ll->m[2].rtyp=INT_CMD;    ll->m[2].data=(void *)dim;
+    ll->m[2].rtyp=MATRIX_CMD; ll->m[2].data=(void *)homogSolSpace;
   }
   else
   {

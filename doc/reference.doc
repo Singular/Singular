@@ -3879,10 +3879,9 @@ See
 @item @strong{Type:}
 matrix
 @item @strong{Purpose:}
-Computes a solution of a linear equation system A*x = b, if solvable
-
-The (m x n matrix A must be given by its LU-decomposition, that is, by three
-matrices P, L, and U, in this order, which satisfy
+Computes all solutions of a linear equation system A*x = b, if solvable
+@*The (m x n matrix A must be given by its LU-decomposition, that is, by
+three matrices P, L, and U, in this order, which satisfy
 @*- P * A = L * U,
 @*- P is an (m x m) permutation matrix, i.e., its rows/columns form the
 standard basis of K^m,
@@ -3892,28 +3891,40 @@ entries equal to 1, and
 @*The fourth argument, b, is expected to be an (m x 1) matrix, i.e., a vector.
 
 @code{list L=lusolve(P,L,U,b);} fills the list L with either one entry = 0
-(signaling that A*x=b has no solution), or with the three entries 1, x, d,
-where x is any (n x 1) solution and d the dimension of the affine solution
-space.
+(signaling that A*x=b has no solution), or with the three entries 1, x, H,
+where x is any (n x 1) solution of the given linear system, and H is a
+matrix the columns of which span the solution space of the homogeneous
+linear system. (I.e., @code{ncols(H)} is the dimension of the solution space.)
+@*If there is exactly one solution, then H is the 1x1 matrix with entry
+zero.
 @item @strong{Note:}
 The method will give a warning if the matrices violate the above conditions
 regarding row and column numbers, or if the number of rows of the vector b
 does not equal m.
+@* The method expects matrices with entries coming from the ground field of
+the given polynomial ring, only.
 
 @item @strong{Example:}
 @smallexample
 @c example
   ring r=0,(x),dp;
-  matrix A[4][3]=1,1,3,2,1,4,3,0,3,4,0,4;
-  matrix b[4][1]=5,7,6,8;
+  matrix A[4][4]=1,1,1,0,1,2,3,1,1,3,5,2,1,4,7,3;
+  matrix b[4][1]=2,5,8,11;
   list L=ludecomp(A);
   list Q=lusolve(L[1],L[2],L[3],b);
   if (Q[1] == 1)
   {
+    "one solution:";
     print(Q[2]);
-    "----- next should be the zero vector:";
+    "check whether result is correct (iff next is zero vector):";
     print(A*Q[2]-b);
-    "solution space has dimension", Q[3];
+    if ((nrows(Q[3])==1) and (ncols(Q[3])==1) and (Q[3][1,1]==0))
+    { "printed solution is the only solution to given linear system" }
+    else
+    {
+      "homogeneous solution space is spanned by columns of:";
+      print(Q[3]);
+    }
   }
 @c example
 @end smallexample
