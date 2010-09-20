@@ -2700,7 +2700,7 @@ static BOOLEAN jjMONITOR2(leftv res, leftv u,leftv v)
   monitor((char *)(u->Data()),mode);
 #else
   si_link l=(si_link)u->Data();
-  if (slOpen(l,SI_LINK_WRITE)) return TRUE;
+  if (slOpen(l,SI_LINK_WRITE,u)) return TRUE;
   if(strcmp(l->m->type,"ASCII")!=0)
   {
     Werror("ASCII link required, not `%s`",l->m->type);
@@ -4898,7 +4898,7 @@ static BOOLEAN jjNVARS(leftv res, leftv v)
 static BOOLEAN jjOpenClose(leftv res, leftv v)
 {
   si_link l=(si_link)v->Data();
-  if (iiOp==OPEN_CMD) return slOpen(l, SI_LINK_OPEN);
+  if (iiOp==OPEN_CMD) return slOpen(l, SI_LINK_OPEN,v);
   else                return slClose(l);
 }
 static BOOLEAN jjORD(leftv res, leftv v)

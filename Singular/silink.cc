@@ -188,7 +188,7 @@ const char* slStatus(si_link l, const char *request)
 }
 
 //--------------------------------------------------------------------------
-BOOLEAN slOpen(si_link l, short flag)
+BOOLEAN slOpen(si_link l, short flag, leftv h)
 {
   BOOLEAN res;
 
@@ -201,13 +201,16 @@ BOOLEAN slOpen(si_link l, short flag)
     return FALSE;
   }
   else if (l->m->Open != NULL)
-    res = l->m->Open(l, flag);
+    res = l->m->Open(l, flag, h);
   else
     res = TRUE;
 
+  const char *c="_";;
+  if (h!=NULL) c=h->Name();
+
   if (res)
-    Werror("open: Error for link of type: %s, mode: %s, name: %s",
-           l->m->type, l->mode, l->name);
+    Werror("open: Error for link %s of type: %s, mode: %s, name: %s",
+           c, l->m->type, l->mode, l->name);
   return res;
 }
 
@@ -242,7 +245,7 @@ leftv slRead(si_link l, leftv a)
       }
 #endif
 #endif
-    if (slOpen(l, SI_LINK_READ)) return NULL;
+    if (slOpen(l, SI_LINK_READ,NULL)) return NULL;
   }
 
   if (SI_LINK_R_OPEN_P(l))
@@ -289,7 +292,7 @@ BOOLEAN slWrite(si_link l, leftv v)
       }
 #endif
 #endif
-    if (slOpen(l, SI_LINK_WRITE)) return TRUE;
+    if (slOpen(l, SI_LINK_WRITE,NULL)) return TRUE;
   }
 
   if (SI_LINK_W_OPEN_P(l))
@@ -318,7 +321,7 @@ BOOLEAN slDump(si_link l)
 
   if(! SI_LINK_W_OPEN_P(l)) // open w ?
   {
-    if (slOpen(l, SI_LINK_WRITE)) return TRUE;
+    if (slOpen(l, SI_LINK_WRITE,NULL)) return TRUE;
   }
 
   if(SI_LINK_W_OPEN_P(l))
@@ -347,7 +350,7 @@ BOOLEAN slGetDump(si_link l)
 
   if(! SI_LINK_R_OPEN_P(l)) // open r ?
   {
-    if (slOpen(l, SI_LINK_READ)) return TRUE;
+    if (slOpen(l, SI_LINK_READ,NULL)) return TRUE;
   }
 
   if(SI_LINK_R_OPEN_P(l))
@@ -373,7 +376,7 @@ BOOLEAN slGetDump(si_link l)
 
 
 /* =============== ASCII ============================================= */
-BOOLEAN slOpenAscii(si_link l, short flag)
+BOOLEAN slOpenAscii(si_link l, short flag, leftv h)
 {
   const char *mode;
   if (flag & SI_LINK_OPEN)

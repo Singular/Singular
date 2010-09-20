@@ -557,7 +557,7 @@ LINKAGE int Batch_do(const char* port, const char* host)
   slInit(silink, istr);
   omFree(istr);
   // open link
-  if (slOpen(silink, SI_LINK_OPEN))
+  if (slOpen(silink, SI_LINK_OPEN,NULL))
   {
     fprintf(stderr, "Batch side could not connect on port %s and host %s\n",
             port, host);

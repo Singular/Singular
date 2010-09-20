@@ -463,7 +463,7 @@ lists ssiReadList(si_link l)
 }
 
 //**************************************************************************/
-BOOLEAN ssiOpen(si_link l, short flag)
+BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 {
   const char *mode;
   ssiInfo *d=(ssiInfo*)omAlloc0(sizeof(ssiInfo));
@@ -504,6 +504,11 @@ BOOLEAN ssiOpen(si_link l, short flag)
         SI_LINK_SET_RW_OPEN_P(l);
         myynest=0;
         fe_fgets_stdin=fe_fgets_dummy;
+	if ((u!=NULL)&&(u->rtyp==IDHDL))
+	{
+	  idhdl h=(idhdl)u->data;
+	  h->lev=0;
+	}
         loop
         {
           leftv h=ssiRead1(l); /*contains an exit.... */
@@ -844,7 +849,7 @@ no_ring: WerrorS("no ring");
 //**************************************************************************/
 LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
 {
-  if(!SI_LINK_W_OPEN_P(l)) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE);
+  if(!SI_LINK_W_OPEN_P(l)) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL);
   ssiInfo *d = (ssiInfo *)l->data;
   d->level++;
   //FILE *fich=d->f;
@@ -934,12 +939,12 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
 
 si_link_extension slInitSsiExtension(si_link_extension s)
 {
-  s->Open=(slOpenProc)ssiOpen;
-  s->Close=(slCloseProc)ssiClose;
-  s->Kill=(slKillProc)ssiClose;
-  s->Read=(slReadProc)ssiRead1;
+  s->Open=ssiOpen;
+  s->Close=ssiClose;
+  s->Kill=ssiClose;
+  s->Read=ssiRead1;
   s->Read2=(slRead2Proc)NULL;
-  s->Write=(slWriteProc)ssiWrite;
+  s->Write=ssiWrite;
 
   s->Status=slStatusSsi;
   s->type="ssi";
@@ -1075,7 +1080,7 @@ int ssiBatch(const char *host, const char * port)
   char *buf=(char*)omAlloc(256);
   sprintf(buf,"ssi:connect %s:%s",host,port);
   slInit(l, buf);
-  slOpen(l,SI_LINK_OPEN);
+  slOpen(l,SI_LINK_OPEN,NULL);
   SI_LINK_SET_RW_OPEN_P(l);
   loop
   {

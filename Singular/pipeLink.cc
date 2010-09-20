@@ -37,7 +37,7 @@ typedef struct
 } pipeInfo;
 
 //**************************************************************************/
-BOOLEAN pipeOpen(si_link l, short flag)
+BOOLEAN pipeOpen(si_link l, short flag, leftv u)
 {
   pipeInfo *d=(pipeInfo*)omAlloc0(sizeof(pipeInfo));
   if (flag & SI_LINK_OPEN)
@@ -127,7 +127,7 @@ LINKAGE leftv pipeRead1(si_link l)
 extern si_link pipeLastLink;
 LINKAGE BOOLEAN pipeWrite(si_link l, leftv data)
 {
-  if(!SI_LINK_W_OPEN_P(l)) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE);
+  if(!SI_LINK_W_OPEN_P(l)) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL);
   pipeInfo *d = (pipeInfo *)l->data;
   FILE *outfile=d->f_write;;
   BOOLEAN err=FALSE;
@@ -194,12 +194,12 @@ const char* slStatusPipe(si_link l, const char* request)
 
 si_link_extension slInitPipeExtension(si_link_extension s)
 {
-  s->Open=(slOpenProc)pipeOpen;
-  s->Close=(slCloseProc)pipeClose;
-  s->Kill=(slKillProc)pipeKill;
-  s->Read=(slReadProc)pipeRead1;
+  s->Open=pipeOpen;
+  s->Close=pipeClose;
+  s->Kill=pipeKill;
+  s->Read=pipeRead1;
   s->Read2=(slRead2Proc)NULL;
-  s->Write=(slWriteProc)pipeWrite;
+  s->Write=pipeWrite;
 
   s->Status=slStatusPipe;
   s->type="pipe";

@@ -12,7 +12,7 @@
 #include <Singular/sing_dbm.h>
 
 // extension links:
-typedef BOOLEAN    (*slOpenProc)(si_link l, short flag);
+typedef BOOLEAN    (*slOpenProc)(si_link l, short flag, leftv h);
 typedef BOOLEAN    (*slWriteProc)(si_link l, leftv lv);
 typedef BOOLEAN    (*slCloseProc)(si_link l);
 typedef BOOLEAN    (*slKillProc)(si_link l);
@@ -66,7 +66,7 @@ struct sip_link
 #define SI_LINK_SET_R_OPEN_P(l) ((l)->flags |= (SI_LINK_OPEN | SI_LINK_READ))
 #define SI_LINK_SET_RW_OPEN_P(l) ((l)->flags |= (SI_LINK_OPEN | SI_LINK_READ | SI_LINK_WRITE))
 
-BOOLEAN slOpen(si_link l, short flag);
+BOOLEAN slOpen(si_link l, short flag, leftv h);
 BOOLEAN slClose(si_link l);
 leftv   slRead(si_link l,leftv a=NULL);
 BOOLEAN slWrite(si_link l, leftv v);
