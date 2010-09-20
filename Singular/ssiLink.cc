@@ -482,6 +482,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
   else mode = "a";
 
 
+  SI_LINK_SET_OPEN_P(l, flag);
+  l->data=d;
+  omFree(l->mode);
+  l->mode = omStrDup(mode);
+
   if (l->name[0] == '\0')
   {
     if (strcmp(mode,"fork")==0)
@@ -537,6 +542,9 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       else
       {
         Werror("fork failed (%d)",errno);
+        l->data=NULL;
+        omFree(d);
+        return TRUE;
       }
     }
     else if (strcmp(mode,"tcp")==0)
@@ -548,6 +556,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       if(sockfd < 0)
       {
         WerrorS("ERROR opening socket");
+        l->data=NULL;
+        omFree(d);
         return TRUE;
       }
       memset((char *) &serv_addr,0, sizeof(serv_addr));
@@ -561,6 +571,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         if(portno > 50000)
         {
           WerrorS("ERROR on binding (no free port available?)");
+          l->data=NULL;
+          omFree(d);
           return TRUE;
         }
       }
@@ -571,6 +583,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       if(newsockfd < 0)
       {
         WerrorS("ERROR on accept");
+        l->data=NULL;
+        omFree(d);
         return TRUE;
       }
       PrintS("client accepted\n");
@@ -605,6 +619,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       if(sockfd < 0)
       {
         WerrorS("ERROR opening socket");
+        l->data=NULL;
+        omFree(d);
         return TRUE;
       }
       memset((char *) &serv_addr,0, sizeof(serv_addr));
@@ -618,6 +634,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         if(portno > 50000)
         {
           WerrorS("ERROR on binding (no free port available?)");
+          l->data=NULL;
           return TRUE;
         }
       }
@@ -630,6 +647,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       if(r == 0)
       {
         WerrorS("ERROR: no host specified");
+        l->data=NULL;
+        omFree(d);
         return TRUE;
       }
       else if(r == 1)
@@ -647,6 +666,8 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       if(newsockfd < 0)
       {
         WerrorS("ERROR on accept");
+        l->data=NULL;
+        omFree(d);
         return TRUE;
       }
       //PrintS("client accepted\n");
@@ -685,11 +706,15 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         d->fd_read=sockfd;
         d->f_write=fdopen(sockfd,"w");
         d->fd_write=sockfd;
-        l->data=d;
         SI_LINK_SET_RW_OPEN_P(l);
 	omFree(host);
       }
-      else return TRUE;
+      else
+      {
+        l->data=NULL;
+        omFree(d);
+        return TRUE;
+      }
     }
     else
     {
@@ -719,15 +744,12 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       else
       {
         omFree(d);
+        l->data=NULL;
         return TRUE;
       }
     }
   }
-  l->data=d;
 
-  omFree(l->mode);
-  l->mode = omStrDup(mode);
-  SI_LINK_SET_OPEN_P(l, flag);
   return FALSE;
 }
 
@@ -849,7 +871,7 @@ no_ring: WerrorS("no ring");
 //**************************************************************************/
 LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
 {
-  if(!SI_LINK_W_OPEN_P(l)) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL);
+  if(SI_LINK_W_OPEN_P(l)==0) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL);
   ssiInfo *d = (ssiInfo *)l->data;
   d->level++;
   //FILE *fich=d->f;
@@ -1017,7 +1039,7 @@ int slStatusSsiL(lists L, int timeout)
     if (L->m[i].Typ()!=LINK_CMD)
     { WerrorS("all elements must be of type link"); return -2;}
     l=(si_link)L->m[i].Data();
-    if(!SI_LINK_OPEN_P(l))
+    if(SI_LINK_OPEN_P(l)==0)
     { WerrorS("all links must be open"); return -2;}
     if ((strcmp(l->m->type,"ssi")!=0)
     && (strcmp(l->mode,"fork")!=0) || (strcmp(l->mode,"tcp")!=NULL))
