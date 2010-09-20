@@ -20,6 +20,7 @@ PROCEDURES:
  weightKB(stc,dd,vl)    degree dd part of a kbase w.r.t. some weigths
  qslimgb(i)             computes a standard basis with slimgb in a qring
  par2varRing([i])       create a ring making pars to vars, together with i
+ datetime()		return date and time as a string
 
 ";
 //AUXILIARY PROCEDURES:
@@ -1987,6 +1988,22 @@ example
 { "EXAMPLE:"; echo=2;
   ring R=0, (x,y), wp(1,2);
   weightKB(ideal(0),3,intvec(1,2));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc datetime()
+"SYNTAX: @code{datetime ()}
+RETURN:  string
+PURPOSE: return the curent date and time as a string
+EXAMPLE: example datetime; shows an example
+"
+{
+  return(read("|: date"));
+}
+example
+{ "EXAMPLE:"; echo=2;
+  datetime();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
