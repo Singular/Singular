@@ -49,7 +49,7 @@ TIMING_DEFINE_PRINT(newton_interpolation);
 /// N to reverse the compression
 static inline
 int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
-                CFMap & N, bool& top_level) 
+                CFMap & N, bool& topLevel) 
 { 
   int n= tmax (F.level(), G.level());
   int * degsf= new int [n + 1];
@@ -66,7 +66,7 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
   int g_zero= 0;
   int both_zero= 0;
 
-  if (top_level) 
+  if (topLevel) 
   {
     for (int i= 1; i <= n; i++) 
     {
@@ -87,7 +87,12 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
       }
     }
 
-    if (both_non_zero == 0) return 0;
+    if (both_non_zero == 0) 
+    {
+      delete [] degsf;
+      delete [] degsg;
+      return 0;
+    }
 
     // map Variables which do not occur in both polynomials to higher levels
     int k= 1;
@@ -200,6 +205,146 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
   return 1;
 }
 
+int
+substituteCheck (const CanonicalForm& F, const CanonicalForm& G) 
+{
+  if (F.inCoeffDomain() || G.inCoeffDomain())
+    return 0;
+  Variable x= Variable (1);
+  if (degree (F, x) <= 1 || degree (G, x) <= 1)
+    return 0;
+  CanonicalForm f= swapvar (F, F.mvar(), x); //TODO swapping seems to be pretty expensive 
+  CanonicalForm g= swapvar (G, G.mvar(), x); 
+  int sizef= 0;
+  int sizeg= 0; 
+  for (CFIterator i= f; i.hasTerms(); i++, sizef++)
+  {
+    if (i.exp() == 1)
+      return 0;
+  }
+  for (CFIterator i= g; i.hasTerms(); i++, sizeg++)
+  {
+    if (i.exp() == 1)
+      return 0;
+  }
+  int * expf= new int [sizef];
+  int * expg= new int [sizeg];
+  int j= 0;
+  for (CFIterator i= f; i.hasTerms(); i++, j++)
+  {
+    expf [j]= i.exp();
+  }
+  j= 0;
+  for (CFIterator i= g; i.hasTerms(); i++, j++)
+  {
+    expg [j]= i.exp();
+  }
+  
+  int indf= sizef - 1;
+  int indg= sizeg - 1;
+  if (expf[indf] == 0)
+    indf--;
+  if (expg[indg] == 0)
+    indg--;
+    
+  if (expg[indg] != expf [indf] || (expg[indg] == 1 && expf[indf] == 1))
+  {
+    delete [] expg;
+    delete [] expf;
+    return 0;
+  }
+  // expf[indg] == expf[indf] after here
+  int result= expg[indg];
+  for (int i= indf - 1; i >= 0; i--)
+  {
+    if (expf [i]%result != 0)
+    {
+      delete [] expg;
+      delete [] expf;
+      return 0;
+    }
+  }
+  
+  for (int i= indg - 1; i >= 0; i--)
+  {
+    if (expg [i]%result != 0)
+    {
+      delete [] expg;
+      delete [] expf;
+      return 0;
+    }
+  }
+
+  delete [] expg;
+  delete [] expf;
+  return result;
+}
+
+// substiution
+void 
+subst (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& A, 
+       CanonicalForm& B, const int d
+      )
+{
+  if (d == 1)
+  {
+    A= F;
+    B= G;
+    return;
+  }
+  
+  CanonicalForm C= 0;
+  CanonicalForm D= 0;  
+  Variable x= Variable (1);
+  CanonicalForm f= swapvar (F, x, F.mvar());
+  CanonicalForm g= swapvar (G, x, G.mvar());
+  for (CFIterator i= f; i.hasTerms(); i++)
+    C += i.coeff()*power (f.mvar(), i.exp()/ d);
+  for (CFIterator i= g; i.hasTerms(); i++)
+    D += i.coeff()*power (g.mvar(), i.exp()/ d);
+  A= swapvar (C, x, F.mvar());
+  B= swapvar (D, x, G.mvar());
+}
+
+CanonicalForm 
+reverseSubst (const CanonicalForm& F, const int d)
+{
+  if (d == 1)
+    return F;
+  
+  Variable x= Variable (1);
+  if (degree (F, x) <= 0)
+    return F;
+  CanonicalForm f= swapvar (F, x, F.mvar());
+  CanonicalForm result= 0;
+  for (CFIterator i= f; i.hasTerms(); i++)
+    result += i.coeff()*power (f.mvar(), d*i.exp());
+  return swapvar (result, x, F.mvar());   
+}
+
+static inline CanonicalForm 
+uni_content (const CanonicalForm & F);
+
+CanonicalForm
+uni_content (const CanonicalForm& F, const Variable& x)
+{
+  if (F.inCoeffDomain())
+    return F.genOne();
+  if (F.level() == x.level() && F.isUnivariate())
+    return F;
+  if (F.level() != x.level() && F.isUnivariate())
+    return F.genOne();
+    
+  if (x.level() != 1)
+  {
+    CanonicalForm f= swapvar (F, x, Variable (1));
+    CanonicalForm result= uni_content (f);
+    return swapvar (result, x, Variable (1));
+  }
+  else
+    return uni_content (F);
+} 
+
 /// compute the content of F, where F is considered as an element of 
 /// \f$ R[x_{1}][x_{2},\ldots ,x_{n}] \f$ 
 static inline CanonicalForm 
@@ -230,6 +375,31 @@ uni_content (const CanonicalForm & F)
     }
     return c;
   }
+}
+
+CanonicalForm 
+extractContents (const CanonicalForm& F, const CanonicalForm& G, 
+                 CanonicalForm& contentF, CanonicalForm& contentG, 
+                 CanonicalForm& ppF, CanonicalForm& ppG, const int d)
+{
+  CanonicalForm uniContentF, uniContentG, gcdcFcG;
+  contentF= 1;
+  contentG= 1;
+  ppF= F;
+  ppG= G;
+  CanonicalForm result= 1;
+  for (int i= 1; i <= d; i++)
+  {
+    uniContentF= uni_content (F, Variable (i));
+    uniContentG= uni_content (G, Variable (i));
+    gcdcFcG= gcd (uniContentF, uniContentG);
+    contentF *= uniContentF;
+    contentG *= uniContentG;
+    ppF /= uniContentF;
+    ppG /= uniContentG;
+    result *= gcdcFcG;
+  }
+  return result;
 }
 
 /// compute the leading coefficient of F, where F is considered as an element
@@ -335,12 +505,12 @@ void choose_extension (const int& d, const int& num_vars, Variable& beta)
 }
 
 /// GCD of F and G over \f$ F_{p}(\alpha ) \f$ , 
-/// l and top_level are only used internally, output is monic
+/// l and topLevel are only used internally, output is monic
 /// based on Alg. 7.2. as described in "Algorithms for
 /// Computer Algebra" by Geddes, Czapor, Labahn
 CanonicalForm 
 GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G, 
-                  Variable & alpha, CFList& l, bool& top_level) 
+                  Variable & alpha, CFList& l, bool& topLevel) 
 { 
   CanonicalForm A= F;
   CanonicalForm B= G;
@@ -353,7 +523,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   if (F == G) return F/Lc(F);
  
   CFMap M,N;
-  int best_level= myCompress (A, B, M, N, top_level);
+  int best_level= myCompress (A, B, M, N, topLevel);
 
   if (best_level == 0) return B.genOne();
 
@@ -366,17 +536,30 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   if (A.isUnivariate() && B.isUnivariate()) 
     return N (gcd(A,B)); 
   
+  int substitute= substituteCheck (A, B);
+  
+  if (substitute > 1)
+    subst (A, B, A, B, substitute);
+
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
 
-  cA = uni_content (A);
-  cB = uni_content (B);
-
-  gcdcAcB= gcd (cA, cB);
-
-  ppA= A/cA;
-  ppB= B/cB;
+  if (topLevel)
+  {
+    if (best_level <= 2)
+      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
+    else 
+      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);  
+  }
+  else
+  {
+    cA = uni_content (A);
+    cB = uni_content (B); 
+    gcdcAcB= gcd (cA, cB);
+    ppA= A/cA;
+    ppB= B/cB;
+  }
 
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB; 
@@ -384,7 +567,8 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   lcA= uni_lcoeff (ppA);
   lcB= uni_lcoeff (ppB);
   
-  if (fdivides (lcA, lcB)) { 
+  if (fdivides (lcA, lcB)) 
+  { 
     if (fdivides (A, B))
       return F/Lc(F);    
   }
@@ -398,11 +582,23 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
 
   int d= totaldegree (ppA, Variable(2), Variable (ppA.level()));
 
-  if (d == 0) return N(gcdcAcB);
+  if (d == 0)
+  {
+    if (substitute > 1)
+      return N (reverseSubst (gcdcAcB, substitute));
+    else 
+      return N(gcdcAcB);
+  }
   int d0= totaldegree (ppB, Variable(2), Variable (ppB.level()));
   if (d0 < d) 
     d= d0; 
-  if (d == 0) return N(gcdcAcB);
+  if (d == 0)
+  {
+    if (substitute > 1)
+      return N (reverseSubst (gcdcAcB, substitute));
+    else 
+      return N(gcdcAcB);
+  }
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
   CanonicalForm newtonPoly;
@@ -412,7 +608,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
   G_m= 0;
   H= 0;
   bool fail= false;
-  top_level= false;
+  topLevel= false;
   bool inextension= false;
   Variable V_buf= alpha;
   CanonicalForm prim_elem, im_prim_elem;
@@ -460,7 +656,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       TIMING_START (gcd_recursion);
       G_random_element= 
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), V_buf,
-                        list, top_level);
+                        list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion, 
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -471,7 +667,7 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
       TIMING_START (gcd_recursion);
       G_random_element= 
       GCD_Fp_extension (ppA(random_element, x), ppB(random_element, x), V_buf,
-                        list, top_level);
+                        list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion, 
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -479,7 +675,13 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
 
     d0= totaldegree (G_random_element, Variable(2), 
                      Variable (G_random_element.level()));
-    if (d0 == 0) return N(gcdcAcB); 
+    if (d0 == 0)
+    {
+      if (substitute > 1)
+        return N (reverseSubst (gcdcAcB, substitute));
+      else 
+        return N(gcdcAcB);
+    }
     if (d0 >  d) 
     {
       if (!find (l, random_element))
@@ -521,10 +723,24 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
         ppH /= Lc(ppH);
         DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
         if (fdivides (ppH, A) && fdivides (ppH, B))         
+        {
+          if (substitute > 1)
+          {
+            ppH= reverseSubst (ppH, substitute);
+            gcdcAcB= reverseSubst (gcdcAcB, substitute);
+          }
           return N(gcdcAcB*ppH);
+        }
       }
       else if (fdivides (ppH, A) && fdivides (ppH, B)) 
-        return N(gcdcAcB*(ppH/Lc(ppH)));
+      {
+        if (substitute > 1)
+        {
+          ppH= reverseSubst (ppH, substitute);
+          gcdcAcB= reverseSubst (gcdcAcB, substitute);
+        }
+        return N(gcdcAcB*ppH);
+      }
     }
 
     G_m= H;
@@ -579,7 +795,7 @@ GFRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
 /// faster field arithmetics, however it might fail if the input is large since
 /// the size of the base field is bounded by 2^16, output is monic
 CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
-        CFList& l, bool& top_level) 
+        CFList& l, bool& topLevel) 
 { 
   CanonicalForm A= F;
   CanonicalForm B= G;
@@ -592,7 +808,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   if (F == G) return F/Lc(F);
  
   CFMap M,N;
-  int best_level= myCompress (A, B, M, N, top_level);
+  int best_level= myCompress (A, B, M, N, topLevel);
 
   if (best_level == 0) return B.genOne();
 
@@ -605,17 +821,30 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   if (A.isUnivariate() && B.isUnivariate()) 
     return N (gcd (A, B)); 
 
+  int substitute= substituteCheck (A, B);
+  
+  if (substitute > 1)
+    subst (A, B, A, B, substitute);
+
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
 
-  cA = uni_content (A);
-  cB = uni_content (B);
-
-  gcdcAcB= gcd (cA, cB);
-
-  ppA= A/cA;
-  ppB= B/cB;
+  if (topLevel)
+  {
+    if (best_level <= 2)
+      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
+    else 
+      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);  
+  }
+  else
+  {
+    cA = uni_content (A);
+    cB = uni_content (B); 
+    gcdcAcB= gcd (cA, cB);
+    ppA= A/cA;
+    ppB= B/cB;
+  }
 
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB; 
@@ -637,11 +866,23 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   gcdlcAlcB= gcd (lcA, lcB);
 
   int d= totaldegree (ppA, Variable(2), Variable (ppA.level()));
-  if (d == 0) return N(gcdcAcB);
+  if (d == 0)
+  {
+    if (substitute > 1)
+      return N (reverseSubst (gcdcAcB, substitute));
+    else 
+      return N(gcdcAcB);
+  }
   int d0= totaldegree (ppB, Variable(2), Variable (ppB.level()));
   if (d0 < d) 
     d= d0; 
-  if (d == 0) return N(gcdcAcB);
+  if (d == 0)
+  {
+    if (substitute > 1)
+      return N (reverseSubst (gcdcAcB, substitute));
+    else 
+      return N(gcdcAcB);
+  }
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
   CanonicalForm newtonPoly;
@@ -651,7 +892,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   G_m= 0;
   H= 0;
   bool fail= false;
-  top_level= false;
+  topLevel= false;
   bool inextension= false;
   int p;
   int k= getGFDegree();
@@ -693,7 +934,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element= GCD_GF (ppA(random_element, x), ppB(random_element, x), 
-                                list, top_level);
+                                list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion, 
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -703,7 +944,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element= GCD_GF (ppA(random_element, x), ppB(random_element, x), 
-                                list, top_level);
+                                list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion, 
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -716,10 +957,20 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       if (inextension) 
       {
         setCharacteristic (p, k, gf_name_buf);
-        return N(gcdcAcB); 
+        {
+          if (substitute > 1)
+            return N (reverseSubst (gcdcAcB, substitute));
+          else
+            return N(gcdcAcB); 
+        } 
       }
       else
-        return N(gcdcAcB);
+      {
+        if (substitute > 1)
+          return N (reverseSubst (gcdcAcB, substitute));
+        else
+          return N(gcdcAcB); 
+      }
     } 
     if (d0 >  d) 
     {
@@ -758,6 +1009,11 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
           DEBOUTLN (cerr, "ppH before mapDown= " << ppH);
           ppH= GFMapDown (ppH, k);
           DEBOUTLN (cerr, "ppH after mapDown= " << ppH);
+          if (substitute > 1)
+          {
+            ppH= reverseSubst (ppH, substitute);
+            gcdcAcB= reverseSubst (gcdcAcB, substitute);
+          }
           setCharacteristic (p, k, gf_name_buf);
           return N(gcdcAcB*ppH);
         }
@@ -765,7 +1021,14 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
       else 
       {
         if (fdivides (ppH, A) && fdivides (ppH, B)) 
+        {
+          if (substitute > 1)
+          {
+            ppH= reverseSubst (ppH, substitute);
+            gcdcAcB= reverseSubst (gcdcAcB, substitute);
+          }
           return N(gcdcAcB*ppH);
+        }
       }
     }
 
@@ -828,7 +1091,7 @@ FpRandomElement (const CanonicalForm& F, CFList& list, bool& fail)
 }
 
 CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G, 
-                           bool& top_level, CFList& l) 
+                           bool& topLevel, CFList& l) 
 {
   CanonicalForm A= F;
   CanonicalForm B= G;
@@ -841,7 +1104,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   if (F == G) return F/Lc(F);
 
   CFMap M,N;
-  int best_level= myCompress (A, B, M, N, top_level);
+  int best_level= myCompress (A, B, M, N, topLevel);
 
   if (best_level == 0) return B.genOne();
 
@@ -854,14 +1117,30 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   if (A.isUnivariate() && B.isUnivariate()) 
     return N (gcd (A, B));
 
+  int substitute= substituteCheck (A, B);
+  
+  if (substitute > 1)
+    subst (A, B, A, B, substitute);
+
   CanonicalForm cA, cB;    // content of A and B
   CanonicalForm ppA, ppB;    // primitive part of A and B
   CanonicalForm gcdcAcB;
-  cA = uni_content (A);
-  cB = uni_content (B); 
-  gcdcAcB= gcd (cA, cB);
-  ppA= A/cA;
-  ppB= B/cB;
+
+  if (topLevel)
+  {
+    if (best_level <= 2)
+      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
+    else 
+      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);  
+  }
+  else
+  {
+    cA = uni_content (A);
+    cB = uni_content (B); 
+    gcdcAcB= gcd (cA, cB);
+    ppA= A/cA;
+    ppB= B/cB;
+  }
 
   CanonicalForm lcA, lcB;  // leading coefficients of A and B
   CanonicalForm gcdlcAlcB; 
@@ -884,13 +1163,25 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   int d= totaldegree (ppA, Variable (2), Variable (ppA.level()));
   int d0;
 
-  if (d == 0) return N(gcdcAcB);
+  if (d == 0)
+  {
+    if (substitute > 1)
+      return N (reverseSubst (gcdcAcB, substitute));
+    else 
+      return N(gcdcAcB);
+  }
   d0= totaldegree (ppB, Variable (2), Variable (ppB.level()));
 
   if (d0 < d) 
     d= d0;
 
-  if (d == 0) return N(gcdcAcB);
+  if (d == 0) 
+  {
+    if (substitute > 1)
+      return N (reverseSubst (gcdcAcB, substitute));
+    else 
+      return N(gcdcAcB);
+  }
 
   CanonicalForm m, random_element, G_m, G_random_element, H, cH, ppH;
   CanonicalForm newtonPoly= 1;
@@ -898,14 +1189,11 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   H= 0;
   G_m= 0;
   Variable alpha, V_buf;
-  int p, k;
   bool fail= false;
   bool inextension= false;
   bool inextensionextension= false;
-  top_level= false;
-  CanonicalForm CF_buf;
+  topLevel= false;
   CFList source, dest;
-  CanonicalForm gcdcheck;
   do 
   {
     if (inextension)
@@ -918,7 +1206,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       CFList list;
       TIMING_START (gcd_recursion);
       G_random_element= 
-      GCD_small_p (ppA (random_element,x), ppB (random_element,x), top_level, 
+      GCD_small_p (ppA (random_element,x), ppB (random_element,x), topLevel, 
       list);
       TIMING_END_AND_PRINT (gcd_recursion, 
                             "time for recursive call: ");
@@ -930,7 +1218,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       TIMING_START (gcd_recursion);
       G_random_element= 
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), alpha, 
-                        list, top_level);
+                        list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion, 
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);    
@@ -941,7 +1229,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       dest= CFList();
       CFList list;
       CanonicalForm mipo;
-      int deg= 3;
+      int deg= 2;
       do {
         mipo= randomIrredpoly (deg, x); 
         alpha= rootOf (mipo);
@@ -954,7 +1242,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       TIMING_START (gcd_recursion);
       G_random_element= 
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), alpha, 
-                        list, top_level);
+                        list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion, 
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -1000,7 +1288,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       TIMING_START (gcd_recursion);
       G_random_element= 
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), V_buf,
-                        list, top_level);
+                        list, topLevel);
       TIMING_END_AND_PRINT (gcd_recursion, 
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
@@ -1012,7 +1300,10 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
 
     if (d0 == 0)
     {
-      return N(gcdcAcB); 
+      if (substitute > 1)
+        return N (reverseSubst (gcdcAcB, substitute));
+      else
+        return N(gcdcAcB); 
     }
     if (d0 >  d) 
     { 
@@ -1049,7 +1340,14 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       ppH /= Lc (ppH);
       DEBOUTLN (cerr, "ppH= " << ppH);
       if (fdivides (ppH, A) && fdivides (ppH, B)) 
+      {
+        if (substitute > 1)
+        {
+          ppH= reverseSubst (ppH, substitute);
+          gcdcAcB= reverseSubst (gcdcAcB, substitute);
+        }
         return N(gcdcAcB*ppH);
+      }
     }
 
     G_m= H;
