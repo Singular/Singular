@@ -796,7 +796,7 @@ See
 @ref{coeffs}.
 @c ref
 @c ---------------------------------------
-@node coeffs, datetime, coef, Functions
+@node coeffs, contract, coef, Functions
 @subsection coeffs
 @cindex coeffs
 
@@ -1109,20 +1109,7 @@ See
 @node datetime, dbprint, contract, Functions
 @subsection datetime
 @cindex datetime
-
-@table @code
-@item @strong{Syntax:}
-@code{datetime}
-@item @strong{Type:}
-string
-@item @strong{Purpose:}
-return the current local date and time as a string;
-@*This string has the format 'DAY MMM DD HH:MM:SS YYYY\n',
-where DAY is a three character string representing the day
-of the week, MMM a three character string representing the
-month, DD a two digit string representing the day, HH:MM:SS
-the current local time, and YYYY the year.
-@*Note that the returned string ends with a linefeed.
+@c lib standard.lib:datetime lib_fun lib_ex subsection
 
 @c ---------------------------------------
 @node dbprint, defined, datetime, Functions
