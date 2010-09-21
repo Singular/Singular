@@ -98,10 +98,8 @@ public:
     InternalCF * normalize_myself();
 
     friend class InternalInteger;
-#ifdef SINGULAR
     friend void gmp_numerator ( const CanonicalForm & f, mpz_ptr result );
     friend void gmp_denominator ( const CanonicalForm & f, mpz_ptr result );
-#endif /* SINGULAR */
     friend CanonicalForm make_cf ( const MP_INT & n, const MP_INT & d );
 };
 
