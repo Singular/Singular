@@ -46,6 +46,18 @@ typedef struct
   char level;
 } ssiInfo;
 
+
+typedef struct
+{
+  leftv u;
+  si_link l;
+  void * next;
+} link_struct;
+
+typedef link_struct* link_list;
+
+link_list ssiToBeClosed=NULL;
+
 // the helper functions:
 void ssiSetCurrRing(const ring r)
 {
@@ -491,6 +503,12 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
   {
     if (strcmp(mode,"fork")==0)
     {
+      link_list n=(link_list)omAlloc(sizeof(link_struct));
+      n->u=u;
+      n->l=l;
+      n->next=(void *)ssiToBeClosed;
+      ssiToBeClosed=n;
+
       int pc[2];
       int cp[2];
       pipe(pc);
@@ -498,6 +516,21 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       pid_t pid=fork();
       if (pid==0) /*child*/
       {
+        link_list hh=ssiToBeClosed;
+        while(hh!=NULL)
+        {
+          if (hh->l!=l)
+          {
+            ssiInfo *dd=(ssiInfo*)hh->l->data;
+            fclose(dd->f_read);
+            fclose(dd->f_write);
+            if (dd->r!=NULL) rKill(dd->r);
+            omFreeSize((ADDRESS)dd,(sizeof *dd));
+            hh->l->data=NULL;
+            SI_LINK_SET_CLOSE_P(hh->l);
+          }
+          hh=(link_list)hh->next;
+        }
         close(pc[1]); close(cp[0]);
         d->f_read=fdopen(pc[0],"r");
         d->fd_read=pc[0];
@@ -509,11 +542,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         SI_LINK_SET_RW_OPEN_P(l);
         myynest=0;
         fe_fgets_stdin=fe_fgets_dummy;
-	if ((u!=NULL)&&(u->rtyp==IDHDL))
-	{
-	  idhdl h=(idhdl)u->data;
-	  h->lev=0;
-	}
+        if ((u!=NULL)&&(u->rtyp==IDHDL))
+        {
+          idhdl h=(idhdl)u->data;
+          h->lev=0;
+        }
         loop
         {
           leftv h=ssiRead1(l); /*contains an exit.... */
@@ -684,7 +717,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       int sockfd, portno, n;
       struct sockaddr_in serv_addr;
       struct hostent *server;
-  
+
       sscanf(l->name,"%255[^:]:%d",host,&portno);
       //Print("connect to host %s, port %d\n",host,portno);mflush();
       if (portno!=0)
@@ -696,18 +729,18 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         memset((char *) &serv_addr, 0, sizeof(serv_addr));
         serv_addr.sin_family = AF_INET;
         memcpy((char *)&serv_addr.sin_addr.s_addr,
-	      (char *)server->h_addr,
+              (char *)server->h_addr,
               server->h_length);
         serv_addr.sin_port = htons(portno);
         if (connect(sockfd,(sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
         { WerrorS("ERROR connecting"); return TRUE; }
-	//PrintS("connected\n");mflush();
+        //PrintS("connected\n");mflush();
         d->f_read=fdopen(sockfd,"r");
         d->fd_read=sockfd;
         d->f_write=fdopen(sockfd,"w");
         d->fd_write=sockfd;
         SI_LINK_SET_RW_OPEN_P(l);
-	omFree(host);
+        omFree(host);
       }
       else
       {
@@ -763,6 +796,23 @@ LINKAGE BOOLEAN ssiClose(si_link l)
     || (strcmp(l->mode,"fork")==0))
     {
       fprintf(d->f_write,"99\n");fflush(d->f_write);
+      link_list hh=ssiToBeClosed;
+      if (hh->l==l)
+      {
+         ssiToBeClosed=(link_list)hh->next;
+         omFreeSize(hh,sizeof(link_struct));
+      }
+      else while(hh!=NULL)
+      {
+        link_list hhh=(link_list)hh->next;
+        if (hhh->l==l)
+        {
+          hh->next=hhh->next;
+          omFreeSize(hhh,sizeof(link_struct));
+          break;
+        }
+        hh=(link_list)hh->next;
+      }
     }
     if (d->f_read!=NULL) fclose(d->f_read);
     if (d->f_write!=NULL) fclose(d->f_write);
@@ -883,7 +933,7 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
     switch(tt /*data->Typ()*/)
     {
           case NONE/* nothing*/:fprintf(d->f_write,"16 ");
-	                  break;
+                          break;
           case STRING_CMD: fprintf(d->f_write,"2 ");
                            ssiWriteString(d,(char *)dd);
                            break;
@@ -1061,7 +1111,7 @@ int slStatusSsiL(lists L, int timeout)
   /* check with select: chars waiting: no -> not ready */
   int s= select(max_fd, &mask, NULL, NULL, wt_ptr);
   if (s==-1) return -2; /*error*/
-  if (s==0) 
+  if (s==0)
   {
     return -1; /*poll: not ready */
   }
