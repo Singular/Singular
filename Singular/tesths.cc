@@ -76,7 +76,9 @@ int mmInit( void )
 #endif // ifndef LIBSINGULAR
     om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
 #ifndef OM_NDEBUG
+#ifndef __OPTIMIZE__
     om_Opts.ErrorHook = dErrorBreak;
+#endif
 #endif
     omInitInfo();
 #ifdef OM_SING_KEEP
