@@ -287,7 +287,7 @@ typedef struct {
 } DBM_info;
 
 //**************************************************************************/
-LINKAGE BOOLEAN dbOpen(si_link l, short flag)
+LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv u)
 {
   const char *mode = "r";
   DBM_info *db;
