@@ -131,24 +131,29 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
       #ifdef SINGULAR
       if (f.inZ())
       {
-        MP_INT m=gmp_numerator(f);
-        char * str = new char[mpz_sizeinbase( &m, 10 ) + 2];
-        str = mpz_get_str( str, 10, &m );
+        mpz_t m;
+	gmp_numerator(f,m);
+        char * str = new char[mpz_sizeinbase( m, 10 ) + 2];
+        str = mpz_get_str( str, 10, m );
         printf("%s",str);
         delete[] str;
+	mpz_clear(m);
       }
       else if (f.inQ())
       {
-        MP_INT m=gmp_numerator(f);
-        char * str = new char[mpz_sizeinbase( &m, 10 ) + 2];
-        str = mpz_get_str( str, 10, &m );
+        mpz_t m;
+	gmp_numerator(f,m);
+        char * str = new char[mpz_sizeinbase( m, 10 ) + 2];
+        str = mpz_get_str( str, 10, m );
         printf("%s/",str);
         delete[] str;
-        m=gmp_denominator(f);
-        str = new char[mpz_sizeinbase( &m, 10 ) + 2];
-        str = mpz_get_str( str, 10, &m );
+	mpz_clear(m);
+        gmp_denominator(f,m);
+        str = new char[mpz_sizeinbase( m, 10 ) + 2];
+        str = mpz_get_str( str, 10, m );
         printf("%s",str);
         delete[] str;
+	mpz_clear(m);
       }
       #else
       printf("+...");
