@@ -42,7 +42,7 @@ typedef struct {
 } GDBM_info;
 
 //**************************************************************************/
-LINKAGE BOOLEAN dbOpen(si_link l, short flag)
+LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv u)
 {
   char *mode = "r";
   GDBM_info *db;

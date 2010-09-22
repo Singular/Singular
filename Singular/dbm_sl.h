@@ -8,7 +8,7 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
-LINKAGE BOOLEAN dbOpen(si_link l, short flag);
+LINKAGE BOOLEAN dbOpen(si_link l, short flag, leftv u);
 LINKAGE BOOLEAN dbWrite(si_link l, leftv v);
 LINKAGE leftv dbRead1(si_link l);
 LINKAGE leftv dbRead2(si_link l, leftv key);
