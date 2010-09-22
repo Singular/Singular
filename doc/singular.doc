@@ -873,10 +873,11 @@ Comments should be send to the author of the library directly.
 
 @menu
 * findiff_lib:: finite difference schemes for linear differential equations.
+* resjung_lib:: Resolution of surface singularities by Jung's Algorithm.
 * surfacesignature_lib:: signature of surface singularities.
 @end menu
 @c ----------------------------------------------------------
-@node findiff_lib, surfacesignature_lib,, Experimental libaries
+@node findiff_lib, resjung_lib,, Experimental libaries
 @subsection findiff_lib
 @cindex findiff_lib
 
@@ -888,14 +889,29 @@ Issues:
 @item temporary files needs to be cleaned
 @item temporary file names need to be unique (think about multiple instances)
 @item pollution of global Top namespace must be solved
+@item u is not a good name for a procedure
 @end itemize
 
 @c lib findiff.lib
 
 @c ----------------------------------------------------------
-@node surfacesignature_lib,,findiff_lib, Experimental libaries
-@subsection findiff_lib
-@cindex findiff_lib
+@node resjung_lib,surfacesignature_lib,findiff_lib, Experimental libaries
+@subsection resjung_lib
+@cindex resjung_lib
+
+Issues:
+@itemize
+@item info entry "PROCEDURES" is missing
+@item info entry "MAIN PROCEDURES" is not allowed
+@item info entry "AUXILLARY PROCEDURES" is not allowed
+@end itemize
+
+@c lib resjung.lib
+
+@c ----------------------------------------------------------
+@node surfacesignature_lib,,resjung_lib, Experimental libaries
+@subsection surfacesignature_lib
+@cindex surfacesignature_lib
 
 Issues:
 @itemize
