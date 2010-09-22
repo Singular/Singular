@@ -1,7 +1,7 @@
 version="$Id$";
 category="Singularities";
 info="
-LIBRARY:  surfsig.lib                 signature of surface singularity
+LIBRARY:  surfacesignature.lib        signature of surface singularity
 AUTHORS:  Gerhard Pfister,            pfister@mathematik.uni-kl.de
           Muhammad Ahsan Banyamin,    ahsanbanyamin@gmail.com
 
