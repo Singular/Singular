@@ -194,17 +194,16 @@ basefactorysrc := \
 		NTLconvert.cc \
                 abs_fac.cc \
 		bifac.cc \
-		lgs.cc
-
-singfactorysrc := \
+		lgs.cc \
 		singext.cc
+
 useiofactorysrc := \
 		parseutil.cc \
 		readcf.y
 distfactorysrc := \
 		$(basefactorysrc) \
-		$(singfactorysrc) \
 		$(useiofactorysrc)
+
 doxysrc :=	\
 		$(basefactorysrc) \
 		parseutil.cc
@@ -281,16 +280,15 @@ basefactoryincl := \
 		bifac.h \
 		bifacConfig.h \
 		lgs.h \
-		algext.h
-
-singfactoryincl := \
+		algext.h \
 		singext.h
+
 useiofactoryincl := \
 		parseutil.h
 distfactoryincl := \
 		$(basefactoryincl) \
-		$(singfactoryincl) \
 		$(useiofactoryincl)
+
 doxyincl :=	\
 		$(basefactoryincl) \
 		parseutil.h
