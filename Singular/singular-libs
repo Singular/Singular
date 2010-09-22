@@ -25,7 +25,7 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	reszeta.lib  ring.lib  rinvar.lib  rootsmr.lib  rootsur.lib \
 	sagbi.lib  sheafcoh.lib  sing.lib  sing4ti2.lib  signcond.lib \
 	solve.lib  spcurve.lib  spectrum.lib  standard.lib  stratify.lib \
-	surf.lib  surfex.lib \ 
+	surf.lib  surfex.lib \
 	teachstd.lib  toric.lib  triang.lib \
 	tropical.lib weierstr.lib  zeroset.lib
 
