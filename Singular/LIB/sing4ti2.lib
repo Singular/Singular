@@ -11,8 +11,6 @@ NOTE: This library uses the external program 4ti2 for calculations
 @*    and the standard unix tools sed and awk for conversion of
 @*    the returned result
 
-REQUIRES: External programs 4ti2, sed and awk to be installed
-
 PROCEDURES:
 markov4ti2(A[,i])   compute Markov basis of given lattice
 hilbert4ti2(A[,i])  compute Hilbert basis of given lattice
