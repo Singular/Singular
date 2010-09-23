@@ -290,7 +290,7 @@ int main(int argc, char** argv)
     }
     if ((p=strstr(buf,"LIB\""))!=NULL)
     {
-      printf("error: use a space between LIB and \""\n);
+      printf("error: use a space between LIB and \"\n");
       if (p!=buf)
       { printf("end of header ? LIB should be in col. 1:>>%s<<\n",buf); }
       break; /* end of header */
