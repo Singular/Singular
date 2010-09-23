@@ -1,3 +1,4 @@
+//
 version="$Id: jung.lib,v 1.0 2008/13/06 10:32:00 Singular Exp $";
 category="Commutative Algebra";
 info="
@@ -6,11 +7,9 @@ LIBRARY:  resjung.lib      Resolution of surface singularities (Desingularizatio
 AUTHORS:  Philipp Renner,   philipp_renner@web.de
           Anne Fruehbis-Krueger, anne@math.uni-hannover.de
 
-MAIN PROCEDURES:
+PROCEDURES:
  jungresolve(J,i)  computes a resolution of the surface given by the
                    ideal J using Jungs Method
-
-AUXILLARY PROCEDURES:
  clocus(J)         computes the critical locus of the projection of V(J)
                    onto the coordinate plane of the last two coordinates
  embR(C)           computes a strong embedded resolution of
@@ -89,7 +88,8 @@ EXAMPLE: example clocus;  shows an example
     int index = 1;
     if(attrib(J,"isPrincipal")==0){
       setring R;
-      for(j = 1;j<=size(J);j++){   //determines the monic polynomial in var(i) with coefficents in C2
+      for(j = 1;j<=size(J);j++)
+      {   //determines the monic polynomial in var(i) with coefficents in C2
         if(defined(w)) {kill w;}
         intvec w = leadexp(J[j]);
         attrib(w,"isMonic",1);
@@ -107,14 +107,16 @@ EXAMPLE: example clocus;  shows an example
       }
       setring A;
     }
-    product = product*resultant(J[index],diff(J[index],var(i)),var(i));   //Product of the discriminants, which lies in C2
+    //Product of the discriminants, which lies in C2:
+    product = product*resultant(J[index],diff(J[index],var(i)),var(i)); 
     kill index,J,v;
   }
   ring C2 = 0,(var(n-1),var(n)),dp;
   setring C2;
   ideal Clocus = imap(A,product);      //the critical locus is contained in this
   ideal I = preimage(A,LastTwo,lowdim);
-  Clocus = radical(intersect(Clocus,I));  //radical is necessary since the resultant is not reduced in general
+  //radical is necessary since the resultant is not reduced in general:
+  Clocus = radical(intersect(Clocus,I));
   export(Clocus);
   return(C2);
 }
