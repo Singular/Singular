@@ -1,5 +1,6 @@
 #
 # Singular libraries which go into distribution
+# (they should be ordered alphabetically)
 # MAKE SURE THAT THIS IS UP_TO_DATE
 # and use:
 # svn propset svn:keywords "Id" yourlib.lib
@@ -31,8 +32,12 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 
 # libs in beta testing:
 # the will be included in share.tar.gz, but not in all.lib
+# (they should be ordered alphabetically)
+# and use:
+# svn propset svn:keywords "Id" yourlib.lib
+# for new libs
 
-SLIBS1 = findiff.lib resjung.lib surfacesignature.lib multigrading.lib
+SLIBS1 = findiff.lib multigrading.lib resjung.lib surfacesignature.lib
 
 PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib dmodvar.lib \
 	freegb.lib  gkdim.lib  involut.lib  ncalg.lib  ncdecomp.lib \
