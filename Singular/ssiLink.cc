@@ -516,21 +516,22 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       pid_t pid=fork();
       if (pid==0) /*child*/
       {
-        link_list hh=ssiToBeClosed;
+        link_list hh=(link_list)ssiToBeClosed->next;
+	/* we know: l is the first entry in ssiToBeClosed-list */
         while(hh!=NULL)
         {
-          if (hh->l!=l)
-          {
-            ssiInfo *dd=(ssiInfo*)hh->l->data;
-            fclose(dd->f_read);
-            fclose(dd->f_write);
-            if (dd->r!=NULL) rKill(dd->r);
-            omFreeSize((ADDRESS)dd,(sizeof *dd));
-            hh->l->data=NULL;
-            SI_LINK_SET_CLOSE_P(hh->l);
-          }
-          hh=(link_list)hh->next;
+          ssiInfo *dd=(ssiInfo*)hh->l->data;
+          fclose(dd->f_read);
+          fclose(dd->f_write);
+          if (dd->r!=NULL) rKill(dd->r);
+          omFreeSize((ADDRESS)dd,(sizeof *dd));
+          hh->l->data=NULL;
+          SI_LINK_SET_CLOSE_P(hh->l);
+	  link_list nn=(link_list hh->next;
+	  omFree(hh);
+	  hh=nn;
         }
+	ssiToBeClosed->next=NULL;
         close(pc[1]); close(cp[0]);
         d->f_read=fdopen(pc[0],"r");
         d->fd_read=pc[0];
