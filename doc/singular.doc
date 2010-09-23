@@ -238,7 +238,7 @@ See also @ref{Non-commutative libraries}.
 * Teaching::
 * Tropical Geometry::
 * Miscellaneous libraries::
-* Experimental libaries::
+* Experimental libraries::
 @end menu
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
@@ -844,7 +844,7 @@ but not for serious computations.
 @c lib tropical.lib no_ex
 
 @c ----------------------------------------------------------------------------
-@node  Miscellaneous libraries,Experimental libaries,Tropical Geometry, SINGULAR libraries
+@node  Miscellaneous libraries,Experimental libraries,Tropical Geometry, SINGULAR libraries
 @section  Miscellaneous libraries
 @cindex  Miscellaneous libraries
 
@@ -859,9 +859,9 @@ but not for serious computations.
 @c lib phindex.lib
 
 @c ----------------------------------------------------------------------------
-@node Experimental libaries,,Miscellaneous libraries, SINGULAR libraries
-@section Experimental libaries
-@cindex Experimental libaries
+@node Experimental libraries,,Miscellaneous libraries, SINGULAR libraries
+@section Experimental libraries
+@cindex Experimental libraries
 
 This sections collect libraries in the beta test phase.
 Everything in  these libraries may change.
@@ -875,9 +875,11 @@ Comments should be send to the author of the library directly.
 * findiff_lib:: finite difference schemes for linear differential equations
 * resjung_lib:: Resolution of surface singularities by Jung's Algorithm
 * surfacesignature_lib:: signature of surface singularities
+* multigrading_lib:: Multigradings and related computations
 @end menu
 @c ----------------------------------------------------------
-@node findiff_lib, resjung_lib,, Experimental libaries
+
+@node findiff_lib, resjung_lib,, Experimental libraries
 @subsection findiff_lib
 @cindex findiff_lib
 
@@ -895,7 +897,7 @@ Issues:
 @c lib findiff.lib
 
 @c ----------------------------------------------------------
-@node resjung_lib,surfacesignature_lib,findiff_lib, Experimental libaries
+@node resjung_lib,surfacesignature_lib,findiff_lib, Experimental libraries
 @subsection resjung_lib
 @cindex resjung_lib
 
@@ -909,7 +911,7 @@ Issues:
 @c lib resjung.lib
 
 @c ----------------------------------------------------------
-@node surfacesignature_lib,,resjung_lib, Experimental libaries
+@node surfacesignature_lib,multigrading_lib,resjung_lib, Experimental libraries
 @subsection surfacesignature_lib
 @cindex surfacesignature_lib
 
@@ -918,6 +920,18 @@ Issues:
 @end itemize
 
 @c lib surfacesignature.lib
+
+@c ----------------------------------------------------------
+@node multigrading_lib,,surfacesignature_lib, Experimental libraries
+@subsection multigrading_lib
+@cindex multigrading_lib
+
+Todos/Issues:
+@itemize
+@item See http://code.google.com/p/convex-singular/wiki/Multigrading
+@end itemize
+
+@c lib multigrading.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top

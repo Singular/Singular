@@ -62,6 +62,8 @@ new library: normaliz.lib (see @nref{normaliz_lib}: Interface to Normaliz 2.2)
 @c new library: binresol.lib (see @nref{binresol_lib}: binomial ideals)
 @c @item
 @c new library: findiff.lib (see @nref{findiff_lib}: finite difference schemes)
+@c @item
+@c new library: multigrading.lib (see @nref{multigrading_lib}: multigradings and related computations)
 @end itemize
 
 @heading Changed @sc{Singular} libraries

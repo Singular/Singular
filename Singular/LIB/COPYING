@@ -113,15 +113,18 @@ mondromy.lib    Mathias Schulze                 mschulze@mathematik.uni-kl.de
 mregular.lib    I.Bermejo                       ibermejo@ull.es
                 Ph.Gimenez                      pgimenez@agt.uva.es
                 G.-M.Greuel                     greuel@mathematik.uni-kl.de
+multigrading.lib Rene Birkner                   rbirkner@math.fu-berlin.de
+                Lars Kastner                    lkastner@math.fu-berlin.de
+                Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
 ncalg.lib       Viktor Levandovskyy             levandov@mathematik.uni-kl.de
-                Oleksandr Motsak                motsak@mathematik.uni-kl.de
+                Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
 ncdecomp.lib    Viktor Levandovskyy             levandov@mathematik.uni-kl.de
 nchomolog.lib   Viktor Levandovskyy             levandov@math.rwth-aachen.de
                 Gerhard Pfister                 pfister@mathematik.uni-kl.de
 nctools.lib     Levandovskyy V.                 levandov@mathematik.uni-kl.de
                 Lobillo, F.J.                   jlobillo@ugr.es
                 Rabelo, C.                      crabelo@ugr.es
-                Oleksandr Motsak                motsak@mathematik.uni-kl.de
+                Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
 noether.lib     A. Hashemi                      Amir.Hashemi@lip6.fr
 normal.lib      Gert-Martin Greuel              greuel@mathematik.uni-kl.de
                 G. Pfister                      pfister@mathematik.uni-kl.de
@@ -130,7 +133,7 @@ normaliz.ib     W. Bruns                        Winfried.Bruns@Uni-Osnabrueck.de
 ntsolve.lib     Wilfred Pohl                    pohl@mathematik.uni-kl.de
                 Dietmar Hillebrand
 paramet.lib     Thomas Keilen                   keilen@mathematik.uni-kl.de
-perron.lib      Oleksandr Motsak                motsak@mathematik.uni-kl.de
+perron.lib      Oleksandr Motsak                motsak at mathematik dot uni minus kl dot de
 phindex.lib 
 pointid.lib     Stefan Steidel                  steidel@mathematik.uni-kl.de
 poly.lib        Olaf Bachmann                   obachman@mathematik.uni-kl.de

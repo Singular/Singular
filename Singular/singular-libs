@@ -32,7 +32,7 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 # libs in beta testing:
 # the will be included in share.tar.gz, but not in all.lib
 
-SLIBS1 = findiff.lib resjung.lib surfacesignature.lib
+SLIBS1 = findiff.lib resjung.lib surfacesignature.lib multigrading.lib
 
 PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib dmodvar.lib \
 	freegb.lib  gkdim.lib  involut.lib  ncalg.lib  ncdecomp.lib \
