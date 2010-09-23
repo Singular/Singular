@@ -324,6 +324,10 @@ int main(int argc, char** argv)
       {
         printf("warning: proc should be in col. 1: line %d:%s",lines,buf);
       }
+      else if (pp!=p)
+      {
+        footer++; get_next(); continue; /* this is not a proc start*/
+      }
       p+=5; /* skip proc+blank*/
       while(*p==' ') p++;
       pp=p;
