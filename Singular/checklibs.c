@@ -70,6 +70,7 @@ void scan_proc(int *l)
       }
     }
     else if (strstr(buf,"LIB ")!=NULL) break;
+    else if (strstr(buf,"LIB\"")!=NULL) break;
     else if (strstr(buf,"proc ")!=NULL) break;
     else if (strncmp(buf,"\";",2)==0) break; /* poor mans end-of-info*/
     else if ((p=strstr(buf,":"))!=NULL)
@@ -103,6 +104,7 @@ void scan_keywords(int *l)
     if (isalpha(*p)) { get_next(); (*l)++; return; }
     if (*p=='\0') { get_next(); (*l)++; }
     else if (strstr(buf,"LIB ")!=NULL) break;
+    else if (strstr(buf,"LIB\"")!=NULL) break;
     else if (strstr(buf,"proc ")!=NULL) break;
     else if (strncmp(buf,"\";",2)==0) break; /* poor mans end-of-info*/
     else if ((p=strstr(buf,":"))!=NULL)
@@ -285,6 +287,13 @@ int main(int argc, char** argv)
        pp++;
       }
       if (p=pp) { have_info++; scan_info(&header); }
+    }
+    if ((p=strstr(buf,"LIB\""))!=NULL)
+    {
+      printf("error: use a space between LIB and \""\n);
+      if (p!=buf)
+      { printf("end of header ? LIB should be in col. 1:>>%s<<\n",buf); }
+      break; /* end of header */
     }
     if ((p=strstr(buf,"LIB \""))!=NULL)
     {
