@@ -106,7 +106,7 @@ define a \textbf{leading ideal} of $G$ to be the two-sided ideal
 $L(G) \; = \; {}_{T} \langle$ $\; \{lm(g) \;|\; g \in G\setminus\{0\} \}$ $\; \rangle_{T} \subseteq T$.
 
 Let $<$ be a fixed monomial ordering on $T$.
-We say that a subset $G \subset I$ is a \textbf{(two-sided) Groebner basis} for the ideal $I$ with respect to $<$, if $L(G) = L(I)$. That is $\forall f\in I$ there exists $g\in G$, such that
+We say that a subset $G \subset I$ is a \textbf{(two-sided) Groebner basis} for the ideal $I$ with respect to $<$, if $L(G) = L(I)$. That is $\forall f\in I\setminus\{0\}$ there exists $g\in G$, such that
 $lm(g)$ divides $lm(f)$.
 @end tex
 
@@ -117,7 +117,7 @@ define a @strong{leading ideal} of @math{G} to be the two-sided ideal
 @math{L(G)  =}  @{ @math{lm(g) | g} in @math{G}\@{0@} @} in @math{T}.
 
 Let @math{<} be a fixed monomial ordering on @math{T}.
-We say that a subset @math{G} of @math{I} is a (two-sided) Groebner basis for the ideal @math{I} with respect to @math{<}, if @math{L(G) = L(I)}. That is for all @math{f} from @math{I} there exists @math{g} in @math{G}, such that @math{lm(g)} divides @math{lm(f)}.
+We say that a subset @math{G} of @math{I} is a (two-sided) Groebner basis for the ideal @math{I} with respect to @math{<}, if @math{L(G) = L(I)}. That is for all @math{f} from @math{I}\@{0@} there exists @math{g} in @math{G}, such that @math{lm(g)} divides @math{lm(f)}.
 @end ifinfo
 
 @c ---------------------------------------------------------------------------
