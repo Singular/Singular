@@ -527,7 +527,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           omFreeSize((ADDRESS)dd,(sizeof *dd));
           hh->l->data=NULL;
           SI_LINK_SET_CLOSE_P(hh->l);
-	  link_list nn=(link_list hh->next;
+	  link_list nn=(link_list)hh->next;
 	  omFree(hh);
 	  hh=nn;
         }
