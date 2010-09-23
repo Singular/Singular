@@ -1,3 +1,7 @@
+- new command: rank
+- function: datetime()
+- new libs: resjung.lib, monomial.lib, surfacesignature.lib
+
 Fr 20. Aug 13:36:49 CEST 2010
 - release 3-1-1-5
 - code cleanup: HAVE_TCL removed, HAVE_FGLM: substituted by HAVE_FACTORY
