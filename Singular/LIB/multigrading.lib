@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-Version="$Id: multigrading.lib 0.1 2010-02-13$";
+version="$Id$";
 category="Combinatorial Commutative Algebra";
 info="
 LIBRARY:  multigrading.lib          Multigraded Rings
@@ -11,61 +11,58 @@ AUTHORS:  Rene Birkner, rbirkner@math.fu-berlin.de
 
 OVERVIEW: using this library allows one can virtually add multigrading to Singular.
 For more see http://code.google.com/p/convex-singular/wiki/Multigrading
+For theoretical references see: 
+E. Miller, B. Sturmfels: 'Combinatorial Commutative Algebra' and
+M. Kreuzer, L. Robbiano: 'Computational Commutative Algebra'.
 
-NOTE: this is a proof of concept using Singular attributes. 
-
-REFERENCE:
-E. Miller, B. Sturmfels: 'Combinatorial Commutative Algebra', 
-M. Kreuzer, L. Robbiano: 'Computational Commutative Algebra'
-
-KEYWORDS:  multigradeding, multidegree, multiweights, multigraded-homogenous
-
-
-REQUIRES: 4ti2 for Hilbert Bases needed for mDegBasis
+NOTE: 'mDegBasis' relies on 4ti2 for computing Hilbert Bases.
 
 PROCEDURES:
-setBaseMultigrading(M,T) attach multiweights/torsion matrices to the basering
-getVariableWeights([R])  get matrix of multidegrees of vars attached to a ring
-getTorsion([R])          get torsion matrix attached to a ring
+setBaseMultigrading(M,T); attach multiweights/torsion matrices to the basering
+getVariableWeights([R]);  get matrix of multidegrees of vars attached to a ring
+getTorsion([R]);          get torsion matrix attached to a ring
 
-setModuleGrading(M,v)    attach multiweights of units to a module and return it
-getModuleGrading(M)      get multiweights of module units (attached to M)
+setModuleGrading(M,v);    attach multiweights of units to a module and return it
+getModuleGrading(M);      get multiweights of module units (attached to M)
 
-mDeg(A)                  compute the multidegree of A
-mDegBasis(d)             compute all monomials of multidegree d
-mDegPartition(p)         compute the multigraded-homogenous components of p
+mDeg(A);                  compute the multidegree of A
+mDegBasis(d);             compute all monomials of multidegree d
+mDegPartition(p);         compute the multigraded-homogenous components of p
 
-isTorsionFree()          test whether the current multigrading is torsion free
-isTorsionElement(p)      test whether p has zero multidegree
-isHomogenous(a)          test whether 'a' is multigraded-homogenous
+isTorsionFree();          test whether the current multigrading is torsion free
+isTorsionElement(p);      test whether p has zero multidegree
+isHomogenous(a);          test whether 'a' is multigraded-homogenous
 
-equalMDeg(e1,e2[,V])     test whether e1==e2 in the current multigrading
+equalMDeg(e1,e2[,V]);     test whether e1==e2 in the current multigrading
 
-mDegGroebner(M)          compute the multigraded GB/SB of M
-mDegSyzygy(M)            compute the multigraded syzygies of M
-mDegResolution(M,l[,m])  compute the multigraded resolution of M
+mDegGroebner(M);          compute the multigraded GB/SB of M
+mDegSyzygy(M);            compute the multigraded syzygies of M
+mDegResolution(M,l[,m]);  compute the multigraded resolution of M
 
-defineHomogenous(p)      get a torsion matrix wrt which p becomes homogenous
-pushForward(f)           find the finest grading on the image ring, homogenizing f
+defineHomogenous(p);      get a torsion matrix wrt which p becomes homogenous
+pushForward(f);           find the finest grading on the image ring, homogenizing f
 
-hermite(A)               compute the Hermite Normal Form of a matrix
+hermite(A);               compute the Hermite Normal Form of a matrix
 
-hilbertSeries(M)         compute the multigraded Hilbert Series of M
+hilbertSeries(M);         compute the multigraded Hilbert Series of M
 
            (parameters in square brackets [] are optional)
+
+KEYWORDS:  multigradeding, multidegree, multiweights, multigraded-homogenous
 ";
 
 // finestMDeg(def r)
 // newMap(map F, intmat Q, list #)
 
-
-
 LIB "standard.lib"; // for groebner
 
 /******************************************************/
 proc setBaseMultigrading(intmat M, list #)
-"USAGE:   setBaseMultigrading(M[, T])
-PURPOSE: attach M abd T to the basering, where M is the matrix of the weights of variables, L is the torsion
+"USAGE: setBaseMultigrading(M[, T]); M, T are integer matrices
+PURPOSE: attaches weights of variables and torsion to the basering.
+NOTE: M encodes the weights of variables column-wise.
+The torsion is given by the lattice spanned by the columns of the integer 
+matrix T in Z^nrows(M) over Z.
 RETURN: nothing
 EXAMPLE: example setBaseMultigrading; shows an example
 "
@@ -989,8 +986,11 @@ example
 
 /******************************************************/
 proc equalMDeg(intvec exp1, intvec exp2, list #)
-"USAGE: equalMDeg(exp1, exp2[, V]) where exp1,exp2 are exponents of terms [, V is multidegree of module components];
-PURPOSE: Tests if the exponent vectors of two monomials represent the same multidegree.
+"USAGE: equalMDeg(exp1, exp2[, V]); intvec exp1, exp2, intmat V
+PURPOSE: Tests if the exponent vectors of two monomials (given by exp1 and exp2) 
+represent the same multidegree.
+NOTE: the integer matrix V encodes multidegrees of module components, 
+if module component is present in exp1 and exp2
 "
 {
   if( size(exp1) != size(exp2) )
@@ -1011,7 +1011,7 @@ PURPOSE: Tests if the exponent vectors of two monomials represent the same multi
   {
     if( (size(#) == 0) or (typeof(#[1])!="intmat") )
     {
-      ERROR("Sorry: wrong or missing module-unit-weights-matrix!");
+      ERROR("Sorry: wrong or missing module-unit-weights-matrix V!");
     }
     intmat V = #[1];
 
@@ -1543,8 +1543,8 @@ RETURNS: an ideal/module consisting of multigraded-homogeneous parts of p
 
       while( size(tt) > 0 )
       { 
-
-        if( equalMDeg( leadexp(tt), m, V  ) ) // TODO: we make no caching of matrices (M,T,H,V), which remain the same!
+        // TODO: we make no caching of matrices (M,T,H,V), which remain the same!
+        if( equalMDeg( leadexp(tt), m, V  ) ) 
         {
           mp = mp + lead(tt); // "mp", mp;
         }
@@ -1849,7 +1849,11 @@ EXAMPLE: example graver4ti2; shows an example
 //----------------------------------------------------------------------
    j=system("sh","hilbert -q -n sing4ti2"); ////////// be quiet + no loggin!!!
 
-   j=system("sh","awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.hil | sed s/[\\\ \\\t\\\v\\\f]/,/g | sed s/,+/,/g |sed s/,,/,/g|sed s/,,/,/g > sing4ti2.converted");
+   j=system("sh", "awk \'BEGIN{ORS=\",\";}{print $0;}\' sing4ti2.hil " + 
+                "| sed s/[\\\ \\\t\\\v\\\f]/,/g " + 
+                "| sed s/,+/,/g|sed s/,,/,/g " + 
+                "| sed s/,,/,/g " + 
+                "> sing4ti2.converted" );
    if( defined(keepfiles) <= 0)
    {
       j=system("sh",("rm -f sing4ti2.hil sing4ti2."+fileending));
@@ -1895,7 +1899,14 @@ example
   "EXAMPLE:"; echo=2;
 
    ring r=0,(x1,x2,x3,x4,x5,x6,x7,x8,x9),dp;
-   intmat M[7][9]=1,1,1,-1,-1,-1,0,0,0,1,1,1,0,0,0,-1,-1,-1,0,1,1,-1,0,0,-1,0,0,1,0,1,0,-1,0,0,-1,0,1,1,0,0,0,-1,0,0,-1,0,1,1,0,-1,0,0,0,-1,1,1,0,0,-1,0,-1,0,0;
+   intmat M[7][9]=
+      1, 1, 1, -1, -1, -1, 0, 0, 0,
+      1, 1, 1,  0,  0,  0,-1,-1,-1,
+      0, 1, 1, -1,  0,  0,-1, 0, 0,
+      1, 0, 1,  0, -1,  0, 0,-1, 0,
+      1, 1, 0,  0,  0, -1, 0, 0,-1,
+      0, 1, 1,  0, -1,  0, 0, 0,-1,
+      1, 1, 0,  0, -1,  0,-1, 0, 0;
    hilbert4ti2intmat(M);
    hermite(M);
 }
