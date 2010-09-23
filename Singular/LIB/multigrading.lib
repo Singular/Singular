@@ -96,82 +96,60 @@ EXAMPLE: example setBaseMultigrading; shows an example
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring R = 0, (x, y, z), dp;
-
   // Weights of variables
   intmat M[3][3] =
     1, 0, 0,
     0, 1, 0,
     0, 0, 1;
-
   // Torsion:
   intmat L[3][2] =
     1, 1,
     1, 3,
     1, 5;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M, L); // Grading: Z^3/L
-
   // Weights are accessible via "getVariableWeights()":
   getVariableWeights() == M;
   getVariableWeights(R) == M;
   getVariableWeights(basering) == M;
-
   // Torsion is accessible via "getTorsion()":
   getTorsion() == L;
   getTorsion(R) == L;
   getTorsion(basering) == L;
-
   // And its hermite NF via getTorsion("hermite"):
   intmat H = hermite(L);
   getTorsion("hermite") == H;
   getTorsion(R, "hermite") == H;
   getTorsion(basering, "hermite") == H;
-
-
-
   kill L, M;
-
   // ----------- isomorphic multigrading -------- //
-
   // Weights of variables
   intmat M[2][3] =
     1, -2, 1,
     1,  1, 0;
-
   // Torsion:
   intmat L[2][1] =
     0,
     2;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M, L); // Grading: Z + (Z/2Z)
-
   // Weights are accessible via "getVariableWeights()":
   getVariableWeights() == M;
-
   // Torsion is accessible via "getTorsion()":
   getTorsion() == L;
-
   kill L, M;
   // ----------- extreme case ------------ //
-
   // Weights of variables
   intmat M[1][3] =
     1,  -1, 10;
-
   // Torsion:
   intmat L[1][1] =
     0;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M); // Grading: Z^3
-
   // Weights are accessible via "getVariableWeights()":
   getVariableWeights() == M;
-
   // Torsion is accessible via "getTorsion()":
   getTorsion() == L;
 }
@@ -211,62 +189,45 @@ EXAMPLE: example getVariableWeights; shows an example
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring R = 0, (x, y, z), dp;
-
   // Weights of variables
   intmat M[3][3] =
     1, 0, 0,
     0, 1, 0,
     0, 0, 1;
-
   // Torsion:
   intmat L[3][2] =
     1, 1,
     1, 3,
     1, 5;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M, L); // Grading: Z^3/L
-
   // Weights are accessible via "getVariableWeights()":
   getVariableWeights() == M;
-
   kill L, M;
-
   // ----------- isomorphic multigrading -------- //
-
   // Weights of variables
   intmat M[2][3] =
     1, -2, 1,
     1,  1, 0;
-
   // Torsion:
   intmat L[2][1] =
     0,
     2;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M, L); // Grading: Z + (Z/2Z)
-
   // Weights are accessible via "getVariableWeights()":
   getVariableWeights() == M;
-
   kill L, M;
-
   // ----------- extreme case ------------ //
-
   // Weights of variables
   intmat M[1][3] =
     1,  -1, 10;
-
   // Torsion:
   intmat L[1][1] =
     0;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M); // Grading: Z^3
-
   // Weights are accessible via "getVariableWeights()":
   getVariableWeights() == M;
 }
@@ -325,71 +286,51 @@ RETURN: intmat, the torsion matrix, or its hermite normal form
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring R = 0, (x, y, z), dp;
-
   // Weights of variables
   intmat M[3][3] =
     1, 0, 0,
     0, 1, 0,
     0, 0, 1;
-
   // Torsion:
   intmat L[3][2] =
     1, 1,
     1, 3,
     1, 5;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M, L); // Grading: Z^3/L
-
   // Torsion is accessible via "getTorsion()":
   getTorsion() == L;
-
   // its hermite NF:
   print(getTorsion("hermite"));
-
   kill L, M;
-
   // ----------- isomorphic multigrading -------- //
-
   // Weights of variables
   intmat M[2][3] =
     1, -2, 1,
     1,  1, 0;
-
   // Torsion:
   intmat L[2][1] =
     0,
     2;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M, L); // Grading: Z + (Z/2Z)
-
   // Torsion is accessible via "getTorsion()":
   getTorsion() == L;
-
   // its hermite NF:
   print(getTorsion("hermite"));
-
   kill L, M;
-
   // ----------- extreme case ------------ //
-
   // Weights of variables
   intmat M[1][3] =
     1,  -1, 10;
-
   // Torsion:
   intmat L[1][1] =
     0;
-
   // attaches M & L to R (==basering):
   setBaseMultigrading(M); // Grading: Z^3
-
   // Torsion is accessible via "getTorsion()":
   getTorsion() == L;
-
   // its hermite NF:
   print(getTorsion("hermite"));
 }
@@ -433,7 +374,6 @@ RETURN: integer matrix of the multiweights of free module generators attached to
 example
 {
   "EXAMPLE:"; echo=2;
-
    ring R = 0, (x,y), dp;
    intmat M[2][2]=
      1, 1,
@@ -441,25 +381,17 @@ example
    intmat T[2][5]=
      1,  2,  3,  4, 0,
      0, 10, 20, 30, 1;
-
    setBaseMultigrading(M, T);
-
    ideal I = x, y, xy^5;
    isHomogenous(I);
-
    intmat V = mDeg(I); print(V);
-
    module S = syz(I); print(S);
-
    S = setModuleGrading(S, V);
-
    getModuleGrading(S) == V;
-
    vector v = setModuleGrading(S[1], V);
    getModuleGrading(v) == V;
    isHomogenous(v);
    print( mDeg(v) );
-
    isHomogenous(S);
    print( mDeg(S) );
 }
@@ -485,7 +417,6 @@ WARNING: The method does not verify that the multigrading makes the
 example
 {
   "EXAMPLE:"; echo=2;
-
    ring R = 0, (x,y), dp;
    intmat M[2][2]=
      1, 1,
@@ -493,29 +424,19 @@ example
    intmat T[2][5]=
      1,  2,  3,  4, 0,
      0, 10, 20, 30, 1;
-
    setBaseMultigrading(M, T);
-
    ideal I = x, y, xy^5;
    intmat V = mDeg(I);
-
    // V == M; modulo T
    print(V);
-
    module S = syz(I);
-
    S = setModuleGrading(S, V);
    getModuleGrading(S) == V;
-
    print(S);
-
    vector v = S[1]; v = setModuleGrading(v, V);
    getModuleGrading(v) == V;
-
    print( mDeg(v) );
-
    isHomogenous(S);
-
    print( mDeg(S) );
 }
 
@@ -557,7 +478,6 @@ RETURN: boolean, the result of the test
 example
 {
   "EXAMPLE:"; echo=2;
-
    ring R = 0,(x,y),dp;
    intmat M[2][2]=
      1,0,
@@ -565,15 +485,11 @@ example
    intmat T[2][5]=
      1, 2, 3, 4, 0,
      0,10,20,30, 1;
-
    setBaseMultigrading(M,T);
-
    // Is the resulting group torsion free?
    isTorsionFree();
-
    kill R, M, T;
    ///////////////////////////////////////////
-
    ring R=0,(x,y,z),dp;
    intmat A[3][3] =
      1,0,0,
@@ -586,7 +502,6 @@ example
    setBaseMultigrading(A,B);
    // Is the resulting group torsion free?
    isTorsionFree();
-
    kill R, A, B;
 }
 
@@ -687,28 +602,22 @@ RETURN: intmat, the Hermite Normal Form of A
 example
 {
   "EXAMPLE:"; echo=2;
-
    intmat M[2][5] =
      1, 2, 3, 4, 0,
      0,10,20,30, 1;
-
    // Hermite Normal Form of M:
    print(hermite(M));
-
    intmat T[3][4] =
      3,3,3,3,
      2,1,3,0,
      1,2,0,3;
-
    // Hermite Normal Form of T:
    print(hermite(T));
-
    intmat A[4][5] =
      1,2,3,2,2,
      1,2,3,4,0,
      0,5,4,2,1,
      3,2,4,0,2;
-
    // Hermite Normal Form of A:
    print(hermite(A));
 }
@@ -756,37 +665,29 @@ group, i.e. if it is zero in the multigrading.
 example
 {
  "EXAMPLE:"; echo=2;
-
   ring r = 0,(x,y,z),dp;
-
   intmat g[2][3]=
     1,0,1,
     0,1,1;
   intmat t[2][1]=
     -2,
     1;
-
   setBaseMultigrading(g,t);
-
   poly a = x10yz;
   poly b = x8y2z;
   poly c = x4z2;
   poly d = y5;
   poly e = x2y2;
   poly f = z2;
-
   intvec v1 = mDeg(a) - mDeg(b);
   v1;
   isTorsionElement(v1);
-
   intvec v2 = mDeg(a) - mDeg(c);
   v2;
   isTorsionElement(v2);
-
   intvec v3 = mDeg(e) - mDeg(f);
   v3;
   isTorsionElement(v3);
-
   intvec v4 = mDeg(c) - mDeg(d);
   v4;
   isTorsionElement(v4);
@@ -830,20 +731,15 @@ polynomial f homogenous in the grading by grad.
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r =0,(x,y,z),dp;
   intmat grad[2][3] =
     1,0,1,
     0,1,1;
-
   setBaseMultigrading(grad);
-
   poly f = x2y3-z5+x-3zx;
-
   intmat M = defineHomogenous(f);
   M;
   defineHomogenous(f, grad) == M;
-
   isHomogenous(f);
   setBaseMultigrading(grad, M);
   isHomogenous(f);
@@ -949,38 +845,29 @@ are needed to find the correct image of the preimage gradings.
 example
 {
   "EXAMPLE:"; echo=2;
-
   // Setting degrees for preimage ring.;
   intmat grad[3][3] =
     1,0,0,
     0,1,0,
     0,0,1;
-
   ring r = 0,(x,y,z),dp;
-  keepring(r);
+  if (voice>1) {keepring(r);}
   setBaseMultigrading(grad);
-
   // grading on r:
   getVariableWeights();
   getTorsion();
-
   ring R = 0,(a,b),dp;
   ideal i=a2-b2+a6-b5+ab3,a7b+b15-ab6+a6b6;
-
   // The quotient ring by this ideal will become our image ring.;
   qring Q = std(i);
   map f = r,-a2b6+b5+a3b+a2+ab,-a2b7-3a2b5+b4+a,a6-b6-b3+a2;
   f;
-
   // Pushing forward f:
   pushForward(f);
-
   // due to pushForward we have got new grading on Q
   getVariableWeights();
   getTorsion();
-
   // TODO: Unfortunately this is not a very spectacular example.;
-
 }
 
 
@@ -1040,47 +927,35 @@ if module component is present in exp1 and exp2
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r = 0,(x,y,z),dp;
-
   intmat g[2][3]=
     1,0,1,
     0,1,1;
-
   intmat t[2][1]=
     -2,
     1;
-
   setBaseMultigrading(g,t);
-
   poly a = x10yz;
   poly b = x8y2z;
   poly c = x4z2;
   poly d = y5;
   poly e = x2y2;
   poly f = z2;
-
-
   equalMDeg(leadexp(a), leadexp(b));
   equalMDeg(leadexp(a), leadexp(c));
   equalMDeg(leadexp(a), leadexp(d));
   equalMDeg(leadexp(a), leadexp(e));
   equalMDeg(leadexp(a), leadexp(f));
-
   equalMDeg(leadexp(b), leadexp(c));
   equalMDeg(leadexp(b), leadexp(d));
   equalMDeg(leadexp(b), leadexp(e));
   equalMDeg(leadexp(b), leadexp(f));
-
   equalMDeg(leadexp(c), leadexp(d));
   equalMDeg(leadexp(c), leadexp(e));
   equalMDeg(leadexp(c), leadexp(f));
-
   equalMDeg(leadexp(d), leadexp(e));
   equalMDeg(leadexp(d), leadexp(f));
-
   equalMDeg(leadexp(e), leadexp(f));
-
 }
 
 
@@ -1166,33 +1041,23 @@ RETURN: boolean, TRUE if a is (multi)homogenous, and FALSE otherwise
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r = 0,(x,y,z),dp;
-
   //Grading and Torsion matrices:
   intmat M[3][3] =
     1,0,0,
     0,1,0,
     0,0,1;
-
   intmat T[3][1] =
     1,2,3;
-
   setBaseMultigrading(M,T);
-
   attrib(r);
-
   poly f = x-yz;
-
   mDegPartition(f);
   print(mDeg(_));
-
   isHomogenous(f);   // f: is not homogenous
-
   poly g = 1-xy2z3;
   isHomogenous(g); // g: is homogenous
   mDegPartition(g);
-
   kill T;
   /////////////////////////////////////////////////////////
   // new Torsion matrix:
@@ -1200,22 +1065,16 @@ example
     3,3,3,3,
     2,1,3,0,
     1,2,0,3;
-
   setBaseMultigrading(M,T);
-
   f;
   isHomogenous(f);
   mDegPartition(f);
-
   // ---------------------
   g;
   isHomogenous(g);
   mDegPartition(g);
-
   kill r, T, M;
-
   ring R = 0, (x,y,z), dp;
-
   intmat A[2][3] =
     0,0,1,
     3,2,1;
@@ -1223,68 +1082,48 @@ example
     -1,
      4;
   setBaseMultigrading(A, T);
-
   isHomogenous(ideal(x2 - y3 -xy +z, x*y-z, x^3 - y^2*z + x^2 -y^3)); // 1
   isHomogenous(ideal(x2 - y3 -xy +z, x*y-z, x^3 - y^2*z + x^2 -y^3), "checkGens");
   isHomogenous(ideal(x+y, x2 - y2)); // 0
-
   // Degree partition:
   mDegPartition(x2 - y3 -xy +z);
   mDegPartition(x3 -y2z + x2 -y3 + z + 1);
-
-
   module N = gen(1) + (x+y) * gen(2), z*gen(3);
-
   intmat V[2][3] = 0; // 1, 2, 3,  4, 5, 6; //  column-wise weights of components!!??
-
   vector v1, v2;
-
   v1 = setModuleGrading(N[1], V); v1;
   mDegPartition(v1);
   print( mDeg(_) );
-
   v2 = setModuleGrading(N[2], V); v2;
   mDegPartition(v2);
   print( mDeg(_) );
-
   N = setModuleGrading(N, V);
   isHomogenous(N);
   print( mDeg(N) );
-
   ///////////////////////////////////////
-
   V =
     1, 2, 3,
     4, 5, 6;
-
   v1 = setModuleGrading(N[1], V); v1;
   mDegPartition(v1);
   print( mDeg(_) );
-
   v2 = setModuleGrading(N[2], V); v2;
   mDegPartition(v2);
   print( mDeg(_) );
-
   N = setModuleGrading(N, V);
   isHomogenous(N);
   print( mDeg(N) );
-
   ///////////////////////////////////////
-
   V =
     0, 0, 0,
     4, 1, 0;
-
   N = gen(1) + x * gen(2), z*gen(3);
-
   N = setModuleGrading(N, V); N;
   isHomogenous(N);
   print( mDeg(N) );
-
   v1 = setModuleGrading(N[1], V); v1;
   mDegPartition(v1);
   print( mDeg(_) );
-
   N = setModuleGrading(N, V); N;
   isHomogenous(N);
   print( mDeg(N) );
@@ -1416,81 +1255,52 @@ PURPOSE: compute multidegree
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r = 0,(x, y), dp;
-
   intmat A[2][2] = 1, 0, 0, 1;
   print(A);
-
   intmat Ta[2][1] = 0, 3;
   print(Ta);
-
   //   attrib(A, "torsion", Ta); // to think about
-
 //  "poly:";
   setBaseMultigrading(A);
-
-
   mDeg( x*x, A );
   mDeg( y*y*y, A );
-
   setBaseMultigrading(A, Ta);
-
   mDeg( x*x*y );
-
   mDeg( y*y*y*x );
-
   mDeg( x*y + x + 1 );
-
   mDegPartition(x*y + x + 1);
-
   print ( mDeg(0) );
   poly zero = 0;
   print ( mDeg(zero) );
-
 //  "ideal:";
-
   ideal I = y*x*x, x*y*y*y;
   print( mDeg(I) );
-
   print ( mDeg(ideal(0)) );
   print ( mDeg(ideal(0,0,0)) );
-
 //  "vectors:";
-
   intmat B[2][2] = 0, 1, 1, 0;
   print(B);
-
   mDeg( setModuleGrading(y*y*y*gen(2), B ));
   mDeg( setModuleGrading(x*x*gen(1), B ));
-
-
   vector V = x*gen(1) + y*gen(2);
   V = setModuleGrading(V, B);
   mDeg( V );
-
   vector v1 = setModuleGrading([0, 0, 0], B);
   print( mDeg( v1 ) );
-
   vector v2 = setModuleGrading([0], B);
   print( mDeg( v2 ) );
-
 //  "module:";
-
   module D = x*gen(1), y*gen(2);
   D;
   D = setModuleGrading(D, B);
   print( mDeg( D ) );
-
-
   module DD = [0, 0],[0, 0, 0];
   DD = setModuleGrading(DD, B);
   print( mDeg( DD ) );
-
   module DDD = [0, 0];
   DDD = setModuleGrading(DDD, B);
   print( mDeg( DDD ) );
-
 };
 
 
@@ -1576,27 +1386,20 @@ RETURNS: an ideal/module consisting of multigraded-homogeneous parts of p
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r = 0,(x,y,z),dp;
-
   intmat g[2][3]=
     1,0,1,
     0,1,1;
   intmat t[2][1]=
     -2,
     1;
-
   setBaseMultigrading(g,t);
-
   poly f = x10yz+x8y2z-x4z2+y5+x2y2-z2+x17z3-y6;
-
   mDegPartition(f);
-
   vector v = xy*gen(1)-x3y2*gen(2)+x4y*gen(3);
   intmat B[2][3]=1,-1,-2,0,0,1;
   v = setModuleGrading(v,B);
   getModuleGrading(v);
-
   mDegPartition(v, B);
 }
 
@@ -1692,12 +1495,9 @@ PURPOSE: finest multigrading
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r = 0,(x, y), dp;
   qring q  = std(x^2 - y);
-
   finestMDeg(q);
-
 }
 
 
@@ -1764,7 +1564,6 @@ EXAMPLE: example leftKernel; shows an example
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r= 0,(x,y,z),dp;
   matrix M[3][1] = x,y,z;
   print(M);
@@ -1897,7 +1696,6 @@ EXAMPLE: example graver4ti2; shows an example
 example
 {
   "EXAMPLE:"; echo=2;
-
    ring r=0,(x1,x2,x3,x4,x5,x6,x7,x8,x9),dp;
    intmat M[7][9]=
       1, 1, 1, -1, -1, -1, 0, 0, 0,
@@ -2060,78 +1858,50 @@ PURPOSE: compute all monomials of multidegree d
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring R = 0, (x, y), dp;
-
   intmat g1[2][2]=1,0,0,1;
   intmat t[2][1]=2,0;
   intmat g2[2][2]=1,1,1,1;
   intvec v1=4,0;
   intvec v2=4,4;
-
   intmat g3[1][2]=1,1;
   setBaseMultigrading(g3);
   intvec v3=4:1;
   v3;
   mDegBasis(v3);
-
   setBaseMultigrading(g1,t);
   mDegBasis(v1);
   setBaseMultigrading(g2);
   mDegBasis(v2);
-
   intmat M[2][2] = 1, -1, -1, 1;
   intvec d = -2, 2;
-
   setBaseMultigrading(M);
-
   mDegBasis(d);
   attrib(_, "ZeroPart");
-
   kill R;
   ring R = 0, (x, y, z), dp;
-
   intmat M[2][3] = 1, -2, 1,     1, 1, 0;
-
   intmat T[2][1] = 0, 2;
-
   intvec d = 4, 1;
-
   setBaseMultigrading(M, T);
-
   mDegBasis(d);
   attrib(_, "ZeroPart");
-
-
   kill R;
-
   ring R = 0, (x, y, z), dp;
   qring Q = std(ideal( y^6+ x*y^3*z-x^2*z^2 ));
-
-
   intmat M[2][3] = 1, 1, 2,     2, 1, 1;
   //  intmat T[2][1] = 0, 2;
-
   setBaseMultigrading(M);
-
   intvec d = 6, 6;
   mDegBasis(d);
   attrib(_, "ZeroPart");
-
-
-
   kill R;
   ring R = 0, (x, y, z), dp;
   qring Q = std(ideal( x*z^3 - y *z^6, x*y*z  - x^4*y^2 ));
-
-
   intmat M[2][3] = 1, -2, 1,     1, 1, 0;
   intmat T[2][1] = 0, 2;
-
   intvec d = 4, 1;
-
   setBaseMultigrading(M, T);
-
   mDegBasis(d);
   attrib(_, "ZeroPart");
 }
@@ -2155,34 +1925,22 @@ NOTE: generators of I must be multigraded homogeneous
 example
 {
   "EXAMPLE:"; echo=2;
-
-
   ring r = 0,(x,y,z,w),dp;
-
-  intmat M[2][4]=
+  intmat MM[2][4]=
     1,1,1,1,
     0,1,3,4;
-
-  setBaseMultigrading(M);
-
-
+  setBaseMultigrading(MM);
   module M = ideal(  xw-yz, x2z-y3, xz2-y2w, yw2-z3);
-
-
   intmat v[2][nrows(M)]=
     1,
     0;
-
   M = setModuleGrading(M, v);
-
   isHomogenous(M);
   "Multidegrees: "; print(mDeg(M));
-
   // Let's compute Syzygy!
   def S = mDegSyzygy(M); S;
   "Module Units Multigrading: "; print( getModuleGrading(S) );
   "Multidegrees: "; print(mDeg(S));
-
   isHomogenous(S);
 }
 
@@ -2214,11 +1972,11 @@ example
 
   ring r = 0,(x,y,z,w),dp;
 
-  intmat M[2][4]=
+  intmat MM[2][4]=
     1,1,1,1,
     0,1,3,4;
 
-  setBaseMultigrading(M);
+  setBaseMultigrading(MM);
 
 
   module M = ideal(  xw-yz, x2z-y3, xz2-y2w, yw2-z3);
@@ -2299,50 +2057,33 @@ RETURNS: list, the computed resolution
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r = 0,(x,y,z,w),dp;
-
   intmat M[2][4]=
     1,1,1,1,
     0,1,3,4;
-
   setBaseMultigrading(M);
-
-
   module m= ideal(  xw-yz, x2z-y3, xz2-y2w, yw2-z3);
-
   isHomogenous(ideal(  xw-yz, x2z-y3, xz2-y2w, yw2-z3), "checkGens");
-
   ideal A = xw-yz, x2z-y3, xz2-y2w, yw2-z3;
-
   int j;
-
   for(j=1; j<=ncols(A); j++)
   {
     mDegPartition(A[j]);
   }
-
   intmat v[2][1]=
     1,
     0;
-
   m = setModuleGrading(m, v);
-
   // Let's compute Syzygy!
   def S = mDegSyzygy(m); S;
   "Module Units Multigrading: "; print( getModuleGrading(S) );
   "Multidegrees: "; print(mDeg(S));
-
   /////////////////////////////////////////////////////////////////////////////
-
   S = mDegGroebner(S); S;
   "Module Units Multigrading: "; print( getModuleGrading(S) );
   "Multidegrees: "; print(mDeg(S));
-
   /////////////////////////////////////////////////////////////////////////////
-
   def L = mDegResolution(m, 0, 1);
-
   for( j =1; j<=size(L); j++)
   {
     "----------------------------------- ", j, " -----------------------------";
@@ -2350,11 +2091,8 @@ example
     "Module Multigrading: "; print( getModuleGrading(L[j]) );
     "Multigrading: "; print(mDeg(L[j]));
   }
-
   /////////////////////////////////////////////////////////////////////////////
-
   L = mDegResolution(maxideal(1), 0, 1);
-
   for( j =1; j<=size(L); j++)
   {
     "----------------------------------- ", j, " -----------------------------";
@@ -2362,22 +2100,15 @@ example
     "Module Multigrading: "; print( getModuleGrading(L[j]) );
     "Multigrading: "; print(mDeg(L[j]));
   }
-
   kill v;
-
-
   def h = hilbertSeries(m);
   setring h;
-
   numerator1;
   factorize(numerator1);
-
   denominator1;
   factorize(denominator1);
-
   numerator2;
   factorize(numerator2);
-
   denominator2;
   factorize(denominator2);
 }
@@ -2548,37 +2279,27 @@ and denominator2, quotients of which give the series.
 example
 {
   "EXAMPLE:"; echo=2;
-
   ring r = 0,(x,y,z,w),dp;
   intmat g[2][4]=
     1,1,1,1,
     0,1,3,4;
   setBaseMultigrading(g);
-
   module M = ideal(xw-yz, x2z-y3, xz2-y2w, yw2-z3);
   intmat V[2][1]=
     1,
     0;
-
   M = setModuleGrading(M, V);
-
   def h = hilbertSeries(M); setring h;
-
   factorize(numerator2);
   factorize(denominator2);
-
   kill g, h; setring r;
-
   intmat g[2][4]=
     1,2,3,4,
     0,0,5,8;
-
   setBaseMultigrading(g);
-
   ideal I = x^2, y, z^3;
   I = std(I);
   def L = mDegResolution(I, 0, 1);
-
   for( int j = 1; j<=size(L); j++)
   {
     "----------------------------------- ", j, " -----------------------------";
@@ -2586,237 +2307,138 @@ example
     "Module Multigrading: "; print( getModuleGrading(L[j]) );
     "Multigrading: "; print(mDeg(L[j]));
   }
-
   mDeg(I);
   def h = hilbertSeries(I); setring h;
-
   factorize(numerator2);
   factorize(denominator2);
-
   kill r, h, g, V;
   ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
-
   ring R = 0,(x,y,z),dp;
   intmat W[2][3] =
      1,1, 1,
      0,0,-1;
   setBaseMultigrading(W);
   ideal I = x3y,yz2,y2z,z4;
-
   def h = hilbertSeries(I); setring h;
-
   factorize(numerator2);
   factorize(denominator2);
-
   kill R, W, h;
   ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
-
   ring R = 0,(x,y,z,a,b,c),dp;
   intmat W[2][6] =
      1,1, 1,1,1,1,
      0,0,-1,0,0,0;
   setBaseMultigrading(W);
   ideal I = x3y,yz2,y2z,z4;
-
   def h = hilbertSeries(I); setring h;
-
   factorize(numerator2);
   factorize(denominator2);
-
   kill R, W, h;
-
-  ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
   ////////////////////////////////////////////////
   // This is example 5.3.9. from Robbianos book.
-
   ring R = 0,(x,y,z,w),dp;
   intmat W[1][4] =
      1,1, 1,1;
   setBaseMultigrading(W);
   ideal I = z3,y3zw2,x2y4w2xyz2;
-
   hilb(std(I));
-
   def h = hilbertSeries(I); setring h;
-
   numerator1;
   denominator1;
-
   factorize(numerator2);
   factorize(denominator2);
-
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
   ideal I2 = x2,y2,z2; I2;
-
   hilb(std(I2));
-
   def h = hilbertSeries(I2); setring h;
-
   numerator1;
   denominator1;
-
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
   W = 2,2,2,2;
-
   setBaseMultigrading(W);
-
   getVariableWeights();
-
   intvec w = 2,2,2,2;
-
   hilb(std(I2), 1, w);
-
   kill w;
-
-
   def h = hilbertSeries(I2); setring h;
-
-
   numerator1; denominator1;
   kill h;
-
-
   kill R, W;
-
   ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
-  ////////////////////////////////////////////////
-
   ring R = 0,(x),dp;
   intmat W[1][1] =
      1;
   setBaseMultigrading(W);
-
   ideal I;
-
   I = 1; I;
-
   hilb(std(I));
-
   def h = hilbertSeries(I); setring h;
-
   numerator1; denominator1;
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
   I = x; I;
-
   hilb(std(I));
-
   def h = hilbertSeries(I); setring h;
-
   numerator1; denominator1;
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
   I = x^5; I;
-
   hilb(std(I));
   hilb(std(I), 1);
-
   def h = hilbertSeries(I); setring h;
-
   numerator1; denominator1;
-
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
   I = x^10; I;
-
   hilb(std(I));
-
   def h = hilbertSeries(I); setring h;
-
   numerator1; denominator1;
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
   module M = 1;
-
   M = setModuleGrading(M, W);
-
-
   hilb(std(M));
-
   def h = hilbertSeries(M); setring h;
-
   numerator1; denominator1;
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
   kill M; module M = x^5*gen(1);
-
 //  intmat V[1][3] = 0; // TODO: this would lead to a wrong result!!!?
-
   intmat V[1][1] = 0; // all gen(i) of degree 0!
-
   M = setModuleGrading(M, V);
-
   hilb(std(M));
-
   def h = hilbertSeries(M); setring h;
-
   numerator1; denominator1;
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
   module N = x^5*gen(3);
-
   kill V;
-
   intmat V[1][3] = 0; // all gen(i) of degree 0!
-
   N = setModuleGrading(N, V);
-
   hilb(std(N));
-
   def h = hilbertSeries(N); setring h;
-
   numerator1; denominator1;
-
   kill h;
   ////////////////////////////////////////////////
   setring R;
-
-
   module S = M + N;
-
   S = setModuleGrading(S, V);
-
   hilb(std(S));
-
   def h = hilbertSeries(S); setring h;
-
   numerator1; denominator1;
-
   kill h;
-
   kill V;
   kill R, W;
-
 }
 
 
