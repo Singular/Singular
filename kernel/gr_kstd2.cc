@@ -318,7 +318,7 @@ int redGrRatGB (LObject* h,kStrategy strat)
     if (p_LmDivisibleByPart(strat->S[j],(*h).p,currRing,
         currRing->real_var_start,currRing->real_var_end))
     {
-      int a_e=(pTotaldegree(strat->S[j],currRing)-pFDeg(strat->S[j],currRing));
+      int a_e=(p_Totaldegree(strat->S[j],currRing)-pFDeg(strat->S[j],currRing));
 #ifdef KDEBUG
       if(TEST_OPT_DEBUG)
       {

@@ -101,6 +101,9 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include <kernel/ncSAMult.h> // for CMultiplier etc classes
 #include <Singular/ipconv.h>
 #include <kernel/ring.h>
+#ifdef HAVE_RATGRING
+#include <kernel/ratgring.h>
+#endif
 #endif
 
 #ifdef ix86_Win /* only for the DLLTest */

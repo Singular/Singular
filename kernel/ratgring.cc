@@ -751,7 +751,7 @@ void pContentRat(poly &ph)
   {
     pDelete(&C[0]);
     pDelete(&LM[0]);
-    pContent(ph);
+    p_Content(ph,currRing);
     goto cleanup;
   }
 
@@ -787,7 +787,7 @@ void pContentRat(poly &ph)
         pDelete(&C[k]);
         pDelete(&LM[k]);
       }
-      pContent(ph);
+      p_Content(ph,currRing);
       goto cleanup;
     }
   }
