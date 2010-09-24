@@ -233,15 +233,15 @@ int main(          /* main entry to Singular */
   if (TEST_V_QUIET)
   {
     (printf)(
-"                     SINGULAR                             /"
+"                     SINGULAR                                 /"
 #ifndef MAKE_DISTRIBUTION
 "  Development"
 #endif
 "\n"
-" A Computer Algebra System for Polynomial Computations   /   version %s\n"
-"                                                       0<\n"
-"     by: G.-M. Greuel, G. Pfister, H. Schoenemann        \\   %s\n"
-"FB Mathematik der Universitaet, D-67653 Kaiserslautern    \\\n"
+" A Computer Algebra System for Polynomial Computations       /   version %s\n"
+"                                                           0<\n"
+" by: W. Decker, G.-M. Greuel, G. Pfister, H. Schoenemann     \\   %s\n"
+"FB Mathematik der Universitaet, D-67653 Kaiserslautern        \\\n"
 , S_VERSION1,S_VERSION2);
   }
   else
