@@ -48,7 +48,7 @@ This is the texinfo file describing Singular (version @value{VERSION})
 @center Version @value{VERSION}, @value{VERSION_DATE}
 @sp 2
 @center @sc{Singular} is created and its development is directed and coordinated by
-@center G.-M. Greuel, G. Pfister, and H. Sch@"onemann
+@center W. Decker, G.-M. Greuel, G. Pfister, and H. Sch@"onemann
 @sp 2
 @c @center with contributions by
 @center Principal developers:
