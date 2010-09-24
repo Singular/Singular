@@ -1,20 +1,21 @@
+//
 version="$Id$";
 category="Singularities";
 info="
-LIBRARY:  signaturesurfsing.lib       signature of surface singularity
+LIBRARY:  surfacesignature.lib       signature of surface singularity
 
 AUTHORS:  Gerhard Pfister             pfister@mathematik.uni-kl.de
 @*        Muhammad Ahsan Banyamin     ahsanbanyamin@gmail.com
-@*        Stefan Steidel              steidel@mathematik.uni-kl.de 
+@*        Stefan Steidel              steidel@mathematik.uni-kl.de
 
-OVERVIEW: 
+OVERVIEW:
 
   A library for computing the signature of irreducible surface singularity.
-  The signature of a surface singularity is defined in [Durfee, A.: The 
-  Signature of Smoothings of Complex Surface Singularities, Math. Ann., 232, 
-  85-98 (1978)]. The algorithm we use has been proposed in [Nemethi, A.: The 
-  signature of f(x,y)+z^N, Proceedings of Singularity Conference (C.T.C. Wall's 
-  60th birthday meeting), Liverpool 1996, London Math.Soc. LN 263(1999), 
+  The signature of a surface singularity is defined in [Durfee, A.: The
+  Signature of Smoothings of Complex Surface Singularities, Math. Ann., 232,
+  85-98 (1978)]. The algorithm we use has been proposed in [Nemethi, A.: The
+  signature of f(x,y)+z^N, Proceedings of Singularity Conference (C.T.C. Wall's
+  60th birthday meeting), Liverpool 1996, London Math.Soc. LN 263(1999),
   131-149].
 
 PROCEDURES:
@@ -30,9 +31,9 @@ LIB "gmssing.lib";
 //------- sigma(z^N + f) in terms of Puiseux pairs of f for f irreducible ----
 
 static proc exponentSequence(poly f)
-//=== computes the sequence a_1,...,a_s of exponents as described in [Nemethi] 
+//=== computes the sequence a_1,...,a_s of exponents as described in [Nemethi]
 //=== using the Puiseux pairs (m_1, n_1),...,(m_s, n_s) of f:
-//===  - a_1 = m_1, 
+//===  - a_1 = m_1,
 //===  - a_i = m_i - n_i * (m_[i-1] - n_[i-1] * a_[i-1]).
 //===
 //=== Return: list of two intvecs:
@@ -44,10 +45,10 @@ static proc exponentSequence(poly f)
    poly f = fetch(R,f);
    list puiseuxPairs = invariants(f);
    setring R;
-   
+
    intvec M = puiseuxPairs[1][3];
    intvec N = puiseuxPairs[1][4];
-   
+
    int i;
    int a = M[1];
    intvec A = a;
@@ -56,7 +57,7 @@ static proc exponentSequence(poly f)
       a = M[i] - N[i] * (M[i-1] - N[i-1] * a);
       A[size(A)+1] = a;
    }
-  
+
    return(list(A,N));
 }
 example
@@ -75,11 +76,11 @@ EXAMPLE: example brieskornSign; shows an example
 {
    int a_temp, t, k1, k2, k3, s_t, sigma;
    number s;
-   
+
    if(a1 > a2) { a_temp = a1; a1 = a2; a2 = a_temp; }
    if(a2 > a3) { a_temp = a2; a2 = a3; a3 = a_temp; }
    if(a1 > a2) { a_temp = a1; a1 = a2; a2 = a_temp; }
-   
+
    for(t = 0; t <= 2; t++)
    {
       s_t = 0;
@@ -98,7 +99,7 @@ EXAMPLE: example brieskornSign; shows an example
                   }
                   else
                   {
-                     break; 
+                     break;
                   }
                }
             }
@@ -127,12 +128,12 @@ EXAMPLE: example signatureP; shows an example
    int i, d, prod, sigma;
    list L = exponentSequence(f);
    int s = size(L[2]);
-   
+
    if(s == 1)
    {
       return(brieskornSign(L[1][1], L[2][1], N));
    }
-   
+
    prod = 1;
    sigma = brieskornSign(L[1][s], L[2][s], N);
    for(i = s - 1; i >= 1; i--)
@@ -141,7 +142,7 @@ EXAMPLE: example signatureP; shows an example
       d = gcd(N, prod);
       sigma = sigma + d * brieskornSign(L[1][i], L[2][i], N/d);
    }
-   
+
    return(sigma);
 }
 example
@@ -190,7 +191,7 @@ static proc isRupture(intvec v)
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc sumExcepDiv(intmat N, list M, int K, int n)
-//=== computes part of the formulae for eta(g,K), g defining an 
+//=== computes part of the formulae for eta(g,K), g defining an
 //=== isolated curve singularity
 //=== N the incidence matrix of the resolution graph of g
 //=== M list of total multiplicities
@@ -219,7 +220,7 @@ static proc sumExcepDiv(intmat N, list M, int K, int n)
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc sumEdges(intmat N, list M, int K, int n)
-//=== computes part of the formulae for eta(g,K), g defining an 
+//=== computes part of the formulae for eta(g,K), g defining an
 //=== isolated curve singularity
 //=== N the incidence matrix of the resolution graph of g
 //=== M list of total multiplicities
@@ -274,7 +275,7 @@ static proc etaRes(list L, int K)
                e=e+dedekindSum(M[j],K,M[i]);
             }
          }
-      }   
+      }
    }
    if(a==1)
    {
@@ -308,14 +309,14 @@ static proc fracPart(number n)
 
 static proc etaSpec(list L, int N)
 //=== L spectral numbers
-//=== eta-invariant in terms of the spectral pairs of f 
+//=== eta-invariant in terms of the spectral pairs of f
 {
    int i;
    number e, h;
-   
+
    int n = ncols(L[1]);
-   
-   if((n mod 2) == 0)               
+
+   if((n mod 2) == 0)
    // 0 is not a spectral number, thus f is irreducible
    {
       for(i = n/2+1; i <= n; i++)
@@ -328,17 +329,17 @@ static proc etaSpec(list L, int N)
    // 0 is a spectral number, thus f is reducible
    {
       // sum of Hodge numbers in eta function
-      for(i = 1; i <= n; i++)                   
+      for(i = 1; i <= n; i++)
       {
-         if((L[2][i] == 2)&&((denominator(leadcoef(N*L[1][i]))==1)||(denominator(leadcoef(N*L[1][i]))==-1))) 
-         { 
-            h = h + L[3][i]; 
+         if((L[2][i] == 2)&&((denominator(leadcoef(N*L[1][i]))==1)||(denominator(leadcoef(N*L[1][i]))==-1)))
+         {
+            h = h + L[3][i];
          }
       }
-      
+
       // summand coming from spectral number 0 in eta function
       h = h + L[3][(n+1)/2];
-      
+
       // sum coming from non-zero spectral numbers in eta function
       for(i = (n+3)/2; i <= n; i++)
       {
@@ -346,7 +347,7 @@ static proc etaSpec(list L, int N)
          {
             e = e + (1 - 2 * fracPart(N * number(L[1][i]))) * L[3][i];
          }
-      }    
+      }
       return(h + 2*e);
    }
 }
@@ -368,18 +369,18 @@ EXAMPLE: example signature; shows an example
       list L = totalmultiplicities(f);
       return(etaRes(L,N) - N*etaRes(L,1));
    }
-   
+
    if(#[1] == 1)
    {
       return(signatureP(N,f));
    }
-   
+
    if(#[1] == 2)
    {
       list L = totalmultiplicities(f);
       return(etaRes(L,N) - N*etaRes(L,1));
    }
-   
+
    if(#[1] == 3)
    {
       def R = basering;
@@ -415,12 +416,12 @@ poly f,g,g1,g2,g3;
 // irreducible polynomials
 
 N = 5;
-f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2    
-    +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;      
-g = f^3 + x17y17;                                                
+f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
+    +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
+g = f^3 + x17y17;
 
 N = 6;
-f = y4+2x3y2+x6+x5y;                                             
+f = y4+2x3y2+x6+x5y;
 g1 = f^2 + x5y5;
 g2 = f^3 + x11y11;
 g3 = f^3 + x17y17;
@@ -430,7 +431,7 @@ f = x5+y11;
 g1 = f^3 + x11y11;
 g2 = f^3 + x17y17;
 
-N = 6;     
+N = 6;
 // k0 = 30, k1 = 35, k2 = 71
 f = x71+6x65+15x59-630x52y6+20x53+6230x46y6+910x39y12+15x47
     -7530x40y6+14955x33y12-285x26y18+6x41+1230x34y6+4680x27y12
@@ -445,7 +446,7 @@ f = x31-781x30+16x29y-3010x29-2464x28y+104x27y2-2805x28-7024x27y
     +8x21y2-96x20y3+524x19y4-1472x18y5+3464x17y6-3808x16y7+1290x15y8
     -28x18y4+240x17y5-976x16y6+2208x15y7-2494x14y8+816x13y9+56x15y6
     -320x14y7+844x13y8-1216x12y9+440x11y10-70x12y8+240x11y9-344x10y10
-    +240x9y11+56x9y10-96x8y11+52x7y12-28x6y12+16x5y13+8x3y14-y16; 
+    +240x9y11+56x9y10-96x8y11+52x7y12-28x6y12+16x5y13+8x3y14-y16;
 
 
 // reducible polynomials
