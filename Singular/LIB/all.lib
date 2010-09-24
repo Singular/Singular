@@ -16,7 +16,7 @@ LIB "aksaka.lib";
 LIB "alexpoly.lib";
 LIB "algebra.lib";
 LIB "arcpoint.lib";
-LIB "assprime.lib";
+LIB "assprimeszerodim.lib";
 LIB "atkins.lib";
 LIB "brnoeth.lib";
 LIB "cimonom.lib";
