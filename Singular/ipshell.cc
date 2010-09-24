@@ -4665,6 +4665,10 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
   return FALSE;
 }
 
+#ifdef HAVE_RINGS
+char ring_warn_done=0;
+#endif
+
 ////////////////////
 //
 // rInit itself:
@@ -4788,7 +4792,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   pn=pn->next;
 
 #ifdef HAVE_RINGS
-  if (ringtype > 0)
+  if ((ringtype > 0)&&(ring_warn_done==0))
   {
     WarnS("You are using coefficient rings which are not fields.");
     WarnS("Please note that only limited functionality is available");
@@ -4800,6 +4804,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     WarnS("- syz");
     WarnS("- lift");
     WarnS("- reduce");
+    ring_warn_done=1;
   }
 #endif
 
