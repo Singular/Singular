@@ -350,7 +350,7 @@ LIB "all.lib";
 @menu
 * absfact_lib:: absolute factorization for characteristic 0
 * algebra_lib:: procedures for computing with algebras and maps
-* assprimeszerodim:: associated primes of a zero-dimensional ideal
+* assprimeszerodim_lib:: associated primes of a zero-dimensional ideal
 * cimonom_lib:: is the toric ideal of an affine monomial curve a complete intersection ?
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
@@ -921,7 +921,7 @@ Todos/Issues:
 @c lib primdecint.lib
 
 @c ----------------------------------------------------------
-@node resjung_lib,surfacesignature_lib,multigrading_lib, Experimental libraries
+@node resjung_lib,surfacesignature_lib,primdecint_lib, Experimental libraries
 @subsection resjung_lib
 @cindex resjung_lib
 
