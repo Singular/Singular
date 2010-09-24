@@ -33,12 +33,12 @@ PROCEDURES:
  spgeomgenus(sp);           geometrical genus of spectrum sp
  spgamma(sp);               gamma invariant of spectrum sp
 
-SEE ALSO: mondromy_lib, spectrum_lib, gmspoly_lib
+SEE ALSO: mondromy_lib, spectrum_lib, gmspoly_lib, dmod_lib
 
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          mixed Hodge structure; V-filtration; weight filtration
-          Bernstein-Sato polynomial; monodromy; spectrum; spectral pairs;
-          good basis
+          mixed Hodge structure; V-filtration; weight filtration;
+          Bernstein-Sato polynomial; local Bernstein-Sato polynomial; 
+          monodromy; spectrum; spectral pairs; good basis
 ";
 
 LIB "linalg.lib";
@@ -589,7 +589,7 @@ list bs;  Bernstein-Sato polynomial b(s) of t
     int bs[2][i];  multiplicity of i-th root of b(s)
 @end format
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          Bernstein-Sato polynomial
+          Bernstein-Sato polynomial; local Bernstein-Sato polynomial
 EXAMPLE:  example bernstein; shows examples
 "
 {
