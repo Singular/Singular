@@ -1,375 +1,162 @@
 version="$Id$";
 category="Singularities";
 info="
-LIBRARY:  surfacesignature.lib        signature of surface singularity
-AUTHORS:  Gerhard Pfister,            pfister@mathematik.uni-kl.de
-          Muhammad Ahsan Banyamin,    ahsanbanyamin@gmail.com
+LIBRARY:  signaturesurfsing.lib       signature of surface singularity
 
-OVERVIEW:
- A library for computing the signature of irreducible surface singularity.
- It contains also a procedure for computing the newton pairs of a surface
- singularity.
+AUTHORS:  Gerhard Pfister             pfister@mathematik.uni-kl.de
+@*        Muhammad Ahsan Banyamin     ahsanbanyamin@gmail.com
+@*        Stefan Steidel              steidel@mathematik.uni-kl.de 
 
-THEORY: The signature of a surface singularity is defined in
-        [Durfee,A.:The Signature of Smoothings of Complex Surface
-        Singularities, Math. Ann.,232,85-98 (1978)].
-        The algorithm we use has been proposed in
-        [Nemethi,A.:The signature of f(x,y)+z^n, Proceedings of Singularity
-        Conference (C.T.C Wall's 60th birthday meeting),Liverpool 1996,
-        London Math.Soc. LN 263(1999),131-149].
+OVERVIEW: 
+
+  A library for computing the signature of irreducible surface singularity.
+  The signature of a surface singularity is defined in [Durfee, A.: The 
+  Signature of Smoothings of Complex Surface Singularities, Math. Ann., 232, 
+  85-98 (1978)]. The algorithm we use has been proposed in [Nemethi, A.: The 
+  signature of f(x,y)+z^N, Proceedings of Singularity Conference (C.T.C. Wall's 
+  60th birthday meeting), Liverpool 1996, London Math.Soc. LN 263(1999), 
+  131-149].
 
 PROCEDURES:
- brieskornSign(a,b,c);   signature of Brieskorn singularity x^a+y^b+z^c=0
- newtonpairs(f);         newton pairs of surface singularity
- signature(N,f);         signature of singularity z^+f(x,y)=0,f irreducible
+ brieskornSign(a1,a2,a3);  signature of Brieskorn singularity x^a1+y^a2+z^a3
+ signature(N,f);           signature of singularity z^N+f(x,y)=0, f irreducible
 ";
 
 LIB "hnoether.lib";
+LIB "alexpoly.lib";
+LIB "gmssing.lib";
+
 ///////////////////////////////////////////////////////////////////////////////
-proc signature(int N,poly f)
-"
-USAGE:   signature(N,f); N=integer, f=irreducible poly in 2 variables
-RETURN:  signature of surface singularity defined by z^N+f=0
-EXAMPLE: example signature; shows an example
+//------- sigma(z^N + f) in terms of Puiseux pairs of f for f irreducible ----
+
+static proc exponentSequence(poly f)
+//=== computes the sequence a_1,...,a_s of exponents as described in [Nemethi] 
+//=== using the Puiseux pairs (m_1, n_1),...,(m_s, n_s) of f:
+//===  - a_1 = m_1, 
+//===  - a_i = m_i - n_i * (m_[i-1] - n_[i-1] * a_[i-1]).
+//===
+//=== Return: list of two intvecs:
+//===         1st entry: A = (a_1,...,a_s)
+//===         2nd entry: N = (n_1,...,n_s)
+{
+   def R = basering;
+   ring S = 0,(x,y),dp;
+   poly f = fetch(R,f);
+   list puiseuxPairs = invariants(f);
+   setring R;
+   
+   intvec M = puiseuxPairs[1][3];
+   intvec N = puiseuxPairs[1][4];
+   
+   int i;
+   int a = M[1];
+   intvec A = a;
+   for(i = 2; i <= size(M); i++)
+   {
+      a = M[i] - N[i] * (M[i-1] - N[i-1] * a);
+      A[size(A)+1] = a;
+   }
+  
+   return(list(A,N));
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y),dp;
+   exponentSequence(y4+2x3y2+x6+x5y);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc brieskornSign(a1,a2,a3)
+"USAGE:  brieskornSign(a1,a2,a3); a1,a2,a3 = integers
+RETURN:  signature of Brieskorn singularity x^a1+y^a2+z^a3
+EXAMPLE: example brieskornSign; shows an example
 "
 {
-   def R=basering;
-   ring S=0,(x,y),dp;
-   poly f = fetch(R,f);
-   list L=newtonpairs(f);
-   setring R;
-   if(size(L)>2)
+   int a_temp, t, k1, k2, k3, s_t, sigma;
+   number s;
+   
+   if(a1 > a2) { a_temp = a1; a1 = a2; a2 = a_temp; }
+   if(a2 > a3) { a_temp = a2; a2 = a3; a3 = a_temp; }
+   if(a1 > a2) { a_temp = a1; a1 = a2; a2 = a_temp; }
+   
+   for(t = 0; t <= 2; t++)
    {
-     return(Generalcase(N,L));
+      s_t = 0;
+      for(k1 = 1; k1 <= a1-1; k1++)
+      {
+         for(k2 = 1; k2 <= a2-1; k2++)
+         {
+            for(k3 = 1; k3 <= a3-1; k3++)
+            {
+               s = number(k1)/a1 + number(k2)/a2 + number(k3)/a3;
+               if(t < s)
+               {
+                  if(s < t+1)
+                  {
+                     s_t = s_t + 1;
+                  }
+                  else
+                  {
+                     break; 
+                  }
+               }
+            }
+            if(k3 == 1) { break; }
+         }
+         if(k2 == 1) { break; }
+      }
+      sigma = sigma + (-1)^t * s_t;
    }
-   if(size(L)==2)
+   return(sigma);
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring R = 0,x,dp;
+   brieskornSign(11,3,5);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc signatureP(int N,poly f)
+"USAGE:  signatureP(N,f); N = integer, f = irreducible poly in 2 variables
+RETURN:  signature of surface singularity defined by z^N + f(x,y) = 0
+EXAMPLE: example signatureP; shows an example
+"
+{
+   int i, d, prod, sigma;
+   list L = exponentSequence(f);
+   int s = size(L[2]);
+   
+   if(s == 1)
    {
-     return(signtwopairs(N,L));
+      return(brieskornSign(L[1][1], L[2][1], N));
    }
-   return(brieskornSign(L[1][2],L[1][1],N));
- }
- example
+   
+   prod = 1;
+   sigma = brieskornSign(L[1][s], L[2][s], N);
+   for(i = s - 1; i >= 1; i--)
+   {
+      prod = prod * L[2][i+1];
+      d = gcd(N, prod);
+      sigma = sigma + d * brieskornSign(L[1][i], L[2][i], N/d);
+   }
+   
+   return(sigma);
+}
+example
 { "EXAMPLE:"; echo = 2;
    ring r = 0,(x,y),dp;
    int N  = 3;
-   poly f= x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
-      +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
-   signature(N,f);
+   poly f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
+            +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
+   signatureP(N,f);
 }
 
-///////////////////////////////////////////////////////////////////////////
-proc newtonpairs(poly f)
-"USAGE:   newtonpairs(f); f= irreducible bivariate poly
- RETURN:  newton pairs of curve singularity f(x,y)=0
- EXAMPLE: example newtonpairs; shows an example
-"
-{
- def R=basering;
- ring S=0,(x,y),dp;
- poly f = fetch(R,f);
- list M=invariants(f);
- setring R;
- list L=M[1][3];
- list K=M[1][4];
- int i,j;
- intvec v;
- list N1,N2,P,T;
- N1[1]=M[1][4][1];
- N2[1]=M[1][3][1];
- for(i=2;i<=size(M[1][3]);i++)
- {
-  N1[i]=M[1][4][i];
-  N2[i]=M[1][3][i]-N1[i]*M[1][3][i-1];
- }
-  P[1]=N1;
-  P[2]=N2;
-  for(j=1;j<=size(P[1]);j++)
-  {
-     v=P[1][j],P[2][j];
-     T[j]=v;
-   }
-  return(T);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,(x,y),dp;
-   newtonpairs(y4+2x3y2+x6+x5y);
-}
+///////////////////////////////////////////////////////////////////////////////
+//------- sigma(z^N + f) in terms of the imbedded resolution graph of f -------
 
-///////////////////////////////////////////////////////////////////////////
-proc brieskornSign(a,b,c)
-"USAGE:   brieskornSign(a,b,c);a,b,c=integers
- RETURN:  signature of Brieskorn singularity x^a+y^b+z^c
- EXAMPLE: example brieskornSign; shows an example
-"
-{
-   int i,j,k,d;
-   for(i=1;i<=a-1;i++)
-   {
-       for(j=1;j<=b-1;j++)
-       {
-          for(k=1;k<=c-1;k++)
-         {
-            d=d+signa(number(i)/a+number(j)/b+number(k)/c);
-         }
-       }
-    }
-    return(d);
- }
-example
-{ "EXAMPLE:"; echo = 2;
-   ring R=0,x,dp;
-   brieskornSign(11,3,5);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc signsin(number n)
-"USAGE:   signsin(n); n=number
- RETURN:  the sign of sin(n) (sin(n) = the value of the sine of n)
- EXAMPLE: example signSin; shows an example
-"
-{
-   def r=basering;
-   int a;
-   int b=10;
-   ring s=(real,10),x,dp;
-   number m=imap(r,n);
-   number pi = number_pi(11);
-   number t=m*pi;
-   poly f=sin(b);
-   poly h=subst(f,x,t);
-   if(h>0){a=1;}
-   if(h<0){a=-1;}
-   setring r;
-   return(a);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,x,dp;
-   signsin(11/3);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc split1(number n)
-"USAGE:   split1(n); n=number
- RETURN:  integral and fractional parts of number n
- EXAMPLE: example split1; shows an example
- "
-{
-   number a,b;
-   int r;
-   a=numerator(n);
-   b=denominator(n);
-   int z=int(number(a));
-   int y=int(number(b));
-   r=z mod y;
-   int q=(z-r) div y;
-   number n1=q;
-   number n2=n-n1;
-   list l=n1,n2;
-   return(l);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-     ring r=0,x,dp;
-     split1(11/3);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc sin( int n)
-"USAGE:   sin(n); n=integer
- RETURN:  approximate value of the sine of n by using maclaurin series
- EXAMPLE:  example sin; shows an example
- "
-{
-   def R=basering;
-   ring S=0,x,dp;
-   int i;
-   poly f;
-   int z;
-   for(i=1;i<=n;i=i+2)
-   {
-     f=f+(-1)^z*x^i/factorial(i) ;
-     z++;
-   }
-   setring R;
-   map phi=S,var(1);
-   poly f=phi(f);
-   return(f);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,x,dp;
-   sin(10);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc cos(int n)
-"USAGE:   cos(n); n=integer
- RETURN:  approximate value of the cosine of n by using maclaurin series
- EXAMPLE: example cos; shows an example
- "
-{
-   def R=basering;
-   ring S=0,x,dp;
-   poly f;
-   int i;
-   int z;
-   for(i=0;i<=n;i=i+2)
-   {
-     // f=f+(-1)^z*x^i/factorial(i,0);
-     f=f+(-1)^z*x^i/factorial(i) ;
-     z++;
-   }
-   setring R;
-   map phi=S,var(1);
-   poly f=phi(f);
-   return(f);
- }
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,x,dp;
-   cos(10);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc signcos(number n)
-"USAGE:   signcos(n); n=number
- RETURN:  the sign of cosin(n) (cosin(n) = the value of the cosine of n)
- EXAMPLE: example signcos; shows an example
-"
-{
-   def r=basering;
-   int a;
-   int b=10;
-   ring s=(real,10),x,dp;
-   number m=imap(r,n);
-   number pi = number_pi(11);
-   number t=m*pi;
-   poly f=cos(b);
-   poly h=subst(f,x,t);
-   if(h>0){a=1;}
-   if(h<0){a=-1;}
-   setring r;
-   return(a);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,x,dp;
-   signcos(11/3);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc  signa( number u)
-"USAGE:   signa(u); u=number
- RETURN:  the signa of a number
- EXAMPLE: example signa; shows an example
-"
-{
-   list l=split1(u);
-   int z;
-   if( l[1] mod 2==0 )
-   { z=signsin(l[2]); }
-   else
-   { z=signcos(l[1]);}
-   return(z);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   ring r=0,x,dp;
-   signa(11/3);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc prods(list L)
-"USAGE:   product(L); L=list of intvec
- RETURN:  product of first components of Newton pairs in L
- EXAMPLE: example product; shows an example
-"
-{
-   int a=L[2][1];
-   int i;
-   for(i=1;i<=size(L)-2;i++)
-   {
-      a=a*L[i+2][1];
-   }
-   return(a);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   list L=intvec(2,3),intvec(2,1);
-   prods(L);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc Generalcase(int N, list L)
-"USAGE:   Generalcase(N,f);N=integer,list L of intvec
- RETURN:  signature of surface singularity with Newton pairs in L
- ASSUME:  number of newton pairs greater than 2
- EXAMPLE: example Generalcase; shows an example
-"
-{
-   int i,j,k,n,m,t,p;
-   int a=L[1][2];
-   int b=prods(L);
-   int d=gcd(N,b);
-   int q=d*brieskornSign(a,L[1][1],N/d);
-   list A;
-   list B;
-   list S;
-   for(i=1;i<=size(L)-1;i++)
-   {
-     a=L[i+1][2]+L[i+1][1]*L[i][1]*a;
-     A[i]=a;
-     S[i]=L[i+1][1];
-   }
-   for(m=1;m<=size(L)-2;m++)
-   {
-     B[m]=L[m+2][1];
-   }
-   list C;
-   int c=B[size(B)];
-   C[size(B)]=c;
-   for(j=1;j<=size(B)-1;j++)
-   {
-      c=c*B[size(B)-j];
-      C[size(B)-j]=c;
-   }
-   list D;
-   D[size(L)-1]=1;
-   for(k=1;k<=size(L)-2;k++)
-   {
-      D[k]=gcd(N,C[k]);
-   }
-   for(n=1;n<=size(L)-1;n++)
-   {
-     t=t+D[n]*brieskornSign(A[n],S[n],N/D[n]);
-   }
-   return(q+t);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   int N=2;
-   list L=intvec(2,3),intvec(2,1),intvec(2,1);
-   Generalcase(N,L);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc signtwopairs(int N,list L)
-"USAGE:   signtwopairs(N,f);N=integer,L=list of intvec
- RETURN:  signature of surface singularity with Newton pairs in L
- ASSUME:  number of newton pairs equal to 2
- EXAMPLE: example signtwopairs; shows an example
-"
-{
-  int a1,a2,b,d1,q,t;
-  a1=L[1][2];
-  b=prods(L);
-  d1=gcd(N,b);
-  q=d1*brieskornSign(a1,L[1][1],N/d1);
-  a2=L[2][2]+L[2][1]*L[1][1]*a1;
-  t=brieskornSign(a2,L[2][1],N);
-  return(q+t);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   int N=2;
-   list L=intvec(2,3),intvec(2,1);
-   signtwopairs(N,L);
-}
-///////////////////////////////////////////////////////////////////////////
-static proc DedekindSum(number b, number c, int a)
+static proc dedekindSum(number b, number c, int a)
 {
    number s,d,e;
    int k;
@@ -384,21 +171,289 @@ static proc DedekindSum(number b, number c, int a)
    }
    return(s);
 }
-///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc isRupture(intvec v)
+//=== decides whether the exceptional divisor given by the row v in the
+//=== incidence matrix of the resolution graph intersects at least 3 other divisors
+{
+   int i,j;
+   for(i=1;i<=size(v);i++)
+   {
+       if(v[i]<0){return(0);}
+       if(v[i]!=0){j++;}
+   }
+   return(j>=4);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc sumExcepDiv(intmat N, list M, int K, int n)
+//=== computes part of the formulae for eta(g,K), g defining an 
+//=== isolated curve singularity
+//=== N the incidence matrix of the resolution graph of g
+//=== M list of total multiplicities
+//=== n = nrows(N)
+{
+   int i,j,m,d;
+   for(i=1;i<=n;i++)
+   {
+      if(N[i,i]>0)
+      {
+         m=gcd(K,M[i]);
+         for(j=1;j<=n;j++)
+         {
+            if((i!=j)&&(N[i,j]!=0))
+            {
+               if(m==1){break;}
+               m=gcd(m,M[j]);
+            }
+         }
+         d=d+m-1;
+      }
+   }
+   return(d);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc sumEdges(intmat N, list M, int K, int n)
+//=== computes part of the formulae for eta(g,K), g defining an 
+//=== isolated curve singularity
+//=== N the incidence matrix of the resolution graph of g
+//=== M list of total multiplicities
+//=== n = nrows(N)
+{
+   int i,j,d;
+   for(i=1;i<=n-1;i++)
+   {
+      for(j=i+1;j<=n;j++)
+      {
+         if(N[i,j]==1)
+         {
+            d=d+gcd(K,gcd(M[i],M[j]))-1;
+         }
+      }
+   }
+   return(d);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc etaRes(list L, int K)
+//=== L total multiplicities
+//=== eta-invariant in terms of the imbedded resolution graph of f
+{
+   int i,j,d;
+   intvec v;
+   number e;
+   intmat N = L[1];         // incidence matrix of the resolution graph
+   int n = ncols(L[1]);     // number of vertices in the resolution graph
+   int a = ncols(L[2]);     // number of branches
+   list M;                  // total multiplicities
+   for(i=1;i<=n;i++)
+   {
+      d=L[2][i,1];
+      for(j=2;j<=a;j++)
+      {
+         d=d+L[2][i,j];
+      }
+      if(d==0){d=1;}
+      M[i]=d;
+   }
+   for(i=1;i<=n;i++)
+   {
+      v=N[i,1..n];
+      if(isRupture(v))    // the divisor intersects more then two others
+      {
+         for(j=1;j<=n;j++)
+         {
+            if((i!=j)&&(v[j]!=0))
+            {
+               e=e+dedekindSum(M[j],K,M[i]);
+            }
+         }
+      }   
+   }
+   if(a==1)
+   {
+      //the irreducible case
+      return(4*e);
+   }
+   return(a-1+4*e+sumEdges(N,M,K,n)-sumExcepDiv(N,M,K,n));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//------------ sigma(z^N + f) in terms of the spectral pairs of f -------------
+
+static proc fracPart(number n)
+//=== computes the fractional part n2 of n
+//=== i.e. n2 is not in Z but n-n2 is in Z
+{
+   number a,b;
+   int r;
+   a = numerator(n);
+   b = denominator(n);
+   int z = int(number(a));
+   int y = int(number(b));
+   r = z mod y;
+   int q = (z-r) div y;
+   number n1 = q;
+   number n2 = n-n1;
+   return(n2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc etaSpec(list L, int N)
+//=== L spectral numbers
+//=== eta-invariant in terms of the spectral pairs of f 
+{
+   int i;
+   number e, h;
+   
+   int n = ncols(L[1]);
+   
+   if((n mod 2) == 0)               
+   // 0 is not a spectral number, thus f is irreducible
+   {
+      for(i = n/2+1; i <= n; i++)
+      {
+         e = e + (1 - 2 * fracPart(N * number(L[1][i]))) * L[3][i];
+      }
+      return(2*e);
+   }
+   else
+   // 0 is a spectral number, thus f is reducible
+   {
+      // sum of Hodge numbers in eta function
+      for(i = 1; i <= n; i++)                   
+      {
+         if((L[2][i] == 2)&&((denominator(leadcoef(N*L[1][i]))==1)||(denominator(leadcoef(N*L[1][i]))==-1))) 
+         { 
+            h = h + L[3][i]; 
+         }
+      }
+      
+      // summand coming from spectral number 0 in eta function
+      h = h + L[3][(n+1)/2];
+      
+      // sum coming from non-zero spectral numbers in eta function
+      for(i = (n+3)/2; i <= n; i++)
+      {
+         if(!((denominator(leadcoef(N*L[1][i]))==1)||(denominator(leadcoef(N*L[1][i]))==-1)))
+         {
+            e = e + (1 - 2 * fracPart(N * number(L[1][i]))) * L[3][i];
+         }
+      }    
+      return(h + 2*e);
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//---------------- Consolidation of the three former variants -----------------
+
+proc signature(int N, poly f, list #)
+"USAGE:  signature(N,f); N = integer, f = reduced poly in 2 variables, # empty or 1,2,3
+@*       - if # is empty or #[1] = 2 then resolution of singularities is used
+@*       - if #[1] = 1 then f has to be analytically irreducible and Puiseux expansions are used
+@*       - if #[1] = 3 then spectral pairs are used
+RETURN:  signature of surface singularity defined by z^N + f(x,y) = 0
+EXAMPLE: example signature; shows an example
+"
+{
+   if(size(#) == 0)
+   {
+      list L = totalmultiplicities(f);
+      return(etaRes(L,N) - N*etaRes(L,1));
+   }
+   
+   if(#[1] == 1)
+   {
+      return(signatureP(N,f));
+   }
+   
+   if(#[1] == 2)
+   {
+      list L = totalmultiplicities(f);
+      return(etaRes(L,N) - N*etaRes(L,1));
+   }
+   
+   if(#[1] == 3)
+   {
+      def R = basering;
+      def Rds = changeord("ds");
+      setring Rds;
+      poly f = imap(R,f);
+      list L = sppairs(f);
+      setring R;
+      list L = imap(Rds,L);
+      return(etaSpec(L,N) - N*etaSpec(L,1));
+   }
+}
+example
+{ "EXAMPLE:"; echo = 2;
+   ring r = 0,(x,y),dp;
+   int N  = 3;
+   poly f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
+            +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
+   signature(N,f,1);
+   signature(N,f,2);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 /*
 Further examples
 
-   ring r = 0,(x,y),dp;
-   int N;
-   poly f;
+ring r = 0,(x,y),dp;
+int N;
+poly f,g,g1,g2,g3;
 
-   N  = 5;
-   poly f= x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2    //3 characteristic pairs
-      +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
 
-   N=6;
-   f= y4+2x3y2+x6+x5y;                                             //2 characteristic pairs
+// irreducible polynomials
 
-   N=7;
-   f=x5+y11;                                                       //1 characteristc pair
+N = 5;
+f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2    
+    +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;      
+g = f^3 + x17y17;                                                
+
+N = 6;
+f = y4+2x3y2+x6+x5y;                                             
+g1 = f^2 + x5y5;
+g2 = f^3 + x11y11;
+g3 = f^3 + x17y17;
+
+N = 7;
+f = x5+y11;
+g1 = f^3 + x11y11;
+g2 = f^3 + x17y17;
+
+N = 6;     
+// k0 = 30, k1 = 35, k2 = 71
+f = x71+6x65+15x59-630x52y6+20x53+6230x46y6+910x39y12+15x47
+    -7530x40y6+14955x33y12-285x26y18+6x41+1230x34y6+4680x27y12
+    +1830x20y18+30x13y24+x35-5x28y6+10x21y12-10x14y18+5x7y24-y30;
+
+// k0 = 16, k1 = 24, k2 = 28, k3 = 30, k4 = 31
+f = x31-781x30+16x29y-3010x29-2464x28y+104x27y2-2805x28-7024x27y
+    -5352x26y2+368x25y3+366x27-7136x26y-984x25y2-8000x24y3
+    +836x23y4+34x26-320x25y-6464x24y2+6560x23y3-8812x22y4+1392x21y5
+    -12x25+256x24y-1296x23y2-1536x22y3+4416x21y4-8864x20y5+1752x19y6
+    -x24+16x23y-88x22y2-16x21y3-404x20y4+3056x19y5-6872x18y6+1648x17y7
+    +8x21y2-96x20y3+524x19y4-1472x18y5+3464x17y6-3808x16y7+1290x15y8
+    -28x18y4+240x17y5-976x16y6+2208x15y7-2494x14y8+816x13y9+56x15y6
+    -320x14y7+844x13y8-1216x12y9+440x11y10-70x12y8+240x11y9-344x10y10
+    +240x9y11+56x9y10-96x8y11+52x7y12-28x6y12+16x5y13+8x3y14-y16; 
+
+
+// reducible polynomials
+
+N = 12;
+f = ((y2-x3)^2 - 4x5y - x7)*(x2-y3);
+
+f = 2x3y3-2y5+x4-xy2;
+
+f = -x3y3+x6y+xy6-x4y4;
+*/

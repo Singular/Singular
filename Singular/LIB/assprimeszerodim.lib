@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 version="$Id$";
-category = "Commutative algebra";
+category = "Commutative Algebra";
 info="
-LIBRARY:  assPrimes.lib    associated primes of a zero-dimensional ideal
+LIBRARY:  assprimeszerodim.lib   associated primes of a zero-dimensional ideal
 
 AUTHORS:  N. Idrees       nazeranjawwad@gmail.com
 @*        G. Pfister      pfister@mathematik.uni-kl.de
@@ -10,15 +10,15 @@ AUTHORS:  N. Idrees       nazeranjawwad@gmail.com
 
 OVERVIEW:
 
-  A library for computing the associated primes  and the radical of a
+  A library for computing the associated primes and the radical of a
   zero-dimensional ideal in the polynomial ring over the rational numbers,
-  Q[x_1,...,x_n] using modular computations.
+  Q[x_1,...,x_n], using modular computations.
 
 SEE ALSO: primdec_lib
 
 PROCEDURES:
+ zeroR(I);             computes the radical of I
  assPrimes(I);         computes the associated primes of I
- zeroR(I);             compute the radical of I
 ";
 
 LIB "primdec.lib";
@@ -29,6 +29,8 @@ LIB "modstd.lib";
 proc zeroR(ideal I, list #)
 "USAGE:  zeroR(I,[n]); I ideal, optional: n number of processors (for parallel computing)
 ASSUME:  I is zero-dimensional in Q[variables]
+NOTE:    Parallelization is just applicable using 32-bit Singular version since
+         MP-links are not compatible with 64-bit Singular version.
 RETURN:  the radical of I
 EXAMPLE: example zeroR; shows an example
 "
@@ -63,8 +65,7 @@ EXAMPLE: example zeroR; shows an example
    }
 
 //--------------------  Initialize the list of primes  -------------------------
-// nach Umstellung von modstd.lib auf unsere neue Version: primeList(I,10)
-   intvec L = primeList(10);
+   intvec L = primeList(I,10);
    L[5] = prime(random(100000000,536870912));
 
    if(n > 1)
@@ -140,7 +141,7 @@ EXAMPLE: example zeroR; shows an example
          }
       }
 
-      //hier deleteUnlucky einbauen, streichen, wenn der Grad nicht stimmt
+      // insert deleteUnluckyPrimes
       G = chinrem(CO1,CO2);
       N = CO2[1];
       for(i = 2; i <= size(CO2); i++){N = N*CO2[i];}
@@ -159,9 +160,7 @@ EXAMPLE: example zeroR; shows an example
          index = 2;
 
          j = size(L) + 1;
-
-// nach Umstellung von modstd.lib auf unsere neue Version: primeList(I,10,L)
-         L = primeList(10,L);
+         L = primeList(I,10,L);
 
          if(n > 1)
          {
@@ -197,13 +196,15 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 proc assPrimes(list #)
-"USAGE:  assPrimes(I,[n],[a]); I ideal or module,
+"USAGE:  assPrimes(I,[a],[n]); I ideal or module,
          optional: n number of processors (for parallel computing), a
-         - a=1: method of Eisenbud/Hunecke/Vasconcelos
-         - a=2: method of Gianni/Trager/Zacharias
-         - a=3: mathod of Monico
-         assPrimes(I)  chooses n=a=1
+         - a = 1: method of Eisenbud/Hunecke/Vasconcelos
+         - a = 2: method of Gianni/Trager/Zacharias
+         - a = 3: mathod of Monico
+         assPrimes(I) chooses n = a = 1
 ASSUME:  I is zero-dimensional over Q[variables]
+NOTE:    Parallelization is just applicable using 32-bit Singular version since
+         MP-links are not compatible with 64-bit Singular version.
 RETURN:  a list pr of associated primes of I:
 EXAMPLE: example assPrimes; shows an example
 "
@@ -213,7 +214,7 @@ EXAMPLE: example assPrimes; shows an example
    int RT = rtimer;
 
    ideal I;
-   if(typeof(#[1])=="ideal")
+   if(typeof(#[1]) == "ideal")
    {
       I = #[1];
    }
@@ -222,9 +223,37 @@ EXAMPLE: example assPrimes; shows an example
       module M = #[1];
       I = Ann(M);
    }
+   
+   //---------------------  Initialize optional parameter  ------------------------
+   if(size(#) > 1)
+   {
+      if(size(#) == 2)
+      {
+         int alg = #[2];
+         int n = 1;
+      }
+      if(size(#) == 3)
+      {
+         int alg = #[2];
+         int n = #[3];
+         if((n > 1) && (1 - system("with","MP")))
+         {
+            "========================================================================";
+            "There is no MP available on your system. Since this is necessary to     ";
+            "parallelize the algorithm, the computation will be done without forking.";
+            "========================================================================";
+            n = 1;
+         }
+      }
+   }
+   else
+   {
+      int alg = 1;
+      int n = 1;
+   }
 
    def SPR = basering;
-   I = std(I);
+   I = modStd(I,n);
    int d = vdim(I);
    if(d == -1) { ERROR("Ideal is not zero-dimensional."); }
    if(homog(I) == 1){ return(list(maxideal(1))); }
@@ -262,39 +291,16 @@ EXAMPLE: example assPrimes; shows an example
       "Real-time for radical-check is "+string(rtimer - RT)+" seconds.";
       "CPU-time for radical-check is "+string(timer - T)+" seconds.";
    }
-//---------------------  Initialize optional parameter  ------------------------
-   if(size(#) > 1)
-   {
-      if(size(#) == 2)
-      {
-         int alg = #[2];
-         int n = 1;
-      }
-      if(size(#) == 3)
-      {
-         int alg = #[2];
-         int n = #[3];
-         if((n > 1) && (1 - system("with","MP")))
-         {
-            "========================================================================";
-            "There is no MP available on your system. Since this is necessary to     ";
-            "parallelize the algorithm, the computation will be done without forking.";
-            "========================================================================";
-            n = 1;
-         }
-      }
-   }
-   else
-   {
-      int alg = 1;
-      int n = 1;
-   }
 
    export(SPR);
    poly f_for_fork = f;
    export(f_for_fork);           // f available for each link
    ideal I_for_fork = I;
    export(I_for_fork);           // I available for each link
+
+//--------------------  Initialize the list of primes  -------------------------
+   intvec L = primeList(I,10);
+   L[5] = prime(random(1000000000,2134567879));
 
    list Re;
 
@@ -307,12 +313,6 @@ EXAMPLE: example assPrimes; shows an example
    int i,k,e,int_break;
    int j = 1;
    int index = 1;
-
-
-//--------------------  Initialize the list of primes  -------------------------
-// nach Umstellung von modstd.lib auf unsere neue Version: primeList(I,10)
-   intvec L = primeList(10);
-   L[5] = prime(random(1000000000,2134567879));
 
 //-----  If there is more than one processor available, we parallelize the  ----
 //-----  main standard basis computations in positive characteristic        ----
@@ -358,9 +358,9 @@ EXAMPLE: example assPrimes; shows an example
          {
             for(i = 1; i <= n; i++)
             {
-               if(status(l(i), "read", "ready"))                         // ask if link l(i) is ready otherwise sleep for t seconds
+               if(status(l(i), "read", "ready"))           // ask if link l(i) is ready otherwise sleep for t seconds
                {
-                  P = read(l(i));                                        // read the result from l(i)
+                  P = read(l(i));                          // read the result from l(i)
                   CO1[index] = P[1];
                   CO2[index] = bigint(P[2]);
                   index++;
@@ -377,7 +377,7 @@ EXAMPLE: example assPrimes; shows an example
                   }
                }
             }
-            if(k == n)                                                  // k describes the number of closed links
+            if(k == n)                                     // k describes the number of closed links
             {
                j++;
             }
@@ -400,7 +400,8 @@ EXAMPLE: example assPrimes; shows an example
          "Real-time for computing list in assPrimes is "+string(rtimer - rt)+" seconds.";
          "CPU-time for computing list in assPrimes is "+string(timer - tt)+" seconds.";
       }
-      //hier deleteUnlucky einbauen, streichen, wenn der Grad nicht stimmt
+      
+      // insert deleteUnluckyPrimes
       G = chinrem(CO1,CO2);
       N = CO2[1];
       for(j = 2; j <= size(CO2); j++){N = N*CO2[j];}
@@ -460,15 +461,7 @@ EXAMPLE: example assPrimes; shows an example
                   for(i = 2; i <= s; i++)
                   {
                      H[1][i] = quickSubst(H[1][i],f,I);
-
-                     if(typeof(#[1])=="ideal")
-                     {
-                        Re[i-1] = #[1] + ideal(H[1][i]);
-                     }
-                     else
-                     {
-                        Re[i-1] = M + H[1][i]*freemodule(nrows(M));
-                     }
+                     Re[i-1] = I + ideal(H[1][i]);
                   }
 
                   if(n > 1)
@@ -513,8 +506,9 @@ EXAMPLE: example assPrimes; shows an example
 
       j = size(L) + 1;
 
-// nach Umstellung von modstd.lib auf unsere neue Version: primeList(I,10,L)
-      L = primeList(10,L);
+      setring(SPR);
+      L = primeList(I,10,L);
+      setring rHelp;
 
       if(n > 1)
       {
@@ -745,46 +739,6 @@ static proc pTestRad(int d, poly p1, ideal I)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static proc primeList(int n, list #)
-"USAGE:  primeList(n); (resp. primeList(n,L); )
-RETURN: the intvec of n greatest primes  <= 536870912 (resp. n greatest
-        primes < L[size(L)] union with L)
-EXAMPLE:example primList; shows an example
-"
-{
-   intvec L;
-   int i,p;
-   if(size(#) == 0)
-   {
-      p = prime(536870912);
-      L[1] = p;
-   }
-   else
-   {
-      L = #[1];
-      p = prime(L[size(L)]-1);
-      L[size(L)+1] = p;
-   }
-   if(p == 2){ERROR("no more primes");}
-   for(i = 2; i <= n; i++)
-   {
-      p = prime(p-1);
-      L[size(L)+1] = p;
-   }
-   return(L);
-}
-example
-{ "EXAMPLE:"; echo = 2;
-   intvec L=primeList(10);
-   size(L);
-   L[size(L)];
-   L=primeList(5,L);
-   size(L);
-   L[size(L)];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 static proc zeroRadP(ideal I, int p)
 {
 //=== computes F=(F_1,...,F_n) such that <F_i>=IZ/p[x_1,...,x_n] intersected with Z/p[x_i], F_i monic
@@ -873,82 +827,59 @@ static proc modpSpecialAlgDep(list ringL, int p, list #)
 Examples
 
 //Test for zeroR
-ring R = 0, (x,y), dp;
+ring R = 0,(x,y),dp;
 ideal I = xy4-2xy2+x, x2-x, y4-2y2+1;
 
 //Cyclic 6
-ring R=0,x(1..6),dp;
-ideal I=cyclic(6);
+ring R = 0,x(1..6),dp;
+ideal I = cyclic(6);
 
 //Amrhei
-ring R=0,(a,b,c,d,e,f),dp;
-ideal I=
-2fb+2ec+d2+a2+a,
-2fc+2ed+2ba+b,
-2fd+e2+2ca+c+b2,
-2fe+2da+d+2cb,
-f2+2ea+e+2db+c2,
-2fa+f+2eb+2dc;
+ring R = 0,(a,b,c,d,e,f),dp;
+ideal I = 2fb+2ec+d2+a2+a,
+          2fc+2ed+2ba+b,
+          2fd+e2+2ca+c+b2,
+          2fe+2da+d+2cb,
+          f2+2ea+e+2db+c2,
+          2fa+f+2eb+2dc;
 
 
 //Becker-Niermann
 ring R = 0,(x,y,z),dp;
-ideal I=
-x2+xy2z-2xy+y4+y2+z2,
--x3y2+xy2z+xyz3-2xy+y4,
--2x2y+xy4+yz4-3;
+ideal I = x2+xy2z-2xy+y4+y2+z2,
+          -x3y2+xy2z+xyz3-2xy+y4,
+          -2x2y+xy4+yz4-3;
 
 //Roczen
-ring R=0,(a,b,c,d,e,f,g,h,k,o),dp;
-ideal I=
-o+1,
-k4+k,
-hk,
-h4+h,
-gk,
-gh,
-g3+h3+k3+1,
-fk,
-f4+f,
-eh,
-ef,
-f3h3+e3k3+e3+f3+h3+k3+1,
-e3g+f3g+g,
-e4+e,
-dh3+dk3+d,
-dg,
-df,
-de,
-d3+e3+f3+1,
-e2g2+d2h2+c,
-f2g2+d2k2+b,
-f2h2+e2k2+a;
+ring R = 0,(a,b,c,d,e,f,g,h,k,o),dp;
+ideal I = o+1, k4+k, hk, h4+h, gk, gh, g3+h3+k3+1,
+          fk, f4+f, eh, ef, f3h3+e3k3+e3+f3+h3+k3+1,
+          e3g+f3g+g, e4+e, dh3+dk3+d, dg, df, de,
+          d3+e3+f3+1, e2g2+d2h2+c, f2g2+d2k2+b,
+          f2h2+e2k2+a;
 
 //4 bodies with equal masses, before symmetrisation.
 //We are looking for the real positive solutions
-ring R=0,(B,D,F,b,d,f),dp;
+ring R = 0,(B,b,D,d,F,f),dp;
+ideal I = (b-d)*(B-D)-2*F+2,
+          (b-d)*(B+D-2*F)+2*(B-D),
+          (b-d)^2-2*(b+d)+f+1,
+          B^2*b^3-1,D^2*d^3-1,F^2*f^3-1;
 
-ring R=0,(B,b,D,d,F,f),dp;
-ideal I=(b-d)*(B-D)-2*F+2,
-(b-d)*(B+D-2*F)+2*(B-D),
-(b-d)^2-2*(b+d)+f+1,
-B^2*b^3-1,D^2*d^3-1,F^2*f^3-1;
-
-ring R=0,(B,b,D,d,F,f),dp;
-ideal I=(b-d)*(B-D)-F+1,
-(b-d)*(B+D-F)+(B-D),
-(b-d)^2-(b+d)+f+1,
-B^2*b^3-1,D^2*d^3-1,F^2*f^3-1;
+ring R = 0,(B,b,D,d,F,f),dp;
+ideal I = (b-d)*(B-D)-F+1,
+          (b-d)*(B+D-F)+(B-D),
+          (b-d)^2-(b+d)+f+1,
+          B^2*b^3-1,D^2*d^3-1,F^2*f^3-1;
 
 
 //prime
-ring R=0,(x,y,z,t,u),dp;
-
-ideal I=2x2-2y2+2z2-2t2+2u2-1,
+ring R = 0,(x,y,z,t,u),dp;
+ideal I = 2x2-2y2+2z2-2t2+2u2-1,
           2x3-2y3+2z3-2t3+2u3-1,
-         2x4-2y4+2z4-2t4+2u4-1,
-         2x5-2y5+2z5-2t5+2u5-1,
-         2x6-2y6+2z6-2t6+2u6-1;
+          2x4-2y4+2z4-2t4+2u4-1,
+          2x5-2y5+2z5-2t5+2u5-1,
+          2x6-2y6+2z6-2t6+2u6-1;
 
 */
 
