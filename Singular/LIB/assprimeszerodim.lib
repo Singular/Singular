@@ -223,7 +223,7 @@ EXAMPLE: example assPrimes; shows an example
       module M = #[1];
       I = Ann(M);
    }
-   
+
    //---------------------  Initialize optional parameter  ------------------------
    if(size(#) > 1)
    {
@@ -400,7 +400,7 @@ EXAMPLE: example assPrimes; shows an example
          "Real-time for computing list in assPrimes is "+string(rtimer - rt)+" seconds.";
          "CPU-time for computing list in assPrimes is "+string(timer - tt)+" seconds.";
       }
-      
+
       // insert deleteUnluckyPrimes
       G = chinrem(CO1,CO2);
       N = CO2[1];
