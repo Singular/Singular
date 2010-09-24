@@ -350,7 +350,7 @@ LIB "all.lib";
 @menu
 * absfact_lib:: absolute factorization for characteristic 0
 * algebra_lib:: procedures for computing with algebras and maps
-* assprime_lib:: associated primes of a zero-dimensional ideal
+* assprimeszerodim:: associated primes of a zero-dimensional ideal
 * cimonom_lib:: is the toric ideal of an affine monomial curve a complete intersection ?
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
@@ -383,15 +383,15 @@ LIB "all.lib";
 @subsection absfact_lib
 @c lib absfact.lib
 @c ---------------------------------------------------------
-@node algebra_lib, assprime_lib, absfact_lib, Commutative algebra
+@node algebra_lib, assprimeszerodim_lib, absfact_lib, Commutative algebra
 @subsection algebra_lib
 @c lib algebra.lib
 @c ---------------------------------------------------------
-@node assprime_lib, cimonom_lib, algebra_lib, Commutative algebra
-@subsection assprime_lib
-@c lib assprime.lib
+@node assprimeszerodim_lib, cimonom_lib, algebra_lib, Commutative algebra
+@subsection assprimeszerodim_lib
+@c lib assprimeszerodim.lib
 @c ---------------------------------------------------------
-@node cimonom_lib, elim_lib, assprime_lib, Commutative algebra
+@node cimonom_lib, elim_lib, assprimeszerodim_lib, Commutative algebra
 @subsection cimonom_lib
 @c lib cimonom.lib
 @c ----------------------------------------------------------
@@ -874,6 +874,7 @@ Comments should be send to the author of the library directly.
 @menu
 * findiff_lib:: finite difference schemes for linear differential equations
 * multigrading_lib:: Multigradings and related computations
+* primdecint_lib:: primary decomposition over the integers
 * resjung_lib:: Resolution of surface singularities by Jung's Algorithm
 * surfacesignature_lib:: signature of surface singularities
 @end menu
@@ -897,7 +898,7 @@ Issues:
 @c lib findiff.lib
 
 @c ----------------------------------------------------------
-@node multigrading_lib,resjung_lib,findiff_lib, Experimental libraries
+@node multigrading_lib,primdecint_lib,findiff_lib, Experimental libraries
 @subsection multigrading_lib
 @cindex multigrading_lib
 
@@ -907,6 +908,17 @@ Todos/Issues:
 @end itemize
 
 @c lib multigrading.lib
+
+@c ----------------------------------------------------------
+@node primdecint_lib,resjung_lib,multigrading_lib, Experimental libraries
+@subsection primdecint_lib
+@cindex primdecint_lib
+
+Todos/Issues:
+@itemize
+@end itemize
+
+@c lib primdecint.lib
 
 @c ----------------------------------------------------------
 @node resjung_lib,surfacesignature_lib,multigrading_lib, Experimental libraries
