@@ -1357,6 +1357,12 @@ something @sc{Singular} can write to and/or read from. Currently,
 @item MPtcp links (see
 @ref{MPtcp links})
 
+@item ssi links (see
+@ref{Ssi links})
+
+@item pipe links (see
+@ref{Pipe links})
+
 @item DBM links (see
 @ref{DBM links})
 @end itemize
@@ -1367,6 +1373,8 @@ something @sc{Singular} can write to and/or read from. Currently,
 * link related functions::
 * ASCII links::
 * MP links::
+* Ssi links::
+* Pipe links::
 * DBM links::
 @end menu
 
@@ -1434,6 +1442,12 @@ For a detailed format description of the link describing string see:
 @item for MPtcp links:
 @ref{MPtcp links}
 
+@item ssi links (see
+@ref{Ssi links})
+
+@item pipe links (see
+@ref{Pipe links})
+
 @item for DBM links:
 @ref{DBM links}
 @end itemize
@@ -1443,6 +1457,8 @@ For a detailed format description of the link describing string see:
 * ASCII links::
 * MPfile links::
 * MPtcp links::
+* Ssi links::
+* Pipe links::
 * DBM links::
 @end menu
 
@@ -1549,7 +1565,7 @@ written.
 @end smallexample
 
 @c ------------------------------
-@node MP links, DBM links, ASCII links, link
+@node MP links, Ssi links, ASCII links, link
 @subsection MP links
 @cindex MP links
 
@@ -1799,8 +1815,204 @@ is data to read.
 @c example
 @end smallexample
 
+@c-------------------------------------------------------------------
+@node Ssi links, Pipe links, MP links, link
+@subsection Ssi links
+@cindex Ssi links
+
+Ssi (simple singular interface) links give the possibility to store
+and communicate data betweenm Singular processes:
+Read and write access is very fast
+compared to ASCII links. Ssi links can be established using files
+or using TCP sockets.
+For ring-dependent data, a
+ring description is written together with the data. Reading from an Ssi
+link returns an expression (not a string) which was evaluated after the
+read operation. If the expression read from an Ssi link is not from the
+same ring as the current ring, then a @code{read} changes the current
+ring.
+
+Currently under development - not everything is implemtented.
+
+@menu
+* Ssi file links::
+* Ssi tcp links::
+@end menu
+
+@c -------------------------------------------------------------
+@node Ssi file links, Ssi tcp links, Ssi  links, Ssi  links
+@subsubsection Ssi file links
+@cindex Ssi file links
+
+Ssi file links provide the possibility to store data in a file using the
+ssi format.
+For storing large amounts of data, ssi file links
+should be used instead of ASCII links. Unlike ASCII links, data read
+from ssi file links is returned as expressions one at a time.
+
+The ssi file link describing string has to be one of the following:
+
+@enumerate
+@item @code{"ssi:r "} + filename
+@*opens the file for reading.
+@item @code{"ssi:w "} + filename
+@*opens the file for overwriting.
+@item @code{"ssi:a "} + filename
+@*opens the file for appending.
+@end enumerate
+
+Note that the filename may contain a path. An ssi file link can be used
+either for reading or for writing, but not for both at the same time. A
+@code{close} command must be used before a change of I/O direction.
+
+@*@strong{Example:}
+@smallexample
+@c example
+  ring r;
+  link l="ssi:w example.ssi"; // type=ssi, mode=overwrite
+  l;
+  ideal i=x2,y2,z2;
+  write (l,1, i, "hello world");// write three expressions
+  write(l,4);                   // append one more expression
+  close(l);                     // link is closed
+  // open the file for reading now
+  read(l);                      // only first expression is read
+  kill r;                       // no basering active now
+  def i = read(l);              // second expression
+  // notice that current ring was set, the name was assigned
+  // automatically
+  listvar(ring);
+  def s = read(l);              // third expression
+  listvar();
+  close(l);                     // link is closed
+@c example
+@end smallexample
+
+@c -------------------------------------------------------------
+@node Ssi tcp links,  , Ssi file links, Ssi  links
+@subsubsection Ssi tcp links
+@cindex Ssi tcp links
+
+Ssi tcp links give the possibility to exchange data
+between two processes which may run on the same or on different
+computers. Ssi tcp links can be opened in four different modes:
+
+@table @code
+@item tcp
+@sc{Singular} acts as a server.
+
+@item connect
+@sc{Singular} acts as a client.
+
+@item tcp <host>:<program>
+@sc{Singular} acts as a client, launching an application as server.
+
+@item fork
+@sc{Singular} acts as a client, forking another @sc{Singular} as
+server.
+@end table
+
+The Ssi tcp link describing string has to be
+@itemize @bullet
+@item tcp mode:
+@enumerate
+@item @code{"ssi:tcp"}
+@end enumerate
+@sc{Singular} becomes a server and waits at the first free port (>1024) for a
+connect call.
+@item connect mode:
+@enumerate 2
+@item @code{"ssi:connect "} + host@code{:}port
+@end enumerate
+@sc{Singular} becomes a client and connects to a server waiting at
+the host and port.
+@item launch mode:
+@enumerate 4
+@item @code{"ssi:tcp"} + host@code{:}application
+@end enumerate
+@sc{Singular} becomes a client and starts (launches) the application
+using ssh on a (possibly) different host
+which then acts as a server.
+@item fork mode:
+@enumerate 8
+@item @code{"ssi:fork"}
+@end enumerate
+@sc{Singular} becomes a client and forks another @sc{Singular} on the
+same host which acts as a server.
+@end itemize
+
+To open an ssi tcp link in launch mode, the application to launch must
+either be given with an absolute pathname, or must be in a directory
+contained in the search path. The launched application acts as a server,
+whereas the @sc{Singular} that actually opened the link acts as a
+client.
+The client "listens" at the some free port until the server
+application does a connect call. 
+
+If the ssi tcp link is opened in fork mode a child of the current
+@sc{Singular} is forked. All variables and their values are inherited by
+the child. The child acts as a server whereas the @sc{Singular} that
+actually opened the link acts as a client.
+
+To arrange the evaluation of an expression by a server, the expression
+must be quoted using the command @code{quote} (see @ref{quote}), so that
+a local evaluation is prevented. Otherwise, the expression is evaluated
+first, and the result of the evaluation is written, instead of the
+expression which is to be evaluated.
+
+If @sc{Singular} is in server mode,
+@sc{Singular} is in an infinite read-eval-write loop until the
+connection is closed from the client side (by closing its connecting
+link). After an
+expression is read, it is evaluated and the result of the evaluation is
+written back.  That is, for each expression which was written to the
+server, there is exactly one expression written back. This might be an
+"empty" expression, if the evaluation on the server side does not return
+a value.
+
+Ssi tcp links should explicitly be opened before being used. Ssi tcp links
+are bidirectional, i.e. can be used for both, writing and
+reading. Reading from an ssi tcp link blocks until data was written to
+that link. The @code{status} command can be used to check whether there
+is data to read.
+
+@*@strong{Example:}
+@smallexample
+@c example unix_only
+  int i=7;
+  link l = "ssi:fork";      // fork link declaration
+  open(l); l;
+
+  write(l,quote(i)); // Child inherited vars and their values
+  read(l);
+  close(l);          // shut down forked child
+@c example
+@end smallexample
+
+@c-------------------------------------------------------------------
+@node Pipe links, DBM links, Ssi links, link
+@subsection Pipe links
+@cindex Pipe links
+Pipe links provide acces to stdin and stdout of any program.
+Pipe links are bidirectional.
+@strong{Syntax:} @code{"|: "} + string_for_system
+
+The string_for system will be passed to @code{system} after conneting
+the input and output to the corresponding stdout and stdin.
+
+@strong{Example:}
+@smallexample
+@c example
+  link l="|: date";
+  open(l); l;
+  read(l);
+  l;
+  close(l);
+@c example
+@end smallexample
+
 @c ------------------------------
-@node DBM links,  , MP links, link
+@node DBM links,  , Pipe links, link
 @subsection DBM links
 @cindex DBM links
 
