@@ -22,6 +22,62 @@
 
 @heading News for version @value{VERSION}
 
+@heading New @sc{Singular} functions
+@itemize @bullet
+@item
+new command: @code{datetime} (see @nref{datetime})
+@item
+new command: @code{ludecomp} (see @nref{ludecomp})
+@item
+new command: @code{luinverse} (see @nref{luinverse})
+@item
+new command: @code{lusolve} (see @nref{lusolve})
+@item
+new command: @code{primefactors} (see @nref{primefactors})
+@item
+new command: @code{rank} (see @nref{rank})
+@end itemize
+
+@heading New @sc{Singular} link types
+@itemize @bullet
+@item
+@code{ssi}: experimental Singular-Singular interface (see @nref{Ssi links})
+@item
+@code{pipe}: string based interface to any program (see @nref{Pipe links})
+@end itemize
+
+@heading Changed @sc{Singular} libraries
+@itemize @bullet
+@item
+extended library: modstd.lib (see @nref{modstd_lib}: Groebner basis via modular methods
+@end itemize
+
+@heading New @sc{Singular} libraries
+@itemize @bullet
+@item
+new library: dmodvar.lib (see @nref{dmodvar_lib}: algebraic D-modules for varieties
+@item
+new library: monomial.lib (see @nref{monomial_lib}: operation for monomial ideals)
+@item
+new library: resbin.lib (see @nref{resbin_lib}: resolution of singularities of binomial ideals
+@item
+new library: resjung.lib (see @nref{resjung_lib}: resolution of surface singularities by Jung's Algorithm
+@item
+new library: surfacesignature.lib (see @nref{surfacesignature_lib}: signature of irreducible surface singularities
+@end itemize
+
+@heading Internal Changes
+@itemize @bullet
+@item
+new gcd code
+@item
+new factorization code
+@end itemize
+
+@heading --------------------------------------------------------------------
+@heading Older versions:
+@heading News for version 3-1-1
+
 @itemize @bullet
 @item
 new option @code{qringNF}, see @nref{option}.
