@@ -864,18 +864,25 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
       }
       else
       {
-        CanonicalForm G( convSingTrPFactoryP( f ) );
         //  over Q(a)
-        do
+        if (F.isUnivariate())
         {
-          libfac_interruptflag=0;
-          L=Factorize2(G, mipo);
+          L= factorize (F, a);
         }
-        while ((libfac_interruptflag!=0) ||(L.isEmpty()));
-        #ifdef FACTORIZE2_DEBUG
-        printf("while okay\n");
-        #endif
-        libfac_interruptflag=0;
+        else
+        {
+          CanonicalForm G( convSingTrPFactoryP( f ) );
+          do
+          {
+            libfac_interruptflag=0;
+            L=Factorize2(G, mipo);
+          }
+          while ((libfac_interruptflag!=0) ||(L.isEmpty()));
+          #ifdef FACTORIZE2_DEBUG
+          printf("while okay\n");
+          #endif
+          libfac_interruptflag=0;
+        }
       }
     }
     else

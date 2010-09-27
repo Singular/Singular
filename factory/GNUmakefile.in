@@ -159,6 +159,7 @@ basefactorysrc := \
 		debug.cc \
                 DegreePattern.cc \
                 ExtensionInfo.cc \
+                facAlgExt.cc \
 		fac_berlekamp.cc \
 		fac_cantzass.cc \
 		fac_distrib.cc \
@@ -241,6 +242,7 @@ basefactoryincl := \
 		debug.h \
                 DegreePattern.h \
                 ExtensionInfo.h \
+                facAlgExt.h \
 		fac_berlekamp.h \
 		fac_cantzass.h \
 		fac_distrib.h \

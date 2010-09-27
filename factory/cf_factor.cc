@@ -29,6 +29,7 @@
 #include "facFqFactorize.h"
 #include "cf_map.h"
 #include "algext.h"
+#include "facAlgExt.h"
 
 #include "int_int.h"
 #ifdef HAVE_NTL
@@ -800,7 +801,11 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     #endif
 
   }
-  else // Q(a)-
+  else if (f.isUnivariate() && ch == 0) // Q(a)[x]
+  {
+    F= AlgExtFactorize (f, alpha);
+  }
+  else //Q(a)[x1,...,xn]
   {
   #ifdef SINGULAR
       WerrorS("not implemented");
