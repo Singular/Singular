@@ -7184,7 +7184,7 @@ Makes either use of the multipolynomial resultant of Macaulay (second argument
 = 1), which works only for homogeneous ideals, or uses the sparse resultant
 of Gelfand, Kapranov and Zelevinsky (second argument = 0). @*
 The sparse resultant algorithm uses a mixed polyhedral subdivision of the
-Minkowsky sum of the Newton polytopes in order to construct the sparse
+Minkowski sum of the Newton polytopes in order to construct the sparse
 resultant matrix. Its determinant is a nonzero multiple of the sparse
 resultant. The u-resultant of B.\ L.@: van der Waerden and Laguerre's algorithm
 are used to determine the complex roots. @*
