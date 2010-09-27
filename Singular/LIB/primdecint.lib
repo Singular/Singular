@@ -1319,7 +1319,7 @@ static proc stdZ(ideal I)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc intersectZ(ideal I, ideal J)
+proc intersectZ(ideal I, ideal J)
 {
 //=== this is needed because intersect(I,J) does not work, should be replaced 
 //=== by intersect later
