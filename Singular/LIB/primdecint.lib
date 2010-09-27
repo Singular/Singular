@@ -8,7 +8,7 @@ AUTHORS:  G. Pfister      pfister@mathematik.uni-kl.de
 @*        A. Sadiq        afshanatiq@gmail.com
 @*        S. Steidel      steidel@mathematik.uni-kl.de
 
-NOTE:
+OVERVIEW:
 
   A library for computing the primary decomposition of an ideal in the polynomial
   ring over the integers, Z[x_1,...,x_n].
@@ -25,7 +25,6 @@ LIB "crypto.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
 proc primdecZ(ideal I, list #)
 "USAGE:  primdecZ(I); I ideal
 NOTE:    If size(#) > 0, then #[1] is the number of available processors for
@@ -40,7 +39,6 @@ EXAMPLE: example primdecZ; shows an example
 "
 {
    if(size(I)==0){return(list(ideal(0),ideal(0)));}
-
 
    //--------------------  Initialize optional parameters  ------------------------
    if(size(#) > 0)
@@ -108,22 +106,14 @@ EXAMPLE: example primdecZ; shows an example
       number q=imap(R,q);
       //=== computes the primes occuring in a generator of I intersect Z
 
-
-
       list L = primefactors(q);
 
-
-
       list A;
-
       ideal J = imap(R,J);
-
-
 
       for(j=1;j<=size(L[3]);j++)
       {
          if(L[3][j] > 1){ ex = 1; break; }
-
       }
 
       if(printlevel >= 10)
@@ -163,9 +153,11 @@ EXAMPLE: example primdecZ; shows an example
          {
             for(i = 1; i <= n; i++)
             {
-               if(status(l(i), "read", "ready"))                         // ask if link l(i) is ready otherwise sleep for t seconds
+               //=== ask if link l(i) is ready otherwise sleep for t seconds 
+               if(status(l(i), "read", "ready"))                         
                {
-                  A[size(A)+1] = read(l(i));                             // read the result from l(i)
+                  //=== read the result from l(i) 
+                  A[size(A)+1] = read(l(i));                             
 
                   if(j <= size(L[3]))
                   {
@@ -181,7 +173,8 @@ EXAMPLE: example primdecZ; shows an example
                   }
                }
             }
-            if(k_link == n)                                              // k_link describes the number of closed links
+            //=== k_link describes the number of closed links
+            if(k_link == n)                                              
             {
                j++;
             }
@@ -196,7 +189,6 @@ EXAMPLE: example primdecZ; shows an example
             A[size(A)+1] = modp(J, L[2][j], L[3][j]);
          }
       }
-
 
       setring R;
       list A = imap(Rhelp,A);
@@ -367,7 +359,6 @@ EXAMPLE: example primdecZ; shows an example
       {
          pr[size(pr)+1]=M[i];
       }
-
    }
    return(pr);
 }
@@ -899,11 +890,10 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc modp(ideal J, int p, int nu)
-
 {
-
+//=== computes the minimal associated primes (if nu > 1) resp. the primary 
+//=== decomposition (else) of J in Z/p and maps the result back to the basering
    def R = basering;
-
    list rp = ringlist(R);
    rp[1] = p;
    def Rp = ring(rp);
@@ -914,35 +904,23 @@ static proc modp(ideal J, int p, int nu)
       //=== p is of multiplicity > 1 in q
       list A = minAssGTZ(J);
       setring R;
-
       list A = imap(Rp,A);
-
       return(list(A,p,nu));
-
    }
-
    else
-
    {
-
       list A = primdecGTZ(J);
-
       setring R;
-
       list A = imap(Rp,A);
-
       return(list(A,p,nu));
-
    }
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
 static proc coefPrimeZ(ideal I)
 {
-//=== computes the primes occurning in the product of the leading coefficients of I
+//=== computes the primes occuring in the product of the leading coefficients of I
    number h=1;
    int i;
    for(i=1;i<=size(I);i++)
@@ -962,10 +940,10 @@ static proc coefPrimeZ(ideal I)
 
 static proc coefZ(ideal I)
 {
-   //assume === IQ[variables]=<g_1,...,g_s>, Groebner basis, g_i in Z[variables]
-   //=== computes an integer h such that
-   //=== <g_1,...,g_s>Z[variables]:h^infinity = IQ[variables] intersected with Z[variables]
-   //=== returns a list with IQ[variables] intersected with Z[variables] and h
+//=== assume IQ[variables]=<g_1,...,g_s>, Groebner basis, g_i in Z[variables]
+//=== computes an integer h such that
+//=== <g_1,...,g_s>Z[variables]:h^infinity = IQ[variables] intersected with Z[variables]
+//=== returns a list with IQ[variables] intersected with Z[variables] and h
    int h=1;
    int i,e;
    ideal K=1;
@@ -1097,7 +1075,6 @@ static proc extractZ(ideal J, int j, list L, list B)
          list rl=ringlist(R);
          rl[1]=0;
          def Shelp =ring(rl);
-
       }
       poly h=1;
       for(i=1;i<=size(C);i++)
@@ -1149,9 +1126,9 @@ static proc satZ(ideal I,poly h)
    ideal J=quotientOneZ(I,h);
    while(size(reduce(J,stdZ(I)))!=0)
    {
-       I=J;
-       J=quotientOneZ(I,h);
-       J=normalizeZ(J);
+      I=J;
+      J=quotientOneZ(I,h);
+      J=normalizeZ(J);
    }
    return(J);
 }
@@ -1160,7 +1137,8 @@ static proc satZ(ideal I,poly h)
 
 static proc prepareQuotientring (int nnp)
 {
-//=== this is from primdec.lib, it is static there, should be imported later if it is no more static
+//=== this is from primdec.lib, it is static there, should be imported later 
+//=== if it is no more static
   ideal @ih,@jh;
   int npar=npars(basering);
   int @n;
@@ -1176,21 +1154,20 @@ static proc prepareQuotientring (int nnp)
   @jh=@jh+var(1);
   for(@n=2;@n<=nnp;@n++)
   {
-    quotring=quotring+",var("+string(@n)+")";
-    @jh=@jh+var(@n);
+     quotring=quotring+",var("+string(@n)+")";
+     @jh=@jh+var(@n);
   }
   quotring=quotring+"),(C,lp);";
 
   return(quotring);
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc maxIndependSet (ideal j)
 {
-
-//=== this is from primdec.lib, it is static there, should be imported later if it is no more static
+//=== this is from primdec.lib, it is static there, should be imported later 
+//=== if it is no more static
   int n,k,di;
 
   list resu,hilf;
@@ -1242,11 +1219,12 @@ static proc maxIndependSet (ideal j)
 
 static proc quotientOneZ(ideal I, poly f)
 {
-//=== this is needed because quotient(I,f) does not work properly, should be replaced by quotient later
+//=== this is needed because quotient(I,f) does not work properly, should be 
+//=== replaced by quotient later
    def R=basering;
    int i;
    ideal K=intersectZ(I,ideal(f));
-   //=== K[i]/f; does not work in rings with integer! This should by replaced later
+   //=== K[i]/f; does not work in rings with integer! This should be replaced later
    execute("ring Rhelp=0,("+varstr(R)+"),dp;");
    ideal K=imap(R,K);
    poly f=imap(R,f);
@@ -1263,7 +1241,8 @@ static proc quotientOneZ(ideal I, poly f)
 
 static proc quotientZ(ideal I, ideal J)
 {
-//=== this is needed because quotient(I,J) does not work properly, should be replaced by quotient later
+//=== this is needed because quotient(I,J) does not work properly, should be 
+//=== replaced by quotient later
    int i;
    ideal K=quotientOneZ(I,J[1]);
    for(i=2;i<=size(J);i++)
@@ -1277,7 +1256,8 @@ static proc quotientZ(ideal I, ideal J)
 
 static proc reduceZ(poly f, ideal I)
 {
-//=== this is needed because reduce(f,I) does not work properly, should be replaced by reduce later
+//=== this is needed because reduce(f,I) does not work properly, should be 
+//=== replaced by reduce later
    if(f==0){return(f);}
    def R=basering;
    execute("ring Rhelp=0,("+varstr(R)+"),dp;");
@@ -1296,22 +1276,21 @@ static proc reduceZ(poly f, ideal I)
          m=leadmonom(f)/leadmonom(I[j]);
          if(m!=0)
          {
-             n=leadcoef(f) mod leadcoef(I[j]);
-             if(n==0)
-             {
-                 f=f-leadcoef(f)/leadcoef(I[j])*m*I[j];
-                 if(f==0){setring R;return(0);}
-                 i=0;
-                 break;
-              }
-              if(n!=leadcoef(f))
-              {
-                   f=f+(n-leadcoef(f))/leadcoef(I[j])*m*I[j];
-                   i=0;
-                   break;
-               }
-
-          }
+            n=leadcoef(f) mod leadcoef(I[j]);
+            if(n==0)
+            {
+               f=f-leadcoef(f)/leadcoef(I[j])*m*I[j];
+               if(f==0){setring R;return(0);}
+               i=0;
+               break;
+            }
+            if(n!=leadcoef(f))
+            {
+               f=f+(n-leadcoef(f))/leadcoef(I[j])*m*I[j];
+               i=0;
+               break;
+            }
+         }
       }
    }
    setring R;
@@ -1324,7 +1303,7 @@ static proc reduceZ(poly f, ideal I)
 static proc stdZ(ideal I)
 {
 //=== this is needed because we want the leading coefficients to be positive
-//=== otherwhise reduce gives wrong results!   should be replaced later by std
+//=== otherwhise reduce gives wrong results! should be replaced later by std
    I=simplify(I,2);
    I=normalizeZ(I);
    ideal J=std(I);
@@ -1340,9 +1319,10 @@ static proc stdZ(ideal I)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc intersectZ(ideal I, ideal J)
+static proc intersectZ(ideal I, ideal J)
 {
-//=== this is needed because intersect(I,J) does not work, should be replaced by intersect later
+//=== this is needed because intersect(I,J) does not work, should be replaced 
+//=== by intersect later
    def R = basering;
    execute("ring S=integer,(t,"+varstr(R)+"),(dp(1),dp(nvars(R)));");
    ideal I=imap(R,I);
@@ -1392,7 +1372,7 @@ static proc testPrimaryZ(ideal I, list L)
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
-examples
+Examples:
 
 //=== IQ[a,b,c,d,e,f,g] intersect Z[a,b,c,d,e,f,g] = I  (takes some time)
 ring R1=integer,(a,b,c,d,e,f,g),dp;

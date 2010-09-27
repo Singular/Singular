@@ -1,8 +1,8 @@
-//
+///////////////////////////////////////////////////////////////////////////////
 version="$Id$";
 category="Singularities";
 info="
-LIBRARY:  surfacesignature.lib       signature of surface singularity
+LIBRARY:  surfacesignature.lib        signature of surface singularity
 
 AUTHORS:  Gerhard Pfister             pfister@mathematik.uni-kl.de
 @*        Muhammad Ahsan Banyamin     ahsanbanyamin@gmail.com
@@ -28,7 +28,7 @@ LIB "alexpoly.lib";
 LIB "gmssing.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
-//------- sigma(z^N + f) in terms of Puiseux pairs of f for f irreducible ----
+//------- sigma(z^N + f) in terms of Puiseux pairs of f for f irreducible -----
 
 static proc exponentSequence(poly f)
 //=== computes the sequence a_1,...,a_s of exponents as described in [Nemethi]

@@ -105,7 +105,8 @@ EXAMPLE: example zeroR; shows an example
             {
                if(status(l(i), "read", "ready"))
                {
-                  P = read(l(i));                                        // read the result from l(i)
+                  //--- read the result from l(i) ---
+                  P = read(l(i));                                        
                   CO1[index] = P[1];
                   CO2[index] = bigint(P[2]);
                   index++;
@@ -122,11 +123,13 @@ EXAMPLE: example zeroR; shows an example
                   }
                }
             }
-            if(k == n)                                                   // k describes the number of closed links
+            //--- k describes the number of closed links ---
+            if(k == n)                                                   
             {
                j++;
             }
-            i_sleep = system("sh", "sleep "+string(t));                  // sleep for t seconds
+            //--- sleep for t seconds ---
+            i_sleep = system("sh", "sleep "+string(t));                  
          }
       }
       else
@@ -358,9 +361,11 @@ EXAMPLE: example assPrimes; shows an example
          {
             for(i = 1; i <= n; i++)
             {
-               if(status(l(i), "read", "ready"))           // ask if link l(i) is ready otherwise sleep for t seconds
+               //--- ask if link l(i) is ready otherwise sleep for t seconds ---
+               if(status(l(i), "read", "ready"))           
                {
-                  P = read(l(i));                          // read the result from l(i)
+                  //--- read the result from l(i) ---
+                  P = read(l(i));                          
                   CO1[index] = P[1];
                   CO2[index] = bigint(P[2]);
                   index++;
@@ -377,7 +382,8 @@ EXAMPLE: example assPrimes; shows an example
                   }
                }
             }
-            if(k == n)                                     // k describes the number of closed links
+            //--- k describes the number of closed links ---
+            if(k == n)                                     
             {
                j++;
             }
@@ -682,7 +688,7 @@ static proc findGen(ideal J, list #)
 static proc pTestRad(int d, poly p1, ideal I)
 {
 //=== computes a poly F in Z/q1[T] such that <F>=kernel(Z/q1[T]--->Z/q1[vars(basering)])
-//=== mapping T to p1 and test if d=deg(squarefreepart(F)), q1 a prime randomly choosen
+//=== mapping T to p1 and test if d=deg(squarefreepart(F)), q1 a prime randomly chosen
 //=== If not choose randomly another prime q2 and another linear form p2 and
 //=== computes a poly F in Z/q2[T] such that <F>=kernel(Z/q2[T]--->Z/q2[vars(basering)])
 //=== mapping T to p2 and test if d=deg(squarefreepart(F))
@@ -741,7 +747,8 @@ static proc pTestRad(int d, poly p1, ideal I)
 
 static proc zeroRadP(ideal I, int p)
 {
-//=== computes F=(F_1,...,F_n) such that <F_i>=IZ/p[x_1,...,x_n] intersected with Z/p[x_i], F_i monic
+//=== computes F=(F_1,...,F_n) such that <F_i>=IZ/p[x_1,...,x_n] intersected 
+//=== with Z/p[x_i], F_i monic
    def R0 = basering;
    list ringL = ringlist(R0);
    ringL[1] = p;
