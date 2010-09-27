@@ -48,9 +48,9 @@ read(l1,"Key4");
 write(l1,"Key2");
 read(l1,"Key2");
 l2="DBM:r db2";
-write(l2,"Key4");
+write(l2,"Key4"); // should fail
 l1="DBM: db1";
-write(l1,"Key4");
+write(l1,"Key4"); // should not fail
 close(l1);
 close(l2);
 kill l1,l2;
