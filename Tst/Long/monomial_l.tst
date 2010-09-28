@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "monomial.lib";
+LIB "monomialideal.lib";
 
 // EX. 1:
 ring r4=0,x(1..4),dp;
