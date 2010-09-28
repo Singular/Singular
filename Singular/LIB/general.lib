@@ -1174,12 +1174,10 @@ proc primecoeffs(J, list #)
 "USAGE:   primecoeffs(J[,p]); J any type which can be converted to a matrix
          e.g. ideal, matrix, vector, module, int, intvec
          p = integer
-COMPUTE: primefactors <= min(p,32003) of coeffs of J (default p = 32003)
+COMPUTE: primefactors <= p of coeffs of J (default p = 32003)
 RETURN:  a list, say l, of two intvectors:@*
          l[1] : the different primefactors of all coefficients of J@*
          l[2] : the different remaining factors
-NOTE:    the procedure works for small integers only, just by testing all
-         primes (not to be considered as serious prime factorization!)
 EXAMPLE: example primecoeffs; shows an example
 "
 {
@@ -1218,8 +1216,10 @@ EXAMPLE: example primecoeffs; shows an example
    for (ii=1; ii<=size(id); ii++)
    {
      l = primefactors(number(id[ii]),q);
-     jd = jd,l[1];
-     rest = rest,l[3];
+     list jdl=l[2];
+     jd = jd,jdl[1..size(jdl)]; 
+     kill jdl;
+     rest=rest, l[1];
    }
    jd = simplify(jd,6);
    for (ii=1; ii<=size(jd); ii++)
