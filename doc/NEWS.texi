@@ -57,7 +57,7 @@ extended library: modstd.lib (see @nref{modstd_lib}: Groebner basis via modular 
 @item
 new library: dmodvar.lib (see @nref{dmodvar_lib}: algebraic D-modules for varieties
 @item
-new library: monomial.lib (see @nref{monomial_lib}: operation for monomial ideals)
+new library: monomialideal.lib (see @nref{monomialideal_lib}: operation for monomial ideals)
 @item
 new library: resbin.lib (see @nref{resbin_lib}: resolution of singularities of binomial ideals
 @item
