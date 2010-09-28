@@ -79,7 +79,7 @@ static void attr_free(attr h, const ring r=currRing)
     break;
 #ifdef TEST
   default:
-    ::Print("atKill: unknown type(%d)\n",h->atyp);  /* DEBUG */
+    ::Print("atKill: unknown type(%s [%d]) of attribute >>%s<<\n", Tok2Cmdname(h->atyp), h->atyp, h->name);  /* DEBUG */
 #endif
   } /* end switch: (atyp) */
   h->data=NULL;
@@ -102,7 +102,9 @@ attr sattr::set(const char * s, void * data, int t)
   h->name = s;
   h->data = data;
   h->atyp = t;
-  //::Print("set attr >>%s<< of type %d\n",h->name,t);
+#ifdef TEST
+  ::Print("set attr >>%s<< of type %s\n",h->name, Tok2Cmdname(t));
+#endif
   return  result;
 }
 
@@ -111,7 +113,13 @@ attr sattr::get(const char * s)
   attr h = this;
   while (h!=NULL)
   {
-    if (0 == strcmp(s,h->name)) return h;
+    if (0 == strcmp(s,h->name)) 
+    { 
+#ifdef TEST
+      ::Print("get attr >>%s<< of type %s\n",h->name, Tok2Cmdname(h->atyp));
+#endif
+      return h;
+    }
     h = h->next;
   }
   return NULL;
@@ -201,9 +209,9 @@ void atSet(leftv root,const char * name,void * data,int typ)
 
 void sattr::kill(const ring r)
 {
+  attr_free(this,r);
   omFree((ADDRESS)name);
   name=NULL;
-  attr_free(this,r);
   omFreeBin((ADDRESS)this, sattr_bin);
 }
 
