@@ -26,10 +26,10 @@ GUIDE: Let K be a field of characteristic 0, R = K[x1,...,xN] and
 @* in Weyl algebras with respect to a given weight vector can be computed with
 @* GBWeight, inForm, initialMalgrange and initialIdealW.
 @*
-@* - restriction and integration of a holonomic module D/I. Suppose I is
-@* annihilating a function F(x1,...,xn). Our aim is to compute an ideal J
+@* - restriction and integration of a holonomic module D/I. Suppose I
+@* annihilates a function F(x1,...,xn). Our aim is to compute an ideal J
 @* directly from I, which annihilates
-@*   - F(0,...,0,xm,...,xn) in case of restriction or
+@*   - F(0,...,0,xk,...,xn) in case of restriction or
 @*   - the integral of F with respect to x1,...,xm in case of integration.
 @* The corresponding procedures are restrictionModule, restrictionIdeal,
 @* integralModule and integralIdeal.
@@ -3161,6 +3161,3 @@ static proc ex_annRat()
   setring A;
 }
 */
-
-
-// TODO deRhamCohom: m <= min int root of b_f or b_{I,w}??
