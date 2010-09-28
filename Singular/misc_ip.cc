@@ -52,7 +52,7 @@ void divTimes(mpz_t n, mpz_t d, int* times)
   mpz_clear(q);
 }
 
-void divTimes_ui(mpz_t n, long d, int* times)
+void divTimes_ui(mpz_t n, unsigned long d, int* times)
 {
   *times = 0;
   mpz_t r; mpz_init(r);
@@ -66,6 +66,19 @@ void divTimes_ui(mpz_t n, long d, int* times)
   }
   mpz_clear(r);
   mpz_clear(q);
+}
+
+static inline void divTimes_ui_ui(unsigned long *n, unsigned long d, int* times)
+{
+  *times = 0;
+  unsigned long q=(*n) / d;
+  unsigned long r=(*n) % d;
+  while (r==0)
+  {
+    (*times)++;
+    (*n)=q;
+    q=(*n)/d; r=(*n)%d;
+  }
 }
 
 /* returns an object of type lists which contains the entries
@@ -179,68 +192,95 @@ lists primeFactorisation(const number n, const number pBound)
   mpz_t sr; mpz_init(sr); int index = 0; int add;
   lists primes = (lists)omAllocBin(slists_bin); primes->Init(1000);
   int* multiplicities = new int[1000];
+  int positive=1;
 
-  divTimes_ui(nn, 2, &tt);
-  if (tt > 0)
+  if (!nlIsZero(n))
   {
-    setListEntry_ui(primes, index, 2);
-    multiplicities[index++] = tt;
-  }
-
-  divTimes_ui(nn, 3, &tt);
-  if (tt > 0)
-  {
-    setListEntry_ui(primes, index, 3);
-    multiplicities[index++] = tt;
-  }
-
-  unsigned long p_ui=5; add = 2;
-  mpz_sqrt(sr, nn);
-  if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-  int limit=mpz_get_ui(pb);
-  if ((limit==0)||(mpz_cmp_ui(pb,limit)!=0)) limit=1<<31;
-  while (p_ui <=limit)
-  {
-    divTimes_ui(nn, p_ui, &tt);
+    if (!nlGreaterZero(n)) 
+    {
+      positive=-1;
+      mpz_neg(nn,nn);
+    }
+    divTimes_ui(nn, 2, &tt);
     if (tt > 0)
     {
-      setListEntry_ui(primes, index, p_ui);
+      setListEntry_ui(primes, index, 2);
       multiplicities[index++] = tt;
-      //mpz_sqrt(sr, nn);
-      //if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-      if (mpz_size1(nn)<=2) 
+    }
+
+    divTimes_ui(nn, 3, &tt);
+    if (tt > 0)
+    {
+      setListEntry_ui(primes, index, 3);
+      multiplicities[index++] = tt;
+    }
+
+    unsigned long p_ui=5; add = 2;
+    mpz_sqrt(sr, nn);
+    if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+    int limit=mpz_get_ui(pb);
+    if ((limit==0)||(mpz_cmp_ui(pb,limit)!=0)) limit=1<<31;
+    while (p_ui <=limit)
+    {
+      divTimes_ui(nn, p_ui, &tt);
+      if (tt > 0)
       {
+        setListEntry_ui(primes, index, p_ui);
+        multiplicities[index++] = tt;
+        //mpz_sqrt(sr, nn);
+        //if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+        if (mpz_size1(nn)<=2) 
+        {
+          mpz_sqrt(sr, nn);
+          if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+          unsigned long l=mpz_get_ui(sr);
+          if (l<limit) limit=l;
+	  if (mpz_size1(nn)<=1)
+	  {
+	    unsigned long nn_ui=mpz_get_ui(nn);
+	    while ((p_ui <=limit)&&(nn_ui>1))
+	    {
+              divTimes_ui_ui(&nn_ui, p_ui, &tt);
+              if (tt > 0)
+              {
+                setListEntry_ui(primes, index, p_ui);
+                multiplicities[index++] = tt;
+		if (nn_ui>(limit/6)) limit=nn_ui/6;
+              }
+              p_ui +=add;
+              add += 2; if (add == 6) add = 2;
+	    }
+	    mpz_set_ui(nn,nn_ui);
+	    break;
+	  }
+        }
+      }
+      p_ui +=add;
+      add += 2; if (add == 6) add = 2;
+    }
+    mpz_set_ui(p, p_ui);
+    mpz_sqrt(sr, nn);
+    if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+    while (mpz_cmp(pb, p) >= 0)
+    {
+      divTimes(nn, p, &tt);
+      if (tt > 0)
+      {
+        setListEntry(primes, index, p);
+        multiplicities[index++] = tt;
         mpz_sqrt(sr, nn);
         if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-        unsigned long l=mpz_get_ui(sr);
-        if (l<limit) limit=l;
       }
+      mpz_add_ui(p, p, add);
+      add += 2; if (add == 6) add = 2;
     }
-    p_ui +=add;
-    add += 2; if (add == 6) add = 2;
-  }
-  mpz_set_ui(p, p_ui);
-  mpz_sqrt(sr, nn);
-  if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-  while (mpz_cmp(pb, p) >= 0)
-  {
-    divTimes(nn, p, &tt);
-    if (tt > 0)
+    if ((mpz_cmp_ui(nn, 1) > 0) &&
+        ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(nn, b) <= 0)))
     {
-      setListEntry(primes, index, p);
-      multiplicities[index++] = tt;
-      mpz_sqrt(sr, nn);
-      if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+      setListEntry(primes, index, nn);
+      multiplicities[index++] = 1;
+      mpz_set_ui(nn, 1);
     }
-    mpz_add_ui(p, p, add);
-    add += 2; if (add == 6) add = 2;
-  }
-  if ((mpz_cmp_ui(nn, 1) > 0) &&
-      ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(nn, b) <= 0)))
-  {
-    setListEntry(primes, index, nn);
-    multiplicities[index++] = 1;
-    mpz_set_ui(nn, 1);
   }
 
   lists primesL = (lists)omAllocBin(slists_bin);
@@ -264,6 +304,7 @@ lists primeFactorisation(const number n, const number pBound)
 
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(4);
+  if (positive==-1) mpz_neg(nn,nn);
   setListEntry(L, 0, nn);
   L->m[1].rtyp = LIST_CMD; L->m[1].data = (void*)primesL;
   L->m[2].rtyp = LIST_CMD; L->m[2].data = (void*)multiplicitiesL;
