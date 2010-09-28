@@ -101,10 +101,13 @@ poly singclap_gcd ( poly f, poly g )
 {
   poly res=NULL;
 
-  if (f!=NULL) p_Cleardenom(f, currRing);
-  if (g!=NULL) p_Cleardenom(g, currRing);
-  else         return f; // g==0 => gcd=f (but do a p_Cleardenom)
-  if (f==NULL) return g; // f==0 => gcd=g (but do a p_Cleardenom)
+  if (f!=NULL) 
+  {
+    p_Cleardenom(f, currRing);
+    if (g!=NULL) p_Cleardenom(g, currRing);
+    else         return f; // g==0 => gcd=f (but do a p_Cleardenom)
+  }
+  else /*f==NULL*/ return g; // f==0 => gcd=g (but do a p_Cleardenom)
 
   res=singclap_gcd_r(f,g,currRing);
   pDelete(&f);
