@@ -5,6 +5,8 @@
  * @author Martin Lee
  * @date 
  *
+ * Univariate factorization over algebraic extension of Q using Trager's
+ * algorithm
  *
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
@@ -27,6 +29,7 @@
 #include "facFqBivarUtil.h"
 #include "facAlgExt.h"
 
+// squarefree part of F
 CanonicalForm
 sqrfPart (const CanonicalForm& F)
 {
@@ -37,6 +40,7 @@ sqrfPart (const CanonicalForm& F)
   return F/G; 
 }
 
+// i is an integer such that Norm (F (x-i*alpha)) is squarefree
 CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
 {
   Variable x= Variable (F.level() + 1);
