@@ -874,12 +874,10 @@ EXAMPLE: example pushForward; shows an example
   int k,i,j;
 //  f;
 
-  listvar();
-
+//  listvar();
   def pre = preimage(f);
   
-  "pre: ";
-  pre;
+//  "pre: ";  pre;
 
   intmat oldgrad=getVariableWeights(pre);
   intmat oldtor=getTorsion(pre);
@@ -985,7 +983,7 @@ example
   getTorsion();
 
   // only for the purpose of this example
-  if( voice > 1 ){ keepring(r); export(r); }
+  if( voice > 1 ){ /*keepring(r);*/ export(r); }
 
   ring R = 0,(a,b),dp;
   ideal i = a2-b2+a6-b5+ab3,a7b+b15-ab6+a6b6;
