@@ -50,7 +50,7 @@ LIB "makedbm.lib";
 LIB "matrix.lib";
 LIB "modstd.lib";
 LIB "mondromy.lib";
-LIB "monomial.lib";
+LIB "monomialideal.lib";
 LIB "mprimdec.lib";
 LIB "mregular.lib";
 LIB "noether.lib";

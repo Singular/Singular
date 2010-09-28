@@ -2,8 +2,8 @@
 version = "$Id$";
 category = "Commutative algebra";
 info = "
-LIBRARY: monomial.lib   Primary and irreducible decompositions of monomial
-                        ideals
+LIBRARY: monomialideal.lib   Primary and irreducible decompositions of monomial
+                             ideals
 AUTHORS: I.Bermejo,           ibermejo@ull.es
 @*       E.Garcia-Llorente,   evgarcia@ull.es
 @*       Ph.Gimenez,          pgimenez@agt.uva.es
