@@ -6222,6 +6222,8 @@ EXAMPLE: example bernsteinLift; shows examples
   number bcand = leadcoef(V[1]); // 1st component
   V[1]=0;
   number ct = content(V); // content of the cofactors
+  // addition by VL: indeed just gcd of denominators is needed!!!
+  // hence TODO
   poly CF = ct*V[ncols(J)]; // polynomial in K[s]<x,dx>, cofactor to F
   dbprint(ppl,"// -3-4- the cofactor candidate found");
   dbprint(ppl-1,CF);
