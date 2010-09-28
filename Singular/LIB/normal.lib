@@ -2549,6 +2549,7 @@ KEYWORDS: delta invariant; Tjurina number
 EXAMPLE: example deltaLoc;  shows an example
 "
 {
+   intvec save_opt=option(get);
    option(redSB);
    def R=basering;
    execute("ring S=("+charstr(R)+"),(x,y),lp;");
@@ -2632,7 +2633,7 @@ EXAMPLE: example deltaLoc;  shows an example
         "";
       }
    }
-   option(noredSB);
+   option(set,save_opt);
    ideal fstd=std(ideal(f)+jacob(f));
    poly hc=highcorner(fstd);
    int tau=vdim(fstd);
