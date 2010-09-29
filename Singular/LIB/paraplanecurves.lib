@@ -2,7 +2,7 @@
 version="$Id: paraplanecurves.lib, v 1.0 2010/05/29 Exp$";
 category="Commutative Algebra";
 info="
-LIBRARY:  paraplanecurves.lib     
+LIBRARY:  paraplanecurves.lib
 
 PURPOSE:  Rational parametrization of rational plane curves
 
@@ -97,7 +97,7 @@ testPointConic(poly,ring);        Checks whether a given point (defined in the
 ";
 
 LIB "elim.lib";
-LIB "intBasis.lib";
+LIB "intbasis.lib";
 LIB "normal.lib";
 LIB "general.lib";
 LIB "primdec.lib";
@@ -2500,6 +2500,9 @@ EXAMPLE: example rationalPointConic; shows an example
   }
   else
   {
+    string dummyString = string(K); // without this useless line, we
+                                    // sometimes get a seg fault because
+                                    // mm is corrupted; strange!?!?!?!?
     number nx = number(subst(mm[1], var(1), K[2], var(2), K[3], var(3), K[4]));
     number ny = number(subst(mm[2], var(1), K[2], var(2), K[3], var(3), K[4]));
     number nz = number(subst(mm[3], var(1), K[2], var(2), K[3], var(3), K[4]));
