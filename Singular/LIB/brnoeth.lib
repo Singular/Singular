@@ -1,3 +1,4 @@
+//
 version="$Id$";
 category="Coding theory";
 info="
@@ -13,7 +14,7 @@ OVERVIEW:
  a prime field of positive characteristic.@*
  For more information about the library see the end of the file brnoeth.lib.
 
-MAIN PROCEDURES:
+PROCEDURES:
  Adj_div(f)            computes the conductor of a curve
  NSplaces(h,A)         computes non-singular places with given degrees
  BrillNoether(D,C)     computes a vector space basis of the linear system L(D)
@@ -23,8 +24,6 @@ MAIN PROCEDURES:
  AGcode_Omega(G,D,E)   computes the residual AG code with divisors G and D
  prepSV(G,D,F,E)       preprocessing for the basic decoding algorithm
  decodeSV(y,K)         decoding of a word with the basic decoding algorithm
-
-AUXILIARY PROCEDURES:
  closed_points(I)      computes the zero-set of a zero-dim. ideal in 2 vars
  dual_code(C)          computes the dual code
  sys_code(C)           computes an equivalent systematic code
