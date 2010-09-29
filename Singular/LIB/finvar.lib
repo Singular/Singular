@@ -10,7 +10,7 @@ OVERVIEW:
  generators of related varieties. The algorithms are based on B. Sturmfels,
  G. Kemper, S. King and W. Decker et al..
 
-MAIN PROCEDURES:
+PROCEDURES:
  invariant_ring()                  generators of the invariant ring (i.r.)
  invariant_ring_random()           generators of the i.r., randomized alg.
  primary_invariants()              primary invariants (p.i.)
@@ -20,7 +20,6 @@ MAIN PROCEDURES:
  invariant_algebra_perm()          minimal generating set for the invariant
                                    ring or a permutation group, in the non-modular case
 
-AUXILIARY PROCEDURES:
  cyclotomic()                      cyclotomic polynomial
  group_reynolds()                  finite group and Reynolds operator (R.o.)
  molien()                          Molien series (M.s.)
