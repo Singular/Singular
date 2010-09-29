@@ -8,11 +8,10 @@ AUTHORS: Lobillo, F.J.,  jlobillo@ugr.es
 
 SUPPORT: 'Metodos algebraicos y efectivos en grupos cuanticos', BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
-MAIN PROCEDURES:
+PROCEDURES:
 quantMat(n, [p]);          generates the quantum matrix ring of order n;
 qminor(u, v, nr);          calculate a quantum minor of a quantum matrix
 
-AUXILIARY PROCEDURES:
 SymGroup(n);                generates an intmat containing S(n), each row is an element of S(n)
 LengthSymElement(v);        calculates the length of the element v of S(n)
 LengthSym(M);               calculates the length of each element of M, being M a subset of S(n)
