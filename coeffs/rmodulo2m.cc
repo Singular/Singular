@@ -33,41 +33,42 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   
   nr2mInitExp((int)(long)(p), r);
 
-     r->cfInit       = nr2mInit;
-     r->cfCopy       = ndCopy;
-     r->cfInt        = nr2mInt;
-     r->cfAdd         = nr2mAdd;
-     r->cfSub         = nr2mSub;
-     r->cfMult        = nr2mMult;
-     r->cfDiv         = nr2mDiv;
-     r->cfIntDiv      = nr2mIntDiv;
-     r->cfIntMod      = nr2mMod;
-     r->cfExactDiv    = nr2mDiv;
-     r->cfNeg         = nr2mNeg;
-     r->cfInvers      = nr2mInvers;
-     r->cfDivBy       = nr2mDivBy;
-     r->cfDivComp     = nr2mDivComp;
-     r->cfGreater     = nr2mGreater;
-     r->cfEqual       = nr2mEqual;
-     r->cfIsZero      = nr2mIsZero;
-     r->cfIsOne       = nr2mIsOne;
-     r->cfIsMOne      = nr2mIsMOne;
-     r->cfGreaterZero = nr2mGreaterZero;
-     r->cfWrite      = nr2mWrite;
-     r->cfRead        = nr2mRead;
-     r->cfPower       = nr2mPower;
-     r->cfSetMap     = nr2mSetMap;
-     r->cfNormalize   = ndNormalize;
-     r->cfLcm         = nr2mLcm;
-     r->cfGcd         = nr2mGcd;
-     r->cfIsUnit      = nr2mIsUnit;
-     r->cfGetUnit     = nr2mGetUnit;
-     r->cfExtGcd      = nr2mExtGcd;
-     r->cfName        = ndName;
+  r->cfInit       = nr2mInit;
+  r->cfCopy       = ndCopy;
+  r->cfInt        = nr2mInt;
+  r->cfAdd         = nr2mAdd;
+  r->cfSub         = nr2mSub;
+  r->cfMult        = nr2mMult;
+  r->cfDiv         = nr2mDiv;
+  r->cfIntDiv      = nr2mIntDiv;
+  r->cfIntMod      = nr2mMod;
+  r->cfExactDiv    = nr2mDiv;
+  r->cfNeg         = nr2mNeg;
+  r->cfInvers      = nr2mInvers;
+  r->cfDivBy       = nr2mDivBy;
+  r->cfDivComp     = nr2mDivComp;
+  r->cfGreater     = nr2mGreater;
+  r->cfEqual       = nr2mEqual;
+  r->cfIsZero      = nr2mIsZero;
+  r->cfIsOne       = nr2mIsOne;
+  r->cfIsMOne      = nr2mIsMOne;
+  r->cfGreaterZero = nr2mGreaterZero;
+  r->cfWrite      = nr2mWrite;
+  r->cfRead        = nr2mRead;
+  r->cfPower       = nr2mPower;
+  r->cfSetMap     = nr2mSetMap;
+  r->cfNormalize   = ndNormalize;
+  r->cfLcm         = nr2mLcm;
+  r->cfGcd         = nr2mGcd;
+  r->cfIsUnit      = nr2mIsUnit;
+  r->cfGetUnit     = nr2mGetUnit;
+  r->cfExtGcd      = nr2mExtGcd;
+  r->cfName        = ndName;
 #ifdef LDEBUG
-     r->cfDBTest      = nr2mDBTest;
+  r->cfDBTest      = nr2mDBTest;
 #endif
-     r->has_simple_Alloc=TRUE;
+  r->has_simple_Alloc=TRUE;
+  return FALSE;
 }
 
 /*

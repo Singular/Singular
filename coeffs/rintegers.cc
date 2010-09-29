@@ -419,6 +419,7 @@ BOOLEAN nrzInitChar(coeffs r,  void * parameter)
   r->ch = 0;
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE; 
+  return FALSE;
 }
 
 #endif

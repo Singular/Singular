@@ -579,4 +579,5 @@ BOOLEAN nrInitChar(coeffs n, void*)
   n->nCoeffIsEqual = nrCoeffsEqual;
 
   // TODO: Any variables?
+  return FALSE;
 }

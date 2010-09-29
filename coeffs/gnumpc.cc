@@ -484,7 +484,7 @@ BOOLEAN ngcInitChar(coeffs n, void*)
 */
 
 /// TODO: Any variables?
-  
+  return FALSE;
 }
 
 

@@ -2528,6 +2528,7 @@ BOOLEAN nlInitChar(coeffs r, void* p)
   
   // variables for this type of coeffs:
   // (none)
+  return FALSE;
 }
 #if 0
 number nlMod(number a, number b)
