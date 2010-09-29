@@ -441,6 +441,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
     r->npInvTable=(unsigned short*)omAlloc0( r->npPrimeM*sizeof(unsigned short) );
 #endif
   }
+  return FALSE;
 }
 
 #ifdef LDEBUG

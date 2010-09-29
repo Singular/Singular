@@ -419,6 +419,7 @@ BOOLEAN ngfInitChar(coeffs n, void *)
 #endif
 
   n->nCoeffIsEqual = ngfCoeffsEqual;
+  return FALSE;
 }
 
 number ngfMapQ(number from, const coeffs src, const coeffs dst)

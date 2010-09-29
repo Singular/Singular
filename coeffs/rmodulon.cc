@@ -70,6 +70,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
 #ifdef LDEBUG
      r->cfDBTest      = nrnDBTest;
 #endif
+  return FALSE;
 }
 
 /*
