@@ -7,7 +7,7 @@ LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
 AUTHORS:  A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
 @*        G. Pfister,           pfister@mathematik.uni-kl.de
 
-MAIN PROCEDURES:
+PROCEDURES:
  blowUp(J,C[,W,E]) computes the blowing up of the variety V(J) (considered
                    as embedded in V(W)) in the (smooth) center V(C),
  blowUp2(J,C)      computes the blowing up of the variety V(J) in the
@@ -15,12 +15,10 @@ MAIN PROCEDURES:
  Center(J[,W,E])   computes 'Villamayor'-center for blow up
  resolve(J)        computes the desingularization of the variety V(J)
 
-PROCEDURES FOR PRETTY PRINTING OF OUTPUT:
  showBO(BO)      prints the content of a BO in more human readable form
  presentTree(L)  prints the final charts in more human readable form
  showDataTypes() prints help text for output data types
 
-AUXILLARY PROCEDURES:
  blowUpBO(BO,C)  computes the blowing up of the variety V(BO[1]) in the
                  center V(C). BO is a list (basic object), C is an ideal
  createBO(J,W,E) creates basic object from input data
@@ -1242,8 +1240,7 @@ example
    BO;
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc slocusE(ideal i)
+static proc slocusE(ideal i)
 "Internal procedure - no help and no example available
 "
 {
@@ -1263,8 +1260,7 @@ proc slocusE(ideal i)
   return(slocus(i));
 }
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc inters_E(list BO)
+static proc inters_E(list BO)
 "USAGE:  inters_E(BO);
 @*       BO = basic object, a list: ideal W,
 @*                                  ideal J,
@@ -1749,8 +1745,7 @@ example
 }
 
 //////////////////////////////////////////////////////////////////////////////
-static
-proc redMax(int k,ideal J)
+static proc redMax(int k,ideal J)
 "Internal procedure - no help and no example available
 "
 {
@@ -1765,8 +1760,7 @@ proc redMax(int k,ideal J)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-static
-proc findMinor(ideal W)
+static proc findMinor(ideal W)
 "Internal procedure - no help and no example available
 "
 {
@@ -1836,8 +1830,7 @@ proc findMinor(ideal W)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-static
-proc indexSet(int a, int b)
+static proc indexSet(int a, int b)
 "Internal procedure - no help and no example available
 "
 {
@@ -2132,8 +2125,7 @@ example
 }
 
 /////////////////////////////////////////////////////////////////////////////
-static
-proc invGreater(intmat M1, intmat M2, intvec iv1, intvec iv2)
+static proc invGreater(intmat M1, intmat M2, intvec iv1, intvec iv2)
 {
 // Auxilliary procedure, BM-algorithm
    int i;
@@ -2252,8 +2244,7 @@ proc CenterTail(list BM, ideal C)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-static
-proc deleteInt(intvec v,int i,int ini)
+static proc deleteInt(intvec v,int i,int ini)
 {
 //!!! Should be in kernel of Singular
 //--- delete i-th entry in intvec v,
@@ -2267,8 +2258,7 @@ proc deleteInt(intvec v,int i,int ini)
    return(w);
 }
 /////////////////////////////////////////////////////////////////////////////
-static
-proc concatInt(intmat A, intmat B)
+static proc concatInt(intmat A, intmat B)
 {
 //!!! Should be in kernel of Singular
 //--- concatenate two intmats
@@ -2917,8 +2907,7 @@ example
    CenterBO(BO);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc CoverCenter(list BO,int b, ideal Jb)
+static proc CoverCenter(list BO,int b, ideal Jb)
 {
 //----------------------------------------------------------------------------
 // Initialization
@@ -3101,8 +3090,7 @@ proc CoverCenter(list BO,int b, ideal Jb)
    return(re);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc SpecialCoeff(list BO,int b,poly f)
+static proc SpecialCoeff(list BO,int b,poly f)
 {
 //----------------------------------------------------------------------------
 // Coeff with given hypersurface -- no checks of the hypersurface performed
@@ -3133,8 +3121,7 @@ proc SpecialCoeff(list BO,int b,poly f)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-static
-proc DropCoeff(list BO)
+static proc DropCoeff(list BO)
 "Internal procedure - no help and no example available
 "
 {
@@ -3199,8 +3186,7 @@ proc DropCoeff(list BO)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-static
-proc DropRedundant(list BO,list E)
+static proc DropRedundant(list BO,list E)
 "Internal procedure - no help and no example available
 "
 {
@@ -3401,8 +3387,7 @@ proc DropRedundant(list BO,list E)
   return(retlist);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc transversalT(ideal J, list E,list #)
+static proc transversalT(ideal J, list E,list #)
 "Internal procedure - no help and no example available
 "
 {
@@ -3453,8 +3438,7 @@ proc transversalT(ideal J, list E,list #)
    return(1);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc transversalTB(ideal J, list E,ideal V)
+static proc transversalTB(ideal J, list E,ideal V)
 "Internal procedure - no help and no example available
 "
 {
@@ -3494,8 +3478,7 @@ proc transversalTB(ideal J, list E,ideal V)
    return(1);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc powerI(ideal I,int n,int m)
+static proc powerI(ideal I,int n,int m)
 {
 //--- compute (n!/m)-th power of I, more efficient variant
    int i;
@@ -3533,8 +3516,7 @@ proc powerI(ideal I,int n,int m)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc Coeff(list BO, int b, list #)
+static proc Coeff(list BO, int b, list #)
 "USAGE:  Coeff (BO);
 @*       BO = basic object, a list: ideal W,
 @*                                  ideal J,
@@ -3740,8 +3722,7 @@ example
    Coeff(BO,2);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc goodChoice(list BO, poly p)
+static proc goodChoice(list BO, poly p)
 "Internal procedure - no help and no example available
 "
 {
@@ -3877,8 +3858,7 @@ EXAMPLE:  none
   "==== Images of variables of original ring:";BO[5];"   ";
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc max(int i,int j)
+static proc max(int i,int j)
 "Internal procedure - no help and no example available
 "
 {
@@ -3887,8 +3867,7 @@ proc max(int i,int j)
   return(j);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc min(int i,int j)
+static proc min(int i,int j)
 "Internal procedure - no help and no example available
 "
 {
@@ -4714,8 +4693,7 @@ proc CompMeetsE(ideal J, list E)
 //========================================================================
 
 //////////////////////////////////////////////////////////////////////////
-static
-proc testRes(ideal J,list L,int loca)
+static proc testRes(ideal J,list L,int loca)
 "Internal procedure - no help and no example available
 "
 {
@@ -4808,8 +4786,7 @@ proc testRes(ideal J,list L,int loca)
    return(1);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc testBlowUp(list BO,ideal cent,list tmpList, int j, int extra)
+static proc testBlowUp(list BO,ideal cent,list tmpList, int j, int extra)
 {
    def R=basering;
    int n=nvars(basering);
@@ -4862,8 +4839,7 @@ proc testBlowUp(list BO,ideal cent,list tmpList, int j, int extra)
    return(1);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc normalCross(list E,list #)
+static proc normalCross(list E,list #)
 "Internal procedure - no help and no example available
 "
 {
@@ -4990,8 +4966,7 @@ proc normalCross(list E,list #)
    return(re);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc normalCrossB(ideal J,list E,ideal V)
+static proc normalCrossB(ideal J,list E,ideal V)
 "Internal procedure - no help and no example available
 "
 {
@@ -5066,8 +5041,7 @@ proc normalCrossB(ideal J,list E,ideal V)
    return(re);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc norC(list BO,ideal cent)
+static proc norC(list BO,ideal cent)
 "Internal procedure - no help and no example available
 "
 {
@@ -5082,8 +5056,7 @@ proc norC(list BO,ideal cent)
    return(1);
 }
 //////////////////////////////////////////////////////////////////////////////
-static
-proc specialReduce(ideal I,ideal J,poly p)
+static proc specialReduce(ideal I,ideal J,poly p)
 {
    matrix M;
    int i,j;
