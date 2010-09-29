@@ -11,6 +11,7 @@
 // #include "config.h"
 #include "si_gmp.h"
 #include <auxiliary.h>
+#include <omalloc.h>
 
 #define SR_HDL(A) ((long)(A))
 
@@ -94,10 +95,7 @@ extern number nlOne;
 
 nMapFunc nlSetMap(const coeffs src, const coeffs dst);
 
-#ifndef OM_ALLOC_H
-struct omBin_s;
-#endif
-extern omBin_s* rnumber_bin;
+extern omBin rnumber_bin;
 
 
 #define FREE_RNUMBER(x) omFreeBin((void *)x, rnumber_bin)
