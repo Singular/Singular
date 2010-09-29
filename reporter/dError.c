@@ -15,7 +15,7 @@
 #include "config.h"
 #include "reporter.h"
 #ifdef HAVE_CONFIG_H
-#include <omalloc/omalloc.h>
+#include <omalloc.h>
 #endif
 
 #ifndef MAKE_DISTRIBUTION
