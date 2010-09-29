@@ -18,7 +18,7 @@ typedef struct
 } GFInfo;
 
 
-void nfInitChar(coeffs r, void*);
+BOOLEAN nfInitChar(coeffs r, void*);
 
 //static BOOLEAN nfCoeffsEqual(const coeffs r, n_coeffType n, void* parameter);
 

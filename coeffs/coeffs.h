@@ -226,6 +226,7 @@ static inline int nInternalChar(const coeffs r)
 }
 
 /// one-time initialisations for new coeffs
+/// in case of an error return NULL
 coeffs nInitChar(n_coeffType t, void * parameter);
 /// undo all initialisations
 void nKillChar(coeffs r);

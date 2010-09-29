@@ -374,7 +374,7 @@ gmp_float numberToFloat( number num, const coeffs src)
 {
   gmp_float r;
 
-  if ( nField_is_Q(src) )
+  if ( nCoeff_is_Q(src) )
   {
     if ( num != NULL )
     {
@@ -411,11 +411,11 @@ gmp_float numberToFloat( number num, const coeffs src)
       r= 0.0;
     }
   }
-  else if (nField_is_long_R(src) || nField_is_long_C(src))
+  else if (nCoeff_is_long_R(src) || nCoeff_is_long_C(src))
   {
     r= *(gmp_float*)num;
   }
-  else if ( nField_is_R(src) )
+  else if ( nCoeff_is_R(src) )
   {
     // Add some code here :-)
     WerrorS("Ground field not implemented!");
@@ -716,7 +716,7 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec, const coeffs src 
     in_real=floatToStr( c.real(), oprec );         // get real part
     in_imag=floatToStr( abs(c.imag()), oprec );    // get imaginary part
 
-    if (nField_is_long_C(src))
+    if (nCoeff_is_long_C(src))
     {
       int len=(strlen(in_real)+strlen(in_imag)+7+strlen(src->parameter[0]))*sizeof(char);
       out=(char*)omAlloc(len);

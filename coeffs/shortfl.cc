@@ -510,23 +510,23 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
 
-  if (nField_is_Q(src))
+  if (nCoeff_is_Q(src))
   {
     return nrMapQ;
   }
-  if (nField_is_long_R(src))
+  if (nCoeff_is_long_R(src))
   {
     return nrMapLongR;
   }
-  if (nField_is_R(src))
+  if (nCoeff_is_R(src))
   {
     return ndCopyMap;
   }
-  if(nField_is_Zp(src))
+  if(nCoeff_is_Zp(src))
   {
     return nrMapP;
   }
-  if (nField_is_long_C(src))
+  if (nCoeff_is_long_C(src))
   {
     return nrMapC;
   }
@@ -546,7 +546,7 @@ static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, void*)
 }
 
 
-void nrInitChar(coeffs n, void*)
+BOOLEAN nrInitChar(coeffs n, void*)
 {
   assume( getCoeffType(n) == ID );
 

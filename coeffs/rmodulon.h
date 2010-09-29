@@ -15,7 +15,7 @@
 #define NATNUMBER unsigned long
 #endif
 
-void    nrnInitChar    (coeffs r, void*);
+BOOLEAN nrnInitChar    (coeffs r, void*);
 number  nrnCopy        (number a, const coeffs r);
 int     nrnSize        (number a, const coeffs r);
 void    nrnDelete      (number *a, const coeffs r);

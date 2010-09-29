@@ -29,7 +29,7 @@ int_number nrnMinusOne = NULL;
 unsigned long nrnExponent = 0;
 
 /* for initializing function pointers */
-void nrnInitChar (coeffs r, void* p)
+BOOLEAN nrnInitChar (coeffs r, void* p)
 {
   
   nrnInitExp((int)(long)(p), r);
@@ -457,16 +457,16 @@ number nrnMapQ(number from, const coeffs src, const coeffs dst)
 nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
 {
   /* dst = currRing->cf */
-  if (nField_is_Ring_Z(src))
+  if (nCoeff_is_Ring_Z(src))
   {
     return nrnMapGMP;
   }
-  if (nField_is_Q(src))
+  if (nCoeff_is_Q(src))
   {
     return nrnMapQ;
   }
   // Some type of Z/n ring / field
-  if (nField_is_Ring_ModN(src) || nField_is_Ring_PtoM(src) || nField_is_Ring_2toM(src) || nField_is_Zp(src))
+  if (nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_2toM(src) || nCoeff_is_Zp(src))
   {
     if (   (src->ringtype > 0)
         && (mpz_cmp(src->ringflaga, dst->ringflaga) == 0)
@@ -475,7 +475,7 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
     {
       int_number nrnMapModul = (int_number) omAllocBin(gmp_nrz_bin);
       // Computing the n of Z/n
-      if (nField_is_Zp(src))
+      if (nCoeff_is_Zp(src))
       {
         mpz_init_set_si(nrnMapModul, src->ch);
       }
@@ -520,9 +520,9 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
         return NULL;
       }
       nrnDelete((number*) &nrnMapModul, dst);
-      if (nField_is_Ring_2toM(src))
+      if (nCoeff_is_Ring_2toM(src))
         return nrnMap2toM;
-      else if (nField_is_Zp(src))
+      else if (nCoeff_is_Zp(src))
         return nrnMapZp;
       else
         return nrnMapModN;

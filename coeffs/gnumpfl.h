@@ -13,7 +13,7 @@
 nMapFunc  ngfSetMap(const coeffs src, const coeffs dst);
 
 /// Initialize r
-void ngfInitChar(coeffs r, void *);
+BOOLEAN ngfInitChar(coeffs r, void *);
 
 const char *   ngfRead (const char *s, number *a, const coeffs r);
 
