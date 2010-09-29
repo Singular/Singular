@@ -5374,15 +5374,17 @@ prime factors
 @*When called with int(s)/bigint(s), no ring needs to be active.
 @*When called with numbers these are assumed to be integers in a polynomial
 ring over Q.
-@*The method finds all prime factors of a positive integer n. When a bound b
-is given then it is expected to be at least 2. In this case, the implementation
-finds only all prime factors <= b. Then, there may remain a non-factored
-portion n' of n arising by dividing out all found prime factors.
+@*The method finds all prime factors of an integer n. When some positive bound
+b is given then it is expected to be at least 2. In this case, the
+implementation finds only all prime factors <= b. Then, there may remain a
+non-factored portion n' of n arising by dividing out all found prime factors.
+Moreover, in case n is negative or zero, n' will contain the sign or be zero,
+respectively.
 The returned list contains the following information:
-@*L[1] = n',
-@*L[2][i] = i-th prime factor (in ascending order),
-@*L[3][i] = multiplicity of L[2][i],
-@*L[4] = 1 if probabilistic test says that n' is a prime, 0 otherwise.
+@*L[1][i] = i-th prime factor (in ascending order),
+@*L[2][i] = multiplicity of L[1][i],
+@*L[3] = n',
+@*L[4] = 1 if probabilistic test says that |n'| is a prime, 0 otherwise.
 @item @strong{Example:}
 @smallexample
 @c example

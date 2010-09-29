@@ -192,7 +192,7 @@ lists primeFactorisation(const number n, const number pBound)
   mpz_t sr; mpz_init(sr); int index = 0; int add;
   lists primes = (lists)omAllocBin(slists_bin); primes->Init(1000);
   int* multiplicities = new int[1000];
-  int positive=1;
+  int positive=1; int probTest = 0;
 
   if (!nlIsZero(n))
   {
@@ -281,6 +281,8 @@ lists primeFactorisation(const number n, const number pBound)
       multiplicities[index++] = 1;
       mpz_set_ui(nn, 1);
     }
+    if ((mpz_cmp_ui(nn, 1) > 0) && (mpz_probab_prime_p(nn, 25) != 0))
+      probTest = 1;
   }
 
   lists primesL = (lists)omAllocBin(slists_bin);
@@ -305,11 +307,9 @@ lists primeFactorisation(const number n, const number pBound)
   lists L=(lists)omAllocBin(slists_bin);
   L->Init(4);
   if (positive==-1) mpz_neg(nn,nn);
-  setListEntry(L, 0, nn);
-  L->m[1].rtyp = LIST_CMD; L->m[1].data = (void*)primesL;
-  L->m[2].rtyp = LIST_CMD; L->m[2].data = (void*)multiplicitiesL;
-  int probTest = 0;
-  if (mpz_probab_prime_p(nn, 25) != 0) probTest = 1;
+  L->m[0].rtyp = LIST_CMD; L->m[0].data = (void*)primesL;
+  L->m[1].rtyp = LIST_CMD; L->m[1].data = (void*)multiplicitiesL;
+  setListEntry(L, 2, nn);
   L->m[3].rtyp =  INT_CMD; L->m[3].data = (void*)probTest;
   mpz_clear(nn); mpz_clear(pb); mpz_clear(b); mpz_clear(p); mpz_clear(sr);
 

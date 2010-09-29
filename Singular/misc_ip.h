@@ -59,22 +59,26 @@ void divTimes(mpz_t n,   /**< [in]  a GMP number >= 0                      */
              );
 
 /**
- * Factorises a given positive bigint number n into its prime factors less
+ * Factorises a given bigint number n into its prime factors less
  * than or equal to a given bound, with corresponding multiplicities.
  *
- * The method finds all prime factors with multiplicities. If a non-zero
+ * The method finds all prime factors with multiplicities. If a positive
  * bound is given, then only the prime factors <= pBound are being found.
  * In this case, there may remain an unfactored portion m of n.
+ * Also, when n is negative, m will contain the sign. If n is zero, m will
+ * be zero.
  * The method returns a list L filled with four entries:
- * L[1] contains the remainder m as int or bigint, depending on the size,
- * L[2] a list; L[2][i] contains the i-th prime factor as int or bigint
- *                     (sorted in ascending order),
- * L[3] a list; L[3][i] contains the multiplicity of L[2, i] in n as int
- * L[4] 1 iff the remainder m is probably a prime, 0 otherwise
+ * L[1] a list; L[1][i] contains the i-th prime factor of |n| as int or
+ *                      bigint (sorted in ascending order),
+ * L[2] a list; L[2][i] contains the multiplicity of L[1, i] in |n| as int
+ * L[3] contains the remainder m as int or bigint, depending on the size,
+ * L[4] 1 iff |m| is probably a prime, 0 otherwise
  *
- * We thus have: n = L[1] * L[2][1]^L[3][1] * ... * L[2][k]^L[3][k], where
+ * We thus have: n = L[1][1]^L[2][1] * ... * L[1][k]^L[2][k] * L[1], where
  * k is the number of mutually distinct prime factors (<= a provided non-
  * zero bound).
+ * Note that for n = 0, L[2] and L[3] will be emtpy lists and L[4] will be
+ * zero.
  *
  * @return the factorisation data in a SINGULAR-internal list
  **/

@@ -111,36 +111,36 @@ EXAMPLE: example primdecZ; shows an example
       list A;
       ideal J = imap(R,J);
 
-      for(j=1;j<=size(L[3]);j++)
+      for(j=1;j<=size(L[2]);j++)
       {
-         if(L[3][j] > 1){ ex = 1; break; }
+         if(L[2][j] > 1){ ex = 1; break; }
       }
 
       if(printlevel >= 10)
       {
          "n = "+string(n);
-         "size(L[3]) = "+string(size(L[3]));
+         "size(L[2]) = "+string(size(L[2]));
       }
 
       int RT = rtimer;
-      if((n > 1) && (n < size(L[3])))
+      if((n > 1) && (n < size(L[2])))
       {
 
 //-----  Create n1 links l(1),...,l(n1), open all of them and compute  ---------
-//-----  standard basis for the primes L[2],...,L[n + 1].              ---------
+//-----  standard basis for the primes L[1][2],...,L[1][n + 1].              ---------
 
          for(i = 1; i <= n; i++)
          {
-            p=int(L[2][i + 1]);
-            nu=int(L[3][i + 1]);
+            p=int(L[1][i + 1]);
+            nu=int(L[2][i + 1]);
             link l(i) = "MPtcp:fork";
 //            link l(i) = "ssi:fork";
             open(l(i));
             write(l(i), quote(modp(eval(J), eval(p), eval(nu))));
          }
 
-         p = int(L[2][1]);
-         nu = int(L[3][1]);
+         p = int(L[1][1]);
+         nu = int(L[2][1]);
          int t = timer;
          A[size(A)+1] = modp(J, p, nu);
          t = timer - t;
@@ -149,7 +149,7 @@ EXAMPLE: example primdecZ; shows an example
 
          j = n + 2;
 
-         while(j <= size(L[3]) + 1)
+         while(j <= size(L[2]) + 1)
          {
             for(i = 1; i <= n; i++)
             {
@@ -159,10 +159,10 @@ EXAMPLE: example primdecZ; shows an example
                   //=== read the result from l(i) 
                   A[size(A)+1] = read(l(i));                             
 
-                  if(j <= size(L[3]))
+                  if(j <= size(L[2]))
                   {
-                     p=int(L[2][j]);
-                     nu=int(L[3][j]);
+                     p=int(L[1][j]);
+                     nu=int(L[2][j]);
                      write(l(i), quote(modp(eval(J), eval(p), eval(nu))));
                      j++;
                   }
@@ -184,9 +184,9 @@ EXAMPLE: example primdecZ; shows an example
       }
       else
       {
-         for(j=1;j<=size(L[3]);j++)
+         for(j=1;j<=size(L[2]);j++)
          {
-            A[size(A)+1] = modp(J, L[2][j], L[3][j]);
+            A[size(A)+1] = modp(J, L[1][j], L[2][j]);
          }
       }
 
