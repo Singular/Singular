@@ -132,6 +132,7 @@ void scan_info(int *l)
   int have_OVERVIEW=0;
   int have_NOTE=0;
   int have_other=0;
+  int texinfo=0;
   char *p;
 
   while(!feof(f))
@@ -200,9 +201,17 @@ void scan_info(int *l)
       {
         printf("error: unknown section in library header: %s",buf);
         have_other++;
+        if (have_PROCEDURES!=0)
+          printf("error: only KEYWORDS/SEE ALSO may follow PROCEDURES\n");
       }
     }
     else if (strncmp(buf,"\";",2)==0) goto e_o_info; /* poor mans end-of-info*/
+    else
+    {
+      p=buf;
+      while(*p==' ') p++;
+      if (*p=='@') { p++; texinfo+=(isalpha(*p)); }
+    }
     get_next(); (*l)++;
   }
   e_o_info:
@@ -231,6 +240,10 @@ void scan_info(int *l)
     if ((star_nl>0)&&(star_nl*10>=header))
     {
       printf("warning: %d forced line braks in %d header lines: @* should be used very rarely!\n",star_nl,header);
+    }
+    if (texinfo>0)
+    {
+      printf("warning: %d texinfo commands %d header lines: should be used very rarely!\n",texinfo,header);
     }
 }
 
