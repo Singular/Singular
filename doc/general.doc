@@ -3494,10 +3494,7 @@ recommend that you follow certain rules as explained in
 defines the version number for the library. It is displayed when the
 library is loaded.
 @item @strong{Example:}
-@smallexample
-version="$ Id: smaple.lib 13320 2010-09-29 09:31:38Z someone $";
-version="some version string";
-@end smallexample
+@code{version="$}@code{Id: sample.lib 13320 2010-09-29 09:31:38Z someone $";}
 @item @strong{Note:}
 It is common practice to simply define the version string to be
 @code{"$I}@code{d:$"} and let a version control system expand it.
@@ -3530,6 +3527,8 @@ understanding are made easier.
 
 @strong{Note:} For libraries which are to be included in the @sc{Singular}
 distribution, the following guidelines are mandatory.
+
+The keyword @code{LIB} must be followed by at least one space.
 
 @menu
 * Procedures in a library::
@@ -3676,12 +3675,12 @@ the info string of the library is parsed and typeset
 as explained in @ref{Typesetting of help strings}.
 
 @item
-the help string of each procedure listed in the @code{PROCEDURE:}
+the help string of each procedure listed in the @code{PROCEDURES:}
 section of the library info string is parsed
 and typeset as explained in @ref{Typesetting of help strings}.
 
 @item
-the example of each procedure listed in the @code{PROCEDURE:} section of
+the example of each procedure listed in the @code{PROCEDURES:} section of
 the library info string is computed and its output is
 included into the documentation.
 @end itemize
@@ -3701,7 +3700,7 @@ for examples on how library documentations are
 written.
 
 @item
-make sure that each procedure listed in the @code{PROCEDURE:}
+make sure that each procedure listed in the @code{PROCEDURES:}
 section of the library info string has a help string and an example
 section.
 
@@ -3971,10 +3970,10 @@ AUTHOR:  <name, and email address of author>
 [SEE ALSO: <comma-separated words of cross references>]
 [KEYWORDS: <semicolon-separated phrases of index keys>]
 PROCEDURES:
-  <procedure1>;     <one line description of the purpose>
+  <procedure1>();     <one line description of the purpose>
    .
    .
-  <procedureN>;     <one line description of the purpose>
+  <procedureN>();     <one line description of the purpose>
 ";
 @end smallexample
 Only such procedures should be listed in the @code{PROCEDURE} section
@@ -3987,6 +3986,8 @@ the right one for the job. Details can then be found in the help section
 of each procedure. Therefore, parameters may be omitted or abbreviated if
 necessary. If this description consists of only upper-case characters,
 then it will be typeset in all lowercase characters in the manual.
+
+Other sections may be present.
 
 Please note, that the section @code{PROCEDURES:} must be the last section
 and the only section to list procedures.
