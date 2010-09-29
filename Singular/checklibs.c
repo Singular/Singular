@@ -66,6 +66,8 @@ void scan_proc(int *l)
       }
       else
       {
+        if (strlen(s)<4)
+	  printf("error: minimal length of a procedure name is 4: %s\n",s);
         proc[proc_cnt]=strdup(s); proc_cnt++;
       }
     }
