@@ -403,7 +403,7 @@ int main(int argc, char** argv)
     printf("error: some lines are in DOS format, some not (%d/%d)\n",crlf,lines);
   }
   printf("%d lines parsed\n",lines);
-  printf("%d proc checked\n",proc_cnt);
+  printf("%d proc found in header\n",proc_cnt);
   fclose(f);
   return 0;
 }
