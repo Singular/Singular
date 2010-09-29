@@ -14,7 +14,7 @@
 nMapFunc nrSetMap(const coeffs src, const coeffs dst);
 
 /// Initialize r
-void nrInitChar(coeffs r, void*);
+BOOLEAN nrInitChar(coeffs r, void*);
 
 // Private interface should be hidden!!!
 

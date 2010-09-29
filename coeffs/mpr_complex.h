@@ -313,7 +313,7 @@ gmp_complex sqrt( const gmp_complex & x );
 
 inline gmp_complex numberToComplex( number num, const coeffs r )
 {
-  if (nField_is_long_C(r))
+  if (nCoeff_is_long_C(r))
   {
     return *(gmp_complex*)num;
   }

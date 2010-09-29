@@ -278,19 +278,19 @@ number nrzMapQ(number from, const coeffs src, const coeffs dst)
 nMapFunc nrzSetMap(const coeffs src, const coeffs dst)
 {
   /* dst = currRing */
-  if (nField_is_Ring_Z(src) || nField_is_Ring_ModN(src) || nField_is_Ring_PtoM(src))
+  if (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src))
   {
     return nrzCopyMap;
   }
-  if (nField_is_Ring_2toM(src))
+  if (nCoeff_is_Ring_2toM(src))
   {
     return nrzMapMachineInt;
   }
-  if (nField_is_Zp(src))
+  if (nCoeff_is_Zp(src))
   {
     return nrzMapZp;
   }
-  if (nField_is_Q(src))
+  if (nCoeff_is_Q(src))
   {
     return nrzMapQ;
   }
@@ -372,7 +372,7 @@ const char * nrzRead (const char *s, number *a, const coeffs r)
   return s;
 }
 
-void nrzInitChar(coeffs r,  void * parameter)
+BOOLEAN nrzInitChar(coeffs r,  void * parameter)
 {
   r->cfSetChar= NULL;
   r->cfMult  = nrzMult;

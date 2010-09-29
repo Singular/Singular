@@ -735,11 +735,11 @@ number nfMapGGrev(number c, const coeffs src, const coeffs dst)
 */
 nMapFunc nfSetMap(const coeffs src, const coeffs dst)
 {
-  if (nField_is_GF(src,src->m_nfCharQ))
+  if (nCoeff_is_GF(src,src->m_nfCharQ))
   {
     return ndCopyMap;   /* GF(p,n) -> GF(p,n) */
   }
-  if (nField_is_GF(src))
+  if (nCoeff_is_GF(src))
   {
     const coeffs r = dst;
     int q=src->ch;
@@ -773,14 +773,14 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
         return NULL;
     }
   }
-  if (nField_is_Zp(src,src->m_nfCharP))
+  if (nCoeff_is_Zp(src,src->m_nfCharP))
   {
     return nfMapP;    /* Z/p -> GF(p,n) */
   }
   return NULL;     /* default */
 }
 
-void nfInitChar(coeffs r,  void * parameter)
+BOOLEAN nfInitChar(coeffs r,  void * parameter)
 {
 
 

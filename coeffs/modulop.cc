@@ -321,7 +321,7 @@ static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   return (n==n_Zp) && (r->ch==(int)(long)parameter);
 }
 
-void npInitChar(coeffs r, void* p)
+BOOLEAN npInitChar(coeffs r, void* p)
 {
   const int c = (int) (long) p;
 
@@ -586,20 +586,20 @@ number npMapCanonicalForm (number a, const coeffs src, const coeffs dst)
 nMapFunc npSetMap(const coeffs src, const coeffs dst)
 {
 #ifdef HAVE_RINGS
-  if (nField_is_Ring_2toM(src))
+  if (nCoeff_is_Ring_2toM(src))
   {
     return npMapMachineInt;
   }
-  if (nField_is_Ring_Z(src) || nField_is_Ring_PtoM(src) || nField_is_Ring_ModN(src))
+  if (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
   {
     return npMapGMP;
   }
 #endif
-  if (nField_is_Q(src))
+  if (nCoeff_is_Q(src))
   {
     return npMap0;
   }
-  if ( nField_is_Zp(src) )
+  if ( nCoeff_is_Zp(src) )
   {
     if (n_GetChar(src) == n_GetChar(dst))
     {
@@ -610,12 +610,12 @@ nMapFunc npSetMap(const coeffs src, const coeffs dst)
       return npMapP;
     }
   }
-  if (nField_is_long_R(src))
+  if (nCoeff_is_long_R(src))
   {
     return npMapLongR;
   }
 #ifdef HAVE_FACTORY
-  if (nField_is_CF (src))
+  if (nCoeff_is_CF (src))
   {
     return npMapCanonicalForm;
   }

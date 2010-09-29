@@ -381,7 +381,7 @@ static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, void*)
   return (n == ID);
 }
 
-void ngcInitChar(coeffs n, void*)
+BOOLEAN ngcInitChar(coeffs n, void*)
 {
   assume( getCoeffType(n) == ID );
 
@@ -562,23 +562,23 @@ nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
 
-  if (nField_is_Q(src))
+  if (nCoeff_is_Q(src))
   {
     return ngcMapQ;
   }
-  if (nField_is_long_R(src))
+  if (nCoeff_is_long_R(src))
   {
     return ngcMapLongR;
   }
-  if (nField_is_long_C(src))
+  if (nCoeff_is_long_C(src))
   {
     return ngcCopyMap;
   }
-  if (nField_is_R(src))
+  if (nCoeff_is_R(src))
   {
     return ngcMapR;
   }
-  if (nField_is_Zp(src))
+  if (nCoeff_is_Zp(src))
   {
     return ngcMapP;
   }

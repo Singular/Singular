@@ -13,7 +13,7 @@
 extern int nrzExp;
 extern NATNUMBER nrzModul;
 
-void    nrzInitChar    (coeffs r,  void * parameter);
+BOOLEAN nrzInitChar    (coeffs r,  void * parameter);
 number  nrzCopy        (number a, const coeffs r);
 int     nrzSize        (number a, const coeffs r);
 void    nrzDelete      (number *a, const coeffs r);

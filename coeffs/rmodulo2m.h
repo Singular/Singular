@@ -16,7 +16,7 @@
 #endif
 
 
-void    nr2mInitChar    (coeffs r, void*);
+BOOLEAN nr2mInitChar    (coeffs r, void*);
 
 extern int nr2mExp;
 extern NATNUMBER nr2mModul; /* for storing 2^m - 1, i.e., the

@@ -1919,28 +1919,28 @@ nMapFunc nlSetMap(const coeffs src, const coeffs dst)
   assume( getCoeffType(dst) == ID );
 //  assume( getCoeffType(src) == ID );
   
-  if (nField_is_Q(src))
+  if (nCoeff_is_Q(src))
   {
     return nlCopyMap;
   }
-  if (nField_is_Zp(src))
+  if (nCoeff_is_Zp(src))
   {
     return nlMapP;
   }
-  if (nField_is_R(src))
+  if (nCoeff_is_R(src))
   {
     return nlMapR;
   }
-  if (nField_is_long_R(src))
+  if (nCoeff_is_long_R(src))
   {
     return nlMapLongR; /* long R -> Q */
   }
 #ifdef HAVE_RINGS
-  if (nField_is_Ring_Z(src) || nField_is_Ring_PtoM(src) || nField_is_Ring_ModN(src))
+  if (nCoeff_is_Ring_Z(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
   {
     return nlMapGMP;
   }
-  if (nField_is_Ring_2toM(src))
+  if (nCoeff_is_Ring_2toM(src))
   {
     return nlMapMachineInt;
   }
@@ -2461,7 +2461,7 @@ static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   return (n==n_Q);
 }
 
-void nlInitChar(coeffs r, void* p)
+BOOLEAN nlInitChar(coeffs r, void* p)
 {
   const int ch = (int)(long)(p);
   

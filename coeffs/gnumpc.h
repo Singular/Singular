@@ -13,7 +13,7 @@
 nMapFunc  ngcSetMap(const coeffs src, const coeffs dst);
 
 /// Initialize r
-void ngcInitChar(coeffs r, void*);
+BOOLEAN ngcInitChar(coeffs r, void*);
 
 
 // Private interface should be hidden!!!

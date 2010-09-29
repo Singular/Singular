@@ -28,7 +28,7 @@ int nr2mExp;
 extern omBin gmp_nrz_bin; /* init in rintegers*/
 
 /* for initializing function pointers */
-void nr2mInitChar (coeffs r, void* p)
+BOOLEAN nr2mInitChar (coeffs r, void* p)
 {
   
   nr2mInitExp((int)(long)(p), r);
@@ -562,36 +562,36 @@ number nr2mMapGMP(number from, const coeffs src, const coeffs dst)
 
 nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
 {
-  if (nField_is_Ring_2toM(src)
+  if (nCoeff_is_Ring_2toM(src)
      && (src->ringflagb == dst->ringflagb))
   {
     return ndCopyMap;
   }
-  if (nField_is_Ring_2toM(src)
+  if (nCoeff_is_Ring_2toM(src)
      && (src->ringflagb < dst->ringflagb))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t < s */
     return nr2mMapMachineInt;
   }
-  if (nField_is_Ring_2toM(src)
+  if (nCoeff_is_Ring_2toM(src)
      && (src->ringflagb > dst->ringflagb))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t > s */
     // to be done
   }
-  if (nField_is_Ring_Z(src))
+  if (nCoeff_is_Ring_Z(src))
   {
     return nr2mMapGMP;
   }
-  if (nField_is_Q(src))
+  if (nCoeff_is_Q(src))
   {
     return nr2mMapQ;
   }
-  if (nField_is_Zp(src)
+  if (nCoeff_is_Zp(src)
      && (src->ch == 2)
      && (dst->ringflagb == 1))
   {
     return nr2mMapZp;
   }
-  if (nField_is_Ring_PtoM(src) || nField_is_Ring_ModN(src))
+  if (nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_ModN(src))
   {
     // Computing the n of Z/n
     int_number modul = (int_number)  omAllocBin(gmp_nrz_bin);

@@ -91,7 +91,7 @@ number ndCopy(number a, const coeffs) { return a; }
 number ndCopyMap(number a, const coeffs aRing, const coeffs r)
 {
   assume( getCoeffType(r) == getCoeffType(aRing) );
-  assume( nField_has_simple_Alloc(r) && nField_has_simple_Alloc(aRing) );
+  assume( nCoeff_has_simple_Alloc(r) && nCoeff_has_simple_Alloc(aRing) );
   
   return a;
 }
@@ -189,12 +189,19 @@ coeffs nInitChar(n_coeffType t, void * parameter)
   }
   #endif
     cf_root=n;
+    
+    BOOLEAN nOK=TRUE;
     // init
     if ((nInitCharTable!=NULL) && (t<=nLastCoeffs))
-       (nInitCharTable[t])(n,parameter);
-     else
+      nOK = (nInitCharTable[t])(n,parameter);
+    else
        Werror("coeff init missing for %d",(int)t);
-    
+    if (nOK)
+      {
+	omFreeSize(n,sizeof(*n));
+	return NULL;
+      }
+    cf_root=n;
     // post init settings:
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
     if (n->cfIntDiv==NULL) n->cfIntDiv=n->cfDiv;
