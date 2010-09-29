@@ -12,7 +12,7 @@ AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 
 SUPPORT: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
-MAIN PROCEDURES:
+PROCEDURES:
 Gweights(r);              compute weights for a compatible ordering in a G-algebra,
 weightedRing(r);          change the ordering of a ring to a weighted one,
 ndcond();                 the ideal of non-degeneracy conditions in G-algebra,
@@ -24,7 +24,6 @@ findimAlgebra(M,[r]);     create finite dimensional algebra structure from the b
 superCommutative([b,e,Q]);  return qring, a super-commutative algebra over a basering,
 rightStd(I);              compute a right Groebner basis of an ideal,
 
-AUXILIARY PROCEDURES:
 moduloSlim(A,B);  compute modulo via slimgb
 ncRelations(r);      recover the non-commutative relations of a G-algebra,
 isCentral(p);         check for the commutativity of a polynomial in the G-algebra,
@@ -42,7 +41,6 @@ makeModElimRing(R); equip a ring with module elimination ordering
 LIB "ring.lib"; // for rootofUnity
 LIB "poly.lib"; // for newtonDiag
 LIB "matrix.lib"; // for submat
-// LIB "ncalg.lib";
 
 ///////////////////////////////////////////////////////////////////////////////
 
