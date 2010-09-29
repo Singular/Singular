@@ -18,7 +18,6 @@ PROCEDURES:
  dimH(i,M,d);            compute h^i(F(d)), F sheaf associated to coker(M)
  dimGradedPart()
 
-AUXILIARY PROCEDURES:
  displayCohom(B,l,h,n);  display intmat as Betti diagram (with zero rows)
 
 KEYWORDS: sheaf cohomology
