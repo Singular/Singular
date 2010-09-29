@@ -314,6 +314,11 @@ int main(int argc, char** argv)
   /* part 2: procs */
   while(!feof(f))
   {
+    if ((strstr(buf,"static")==buf) && (strstr(buf,"proc")==NULL))
+    {
+      printf("error: 'static' without 'proc' found\n");
+      get_next();
+    }
     if(((p=strstr(buf,"proc "))!=NULL)
     &&(strncmp(buf,"static proc ",12)!=0))
     {
