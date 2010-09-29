@@ -3495,9 +3495,7 @@ defines the version number for the library. It is displayed when the
 library is loaded.
 @item @strong{Example:}
 @smallexample
-version="$I"
-@comment
-"d: smaple.lib 13320 2010-09-29 09:31:38Z someone $";
+version="$ Id: smaple.lib 13320 2010-09-29 09:31:38Z someone $";
 version="some version string";
 @end smallexample
 @item @strong{Note:}
