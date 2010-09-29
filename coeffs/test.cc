@@ -167,7 +167,7 @@ bool Test(const n_coeffType type, void* p = NULL)
 
   const coeffs r = nInitChar( type, p );
 
-  assume( r != NULL );
+  if( r == NULL ) { cout << "error"; return false; };
 
   nSetChar( r );
   assume( getCoeffType(r) == type );
