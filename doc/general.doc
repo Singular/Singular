@@ -3495,18 +3495,12 @@ defines the version number for the library. It is displayed when the
 library is loaded.
 @item @strong{Example:}
 @smallexample
-version="$I@comment
-@comment !! Do not erase the @comment at the end of the previous line !!
-@comment !! It prevents cvs to substitute the id string                !!
-d: sample.lib,v 1.2 1998/05/07 singular Exp $";
+version="$Id$";
 version="some version string";
 @end smallexample
 @item @strong{Note:}
 It is common practice to simply define the version string to be
-@code{"$I}@comment
-@comment !! Do not erase the @comment at the end of the previous line !!
-@comment !! It prevents cvs to substitute the id string                !!
-@code{d:$"} and let a version control system expand it.
+@code{"$I}@code{d:$"} and let a version control system expand it.
 @end table
 
 @cindex  category in a library
@@ -3557,7 +3551,9 @@ In this section we list miscellaneous recommendations on how procedures
 contained in a library should be implemented.
 @enumerate
 @item
-The info- and version-string should appear at the beginning of the
+the library must start with @code{//}
+@item
+The info-, category- and  version-string should appear at the beginning of the
 library, before the first procedure definition.
 
 @item
@@ -3722,7 +3718,7 @@ do not forget automatic type conversions.
 @item
 carefully check the generated
 documentation of their libraries in its various formats using the
-@code{lib2doc} (@pxref{lib2doc}) utility.
+@code{lib2doc} (@pxref{lib2doc}) and @code{checklibs} utilities.
 @end itemize
 
 @menu
