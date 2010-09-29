@@ -854,8 +854,8 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   if(p->GFChar > (2<<15))
   {
-    Werror("illegal characteristic"); // no exceptions :(((
-    return;
+    Werror("illegal characteristic");
+    return TRUE;
   }
 
   const double check= log ((double) (p->GFChar)); 
@@ -863,7 +863,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   if( (p->GFDegree * check) > sixteenlog2 )
   {
     Werror("Sorry: illegal size: %u ^ %u", p->GFChar, p->GFDegree );
-    return; // EXCEPTION? OR RETURN AN ERROR!???
+    return TRUE;
   }
 
   int c = pow (p->GFChar, p->GFDegree);
@@ -873,7 +873,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   if( r->m_nfPlus1Table == NULL )
   {
     Werror("Sorry: cannot init lookup table!");
-    return;
+    return TRUE;
   }
   
   
@@ -881,5 +881,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
 
   r->ch = r->m_nfCharP; 
   assume( r->m_nfPlus1Table != NULL );
-
+  
+  return FALSE;
+  
 }
