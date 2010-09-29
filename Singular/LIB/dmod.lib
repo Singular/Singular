@@ -41,21 +41,20 @@ Differential Equations', Springer, 2000
 
 
 GUIDE:
-- Ann F^s = I(F^s) = LD in D(R)[s] can be computed by Sannfs [BM, OT, LOT]
-- Ann^(1) F^s in D(R)[s] can be computed by Sannfslog
-- global Bernstein polynomial bs in K[s] can be computed by bernsteinBM
-- Ann F^s0 = I(F^s0) = LD0 in D(R) can be computed by annfs0, annfs, annfsBM,
+@*- Ann F^s = I(F^s) = LD in D(R)[s] can be computed by Sannfs [BM, OT, LOT]
+@*- Ann^(1) F^s in D(R)[s] can be computed by Sannfslog
+@*- global Bernstein polynomial bs in K[s] can be computed by bernsteinBM
+@*- Ann F^s0 = I(F^s0) = LD0 in D(R) can be computed by annfs0, annfs, annfsBM,
     annfsOT, annfsLOT, annfs2, annfsRB etc.
-- all the relevant data to F^s (LD, LD0, bs, PS) are computed by operatorBM
-- operator PS can be computed via operatorModulo or operatorBM
+@*- all the relevant data to F^s (LD, LD0, bs, PS) are computed by operatorBM
+@*- operator PS can be computed via operatorModulo or operatorBM
 
-- annihilator of F^{s1} for a number s1 is computed with annfspecial
-- annihilator of F_1^s_1 * ... * F_p^s_p is computed with annfsBMI
-- computing the multiplicity of a rational number r in the Bernstein poly
+@*- annihilator of F^{s1} for a number s1 is computed with annfspecial
+@*- annihilator of F_1^s_1 * ... * F_p^s_p is computed with annfsBMI
+@*- computing the multiplicity of a rational number r in the Bernstein poly
    of a given ideal goes with checkRoot
-- check, whether a given univariate polynomial divides the Bernstein poly
+@*- check, whether a given univariate polynomial divides the Bernstein poly
    goes with checkFactor
-
 
 PROCEDURES:
 
