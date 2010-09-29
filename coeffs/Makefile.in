@@ -35,10 +35,11 @@ CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ ${PIPE} -g
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 CPPFLAGS	= -I${srcdir} -I${includedir} -I${prefix}/include
-LDFLAGS		= -L${libdir} -L${prefix}/lib
+LDFLAGS		= -L${libdir} -L${prefix}/lib -L${srcdir}
 DEFS		= -DNDEBUG -DOM_NDEBUG @DEFS@
 
-LIBSG		=  @LIBPREFIX@ -lcoeffs_g -lreporter -lresource -lomalloc -lgmp
+LIBS		=  @LIBPREFIX@ -lcoeffs -lreporter -lresource -lgmp -lomalloc_ndebug
+LIBSG		=  @LIBPREFIX@ -lcoeffs_g -lreporter -lresource -lgmp -lomalloc
 
 #-DHAVE_RINGS 
 # -DHAVE_RINGS # Doesn't work :(
@@ -68,6 +69,10 @@ HEADERS= gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h \
 DISTFILES=${SOURCES} ${HEADERS}
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
+
+
+all: libcoeffs.a libcoeffs_g.a
+
 
 .cc.o:	
 	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} -c $<
@@ -102,15 +107,14 @@ mostlyclean:
 	-rm -f *.o *.og core *.op
 
 cleantest: 
+	-rm -f test test-g
 	-rm -Rf test test.dSYM/
 
 clean: mostlyclean cleantest
-	-rm -f *.bak *.d *.dd depend *.a *.so*
+	-rm -f *.bak *.d *.dd depend *.a *.so* 
 
 tags:   
 	ctags *.c *.h *.cc *.inc
-
-all: libcoeffs.a libcoeffs_g.a
 
 install: all
 	${MKINSTALLDIRS} ${includedir}
@@ -119,5 +123,9 @@ install: all
 	${INSTALL_DATA} libcoeffs_g.a ${libdir}/libcoeffs_g.a
 	$(INSTALL_DATA) coeffs.h $(includedir)/coeffs.h
 
-test: test.cc libcoeffs_g.a
-	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} test.cc ${LDFLAGS} ${LIBSG} -o test
+test: test.cc libcoeffs.a
+	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} test.cc ${LDFLAGS} ${LIBS} -o test
+
+
+test-g: test.cc libcoeffs_g.a
+	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} test.cc ${LDFLAGS} ${LIBSG} -o test-g

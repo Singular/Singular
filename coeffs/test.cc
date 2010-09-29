@@ -250,10 +250,27 @@ int main()
   n_coeffType type;
 
   // rings needed for: n_Zp_a, n_Q_a ?
+#ifdef HAVE_RINGS
+  TODO(Frank, Segmentation fault! (if used wihout omalloc???). Please_ investigate!);
+/*
+  type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m ); 
+  if( Test(type, (void*) 2) )
+    c ++;
+*/
+#endif
 
   type = nRegister( n_Zp, npInitChar); assume( type == n_Zp );
   if( Test(type, (void*) 11) )
     c ++;
+
+#ifdef HAVE_RINGS
+  TODO(Frank, memmory corruption_ if used wihout omalloc??? Please_ investigate!);
+/*
+  type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m ); 
+  if( Test(type, (void*) 2) )
+    c ++;
+*/    
+#endif
 
   
   type = nRegister( n_Q, nlInitChar); assume( type == n_Q );
@@ -264,17 +281,11 @@ int main()
   if( Test(type) )
     c ++;
 
-
 #ifdef HAVE_RINGS
-  type = nRegister( n_Z, nrzInitChar); assume( type == n_Z );
+  type = nRegister( n_Z, nrzInitChar); assume( type == n_Z ); // No need in GMP?
   if( Test(type) )
     c ++;
-
-  type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m );
-  if( Test(type, (void*) 2) )
-    c ++;
 #endif
-
 
    type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
 
@@ -282,17 +293,35 @@ int main()
 
    param.GFChar= 5;
    param.GFDegree= 12;
-
    param.GFPar_name= (const char*)"q";
 
    if( Test(type, (void*) &param) )
      c ++;
   
- 
-  TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Fix it!);
-  
-  setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's...
-      
+   param.GFChar= 5;
+   param.GFDegree= 2;
+   param.GFPar_name= (const char*)"Q";
+
+   if( Test(type, (void*) &param) )
+     c ++;
+
+  TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Please fix it!);
+
+
+
+#ifdef HAVE_RINGS
+  TODO(Somebody, This will result in memory corruption at Z_2^m later on (due to the succs. setGMPFloatDigits?)...!?);
+/*
+  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
+
+  if( Test(type, (void*) 3) )
+    c ++;
+*/
+#endif
+
+  setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
+
+
   type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
   if( Test(type) )
     c ++;
@@ -300,16 +329,20 @@ int main()
   type = nRegister( n_long_R, ngfInitChar); assume( type == n_long_R );
   if( Test(type) )
     c ++;
-  
-  
-#ifdef HAVE_RINGS
-  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
 
-  TODO(Frank, this seems to be a trivial BUG: the parameter 'm' is ignored now in nrnSetExp. Please fix someday!!!)
-  if( Test(type, (void*) 3) )
+#ifdef HAVE_RINGS
+  type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m ); 
+  if( Test(type, (void*) 2) )
     c ++;
 #endif
 
+
+#ifdef HAVE_RINGS
+  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
+
+  if( Test(type, (void*) 3) )
+    c ++;
+#endif
   
   
   return c;
