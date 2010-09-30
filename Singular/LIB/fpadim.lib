@@ -2,7 +2,7 @@
 version="$Id: fpadim.lib,v beta 2010/09/27 13:14:51 studzins Exp $";
 category="Noncommutative";
 info="
-LIBRARY: fpadim.lib     Algorithms for quotient algebras
+LIBRARY: fpadim.lib     Algorithms for quotient algebras in the letterplace case
 AUTHORS: Grischa Studzinski,       grischa.studzinski@rwth-aachen.de
 
 SUPPORT: Projects LE 2697/2-1; KR 1907/3-1 of the Priority Programme SPP 1489:
