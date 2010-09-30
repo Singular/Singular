@@ -6,9 +6,9 @@ LIBRARY: dmodapp.lib     Applications of algebraic D-modules
 AUTHORS: Viktor Levandovskyy,  levandov@math.rwth-aachen.de
 @*       Daniel Andres,   daniel.andres@math.rwth-aachen.de
 
-SUPPORT: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
+Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
 
-GUIDE: Let K be a field of characteristic 0, R = K[x1,...,xN] and
+OVERVIEW: Let K be a field of characteristic 0, R = K[x1,...,xN] and
 @* D be the Weyl algebra in variables x1,...,xN,d1,...,dN.
 @* In this library there are the following procedures for algebraic D-modules:
 @*
@@ -41,14 +41,14 @@ GUIDE: Let K be a field of characteristic 0, R = K[x1,...,xN] and
 @* which annihilate corresponding Appel hypergeometric functions.
 
 
-REFERENCES:
+References:
 @* (SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric
 @*         Differential Equations', Springer, 2000
 @* (OTW) Oaku, Takayama, Walther 'A Localization Algorithm for D-modules', 2000
 @* (OT)  Oaku, Takayama 'Algorithms for D-modules', 1998
 
 
-MAIN PROCEDURES:
+PROCEDURES:
 
 annPoly(f);   annihilator of a polynomial f in the corr. Weyl algebra
 annRat(f,g);  annihilator of a rational function f/g in the corr. Weyl algebra
@@ -73,7 +73,6 @@ charInfo(I);    char. variety of ideal I, its singular locus and primary decomp.
 isFsat(I,F);    check whether the ideal I is F-saturated
 
 
-AUXILIARY PROCEDURES:
 
 appelF1();     create an ideal annihilating Appel F1 function
 appelF2();     create an ideal annihilating Appel F2 function
@@ -102,7 +101,6 @@ KEYWORDS: D-module; annihilator of polynomial; annihilator of rational function;
 D-localization; localization of D-module; D-restriction; restriction of 
 D-module; D-integration; integration of D-module; characteristic variety;
 Appel function; Appel hypergeometric function
-
 ";
 
 

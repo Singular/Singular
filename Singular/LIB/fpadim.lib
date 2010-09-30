@@ -5,7 +5,7 @@ info="
 LIBRARY: fpadim.lib     Algorithms for quotient algebras in the letterplace case
 AUTHORS: Grischa Studzinski,       grischa.studzinski@rwth-aachen.de
 
-SUPPORT: Projects LE 2697/2-1; KR 1907/3-1 of the Priority Programme SPP 1489:
+Support: Projects LE 2697/2-1; KR 1907/3-1 of the Priority Programme SPP 1489:
 @* 'Algorithmische und Experimentelle Methoden in Algebra, Geometrie und Zahlentheorie'
 @* of the German DFG
 
@@ -40,7 +40,7 @@ OVERVIEW: Given the free algebra A = K<x_1,...,x_n> and a (finite) Groebner basi
 @*      computing the normalform yet, but for our case it is not needed.
 @*
 
-REFERENCES:
+References:
 
 @*   [ufna] Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990
 @*   [lls] Levandovskyy, La Scala: Letterplace ideals and non-commutative
@@ -48,7 +48,7 @@ REFERENCES:
 @*   [studzins] Studzinski: Dimension computations in non-commutative,
                       associative algebras, Diploma thesis, RWTH Aachen, 2010
 
-ASSUMPTIONS:
+Assumptions:
 @* - basering is always a Letterplace ring
 @* - all intvecs correspond to Letterplace monomials
 @* - if you specify a different degree bound d,

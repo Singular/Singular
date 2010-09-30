@@ -1,22 +1,24 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 version = "$Id: ncfactor.lib, v 1.00 2010/02/15 10:06 heinle Exp $";
 category="Noncommutative";
 info="
 LIBRARY: ncfactor.lib   Tools for factorization in the first Weyl algebra
 AUTHORS: Albert Heinle,     albert.heinle@rwth-aachen.de
 
-MAIN PROCEDURES:
-homogfac(h);         computes one factorization of a homogeneous polynomial h
-homogfac_all(h);     computes all factorizations of a homogeneous polynomial h
-facwa(h);            computes all factorizations of an inhomogeneous polynomial h
-
-/* ring R = 0,(x,y),Ws(-1,1); */
-/* def r = nc_algebra(1,1); */
-/* setring(r); */
+PROCEDURES:
+facfirstwa(h);     factorization in the first Weyl algebra
 ";
+
 LIB "general.lib";
 LIB "nctools.lib";
 LIB "involut.lib";
+
+//static homogfac(h);         computes one factorization of a homogeneous polynomial h
+//static homogfac_all(h);     computes all factorizations of a homogeneous polynomial h
+//static facwa(h);            computes all factorizations of an inhomogeneous polynomial h
+/* ring R = 0,(x,y),Ws(-1,1); */
+/* def r = nc_algebra(1,1); */
+/* setring(r); */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //==================================================*
@@ -427,7 +429,7 @@ static proc limitcheck(list g, intvec limits)
 //==================================================*
 //one factorization of a homogeneous polynomial
 //in the first Weyl Algebra
-proc homogfac(poly h)
+static proc homogfac(poly h)
 "USAGE: homogfac(h); h is a homogeneous polynomial in the first Weyl algebra with respect to the weight vector [-1,1]
 RETURN: list
 PURPOSE: Computes a factorization of a homogeneous polynomial h with respect to the weight vector [-1,1] in the first Weyl algebra
@@ -435,14 +437,6 @@ THEORY: @code{homogfac} returns a list with a factorization of the given, homoge
 EXAMPLE: example homogfac; shows examples
 SEE ALSO: homogfac_all
 "{//proc homogfac
-     if (!isWeyl())
-     {//Our basering is not the Weyl algebra
-	  return(list());
-     }//Our basering is not the Weyl algebra
-     if(nvars(basering)!=2)
-     {//Our basering is the Weyl algebra, but not the first
-	  return(list());
-     }//Our basering is the Weyl algebra, but not the first
      def r = basering;
      poly hath;
      int i; int j;
@@ -529,19 +523,19 @@ SEE ALSO: homogfac_all
      result = tempresult+result;
      return(result);
 }//proc homogfac
-example
-{
-     "EXAMPLE:";echo=2;
-     ring R = 0,(x,y),Ws(-1,1);
-     def r = nc_algebra(1,1);
-     setring(r);
-     poly h = (x^2*y^2+1)*(x^4);
-     homogfac(h);
-}
+/* example */
+/* { */
+/*      "EXAMPLE:";echo=2; */
+/*      ring R = 0,(x,y),Ws(-1,1); */
+/*      def r = nc_algebra(1,1); */
+/*      setring(r); */
+/*      poly h = (x^2*y^2+1)*(x^4); */
+/*      homogfac(h); */
+/* } */
 
 //==================================================
 //Computes all possible homogeneous factorizations
-proc homogfac_all(poly h)
+static proc homogfac_all(poly h)
 "USAGE: homogfac_all(h); h is a homogeneous polynomial in the first Weyl algebra with respect to the weight vector [-1,1]
 RETURN: list
 PURPOSE: Computes all factorizations of a homogeneous polynomial h with respect to the weight vector [-1,1] in the first Weyl algebra
@@ -553,14 +547,6 @@ SEE ALSO: homogfac
      {//h is a constant
 	  return(list(list(h)));
      }//h is a constant
-     if (!isWeyl())
-     {//Our basering is not the Weyl algebra
-	  return(list());
-     }//Our basering is not the Weyl algebra
-     if(nvars(basering)!=2)
-     {//Our basering is the Weyl algebra, but not the first
-	  return(list());
-     }//Our basering is the Weyl algebra, but not the first
      def r = basering;
      list one_hom_fac; //stands for one homogeneous factorization
      int i; int j; int k;
@@ -799,15 +785,15 @@ SEE ALSO: homogfac
      result = delete_dublicates_noteval(result);
      return(result);
 }//proc HomogFacAll
-example
-{
-     "EXAMPLE:";echo=2;
-     ring R = 0,(x,y),Ws(-1,1);
-     def r = nc_algebra(1,1);
-     setring(r);
-     poly h = (x^2*y^2+1)*(x^4);
-     homogfac_all(h);
-}
+/* example */
+/* { */
+/*      "EXAMPLE:";echo=2; */
+/*      ring R = 0,(x,y),Ws(-1,1); */
+/*      def r = nc_algebra(1,1); */
+/*      setring(r); */
+/*      poly h = (x^2*y^2+1)*(x^4); */
+/*      homogfac_all(h); */
+/* } */
 
 //==================================================*
 //Computes all permutations of a given list
@@ -886,19 +872,14 @@ static proc permpp(list l)
 
 //==================================================
 //factorization of the first Weyl Algebra
-proc facwa(poly h)
-"USAGE: facwa(h); h is a polynomial in the first Weyl algebra
-RETURN: list
-PURPOSE: Computes a factorization of a polynomial h in the first Weyl algebra
-THEORY: @code{homogfac} returns a list with some factorizations of the given polynomial. The possibilities of the factorization of the highest homogeneous part and those of the lowest will be merged.
-EXAMPLE: example facwa; shows examples
-SEE ALSO: homogfac_all, homogfac
-"{//proc facwa
-     if(homogwithorder(h,intvec(-1,1)))
-     {
-	  return(homogfac_all(h));
-     }
-     //Redefine the ring in my standard form
+
+//The following procedure just serves the purpose to
+//transform the input into an appropriate input for
+//the procedure sfacwa, where the ring must contain the
+//variables in a certain order.
+proc facfirstwa(poly h)
+{//proc facfirstwa
+      //Redefine the ring in my standard form
      if (!isWeyl())
      {//Our basering is not the Weyl algebra
 	  return(list());
@@ -907,6 +888,43 @@ SEE ALSO: homogfac_all, homogfac
      {//Our basering is the Weyl algebra, but not the first
 	  return(list());
      }//Our basering is the Weyl algebra, but not the first
+     if (ringlist(basering)[6][1,2] == -1) //manual of ringlist will tell you why
+     {
+	  def r = basering;
+	  ring tempRing = ringlist(r)[1][1],(x,y),Ws(-1,1);
+	  def tempRingnc = nc_algebra(1,1);
+	  setring(tempRingnc);
+	  map transf = r, var(2), var(1);
+	  list result = sfacwa(transf(h));
+	  setring(r);
+	  map transfback = tempRingnc, var(2),var(1);
+	  return(transfback(result));
+     }
+     else { return(sfacwa(h));}
+}//proc facfirstwa
+example
+{
+     "EXAMPLE:";echo=2;
+     ring R = 0,(x,y),dp;
+     def r = nc_algebra(1,1);
+     setring(r);
+     poly h = (x^2*y^2+x)*(y-1);
+     facfirstwa(h);
+}
+
+//This is the main program
+static proc sfacwa(poly h)
+"USAGE: facwa(h); h is a polynomial in the first Weyl algebra
+RETURN: list
+PURPOSE: Computes a factorization of a polynomial h in the first Weyl algebra
+THEORY: @code{homogfac} returns a list with some factorizations of the given polynomial. The possibilities of the factorization of the highest homogeneous part and those of the lowest will be merged.
+EXAMPLE: example facwa; shows examples
+SEE ALSO: homogfac_all, homogfac
+"{//proc sfacwa
+     if(homogwithorder(h,intvec(-1,1)))
+     {
+	  return(homogfac_all(h));
+     }
      def r = basering;
      map invo = basering,-var(1),var(2);
      int i; int j; int k;
@@ -1057,16 +1075,8 @@ SEE ALSO: homogfac_all, homogfac
      }//add a constant factor
      result = delete_dublicates_noteval(result);
      return(result);
-}//proc facwa
-example
-{
-     "EXAMPLE:";echo=2;
-     ring R = 0,(x,y),Ws(-1,1);
-     def r = nc_algebra(1,1);
-     setring(r);
-     poly h = (x^2*y^2+x)*x;
-     facwa(h);
-}
+}//proc sfacwa
+
 
 //==================================================
 /*Singular has no way implemented to test polynomials
@@ -1089,6 +1099,176 @@ static proc homogwithorder(poly h, intvec weights)
      }
      return(1);
 }//proc homogwithorder
+
+//==================================================
+//Testfac: Given a list with different factorizations of
+// one polynomial, the following procedure checks
+// whether they all refer to the same polynomial.
+// If they do, the output will be a list, that contains
+// the product of each factorization. If not, the empty
+// list will be returned.
+// If the optional argument # is given (i.e. the polynomial
+// which is factorized by the elements of the given list),
+// then we look, if the entries are factorizations of p
+// and if not, a list with the products subtracted by p
+// will be returned
+proc testfac(list l, list #)
+"USAGE:  - testfac(l); l is a list, that contains lists with entries in the first Weyl algebra or
+         @*- testfac(l,p); l is a list, that contains lists with entries in the first Weyl algebra and p is a polynomial in the first Weyl algebra
+RETURN: list@*
+PURPOSE: Checks whether a list of factorizations contains factorizations of the same element in the first Weyl algebra@*
+THEORY: @code{testfac} multiplies out each factorization and checks whether each factorization was a factorization of the same element.
+@* - if there is only a list given, the output will be the empty list, if it does not contain factorizations of the same element. Otherwise it will multiply out all the factorizations and return a list of the length if the given one, in which each entry is the factorized polynomial
+@* - if there is a polynomial in the second argument, then the procedure checks whether the given list contains factorizations of this polynomial. If it does, then the output will be a list with the length of the given one and each entry contains this polynomial. If it does not, then the procedure returns a list, in which each entry is the given polynomial subtracted by the multiplied candidate for its factorization.
+EXAMPLE: example testfac; shows examples
+SEE ALSO: homogfac_all, homogfac, facwa
+"{//proc testfac
+     if (size(l)==0)
+     {//The empty list is given
+	  return(list());
+     }//The empty list is given
+     if (size(#)>1)
+     {//We want max. one optional argument
+	  return(list());
+     }//We want max. one optional argument
+     list result;
+     int i; int j;
+     if (size(#)==0)
+     {//No optional argument is given
+	  int valid = 1;
+	  for (i = size(l);i>=1;i--)
+	  {//iterate over the elements of the given list
+	       if (size(result)>0)
+	       {
+		    if (product(l[i])!=result[size(l)-i])
+		    {
+			 valid = 0;
+			 break;
+		    }
+	       }
+	       result = insert(result, product(l[i]));
+	  }//iterate over the elements of the given list
+	  if (valid)
+	  {
+	       return(result);
+	  }
+	  return(list());
+     }//No optional argument is given
+     else
+     {
+	  int valid = 1;
+	  for (i = size(l);i>=1;i--)
+	  {//iterate over the elements of the given list
+	       if (product(l[i])!=#[1])
+	       {
+		    valid = 0;
+	       }
+	       result = insert(result, product(l[i]));
+	  }//iterate over the elements of the given list
+	  if (valid)
+	  {
+	       return(result);
+	  }
+	  for (i = 1 ; i<= size(result);i++)
+	  {//subtract p from every entry in result
+	       result[i] = result[i] - #[1];
+	  }//subtract p from every entry in result
+	  return(result);
+     }
+}//proc testfac
+example
+{
+     "EXAMPLE:";echo=2;
+     ring R = 0,(x,y),Ws(-1,1);
+     def r = nc_algebra(1,1);
+     setring(r);
+     poly h = (x^2*y^2+1)*(x^4);
+     def t1 = facfirstwa(h);
+     //fist a correct list
+     testfac(t1);
+     //now a correct list with the factorized polynomial
+     testfac(t1,h);
+     //now we put in an incorrect list without a polynomial
+     t1[5][3] = y;
+     testfac(t1);
+     //and last but not least we take h as additional input
+     testfac(t1,h);
+}
+//==================================================
+//Procedure facsubwa:
+//This procedure serves the purpose to compute a
+//factorization of a given polynomial in a ring, whose subring
+//is the first Weyl algebra. The polynomial must only contain
+//the two arguments, which are also given by the user.
+proc facsubwa(poly h, X, D)
+"USAGE:  facsubwa(h,x,y) - h is a polynomial in the first Weyl algebra, X and D are the variables in h, which have the commutation rule DX = XD + 1@*
+RETURN: list@*
+PURPOSE: Given a polynomial in a Ring, which contains the first Weyl algebra as a subring. Furthermore let this polynomial be in the first Weyl algebra with the variables X and D with DX = XD +1.@*
+THEORY: @code{facsubwa} computes some factorizations of the given polynomial, which is a polynomial in the variables X and D@*
+EXAMPLE: example facsubwa; shows examples
+SEE ALSO: facfirstwa
+"{//proc facsubwa
+     if(!isWeyl())
+     {
+	  return(list());
+     }
+     def r = basering;
+     //We begin to check the input
+     if (size(X)>1)
+     {
+	  return(list());
+     }
+     if (size(D)>1)
+     {
+	  return(list());
+     }
+     intvec lexpofX = leadexp(X);
+     intvec lexpofD = leadexp(D);
+     if (sum(lexpofX)!=1)
+     {
+	  return(list());
+     }
+     if (sum(lexpofD)!=1)
+     {
+	  return(list());
+     }
+     int varnumX=1;
+     int varnumD=1;
+     while(lexpofX[varnumX] != 1)
+     {
+	  varnumX++;
+     }
+     while(lexpofD[varnumD] != 1)
+     {
+	  varnumD++;
+     }
+     lexpofX = lexpofX +1;
+     lexpofX[varnumX] = 0;
+     lexpofX[varnumD] = 0;
+     if (deg(h,lexpofX)!=0)
+     {
+	  return(list());
+     }
+     //Input successfully checked
+     ring firstweyl = 0,(var(varnumX),var(varnumD)),dp;
+     def Firstweyl = nc_algebra(1,1);
+     setring Firstweyl;
+     poly h = imap(r,h);
+     list result = facfirstwa(h);
+     setring r;
+     list result = imap(Firstweyl,result);
+     return(result);
+}//proc facsubwa
+example
+{
+     "EXAMPLE:";echo=2;
+     ring R = 0,(x,y),Ws(-1,1);
+     def r = nc_algebra(1,1);
+     setring(r);
+     poly h = (x^2*y^2+x)*x;
+     facsubwa(h,x,y);
+}
+//==================================================
 /*
 Example polynomials where one can find factorizations
 (x^2+y)*(x^2+y);

@@ -5,14 +5,13 @@ info="
 LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace
 AUTHOR: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 
-THEORY: See chapter 'LETTERPLACE' in the @sc{Singular} Manual.
+OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual.
 
 PROCEDURES:
 makeLetterplaceRing(d);    creates a ring with d blocks of shifted original variables
 freeGBasis(L, n);   compute two-sided Groebner basis of ideal, encoded via L, up to degree n
 setLetterplaceAttributes(R,d,b);  supplies ring R with the letterplace structure
 
-AUXILIARY PROCEDURES:
 
 lpMult(f,g);        letterplace multiplication of letterplace polynomials
 shiftPoly(p,i);    compute the i-th shift of letterplace polynomial p
@@ -27,8 +26,8 @@ fullSerreRelations(A,N,C,P,d); compute the ideal of all Serre's relations associ
 isVar(p);                   check whether p is a power of a single variable
 ademRelations(i,j);    compute the ideal of Adem relations for i<2j in char 0
 
-SEE ALSO: LETTERPLACE
-"
+SEE ALSO: fpadim_lib, Letterplace
+";
 
 // this library computes two-sided GB of an ideal
 // in a free associative algebra
@@ -906,7 +905,7 @@ proc makeLetterplaceRing(int d, list #)
 "USAGE:  makeLetterplaceRing(d [,h]); d an integer, h an optional integer
 RETURN:  ring
 PURPOSE: creates a ring with the ordering, used in letterplace computations
-NOTE: if h is given an nonzero, the pure homogeneous letterplace block ordering will be used.
+NOTE: if h is given and nonzero, the pure homogeneous letterplace block ordering will be used.
 EXAMPLE: example makeLetterplaceRing; shows examples
 "
 {
@@ -1135,6 +1134,117 @@ example
   attrib(A,"uptodeg");  // degree bound
   attrib(A,"lV"); // number of variables in the main block
 }
+
+
+proc makeLetterplaceRing3(int d)
+"USAGE:  makeLetterplaceRing1(d); d an integer
+RETURN:  ring
+PURPOSE: creates a ring with a special ordering, representing
+@* the original P[s,sigma] (adds d blocks of shifted s)
+ASSUME: basering is a letterplace ring as well
+NOTE: experimental status
+EXAMPLE: example makeLetterplaceRing1; shows examples
+"
+{
+  // d = up to degree, will be shifted to d+1
+  if (d<1) {"bad d"; return(0);}
+
+  int uptodeg = d; int lV = nvars(basering);
+
+  int ppl = printlevel-voice+2;
+  string err = "";
+
+  int i,j,s;
+  def save = basering;
+  int D = d-1;
+  list LR  = ringlist(save);
+  list L, tmp;
+  L[1] = LR[1]; // ground field
+  L[4] = LR[4]; // quotient ideal
+  tmp  = LR[2]; // varnames
+  tmp[size(tmp)+1] = "s";
+  // add s's
+  //  string newSname = "@s";
+  s = size(LR[2]);
+  for (i=1; i<=D; i++)
+  {
+    for (j=1; j<=s; j++)
+    {
+      tmp[i*s+j] = string(tmp[j])+"("+string(i+1)+")";
+    }
+  }
+  // the final index is D*s+s = (D+1)*s = degBound*s
+  for (i=1; i<=d; i++)
+  {
+    tmp[FIndex + i] =  string(newSname)+"("+string(i)+")";
+  }
+  L[2] = tmp;
+  list OrigNames = LR[2];
+  // ordering: d blocks of the MODIFIED ord on r
+  // try to get whether the ord on r is blockord itself
+  // TODO: make L(2) ordering! exponent is maximally 2
+  s = size(LR[3]);
+
+  // assume: basering was a letterplace, so get its block
+  tmp = LR[3][1]; // ASSUME: it's a nice block
+  // modify it
+  // add (0,..,0,1) ... as antiblock part
+  intvec iv; list ttmp, tmp1;
+  for (i=1; i<=d; i++)
+  {
+    // the position to hold 1: 
+    iv = intvec( gen( i*(lV+1)-1 ) );
+    ttmp[1] = "a";
+    ttmp[2] = iv;
+    tmp1[i] = ttmp;
+  }
+  // finished: antiblock part //TOCONTINUE
+
+  if (s==2)
+  {
+    // not a blockord, 1 block + module ord
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      LR[3][s-1+i] = LR[3][1];
+    }
+    LR[3][s+D] = tmp;
+  }
+  if (s>2)
+  {
+    // there are s-1 blocks
+    int nb = s-1;
+    tmp = LR[3][s]; // module ord
+    for (i=1; i<=D; i++)
+    {
+      for (j=1; j<=nb; j++)
+      {
+        LR[3][i*nb+j] = LR[3][j];
+      }
+    }
+    //    size(LR[3]);
+    LR[3][nb*(D+1)+1] = tmp;
+  }
+  L[3] = LR[3];
+  def @R = ring(L);
+  //  setring @R;
+  //  int uptodeg = d; int lV = nvars(basering); // were defined before
+  def @@R = setLetterplaceAttributes(@R,uptodeg,lV);
+  return (@@R);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y,z),(dp(1),dp(2));
+  def A = makeLetterplaceRing3(2);
+  setring A;
+  A;
+  attrib(A,"isLetterplaceRing");
+  attrib(A,"uptodeg");  // degree bound
+  attrib(A,"lV"); // number of variables in the main block
+}
+
+
 
 /* EXAMPLES:
 
