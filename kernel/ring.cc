@@ -428,7 +428,7 @@ void rWrite(ring r)
       }
     }
     else PrintS(" ...");
-#ifdef PDEBUG
+#if 0  /*Singularg should not differ from Singular except in error case*/
     Print("\n//   noncommutative type:%d", (int)ncRingType(r));
     Print("\n//      is skew constant:%d",r->GetNC()->IsSkewConstant);
     if( rIsSCA(r) )

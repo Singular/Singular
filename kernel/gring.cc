@@ -2852,7 +2852,7 @@ BOOLEAN gnc_CheckOrdCondition(matrix D, ring r)
     if (p_LmCmp(q,p,r) != 1) /* i.e. lm(p)==xy < lm(q)==D_ij  */
     {
       Werror("Bad ordering at %d,%d\n",i,j);
-#ifdef PDEBUG
+#if 0 /*Singularg should not differ from Singular except in error case*/
       p_Write(p,r);
       p_Write(q,r);
 #endif
