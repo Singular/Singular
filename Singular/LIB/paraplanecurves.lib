@@ -9,7 +9,7 @@ AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
           S. Laplagne, slaplagn@dm.uba.ar @*
           F. Seelisch, seelisch@mathematik.uni-kl.de
 
-OVERVIEW: 
+OVERVIEW:
 
 A library for computing rational parametrizations of rational plane curves
 defined over Q. @*
@@ -25,16 +25,16 @@ adjointIdeal, C satisfies: @*
 Considering C in the chart z<>0, the algorithm regards x as transcendental
 and y as algebraic and computes an integral basis in C(x)[y] of the integral
 closure of C[x] in C(x,y) using the  normalization algorithm from
-@ref normal.lib: see @ref intbasis.lib. In a future edition of the library,
+@ref normal.lib: see @ref integralbasis.lib. In a future edition of the library,
 also van Hoeij's algorithm for computing the integral basis will be
 available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
-does not correspond to ordinary multiple points or cusps, the integral 
+does not correspond to ordinary multiple points or cusps, the integral
 basis algorithm is applied separately. The ordinary multiple points and
-cusps, in turn, are adressed by a straightforward direct algorithm. The 
-adjoint ideal is obtained by intersecting all ideals obtained locally. 
+cusps, in turn, are adressed by a straightforward direct algorithm. The
+adjoint ideal is obtained by intersecting all ideals obtained locally.
 The local variant of the algorithm is used by default. @*
 The linear system corresponding to the adjoint ideal maps the curve
 birationally to a rational normal curve in P^(n-2). @*
@@ -61,7 +61,7 @@ Mark van Hoeij: An Algorithm for Computing an Integral Basis in an Algebraic
 Function Field, Journal of Symbolic Computation 18 (1994), p. 353-363,
 http://www.math.fsu.edu/~hoeij/papers/comments/jsc1994.html
 
-KEYWORDS: 
+KEYWORDS:
 Curves; Parametrization; Rational curves; Adjoint ideal; Geometric genus
 
 
@@ -84,9 +84,9 @@ rncItProjEven(ideal);             Map a RNC via successive anticanonical maps
                                   to a conic in PP2
 paraConic(poly);                  Compute a rational parametrization of a conic
 testParametrization(poly,ring);   Checks whether a given curve is parametrized
-                                  by a given rational map (defined in the 
+                                  by a given rational map (defined in the
                                   given ring)
-testPointConic(poly,ring);        Checks whether a given point (defined in the 
+testPointConic(poly,ring);        Checks whether a given point (defined in the
                                   given ring) lies on the given conic.
 ";
 
@@ -97,7 +97,7 @@ LIB "absfact.lib";
 LIB "matrix.lib";
 LIB "random.lib";
 LIB "homolog.lib";
-LIB "intbasis.lib";
+LIB "integralbasis.lib";
 LIB "normal.lib";
 
 
@@ -110,8 +110,8 @@ ASSUME: The ideal phi in the basering R represents a birational map of the
 NOTE:   The procedure might fail or give a wrong output if phi does
         not define a birational map.
 RETURN: ring, the coordinate ring of P, with an ideal
-        named J and an ideal named psi. 
-@format The ideal J defines the image of phi.@* 
+        named J and an ideal named psi.
+@format The ideal J defines the image of phi.@*
         The ideal psi gives the inverse of phi.@*
         Note that the entries of psi should be considered as representatives
         of classes in the quotient ring R/J.@*
@@ -126,18 +126,18 @@ EXAMPLE: example invertBirMap; shows an example
 {
    def Roriginal = basering;
    int n = nvars(Roriginal);
-   int m = size(phi);    
+   int m = size(phi);
    /*phi: P^(n-1) --> P^(m-1)*/
    list rl = ringlist(Roriginal);
    int k;
    for(k = 1; k <= n; k++)
      {
-        rl[2][k] = "x("+string(k)+")";     
-     }   
+        rl[2][k] = "x("+string(k)+")";
+     }
    for(k = 1; k <= m; k++)
      {
-        rl[2][k+n] = "y("+string(k)+")";     
-     } 
+        rl[2][k+n] = "y("+string(k)+")";
+     }
    rl[3]= list(list("dp",1:(n+m)),list("C",0));
    /*Use Hilbert driven Buchberger*/
    def Rbig0 = ring(rl);
@@ -152,25 +152,25 @@ EXAMPLE: example invertBirMap; shows an example
    graph = sat(graph,xv)[1];
    intvec Hgraph = hilb(graph,1);
    setring Roriginal;
-   rl[3]= list(list("dp",1:n),list("dp",1:m),list("C",0)); 
+   rl[3]= list(list("dp",1:n),list("dp",1:m),list("C",0));
    def Rbig = ring(rl);
    setring Rbig;
    ideal graph = imap(Rbig0,graph);
-   graph = std(graph,Hgraph); 
+   graph = std(graph,Hgraph);
    ideal xv = imap(Rbig0,xv);
    /*The ideal J defines the image of phi*/
    ideal J = graph;
    for(k = 1; k <= n; k++)
      {
-        J = subst(J,xv[k],0);     
-     } 
+        J = subst(J,xv[k],0);
+     }
    J = compress(J);
    /*now we start inverting phi to psi*/
    matrix relpsi = diff(xv,graph);
    for(k = 1; k <= n; k++)
      {
-        relpsi = subst(relpsi,xv[k],0);     
-     } 
+        relpsi = subst(relpsi,xv[k],0);
+     }
     relpsi = compress(relpsi);
     list rl = ringlist(Rbig);
     list rl2 = rl[2];
@@ -209,13 +209,13 @@ example
 static proc checkAssumptions(poly f)
 "USAGE:  checkAssumptions(f); f poly
 RETURN:  1 if assumptions are satisfied, 0 otherwise.@*
-         Assumptions checked are: basering is polynomial ring in 3 variables 
+         Assumptions checked are: basering is polynomial ring in 3 variables
          with coefficients in Q, f is homogeneous and absolutely irreducible
 "
 {
   def Roriginal = basering;
   list rl = ringlist(Roriginal);
-  rl[3] = list(list("dp",1:3),list("C",0));  
+  rl[3] = list(list("dp",1:3),list("C",0));
   if(size(rl[1])>1){ERROR("ground field is not Q");}
   if(rl[1]!=0){ERROR("ground field is not Q");}
   if(nvars(Roriginal)!=3)
@@ -223,16 +223,16 @@ RETURN:  1 if assumptions are satisfied, 0 otherwise.@*
   if(homog(f)==0)
   { ERROR("not a projective plane curve: polynomial is not homogeneous"); }
   def RP2 = ring(rl);
-  setring RP2;   
+  setring RP2;
   poly f = fetch(Roriginal,f);
-  if(isIrreducible(f)==0){ERROR("curve is not absolutely irreducible");} 
+  if(isIrreducible(f)==0){ERROR("curve is not absolutely irreducible");}
   setring Roriginal;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 proc paraPlaneCurve(poly f, list #)
 "USAGE:  paraPlaneCurve(f [,c]); f poly , c optional integer@*
-         optional integer c can be: @*        
+         optional integer c can be: @*
          1: compute integral basis via normalization. @*
          2: make local analysis of singularities first and apply normalization
             separately. @*
@@ -257,10 +257,10 @@ algorithm for computing the integral basis will be available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
-does not correspond to ordinary multiple points or cusps, the integral 
+does not correspond to ordinary multiple points or cusps, the integral
 basis algorithm is applied separately. The ordinary multiple points and
-cusps, in turn, are adressed by a straightforward direct algorithm. The 
-adjoint ideal is obtained by intersecting all ideals obtained locally. 
+cusps, in turn, are adressed by a straightforward direct algorithm. The
+adjoint ideal is obtained by intersecting all ideals obtained locally.
 The local variant of the algorithm is used by default. @*
 The linear system corresponding to the adjoint ideal maps the curve
 birationally to a rational normal curve in P^(n-2). @*
@@ -274,16 +274,16 @@ C is obtained (defined over Q or the quadratic field extension).
 KEYWORDS: rational curves, rational parametrization of rational curves.
 EXAMPLE:  example paraPlaneCurve; shows an example
 "
-{ 
-  if(size(#)==0) {int choice = 2;} else {int choice = #[1];} 
-  def Roriginal = basering;  
+{
+  if(size(#)==0) {int choice = 2;} else {int choice = #[1];}
+  def Roriginal = basering;
   /*checking assumptions and handling the conic case*/
   checkAssumptions(f);
   list rl = ringlist(Roriginal);
   rl[2] = list("x","y","z");
   rl[3] = list(list("dp",1:3),list("C",0));
   def RP2 = ring(rl);
-  setring RP2;   
+  setring RP2;
   poly f = fetch(Roriginal,f);
   int d = deg(f);
   if(d==2)
@@ -297,10 +297,10 @@ EXAMPLE:  example paraPlaneCurve; shows an example
       "// you may access the ideal by typing";
       "//      setring RP1; PARA;";
       return(RP1);
-    } 
+    }
   int k;
-  /*the adjoint ideal*/ 
-  ideal AI = adjointIdeal(f,list(choice,"rattestyes/firstchecksdone"));  
+  /*the adjoint ideal*/
+  ideal AI = adjointIdeal(f,list(choice,"rattestyes/firstchecksdone"));
   /*rattestyes -> causes error message if curve is not rational*/
   /*firstchecksdone -> prevents that check of assumptions will be done again*/
   /*mapping the curve to a rational normal curve V(RNC) in Proj(Rrnc) via AI*/
@@ -319,7 +319,7 @@ EXAMPLE:  example paraPlaneCurve; shows an example
       ideal PROJ = imap(Rrnc,PHI);
       for(k = 1; k <= m; k++)
         {
-          PROJ = subst(PROJ,var(k),AI[k]);     
+          PROJ = subst(PROJ,var(k),AI[k]);
         }
       setring RP2;
       ideal If = ideal(fetch(Roriginal,f));
@@ -338,12 +338,12 @@ EXAMPLE:  example paraPlaneCurve; shows an example
       "// you may access the ideal by typing";
       "//      setring RP1; PARA;";
       return(RP1);
-    } 
+    }
   /*the even dimensional case*/
   /*mapping the rational normal curve to a CONIC in P^2* creating PHI*/
   def RP2conic = rncItProjEven(RNC);  // exports PHI, returns ring
                                       // containing CONIC
-  setring RP2conic; 
+  setring RP2conic;
   /*mapping the conic to P^1 via pencil defined by Ipoint*/
   def RP2conicNew = projConic(CONIC);  // ring containing ideal Ipoint
                                // possibly defined over algebraic number field
@@ -355,18 +355,18 @@ EXAMPLE:  example paraPlaneCurve; shows an example
   ideal PROJ = imap(RP2conicNew,Ipoint);
   for(k = 1; k <= 3; k++)
     {
-      PROJ = subst(PROJ,var(k),PHI[k]);     
-    }    
+      PROJ = subst(PROJ,var(k),PHI[k]);
+    }
   ideal AI = fetch(RP2,AI);
   for(k = 1; k <= m; k++)
     {
-       PROJ = subst(PROJ,var(k+3),AI[k]);     
+       PROJ = subst(PROJ,var(k+3),AI[k]);
     }
   setring RP2conicNew;
   ideal If = ideal(fetch(Roriginal,f));
   ideal PROJ = imap(Rbig,PROJ);
   /*inverting the composed map to psi*/
-  def rp1 = invertBirMap(PROJ,If); // (ring, (J,psi)) 
+  def rp1 = invertBirMap(PROJ,If); // (ring, (J,psi))
   setring rp1;
   list rl1 = ringlist(rp1);
   rl1[2] = list("s","t");
@@ -393,7 +393,7 @@ example
   f2 = f2+36x2z4+36xyz4+9y2z4;
   def Rp2 = paraPlaneCurve(f2);
   setring Rp2;
-  PARA;  
+  PARA;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -401,7 +401,7 @@ static proc findCoordChange(poly f, ideal JAC)
 "USAGE:  findCoordChange(f, JAC); f poly, JAC ideal.
 ASSUME:  The polynomial f is homogeneous in three variables, JAC is
          the Jacobi ideal of f.
-RETURN:  intvec, say a,b,c. After the coordinate change 
+RETURN:  intvec, say a,b,c. After the coordinate change
          var(3) --> a*var(1)+b*var(2)+c*var(3), the curve {f=0}
          has no singularities at infinity {var(3)=0}.
 "
@@ -420,7 +420,7 @@ RETURN:  intvec, say a,b,c. After the coordinate change
                 a = h-b-c;
                 Jfinfty = JAC,a*var(1)+b*var(2)+c*var(3);
                 if(dim(std(Jfinfty)) == 0)
-                  {                  
+                  {
                     return(a,b,c);
                   }
                 b = b+1;
@@ -428,7 +428,7 @@ RETURN:  intvec, say a,b,c. After the coordinate change
             c = c+1;
           }
        h = h+1;
-    }  
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -458,15 +458,15 @@ van Hoeij's algorithm for computing the integral basis will be available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
-does not correspond to ordinary multiple points or cusps, the integral 
+does not correspond to ordinary multiple points or cusps, the integral
 basis algorithm is applied separately. The ordinary multiple points and
-cusps, in turn, are adressed by a straightforward direct algorithm. The 
-adjoint ideal is obtained by intersecting all ideals obtained locally. 
+cusps, in turn, are adressed by a straightforward direct algorithm. The
+adjoint ideal is obtained by intersecting all ideals obtained locally.
 The local variant of the algorithm is used by default. @*
 KEYWORDS: integral basis; normalization.
 EXAMPLE: example adjointIdeal; shows an example
 "
-{ 
+{
   list choices = #;
   if(size(#)==0)
     {
@@ -490,14 +490,14 @@ EXAMPLE: example adjointIdeal; shows an example
              {
                choices = list(2, choices[1]);
              }
-        }   
-    } 
+        }
+    }
   if(size(#) == 2)
-    {      
+    {
       if(not(find(choices[2],"firstchecksdone")))
         {
           checkAssumptions(f);
-        }  
+        }
     }
   ideal JAC = diff(maxideal(1),ideal(f));
   ideal Jfinfty = JAC,var(3);
@@ -506,25 +506,25 @@ EXAMPLE: example adjointIdeal; shows an example
   if(dim(std(Jfinfty)) >= 1)
     {
        bb1 = 1;
-       int a,b,c  = findCoordChange(f,JAC); 
-       f = subst(f,var(3),var(3)-a/c*var(1)-b/c*var(2));       
+       int a,b,c  = findCoordChange(f,JAC);
+       f = subst(f,var(3),var(3)-a/c*var(1)-b/c*var(2));
     }
   /*applying a change of coordinates if the point (0:1:0) lies on the curve*/
   matrix co = coeffs(f,var(2));
   int bb2 = ((size(co)-1) != deg(f));
   if(bb2)
-    {   
+    {
        co = coeffs(f,var(1));
        int bb2x = ((size(co)-1) == deg(f));
-       if(bb2x) 
+       if(bb2x)
          {
            map perm = basering, var(2), var(1), var(3);
            f = perm(f);
          }
        else
          {
-           f = subst(f,var(1),var(1)+var(2));  
-         }            
+           f = subst(f,var(1),var(1)+var(2));
+         }
     }
   co = coeffs(f,var(2));
   f = f/co[size(co),1];
@@ -533,16 +533,16 @@ EXAMPLE: example adjointIdeal; shows an example
   /*reversing the changes of coordinates if needed*/
   if(bb2)
     {
-       if(bb2x) 
+       if(bb2x)
          {
            map perm = basering, var(2), var(1), var(3);
            AI = mstd(perm(AI))[2];
          }
        else
          {
-           AI = mstd(substitute(AI,var(1),var(1)-var(2)))[2]; 
-         }             
-      
+           AI = mstd(substitute(AI,var(1),var(1)-var(2)))[2];
+         }
+
     }
   if(bb1==1)
    {
@@ -566,7 +566,7 @@ static proc adjointIdealAtWork(poly f, list choices)
          1: compute integral basis via normalization. @*
          2: make local analysis of singularities first and apply normalization
             separately. @*
-         The default is 2. @*       
+         The default is 2. @*
          string  may contain substring: @*
          - rattestyes -> causes error message if curve is not rational. @*
 ASSUME:  The basering must be a polynomial ring in three variables, say x,y,z,
@@ -575,15 +575,15 @@ ASSUME:  The basering must be a polynomial ring in three variables, say x,y,z,
          Its dehomogenization with respect to the third variable must be monic
          as a polynomial in the second variable (that is, C does not contain
          the point (0:1:0)).@*
-         The curve C is not allowed to have singularities 
+         The curve C is not allowed to have singularities
          at infinity (z = 0). @*
 RETURN:  ideal, the adjoint ideal of the curve defined by f.
 "
-{ 
-  def Roriginal = basering;  
+{
+  def Roriginal = basering;
   list rl = ringlist(Roriginal);
   rl[3] = list(list("dp",1:nvars(Roriginal)),list("C",0));
-  def RP2 = ring(rl);   
+  def RP2 = ring(rl);
   setring RP2;
   poly f = imap(Roriginal,f);
   poly dhf = subst(f,var(3),1);
@@ -647,16 +647,16 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
        {
          A(OMP[k][1]) = intersect(A(OMP[k][1]), OMP[k][2]);
        }
-     int i = ub;  
+     int i = ub;
      setring RP2;
      B = maxideal(n-i);
      B = subst(B,var(3),1);
      B[1] = 0;
      setring Rdummy;
      B = imap(RP2,B);
-     ideal A; 
+     ideal A;
      while(i>=lb)
-        {  
+        {
           A = A(i)**(i-1);
           B = intersect(B,A);
           i = i-1;
@@ -684,15 +684,15 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
           SL = sat(SL, A(k))[1];
         }
     }
-  list PD = primdecGTZ(SL);  // could be made faster -- see minAssGTZ 
+  list PD = primdecGTZ(SL);  // could be made faster -- see minAssGTZ
                              // in deltaLocMod -- only one PD needed
   int pd = size(PD);
   setring RP2;
   B = imap(Rdummy,B);
-  list PD = imap(Rdummy,PD); 
+  list PD = imap(Rdummy,PD);
   ideal AI = 1;
   for(k=1;k<=pd;k++)
-    {  
+    {
        AI = intersect(AI,adjointIdealIB(f,insert(choices,PD[k][1],
                                                  size(choices))));
     }
@@ -706,7 +706,7 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc adjointIdealIB(poly f, list choices)
-"USAGE:  adjointIdealIB(f, choices); f polynomial in three variables, choices 
+"USAGE:  adjointIdealIB(f, choices); f polynomial in three variables, choices
          list consisting of one integer followed by one string followed by one
          ideal. @*
          integer can be: @*
@@ -718,14 +718,14 @@ static proc adjointIdealIB(poly f, list choices)
 ASSUME:  The basering must be a polynomial ring in three variables, say x,y,z,
          with coefficients in Q. @*
          The polynomial f must be homogeneous and absolutely irreducible.@*
-         Its dehomogenization with respect to the third variable must be monic 
-         as a polynomial in the second variable (that is, C does not contain 
+         Its dehomogenization with respect to the third variable must be monic
+         as a polynomial in the second variable (that is, C does not contain
          the point (0:1:0)).@*
-         The curve C is not allowed to have singularities 
+         The curve C is not allowed to have singularities
          at infinity (z = 0). @*
 RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
 "
-{ 
+{
   poly dhf = subst(f,var(3),1);
   def Roriginal = basering;
   list rl = ringlist(Roriginal);
@@ -742,7 +742,7 @@ RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
   rl[3] = list(list("lp",1:2),list("C",0));
   def Rred = ring(rl);   // make var(2) > var(1)
   rl = ringlist(Rdummy);
-  rl[1] = list(0,list(var(1)),list(list("dp",1)),ideal(0)); 
+  rl[1] = list(0,list(var(1)),list(list("dp",1)),ideal(0));
   rl[2] = list(var(2));
   rl[3] = list(list("dp",1),list("C",0));
   def QF = ring(rl);   // make var(1) transcendental
@@ -750,16 +750,16 @@ RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
   if((DATA[1] == 1) || (DATA[1] == 2))  // use normalization algorithm
     {
       LIntB = integralBasis(f, 2, list(list("inputC", DATA[3]),"isIrred"));
-    }  
+    }
   else                                 // use van Hoeij's algorithm
-    {      
+    {
       LIntB = integralBasisVH(f,DATA[3],2);  // van Hoeij in future version
     }
   if(find(DATA[2],"rattestyes") && (DATA[3]==0))
     {
       setring Roriginal;
       int gg = geomGenusIB(f,imap(Rdummy, LIntB));
-      if(gg!=0){ERROR("not a rational curve");}  
+      if(gg!=0){ERROR("not a rational curve");}
       setring Rdummy;
     }
   int i,j,k,l;
@@ -775,8 +775,8 @@ RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
   matrix M = imap(Rred,M);
   poly d = imap(Rdummy,d);
   M=1/d*M;
-  list LUM = ludecomp(M); 
-  list LS;  
+  list LUM = ludecomp(M);
+  list LS;
   matrix dummyvector[sL][1];
   matrix Gij[sL][sL];
   matrix Tr[sL][sL];
@@ -787,34 +787,34 @@ RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
   for(i = 1; i <= sL; i++)
      {
        for(j = i; j <= sL; j++)
-          {   
+          {
             setring Rred;
-            Gij = 0;       
-            eiej = IB[i]*IB[j]; 
+            Gij = 0;
+            eiej = IB[i]*IB[j];
             Iij=empty;
             for(k = 1; k <= sL; k++)
                {
                   Iij[k] = reduce(eiej*IB[k],fred);
-               } 
-            Gij = coeffs(ideal(Iij[1..sL]),var(1)); 
+               }
+            Gij = coeffs(ideal(Iij[1..sL]),var(1));
             setring QF;
-            Gij = imap (Rred, Gij);  
-            for(k = 1; k <= sL; k++) 
+            Gij = imap (Rred, Gij);
+            for(k = 1; k <= sL; k++)
                {
                   dummyvector = Gij[1..sL,k];
-                  LS = lusolve(LUM[1], LUM[2], LUM[3], dummyvector);                    
+                  LS = lusolve(LUM[1], LUM[2], LUM[3], dummyvector);
                   Tr[i,j] = Tr[i,j] + 1/d^3*LS[2][k,1];
-               }                
+               }
           }
      }
   for(i = 1; i <= sL; i++)
      {
        for(j = 1; j < i; j++)
-          {  
+          {
              Tr[i,j] = Tr[j,i];
-          }  
-     } 
-  LUM = ludecomp(Tr); 
+          }
+     }
+  LUM = ludecomp(Tr);
   setring Rred;
   poly d2f = imap(Rdummy,d2f);
   IB = d2f*IB;
@@ -839,28 +839,28 @@ ASSUME:  The polynomial f is homogeneous in three variables and absolutely
 RETURN:  ring with an ideal RNC.
 EXAMPLE: example mapToRatNormCurve; shows an example
 "
-{ 
+{
    int n = size(AI);
    int k;
    //if(n!=deg(f)-1){ERROR("not a rational curve");}
    def Roriginal = basering;
    ideal IC = f;
-   list rl = ringlist(Roriginal);    
+   list rl = ringlist(Roriginal);
    /* begin workaround elimination*/
    for(k = 1; k <= 3; k++)
      {
-        rl[2][k] = "x("+string(k)+")";     
-     }   
+        rl[2][k] = "x("+string(k)+")";
+     }
    for(k = 1; k <= n; k++)
      {
-        rl[2][k+3] = "y("+string(k)+")";     
-     } 
+        rl[2][k+3] = "y("+string(k)+")";
+     }
    rl[3]= list(list("dp",1:(3+n)),list("C",0));
    def Relim = ring(rl);
    setring Relim;
    ideal IC = fetch(Roriginal,IC);
    ideal AI = fetch(Roriginal,AI);
-   ideal J;  
+   ideal J;
    J = IC;
    for(k=1;k<=n;k++)
      {
@@ -898,24 +898,24 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc rncAntiCanonicalMap(ideal I)
-"USAGE:  rncAntiCanonicalMap(I); I ideal 
+"USAGE:  rncAntiCanonicalMap(I); I ideal
 ASSUME:  I is a homogeneous ideal in the basering
          defining a rational normal curve C in PP^n.
-NOTE:   The procedure will fail or give a wrong output if I is not the 
+NOTE:   The procedure will fail or give a wrong output if I is not the
         ideal of a rational normal curve.
 RETURN:  ideal defining the anticanonical map  C --> PP^(n-2). @*
-         Note that the entries of the ideal should be considered as 
+         Note that the entries of the ideal should be considered as
          representatives of elements in R/I, where R is the basering.
-THEORY:  The anti-canonical map of a rational normal curve 
+THEORY:  The anti-canonical map of a rational normal curve
          maps C isomorpically to a rational normal curve in PP^(n-2).
 KEYWORDS: rational normal curve, projection.
 EXAMPLE: example rncAntiCanonicalMap; shows an example
 "
-{ 
+{
   def Roriginal = basering;
   list rl = ringlist(Roriginal);
   rl[3] = list(list("dp",1:nvars(Roriginal)),list("C",0));
-  def RoriginalDP = ring(rl); 
+  def RoriginalDP = ring(rl);
   setring RoriginalDP;
   ideal I = imap(Roriginal,I);
   int cc = nvars(RoriginalDP)-2;
@@ -942,36 +942,36 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc rncItProjOdd(ideal I)
-"USAGE:  rncItProjOdd(I); I ideal 
+"USAGE:  rncItProjOdd(I); I ideal
 ASSUME:  I is a homogeneous ideal in the basering
          with n+1 variables defining a rational normal curve C in PP^n with n
          odd.
 NOTE:    The procedure will fail or give a wrong output if I is not the
          ideal of a rational normal curve. It will test whether n is odd.
 RETURN:  ideal PHI defining an isomorphic projection of C to PP^1.@*
-         Note that the entries of PHI should be considered as 
+         Note that the entries of PHI should be considered as
          representatives of elements in R/I, where R is the basering.
 THEORY:  We iterate the procedure @ref rncAntiCanonicalMap to obtain PHI.
 KEYWORDS: rational normal curve, projection.
 SEE ALSO: rncItProjEven.
 EXAMPLE: example rncItProjOdd; shows an example
 "
-{ 
+{
   int n = nvars(basering);
   if((n mod 2) == 1){ERROR("Pn has even dimension");}
-  def Roriginal = basering; 
+  def Roriginal = basering;
   list rlo = ringlist(Roriginal);
   rlo[3]= list(list("dp",1:n),list("C",0));
   int k;
   for(k = 1; k <= n; k++)
     {
-      rlo[2][k] = "z("+string(k)+")";     
-    } 
+      rlo[2][k] = "z("+string(k)+")";
+    }
   def RoriginalCopy = ring(rlo);
   for(k = 1; k <= n; k++)
     {
-      rlo[2][k] = "y("+string(k)+")";     
-    } 
+      rlo[2][k] = "y("+string(k)+")";
+    }
   def Rold = ring(rlo);
   setring RoriginalCopy;
   ideal PHI  = maxideal(1);
@@ -983,7 +983,7 @@ EXAMPLE: example rncItProjOdd; shows an example
   def Relim;
   intvec HJJ;
   while(n>2)
-     {       
+     {
         ideal PR = rncAntiCanonicalMap(J);
         list rl = ringlist(Rold);
         Rbig = Rold + RoriginalCopy;
@@ -992,20 +992,20 @@ EXAMPLE: example rncItProjOdd; shows an example
         ideal dummy = imap(Rold,PR);
         for(k = 1; k <= n; k++)
           {
-             dummy = subst(dummy,var(k),PHI[k]);     
-          } 
+             dummy = subst(dummy,var(k),PHI[k]);
+          }
         setring RoriginalCopy;
         PHI = imap(Rbig,dummy);
         /* begin workaround elimination*/
         setring Rold;
         for(k = 1; k <= n; k++)
           {
-            rl[2][k] = "x("+string(k)+")";     
-          }   
+            rl[2][k] = "x("+string(k)+")";
+          }
         for(k = 1; k <= n-2; k++)
           {
-            rl[2][k+n] = "y("+string(k)+")";     
-          } 
+            rl[2][k+n] = "y("+string(k)+")";
+          }
         rl[3]= list(list("dp",1:(2*n-2)),list("C",0));
         Relim = ring(rl);
         setring Relim;
@@ -1015,8 +1015,8 @@ EXAMPLE: example rncItProjOdd; shows an example
         poly pvar=1;
         for(k = 1; k <= n; k++)
           {
-            pvar = pvar*var(k);     
-          }   
+            pvar = pvar*var(k);
+          }
         for(k=1;k<=n-2;k++)
           {
             JJ=JJ,var(k+n)-PR[k];
@@ -1057,38 +1057,38 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 proc rncItProjEven(ideal I)
-"USAGE:  rncItProjEven(I); I ideal 
+"USAGE:  rncItProjEven(I); I ideal
 ASSUME:  I is a homogeneous ideal in the basering
          with n+1 variables defining a rational normal curve C in PP^n with n
          even.
-NOTE:    The procedure will fail or give a wrong output if I is not the 
+NOTE:    The procedure will fail or give a wrong output if I is not the
          ideal of a rational normal curve. It will test whether n is odd.
 RETURN:  ring with an ideal CONIC defining a conic C2 in PP^2. In addition,
          an ideal PHI in the basering defining an isomorphic projection
          of C to C2 will be exported.@*
-         Note that the entries of PHI should be considered as 
+         Note that the entries of PHI should be considered as
          representatives of elements in R/I, where R is the basering.
 THEORY:  We iterate the procedure @ref rncAntiCanonicalMap to obtain PHI.
 KEYWORDS: rational normal curve, projection.
 SEE ALSO: rncItProjOdd.
 EXAMPLE: example rncItProjEven; shows an example
 "
-{ 
+{
   int n = nvars(basering);
   if((n mod 2) == 0){ERROR("Pn has odd dimension");}
-  def Roriginal = basering; 
+  def Roriginal = basering;
   list rlo = ringlist(Roriginal);
   rlo[3]= list(list("dp",1:n),list("C",0));
   int k;
   for(k = 1; k <= n; k++)
     {
-      rlo[2][k] = "z("+string(k)+")";     
-    } 
+      rlo[2][k] = "z("+string(k)+")";
+    }
   def RoriginalCopy = ring(rlo);
   for(k = 1; k <= n; k++)
     {
-      rlo[2][k] = "y("+string(k)+")";     
-    } 
+      rlo[2][k] = "y("+string(k)+")";
+    }
   def Rold = ring(rlo);
   setring RoriginalCopy;
   ideal PHI  = maxideal(1);
@@ -1100,7 +1100,7 @@ EXAMPLE: example rncItProjEven; shows an example
   def Relim;
   intvec HJJ;
   while(n>3)
-     {       
+     {
         ideal PR = rncAntiCanonicalMap(J);
         list rl = ringlist(Rold);
         Rbig = Rold + RoriginalCopy;
@@ -1109,20 +1109,20 @@ EXAMPLE: example rncItProjEven; shows an example
         ideal dummy = imap(Rold,PR);
         for(k = 1; k <= n; k++)
           {
-             dummy = subst(dummy,var(k),PHI[k]);     
-          } 
+             dummy = subst(dummy,var(k),PHI[k]);
+          }
         setring RoriginalCopy;
         PHI = imap(Rbig,dummy);
         /* begin workaround elimination*/
         setring Rold;
         for(k = 1; k <= n; k++)
           {
-            rl[2][k] = "x("+string(k)+")";     
-          }   
+            rl[2][k] = "x("+string(k)+")";
+          }
         for(k = 1; k <= n-2; k++)
           {
-            rl[2][k+n] = "y("+string(k)+")";     
-          } 
+            rl[2][k+n] = "y("+string(k)+")";
+          }
         rl[3]= list(list("dp",1:(2*n-2)),list("C",0));
         Relim = ring(rl);
         setring Relim;
@@ -1132,8 +1132,8 @@ EXAMPLE: example rncItProjEven; shows an example
         poly pvar=1;
         for(k = 1; k <= n; k++)
           {
-            pvar = pvar*var(k);     
-          }   
+            pvar = pvar*var(k);
+          }
         for(k=1;k<=n-2;k++)
           {
             JJ=JJ,var(k+n)-PR[k];
@@ -1151,7 +1151,7 @@ EXAMPLE: example rncItProjEven; shows an example
         /* end workaround elimination*/
         Rold = Rnew;
         setring Rold;
-        n = n-2;  
+        n = n-2;
      }
   poly CONIC = J[1];
   export(CONIC);
@@ -1182,10 +1182,10 @@ static proc geomGenusIB(poly f, list #)
 ASSUME:  The basering must be a polynomial ring in three variables, say x,y,z,
          with coefficients in Q. @*
          The polynomial f must be homogeneous and absolutely irreducible.@*
-         Its dehomogenization with respect to the third variable must be monic 
+         Its dehomogenization with respect to the third variable must be monic
          as a polynomial in the second variable (that is, the curve C = {f = 0}
          does not contain the point (0:1:0)).@*
-         The curve C is not allowed to have singularities 
+         The curve C is not allowed to have singularities
          at infinity (z = 0). @*
 NOTE:    The last two conditions can be met by a suitable change of coordinates in PGL(3)
          as applied in the procedure @ref adjointIdeal. The other conditions
@@ -1196,7 +1196,7 @@ THEORY:  We compute an integral basis of the integral closure of the coordinate
 KEYWORDS: geometric genus, plane curves.
 SEE ALSO: genus.
 "
-{ 
+{
   int bb = size(#);
   poly dhf = subst(f,var(3),1);
   def Roriginal = basering;
@@ -1209,7 +1209,7 @@ SEE ALSO: genus.
   list LIntB;
   if(bb == 0)
     {
-      LIntB = integralBasis(f,2,"isIrred");     
+      LIntB = integralBasis(f,2,"isIrred");
     }
   else
     {
@@ -1223,7 +1223,7 @@ SEE ALSO: genus.
   int gg = (sL-1)*(sL-2)/2-sL*ud;
   for(k = 1; k <= sL; k++)
      {
-        gg = gg + deg(gcd(d,IB[k]));     
+        gg = gg + deg(gcd(d,IB[k]));
      }
   setring Roriginal;
   return(gg);
@@ -1256,7 +1256,7 @@ NOTE:    delta is the sum of all local delta-invariants of the singularities,
          singularity. @*
 SEE ALSO: genus
 "
-{   
+{
    int w = printlevel-voice+2;  // w=printlevel (default: w=0)
    int d = deg(F);
    def R = basering;
@@ -1267,15 +1267,15 @@ SEE ALSO: genus
 
    int delt,deltaloc,deltainf,tau,tauinf,cusps,iloc,iglob,l,nsing,
        tauloc,tausing,k,rat,nbranchinf,nbranch,nodes,cuspsinf,nodesinf;
-   list inv;  
+   list inv;
    execute("ring newR=("+charstr(R)+"),(x,y),dp;");
    //the singularities at the affine part
    map sigma=R,var(1),var(2),1;
    ideal I=sigma(F);
 
-   list OMPButNodes; 
-   int sizeOMPButNodes;   
-   int NotOnlyOMPPlusCusps;  
+   list OMPButNodes;
+   int sizeOMPButNodes;
+   int NotOnlyOMPPlusCusps;
 
    ideal I1=jacob(I);
    matrix Hess[2][2]=jacob(I1);
@@ -1314,7 +1314,7 @@ SEE ALSO: genus
    cusps=vdim(radID)-iglob;
 
    ideal NodesPlusCusps  = radical(sat(I+I1, radIDsing)[1]);
-  
+
    nsing=nsing+cusps;
 
    if(iglob==0)
@@ -1347,7 +1347,7 @@ SEE ALSO: genus
           nbranch=inv[3]+ 2*nodes+cusps;
           delt=delt+nodes+cusps;
           if((w>=1)&&(inv[2]==0)){"smooth at (0,0,1)";}
-          if(inv[4]!=0)  
+          if(inv[4]!=0)
             {
               OMPButNodes = insert(OMPButNodes,list(inv[4],maxideal(1)),
                                    sizeOMPButNodes);
@@ -1355,7 +1355,7 @@ SEE ALSO: genus
             }
           else
             {
-              NotOnlyOMPPlusCusps = NotOnlyOMPPlusCusps + 1; 
+              NotOnlyOMPPlusCusps = NotOnlyOMPPlusCusps + 1;
             }
         }
         else
@@ -1371,15 +1371,15 @@ SEE ALSO: genus
               delt=delt+inv[1];
               tausing=tausing+inv[2];
               nbranch=nbranch+inv[3];
-              if(inv[4]!=0)  
+              if(inv[4]!=0)
                 {
                   OMPButNodes = insert(OMPButNodes,list(inv[4],pr[k]),
                                        sizeOMPButNodes);
-                  sizeOMPButNodes = size(OMPButNodes); 
+                  sizeOMPButNodes = size(OMPButNodes);
                 }
               else
                 {
-                  NotOnlyOMPPlusCusps = NotOnlyOMPPlusCusps + 1; 
+                  NotOnlyOMPPlusCusps = NotOnlyOMPPlusCusps + 1;
                 }
            }
            tau=vdim(std(I+jacob(I)));
@@ -1407,9 +1407,9 @@ SEE ALSO: genus
       "";
    }
    setring R;
-   if(sizeOMPButNodes>0)  
+   if(sizeOMPButNodes>0)
      {
-       list OMPButNodes = fetch(newR,OMPButNodes);   
+       list OMPButNodes = fetch(newR,OMPButNodes);
      }
    return(list(genus,NotOnlyOMPPlusCusps,OMPButNodes,
                fetch(newR,NodesPlusCusps)));
@@ -1528,21 +1528,21 @@ KEYWORDS: delta invariant; Tjurina number
         "";
       }
    }
-   int intMult = deg(lead(f)); 
-   poly fdummy = f;  
-   poly gdummy = lead(f); 
-   int ivr = 1;  
-   while(ivr)  
+   int intMult = deg(lead(f));
+   poly fdummy = f;
+   poly gdummy = lead(f);
+   int ivr = 1;
+   while(ivr)
       {
         fdummy = fdummy - lead(fdummy);
         if((fdummy ==0) || (deg(lead(fdummy))>intMult)){break;}
-        gdummy = gdummy + lead(fdummy);  
+        gdummy = gdummy + lead(fdummy);
       }
-   ideal SQRpart = sqrfree(gdummy);  
+   ideal SQRpart = sqrfree(gdummy);
    int IntForRet;  ///neu
-   if(deg(SQRpart[1])==intMult)  
+   if(deg(SQRpart[1])==intMult)
      {
-        IntForRet = intMult;    
+        IntForRet = intMult;
      }
    option(noredSB);
    ideal fstd=std(ideal(f)+jacob(f));
@@ -1663,7 +1663,7 @@ KEYWORDS: delta invariant; Tjurina number
 ///////////////////////////////////////////////////////////////////////////////
 proc paraConic(poly q)
 "USAGE:  paraConic(q); q poly
-ASSUME:  The basering must be a polynomial ring in three variables with 
+ASSUME:  The basering must be a polynomial ring in three variables with
          coefficients in Q. @*
          The polynomial q must be homogeneous of degree 2 and absolutely
          irreducible. @*
@@ -1687,7 +1687,7 @@ KEYWORDS: conic, parametrization, rational point.
 SEE ALSO: rationalPointConic.
 EXAMPLE: example paraConic; shows an example
 "
-{   
+{
   def Roriginal = basering;
   def RP2 = projConic(q);  // ring with ideal Ipoint
                            // possibly defined over algebraic number field
@@ -1698,7 +1698,7 @@ EXAMPLE: example paraConic; shows an example
   rl[2] = list("s","t");
   def RP1 = ring(rl);
   setring RP1;
-  ideal PARACONIC = fetch(rp1,psi); 
+  ideal PARACONIC = fetch(rp1,psi);
   export(PARACONIC);
   "// 'paraConic' created a ring together with an ideal RNC.";
   "// Supposing you typed, say,  def RP1 = paraConic(q);";
@@ -1726,7 +1726,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 static proc projConic(poly q)
 "USAGE:  projConic(q); q poly
-ASSUME:  The basering must be a polynomial ring in three variables with 
+ASSUME:  The basering must be a polynomial ring in three variables with
          coefficients in Q. @*
          The polynomial q must be homogeneous of degree 2 and absolutely
          irreducible. @*
@@ -1739,7 +1739,7 @@ THEORY:  We compute the point on C2 via @ref rationalPointConic.
 KEYWORDS: conic, parametrization, rational point.
 SEE ALSO: rationalPointConic.
 "
-{ 
+{
   def Roriginal = basering;
   list rl = ringlist(Roriginal);
   rl[3] = list(list("dp",1:3),list("C",0));
@@ -1750,11 +1750,11 @@ SEE ALSO: rationalPointConic.
                                      //  point on conic
                                      //  possibly defined over algebraic number
                                      //  field
-  setring RP21; 
+  setring RP21;
   list rl1 = ringlist(RP21);
-  rl1[2] = list("u","v","w"); 
+  rl1[2] = list("u","v","w");
   rl1[3] = list(list("dp",1:3),list("C",0));
-  def RP2 = ring(rl1);  
+  def RP2 = ring(rl1);
   setring RP2;
   ideal point = fetch(RP21,point);
   matrix bP = syz(point);
@@ -2188,7 +2188,7 @@ KEYWORDS: extended Euclidean algorithm.
   if ((a mod b) == 0) { l = b, 0, 1; if (b < 0) { l = -b, 0, -1; }; }
   if ((b mod a) == 0) { l = a, 1, 0; if (a < 0) { l = -a, -1, 0; }; }
   if (size(l) > 1) { return (l); }
-                
+
   temp = a mod b;
   l = extendedEuclid(b, temp);
   temp = (a - temp) / b;
@@ -2534,13 +2534,13 @@ S = rationalPointConic(p); // same as current basering,
 testPointConic(p, S);
 }
 ///////////////////////////////////////////////////////////////////////////////
-proc testParametrization(poly f, def rTT) 
+proc testParametrization(poly f, def rTT)
 "USAGE:  testParametrization(f,rTT); f poly, rTT ring
-ASSUME:  The assumptions on the basering and the polynomial f are as required 
-         by @ref paraPlaneCurve. The ring rTT has two variables and contains 
+ASSUME:  The assumptions on the basering and the polynomial f are as required
+         by @ref paraPlaneCurve. The ring rTT has two variables and contains
          an ideal PARA (such as the ring obtained by applying
-         @ref paraPlaneCurve to f). 
-RETURN: int which is 1 if PARA defines a parametrization of the curve 
+         @ref paraPlaneCurve to f).
+RETURN: int which is 1 if PARA defines a parametrization of the curve
         {f=0} and 0, otherwise.
 THEORY: We compute the image of PARA and compare it with f.
 KEYWORDS: Parametrization, image.
@@ -2557,7 +2557,7 @@ EXAMPLE: example testParametrization; shows an example
   def Relim = ring(rl);
   setring Relim;
   ideal PARA = fetch(rTT,PARA);
-  ideal JJ;  
+  ideal JJ;
   for(k=1;k<=3;k++)
      {
        JJ=JJ,var(k+2)-PARA[k];
@@ -2577,7 +2577,7 @@ EXAMPLE: example testParametrization; shows an example
   if(g!=0){return(0)};
   g = reduce(ftest[1],std(ideal(f)));
   if(g!=0){return(0)};
-  return (1);  
+  return (1);
 }
 
 example
@@ -2734,7 +2734,7 @@ poly f = y^8-x^3*(z+x)^5;  // 1 sing at origin, 1 further sing, no OMPs,
 adjointIdeal(f,1);
 adjointIdeal(f,2);
 def RP1 = paraPlaneCurve(f);  // time 0
-testParametrization(f,RP1);  
+testParametrization(f,RP1);
 setring RP1; PARA;
 kill RR;kill RP1;
 // -------------------------------------------------------
@@ -2796,7 +2796,7 @@ kill SS;kill RP1;
 // Example 14
 // -------------------------------------------------------
 ring SS = 0, (u,v,z), dp;
-poly f = 
+poly f =
 2*u^7+u^6*v+3*u^5*v^2+u^4*v^3+2*u^3*v^4+u^2*v^5+2*u*v^6+v^7
 -7780247/995328*u^6*z-78641/9216*u^5*v*z-10892131/995328*u^4*v^2*z
 -329821/31104*u^3*v^3*z-953807/331776*u^2*v^4*z-712429/248832*u*v^5*z
@@ -2835,7 +2835,7 @@ f = f+1022525576391791616258310v2z5+82293493608853837667471uz6;
 f = f+496839109904761426785889vz6+103766136235628614937587z7; // 15 nodes
 adjointIdeal(f,2);
 def RP1 = paraPlaneCurve(f);  // time 72
-testParametrization(f,RP1);  
+testParametrization(f,RP1);
 setring RP1; PARA;
 kill SS;kill RP1;
 
