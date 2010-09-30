@@ -157,10 +157,7 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows,
 }
 
 bool MinorProcessor::setNextKeys(const int k)
-{  bool b = false; bool c = false;
-if (b) printf("1_minor = %s\n", _minor.toString().c_str());
-if (b) printf("1_container = %s\n", _container.toString().c_str());
-if (c) printf("###1\n");
+{
   /* This method moves _minor to the next valid (k x k)-minor within
      _container. It returns true iff this is successful, i.e. iff
      _minor did not already encode the terminal (k x k)-minor. */
@@ -169,22 +166,13 @@ if (c) printf("###1\n");
     /* This means that we haven't started yet. Thus, we are about
        to compute the first (k x k)-minor. */
     _minor.selectFirstRows(k, _container);
-if (b) printf("21_minor = %s\n", _minor.toString().c_str());
-if (b) printf("21_container = %s\n", _container.toString().c_str());
-if (c) printf("###21\n");
     _minor.selectFirstColumns(k, _container);
-if (b) printf("22_minor = %s\n", _minor.toString().c_str());
-if (b) printf("22_container = %s\n", _container.toString().c_str());
-if (c) printf("###22\n");
     return true;
   }
   else if (_minor.selectNextColumns(k, _container))
   {
     /* Here we were able to pick a next subset of columns
        within the same subset of rows. */
-if (b) printf("3_minor = %s\n", _minor.toString().c_str());
-if (b) printf("3_container = %s\n", _container.toString().c_str());
-if (c) printf("###3\n");
     return true;
   }
   else if (_minor.selectNextRows(k, _container))
@@ -193,9 +181,6 @@ if (c) printf("###3\n");
        within the same subset of rows. But we could pick a next
        subset of rows. We must hence reset the subset of columns: */
     _minor.selectFirstColumns(k, _container);
-if (b) printf("4_minor = %s\n", _minor.toString().c_str());
-if (b) printf("4_container = %s\n", _container.toString().c_str());
-if (c) printf("###4\n");
     return true;
   }
   else
@@ -203,9 +188,6 @@ if (c) printf("###4\n");
     /* We were neither able to pick a next subset
        of columns nor of rows. I.e., we have iterated through
        all sensible choices of subsets of rows and columns. */
-if (b) printf("5_minor = %s\n", _minor.toString().c_str());
-if (b) printf("5_container = %s\n", _container.toString().c_str());
-if (c) printf("###5\n");
     return false;
   }
 }
