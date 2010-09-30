@@ -4,14 +4,14 @@ category = "Commutative Algebra";
 info="
 LIBRARY:  primdecint.lib   primary decomposition over the integers
 
-AUTHORS:  G. Pfister      pfister@mathematik.uni-kl.de
-@*        A. Sadiq        afshanatiq@gmail.com
-@*        S. Steidel      steidel@mathematik.uni-kl.de
+AUTHORS:  G. Pfister       pfister@mathematik.uni-kl.de
+@*        A. Sadiq         afshanatiq@gmail.com
+@*        S. Steidel       steidel@mathematik.uni-kl.de
 
 OVERVIEW:
 
-  A library for computing the primary decomposition of an ideal in the polynomial
-  ring over the integers, Z[x_1,...,x_n].
+  A library for computing the primary decomposition of an ideal in the 
+  polynomial ring over the integers, Z[x_1,...,x_n].
 
 PROCEDURES:
  primdecZ(I);       compute the primary decomposition of I
@@ -19,6 +19,7 @@ PROCEDURES:
  radicalZ(I);       compute the radical of I
  heightZ(I);        compute the height of I
  equidimZ(I);       compute the equidimensional part of I
+ intersectZ(I,J)    compute the intersection of I and J 
 ";
 
 LIB "crypto.lib";
@@ -28,8 +29,9 @@ LIB "crypto.lib";
 proc primdecZ(ideal I, list #)
 "USAGE:  primdecZ(I); I ideal
 NOTE:    If size(#) > 0, then #[1] is the number of available processors for
-         the computation. Parallelization is just applicable using 32-bit Singular
-         version since MP-links are not compatible with 64-bit Singular version.
+         the computation. Parallelization is just applicable using 32-bit 
+         Singular version since MP-links are not compatible with 64-bit Singular 
+         version.
 RETURN:  a list pr of primary ideals and their associated primes:
 @format
    pr[i][1]   the i-th primary component,
@@ -40,7 +42,7 @@ EXAMPLE: example primdecZ; shows an example
 {
    if(size(I)==0){return(list(ideal(0),ideal(0)));}
 
-   //--------------------  Initialize optional parameters  ------------------------
+//--------------------  Initialize optional parameters  ------------------------
    if(size(#) > 0)
    {
       if(size(#) == 1)
@@ -48,10 +50,10 @@ EXAMPLE: example primdecZ; shows an example
          int n = #[1];
          if((n > 1) && (1 - system("with","MP")))
          {
-            "========================================================================";
-            "There is no MP available on your system. Since this is necessary to     ";
-            "parallelize the algorithm, the computation will be done without forking.";
-            "========================================================================";
+     "========================================================================";
+     "There is no MP available on your system. Since this is necessary to     ";
+     "parallelize the algorithm, the computation will be done without forking.";
+     "========================================================================";
             n = 1;
          }
          ideal TES = 1;
@@ -61,10 +63,10 @@ EXAMPLE: example primdecZ; shows an example
          int n = #[1];
          if((n > 1) && (1 - system("with","MP")))
          {
-            "========================================================================";
-            "There is no MP available on your system. Since this is necessary to     ";
-            "parallelize the algorithm, the computation will be done without forking.";
-            "========================================================================";
+     "========================================================================";
+     "There is no MP available on your system. Since this is necessary to     ";
+     "parallelize the algorithm, the computation will be done without forking.";
+     "========================================================================";
             n = 1;
          }
          ideal TES = #[2];
@@ -127,7 +129,7 @@ EXAMPLE: example primdecZ; shows an example
       {
 
 //-----  Create n1 links l(1),...,l(n1), open all of them and compute  ---------
-//-----  standard basis for the primes L[1][2],...,L[1][n + 1].              ---------
+//-----  standard basis for the primes L[1][2],...,L[1][n + 1].        ---------
 
          for(i = 1; i <= n; i++)
          {
@@ -198,7 +200,8 @@ EXAMPLE: example primdecZ; shows an example
       }
       for(i=1;i<=size(A);i++)
       {
-      //=== computes for all p in L the minimal associated primes of IZ/p[variables]
+      //=== computes for all p in L the minimal associated primes of 
+      //=== IZ/p[variables]
          p = int(A[i][2]);
          if(printlevel >= 10)
          {
@@ -314,8 +317,8 @@ EXAMPLE: example primdecZ; shows an example
    setring Rhelp;
    ideal J=imap(R,J);
    J=std(J);
-   //=== the primary decomposition over Q which gives the primary decomposition
-   //=== of I:h for a suitable integer h
+   //=== the primary decomposition over Q which gives the primary 
+   //=== decomposition of I:h for a suitable integer h
    list pr=primdecGTZ(J);
    for(i=1;i<=size(pr);i++)
    {
@@ -383,7 +386,7 @@ example
    primdecZ(K);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 proc minAssZ(ideal I)
 "USAGE:  minAssZ(I); I ideal
@@ -418,7 +421,8 @@ EXAMPLE: example minAssZ; shows an example
       list L=PollardRho(q,5000,1);
       for(i=1;i<=size(L);i++)
       {
-      //=== computes for all p in L the minimal associated primes of IZ/p[variables]
+      //=== computes for all p in L the minimal associated primes of 
+      //=== IZ/p[variables]
          p=int(L[i]);
          setring R;
          rp[1]=p;
@@ -450,8 +454,8 @@ EXAMPLE: example minAssZ; shows an example
    setring Rhelp;
    ideal J=imap(R,J);
    J=std(J);
-   //=== the primary decomposition over Q which gives the primary decomposition
-   //=== of I:h for a suitable integer h
+   //=== the primary decomposition over Q which gives the primary 
+   //=== decomposition of I:h for a suitable integer h
    list pr=minAssGTZ(J);
    for(i=1;i<=size(pr);i++)
    {
@@ -518,7 +522,7 @@ example
    minAssZ(K);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 proc heightZ(ideal I)
 "USAGE:  heightZ(I); I ideal
@@ -610,7 +614,7 @@ example
    heightZ(I);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 proc radicalZ(ideal I)
 "USAGE:  radicalZ(I); I ideal
@@ -710,7 +714,7 @@ example
    radicalZ(J);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 proc equidimZ(ideal I)
 "USAGE:  equidimZ(I); I ideal
@@ -765,7 +769,8 @@ EXAMPLE: example equidimZ; shows an example
       }
       for(i=1;i<=size(L);i++)
       {
-      //=== computes for all p in L the minimal associated primes of IZ/p[variables]
+      //=== computes for all p in L the minimal associated primes of 
+      //=== IZ/p[variables]
          p=int(L[i]);
          j=Le[i];
          setring R;
@@ -843,8 +848,8 @@ EXAMPLE: example equidimZ; shows an example
    setring Rhelp;
    ideal J=imap(R,J);
    J=std(J);
-   //=== the equidimensional part over Q which gives the equdimensional part
-   //=== of I:h for a suitable integer h
+   //=== the equidimensional part over Q which gives the equdimensional 
+   //=== part of I:h for a suitable integer h
    ideal E=1;
    if(nvars(R)-he==dim(J))
    {
@@ -887,7 +892,48 @@ example
    equidimZ(I);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+proc intersectZ(ideal I, ideal J)
+"USAGE:  intersectZ(I,J); I,J ideals
+RETURN:  the intersection of the input ideals
+NOTE:    this is needed because intersect(I,J) does not work, should be replaced
+         by intersect later 
+EXAMPLE: example intersectZ; shows an example
+{
+   def R = basering;
+   execute("ring S=integer,(t,"+varstr(R)+"),(dp(1),dp(nvars(R)));");
+   ideal I=imap(R,I);
+   ideal J=imap(R,J);
+   ideal K=addIdealZ(t*I,(1-t)*J);
+   K=stdZ(K);
+   int i;
+   ideal L;
+   for(i=1;i<=size(K);i++)
+   {
+      if(lead(K[i])/t==0){L[size(L)+1]=K[i];}
+   }
+   setring R;
+   ideal L=imap(S,L);
+   return(L);
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring R=integer,(a,b,c,d),dp;
+   ideal I1=9,a,b;
+   ideal I2=3,c;
+   ideal I3=11,2a,7b;
+   ideal I4=13a2,17b4;
+   ideal I5=9c5,6d5;
+   ideal I6=17,a15,b15,c15,d15;
+   ideal I=intersectZ(I1,I2); I;
+   I=intersectZ(I,I3); I;
+   I=intersectZ(I,I4); I;
+   I=intersectZ(I,I5); I;
+   I=intersectZ(I,I6); I;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 static proc modp(ideal J, int p, int nu)
 {
@@ -920,12 +966,14 @@ static proc modp(ideal J, int p, int nu)
 
 static proc coefPrimeZ(ideal I)
 {
-//=== computes the primes occuring in the product of the leading coefficients of I
+//=== computes the primes occuring in the product of the leading coefficients 
+//=== of I
    number h=1;
    int i;
    for(i=1;i<=size(I);i++)
    {
-      h=h*leadcoef(I[i]);  //besser machen (gleich zerlegen, nict ausmultiplizieren)
+      h=h*leadcoef(I[i]);  // besser machen (gleich zerlegen, 
+                           // nicht ausmultiplizieren)
    }
    def R=basering;
    ring Rhelp=0,x,dp;
@@ -936,13 +984,14 @@ static proc coefPrimeZ(ideal I)
    return(L);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc coefZ(ideal I)
 {
 //=== assume IQ[variables]=<g_1,...,g_s>, Groebner basis, g_i in Z[variables]
 //=== computes an integer h such that
-//=== <g_1,...,g_s>Z[variables]:h^infinity = IQ[variables] intersected with Z[variables]
+//===   <g_1,...,g_s>Z[variables]:h^infinity = IQ[variables] intersected 
+//===                                          with Z[variables]
 //=== returns a list with IQ[variables] intersected with Z[variables] and h
    int h=1;
    int i,e;
@@ -977,7 +1026,7 @@ static proc coefZ(ideal I)
    return(list(K,h));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc specialPowerZ(ideal I, int m)
 {
@@ -990,7 +1039,7 @@ static proc specialPowerZ(ideal I, int m)
    return(I);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc separatorsZ(int j, list B)
 {
@@ -1014,11 +1063,12 @@ static proc separatorsZ(int j, list B)
    return(s);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc extractZ(ideal J, int j, list L, list B)
 {
-   //=== P is an associated prime of J, the corresponding primary ideal is computed
+   //=== P is an associated prime of J, the corresponding primary ideal is 
+   //=== computed,
    //=== L is a list of maximal independent sets for P in Z/p[variables]
    def R=basering;
    ideal P=B[j];
@@ -1035,7 +1085,8 @@ static proc extractZ(ideal J, int j, list L, list B)
    {
       if(L[1][3]!=0)
       {
-         //=== if u in x is an independent set of L then we compute a Groebnerbasis in Z[u][x-u]
+         //=== if u in x is an independent set of L then we compute a Groebner
+         //=== Basis in Z[u][x-u]
          execute("ring S=integer,("+L[1][1]+"),lp;");
          ideal I=imap(R,I);
          I=stdZ(I);
@@ -1079,7 +1130,8 @@ static proc extractZ(ideal J, int j, list L, list B)
       poly h=1;
       for(i=1;i<=size(C);i++)
       {
-         if(deg(C[i])>0){h=h*C[i];}  //das muss noch besser gemacht werden, nicht ausmultiplizieren!
+         if(deg(C[i])>0){h=h*C[i];}  // das muss noch besser gemacht werden,
+                                     // nicht ausmultiplizieren!
       }
       setring Shelp;
       poly h=imap(R,h);
@@ -1094,12 +1146,13 @@ static proc extractZ(ideal J, int j, list L, list B)
    I=stdZ(I);
    return(I);
 }
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc normalizeZ(ideal I)
 {
-//=== if I[1]=q in Z, it replaces all other coeffs of polys in I by there value mod q
-//=== std should do this automatically and then tis procedure should be removed
+//=== if I[1]=q in Z, it replaces all other coeffs of polys in I by there value 
+//=== mod q, std should do this automatically and then this procedure should be
+//=== removed
    if(deg(I[1])>0){return(I);}
    int i,j;
    number n;
@@ -1118,7 +1171,7 @@ static proc normalizeZ(ideal I)
    return(I);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc satZ(ideal I,poly h)
 {
@@ -1133,7 +1186,7 @@ static proc satZ(ideal I,poly h)
    return(J);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc prepareQuotientring (int nnp)
 {
@@ -1162,7 +1215,7 @@ static proc prepareQuotientring (int nnp)
   return(quotring);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc maxIndependSet (ideal j)
 {
@@ -1215,7 +1268,7 @@ static proc maxIndependSet (ideal j)
   return(resu);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc quotientOneZ(ideal I, poly f)
 {
@@ -1224,7 +1277,8 @@ static proc quotientOneZ(ideal I, poly f)
    def R=basering;
    int i;
    ideal K=intersectZ(I,ideal(f));
-   //=== K[i]/f; does not work in rings with integer! This should be replaced later
+   //=== K[i]/f; does not work in rings with integer! This should be replaced 
+   //=== later
    execute("ring Rhelp=0,("+varstr(R)+"),dp;");
    ideal K=imap(R,K);
    poly f=imap(R,f);
@@ -1237,7 +1291,7 @@ static proc quotientOneZ(ideal I, poly f)
    return(K);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc quotientZ(ideal I, ideal J)
 {
@@ -1252,7 +1306,7 @@ static proc quotientZ(ideal I, ideal J)
    return(K);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc reduceZ(poly f, ideal I)
 {
@@ -1298,7 +1352,7 @@ static proc reduceZ(poly f, ideal I)
    return(lead(f)+reduceZ(f-lead(f),I));
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc stdZ(ideal I)
 {
@@ -1317,30 +1371,7 @@ static proc stdZ(ideal I)
    return(J);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-proc intersectZ(ideal I, ideal J)
-{
-//=== this is needed because intersect(I,J) does not work, should be replaced 
-//=== by intersect later
-   def R = basering;
-   execute("ring S=integer,(t,"+varstr(R)+"),(dp(1),dp(nvars(R)));");
-   ideal I=imap(R,I);
-   ideal J=imap(R,J);
-   ideal K=addIdealZ(t*I,(1-t)*J);
-   K=stdZ(K);
-   int i;
-   ideal L;
-   for(i=1;i<=size(K);i++)
-   {
-      if(lead(K[i])/t==0){L[size(L)+1]=K[i];}
-   }
-   setring R;
-   ideal L=imap(S,L);
-   return(L);
-}
-
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc addIdealZ(ideal I,ideal J)
 {
@@ -1353,7 +1384,7 @@ static proc addIdealZ(ideal I,ideal J)
    return(I);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 static proc testPrimaryZ(ideal I, list L)
 {
@@ -1369,7 +1400,7 @@ static proc testPrimaryZ(ideal I, list L)
    return(0);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /*
 Examples:
@@ -1396,15 +1427,15 @@ ideal I=181*32003,
  
 ring R3=integer,(w,z,y,x),dp;
 ideal I=xzw+(-y^2+y)*z^2,
-         (-x^2+x)*w^2+yzw,
-         ((y^4-2*y^3+y^2)*x-y^4+y^3)*z^3,
-         y2z2w+(-y*4+2*y^3-y^2)*z3;
+        (-x^2+x)*w^2+yzw,
+        ((y^4-2*y^3+y^2)*x-y^4+y^3)*z^3,
+        y2z2w+(-y*4+2*y^3-y^2)*z3;
 
 ring R4=integer,(w,z,y,x),dp;
 ideal I=-2*yxzw+(-yx-y^2+y)*z^2,
-         xw^2-yz^2,
-         (yx^2-(2*y^2+2*y)*x+y^3-2*y^2+y)*z^3,
-         (-2*y^2+2*y)*z^2*w+(yx-3*y^2-y)*z^3;
+        xw^2-yz^2,
+        (yx^2-(2*y^2+2*y)*x+y^3-2*y^2+y)*z^3,
+        (-2*y^2+2*y)*z^2*w+(yx-3*y^2-y)*z^3;
 
 ring R5=integer,(x,y,z),dp;
 ideal I=x2-y2-z2,
@@ -1448,12 +1479,12 @@ ideal I=1260,
 
 ring R11=integer,(w,z,y,x),dp;
 ideal I=(4*y^2*x^2+(4*y^3+4*y^2-y)*x-y^2-y)*z^2,
-         (x+y+1)*zw+(-4*y^2*x-4*y^3-4*y^2)*z^2,
-         (-x-2*y^2 - 2*y - 1)*zw + (8*y^3*x + 8*y^4 + 8*y^3 + 2*y^2+y)*z^2,
-         ((y^3 + y^2)*x - y^2 - y)*z^2,
-         (y +1)*zw + (-y^3 -y^2)*z^2,
-         (x + 1)*zw +(- y^2 -y)*z^2,
-         (x^2 +x)*w^2 + (-yx - y)*zw;
+        (x+y+1)*zw+(-4*y^2*x-4*y^3-4*y^2)*z^2,
+        (-x-2*y^2 - 2*y - 1)*zw + (8*y^3*x + 8*y^4 + 8*y^3 + 2*y^2+y)*z^2,
+        ((y^3 + y^2)*x - y^2 - y)*z^2,
+        (y +1)*zw + (-y^3 -y^2)*z^2,
+        (x + 1)*zw +(- y^2 -y)*z^2,
+        (x^2 +x)*w^2 + (-yx - y)*zw;
 
 ring R12=integer,(w,z,y,x),dp;
 ideal I=72,
@@ -1462,24 +1493,27 @@ ideal I=72,
         (x + 1)*zw + (-y^2 -y)*z^2, (x^2 + x)*w^2 + (-yx - y)*zw;
 
 ring R13=integer,(w,z,y,x),dp;
-ideal I= (((12*y+8)*x^2 +(2*y+2)*x)*zw +((-15*y^2 -4*y)*x-4*y^2 -y)*z^2,
+ideal I=(((12*y+8)*x^2 +(2*y+2)*x)*zw +((-15*y^2 -4*y)*x-4*y^2 -y)*z^2,
         -x*w^2 +((-12*y -8)*x+2*y)*zw +(15*y^2+4*y)*z^2,
         (81*y^4*x^2 +(-54*y^3 -12*y^2)*x-12*y^3 -3*y^2)*z^3, 
         (-24*yx+6*y^2-6*y)*z^2*w + (-81*y^4*x + 81*y^3 + 24*y^2)*z^3,
-        (48*x^2 + (-30*y + 12)*x - 6*y)*z^2*w + ((81*y^3 -54*y^2 -24*y)*x-21*y^2 -6*y)*z^3,
-        (-96*yx-18*y^3 +18*y^2-24*y)*z^2*w +(243*y^5*x-243*y^4 +72*y^3+48*y^2)*z^3,
-         6*y*z^2*w^2 +((576*y+384)*x^2 + (-81*y^3 -306*y^2 -168*y+96)*x+81*y^2-18*y)*z^3*w +((-720*y^2 - 192*y)*x + 450*y^3 - 60*y^2 - 48*y)*z^4);
+        (48*x^2 + (-30*y + 12)*x - 6*y)*z^2*w + ((81*y^3 -54*y^2 -24*y)*x
+        -21*y^2 -6*y)*z^3,
+        (-96*yx-18*y^3 +18*y^2-24*y)*z^2*w +(243*y^5*x-243*y^4 +72*y^3
+        +48*y^2)*z^3,
+        6*y*z^2*w^2 +((576*y+384)*x^2 + (-81*y^3 -306*y^2 -168*y+96)*x+81*y^2
+        -18*y)*z^3*w +((-720*y^2 - 192*y)*x + 450*y^3 - 60*y^2 - 48*y)*z^4);
 
 ring R14=integer,(x(1),x(2),x(3),x(4)),dp;
-ideal I= 181*49^2,
-         x(4)^4,
-         x(1)*x(4)^3,
-         x(1)*x(2)*x(4)^2,
-         x(2)^2*x(4)^2,
-         x(2)^2*x(3)*x(4),
-         x(1)*x(2)*x(3)*x(4),
-         x(1)*x(3)^2*x(4),
-         x(3)^3*x(4);
+ideal I=181*49^2,
+        x(4)^4,
+        x(1)*x(4)^3,
+        x(1)*x(2)*x(4)^2,
+        x(2)^2*x(4)^2,
+        x(2)^2*x(3)*x(4),
+        x(1)*x(2)*x(3)*x(4),
+        x(1)*x(3)^2*x(4),
+        x(3)^3*x(4);
 
 
 ring R15=integer,(x,y,z),dp;  
@@ -1488,7 +1522,8 @@ ideal I=32003*181*64,
         (y^4 - y^2)*x, (z^2 - z)*y*x^2, (y^3 - y^2)*x^2,
         (z^3 - z^2)*x^4 + (2*z^3 -2*z^2)*x^3 + (z^3 -z^2)*x^2,
         z*y^2*x^2, z*y*x^4 +z*y*x^3,
-        2*y^2*x^4 +6*y^2*x^3 +6*y^2*x^2 + (y^3 +y^2)*x, z*x^5 + (z^2 +z)*x^4 + (2*z^2 -z)*x^3 + (z^2 -z)*x^2,
+        2*y^2*x^4 +6*y^2*x^3 +6*y^2*x^2 + (y^3 +y^2)*x, z*x^5 + (z^2 +z)*x^4 
+        + (2*z^2 -z)*x^3 + (z^2 -z)*x^2,
         y*x^6 + 3*y*x^5 + 3*y*x^4 + y*x^3;
 
 
