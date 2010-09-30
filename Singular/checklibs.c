@@ -201,8 +201,12 @@ void scan_info(int *l)
       ch=strspn(pp,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
       if ((ch>1)||(pp+ch==p))
       {
-        printf("error: unknown section in library header: %s",buf);
-        have_other++;
+        /* check for other allowed sections: REFERENCES*/
+        if ((ch!=10)||(strncmp(pp,"REFERENCES",10)!=0))
+	{
+          printf("error: unknown section in library header: %s",buf);
+          have_other++;
+	}
         if (have_PROCEDURES!=0)
           printf("error: only KEYWORDS/SEE ALSO may follow PROCEDURES\n");
       }
@@ -241,7 +245,7 @@ void scan_info(int *l)
       printf("error: other header entries found (illegal ?) :%d lines found, should be 0\n",have_other);
     if ((star_nl>0)&&(star_nl*10>=header))
     {
-      printf("warning: %d forced line braks in %d header lines: @* should be used very rarely!\n",star_nl,header);
+      printf("warning: %d forced line breaks in %d header lines: @* should be used very rarely!\n",star_nl,header);
     }
     if (texinfo>0)
     {
