@@ -2,52 +2,54 @@
 version = "$Id$";
 category = "Commutative algebra";
 info = "
-LIBRARY: monomialideal.lib   Primary and irreducible decompositions of monomial
-                             ideals
-AUTHORS: I.Bermejo,           ibermejo@ull.es
-@*       E.Garcia-Llorente,   evgarcia@ull.es
-@*       Ph.Gimenez,          pgimenez@agt.uva.es
+LIBRARY: monomialideal.lib   Primary and irreducible decompositions of
+                             monomial ideals
+AUTHORS: I.Bermejo,          ibermejo@ull.es
+@*       E.Garcia-Llorente,  evgarcia@ull.es
+@*       Ph.Gimenez,         pgimenez@agt.uva.es
 
 OVERVIEW:
  A library for computing a primary and the irreducible decompositions of a
  monomial ideal using several methods.
- In this library we also take advantage of the fact that the ideal is
- monomial to make some computations that are Grobner free in this case
+ In this library we specifically take advantage of the fact that the ideal
+ is monomial to make some computations that are Grobner free in this case
  (radical, intersection, quotient...).
 
-LITERATURE: Miller, Ezra  and Sturmfels, Bernd: Combinatorial Commutative Algebra,
-            Springer 2004
+LITERATURE: Miller, Ezra  and Sturmfels, Bernd: Combinatorial Commutative
+            Algebra, Springer 2004
 
 PROCEDURES:
- isMonomial(id);       checks whether an ideal id is monomial
- minbaseMon(id);       computes the minimal monomial generating set of a
-                       monomial ideal id
- gcdMon(f,g);          computes the gcd of two monomials f, g
- lcmMon(f,g);          computes the lcm of two monomials f, g
- membershipMon(f,id);  checks whether a polynomial f belongs to a monomial
-                       ideal id
- intersectMon(id1,id2);intersection of monomial ideals id1 and id2
- quotientMon(id1,id2); quotient ideal id1:id2
- radicalMon(id);       computes the radical of a monomial ideal id
- isprimeMon(id);       checks whether a monomial ideal id is prime
- isprimaryMon(id);     checks whether a monomial ideal id is primary
- isirreducibleMon(id); checks whether a monomial ideal id is irreducible
- isartinianMon(id);    checks whether a monomial ideal id is artininan
- isgenericMon(id);     checks whether a monomial ideal id is generic, i.e.,
-                       no two  minimal generators of it agree in the exponent
-                       of any variable that actually appears in both of them.
- dimMon(id);           dimension of a monomial ideal id
- irreddecMon(id,..);   computes the irreducible decomposition of a monomial
-                       ideal id
- primdecMon(id,..);    computes a minimal primary decomposition of a monomial
-                       ideal id
+ isMonomial(id);        checks whether an ideal id is monomial
+ minbaseMon(id);        computes the minimal monomial generating set of a
+                        monomial ideal id
+ gcdMon(f,g);           computes the gcd of two monomials f, g
+ lcmMon(f,g);           computes the lcm of two monomials f, g
+ membershipMon(f,id);   checks whether a polynomial f belongs to a monomial
+                        ideal id
+ intersectMon(id1,id2); intersection of monomial ideals id1 and id2
+ quotientMon(id1,id2);  quotient ideal id1:id2
+ radicalMon(id);        computes the radical of a monomial ideal id
+ isprimeMon(id);        checks whether a monomial ideal id is prime
+ isprimaryMon(id);      checks whether a monomial ideal id is primary
+ isirreducibleMon(id);  checks whether a monomial ideal id is irreducible
+ isartinianMon(id);     checks whether a monomial ideal id is artininan
+ isgenericMon(id);      checks whether a monomial ideal id is generic, i.e.,
+                        no two minimal generators of it agree in the exponent
+                        of any variable that actually appears in both of them
+ dimMon(id);            dimension of a monomial ideal id
+ irreddecMon(id,..);    computes the irreducible decomposition of a monomial
+                        ideal id
+ primdecMon(id,..);     computes a minimal primary decomposition of a monomial
+                        ideal id
 ";
+
 LIB "poly.lib";  // Para "maxdeg1" en "isprimeMon"
+
 //---------------------------------------------------------------------------
 //-----------------------   INTERNOS    -------------------------------------
 //---------------------------------------------------------------------------
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc checkIdeal (ideal I)
 "
 USAGE:    checkIdeal (I); I ideal.
@@ -66,9 +68,9 @@ RETURN:   1, if the given generators of I are monomials; 0, otherwise.
   }
   return (1);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
-static proc quotientIdealMon (ideal I,poly f)
+static proc quotientIdealMon (ideal I, poly f)
 "
 USAGE:    quotientIdealMon(I,f); I ideal, f polynomial.
 RETURN:   an ideal, the quotient ideal I:(f).
@@ -99,8 +101,8 @@ ASSUME:   I is an ideal given by a list of monomials and f is a monomial
   // minimal monomial basis
   return ( minbase(J) );
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc soporte (poly f)
 "
 USAGE:    soporte(f); f polynomial.
@@ -133,18 +135,18 @@ ASSUME:   f is a monomial of the basering K[x(1)..x(n)].
   }
   return(sop);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc irredAux (ideal I)
 "
 USAGE:    irredAux (I); I ideal.
-RETURN:   1, if I is irreducible; otherwise, an intvec whose fist entry is
+RETURN:   1, if I is irreducible; otherwise, an intvec whose first entry is
           the position of a generator which is the product of more than one
-          variable, the next entries are the indexes of those variables.
+          variable, the next entries are the indices of those variables.
 ASSUME:   I is a monomial ideal of the basering K[x(1)..x(n)] and it is
           generated by its minimal monomial generators.
 NOTE:     This procedure is a modification of isirreducibleMon to give
-          more information when ideal is not irreducible.
+          more information when the ideal is not irreducible.
 "
 {
   // Variables
@@ -175,13 +177,13 @@ NOTE:     This procedure is a modification of isirreducibleMon to give
   }
   return(1);
 }
-//////////////////////////////////////////////////////////////////////
-//
-static proc contents (ideal I,ideal J)
+
+/////////////////////////////////////////////////////////////////////////////
+static proc contents (ideal I, ideal J)
 "
 USAGE:    contents (I,J); I,J ideals.
 RETURN:   1, if I is contained in J; 0, otherwise.
-ASSUME:   I,J are monomial ideals of the basering.
+ASSUME:   I, J are monomial ideals of the basering.
 "
 {
   // Variables
@@ -200,13 +202,13 @@ ASSUME:   I,J are monomial ideals of the basering.
   }
   return(1);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
-static proc equal (ideal I,ideal J)
+static proc equal (ideal I, ideal J)
 "
 USAGE:    equal (I,J); I,J ideals.
 RETURN:   1, if I and J are the same ideal; 0, otherwise.
-ASSUME:   I,J are monomial ideals of the basering and are defined by their
+ASSUME:   I, J are monomial ideals of the basering and are defined by their
           minimal monomial generators.
 "
 {
@@ -236,8 +238,8 @@ ASSUME:   I,J are monomial ideals of the basering and are defined by their
   //}
   //return(1);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc radicalAux (ideal I)
 "
 USAGE:    radicalAux (I); I ideal.
@@ -272,18 +274,18 @@ ASSUME:   I is an irreducible monomial ideal of the basering given by its
   }
   return (rad);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc primAux (ideal I)
 "
 USAGE:    primAux (I); I ideal.
 RETURN:   1, if I is primary; otherwise, an intvec, whose first element is
           0, the second is the index of one variable such that a power of it
           does not appear as a generator of I, the rest of the elements are
-          the situation in the ideal of that elements of I which
-          are product of more than one variable.
+          the position in the ideal of those elements of I which are product
+          of more than one variable.
 ASSUME:   I is a monomial ideal of the basering K[x(1)..x(n)].
-NOTE:     This procedure detects if the ideal is primary, when the
+NOTE:     This procedure detects if the ideal is primary. When the
           ideal is not primary, it gives some additional information.
 "
 {
@@ -339,9 +341,9 @@ NOTE:     This procedure detects if the ideal is primary, when the
   // es primario.
   return (1);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
-static proc maxExp (ideal I,intvec v)
+static proc maxExp (ideal I, intvec v)
 "
 USAGE:    maxExp (I,v); I ideal, v integer vector.
 RETURN:   an integer, the greatest power of a variable in the minimal
@@ -349,7 +351,7 @@ RETURN:   an integer, the greatest power of a variable in the minimal
 ASSUME:   I is a monomial ideal of the basering, v=primAux(I) and the
           variable considered is v[2].
           If the ideal I is primary, it returns 0.
-NOTE:     The elements of the vector shows what variable and what
+NOTE:     The elements of the vector suggest what variable and which
           generators we must consider to look for the greatest power
           of this variable.
 "
@@ -374,14 +376,14 @@ NOTE:     The elements of the vector shows what variable and what
   }
   return (max);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc irredundant (list l)
 "
 USAGE:    irredundant (l); l, list.
 RETURN:   a list such that the intersection of the elements in that list has
           no redundant component.
-ASSUME:   elements of l are monomial ideals of the basering.
+ASSUME:   The elements of l are monomial ideals of the basering.
 "
 {
   // Variables
@@ -412,16 +414,16 @@ ASSUME:   elements of l are monomial ideals of the basering.
   }
   return (l);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
-static proc alexDif (intvec v,ideal I)
+static proc alexDif (intvec v, ideal I)
 "
 USAGE:    alexDif (v,I); v, intvec; I, ideal.
 RETURN:   a list, irreducible monomial ideals whose intersection is the
           Alexander dual of I with respect to v.
 ASSUME:   I is a monomial ideal of the basering K[x(1),...,x(n)] given by
           its minimal monomial generators and v is an integer vector with
-          n entries s.t.monomial(v) is a multiple of all minimal monomial
+          n entries s.t. monomial(v) is a multiple of all minimal monomial
           generators of I.
 "
 {
@@ -454,8 +456,8 @@ ASSUME:   I is a monomial ideal of the basering K[x(1),...,x(n)] given by
   }
   return (l);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc irredPrimary (list l1)
 "
 USAGE:    irredPrimary (l1); l1, list of ideals.
@@ -506,8 +508,8 @@ ASSUME:   list l1 is the list of the irredundant irreducible components of a
   }
   return (l3);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc isMinimal (ideal I)
 "
 USAGE:    isMinimal (I); I ideal.
@@ -565,8 +567,8 @@ ASSUME:   I is an ideal of the basering given by monomial generators.
     return (0,I);
   }
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 static proc isMonomialGB (ideal I)
 "
 USAGE:    isMonomialGB (I); I ideal.
@@ -574,8 +576,8 @@ RETURN:   a list, 1 & the minimal generators of I, if I is a monomial ideal;
           0, otherwise.
 ASSUME:   I is an ideal of the basering whose given generators are not
           monomials.
-NOTE:     this procedure is NOT Grobner free and should be used only if the
-          given generators are not monomials. (use first checkIdeal)
+NOTE:     This procedure is NOT Groebner free and should be used only if the
+          given generators are not monomials. (Use the proc checkIdeal first.)
 "
 {
   // Variables
@@ -603,14 +605,15 @@ NOTE:     this procedure is NOT Grobner free and should be used only if the
     return (1,I);
   }
 }
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Comparing irreducible decompsitions
 // WARNING: this is not a test, when the answer is 1 and the decompositions
 //          may not coincide but it is fast and easy and when the answer is
-//          0 the decomposition do not coincide.
+//          0 the decompositions do not coincide.
 //
-proc areEqual(list l1,list l2)
+proc areEqual(list l1, list l2)
 {
   int i,j,sizIdeal;
   poly generator;
@@ -639,15 +642,17 @@ proc areEqual(list l1,list l2)
   }
   return (equal(l1Ideal,l2Ideal));
 }
+
 /////////////////////////////////////////////////////////////////////////////
 //-------------------------------------------------------------------------//
 //-----------------------   EXTERNOS   ------------------------------------//
 //-------------------------------------------------------------------------//
 /////////////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc isMonomial (ideal I)
-"USAGE:    isMonomial (I); I ideal.
-RETURN:   1, if I is monomial ideal; 0, otherwise.
+"USAGE:   isMonomial (I); I ideal
+RETURN:   1, if I is a monomial ideal; 0, otherwise.
 ASSUME:   I is an ideal of the basering.
 EXAMPLE:  example isMonomial; shows some examples.
 "
@@ -684,12 +689,12 @@ example
  ideal J = w^3*x*y + x^3*y^9*t^3, w^2*x^2*y^2*z^2 - y^3*z, w*x*y*z*t - w*x^6*y^5*z^4, x^2*z^4*t^3 + y^4*z^4*t^4, w^6*y^4*z^2 + x^2*y^2*z^2;
  isMonomial(J);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
 proc minbaseMon (ideal I)
-"USAGE:    minbaseMon (I); I ideal.
+"USAGE:   minbaseMon (I); I ideal.
 RETURN:   an ideal, the minimal monomial generators of I.
-          (-1 if the given generators of I are not monomials)
+          -1 if the given generators of I are not monomials
 ASSUME:   I is an  ideal generated by a list of monomials of the basering.
 EXAMPLE:  example minbaseMon; shows an example.
 "
@@ -748,10 +753,10 @@ example
  ideal I = w^3*x*y, w^2*x^2*y^2*z^2, y^3*z,x^4*z^4*t^4, w*x*y*z*t,w*x^6*y^5*z^4, x^2*z^4*t^3 , w^6*y^4*z^2,x^2*y^2*z^2;
  minbaseMon(I);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
-proc gcdMon (poly f,poly g)
-"USAGE:    gcdMon (f,g); f,g polynomials.
+proc gcdMon (poly f, poly g)
+"USAGE:   gcdMon (f,g); f,g polynomials.
 RETURN:   a monomial, the greatest common divisor of f and g.
 ASSUME:   f and g are monomials of the basering.
 EXAMPLE:  example gcdMon; shows an example.
@@ -794,10 +799,10 @@ example
   poly g = y^6*z^3*t^3;
   gcdMon(f,g);
 }
+
 /////////////////////////////////////////////////////////////////////////////
-//
-proc lcmMon (poly f,poly g)
-"USAGE:    lcmMon (f,g); f,g polynomials.
+proc lcmMon (poly f, poly g)
+"USAGE:   lcmMon (f,g); f, g polynomials.
 RETURN:   a monomial,the least common multiple of f and g.
 ASSUME:   f,g are monomials of the basering.
 EXAMPLE:  example lcmMon; shows an example.
@@ -839,12 +844,12 @@ example
   poly g = y^6*z^3*t^3;
   lcmMon(f,g);
 }
-//////////////////////////////////////////////////////////////////////
-//
-proc membershipMon(poly f,ideal I)
-"USAGE:    membershipMon(f,I); f polynomial, I ideal.
+
+/////////////////////////////////////////////////////////////////////////////
+proc membershipMon(poly f, ideal I)
+"USAGE:   membershipMon(f, I); f polynomial, I ideal.
 RETURN:   1, if f lies in I; 0 otherwise.
-          (-1 if I and f are nonzero and I is not a monomial ideal)
+          -1 if I and f are nonzero and I is not a monomial ideal
 ASSUME:   I is a monomial ideal of the basering.
 EXAMPLE:  example membershipMon; shows some examples
 "
@@ -941,10 +946,10 @@ example
  poly g = 3*w^2*t^3 - 4*y^3*z*t^3 - 2*x^2*y^5*t + 4*x*y^3;
  membershipMon(g,I);
 }
-//////////////////////////////////////////////////////////////////////
-//
-proc intersectMon (ideal I,ideal J)
-"USAGE:    intersectMon (I,J); I,J ideals.
+
+/////////////////////////////////////////////////////////////////////////////
+proc intersectMon (ideal I, ideal J)
+"USAGE:   intersectMon (I, J); I, J ideals.
 RETURN:   an ideal, the intersection of I and J.
           (it returns -1 if I or J are not monomial ideals)
 ASSUME:   I,J are monomial ideals of the basering.
@@ -1027,13 +1032,13 @@ example
  ideal J = w*x, x^2, y*z*t, y^5*t;
  intersectMon (I,J);
 }
-//////////////////////////////////////////////////////////////////////
-//
-proc quotientMon (ideal I,ideal J)
-"USAGE:    quotientMon (I,J); I,J ideals.
+
+/////////////////////////////////////////////////////////////////////////////
+proc quotientMon (ideal I, ideal J)
+"USAGE:   quotientMon (I, J); I, J ideals.
 RETURN:   an ideal, the quotient I:J.
           (returns -1 if I or J is not monomial)
-ASSUME:   I,J are monomial ideals of the basering.
+ASSUME:   I, J are monomial ideals of the basering.
 NOTE:     the minimal monomial generating set is returned.
 EXAMPLE:  example quotientMon; shows an example.
 "
@@ -1109,14 +1114,14 @@ example
  ideal J = w*x, x^2, y*z*t, y^5*t;
  quotientMon (I,J);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc radicalMon(ideal I)
-"USAGE:    radicalMon(I); I ideal
+"USAGE:   radicalMon(I); I ideal
 RETURN:   an ideal, the radical ideal of the ideal I.
           (returns -1 if I is not a monomial ideal)
 ASSUME:   I is a monomial ideal of the basering.
-NOTE:     the minimal monomial generating set is returned.
+NOTE:     The minimal monomial generating set is returned.
 EXAMPLE:  example radicalMon; shows an example.
 "
 {
@@ -1176,10 +1181,10 @@ example
  ideal I = w^3*x*y,w*x*y*z*t,x^2*y^2*z^2,x^2*z^4*t^3,y^3*z;
  radicalMon(I);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc isprimeMon (ideal I)
-"USAGE:    isprimeMon (I); I ideal
+"USAGE:   isprimeMon (I); I ideal
 RETURN:   1, if I is prime; 0, otherwise.
           (returns -1 if I is not a monomial ideal)
 ASSUME:   I is a monomial ideal of the basering.
@@ -1226,10 +1231,10 @@ example
  ideal J = w,y,t,x*z;
  isprimeMon (J);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc isprimaryMon (ideal I)
-"USAGE:    isprimaryMon (I); I ideal
+"USAGE:   isprimaryMon (I); I ideal
 RETURN:   1, if I is primary; 0, otherwise.
           (returns -1 if I is not a monomial ideal)
 ASSUME:   I is a monomial ideal of the basering.
@@ -1328,12 +1333,12 @@ example
  ideal J = w^4,x^3,z^2,t^5,x*t,w*x^2*z,y^3*t^3;
  isprimaryMon (J);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc isirreducibleMon (ideal I)
-"USAGE:    isirreducibleMon(I); I ideal
+"USAGE:   isirreducibleMon(I); I ideal
 RETURN:   1, if I is irreducible; 0, otherwise.
-          (return -1 if I is not a monomial ideal)
+          returns -1 if I is not a monomial ideal
 ASSUME:   I is a monomial ideal of the basering.
 EXAMPLE:  example isirreducibleMon; shows some examples
 "
@@ -1384,12 +1389,12 @@ example
  ideal J = w^4*x,x^3,z^2,t^5;
  isirreducibleMon (J);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc isartinianMon (ideal I)
-"USAGE:    isartinianMon(I); I ideal.
+"USAGE:   isartinianMon(I); I ideal.
 RETURN:   1, if ideal is artinian; 0, otherwise.
-          (return -1 if ideal I is not a monmomial ideal).
+          returns -1 if ideal I is not a monmomial ideal
 ASSUME:   I is a monomial ideal of the basering.
 EXAMPLE:  example isartinianMon; shows some examples
 "
@@ -1452,12 +1457,12 @@ example
  ideal J = w^4,x^3,y^4,z^2,w^2*x^2*y,w*z*t^4,x^2*y^3,z^2*t^5;
  isartinianMon (J);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc isgenericMon (ideal I)
-"USAGE:    isgenericMon(I); I ideal.
+"USAGE:   isgenericMon(I); I ideal.
 RETURN:   1, if ideal is generic; 0, otherwise.
-          (return -1 if ideal I is not a monomial ideal)
+          returns -1 if ideal I is not a monomial ideal
 ASSUME:   I is a monomial ideal of the basering.
 EXAMPLE:  example isgenericMon; shows some examples.
 "
@@ -1523,13 +1528,13 @@ example
  ideal J = w^4,x^3,y^4,z^3,w^2*x^2*y,w*z*t^4,x*y^3,z^2*t^5;
  isgenericMon (J);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc dimMon (ideal I)
-"USAGE:   dimMon (I); I ideal
+"USAGE:  dimMon (I); I ideal
 RETURN:  an integer, the dimension of the affine variety defined by
          the ideal I.
-         (returns -1 if I is not a monomial ideal)
+         returns -1 if I is not a monomial ideal
 ASSUME:  I is a monomial ideal of the basering.
 EXAMPLE: example dimMon; shows some examples.
 "
@@ -1630,12 +1635,14 @@ example
  ideal J = w^4,x^3,y^4,z^2,t^6,w^2*x^2*y,w*z*t^4,x^2*y^3,z*t^5;
  dimMon (J);
 }
+
 /////////////////////////////////////////////////////////////////////////////
 //-------------------------------------------------------------------------//
 //-----------------------  DESCOMPOSICIONES  -----------------------------_//
 //-------------------------------------------------------------------------//
 /////////////////////////////////////////////////////////////////////////////
-//
+
+//////////////////////////////////////////////////////////////////////
 // METODO 1: Metodo directo para descomp. irreducible (ver Vasconcelos)
 //
 //////////////////////////////////////////////////////////////////////
@@ -1644,7 +1651,6 @@ example
 // haciendo uso de la caracterizacion de ideal monomial irreducible //
 // (Vasconcelos)                                                    //
 //////////////////////////////////////////////////////////////////////
-//
 static proc irredDec1 (ideal I)
 {
   // Variables
@@ -1710,11 +1716,11 @@ static proc irredDec1 (ideal I)
   // La salida es la lista de los ideales irreducibles.
   return (l2);
 }
+
 //////////////////////////////////////////////////////////////////////
 // La siguiente funcion va a obtener una descomposicion primaria    //
 // minimal a partir de la irreducible anterior.                     //
 //////////////////////////////////////////////////////////////////////
-//
 static proc primDec1 (ideal I)
 {
   // Variables
@@ -1725,7 +1731,8 @@ static proc primDec1 (ideal I)
   l2 = irredPrimary (l1);
   return (l2);
 }
-//
+
+//////////////////////////////////////////////////////////////////////
 // METODO 2: Metodo directo para descomp. primaria (ver Vasconcelos)
 //
 //////////////////////////////////////////////////////////////////////
@@ -1734,7 +1741,6 @@ static proc primDec1 (ideal I)
 // caracterizacion de ideal monomial primario y un resultado que    //
 //  hace uso de esta (Vasconcelos).                                 //
 //////////////////////////////////////////////////////////////////////
-//
 static proc primDec2 (ideal I)
 {
   // Variables en el nuevo anillo
@@ -1786,7 +1792,7 @@ static proc primDec2 (ideal I)
   l2 = irredundant (l2);
   return (l2);
 }
-//
+//////////////////////////////////////////////////////////////////////
 // METODO 3: via dual de Alexander y doble dual (Miller)
 //
 //////////////////////////////////////////////////////////////////////
@@ -1794,7 +1800,6 @@ static proc primDec2 (ideal I)
 // dual de Alexander teniendo en cuenta que el dual del dual es el  //
 // ideal de partida (Miller)                                        //
 //////////////////////////////////////////////////////////////////////
-//
 static proc irredDec3 (ideal I)
 {
   int i,n,j;
@@ -1825,11 +1830,11 @@ static proc irredDec3 (ideal I)
   l = alexDif (v,J);
   return (l);
 }
+
 //////////////////////////////////////////////////////////////////////
 // En este caso hallamos una descomposicion primaria minimal usando //
 // la irreducible irredundante del procedimiento anterior.          //
 //////////////////////////////////////////////////////////////////////
-//
 static proc primDec3 (ideal I)
 {
   // Variables
@@ -1840,7 +1845,8 @@ static proc primDec3 (ideal I)
   l2 = irredPrimary (l1);
   return (l2);
 }
-//
+
+//////////////////////////////////////////////////////////////////////
 // METODO 4: via dual de Alexander y cociente (Miller)
 //
 //////////////////////////////////////////////////////////////////////
@@ -1848,7 +1854,6 @@ static proc primDec3 (ideal I)
 // dado por sus generadores minimales haciendo uso del dual de      //
 // Alexander (con el cociente) (Miller)                             //
 //////////////////////////////////////////////////////////////////////
-//
 static proc irredDec4 (ideal I)
 {
   // Cambiamos de anillo.
@@ -1897,12 +1902,12 @@ static proc irredDec4 (ideal I)
   // componentes irreducibles irredundantes.
   return (L);
 }
+
 //////////////////////////////////////////////////////////////////////
 // Ahora hallamos una descomposicion primaria irredundante usando   //
 // la ultima funcion para hallar las componentes irreducibles de un //
 // ideal monomial dado por sus generadores minimales.               //
 //////////////////////////////////////////////////////////////////////
-//
 static proc primDec4 (ideal I)
 {
   // Variables
@@ -1913,7 +1918,8 @@ static proc primDec4 (ideal I)
   l2 = irredPrimary (l1);
   return (l2);
 }
-//
+
+//////////////////////////////////////////////////////////////////////
 // METODO 5: un misterio!!
 //
 //////////////////////////////////////////////////////////////////////
@@ -1921,7 +1927,6 @@ static proc primDec4 (ideal I)
 // estandar del ideal, que se correspoenden con las componentes     //
 // irreducibles del ideal 1-1.                                      //
 //////////////////////////////////////////////////////////////////////
-//
 static proc irredDec5 (ideal I)
 {
   int nvar = nvars(basering);
@@ -2005,12 +2010,12 @@ static proc irredDec5 (ideal I)
   }
   return (facets);
 }
+
 //////////////////////////////////////////////////////////////////////
 // Ahora hallamos una descomposicion primaria irredundante usando   //
 // la ultima funcion para hallar las componentes irreducibles de un //
 // ideal monomial dado por sus generadores minimales.               //
 //////////////////////////////////////////////////////////////////////
-//
 static proc primDec5 (ideal I)
 {
   // Variables
@@ -2021,7 +2026,8 @@ static proc primDec5 (ideal I)
   l2 = irredPrimary (l1);
   return (l2);
 }
-//
+
+//////////////////////////////////////////////////////////////////////
 // METODO 6: via complejo de Scarf (Milovsky)
 //
 //////////////////////////////////////////////////////////////////////
@@ -2032,7 +2038,6 @@ static proc primDec5 (ideal I)
 // Calcula el maximo exponente de la variable x(i) entre los        //
 // generadores del ideal.                                           //
 //////////////////////////////////////////////////////////////////////
-//
 static proc maximoExp(ideal I,int i)
 {
   // VARIABLES
@@ -2050,13 +2055,13 @@ static proc maximoExp(ideal I,int i)
   }
   return(max);
 }
+
 //////////////////////////////////////////////////////////////////////
 // Esta funcion estudia si un ideal monomial dado por su sistema    //
 // minimal de generadores es o no artiniano. En caso de no serlo,   //
 // halla el artiniano mas proximo y ademas devuelve los generadores //
 // que han sido introducidos.                                       //
 //////////////////////////////////////////////////////////////////////
-//
 static proc artinian (ideal I)
 {
   // Cambiamos de anillo
@@ -2140,12 +2145,12 @@ static proc artinian (ideal I)
     return(output);
   }
 }
+
 //////////////////////////////////////////////////////////////////////
 // En este caso vamos primero a chequear si el ideal es o no        //
 // generico y en caso de no serlo vamos a devolver  los cambios,    //
 // pues estos son una aplicacion biyectiva.                         //
 //////////////////////////////////////////////////////////////////////
-//
 static proc generic (ideal I)
 {
   // New ring
@@ -2209,12 +2214,12 @@ static proc generic (ideal I)
     return(0,I,EXP,NEWEXP);
   }
 }
+
 //////////////////////////////////////////////////////////////////////
 // Esta funci?n obtiene una descomposicion irreducible del ideal    //
 // monomial a partir de la descomposicion irreducible del idal      //
 // generico que le asociamos.                                       //
 //////////////////////////////////////////////////////////////////////
-//
 static proc nonGeneric (EXP,NEWEXP,Faces,sizI)
 {
   int nvar = nvars(basering);
@@ -2249,12 +2254,12 @@ static proc nonGeneric (EXP,NEWEXP,Faces,sizI)
   }
   return (newFaces);
 }
+
 //////////////////////////////////////////////////////////////////////
 // Este procedimiento va a dar una faceta inicial para el complejo  //
 // de Scarf asociado a I, donde I es un ideal monomial artiniano    //
 // y generico (evidentemente I dado por la bse minimal)             //
 //////////////////////////////////////////////////////////////////////
-//
 static proc initialFacet (ideal I)
 {
   // Cambiamos de anillo
@@ -2341,11 +2346,11 @@ static proc initialFacet (ideal I)
   }
   return (face);
 }
+
 //////////////////////////////////////////////////////////////////////
 // La funcion que sigue devuelve las facetas adyacentes a una dada  //
 // en el complejo de Scarf asociado a I.                            //
 //////////////////////////////////////////////////////////////////////
-//
 static proc adyacency (list l1, ideal I)
 {
   // Cambiamos de anillo
@@ -2505,11 +2510,11 @@ static proc adyacency (list l1, ideal I)
   }
   return(l2);
 }
+
 //////////////////////////////////////////////////////////////////////
 // Metodo que calcula la descomposicion irreducible de un ideal     //
 // monomial usando el complejo de Scarf (Milowski)                  //
 //////////////////////////////////////////////////////////////////////
-//
 static proc ScarfMethod (ideal I)
 {
   // Cambiamos de anillo
@@ -2684,11 +2689,11 @@ static proc ScarfMethod (ideal I)
   }
   return(Faces);
 }
+
 //////////////////////////////////////////////////////////////////////
 // Devuelve una descomposicion primaria minimal de un ideal         //
 // monomial via el complejo de Scarf.                               //
 //////////////////////////////////////////////////////////////////////
-//
 static proc scarfMethodPrim (ideal I)
 {
  // VARIABLES
@@ -2700,7 +2705,8 @@ static proc scarfMethodPrim (ideal I)
   l2 = irredPrimary (l1);
   return (l2);
 }
-//
+
+//////////////////////////////////////////////////////////////////////
 // METODO 7: algoritmo de etiquetas (Roune)
 //
 //////////////////////////////////////////////////////////////////////
@@ -2708,7 +2714,6 @@ static proc scarfMethodPrim (ideal I)
 // irreducibles de un ideal monomial. En este caso utilizamos el    //
 // algoritmo de etiquetas de B. Roune.                              //
 //////////////////////////////////////////////////////////////////////
-//
 static proc phi (list F)
 {
   // Cambiamos de anillo
@@ -2739,8 +2744,8 @@ static proc phi (list F)
   // luego haremos el "lcm"
   return (listphi);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc pi(poly f)
 {
  // Cambiamos de anillo
@@ -2758,8 +2763,8 @@ static proc pi(poly f)
   f = monomial(exp);
   return (f);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc conditionComplex (intvec posActual,ideal I,ideal S)
 {
   int nvar = nvars(basering);
@@ -2816,8 +2821,8 @@ static proc conditionComplex (intvec posActual,ideal I,ideal S)
   }
   return (0);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc findFaces (ideal I)
 {
   int nvar = nvars(basering);
@@ -2869,12 +2874,12 @@ static proc findFaces (ideal I)
   }
   return (F);
 }
+
 //////////////////////////////////////////////////////////////////////
 // La siguiente funcion calcula la descomposicion en irreducibles de//
 // un ideal monomial artininano usando el algoritmo de etiquetas del//
 // metodo de Bjarke Roune.                                          //
 //////////////////////////////////////////////////////////////////////
-//
 static proc labelAlgorithm(ideal I)
 {
   int nvar = nvars(basering);
@@ -2945,12 +2950,12 @@ static proc labelAlgorithm(ideal I)
   }
   return (facets);
 }
+
 //////////////////////////////////////////////////////////////////////
 // Devuelve una descomposicion primaria minimal de un ideal monomial//
 // dado.                                                            //
 //////////////////////////////////////////////////////////////////////
-//
-static proc  labelAlgPrim (ideal I)
+static proc labelAlgPrim (ideal I)
 {
   // VARIABLES
   list l1,l2;
@@ -2961,11 +2966,11 @@ static proc  labelAlgPrim (ideal I)
   l2 = irredPrimary (l1);
   return (l2);
 }
-//
+
+//////////////////////////////////////////////////////////////////////
 // METODO 8: Gao-Zhu
 //
 //////////////////////////////////////////////////////////////////////
-//
 static proc divide (intvec v, intvec w, int k)
 {
   int nvar = nvars(basering);
@@ -2990,10 +2995,8 @@ static proc divide (intvec v, intvec w, int k)
   }
   return (1);
 }
-//////////////////////////////////////////////////////////////////////
-//                                        //
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc incrementalAlg (ideal I)
 {
   int nvar = nvars(basering);
@@ -3202,8 +3205,8 @@ static proc incrementalAlg (ideal I)
   }
   return (facets);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc  incrementalAlgPrim (ideal I)
 {
   // VARIABLES
@@ -3215,13 +3218,13 @@ static proc  incrementalAlgPrim (ideal I)
   l2 = irredPrimary (l1);
   return (l2);
 }
-//
+
+//////////////////////////////////////////////////////////////////////
 // METODO 9: slice algorithm (Roune)
 //
 //////////////////////////////////////////////////////////////////////
 // SLICE ALGORITHM (B.Roune)                                        //
 //////////////////////////////////////////////////////////////////////
-//
 static proc divideMon (poly f , poly g)
 {
   return (lead(g)/lead(f)!=0);
@@ -3237,8 +3240,8 @@ static proc divideMon (poly f , poly g)
   //}
   //return (1);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc pivot (ideal I , poly lcmMin, ideal S)
 {
   // I is monomial ideal
@@ -3301,8 +3304,8 @@ static proc pivot (ideal I , poly lcmMin, ideal S)
     }
   }
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc simplification (I)
 {
   // VARIABLES
@@ -3423,8 +3426,8 @@ static proc simplification (I)
   // Devolvemos tambien el ideal (por si se ha modificado).
   return (lcmMi,I);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc con (ideal I , ideal S , poly q)
 {
   int nvar = nvars(basering);
@@ -3535,8 +3538,8 @@ static proc con (ideal I , ideal S , poly q)
   S2 = minbase(S2);
   return (con(I1,S1,p*q),con(I,S2,q));
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc irredDecMonSlice (ideal I)
 {
   int nvar = nvars(basering);
@@ -3613,8 +3616,8 @@ static proc irredDecMonSlice (ideal I)
   }
   return (components);
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 static proc primDecMonSlice (ideal I)
 {
  // VARIABLES
@@ -3626,15 +3629,17 @@ static proc primDecMonSlice (ideal I)
   l2 = irredPrimary (l1);
   return (l2);
 }
+
 //////////////////////////////////////////////////////////////////////
 //                                                                  //
 //                       DECOMPOSITIONS                             //
 //                                                                  //
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc irreddecMon
-"USAGE:    irreddecMon (I[,alg]); I ideal, alg string.
+"USAGE:   irreddecMon (I[,alg]); I ideal, alg string.
 RETURN:   list, the irreducible components of the monomial ideal I.
           (returns -1 if I is not a monomial ideal).
 ASSUME:   I is a monomial ideal of the basering k[x(1)..x(n)].
@@ -3738,10 +3743,10 @@ ideal I = w^3*x*y,w*x*y*z,x^2*y^2*z^2,x^2*z^4,y^3*z;
  // slice algorithm
  irreddecMon(I,"sr");
 }
-//////////////////////////////////////////////////////////////////////
-//
+
+/////////////////////////////////////////////////////////////////////////////
 proc primdecMon
-"USAGE:    primdecMon (I[,alg]); I ideal, alg string
+"USAGE:   primdecMon (I[,alg]); I ideal, alg string
 RETURN:   list, the components in a minimal primary decomposition of I.
           (returns -1 if I is not a monomial ideal).
 ASSUME:   I is a monomial ideal of the basering k[x(1)..x(n)].
