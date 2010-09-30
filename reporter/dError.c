@@ -32,10 +32,7 @@ int dReportError(const char* fmt, ...)
 #ifndef MAKE_DISTRIBUTION
   fprintf(stderr, "\n// ***dError: ");
   vfprintf(stderr, fmt, ap);
-#if 0
-    if !defined(OM_NDEBUG) && defined(HAVE_CONFIG_H)
-#endif
-#if  defined(HAVE_CONFIG_H)
+#if (!defined(NDEBUG)) && (!defined(OM_NDEBUG)) && defined(HAVE_CONFIG_H)
   fprintf(stderr, " occured at: \n");
   omPrintCurrentBackTraceMax(stderr, 8);
 #endif

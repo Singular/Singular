@@ -21,7 +21,7 @@
 #endif
 
 #include "reporter.h"
-#include "omalloc.h"
+#include <omalloc.h>
 //#include "options.h"
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
@@ -62,7 +62,9 @@ char * StringAppend(const char *fmt, ...)
     int l=s-feBuffer;
     feBuffer=(char *)omReallocSize((void *)feBuffer,feBufferLength,
                                                      more);
+#if (!defined(NDEBUG)) && (!defined(OM_NDEBUG)) && defined(HAVE_CONFIG_H)
     omMarkAsStaticAddr(feBuffer);
+#endif
     feBufferLength=more;
     s=feBuffer+l;
 #ifndef BSD_SPRINTF
