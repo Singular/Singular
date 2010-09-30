@@ -197,6 +197,13 @@ class MinorProcessor
     * The default constructor
     */
     MinorProcessor ();
+    
+    /**
+     * A destructor for deleting an instance. We must make this destructor
+     * virtual so that destructors of all derived classes will automatically
+     * also call the destructor of the base class MinorProcessor.
+     */
+     virtual ~MinorProcessor ();
 
     /**
     * A method for defining a sub-matrix within a pre-defined matrix.

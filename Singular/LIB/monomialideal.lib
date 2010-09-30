@@ -9,14 +9,18 @@ AUTHORS: I.Bermejo,          ibermejo@ull.es
 @*       Ph.Gimenez,         pgimenez@agt.uva.es
 
 OVERVIEW:
- A library for computing a primary and the irreducible decompositions of a
- monomial ideal using several methods.
- In this library we specifically take advantage of the fact that the ideal
- is monomial to make some computations that are Grobner free in this case
- (radical, intersection, quotient...).
+ A library for computing a primary and the irreducible decomposition of 
+ a monomial ideal using several methods.@*
+ In addition, taking advantage of the fact that the ideals under
+ consideration are monomial, the library offers some basic operations 
+ on ideals which are Groebner free in the monomial case (radical, 
+ intersection, ideal quotient...). Note, however, that the general 
+ Singular kernel commands for these operations are usually faster.
+ In a future edition of Singular, the specialized algorithms will also
+ be implemented in the Singular kernel.
 
-LITERATURE: Miller, Ezra  and Sturmfels, Bernd: Combinatorial Commutative
-            Algebra, Springer 2004
+ Literature: Miller, Ezra  and Sturmfels, Bernd: Combinatorial Commutative
+             Algebra, Springer 2004
 
 PROCEDURES:
  isMonomial(id);        checks whether an ideal id is monomial

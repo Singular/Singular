@@ -130,7 +130,7 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
                           const int columnCount, const int minorSize,
                           const int k, const char* algorithm,
                           const ideal i, const bool allDifferent)
-{
+{       
   /* setting up a MinorProcessor for matrices with polynomial entries: */
   PolyMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, polyMatrix);
@@ -353,7 +353,7 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
                               const int k, const ideal i,
                               const int cacheStrategy, const int cacheN,
                               const int cacheW, const bool allDifferent)
-{
+{  
   /* setting up a MinorProcessor for matrices with polynomial entries: */
   PolyMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, polyMatrix);

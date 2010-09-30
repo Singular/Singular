@@ -1,0 +1,555 @@
+///////////////////////////////////////////////////////////////////////////////
+version="$Id: integralbasis.lib,v 1.0 2010/05/19 Exp$";
+category="Commutative Algebra";
+info="
+LIBRARY:  integralbasis.lib  Integral basis in algebraic function fields
+AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
+          W. Decker, decker@mathematik.uni-kl.de> @*
+          S. Laplagne, slaplagn@dm.uba.ar @*
+          F. Seelisch, seelisch@mathematik.uni-kl.de
+
+PROCEDURES:
+ integralBasis(f, intVar);     Integral basis of an algebraic function field
+";
+
+LIB "normal.lib";
+
+///////////////////////////////////////////////////////////////////////////////
+
+proc integralBasis(poly f, int intVar, list #)
+"USAGE: integralBasis(f, intVar); f irreducible polynomial in two variables, 
+        intVar integer indicating that the intVar-th variable of the ring is the 
+        integral element.@*
+        The base ring must be a ring in two variables, and the polynomial f
+        must be monic as polynomial in the intVar-th variable.@*
+        Optional parameters in list choose (can be entered in any order):@*
+        Algorithm:@*
+        - \"global\" -> computes the integral basis by computing the
+        normalization of R/<f>, where R is the base ring.@*
+        - \"local\" -> computes the integral basis by computing the 
+        normalization of R/<f> localized at each component of the singular
+        locus of R/<f>, and then putting everything together.
+        This is the default option.@*
+        Other:@*
+        - \"isIrred\" -> assumes that the input polynomial f is irreducible,
+        and therefore will not check it. If this option is given but f is not
+        irreducible, the output might be wrong.@*
+        - list(\"inputJ\", ideal inputJ) -> takes as initial test ideal the
+        ideal inputJ. This option is only for use in other procedures. Using 
+        this option, the result might not be the integral basis.@*
+        (When this option is given the global option will be used.)@*         
+        - list(\"inputC\", ideal inputC) -> takes as initial conductor the 
+        ideal inputC. This option is only for use in other procedures. Using 
+        this option, the result might not be the integral basis.@*
+        (When this option is given the global option will be used.)@*         
+RETURN: a list, say l, of size 2.
+@format l[1] is an ideal I and l[2] is a polynomial D such that the integral
+        basis is b_0 = I[1] / D, b_1 = I[2] / D, ..., b_{n-1} = I[n] / D.@*
+        That is, the integral closure of k[x] in the algebraic function 
+        field k(x,y) is @* 
+        k[x] b_0 + k[x] b_1 + ... + k[x] b_{n-1},@*
+        where we assume that x is the trascendental variable, y is the integral 
+        element (indicated by intVar), f gives the integral equation and n is 
+        the degree of f as a polynomial in y.@*
+@end format
+THEORY:  We compute the integral basis of the integral closure of k[x] in k(x,y)
+         by computing the normalization of the affine ring k[x,y]/<f> and 
+         converting the k[x,y]-module generators into a k[x]-basis.@*
+KEYWORDS: integral basis; normalization.
+SEE ALSO: normal.
+EXAMPLE: example integralBasis; shows an example
+"
+{
+  int i;
+  ideal inputJ = 0;
+  ideal inputC = 0;
+  string algorithm = "local";     // The default option is "local"
+  int checkIrred = 1;
+
+//--------------------------- read the input options---------------------------
+  for ( i=1; i <= size(#); i++ )
+  {
+    if ( typeof(#[i]) == "string" )
+    {
+      if (#[i]=="local"){
+        algorithm = "local";
+      }
+      if (#[i]=="global"){
+        algorithm = "global";
+      }
+      if (#[i]=="isIrred"){
+        checkIrred = 0;
+      }
+    }
+    if(typeof(#[i]) == "list"){
+      if(size(#[i]) == 2){
+        if (#[i][1]=="inputJ"){
+          if((typeof(#[i][2]) == "ideal") or (typeof(#[i][2]) == "poly")){
+            inputJ = #[i][2];
+            algorithm = "global";
+          }
+        }
+      }
+      if (#[i][1]=="inputC"){
+        if(size(#[i]) == 2){
+          if((typeof(#[i][2]) == "ideal") or (typeof(#[i][2]) == "poly")){
+            inputC = #[i][2];
+            algorithm = "global";
+          }
+        }
+      }
+    }
+  }
+  
+//--------------------------- preliminary checks ------------------------------
+  // The ring must have two variables.
+  if(nvars(basering) != 2){
+    ERROR("The base ring must be a ring in two variables.");
+  }
+
+  // intVar must be either 1 or 2.
+  if((intVar < 0) || (intVar > 2)){
+      ERROR("The second parameter intVar must be either 1 or 2, indicating the 
+            integral variable.");
+  }
+  
+  // No parameters or algebraic numbers are allowed.
+  if(npars(basering) >0){
+    ERROR("No parameters or algebraic extensions are allowed in the base ring.");
+  }
+  
+  // The polynomial f must be monic in the intVar-th variable.
+  matrix cs = coeffs(f, var(intVar));
+  if(cs[size(cs),1] != 1){
+      ERROR("The input polynomial must be monic as a polynomial in the 
+            intVar-th variable.");
+  }
+  
+  // The polynomial f must be irreducible.
+  if(checkIrred == 1){
+    if(factorize(f)[2] != [1,1]){
+        ERROR("The input polynomial must be irreducible.");
+    }
+  }
+  
+//--------------------- computing the integral basis --------------------------
+  return(cancelCF(integralBasisMain(f, algorithm, inputJ, inputC, intVar)));
+}
+example
+{ "EXAMPLE:";
+  printlevel = printlevel+1;
+  echo = 2;
+  ring s = 0,(x,y),dp;
+  poly f = y5-y4x+4y2x2-x4;
+  list l = integralBasis(f, 2);
+  l;
+// The integral basis of the integral closure of Q[x] in Q(x,y) consists 
+// of the elements of l[1] divided by the polynomial l[2].
+  echo = 0;
+  printlevel = printlevel-1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inputC, int intVar)
+// Computes the integral basis of R/<f>, from the normalizaiton of R/<f>.
+// inputC is the conductor ideal to be used in proc normal.
+// If inputC = < 0 >, then the default conductor ideal is used (the full 
+// jacobian ideal).
+// inputJ is the test ideal to be used in proc normal.
+// If inputJ = < 0 >, then the default test ideal is used (the radical of the 
+// conductor).
+{
+  int dbg = printlevel - voice + 2;
+  int i, j;
+  int newRing = 0;    // If = 1, a new ring with dp ordering was used.
+  def origR = basering;
+
+//--------------------- moving to a ring with dp ordering ---------------------
+  if(ordstr(origR) != "dp(2),C"){
+    ring R = 0, (var(1), var(2)), dp;
+    poly f = fetch(origR, f);
+    ideal inputJ = fetch(origR, inputJ);
+    ideal inputC = fetch(origR, inputC);
+    newRing = 1;
+  } else {
+    def R = basering;
+  }
+  
+//-------------------------------- basic data ---------------------------------
+  // The degree of f with respect to the variable intVar
+  ideal I = f;
+  int n = size(coeffs(f, var(intVar))) - 1;  
+
+  // If the integral variable is the first, then the universal denominator
+  // must be a polynomial in the second variable (and viceversa).
+  string conduStr;
+  if(intVar == 1){
+    conduStr = "var2";
+  } else {
+    conduStr = "var1";
+  }
+  list opts = conduStr;
+
+//-------------------------- computes the normalization -----------------------
+  if(algorithm == "local"){
+    list nor = integralLocal(I, opts);
+  } else {
+    if(inputJ != 0){
+      opts = insert(opts, list("inputJ", inputJ));
+    }
+    if(inputC != 0){
+      opts = insert(opts, list("inputC", inputC));
+    }
+    list nor = normal(I, opts);
+  } 
+  ideal normalGen = nor[2][1];
+  poly D = normalGen[size(normalGen)];  // The universal denominator
+  
+  //Debug information
+  if(dbg >= 2){
+    "The universal denominator is: ", D;
+  }
+  
+//--------------- computes the integral basis from the normalization ----------
+  // We define a new ring where the integral variable is the first (needed for
+  // reduction) and has the appropiate ordering.  
+  list rl = ringlist(R);
+  rl[2] = list(var(intVar), var(3-intVar));
+  rl[3] = list(list("C", 0), list("lp", intvec(1,1)));
+  def S = ring(rl);
+  setring S;
+
+  // We map the elements in the previous ring to the new one
+  poly f = imap(R, f);
+  ideal normalGen = imap(R, normalGen);
+  
+  // We create the system of generatos y^i*f_j.
+  list l;
+  ideal red = groebner(f);
+  for(j = 1; j <= size(normalGen); j++){
+    l[j] = reduce(normalGen[j], red);
+  } 
+  for(i = 1; i <= n-1; i++){
+    for(j = 1; j <= size(normalGen); j++){ 
+      l[size(l)+1] = reduce(var(1)^i*normalGen[j], red);
+    }
+  }
+
+  // To eliminate the redundant elements, we look at the polynomials as
+  // elements of a free module where the coordinates are the coefficients
+  // of the polynomials regarded as polynomials in y.
+  // The groebner basis of the module generated by these elements
+  // gives the desired basis.   
+  matrix vecs[n + 1][size(l)];
+  matrix coeffi[n + 1][2];
+  
+  for(i = 1; i<= size(l); i++){
+    coeffi = coeffs(l[i], var(1));
+    vecs[1..nrows(coeffi), i] = coeffi[1..nrows(coeffi), 1];
+  }
+  module M = vecs;
+  M = std(M);
+
+  // We go back to the original ring.  
+  setring origR;
+  module M = imap(S, M);
+  if(newRing == 1){
+    poly D = fetch(R, D);
+  }
+  
+  // We go back from the module to the ring in two variables
+  ideal G;
+  poly g;
+  for(i = 1; i <= size(M); i++){
+    g = 0;
+    for(j = 0; j <= n; j++){
+      g = g + M[i][j+1] * var(intVar)^j;
+    }
+    G[i] = g;
+  }
+  
+  // The first element in the output is the ideal of numerators.
+  // The second element is the denominator.
+  list outp = G, D;       
+  
+  return(outp);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc integralLocal(ideal I, list #){
+// Computes the integral basis  by localizing at the different components of 
+// the singular locus.
+  int i;  
+  int dbg = printlevel - voice + 4;
+  def R = basering;
+  
+  list n;         // Output of proc normal
+  ideal norT;     // Temporary data.
+  poly denomT;    // Temporary data.
+
+  ideal nor;      // Output of normal with the denominator changed to the 
+                  // common denominator.
+  ideal res;      // The full integral basis
+
+//--------------------------- read the input options---------------------------
+  int denomOption = 0;
+  for ( i=1; i <= size(#); i++ )
+  {
+    if ( typeof(#[i]) == "string" )
+    {
+      if (#[i]=="var1")
+      {denomOption = 1;}
+      if (#[i]=="var2")
+      {denomOption = 2;}
+    }
+  }
+
+//------------------------ singular locus computation -------------------------
+  // We use a general method that works for any ideal.
+  // For I defined by a single polynomial a simpler method could be used.
+  list IM = mstd(I);
+  I = IM[1];
+  int d = dim(I);
+  ideal IMin = IM[2];  
+  qring Q = I;  // We work in the quotient by the Groebner basis of the ideal I
+  option("redSB");
+  option("returnSB");
+  ideal I = fetch(R, I);
+  attrib(I, "isSB", 1);
+  ideal IMin = fetch(R, IMin);
+  if(dbg >= 2){
+    int t = timer;
+  }
+  ideal J = minor(jacob(IMin), nvars(basering) - d, I);
+  if(dbg >= 2){
+    "singular locus time: ", timer - t;
+    t = timer;
+  }
+  setring R;
+  ideal J = fetch(Q, J);
+  J = J, I;
+  J = groebner(J);
+
+  if(dbg >= 2){
+    "groebner of the singular locus time: ", timer - t;
+    t = timer;
+  }
+  
+  if(dbg >= 2){
+    "The original singular locus is";
+    J;
+  }
+
+//------------------------ universal denominator ------------------------------
+  // We could use the LCD of the denominators of each component, but we need
+  // a denominator in the required variable.
+  if(denomOption == 0){
+    poly condu = getSmallest(J);   // Choses the polynomial of smallest degree
+                                   // of J as universal denominator.
+  } else {
+    poly condu = getOneVar(J, denomOption);
+  }
+
+//------------------- components of the singular locus------------------------
+  list pd = primdecGTZ(J);
+  if(dbg >= 2){
+    "primary decomposition time:", timer - t;
+  }
+  if(dbg >= 1){  
+    "The number of components of the Singular Locus is ", size(pd);
+  }
+
+  // The following commented lines are not needed for integral basis, since 
+  // all components are maximal.
+  // Computes the maximal components and the components included in them
+  //list comps = maxComps(pd);
+  // For each maximal component, it intersects all the components included in it
+  //list locs = intersectList(comps);
+  
+//------------------- normalization of each component--------------------------
+  list opts;
+  for(i = 1; i <= size(pd); i++){
+    //opts = #;
+    // We use the prime components as test ideals in the normalization.
+    //opts = list(list("inputJ", pd[i][2]));
+    // We use the primary components as conductor in the normalization.
+    opts = list(list("inputC", pd[i][1]));
+
+    if(dbg >= 2){
+      t = timer;
+    }
+    n = normal(I, opts);
+    if(dbg >= 2){
+      "normalization of component ", i, " time: ", timer - t;
+    }
+    if(size(n[2]) > 1){
+      ERROR("The input polynomial is not irreducible.");
+    }
+    
+    // We add up the normalizations at each localization, to construct the 
+    // normalization of the whole ideal.
+    norT = n[2][1];
+    denomT = norT[size(norT)];
+
+    // We change the denominator of the normalization of the localized ring,
+    // to have the same denominator for all the normalizations.
+    nor = changeDenominator(norT, denomT, condu, I);
+
+    // We sum the result to the previous results. 
+    res = res, nor;
+  }
+  res = groebner(res);
+  res[size(res)+1] = condu;
+  
+  // The output follows the output of proc normal, but we don't return the
+  // ring structure, only the generators. (We return 0 instead of the ring.)
+  return(list(0,list(res)));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static proc cancelCF(list IB)
+"USAGE:  cancelCF(IB); IB list of type returned by integralBasis
+RETURN:  list of same type with  common factor cancelled.
+KEYWORDS: greatest common divisor.
+"
+{  
+  int l = size(IB[1]);
+  poly GrCoDi = IB[2];
+  int k = l;
+  while((GrCoDi != 1) && (k >=1))
+      {
+        GrCoDi = gcd(GrCoDi,IB[1][k]);
+        k = k-1;
+      }
+  if(GrCoDi != 1)
+    {
+      for(k = 1; k <= l; k++)
+         {
+           IB[1][k] = IB[1][k]/GrCoDi;     
+         }
+      IB[2] = IB[2]/GrCoDi;
+    }
+  return(IB);
+}
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+/*
+/////////////////////////////////////////////////////////////////////////////
+/// Examples for testing the main procedures
+/// Timings on wawa Sept 30
+/////////////////////////////////////////////////////////////////////////////
+LIB"intbasis.lib";
+// -------------------------------------------------------
+// Example 1
+// -------------------------------------------------------
+ring r = 0, (x, y), dp;
+poly f = y5-y4x+4y2x2-x4;
+integralBasis(f, 2, "global");  // time 0
+integralBasis(f, 1);
+integralBasis(f, 2);  // local by default, time 0
+normal(f);
+kill r;
+// -------------------------------------------------------
+// Example 2
+// -------------------------------------------------------
+ring r = 0, (x, y), dp;
+poly f = y2-x2*(x+1)^2*(x+2);
+integralBasis(f, 2, "global");  // time 0
+integralBasis(f, 2);  // local by default, time 0
+integralBasis(f, 2, list(list("inputJ", ideal(x,y))));
+kill r;
+// -------------------------------------------------------
+// Example 3
+// -------------------------------------------------------
+ring RR = 0, (x,y), dp;
+poly f = 11y7+7y6x+8y5x2-3y4x3-10y3x4-10y2x5-x7-33y6-29y5x-13y4x2+26y3x3;
+f = f+30y2x4+10yx5+3x6+33y5+37y4x-8y3x2-33y2x3-20yx4-3x5-11y4-15y3x;
+f = f+13y2x2+10yx3+x4; // 3 OMPs of mult 3, 1 OMP of mult 4
+integralBasis(f, 2);
+f =1/11*f;
+integralBasis(f, 2, "global");  // time 2
+integralBasis(f, 2);  // local by default, time 0
+kill RR;
+// -------------------------------------------------------
+// Example 4
+// -------------------------------------------------------
+ring RR = 0, (x,y), dp;
+poly f = y^20+x*y^13+x^4*y^5+x^5+2*x^4+x^3;  
+integralBasis(f, 2, "global");  // time 0
+integralBasis(f, 2);  // local by default,  time 0
+kill RR;
+// -------------------------------------------------------
+// Example 5
+// -------------------------------------------------------
+ring SS = 0, (u,v,z), dp;
+poly f = u^6+3*u^4*v^2+3*u^2*v^4+v^6-4*u^4*z^2-34*u^3*v*z^2-7*u^2*v^2*z^2;
+f = f+12*u*v^3*z^2+6*v^4*z^2+36*u^2*z^4+36*u*v*z^4+9*v^2*z^4;
+f = subst(f,z,1);
+ring RR = 0, (x,y), dp;
+poly f = fetch(SS,f);
+integralBasis(f, 2);  integralBasis(f, 2, "global");  // time 1
+integralBasis(f, 2);  // local by default, time 0
+kill RR, SS;
+// -------------------------------------------------------
+// Example 6
+// -------------------------------------------------------
+ring SS = 0, (u,v,z), dp;
+poly f = -24135/322*u^6-532037/6440*u^5*v+139459/560*u^4*v^2;
+f = f-1464887/12880*u^3*v^3+72187/25760*u^2*v^4+9/8*u*v^5+1/8*v^6;
+f = f-403511/3220*u^5*z-40817/920*u^4*v*z+10059/80*u^3*v^2*z;
+f = f-35445/1288*u^2*v^3*z+19/4*u*v^4*z+3/4*v^5*z-20743/805*u^4*z^2;
+f = f+126379/3220*u^3*v*z^2-423417/6440*u^2*v^2*z^2+11/2*u*v^3*z^2;
+f = f+3/2*v^4*z^2+3443/140*u^3*z^3+u^2*v*z^3+u*v^2*z^3+v^3*z^3;
+f = 8/27*subst(f,z,u+v+z);
+f = subst(f,z,1);
+ring RR = 0, (x,y), dp;
+poly f = fetch(SS,f);
+integralBasis(f, 2, "global");  // time 3
+integralBasis(f, 2);  // local by default, time 0
+kill RR, SS;
+// -------------------------------------------------------
+// Example 8
+// -------------------------------------------------------
+ring SS = 0, (u,v,z), dp;
+poly f = 25*u^8+184*u^7*v+518*u^6*v^2+720*u^5*v^3+576*u^4*v^4+282*u^3*v^5;
+f = f+84*u^2*v^6+14*u*v^7+v^8+244*u^7*z+1326*u^6*v*z+2646*u^5*v^2*z;
+f = f+2706*u^4*v^3*z+1590*u^3*v^4*z+546*u^2*v^5*z+102*u*v^6*z+8*v^7*z;
+f = f+854*u^6*z^2+3252*u^5*v*z^2+4770*u^4*v^2*z^2+3582*u^3*v^3*z^2;
+f = f+1476*u^2*v^4*z^2+318*u*v^5*z^2+28*v^6*z^2+1338*u^5*z^3+3740*u^4*v*z^3;
+f = f+4030*u^3*v^2*z^3+2124*u^2*v^3*z^3+550*u*v^4*z^3+56*v^5*z^3+1101*u^4*z^4;
+f = f+2264*u^3*v*z^4+1716*u^2*v^2*z^4+570*u*v^3*z^4+70*v^4*z^4+508*u^3*z^5;
+f = f+738*u^2*v*z^5+354*u*v^2*z^5+56*v^3*z^5+132*u^2*z^6+122*u*v*z^6;
+f = f+28*v^2*z^6+18*u*z^7+8*v*z^7+z^8; 
+f = subst(f,z,1);
+ring RR = 0, (x,y), dp;
+poly f = fetch(SS,f);
+integralBasis(f, 2, "global");  // time 95
+integralBasis(f, 2);  // local by default, time  13 
+kill RR, SS;
+// -------------------------------------------------------
+// Example 9
+// -------------------------------------------------------
+ring SS = 0, (u,v,z), dp;
+poly f = u^10+6*u^9*v-30*u^7*v^3-15*u^6*v^4+u^5*v^5+u^4*v^6+6*u^3*v^7+u^2*v^8;
+f = f+7*u*v^9+v^10+5*u^9*z+24*u^8*v*z-30*u^7*v^2*z-120*u^6*v^3*z-43*u^5*v^4*z;
+f = f+5*u^4*v^5*z+20*u^3*v^6*z+10*u^2*v^7*z+29*u*v^8*z+5*v^9*z;
+f = f+10*u^8*z^2+36*u^7*v*z^2-105*u^6*v^2*z^2-179*u^5*v^3*z^2;
+f = f-38*u^4*v^4*z^2+25*u^3*v^5*z^2+25*u^2*v^6*z^2+46*u*v^7*z^2;
+f = f+10*v^8*z^2+10*u^7*z^3+24*u^6*v*z^3-135*u^5*v^2*z^3;
+f = f-117*u^4*v^3*z^3-u^3*v^4*z^3+25*u^2*v^5*z^3+34*u*v^6*z^3;
+f = f+10*v^7*z^3+5*u^6*z^4+6*u^5*v*z^4-75*u^4*v^2*z^4-27*u^3*v^3*z^4;
+f = f+10*u^2*v^4*z^4+11*u*v^5*z^4+5*v^6*z^4+u^5*z^5;
+f = f-15*u^3*v^2*z^5+u^2*v^3*z^5+u*v^4*z^5+v^5*z^5;
+f = subst(f,z,1);
+ring RR = 0, (x,y), dp;
+poly f = fetch(SS,f);
+// integralBasis(f, 2, "global");  // fail
+integralBasis(f, 2);  //  local by default, time 2
+kill RR, SS;
+*/
+
+

@@ -5,7 +5,7 @@
 #include <kernel/febase.h>
 
 void MinorKey::reset()
-{
+{                     
   _numberOfRowBlocks = 0;
   _numberOfColumnBlocks = 0;
   delete [] _rowKey;
@@ -99,9 +99,12 @@ MinorKey::MinorKey(const int lengthOfRowArray,
 
 MinorKey::~MinorKey()
 {
-  /* free memory of _rowKey and _columnKey */
+  _numberOfRowBlocks = 0;
+  _numberOfColumnBlocks = 0;
   delete [] _rowKey;
   delete [] _columnKey;
+  _rowKey = 0;
+  _columnKey = 0;
 }
 
 void MinorKey::print() const
@@ -553,7 +556,6 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk)
   int hitBits = 0;    /* the number of bits we have hit */
   int bitCounter = 0; /* for storing the number of bits hit before a
                          specific moment; see below */
-
   while (hitBits < k)
   {
     mkBlockIndex--;
@@ -575,7 +577,6 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk)
       shiftedBit = shiftedBit >> 1;
     }
   }
-
   if (newBitToBeSet == 0)
   {
     return false;
@@ -650,7 +651,6 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk)
       }
     };
     /* in the example, we shall obtain _rowKey[...] = 11000001 */
-
     return true;
   }
 }
@@ -685,8 +685,7 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
   int hitBits = 0;    /* the number of bits we have hit */
   int bitCounter = 0; /* for storing the number of bits hit before a specific
                          moment; see below */
-
-  while (hitBits < k) 
+  while (hitBits < k)
   {
     mkBlockIndex--;
     unsigned int currentInt = mk.getColumnKey(mkBlockIndex);
@@ -707,7 +706,6 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
       shiftedBit = shiftedBit >> 1;
     }
   }
-
   if (newBitToBeSet == 0)
   {
     return false;
@@ -783,7 +781,6 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
       }
     };
     /* in the example, we shall obtain _columnKey[...] = 11000001 */
-
     return true;
   }
 }

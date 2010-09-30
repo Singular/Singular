@@ -9,19 +9,22 @@ AUTHORS:  G.-M. Greuel,  greuel@mathematik.uni-kl.de,
 
 
 MAIN PROCEDURES:
- normal(I[...]);     normalization of an affine ring
+ normal(I,[...]);    normalization of an affine ring
  normalP(I,[...]);   normalization of an affine ring in positive characteristic
  normalC(I,[...]);   normalization of an affine ring through a chain of rings
  HomJJ(L);           presentation of End_R(J) as affine ring, J an ideal
  genus(I);           computes the geometric genus of a projective curve
  primeClosure(L);    integral closure of R/p, p a prime ideal
- closureFrac(L);     write a polynomial in integral closure as element of Quot(R/p)
+ closureFrac(L);     writes a poly in integral closure as element of Quot(R/p)
  iMult(L);           intersection multiplicity of the ideals of the list L
 
 AUXILIARY PROCEDURES:
  deltaLoc(f,S);      sum of delta invariants at conjugated singular points
  locAtZero(I);       checks whether the zero set of I is located at 0
  norTest(I,nor);     checks the output of normal, normalP, normalC
+ getSmallest(J);     computes the polynomial of smallest degree of J
+ getOneVar(J, vari); computes a polynomial of J in the variable vari
+ changeDenominator(U1, c1, c2, I); computes ideal U2 such that 1/c1*U1=1/c2*U2
 ";
 
 LIB "general.lib";
@@ -36,12 +39,10 @@ LIB "hnoether.lib";
 LIB "reesclos.lib";
 LIB "algebra.lib";
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
 proc normal(ideal id, list #)
-"USAGE:  normal(id [,choose]); id = radical ideal, choose = list of optional
-         strings. @*
+"USAGE:  normal(id [,choose]); id = radical ideal, choose = list of options. @*
          Optional parameters in list choose (can be entered in any order):@*
          Decomposition:@*
          - \"equidim\" -> computes first an equidimensional decomposition,
@@ -64,10 +65,22 @@ proc normal(ideal id, list #)
          - \"withDelta\" (or \"wd\") -> returns also the delta invariants.@*
          If the optional parameter choose is not given or empty, only
          \"equidim\" but no other option is used.@*
-         The following options can be used when the ring has two variables.
-         They are needed for computing integral basis.@*
-         - \"var1\" -> uses a polynomial in the first variable as conductor.@*
-         - \"var2\" -> uses a polynomial in the second variable as conductor.@*
+         - list(\"inputJ\", ideal inputJ) -> takes as initial test ideal the
+         ideal inputJ. This option is only for use in other procedures. Using 
+         this option, the result might not be the normalization.@*
+         (Option only valid for global algorithm.)@*         
+         - list(\"inputC\", ideal inputC) -> takes as initial conductor the 
+         ideal inputC. This option is only for use in other procedures. Using 
+         this option, the result might not be the normalization.@*
+         (Option only valid for global algorithm.)@*
+         Options used for computing integral basis (over rings of two 
+         variables):@*
+         - \"var1\" -> uses a polynomial in the first variable as 
+         universal denominator.@*
+         - \"var2\" -> uses a polynomial in the second variable as universal 
+         denominator.@*
+         If the optional parameter choose is not given or empty, only
+         \"equidim\" but no other option is used.@*
 ASSUME:  The ideal must be radical, for non-radical ideals the output may
          be wrong (id=radical(id); makes id radical). However, when using the
          \"prim\" option the minimal associated primes of id are computed first
@@ -141,7 +154,11 @@ EXAMPLE: example normal; shows an example
   int dbg = printlevel - voice + 2;
   int nvar = nvars(basering);
   int chara  = char(basering);
-  int conduOption;   // Method for choosing the conductor
+  int denomOption;   // Method for choosing the conductor
+
+  ideal inputJ = 0;      // Test ideal given in the input (if any).
+  ideal inputC = 0;      // Conductor ideal given in the input (if any).
+
   list result, resultNew;
   list keepresult;
   list ringStruc;
@@ -155,61 +172,70 @@ EXAMPLE: example normal; shows an example
   useRing = 0;       // Change first to dp ordering, and perform all
                      // computations there.
   withDelta = 0;     // Do not compute the delta invariant.
+  denomOption = 0;   // The default universal denominator is the smallest 
+                     // degree polynomial.
 
 //--------------------------- define the method ---------------------------
-  string method;                //make all options one string in order to use
-                                //all combinations of options simultaneously
   for ( i=1; i <= size(#); i++ )
   {
     if ( typeof(#[i]) == "string" )
     {
-      method = method + #[i];
-    }
-  }
-
 //--------------------------- choosen methods -----------------------
-  if ( find(method,"isprim") or find(method,"isPrim") )
-  {decomp = 0;}
+      if ( (#[i]=="isprim") or (#[i]=="isPrim") )
+      {decomp = 0;}
 
-  if ( find(method,"nodeco") or find(method,"noDeco") )
-  {decomp = 1;}
+      if ( (#[i]=="nodeco") or (#[i]=="noDeco") )
+      {decomp = 1;}
 
-  if ( find(method,"prim") )
-  {decomp = 3;}
+      if (#[i]=="prim")
+      {decomp = 3;}
 
-  if ( find(method,"equidim") )
-  {decomp = 2;}
+      if (#[i]=="equidim")
+      {decomp = 2;}
 
-  if ( find(method,"nofac") or find(method,"noFac") )
-  {noFac=1;}
+      if ( (#[i]=="nofac") or (#[i]=="noFac") )
+      {noFac=1;}
 
-  if ( (find(method,"useRing") or find(method,"usering")) and (ordstr(basering) != "dp("+string(nvars(basering))+"),C"))
-  {useRing = 1;}
+      if ( ((#[i]=="useRing") or (#[i]=="usering")) and (ordstr(basering) != "dp("+string(nvars(basering))+"),C"))
+      {useRing = 1;}
 
-  if ( find(method,"withDelta") or find(method,"wd") or find(method,"withdelta"))
-  {
-    if((decomp == 0) or (decomp == 3))
-    {
-      withDelta = 1;
+      if ( (#[i]=="withDelta") or (#[i]=="wd") or (#[i]=="withdelta"))
+      {
+        if((decomp == 0) or (decomp == 3))
+        {
+          withDelta = 1;
+        }
+        else
+        {
+          decomp = 3;
+          withDelta = 1;
+          //Note: the delta invariants cannot be computed with an equidimensional
+          //decomposition, hence we compute first the minimal primes
+        }
+      }
+      if (#[i]=="var1")
+      {denomOption = 1;}
+      if (#[i]=="var2")
+      {denomOption = 2;}
     }
-    else
-    {
-      decomp = 3;
-      withDelta = 1;
-      //Note: the delta invariants cannot be computed with an equidimensional
-      //decomposition, hence we compute first the minimal primes
+    if(typeof(#[i]) == "list"){
+      if(size(#[i]) == 2){
+        if (#[i][1]=="inputJ"){
+          if(typeof(#[i][2]) == "ideal"){
+            inputJ = #[i][2];
+          }
+        }
+      }
+      if (#[i][1]=="inputC"){
+        if(size(#[i]) == 2){
+          if(typeof(#[i][2]) == "ideal"){
+            inputC = #[i][2];
+          }
+        }
+      }
     }
   }
-
-  conduOption = 0;     // The default is the smallest degree polynomial
-  if ( find(method,"var1") )
-  {conduOption = 1;}
-  if ( find(method,"var2") )
-  {conduOption = 2;}
-
-
   kill #;
-  list #;
 
 //------------------------ change ring if required ------------------------
 // If the ordering is not global, we change to dp ordering for computing the
@@ -306,6 +332,8 @@ EXAMPLE: example normal; shows an example
   else
   {
     def R = basering;
+    ideal inputJ = fetch(origR, inputJ);
+    ideal inputC = fetch(origR, inputC);
     if(useRing == 0)
     {
       ideal U;
@@ -343,7 +371,7 @@ EXAMPLE: example normal; shows an example
         "We compute the normalization in the ring"; basering;
       }
       printlevel = printlevel + 1;
-      norComp = normalM(prim[i], decomp, withDelta, conduOption);
+      norComp = normalM(prim[i], decomp, withDelta, denomOption, inputJ, inputC);
       printlevel = printlevel - 1;
       for(j = 1; j <= size(norComp); j++)
       {
@@ -1402,17 +1430,18 @@ EXAMPLE: example normalizationPrimes; shows an example
        {
          "// extra test for onlySingularAtZero:";
        }
-       if ( locAtZero(JM[1]) )
-       {
-           attrib(SM[2],"onlySingularAtZero",1);
-           JM = maxideal(1),maxideal(1);
-           attrib(JM[1],"isSB",1);
-           attrib(JM[2],"isRadical",1);
-       }
-       else
-       {
+       // Not so cheap... removed       
+       //if ( locAtZero(JM[1]) )
+       //{
+       //    attrib(SM[2],"onlySingularAtZero",1);
+       //    JM = maxideal(1),maxideal(1);
+       //    attrib(JM[1],"isSB",1);
+       //    attrib(JM[2],"isRadical",1);
+       //}
+       //else
+       //{
               attrib(SM[2],"onlySingularAtZero",0);
-       }
+       //}
    }
 
   //displaying the attributes:
@@ -2549,7 +2578,6 @@ KEYWORDS: delta invariant; Tjurina number
 EXAMPLE: example deltaLoc;  shows an example
 "
 {
-   intvec save_opt=option(get);
    option(redSB);
    def R=basering;
    execute("ring S=("+charstr(R)+"),(x,y),lp;");
@@ -2633,7 +2661,7 @@ EXAMPLE: example deltaLoc;  shows an example
         "";
       }
    }
-   option(set,save_opt);
+   option(noredSB);
    ideal fstd=std(ideal(f)+jacob(f));
    poly hc=highcorner(fstd);
    int tau=vdim(fstd);
@@ -4178,7 +4206,10 @@ static proc computeRing(ideal J, ideal I, list #)
 ///////////////////////////////////////////////////////////////////////////////
 //                From here: subprocedures for normal
 
-static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
+// inputJ is used in parametrization of rational curves algorithms, to specify
+// a different test ideal.
+
+static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal inputJ, ideal inputC){
 // Computes the normalization of a ring R / I using the module structure as far
 // as possible.
 // The ring R is the basering.
@@ -4199,7 +4230,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
 // In step s, the denominator is D^s, where D is a nzd of the original quotient
 // ring, contained in the radical of the singular locus.
 // This denominator is used except when the degree of D^i is greater than the
-// degree of a conductor.
+// degree of a universal denominator.
 // The nzd is taken as the smallest degree polynomial in the radical of the
 // singular locus.
 
@@ -4216,8 +4247,8 @@ static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
 // The delta invariant is only computed if withDelta = 1, and decomp = 0 or
 // decomp = 3 (meaning that the ideal is prime).
 
-// conduOption = 0      -> Uses the smallest degree polynomial
-// conduOption = i > 0  -> Uses a polynomial in the i-th variable
+// denomOption = 0      -> Uses the smallest degree polynomial
+// denomOption = i > 0  -> Uses a polynomial in the i-th variable
 
   option("redSB");
   option("returnSB");
@@ -4251,14 +4282,29 @@ static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
   qring Q = I;   // We work in the quotient by the groebner base of the ideal I
   option("redSB");
   option("returnSB");
-  ideal I = fetch(R, I);
-  attrib(I, "isSB", 1);
-  ideal IMin = fetch(R, IMin);
 
-  dbprint(dbg, "Computing the jacobian ideal...");
+  // If a conductor ideal was given as input, we use it instead of the
+  // singular locus. If a test ideal was given as input, we do not compute the
+  // singular locus.
+  ideal inputC = fetch(R, inputC);
+  ideal inputJ = fetch(R, inputJ);
+  if((inputC == 0) && (inputJ == 0)){
+    // We compute the radical of the ideal of minors modulo the original ideal.
+    // This is done only in the first step.
+    ideal I = fetch(R, I);
+    attrib(I, "isSB", 1);
+    ideal IMin = fetch(R, IMin);
 
-  ideal J = minor(jacob(IMin), nvars(basering) - d, I);
-  J = groebner(J);
+    dbprint(dbg, "Computing the jacobian ideal...");
+
+    // If a given conductor ideal is given, we use it.
+    // If a given test ideal is given, we don't need to compute the jacobian
+    ideal J = minor(jacob(IMin), nvars(basering) - d, I);
+    J = groebner(J);
+  } else {
+    ideal J = fetch(R, inputC);
+    J = groebner(J);
+  }
 
   //------------------ We check if the singular locus is empty -------------
   if(J[1] == 1){
@@ -4284,90 +4330,97 @@ static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
   }
 
 
-  // -------------------- election of the conductor -------------------------
-  if(conduOption == 0){
-    poly condu = getSmallest(J);   // Choses the polynomial of smallest degree
-                                   // of J as universal denominator.
-  }
-  else
-  {
-    poly condu = getOnevar(J, conduOption);
-  }
-  if(dbg >= 1){
-    "";
-    "The universal denominator is ", condu;
-  }
-
-  // ---------  splitting the ideal by the conductor (if possible) -----------
-  // If the ideal is equidimensional, but not necessarily prime, we check if
-  // the conductor is a non-zerodivisor of R/I.
-  // If not, we split I.
-  if((decomp == 1) or (decomp == 2)){
-    ideal Id1 = quotient(0, condu);
-    if(size(Id1) > 0){
-      // We have to split.
-      if(dbg >= 1){
-        "A zerodivisor was found. We split the ideal. The zerodivisor is ", condu;
-      }
-      setring R;
-      ideal Id1 = fetch(Q, Id1), I;
-      Id1 = groebner(Id1);
-      ideal Id2 = quotient(I, Id1);
-      // I = I1 \cap I2
-      printlevel = printlevel + 1;
-      list nor1 = normalM(Id1, decomp, withDelta, conduOption)[1];
-      list nor2 = normalM(Id2, decomp, withDelta, conduOption)[1];
-      printlevel = printlevel - 1;
-      return(list(nor1, nor2));
+  // -------------------- election of the universal denominator----------------
+  // We first check if a conductor ideal was computed. If not, we don't
+  // compute a universal denominator.
+  ideal Id1;
+  if(J != 0){
+    if(denomOption == 0){
+      poly condu = getSmallest(J);   // Choses the polynomial of smallest degree
+                                     // of J as universal denominator.
+    } else {
+      poly condu = getOneVar(J, denomOption);
     }
+    if(dbg >= 1){
+      "";
+      "The universal denominator is ", condu;
+    }
+
+    // ----- splitting the ideal by the universal denominator (if possible) -----
+    // If the ideal is equidimensional, but not necessarily prime, we check if
+    // the universal denominator is a non-zerodivisor of R/I.
+    // If not, we split I.
+    if((decomp == 1) or (decomp == 2)){
+      Id1 = quotient(0, condu);
+      if(size(Id1) > 0){
+        // We have to split.
+        if(dbg >= 1){
+          "A zerodivisor was found. We split the ideal. The zerodivisor is ", condu;
+        }
+        setring R;
+        ideal Id1 = fetch(Q, Id1), I;
+        Id1 = groebner(Id1);
+        ideal Id2 = quotient(I, Id1);
+        // I = I1 \cap I2
+        printlevel = printlevel + 1;
+        ideal JDefault = 0;		// Now it uses the default J;
+        list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault)[1];
+        list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault)[1];
+        printlevel = printlevel - 1;
+        return(list(nor1, nor2));
+      }
+    }
+  } else {
+    poly condu = 0;
   }
 
   // --------------- computation of the first test ideal ---------------------
   // To compute the radical we go back to the original ring.
   // If we are using a non-global ordering, we must change to the global
   // ordering.
-  if(isGlobal == 1){
-    setring R;
-    ideal J = fetch(Q, J);
-    J = J, I;
-    if(dbg >= 1){
-      "The original singular locus is";
-      groebner(J);
-      if(dbg >= 2){pause();}
-       "";
-    }
-    // We check if the only singular point is the origin.
-    // If so, the radical is the maximal ideal at the origin.
-    J = groebner(J);
-    if(locAtZero(J)){
-      J = maxideal(1);
-    }
-    else
-    {
+  setring R;
+  // If a test ideal is given at the input, we use it.
+  if(inputJ == 0){
+    if(isGlobal == 1){
+      ideal J = fetch(Q, J);
+      J = J, I;
+      if(dbg >= 1){
+        "The original singular locus is";
+        groebner(J);
+        if(dbg >= 2){pause();}
+        "";
+      }
+      // We check if the only singular point is the origin.
+      // If so, the radical is the maximal ideal at the origin.
+      J = groebner(J);
+      if(locAtZero(J)){
+        J = maxideal(1);
+      } else {
+        J = radical(J);
+      }
+    } else {
+      // We change to global dp ordering.
+      list rl = ringlist(R);
+      list origOrd = rl[3];
+      list newOrd = list("dp", intvec(1:nvars(R))), list("C", 0);
+      rl[3] = newOrd;
+      def globR = ring(rl);
+      setring globR;
+      ideal J = fetch(Q, J);
+      ideal I = fetch(R, I);
+      J = J, I;
+      if(dbg >= 1){
+        "The original singular locus is";
+        groebner(J);
+        if(dbg>=2){pause();}
+        "";
+      }
       J = radical(J);
+      setring R;
+      ideal J = fetch(globR, J);
     }
-  }
-  else
-  {
-    // We change to global dp ordering.
-    list rl = ringlist(R);
-    list origOrd = rl[3];
-    list newOrd = list("dp", intvec(1:nvars(R))), list("C", 0);
-    rl[3] = newOrd;
-    def globR = ring(rl);
-    setring globR;
-    ideal J = fetch(Q, J);
-    ideal I = fetch(R, I);
-    J = J, I;
-    if(dbg >= 1){
-      "The original singular locus is";
-      groebner(J);
-      if(dbg>=2){pause();}
-      "";
-    }
-    J = radical(J);
-    setring R;
-    ideal J = fetch(globR, J);
+  } else {
+    ideal J = inputJ;
   }
 
   if(dbg >= 1){
@@ -4380,13 +4433,11 @@ static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
   setring Q;
   J = fetch(R, J);
   J = interred(J);
-  if(conduOption == 0){
+  if(denomOption == 0){
     poly D = getSmallest(J);    // Chooses the polynomial of smallest degree as
                                 // non-zerodivisor.
-  }
-  else
-  {
-    poly D = getOnevar(J, conduOption);
+  } else {
+    poly D = getOneVar(J, denomOption);
   }
   if(dbg >= 1){
     "The non zero divisor is ", D;
@@ -4413,8 +4464,9 @@ static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
       // I = Id1 \cap Id2
       printlevel = printlevel + 1;
 
-      list nor1 = normalM(Id1, decomp, withDelta, conduOption)[1];
-      list nor2 = normalM(Id2, decomp, withDelta, conduOption)[1];
+      ideal JDefault = 0;  // Now it uses the default J;
+      list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault)[1];
+      list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault)[1];
       printlevel = printlevel - 1;
       return(list(nor1, nor2));
     }
@@ -4427,7 +4479,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int conduOption){
   poly condu = fetch(Q, condu);
   J = fetch(Q, J);
   printlevel = printlevel + 1;
-  list result = normalMEqui(I, J, condu, D, withDelta, conduOption);
+  list result = normalMEqui(I, J, condu, D, withDelta, denomOption);
   printlevel = printlevel - 1;
   return(list(result));
 }
@@ -4441,7 +4493,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
 // I is assumed to be radical and equidimensional.
 // origJ is the first test ideal.
 // D is a non-zerodivisor of R/I.
-// condu is a non-zerodivisor in the conductor.
+// condu is a non-zerodivisor in the conductor or 0 if it was not computed.
 // If withDelta = 1, computes the delta invariant.
 {
   int step = 0;                       // Number of steps. (for debugging)
@@ -4566,10 +4618,15 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
       // We have to go on.
       // The new denominator is chosen.
       c = D * c;
-      if(deg(c) > deg(condu))
-      {
-        U = changeDenominatorQ(U, c, condu);
-        c = condu;
+      
+      // If we have a universal denominator of smaller degree than c, 
+      // we replace c by it.
+      if(condu != 0){
+        if(deg(c) > deg(condu))
+        {
+          U = changeDenominatorQ(U, c, condu);
+          c = condu;
+        }
       }
       if(dbg >= 1)
       {
@@ -4650,29 +4707,52 @@ static proc lineUp(ideal U, poly c)
 ///////////////////////////////////////////////////////////////////////////////
 
 //WARNING - elim is not working here!! Check!!
-//It is now replace by computing an eliminating groebner basis.
-static proc getOnevar(ideal J, int vari)
+//It is now replaced by computing an eliminating groebner basis.
+proc getOneVar(ideal J, int vari)
+"USAGE:   getOneVar(J, vari); J is a 0-dimensional ideal, vari is an integer.
+RETURN:  a polynomial of J in the variable indicated by vari of smallest 
+         degree.@*
+NOTE:    Works only over rings of two variables.@*
+         It is intended mainly as an auxiliary procedure for computing 
+         integral bases. @*
+EXAMPLE: example getOneVar; shows an example
+"
 {
-// Computes the polynomial of smallest degree of J.
-// If there are more than one, it chooses the one with smallest number
-// of monomials.
   def R = basering;
   ring RR = 0, (var(3-vari), var(vari)), lp;
   ideal J = imap(R, J);
   J = groebner(J);
-  poly D = J[1];
+  poly g = J[1];
   setring R;
-  poly D = imap(RR, D);
-  return(D);
+  poly g = imap(RR, g);
+  return(g);
 }
+example
+{ "EXAMPLE:";
+  printlevel = printlevel+1;
+  echo = 2;
+  ring s = 0,(x,y),dp;
+  ideal J = x3-y, y3;
+  getOneVar(J, 1);
 
+  echo = 0;
+  printlevel = printlevel-1;
+}
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc getSmallest(ideal J)
+proc getSmallest(ideal J)
+"USAGE:   getSmallest(J); J is an ideal.
+RETURN:  the generator of J of smallest degree. If there are more than one, it 
+         chooses the one with smallest number of monomials.@*
+NOTE:    It looks only at the generator of J, not at all the polynomials in
+         the ideal.@*
+         It is intended maninly to compute a good universal denominator in the 
+         normalization algorithms.@*
+EXAMPLE: example getSmallest; shows an example
+"
 {
 // Computes the polynomial of smallest degree of J.
-// If there are more than one, it chooses the one with smallest number
-// of monomials.
+// 
   int i;
   poly p = J[1];
   int d = deg(p);
@@ -4700,6 +4780,17 @@ static proc getSmallest(ideal J)
     }
   }
   return(p);
+}
+example
+{ "EXAMPLE:";
+  printlevel = printlevel+1;
+  echo = 2;
+  ring s = 0,(x,y),dp;
+  ideal J = x3-y, y5, x2-y2+1;
+  getSmallest(J);
+
+  echo = 0;
+  printlevel = printlevel-1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4903,10 +4994,18 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc changeDenominator(ideal U1, poly c1, poly c2, ideal I)
+proc changeDenominator(ideal U1, poly c1, poly c2, ideal I)
+"USAGE:   changeDenominator(U1, c1, c2, I); U1 and I ideals, c1 and c2
+         polynomials.@*
+RETURN:  an ideal U2 such that the A-modules 1/c1 * U1 and 1/c2 * U2 are equal,
+         where A = R/I and R is the basering.@*
+NOTE:    It assumes that such U2 exists. It is intended maninly as an auxiliary
+         procedure in the normalization algorithms.@*
+EXAMPLE: example changeDenominator; shows an example
+"
 {
-// Given a ring in the form 1/c1 * U, it computes a new ideal U2 such that the
-// ring is 1/c2 * U2.
+// Let A = R / I. Given an A-module in the form 1/c1 * U1 (U1 ideal of A), it 
+// computes a new ideal U2 such that the the A-module is 1/c2 * U2.
 // The base ring is R, but the computations are to be done in R / I.
   int a;      // counter
   def R = basering;
@@ -4918,6 +5017,21 @@ static proc changeDenominator(ideal U1, poly c1, poly c2, ideal I)
   setring R;
   ideal U2 = fetch(Q, U2);
   return(U2);
+}
+example
+{ 
+  "EXAMPLE:";
+  echo = 2;
+  ring s = 0,(x,y),dp;
+  ideal I = y5-y4x+4y2x2-x4;
+  ideal U1 = normal(I)[2][1];
+  poly c1 = U1[4];
+  U1;c1;
+  // 1/c1 * U1 is the normalization of I.
+  ideal U2 = changeDenominator(U1, c1, x3, I);
+  U2;
+  // 1/x3 * U2 is also the normalization of I, but with a different denominator.
+  echo = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

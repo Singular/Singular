@@ -1,16 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 version="$Id: paraplanecurves.lib, v 1.0 2010/05/29 Exp$";
-category="Commutative Algebra";
+category="Algebraic Geometry";
 info="
-LIBRARY:  paraplanecurves.lib
-
-PURPOSE:  Rational parametrization of rational plane curves
+LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves
 
 AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
           W. Decker, decker@mathematik.uni-kl.de> @*
           S. Laplagne, slaplagn@dm.uba.ar @*
           F. Seelisch, seelisch@mathematik.uni-kl.de
-
 
 OVERVIEW: 
 
@@ -49,8 +46,7 @@ the parametrization given is defined over a quadratic field extension of Q. @*
 By inverting the birational map of C to PP1 resp. to C2, a parametrization
 of C is obtained (defined over Q or the quadratic field extension).
 
-
-REFERENCES:
+References:
 
 Theo de Jong: An algorithm for computing the integral closure,
 Journal of Symbolic Computation 26 (3) (1998), p. 273-277
@@ -76,12 +72,10 @@ invertBirMap(ideal,ideal);        Invert a birational map of algebraic
                                   varieties
 paraPlaneCurve(poly, [...]);      Compute a rational parametrization of a
                                   rational plane curve
-AntiCanonicalMap(ideal);          Anticanonical map of a rational normal curve
+rncAntiCanonicalMap(ideal);       Anticanonical map of a rational normal curve
 rationalPointConic(poly);         Finds a point on the conic. This point has
                                   either coefficients in Q or in a quadratic
                                   extension field of Q
-isIrreducible(poly);              Test whether a hypersurface is absolutely
-                                  irreducible
 mapToRatNormCurve(poly,ideal);    Map a plane rational curve to a rational
                                   normal curve (RNC)
 rncItProjOdd(ideal);              Map a RNC via successive anticanonical maps
@@ -97,12 +91,14 @@ testPointConic(poly,ring);        Checks whether a given point (defined in the
 ";
 
 LIB "elim.lib";
-LIB "intbasis.lib";
-LIB "normal.lib";
 LIB "general.lib";
 LIB "primdec.lib";
+LIB "absfact.lib";
 LIB "matrix.lib";
 LIB "random.lib";
+LIB "homolog.lib";
+LIB "intbasis.lib";
+LIB "normal.lib";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2523,7 +2519,20 @@ EXAMPLE: example rationalPointConic; shows an example
   }
 }
 
-
+example
+{ "EXAMPLE:";
+ring R = 0, (x,y,z), dp;
+system("random", 4711);
+poly p = x^2 + 2*y^2 + 5*z^2 - 4*x*y + 3*x*z + 17*y*z;
+def S = rationalPointConic(p); // quadratic field extension,
+                               // minpoly = a^2 - 2
+testPointConic(p, S);
+setring R;
+p = x^2 - 1857669520 * y^2 + 86709575222179747132487270400 * z^2;
+S = rationalPointConic(p); // same as current basering,
+                           // no extension needed
+testPointConic(p, S);
+}
 ///////////////////////////////////////////////////////////////////////////////
 proc testParametrization(poly f, def rTT) 
 "USAGE:  testParametrization(f,rTT); f poly, rTT ring
@@ -2629,6 +2638,7 @@ example
 /// Further examples for testing the main procedures
 /// Timings on wawa Sept 29
 /////////////////////////////////////////////////////////////////////////////
+LIB"paraplanecurves.lib";
 // -------------------------------------------------------
 // Example 1
 // -------------------------------------------------------
@@ -2890,7 +2900,7 @@ f = f-27*u^3*v^3*z^4+10*u^2*v^4*z^4+11*u*v^5*z^4+5*v^6*z^4+u^5*z^5;
 f = f-15*u^3*v^2*z^5+u^2*v^3*z^5+u*v^4*z^5+v^5*z^5;
 // 1 OMP of mult 4, 3 OMPs of mult 5 (1 at origin)
 adjointIdeal(f,2);
-def RP1 = paraPlaneCurve(f);  // time 2
+def RP1 = paraPlaneCurve(f);  // time 2 // see Ex. 18
 testParametrization(f,RP1);
 setring RP1; PARA;
 kill SS;kill RP1;
