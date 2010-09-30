@@ -306,7 +306,7 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node general_lib, inout_lib, compregb_lib, General purpose
 @subsection general_lib
-@c lib  general.lib no_ex
+@c lib  general.lib
 @c ----------------------------------------------------------
 @node inout_lib, poly_lib, general_lib, General purpose
 @subsection inout_lib
