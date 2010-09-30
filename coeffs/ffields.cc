@@ -702,7 +702,7 @@ err:
 /*2
 * map Z/p -> GF(p,n)
 */
-number nfMapP(number c, const coeffs src, const coeffs dst)
+number nfMapP(number c, const coeffs, const coeffs dst)
 {
   return nfInit((int)((long)c), dst);
 }
@@ -711,7 +711,7 @@ number nfMapP(number c, const coeffs src, const coeffs dst)
 * map GF(p,n1) -> GF(p,n2), n1 < n2, n1 | n2
 */
 int nfMapGG_factor;
-number nfMapGG(number c, const coeffs src, const coeffs dst)
+number nfMapGG(number c, const coeffs src, const coeffs)
 {
   int i=(long)c;
   i*= nfMapGG_factor;
@@ -721,7 +721,7 @@ number nfMapGG(number c, const coeffs src, const coeffs dst)
 /*2
 * map GF(p,n1) -> GF(p,n2), n1 > n2, n2 | n1
 */
-number nfMapGGrev(number c, const coeffs src, const coeffs dst)
+number nfMapGGrev(number c, const coeffs src, const coeffs)
 {
   int ex=(int)((long)c);
   if ((ex % nfMapGG_factor)==0)
@@ -756,7 +756,6 @@ nMapFunc nfSetMap(const coeffs src, const coeffs dst)
       if ((n2 % n1)==0)
       {
         int save_ch=r->ch;
-        char **save_par=r->parameter;
         nfReadTable(src->ch, r);
         int nn=r->m_nfPlus1Table[0];
         nfReadTable(save_ch, r);
