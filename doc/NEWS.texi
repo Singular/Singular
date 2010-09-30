@@ -55,6 +55,8 @@ extended library: modstd.lib (see @nref{modstd_lib}: Groebner basis via modular 
 @heading New @sc{Singular} libraries
 @itemize @bullet
 @item
+new library: fpadim.lib (see @nref{fpadim_lib}:  Algorithms for quotient algebras in the letterplace case
+@item
 new library: dmodvar.lib (see @nref{dmodvar_lib}: algebraic D-modules for varieties
 @item
 new library: monomialideal.lib (see @nref{monomialideal_lib}: operation for monomial ideals)

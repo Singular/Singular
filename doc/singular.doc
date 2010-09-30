@@ -240,6 +240,9 @@ See also @ref{Non-commutative libraries}.
 * Miscellaneous libraries::
 * Experimental libraries::
 @end menu
+@ifset withplural
+@xref{Non-commutative libraries}
+@end ifset
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
 @section standard_lib
@@ -872,6 +875,7 @@ see @ref{Guidelines for writing a library}.
 Comments should be send to the author of the library directly.
 
 @menu
+* fpadim_lib::  Algorithms for quotient algebras in the letterplace case
 * findiff_lib:: finite difference schemes for linear differential equations
 * multigrading_lib:: Multigradings and related computations
 * primdecint_lib:: primary decomposition over the integers
@@ -880,7 +884,18 @@ Comments should be send to the author of the library directly.
 @end menu
 @c ----------------------------------------------------------
 
-@node findiff_lib, multigrading_lib,, Experimental libraries
+@node fpadim_lib, findiff_lib, , Experimental libraries
+@subsection fpadim_lib
+@cindex fpadim_lib
+
+Issues:
+@itemize
+@end itemize
+
+@c lib fpadim.lib
+@c ----------------------------------------------------------
+
+@node findiff_lib, multigrading_lib,fpadim_lib, Experimental libraries
 @subsection findiff_lib
 @cindex findiff_lib
 
