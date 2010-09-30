@@ -442,7 +442,7 @@ KEYWORDS: greatest common divisor.
 /// Examples for testing the main procedures
 /// Timings on wawa Sept 30
 /////////////////////////////////////////////////////////////////////////////
-LIB"intbasis.lib";
+LIB"integralbasis.lib";
 // -------------------------------------------------------
 // Example 1
 // -------------------------------------------------------

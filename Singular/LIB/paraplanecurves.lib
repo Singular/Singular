@@ -252,7 +252,7 @@ THEORY:  After a first step, realized by a projective automorphism in the
 Considering C in the chart z<>0, the algorithm regards x as transcendental
 and y as algebraic and computes an integral basis in C(x)[y] of the integral
 closure of C[x] in C(x,y) using the normalization algorithm from normal.lib
-(see intbasis.lib). In a future edition of the library, also van Hoeij's
+(see integralbasis.lib). In a future edition of the library, also van Hoeij's
 algorithm for computing the integral basis will be available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
@@ -453,8 +453,8 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
 THEORY:  Considering C in the chart z<>0, the algorithm regards x as
 transcendental and y as algebraic and computes an integral basis in C(x)[y] of
 the integral closure of C[x] in C(x,y) using the normalization algorithm
-from normal.lib (see intbasis.lib). In a future edition of the library, also
-van Hoeij's algorithm for computing the integral basis will be available. @*
+from normal.lib (see integralbasis.lib). In a future edition of the library,
+also van Hoeij's algorithm for computing the integral basis will be available.@*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
