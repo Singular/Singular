@@ -14,7 +14,7 @@ PROCEDURES:
  binomial(n,m[,../..]); n choose m (type int), [type bigint]
  deleteSublist(iv,l);   delete entries given by iv from list l
  factorial(n[,../..]);  n factorial (=n!) (type int), [type bigint]
- fibonacci(n[,p]);      nth Fibonacci number [char p]
+ fibonacci(n);          nth Fibonacci number
  kmemory([n[,v]]);      active [allocated] memory in kilobyte
  killall();             kill all user-defined variables
  number_e(n);           compute exp(1) up to n decimal digits
@@ -171,9 +171,6 @@ example
 proc binomial (int n, int k)
 "USAGE:   binomial(n,k); n,k integers
 RETURN:  binomial(n,k); binomial coefficient n choose k
-@*       - of type bigint (computed in characteristic 0)
-NOTE:    In any characteristic, binomial(n,k) = coefficient of x^k in (1+x)^n
-SEE ALSO: prime
 EXAMPLE: example binomial; shows an example
 "
 {
@@ -202,44 +199,6 @@ example
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc binomp (int n, int k, int p)
- //computes binomial coefficient n choose k in basering of char p > 0
- //binomial(n,k) = coefficient of x^k in (1+x)^n.
- //Let n=q*p^j, gcd(q,p)=1, then (1+x)^n = (1 + x^(p^j))^q. We have
- //binomial(n,k)=0 if k!=l*p^j and binomial(n,l*p^j) = binomial(q,l).
- //Do this reduction first. Then, in denominator and numerator
- //of defining formula for binomial coefficient, reduce those factors
- //mod p which are not divisible by p and cancel common factors p. Hence,
- //if n = h*p+r, k=l*p+s, r,s<p, binomial(n,k) = binomial(r,s)*binomial(h,l)
-{
-   int l,q,i= 1,n,1;
-   number r=1;
-   if ( k > n-k )
-   { k = n-k;
-   }
-   if ( k<=0 or k>n)               //trivial cases
-   { r = (k==0)*r;
-   }
-   else
-   {
-      while ( q mod p == 0 )
-      {  l = l*p;
-         q = q div p;
-      }                            //we have now n=q*l, l=p^j, gcd(q,p)=1;
-      if (k mod l != 0 )
-      { r = 0;
-      }
-      else
-      {  l = k div l;
-         n = q mod p;
-         k = l mod p;              //now 0<= k,n <p, use binom0 for n,k
-         q = q div p;              //recursion for q,l
-         l = l div p;              //use binomp for q,l
-         r = binom0(n,k)*binomp(q,l,p);
-      }
-   }
-   return(r);
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc factorial (int n)
@@ -259,7 +218,7 @@ EXAMPLE:  example factorial; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   factorial(37);"";                 //37! (as long integer)
+   factorial(37);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -273,7 +232,7 @@ EXAMPLE: example fibonacci; shows an example
 {
   bigint f,g,h=1,1,1;
 //------------------------------ computation --------------------------------
-   for (ii=3; ii<=n; ii=ii+1)
+   for (int ii=3; ii<=n; ii++)
    {
       h = f+g; f = g; g = h;
    }
@@ -281,10 +240,7 @@ EXAMPLE: example fibonacci; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   fibonacci(42); "";             //f(42) of type string (as long integer)
-   ring r = 2,x,dp;
-   number b = fibonacci(42,2);    //f(42) of type number, computed in r
-   b;
+   fibonacci(42);
 }
 ///////////////////////////////////////////////////////////////////////////////
 
