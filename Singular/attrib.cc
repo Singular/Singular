@@ -103,7 +103,7 @@ attr sattr::set(const char * s, void * data, int t)
   h->data = data;
   h->atyp = t;
 #ifdef TEST
-  ::Print("set attr >>%s<< of type %s\n",h->name, Tok2Cmdname(t));
+  //::Print("set attr >>%s<< of type %s\n",h->name, Tok2Cmdname(t));
 #endif
   return  result;
 }
@@ -116,7 +116,7 @@ attr sattr::get(const char * s)
     if (0 == strcmp(s,h->name)) 
     { 
 #ifdef TEST
-      ::Print("get attr >>%s<< of type %s\n",h->name, Tok2Cmdname(h->atyp));
+      //::Print("get attr >>%s<< of type %s\n",h->name, Tok2Cmdname(h->atyp));
 #endif
       return h;
     }
