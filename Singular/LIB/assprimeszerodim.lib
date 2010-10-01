@@ -27,7 +27,8 @@ LIB "modstd.lib";
 ////////////////////////////////////////////////////////////////////////////////
 
 proc zeroR(ideal I, list #)
-"USAGE:  zeroR(I,[n]); I ideal, optional: n number of processors (for parallel computing)
+"USAGE:  zeroR(I,[n]); I ideal, optional: n number of processors (for parallel
+         computing)
 ASSUME:  I is zero-dimensional in Q[variables]
 NOTE:    Parallelization is just applicable using 32-bit Singular version since
          MP-links are not compatible with 64-bit Singular version.
@@ -52,10 +53,10 @@ EXAMPLE: example zeroR; shows an example
       int n = #[1];
       if((n > 1) && (1 - system("with","MP")))
       {
-         "========================================================================";
-         "There is no MP available on your system. Since this is necessary to     ";
-         "parallelize the algorithm, the computation will be done without forking.";
-         "========================================================================";
+     "========================================================================";
+     "There is no MP available on your system. Since this is necessary to     ";
+     "parallelize the algorithm, the computation will be done without forking.";
+     "========================================================================";
          n = 1;
       }
    }
@@ -200,22 +201,18 @@ example
 
 proc assPrimes(list #)
 "USAGE:  assPrimes(I,[a],[n]); I ideal or module,
-         optional: n number of processors (for parallel computing), a
+         optional: int n: number of processors (for parallel computing), int a:
          - a = 1: method of Eisenbud/Hunecke/Vasconcelos
          - a = 2: method of Gianni/Trager/Zacharias
-         - a = 3: mathod of Monico
+         - a = 3: method of Monico
          assPrimes(I) chooses n = a = 1
 ASSUME:  I is zero-dimensional over Q[variables]
 NOTE:    Parallelization is just applicable using 32-bit Singular version since
          MP-links are not compatible with 64-bit Singular version.
-RETURN:  a list pr of associated primes of I:
+RETURN:  a list Re of associated primes of I:
 EXAMPLE: example assPrimes; shows an example
 "
-
 {
-   int T = timer;
-   int RT = rtimer;
-
    ideal I;
    if(typeof(#[1]) == "ideal")
    {
@@ -227,7 +224,7 @@ EXAMPLE: example assPrimes; shows an example
       I = Ann(M);
    }
 
-   //---------------------  Initialize optional parameter  ------------------------
+//---------------------  Initialize optional parameter  ------------------------
    if(size(#) > 1)
    {
       if(size(#) == 2)
@@ -241,10 +238,10 @@ EXAMPLE: example assPrimes; shows an example
          int n = #[3];
          if((n > 1) && (1 - system("with","MP")))
          {
-            "========================================================================";
-            "There is no MP available on your system. Since this is necessary to     ";
-            "parallelize the algorithm, the computation will be done without forking.";
-            "========================================================================";
+     "========================================================================";
+     "There is no MP available on your system. Since this is necessary to     ";
+     "parallelize the algorithm, the computation will be done without forking.";
+     "========================================================================";
             n = 1;
          }
       }
@@ -261,12 +258,18 @@ EXAMPLE: example assPrimes; shows an example
    if(d == -1) { ERROR("Ideal is not zero-dimensional."); }
    if(homog(I) == 1){ return(list(maxideal(1))); }
    poly f = findGen(I);
+   
+   int T = timer;
+   int RT = rtimer;
+   int TT;
    if(size(f) == nvars(SPR))
    {
+      TT = timer;
       int spT = pTestRad(d,f,I);
       if(printlevel>=10)
       {
-         "pTestRad(d,f,I) = "+string(spT);
+         "pTestRad(d,f,I) = "+string(spT)+" and takes 
+         "+string(timer-TT)+" seconds.";
       }
       if(!spT)
       {
@@ -274,16 +277,36 @@ EXAMPLE: example assPrimes; shows an example
          {
             if(attrib(#[1],"isRad") == 0)
             {
-               I = zeroR(I);
+               TT = timer;
+               I = zeroR(I,n);
+               if(printlevel>=10)
+               { 
+                  "zeroR(I,n) takes "+string(timer-TT)+" seconds."; 
+               }
+               TT = timer;
                I = std(I);
+               if(printlevel>=10) 
+               { 
+                  "std(I) takes "+string(timer-TT)+" seconds."; 
+               }
                d = vdim(I);
                f = findGen(I);
             }
          }
          else
          {
-            I = zeroR(I);
+            TT = timer;
+            I = zeroR(I,n);
+            if(printlevel>=10) 
+            { 
+               "zeroR(I,n) takes "+string(timer-TT)+" seconds.";
+            }
+            TT = timer;
             I = std(I);
+            if(printlevel>=10) 
+            { 
+               "std(I) takes "+string(timer-TT)+" seconds."; 
+            }
             d = vdim(I);
             f = findGen(I);
          }
@@ -330,7 +353,8 @@ EXAMPLE: example assPrimes; shows an example
       {
          link l(i) = "MPtcp:fork";
          open(l(i));
-         write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[i + 1]), eval(alg))));
+         write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[i + 1]), 
+                                                          eval(alg))));
       }
 
       int t = timer;
@@ -372,7 +396,9 @@ EXAMPLE: example assPrimes; shows an example
 
                   if(j <= size(L))
                   {
-                     write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[j]), eval(alg))));
+                     write(l(i), quote(modpSpecialAlgDep(eval(ringL), 
+                                                         eval(L[j]),
+                                                         eval(alg))));
                      j++;
                   }
                   else
@@ -403,8 +429,10 @@ EXAMPLE: example assPrimes; shows an example
       }
       if(printlevel>=10)
       {
-         "Real-time for computing list in assPrimes is "+string(rtimer - rt)+" seconds.";
-         "CPU-time for computing list in assPrimes is "+string(timer - tt)+" seconds.";
+         "Real-time for computing list in assPrimes is "+string(rtimer - rt)+
+         " seconds.";
+         "CPU-time for computing list in assPrimes is "+string(timer - tt)+
+         " seconds.";
       }
 
       // insert deleteUnluckyPrimes
@@ -521,7 +549,8 @@ EXAMPLE: example assPrimes; shows an example
          for(i = 1; i <= n; i++)
          {
             open(l(i));
-            write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[j+i-1]), eval(alg))));
+            write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[j+i-1]),
+                                                             eval(alg))));
          }
          j = j + n;
          k = 0;
@@ -647,7 +676,8 @@ static proc specialTest(int d, poly p, ideal I)
 
 static proc findGen(ideal J, list #)
 {
-//=== try to find a sparse linear form r such that vector space dim(baserng/J)=deg(F),
+//=== try to find a sparse linear form r such that 
+//=== vector space dim(basering/J)=deg(F),
 //=== F a poly in Q[T] such that <F>=kernel(Q[T]--->basering) mapping T to r
 //=== if not found returns a generic (randomly choosen) r
    int d = vdim(J);
@@ -687,10 +717,13 @@ static proc findGen(ideal J, list #)
 
 static proc pTestRad(int d, poly p1, ideal I)
 {
-//=== computes a poly F in Z/q1[T] such that <F>=kernel(Z/q1[T]--->Z/q1[vars(basering)])
-//=== mapping T to p1 and test if d=deg(squarefreepart(F)), q1 a prime randomly chosen
+//=== computes a poly F in Z/q1[T] such that 
+//===                    <F> = kernel(Z/q1[T]--->Z/q1[vars(basering)])
+//=== mapping T to p1 and test if d=deg(squarefreepart(F)), q1 a prime randomly 
+//=== chosen
 //=== If not choose randomly another prime q2 and another linear form p2 and
-//=== computes a poly F in Z/q2[T] such that <F>=kernel(Z/q2[T]--->Z/q2[vars(basering)])
+//=== computes a poly F in Z/q2[T] such that 
+//===                    <F> = kernel(Z/q2[T]--->Z/q2[vars(basering)])
 //=== mapping T to p2 and test if d=deg(squarefreepart(F))
 //=== if the test is positive then I is radical
    def R = basering;
@@ -803,7 +836,7 @@ static proc modpSpecialAlgDep(list ringL, int p, list #)
 //=== prepare parallel computing
 //===  #=1: method of Eisenbud/Hunecke/Vasconcelos
 //===  #=2: method of Gianni/Trager/Zacharias
-//===  #=3: mathod of Monico
+//===  #=3: method of Monico
 
    def R0 = basering;
 
@@ -831,17 +864,18 @@ static proc modpSpecialAlgDep(list ringL, int p, list #)
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
-Examples
+Examples:
+=========
 
-//Test for zeroR
+//=== Test for zeroR
 ring R = 0,(x,y),dp;
 ideal I = xy4-2xy2+x, x2-x, y4-2y2+1;
 
-//Cyclic 6
+//=== Cyclic_6
 ring R = 0,x(1..6),dp;
 ideal I = cyclic(6);
 
-//Amrhei
+//=== Amrhein
 ring R = 0,(a,b,c,d,e,f),dp;
 ideal I = 2fb+2ec+d2+a2+a,
           2fc+2ed+2ba+b,
@@ -850,14 +884,13 @@ ideal I = 2fb+2ec+d2+a2+a,
           f2+2ea+e+2db+c2,
           2fa+f+2eb+2dc;
 
-
-//Becker-Niermann
+//=== Becker-Niermann
 ring R = 0,(x,y,z),dp;
 ideal I = x2+xy2z-2xy+y4+y2+z2,
           -x3y2+xy2z+xyz3-2xy+y4,
           -2x2y+xy4+yz4-3;
 
-//Roczen
+//=== Roczen
 ring R = 0,(a,b,c,d,e,f,g,h,k,o),dp;
 ideal I = o+1, k4+k, hk, h4+h, gk, gh, g3+h3+k3+1,
           fk, f4+f, eh, ef, f3h3+e3k3+e3+f3+h3+k3+1,
@@ -865,28 +898,77 @@ ideal I = o+1, k4+k, hk, h4+h, gk, gh, g3+h3+k3+1,
           d3+e3+f3+1, e2g2+d2h2+c, f2g2+d2k2+b,
           f2h2+e2k2+a;
 
-//4 bodies with equal masses, before symmetrisation.
-//We are looking for the real positive solutions
+//=== FourBodyProblem
+//=== 4 bodies with equal masses, before symmetrisation.
+//=== We are looking for the real positive solutions
 ring R = 0,(B,b,D,d,F,f),dp;
 ideal I = (b-d)*(B-D)-2*F+2,
           (b-d)*(B+D-2*F)+2*(B-D),
           (b-d)^2-2*(b+d)+f+1,
           B^2*b^3-1,D^2*d^3-1,F^2*f^3-1;
 
-ring R = 0,(B,b,D,d,F,f),dp;
-ideal I = (b-d)*(B-D)-F+1,
-          (b-d)*(B+D-F)+(B-D),
-          (b-d)^2-(b+d)+f+1,
-          B^2*b^3-1,D^2*d^3-1,F^2*f^3-1;
-
-
-//prime
+//=== Reimer_5
 ring R = 0,(x,y,z,t,u),dp;
 ideal I = 2x2-2y2+2z2-2t2+2u2-1,
           2x3-2y3+2z3-2t3+2u3-1,
           2x4-2y4+2z4-2t4+2u4-1,
           2x5-2y5+2z5-2t5+2u5-1,
           2x6-2y6+2z6-2t6+2u6-1;
+          
+//=== ZeroDim.example_12
+ring R = 0, (x, y, z), lp;
+ideal I = 7xy+x+3yz+4y+2z+10, 
+          x3+x2y+3xyz+5xy+3x+2y3+6y2z+yz+1, 
+          3x4+2x2y2+3x2y+4x2z2+xyz+xz2+6y2z+5z4;
 
+//=== ZeroDim.example_27
+ring R = 0, (w, x, y, z), lp;
+ideal I = -2w2+9wx+9wy-7wz-4w+8x2+9xy-3xz+8x+6y2-7yz+4y-6z2+8z+2,
+          3w2-5wx-3wy-6wz+9w+4x2+2xy-2xz+7x+9y2+6yz+5y+7z2+7z+5,
+          7w2+5wx+3wy-5wz-5w+2x2+9xy-7xz+4x-4y2-5yz+6y-4z2-9z+2,
+          8w2+5wx-4wy+2wz+3w+5x2+2xy-7xz-7x+7y2-8yz-7y+7z2-8z+8;
+
+//=== Cassou_1
+ring R = 0, (b,c,d,e), dp;
+ideal I = 6b4c3+21b4c2d+15b4cd2+9b4d3+36b4c2+84b4cd+30b4d2+72b4c+84b4d-8b2c2e
+          -28b2cde+36b2d2e+48b4-32b2ce-56b2de-144b2c-648b2d-32b2e-288b2-120,
+          9b4c4+30b4c3d+39b4c2d2+18b4cd3+72b4c3+180b4c2d+156b4cd2+36b4d3+216b4c2
+          +360b4cd+156b4d2-24b2c3e-16b2c2de+16b2cd2e+24b2d3e+288b4c+240b4d
+          -144b2c2e+32b2d2e+144b4-432b2c2-720b2cd-432b2d2-288b2ce+16c2e2-32cde2
+          +16d2e2-1728b2c-1440b2d-192b2e+64ce2-64de2-1728b2+576ce-576de+64e2
+          -240c+1152e+4704,
+          -15b2c3e+15b2c2de-90b2c2e+60b2cde-81b2c2+216b2cd-162b2d2-180b2ce
+          +60b2de+40c2e2-80cde2+40d2e2-324b2c+432b2d-120b2e+160ce2-160de2-324b2
+          +1008ce-1008de+160e2+2016e+5184,
+          -4b2c2+4b2cd-3b2d2-16b2c+8b2d-16b2+22ce-22de+44e+261;
+          
+================================================================================
+
+The following timings are conducted on an Intel Xeon X5460 with 4 CPUs, 3.16 GHz 
+each, 64 GB RAM under the Gentoo Linux operating system by using the 32-bit 
+version of Singular 3-1-1.
+The results of the timinings are summarized in the following table where 
+assPrimes* denotes the parallelized version of the algorithm on 4 CPUs and
+ (1) approach of Eisenbud, Hunecke, Vasconcelos (cf. specialAlgDepEHV),
+ (2) approach of Gianni, Trager, Zacharias      (cf. specialAlgDepGTZ),
+ (3) approach of Monico                         (cf. specialAlgDepMonico). 
+
+Example             | minAssGTZ |     assPrimes         assPrimes*    
+                    |           |  (1)   (2)   (3)   (1)   (2)   (3)   
+--------------------------------------------------------------------
+Cyclic_6            |      5    |    5    10     7     4     7     6
+Amrhein             |      1    |    3     3     5     1     2    21  
+Becker-Niermann     |      -    |    0     0     1     0     0     0   
+Roczen              |      0    |    3     2     0     2     4     1   
+FourBodyProblem     |      -    |  139   139   148    96    83    96   
+Reimer_5            |      -    |  132   128   175    97    70   103   
+ZeroDim.example_12  |    170    |  125   125   125    67    68    63   
+ZeroDim.example_27  |     27    |  215   226   215   113   117   108   
+Cassou_1            |    525    |  112   112   112    56    56    57  
+
+minAssGTZ (cf. primdec_lib) runs out of memory for Becker-Niermann, 
+FourBodyProblem and Reimer_5.
+
+================================================================================
 */
 
