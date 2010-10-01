@@ -1430,18 +1430,17 @@ EXAMPLE: example normalizationPrimes; shows an example
        {
          "// extra test for onlySingularAtZero:";
        }
-       // Not so cheap... removed       
-       //if ( locAtZero(JM[1]) )
-       //{
-       //    attrib(SM[2],"onlySingularAtZero",1);
-       //    JM = maxideal(1),maxideal(1);
-       //    attrib(JM[1],"isSB",1);
-       //    attrib(JM[2],"isRadical",1);
-       //}
-       //else
-       //{
-              attrib(SM[2],"onlySingularAtZero",0);
-       //}
+       if ( locAtZero(JM[1]) )
+       {
+           attrib(SM[2],"onlySingularAtZero",1);
+           JM = maxideal(1),maxideal(1);
+           attrib(JM[1],"isSB",1);
+           attrib(JM[2],"isRadical",1);
+       }
+       else
+       {
+            attrib(SM[2],"onlySingularAtZero",0);
+       }
    }
 
   //displaying the attributes:
