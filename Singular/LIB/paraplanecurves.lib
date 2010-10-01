@@ -1825,13 +1825,13 @@ KEYWORDS: prime factorization.
 
   bigint nn = n; if (nn < 0) { nn = -n; }
   list L = primefactors(nn);
-  if (L[1] != 1)
+  if (L[3] != 1)
   { "WARNING: command 'primefactors(.)' did not find all prime factors"; }
   int i; bigint m = bigint(1); int e; int j;
-  for (i = 1; i <= size(L[2]); i = i + 1)
+  for (i = 1; i <= size(L[1]); i++)
   {
-    e = L[3][i] / 2;
-    for (j = 1; j <= e; j = j + 1) { m = m * bigint(L[2][i]); }
+    e = L[2][i] / 2;
+    for (j = 1; j <= e; j++) { m = m * bigint(L[1][i]); }
   }
   return (m);
 }
@@ -1890,7 +1890,7 @@ KEYWORDS: Cantor-Zassenhaus algorithm.
   {
     /* For small p, we use a brute force approach: */
     int i;
-    for (i = 2; i < p; i = i + 1)
+    for (i = 2; i < p; i++)
     {
       if (((i*i) mod p) == r) { return (i); }
     }
@@ -1973,12 +1973,12 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
   if (m == 0) { "ERROR: squareRoot had been invoked with m = 0"; }
 
   list L = primefactors(m);
-  if (L[1] != 1)
+  if ((L[3] != 1)||(L[3]!=-1))
  { "WARNING: command 'primefactors(.)' did not find all prime factors"; }
   int i;
-  for (i = 1; i <= size(L[2]); i = i + 1)
+  for (i = 1; i <= size(L[2]); i++)
   {
-    if (legendreSymbol(r, L[2][i]) == -1) { return (-1); }
+    if (legendreSymbol(r, L[1][i]) == -1) { return (-1); }
   }
   /* now we know that there is some x in {0, 1, m-1} with
      x^2 = r mod m */
@@ -1995,36 +1995,36 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
 
     list roots;
     // 2.1):
-    for (i = 1; i <= size(L[2]); i = i + 1)
+    for (i = 1; i <= size(L[1]); i++)
     {
-      roots = insert(roots, rootModP(r mod L[2][i], L[2][i]), size(roots));
+      roots = insert(roots, rootModP(r mod L[1][i], L[1][i]), size(roots));
     }
 
     // 2.2):
     bigint c; bigint l; bigint temp; bigint pPower; int e;
-    for (i = 1; i <= size(roots); i = i + 1)
+    for (i = 1; i <= size(roots); i++)
     {
-      pPower = bigint(L[2][i]);
-      for (e = 2; e <= L[3][i]; e = e + 1)
+      pPower = bigint(L[1][i]);
+      for (e = 2; e <= L[2][i]; e++)
       {
         c = bigint(roots[i]); l = pPower;
         temp = r - c * c; l = bigint(2) * c * l; c = temp;
         c = c div pPower; l = l div pPower;
-        c = c mod L[2][i]; l = l mod L[2][i];
-        c = (c * bigint(inverseModP(l, L[2][i]))) mod L[2][i];
+        c = c mod L[1][i]; l = l mod L[1][i];
+        c = (c * bigint(inverseModP(l, L[1][i]))) mod L[1][i];
         c = bigint(roots[i]) + c * pPower;
-        pPower = pPower * L[2][i]; roots[i] = c;
+        pPower = pPower * L[1][i]; roots[i] = c;
       }
     }
 
     // 2.3):
     list mm; bigint z; int j;
-    for (i = 1; i <= size(L[2]); i = i + 1)
+    for (i = 1; i <= size(L[1]); i++)
     {
-      z = bigint(L[2][i]);
-      for (j = 2; j <= L[3][i]; j = j + 1)
+      z = bigint(L[1][i]);
+      for (j = 2; j <= L[2][i]; j++)
       {
-        z = z * bigint(L[2][i]);
+        z = z * bigint(L[1][i]);
       }
       mm = insert(mm, z, size(mm));
     }
@@ -2045,8 +2045,8 @@ KEYWORDS: Chinese remainder.
 {
   bigint x = bigint(0); int i; bigint N; list l;
   bigint M = bigint(mm[1]);
-  for (i = 2; i <= size(mm); i = i + 1) { M = M * bigint(mm[i]); }
-  for (i = 1; i <= size(mm); i = i + 1)
+  for (i = 2; i <= size(mm); i++) { M = M * bigint(mm[i]); }
+  for (i = 1; i <= size(mm); i++)
   {
     N = M div mm[i];
     l = extendedEuclid(mm[i], N);
