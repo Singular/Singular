@@ -46,7 +46,7 @@ the parametrization given is defined over a quadratic field extension of Q. @*
 By inverting the birational map of C to PP1 resp. to C2, a parametrization
 of C is obtained (defined over Q or the quadratic field extension).
 
-References:
+REFERENCES:
 
 Theo de Jong: An algorithm for computing the integral closure,
 Journal of Symbolic Computation 26 (3) (1998), p. 273-277

@@ -26,7 +26,7 @@ fullSerreRelations(A,N,C,P,d); compute the ideal of all Serre's relations associ
 isVar(p);                   check whether p is a power of a single variable
 ademRelations(i,j);    compute the ideal of Adem relations for i<2j in char 0
 
-SEE ALSO: fpadim_lib, Letterplace
+SEE ALSO: fpadim_lib, LETTERPLACE
 ";
 
 // this library computes two-sided GB of an ideal
