@@ -247,7 +247,8 @@ static void smMinSelect(long *c, int t, int d)
 void smRingChange(ring *origR, sip_sring &tmpR, long bound)
 {
   *origR =currRing;
-  tmpR=*currRing;
+  ring tt=rCopy0(currRing,FALSE,FALSE);
+  tmpR=*tt;
   int *ord=(int*)omAlloc0(3*sizeof(int));
   int *block0=(int*)omAlloc(3*sizeof(int));
   int *block1=(int*)omAlloc(3*sizeof(int));
@@ -265,6 +266,10 @@ void smRingChange(ring *origR, sip_sring &tmpR, long bound)
 //  if (tmpR.bitmask > currRing->bitmask) tmpR.bitmask = currRing->bitmask;
 
   rComplete(&tmpR,1);
+  if ((*origR)->qideal!=NULL)
+  {
+    tmpR.qideal= idrCopyR_NoSort((*origR)->qideal, (*origR), &tmpR);
+  }
   rChangeCurrRing(&tmpR);
   if (TEST_OPT_PROT)
     Print("[%ld:%d]", (long) tmpR.bitmask, tmpR.ExpL_Size);
@@ -272,6 +277,7 @@ void smRingChange(ring *origR, sip_sring &tmpR, long bound)
 
 void smRingClean(ring origR, ip_sring &tmpR)
 {
+  if (tmpR.qideal!=NULL) id_Delete(&(tmpR.qideal),&tmpR);
   rUnComplete(&tmpR);
   omFreeSize((ADDRESS)tmpR.order,3*sizeof(int));
   omFreeSize((ADDRESS)tmpR.block0,3*sizeof(int));
