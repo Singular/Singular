@@ -835,9 +835,9 @@ EXAMPLE: example equidimZ; shows an example
                E=stdZ(E);
                TQ=intersectZ(TQ,E);
             }
-            kill S;
-            setring Rhelp;
          }
+         kill S;
+         setring Rhelp;
       }
       setring R;
       return(TQ);
@@ -856,7 +856,7 @@ EXAMPLE: example equidimZ; shows an example
       E=std(equidimMax(J));
    }
    setring R;
-   ideal  E =imap(Rhelp,E);
+   E =imap(Rhelp,E);
    //=== intersection with Z[variables]
    E=coefZ(E)[1];
    //=== find h in Z such that I is the intersection of I:h and I,h
