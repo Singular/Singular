@@ -877,7 +877,9 @@ Comments should be send to the author of the library directly.
 @menu
 * fpadim_lib::  Algorithms for quotient algebras in the letterplace case
 * findiff_lib:: finite difference schemes for linear differential equations
+* integralbasis_lib:: Integral basis in algebraic function fields
 * multigrading_lib:: Multigradings and related computations
+* paraplanecurves_lib:: Rational parametrization of rational plane curves
 * primdecint_lib:: primary decomposition over the integers
 * resjung_lib:: Resolution of surface singularities by Jung's Algorithm
 * surfacesignature_lib:: signature of surface singularities
@@ -895,7 +897,7 @@ Issues:
 @c lib fpadim.lib
 @c ----------------------------------------------------------
 
-@node findiff_lib, multigrading_lib,fpadim_lib, Experimental libraries
+@node findiff_lib, integralbasis_lib,fpadim_lib, Experimental libraries
 @subsection findiff_lib
 @cindex findiff_lib
 
@@ -913,7 +915,19 @@ Issues:
 @c lib findiff.lib
 
 @c ----------------------------------------------------------
-@node multigrading_lib,primdecint_lib,findiff_lib, Experimental libraries
+
+@node integralbasis_lib, multigrading_lib,findiff_lib, Experimental libraries
+@subsection integralbasis_lib
+@cindex integralbasis_lib
+
+Issues:
+@itemize
+@end itemize
+
+@c lib integralbasis.lib
+
+@c ----------------------------------------------------------
+@node multigrading_lib,paraplanecurves_lib,integralbasis_lib, Experimental libraries
 @subsection multigrading_lib
 @cindex multigrading_lib
 
@@ -925,7 +939,18 @@ Todos/Issues:
 @c lib multigrading.lib
 
 @c ----------------------------------------------------------
-@node primdecint_lib,resjung_lib,multigrading_lib, Experimental libraries
+@node paraplanecurves_lib,primdecint_lib,multigrading_lib, Experimental libraries
+@subsection paraplanecurves_lib
+@cindex paraplanecurves_lib
+
+Todos/Issues:
+@itemize
+@end itemize
+
+@c lib paraplanecurves.lib
+
+@c ----------------------------------------------------------
+@node primdecint_lib,resjung_lib,paraplanecurves_lib, Experimental libraries
 @subsection primdecint_lib
 @cindex primdecint_lib
 
