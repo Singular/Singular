@@ -157,6 +157,7 @@ mora_9
 ; mpsr_s
 mres_s
 normal
+paraplan_s
 pAddManyVarsManyL_s
 pAddManyVars_s
 pAdd_s
