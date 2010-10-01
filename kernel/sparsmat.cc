@@ -244,44 +244,42 @@ static void smMinSelect(long *c, int t, int d)
 }
 
 /* ----------------- ops with rings ------------------ */
-void smRingChange(ring *origR, sip_sring &tmpR, long bound)
+ring smRingChange(ring *origR, long bound)
 {
   *origR =currRing;
-  ring tt=rCopy0(currRing,FALSE,FALSE);
-  tmpR=*tt;
+  ring tmpR=rCopy0(currRing,FALSE,FALSE);
   int *ord=(int*)omAlloc0(3*sizeof(int));
   int *block0=(int*)omAlloc(3*sizeof(int));
   int *block1=(int*)omAlloc(3*sizeof(int));
   ord[0]=ringorder_c;
   ord[1]=ringorder_dp;
-  tmpR.order=ord;
-  tmpR.OrdSgn=1;
+  tmpR->order=ord;
+  tmpR->OrdSgn=1;
   block0[1]=1;
-  tmpR.block0=block0;
-  block1[1]=tmpR.N;
-  tmpR.block1=block1;
-  tmpR.bitmask = 2*bound;
+  tmpR->block0=block0;
+  block1[1]=tmpR->N;
+  tmpR->block1=block1;
+  tmpR->bitmask = 2*bound;
+  tmpR->wvhdl = (int **)omAlloc0((3) * sizeof(int_ptr));
 
 // ???
-//  if (tmpR.bitmask > currRing->bitmask) tmpR.bitmask = currRing->bitmask;
+//  if (tmpR->bitmask > currRing->bitmask) tmpR->bitmask = currRing->bitmask;
 
-  rComplete(&tmpR,1);
+  rComplete(tmpR,1);
   if ((*origR)->qideal!=NULL)
   {
-    tmpR.qideal= idrCopyR_NoSort((*origR)->qideal, (*origR), &tmpR);
+    tmpR->qideal= idrCopyR_NoSort((*origR)->qideal, (*origR), tmpR);
   }
-  rChangeCurrRing(&tmpR);
+  rChangeCurrRing(tmpR);
   if (TEST_OPT_PROT)
-    Print("[%ld:%d]", (long) tmpR.bitmask, tmpR.ExpL_Size);
+    Print("[%ld:%d]", (long) tmpR->bitmask, tmpR->ExpL_Size);
+  return tmpR;
 }
 
-void smRingClean(ring origR, ip_sring &tmpR)
+void smKillModifiedRing(ring r)
 {
-  if (tmpR.qideal!=NULL) id_Delete(&(tmpR.qideal),&tmpR);
-  rUnComplete(&tmpR);
-  omFreeSize((ADDRESS)tmpR.order,3*sizeof(int));
-  omFreeSize((ADDRESS)tmpR.block0,3*sizeof(int));
-  omFreeSize((ADDRESS)tmpR.block1,3*sizeof(int));
+  if (r->qideal!=NULL) id_Delete(&(r->qideal),r);
+  rKillModifiedRing(r);
 }
 
 /*2
@@ -359,11 +357,11 @@ poly smCallDet(ideal I)
   number diag,h=nInit(1);
   poly res;
   ring origR;
-  sip_sring tmpR;
+  ring tmpR;
   sparse_mat *det;
   ideal II;
 
-  smRingChange(&origR,tmpR,bound);
+  tmpR=smRingChange(&origR,bound);
   II = idrCopyR(I, origR);
   diag = smCleardenom(II);
   det = new sparse_mat(II);
@@ -372,15 +370,15 @@ poly smCallDet(ideal I)
   {
     delete det;
     rChangeCurrRing(origR);
-    smRingClean(origR,tmpR);
+    smKillModifiedRing(tmpR);
     return NULL;
   }
   res=det->smDet();
   if(det->smGetSign()<0) res=pNeg(res);
   delete det;
   rChangeCurrRing(origR);
-  res = prMoveR(res, &tmpR);
-  smRingClean(origR,tmpR);
+  res = prMoveR(res, tmpR);
+  smKillModifiedRing(tmpR);
   if (nEqual(diag,h) == FALSE)
   {
     pMult_nn(res,diag);
@@ -397,7 +395,7 @@ void smCallBareiss(ideal I, int x, int y, ideal &M, intvec ** iv)
   int c=IDELEMS(I),s=c;
   long bound;
   ring origR;
-  sip_sring tmpR;
+  ring tmpR;
   sparse_mat *bareiss;
 
   if ((x>0) && (x<t))
@@ -406,7 +404,7 @@ void smCallBareiss(ideal I, int x, int y, ideal &M, intvec ** iv)
     s-=y;
   if (t>s) t=s;
   bound=2*smExpBound(I,c,r,t);
-  smRingChange(&origR,tmpR,bound);
+  tmpR=smRingChange(&origR,bound);
   ideal II = idrCopyR(I, origR);
   bareiss = new sparse_mat(II);
   if (bareiss->smGetAct() == NULL)
@@ -424,9 +422,9 @@ void smCallBareiss(ideal I, int x, int y, ideal &M, intvec ** iv)
     bareiss->smToIntvec(*iv);
     delete bareiss;
     rChangeCurrRing(origR);
-    II = idrMoveR(II,&tmpR);
+    II = idrMoveR(II,tmpR);
   }
-  smRingClean(origR,tmpR);
+  smKillModifiedRing(tmpR);
   M=II;
 }
 
@@ -436,7 +434,7 @@ void smCallNewBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
   int c=IDELEMS(I),s=c;
   long bound;
   ring origR;
-  sip_sring tmpR;
+  ring tmpR;
   sparse_mat *bareiss;
 
   if ((x>0) && (x<t))
@@ -445,7 +443,7 @@ void smCallNewBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
     s-=y;
   if (t>s) t=s;
   bound=smExpBound(I,c,r,t);
-  smRingChange(&origR,tmpR,bound);
+  tmpR=smRingChange(&origR,bound);
   ideal II = idrCopyR(I, origR);
   bareiss = new sparse_mat(II);
   if (bareiss->smGetAct() == NULL)
@@ -463,9 +461,9 @@ void smCallNewBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
     bareiss->smToIntvec(*iv);
     delete bareiss;
     rChangeCurrRing(origR);
-    II = idrMoveR(II,&tmpR);
+    II = idrMoveR(II,tmpR);
   }
-  smRingClean(origR,tmpR);
+  smKillModifiedRing(tmpR);
   M=II;
 }
 
@@ -2588,7 +2586,7 @@ ideal smCallSolv(ideal I)
 {
   sparse_number_mat *linsolv;
   ring origR;
-  sip_sring tmpR;
+  ring tmpR;
   ideal rr;
 
   if (idIsConstant(I)==FALSE)
@@ -2598,7 +2596,7 @@ ideal smCallSolv(ideal I)
   }
   I->rank = idRankFreeModule(I);
   if (smCheckSolv(I)) return NULL;
-  smRingChange(&origR,tmpR,1);
+  tmpR=smRingChange(&origR,1);
   rr=idrCopyR(I,origR);
   linsolv = new sparse_number_mat(rr);
   rr=NULL;
@@ -2613,8 +2611,8 @@ ideal smCallSolv(ideal I)
   delete linsolv;
   rChangeCurrRing(origR);
   if (rr!=NULL)
-    rr = idrMoveR(rr,&tmpR);
-  smRingClean(origR,tmpR);
+    rr = idrMoveR(rr,tmpR);
+  smKillModifiedRing(tmpR);
   return rr;
 }
 

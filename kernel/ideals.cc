@@ -2846,7 +2846,7 @@ ideal idMinors(matrix a, int ar, ideal R)
   matrix b;
   ideal result,h;
   ring origR;
-  sip_sring tmpR;
+  ring tmpR;
   long bound;
 
   if((ar<=0) || (ar>r) || (ar>c))
@@ -2857,7 +2857,7 @@ ideal idMinors(matrix a, int ar, ideal R)
   h = idMatrix2Module(mpCopy(a));
   bound = smExpBound(h,c,r,ar);
   idDelete(&h);
-  smRingChange(&origR,tmpR,bound);
+  tmpR=smRingChange(&origR,bound);
   b = mpNew(r,c);
   for (i=r*c-1;i>=0;i--)
   {
@@ -2881,8 +2881,8 @@ ideal idMinors(matrix a, int ar, ideal R)
   if (R!=NULL) idDelete(&R);
   idSkipZeroes(result);
   rChangeCurrRing(origR);
-  result = idrMoveR(result,&tmpR);
-  smRingClean(origR,tmpR);
+  result = idrMoveR(result,tmpR);
+  smKillModifiedRing(tmpR);
   idTest(result);
   return result;
 }
