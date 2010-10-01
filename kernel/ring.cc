@@ -11,12 +11,6 @@
 #include <math.h>
 #include <kernel/mod2.h>
 
-#ifndef NDEBUG
-# define MYTEST 0
-#else /* ifndef NDEBUG */
-# define MYTEST 0
-#endif /* ifndef NDEBUG */
-
 #include <kernel/options.h>
 #include <omalloc/omalloc.h>
 #include <kernel/polys.h>
@@ -1358,8 +1352,6 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
                  sum->names, rVar(sum), sum->parameter, rPar(sum),
                  perm2, par_perm2, sum->ch);
 
-      nMapFunc nMap1 = nSetMap(R1);
-      nMapFunc nMap2 = nSetMap(R2);
 
       matrix C1 = R1->GetNC()->C, C2 = R2->GetNC()->C;
       matrix D1 = R1->GetNC()->D, D2 = R2->GetNC()->D;
@@ -1381,6 +1373,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
       idTest((ideal)C);
 
+      nMapFunc nMap1 = nSetMap(R1); // can change something global: not usable after the next nSetMap call :(
       // Create blocked C and D matrices:
       for (i=1; i<= rVar(R1); i++)
         for (j=i+1; j<=rVar(R1); j++)
@@ -1396,6 +1389,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       idTest((ideal)D);
 
 
+      nMapFunc nMap2 = nSetMap(R2); // can change something global: not usable after the next nSetMap call :(
       for (i=1; i<= rVar(R2); i++)
         for (j=i+1; j<=rVar(R2); j++)
         {
@@ -2415,6 +2409,11 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
   place++;
 }
 
+#ifndef NDEBUG
+# define MYTEST 0
+#else /* ifndef NDEBUG */
+# define MYTEST 0
+#endif /* ifndef NDEBUG */
 
 static void rO_ISPrefix(int &place, int &bitplace, int &prev_ord,
     long *o, int N, int *v, sro_ord &ord_struct)
@@ -3997,7 +3996,7 @@ void rDebugPrint(ring r)
     {
       Print("  start (level) %d, suffixpos: %d, VO: ",r->typ[j].data.isTemp.start, r->typ[j].data.isTemp.suffixpos);
 
-#if MYTEST
+#ifndef NDEBUG
       for( int k = 0; k <= r->N; k++)
         if (r->typ[j].data.isTemp.pVarOffset[k] != -1)
           Print("[%2d]: %09x; ", k, r->typ[j].data.isTemp.pVarOffset[k]);
