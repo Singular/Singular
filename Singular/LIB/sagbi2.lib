@@ -2,7 +2,7 @@
 version="$Id: sagbi2.lib 12231 2010-03-12 21:09:22Z hannes $";
 category="Commutative Algebra";
 info="
-LIBRARY: sagbi2.lib  Compute SAGBI basis (subalgebra bases analogous to Groebner bases for ideals) of a given subalgebra
+LIBRARY: sagbi2.lib  Compute SAGBI basis (subalgebra bases analogous to Groebner bases for ideals) of a subalgebra
 AUTHORS: Jan Hackfeld, Jan.Hackfeld@rwth-aachen.de
 
 PROCEDURES:
@@ -10,12 +10,16 @@ PROCEDURES:
  sagbiReduce(I,A);     performs subalgebra reduction of I by A
  sagbi(A [,m,t]);      construct a SAGBI basis for the given subalgebra
  sagbiPart(A,k[,m]);   constructs a partial SAGBI basis for the given subalgebra
+ algebraicDependence(I,it);  compute it iteration of SAGBI for algebraic dependencies of I
 
+SEE ALSO: algebra_lib
 ";
+
+
 //AUXILIARY PROCEDURES:
 //uniqueVariableName(s)      			adds character "@" at the beginning of string s until this is a unique new variable name
 //extendRing(r, ...) 					creates a new ring, which is an extension of r
-//proc stdKernPhi(kernNew, kernOld,...) computes Groebner basis of kernNew+kernOld 
+//stdKernPhi(kernNew, kernOld,...) computes Groebner basis of kernNew+kernOld 
 //spolynomialsGB(A,...)  				computes the SAGBI S-polynomials of the subalgebra defined by the generators in A using Groebner bases
 //spolynomialsToric(A)      			computes the SAGBI S-polynomials of the subalgebra defined by the generators in A using toric.lib
 //reductionGB(ideal F, ideal A,....) 	performs subalgebra reduction of F by A
@@ -422,8 +426,8 @@ static proc sagbiConstruction(ideal algebra, int iterations, int tailreduction, 
 
 
 proc sagbiSPoly(ideal algebra,list #)
-  "USAGE:   sagbiSPoly(A[, returnRing, meth]);  A is an ideal, returnRing and meth are integers.
-RETURN:   Returns SAGBI S-polynomials of the leading terms of given ideal A if returnRing==0.
+"USAGE:   sagbiSPoly(A[, returnRing, meth]);  A is an ideal, returnRing and meth are integers.
+RETURN:   Returns SAGBI S-polynomials of the leading terms of given ideal A if returnRing=0.
 @*	  Otherwise returns a new ring containing the ideals algebraicRelations
 @*	  and spolynomials, where these objects are explained by their name. 
 @*        See the example on how to access these objects. 
@@ -490,10 +494,10 @@ example
 { "EXAMPLE:"; echo = 2;
   ring r= 0,(x,y),dp;
   ideal A=x*y+x,x*y^2,y^2+y,x^2+x;
-  //------------------ Computing the SAGBI S-polynomials only
+  //------------------ Compute the SAGBI S-polynomials only
   sagbiSPoly(A);
-  //------------------ Now the extended ring is returned, 
-  // containing the ideal of algebraic relations and the ideal of the S-polynomials
+  //------------------ Extended ring is to be returned, which contains
+  // the ideal of algebraic relations and the ideal of the S-polynomials
   def rNew=sagbiSPoly(A,1);  setring rNew;
   spolynomials;
   algebraicRelations;
@@ -507,16 +511,16 @@ example
 
 
 proc sagbiReduce(idealORpoly, ideal algebra, list #) 
-  "USAGE:   sagbiReduce(idealORpoly, A[, tailred, meth]]); idealORPoly is an ideal or poly, A is an ideal, tailred and meth are both integers
-RETURN:   Returns the remainder(s) of idealORPoly after SAGBI reduction by A of type ideal or poly (same as input type).
+"USAGE:   sagbiReduce(I, A[, tr, mt]); I, A ideals, tr, mt optional integers
+RETURN:   Returns the remainder(s) of I after SAGBI reduction by A 
 @format
-    The optional argument tailred determines if tail-reduction is done.
-     - If (tailred==0), no tail-reduction is done.
-     - If (tailred!=0), tail-reduction is done.
+    The optional argument tr=tailred determines whether tail reduction will be performed.
+     - If (tailred=0), no tail reduction is done.
+     - If (tailred<>0), tail reduction is done.
      The other optional argument meth determines which method is
 	 used for Groebner basis computations.
-	 - If meth==0 (default), the procedure std is used.
-	 - If meth==1, the procedure slimgb is used.
+	 - If mt=0 (default), the procedure std is used.
+	 - If mt=1, the procedure slimgb is used.
 @end format		
 EXAMPLE:  example sagbiReduce; shows an example"
 {
@@ -570,25 +574,25 @@ example
   poly p1=x^5+x2y+y;
   poly p2=x^16+x^12*y^5+6*x^8*y^4+x^6+y^4+3;
   ideal P=p1,p2;
- 
+  //--------------------------------------------- 
   //SAGBI reduction of polynomial p1 by algebra A. Default call, that is, no tail-reduction is done.
   sagbiReduce(p1,A);
- 
+  //--------------------------------------------- 
   //SAGBI reduction of set of polynomials P by algebra A, now tail-reduction is done.
   sagbiReduce(P,A,1);
 }
 
 proc sagbi(ideal algebra, list #)
-  "USAGE:   sagbi(A[, tailred, meth]])   A is an ideal, tailred and meth are both integers 
+"USAGE:   sagbi(A[, tr, mt]); A ideal, tr, mt optional integers 
 RETURN: A SAGBI basis for the subalgebra given by the generators in A.
 @format
-    The optional argument tailred determines if tail reduction is done.
-     - If (tailred==0), no tail-reduction is done.
-     - If (tailred!=0), tail-reduction is done.
+    The optional argument tr=tailred determines whether tail reduction will be performed.
+     - If (tailred=0), no tail reduction is performed,
+     - If (tailred<>0), tail reduction is performed.
      The other optional argument meth determines which method is
 	 used for Groebner basis computations.
-	 - If meth==0 (default), the procedure std is used.
-	 - If meth==1, the procedure slimgb is used.
+	 - If mt=0 (default), the procedure std is used.
+	 - If mt=1, the procedure slimgb is used.
 @end format
 EXAMPLE:  example sagbi; shows an example"
 {
@@ -623,23 +627,22 @@ example
   ideal A=x2,y2,xy+y;
   //Default call, no tail-reduction is done.
   sagbi(A);
- 
+  //--------------------------------------------- 
   //Call with tail-reduction and method specified.
   sagbi(A,1,0);
 }
 
-
 proc sagbiPart(ideal algebra, int iterations, list #)
-  "USAGE:   sagbiPart(A, k,[tailred, meth]]); A is an ideal, k, integer, tailred and meth are both integers 
+"USAGE:   sagbiPart(A, k,[tr, mt]); A is an ideal, k, tr and mt are integers 
 RETURN: Performs k iterations of the SAGBI construction algorithm for the subalgebra given by the generators in A.
 @format
-     The optional argument tailred determines if tailreduction is done.
-     - If (tailred==0), no tail-reduction is done.
-     - If (tailred!=0), tail-reduction is done.
+     The optional argument tr=tailred determines if tail reduction will be performed.
+     - If (tailred=0), no tail reduction is performed,
+     - If (tailred<>0), tail reduction is performed.
      The other optional argument meth determines which method is
 	 used for Groebner basis computations.
-	 - If meth==0 (default), the procedure std is used.
-	 - If meth==1, the procedure slimgb is used.
+	 - If mt=0 (default), the procedure std is used.
+	 - If mt=1, the procedure slimgb is used.
 @end format
 EXAMPLE:  example sagbiPart; shows an example"
 {
@@ -676,18 +679,22 @@ example
   ring r= 0,(x,y,z),dp;
   //The following algebra does not have a finite SAGBI basis.
   ideal A=x,xy-y2,xy2;
- 
-  //Call with two iterations, not tail-reduction is done.
+  //--------------------------------------------------- 
+  //Call with two iterations, no tail-reduction is done.
   sagbiPart(A,2);
- 
+  //--------------------------------------------------- 
   //Call with three iterations, tail-reduction and method 0.
   sagbiPart(A,3,1,0);
 }	
 
 
-//TODO: 1nsen als werden noch mit ausgegeben, aus algebraischen Abhängigkeiten entfernen
-// TODO2: finish the documentation
+//DONE? 1nsen als werden noch mit ausgegeben, aus algebraischen Abhängigkeiten entfernen
+// VL: finished the documentation
+// TO comapre with algDependent from algebra_lib
 proc algebraicDependence(ideal I,int iterations)
+"USAGE: algebraicDependence(I,it); I an an ideal, it is an integer
+RETURN: In 'it' iterations, compute algebraic dependencies between elements of I
+EXAMPLE: example algebraicDependence; shows an example"
 {
   def br=basering;
   int i;
@@ -781,3 +788,31 @@ proc algebraicDependence(ideal I,int iterations)
   setring br;
   return(extendVarRing);
 }
+example
+{ "EXAMPLE:"; echo = 2;
+  ring r= 0,(x,y),dp;
+  //The following algebra does not have a finite SAGBI basis.
+  ideal I=x^2, xy-y2, xy2;
+  //--------------------------------------------------- 
+  //Call with two iterations
+  def DI = algebraicDependence(I,2);
+  setring DI; algDep; 
+  // we see that no dependency has been seen so far
+  //--------------------------------------------------- 
+  //Call with two iterations
+  setring r; kill DI;
+  def DI = algebraicDependence(I,3);
+  setring DI; algDep; 
+  map F = DI,x,y,x^2, xy-y2, xy2;
+  F(algDep); // we see that it is a dependence indeed
+}
+
+/* 
+  ring r= 0,(x,y),dp;
+  //The following algebra does not have a finite SAGBI basis.
+  ideal J=x^2, xy-y2, xy2, x^2*(x*y-y^2)^2 - (x*y^2)^2*x^4 + 11;
+  //--------------------------------------------------- 
+  //Call with two iterations
+  def DI = algebraicDependence(J,2);
+  setring DI; algDep; 
+*/
