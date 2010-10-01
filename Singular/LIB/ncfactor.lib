@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////
-version = "$Id: ncfactor.lib, v 1.00 2010/02/15 10:06 heinle Exp $";
+version = "$Id$";
 category="Noncommutative";
 info="
 LIBRARY: ncfactor.lib   Tools for factorization in the first Weyl algebra

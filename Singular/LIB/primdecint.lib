@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-version="$Id: primdecint.lib,v 1.16 2010/06/01 08:01:11 Singular Exp $";
+version="$Id$";
 category = "Commutative Algebra";
 info="
 LIBRARY:  primdecint.lib   primary decomposition over the integers
