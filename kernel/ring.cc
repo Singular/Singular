@@ -2071,10 +2071,12 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
   omCheckAddrSize(r->block0,i*sizeof(int));
   omCheckAddrSize(r->block1,i*sizeof(int));
   if (r->wvhdl!=NULL)
-    omCheckAddrSize(r->wvhdl,i*sizeof(int *));
-  for (j=0;j<i; j++)
   {
-    if (r->wvhdl[j] != NULL) omCheckAddr(r->wvhdl[j]);
+    omCheckAddrSize(r->wvhdl,i*sizeof(int *));
+    for (j=0;j<i; j++)
+    {
+      if (r->wvhdl[j] != NULL) omCheckAddr(r->wvhdl[j]);
+    }
   }
 #endif
   if (r->VarOffset == NULL)
@@ -3302,7 +3304,7 @@ static void rSetDegStuff(ring r)
       r->pFDeg = p_Totaldegree;
     }
     r->firstBlockEnds=block1[1];
-    r->firstwv = wvhdl[1];
+    if (wvhdl!=NULL) r->firstwv = wvhdl[1];
     if ((order[1] == ringorder_a)
     || (order[1] == ringorder_wp)
     || (order[1] == ringorder_Wp)
