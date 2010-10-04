@@ -257,11 +257,11 @@ BOOLEAN nlDBTest(number a, const char *f,const int l)
     }
     return TRUE;
   }
-  if (a->s==2)
-  {
-    Print("!!longrat:s=2 in %s:%d\n",f,l);
-    return FALSE;
-  }
+  //if (a->s==2)
+  //{
+  //  Print("!!longrat:s=2 in %s:%d\n",f,l);
+  //  return FALSE;
+  //}
   if (mpz_size1(a->z)>MP_SMALL) return TRUE;
   int ui=(int)mpz_get_si(a->z);
   if ((((ui<<3)>>3)==ui)
@@ -530,7 +530,20 @@ number nlBigInt(number &i)
   }
   number tmp=nlRInit(1);
   MPZ_DIV(tmp->z,i->z,i->n);
-  nlNormalize(tmp);
+  if (mpz_size1(tmp->z)<=MP_SMALL)
+  {
+    int ui=mpz_get_si(tmp->z);
+     if ((((ui<<3)>>3)==ui)
+     && (mpz_cmp_si(tmp->z,(long)ui)==0))
+     {
+       mpz_clear(tmp->z);
+#if defined(LDEBUG)
+       tmp->debug=654324;
+#endif
+       omFreeBin((ADDRESS)tmp, rnumber_bin);
+       return INT_TO_SR(ui);
+     }
+  }
   return tmp;
 }
 
@@ -1216,7 +1229,11 @@ void nlNormalize (number &x)
   if ((SR_HDL(x) & SR_INT) ||(x==NULL))
     return;
 #ifdef LDEBUG
-  if (!nlTest(x)) { if (x->s!=3) x->s=1; return; }
+  if (!nlTest(x))
+  { 
+    if (x->s!=3) x->s=1; 
+    return;
+  }
 #endif
   if (x->s==3)
   {
