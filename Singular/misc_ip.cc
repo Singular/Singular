@@ -218,17 +218,18 @@ lists primeFactorisation(const number n, const number pBound)
     }
 
     unsigned long p_ui=5; add = 2;
+    BOOLEAN b_is_0=(mpz_cmp_ui(b, 0) == 0);
     mpz_sqrt(sr, nn);
     // there are 3 possible limits, we take the minimum:
     // - argument pBound (if >0)
     // - sr = sqrt(nn)
     // - 1<<31
-    unsigned long  limit=1<<31;
-    if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0))
+    unsigned long  limit=~(0L);
+    if (b_is_0 || (mpz_cmp(pb, sr) > 0))
     {
       mpz_set(pb, sr);
     }
-    if (mpz_cmp_ui(b, limit)<0)
+    if (mpz_cmp_ui(pb, limit)<0)
     {
      limit=mpz_get_ui(pb);
     }
@@ -277,7 +278,7 @@ lists primeFactorisation(const number n, const number pBound)
     }
     mpz_set_ui(p, p_ui);
     mpz_sqrt(sr, nn);
-    if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+    if (b_is_0 || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
     while (mpz_cmp(pb, p) >= 0)
     {
       divTimes(nn, p, &tt);
@@ -286,14 +287,14 @@ lists primeFactorisation(const number n, const number pBound)
         setListEntry(primes, index, p);
         multiplicities[index++] = tt;
         mpz_sqrt(sr, nn);
-        if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+        if (b_is_0 || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
         if (mpz_cmp_ui(nn,1)==0) break;
       }
       mpz_add_ui(p, p, add);
       add += 2; if (add == 6) add = 2;
     }
     if ((mpz_cmp_ui(nn, 1) > 0) &&
-        ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(nn, pb) <= 0)))
+        (b_is_0 || (mpz_cmp(nn, pb) <= 0)))
     {
       setListEntry(primes, index, nn);
       multiplicities[index++] = 1;
