@@ -1973,8 +1973,8 @@ THEORY:  This algorithm checks solvability by computing the Legendre symbols
   if (m == 0) { "ERROR: squareRoot had been invoked with m = 0"; }
 
   list L = primefactors(m);
-  if ((L[3] != 1)||(L[3]!=-1))
- { "WARNING: command 'primefactors(.)' did not find all prime factors"; }
+  if ((L[3] != 1) && (L[3] != -1))
+  { "WARNING: command 'primefactors(.)' did not find all prime factors"; }
   int i;
   for (i = 1; i <= size(L[2]); i++)
   {
