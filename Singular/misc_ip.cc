@@ -185,7 +185,7 @@ void nextPrime(mpz_t p, mpz_t bound)
 */
 
 /* n and pBound are assumed to be bigint numbers */
-lists primeFactorisation(const number n, number pBound)
+lists primeFactorisation(const number n, const number pBound)
 {
   mpz_t nn; number2mpz(n, nn);
   mpz_t pb; number2mpz(pBound, pb);
@@ -219,18 +219,22 @@ lists primeFactorisation(const number n, number pBound)
 
     unsigned long p_ui=5; add = 2;
     mpz_sqrt(sr, nn);
-    unsigned long  limit=nlInt(pBound,NULL);
-    if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) 
+    // there are 3 possible limits, we take the minimum:
+    // - argument pBound (if >0)
+    // - sr = sqrt(nn)
+    // - 1<<31
+    unsigned long  limit=1<<31;
+    if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0))
     {
       mpz_set(pb, sr);
-      mpz_set(b, sr);
-      limit=mpz_get_ui(sr);
     }
-    else if (limit==0)
+    if (mpz_cmp_ui(b, limit)<0)
     {
-      limit=1<<31;
+     limit=mpz_get_ui(pb);
+    }
+    else
+    {
       mpz_set_ui(pb,limit);
-      mpz_set_ui(b,limit);
     }
     while (p_ui <=limit)
     {
@@ -241,7 +245,7 @@ lists primeFactorisation(const number n, number pBound)
         multiplicities[index++] = tt;
         //mpz_sqrt(sr, nn);
         //if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-        if (mpz_size1(nn)<=1)
+        if (mpz_size1(nn)<=2)
         {
           mpz_sqrt(sr, nn);
           if (mpz_cmp(pb, sr) > 0) mpz_set(pb, sr);
@@ -250,13 +254,14 @@ lists primeFactorisation(const number n, number pBound)
           if (mpz_size1(nn)<=1)
           {
             unsigned long nn_ui=mpz_get_ui(nn);
-            while ((p_ui <=limit)&&(nn_ui>1))
+            while (p_ui <=limit)
             {
               divTimes_ui_ui(&nn_ui, p_ui, &tt);
               if (tt > 0)
               {
                 setListEntry_ui(primes, index, p_ui);
                 multiplicities[index++] = tt;
+                if (nn_ui==1) break;
                 if (nn_ui<(limit/6)) { limit=nn_ui/6;}
               }
               p_ui +=add;
@@ -282,12 +287,13 @@ lists primeFactorisation(const number n, number pBound)
         multiplicities[index++] = tt;
         mpz_sqrt(sr, nn);
         if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+        if (mpz_cmp_ui(nn,1)==0) break;
       }
       mpz_add_ui(p, p, add);
       add += 2; if (add == 6) add = 2;
     }
     if ((mpz_cmp_ui(nn, 1) > 0) &&
-        ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(nn, b) <= 0)))
+        ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(nn, pb) <= 0)))
     {
       setListEntry(primes, index, nn);
       multiplicities[index++] = 1;
