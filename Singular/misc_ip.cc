@@ -109,16 +109,18 @@ void setListEntry(lists L, int index, mpz_t n)
   L->m[index].rtyp = BIGINT_CMD; L->m[index].data = (void*)nn;
 }
 
-void setListEntry_ui(lists L, int index, long ui)
+void setListEntry_ui(lists L, int index, unsigned long ui)
 { /* assumes n > 0 */
   /* try to fit nn into an int: */
-  if (((ui<<3)>>3)==ui)
+  int i=(int)ui;
+  if ((((unsigned long)i)==ui) && (((i<<3)>>3)==i))
   {
-    L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)ui;
+    L->m[index].rtyp = INT_CMD; L->m[index].data = (void*)i;
   }
   else
   {
-    number nn = nlInit(ui,NULL);
+    number nn = nlRInit(ui);
+    mpz_set_ui(nn->z,ui);
     L->m[index].rtyp = BIGINT_CMD; L->m[index].data = (void*)nn;
   }
 }
@@ -196,7 +198,7 @@ lists primeFactorisation(const number n, const number pBound)
 
   if (!nlIsZero(n))
   {
-    if (!nlGreaterZero(n)) 
+    if (!nlGreaterZero(n))
     {
       positive=-1;
       mpz_neg(nn,nn);
@@ -218,7 +220,7 @@ lists primeFactorisation(const number n, const number pBound)
     unsigned long p_ui=5; add = 2;
     mpz_sqrt(sr, nn);
     if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-    int limit=mpz_get_ui(pb);
+    unsigned long  limit=mpz_get_ui(pb);
     if ((limit==0)||(mpz_cmp_ui(pb,limit)!=0)) limit=1<<31;
     while (p_ui <=limit)
     {
@@ -229,30 +231,30 @@ lists primeFactorisation(const number n, const number pBound)
         multiplicities[index++] = tt;
         //mpz_sqrt(sr, nn);
         //if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-        if (mpz_size1(nn)<=2) 
+        if (mpz_size1(nn)<=2)
         {
           mpz_sqrt(sr, nn);
           if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
           unsigned long l=mpz_get_ui(sr);
           if (l<limit) limit=l;
-	  if (mpz_size1(nn)<=1)
-	  {
-	    unsigned long nn_ui=mpz_get_ui(nn);
-	    while ((p_ui <=limit)&&(nn_ui>1))
-	    {
+          if (mpz_size1(nn)<=1)
+          {
+            unsigned long nn_ui=mpz_get_ui(nn);
+            while ((p_ui <=limit)&&(nn_ui>1))
+            {
               divTimes_ui_ui(&nn_ui, p_ui, &tt);
               if (tt > 0)
               {
                 setListEntry_ui(primes, index, p_ui);
                 multiplicities[index++] = tt;
-		if (nn_ui>(limit/6)) limit=nn_ui/6;
+                if (nn_ui>(limit/6)) limit=nn_ui/6;
               }
               p_ui +=add;
               add += 2; if (add == 6) add = 2;
-	    }
-	    mpz_set_ui(nn,nn_ui);
-	    break;
-	  }
+            }
+            mpz_set_ui(nn,nn_ui);
+            break;
+          }
         }
       }
       p_ui +=add;
