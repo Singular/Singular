@@ -185,7 +185,7 @@ void nextPrime(mpz_t p, mpz_t bound)
 */
 
 /* n and pBound are assumed to be bigint numbers */
-lists primeFactorisation(const number n, const number pBound)
+lists primeFactorisation(const number n, number pBound)
 {
   mpz_t nn; number2mpz(n, nn);
   mpz_t pb; number2mpz(pBound, pb);
@@ -219,9 +219,19 @@ lists primeFactorisation(const number n, const number pBound)
 
     unsigned long p_ui=5; add = 2;
     mpz_sqrt(sr, nn);
-    if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-    unsigned long  limit=mpz_get_ui(pb);
-    if ((limit==0)||(mpz_cmp_ui(pb,limit)!=0)) limit=1<<31;
+    unsigned long  limit=nlInt(pBound,NULL);
+    if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) 
+    {
+      mpz_set(pb, sr);
+      mpz_set(b, sr);
+      limit=mpz_get_ui(sr);
+    }
+    else if (limit==0)
+    {
+      limit=1<<31;
+      mpz_set_ui(pb,limit);
+      mpz_set_ui(b,limit);
+    }
     while (p_ui <=limit)
     {
       divTimes_ui(nn, p_ui, &tt);
@@ -231,12 +241,12 @@ lists primeFactorisation(const number n, const number pBound)
         multiplicities[index++] = tt;
         //mpz_sqrt(sr, nn);
         //if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
-        if (mpz_size1(nn)<=2)
+        if (mpz_size1(nn)<=1)
         {
           mpz_sqrt(sr, nn);
-          if ((mpz_cmp_ui(b, 0) == 0) || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+          if (mpz_cmp(pb, sr) > 0) mpz_set(pb, sr);
           unsigned long l=mpz_get_ui(sr);
-          if (l<limit) limit=l;
+          if (l<limit) { limit=l; }
           if (mpz_size1(nn)<=1)
           {
             unsigned long nn_ui=mpz_get_ui(nn);
@@ -247,7 +257,7 @@ lists primeFactorisation(const number n, const number pBound)
               {
                 setListEntry_ui(primes, index, p_ui);
                 multiplicities[index++] = tt;
-                if (nn_ui>(limit/6)) limit=nn_ui/6;
+                if (nn_ui<(limit/6)) { limit=nn_ui/6;}
               }
               p_ui +=add;
               add += 2; if (add == 6) add = 2;
