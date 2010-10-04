@@ -988,7 +988,8 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
 {
   int k,m;
   int rN=r->N;
-  matrix cMT=r->GetNC()->MT[UPMATELEM(j,i,rN)];         /* cMT=current MT */
+  const int cMTindex = UPMATELEM(j,i,rN);
+  matrix cMT=r->GetNC()->MT[cMTindex];         /* cMT=current MT */
 
   poly x=pOne();p_SetExp(x,j,1,r);p_Setm(x,r);
 /* var(j); */
@@ -1010,6 +1011,11 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
        t = nc_p_CopyGet(MATELEM(cMT,k-1,1),r);
        //        t=p_Copy(MATELEM(cMT,k-1,1),r);
        t = gnc_mm_Mult_p(y,t,r);
+       cMT=r->GetNC()->MT[cMTindex]; // since multiplication can change the MT table...
+       assume( t != NULL );
+#ifdef PDEBUG
+       p_Test(t,r);
+#endif
        MATELEM(cMT,k,1) = nc_p_CopyPut(t,r);
        //        omCheckAddr(cMT->m);
        p_Delete(&t,r);
@@ -1024,8 +1030,13 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
     if (t==NULL)   //not computed yet
     {
       t = nc_p_CopyGet(MATELEM(cMT,a,m-1),r);
+      assume( t != NULL );
       //      t=p_Copy(MATELEM(cMT,a,m-1),r);
       t = gnc_p_Mult_mm(t,x,r);
+      cMT=r->GetNC()->MT[cMTindex]; // since multiplication can change the MT table...
+#ifdef PDEBUG
+      p_Test(t,r);
+#endif
       MATELEM(cMT,a,m) = nc_p_CopyPut(t,r);
       //      MATELEM(cMT,a,m) = t;
       //        omCheckAddr(cMT->m);
@@ -1035,8 +1046,13 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
   }
   p_Delete(&x,r);
   p_Delete(&y,r);
-  //  t=MATELEM(cMT,a,b);
-  t= nc_p_CopyGet(MATELEM(cMT,a,b),r);
+  t=MATELEM(cMT,a,b);
+  assume( t != NULL );
+  
+  t= nc_p_CopyGet(t,r);
+#ifdef PDEBUG
+  p_Test(t,r);
+#endif
   //  return(p_Copy(t,r));
   /* since the last computed element was cMT[a,b] */
   return(t);
