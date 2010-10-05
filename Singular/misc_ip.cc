@@ -219,6 +219,7 @@ lists primeFactorisation(const number n, const number pBound)
 
     unsigned long p_ui=5; add = 2;
     BOOLEAN b_is_0=(mpz_cmp_ui(b, 0) == 0);
+    BOOLEAN sr_sets_pb=FALSE;
     mpz_sqrt(sr, nn);
     // there are 3 possible limits, we take the minimum:
     // - argument pBound (if >0)
@@ -228,6 +229,7 @@ lists primeFactorisation(const number n, const number pBound)
     if (b_is_0 || (mpz_cmp(pb, sr) > 0))
     {
       mpz_set(pb, sr);
+      sr_sets_pb=TRUE;
     }
     if (mpz_cmp_ui(pb, limit)<0)
     {
@@ -249,7 +251,7 @@ lists primeFactorisation(const number n, const number pBound)
         if (mpz_size1(nn)<=2)
         {
           mpz_sqrt(sr, nn);
-          if (mpz_cmp(pb, sr) > 0) mpz_set(pb, sr);
+          if (sr_sets_pb || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
           unsigned long l=mpz_get_ui(sr);
           if (l<limit) { limit=l; }
           if (mpz_size1(nn)<=1)
@@ -266,7 +268,8 @@ lists primeFactorisation(const number n, const number pBound)
                 if (nn_ui<(limit/6)) { limit=nn_ui/6;}
               }
               p_ui +=add;
-              add += 2; if (add == 6) add = 2;
+              //add += 2; if (add == 6) add = 2;
+	      add =2+2*(add==2);
             }
             mpz_set_ui(nn,nn_ui);
             break;
@@ -274,11 +277,12 @@ lists primeFactorisation(const number n, const number pBound)
         }
       }
       p_ui +=add;
-      add += 2; if (add == 6) add = 2;
+      //add += 2; if (add == 6) add = 2;
+      add =2+2*(add==2);
     }
     mpz_set_ui(p, p_ui);
     mpz_sqrt(sr, nn);
-    if (b_is_0 || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
+    if (b_is_0 || sr_sets_pb || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
     while (mpz_cmp(pb, p) >= 0)
     {
       divTimes(nn, p, &tt);
@@ -286,12 +290,13 @@ lists primeFactorisation(const number n, const number pBound)
       {
         setListEntry(primes, index, p);
         multiplicities[index++] = tt;
-        mpz_sqrt(sr, nn);
-        if (b_is_0 || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
         if (mpz_cmp_ui(nn,1)==0) break;
+        mpz_sqrt(sr, nn);
+        if (b_is_0 || sr_sets_pb || (mpz_cmp(pb, sr) > 0)) mpz_set(pb, sr);
       }
       mpz_add_ui(p, p, add);
-      add += 2; if (add == 6) add = 2;
+      //add += 2; if (add == 6) add = 2;
+      add =2+2*(add==2);
     }
     if ((mpz_cmp_ui(nn, 1) > 0) &&
         (b_is_0 || (mpz_cmp(nn, b) <= 0)))
