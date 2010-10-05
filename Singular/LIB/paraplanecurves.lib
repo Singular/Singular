@@ -11,29 +11,26 @@ AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
 
 OVERVIEW:
 
-A library for computing rational parametrizations of rational plane curves
-defined over Q. @*
-Suppose the curve is C = {f(x,y,z)=0} where f is homogeneous of degree
-n and absolutely irreducible. (The conditions required will be checked
-automatically.) @*
+Suppose C = {f(x,y,z)=0} is a rational plane curve, where f is homogeneous 
+of degree n with coefficients in Q and absolutely irreducible (these 
+conditions are checked automatically.) @*
 After a first step, realized by a projective automorphism in the procedure
 adjointIdeal, C satisfies: @*
 - C does not have singularities at infinity z=0. @*
 - C does not contain the point (0:1:0) (that is, the dehomogenization of f
-  with respect to the third variable z must be monic as a polynomial in the
-  second variable y). @*
+  with respect to z is monic as a polynomial in y). @*
 Considering C in the chart z<>0, the algorithm regards x as transcendental
 and y as algebraic and computes an integral basis in C(x)[y] of the integral
 closure of C[x] in C(x,y) using the  normalization algorithm from
-@ref normal.lib: see @ref integralbasis.lib. In a future edition of the library,
-also van Hoeij's algorithm for computing the integral basis will be
-available. @*
+@ref{normal.lib}: see @ref{integralbasis.lib}. In a future edition of the 
+library, also van Hoeij's algorithm for computing the integral basis will 
+be available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
 basis algorithm is applied separately. The ordinary multiple points and
-cusps, in turn, are adressed by a straightforward direct algorithm. The
+cusps, in turn, are addressed by a straightforward direct algorithm. The
 adjoint ideal is obtained by intersecting all ideals obtained locally.
 The local variant of the algorithm is used by default. @*
 The linear system corresponding to the adjoint ideal maps the curve
@@ -48,14 +45,14 @@ of C is obtained (defined over Q or the quadratic field extension).
 
 REFERENCES:
 
+Janko Boehm: Parametrisierung rationaler Kurven, Diploma Thesis,
+http://www.math.uni-sb.de/ag/schreyer/jb/diplom%20janko%20boehm.pdf
+
 Theo de Jong: An algorithm for computing the integral closure,
 Journal of Symbolic Computation 26 (3) (1998), p. 273-277
 
 Gert-Martin Greuel, Santiago Laplagne, Frank Seelisch: Normalization of Rings,
 Journal of Symbolic Computation 9 (2010), p. 887-901
-
-Janko Boehm: Parametrisierung rationaler Kurven, Diploma Thesis,
-http://www.math.uni-sb.de/ag/schreyer/jb/diplom%20janko%20boehm.pdf
 
 Mark van Hoeij: An Algorithm for Computing an Integral Basis in an Algebraic
 Function Field, Journal of Symbolic Computation 18 (1994), p. 353-363,
@@ -109,13 +106,12 @@ ASSUME: The ideal phi in the basering R represents a birational map of the
         P = PP^(size(phi)-1).
 NOTE:   The procedure might fail or give a wrong output if phi does
         not define a birational map.
-RETURN: ring, the coordinate ring of P, with an ideal
-        named J and an ideal named psi.
-@format The ideal J defines the image of phi.@*
+RETURN: ring, the coordinate ring of P, with an ideal named J and an ideal 
+        named psi.@*
+        The ideal J defines the image of phi.@*
         The ideal psi gives the inverse of phi.@*
         Note that the entries of psi should be considered as representatives
         of classes in the quotient ring R/J.@*
-@end format
 THEORY: We compute the ideal I(G) in R**S of the graph G of phi.@*
         The ideal J is given by the intersection of I(G) with S.@*
         The map psi is given by a relation mod J of those relations
@@ -231,7 +227,7 @@ RETURN:  1 if assumptions are satisfied, 0 otherwise.@*
 
 ///////////////////////////////////////////////////////////////////////////////
 proc paraPlaneCurve(poly f, list #)
-"USAGE:  paraPlaneCurve(f [,c]); f poly , c optional integer@*
+"USAGE:  paraPlaneCurve(f [, c]); f poly , c optional integer@*
          optional integer c can be: @*
          1: compute integral basis via normalization. @*
          2: make local analysis of singularities first and apply normalization
@@ -241,25 +237,25 @@ ASSUME:  The basering must be a polynomial ring in three variables, say x,y,z,
          with coefficients in Q. @*
          The polynomial f must be homogeneous and absolutely irreducible. @*
          The curve C = {f = 0} must be rational, i.e., have geometric genus 0
-         (see @ref genus). @*
+         (see @ref{genus}). @*
+         These conditions will be checked automatically.
 RETURN:  ring with an ideal PARA.
 THEORY:  After a first step, realized by a projective automorphism in the
          procedure adjointIdeal, C satisfies: @*
 - C does not have singularities at infinity z=0. @*
 - C does not contain the point (0:1:0) (that is, the dehomogenization of f
-  with respect to the third variable must be monic as a polynomial in the
-  second variable). @*
+  with respect to z is monic as a polynomial in y). @*
 Considering C in the chart z<>0, the algorithm regards x as transcendental
 and y as algebraic and computes an integral basis in C(x)[y] of the integral
-closure of C[x] in C(x,y) using the normalization algorithm from normal.lib
-(see integralbasis.lib). In a future edition of the library, also van Hoeij's
+closure of C[x] in C(x,y) using the normalization algorithm from @ref{normal.lib}:
+see @ref{integralbasis.lib}. In a future edition of the library, also van Hoeij's
 algorithm for computing the integral basis will be available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
 basis algorithm is applied separately. The ordinary multiple points and
-cusps, in turn, are adressed by a straightforward direct algorithm. The
+cusps, in turn, are addressed by a straightforward direct algorithm. The
 adjoint ideal is obtained by intersecting all ideals obtained locally.
 The local variant of the algorithm is used by default. @*
 The linear system corresponding to the adjoint ideal maps the curve
@@ -433,15 +429,15 @@ RETURN:  intvec, say a,b,c. After the coordinate change
 
 ///////////////////////////////////////////////////////////////////////////////
 proc adjointIdeal(poly f, list #)
-"USAGE:  adjointIdeal(f,  [,choices]); f polynomial in three variables, choices
+"USAGE:  adjointIdeal(f [, choices]); f polynomial in three variables, choices
          optional list consisting of one integer or of one string or of one
          integer followed by one string. @*
-         optional integer can be: @*
+         Optional integer can be: @*
          1: compute integral basis via normalization. @*
          2: make local analysis of singularities first and apply normalization
             separately. @*
          The default is 2. @*
-         optional string may contain substrings: @*
+         Optional string may contain substrings: @*
          - rattestyes -> causes error message if curve is not rational. @*
          - firstchecksdone -> prevents that check of assumptions will be done
            more than once.
@@ -453,14 +449,14 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
 THEORY:  Considering C in the chart z<>0, the algorithm regards x as
 transcendental and y as algebraic and computes an integral basis in C(x)[y] of
 the integral closure of C[x] in C(x,y) using the normalization algorithm
-from normal.lib (see integralbasis.lib). In a future edition of the library,
+from @ref{normal.lib}: see @ref{integralbasis.lib}. In a future edition of the library,
 also van Hoeij's algorithm for computing the integral basis will be available.@*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
 locus of C. Then, for each  primary component of the singular locus which
 does not correspond to ordinary multiple points or cusps, the integral
 basis algorithm is applied separately. The ordinary multiple points and
-cusps, in turn, are adressed by a straightforward direct algorithm. The
+cusps, in turn, are addressed by a straightforward direct algorithm. The
 adjoint ideal is obtained by intersecting all ideals obtained locally.
 The local variant of the algorithm is used by default. @*
 KEYWORDS: integral basis; normalization.
@@ -835,7 +831,7 @@ proc mapToRatNormCurve(poly f, ideal AI)
 ASSUME:  The polynomial f is homogeneous in three variables and absolutely
          irreducible.
          The plane curve C defined by f is rational.
-         The ideal I is the adjoint ideal of C.
+         The ideal AI is the adjoint ideal of C.
 RETURN:  ring with an ideal RNC.
 EXAMPLE: example mapToRatNormCurve; shows an example
 "
@@ -899,7 +895,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc rncAntiCanonicalMap(ideal I)
 "USAGE:  rncAntiCanonicalMap(I); I ideal
-ASSUME:  I is a homogeneous ideal in the basering
+ASSUME:  I is a homogeneous ideal in the basering 
          defining a rational normal curve C in PP^n.
 NOTE:   The procedure will fail or give a wrong output if I is not the
         ideal of a rational normal curve.
@@ -943,15 +939,14 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc rncItProjOdd(ideal I)
 "USAGE:  rncItProjOdd(I); I ideal
-ASSUME:  I is a homogeneous ideal in the basering
-         with n+1 variables defining a rational normal curve C in PP^n with n
-         odd.
+ASSUME:  I is a homogeneous ideal in the basering with n+1 variables 
+         defining a rational normal curve C in PP^n with n odd.
 NOTE:    The procedure will fail or give a wrong output if I is not the
          ideal of a rational normal curve. It will test whether n is odd.
 RETURN:  ideal PHI defining an isomorphic projection of C to PP^1.@*
          Note that the entries of PHI should be considered as
          representatives of elements in R/I, where R is the basering.
-THEORY:  We iterate the procedure @ref rncAntiCanonicalMap to obtain PHI.
+THEORY:  We iterate the procedure @ref{rncAntiCanonicalMap} to obtain PHI.
 KEYWORDS: rational normal curve, projection.
 SEE ALSO: rncItProjEven.
 EXAMPLE: example rncItProjOdd; shows an example
@@ -1058,17 +1053,16 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc rncItProjEven(ideal I)
 "USAGE:  rncItProjEven(I); I ideal
-ASSUME:  I is a homogeneous ideal in the basering
-         with n+1 variables defining a rational normal curve C in PP^n with n
-         even.
+ASSUME:  I is a homogeneous ideal in the basering with n+1 variables 
+         defining a rational normal curve C in PP^n with n even.
 NOTE:    The procedure will fail or give a wrong output if I is not the
          ideal of a rational normal curve. It will test whether n is odd.
-RETURN:  ring with an ideal CONIC defining a conic C2 in PP^2. In addition,
-         an ideal PHI in the basering defining an isomorphic projection
-         of C to C2 will be exported.@*
+RETURN:  ring with an ideal CONIC defining a conic C2 in PP^2.@*
+         In addition, an ideal PHI in the basering defining an isomorphic 
+         projection of C to C2 will be exported.@*
          Note that the entries of PHI should be considered as
          representatives of elements in R/I, where R is the basering.
-THEORY:  We iterate the procedure @ref rncAntiCanonicalMap to obtain PHI.
+THEORY:  We iterate the procedure @ref{rncAntiCanonicalMap} to obtain PHI.
 KEYWORDS: rational normal curve, projection.
 SEE ALSO: rncItProjOdd.
 EXAMPLE: example rncItProjEven; shows an example
@@ -1667,8 +1661,6 @@ ASSUME:  The basering must be a polynomial ring in three variables with
          coefficients in Q. @*
          The polynomial q must be homogeneous of degree 2 and absolutely
          irreducible. @*
-         We have the technical requirement that the basering should neither
-         use a variable s nor t.
 NOTE:    The procedure might fail or give a wrong output if the assumptions
          do not hold.
 
@@ -1676,11 +1668,7 @@ RETURN:  ring with an ideal PARACONIC. The ring should be considered as the
          homogeneous coordinate ring of PP^1, the ideal defines a rational
          parametrization PP^1 --> C2 = {q=0}.
 
-RETURN:  ring with an ideal Ipoint defining a pencil of lines through a point
-         on the conic C2 = {q=0}. This point has either coefficients in Q or
-         in a quadratic extension field of Q.
-
-THEORY:  We compute a point on C2 via @ref rationalPointConic. The pencil of
+THEORY:  We compute a point on C2 via @ref{rationalPointConic}. The pencil of
          lines through this point projects C2 birationally to PP^1. Inverting
          the projection gives the result.
 KEYWORDS: conic, parametrization, rational point.
@@ -2336,7 +2324,7 @@ proc rationalPointConic(poly p)
 "USAGE:  rationalPointConic(p); p poly
 ASSUME:  assumes that p is an irreducible quadratic polynomial in the first
          three ring variables;
-         Ground field is expected to be Q.
+         ground field is expected to be Q.
 RETURN:  The method finds a point on the given conic. There are two
          possibilities:
          1) There is a rational point on the curve.
@@ -2536,14 +2524,15 @@ testPointConic(p, S);
 }
 ///////////////////////////////////////////////////////////////////////////////
 proc testParametrization(poly f, def rTT)
-"USAGE:  testParametrization(f,rTT); f poly, rTT ring
+"USAGE:  testParametrization(f, rTT); f poly, rTT ring
 ASSUME:  The assumptions on the basering and the polynomial f are as required
-         by @ref paraPlaneCurve. The ring rTT has two variables and contains
+         by @ref{paraPlaneCurve}. The ring rTT has two variables and contains
          an ideal PARA (such as the ring obtained by applying
-         @ref paraPlaneCurve to f).
+         @ref{paraPlaneCurve} to f).
 RETURN: int which is 1 if PARA defines a parametrization of the curve
         {f=0} and 0, otherwise.
-THEORY: We compute the image of PARA and compare it with f.
+THEORY: We compute the polynomial defining the image of PARA 
+        and compare it with f.
 KEYWORDS: Parametrization, image.
 EXAMPLE: example testParametrization; shows an example
 "
