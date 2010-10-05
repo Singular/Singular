@@ -294,7 +294,7 @@ lists primeFactorisation(const number n, const number pBound)
       add += 2; if (add == 6) add = 2;
     }
     if ((mpz_cmp_ui(nn, 1) > 0) &&
-        (b_is_0 || (mpz_cmp(nn, pb) <= 0)))
+        (b_is_0 || (mpz_cmp(nn, b) <= 0)))
     {
       setListEntry(primes, index, nn);
       multiplicities[index++] = 1;
