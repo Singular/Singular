@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 version = "$Id$";
 category="Noncommutative";
 info="
@@ -6,21 +6,21 @@ LIBRARY: ncfactor.lib   Tools for factorization in the first Weyl algebra
 AUTHORS: Albert Heinle,     albert.heinle@rwth-aachen.de
 
 PROCEDURES:
-facfirstwa(h);     factorization in the first Weyl algebra
+facFirstWeyl(h);    factorization in the first Weyl algebra
+testNCfac(l[,h]);   tests factorizations from a given list for correctness
+facSubWeyl(h,X,D);  factorization in the first Weyl algebra as a subalgebra
 ";
 
 LIB "general.lib";
 LIB "nctools.lib";
 LIB "involut.lib";
+LIB "freegb.lib"; // for isVar
 
-//static homogfac(h);         computes one factorization of a homogeneous polynomial h
-//static homogfac_all(h);     computes all factorizations of a homogeneous polynomial h
-//static facwa(h);            computes all factorizations of an inhomogeneous polynomial h
 /* ring R = 0,(x,y),Ws(-1,1); */
 /* def r = nc_algebra(1,1); */
 /* setring(r); */
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 //==================================================*
 //deletes double-entries in a list of factorization
 //without evaluating the product.
@@ -32,29 +32,29 @@ static proc delete_dublicates_noteval(list l)
      int is_equal;
      for (i = 1; i<= size(l); i++)
      {//Iterate over the different factorizations
-	  for (j = i+1; j<= size(l); j++)
-	  {//Compare the i'th factorization to the j'th
-	       if (size(l[i])!= size(l[j]))
-	       {//different sizes => not equal
-		    j++;
-		    continue;
-	       }//different sizes => not equal
-	       is_equal = 1;
-	       for (k = 1; k <= size(l[i]);k++)
-	       {//Compare every entry
-		    if (l[i][k]!=l[j][k])
-		    {
-			 is_equal = 0;
-			 break;
-		    }
-	       }//Compare every entry
-	       if (is_equal == 1)
-	       {//Delete this entry, because there is another equal one int the list
-		    result = delete(result, i-deleted);
-		    deleted = deleted+1;
-		    break;
-	       }//Delete this entry, because there is another equal one int the list
-	  }//Compare the i'th factorization to the j'th
+          for (j = i+1; j<= size(l); j++)
+          {//Compare the i'th factorization to the j'th
+               if (size(l[i])!= size(l[j]))
+               {//different sizes => not equal
+                    j++;
+                    continue;
+           }//different sizes => not equal
+           is_equal = 1;
+           for (k = 1; k <= size(l[i]);k++)
+           {//Compare every entry
+            if (l[i][k]!=l[j][k])
+            {
+             is_equal = 0;
+             break;
+            }
+           }//Compare every entry
+           if (is_equal == 1)
+           {//Delete this entry, because there is another equal one int the list
+            result = delete(result, i-deleted);
+            deleted = deleted+1;
+            break;
+           }//Delete this entry, because there is another equal one int the list
+      }//Compare the i'th factorization to the j'th
      }//Iterate over the different factorizations
      return(result);
 }//proc delete_dublicates_noteval
@@ -70,23 +70,23 @@ static proc delete_dublicates_eval(list l)
      int is_equal;
      for (i = 1; i<= size(result); i++)
      {//Iterating over all elements in result
-	  for (j = i+1; j<= size(result); j++)
-	  {//comparing with the other elements
-	       if (product(result[i]) == product(result[j]))
-	       {//There are two equal results; throw away that one with the smaller size
-		    if (size(result[i])>=size(result[j]))
-		    {//result[i] has more entries
-			 result = delete(result,j);
-			 continue;
-		    }//result[i] has more entries
-		    else
-		    {//result[j] has more entries
-			 result = delete(result,i);
-			 i--;
-			 break;
-		    }//result[j] has more entries
-	       }//There are two equal results; throw away that one with the smaller size
-	  }//comparing with the other elements
+      for (j = i+1; j<= size(result); j++)
+      {//comparing with the other elements
+           if (product(result[i]) == product(result[j]))
+           {//There are two equal results; throw away that one with the smaller size
+            if (size(result[i])>=size(result[j]))
+            {//result[i] has more entries
+             result = delete(result,j);
+             continue;
+            }//result[i] has more entries
+            else
+            {//result[j] has more entries
+             result = delete(result,i);
+             i--;
+             break;
+            }//result[j] has more entries
+           }//There are two equal results; throw away that one with the smaller size
+      }//comparing with the other elements
      }//Iterating over all elements in result
      return(result);
 }//proc delete_dublicates_eval
@@ -105,63 +105,63 @@ static proc combinekfinlf(list g, int nof, intvec limits) //nof stands for "numb
      def nofgl = size(g); //nofgl stands for "number of factors of the given list"
      if (nofgl == 0)
      {//g was the empty list
-	  return(result);
+      return(result);
      }//g was the empty list
      if (nof <= 0)
      {//The user wants to recieve a negative number or no element as a result
-	  return(result);
+      return(result);
      }//The user wants to recieve a negative number or no element as a result
      if (nofgl == nof)
      {//There are no factors to combine
-	  if (limitcheck(g,limits))
-	  {
-	       result = result + list(g);
-	  }
-	  return(result);
+      if (limitcheck(g,limits))
+      {
+           result = result + list(g);
+      }
+      return(result);
      }//There are no factors to combine
      if (nof == 1)
      {//User wants to get just one factor
-	  if (limitcheck(list(product(g)),limits))
-	  {
-	       result = result + list(list(product(g)));
-	  }
-	  return(result);
+      if (limitcheck(list(product(g)),limits))
+      {
+           result = result + list(list(product(g)));
+      }
+      return(result);
      }//User wants to get just one factor
      for (i = nof; i > 1; i--)
      {//computing the possibilities that have at least one original factor from g
-	  for (j = i; j>=1; j--)
-	  {//shifting the window of combinable factors to the left
-	       fc = combinekfinlf(list(g[(j)..(j+nofgl - i)]),nof - i + 1,limits); //fc stands for "factors combined"
-	       for (k = 1; k<=size(fc); k++)
-	       {//iterating over the different solutions of the smaller problem
-		    if (j>1)
-		    {//There are g_i before the combination
-			 if (j+nofgl -i < nofgl)
-			 {//There are g_i after the combination
-			      temp = list(g[1..(j-1)]) + fc[k] + list(g[(j+nofgl-i+1)..nofgl]);
-			 }//There are g_i after the combination
-			 else
-			 {//There are no g_i after the combination
-			      temp = list(g[1..(j-1)]) + fc[k];
-			 }//There are no g_i after the combination
-		    }//There are g_i before the combination
-		    if (j==1)
-		    {//There are no g_i before the combination
-			 if (j+ nofgl -i <nofgl)
-			 {//There are g_i after the combination
-			      temp = fc[k]+ list(g[(j + nofgl - i +1)..nofgl]);
-			 }//There are g_i after the combination
-		    }//There are no g_i before the combination
-		    if (limitcheck(temp,limits))
-		    {
-			 result = result + list(temp);
-		    }
-	       }//iterating over the different solutions of the smaller problem
-	  }//shifting the window of combinable factors to the left
+      for (j = i; j>=1; j--)
+      {//shifting the window of combinable factors to the left
+           fc = combinekfinlf(list(g[(j)..(j+nofgl - i)]),nof - i + 1,limits); //fc stands for "factors combined"
+           for (k = 1; k<=size(fc); k++)
+           {//iterating over the different solutions of the smaller problem
+            if (j>1)
+            {//There are g_i before the combination
+             if (j+nofgl -i < nofgl)
+             {//There are g_i after the combination
+                  temp = list(g[1..(j-1)]) + fc[k] + list(g[(j+nofgl-i+1)..nofgl]);
+             }//There are g_i after the combination
+             else
+             {//There are no g_i after the combination
+                  temp = list(g[1..(j-1)]) + fc[k];
+             }//There are no g_i after the combination
+            }//There are g_i before the combination
+            if (j==1)
+            {//There are no g_i before the combination
+             if (j+ nofgl -i <nofgl)
+             {//There are g_i after the combination
+                  temp = fc[k]+ list(g[(j + nofgl - i +1)..nofgl]);
+             }//There are g_i after the combination
+            }//There are no g_i before the combination
+            if (limitcheck(temp,limits))
+            {
+             result = result + list(temp);
+            }
+           }//iterating over the different solutions of the smaller problem
+      }//shifting the window of combinable factors to the left
      }//computing the possibilities that have at least one original factor from g
      for (i = 2; i<=nofgl/nof;i++)
      {//getting the other possible results
-	  result = result + combinekfinlf(list(product(list(g[1..i])))+list(g[(i+1)..nofgl]),nof,limits);
+      result = result + combinekfinlf(list(product(list(g[1..i])))+list(g[(i+1)..nofgl]),nof,limits);
      }//getting the other possible results
      result = delete_dublicates_noteval(result);
      return(result);
@@ -178,34 +178,34 @@ static proc merge_icf(list l1, list l2, intvec limits)
      int i; int j;
      if (size(l1)==0)
      {
-	  return(list());
+      return(list());
      }
      if (size(l2)==0)
      {
-	  return(list());
+      return(list());
      }
      if (size(l2)<=size(l1))
      {//l1 will be our g, l2 our f
-	  g = l1;
-	  f = l2;
+      g = l1;
+      f = l2;
      }//l1 will be our g, l2 our f
      else
      {//l1 will be our f, l2 our g
-	  g = l2;
-	  f = l1;
+      g = l2;
+      f = l1;
      }//l1 will be our f, l2 our g
      def result = combinekfinlf(g,size(f),limits);
      for (i = 1 ; i<= size(result); i++)
      {//Adding the factors of f to every possibility listed in temp
-	  for (j = 1; j<= size(f); j++)
-	  {
-	       result[i][j] = result[i][j]+f[j];
-	  }
-	  if(!limitcheck(result[i],limits))
-	  {
-	       result = delete(result,i);
-	       i--;
-	  }
+      for (j = 1; j<= size(f); j++)
+      {
+           result[i][j] = result[i][j]+f[j];
+      }
+      if(!limitcheck(result[i],limits))
+      {
+           result = delete(result,i);
+           i--;
+      }
      }//Adding the factors of f to every possibility listed in temp
      return(result);
 }//proc merge_icf
@@ -225,143 +225,143 @@ static proc merge_cf(list l1, list l2, intvec limits)
      int temppos;
      if (size(l1)==0)
      {//the first list is empty
-	  return(list());
+      return(list());
      }//the first list is empty
      if(size(l2)==0)
      {//the second list is empty
-	  return(list());
+      return(list());
      }//the second list is empty
      if (size(l2)<=size(l1))
      {//l1 will be our g, l2 our f
-	  g = l1;
-	  f = l2;
+      g = l1;
+      f = l2;
      }//l1 will be our g, l2 our f
      else
      {//l1 will be our f, l2 our g
-	  g = l2;
-	  f = l1;
+      g = l2;
+      f = l1;
      }//l1 will be our f, l2 our g
      list M;
      for (i = 2; i<size(f); i++)
      {//finding common factors of f and g...
-	for (j=2; j<size(g);j++)
-	{//... with g
-	     if (f[i] == g[j])
-	     {//we have an equal pair
-		  M = M + list(list(i,j));
-	     }//we have an equal pair
-	}//... with g
+    for (j=2; j<size(g);j++)
+    {//... with g
+         if (f[i] == g[j])
+         {//we have an equal pair
+          M = M + list(list(i,j));
+         }//we have an equal pair
+    }//... with g
      }//finding common factors of f and g...
      if (g[1]==f[1])
      {//Checking for the first elements to be equal
-	  M = M + list(list(1,1));
+      M = M + list(list(1,1));
      }//Checking for the first elements to be equal
      if (g[size(g)]==f[size(f)])
      {//Checking for the last elements to be equal
-	  M = M + list(list(size(f),size(g)));
+      M = M + list(list(size(f),size(g)));
      }//Checking for the last elements to be equal
      list result;//= list(list());
      while(size(M)>0)
      {//set of equal pairs is not empty
-	  temp = M[1];
-	  temppos = 1;
-	  for (i = 2; i<=size(M); i++)
-	  {//finding the minimal element of M
-	       if (M[i][1]<=temp[1])
-	       {//a possible candidate that is smaller than temp could have been found
-		    if (M[i][1]==temp[1])
-		    {//In this case we must look at the second number
-			 if (M[i][2]< temp[2])
-			 {//the candidate is smaller
-			      temp = M[i];
-			      temppos = i;
-			 }//the candidate is smaller
-		    }//In this case we must look at the second number
-		    else
-		    {//The candidate is definately smaller
-			 temp = M[i];
-			 temppos = i;
-		    }//The candidate is definately smaller
-	       }//a possible candidate that is smaller than temp could have been found
-	  }//finding the minimal element of M
-	  M = delete(M, temppos);
-	  if(temp[1]>1)
-	  {//There are factors to combine before the equal factor
-	       if (temp[1]<size(f))
-	       {//The most common case
-		    //first the combinations ignoring common factors
-		    pre = merge_icf(list(f[1..(temp[1]-1)]),list(g[1..(temp[2]-1)]),limits);
-		    post = merge_icf(list(f[(temp[1]+1)..size(f)]),list(g[(temp[2]+1..size(g))]),limits);
-		    for (i = 1; i <= size(pre); i++)
-		    {//all possible pre's...
-			 for (j = 1; j<= size(post); j++)
-			 {//...combined with all possible post's
-			      candidate = pre[i]+list(f[temp[1]])+post[j];
-			      if (limitcheck(candidate,limits))
-			      {
-				   result = result + list(candidate);
-			      }
-			 }//...combined with all possible post's
-		    }//all possible pre's...
-		    //Now the combinations with respect to common factors
-		    post = merge_cf(list(f[(temp[1]+1)..size(f)]),list(g[(temp[2]+1..size(g))]),limits);
-		    if (size(post)>0)
-		    {//There are factors to combine
-			 for (i = 1; i <= size(pre); i++)
-			 {//all possible pre's...
-			      for (j = 1; j<= size(post); j++)
-			      {//...combined with all possible post's
-				   candidate= pre[i]+list(f[temp[1]])+post[j];
-				   if (limitcheck(candidate,limits))
-				   {
-					result = result + list(candidate);
-				   }
-			      }//...combined with all possible post's
-			 }//all possible pre's...
-		    }//There are factors to combine
-	       }//The most common case
-	       else
-	       {//the last factor is the common one
-		    pre = merge_icf(list(f[1..(temp[1]-1)]),list(g[1..(temp[2]-1)]),limits);
-		    for (i = 1; i<= size(pre); i++)
-		    {//iterating over the possible pre-factors
-			 candidate = pre[i]+list(f[temp[1]]);
-			 if (limitcheck(candidate,limits))
-			 {
-			      result = result + list(candidate);
-			 }
-		    }//iterating over the possible pre-factors
-	       }//the last factor is the common one
-	  }//There are factors to combine before the equal factor
-	  else
-	  {//There are no factors to combine before the equal factor
-	       if (temp[1]<size(f))
-	       {//Just a check for security
-		    //first without common factors
-		    post=merge_icf(list(f[(temp[1]+1)..size(f)]),list(g[(temp[2]+1..size(g))]),limits);
-		    for (i = 1; i<=size(post); i++)
-		    {
-			 candidate = list(f[temp[1]])+post[i];
-			 if (limitcheck(candidate,limits))
-			 {
-			      result = result + list(candidate);
-			 }
-		    }
-		    //Now with common factors
-		    post = merge_cf(list(f[(temp[1]+1)..size(f)]),list(g[(temp[2]+1..size(g))]),limits);
-		    if(size(post)>0)
-		    {//we could find other combinations
-			 for (i = 1; i<=size(post); i++)
-			 {
-			      candidate = list(f[temp[1]])+post[i];
-			      if (limitcheck(candidate,limits))
-			      {
-				   result = result + list(candidate);
-			      }
-			 }
-		    }//we could find other combinations
-	       }//Just a check for security
-	  }//There are no factors to combine before the equal factor
+      temp = M[1];
+      temppos = 1;
+      for (i = 2; i<=size(M); i++)
+      {//finding the minimal element of M
+           if (M[i][1]<=temp[1])
+           {//a possible candidate that is smaller than temp could have been found
+            if (M[i][1]==temp[1])
+            {//In this case we must look at the second number
+             if (M[i][2]< temp[2])
+                     {//the candidate is smaller
+                              temp = M[i];
+                              temppos = i;
+                         }//the candidate is smaller
+                    }//In this case we must look at the second number
+                    else
+                    {//The candidate is definately smaller
+                         temp = M[i];
+                         temppos = i;
+                    }//The candidate is definately smaller
+               }//a possible candidate that is smaller than temp could have been found
+          }//finding the minimal element of M
+          M = delete(M, temppos);
+          if(temp[1]>1)
+          {//There are factors to combine before the equal factor
+               if (temp[1]<size(f))
+               {//The most common case
+                    //first the combinations ignoring common factors
+                    pre = merge_icf(list(f[1..(temp[1]-1)]),list(g[1..(temp[2]-1)]),limits);
+                    post = merge_icf(list(f[(temp[1]+1)..size(f)]),list(g[(temp[2]+1..size(g))]),limits);
+                    for (i = 1; i <= size(pre); i++)
+                    {//all possible pre's...
+                         for (j = 1; j<= size(post); j++)
+                         {//...combined with all possible post's
+                              candidate = pre[i]+list(f[temp[1]])+post[j];
+                              if (limitcheck(candidate,limits))
+                              {
+                                   result = result + list(candidate);
+                              }
+                         }//...combined with all possible post's
+                    }//all possible pre's...
+                    //Now the combinations with respect to common factors
+                    post = merge_cf(list(f[(temp[1]+1)..size(f)]),list(g[(temp[2]+1..size(g))]),limits);
+                    if (size(post)>0)
+                    {//There are factors to combine
+                         for (i = 1; i <= size(pre); i++)
+                         {//all possible pre's...
+                              for (j = 1; j<= size(post); j++)
+                              {//...combined with all possible post's
+                                   candidate= pre[i]+list(f[temp[1]])+post[j];
+                                   if (limitcheck(candidate,limits))
+                                   {
+                                        result = result + list(candidate);
+                                   }
+                              }//...combined with all possible post's
+                         }//all possible pre's...
+                    }//There are factors to combine
+               }//The most common case
+               else
+               {//the last factor is the common one
+                    pre = merge_icf(list(f[1..(temp[1]-1)]),list(g[1..(temp[2]-1)]),limits);
+                    for (i = 1; i<= size(pre); i++)
+                    {//iterating over the possible pre-factors
+                         candidate = pre[i]+list(f[temp[1]]);
+                         if (limitcheck(candidate,limits))
+                         {
+                              result = result + list(candidate);
+                         }
+                    }//iterating over the possible pre-factors
+               }//the last factor is the common one
+          }//There are factors to combine before the equal factor
+          else
+          {//There are no factors to combine before the equal factor
+               if (temp[1]<size(f))
+               {//Just a check for security
+                    //first without common factors
+                    post=merge_icf(list(f[(temp[1]+1)..size(f)]),list(g[(temp[2]+1..size(g))]),limits);
+                    for (i = 1; i<=size(post); i++)
+                    {
+                         candidate = list(f[temp[1]])+post[i];
+                         if (limitcheck(candidate,limits))
+                         {
+                              result = result + list(candidate);
+                         }
+                    }
+                    //Now with common factors
+                    post = merge_cf(list(f[(temp[1]+1)..size(f)]),list(g[(temp[2]+1..size(g))]),limits);
+                    if(size(post)>0)
+                    {//we could find other combinations
+                         for (i = 1; i<=size(post); i++)
+                         {
+                              candidate = list(f[temp[1]])+post[i];
+                              if (limitcheck(candidate,limits))
+                              {
+                                   result = result + list(candidate);
+                              }
+                         }
+                    }//we could find other combinations
+               }//Just a check for security
+          }//There are no factors to combine before the equal factor
      }//set of equal pairs is not empty
      return(result);
 }//proc merge_cf
@@ -378,23 +378,23 @@ static proc mergence(list l1, list l2, intvec limits)
      list F;
      if (size(l2)<=size(l1))
      {//l1 will be our g, l2 our f
-	  g = l1;
-	  f = l2;
+          g = l1;
+          f = l2;
      }//l1 will be our g, l2 our f
      else
      {//l1 will be our f, l2 our g
-	  g = l2;
-	  f = l1;
+          g = l2;
+          f = l1;
      }//l1 will be our f, l2 our g
      list result;
      for (l = size(f); l>=1; l--)
      {//all possibilities to combine the factors of f
-	  F = combinekfinlf(f,l,limits);
-	  for (k = 1; k<= size(F);k++)
+          F = combinekfinlf(f,l,limits);
+          for (k = 1; k<= size(F);k++)
           {//for all possibilities of combinations of the factors of f
-	       result = result + merge_cf(F[k],g,limits);
-	       result = result + merge_icf(F[k],g,limits);
-	  }//for all possibilities of combinations of the factors of f
+               result = result + merge_cf(F[k],g,limits);
+               result = result + merge_icf(F[k],g,limits);
+          }//for all possibilities of combinations of the factors of f
      }//all possibilities to combine the factors of f
      return(result);
 }//Procedure mergence
@@ -407,20 +407,20 @@ static proc limitcheck(list g, intvec limits)
      int i;
      if (size(limits)!=3)
      {//check the input
-	  return(0);
+          return(0);
      }//check the input
      if(size(g)==0)
      {
-	  return(0);
+          return(0);
      }
      def prod = product(g);
      def limg = intvec(deg(prod,intvec(1,1)) ,deg(prod,intvec(1,0)),deg(prod,intvec(0,1)));
      for (i = 1; i<=size(limg);i++)
      {//the final check
-	  if(limg[i]>limits[i])
-	  {
-	       return(0);
-	  }
+          if(limg[i]>limits[i])
+          {
+               return(0);
+          }
      }//the final check
      return(1);
 }//proc limitcheck
@@ -430,11 +430,16 @@ static proc limitcheck(list g, intvec limits)
 //one factorization of a homogeneous polynomial
 //in the first Weyl Algebra
 static proc homogfac(poly h)
-"USAGE: homogfac(h); h is a homogeneous polynomial in the first Weyl algebra with respect to the weight vector [-1,1]
+"USAGE: homogfac(h); h is a homogeneous polynomial in the
+        first Weyl algebra with respect to the weight vector [-1,1]
 RETURN: list
-PURPOSE: Computes a factorization of a homogeneous polynomial h with respect to the weight vector [-1,1] in the first Weyl algebra
-THEORY: @code{homogfac} returns a list with a factorization of the given, homogeneous polynomial. If the degree of the polynomial is k with k positive, the last k entries in the output list are the second variable. If k is positive, the last k entries will be x. The other entries will be irreducible polynomials of degree zero or 1 resp. -1.
-EXAMPLE: example homogfac; shows examples
+PURPOSE: Computes a factorization of a homogeneous polynomial h with
+         respect to the weight vector [-1,1] in the first Weyl algebra
+THEORY: @code{homogfac} returns a list with a factorization of the given,
+        [-1,1]-homogeneous polynomial. If the degree of the polynomial is k with
+        k positive, the last k entries in the output list are the second
+        variable. If k is positive, the last k entries will be x. The other
+        entries will be irreducible polynomials of degree zero or 1 resp. -1.
 SEE ALSO: homogfac_all
 "{//proc homogfac
      def r = basering;
@@ -442,42 +447,42 @@ SEE ALSO: homogfac_all
      int i; int j;
      if (!homogwithorder(h,intvec(-1,1)))
      {//The given polynomial is not homogeneous
-	  return(list());
+          return(list());
      }//The given polynomial is not homogeneous
      if (h==0)
      {
-	  return(list(0));
+          return(list(0));
      }
      list result;
      int m = deg(h,intvec(-1,1));
      if (m!=0)
      {//The degree is not zero
-	  if (m <0)
-	  {//There are more x than y
-	       hath = lift(var(1)^(-m),h)[1,1];
-	       for (i = 1; i<=-m; i++)
-	       {
-		    result = result + list(var(1));
-	       }
-	  }//There are more x than y
-	  else
-	  {//There are more y than x
-	       hath = lift(var(2)^m,h)[1,1];
-	       for (i = 1; i<=m;i++)
-	       {
-		    result = result + list(var(2));
-	       }
-	  }//There are more y than x
+          if (m <0)
+          {//There are more x than y
+               hath = lift(var(1)^(-m),h)[1,1];
+               for (i = 1; i<=-m; i++)
+               {
+                    result = result + list(var(1));
+               }
+          }//There are more x than y
+          else
+          {//There are more y than x
+               hath = lift(var(2)^m,h)[1,1];
+               for (i = 1; i<=m;i++)
+               {
+                    result = result + list(var(2));
+               }
+          }//There are more y than x
      }//The degree is not zero
      else
      {//The degree is zero
-	  hath = h;
+          hath = h;
      }//The degree is zero
      //beginning to transform x^i*y^i in teta(teta-1)...(teta-i+1)
      list mons;
      for(i = 1; i<=size(hath);i++)
      {//Putting the monomials in a list
-	  mons = mons+list(hath[i]);
+          mons = mons+list(hath[i]);
      }//Putting the monomials in a list
      ring tempRing = 0,(x,y,teta),dp;
      setring tempRing;
@@ -486,39 +491,39 @@ SEE ALSO: homogfac_all
      poly entry;
      for (i = 1; i<=size(mons);i++)
      {//transforming the monomials as monomials in theta
-	  entry = leadcoef(mons[i]);
-	  for (j = 0; j<leadexp(mons[i])[2];j++)
-	  {
-	       entry = entry * (teta-j);
-	  }
-	  mons[i] = entry;
+          entry = leadcoef(mons[i]);
+          for (j = 0; j<leadexp(mons[i])[2];j++)
+          {
+               entry = entry * (teta-j);
+          }
+          mons[i] = entry;
      }//transforming the monomials as monomials in theta
      list azeroresult = factorize(sum(mons));
      list azeroresult_return_form;
      for (i = 1; i<=size(azeroresult[1]);i++)
      {//rewrite the result of the commutative factorization
-	  for (j = 1; j <= azeroresult[2][i];j++)
-	  {
-	       azeroresult_return_form = azeroresult_return_form + list(azeroresult[1][i]);
-	  }
+          for (j = 1; j <= azeroresult[2][i];j++)
+          {
+               azeroresult_return_form = azeroresult_return_form + list(azeroresult[1][i]);
+          }
      }//rewrite the result of the commutative factorization
      setring(r);
      map finalmap = tempRing,var(1),var(2),var(1)*var(2);
      list tempresult = finalmap(azeroresult_return_form);
      for (i = 1; i<=size(tempresult);i++)
      {//factorizations of theta resp. theta +1
-	  if(tempresult[i]==var(1)*var(2))
-	  {
-	       tempresult = insert(tempresult,var(1),i-1);
-	       i++;
-	       tempresult[i]=var(2);
-	  }
-	  if(tempresult[i]==var(2)*var(1))
-	  {
-	       tempresult = insert(tempresult,var(2),i-1);
-	       i++;
-	       tempresult[i]=var(1);
-	  }
+          if(tempresult[i]==var(1)*var(2))
+          {
+               tempresult = insert(tempresult,var(1),i-1);
+               i++;
+               tempresult[i]=var(2);
+          }
+          if(tempresult[i]==var(2)*var(1))
+          {
+               tempresult = insert(tempresult,var(2),i-1);
+               i++;
+               tempresult[i]=var(1);
+          }
      }//factorizations of theta resp. theta +1
      result = tempresult+result;
      return(result);
@@ -536,16 +541,22 @@ SEE ALSO: homogfac_all
 //==================================================
 //Computes all possible homogeneous factorizations
 static proc homogfac_all(poly h)
-"USAGE: homogfac_all(h); h is a homogeneous polynomial in the first Weyl algebra with respect to the weight vector [-1,1]
+"USAGE: homogfac_all(h); h is a homogeneous polynomial in the first Weyl algebra
+        with respect to the weight vector [-1,1]
 RETURN: list
-PURPOSE: Computes all factorizations of a homogeneous polynomial h with respect to the weight vector [-1,1] in the first Weyl algebra
-THEORY: @code{homogfac} returns a list with all factorization of the given, homogeneous polynomial. It uses the output of homogfac and permutes its entries with respect to the commutation rule. Furthermore, if a factor of degree zero is irreducible in K[\theta], but reducible in the first Weyl algebra, the permutations of this element with the other entries will also be computed.
-EXAMPLE: example homogfac; shows examples
+PURPOSE: Computes all factorizations of a homogeneous polynomial h with respect
+         to the weight vector [-1,1] in the first Weyl algebra
+THEORY: @code{homogfac} returns a list with all factorization of the given,
+        homogeneous polynomial. It uses the output of homogfac and permutes
+        its entries with respect to the commutation rule. Furthermore, if a
+        factor of degree zero is irreducible in K[\theta], but reducible in
+        the first Weyl algebra, the permutations of this element with the other
+        entries will also be computed.
 SEE ALSO: homogfac
 "{//proc HomogFacAll
      if (deg(h,intvec(1,1)) <= 0 )
      {//h is a constant
-	  return(list(list(h)));
+          return(list(list(h)));
      }//h is a constant
      def r = basering;
      list one_hom_fac; //stands for one homogeneous factorization
@@ -554,7 +565,7 @@ SEE ALSO: homogfac
      one_hom_fac = homogfac(h);
      if (size(one_hom_fac) == 0)
      {//there is no homogeneous factorization or the polynomial was not homogeneous
-	  return(list());
+          return(list());
      }//there is no homogeneous factorization or the polynomial was not homogeneous
      //divide list in A0-Part and a list of x's resp. y's
      list list_not_azero = list();
@@ -565,32 +576,32 @@ SEE ALSO: homogfac
      k_factor = list(one_hom_fac[1]);
      if (absValue(deg(h,intvec(-1,1)))<size(one_hom_fac)-1)
      {//There is a nontrivial A_0-part
-	  list_azero = one_hom_fac[2..(size(one_hom_fac)-absValue(deg(h,intvec(-1,1))))];
-	  is_list_azero_empty = 0;
+          list_azero = one_hom_fac[2..(size(one_hom_fac)-absValue(deg(h,intvec(-1,1))))];
+          is_list_azero_empty = 0;
      }//There is a nontrivial A_0 part
      for (i = 1; i<=size(list_azero)-1;i++)
      {//in homogfac, we factorized theta, and this will be made undone
-	  if (list_azero[i] == var(1))
-	  {
-	       if (list_azero[i+1]==var(2))
-	       {
-		    list_azero[i] = var(1)*var(2);
-		    list_azero = delete(list_azero,i+1);
-	       }
-	  }
-	  if (list_azero[i] == var(2))
-	  {
-	       if (list_azero[i+1]==var(1))
-	       {
-		    list_azero[i] = var(2)*var(1);
-		    list_azero = delete(list_azero,i+1);
-	       }
-	  }
+          if (list_azero[i] == var(1))
+          {
+               if (list_azero[i+1]==var(2))
+               {
+                    list_azero[i] = var(1)*var(2);
+                    list_azero = delete(list_azero,i+1);
+               }
+          }
+          if (list_azero[i] == var(2))
+          {
+               if (list_azero[i+1]==var(1))
+               {
+                    list_azero[i] = var(2)*var(1);
+                    list_azero = delete(list_azero,i+1);
+               }
+          }
      }//in homogfac, we factorized theta, and this will be made undone
      if(deg(h,intvec(-1,1))!=0)
      {//list_not_azero is not empty
-	  list_not_azero = one_hom_fac[(size(one_hom_fac)-absValue(deg(h,intvec(-1,1)))+1)..size(one_hom_fac)];
-	  is_list_not_azero_empty = 0;
+          list_not_azero = one_hom_fac[(size(one_hom_fac)-absValue(deg(h,intvec(-1,1)))+1)..size(one_hom_fac)];
+          is_list_not_azero_empty = 0;
      }//list_not_azero is not empty
      //Map list_azero in K[theta]
      ring tempRing = 0,(x,y,theta), dp;
@@ -599,31 +610,31 @@ SEE ALSO: homogfac
      map thetamap = r,x,y;
      if(!is_list_not_azero_empty)
      {//Mapping in Singular is only possible, if the list before contained at least one element of the other ring
-	  list list_not_azero = thetamap(list_not_azero);
+          list list_not_azero = thetamap(list_not_azero);
      }//Mapping in Singular is only possible, if the list before contained at least one element of the other ring
      if(!is_list_azero_empty)
      {//Mapping in Singular is only possible, if the list before contained at least one element of the other ring
-	  list list_azero= thetamap(list_azero);
+          list list_azero= thetamap(list_azero);
      }//Mapping in Singular is only possible, if the list before contained at least one element of the other ring
      list k_factor = thetamap(k_factor);
      list tempmons;
      for(i = 1; i<=size(list_azero);i++)
      {//rewrite the polynomials in A1 as polynomials in K[theta]
-	  tempmons = list();
-	  for (j = 1; j<=size(list_azero[i]);j++)
-	  {
-	       tempmons = tempmons + list(list_azero[i][j]);
-	  }
-	  for (j = 1 ; j<=size(tempmons);j++)
-	  {
-	       entry = leadcoef(tempmons[j]);
-	       for (k = 0; k < leadexp(tempmons[j])[2];k++)
-	       {
-		    entry = entry*(theta-k);
-	       }
-	       tempmons[j] = entry;
-	  }
-	  list_azero[i] = sum(tempmons);
+          tempmons = list();
+          for (j = 1; j<=size(list_azero[i]);j++)
+          {
+               tempmons = tempmons + list(list_azero[i][j]);
+          }
+          for (j = 1 ; j<=size(tempmons);j++)
+          {
+               entry = leadcoef(tempmons[j]);
+               for (k = 0; k < leadexp(tempmons[j])[2];k++)
+               {
+                    entry = entry*(theta-k);
+               }
+               tempmons[j] = entry;
+          }
+          list_azero[i] = sum(tempmons);
      }//rewrite the polynomials in A1 as polynomials in K[theta]
      //Compute all permutations of the A0-part
      list result;
@@ -632,40 +643,40 @@ SEE ALSO: homogfac
      poly shiftvar;
      if (size(list_not_azero)!=0)
      {//Compute all possibilities to permute the x's resp. the y's in the list
-	  if (list_not_azero[1] == x)
-	  {//h had a negative weighted degree
-	       shift_sign = 1;
-	       shiftvar = x;
-	  }//h had a negative weighted degree
-	  else
-	  {//h had a positive weighted degree
-	       shift_sign = -1;
-	       shiftvar = y;
-	  }//h had a positive weighted degree
-	  result = permpp(list_azero + list_not_azero);
-	  for (i = 1; i<= size(result); i++)
-	  {//adjust the a_0-parts
-	       shift = 0;
-	       for (j=1; j<=size(result[i]);j++)
-	       {
-		    if (result[i][j]==shiftvar)
-		    {
-			 shift = shift + shift_sign;
-		    }
-		    else
-		    {
-			 result[i][j] = subst(result[i][j],theta,theta + shift);
-		    }
-	       }
-	  }//adjust the a_0-parts
+          if (list_not_azero[1] == x)
+          {//h had a negative weighted degree
+               shift_sign = 1;
+               shiftvar = x;
+          }//h had a negative weighted degree
+          else
+          {//h had a positive weighted degree
+               shift_sign = -1;
+               shiftvar = y;
+          }//h had a positive weighted degree
+          result = permpp(list_azero + list_not_azero);
+          for (i = 1; i<= size(result); i++)
+          {//adjust the a_0-parts
+               shift = 0;
+               for (j=1; j<=size(result[i]);j++)
+               {
+                    if (result[i][j]==shiftvar)
+                    {
+                         shift = shift + shift_sign;
+                    }
+                    else
+                    {
+                         result[i][j] = subst(result[i][j],theta,theta + shift);
+                    }
+               }
+          }//adjust the a_0-parts
      }//Compute all possibilities to permute the x's resp. the y's in the list
      else
      {//The result is just all the permutations of the a_0-part
-	  result = permpp(list_azero);
+          result = permpp(list_azero);
      }//The result is just all the permutations of the a_0 part
      if (size(result)==0)
      {
-	  return(result);
+          return(result);
      }
      //Now we are going deeper and search for theta resp. theta + 1, substitute them by xy resp. yx and go on permuting
      int found_theta;
@@ -677,102 +688,102 @@ SEE ALSO: homogfac
      list tempadd;
      for (i = 1; i<=size(result) ; i++)
      {//checking every entry of result for theta or theta +1
-	  found_theta = 0;
+          found_theta = 0;
           for(j=1;j<=size(result[i]);j++)
           {
-	       if (result[i][j]==theta)
-	       {//the jth entry is theta and can be written as x*y
-		    thetapos = j;
-		    result[i]= insert(result[i],x,j-1);
-		    j++;
-		    result[i][j] = y;
-		    found_theta = 1;
-		    break;
-	       }//the jth entry is theta and can be written as x*y
-	       if(result[i][j] == theta +1)
-	       {
-		    thetapos = j;
-		    result[i] = insert(result[i],y,j-1);
-		    j++;
-		    result[i][j] = x;
-		    found_theta = 1;
-		    break;
-	       }
-	  }
-	  if (found_theta)
-	  {//One entry was theta resp. theta +1 
-	       leftpart = result[i];
-	       leftpart = leftpart[1..thetapos];
-	       rightpart = result[i];
-	       rightpart = rightpart[(thetapos+1)..size(rightpart)];
-	       lparts = list(leftpart);
-	       rparts = list(rightpart);
-	       //first deal with the left part
-	       if (leftpart[thetapos] == x)
-	       {
-		    shift_sign = 1;
-		    shiftvar = x;
-	       }
-	       else
-	       {
-		    shift_sign = -1;
-		    shiftvar = y;
-	       }
-	       for (j = size(leftpart); j>1;j--)
-	       {//drip x resp. y
-		    if (leftpart[j-1]==shiftvar)
-		    {//commutative
-			 j--;
-		         continue;
-		    }//commutative
-		    if (deg(leftpart[j-1],intvec(-1,1,0))!=0)
-		    {//stop here
-		         break;
-		    }//stop here
-		    //Here, we can only have a a0- part
-		    leftpart[j] = subst(leftpart[j-1],theta, theta + shift_sign);
-		    leftpart[j-1] = shiftvar;
-		    lparts = lparts + list(leftpart);
-	        }//drip x resp. y
-	        //and now deal with the right part
-	        if (rightpart[1] == x)
-	        {
-		     shift_sign = 1;
-		     shiftvar = x;
-		}
-	        else
-	        {
-		     shift_sign = -1;
-		     shiftvar = y;
-		}
-		for (j = 1 ; j < size(rightpart); j++)
-	        {
-		     if (rightpart[j+1] == shiftvar)
-		     {
-			  j++;
-			  continue;
-		     }
-		     if (deg(rightpart[j+1],intvec(-1,1,0))!=0)
-		     {
-			  break;
-		     }
-		     rightpart[j] = subst(rightpart[j+1], theta, theta - shift_sign);
-		     rightpart[j+1] = shiftvar;
-		     rparts = rparts + list(rightpart);
-	        }
-		//And now, we put all possibilities together
-		tempadd = list();
-	        for (j = 1; j<=size(lparts); j++)
-		{
-	     	   for (k = 1; k<=size(rparts);k++)
-		   {
-			      tempadd = tempadd + list(lparts[j]+rparts[k]);
-		   }
-	        }
-		tempadd = delete(tempadd,1); // The first entry is already in the list
-	        result = result + tempadd;
-	        continue; //We can may be not be done already with the ith entry
-	  }//One entry was theta resp. theta +1
+               if (result[i][j]==theta)
+               {//the jth entry is theta and can be written as x*y
+                    thetapos = j;
+                    result[i]= insert(result[i],x,j-1);
+                    j++;
+                    result[i][j] = y;
+                    found_theta = 1;
+                    break;
+               }//the jth entry is theta and can be written as x*y
+               if(result[i][j] == theta +1)
+               {
+                    thetapos = j;
+                    result[i] = insert(result[i],y,j-1);
+                    j++;
+                    result[i][j] = x;
+                    found_theta = 1;
+                    break;
+               }
+          }
+          if (found_theta)
+          {//One entry was theta resp. theta +1
+               leftpart = result[i];
+               leftpart = leftpart[1..thetapos];
+               rightpart = result[i];
+               rightpart = rightpart[(thetapos+1)..size(rightpart)];
+               lparts = list(leftpart);
+               rparts = list(rightpart);
+               //first deal with the left part
+               if (leftpart[thetapos] == x)
+               {
+                    shift_sign = 1;
+                    shiftvar = x;
+               }
+               else
+               {
+                    shift_sign = -1;
+                    shiftvar = y;
+               }
+               for (j = size(leftpart); j>1;j--)
+               {//drip x resp. y
+                    if (leftpart[j-1]==shiftvar)
+                    {//commutative
+                         j--;
+                         continue;
+                    }//commutative
+                    if (deg(leftpart[j-1],intvec(-1,1,0))!=0)
+                    {//stop here
+                         break;
+                    }//stop here
+                    //Here, we can only have a a0- part
+                    leftpart[j] = subst(leftpart[j-1],theta, theta + shift_sign);
+                    leftpart[j-1] = shiftvar;
+                    lparts = lparts + list(leftpart);
+                }//drip x resp. y
+                //and now deal with the right part
+                if (rightpart[1] == x)
+                {
+                     shift_sign = 1;
+                     shiftvar = x;
+                }
+                else
+                {
+                     shift_sign = -1;
+                     shiftvar = y;
+                }
+                for (j = 1 ; j < size(rightpart); j++)
+                {
+                     if (rightpart[j+1] == shiftvar)
+                     {
+                          j++;
+                          continue;
+                     }
+                     if (deg(rightpart[j+1],intvec(-1,1,0))!=0)
+                     {
+                          break;
+                     }
+                     rightpart[j] = subst(rightpart[j+1], theta, theta - shift_sign);
+                     rightpart[j+1] = shiftvar;
+                     rparts = rparts + list(rightpart);
+                }
+                //And now, we put all possibilities together
+                tempadd = list();
+                for (j = 1; j<=size(lparts); j++)
+                {
+                        for (k = 1; k<=size(rparts);k++)
+                   {
+                              tempadd = tempadd + list(lparts[j]+rparts[k]);
+                   }
+                }
+                tempadd = delete(tempadd,1); // The first entry is already in the list
+                result = result + tempadd;
+                continue; //We can may be not be done already with the ith entry
+          }//One entry was theta resp. theta +1
      }//checking every entry of result for theta or theta +1
      //map back to the basering
      setring(r);
@@ -780,7 +791,7 @@ SEE ALSO: homogfac
      list result = finalmap(result);
      for (i=1; i<=size(result);i++)
      {//adding the K factor
-	  result[i] = k_factor + result[i];
+          result[i] = k_factor + result[i];
      }//adding the k-factor
      result = delete_dublicates_noteval(result);
      return(result);
@@ -804,20 +815,20 @@ static proc perm(list l)
      list result;
      if (size(l)==0)
      {
-	  return(list());
+          return(list());
      }
      if (size(l)==1)
      {
-	  return(list(l));
+          return(list(l));
      }
      for (i = 1; i<=size(l); i++ )
      {
-	  tempresult = perm(delete(l,i));
-	  for (j = 1; j<=size(tempresult);j++)
-	  {
-	       tempresult[j] = list(l[i])+tempresult[j];
-	  }
-	  result = result+tempresult;
+          tempresult = perm(delete(l,i));
+          for (j = 1; j<=size(tempresult);j++)
+          {
+               tempresult[j] = list(l[i])+tempresult[j];
+          }
+          result = result+tempresult;
      }
      return(result);
 }//proc perm
@@ -835,37 +846,37 @@ static proc permpp(list l)
      list result;
      if (size(l)==0)
      {
-	  return(list());
+          return(list());
      }
      if (size(l)==1)
      {
-	  return(list(l));
+          return(list(l));
      }
      for (i = 1; i<=size(l);i++)
      {//Filling the list with unique entries
-	  double_entry = 0;
-	  for (j = 1; j<=size(l_without_double);j++)
-	  {
-	       if (l_without_double[j] == l[i])
-	       {
-		    double_entry = 1;
-		    break;
-	       }
-	  }
-	  if (!double_entry)
-	  {
-	       l_without_double = l_without_double + list(l[i]);
-	       l_without_double_pos = l_without_double_pos + list(i);
-	  }
+          double_entry = 0;
+          for (j = 1; j<=size(l_without_double);j++)
+          {
+               if (l_without_double[j] == l[i])
+               {
+                    double_entry = 1;
+                    break;
+               }
+          }
+          if (!double_entry)
+          {
+               l_without_double = l_without_double + list(l[i]);
+               l_without_double_pos = l_without_double_pos + list(i);
+          }
      }//Filling the list with unique entries
      for (i = 1; i<=size(l_without_double); i++ )
      {
-	  tempresult = permpp(delete(l,l_without_double_pos[i]));
-	  for (j = 1; j<=size(tempresult);j++)
-	  {
-	       tempresult[j] = list(l_without_double[i])+tempresult[j];
-	  }
-	  result = result+tempresult;
+          tempresult = permpp(delete(l,l_without_double_pos[i]));
+          for (j = 1; j<=size(tempresult);j++)
+          {
+               tempresult[j] = list(l_without_double[i])+tempresult[j];
+          }
+          result = result+tempresult;
      }
      return(result);
 }//proc permpp
@@ -877,53 +888,64 @@ static proc permpp(list l)
 //transform the input into an appropriate input for
 //the procedure sfacwa, where the ring must contain the
 //variables in a certain order.
-proc facfirstwa(poly h)
-{//proc facfirstwa
+proc facFirstWeyl(poly h)
+"USAGE: facFirstWeyl(h); h a poly
+RETURN: list
+PURPOSE: compute all factorizations of a polynomial in the first Weyl algebra
+THEORY: Implements the new algorithm by A. Heinle and V. Levandovskyy, see the thesis of A. Heinle
+ASSUME: basering in the first Weyl algebra
+EXAMPLE: example facFirstWeyl; shows examples
+SEE ALSO: facSubWeyl, testNCfac
+"{//proc facFirstWeyl
       //Redefine the ring in my standard form
      if (!isWeyl())
      {//Our basering is not the Weyl algebra
-	  return(list());
+          return(list());
      }//Our basering is not the Weyl algebra
      if(nvars(basering)!=2)
      {//Our basering is the Weyl algebra, but not the first
-	  return(list());
+          return(list());
      }//Our basering is the Weyl algebra, but not the first
      if (ringlist(basering)[6][1,2] == -1) //manual of ringlist will tell you why
      {
-	  def r = basering;
-	  ring tempRing = ringlist(r)[1][1],(x,y),Ws(-1,1);
-	  def tempRingnc = nc_algebra(1,1);
-	  setring(tempRingnc);
-	  map transf = r, var(2), var(1);
-	  list result = sfacwa(transf(h));
-	  setring(r);
-	  map transfback = tempRingnc, var(2),var(1);
-	  return(transfback(result));
+          def r = basering;
+          ring tempRing = ringlist(r)[1][1],(x,y),Ws(-1,1);
+          def tempRingnc = nc_algebra(1,1);
+          setring(tempRingnc);
+          map transf = r, var(2), var(1);
+          list result = sfacwa(transf(h));
+          setring(r);
+          map transfback = tempRingnc, var(2),var(1);
+          return(transfback(result));
      }
      else { return(sfacwa(h));}
-}//proc facfirstwa
+}//proc facFirstWeyl
 example
 {
      "EXAMPLE:";echo=2;
      ring R = 0,(x,y),dp;
      def r = nc_algebra(1,1);
      setring(r);
-     poly h = (x^2*y^2+x)*(y-1);
-     facfirstwa(h);
+     poly h = (x^2*y^2+x)*(x+1);
+     facFirstWeyl(h);
 }
 
 //This is the main program
 static proc sfacwa(poly h)
-"USAGE: facwa(h); h is a polynomial in the first Weyl algebra
+"USAGE: sfacwa(h); h is a polynomial in the first Weyl algebra
 RETURN: list
 PURPOSE: Computes a factorization of a polynomial h in the first Weyl algebra
-THEORY: @code{homogfac} returns a list with some factorizations of the given polynomial. The possibilities of the factorization of the highest homogeneous part and those of the lowest will be merged.
-EXAMPLE: example facwa; shows examples
+THEORY: @code{sfacwa} returns a list with some factorizations of the given
+        polynomial. The possibilities of the factorization of the highest
+        homogeneous part and those of the lowest will be merged. If during this
+        procedure a factorization of the polynomial occurs, it will be added to
+        the output list. For a more detailled description visit
+        @url{http://math.rwth-aachen.de/\~Albert.Heinle}
 SEE ALSO: homogfac_all, homogfac
 "{//proc sfacwa
      if(homogwithorder(h,intvec(-1,1)))
      {
-	  return(homogfac_all(h));
+          return(homogfac_all(h));
      }
      def r = basering;
      map invo = basering,-var(1),var(2);
@@ -943,135 +965,135 @@ SEE ALSO: homogfac_all, homogfac
      poly hath;
      for (i = 1; i<=size(f1);i++)
      {//Merge all combinations
-	  for (j = 1; j<=size(f2); j++)
-	  {
-	       M = M + mergence(f1[i],f2[j],limits);
-	  }
+          for (j = 1; j<=size(f2); j++)
+          {
+               M = M + mergence(f1[i],f2[j],limits);
+          }
      }//Merge all combinations
      for (i = 1 ; i<= size(M); i++)
      {//filter valid combinations
-	  if (product(M[i]) == h)
-	  {//We have one factorization
-	       result = result + list(M[i]);
-	       M = delete(M,i);
-	       continue;
-	  }//We have one factorization
-	  else
-	  {
-	       if (deg(h,intvec(-1,1))<=deg(h-product(M[i]),intvec(-1,1)))
-	       {
-		    M = delete(M,i);
-		    continue;
-	       }
-	       if (deg(h,intvec(1,-1))<=deg(h-product(M[i]),intvec(1,-1)))
-	       {
-		    M = delete(M,i);
-		    continue;
-	       }
-	  }
+          if (product(M[i]) == h)
+          {//We have one factorization
+               result = result + list(M[i]);
+               M = delete(M,i);
+               continue;
+          }//We have one factorization
+          else
+          {
+               if (deg(h,intvec(-1,1))<=deg(h-product(M[i]),intvec(-1,1)))
+               {
+                    M = delete(M,i);
+                    continue;
+               }
+               if (deg(h,intvec(1,-1))<=deg(h-product(M[i]),intvec(1,-1)))
+               {
+                    M = delete(M,i);
+                    continue;
+               }
+          }
      }//filter valid combinations
      M = delete_dublicates_eval(M);
      while(size(M)>0)
      {//work on the elements of M
-	  hatM = list();
-	  for(i = 1; i<=size(M); i++)
-	  {//iterate over all elements of M
-	       hath = h-product(M[i]);
-	       temp = list();
-	       //First check for common inhomogeneous factors between hath and h
-	       if (involution(NF(involution(hath,invo), std(involution(ideal(M[i][1]),invo))),invo)==0)
-	       {//hath and h have a common factor on the left
-		    j = 1;
-		    f1 = M[i];
-		    if (j+1<=size(f1))
-		    {//Checking for more than one common factor
-			 while(involution(NF(involution(hath,invo),std(involution(ideal(product(f1[1..(j+1)])),invo))),invo)==0)
-			 {
-			      if (j+1<size(f1))
-			      {
-				   j++;
-			      }
-			      else
-			      {
-				   break;
-			      }
-			 }
-		    }//Checking for more than one common factor
-		    f2 = list(f1[1..j])+list(involution(lift(involution(product(f1[1..j]),invo),involution(hath,invo))[1,1],invo));
-		    temp = temp + merge_cf(f2,f1,limits);
-	       }//hath and h have a common factor on the left
-	       if (reduce(hath, std(ideal(M[i][size(M[i])])))==0)
-	       {//hath and h have a common factor on the right
-		    j = size(M[i]);
-		    f1 = M[i];
-		    if (j-1>0)
-		    {//Checking for more than one factor
-			 while(reduce(hath,std(ideal(product(f1[(j-1)..size(f1)]))))==0)
-			 {
-			      if (j-1>1)
-			      {
-				   j--;
-			      }
-			      else
-			      {
-				   break;
-			      }
-			 }
-		    }//Checking for more than one factor
-     		    f2 = list(lift(product(f1[j..size(f1)]),hath)[1,1])+list(f1[j..size(f1)]);
-		    temp = temp + merge_cf(f2,M[i],limits);
-	       }//hath and h have a common factor on the right
-	       //and now the homogeneous
-	       maxh = jet(hath,deg(hath,intvec(-1,1)),intvec(-1,1))-jet(hath,deg(hath,intvec(-1,1))-1,intvec(-1,1));
-	       minh = jet(hath,deg(hath,intvec(1,-1)),intvec(1,-1))-jet(hath,deg(hath,intvec(1,-1))-1,intvec(1,-1));
-	       f1 = homogfac_all(maxh);
-	       f2 = homogfac_all(minh);
-	       for (j = 1; j<=size(f1);j++)
-	       {
-		    for (k=1; k<=size(f2);k++)
-		    {
-			 homogtemp = mergence(f1[j],f2[k],limits);
-		    }
-	       }
-	       for (j = 1; j<= size(homogtemp); j++)
-	       {
-		    temp = temp + mergence(homogtemp[j],M[i],limits);
-	       }
-	       for (j = 1; j<=size(temp); j++)
-	       {//filtering invalid entries in temp
-		    if(product(temp[j])==h)
-		    {//This is already a result
-			 result = result + list(temp[j]);
-			 temp = delete(temp,j);
-			 continue;
-		    }//This is already a result
-		    if (deg(hath,intvec(-1,1))<=deg(hath-product(temp[j]),intvec(-1,1)))
-		    {
-			 temp = delete(temp,j);
-			 continue;
-		    }
-	       }//filtering invalid entries in temp
-	       hatM = hatM + temp;
-	  }//iterate over all elements of M
-	  M = hatM;
-	  for (i = 1; i<=size(M);i++)
-	  {//checking for complete factorizations
-	       if (h == product(M[i]))
-	       {
-		    result = result + list(M[i]);
-		    M = delete(M,i);
-		    continue;
-	       }
-	  }//checking for complete factorizations
-	  M = delete_dublicates_eval(M);
+          hatM = list();
+          for(i = 1; i<=size(M); i++)
+          {//iterate over all elements of M
+               hath = h-product(M[i]);
+               temp = list();
+               //First check for common inhomogeneous factors between hath and h
+               if (involution(NF(involution(hath,invo), std(involution(ideal(M[i][1]),invo))),invo)==0)
+               {//hath and h have a common factor on the left
+                    j = 1;
+                    f1 = M[i];
+                    if (j+1<=size(f1))
+                    {//Checking for more than one common factor
+                         while(involution(NF(involution(hath,invo),std(involution(ideal(product(f1[1..(j+1)])),invo))),invo)==0)
+                         {
+                              if (j+1<size(f1))
+                              {
+                                   j++;
+                              }
+                              else
+                              {
+                                   break;
+                              }
+                         }
+                    }//Checking for more than one common factor
+                    f2 = list(f1[1..j])+list(involution(lift(involution(product(f1[1..j]),invo),involution(hath,invo))[1,1],invo));
+                    temp = temp + merge_cf(f2,f1,limits);
+               }//hath and h have a common factor on the left
+               if (reduce(hath, std(ideal(M[i][size(M[i])])))==0)
+               {//hath and h have a common factor on the right
+                    j = size(M[i]);
+                    f1 = M[i];
+                    if (j-1>0)
+                    {//Checking for more than one factor
+                         while(reduce(hath,std(ideal(product(f1[(j-1)..size(f1)]))))==0)
+                         {
+                              if (j-1>1)
+                              {
+                                   j--;
+                              }
+                              else
+                              {
+                                   break;
+                              }
+                         }
+                    }//Checking for more than one factor
+                         f2 = list(lift(product(f1[j..size(f1)]),hath)[1,1])+list(f1[j..size(f1)]);
+                    temp = temp + merge_cf(f2,M[i],limits);
+               }//hath and h have a common factor on the right
+               //and now the homogeneous
+               maxh = jet(hath,deg(hath,intvec(-1,1)),intvec(-1,1))-jet(hath,deg(hath,intvec(-1,1))-1,intvec(-1,1));
+               minh = jet(hath,deg(hath,intvec(1,-1)),intvec(1,-1))-jet(hath,deg(hath,intvec(1,-1))-1,intvec(1,-1));
+               f1 = homogfac_all(maxh);
+               f2 = homogfac_all(minh);
+               for (j = 1; j<=size(f1);j++)
+               {
+                    for (k=1; k<=size(f2);k++)
+                    {
+                         homogtemp = mergence(f1[j],f2[k],limits);
+                    }
+               }
+               for (j = 1; j<= size(homogtemp); j++)
+               {
+                    temp = temp + mergence(homogtemp[j],M[i],limits);
+               }
+               for (j = 1; j<=size(temp); j++)
+               {//filtering invalid entries in temp
+                    if(product(temp[j])==h)
+                    {//This is already a result
+                         result = result + list(temp[j]);
+                         temp = delete(temp,j);
+                         continue;
+                    }//This is already a result
+                    if (deg(hath,intvec(-1,1))<=deg(hath-product(temp[j]),intvec(-1,1)))
+                    {
+                         temp = delete(temp,j);
+                         continue;
+                    }
+               }//filtering invalid entries in temp
+               hatM = hatM + temp;
+          }//iterate over all elements of M
+          M = hatM;
+          for (i = 1; i<=size(M);i++)
+          {//checking for complete factorizations
+               if (h == product(M[i]))
+               {
+                    result = result + list(M[i]);
+                    M = delete(M,i);
+                    continue;
+               }
+          }//checking for complete factorizations
+          M = delete_dublicates_eval(M);
      }//work on the elements of M
      //In the case, that there is none, write a constant factor before the factor of interest.
      for (i = 1 ; i<=size(result);i++)
      {//add a constant factor
-	  if (deg(result[i][1],intvec(1,1))!=0)
-	  {
-	       result[i] = insert(result[i],1);
-	  }
+          if (deg(result[i][1],intvec(1,1))!=0)
+          {
+               result[i] = insert(result[i],1);
+          }
      }//add a constant factor
      result = delete_dublicates_noteval(result);
      return(result);
@@ -1086,16 +1108,16 @@ static proc homogwithorder(poly h, intvec weights)
 {//proc homogwithorder
      if(size(weights) != nvars(basering))
      {//The user does not know how many variables the current ring has
-	  return(0);
+          return(0);
      }//The user does not know how many variables the current ring has
      int i;
      int dofp = deg(h,weights); //degree of polynomial
      for (i = 1; i<=size(h);i++)
      {
-	  if (deg(h[i],weights)!=dofp)
-	  {
-	       return(0);
-	  }
+          if (deg(h[i],weights)!=dofp)
+          {
+               return(0);
+          }
      }
      return(1);
 }//proc homogwithorder
@@ -1112,161 +1134,190 @@ static proc homogwithorder(poly h, intvec weights)
 // then we look, if the entries are factorizations of p
 // and if not, a list with the products subtracted by p
 // will be returned
-proc testfac(list l, list #)
-"USAGE:  - testfac(l); l is a list, that contains lists with entries in the first Weyl algebra or
-         @*- testfac(l,p); l is a list, that contains lists with entries in the first Weyl algebra and p is a polynomial in the first Weyl algebra
-RETURN: list@*
-PURPOSE: Checks whether a list of factorizations contains factorizations of the same element in the first Weyl algebra@*
-THEORY: @code{testfac} multiplies out each factorization and checks whether each factorization was a factorization of the same element.
-@* - if there is only a list given, the output will be the empty list, if it does not contain factorizations of the same element. Otherwise it will multiply out all the factorizations and return a list of the length if the given one, in which each entry is the factorized polynomial
-@* - if there is a polynomial in the second argument, then the procedure checks whether the given list contains factorizations of this polynomial. If it does, then the output will be a list with the length of the given one and each entry contains this polynomial. If it does not, then the procedure returns a list, in which each entry is the given polynomial subtracted by the multiplied candidate for its factorization.
-EXAMPLE: example testfac; shows examples
-SEE ALSO: homogfac_all, homogfac, facwa
+proc testNCfac(list l, list #)
+"USAGE: testNCfac(l[,p]); l is a list, p is an optional poly
+RETURN: list
+ASSUME: basering is the first Weyl algebra, the entries of l are polynomials
+PURPOSE: Checks whether a list of factorizations contains factorizations of
+         the same element in the first Weyl algebra
+THEORY: @code{testNCfac} multiplies out each factorization and checks whether
+        each factorization was a factorization of the same element.
+@* - if there is only a list given, the output will be the empty list, if it
+     does not contain factorizations of the same element. Otherwise it will
+     multiply out all the factorizations and return a list of the length if the
+     given one, in which each entry is the factorized polynomial
+@* - if there is a polynomial in the second argument, then the procedure checks
+     whether the given list contains factorizations of this polynomial. If it
+     does, then the output will be a list with the length of the given one and
+     each entry contains this polynomial. If it does not, then the procedure
+     returns a list, in which each entry is the given polynomial subtracted
+     by the multiplied candidate for its factorization.
+EXAMPLE: example testNCfac; shows examples
+SEE ALSO: facFirstWeyl, facSubWeyl
 "{//proc testfac
      if (size(l)==0)
      {//The empty list is given
-	  return(list());
+          return(list());
      }//The empty list is given
      if (size(#)>1)
      {//We want max. one optional argument
-	  return(list());
+          return(list());
      }//We want max. one optional argument
      list result;
      int i; int j;
      if (size(#)==0)
      {//No optional argument is given
-	  int valid = 1;
-	  for (i = size(l);i>=1;i--)
-	  {//iterate over the elements of the given list
-	       if (size(result)>0)
-	       {
-		    if (product(l[i])!=result[size(l)-i])
-		    {
-			 valid = 0;
-			 break;
-		    }
-	       }
-	       result = insert(result, product(l[i]));
-	  }//iterate over the elements of the given list
-	  if (valid)
-	  {
-	       return(result);
-	  }
-	  return(list());
+          int valid = 1;
+          for (i = size(l);i>=1;i--)
+          {//iterate over the elements of the given list
+               if (size(result)>0)
+               {
+                    if (product(l[i])!=result[size(l)-i])
+                    {
+                         valid = 0;
+                         break;
+                    }
+               }
+               result = insert(result, product(l[i]));
+          }//iterate over the elements of the given list
+          if (valid)
+          {
+               return(result);
+          }
+          return(list());
      }//No optional argument is given
      else
      {
-	  int valid = 1;
-	  for (i = size(l);i>=1;i--)
-	  {//iterate over the elements of the given list
-	       if (product(l[i])!=#[1])
-	       {
-		    valid = 0;
-	       }
-	       result = insert(result, product(l[i]));
-	  }//iterate over the elements of the given list
-	  if (valid)
-	  {
-	       return(result);
-	  }
-	  for (i = 1 ; i<= size(result);i++)
-	  {//subtract p from every entry in result
-	       result[i] = result[i] - #[1];
-	  }//subtract p from every entry in result
-	  return(result);
+          int valid = 1;
+          for (i = size(l);i>=1;i--)
+          {//iterate over the elements of the given list
+               if (product(l[i])!=#[1])
+               {
+                    valid = 0;
+               }
+               result = insert(result, product(l[i]));
+          }//iterate over the elements of the given list
+          if (valid)
+          {
+               return(result);
+          }
+          for (i = 1 ; i<= size(result);i++)
+          {//subtract p from every entry in result
+               result[i] = result[i] - #[1];
+          }//subtract p from every entry in result
+          return(result);
      }
 }//proc testfac
 example
 {
      "EXAMPLE:";echo=2;
-     ring R = 0,(x,y),Ws(-1,1);
-     def r = nc_algebra(1,1);
-     setring(r);
-     poly h = (x^2*y^2+1)*(x^4);
-     def t1 = facfirstwa(h);
+     ring r = 0,(x,y),dp;
+     def R = nc_algebra(1,1);
+     setring R;
+     poly h = (x^2*y^2+1)*(x^2);
+     def t1 = facFirstWeyl(h);
      //fist a correct list
-     testfac(t1);
+     testNCfac(t1);
      //now a correct list with the factorized polynomial
-     testfac(t1,h);
+     testNCfac(t1,h);
      //now we put in an incorrect list without a polynomial
-     t1[5][3] = y;
-     testfac(t1);
+     t1[3][3] = y;
+     testNCfac(t1);
      //and last but not least we take h as additional input
-     testfac(t1,h);
+     testNCfac(t1,h);
 }
 //==================================================
-//Procedure facsubwa:
+//Procedure facSubWeyl:
 //This procedure serves the purpose to compute a
 //factorization of a given polynomial in a ring, whose subring
 //is the first Weyl algebra. The polynomial must only contain
 //the two arguments, which are also given by the user.
-proc facsubwa(poly h, X, D)
-"USAGE:  facsubwa(h,x,y) - h is a polynomial in the first Weyl algebra, X and D are the variables in h, which have the commutation rule DX = XD + 1@*
-RETURN: list@*
-PURPOSE: Given a polynomial in a Ring, which contains the first Weyl algebra as a subring. Furthermore let this polynomial be in the first Weyl algebra with the variables X and D with DX = XD +1.@*
-THEORY: @code{facsubwa} computes some factorizations of the given polynomial, which is a polynomial in the variables X and D@*
-EXAMPLE: example facsubwa; shows examples
-SEE ALSO: facfirstwa
-"{//proc facsubwa
-     if(!isWeyl())
-     {
-	  return(list());
-     }
+
+proc facSubWeyl(poly h, X, D)
+"USAGE:  facSubWeyl(h,x,y); h, X, D polynomials
+RETURN: list
+ASSUME: X and D are variables of a basering, which satisfy DX = XD +1. 
+@* That is,  they generate the copy of the first Weyl algebra in a basering.
+@* Moreover, h is a polynomial in X and D only.
+PURPOSE: compute factorizations of the polynomial, which depends on X and D.
+EXAMPLE: example facSubWeyl; shows examples
+SEE ALSO: facFirstWeyl, testNCfac
+"{
+//proc facSubWeyl
+// basering can be anything having a Weyl algebra as subalgebra
      def r = basering;
-     //We begin to check the input
-     if (size(X)>1)
+     //We begin to check the input for assumptions
+     // which are: X,D are vars of the basering,
+     if ( (isVar(X)!=1) || (isVar(D)!=1) || (size(X)>1) || (size(D)>1) ||
+          (leadcoef(X) != number(1)) || (leadcoef(D) != number(1)) )
      {
-	  return(list());
+       ERROR("expected pure variables as generators of a subalgebra");
      }
-     if (size(D)>1)
+     // Weyl algebra:
+     poly w = D*X-X*D-1; // [D,X]=1
+     poly u = D*X-X*D+1; // [X,D]=1
+     if (u*w!=0) 
      {
-	  return(list());
+       // that is no combination gives Weyl
+       ERROR("2nd and 3rd argument do not generate a Weyl algebra");
      }
+     // one of two is correct
+     if (u==0)
+     {
+       // hence w != 0, swap X<->D
+       w = D; D=X; X=w; 
+     }
+     // DONE with assumptions	  
+     //Input successfully checked
      intvec lexpofX = leadexp(X);
      intvec lexpofD = leadexp(D);
-     if (sum(lexpofX)!=1)
-     {
-	  return(list());
-     }
-     if (sum(lexpofD)!=1)
-     {
-	  return(list());
-     }
      int varnumX=1;
      int varnumD=1;
      while(lexpofX[varnumX] != 1)
      {
-	  varnumX++;
+          varnumX++;
      }
      while(lexpofD[varnumD] != 1)
      {
-	  varnumD++;
+          varnumD++;
      }
-     lexpofX = lexpofX +1;
-     lexpofX[varnumX] = 0;
-     lexpofX[varnumD] = 0;
-     if (deg(h,lexpofX)!=0)
-     {
-	  return(list());
-     }
-     //Input successfully checked
+/* VL: it's not clear what you do here!!! I comment out */
+     //     lexpofX = lexpofX +1;
+     //      lexpofX[varnumX] = 0;
+     //      lexpofX[varnumD] = 0;
+     //      if (deg(h,lexpofX)!=0)
+     //      {
+     //           return(list());
+     //      }
+/* VL : to add printlevel stuff */
+
      ring firstweyl = 0,(var(varnumX),var(varnumD)),dp;
      def Firstweyl = nc_algebra(1,1);
      setring Firstweyl;
      poly h = imap(r,h);
-     list result = facfirstwa(h);
+     list result = facFirstWeyl(h);
      setring r;
      list result = imap(Firstweyl,result);
      return(result);
-}//proc facsubwa
+}//proc facSubWeyl
 example
 {
      "EXAMPLE:";echo=2;
-     ring R = 0,(x,y),Ws(-1,1);
-     def r = nc_algebra(1,1);
-     setring(r);
-     poly h = (x^2*y^2+x)*x;
-     facsubwa(h,x,y);
+     ring r = 0,(x,y,z),dp;
+     matrix D[3][3]; D[1,3]=-1;
+     def R = nc_algebra(1,D); // x,z generate Weyl subalgebra
+     setring R;
+     poly h = (x^2*z^2+x)*x;
+     list fact1 = facSubWeyl(h,x,z); fact1[2];
+     poly test1 = fact1[2][2]; // for testing
+     // compare with facFirstWeyl:
+     ring s = 0,(z,x),dp;
+     def S = nc_algebra(1,1); setring S;
+     poly h = (x^2*z^2+x)*x;
+     list fact2 = facFirstWeyl(h); fact2[2];
+     poly test2 = fact2[2][2]; // for testing
+     map F = R,x,z;
+     F(test1) - test2; // they are identical
 }
 //==================================================
 /*
