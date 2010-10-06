@@ -80,7 +80,7 @@ static inline void *omRealloc(void *d, size_t ns)
     *dd=ns+sizeof(long);dd++; return dd;
   }
 }
-static inline void *omReallocSize(void *d, size_t os, size_t ns)
+static inline void *omReallocSize(void *d, size_t /*os*/, size_t ns)
 { if (d==NULL) return omAlloc(ns);
   else 
   {
@@ -107,7 +107,7 @@ static inline void *omRealloc0(void *d, size_t ns)
   }
   return n;
 }
-static inline void omFreeSize(void *d, size_t s)
+static inline void omFreeSize(void *d, size_t /*s*/)
 { if (d!=NULL) { long *dd=(long*)d; dd--; free(dd);}}
 
 static inline char * omStrDup(const char *s)
