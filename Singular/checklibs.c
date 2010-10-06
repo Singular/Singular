@@ -67,7 +67,7 @@ void scan_proc(int *l)
       else
       {
         if (strlen(s)<4)
-	  printf("error: minimal length of a procedure name is 4: %s\n",s);
+          printf("error: minimal length of a procedure name is 4: %s\n",s);
         proc[proc_cnt]=strdup(s); proc_cnt++;
       }
     }
@@ -203,10 +203,10 @@ void scan_info(int *l)
       {
         /* check for other allowed sections: REFERENCES*/
         if ((ch!=10)||(strncmp(pp,"REFERENCES",10)!=0))
-	{
+        {
           printf("error: unknown section in library header: %s",buf);
           have_other++;
-	}
+        }
         if (have_PROCEDURES!=0)
           printf("error: only KEYWORDS/SEE ALSO may follow PROCEDURES\n");
       }
@@ -288,10 +288,11 @@ int main(int argc, char** argv)
       if (p=pp)
       {
         have_version++;
-	pp=p+8;
-	while((*pp)==' ') pp++);
-	if (((*pp)!='"') || (strstr(pp,"$Id")==NULL))
-	  printf("error: version string should start with $""Id");
+        pp=p+8;
+        while((*pp)==' ') pp++;
+        if (((*pp)!='"') || (strstr(pp,"$Id")==NULL))
+          printf("error: version string should start with $""Id");
+      }
     }
     if ((p=strstr(buf,"category="))!=NULL)
     {
@@ -367,7 +368,7 @@ int main(int argc, char** argv)
       {
         if(strcmp(proc[i],pp)==0) break;
       }
-      if (i<0) 
+      if (i<0)
       {
         printf("hint: global proc %s not found in header\n",pp);
         footer++; get_next();
