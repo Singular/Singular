@@ -4018,9 +4018,18 @@ $as_echo "$as_me: not updating unwritable cache $cache_file" >&6;}
 fi
 rm -f confcache
 
+project=singular
+component=misc
+
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 # Let make expand exec_prefix.
 test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
+
+# expand libdir
+test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${project}/${component}"
+
+# expand includedir
+test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include/${project}/${component}"
 
 DEFS=-DHAVE_CONFIG_H
 
