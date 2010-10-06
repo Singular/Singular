@@ -7,10 +7,10 @@
 
 #include "config.h"
 
-#include <auxiliary.h>
+#include <misc/auxiliary.h>
 
-#include <omalloc.h>
-#include <reporter.h>
+#include <omalloc/omalloc.h>
+#include <reporter/reporter.h>
 
 #include "feFopen.h"
 #include "feResource.h"

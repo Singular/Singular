@@ -596,6 +596,7 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+project
 SINGUNAME
 EGREP
 GREP
@@ -3649,6 +3650,27 @@ _ACEOF
 
 SINGUNAME=$ac_cv_singuname
 
+
+
+project=singular
+component=resource
+
+
+
+
+# expand prefix
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+
+# expand exec_prefixad
+if test "x$exec_prefix" = xNONE; then
+ exec_prefix=${prefix}
+fi
+
+# expand libdir
+test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${project}/${component}"
+
+# expand includedir
+test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include/${project}/${component}"
 
 ac_config_files="$ac_config_files Makefile"
 
