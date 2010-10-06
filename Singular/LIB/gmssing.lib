@@ -37,7 +37,7 @@ SEE ALSO: mondromy_lib, spectrum_lib, gmspoly_lib, dmod_lib
 
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration;
-          Bernstein-Sato polynomial; local Bernstein-Sato polynomial; 
+          Bernstein-Sato polynomial; local Bernstein-Sato polynomial;
           monodromy; spectrum; spectral pairs; good basis
 ";
 

@@ -11,8 +11,8 @@ AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
 
 OVERVIEW:
 
-Suppose C = {f(x,y,z)=0} is a rational plane curve, where f is homogeneous 
-of degree n with coefficients in Q and absolutely irreducible (these 
+Suppose C = {f(x,y,z)=0} is a rational plane curve, where f is homogeneous
+of degree n with coefficients in Q and absolutely irreducible (these
 conditions are checked automatically.) @*
 After a first step, realized by a projective automorphism in the procedure
 adjointIdeal, C satisfies: @*
@@ -22,8 +22,8 @@ adjointIdeal, C satisfies: @*
 Considering C in the chart z<>0, the algorithm regards x as transcendental
 and y as algebraic and computes an integral basis in C(x)[y] of the integral
 closure of C[x] in C(x,y) using the  normalization algorithm from
-@ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the 
-library, also van Hoeij's algorithm for computing the integral basis will 
+@ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the
+library, also van Hoeij's algorithm for computing the integral basis will
 be available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
@@ -106,7 +106,7 @@ ASSUME: The ideal phi in the basering R represents a birational map of the
         P = PP^(size(phi)-1).
 NOTE:   The procedure might fail or give a wrong output if phi does
         not define a birational map.
-RETURN: ring, the coordinate ring of P, with an ideal named J and an ideal 
+RETURN: ring, the coordinate ring of P, with an ideal named J and an ideal
         named psi.@*
         The ideal J defines the image of phi.@*
         The ideal psi gives the inverse of phi.@*
@@ -895,7 +895,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc rncAntiCanonicalMap(ideal I)
 "USAGE:  rncAntiCanonicalMap(I); I ideal
-ASSUME:  I is a homogeneous ideal in the basering 
+ASSUME:  I is a homogeneous ideal in the basering
          defining a rational normal curve C in PP^n.
 NOTE:   The procedure will fail or give a wrong output if I is not the
         ideal of a rational normal curve.
@@ -939,7 +939,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc rncItProjOdd(ideal I)
 "USAGE:  rncItProjOdd(I); I ideal
-ASSUME:  I is a homogeneous ideal in the basering with n+1 variables 
+ASSUME:  I is a homogeneous ideal in the basering with n+1 variables
          defining a rational normal curve C in PP^n with n odd.
 NOTE:    The procedure will fail or give a wrong output if I is not the
          ideal of a rational normal curve. It will test whether n is odd.
@@ -1053,12 +1053,12 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 proc rncItProjEven(ideal I)
 "USAGE:  rncItProjEven(I); I ideal
-ASSUME:  I is a homogeneous ideal in the basering with n+1 variables 
+ASSUME:  I is a homogeneous ideal in the basering with n+1 variables
          defining a rational normal curve C in PP^n with n even.
 NOTE:    The procedure will fail or give a wrong output if I is not the
          ideal of a rational normal curve. It will test whether n is odd.
 RETURN:  ring with an ideal CONIC defining a conic C2 in PP^2.@*
-         In addition, an ideal PHI in the basering defining an isomorphic 
+         In addition, an ideal PHI in the basering defining an isomorphic
          projection of C to C2 will be exported.@*
          Note that the entries of PHI should be considered as
          representatives of elements in R/I, where R is the basering.
@@ -2531,7 +2531,7 @@ ASSUME:  The assumptions on the basering and the polynomial f are as required
          @ref{paraPlaneCurve} to f).
 RETURN: int which is 1 if PARA defines a parametrization of the curve
         {f=0} and 0, otherwise.
-THEORY: We compute the polynomial defining the image of PARA 
+THEORY: We compute the polynomial defining the image of PARA
         and compare it with f.
 KEYWORDS: Parametrization, image.
 EXAMPLE: example testParametrization; shows an example

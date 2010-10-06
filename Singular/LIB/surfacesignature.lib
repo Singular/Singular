@@ -177,7 +177,7 @@ static proc dedekindSum(number b, number c, int a)
 
 static proc isRupture(intvec v)
 //=== decides whether the exceptional divisor given by the row v in the
-//=== incidence matrix of the resolution graph intersects at least 3 other 
+//=== incidence matrix of the resolution graph intersects at least 3 other
 //=== divisors
 {
    int i,j;
@@ -359,10 +359,10 @@ static proc etaSpec(list L, int N)
 //---------------- Consolidation of the three former variants -----------------
 
 proc signature(int N, poly f, list #)
-"USAGE:  signature(N,f); N = integer, f = reduced poly in 2 variables, 
+"USAGE:  signature(N,f); N = integer, f = reduced poly in 2 variables,
                          # empty or 1,2,3
 @*       - if # is empty or #[1] = 2 then resolution of singularities is used
-@*       - if #[1] = 1 then f has to be analytically irreducible and Puiseux 
+@*       - if #[1] = 1 then f has to be analytically irreducible and Puiseux
                        expansions are used
 @*       - if #[1] = 3 then spectral pairs are used
 RETURN:  signature of surface singularity defined by z^N + f(x,y) = 0

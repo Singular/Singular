@@ -1192,7 +1192,7 @@ EXAMPLE: example makeLetterplaceRing1; shows examples
   intvec iv; list ttmp, tmp1;
   for (i=1; i<=d; i++)
   {
-    // the position to hold 1: 
+    // the position to hold 1:
     iv = intvec( gen( i*(lV+1)-1 ) );
     ttmp[1] = "a";
     ttmp[2] = iv;

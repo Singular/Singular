@@ -108,7 +108,7 @@ EXAMPLE: example clocus;  shows an example
       setring A;
     }
     //Product of the discriminants, which lies in C2:
-    product = product*resultant(J[index],diff(J[index],var(i)),var(i)); 
+    product = product*resultant(J[index],diff(J[index],var(i)),var(i));
     kill index,J,v;
   }
   ring C2 = 0,(var(n-1),var(n)),dp;

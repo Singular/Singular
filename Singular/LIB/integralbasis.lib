@@ -9,12 +9,12 @@ AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
           F. Seelisch, seelisch@mathematik.uni-kl.de
 
 OVERVIEW:
-Given an irreducible polynomial f in two variables defining a plane curve, 
-this library implements an algorithm to compute an integral basis of the 
-integral closure of the affine coordinate ring in the algebraic function 
+Given an irreducible polynomial f in two variables defining a plane curve,
+this library implements an algorithm to compute an integral basis of the
+integral closure of the affine coordinate ring in the algebraic function
 field via normalization.@*
-The user can choose whether the algorithm will do the computation globally 
-or (this is the default) compute in the localization at each component of 
+The user can choose whether the algorithm will do the computation globally
+or (this is the default) compute in the localization at each component of
 the singular locus and put everything together.
 
 PROCEDURES:
@@ -26,8 +26,8 @@ LIB "normal.lib";
 ///////////////////////////////////////////////////////////////////////////////
 
 proc integralBasis(poly f, int intVar, list #)
-"USAGE: integralBasis(f, intVar); f irreducible polynomial in two variables, 
-        intVar integer indicating that the intVar-th variable of the ring is the 
+"USAGE: integralBasis(f, intVar); f irreducible polynomial in two variables,
+        intVar integer indicating that the intVar-th variable of the ring is the
         integral element.@*
         The base ring must be a ring in two variables, and the polynomial f
         must be monic as polynomial in the intVar-th variable.@*
@@ -35,7 +35,7 @@ proc integralBasis(poly f, int intVar, list #)
         Parameters for selecting the algorithm:@*
         - \"global\" -> computes the integral basis by computing the
         normalization of R/<f>, where R is the base ring.@*
-        - \"local\" -> computes the integral basis by computing the 
+        - \"local\" -> computes the integral basis by computing the
         normalization of R/<f> localized at each component of the singular
         locus of R/<f>, and then putting everything together.
         This is the default option.@*
@@ -44,25 +44,25 @@ proc integralBasis(poly f, int intVar, list #)
         and therefore will not check this. If this option is given but f is not
         irreducible, the output might be wrong.@*
         - list(\"inputJ\", ideal inputJ) -> takes as initial test ideal the
-        ideal inputJ. This option is only for use in other procedures. Using 
+        ideal inputJ. This option is only for use in other procedures. Using
         this option, the result might not be the integral basis.@*
-        (When this option is given, the global option will be used.)@*         
-        - list(\"inputC\", ideal inputC) -> takes as initial conductor the 
-        ideal inputC. This option is only for use in other procedures. Using 
+        (When this option is given, the global option will be used.)@*
+        - list(\"inputC\", ideal inputC) -> takes as initial conductor the
+        ideal inputC. This option is only for use in other procedures. Using
         this option, the result might not be the integral basis.@*
-        (When this option is given, the global option will be used.)@*         
+        (When this option is given, the global option will be used.)@*
 RETURN: a list, say l, of size 2.
         l[1] is an ideal I and l[2] is a polynomial D such that the integral
         basis is b_0 = I[1] / D, b_1 = I[2] / D, ..., b_{n-1} = I[n] / D.@*
-        That is, the integral closure of k[x] in the algebraic function 
-        field k(x,y) is @* 
+        That is, the integral closure of k[x] in the algebraic function
+        field k(x,y) is @*
         k[x] b_0 + k[x] b_1 + ... + k[x] b_{n-1},@*
-        where we assume that x is the transcendental variable, y is the integral 
-        element (indicated by intVar), f gives the integral equation and n is 
+        where we assume that x is the transcendental variable, y is the integral
+        element (indicated by intVar), f gives the integral equation and n is
         the degree of f as a polynomial in y.@*
 
 THEORY:  We compute the integral basis of the integral closure of k[x] in k(x,y)
-         by computing the normalization of the affine ring k[x,y]/<f> and 
+         by computing the normalization of the affine ring k[x,y]/<f> and
          converting the k[x,y]-module generators into a k[x]-basis.@*
 KEYWORDS: integral basis; normalization.
 SEE ALSO: normal.
@@ -109,7 +109,7 @@ EXAMPLE: example integralBasis; shows an example
       }
     }
   }
-  
+
 //--------------------------- preliminary checks ------------------------------
   // The ring must have two variables.
   if(nvars(basering) != 2){
@@ -118,29 +118,29 @@ EXAMPLE: example integralBasis; shows an example
 
   // intVar must be either 1 or 2.
   if((intVar < 0) || (intVar > 2)){
-      ERROR("The second parameter intVar must be either 1 or 2, indicating the 
+      ERROR("The second parameter intVar must be either 1 or 2, indicating the
             integral variable.");
   }
-  
+
   // No parameters or algebraic numbers are allowed.
   if(npars(basering) >0){
     ERROR("No parameters or algebraic extensions are allowed in the base ring.");
   }
-  
+
   // The polynomial f must be monic in the intVar-th variable.
   matrix cs = coeffs(f, var(intVar));
   if(cs[size(cs),1] != 1){
-      ERROR("The input polynomial must be monic as a polynomial in the 
+      ERROR("The input polynomial must be monic as a polynomial in the
             intVar-th variable.");
   }
-  
+
   // The polynomial f must be irreducible.
   if(checkIrred == 1){
     if(factorize(f)[2] != [1,1]){
         ERROR("The input polynomial must be irreducible.");
     }
   }
-  
+
 //--------------------- computing the integral basis --------------------------
   return(cancelCF(integralBasisMain(f, algorithm, inputJ, inputC, intVar)));
 }
@@ -152,7 +152,7 @@ example
   poly f = y5-y4x+4y2x2-x4;
   list l = integralBasis(f, 2);
   l;
-// The integral basis of the integral closure of Q[x] in Q(x,y) consists 
+// The integral basis of the integral closure of Q[x] in Q(x,y) consists
 // of the elements of l[1] divided by the polynomial l[2].
   echo = 0;
   printlevel = printlevel-1;
@@ -163,10 +163,10 @@ example
 static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inputC, int intVar)
 // Computes the integral basis of R/<f>, from the normalizaiton of R/<f>.
 // inputC is the conductor ideal to be used in proc normal.
-// If inputC = < 0 >, then the default conductor ideal is used (the full 
+// If inputC = < 0 >, then the default conductor ideal is used (the full
 // jacobian ideal).
 // inputJ is the test ideal to be used in proc normal.
-// If inputJ = < 0 >, then the default test ideal is used (the radical of the 
+// If inputJ = < 0 >, then the default test ideal is used (the radical of the
 // conductor).
 {
   int dbg = printlevel - voice + 2;
@@ -184,11 +184,11 @@ static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inpu
   } else {
     def R = basering;
   }
-  
+
 //-------------------------------- basic data ---------------------------------
   // The degree of f with respect to the variable intVar
   ideal I = f;
-  int n = size(coeffs(f, var(intVar))) - 1;  
+  int n = size(coeffs(f, var(intVar))) - 1;
 
   // If the integral variable is the first, then the universal denominator
   // must be a polynomial in the second variable (and viceversa).
@@ -211,18 +211,18 @@ static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inpu
       opts = insert(opts, list("inputC", inputC));
     }
     list nor = normal(I, opts);
-  } 
+  }
   ideal normalGen = nor[2][1];
   poly D = normalGen[size(normalGen)];  // The universal denominator
-  
+
   //Debug information
   if(dbg >= 2){
     "The universal denominator is: ", D;
   }
-  
+
 //--------------- computes the integral basis from the normalization ----------
   // We define a new ring where the integral variable is the first (needed for
-  // reduction) and has the appropiate ordering.  
+  // reduction) and has the appropiate ordering.
   list rl = ringlist(R);
   rl[2] = list(var(intVar), var(3-intVar));
   rl[3] = list(list("C", 0), list("lp", intvec(1,1)));
@@ -232,15 +232,15 @@ static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inpu
   // We map the elements in the previous ring to the new one
   poly f = imap(R, f);
   ideal normalGen = imap(R, normalGen);
-  
+
   // We create the system of generatos y^i*f_j.
   list l;
   ideal red = groebner(f);
   for(j = 1; j <= size(normalGen); j++){
     l[j] = reduce(normalGen[j], red);
-  } 
+  }
   for(i = 1; i <= n-1; i++){
-    for(j = 1; j <= size(normalGen); j++){ 
+    for(j = 1; j <= size(normalGen); j++){
       l[size(l)+1] = reduce(var(1)^i*normalGen[j], red);
     }
   }
@@ -249,10 +249,10 @@ static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inpu
   // elements of a free module where the coordinates are the coefficients
   // of the polynomials regarded as polynomials in y.
   // The groebner basis of the module generated by these elements
-  // gives the desired basis.   
+  // gives the desired basis.
   matrix vecs[n + 1][size(l)];
   matrix coeffi[n + 1][2];
-  
+
   for(i = 1; i<= size(l); i++){
     coeffi = coeffs(l[i], var(1));
     vecs[1..nrows(coeffi), i] = coeffi[1..nrows(coeffi), 1];
@@ -260,13 +260,13 @@ static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inpu
   module M = vecs;
   M = std(M);
 
-  // We go back to the original ring.  
+  // We go back to the original ring.
   setring origR;
   module M = imap(S, M);
   if(newRing == 1){
     poly D = fetch(R, D);
   }
-  
+
   // We go back from the module to the ring in two variables
   ideal G;
   poly g;
@@ -277,28 +277,28 @@ static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inpu
     }
     G[i] = g;
   }
-  
+
   // The first element in the output is the ideal of numerators.
   // The second element is the denominator.
-  list outp = G, D;       
-  
+  list outp = G, D;
+
   return(outp);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 static proc integralLocal(ideal I, list #){
-// Computes the integral basis  by localizing at the different components of 
+// Computes the integral basis  by localizing at the different components of
 // the singular locus.
-  int i;  
+  int i;
   int dbg = printlevel - voice + 4;
   def R = basering;
-  
+
   list n;         // Output of proc normal
   ideal norT;     // Temporary data.
   poly denomT;    // Temporary data.
 
-  ideal nor;      // Output of normal with the denominator changed to the 
+  ideal nor;      // Output of normal with the denominator changed to the
                   // common denominator.
   ideal res;      // The full integral basis
 
@@ -321,7 +321,7 @@ static proc integralLocal(ideal I, list #){
   list IM = mstd(I);
   I = IM[1];
   int d = dim(I);
-  ideal IMin = IM[2];  
+  ideal IMin = IM[2];
   qring Q = I;  // We work in the quotient by the Groebner basis of the ideal I
   option("redSB");
   option("returnSB");
@@ -345,7 +345,7 @@ static proc integralLocal(ideal I, list #){
     "groebner of the singular locus time: ", timer - t;
     t = timer;
   }
-  
+
   if(dbg >= 2){
     "The original singular locus is";
     J;
@@ -366,17 +366,17 @@ static proc integralLocal(ideal I, list #){
   if(dbg >= 2){
     "primary decomposition time:", timer - t;
   }
-  if(dbg >= 1){  
+  if(dbg >= 1){
     "The number of components of the Singular Locus is ", size(pd);
   }
 
-  // The following commented lines are not needed for integral basis, since 
+  // The following commented lines are not needed for integral basis, since
   // all components are maximal.
   // Computes the maximal components and the components included in them
   //list comps = maxComps(pd);
   // For each maximal component, it intersects all the components included in it
   //list locs = intersectList(comps);
-  
+
 //------------------- normalization of each component--------------------------
   list opts;
   for(i = 1; i <= size(pd); i++){
@@ -396,8 +396,8 @@ static proc integralLocal(ideal I, list #){
     if(size(n[2]) > 1){
       ERROR("The input polynomial is not irreducible.");
     }
-    
-    // We add up the normalizations at each localization, to construct the 
+
+    // We add up the normalizations at each localization, to construct the
     // normalization of the whole ideal.
     norT = n[2][1];
     denomT = norT[size(norT)];
@@ -406,12 +406,12 @@ static proc integralLocal(ideal I, list #){
     // to have the same denominator for all the normalizations.
     nor = changeDenominator(norT, denomT, condu, I);
 
-    // We sum the result to the previous results. 
+    // We sum the result to the previous results.
     res = res, nor;
   }
   res = groebner(res);
   res[size(res)+1] = condu;
-  
+
   // The output follows the output of proc normal, but we don't return the
   // ring structure, only the generators. (We return 0 instead of the ring.)
   return(list(0,list(res)));
@@ -424,7 +424,7 @@ static proc cancelCF(list IB)
 RETURN:  list of same type with  common factor cancelled.
 KEYWORDS: greatest common divisor.
 "
-{  
+{
   int l = size(IB[1]);
   poly GrCoDi = IB[2];
   int k = l;
@@ -437,7 +437,7 @@ KEYWORDS: greatest common divisor.
     {
       for(k = 1; k <= l; k++)
          {
-           IB[1][k] = IB[1][k]/GrCoDi;     
+           IB[1][k] = IB[1][k]/GrCoDi;
          }
       IB[2] = IB[2]/GrCoDi;
     }
@@ -487,7 +487,7 @@ kill RR;
 // Example 4
 // -------------------------------------------------------
 ring RR = 0, (x,y), dp;
-poly f = y^20+x*y^13+x^4*y^5+x^5+2*x^4+x^3;  
+poly f = y^20+x*y^13+x^4*y^5+x^5+2*x^4+x^3;
 integralBasis(f, 2, "global");  // time 0
 integralBasis(f, 2);  // local by default,  time 0
 kill RR;
@@ -532,12 +532,12 @@ f = f+1476*u^2*v^4*z^2+318*u*v^5*z^2+28*v^6*z^2+1338*u^5*z^3+3740*u^4*v*z^3;
 f = f+4030*u^3*v^2*z^3+2124*u^2*v^3*z^3+550*u*v^4*z^3+56*v^5*z^3+1101*u^4*z^4;
 f = f+2264*u^3*v*z^4+1716*u^2*v^2*z^4+570*u*v^3*z^4+70*v^4*z^4+508*u^3*z^5;
 f = f+738*u^2*v*z^5+354*u*v^2*z^5+56*v^3*z^5+132*u^2*z^6+122*u*v*z^6;
-f = f+28*v^2*z^6+18*u*z^7+8*v*z^7+z^8; 
+f = f+28*v^2*z^6+18*u*z^7+8*v*z^7+z^8;
 f = subst(f,z,1);
 ring RR = 0, (x,y), dp;
 poly f = fetch(SS,f);
 integralBasis(f, 2, "global");  // time 95
-integralBasis(f, 2);  // local by default, time  13 
+integralBasis(f, 2);  // local by default, time  13
 kill RR, SS;
 // -------------------------------------------------------
 // Example 9

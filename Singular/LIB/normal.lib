@@ -66,18 +66,18 @@ proc normal(ideal id, list #)
          If the optional parameter choose is not given or empty, only
          \"equidim\" but no other option is used.@*
          - list(\"inputJ\", ideal inputJ) -> takes as initial test ideal the
-         ideal inputJ. This option is only for use in other procedures. Using 
-         this option, the result might not be the normalization.@*
-         (Option only valid for global algorithm.)@*         
-         - list(\"inputC\", ideal inputC) -> takes as initial conductor the 
-         ideal inputC. This option is only for use in other procedures. Using 
+         ideal inputJ. This option is only for use in other procedures. Using
          this option, the result might not be the normalization.@*
          (Option only valid for global algorithm.)@*
-         Options used for computing integral basis (over rings of two 
+         - list(\"inputC\", ideal inputC) -> takes as initial conductor the
+         ideal inputC. This option is only for use in other procedures. Using
+         this option, the result might not be the normalization.@*
+         (Option only valid for global algorithm.)@*
+         Options used for computing integral basis (over rings of two
          variables):@*
-         - \"var1\" -> uses a polynomial in the first variable as 
+         - \"var1\" -> uses a polynomial in the first variable as
          universal denominator.@*
-         - \"var2\" -> uses a polynomial in the second variable as universal 
+         - \"var2\" -> uses a polynomial in the second variable as universal
          denominator.@*
          If the optional parameter choose is not given or empty, only
          \"equidim\" but no other option is used.@*
@@ -172,7 +172,7 @@ EXAMPLE: example normal; shows an example
   useRing = 0;       // Change first to dp ordering, and perform all
                      // computations there.
   withDelta = 0;     // Do not compute the delta invariant.
-  denomOption = 0;   // The default universal denominator is the smallest 
+  denomOption = 0;   // The default universal denominator is the smallest
                      // degree polynomial.
 
 //--------------------------- define the method ---------------------------
@@ -4617,8 +4617,8 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
       // We have to go on.
       // The new denominator is chosen.
       c = D * c;
-      
-      // If we have a universal denominator of smaller degree than c, 
+ 
+      // If we have a universal denominator of smaller degree than c,
       // we replace c by it.
       if(condu != 0){
         if(deg(c) > deg(condu))
@@ -4709,10 +4709,10 @@ static proc lineUp(ideal U, poly c)
 //It is now replaced by computing an eliminating groebner basis.
 proc getOneVar(ideal J, int vari)
 "USAGE:   getOneVar(J, vari); J is a 0-dimensional ideal, vari is an integer.
-RETURN:  a polynomial of J in the variable indicated by vari of smallest 
+RETURN:  a polynomial of J in the variable indicated by vari of smallest
          degree.@*
 NOTE:    Works only over rings of two variables.@*
-         It is intended mainly as an auxiliary procedure for computing 
+         It is intended mainly as an auxiliary procedure for computing
          integral bases. @*
 EXAMPLE: example getOneVar; shows an example
 "
@@ -4741,17 +4741,17 @@ example
 
 proc getSmallest(ideal J)
 "USAGE:   getSmallest(J); J is an ideal.
-RETURN:  the generator of J of smallest degree. If there are more than one, it 
+RETURN:  the generator of J of smallest degree. If there are more than one, it
          chooses the one with smallest number of monomials.@*
 NOTE:    It looks only at the generator of J, not at all the polynomials in
          the ideal.@*
-         It is intended maninly to compute a good universal denominator in the 
+         It is intended maninly to compute a good universal denominator in the
          normalization algorithms.@*
 EXAMPLE: example getSmallest; shows an example
 "
 {
 // Computes the polynomial of smallest degree of J.
-// 
+//
   int i;
   poly p = J[1];
   int d = deg(p);
@@ -5003,7 +5003,7 @@ NOTE:    It assumes that such U2 exists. It is intended maninly as an auxiliary
 EXAMPLE: example changeDenominator; shows an example
 "
 {
-// Let A = R / I. Given an A-module in the form 1/c1 * U1 (U1 ideal of A), it 
+// Let A = R / I. Given an A-module in the form 1/c1 * U1 (U1 ideal of A), it
 // computes a new ideal U2 such that the the A-module is 1/c2 * U2.
 // The base ring is R, but the computations are to be done in R / I.
   int a;      // counter
@@ -5018,7 +5018,7 @@ EXAMPLE: example changeDenominator; shows an example
   return(U2);
 }
 example
-{ 
+{
   "EXAMPLE:";
   echo = 2;
   ring s = 0,(x,y),dp;

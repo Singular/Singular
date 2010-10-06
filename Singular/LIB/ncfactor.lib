@@ -1236,7 +1236,7 @@ example
 proc facSubWeyl(poly h, X, D)
 "USAGE:  facSubWeyl(h,x,y); h, X, D polynomials
 RETURN: list
-ASSUME: X and D are variables of a basering, which satisfy DX = XD +1. 
+ASSUME: X and D are variables of a basering, which satisfy DX = XD +1.
 @* That is,  they generate the copy of the first Weyl algebra in a basering.
 @* Moreover, h is a polynomial in X and D only.
 PURPOSE: compute factorizations of the polynomial, which depends on X and D.
@@ -1256,7 +1256,7 @@ SEE ALSO: facFirstWeyl, testNCfac
      // Weyl algebra:
      poly w = D*X-X*D-1; // [D,X]=1
      poly u = D*X-X*D+1; // [X,D]=1
-     if (u*w!=0) 
+     if (u*w!=0)
      {
        // that is no combination gives Weyl
        ERROR("2nd and 3rd argument do not generate a Weyl algebra");
@@ -1265,9 +1265,9 @@ SEE ALSO: facFirstWeyl, testNCfac
      if (u==0)
      {
        // hence w != 0, swap X<->D
-       w = D; D=X; X=w; 
+       w = D; D=X; X=w;
      }
-     // DONE with assumptions	  
+     // DONE with assumptions	
      //Input successfully checked
      intvec lexpofX = leadexp(X);
      intvec lexpofD = leadexp(D);

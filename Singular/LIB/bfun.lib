@@ -51,7 +51,7 @@ linSyzSolve(I[,s]);         compute a linear dependency of elements of ideal I
 
 SEE ALSO: dmod_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
 
-KEYWORDS: D-module; global Bernstein-Sato polynomial; Bernstein-Sato polynomial; b-function; 
+KEYWORDS: D-module; global Bernstein-Sato polynomial; Bernstein-Sato polynomial; b-function;
 graded Weyl algebra; initial ideal; initial form; principal intersection; linear interreduction;
 initial ideal approach
 ";
