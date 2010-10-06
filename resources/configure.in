@@ -35,7 +35,7 @@ dnl path stuff
 dnl
 
 project=singular
-component=resource
+component=resources
 
 AC_SUBST(project)
 
