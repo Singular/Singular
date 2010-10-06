@@ -1267,7 +1267,7 @@ SEE ALSO: facFirstWeyl, testNCfac
        // hence w != 0, swap X<->D
        w = D; D=X; X=w;
      }
-     // DONE with assumptions	
+     // DONE with assumptions
      //Input successfully checked
      intvec lexpofX = leadexp(X);
      intvec lexpofD = leadexp(D);

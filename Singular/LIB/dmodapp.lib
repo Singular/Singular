@@ -605,8 +605,8 @@ EXAMPLE: example intRoots; shows an example
       if (typeof(l[2])<>"intvec"){wronginput = 1;}
       if (sl>2)
       {
-	if (typeof(l[3])<>"string"){wronginput = 1;}
-	if (sl>3){wronginput = 1;}
+        if (typeof(l[3])<>"string"){wronginput = 1;}
+        if (sl>3){wronginput = 1;}
       }
     }
   }
@@ -1511,18 +1511,18 @@ EXAMPLE: example GBWeight; shows examples
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="intvec")
-	{
-	  if (size(#[3])==2*n && allPositive(#[3])==1)
-	  {
-	    homogweights = #[3];
-	  }
-	  else
-	  {
-	    print("// Homogenization weight vector must consist of positive entries and be");
-	    print("// of size " + string(n) + ". Using weight (1,...,1).");
-	  }
-	}
+        if (typeof(#[3])=="intvec")
+        {
+          if (size(#[3])==2*n && allPositive(#[3])==1)
+          {
+            homogweights = #[3];
+          }
+          else
+          {
+            print("// Homogenization weight vector must consist of positive entries and be");
+            print("// of size " + string(n) + ". Using weight (1,...,1).");
+          }
+        }
       }
     }
   }
@@ -1568,7 +1568,7 @@ EXAMPLE: example GBWeight; shows examples
     @relD[i,n+i] = var(N)^(homogweights[i]+homogweights[n+i]);
   }
   def Dh = nc_algebra(1,@relD);
-  setring Dh; kill @Dh;	
+  setring Dh; kill @Dh;
   dbprint(ppl-1,"// computing in ring",Dh);
   // 2. Compute the initial ideal
   ideal I = imap(save,I);
@@ -1885,16 +1885,16 @@ static proc restrictionModuleEngine (ideal I, intvec w, list #)
     {
       if (typeof(#[2])=="int" || typeof(#[2])=="number")
       {
-	l0 = int(#[2]);
-	l0set = 1;
+        l0 = int(#[2]);
+        l0set = 1;
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="ideal")
+        if (typeof(#[3])=="ideal")
         {
-	  G = #[3];
-	  Gset = 1;
-	}
+          G = #[3];
+          Gset = 1;
+        }
       }
     }
   }
@@ -2013,9 +2013,9 @@ static proc restrictionModuleEngine (ideal I, intvec w, list #)
       B = Blist[j];
       for (k=1; k<=ncols(B); k++)
       {
-	p = B[k]*G[i];
-	p = f(p);
-	M[size(M)+1] = p;
+        p = B[k]*G[i];
+        p = f(p);
+        M[size(M)+1] = p;
       }
     }
   }
@@ -2191,11 +2191,11 @@ static proc restrictionIdealEngine (ideal I, intvec w, string cf, list #)
     {
       if (M[1,i]<>0)
       {
-	v = M[2..r,i];
-	if (v == zm)
-	{
-	  J[size(J+1)] = M[1,i];
-	}
+        v = M[2..r,i];
+        if (v == zm)
+        {
+          J[size(J+1)] = M[1,i];
+        }
       }
     }
   }
@@ -2301,7 +2301,7 @@ EXAMPLE: example fourier; shows examples
     {
       if (v[i] == v[i+1])
       {
-	ERROR("No double entries allowed in intvec");
+        ERROR("No double entries allowed in intvec");
       }
     }
   }
@@ -2370,7 +2370,7 @@ EXAMPLE: example inverseFourier; shows examples
     {
       if (v[i] == v[i+1])
       {
-	ERROR("No double entries allowed in intvec");
+        ERROR("No double entries allowed in intvec");
       }
     }
   }
@@ -2452,16 +2452,16 @@ EXAMPLE: example integralModule; shows examples
     {
       if (typeof(#[2])=="int" || typeof(#[2])=="number")
       {
-	l0 = int(#[2]);
-	l0set = 1;
+        l0 = int(#[2]);
+        l0set = 1;
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="ideal")
+        if (typeof(#[3])=="ideal")
         {
-	  G = #[3];
-	  Gset = 1;
-	}
+          G = #[3];
+          Gset = 1;
+        }
       }
     }
   }
@@ -2475,11 +2475,11 @@ EXAMPLE: example integralModule; shows examples
     {
       if (v == intvec(0))
       {
-	v[1] = i;
+        v[1] = i;
       }
       else
       {
-	v[size(v)+1] = i;
+        v[size(v)+1] = i;
       }
     }
   }
@@ -2615,35 +2615,35 @@ EXAMPLE: example deRhamCohomIdeal; shows examples
     {
       if (allPositive(#[1])==1)
       {
-	w = #[1];
+        w = #[1];
       }
       else
       {
-	print("// Entries of intvec must be strictly positive");
-	print("// Using weight " + string(w));
+        print("// Entries of intvec must be strictly positive");
+        print("// Using weight " + string(w));
       }
       if (size(#)>1)
       {
-	if (typeof(#[2])=="int" || typeof(#[2])=="number")
+        if (typeof(#[2])=="int" || typeof(#[2])=="number")
         {
-	  whichengine = int(#[2]);
-	}
-	if (size(#)>2)
+          whichengine = int(#[2]);
+        }
+        if (size(#)>2)
         {
-	  if (typeof(#[3])=="int" || typeof(#[3])=="number")
+          if (typeof(#[3])=="int" || typeof(#[3])=="number")
           {
-	    l0 = int(#[3]);
-	    l0set = 1;
-	  }
-	  if (size(#)>3)
+            l0 = int(#[3]);
+            l0set = 1;
+          }
+          if (size(#)>3)
           {
-	    if (typeof(#[4])=="ideal")
+            if (typeof(#[4])=="ideal")
             {
-	      G = #[4];
-	      Gset = 1;
-	    }
-	  }
-	}
+              G = #[4];
+              Gset = 1;
+            }
+          }
+        }
       }
     }
   }
@@ -2657,11 +2657,11 @@ EXAMPLE: example deRhamCohomIdeal; shows examples
     {
       if (v == intvec(0))
       {
-	v[1] = i;
+        v[1] = i;
       }
       else
       {
-	v[size(v)+1] = i;
+        v[size(v)+1] = i;
       }
     }
   }
@@ -2710,7 +2710,7 @@ EXAMPLE: example deRhamCohomIdeal; shows examples
       j=1;
       while (p<N[j])
       {
-	j++;
+        j++;
       }
       N = insertGenerator(N,p,j+1);
     }
@@ -2761,8 +2761,8 @@ EXAMPLE: example deRhamCohom; shows example
     {
       if(typeof(#[2])=="int" || typeof(#[2])=="number")
       {
-	l0 = int(#[2]);
-	l0given = 1;
+        l0 = int(#[2]);
+        l0given = 1;
       }
     }
   }

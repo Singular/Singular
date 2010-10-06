@@ -4362,7 +4362,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
         ideal Id2 = quotient(I, Id1);
         // I = I1 \cap I2
         printlevel = printlevel + 1;
-        ideal JDefault = 0;		// Now it uses the default J;
+        ideal JDefault = 0; // Now it uses the default J;
         list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault)[1];
         list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault)[1];
         printlevel = printlevel - 1;
