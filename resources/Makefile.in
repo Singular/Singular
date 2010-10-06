@@ -63,17 +63,17 @@ OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
-libresource.a: ${OBJS}
+libresources.a: ${OBJS}
 	 -rm -f $@
 	 ar cr $@ $^
 
-all:  libresource.a
+all:  libresources.a
 
 install: all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
 	${INSTALL_DATA} feFopen.h ${includedir}/feFopen.h
-	${INSTALL_DATA} libresource.a ${libdir}/libresource.a
+	${INSTALL_DATA} libresources.a ${libdir}/libresources.a
 
 ##
 ## clean targest
