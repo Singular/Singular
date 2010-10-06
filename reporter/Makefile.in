@@ -34,7 +34,7 @@ PIPE		= -pipe
 CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
 CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-CPPFLAGS	= -I${srcdir} -I${includedir}
+CPPFLAGS	= -I${srcdir} -I${includedir} -I${prefix}/include/singular
 DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
 
 ## End configuration dependend stuff
