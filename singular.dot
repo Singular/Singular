@@ -29,6 +29,7 @@ digraph singular {
 	polys [ fontcolor=blue ];
 }
 
+// dot -Tpng -o singular.png singular.dot
 
 // boxed = third party
 // filled = external
