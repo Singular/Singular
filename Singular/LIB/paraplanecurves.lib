@@ -22,7 +22,7 @@ adjointIdeal, C satisfies: @*
 Considering C in the chart z<>0, the algorithm regards x as transcendental
 and y as algebraic and computes an integral basis in C(x)[y] of the integral
 closure of C[x] in C(x,y) using the  normalization algorithm from
-@ref{normal.lib}: see @ref{integralbasis.lib}. In a future edition of the 
+@ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the 
 library, also van Hoeij's algorithm for computing the integral basis will 
 be available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
@@ -247,8 +247,8 @@ THEORY:  After a first step, realized by a projective automorphism in the
   with respect to z is monic as a polynomial in y). @*
 Considering C in the chart z<>0, the algorithm regards x as transcendental
 and y as algebraic and computes an integral basis in C(x)[y] of the integral
-closure of C[x] in C(x,y) using the normalization algorithm from @ref{normal.lib}:
-see @ref{integralbasis.lib}. In a future edition of the library, also van Hoeij's
+closure of C[x] in C(x,y) using the normalization algorithm from @ref{normal_lib}:
+see @ref{integralbasis_lib}. In a future edition of the library, also van Hoeij's
 algorithm for computing the integral basis will be available. @*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
@@ -449,7 +449,7 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
 THEORY:  Considering C in the chart z<>0, the algorithm regards x as
 transcendental and y as algebraic and computes an integral basis in C(x)[y] of
 the integral closure of C[x] in C(x,y) using the normalization algorithm
-from @ref{normal.lib}: see @ref{integralbasis.lib}. In a future edition of the library,
+from @ref{normal_lib}: see @ref{integralbasis_lib}. In a future edition of the library,
 also van Hoeij's algorithm for computing the integral basis will be available.@*
 From the integral basis, the adjoint ideal is obtained by linear algebra.
 Alternatively, the algorithm starts with a local analysis of the singular
