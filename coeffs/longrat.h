@@ -10,8 +10,8 @@
 #include "coeffs.h"
 // #include "config.h"
 #include "si_gmp.h"
-#include <auxiliary.h>
-#include <omalloc.h>
+#include <misc/auxiliary.h>
+#include <omalloc/omalloc.h>
 
 #define SR_HDL(A) ((long)(A))
 

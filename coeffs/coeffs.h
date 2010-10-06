@@ -8,9 +8,9 @@
 * ABSTRACT
 */
 
-#include <auxiliary.h>
+#include <misc/auxiliary.h>
 /* for assume: */
-#include <reporter.h>
+#include <reporter/reporter.h>
 #include <si_gmp.h>
 
 enum n_coeffType

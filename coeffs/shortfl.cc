@@ -11,12 +11,12 @@
 
 #include <string.h>
 #include "coeffs.h"
-#include "reporter.h"
+#include "reporter/reporter.h"
 #include "numbers.h"
 #include "longrat.h"
 #include "mpr_complex.h"
 
-#include <mylimits.h>
+#include <misc/mylimits.h>
 
 /// Our Type!
 static const n_coeffType ID = n_R;
