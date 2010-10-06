@@ -9,7 +9,7 @@
 */
 #include <stdio.h>
 #include <string.h>
-#include <auxiliary.h>
+#include <misc/auxiliary.h>
 
 extern char*  feErrors;
 extern int    feErrorsLen;

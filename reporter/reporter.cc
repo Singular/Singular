@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mylimits.h>
+#include <misc/mylimits.h>
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <ctype.h>
@@ -21,7 +21,7 @@
 #endif
 
 #include "reporter.h"
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 //#include "options.h"
 
 #define fePutChar(c) fputc((unsigned char)(c),stdout)
