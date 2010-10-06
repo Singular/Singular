@@ -3653,7 +3653,7 @@ SINGUNAME=$ac_cv_singuname
 
 
 project=singular
-component=resource
+component=resources
 
 
 
