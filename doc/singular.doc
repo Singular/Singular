@@ -229,6 +229,7 @@ See also @ref{Non-commutative libraries}.
 * General purpose::
 * Linear algebra::
 * Commutative algebra::
+* Algebraic geometry::
 * Singularities::
 * Invariant theory::
 * Symbolic-numerical solving::
@@ -241,7 +242,7 @@ See also @ref{Non-commutative libraries}.
 * Experimental libraries::
 @end menu
 @ifset withplural
-@xref{Non-commutative libraries}
+@xref{Non-commutative libraries}.
 @end ifset
 @c ----------------------------------------------------------
 @node standard_lib, General purpose, SINGULAR libraries, SINGULAR libraries
@@ -302,11 +303,11 @@ LIB "all.lib";
 @c ----------------------------------------------------------
 @node compregb_lib, general_lib, all_lib, General purpose
 @subsection compregb_lib
-@c lib  compregb.lib
+@c lib compregb.lib
 @c ----------------------------------------------------------
 @node general_lib, inout_lib, compregb_lib, General purpose
 @subsection general_lib
-@c lib  general.lib
+@c lib general.lib
 @c ----------------------------------------------------------
 @node inout_lib, poly_lib, general_lib, General purpose
 @subsection inout_lib
@@ -346,7 +347,7 @@ LIB "all.lib";
 @subsection linalg_lib
 @c lib linalg.lib
 @c ----------------------------------------------------------------------------
-@node Commutative algebra, Singularities, Linear algebra, SINGULAR libraries
+@node Commutative algebra, Algebraic geometry, Linear algebra, SINGULAR libraries
 @section Commutative algebra
 @cindex Commutative algebra
 
@@ -373,10 +374,7 @@ LIB "all.lib";
 * realrad_lib:: procedures for finding the real radical
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
 * resbin_lib:: Resolution of singularities of binomial ideals
-* resolve_lib:: Resolution of Singularities
-* reszeta_lib:: Applications of Resolution of Singularities
 * sagbi_lib:: Subalgebras bases Analogous to Groebner bases for ideals
-* sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
 * sing4ti2_lib:: interface to program 4ti2
 * toric_lib:: toric ideals
 @end menu
@@ -466,36 +464,56 @@ LIB "all.lib";
 @subsection reesclos_lib
 @c lib reesclos.lib
 @c ---------------------------------------------------------
-@node resbin_lib, resolve_lib, reesclos_lib, Commutative algebra
+@node resbin_lib, sagbi_lib, reesclos_lib, Commutative algebra
 @subsection resbin_lib
 @c lib resbin.lib
 @c ---------------------------------------------------------
-@node resolve_lib, reszeta_lib, resbin_lib, Commutative algebra
-@subsection resolve_lib
-@c lib resolve.lib
-@c ---------------------------------------------------------
-@node reszeta_lib, sagbi_lib , resolve_lib, Commutative algebra
-@subsection reszeta_lib
-@c lib reszeta.lib
-@c ---------------------------------------------------------
-@node sagbi_lib, sheafcoh_lib , reszeta_lib, Commutative algebra
+@node sagbi_lib, sing4ti2_lib, resbin_lib, Commutative algebra
 @subsection sagbi_lib
 @c lib sagbi.lib
 @c ---------------------------------------------------------
-@node sheafcoh_lib, sing4ti2_lib, sagbi_lib, Commutative algebra
-@subsection sheafcoh_lib
-@c lib sheafcoh.lib
-@c ---------------------------------------------------------
-@node sing4ti2_lib, toric_lib, sheafcoh_lib, Commutative algebra
+@node sing4ti2_lib, toric_lib, sagbi_lib, Commutative algebra
 @subsection sing4ti2_lib
 @c lib sing4ti2.lib
 @c ---------------------------------------------------------
 @node toric_lib, , sing4ti2_lib, Commutative algebra
 @subsection toric_lib
 @c lib toric.lib
+@c ---------------------------------------------------------
+@node Algebraic geometry, Singularities, Commutative algebra, SINGULAR libraries
+@section Algebraic geometry
+@cindex Algebraic geometry
 
+@menu
+* resgraph_lib:: Visualization of Resolution data
+* resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
+* resolve_lib:: Resolution of Singularities
+* reszeta_lib:: Applications of Resolution of Singularities
+* sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
+@end menu
+
+@c ---------------------------------------------------------
+@node resgraph_lib, resjung_lib, Algebraic geometry, Algebraic geometry
+@subsection resgraph_lib
+@c lib resgraph.lib
+@c ---------------------------------------------------------
+@node resjung_lib, resolve_lib, resgraph_lib, Algebraic geometry
+@subsection resjung_lib
+@c lib resjung.lib
+@c ---------------------------------------------------------
+@node resolve_lib, reszeta_lib, resjung_lib, Algebraic geometry
+@subsection resolve_lib
+@c lib resolve.lib
+@c ---------------------------------------------------------
+@node reszeta_lib, sheafcoh_lib, resolve_lib, Algebraic geometry
+@subsection reszeta_lib
+@c lib reszeta.lib
+@c ---------------------------------------------------------
+@node sheafcoh_lib, ,reszeta_lib, Algebraic geometry
+@subsection sheafcoh_lib
+@c lib sheafcoh.lib
 @c ----------------------------------------------------------------------------
-@node Singularities, Invariant theory, Commutative algebra, SINGULAR libraries
+@node Singularities, Invariant theory, Algebraic geometry, SINGULAR libraries
 @section Singularities
 @cindex Singularities
 
@@ -651,7 +669,6 @@ LIB "all.lib";
 @menu
 * graphics_lib:: procedures to draw  with Mathematica
 * latex_lib:: procedures for typesetting in TeX
-* resgraph_lib:: visualization of resolution data
 * surf_lib:: interface to the surf programm
 * surfex_lib:: Procedures for Visualizing Surfaces
 @end menu
@@ -661,15 +678,11 @@ LIB "all.lib";
 @subsection graphics_lib
 @c lib graphics.lib no_ex
 @c ---------------------------------------------------------
-@node latex_lib, resgraph_lib, graphics_lib, Visualization
+@node latex_lib, surf_lib, graphics_lib, Visualization
 @subsection latex_lib
 @c lib latex.lib
 @c ---------------------------------------------------------
-@node resgraph_lib, surf_lib, latex_lib, Visualization
-@subsection resgraph_lib
-@c lib resgraph.lib
-@c ---------------------------------------------------------
-@node surf_lib,surfex_lib, resgraph_lib, Visualization
+@node surf_lib,surfex_lib, latex_lib, Visualization
 @subsection surf_lib
 @c lib surf.lib no_ex
 @c ---------------------------------------------------------
@@ -867,7 +880,7 @@ but not for serious computations.
 @cindex Experimental libraries
 
 This sections collect libraries in the beta test phase.
-Everything in  these libraries may change.
+Everything in these libraries may change.
 
 For the minimal requirements and guidelines
 see @ref{Guidelines for writing a library}.
@@ -881,7 +894,6 @@ Comments should be send to the author of the library directly.
 * multigrading_lib:: Multigradings and related computations
 * paraplanecurves_lib:: Rational parametrization of rational plane curves
 * primdecint_lib:: primary decomposition over the integers
-* resjung_lib:: Resolution of surface singularities by Jung's Algorithm
 * surfacesignature_lib:: signature of surface singularities
 @end menu
 @c ----------------------------------------------------------
@@ -950,7 +962,7 @@ Todos/Issues:
 @c lib paraplanecurves.lib
 
 @c ----------------------------------------------------------
-@node primdecint_lib,resjung_lib,paraplanecurves_lib, Experimental libraries
+@node primdecint_lib,surfacesignature_lib,paraplanecurves_lib, Experimental libraries
 @subsection primdecint_lib
 @cindex primdecint_lib
 
@@ -961,18 +973,7 @@ Todos/Issues:
 @c lib primdecint.lib
 
 @c ----------------------------------------------------------
-@node resjung_lib,surfacesignature_lib,primdecint_lib, Experimental libraries
-@subsection resjung_lib
-@cindex resjung_lib
-
-Issues:
-@itemize
-@end itemize
-
-@c lib resjung.lib
-
-@c ----------------------------------------------------------
-@node surfacesignature_lib,,resjung_lib, Experimental libraries
+@node surfacesignature_lib,,primdecint_lib, Experimental libraries
 @subsection surfacesignature_lib
 @cindex surfacesignature_lib
 
