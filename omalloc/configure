@@ -1263,6 +1263,24 @@ EOF
 esac
 
 
+project=singular
+component=omalloc
+
+
+# expand prefix
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+
+# expand exec_prefixad
+if test "x$exec_prefix" = xNONE; then
+ exec_prefix=${prefix}
+fi
+
+# expand libdir
+test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${project}/${component}"
+
+# expand includedir
+test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include/${project}/${component}"
+
 # Extract the first word of "ar", so it can be a program name with args.
 set dummy ar; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
