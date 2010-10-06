@@ -12,7 +12,7 @@
 
 #include "config.h"
 
-#include <auxiliary.h>
+#include <misc/auxiliary.h>
 
 #include "feResource.h"
 
@@ -27,9 +27,9 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #endif
 
 
-#include <reporter.h>
+#include <reporter/reporter.h>
 #if !defined(ESINGULAR) && !defined(TSINGULAR)
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 #else
 char* feResource(const char id, int warn = -1);
 char* feResource(const char* key, int warn = -1);
