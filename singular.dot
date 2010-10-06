@@ -1,0 +1,35 @@
+digraph singular {
+	gmp [ color=lightgrey, fontcolor=blue, style=filled, shape=box ];
+	gmp -> ntl;
+	gmp -> cf_gmp;
+	cf_gmp -> factory_libfac;
+	cf_gmp -> coeffs;
+	ntl [ color=lightgrey, fontcolor=blue, style=filled, shape=box ];
+	ntl -> factory_libfac;
+	omalloc_xalloc [ color=lightgrey, fontcolor=green, style=filled ];
+	omalloc_xalloc -> factory_libfac [label="x"];
+	omalloc_xalloc -> reporter;
+	omalloc_xalloc -> resources [label="?"];
+	omalloc_xalloc -> coeffs;
+	omalloc_xalloc -> polys;
+	factory_libfac [ color=lightgrey, fontcolor=blue, style=filled ];
+	factory_libfac -> polys;
+	misc -> reporter;
+	misc -> resources;
+	misc -> coeffs;
+	misc -> polys;
+	reporter -> resources;
+	reporter -> coeffs;
+	reporter -> polys;
+	resources -> coeffs;
+	coeffs [ fontcolor=blue ];
+	coeffs -> polys;
+	edge [style=dashed];
+	ntl -> coeffs;
+	polys [ fontcolor=blue ];
+}
+
+
+// boxed = third party
+// filled = external
+// blue = math
