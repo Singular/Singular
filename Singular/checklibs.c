@@ -285,7 +285,13 @@ int main(int argc, char** argv)
        if ((*pp!=' ')&&(*pp!='\t')) break;
        pp++;
       }
-      if (p=pp) have_version++;
+      if (p=pp)
+      {
+        have_version++;
+	pp=p+8;
+	while((*pp)==' ') pp++);
+	if (((*pp)!='"') || (strstr(pp,"$Id")==NULL))
+	  printf("error: version string should start with $""Id");
     }
     if ((p=strstr(buf,"category="))!=NULL)
     {
