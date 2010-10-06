@@ -34,8 +34,8 @@ PIPE		= -pipe
 CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ ${PIPE} -g
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-CPPFLAGS	= -I${srcdir} -I${includedir} -I${prefix}/include
-LDFLAGS		= -L${libdir} -L${prefix}/lib -L${srcdir}
+CPPFLAGS	= -I${srcdir} -I${includedir} -I${prefix}/include -I${prefix}/include/@project@
+LDFLAGS		= -L${libdir} -L${prefix}/lib -L${srcdir} -L${prefix}/lib/@project@
 DEFS		= -DNDEBUG -DOM_NDEBUG @DEFS@
 
 LIBS		=  @LIBPREFIX@ -lcoeffs -lreporter -lresource -lgmp -lomalloc_ndebug

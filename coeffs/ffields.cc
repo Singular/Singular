@@ -6,15 +6,15 @@
 * ABSTRACT: finite fields with a none-prime number of elements (via tables)
 */
 
-#include <auxiliary.h>
+#include <misc/auxiliary.h>
 #include <string.h>
 #include "coeffs.h"
-#include <mylimits.h>
-#include <omalloc.h>
-#include <reporter.h>
+#include <misc/mylimits.h>
+#include <omalloc/omalloc.h>
+#include <reporter/reporter.h>
 #include "numbers.h"
 #include "ffields.h"
-#include <feFopen.h>
+#include <resources/feFopen.h>
 #include <math.h>
 
 
