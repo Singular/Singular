@@ -8,6 +8,15 @@ AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
           S. Laplagne, slaplagn@dm.uba.ar @*
           F. Seelisch, seelisch@mathematik.uni-kl.de
 
+OVERVIEW:
+Given an irreducible polynomial f in two variables defining a plane curve, 
+this library implements an algorithm to compute an integral basis of the 
+integral closure of the affine coordinate ring in the algebraic function 
+field via normalization.@*
+The user can choose whether the algorithm will do the computation globally 
+or (this is the default) compute in the localization at each component of 
+the singular locus and put everything together.
+
 PROCEDURES:
  integralBasis(f, intVar);     Integral basis of an algebraic function field
 ";
@@ -23,35 +32,35 @@ proc integralBasis(poly f, int intVar, list #)
         The base ring must be a ring in two variables, and the polynomial f
         must be monic as polynomial in the intVar-th variable.@*
         Optional parameters in list choose (can be entered in any order):@*
-        Algorithm:@*
+        Parameters for selecting the algorithm:@*
         - \"global\" -> computes the integral basis by computing the
         normalization of R/<f>, where R is the base ring.@*
         - \"local\" -> computes the integral basis by computing the 
         normalization of R/<f> localized at each component of the singular
         locus of R/<f>, and then putting everything together.
         This is the default option.@*
-        Other:@*
+        Other parameters:@*
         - \"isIrred\" -> assumes that the input polynomial f is irreducible,
-        and therefore will not check it. If this option is given but f is not
+        and therefore will not check this. If this option is given but f is not
         irreducible, the output might be wrong.@*
         - list(\"inputJ\", ideal inputJ) -> takes as initial test ideal the
         ideal inputJ. This option is only for use in other procedures. Using 
         this option, the result might not be the integral basis.@*
-        (When this option is given the global option will be used.)@*         
+        (When this option is given, the global option will be used.)@*         
         - list(\"inputC\", ideal inputC) -> takes as initial conductor the 
         ideal inputC. This option is only for use in other procedures. Using 
         this option, the result might not be the integral basis.@*
-        (When this option is given the global option will be used.)@*         
+        (When this option is given, the global option will be used.)@*         
 RETURN: a list, say l, of size 2.
-@format l[1] is an ideal I and l[2] is a polynomial D such that the integral
+        l[1] is an ideal I and l[2] is a polynomial D such that the integral
         basis is b_0 = I[1] / D, b_1 = I[2] / D, ..., b_{n-1} = I[n] / D.@*
         That is, the integral closure of k[x] in the algebraic function 
         field k(x,y) is @* 
         k[x] b_0 + k[x] b_1 + ... + k[x] b_{n-1},@*
-        where we assume that x is the trascendental variable, y is the integral 
+        where we assume that x is the transcendental variable, y is the integral 
         element (indicated by intVar), f gives the integral equation and n is 
         the degree of f as a polynomial in y.@*
-@end format
+
 THEORY:  We compute the integral basis of the integral closure of k[x] in k(x,y)
          by computing the normalization of the affine ring k[x,y]/<f> and 
          converting the k[x,y]-module generators into a k[x]-basis.@*
