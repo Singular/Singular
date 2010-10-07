@@ -177,8 +177,8 @@ Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lc
                       }
                     }
                   }
-                  pDelete(&p1);
-                  pDelete(&p2);
+                  pLmDelete(&p1);
+                  pLmDelete(&p2);
                 }
 #endif
               }
@@ -231,13 +231,13 @@ Print("gefunden in Mod %d: ",index); poly_write((syzstr->resPairs[index])[ti].lc
           poly tt = pDivide(tso.lcm,tso.p1);
           pSetCoeff(tt,nDiv(pGetCoeff(tso.p1),coefgcd));
           tso.syz = pMult_mm(tso.syz,tt);
-          pDelete(&tt);
+          pLmDelete(&tt);
           coefgcd = nNeg(coefgcd);
           pp = pCopy((syzstr->resPairs[index])[r1].syz);
           tt = pDivide(tso.lcm,tso.p2);
           pSetCoeff(tt,nDiv(pGetCoeff(tso.p2),coefgcd));
           pp = pMult_mm(pp,tt);
-          pDelete(&tt);
+          pLmDelete(&tt);
           tso.syz = pAdd(pp,tso.syz);
           nDelete(&coefgcd);
           pSetComp(tso.lcm,pGetComp((syzstr->resPairs[index])[r1].syz));
@@ -395,7 +395,7 @@ inline void sySPRedSyz(syStrategy syzstr,sSObject redWith,poly q=NULL)
   pSetCoeff(p,nDiv(pGetCoeff(q),pGetCoeff(redWith.p)));
   int il=-1;
   kBucket_Minus_m_Mult_p(syzstr->syz_bucket,p,redWith.syz,&il,NULL);
-  pDelete(&p);
+  pLmDelete(&p);
 }
 
 static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
