@@ -1046,7 +1046,8 @@ Print("Bilde neue Paare in Modul %d!\n",index);
 #ifdef SHOW_PROT
 Print("Bilde neue Paare in Modul %d!\n",index+1);
 #endif
-      syCreateNewPairs_Hilb(syzstr,index+1,actdeg-1);    }
+      syCreateNewPairs_Hilb(syzstr,index+1,actdeg-1);
+    }
     index++;
     nextPairs = syChosePairs(syzstr,&index,&howmuch,&actdeg);
   }
