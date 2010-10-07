@@ -2073,6 +2073,7 @@ RETURN:  with poly p = var(1)^2 + b1 * var(2)^2 + c1 * var(3)^2, the method
   bigint b_s = largestSquare(b1); bigint b_r = b1/b_s/b_s;
   bigint c_s = largestSquare(c1); bigint c_r = c1/c_s/c_s;
   bigint g = gcd(b_r, c_r);
+  def S=basering;
   ideal mi = maxideal(1);
   map mm = basering, mi; map mTemp;
   mm[1] = var(1); mm[2] = var(2)/b_s/g; mm[3] = var(3)/c_s/g;
