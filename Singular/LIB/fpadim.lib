@@ -41,7 +41,6 @@ OVERVIEW: Given the free algebra A = K<x_1,...,x_n> and a (finite) Groebner basi
 @*
 
 REFERENCES:
-
 @*   [ufna] Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990
 @*   [lls] Levandovskyy, La Scala: Letterplace ideals and non-commutative
            Groebner bases, 2009
