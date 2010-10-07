@@ -21,7 +21,7 @@ OVERVIEW: Given the free algebra A = K<x_1,...,x_n> and a (finite) Groebner basi
 @*      The Ufnarovskij graph is used to determine whether A/<GB> has finite
 @*      K-dimension. One has to check if the graph contains cycles.
 @*      For the whole theory we refer to [ufna]. Given a
-@*      reduced set of monomials GB one can define the basis tree, which vertex
+@*      reduced set of monomials GB one can define the basis tree, whose vertex
 @*      set V consists of all normal monomials w.r.t. GB. For every two
 @*      monomials m_1, m_2 in V there is a direct edge from m_1 to m_2, if and
 @*      only if there exists x_k in {x_1,..,x_n}, such that m_1*x_k = m_2. The
@@ -40,7 +40,7 @@ OVERVIEW: Given the free algebra A = K<x_1,...,x_n> and a (finite) Groebner basi
 @*      computing the normalform yet, but for our case it is not needed.
 @*
 
-References:
+REFERENCES:
 
 @*   [ufna] Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990
 @*   [lls] Levandovskyy, La Scala: Letterplace ideals and non-commutative
@@ -102,7 +102,7 @@ LIB "general.lib";//for sorting mistletoes
 
 static proc allVars(list L, intvec P, int n)
 "USAGE: allVars(L,P,n); L a list of intmats, P an intvec, n an integer
-RETURN: 0, if all variables are contained in the quotient algebra, 1 otherwise
+RETURN: int, 0 if all variables are contained in the quotient algebra, 1 otherwise
 "
 {int i,j,r;
  intvec V;
@@ -128,7 +128,7 @@ static proc checkAssumptions(int d, list L)
 
 static proc createStartMat(int d, int n)
 "USAGE: createStartMat(d,n); d, n integers
-RETURN: An intmat
+RETURN: intmat
 PURPOSE:Creating the intmat with all normal monomials in n variables and of degree d to start with
 NOTE:   d has to be > 0
 "
@@ -150,7 +150,7 @@ NOTE:   d has to be > 0
 
 static proc createStartMat1(int n, intmat M)
 "USAGE: createStartMat1(n,M); n an integer, M an intmat
-RETURN: An intmat with all variables except those in M
+RETURN: intmat, with all variables except those in M
 "
 {int i;
  intvec V,Vt;
@@ -174,7 +174,7 @@ static proc entryViolation(intmat M, int n)
 static proc findDimen(intvec V, int n, list L, intvec P, list #)
 "USAGE: findDimen(V,n,L,P,degbound); V,P intvecs, n, an integer, L a list,
 @*      degbound an optional integer
-RETURN: An integer
+RETURN: int
 PURPOSE:Computing the K-dimension of the quotient algebra
 "
 {int degbound = 0;
@@ -241,7 +241,7 @@ PURPOSE:Computing the K-dimension of the quotient algebra
 
 static proc findCycle(intvec V, list L, intvec P, int n, int ld, module M)
 "USAGE:
-RETURN: 1, if Ufn-graph contains a cycle, or 0 otherwise
+RETURN: int, 1 if Ufn-graph contains a cycle, or 0 otherwise
 PURPOSE:Searching the Ufnarovskij graph for cycles
 "
 {int i,j,w,r;intvec Vt,Vt2;
@@ -322,7 +322,7 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
 
 static proc findHCoeff(intvec V,int n,list L,intvec P,intvec H,list #)
 "USAGE: findHCoeff(V,n,L,P,H,degbound); L a list of intmats, degbound an integer
-RETURN: An intvec
+RETURN: intvec
 PURPOSE:Computing the coefficient of the Hilbert series (upto degree degbound)
 NOTE:   Starting with a part of the Hilbert series we change the coefficient
 @*      depending on how many baseelements we found on the actual branch
@@ -401,7 +401,7 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
 static proc findHCoeffMis(intvec V, int n, list L, intvec P, list R,list #)
 "USAGE: findHCoeffMis(V,n,L,P,R,degbound); degbound an optional integer, L a
 @*      list of Intmats, R
-RETURN: A list
+RETURN: list
 PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
 @*      at once
 "
@@ -483,7 +483,7 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
 
 static proc findMisDim(intvec V,int n,list L,intvec P,list R,list #)
 "USAGE:
-RETURN: A list
+RETURN: list
 PURPOSE:Computing the K-dimension and the Mistletoes all at once
 "
 {int degbound = 0;
@@ -567,7 +567,7 @@ static proc findmistletoes(intvec V, int n, list L, intvec P, list #)
 "USAGE: findmistletoes(V,n,L,P,degbound); V a normal word, n the number of
 @*      variables, L the GB, P the occuring degrees,
 @*      and degbound the (optional) degreebound
-RETURN: A list
+RETURN:  list
 PURPOSE:Computing mistletoes starting in V
 NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
 "
@@ -641,7 +641,7 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
 
 static proc isInList(intvec V, list L)
 "USAGE: isInList(V,L); V an intvec, L a list of intvecs
-RETURN: An integer
+RETURN: int
 PURPOSE:Finding the position of V in L, returns 0, if V is not in M
 "
 {int i,n;
@@ -652,7 +652,7 @@ PURPOSE:Finding the position of V in L, returns 0, if V is not in M
 
 static proc isInMat(intvec V, intmat M)
 "USAGE: isInMat(V,M);V an intvec, M an intmat
-RETURN: An integer
+RETURN: int
 PURPOSE:Finding the position of V in M, returns 0, if V is not in M
 "
 {if (size(V) <> ncols(M)) {return(0);}
@@ -667,7 +667,7 @@ PURPOSE:Finding the position of V in M, returns 0, if V is not in M
 
 static proc isInVec(int v,intvec V)
 "USAGE: isInVec(v,V); v an integer,V an intvec
-RETURN: An integer
+RETURN: int
 PURPOSE:Finding the position of v in V, returns 0, if v is not in V
 "
 {int i,n;
@@ -1064,7 +1064,7 @@ example
 proc ivHilbert(list L, int n, list #)
 "USAGE: ivHilbert(L,n[,degbound]); L a list of intmats, n an integer,
 @*      degbound an optional integer
-RETURN: An intvec, containing the coefficients of the Hilbert series
+RETURN: intvec, containing the coefficients of the Hilbert series
 PURPOSE:Computing the Hilbert series
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
@@ -1149,7 +1149,7 @@ example
 proc ivKDim(list L, int n, list #)
 "USAGE: ivKDim(L,n[,degbound]); L a list of intmats,
 @*      n an integer, degbound an optional integer
-RETURN: An integer, the K-dimension of A/<L>
+RETURN: int, the K-dimension of A/<L>
 PURPOSE:Computing the K-dimension of A/<L>
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
@@ -1230,7 +1230,7 @@ example
 
 proc ivMis2Dim(list M)
 "USAGE: ivMis2Dim(M); M a list of intvecs
-RETURN: An integer, the K-dimension of the given algebra
+RETURN: int, the K-dimension of the given algebra
 PURPOSE:Computing the K-dimension out of given mistletoes
 ASSUME: - The mistletoes have to be ordered lexicographically -> OrdMisLex.
 @*        Otherwise the returned value may differ from the K-dimension.
@@ -1266,7 +1266,7 @@ example
 
 proc ivOrdMisLex(list M)
 "USAGE: ivOrdMisLex(M); M a list of intvecs
-RETURN: A list, containing the ordered intvecs of M
+RETURN: list, containing the ordered intvecs of M
 PURPOSE:Orders a given set of mistletoes lexicographically
 ASSUME: - basering is a Letterplace ring.
         - intvecs correspond to monomials
@@ -1294,7 +1294,7 @@ example
 proc ivSickle(list L, int n, list #)
 "USAGE: ivSickle(L,n,[degbound]); L a list of intmats, n an int, degbound an
 @*      optional integer
-RETURN: A list, containing intvecs, the mistletoes of A/<L>
+RETURN: list, containing intvecs, the mistletoes of A/<L>
 PURPOSE:Computing the mistletoes for a given Groebner basis L
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
@@ -1373,7 +1373,7 @@ example
 proc ivSickleDim(list L, int n, list #)
 "USAGE: ivSickleDim(L,n[,degbound]); L a list of intmats, n an integer, degbound
 @*      an optional integer
-RETURN: A list
+RETURN: list
 PURPOSE:Computing mistletoes and the K-dimension
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
@@ -1460,7 +1460,7 @@ example
 proc ivSickleHil(list L, int n, list #)
 "USAGE:ivSickleHil(L,n[,degbound]); L a list of intmats, n an integer,
 @*     degbound an optional integer
-RETURN: A list
+RETURN: list
 PURPOSE:Computing the mistletoes and the Hilbert series
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
@@ -1546,12 +1546,14 @@ example
 
 proc lpDHilbert(ideal G, list #)
 "USAGE: lpDHilbert(G[,degbound,n]); G an ideal, degbound, n optional integers
-RETURN: A list
+RETURN: list
 PURPOSE:Computing K-dimension and Hilbert series, starting with a lp-ideal
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
-NOTE: - If L is the list returned, then L[1] is an integer, L[2] is an intvec.
+NOTE: - If L is the list returned, then L[1] is an integer corresponding to the
+@*      dimension, L[2] is an intvec which contains the coefficients of the
+@*      Hilbert series
 @*    - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering,uptodeg).
 @*    - n can be set to a different number of variables.
@@ -1586,7 +1588,7 @@ example
 proc lpDHilbertSickle(ideal G, list #)
 "USAGE: lpDHilbertSickle(G[,degbound,n]); G an ideal, degbound, n optional
 @*      integers
-RETURN: A list
+RETURN: list
 PURPOSE:Computing K-dimension, Hilbert series and mistletoes at once
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
@@ -1628,7 +1630,7 @@ example
 
 proc lpHilbert(ideal G, list #)
 "USAGE: lpHilbert(G[,degbound,n]); G an ideal, degbound, n optional integers
-RETURN: An intvec, containing the coefficients of the Hilbert series
+RETURN: intvec, containing the coefficients of the Hilbert series
 PURPOSE:Computing the Hilbert series
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
@@ -1666,7 +1668,7 @@ example
 
 proc lpDimCheck(ideal G)
 "USAGE: lpDimCheck(G);
-RETURN: 1, if K-dimension of the factor algebra is infinite, 0 otherwise
+RETURN: int, 1 if K-dimension of the factor algebra is infinite, 0 otherwise
 PURPOSE:Checking a factor algebra for finiteness of the K-dimension
 ASSUME: - basering is a Letterplace ring.
 EXAMPLE: example lpDimCheck; shows examples
@@ -1694,7 +1696,7 @@ example
 
 proc lpKDim(ideal G, list #)
 "USAGE: lpKDim(G[,degbound, n]); G an ideal, degbound, n optional integers
-RETURN: An integer, the K-dimension of the factor algebra
+RETURN: int, the K-dimension of the factor algebra
 PURPOSE:Computing the K-dimension of a factor algebra, given via an ideal
 ASSUME: - basering is a Letterplace ring
 @*      - if you specify a different degree bound degbound,
@@ -1729,7 +1731,7 @@ example
 
 proc lpMis2Dim(ideal M)
 "USAGE: lpMis2Dim(M); M an ideal
-RETURN: An integer, the K-dimension of the factor algebra
+RETURN: int, the K-dimension of the factor algebra
 PURPOSE:Computing the K-dimension out of given mistletoes
 ASSUME: - basering is a Letterplace ring.
 @*      - M contains only monomials
@@ -1753,7 +1755,7 @@ example
 
 proc lpOrdMisLex(ideal M)
 "USAGE: lpOrdMisLex(M); M an ideal of mistletoes
-RETURN: An ideal, containing the mistletoes, ordered lexicographically
+RETURN: ideal, containing the mistletoes, ordered lexicographically
 PURPOSE:A given set of mistletoes is ordered lexicographically
 ASSUME: - basering is a Letterplace ring.
 NOTE:   This is preprocessing, it is not needed if the mistletoes are returned
@@ -1774,7 +1776,7 @@ example
 
 proc lpSickle(ideal G,  list #)
 "USAGE: lpSickle(G[,degbound,n]); G an ideal, degbound, n optional integers
-RETURN: An ideal
+RETURN: ideal
 PURPOSE:Computing the mistletoes of K[X]/<G>
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
@@ -1812,7 +1814,7 @@ example
 
 proc lpSickleDim(ideal G, list #)
 "USAGE: lpSickleDim(G[,degbound,n]); G an ideal, degbound, n optional integers
-RETURN: A list
+RETURN: list
 PURPOSE:Computing the K-dimension and the mistletoes
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
@@ -1851,7 +1853,7 @@ example
 
 proc lpSickleHil(ideal G, list #)
 "USAGE: lpSickleHil(G);
-RETURN: A list
+RETURN: list
 PURPOSE:Computing the Hilbert series and the mistletoes
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
@@ -1893,7 +1895,7 @@ example
 proc sickle(ideal G, list #)
 "USAGE: sickle(G[,m, d, h, degbound]); G an ideal; m,d,h,degbound optional
 @*      integers
-RETURN: A list
+RETURN: list
 PURPOSE:Allowing the user to access all procs with one command
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
