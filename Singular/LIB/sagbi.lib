@@ -5,13 +5,25 @@ info="
 LIBRARY: sagbi.lib  Compute SAGBI basis (subalgebra bases analogous to Groebner bases for ideals) of a subalgebra
 AUTHORS: Jan Hackfeld,     Jan.Hackfeld@rwth-aachen.de
          Gerhard Pfister,  pfister@mathematik.uni-kl.de
+         Viktor Levandovskyy,     levandov@math.rwth-aachen.de
+
+OVERVIEW: 
+SAGBI stands for 'subalgebra bases analogous to Groebner bases for ideals'.
+It is an important tools in working with finitely presented subalgebras,
+many properties of SAGBI bases are analogously important to Groebner bases
+of ideals. Note, that due to absence of Noetherian property, SAGBI basis
+of a finite number of generators of a subalgebra may be infinite.
+Hence we provide procedures, which perform a given number of steps in
+computations.
 
 PROCEDURES:
- sagbiSPoly(A [,r,m]); SAGBI S-polynomials of A
- sagbiReduce(I,A);     subalgebra reduction of I by A
- sagbi(A [,m,t]);      SAGBI basis for A
- sagbiPart(A,k[,m]);   partial SAGBI basis for A
- algebraicDependence(I,it); iteration of SAGBI for algebraic dependencies of I
+ sagbiSPoly(A [,r,m]); computes SAGBI S-polynomials of A
+ sagbiNF(id,dom,k[,n]); computes SAGBI normal form of id wrt dom
+ sagbiReduce(I,A [,t,mt]);  performs subalgebra reduction of I by A
+ sagbiReduction(I,A [,n]);  performs subalgebra reduction of I by A in a quotient ring
+ sagbi(A [,m,t]);      computes SAGBI basis for A
+ sagbiPart(A,k[,m]);   computes partial SAGBI basis for A
+ algebraicDependence(I,it); performs iterations of SAGBI for algebraic dependencies of I
 
 SEE ALSO: algebra_lib
 ";
@@ -31,6 +43,18 @@ LIB "toric.lib"; //for toric_ideal
 LIB "algebra.lib";
 //////////////////////////////////////////////////////////////////////////////
 
+
+//static 
+proc tst_sagbi()
+{
+  example sagbiSPoly;
+  example sagbiNF;
+  example sagbiReduce;
+  example sagbiReduction;
+  example sagbi;
+  example sagbiPart;
+  example algebraicDependence;
+}
 
 
 static proc uniqueVariableName (string variableName)
@@ -443,15 +467,17 @@ static proc sagbiConstruction(ideal algebra, int iterations, int tailreduction, 
 
 proc sagbiSPoly(ideal algebra,list #)
 "USAGE:   sagbiSPoly(A[, returnRing, meth]);  A is an ideal, returnRing and meth are integers.
-RETURN:   Returns SAGBI S-polynomials of the leading terms of given ideal A if returnRing=0.
-@*          Otherwise returns a new ring containing the ideals algebraicRelations
-@*          and spolynomials, where these objects are explained by their name.
-@*        See the example on how to access these objects.
-@format          The other optional argument meth determines which method is
-                  used for computing the algebraic relations.
-                  - If meth=0 (default), the procedure std is used.
-                  - If meth=1, the procedure slimgb is used.
-                  - If meth=2, the prodecure uses toric_ideal.
+RETURN:   ideal or ring 
+ASSUME: basering is not a qring
+PURPOSE: Returns SAGBI S-polynomials of the leading terms of given ideal A if returnRing=0.
+@*       Otherwise returns a new ring containing the ideals algebraicRelations
+@*       and spolynomials, where these objects are explained by their name.
+@*       See the example on how to access these objects.
+@format     The other optional argument meth determines which method is
+            used for computing the algebraic relations.
+            - If meth=0 (default), the procedure std is used.
+            - If meth=1, the procedure slimgb is used.
+            - If meth=2, the prodecure uses toric_ideal.
 @end format
 EXAMPLE:  example sagbiSPoly; shows an example"
 {
@@ -542,7 +568,9 @@ example
 
 proc sagbiReduce(idealORpoly, ideal algebra, list #)
 "USAGE:   sagbiReduce(I, A[, tr, mt]); I, A ideals, tr, mt optional integers
-RETURN:   Returns the remainder(s) of I after SAGBI reduction by A
+RETURN:   ideal of remainders of I after SAGBI reduction by A
+ASSUME: basering is not a qring
+PURPOSE: 
 @format
     The optional argument tr=tailred determines whether tail reduction will be performed.
      - If (tailred=0), no tail reduction is done.
@@ -634,7 +662,9 @@ example
 
 proc sagbi(ideal algebra, list #)
 "USAGE:   sagbi(A[, tr, mt]); A ideal, tr, mt optional integers
-RETURN: A SAGBI basis for the subalgebra given by the generators in A.
+RETURN: ideal, a SAGBI basis for A
+ASSUME: basering is not a qring
+PURPOSE: Computes a SAGBI basis for the subalgebra given by the generators in A.
 @format
     The optional argument tr=tailred determines whether tail reduction will be performed.
      - If (tailred=0), no tail reduction is performed,
@@ -677,10 +707,11 @@ EXAMPLE:  example sagbi; shows an example"
       ERROR("Type of optional arguments needs to be int.");
     }
   }
-  algebra=sagbiConstruction(algebra,-1,tailreduction,method,0);
-  algebra=simplify(algebra,7);
-  algebra=interreduced(algebra);
-  return(algebra);
+  ideal a;
+  a=sagbiConstruction(algebra,-1,tailreduction,method,0);
+  a=simplify(a,7);
+  a=interreduced(a);
+  return(a);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -694,8 +725,10 @@ example
 }
 
 proc sagbiPart(ideal algebra, int iterations, list #)
-"USAGE:   sagbiPart(A, k,[tr, mt]); A is an ideal, k, tr and mt are integers
-RETURN: Performs k iterations of the SAGBI construction algorithm for the subalgebra given by the generators in A.
+"USAGE: sagbiPart(A, k,[tr, mt]); A is an ideal, k, tr and mt are integers
+RETURN: ideal
+ASSUME: basering is not a qring
+PURPOSE: Performs k iterations of the SAGBI construction algorithm for the subalgebra given by the generators given by A.
 @format
      The optional argument tr=tailred determines if tail reduction will be performed.
      - If (tailred=0), no tail reduction is performed,
@@ -742,10 +775,11 @@ EXAMPLE:  example sagbiPart; shows an example"
   {
     ERROR("Number of iterations needs to be non-negative.");
   }
-  algebra=sagbiConstruction(algebra,iterations,tailreduction,method,0);
-  algebra=simplify(algebra,7);
-  algebra=interreduced(algebra);
-  return(algebra);
+  ideal a;
+  a=sagbiConstruction(algebra,iterations,tailreduction,method,0);
+  a=simplify(a,7);
+  a=interreduced(a);
+  return(a);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -761,12 +795,15 @@ example
 }
 
 
-//DONE? 1nsen als werden noch mit ausgegeben, aus algebraischen Abhängigkeiten entfernen
+
 // VL: finished the documentation
-// TO comapre with algDependent from algebra_lib
+// TO compare with algDependent from algebra_lib
+// TODO : remove constants from algebraic dependencies
 proc algebraicDependence(ideal I,int iterations)
 "USAGE: algebraicDependence(I,it); I an an ideal, it is an integer
-RETURN: In 'it' iterations, compute algebraic dependencies between elements of I
+RETURN: ring
+ASSUME: basering is not a qring
+PURPOSE: In @code{it} iterations, compute algebraic dependencies between elements of I
 EXAMPLE: example algebraicDependence; shows an example"
 {
   def br=basering;
@@ -899,13 +936,15 @@ static proc interreduced(ideal I)
 
 proc sagbiReduction(poly p,ideal dom,list #)
 "USAGE: sagbiReduction(p,dom[,n]); p poly , dom  ideal
-RETURN: a polynomial, after one step subalgebra reduction
+RETURN: polynomial, after one step of subalgebra reduction
+PURPOSE:
 @format
     Three algorithm variants are used to perform subalgebra reduction.
     The positive interger n determines which variant should be used.
     n may take the values 0 (default), 1 or 2.
 @end format
-EXAMPLE: sagbiReduction; shows an example"
+NOTE: works over both polynomial rings and their quotients
+EXAMPLE: example sagbiReduction; shows an example"
 {
   def bsr=basering;
   ideal B=ideal(bsr);//When the basering is quotient ring  this type casting
@@ -1031,13 +1070,19 @@ example
   ideal dom =x2,y2,xy-y;
   poly p=x4+x3y+xy2-y2;
   sagbiReduction(p,dom);
-  sagbiReduction(p,dom,1);
   sagbiReduction(p,dom,2);
+  // now let us see the action over quotient ring
+  ideal I = xy; 
+  qring Q = std(I); 
+  ideal dom = imap(r,dom); poly p = imap(r,p);
+  sagbiReduction(p,dom,1);
 }
 
 proc sagbiNF(id,ideal dom,int k,list#)
 "USAGE: sagbiNF(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive intergers.
 RETURN: same as type of id; ideal or polynomial.
+ASSUME: basering is not a qring
+PURPOSE:
 @format
     The integer k determines what kind of s-reduction is performed:
     - if (k=0) no tail s-reduction is performed.
@@ -1046,8 +1091,6 @@ RETURN: same as type of id; ideal or polynomial.
     The positive integer n determines which variant should be used.
     n may take the values (0 or default),1 or 2.
 @end format
-NOTE: computation of subalgebra normal forms may be performed in polynomial rings or quotients
-      thereof
 EXAMPLE: example sagbiNF; show example "
 {
    return(sagbiReduce(id,dom,k));
