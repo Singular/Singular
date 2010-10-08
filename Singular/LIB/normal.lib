@@ -4723,6 +4723,7 @@ EXAMPLE: example getOneVar; shows an example
   // order the variables as needed.
   RL[3] = list(list("lp", 1:2), list("C", 0:1));
   RL[2] = list(var(3-vari), var(vari));
+  RL[4]=ideal(0); // does not work with qrings: Ex.7 of paraplanecurves
   def RR = ring(RL);
   setring RR;
   ideal J = imap(R, J);
