@@ -1815,7 +1815,7 @@ is data to read.
 @c example
 @end smallexample
 
-@c-------------------------------------------------------------------
+@c -------------------------------------------------------------------
 @node Ssi links, Pipe links, MP links, link
 @subsection Ssi links
 @cindex Ssi links
@@ -1989,7 +1989,7 @@ is data to read.
 @c example
 @end smallexample
 
-@c-------------------------------------------------------------------
+@c -------------------------------------------------------------------
 @node Pipe links, DBM links, Ssi links, link
 @subsection Pipe links
 @cindex Pipe links

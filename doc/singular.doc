@@ -965,7 +965,7 @@ Todos/Issues:
 @c lib primdecint.lib
 
 @c ---------------------------------------------------------
-@node resbin_lib, surfacesignature_lib, primdecint_lib, Experimental libraries
+@node resbin_lib, resjung_lib, primdecint_lib, Experimental libraries
 @subsection resbin_lib
 
 Todos/Issues:
