@@ -4718,7 +4718,13 @@ EXAMPLE: example getOneVar; shows an example
 "
 {
   def R = basering;
-  ring RR = 0, (var(3-vari), var(vari)), lp;
+  list RL = ringlist(R);
+  // We keep everything from R but we change the ordering to lp, and we
+  // order the variables as needed.
+  RL[3] = list(list("lp", 1:2), list("C", 0:1));
+  RL[2] = list(var(3-vari), var(vari));
+  def RR = ring(RL);
+  setring RR;
   ideal J = imap(R, J);
   J = groebner(J);
   poly g = J[1];
