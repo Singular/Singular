@@ -58,7 +58,9 @@ new command: @code{rank} (see @nref{rank})
 @item
 extended library: modstd.lib (see @nref{modstd_lib}: Groebner basis via modular methods
 @item
-rewritten library: sagbi.lib (see @nref{sagbi_lib})
+extended library: normal.lib (see @nref{normal_lib}:Normalization of Affine Rings)
+@item
+rewritten library: sagbi.lib (see @nref{sagbi_lib}: subalgebra bases analogous to Groebner bases for ideals)
 @end itemize
 
 @heading New @sc{Singular} libraries
