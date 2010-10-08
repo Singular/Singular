@@ -23,7 +23,7 @@
 @heading News for version @value{VERSION}
 
 This version starts some reorganization: a section for new libraries:
-(see @nref{Experimental libararies}), preparations for parallel computations
+(see @nref{Experimental libraries}), preparations for parallel computations
 (see @nref{modstd_lib}, @nref{Ssi links}), some linear algebra (see below),
 many new libaries, 
 many bug fixes etc.
@@ -58,7 +58,7 @@ new command: @code{rank} (see @nref{rank})
 @item
 extended library: modstd.lib (see @nref{modstd_lib}: Groebner basis via modular methods
 @item
-rewriten library: sagbi.lib (see @nref{sagbi_lib})
+rewritten library: sagbi.lib (see @nref{sagbi_lib})
 @end itemize
 
 @heading New @sc{Singular} libraries
