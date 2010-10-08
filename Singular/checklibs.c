@@ -9,7 +9,7 @@ int trailing_spaces=0;
 int tabs=0;
 int verylong_lines=0;
 int lines=0;
-char buf[LINE_LEN];
+unsigned char buf[LINE_LEN];
 int proc_cnt=0;
 char *proc[NUM_PROC];
 char have_doc[NUM_PROC];
@@ -40,7 +40,7 @@ void get_next()
     if (strchr(buf,'\t')!=NULL) tabs++;
     for(i=0;(i<LINE_LEN) && (buf[i]!='\0'); i++)
     {
-      if (buf[i]>127) { non_ascii++;non_ascii_line=lines; break; }
+      if (buf[i]>=127) { non_ascii++;non_ascii_line=lines; break; }
     }
     if (footer==0) /* we are still in the header */
     {
