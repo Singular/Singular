@@ -971,10 +971,14 @@ Todos/Issues:
 @c ---------------------------------------------------------
 @node resbin_lib, surfacesignature_lib, primdecint_lib, Experimental libraries
 @subsection resbin_lib
+
 Todos/Issues:
 @itemize
 @item formatting is inapprociate
 @item avoid export
+@item bad names(or should be static):
+inidata, data, identifyvars, elimrep, convertdata, lcmofall, genoutput, salida,
+iniD, reslist, sumlist, dividelist, createlist, list0
 @end itemize
 
 @c lib resbin.lib
