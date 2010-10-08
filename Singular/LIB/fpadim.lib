@@ -5,7 +5,7 @@ info="
 LIBRARY: fpadim.lib     Algorithms for quotient algebras in the letterplace case
 AUTHORS: Grischa Studzinski,       grischa.studzinski@rwth-aachen.de
 
-Support: Projects LE 2697/2-1; KR 1907/3-1 of the Priority Programme SPP 1489:
+Support: Joint projects LE 2697/2-1 and KR 1907/3-1 of the Priority Programme SPP 1489:
 @* 'Algorithmische und Experimentelle Methoden in Algebra, Geometrie und Zahlentheorie'
 @* of the German DFG
 
@@ -37,23 +37,24 @@ OVERVIEW: Given the free algebra A = K<x_1,...,x_n> and a (finite) Groebner basi
 @*      number, so variable one is represented as 1, variable two as 2 and so
 @*      on. The monomial x_1*x_3*x_2 for example will be stored as (1,3,2).
 @*      Multiplication is concatenation. Note that there is no algorithm for
-@*      computing the normalform yet, but for our case it is not needed.
+@*      computing the normal form yet, but for our case it is not needed.
 @*
 
-REFERENCES:
+References:
+
 @*   [ufna] Ufnarovskij: Combinatorical and asymptotic methods in algebra, 1990
 @*   [lls] Levandovskyy, La Scala: Letterplace ideals and non-commutative
-           Groebner bases, 2009
+          Groebner bases, 2009
 @*   [studzins] Studzinski: Dimension computations in non-commutative,
-                      associative algebras, Diploma thesis, RWTH Aachen, 2010
+                     associative algebras, Diploma thesis, RWTH Aachen, 2010
 
 Assumptions:
 @* - basering is always a Letterplace ring
 @* - all intvecs correspond to Letterplace monomials
 @* - if you specify a different degree bound d,
-      d <= attrib(basering,uptodeg) holds
+     d <= attrib(basering,uptodeg) holds
 @* In the procedures below, 'iv' stands for intvec representation
-   and 'lp' for the letterplace representation of monomials
+  and 'lp' for the letterplace representation of monomials
 
 PROCEDURES:
 
@@ -104,25 +105,25 @@ static proc allVars(list L, intvec P, int n)
 RETURN: int, 0 if all variables are contained in the quotient algebra, 1 otherwise
 "
 {int i,j,r;
- intvec V;
- for (i = 1; i <= size(P); i++) {if (P[i] == 1){ j = i; break;}}
- V = L[j][1..nrows(L[j]),1];
- for (i = 1; i <= n; i++) {if (isInVec(i,V) == 0) {r = 1; break;}}
- if (r == 0) {return(1);}
- else {return(0);}
+  intvec V;
+  for (i = 1; i <= size(P); i++) {if (P[i] == 1){ j = i; break;}}
+  V = L[j][1..nrows(L[j]),1];
+  for (i = 1; i <= n; i++) {if (isInVec(i,V) == 0) {r = 1; break;}}
+  if (r == 0) {return(1);}
+  else {return(0);}
 }
 
 static proc checkAssumptions(int d, list L)
 "PURPOSE: Checks, if all the Assumptions are holding
 "
 {if (typeof(attrib(basering,"isLetterplaceRing"))=="string") {ERROR("Basering is not a Letterplace ring!");}
- if (d > attrib(basering,"uptodeg")) {ERROR("Specified degree bound exceeds ring parameter!");}
- int i;
- for (i = 1; i <= size(L); i++)
- {if (entryViolation(L[i], attrib(basering,"lV")))
-  {ERROR("Not allowed monomial/intvec found!");}
- }
- return();
+  if (d > attrib(basering,"uptodeg")) {ERROR("Specified degree bound exceeds ring parameter!");}
+  int i;
+  for (i = 1; i <= size(L); i++)
+  {if (entryViolation(L[i], attrib(basering,"lV")))
+    {ERROR("Not allowed monomial/intvec found!");}
+  }
+  return();
 }
 
 static proc createStartMat(int d, int n)
@@ -132,19 +133,19 @@ PURPOSE:Creating the intmat with all normal monomials in n variables and of degr
 NOTE:   d has to be > 0
 "
 {intmat M[(n^d)][d];
- int i1,i2,i3,i4;
- for (i1 = 1; i1 <= d; i1++)  //Spalten
- {i2 = 1; //durchlaeuft Zeilen
-  while (i2 <= (n^d))
-  {for (i3 = 1; i3 <= n; i3++)
-   {for (i4 = 1; i4 <= (n^(i1-1)); i4++)
-    {M[i2,i1] = i3;
-     i2 = i2 + 1;
+  int i1,i2,i3,i4;
+  for (i1 = 1; i1 <= d; i1++)  //Spalten
+  {i2 = 1; //durchlaeuft Zeilen
+    while (i2 <= (n^d))
+    {for (i3 = 1; i3 <= n; i3++)
+      {for (i4 = 1; i4 <= (n^(i1-1)); i4++)
+	{M[i2,i1] = i3;
+	  i2 = i2 + 1;
+	}
+      }
     }
-   }
   }
- }
- return(M);
+  return(M);
 }
 
 static proc createStartMat1(int n, intmat M)
@@ -152,22 +153,22 @@ static proc createStartMat1(int n, intmat M)
 RETURN: intmat, with all variables except those in M
 "
 {int i;
- intvec V,Vt;
- V = M[(1..nrows(M)),1];
- for (i = 1; i <= size(V); i++) {if (isInVec(i,V) == 0) {Vt = Vt,i;}}
- if (Vt == 0) {intmat S; return(S);}
- else {Vt = Vt[2..size(Vt)]; intmat S [size(Vt)][1]; S[1..size(Vt),1] = Vt; return(S);}
+  intvec V,Vt;
+  V = M[(1..nrows(M)),1];
+  for (i = 1; i <= size(V); i++) {if (isInVec(i,V) == 0) {Vt = Vt,i;}}
+  if (Vt == 0) {intmat S; return(S);}
+  else {Vt = Vt[2..size(Vt)]; intmat S [size(Vt)][1]; S[1..size(Vt),1] = Vt; return(S);}
 }
 
 static proc entryViolation(intmat M, int n)
 "PURPOSE:checks, if all entries in M are variable-related
 "
 {int i,j;
- for (i = 1; i <= nrows(M); i++)
- {for (j = 1; j <= ncols(M); j++)
-  {if(!((1<=M[i,j])&&(M[i,j]<=n))) {return(1);}}
- }
- return(0);
+  for (i = 1; i <= nrows(M); i++)
+  {for (j = 1; j <= ncols(M); j++)
+    {if(!((1<=M[i,j])&&(M[i,j]<=n))) {return(1);}}
+  }
+  return(0);
 }
 
 static proc findDimen(intvec V, int n, list L, intvec P, list #)
@@ -177,65 +178,65 @@ RETURN: int
 PURPOSE:Computing the K-dimension of the quotient algebra
 "
 {int degbound = 0;
- if (size(#) > 0) {if (#[1] > 0) {degbound = #[1];}}
- int dimen,i,j,w,it;
- intvec Vt,Vt2;
- module M;
- if (degbound == 0)
- {for (i = 1; i <= n; i++)
-  {Vt = V, i; w = 0;
-   for (j = 1; j<= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+  if (size(#) > 0) {if (#[1] > 0) {degbound = #[1];}}
+  int dimen,i,j,w,it;
+  intvec Vt,Vt2;
+  module M;
+  if (degbound == 0)
+  {for (i = 1; i <= n; i++)
+    {Vt = V, i; w = 0;
+      for (j = 1; j<= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
     }
-   }
-    if (w == 0)
-    {vector Vtt;
-     for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-     M = M,Vtt;
-     kill Vtt;
+    if (size(M) == 0) {return(0);}
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= size(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	dimen = dimen + 1 + findDimen(Vt,n,L,P);
+      }
+      return(dimen);
     }
   }
-  if (size(M) == 0) {return(0);}
   else
-  {M = simplify(M,2);
-   for (i = 1; i <= size(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-    dimen = dimen + 1 + findDimen(Vt,n,L,P);
-   }
-   return(dimen);
-  }
- }
- else
- {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
-  if (size(V) == degbound) {return(0);}
-  for (i = 1; i <= n; i++)
-  {Vt = V, i; w = 0;
-   for (j = 1; j<= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+  {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
+    if (size(V) == degbound) {return(0);}
+    for (i = 1; i <= n; i++)
+    {Vt = V, i; w = 0;
+      for (j = 1; j<= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
+      }
+      if (w == 0) {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
     }
-   }
-    if (w == 0) {vector Vtt;
-     for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-     M = M,Vtt;
-     kill Vtt;
+    if (size(M) == 0) {return(0);}
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= size(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	dimen = dimen + 1 + findDimen(Vt,n,L,P,degbound);
+      }
+      return(dimen);
     }
   }
-  if (size(M) == 0) {return(0);}
-  else
-  {M = simplify(M,2);
-   for (i = 1; i <= size(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-    dimen = dimen + 1 + findDimen(Vt,n,L,P,degbound);
-   }
-   return(dimen);
-  }
- }
 }
 
 static proc findCycle(intvec V, list L, intvec P, int n, int ld, module M)
@@ -244,79 +245,79 @@ RETURN: int, 1 if Ufn-graph contains a cycle, or 0 otherwise
 PURPOSE:Searching the Ufnarovskij graph for cycles
 "
 {int i,j,w,r;intvec Vt,Vt2;
- int it, it2;
- if (size(V) < ld)
- {for (i = 1; i <= n; i++)
-  {Vt = V,i; w = 0;
-   for (j = 1; j <= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0)
-     {w = 1; break;}
-    }
-   }
-   if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-   if (r == 1) {break;}
-  }
-  return(r);
- }
- else
- {j = size(M);
-  if (j > 0)
-  {
-   intmat Mt[j][nrows(M)];
-   for (it = 1; it <= j; it++)
-   { for(it2 = 1; it2 <= nrows(M);it2++)
-     {Mt[it,it2] = int(leadcoef(M[it2,it]));}
-   }
-   Vt = V[(size(V)-ld+1)..size(V)];
-   //Mt; type(Mt);Vt;type(Vt);
-   if (isInMat(Vt,Mt) > 0) {return(1);}
-   else
-   {vector Vtt;
-    for (it =1; it <= size(Vt); it++)
-     {Vtt = Vtt + Vt[it]*gen(it);}
-    M = M,Vtt;
-    kill Vtt;
-    for (i = 1; i <= n; i++)
+  int it, it2;
+  if (size(V) < ld)
+  {for (i = 1; i <= n; i++)
     {Vt = V,i; w = 0;
-     for (j = 1; j <= size(P); j++)
-     {if (P[j] <= size(Vt))
-      {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-      //L[j]; type(L[j]);Vt2;type(Vt2);
-       if (isInMat(Vt2,L[j]) > 0)
-       {w = 1; break;}
+      for (j = 1; j <= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0)
+	  {w = 1; break;}
+	}
       }
-     }
-     if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-     if (r == 1) {break;}
+      if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+      if (r == 1) {break;}
     }
     return(r);
-   }
   }
   else
-  { Vt = V[(size(V)-ld+1)..size(V)];
-    vector Vtt;
-    for (it = 1; it <= size(Vt); it++)
-     {Vtt = Vtt + Vt[it]*gen(it);}
-    M = Vtt;
-    kill Vtt;
-    for (i = 1; i <= n; i++)
-    {Vt = V,i; w = 0;
-     for (j = 1; j <= size(P); j++)
-     {if (P[j] <= size(Vt))
-      {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-      //L[j]; type(L[j]);Vt2;type(Vt2);
-       if (isInMat(Vt2,L[j]) > 0)
-       {w = 1; break;}
+  {j = size(M);
+    if (j > 0)
+    {
+      intmat Mt[j][nrows(M)];
+      for (it = 1; it <= j; it++)
+      { for(it2 = 1; it2 <= nrows(M);it2++)
+	{Mt[it,it2] = int(leadcoef(M[it2,it]));}
       }
-     }
-     if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-     if (r == 1) {break;}
+      Vt = V[(size(V)-ld+1)..size(V)];
+      //Mt; type(Mt);Vt;type(Vt);
+      if (isInMat(Vt,Mt) > 0) {return(1);}
+      else
+      {vector Vtt;
+	for (it =1; it <= size(Vt); it++)
+	{Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+	for (i = 1; i <= n; i++)
+	{Vt = V,i; w = 0;
+	  for (j = 1; j <= size(P); j++)
+	  {if (P[j] <= size(Vt))
+	    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	      //L[j]; type(L[j]);Vt2;type(Vt2);
+	      if (isInMat(Vt2,L[j]) > 0)
+	      {w = 1; break;}
+	    }
+	  }
+	  if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+	  if (r == 1) {break;}
+	}
+	return(r);
+      }
     }
-    return(r);
+    else
+    { Vt = V[(size(V)-ld+1)..size(V)];
+      vector Vtt;
+      for (it = 1; it <= size(Vt); it++)
+      {Vtt = Vtt + Vt[it]*gen(it);}
+      M = Vtt;
+      kill Vtt;
+      for (i = 1; i <= n; i++)
+      {Vt = V,i; w = 0;
+	for (j = 1; j <= size(P); j++)
+	{if (P[j] <= size(Vt))
+	  {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	    //L[j]; type(L[j]);Vt2;type(Vt2);
+	    if (isInMat(Vt2,L[j]) > 0)
+	    {w = 1; break;}
+	  }
+	}
+	if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+	if (r == 1) {break;}
+      }
+      return(r);
+    }
   }
- }
 }
 
 static proc findHCoeff(intvec V,int n,list L,intvec P,intvec H,list #)
@@ -324,77 +325,77 @@ static proc findHCoeff(intvec V,int n,list L,intvec P,intvec H,list #)
 RETURN: intvec
 PURPOSE:Computing the coefficient of the Hilbert series (upto degree degbound)
 NOTE:   Starting with a part of the Hilbert series we change the coefficient
-@*      depending on how many baseelements we found on the actual branch
+@*      depending on how many basis elements we found on the actual branch
 "
 {int degbound = 0;
- if (size(#) > 0){if (#[1] > 0){degbound = #[1];}}
- int i,w,j,it;
- int h1 = 0;
- intvec Vt,Vt2,H1;
- module M;
- if (degbound == 0)
- {for (i = 1; i <= n; i++)
-  {Vt = V, i; w = 0;
-   for (j = 1; j<= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+  if (size(#) > 0){if (#[1] > 0){degbound = #[1];}}
+  int i,w,j,it;
+  int h1 = 0;
+  intvec Vt,Vt2,H1;
+  module M;
+  if (degbound == 0)
+  {for (i = 1; i <= n; i++)
+    {Vt = V, i; w = 0;
+      for (j = 1; j<= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
     }
-   }
-    if (w == 0)
-    {vector Vtt;
-     for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-     M = M,Vtt;
-     kill Vtt;
+    if (size(M) == 0) {return(H);}
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= size(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++) {Vt[j] =  int(leadcoef(M[i][j]));}
+	h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1);
+      }
+      if (size(H1) < (size(V)+2)) {H1[(size(V)+2)] = h1;}
+      else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
+      H1 = H1 + H;
+      return(H1);
     }
   }
-  if (size(M) == 0) {return(H);}
   else
-  {M = simplify(M,2);
-   for (i = 1; i <= size(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++) {Vt[j] =  int(leadcoef(M[i][j]));}
-    h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1);
-   }
-   if (size(H1) < (size(V)+2)) {H1[(size(V)+2)] = h1;}
-   else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
-   H1 = H1 + H;
-   return(H1);
-  }
- }
- else
- {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
-  if (size(V) == degbound) {return(H);}
-  for (i = 1; i <= n; i++)
-  {Vt = V, i; w = 0;
-   for (j = 1; j<= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+  {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
+    if (size(V) == degbound) {return(H);}
+    for (i = 1; i <= n; i++)
+    {Vt = V, i; w = 0;
+      for (j = 1; j<= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
     }
-   }
-    if (w == 0)
-    {vector Vtt;
-     for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-     M = M,Vtt;
-     kill Vtt;
+    if (size(M) == 0) {return(H);}
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= size(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++)
+	{Vt[j] =  int(leadcoef(M[i][j]));}
+	h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1,degbound);
+      }
+      if (size(H1) < (size(V)+2)) { H1[(size(V)+2)] = h1;}
+      else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
+      H1 = H1 + H;
+      return(H1);
     }
   }
-  if (size(M) == 0) {return(H);}
-  else
-  {M = simplify(M,2);
-   for (i = 1; i <= size(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++)
-     {Vt[j] =  int(leadcoef(M[i][j]));}
-    h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1,degbound);
-   }
-   if (size(H1) < (size(V)+2)) { H1[(size(V)+2)] = h1;}
-   else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
-   H1 = H1 + H;
-   return(H1);
-  }
- }
 }
 
 static proc findHCoeffMis(intvec V, int n, list L, intvec P, list R,list #)
@@ -405,78 +406,78 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
 @*      at once
 "
 {int degbound = 0;
- if (size(#) > 0) {if (#[1] > 0) {degbound = #[1];}}
- int i,w,j,h1;
- intvec Vt,Vt2,H1; int it;
- module M;
- if (degbound == 0)
- {for (i = 1; i <= n; i++)
-  {Vt = V, i; w = 0;
-   for (j = 1; j<= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+  if (size(#) > 0) {if (#[1] > 0) {degbound = #[1];}}
+  int i,w,j,h1;
+  intvec Vt,Vt2,H1; int it;
+  module M;
+  if (degbound == 0)
+  {for (i = 1; i <= n; i++)
+    {Vt = V, i; w = 0;
+      for (j = 1; j<= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
     }
-   }
-    if (w == 0)
-    {vector Vtt;
-    for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-    M = M,Vtt;
-    kill Vtt;
-    }
-  }
-  if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
-  else
-  {M = simplify(M,2);
-   for (i = 1; i <= size(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++)
-     {Vt[j] =  int(leadcoef(M[i][j]));}
-    if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+    if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
     else
-    {R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
-    R = findHCoeffMis(Vt,n,L,P,R);
-   }
-   return(R);
-  }
- }
- else
- {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
-  if (size(V) == degbound)
-  {if (size(R) < 2){R[2] = list (V);}
-   else{R[2] = R[2] + list (V);}
-   return(R);
-  }
-  for (i = 1; i <= n; i++)
-  {Vt = V, i; w = 0;
-   for (j = 1; j<= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-    }
-   }
-    if (w == 0)
-    {vector Vtt;
-    for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-    M = M,Vtt;
-    kill Vtt;
+    {M = simplify(M,2);
+      for (i = 1; i <= size(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++)
+	{Vt[j] =  int(leadcoef(M[i][j]));}
+	if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+	else
+	{R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
+	R = findHCoeffMis(Vt,n,L,P,R);
+      }
+      return(R);
     }
   }
-  if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
   else
-  {M = simplify(M,2);
-    for (i = 1; i <= ncols(M); i++)
-    {kill Vt; intvec Vt;
-     for (j =1; j <= size(M[i]); j++)
-     {Vt[j] =  int(leadcoef(M[i][j]));}
-     if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
-     else
-     {R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
-     R = findHCoeffMis(Vt,n,L,P,R,degbound);
+  {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
+    if (size(V) == degbound)
+    {if (size(R) < 2){R[2] = list (V);}
+      else{R[2] = R[2] + list (V);}
+      return(R);
     }
-   return(R);
+    for (i = 1; i <= n; i++)
+    {Vt = V, i; w = 0;
+      for (j = 1; j<= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
+    }
+    if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= ncols(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++)
+	{Vt[j] =  int(leadcoef(M[i][j]));}
+	if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+	else
+	{R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
+	R = findHCoeffMis(Vt,n,L,P,R,degbound);
+      }
+      return(R);
+    }
   }
- }
 }
 
 
@@ -486,79 +487,79 @@ RETURN: list
 PURPOSE:Computing the K-dimension and the Mistletoes all at once
 "
 {int degbound = 0;
- if (size(#) > 0) {if (#[1] > 0) {degbound = #[1];}}
- int dimen,i,j,w;
- intvec Vt,Vt2; int it;
- module M;
- if (degbound == 0)
- {for (i = 1; i <= n; i++)
-  {Vt = V, i; w = 0;
-   for (j = 1; j<= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+  if (size(#) > 0) {if (#[1] > 0) {degbound = #[1];}}
+  int dimen,i,j,w;
+  intvec Vt,Vt2; int it;
+  module M;
+  if (degbound == 0)
+  {for (i = 1; i <= n; i++)
+    {Vt = V, i; w = 0;
+      for (j = 1; j<= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
     }
-   }
-    if (w == 0)
-    {vector Vtt;
-     for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-     M = M,Vtt;
-     kill Vtt;
+    if (size(M) == 0)
+    {if (size(R) < 2){R[2] = list (V);}
+      else{R[2] = R[2] + list(V);}
+      return(R);
     }
-  }
-  if (size(M) == 0)
-  {if (size(R) < 2){R[2] = list (V);}
-   else{R[2] = R[2] + list(V);}
-   return(R);
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= size(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R);
+      }
+      return(R);
+    }
   }
   else
-  {M = simplify(M,2);
-   for (i = 1; i <= size(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-     R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R);
-   }
-   return(R);
-  }
- }
- else
- {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
-  if (size(V) == degbound)
-  {if (size(R) < 2){R[2] = list (V);}
-   else{R[2] = R[2] + list (V);}
-   return(R);
-  }
-  for (i = 1; i <= n; i++)
-  {Vt = V, i; w = 0;
-   for (j = 1; j<= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+  {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
+    if (size(V) == degbound)
+    {if (size(R) < 2){R[2] = list (V);}
+      else{R[2] = R[2] + list (V);}
+      return(R);
     }
-   }
-    if (w == 0)
-    {vector Vtt;
-     for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-     M = M,Vtt;
-     kill Vtt;
+    for (i = 1; i <= n; i++)
+    {Vt = V, i; w = 0;
+      for (j = 1; j<= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
     }
-  }
-  if (size(M) == 0)
-  {if (size(R) < 2){R[2] = list (V);}
-   else{R[2] = R[2] + list(V);}
-   return(R);
-  }
-  else
-  {M = simplify(M,2);
-   for (i = 1; i <= size(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-     R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R,degbound);
-   }
-   return(R);
+    if (size(M) == 0)
+    {if (size(R) < 2){R[2] = list (V);}
+      else{R[2] = R[2] + list(V);}
+      return(R);
+    }
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= size(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R,degbound);
+      }
+      return(R);
 
+    }
   }
- }
 }
 
 
@@ -571,71 +572,71 @@ PURPOSE:Computing mistletoes starting in V
 NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
 "
 {int degbound = 0;
- if (size(#) > 0) {if (#[1] > 0) {degbound = #[1];}}
- list R; intvec Vt,Vt2; int it;
- int i,j;
- module M;
- if (degbound == 0)
- {int w;
-  for (i = 1; i <= n; i++)
-  {Vt = V,i; w = 0;
-   for (j = 1; j <= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0)
-     {w = 1; break;}
+  if (size(#) > 0) {if (#[1] > 0) {degbound = #[1];}}
+  list R; intvec Vt,Vt2; int it;
+  int i,j;
+  module M;
+  if (degbound == 0)
+  {int w;
+    for (i = 1; i <= n; i++)
+    {Vt = V,i; w = 0;
+      for (j = 1; j <= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0)
+	  {w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
     }
-   }
-   if (w == 0)
-   {vector Vtt;
-    for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-    M = M,Vtt;
-    kill Vtt;
-   }
-  }
-  if (size(M)==0) {R = V; return(R);}
-  else
-  {M = simplify(M,2);
-   for (i = 1; i <= size(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-    R = R + findmistletoes(Vt,n,L,P);
-   }
-   return(R);
-  }
- }
- else
- {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
-  if (size(V) == degbound) {R = V; return(R);}
-  int w;
-  for (i = 1; i <= n; i++)
-  {Vt = V,i; w = 0;
-   for (j = 1; j <= size(P); j++)
-   {if (P[j] <= size(Vt))
-    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-     if (isInMat(Vt2,L[j]) > 0){w = 1; break;}
+    if (size(M)==0) {R = V; return(R);}
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= size(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	R = R + findmistletoes(Vt,n,L,P);
+      }
+      return(R);
     }
-   }
-   if (w == 0)
-   {vector Vtt;
-    for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-    M = M,Vtt;
-    kill Vtt;
-   }
   }
-  if (size(M) == 0) {R = V; return(R);}
   else
-  {M = simplify(M,2);
-   for (i = 1; i <= ncols(M); i++)
-   {kill Vt; intvec Vt;
-    for (j =1; j <= size(M[i]); j++)
-     {Vt[j] =  int(leadcoef(M[i][j]));}
-      //Vt; typeof(Vt); size(Vt);
-      R = R + findmistletoes(Vt,n,L,P,degbound);
-   }
-   return(R);
+  {if (size(V) > degbound) {ERROR("monomial exceeds degreebound");}
+    if (size(V) == degbound) {R = V; return(R);}
+    int w;
+    for (i = 1; i <= n; i++)
+    {Vt = V,i; w = 0;
+      for (j = 1; j <= size(P); j++)
+      {if (P[j] <= size(Vt))
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0){w = 1; break;}
+	}
+      }
+      if (w == 0)
+      {vector Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+      }
+    }
+    if (size(M) == 0) {R = V; return(R);}
+    else
+    {M = simplify(M,2);
+      for (i = 1; i <= ncols(M); i++)
+      {kill Vt; intvec Vt;
+	for (j =1; j <= size(M[i]); j++)
+	{Vt[j] =  int(leadcoef(M[i][j]));}
+	//Vt; typeof(Vt); size(Vt);
+	R = R + findmistletoes(Vt,n,L,P,degbound);
+      }
+      return(R);
+    }
   }
- }
 }
 
 static proc isInList(intvec V, list L)
@@ -644,9 +645,9 @@ RETURN: int
 PURPOSE:Finding the position of V in L, returns 0, if V is not in M
 "
 {int i,n;
- n = 0;
- for (i = 1; i <= size(L); i++) {if (L[i] == V) {n = i; break;}}
- return(n);
+  n = 0;
+  for (i = 1; i <= size(L); i++) {if (L[i] == V) {n = i; break;}}
+  return(n);
 }
 
 static proc isInMat(intvec V, intmat M)
@@ -655,13 +656,13 @@ RETURN: int
 PURPOSE:Finding the position of V in M, returns 0, if V is not in M
 "
 {if (size(V) <> ncols(M)) {return(0);}
- int i;
- intvec Vt;
- for (i = 1; i <= nrows(M); i++)
- {Vt = M[i,1..ncols(M)];
-  if ((V-Vt) == 0){return(i);}
- }
- return(0);
+  int i;
+  intvec Vt;
+  for (i = 1; i <= nrows(M); i++)
+  {Vt = M[i,1..ncols(M)];
+    if ((V-Vt) == 0){return(i);}
+  }
+  return(0);
 }
 
 static proc isInVec(int v,intvec V)
@@ -670,9 +671,9 @@ RETURN: int
 PURPOSE:Finding the position of v in V, returns 0, if v is not in V
 "
 {int i,n;
- n = 0;
- for (i = 1; i <= size(V); i++) {if (V[i] == v) {n = i; break;}}
- return(n);
+  n = 0;
+  for (i = 1; i <= size(V); i++) {if (V[i] == v) {n = i; break;}}
+  return(n);
 }
 
 proc ivL2lpI(list L)
@@ -684,13 +685,13 @@ ASSUME: - Intvec corresponds to a Letterplace monomial
 EXAMPLE: example ivL2lpI; shows examples
 "
 {checkAssumptions(0,L);
- int i; ideal G;
- poly p;
- for (i = 1; i <= size(L); i++)
- {p = iv2lp(L[i]);
-  G[(size(G) + 1)] = p;
- }
- return(G);
+  int i; ideal G;
+  poly p;
+  for (i = 1; i <= size(L); i++)
+  {p = iv2lp(L[i]);
+    G[(size(G) + 1)] = p;
+  }
+  return(G);
 }
 example
 {
@@ -714,11 +715,11 @@ NOTE:   - Assumptions will not be checked!
 EXAMPLE: example iv2lp; shows examples
 "
 {if (I[1] == 0) {return(1);}
- int i = size(I);
- if (i > attrib(basering,"uptodeg")) {ERROR("polynomial exceeds degreebound");}
- int j; poly p = 1;
- for (j = 1; j <= i; j++) {if (I[j] > 0) { p = lpMult(p,var(I[j]));}} //ignore zeroes, because they correspond to 1
- return(p);
+  int i = size(I);
+  if (i > attrib(basering,"uptodeg")) {ERROR("polynomial exceeds degreebound");}
+  int j; poly p = 1;
+  for (j = 1; j <= i; j++) {if (I[j] > 0) { p = lpMult(p,var(I[j]));}} //ignore zeroes, because they correspond to 1
+  return(p);
 }
 example
 {
@@ -742,10 +743,10 @@ ASSUME: - The rows of each intmat in L must correspond to a Letterplace monomial
 EXAMPLE: example iv2lpList; shows examples
 "
 {checkAssumptions(0,L);
- ideal G;
- int i;
- for (i = 1; i <= size(L); i++){G = G + iv2lpMat(L[i]);}
- return(G);
+  ideal G;
+  int i;
+  for (i = 1; i <= size(L); i++){G = G + iv2lpMat(L[i]);}
+  return(G);
 }
 example
 {
@@ -771,16 +772,16 @@ ASSUME: - The rows of M must correspond to Letterplace monomials
 EXAMPLE: example iv2lpMat; shows examples
 "
 {list L = M;
- checkAssumptions(0,L);
- kill L;
- ideal G; poly p;
- int i; intvec I;
- for (i = 1; i <= nrows(M); i++)
+  checkAssumptions(0,L);
+  kill L;
+  ideal G; poly p;
+  int i; intvec I;
+  for (i = 1; i <= nrows(M); i++)
   { I = M[i,1..ncols(M)];
     p = iv2lp(I);
     G[size(G)+1] = p;
   }
- return(G);
+  return(G);
 }
 example
 {
@@ -804,19 +805,19 @@ ASSUME: - basering has to be a Letterplace ring
 EXAMPLE: example lpId2ivLi; shows examples
 "
 {int i,j,k;
- list M;
- checkAssumptions(0,M);
- for (i = 1; i <= size(G); i++) {M[i] = lp2iv(G[i]);}
- return(M);
+  list M;
+  checkAssumptions(0,M);
+  for (i = 1; i <= size(G); i++) {M[i] = lp2iv(G[i]);}
+  return(M);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
-   ring r = 0,(x,y),dp;
-   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
-   setring R; // sets basering to Letterplace ring
-   ideal L = x(1)*x(2),y(1)*y(2),x(1)*y(2)*x(3);
-   lpId2ivLi(L); // returns the corresponding intvecs as a list
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  setring R; // sets basering to Letterplace ring
+  ideal L = x(1)*x(2),y(1)*y(2),x(1)*y(2)*x(3);
+  lpId2ivLi(L); // returns the corresponding intvecs as a list
 }
 
 proc lp2iv(poly p)
@@ -828,24 +829,24 @@ NOTE:   - Assumptions will not be checked!
 EXAMPLE: example lp2iv; shows examples
 "
 {p = normalize(lead(p));
- intvec I;
- int i,j;
- if (deg(p) > attrib(basering,"uptodeg")) {ERROR("Monomial exceeds degreebound");}
- if (p == 1) {return(I);}
- if (p == 0) {ERROR("Monomial is not allowed to equal zero");}
- intvec lep = leadexp(p);
- for ( i = 1; i <= attrib(basering,"lV"); i++) {if (lep[i] == 1) {I = i; break;}}
- for (i = (attrib(basering,"lV")+1); i <= size(lep); i++)
-   {if (lep[i] == 1)
+  intvec I;
+  int i,j;
+  if (deg(p) > attrib(basering,"uptodeg")) {ERROR("Monomial exceeds degreebound");}
+  if (p == 1) {return(I);}
+  if (p == 0) {ERROR("Monomial is not allowed to equal zero");}
+  intvec lep = leadexp(p);
+  for ( i = 1; i <= attrib(basering,"lV"); i++) {if (lep[i] == 1) {I = i; break;}}
+  for (i = (attrib(basering,"lV")+1); i <= size(lep); i++)
+  {if (lep[i] == 1)
     { j = (i mod attrib(basering,"lV"));
       if (j == 0) {I = I,attrib(basering,"lV");}
       else {I = I,j;}
     }
     else { if (lep[i] > 1) {ERROR("monomial has a not allowed multidegree");}}
-   }
- if (I[1] == 0) {ERROR("monomial has a not allowed multidegree");}
+  }
+  if (I[1] == 0) {ERROR("monomial has a not allowed multidegree");}
 
- return(I);
+  return(I);
 }
 example
 {
@@ -869,24 +870,24 @@ ASSUME: - basering has to be a Letterplace ring
 EXAMPLE: example lp2ivId; shows examples
 "
 {G = normalize(lead(G));
- intvec I; list L;
- checkAssumptions(0,L);
- int i,md;
- for (i = 1; i <= size(G); i++) { if (md <= deg(G[i])) {md = deg(G[i]);}}
- while (size(G) > 0)
- {ideal Gt;
-  for (i = 1; i <= ncols(G); i++) {if (md == deg(G[i])) {Gt = Gt + G[i]; G[i] = 0;}}
-  if (size(Gt) > 0)
-  {G = simplify(G,2);
-   intmat M [size(Gt)][md];
-   for (i = 1; i <= size(Gt); i++) {M[i,1..md] = lp2iv(Gt[i]);}
-   L = insert(L,M);
-   kill M; kill Gt;
-   md = md - 1;
+  intvec I; list L;
+  checkAssumptions(0,L);
+  int i,md;
+  for (i = 1; i <= size(G); i++) { if (md <= deg(G[i])) {md = deg(G[i]);}}
+  while (size(G) > 0)
+  {ideal Gt;
+    for (i = 1; i <= ncols(G); i++) {if (md == deg(G[i])) {Gt = Gt + G[i]; G[i] = 0;}}
+    if (size(Gt) > 0)
+    {G = simplify(G,2);
+      intmat M [size(Gt)][md];
+      for (i = 1; i <= size(Gt); i++) {M[i,1..md] = lp2iv(Gt[i]);}
+      L = insert(L,M);
+      kill M; kill Gt;
+      md = md - 1;
+    }
+    else {kill Gt; md = md - 1;}
   }
-  else {kill Gt; md = md - 1;}
- }
- return(L);
+  return(L);
 }
 example
 {
@@ -926,20 +927,20 @@ NOTE: - If L is the list returned, then L[1] is an integer corresponding to the
 EXAMPLE: example ivDHilbert; shows examples
 "
 {int degbound = 0;
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] > 0){degbound = #[1];}}}
- checkAssumptions(degbound,L);
- intvec H; int i,dimen;
- H = ivHilbert(L,n,degbound);
- for (i = 1; i <= size(H); i++){dimen = dimen + H[i];}
- L = dimen,H;
- return(L);
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] > 0){degbound = #[1];}}}
+  checkAssumptions(degbound,L);
+  intvec H; int i,dimen;
+  H = ivHilbert(L,n,degbound);
+  for (i = 1; i <= size(H); i++){dimen = dimen + H[i];}
+  L = dimen,H;
+  return(L);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y),dp;
   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
-    R;
+  R;
   setring R; // sets basering to Letterplace ring
   //some intmats, which contain monomials in intvec representation as rows
   intmat I1 [2][2] = 1,1,2,2; intmat I2 [1][3]  = 1,2,1;
@@ -965,25 +966,25 @@ ASSUME: - basering is a Letterplace ring.
 @*      - All rows of each intmat correspond to a Letterplace monomial.
 @*      - If you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
-NOTE: - If L is the list returned, then L[1] is an intvec which contains the
-@*      coefficients of the Hilbert series, L[2] is an integer and L[3]
+NOTE: - If L is the list returned, then L[1] is an integer, L[2] is an intvec
+@*      which contains the coefficients of the Hilbert series and L[3]
 @*      is a list, containing the mistletoes as intvecs.
 @*    - If degbound is set, a degree bound will be added. By default there
 @*      is no degree bound.
 @*    - n is the number of variables.
-@*    - If I = L[1] is the intvec returned, then I[k] is the (k-1)-th
+@*    - If I = L[2] is the intvec returned, then I[k] is the (k-1)-th
 @*      coefficient of the Hilbert series.
 @*    - If the K-dimension is known to be infinite, a degree bound is needed
 EXAMPLE: example ivDHilbertSickle; shows examples
 "
 {int degbound = 0;
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] > 0){degbound = #[1];}}}
- checkAssumptions(degbound,L);
- int i,dimen; list R;
- R = ivSickleHil(L,n,degbound);
- for (i = 1; i <= size(R[1]); i++){dimen = dimen + R[1][i];}
- R[3] = R[2]; R[2] = dimen;
- return(R);
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] > 0){degbound = #[1];}}}
+  checkAssumptions(degbound,L);
+  int i,dimen; list R;
+  R = ivSickleHil(L,n,degbound);
+  for (i = 1; i <= size(R[1]); i++){dimen = dimen + R[1][i];}
+  R[3] = R[2]; R[2] = R[1]; R[1] = dimen;
+  return(R);
 }
 example
 {
@@ -1015,30 +1016,30 @@ NOTE:   - n is the number of variables.
 EXAMPLE: example ivDimCheck; shows examples
 "
 {checkAssumptions(0,L);
- int i,r;
- intvec P,H;
- for (i = 1; i <= size(L); i++)
- {P[i] = ncols(L[i]);
-  if (P[i] == 1) {if (isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
- }
- if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
- kill H;
- intmat S; int sd,ld; intvec V;
- sd = P[1]; ld = P[1];
- for (i = 2; i <= size(P); i++)
- {if (P[i] < sd) {sd = P[i];}
-  if (P[i] > ld) {ld = P[i];}
- }
- sd = (sd - 1); ld = ld - 1;
- if (ld == 0) { return(allVars(L,P,n));}
- if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
- else {S = createStartMat(sd,n);}
- module M;
- for (i = 1; i <= nrows(S); i++)
- {V = S[i,1..ncols(S)];
-  if (findCycle(V,L,P,n,ld,M)) {r = 1; break;}
- }
- return(r);
+  int i,r;
+  intvec P,H;
+  for (i = 1; i <= size(L); i++)
+  {P[i] = ncols(L[i]);
+    if (P[i] == 1) {if (isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
+  }
+  if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
+  kill H;
+  intmat S; int sd,ld; intvec V;
+  sd = P[1]; ld = P[1];
+  for (i = 2; i <= size(P); i++)
+  {if (P[i] < sd) {sd = P[i];}
+    if (P[i] > ld) {ld = P[i];}
+  }
+  sd = (sd - 1); ld = ld - 1;
+  if (ld == 0) { return(allVars(L,P,n));}
+  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+  else {S = createStartMat(sd,n);}
+  module M;
+  for (i = 1; i <= nrows(S); i++)
+  {V = S[i,1..ncols(S)];
+    if (findCycle(V,L,P,n,ld,M)) {r = 1; break;}
+  }
+  return(r);
 }
 example
 {
@@ -1078,51 +1079,51 @@ NOTE: - If degbound is set, a degree bound  will be added. By default there
 EXAMPLE: example ivHilbert; shows examples
 "
 {int degbound = 0;
- if (size(#) > 0) {if (typeof(#[1])=="int"){if (#[1] > 0) {degbound = #[1];}}}
- intvec P,H; int i;
- for (i = 1; i <= size(L); i++)
- {P[i] = ncols(L[i]);
-  if (P[i] == 1) {if ( isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
- }
- if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
- H[1] = 1;
- checkAssumptions(degbound,L);
- if (degbound == 0)
- {int sd;
-  intmat S;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(H);}
-  for (i = 1; i <= sd; i++) {H = H,(n^i);}
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   H = findHCoeff(St,n,L,P,H);
-   kill St;
+  if (size(#) > 0) {if (typeof(#[1])=="int"){if (#[1] > 0) {degbound = #[1];}}}
+  intvec P,H; int i;
+  for (i = 1; i <= size(L); i++)
+  {P[i] = ncols(L[i]);
+    if (P[i] == 1) {if ( isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
   }
-  return(H);
- }
- else
- {for (i = 1; i <= size(P); i++)
-  {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
-  int sd;
-  intmat S;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(H);}
-  for (i = 1; i <= sd; i++) {H = H,(n^i);}
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   H = findHCoeff(St,n,L,P,H,degbound);
-   kill St;
+  if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
+  H[1] = 1;
+  checkAssumptions(degbound,L);
+  if (degbound == 0)
+  {int sd;
+    intmat S;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(H);}
+    for (i = 1; i <= sd; i++) {H = H,(n^i);}
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      H = findHCoeff(St,n,L,P,H);
+      kill St;
+    }
+    return(H);
   }
-  return(H);
- }
+  else
+  {for (i = 1; i <= size(P); i++)
+    {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
+    int sd;
+    intmat S;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(H);}
+    for (i = 1; i <= sd; i++) {H = H,(n^i);}
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      H = findHCoeff(St,n,L,P,H,degbound);
+      kill St;
+    }
+    return(H);
+  }
 }
 example
 {
@@ -1161,51 +1162,51 @@ NOTE: - If degbound is set, a degree bound will be added. By default there
 EXAMPLE: example ivKDim; shows examples
 "
 {int degbound = 0;
- if (size(#) > 0) {if (typeof(#[1])=="int"){if (#[1] > 0) {degbound = #[1];}}}
- intvec P,H; int i;
- for (i = 1; i <= size(L); i++)
- {P[i] = ncols(L[i]);
-  if (P[i] == 1) {if ( isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
- }
- if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
- kill H;
- checkAssumptions(degbound,L);
- if (degbound == 0)
- {int sd; int dimen = 1;
-  intmat S;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(dimen);}
-  for (i = 1; i <= sd; i++) {dimen = dimen +(n^i);}
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   dimen = dimen + findDimen(St,n,L,P);
-   kill St;
+  if (size(#) > 0) {if (typeof(#[1])=="int"){if (#[1] > 0) {degbound = #[1];}}}
+  intvec P,H; int i;
+  for (i = 1; i <= size(L); i++)
+  {P[i] = ncols(L[i]);
+    if (P[i] == 1) {if ( isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
   }
-  return(dimen);
- }
- else
- {for (i = 1; i <= size(P); i++)
-  {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
-  int sd; int dimen = 1;
-  intmat S;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(dimen);}
-  for (i = 1; i <= sd; i++) {dimen = dimen +(n^i);}
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   dimen = dimen + findDimen(St,n,L,P, degbound);
-   kill St;
+  if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
+  kill H;
+  checkAssumptions(degbound,L);
+  if (degbound == 0)
+  {int sd; int dimen = 1;
+    intmat S;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(dimen);}
+    for (i = 1; i <= sd; i++) {dimen = dimen +(n^i);}
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      dimen = dimen + findDimen(St,n,L,P);
+      kill St;
+    }
+    return(dimen);
   }
-  return(dimen);
- }
+  else
+  {for (i = 1; i <= size(P); i++)
+    {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
+    int sd; int dimen = 1;
+    intmat S;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(dimen);}
+    for (i = 1; i <= sd; i++) {dimen = dimen +(n^i);}
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      dimen = dimen + findDimen(St,n,L,P, degbound);
+      kill St;
+    }
+    return(dimen);
+  }
 }
 example
 {
@@ -1237,30 +1238,30 @@ ASSUME: - The mistletoes have to be ordered lexicographically -> OrdMisLex.
 EXAMPLE: example ivMis2Dim; shows examples
 "
 {checkAssumptions(0,M);
- intvec L;
- if (size(M) == 0){ERROR("There are no mistletoes, so it appears your dimension is infinite!");}
- if (isInList(L,M) > 0) {print("1 is a mistletoe, therefore dim = 1"); return(1);}
- int i,j,d,s;
- j = 1;
- d = 1 + size(M[1]);
- for (i = 1; i < size(M); i++)
+  intvec L;
+  if (size(M) == 0){ERROR("There are no mistletoes, so it appears your dimension is infinite!");}
+  if (isInList(L,M) > 0) {print("1 is a mistletoe, therefore dim = 1"); return(1);}
+  int i,j,d,s;
+  j = 1;
+  d = 1 + size(M[1]);
+  for (i = 1; i < size(M); i++)
   {s = size(M[i]); if (s > size(M[i+1])){s = size(M[i+1]);}
-   while ((M[i][j] == M[i+1][j]) && (j <= s)){j = j + 1;}
-   d = d + size(M[i+1])- j + 1;
+    while ((M[i][j] == M[i+1][j]) && (j <= s)){j = j + 1;}
+    d = d + size(M[i+1])- j + 1;
   }
- return(d);
+  return(d);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
-   ring r = 0,(x,y),dp;
-   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
-   R;
-   setring R; // sets basering to Letterplace ring
-   intvec i1 = 1,2; intvec i2 = 2,1,2;
-   // the mistletoes are xy and yxy, which are already ordered lexicographically
-   list L = i1,i2;
-   ivMis2Dim(L); // returns the dimension of the factor algebra
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  R;
+  setring R; // sets basering to Letterplace ring
+  intvec i1 = 1,2; intvec i2 = 2,1,2;
+  // the mistletoes are xy and yxy, which are already ordered lexicographically
+  list L = i1,i2;
+  ivMis2Dim(L); // returns the dimension of the factor algebra
 }
 
 proc ivOrdMisLex(list M)
@@ -1268,26 +1269,26 @@ proc ivOrdMisLex(list M)
 RETURN: list, containing the ordered intvecs of M
 PURPOSE:Orders a given set of mistletoes lexicographically
 ASSUME: - basering is a Letterplace ring.
-        - intvecs correspond to monomials
+       - intvecs correspond to monomials
 NOTE:   - This is preprocessing, it's not needed if the mistletoes are returned
 @*        from the sickle algorithm.
 @*      - Each entry of the list returned is an intvec.
 EXAMPLE: example ivOrdMisLex; shows examples
 "
 {checkAssumptions(0,M);
- return(sort(M)[1]);
+  return(sort(M)[1]);
 }
 example
 {
   "EXAMPLE:"; echo = 2;
-   ring r = 0,(x,y),dp;
-   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
-   setring R; // sets basering to Letterplace ring
-   intvec i1 = 1,2,1; intvec i2 = 2,2,1; intvec i3 = 1,1; intvec i4 = 2,1,1,1;
-   // the corresponding monomials are xyx,y^2x,x^2,yx^3
-   list M = i1,i2,i3,i4;
-   M;
-   ivOrdMisLex(M);// orders the list of monomials
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  setring R; // sets basering to Letterplace ring
+  intvec i1 = 1,2,1; intvec i2 = 2,2,1; intvec i3 = 1,1; intvec i4 = 2,1,1,1;
+  // the corresponding monomials are xyx,y^2x,x^2,yx^3
+  list M = i1,i2,i3,i4;
+  M;
+  ivOrdMisLex(M);// orders the list of monomials
 }
 
 proc ivSickle(list L, int n, list #)
@@ -1306,49 +1307,49 @@ NOTE: - If degbound is set, a degree bound will be added. By default there
 EXAMPLE: example ivSickle; shows examples
 "
 {list M;
- int degbound = 0;
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] > 0){degbound = #[1];}}}
- int i;
- intvec P,H;
- for (i = 1; i <= size(L); i++)
- {P[i] = ncols(L[i]);
-  if (P[i] == 1) {if (isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
- }
- if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
- kill H;
- checkAssumptions(degbound,L);
- if (degbound == 0)
- {intmat S; int sd;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(list (intvec(0)));}
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   M = M + findmistletoes(St,n,L,P);
-   kill St;
+  int degbound = 0;
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] > 0){degbound = #[1];}}}
+  int i;
+  intvec P,H;
+  for (i = 1; i <= size(L); i++)
+  {P[i] = ncols(L[i]);
+    if (P[i] == 1) {if (isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
   }
-  return(M);
- }
- else
- {for (i = 1; i <= size(P); i++)
-  {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
-  intmat S; int sd;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(list (intvec(0)));}
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   M = M + findmistletoes(St,n,L,P,degbound);
-   kill St;
+  if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
+  kill H;
+  checkAssumptions(degbound,L);
+  if (degbound == 0)
+  {intmat S; int sd;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(list (intvec(0)));}
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      M = M + findmistletoes(St,n,L,P);
+      kill St;
+    }
+    return(M);
   }
-  return(M);
- }
+  else
+  {for (i = 1; i <= size(P); i++)
+    {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
+    intmat S; int sd;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(list (intvec(0)));}
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      M = M + findmistletoes(St,n,L,P,degbound);
+      kill St;
+    }
+    return(M);
+  }
 }
 example
 {
@@ -1387,55 +1388,55 @@ NOTE: - If L is the list returned, then L[1] is an integer, L[2] is a list,
 EXAMPLE: example ivSickleDim; shows examples
 "
 {list M;
- int degbound = 0;
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] > 0){degbound = #[1];}}}
- int i,dimen; list R;
- intvec P,H;
- for (i = 1; i <= size(L); i++)
- {P[i] = ncols(L[i]);
-  if (P[i] == 1) {if (isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial, dimension equals zero");}}
- }
- if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
- kill H;
- checkAssumptions(degbound,L);
- if (degbound == 0)
- {int sd; dimen = 1;
-  intmat S;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(list(dimen,list(intvec(0))));}
-  for (i = 1; i <= sd; i++) {dimen = dimen +(n^i);}
-  R[1] = dimen;
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   R = findMisDim(St,n,L,P,R);
-   kill St;
+  int degbound = 0;
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] > 0){degbound = #[1];}}}
+  int i,dimen; list R;
+  intvec P,H;
+  for (i = 1; i <= size(L); i++)
+  {P[i] = ncols(L[i]);
+    if (P[i] == 1) {if (isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial, dimension equals zero");}}
   }
-  return(R);
- }
- else
- {for (i = 1; i <= size(P); i++)
-  {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
-  int sd; dimen = 1;
-  intmat S;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(list(dimen,list(intvec(0))));}
-  for (i = 1; i <= sd; i++) {dimen = dimen +(n^i);}
-  R[1] = dimen;
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   R = findMisDim(St,n,L,P,R,degbound);
-   kill St;
+  if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
+  kill H;
+  checkAssumptions(degbound,L);
+  if (degbound == 0)
+  {int sd; dimen = 1;
+    intmat S;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(list(dimen,list(intvec(0))));}
+    for (i = 1; i <= sd; i++) {dimen = dimen +(n^i);}
+    R[1] = dimen;
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      R = findMisDim(St,n,L,P,R);
+      kill St;
+    }
+    return(R);
   }
-  return(R);
- }
+  else
+  {for (i = 1; i <= size(P); i++)
+    {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
+    int sd; dimen = 1;
+    intmat S;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(list(dimen,list(intvec(0))));}
+    for (i = 1; i <= sd; i++) {dimen = dimen +(n^i);}
+    R[1] = dimen;
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      R = findMisDim(St,n,L,P,R,degbound);
+      kill St;
+    }
+    return(R);
+  }
 }
 example
 {
@@ -1476,53 +1477,53 @@ NOTE: - If L is the list returned, then L[1] is an intvec, L[2] is a list,
 EXAMPLE: example ivSickleHil; shows examples
 "
 {int degbound = 0;
- if (size(#) > 0) {if (typeof(#[1])=="int"){if (#[1] > 0) {degbound = #[1];}}}
- intvec P,H; int i; list R;
- for (i = 1; i <= size(L); i++)
- {P[i] = ncols(L[i]);
-  if (P[i] == 1) {if ( isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
- }
- if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
- H[1] = 1;
- checkAssumptions(degbound,L);
- if (degbound == 0)
- {int sd;
-  intmat S;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(list(H,list(intvec (0))));}
-  for (i = 1; i <= sd; i++) {H = H,(n^i);}
-  R[1] = H; kill H;
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   R = findHCoeffMis(St,n,L,P,R);
-   kill St;
+  if (size(#) > 0) {if (typeof(#[1])=="int"){if (#[1] > 0) {degbound = #[1];}}}
+  intvec P,H; int i; list R;
+  for (i = 1; i <= size(L); i++)
+  {P[i] = ncols(L[i]);
+    if (P[i] == 1) {if ( isInMat(H,L[i]) > 0) {ERROR("Quotient algebra is trivial");}}
   }
-  return(R);
- }
- else
- {for (i = 1; i <= size(P); i++)
-  {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
-  int sd;
-  intmat S;
-  sd = P[1];
-  for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
-  sd = (sd - 1);
-  if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
-  else {S = createStartMat(sd,n);}
-  if (intvec(S) == 0) {return(list(H,list(intvec(0))));}
-  for (i = 1; i <= sd; i++) {H = H,(n^i);}
-  R[1] = H; kill H;
-  for (i = 1; i <= nrows(S); i++)
-  {intvec St = S[i,1..ncols(S)];
-   R = findHCoeffMis(St,n,L,P,R,degbound);
-   kill St;
+  if (size(L) == 0) {ERROR("GB is empty, quotient algebra corresponds to free algebra");}
+  H[1] = 1;
+  checkAssumptions(degbound,L);
+  if (degbound == 0)
+  {int sd;
+    intmat S;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(list(H,list(intvec (0))));}
+    for (i = 1; i <= sd; i++) {H = H,(n^i);}
+    R[1] = H; kill H;
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      R = findHCoeffMis(St,n,L,P,R);
+      kill St;
+    }
+    return(R);
   }
-  return(R);
- }
+  else
+  {for (i = 1; i <= size(P); i++)
+    {if (P[i] > degbound) {ERROR("degreebound is too small, GB contains elements of higher degree");}}
+    int sd;
+    intmat S;
+    sd = P[1];
+    for (i = 2; i <= size(P); i++) {if (P[i] < sd) {sd = P[i];}}
+    sd = (sd - 1);
+    if (sd == 0) { for (i = 1; i <= size(L); i++){if (ncols(L[i]) == 1){S = createStartMat1(n,L[i]); break;}}}
+    else {S = createStartMat(sd,n);}
+    if (intvec(S) == 0) {return(list(H,list(intvec(0))));}
+    for (i = 1; i <= sd; i++) {H = H,(n^i);}
+    R[1] = H; kill H;
+    for (i = 1; i <= nrows(S); i++)
+    {intvec St = S[i,1..ncols(S)];
+      R = findHCoeffMis(St,n,L,P,R,degbound);
+      kill St;
+    }
+    return(R);
+  }
 }
 example
 {
@@ -1563,11 +1564,11 @@ NOTE: - If L is the list returned, then L[1] is an integer corresponding to the
 EXAMPLE: example lpDHilbert; shows examples
 "
 {int degbound = attrib(basering,"uptodeg");int n = attrib(basering, "lV");
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
- if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
- list L;
- L = lp2ivId(normalize(lead(G)));
- return(ivDHilbert(L,n,degbound));
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
+  if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
+  list L;
+  L = lp2ivId(normalize(lead(G)));
+  return(ivDHilbert(L,n,degbound));
 }
 example
 {
@@ -1592,8 +1593,9 @@ PURPOSE:Computing K-dimension, Hilbert series and mistletoes at once
 ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
-NOTE: - If L is the list returned, then L[1] is an intvec, the Hilbert series,
-@*      L[2] is an integer, the K-dimension and L[3] is an ideal, the mistletoes
+NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
+@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal, 
+@*      the mistletoes
 @*    - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering,uptodeg).
 @*    - n can be set to a different number of variables.
@@ -1604,13 +1606,13 @@ NOTE: - If L is the list returned, then L[1] is an intvec, the Hilbert series,
 EXAMPLE: example lpDHilbertSickle; shows examples
 "
 {int degbound = attrib(basering,"uptodeg");int n = attrib(basering, "lV");
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
- if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
- list L;
- L = lp2ivId(normalize(lead(G)));
- L = ivDHilbertSickle(L,n,degbound);
- L[3] =  ivL2lpI(L[3]);
- return(L);
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
+  if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
+  list L;
+  L = lp2ivId(normalize(lead(G)));
+  L = ivDHilbertSickle(L,n,degbound);
+  L[3] =  ivL2lpI(L[3]);
+  return(L);
 }
 example
 {
@@ -1623,8 +1625,8 @@ example
   lpDHilbertSickle(G,5,2); //invokes procedure with degree bound 5 and 2 variables
   // note that the optional parameters are not necessary, due to the finiteness
   // of the K-dimension of the factor algebra
-  lpDHilbert(G); // procedure with ring parameters
-  lpDHilbert(G,0); // procedure without degreebound
+  lpDHilbertSickle(G); // procedure with ring parameters
+  lpDHilbertSickle(G,0); // procedure without degreebound
 }
 
 proc lpHilbert(ideal G, list #)
@@ -1644,11 +1646,11 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 EXAMPLE: example lpHilbert; shows examples
 "
 {int degbound = attrib(basering,"uptodeg");int n = attrib(basering, "lV");
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
- if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
- list L;
- L = lp2ivId(normalize(lead(G)));
- return(ivHilbert(L,n,degbound));
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
+  if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
+  list L;
+  L = lp2ivId(normalize(lead(G)));
+  return(ivHilbert(L,n,degbound));
 }
 example
 {
@@ -1673,11 +1675,11 @@ ASSUME: - basering is a Letterplace ring.
 EXAMPLE: example lpDimCheck; shows examples
 "
 {int n = attrib(basering,"lV");
- list L;
- ideal R;
- R = normalize(lead(G));
- L = lp2ivId(R);
- return(ivDimCheck(L,n));
+  list L;
+  ideal R;
+  R = normalize(lead(G));
+  L = lp2ivId(R);
+  return(ivDimCheck(L,n));
 }
 example
 {
@@ -1708,11 +1710,11 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 EXAMPLE: example lpKDim; shows examples
 "
 {int degbound = attrib(basering, "uptodeg");int n = attrib(basering, "lV");
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
- if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
- list L;
- L = lp2ivId(normalize(lead(G)));
- return(ivKDim(L,n,degbound));
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
+  if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
+  list L;
+  L = lp2ivId(normalize(lead(G)));
+  return(ivKDim(L,n,degbound));
 }
 example
 {
@@ -1738,18 +1740,18 @@ NOTE:   - The mistletoes have to be ordered lexicographically -> OrdMisLex.
 EXAMPLE: example lpMis2Dim; shows examples
 "
 {list L;
- L = lpId2ivLi(M);
- return(ivMis2Dim(L));
+  L = lpId2ivLi(M);
+  return(ivMis2Dim(L));
 }
 example
 {
   "EXAMPLE:"; echo = 2;
-   ring r = 0,(x,y),dp;
-   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
   setring R; // sets basering to Letterplace ring
-   ideal L = x(1)*y(2),y(1)*x(2)*y(3);
-   // ideal containing the mistletoes
-   lpMis2Dim(L); // returns the K-dimension of the factor algebra
+  ideal L = x(1)*y(2),y(1)*x(2)*y(3);
+  // ideal containing the mistletoes
+  lpMis2Dim(L); // returns the K-dimension of the factor algebra
 }
 
 proc lpOrdMisLex(ideal M)
@@ -1765,12 +1767,12 @@ EXAMPLE: example lpOrdMisLex; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-   ring r = 0,(x,y),dp;
-   def R = makeLetterplaceRing(5); // constructs a Letterplace ring
-   setring R; // sets basering to Letterplace ring
-   ideal M = x(1)*y(2)*x(3), y(1)*y(2)*x(3), x(1)*x(2), y(1)*x(2)*x(3)*x(4);
-   // some monomials
-   lpOrdMisLex(M); // orders the monomials lexicographically
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  setring R; // sets basering to Letterplace ring
+  ideal M = x(1)*y(2)*x(3), y(1)*y(2)*x(3), x(1)*x(2), y(1)*x(2)*x(3)*x(4);
+  // some monomials
+  lpOrdMisLex(M); // orders the monomials lexicographically
 }
 
 proc lpSickle(ideal G,  list #)
@@ -1788,14 +1790,14 @@ NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 EXAMPLE: example lpSickle; shows examples
 "
 {int degbound = attrib(basering,"uptodeg"); int n = attrib(basering, "lV");
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
- if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
- list L; ideal R;
- R = normalize(lead(G));
- L = lp2ivId(R);
- L = ivSickle(L,n,degbound);
- R = ivL2lpI(L);
- return(R);
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
+  if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
+  list L; ideal R;
+  R = normalize(lead(G));
+  L = lp2ivId(R);
+  L = ivSickle(L,n,degbound);
+  R = ivL2lpI(L);
+  return(R);
 }
 example
 {
@@ -1828,13 +1830,13 @@ NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
 EXAMPLE: example lpSickleDim; shows examples
 "
 {int degbound = attrib(basering,"uptodeg");int n = attrib(basering, "lV");
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
- if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
- list L;
- L = lp2ivId(normalize(lead(G)));
- L = ivSickleDim(L,n,degbound);
- L[2] = ivL2lpI(L[2]);
- return(L);
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
+  if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
+  list L;
+  L = lp2ivId(normalize(lead(G)));
+  L = ivSickleDim(L,n,degbound);
+  L[2] = ivL2lpI(L[2]);
+  return(L);
 }
 example
 {
@@ -1869,13 +1871,13 @@ NOTE: - If L is the list returned, then L[1] is an intvec, corresponding to the
 EXAMPLE: example lpSickleHil; shows examples
 "
 {int degbound = attrib(basering,"uptodeg");int n = attrib(basering, "lV");
- if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
- if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
- list L;
- L = lp2ivId(normalize(lead(G)));
- L = ivSickleHil(L,n,degbound);
- L[2] =  ivL2lpI(L[2]);
- return(L);
+  if (size(#) > 0){if (typeof(#[1])=="int"){if (#[1] >= 0){degbound = #[1];}}}
+  if (size(#) > 1){if (typeof(#[1])=="int"){if (#[2] > 0){n = #[2];}}}
+  list L;
+  L = lp2ivId(normalize(lead(G)));
+  L = ivSickleHil(L,n,degbound);
+  L[2] =  ivL2lpI(L[2]);
+  return(L);
 }
 example
 {
@@ -1915,31 +1917,31 @@ NOTE:   The returned object will always be a list, but the entries of the
 EXAMPLE: example sickle; shows examples
 "
 {int m,d,h,degbound;
- m = 1; d = 0; h = 0; degbound = attrib(basering,"uptodeg");
- if (size(#) > 0) {if (typeof(#[1])=="int"){if (#[1] < 1) {m = 0;}}}
- if (size(#) > 1) {if (typeof(#[1])=="int"){if (#[2] > 0) {d = 1;}}}
- if (size(#) > 2) {if (typeof(#[1])=="int"){if (#[3] > 0) {h = 1;}}}
- if (size(#) > 3) {if (typeof(#[1])=="int"){if (#[4] >= 0) {degbound = #[4];}}}
- if (m == 1)
- {if (d == 0)
-  {if (h == 0) {return(lpSickle(G,degbound,attrib(basering,"lV")));}
-   else        {return(lpSickleHil(G,degbound,attrib(basering,"lV")));}
+  m = 1; d = 0; h = 0; degbound = attrib(basering,"uptodeg");
+  if (size(#) > 0) {if (typeof(#[1])=="int"){if (#[1] < 1) {m = 0;}}}
+  if (size(#) > 1) {if (typeof(#[1])=="int"){if (#[2] > 0) {d = 1;}}}
+  if (size(#) > 2) {if (typeof(#[1])=="int"){if (#[3] > 0) {h = 1;}}}
+  if (size(#) > 3) {if (typeof(#[1])=="int"){if (#[4] >= 0) {degbound = #[4];}}}
+  if (m == 1)
+  {if (d == 0)
+    {if (h == 0) {return(lpSickle(G,degbound,attrib(basering,"lV")));}
+      else        {return(lpSickleHil(G,degbound,attrib(basering,"lV")));}
+    }
+    else
+    {if (h == 0) {return(lpSickleDim(G,degbound,attrib(basering,"lV")));}
+      else {return(lpDHilbertSickle(G,degbound,attrib(basering,"lV")));}
+    }
   }
   else
-  {if (h == 0) {return(lpSickleDim(G,degbound,attrib(basering,"lV")));}
-   else {return(lpDHilbertSickle(G,degbound,attrib(basering,"lV")));}
+  {if (d == 0)
+    {if (h == 0) {ERROR("You request to do nothing, so relax and do so");}
+      else        {return(lpHilbert(G,degbound,attrib(basering,"lV")));}
+    }
+    else
+    {if (h == 0) {return(lpKDim(G,degbound,attrib(basering,"lV")));}
+      else {return(lpDHilbert(G,degbound,attrib(basering,"lV")));}
+    }
   }
- }
- else
- {if (d == 0)
-  {if (h == 0) {ERROR("You request to do nothing, so relax and do so");}
-   else        {return(lpHilbert(G,degbound,attrib(basering,"lV")));}
-  }
-  else
-  {if (h == 0) {return(lpKDim(G,degbound,attrib(basering,"lV")));}
-   else {return(lpDHilbert(G,degbound,attrib(basering,"lV")));}
-  }
- }
 }
 example
 {
@@ -1960,34 +1962,34 @@ example
 
 proc tst_fpadim()
 {
- example ivDHilbert;
- example ivDHilbertSickle;
- example ivDimCheck;
- example ivHilbert;
- example ivKDim;
- example ivMis2Dim;
- example ivOrdMisLex;
- example ivSickle;
- example ivSickleHil;
- example ivSickleDim;
- example lpDHilbert;
- example lpDHilbertSickle;
- example lpHilbert;
- example lpDimCheck;
- example lpKDim;
- example lpMis2Dim;
- example lpOrdMisLex;
- example lpSickle;
- example lpSickleHil;
- example lpSickleDim;
- example sickle;
- example ivL2lpI;
- example iv2lp;
- example iv2lpList;
- example iv2lpMat;
- example lp2iv;
- example lp2ivId;
- example lpId2ivLi;
+  example ivDHilbert;
+  example ivDHilbertSickle;
+  example ivDimCheck;
+  example ivHilbert;
+  example ivKDim;
+  example ivMis2Dim;
+  example ivOrdMisLex;
+  example ivSickle;
+  example ivSickleHil;
+  example ivSickleDim;
+  example lpDHilbert;
+  example lpDHilbertSickle;
+  example lpHilbert;
+  example lpDimCheck;
+  example lpKDim;
+  example lpMis2Dim;
+  example lpOrdMisLex;
+  example lpSickle;
+  example lpSickleHil;
+  example lpSickleDim;
+  example sickle;
+  example ivL2lpI;
+  example iv2lp;
+  example iv2lpList;
+  example iv2lpMat;
+  example lp2iv;
+  example lp2ivId;
+  example lpId2ivLi;
 }
 
 
@@ -1995,83 +1997,83 @@ proc tst_fpadim()
 
 
 /*
-Here are some examples one may try. Just copy them into your console.
-These are relations for braid groups, up to degree d:
+  Here are some examples one may try. Just copy them into your console.
+  These are relations for braid groups, up to degree d:
 
 
-LIB "fpadim.lib";
-ring r = 0,(x,y,z),dp;
-int d =10; // degree
-def R = makeLetterplaceRing(d);
-setring R;
-ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
-z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
-z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
-option(prot);
-option(redSB);option(redTail);option(mem);
-ideal J = system("freegb",I,d,3);
-lpDimCheck(J);
-sickle(J,1,1,1,d);//Computes mistletoes, K-dimension and the Hilbert series
-
-
-
-LIB "fpadim.lib";
-ring r = 0,(x,y,z),dp;
-int d =11; // degree
-def R = makeLetterplaceRing(d);
-setring R;
-ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*z(3) - z(1)*x(2)*y(3),
-z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
-z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
-option(prot);
-option(redSB);option(redTail);option(mem);
-ideal J = system("freegb",I,d,3);
-lpDimCheck(J);
-sickle(J,1,1,1,d);
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  int d =10; // degree
+  def R = makeLetterplaceRing(d);
+  setring R;
+  ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
+  z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
+  z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
+  option(prot);
+  option(redSB);option(redTail);option(mem);
+  ideal J = system("freegb",I,d,3);
+  lpDimCheck(J);
+  sickle(J,1,1,1,d);//Computes mistletoes, K-dimension and the Hilbert series
 
 
 
-LIB "fpadim.lib";
-ring r = 0,(x,y,z),dp;
-int d  = 6; // degree
-def R  = makeLetterplaceRing(d);
-setring R;
-ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
-z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) -2*y(1)*y(2)*y(3) + 3*z(1)*z(2)*z(3) -4*x(1)*y(2)*z(3) + 5*x(1)*z(2)*z(3)- 6*x(1)*y(2)*y(3) +7*x(1)*x(2)*z(3) - 8*x(1)*x(2)*y(3);
-option(prot);
-option(redSB);option(redTail);option(mem);
-ideal J = system("freegb",I,d,3);
-lpDimCheck(J);
-sickle(J,1,1,1,d);
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  int d =11; // degree
+  def R = makeLetterplaceRing(d);
+  setring R;
+  ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*z(3) - z(1)*x(2)*y(3),
+  z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) +
+  z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
+  option(prot);
+  option(redSB);option(redTail);option(mem);
+  ideal J = system("freegb",I,d,3);
+  lpDimCheck(J);
+  sickle(J,1,1,1,d);
+
+
+
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  int d  = 6; // degree
+  def R  = makeLetterplaceRing(d);
+  setring R;
+  ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3),
+  z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) -2*y(1)*y(2)*y(3) + 3*z(1)*z(2)*z(3) -4*x(1)*y(2)*z(3) + 5*x(1)*z(2)*z(3)- 6*x(1)*y(2)*y(3) +7*x(1)*x(2)*z(3) - 8*x(1)*x(2)*y(3);
+  option(prot);
+  option(redSB);option(redTail);option(mem);
+  ideal J = system("freegb",I,d,3);
+  lpDimCheck(J);
+  sickle(J,1,1,1,d);
 */
 
 /*
-Here are some examples, which can also be found in [studzins]:
+  Here are some examples, which can also be found in [studzins]:
 
-// takes up to 880Mb of memory
-LIB "fpadim.lib";
-ring r = 0,(x,y,z),dp;
-int d =10; // degree
-def R = makeLetterplaceRing(d);
-setring R;
-ideal I =
-z(1)*z(2)*z(3)*z(4) + y(1)*x(2)*y(3)*x(4) - x(1)*y(2)*y(3)*x(4) - 3*z(1)*y(2)*x(3)*z(4), x(1)*x(2)*x(3) + y(1)*x(2)*y(3) - x(1)*y(2)*x(3), z(1)*y(2)*x(3)-x(1)*y(2)*z(3) + z(1)*x(2)*z(3);
-option(prot);
-option(redSB);option(redTail);option(mem);
-ideal J = system("freegb",I,d,nvars(r));
-lpDimCheck(J);
-sickle(J,1,1,1,d); // dimension is 24872
+  // takes up to 880Mb of memory
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  int d =10; // degree
+  def R = makeLetterplaceRing(d);
+  setring R;
+  ideal I =
+  z(1)*z(2)*z(3)*z(4) + y(1)*x(2)*y(3)*x(4) - x(1)*y(2)*y(3)*x(4) - 3*z(1)*y(2)*x(3)*z(4), x(1)*x(2)*x(3) + y(1)*x(2)*y(3) - x(1)*y(2)*x(3), z(1)*y(2)*x(3)-x(1)*y(2)*z(3) + z(1)*x(2)*z(3);
+  option(prot);
+  option(redSB);option(redTail);option(mem);
+  ideal J = system("freegb",I,d,nvars(r));
+  lpDimCheck(J);
+  sickle(J,1,1,1,d); // dimension is 24872
 
 
-LIB "fpadim.lib";
-ring r = 0,(x,y,z),dp;
-int d =10; // degree
-def R = makeLetterplaceRing(d);
-setring R;
-ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
-option(prot);
-option(redSB);option(redTail);option(mem);
-ideal J = system("freegb",I,d,3);
-lpDimCheck(J);
-sickle(J,1,1,1,d);
+  LIB "fpadim.lib";
+  ring r = 0,(x,y,z),dp;
+  int d =10; // degree
+  def R = makeLetterplaceRing(d);
+  setring R;
+  ideal I = x(1)*y(2) + y(1)*z(2), x(1)*x(2) + x(1)*y(2) - y(1)*x(2) - y(1)*y(2);
+  option(prot);
+  option(redSB);option(redTail);option(mem);
+  ideal J = system("freegb",I,d,3);
+  lpDimCheck(J);
+  sickle(J,1,1,1,d);
 */
