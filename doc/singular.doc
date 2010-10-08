@@ -373,7 +373,6 @@ LIB "all.lib";
 * primitiv_lib:: procedures for finding a primitive element
 * realrad_lib:: procedures for finding the real radical
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
-* resbin_lib:: Resolution of singularities of binomial ideals
 * sagbi_lib:: Subalgebras bases Analogous to Groebner bases for ideals
 * sing4ti2_lib:: interface to program 4ti2
 * toric_lib:: toric ideals
@@ -460,15 +459,11 @@ LIB "all.lib";
 @subsection realrad_lib
 @c lib realrad.lib
 @c ---------------------------------------------------------
-@node reesclos_lib, resbin_lib, realrad_lib, Commutative algebra
+@node reesclos_lib, sagbi_lib, realrad_lib, Commutative algebra
 @subsection reesclos_lib
 @c lib reesclos.lib
 @c ---------------------------------------------------------
-@node resbin_lib, sagbi_lib, reesclos_lib, Commutative algebra
-@subsection resbin_lib
-@c lib resbin.lib
-@c ---------------------------------------------------------
-@node sagbi_lib, sing4ti2_lib, resbin_lib, Commutative algebra
+@node sagbi_lib, sing4ti2_lib, reesclos_lib, Commutative algebra
 @subsection sagbi_lib
 @c lib sagbi.lib
 @c ---------------------------------------------------------
@@ -894,6 +889,7 @@ Comments should be send to the author of the library directly.
 * multigrading_lib:: Multigradings and related computations
 * paraplanecurves_lib:: Rational parametrization of rational plane curves
 * primdecint_lib:: primary decomposition over the integers
+* resbin_lib:: Resolution of singularities of binomial ideals
 * surfacesignature_lib:: signature of surface singularities
 @end menu
 @c ----------------------------------------------------------
@@ -962,7 +958,7 @@ Todos/Issues:
 @c lib paraplanecurves.lib
 
 @c ----------------------------------------------------------
-@node primdecint_lib,surfacesignature_lib,paraplanecurves_lib, Experimental libraries
+@node primdecint_lib,resbin_lib,paraplanecurves_lib, Experimental libraries
 @subsection primdecint_lib
 @cindex primdecint_lib
 
@@ -972,8 +968,18 @@ Todos/Issues:
 
 @c lib primdecint.lib
 
+@c ---------------------------------------------------------
+@node resbin_lib, surfacesignature_lib, primdecint_lib, Experimental libraries
+@subsection resbin_lib
+Todos/Issues:
+@itemize
+@item formatting is inapprociate
+@item avoid export
+@end itemize
+
+@c lib resbin.lib
 @c ----------------------------------------------------------
-@node surfacesignature_lib,,primdecint_lib, Experimental libraries
+@node surfacesignature_lib,,resbin_lib, Experimental libraries
 @subsection surfacesignature_lib
 @cindex surfacesignature_lib
 
