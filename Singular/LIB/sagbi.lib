@@ -11,7 +11,7 @@ PROCEDURES:
  sagbiReduce(I,A);     subalgebra reduction of I by A
  sagbi(A [,m,t]);      SAGBI basis for A
  sagbiPart(A,k[,m]);   partial SAGBI basis for A
- algDep(I,it);         iteration of SAGBI for algebraic dependencies of I
+ algebraicDependence(I,it); iteration of SAGBI for algebraic dependencies of I
 
 SEE ALSO: algebra_lib
 ";
@@ -79,7 +79,7 @@ static proc extendRing(r, ideal leadTermsAlgebra, int method) {
   // VL : todo noncomm case: correctly use l[5] and l[6]
   // that is update matrices
   // at the moment this is troublesome, so use nc_algebra call
-  // see how it done in algDep proc // VL
+  // see how it done in algebraicDependence proc // VL
   def rNew=ring(l);
   setring br;
   return(rNew);
@@ -764,10 +764,10 @@ example
 //DONE? 1nsen als werden noch mit ausgegeben, aus algebraischen Abhängigkeiten entfernen
 // VL: finished the documentation
 // TO comapre with algDependent from algebra_lib
-proc algDep(ideal I,int iterations)
-"USAGE: algDep(I,it); I an an ideal, it is an integer
+proc algebraicDependence(ideal I,int iterations)
+"USAGE: algebraicDependence(I,it); I an an ideal, it is an integer
 RETURN: In 'it' iterations, compute algebraic dependencies between elements of I
-EXAMPLE: example algDep; shows an example"
+EXAMPLE: example algebraicDependence; shows an example"
 {
   def br=basering;
   int i;
@@ -868,13 +868,13 @@ example
   ideal I=x^2, xy-y2, xy2;
   //---------------------------------------------------
   //Call with two iterations
-  def DI = algDep(I,2);
+  def DI = algebraicDependence(I,2);
   setring DI; algDep;
   // we see that no dependency has been seen so far
   //---------------------------------------------------
   //Call with two iterations
   setring r; kill DI;
-  def DI = algDep(I,3);
+  def DI = algebraicDependence(I,3);
   setring DI; algDep;
   map F = DI,x,y,x^2, xy-y2, xy2;
   F(algDep); // we see that it is a dependence indeed
@@ -1069,6 +1069,6 @@ example
   ideal J=x^2, xy-y2, xy2, x^2*(x*y-y^2)^2 - (x*y^2)^2*x^4 + 11;
   //---------------------------------------------------
   //Call with two iterations
-  def DI = algDep(J,2);
+  def DI = algebraicDependence(J,2);
   setring DI; algDep;
 */
