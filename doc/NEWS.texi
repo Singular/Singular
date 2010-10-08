@@ -53,16 +53,6 @@ new command: @code{rank} (see @nref{rank})
 @code{pipe}: string based interface to any program (see @nref{Pipe links})
 @end itemize
 
-@heading Changed @sc{Singular} libraries
-@itemize @bullet
-@item
-extended library: modstd.lib (see @nref{modstd_lib}: Groebner basis via modular methods
-@item
-extended library: normal.lib (see @nref{normal_lib}:Normalization of Affine Rings)
-@item
-rewritten library: sagbi.lib (see @nref{sagbi_lib}: subalgebra bases analogous to Groebner bases for ideals)
-@end itemize
-
 @heading New @sc{Singular} libraries
 @itemize @bullet
 @item
@@ -79,6 +69,16 @@ new library: resbin.lib (see @nref{resbin_lib}: resolution of singularities of b
 new library: resjung.lib (see @nref{resjung_lib}: resolution of surface singularities by Jung's Algorithm
 @item
 new library: surfacesignature.lib (see @nref{surfacesignature_lib}: signature of irreducible surface singularities
+@end itemize
+
+@heading Changed @sc{Singular} libraries
+@itemize @bullet
+@item
+extended library: modstd.lib (see @nref{modstd_lib}: Groebner basis via modular methods
+@item
+extended library: normal.lib (see @nref{normal_lib}:Normalization of Affine Rings)
+@item
+rewritten library: sagbi.lib (see @nref{sagbi_lib}: subalgebra bases analogous to Groebner bases for ideals)
 @end itemize
 
 @heading Internal Changes

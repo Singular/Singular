@@ -481,22 +481,17 @@ LIB "all.lib";
 
 @menu
 * resgraph_lib:: Visualization of Resolution data
-* resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
 * resolve_lib:: Resolution of Singularities
 * reszeta_lib:: Applications of Resolution of Singularities
 * sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
 @end menu
 
 @c ---------------------------------------------------------
-@node resgraph_lib, resjung_lib, Algebraic geometry, Algebraic geometry
+@node resgraph_lib, resolve_lib, Algebraic geometry, Algebraic geometry
 @subsection resgraph_lib
 @c lib resgraph.lib
 @c ---------------------------------------------------------
-@node resjung_lib, resolve_lib, resgraph_lib, Algebraic geometry
-@subsection resjung_lib
-@c lib resjung.lib
-@c ---------------------------------------------------------
-@node resolve_lib, reszeta_lib, resjung_lib, Algebraic geometry
+@node resolve_lib, reszeta_lib, resgraph_lib, Algebraic geometry
 @subsection resolve_lib
 @c lib resolve.lib
 @c ---------------------------------------------------------
@@ -890,6 +885,7 @@ Comments should be send to the author of the library directly.
 * paraplanecurves_lib:: Rational parametrization of rational plane curves
 * primdecint_lib:: primary decomposition over the integers
 * resbin_lib:: Resolution of singularities of binomial ideals
+* resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
 * surfacesignature_lib:: signature of surface singularities
 @end menu
 @c ----------------------------------------------------------
@@ -982,8 +978,17 @@ iniD, reslist, sumlist, dividelist, createlist, list0
 @end itemize
 
 @c lib resbin.lib
+@c ---------------------------------------------------------
+@node resjung_lib, surfacesignature_lib, resbin_lib, Experimental libraries
+@subsection resjung_lib
+
+Todos/Issues:
+@itemize
+@end itemize
+
+@c lib resjung.lib
 @c ----------------------------------------------------------
-@node surfacesignature_lib,,resbin_lib, Experimental libraries
+@node surfacesignature_lib,,resjung_lib, Experimental libraries
 @subsection surfacesignature_lib
 @cindex surfacesignature_lib
 
