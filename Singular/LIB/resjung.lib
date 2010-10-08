@@ -22,9 +22,9 @@ REFERENCES:
 [1] Jung, H.: Darstellung der Funktionen eines algebraischen Koerpers zweier unabhaengigen
 Veraenderlichen x,y in der Umgebung x=a, y= b, Journal fuer Reine und Angewandte Mathematik 133,289-314 (1908)
 @*  (the origin of this method)
-[2] J.Kollar: Lectures on Resolution of Singularities, Princeton University Press (2007)
+@*[2] J.Kollar: Lectures on Resolution of Singularities, Princeton University Press (2007)
 @*  (contains large overview over various known methods for curves and surfaces as well as
-@*   a detailed description of the approach in the general case)
+   a detailed description of the approach in the general case)
 
 PROCEDURES:
  jungresolve(J,i)  computes a resolution of the surface given by the
