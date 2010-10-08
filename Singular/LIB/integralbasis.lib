@@ -176,7 +176,13 @@ static proc integralBasisMain(poly f, string algorithm, ideal inputJ, ideal inpu
 
 //--------------------- moving to a ring with dp ordering ---------------------
   if(ordstr(origR) != "dp(2),C"){
-    ring R = 0, (var(1), var(2)), dp;
+    // We change to dp ordering.
+    list rl = ringlist(origR);
+    list origOrd = rl[3];
+    list newOrd = list("dp", intvec(1:nvars(origR))), list("C", 0);
+    rl[3] = newOrd;
+    def R = ring(rl);
+    setring R;
     poly f = fetch(origR, f);
     ideal inputJ = fetch(origR, inputJ);
     ideal inputC = fetch(origR, inputC);
