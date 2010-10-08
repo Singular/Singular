@@ -332,47 +332,44 @@ void cancelunit (LObject* L,BOOLEAN inNF)
 
   if(p_GetComp(p, r) != 0 && !p_OneComp(p, r)) return;
 
-  if (L->ecart != 0)
-  {
 //    for(i=r->N;i>0;i--)
 //    {
 //      if ((p_GetExp(p,i,r)>0) && (rIsPolyVar(i, r)==TRUE)) return;
 //    }
-    h = pNext(p);
+  h = pNext(p);
+  loop
+  {
+    if (h==NULL)
+    {
+      p_Delete(&pNext(p), r);
+      if (!inNF)
+      {
+        number eins=nInit(1);
+        if (L->p != NULL)  pSetCoeff(L->p,eins);
+        else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
+        if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
+      }
+      L->ecart = 0;
+      L->length = 1;
+      //if (L->pLength > 0)
+      L->pLength = 1;
+      if (L->last != NULL) L->last = p;
+      L->max = NULL;
+
+      if (L->t_p != NULL && pNext(L->t_p) != NULL)
+        pNext(L->t_p) = NULL;
+      if (L->p != NULL && pNext(L->p) != NULL)
+        pNext(L->p) = NULL;
+      return;
+    }
+    i = 0;
     loop
     {
-      if (h==NULL)
-      {
-        p_Delete(&pNext(p), r);
-        if (!inNF)
-        {
-          number eins=nInit(1);
-          if (L->p != NULL)  pSetCoeff(L->p,eins);
-          else if (L->t_p != NULL) nDelete(&pGetCoeff(L->t_p));
-          if (L->t_p != NULL) pSetCoeff0(L->t_p,eins);
-        }
-        L->ecart = 0;
-        L->length = 1;
-        //if (L->pLength > 0)
-        L->pLength = 1;
-        if (L->last != NULL) L->last = p;
-        L->max = NULL;
-
-        if (L->t_p != NULL && pNext(L->t_p) != NULL)
-          pNext(L->t_p) = NULL;
-        if (L->p != NULL && pNext(L->p) != NULL)
-          pNext(L->p) = NULL;
-        return;
-      }
-      i = 0;
-      loop
-      {
-        i++;
-        if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
-        if (i == r->N) break; // does divide, try next monom
-      }
-      pIter(h);
+      i++;
+      if (p_GetExp(p,i,r) > p_GetExp(h,i,r)) return ; // does not divide
+      if (i == r->N) break; // does divide, try next monom
     }
+    pIter(h);
   }
 }
 
