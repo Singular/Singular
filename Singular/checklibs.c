@@ -11,10 +11,10 @@ int verylong_lines=0;
 int lines=0;
 unsigned char buf[LINE_LEN];
 int proc_cnt=0;
-char *proc[NUM_PROC];
-char have_doc[NUM_PROC];
-char have_example[NUM_PROC];
-char proc_found[NUM_PROC];
+unsigned char *proc[NUM_PROC];
+unsigned char have_doc[NUM_PROC];
+unsigned char have_example[NUM_PROC];
+unsigned char proc_found[NUM_PROC];
 int non_ascii=0;
 int non_ascii_line=0;
 int star_nl=0;
@@ -51,13 +51,13 @@ void get_next()
 
 void scan_proc(int *l)
 {
-  char *p;
+  unsigned char *p;
   while(1)
   {
     get_next(); (*l)++;
     if (((p=strchr(buf,'('))!=NULL)&&(isalnum(*(--p))||(*p=='_')))
     {
-      char *s=buf;
+      unsigned char *s=buf;
       while(*s==' ') s++;
       p++; (*p)='\0';
       if ((((int)(long)(s-buf))>10)||(strchr(s,' ')!=NULL))
@@ -79,7 +79,7 @@ void scan_proc(int *l)
     { /* handles all capital letters + : */
       /* SEE ALSO, KEYWORDS, NOTE, ... */
       int ch;
-      char *pp=buf;
+      unsigned char *pp=buf;
       while((*pp==' ')||(*pp=='\t')) pp++;
       ch=strspn(pp,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
       if ((ch>1)||(pp+ch==p))
@@ -97,7 +97,7 @@ void scan_keywords(int *l)
 {
   /* the main problem with KEYWORDS: seperator between is ;,
    * but it MUST NOT appear at the end */
-  char *p;
+  unsigned char *p;
   while(!feof(f))
   {
     p=strrchr(buf,';'); /* the last ; in the line*/
@@ -113,7 +113,7 @@ void scan_keywords(int *l)
     { /* handles all capital letters + : */
       /* SEE ALSO, KEYWORDS, NOTE, ... */
       int ch;
-      char *pp=buf;
+      unsigned char *pp=buf;
       while((*pp==' ')||(*pp=='\t')) pp++;
       ch=strspn(pp,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
       if ((ch>1)||(pp+ch==p))
@@ -135,7 +135,7 @@ void scan_info(int *l)
   int have_NOTE=0;
   int have_other=0;
   int texinfo=0;
-  char *p;
+  unsigned char *p;
 
   while(!feof(f))
   {
@@ -175,7 +175,7 @@ void scan_info(int *l)
     }
     else if ((p=strstr(buf,"PROCEDURES:"))!=NULL)
     {
-      char *pp=buf;
+      unsigned char *pp=buf;
       while (pp!=p)
       {
        if ((*pp!=' ')&&(*pp!='\t')) break;
@@ -196,7 +196,7 @@ void scan_info(int *l)
     else if ((p=strstr(buf,":"))!=NULL)
     {
       int ch;
-      char *pp=buf;
+      unsigned char *pp=buf;
       while((*pp==' ')||(*pp=='\t')) pp++;
       ch=strspn(pp,"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
       if ((ch>1)||(pp+ch==p))
@@ -258,7 +258,7 @@ int main(int argc, char** argv)
   int have_version=0;
   int have_category=0;
   int have_info=0;
-  char *p;
+  unsigned char *p;
 
   memset(proc,0,NUM_PROC*sizeof(char*));
   memset(have_doc,0,NUM_PROC);
@@ -279,7 +279,7 @@ int main(int argc, char** argv)
   {
     if ((p=strstr(buf,"version="))!=NULL)
     {
-      char *pp=buf;
+      unsigned char *pp=buf;
       while (pp!=p)
       {
        if ((*pp!=' ')&&(*pp!='\t')) break;
@@ -296,7 +296,7 @@ int main(int argc, char** argv)
     }
     if ((p=strstr(buf,"category="))!=NULL)
     {
-      char *pp=buf;
+      unsigned char *pp=buf;
       while (pp!=p)
       {
        if ((*pp!=' ')&&(*pp!='\t')) break;
@@ -306,7 +306,7 @@ int main(int argc, char** argv)
     }
     if ((p=strstr(buf,"info="))!=NULL)
     {
-      char *pp=buf;
+      unsigned char *pp=buf;
       while (pp!=p)
       {
        if ((*pp!=' ')&&(*pp!='\t')) break;
@@ -340,7 +340,7 @@ int main(int argc, char** argv)
   /* part 2: procs */
   while(!feof(f))
   {
-    if ((strstr(buf,"static")==buf) && (strstr(buf,"proc")==NULL))
+    if ((strstr(buf,"static")==(char*)buf) && (strstr(buf,"proc")==NULL))
     {
       printf("error: 'static' without 'proc' found\n");
       get_next();
@@ -348,7 +348,7 @@ int main(int argc, char** argv)
     if(((p=strstr(buf,"proc "))!=NULL)
     &&(strncmp(buf,"static proc ",12)!=0))
     {
-      char *pp=buf;
+      unsigned char *pp=buf;
       int i;
       while(*pp==' ') pp++;
       if ((pp!=buf)&&(pp==p))
