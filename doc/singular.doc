@@ -887,16 +887,13 @@ Comments should be send to the author of the library directly.
 * resbin_lib:: Resolution of singularities of binomial ideals
 * resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
 * surfacesignature_lib:: signature of surface singularities
+* ncfactor_lib::Tools for factorization in some noncommutative algebras
 @end menu
 @c ----------------------------------------------------------
 
 @node fpadim_lib, findiff_lib, , Experimental libraries
 @subsection fpadim_lib
 @cindex fpadim_lib
-
-Issues:
-@itemize
-@end itemize
 
 @c lib fpadim.lib
 @c ----------------------------------------------------------
@@ -924,10 +921,6 @@ Issues:
 @subsection integralbasis_lib
 @cindex integralbasis_lib
 
-Issues:
-@itemize
-@end itemize
-
 @c lib integralbasis.lib
 
 @c ----------------------------------------------------------
@@ -947,20 +940,12 @@ Todos/Issues:
 @subsection paraplanecurves_lib
 @cindex paraplanecurves_lib
 
-Todos/Issues:
-@itemize
-@end itemize
-
 @c lib paraplanecurves.lib
 
 @c ----------------------------------------------------------
 @node primdecint_lib,resbin_lib,paraplanecurves_lib, Experimental libraries
 @subsection primdecint_lib
 @cindex primdecint_lib
-
-Todos/Issues:
-@itemize
-@end itemize
 
 @c lib primdecint.lib
 
@@ -982,21 +967,20 @@ iniD, reslist, sumlist, dividelist, createlist, list0
 @node resjung_lib, surfacesignature_lib, resbin_lib, Experimental libraries
 @subsection resjung_lib
 
-Todos/Issues:
-@itemize
-@end itemize
-
 @c lib resjung.lib
 @c ----------------------------------------------------------
-@node surfacesignature_lib,,resjung_lib, Experimental libraries
+@node surfacesignature_lib,ncfactor_lib,resjung_lib, Experimental libraries
 @subsection surfacesignature_lib
 @cindex surfacesignature_lib
 
-Issues:
-@itemize
-@end itemize
-
 @c lib surfacesignature.lib
+
+@c ----------------------------------------------------------
+@node ncfactor_lib,,surfacesignature_lib, Experimental libraries
+@subsection ncfactor_lib
+@cindex ncfactor_lib
+
+@c lib ncfactor.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
