@@ -20,7 +20,8 @@ OVERVIEW: This library implements resolution of singularities by Jung's algorith
 @*        implemented yet.
 REFERENCES:
 [1] Jung, H.: Darstellung der Funktionen eines algebraischen Koerpers zweier unabhaengigen
-Veraenderlichen x,y in der Umgebung x=a, y= b, Journal fuer Reine und Angewandte Mathematik 133,289-314 (1908)
+Veraenderlichen x,y in der Umgebung x=a, y= b, Journal fuer Reine und Angewandte Mathematik 
+133,289-314 (1908)
 @*  (the origin of this method)
 @*[2] J.Kollar: Lectures on Resolution of Singularities, Princeton University Press (2007)
 @*  (contains large overview over various known methods for curves and surfaces as well as
@@ -32,8 +33,7 @@ PROCEDURES:
 
  clocus(J)         computes the critical locus of the projection of V(J)
                    onto the coordinate plane of the last two coordinates
- embR(C)           computes a strong embedded resolution of
-                   the plane curve V(C)
+ embR(C)           computes a strong embedded resolution of the plane curve V(C)
  jungnormal(J,i)   computes intermediate step in Jung's algorithm
                    such that all singularities are of Hirzebruch-Jung type
 ";
@@ -108,7 +108,8 @@ EXAMPLE: example clocus;  shows an example
     int index = 1;
     if(attrib(J,"isPrincipal")==0){
       setring R;
-      for(j = 1;j<=size(J);j++){   //determines the monic polynomial in var(i) with coefficents in C2
+      for(j = 1;j<=size(J);j++){   //determines the monic polynomial 
+                                   //in var(i) with coefficents in C2
         if(defined(w)) {kill w;}
         intvec w = leadexp(J[j]);
         attrib(w,"isMonic",1);
@@ -126,14 +127,16 @@ EXAMPLE: example clocus;  shows an example
       }
       setring A;
     }
-    product = product*resultant(J[index],diff(J[index],var(i)),var(i));   //Product of the discriminants, which lies in C2
+    product = product*resultant(J[index],diff(J[index],var(i)),var(i));   
+                       //Product of the discriminants, which lies in C2
     kill index,J,v;
   }
   ring C2 = 0,(var(n-1),var(n)),dp;
   setring C2;
   ideal Clocus = imap(A,product);      //the critical locus is contained in this
   ideal I = preimage(A,LastTwo,lowdim);
-  Clocus = radical(intersect(Clocus,I));  //radical is necessary since the resultant is not reduced in general
+  Clocus = radical(intersect(Clocus,I));  //radical is necessary since the 
+                                          //resultant is not reduced in general
   export(Clocus);
   return(C2);
 }
@@ -152,8 +155,7 @@ example
 // Build the fibre product of the embedded resolution and
 // the coordinate ring of the variety
 //-----------------------------------------------------------------------------
-static
-proc buildFP(list embR,ideal NoetherN, map phi){
+static proc buildFP(list embR,ideal NoetherN, map phi){
   def A = basering;
   int i,j,k;
   list fibreP;
@@ -259,8 +261,7 @@ example
   showBO(BO);
 }
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc resolve2(list BO){
+static proc resolve2(list BO){
 // computes an embedded resolution for the basic object BO
 // and returns a list of rings with BO -- specifically optimized
 // to our situation
@@ -433,8 +434,7 @@ proc resolve2(list BO){
   return(result);
 };
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc jungfib(ideal id, int noeth)
+static proc jungfib(ideal id, int noeth)
 "USAGE:  jungfib(ideal J, int i);
 @*       J = ideal
 @*       i = int
@@ -613,7 +613,7 @@ RETURN:  a list l of rings
          to the last two variables.
          If i=0 the algorithm computes a coordinate change such that J is in
          noether position.
-EXAMPLE: none
+EXAMPLE: example jungresolve; shows an example
 "
 {
   def A = basering;
@@ -667,8 +667,7 @@ example
    BMap;
 }
 ///////////////////////////////////////////////////////////////////////////////
-static
-proc NoetherP_test(ideal id){
+static proc NoetherP_test(ideal id){
   def A = basering;
   list ringA=ringlist(A);
   int i,j,k;
@@ -724,8 +723,7 @@ proc NoetherP_test(ideal id){
 //// copied from resolve.lib, deleting parts of procedures which are  ///
 //// not necessary in this setting                                    ///
 /////////////////////////////////////////////////////////////////////////
-static
-proc normalCrossing(ideal J,list E,ideal V)
+static proc normalCrossing(ideal J,list E,ideal V)
 "Internal procedure - no help and no example available
 "
 {
@@ -801,7 +799,7 @@ proc normalCrossing(ideal J,list E,ideal V)
 }
 //////////////////////////////////////////////////////////////////////////////
 
-proc zariski(ideal id){
+static proc zariski(ideal id){
   def A = basering;
   ideal QIdeal = std(id);
   ideal BMap= maxideal(1);
