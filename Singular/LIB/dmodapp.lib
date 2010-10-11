@@ -9,49 +9,49 @@ AUTHORS: Viktor Levandovskyy,  levandov@math.rwth-aachen.de
 Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
 
 OVERVIEW: Let K be a field of characteristic 0, R = K[x1,...,xN] and
-@* D be the Weyl algebra in variables x1,...,xN,d1,...,dN.
-@* In this library there are the following procedures for algebraic D-modules:
-@*
+ D be the Weyl algebra in variables x1,...,xN,d1,...,dN.
+ In this library there are the following procedures for algebraic D-modules:
+
 @* - given a cyclic representation D/I of a holonomic module and a polynomial
-@* F in R, it is proved that the localization of D/I with respect to the mult.
-@* closed set of all powers of F is a holonomic D-module. Thus we aim to compute
-@* its cyclic representaion D/L for an ideal L in D. The procedures for the
-@* localization are DLoc, SDLoc and DLoc0.
-@*
+ F in R, it is proved that the localization of D/I with respect to the mult.
+ closed set of all powers of F is a holonomic D-module. Thus we aim to compute
+ its cyclic representaion D/L for an ideal L in D. The procedures for the
+ localization are DLoc, SDLoc and DLoc0.
+
 @* - annihilator in D of a given polynomial F from R as well as
-@* of a given rational function G/F from Quot(R). These can be computed via
-@* procedures annPoly resp. annRat.
-@*
+ of a given rational function G/F from Quot(R). These can be computed via
+ procedures annPoly resp. annRat.
+
 @* - Groebner bases with respect to weights (according to (SST), given an 
-@* arbitrary integer vector containing weights for variables, one computes the
-@* homogenization of a given ideal relative to this vector, then one computes a
-@* Groebner basis and returns the dehomogenization of the result), initial 
-@* forms and initial ideals in Weyl algebras with respect to a given weight
-@* vector can be computed with GBWeight, inForm, initialMalgrange and 
-@* initialIdealW.
-@*
+ arbitrary integer vector containing weights for variables, one computes the
+ homogenization of a given ideal relative to this vector, then one computes a
+ Groebner basis and returns the dehomogenization of the result), initial 
+ forms and initial ideals in Weyl algebras with respect to a given weight
+ vector can be computed with GBWeight, inForm, initialMalgrange and 
+ initialIdealW.
+
 @* - restriction and integration of a holonomic module D/I. Suppose I
-@* annihilates a function F(x1,...,xn). Our aim is to compute an ideal J
-@* directly from I, which annihilates
+ annihilates a function F(x1,...,xn). Our aim is to compute an ideal J
+ directly from I, which annihilates
 @*   - F(0,...,0,xk,...,xn) in case of restriction or
 @*   - the integral of F with respect to x1,...,xm in case of integration.
-@* The corresponding procedures are restrictionModule, restrictionIdeal,
-@* integralModule and integralIdeal.
-@*
+ The corresponding procedures are restrictionModule, restrictionIdeal,
+ integralModule and integralIdeal.
+
 @* - characteristic varieties defined by ideals in Weyl algebras can be computed
-@* with charVariety and charInfo.
-@*
+ with charVariety and charInfo.
+
 @* - appelF1, appelF2 and appelF4 return ideals in parametric Weyl algebras,
-@* which annihilate corresponding Appel hypergeometric functions.
+ which annihilate corresponding Appel hypergeometric functions.
 
 
 References:
 @* (SST) Saito, Sturmfels, Takayama 'Groebner Deformations of Hypergeometric
-@*         Differential Equations', Springer, 2000
+         Differential Equations', Springer, 2000
 @* (OTW) Oaku, Takayama, Walther 'A Localization Algorithm for D-modules',
-@*         Journal of Symbolic Computation, 2000
+         Journal of Symbolic Computation, 2000
 @* (OT)  Oaku, Takayama 'Algorithms for D-modules',
-@*         Journal of Pure and Applied Algebra, 1998
+         Journal of Pure and Applied Algebra, 1998
 
 
 PROCEDURES:
@@ -99,36 +99,36 @@ engine(I,i);   computes a Groebner basis with the algorithm specified by i
 isInt(n);      checks whether number n is actually an int
 sortIntvec(v); sorts intvec
 
-
-SEE ALSO: bfun_lib, dmod_lib, dmodvar_lib, gmssing_lib
-
-
 KEYWORDS: D-module; annihilator of polynomial; annihilator of rational function;
 D-localization; localization of D-module; D-restriction; restriction of 
 D-module; D-integration; integration of D-module; characteristic variety;
 Appel function; Appel hypergeometric function
+
+SEE ALSO: bfun_lib, dmod_lib, dmodvar_lib, gmssing_lib
 ";
 
-
 /*
-CHANGELOG
-21.09.10 by DA:
-- restructured library for better readability
-- new / improved procs: 
+  Changelog
+  21.09.10 by DA:
+  - restructured library for better readability
+  - new / improved procs: 
   - toolbox: isInt, intRoots, sortIntvec
   - GB wrt weights: GBWeight, initialIdealW rewritten using GBWeight
   - restriction/integration: restrictionX, integralX where X in {Module, Ideal},
-    fourier, inverseFourier, deRhamCohom, deRhamCohomIdeal
+  fourier, inverseFourier, deRhamCohom, deRhamCohomIdeal
   - characteristic variety: charVariety, charInfo
-- added keywords for features
-- reformated help strings and examples in existing procs
-- added SUPPORT in header
-- added reference (OT)
+  - added keywords for features
+  - reformated help strings and examples in existing procs
+  - added SUPPORT in header
+  - added reference (OT)
 
-04.10.10 by DA:
-- incorporated suggestions by Oleksandr Motsak, among other:
+  04.10.10 by DA:
+  - incorporated suggestions by Oleksandr Motsak, among other:
   - bugfixes for fl2poly, sortIntvec, annPoly, GBWeight
   - enhanced functionality for deleteGenerator, inForm
+
+  11.10.10 by DA:
+  - procedure bFactor now sorts the roots using new static procedure sortNumberIdeal
 */
 
 
@@ -232,7 +232,7 @@ static proc safeVarName (string s, string cv)
   }
   s = s[2..size(s)-1];
   return(s)
-}
+    }
 
 static proc intLike (def i)
 {
@@ -251,7 +251,7 @@ static proc intLike (def i)
 // toolbox ////////////////////////////////////////////////////////////////////
 
 proc engine(def I, int i)
-"USAGE:  engine(I,i);  I  ideal/module/matrix, i an int
+  "USAGE:  engine(I,i);  I  ideal/module/matrix, i an int
 RETURN:  the same type as I
 PURPOSE: compute the Groebner basis of I with the algorithm, chosen via i
 NOTE:    By default and if i=0, slimgb is used; otherwise std does the job.
@@ -286,7 +286,7 @@ example
 }
 
 proc poly2list (poly f)
-"USAGE:  poly2list(f); f a poly
+  "USAGE:  poly2list(f); f a poly
 RETURN:  list of exponents and corresponding terms of f
 PURPOSE: converts a poly to a list of pairs consisting of intvecs (1st entry)
 @*       and polys (2nd entry), where the i-th pair contains the exponent of the
@@ -325,7 +325,7 @@ example
 }
 
 proc fl2poly(list L, string s)
-"USAGE:  fl2poly(L,s); L a list, s a string
+  "USAGE:  fl2poly(L,s); L a list, s a string
 RETURN:  poly
 PURPOSE: reconstruct a monic polynomial in one variable from its factorization
 ASSUME:  s is a string with the name of some variable and
@@ -374,7 +374,7 @@ example
 }
 
 proc insertGenerator (list #)
-"USAGE:  insertGenerator(id,p[,k]);
+  "USAGE:  insertGenerator(id,p[,k]);
 @*       id an ideal/module, p a poly/vector, k an optional int
 RETURN:  of the same type as id
 PURPOSE: inserts p into id at k-th position and returns the enlarged object
@@ -455,7 +455,7 @@ example
 }
 
 proc deleteGenerator (def id, int k)
-"USAGE:   deleteGenerator(id,k);  id an ideal/module, k an int
+  "USAGE:   deleteGenerator(id,k);  id an ideal/module, k an int
 RETURN:   of the same type as id
 PURPOSE:  deletes the k-th generator from the first argument and returns
 @*        the altered object
@@ -500,8 +500,36 @@ example
   deleteGenerator(M,1);
 }
 
+static proc sortNumberIdeal (ideal I)
+// sorts ideal of constant polys (ie numbers), returns according permutation
+{
+  int i;
+  int nI = ncols(I);
+  intvec dI;
+  for (i=nI; i>0; i--)
+  {
+    dI[i] = int(denominator(leadcoef(I[i])));
+  }
+  int lcmI = lcm(dI);
+  for (i=nI; i>0; i--)
+  {
+    dI[i] = int(lcmI*leadcoef(I[i]));
+  }
+  intvec perm = sortIntvec(dI)[2];
+  return(perm);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,s,dp;
+  ideal I = -9/20,-11/20,-23/20,-19/20,-1,-13/10,-27/20,-13/20,-21/20,-17/20,
+    -11/10,-9/10,-7/10; // roots of BS poly of reiffen(4,5)
+  intvec v = sortNumberIdeal(I); v;
+  I[v];
+}
+
 proc bFactor (poly F)
-"USAGE:  bFactor(f);  f poly
+  "USAGE:  bFactor(f);  f poly
 RETURN:  list of ideal and intvec and possibly a string
 PURPOSE: tries to compute the roots of a univariate poly f
 NOTE:    The output list consists of two or three entries:
@@ -553,6 +581,9 @@ EXAMPLE: example bFactor; shows examples
   II = normalize(II);
   II = subst(II,var(1),0);
   II = -II;
+  intvec perm = sortNumberIdeal(II);
+  II = II[perm];
+  mm = mm[perm];
   if (size(II)>0)
   {
     dbprint(ppl,"// found roots");
@@ -590,7 +621,7 @@ example
 }
 
 proc isInt (number n)
-"USAGE:  isInt(n); n a number
+  "USAGE:  isInt(n); n a number
 RETURN:  int, 1 if n is an integer or 0 otherwise
 PURPOSE: check whether given object of type number is actually an int
 NOTE:    Parameters are treated as integers.
@@ -618,7 +649,7 @@ example
 }
 
 proc intRoots (list l)
-"USAGE:  isInt(L); L a list
+  "USAGE:  isInt(L); L a list
 RETURN:  list
 PURPOSE: extracts integer roots from a list given in @code{bFactor} format
 ASSUME:  The input list must be given in the format of @code{bFactor}.
@@ -677,7 +708,7 @@ example
 }
 
 proc sortIntvec (intvec v)
-"USAGE:  sortIntvec(v); v an intvec
+  "USAGE:  sortIntvec(v); v an intvec
 RETURN:  list of two intvecs
 PURPOSE: sorts an intvec
 NOTE:    In the output list L, the first entry consists of the entries of v
@@ -759,7 +790,7 @@ example
 // F-saturation ///////////////////////////////////////////////////////////////
 
 proc isFsat(ideal I, poly F)
-"USAGE:  isFsat(I, F);  I an ideal, F a poly
+  "USAGE:  isFsat(I, F);  I an ideal, F a poly
 RETURN:  int, 1  if I is F-saturated and 0 otherwise
 PURPOSE: checks whether the ideal I is F-saturated
 NOTE:    We check indeed that Ker(D--> F--> D/I) is 0, where D is the basering.
@@ -798,7 +829,7 @@ example
 // annihilators ///////////////////////////////////////////////////////////////
 
 proc annRat(poly g, poly f)
-"USAGE:   annRat(g,f);  f, g polynomials
+  "USAGE:   annRat(g,f);  f, g polynomials
 RETURN:   ring (a Weyl algebra) containing an ideal 'LD'
 PURPOSE:  compute the annihilator of the rational function g/f in the
 @*        corresponding Weyl algebra
@@ -915,16 +946,16 @@ example
   LD;
   // Now, compare with the output of Macaulay2:
   ideal tst = 3*x*Dx + 2*y*Dy + 1, y^3*Dy^2 - x^2*Dy^2 + 6*y^2*Dy + 6*y,
-9*y^2*Dx^2*Dy-4*y*Dy^3+27*y*Dx^2+2*Dy^2, 9*y^3*Dx^2-4*y^2*Dy^2+10*y*Dy -10;
- option(redSB); option(redTail);
- LD = groebner(LD);
- tst = groebner(tst);
- print(matrix(NF(LD,tst)));  print(matrix(NF(tst,LD)));
- // So, these two answers are the same
+    9*y^2*Dx^2*Dy-4*y*Dy^3+27*y*Dx^2+2*Dy^2, 9*y^3*Dx^2-4*y^2*Dy^2+10*y*Dy -10;
+  option(redSB); option(redTail);
+  LD = groebner(LD);
+  tst = groebner(tst);
+  print(matrix(NF(LD,tst)));  print(matrix(NF(tst,LD)));
+  // So, these two answers are the same
 }
 
 proc annPoly(poly f)
-"USAGE:   annPoly(f);  f a poly
+  "USAGE:   annPoly(f);  f a poly
 RETURN:   ring (a Weyl algebra) containing an ideal 'LD'
 PURPOSE:  compute the complete annihilator ideal of f in the corresponding
 @*        Weyl algebra
@@ -991,7 +1022,7 @@ example
 // localizations //////////////////////////////////////////////////////////////
 
 proc DLoc(ideal I, poly F)
-"USAGE:  DLoc(I, f);  I an ideal, f a poly
+  "USAGE:  DLoc(I, f);  I an ideal, f a poly
 RETURN:  list of ideal and list
 ASSUME:  the basering is a Weyl algebra
 PURPOSE: compute the presentation of the localization of D/I w.r.t. f^s
@@ -1045,7 +1076,7 @@ example;
 }
 
 proc DLoc0(ideal I, poly F)
-"USAGE:  DLoc0(I, f);  I an ideal, f a poly
+  "USAGE:  DLoc0(I, f);  I an ideal, f a poly
 RETURN:  ring (a Weyl algebra) containing an ideal 'LD0' and a list 'BS'
 PURPOSE: compute the presentation of the localization of D/I w.r.t. f^s,
 @*       where D is a Weyl Algebra, based on the output of procedure SDLoc
@@ -1090,7 +1121,8 @@ EXAMPLE: example DLoc0; shows examples
   poly p = K3[1];
   dbprint(ppl,"// -2-2- attempt the factorization");
   list PP = factorize(p);          //with constants and multiplicities
-  ideal bs; intvec m;             //the Bernstein polynomial is monic, so we are not interested in constants
+  ideal bs; intvec m;             //the Bernstein polynomial is monic, so 
+  // we are not interested in constants
   for (i=2; i<= size(PP[1]); i++)  //we delete P[1][1] and P[2][1]
   {
     bs[i-1] = PP[1][i];
@@ -1139,10 +1171,10 @@ EXAMPLE: example DLoc0; shows examples
         vP[cnt] = int(nP);
       }
     }
-//     if ( size(vP)>=2 )
-//     {
-//       vP = vP[2..size(vP)];
-//     }
+    //     if ( size(vP)>=2 )
+    //     {
+    //       vP = vP[2..size(vP)];
+    //     }
     if ( size(vP)==0 )
     {
       // no roots!
@@ -1158,8 +1190,8 @@ EXAMPLE: example DLoc0; shows examples
       dbprint(ppl,"// -2-4- minimal integer root found");
       dbprint(ppl-1, sP);
       //    int sP = minIntRoot(bbs,1);
-//       P =  normalize(P);
-//       bs = -subst(bs,s,0);
+      //       P =  normalize(P);
+      //       bs = -subst(bs,s,0);
       if (sP >=0)
       {
         dbprint(ppl,"// -2-5- nonnegative root, setting s0 = -1");
@@ -1286,7 +1318,7 @@ example;
 }
 
 proc SDLoc(ideal I, poly F)
-"USAGE:  SDLoc(I, f);  I an ideal, f a poly
+  "USAGE:  SDLoc(I, f);  I an ideal, f a poly
 RETURN:  ring (basering extended by a new variable) containing an ideal 'LD'
 PURPOSE: compute a generic presentation of the localization of D/I w.r.t. f^s
 ASSUME:  the basering D is a Weyl algebra over a field of characteristic 0
@@ -1504,7 +1536,7 @@ example;
 // Groebner basis wrt weights and initial ideal business //////////////////////
 
 proc GBWeight (ideal I, intvec u, intvec v, list #)
-"USAGE:  GBWeight(I,u,v [,s,t,w]);  
+  "USAGE:  GBWeight(I,u,v [,s,t,w]);  
 @*       I ideal, u,v intvecs, s,t optional ints, w an optional intvec
 RETURN:  ideal, Groebner basis of I w.r.t. the weights u and v
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
@@ -1640,7 +1672,7 @@ example
 }
 
 proc inForm (def I, intvec w)
-"USAGE:  inForm(I,w);  I ideal or poly, w intvec
+  "USAGE:  inForm(I,w);  I ideal or poly, w intvec
 RETURN:  ideal, generated by initial forms of generators of I w.r.t. w, or
 @*       poly, initial form of input poly w.r.t. w
 PURPOSE: computes the initial form of an ideal or a poly w.r.t. the weight w
@@ -1717,7 +1749,7 @@ example
 }
 
 proc initialIdealW(ideal I, intvec u, intvec v, list #)
-"USAGE:  initialIdealW(I,u,v [,s,t,w]);
+  "USAGE:  initialIdealW(I,u,v [,s,t,w]);
 @*       I ideal, u,v intvecs, s,t optional ints, w an optional intvec
 RETURN:  ideal, GB of initial ideal of the input ideal wrt the weights u and v
 ASSUME:  The basering is the n-th Weyl algebra in characteristic 0 and for all
@@ -1776,7 +1808,7 @@ example
 }
 
 proc initialMalgrange (poly f,list #)
-"USAGE:  initialMalgrange(f,[,a,b,v]); f poly, a,b optional ints, v opt. intvec
+  "USAGE:  initialMalgrange(f,[,a,b,v]); f poly, a,b optional ints, v opt. intvec
 RETURN:  ring, Weyl algebra induced by basering, extended by two new vars t,Dt
 PURPOSE: computes the initial Malgrange ideal of a given polynomial w.r.t. the
 @*       weight vector (-1,0...,0,1,0,...,0) such that the weight of t is -1
@@ -2142,7 +2174,7 @@ static proc restrictionModuleOutput (ideal B, ideal N, intvec w, int eng, string
 }
 
 proc restrictionModule (ideal I, intvec w, list #)
-"USAGE:  restrictionModule(I,w,[,eng,m,G]);
+  "USAGE:  restrictionModule(I,w,[,eng,m,G]);
 @*       I ideal, w intvec, eng and m optional ints, G optional ideal
 RETURN:  ring (a Weyl algebra) containing a module 'resMod'
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
@@ -2264,7 +2296,7 @@ static proc restrictionIdealEngine (ideal I, intvec w, string cf, list #)
 }
 
 proc restrictionIdeal (ideal I, intvec w, list #)
-"USAGE:  restrictionIdeal(I,w,[,eng,m,G]);
+  "USAGE:  restrictionIdeal(I,w,[,eng,m,G]);
 @*       I ideal, w intvec, eng and m optional ints, G optional ideal
 RETURN:  ring (a Weyl algebra) containing an ideal 'resIdeal'
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
@@ -2316,7 +2348,7 @@ example
 }
 
 proc fourier (ideal I, list #)
-"USAGE:  fourier(I[,v]); I an ideal, v an optional intvec
+  "USAGE:  fourier(I[,v]); I an ideal, v an optional intvec
 RETURN:  ideal
 PURPOSE: computes the Fourier transform of an ideal in a Weyl algebra
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
@@ -2385,7 +2417,7 @@ example
 }
 
 proc inverseFourier (ideal I, list #)
-"USAGE:  inverseFourier(I[,v]); I an ideal, v an optional intvec
+  "USAGE:  inverseFourier(I[,v]); I an ideal, v an optional intvec
 RETURN:  ideal
 PURPOSE: computes the inverse Fourier transform of an ideal in a Weyl algebra
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
@@ -2454,7 +2486,7 @@ example
 }
 
 proc integralModule (ideal I, intvec w, list #)
-"USAGE:  integralModule(I,w,[,eng,m,G]);
+  "USAGE:  integralModule(I,w,[,eng,m,G]);
 @*       I ideal, w intvec, eng and m optional ints, G optional ideal
 RETURN:  ring (a Weyl algebra) containing a module 'intMod'
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
@@ -2568,7 +2600,7 @@ example
 }
 
 proc integralIdeal (ideal I, intvec w, list #)
-"USAGE:  integralIdeal(I,w,[,eng,m,G]);
+  "USAGE:  integralIdeal(I,w,[,eng,m,G]);
 @*       I ideal, w intvec, eng and m optional ints, G optional ideal
 RETURN:  ring (a Weyl algebra) containing an ideal 'intIdeal'
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
@@ -2615,7 +2647,7 @@ example
 }
 
 proc deRhamCohomIdeal (ideal I, list #)
-"USAGE:  deRhamCohomIdeal (I[,w,eng,k,G]);
+  "USAGE:  deRhamCohomIdeal (I[,w,eng,k,G]);
 @*       I ideal, w optional intvec, eng and k optional ints, G optional ideal
 RETURN:  ideal
 ASSUME:  The basering is the n-th Weyl algebra D over a field of characteristic
@@ -2778,7 +2810,7 @@ example
 }
 
 proc deRhamCohom (poly f, list #)
-"USAGE:  deRhamCohom(f[,eng,m]);  f poly, eng and m optional ints
+  "USAGE:  deRhamCohom(f[,eng,m]);  f poly, eng and m optional ints
 RETURN:  ring (a Weyl Algebra) containing an ideal 'DR'
 ASSUME:  Basering is a commutative and over a field of characteristic 0.
 PURPOSE: computes a basis of the n-th de Rham cohomology group of the complement
@@ -2889,7 +2921,7 @@ example
 // Appel hypergeometric functions /////////////////////////////////////////////
 
 proc appelF1()
-"USAGE:  appelF1();
+  "USAGE:  appelF1();
 RETURN:  ring (a parametric Weyl algebra) containing an ideal 'IAppel1'
 PURPOSE: defines the ideal in a parametric Weyl algebra,
 @*       which annihilates Appel F1 hypergeometric function
@@ -2920,7 +2952,7 @@ example
 }
 
 proc appelF2()
-"USAGE:  appelF2();
+  "USAGE:  appelF2();
 RETURN:  ring (a parametric Weyl algebra) containing an ideal 'IAppel2'
 PURPOSE: defines the ideal in a parametric Weyl algebra,
 @*       which annihilates Appel F2 hypergeometric function
@@ -2950,7 +2982,7 @@ example
 }
 
 proc appelF4()
-"USAGE:  appelF4();
+  "USAGE:  appelF4();
 RETURN:  ring (a parametric Weyl algebra) containing an ideal 'IAppel4'
 PURPOSE: defines the ideal in a parametric Weyl algebra,
 @*       which annihilates Appel F4 hypergeometric function
@@ -2983,7 +3015,7 @@ example
 // characteric variety ////////////////////////////////////////////////////////
 
 proc charVariety(ideal I, list #)
-"USAGE:  charVariety(I [,eng]); I an ideal, eng an optional int
+  "USAGE:  charVariety(I [,eng]); I an ideal, eng an optional int
 RETURN:  ring (commutative) containing an ideal 'charVar'
 PURPOSE: computes an ideal whose zero set is the characteristic variety of I in
 @*       the sense of D-module theory
@@ -3047,7 +3079,7 @@ example
 }
 
 proc charInfo(ideal I)
-"USAGE:  charInfo(I);  I an ideal
+  "USAGE:  charInfo(I);  I an ideal
 RETURN:  ring (commut.) containing ideals 'charVar','singLoc' and list 'primDec'
 PURPOSE: computes characteristic variety of I (in the sense of D-module theory),
 @*       its singular locus and primary decomposition
@@ -3105,8 +3137,8 @@ example
 // examples ///////////////////////////////////////////////////////////////////
 
 /*
-static proc exCusp()
-{
+  static proc exCusp()
+  {
   "EXAMPLE:"; echo = 2;
   ring r = 0,(x,y,Dx,Dy),dp;
   def R = Weyl();   setring R;
@@ -3122,10 +3154,10 @@ static proc exCusp()
   // the same with DLoc:
   setring R;
   DLoc(I,F);
-}
+  }
 
-static proc exWalther1()
-{
+  static proc exWalther1()
+  {
   // p.18 Rem 3.10
   ring r = 0,(x,Dx),dp;
   def R = nc_algebra(1,1);
@@ -3142,10 +3174,10 @@ static proc exWalther1()
   setring U;
   LD0;
   BS;
-}
+  }
 
-static proc exWalther2()
-{
+  static proc exWalther2()
+  {
   // p.19 Rem 3.10 cont'd
   ring r = 0,(x,Dx),dp;
   def R = nc_algebra(1,1);
@@ -3165,10 +3197,10 @@ static proc exWalther2()
   // almost the same with DLoc
   setring R;
   DLoc(I,F);
-}
+  }
 
-static proc exWalther3()
-{
+  static proc exWalther3()
+  {
   // can check with annFs too :-)
   // p.21 Ex 3.15
   LIB "nctools.lib";
@@ -3196,15 +3228,15 @@ static proc exWalther3()
   // the same result with DLoc:
   setring R;
   DLoc(I,F);
-}
+  }
 
-static proc ex_annRat()
-{
+  static proc ex_annRat()
+  {
   // more complicated example for annRat
   ring r = 0,(x,y,z),dp;
   poly f = x3+y3+z3; // mir = -2
   poly g = x*y*z;
   def A = annRat(g,f);
   setring A;
-}
+  }
 */

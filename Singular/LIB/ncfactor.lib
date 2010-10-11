@@ -978,7 +978,8 @@ SEE ALSO: facSubWeyl, testNCfac, facFirstShift
   {//only the trivial factorization could be found
     result = list(list(1,h));
   }//only the trivial factorization could be found
-  return(result);
+  //now, refine the possible redundant list
+  return( refineFactList(result) );
 }//proc facFirstWeyl
 example
 {
@@ -1594,7 +1595,8 @@ SEE ALSO: testNCfac, facFirstWeyl, facSubWeyl
       }//Factorize every factor
     }//Nontrivial factorization
   }//recursively factorize factors
-  return(result);
+  //now, refine the possible redundant list
+  return( refineFactList(result) );
 }//facFirstShift
 example
 {
@@ -1840,3 +1842,97 @@ testNCfac(l1); // was not ok, but now it's been fixed!!!
 // selbst D und X so vertauschen dass sie erfuellt ist : ist gemacht
 
 */
+
+/* more things from Martin Lee to fix: 
+
+ring R = 0,(x,s),dp;
+def r = nc_algebra(1,s);
+setring(r);
+poly h = (s2*x+x)*s;
+h= h* (x+s);
+def l= facFirstShift(h);
+l; // contained doubled entries
+
+
+ring R = 0,(x,s),dp;
+def r = nc_algebra(1,-1);
+setring(r); 
+poly h = (s2*x+x)*s;
+h= h* (x+s);
+def l= facFirstWeyl(h);
+l; // contained doubled entries: not anymore, fixed!
+
+*/
+
+static proc refineFactList(list L)
+{
+  // assume: list L is an output of factorization proc
+  // doing: remove doubled entries
+  int s = size(L); int sm;
+  int i,j,k,cnt;
+  list M, U, A, B;
+  A = L;
+  k = 0;
+  cnt  = 1;
+  for (i=1; i<=s; i++)
+  {
+    if (size(A[i]) != 0)
+    { 
+      M = A[i];
+      //      "probing with"; M; i;
+      B[cnt] = M; cnt++;
+      for (j=i+1; j<=s; j++)
+      {
+	//      if ( (size(L[j]) == sm) && (isEqualList(M,L[j])) )
+	if ( isEqualList(M,A[j]) )
+	{
+	  k++;
+	// U consists of intvecs with equal pairs
+	  U[k] = intvec(i,j);
+	  A[j] = 0;
+	}
+      }
+    }
+  }
+  kill A,U,M;
+  return(B);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = 0,(x,s),dp;
+  def r = nc_algebra(1,1);
+  setring(r);
+  list l,m;
+  l = list(1,s2+1,x,s,x+s);
+  m = l,list(1,s,x,s,x),l;
+  refineFactList(m);
+}
+
+static proc isEqualList(list L, list M)
+{
+  // int boolean: 1=yes, 0 =no : test whether two lists are identical
+  int s = size(L);
+  if (size(M)!=s) { return(0); }
+  int j=1;
+  while ( (L[j]==M[j]) && (j<s) )
+  {
+    j++;
+  }
+  if (L[j]==M[j]) 
+  { 
+    return(1);
+  }
+  return(0);
+}
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = 0,(x,s),dp;
+  def r = nc_algebra(1,1);
+  setring(r);
+  list l,m;
+  l = list(1,s2+1,x,s,x+s);
+  m = l;
+  isEqualList(m,l);
+}
