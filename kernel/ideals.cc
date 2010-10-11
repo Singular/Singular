@@ -412,12 +412,27 @@ static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
   if (b==NULL) return 1;
   if (a==NULL) return -1;
 
-  if (nolex) return pLmCmp(a,b);
+  if (nolex) 
+  {
+    int r=pLmCmp(a,b);
+    if (r!=0) return r;
+    number h=nSub(pGetCoeff(a),pGetCoeff(b));
+    r = -1+nIsZero(h)+2*nGreaterZero(h); /* -1: <, 0:==, 1: > */
+    nDelete(&h);
+    return r;
+  }
   int l=pVariables;
   while ((l>0) && (pGetExp(a,l)==pGetExp(b,l))) l--;
   if (l==0)
   {
-    if (pGetComp(a)==pGetComp(b)) return 0;
+    if (pGetComp(a)==pGetComp(b))
+    {
+      int r;
+      number h=nSub(pGetCoeff(a),pGetCoeff(b));
+      r = -1+nIsZero(h)+2*nGreaterZero(h); /* -1: <, 0:==, 1: > */
+      nDelete(&h);
+      return r;
+    }
     if (pGetComp(a)>pGetComp(b)) return 1;
   }
   else if (pGetExp(a,l)>pGetExp(b,l))
