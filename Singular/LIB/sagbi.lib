@@ -16,6 +16,11 @@ of a finite number of generators of a subalgebra may be infinite.
 Hence we provide procedures, which perform a given number of steps in
 computations.
 
+Guide: new implementations of sagbi, sagbiPart, sagbiReduce, sagbiSPoly 
+as well as algebraicDependence by Jan Hackfeld do not support computations 
+over a quotient ring yet. On the contrary, sagbiReduction and sagbiNF do
+work over any ring.
+
 PROCEDURES:
  sagbiSPoly(A [,r,m]); computes SAGBI S-polynomials of A
  sagbiNF(id,dom,k[,n]); computes SAGBI normal form of id wrt dom
@@ -54,6 +59,14 @@ proc tst_sagbi()
   example sagbi;
   example sagbiPart;
   example algebraicDependence;
+}
+
+static proc assumeQring()
+{
+  if (ideal(basering) != 0)
+  {
+    ERROR("This function has not yet been implemented over qrings.");
+  }
 }
 
 
@@ -481,6 +494,7 @@ PURPOSE: Returns SAGBI S-polynomials of the leading terms of given ideal A if re
 @end format
 EXAMPLE:  example sagbiSPoly; shows an example"
 {
+  assumeQring();
   int returnRing;
   int method=0;
   def br=basering;
@@ -567,8 +581,8 @@ example
 
 
 proc sagbiReduce(idealORpoly, ideal algebra, list #)
-"USAGE:   sagbiReduce(I, A[, tr, mt]); I, A ideals, tr, mt optional integers
-RETURN:   ideal of remainders of I after SAGBI reduction by A
+"USAGE: sagbiReduce(I, A[, tr, mt]); I, A ideals, tr, mt optional integers
+RETURN: ideal of remainders of I after SAGBI reduction by A
 ASSUME: basering is not a qring
 PURPOSE: 
 @format
@@ -582,6 +596,7 @@ PURPOSE:
 @end format
 EXAMPLE:  example sagbiReduce; shows an example"
 {
+  assumeQring();
   int tailreduction=0; //Default
   int method=0; //Default
   ideal I;
@@ -676,6 +691,7 @@ PURPOSE: Computes a SAGBI basis for the subalgebra given by the generators in A.
 @end format
 EXAMPLE:  example sagbi; shows an example"
 {
+  assumeQring();
   int tailreduction=0; //default value
   int method=0; //default value
   if (size(#)>=1)
@@ -740,6 +756,7 @@ PURPOSE: Performs k iterations of the SAGBI construction algorithm for the subal
 @end format
 EXAMPLE:  example sagbiPart; shows an example"
 {
+  assumeQring();
   int tailreduction=0; //default value
   int method=0; //default value
   if (size(#)>=1)
@@ -806,6 +823,7 @@ ASSUME: basering is not a qring
 PURPOSE: In @code{it} iterations, compute algebraic dependencies between elements of I
 EXAMPLE: example algebraicDependence; shows an example"
 {
+  assumeQring();
   def br=basering;
   int i;
 
@@ -1081,7 +1099,6 @@ example
 proc sagbiNF(id,ideal dom,int k,list#)
 "USAGE: sagbiNF(id,dom,k[,n]); id either poly or ideal,dom ideal, k and n positive intergers.
 RETURN: same as type of id; ideal or polynomial.
-ASSUME: basering is not a qring
 PURPOSE:
 @format
     The integer k determines what kind of s-reduction is performed:
@@ -1091,18 +1108,33 @@ PURPOSE:
     The positive integer n determines which variant should be used.
     n may take the values (0 or default),1 or 2.
 @end format
+NOTE: sagbiNF works over both rings and quotient rings
 EXAMPLE: example sagbiNF; show example "
 {
-   return(sagbiReduce(id,dom,k));
+  ideal rs;
+  if (ideal(basering) == 0)
+  {
+    rs = sagbiReduce(id,dom,k) ;
+  }
+  else
+  {
+    rs = sagbiReduction(id,dom,k) ;
+  }
+  return(rs);
 }
 example
 {"EXAMPLE:"; echo = 2;
  ring r=0,(x,y),dp;
- ideal I= x2-xy;
- qring Q=std(I);
- ideal dom =x2,x2y+y,x3y2;
  poly p=x4+x2y+y;
- sagbiNF(p,dom,0);
+ ideal dom =x2,x2y+y,x3y2;
+ sagbiNF(p,dom,1);
+ ideal I= x2-xy;
+ qring Q=std(I); // we go to the quotient ring
+ poly p=imap(r,p);
+ NF(p,std(0)); // the representative of p has changed
+ ideal dom = imap(r,dom);
+ print(matrix(NF(dom,std(0)))); // dom has changed as well
+ sagbiNF(p,dom,0); // no tail reduction
  sagbiNF(p,dom,1);// tail subalgebra reduction is performed
 }
 
