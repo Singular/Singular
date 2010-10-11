@@ -427,9 +427,8 @@ static int pComp_RevLex(poly a, poly b,BOOLEAN nolex)
   {
     if (pGetComp(a)==pGetComp(b))
     {
-      int r;
       number h=nSub(pGetCoeff(a),pGetCoeff(b));
-      r = -1+nIsZero(h)+2*nGreaterZero(h); /* -1: <, 0:==, 1: > */
+      int r = -1+nIsZero(h)+2*nGreaterZero(h); /* -1: <, 0:==, 1: > */
       nDelete(&h);
       return r;
     }
