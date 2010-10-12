@@ -1317,5 +1317,8 @@ int main()
   ttGen2b();
   rename(iparith_inc,"iparith.inc");
   rename("plural_cmd.xx","plural_cmd.inc");
+  #ifdef HAVE_MPSR
+  rename(mpsr_Tok_inc,"mpsr_Tok.inc");
+  #endif
   return 0;
 }
