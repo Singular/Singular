@@ -19,7 +19,7 @@ OVERVIEW: This library implements resolution of singularities by Jung's algorith
 @*        implemented yet.
 REFERENCES:
 [1] Jung, H.: Darstellung der Funktionen eines algebraischen Koerpers zweier unabhaengigen
-Veraenderlichen x,y in der Umgebung x=a, y= b, Journal fuer Reine und Angewandte Mathematik 
+Veraenderlichen x,y in der Umgebung x=a, y= b, Journal fuer Reine und Angewandte Mathematik
 133,289-314 (1908)
 @*  (the origin of this method)
 @*[2] J.Kollar: Lectures on Resolution of Singularities, Princeton University Press (2007)
@@ -107,7 +107,7 @@ EXAMPLE: example clocus;  shows an example
     int index = 1;
     if(attrib(J,"isPrincipal")==0){
       setring R;
-      for(j = 1;j<=size(J);j++){   //determines the monic polynomial 
+      for(j = 1;j<=size(J);j++){   //determines the monic polynomial
                                    //in var(i) with coefficents in C2
         if(defined(w)) {kill w;}
         intvec w = leadexp(J[j]);
@@ -126,7 +126,7 @@ EXAMPLE: example clocus;  shows an example
       }
       setring A;
     }
-    product = product*resultant(J[index],diff(J[index],var(i)),var(i));   
+    product = product*resultant(J[index],diff(J[index],var(i)),var(i));
                        //Product of the discriminants, which lies in C2
     kill index,J,v;
   }
@@ -134,7 +134,7 @@ EXAMPLE: example clocus;  shows an example
   setring C2;
   ideal Clocus = imap(A,product);      //the critical locus is contained in this
   ideal I = preimage(A,LastTwo,lowdim);
-  Clocus = radical(intersect(Clocus,I));  //radical is necessary since the 
+  Clocus = radical(intersect(Clocus,I));  //radical is necessary since the
                                           //resultant is not reduced in general
   export(Clocus);
   return(C2);
@@ -219,16 +219,16 @@ THEORY:  Given a plain curve C, an embedded resolution of this curve
 @*         by means of a sequence of blow ups at singular points of C is
 @*         computed such that the resulting total transform consists
 @*         of non-singular components and only has strict normal crossings.
-@*         The result of each blow up is represented by means of 
+@*         The result of each blow up is represented by means of
 @*         affine charts and hence also the final result is represented in
 @*         charts, which are collected in a list l of rings. Each ring
 @*         in this list corresponds to one chart. The collection of
 @*         data describing the ambient space, the strict transform, the
-@*         exceptional divisors and the combination of the blow ups 
+@*         exceptional divisors and the combination of the blow ups
 @*         leading to this chart is contained in the list BO which resides
-@*         in this ring. 
+@*         in this ring.
 NOTE:      - The best way to look at the data contained in BO is the
-@*           procedure showBO from the library resolve.lib.   
+@*           procedure showBO from the library resolve.lib.
 @*         - The algorithm does not touch normal crossings of V(C).
 EXAMPLE: example embR; shows an example
 "

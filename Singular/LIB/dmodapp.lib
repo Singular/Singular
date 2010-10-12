@@ -22,12 +22,12 @@ OVERVIEW: Let K be a field of characteristic 0, R = K[x1,...,xN] and
  of a given rational function G/F from Quot(R). These can be computed via
  procedures annPoly resp. annRat.
 
-@* - Groebner bases with respect to weights (according to (SST), given an 
+@* - Groebner bases with respect to weights (according to (SST), given an
  arbitrary integer vector containing weights for variables, one computes the
  homogenization of a given ideal relative to this vector, then one computes a
- Groebner basis and returns the dehomogenization of the result), initial 
+ Groebner basis and returns the dehomogenization of the result), initial
  forms and initial ideals in Weyl algebras with respect to a given weight
- vector can be computed with GBWeight, inForm, initialMalgrange and 
+ vector can be computed with GBWeight, inForm, initialMalgrange and
  initialIdealW.
 
 @* - restriction and integration of a holonomic module D/I. Suppose I
@@ -100,7 +100,7 @@ isInt(n);      checks whether number n is actually an int
 sortIntvec(v); sorts intvec
 
 KEYWORDS: D-module; annihilator of polynomial; annihilator of rational function;
-D-localization; localization of D-module; D-restriction; restriction of 
+D-localization; localization of D-module; D-restriction; restriction of
 D-module; D-integration; integration of D-module; characteristic variety;
 Appel function; Appel hypergeometric function
 
@@ -111,7 +111,7 @@ SEE ALSO: bfun_lib, dmod_lib, dmodvar_lib, gmssing_lib
   Changelog
   21.09.10 by DA:
   - restructured library for better readability
-  - new / improved procs: 
+  - new / improved procs:
   - toolbox: isInt, intRoots, sortIntvec
   - GB wrt weights: GBWeight, initialIdealW rewritten using GBWeight
   - restriction/integration: restrictionX, integralX where X in {Module, Ideal},
@@ -185,7 +185,7 @@ proc testdmodapp()
 // general assumptions ////////////////////////////////////////////////////////
 
 static proc dmodappAssumeViolation()
-{  
+{
   // char K <> 0 or qring
   if (  (size(ideal(basering)) >0) || (char(basering) >0) )
   {
@@ -201,7 +201,7 @@ static proc dmodappMoreAssumeViolation()
   // no Weyl algebra
   if (isWeyl() == 0)
   {
-    ERROR("Basering is not a Weyl algebra"); 
+    ERROR("Basering is not a Weyl algebra");
   }
   // wrong sequence of vars
   int i,n;
@@ -668,8 +668,8 @@ EXAMPLE: example intRoots; shows an example
       if (typeof(l[2])<>"intvec"){wronginput = 1;}
       if (sl>2)
       {
-	if (typeof(l[3])<>"string"){wronginput = 1;}
-	if (sl>3){wronginput = 1;}
+        if (typeof(l[3])<>"string"){wronginput = 1;}
+        if (sl>3){wronginput = 1;}
       }
     }
   }
@@ -835,7 +835,7 @@ PURPOSE:  compute the annihilator of the rational function g/f in the
 @*        corresponding Weyl algebra
 ASSUME:   basering is commutative and over a field of characteristic 0
 NOTE:     Activate the output ring with the @code{setring} command.
-@*        In the output ring, the ideal 'LD' (in Groebner basis) is the 
+@*        In the output ring, the ideal 'LD' (in Groebner basis) is the
 @*        annihilator of g/f.
 @*        The algorithm uses the computation of Ann(f^{-1}) via D-modules,
 @*        see (SST).
@@ -1084,7 +1084,7 @@ ASSUME:  the basering is similar to the output ring of SDLoc procedure
 NOTE:    activate the output ring with the @code{setring} command. In this ring,
 @*       - the ideal LD0 (given as Groebner basis) is the presentation of the
 @*       localization,
-@*       - the list BS contains roots and multiplicities of Bernstein 
+@*       - the list BS contains roots and multiplicities of Bernstein
 @*       polynomial of (D/I)_f.
 DISPLAY: If printlevel =1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
@@ -1121,7 +1121,7 @@ EXAMPLE: example DLoc0; shows examples
   poly p = K3[1];
   dbprint(ppl,"// -2-2- attempt the factorization");
   list PP = factorize(p);          //with constants and multiplicities
-  ideal bs; intvec m;             //the Bernstein polynomial is monic, so 
+  ideal bs; intvec m;             //the Bernstein polynomial is monic, so
   // we are not interested in constants
   for (i=2; i<= size(PP[1]); i++)  //we delete P[1][1] and P[2][1]
   {
@@ -1536,12 +1536,12 @@ example;
 // Groebner basis wrt weights and initial ideal business //////////////////////
 
 proc GBWeight (ideal I, intvec u, intvec v, list #)
-  "USAGE:  GBWeight(I,u,v [,s,t,w]);  
+  "USAGE:  GBWeight(I,u,v [,s,t,w]);
 @*       I ideal, u,v intvecs, s,t optional ints, w an optional intvec
 RETURN:  ideal, Groebner basis of I w.r.t. the weights u and v
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
 PURPOSE: computes a Groebner basis with respect to given weights
@@ -1579,22 +1579,22 @@ EXAMPLE: example GBWeight; shows examples
     {
       if (intLike(#[2]))
       {
-	methodord = int(#[2]);
+        methodord = int(#[2]);
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="intvec")
-	{
-	  if (size(#[3])==2*n && allPositive(#[3])==1)
-	  {
-	    homogweights = #[3];
-	  }
-	  else
-	  {
-	    print("// Homogenization weight vector must consist of positive entries and be");
-	    print("// of size " + string(n) + ". Using weight (1,...,1).");
-	  }
-	}
+        if (typeof(#[3])=="intvec")
+        {
+          if (size(#[3])==2*n && allPositive(#[3])==1)
+          {
+            homogweights = #[3];
+          }
+          else
+          {
+            print("// Homogenization weight vector must consist of positive entries and be");
+            print("// of size " + string(n) + ". Using weight (1,...,1).");
+          }
+        }
       }
     }
   }
@@ -1618,8 +1618,8 @@ EXAMPLE: example GBWeight; shows examples
   {
     intmat @Ord[N][N];
     @Ord[1,1..N] = uv; @Ord[2,1..N] = 1:(N-1);
-    for (i=1; i<=N-2; i++) 
-    { 
+    for (i=1; i<=N-2; i++)
+    {
       @Ord[2+i,N - i] = -1;
     }
     dbprint(ppl-1,"// the ordering matrix:",@Ord);
@@ -1635,12 +1635,12 @@ EXAMPLE: example GBWeight; shows examples
   setring @Dh;
   // 1.4 create non-commutative relations
   matrix @relD[N][N];
-  for (i=1; i<=n; i++) 
+  for (i=1; i<=n; i++)
   {
-    @relD[i,n+i] = var(N)^(homogweights[i]+homogweights[n+i]); 
+    @relD[i,n+i] = var(N)^(homogweights[i]+homogweights[n+i]);
   }
   def Dh = nc_algebra(1,@relD);
-  setring Dh; kill @Dh;	
+  setring Dh; kill @Dh;
   dbprint(ppl-1,"// computing in ring",Dh);
   // 2. Compute the initial ideal
   ideal I = imap(save,I);
@@ -1709,7 +1709,7 @@ EXAMPLE: example inForm; shows examples
       s = scalarProd(w,l[i][1]);
       if (s == m)
       {
-	g = g + l[i][2];
+        g = g + l[i][2];
       }
       else
       {
@@ -1764,7 +1764,7 @@ NOTE:    u and v are understood as weight vectors for x(1..n) and D(1..n)
 @*       If t<>0, a matrix ordering is used for Groebner basis computations,
 @*       otherwise, and by default, a block ordering is used.
 @*       If w is given and consists of exactly 2*n strictly positive entries,
-@*       w is used as homogenization weight. 
+@*       w is used as homogenization weight.
 @*       Otherwise, and by default, the homogenization weight (1,...,1) is used.
 DISPLAY: If printlevel=1, progress debug messages will be printed,
 @*       if printlevel>=2, all the debug messages will be printed.
@@ -1971,16 +1971,16 @@ static proc restrictionModuleEngine (ideal I, intvec w, list #)
     {
       if (intLike(#[2]))
       {
-	l0 = int(#[2]);
-	l0set = 1;
+        l0 = int(#[2]);
+        l0set = 1;
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="ideal")
+        if (typeof(#[3])=="ideal")
         {
-	  G = #[3];
-	  Gset = 1;
-	}
+          G = #[3];
+          Gset = 1;
+        }
       }
     }
   }
@@ -2099,9 +2099,9 @@ static proc restrictionModuleEngine (ideal I, intvec w, list #)
       B = Blist[j];
       for (k=1; k<=ncols(B); k++)
       {
-	p = B[k]*G[i];
-	p = f(p);
-	M[size(M)+1] = p;
+        p = B[k]*G[i];
+        p = f(p);
+        M[size(M)+1] = p;
       }
     }
   }
@@ -2142,7 +2142,7 @@ static proc restrictionModuleOutput (ideal B, ideal N, intvec w, int eng, string
   }
   if (!zeropresent) // restrict/integrate all vars, return input ring
   {
-    def newR = save; 
+    def newR = save;
   }
   else
   {
@@ -2179,7 +2179,7 @@ proc restrictionModule (ideal I, intvec w, list #)
 RETURN:  ring (a Weyl algebra) containing a module 'resMod'
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
 @*       Further, assume that I is holonomic and that w is n-dimensional with
@@ -2272,11 +2272,11 @@ static proc restrictionIdealEngine (ideal I, intvec w, string cf, list #)
     {
       if (M[1,i]<>0)
       {
-	v = M[2..r,i];
-	if (v == zm)
-	{
-	  J[size(J+1)] = M[1,i];
-	}
+        v = M[2..r,i];
+        if (v == zm)
+        {
+          J[size(J+1)] = M[1,i];
+        }
       }
     }
   }
@@ -2301,7 +2301,7 @@ proc restrictionIdeal (ideal I, intvec w, list #)
 RETURN:  ring (a Weyl algebra) containing an ideal 'resIdeal'
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
 @*       Further, assume that I is holonomic and that w is n-dimensional with
@@ -2353,10 +2353,10 @@ RETURN:  ideal
 PURPOSE: computes the Fourier transform of an ideal in a Weyl algebra
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
-NOTE:    The Fourier automorphism is defined by mapping x(i) to -D(i) and 
+NOTE:    The Fourier automorphism is defined by mapping x(i) to -D(i) and
 @*       D(i) to x(i).
 @*       If v is an intvec with entries ranging from 1 to n, the Fourier
 @*       transform of I restricted to the variables given by v is computed.
@@ -2382,11 +2382,11 @@ EXAMPLE: example fourier; shows examples
     {
       if (v[i] == v[i+1])
       {
-	ERROR("No double entries allowed in intvec");
+        ERROR("No double entries allowed in intvec");
       }
     }
   }
-  else  
+  else
   {
     v = 1..n;
   }
@@ -2422,10 +2422,10 @@ RETURN:  ideal
 PURPOSE: computes the inverse Fourier transform of an ideal in a Weyl algebra
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
-NOTE:    The Fourier automorphism is defined by mapping x(i) to -D(i) and 
+NOTE:    The Fourier automorphism is defined by mapping x(i) to -D(i) and
 @*       D(i) to x(i).
 @*       If v is an intvec with entries ranging from 1 to n, the inverse Fourier
 @*       transform of I restricted to the variables given by v is computed.
@@ -2451,11 +2451,11 @@ EXAMPLE: example inverseFourier; shows examples
     {
       if (v[i] == v[i+1])
       {
-	ERROR("No double entries allowed in intvec");
+        ERROR("No double entries allowed in intvec");
       }
     }
   }
-  else  
+  else
   {
     v = 1..n;
   }
@@ -2491,7 +2491,7 @@ proc integralModule (ideal I, intvec w, list #)
 RETURN:  ring (a Weyl algebra) containing a module 'intMod'
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
 @*       Further, assume that I is holonomic and that w is n-dimensional with
@@ -2530,16 +2530,16 @@ EXAMPLE: example integralModule; shows examples
     {
       if (intLike(#[2]))
       {
-	l0 = int(#[2]);
-	l0set = 1;
+        l0 = int(#[2]);
+        l0set = 1;
       }
       if (size(#)>2)
       {
-	if (typeof(#[3])=="ideal")
+        if (typeof(#[3])=="ideal")
         {
-	  G = #[3];
-	  Gset = 1;
-	}
+          G = #[3];
+          Gset = 1;
+        }
       }
     }
   }
@@ -2553,11 +2553,11 @@ EXAMPLE: example integralModule; shows examples
     {
       if (v == 0:size(v))
       {
-	v[1] = i;
+        v[1] = i;
       }
       else
       {
-	v[size(v)+1] = i;
+        v[size(v)+1] = i;
       }
     }
   }
@@ -2605,7 +2605,7 @@ proc integralIdeal (ideal I, intvec w, list #)
 RETURN:  ring (a Weyl algebra) containing an ideal 'intIdeal'
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
 @*       Further, assume that I is holonomic and that w is n-dimensional with
@@ -2652,7 +2652,7 @@ proc deRhamCohomIdeal (ideal I, list #)
 RETURN:  ideal
 ASSUME:  The basering is the n-th Weyl algebra D over a field of characteristic
 @*       zero and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
 @*       Further, assume that I is of special kind, namely let f in K[x] and
@@ -2694,35 +2694,35 @@ EXAMPLE: example deRhamCohomIdeal; shows examples
     {
       if (allPositive(#[1])==1)
       {
-	w = #[1];
+        w = #[1];
       }
       else
       {
-	print("// Entries of intvec must be strictly positive");
-	print("// Using weight " + string(w));
+        print("// Entries of intvec must be strictly positive");
+        print("// Using weight " + string(w));
       }
       if (size(#)>1)
       {
-	if (intLike(#[2]))
+        if (intLike(#[2]))
         {
-	  whichengine = int(#[2]);
-	}
-	if (size(#)>2)
+          whichengine = int(#[2]);
+        }
+        if (size(#)>2)
         {
-	  if (intLike(#[3]))
+          if (intLike(#[3]))
           {
-	    l0 = int(#[3]);
-	    l0set = 1;
-	  }
-	  if (size(#)>3)
+            l0 = int(#[3]);
+            l0set = 1;
+          }
+          if (size(#)>3)
           {
-	    if (typeof(#[4])=="ideal")
+            if (typeof(#[4])=="ideal")
             {
-	      G = #[4];
-	      Gset = 1;
-	    }
-	  }
-	}
+              G = #[4];
+              Gset = 1;
+            }
+          }
+        }
       }
     }
   }
@@ -2736,11 +2736,11 @@ EXAMPLE: example deRhamCohomIdeal; shows examples
     {
       if (v == 0:size(v))
       {
-	v[1] = i;
+        v[1] = i;
       }
       else
       {
-	v[size(v)+1] = i;
+        v[size(v)+1] = i;
       }
     }
   }
@@ -2778,7 +2778,7 @@ EXAMPLE: example deRhamCohomIdeal; shows examples
   }
   N = simplify(N,2+8);
   printlevel = printlevel-1;
-  N = linReduceIdeal(N);  
+  N = linReduceIdeal(N);
   N = simplify(N,2+8);
   for (i=1; i<=size(B); i++)
   {
@@ -2789,7 +2789,7 @@ EXAMPLE: example deRhamCohomIdeal; shows examples
       j=1;
       while (p<N[j])
       {
-	j++;
+        j++;
       }
       N = insertGenerator(N,p,j+1);
     }
@@ -2844,8 +2844,8 @@ EXAMPLE: example deRhamCohom; shows example
     {
       if(intLike(#[2]))
       {
-	l0 = int(#[2]);
-	l0given = 1;
+        l0 = int(#[2]);
+        l0given = 1;
       }
     }
   }
@@ -3021,7 +3021,7 @@ PURPOSE: computes an ideal whose zero set is the characteristic variety of I in
 @*       the sense of D-module theory
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
 NOTE:    The output ring is commutative. It contains an ideal 'charVar'.
@@ -3085,7 +3085,7 @@ PURPOSE: computes characteristic variety of I (in the sense of D-module theory),
 @*       its singular locus and primary decomposition
 ASSUME:  The basering is the n-th Weyl algebra over a field of characteristic 0
 @*       and for all 1<=i<=n the identity var(i+n)*var(i)=var(i)*var(i+1)+1
-@*       holds, i.e. the sequence of variables is given by 
+@*       holds, i.e. the sequence of variables is given by
 @*       x(1),...,x(n),D(1),...,D(n), where D(i) is the differential operator
 @*       belonging to x(i).
 NOTE:    In the output ring, which is commutative:

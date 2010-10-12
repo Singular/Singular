@@ -7,7 +7,7 @@ AUTHORS: Jan Hackfeld,     Jan.Hackfeld@rwth-aachen.de
          Gerhard Pfister,  pfister@mathematik.uni-kl.de
          Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 
-OVERVIEW: 
+OVERVIEW:
 SAGBI stands for 'subalgebra bases analogous to Groebner bases for ideals'.
 It is an important tools in working with finitely presented subalgebras,
 many properties of SAGBI bases are analogously important to Groebner bases
@@ -49,7 +49,7 @@ LIB "algebra.lib";
 //////////////////////////////////////////////////////////////////////////////
 
 
-//static 
+//static
 proc tst_sagbi()
 {
   example sagbiSPoly;
@@ -480,7 +480,7 @@ static proc sagbiConstruction(ideal algebra, int iterations, int tailreduction, 
 
 proc sagbiSPoly(ideal algebra,list #)
 "USAGE:   sagbiSPoly(A[, returnRing, meth]);  A is an ideal, returnRing and meth are integers.
-RETURN:   ideal or ring 
+RETURN:   ideal or ring
 ASSUME: basering is not a qring
 PURPOSE: Returns SAGBI S-polynomials of the leading terms of given ideal A if returnRing=0.
 @*       Otherwise returns a new ring containing the ideals algebraicRelations
@@ -584,7 +584,7 @@ proc sagbiReduce(idealORpoly, ideal algebra, list #)
 "USAGE: sagbiReduce(I, A[, tr, mt]); I, A ideals, tr, mt optional integers
 RETURN: ideal of remainders of I after SAGBI reduction by A
 ASSUME: basering is not a qring
-PURPOSE: 
+PURPOSE:
 @format
     The optional argument tr=tailred determines whether tail reduction will be performed.
      - If (tailred=0), no tail reduction is done.
@@ -1090,8 +1090,8 @@ example
   sagbiReduction(p,dom);
   sagbiReduction(p,dom,2);
   // now let us see the action over quotient ring
-  ideal I = xy; 
-  qring Q = std(I); 
+  ideal I = xy;
+  qring Q = std(I);
   ideal dom = imap(r,dom); poly p = imap(r,p);
   sagbiReduction(p,dom,1);
 }

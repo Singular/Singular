@@ -25,7 +25,7 @@ tensored with S over K, where
 
 References:
    (BMS06) Budur, Mustata, Saito: Bernstein-Sato polynomials of arbitrary varieties (2006).
-@* (ALM09) Andres, Levandovskyy, Martin-Morales: Principal Intersection and Bernstein-Sato 
+@* (ALM09) Andres, Levandovskyy, Martin-Morales: Principal Intersection and Bernstein-Sato
 Polynomial of an Affine Variety (2009).
 
 
@@ -257,15 +257,15 @@ EXAMPLE: example SannfsVar; shows examples
       for (k=1; k<=P; k++)
       {
         //[sij,Dtk] = djk*Dti
-	//         @D[k,P+(i-1)*P+j] = (j==k)*Dt(i);
-	@D[k,P+(i-1)*P+j] = (j==k)*var(i);
+        //         @D[k,P+(i-1)*P+j] = (j==k)*Dt(i);
+        @D[k,P+(i-1)*P+j] = (j==k)*var(i);
         for (l=1; l<=P; l++)
         {
           if ( (i-k)*P < l-j )
           {
             //[sij,skl] = djk*sil - dil*skj
-	    //             @D[P+(i-1)*P+j,P+(k-1)*P+l] = -(j==k)*s(i)(l) + (i==l)*s(k)(j);
-	    @D[P+(i-1)*P+j,P+(k-1)*P+l] = -(j==k)*var(i*P+l) + (i==l)*var(k*P+j);
+            //             @D[P+(i-1)*P+j,P+(k-1)*P+l] = -(j==k)*s(i)(l) + (i==l)*s(k)(j);
+            @D[P+(i-1)*P+j,P+(k-1)*P+l] = -(j==k)*var(i*P+l) + (i==l)*var(k*P+j);
           }
         }
       }
