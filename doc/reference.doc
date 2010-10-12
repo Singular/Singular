@@ -6341,6 +6341,8 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{size (} string_expression @code{)}
+@*@code{size (} bigint_expression @code{)}
+@*@code{size (} number_expression @code{)}
 @*@code{size (} intvec_expression @code{)}
 @*@code{size (} intmat_expression @code{)}
 @*@code{size (} poly_expression @code{)}
@@ -6367,6 +6369,8 @@ returns the number of entries (rows*columns).
 @item ring
 returns the number of elements in the ground field
 (for Z/p and algebraic extensions) or -1
+@item number or bigint
+returns 0 for 0 or the number of words
 @end table
 @item @strong{Example:}
 @smallexample

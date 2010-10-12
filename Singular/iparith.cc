@@ -3205,7 +3205,10 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
        ("`hres` not implemented for inhomogeneous input or qring");
        return TRUE;
     }
-    r=syHilb(u_id,&dummy);
+    ideal u_id_copy=idCopy(u_id);
+    idSkipZeroes(u_id_copy);
+    r=syHilb(u_id_copy,&dummy);
+    idDelete(&u_id_copy);
   }
   if (r==NULL) return TRUE;
   //res->data=(void *)liMakeResolv(r,l,wmaxl,u->Typ(),weights);
@@ -4215,6 +4218,11 @@ static BOOLEAN jjCONTENT(leftv res, leftv v)
   poly p=(poly)v->CopyD(POLY_CMD);
   if (p!=NULL) p_Cleardenom(p, currRing);
   res->data = (char *)p;
+  return FALSE;
+}
+static BOOLEAN jjCOUNT_BI(leftv res, leftv v)
+{
+  res->data = (char *)(long)nlSize((number)v->Data());
   return FALSE;
 }
 static BOOLEAN jjCOUNT_N(leftv res, leftv v)
@@ -5832,6 +5840,7 @@ struct sValCmd1 dArith1[]=
 ,{jjWRONG,      COLS_CMD,        0,              INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{jjCONTENT,    CONTENT_CMD,     POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{jjCONTENT,    CONTENT_CMD,     VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{jjCOUNT_BI,   COUNT_CMD,       INT_CMD,        BIGINT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{jjCOUNT_N,    COUNT_CMD,       INT_CMD,        NUMBER_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{jjCOUNT_RES,  COUNT_CMD,       XS(INT_CMD),    RESOLUTION_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{jjstrlen,     COUNT_CMD,       XS(INT_CMD),    STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
