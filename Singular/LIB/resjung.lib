@@ -1,4 +1,3 @@
-//
 version="$Id$";
 category="Algebraic Geometry";
 info="
@@ -216,7 +215,21 @@ ASSUME:  C  = ideal of plane curve
 RETURN:  a list l of rings
          l[i] is a ring containing a basic object BO, the result of the
          resolution.
-NOTE:    Algorithm does not touch normal crossings of V(C)
+THEORY:  Given a plain curve C, an embedded resolution of this curve
+@*         by means of a sequence of blow ups at singular points of C is
+@*         computed such that the resulting total transform consists
+@*         of non-singular components and only has strict normal crossings.
+@*         The result of each blow up is represented by means of 
+@*         affine charts and hence also the final result is represented in
+@*         charts, which are collected in a list l of rings. Each ring
+@*         in this list corresponds to one chart. The collection of
+@*         data describing the ambient space, the strict transform, the
+@*         exceptional divisors and the combination of the blow ups 
+@*         leading to this chart is contained in the list BO which resides
+@*         in this ring. 
+NOTE:      - The best way to look at the data contained in BO is the
+@*           procedure showBO from the library resolve.lib.   
+@*         - The algorithm does not touch normal crossings of V(C).
 EXAMPLE: example embR; shows an example
 "
 {
