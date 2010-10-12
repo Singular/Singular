@@ -27,8 +27,8 @@ public:
 };
 
 CFFList newfactoras( const CanonicalForm & f, const CFList & as, int &success);
-CFFList newcfactor(const CanonicalForm & f, const CFList & as, int success );
 /*BEGINPUBLIC*/
+CFFList newcfactor(const CanonicalForm & f, const CFList & as, int & success );
 /*ENDPUBLIC*/
 
 #endif /* INCL_ALGFACTOR_H */

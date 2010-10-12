@@ -810,7 +810,7 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success){
 }
 
 CFFList
-newcfactor(const CanonicalForm & f, const CFList & as, int success ){
+newcfactor(const CanonicalForm & f, const CFList & as, int & success ){
   Off(SW_RATIONAL);
   CFFList Output, output, Factors=Factorize(f); On(SW_RATIONAL);
   Factors.removeFirst();
