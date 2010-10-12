@@ -9,8 +9,9 @@ AUTHORS:   Levandovskyy V.,     levandov@mathematik.uni-kl.de,
 @*         Motsak, O.,          U@D, where U={motsak}, D={mathematik.uni-kl.de}
 
 
-
-SUPPORT: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
+OVERVIEW:
+Support: DFG (Deutsche Forschungsgesellschaft) and Metodos algebraicos y efectivos 
+en grupos cuanticos, BFM2001-3141, MCYT, Jose Gomez-Torrecillas (Main researcher).
 
 PROCEDURES:
 Gweights(r);              compute weights for a compatible ordering in a G-algebra,
@@ -24,17 +25,17 @@ findimAlgebra(M,[r]);     create finite dimensional algebra structure from the b
 superCommutative([b,e,Q]);  return qring, a super-commutative algebra over a basering,
 rightStd(I);              compute a right Groebner basis of an ideal,
 
-moduloSlim(A,B);  compute modulo via slimgb
+moduloSlim(A,B);     compute modulo command via slimgb
 ncRelations(r);      recover the non-commutative relations of a G-algebra,
-isCentral(p);         check for the commutativity of a polynomial in the G-algebra,
-isNC();                 check whether basering is noncommutative,
-isCommutative();  check whether basering is commutative
-isWeyl();               check whether basering is a Weyl algebra
-UpOneMatrix();   return NxN matrix with 1's in the whole upper triagle,
-AltVarStart();        return first alternating variable of a super-commutative algebra,
-AltVarEnd();          return last alternating variable of a super-commutative algebra,
-IsSCA();                check whether current ring is a super-commutative algebra
-makeModElimRing(R); equip a ring with module elimination ordering
+isCentral(p);        check for the commutativity of a polynomial in the G-algebra,
+isNC();              check whether basering is noncommutative,
+isCommutative();     check whether basering is commutative
+isWeyl();            check whether basering is a Weyl algebra
+UpOneMatrix();       return NxN matrix with 1's in the whole upper triagle,
+AltVarStart();       return first alternating variable of a super-commutative algebra,
+AltVarEnd();         return last alternating variable of a super-commutative algebra,
+IsSCA();             check whether current ring is a super-commutative algebra
+makeModElimRing(R);  equip a ring with module elimination ordering
 ";
 
 
