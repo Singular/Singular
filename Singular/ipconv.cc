@@ -246,72 +246,9 @@ static void * iiL2R(void * data)
 //
 // automatic conversions:
 //
-struct sConvertTypes dConvertTypes[] =
-{
-//   input type       output type     convert procedure
-//  int -> bigint
-   { INT_CMD,         BIGINT_CMD,     iiI2BI , NULL },
-//  int -> number
-   { INT_CMD,         NUMBER_CMD,     iiI2N , NULL },
-   { BIGINT_CMD,      NUMBER_CMD,     iiBI2N , NULL },
-//  int -> poly
-   { INT_CMD,         POLY_CMD,       iiI2P , NULL },
-   { BIGINT_CMD,      POLY_CMD,       iiBI2P , NULL },
-//  int -> vector
-   { INT_CMD,         VECTOR_CMD,     iiI2V , NULL },
-   { BIGINT_CMD,      VECTOR_CMD,     iiBI2V , NULL },
-//  int -> ideal
-   { INT_CMD,         IDEAL_CMD,      iiI2Id , NULL },
-   { BIGINT_CMD,      IDEAL_CMD,      iiBI2Id , NULL },
-//  int -> matrix
-   { INT_CMD,         MATRIX_CMD,     iiI2Id , NULL },
-   { BIGINT_CMD,      MATRIX_CMD,     iiBI2Id , NULL },
-//  int -> intvec
-   { INT_CMD,         INTVEC_CMD,     iiI2Iv , NULL },
-//  intvec -> intmat
-   { INTVEC_CMD,      INTMAT_CMD,     iiDummy, NULL },
-//  intvec -> matrix
-   { INTVEC_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
-//  intmat -> matrix
-   { INTMAT_CMD,      MATRIX_CMD,     iiIm2Ma , NULL },
-//  number -> poly
-   { NUMBER_CMD,      POLY_CMD,       iiN2P  , NULL },
-//  number -> matrix
-   { NUMBER_CMD,      MATRIX_CMD,     iiN2Ma  , NULL },
-//  number -> ideal
-//  number -> vector
-//  number -> module
-//  poly -> number
-//  poly -> ideal
-   { POLY_CMD,        IDEAL_CMD,      iiP2Id , NULL },
-//  poly -> vector
-   { POLY_CMD,        VECTOR_CMD,     iiP2V , NULL },
-//  poly -> matrix
-   { POLY_CMD,        MATRIX_CMD,     iiP2Id , NULL },
-//  vector -> module
-   { VECTOR_CMD,      MODUL_CMD,      iiP2Id , NULL },
-//  vector -> matrix
-   { VECTOR_CMD,      MATRIX_CMD,     iiV2Ma , NULL },
-//  ideal -> module
-   { IDEAL_CMD,       MODUL_CMD,      iiMa2Mo , NULL },
-//  ideal -> matrix
-   { IDEAL_CMD,       MATRIX_CMD,     iiDummy , NULL },
-//  module -> matrix
-   { MODUL_CMD,       MATRIX_CMD,     iiMo2Ma , NULL },
-//  matrix -> ideal
-//  matrix -> module
-   { MATRIX_CMD,      MODUL_CMD,      iiMa2Mo , NULL },
-//  intvec
-//  link
-   { STRING_CMD,      LINK_CMD,       iiS2Link , NULL },
-// resolution -> list
-   { RESOLUTION_CMD,  LIST_CMD,       NULL /*iiR2L*/ , iiR2L_l },
-// list -> resolution
-   { LIST_CMD,        RESOLUTION_CMD, iiL2R , NULL },
-//  end of list
-   { 0,               0,              NULL , NULL }
-};
-
+#define IPCONV
+#define D(A) A
+#include <Singular/table.h>
 /*2
 * try to convert 'input' of type 'inputType' to 'output' of type 'outputType'
 * return FALSE on success

@@ -703,62 +703,9 @@ static BOOLEAN jiA_PACKAGE(leftv res, leftv a, Subexpr e)
   return FALSE;
 }
 /*=================== table =================*/
-struct sValAssign dAssign[]=
-{
-// proc         res             arg
- {jiA_IDEAL,    IDEAL_CMD,      IDEAL_CMD }
-,{jiA_IDEAL_M,  IDEAL_CMD,      MATRIX_CMD }
-,{jiA_RESOLUTION,RESOLUTION_CMD,RESOLUTION_CMD }
-,{jiA_INT,      INT_CMD,        INT_CMD }
-,{jiA_1x1INTMAT, INT_CMD,       INTMAT_CMD }
-,{jiA_IDEAL,    MATRIX_CMD,     MATRIX_CMD }
-,{jiA_MAP_ID,   MAP_CMD,        IDEAL_CMD }
-,{jiA_MAP,      MAP_CMD,        MAP_CMD }
-,{jiA_IDEAL,    MODUL_CMD,      MODUL_CMD }
-,{jiA_MODUL_P,  MODUL_CMD,      POLY_CMD }
-,{jiA_POLY,     POLY_CMD,       POLY_CMD }
-,{jiA_1x1MATRIX,POLY_CMD,       MATRIX_CMD }
-,{jiA_QRING,    QRING_CMD,      IDEAL_CMD }
-,{jiA_RING,     RING_CMD,       RING_CMD }
-,{jiA_RING,     QRING_CMD,      QRING_CMD }
-,{jiA_STRING,   STRING_CMD,     STRING_CMD }
-,{jiA_PROC,     PROC_CMD,       STRING_CMD }
-,{jiA_PROC,     PROC_CMD,       PROC_CMD }
-,{jiA_POLY,     VECTOR_CMD,     VECTOR_CMD }
-,{jiA_INTVEC,   INTVEC_CMD,     INTVEC_CMD }
-,{jiA_INTVEC,   INTMAT_CMD,     INTMAT_CMD }
-//,{jiA_INTVEC,   INTMAT_CMD,     INTVEC_CMD }
-,{jiA_NUMBER,   NUMBER_CMD,     NUMBER_CMD }
-,{jiA_BIGINT,   BIGINT_CMD,     BIGINT_CMD }
-,{jiA_LIST_RES, LIST_CMD,       RESOLUTION_CMD }
-,{jiA_LIST,     LIST_CMD,       LIST_CMD }
-,{jiA_LINK,     LINK_CMD,       STRING_CMD }
-,{jiA_LINK,     LINK_CMD,       LINK_CMD }
-#ifdef HAVE_FANS
-,{jiA_FAN,      FAN_CMD,        FAN_CMD }
-,{jiA_CONE,     CONE_CMD,       CONE_CMD }
-#endif /* HAVE_FANS */
-,{jiA_PACKAGE,  PACKAGE_CMD,    PACKAGE_CMD }
-,{NULL,         0,              0 }
-};
-struct sValAssign_sys dAssign_sys[]=
-{
-// sysvars:
- {jjECHO,       VECHO,          INT_CMD }
-,{jjPRINTLEVEL, VPRINTLEVEL,    INT_CMD }
-,{jjCOLMAX,     VCOLMAX,        INT_CMD }
-,{jjTIMER,      VTIMER,         INT_CMD }
-#ifdef HAVE_RTIMER
-,{jjRTIMER,     VRTIMER,        INT_CMD }
-#endif
-,{jjMAXDEG,     VMAXDEG,        INT_CMD }
-,{jjMAXMULT,    VMAXMULT,       INT_CMD }
-,{jjTRACE,      TRACE,          INT_CMD }
-,{jjSHORTOUT,   VSHORTOUT,      INT_CMD }
-,{jjMINPOLY,    VMINPOLY,       NUMBER_CMD }
-,{jjNOETHER,    VNOETHER,       POLY_CMD }
-,{NULL,         0,              0 }
-};
+#define IPASSIGN
+#define D(A) A
+#include <Singular/table.h>
 /*=================== operations ============================*/
 /*2
 * assign a = b
