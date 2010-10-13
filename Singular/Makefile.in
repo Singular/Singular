@@ -386,8 +386,8 @@ iparith.inc: gentable.cc grammar.h tok.h table.h mod2.h
 	./gentable1
 	/bin/rm -f gentable1 gentable1.exe
 
-mpsr_Tok.inc: gentable.cc grammar.h tok.h table.h mod2.h
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable.cc \
+mpsr_Tok.inc: gentable2.cc grammar.h tok.h table.h mod2.h
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable2.cc \
 	     -o gentable2 ${LDFLAGS} ${LIBS}
 	./gentable2
 	/bin/rm -f gentable2 gentable2.exe
