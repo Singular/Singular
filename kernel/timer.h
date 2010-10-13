@@ -15,7 +15,7 @@ void writeTime(const char* s);
 int initTimer();
 int  getTimer();
 
-#ifdef HAVE_RTIMER
+#ifdef HAVE_GETTIMEOFDAY
 extern int rtimerv;
 void startRTimer(void);
 void writeRTime(const char* s);

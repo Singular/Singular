@@ -202,11 +202,6 @@
 /* procedures to compute with units */
 #define HAVE_UNITS
 
-/* Define to use old mechanismen for saving currRing with procedures
- */
-#undef USE_IILOCALRING
-
-
 /* Define to use scanner when loading libraries */
 #define HAVE_LIBPARSER
 
@@ -222,11 +217,6 @@
  ******************************************************************/
 /* Spectrum needs GMP */
 #define HAVE_SPECTRUM 1
-
-/* Undefine to disable real time measurments  */
-#ifdef HAVE_GETTIMEOFDAY
-#define HAVE_RTIMER
-#endif
 
 #if SIZEOF_VOIDP == 8
 /* SIZEOF_LONG == SIZEOF_VOIDP is guaranteed by configure */

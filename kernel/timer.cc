@@ -139,7 +139,7 @@ void writeTime(const char* v)
   }
 }
 
-#ifdef HAVE_RTIMER
+#ifdef HAVE_GETTIMEOFDAY
 /*0 Real timer implementation*/
 int rtimerv = 0;
 static struct timeval  startRl;
