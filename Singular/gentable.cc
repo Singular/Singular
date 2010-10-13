@@ -450,7 +450,7 @@ void ttGen2()
     if(f)
     {
       id_nr++;
-      if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#ifdef HAVE_RTIMER\n");
+      if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#ifdef HAVE_GETTIMEOFDAY\n");
       fprintf(outfile,"  {\"%s\", %*d, %3d, ",cmds[m].name,
                                              20-strlen(cmds[m].name),
                                              cmds[m].alias,
@@ -529,7 +529,7 @@ void ttGen2()
 "/* end of list marker */\n"
 "  { NULL, 0, 0, 0}\n"
 "};\n"
-"#ifdef HAVE_RTIMER\n"
+"#ifdef HAVE_GETTIMEOFDAY\n"
 "#define LAST_IDENTIFIER %d\n"
 "#else\n"
 "#define LAST_IDENTIFIER %d\n"
@@ -575,7 +575,7 @@ void ttGen2b()
   for(m=0; m<cmd_size; m++)
   {
     if(cmds[m].tokval>0) id_nr++;
-    if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#ifdef HAVE_RTIMER\n");
+    if(cmds[m].tokval==VRTIMER) fprintf(outfile,"#ifdef HAVE_GETTIMEOFDAY\n");
     fprintf(outfile,"  iiArithAddCmd(\"%s\", %*d, %3d, ",cmds[m].name,
             (int)(20-strlen(cmds[m].name)),
             cmds[m].alias,
@@ -617,17 +617,17 @@ void ttGen2b()
   }
   fprintf(outfile, "/* end of list marker */\n");
   fprintf(outfile,
-          "#ifdef HAVE_RTIMER\n"
+          "#ifdef HAVE_GETTIMEOFDAY\n"
           "  sArithBase.nLastIdentifier = %d;\n"
-          "#else /* HAVE_RTIMER */\n"
+          "#else /* HAVE_GETTIMEOFDAY */\n"
           "  sArithBase.nLastIdentifier = %d;\n"
-          "#endif /* HAVE_RTIMER */\n",
+          "#endif /* HAVE_GETTIMEOFDAY */\n",
           id_nr,id_nr-1);
 
 
   fprintf(outfile,
 "}\n"
-"#ifdef HAVE_RTIMER\n"
+"#ifdef HAVE_GETTIMEOFDAY\n"
 "#define LAST_IDENTIFIER %d\n"
 "#else\n"
 "#define LAST_IDENTIFIER %d\n"
