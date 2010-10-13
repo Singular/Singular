@@ -10,13 +10,12 @@ AUTHORS:  Oleksandr Iena,       yena@mathematik.uni-kl.de
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
 and V. Levandovskyy), University of Kaiserslautern
 
-MAIN PROCEDURES:
+PROCEDURES:
   control(R);     analysis of controllability-related properties of R (using Ext modules)
   controlDim(R);  analysis of controllability-related properties of R (using dimension)
   autonom(R);     analysis of autonomy-related properties of R (using Ext modules)
   autonomDim(R);  analysis of autonomy-related properties of R (using dimension)
 
-COMPONENT PROCEDURES:
   leftKernel(R);       a left kernel of R
   rightKernel(R);      a right kernel of R
   leftInverse(R);      a left inverse of R
@@ -27,7 +26,6 @@ COMPONENT PROCEDURES:
   iostruct(R);         computes an IO-structure of behavior given by a module R
   findTorsion(R, I);   generators of the submodule of a module R, annihilated by the ideal I
 
-AUXILIARY PROCEDURES:
   controlExample(s);   set up an example from the mini database inside of the library
   view();              well-formatted output of lists, modules and matrices
 ";

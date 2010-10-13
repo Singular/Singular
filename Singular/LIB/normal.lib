@@ -8,7 +8,7 @@ AUTHORS:  G.-M. Greuel,  greuel@mathematik.uni-kl.de,
 @*        G. Pfister,    pfister@mathematik.uni-kl.de
 
 
-MAIN PROCEDURES:
+PROCEDURES:
  normal(I,[...]);    normalization of an affine ring
  normalP(I,[...]);   normalization of an affine ring in positive characteristic
  normalC(I,[...]);   normalization of an affine ring through a chain of rings
@@ -18,7 +18,6 @@ MAIN PROCEDURES:
  closureFrac(L);     writes a poly in integral closure as element of Quot(R/p)
  iMult(L);           intersection multiplicity of the ideals of the list L
 
-AUXILIARY PROCEDURES:
  deltaLoc(f,S);      sum of delta invariants at conjugated singular points
  locAtZero(I);       checks whether the zero set of I is located at 0
  norTest(I,nor);     checks the output of normal, normalP, normalC

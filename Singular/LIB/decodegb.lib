@@ -15,7 +15,7 @@ OVERVIEW:
  For the vanishing ideal computation the algorithm of Farr and Gao is
  implemented.
 
-MAIN PROCEDURES:
+PROCEDURES:
  sysCRHT(..);        generates the CRHT-ideal as in Cooper's philosophy
  sysCRHTMindist(..); CRHT-ideal to find the minimum distance in the binary case
  sysNewton(..);      generates the ideal with the generalized Newton identities

@@ -6,13 +6,12 @@ LIBRARY:  equising.lib  Equisingularity Stratum of a Family of Plane Curves
 AUTHOR:   Christoph Lossen, lossen@mathematik.uni-kl.de
           Andrea Mindnich, mindnich@mathematik.uni-kl.de
 
-MAIN PROCEDURES:
+PROCEDURES:
  tau_es(f);             codim of mu-const stratum in semi-universal def. base
  esIdeal(f);            (Wahl's) equisingularity ideal of f
  esStratum(F[,m,L]);    equisingularity stratum of a family F
  isEquising(F[,m,L]);   tests if a given deformation is equisingular
 
-AUXILIARY PROCEDURE:
  control_Matrix(M);     computes list of blowing-up data
 ";
 

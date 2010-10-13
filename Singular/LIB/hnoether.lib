@@ -16,7 +16,7 @@ OVERVIEW:
  The library contains also procedures for computing the (topological)
  numerical invariants of plane curve singularities.
 
-MAIN PROCEDURES:
+PROCEDURES:
  hnexpansion(f [,\"ess\"]); Hamburger-Noether (HN) expansion of f
  develop(f [,n]);           HN expansion of irreducible plane curve germs
  extdevelop(hne,n);         extension of the H-N expansion hne of f
@@ -33,7 +33,6 @@ MAIN PROCEDURES:
  is_NND(f);                 test whether f is Newton non-degenerate
 
 
-AUXILIARY PROCEDURES:
  stripHNE(hne);             reduce amount of memory consumed by hne
  puiseux2generators(m,n);   convert Puiseux pairs to generators of semigroup
  separateHNE(hne1,hne2);    number of quadratic transf. needed for separation

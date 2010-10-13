@@ -28,7 +28,7 @@ Theory: Let K be a field of characteristic 0. Given a polynomial ring
 @* - an operator in D(R)[s], denoted by PS, such that the functional equality
 @*     PS*F^(s+1) = bs*F^s holds in K[x_1,...,x_n,1/F]*F^s.
 
-References:
+REFERENCES:
 @* We provide the following implementations of algorithms:
 @* (OT) the classical Ann F^s algorithm from Oaku and Takayama (Journal of
 @* Pure and Applied Math., 1999),
