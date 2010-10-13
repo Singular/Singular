@@ -2375,7 +2375,7 @@ yyreduce:
               writeTime("used time:");
               startTimer();
             }
-            #ifdef HAVE_RTIMER
+            #ifdef HAVE_GETTIMEOFDAY
             if (rtimerv)
             {
               writeRTime("used real time:");

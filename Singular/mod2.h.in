@@ -218,11 +218,6 @@
 /* Spectrum needs GMP */
 #define HAVE_SPECTRUM 1
 
-/* Undefine to disable real time measurments  */
-#ifdef HAVE_GETTIMEOFDAY
-#define HAVE_RTIMER
-#endif
-
 #if SIZEOF_VOIDP == 8
 /* SIZEOF_LONG == SIZEOF_VOIDP is guaranteed by configure */
 #define ALIGN_8

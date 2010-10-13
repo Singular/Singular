@@ -64,7 +64,7 @@ static BOOLEAN jjTIMER(leftv res, leftv a)
   initTimer();
   return FALSE;
 }
-#ifdef HAVE_RTIMER
+#ifdef HAVE_GETTIMEOFDAY
 static BOOLEAN jjRTIMER(leftv res, leftv a)
 {
   rtimerv=(int)((long)(a->Data()));

@@ -404,7 +404,7 @@ int inits(void)
   t=initTimer();
   /*t=(int)time(NULL);*/
   if (t==0) t=1;
-#ifdef HAVE_RTIMER
+#ifdef HAVE_GETTIMEOFDAY
   initRTimer();
 #endif
 #ifdef buildin_rand

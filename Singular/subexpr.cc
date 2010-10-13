@@ -368,7 +368,7 @@ void sleftv::CleanUp(ring r)
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
-#ifdef HAVE_RTIMER
+#ifdef HAVE_GETTIMEOFDAY
       case VRTIMER:
 #endif
       case VOICE:
@@ -400,7 +400,7 @@ void sleftv::CleanUp(ring r)
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
-#ifdef HAVE_RTIMER
+#ifdef HAVE_GETTIMEOFDAY
       case VRTIMER:
 #endif
       case VOICE:
@@ -886,7 +886,7 @@ int  sleftv::Typ()
       case VPRINTLEVEL:
       case VCOLMAX:
       case VTIMER:
-#ifdef HAVE_RTIMER
+#ifdef HAVE_GETTIMEOFDAY
       case VRTIMER:
 #endif
       case VOICE:
@@ -1015,7 +1015,7 @@ void * sleftv::Data()
       case VPRINTLEVEL:return (void *)printlevel;
       case VCOLMAX:    return (void *)colmax;
       case VTIMER:     return (void *)getTimer();
-#ifdef HAVE_RTIMER
+#ifdef HAVE_GETTIMEOFDAY
       case VRTIMER:    return (void *)getRTimer();
 #endif
       case VOICE:      return (void *)(myynest+1);
