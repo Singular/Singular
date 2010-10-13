@@ -17,8 +17,8 @@ of a finite number of generators of a subalgebra may be infinite.
 Hence we provide procedures, which perform a given number of steps in
 computations.
 
-Guide: new implementations of sagbi, sagbiPart, sagbiReduce, sagbiSPoly 
-as well as algebraicDependence by Jan Hackfeld do not support computations 
+Guide: new implementations of sagbi, sagbiPart, sagbiReduce, sagbiSPoly
+as well as algebraicDependence by Jan Hackfeld do not support computations
 over a quotient ring yet. On the contrary, sagbiReduction and sagbiNF do
 work over any ring.
 
