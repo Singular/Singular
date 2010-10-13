@@ -1226,9 +1226,7 @@ struct sValAssign_sys dAssign_sys[]=
 ,{D(jjPRINTLEVEL), VPRINTLEVEL,    INT_CMD }
 ,{D(jjCOLMAX),     VCOLMAX,        INT_CMD }
 ,{D(jjTIMER),      VTIMER,         INT_CMD }
-#ifdef HAVE_GETTIMEOFDAY
 ,{D(jjRTIMER),     VRTIMER,        INT_CMD }
-#endif
 ,{D(jjMAXDEG),     VMAXDEG,        INT_CMD }
 ,{D(jjMAXMULT),    VMAXMULT,       INT_CMD }
 ,{D(jjTRACE),      TRACE,          INT_CMD }

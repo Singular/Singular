@@ -139,7 +139,6 @@ void writeTime(const char* v)
   }
 }
 
-#ifdef HAVE_GETTIMEOFDAY
 /*0 Real timer implementation*/
 int rtimerv = 0;
 static struct timeval  startRl;
@@ -147,8 +146,13 @@ static struct timeval  siStartRTime;
 static struct timezone tzp;
 void initRTimer()
 {
+#ifdef HAVE_GETTIMEOFDAY
   gettimeofday(&startRl, &tzp);
   gettimeofday(&siStartRTime, &tzp);
+#else
+  memset(&startRl,0,sizeof(startRl));
+  memset(&startRTime,0,sizeof(startRTime));
+#endif
 }
 
 void startRTimer()
@@ -201,4 +205,3 @@ void writeRTime(const char* v)
   if (f > mintime)
    Print("//%s %.2f sec \n" ,v ,f);
 }
-#endif

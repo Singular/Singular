@@ -363,13 +363,11 @@ lines:
               writeTime("used time:");
               startTimer();
             }
-            #ifdef HAVE_GETTIMEOFDAY
             if (rtimerv)
             {
               writeRTime("used real time:");
               startRTimer();
             }
-            #endif
             prompt_char = '>';
 #ifdef HAVE_SDB
             if (sdb_flags & 2) { sdb_flags=1; YYERROR; }
