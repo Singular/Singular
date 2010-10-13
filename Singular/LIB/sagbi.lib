@@ -208,7 +208,7 @@ static proc spolynomialsGB(ideal algebra,r,int method)
   ideal kernOld,algebraicRelationsOld;
   kernOld=fetch(r,kern); //kern is Groebner basis of the kernel of the map
                          //Phi:r->K[x_1,...,x_n], x(i)->x(i),@y(i)
-                                ->leadTermsAlgebra(i)
+                         //       ->leadTermsAlgebra(i)
   algebraicRelationsOld=fetch(r,algebraicRelations);
   ideal leadTermsAlgebra=fetch(br,leadTermsAlgebra);
   ideal listOfVariables=maxideal(1);
