@@ -67,7 +67,6 @@ omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr));
 */
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
-#ifdef buildin_rand
 /*
  *
  *  A prime modulus multiplicative linear congruential
@@ -105,5 +104,4 @@ int siRand()
 
   return( siSeed );
 }
-#endif
 

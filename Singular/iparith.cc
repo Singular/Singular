@@ -2656,11 +2656,7 @@ static BOOLEAN jjRANDOM(leftv res, leftv u, leftv v)
 {
   int i=(int)(long)u->Data();
   int j=(int)(long)v->Data();
-#ifdef buildin_rand
   res->data =(char *)(long)((i > j) ? i : (siRand() % (j-i+1)) + i);
-#else /* buildin_rand */
-  res->data =(char *)(long)((i > j) ? i : (rand() % (j-i+1)) + i);
-#endif /* buildin_rand */
   return FALSE;
 }
 static BOOLEAN jjRANK2(leftv res, leftv u, leftv v)
@@ -5862,11 +5858,7 @@ static BOOLEAN jjRANDOM_Im(leftv res, leftv u, leftv v, leftv w)
     di = 2 * i + 1;
     for (k=0; k<iv->length(); k++)
     {
-#ifdef buildin_rand
       (*iv)[k] = ((siRand() % di) - i);
-#else
-      (*iv)[k] = ((rand() % di) - i);
-#endif
     }
   }
   res->data = (char *)iv;

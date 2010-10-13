@@ -632,10 +632,8 @@ void  m2_end(int i) __attribute__((noreturn));
 #ifdef __cplusplus
 int   inits(void);
 int   IsPrime(int i);
-#ifdef buildin_rand
 extern int siSeed;
 int siRand();
-#endif
 #endif
 
 #define loop for(;;)

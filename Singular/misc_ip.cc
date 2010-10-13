@@ -405,11 +405,7 @@ int inits(void)
   /*t=(int)time(NULL);*/
   if (t==0) t=1;
   initRTimer();
-#ifdef buildin_rand
   siSeed=t;
-#else
-  srand((unsigned int)t);
-#endif
 #ifdef HAVE_FACTORY
   factoryseed(t);
 #endif

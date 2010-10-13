@@ -546,11 +546,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if ((h!=NULL) &&(h->Typ()==INT_CMD))
         {
           siRandomStart=(int)((long)h->Data());
-  #ifdef buildin_rand
           siSeed=siRandomStart;
-  #else
-          srand((unsigned int)siRandomStart);
-  #endif
   #ifdef HAVE_FACTORY
           factoryseed(siRandomStart);
   #endif

@@ -117,6 +117,9 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
   //        or     3 0 <mpz_t nominator> <mpz_t denominator>
   //        or     3 1  dto.
   //        or     3 3 <mpz_t nominator>
+  //        or     3 5 <mpz_t raw nom.> <mpz_t raw denom.>
+  //        or     3 6 <mpz_t raw nom.> <mpz_t raw denom.>
+  //        or     3 7 <mpz_t raw nom.>
   if(rField_is_Zp(d->r))
   {
     fprintf(d->f_write,"%d ",(int)(long)n);
@@ -131,12 +134,22 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
     }
     else if (n->s<2)
     {
-      gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
+      //gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
+      fprintf(d->f_write,"%d ",n->s+5);
+      mpz_out_str (d->f_write,32, n->z);
+      fprintf(d->f_write," ");
+      mpz_out_str (d->f_write,32, n->n);
+      fprintf(d->f_write," ");
+
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
     }
     else /*n->s==3*/
     {
-      gmp_fprintf(d->f_write,"3 %Zd ",n->z);
+      //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
+      fprintf(d->f_write,"8 ");
+      mpz_out_str (d->f_write,32, n->z);
+      fprintf(d->f_write," ");
+      
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
     }
   }
@@ -284,7 +297,7 @@ number ssiReadNumber(ssiInfo *d)
      {
      case 0:
      case 1:
-       {// read int or mpz_t or mpz_t, mpz_t
+       {// read mpz_t, mpz_t
         number n=nlRInit(0);
         mpz_init(n->n);
         gmp_fscanf(d->f_read,"%Zd %Zd",n->z,n->n);
@@ -293,13 +306,31 @@ number ssiReadNumber(ssiInfo *d)
        }
 
      case 3:
-       {// read int or mpz_t or mpz_t, mpz_t
+       {// read mpz_t
          number n=nlRInit(0);
          gmp_fscanf(d->f_read,"%Zd",n->z);
-         n->s=sub_type;
+         n->s=3; /*sub_type*/
          return n;
        }
      case 4: { int dd; fscanf(d->f_read,"%d",&dd); return INT_TO_SR(dd); }
+     case 5:
+     case 6:
+       {// read raw mpz_t, mpz_t
+        number n=nlRInit(0);
+        mpz_init(n->n);
+        mpz_inp_str (n->z, d->f_read, 32);
+        mpz_inp_str (n->n, d->f_read, 32);
+        n->s=sub_type-5;
+        return n;
+       }
+     case 8:
+       {// read raw mpz_t
+        number n=nlRInit(0);
+        mpz_inp_str (n->z, d->f_read, 32);
+        n->s=sub_type=3; /*subtype-5*/
+        return n;
+       }
+
      default: Werror("error in reading number: invalid subtype %d",sub_type);
               return NULL;
      }

@@ -299,8 +299,6 @@ int hpux9_system(const char* system);
 #undef DO_DEEP_PROFILE
 #endif
 
-#define buildin_rand 1
-
 /* define to enable assume */
 #ifndef HAVE_ASSUME
 #undef HAVE_ASSUME
@@ -497,12 +495,6 @@ int hpux9_system(const char* system);
 #define MPSR_DEBUG
 #endif
 
-
-#ifdef TEST
-#ifndef buildin_rand
-#define buildin_rand 1
-#endif
-#endif
 
 /* define SPECTRUM_DEBUG and SPECTRUM_PRINT for debugging the spectrum code */
 /* define SPECTRUM_IOSTREAM to use C++ iostream for error messages          */

@@ -398,11 +398,7 @@ static const char* feOptAction(feOptIndex opt)
       case FE_OPT_RANDOM:
         siRandomStart = (unsigned int) ((unsigned long)
 			                  (feOptSpec[FE_OPT_RANDOM].value));
-#ifdef buildin_rand
         siSeed=siRandomStart;
-#else
-        srand((unsigned int)siRandomStart);
-#endif
 #ifdef HAVE_FACTORY
         factoryseed(siRandomStart);
 #endif
