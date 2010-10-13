@@ -1304,8 +1304,7 @@ PURPOSE: compute factorizations of the polynomial, which depends on X and D.
 EXAMPLE: example facSubWeyl; shows examples
 SEE ALSO: facFirstWeyl, testNCfac, facFirstShift
 "{
-  //proc facSubWeyl
-  // basering can be anything having a Weyl algebra as subalgebra
+    // basering can be anything having a Weyl algebra as subalgebra
   def @r = basering;
   //We begin to check the input for assumptions
   // which are: X,D are vars of the basering,
@@ -1326,13 +1325,10 @@ SEE ALSO: facFirstWeyl, testNCfac, facFirstShift
   int isReverted = 0; // Reverted Weyl if dx=xd-1 holds
   if (u==0)
   {
-    // hence w != 0, swap X<->D later
     isReverted = 1;
-    //    w = D; D=X; X=w;
   }
   // else: do nothing
-  // DONE with assumptions
-  //Input successfuy checked
+  // DONE with assumptions, Input successfully checked
   intvec lexpofX = leadexp(X);
   intvec lexpofD = leadexp(D);
   int varnumX=1;
@@ -1345,14 +1341,6 @@ SEE ALSO: facFirstWeyl, testNCfac, facFirstShift
   {
     varnumD++;
   }
-  /* VL: it's not clear what you do here!!! I comment out */
-  //     lexpofX = lexpofX +1;
-  //      lexpofX[varnumX] = 0;
-  //      lexpofX[varnumD] = 0;
-  //      if (deg(h,lexpofX)!=0)
-  //      {
-  //           return(list());
-  //      }
   /* VL : to add printlevel stuff */
 
   if (isReverted)
@@ -1783,20 +1771,6 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
   return(result);
 }//proc facshift
 
-static proc bugFromMLee()
-{
-  LIB "ncfactor.lib";
-  ring s = 0,(z,x),dp;
-  def S = nc_algebra(1,1); setring S;
-  poly f= -60z4x2-54z4-56zx3-59z2x-64;
-  option(prot); option(mem);
-  def l= facFirstWeyl (f);
-  l; // before: empty list; after fix: 1 entry, f is irreducible
-  poly g = 75z3x2+92z3+24;
-  def l= facFirstWeyl (g);
-  l; //before: empty list
-}
-
 static proc refineFactList(list L)
 {
   // assume: list L is an output of factorization proc
@@ -1816,7 +1790,6 @@ static proc refineFactList(list L)
       B[cnt] = M; cnt++;
       for (j=i+1; j<=s; j++)
       {
-        //      if ( (size(L[j]) == sm) && (isEqualList(M,L[j])) )
         if ( isEqualList(M,A[j]) )
         {
           k++;
@@ -1917,8 +1890,20 @@ testNCfac(l1); // was not ok, but now it's been fixed!!!
 
 */
 
-/* more things from Martin Lee to fix:
+/*
+// bug from M Lee
+LIB "ncfactor.lib";
+ring s = 0,(z,x),dp;
+def S = nc_algebra(1,1); setring S;
+poly f= -60z4x2-54z4-56zx3-59z2x-64;
+def l= facFirstWeyl (f);
+l; // before: empty list; after fix: 1 entry, f is irreducible
+poly g = 75z3x2+92z3+24;
+def l= facFirstWeyl (g);
+l; //before: empty list, now: correct
+*/
 
+/* more things from Martin Lee; fixed
 ring R = 0,(x,s),dp;
 def r = nc_algebra(1,s);
 setring(r);
@@ -1926,7 +1911,6 @@ poly h = (s2*x+x)*s;
 h= h* (x+s);
 def l= facFirstShift(h);
 l; // contained doubled entries: not anymore, fixed!
-
 
 ring R = 0,(x,s),dp;
 def r = nc_algebra(1,-1);
