@@ -2486,7 +2486,7 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
 
 
 #if MYTEST
-  PrintS("Changes in v: {");
+  PrintS("Changes in v: { ");
 #endif
 
   for( int i = 0; i <= N; i++ ) // Note [0] == component !!! No Skip?
@@ -2498,7 +2498,7 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
       v[i] = -1; // Undo!
       assume( pVarOffset[i] != -1 );
 #if MYTEST
-      Print("v[%d]: %010x", i, pVarOffset[i]);
+      Print("v[%d]: %010x; ", i, pVarOffset[i]);
 #endif
     }
     else
@@ -2509,7 +2509,7 @@ static void rO_ISSuffix(int &place, int &bitplace, int &prev_ord, long *o,
     pVarOffset[0] &= 0x0fff;
 
 #if MYTEST
-  PrintS("}!\n");
+  PrintS(" }!\n");
 #endif
   sro_ord &ord_struct = tmp_typ[typ_j];
 
@@ -2785,7 +2785,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       {
         if (omit_comp)
         {
-          dReportError("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d", i, r_ord);
+          dReportError("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d (ringorder_IS)", i, r_ord);
           omit_comp = FALSE;
         }
         order[j]=r_ord; /*r->order[i];*/
@@ -2798,7 +2798,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         if (omit_comp)
         {
 #ifndef NDEBUG
-          Warn("WRONG USAGE? of rModifyRing: omitting component due to the ordering block [%d]: %d", i, r_ord);
+          Warn("WRONG USAGE? of rModifyRing: omitting component due to the ordering block [%d]: %d (ringorder_s)", i, r_ord);
 #endif
           omit_comp = FALSE;
         }
