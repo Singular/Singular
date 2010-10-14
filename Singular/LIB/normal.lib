@@ -2494,7 +2494,7 @@ EXAMPLE: example genus; shows an example
           tauloc=inv[2];
           nodes=tau-tauloc-2*cusps;
           nsing=nsing+nodes;
-	  if (inv[2]!=0) { nsing++; }
+          if (inv[2]!=0) { nsing++; }
           nbranch=inv[3]+ 2*nodes+cusps;
           delt=delt+nodes+cusps;
           if((w>=1)&&(inv[2]==0)){"smooth at (0,0,1)";}
@@ -4617,7 +4617,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
       // We have to go on.
       // The new denominator is chosen.
       c = D * c;
- 
+
       // If we have a universal denominator of smaller degree than c,
       // we replace c by it.
       if(condu != 0){
