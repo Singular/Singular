@@ -4080,6 +4080,9 @@ static number jjLONG2N(long d)
   }
   else
   {
+#if !defined(OM_NDEBUG) && !defined(NDEBUG)
+    omCheckBin(rnumber_bin);
+#endif
     number z=(number)omAllocBin(rnumber_bin);
     #if defined(LDEBUG)
     z->debug=123456;
