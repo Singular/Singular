@@ -3,32 +3,59 @@ version="$Id$";
 category="Applications";
 info="
 LIBRARY: findifs.lib  Tools for the finite difference schemes
-AUTHORS: Viktor Levandovskyy,     levandov@risc.uni-linz.ac.at
+AUTHORS: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
 
-THEORY: We provide the presentation of difference operators in a polynomial,
+OVERVIEW:
+        We provide the presentation of difference operators in a polynomial,
         semi-factorized and a nodal form. Running @code{findifs_example();}
-        will show how we generate finite difference schemes of linear PDE's
-        from given approximations.
+        will demonstrate, how we generate finite difference schemes of linear PDEs
+        from given approximations. 
+
+Theory: The method we use have been developed by V. Levandovskyy and Bernd Martin. The
+computation of a finite difference scheme of a given single linear partial
+differential equation with constant coefficients with a given approximation
+rules boils down to the computation of a Groebner basis of a submodule of
+a free module with respect to the ordering, eliminating module components.
+
+
+Support: SpezialForschungsBereich F1301 of the Austrian FWF
 
 PROCEDURES:
+findifs_example();  containes a guided explanation of our approach
 decoef(P,n);  decompose polynomial P into summands with respect to the number n
 difpoly2tex(S,P[,Q]); present the difference scheme in the nodal form
 
-AUXILIARY PROCEDURES:
-findifs_example();  containes a guided explanation of our approach
+
 exp2pt(P[,L]); convert a polynomial M into the TeX format, in nodal form
-mon2pt(P[,L]); convert a monomial M into the TeX format, in nodal form
 texcoef(n);  converts the number n into TeX
 npar(n); search for 'n' among the parameters and returns its number
 magnitude(P); compute the square of the magnitude of a complex expression
 replace(s,what,with);  replace in s all the substrings with a given string
-xchange(w,a,b); exchange two substrings of a string
-par2tex(s);     convert special characters to TeX in s
+xchange(w,a,b); exchange two substrings in a given string
+
+SEE ALSO: latex_lib, findiff_lib
 ";
 
 
 LIB "latex.lib";
 LIB "poly.lib";
+
+proc tst_findif()
+{
+  example decoef;
+  example difpoly2tex;
+  example exp2pt;
+  example texcoef;
+  example npar;
+  example magnitude;
+  example replace;
+  example xchange;
+}
+
+// static procs:
+// par2tex(s);     convert special characters to TeX in s
+// mon2pt(P[,L]); convert a monomial M into the TeX format, in nodal form
+
 
 // 1. GLOBAL ASSUME: in the ring we have first Tx, then Tt: [FIXED, not needed anymore]!
 // 2. map vars other than Tx,Tt to parameters instead or just ignore them [?]
@@ -62,7 +89,7 @@ example
  t;
 }
 
-proc par2tex(string s)
+static proc par2tex(string s)
 "USAGE:  par2tex(s);  s a string
 RETURN:  string
 PURPOSE: converts special characters to TeX in s
@@ -72,6 +99,8 @@ NOTE: the convention is the following:
       'theta', 'ro', 'A', 'V' are converted to greek letters.
 EXAMPLE: example par2tex; shows examples
 "{
+  // can be done with the help of latex_lib
+
 // s is a tex string with a poly
 // replace theta with \theta
 // A with \lambda
@@ -219,7 +248,7 @@ example
   print(exp2pt(M,"F"));
 }
 
-proc mon2pt(poly M, string V)
+static proc mon2pt(poly M, string V)
 "USAGE:  mon2pt(M,V);  M poly, V a string
 RETURN:  string
 PURPOSE: convert a monomial M into the TeX format, nodal form
@@ -333,7 +362,7 @@ proc decoef(poly P, number n)
 "USAGE:  decoef(P,n);  P a poly, n a number
 RETURN:  ideal
 PURPOSE:  decompose polynomial P into summands with respect
-to the  presence of a number n in the coefficients
+to the  presence of the number n in the coefficients
 NOTE:    n is usually a parameter with no power
 EXAMPLE: example decoef; shows examples
 "{
@@ -394,8 +423,7 @@ proc texcoef(number n)
 "USAGE:  texcoef(n);  n a number
 RETURN:  string
 PURPOSE:  converts the number n into TeX format
-NOTE: if n is a polynomial, texcoef adds extra brackets.
-@* Performs some space substitutions
+NOTE: if n is a polynomial, texcoef adds extra brackets and performs some space substitutions
 EXAMPLE: example texcoef; shows examples
 "{
   // makes tex from n
@@ -463,7 +491,7 @@ proc difpoly2tex(ideal S, list P, list #)
 "USAGE:  difpoly2tex(S,P[,Q]);  S an ideal, P and optional Q are lists
 RETURN:  string
 PURPOSE: present the difference scheme in the nodal form
-ASSUME: ideal S is the result of 'decoef' procedure
+ASSUME: ideal S is the result of @code{decoef} procedure
 NOTE: a list P may be empty or may contain parameters, which will not
 appear in denominators
 @* an optional list Q represents the part of the scheme, depending
@@ -610,8 +638,25 @@ ASSUME: i is the variable of a basering
 EXAMPLE: example magnitude; shows examples
 "
 {
-  // check whether i is present among the vars TODO
-  // assume i^2+1=0;
+  // check whether i is present among the vars
+  list L = ringlist(basering)[2]; // vars
+  int j; int cnt = 0;
+  for(j=size(L);j>0;j--)
+  {
+    if (L[j] == "i") 
+    {
+      cnt = 1; break;
+    }
+  }
+  if (!cnt)
+  {
+    ERROR("a variable called i is expected in basering");
+  }
+  // i is present, check that i^2+1=0;
+//   if (NF(i^2+1,std(0)) != 0)
+//   {
+//     "Warning: i^2+1=0 does not hold. Reduce the output manually";
+//   }
   poly re = subst(P,i,0);
   poly im = (P - re)/i;
   return(re^2+im^2);
@@ -620,8 +665,8 @@ example
 {
   "EXAMPLE:"; echo=2;
   ring r = (0,d),(g,i,sin,cos),dp;
-  poly P = d*i*sin - g*cos +d^2;
-  magnitude(P);
+  poly P = d*i*sin - g*cos +d^2*i;
+  NF( magnitude(P), std(i^2+1) );
 }
 
 
@@ -636,24 +681,6 @@ static proc clTex(string s)
   }
   return(t);
 }
-
-static proc ElimModComp(module M, int num)
-{
-  // experimental, todo
-  // check whether a curr.ord is elim-comp
-  string s = ordstr(basering);
-  int ns = size(s);
-  //  s[ns] = "c", "C";
-  if (s[1]="c")
-  {
-    // num last components
-  }
-  if (s[1]="C")
-  {
-    // num first components
-  }
-}
-
 
 static proc simfrac(poly up, poly down)
 {
@@ -712,10 +739,17 @@ print(M*X);
  "* Perform the elimination of module components:";
  " module R = transpose(M);";
  " module S = std(R);";
- " poly   p = S[4,1];" ;
  module R = transpose(M);
  module S = std(R);
+ " * See the result of Groebner bases: generators are columns";
+ " print(S);";
+ print(S);
+ " * So, only the first column has its nonzero element in the last component";
+ " * Hence, this polynomial is the scheme";
+ " poly   p = S[4,1];" ;
  poly   p = S[4,1]; // by elimination of module components
+ " print(p); ";
+ print(p);
  list L; L[1]=A;L[2] = B;
  ideal I = decoef(p,dt); // make splitting w.r.t. the appearance of dt
  "* Create the nodal of the scheme in TeX format: ";
