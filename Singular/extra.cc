@@ -2210,7 +2210,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         else
   /*==================== generic debug ==================================*/
-  #ifdef PDEBUG
         if(strcmp(sys_cmd,"DetailedPrint")==0)
         {
           if( h == NULL )
@@ -2224,10 +2223,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
             const ring r = (const ring)h->Data();
             rWrite(r);
             PrintLn();
-  #ifdef RDEBUG
+#ifdef RDEBUG
             rDebugPrint(r);
-  #endif
+#endif
           }
+#ifdef PDEBUG
           else
           if( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD)
           {
@@ -2257,11 +2257,11 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
             idShow(id, currRing, currRing, nTerms);
           }
+#endif
 
           return FALSE;
         }
         else
-  #endif
   /*==================== mtrack ==================================*/
       if(strcmp(sys_cmd,"mtrack")==0)
       {
@@ -2326,6 +2326,84 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       }
       else
   #endif
+  /*==================== omMemoryTest ==================================*/
+        if (strcmp(sys_cmd,"omMemoryTest")==0)
+        {
+
+#if !defined(OM_NDEBUG)
+
+#ifdef OM_STATS_H          
+          PrintS("\n[om_Info]: \n");
+          omUpdateInfo();
+#define OM_PRINT(name) Print(" %-22s : %10ld \n", #name, om_Info . name)
+          OM_PRINT(MaxBytesSystem);
+          OM_PRINT(CurrentBytesSystem);
+          OM_PRINT(MaxBytesSbrk);
+          OM_PRINT(CurrentBytesSbrk);
+          OM_PRINT(MaxBytesMmap);
+          OM_PRINT(CurrentBytesMmap);
+          OM_PRINT(UsedBytes);
+          OM_PRINT(AvailBytes);
+          OM_PRINT(UsedBytesMalloc);
+          OM_PRINT(AvailBytesMalloc);
+          OM_PRINT(MaxBytesFromMalloc);
+          OM_PRINT(CurrentBytesFromMalloc);
+          OM_PRINT(MaxBytesFromValloc);
+          OM_PRINT(CurrentBytesFromValloc);
+          OM_PRINT(UsedBytesFromValloc);
+          OM_PRINT(AvailBytesFromValloc);
+          OM_PRINT(MaxPages);
+          OM_PRINT(UsedPages);
+          OM_PRINT(AvailPages);
+          OM_PRINT(MaxRegionsAlloc);
+          OM_PRINT(CurrentRegionsAlloc);
+#undef OM_PRINT
+#endif
+
+#ifdef OM_OPTS_H
+          PrintS("\n[om_Opts]: \n");
+#define OM_PRINT(format, name) Print(" %-22s : %10" format"\n", #name, om_Opts . name)
+          OM_PRINT("d", MinTrack);
+          OM_PRINT("d", MinCheck);
+          OM_PRINT("d", MaxTrack);
+          OM_PRINT("d", MaxCheck);
+          OM_PRINT("d", Keep);
+          OM_PRINT("d", HowToReportErrors);
+          OM_PRINT("d", MarkAsStatic);
+          OM_PRINT("u", PagesPerRegion);
+          OM_PRINT("p", OutOfMemoryFunc);
+          OM_PRINT("p", MemoryLowFunc);
+          OM_PRINT("p", ErrorHook);
+#undef OM_PRINT          
+#endif
+
+          
+
+#ifdef OM_ERROR_H          
+          Print("\n\n[om_ErrorStatus]        : '%s' (%s)\n",
+                omError2String(om_ErrorStatus),
+                omError2Serror(om_ErrorStatus));
+          Print("[om_InternalErrorStatus]: '%s' (%s)\n",
+                omError2String(om_InternalErrorStatus),
+                omError2Serror(om_InternalErrorStatus));
+
+//          PrintS("Trying to check the omalloc memory system: ");
+          {
+            omError_t ret = _omDebugMemory(10, OM_FL);
+            Print("[omDebugMemory()]       : '%s' (%s)\n", omError2String(ret), omError2Serror(ret));
+          }
+#endif
+          
+          
+#else
+          WarnS("Sorry: not available with -DOM_NDEBUG!\n");        
+#endif
+
+//        omTestMemory(1);
+//        omtTestErrors();
+          return FALSE;
+        }
+        else      
   /*==================== naIdeal ==================================*/
       if(strcmp(sys_cmd,"naIdeal")==0)
       {
@@ -3485,13 +3563,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
     }
     else
   #endif // HAVE_SINGULAR_PLUS_PLUS
-
-      if (strcmp(sys_cmd,"FrankTest")==0)
-    {
-      PrintS("Hell Or Word!");
-      return FALSE;
-    }
-    else
 
 #ifdef HAVE_GFAN
   /*======== GFAN ==============*/
