@@ -8,6 +8,8 @@ AUTHORS: Daniel Andres,        daniel.andres@math.rwth-aachen.de
 @*       Viktor Levandovskyy,  levandov@math.rwth-aachen.de
 @*       Jorge Martin-Morales, jorge@unizar.es
 
+Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
+
 OVERVIEW: Let K be a field of characteristic 0. Given a polynomial ring R = K[x_1,...,x_n]
 and polynomials f_1,...,f_r in R, define F = f_1*...*f_r and F^s = f_1^s_1*...*f_r^s_r
 for symbolic discrete (that is shiftable) variables s_1,..., s_r.
