@@ -572,7 +572,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         omFree(l->mode);
         l->mode = omStrDup(mode);
         SI_LINK_SET_RW_OPEN_P(l);
-        myynest=0;
+        //myynest=0;
         fe_fgets_stdin=fe_fgets_dummy;
         if ((u!=NULL)&&(u->rtyp==IDHDL))
         {
