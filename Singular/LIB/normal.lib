@@ -2481,7 +2481,7 @@ EXAMPLE: example genus; shows an example
    {
        if(w>=1){"the non-nodal-cuspidal singularities";"";}
        setring C;
-       ideal I1=imap(newR,IDsing);
+       ideal I1=imap(newR,radIDsing);
        iloc=vdim(std(I1));
        if(iglob==iloc)
        {
@@ -2494,6 +2494,7 @@ EXAMPLE: example genus; shows an example
           tauloc=inv[2];
           nodes=tau-tauloc-2*cusps;
           nsing=nsing+nodes;
+	  if (inv[2]!=0) { nsing++; }
           nbranch=inv[3]+ 2*nodes+cusps;
           delt=delt+nodes+cusps;
           if((w>=1)&&(inv[2]==0)){"smooth at (0,0,1)";}
@@ -2501,7 +2502,7 @@ EXAMPLE: example genus; shows an example
         else
         {
            setring newR;
-           list pr=minAssGTZ(IDsing);
+           list pr=minAssGTZ(radIDsing);
            if(w>=1){pr;}
 
            for(k=1;k<=size(pr);k++)
