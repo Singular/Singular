@@ -578,7 +578,7 @@ ac_configure=$ac_aux_dir/configure # This should be Cygnus configure.
 #
 # Do not change version here!!!
 #
-factory_version="3.1.1"
+factory_version="3.1.2"
 factory_configuration="'$ac_configure_args' in `pwd`"
 
 #
