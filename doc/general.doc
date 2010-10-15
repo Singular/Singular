@@ -2509,6 +2509,7 @@ delimiter for name substitution
 synonym for @code{help}
 @item @code{//}
 @cindex //
+@cindec comment
 comment delimiter.  Comment extends to the end of the line.
 @item @code{/*}
 @cindex //
