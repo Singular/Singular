@@ -1594,7 +1594,7 @@ ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
 NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
-@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal, 
+@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal,
 @*      the mistletoes
 @*    - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering,uptodeg).

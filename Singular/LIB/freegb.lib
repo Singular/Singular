@@ -492,7 +492,7 @@ EXAMPLE: example letplaceGBasis; shows examples
 example
 {
   "EXAMPLE:"; echo = 2;
-  ring r = 0,(x,y,z),(dp(1),dp(2)); 
+  ring r = 0,(x,y,z),(dp(1),dp(2));
   int degree_bound = 5;
   def R = makeLetterplaceRing(5);
   setring R;
@@ -3007,7 +3007,7 @@ example
 
 */
 
-//static 
+//static
 proc lpMultX(poly f, poly g)
 {
   /* multiplies two polys in a very general setting correctly */
@@ -3075,7 +3075,7 @@ EXAMPLE: example lpMult; shows examples
 "
 {
 
-  // changelog: 
+  // changelog:
   // VL oct 2010: deg -> deg(_,w) for the length
   // shrink the result => don't need to decompose polys
   // since the shift is big enough

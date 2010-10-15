@@ -1,4 +1,3 @@
-//GP, last modified 28.6.06
 ///////////////////////////////////////////////////////////////////////////////
 version="$Id$";
 category="Teaching";
@@ -6,7 +5,8 @@ info="
 LIBRARY:  crypto.lib     Procedures for teaching cryptography
 AUTHOR:                  Gerhard Pfister, pfister@mathematik.uni-kl.de
 
-NOTE: The library contains procedures to compute the discrete logarithm,
+OVERVIEW:
+     The library contains procedures to compute the discrete logarithm,
       primality-tests, factorization included elliptic curves.
       The library is intended to be used for teaching purposes but not
       for serious computations. Sufficiently high printlevel allows to

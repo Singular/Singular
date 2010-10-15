@@ -6,7 +6,8 @@ LIBRARY: jacobson.lib     Algorithms for Smith and Jacobson Normal Form
 AUTHOR: Kristina Schindelar,     Kristina.Schindelar@math.rwth-aachen.de,
 @*           Viktor Levandovskyy,      levandov@math.rwth-aachen.de
 
-THEORY: We work over a ring R, that is an Euclidean principal ideal domain.
+OVERVIEW:
+We work over a ring R, that is an Euclidean principal ideal domain.
 @* If R is commutative, we suppose R to be a polynomial ring in one variable.
 @* If R is non-commutative, we suppose R to have two variables, say x and d.
 @* We treat then the basering as the Ore localization of R

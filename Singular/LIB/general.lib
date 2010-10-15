@@ -1,6 +1,3 @@
-//GMG, last modified 18.6.99
-//anne, added deleteSublist and watchdog 12.12.2000
-//eric, added absValue 11.04.2002
 ///////////////////////////////////////////////////////////////////////////////
 version="$Id$";
 category="General purpose";

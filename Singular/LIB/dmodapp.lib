@@ -8,9 +8,10 @@ AUTHORS: Viktor Levandovskyy,  levandov@math.rwth-aachen.de
 
 Support: DFG Graduiertenkolleg 1632 'Experimentelle und konstruktive Algebra'
 
-OVERVIEW: Let K be a field of characteristic 0, R = K[x1,...,xN] and
- D be the Weyl algebra in variables x1,...,xN,d1,...,dN.
- In this library there are the following procedures for algebraic D-modules:
+OVERVIEW:
+Let K be a field of characteristic 0, R = K[x1,...,xN] and
+D be the Weyl algebra in variables x1,...,xN,d1,...,dN.
+In this library there are the following procedures for algebraic D-modules:
 
 @* - given a cyclic representation D/I of a holonomic module and a polynomial
  F in R, it is proved that the localization of D/I with respect to the mult.

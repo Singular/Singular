@@ -1,8 +1,6 @@
-// $Id$
-// E. Tobis  12.Nov.2004
-// last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
-category="Symbolic-numerical solving"
+version="$Id$";
+category="Symbolic-numerical solving";
 info="
 LIBRARY: signcond.lib Routines for computing realizable sign conditions
 AUTHOR:               Enrique A. Tobis, etobis@dc.uba.ar

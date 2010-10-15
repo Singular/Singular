@@ -1,6 +1,5 @@
-version="$Id$";
-// (GMG, last modified 08.06.08: comments to Newton non-degenerate added)
 ///////////////////////////////////////////////////////////////////////////////
+version="$Id$";
 
 category="Singularities";
 info="

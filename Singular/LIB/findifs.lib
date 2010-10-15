@@ -9,7 +9,7 @@ OVERVIEW:
         We provide the presentation of difference operators in a polynomial,
         semi-factorized and a nodal form. Running @code{findifs_example();}
         will demonstrate, how we generate finite difference schemes of linear PDEs
-        from given approximations. 
+        from given approximations.
 
 Theory: The method we use have been developed by V. Levandovskyy and Bernd Martin. The
 computation of a finite difference scheme of a given single linear partial
@@ -643,7 +643,7 @@ EXAMPLE: example magnitude; shows examples
   int j; int cnt = 0;
   for(j=size(L);j>0;j--)
   {
-    if (L[j] == "i") 
+    if (L[j] == "i")
     {
       cnt = 1; break;
     }

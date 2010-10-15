@@ -1,13 +1,3 @@
-// $Id$
-// (GMG, modified 22.06.96)
-// GMG, last modified 30.10.08: new procedure elimRing;
-// elim changes now to ring with elimination ordering (extra weight vector
-// a(...)), works now in qring, new examples have been added;
-// syntax of elim, nselect, select and select1 changed: instead of two
-// integers an intvec can be given. Bug in nselect fixed which occured
-// in connectin with type conversion from matrix to module.
-// GMG, last modified 5.01.09: elim uses now stdhilb(id,@w) instead of std(id)
-// and can now choose as method slimgb or std.
 ///////////////////////////////////////////////////////////////////////////////
 version="$Id$";
 category="Commutative Algebra";

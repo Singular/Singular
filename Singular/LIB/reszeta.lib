@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 version="$Id$";
 category="Algebraic Geometry";
 info="
@@ -9,12 +9,12 @@ AUTHORS:  A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
 @*        G. Pfister,           pfister@mathematik.uni-kl.de
 
 REFERENCES:
-[1] Fruehbis-Krueger,A., Pfister,G.: Some Applications of Resolution of 
-@*  Singularities from a Practical Point of View, in Computational 
+[1] Fruehbis-Krueger,A., Pfister,G.: Some Applications of Resolution of
+@*  Singularities from a Practical Point of View, in Computational
 @*  Commutative and Non-commutative Algebraic Geometry,
 @*  NATO Science Series III, Computer and Systems Sciences 196, 104-117 (2005)
-[2] Fruehbis-Krueger: An Application of Resolution of Singularities: 
-@*  Computing the topological Zeta-function of isolated surface singularities 
+[2] Fruehbis-Krueger: An Application of Resolution of Singularities:
+@*  Computing the topological Zeta-function of isolated surface singularities
 @*  in (C^3,0),  in D.Cheniot, N.Dutertre et al.(Editors): Singularity Theory, @*  World Scientific Publishing (2007)
 
 PROCEDURES:

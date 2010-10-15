@@ -1,9 +1,4 @@
 //////////////////////////////////////////////////////////////////////////////
-//major revision Jan/Feb. 2007, GMG (groebner with several options)
-//Change of default methods in groebner (June 2008, GMG)
-//stdhilb can be called with std or slimgb (Jan 2008, GMG)
-//### Todo: im lokalen Fall die Hilbert-Samuel Funktion verwenden
-//////////////////////////////////////////////////////////////////////////////
 version="$Id$";
 category="Miscellaneous";
 info="

@@ -1,3 +1,4 @@
+//
 version="$Id$";
 category="Noncommutative";
 info="
@@ -6,7 +7,8 @@ AUTHORS:  Oleksandr Iena,       yena@mathematik.uni-kl.de,
 @*        Markus Becker,        mbecker@mathematik.uni-kl.de,
 @*        Viktor Levandovskyy,  levandov@mathematik.uni-kl.de
 
-THEORY: Involution is an anti-isomorphism of a non-commutative K-algebra
+OVERVIEW:s
+Involution is an anti-isomorphism of a non-commutative K-algebra
 @* with the property that applied an involution twice, one gets an identity.
 @* Involution is linear with respect to the ground field. In this library we compute
 @* linear involutions, distinguishing the case of a diagonal matrix (such involutions
@@ -16,7 +18,7 @@ THEORY: Involution is an anti-isomorphism of a non-commutative K-algebra
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
 and V. Levandovskyy), Uni Kaiserslautern
 
-NOTE: This library provides algebraic tools for computations and operations
+REMARK: This library provides algebraic tools for computations and operations
 with algebraic involutions and linear automorphisms of non-commutative algebras
 
 PROCEDURES:

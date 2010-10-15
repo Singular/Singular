@@ -1,8 +1,6 @@
-// $Id$
-// E. Tobis  12.Nov.2004, April 2004
-// last change 5. May 2005 (G.-M. Greuel)
 ///////////////////////////////////////////////////////////////////////////////
-category="Teaching"
+version="$Id$";
+category="Teaching";
 info="
 LIBRARY: rootsur.lib   Counting number of real roots of univariate polynomial
 AUTHOR:                 Enrique A. Tobis, etobis@dc.uba.ar

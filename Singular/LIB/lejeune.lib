@@ -1,7 +1,6 @@
-
 //-*- mode:C++;-*-
-// $Id$
-
+version="$Id$";
+category="??";
 
 info="
 LIBRARY: lejeune.lib     Arc space computations

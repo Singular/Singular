@@ -1,6 +1,4 @@
-// last change ML: 12.08.99
 ///////////////////////////////////////////////////////////////////////////////
-// This library is for Singular 1.2 or newer
 
 version="$Id$";
 category="Commutative Algebra";

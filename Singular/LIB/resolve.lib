@@ -7,16 +7,16 @@ LIBRARY:  resolve.lib      Resolution of singularities (Desingularization)
 AUTHORS:  A. Fruehbis-Krueger,  anne@mathematik.uni-kl.de,
 @*        G. Pfister,           pfister@mathematik.uni-kl.de
 
-REFERENCES: 
+REFERENCES:
 [1] J.Kollar: Lectures on Resolution of Singularities, Princeton University Press (2007)
 @*  (contains large overview over various known methods for curves and surfaces as well as
 @*   a detailed description of the approach in the general case)
-[2] A.Bravo, S.Encinas, O.Villamayor: A Simplified Proof of Desingularisation and 
+[2] A.Bravo, S.Encinas, O.Villamayor: A Simplified Proof of Desingularisation and
 @*  Applications, Rev. Math. Iberoamericana 21 (2005), 349-458
 @*  (description of the algorithmic proof of desingularization in characteristic zero
 @*  which underlies this implementation)
-[3] A.Fruehbis-Krueger: Computational Aspects of Singularities, in J.-P. Brasselet, 
-@*  J.Damon et al.: Singularities in Geometry and Topology, World Scientific 
+[3] A.Fruehbis-Krueger: Computational Aspects of Singularities, in J.-P. Brasselet,
+@*  J.Damon et al.: Singularities in Geometry and Topology, World Scientific
 @*  Publishing, 253--327 (2007)
 @*  (chapter 4 contains a detailed discussion on algorithmic desingularization and
 @*  efficiency aspects thereof)

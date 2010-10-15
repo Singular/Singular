@@ -1,6 +1,4 @@
 ////////////////////////////////////////////////////////////////////
-// version string automatically expanded by CVS
-
 version="$Id$";
 category="Miscellaneous";
 // summary description of the library

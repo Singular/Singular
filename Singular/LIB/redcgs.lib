@@ -3,7 +3,9 @@ version="$Id$";
 category="General purpose";
 info="
 LIBRARY:  redcgs.lib      Reduced Comprehensive Groebner Systems.
-PURPOSE:  Comprehensive Groebner Systems. Canonical Forms.
+
+OVERVIEW:
+          Comprehensive Groebner Systems. Canonical Forms.
           The library contains Monte's algorithms to compute disjoint, reduced
           Comprehensive Groebner Systems (CGS). A CGS is a set of pairs of
           (segment,basis). The segments S_i are subsets of the parameter space,
