@@ -549,7 +549,7 @@ void mpsr_ttGen()
   mpsr_Tok_inc[12]=(pid %10)+'0'; pid/=10;
   mpsr_Tok_inc[13]=(pid %10)+'0';
 
-  outfile = myfopen(mpsr_Tok_inc, "w");
+  outfile = fopen(mpsr_Tok_inc, "w");
   if (outfile == NULL)
   {
     fprintf(stderr, "Error: mpsr_ttGen: Cannot open file mpsr_Tok.inc\n");
