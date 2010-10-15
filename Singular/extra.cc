@@ -620,7 +620,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           mpz_t m; mpz_init(m);
           mpz_inp_str(m, f, 10);
           fclose(f);
-          number n = mpz2number(m);                           
+          number n = mpz2number(m);
           res->rtyp = BIGINT_CMD;
           res->data = (void*)n;
           return FALSE;
@@ -2009,8 +2009,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 #  include <kernel/ring.h>
 #  include <kernel/shiftgb.h>
 
-  static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
-  {
+static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
+{
     if(h->Typ() == STRING_CMD)
     {
       char *sys_cmd=(char *)(h->Data());
@@ -2212,6 +2212,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   /*==================== generic debug ==================================*/
         if(strcmp(sys_cmd,"DetailedPrint")==0)
         {
+  #ifndef NDEBUG
           if( h == NULL )
           {
             WarnS("DetailedPrint needs arguments...");
@@ -2258,7 +2259,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
             idShow(id, currRing, currRing, nTerms);
           }
 #endif
-
+#endif
           return FALSE;
         }
         else
@@ -2288,9 +2289,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if (fd != NULL) fclose(fd);
         om_Opts.MarkAsStatic = 0;
         return FALSE;
-  #else
-       WerrorS("mtrack not supported without OM_TRACK");
-       return TRUE;
   #endif
       }
   /*==================== mtrack_all ==================================*/
@@ -2311,9 +2309,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if (fd != NULL) fclose(fd);
         om_Opts.MarkAsStatic = 0;
         return FALSE;
-  #else
-       WerrorS("mtrack not supported without OM_TRACK");
-       return TRUE;
   #endif
       }
       else
@@ -2332,7 +2327,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
 
 #if !defined(OM_NDEBUG)
 
-#ifdef OM_STATS_H          
+#ifdef OM_STATS_H
           PrintS("\n[om_Info]: \n");
           omUpdateInfo();
 #define OM_PRINT(name) Print(" %-22s : %10ld \n", #name, om_Info . name)
@@ -2374,12 +2369,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           OM_PRINT("p", OutOfMemoryFunc);
           OM_PRINT("p", MemoryLowFunc);
           OM_PRINT("p", ErrorHook);
-#undef OM_PRINT          
+#undef OM_PRINT
 #endif
 
-          
 
-#ifdef OM_ERROR_H          
+
+#ifdef OM_ERROR_H
           Print("\n\n[om_ErrorStatus]        : '%s' (%s)\n",
                 omError2String(om_ErrorStatus),
                 omError2Serror(om_ErrorStatus));
@@ -2393,17 +2388,13 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
             Print("[omDebugMemory()]       : '%s' (%s)\n", omError2String(ret), omError2Serror(ret));
           }
 #endif
-          
-          
-#else
-          WarnS("Sorry: not available with -DOM_NDEBUG!\n");        
 #endif
 
 //        omTestMemory(1);
 //        omtTestErrors();
           return FALSE;
         }
-        else      
+        else
   /*==================== naIdeal ==================================*/
       if(strcmp(sys_cmd,"naIdeal")==0)
       {

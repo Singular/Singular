@@ -1,3 +1,9 @@
+Mi 13. Okt 15:52:56 CEST 2010
+- release 3-1-2
+- removed macos 9 stuff
+- factorize for Z/p, Z/p(a) improved
+- windows port improved (.h files instead of .inc)
+
 Fri Feb 14 16:53:42 CET 2003 * hannes: bugfix
        could not factorize x2+xy+y2 in Fp(a)[x,y], a2+a+1=0
        added tests in factorize(f,a) (isPurePoly(f,a))

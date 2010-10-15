@@ -13,7 +13,6 @@
 #include <kernel/mod2.h>
 
 #include <kernel/structs.h>
-#include <kernel/structs.h>
 #include <kernel/p_polys.h>
 #include <kernel/ring.h>
 #include <kernel/ideals.h>
