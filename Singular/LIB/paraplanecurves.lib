@@ -1330,7 +1330,7 @@ SEE ALSO: genus
    {
        if(w>=1){"the non-nodal-cuspidal singularities";"";}
        setring C;
-       ideal I1=imap(newR,IDsing);
+       ideal I1=imap(newR,radIDsing);
        iloc=vdim(std(I1));
        if(iglob==iloc)
        {
@@ -1343,6 +1343,10 @@ SEE ALSO: genus
           tauloc=inv[2];
           nodes=tau-tauloc-2*cusps;
           nsing=nsing+nodes;
+          if(inv[2]!=0)
+            {
+              nsing=nsing+1;
+            }
           nbranch=inv[3]+ 2*nodes+cusps;
           delt=delt+nodes+cusps;
           if((w>=1)&&(inv[2]==0)){"smooth at (0,0,1)";}
@@ -1360,7 +1364,7 @@ SEE ALSO: genus
         else
         {
            setring newR;
-           list pr=minAssGTZ(IDsing);
+           list pr=minAssGTZ(radIDsing);
            if(w>=1){pr;}
 
            for(k=1;k<=size(pr);k++)
@@ -1538,7 +1542,7 @@ KEYWORDS: delta invariant; Tjurina number
         gdummy = gdummy + lead(fdummy);
       }
    ideal SQRpart = sqrfree(gdummy);
-   int IntForRet;  ///neu
+   int IntForRet; 
    if(deg(SQRpart[1])==intMult)
      {
         IntForRet = intMult;
@@ -2860,7 +2864,7 @@ ring SS = 0, (u,v,z), dp;
 poly f = -2*u*v^4*z^4+u^4*v^5+12*u^4*v^3*z^2+12*u^2*v^4*z^3-u^3*v*z^5;
 f = f+11*u^3*v^2*z^4-21*u^3*v^3*z^3-4*u^4*v*z^4+2*u^4*v^2*z^3-6*u^4*v^4*z;
 f = f+u^5*z^4-3*u^5*v^2*z^2+u^5*v^3*z-3*u*v^5*z^3-2*u^2*v^3*z^4+u^3*v^4*z^2;
-f = f+v^5*z^4; // 1 OMP of mult 4, 3 OMPs of mult 5, 1 sing at origin
+f = f+v^5*z^4; // 2 OMPs of mult 4, 1 OMP of mult 5, 1 sing at origin
 f = subst(f,z,u+v+z);
 adjointIdeal(f,2);
 def RP1 = paraPlaneCurve(f);  // time 5
