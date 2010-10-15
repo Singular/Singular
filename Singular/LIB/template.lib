@@ -7,7 +7,7 @@ LIBRARY:   template.lib  A Template for a Singular Library
 AUTHOR:    Olaf Bachmann, email: obachman@mathematik.uni-kl.de
 
 SEE ALSO:  standard_lib, Guidelines for writing a library,
-           Typesetting of help strings
+           Typesetting of help and info strings
 
 KEYWORDS: library, template.lib; template.lib; library, info string
 
@@ -23,7 +23,7 @@ RETURN:   int: i+i
 NOTE:     Help string is in pure ASCII
           this line starts on a new line since previous line is short
           mdouble(i): no new line
-SEE ALSO: msum, mtripple, Typesetting of help strings
+SEE ALSO: msum, mtripple, Typesetting of help and info strings
 KEYWORDS: procedure, ASCII help
 EXAMPLE:  example mdouble; shows an example"
 {
@@ -55,7 +55,7 @@ more cumbersome to write.
 @cindex procedure, texinfo help
 @c ref
 @strong{See also:}
-@ref{mdouble}, @ref{msum}, @ref{Typesetting of help strings}
+@ref{mdouble}, @ref{msum}, @ref{Typesetting of help and info strings}
 @c ref
 "
 {
@@ -94,7 +94,7 @@ $i_{1,1}$
 @end texinfo
         Notice that
         automatic linebreaking         is still in affect (like on this line).
-SEE ALSO: mdouble, mtripple, Typesetting of help strings
+SEE ALSO: mdouble, mtripple, Typesetting of help and info strings
 KEYWORDS: procedure, ASCII/Texinfo help
 EXAMPLE: example msum; shows an example"
 {
