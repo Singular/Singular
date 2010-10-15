@@ -2,7 +2,7 @@
 version="$Id$";
 category = "Commutative Algebra";
 info="
-LIBRARY:  modstd.lib  Groebner basis of ideals
+LIBRARY:  modstd.lib      Groebner basis of ideals
 
 AUTHORS:  A. Hashemi      Amir.Hashemi@lip6.fr
 @*        G. Pfister      pfister@mathematik.uni-kl.de
@@ -19,12 +19,33 @@ OVERVIEW:
 
 PROCEDURES:
  modStd(I);        standard basis of I using modular methods (chinese remainder)
- modHenselStd(I);  standard basis of I using modular methods (hensel lifting)
  modS(I,L);        liftings to Q of standard bases of I mod p for p in L
+ modHenselStd(I);  standard basis of I using modular methods (hensel lifting)
 ";
 
 LIB "poly.lib";
 LIB "ring.lib";
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc mixedTest()
+// decides whether the ordering of the basering is mixed
+{
+   int i,p,m;
+   for(i = 1; i <= nvars(basering); i++)
+   {
+      if(var(i) > 1)
+      {
+         p++;
+      }
+      else
+      {
+         m++;
+      }
+   }
+   if((p > 0) && (m > 0)) { return(1); }
+   return(0);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -43,18 +64,24 @@ RETURN:  1 if J includes I,
 EXAMPLE: example isIncluded; shows an example
 "
 {
+   def R = basering;
+   setring R;
+   
    attrib(J,"isSB",1);
    int i,j,k;
 
    if(size(#) > 0)
    {
       int n = #[1];
-      if((n > 1) && (n < ncols(I)) && system("with","MP"))
+      if(n >= ncols(I)) { n = ncols(I); }
+      if((n > 1) && system("with","MP"))
       {
          for(i = 1; i <= n - 1; i++)
          {
             link l(i) = "MPtcp:fork";
+            //link l(i) = "ssi:fork";
             open(l(i));
+            
             write(l(i), quote(redFork(eval(I[ncols(I)-i]), eval(J), 1)));
          }
 
@@ -78,7 +105,7 @@ EXAMPLE: example isIncluded; shows an example
             for(i = 1; i <= n - 1; i++)
             {
                if(status(l(i), "read", "ready"))
-               {
+               { 
                   if(read(l(i)) != 0)
                   {
                      for(i = 1; i <= n - 1; i++)
@@ -224,7 +251,8 @@ example
 
 proc deleteUnluckyPrimes(list T, list L, int ho, list #)
 "USAGE:  deleteUnluckyPrimes(T,L,ho,#); T/L list of polys/primes, ho integer
-RETURN:  lists T,L(,M),lT with T/L(/M) list of polys/primes(/type of #), lT ideal
+RETURN:  lists T,L(,M),lT with T/L(/M) list of polys/primes(/type of #), 
+         lT ideal
 NOTE:    - if ho = 1, the polynomials in T are homogeneous, else ho = 0,
          - lT is prevalent, i.e. the most appearing leading ideal in T
 EXAMPLE: example deleteUnluckyPrimes; shows an example
@@ -350,7 +378,7 @@ proc primeTest(ideal I, bigint p)
 proc primeList(ideal I, int n, list #)
 "USAGE:  primeList(I,n); ( resp. primeList(I,n,L); ) I ideal, n integer
 RETURN:  the intvec of n greatest primes  <= 2147483647 (resp. n greatest primes
-         < L[size(L)] union with L) such that none ot these primes divides any
+         < L[size(L)] union with L) such that none of these primes divides any
          coefficient occuring in I
 EXAMPLE: example primList; shows an example
 "
@@ -489,18 +517,15 @@ example
 proc modpStd(ideal I, int p, int variant, list #)
 "USAGE:  modpStd(I,p,variant,#); I ideal, p integer, variant integer
 ASSUME:  If size(#) > 0, then #[1] is an intvec describing the Hilbert series.
-RETURN:  ideal - a standard basis of I mod p, integer - p (, matrix - if variant
-         = 5, the transformation matrix obtained from liftstd)
+RETURN:  ideal - a standard basis of I mod p, integer - p 
 NOTE:    The procedure computes a standard basis of the ideal I modulo p and
          fetches the result to the basering. If size(#) > 0 the Hilbert driven
          standard basis computation std(.,#[1]) is used instead of groebner.
          The standard basis computation modulo p does also vary depending on the
          integer variant, namely
-@*       - variant = 1: std(.,#[1]) resp. groebner,
-@*       - variant = 2: groebner,
-@*       - variant = 3: homogenize - std(.,#[1]) resp. groebner - dehomogenize,
-@*       - variant = 4: std(.,#[1]) resp. groebner,
-@*       - variant = 5: liftstd1.
+@*       - variant = 1/4: std(.,#[1]) resp. groebner,
+@*       - variant = 2/5: groebner,
+@*       - variant = 3/6: homog. - std(.,#[1]) resp. groebner - dehomog..
 EXAMPLE: example modpStd; shows an example
 "
 {
@@ -525,12 +550,13 @@ EXAMPLE: example modpStd; shows an example
          i = groebner(i);
       }
    }
-   if(variant == 2)
+   
+   if((variant == 2) || (variant == 5))
    {
       i = groebner(i);
    }
 
-   if(variant == 3)
+   if((variant == 3) || (variant == 6))
    {
       list rl = ringlist(@r);
       int nvar@r = nvars(@r);
@@ -576,15 +602,7 @@ EXAMPLE: example modpStd; shows an example
       i = interred(i);
       kill HomR;
    }
-
-   if(variant == 5)
-   {
-      matrix trans;
-      i,trans = liftstd1(i);
-      setring R0;
-      return(list(fetch(@r,i),p,fetch(@r,trans)));
-   }
-
+   
    setring R0;
    return(list(fetch(@r,i),p));
 }
@@ -595,7 +613,6 @@ example
    int p = 181;
    list P = modpStd(I,p,5);
    P;
-   matrix(P[1])-matrix(I)*P[3];
 
    int q = 32003;
    list Q = modpStd(I,q,2);
@@ -607,7 +624,10 @@ example
 proc modStd(ideal I, list #)
 "USAGE:  modStd(I); I ideal
 ASSUME:  If size(#) > 0, then # contains either 1, 2 or 4 integers such that
-@*       - #[1] is the number of available processors for the computation,
+@*       - #[1] is the number of available processors for the computation
+                (parallelization is just applicable using 32-bit Singular 
+                version since MP-links are not compatible with 64-bit Singular 
+                version),
 @*       - #[2] is an optional parameter for the exactness of the computation,
                 if #[2] = 1, the procedure computes a standard basis for sure,
 @*       - #[3] is the number of primes until the first lifting,
@@ -618,8 +638,9 @@ NOTE:    The procedure computes a standard basis of I (over the rational
          numbers) by using  modular methods. If a warning appears then the
          result is a standard basis containing I and with high probability
          a standard basis of I.
-         By default the procedure computes a standard basis of I with high
-         probability, but if the optional parameter #[2] = 1, it is exact.
+         By default the procedure computes a standard basis of I for sure, but 
+         if the optional parameter #[2] = 0, it computes a standard basis of I 
+         with high probability and a warning appears at the end.
          The procedure distinguishes between different variants for the standard
          basis computation in positive characteristic depending on the ordering
          of the basering, the parameter #[2] and if the ideal I is homogeneous.
@@ -629,7 +650,10 @@ NOTE:    The procedure computes a standard basis of I (over the rational
 @*       - variant = 3, if I is not homogeneous, complicated ordering (lp or
                         > 1 block) and exactness = 0,
 @*       - variant = 4, if I is homogeneous and exactness = 1,
-@*       - variant = 5, if I is not homogeneous and exactness = 1.
+@*       - variant = 5, if I is not homogeneous, 1-block-ordering and
+                        exactness = 1,
+@*       - variant = 3, if I is not homogeneous, complicated ordering (lp or
+                        > 1 block) and exactness = 1.
 EXAMPLE: example modStd; shows an example
 "
 {
@@ -640,14 +664,15 @@ EXAMPLE: example modStd; shows an example
    list rl = ringlist(R0);
    if((npars(R0) > 0) || (rl[1] > 0))
    {
-      ERROR("characteristic of basering should be zero, basering should have no parameters");
+      ERROR("Characteristic of basering should be zero, basering should 
+             have no parameters.");
    }
 
    int index = 1;
    int i,k,c;
    int pd = printlevel-voice+2;
    int j = 1;
-   int pTest;
+   int pTest, sizeTest;
    int en = 2134567879;
    int an = 1000000000;
    bigint N;
@@ -660,13 +685,13 @@ EXAMPLE: example modStd; shows an example
          int n1 = #[1];
          if((n1 > 1) && (1 - system("with","MP")))
          {
-            "========================================================================";
-            "There is no MP available on your system. Since this is necessary to     ";
-            "parallelize the algorithm, the computation will be done without forking.";
-            "========================================================================";
+     "========================================================================";
+     "There is no MP available on your system. Since this is necessary to     ";
+     "parallelize the algorithm, the computation will be done without forking.";
+     "========================================================================";
             n1 = 1;
          }
-         int exactness = 0;
+         int exactness = 1;
          int n2 = 10;
          int n3 = 10;
       }
@@ -675,10 +700,10 @@ EXAMPLE: example modStd; shows an example
          int n1 = #[1];
          if((n1 > 1) && (1 - system("with","MP")))
          {
-            "========================================================================";
-            "There is no MP available on your system. Since this is necessary to     ";
-            "parallelize the algorithm, the computation will be done without forking.";
-            "========================================================================";
+     "========================================================================";
+     "There is no MP available on your system. Since this is necessary to     ";
+     "parallelize the algorithm, the computation will be done without forking.";
+     "========================================================================";
             n1 = 1;
          }
          int exactness = #[2];
@@ -690,10 +715,10 @@ EXAMPLE: example modStd; shows an example
          int n1 = #[1];
          if((n1 > 1) && (1 - system("with","MP")))
          {
-            "========================================================================";
-            "There is no MP available on your system. Since this is necessary to     ";
-            "parallelize the algorithm, the computation will be done without forking.";
-            "========================================================================";
+     "========================================================================";
+     "There is no MP available on your system. Since this is necessary to     ";
+     "parallelize the algorithm, the computation will be done without forking.";
+     "========================================================================";
             n1 = 1;
          }
          int exactness = #[2];
@@ -704,14 +729,14 @@ EXAMPLE: example modStd; shows an example
    else
    {
       int n1 = 1;
-      int exactness = 0;
+      int exactness = 1;
       int n2 = 10;
       int n3 = 10;
    }
 
 //-------------------------  Save current options  -----------------------------
    intvec opt = option(get);
-
+   
    option(redSB);
 
 //--------------------  Initialize the list of primes  -------------------------
@@ -725,38 +750,55 @@ EXAMPLE: example modStd; shows an example
    int tt = timer;
    int rt = rtimer;
 
-   if(h)
+   if(!mixedTest())
    {
-      if(exactness == 0) { variant = 1; if(printlevel >= 10) { "variant = 1"; } }
-      if(exactness == 1) { variant = 4; if(printlevel >= 10) { "variant = 4"; } }
-      rl[1] = L[5];
-      def @r = ring(rl);
-      setring @r;
-      def @s = changeord("dp");
-      setring @s;
-      ideal I = std(fetch(R0,I));
-      intvec hi = hilb(I,1);
-      setring R0;
-      kill @r,@s;
-   }
-   else
-   {
-      if(exactness == 0)
+      if(h)
+      {
+         if(exactness == 0) 
+         { 
+            variant = 1; 
+            if(printlevel >= 10) { "variant = 1"; } 
+         }
+         if(exactness == 1) 
+         { 
+            variant = 4; 
+            if(printlevel >= 10) { "variant = 4"; } 
+         }
+         rl[1] = L[5];
+         def @r = ring(rl);
+         setring @r;
+         def @s = changeord("dp");
+         setring @s;
+         ideal I = std(fetch(R0,I));
+         intvec hi = hilb(I,1);
+         setring R0;
+         kill @r,@s;
+      }
+      else
       {
          string ordstr_R0 = ordstr(R0);
          int neg = 1 - attrib(R0,"global");
 
          if((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg)
          {
-            variant = 2;
-            if(printlevel >= 10) { "variant = 2"; }
+            if(exactness == 0)
+            {
+               variant = 2;
+               if(printlevel >= 10) { "variant = 2"; }
+            }
+            if(exactness == 1)
+            {
+               variant = 5;
+               if(printlevel >= 10) { "variant = 5"; }
+            }
          }
          else
          {
             string order;
             if(system("nblocks") <= 2)
             {
-               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp") + find(ordstr_R0, "rp") <= 0)
+               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp") 
+                                       + find(ordstr_R0, "rp") <= 0)
                {
                   order = "simple";
                }
@@ -764,13 +806,30 @@ EXAMPLE: example modStd; shows an example
 
             if((order == "simple") || (size(rl) > 4))
             {
-               variant = 2;
-               if(printlevel >= 10) { "variant = 2"; }
+               if(exactness == 0)
+               {
+                  variant = 2;
+                  if(printlevel >= 10) { "variant = 2"; }
+               }
+               if(exactness == 1)
+               {
+                  variant = 5;
+                  if(printlevel >= 10) { "variant = 5"; }
+               }
             }
             else
             {
-               variant = 3;
-               if(printlevel >= 10) { "variant = 3"; }
+               if(exactness == 0)
+               {
+                  variant = 3;
+                  if(printlevel >= 10) { "variant = 3"; }
+               }
+               if(exactness == 1)
+               {
+                  variant = 6;
+                  if(printlevel >= 10) { "variant = 6"; }
+               }
+       
                rl[1] = L[5];
                def @r = ring(rl);
                setring @r;
@@ -795,18 +854,81 @@ EXAMPLE: example modStd; shows an example
             }
          }
       }
-
-      if(exactness == 1)
+   }
+   else
+   {
+      if(exactness == 1) { return(groebner(I)); }
+      if(h)
       {
-         variant = 5;
-         if(printlevel >= 10) { "variant = 5"; }
-         "=============================================================";
-         "WARNING: This variant is not applicable if ordering is mixed.";
-         "=============================================================";
-         matrix trans;
+         variant = 1; if(printlevel >= 10) { "variant = 1"; } 
+         rl[1] = L[5];
+         def @r = ring(rl);
+         setring @r;
+         def @s = changeord("dp");
+         setring @s;
+         ideal I = std(fetch(R0,I));
+         intvec hi = hilb(I,1);
+         setring R0;
+         kill @r,@s;
+      }
+      else
+      {
+         string ordstr_R0 = ordstr(R0);
+         int neg = 1 - attrib(R0,"global");
+
+         if((find(ordstr_R0, "M") > 0) || (find(ordstr_R0, "a") > 0) || neg)
+         {
+            variant = 2;
+            if(printlevel >= 10) { "variant = 2"; }
+         }
+         else
+         {
+            string order;
+            if(system("nblocks") <= 2)
+            {
+               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp") 
+                                       + find(ordstr_R0, "rp") <= 0)
+               {
+                  order = "simple";
+               }
+            }
+
+            if((order == "simple") || (size(rl) > 4))
+            {
+               variant = 2;
+               if(printlevel >= 10) { "variant = 2"; }
+            }
+            else
+            {
+               variant = 3;
+               if(printlevel >= 10) { "variant = 3"; }
+       
+               rl[1] = L[5];
+               def @r = ring(rl);
+               setring @r;
+               int nvar@r = nvars(@r);
+               intvec w;
+               for(i = 1; i <= nvar@r; i++)
+               {
+                  w[i] = deg(var(i));
+               }
+               w[nvar@r + 1] = 1;
+
+               list hiRi = hilbRing(fetch(R0,I),w);
+               intvec W = hiRi[2];
+               def @s = hiRi[1];
+               setring @s;
+
+               Id(1) = std(Id(1));
+               intvec hi = hilb(Id(1), 1, W);
+
+               setring R0;
+               kill @r,@s;
+            }
+         }
       }
    }
-
+  
    list P,T1,T2,T3,LL;
 
    ideal J,K,H;
@@ -826,18 +948,21 @@ EXAMPLE: example modStd; shows an example
       {
          link l(i) = "MPtcp:fork";
          open(l(i));
-         if((variant == 1) || (variant == 3) || (variant == 4))
+         if((variant == 1) || (variant == 3) || 
+            (variant == 4) || (variant == 6))
          {
-            write(l(i), quote(modpStd(I_for_fork, eval(L[i + 1]), eval(variant), eval(hi))));
+            write(l(i), quote(modpStd(I_for_fork, eval(L[i + 1]), 
+                                                  eval(variant), eval(hi))));
          }
          if((variant == 2) || (variant == 5))
          {
-            write(l(i), quote(modpStd(I_for_fork, eval(L[i + 1]), eval(variant))));
+            write(l(i), quote(modpStd(I_for_fork, eval(L[i + 1]), 
+                                                  eval(variant))));
          }
       }
 
       int t = timer;
-      if((variant == 1) || (variant == 3) || (variant == 4))
+      if((variant == 1) || (variant == 3) || (variant == 4) || (variant == 6))
       {
          P = modpStd(I_for_fork, L[1], variant, hi);
       }
@@ -850,7 +975,6 @@ EXAMPLE: example modStd; shows an example
       int i_sleep = system("sh", "sleep "+string(t));
       T1[1] = P[1];
       T2[1] = bigint(P[2]);
-      if(variant == 5) { T3[1] = P[3]; }
       index++;
 
       j = j + n1 + 1;
@@ -870,24 +994,28 @@ EXAMPLE: example modStd; shows an example
          {
             for(i = 1; i <= n1; i++)
             {
-               if(status(l(i), "read", "ready"))                         // ask if link l(i) is ready otherwise sleep for t seconds
+               //--- ask if link l(i) is ready otherwise sleep for t seconds ---
+               if(status(l(i), "read", "ready"))                      
                {
-                  P = read(l(i));                                        // read the result from l(i)
+                  //--- read the result from l(i) ---
+                  P = read(l(i));                                     
                   T1[index] = P[1];
                   T2[index] = bigint(P[2]);
-                  if(variant == 5) { T3[index] = P[3]; }
                   index++;
 
                   if(j <= size(L))
                   {
-                     if((variant == 1) || (variant == 3) || (variant == 4))
+                     if((variant == 1) || (variant == 3) || 
+                        (variant == 4) || (variant == 6))
                      {
-                        write(l(i), quote(modpStd(I_for_fork, eval(L[j]), eval(variant), eval(hi))));
+                        write(l(i), quote(modpStd(I_for_fork, eval(L[j]), 
+                                                  eval(variant), eval(hi))));
                         j++;
                      }
                      if((variant == 2) || (variant == 5))
                      {
-                        write(l(i), quote(modpStd(I_for_fork, eval(L[j]), eval(variant))));
+                        write(l(i), quote(modpStd(I_for_fork, 
+                                                  eval(L[j]), eval(variant))));
                         j++;
                      }
                   }
@@ -898,7 +1026,8 @@ EXAMPLE: example modStd; shows an example
                   }
                }
             }
-            if(k == n1)                                                   // k describes the number of closed links
+            //--- k describes the number of closed links ---
+            if(k == n1)                                               
             {
                j++;
             }
@@ -909,7 +1038,8 @@ EXAMPLE: example modStd; shows an example
       {
          while(j <= size(L))
          {
-            if((variant == 1) || (variant == 3) || (variant == 4))
+            if((variant == 1) || (variant == 3) || 
+               (variant == 4) || (variant == 6))
             {
                P = modpStd(I, L[j], variant, hi);
             }
@@ -920,7 +1050,6 @@ EXAMPLE: example modStd; shows an example
 
             T1[index] = P[1];
             T2[index] = bigint(P[2]);
-            if(variant == 5) { T3[index] = P[3]; }
             index++;
             j++;
          }
@@ -932,13 +1061,12 @@ EXAMPLE: example modStd; shows an example
          "Real-time for computing list is "+string(rtimer - rt)+" seconds.";
       }
 
-      if(pd>2){"lifting";}
+      if(pd > 2) { "lifting"; }
 
 //------------------------  Delete unlucky primes  -----------------------------
 //-------------  unlucky if and only if the leading ideal is wrong  ------------
 
-      if(variant == 5) { LL = deleteUnluckyPrimes(T1,T2,h,T3); T3 = LL[3]; }
-      else { LL = deleteUnluckyPrimes(T1,T2,h); }
+      LL = deleteUnluckyPrimes(T1,T2,h);
       T1 = LL[1];
       T2 = LL[2];
 
@@ -949,80 +1077,70 @@ EXAMPLE: example modStd; shows an example
       for(i = 2; i <= size(T2); i++){N = N*T2[i];}
       H = chinrem(T1,T2);
       J = farey(H,N);
-      if(variant == 5) { trans = farey(chinrem(T3,T2), N); }
 
 //----------------  Test if we already have a standard basis of I --------------
 
       tt = timer; rt = rtimer;
-      if(pd > 2){ "list of primes:"; L; "pTest" ;}
-      if((variant == 1) || (variant == 3) || (variant == 4)) { pTest = pTestSB(I,J,L,variant,hi); }
-      if((variant == 2) || (variant == 5)) { pTest = pTestSB(I,J,L,variant); }
+      if(pd > 2) { "list of primes:"; L; "pTest"; }
+      if((variant == 1) || (variant == 3) || (variant == 4) || (variant == 6)) 
+      { 
+         pTest = pTestSB(I,J,L,variant,hi); 
+      }
+      if((variant == 2) || (variant == 5)) 
+      { 
+         pTest = pTestSB(I,J,L,variant); 
+      }
 
       if(printlevel >= 10)
       {
          "CPU-time for pTest is "+string(timer - tt)+" seconds.";
          "Real-time for pTest is "+string(rtimer - rt)+" seconds.";
       }
-
+  
       if(pTest)
       {
          if(printlevel >= 10)
          {
-            "CPU-time for computation without final tests is "+string(timer - TT)+" seconds.";
-            "Real-time for computation without final tests is "+string(rtimer - RT)+" seconds.";
+            "CPU-time for computation without final tests is
+            "+string(timer - TT)+" seconds.";
+            "Real-time for computation without final tests is 
+            "+string(rtimer - RT)+" seconds.";
          }
 
          attrib(J,"isSB",1);
          tt = timer; rt = rtimer;
-         int sizeTest = 1 - isIncluded(I,J,n1);
+         sizeTest = 1 - isIncluded(I,J,n1);
 
          if(printlevel >= 10)
          {
-            "CPU-time for checking if I subset <G> is "+string(timer - tt)+" seconds.";
-            "Real-time for checking if I subset <G> is "+string(rtimer - rt)+" seconds.";
+            "CPU-time for checking if I subset <G> is 
+            "+string(timer - tt)+" seconds.";
+            "Real-time for checking if I subset <G> is 
+            "+string(rtimer - rt)+" seconds.";
          }
 
          if(sizeTest == 0)
          {
-            if(variant == 1)
+            if((variant == 1) || (variant == 2) || (variant == 3))
             {
-               "===================================================================";
-               "WARNING: Ideal generated by output may be greater than input ideal.";
-               "===================================================================";
+               "===========================================================";
+               "WARNING: Output might not be a standard basis of the input.";
+               "===========================================================";
                option(set, opt);
                if(n1 > 1) { kill I_for_fork; }
                return(J);
             }
-            if((variant == 2) || (variant == 3))
+            if((variant == 4) || (variant == 5) || (variant == 6))
             {
                tt = timer; rt = rtimer;
                K = std(J);
 
                if(printlevel >= 10)
                {
-                  "CPU-time for last std-computation is "+string(timer - tt)+" seconds.";
-                  "Real-time for last std-computation is "+string(rtimer - rt)+" seconds.";
-               }
-
-               if(size(reduce(K,J)) == 0)
-               {
-                  "===================================================================";
-                  "WARNING: Ideal generated by output may be greater than input ideal.";
-                  "===================================================================";
-                  option(set, opt);
-                  if(n1 > 1) { kill I_for_fork; }
-                  return(J);
-               }
-            }
-            if(variant == 4)
-            {
-               tt = timer; rt = rtimer;
-               K = std(J);
-
-               if(printlevel >= 10)
-               {
-                  "CPU-time for last std-computation is "+string(timer - tt)+" seconds.";
-                  "Real-time for last std-computation is "+string(rtimer - rt)+" seconds.";
+                  "CPU-time for last std-computation is 
+                  "+string(timer - tt)+" seconds.";
+                  "Real-time for last std-computation is 
+                  "+string(rtimer - rt)+" seconds.";
                }
 
                if(size(reduce(K,J)) == 0)
@@ -1032,30 +1150,9 @@ EXAMPLE: example modStd; shows an example
                   return(J);
                }
             }
-            if(variant == 5)
-            {
-               tt = timer; rt = rtimer;
-               K = std(J);
-
-               if(printlevel >= 10)
-               {
-                  "CPU-time for last std-computation is "+string(timer - tt)+" seconds.";
-                  "Real-time for last std-computation is "+string(rtimer - rt)+" seconds.";
-               }
-
-               if(size(reduce(K,J)) == 0)
-               {
-                  if(matrix(J) == matrix(I)*trans)
-                  {
-                     option(set, opt);
-                     if(n1 > 1) { kill I_for_fork; }
-                     return(J);
-                  }
-               }
-            }
-            if(pd>2){"pTest o.k. but result wrong";}
+            if(pd > 2) { "pTest o.k. but result wrong"; }
          }
-         if(pd>2){"pTest o.k. but result wrong";}
+         if(pd > 2) { "pTest o.k. but result wrong"; }
       }
 
 //--------------  We do not already have a standard basis of I  ----------------
@@ -1073,13 +1170,16 @@ EXAMPLE: example modStd; shows an example
          for(i = 1; i <= n1; i++)
          {
             open(l(i));
-            if((variant == 1) || (variant == 3) || (variant == 4))
+            if((variant == 1) || (variant == 3) || 
+               (variant == 4) || (variant == 6))
             {
-               write(l(i), quote(modpStd(I_for_fork, eval(L[j+i-1]), eval(variant), eval(hi))));
+               write(l(i), quote(modpStd(I_for_fork, eval(L[j+i-1]), 
+                                                     eval(variant), eval(hi))));
             }
             if((variant == 2) || (variant == 5))
             {
-               write(l(i), quote(modpStd(I_for_fork, eval(L[j+i-1]), eval(variant))));
+               write(l(i), quote(modpStd(I_for_fork, eval(L[j+i-1]), 
+                                                     eval(variant))));
             }
          }
          j = j + n1;
@@ -1089,7 +1189,7 @@ EXAMPLE: example modStd; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r = 0,(x,y,z,t),dp;
+   ring R1 = 0,(x,y,z,t),dp;
    ideal I = 3x3+x2+1, 11y5+y3+2, 5z4+z2+4;
    ideal J = modStd(I);
    J;
@@ -1097,22 +1197,23 @@ example
    J = modStd(I);
    J;
 
-   ring s = 0,(x,y,z),ds;
+   ring R2 = 0,(x,y,z),ds;
    ideal I = jacob(x5+y6+z7+xyz);
-   ideal J1 = modStd(I,1,1);
+   ideal J1 = modStd(I,1,0);
    J1;
-   //requires MP
-   //ideal J2 = modStd(I,3);
-   //J2;
-   //size(reduce(J1,J2));
-   //size(reduce(J2,J1));
 
-   ring rr = 0,x(1..4),lp;
+   ring R3 = 0,x(1..4),lp;
    ideal I = cyclic(4);
    ideal J1 = modStd(I,1);
-   ideal J2 = modStd(I,1,1);
+   ideal J2 = modStd(I,1,0);
    size(reduce(J1,J2));
    size(reduce(J2,J1));
+   
+   /*
+   ring R4 = 0,x(1..4),wp(1,-1,-1,1);
+   ideal I = cyclic(4);
+   ideal J1 = modStd(I,1,0);
+   */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1133,7 +1234,10 @@ EXAMPLE: example modS; shows an example
    ideal J;
    list T;
    list rl = ringlist(R0);
-   if((npars(R0)>0) || (rl[1]>0)) { ERROR("characteristic of basering should be zero"); }
+   if((npars(R0)>0) || (rl[1]>0)) 
+   { 
+      ERROR("Characteristic of basering should be zero."); 
+   }
    for(j = 1; j <= size(L); j++)
    {
       N = N*L[j];
@@ -1153,7 +1257,8 @@ EXAMPLE: example modS; shows an example
       T[j] = fetch(@r,I);
       kill @r;
    }
-   L = deleteUnluckyPrimes(T,L,homog(I)); // unlucky if and only if the leading ideal is wrong
+   L = deleteUnluckyPrimes(T,L,homog(I)); 
+   // unlucky if and only if the leading ideal is wrong
    J = farey(chinrem(L[1],L[2]),N);
    attrib(J,"isSB",1);
    return(J);
@@ -1339,7 +1444,8 @@ int a = 16;
 int b = 15;
 int c = 4;
 int t = 1;
-poly f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3+x^(c-2)*y^c*(y2+t*x)^2;
+poly f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
+         +x^(c-2)*y^c*(y2+t*x)^2;
 ideal i = jacob(f);
 
 ring r = 0, (x,y,z), ds;
@@ -1347,7 +1453,8 @@ int a = 25;
 int b = 25;
 int c = 5;
 int t = 1;
-poly f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3+x^(c-2)*y^c*(y2+t*x)^2;
+poly f = x^a+y^b+z^(3*c)+x^(c+2)*y^(c-1)+x^(c-1)*y^(c-1)*z3
+         +x^(c-2)*y^c*(y2+t*x)^2;
 ideal i = jacob(f),f;
 
 ring r = 0, (x,y,z), ds;
@@ -1362,7 +1469,8 @@ int c = 10;
 int alpha = 5;
 int beta = 5;
 int t = 1;
-poly f = x^a+y^b+z^c+x^alpha*y^(beta-5)+x^(alpha-2)*y^(beta-3)+x^(alpha-3)*y^(beta-4)*z^2+x^(alpha-4)*y^(beta-4)*(y^2+t*x)^2;
+poly f = x^a+y^b+z^c+x^alpha*y^(beta-5)+x^(alpha-2)*y^(beta-3)
+         +x^(alpha-3)*y^(beta-4)*z^2+x^(alpha-4)*y^(beta-4)*(y^2+t*x)^2;
 ideal i = jacob(f);
 */
 
