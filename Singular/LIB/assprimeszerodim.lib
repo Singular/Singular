@@ -17,7 +17,7 @@ OVERVIEW:
 SEE ALSO: primdec_lib
 
 PROCEDURES:
- zeroR(I);             computes the radical of I
+ zeroRadical(I);       computes the radical of I
  assPrimes(I);         computes the associated primes of I
 ";
 
@@ -26,15 +26,30 @@ LIB "modstd.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-proc zeroR(ideal I, list #)
-"USAGE:  zeroR(I,[n]); I ideal, optional: n number of processors (for parallel
-         computing)
+proc zeroRadical(ideal I, list #)
+"USAGE:  zeroRadical(I,[n]); I ideal, optional: n number of processors (for 
+         parallel computing)
 ASSUME:  I is zero-dimensional in Q[variables]
 NOTE:    Parallelization is just applicable using 32-bit Singular version since
          MP-links are not compatible with 64-bit Singular version.
 RETURN:  the radical of I
-EXAMPLE: example zeroR; shows an example
+EXAMPLE: example zeroRadical; shows an example
 "
+{
+   return(zeroR(modStd(I,#),#));
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring R = 0, (x,y), dp;
+   ideal I = xy4-2xy2+x, x2-x, y4-2y2+1;
+   zeroRadical(I);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc zeroR(ideal I, list #)
+// compute the radical of I provided that I is zero-dimensional in Q[variables] 
+// and a standard basis
 {
    attrib(I,"isSB",1);
    int i, k;
@@ -189,12 +204,6 @@ EXAMPLE: example zeroR; shows an example
 
    if(k == 0) { return(I); }
    else { return(std(I + F)); }
-}
-example
-{ "EXAMPLE:";  echo = 2;
-   ring R = 0, (x,y), dp;
-   ideal I = xy4-2xy2+x, x2-x, y4-2y2+1;
-   zeroR(I);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
