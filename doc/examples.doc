@@ -198,7 +198,7 @@ usually collected in @sc{Singular} libraries).
 At this point, we restrict ourselves to describing the first kind of
 (library) procedures, which are sufficient for most applications. The
 syntax and general structure of a library (procedure) is described in
-@ref{Procedures}, and @ref{Format of a library}.
+@ref{Procedures}, and @ref{Libraries}.
 
 The probably most efficient way of
 writing a new library is to use one of the official @sc{Singular}

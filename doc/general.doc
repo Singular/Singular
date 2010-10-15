@@ -29,7 +29,6 @@
 * Input and output::
 * Procedures::
 * Libraries::
-* Guidelines for writing a library::
 * Debugging tools::
 * Dynamic loading::
 @end menu
@@ -3065,6 +3064,7 @@ defined procedures can be displayed by the command @code{listvar(proc);}.
 * Names in procedures::
 * Parameter list::
 * Procedure commands::
+* The help string of procedures::
 @end menu
 
 @xref{Procedures in a library}.
@@ -3290,7 +3290,7 @@ proc x7 (ring r)
 @end table
 
 @c --------------------------------------- ----------
-@node Procedure commands, , Parameter list, Procedures
+@node Procedure commands, The help string of procedures, Parameter list, Procedures
 @subsection Procedure commands
 @cindex Procedure commands
 
@@ -3305,437 +3305,260 @@ See
 @ref{return}.
 @c ref
 
+@c --------------------------------------- ----------
+@node The help string of procedures,,Procedure commands, Procedures
+@subsection The help string of procedures
+@cindex The help string of procedures
+@cindex procedures, help string
+
+The help string of a procedure should have the following format:
+
+@smallexample
+USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
+[CREATE:  <description of created objects which are not returned>]
+RETURN:   <description of the purpose and return value>
+[NOTE:    <particular assumptions or limitations, details>]
+[SEE ALSO: <comma-separated names of related procedures/cross references>]
+[KEYWORDS: <semicolon-separated phrases of index keys>]
+EXAMPLE:  example <proc_name>; shows an example
+@end smallexample
+
+Further arbitrary items (like @code{THEORY:}, or @code{BACKGROUND:}) are
+recognized, as well, but should be used diligently.
+
+Remember that help strings are formatted as explained in
+@ref{Typesetting of help and info strings}. In particular, descriptions may
+contain the texinfo markup elements @code{@@*, @@math@{..@},
+@@code@{..@}, @@example, @@format, @@texinfo} to better control their
+typesetting. See @ref{msum}, @ref{mdouble}, @ref{mtripple} for examples.
+
+
 @c ----------------------------------------------------------------------
-@node Libraries, Guidelines for writing a library, Procedures, General concepts
+@node Libraries, Debugging tools, Procedures, General concepts
 @section Libraries
 @cindex Libraries
 
 A library is a collection of @sc{Singular}
 procedures in a file.
-@*@sc{Singular} reads a library with the commands @code{load} and
-@code{LIB}. General information about the library is displayed by the command
-@code{help libname_lib}. After loading the library, its procedures can be used
-like any built-in @sc{Singular} function.
+@*@sc{Singular} loads a library with the commands @code{load} and
+@code{LIB}.
+After loading the library, the library procedures can be used like
+any built-in @sc{Singular} function, and information on the library
+is  obtained by entering @code{help libname.lib}
 
-To have the full functionality of a built-in function, libraries have to
-comply with the set of syntax rules described below.
+@xref{SINGULAR libraries}, for all libraries currently distributed
+with  @sc{Singular}.
 
-Furthermore, libraries which are to be included in the @sc{Singular}
-distribution, have to comply with certain rules as explained in
-@ref{Guidelines for writing a library}.
+When writing your own library, it is important to follow the
+guidelines described in what follows. Otherwise, due to possible
+parser errors, the loading of the library may be aborted.
 
+Each library consists of a header and a body. The first line
+of a library must start with a double slash @code{//}.
+
+The library header consists of a version string, a category string,
+an info string, and LIB commands. The strings are mandatory. LIB
+commands are meant to load the additional libraries used by the
+library under consideration.
+
+The library body collects the procedures which may be static or not.
+
+For more details, check here:
 @menu
+* Version String::
+* Category String::
+* Info String::
+* LIB commands::
+* Procedures in a library::
+* template_lib::
+* Formal Checker::
+* Libraries in the SINGULAR Documentation::
+* Documentation Tool::
+* Typesetting of help and info strings::
 * Loading a library::
-* Format of a library::
+* Guidelines for writing a library::
 @end menu
 
-@c ---------------------------------------
-@node Loading a library, Format of a library,, Libraries
-@subsection Loading a library
-@cindex Loading a library
-@cindex path
-@cindex SearchPath
-@cindex RootDir
-@cindex BinDir
-@cindex DefaultDir
-@cindex SINGULARPATH
+@c -------------------------------------------------------------------
+@node Version String,Category String,,Libraries
+@subsection Version String
+@cindex Version String
 
-Libraries can be loaded with the @code{LIB} or the @code{load} command
-(see @ref{load}):
-
-@c ------------------------------------------------------------
-@c   This piece of text exists also in the file reference.doc,
-@c   chapter "LIB".
-@c   chapter "load".
-@c   If you change something here, change it there, too!
-@c ------------------------------------------------------------
-@table @code
+@table @asis
 @item @strong{Syntax:}
-@code{LIB} string_expression @code{;}
-@item @strong{Type:}
-none
+  version = string_constant ;
 @item @strong{Purpose:}
-reads a library of procedures from a file. If the given filename does
-not start with @kbd{.} or @kbd{/} and cannot be located in the current
-directory, each directory contained in the
-@code{SearchPath} is searched for a file with this name.
-@item @strong{Note on SearchPath:}
-The @code{SearchPath} for a library is constructed at @sc{Singular}
-start-up time as follows:
-@enumerate
-@item
-the directories contained in the environment variable
-@code{SINGULARPATH} are appended
-
-@item
-the directories @code{$BinDir/LIB}, @code{$RootDir/LIB},
-@code{$RootDir/../LIB}, @code{$DefaultDir/LIB}, @code{$DefaultDir/../LIB}
-are appended, where
-@itemize @bullet
-@item @code{$BinDir}
-is the value of the environment variable
-@code{SINGULAR_BIN_DIR}, if set, or, if not set, the directory in which the
-@sc{Singular} program
-resides
-@item @code{$RootDir}
-is the value of the environment variable
-@code{SINGULAR_ROOT_DIR}, if set, or, if not set, @code{$BinDir/../}.
-@item @code{$DefaultDir}
-is the value of the environment variable
-@code{SINGULAR_DEFAULT_DIR}, if set, or @code{/usr/local/Singular/} on a
-Unix platform, @code{\Singular\} on a Windows 95/98/NT/XP/Vista platform.
-@end itemize
-
-@item
-all directories which do not exist are removed from the @code{SearchPath}.
-@end enumerate
-
-For setting environment variables see @ref{system}, or consult the manual of
-your shell.
-
-The library @code{SearchPath} can be examined  by starting up
-@sc{Singular} with the option @code{-v}, or by issuing the command
-@code{system("--version");}.
-
-@item @strong{Note on standard.lib:}
-Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
-library @code{standard.lib} is automatically loaded at start-up time.
-
-@end table
-
-Only the names of the procedures in the library are loaded, the body of
-each procedure is only read during the first call of this procedure. This minimizes
-memory consumption by unused procedures.  When @sc{Singular} is started
-with the @code{-q} or @code{--quiet} option, no message about the
-loading of a library is displayed.  More precisely, option @code{-q} (and
-likewise @code{--quiet}) unsets option @code{loadLib} to inhibit
-monitoring of library loading (@pxref{option}).
-
-All loaded libraries are displayed by the @code{listvar(package);}
-command:
-@smallexample
-@c example
-  option(loadLib);   // show loading of libraries;
-                     // standard.lib is loaded
-  listvar(package);
-                     // the names of the procedures of inout.lib
-  LIB "inout.lib";   // are now known to Singular
-  listvar(package);
-@c example
-@end smallexample
-
-@c ref
-See
-@ref{Command line options};
-@ref{Procedures and libraries};
-@ref{SINGULAR libraries};
-@ref{proc};
-@ref{LIB};
-@ref{standard_lib};
-@ref{string};
-@ref{system}.
-@c ref
-
-@c ---------------------------------------
-@node Format of a library,, Loading a library, Libraries
-@subsection Format of a library
-@cindex Format of a library
-
-A library file can contain comments, a category-, info- and version-string
-definition, @code{LIB} commands, @code{proc} commands
-and @code{proc} commands with @code{example} and @code{help} sections,
-i.e., the following keywords are allowed:
-@code{category},
-@code{info},
-@code{version},
-@code{LIB},
-@code{/* ... */},
-@code{//},
-@code{[static] proc}.
-Anything else is not recognized by the parser of @sc{Singular} and leads
-to an error message while loading the library.
-If an error occurs, loading is aborted and an error message is displayed,
-specifying the type of error and the line where it was detected.
-
-The first line of the library should start with the string
-@code{// Singular-library}.
-
-The category-, info- and version-string are defined as follows:
-@cindex  info in a library
-@table @code
-@item @strong{Syntax:}
-@code{info} = string_constant @code{;}
-@item @strong{Purpose:}
-defines the general help for the library. This text is displayed on
-@code{help libname_lib;}.
-@item @strong{Example:}
-@smallexample
-info="
-      This could be the general help of a library.
-     Quotes must be escaped with a \ such as \"
-";
-@end smallexample
-@item @strong{Note:}
-In the info-string the characters \ and " must be preceded by a \ (escaped).
-It is recommended that the info string is placed at the head of a
-library file and contains general information about the library as well
-as a listing of all procedures available to the users (with a one line
-description of each procedure).
-
-Although there is no enforced format of the info string of a library, we
-recommend that you follow certain rules as explained in
-@ref{The help string of a library}.
-@end table
-
-@cindex  version in a library
-@table @code
-@item @strong{Syntax:}
-@code{version} = string_constant @code{;}
-@item @strong{Purpose:}
-defines the version number for the library. It is displayed when the
-library is loaded.
-@item @strong{Example:}
+  defines the version number of a library. It is displayed when the library is loaded.
+@item @strong{Example:}  
 @code{version="$}@code{Id: sample.lib 13320 2010-09-29 09:31:38Z someone $";}
 @item @strong{Note:}
 It is common practice to simply define the version string to be
 @code{"$I}@code{d:$"} and let a version control system expand it.
 @end table
 
-@cindex  category in a library
-@table @code
+@c -------------------------------------------------------------------
+@node Category String,Info String,Version String,Libraries
+@subsection Category String
+@cindex Category String
+
+
+@table @asis
 @item @strong{Syntax:}
-@code{category} = string_constant @code{;}
+  category = string_constant ;
 @item @strong{Purpose:}
-defines the category for the library.
-@item @strong{Example:}
-@smallexample
-category="Utilities";
-@end smallexample
+  defines the category of a library.
+@item @strong{Example:}  
+  category="Algebraic geometry";
 @item @strong{Note:}
-reserved for sorting the libraries into categories.
+  reserved for sorting the libraries into categories.
 @end table
 
-@c ---------------------------------------
-@node Guidelines for writing a library, Debugging tools, Libraries, General concepts
-@section Guidelines for writing a library
-@cindex Guidelines for writing a library
-@cindex library, Guidelines for writing
+@c -------------------------------------------------------------------
+@node Info String,LIB commands,Category String,Libraries
+@subsection Info String
+@cindex Info String
 
-Although there are very few enforced rules on how @sc{Singular} libraries should be
-written (see @ref{Libraries}), it is recommended that the libraries comply with
-the guidelines explained in this section, so that debugging and
-understanding are made easier.
 
-@strong{Note:} For libraries which are to be included in the @sc{Singular}
-distribution, the following guidelines are mandatory.
-
-The keyword @code{LIB} must be followed by at least one space.
-
-@menu
-* Procedures in a library::
-* Documentation of a library::
-* Typesetting of help strings::
-* The help string of a library::
-* The help string of procedures::
-* template_lib::
-@end menu
-
-@c ---------------------------------------
-@node Procedures in a library, Documentation of a library,,Guidelines for writing a library
-
-@subsection Procedures in a library
-@cindex Procedures in a library
-@cindex library, procedures
-
-In this section we list miscellaneous recommendations on how procedures
-contained in a library should be implemented.
-@enumerate
-@item
-the library must start with @code{//}
-@item
-The info-, category- and  version-string should appear at the beginning of the
-library, before the first procedure definition.
-
-@item
-The info-string should have the format as explained in @ref{The help
-string of a library}.
-
-@item
-Each procedure which should not be accessible by users should be
-declared @code{static}.
-
-@item
-Each procedure which is not declared @code{static} should have a
-help and example section as explained in @ref{Procedure definition}.
-@*Such procedures should furthermore carefully check any assumptions
-made about their input (like the type of list elements), and, if
-necessary, report an error using the  function @ref{ERROR}.
-
-@item
-Names of procedures should not be shorter than 4 characters and should
-not contain any special characters, in particular the use of @code{_}
-in names of procedures is discourraged. If the name of the procedure is
-composed of more than one word, each new word should start with a
-capital letter, all other letters should be lower case.
-
-@item
-No procedures should be defined within the body of another procedure.
-
-@item
-If the value of
-the reserved variable @code{printlevel} (@pxref{printlevel}) is greater
-than 0 then interactive user-input, i.e., the usage of functions like
-@code{pause("..")} or @code{read("");} (@pxref{read}), may be requested.
-
-@item
-If the value of
-the reserved variable @code{printlevel} (@pxref{printlevel}) is 0
-then interactive user-input, i.e., the usage of functions like
-@code{pause("..")} or @code{read("");} (@pxref{read}), may @strong{not} be
-requested. Instead, an error (using the function
-@ref{ERROR}) should be reported together with the recommendation on
-increasing the value of the reserved variable @code{printlevel}.
-
-@item
-It is often useful for a procedure to print out comments, either for
-explaining results or for displaying intermediate computations. However,
-if this procedure is called by another procedure, such comments are
-confusing and disturbing in most cases.
-
-@sc{Singular} offers an elegant solution, which requires the usage of
-the @sc{Singular} function @ref{dbprint} and the reserved variables
-@ref{printlevel}, and @ref{voice} (@code{voice} counts the nesting of
-procedures; It has the value 1 on the top level, 2 inside the first
-procedure etc.; @code{printlevel} has the value 0 by default, but can be
-set to any integer value by the user).
-
-For example, if the following procedure @code{Test} is called
-directly from the top level then @samp{comment1} is displayed (i.e.,
-printed out) but not
-@samp{comment2}; and nothing is displayed if  @code{Test} is called
-from within any other procedure.
-However, if @code{printlevel} is set to  a value k with k>0, then
-@samp{comment1} (resp.@: @samp{comment2}) is displayed provided that
-@code{Test} is called from other procedures, with a nesting level up to
-k (resp.@: k-1).
-
-Note furthermore, that the example part of a procedure
-behaves in this respect like a procedure (i.e., the value of @code{voice}
-is 1). Therefore, the command @code{printlevel=1;} is necessary for
-@samp{comment1} to be displayed on @code{ example Test;}. However,
-since printlevel is a global variable, it should be reset to the old
-value at the end of the example part.
-
+@table @asis
+@item @strong{Syntax:}
+  info = string_constant ;
+@item @strong{Purpose:}
+  constitutes the help text of a library. Will be displayed upon
+  entering @code{help libname.lib;}
+@item @strong{Format:}  
 @smallexample
-proc Test
-"USAGE:   ...
-         ...
-EXAMPLE: example Test; shows an example
-"
-@{   ...
-   int p = printlevel - voice + 3;
-    ...
-   dbprint(p,"comment1");
-   dbprint(p-1,"comment2");
-   // dbprint prints only if p > 0
-    ...
-@}
-example
-@{ "EXAMPLE:"; echo = 2;
-   int p = printlevel;   //store old value of printlevel
-   printlevel = 1;       //assign new value to printlevel
-    ...
-   Test();
-   printlevel = p;       //reset printlevel to old value
-@}
+info="
+LIBRARY: <library_name> <one line description of the purpose>
+AUTHOR:  <name, and email address of author>
+OVERVIEW: <concise information
+REFERENCES: <references for further information>
+SEE ALSO: <comma-separated words of cross references>]
+KEYWORDS: <semicolon-separated phrases of index keys>]
+PROCEDURES:
+  <procedure1>();     <one line description of the purpose>
+     .
+     .
+  <procedureN>();     <one line description of the purpose>
+";
 @end smallexample
 
-@end enumerate
-@c @end table
+REFERENCES, SEE ALSO, and KEYWORDS are optional. In the documentation,
+the one line description of the purpose following LIBRARY: will be printed
+in its own line, starting with the prefix PURPOSE: .
 
-@c ---------------------------------------
-@node Documentation of a library, Typesetting of help strings, Procedures in a library, Guidelines for writing a library
+@item @strong{Example:}  
+@smallexample
+info="
+LIBRARY: absfact.lib   Absolute factorization for characteristic 0
+AUTHORS: Wolfram Decker,       decker at math.uni-sb.de
+         Gregoire Lecerf,      lecerf at math.uvsq.fr
+	 Gerhard Pfister,      pfister at mathematik.uni-kl.de
 
-@subsection Documentation of a library
-@cindex Documentation of a library
-@cindex library, documentation
+OVERVIEW:
+A library for computing the absolute factorization of multivariate
+polynomials f with coefficients in a field K of characteristic zero.
+Using Trager's idea, the implemented algorithm computes an absolutely
+irreducible factor by factorizing over some finite extension field L
+(which is chosen such that V(f) has a smooth point with coordinates in L).
+Then a minimal extension field is determined making use of the
+Rothstein-Trager partial fraction decomposition algorithm.
 
-The typesetting language in which the @sc{Singular} documentation is
-written is @code{texinfo}. Based on various tools, @code{info, dvi, ps,} and
-@code{html} versions of the @code{texinfo} documentation are generated.
+REFERENCES:
+G. Chèze, G. Lecerf: Lifting and recombination techniques for absolute
+             factorization. Journal of Complexity, 23(3):380-420, 2007.
+
+KEYWORDS: factorization, absolute factorization.
+SEE ALSO: factorize
+
+PROCEDURES:
+  absFactorize(f);        absolute factorization of poly
+";
+@end smallexample
+  
+@item @strong{Note:}
+The typesetting language in which the @sc{Singular} documentation
+is written is texinfo - but it should also be readibly verbatim.
+The info strings of a library included
+in the @sc{Singular} distribution will be parsed and automatically
+translated to the texinfo format. For texinfo markup elements
+and other information facilating optimal typesetting results,
+check see @ref{Typesetting of help and info strings}.
+@end table
 
 
-Starting with @sc{Singular} version 1-3, the @code{texinfo}
-documentation of all libraries of the @sc{Singular} distribution is
-generated automatically from their source code.
+@c -------------------------------------------------------------------
+@node LIB commands,Procedures in a library,Info String,Libraries
+@subsection  LIB commands
+@cindex  LIB commands
 
-More precisely, for each library,
-@itemize @minus
-@item
-the info string of the library is parsed and typeset
-as explained in @ref{Typesetting of help strings}.
 
-@item
-the help string of each procedure listed in the @code{PROCEDURES:}
-section of the library info string is parsed
-and typeset as explained in @ref{Typesetting of help strings}.
+@table @asis
+@item @strong{Syntax:}
+   LIB "lib_1.lib";
+   ...
+   LIB "lib_r.lib";
+@item @strong{Purpose:}
+  loads libraries used by the library under consideration.
+@item @strong{Example:}
+@smallexample
+    LIB "primdec.lib";
+    LIB "normal.lib";
+@end smallexample
+@item @strong{Note:}
+  The keyword LIB must be followed by at least one space.
+@end table
 
-@item
-the example of each procedure listed in the @code{PROCEDURES:} section of
-the library info string is computed and its output is
-included into the documentation.
-@end itemize
+@c -------------------------------------------------------------------
+@node Procedures in a library,template_lib,LIB commands,Libraries
+@subsection  Procedures in a library
+@cindex  Procedures in a library
 
-For a uniform look-and-feel of the library documentation, library
-developers should
-@itemize @minus
-@item
-follow the recommendation of
-@ref{The help string of a library} and @ref{The help string of
-procedures}.
+@c -------------------------------------------------------------------
+@node template_lib,Formal Checker,Procedures in a library,Libraries
+@subsection  template_lib
+@cindex  template_lib
+@cindex Template for writing a library
+@cindex library, template
 
-@item
-consult the source code of libraries like
-@code{template.lib} (@pxref{template_lib})
-for examples on how library documentations are
-written.
+First, we show the source-code of a template library:
+@smallexample
+@c include template.lib
+@end smallexample
 
-@item
-make sure that each procedure listed in the @code{PROCEDURES:}
-section of the library info string has a help string and an example
-section.
+After typesetting, the library appears in the document as follows (with
+one subsection for each procedure):
 
-@item
-not use interactive functions like
-@code{pause("..")} or @code{read("");} (@pxref{read}) and should limit the
-length of input lines to 60 characters in the example section of
-procedures.
+@c lib template.lib  lib_fun lib_ex
 
-@item
-try to avoid time-consuming operations in loops: especially
-do not forget automatic type conversions.
 
-@item
-carefully check the generated
-documentation of their libraries in its various formats using the
-@code{lib2doc} (@pxref{lib2doc}) and @code{checklibs} utilities.
-@end itemize
+@c -------------------------------------------------------------------
+@node Formal Checker,Libraries in the SINGULAR Documentation,template_lib,Libraries
+@subsection  Formal Checker
+@cindex  Formal Checker
 
-@menu
-* lib2doc::
-@end menu
+There is a formal library checker for SINGULAR which can be used online:
+see @url{http://www.singular.uni-kl.de/index.php/new-libraries/formal-library-checker.html}.
 
-@node lib2doc,,,Documentation of a library
-@subsubsection lib2doc
+After uploading your library file, you will receive an output of hints, warnings,
+and errors which may help you to improve your library.
+
+@c -------------------------------------------------------------------
+@node Libraries in the SINGULAR Documentation,Documentation Tool,Formal Checker,Libraries
+@subsection  Libraries in the SINGULAR Documentation
+@cindex  Libraries in the SINGULAR Documentation
+
+@c -------------------------------------------------------------------
+@node Documentation Tool,Typesetting of help and info strings,Libraries in the SINGULAR Documentation,Libraries
+@subsection  Documentation Tool
+@cindex  Documentation Tool
 @cindex lib2doc
 
 @include lib2doc.texi
 
-@c ----------------------------------------
-@node Typesetting of help strings, The help string of a library, Documentation of a library, Guidelines for writing a library
-@subsection Typesetting of help strings
-@cindex Typesetting of help strings
-@cindex library, typesetting of help strings
+@c -------------------------------------------------------------------
+@node Typesetting of help and info strings,Loading a library,Documentation Tool,Libraries
+@subsection  Typesetting of help and info strings
+@cindex  Typesetting of help and info strings
 
 The help strings of procedures and info strings of libraries which are
 included in the
@@ -3954,94 +3777,22 @@ texinfo markup elements.
 See also @ref{template_lib} for an examples of the typesetting rules
 explained here.
 
-@c ----------------------------------------
-@node The help string of a library, The help string of procedures, Typesetting of help strings, Guidelines for writing a library
-@subsection The help string of a library
-@cindex help string of a library
-@cindex library, help string
-@cindex library, info string
-@cindex info string of a library
 
-The help (or, info) string of a library should have the following format:
+@c -------------------------------------------------------------------
+@node Loading a library,Guidelines for writing a library,Typesetting of help and info strings,Libraries
+@subsection   Loading a library
+@cindex   Loading a library
 
-@smallexample
-info="
-LIBRARY: <library_name> <one line description of the content>
-AUTHOR:  <name, and email address of author>
-[SEE ALSO: <comma-separated words of cross references>]
-[KEYWORDS: <semicolon-separated phrases of index keys>]
-PROCEDURES:
-  <procedure1>();     <one line description of the purpose>
-   .
-   .
-  <procedureN>();     <one line description of the purpose>
-";
-@end smallexample
-Only such procedures should be listed in the @code{PROCEDURE} section
-which are not @code{static} and which
-have a help and example section.
-
-The purpose of the one line procedure descriptions is not to give a short help
-for the procedure, but to help the user decide what procedure might be
-the right one for the job. Details can then be found in the help section
-of each procedure. Therefore, parameters may be omitted or abbreviated if
-necessary. If this description consists of only upper-case characters,
-then it will be typeset in all lowercase characters in the manual.
-
-Other sections may be present.
-
-Please note, that the section @code{PROCEDURES:} must be the last section
-and the only section to list procedures.
-
-For more information, see @ref{Typesetting of help strings}. For an
-example, see @ref{template_lib}.
-
-@c ----------------------------------------
-@node The help string of procedures, template_lib, The help string of a library, Guidelines for writing a library
-@subsection The help string of procedures
-@cindex help string of a procedure
-@cindex procedures, help string
-
-The help string of a procedure should have the following format:
-
-@smallexample
-USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
-[CREATE:  <description of created objects which are not returned>]
-RETURN:   <description of the purpose and return value>
-[NOTE:    <particular assumptions or limitations, details>]
-[SEE ALSO: <comma-separated names of related procedures/cross references>]
-[KEYWORDS: <semicolon-separated phrases of index keys>]
-EXAMPLE:  example <proc_name>; shows an example
-@end smallexample
-
-Further arbitrary items (like @code{THEORY:}, or @code{BACKGROUND:}) are
-recognized, as well, but should be used diligently.
-
-Remember that help strings are formatted as explained in
-@ref{Typesetting of help strings}. In particular, descriptions may
-contain the texinfo markup elements @code{@@*, @@math@{..@},
-@@code@{..@}, @@example, @@format, @@texinfo} to better control their
-typesetting. See @ref{msum}, @ref{mdouble}, @ref{mtripple} for examples.
-
-@c ----------------------------------------
-@node template_lib,, The help string of procedures, Guidelines for writing a library
-@subsection template_lib
-@cindex template_lib
-@cindex Template for writing a library
-@cindex library, template
-
-First, we show the source-code of a template library:
-@smallexample
-@c include template.lib
-@end smallexample
-
-After typesetting, the library appears in the document as follows (with
-one subsection for each procedure):
-
-@c lib template.lib  lib_fun lib_ex
-
+@c -------------------------------------------------------------------
+@node Guidelines for writing a library, ,Loading a library,Libraries
+@subsection   Guidelines for writing a library
+@cindex   Guidelines for writing a library
+@c ---------------------------------------
+@c ---------------------------------------
+@c ---------------------------------------
+@c ---------------------------------------
 @c ----------------------------------------------------------------------
-@node Debugging tools, Dynamic loading, Guidelines for writing a library, General concepts
+@node Debugging tools, Dynamic loading, Libraries, General concepts
 @section Debugging tools
 @cindex Debugging tools
 

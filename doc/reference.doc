@@ -2374,7 +2374,7 @@ help standard.lib;  // displays help for library 'standard.lib'
 
 @c ref
 See
-@ref{Format of a library};
+@ref{Libraries};
 @ref{Procedure definition};
 @ref{Command line options};
 @ref{system};
