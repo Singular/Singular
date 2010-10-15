@@ -1542,7 +1542,7 @@ KEYWORDS: delta invariant; Tjurina number
         gdummy = gdummy + lead(fdummy);
       }
    ideal SQRpart = sqrfree(gdummy);
-   int IntForRet; 
+   int IntForRet;
    if(deg(SQRpart[1])==intMult)
      {
         IntForRet = intMult;
