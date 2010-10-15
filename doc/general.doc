@@ -3376,7 +3376,6 @@ For more details, check here:
 * Documentation Tool::
 * Typesetting of help and info strings::
 * Loading a library::
-* Guidelines for writing a library::
 @end menu
 
 @c -------------------------------------------------------------------
@@ -3477,7 +3476,7 @@ PROCEDURES:
   
 @item @strong{Note:}
 The typesetting language in which the @sc{Singular} documentation
-is written is texinfo - but it should also be readibly verbatim.
+is written is texinfo - but it should also be readably verbatim.
 The info strings of a library included
 in the @sc{Singular} distribution will be parsed and automatically
 translated to the texinfo format. For texinfo markup elements
@@ -3779,14 +3778,11 @@ explained here.
 
 
 @c -------------------------------------------------------------------
-@node Loading a library,Guidelines for writing a library,Typesetting of help and info strings,Libraries
+@node Loading a library,,Typesetting of help and info strings,Libraries
 @subsection   Loading a library
 @cindex   Loading a library
 
 @c -------------------------------------------------------------------
-@node Guidelines for writing a library, ,Loading a library,Libraries
-@subsection   Guidelines for writing a library
-@cindex   Guidelines for writing a library
 @c ---------------------------------------
 @c ---------------------------------------
 @c ---------------------------------------

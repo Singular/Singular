@@ -868,7 +868,7 @@ This sections collect libraries in the beta test phase.
 Everything in these libraries may change.
 
 For the minimal requirements and guidelines
-see @ref{Guidelines for writing a library}.
+see @ref{Libraries}.
 
 Comments should be send to the author of the library directly.
 

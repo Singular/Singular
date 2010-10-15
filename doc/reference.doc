@@ -1134,7 +1134,7 @@ none
 The print command is applied to the expression
 if @code{printlevel>=voice}.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for an example how this is used
+@xref{Libraries}, for an example how this is used
 for displaying comments while procedures are executed.
 @item @strong{Example:}
 @smallexample
@@ -8588,7 +8588,7 @@ int
 @item @strong{Purpose:}
 shows the nesting level of procedures.
 @item @strong{Note:}
-@xref{Guidelines for writing a library}, for a small example how this is used
+@xref{Libraries}, for a small example how this is used
 for the display of comments while procedures are executed.
 @item @strong{Example:}
 @smallexample
