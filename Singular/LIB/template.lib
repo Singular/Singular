@@ -6,7 +6,7 @@ info="
 LIBRARY:   template.lib  A Template for a Singular Library
 AUTHOR:    Olaf Bachmann, email: obachman@mathematik.uni-kl.de
 
-SEE ALSO:  standard_lib, Guidelines for writing a library,
+SEE ALSO:  standard_lib, Libraries,
            Typesetting of help and info strings
 
 KEYWORDS: library, template.lib; template.lib; library, info string
