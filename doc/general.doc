@@ -3495,7 +3495,7 @@ PROCEDURES:
 @end smallexample
 
 To see how this infostring appears in the documentation after 
-typesetting, check @ref{absfac_lib}:
+typesetting, check @ref{absfact_lib}:
 
 @item @strong{Note:}
 The typesetting language in which the @sc{Singular} documentation
@@ -3545,7 +3545,7 @@ see @xref{Procedures}.
 Each procedure not meant to be accessible by users should be declared static.
 @item
 The header of each procedure not declared static must comply with the guidelines 
-described in @xref{Procedure definition} and @xref{The help string of procedures}. 
+described in @ref{Procedure definition} and @ref{The help string of procedures}. 
 In particular, it must have a help and example section, and assumptions made 
 should be carefully explained. If the assumptions are checked by the procedure 
 on run-time, errors may be reported using the @xref{ERROR} function.
@@ -3562,7 +3562,7 @@ A procedure may print out comments, for instance to explain results or to
 display intermediate computations. This is often helpful when calling the 
 procedure directly, but it may also cause confusions in cases where the 
 procedure is called by another procedure. The @sc{Singular}  solution to 
-this problem makes use of the function @code{dbprint} (see @xref{dbprint}) and 
+this problem makes use of the function @code{dbprint} (@pxref{dbprint}) and 
 the reserved variables printlevel and voice (see @xref{printlevel} and 
 @xref{voice}). Note that @code{printlevel} is a predefined variable whose 
 value can be changed by the user, while @code{voice} is an internal variable, 
