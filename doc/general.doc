@@ -3333,7 +3333,7 @@ Remember that help strings are formatted as explained in
 @ref{Typesetting of help and info strings}. In particular, descriptions may
 contain the texinfo markup elements @code{@@*, @@math@{..@},
 @@code@{..@}, @@example, @@format, @@texinfo} to better control their
-typesetting. See @ref{msum}, @ref{mdouble}, @ref{mtripple} for examples.
+typesetting. See @ref{msum}, @ref{mdouble} for examples.
 
 
 @c ----------------------------------------------------------------------
@@ -3567,7 +3567,7 @@ the reserved variables printlevel and voice (@pxref{printlevel} and
 @pxref{voice}). Note that @code{printlevel} is a predefined variable whose 
 value can be changed by the user, while @code{voice} is an internal variable, 
 representing the nesting level of procedures. Accordingly, the value of
-@xref{voice}) is 1 on the top level, 2 inside the first procedure etc.;
+@ref{voice} is 1 on the top level, 2 inside the first procedure etc.;
 printlevel has the value 0 by default, but can be set to any integer 
 value by the user.
 
@@ -3592,22 +3592,22 @@ example part.
                ...
       EXAMPLE: example Test; shows an example
       "
-      {   ...
+      @{   ...
          int p = printlevel - voice + 3;
           ...
          dbprint(p,"comment1");
          dbprint(p-1,"comment2");
          // dbprint prints only if p > 0
           ...
-      }
+      @}
       example
-      { "EXAMPLE:"; echo = 2;
+      @{ "EXAMPLE:"; echo = 2;
          int p = printlevel;   //store old value of printlevel
          printlevel = 1;       //assign new value to printlevel
           ...
          Test();
          printlevel = p;       //reset printlevel to old value
-      }
+      @}
 @end smallexample
 
 @item
