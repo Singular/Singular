@@ -3067,6 +3067,7 @@ entering @code{listvar(proc);}.
 * The help string of procedures::
 * Names in procedures::
 * Procedure commands::
+* The help string of procedures::
 @end menu
 
 See also @xref{Procedures in a library}.
@@ -3348,7 +3349,7 @@ Having loaded a library, its procedures can be used like any built-in
 @sc{Singular} function, and information on the library is obtained 
 by entering @code{help libname.lib}
 
-@xref{SINGULAR libraries} for all libraries currently distributed
+@xref{SINGULAR libraries}, for all libraries currently distributed
 with  @sc{Singular}.
 
 When writing your own library, it is important to comply with the
@@ -3386,6 +3387,7 @@ For more details, check here:
 * Procedures in a library::
 * template_lib::
 * Formal Checker::
+* Libraries in the SINGULAR Documentation::
 * Documentation Tool::
 * Typesetting of help and info strings::
 * Loading a library::
@@ -3493,8 +3495,7 @@ PROCEDURES:
 @end smallexample
 
 To see how this infostring appears in the documentation after 
-typesetting, check vvvvvvvvvvvv:
-
+typesetting, check @ref{absfac_lib):
 
 @item @strong{Note:}
 The typesetting language in which the @sc{Singular} documentation
@@ -3507,11 +3508,11 @@ For the convenience of users checking directly the source code,
 the info text should also be well readable verbatim.
 @end table
 
-
 @c -------------------------------------------------------------------
 @node LIB commands,Procedures in a library,Info String,Libraries
 @subsection  LIB commands
 @cindex  LIB commands
+
 
 LIB commands are part of the header of a library.
 
@@ -3539,7 +3540,6 @@ LIB commands are part of the header of a library.
 In this section, we list hints and requirements on how procedures 
 contained in a library should be implemented. For more on procedures, 
 see @xref{Procedures}.
-
 @enumerate
 @item
 Each procedure not meant to be accessible by users should be declared static.
@@ -3621,7 +3621,6 @@ tested against changes in the code.
 @end enumerate
 
 
-
 @c -------------------------------------------------------------------
 @node template_lib,Formal Checker,Procedures in a library,Libraries
 @subsection  template_lib
@@ -3629,7 +3628,8 @@ tested against changes in the code.
 @cindex Template for writing a library
 @cindex library, template
 
-First, we show the source-code of the template library:
+First, we show the source-code of a template library:
+
 @smallexample
 @c include template.lib
 @end smallexample
