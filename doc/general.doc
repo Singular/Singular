@@ -3054,7 +3054,7 @@ Procedures contain sequences of commands in the @sc{Singular} language.
 They are used to extend the set of commands by user defined commands.  
 In a @sc{Singular} session, procedures are defined by either typing them 
 on the command line or by loading them from a library file with the 
-@code{LIB} or @code{load}  command (see @xref{Libraries}).  Procedures are
+@code{LIB} or @code{load}  command (@pxref{Libraries}).  Procedures are
 invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
 executes the sequence of commands stored in the specified procedure. All
@@ -3495,7 +3495,7 @@ PROCEDURES:
 @end smallexample
 
 To see how this infostring appears in the documentation after 
-typesetting, check @ref{absfac_lib):
+typesetting, check @ref{absfac_lib}:
 
 @item @strong{Note:}
 The typesetting language in which the @sc{Singular} documentation
