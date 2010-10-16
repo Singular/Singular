@@ -3548,7 +3548,7 @@ The header of each procedure not declared static must comply with the guidelines
 described in @ref{Procedure definition} and @ref{The help string of procedures}. 
 In particular, it must have a help and example section, and assumptions made 
 should be carefully explained. If the assumptions are checked by the procedure 
-on run-time, errors may be reported using the @xref{ERROR} function.
+on run-time, errors may be reported using the @ref{ERROR} function.
 @item
 Names of procedures should not be shorter than 4 characters and should not 
 contain any special characters. In particular, the use of @code{_} in names of 
@@ -3563,8 +3563,8 @@ display intermediate computations. This is often helpful when calling the
 procedure directly, but it may also cause confusions in cases where the 
 procedure is called by another procedure. The @sc{Singular}  solution to 
 this problem makes use of the function @code{dbprint} (@pxref{dbprint}) and 
-the reserved variables printlevel and voice (see @xref{printlevel} and 
-@xref{voice}). Note that @code{printlevel} is a predefined variable whose 
+the reserved variables printlevel and voice (@pxref{printlevel} and 
+@pxref{voice}). Note that @code{printlevel} is a predefined variable whose 
 value can be changed by the user, while @code{voice} is an internal variable, 
 representing the nesting level of procedures. Accordingly, the value of
 @xref{voice}) is 1 on the top level, 2 inside the first procedure etc.;
@@ -3585,7 +3585,8 @@ command @code{printlevel=1;} is necessary for `comment1' to be
 displayed on @code{example Test;}. However, since printlevel is a 
 global variable, it should be reset to its old value at the end of the 
 example part.  
-       	
+
+@smallexample       	
       proc Test
       "USAGE:   ...
                ...
@@ -3607,6 +3608,7 @@ example part.
          Test();
          printlevel = p;       //reset printlevel to old value
       }
+@end smallexample
 
 @item
 @sc{Singular}  functions such as @code{pause} or @code{read}  allow
