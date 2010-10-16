@@ -3050,24 +3050,26 @@ data bases).
 @section Procedures
 @cindex Procedures
 
-Procedures contain sequences of commands of the @sc{Singular} language.
-They are used to extend the set of commands by user defined commands.  Procedures are defined
-by either typing them on the command line or by loading them from a
-so-called library file with the LIB command, see @ref{LIB}.  Procedures are
+Procedures contain sequences of commands in the @sc{Singular} language.
+They are used to extend the set of commands by user defined commands.  
+In a @sc{Singular} session, procedures are defined by either typing them 
+on the command line or by loading them from a library file with the 
+@code{LIB} or @code{load}  command (see @xref{Libraries}).  Procedures are
 invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
 executes the sequence of commands stored in the specified procedure. All
-defined procedures can be displayed by the command @code{listvar(proc);}.
+procedures defined in a @sc{Singular} session can be displayed by 
+entering @code{listvar(proc);}.
 
 @menu
 * Procedure definition::
-* Names in procedures::
 * Parameter list::
-* Procedure commands::
 * The help string of procedures::
+* Names in procedures::
+* Procedure commands::
 @end menu
 
-@xref{Procedures in a library}.
+See also @xref{Procedures in a library}.
 @c -------------------------------------------------
 @node Procedure definition, Names in procedures, Procedures, Procedures
 @subsection Procedure definition
@@ -3340,18 +3342,18 @@ typesetting. See @ref{msum}, @ref{mdouble}, @ref{mtripple} for examples.
 
 A library is a collection of @sc{Singular}
 procedures in a file.
-@*@sc{Singular} loads a library with the commands @code{load} and
-@code{LIB}.
-After loading the library, the library procedures can be used like
-any built-in @sc{Singular} function, and information on the library
-is  obtained by entering @code{help libname.lib}
+@*To load a library into a @sc{Singular} session, use the @code{LIB} or
+@code{load} command.
+Having loaded a library, its procedures can be used like any built-in 
+@sc{Singular} function, and information on the library is obtained 
+by entering @code{help libname.lib}
 
-@xref{SINGULAR libraries}, for all libraries currently distributed
+@xref{SINGULAR libraries} for all libraries currently distributed
 with  @sc{Singular}.
 
-When writing your own library, it is important to follow the
+When writing your own library, it is important to comply with the
 guidelines described in what follows. Otherwise, due to possible
-parser errors, the loading of the library may be aborted.
+parser errors, it may not be possible to load the library.
 
 Each library consists of a header and a body. The first line
 of a library must start with a double slash @code{//}.
@@ -3361,7 +3363,19 @@ an info string, and LIB commands. The strings are mandatory. LIB
 commands are meant to load the additional libraries used by the
 library under consideration.
 
-The library body collects the procedures which may be static or not.
+The library body collects the procedures (declared static or not).
+
+@table @asis
+@item @strong{Note:}
+The typesetting language in which the @sc{Singular} documentation
+is written is texinfo. The info strings of a library included in the 
+@sc{Singular} distribution will be parsed and automatically
+translated to the texinfo format. For texinfo markup elements
+and other information facilitating optimal typesetting results,
+see @ref{Typesetting of help and info strings}.
+For the convenience of users checking directly the source code,
+the info and help texts should also be well readable verbatim.
+@end table
 
 For more details, check here:
 @menu
@@ -3372,7 +3386,6 @@ For more details, check here:
 * Procedures in a library::
 * template_lib::
 * Formal Checker::
-* Libraries in the SINGULAR Documentation::
 * Documentation Tool::
 * Typesetting of help and info strings::
 * Loading a library::
@@ -3382,6 +3395,8 @@ For more details, check here:
 @node Version String,Category String,,Libraries
 @subsection Version String
 @cindex Version String
+
+A version string is part of the header of a library.
 
 @table @asis
 @item @strong{Syntax:}
@@ -3400,6 +3415,7 @@ It is common practice to simply define the version string to be
 @subsection Category String
 @cindex Category String
 
+A category string is part of the header of a library.
 
 @table @asis
 @item @strong{Syntax:}
@@ -3429,21 +3445,23 @@ It is common practice to simply define the version string to be
 info="
 LIBRARY: <library_name> <one line description of the purpose>
 AUTHOR:  <name, and email address of author>
-OVERVIEW: <concise information
+OVERVIEW: <concise and useful information on the algorithms implemented>
 REFERENCES: <references for further information>
-SEE ALSO: <comma-separated words of cross references>]
-KEYWORDS: <semicolon-separated phrases of index keys>]
+SEE ALSO: <comma-separated words of cross references>
+KEYWORDS: <semicolon-separated phrases of index keys>
 PROCEDURES:
-  <procedure1>();     <one line description of the purpose>
+  <procedure name 1>();     <one line description of the purpose>
      .
      .
-  <procedureN>();     <one line description of the purpose>
+  <procedure name N>();     <one line description of the purpose>
 ";
 @end smallexample
 
 REFERENCES, SEE ALSO, and KEYWORDS are optional. In the documentation,
 the one line description of the purpose following LIBRARY: will be printed
-in its own line, starting with the prefix PURPOSE: .
+in its own line, starting with the prefix PURPOSE: . A procedure parameter
+should be included between the brackets @code{()} only if the corresponding
+one line description of the purpose refers to it.
 
 @item @strong{Example:}  
 @smallexample
@@ -3464,24 +3482,29 @@ Rothstein-Trager partial fraction decomposition algorithm.
 
 REFERENCES:
 G. Chèze, G. Lecerf: Lifting and recombination techniques for absolute
-             factorization. Journal of Complexity, 23(3):380-420, 2007.
+                  factorization. Journal of Complexity, 23(3):380-420, 2007.
 
 KEYWORDS: factorization, absolute factorization.
 SEE ALSO: factorize
 
 PROCEDURES:
-  absFactorize(f);        absolute factorization of poly
+  absFactorize();        absolute factorization of poly
 ";
 @end smallexample
-  
+
+To see how this infostring appears in the documentation after 
+typesetting, check vvvvvvvvvvvv:
+
+
 @item @strong{Note:}
 The typesetting language in which the @sc{Singular} documentation
-is written is texinfo - but it should also be readably verbatim.
-The info strings of a library included
-in the @sc{Singular} distribution will be parsed and automatically
+is written is texinfo. The info strings of a library included in the 
+@sc{Singular} distribution will be parsed and automatically
 translated to the texinfo format. For texinfo markup elements
-and other information facilating optimal typesetting results,
-check see @ref{Typesetting of help and info strings}.
+and other information facilitating optimal typesetting results,
+see @ref{Typesetting of help and info strings}.
+For the convenience of users checking directly the source code,
+the info text should also be well readable verbatim.
 @end table
 
 
@@ -3490,6 +3513,7 @@ check see @ref{Typesetting of help and info strings}.
 @subsection  LIB commands
 @cindex  LIB commands
 
+LIB commands are part of the header of a library.
 
 @table @asis
 @item @strong{Syntax:}
@@ -3512,6 +3536,92 @@ check see @ref{Typesetting of help and info strings}.
 @subsection  Procedures in a library
 @cindex  Procedures in a library
 
+In this section, we list hints and requirements on how procedures 
+contained in a library should be implemented. For more on procedures, 
+see @xref{Procedures}.
+
+@enumerate
+@item
+Each procedure not meant to be accessible by users should be declared static.
+@item
+The header of each procedure not declared static must comply with the guidelines 
+described in @xref{Procedure definition} and @xref{The help string of procedures}. 
+In particular, it must have a help and example section, and assumptions made 
+should be carefully explained. If the assumptions are checked by the procedure 
+on run-time, errors may be reported using the @xref{ERROR} function.
+@item
+Names of procedures should not be shorter than 4 characters and should not 
+contain any special characters. In particular, the use of @code{_} in names of 
+procedures is discourraged. If the name of the procedure is composed of 
+more than one word, each new word should start with a capital letter, all 
+other letters should be lower case (e.g. linearMapKernel).
+@item
+No procedures should be defined within the body of another procedure.
+@item
+A procedure may print out comments, for instance to explain results or to 
+display intermediate computations. This is often helpful when calling the 
+procedure directly, but it may also cause confusions in cases where the 
+procedure is called by another procedure. The @sc{Singular}  solution to 
+this problem makes use of the function @code{dbprint} (see @xref{dbprint}) and 
+the reserved variables printlevel and voice (see @xref{printlevel} and 
+@xref{voice}). Note that @code{printlevel} is a predefined variable whose 
+value can be changed by the user, while @code{voice} is an internal variable, 
+representing the nesting level of procedures. Accordingly, the value of
+@xref{voice}) is 1 on the top level, 2 inside the first procedure etc.;
+printlevel has the value 0 by default, but can be set to any integer 
+value by the user.
+
+For example, if the following procedure @code{Test} is called directly from 
+the top level, then `comment1' is displayed, but not `comment2'. 
+By default, nothing is displayed if @code{Test} is called from within any 
+other procedure. However, if @code{printlevel} is set to a value k 
+with k>0, then `comment1' (resp. `comment2') is displayed provided 
+that @code{Test} is called from another procedure with nesting level at 
+most k (resp. k-1).
+
+The example part of a procedure behaves in this respect like the 
+procedure on top level (i.e., the value of @code{voice} is 1). Therefore, the 
+command @code{printlevel=1;} is necessary for `comment1' to be 
+displayed on @code{example Test;}. However, since printlevel is a 
+global variable, it should be reset to its old value at the end of the 
+example part.  
+       	
+      proc Test
+      "USAGE:   ...
+               ...
+      EXAMPLE: example Test; shows an example
+      "
+      {   ...
+         int p = printlevel - voice + 3;
+          ...
+         dbprint(p,"comment1");
+         dbprint(p-1,"comment2");
+         // dbprint prints only if p > 0
+          ...
+      }
+      example
+      { "EXAMPLE:"; echo = 2;
+         int p = printlevel;   //store old value of printlevel
+         printlevel = 1;       //assign new value to printlevel
+          ...
+         Test();
+         printlevel = p;       //reset printlevel to old value
+      }
+
+@item
+@sc{Singular}  functions such as @code{pause} or @code{read}  allow
+and require interactive user-input. They are, thus, in particular useful
+for debugging purposes. If such a command is used inside the procedure
+of a library to be distributed with @sc{Singular}, the example section of 
+the procedure has to be written with some care -- the procedure should 
+only be called from within the example if the printlevel is 0. Otherwise, 
+the automatic build process of @sc{Singular} will not run through since 
+all examples are carried out during the build process. They are, thus, 
+tested against changes in the code.
+@end enumerate
+
+
+
 @c -------------------------------------------------------------------
 @node template_lib,Formal Checker,Procedures in a library,Libraries
 @subsection  template_lib
@@ -3519,13 +3629,13 @@ check see @ref{Typesetting of help and info strings}.
 @cindex Template for writing a library
 @cindex library, template
 
-First, we show the source-code of a template library:
+First, we show the source-code of the template library:
 @smallexample
 @c include template.lib
 @end smallexample
 
-After typesetting, the library appears in the document as follows (with
-one subsection for each procedure):
+Second, we show how the library appears in the documentation
+after typesetting (with one subsection for each procedure):
 
 @c lib template.lib  lib_fun lib_ex
 
