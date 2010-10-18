@@ -3059,20 +3059,19 @@ invoked like normal built-in commands, i.e., by typing their name
 followed by the list of arguments in parentheses. The invocation then
 executes the sequence of commands stored in the specified procedure. All
 procedures defined in a @sc{Singular} session can be displayed by 
-entering @code{listvar(proc);}.
+entering @code{listvar(proc);} .
 
 @menu
 * Procedure definition::
 * Parameter list::
-* The help string of procedures::
+* Help string::
 * Names in procedures::
-* Procedure commands::
-* The help string of procedures::
+* Procedure-specific commands::
 @end menu
 
 See also @xref{Procedures in a library}.
 @c -------------------------------------------------
-@node Procedure definition, Names in procedures, Procedures, Procedures
+@node Procedure definition, Parameter list,, Procedures
 @subsection Procedure definition
 @cindex Procedure definition
 @cindex procedures, static
@@ -3084,14 +3083,14 @@ See also @xref{Procedures in a library}.
 @c ------------------------------------------------------------
 @table @strong
 @item Syntax:
-[@code{static}] @code{proc} proc_name [parameter_list]
-@*["help_text"]
+[@code{static}] @code{proc} proc_name ([<parameter list>])
+@*[<help string>]
 @*@code{@{}
 @*
 @tex
 \quad
 @end tex
-   procedure_body
+   <procedure body>
 @*@code{@}}
 @*[@code{example}
 @*@code{@{}
@@ -3099,31 +3098,25 @@ See also @xref{Procedures in a library}.
 @tex
 \quad
 @end tex
-   sequence_of_commands;
+   <sequence of commands>
 @*@code{@}}]
 @item Purpose:
-defines a new function, the @code{proc} proc_name, with the additional
-information help_text, which is written to the screen by
-@code{help proc_name;} and the @code{example} section
-which is executed by @code{example proc_name;}.
-@* The help_text, the parameter_list, and the example section are optional.
-The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
-The help and example sections are ignored if the procedure is defined
-@ifset namespaces
-interactively, i.e., if it was not loaded from a file by a command as in @ref{load}.
-@end ifset
-@ifclear namespaces
-interactively, i.e., if it was not loaded from a file by a LIB command
-(@ref{LIB}).
-@end ifclear
-@* Specifying @code{static} in front of the proc-definition (in a library file)
-makes this procedure local to the library, i.e., accessible only for the other
-procedures in the same library, but not for the users. So there is no
-reason anymore to define a procedure within another one (it just makes
-debugging harder).
+Defines a new function, the @code{proc} proc_name. Once loaded in a 
+@sc{Singular} session, the information provided in the help string will be 
+displayed upon entering @code{help proc_name;}, while the @code{example} 
+section will be executed  upon entering @code{example proc_name;}.
+@xref{Parameter list}, @ref{Help string}, and the example in 
+@ref{Procedures in a library}.
+@* The help string, the parameter list, and the example section are optional.
+They are, however, mandatory for the procedures listet in the header of a library.
+The help string and the example section are ignored if the procedure is defined
+interactively, i.e., if it was not loaded from a file by the @code{LIB} or @code{load}  
+command (@pxref{LIB} and @pxref{load} ).
+@* In the body of a library, each procedure not meant to be accessible by 
+users should be declared static. @xref{Procedures in a library}. 
 @end table
 
-@subsubheading Example of an interactive procedure definition
+@subsubheading Example of an interactive procedure definition and its execution
 @smallexample
 @c example
   proc milnor_number (poly p)
@@ -3143,12 +3136,12 @@ debugging harder).
 @end smallexample
 
 @subsubheading Example of a procedure definition in a library
-First, the library definition:
+First, we define the library (and store it as @code{ sample.lib}):
 @smallexample
 @c include sample.lib
 @end smallexample
 
-Now, we load the library and execute the procedures defined there:
+Now, we load the library and execute its procedures:
 @smallexample
 @c example error
   LIB "sample.lib";        // load the library sample.lib
@@ -3161,62 +3154,8 @@ Now, we load the library and execute the procedures defined there:
 @c example
 @end smallexample
 
-@subsubheading Guidelines for the help text of a procedure
-There are no enforced rules on the format of the help section of a
-procedure.
-
-Nevertheless, we recommend that the help text of a procedure should
-contain information about the usage,
-purpose, return values and generated objects. Particular assumptions or
-limitations should be listed. It should also be mentioned if global
-objects are generated or manipulated.
-
-The help text of procedures contained in libraries of the
-@sc{Singular} distribution
-should furthermore comply with  certain rules as explained in
-@ref{The help string of procedures}.
-
 @c ---------------------------------------
-@node Names in procedures, Parameter list, Procedure definition, Procedures
-@subsection Names in procedures
-@cindex Names in procedures
-@cindex local names
-
-All variables are local to the procedure. They are defined in the package
-in which the procedure is defined. Locally defined variables cannot interfere
-with names in other procedures and are automatically deleted after leaving
-the procedure.
-
-Internally, local variables are stored using the nesting level. A variable
-is said to have nesting level 1, if it is local to a procedure that was
-called interactively, nesting level 2, if it is local to a procedure that
-was called by a procedure of nesting level 1 etc. @code{listvar()} also
-displays the nesting level, nesting level 0 is used for global objects
-(see @ref{listvar}).
-
-To keep local variables after leaving the procedure, they have to be
-exported (i.e. made known) to some higher level or to some package
-by a command like @code{export} or @code{exportto} (@pxref{export},
-@pxref{exportto}, @pxref{importfrom}; see also @pxref{package}).
-
-@strong{Example:}
-@smallexample
-@c example
-proc xxx
-{
-  int k=4;        //defines a local variable k
-  int result=k+2;
-  export(result);  //defines the global variable "result".
-}
-xxx();
-listvar(all);
-@c example
-@end smallexample
-Note that the variable @code{result} became a global variable after the
-execution of @code{xxx}.
-
-@c ---------------------------------------
-@node Parameter list, Procedure commands, Names in procedures, Procedures
+@node Parameter list, Help string, Procedure definition, Procedures
 @subsection Parameter list
 @cindex Parameter list
 @cindex argument, optional
@@ -3293,13 +3232,93 @@ proc x7 (ring r)
 @end table
 
 @c --------------------------------------- ----------
-@node Procedure commands, The help string of procedures, Parameter list, Procedures
-@subsection Procedure commands
-@cindex Procedure commands
+@node Help string,Names in procedures,Parameter list,Procedures
+@subsection Help string
+@cindex Help string
+@cindex procedures, help string
 
-Some commands only make sense inside a procedure, since they make
-objects known to the nesting level from which the procedure was called
-or to all nesting levels.
+@table @asis
+@item @strong{Syntax:}
+  string_constant;
+@item @strong{Purpose:}
+  Constitutes the help text of a procedure.  
+@item @strong{Format:}  
+@smallexample  
+USAGE:    <proc_name>(<parameter list>);   <explanation of parameters>
+ASSUME:  <description of assumptions made>
+RETURN:   <description of what is returned>
+SIDE EFFECTS:  <description of global objects generated or manipulated,
+but not returned>
+REMARKS: <remarks on theory, implemented  algorithms,references>
+NOTE:    <particularities, limitations, additional details>
+KEYWORDS: <semicolon-separated phrases of index keys>
+SEE ALSO: <comma-separated names of related procedures/cross references>
+EXAMPLE:  example <proc_name>; shows an example  
+@end smallexample
+@end table
+@item @strong{NOTE:}  
+@itemize @bullet
+@item
+SIDE EFFECTS, KEYWORDS, and SEE ALSO are optional.
+@item
+In a @sc{Singular} session, the example will be carried out upon
+entering @code{example <proc_name>;}.
+@item
+@xref{{Typesetting of help and info strings} for help strings
+in the @sc{Singular}  documentaion.
+@item
+See the example in @ref{Procedures in a library} for an
+illustration.
+@end itemize
+
+@c ---------------------------------------
+@node Names in procedures, Procedure-specific commands, Help string, Procedures
+@subsection Names in procedures
+@cindex Names in procedures
+@cindex local names
+
+All variables are local to the procedure. They are defined in the package
+in which the procedure is defined. Locally defined variables cannot interfere
+with names in other procedures and are automatically deleted after leaving
+the procedure.
+
+Internally, local variables are stored using the nesting level. A variable
+is said to have nesting level 1, if it is local to a procedure that was
+called interactively, nesting level 2, if it is local to a procedure that
+was called by a procedure of nesting level 1 etc. @code{listvar()} also
+displays the nesting level, nesting level 0 is used for global objects
+(see @ref{listvar}).
+
+To keep local variables after leaving the procedure, they have to be
+exported (i.e. made known) to some higher level or to some package
+by a command like @code{export} or @code{exportto} (@pxref{export},
+@pxref{exportto}, @pxref{importfrom}; see also @pxref{package}).
+
+@strong{Example:}
+@smallexample
+@c example
+proc xxx
+{
+  int k=4;        //defines a local variable k
+  int result=k+2;
+  export(result);  //defines the global variable "result".
+}
+xxx();
+listvar(all);
+@c example
+@end smallexample
+Note that the variable @code{result} became a global variable after the
+execution of @code{xxx}.
+
+
+@c --------------------------------------- ----------
+@node Procedure-specific commands,, Names in procedures, Procedures
+@subsection Procedure-specific commands
+@cindex Procedure-specific commands
+
+A few  commands should only be used inside a procedure. They either make
+local objects global ones or return results to the level from where the
+procedure was called.
 
 @c ref
 See
@@ -3308,32 +3327,6 @@ See
 @ref{return}.
 @c ref
 
-@c --------------------------------------- ----------
-@node The help string of procedures,,Procedure commands, Procedures
-@subsection The help string of procedures
-@cindex The help string of procedures
-@cindex procedures, help string
-
-The help string of a procedure should have the following format:
-
-@smallexample
-USAGE:    <proc_name>(<parameters>);   <explanation of parameters>
-[CREATE:  <description of created objects which are not returned>]
-RETURN:   <description of the purpose and return value>
-[NOTE:    <particular assumptions or limitations, details>]
-[SEE ALSO: <comma-separated names of related procedures/cross references>]
-[KEYWORDS: <semicolon-separated phrases of index keys>]
-EXAMPLE:  example <proc_name>; shows an example
-@end smallexample
-
-Further arbitrary items (like @code{THEORY:}, or @code{BACKGROUND:}) are
-recognized, as well, but should be used diligently.
-
-Remember that help strings are formatted as explained in
-@ref{Typesetting of help and info strings}. In particular, descriptions may
-contain the texinfo markup elements @code{@@*, @@math@{..@},
-@@code@{..@}, @@example, @@format, @@texinfo} to better control their
-typesetting. See @ref{msum}, @ref{mdouble} for examples.
 
 
 @c ----------------------------------------------------------------------
@@ -3347,13 +3340,13 @@ procedures in a file.
 @code{load} command.
 Having loaded a library, its procedures can be used like any built-in 
 @sc{Singular} function, and information on the library is obtained 
-by entering @code{help libname.lib}
+by entering @code{help libname.lib;}
 
 @xref{SINGULAR libraries}, for all libraries currently distributed
 with  @sc{Singular}.
 
 When writing your own library, it is important to comply with the
-guidelines described in what follows. Otherwise, due to possible
+guidelines described in this section. Otherwise, due to possible
 parser errors, it may not be possible to load the library.
 
 Each library consists of a header and a body. The first line
@@ -3366,45 +3359,63 @@ library under consideration.
 
 The library body collects the procedures (declared static or not).
 
-@table @asis
-@item @strong{Note:}
-The typesetting language in which the @sc{Singular} documentation
-is written is texinfo. The info strings of a library included in the 
-@sc{Singular} distribution will be parsed and automatically
-translated to the texinfo format. For texinfo markup elements
-and other information facilitating optimal typesetting results,
-see @ref{Typesetting of help and info strings}.
-For the convenience of users checking directly the source code,
-the info and help texts should also be well readable verbatim.
-@end table
+No line of a library should consist of more than 60 characters.
 
-For more details, check here:
 @menu
-* Version String::
-* Category String::
-* Info String::
+* Libraries in the @sc{Singular}  Documentation::	  	
+* Version string::
+* Category string::
+* Info string::
 * LIB commands::
 * Procedures in a library::
 * template_lib::
 * Formal Checker::
-* Libraries in the SINGULAR Documentation::
 * Documentation Tool::
 * Typesetting of help and info strings::
 * Loading a library::
 @end menu
 
 @c -------------------------------------------------------------------
-@node Version String,Category String,,Libraries
-@subsection Version String
-@cindex Version String
+@node Libraries in the @sc{Singular}  Documentation,Version string,Libraries,Libraries
+@subsection Libraries in the @sc{Singular}  Documentation
+@cindex Libraries in the @sc{Singular}  Documentation
+
+@itemize @bullet
+@item
+The typesetting language in which the @sc{Singular} documentation
+is written is @code{texinfo}. The info string of a library included in the 
+@sc{Singular} distribution will be parsed and automatically
+translated to the @code{texinfo} format. The same applies to the 
+help string of each procedure listed in the PROCEDURE: section of 
+the info string.
+@item
+Based on various tools, @code{info}, @code{dvi}, @code{p}, and 
+@code{html} versions of the @code{texinfo} documentation are generated.  
+@item
+For texinfo markup elements and other information facilitating optimal 
+typesetting results, see @ref{Typesetting of help and info strings}. 
+@item
+For the convenience of users checking directly the source code, the 
+@code{texinfo}  tools should be used economically. That is, the info 
+and  help texts should be well readable verbatim.
+@item
+The example of each procedure listed in the PROCEDURE: section of the 
+info string is computed and its output is included in the documentation. 
+@end itemize
+
+
+@c -------------------------------------------------------------------
+@node Version string,Category string,Libraries in the @sc{Singular}  Documentation,Libraries
+@subsection Version string
+@cindex Version string
 
 A version string is part of the header of a library.
 
 @table @asis
 @item @strong{Syntax:}
-  version = string_constant ;
+  version = string_constant;
 @item @strong{Purpose:}
-  defines the version number of a library. It is displayed when the library is loaded.
+  Defines the version number of a library. It is displayed when the library is loaded.
 @item @strong{Example:}  
 @code{version="$}@code{Id: sample.lib 13320 2010-09-29 09:31:38Z someone $";}
 @item @strong{Note:}
@@ -3413,57 +3424,73 @@ It is common practice to simply define the version string to be
 @end table
 
 @c -------------------------------------------------------------------
-@node Category String,Info String,Version String,Libraries
-@subsection Category String
-@cindex Category String
+@node Category string,Info string,Version string,Libraries
+@subsection Category string
+@cindex Category string
 
 A category string is part of the header of a library.
 
 @table @asis
 @item @strong{Syntax:}
-  category = string_constant ;
+  category = string_constant;
 @item @strong{Purpose:}
-  defines the category of a library.
+  Defines the category of a library.
 @item @strong{Example:}  
   category="Algebraic geometry";
 @item @strong{Note:}
-  reserved for sorting the libraries into categories.
+  Reserved for sorting the libraries into categories.
 @end table
 
 @c -------------------------------------------------------------------
-@node Info String,LIB commands,Category String,Libraries
-@subsection Info String
-@cindex Info String
+@node Info string,LIB commands,Category string,Libraries
+@subsection Info string
+@cindex Info string
 
 
 @table @asis
 @item @strong{Syntax:}
-  info = string_constant ;
+  info = string_constant;
 @item @strong{Purpose:}
-  constitutes the help text of a library. Will be displayed upon
-  entering @code{help libname.lib;}
+  Constitutes the help text of a library. Will be displayed in a
+  @sc{Singular}  session upon entering @code{help libname.lib;}.
+  Will be part of the @sc{Singular} documentation if the library
+  is distributed with @sc{Singular}. @xref{Libraries in the 
+  @sc{Singular}  Documentation}  
 @item @strong{Format:}  
 @smallexample
 info="
 LIBRARY: <library_name> <one line description of the purpose>
 AUTHOR:  <name, and email address of author>
-OVERVIEW: <concise and useful information on the algorithms implemented>
+OVERVIEW: <concise, additional information on what is implemented>
 REFERENCES: <references for further information>
-SEE ALSO: <comma-separated words of cross references>
 KEYWORDS: <semicolon-separated phrases of index keys>
+SEE ALSO: <comma-separated words of cross references>
 PROCEDURES:
-  <procedure name 1>();     <one line description of the purpose>
+  <proc_name 1>();     <one line description of the purpose>
      .
      .
-  <procedure name N>();     <one line description of the purpose>
+  <proc_name N>();     <one line description of the purpose>
 ";
 @end smallexample
 
-REFERENCES, SEE ALSO, and KEYWORDS are optional. In the documentation,
-the one line description of the purpose following LIBRARY: will be printed
-in its own line, starting with the prefix PURPOSE: . A procedure parameter
-should be included between the brackets @code{()} only if the corresponding
-one line description of the purpose refers to it.
+@item @strong{NOTE:}  
+@itemize @bullet
+@item
+In the documentation, the one line description of the purpose following 
+LIBRARY: will be printed in its own line, starting with the prefix PURPOSE: .
+@item
+REFERENCES, KEYWORDS, and SEE ALSO are optional.
+@item
+Only non-static procedures should be listed in the PROCEDURES: section.
+A procedure parameter should be included between the brackets 
+@code{()} only if the corresponding one line description of the purpose 
+refers to it. @xref{Procedures in a library}.
+@item
+In the documentation,  separate nodes (subsections in printed documents) 
+are created precisely for those  procedures of the library appearing
+n the PROCEDURES: section (that is, for some if not all non-static 
+procedures of the library).
+@end itemize
 
 @item @strong{Example:}  
 @smallexample
@@ -3486,7 +3513,7 @@ REFERENCES:
 G. Chèze, G. Lecerf: Lifting and recombination techniques for absolute
                   factorization. Journal of Complexity, 23(3):380-420, 2007.
 
-KEYWORDS: factorization, absolute factorization.
+KEYWORDS: factorization; absolute factorization.
 SEE ALSO: factorize
 
 PROCEDURES:
@@ -3496,20 +3523,10 @@ PROCEDURES:
 
 To see how this infostring appears in the documentation after 
 typesetting, check @ref{absfact_lib}:
-
-@item @strong{Note:}
-The typesetting language in which the @sc{Singular} documentation
-is written is texinfo. The info strings of a library included in the 
-@sc{Singular} distribution will be parsed and automatically
-translated to the texinfo format. For texinfo markup elements
-and other information facilitating optimal typesetting results,
-see @ref{Typesetting of help and info strings}.
-For the convenience of users checking directly the source code,
-the info text should also be well readable verbatim.
 @end table
 
 @c -------------------------------------------------------------------
-@node LIB commands,Procedures in a library,Info String,Libraries
+@node LIB commands,Procedures in a library,Info string,Libraries
 @subsection  LIB commands
 @cindex  LIB commands
 
@@ -3518,8 +3535,8 @@ LIB commands are part of the header of a library.
 
 @table @asis
 @item @strong{Syntax:}
-   LIB "lib_1.lib";
-   ...
+   LIB "lib_1.lib";@*
+   ...                  @*
    LIB "lib_r.lib";
 @item @strong{Purpose:}
   loads libraries used by the library under consideration.
@@ -3539,13 +3556,13 @@ LIB commands are part of the header of a library.
 
 In this section, we list hints and requirements on how procedures 
 contained in a library should be implemented. For more on procedures, 
-see @xref{Procedures}.
+see @ref{Procedures}.
 @enumerate
 @item
 Each procedure not meant to be accessible by users should be declared static.
 @item
 The header of each procedure not declared static must comply with the guidelines 
-described in @ref{Procedure definition} and @ref{The help string of procedures}. 
+described in @ref{Procedure definition} and @ref{Help string}. 
 In particular, it must have a help and example section, and assumptions made 
 should be carefully explained. If the assumptions are checked by the procedure 
 on run-time, errors may be reported using the @ref{ERROR} function.
@@ -3562,29 +3579,39 @@ A procedure may print out comments, for instance to explain results or to
 display intermediate computations. This is often helpful when calling the 
 procedure directly, but it may also cause confusions in cases where the 
 procedure is called by another procedure. The @sc{Singular}  solution to 
-this problem makes use of the function @code{dbprint} (@pxref{dbprint}) and 
-the reserved variables printlevel and voice (@pxref{printlevel} and 
-@pxref{voice}). Note that @code{printlevel} is a predefined variable whose 
-value can be changed by the user, while @code{voice} is an internal variable, 
-representing the nesting level of procedures. Accordingly, the value of
-@ref{voice} is 1 on the top level, 2 inside the first procedure etc.;
-printlevel has the value 0 by default, but can be set to any integer 
-value by the user.
+this problem makes use of the function @code{dbprint} (@pxref{dbprint}) 
+and the reserved variables @code{printlevel} and @code{voice}
+(@pxref{printlevel} and @pxref{voice}). Note that @code{printlevel} is a 
+predefined, global variable whose value can be changed by the user, while 
+@code{voice} is an internal variable, representing the nesting level of 
+procedures. Accordingly, the value of @ref{voice} is 1 on the top level, 
+2 inside the first procedure, and so on. The default value of 
+@code{printlevel}  is 0, but @code{printlevel}  can be set to 
+any integer value by the user.
+@end enumerate
 
-For example, if the following procedure @code{Test} is called directly from 
+@table @asis
+@item @strong{Example:}
+If the procedure @code{Test} below is called directly from 
 the top level, then `comment1' is displayed, but not `comment2'. 
 By default, nothing is displayed if @code{Test} is called from within any 
 other procedure. However, if @code{printlevel} is set to a value k 
-with k>0, then `comment1' (resp. `comment2') is displayed provided 
-that @code{Test} is called from another procedure with nesting level at 
+with k>0, then `comment1' (resp. `comment2') is displayed -- provided 
+@code{Test} is called from another procedure with nesting level at 
 most k (resp. k-1).
 
 The example part of a procedure behaves in this respect like the 
-procedure on top level (i.e., the value of @code{voice} is 1). Therefore, the 
-command @code{printlevel=1;} is necessary for `comment1' to be 
-displayed on @code{example Test;}. However, since printlevel is a 
-global variable, it should be reset to its old value at the end of the 
-example part.  
+procedure on top level (the nesting level is 1, that is, the value of 
+@code{voice} is 2). Therefore, due to the command @code{printlevel=1;},
+`comment1' will be displayed when entering @code{example Test;}. 
+However, since printlevel is a global variable, it should be reset to
+its old value at the end of the example part.  
+
+The predefined variable @code{echo}  controls whether input lines are
+echoed or not. Its default is 0, but it can be reset by the user. Input 
+is echoed if @code{echo>=voice}. At the beginning of the example 
+part, @code{echo} is set to the value 2. In this way, the input lines 
+of the example will be displayed when entering @code{example Test;}.
 
 @smallexample       	
       proc Test
@@ -3610,17 +3637,17 @@ example part.
       @}
 @end smallexample
 
-@item
+@item @strong{Note:}
 @sc{Singular}  functions such as @code{pause} or @code{read}  allow
 and require interactive user-input. They are, thus, in particular useful
 for debugging purposes. If such a command is used inside the procedure
 of a library to be distributed with @sc{Singular}, the example section of 
 the procedure has to be written with some care -- the procedure should 
-only be called from within the example if the printlevel is 0. Otherwise, 
-the automatic build process of @sc{Singular} will not run through since 
-all examples are carried out during the build process. They are, thus, 
-tested against changes in the code.
-@end enumerate
+only be called from within the example if the value of @code{printlevel}  
+is 0. Otherwise,  the automatic build process of @sc{Singular} will not 
+run through since the examples are carried out during the build process. 
+They are, thus, tested against changes in the code.
+@end table
 
 
 @c -------------------------------------------------------------------
@@ -3671,62 +3698,72 @@ and errors which may help you to improve your library.
 @subsection  Typesetting of help and info strings
 @cindex  Typesetting of help and info strings
 
-The help strings of procedures and info strings of libraries which are
-included in the
-distribution of @sc{Singular} are parsed and automatically converted
-into the texinfo format (the typesetting language in which the
-documentation  of @sc{Singular} is written).
+The info strings of the libraries which are included in the distribution 
+of @sc{Singular} and the help strings of the corresponding procedures 
+are parsed and automatically converted into the @code{texinfo} format 
+(the typesetting language in which the documentation  of @sc{Singular} 
+is written). 
 
-For optimal typesetting results, the guidelines for writing libraries
-and procedures should be followed, and the following points should be
-kept in mind:
+The illustrative example given in @xref{template_lib} should provide
+sufficient information on how this works. For more details, check the 
+following items:
 
 @itemize @bullet
 @item
-If a help string starts with an @code{@@} sign, then no parsing is done,
-and the help string is assumed to be already in the texinfo format.
+Users familiar with @code{texinfo} may write help and info strings
+directly in the @code{texinfo} format. The string should, then, 
+start with the @code{@@} sign. In this case, no parsing will be done.
 @item
-help strings are typeset within a @code{@@table @@asis} environment
-(which is similar to a latex @code{description} environment).
+Help and info strings are typeset within a @code{@@table @@asis} environment
+(which is similar to the @code{latex} @code{description} environment).
 @item
-If a line starts with  only uppercase words and contains a colon, then
-the text up
-to the colon is taken to be the description-string of an item and the
+If a line starts with uppercase words up to a colon, then the text up to 
+the colon is taken to be the description-string of an item, and the
 text following the colon is taken to be the content of the item.
 @item
 If the description-string of an item matches
 @table @asis
-@item @code{EXAMPLE}
-then this item and its content is ignored.
 @item @code{SEE ALSO}
 then the
-content of the item is assumed to be comma-separated words which are
-valid references to other texinfo nodes of the manual. (e.g., all
-procedure and command names are also texinfo nodes).
+content of the item is assumed to consist of comma-separated words 
+which are valid references to other @code{texinfo}  nodes of the manual 
+(e.g., all procedure and command names are also @code{texinfo}  nodes).
 @item  @code{KEYWORDS} (or, @code{KEYPHRASES})
 then the content of the item is assumed to be a
 semicolon-separated list of phrases which are taken as keys for the
-index of the manual (N.B. the name of a procedure/library is
+index of the manual (the name of a procedure/library is
 automatically added to the index keys).
-@item @code{PROCEDURES}
-then the
-content of the item is assumed to be a summary description of the
-procedures contained in the library. Separate texinfo nodes (subsections
-in printed documents) are created exclusively from the help strings of such
-procedures appearing in the summary description of a library.
+@end table
+@item
+If the description-string of an item in the @strong{info string of a
+library} matches
+@table @asis
+@item
+@item @code{EXAMPLE}
+then this has no effect (that is, the corresponding item and its content 
+is ignored). 
 @item @code{LIBRARY}
 then the content of the item is assumed to be a one-line description of
-a library. If this one-line description consist of only uppercase
-characters, then it is typeset in all lowercase characters in the
-manual (otherwise it is left as is).
-@end table
+the library. If this one-line description consist of only uppercase
+characters, then it is typeset in lowercase characters (otherwise it 
+is left as is).
+@item @code{PROCEDURES}
+then the content of the item is assumed to consist of lines of type
 
-@item
-For the content of an item, the following texinfo markup elements
-are recognized (and, their content not further manipulated):
-@table @asis
+<proc_name i>();     <one line description of the purpose> 
+
+Separate @code{texinfo} nodes (subsections in printed documents) 
+are created precisely for those  procedures of the library appearing
+here (that is, for some if not all non-static procedures of the library).
+@end table
+@end itemize
+
+With respect to the content of an item, the following @code{texinfo} 
+markup elements are recognized: 
+
+@itemize 
 @item @code{@@*}
-to enforce a line-break.
+Enforces a line-break.
 @table @asis
 @item Example:
 @code{old line @@* new line}
@@ -3735,11 +3772,11 @@ to enforce a line-break.
 @end table
 
 @item @code{@@ref@{...@}}
-References to other parts of the @sc{Singular} manual can be set using
-one of the following @code{@@ref@{node@}} constructs. Notice that
-@code{node} must be the name of a section of the @sc{Signular}
-manual. In particular, it may be a name of a function, library or library
-procedure.
+For references to other parts of the @sc{Singular} manual use one of 
+the following @code{@@ref@{node@}} constructs. Here, @code{node} 
+must be the name of a section of the @sc{Signular} manual. In
+particular,  it may be a name of a function, library or procedure
+in a library.
 
 @table @asis
 @item @code{@@xref@{node@}}
@@ -3750,7 +3787,7 @@ for a reference to the node @code{node} at the end of a sentence.
 for a reference to the node @code{node} within parenthesis.
 
 @item Example:
-@code{@@xref@{Tropical Storms@}, for more info.}
+@code{@@xref@{Hurricanes@}, for more info.}
 @*@expansion{}*Note Hurricanes::, for more info.
 @*@expansion{}See Section 3.1 [Hurricanes], page 24, for more info.
 
@@ -3766,39 +3803,36 @@ page 24)
 @end table
 
 @item @code{@@math@{..@}}
-for typesetting of small (i.e., which do not expand over
-multiple lines) mathematical expressions  in LaTeX math-mode
-syntax.
+Typeset short mathematical expressions  in LaTeX math-mode
+syntax (short: does not cause expansion over multiple lines).
 @table @asis
 @item Example:
 @code{@@math@{\alpha@}}
 @*@expansion{}
 @*@math{\alpha}
 @item Note:
-Mathematical expressions inside @code{@@math@{..@}} must
-not contain curly parenthesis and the "at" sign, i.e., may not contain
-@code{@{,@},@@}.
+The mathematical expressions inside @code{@@math@{..@}} must
+not contain the characters @code{@{},@code{@}}, and @code{@@}}.
 @end table
 
 @item @code{@@code@{..@}}
-for typesetting of small (i.e., which do not go over
-multiple lines) strings in typewriter font.
+Typeset short strings in typewriter font (short: does not cause 
+expansion over multiple lines).
 @table @asis
 @item Example:
 @code{@@code@{typewriter font@}}
 @*@expansion{}
 @*@code{typewriter font}
 @item Note:
-The string inside @code{@@code@{..@}} must
-not contain curly parenthesis and the "at" sign, i.e., must not contain
-@code{@{,@},@@}.
+The string inside @code{@@code@{..@}} must not contain the 
+characters @code{@{},@code{@}}, and @code{@@}}.
 @end table
 
 @item @code{@@example}
  @code{...}
 @item @code{@@end example}
-for pre-formatted text which is indented and typeset in typewriter
-font.
+Typeset pre-formatted text in typewriter font (with an
+extra identation).
 @table @asis
 @item Example:
 @example
@@ -3819,15 +3853,15 @@ escape of special characters like @{,@},@@
 @end example
 after example
 @item Note:
-The characters @{,@},@@ have to be escaped by an @@ sign inside an
-@@example environment.
+Inside an @@example environment, the characters @{,@},@@ have 
+to be escaped by an @@ sign. 
 @end table
 
 @item @code{@@format}
  @code{...}
 @item @code{@@end format}
-for pre-formatted text which is not indented and typeset in normal
-font.
+Typeset pre-formatted text in normal font (with no
+extra identation).
 @table @asis
 @item Example:
 @example
@@ -3848,8 +3882,8 @@ escape of special characters like @{,@},@@
 @end format
 after format
 @item Note:
-The characters @{,@},@@ have to be escaped by an @@ sign inside an
-@@example environment.
+Inside an @@format environment, the characters @{,@},@@ have 
+to be escaped by an @@ sign. 
 @end table
 
 
@@ -3861,7 +3895,7 @@ for text which is written in pure texinfo.
 @item Example:
 @example
 @@texinfo
-Among others, within a texinfo environment
+Among others, within a texinfo environment,
 one can use the tex environment to typeset
 more complex mathematical items like
 @@tex
@@ -3870,7 +3904,7 @@ $i_@{1,1@} $
 @@end texinfo
 @end example
 @*@expansion{}
-@*Among others, within a texinfo environment one can use the tex environment
+@*Among others, within a texinfo environment, one can use the tex environment
 to typeset more complex mathematical items like
 @tex
 $ i_{1,1} $
@@ -3885,14 +3919,73 @@ characters and does not contain any of the above described recognized
 texinfo markup elements.
 @end itemize
 
-See also @ref{template_lib} for an examples of the typesetting rules
-explained here.
-
 
 @c -------------------------------------------------------------------
 @node Loading a library,,Typesetting of help and info strings,Libraries
 @subsection   Loading a library
 @cindex   Loading a library
+
+Check with Hans:  noch aktuell, platform, 3.,The library SearchPath ...
+SearchPath for a library Note on SearchPath:, are appended to what
+
+Libraries can be loaded with the @code{LIB}  or the @code{load}  command 
+(@pxref{LIB} and @pxref{load}).
+
+Syntax:
+    LIB string_expression ; 
+    load string_expression ;
+Type:
+    none 
+Purpose:
+    Reads a library from a file. If the given filename does not start
+    with . or / and if the file cannot be located in the current directory, 
+    the SearchPath is checked in a top-down manner for a directory
+    containing a file with this name. 
+Note on SearchPath:
+    The SearchPath for a library is constructed at SINGULAR start-up time as follows:
+
+       1. The directories contained in the environment variable SINGULARPATH are appended
+
+       2. The directories $BinDir/LIB, $RootDir/LIB, $RootDir/../LIB, $DefaultDir/LIB, $DefaultDir/../LIB are appended, where
+              * $BinDir is the value of the environment variable SINGULAR_BIN_DIR, if set, or, if not set, the directory in which the SINGULAR program resides
+              * $RootDir is the value of the environment variable SINGULAR_ROOT_DIR, if set, or, if not set, $BinDir/../.
+              * $DefaultDir is the value of the environment variable SINGULAR_DEFAULT_DIR, if set, or /usr/local/Singular/ on a Unix platform, \Singular\ on a Windows 95/98/NT/XP/Vista platform. 
+
+       3. All directories which do not exist are removed from the SearchPath. 
+
+    For setting environment variables see system, or consult the manual of your shell.
+
+    The library SearchPath can be examined by starting up SINGULAR with the option -v, or by issuing the command system("--version");.
+
+Note on standard.lib:
+    Unless @sc{Singular}  is started with the --no-stdlib option, the library standard.lib is automatically loaded at start-up time.
+
+Following a @code{LIB}  or @code{load}  command, only the names 
+of the procedures in the library are loaded. The body of a particular 
+procedure is only read upon the first call of the procedure. This 
+minimizes memory consumption by unused procedures. Starting 
+a @sc{Singular}  session with the -q or --quiet option unsets the
+option loadLib and inhibits, thus, the monitoring of library 
+loading (see option).
+
+All libraries loaded in a @sc{Singular}  session are displayed upon 
+entering listvar(package); :
+ 	
+
+  option(loadLib);   // show loading of libraries;
+                     // standard.lib is loaded
+  listvar(package);
+==> // Standard             [0]  package (S,standard.lib)
+==> // Top                  [0]  package (N)
+                     // the names of the procedures of inout.lib
+  LIB "inout.lib";   // are now known to Singular
+==> // ** loaded inout.lib (1.34,2009/04/15)
+  listvar(package);
+==> // Inout                [0]  package (S,inout.lib)
+==> // Standard             [0]  package (S,standard.lib)
+==> // Top                  [0]  package (N)
+
+See Command line options; LIB; Procedures and libraries; SINGULAR libraries; proc; standard_lib; string; system. 
 
 @c -------------------------------------------------------------------
 @c ---------------------------------------
