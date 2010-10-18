@@ -3586,14 +3586,14 @@ using the command @code{LIB}. For more information on libraries see
 @c ------------------------------------------------------------
 @table @strong
 @item Syntax:
-[@code{static}] @code{proc} proc_name [parameter_list]
-@*["help_text"]
+[@code{static}] @code{proc} proc_name [(<parameter_list>)
+@*[<help_string>]
 @*@code{@{}
 @*
 @tex
 \quad
 @end tex
-   procedure_body
+   <procedure_body>
 @*@code{@}}
 @*[@code{example}
 @*@code{@{}
@@ -3601,24 +3601,23 @@ using the command @code{LIB}. For more information on libraries see
 @tex
 \quad
 @end tex
-   sequence_of_commands;
+   <sequence_of_commands>
 @*@code{@}}]
-@*@code{proc} proc_name @code{=} proc_name @code{;}
-@*@code{proc} proc_name @code{=} string_expression @code{;}
 @item Purpose:
-defines a new function, the @code{proc} proc_name, with the additional
-information help_text, which is copied to the screen by
-@code{help proc_name;} and the @code{example} section
-which is executed by @code{example proc_name;}.
-@* The help_text, the parameter_list, and the example section are optional.
-The default for a parameter_list is @code{(list #)}, see @ref{Parameter list}.
-The help and example sections are ignored if the procedure is defined
-interactively, i.e., if it was not loaded from a file by a @code{LIB} command
-(see @ref{LIB}).
-@* Specifying @code{static} in front of the proc-definition is only possible
-in a library file and makes this procedure local to the library,
-i.e., accessible only for the other procedures in the same library,
-but not for the users.
+Defines a new function, the @code{proc} proc_name. Once loaded in a 
+@sc{Singular} session, the information provided in the help string will be 
+displayed upon entering @code{help proc_name;}, while the @code{example} 
+section will be executed  upon entering @code{example proc_name;}.
+@xref{Parameter list}, @ref{Help string}, and the example in 
+@ref{Procedures in a library}.
+@* The help string, the parameter list, and the example section are optional.
+They are, however, mandatory for the procedures listed in the header of a library.
+The help string is ignored and no example section is allowed if the procedure is defined
+interactively, i.e., if it is not loaded from a file by the @code{LIB} or @code{load}  
+command (@pxref{LIB} and @pxref{load} ).
+@* In the body of a library, each procedure not meant to be accessible by 
+users should be declared static. @xref{Procedures in a library}. 
+@end table
 
 @item Example:
 @smallexample
