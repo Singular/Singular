@@ -1,81 +1,12 @@
 #! /bin/sh
 
-# Guess values for system-dependent variables and create Makefiles.
-# Generated automatically using autoconf version 2.13 
-# Copyright (C) 1992, 93, 94, 95, 96 Free Software Foundation, Inc.
-#
-# This configure script is free software; the Free Software Foundation
-# gives unlimited permission to copy, distribute and modify it.
-
-# Defaults:
-ac_help=
-ac_default_prefix=/usr/local
-# Any additions from configure.in:
-ac_default_prefix=`pwd`
-ac_help="$ac_help
-\
-  --with-tmpdir=DIR       use DIR as temporary directory"
-ac_help="$ac_help
-\
-  --enable-PACKAGE        configure and/or build PACKAGE
-  --disable-PACKAGE       do not configure and/or build PACKAGE
-   where PACKAGE can be:
-     omalloc               omalloc memory managment"
-ac_help="$ac_help
-\
-     gmp                  Gnu Multiple Precision package"
-ac_help="$ac_help
-\
-     MP                   Multi Protocol library"
-ac_help="$ac_help
-\
-     factory              polynomial factorization library"
-ac_help="$ac_help
-\
-     libfac               char set and modp poly factorization library"
-ac_help="$ac_help
-\
-     sgroup               numerical semigroup computations"
-ac_help="$ac_help
-\
-     Singular             CAS for Polynomial Computations"
-ac_help="$ac_help
-\
-     IntegerProgramming   IntegerProgramming"
-ac_help="$ac_help
-\
-     Plural               Plural"
-ac_help="$ac_help
-\
-     Texinfo              Texinfo for info, texi2dvi, makeinfo"
-ac_help="$ac_help
-\
-     Texi2html            Texinfo to HTML converter"
-ac_help="$ac_help
-\
-     doc                  Singular documentation"
-ac_help="$ac_help
-\
-     emacs                emacs completion files"
-ac_help="$ac_help
-\
-  --with-PACKAGE          use PACKAGE, provide dependent functionality
-  --without-PACKAGE       do not use PACKAGE, disable dependent functionality
-   where PACKAGE can be:
-     MP                   Multi Protocol library"
-ac_help="$ac_help
-\
-     factory              polynomial factorization library"
-ac_help="$ac_help
-\
-     libfac               char set and modp poly factorization library"
-ac_help="$ac_help
-\
-  --with-apint=PACKAGE    use PACKAGE for arbitary integer arithmetic
-                          where PACKAGE can be gmp
-All additional --enable and --with options are passed to subsequent calls 
-to configure of the packages to be built. See also configure --help in 
-these packages (resp. subdirs). "
+#PACKAGES="omalloc ntl factory libfac misc resources reporter coeffs polys"
+PACKAGES="omalloc xalloc misc reporter resources coeffs polys"
+_PWD="$(pwd)"
+_TOP_ARGS="$@"
+_ARGS0="--prefix=$_PWD"
+#_ARGS0="--libdir=$(pwd)/lib --includedir=$(pwd)/include"
+for d in $PACKAGES
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -488,15 +419,17 @@ running configure, to aid debugging if configure makes a mistake.
 ac_configure_args=
 for ac_arg
 do
-  case "$ac_arg" in
-  -no-create | --no-create | --no-creat | --no-crea | --no-cre \
-  | --no-cr | --no-c) ;;
-  -no-recursion | --no-recursion | --no-recursio | --no-recursi \
-  | --no-recurs | --no-recur | --no-recu | --no-rec | --no-re | --no-r) ;;
-  *" "*|*"	"*|*[\[\]\~\#\$\^\&\*\(\)\{\}\\\|\;\<\>\?]*)
-  ac_configure_args="$ac_configure_args '$ac_arg'" ;;
-  *) ac_configure_args="$ac_configure_args $ac_arg" ;;
-  esac
+  echo "----------------------------------"
+  echo $d
+  echo "=================================="
+  { 
+    cd $d || exit 1; 
+    _ARGS="$_ARGS0 $_TOP_ARGS";
+    if [ -e ./configure ]; then 
+      echo "./configure $_ARGS" && ./configure $_ARGS || exit 1;
+    fi
+    cd ..;
+   } || exit 1
 done
 
 # NLS nuisances.
