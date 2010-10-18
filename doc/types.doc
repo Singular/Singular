@@ -3617,7 +3617,6 @@ interactively, i.e., if it is not loaded from a file by the @code{LIB} or @code{
 command (@pxref{LIB} and @pxref{load} ).
 @* In the body of a library, each procedure not meant to be accessible by 
 users should be declared static. @xref{Procedures in a library}. 
-@end table
 
 @item Example:
 @smallexample
@@ -3638,14 +3637,13 @@ users should be declared static. @xref{Procedures in a library}.
 @c example
 @end smallexample
 @end table
+
 @c ref
 See
 @ref{LIB};
 @ref{Libraries};
 @ref{Procedures}
 @c ref
-
-
 
 @c ---------------------------------------
 @node qring, resolution, proc, Data types
