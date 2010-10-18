@@ -191,7 +191,7 @@ EXAMPLE: example invertBirMap; shows an example
  }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f = y^8-x^3*(z+x)^5;
   ideal adj = adjointIdeal(f);
@@ -378,7 +378,7 @@ EXAMPLE:  example paraPlaneCurve; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f1 = 1/2*x^5+x^2*y*z^2+x^3*y*z+1/2*x*y^2*z^2-2*x*y^3*z+y^5;
   def Rp1 = paraPlaneCurve(f1);
@@ -548,7 +548,7 @@ EXAMPLE: example adjointIdeal; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f = y^8-x^3*(z+x)^5;
   adjointIdeal(f);
@@ -888,7 +888,7 @@ EXAMPLE: example mapToRatNormCurve; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f = y^8-x^3*(z+x)^5;
   ideal adj = adjointIdeal(f);
@@ -930,7 +930,7 @@ EXAMPLE: example rncAntiCanonicalMap; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f = y^8-x^3*(z+x)^5;
   ideal adj = adjointIdeal(f);
@@ -1041,7 +1041,7 @@ EXAMPLE: example rncItProjOdd; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f = -x7-10x5y2-10x4y3-3x3y4+8x2y5+7xy6+11y7+3x6+10x5y +30x4y2
            +26x3y3-13x2y4-29xy5-33y6-3x5-20x4y-33x3y2-8x2y3+37xy4+33y5
@@ -1161,7 +1161,7 @@ EXAMPLE: example rncItProjEven; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f = y^8-x^3*(z+x)^5;
   ideal adj = adjointIdeal(f);
@@ -1704,7 +1704,7 @@ EXAMPLE: example paraConic; shows an example
   return(RP1);
 }
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f = y^8-x^3*(z+x)^5;
   ideal adj = adjointIdeal(f);
@@ -2322,7 +2322,7 @@ NOTE:    This method calles rationalPointConic, measures time consumption
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring r = 0, (x,y,z, u, v, w), dp;
   poly p = x^2 + 2*y^2 + 5*z^2 - 4*x*y + 3*x*z + 17*y*z;
   testRationalPointConic(p);
@@ -2518,7 +2518,7 @@ EXAMPLE: example rationalPointConic; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
 ring R = 0, (x,y,z), dp;
 system("random", 4711);
 poly p = x^2 + 2*y^2 + 5*z^2 - 4*x*y + 3*x*z + 17*y*z;
@@ -2580,7 +2580,7 @@ EXAMPLE: example testParametrization; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
   ring R = 0,(x,y,z),dp;
   poly f = y^8-x^3*(z+x)^5;
   def RP1 = paraPlaneCurve(f);
@@ -2618,7 +2618,7 @@ EXAMPLE: example testPointConic; shows an example
 }
 
 example
-{ "EXAMPLE:";
+{ "EXAMPLE:"; echo=2;
  ring R = 0, (x,y,z), dp;
  system("random", 4711);
  poly p = x^2 + 2*y^2 + 5*z^2 - 4*x*y + 3*x*z + 17*y*z;
