@@ -17,7 +17,7 @@ Then a minimal extension field is determined making use of the
 Rothstein-Trager partial fraction decomposition algorithm.
 
 REFERENCES:
-G. Chèze, G. Lecerf: Lifting and recombination techniques for absolute
+G. Cheze, G. Lecerf: Lifting and recombination techniques for absolute
                   factorization. Journal of Complexity, 23(3):380-420, 2007.
 
 KEYWORDS: factorization; absolute factorization.
