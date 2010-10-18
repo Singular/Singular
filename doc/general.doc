@@ -3083,14 +3083,14 @@ See also @xref{Procedures in a library}.
 @c ------------------------------------------------------------
 @table @strong
 @item Syntax:
-[@code{static}] @code{proc} proc_name ([<parameter list>])
-@*[<help string>]
+[@code{static}] @code{proc} proc_name [(<parameter_list>)
+@*[<help_string>]
 @*@code{@{}
 @*
 @tex
 \quad
 @end tex
-   <procedure body>
+   <procedure_body>
 @*@code{@}}
 @*[@code{example}
 @*@code{@{}
@@ -3098,7 +3098,7 @@ See also @xref{Procedures in a library}.
 @tex
 \quad
 @end tex
-   <sequence of commands>
+   <sequence_of_commands>
 @*@code{@}}]
 @item Purpose:
 Defines a new function, the @code{proc} proc_name. Once loaded in a 
@@ -3249,7 +3249,7 @@ ASSUME:  <description of assumptions made>
 RETURN:   <description of what is returned>
 SIDE EFFECTS:  <description of global objects generated or manipulated,
 but not returned>
-REMARKS: <remarks on theory, implemented  algorithms,references>
+REMARKS: <information on theory and implemented  algorithms,references>
 NOTE:    <particularities, limitations, additional details>
 KEYWORDS: <semicolon-separated phrases of index keys>
 SEE ALSO: <comma-separated names of related procedures/cross references>
@@ -3258,7 +3258,8 @@ EXAMPLE:  example <proc_name>; shows an example
 @item @strong{NOTE:}  
 @itemize @bullet
 @item
-SIDE EFFECTS, KEYWORDS, and SEE ALSO are optional.
+ASSUME, SIDE EFFECTS, KEYWORDS, and SEE ALSO are optional.
+No help string is required for static procedures.
 @item
 In a @sc{Singular} session, the example will be carried out upon
 entering @code{example <proc_name>;}.
@@ -3334,32 +3335,36 @@ See
 @section Libraries
 @cindex Libraries
 
+@itemize @bullet
+@item
 A library is a collection of @sc{Singular}
 procedures in a file.
-@*To load a library into a @sc{Singular} session, use the @code{LIB} or
+@item
+To load a library into a @sc{Singular} session, use the @code{LIB} or
 @code{load} command.
 Having loaded a library, its procedures can be used like any built-in 
 @sc{Singular} function, and information on the library is obtained 
 by entering @code{help libname.lib;}
-
+@item
 @xref{SINGULAR libraries}, for all libraries currently distributed
 with  @sc{Singular}.
-
+@item
 When writing your own library, it is important to comply with the
-guidelines described in this section. Otherwise, due to possible
+guidelines described in this section. Otherwise, due to potential
 parser errors, it may not be possible to load the library.
-
+@item
 Each library consists of a header and a body. The first line
 of a library must start with a double slash @code{//}.
-
+@item
 The library header consists of a version string, a category string,
 an info string, and LIB commands. The strings are mandatory. LIB
 commands are meant to load the additional libraries used by the
 library under consideration.
-
+@item
 The library body collects the procedures (declared static or not).
-
+@item
 No line of a library should consist of more than 60 characters.
+@end itemize
 
 @menu
 * Libraries in the SINGULAR  Documentation::	  	
@@ -3393,7 +3398,7 @@ Based on various tools, @code{info}, @code{dvi}, @code{p}, and
 @code{html} versions of the @code{texinfo} documentation are generated.  
 @item
 For texinfo markup elements and other information facilitating optimal 
-typesetting results, see @ref{Typesetting of help and info strings}. 
+typesetting, see @ref{Typesetting of help and info strings}. 
 @item
 For the convenience of users checking directly the source code, the 
 @code{texinfo}  tools should be used economically. That is, the info 
@@ -3452,7 +3457,7 @@ A category string is part of the header of a library.
   info = string_constant;
 @item @strong{Purpose:}
   Constitutes the help text of a library. Will be displayed in a
-  @sc{Singular}  session upon entering @code{help libname.lib;}.
+  @sc{Singular}  session upon entering @code{help libname.lib;} .
   Will be part of the @sc{Singular} documentation if the library
   is distributed with @sc{Singular}. @xref{Libraries in the 
   SINGULAR  Documentation}. 
@@ -3466,10 +3471,10 @@ REFERENCES: <references for further information>
 KEYWORDS: <semicolon-separated phrases of index keys>
 SEE ALSO: <comma-separated words of cross references>
 PROCEDURES:
-  <proc_name 1>();     <one line description of the purpose>
+  <proc_name_1>();     <one line description of the purpose>
      .
      .
-  <proc_name N>();     <one line description of the purpose>
+  <proc_name_N>();     <one line description of the purpose>
 ";
 @end smallexample
 
@@ -3539,7 +3544,7 @@ LIB commands are part of the header of a library.
    ...                  @*
    LIB "lib_r.lib";
 @item @strong{Purpose:}
-  loads libraries used by the library under consideration.
+  Loads libraries used by the library under consideration.
 @item @strong{Example:}
 @smallexample
     LIB "primdec.lib";
