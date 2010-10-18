@@ -3922,34 +3922,66 @@ SearchPath for a library Note on SearchPath:, are appended to what
 Libraries can be loaded with the @code{LIB}  or the @code{load}  command 
 (@pxref{LIB} and @pxref{load}).
 
-Syntax:
-    LIB string_expression ; 
-    load string_expression ;
-Type:
-    none 
-Purpose:
-    Reads a library from a file. If the given filename does not start
-    with . or / and if the file cannot be located in the current directory, 
-    the SearchPath is checked in a top-down manner for a directory
-    containing a file with this name. 
-Note on SearchPath:
-    The SearchPath for a library is constructed at SINGULAR start-up time as follows:
+@c ------------------------------------------------------------
+@c   This piece of text exists also in the file reference.doc,
+@c   chapter "LIB".
+@c   chapter "load".
+@c   If you change something here, change it there, too!
+@c ------------------------------------------------------------
+@table @code
+@item @strong{Syntax:}
+@code{LIB} string_expression @code{;}
+@code{load} string_expression @code{;}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+Reads a library from a file. If the given filename does not start with 
+@kbd{.} or @kbd{/}  and if the file cannot be located in the current 
+directory,  the @code{SearchPath} is checked in a top-down manner 
+for a  directory containing a file with this name. 
+@item @strong{Note on SearchPath:}
+The @code{SearchPath} for a library is constructed at @sc{Singular}
+start-up time as follows:
+@enumerate
+@item
+the directories contained in the environment variable
+@code{SINGULARPATH} are appended
 
-       1. The directories contained in the environment variable SINGULARPATH are appended
+@item
+the directories @code{$BinDir/LIB}, @code{$RootDir/LIB},
+@code{$RootDir/../LIB}, @code{$DefaultDir/LIB}, @code{$DefaultDir/../LIB}
+are appended, where
+@itemize @bullet
+@item @code{$BinDir}
+is the value of the environment variable
+@code{SINGULAR_BIN_DIR}, if set, or, if not set, the directory in which the
+@sc{Singular} program
+resides
+@item @code{$RootDir}
+is the value of the environment variable
+@code{SINGULAR_ROOT_DIR}, if set, or, if not set, @code{$BinDir/../}.
+@item @code{$DefaultDir}
+is the value of the environment variable
+@code{SINGULAR_DEFAULT_DIR}, if set, or @code{/usr/local/Singular/} on a
+Unix platform, @code{\Singular\} on a Windows 95/98/NT/XP/Vista platform.
+@end itemize
 
-       2. The directories $BinDir/LIB, $RootDir/LIB, $RootDir/../LIB, $DefaultDir/LIB, $DefaultDir/../LIB are appended, where
-              * $BinDir is the value of the environment variable SINGULAR_BIN_DIR, if set, or, if not set, the directory in which the SINGULAR program resides
-              * $RootDir is the value of the environment variable SINGULAR_ROOT_DIR, if set, or, if not set, $BinDir/../.
-              * $DefaultDir is the value of the environment variable SINGULAR_DEFAULT_DIR, if set, or /usr/local/Singular/ on a Unix platform, \Singular\ on a Windows 95/98/NT/XP/Vista platform. 
+@item
+all directories which do not exist are removed from the @code{SearchPath}.
+@end enumerate
 
-       3. All directories which do not exist are removed from the SearchPath. 
+For setting environment variables see @ref{system}, or consult the manual of
+your shell.
 
-    For setting environment variables see system, or consult the manual of your shell.
+The library @code{SearchPath} can be examined  by starting up
+@sc{Singular} with the option @code{-v}, or by issuing the command
+@code{system("--version");}.
 
-    The library SearchPath can be examined by starting up SINGULAR with the option -v, or by issuing the command system("--version");.
+@item @strong{Note on standard.lib:}
+Unless  @sc{Singular} is started with the @code{--no-stdlib} option, the
+library @code{standard.lib} is automatically loaded at start-up time.
 
-Note on standard.lib:
-    Unless @sc{Singular}  is started with the --no-stdlib option, the library standard.lib is automatically loaded at start-up time.
+@end table
 
 Following a @code{LIB}  or @code{load}  command, only the names 
 of the procedures in the library are loaded. The body of a particular 
@@ -3960,23 +3992,31 @@ option loadLib and inhibits, thus, the monitoring of library
 loading (see option).
 
 All libraries loaded in a @sc{Singular}  session are displayed upon 
-entering listvar(package); :
+entering @code{listvar(package);} :
  	
+@smallexample
+@c example
+ option(loadLib);   // show loading of libraries;
+                    // standard.lib is loaded
+ listvar(package);
+                    // the names of the procedures of inout.lib
+ LIB "inout.lib";   // are now known to Singular
+ listvar(package);
+@c example
+@end smallexample
 
-  option(loadLib);   // show loading of libraries;
-                     // standard.lib is loaded
-  listvar(package);
-==> // Standard             [0]  package (S,standard.lib)
-==> // Top                  [0]  package (N)
-                     // the names of the procedures of inout.lib
-  LIB "inout.lib";   // are now known to Singular
-==> // ** loaded inout.lib (1.34,2009/04/15)
-  listvar(package);
-==> // Inout                [0]  package (S,inout.lib)
-==> // Standard             [0]  package (S,standard.lib)
-==> // Top                  [0]  package (N)
+@c ref
+See
+@ref{Command line options};
+@ref{Procedures and libraries};
+@ref{SINGULAR libraries};
+@ref{proc};
+@ref{LIB};
+@ref{standard_lib};
+@ref{string};
+@ref{system}.
+@c ref
 
-See Command line options; LIB; Procedures and libraries; SINGULAR libraries; proc; standard_lib; string; system. 
 
 @c -------------------------------------------------------------------
 @c ---------------------------------------
