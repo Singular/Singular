@@ -3054,10 +3054,10 @@ Procedures contain sequences of commands in the @sc{Singular} language.
 They are used to extend the set of commands by user defined commands.  
 In a @sc{Singular} session, procedures are defined by either typing them 
 on the command line or by loading them from a library file with the 
-@code{LIB} or @code{load}  command (@pxref{Libraries}).  Procedures are
-invoked like normal built-in commands, i.e., by typing their name
+@code{LIB} or @code{load}  command (@pxref{Libraries}).  A procedure
+is invoked like normal built-in commands, i.e., by typing its name
 followed by the list of arguments in parentheses. The invocation then
-executes the sequence of commands stored in the specified procedure. All
+executes the sequence of commands constituting the procedure. All
 procedures defined in a @sc{Singular} session can be displayed by 
 entering @code{listvar(proc);} .
 
@@ -3108,15 +3108,15 @@ section will be executed  upon entering @code{example proc_name;}.
 @xref{Parameter list}, @ref{Help string}, and the example in 
 @ref{Procedures in a library}.
 @* The help string, the parameter list, and the example section are optional.
-They are, however, mandatory for the procedures listet in the header of a library.
-The help string and the example section are ignored if the procedure is defined
-interactively, i.e., if it was not loaded from a file by the @code{LIB} or @code{load}  
+They are, however, mandatory for the procedures listed in the header of a library.
+The help string is ignored and no example section is allowed if the procedure is defined
+interactively, i.e., if it is not loaded from a file by the @code{LIB} or @code{load}  
 command (@pxref{LIB} and @pxref{load} ).
 @* In the body of a library, each procedure not meant to be accessible by 
 users should be declared static. @xref{Procedures in a library}. 
 @end table
 
-@subsubheading Example of an interactive procedure definition and its execution
+@subsubheading Example of an interactive procedure definition and its execution:
 @smallexample
 @c example
   proc milnor_number (poly p)
@@ -3135,7 +3135,7 @@ users should be declared static. @xref{Procedures in a library}.
 @c example
 @end smallexample
 
-@subsubheading Example of a procedure definition in a library
+@subsubheading Example of a procedure definition in a library:
 First, we define the library (and store it as @code{ sample.lib}):
 @smallexample
 @c include sample.lib
@@ -3262,10 +3262,13 @@ ASSUME, SIDE EFFECTS, KEYWORDS, and SEE ALSO are optional.
 No help string is required for static procedures.
 @item
 In a @sc{Singular} session, the example will be carried out upon
-entering @code{example <proc_name>;}.
+entering @code{example <proc_name>;} if the procedure is loaded 
+from a file by the @code{LIB} or @code{load}  command (@pxref{LIB} 
+and @pxref{load} ). No example section is allowed if the procedure 
+is defined interactively.
 @item
 See @ref{Typesetting of help and info strings} for help strings
-in the @sc{Singular}  documentaion.
+in the @sc{Singular}  documentation.
 @item
 See the example in @ref{Procedures in a library} for an
 illustration.
@@ -3278,22 +3281,17 @@ illustration.
 @cindex Names in procedures
 @cindex local names
 
-All variables are local to the procedure. They are defined in the package
-in which the procedure is defined. Locally defined variables cannot interfere
-with names in other procedures and are automatically deleted after leaving
-the procedure.
-
-Internally, local variables are stored using the nesting level. A variable
-is said to have nesting level 1, if it is local to a procedure that was
-called interactively, nesting level 2, if it is local to a procedure that
-was called by a procedure of nesting level 1 etc. @code{listvar()} also
-displays the nesting level, nesting level 0 is used for global objects
-(see @ref{listvar}).
-
+@itemize @bullet
+@item
+All variables defined inside a procedure are local to the procedure and cannot 
+interfere with names in other procedures. Without further action, they are 
+automatically deleted after leaving the procedure.
+@item
 To keep local variables after leaving the procedure, they have to be
-exported (i.e. made known) to some higher level or to some package
-by a command like @code{export} or @code{exportto} (@pxref{export},
-@pxref{exportto}, @pxref{importfrom}; see also @pxref{package}).
+exported (i.e. made global) by a command like @code{export} or 
+@code{exportto} (@pxref{export},@pxref{exportto}, @pxref{importfrom}; 
+see also @pxref{package}).
+@end itemize
 
 @strong{Example:}
 @smallexample
@@ -3503,7 +3501,7 @@ info="
 LIBRARY: absfact.lib   Absolute factorization for characteristic 0
 AUTHORS: Wolfram Decker,       decker at math.uni-sb.de
          Gregoire Lecerf,      lecerf at math.uvsq.fr
-	 Gerhard Pfister,      pfister at mathematik.uni-kl.de
+         Gerhard Pfister,      pfister at mathematik.uni-kl.de
 
 OVERVIEW:
 A library for computing the absolute factorization of multivariate
@@ -3515,7 +3513,7 @@ Then a minimal extension field is determined making use of the
 Rothstein-Trager partial fraction decomposition algorithm.
 
 REFERENCES:
-G. Chèze, G. Lecerf: Lifting and recombination techniques for absolute
+G. Cheze, G. Lecerf: Lifting and recombination techniques for absolute
                   factorization. Journal of Complexity, 23(3):380-420, 2007.
 
 KEYWORDS: factorization; absolute factorization.
@@ -3728,7 +3726,7 @@ then the
 content of the item is assumed to consist of comma-separated words 
 which are valid references to other @code{texinfo}  nodes of the manual 
 (e.g., all procedure and command names are also @code{texinfo}  nodes).
-@item  @code{KEYWORDS} (or, @code{KEYPHRASES})
+@item  @code{KEYWORDS} 
 then the content of the item is assumed to be a
 semicolon-separated list of phrases which are taken as keys for the
 index of the manual (the name of a procedure/library is
@@ -3738,10 +3736,6 @@ automatically added to the index keys).
 If the description-string of an item in the @strong{info string of a
 library} matches
 @table @asis
-@item
-@item @code{EXAMPLE}
-then this has no effect (that is, the corresponding item and its content 
-is ignored). 
 @item @code{LIBRARY}
 then the content of the item is assumed to be a one-line description of
 the library. If this one-line description consist of only uppercase
@@ -3750,7 +3744,9 @@ is left as is).
 @item @code{PROCEDURES}
 then the content of the item is assumed to consist of lines of type
 
-<proc_name i>();     <one line description of the purpose> 
+@smallexample
+<proc_name>();     <one line description of the purpose> 
+@end smallexample
 
 Separate @code{texinfo} nodes (subsections in printed documents) 
 are created precisely for those  procedures of the library appearing
@@ -3772,10 +3768,10 @@ Enforces a line-break.
 @end table
 
 @item @code{@@ref@{...@}}
-For references to other parts of the @sc{Singular} manual use one of 
+For references to other parts of the @sc{Singular} manual, use one of 
 the following @code{@@ref@{node@}} constructs. Here, @code{node} 
 must be the name of a section of the @sc{Signular} manual. In
-particular,  it may be a name of a function, library or procedure
+particular,  it may be the name of a function, library or procedure
 in a library.
 
 @table @asis
@@ -3784,7 +3780,7 @@ for a reference to the node @code{node} at the beginning of a sentence.
 @item @code{@@ref@{node@}}
 for a reference to the node @code{node} at the end of a sentence.
 @item @code{@@pxref@{node@}}
-for a reference to the node @code{node} within parenthesis.
+for a reference to the node @code{node} within parentheses.
 
 @item Example:
 @code{@@xref@{Hurricanes@}, for more info.}
@@ -3828,28 +3824,28 @@ The string inside @code{@@code@{..@}} must not contain the
 characters @code{@{},@code{@}}, and @code{@@}.
 @end table
 
-@item @code{@@example}
- @code{...}
-@item @code{@@end example}
-Typeset pre-formatted text in typewriter font (with an
-extra identation).
+@item
+@example
+@@example
+ ...
+@@end example
+@end example
+Typeset pre-formatted text in typewriter font.
 @table @asis
 @item Example:
 @example
 before example
 @@example
-in              example
-notice extra identation and
-escape of special characters like @@@{,@@@},@@@@
+in example
+notice escape of special characters like @@@{,@@@},@@@@
 @@end example
 after example
 @end example
 @expansion{}
 @*before example
 @example
-in                example
-notice extra identation  and
-escape of special characters like @{,@},@@
+in example
+notice escape of special characters like @{,@},@@
 @end example
 after example
 @item Note:
@@ -3860,24 +3856,21 @@ to be escaped by an @@ sign.
 @item @code{@@format}
  @code{...}
 @item @code{@@end format}
-Typeset pre-formatted text in normal font (with no
-extra identation).
+Typeset pre-formatted text in normal font.
 @table @asis
 @item Example:
 @example
 before format
 @@format
-in              format
-no extra identation but still
-escape of special characters like @@@{,@@@},@@@@
+in format
+notice escape of special characters like @@@{,@@@},@@@@
 @@end format
 after format
 @end example
 @expansion{}
 @*before format
 @format
-in              format
-no extra identation  but still
+in format
 escape of special characters like @{,@},@@
 @end format
 after format
