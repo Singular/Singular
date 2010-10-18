@@ -13,8 +13,8 @@
 
 #include <misc/mylimits.h>
 #include "coeffs.h"
-#include "reporter/reporter.h"
-#include "omalloc/omalloc.h"
+#include <reporter/reporter.h>
+#include <omalloc/omalloc.h>
 #include "numbers.h"
 #include "longrat.h"
 #include "mpr_complex.h"

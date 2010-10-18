@@ -10,11 +10,11 @@
 #include "config.h"
 #include <omalloc/omalloc.h>
 #include "coeffs.h"
-#include "reporter/reporter.h"
+#include <reporter/reporter.h>
 #include "numbers.h"
 #include "longrat.h"
 #include "mpr_complex.h"
-#include "misc/mylimits.h"
+#include <misc/mylimits.h>
 #include "modulop.h"
 #ifdef HAVE_FACTORY
 #include <factory.h>
