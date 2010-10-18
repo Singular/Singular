@@ -11,7 +11,7 @@
 
 #include <string.h>
 #include "coeffs.h"
-#include "reporter/reporter.h"
+#include <reporter/reporter.h>
 #include "numbers.h"
 #include "longrat.h"
 #include "mpr_complex.h"

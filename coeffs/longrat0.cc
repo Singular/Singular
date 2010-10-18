@@ -10,9 +10,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "config.h"
-#include "reporter/reporter.h"
+#include <reporter/reporter.h>
 #include "coeffs.h"
-#include "omalloc/omalloc.h"
+#include <omalloc/omalloc.h>
 #include "longrat.h"
 #include "numbers.h"
 
