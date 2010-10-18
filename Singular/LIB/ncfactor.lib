@@ -433,7 +433,10 @@ static proc limitcheck(list g, intvec limits)
     return(0);
   }
   def prod = product(g);
-  def limg = intvec(deg(prod,intvec(1,1)) ,deg(prod,intvec(1,0)),deg(prod,intvec(0,1)));
+  intvec iv11 = intvec(1,1);
+  intvec iv10 = intvec(1,0);
+  intvec iv01 = intvec(0,1);
+  def limg = intvec(deg(prod,iv11) ,deg(prod,iv10),deg(prod,iv01));
   for (i = 1; i<=size(limg);i++)
   {//the final check
     if(limg[i]>limits[i])
@@ -461,11 +464,14 @@ THEORY: @code{homogfacFirstWeyl} returns a list with a factorization of the give
         entries will be irreducible polynomials of degree zero or 1 resp. -1.
 SEE ALSO: homogfacFirstWeyl_all
 "{//proc homogfacFirstWeyl
+  int p = printlevel-voice+2;//for dbprint
   def r = basering;
   poly hath;
   int i; int j;
-  if (!homogwithorder(h,intvec(-1,1)))
+  intvec ivm11 = intvec(-1,1);
+  if (!homogwithorder(h,ivm11))
   {//The given polynomial is not homogeneous
+    ERROR("Given polynomial was not [-1,1]-homogeneous");
     return(list());
   }//The given polynomial is not homogeneous
   if (h==0)
@@ -473,7 +479,8 @@ SEE ALSO: homogfacFirstWeyl_all
     return(list(0));
   }
   list result;
-  int m = deg(h,intvec(-1,1));
+  int m = deg(h,ivm11);
+  dbprint(p,"==> Splitting the polynomial in A_0 and A_k-Part");
   if (m!=0)
   {//The degree is not zero
     if (m <0)
@@ -497,12 +504,16 @@ SEE ALSO: homogfacFirstWeyl_all
   {//The degree is zero
     hath = h;
   }//The degree is zero
+  dbprint(p,"==> Done");
   //beginning to transform x^i*y^i in theta(theta-1)...(theta-i+1)
   list mons;
+  dbprint(p,"==> Putting the monomials in the A_0-part in a list.");
   for(i = 1; i<=size(hath);i++)
   {//Putting the monomials in a list
     mons = mons+list(hath[i]);
   }//Putting the monomials in a list
+  dbprint(p,"==> Done");
+  dbprint(p,"==> Mapping this monomials to K[theta]");
   ring tempRing = 0,(x,y,theta),dp;
   setring tempRing;
   map thetamap = r,x,y;
@@ -517,7 +528,10 @@ SEE ALSO: homogfacFirstWeyl_all
     }
     mons[i] = entry;
   }//transforming the monomials as monomials in theta
+  dbprint(p,"==> Done");
+  dbprint(p,"==> Factorize the A_0-Part in K[theta]");
   list azeroresult = factorize(sum(mons));
+  dbprint(p,"==> Successful");
   list azeroresult_return_form;
   for (i = 1; i<=size(azeroresult[1]);i++)
   {//rewrite the result of the commutative factorization
@@ -526,9 +540,11 @@ SEE ALSO: homogfacFirstWeyl_all
       azeroresult_return_form = azeroresult_return_form + list(azeroresult[1][i]);
     }
   }//rewrite the result of the commutative factorization
+  dbprint(p,"==> Mapping back to A_0.");
   setring(r);
   map finalmap = tempRing,var(1),var(2),var(1)*var(2);
   list tempresult = finalmap(azeroresult_return_form);
+  dbprint(p,"Successful.");
   for (i = 1; i<=size(tempresult);i++)
   {//factorizations of theta resp. theta +1
     if(tempresult[i]==var(1)*var(2))
@@ -573,15 +589,21 @@ THEORY: @code{homogfacFirstWeyl} returns a list with all factorization of the gi
         entries will also be computed.
 SEE ALSO: homogfacFirstWeyl
 "{//proc HomogfacFirstWeylAll
-  if (deg(h,intvec(1,1)) <= 0 )
+  int p=printlevel-voice+2;//for dbprint
+  intvec iv11= intvec(1,1);
+  if (deg(h,iv11) <= 0 )
   {//h is a constant
+    dbprint(p,"Given polynomial was not homogeneous");
     return(list(list(h)));
   }//h is a constant
   def r = basering;
   list one_hom_fac; //stands for one homogeneous factorization
   int i; int j; int k;
+  intvec ivm11 = intvec(-1,1);
+  dbprint(p,"==> Calculate one homogeneous factorization using homogfacFirstWeyl");
   //Compute again a homogeneous factorization
   one_hom_fac = homogfacFirstWeyl(h);
+  dbprint(p,"Successful");
   if (size(one_hom_fac) == 0)
   {//there is no homogeneous factorization or the polynomial was not homogeneous
     return(list());
@@ -593,11 +615,12 @@ SEE ALSO: homogfacFirstWeyl
   int is_list_not_azero_empty = 1;
   int is_list_azero_empty = 1;
   k_factor = list(one_hom_fac[1]);
-  if (absValue(deg(h,intvec(-1,1)))<size(one_hom_fac)-1)
+  if (absValue(deg(h,ivm11))<size(one_hom_fac)-1)
   {//There is a nontrivial A_0-part
-    list_azero = one_hom_fac[2..(size(one_hom_fac)-absValue(deg(h,intvec(-1,1))))];
+    list_azero = one_hom_fac[2..(size(one_hom_fac)-absValue(deg(h,ivm11)))];
     is_list_azero_empty = 0;
   }//There is a nontrivial A_0 part
+  dbprint(p,"==> Combine x,y to xy in the factorization again.");
   for (i = 1; i<=size(list_azero)-1;i++)
   {//in homogfacFirstWeyl, we factorized theta, and this will be made undone
     if (list_azero[i] == var(1))
@@ -617,13 +640,15 @@ SEE ALSO: homogfacFirstWeyl
       }
     }
   }//in homogfacFirstWeyl, we factorized theta, and this will be made undone
-  if(deg(h,intvec(-1,1))!=0)
+  dbprint(p,"==> Done");
+  if(deg(h,ivm11)!=0)
   {//list_not_azero is not empty
     list_not_azero =
-      one_hom_fac[(size(one_hom_fac)-absValue(deg(h,intvec(-1,1)))+1)..size(one_hom_fac)];
+      one_hom_fac[(size(one_hom_fac)-absValue(deg(h,ivm11))+1)..size(one_hom_fac)];
     is_list_not_azero_empty = 0;
   }//list_not_azero is not empty
   //Map list_azero in K[theta]
+  dbprint(p,"==> Map list_azero to K[theta]");
   ring tempRing = 0,(x,y,theta), dp;
   setring(tempRing);
   poly entry;
@@ -642,6 +667,7 @@ SEE ALSO: homogfacFirstWeyl
   //contained at least one element of the other ring
   list k_factor = thetamap(k_factor);
   list tempmons;
+  dbprint(p,"==> Done");
   for(i = 1; i<=size(list_azero);i++)
   {//rewrite the polynomials in A1 as polynomials in K[theta]
     tempmons = list();
@@ -661,6 +687,7 @@ SEE ALSO: homogfacFirstWeyl
     list_azero[i] = sum(tempmons);
   }//rewrite the polynomials in A1 as polynomials in K[theta]
   //Compute all permutations of the A0-part
+  dbprint(p,"==> Compute all permutations of the A_0-part with the first resp. the snd. variable");
   list result;
   int shift_sign;
   int shift;
@@ -702,6 +729,8 @@ SEE ALSO: homogfacFirstWeyl
   {
     return(result);
   }
+  dbprint(p,"==> Done");
+  dbprint(p,"==> Searching for theta resp. theta + 1 in the list and factorize them");
   //Now we are going deeper and search for theta resp. theta + 1, substitute
   //them by xy resp. yx and go on permuting
   int found_theta;
@@ -810,7 +839,9 @@ SEE ALSO: homogfacFirstWeyl
       continue; //We can may be not be done already with the ith entry
     }//One entry was theta resp. theta +1
   }//checking every entry of result for theta or theta +1
+  dbprint(p,"==> Done");
   //map back to the basering
+  dbprint(p,"==> Mapping back everything to the basering");
   setring(r);
   map finalmap = tempRing, var(1), var(2),var(1)*var(2);
   list result = finalmap(result);
@@ -818,7 +849,10 @@ SEE ALSO: homogfacFirstWeyl
   {//adding the K factor
     result[i] = k_factor + result[i];
   }//adding the k-factor
+  dbprint(p,"==> Done");
+  dbprint(p,"==> Delete double entries in the list.");
   result = delete_dublicates_noteval(result);
+  dbprint(p,"==> Done");
   return(result);
 }//proc HomogfacFirstWeylAll
 /* example */
@@ -924,31 +958,49 @@ The first factor is always a constant (1, if no nontrivial constant could be exc
 EXAMPLE: example facFirstWeyl; shows examples
 SEE ALSO: facSubWeyl, testNCfac, facFirstShift
 "{//proc facFirstWeyl
+  //Definition of printlevel variable
+  int p = printlevel-voice+2;
+  dbprint(p,"==> Checking if the given algebra is a Weyl algebra");
   //Redefine the ring in my standard form
   if (!isWeyl())
   {//Our basering is not the Weyl algebra
+    ERROR("Ring was not the first Weyl algebra");
     return(list());
   }//Our basering is not the Weyl algebra
+  dbprint(p,"==> Successful");
+  dbprint(p,"==> Checking, if the given ring is the first Weyl algebra");
   if(nvars(basering)!=2)
   {//Our basering is the Weyl algebra, but not the first
+    ERROR("==>Ring is not the first Weyl algebra");
     return(list());
   }//Our basering is the Weyl algebra, but not the first
+  dbprint(p,"==> Successful");
   list result = list();
   int i;int j; int k; int l; //counter
   if (ringlist(basering)[6][1,2] == -1) //manual of ringlist will tell you why
   {
+    dbprint(p,"==> positions of the variables have to be switched");
     def r = basering;
     ring tempRing = ringlist(r)[1][1],(x,y),Ws(-1,1); // very strange:
     // setting Wp(-1,1) leads to SegFault; to clarify why!!!
     def NTR = nc_algebra(1,1);
     setring NTR ;
     map transf = r, var(2), var(1);
+    dbprint(p,"==> Successful");
+    dbprint(p, "==> factorization of the polynomial with the routine sfacwa");
     list resulttemp = sfacwa(transf(h));
+    dbprint(p,"==> Done");
     setring(r);
     map transfback = NTR, var(2),var(1);
     result = transfback(resulttemp);
   }
-  else { result = sfacwa(h);}
+  else
+  {
+    dbprint(p, "==> factorization of the polynomial with the routine sfacwa");
+    result = sfacwa(h);
+    dbprint(p,"==> Done");
+  }
+  dbprint(p,"==> recursively check factors for irreducibility");
   list recursivetemp;
   for(i = 1; i<=size(result);i++)
   {//recursively factorize factors
@@ -975,6 +1027,7 @@ SEE ALSO: facSubWeyl, testNCfac, facFirstShift
       }//Factorize every factor
     }//Nontrivial factorization
   }//recursively factorize factors
+  dbprint(p,"==> Done");
   if (size(result)==0)
   {//only the trivial factorization could be found
     result = list(list(1,h));
@@ -1005,26 +1058,39 @@ THEORY: @code{sfacwa} returns a list with some factorizations of the given
         @url{http://www.math.rwth-aachen.de/\~Albert.Heinle}
 SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
 "{//proc sfacwa
-  if(homogwithorder(h,intvec(-1,1)))
+  int p=printlevel-voice+2; // for dbprint
+  intvec ivm11 = intvec(-1,1);
+  intvec iv11 = intvec(1,1);
+  intvec iv10 = intvec(1,0);
+  intvec iv01 = intvec(0,1);
+  intvec iv1m1 = intvec(1,-1);
+  if(homogwithorder(h,ivm11))
   {
+    dbprint(p,"==> Given polynomial is -1,1 homogeneous. Starting homog. fac. and ret. its result");
     return(homogfacFirstWeyl_all(h));
   }
   def r = basering;
   map invo = basering,-var(1),var(2);
   int i; int j; int k;
-  intvec limits = deg(h,intvec(1,1)) ,deg(h,intvec(1,0)),deg(h,intvec(0,1));
+  dbprint(p,"==> Computing the degree-limits of the factorization");
+  intvec limits = deg(h,iv11) ,deg(h,iv10),deg(h,iv01);
   def prod;
   //end finding the limits
-  poly maxh = jet(h,deg(h,intvec(-1,1)),intvec(-1,1))-jet(h,deg(h,intvec(-1,1))-1,intvec(-1,1));
-  poly minh = jet(h,deg(h,intvec(1,-1)),intvec(1,-1))-jet(h,deg(h,intvec(1,-1))-1,intvec(1,-1));
+  dbprint(p,"==> Computing the maximal and the minimal homogeneous part of the give polynomial");
+  poly maxh = jet(h,deg(h,ivm11),ivm11)-jet(h,deg(h,ivm11)-1,ivm11);
+  poly minh = jet(h,deg(h,iv1m1),iv1m1)-jet(h,deg(h,iv1m1)-1,iv1m1);
   list result;
   list temp;
   list homogtemp;
+  def invhath;
+  def invideal;
   list M; list hatM;
+  dbprint(p,"==> Factorize the maximal and the minimal homog. part of the given polynomial");
   list f1 = homogfacFirstWeyl_all(maxh);
   list f2 = homogfacFirstWeyl_all(minh);
   int is_equal;
   poly hath;
+  dbprint(p,"==> Merging the factorizations");
   for (i = 1; i<=size(f1);i++)
   {//Merge all combinations
     for (j = 1; j<=size(f2); j++)
@@ -1032,6 +1098,7 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
       M = M + mergence(f1[i],f2[j],limits);
     }
   }//Merge all combinations
+  dbprint(p,"==> Filtering invalid combinations");
   for (i = 1 ; i<= size(M); i++)
   {//filter valid combinations
     if (product(M[i]) == h)
@@ -1042,19 +1109,21 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
     }//We have one factorization
     else
     {
-      if (deg(h,intvec(-1,1))<=deg(h-product(M[i]),intvec(-1,1)))
+      if (deg(h,ivm11)<=deg(h-product(M[i]),ivm11))
       {
         M = delete(M,i);
         continue;
       }
-      if (deg(h,intvec(1,-1))<=deg(h-product(M[i]),intvec(1,-1)))
+      if (deg(h,iv1m1)<=deg(h-product(M[i]),iv1m1))
       {
         M = delete(M,i);
         continue;
       }
     }
   }//filter valid combinations
+  dbprint(p,"==> Deleting doublicates in the resulting list");
   M = delete_dublicates_eval(M);
+  dbprint(p,"==> Iterating over all possible Combinations");
   while(size(M)>0)
   {//work on the elements of M
     hatM = list();
@@ -1063,13 +1132,16 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
       hath = h-product(M[i]);
       temp = list();
       //First check for common inhomogeneous factors between hath and h
-      if (involution(NF(involution(hath,invo), std(involution(ideal(M[i][1]),invo))),invo)==0)
+      invhath = involution(hath,invo);
+      invideal = std(involution(ideal(M[i][1]),invo));
+      if (involution(NF(invhath,invideal) ,invo)==0)
       {//hath and h have a common factor on the left
         j = 1;
         f1 = M[i];
         if (j+1<=size(f1))
         {//Checking for more than one common factor
-          while(involution(NF(involution(hath,invo),std(involution(ideal(product(f1[1..(j+1)])),invo))),invo)==0)
+	  invideal = std(involution(ideal(product(f1[1..(j+1)])),invo));
+          while(involution(NF(invhath,invideal),invo)==0)
           {
             if (j+1<size(f1))
             {
@@ -1081,7 +1153,8 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
             }
           }
         }//Checking for more than one common factor
-        f2 = list(f1[1..j])+list(involution(lift(involution(product(f1[1..j]),invo),involution(hath,invo))[1,1],invo));
+	invideal = lift(involution(product(f1[1..j]),invo),invhath);
+        f2 = list(f1[1..j])+list(involution(invideal[1,1],invo));
         temp = temp + merge_cf(f2,f1,limits);
       }//hath and h have a common factor on the left
       if (reduce(hath, std(ideal(M[i][size(M[i])])))==0)
@@ -1106,8 +1179,8 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
         temp = temp + merge_cf(f2,M[i],limits);
       }//hath and h have a common factor on the right
       //and now the homogeneous
-      maxh = jet(hath,deg(hath,intvec(-1,1)),intvec(-1,1))-jet(hath,deg(hath,intvec(-1,1))-1,intvec(-1,1));
-      minh = jet(hath,deg(hath,intvec(1,-1)),intvec(1,-1))-jet(hath,deg(hath,intvec(1,-1))-1,intvec(1,-1));
+      maxh = jet(hath,deg(hath,ivm11),ivm11)-jet(hath,deg(hath,ivm11)-1,ivm11);
+      minh = jet(hath,deg(hath,iv1m1),iv1m1)-jet(hath,deg(hath,iv1m1)-1,iv1m1);
       f1 = homogfacFirstWeyl_all(maxh);
       f2 = homogfacFirstWeyl_all(minh);
       for (j = 1; j<=size(f1);j++)
@@ -1129,7 +1202,7 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
           temp = delete(temp,j);
           continue;
         }//This is already a result
-        if (deg(hath,intvec(-1,1))<=deg(hath-product(temp[j]),intvec(-1,1)))
+        if (deg(hath,ivm11)<=deg(hath-product(temp[j]),ivm11))
         {
           temp = delete(temp,j);
           continue;
@@ -1150,13 +1223,15 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
     M = delete_dublicates_eval(M);
   }//work on the elements of M
   //In the case, that there is none, write a constant factor before the factor of interest.
+  dbprint(p,"==> Done");
   for (i = 1 ; i<=size(result);i++)
   {//add a constant factor
-    if (deg(result[i][1],intvec(1,1))!=0)
+    if (deg(result[i][1],iv11)!=0)
     {
       result[i] = insert(result[i],1);
     }
   }//add a constant factor
+  dbprint(p,"==> Deleting doublicates in the output list");
   result = delete_dublicates_noteval(result);
   return(result);
 }//proc sfacwa
@@ -1225,18 +1300,24 @@ THEORY: @code{testNCfac} multiplies out each factorization and checks whether
 EXAMPLE: example testNCfac; shows examples
 SEE ALSO: facFirstWeyl, facSubWeyl, facFirstShift
 "{//proc testfac
+  int p = printlevel - voice + 2;
+  dbprint(p,"==> Checking the input");
   if (size(l)==0)
   {//The empty list is given
+    dbprint(p,"==> Given list was empty");
     return(list());
   }//The empty list is given
   if (size(#)>2)
-  {//We want max. one optional argument
+  {//We want max. two optional arguments
+    dbprint(p,"==> More than two optional arguments");
     return(list());
-  }//We want max. one optional argument
+  }//We want max. two optional arguments
+  dbprint(p,"==> Done");
   list result;
   int i; int j;
   if (size(#)==0)
   {//No optional argument is given
+    dbprint(p,"==> No optional arguments");
     int valid = 1;
     for (i = size(l);i>=1;i--)
     {//iterate over the elements of the given list
@@ -1254,6 +1335,7 @@ SEE ALSO: facFirstWeyl, facSubWeyl, facFirstShift
   }//No optional argument is given
   else
   {
+    dbprint(p,"==> Optional arguments are given.");
     int valid = 1;
     for (i = size(l);i>=1;i--)
     {//iterate over the elements of the given list
@@ -1263,7 +1345,11 @@ SEE ALSO: facFirstWeyl, facSubWeyl, facFirstShift
       }
       result = insert(result, product(l[i])-#[1]);
     }//iterate over the elements of the given list
-    if(size(#)==2){return(result);}
+    if(size(#)==2)
+    {
+      dbprint(p,"==> A third argument is given. Output is a list now.");
+      return(result);
+    }
     return(valid);
   }
 }//proc testfac
@@ -1304,6 +1390,8 @@ PURPOSE: compute factorizations of the polynomial, which depends on X and D.
 EXAMPLE: example facSubWeyl; shows examples
 SEE ALSO: facFirstWeyl, testNCfac, facFirstShift
 "{
+  int p = printlevel - voice + 2;
+  dbprint(p,"==> Start initial Checks of the input.");
     // basering can be anything having a Weyl algebra as subalgebra
   def @r = basering;
   //We begin to check the input for assumptions
@@ -1329,6 +1417,7 @@ SEE ALSO: facFirstWeyl, testNCfac, facFirstShift
   }
   // else: do nothing
   // DONE with assumptions, Input successfully checked
+  dbprint(p,"==> Successful");
   intvec lexpofX = leadexp(X);
   intvec lexpofD = leadexp(D);
   int varnumX=1;
@@ -1342,7 +1431,7 @@ SEE ALSO: facFirstWeyl, testNCfac, facFirstShift
     varnumD++;
   }
   /* VL : to add printlevel stuff */
-
+  dbprint(p,"==> Change positions of the two variables in the list, if needed");
   if (isReverted)
   {
     ring firstweyl = 0,(var(varnumD),var(varnumX)),dp;
@@ -1361,6 +1450,7 @@ SEE ALSO: facFirstWeyl, testNCfac, facFirstShift
     setring Firstweyl;
     poly h= imap(@r,h);
   }
+  dbprint(p,"==> Done!");
   list result = facFirstWeyl(h);
   setring @r;
   list result;
@@ -1406,11 +1496,14 @@ example
 //in the first Shift Algebra
 static proc homogfacFirstShift(poly h)
 {//proc homogfacFirstShift
+  int p=printlevel-voice+2; //for dbprint
   def r = basering;
   poly hath;
+  intvec iv01 = intvec(0,1);
   int i; int j;
-  if (!homogwithorder(h,intvec(0,1)))
+  if (!homogwithorder(h,iv01))
   {//The given polynomial is not homogeneous
+    ERROR("The given polynomial is not homogeneous.");
     return(list());
   }//The given polynomial is not homogeneous
   if (h==0)
@@ -1418,7 +1511,8 @@ static proc homogfacFirstShift(poly h)
     return(list(0));
   }
   list result;
-  int m = deg(h,intvec(0,1));
+  int m = deg(h,iv01);
+  dbprint(p,"==> exclude the homogeneous part of deg. 0");
   if (m>0)
   {//The degree is not zero
     hath = lift(var(2)^m,h)[1,1];
@@ -1435,6 +1529,7 @@ static proc homogfacFirstShift(poly h)
   setring tempRing;
   map thetamap = r,x,1;
   poly hath = thetamap(hath);
+  dbprint(p,"==> Factorize it using commutative factorization.");
   list azeroresult = factorize(hath);
   list azeroresult_return_form;
   for (i = 1; i<=size(azeroresult[1]);i++)
@@ -1455,7 +1550,9 @@ static proc homogfacFirstShift(poly h)
 //Computes all possible homogeneous factorizations
 static proc homogfacFirstShift_all(poly h)
 {//proc HomogfacFirstShiftAll
-  if (deg(h,intvec(1,1)) <= 0 )
+  int p=printlevel-voice+2; //for dbprint
+  intvec iv11 = intvec(1,1);
+  if (deg(h,iv11) <= 0 )
   {//h is a constant
     return(list(list(h)));
   }//h is a constant
@@ -1464,12 +1561,14 @@ static proc homogfacFirstShift_all(poly h)
   int i; int j; int k;
   int shiftcounter;
   //Compute again a homogeneous factorization
+  dbprint(p,"==> Computing one homog. factorization of the polynomial");
   one_hom_fac = homogfacFirstShift(h);
   one_hom_fac = delete(one_hom_fac,1);
   if (size(one_hom_fac) == 0)
   {//there is no homogeneous factorization or the polynomial was not homogeneous
     return(list());
   }//there is no homogeneous factorization or the polynomial was not homogeneous
+  dbprint(p,"==> Permuting the 0-homogeneous part with the s");
   list result = permpp(one_hom_fac);
   for (i = 1; i<=size(result);i++)
   {
@@ -1487,6 +1586,7 @@ static proc homogfacFirstShift_all(poly h)
     }
     result[i] = insert(result[i],1);
   }
+  dbprint(p,"==> Deleting double entries in the resulting list");
   result = delete_dublicates_noteval(result);
   return(result);
 }//proc HomogfacFirstShiftAll
@@ -1503,6 +1603,8 @@ NOTE: Every entry of the output list is a list with factors for one possible fac
 EXAMPLE: example facFirstShift; shows examples
 SEE ALSO: testNCfac, facFirstWeyl, facSubWeyl
 "{//facFirstShift
+  int p = printlevel - voice + 2;
+  dbprint(p,"==> Checking the input.");
   if(nvars(basering)!=2)
   {//Our basering is the Shift algebra, but not the first
     ERROR("Basering is not the first shift algebra");
@@ -1518,6 +1620,7 @@ SEE ALSO: testNCfac, facFirstWeyl, facSubWeyl
     ERROR("Basering is not the first shift algebra");
     return(list());
   }
+  dbprint(p,"==> Done");
   list result = list();
   int i;int j; int k; int l; //counter
   // create a ring with the ordering which makes shift algebra
@@ -1529,6 +1632,7 @@ SEE ALSO: testNCfac, facFirstWeyl, facSubWeyl
   // information on relations
   if (@p == -var(1)) // reverted shift algebra
   {
+    dbprint(p,"==> Reverted shift algebra. Swaping variables in Ringlist");
     setring(tempRingnc);
     map transf = r, var(2), var(1);
     setring(r);
@@ -1553,10 +1657,12 @@ SEE ALSO: testNCfac, facFirstWeyl, facSubWeyl
   }
   // main calls
   setring(tempRingnc);
+  dbprint(p,"==> Factorize the given polynomial with the subroutine facshift");
   list resulttemp = facshift(transf(h));
+  dbprint(p,"==> Successful");
   setring(r);
   result = transfback(resulttemp);
-
+  dbprint(p,"==> Recursively check the found factors for reducibility.");
   list recursivetemp;
   for(i = 1; i<=size(result);i++)
   {//recursively factorize factors
@@ -1584,6 +1690,7 @@ SEE ALSO: testNCfac, facFirstWeyl, facSubWeyl
     }//Nontrivial factorization
   }//recursively factorize factors
   //now, refine the possible redundant list
+  dbprint(p,"==> Done");
   return( delete_dublicates_noteval(result) );
 }//facFirstShift
 example
@@ -1608,26 +1715,36 @@ THEORY: @code{facshift} returns a list with some factorizations of the given
         @url{http://www.math.rwth-aachen.de/\~Albert.Heinle}
 SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
 "{//proc facshift
-  if(homogwithorder(h,intvec(0,1)))
+  int p=printlevel-voice+2; // for dbprint
+  intvec iv01 = intvec(0,1);
+  intvec iv11 = intvec(1,1);
+  intvec iv10 = intvec(1,0);
+  intvec iv0m1 = intvec(0,-1);
+  if(homogwithorder(h,iv01))
   {
+    dbprint(p,"==> Given polynomial was 1,0-homogeneous. Calling subroutine for homog. polys.");
     return(homogfacFirstShift_all(h));
   }
   def r = basering;
   map invo = basering,-var(1),-var(2);
   int i; int j; int k;
-  intvec limits = deg(h,intvec(1,1)) ,deg(h,intvec(1,0)),deg(h,intvec(0,1));
+  intvec limits = deg(h,iv11) ,deg(h,iv10),deg(h,iv01);
   def prod;
   //end finding the limits
-  poly maxh = jet(h,deg(h,intvec(0,1)),intvec(0,1))-jet(h,deg(h,intvec(0,1))-1,intvec(0,1));
-  poly minh = jet(h,deg(h,intvec(0,-1)),intvec(0,-1))-jet(h,deg(h,intvec(0,-1))-1,intvec(0,-1));
+  poly maxh = jet(h,deg(h,iv01),iv01)-jet(h,deg(h,iv01)-1,iv01);
+  poly minh = jet(h,deg(h,iv0m1),iv0m1)-jet(h,deg(h,iv0m1)-1,iv0m1);
   list result;
   list temp;
   list homogtemp;
   list M; list hatM;
+  def invhath;
+  def invideal;
+  dbprint(p,"==> Factorizing the highest and the lowest homogeneous part");
   list f1 = homogfacFirstShift_all(maxh);
   list f2 = homogfacFirstShift_all(minh);
   int is_equal;
   poly hath;
+  dbprint(p,"==> Merging their factors");
   for (i = 1; i<=size(f1);i++)
   {//Merge all combinations
     for (j = 1; j<=size(f2); j++)
@@ -1635,6 +1752,7 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
       M = M + mergence(f1[i],f2[j],limits);
     }
   }//Merge all combinations
+  dbprint(p,"==> Filtering invalid combinations");
   for (i = 1 ; i<= size(M); i++)
   {//filter valid combinations
     if (product(M[i]) == h)
@@ -1645,18 +1763,19 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
     }//We have one factorization
     else
     {
-      if (deg(h,intvec(0,1))<=deg(h-product(M[i]),intvec(0,1)))
+      if (deg(h,iv01)<=deg(h-product(M[i]),iv01))
       {
         M = delete(M,i);
         continue;
       }
-      if (deg(h,intvec(0,-1))<=deg(h-product(M[i]),intvec(0,-1)))
+      if (deg(h,iv0m1)<=deg(h-product(M[i]),iv0m1))
       {
         M = delete(M,i);
         continue;
       }
     }
   }//filter valid combinations
+  dbprint(p,"==> Iterating over all elements in M");
   M = delete_dublicates_eval(M);
   while(size(M)>0)
   {//work on the elements of M
@@ -1666,13 +1785,16 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
       hath = h-product(M[i]);
       temp = list();
       //First check for common inhomogeneous factors between hath and h
-      if (involution(NF(involution(hath,invo), std(involution(ideal(M[i][1]),invo))),invo)==0)
+      invhath = involution(hath,invo);
+      invideal = std(involution(ideal(M[i][1]),invo));
+      if (involution(NF(invhath, invideal ),invo)==0)
       {//hath and h have a common factor on the left
         j = 1;
         f1 = M[i];
         if (j+1<=size(f1))
         {//Checking for more than one common factor
-          while(involution(NF(involution(hath,invo),std(involution(ideal(product(f1[1..(j+1)])),invo))),invo)==0)
+	  invideal = std(involution(ideal(product(f1[1..(j+1)])),invo));
+          while(involution(NF(invhath,invideal),invo)==0)
           {
             if (j+1<size(f1))
             {
@@ -1684,13 +1806,15 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
             }
           }
         }//Checking for more than one common factor
-        if (deg(product(f1[1..j]),intvec(1,1))!=0)
+        if (deg(product(f1[1..j]),iv11)!=0)
         {
-          f2 = list(f1[1..j])+list(involution(lift(involution(product(f1[1..j]),invo),involution(hath,invo))[1,1],invo));
+	  invideal = lift(involution(product(f1[1..j]),invo),invhath);
+          f2 = list(f1[1..j])+list(involution(invideal[1,1],invo));
         }
         else
         {
-          f2 = list(f1[1..j])+list(involution(lift(product(f1[1..j]),involution(hath,invo))[1,1],invo));
+	  invideal = lift(product(f1[1..j]),involution(hath,invo));
+          f2 = list(f1[1..j])+list(involution(invideal[1,1],invo));
         }
         temp = temp + merge_cf(f2,f1,limits);
       }//hath and h have a common factor on the left
@@ -1716,8 +1840,8 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
         temp = temp + merge_cf(f2,M[i],limits);
       }//hath and h have a common factor on the right
       //and now the homogeneous
-      maxh = jet(hath,deg(hath,intvec(0,1)),intvec(0,1))-jet(hath,deg(hath,intvec(0,1))-1,intvec(0,1));
-      minh = jet(hath,deg(hath,intvec(0,-1)),intvec(0,-1))-jet(hath,deg(hath,intvec(0,-1))-1,intvec(0,-1));
+      maxh = jet(hath,deg(hath,iv01),iv01)-jet(hath,deg(hath,iv01)-1,iv01);
+      minh = jet(hath,deg(hath,iv0m1),iv0m1)-jet(hath,deg(hath,iv0m1)-1,iv0m1);
       f1 = homogfacFirstShift_all(maxh);
       f2 = homogfacFirstShift_all(minh);
       for (j = 1; j<=size(f1);j++)
@@ -1739,7 +1863,7 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
           temp = delete(temp,j);
           continue;
         }//This is already a result
-        if (deg(hath,intvec(0,1))<=deg(hath-product(temp[j]),intvec(0,1)))
+        if (deg(hath,iv01)<=deg(hath-product(temp[j]),iv01))
         {
           temp = delete(temp,j);
           continue;
@@ -1762,11 +1886,12 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
   //In the case, that there is none, write a constant factor before the factor of interest.
   for (i = 1 ; i<=size(result);i++)
   {//add a constant factor
-    if (deg(result[i][1],intvec(1,1))!=0)
+    if (deg(result[i][1],iv11)!=0)
     {
       result[i] = insert(result[i],1);
     }
   }//add a constant factor
+  dbprint(p,"==> Deleting double entries in the resulting list.");
   result = delete_dublicates_noteval(result);
   return(result);
 }//proc facshift
