@@ -3255,7 +3255,6 @@ KEYWORDS: <semicolon-separated phrases of index keys>
 SEE ALSO: <comma-separated names of related procedures/cross references>
 EXAMPLE:  example <proc_name>; shows an example  
 @end smallexample
-@end table
 @item @strong{NOTE:}  
 @itemize @bullet
 @item
@@ -3264,12 +3263,13 @@ SIDE EFFECTS, KEYWORDS, and SEE ALSO are optional.
 In a @sc{Singular} session, the example will be carried out upon
 entering @code{example <proc_name>;}.
 @item
-@xref{{Typesetting of help and info strings} for help strings
+See @ref{Typesetting of help and info strings} for help strings
 in the @sc{Singular}  documentaion.
 @item
 See the example in @ref{Procedures in a library} for an
 illustration.
 @end itemize
+@end table
 
 @c ---------------------------------------
 @node Names in procedures, Procedure-specific commands, Help string, Procedures
@@ -3362,7 +3362,7 @@ The library body collects the procedures (declared static or not).
 No line of a library should consist of more than 60 characters.
 
 @menu
-* Libraries in the @sc{Singular}  Documentation::	  	
+* Libraries in the SINGULAR  Documentation::	  	
 * Version string::
 * Category string::
 * Info string::
@@ -3376,9 +3376,9 @@ No line of a library should consist of more than 60 characters.
 @end menu
 
 @c -------------------------------------------------------------------
-@node Libraries in the @sc{Singular}  Documentation,Version string,Libraries,Libraries
-@subsection Libraries in the @sc{Singular}  Documentation
-@cindex Libraries in the @sc{Singular}  Documentation
+@node Libraries in the SINGULAR Documentation,Version string,Libraries,Libraries
+@subsection Libraries in the @sc{Singular} Documentation
+@cindex Libraries in the SINGULAR Documentation
 
 @itemize @bullet
 @item
@@ -3405,7 +3405,7 @@ info string is computed and its output is included in the documentation.
 
 
 @c -------------------------------------------------------------------
-@node Version string,Category string,Libraries in the @sc{Singular}  Documentation,Libraries
+@node Version string,Category string,Libraries in the SINGULAR Documentation,Libraries
 @subsection Version string
 @cindex Version string
 
@@ -3455,7 +3455,7 @@ A category string is part of the header of a library.
   @sc{Singular}  session upon entering @code{help libname.lib;}.
   Will be part of the @sc{Singular} documentation if the library
   is distributed with @sc{Singular}. @xref{Libraries in the 
-  @sc{Singular}  Documentation}  
+  SINGULAR  Documentation}. 
 @item @strong{Format:}  
 @smallexample
 info="
@@ -3670,7 +3670,7 @@ after typesetting (with one subsection for each procedure):
 
 
 @c -------------------------------------------------------------------
-@node Formal Checker,Libraries in the SINGULAR Documentation,template_lib,Libraries
+@node Formal Checker,Documentation Tool,template_lib,Libraries
 @subsection  Formal Checker
 @cindex  Formal Checker
 
@@ -3681,12 +3681,7 @@ After uploading your library file, you will receive an output of hints, warnings
 and errors which may help you to improve your library.
 
 @c -------------------------------------------------------------------
-@node Libraries in the SINGULAR Documentation,Documentation Tool,Formal Checker,Libraries
-@subsection  Libraries in the SINGULAR Documentation
-@cindex  Libraries in the SINGULAR Documentation
-
-@c -------------------------------------------------------------------
-@node Documentation Tool,Typesetting of help and info strings,Libraries in the SINGULAR Documentation,Libraries
+@node Documentation Tool,Typesetting of help and info strings,Formal Checker,Libraries
 @subsection  Documentation Tool
 @cindex  Documentation Tool
 @cindex lib2doc
@@ -3704,7 +3699,7 @@ are parsed and automatically converted into the @code{texinfo} format
 (the typesetting language in which the documentation  of @sc{Singular} 
 is written). 
 
-The illustrative example given in @xref{template_lib} should provide
+The illustrative example given in @ref{template_lib} should provide
 sufficient information on how this works. For more details, check the 
 following items:
 
@@ -3812,7 +3807,7 @@ syntax (short: does not cause expansion over multiple lines).
 @*@math{\alpha}
 @item Note:
 The mathematical expressions inside @code{@@math@{..@}} must
-not contain the characters @code{@{},@code{@}}, and @code{@@}}.
+not contain the characters @code{@{},@code{@}}, and @code{@@}.
 @end table
 
 @item @code{@@code@{..@}}
@@ -3825,7 +3820,7 @@ expansion over multiple lines).
 @*@code{typewriter font}
 @item Note:
 The string inside @code{@@code@{..@}} must not contain the 
-characters @code{@{},@code{@}}, and @code{@@}}.
+characters @code{@{},@code{@}}, and @code{@@}.
 @end table
 
 @item @code{@@example}
@@ -3909,8 +3904,6 @@ to typeset more complex mathematical items like
 @tex
 $ i_{1,1} $
 @end tex
-@end table
-
 @end table
 
 Furthermore, a line-break is inserted before each line
