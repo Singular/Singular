@@ -8,21 +8,23 @@ AUTHORS: Wolfram Decker,       decker at math.uni-sb.de
          Gerhard Pfister,      pfister at mathematik.uni-kl.de
 
 OVERVIEW:
- A library for computing the absolute factorization of multivariate
- polynomials f with coefficients in a field K of characteristic zero.
- Using Trager's idea, the implemented algorithm computes an absolutely
- irreducible factor by factorizing over some finite extension field L
- (which is chosen such that V(f) has a smooth point with coordinates in L).
- Then a minimal extension field is determined making use of the
- Rothstein-Trager partial fraction decomposition algorithm. See [Cheze
- and Lecerf, Lifting and recombination techniques for absolute
- factorization].
+A library for computing the absolute factorization of multivariate
+polynomials f with coefficients in a field K of characteristic zero.
+Using Trager's idea, the implemented algorithm computes an absolutely
+irreducible factor by factorizing over some finite extension field L
+(which is chosen such that V(f) has a smooth point with coordinates in L).
+Then a minimal extension field is determined making use of the
+Rothstein-Trager partial fraction decomposition algorithm.
 
-KEYWORDS: factorization, absolute factorization.
+REFERENCES:
+G. Chèze, G. Lecerf: Lifting and recombination techniques for absolute
+                  factorization. Journal of Complexity, 23(3):380-420, 2007.
+
+KEYWORDS: factorization; absolute factorization.
 SEE ALSO: factorize
 
 PROCEDURES:
-  absFactorize(f);        absolute factorization of poly
+  absFactorize();        absolute factorization of poly
 ";
 
 ////////////////////////////////////////////////////////////////////
