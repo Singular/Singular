@@ -3178,15 +3178,16 @@ Defines the number, type and names of the arguments of a procedure.
 @item
 The parameter_list is optional.
 @item
-Adding @code{(list #)} to a parameter means to allow optional parameters
-and @code{(list #)} is also the default for a parameter list if such a list
-is not explicitly given. Inside the procedure body, the arguments are 
-referenced by @code{#[1], #[2]}, etc.
+Adding @code{list #} as argument to a parameter list means to allow 
+optional parameters. Furthermore, @code{(list #)} is the default for a 
+parameter list (in case no list is explicitly given). Inside the procedure 
+body, the arguments of @code{list #}  are referenced by @code{#[1], #[2]}, 
+etc.
 @item
-@*If a procedure has optional parameters (i.e. @code{(list #)} appears
-in the declaration), the attribute @code{default_arg} gives the default values
-for the optional arguments. This provides the possibility to also change the 
-behaviour of all procedures nested inside the given procedure.
+If a procedure has optional parameters, the attribute @code{default_arg} 
+gives the default values for the optional arguments. This provides in
+particular the possibility to also change the behaviour of all procedures 
+nested inside the given procedure.
 @end itemize
 
 @item @strong{Example:}
@@ -3298,14 +3299,15 @@ illustration.
 
 @itemize @bullet
 @item
-All variables defined inside a procedure are local to the procedure and cannot 
-interfere with names in other procedures. Without further action, they are 
-automatically deleted after leaving the procedure.
+All variables defined inside a procedure are local to the procedure and their
+names cannot interfere with names in other procedures. Without further action, 
+they are automatically deleted after leaving the procedure.
 @item
-To keep local variables after leaving the procedure, they have to be
-exported (i.e. made global) by a command like @code{export} or 
+To keep local variables and their value after leaving the procedure, they have 
+to be exported (i.e. made global) by a command like @code{export} or 
 @code{exportto} (@pxref{export},@pxref{exportto}, @pxref{importfrom}; 
-@pxref{package}).
+@pxref{package}). To return the value of a local variable, use the 
+@code{return} command (@pxref{return}).
 @end itemize
 
 @strong{Example:}
@@ -3337,7 +3339,7 @@ procedure was called.
 @c ref
 See
 @ref{export};
-@ref{keepring};
+@ref{exportto};
 @ref{return}.
 @c ref
 
@@ -3572,8 +3574,8 @@ LIB commands are part of the header of a library.
 @subsection  Procedures in a library
 @cindex  Procedures in a library
 
-In this section, we list hints and requirements on how procedures 
-contained in a library should be implemented. For more on procedures, 
+Here asre hints and requirements on how procedures contained in a 
+library should be implemented. For more on procedures, 
 see @ref{Procedures}.
 @enumerate
 @item
@@ -3753,16 +3755,13 @@ library} matches
 @table @asis
 @item @code{LIBRARY}
 then the content of the item is assumed to be a one-line description of
-the library. If this one-line description consist of only uppercase
-characters, then it is typeset in lowercase characters (otherwise it 
-is left as is).
+the library. If this one-line description consists of uppercase characters 
+only, then it is typeset in lowercase characters (otherwise it is left as is).
 @item @code{PROCEDURES}
 then the content of the item is assumed to consist of lines of type
-
 @smallexample
 <proc_name>();     <one line description of the purpose> 
 @end smallexample
-
 Separate @code{texinfo} nodes (subsections in printed documents) 
 are created precisely for those  procedures of the library appearing
 here (that is, for some if not all non-static procedures of the library).
@@ -3936,9 +3935,6 @@ texinfo markup elements.
 @subsection   Loading a library
 @cindex   Loading a library
 
-Check with Hans:  noch aktuell, platform, 3.,The library SearchPath ...
-SearchPath for a library Note on SearchPath:, are appended to what
-
 Libraries can be loaded with the @code{LIB}  or the @code{load}  command 
 (@pxref{LIB} and @pxref{load}).
 
@@ -3951,7 +3947,7 @@ Libraries can be loaded with the @code{LIB}  or the @code{load}  command
 @table @code
 @item @strong{Syntax:}
 @code{LIB} string_expression @code{;}
-@code{load} string_expression @code{;}
+@*@code{load} string_expression @code{;}
 @item @strong{Type:}
 none
 @item @strong{Purpose:}
@@ -4007,9 +4003,9 @@ Following a @code{LIB}  or @code{load}  command, only the names
 of the procedures in the library are loaded. The body of a particular 
 procedure is only read upon the first call of the procedure. This 
 minimizes memory consumption by unused procedures. Starting 
-a @sc{Singular}  session with the -q or --quiet option unsets the
-option loadLib and inhibits, thus, the monitoring of library 
-loading (see option).
+a @sc{Singular}  session with the @code{-q} or @code{--quiet} 
+@code{option} unsets the @code{option} @code{loadLib} and 
+inhibits, thus, the monitoring of library loading (see @code{option}).
 
 All libraries loaded in a @sc{Singular}  session are displayed upon 
 entering @code{listvar(package);} :
