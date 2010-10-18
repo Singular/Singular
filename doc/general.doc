@@ -3083,7 +3083,7 @@ See also @xref{Procedures in a library}.
 @c ------------------------------------------------------------
 @table @strong
 @item Syntax:
-[@code{static}] @code{proc} proc_name [(<parameter_list>)
+[@code{static}] @code{proc} proc_name [(<parameter_list>)]
 @*[<help_string>]
 @*@code{@{}
 @*
@@ -3100,20 +3100,26 @@ See also @xref{Procedures in a library}.
 @end tex
    <sequence_of_commands>
 @*@code{@}}]
-@item Purpose:
-Defines a new function, the @code{proc} proc_name. Once loaded in a 
-@sc{Singular} session, the information provided in the help string will be 
-displayed upon entering @code{help proc_name;}, while the @code{example} 
-section will be executed  upon entering @code{example proc_name;}.
-@xref{Parameter list}, @ref{Help string}, and the example in 
-@ref{Procedures in a library}.
-@* The help string, the parameter list, and the example section are optional.
+@item Purpose:  
+@itemize @bullet
+@item
+Defines a new function, the @code{proc} proc_name. 
+@item
+The help string, the parameter list, and the example section are optional.
 They are, however, mandatory for the procedures listed in the header of a library.
 The help string is ignored and no example section is allowed if the procedure is defined
 interactively, i.e., if it is not loaded from a file by the @code{LIB} or @code{load}  
 command (@pxref{LIB} and @pxref{load} ).
-@* In the body of a library, each procedure not meant to be accessible by 
+@item
+Once loaded from a file into a  @sc{Singular} session, the information provided in the help 
+string will be displayed upon entering @code{help proc_name;}, while the @code{example} 
+section will be executed  upon entering @code{example proc_name;}.
+@xref{Parameter list}, @ref{Help string}, and the example in 
+@ref{Procedures in a library}.
+@item
+In the body of a library, each procedure not meant to be accessible by 
 users should be declared static. @xref{Procedures in a library}. 
+@end itemize
 @end table
 
 @subsubheading Example of an interactive procedure definition and its execution:
@@ -3166,16 +3172,23 @@ Now, we load the library and execute its procedures:
 @code{( )}
 @*@code{(} parameter_definition @code{)}
 @item @strong{Purpose:}
-defines the number, type and names of the
-arguments to a @code{proc}.
-@*The parameter_list is optional.
-The default for a parameter_list is @code{(list #)}
-which means the arguments are referenced by @code{#[1], #[2]}, etc.
+@itemize @bullet
+@item
+Defines the number, type and names of the arguments of a procedure.
+@item
+The parameter_list is optional.
+@item
+Adding @code{(list #)} to a parameter means to allow optional parameters
+and @code{(list #)} is also the default for a parameter list if such a list
+is not explicitly given. Inside the procedure body, the arguments are 
+referenced by @code{#[1], #[2]}, etc.
+@item
 @*If a procedure has optional parameters (i.e. @code{(list #)} appears
 in the declaration), the attribute @code{default_arg} gives the default values
-for this optional arguments.
-(This provides the possibility to also change the behaviour of all procedures
-nested inside the given procedure.)
+for the optional arguments. This provides the possibility to also change the 
+behaviour of all procedures nested inside the given procedure.
+@end itemize
+
 @item @strong{Example:}
 @smallexample
 proc x0
@@ -3216,12 +3229,13 @@ x5(2,3);
 @item @strong{Note:}
 @* The parameter_list may stretch across multiple lines.
 @* A parameter may have any type (including the types @code{proc}
-   and @code{ring}). If a parameter is of type ring, then it
-   can only be specified by name, but not with a type, e.g.
+   and @code{ring}). 
+@*If a parameter is of type ring, then it
+   can only be specified by name, but not with a type. For instance:
 @smallexample
 proc x6 (r)
 @{
-... // this is correct even if the parameter is a ring
+... // this is correct, r may be of any type, even of type ring
 @}
 
 proc x7 (ring r)
@@ -3261,6 +3275,7 @@ EXAMPLE:  example <proc_name>; shows an example
 ASSUME, SIDE EFFECTS, KEYWORDS, and SEE ALSO are optional.
 No help string is required for static procedures.
 @item
+EXAMPLE: refers to the example section of the procedure.
 In a @sc{Singular} session, the example will be carried out upon
 entering @code{example <proc_name>;} if the procedure is loaded 
 from a file by the @code{LIB} or @code{load}  command (@pxref{LIB} 
@@ -3290,7 +3305,7 @@ automatically deleted after leaving the procedure.
 To keep local variables after leaving the procedure, they have to be
 exported (i.e. made global) by a command like @code{export} or 
 @code{exportto} (@pxref{export},@pxref{exportto}, @pxref{importfrom}; 
-see also @pxref{package}).
+@pxref{package}).
 @end itemize
 
 @strong{Example:}
@@ -3825,12 +3840,12 @@ characters @code{@{},@code{@}}, and @code{@@}.
 @end table
 
 @item
+Typeset pre-formatted text in typewriter font.
 @example
 @@example
  ...
 @@end example
 @end example
-Typeset pre-formatted text in typewriter font.
 @table @asis
 @item Example:
 @example
@@ -3853,10 +3868,13 @@ Inside an @@example environment, the characters @{,@},@@ have
 to be escaped by an @@ sign. 
 @end table
 
-@item @code{@@format}
- @code{...}
-@item @code{@@end format}
+@item
 Typeset pre-formatted text in normal font.
+@example
+@@format
+ ...
+@@end format
+@end example
 @table @asis
 @item Example:
 @example
@@ -3879,11 +3897,13 @@ Inside an @@format environment, the characters @{,@},@@ have
 to be escaped by an @@ sign. 
 @end table
 
-
-@item @code{@@texinfo}
- @code{...}
-@item @code{@@end texinfo}
-for text which is written in pure texinfo.
+@item
+Write text in pure @code{texinfo}.
+@example
+@@texinfo
+ ...
+@@end texinfo
+@end example
 @table @asis
 @item Example:
 @example
@@ -3937,15 +3957,15 @@ none
 @item @strong{Purpose:}
 Reads a library from a file. If the given filename does not start with 
 @kbd{.} or @kbd{/}  and if the file cannot be located in the current 
-directory,  the @code{SearchPath} is checked in a top-down manner 
-for a  directory containing a file with this name. 
+directory,  the @code{SearchPath} is checked for a  directory containing 
+a file with this name. 
 @item @strong{Note on SearchPath:}
 The @code{SearchPath} for a library is constructed at @sc{Singular}
 start-up time as follows:
 @enumerate
 @item
 the directories contained in the environment variable
-@code{SINGULARPATH} are appended
+@code{SINGULARPATH} are appended.
 
 @item
 the directories @code{$BinDir/LIB}, @code{$RootDir/LIB},
@@ -3970,7 +3990,7 @@ Unix platform, @code{\Singular\} on a Windows 95/98/NT/XP/Vista platform.
 all directories which do not exist are removed from the @code{SearchPath}.
 @end enumerate
 
-For setting environment variables see @ref{system}, or consult the manual of
+For setting environment variables, see @ref{system}, or consult the manual of
 your shell.
 
 The library @code{SearchPath} can be examined  by starting up
