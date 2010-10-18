@@ -46,7 +46,7 @@ int: @math{i+i+i}
 @item @strong{Note:}
 Help is in pure Texinfo.
 @*This help string is written in texinfo, which enables you to use,
-among others, the @@math command for mathematical typesetting 
+among others, the @@math command for mathematical typesetting
 (for instance, to print @math{\alpha, \beta}).
 @*Texinfo also gives more control over the layout, but is, admittingly,
 more cumbersome to write.
@@ -75,7 +75,7 @@ NOTE:    This help string is written in a mixture of ASCII and texinfo.
          @* Use @code for typewriter font (e.g., @code{i_1}).
          @* Use @math for simple math mode typesetting (e.g., @math{i_1}).
          @* Warning: Parenthesis like } are not allowed inside @math and @code.
-         @* Use @example for indented, preformatted text typesetting in 
+         @* Use @example for indented, preformatted text typesetting in
          typewriter font:
 @example
          this  --> that

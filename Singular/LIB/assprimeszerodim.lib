@@ -27,7 +27,7 @@ LIB "modstd.lib";
 ////////////////////////////////////////////////////////////////////////////////
 
 proc zeroRadical(ideal I, list #)
-"USAGE:  zeroRadical(I,[n]); I ideal, optional: n number of processors (for 
+"USAGE:  zeroRadical(I,[n]); I ideal, optional: n number of processors (for
          parallel computing)
 ASSUME:  I is zero-dimensional in Q[variables]
 NOTE:    Parallelization is just applicable using 32-bit Singular version since
@@ -48,7 +48,7 @@ example
 ////////////////////////////////////////////////////////////////////////////////
 
 static proc zeroR(ideal I, list #)
-// compute the radical of I provided that I is zero-dimensional in Q[variables] 
+// compute the radical of I provided that I is zero-dimensional in Q[variables]
 // and a standard basis
 {
    attrib(I,"isSB",1);

@@ -66,7 +66,7 @@ EXAMPLE: example isIncluded; shows an example
 {
    def R = basering;
    setring R;
-   
+
    attrib(J,"isSB",1);
    int i,j,k;
 
@@ -81,7 +81,7 @@ EXAMPLE: example isIncluded; shows an example
             link l(i) = "MPtcp:fork";
             //link l(i) = "ssi:fork";
             open(l(i));
-            
+
             write(l(i), quote(redFork(eval(I[ncols(I)-i]), eval(J), 1)));
          }
 
@@ -105,7 +105,7 @@ EXAMPLE: example isIncluded; shows an example
             for(i = 1; i <= n - 1; i++)
             {
                if(status(l(i), "read", "ready"))
-               { 
+               {
                   if(read(l(i)) != 0)
                   {
                      for(i = 1; i <= n - 1; i++)
@@ -251,7 +251,7 @@ example
 
 proc deleteUnluckyPrimes(list T, list L, int ho, list #)
 "USAGE:  deleteUnluckyPrimes(T,L,ho,#); T/L list of polys/primes, ho integer
-RETURN:  lists T,L(,M),lT with T/L(/M) list of polys/primes(/type of #), 
+RETURN:  lists T,L(,M),lT with T/L(/M) list of polys/primes(/type of #),
          lT ideal
 NOTE:    - if ho = 1, the polynomials in T are homogeneous, else ho = 0,
          - lT is prevalent, i.e. the most appearing leading ideal in T
@@ -517,7 +517,7 @@ example
 proc modpStd(ideal I, int p, int variant, list #)
 "USAGE:  modpStd(I,p,variant,#); I ideal, p integer, variant integer
 ASSUME:  If size(#) > 0, then #[1] is an intvec describing the Hilbert series.
-RETURN:  ideal - a standard basis of I mod p, integer - p 
+RETURN:  ideal - a standard basis of I mod p, integer - p
 NOTE:    The procedure computes a standard basis of the ideal I modulo p and
          fetches the result to the basering. If size(#) > 0 the Hilbert driven
          standard basis computation std(.,#[1]) is used instead of groebner.
@@ -550,7 +550,7 @@ EXAMPLE: example modpStd; shows an example
          i = groebner(i);
       }
    }
-   
+
    if((variant == 2) || (variant == 5))
    {
       i = groebner(i);
@@ -602,7 +602,7 @@ EXAMPLE: example modpStd; shows an example
       i = interred(i);
       kill HomR;
    }
-   
+
    setring R0;
    return(list(fetch(@r,i),p));
 }
@@ -625,8 +625,8 @@ proc modStd(ideal I, list #)
 "USAGE:  modStd(I); I ideal
 ASSUME:  If size(#) > 0, then # contains either 1, 2 or 4 integers such that
 @*       - #[1] is the number of available processors for the computation
-                (parallelization is just applicable using 32-bit Singular 
-                version since MP-links are not compatible with 64-bit Singular 
+                (parallelization is just applicable using 32-bit Singular
+                version since MP-links are not compatible with 64-bit Singular
                 version),
 @*       - #[2] is an optional parameter for the exactness of the computation,
                 if #[2] = 1, the procedure computes a standard basis for sure,
@@ -638,8 +638,8 @@ NOTE:    The procedure computes a standard basis of I (over the rational
          numbers) by using  modular methods. If a warning appears then the
          result is a standard basis containing I and with high probability
          a standard basis of I.
-         By default the procedure computes a standard basis of I for sure, but 
-         if the optional parameter #[2] = 0, it computes a standard basis of I 
+         By default the procedure computes a standard basis of I for sure, but
+         if the optional parameter #[2] = 0, it computes a standard basis of I
          with high probability and a warning appears at the end.
          The procedure distinguishes between different variants for the standard
          basis computation in positive characteristic depending on the ordering
@@ -664,7 +664,7 @@ EXAMPLE: example modStd; shows an example
    list rl = ringlist(R0);
    if((npars(R0) > 0) || (rl[1] > 0))
    {
-      ERROR("Characteristic of basering should be zero, basering should 
+      ERROR("Characteristic of basering should be zero, basering should
              have no parameters.");
    }
 
@@ -736,7 +736,7 @@ EXAMPLE: example modStd; shows an example
 
 //-------------------------  Save current options  -----------------------------
    intvec opt = option(get);
-   
+
    option(redSB);
 
 //--------------------  Initialize the list of primes  -------------------------
@@ -754,15 +754,15 @@ EXAMPLE: example modStd; shows an example
    {
       if(h)
       {
-         if(exactness == 0) 
-         { 
-            variant = 1; 
-            if(printlevel >= 10) { "variant = 1"; } 
+         if(exactness == 0)
+         {
+            variant = 1;
+            if(printlevel >= 10) { "variant = 1"; }
          }
-         if(exactness == 1) 
-         { 
-            variant = 4; 
-            if(printlevel >= 10) { "variant = 4"; } 
+         if(exactness == 1)
+         {
+            variant = 4;
+            if(printlevel >= 10) { "variant = 4"; }
          }
          rl[1] = L[5];
          def @r = ring(rl);
@@ -797,7 +797,7 @@ EXAMPLE: example modStd; shows an example
             string order;
             if(system("nblocks") <= 2)
             {
-               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp") 
+               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp")
                                        + find(ordstr_R0, "rp") <= 0)
                {
                   order = "simple";
@@ -829,7 +829,7 @@ EXAMPLE: example modStd; shows an example
                   variant = 6;
                   if(printlevel >= 10) { "variant = 6"; }
                }
-       
+
                rl[1] = L[5];
                def @r = ring(rl);
                setring @r;
@@ -860,7 +860,7 @@ EXAMPLE: example modStd; shows an example
       if(exactness == 1) { return(groebner(I)); }
       if(h)
       {
-         variant = 1; if(printlevel >= 10) { "variant = 1"; } 
+         variant = 1; if(printlevel >= 10) { "variant = 1"; }
          rl[1] = L[5];
          def @r = ring(rl);
          setring @r;
@@ -886,7 +886,7 @@ EXAMPLE: example modStd; shows an example
             string order;
             if(system("nblocks") <= 2)
             {
-               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp") 
+               if(find(ordstr_R0, "M") + find(ordstr_R0, "lp")
                                        + find(ordstr_R0, "rp") <= 0)
                {
                   order = "simple";
@@ -902,7 +902,7 @@ EXAMPLE: example modStd; shows an example
             {
                variant = 3;
                if(printlevel >= 10) { "variant = 3"; }
-       
+
                rl[1] = L[5];
                def @r = ring(rl);
                setring @r;
@@ -928,7 +928,7 @@ EXAMPLE: example modStd; shows an example
          }
       }
    }
-  
+
    list P,T1,T2,T3,LL;
 
    ideal J,K,H;
@@ -948,15 +948,15 @@ EXAMPLE: example modStd; shows an example
       {
          link l(i) = "MPtcp:fork";
          open(l(i));
-         if((variant == 1) || (variant == 3) || 
+         if((variant == 1) || (variant == 3) ||
             (variant == 4) || (variant == 6))
          {
-            write(l(i), quote(modpStd(I_for_fork, eval(L[i + 1]), 
+            write(l(i), quote(modpStd(I_for_fork, eval(L[i + 1]),
                                                   eval(variant), eval(hi))));
          }
          if((variant == 2) || (variant == 5))
          {
-            write(l(i), quote(modpStd(I_for_fork, eval(L[i + 1]), 
+            write(l(i), quote(modpStd(I_for_fork, eval(L[i + 1]),
                                                   eval(variant))));
          }
       }
@@ -995,26 +995,26 @@ EXAMPLE: example modStd; shows an example
             for(i = 1; i <= n1; i++)
             {
                //--- ask if link l(i) is ready otherwise sleep for t seconds ---
-               if(status(l(i), "read", "ready"))                      
+               if(status(l(i), "read", "ready"))
                {
                   //--- read the result from l(i) ---
-                  P = read(l(i));                                     
+                  P = read(l(i));
                   T1[index] = P[1];
                   T2[index] = bigint(P[2]);
                   index++;
 
                   if(j <= size(L))
                   {
-                     if((variant == 1) || (variant == 3) || 
+                     if((variant == 1) || (variant == 3) ||
                         (variant == 4) || (variant == 6))
                      {
-                        write(l(i), quote(modpStd(I_for_fork, eval(L[j]), 
+                        write(l(i), quote(modpStd(I_for_fork, eval(L[j]),
                                                   eval(variant), eval(hi))));
                         j++;
                      }
                      if((variant == 2) || (variant == 5))
                      {
-                        write(l(i), quote(modpStd(I_for_fork, 
+                        write(l(i), quote(modpStd(I_for_fork,
                                                   eval(L[j]), eval(variant))));
                         j++;
                      }
@@ -1027,7 +1027,7 @@ EXAMPLE: example modStd; shows an example
                }
             }
             //--- k describes the number of closed links ---
-            if(k == n1)                                               
+            if(k == n1)
             {
                j++;
             }
@@ -1038,7 +1038,7 @@ EXAMPLE: example modStd; shows an example
       {
          while(j <= size(L))
          {
-            if((variant == 1) || (variant == 3) || 
+            if((variant == 1) || (variant == 3) ||
                (variant == 4) || (variant == 6))
             {
                P = modpStd(I, L[j], variant, hi);
@@ -1082,13 +1082,13 @@ EXAMPLE: example modStd; shows an example
 
       tt = timer; rt = rtimer;
       if(pd > 2) { "list of primes:"; L; "pTest"; }
-      if((variant == 1) || (variant == 3) || (variant == 4) || (variant == 6)) 
-      { 
-         pTest = pTestSB(I,J,L,variant,hi); 
+      if((variant == 1) || (variant == 3) || (variant == 4) || (variant == 6))
+      {
+         pTest = pTestSB(I,J,L,variant,hi);
       }
-      if((variant == 2) || (variant == 5)) 
-      { 
-         pTest = pTestSB(I,J,L,variant); 
+      if((variant == 2) || (variant == 5))
+      {
+         pTest = pTestSB(I,J,L,variant);
       }
 
       if(printlevel >= 10)
@@ -1096,14 +1096,14 @@ EXAMPLE: example modStd; shows an example
          "CPU-time for pTest is "+string(timer - tt)+" seconds.";
          "Real-time for pTest is "+string(rtimer - rt)+" seconds.";
       }
-  
+
       if(pTest)
       {
          if(printlevel >= 10)
          {
             "CPU-time for computation without final tests is
             "+string(timer - TT)+" seconds.";
-            "Real-time for computation without final tests is 
+            "Real-time for computation without final tests is
             "+string(rtimer - RT)+" seconds.";
          }
 
@@ -1113,9 +1113,9 @@ EXAMPLE: example modStd; shows an example
 
          if(printlevel >= 10)
          {
-            "CPU-time for checking if I subset <G> is 
+            "CPU-time for checking if I subset <G> is
             "+string(timer - tt)+" seconds.";
-            "Real-time for checking if I subset <G> is 
+            "Real-time for checking if I subset <G> is
             "+string(rtimer - rt)+" seconds.";
          }
 
@@ -1137,9 +1137,9 @@ EXAMPLE: example modStd; shows an example
 
                if(printlevel >= 10)
                {
-                  "CPU-time for last std-computation is 
+                  "CPU-time for last std-computation is
                   "+string(timer - tt)+" seconds.";
-                  "Real-time for last std-computation is 
+                  "Real-time for last std-computation is
                   "+string(rtimer - rt)+" seconds.";
                }
 
@@ -1170,15 +1170,15 @@ EXAMPLE: example modStd; shows an example
          for(i = 1; i <= n1; i++)
          {
             open(l(i));
-            if((variant == 1) || (variant == 3) || 
+            if((variant == 1) || (variant == 3) ||
                (variant == 4) || (variant == 6))
             {
-               write(l(i), quote(modpStd(I_for_fork, eval(L[j+i-1]), 
+               write(l(i), quote(modpStd(I_for_fork, eval(L[j+i-1]),
                                                      eval(variant), eval(hi))));
             }
             if((variant == 2) || (variant == 5))
             {
-               write(l(i), quote(modpStd(I_for_fork, eval(L[j+i-1]), 
+               write(l(i), quote(modpStd(I_for_fork, eval(L[j+i-1]),
                                                      eval(variant))));
             }
          }
@@ -1208,7 +1208,7 @@ example
    ideal J2 = modStd(I,1,0);
    size(reduce(J1,J2));
    size(reduce(J2,J1));
-   
+
    /*
    ring R4 = 0,x(1..4),wp(1,-1,-1,1);
    ideal I = cyclic(4);
@@ -1234,9 +1234,9 @@ EXAMPLE: example modS; shows an example
    ideal J;
    list T;
    list rl = ringlist(R0);
-   if((npars(R0)>0) || (rl[1]>0)) 
-   { 
-      ERROR("Characteristic of basering should be zero."); 
+   if((npars(R0)>0) || (rl[1]>0))
+   {
+      ERROR("Characteristic of basering should be zero.");
    }
    for(j = 1; j <= size(L); j++)
    {
@@ -1257,7 +1257,7 @@ EXAMPLE: example modS; shows an example
       T[j] = fetch(@r,I);
       kill @r;
    }
-   L = deleteUnluckyPrimes(T,L,homog(I)); 
+   L = deleteUnluckyPrimes(T,L,homog(I));
    // unlucky if and only if the leading ideal is wrong
    J = farey(chinrem(L[1],L[2]),N);
    attrib(J,"isSB",1);

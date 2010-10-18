@@ -1,4 +1,3 @@
-// rocio, last modified 23.05.10
 ////////////////////////////////////////////////////////////////////////////
 version="$Id: resbin.lib$";
 category="Resolution of singularities";
