@@ -3,10 +3,10 @@ version="$Id$";
 category="Commutative Algebra";
 info="
 LIBRARY:  integralbasis.lib  Integral basis in algebraic function fields
-AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
-          W. Decker, decker@mathematik.uni-kl.de> @*
-          S. Laplagne, slaplagn@dm.uba.ar @*
-          F. Seelisch, seelisch@mathematik.uni-kl.de
+AUTHORS:  J. Boehm, j.boehm at mx.uni-saarland.de @*
+          W. Decker, decker at mathematik.uni-kl.de> @*
+          S. Laplagne, laplagn at dm.uba.ar @*
+          F. Seelisch, seelisch at mathematik.uni-kl.de
 
 OVERVIEW:
 Given an irreducible polynomial f in two variables defining a plane curve,
