@@ -56,13 +56,22 @@ new command: @code{rank} (see @nref{rank})
 @heading New @sc{Singular} libraries
 @itemize @bullet
 @item
-new library: fpadim.lib (see @nref{fpadim_lib}:  Algorithms for quotient algebras in the letterplace case
+new library: findiff.lib (see @nref{findiff_lib}:  finite difference schemes for
+linear differential equations)
 @item
-new library: dmodvar.lib (see @nref{dmodvar_lib}: algebraic D-modules for varieties
+new library: fpadim.lib (see @nref{fpadim_lib}:  Algorithms for quotient algebras in the letterplace case)
+@item
+new library: integralbasis.lib (see @nref{integralbasis_lib}: Integral basis in algebraic function fields)
 @item
 new library: monomialideal.lib (see @nref{monomialideal_lib}: operation for monomial ideals)
 @item
 new library: multigrading.lib (see @nref{multigrading_lib}: multigradings and related computations)
+@item
+new library: ncfactor.lib (see @nref{ncfactor_lib}:Tools for factorization in some noncommutative algebras)
+@item
+new library: paraplanecurves.lib (see @nref{paraplanecurves_lib}: Rational parametrization of rational plane curves)
+@item
+new library: primdecint.lib (see @nref{primdecint_lib}: primary decomposition over the integers)
 @item
 new library: resbin.lib (see @nref{resbin_lib}: resolution of singularities of binomial ideals
 @item
@@ -73,6 +82,10 @@ new library: surfacesignature.lib (see @nref{surfacesignature_lib}: signature of
 
 @heading Changed @sc{Singular} libraries
 @itemize @bullet
+@item
+changed library: dmodapp.lib (see @nref{dmodapp_lib}: Applications of algebraic D-modules
+@item
+changed library: dmodvar.lib (see @nref{dmodvar_lib}: algebraic D-modules for varieties
 @item
 extended library: modstd.lib (see @nref{modstd_lib}: Groebner basis via modular methods
 @item
