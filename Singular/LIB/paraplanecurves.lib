@@ -4,10 +4,10 @@ category="Algebraic Geometry";
 info="
 LIBRARY:  paraplanecurves.lib Rational parametrization of rational plane curves
 
-AUTHORS:  J. Boehm, j.boehm@mx.uni-saarland.de @*
-          W. Decker, decker@mathematik.uni-kl.de> @*
-          S. Laplagne, slaplagn@dm.uba.ar @*
-          F. Seelisch, seelisch@mathematik.uni-kl.de
+AUTHORS:  J. Boehm, j.boehm at mx.uni-saarland.de @*
+          W. Decker, decker at mathematik.uni-kl.de> @*
+          S. Laplagne, slaplagn at dm.uba.ar @*
+          F. Seelisch, seelisch at mathematik.uni-kl.de
 
 OVERVIEW:
 
