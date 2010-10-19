@@ -20,7 +20,7 @@
 @center @sc{Singular} version @value{VERSION}
 @center @uref{http://www.uni-kl.de/,,University of Kaiserslautern}
 @center @uref{http://www.mathematik.uni-kl.de/,,Department of Mathematics} and  @uref{http://www.mathematik.uni-kl.de/~zca/,,Centre for Computer Algebra}
-@center Authors: @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
+@center Authors: @uref{http://www.mathematik.uni-kl.de/~decker,,W. Decker}, @uref{http://www.mathematik.uni-kl.de/~greuel,,G.-M. Greuel}, @uref{http://www.mathematik.uni-kl.de/~pfister,,G. Pfister}, @uref{http://www.mathematik.uni-kl.de/~hannes,,H. Schoenemann}
 
 @center Copyright @copyright{} 1986-2010
 @sp 2
@@ -38,7 +38,7 @@ the omalloc library, the readline library,
 the GNU Multiple Precision Library (GMP),
 NTL: A Library for doing Number Theory (NTL),
 the Multi Protocol library (MP), the
-Singular-Factory library, the Singular-libfac library, 
+Singular-Factory library, the Singular-libfac library,
 surfex, and,
 for the Windows distributions, the Cygwin DLL and the Cygwin tools (Cygwin), and the
 XEmacs editor (XEmacs).
@@ -62,12 +62,12 @@ Please send any comments or bug reports to
 @email{singular@@mathematik.uni-kl.de}.
 
 If you want to be informed of new releases,
-please register as a @sc{Singular} user by 
+please register as a @sc{Singular} user by
 @c using the
 @c registration form on the @sc{Singular} homepage
 @c               @uref{http://www.singular.uni-kl.de}.
 @c If for some reason you cannot access the registration form, you
-@c can also register by 
+@c can also register by
 sending an email to
               @email{singular@@mathematik.uni-kl.de}
 with subject line @code{register} and body containing the following data:
@@ -168,13 +168,13 @@ University of Hannover,
 University of La Laguna
 and
 University of Valladolid.
- 
+
 Current @sc{Singular} developers:
 Wolfram Decker,
 Gert-Martin Greuel,
 Gerhard Pfister,
 Hans Sch@"onemann,
-  
+
 Shawki Al-Rashed,
 Daniel Andres,
 Mohamed Barakat,
@@ -231,7 +231,7 @@ Grischa Studzinski,
 Katharina Werner
 and
 Eva Zerz.
-  
+
 Further contributions to @sc{Singular} have been made by:
 Martin Albrecht,
 Olaf Bachmann,
@@ -300,7 +300,7 @@ Oliver Wienand,
 Denis Yanovich
 and
 Oleksandr Yena.
-						   
+
 We should like to acknowledge the financial support given by
 the Volkswagen-Stiftung, the Deutsche Forschungsgemeinschaft
 and the Stiftung f@"ur Innovation des Landes Rheinland-Pfalz

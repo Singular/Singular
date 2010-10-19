@@ -3,7 +3,7 @@ version="$Id$";
 category="Singularities";
 
 info="
-LIBRARY:  gaussman.lib  Gauss-Manin System of Isolated Singularities
+LIBRARY: gmssing.lib  Gauss-Manin System of Isolated Singularities
 
 AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
 

@@ -30,6 +30,7 @@ void get_next()
   lines++;
   if (buf[0]!='\0')
   {
+    int non_ascii_found=0;
     if (strchr(buf,'\r')!=NULL) crlf++;
     if ((buf[LINE_LEN-1]!='\0')||(strlen(buf)>RECOMMENDED_LEN))
     {
@@ -38,10 +39,12 @@ void get_next()
     }
     if ((strstr(buf," \n")!=NULL)||(strstr(buf," \r\n")!=NULL)) trailing_spaces++;
     if (strchr(buf,'\t')!=NULL) tabs++;
+
     for(i=0;(i<LINE_LEN) && (buf[i]!='\0'); i++)
     {
-      if (buf[i]>=127) { non_ascii++;non_ascii_line=lines; break; }
+      if (buf[i]>=127) { non_ascii_found=1;non_ascii++;non_ascii_line=lines; break; }
     }
+    if (non_ascii_found) printf("non-ascii:>>%s<<\n",buf); 
     if (footer==0) /* we are still in the header */
     {
       if (strstr(buf,"@*")!=NULL) star_nl++;
@@ -419,7 +422,7 @@ int main(int argc, char** argv)
   if(trailing_spaces!=0) printf("hint: lib should not contain trailing_spaces, >=%d found\n",trailing_spaces);
   if(verylong_lines!=0) printf("hint: lib should not contain very long lines, >=%d found\n",verylong_lines);
   if(non_ascii>0)
-  printf("error: lib shlould not contain non-ascii characters, %d found, last in line %d\n",non_ascii, non_ascii_line);
+  printf("error: lib should not contain non-ascii characters, %d found, last in line %d\n",non_ascii, non_ascii_line);
   if (crlf>=lines-1)
   {
     printf("warning: DOS format (%d)\n",crlf);
