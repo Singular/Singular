@@ -1183,6 +1183,12 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
   int reduc = 0;
   int red_result = 1;
   int hilbeledeg=1,hilbcount=0;
+  int save_test=test;
+  if (currRing->MixedOrder)
+  {
+    test &= ~Sy_bit(OPT_REDSB);
+    test &= ~Sy_bit(OPT_REDTAIL);
+  }
 
   strat->update = TRUE;
   /*- setting global variables ------------------- -*/
@@ -1404,6 +1410,7 @@ ideal mora (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     }
   }
   if (Q!=NULL) updateResult(strat->Shdl,Q,strat);
+  test=save_test;
   idTest(strat->Shdl);
   return (strat->Shdl);
 }
