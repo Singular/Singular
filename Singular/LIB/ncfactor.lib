@@ -1140,7 +1140,7 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
         f1 = M[i];
         if (j+1<=size(f1))
         {//Checking for more than one common factor
-	  invideal = std(involution(ideal(product(f1[1..(j+1)])),invo));
+          invideal = std(involution(ideal(product(f1[1..(j+1)])),invo));
           while(involution(NF(invhath,invideal),invo)==0)
           {
             if (j+1<size(f1))
@@ -1153,7 +1153,7 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
             }
           }
         }//Checking for more than one common factor
-	invideal = lift(involution(product(f1[1..j]),invo),invhath);
+        invideal = lift(involution(product(f1[1..j]),invo),invhath);
         f2 = list(f1[1..j])+list(involution(invideal[1,1],invo));
         temp = temp + merge_cf(f2,f1,limits);
       }//hath and h have a common factor on the left
@@ -1793,7 +1793,7 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
         f1 = M[i];
         if (j+1<=size(f1))
         {//Checking for more than one common factor
-	  invideal = std(involution(ideal(product(f1[1..(j+1)])),invo));
+          invideal = std(involution(ideal(product(f1[1..(j+1)])),invo));
           while(involution(NF(invhath,invideal),invo)==0)
           {
             if (j+1<size(f1))
@@ -1808,12 +1808,12 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
         }//Checking for more than one common factor
         if (deg(product(f1[1..j]),iv11)!=0)
         {
-	  invideal = lift(involution(product(f1[1..j]),invo),invhath);
+          invideal = lift(involution(product(f1[1..j]),invo),invhath);
           f2 = list(f1[1..j])+list(involution(invideal[1,1],invo));
         }
         else
         {
-	  invideal = lift(product(f1[1..j]),involution(hath,invo));
+          invideal = lift(product(f1[1..j]),involution(hath,invo));
           f2 = list(f1[1..j])+list(involution(invideal[1,1],invo));
         }
         temp = temp + merge_cf(f2,f1,limits);
