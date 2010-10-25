@@ -65,6 +65,7 @@ int sleftv::listLength()
   return n;
 }
 
+#ifdef HAVE_FANS
 std::string toString(gfan::ZMatrix const &m, char *tab=0)
 {
   std::stringstream s;
@@ -136,6 +137,7 @@ std::string toPrintString(gfan::ZCone const &c, char *nameOfCone)
   s<<toPrintString(e,6,"   ");
   return s.str();
 }
+#endif
 
 void sleftv::Print(leftv store, int spaces)
 {
