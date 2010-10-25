@@ -332,8 +332,8 @@ p_SetmProc p_GetSetmProc(ring r);
 #define p_SetmComp  p_Setm
 
 // sets component of poly a to i, returns length of a
-PINLINE0   int p_SetCompP(poly a, int i, ring r);
-PINLINE0   int p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
+PINLINE0   void p_SetCompP(poly a, int i, ring r);
+PINLINE0   void p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
 PINLINE0   long p_MaxComp(poly p, ring lmRing, ring tailRing);
 inline long p_MaxComp(poly p,ring lmRing) {return p_MaxComp(p,lmRing,lmRing);}
 PINLINE0   long p_MinComp(poly p, ring lmRing, ring tailRing);

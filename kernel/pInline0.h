@@ -20,54 +20,55 @@
 #include <kernel/p_polys.h>
 #include <kernel/ring.h>
 
-PINLINE0 int p_SetCompP(poly p, int i, ring r)
+PINLINE0 void p_SetCompP(poly p, int i, ring r)
 {
-  if (p == NULL) return 0;
-
+  if (p != NULL)
+  {
 #ifdef PDEBUG
-  poly q = p;
+    poly q = p;
+    int l = 0;
 #endif
 
-  int l = 0;
-
-  if (rOrd_SetCompRequiresSetm(r))
-  {
-    do
+    if (rOrd_SetCompRequiresSetm(r))
     {
-      p_SetComp(p, i, r);
-      p_SetmComp(p, r);
-      l++;
-      pIter(p);
-    }
-    while (p != NULL);
-  }
-  else
-  {
-    do
-    {
-      p_SetComp(p, i, r);
-      l++;
-      pIter(p);
-    }
-    while(p != NULL);
-  }
+      do
+      {
+        p_SetComp(p, i, r);
+        p_SetmComp(p, r);
 #ifdef PDEBUG
-  p_Test(q, r);
-  assume(l == pLength(q));
+        l++;
 #endif
-  return l;
+        pIter(p);
+      }
+      while (p != NULL);
+    }
+    else
+    {
+      do
+      {
+        p_SetComp(p, i, r);
+#ifdef PDEBUG
+        l++;
+#endif
+        pIter(p);
+      }
+      while(p != NULL);
+    }
+#ifdef PDEBUG
+    p_Test(q, r);
+    assume(l == pLength(q));
+#endif
+  }
 }
 
-PINLINE0 int p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
+PINLINE0 void p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
 {
   if (p != NULL)
   {
     p_SetComp(p, i, lmRing);
     p_SetmComp(p, lmRing);
-    return p_SetCompP(pNext(p), i, tailRing) + 1;
+    p_SetCompP(pNext(p), i, tailRing);
   }
-  else
-    return 0;
 }
 
 // returns minimal column number in the modul element a (or 0)
