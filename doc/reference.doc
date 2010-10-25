@@ -166,6 +166,7 @@ and @code{LIB} no brackets are allowed.
 * printf::
 * prune::
 * qhweight::
+* qrds::
 * quote::
 * quotient::
 * random::
@@ -5536,8 +5537,8 @@ See
 @ref{module}.
 @c ref
 @c ---------------------------------------
-@c @node qhweight, quot, prune, Functions
-@node qhweight, quote, prune, Functions
+@c @node qhweight, qrds, prune, Functions
+@node qhweight, qrds, prune, Functions
 @subsection qhweight
 @cindex qhweight
 @table @code
@@ -5563,9 +5564,51 @@ See
 @ref{intvec};
 @ref{weight}.
 @c ref
+@c ---------------------------------------
+@c @node qrds, quote, qhweight, Functions
+@node qrds, quote, qhweight, Functions
+@subsection qrds
+@cindex qrds
+@table @code
+@item @strong{Syntax:}
+@code{qrds (} matrix_expression@code{,} number_expression@code{,}
+              number_expression@code{,} number_expression@code{)}
+@item @strong{Type:}
+list
+@item @strong{Purpose:}
+computes all eigenvalues with multiplicities of the given matrix
+by performing the numeric QR double shift algorithm involving
+Hessenberg form and householder transformations.@*
+This method expects the ground field to be the complex numbers,
+and all matrix entries to be real numbers, i.e., elements of this
+ground field with the imaginary part equal to zero.@*
+If the algorithm works, then it returns a list with two entries which
+are again lists of the same size:@*
+_[1][i] is the i-th mutually distinct eigenvalue that was found,@*
+_[2][i] is the (int) multiplicity of _[1][i].@*
+If the algorithm does not work (due to an ill-posed matrix), a list with
+the single entry (int)0 is returned.@*
+The first number argument is used for detection of deflation in the
+actual QR double shift algorithm. The second number argument is used
+for ending Heron's iteration whenever square roots are being computed.
+And the third number argument is used to distinguish between distinct
+eigenvalues: When the Euclidean distance between two computed eigenvalues
+is less then this number, then they will be regarded equal, resulting in
+a higher multiplicity of the corresponding eigenvalue. (A good choice
+for all three number arguments is a small value like e.g. 10^(-100).)
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r=(complex,50),(dummy),dp;
+  matrix A[3][3]=-10,37,-5,-14,51,-10,-29,99,-18;
+  bigint b = bigint(10)^100; number t = 1/b;
+  list L=qrds(A,t,t,t); L;
+@c example
+@end smallexample
+@end table
 
 @c ---------------------------------------
-@c @node quot, quote, qhweight, Functions
+@c @node quot, quote, qrds, Functions
 @c @subsection quot
 @c @cindex quot
 @c @c lib standard.lib:quot lib_fun lib_ex subsection
