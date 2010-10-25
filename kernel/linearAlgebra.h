@@ -262,6 +262,196 @@ bool luSolveViaLUDecomp(
                                      homogeneous solution space   */
                           );
 
+/**
+ * Creates a new matrix which is the (nxn) unit matrix, and returns true
+ * in case of success.
+ *
+ * The method will be successful whenever n >= 1. In this case and only then
+ * true will be returned and the new (nxn) unit matrix will reside inside
+ * the second argument.
+ *
+ * @return true iff the (nxn) unit matrix could be build
+ **/
+bool unitMatrix(
+       const int n,     /**< [in]  size of the matrix */
+       matrix &unitMat  /**< [out] the new (nxn) unit matrix */
+               );
+
+/**
+ * Creates a new matrix which is a submatrix of the first argument, and
+ * returns true in case of success.
+ *
+ * The method will be successful whenever rowIndex1 <= rowIndex2 and
+ * colIndex1 <= colIndex2. In this case and only then true will be
+ * returned and the last argument will afterwards contain a copy of the
+ * respective submatrix of the first argument.
+ * Note that this method may also be used to copy an entire matrix.
+ *
+ * @return true iff the submatrix could be build
+ **/
+bool subMatrix(
+       const matrix aMat,    /**< [in]  the input matrix */
+       const int rowIndex1,  /**< [in]  lower row index */
+       const int rowIndex2,  /**< [in]  higher row index */
+       const int colIndex1,  /**< [in]  lower column index */
+       const int colIndex2,  /**< [in]  higher column index */
+       matrix &subMat        /**< [out] the new submatrix */
+              );
+
+/**
+ * Swaps two rows of a given matrix and thereby modifies it.
+ *
+ * The method expects two valid, distinct row indices, i.e. in
+ * [1..n], where n is the number of rows in aMat.
+ **/
+void swapRows(
+       int row1,     /**< [in]     index of first row to swap */
+       int row2,     /**< [in]     index of second row to swap */
+       matrix& aMat  /**< [in/out] matrix subject to swapping */
+             );
+
+/**
+ * Swaps two columns of a given matrix and thereby modifies it.
+ *
+ * The method expects two valid, distinct column indices, i.e. in
+ * [1..n], where n is the number of columns in aMat.
+ **/
+void swapColumns(
+       int column1,  /**< [in]     index of first column to swap */
+       int column2,  /**< [in]     index of second column to swap */
+       matrix& aMat  /**< [in/out] matrix subject to swapping */
+             );
+
+/**
+ * Creates a new matrix which contains the first argument in the top left
+ * corner, and the second in the bottom right.
+ *
+ * All other entries of the resulting matrix which will be created in the
+ * third argument, are zero.
+ **/
+void matrixBlock(
+       const matrix aMat,    /**< [in]  the top left input matrix */
+       const matrix bMat,    /**< [in]  the bottom right input matrix */
+       matrix &block         /**< [out] the new block matrix */
+                );
+
+/**
+ * Computes the characteristic polynomial from a quadratic (2x2) matrix
+ * and returns true in case of success.
+ *
+ * The method will be successful whenever the input matrix is a (2x2) matrix.
+ * In this case, the resulting polynomial will be a univariate polynomial in
+ * the first ring variable of degree 2 and it will reside in the second
+ * argument.
+ * The method assumes that the matrix entries are all numbers, i.e., elements
+ * from the ground field/ring.
+ *
+ * @return true iff the input matrix was (2x2)
+ **/
+bool charPoly(
+       const matrix aMat,    /**< [in]  the input matrix */
+       poly &charPoly        /**< [out] the characteristic polynomial */
+             );
+
+/**
+ * Computes the square root of a non-negative real number and returns
+ * it as a new number.
+ *
+ * The method assumes that the current ground field is the complex
+ * numbers, and that the argument has imaginary part zero.
+ * If the real part is negative, then false is returned, otherwise true.
+ * The square root will be computed in the last argument by Heron's
+ * iteration formula with the first argument as the starting value. The
+ * iteration will stop as soon as two successive values (in the resulting
+ * sequence) differ by no more than the given tolerance, which is assumed
+ * to be a positive real number.
+ *
+ * @return the square root of the non-negative argument number
+ **/
+bool realSqrt(
+       const number n,          /**< [in]  the input number */
+       const number tolerance,  /**< [in]  accuracy of iteration */
+       number &root             /**< [out] the root of n */
+             );
+
+/**
+ * Computes the Hessenberg form of a given square matrix.
+ *
+ * The method assumes that all matrix entries are numbers coming from some
+ * subfield of the reals..
+ * Afterwards, the following conditions will hold:
+ * 1) hessenbergMat = pMat * aMat * pMat^{-1},
+ * 2) hessenbergMat is in Hessenberg form.
+ * During the algorithm, pMat will be constructed as the product of self-
+ * inverse matrices.
+ * The algorithm relies on computing square roots of floating point numbers.
+ * These will be combuted by Heron's iteration formula, with iteration
+ * stopping when two successive approximations of the square root differ by
+ * no more than the given tolerance, which is assumed to be a positve real
+ * number.
+ **/
+void hessenberg(
+       const matrix aMat,      /**< [in]  the square input matrix */
+       matrix &pMat,           /**< [out] the transformation matrix */
+       matrix &hessenbergMat,  /**< [out] the Hessenberg form of aMat */
+       const number tolerance  /**< [in]  accuracy */
+               );
+
+/**
+ * Returns all solutions of a quadratic polynomial relation with real
+ * coefficients.
+ *
+ * The method assumes that the polynomial is univariate in the first
+ * ring variable, and that the current ground field is the complex numbers.
+ * The polynomial has degree <= 2. Thus, there may be
+ * a) infinitely many zeros, when p == 0; then -1 is returned;
+ * b) no zero, when p == constant <> 0; then 0 is returned;
+ * c) one zero, when p is linear; then 1 is returned;
+ * d) one double zero; then 2 is returned;
+ * e) two distinct zeros; then 3 is returned;
+ * In the case e), s1 and s2 will contain the two distinct solutions.
+ * In cases c) and d) s1 will contain the single/double solution.
+ *
+ * @return the number of distinct zeros
+ **/
+int quadraticSolve(
+       const poly p,           /**< [in]  the polynomial        */
+       number &s1,             /**< [out] first zero, if any    */
+       number &s2,             /**< [out] second zero, if any   */
+       const number tolerance  /**< [in] accuracy               */
+                  );
+
+/**
+ * Computes all eigenvalues of a given real quadratic matrix with
+ * multiplicites.
+ *
+ * The method assumes that the current ground field is the complex numbers.
+ * Computations are based on the QR double shift algorithm involving
+ * Hessenberg form and householder transformations.
+ * If the algorithm works, then it returns a list with two entries which
+ * are again lists of the same size:
+ * _[1][i] is the i-th mutually distinct eigenvalue that was found,
+ * _[2][i] is the (int) multiplicity of _[1][i].
+ * If the algorithm does not work (due to an ill-posed matrix), a list with
+ * the single entry (int)0 is returned.
+ * 'tol1' is used for detection of deflation in the actual qr double shift
+ * algorithm.
+ * 'tol2' is used for ending Heron's iteration whenever square roots
+ * are being computed.
+ * 'tol3' is used to distinguish between distinct eigenvalues: When
+ * the Euclidean distance between two computed eigenvalues is less then
+ * tol3, then they will be regarded equal, resulting in a higher
+ * multiplicity of the corresponding eigenvalue.
+ *
+ * @return a list with one entry (int)0, or two entries which are again lists
+ **/
+lists qrDoubleShift(
+       const matrix A,     /**< [in]  the quadratic matrix         */
+       const number tol1,  /**< [in]  tolerance for deflation      */
+       const number tol2,  /**< [in]  tolerance for square roots   */
+       const number tol3   /**< [in]  tolerance for distinguishing
+                                      eigenvalues                  */
+                   );
+
 #endif
 /* LINEAR_ALGEBRA_H */
-
