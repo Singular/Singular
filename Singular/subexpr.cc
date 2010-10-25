@@ -11,9 +11,11 @@
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <sstream>
 
 #include <kernel/mod2.h>
+#ifdef HAVE_FANS
+#include <sstream>
+#endif
 #include <kernel/intvec.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
