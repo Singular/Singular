@@ -7250,6 +7250,23 @@ static BOOLEAN jjSUBST_M(leftv res, leftv u)
   // rest was w->next, but is already cleaned
   return b;
 }
+static BOOLEAN jjQRDS(leftv res, leftv INPUT)
+{
+  if ((INPUT->Typ() != MATRIX_CMD) ||
+      (INPUT->next->Typ() != NUMBER_CMD) ||
+      (INPUT->next->next->Typ() != NUMBER_CMD) ||
+      (INPUT->next->next->next->Typ() != NUMBER_CMD))
+  {
+    WerrorS("expected (matrix, number, number, number) as arguments");
+    return TRUE;
+  }
+  leftv u = INPUT; leftv v = u->next; leftv w = v->next; leftv x = w->next;
+  res->data = (char *)qrDoubleShift((matrix)(u->Data()),
+                                    (number)(v->Data()),
+                                    (number)(w->Data()),
+                                    (number)(x->Data()));
+  return FALSE;
+}
 static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
 { ideal result;
   leftv u = INPUT;    /* an ideal, weighted homogeneous and standard */

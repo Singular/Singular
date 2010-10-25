@@ -818,6 +818,7 @@ struct sValCmdM dArithM[]=
 ,{D(jjCALL2ARG),  STD_CMD,         IDEAL_CMD,           2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  STD_CMD,         IDEAL_CMD,           3      , NO_PLURAL |ALLOW_RING}
 ,{D(jjSTD_HILB_WP), STD_CMD,       IDEAL_CMD,           4      , NO_PLURAL |ALLOW_RING}
+,{D(jjQRDS),      QRDS_CMD,        LIST_CMD,            4      , ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_FANS
 ,{D(jjADDADJ),    ADDADJ_CMD,      NONE,               -2      , NO_PLURAL |NO_RING}
 #endif /* HAVE_FANS */
@@ -1017,6 +1018,7 @@ cmdnames cmds[] =
   { "prune",       0, PRUNE_CMD ,         CMD_1},
   { "proc",        0, PROC_CMD ,          PROC_CMD},
   { "qhweight",    0, QHWEIGHT_CMD ,      CMD_1},
+  { "qrds",        0, QRDS_CMD ,          CMD_M},
   { "qring",       0, QRING_CMD ,         ROOT_DECL},
   { "quote",       0, QUOTE ,             QUOTE},
   { "quotient",    0, QUOTIENT_CMD ,      CMD_2},
