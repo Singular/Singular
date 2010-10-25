@@ -380,19 +380,15 @@ misc_ip.o emacs.o tesths.o: version.h
 claptmpl.o: claptmpl.cc mod2.h
 	${CXX} ${CXXFLAGS}  ${CPPFLAGS} ${DEFS} -c $<
 
-iparith.inc: ${OBJS} claptmpl.o iparith.cc \
-                          ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
-	     -o gentable1 claptmpl.o iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
+iparith.inc: gentable.cc grammar.h tok.h table.h mod2.h
+	 ${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable.cc \
+	     -o gentable1
 	./gentable1
 	/bin/rm -f gentable1 gentable1.exe
 
-mpsr_Tok.inc: ${OBJS} claptmpl.o iparith.cc \
-                          ipconv.cc tok.h mpsr_Tok.cc grammar.h mod2.h
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DGENTABLE \
-	     -o gentable2 claptmpl.o iparith.cc tesths.cc mpsr_Tok.cc \
-	     ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
+mpsr_Tok.inc: gentable2.cc grammar.h tok.h table.h mod2.h
+	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} gentable2.cc \
+	     -o gentable2
 	./gentable2
 	/bin/rm -f gentable2 gentable2.exe
 
@@ -820,7 +816,7 @@ installp: Singularp
 
 %.dd: %.cc mod2.h 
 	echo $(@:.dd=.og) $(@:.dd=.op) $(@:.dd=.dl_o) $(@:.dd=.dl_og)  $(@:.dd=.dl_op)" " \\ > $@
-	$(CXXM) -DGENTABLE ${CPPFLAGS} ${DEFSG} $< >> $@
+	$(CXXM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
 %.d: %.c mod2.h 
 	echo $(@:.d=.og) $(@:.d=.op)" " \\ > $@
