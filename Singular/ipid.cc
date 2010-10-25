@@ -29,7 +29,7 @@
 #include <kernel/syz.h>
 #include <Singular/ipid.h>
 #include <Singular/Fan.h>
-#include <Singular/Cone.h>
+#include <gfanlib/gfanlib.h>
 
 #ifdef HAVE_DYNAMIC_LOADING
 #include <kernel/mod_raw.h>
@@ -200,6 +200,16 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
       IDPACKAGE(h)->language=LANG_NONE;
       IDPACKAGE(h)->loaded = FALSE;
     }
+#ifdef HAVE_FANS
+    else if (t == FAN_CMD)
+    {
+      IDSTRING(h) = (char*)(new Fan());
+    }
+    else if (t == CONE_CMD)
+    {
+      IDSTRING(h) = (char*)(new gfan::ZCone());
+    }
+#endif /* HAVE_FANS */
   }
   // --------------------------------------------------------
   return  h;

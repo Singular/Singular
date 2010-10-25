@@ -70,6 +70,7 @@
 #include <kernel/mpr_inout.h>
 #include <Singular/Fan.h>
 #include <Singular/Cone.h>
+#include <gfanlib/gfanlib.h>
 
 #include <kernel/timer.h>
 
@@ -3160,57 +3161,188 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   return FALSE;
 }
 #ifdef HAVE_FANS
-static BOOLEAN jjADDMCONE1(leftv res, leftv u, leftv v)
+int integerToInt(gfan::Integer const &V, bool &ok)
 {
-  /* method for adding a maximal cone in the given fan;
-     valid parametrizations: (fan, cone),
-     Errors will be invoked in the following cases:
-     - the cone has been generated in the context of a
-       fan which is different from the given one */
-  Fan* f = (Fan*)u->Data();
-  Cone* c = (Cone*)v->Data();
-  if (! f->addMaxCone(c))
-  {
-    WerrorS("cone references a fan which is different from the 1st argument");
-    return TRUE;
-  }
-  else return FALSE;
+  mpz_t v;
+  mpz_init(v);
+  V.setGmp(v);
+  int ret=0;
+  if(mpz_fits_sint_p(v))
+    ret=mpz_get_si(v);
+  else
+    ok=false;
+  mpz_clear(v);
+  return ret;
 }
-static BOOLEAN jjADDMCONE2(leftv res, leftv u, leftv v)
+intvec* zVector2Intvec(const gfan::ZVector zv)
 {
-  /* method for adding numerous maximal cones in the given fan;
-     valid parametrizations: (fan, list),
-     where the list entries are expected to be cones;
+  int d=zv.size();
+  intvec* iv = new intvec(1, d, 0);
+  bool ok = true;
+  for(int i=1;i<=d;i++)
+    IMATELEM(*iv, 1, i) = integerToInt(zv[i-1], ok);
+  if (!ok) WerrorS("overflow while converting a gfan::ZVector to an intvec");
+  return iv;
+}
+intvec* zMatrix2Intvec(const gfan::ZMatrix zm)
+{
+  int d=zm.getHeight();
+  int n=zm.getWidth();
+  intvec* iv = new intvec(d, n, 0);
+  bool ok = true;
+  for(int i=1;i<=d;i++)
+    for(int j=1;j<=n;j++)
+      IMATELEM(*iv, i, j) = integerToInt(zm[i-1][j-1], ok);
+  if (!ok) WerrorS("overflow while converting a gfan::ZMatrix to an intmat");
+  return iv;
+}
+gfan::ZMatrix intmat2ZMatrix(const intvec* iMat)
+{
+  int d=iMat->rows();
+  int n=iMat->cols();
+  gfan::ZMatrix ret(d,n);
+  for(int i=0;i<d;i++)
+    for(int j=0;j<n;j++)
+      ret[i][j]=IMATELEM(*iMat, i+1, j+1);
+  return ret;
+}
+/* expects iMat to have just one row */
+gfan::ZVector intvec2ZVector(const intvec* iVec)
+{
+  int n =iVec->rows();
+  gfan::ZVector ret(n);
+  for(int j=0;j<n;j++)
+    ret[j]=IMATELEM(*iVec, j+1, 1);
+  return ret;
+}
+static BOOLEAN jjCONERAYS2(leftv res, leftv u, leftv v)
+{
+  /* method for generating a cone object from half-lines,
+     and lines (any point in the cone being the sum of a point
+     in the convex hull of the half-lines and a point in the span
+     of the lines; the second argument may contain or entirely consist
+     of zero rows);
+     valid parametrizations: (intmat, intmat)
      Errors will be invoked in the following cases:
-     - one of the cones has been generated in the context
-       of a fan which is different from the given one */
-  Fan* f = (Fan*)u->Data();
-  lists L = (lists)v->Data();
-  int index = f->addMaxCones(L);
-  if (index != 0)
+     - u and v have different numbers of columns */
+  intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
+  if (rays->cols() != linSpace->cols())
   {
-    Werror("cone at position %d references a fan which %s",
-           index, "is different from the 1st argument");
+    Werror("expected same number of columns but got %d vs. %d",
+           rays->cols(), linSpace->cols());
     return TRUE;
   }
-  else return FALSE;
+  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZCone* zc = new gfan::ZCone();
+  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  res->data = (char *)zc;
+  return FALSE;
+}
+static BOOLEAN jjFACECONT(leftv res, leftv u, leftv v)
+{
+  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+  intvec* iv = (intvec*)v->Data();
+  gfan::ZVector zv = intvec2ZVector(iv);
+  int d1 = zc->ambientDimension();
+  int d2 = zv.size();
+  if (d1 != d2)
+    Werror("expected ambient dim of cone and size of vector\n"
+           "to be equal but got %d and %d", d1, d2);
+  if(!zc->contains(zv))
+  {
+    WerrorS("provided intvec does not lie in the cone");
+  }
+  res->data = (void *)new gfan::ZCone(zc->faceContaining(zv));
+  return FALSE;
+}
+static BOOLEAN jjINTERSC(leftv res, leftv u, leftv v)
+{ 
+  gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+  gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+  int d1 = zc1->ambientDimension();
+  int d2 = zc2->ambientDimension();
+  if (d1 != d2)
+    Werror("expected ambient dims of both cones to coincide\n"
+           "but got %d and %d", d1, d2);
+  gfan::ZCone zc3 = gfan::intersection(*zc1, *zc2);
+  res->data = (void *)new gfan::ZCone(zc3);
+  return FALSE;
+}
+static BOOLEAN jjCONELINK(leftv res, leftv u, leftv v)
+{
+  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+  intvec* iv = (intvec*)v->Data();
+  gfan::ZVector zv= intvec2ZVector(iv);
+  int d1 = zc->ambientDimension();
+  int d2 = zv.size();
+  if (d1 != d2)
+    Werror("expected ambient dim of cone and size of vector\n"
+           "to be equal but got %d and %d", d1, d2);
+  if(!zc->contains(zv))
+  {
+    WerrorS("the provided intvec does not lie in the cone");
+  }
+  res->data = (void *)new gfan::ZCone(zc->link(zv));
+  return FALSE;
+}
+static BOOLEAN jjCONTAINS2(leftv res, leftv u, leftv v)
+{
+  gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
+  gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
+  int d1 = zc1->ambientDimension();
+  int d2 = zc2->ambientDimension();
+  if (d1 != d2)
+    Werror("expected cones with same ambient dimensions\n but got"
+           " dimensions %d and %d", d1, d2);
+  res->data = (void *)(zc1->contains(*zc2) ? 1 : 0);
+  return FALSE;
+}
+static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
+{
+  /* method for generating a cone object from iequalities,
+     and equations (...)
+     valid parametrizations: (intmat, intmat)
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
+  res->data = (char *)zc;
+  return FALSE;
 }
 static BOOLEAN jjDELMCONE2(leftv res, leftv u, leftv v)
 {
   /* method for deleting a maximal cone from the given fan;
      valid parametrizations: (fan, int),
      Errors will be invoked in the following cases:
-     - the given index is out of range [1..m], where m is
+     - the given index is out of range [0..m-1], where m is
        the number of maximal cones in the given fan */
   Fan* f = (Fan*)u->Data();
   int index = (int)(long)v->Data();
-  if (! f->deleteMaxCone(index))
+  int n = f->getNumberOfMaxCones();
+  if (n == 0)
   {
-    Werror("cone index %d out of range [1..%d]; no cone deleted",
-           index, f->getMaxCones()->nr + 1);
+    WerrorS("no maximal cones defined in the given fan");
     return TRUE;
   }
-  else return FALSE;
+  if ((index < 0) || (n <= index))
+  {
+    Werror("cone index %d out of range [0..%d]; no cone deleted",
+           index, f->getNumberOfMaxCones() - 1);
+    return TRUE;
+  }
+  f->deleteMaxCone(index);
+  return FALSE;
 }
 static BOOLEAN jjDELMCONE3(leftv res, leftv u, leftv v)
 {
@@ -3218,45 +3350,78 @@ static BOOLEAN jjDELMCONE3(leftv res, leftv u, leftv v)
      given fan;
      valid parametrizations: (fan, intvec),
      Errors will be invoked in the following cases:
-     - one of the given indices is out of range [1..m],
+     - one of the given indices is out of range [0..m-1],
        where m is the number of maximal cones in the given
        fan;
-     The method does not check that the given indices are
-     mutually distinct. */
+     The method does not check whether the given indices are
+     mutually distinct. This is however assumed by this method. */
   Fan* f = (Fan*)u->Data();
-  intvec* indices = (intvec*)v->Data();
-  int result = f->deleteMaxCones(indices);
-  if (result != 0)
+  intvec* iv = (intvec*)v->Data();
+  int n = f->getNumberOfMaxCones();
+  if (n == 0)
   {
-    Werror("cone index %d at position %d out of range [1..%d]; %s",
-           (*indices)[result - 1], result, f->getMaxCones()->nr + 1,
-           "no cone deleted");
+    WerrorS("no maximal cones defined in the given fan");
     return TRUE;
   }
-  else return FALSE;
+  for (int i = 0; i < iv->length(); i++)
+    if (((*iv)[i] < 0) || (n <= (*iv)[i]))
+    {
+      Werror("cone index %d out of range [0..%d]", (*iv)[i], n - 1);
+      return TRUE;
+    }
+  f->deleteMaxCones(iv);
+  return FALSE;
 }
-static BOOLEAN jjMAXCONE2(leftv res, leftv u, leftv v)
+static BOOLEAN jjMAXCONE1(leftv res, leftv u, leftv v)
 {
-  /* method for retrieving a maximal cone of the given fan;
+  /* method for retrieving a maximal cone from the given fan;
      valid parametrizations: (fan, int),
      Errors will be invoked in the following cases:
      - maximal cones not yet set in the fan,
-     - maximal cone index invalid;
+     - maximal cone index out of range;
      The method returns an object of type cone. */
   Fan* f = (Fan*)u->Data();
   int index = (int)(long)v->Data();
-  lists maxCones = f->getMaxCones();
-  if (maxCones == NULL)
+  int n = f->getNumberOfMaxCones();
+  if (n == 0)
   {
-    WerrorS("no maximal cones set in the given fan");
+    WerrorS("no maximal cones defined in the given fan");
     return TRUE;
   }
-  else if ((index < 1) || (maxCones->nr + 1 < index))
+  if ((index < 0) || (n <= index))
   {
-    Werror("invalid cone index %d", index);
+    Werror("cone index %d out of range [0..%d]", index, n - 1);
     return TRUE;
   }
-  res->data = (char*)new Cone(*(Cone*)(maxCones->m[index - 1].data));
+  Cone* c = f->getMaxCone(index);
+  res->data = (char*)c;
+  return FALSE;
+}
+static BOOLEAN jjMAXCONE2(leftv res, leftv u, leftv v)
+{
+  /* method for retrieving numerous maximal cones of the given fan
+     in a list;
+     valid parametrizations: (fan, intvec),
+     Errors will be invoked in the following cases:
+     - maximal cones not yet set in the fan,
+     - cone index out of range;
+     The method returns a list of cone objects. */
+  Fan* f = (Fan*)u->Data();
+  intvec* iv = (intvec*)v->Data();
+  int n = f->getNumberOfMaxCones();
+  if (n == 0)
+  {
+    WerrorS("no maximal cones defined in the given fan");
+    return TRUE;
+  }
+  for (int i = 0; i < iv->length(); i++)
+    if (((*iv)[i] < 0) || (n <= (*iv)[i]))
+    {
+      Werror("cone index %d out of range [0..%d]", (*iv)[i], n - 1);
+      return TRUE;
+    }
+  lists maxCones = f->getMaxCones(iv);
+  res->data = (char*)maxCones;
   return FALSE;
 }
 static BOOLEAN jjGETPROP1(leftv res, leftv u, leftv v)
@@ -3296,32 +3461,198 @@ static BOOLEAN jjGETPROP1(leftv res, leftv u, leftv v)
   res->data = (void*)result;
   return FALSE;
 }
-static BOOLEAN jjGETPROP2(leftv res, leftv u, leftv v)
+static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
 {
   /* method for retrieving cone properties;
      valid parametrizations: (cone, string),
      Errors will be invoked in the following cases:
-     - cone has so far only been instantiated by "cone c;",
-     - string is not 'dim' */
-  Cone* c = (Cone*)u->Data();
+     - invalid property string (see below for valid ones) */
+  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
   char* prop = (char*)v->Data();
-  int result;
+  gfan::ZMatrix retMat;
+  gfan::ZCone retCone;
+  int retInt;
+  gfan::ZVector retVec;
+  int typeInfo;
 
-  if (c->getFan() == NULL)
+  /* ################ properties with return type intmat: ################## */
+  if      (strcmp(prop, "INEQUALITIES") == 0)
   {
-    WerrorS("the given cone has no properties yet (freshly instantiated)");
-    return TRUE;
+    retMat = zc->getInequalities();
+    typeInfo = INTMAT_CMD;
   }
-
-  if (strcmp(prop, "dim") == 0)
-    result = c->getDim();
+  else if (strcmp(prop, "EQUATIONS") == 0)
+  {
+    retMat = zc->getEquations();
+    typeInfo = INTMAT_CMD;
+  }
+  else if (strcmp(prop, "FACETS") == 0)
+  {
+    retMat = zc->getFacets();
+    typeInfo = INTMAT_CMD;
+  }
+  else if (strcmp(prop, "IMPLIED_EQUATIONS") == 0)
+  {
+    retMat = zc->getImpliedEquations();
+    typeInfo = INTMAT_CMD;
+  }
+  else if (strcmp(prop, "GENERATORS_OF_SPAN") == 0)
+  {
+    retMat = zc->generatorsOfSpan();
+    typeInfo = INTMAT_CMD;
+  }
+  else if (strcmp(prop, "GENERATORS_OF_LINEALITY_SPACE") == 0)
+  {
+    retMat = zc->generatorsOfLinealitySpace();
+    typeInfo = INTMAT_CMD;
+  }
+  else if (strcmp(prop, "RAYS") == 0)
+  {
+    retMat = zc->extremeRays();
+    typeInfo = INTMAT_CMD;
+  }
+  else if (strcmp(prop, "QUOTIENT_LATTICE_BASIS") == 0)
+  {
+    retMat = zc->quotientLatticeBasis();
+    typeInfo = INTMAT_CMD;
+  }
+  else if (strcmp(prop, "LINEAR_FORMS") == 0)
+  {
+    retMat = zc->getLinearForms();
+    typeInfo = INTMAT_CMD;
+  }
+  /* ################ properties with return type int: ################## */
+  else if (strcmp(prop, "AMBIENT_DIM") == 0)
+  {
+    retInt = zc->ambientDimension();
+    typeInfo = INT_CMD;
+  }
+  else if (strcmp(prop, "DIM") == 0)
+  {
+    retInt = zc->dimension();
+    typeInfo = INT_CMD;
+  }
+  else if (strcmp(prop, "LINEALITY_DIM") == 0)
+  {
+    retInt = zc->dimensionOfLinealitySpace();
+    typeInfo = INT_CMD;
+  }
+  else if (strcmp(prop, "MULTIPLICITY") == 0)
+  {
+    bool ok = true;
+    retInt = integerToInt(zc->getMultiplicity(), ok);
+    if (!ok)
+      WerrorS("overflow while converting a gfan::Integer to an int");
+    typeInfo = INT_CMD;
+  }
+  else if (strcmp(prop, "IS_ORIGIN") == 0)
+  {
+    retInt = zc->isOrigin() ? 1 : 0;
+    typeInfo = INT_CMD;
+  }
+  else if (strcmp(prop, "IS_FULL_SPACE") == 0)
+  {
+    retInt = zc->isFullSpace() ? 1 : 0;
+    typeInfo = INT_CMD;
+  }
+  else if (strcmp(prop, "SIMPLICIAL") == 0)
+  {
+    retInt = zc->isSimplicial() ? 1 : 0;
+    typeInfo = INT_CMD;
+  }
+  else if (strcmp(prop, "CONTAINS_POSITIVE_VECTOR") == 0)
+  {
+    retInt = zc->containsPositiveVector() ? 1 : 0;
+    typeInfo = INT_CMD;
+  }
+  /* ################ properties with return type ZCone: ################## */
+  else if (strcmp(prop, "LINEALITY_SPACE") == 0)
+  {
+    retCone = zc->linealitySpace();
+    typeInfo = CONE_CMD;
+  }
+  else if (strcmp(prop, "DUAL_CONE") == 0)
+  {
+    retCone = zc->dualCone();
+    typeInfo = CONE_CMD;
+  }
+  else if (strcmp(prop, "NEGATED") == 0)
+  {
+    retCone = zc->negated();
+    typeInfo = CONE_CMD;
+  }
+  /* ################ properties with return type intvec: ################## */
+  else if (strcmp(prop, "SEMI_GROUP_GENERATOR") == 0)
+  {
+    /* test whether the cone's dim = dim of lin space + 1: */
+    int d = zc->dimension();
+    int dLS = zc->dimensionOfLinealitySpace();
+    if (d == dLS + 1)
+      retVec = zc->semiGroupGeneratorOfRay();
+    else
+    {
+      Werror("expected dim of cone one larger than dim of lin space\n"
+             "but got dimensions %d and %d", d, dLS);
+    }
+    typeInfo = INTVEC_CMD;
+  }
+  else if (strcmp(prop, "RELATIVE_INTERIOR_POINT") == 0)
+  {
+    retVec = zc->getRelativeInteriorPoint();
+    typeInfo = INTVEC_CMD;
+  }
+  else if (strcmp(prop, "UNIQUE_POINT") == 0)
+  {
+    retVec = zc->getUniquePoint();
+    typeInfo = INTVEC_CMD;
+  }
   else
   {
     Werror("unexpected cone property '%s'", prop);
     return TRUE;
   }
 
-  res->data = (void*)result;
+  res->rtyp = typeInfo;
+  switch(typeInfo)
+  {
+    case INTMAT_CMD:
+      res->data = (void*)zMatrix2Intvec(retMat);
+      break;
+    case INT_CMD:
+      res->data = (void*)retInt;
+      break;
+    case CONE_CMD:
+      res->data = (void*)new gfan::ZCone(retCone);
+      break;
+    case INTVEC_CMD:
+      res->data = (void*)zVector2Intvec(retVec);
+      break;
+    default: ; /* should never be reached */
+  }
+  return FALSE;
+}
+static BOOLEAN jjADJACENCY2(leftv res, leftv u, leftv v)
+{
+  /* method for retrieving all maximal cones in the given fan that
+     are adjacent to a given maximal cone;
+     valid parametrizations: (fan, int),
+     Errors will be invoked in the following cases:
+     - the maximal cone index is out of range [0..m-1],
+       where m is the number of maximal cones in the given fan;
+     In case there are no neighbours (yet) of the specified maximal
+     cone, the method returns an intvec of length one with entry zero. */
+  Fan* f = (Fan*)u->Data();
+  int maxCone = (int)(long)v->Data();
+  int nMaxCones = f->getNumberOfMaxCones();
+  if ((maxCone < 0) || (nMaxCones <= maxCone))
+  {
+    Werror("index %d out of range [0..%d]",
+           maxCone, nMaxCones - 1);
+    return TRUE;
+  }
+  intvec* result = f->getAdjacency(maxCone);
+  result = ivCopy(result);
+  res->data = (char*)result;
   return FALSE;
 }
 #endif /* HAVE_FANS */
@@ -4692,12 +5023,40 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
   return FALSE;
 }
 #ifdef HAVE_FANS
+static BOOLEAN jjCONERAYS1(leftv res, leftv v)
+{
+  /* method for generating a cone object from half-lines
+     (cone = convex hull of the half-lines; note: there may be
+     entire lines in the cone);
+     valid parametrizations: (intmat) */
+  intvec* rays = (intvec *)v->CopyD(INTVEC_CMD);
+  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZCone* zc = new gfan::ZCone();
+  *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
+  res->data = (char *)zc;
+  return FALSE;
+}
+static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
+{
+  /* method for generating a cone object from inequalities;
+     valid parametrizations: (intmat) */
+  intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
+  gfan::ZMatrix zm = intmat2ZMatrix(inequs);
+  gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
+  res->data = (char *)zc;
+  return FALSE;
+}
 static BOOLEAN jjDELMCONE1(leftv res, leftv v)
 {
-  /* method for deleting all maximal cones of the given fan;
+  /* method for deleting all maximal cones from a given fan;
      valid parametrizations: (fan) */
   Fan* f = (Fan*)v->Data();
-  f->deleteMaxCones(NULL);
+  int n = f->getNumberOfMaxCones();
+  intvec* iv = new intvec(1, n, 0);
+  for (int i = 1; i <= n; i++)
+    IMATELEM(*iv, 1, i) = i - 1;
+  f->deleteMaxCones(iv);
+  delete iv;
   return FALSE;
 }
 static BOOLEAN jjMAXRAYS1(leftv res, leftv v)
@@ -4706,7 +5065,7 @@ static BOOLEAN jjMAXRAYS1(leftv res, leftv v)
      valid parametrizations: (fan),
      If there are no maximal rays, the method returns a 1x1
      matrix with entry 0. Otherwise the returned matrix contains
-     the maximal rays as column vectors. */
+     the maximal rays as row vectors. */
   Fan* f = (Fan*)v->Data();
   intvec* result = NULL;
   if (f->getMaxRays() == NULL)
@@ -4723,23 +5082,14 @@ static BOOLEAN jjMAXRAYS2(leftv res, leftv v)
      valid parametrizations: (cone),
      If there are no maximal rays, the method returns a 1x1
      matrix with entry 0. Otherwise the returned matrix contains
-     the maximal rays as column vectors. */
+     the maximal rays as row vectors. */
   Cone* c = (Cone*)v->Data();
   intvec* result = NULL;
-  if (c->getRays() == NULL)
+  if (c->getMaxRays() == NULL)
     /* return a 1x1 matrix with sole entry zero */
     result = new intvec(1, 1, 0);
   else
-  {
-    intvec* indices = c->getRays();
-    intvec* maxRays = c->getFan()->getMaxRays();
-    result = new intvec(maxRays->rows(), indices->length(), 0);
-    for (int c = 1; c <= indices->length(); c++)
-      for (int r = 1; r <= maxRays->rows(); r++)
-      {
-        IMATELEM(*result, r, c) = IMATELEM(*maxRays, r, (*indices)[c - 1]);
-      }
-  }
+    result = ivCopy(c->getMaxRays());
   res->data = (char*)result;
   return FALSE;
 }
@@ -4748,7 +5098,7 @@ static BOOLEAN jjFACETNS1(leftv res, leftv v)
   /* method for retrieving the facet normals of the given fan;
      valid parametrizations: (fan),
      If there are no facet normals, a 1x1 matrix with entry 0
-     is returned; otherwise a matrix the columns of which are
+     is returned; otherwise a matrix the rows of which are
      the facet normals of the given fan. */
   Fan* f = (Fan*)v->Data();
   intvec* result = NULL;
@@ -4763,9 +5113,9 @@ static BOOLEAN jjFACETNS1(leftv res, leftv v)
 static BOOLEAN jjFACETNS2(leftv res, leftv v)
 {
   /* method for retrieving the facet normals of the given cone;
-     valid parametrizations: (fan),
+     valid parametrizations: (cone),
      If there are no facet normals, a 1x1 matrix with entry 0
-     is returned; otherwise a matrix the columns of which are
+     is returned; otherwise a matrix the rows of which are
      the facet normals of the given cone. */
   Cone* c = (Cone*)v->Data();
   intvec* result = NULL;
@@ -4773,20 +5123,11 @@ static BOOLEAN jjFACETNS2(leftv res, leftv v)
     /* return a 1x1 matrix with sole entry zero */
     result = new intvec(1, 1, 0);
   else
-  {
-    intvec* indices = c->getFacetNs();
-    intvec* facetNs = c->getFan()->getFacetNs();
-    result = new intvec(facetNs->rows(), indices->length(), 0);
-    for (int c = 1; c <= indices->length(); c++)
-      for (int r = 1; r <= facetNs->rows(); r++)
-      {
-        IMATELEM(*result, r, c) = IMATELEM(*facetNs, r, (*indices)[c - 1]);
-      }
-  }
+    result = ivCopy(c->getFacetNs());
   res->data = (char*)result;
   return FALSE;
 }
-static BOOLEAN jjLINSPACE(leftv res, leftv v)
+static BOOLEAN jjLINSPACE1(leftv res, leftv v)
 {
   /* method for retrieving the lineality space of the given fan;
      valid parametrizations: (fan) */
@@ -4795,44 +5136,33 @@ static BOOLEAN jjLINSPACE(leftv res, leftv v)
   res->data = (char*)result;
   return FALSE;
 }
-static BOOLEAN jjMAXCONE1(leftv res, leftv v)
+static BOOLEAN jjLINSPACE2(leftv res, leftv v)
 {
-  /* method for retrieving all maximal cones of the given fan;
-     valid parametrizations: (fan),
-     Errors will be invoked in the following cases:
-     - maximal cones not yet set in the fan;
-     The method returns a list of cone objects. */
-  Fan* f = (Fan*)v->Data();
-  lists maxCones = lCopy(f->getMaxCones());
-  if (maxCones == NULL)
-  {
-    WerrorS("no maximal cones set in the given fan");
-    return TRUE;
-  }
-  res->data = (char*)maxCones;
+  /* method for retrieving the lineality space of the given cone;
+     valid parametrizations: (cone) */
+  Cone* c = (Cone*)v->Data();
+  intvec* result = ivCopy(c->getLinSpace());
+  res->data = (char*)result;
   return FALSE;
 }
 static BOOLEAN jjADJACENCY1(leftv res, leftv v)
 {
-  /* method for retrieving the adjacency matrix of the given fan;
+  /* method for retrieving adjacency information for the given fan;
      valid parametrizations: (fan),
      Errors will be invoked in the following cases:
      - no maximal cone has been defined yet in the given fan;
-     The matrix entries have the following meaning:
-     _[i, j] =  0: the maximal cones with indices i and j are
-                   not adjacent,
-             =  1: they are adjacent, and the intersection facet
-                   has been stored in the given fan,
-             = -1: they are adjacent but there is no intersection
-                   facet available */
+     The method returns a list with an entry for each maximal cone
+     in the given fan. Each such entry is an intvec with the indices
+     of all neighbouring maximal cones. */
   Fan* f = (Fan*)v->Data();
-  if (f->getMaxCones()->nr + 1 < 1)
+  if (f->getNumberOfMaxCones() == 0)
   {
     WerrorS("no maximal cones defined yet");
     return TRUE;
   }
-  intvec* adjacencyMatrix = f->getAdjacency();
-  res->data = (char*)adjacencyMatrix;
+  lists adjacencyList = f->getAdjacencyList();
+  adjacencyList = lCopy(adjacencyList);
+  res->data = (char*)adjacencyList;
   return FALSE;
 }
 #endif /* HAVE_FANS */
@@ -6121,105 +6451,197 @@ static BOOLEAN jjSTATUS3(leftv res, leftv u, leftv v, leftv w)
   return FALSE;
 }
 #ifdef HAVE_FANS
-static BOOLEAN jjSETPROP1(leftv res, leftv u, leftv v, leftv w)
+static BOOLEAN jjSETPROPC1(leftv res, leftv u, leftv v, leftv w)
 {
-  /* method for setting fan properties;
-     valid parametrizations: (fan, string, int),
-     Errors will be invoked in the following cases:
-     - string is neither of 'dim', 'complete', 'simplicial',
-       and 'pure';
-     A value 0 means that the property is not fulfilled.
-     1 means it is. -1 means that the answer is unknown.
-     Any value other than 0 and 1 will be converted to -1;
-     except for dim: Here, only negative values will be converted
-     to -1. */
-  Fan* f = (Fan*)u->Data();
+  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
   char* prop = (char*)v->Data();
-  int value = (int)(long)w->Data();
+  int val = (int)(long)w->Data();
 
-  if      (strcmp(prop, "ambientdim") == 0)
+  if (strcmp(prop, "MULTIPLICITY") == 0)
   {
-    Werror("ambient dimension of a fan cannot be set (implicitely given)");
-    return TRUE;
+    zc->setMultiplicity(gfan::Integer(val));
   }
-  else if (strcmp(prop, "dim")        == 0)
-    f->setDim(value);
-  else if (strcmp(prop, "complete")   == 0)
-    f->setComplete(value);
-  else if (strcmp(prop, "simplicial") == 0)
-    f->setSimplicial(value);
-  else if (strcmp(prop, "pure")       == 0)
-    f->setPure(value);
-  else
-  {
-    Werror("unexpected fan property '%s'", prop);
-    return TRUE;
-  }
-
-  return FALSE;
-}
-static BOOLEAN jjSETPROP2(leftv res, leftv u, leftv v, leftv w)
-{
-  /* method for setting cone properties;
-     valid parametrizations: (fan, string, int),
-     Errors will be invoked in the following cases:
-     - string is not 'dim';
-     Any negative value will be converted to -1 signaling
-     that the dim is unknown. */
-  Cone* c = (Cone*)u->Data();
-  char* prop = (char*)v->Data();
-  int value = (int)(long)w->Data();
-
-  if (strcmp(prop, "dim") == 0)
-    c->setDim(value);
   else
   {
     Werror("unexpected cone property '%s'", prop);
     return TRUE;
   }
-
   return FALSE;
 }
-static BOOLEAN jjADJACENCY2(leftv res, leftv u, leftv v, leftv w)
+static BOOLEAN jjSETPROPC2(leftv res, leftv u, leftv v, leftv w)
 {
-  /* method for retrieving the adjacency information concerning
-     two maximal cones of the given fan;
+  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+  char* prop = (char*)v->Data();
+  intvec* mat = (intvec*)w->Data();
+  gfan::ZMatrix zm = intmat2ZMatrix(mat);
+  int val = (int)(long)w->Data();
+
+  if (strcmp(prop, "LINEAR_FORMS") == 0)
+  {
+    zc->setLinearForms(zm);
+  }
+  else
+  {
+    Werror("unexpected cone property '%s'", prop);
+    return TRUE;
+  }
+  return FALSE;
+}
+static BOOLEAN jjCONTAINS3(leftv res, leftv u, leftv v, leftv w)
+{
+  gfan::ZCone* zc = (gfan::ZCone*)u->Data();
+  intvec* vec = (intvec*)v->Data();
+  int flag = (int)(long)w->Data();
+  gfan::ZVector zv = intvec2ZVector(vec);
+  int d1 = zc->ambientDimension();
+  int d2 = zv.size();
+  if (d1 != d2)
+    Werror("expected ambient dim of cone and size of vector\n"
+           "to be equal but got %d and %d", d1, d2);
+  if (flag)
+    res->data = (void *)(zc->containsRelatively(zv) ? 1 : 0);
+  else
+    res->data = (void *)(zc->contains(zv) ? 1 : 0);;
+  return FALSE;
+}
+static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for generating a cone object from half-lines,
+     and lines (any point in the cone being the sum of a point
+     in the convex hull of the half-lines and a point in the span
+     of the lines), and an integer k;
+     valid parametrizations: (intmat, intmat, int);
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns,
+     - k not in [0..3];
+     if the 2^0-bit of k is set, then the lineality space is known
+     to be the span of the provided lines;
+     if the 2^1-bit of k is set, then the extreme rays are known:
+     each half-line spans a (different) extreme ray */
+  intvec* rays = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* linSpace = (intvec *)v->CopyD(INTVEC_CMD);
+  if (rays->cols() != linSpace->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           rays->cols(), linSpace->cols());
+    return TRUE;
+  }
+  int k = (int)(long)w->Data();
+  if ((k < 0) || (k > 3))
+  {
+    WerrorS("expected int argument in [0..3]");
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZCone* zc = new gfan::ZCone();
+  *zc = gfan::ZCone::givenByRays(zm1, zm2);
+  //k should be passed on to zc; not available yet
+  res->data = (char *)zc;
+  return FALSE;
+}
+static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for generating a cone object from inequalities, equations,
+     and an integer k;
+     valid parametrizations: (intmat, intmat, int);
+     Errors will be invoked in the following cases:
+     - u and v have different numbers of columns,
+     - k not in [0..3];
+     if the 2^0-bit of k is set, then ... */
+  intvec* inequs = (intvec *)u->CopyD(INTVEC_CMD);
+  intvec* equs = (intvec *)v->CopyD(INTVEC_CMD);
+  if (inequs->cols() != equs->cols())
+  {
+    Werror("expected same number of columns but got %d vs. %d",
+           inequs->cols(), equs->cols());
+    return TRUE;
+  }
+  int k = (int)(long)w->Data();
+  if ((k < 0) || (k > 3))
+  {
+    WerrorS("expected int argument in [0..3]");
+    return TRUE;
+  }
+  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
+  gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
+  res->data = (char *)zc;
+  return FALSE;
+}
+static BOOLEAN jjADDADJ1(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for feeding adjacency information into the given fan;
      valid parametrizations: (fan, int, int),
      Errors will be invoked in the following cases:
-     - a maximal cone index is out of range [1..m],
-       where m is the number of maximal cones in the given fan,
-     - the two specified maximal cones are not adjacent,
-     - the two specified maximal cones are adjacent but the
-       intersection facet has not been stored in the fan */
+     - a maximal cone index is out of range [0..m-1],
+       where m is the number of maximal cones in the given fan;
+     - the two indices coincide */
   Fan* f = (Fan*)u->Data();
-  int maxCone1 = (int)(long)v->Data();
-  int maxCone2 = (int)(long)w->Data();
-  int nMaxCones = f->getMaxCones()->nr + 1;
-  if ((maxCone1 < 1) || (nMaxCones < maxCone1))
+  int i = (int)(long)v->Data();
+  int j = (int)(long)w->Data();
+  int n = f->getNumberOfMaxCones();
+  if (n == 0)
   {
-    Werror("1st index %d out of range [1..%d]",
-           maxCone1, nMaxCones);
+    WerrorS("no maximal cones defined in the given fan");
     return TRUE;
   }
-  if ((maxCone2 < 1) || (nMaxCones < maxCone2))
+  if ((i < 0) || (n <= i))
   {
-    Werror("2nd index %d out of range [1..%d]",
-           maxCone2, nMaxCones);
+    Werror("1st cone index %d out of range [0..%d]", i, n - 1);
     return TRUE;
   }
-  Cone* result = (Cone*)f->getAdjacencyFacet(maxCone1, maxCone2);
-  if (result->isNoAdj())
+  if ((j < 0) || (n <= j))
   {
-    WerrorS("specified cones are not adjacent");
+    Werror("2nd cone index %d out of range [0..%d]", j, n - 1);
     return TRUE;
   }
-  if (result->isNoFacet())
+  if (i == j)
   {
-    Werror("specified cones are adjacent, %s",
-           "but there is no facet information available");
+    WerrorS("expected two distinct maximal cone indices");
     return TRUE;
   }
-  res->data = (char*)result;
+  f->addAdjacency(i, j);
+  return FALSE;
+}
+static BOOLEAN jjADDADJ2(leftv res, leftv u, leftv v, leftv w)
+{
+  /* method for feeding adjacency information into the given fan;
+     valid parametrizations: (fan, int, intvec);
+     This method sets all adjacencies regarding the maximal cone
+     with index = second argument simultaneously.
+     Errors will be invoked in the following cases:
+     - a maximal cone index is out of range [0..m-1],
+       where m is the number of maximal cones in the given fan;
+     - the index (1st argument) appears in the intvec (2nd arg.) */
+  Fan* f = (Fan*)u->Data();
+  int i = (int)(long)v->Data();
+  intvec* jj = (intvec*)w->Data();
+  int n = f->getNumberOfMaxCones();
+  if (n == 0)
+  {
+    WerrorS("no maximal cones defined in the given fan");
+    return TRUE;
+  }
+  if ((i < 0) || (n <= i))
+  {
+    Werror("1st cone index %d out of range [0..%d]", i, n - 1);
+    return TRUE;
+  }
+  for (int j = 0; j < jj->length(); j++)
+  {
+    if (((*jj)[j] < 0) || (n <= (*jj)[j]))
+    {
+      Werror("cone index %d out of range [0..%d]", (*jj)[j], n - 1);
+      return TRUE;
+    }
+    if ((*jj)[j] == i)
+    {
+      Werror("unexpectedly found int argument %d in intvec argument", i);
+      return TRUE;
+    }
+  }
+  f->addAdjacencies(i, jj);
   return FALSE;
 }
 #endif /* HAVE_FANS */
@@ -6299,6 +6721,188 @@ static BOOLEAN jjCALL2ARG(leftv res, leftv u)
   u->next=v;
   return b;
 }
+#ifdef HAVE_FANS
+static BOOLEAN jjSETPROP1(leftv res, leftv INPUT)
+{
+  /* method for setting fan properties;
+     valid parametrizations: (fan, string, int),
+     Errors will be invoked in the following cases:
+     - types are not correct,
+     - string is neither of 'dim', 'complete', 'simplicial',
+       and 'pure';
+     A value 0 means that the property is not fulfilled.
+     1 means it is. -1 means that the answer is unknown.
+     Any value other than 0 and 1 will be converted to -1;
+     except for dim: Here, only negative values will be converted
+     to -1. */
+  leftv u = INPUT;
+  leftv v = u->next;
+  leftv w = v->next;
+  if (u->Typ() != FAN_CMD)
+  {
+    Werror("expected a fan as 1st argument");
+    return TRUE;
+  }
+  if (v->Typ() != STRING_CMD)
+  {
+    Werror("expected a string as 2nd argument");
+    return TRUE;
+  }
+  if (w->Typ() != INT_CMD)
+  {
+    Werror("expected an int as 3rd argument");
+    return TRUE;
+  }
+
+  Fan* f = (Fan*)u->Data();
+  char* prop = (char*)v->Data();
+  int value = (int)(long)w->Data();
+
+  if      (strcmp(prop, "ambientdim") == 0)
+  {
+    Werror("ambient dimension of a fan cannot be set (implicitely given)");
+    return TRUE;
+  }
+  else if (strcmp(prop, "dim")        == 0)
+    f->setDim(value);
+  else if (strcmp(prop, "complete")   == 0)
+    f->setComplete(value);
+  else if (strcmp(prop, "simplicial") == 0)
+    f->setSimplicial(value);
+  else if (strcmp(prop, "pure")       == 0)
+    f->setPure(value);
+  else
+  {
+    Werror("unexpected fan property '%s'", prop);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+static BOOLEAN jjSETPROP2(leftv res, leftv INPUT)
+{
+  /* method for setting cone properties;
+     valid parametrizations: (fan, int, string, int),
+     Errors will be invoked in the following cases:
+     - types are not correct,
+     - string is neither of 'dim', 'multiplicity', and 'weight',
+     - no maximal cones defined in the given fan,
+     - maximal cone index is out of range;
+     Any negative value will be converted to -1. */
+  leftv u = INPUT;    /* a fan */
+  leftv v = u->next;  /* a maximal cone index */
+  leftv w = v->next;  /* a string */
+  leftv x = w->next;  /* an int value */
+  if (u->Typ() != FAN_CMD)
+  {
+    Werror("expected a fan as 1st argument");
+    return TRUE;
+  }
+  if (v->Typ() != INT_CMD)
+  {
+    Werror("expected an int as 2nd argument");
+    return TRUE;
+  }
+  if (w->Typ() != STRING_CMD)
+  {
+    Werror("expected a string as 3rd argument");
+    return TRUE;
+  }
+  if (x->Typ() != INT_CMD)
+  {
+    Werror("expected an int as 4th argument");
+    return TRUE;
+  }
+
+  Fan* f = (Fan*)u->Data();
+  int index = (int)(long)v->Data();
+  char* prop = (char*)w->Data();
+  int value = (int)(long)x->Data();
+
+  int n = f->getNumberOfMaxCones();
+  if (n == 0)
+  {
+    WerrorS("no maximal cones defined in the given fan");
+    return TRUE;
+  }
+  if ((index < 0) || (n <= index))
+  {
+    Werror("cone index %d out of range [0..%d]", index, n - 1);
+    return TRUE;
+  }
+
+  if      (strcmp(prop, "dim")        == 0)
+    f->setConeDim(index, value);
+  else if (strcmp(prop, "multiplicity")   == 0)
+    f->setConeMultiplicity(index, value);
+  else if (strcmp(prop, "weight") == 0)
+    f->setConeWeight(index, value);
+  else
+  {
+    Werror("unexpected cone property '%s'", prop);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+static BOOLEAN jjADDMCONE(leftv res, leftv INPUT)
+{
+  /* method for adding a maximal cones to the given fan;
+     valid parametrizations: (fan, intvec/0, intvec/0),
+     where not both intvec arguments may be the int zero.
+     Errors will be invoked in the following cases:
+     - 2nd and 3rd argument are int's,
+     - an index in one of the intvec's is out of range;
+     In case of an error addition of the cone fails. */
+  leftv u = INPUT;
+  leftv v = u->next;
+  leftv w = v->next;
+  Fan* f;
+  intvec* ii = NULL;
+  intvec* jj = NULL;
+  int n;
+  if (u->Typ() != FAN_CMD)
+  {
+    Werror("expected a fan as 1st argument");
+    return TRUE;
+  }
+  else { f = (Fan*)u->Data(); }
+  if (v->Typ() == INTVEC_CMD)
+  {
+    ii = (intvec*)v->Data();
+    n = f->getNumberOfMaxRays();
+    for (int i = 0; i < ii->length(); i++)
+    if (((*ii)[i] < 1) || (n < (*ii)[i]))
+    {
+      Werror("max. ray index %d out of range [1..%d]", (*ii)[i], n);
+      return TRUE;
+    }
+  }
+  else if ((v->Typ() != INT_CMD) || ((int)(long)v->Data() != 0))
+  {
+    Werror("expected an intvec or the int 0 as 2nd argument");
+    return TRUE;
+  }
+  if (w->Typ() == INTVEC_CMD)
+  {
+    jj = (intvec*)w->Data();
+    n = f->getNumberOfFacetNormals();
+    for (int j = 0; j < jj->length(); j++)
+    if (((*jj)[j] < 1) || (n < (*jj)[j]))
+    {
+      Werror("facet normal index %d out of range [1..%d]", (*jj)[j], n);
+      return TRUE;
+    }
+  }
+  else if ((w->Typ() != INT_CMD) || ((int)(long)w->Data() != 0))
+  {
+    Werror("expected an intvec or the int 0 as 3rd argument");
+    return TRUE;
+  }
+  f->addMaxCone(ii, jj);
+  return FALSE;
+}
+#endif /* HAVE_FANS */
 static BOOLEAN jjCALL3ARG(leftv res, leftv u)
 {
   leftv v = u->next;
@@ -6743,128 +7347,6 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
   res->data=(char*)ll;
   return FALSE;
 }
-#ifdef HAVE_FANS
-static BOOLEAN jjADDADJ(leftv res, leftv v)
-{
-  /* method for adding one or more adjacencies between pairs of
-     maximal cones of the given fan;
-     valid parametrizations: (fan, int, int, cone),
-                             (fan, int, int, 0), or
-                             (fan, intvec, intvec, list),
-     where in the latter case, the list entries must either be
-     of type Cone* or the integer zero;
-     Errors will be invoked in the following cases:
-     - we have none of the above parametrizations,
-     - intvecs and list have different lengths,
-     - int's resp. intvec entries are out of range [1..m], where
-       m is the number of maximal cones in the given fan,
-     - int's are equal resp. intvec entries at same positions
-       are equal */
-  if ((v == NULL) || (v->next == NULL) ||
-      (v->next->next == NULL) || (v->next->next->next == NULL) ||
-      (v->next->next->next->next != NULL))
-  {
-    WerrorS("expected exactly four arguments as input");
-    return TRUE;
-  }
-  Fan* f = NULL;
-  int i; intvec* iv;
-  int j; intvec* jv;
-  Cone* c = NULL; lists L;
-  leftv x = v; bool listCase = false;
-  if (x->Typ() == FAN_CMD)
-    f = (Fan*)x->Data();
-  else
-  {
-    WerrorS("expected fan as 1st argument");
-    return TRUE;
-  }
-  x = x->next;
-  if      (x->Typ() == INT_CMD)
-    i = (int)(long)x->Data();
-  else if (x->Typ() == INTVEC_CMD)
-  {
-    iv = (intvec*)x->Data(); listCase = true;
-  }
-  else
-  {
-    WerrorS("expected int or intvec as 2nd argument");
-    return TRUE;
-  }
-  x = x->next;
-  if (listCase)
-  {
-    if ((x->Typ() != INTVEC_CMD) || ((x->next->Typ() != LIST_CMD)))
-    {
-      Werror("expected (fan, int, int, cone/0) %s",
-             "or (fan, intvec, intvec, list)");
-      return TRUE;
-    }
-    else jv = (intvec*)x->Data();
-    x = x->next;
-    L = (lists)x->Data();
-  }
-  else
-  {
-    if ((x->Typ() != INT_CMD) ||
-        ((x->next->Typ() != CONE_CMD) && (x->next->Typ() != INT_CMD)))
-    {
-      Werror("expected (fan, int, int, cone/0) %s",
-             "or (fan, intvec, intvec, list)");
-      return TRUE;
-    }
-    else j = (int)(long)x->Data();
-    x = x->next;
-    if ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0))
-    {
-      WerrorS("expected (fan, int, int, cone/0)");
-      return TRUE;
-    }
-    if (x->Typ() != INT_CMD) c = (Cone*)x->Data();
-  }
-  int n = f->getMaxCones()->nr + 1;
-  if (!listCase)
-  {
-    if ((i < 1) || (n < i))
-    { Werror("2nd argument %d out of range [1..%d]", i, n); }
-    if ((j < 1) || (n < j))
-    { Werror("3rd argument %d out of range [1..%d]", j, n); }
-    if (i == j)
-    { WerrorS("2nd and 3rd argument are equal"); }
-    f->addAdjacency(i, j, c);
-  }
-  else
-  {
-    if (iv->length() != jv->length())
-      WerrorS("2nd and 3rd argument have different lengths");
-    if (iv->length() != L->nr + 1)
-      WerrorS("2nd and 4th argument have different lengths");
-    for (i = 0; i < iv->length(); i++)
-    {
-      if (((*iv)[i] < 1) || (n < (*iv)[i]))
-        Werror("index %d at position %d in 2nd argument out of range [1..%d]",
-               (*iv)[i], i + 1, n);
-    }
-    for (j = 0; j < jv->length(); j++)
-    {
-      if (((*jv)[j] < 1) || (n < (*jv)[j]))
-        Werror("index %d at position %d in 3rd argument out of range [1..%d]",
-               (*jv)[j], j + 1, n);
-      if ((*iv)[j] == (*jv)[j])
-        Werror("indices in 2nd and 3rd argument at position %d equal", j + 1);
-    }
-    for (i = 0; i < L->nr + 1; i++)
-    {
-      if ((L->m[i].Typ() != CONE_CMD) &&
-          ((L->m[i].Typ() != INT_CMD) || ((int)(long)L->m[i].Data() != 0)))
-        Werror("entry at position %d in 4th argument neither cone nor int 0",
-               i + 1);
-    }
-    f->addAdjacencies(iv, jv, L);
-  }
-  return FALSE;
-}
-#endif /* HAVE_FANS */
 static BOOLEAN jjINTVEC_PL(leftv res, leftv v)
 {
   int i=0;

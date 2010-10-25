@@ -883,6 +883,14 @@ else
   fi
 fi
 
+AC_MSG_CHECKING(gfanlib)
+if test "$enable_gfanlib" = yes; then
+  AC_MSG_RESULT(yes)
+  NEED_LIBS="${NEED_LIBS} -lgfan -lcddgmp"
+else
+  AC_MSG_RESULT(can not build with gfan lib)
+fi
+
 AC_MSG_CHECKING(whether to use libsvd)
 if test "$with_svd" = yes; then
   AC_MSG_RESULT(yes)

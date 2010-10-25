@@ -5267,6 +5267,14 @@ else
   fi
 fi
 
+echo $ac_n "checking gfan lib""... $ac_c" 1>&6
+if test "$enable_gfanlib" = yes; then
+  echo "yes"
+  NEED_LIBS="${NEED_LIBS} -lcddgmp -lgfan"
+else
+  echo "no"
+fi
+
 echo $ac_n "checking whether to use libsvd""... $ac_c" 1>&6
 echo "configure:5272: checking whether to use libsvd" >&5
 if test "$with_svd" = yes; then

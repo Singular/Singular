@@ -162,6 +162,10 @@ int operator== ( const Substitution<T> &f1, const Substitution<T> &f2 )
   template class ListIterator<fglmDelem>;
 #endif
 
+#ifdef HAVE_FANS
+#include <gfanlib/gfanlib.h>
+#endif
+
 // ----------------------------------------------------------------------------
 //  kmatrix.cc
 //  begin of file
@@ -259,5 +263,12 @@ template class std::list<IntMinorValue>;
 template class std::list<PolyMinorValue>;
 template class Cache<MinorKey, IntMinorValue>;
 template class Cache<MinorKey, PolyMinorValue>;
+#endif
+
+#ifdef HAVE_FANS
+template class gfan::Vector<gfan::Integer>;
+template class gfan::Vector<gfan::Rational>;
+template class gfan::Matrix<gfan::Integer>;
+template class gfan::Matrix<gfan::Rational>;
 #endif
 //template int pos_helper(kStrategy strat, poly p, int len, intset setL, polyset set);

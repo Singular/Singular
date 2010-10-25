@@ -40,7 +40,7 @@
 #include <Singular/ipshell.h>
 #include <kernel/sca.h>
 #include <Singular/Fan.h>
-#include <Singular/Cone.h>
+#include <gfanlib/gfanlib.h>
 
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv res, leftv a)
@@ -347,12 +347,12 @@ static BOOLEAN jiA_CONE(leftv res, leftv a, Subexpr e)
   }
   if (res->data!=NULL)
   {
-    Cone* ccc = (Cone*)res->data;
+    gfan::ZCone* zc = (gfan::ZCone*)res->data;
     res->data = NULL;
-    delete ccc;
+    delete zc;
   }
-  Cone* ccc = (Cone*)a->CopyD(CONE_CMD);
-  res->data=(void*)ccc;
+  gfan::ZCone* zc = (gfan::ZCone*)a->CopyD(CONE_CMD);
+  res->data=(void*)zc;
   return FALSE;
 }
 #endif /* HAVE_FANS */
@@ -1393,12 +1393,6 @@ BOOLEAN jjAssignFan(leftv l, leftv r)
     WerrorS("vector space dims do not agree (1st vs. 3rd argument)");
     return TRUE;
   }
-  if ((facetNs != NULL) && (linSpace != NULL) &&
-      (facetNs->rows() != linSpace->rows()))
-  {
-    WerrorS("vector space dims do not agree (2nd vs. 3rd argument)");
-    return TRUE;
-  }
 
   if (IDDATA((idhdl)l->data) != NULL)
   {
@@ -1412,73 +1406,27 @@ BOOLEAN jjAssignFan(leftv l, leftv r)
 BOOLEAN jjAssignCone(leftv l, leftv r)
 {
   /* method for generating a cone;
-     valid parametrizations: (fan, intvec or 0, intvec or 0),
-     The intvec's capture indices of the maximal rays resp.
-     facet normals of the given fan.
-     2nd and 3rd argument may be the int 0, but not simultaneously.
+     valid parametrizations: int (ambient dimension),
      Errors will be invoked in the following cases:
-     - 2nd and 3rd argument simultaneously the int 0,
-     - invalid index for maximal row or facet normal */
-  Fan* fff = NULL;           /* the Fan where maximal rays and/or
-                                facet normals are stored */
-  intvec* maxRays = NULL;    /* indices of maximal rays */
-  intvec* facetNs = NULL;    /* indices of facet normals */
-
-  leftv x = r;
-  if (x->Typ() != FAN_CMD)
+     - argument < 0 */
+  if (r->Typ() != INT_CMD)
   {
-    WerrorS("expected a fan as 1st argument");
+    WerrorS("expected an int as argument");
     return TRUE;
   }
-  else
+  int ambientDim = (int)(long)r->Data();
+  if (ambientDim < 0)
   {
-    fff = (Fan*)x->Data();
-  }
-  x = x->next;
-  if (x->Typ() == INTVEC_CMD) maxRays = (intvec*)x->Data();
-  else if ((x->Typ() != INT_CMD) ||
-           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
-  {
-    WerrorS("expected '0' or an intvec as 2nd argument");
+    Werror("expected an int >= 0, but got %d", ambientDim);
     return TRUE;
   }
-  x = x->next;
-  if (x->Typ() == INTVEC_CMD) facetNs = (intvec*)x->Data();
-  else if ((x->Typ() != INT_CMD) ||
-           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
-  {
-    WerrorS("expected '0' or an intvec as 3rd argument");
-    return TRUE;
-  }
-  if ((maxRays == NULL) && (facetNs == NULL))
-  {
-    WerrorS("expected 2nd or 3rd argument to be a valid intvec");
-    return TRUE;
-  }
-  
-  int check = Cone::checkConeData(fff, maxRays, facetNs);
-  if (check > 0)
-  {
-    Werror("invalid index %d for maximal ray at position %d",
-           (int)(long)((*maxRays)[check - 1]), check);
-    return TRUE;
-  }
-  else if (check < 0)
-  {
-    char h[150];
-    sprintf(h, "invalid index %d for facet normal at position %d",
-               (int)(long)((*facetNs)[-check - 1]), -check);
-    WerrorS(h);
-    return TRUE;
-  }
-
   if (IDDATA((idhdl)l->data) != NULL)
   {
-    Cone* ccc = (Cone*)IDDATA((idhdl)l->data);
-    delete ccc;
+    gfan::ZCone* zc = (gfan::ZCone*)IDDATA((idhdl)l->data);
+    delete zc;
   }
-  Cone* ccc = new Cone(fff, maxRays, facetNs);
-  IDDATA((idhdl)l->data) = (char*)ccc;
+  gfan::ZCone* zc = new gfan::ZCone(ambientDim);
+  IDDATA((idhdl)l->data) = (char*)zc;
   return FALSE;
 }
 #endif /* HAVE_FANS */
@@ -1541,7 +1489,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
     }
     rl=r->listLength();
     if (rl==1)
-    {
+    {               
+#ifdef HAVE_FANS
+      if ((l->Typ() == CONE_CMD) && (r->Typ() == INT_CMD))
+        return jjAssignCone(l, r);
+#endif
       /* system variables = ... */
       if(((l->rtyp>=VECHO)&&(l->rtyp<=VPRINTLEVEL))
       ||((l->rtyp>=VALTVARS)&&(l->rtyp<=VMINPOLY)))
@@ -1606,10 +1558,6 @@ BOOLEAN iiAssign(leftv l, leftv r)
     else if ((lt == FAN_CMD) && (rl == 3))
     {
       return jjAssignFan(l, r);
-    }
-    else if ((lt == CONE_CMD) && (rl == 3))
-    {
-      return jjAssignCone(l, r);
     }
 #endif /* HAVE_FANS */
     if (rt==NONE) rt=r->Typ();
