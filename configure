@@ -593,12 +593,12 @@ pwd=`pwd`
 # pass them indirectly to subsequent configures
 SINGULAR_MAJOR_VERSION=3
 SINGULAR_MINOR_VERSION=1
-SINGULAR_SUB_VERSION=2
+SINGULAR_SUB_VERSION=1
 VERSION_SEP="-"
 SINGULAR_SHORT_VERSION="${SINGULAR_MAJOR_VERSION}${VERSION_SEP}${SINGULAR_MINOR_VERSION}"
 SINGULAR_VERSION="${SINGULAR_SHORT_VERSION}${VERSION_SEP}${SINGULAR_SUB_VERSION}"
 SINGULAR_RPM_VERSION="${SINGULAR_MAJOR_VERSION}.${SINGULAR_MINOR_VERSION}.${SINGULAR_SUB_VERSION}"
-VERSION_DATE="Oct 2010"
+VERSION_DATE="Feb 2010"
 SINGULAR_ROOT_DIR=$pwd
 
 export SINGULAR_MINOR_VERSION
@@ -2281,32 +2281,15 @@ fi
   fi
 fi
 
-echo $ac_n "checking whether to configure and build gmp lib""... $ac_c" 1>&6
-echo "configure:2286: checking whether to configure and build gmp lib" >&5
-if test "$enable_gmp" != yes && test "$enable_gmp" != no; then
-  if test "$ac_gmp_ok" != yes && test -d gmp; then
+echo $ac_n "checking whether to configure and build gfan lib""... $ac_c" 1>&6
+echo "configure:2286: checking whether to configure and build gfan lib" >&5
+if test "$enable_gfanlib" = yes; then
+  if test -d gfanlib; then
     echo "$ac_t""yes" 1>&6
-    enable_gmp=yes
-    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
-    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gmp"
-    ac_configure_args="$ac_configure_args --enable-gmp"
-    enable_gmp=yes
-#    This we used to need for our patched version of gmp 2.x
-#    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
+    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gfanlib"
+    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gfanlib"
   else
     echo "$ac_t""no" 1>&6
-    enable_gmp=no
-  fi
-elif test "$enable_gmp" = yes; then
-  if test ! -d gmp; then
-    echo "$ac_t""no" 1>&6
-    { echo "configure: error: Can not find gmp subdir" 1>&2; exit 1; }
-  else
-    echo "$ac_t""yes" 1>&6
-    CONFIG_SUBDIRS="$CONFIG_SUBDIRS gmp"
-    BUILD1_SUBDIRS="$BUILD1_SUBDIRS gmp"
-#    This we used to need for our patched version of gmp 2.x
-#    OUTPUT_MAKEFILES="$OUTPUT_MAKEFILES gmp/Makefile.in"
   fi
 else
   echo "$ac_t""no" 1>&6
@@ -3375,8 +3358,6 @@ if test "$no_recursion" != yes; then
     *) ac_sub_configure_args="$ac_sub_configure_args $ac_arg" ;;
     esac
   done
-  CONFIG_SUBDIRS="$CONFIG_SUBDIRS gfanlib"
-  BUILDSUBDIRS1="$BUILDSUBDIRS1 gfanlib" 
 
   for ac_config_dir in $CONFIG_SUBDIRS; do
 
