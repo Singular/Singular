@@ -1048,16 +1048,35 @@ void mpTrafo(
                         ppMult_nn(MATELEM(H,2,1), trace));
   MATELEM(c,3,1) = ppMult_qq(MATELEM(H,2,1), MATELEM(H,3,2));
   nDelete(&trace); nDelete(&det);
-  
-  matrix uVec; matrix hMat;
-  tmp1 = hessenbergStep(c, uVec, hMat, tolerance); nDelete(&tmp1);
-  /* now replace H by hMat * H * hMat: */
-  matrix wMat = mpMult(hMat, H); idDelete((ideal*)&H);
-  matrix H1 = mpMult(wMat, hMat);
-  idDelete((ideal*)&wMat); idDelete((ideal*)&hMat);
-  /* now need to re-establish Hessenberg form of H1 and put it in H */
-  hessenberg(H1, wMat, H, tolerance);
-  idDelete((ideal*)&wMat); idDelete((ideal*)&H1);
+
+  /* for applying hessenbergStep, we need to make sure that c[1, 1] is
+     not zero */
+  if ((MATELEM(c,1,1) != NULL) &&
+      ((MATELEM(c,2,1) != NULL) || (MATELEM(c,3,1) != NULL)))  
+  {
+    matrix uVec; matrix hMat;
+    tmp1 = hessenbergStep(c, uVec, hMat, tolerance); nDelete(&tmp1);
+    /* now replace H by hMat * H * hMat: */
+    matrix wMat = mpMult(hMat, H); idDelete((ideal*)&H);
+    matrix H1 = mpMult(wMat, hMat);
+    idDelete((ideal*)&wMat); idDelete((ideal*)&hMat);
+    /* now need to re-establish Hessenberg form of H1 and put it in H */
+    hessenberg(H1, wMat, H, tolerance);
+    idDelete((ideal*)&wMat); idDelete((ideal*)&H1);
+  }
+  else if ((MATELEM(c,1,1) == NULL) && (MATELEM(c,2,1) != NULL))
+  {
+    swapRows(1, 2, H);
+    swapColumns(1, 2, H);
+  }
+  else if ((MATELEM(c,1,1) == NULL) && (MATELEM(c,3,1) != NULL))
+  {
+    swapRows(1, 3, H);
+    swapColumns(1, 3, H);
+  }
+  else
+  { /* c is the zero vector or a multiple of e_1;
+       no hessenbergStep needed */ }
 }
 
 /* helper for qrDoubleShift */
