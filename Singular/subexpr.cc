@@ -37,7 +37,10 @@
 #include <kernel/syz.h>
 #include <Singular/attrib.h>
 #include <Singular/subexpr.h>
+
+#ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
+#endif
 
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));

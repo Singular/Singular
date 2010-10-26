@@ -39,7 +39,10 @@
 #include <Singular/silink.h>
 #include <Singular/ipshell.h>
 #include <kernel/sca.h>
+
+#ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
+#endif
 
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv res, leftv a)
