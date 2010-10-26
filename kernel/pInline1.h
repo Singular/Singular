@@ -113,15 +113,10 @@ PINLINE1 poly p_LmInit(poly p, const ring r)
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
-  p_ExpVectorCopy(np, p, r);
+  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
   pNext(np) = NULL;
   pSetCoeff0(np, NULL);
   return np;
-}
-PINLINE1 poly p_LmInit(poly s_p, const ring s_r, const ring d_r)
-{
-  pAssume1(d_r != NULL);
-  return p_LmInit(s_p, s_r, d_r, d_r->PolyBin);
 }
 PINLINE1 poly p_LmInit(poly s_p, const ring s_r, const ring d_r, omBin d_bin)
 {
@@ -140,6 +135,11 @@ PINLINE1 poly p_LmInit(poly s_p, const ring s_r, const ring d_r, omBin d_bin)
   p_Setm(d_p, d_r);
   return d_p;
 }
+PINLINE1 poly p_LmInit(poly s_p, const ring s_r, const ring d_r)
+{
+  pAssume1(d_r != NULL);
+  return p_LmInit(s_p, s_r, d_r, d_r->PolyBin);
+}
 PINLINE1 poly p_Head(poly p, const ring r)
 {
   if (p == NULL) return NULL;
@@ -147,7 +147,7 @@ PINLINE1 poly p_Head(poly p, const ring r)
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
-  p_ExpVectorCopy(np, p, r);
+  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
   pNext(np) = NULL;
   pSetCoeff0(np, n_Copy(pGetCoeff(p), r));
   return np;
@@ -162,7 +162,7 @@ PINLINE1 poly p_GetExp_k_n(poly p, int l, int k, const ring r)
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
-  p_ExpVectorCopy(np, p, r);
+  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
   pNext(np) = NULL;
   pSetCoeff0(np, n_Init(1, r));
   int i;

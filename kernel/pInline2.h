@@ -369,12 +369,11 @@ PINLINE2 unsigned long p_GetMaxExp(poly p, ring r)
   return p_GetMaxExp(p_GetMaxExpL(p, r), r);
 }
 
-PINLINE2 unsigned long
-p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps)
+PINLINE2 unsigned long p_GetMaxExp(const unsigned long l, const ring r)
 {
   unsigned long bitmask = r->bitmask;
   unsigned long max = (l & bitmask);
-  unsigned long j = number_of_exps - 1;
+  unsigned long j = r->ExpPerLong - 1;
 
   if (j > 0)
   {
@@ -391,11 +390,6 @@ p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps)
     }
   }
   return max;
-}
-
-PINLINE2 unsigned long p_GetMaxExp(const unsigned long l, const ring r)
-{
-  return p_GetMaxExp(l, r, r->ExpPerLong);
 }
 
 PINLINE2 unsigned long
