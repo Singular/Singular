@@ -83,7 +83,7 @@ typedef struct
 
 char *idhdl2id(idhdl pck, idhdl h);
 void  iiname2hdl(const char *name, idhdl *pck, idhdl *id);
-idhdl enterid(const char * a, int lev, int t, idhdl* root, BOOLEAN init=TRUE);
+idhdl enterid(const char * a, int lev, int t, idhdl* root, BOOLEAN init=TRUE, BOOLEAN serach=TRUE);
 idhdl ggetid(const char *n);
 idhdl ggetid(const char *n, BOOLEAN local, idhdl *packhdl);
 void  killid(const char * a, idhdl * i);

@@ -28,7 +28,10 @@
 #include <Singular/silink.h>
 #include <kernel/syz.h>
 #include <Singular/ipid.h>
+
+#ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
+#endif
 
 #ifdef HAVE_DYNAMIC_LOADING
 #include <kernel/mod_raw.h>
@@ -225,8 +228,7 @@ char * idrec::String()
   return tmp.String();
 }
 
-//#define KAI
-idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init)
+idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init, BOOLEAN search)
 {
   idhdl h;
   s=omStrDup(s);
@@ -251,27 +253,8 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init)
         goto errlabel;
     }
   }
-  // is it already defined in idroot ?
-  else if (*root != IDROOT)
-  {
-    if ((h=IDROOT->get(s,lev))!=NULL)
-    {
-      if (IDLEV(h)==lev)
-      {
-        if ((IDTYP(h) == t)||(t==DEF_CMD))
-        {
-          if (BVERBOSE(V_REDEFINE))
-            Warn("redefining %s **",s);
-          if (s==IDID(h)) IDID(h)=NULL;
-          killhdl2(h,&IDROOT,NULL);
-        }
-        else
-          goto errlabel;
-      }
-    }
-  }
   // is it already defined in currRing->idroot ?
-  else if ((currRing!=NULL)&&((*root) != currRing->idroot))
+  else if (search && (currRing!=NULL)&&((*root) != currRing->idroot))
   {
     if ((h=currRing->idroot->get(s,lev))!=NULL)
     {
@@ -283,6 +266,25 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init)
             Warn("redefining %s **",s);
           IDID(h)=NULL;
           killhdl2(h,&currRing->idroot,currRing);
+        }
+        else
+          goto errlabel;
+      }
+    }
+  }
+  // is it already defined in idroot ?
+  else if (search && (*root != IDROOT))
+  {
+    if ((h=IDROOT->get(s,lev))!=NULL)
+    {
+      if (IDLEV(h)==lev)
+      {
+        if ((IDTYP(h) == t)||(t==DEF_CMD))
+        {
+          if (BVERBOSE(V_REDEFINE))
+            Warn("redefining `%s` **",s);
+          if (s==IDID(h)) IDID(h)=NULL;
+          killhdl2(h,&IDROOT,NULL);
         }
         else
           goto errlabel;
@@ -302,7 +304,6 @@ idhdl enterid(const char * s, int lev, int t, idhdl* root, BOOLEAN init)
     omFree((ADDRESS)s);
     return NULL;
 }
-
 void killid(const char * id, idhdl * ih)
 {
   if (id!=NULL)
@@ -501,13 +502,6 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
 
   //  general  -------------------------------------------------------------
   // now dechain it and delete idrec
-#ifdef KAI
-  if(h->next != NULL)
-    Print("=======>%s(%x) -> %s<====\n", IDID(h), IDID(h), IDID(h->next));
-  else
-    Print("=======>%s(%x)<====\n", IDID(h), IDID(h));
-#endif
-
   if (IDID(h)!=NULL) // OB: ?????
     omFree((ADDRESS)IDID(h));
   IDID(h)=NULL;
@@ -824,3 +818,4 @@ idhdl packFindHdl(package r)
   }
   return NULL;
 }
+>>>>>>> .r13569

@@ -1623,7 +1623,7 @@ YY_RULE_SETUP
              if( mode == LOAD_LIB)
              {
                h0 = enterid( proc, 0 /*myynest*/, PROC_CMD,
-                                 &(IDPACKAGE(pl)->idroot), TRUE);
+                                 &(IDPACKAGE(pl)->idroot), TRUE, !p_static);
                if (h0==NULL) return(1);
                if((!p_static) && autoexport)
                {

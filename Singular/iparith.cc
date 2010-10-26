@@ -68,7 +68,10 @@
 
 #include <Singular/ipshell.h>
 #include <kernel/mpr_inout.h>
+
+#ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
+#endif
 
 #include <kernel/timer.h>
 
