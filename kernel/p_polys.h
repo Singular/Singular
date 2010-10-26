@@ -192,13 +192,13 @@ PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
 // return the maximal exponent of p
 PINLINE2 unsigned long p_GetMaxExp(poly p, ring r);
 // return the maximal exponent of p in form of the maximal long var
-unsigned long p_GetMaxExpL(poly p, ring r, unsigned long l_max = 0);
+unsigned long p_GetMaxExpL(poly p, const ring r, unsigned long l_max = 0);
 // return monomial r such that GetExp(r,i) is maximum of all
 // monomials in p; coeff == 0, next == NULL, ord is not set
 poly p_GetMaxExpP(poly p, ring r);
 
 // suppose that l is a long var in r, return maximal exponent of l
-PINLINE2 unsigned long p_GetMaxExp(unsigned long l, ring r);
+PINLINE2 unsigned long p_GetMaxExp(const unsigned long l, const ring r);
 
 // return the TotalDegree of the long var l
 PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);

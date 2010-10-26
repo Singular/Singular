@@ -364,7 +364,7 @@ PINLINE2 int p_Cmp(poly p1, poly p2, ring r)
   return p_LmCmp(p1,p2,r);
 }
 
-PINLINE2 unsigned long p_GetMaxExp(poly p, ring r)
+PINLINE2 unsigned long p_GetMaxExp(const poly p, const ring r)
 {
   return p_GetMaxExp(p_GetMaxExpL(p, r), r);
 }
