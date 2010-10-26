@@ -13,9 +13,6 @@
 #include <unistd.h>
 
 #include <kernel/mod2.h>
-#ifdef HAVE_FANS
-#include <sstream>
-#endif
 #include <kernel/intvec.h>
 #include <Singular/tok.h>
 #include <kernel/options.h>
@@ -40,7 +37,6 @@
 #include <kernel/syz.h>
 #include <Singular/attrib.h>
 #include <Singular/subexpr.h>
-#include <Singular/Fan.h>
 #include <gfanlib/gfanlib.h>
 
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
@@ -68,6 +64,7 @@ int sleftv::listLength()
 }
 
 #ifdef HAVE_FANS
+#include <sstream>
 std::string toString(gfan::ZMatrix const &m, char *tab=0)
 {
   std::stringstream s;
@@ -233,7 +230,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
 #ifdef HAVE_FANS
        case CONE_CMD:
-       case FAN_CMD:
+       //case FAN_CMD:
           PrintNSpaces(spaces);
           {
             char *s = String();
@@ -576,12 +573,12 @@ static inline void * s_internalCopy(const int t,  void *d)
         return d;
       }
 #ifdef HAVE_FANS
-    case FAN_CMD:
+/*    case FAN_CMD:
       {
         Fan* fff = (Fan*)d;
         Fan* ggg = new Fan(*fff);
         return ggg;
-      }
+      }*/
     case CONE_CMD:
       {
         gfan::ZCone* zc = (gfan::ZCone*)d;
@@ -876,7 +873,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           return s;
 #ifdef HAVE_FANS
-        case FAN_CMD:
+/*        case FAN_CMD:
         {
           Fan* fff = (Fan*)d;
           s = fff->toString();
@@ -885,7 +882,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           omCheckAddr(ns);
           omFree(s);
           return ns;
-        }
+        }*/
         case CONE_CMD:
         {
           gfan::ZCone* zc = (gfan::ZCone*)d;
@@ -893,7 +890,6 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
           sprintf(ns, "%s", s.c_str());
           omCheckAddr(ns);
-          omFree(s);
           return ns;
         }
 #endif /* HAVE_FANS */

@@ -68,8 +68,6 @@
 
 #include <Singular/ipshell.h>
 #include <kernel/mpr_inout.h>
-#include <Singular/Fan.h>
-#include <Singular/Cone.h>
 #include <gfanlib/gfanlib.h>
 
 #include <kernel/timer.h>
@@ -3320,6 +3318,7 @@ static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
   res->data = (char *)zc;
   return FALSE;
 }
+/*
 static BOOLEAN jjDELMCONE2(leftv res, leftv u, leftv v)
 {
   /* method for deleting a maximal cone from the given fan;
@@ -3327,7 +3326,7 @@ static BOOLEAN jjDELMCONE2(leftv res, leftv u, leftv v)
      Errors will be invoked in the following cases:
      - the given index is out of range [0..m-1], where m is
        the number of maximal cones in the given fan */
-  Fan* f = (Fan*)u->Data();
+/*  Fan* f = (Fan*)u->Data();
   int index = (int)(long)v->Data();
   int n = f->getNumberOfMaxCones();
   if (n == 0)
@@ -3355,7 +3354,7 @@ static BOOLEAN jjDELMCONE3(leftv res, leftv u, leftv v)
        fan;
      The method does not check whether the given indices are
      mutually distinct. This is however assumed by this method. */
-  Fan* f = (Fan*)u->Data();
+/*  Fan* f = (Fan*)u->Data();
   intvec* iv = (intvec*)v->Data();
   int n = f->getNumberOfMaxCones();
   if (n == 0)
@@ -3380,7 +3379,7 @@ static BOOLEAN jjMAXCONE1(leftv res, leftv u, leftv v)
      - maximal cones not yet set in the fan,
      - maximal cone index out of range;
      The method returns an object of type cone. */
-  Fan* f = (Fan*)u->Data();
+/*  Fan* f = (Fan*)u->Data();
   int index = (int)(long)v->Data();
   int n = f->getNumberOfMaxCones();
   if (n == 0)
@@ -3406,7 +3405,7 @@ static BOOLEAN jjMAXCONE2(leftv res, leftv u, leftv v)
      - maximal cones not yet set in the fan,
      - cone index out of range;
      The method returns a list of cone objects. */
-  Fan* f = (Fan*)u->Data();
+/*  Fan* f = (Fan*)u->Data();
   intvec* iv = (intvec*)v->Data();
   int n = f->getNumberOfMaxCones();
   if (n == 0)
@@ -3432,7 +3431,7 @@ static BOOLEAN jjGETPROP1(leftv res, leftv u, leftv v)
      - fan has so far only been instantiated by "fan f;",
      - string is neither of 'ambientdim', 'dim', 'complete',
        'simplicial', 'pure' */
-  Fan* f = (Fan*)u->Data();
+/*  Fan* f = (Fan*)u->Data();
   char* prop = (char*)v->Data();
   int result;
 
@@ -3460,7 +3459,7 @@ static BOOLEAN jjGETPROP1(leftv res, leftv u, leftv v)
 
   res->data = (void*)result;
   return FALSE;
-}
+}*/
 static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
 {
   /* method for retrieving cone properties;
@@ -3631,6 +3630,7 @@ static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
+/*
 static BOOLEAN jjADJACENCY2(leftv res, leftv u, leftv v)
 {
   /* method for retrieving all maximal cones in the given fan that
@@ -3641,7 +3641,7 @@ static BOOLEAN jjADJACENCY2(leftv res, leftv u, leftv v)
        where m is the number of maximal cones in the given fan;
      In case there are no neighbours (yet) of the specified maximal
      cone, the method returns an intvec of length one with entry zero. */
-  Fan* f = (Fan*)u->Data();
+/*  Fan* f = (Fan*)u->Data();
   int maxCone = (int)(long)v->Data();
   int nMaxCones = f->getNumberOfMaxCones();
   if ((maxCone < 0) || (nMaxCones <= maxCone))
@@ -3654,7 +3654,7 @@ static BOOLEAN jjADJACENCY2(leftv res, leftv u, leftv v)
   result = ivCopy(result);
   res->data = (char*)result;
   return FALSE;
-}
+}*/
 #endif /* HAVE_FANS */
 static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
 {
@@ -4968,7 +4968,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case LINK_CMD:       res->data=omStrDup("link"); break;
     case RESOLUTION_CMD: res->data=omStrDup("resolution");break;
 #ifdef HAVE_FANS
-    case FAN_CMD:        res->data=omStrDup("fan");break;
+//    case FAN_CMD:        res->data=omStrDup("fan");break;
     case CONE_CMD:       res->data=omStrDup("cone");break;
 #endif /* HAVE_FANS */
     case DEF_CMD:
@@ -5046,11 +5046,12 @@ static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
   res->data = (char *)zc;
   return FALSE;
 }
+/*
 static BOOLEAN jjDELMCONE1(leftv res, leftv v)
 {
   /* method for deleting all maximal cones from a given fan;
      valid parametrizations: (fan) */
-  Fan* f = (Fan*)v->Data();
+/*  Fan* f = (Fan*)v->Data();
   int n = f->getNumberOfMaxCones();
   intvec* iv = new intvec(1, n, 0);
   for (int i = 1; i <= n; i++)
@@ -5066,11 +5067,11 @@ static BOOLEAN jjMAXRAYS1(leftv res, leftv v)
      If there are no maximal rays, the method returns a 1x1
      matrix with entry 0. Otherwise the returned matrix contains
      the maximal rays as row vectors. */
-  Fan* f = (Fan*)v->Data();
+/*  Fan* f = (Fan*)v->Data();
   intvec* result = NULL;
   if (f->getMaxRays() == NULL)
     /* return a 1x1 matrix with sole entry zero */
-    result = new intvec(1, 1, 0);
+/*    result = new intvec(1, 1, 0);
   else
     result = ivCopy(f->getMaxRays());
   res->data = (char*)result;
@@ -5083,11 +5084,11 @@ static BOOLEAN jjMAXRAYS2(leftv res, leftv v)
      If there are no maximal rays, the method returns a 1x1
      matrix with entry 0. Otherwise the returned matrix contains
      the maximal rays as row vectors. */
-  Cone* c = (Cone*)v->Data();
+/*  Cone* c = (Cone*)v->Data();
   intvec* result = NULL;
   if (c->getMaxRays() == NULL)
     /* return a 1x1 matrix with sole entry zero */
-    result = new intvec(1, 1, 0);
+/*    result = new intvec(1, 1, 0);
   else
     result = ivCopy(c->getMaxRays());
   res->data = (char*)result;
@@ -5100,11 +5101,11 @@ static BOOLEAN jjFACETNS1(leftv res, leftv v)
      If there are no facet normals, a 1x1 matrix with entry 0
      is returned; otherwise a matrix the rows of which are
      the facet normals of the given fan. */
-  Fan* f = (Fan*)v->Data();
+/*  Fan* f = (Fan*)v->Data();
   intvec* result = NULL;
   if (f->getFacetNs() == NULL)
     /* return a 1x1 matrix with sole entry zero */
-    result = new intvec(1, 1, 0);
+/*    result = new intvec(1, 1, 0);
   else
     result = ivCopy(f->getFacetNs());
   res->data = (char*)result;
@@ -5117,11 +5118,11 @@ static BOOLEAN jjFACETNS2(leftv res, leftv v)
      If there are no facet normals, a 1x1 matrix with entry 0
      is returned; otherwise a matrix the rows of which are
      the facet normals of the given cone. */
-  Cone* c = (Cone*)v->Data();
+/*  Cone* c = (Cone*)v->Data();
   intvec* result = NULL;
   if (c->getFacetNs() == NULL)
     /* return a 1x1 matrix with sole entry zero */
-    result = new intvec(1, 1, 0);
+/*    result = new intvec(1, 1, 0);
   else
     result = ivCopy(c->getFacetNs());
   res->data = (char*)result;
@@ -5131,7 +5132,7 @@ static BOOLEAN jjLINSPACE1(leftv res, leftv v)
 {
   /* method for retrieving the lineality space of the given fan;
      valid parametrizations: (fan) */
-  Fan* f = (Fan*)v->Data();
+/*  Fan* f = (Fan*)v->Data();
   intvec* result = ivCopy(f->getLinSpace());
   res->data = (char*)result;
   return FALSE;
@@ -5140,7 +5141,7 @@ static BOOLEAN jjLINSPACE2(leftv res, leftv v)
 {
   /* method for retrieving the lineality space of the given cone;
      valid parametrizations: (cone) */
-  Cone* c = (Cone*)v->Data();
+/*  Cone* c = (Cone*)v->Data();
   intvec* result = ivCopy(c->getLinSpace());
   res->data = (char*)result;
   return FALSE;
@@ -5154,7 +5155,7 @@ static BOOLEAN jjADJACENCY1(leftv res, leftv v)
      The method returns a list with an entry for each maximal cone
      in the given fan. Each such entry is an intvec with the indices
      of all neighbouring maximal cones. */
-  Fan* f = (Fan*)v->Data();
+/*  Fan* f = (Fan*)v->Data();
   if (f->getNumberOfMaxCones() == 0)
   {
     WerrorS("no maximal cones defined yet");
@@ -5164,7 +5165,7 @@ static BOOLEAN jjADJACENCY1(leftv res, leftv v)
   adjacencyList = lCopy(adjacencyList);
   res->data = (char*)adjacencyList;
   return FALSE;
-}
+}*/
 #endif /* HAVE_FANS */
 static BOOLEAN jjLOAD1(leftv res, leftv v)
 {
@@ -6569,6 +6570,7 @@ static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
   res->data = (char *)zc;
   return FALSE;
 }
+/*
 static BOOLEAN jjADDADJ1(leftv res, leftv u, leftv v, leftv w)
 {
   /* method for feeding adjacency information into the given fan;
@@ -6577,7 +6579,7 @@ static BOOLEAN jjADDADJ1(leftv res, leftv u, leftv v, leftv w)
      - a maximal cone index is out of range [0..m-1],
        where m is the number of maximal cones in the given fan;
      - the two indices coincide */
-  Fan* f = (Fan*)u->Data();
+/*  Fan* f = (Fan*)u->Data();
   int i = (int)(long)v->Data();
   int j = (int)(long)w->Data();
   int n = f->getNumberOfMaxCones();
@@ -6614,7 +6616,7 @@ static BOOLEAN jjADDADJ2(leftv res, leftv u, leftv v, leftv w)
      - a maximal cone index is out of range [0..m-1],
        where m is the number of maximal cones in the given fan;
      - the index (1st argument) appears in the intvec (2nd arg.) */
-  Fan* f = (Fan*)u->Data();
+/*  Fan* f = (Fan*)u->Data();
   int i = (int)(long)v->Data();
   intvec* jj = (intvec*)w->Data();
   int n = f->getNumberOfMaxCones();
@@ -6643,7 +6645,7 @@ static BOOLEAN jjADDADJ2(leftv res, leftv u, leftv v, leftv w)
   }
   f->addAdjacencies(i, jj);
   return FALSE;
-}
+}*/
 #endif /* HAVE_FANS */
 static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
 {
@@ -6722,6 +6724,7 @@ static BOOLEAN jjCALL2ARG(leftv res, leftv u)
   return b;
 }
 #ifdef HAVE_FANS
+/*
 static BOOLEAN jjSETPROP1(leftv res, leftv INPUT)
 {
   /* method for setting fan properties;
@@ -6735,7 +6738,7 @@ static BOOLEAN jjSETPROP1(leftv res, leftv INPUT)
      Any value other than 0 and 1 will be converted to -1;
      except for dim: Here, only negative values will be converted
      to -1. */
-  leftv u = INPUT;
+/*  leftv u = INPUT;
   leftv v = u->next;
   leftv w = v->next;
   if (u->Typ() != FAN_CMD)
@@ -6789,11 +6792,11 @@ static BOOLEAN jjSETPROP2(leftv res, leftv INPUT)
      - no maximal cones defined in the given fan,
      - maximal cone index is out of range;
      Any negative value will be converted to -1. */
-  leftv u = INPUT;    /* a fan */
-  leftv v = u->next;  /* a maximal cone index */
-  leftv w = v->next;  /* a string */
-  leftv x = w->next;  /* an int value */
-  if (u->Typ() != FAN_CMD)
+//  leftv u = INPUT;    /* a fan */
+//  leftv v = u->next;  /* a maximal cone index */
+//  leftv w = v->next;  /* a string */
+//  leftv x = w->next;  /* an int value */
+/*  if (u->Typ() != FAN_CMD)
   {
     Werror("expected a fan as 1st argument");
     return TRUE;
@@ -6854,7 +6857,7 @@ static BOOLEAN jjADDMCONE(leftv res, leftv INPUT)
      - 2nd and 3rd argument are int's,
      - an index in one of the intvec's is out of range;
      In case of an error addition of the cone fails. */
-  leftv u = INPUT;
+/*  leftv u = INPUT;
   leftv v = u->next;
   leftv w = v->next;
   Fan* f;
@@ -6901,7 +6904,7 @@ static BOOLEAN jjADDMCONE(leftv res, leftv INPUT)
   }
   f->addMaxCone(ii, jj);
   return FALSE;
-}
+}*/
 #endif /* HAVE_FANS */
 static BOOLEAN jjCALL3ARG(leftv res, leftv u)
 {

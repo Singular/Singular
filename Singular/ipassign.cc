@@ -39,7 +39,6 @@
 #include <Singular/silink.h>
 #include <Singular/ipshell.h>
 #include <kernel/sca.h>
-#include <Singular/Fan.h>
 #include <gfanlib/gfanlib.h>
 
 /*=================== proc =================*/
@@ -321,6 +320,7 @@ static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr e)
   return FALSE;
 }
 #ifdef HAVE_FANS
+/*
 static BOOLEAN jiA_FAN(leftv res, leftv a, Subexpr e)
 {
   if (e != NULL)
@@ -337,7 +337,7 @@ static BOOLEAN jiA_FAN(leftv res, leftv a, Subexpr e)
   Fan* fff = (Fan*)a->CopyD(FAN_CMD);
   res->data=(void*)fff;
   return FALSE;
-}
+}*/
 static BOOLEAN jiA_CONE(leftv res, leftv a, Subexpr e)
 {
   if (e != NULL)
@@ -1335,8 +1335,9 @@ static BOOLEAN jiAssign_rec(leftv l, leftv r)
   return b;
 }
 #ifdef HAVE_FANS
+/*
 BOOLEAN jjAssignFan(leftv l, leftv r)
-{
+{*/
   /* method for generating a fan;
      valid parametrizations: (intmat or 0, intmat or 0, intmat or 0),
      The intmat's capture the maximal rays, facet normals and the
@@ -1348,10 +1349,10 @@ BOOLEAN jjAssignFan(leftv l, leftv r)
      - 1st and 2nd argument simultaneously the int 0,
      - numbers of rows in 1st, 2nd, and/or 3rd argument intmat
        disagree */
-  intvec* maxRays = NULL;    /* maximal rays */
-  intvec* facetNs = NULL;    /* facet normals */
-  intvec* linSpace = NULL;   /* lineality space */
-
+//  intvec* maxRays = NULL;    /* maximal rays */
+//  intvec* facetNs = NULL;    /* facet normals */
+//  intvec* linSpace = NULL;   /* lineality space */
+/*
   leftv x = r;
   if (x->Typ() == INTMAT_CMD) maxRays = (intvec*)x->Data();
   else if ((x->Typ() != INT_CMD) ||
@@ -1402,7 +1403,7 @@ BOOLEAN jjAssignFan(leftv l, leftv r)
   Fan* fff = new Fan(maxRays, facetNs, linSpace);
   IDDATA((idhdl)l->data) = (char*)fff;
   return FALSE;
-}
+}*/
 BOOLEAN jjAssignCone(leftv l, leftv r)
 {
   /* method for generating a cone;
@@ -1555,10 +1556,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
       }
     }
 #ifdef HAVE_FANS
+/*
     else if ((lt == FAN_CMD) && (rl == 3))
     {
       return jjAssignFan(l, r);
-    }
+    }*/
 #endif /* HAVE_FANS */
     if (rt==NONE) rt=r->Typ();
   }

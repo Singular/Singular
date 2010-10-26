@@ -266,14 +266,14 @@ struct sValCmd1 dArith1[]=
 ,{D(jjLOAD1),      LOAD_CMD,        NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(loNewtonP),    NEWTONPOLY_CMD,  IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_FANS
-,{D(jjDELMCONE1),  DELMCONE_CMD,    NONE,           FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMAXRAYS1),   MAXRAYS_CMD,     INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMAXRAYS2),   MAXRAYS_CMD,     INTMAT_CMD,     CONE_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFACETNS1),   FACETNS_CMD,     INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjFACETNS2),   FACETNS_CMD,     INTMAT_CMD,     CONE_CMD      , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLINSPACE),   LINSPACE_CMD,    INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjMAXCONE1),   MAXCONE_CMD,     LIST_CMD,       FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjADJACENCY1), ADJACENCY_CMD,   INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjDELMCONE1),  DELMCONE_CMD,    NONE,           FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjMAXRAYS1),   MAXRAYS_CMD,     INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjMAXRAYS2),   MAXRAYS_CMD,     INTMAT_CMD,     CONE_CMD      , ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjFACETNS1),   FACETNS_CMD,     INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjFACETNS2),   FACETNS_CMD,     INTMAT_CMD,     CONE_CMD      , ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjLINSPACE),   LINSPACE_CMD,    INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjMAXCONE1),   MAXCONE_CMD,     LIST_CMD,       FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjADJACENCY1), ADJACENCY_CMD,   INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
 #endif /* HAVE_FANS */
 ,{NULL,             0,               0,              0             , NO_PLURAL |NO_RING}
 };
@@ -643,13 +643,13 @@ struct sValCmd2 dArith2[]=
 ,{D(jjVARSTR2),   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjWEDGE),     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD, NO_PLURAL |ALLOW_RING}
 #ifdef HAVE_FANS
-,{D(jjADDMCONE1), ADDMCONE_CMD,   NONE,           FAN_CMD,    CONE_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjADDMCONE2), ADDMCONE_CMD,   NONE,           FAN_CMD,    LIST_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDELMCONE2), DELMCONE_CMD,   NONE,           FAN_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjDELMCONE3), DELMCONE_CMD,   NONE,           FAN_CMD,    INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjMAXCONE2),  MAXCONE_CMD,    CONE_CMD,       FAN_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjGETPROP1),  GETPROP_CMD,    INT_CMD,        FAN_CMD,    STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjGETPROP2),  GETPROP_CMD,    INT_CMD,        CONE_CMD,   STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjADDMCONE1), ADDMCONE_CMD,   NONE,           FAN_CMD,    CONE_CMD, ALLOW_PLURAL | ALLOW_RING}
+//,{D(jjADDMCONE2), ADDMCONE_CMD,   NONE,           FAN_CMD,    LIST_CMD, ALLOW_PLURAL | ALLOW_RING}
+//,{D(jjDELMCONE2), DELMCONE_CMD,   NONE,           FAN_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+//,{D(jjDELMCONE3), DELMCONE_CMD,   NONE,           FAN_CMD,    INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
+//,{D(jjMAXCONE2),  MAXCONE_CMD,    CONE_CMD,       FAN_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjGETPROP1),  GETPROP_CMD,    INT_CMD,        FAN_CMD,    STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+//,{D(jjGETPROP2),  GETPROP_CMD,    INT_CMD,        CONE_CMD,   STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 #endif /* HAVE_FANS */
 ,{NULL,           0,              0,              0,          0, NO_PLURAL |NO_RING}
 };
@@ -756,9 +756,9 @@ struct sValCmd3 dArith3[]=
 ,{D(nuLagSolve),       LAGSOLVE_CMD,LIST_CMD,  POLY_CMD,   INT_CMD,    INT_CMD  , NO_PLURAL |NO_RING}
 ,{D(nuVanderSys),      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD  , NO_PLURAL |NO_RING}
 #ifdef HAVE_FANS
-,{D(jjSETPROP1),       SETPROP_CMD,NONE,       FAN_CMD,    STRING_CMD, INT_CMD  , NO_PLURAL |NO_RING}
-,{D(jjSETPROP2),       SETPROP_CMD,NONE,       CONE_CMD,   STRING_CMD, INT_CMD  , NO_PLURAL |NO_RING}
-,{D(jjADJACENCY2),     ADJACENCY_CMD,CONE_CMD, FAN_CMD,    INT_CMD,    INT_CMD  , NO_PLURAL |NO_RING}
+//,{D(jjSETPROP1),       SETPROP_CMD,NONE,       FAN_CMD,    STRING_CMD, INT_CMD  , NO_PLURAL |NO_RING}
+//,{D(jjSETPROP2),       SETPROP_CMD,NONE,       CONE_CMD,   STRING_CMD, INT_CMD  , NO_PLURAL |NO_RING}
+//,{D(jjADJACENCY2),     ADJACENCY_CMD,CONE_CMD, FAN_CMD,    INT_CMD,    INT_CMD  , NO_PLURAL |NO_RING}
 #endif /* HAVE_FANS */
 ,{NULL,                0,          0,          0,          0,          0        , NO_PLURAL |NO_RING}
 };
@@ -820,7 +820,7 @@ struct sValCmdM dArithM[]=
 ,{D(jjSTD_HILB_WP), STD_CMD,       IDEAL_CMD,           4      , NO_PLURAL |ALLOW_RING}
 ,{D(jjQRDS),      QRDS_CMD,        LIST_CMD,            4      , ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_FANS
-,{D(jjADDADJ),    ADDADJ_CMD,      NONE,               -2      , NO_PLURAL |NO_RING}
+//,{D(jjADDADJ),    ADDADJ_CMD,      NONE,               -2      , NO_PLURAL |NO_RING}
 #endif /* HAVE_FANS */
 ,{NULL,           0,               0,                   0      , NO_PLURAL |NO_RING}
 };
@@ -829,9 +829,9 @@ cmdnames cmds[] =
 {  // name-string alias tokval          toktype
   { "$INVALID$",   0, -1,                 0},
   #ifdef HAVE_FANS
-  { "addadj",      0, ADDADJ_CMD,         CMD_M},
-  { "addmaxcone",  0, ADDMCONE_CMD,       CMD_2},
-  { "adj",         0, ADJACENCY_CMD,      CMD_13},
+//  { "addadj",      0, ADDADJ_CMD,         CMD_M},
+//  { "addmaxcone",  0, ADDMCONE_CMD,       CMD_2},
+//  { "adj",         0, ADJACENCY_CMD,      CMD_13},
   #endif /* HAVE_FANS */
   { "alias",       0, ALIAS_CMD ,         PARAMETER},
   { "and",         0, '&' ,               LOGIC_OP},
@@ -865,7 +865,7 @@ cmdnames cmds[] =
   { "degree",      0, DEGREE_CMD ,        CMD_1},
   { "delete",      0, DELETE_CMD ,        CMD_2},
   #ifdef HAVE_FANS
-  { "delmaxcone",  0, DELMCONE_CMD,       CMD_12},
+//  { "delmaxcone",  0, DELMCONE_CMD,       CMD_12},
   #endif /* HAVE_FANS */
   { "det",         0, DET_CMD ,           CMD_1},
   { "diff",        0, DIFF_CMD ,          CMD_2},
@@ -886,11 +886,11 @@ cmdnames cmds[] =
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
   { "exportto",    0, EXPORTTO_CMD ,      CMD_2},
   #ifdef HAVE_FANS
-  { "facetnormals",0, FACETNS_CMD,        CMD_1},
+//  { "facetnormals",0, FACETNS_CMD,        CMD_1},
   #endif /* HAVE_FANS */
   { "factorize",   0, FAC_CMD ,           CMD_12},
   #ifdef HAVE_FANS
-  { "fan",         0, FAN_CMD,            ROOT_DECL},
+//  { "fan",         0, FAN_CMD,            ROOT_DECL},
   #endif /* HAVE_FANS */
   { "farey",       0, FAREY_CMD ,         CMD_2},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
@@ -946,7 +946,7 @@ cmdnames cmds[] =
   { "liftstd",     0, LIFTSTD_CMD ,       CMD_23},
   { "link",        0, LINK_CMD ,          ROOT_DECL},
   #ifdef HAVE_FANS
-  { "linspace",    0, LINSPACE_CMD,       CMD_1},
+//  { "linspace",    0, LINSPACE_CMD,       CMD_1},
   #endif /* HAVE_FANS */
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},
@@ -959,8 +959,8 @@ cmdnames cmds[] =
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
   { "maxideal",    0, MAXID_CMD ,         CMD_1},
   #ifdef HAVE_FANS
-  { "maxcone",     0, MAXCONE_CMD,        CMD_12},
-  { "maxrays",     0, MAXRAYS_CMD,        CMD_1},
+//  { "maxcone",     0, MAXCONE_CMD,        CMD_12},
+//  { "maxrays",     0, MAXRAYS_CMD,        CMD_1},
   #endif /* HAVE_FANS */
   { "memory",      0, MEMORY_CMD ,        CMD_1},
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
@@ -1215,7 +1215,7 @@ struct sValAssign dAssign[]=
 ,{D(jiA_LINK),     LINK_CMD,       STRING_CMD }
 ,{D(jiA_LINK),     LINK_CMD,       LINK_CMD }
 #ifdef HAVE_FANS
-,{D(jiA_FAN),      FAN_CMD,        FAN_CMD }
+//,{D(jiA_FAN),      FAN_CMD,        FAN_CMD }
 ,{D(jiA_CONE),     CONE_CMD,       CONE_CMD }
 #endif /* HAVE_FANS */
 ,{D(jiA_PACKAGE),  PACKAGE_CMD,    PACKAGE_CMD }

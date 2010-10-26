@@ -28,7 +28,6 @@
 #include <Singular/silink.h>
 #include <kernel/syz.h>
 #include <Singular/ipid.h>
-#include <Singular/Fan.h>
 #include <gfanlib/gfanlib.h>
 
 #ifdef HAVE_DYNAMIC_LOADING
@@ -201,10 +200,11 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
       IDPACKAGE(h)->loaded = FALSE;
     }
 #ifdef HAVE_FANS
+/*
     else if (t == FAN_CMD)
     {
       IDSTRING(h) = (char*)(new Fan());
-    }
+    }*/
     else if (t == CONE_CMD)
     {
       IDSTRING(h) = (char*)(new gfan::ZCone());
@@ -477,17 +477,17 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   }
 #ifdef HAVE_FANS
   // fan -------------------------------------------------------------
-  else if (IDTYP(h) == FAN_CMD)
+/*  else if (IDTYP(h) == FAN_CMD)
   {
     Fan* fff = (Fan*)IDDATA(h);
     delete fff;
     IDDATA(h) = NULL;
-  }
+  }*/
   // cone ------------------------------------------------------------
   else if (IDTYP(h) == CONE_CMD)
   {
-    Cone* ccc = (Cone*)IDDATA(h);
-    delete ccc;
+    gfan::ZCone* zc = (gfan::ZCone*)IDDATA(h);
+    delete zc;
     IDDATA(h) = NULL;
   }
 #endif /* HAVE_FANS */
