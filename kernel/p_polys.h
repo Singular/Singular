@@ -199,8 +199,6 @@ poly p_GetMaxExpP(poly p, ring r);
 
 // suppose that l is a long var in r, return maximal exponent of l
 PINLINE2 unsigned long p_GetMaxExp(unsigned long l, ring r);
-// similar, except assume that l constains number_of_exps exponents
-PINLINE2 unsigned long p_GetMaxExp(const unsigned long l, const ring r, const int number_of_exps);
 
 // return the TotalDegree of the long var l
 PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
