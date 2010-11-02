@@ -7764,6 +7764,13 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   assumeStdFlag(u);
   ideal i1=(ideal)(u->Data());
   ideal i0;
+  if (((u->Typ()!=IDEAL_CMD)&&(u->Typ()!=MODUL_CMD))
+  || (h->Typ()!=INTVEC_CMD)
+  || (w->Typ()!=INTVEC_CMD))
+  {
+    WerrorS("expected `std(`ideal/module`,`poly/vector`,`intvec`,`intvec`)");
+    return TRUE;
+  }
   intvec *vw=(intvec *)w->Data(); // weights of vars
   /* merging std_hilb_w and std_1 */
   if (vw->length()!=currRing->N)
@@ -7777,11 +7784,16 @@ static BOOLEAN jjSTD_HILB_WP(leftv res, leftv INPUT)
   {
     i0=idInit(1,i1->rank);
     i0->m[0]=(poly)v->Data();
-    BOOLEAN cleanup_i0=TRUE;;
+    BOOLEAN cleanup_i0=TRUE;
   }
-  else /* IDEAL */
+  else if (r==IDEAL_CMD)/* IDEAL */
   {
     i0=(ideal)v->Data();
+  }
+  else
+  {
+    WerrorS("expected `std(`ideal/module`,`poly/vector`,`intvec`,`intvec`)");
+    return TRUE;
   }
   int ii0=idElem(i0);
   i1 = idSimpleAdd(i1,i0);
