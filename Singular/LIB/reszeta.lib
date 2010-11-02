@@ -138,7 +138,7 @@ example
    ideal I=x3+y4+z5;
    list L=resolve(I,"K");
    spectralNeg(L);
-   LIB"gaussman.lib";
+   LIB"gmssing.lib";
    ring r=0,(x,y,z),ds;
    poly f=x3+y4+z5;
    spectrum(f);
