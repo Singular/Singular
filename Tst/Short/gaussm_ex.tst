@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "gaussman.lib";
+LIB "gmssing.lib";
 
 example monodromy;
 example vwfilt;
