@@ -654,7 +654,6 @@ char * rCharStr(ring r)
     char* s = (char*) omAlloc(l);
     gmp_sprintf(s,"integer,%Zd^%lu",r->ringflaga,r->ringflagb);
     return s;
-    
   }
 #endif
   if (r->parameter==NULL)
@@ -3076,7 +3075,7 @@ static void rSetOutParams(ring r)
   r->ShortOut = TRUE;
   {
     int i;
-    if ((r->parameter!=NULL) && (r->ch<2))
+    if (r->parameter!=NULL)
     {
       for (i=0;i<rPar(r);i++)
       {
@@ -3090,7 +3089,7 @@ static void rSetOutParams(ring r)
     if (r->ShortOut)
     {
       // Hmm... sometimes (e.g., from maGetPreimage) new variables
-      // are intorduced, but their names are never set
+      // are introduced, but their names are never set
       // hence, we do the following awkward trick
       int N = omSizeWOfAddr(r->names);
       if (r->N < N) N = r->N;
