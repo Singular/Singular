@@ -274,6 +274,8 @@ struct sValCmd1 dArith1[]=
 //,{D(jjLINSPACE),   LINSPACE_CMD,    INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjMAXCONE1),   MAXCONE_CMD,     LIST_CMD,       FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjADJACENCY1), ADJACENCY_CMD,   INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONERAYS1),  CONERAYS_CMD,    CONE_CMD,      INTMAT_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONENORMALS1),CONENORMALS_CMD,CONE_CMD,      INTMAT_CMD       , ALLOW_PLURAL |ALLOW_RING}
 #endif /* HAVE_FANS */
 ,{NULL,             0,               0,              0             , NO_PLURAL |NO_RING}
 };
@@ -643,6 +645,12 @@ struct sValCmd2 dArith2[]=
 ,{D(jjVARSTR2),   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjWEDGE),     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD, NO_PLURAL |ALLOW_RING}
 #ifdef HAVE_FANS
+,{D(jjCONERAYS2), CONERAYS_CMD,   CONE_CMD,       INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONENORMALS2),CONENORMALS_CMD,CONE_CMD,       INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjINTERSC),   INTERSC_CMD,    CONE_CMD,       CONE_CMD,   CONE_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONELINK),  CONELINK_CMD,   CONE_CMD,       CONE_CMD,   INTMAT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONTAINS2), CONTAINS_CMD,   INT_CMD,        CONE_CMD,   CONE_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjGETPROPC),  GETPROP_CMD,    ANY_TYPE/*set by p*/,CONE_CMD,STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjADDMCONE1), ADDMCONE_CMD,   NONE,           FAN_CMD,    CONE_CMD, ALLOW_PLURAL | ALLOW_RING}
 //,{D(jjADDMCONE2), ADDMCONE_CMD,   NONE,           FAN_CMD,    LIST_CMD, ALLOW_PLURAL | ALLOW_RING}
 //,{D(jjDELMCONE2), DELMCONE_CMD,   NONE,           FAN_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -756,6 +764,11 @@ struct sValCmd3 dArith3[]=
 ,{D(nuLagSolve),       LAGSOLVE_CMD,LIST_CMD,  POLY_CMD,   INT_CMD,    INT_CMD  , NO_PLURAL |NO_RING}
 ,{D(nuVanderSys),      VANDER_CMD, POLY_CMD,   IDEAL_CMD,  IDEAL_CMD,  INT_CMD  , NO_PLURAL |NO_RING}
 #ifdef HAVE_FANS
+,{D(jjCONERAYS3),      CONERAYS_CMD,CONE_CMD,  INTMAT_CMD, INTMAT_CMD, INT_CMD  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONENORMALS3),   CONENORMALS_CMD,CONE_CMD,INTMAT_CMD,INTMAT_CMD, INT_CMD  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONTAINS3),      CONTAINS_CMD,INT_CMD,   CONE_CMD,   INTMAT_CMD, INT_CMD  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSETPROPC1),      SETPROP_CMD,NONE,       CONE_CMD,   STRING_CMD, INT_CMD  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjSETPROPC2),      SETPROP_CMD,NONE,       CONE_CMD,   STRING_CMD, INTMAT_CMD  , ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjSETPROP1),       SETPROP_CMD,NONE,       FAN_CMD,    STRING_CMD, INT_CMD  , NO_PLURAL |NO_RING}
 //,{D(jjSETPROP2),       SETPROP_CMD,NONE,       CONE_CMD,   STRING_CMD, INT_CMD  , NO_PLURAL |NO_RING}
 //,{D(jjADJACENCY2),     ADJACENCY_CMD,CONE_CMD, FAN_CMD,    INT_CMD,    INT_CMD  , NO_PLURAL |NO_RING}
@@ -832,6 +845,20 @@ cmdnames cmds[] =
 //  { "addadj",      0, ADDADJ_CMD,         CMD_M},
 //  { "addmaxcone",  0, ADDMCONE_CMD,       CMD_2},
 //  { "adj",         0, ADJACENCY_CMD,      CMD_13},
+//  { "delmaxcone",  0, DELMCONE_CMD,       CMD_12},
+//  { "fan",         0, FAN_CMD,            ROOT_DECL},
+//  { "facetnormals",0, FACETNS_CMD,        CMD_1},
+//  { "maxcone",     0, MAXCONE_CMD,        CMD_12},
+//  { "maxrays",     0, MAXRAYS_CMD,        CMD_1},
+//  { "linspace",    0, LINSPACE_CMD,       CMD_1},
+  { "cone",        0, CONE_CMD,           ROOT_DECL},
+  { "cone_via_rays",0, CONERAYS_CMD,      CMD_123},
+  { "cone_via_normals",0,CONENORMALS_CMD, CMD_123},
+  { "cone_intersect",0,INTERSC_CMD,       CMD_2},
+  { "cone_link",   0, CONELINK_CMD,       CMD_2},
+  { "contains",    0, CONTAINS_CMD,       CMD_23},
+  { "getprop",     0, GETPROP_CMD,        CMD_2},
+  { "setprop",     0, SETPROP_CMD,        CMD_3},
   #endif /* HAVE_FANS */
   { "alias",       0, ALIAS_CMD ,         PARAMETER},
   { "and",         0, '&' ,               LOGIC_OP},
@@ -852,9 +879,6 @@ cmdnames cmds[] =
   { "close",       0, CLOSE_CMD ,         CMD_1},
   { "coef",        0, COEF_CMD ,          CMD_M},
   { "coeffs",      0, COEFFS_CMD ,        CMD_23},
-  #ifdef HAVE_FANS
-  { "cone",        0, CONE_CMD,           ROOT_DECL},
-  #endif /* HAVE_FANS */
   { "continue",    0, CONTINUE_CMD ,      CONTINUE_CMD},
   { "contract",    0, CONTRACT_CMD ,      CMD_2},
   { "convhull",    0, NEWTONPOLY_CMD,     CMD_1},
@@ -864,9 +888,6 @@ cmdnames cmds[] =
   { "deg",         0, DEG_CMD ,           CMD_12},
   { "degree",      0, DEGREE_CMD ,        CMD_1},
   { "delete",      0, DELETE_CMD ,        CMD_2},
-  #ifdef HAVE_FANS
-//  { "delmaxcone",  0, DELMCONE_CMD,       CMD_12},
-  #endif /* HAVE_FANS */
   { "det",         0, DET_CMD ,           CMD_1},
   { "diff",        0, DIFF_CMD ,          CMD_2},
   { "dim",         0, DIM_CMD ,           CMD_1},
@@ -885,13 +906,7 @@ cmdnames cmds[] =
   { "execute",     0, EXECUTE_CMD ,       CMD_1},
   { "export",      0, EXPORT_CMD ,        EXPORT_CMD},
   { "exportto",    0, EXPORTTO_CMD ,      CMD_2},
-  #ifdef HAVE_FANS
-//  { "facetnormals",0, FACETNS_CMD,        CMD_1},
-  #endif /* HAVE_FANS */
   { "factorize",   0, FAC_CMD ,           CMD_12},
-  #ifdef HAVE_FANS
-//  { "fan",         0, FAN_CMD,            ROOT_DECL},
-  #endif /* HAVE_FANS */
   { "farey",       0, FAREY_CMD ,         CMD_2},
   { "fetch",       0, FETCH_CMD ,         CMD_2},
   { "fglm",        0, FGLM_CMD ,          CMD_2},
@@ -904,9 +919,6 @@ cmdnames cmds[] =
   { "frwalk",      0, FWALK_CMD ,         CMD_23},
   { "gen",         0, E_CMD ,             CMD_1},
   { "getdump",     0, GETDUMP_CMD,        CMD_1},
-  #ifdef HAVE_FANS
-  { "getprop",     0, GETPROP_CMD,        CMD_2},
-  #endif /* HAVE_FANS */
   { "gcd",         0, GCD_CMD ,           CMD_2},
   { "GCD",         2, GCD_CMD ,           CMD_2},
   { "hilb",        0, HILBERT_CMD ,       CMD_123},
@@ -945,9 +957,6 @@ cmdnames cmds[] =
   { "lift",        0, LIFT_CMD ,          CMD_23},
   { "liftstd",     0, LIFTSTD_CMD ,       CMD_23},
   { "link",        0, LINK_CMD ,          ROOT_DECL},
-  #ifdef HAVE_FANS
-//  { "linspace",    0, LINSPACE_CMD,       CMD_1},
-  #endif /* HAVE_FANS */
   { "listvar",     0, LISTVAR_CMD ,       LISTVAR_CMD},
   { "list",        0, LIST_CMD ,          ROOT_DECL_LIST},
   { "load",        0, LOAD_CMD ,          CMD_12},
@@ -958,10 +967,6 @@ cmdnames cmds[] =
   { "map",         0, MAP_CMD ,           RING_DECL},
   { "matrix",      0, MATRIX_CMD ,        MATRIX_CMD},
   { "maxideal",    0, MAXID_CMD ,         CMD_1},
-  #ifdef HAVE_FANS
-//  { "maxcone",     0, MAXCONE_CMD,        CMD_12},
-//  { "maxrays",     0, MAXRAYS_CMD,        CMD_1},
-  #endif /* HAVE_FANS */
   { "memory",      0, MEMORY_CMD ,        CMD_1},
   { "minbase",     0, MINBASE_CMD ,       CMD_1},
   { "minor",       0, MINOR_CMD ,         CMD_M},
@@ -1036,9 +1041,6 @@ cmdnames cmds[] =
   { "ring",        0, RING_CMD ,          RING_CMD},
   { "ringlist",    0, RINGLIST_CMD ,      CMD_1},
   { "rvar",        0, IS_RINGVAR ,        CMD_1},
-  #ifdef HAVE_FANS
-  { "setprop",     0, SETPROP_CMD,        CMD_3},
-  #endif /* HAVE_FANS */
   { "setring",     0, SETRING_CMD ,       SETRING_CMD},
   { "simplex",     0, SIMPLEX_CMD,        CMD_M},
   { "simplify",    0, SIMPLIFY_CMD ,      CMD_2},
