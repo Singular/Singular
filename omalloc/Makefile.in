@@ -18,7 +18,7 @@ prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 
 # header file is installed here
-includedir	= @includedir@ 
+includedir	= @includedir@
 # library is installed here
 libdir 		= @libdir@
 
