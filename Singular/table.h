@@ -265,6 +265,8 @@ struct sValCmd1 dArith1[]=
 ,{D(kWeight),      WEIGHT_CMD,      INTVEC_CMD,     MODUL_CMD     , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLOAD1),      LOAD_CMD,        NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(loNewtonP),    NEWTONPOLY_CMD,  IDEAL_CMD,      IDEAL_CMD     , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjWAIT1ST1),   WAIT1ST_CMD,     INT_CMD,        LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjWAITALL1),   WAITALL_CMD,     NONE,           LIST_CMD      , ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_FANS
 //,{D(jjDELMCONE1),  DELMCONE_CMD,    NONE,           FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjMAXRAYS1),   MAXRAYS_CMD,     INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
@@ -643,6 +645,8 @@ struct sValCmd2 dArith2[]=
 ,{D(jjSTD_HILB),  STD_CMD,        MODUL_CMD,      MODUL_CMD,  INTVEC_CMD, NO_PLURAL |ALLOW_RING}
 ,{D(jjVARSTR2),   VARSTR_CMD,     STRING_CMD,     RING_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjVARSTR2),   VARSTR_CMD,     STRING_CMD,     QRING_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjWAIT1ST2),  WAIT1ST_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjWAITALL2),  WAITALL_CMD,    INT_CMD,        LIST_CMD,   INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjWEDGE),     WEDGE_CMD,      MATRIX_CMD,     MATRIX_CMD, INT_CMD, NO_PLURAL |ALLOW_RING}
 #ifdef HAVE_FANS
 ,{D(jjCONERAYS2), CONERAYS_CMD,   CONE_CMD,       INTMAT_CMD, INTMAT_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -1075,6 +1079,8 @@ cmdnames cmds[] =
   { "varstr",      0, VARSTR_CMD ,        CMD_12},
   { "vdim",        0, VDIM_CMD ,          CMD_1},
   { "vector",      0, VECTOR_CMD ,        RING_DECL},
+  { "waitfirst",   0, WAIT1ST_CMD ,       CMD_12},
+  { "waitall",     0, WAITALL_CMD ,       CMD_12},
   { "wedge",       0, WEDGE_CMD ,         CMD_2},
   { "weight",      0, WEIGHT_CMD ,        CMD_1},
   { "whileif",     0, IF_CMD ,            IF_CMD},

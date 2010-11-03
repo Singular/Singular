@@ -158,6 +158,8 @@ enum {
   VANDER_CMD,
   VARIABLES_CMD,
   VARSTR_CMD,
+  WAIT1ST_CMD,
+  WAITALL_CMD,
   WRITE_CMD,
   /* start system var section: VECHO */
   VECHO,

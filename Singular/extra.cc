@@ -628,7 +628,26 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         else
         {
           Werror( "expected valid file name as a string");
+          return TRUE;
+        }
+      }
+  /*==================== forking experiments ======================*/
+      if(strcmp(sys_cmd, "waitforssilinks")==0)
+      {
+        if ((h != NULL) && (h->Typ() == LIST_CMD) &&
+            (h->next != NULL) && (h->next->Typ() == INT_CMD))
+        {
+          lists L = (lists)h->Data();
+          int timeMillisec = (int)(long)h->next->Data();
+          int n = slStatusSsiL(L, timeMillisec * 1000);
+          res->rtyp = INT_CMD;
+          res->data = (void*)n;
           return FALSE;
+        }
+        else
+        {
+          Werror( "expected list of open ssi links and timeout");
+          return TRUE;
         }
       }
   /*==================== neworder =============================*/

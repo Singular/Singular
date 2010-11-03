@@ -1116,7 +1116,7 @@ int slStatusSsiL(lists L, int timeout)
   int max_fd=0; /* max fd in fd_set */
   struct timeval wt;
   int i;
-  for(i=L->nr-1; i>=0; i--)
+  for(i=L->nr; i>=0; i--)
   {
     if (L->m[i].Typ()!=LINK_CMD)
     { WerrorS("all elements must be of type link"); return -2;}
@@ -1124,12 +1124,13 @@ int slStatusSsiL(lists L, int timeout)
     if(SI_LINK_OPEN_P(l)==0)
     { WerrorS("all links must be open"); return -2;}
     if ((strcmp(l->m->type,"ssi")!=0)
-    && (strcmp(l->mode,"fork")!=0) || (strcmp(l->mode,"tcp")!=NULL))
+    || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=NULL)))
     { WerrorS("all links must be of type ssi:fork or ssi:tcp"); return -2;}
     d=(ssiInfo*)l->data;
     FD_SET(d->fd_read, &mask);
     if (d->fd_read> max_fd) max_fd=d->fd_read;
   }
+  max_fd++;
   struct timeval *wt_ptr=&wt;
   if (timeout== -1)
   {
@@ -1151,7 +1152,7 @@ int slStatusSsiL(lists L, int timeout)
   {
     int j=0;
     while (j<=max_fd) { if (FD_ISSET(j,&mask)) break; j++; }
-    for(i=L->nr-1; i>=0; i--)
+    for(i=L->nr; i>=0; i--)
     {
       l=(si_link)L->m[i].Data();
       d=(ssiInfo*)l->data;

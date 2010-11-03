@@ -206,6 +206,41 @@ extern BOOLEAN expected_parms;
 int iiOp; /* the current operation*/
 
 /*=================== operations with 2 args.: static proc =================*/
+static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
+{
+  lists Lforks = (lists)u->Data();
+  int t = (int)(long)v->Data();
+  int i = slStatusSsiL(Lforks, t*1000);
+  if ( i < 0 ) i = 0;
+  res->data = (void*)(long)i;
+  return FALSE;
+}
+/* returns 1 iff all forks are finished; 0 otherwise */
+static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
+{
+  lists Lforks = (lists)u->Data();
+  int timeout = 1000*(int)(long)v->Data();
+  lists oneFork=(lists)omAllocBin(slists_bin);
+  oneFork->Init(1);
+  int i;
+  int t = getTimer();
+  int ret = 1;
+  for (int j = 0; j <= Lforks->nr; j++)
+  {
+    oneFork->m[0].Copy(&Lforks->m[j]);
+    i = slStatusSsiL(oneFork, timeout);
+    if (i == 1)
+    {
+      timeout = timeout - getTimer() + t;
+    }
+    else { ret = 0; j = Lforks->nr+1; /* terminate the for loop */ }
+    omFreeSize((ADDRESS)oneFork->m,sizeof(sleftv));
+  }
+  omFreeBin((ADDRESS)oneFork, slists_bin);
+  res->data = (void*)(long)ret;
+  return FALSE;
+}
+
 static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
 {
   intvec* aa= (intvec *)u->CopyD(INTVEC_CMD);
@@ -3685,6 +3720,33 @@ static BOOLEAN jjWRONG(leftv res, leftv u)
 }
 
 /*=================== operations with 1 arg.: static proc =================*/
+
+BOOLEAN jjWAIT1ST1(leftv res, leftv a)
+{
+  lists Lforks = (lists)a->Data();
+  int i = slStatusSsiL(Lforks, -1);
+  while (i <= 0) i = slStatusSsiL(Lforks, 10000000); /* redo this all 10 seconds */
+  res->data = (void*)(long)i;
+  return FALSE;
+}
+
+BOOLEAN jjWAITALL1(leftv res, leftv a)
+{
+  lists Lforks = (lists)a->Data();
+  lists oneFork=(lists)omAllocBin(slists_bin);
+  oneFork->Init(1);
+  int i;
+  for (int j = 0; j <= Lforks->nr; j++)
+  {
+    oneFork->m[0].Copy(&Lforks->m[j]);
+    i = slStatusSsiL(oneFork, -1);
+    while (i != 1) i = slStatusSsiL(oneFork, 10000000); /* redo this all 10 seconds */
+    omFreeSize((ADDRESS)oneFork->m,sizeof(sleftv));
+  }
+  omFreeBin((ADDRESS)oneFork, slists_bin);
+  return FALSE;
+}
+
 static BOOLEAN jjDUMMY(leftv res, leftv u)
 {
   res->data = (char *)u->CopyD();
