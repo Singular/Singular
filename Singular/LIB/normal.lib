@@ -2577,6 +2577,7 @@ KEYWORDS: delta invariant; Tjurina number
 EXAMPLE: example deltaLoc;  shows an example
 "
 {
+   intvec save_opt=option(get);
    option(redSB);
    def R=basering;
    execute("ring S=("+charstr(R)+"),(x,y),lp;");
@@ -2670,6 +2671,7 @@ EXAMPLE: example deltaLoc;  shows an example
    if(tau==0)                 //smooth case
    {
       setring R;
+      option(set,save_opt);
       return(list(0,0,1));
    }
    if((char(basering)>=181)||(char(basering)==0))
@@ -2679,6 +2681,7 @@ EXAMPLE: example deltaLoc;  shows an example
         if(w>=1){"A_k-singularity";"";}
          setring R;
          delt=(tau+1)/2;
+         option(set,save_opt);
          return(list(d*delt,d*tau,d*(2*delt-tau+1)));
       }
       if((lead(f)==var(1)*var(2)^2)||(lead(f)==var(1)^2*var(2)))
@@ -2687,6 +2690,7 @@ EXAMPLE: example deltaLoc;  shows an example
 
          setring R;
          delt=(tau+2)/2;
+         option(set,save_opt);
          return(list(d*delt,d*tau,d*(2*delt-tau+1)));
       }
 
@@ -2705,6 +2709,7 @@ EXAMPLE: example deltaLoc;  shows an example
           nb=nb+gcd(NP[i][2]-NP[i+1][2],NP[i][1]-NP[i+1][1]);
         }
         if(w>=1){"Newton-Polygon is non-degenerated";"";}
+        option(set,save_opt);
         return(list(d*(mu+nb-1)/2,d*tau,d*nb));
       }
 
@@ -2737,6 +2742,7 @@ EXAMPLE: example deltaLoc;  shows an example
          }
          nb=deltaLoc(f1,maxideal(1))[3]+deltaLoc(f2,maxideal(1))[3];
          setring R;
+         option(set,save_opt);
          return(list(d*(mu+nb-1)/2,d*tau,d*nb));
       }
 
@@ -2751,6 +2757,7 @@ EXAMPLE: example deltaLoc;  shows an example
             nb=nb+deltaLoc(fac[i],maxideal(1))[3];
          }
          setring R;
+         option(set,save_opt);
          return(list(d*(mu+nb-1)/2,d*tau,d*nb));
       }
       list HNEXP=hnexpansion(f);
@@ -2765,6 +2772,7 @@ EXAMPLE: example deltaLoc;  shows an example
       {
         nb=size(HNEXP);
       }
+      option(set,save_opt);
       return(list(d*(mu+nb-1)/2,d*tau,d*nb));
    }
    else             //the case of small characteristic
@@ -2772,8 +2780,10 @@ EXAMPLE: example deltaLoc;  shows an example
       f=jet(f,deg(hc)+2);
       if(w>=1){"now we have to use Hamburger-Noether (Puiseux) expansion";}
       delt=delta(f);
+      option(set,save_opt);
       return(list(d*delt,d*tau,d));
    }
+   option(set,save_opt);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -4249,8 +4259,9 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
 // denomOption = 0      -> Uses the smallest degree polynomial
 // denomOption = i > 0  -> Uses a polynomial in the i-th variable
 
-  option("redSB");
-  option("returnSB");
+  intvec save_opt=option(get);
+  option(redSB);
+  option(returnSB);
   int step = 0;                       // Number of steps. (for debugging)
   int dbg = printlevel - voice + 2;   // dbg = printlevel (default: dbg = 0)
   int i;                              // counter
@@ -4261,7 +4272,8 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   def R = basering;
 
 //------------------------ Groebner bases and dimension of I-----------------
-  if(isGlobal == 1){
+  if(isGlobal == 1)
+  {
     list IM = mstd(I);
     I = IM[1];
     ideal IMin = IM[2];   // A minimal set of generators in the groebner basis.
@@ -4279,15 +4291,16 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   // We compute the radical of the ideal of minors modulo the original ideal.
   // This is done only in the first step.
   qring Q = I;   // We work in the quotient by the groebner base of the ideal I
-  option("redSB");
-  option("returnSB");
+  option(redSB);
+  option(returnSB);
 
   // If a conductor ideal was given as input, we use it instead of the
   // singular locus. If a test ideal was given as input, we do not compute the
   // singular locus.
   ideal inputC = fetch(R, inputC);
   ideal inputJ = fetch(R, inputJ);
-  if((inputC == 0) && (inputJ == 0)){
+  if((inputC == 0) && (inputJ == 0))
+  {
     // We compute the radical of the ideal of minors modulo the original ideal.
     // This is done only in the first step.
     ideal I = fetch(R, I);
@@ -4300,13 +4313,16 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
     // If a given test ideal is given, we don't need to compute the jacobian
     ideal J = minor(jacob(IMin), nvars(basering) - d, I);
     J = groebner(J);
-  } else {
+  }
+  else
+  {
     ideal J = fetch(R, inputC);
     J = groebner(J);
   }
 
   //------------------ We check if the singular locus is empty -------------
-  if(J[1] == 1){
+  if(J[1] == 1)
+  {
     // The original ring R/I was normal. Nothing to do.
     // We define anyway a new ring, equal to R, to be able to return it.
     setring R;
@@ -4318,13 +4334,15 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
     export norid;
     export normap;
     setring R;
-    if(withDelta){
+    if(withDelta)
+    {
       list output = ideal(1), poly(1), ROut, 0;
     }
     else
     {
       list output = ideal(1), poly(1), ROut;
     }
+    option(set,save_opt);
     return(list(output));
   }
 
@@ -4333,14 +4351,19 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   // We first check if a conductor ideal was computed. If not, we don't
   // compute a universal denominator.
   ideal Id1;
-  if(J != 0){
-    if(denomOption == 0){
+  if(J != 0)
+  {
+    if(denomOption == 0)
+    {
       poly condu = getSmallest(J);   // Choses the polynomial of smallest degree
                                      // of J as universal denominator.
-    } else {
+    }
+    else
+    {
       poly condu = getOneVar(J, denomOption);
     }
-    if(dbg >= 1){
+    if(dbg >= 1)
+    {
       "";
       "The universal denominator is ", condu;
     }
@@ -4349,11 +4372,14 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
     // If the ideal is equidimensional, but not necessarily prime, we check if
     // the universal denominator is a non-zerodivisor of R/I.
     // If not, we split I.
-    if((decomp == 1) or (decomp == 2)){
+    if((decomp == 1) or (decomp == 2))
+    {
       Id1 = quotient(0, condu);
-      if(size(Id1) > 0){
+      if(size(Id1) > 0)
+      {
         // We have to split.
-        if(dbg >= 1){
+        if(dbg >= 1)
+        {
           "A zerodivisor was found. We split the ideal. The zerodivisor is ", condu;
         }
         setring R;
@@ -4366,10 +4392,13 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
         list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault)[1];
         list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault)[1];
         printlevel = printlevel - 1;
+        option(set,save_opt);
         return(list(nor1, nor2));
       }
     }
-  } else {
+  }
+  else
+  {
     poly condu = 0;
   }
 
@@ -4379,11 +4408,14 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   // ordering.
   setring R;
   // If a test ideal is given at the input, we use it.
-  if(inputJ == 0){
-    if(isGlobal == 1){
+  if(inputJ == 0)
+  {
+    if(isGlobal == 1)
+    {
       ideal J = fetch(Q, J);
       J = J, I;
-      if(dbg >= 1){
+      if(dbg >= 1)
+      {
         "The original singular locus is";
         groebner(J);
         if(dbg >= 2){pause();}
@@ -4392,12 +4424,17 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
       // We check if the only singular point is the origin.
       // If so, the radical is the maximal ideal at the origin.
       J = groebner(J);
-      if(locAtZero(J)){
+      if(locAtZero(J))
+      {
         J = maxideal(1);
-      } else {
+      }
+      else
+      {
         J = radical(J);
       }
-    } else {
+    }
+    else
+    {
       // We change to global dp ordering.
       list rl = ringlist(R);
       list origOrd = rl[3];
@@ -4408,7 +4445,8 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
       ideal J = fetch(Q, J);
       ideal I = fetch(R, I);
       J = J, I;
-      if(dbg >= 1){
+      if(dbg >= 1)
+      {
         "The original singular locus is";
         groebner(J);
         if(dbg>=2){pause();}
@@ -4418,11 +4456,14 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
       setring R;
       ideal J = fetch(globR, J);
     }
-  } else {
+  }
+  else
+  {
     ideal J = inputJ;
   }
 
-  if(dbg >= 1){
+  if(dbg >= 1)
+  {
     "The radical of the original singular locus is";
     J;
     if(dbg>=2){pause();}
@@ -4432,13 +4473,17 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   setring Q;
   J = fetch(R, J);
   J = interred(J);
-  if(denomOption == 0){
+  if(denomOption == 0)
+  {
     poly D = getSmallest(J);    // Chooses the polynomial of smallest degree as
                                 // non-zerodivisor.
-  } else {
+  }
+  else
+  {
     poly D = getOneVar(J, denomOption);
   }
-  if(dbg >= 1){
+  if(dbg >= 1)
+  {
     "The non zero divisor is ", D;
     "";
   }
@@ -4447,13 +4492,16 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   // If the ideal is equidimensional, but not necessarily prime, we check if D
   // is actually a non-zerodivisor of R/I.
   // If not, we split I.
-  if((decomp == 1) or (decomp == 2)){
+  if((decomp == 1) or (decomp == 2))
+  {
     // We check if D is actually a non-zerodivisor of R/I.
     // If not, we split I.
     Id1 = quotient(0, D);
-    if(size(Id1) > 0){
+    if(size(Id1) > 0)
+    {
       // We have to split.
-      if(dbg >= 1){
+      if(dbg >= 1)
+      {
         "A zerodivisor was found. We split the ideal. The zerodivisor is ", D;
       }
       setring R;
@@ -4467,6 +4515,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
       list nor1 = normalM(Id1, decomp, withDelta, denomOption, JDefault, JDefault)[1];
       list nor2 = normalM(Id2, decomp, withDelta, denomOption, JDefault, JDefault)[1];
       printlevel = printlevel - 1;
+      option(set,save_opt);
       return(list(nor1, nor2));
     }
   }
@@ -4480,6 +4529,7 @@ static proc normalM(ideal I, int decomp, int withDelta, int denomOption, ideal i
   printlevel = printlevel + 1;
   list result = normalMEqui(I, J, condu, D, withDelta, denomOption);
   printlevel = printlevel - 1;
+  option(set,save_opt);
   return(list(result));
 }
 
@@ -4510,8 +4560,9 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
                                 // (the test ideal and the ring structure)
 
   qring Q = groebner(I);
-  option("redSB");
-  option("returnSB");
+  intvec save_opt=option(get);
+  option(redSB);
+  option(returnSB);
   ideal J = imap(R, origJ);
   poly c = imap(R, c);
   poly D = imap(R, D);
@@ -4560,6 +4611,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
     {
       list output = ideal(1), poly(1), ROut;
     }
+    option(set,save_opt);
     return(output);
   }
 
@@ -4620,7 +4672,8 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
 
       // If we have a universal denominator of smaller degree than c,
       // we replace c by it.
-      if(condu != 0){
+      if(condu != 0)
+      {
         if(deg(c) > deg(condu))
         {
           U = changeDenominatorQ(U, c, condu);
@@ -4659,6 +4712,7 @@ static proc normalMEqui(ideal I, ideal origJ, poly condu, poly D, int withDelta)
   {
     list output = U, c, ere;
   }
+  option(set,save_opt);
   return(output);
 }
 
@@ -4888,8 +4942,9 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D)
 
 
   // ----- computation of the test ideal using the ring structure of Ai -----
-  option("redSB");
-  option("returnSB");
+  intvec save_opt=option(get);
+  option(redSB);
+  option(returnSB);
 
   if(dbg > 1){"Computing the radical of J...";}
   J = radical(J);
@@ -4995,6 +5050,7 @@ static proc testIdeal(ideal I, ideal U, ideal origJ, poly c, poly D)
   setring R;
   J = imap(Q, J);
 
+  option(set,save_opt);
   return(list(J, ele[1]));
 }
 
