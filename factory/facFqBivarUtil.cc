@@ -381,7 +381,8 @@ CFFList multiplicity (CanonicalForm& F, const CFList& factors)
       multi++;
       F /= i.getItem();
     }
-    result.append (CFFactor (i.getItem(), multi));
+    if (multi > 0)
+      result.append (CFFactor (i.getItem(), multi));
     multi= 0;
   }
   return result;

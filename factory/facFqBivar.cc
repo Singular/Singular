@@ -904,7 +904,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   }
   //main variable is chosen s.t. the degree in x is minimal
   bool swap= false;
-  if ((degree (A) < degree (A, x)) || derivXZero) 
+  if ((degree (A) > degree (A, x)) || derivXZero) 
   {
     if (!derivYZero) 
     { 
