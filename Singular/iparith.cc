@@ -4483,6 +4483,7 @@ static number jjLONG2N(long d)
     #if defined(LDEBUG)
     z->debug=123456;
     #endif
+    z->s=3;
     mpz_init_set_si(z->z,d);
     return z;
   }
