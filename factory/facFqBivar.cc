@@ -97,7 +97,9 @@ CanonicalForm evalPoint (const CanonicalForm& F, CanonicalForm & eval,
       fail= true;
       break;
     }
-    if (GF)
+    if (list.isEmpty())
+      random= 0;
+    else if (GF)
       random= genGF.generate();
     else if (list.length() < p || alpha == x) 
       random= genFF.generate();

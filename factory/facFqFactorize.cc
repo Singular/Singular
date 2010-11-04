@@ -1230,7 +1230,9 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
     }
     for (int i= 0; i < k; i++)
     {
-      if (GF)
+      if (list.isEmpty())
+        result.append (0);
+      else if (GF)
       {
         result.append (genGF.generate());
         random += result.getLast()*power (x, i);
