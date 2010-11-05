@@ -340,13 +340,13 @@ Singular${S_EXT}: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
 	  ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
 
 libsingular: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
-         iparith.o libsingular-tesths.o libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) 
+         iparith.o libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) 
 	$(LIBSINGULAR_LD) ${SLDFLAGS} ${LIBSINGULAR_FLAGS} -o libsingular.${SO_SUFFIX} \
-	libsingular-tesths.o iparith.o mpsr_Tok.o claptmpl.o \
+	iparith.o mpsr_Tok.o claptmpl.o \
 	${OBJS} -lkernel -L../kernel -L../factory -L../libfac -L${libdir} ${LIBSINGULAR_LIBS}
 
 libsingular.a: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
-         iparith.o libsingular-tesths.o libparse.cc claptmpl.o mpsr_Tok.o
+         iparith.o libparse.cc claptmpl.o mpsr_Tok.o
 	mkdir libsingular.tmp
 	(cd  libsingular.tmp; \
 	ar x ../../kernel/libkernel.a; \
@@ -359,11 +359,6 @@ libsingular.a: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
 	iparith.o mpsr_Tok.o claptmpl.o \
 	${OBJS} libsingular.tmp/* 
 	rm -rf libsingular.tmp
-
-libsingular-tesths.o: tesths.cc
-	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} -DLIBSINGULAR \
-	  ${SLDFLAGS} -o libsingular-tesths.o \
-          -c tesths.cc 
 
 ../modules/python/libpython_module.a:
 	cd ../modules/python; scons
