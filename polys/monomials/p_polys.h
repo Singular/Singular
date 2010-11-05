@@ -14,37 +14,6 @@
 
 #include "ring.h"
 #include "polys-impl.h"
-/*
- Some general remarks:
- We divide poly operations into roughly 4 categories:
- Level 2: operations on monomials/polynomials with constant time,
-          or operations which are just dispatchers to other
-          poly routines
-          - implemented in: pInline2.h
-          - debugging only if PDEBUG >= 2
-          - normally inlined, unless PDEBUG >= 2 || NO_INLINE2
- Level 1: operations on monomials with time proportional to length
-          - implemented in: pInline1.h
-          - debugging only if PDEBUG >= 1
-          - normally inlined, unless PDEBUG >= 1 || NO_INLINE1
- Level 0: short operations on polynomials with time proportional to
-          length of poly
-          - implemented in pInline0.cc
-          - debugging if PDEBUG
-          - normally _not_ inlined: can be forced with
-            #define DO_PINLINE0
-            #include "pInline0.h"
- Misc   : operations on polynomials which do not fit in any of the
-          above categories
-          - implemented in: polys*.cc
-          - never inlined
-          - debugging if PDEBUG >= 0
-
- You can set PDEBUG on a per-file basis, before including "mod2.h" like
-   #define PDEBUG 2
-   #include "mod2.h"
- However, PDEBUG will only be in effect, if !NDEBUG.
-*/
 
 /***************************************************************
  *
@@ -63,27 +32,27 @@
 #define p_GetCoeff(p,r)     pGetCoeff(p)
 #define p_SetCoeff0(p,n,r)  pSetCoeff0(p,n)
 // deletes old p->coef and sets new one
-PINLINE2 number p_SetCoeff(poly p, number n, ring r);
+static inline number p_SetCoeff(poly p, number n, ring r);
 
 // get Order
-PINLINE2 long p_GetOrder(poly p, ring r);
+static inline long p_GetOrder(poly p, ring r);
 
 // Component
 #define p_GetComp(p, r)     _p_GetComp(p, r)
-PINLINE2 unsigned long p_SetComp(poly p, unsigned long c, ring r);
-PINLINE2 unsigned long p_AddComp(poly p, unsigned long v, ring r);
-PINLINE2 unsigned long p_SubComp(poly p, unsigned long v, ring r);
+static inline unsigned long p_SetComp(poly p, unsigned long c, ring r);
+static inline unsigned long p_AddComp(poly p, unsigned long v, ring r);
+static inline unsigned long p_SubComp(poly p, unsigned long v, ring r);
 
 // Exponent
-PINLINE2 long p_GetExp(poly p, int v, ring r);
-PINLINE2 long p_SetExp(poly p, int v, long e, ring r);
-PINLINE2 long p_IncrExp(poly p, int v, ring r);
-PINLINE2 long p_DecrExp(poly p, int v, ring r);
-PINLINE2 long p_AddExp(poly p, int v, long ee, ring r);
-PINLINE2 long p_SubExp(poly p, int v, long ee, ring r);
-PINLINE2 long p_MultExp(poly p, int v, long ee, ring r);
-PINLINE2 long p_GetExpSum(poly p1, poly p2, int i, ring r);
-PINLINE2 long p_GetExpDiff(poly p1, poly p2, int i, ring r);
+static inline long p_GetExp(poly p, int v, ring r);
+static inline long p_SetExp(poly p, int v, long e, ring r);
+static inline long p_IncrExp(poly p, int v, ring r);
+static inline long p_DecrExp(poly p, int v, ring r);
+static inline long p_AddExp(poly p, int v, long ee, ring r);
+static inline long p_SubExp(poly p, int v, long ee, ring r);
+static inline long p_MultExp(poly p, int v, long ee, ring r);
+static inline long p_GetExpSum(poly p1, poly p2, int i, ring r);
+static inline long p_GetExpDiff(poly p1, poly p2, int i, ring r);
 
 /***************************************************************
  *
@@ -91,20 +60,20 @@ PINLINE2 long p_GetExpDiff(poly p1, poly p2, int i, ring r);
  * except for pHead, all polys must be != NULL
  *
  ***************************************************************/
-PINLINE2 poly p_New(ring r);
-PINLINE2 poly p_New(ring r, omBin bin);
-PINLINE1 poly p_Init(ring r);
-PINLINE1 poly p_Init(ring r, omBin bin);
-PINLINE1 poly p_LmInit(poly p, ring r);
-PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_p);
-PINLINE1 poly p_LmInit(poly s_p, ring s_r, ring d_p, omBin d_bin);
-PINLINE1 poly p_Head(poly p, ring r);
-PINLINE2 void p_LmFree(poly p, ring r);
-PINLINE2 void p_LmFree(poly *p, ring r);
-PINLINE2 poly p_LmFreeAndNext(poly p, ring r);
-PINLINE2 void p_LmDelete(poly p, ring r);
-PINLINE2 void p_LmDelete(poly *p, ring r);
-PINLINE2 poly p_LmDeleteAndNext(poly p, ring r);
+static inline poly p_New(ring r);
+static inline poly p_New(ring r, omBin bin);
+static inline poly p_Init(ring r);
+static inline poly p_Init(ring r, omBin bin);
+static inline poly p_LmInit(poly p, ring r);
+static inline poly p_LmInit(poly s_p, ring s_r, ring d_p);
+static inline poly p_LmInit(poly s_p, ring s_r, ring d_p, omBin d_bin);
+static inline poly p_Head(poly p, ring r);
+static inline void p_LmFree(poly p, ring r);
+static inline void p_LmFree(poly *p, ring r);
+static inline poly p_LmFreeAndNext(poly p, ring r);
+static inline void p_LmDelete(poly p, ring r);
+static inline void p_LmDelete(poly *p, ring r);
+static inline poly p_LmDeleteAndNext(poly p, ring r);
 
 /***************************************************************
  *
@@ -112,29 +81,29 @@ PINLINE2 poly p_LmDeleteAndNext(poly p, ring r);
  *
  ***************************************************************/
 // ExpVextor(d_p) = ExpVector(s_p)
-PINLINE1 void p_ExpVectorCopy(poly d_p, poly s_p, ring r);
+static inline void p_ExpVectorCopy(poly d_p, poly s_p, ring r);
 // adjustments for negative weights
-PINLINE1 void p_MemAdd_NegWeightAdjust(poly p, ring r);
-PINLINE1 void p_MemSub_NegWeightAdjust(poly p, ring r);
+static inline void p_MemAdd_NegWeightAdjust(poly p, ring r);
+static inline void p_MemSub_NegWeightAdjust(poly p, ring r);
 // ExpVector(p1) += ExpVector(p2)
-PINLINE1 void p_ExpVectorAdd(poly p1, poly p2, ring r);
+static inline void p_ExpVectorAdd(poly p1, poly p2, ring r);
 // ExpVector(p1) -= ExpVector(p2)
-PINLINE1 void p_ExpVectorSub(poly p1, poly p2, ring r);
+static inline void p_ExpVectorSub(poly p1, poly p2, ring r);
 // ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
-PINLINE1 void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r);
+static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r);
 // ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
-PINLINE1 void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r);
+static inline void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r);
 /// ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
-PINLINE1 void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r);
+static inline void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r);
 /// returns TRUE if ExpVector(p1) == ExpVector(p2), FALSE, otherwise
-PINLINE1 BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r);
+static inline BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r);
 /// compute the degree of the leading monomial of p
 /// with respect to weigths 1
 /// the ordering may not be compatible with degree so do not use p->Order
-PINLINE1 long p_Totaldegree(poly p, ring r);
+static inline long p_Totaldegree(poly p, ring r);
 
-PINLINE1 void p_GetExpV(poly p, int *ev, ring r);
-PINLINE1 void p_SetExpV(poly p, int *ev, ring r);
+static inline void p_GetExpV(poly p, int *ev, ring r);
+static inline void p_SetExpV(poly p, int *ev, ring r);
 
 
 /***************************************************************
@@ -142,7 +111,7 @@ PINLINE1 void p_SetExpV(poly p, int *ev, ring r);
  * Comparisons: they are all done without regarding coeffs
  *
  ***************************************************************/
-PINLINE1 int p_LmCmp(poly p, poly q, ring r);
+static inline int p_LmCmp(poly p, poly q, ring r);
 #define p_LmCmpAction(p, q, r, actionE, actionG, actionS) \
   _p_LmCmpAction(p, q, r, actionE, actionG, actionS)
 
@@ -151,7 +120,7 @@ PINLINE1 int p_LmCmp(poly p, poly q, ring r);
 
 // pCmp: args may be NULL
 // returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
-PINLINE2 int p_Cmp(poly p1, poly p2, ring r);
+static inline int p_Cmp(poly p1, poly p2, ring r);
 
 
 /***************************************************************
@@ -160,16 +129,16 @@ PINLINE2 int p_Cmp(poly p1, poly p2, ring r);
  * pDivisbleBy
  *
  ***************************************************************/
-PINLINE1 BOOLEAN p_DivisibleBy(poly a, poly b, ring r);
-PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r);
-PINLINE1 BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, ring r);
+static inline BOOLEAN p_DivisibleBy(poly a, poly b, ring r);
+static inline BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r);
+static inline BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, ring r);
 unsigned long p_GetShortExpVector(poly a, ring r);
-PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
+static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
                                       poly b, unsigned long not_sev_b, ring r);
 
-PINLINE1 BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b);
-PINLINE1 BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b);
-PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
+static inline BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b);
+static inline BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b);
+static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
                                       poly b, unsigned long not_sev_b, ring r_b);
 
 /***************************************************************
@@ -179,12 +148,12 @@ PINLINE1 BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
  ***************************************************************/
 // test if the monomial is a constant as a vector component
 // i.e., test if all exponents are zero
-PINLINE1 BOOLEAN p_LmIsConstantComp(const poly p, const ring r);
-PINLINE1 BOOLEAN p_LmIsConstant(const poly p, const ring r);
+static inline BOOLEAN p_LmIsConstantComp(const poly p, const ring r);
+static inline BOOLEAN p_LmIsConstant(const poly p, const ring r);
 
 // return TRUE, if p_LmExpVectorAdd stays within ExpBound of ring r,
 //       FALSE, otherwise
-PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
+static inline BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
 
 /***************************************************************
  *
@@ -192,7 +161,7 @@ PINLINE1 BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
  *
  ***************************************************************/
 // return the maximal exponent of p
-PINLINE2 unsigned long p_GetMaxExp(poly p, ring r);
+static inline unsigned long p_GetMaxExp(poly p, ring r);
 // return the maximal exponent of p in form of the maximal long var
 unsigned long p_GetMaxExpL(poly p, const ring r, unsigned long l_max = 0);
 // return monomial r such that GetExp(r,i) is maximum of all
@@ -200,17 +169,17 @@ unsigned long p_GetMaxExpL(poly p, const ring r, unsigned long l_max = 0);
 poly p_GetMaxExpP(poly p, ring r);
 
 // suppose that l is a long var in r, return maximal exponent of l
-PINLINE2 unsigned long p_GetMaxExp(const unsigned long l, const ring r);
+static inline unsigned long p_GetMaxExp(const unsigned long l, const ring r);
 
 // return the TotalDegree of the long var l
-PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
+static inline unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
 // return the total degree of the long var l containing number_of_exp exponents
-PINLINE2 unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps);
+static inline unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps);
 
 
 // like the respective p_LmIs* routines, except that p might be empty
-PINLINE1 BOOLEAN p_IsConstantComp(const poly p, const ring r);
-PINLINE1 BOOLEAN p_IsConstant(const poly p, const ring r);
+static inline BOOLEAN p_IsConstantComp(const poly p, const ring r);
+static inline BOOLEAN p_IsConstant(const poly p, const ring r);
 PINLINE0 BOOLEAN p_IsConstantPoly(const poly p, const ring r);
 
 // return TRUE if all monoms have the same component
@@ -238,18 +207,18 @@ poly      p_NSet(number n, ring r);
  *
  ***************************************************************/
 // returns a copy of p
-PINLINE2 poly p_Copy(poly p, const ring r);
+static inline poly p_Copy(poly p, const ring r);
 // returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
-PINLINE2 poly p_Copy(poly p, const ring lmRing, const ring tailRing);
+static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing);
 // deletes *p, and sets *p to NULL
-PINLINE2 void p_Delete(poly *p, const ring r);
-PINLINE2 void p_Delete(poly *p, const ring lmRing, const ring tailRing);
+static inline void p_Delete(poly *p, const ring r);
+static inline void p_Delete(poly *p, const ring lmRing, const ring tailRing);
 
 // copys monomials of p, allocates new monomials from bin,
 // deletes monomoals of p
-PINLINE2 poly p_ShallowCopyDelete(poly p, const ring r, omBin bin);
+static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin);
 // simial but does it only for leading monomial
-PINLINE1 poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin);
+static inline poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin);
 // simply deletes monomials, does not free coeffs
 void p_ShallowDelete(poly *p, const ring r);
 
@@ -266,66 +235,66 @@ void p_ShallowDelete(poly *p, const ring r);
  *
  ***************************************************************/
 // returns -p, p is destroyed
-PINLINE2 poly p_Neg(poly p, const ring r);
+static inline poly p_Neg(poly p, const ring r);
 
 // returns p*n, p is const (i.e. copied)
-PINLINE2 poly pp_Mult_nn(poly p, number n, const ring r);
+static inline poly pp_Mult_nn(poly p, number n, const ring r);
 // returns p*n, destroys p
-PINLINE2 poly p_Mult_nn(poly p, number n, const ring r);
-PINLINE2 poly p_Mult_nn(poly p, number n, const ring lmRing, const ring tailRing);
+static inline poly p_Mult_nn(poly p, number n, const ring r);
+static inline poly p_Mult_nn(poly p, number n, const ring lmRing, const ring tailRing);
 
 // returns p*m, does neither destroy p nor m
-PINLINE2 poly pp_Mult_mm(poly p, poly m, const ring r);
+static inline poly pp_Mult_mm(poly p, poly m, const ring r);
 // returns p*m, destroys p, const: m
-PINLINE2 poly p_Mult_mm(poly p, poly m, const ring r);
+static inline poly p_Mult_mm(poly p, poly m, const ring r);
 
 // returns p+q, destroys p and q
-PINLINE2 poly p_Add_q(poly p, poly q, const ring r);
+static inline poly p_Add_q(poly p, poly q, const ring r);
 // like p_Add_q, except that if lp == pLength(lp) lq == pLength(lq)
 // then lp == pLength(p+q)
-PINLINE2 poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r);
+static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r);
 
 // return p - m*q, destroys p; const: q,m
-PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
+static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
 // like p_Minus_mm_Mult_qq, except that if lp == pLength(lp) lq == pLength(lq)
 // then lp == pLength(p -m*q)
-PINLINE2 poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
+static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                  poly spNoether, const ring r);
 // returns p + m*q destroys p, const: q, m
-PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
+static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
 
 // returns p + m*q destroys p, const: q, m
-PINLINE2 poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
+static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                 const ring r);
 
 // returns p*q, destroys p and q
-PINLINE2 poly p_Mult_q(poly p, poly q, const ring r);
+static inline poly p_Mult_q(poly p, poly q, const ring r);
 // returns p*q, does neither destroy p nor q
-PINLINE2 poly pp_Mult_qq(poly p, poly q, const ring r);
+static inline poly pp_Mult_qq(poly p, poly q, const ring r);
 
 // returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
-PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r);
+static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r);
 
 // returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
 // if lp is length of p on input then lp is length of returned poly on output
-PINLINE2 poly pp_Mult_Coeff_mm_DivSelect(poly p, int &lp, const poly m, const ring r);
+static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, int &lp, const poly m, const ring r);
 
 // returns merged p and q, assumes p and q have no monomials which are equal
-PINLINE2 poly p_Merge_q(poly p, poly c, const ring r);
+static inline poly p_Merge_q(poly p, poly c, const ring r);
 // sorts p using bucket sort: returns sorted poly
 // assumes that monomials of p are all different
 // reverses it first, if revert == TRUE, use this if input p is "almost" sorted
 // correctly
-PINLINE2 poly p_SortMerge(poly p, const ring r, BOOLEAN revert = FALSE);
+static inline poly p_SortMerge(poly p, const ring r, BOOLEAN revert = FALSE);
 // like SortMerge, except that p may have equal monimals
-PINLINE2 poly p_SortAdd(poly p, const ring r, BOOLEAN revert = FALSE);
+static inline poly p_SortAdd(poly p, const ring r, BOOLEAN revert = FALSE);
 
 /***************************************************************
  *
  * Misc stuff
  *
  ***************************************************************/
-PINLINE2 void p_Setm(poly p, const ring r);
+static inline void p_Setm(poly p, const ring r);
 p_SetmProc p_GetSetmProc(ring r);
 
 // TODO:
@@ -361,11 +330,11 @@ void      p_Write(poly p, ring lmRing, ring tailRing);
 void      p_Write0(poly p, ring lmRing, ring tailRing);
 void      p_wrp(poly p, ring lmRing, ring tailRing);
 
-PINLINE2 char*     p_String(poly p, ring p_ring);
-PINLINE2 char*     p_String0(poly p, ring p_ring);
-PINLINE2 void      p_Write(poly p, ring p_ring);
-PINLINE2 void      p_Write0(poly p, ring p_ring);
-PINLINE2 void      p_wrp(poly p, ring p_ring);
+static inline char*     p_String(poly p, ring p_ring);
+static inline char*     p_String0(poly p, ring p_ring);
+static inline void      p_Write(poly p, ring p_ring);
+static inline void      p_Write0(poly p, ring p_ring);
+static inline void      p_wrp(poly p, ring p_ring);
 
 
 /***************************************************************
@@ -446,8 +415,1340 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
 
 #endif
 
-#include <kernel/pInline2.h>
-#include <kernel/pInline1.h>
+/***************************************************************
+ *
+ * Primitives for accessing and setting fields of a poly
+ *
+ ***************************************************************/
 
+static inline number p_SetCoeff(poly p, number n, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  n_Delete(&(p->coef), r);
+  (p)->coef=n;
+  return n;
+}
+
+// order
+static inline long p_GetOrder(poly p, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  if (r->typ==NULL) return ((p)->exp[r->pOrdIndex]);
+  int i=0;
+  loop
+  {
+    switch(r->typ[i].ord_typ)
+    {
+      case ro_wp_neg:
+        return (((long)((p)->exp[r->pOrdIndex]))-POLY_NEGWEIGHT_OFFSET);
+      case ro_syzcomp:
+      case ro_syz:
+      case ro_cp:
+        i++;
+        break;
+      //case ro_dp:
+      //case ro_wp:
+      default:
+        return ((p)->exp[r->pOrdIndex]);
+    }
+  }
+}
+
+// Setm
+static inline void p_Setm(poly p, const ring r)
+{
+  p_CheckRing2(r);
+  r->p_Setm(p, r);
+}
+
+// component
+static inline  unsigned long p_SetComp(poly p, unsigned long c, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(rRing_has_Comp(r));
+  __p_GetComp(p,r) = c;
+  return c;
+}
+static inline unsigned long p_AddComp(poly p, unsigned long v, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(rRing_has_Comp(r));
+  return __p_GetComp(p,r) += v;
+}
+static inline unsigned long p_SubComp(poly p, unsigned long v, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(rRing_has_Comp(r));
+  pPolyAssume2(__p_GetComp(p,r) >= v,p,r);
+  return __p_GetComp(p,r) -= v;
+}
+static inline int p_Comp_k_n(poly a, poly b, int k, ring r)
+{
+  if ((a==NULL) || (b==NULL) ) return FALSE;
+  p_LmCheckPolyRing2(a, r);
+  p_LmCheckPolyRing2(b, r);
+  pAssume2(k > 0 && k <= r->N);
+  int i=k;
+  for(;i<=r->N;i++)
+  {
+    if (p_GetExp(a,i,r) != p_GetExp(b,i,r)) return FALSE;
+    //    if (a->exp[(r->VarOffset[i] & 0xffffff)] != b->exp[(r->VarOffset[i] & 0xffffff)]) return FALSE;
+  }
+  return TRUE;
+}
+
+#ifndef HAVE_EXPSIZES
+
+/// get a single variable exponent
+/// @Note:
+/// the integer VarOffset encodes:
+/// 1. the position of a variable in the exponent vector p->exp (lower 24 bits)
+/// 2. number of bits to shift to the right in the upper 8 bits (which takes at most 6 bits for 64 bit)
+/// Thus VarOffset always has 2 zero higher bits!
+static inline long p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
+{
+  pAssume2((VarOffset >> (24 + 6)) == 0);
+#if 0
+  int pos=(VarOffset & 0xffffff);
+  int bitpos=(VarOffset >> 24);
+  unsigned long exp=(p->exp[pos] >> bitmask) & iBitmask;
+  return exp;
+#else
+  return (long)
+         ((p->exp[(VarOffset & 0xffffff)] >> (VarOffset >> 24))
+          & iBitmask);
+#endif
+}
+
+
+/// set a single variable exponent
+/// @Note:
+/// VarOffset encodes the position in p->exp @see p_GetExp
+static inline unsigned long p_SetExp(poly p, const unsigned long e, const unsigned long iBitmask, const int VarOffset)
+{
+  pAssume2(e>=0);
+  pAssume2(e<=iBitmask);
+  pAssume2((VarOffset >> (24 + 6)) == 0);
+
+  // shift e to the left:
+  register int shift = VarOffset >> 24;
+  unsigned long ee = e << shift /*(VarOffset >> 24)*/;
+  // find the bits in the exponent vector
+  register int offset = (VarOffset & 0xffffff);
+  // clear the bits in the exponent vector:
+  p->exp[offset]  &= ~( iBitmask << shift );
+  // insert e with |
+  p->exp[ offset ] |= ee;
+  return e;
+}
+
+
+#else // #ifdef HAVE_EXPSIZES // EXPERIMENTAL!!!
+
+static inline unsigned long BitMask(unsigned long bitmask, int twobits)
+{
+  // bitmask = 00000111111111111
+  // 0 must give bitmask!
+  // 1, 2, 3 - anything like 00011..11
+  pAssume2((twobits >> 2) == 0);
+  static const unsigned long _bitmasks[4] = {-1, 0x7fff, 0x7f, 0x3};
+  return bitmask & _bitmasks[twobits];
+}
+
+
+/// @Note: we may add some more info (6 ) into VarOffset and thus encode
+static inline long p_GetExp(const poly p, const unsigned long iBitmask, const int VarOffset)
+{
+  int pos  =(VarOffset & 0xffffff);
+  int hbyte= (VarOffset >> 24); // the highest byte
+  int bitpos = hbyte & 0x3f; // last 6 bits
+  long bitmask = BitMask(iBitmask, hbyte >> 6);
+
+  long exp=(p->exp[pos] >> bitpos) & bitmask;
+  return exp;
+
+}
+
+static inline long p_SetExp(poly p, const long e, const unsigned long iBitmask, const int VarOffset)
+{
+  pAssume2(e>=0);
+  pAssume2(e <= BitMask(iBitmask, VarOffset >> 30));
+
+  // shift e to the left:
+  register int hbyte = VarOffset >> 24;
+  int bitmask = BitMask(iBitmask, hbyte >> 6);
+  register int shift = hbyte & 0x3f;
+  long ee = e << shift;
+  // find the bits in the exponent vector
+  register int offset = (VarOffset & 0xffffff);
+  // clear the bits in the exponent vector:
+  p->exp[offset]  &= ~( bitmask << shift );
+  // insert e with |
+  p->exp[ offset ] |= ee;
+  return e;
+}
+
+#endif // #ifndef HAVE_EXPSIZES
+
+
+static inline long p_GetExp(const poly p, const ring r, const int VarOffset)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(VarOffset != -1);
+  return p_GetExp(p, r->bitmask, VarOffset);
+}
+
+static inline long p_SetExp(poly p, const long e, const ring r, const int VarOffset)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(VarOffset != -1);
+  return p_SetExp(p, e, r->bitmask, VarOffset);
+}
+
+
+
+/// get v^th exponent for a monomial
+static inline long p_GetExp(const poly p, const int v, const ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(v>0 && v <= r->N);
+  pAssume2(r->VarOffset[v] != -1);
+  return p_GetExp(p, r->bitmask, r->VarOffset[v]);
+}
+
+
+/// set v^th exponent for a monomial
+static inline long p_SetExp(poly p, const int v, const long e, const ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(v>0 && v <= r->N);
+  pAssume2(r->VarOffset[v] != -1);
+  return p_SetExp(p, e, r->bitmask, r->VarOffset[v]);
+}
+
+
+
+
+
+// the following should be implemented more efficiently
+static inline  long p_IncrExp(poly p, int v, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  int e = p_GetExp(p,v,r);
+  e++;
+  return p_SetExp(p,v,e,r);
+}
+static inline  long p_DecrExp(poly p, int v, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  int e = p_GetExp(p,v,r);
+  pAssume2(e > 0);
+  e--;
+  return p_SetExp(p,v,e,r);
+}
+static inline  long p_AddExp(poly p, int v, long ee, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  int e = p_GetExp(p,v,r);
+  e += ee;
+  return p_SetExp(p,v,e,r);
+}
+static inline  long p_SubExp(poly p, int v, long ee, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  long e = p_GetExp(p,v,r);
+  pAssume2(e >= ee);
+  e -= ee;
+  return p_SetExp(p,v,e,r);
+}
+static inline  long p_MultExp(poly p, int v, long ee, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  long e = p_GetExp(p,v,r);
+  e *= ee;
+  return p_SetExp(p,v,e,r);
+}
+
+static inline long p_GetExpSum(poly p1, poly p2, int i, ring r)
+{
+  p_LmCheckPolyRing2(p1, r);
+  p_LmCheckPolyRing2(p2, r);
+  return p_GetExp(p1,i,r) + p_GetExp(p2,i,r);
+}
+static inline long p_GetExpDiff(poly p1, poly p2, int i, ring r)
+{
+  return p_GetExp(p1,i,r) - p_GetExp(p2,i,r);
+}
+
+
+/***************************************************************
+ *
+ * Allocation/Initalization/Deletion
+ *
+ ***************************************************************/
+static inline poly p_New(ring r, omBin bin)
+{
+  p_CheckRing2(r);
+  pAssume2(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
+  poly p;
+  omTypeAllocBin(poly, p, bin);
+  p_SetRingOfLm(p, r);
+  return p;
+}
+
+static inline poly p_New(ring r)
+{
+  return p_New(r, r->PolyBin);
+}
+
+static inline void p_LmFree(poly p, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  omFreeBinAddr(p);
+}
+static inline void p_LmFree(poly *p, ring r)
+{
+  p_LmCheckPolyRing2(*p, r);
+  poly h = *p;
+  *p = pNext(h);
+  omFreeBinAddr(h);
+}
+static inline poly p_LmFreeAndNext(poly p, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  poly pnext = pNext(p);
+  omFreeBinAddr(p);
+  return pnext;
+}
+static inline void p_LmDelete(poly p, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  n_Delete(&pGetCoeff(p), r);
+  omFreeBinAddr(p);
+}
+static inline void p_LmDelete(poly *p, ring r)
+{
+  p_LmCheckPolyRing2(*p, r);
+  poly h = *p;
+  *p = pNext(h);
+  n_Delete(&pGetCoeff(h), r);
+  omFreeBinAddr(h);
+}
+static inline poly p_LmDeleteAndNext(poly p, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  poly pnext = pNext(p);
+  n_Delete(&pGetCoeff(p), r);
+  omFreeBinAddr(p);
+  return pnext;
+}
+
+/***************************************************************
+ *
+ * Misc routines
+ *
+ ***************************************************************/
+static inline int p_Cmp(poly p1, poly p2, ring r)
+{
+  if (p2==NULL)
+    return 1;
+  if (p1==NULL)
+    return -1;
+  return p_LmCmp(p1,p2,r);
+}
+
+static inline unsigned long p_GetMaxExp(const poly p, const ring r)
+{
+  return p_GetMaxExp(p_GetMaxExpL(p, r), r);
+}
+
+static inline unsigned long p_GetMaxExp(const unsigned long l, const ring r)
+{
+  unsigned long bitmask = r->bitmask;
+  unsigned long max = (l & bitmask);
+  unsigned long j = r->ExpPerLong - 1;
+
+  if (j > 0)
+  {
+    unsigned long i = r->BitsPerExp;
+    long e;
+    loop
+    {
+      e = ((l >> i) & bitmask);
+      if ((unsigned long) e > max)
+        max = e;
+      j--;
+      if (j==0) break;
+      i += r->BitsPerExp;
+    }
+  }
+  return max;
+}
+
+static inline unsigned long
+p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps)
+{
+  const unsigned long bitmask = r->bitmask;
+  unsigned long sum = (l & bitmask);
+  unsigned long j = number_of_exps - 1;
+
+  if (j > 0)
+  {
+    unsigned long i = r->BitsPerExp;
+    loop
+    {
+      sum += ((l >> i) & bitmask);
+      j--;
+      if (j==0) break;
+      i += r->BitsPerExp;
+    }
+  }
+  return sum;
+}
+
+static inline unsigned long
+p_GetTotalDegree(const unsigned long l, const ring r)
+{
+  return p_GetTotalDegree(l, r, r->ExpPerLong);
+}
+
+/***************************************************************
+ *
+ * Dispatcher to r->p_Procs, they do the tests/checks
+ *
+ ***************************************************************/
+// returns a copy of p
+static inline poly p_Copy(poly p, const ring r)
+{
+#ifdef PDEBUG
+  poly pp= r->p_Procs->p_Copy(p, r);
+  p_Test(pp,r);
+  return pp;
+#else
+  return r->p_Procs->p_Copy(p, r);
+#endif
+}
+
+static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
+{
+#ifndef PDEBUG
+  if (tailRing == lmRing)
+    return tailRing->p_Procs->p_Copy(p, tailRing);
+#endif
+  if (p != NULL)
+  {
+    poly pres = p_Head(p, lmRing);
+    pNext(pres) = tailRing->p_Procs->p_Copy(pNext(p), tailRing);
+    return pres;
+  }
+  else
+    return NULL;
+}
+
+// deletes *p, and sets *p to NULL
+static inline void p_Delete(poly *p, const ring r)
+{
+  r->p_Procs->p_Delete(p, r);
+}
+
+static inline void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
+{
+#ifndef PDEBUG
+  if (tailRing == lmRing)
+  {
+    tailRing->p_Procs->p_Delete(p, tailRing);
+    return;
+  }
+#endif
+  if (*p != NULL)
+  {
+    if (pNext(*p) != NULL)
+      tailRing->p_Procs->p_Delete(&pNext(*p), tailRing);
+    p_LmDelete(p, lmRing);
+  }
+}
+
+static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(r->PolyBin->sizeW == bin->sizeW);
+  return r->p_Procs->p_ShallowCopyDelete(p, r, bin);
+}
+
+// returns p+q, destroys p and q
+static inline poly p_Add_q(poly p, poly q, const ring r)
+{
+  int shorter;
+  return r->p_Procs->p_Add_q(p, q, shorter, r);
+}
+
+static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r)
+{
+  int shorter;
+  poly res = r->p_Procs->p_Add_q(p, q, shorter, r);
+  lp = (lp + lq) - shorter;
+  return res;
+}
+
+// returns p*n, destroys p
+static inline poly p_Mult_nn(poly p, number n, const ring r)
+{
+  if (n_IsOne(n, r))
+    return p;
+  else
+    return r->p_Procs->p_Mult_nn(p, n, r);
+}
+
+static inline poly p_Mult_nn(poly p, number n, const ring lmRing,
+                        const ring tailRing)
+{
+#ifndef PDEBUG
+  if (lmRing == tailRing)
+  {
+    return p_Mult_nn(p, n, tailRing);
+  }
+#endif
+  poly pnext = pNext(p);
+  pNext(p) = NULL;
+  p = lmRing->p_Procs->p_Mult_nn(p, n, lmRing);
+  pNext(p) = tailRing->p_Procs->p_Mult_nn(pnext, n, tailRing);
+  return p;
+}
+
+// returns p*n, does not destroy p
+static inline poly pp_Mult_nn(poly p, number n, const ring r)
+{
+  if (n_IsOne(n, r))
+    return p_Copy(p, r);
+  else
+    return r->p_Procs->pp_Mult_nn(p, n, r);
+}
+
+// returns Copy(p)*m, does neither destroy p nor m
+static inline poly pp_Mult_mm(poly p, poly m, const ring r)
+{
+  if (p_LmIsConstant(m, r))
+    return pp_Mult_nn(p, pGetCoeff(m), r);
+  else
+  {
+    poly last;
+    return r->p_Procs->pp_Mult_mm(p, m, r, last);
+  }
+}
+
+// returns p*m, destroys p, const: m
+static inline poly p_Mult_mm(poly p, poly m, const ring r)
+{
+  if (p_LmIsConstant(m, r))
+    return p_Mult_nn(p, pGetCoeff(m), r);
+  else
+    return r->p_Procs->p_Mult_mm(p, m, r);
+}
+
+// return p - m*Copy(q), destroys p; const: p,m
+static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
+{
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    int lp, lq;
+    poly spNoether;
+    return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
+  }
+#endif
+
+  int shorter;
+  poly last;
+
+  return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last); // !!!
+}
+
+static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
+                                 poly spNoether, const ring r)
+{
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+     return nc_p_Minus_mm_Mult_qq(p, m, q, lp, lq, spNoether, r);
+#endif
+
+  int shorter;
+  poly last,res;
+  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, spNoether, r, last);
+  lp = (lp + lq) - shorter;
+  return res;
+}
+
+static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
+{
+  int shorter;
+  return r->p_Procs->pp_Mult_Coeff_mm_DivSelect(p, m, shorter, r);
+}
+
+static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, int &lp, const poly m, const ring r)
+{
+  int shorter;
+  poly pp = r->p_Procs->pp_Mult_Coeff_mm_DivSelect(p, m, shorter, r);
+  lp -= shorter;
+  return pp;
+}
+
+// returns -p, destroys p
+static inline poly p_Neg(poly p, const ring r)
+{
+  return r->p_Procs->p_Neg(p, r);
+}
+
+extern poly  _p_Mult_q(poly p, poly q, const int copy, const ring r);
+// returns p*q, destroys p and q
+static inline poly p_Mult_q(poly p, poly q, const ring r)
+{
+  if (p == NULL)
+  {
+    r->p_Procs->p_Delete(&q, r);
+    return NULL;
+  }
+  if (q == NULL)
+  {
+    r->p_Procs->p_Delete(&p, r);
+    return NULL;
+  }
+
+  if (pNext(p) == NULL)
+  {
+#ifdef HAVE_PLURAL
+    if (rIsPluralRing(r))
+      q = nc_mm_Mult_p(p, q, r);
+    else
+#endif /* HAVE_PLURAL */
+      q = r->p_Procs->p_Mult_mm(q, p, r);
+
+    r->p_Procs->p_Delete(&p, r);
+    return q;
+  }
+
+  if (pNext(q) == NULL)
+  {
+  // NEEDED
+#ifdef HAVE_PLURAL
+/*    if (rIsPluralRing(r))
+      p = gnc_p_Mult_mm(p, q, r); // ???
+    else*/
+#endif /* HAVE_PLURAL */
+      p = r->p_Procs->p_Mult_mm(p, q, r);
+
+    r->p_Procs->p_Delete(&q, r);
+    return p;
+  }
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    return _nc_p_Mult_q(p, q, r);
+  else
+#endif
+  return _p_Mult_q(p, q, 0, r);
+}
+
+// returns p*q, does neither destroy p nor q
+static inline poly pp_Mult_qq(poly p, poly q, const ring r)
+{
+  poly last;
+  if (p == NULL || q == NULL) return NULL;
+
+  if (pNext(p) == NULL)
+  {
+#ifdef HAVE_PLURAL
+    if (rIsPluralRing(r))
+      return nc_mm_Mult_pp(p, q, r);
+#endif
+    return r->p_Procs->pp_Mult_mm(q, p, r, last);
+  }
+
+  if (pNext(q) == NULL)
+  {
+    return r->p_Procs->pp_Mult_mm(p, q, r, last);
+  }
+
+  poly qq = q;
+  if (p == q)
+    qq = p_Copy(q, r);
+
+  poly res;
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    res = _nc_pp_Mult_qq(p, qq, r);
+  else
+#endif
+    res = _p_Mult_q(p, qq, 1, r);
+
+  if (qq != q)
+    p_Delete(&qq, r);
+  return res;
+}
+
+// returns p + m*q destroys p, const: q, m
+static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
+                                const ring r)
+{
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+    return nc_p_Plus_mm_Mult_qq(p, m, q, lp, lq, r);
+#endif
+
+// this should be implemented more efficiently
+  poly res, last;
+  int shorter;
+  number n_old = pGetCoeff(m);
+  number n_neg = n_Copy(n_old, r);
+  n_neg = n_Neg(n_neg, r);
+  pSetCoeff0(m, n_neg);
+  res = r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last);
+  lp = (lp + lq) - shorter;
+  pSetCoeff0(m, n_old);
+  n_Delete(&n_neg, r);
+  return res;
+}
+
+static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
+{
+  int lp = 0, lq = 0;
+  return p_Plus_mm_Mult_qq(p, m, q, lp, lq, r);
+}
+
+static inline poly p_Merge_q(poly p, poly q, const ring r)
+{
+  return r->p_Procs->p_Merge_q(p, q, r);
+}
+
+static inline poly p_SortAdd(poly p, const ring r, BOOLEAN revert)
+{
+  if (revert) p = pReverse(p);
+  return sBucketSortAdd(p, r);
+}
+
+static inline poly p_SortMerge(poly p, const ring r, BOOLEAN revert)
+{
+  if (revert) p = pReverse(p);
+  return sBucketSortMerge(p, r);
+}
+
+/***************************************************************
+ *
+ * I/O
+ *
+ ***************************************************************/
+static inline char*     p_String(poly p, ring p_ring)
+{
+  return p_String(p, p_ring, p_ring);
+}
+static inline char*     p_String0(poly p, ring p_ring)
+{
+  return p_String0(p, p_ring, p_ring);
+}
+static inline void      p_Write(poly p, ring p_ring)
+{
+  p_Write(p, p_ring, p_ring);
+}
+static inline void      p_Write0(poly p, ring p_ring)
+{
+  p_Write0(p, p_ring, p_ring);
+}
+static inline void      p_wrp(poly p, ring p_ring)
+{
+  p_wrp(p, p_ring, p_ring);
+}
+
+/***************************************************************
+ *  Purpose: implementation of poly procs which iter over ExpVector
+ *  Author:  obachman (Olaf Bachmann)
+ *  Created: 8/00
+ *  Version: $Id$
+ *******************************************************************/
+#include <mylimits.h>
+#include "p_MemCmp.h"
+#include "structs.h"
+#include "ring.h"
+#include <coeffs.h>
+
+#if PDEBUG > 0
+
+#define _p_LmCmpAction(p, q, r, actionE, actionG, actionS)  \
+do                                                          \
+{                                                           \
+  int _cmp = p_LmCmp(p,q,r);                                \
+  if (_cmp == 0) actionE;                                   \
+  if (_cmp == 1) actionG;                                   \
+  actionS;                                                  \
+}                                                           \
+while(0)
+
+#else
+
+#define _p_LmCmpAction(p, q, r, actionE, actionG, actionS)                      \
+ p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->CmpL_Size, r->ordsgn,    \
+                                   actionE, actionG, actionS)
+
+#endif
+
+#define pDivAssume(x)   ((void)0)
+
+#include <omalloc.h>
+#include <coeffs.h>
+#include "p_polys.h"
+#include "p_MemAdd.h"
+#include "p_MemCopy.h"
+
+/***************************************************************
+ *
+ * Allocation/Initalization/Deletion
+ *
+ ***************************************************************/
+// adjustments for negative weights
+static inline void p_MemAdd_NegWeightAdjust(poly p, const ring r)
+{
+  if (r->NegWeightL_Offset != NULL)
+  {
+    for (int i=r->NegWeightL_Size-1; i>=0; i--)
+    {
+      p->exp[r->NegWeightL_Offset[i]] -= POLY_NEGWEIGHT_OFFSET;
+    }
+  }
+}
+static inline void p_MemSub_NegWeightAdjust(poly p, const ring r)
+{
+  if (r->NegWeightL_Offset != NULL)
+  {
+    for (int i=r->NegWeightL_Size-1; i>=0; i--)
+    {
+      p->exp[r->NegWeightL_Offset[i]] += POLY_NEGWEIGHT_OFFSET;
+    }
+  }
+}
+// ExpVextor(d_p) = ExpVector(s_p)
+static inline void p_ExpVectorCopy(poly d_p, poly s_p, const ring r)
+{
+  p_LmCheckPolyRing1(d_p, r);
+  p_LmCheckPolyRing1(s_p, r);
+  p_MemCopy_LengthGeneral(d_p->exp, s_p->exp, r->ExpL_Size);
+}
+
+static inline poly p_Init(const ring r, omBin bin)
+{
+  p_CheckRing1(r);
+  pAssume1(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
+  poly p;
+  omTypeAlloc0Bin(poly, p, bin);
+  p_MemAdd_NegWeightAdjust(p, r);
+  p_SetRingOfLm(p, r);
+  return p;
+}
+static inline poly p_Init(const ring r)
+{
+  return p_Init(r, r->PolyBin);
+}
+
+static inline poly p_LmInit(poly p, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  poly np;
+  omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfLm(np, r);
+  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
+  pNext(np) = NULL;
+  pSetCoeff0(np, NULL);
+  return np;
+}
+static inline poly p_LmInit(poly s_p, const ring s_r, const ring d_r, omBin d_bin)
+{
+  p_LmCheckPolyRing1(s_p, s_r);
+  p_CheckRing(d_r);
+  pAssume1(d_r->N <= s_r->N);
+  poly d_p = p_Init(d_r, d_bin);
+  for (int i=d_r->N; i>0; i--)
+  {
+    p_SetExp(d_p, i, p_GetExp(s_p, i,s_r), d_r);
+  }
+  if (rRing_has_Comp(d_r))
+  {
+    p_SetComp(d_p, p_GetComp(s_p,s_r), d_r);
+  }
+  p_Setm(d_p, d_r);
+  return d_p;
+}
+static inline poly p_LmInit(poly s_p, const ring s_r, const ring d_r)
+{
+  pAssume1(d_r != NULL);
+  return p_LmInit(s_p, s_r, d_r, d_r->PolyBin);
+}
+static inline poly p_Head(poly p, const ring r)
+{
+  if (p == NULL) return NULL;
+  p_LmCheckPolyRing1(p, r);
+  poly np;
+  omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfLm(np, r);
+  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
+  pNext(np) = NULL;
+  pSetCoeff0(np, n_Copy(pGetCoeff(p), r));
+  return np;
+}
+// set all exponents l..k to 0, assume exp. k+1..n and 1..l-1 are in 
+// different blocks
+// set coeff to 1
+static inline poly p_GetExp_k_n(poly p, int l, int k, const ring r)
+{
+  if (p == NULL) return NULL;
+  p_LmCheckPolyRing1(p, r);
+  poly np;
+  omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfLm(np, r);
+  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
+  pNext(np) = NULL;
+  pSetCoeff0(np, n_Init(1, r));
+  int i;
+  for(i=l;i<=k;i++)
+  {
+    //np->exp[(r->VarOffset[i] & 0xffffff)] =0;
+    p_SetExp(np,i,0,r);
+  }
+  p_Setm(np,r);
+  return np;
+}
+
+static inline poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
+{
+  p_LmCheckPolyRing1(p, r);
+  pAssume1(bin->sizeW == r->PolyBin->sizeW);
+  poly new_p = p_New(r);
+  p_MemCopy_LengthGeneral(new_p->exp, p->exp, r->ExpL_Size);
+  pSetCoeff0(new_p, pGetCoeff(p));
+  pNext(new_p) = pNext(p);
+  omFreeBinAddr(p);
+  return new_p;
+}
+
+/***************************************************************
+ *
+ * Operation on ExpVectors
+ *
+ ***************************************************************/
+// ExpVector(p1) += ExpVector(p2)
+static inline void p_ExpVectorAdd(poly p1, poly p2, const ring r)
+{
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+#if PDEBUG >= 1
+  for (int i=1; i<=r->N; i++)
+    pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
+  pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
+#endif
+
+  p_MemAdd_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
+  p_MemAdd_NegWeightAdjust(p1, r);
+}
+// ExpVector(p1) -= ExpVector(p2)
+static inline void p_ExpVectorSub(poly p1, poly p2, const ring r)
+{
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+#if PDEBUG >= 1
+  for (int i=1; i<=r->N; i++)
+    pAssume1(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
+  pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0 ||
+          p_GetComp(p1, r) == p_GetComp(p2, r));
+#endif
+
+  p_MemSub_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
+  p_MemSub_NegWeightAdjust(p1, r);
+
+}
+// ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
+static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, const ring r)
+{
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(p3, r);
+#if PDEBUG >= 1
+  for (int i=1; i<=r->N; i++)
+    pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
+  pAssume1(p_GetComp(p1, r) == 0 ||
+           (p_GetComp(p2, r) - p_GetComp(p3, r) == 0) ||
+           (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
+#endif
+
+  p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpL_Size);
+  // no need to adjust in case of NegWeights
+}
+
+// ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
+static inline void p_ExpVectorSum(poly pr, poly p1, poly p2, const ring r)
+{
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(pr, r);
+#if PDEBUG >= 1
+  for (int i=1; i<=r->N; i++)
+    pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
+  pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
+#endif
+
+  p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
+  p_MemAdd_NegWeightAdjust(pr, r);
+}
+// ExpVector(pr) = ExpVector(p1) - ExpVector(p2)
+static inline void p_ExpVectorDiff(poly pr, poly p1, poly p2, const ring r)
+{
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(pr, r);
+#if PDEBUG >= 2
+  for (int i=1; i<=r->N; i++)
+    pAssume1(p_GetExp(p1, i, r) >= p_GetExp(p2, i, r));
+  pAssume1(!rRing_has_Comp(r) || p_GetComp(p1, r) == p_GetComp(p2, r));
+#endif
+
+  p_MemDiff_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
+  p_MemSub_NegWeightAdjust(pr, r);
+}
+
+static inline BOOLEAN p_ExpVectorEqual(poly p1, poly p2, const ring r)
+{
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+
+  int i = r->ExpL_Size;
+  unsigned long *ep = p1->exp;
+  unsigned long *eq = p2->exp;
+
+  do
+  {
+    i--;
+    if (ep[i] != eq[i]) return FALSE;
+  }
+  while (i);
+  return TRUE;
+}
+
+static inline long p_Totaldegree(poly p, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  unsigned long s = p_GetTotalDegree(p->exp[r->VarL_Offset[0]],
+                                     r,
+                                     r->MinExpPerLong);
+  for (int i=r->VarL_Size-1; i>0; i--)
+  {
+    s += p_GetTotalDegree(p->exp[r->VarL_Offset[i]], r);
+  }
+  return (long)s;
+}
+
+static inline void p_GetExpV(poly p, int *ev, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  for (int j = r->N; j; j--)
+      ev[j] = p_GetExp(p, j, r);
+
+  ev[0] = p_GetComp(p, r);
+}
+static inline void p_SetExpV(poly p, int *ev, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  for (int j = r->N; j; j--)
+      p_SetExp(p, j, ev[j], r);
+
+  p_SetComp(p, ev[0],r);
+  p_Setm(p, r);
+}
+
+/***************************************************************
+ *
+ * Comparison w.r.t. monomial ordering
+ *
+ ***************************************************************/
+static inline int p_LmCmp(poly p, poly q, const ring r)
+{
+  p_LmCheckPolyRing1(p, r);
+  p_LmCheckPolyRing1(q, r);
+
+  p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->CmpL_Size, r->ordsgn,
+                                    return 0, return 1, return -1);
+}
+
+
+/***************************************************************
+ *
+ * divisibility
+ *
+ ***************************************************************/
+// return: FALSE, if there exists i, such that a->exp[i] > b->exp[i]
+//         TRUE, otherwise
+// (1) Consider long vars, instead of single exponents
+// (2) Clearly, if la > lb, then FALSE
+// (3) Suppose la <= lb, and consider first bits of single exponents in l:
+//     if TRUE, then value of these bits is la ^ lb
+//     if FALSE, then la-lb causes an "overflow" into one of those bits, i.e.,
+//               la ^ lb != la - lb
+static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, poly b, const ring r)
+{
+  int i=r->VarL_Size - 1;
+  unsigned long divmask = r->divmask;
+  unsigned long la, lb;
+
+  if (r->VarL_LowIndex >= 0)
+  {
+    i += r->VarL_LowIndex;
+    do
+    {
+      la = a->exp[i];
+      lb = b->exp[i];
+      if ((la > lb) ||
+          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
+      {
+        pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == FALSE);
+        return FALSE;
+      }
+      i--;
+    }
+    while (i>=r->VarL_LowIndex);
+  }
+  else
+  {
+    do
+    {
+      la = a->exp[r->VarL_Offset[i]];
+      lb = b->exp[r->VarL_Offset[i]];
+      if ((la > lb) ||
+          (((la & divmask) ^ (lb & divmask)) != ((lb - la) & divmask)))
+      {
+        pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == FALSE);
+        return FALSE;
+      }
+      i--;
+    }
+    while (i>=0);
+  }
+#ifdef HAVE_RINGS
+  pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == nDivBy(p_GetCoeff(b, r), p_GetCoeff(a, r)));
+  return (!rField_is_Ring(r)) || nDivBy(p_GetCoeff(b, r), p_GetCoeff(a, r));
+#else
+  pDivAssume(p_DebugLmDivisibleByNoComp(a, b, r) == TRUE);
+  return TRUE;
+#endif
+}
+
+static inline BOOLEAN _p_LmDivisibleByNoComp(poly a, const ring r_a, poly b, const ring r_b)
+{
+  int i=r_a->N;
+  pAssume1(r_a->N == r_b->N);
+
+  do
+  {
+    if (p_GetExp(a,i,r_a) > p_GetExp(b,i,r_b))
+      return FALSE;
+    i--;
+  }
+  while (i);
+#ifdef HAVE_RINGS
+  return nDivBy(p_GetCoeff(b, r), p_GetCoeff(a, r));
+#else
+  return TRUE;
+#endif
+}
+
+#ifdef HAVE_RATGRING
+static inline BOOLEAN _p_LmDivisibleByNoCompPart(poly a, const ring r_a, poly b, const ring r_b,const int start, const int end)
+{
+  int i=end;
+  pAssume1(r_a->N == r_b->N);
+
+  do
+  {
+    if (p_GetExp(a,i,r_a) > p_GetExp(b,i,r_b))
+      return FALSE;
+    i--;
+  }
+  while (i>=start);
+#ifdef HAVE_RINGS
+  return nDivBy(p_GetCoeff(b, r), p_GetCoeff(a, r));
+#else
+  return TRUE;
+#endif
+}
+static inline BOOLEAN _p_LmDivisibleByPart(poly a, const ring r_a, poly b, const ring r_b,const int start, const int end)
+{
+  if (p_GetComp(a, r_a) == 0 || p_GetComp(a,r_a) == p_GetComp(b,r_b))
+    return _p_LmDivisibleByNoCompPart(a, r_a, b, r_b,start,end);
+  return FALSE;
+}
+static inline BOOLEAN p_LmDivisibleByPart(poly a, poly b, const ring r,const int start, const int end)
+{
+  p_LmCheckPolyRing1(b, r);
+  pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
+  if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
+    return _p_LmDivisibleByNoCompPart(a, r, b, r,start, end);
+  return FALSE;
+}
+#endif
+static inline BOOLEAN _p_LmDivisibleBy(poly a, poly b, const ring r)
+{
+  if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
+    return _p_LmDivisibleByNoComp(a, b, r);
+  return FALSE;
+}
+static inline BOOLEAN _p_LmDivisibleBy(poly a, const ring r_a, poly b, const ring r_b)
+{
+  if (p_GetComp(a, r_a) == 0 || p_GetComp(a,r_a) == p_GetComp(b,r_b))
+    return _p_LmDivisibleByNoComp(a, r_a, b, r_b);
+  return FALSE;
+}
+static inline BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, const ring r)
+{
+  p_LmCheckPolyRing1(a, r);
+  p_LmCheckPolyRing1(b, r);
+  return _p_LmDivisibleByNoComp(a, b, r);
+}
+static inline BOOLEAN p_LmDivisibleBy(poly a, poly b, const ring r)
+{
+  p_LmCheckPolyRing1(b, r);
+  pIfThen1(a != NULL, p_LmCheckPolyRing1(b, r));
+  if (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r))
+    return _p_LmDivisibleByNoComp(a, b, r);
+  return FALSE;
+}
+
+static inline BOOLEAN p_DivisibleBy(poly a, poly b, const ring r)
+{
+  pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r));
+  pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r));
+
+  if (a != NULL && (p_GetComp(a, r) == 0 || p_GetComp(a,r) == p_GetComp(b,r)))
+      return _p_LmDivisibleByNoComp(a,b,r);
+  return FALSE;
+}
+static inline BOOLEAN p_DivisibleBy(poly a, const ring r_a, poly b, const ring r_b)
+{
+  pIfThen1(b!=NULL, p_LmCheckPolyRing1(b, r_b));
+  pIfThen1(a!=NULL, p_LmCheckPolyRing1(a, r_a));
+  if (a != NULL) {
+      return _p_LmDivisibleBy(a, r_a, b, r_b);
+  }
+  return FALSE;
+}
+static inline BOOLEAN p_LmDivisibleBy(poly a, const ring r_a, poly b, const ring r_b)
+{
+  p_LmCheckPolyRing(a, r_a);
+  p_LmCheckPolyRing(b, r_b);
+  return _p_LmDivisibleBy(a, r_a, b, r_b);
+}
+static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
+                                    poly b, unsigned long not_sev_b, const ring r)
+{
+  p_LmCheckPolyRing1(a, r);
+  p_LmCheckPolyRing1(b, r);
+#ifndef PDIV_DEBUG
+  pPolyAssume2(p_GetShortExpVector(a, r) == sev_a, a, r);
+  pPolyAssume2(p_GetShortExpVector(b, r) == ~ not_sev_b, b, r);
+
+  if (sev_a & not_sev_b)
+  {
+    pAssume1(p_LmDivisibleByNoComp(a, b, r) == FALSE);
+    return FALSE;
+  }
+  return p_LmDivisibleBy(a, b, r);
+#else
+  return pDebugLmShortDivisibleBy(a, sev_a, r, b, not_sev_b, r);
+#endif
+}
+
+static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, const ring r_a,
+                                      poly b, unsigned long not_sev_b, const ring r_b)
+{
+  p_LmCheckPolyRing1(a, r_a);
+  p_LmCheckPolyRing1(b, r_b);
+#ifndef PDIV_DEBUG
+  pPolyAssume2(p_GetShortExpVector(a, r_a) == sev_a, a, r_a);
+  pPolyAssume2(p_GetShortExpVector(b, r_b) == ~ not_sev_b, b, r_b);
+
+  if (sev_a & not_sev_b)
+  {
+    pAssume1(_p_LmDivisibleByNoComp(a, r_a, b, r_b) == FALSE);
+    return FALSE;
+  }
+  return _p_LmDivisibleBy(a, r_a, b, r_b);
+#else
+  return pDebugLmShortDivisibleBy(a, sev_a, r_a, b, not_sev_b, r_b);
+#endif
+}
+
+/***************************************************************
+ *
+ * Misc things on Lm
+ *
+ ***************************************************************/
+// test if the monomial is a constant as a vector component
+// i.e., test if all exponents are zero
+static inline BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
+{
+  //p_LmCheckPolyRing(p, r);
+  int i = r->VarL_Size - 1;
+
+  do
+  {
+    if (p->exp[r->VarL_Offset[i]] != 0)
+      return FALSE;
+    i--;
+  }
+  while (i >= 0);
+  return TRUE;
+}
+// test if monomial is a constant, i.e. if all exponents and the component
+// is zero
+static inline BOOLEAN p_LmIsConstant(const poly p, const ring r)
+{
+  if (p_LmIsConstantComp(p, r))
+    return (p_GetComp(p, r) == 0);
+  return FALSE;
+}
+
+// like the respective p_LmIs* routines, except that p might be empty
+static inline BOOLEAN p_IsConstantComp(const poly p, const ring r)
+{
+  if (p == NULL) return TRUE;
+  return (pNext(p)==NULL) && p_LmIsConstantComp(p, r);
+}
+
+static inline BOOLEAN p_IsConstant(const poly p, const ring r)
+{
+  if (p == NULL) return TRUE;
+  return (pNext(p)==NULL) && p_LmIsConstant(p, r);
+}
+
+static inline BOOLEAN p_IsUnit(const poly p, const ring r)
+{
+  if (p == NULL) return FALSE;
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r))
+    return (p_LmIsConstant(p, r) && nIsUnit(pGetCoeff(p),r->cf));
+#endif
+  return p_LmIsConstant(p, r);
+}
+
+static inline BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2,
+                                      const ring r)
+{
+  p_LmCheckPolyRing(p1, r);
+  p_LmCheckPolyRing(p2, r);
+  unsigned long l1, l2, divmask = r->divmask;
+  int i;
+
+  for (i=0; i<r->VarL_Size; i++)
+  {
+    l1 = p1->exp[r->VarL_Offset[i]];
+    l2 = p2->exp[r->VarL_Offset[i]];
+    // do the divisiblity trick
+    if ( (l1 > ULONG_MAX - l2) ||
+         (((l1 & divmask) ^ (l2 & divmask)) != ((l1 + l2) & divmask)))
+      return FALSE;
+  }
+  return TRUE;
+}
 #endif // P_POLYS_H
 
