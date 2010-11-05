@@ -89,8 +89,9 @@ bug_tr224
 bug_tr225
 bug_tr230
 bug_tr239
-bug_tr276
-; do not try bug_tr280 without 2.2 GB RAM free
+; do not try bug_tr276 without 2.2 GB RAM free
+; bug_tr276
+; do not try bug_tr280 without MP
 ; bug_tr280
 bug_tr288
 brnoeth_s
