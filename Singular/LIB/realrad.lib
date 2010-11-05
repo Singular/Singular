@@ -546,14 +546,10 @@ EXAMPLE: decision shows an example
    //recursion of variables
    ///////////////////////////////////////////////////////////////////////////
    ///////////////////////////////////////////////////////////////////////////
-   perm="varlist="+varstr(r)+";";
-   execute(perm);
-   varlist=delete(varlist,n);
-   for (@z=1;@z<n;@z++)
-   {
-     lessvar=lessvar+","+string(varlist[@z]);
-   }
-   lessvar=lessvar[2..size(lessvar)];
+   ideal II = maxideal(1);
+   varlist = II[1..n-1];
+   lessvar=string(varlist);
+
    parvar=string(var(n));
    ri="ring r_neu="+charstr(r)+",(@t,"+parvar+","+lessvar+"),dp;";
    execute(ri);
