@@ -43,45 +43,6 @@ struct  spolyrec
 
 /***************************************************************
  *
- * What should be inlined and debugged?
- *
- ***************************************************************/
-// determines inlining of poly procs which iter through polys
-#if defined(DO_PINLINE0) && !defined(PDEBUG)
-#define PINLINE0 static inline
-#else
-#define PINLINE0
-#endif
-
-// determines inlining of poly procs which iter over ExpVector
-#undef NO_PINLINE1
-#if PDEBUG <= 0 && !defined(NO_INLINE1)
-#define PINLINE1 static inline
-#else
-#define PINLINE1
-#define NO_PINLINE1 1
-#endif
-
-// determines inlining of constant time poly procs
-#undef NO_PINLINE2
-#if PDEBUG <= 1 && !defined(NO_INLINE2)
-#define PINLINE2 static inline
-#else
-#define PINLINE2
-#define NO_PINLINE2 1
-#endif
-
-// determines inlining of stuff from polys-impl.h
-#undef NO_PINLINE3
-#if PDEBUG <= 2 && !defined(NO_INLINE3)
-#define PINLINE3 static inline
-#else
-#define PINLINE3
-#define NO_PINLINE3 1
-#endif
-
-/***************************************************************
- *
  * prepare debugging
  *
  ***************************************************************/
