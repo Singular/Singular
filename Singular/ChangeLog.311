@@ -1,0 +1,86 @@
+Mi 13. Okt 15:52:56 CEST 2010
+- release 3-1-2
+- code simplification: HAVE_RTIMER, builin_rand removed (allways on)
+- generation of iparith.inc, mpsr_Tok.inc do not depened on everythings:
+  only gentable*, table.h, tok.h grammar.h is needed
+- new command: rank
+- function: datetime()
+- new libs: resjung.lib, monomial.lib, surfacesignature.lib, multigrading.lib
+             fpadim_lib, findiff_lib, integralbasis_lib, paraplanecurves_lib,
+	     primdecint_lib, resbin_lib, 
+- rewritten: sagbi.lib, latex.lib
+
+Fr 20. Aug 13:36:49 CEST 2010
+- release 3-1-1-5
+- code cleanup: HAVE_TCL removed, HAVE_FGLM: substituted by HAVE_FACTORY
+                removed macos 9 stuff in factory
+- system("HNF",...) computes the Hermite-Normalform for square matrices over Q
+   and intmat (only development version) - to be evaluated
+- new link: ssi with modi:
+    "ssi:tcp"     : waits on a free port xx, two-side communition
+                  (port will be printed)
+   "ssi:connect  <host>:<port>": to connect to a "ssi:tcp" link
+   "ssi:fork"   : create a new process via fork, while lestens in a
+                  read-eval-loop
+   "ssi:tcp <host>:<program>": create a new instance of <program> via ssh
+                  on <host> and connects to via ssi:tcp/ssi:connect".
+                  The new program will execute an read-eval-loop.
+- many small bug fixed(#253, #254, ....)
+- fixed timing problem in make (#252)
+- new functionality for dim: dim(I,J), dim(res)
+
+Thu Jul 15 17:12:09 CEST 2010 
+- ambigous overload of si_max resolved
+- added dependencies (enable parallel build)
+- at toplevel make depend possible (optional)
+
+Do 15. Jul 14:01:09 CEST 2010
+- release 3-1-1-4
+- SAGE patches from SAGE days 23.5
+- parallel build of the subdirectories
+
+Thu Jul  8 14:44:44 CEST 2010
+Changes since 3-1-1-2:
+- release 3-1-1-3
+- libraries fixed: normal.lib(genus), primdec.lib
+
+Fri Jun 25 15:54:15 CEST 2010
+Changes since 3-1-1-1:
+- release 3-1-1-2
+- factorize for Z/p, Z/p(a) improved
+- new lib monomial.lib
+- new lib assprime.lib
+- new lib: resbin.lib
+- lib extended: modstd.lib
+- new command: primefactors (was: General::primefactors)
+- new commands: lusolve, ludecomp(mat) and luinverse(mat [, mat, mat]) 
+- stdhilb fixed (Tst/Short/bug_stdhilb.tst)
+- factory: windows port improved (.h files instead of .inc)
+- fixed trac 226 (for ascii links)
+
+Sat May  8 15:26:00 CEST 2010
+Changes since 3-1-1:
+- release 3-1-1-1
+- new gcd for alg.extension of Z/p
+- decodegb.lib is now indep. of the names opf the variables
+- fixed minor bugs (rvar, ainvar.lib, ...)
+- renamed some old gmp functions (for compatibility with MPIR-2)
+- bug in NF fixed (see Tst/Short/bug_reduce.tst (was somehow wrong in 310..311)
+- cntrl-c hadling in interpreter fixed (was somehow lost in 310..311)
+- structs.h: smpoly moved to sparsemat.cc, 
+             tHomog moved to ring.h, 
+	     Exponent_t removed
+	     idtyp -> int
+	     Sy_refrence removed
+	     idrec -> idrec.h
+- memory leaks fixed for nc rings (trac 214)
+- documentation updates: primdec.lib, PLURAL
+- new lib: surfsig.lib (renamed from signature.lib)
+- memory leaks fixed: nlGcd, nc_ReduceSpolyNew
+- new lib: dmodvar.lib
+
+-  Fri Feb 26 11:55:05 MEZ 2010
+  release 3-1-1
+- Mon Feb  8 13:28:50 CET 2010
+  beta of 3-1-1
+
