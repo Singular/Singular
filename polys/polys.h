@@ -311,7 +311,6 @@ void      pEnlargeSet(polyset *p, int length, int increment);
 #define   pISet(i) p_ISet(i,currRing)
 #define   pNSet(n) p_NSet(n,currRing)
 
-poly p_One(const ring r);
 #define   pOne()   p_One(currRing)
 
 void      p_Content(poly p, const ring r);
