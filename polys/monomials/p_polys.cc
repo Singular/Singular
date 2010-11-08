@@ -1404,6 +1404,59 @@ poly p_Diff(poly a, int k, const ring r)
   }
   return res;
 }
+
+static poly pDiffOpM(poly a, poly b,BOOLEAN multiply, const ring r)
+{
+  int i,j,s;
+  number n,h,hh;
+  poly p=p_One(r);
+  n=n_Mult(pGetCoeff(a),pGetCoeff(b),r->cf);
+  for(i=rVar(r);i>0;i--)
+  {
+    s=p_GetExp(b,i,r);
+    if (s<p_GetExp(a,i,r))
+    {
+      n_Delete(&n,r->cf);
+      p_LmDelete(&p,r);
+      return NULL;
+    }
+    if (multiply)
+    {
+      for(j=p_GetExp(a,i,r); j>0;j--)
+      {
+        h = n_Init(s,r->cf);
+        hh=n_Mult(n,h,r->cf);
+        n_Delete(&h,r->cf);
+        n_Delete(&n,r->cf);
+        n=hh;
+        s--;
+      }
+      p_SetExp(p,i,s,r);
+    }
+    else
+    {
+      p_SetExp(p,i,s-p_GetExp(a,i,r),r);
+    }
+  }
+  p_Setm(p,r);
+  /*if (multiply)*/ p_SetCoeff(p,n,r);
+  if (n_IsZero(n,r->cf))  p=p_LmDeleteAndNext(p,r); // return NULL as p is a monomial
+  return p;
+}
+
+poly p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r)
+{
+  poly result=NULL;
+  poly h;
+  for(;a!=NULL;pIter(a))
+  {
+    for(h=b;h!=NULL;pIter(h))
+    {
+      result=p_Add_q(result,p_DiffOpM(a,h,multiply,r),r);
+    }
+  }
+  return result;
+}
 /***************************************************************
  *
  * p_ShallowDelete

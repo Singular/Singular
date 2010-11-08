@@ -1758,5 +1758,6 @@ poly      p_Divide(poly a, poly b, const ring r);
 poly      p_DivideM(poly a, poly b, const ring r);
 void      p_Lcm(poly a, poly b, poly m, const ring r);
 poly      p_Diff(poly a, int k, const ring r);
+poly      p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r);
 #endif // P_POLYS_H
 

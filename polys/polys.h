@@ -291,7 +291,7 @@ poly      p_Power(poly p, int i, const ring r);
 #define pDivide(a,b) p_Divide(a,b,currRing)
 #define pLcm(a,b,m) p_Lcm(a,b,m,currRing)
 #define pDiff(a,b)  p_Diff(a,b,currRing)
-poly      pDiffOp(poly a, poly b,BOOLEAN multiply);
+#define pDiffOp(a,b,m) p_DiffOp(a,b,m,currRing)
 
 #define   pMaxComp(p)   p_MaxComp(p, currRing)
 #define   pMinComp(p)   p_MinComp(p, currRing)
