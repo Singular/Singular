@@ -289,8 +289,8 @@ poly      p_Power(poly p, int i, const ring r);
 // ----------------- define to enable new p_procs -----*/
 
 #define pDivide(a,b) p_Divide(a,b,currRing)
+#define pLcm(a,b,m) p_Lcm(a,b,m,currRing)
 
-void      pLcm(poly a, poly b, poly m);
 poly      pDiff(poly a, int k);
 poly      pDiffOp(poly a, poly b,BOOLEAN multiply);
 

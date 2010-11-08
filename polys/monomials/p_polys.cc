@@ -1351,6 +1351,20 @@ poly p_DivideM(poly a, poly b, const ring r)
   return result;
 }
 
+/*2
+* returns the LCM of the head terms of a and b in *m
+*/
+void p_Lcm(poly a, poly b, poly m, const ring r)
+{
+  int i;
+  for (i=rVar(r); i; i--)
+  {
+    p_SetExp(m,i, si_max( p_GetExp(a,i,r), p_GetExp(b,i,r)),r);
+  }
+  p_SetComp(m, si_max(p_GetComp(a,r), p_GetComp(b,r)),r);
+  /* Don't do a pSetm here, otherwise hres/lres chockes */
+}
+
 /***************************************************************
  *
  * p_ShallowDelete

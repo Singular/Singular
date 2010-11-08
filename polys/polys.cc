@@ -125,20 +125,6 @@ BOOLEAN pDivisibleByRingCase(poly f, poly g)
 }
 #endif
 
-/*2
-* returns the LCM of the head terms of a and b in *m
-*/
-void pLcm(poly a, poly b, poly m)
-{
-  int i;
-  for (i=pVariables; i; i--)
-  {
-    pSetExp(m,i, si_max( pGetExp(a,i), pGetExp(b,i)));
-  }
-  pSetComp(m, si_max(pGetComp(a), pGetComp(b)));
-  /* Don't do a pSetm here, otherwise hres/lres chockes */
-}
-
 BOOLEAN _p_Test(poly p, ring r, int level);
 
 /*2
