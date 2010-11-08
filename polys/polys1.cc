@@ -353,59 +353,6 @@ poly p_Power(poly p, int i, const ring r)
   return rc;
 }
 
-static poly pDiffOpM(poly a, poly b,BOOLEAN multiply)
-{
-  int i,j,s;
-  number n,h,hh;
-  poly p=pOne();
-  n=nMult(pGetCoeff(a),pGetCoeff(b));
-  for(i=pVariables;i>0;i--)
-  {
-    s=pGetExp(b,i);
-    if (s<pGetExp(a,i))
-    {
-      nDelete(&n);
-      pLmDelete(&p);
-      return NULL;
-    }
-    if (multiply)
-    {
-      for(j=pGetExp(a,i); j>0;j--)
-      {
-        h = nInit(s);
-        hh=nMult(n,h);
-        nDelete(&h);
-        nDelete(&n);
-        n=hh;
-        s--;
-      }
-      pSetExp(p,i,s);
-    }
-    else
-    {
-      pSetExp(p,i,s-pGetExp(a,i));
-    }
-  }
-  pSetm(p);
-  /*if (multiply)*/ pSetCoeff(p,n);
-  if (nIsZero(n))  p=pLmDeleteAndNext(p); // return NULL as p is a monomial
-  return p;
-}
-
-poly pDiffOp(poly a, poly b,BOOLEAN multiply)
-{
-  poly result=NULL;
-  poly h;
-  for(;a!=NULL;pIter(a))
-  {
-    for(h=b;h!=NULL;pIter(h))
-    {
-      result=pAdd(result,pDiffOpM(a,h,multiply));
-    }
-  }
-  return result;
-}
-
 int pMaxCompProc(poly p)
 {
   return pMaxComp(p);
