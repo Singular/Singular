@@ -51,7 +51,6 @@ poly      ppNoether = NULL;
 void pSetGlobals(const ring r, BOOLEAN complete)
 {
   if (ppNoether!=NULL) pDelete(&ppNoether);
-  //pVariables = r->N;
   //pOrdSgn = r->OrdSgn;
   //pFDeg=r->pFDeg;
   //pLDeg=r->pLDeg;
@@ -222,101 +221,7 @@ void pLcm(poly a, poly b, poly m)
   /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
-/*2
-* convert monomial given as string to poly, e.g. 1x3y5z
-*/
-const char * p_Read(const char *st, poly &rc, const ring r)
-{
-  if (r==NULL) { rc=NULL;return st;}
-  int i,j;
-  rc = p_Init(r);
-  const char *s = r->cf->nRead(st,&(rc->coef));
-  if (s==st)
-  /* i.e. it does not start with a coeff: test if it is a ringvar*/
-  {
-    j = r_IsRingVar(s,r);
-    if (j >= 0)
-    {
-      p_IncrExp(rc,1+j,r);
-      while (*s!='\0') s++;
-      goto done;
-    }
-  }
-  while (*s!='\0')
-  {
-    char ss[2];
-    ss[0] = *s++;
-    ss[1] = '\0';
-    j = r_IsRingVar(ss,r);
-    if (j >= 0)
-    {
-      const char *s_save=s;
-      s = eati(s,&i);
-      if (((unsigned long)i) >  r->bitmask)
-      {
-        // exponent to large: it is not a monomial
-        p_LmDelete(&rc,r);
-        return s_save;
-      }
-      p_AddExp(rc,1+j, (long)i, r);
-    }
-    else
-    {
-      // 1st char of is not a varname
-      p_LmDelete(&rc,r);
-      s--;
-      return s;
-    }
-  }
-done:
-  if (r->cf->nIsZero(pGetCoeff(rc))) p_LmDelete(&rc,r);
-  else
-  {
-#ifdef HAVE_PLURAL
-    // in super-commutative ring
-    // squares of anti-commutative variables are zeroes!
-    if(rIsSCA(r))
-    {
-      const unsigned int iFirstAltVar = scaFirstAltVar(r);
-      const unsigned int iLastAltVar  = scaLastAltVar(r);
-
-      assume(rc != NULL);
-
-      for(unsigned int k = iFirstAltVar; k <= iLastAltVar; k++)
-        if( p_GetExp(rc, k, r) > 1 )
-        {
-          p_LmDelete(&rc, r);
-          goto finish;
-        }
-    }
-#endif
-    p_Setm(rc,r);
-  }
-finish:
-  return s;
-}
-
 BOOLEAN _p_Test(poly p, ring r, int level);
-poly pmInit(const char *st, BOOLEAN &ok)
-{
-  poly p;
-  const char *s=p_Read(st,p,currRing);
-  if (*s!='\0')
-  {
-    if ((s!=st)&&isdigit(st[0]))
-    {
-      errorreported=TRUE;
-    }
-    ok=FALSE;
-    pDelete(&p);
-    return NULL;
-  }
-  #ifdef PDEBUG
-  _p_Test(p,currRing,PDEBUG);
-  #endif
-  ok=!errorreported;
-  return p;
-}
 
 /*2
 *make p homogeneous by multiplying the monomials by powers of x_varnum
@@ -559,23 +464,6 @@ void pDeleteComp(poly * p,int k)
   }
 }
 /*----------end of utilities for syzygies--------------*/
-
-/*2
-* pair has no common factor ? or is no polynomial
-*/
-BOOLEAN pHasNotCF(poly p1, poly p2)
-{
-
-  if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
-    return FALSE;
-  int i = pVariables;
-  loop
-  {
-    if ((pGetExp(p1, i) > 0) && (pGetExp(p2, i) > 0))   return FALSE;
-    i--;
-    if (i == 0)                                         return TRUE;
-  }
-}
 
 /*2
 * divides p1 by its leading coefficient if it is a unit

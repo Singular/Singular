@@ -10,42 +10,6 @@
 */
 
 #include <kernel/p_polys.h>
-/*
- Some general remarks:
- We divide poly operations into roughly 4 categories:
- Level 2: operations on monomials/polynomials with constant time,
-          or operations which are just dispatchers to other
-          poly routines
-          - implemented in: pInline2.h
-          - debugging only if PDEBUG >= 2
-          - normally inlined, unless PDEBUG >= 2 || NO_INLINE2
- Level 1: operations on monomials with time proportional to length
-          - implemented in: pInline1.h
-          - debugging only if PDEBUG >= 1
-          - normally inlined, unless PDEBUG >= 1 || NO_INLINE1
- Level 0: short operations on polynomials with time proportional to
-          length of poly
-          - implemented in pInline0.cc
-          - debugging if PDEBUG
-          - normally _not_ inlined: can be forced with
-            #define DO_PINLINE0
-            #include "pInline0.h"
- Misc   : operations on polynomials which do not fit in any of the
-          above categories
-          - implemented in: polys*.cc
-          - never inlined
-          - debugging if PDEBUG >= 0
-
- You can set PDEBUG on a per-file basis, before including "mod2.h" like
-   #define PDEBUG 2
-   #include "mod2.h"
- However, PDEBUG will only be in effect, if !NDEBUG.
-
- All p_* operations take as last argument a ring
- and are ring independent. Their corresponding p* operations are usually
- just macros to the respective p_*(..,currRing).
-
-*/
 
 /***************************************************************
  *
@@ -212,7 +176,7 @@ BOOLEAN pDivisibleByRingCase(poly f, poly g);
  *
  *************************************************************************/
 // sorts p, assumes all monomials in p are different
-#define pSortMerger(p)          pSort(p)
+#define pSortMerger(p)          p_SortMerge(p, currRing)
 #define pSort(p)                p_SortMerge(p, currRing)
 
 // sorts p, p may have equal monomials
@@ -255,25 +219,27 @@ BOOLEAN pDivisibleByRingCase(poly f, poly g);
  ***************************************************************/
 
 typedef poly*   polyset;
-extern int      pVariables;
 extern int      pOrdSgn;
 extern BOOLEAN  pLexOrder;
 extern poly     ppNoether;
 extern BOOLEAN  pVectorOut;
 
 /*-------------predicate on polys ----------------------*/
-BOOLEAN   pHasNotCF(poly p1, poly p2);   /*has no common factor ?*/
-void      pSplit(poly p, poly * r);   /*p => IN(p), r => REST(p) */
+#define  pHasNotCF(p1,p2)   p_HasNotCF(p1,p2,currRing)
+                                /*has no common factor ?*/
+#define  pSplit(p,r)        p_Split(p,r)
+                                /*p => IN(p), r => REST(p) */
 
 
 
 /*-------------ring management:----------------------*/
 extern void pSetGlobals(const ring r, BOOLEAN complete = TRUE);
+
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which
 // only uses pFDeg (and not pDeg, or pTotalDegree, etc).
 // If you use this, make sure your procs does not make any assumptions
-// on oredering and/or OrdIndex -- otherwise they might return wrong results
+// on ordering and/or OrdIndex -- otherwise they might return wrong results
 // on strat->tailRing
 extern void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg = NULL);
 // restores pFDeg and pLDeg:
@@ -282,7 +248,7 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg);
 /*-----------the ordering of monomials:-------------*/
 #define pSetm(p)    p_Setm(p, currRing)
 // TODO:
-#define pSetmComp   pSetm
+#define pSetmComp(p)   p_Setm(p, currRing)
 
 /***************************************************************
  *
@@ -315,12 +281,10 @@ void pSetModDeg(intvec *w);
 
 
 
-poly      pmInit(const char *s, BOOLEAN &ok); /* monom s -> poly, interpreter */
-const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
-
 /*-------------operations on polynomials:------------*/
 poly      pSub(poly a, poly b);
 poly      p_Power(poly p, int i, const ring r);
+#define pmInit(a,b) p_mInit(a,b,currRing)
 
 // ----------------- define to enable new p_procs -----*/
 
