@@ -90,27 +90,6 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg)
   currRing->pLDeg = old_lDeg;
 }
 
-/*2
-* assumes that the head term of b is a multiple of the head term of a
-* and return the multiplicant *m
-* Frank's observation: If LM(b) = LM(a)*m, then we may actually set
-* negative(!) exponents in the below loop. I suspect that the correct
-* comment should be "assumes that LM(a) = LM(b)*m, for some monomial m..."
-*/
-#define pDivide(a,b) p_Divide(a,b,currRing)
-poly p_Divide(poly a, poly b, cont ring r)
-{
-  assume((pGetComp(a)==pGetComp(b)) || (pGetComp(b)==0));
-  int i;
-  poly result = pInit();
-
-  for(i=(int)r->N; i; i--)
-    p_SetExp(result,i, p_GetExp(a,i,r)- p_GetExp(b,i,r),r);
-  p_SetComp(result, p_GetComp(a,r) - p_GetComp(b,r),r);
-  p_Setm(result,r);
-  return result;
-}
-
 #ifdef HAVE_RINGS   //TODO Oliver
 #define pDiv_nn(p, n)              p_Div_nn(p, n, currRing)
 
@@ -145,67 +124,6 @@ BOOLEAN pDivisibleByRingCase(poly f, poly g)
   return nDivBy(pGetCoeff(g), pGetCoeff(f));
 }
 #endif
-
-/*2
-* divides a by the monomial b, ignores monomials which are not divisible
-* assumes that b is not NULL, destroys b
-*/
-poly p_DivideM(poly a, poly b, const ring r)
-{
-  if (a==NULL) { pDelete(&b); return NULL; }
-  poly result=a;
-  poly prev=NULL;
-  int i;
-#ifdef HAVE_RINGS
-  number inv=pGetCoeff(b);
-#else
-  number inv=nInvers(pGetCoeff(b));
-#endif
-
-  while (a!=NULL)
-  {
-    if (p_DivisibleBy(b,a,r))
-    {
-      assume((p_GetComp(a,r)==p_GetComp(b,r)) || (p_GetComp(b,r)==0));
-      for(i=(int)r->N; i; i--)
-         p_SubExp(a,i, p_GetExp(b,i,r),r);
-      p_SubComp(a, p_GetComp(b,r),r);
-      p_Setm(a,r);
-      prev=a;
-      pIter(a);
-    }
-    else
-    {
-      if (prev==NULL)
-      {
-        p_DeleteLm(&result,r);
-        a=result;
-      }
-      else
-      {
-        p_DeleteLm(&pNext(prev),r);
-        a=pNext(prev);
-      }
-    }
-  }
-#ifdef HAVE_RINGS
-  if (n_IsUnit(inv,r->cf))
-  {
-    inv = n_Invers(inv,r->cf);
-    p_Mult_nn(result,inv,r);
-    n_Delete(&inv, r->cf);
-  }
-  else
-  {
-    p_Div_nn(result,inv,r);
-  }
-#else
-  p_Mult_nn(result,inv,r);
-  n_Delete(&inv, r->cf);
-#endif
-  p_Delete(&b, r);
-  return result;
-}
 
 /*2
 * returns the LCM of the head terms of a and b in *m

@@ -1754,5 +1754,7 @@ void      p_Split(poly p, poly * r);   /*p => IN(p), r => REST(p) */
 BOOLEAN p_HasNotCF(poly p1, poly p2, const ring r);
 poly      p_mInit(const char *s, BOOLEAN &ok, const ring r); /* monom s -> poly, interpreter */
 const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
+poly      p_Divide(poly a, poly b, const ring r);
+poly      p_DivideM(poly a, poly b, const ring r);
 #endif // P_POLYS_H
 
