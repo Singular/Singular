@@ -446,15 +446,6 @@ poly pDiffOp(poly a, poly b,BOOLEAN multiply)
   return result;
 }
 
-
-void pSplit(poly p, poly *h)
-{
-  *h=pNext(p);
-  pNext(p)=NULL;
-}
-
-
-
 int pMaxCompProc(poly p)
 {
   return pMaxComp(p);

@@ -1133,6 +1133,126 @@ poly p_One(const ring r)
   return rc;
 }
 
+void p_Split(poly p, poly *h)
+{
+  *h=pNext(p);
+  pNext(p)=NULL;
+}
+
+/*2
+* pair has no common factor ? or is no polynomial
+*/
+BOOLEAN p_HasNotCF(poly p1, poly p2, const ring r)
+{
+
+  if (p_GetComp(p1,r) > 0 || p_GetComp(p2,r) > 0)
+    return FALSE;
+  int i = rVar(r);
+  loop
+  {
+    if ((p_GetExp(p1, i, r) > 0) && (p_GetExp(p2, i, r) > 0))
+      return FALSE;
+    i--;
+    if (i == 0)
+      return TRUE;
+  }
+}
+
+/*2
+* convert monomial given as string to poly, e.g. 1x3y5z
+*/
+const char * p_Read(const char *st, poly &rc, const ring r)
+{
+  if (r==NULL) { rc=NULL;return st;}
+  int i,j;
+  rc = p_Init(r);
+  const char *s = r->cf->nRead(st,&(rc->coef));
+  if (s==st)
+  /* i.e. it does not start with a coeff: test if it is a ringvar*/
+  {
+    j = r_IsRingVar(s,r);
+    if (j >= 0)
+    {
+      p_IncrExp(rc,1+j,r);
+      while (*s!='\0') s++;
+      goto done;
+    }
+  }
+  while (*s!='\0')
+  {
+    char ss[2];
+    ss[0] = *s++;
+    ss[1] = '\0';
+    j = r_IsRingVar(ss,r);
+    if (j >= 0)
+    {
+      const char *s_save=s;
+      s = eati(s,&i);
+      if (((unsigned long)i) >  r->bitmask)
+      {
+        // exponent to large: it is not a monomial
+        p_LmDelete(&rc,r);
+        return s_save;
+      }
+      p_AddExp(rc,1+j, (long)i, r);
+    }
+    else
+    {
+      // 1st char of is not a varname
+      p_LmDelete(&rc,r);
+      s--;
+      return s;
+    }
+  }
+done:
+  if (r->cf->nIsZero(pGetCoeff(rc))) p_LmDelete(&rc,r);
+  else
+  {
+#ifdef HAVE_PLURAL
+    // in super-commutative ring
+    // squares of anti-commutative variables are zeroes!
+    if(rIsSCA(r))
+    {
+      const unsigned int iFirstAltVar = scaFirstAltVar(r);
+      const unsigned int iLastAltVar  = scaLastAltVar(r);
+
+      assume(rc != NULL);
+
+      for(unsigned int k = iFirstAltVar; k <= iLastAltVar; k++)
+        if( p_GetExp(rc, k, r) > 1 )
+        {
+          p_LmDelete(&rc, r);
+          goto finish;
+        }
+    }
+#endif
+    
+    p_Setm(rc,r);
+  }
+finish:  
+  return s;
+}
+poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
+{
+  poly p;
+  const char *s=p_Read(st,p,r);
+  if (*s!='\0')
+  {
+    if ((s!=st)&&isdigit(st[0]))
+    {
+      errorreported=TRUE;
+    }
+    ok=FALSE;
+    p_Delete(&p,r);
+    return NULL;
+  }
+  #ifdef PDEBUG
+  _p_Test(p,r,PDEBUG);
+  #endif
+  ok=!errorreported;
+  return p;
+}
+
 /*2
 * returns a polynomial representing the number n
 * destroys n
