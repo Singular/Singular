@@ -1365,6 +1365,45 @@ void p_Lcm(poly a, poly b, poly m, const ring r)
   /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
+/*2
+* returns the partial differentiate of a by the k-th variable
+* does not destroy the input
+*/
+poly p_Diff(poly a, int k, const ring r)
+{
+  poly res, f, last;
+  number t;
+
+  last = res = NULL;
+  while (a!=NULL)
+  {
+    if (p_GetExp(a,k,r)!=0)
+    {
+      f = p_LmInit(a,r);
+      t = n_Init(p_GetExp(a,k,r),r->cf);
+      pSetCoeff0(f,n_Mult(t,pGetCoeff(a),r->cf));
+      n_Delete(&t,r->cf);
+      if (n_IsZero(pGetCoeff(f),r->cf))
+        p_LmDelete(&f,r);
+      else
+      {
+        p_DecrExp(f,k,r);
+        p_Setm(f,r);
+        if (res==NULL)
+        {
+          res=last=f;
+        }
+        else
+        {
+          pNext(last)=f;
+          last=f;
+        }
+      }
+    }
+    pIter(a);
+  }
+  return res;
+}
 /***************************************************************
  *
  * p_ShallowDelete

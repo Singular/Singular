@@ -1757,5 +1757,6 @@ const char *    p_Read(const char *s, poly &p,const ring r); /* monom -> poly */
 poly      p_Divide(poly a, poly b, const ring r);
 poly      p_DivideM(poly a, poly b, const ring r);
 void      p_Lcm(poly a, poly b, poly m, const ring r);
+poly      p_Diff(poly a, int k, const ring r);
 #endif // P_POLYS_H
 
