@@ -353,46 +353,6 @@ poly p_Power(poly p, int i, const ring r)
   return rc;
 }
 
-/*2
-* returns the partial differentiate of a by the k-th variable
-* does not destroy the input
-*/
-poly pDiff(poly a, int k)
-{
-  poly res, f, last;
-  number t;
-
-  last = res = NULL;
-  while (a!=NULL)
-  {
-    if (pGetExp(a,k)!=0)
-    {
-      f = pLmInit(a);
-      t = nInit(pGetExp(a,k));
-      pSetCoeff0(f,nMult(t,pGetCoeff(a)));
-      nDelete(&t);
-      if (nIsZero(pGetCoeff(f)))
-        pLmDelete(&f);
-      else
-      {
-        pDecrExp(f,k);
-        pSetm(f);
-        if (res==NULL)
-        {
-          res=last=f;
-        }
-        else
-        {
-          pNext(last)=f;
-          last=f;
-        }
-      }
-    }
-    pIter(a);
-  }
-  return res;
-}
-
 static poly pDiffOpM(poly a, poly b,BOOLEAN multiply)
 {
   int i,j,s;
