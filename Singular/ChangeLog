@@ -1,2 +1,10 @@
+Di 9. Nov 11:35:53 CET 2010
+- error handling in factory via factoryError, 
+  Singular sets this to WerrorS via factoryError_callback
+
 Sa 6. Nov 12:12:43 CET 2010
 - new commands: waitall, waitfirst (parallelization stuff)
+
+Mi 13. Okt 15:52:56 CEST 2010
+- release 3-1-2
+

@@ -67,7 +67,7 @@ int main(          /* main entry to Singular */
   omInitGetBackTrace();
 
   /* initialize components */
-  factoryError_callback=WerrorS;
+  factoryError=WerrorS;
   siRandomStart=inits();
   feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
   int optc, option_index;
