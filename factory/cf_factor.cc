@@ -129,7 +129,6 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
     else
     {
     #ifdef NOSTREAMIO
-      #ifdef SINGULAR
       if (f.inZ())
       {
         mpz_t m;
@@ -156,9 +155,6 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
         delete[] str;
 	mpz_clear(m);
       }
-      #else
-      printf("+...");
-      #endif
     #else
        std::cout << f;
     #endif
@@ -364,11 +360,8 @@ homogenize( const CanonicalForm & f, const Variable & x, const Variable & v1, co
 #endif
 }
 
-#ifdef SINGULAR
-extern int singular_homog_flag;
-#else
-#define singular_homog_flag 1
-#endif
+int singular_homog_flag=1;
+
 int cmpCF( const CFFactor & f, const CFFactor & g )
 {
   if (f.exp() > g.exp()) return 1;

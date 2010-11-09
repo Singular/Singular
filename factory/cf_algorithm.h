@@ -55,6 +55,8 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q );
 //}}}
 
 //{{{ function declarations from cf_factor.cc
+extern int singular_homog_flag;
+
 bool isPurePoly(const CanonicalForm & f);
 
 bool isPurePoly_m(const CanonicalForm & f);
