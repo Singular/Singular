@@ -1,12 +1,6 @@
 /* $Id$ */
 #include <config.h>
 
-#ifdef SINGULAR
-#ifndef OM_NDEBUG
-#define OM_NDEBUG
-#endif
-#endif
-
 #include "cf_gmp.h"
 
 #include "assert.h"
