@@ -55,6 +55,6 @@ void factoryError_intern(const char *s)
   fprintf(stderr,s);
   abort();
 }
-void (*factoryError_callback)(const char *s) = factoryError_intern;
+void (*factoryError)(const char *s) = factoryError_intern;
 
 
