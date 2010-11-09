@@ -49,7 +49,6 @@ int initializeGMP()
 #ifdef MDEBUG
     mp_set_memory_functions( mgAllocBlock, mgReallocBlock, mgFreeBlock );
 #else
-    printf("BAD\n");
     // do not initialize this within Singular:
     mp_set_memory_functions( mmAllocBlock, mmReallocBlock, mmFreeBlock );
 #endif
