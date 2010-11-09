@@ -15,7 +15,9 @@
 int ipower ( int b, int n );
 int ilog2 (int a);
 
+/*BEGINPUBLIC*/
 extern void (*factoryError_callback)(const char *s);
+/*ENDPUBLIC*/
 
 void factoryError(const char *s);
 

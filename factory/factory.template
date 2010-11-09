@@ -94,8 +94,6 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "fac_sqrfree.h"
 
-#ifdef SINGULAR
-
 /*MAKEHEADER PUBLIC ONLY*/
 #include "gfops.h"
 
@@ -105,7 +103,8 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "singext.h"
 
-#endif /* SINGULAR */
+/*MAKEHEADER PUBLIC ONLY*/
+#include "cf_util.h"
 
 #ifdef HAVE_BIFAC
 /*MAKEHEADER PUBLIC ONLY*/
