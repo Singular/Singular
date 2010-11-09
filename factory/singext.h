@@ -16,12 +16,6 @@ extern int nfM1;
 extern int nfMinPoly[];
 extern short nfPlus1Table[];
 
-// to use Singular error reporting:
-
-extern int errorreported;
-extern "C" void  WerrorS(const char *s);
-extern "C" void  Werror(const char *s, ...);
-
 // used to open the GF(q) tables from Singular
 extern FILE * feFopen ( const char * path, const char * mode, char *where = 0, int useWerror = 0, int path_only = 0);
 

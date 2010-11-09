@@ -36,10 +36,6 @@
 #include "NTLconvert.h"
 #endif
 
-#ifdef SINGULAR
-#include "singext.h"
-#endif
-
 int getExp(); /* cf_char.cc */
 
 //static bool isUnivariateBaseDomain( const CanonicalForm & f )
@@ -800,11 +796,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   }
   else //Q(a)[x1,...,xn]
   {
-  #ifdef SINGULAR
-      WerrorS("not implemented");
-  #else
-      abort();
-  #endif
+      factoryError("not implemented");
   }
   return F;
 }

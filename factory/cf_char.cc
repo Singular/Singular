@@ -12,9 +12,6 @@
 #include "cf_primes.h"
 #include "cf_binom.h"
 #include "cf_util.h"
-#ifdef SINGULAR
-//#include "singext.h"
-#endif
 
 static int theCharacteristic = 0;
 static int theDegree = 1;
