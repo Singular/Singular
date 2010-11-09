@@ -17,8 +17,8 @@ int ilog2 (int a);
 
 /*BEGINPUBLIC*/
 extern void (*factoryError_callback)(const char *s);
+void factoryError(const char *s);
 /*ENDPUBLIC*/
 
-void factoryError(const char *s);
 
 #endif /* ! INCL_CF_UTIL_H */
