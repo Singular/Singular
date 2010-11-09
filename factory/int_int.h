@@ -23,6 +23,7 @@
 #include "gmpext.h"
 
 #ifdef HAVE_OMALLOC
+#define OM_NDEBUG
 #  include <omalloc/omalloc.h>
 #endif
 

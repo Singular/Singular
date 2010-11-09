@@ -21,13 +21,8 @@
 #include "variable.h"
 #include "canonicalform.h"
 
-#ifdef SINGULAR
-#ifndef OM_NDEBUG
-#define OM_NDEBUG
-#endif
-#endif
-
 #ifdef HAVE_OMALLOC
+#define OM_NDEBUG
 #  include <omalloc/omalloc.h>
 #endif
 
