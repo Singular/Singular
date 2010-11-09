@@ -175,8 +175,6 @@ extern BOOLEAN jjJanetBasis(leftv res, leftv v);
 static int PyInitialized = 0;
 #endif
 
-int singular_homog_flag=1;
-
 //void emStart();
 /*2
 *  the "system" command
