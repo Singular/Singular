@@ -891,12 +891,15 @@ void WerrorS(const char *s)
 #endif
   {
     {
-      if (WerrorS_callback == NULL) {
+      if (WerrorS_callback == NULL)
+      {
         fwrite("   ? ",1,5,stderr);
         fwrite((char *)s,1,strlen((char *)s),stderr);
         fwrite("\n",1,1,stderr);
         fflush(stderr);
-      } else {
+      }
+      else
+      {
         WerrorS_callback(s);
       }
       if (feProt&PROT_O)
