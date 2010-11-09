@@ -1646,12 +1646,8 @@ operator << ( OSTREAM & os, const CanonicalForm & cf )
 ISTREAM&
 operator >> ( ISTREAM & is, CanonicalForm & cf )
 {
-#ifndef SINGULAR
     cf = readCF( is );
     return is;
-#else /* SINGULAR */
-    return is;
-#endif /* SINGULAR */
 }
 #endif /* NOSTREAMIO */
 //}}}
