@@ -25,21 +25,11 @@
 // some CC's need this:
 #include "MVMultiHensel.h"
 
-#ifdef SINGULAR
-#define HAVE_SINGULAR_ERROR
 #ifndef NOSTREAMIO
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 #endif
-#endif
 
-#ifdef HAVE_SINGULAR_ERROR
 extern int libfac_interruptflag;
-   extern "C"
-   {
-     void WerrorS(const char *);
-     void Werror(const char *fmt, ...);
-   }
-#endif
 
 #ifdef HENSELDEBUG
 #  define DEBUGOUTPUT
@@ -149,18 +139,7 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
   // Degrees ok? degree(F1,mainvar) + degree(F2,mainvar) <= i ?
   if ( (degree(F1,levelU) + degree(F2,levelU) ) <= i )
   {
-#ifdef HAVE_SINGULAR_ERROR
-    if (!interrupt_handle()) Werror("libfac: diophant ERROR: degree too large!  (%d + %d <= %d)",degree(F1,levelU), degree(F2,levelU), i);
-      //out_cf("F1:",F1,"\n");
-      //out_cf("F2:",F2,"\n");
-#else
-#ifndef NOSTREAMIO
-    CERR << "libfac: diophant ERROR: degree too large!  "
-         << (degree(F1,levelU) + degree(F2,levelU) ) <<"\n";
-#else
-    ;
-#endif
-#endif
+    if (!interrupt_handle()) factoryError("libfac: diophant ERROR: degree too large!"); /*  (%d + %d <= %d)",degree(F1,levelU), degree(F2,levelU), i);*/
     Retvalue.One=F1;Retvalue.Two=F2;
     return Retvalue;
   }
@@ -193,21 +172,8 @@ diophant( int levelU , const CanonicalForm & F1 , const CanonicalForm & F2 ,
           return Retvalue;
         }
       } 
-#ifdef HAVE_SINGULAR_ERROR
-      if (!interrupt_handle()) WerrorS("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
-#ifndef NOSTREAMIO
-      out_cf("F1:",F1,"\n");
-      out_cf("F2:",F2,"\n");
-      out_cf("gcd:",r,"\n");
-#endif
-#else
-#ifndef NOSTREAMIO
-      CERR << "libfac: diophant ERROR: " << F1 << "  and  " << F2
-           << "  are not relatively prime!" << "\n";
-#else
-     ;
-#endif
-#endif
+      if (!interrupt_handle())
+        factoryError("libfac: diophant ERROR: F1 and F2 are not relatively prime! ");
       Retvalue.One=s/r;Retvalue.Two=t/r;
       return Retvalue;
     }

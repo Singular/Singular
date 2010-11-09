@@ -31,15 +31,6 @@ void out_cf(char *s1,const CanonicalForm &f,char *s2);
 void out_cff(CFFList &L);
 
 
-#ifdef SINGULAR
-#define HAVE_SINGULAR_ERROR
-#endif
-
-#ifdef HAVE_SINGULAR_ERROR
-   extern "C" { void WerrorS(const char *); }
-   extern "C" { void WarnS(const char *); }
-#endif
-
 #ifdef FACTORDEBUG
 #  define DEBUGOUTPUT
 #else
@@ -293,14 +284,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
           }
           else
           {
-#ifdef HAVE_SINGULAR_ERROR
-            WerrorS("libfac: ERROR: not_monic1: case lt is a sum.");
-#else
-#ifndef NOSTREAMIO
-            CERR << "libfac: ERROR: not_monic1: case lt is a sum.\n"
-                 << errmsg << "\n";
-#endif
-#endif
+            factoryError("libfac: ERROR: not_monic1: case lt is a sum.");
           }
         }
         // Now we add a test if we did the right thing:
@@ -313,14 +297,7 @@ not_monic( const CFFList & TheList, const CanonicalForm & ltt, const CanonicalFo
           Returnlist= myUnion( CFFList(CFFactor(1/a,1)),Returnlist) ;
         else
         {
-#ifdef HAVE_SINGULAR_ERROR
-          WerrorS("libfac: ERROR: not_monic2: case lt is a sum.");
-#else
-#ifndef NOSTREAMIO
-          CERR << "libfac: ERROR: not_monic2: case lt is a sum.\n"
-               << errmsg << "\n";
-#endif
-#endif
+          factoryError("libfac: ERROR: not_monic2: case lt is a sum.");
         }
       }
     }
@@ -424,16 +401,9 @@ generate_mipo( int degree_of_Extension , const Variable & Extension ){
   if ( degree(Extension) > 0 ) GFRandom gen;
   else {
     if ( degree(Extension) == 0 ) FFRandom gen;
-    else {
-#ifdef HAVE_SINGULAR_ERROR
-    WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
-#else
-#ifndef NOSTREAMIO
-    CERR << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
-         << "\n";
-#endif
-#endif
-    FFRandom gen;
+    else
+    {
+      factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
     }
   }
   return find_irreducible( degree_of_Extension, gen, Variable(1) );
@@ -516,15 +486,9 @@ specializePoly(const CanonicalForm & f, Variable & Extension, int deg, SFormList
       Extension= minpoly;
       ok= try_specializePoly(f,minpoly,deg,Substitutionlist,i,j);
     }
-    else {
-#ifdef HAVE_SINGULAR_ERROR
-      WerrorS("libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!");
-#else
-#ifndef NOSTREAMIO
-      CERR << "libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!\n"
-           << errmsg << "\n";
-#endif
-#endif
+    else
+    {
+      factoryError("libfac: spezializePoly ERROR: Working over given extension-field not yet implemented!");
       return 0;
     }
   }
@@ -551,27 +515,26 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
   CFFList unilist;
 
   if ( degree(Extension) >0 ) GFRandom gen;
-  else { if ( degree(Extension) == 0 ) FFRandom gen;
-  else {
-#ifdef HAVE_SINGULAR_ERROR
-    WerrorS("libfac: evaluate: Extension not inFF() or inGF() !");
-#else
-#ifndef NOSTREAMIO
-    CERR << "libfac: evaluate: " << Extension << " not inFF() or inGF() !"
-         << "\n";
-#endif
-#endif
-    FFRandom gen; }}
+  else
+  {
+    if ( degree(Extension) == 0 ) FFRandom gen;
+    else
+    {
+      factoryError("libfac: evaluate: Extension not inFF() or inGF() !");
+    }
+  }
   REvaluation k(1,n,gen);
   k.nextpoint();
-  for ( int i=1; i<=maxtries ; i++){
+  for ( int i=1; i<=maxtries ; i++)
+  {
     // k.nextpoint();
     SFormList Substitutionlist;
     for ( int j=1; j<=n; j++ )
      Substitutionlist.insert(SForm(Variable(j),k[j]));
     k.nextpoint();
     CanonicalForm g=substitutePoly(f,Substitutionlist);
-    if ( various_tests(g, degf,1) ){ // found a valid point
+    if ( various_tests(g, degf,1) )
+    { // found a valid point
       failedfactor = 0; tried += 1;
       if ( degree(Extension) == 0   )
         unilist = factorize(g,1); // poly is sqr-free!
@@ -768,16 +731,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
     DEBOUTLN(CERR,  "Returned from specializePoly: success: ", success);
     if (success == 0 ) // No spezialisation could be found
     {
-#ifdef HAVE_SINGULAR_ERROR
-      WarnS("libfac: Factorize: ERROR: Not able to find a valid specialization!");
-#else
-#ifndef NOSTREAMIO
-      CERR << "libfac: Factorize: ERROR: Not able to find a valid specialization!\n"
-           << errmsg << "\n";
-#else
-       ;
-#endif
-#endif
+      factoryError("libfac: Factorize: ERROR: Not able to find a valid specialization!");
       Outputlist.append(CFFactor(F,1));
       return Outputlist;
     }

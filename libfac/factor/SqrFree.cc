@@ -26,14 +26,6 @@ static const char * errmsg = "\nYou found a bug!\nPlease inform singular@mathema
 // some CC's need this:
 #include "SqrFree.h"
 
-#ifdef SINGULAR
-#define HAVE_SINGULAR_ERROR
-#endif
-
-#ifdef HAVE_SINGULAR_ERROR
-   extern "C" { void WerrorS(const char *); }
-#endif
-
 #ifdef SQRFREEDEBUG
 # define DEBUGOUTPUT
 #else
@@ -194,14 +186,7 @@ SqrFreeTest( const CanonicalForm & r, int opt)
     if ( g.isOne() || (-g).isOne() || (g==f) || (getNumVars(g)==0) ) return 1 ;
     else return 0 ;
   }
-#ifdef HAVE_SINGULAR_ERROR
-  WerrorS("libfac: ERROR: SqrFreeTest: we should never fall trough here!");
-#else
-#ifndef NOSTREAMIO
-  CERR << "\nlibfac: ERROR: SqrFreeTest: we should never fall trough here!\n"
-       << errmsg << "\n";
-#endif
-#endif
+  factoryError("libfac: ERROR: SqrFreeTest: we should never fall trough here!");
   return 0;
 }
 
@@ -346,14 +331,7 @@ SqrFreed( const CanonicalForm & r , const CanonicalForm &mipo=0)
     DEBDECLEVEL(CERR, "SqrFreed");
     return Outputlist ;
   }
-#ifdef HAVE_SINGULAR_ERROR
-  WerrorS("libfac: ERROR: SqrFreed: we should never fall trough here!");
-#else
-#ifndef NOSTREAMIO
-  CERR << "\nlibfac: ERROR: SqrFreed: we should never fall trough here!\n"
-       << errmsg << "\n";
-#endif
-#endif
+  factoryError("libfac: ERROR: SqrFreed: we should never fall trough here!");
   DEBDECLEVEL(CERR, "SqrFreed");
   return Outputlist; // for safety purpose
 }

@@ -41,15 +41,6 @@ static CFList     irras(CFList & AS, int &ja, CanonicalForm & reducible);
 #endif
 #include "debug.h"
 
-#ifdef SINGULAR
-#define HAVE_SINGULAR_ERROR
-#endif
-
-#ifdef HAVE_SINGULAR_ERROR
-   extern "C" { void WerrorS(const char *); }
-   extern "C" { void WarnS(const char *); }
-#endif
-
 // the next computes a characteristic set (a basic set in Wang's sense)
 CFList
 BasicSet( const CFList &PS )

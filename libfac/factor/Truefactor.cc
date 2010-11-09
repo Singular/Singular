@@ -25,14 +25,6 @@
 // some CC's need this:
 #include "Truefactor.h"
 
-#ifdef SINGULAR
-#define HAVE_SINGULAR_ERROR
-#endif
-
-#ifdef HAVE_SINGULAR_ERROR
-   extern "C" { void WerrorS(const char *); }
-#endif
-
 #ifdef TRUEFACTORDEBUG
 #  define DEBUGOUTPUT
 #else
@@ -378,16 +370,7 @@ CFFList TakeNorms(const CFFList & PiList)
     int n=2;
     if ( PossibleFactors.length() < n )  // a little check
     {
-#ifdef HAVE_SINGULAR_ERROR
-      WerrorS("libfac: ERROR: TakeNorms less then two items remaining!");
-#else
-#ifndef NOSTREAMIO
-      CERR << "libfac: ERROR: TakeNorms less then two items remaining! "
-           << "\n";
-#else
-      ;
-#endif
-#endif
+      factoryError("libfac: ERROR: TakeNorms less then two items remaining!");
     }
     while ( n < PossibleFactors.length() )
     {
@@ -431,14 +414,7 @@ CFFList TakeNorms(const CFFList & PiList)
       }
       else
       {
-#ifdef HAVE_SINGULAR_ERROR
-        WerrorS("libfac: TakeNorms: somethings wrong with remaining factors!");
-#else
-#ifndef NOSTREAMIO
-        CERR << "libfac: TakeNorms: somethings wrong with remaining factors!"
-             << "\n";
-#endif
-#endif
+        factoryError("libfac: TakeNorms: somethings wrong with remaining factors!");
       }
     }
   }
