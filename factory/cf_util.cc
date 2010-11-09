@@ -48,12 +48,13 @@ int ilog2 (int a)
 }
 
 #include<stdio.h>
+#include<stdlib.h>
 
-void (*factoryError_callback)(const char *s) = 0;
-
-void factoryError(const char *s)
+void factoryError_intern(const char *s)
 {
-  if (factoryError_callback!=0) factoryError_callback(s);
-  else fprintf(stderr,s);
+  fprintf(stderr,s);
+  abort();
 }
+void (*factoryError_callback)(const char *s) = factoryError_intern;
+
 

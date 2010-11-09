@@ -16,8 +16,8 @@ int ipower ( int b, int n );
 int ilog2 (int a);
 
 /*BEGINPUBLIC*/
-extern void (*factoryError_callback)(const char *s);
-void factoryError(const char *s);
+void factoryError_intern(const char *s);
+extern void (*factoryError)(const char *s);
 /*ENDPUBLIC*/
 
 
