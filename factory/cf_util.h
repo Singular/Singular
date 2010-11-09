@@ -15,5 +15,8 @@
 int ipower ( int b, int n );
 int ilog2 (int a);
 
+extern void (*factoryError_callback)(const char *s);
+
+void factoryError(const char *s);
 
 #endif /* ! INCL_CF_UTIL_H */
