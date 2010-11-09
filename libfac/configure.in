@@ -43,33 +43,7 @@ AC_ARG_WITH(
   debug,
   [  --with-debug    build with debugging options turned on])
 
-AC_ARG_WITH(
-  Singular,
-  [  --with-Singular build for use with Singular])
-
-if test "$with_Singular" = yes; then
-  AC_DEFINE(SINGULAR)
-  AC_DEFINE(NOSTREAMIO)
-  if test "$with_debug" = yes; then
-     targetname="libsingfac-g"
-  else
-     targetname="libsingfac"
-  fi
-else
-  if test "$with_debug" = yes; then
-     targetname="libfac-g"
-  else
-     targetname="libfac"
-  fi
-fi
-
-AC_ARG_WITH(
-  Singularerror,
-  [  --with-Singularerror use error reporting from Singular])
-
-if test "$with_Singularerror" = yes; then
-  AC_DEFINE(SINGULAR_ERROR)
-fi
+targetname="libsingfac"
 
 AC_ARG_WITH(
   NOSTREAMIO,

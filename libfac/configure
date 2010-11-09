@@ -14,10 +14,6 @@ ac_default_prefix=/usr/local
 ac_help="$ac_help
   --with-debug    build with debugging options turned on"
 ac_help="$ac_help
-  --with-Singular build for use with Singular"
-ac_help="$ac_help
-  --with-Singularerror use error reporting from Singular"
-ac_help="$ac_help
   --with-NOSTREAMIO : do not require iostream include nor library"
 
 # Initialize some variables set by options.
@@ -568,48 +564,7 @@ if test "${with_debug+set}" = set; then
 fi
 
 
-# Check whether --with-Singular or --without-Singular was given.
-if test "${with_Singular+set}" = set; then
-  withval="$with_Singular"
-  :
-fi
-
-
-if test "$with_Singular" = yes; then
-  cat >> confdefs.h <<\EOF
-#define SINGULAR 1
-EOF
-
-  cat >> confdefs.h <<\EOF
-#define NOSTREAMIO 1
-EOF
-
-  if test "$with_debug" = yes; then
-     targetname="libsingfac-g"
-  else
-     targetname="libsingfac"
-  fi
-else
-  if test "$with_debug" = yes; then
-     targetname="libfac-g"
-  else
-     targetname="libfac"
-  fi
-fi
-
-# Check whether --with-Singularerror or --without-Singularerror was given.
-if test "${with_Singularerror+set}" = set; then
-  withval="$with_Singularerror"
-  :
-fi
-
-
-if test "$with_Singularerror" = yes; then
-  cat >> confdefs.h <<\EOF
-#define SINGULAR_ERROR 1
-EOF
-
-fi
+targetname="libsingfac"
 
 # Check whether --with-NOSTREAMIO or --without-NOSTREAMIO was given.
 if test "${with_NOSTREAMIO+set}" = set; then
