@@ -1,3 +1,4 @@
+// -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
  * Computer Algebra System SINGULAR    
 \*****************************************************************************/
@@ -30,3 +31,5 @@ int Template::someMethod( int a, int &o )
   o = a;
   return t;
 };
+
+// Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab
