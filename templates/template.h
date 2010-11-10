@@ -1,3 +1,4 @@
+// -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 /*****************************************************************************\
  * Computer Algebra System SINGULAR    
 \*****************************************************************************/
@@ -18,11 +19,11 @@
 #define TEMPLATE_H
 
 // include basic definitions
-#include "singularxx_defs.h"
+#include <singularxx_defs.h>
 
 BEGIN_NAMESPACE_SINGULARXX
 
-/** @class Template template.h "someRootDirectory/template.h"
+/** @class Template template.h <someRootDirectory/template.h>
  * 
  * Brief description of class Template.
  *
@@ -91,3 +92,5 @@ END_NAMESPACE_SINGULARXX
 
 #endif 
 /* #ifndef TEMPLATE_H */
+
+// Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab

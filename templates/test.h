@@ -1,7 +1,7 @@
-//*****************************************************************************
-// Computer Algebra System SINGULAR    
-// Copyright: See COPYING file that comes with this distribution
-//*****************************************************************************
+// -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+/*****************************************************************************\
+ * Computer Algebra System SINGULAR    
+\*****************************************************************************/
 /** @file test.h
  * 
  * Let's try to put parameters where they should be, compare F1 and F2.
@@ -13,7 +13,7 @@
  * @internal @version \$Id$
  *
  **/
-//*****************************************************************************
+/*****************************************************************************/
 
   /** F1. 
    *
@@ -43,3 +43,6 @@
      int a2,  ///< [in] some int
      int & r2 ///< [out] integer result
          );
+
+
+// Vi-modeline: vim: filetype=c:syntax:shiftwidth=2:tabstop=8:textwidth=0:expandtab
