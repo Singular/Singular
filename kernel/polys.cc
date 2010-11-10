@@ -274,10 +274,9 @@ done:
         }
     }
 #endif
-    
     p_Setm(rc,r);
   }
-finish:  
+finish:
   return s;
 }
 
@@ -353,6 +352,85 @@ poly pHomogen (poly p, int varnum)
   return q;
 }
 
+/*4
+*Returns the exponent of the maximal power of the leading monomial of
+*p2 in that of p1
+*/
+static int pGetMaxPower (poly p1,poly p2)
+{
+  int     i,k,res = 32000; /*a very large integer*/
+
+  if (p1 == NULL) return 0;
+  for (i=1; i<=pVariables; i++)
+  {
+    if ( pGetExp(p2,i) != 0)
+    {
+      k =  pGetExp(p1,i) /  pGetExp(p2,i);
+      if (k < res) res = k;
+    }
+  }
+  return res;
+}
+
+/*2
+*returns the leading monomial of p1 divided by the maximal power of that
+*of p2
+*/
+static poly pDivByMonom (poly p1,poly p2)
+{
+  int     k, i;
+
+  if (p1 == NULL) return NULL;
+  k = pGetMaxPower(p1,p2);
+  if (k == 0)
+    return pHead(p1);
+  else
+  {
+    number n;
+    poly p = pInit();
+
+    p->next = NULL;
+    for (i=1; i<=pVariables; i++)
+    {
+       pSetExp(p,i, pGetExp(p1,i)-k* pGetExp(p2,i));
+    }
+    nPower(p2->coef,k,&n);
+    pSetCoeff0(p,nDiv(p1->coef,n));
+    nDelete(&n);
+    pSetm(p);
+    return p;
+  }
+}
+// Returns as i-th entry of P the coefficient of the (i-1) power of
+// the leading monomial of p2 in p1
+//
+static void pCancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet)
+{
+  int   maxPow;
+  poly  p,qp,Coeff;
+
+  if (*P == NULL)
+  {
+    *P = (polyset) omAlloc(5*sizeof(poly));
+    *SizeOfSet = 5;
+  }
+  p = pCopy(p1);
+  while (p != NULL)
+  {
+    qp = p->next;
+    p->next = NULL;
+    maxPow = pGetMaxPower(p,p2);
+    Coeff = pDivByMonom(p,p2);
+    if (maxPow > *SizeOfSet)
+    {
+      pEnlargeSet(P,*SizeOfSet,maxPow+1-*SizeOfSet);
+      *SizeOfSet = maxPow+1;
+    }
+    (*P)[maxPow] = pAdd((*P)[maxPow],Coeff);
+    pDelete(&p);
+    p = qp;
+  }
+}
 /*2
 *replaces the maximal powers of the leading monomial of p2 in p1 by
 *the same powers of n, utility for dehomogenization
@@ -388,87 +466,7 @@ poly pDehomogen (poly p1,poly p2,number n)
   return p;
 }
 
-/*4
-*Returns the exponent of the maximal power of the leading monomial of
-*p2 in that of p1
-*/
-static int pGetMaxPower (poly p1,poly p2)
-{
-  int     i,k,res = 32000; /*a very large integer*/
 
-  if (p1 == NULL) return 0;
-  for (i=1; i<=pVariables; i++)
-  {
-    if ( pGetExp(p2,i) != 0)
-    {
-      k =  pGetExp(p1,i) /  pGetExp(p2,i);
-      if (k < res) res = k;
-    }
-  }
-  return res;
-}
-
-/*2
-*Returns as i-th entry of P the coefficient of the (i-1) power of
-*the leading monomial of p2 in p1
-*/
-void pCancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet)
-{
-  int   maxPow;
-  poly  p,qp,Coeff;
-
-  if (*P == NULL)
-  {
-    *P = (polyset) omAlloc(5*sizeof(poly));
-    *SizeOfSet = 5;
-  }
-  p = pCopy(p1);
-  while (p != NULL)
-  {
-    qp = p->next;
-    p->next = NULL;
-    maxPow = pGetMaxPower(p,p2);
-    Coeff = pDivByMonom(p,p2);
-    if (maxPow > *SizeOfSet)
-    {
-      pEnlargeSet(P,*SizeOfSet,maxPow+1-*SizeOfSet);
-      *SizeOfSet = maxPow+1;
-    }
-    (*P)[maxPow] = pAdd((*P)[maxPow],Coeff);
-    pDelete(&p);
-    p = qp;
-  }
-}
-
-/*2
-*returns the leading monomial of p1 divided by the maximal power of that
-*of p2
-*/
-poly pDivByMonom (poly p1,poly p2)
-{
-  int     k, i;
-
-  if (p1 == NULL) return NULL;
-  k = pGetMaxPower(p1,p2);
-  if (k == 0)
-    return pHead(p1);
-  else
-  {
-    number n;
-    poly p = pInit();
-
-    p->next = NULL;
-    for (i=1; i<=pVariables; i++)
-    {
-       pSetExp(p,i, pGetExp(p1,i)-k* pGetExp(p2,i));
-    }
-    nPower(p2->coef,k,&n);
-    pSetCoeff0(p,nDiv(p1->coef,n));
-    nDelete(&n);
-    pSetm(p);
-    return p;
-  }
-}
 /*----------utilities for syzygies--------------*/
 poly pTakeOutComp(poly * p, int k)
 {

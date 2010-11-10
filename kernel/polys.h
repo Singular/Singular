@@ -365,14 +365,6 @@ poly      pHomogen (poly p, int varnum);
 poly      pDehomogen (poly p1,poly p2,number n);
 BOOLEAN   pIsHomogeneous (poly p);
 
-// returns the leading monomial of p1 divided by the maximal power of
-// that of p2
-poly      pDivByMonom (poly p1,poly p2);
-
-// Returns as i-th entry of P the coefficient of the (i-1) power of
-// the leading monomial of p2 in p1
-void      pCancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet);
-
 poly      pPermPoly (poly p, int * perm,const ring OldRing, nMapFunc nMap,
                      int *par_perm=NULL, int OldPar=0);
 
