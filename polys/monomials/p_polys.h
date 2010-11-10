@@ -314,7 +314,6 @@ poly      p_Homogen (poly p, int varnum, const ring r);
 poly      p_Dehomogen (poly p1,poly p2,number n, const ring r);
 BOOLEAN   p_IsHomogeneous (poly p, const ring r);
 
-
 static inline void p_Setm(poly p, const ring r);
 p_SetmProc p_GetSetmProc(ring r);
 
@@ -1781,5 +1780,9 @@ poly      p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r);
 int       p_Weight(int c, const ring r);
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 
+/* syszygy stuff */
+BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r);
+void      p_VectorHasUnit(poly p, int * k, int * len, const ring r);
+poly      p_TakeOutComp1(poly * p, int k, const ring r);
 #endif // P_POLYS_H
 
