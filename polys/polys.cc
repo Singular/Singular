@@ -744,17 +744,6 @@ BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm)
 }
 #endif
 
-int pSize(poly p)
-{
-  int count = 0;
-  while ( p != NULL )
-  {
-    count+= nSize( pGetCoeff( p ) );
-    pIter( p );
-  }
-  return count;
-}
-
 /*2
 * returns the length of a (numbers of monomials)
 * respect syzComp

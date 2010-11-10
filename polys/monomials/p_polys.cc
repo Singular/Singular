@@ -2160,8 +2160,8 @@ void p_Content(poly ph, const ring r)
   }
 }
 #endif
-/* --------------------------------------------------------------------------------*/
-/* cleardenom suff                                                                 */
+/* ---------------------------------------------------------------------------*/
+/* cleardenom suff                                                           */
 poly p_Cleardenom(poly ph, const ring r)
 {
   poly start=ph;
@@ -2400,6 +2400,17 @@ number p_GetAllDenom(poly ph, const ring r)
     pIter(p);
   }
   return d;
+}
+
+int p_Size(poly p, const ring r)
+{
+  int count = 0;
+  while ( p != NULL )
+  {
+    count+= n_Size( pGetCoeff( p ), r->cf );
+    pIter( p );
+  }
+  return count;
 }
 
 /***************************************************************
