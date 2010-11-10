@@ -5541,7 +5541,6 @@ See
 @ref{module}.
 @c ref
 @c ---------------------------------------
-@c @node qhweight, qrds, prune, Functions
 @node qhweight, qrds, prune, Functions
 @subsection qhweight
 @cindex qhweight
@@ -5569,7 +5568,6 @@ See
 @ref{weight}.
 @c ref
 @c ---------------------------------------
-@c @node qrds, quote, qhweight, Functions
 @node qrds, quote, qhweight, Functions
 @subsection qrds
 @cindex qrds
@@ -5618,8 +5616,7 @@ for all three number arguments is a small value like e.g. 10^(-100).)
 @c @c lib standard.lib:quot lib_fun lib_ex subsection
 
 @c ---------------------------------------
-@c @node quote, quotient, quot, Functions
-@node quote, quotient, qhweight, Functions
+@node quote, quotient, qrds, Functions
 @subsection quote
 @cindex quote
 @table @code
