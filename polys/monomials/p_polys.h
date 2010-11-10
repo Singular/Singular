@@ -305,6 +305,8 @@ poly      p_Cleardenom(poly p, const ring r);
 void      p_Cleardenom_n(poly p, const ring r,number &c);
 number    p_GetAllDenom(poly ph, const ring r);
 
+int       pSize( poly p, const ring r );
+
 static inline void p_Setm(poly p, const ring r);
 p_SetmProc p_GetSetmProc(ring r);
 

@@ -303,7 +303,7 @@ void      pEnlargeSet(polyset *p, int length, int increment);
 #define   pOne()   p_One(currRing)
 
 #define   pNormalize(p) p_Normalize(p,currRing)
-int       pSize( poly p );
+#define   pSize(p)      p_Size(p,currRing)
 
 
 // homogenizes p by multiplying certain powers of the varnum-th variable
