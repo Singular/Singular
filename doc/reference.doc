@@ -1421,12 +1421,14 @@ The dimension of an ideal I means
 the Krull dimension of the basering modulo I.
 @*The dimension of a
 module is the dimension of its annihilator ideal.
+@*In the case of ideal (1), -1 is returned.
 @item @strong{Example:}
 @smallexample
 @c example
   ring r=32003,(x,y,z),dp;
   ideal I=x2-y,x3;
   dim(std(I));
+  dim(std(ideal(1)));
 @c example
 @end smallexample
 @end table
