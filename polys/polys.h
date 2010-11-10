@@ -307,9 +307,13 @@ void      pEnlargeSet(polyset *p, int length, int increment);
 
 
 // homogenizes p by multiplying certain powers of the varnum-th variable
-poly      pHomogen (poly p, int varnum);
+#define  pHomogen(p,varnum) p_Homogen(p,varnum,currRing)
 
 BOOLEAN   pIsHomogeneous (poly p);
+// // replaces the maximal powers of the leading monomial of p2 in p1 by
+// // the same powers of n, utility for dehomogenization
+// #define   pDehomogen(p1,p2,n) p_Dehomgen(p1,p2,n,currRing)
+// #define   pIsHomogen(p)       p_IsHomggen(p,currRing)
 
 poly      pPermPoly (poly p, int * perm,const ring OldRing, nMapFunc nMap,
                      int *par_perm=NULL, int OldPar=0);
