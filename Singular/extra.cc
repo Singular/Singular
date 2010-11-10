@@ -126,7 +126,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <kernel/clapconv.h>
 #include <kernel/kstdfac.h>
-#include <factor.h>
+#include <libfac/factor.h>
 #endif
 #include <kernel/clapsing.h>
 
