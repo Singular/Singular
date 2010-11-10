@@ -1784,5 +1784,22 @@ static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r);
 void      p_VectorHasUnit(poly p, int * k, int * len, const ring r);
 poly      p_TakeOutComp1(poly * p, int k, const ring r);
+// Splits *p into two polys: *q which consists of all monoms with
+// component == comp and *p of all other monoms *lq == pLength(*q)
+// On return all components pf *q == 0
+void p_TakeOutComp(poly *p, long comp, poly *q, int *lq, const ring r);
+
+// Similar to pTakeOutComp, except that only those components are
+// taken out whose Order == order
+// ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
+//         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
+void p_DecrOrdTakeOutComp(poly *r_p, long comp, long order,
+                         poly *r_q, int *lq, const ring r)
+
+// This is something weird -- Don't use it, unless you know what you are doing
+poly      p_TakeOutComp(poly * p, int k);
+
+void      p_DeleteComp(poly * p,int k, const ring r);
+
 #endif // P_POLYS_H
 

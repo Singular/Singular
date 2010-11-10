@@ -2706,6 +2706,197 @@ poly p_TakeOutComp1(poly * p, int k, const ring r)
   }
   return result;
 }
+
+poly p_TakeOutComp(poly * p, int k, const ring r)
+{
+  poly q = *p,qq=NULL,result = NULL;
+
+  if (q==NULL) return NULL;
+  BOOLEAN use_setmcomp=rOrd_SetCompRequiresSetm(r);
+  if (p_GetComp(q,r)==k)
+  {
+    result = q;
+    do
+    {
+      p_SetComp(q,0,r);
+      if (use_setmcomp) p_SetmComp(q,r);
+      qq = q;
+      pIter(q);
+    }
+    while ((q!=NULL) && (p_GetComp(q,r)==k));
+    *p = q;
+    pNext(qq) = NULL;
+  }
+  if (q==NULL) return result;
+  if (p_GetComp(q,r) > k)
+  {
+    p_SubComp(q,1,r);
+    if (use_setmcomp) p_SetmComp(q,r);
+  }
+  poly pNext_q;
+  while ((pNext_q=pNext(q))!=NULL)
+  {
+    if (p_GetComp(pNext_q,r)==k)
+    {
+      if (result==NULL)
+      {
+        result = pNext_q;
+        qq = result;
+      }
+      else
+      {
+        pNext(qq) = pNext_q;
+        pIter(qq);
+      }
+      pNext(q) = pNext(pNext_q);
+      pNext(qq) =NULL;
+      p_SetComp(qq,0,r);
+      if (use_setmcomp) p_SetmComp(qq,r);
+    }
+    else
+    {
+      /*pIter(q);*/ q=pNext_q;
+      if (p_GetComp(q,r) > k)
+      {
+        p_SubComp(q,1,r);
+        if (use_setmcomp) p_SetmComp(q,r);
+      }
+    }
+  }
+  return result;
+}
+
+// Splits *p into two polys: *q which consists of all monoms with
+// component == comp and *p of all other monoms *lq == pLength(*q)
+void p_TakeOutComp(poly *r_p, long comp, poly *r_q, int *lq, const ring r)
+{
+  spolyrec pp, qq;
+  poly p, q, p_prev;
+  int l = 0;
+
+#ifdef HAVE_ASSUME
+  int lp = pLength(*r_p);
+#endif
+
+  pNext(&pp) = *r_p;
+  p = *r_p;
+  p_prev = &pp;
+  q = &qq;
+
+  while(p != NULL)
+  {
+    while (p_GetComp(p,r) == comp)
+    {
+      pNext(q) = p;
+      pIter(q);
+      p_SetComp(p, 0,r);
+      p_SetmComp(p,r);
+      pIter(p);
+      l++;
+      if (p == NULL)
+      {
+        pNext(p_prev) = NULL;
+        goto Finish;
+      }
+    }
+    pNext(p_prev) = p;
+    p_prev = p;
+    pIter(p);
+  }
+
+  Finish:
+  pNext(q) = NULL;
+  *r_p = pNext(&pp);
+  *r_q = pNext(&qq);
+  *lq = l;
+#ifdef HAVE_ASSUME
+  assume(pLength(*r_p) + pLength(*r_q) == lp);
+#endif
+  p_Test(*r_p,r);
+  p_Test(*r_q,r);
+}
+
+void p_DecrOrdTakeOutComp(poly *r_p, long comp, long order,
+                         poly *r_q, int *lq, const ring r)
+{
+  spolyrec pp, qq;
+  poly p, q, p_prev;
+  int l = 0;
+
+  pNext(&pp) = *r_p;
+  p = *r_p;
+  p_prev = &pp;
+  q = &qq;
+
+#ifdef HAVE_ASSUME
+  if (p != NULL)
+  {
+    while (pNext(p) != NULL)
+    {
+      assume(p_GetOrder(p,r) >= p_GetOrder(pNext(p),r));
+      pIter(p);
+    }
+  }
+  p = *r_p;
+#endif
+
+  while (p != NULL && p_GetOrder(p,r) > order) pIter(p);
+
+  while(p != NULL && p_GetOrder(p,r) == order)
+  {
+    while (p_GetComp(p,r) == comp)
+    {
+      pNext(q) = p;
+      pIter(q);
+      pIter(p);
+      p_SetComp(p, 0,r);
+      p_SetmComp(p,r);
+      l++;
+      if (p == NULL || p_GetOrder(p,r) != order)
+      {
+        pNext(p_prev) = p;
+        goto Finish;
+      }
+    }
+    pNext(p_prev) = p;
+    p_prev = p;
+    pIter(p);
+  }
+
+  Finish:
+  pNext(q) = NULL;
+  *r_p = pNext(&pp);
+  *r_q = pNext(&qq);
+  *lq = l;
+}
+
+void p_DeleteComp(poly * p,int k, const ring r)
+{
+  poly q;
+
+  while ((*p!=NULL) && (p_GetComp(*p,r)==k)) p_LmDelete(p,r);
+  if (*p==NULL) return;
+  q = *p;
+  if (p_GetComp(q,r)>k)
+  {
+    p_SubComp(q,1,r);
+    p_SetmComp(q,r);
+  }
+  while (pNext(q)!=NULL)
+  {
+    if (p_GetComp(pNext(q),r)==k)
+      p_LmDelete(&(pNext(q)),r);
+    else
+    {
+      pIter(q);
+      if (p_GetComp(q,r)>k)
+      {
+        p_SubComp(q,1,r);
+        p_SetmComp(q,r);
+      }
+    }
+  }
+}
 /***************************************************************
  *
  * p_ShallowDelete
