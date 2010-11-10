@@ -330,8 +330,17 @@ void pTakeOutComp(poly *p, long comp, poly *q, int *lq);
 
 // This is something weird -- Don't use it, unless you know what you are doing
 poly      pTakeOutComp(poly * p, int k);
+/* old spielwiese
+#define   pTakeOutComp(p,k,q,lq)    p_TakeOutComp(p,k,q,lq,currRing)
+
+// Similar to pTakeOutComp, except that only those components are
+// taken out whose Order == order
+// ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
+//         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
+#define   pDecrOrdTakeOutComp(p,c,o,q,lq) p_DecrOrdTakeOutComp(p,c,o,q,lq,currRing)
+*/
 void      pSetPolyComp(poly p, int comp);
-void      pDeleteComp(poly * p,int k);
+#define   pDeleteComp(p,k) p_DeleteComp(p,k,currRing)
 void      pNorm(poly p);
 poly      pSubst(poly p, int n, poly e);
 poly      ppJet(poly p, int m);
