@@ -2487,7 +2487,7 @@ static int p_GetMaxPower (poly p1,poly p2, const ring r)
 *returns the leading monomial of p1 divided by the maximal power of that
 *of p2
 */
-poly p_DivByMonom (poly p1,poly p2, const ring r)
+static poly p_DivByMonom (poly p1,poly p2, const ring r)
 {
   int     k, i;
 
@@ -2517,7 +2517,7 @@ poly p_DivByMonom (poly p1,poly p2, const ring r)
 *Returns as i-th entry of P the coefficient of the (i-1) power of
 *the leading monomial of p2 in p1
 */
-void p_CancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet, const ring r)
+static void p_CancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet, const ring r)
 {
   int   maxPow;
   poly  p,qp,Coeff;
@@ -2598,6 +2598,114 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
   return TRUE;
 }
 
+/*----------utilities for syzygies--------------*/
+BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r)
+{
+  poly q=p,qq;
+  int i;
+
+  while (q!=NULL)
+  {
+    if (p_LmIsConstantComp(q,r))
+    {
+      i = p_GetComp(q,r);
+      qq = p;
+      while ((qq != q) && (p_GetComp(qq,r) != i)) pIter(qq);
+      if (qq == q)
+      {
+        *k = i;
+        return TRUE;
+      }
+      else
+        pIter(q);
+    }
+    else pIter(q);
+  }
+  return FALSE;
+}
+
+void   p_VectorHasUnit(poly p, int * k, int * len, const ring r)
+{
+  poly q=p,qq;
+  int i,j=0;
+
+  *len = 0;
+  while (q!=NULL)
+  {
+    if (p_LmIsConstantComp(q,r))
+    {
+      i = p_GetComp(q,r);
+      qq = p;
+      while ((qq != q) && (p_GetComp(qq,r) != i)) pIter(qq);
+      if (qq == q)
+      {
+       j = 0;
+       while (qq!=NULL)
+       {
+         if (p_GetComp(qq,r)==i) j++;
+        pIter(qq);
+       }
+       if ((*len == 0) || (j<*len))
+       {
+         *len = j;
+         *k = i;
+       }
+      }
+    }
+    pIter(q);
+  }
+}
+
+poly p_TakeOutComp1(poly * p, int k, const ring r)
+{
+  poly q = *p;
+
+  if (q==NULL) return NULL;
+
+  poly qq=NULL,result = NULL;
+
+  if (p_GetComp(q,r)==k)
+  {
+    result = q; /* *p */
+    while ((q!=NULL) && (p_GetComp(q,r)==k))
+    {
+      p_SetComp(q,0,r);
+      p_SetmComp(q,r);
+      qq = q;
+      pIter(q);
+    }
+    *p = q;
+    pNext(qq) = NULL;
+  }
+  if (q==NULL) return result;
+//  if (pGetComp(q) > k) pGetComp(q)--;
+  while (pNext(q)!=NULL)
+  {
+    if (p_GetComp(pNext(q),r)==k)
+    {
+      if (result==NULL)
+      {
+        result = pNext(q);
+        qq = result;
+      }
+      else
+      {
+        pNext(qq) = pNext(q);
+        pIter(qq);
+      }
+      pNext(q) = pNext(pNext(q));
+      pNext(qq) =NULL;
+      p_SetComp(qq,0,r);
+      p_SetmComp(qq,r);
+    }
+    else
+    {
+      pIter(q);
+//      if (pGetComp(q) > k) pGetComp(q)--;
+    }
+  }
+  return result;
+}
 /***************************************************************
  *
  * p_ShallowDelete
