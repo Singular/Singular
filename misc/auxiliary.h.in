@@ -301,18 +301,18 @@ static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
 
 
 #ifdef _DEBUG
-#      define FORCEINLINE inline
+#      define FORCE_INLINE inline
 #else
 #ifdef NDEBUG
 #if   defined(_MSC_VER)
-#      define FORCEINLINE __forceinline
+#      define FORCE_INLINE __forceinline
 #elif defined(__GNUC__) && __GNUC__ > 3
-#      define FORCEINLINE inline __attribute__ ((always_inline))
+#      define FORCE_INLINE inline __attribute__ ((always_inline))
 #else
-#      define FORCEINLINE inline
+#      define FORCE_INLINE inline
 #endif
 #else
-#      define FORCEINLINE inline
+#      define FORCE_INLINE inline
 #endif
 /* NDEBUG */
 #endif
@@ -323,6 +323,32 @@ static inline int si_max(const int a, const int b)  { return (a>b) ? a : b; }
 #define TODO(who, msg) DO_PRAGMA(message ("TODO [for " #who "]: " #msg))
 
 
+
+#if defined(__GNUC__) && defined(__GNUC_MINOR__)
+#define _GNUC_PREREQ(maj, min) ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+#define _GNUC_PREREQ(maj, min) 0
+#endif
+
+#if _GNUC_PREREQ(3,3) && defined(__ELF__)
+#define FORCE_INTERNAL __attribute__ ((visibility ("internal")))
+#else
+#define FORCE_INTERNAL
+#endif
+
+#if _GNUC_PREREQ(3,3)
+#define FORCE_DEPRECATED __attribute__ ((deprecated))
+#else
+#define FORCE_DEPRECATED
+#endif
+
+#ifdef __cplusplus
+# define  BEGIN_CDECL extern "C" {
+# define  END_CDECL   }
+#else
+# define  BEGIN_CDECL
+# define  END_CDECL
+#endif
 
 
 
