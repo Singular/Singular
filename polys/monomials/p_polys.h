@@ -248,11 +248,12 @@ static inline poly pp_Mult_mm(poly p, poly m, const ring r);
 // returns p*m, destroys p, const: m
 static inline poly p_Mult_mm(poly p, poly m, const ring r);
 
-// returns p+q, destroys p and q
+/// returns p+q, destroys p and q
 static inline poly p_Add_q(poly p, poly q, const ring r);
-// like p_Add_q, except that if lp == pLength(lp) lq == pLength(lq)
-// then lp == pLength(p+q)
+/// like p_Add_q, except that if lp == pLength(lp) lq == pLength(lq) then lp == pLength(p+q)
 static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r);
+
+poly      p_Sub(poly a, poly b, const ring r);
 
 // return p - m*q, destroys p; const: q,m
 static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
@@ -289,6 +290,7 @@ static inline poly p_SortMerge(poly p, const ring r, BOOLEAN revert = FALSE);
 // like SortMerge, except that p may have equal monimals
 static inline poly p_SortAdd(poly p, const ring r, BOOLEAN revert = FALSE);
 
+poly      p_Power(poly p, int i, const ring r);
 /***************************************************************
  *
  * Misc stuff
@@ -344,11 +346,9 @@ static inline void      p_wrp(poly p, ring p_ring);
  ***************************************************************/
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
-int  pWeight(int i, ring r);
-long pDeg(poly p, ring r);
 long p_WFirstTotalDegree(poly p, ring r);
 long p_WTotaldegree(poly p, const ring r);
-long pWDegree(poly p, ring r);
+long p_WDegree(poly p,const ring r);
 long pLDeg0(poly p,int *l, ring r);
 long pLDeg0c(poly p,int *l, ring r);
 long pLDegb(poly p,int *l, ring r);
@@ -1759,5 +1759,8 @@ poly      p_DivideM(poly a, poly b, const ring r);
 void      p_Lcm(poly a, poly b, poly m, const ring r);
 poly      p_Diff(poly a, int k, const ring r);
 poly      p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r);
+int       p_Weight(int c, const ring r);
+static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
+
 #endif // P_POLYS_H
 

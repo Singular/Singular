@@ -257,22 +257,11 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg);
  ***************************************************************/
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
-int  pWeight(int c, const ring r = currRing);
-long pDeg(poly p,const ring r = currRing);
+#define pWeight(c) p_Weight(c,currRing)
+#define pDeg(p)    p_Deg(p,currRing)
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
-long pWTotaldegree(poly p,const ring r = currRing);
-long pWDegree(poly p,const ring r = currRing);
-long pLDeg0(poly p,int *l,const ring r = currRing);
-long pLDeg0c(poly p,int *l,const ring r = currRing);
-long pLDegb(poly p,int *l,const ring r = currRing);
-long pLDeg1(poly p,int *l,const ring r = currRing);
-long pLDeg1c(poly p,int *l,const ring r = currRing);
-long pLDeg1_Deg(poly p,int *l,const ring r = currRing);
-long pLDeg1c_Deg(poly p,int *l,const ring r = currRing);
-long pLDeg1_Totaldegree(poly p,int *l,const ring r = currRing);
-long pLDeg1c_Totaldegree(poly p,int *l,const ring r = currRing);
-long pLDeg1_WFirstTotalDegree(poly p,int *l,const ring r=currRing);
-long pLDeg1c_WFirstTotalDegree(poly p,int *l,const ring r=currRing);
+#define pWTotaldegree(p) p_WTotaldegree(p,currRing)
+#define pWDegree(poly p) p_WDegree(p,currRing)
 
 /*-------------pComp for syzygies:-------------------*/
 
@@ -282,8 +271,8 @@ void pSetModDeg(intvec *w);
 
 
 /*-------------operations on polynomials:------------*/
-poly      pSub(poly a, poly b);
-poly      p_Power(poly p, int i, const ring r);
+#define   pSub(a,b) p_Sub(a,b,currRing)
+
 #define pmInit(a,b) p_mInit(a,b,currRing)
 
 // ----------------- define to enable new p_procs -----*/
