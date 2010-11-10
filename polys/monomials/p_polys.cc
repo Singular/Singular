@@ -412,7 +412,7 @@ p_SetmProc p_GetSetmProc(ring r)
 /* several possibilities for pFDeg: the degree of the head term       */
 
 /* comptible with ordering */
-long pDeg(poly a, const ring r)
+long p_Deg(poly a, const ring r)
 {
   p_LmCheckPolyRing(a, r);
   assume(p_GetOrder(a, r) == p_WTotaldegree(a, r));
@@ -515,7 +515,7 @@ long p_WTotaldegree(poly p, const ring r)
   return  j;
 }
 
-int pWeight(int i, const ring r)
+int p_Weight(int i, const ring r)
 {
   if ((r->firstwv==NULL) || (i>r->firstBlockEnds))
   {
@@ -524,7 +524,7 @@ int pWeight(int i, const ring r)
   return r->firstwv[i-1];
 }
 
-long pWDegree(poly p, const ring r)
+long p_WDegree(poly p, const ring r)
 {
   if (r->firstwv==NULL) return p_Totaldegree(p, r);
   p_LmCheckPolyRing(p, r);
@@ -1456,6 +1456,244 @@ poly p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r)
     }
   }
   return result;
+}
+/*2
+* subtract p2 from p1, p1 and p2 are destroyed
+* do not put attention on speed: the procedure is only used in the interpreter
+*/
+poly p_Sub(poly p1, poly p2, const ring r)
+{
+  return p_Add_q(p1, p_Neg(p2,r),r);
+}
+
+/*3
+* compute for a monomial m
+* the power m^exp, exp > 1
+* destroys p
+*/
+static poly p_MonPower(poly p, int exp, const ring r)
+{
+  int i;
+
+  if(!n_IsOne(pGetCoeff(p),r))
+  {
+    number x, y;
+    y = pGetCoeff(p);
+    n_Power(y,exp,&x,r);
+    n_Delete(&y,r);
+    pSetCoeff0(p,x);
+  }
+  for (i=rVar(r); i!=0; i--)
+  {
+    p_MultExp(p,i, exp,r);
+  }
+  p_Setm(p,r);
+  return p;
+}
+
+/*3
+* compute for monomials p*q
+* destroys p, keeps q
+*/
+static void p_MonMult(poly p, poly q, const ring r)
+{
+  number x, y;
+  int i;
+
+  y = pGetCoeff(p);
+  x = n_Mult(y,pGetCoeff(q),r);
+  n_Delete(&y,r);
+  pSetCoeff0(p,x);
+  //for (i=pVariables; i!=0; i--)
+  //{
+  //  pAddExp(p,i, pGetExp(q,i));
+  //}
+  //p->Order += q->Order;
+  p_ExpVectorAdd(p,q,r);
+}
+
+/*3
+* compute for monomials p*q
+* keeps p, q
+*/
+static poly p_MonMultC(poly p, poly q, const ring rr)
+{
+  number x;
+  int i;
+  poly r = p_Init(rr);
+
+  x = n_Mult(pGetCoeff(p),pGetCoeff(q),rr);
+  pSetCoeff0(r,x);
+  p_ExpVectorSum(r,p, q, rr);
+  return r;
+}
+
+/*
+*  compute for a poly p = head+tail, tail is monomial
+*          (head + tail)^exp, exp > 1
+*          with binomial coef.
+*/
+static poly p_TwoMonPower(poly p, int exp, const ring r)
+{
+  int eh, e;
+  long al;
+  poly *a;
+  poly tail, b, res, h;
+  number x;
+  number *bin = pnBin(exp);
+
+  tail = pNext(p);
+  if (bin == NULL)
+  {
+    p_MonPower(p,exp,r);
+    p_MonPower(tail,exp,r);
+#ifdef PDEBUG
+    p_Test(p,r);
+#endif
+    return p;
+  }
+  eh = exp >> 1;
+  al = (exp + 1) * sizeof(poly);
+  a = (poly *)omAlloc(al);
+  a[1] = p;
+  for (e=1; e<exp; e++)
+  {
+    a[e+1] = p_MonMultC(a[e],p,r);
+  }
+  res = a[exp];
+  b = p_Head(tail,r);
+  for (e=exp-1; e>eh; e--)
+  {
+    h = a[e];
+    x = n_Mult(bin[exp-e],pGetCoeff(h),r);
+    p_SetCoeff(h,x,r);
+    p_MonMult(h,b,r);
+    res = pNext(res) = h;
+    p_MonMult(b,tail,r);
+  }
+  for (e=eh; e!=0; e--)
+  {
+    h = a[e];
+    x = n_Mult(bin[e],pGetCoeff(h),r);
+    p_SetCoeff(h,x,r);
+    p_MonMult(h,b,r);
+    res = pNext(res) = h;
+    p_MonMult(b,tail,r);
+  }
+  p_LmDelete(&tail,r);
+  pNext(res) = b;
+  pNext(b) = NULL;
+  res = a[exp];
+  omFreeSize((ADDRESS)a, al);
+  pnFreeBin(bin, exp);
+//  tail=res;
+// while((tail!=NULL)&&(pNext(tail)!=NULL))
+// {
+//   if(nIsZero(pGetCoeff(pNext(tail))))
+//   {
+//     pLmDelete(&pNext(tail));
+//   }
+//   else
+//     pIter(tail);
+// }
+#ifdef PDEBUG
+  p_Test(res,r);
+#endif
+  return res;
+}
+
+static poly p_Pow(poly p, int i, const ring r)
+{
+  poly rc = p_Copy(p,r);
+  i -= 2;
+  do
+  {
+    rc = p_Mult_q(rc,p_Copy(p,r),r);
+    p_Normalize(rc,r);
+    i--;
+  }
+  while (i != 0);
+  return p_Mult_q(rc,p,r);
+}
+
+/*2
+* returns the i-th power of p
+* p will be destroyed
+*/
+poly p_Power(poly p, int i, const ring r)
+{
+  poly rc=NULL;
+
+  if (i==0)
+  {
+    p_Delete(&p,r);
+    return p_One(r);
+  }
+
+  if(p!=NULL)
+  {
+    if ( (i > 0) && ((unsigned long ) i > (r->bitmask)))
+    {
+      Werror("exponent %d is too large, max. is %ld",i,r->bitmask);
+      return NULL;
+    }
+    switch (i)
+    {
+// cannot happen, see above
+//      case 0:
+//      {
+//        rc=pOne();
+//        pDelete(&p);
+//        break;
+//      }
+      case 1:
+        rc=p;
+        break;
+      case 2:
+        rc=p_Mult_q(p_Copy(p,r),p,r);
+        break;
+      default:
+        if (i < 0)
+        {
+          p_Delete(&p,r);
+          return NULL;
+        }
+        else
+        {
+#ifdef HAVE_PLURAL
+          if (rIsPluralRing(r)) /* in the NC case nothing helps :-( */
+          {
+            int j=i;
+            rc = p_Copy(p,r);
+            while (j>1)
+            {
+              rc = p_Mult_q(p_Copy(p,r),rc,r);
+              j--;
+            }
+            p_Delete(&p,r);
+            return rc;
+          }
+#endif
+          rc = pNext(p);
+          if (rc == NULL)
+            return p_MonPower(p,i,r);
+          /* else: binom ?*/
+          int char_p=rChar(r);
+          if ((pNext(rc) != NULL)
+#ifdef HAVE_RINGS
+             || rField_is_Ring(r)
+#endif
+             )
+            return p_Pow(p,i,r);
+          if ((char_p==0) || (i<=char_p))
+            return p_TwoMonPower(p,i,r);
+          poly p_p=p_TwoMonPower(p_Copy(p,r),char_p,r);
+          return p_Mult_q(p_Power(p,i-char_p,r),p_p,r);
+        }
+      /*end default:*/
+    }
+  }
+  return rc;
 }
 /***************************************************************
  *
