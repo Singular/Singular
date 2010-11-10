@@ -1695,6 +1695,713 @@ poly p_Power(poly p, int i, const ring r)
   }
   return rc;
 }
+
+/* --------------------------------------------------------------------------------*/
+/* content suff                                                                   */
+
+static number p_InitContent(poly ph, const ring r);
+static number p_InitContent_a(poly ph, const ring r);
+
+void p_Content(poly ph, const ring r)
+{
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r))
+  {
+    if ((ph!=NULL) && rField_has_Units(r))
+    {
+      number k = nGetUnit(pGetCoeff(ph));
+      if (!n_IsOne(k,r->cf))
+      {
+        number tmpGMP = k;
+        k = n_Invers(k,r->cf);
+        n_Delete(&tmpGMP,r->cf);
+        poly h = pNext(ph);
+        p_SetCoeff(ph, n_Mult(pGetCoeff(ph), k,r->cf),r);
+        while (h != NULL)
+        {
+          p_SetCoeff(h, n_Mult(pGetCoeff(h), k,r->cf),r);
+          pIter(h);
+        }
+      }
+      n_Delete(&k,r->cf);
+    }
+    return;
+  }
+#endif
+  number h,d;
+  poly p;
+
+  if(TEST_OPT_CONTENTSB) return;
+  if(pNext(ph)==NULL)
+  {
+    p_SetCoeff(ph,n_Init(1,r),r->cf);
+  }
+  else
+  {
+    n_Normalize(pGetCoeff(ph),r->cf);
+    if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
+    if (rField_is_Q())
+    {
+      h=p_InitContent(ph,r);
+      p=ph;
+    }
+    else if ((rField_is_Extension(r))
+    && ((rPar(r)>1)||(r->minpoly==NULL)))
+    {
+      h=p_InitContent_a(ph,r);
+      p=ph;
+    }
+    else
+    {
+      h=n_Copy(pGetCoeff(ph),r->cf);
+      p = pNext(ph);
+    }
+    while (p!=NULL)
+    {
+      n_Normalize(pGetCoeff(p),r->cf);
+      d=n_Gcd(h,pGetCoeff(p),r->cf);
+      n_Delete(&h,r->cf);
+      h = d;
+      if(n_IsOne(h,r->cf))
+      {
+        break;
+      }
+      pIter(p);
+    }
+    p = ph;
+    //number tmp;
+    if(!n_IsOne(h,r->cf))
+    {
+      while (p!=NULL)
+      {
+        //d = nDiv(pGetCoeff(p),h);
+        //tmp = nIntDiv(pGetCoeff(p),h);
+        //if (!nEqual(d,tmp))
+        //{
+        //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
+        //  nWrite(h);StringAppendS("=");nWrite(d);StringAppendS(" int:");
+        //  nWrite(tmp);Print(StringAppendS("\n"));
+        //}
+        //nDelete(&tmp);
+        d = n_IntDiv(pGetCoeff(p),h,r->cf);
+        p_SetCoeff(p,d,r);
+        pIter(p);
+      }
+    }
+    n_Delete(&h,r->cf);
+#ifdef HAVE_FACTORY
+    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+    {
+      singclap_divide_content(ph);
+      if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
+    }
+#endif
+    if (rField_is_Q_a(r))
+    {
+      number hzz = nlInit(1, r->cf);
+      h = nlInit(1, r->cf);
+      p=ph;
+      while (p!=NULL)
+      { // each monom: coeff in Q_a
+        lnumber c_n_n=(lnumber)pGetCoeff(p);
+        napoly c_n=c_n_n->z;
+        while (c_n!=NULL)
+        { // each monom: coeff in Q
+          d=nlLcm(hzz,pGetCoeff(c_n),r->algring);
+          n_Delete(&hzz,r->algring);
+          hzz=d;
+          pIter(c_n);
+        }
+        c_n=c_n_n->n;
+        while (c_n!=NULL)
+        { // each monom: coeff in Q
+          d=nlLcm(h,pGetCoeff(c_n),r->algring);
+          n_Delete(&h,r->algring);
+          h=d;
+          pIter(c_n);
+        }
+        pIter(p);
+      }
+      /* hzz contains the 1/lcm of all denominators in c_n_n->z*/
+      /* h contains the 1/lcm of all denominators in c_n_n->n*/
+      number htmp=nlInvers(h);
+      number hzztmp=nlInvers(hzz);
+      number hh=nlMult(hzz,h);
+      nlDelete(&hzz,r->algring);
+      nlDelete(&h,r->algring);
+      number hg=nlGcd(hzztmp,htmp,r->algring);
+      nlDelete(&hzztmp,r->algring);
+      nlDelete(&htmp,r->algring);
+      h=nlMult(hh,hg);
+      nlDelete(&hg,r->algring);
+      nlDelete(&hh,r->algring);
+      nlNormalize(h);
+      if(!nlIsOne(h))
+      {
+        p=ph;
+        while (p!=NULL)
+        { // each monom: coeff in Q_a
+          lnumber c_n_n=(lnumber)pGetCoeff(p);
+          napoly c_n=c_n_n->z;
+          while (c_n!=NULL)
+          { // each monom: coeff in Q
+            d=nlMult(h,pGetCoeff(c_n));
+            nlNormalize(d);
+            nlDelete(&pGetCoeff(c_n),r->algring);
+            pGetCoeff(c_n)=d;
+            pIter(c_n);
+          }
+          c_n=c_n_n->n;
+          while (c_n!=NULL)
+          { // each monom: coeff in Q
+            d=nlMult(h,pGetCoeff(c_n));
+            nlNormalize(d);
+            nlDelete(&pGetCoeff(c_n),r->algring);
+            pGetCoeff(c_n)=d;
+            pIter(c_n);
+          }
+          pIter(p);
+        }
+      }
+      nlDelete(&h,r->algring);
+    }
+  }
+}
+void p_SimpleContent(poly ph,int smax, const ring r)
+{
+  if(TEST_OPT_CONTENTSB) return;
+  if (ph==NULL) return;
+  if (pNext(ph)==NULL)
+  {
+    p_SetCoeff(ph,n_Init(1,r_cf),r);
+    return;
+  }
+  if ((pNext(pNext(ph))==NULL)||(!rField_is_Q(r)))
+  {
+    return;
+  }
+  number d=p_InitContent(ph,r);
+  if (nlSize(d,r->cf)<=smax)
+  {
+    //if (TEST_OPT_PROT) PrintS("G");
+    return;
+  }
+  poly p=ph;
+  number h=d;
+  if (smax==1) smax=2;
+  while (p!=NULL)
+  {
+#if 0
+    d=nlGcd(h,pGetCoeff(p),r->cf);
+    nlDelete(&h,r->cf);
+    h = d;
+#else
+    nlInpGcd(h,pGetCoeff(p),r->cf);
+#endif
+    if(nlSize(h,r->cf)<smax)
+    {
+      //if (TEST_OPT_PROT) PrintS("g");
+      return;
+    }
+    pIter(p);
+  }
+  p = ph;
+  if (!nlGreaterZero(pGetCoeff(p),r->cf)) h=nlNeg(h,r->cf);
+  if(nlIsOne(h,r->cf)) return;
+  //if (TEST_OPT_PROT) PrintS("c");
+  while (p!=NULL)
+  {
+#if 1
+    d = nlIntDiv(pGetCoeff(p),h,r->cf);
+    p_SetCoeff(p,d,r);
+#else
+    nlInpIntDiv(pGetCoeff(p),h,r->cf);
+#endif
+    pIter(p);
+  }
+  nlDelete(&h,r->cf);
+}
+
+static number p_InitContent(poly ph, const ring r)
+// only for coefficients in Q
+#if 0
+{
+  assume(!TEST_OPT_CONTENTSB);
+  assume(ph!=NULL);
+  assume(pNext(ph)!=NULL);
+  assume(rField_is_Q(r));
+  if (pNext(pNext(ph))==NULL)
+  {
+    return nlGetNom(pGetCoeff(pNext(ph)),r->cf);
+  }
+  poly p=ph;
+  number n1=nlGetNom(pGetCoeff(p),r->cf);
+  pIter(p);
+  number n2=nlGetNom(pGetCoeff(p),r->cf);
+  pIter(p);
+  number d;
+  number t;
+  loop
+  {
+    nlNormalize(pGetCoeff(p),r->cf);
+    t=nlGetNom(pGetCoeff(p),r->cf);
+    if (nlGreaterZero(t,r->cf))
+      d=nlAdd(n1,t,r->cf);
+    else
+      d=nlSub(n1,t,r->cf);
+    nlDelete(&t,r->cf);
+    nlDelete(&n1,r->cf);
+    n1=d;
+    pIter(p);
+    if (p==NULL) break;
+    nlNormalize(pGetCoeff(p),r->cf);
+    t=nlGetNom(pGetCoeff(p),r->cf);
+    if (nlGreaterZero(t,r->cf))
+      d=nlAdd(n2,t,r->cf);
+    else
+      d=nlSub(n2,t,r->cf);
+    nlDelete(&t,r->cf);
+    nlDelete(&n2,r->cf);
+    n2=d;
+    pIter(p);
+    if (p==NULL) break;
+  }
+  d=nlGcd(n1,n2,r->cf);
+  nlDelete(&n1,r->cf);
+  nlDelete(&n2,r->cf);
+  return d;
+}
+#else
+{
+  number d=pGetCoeff(ph);
+  if(SR_HDL(d)&SR_INT) return d;
+  int s=mpz_size1(d->z);
+  int s2=-1;
+  number d2;
+  loop
+  {
+    pIter(ph);
+    if(ph==NULL)
+    {
+      if (s2==-1) return nlCopy(d,r->cf);
+      break;
+    }
+    if (SR_HDL(pGetCoeff(ph))&SR_INT)
+    {
+      s2=s;
+      d2=d;
+      s=0;
+      d=pGetCoeff(ph);
+      if (s2==0) break;
+    }
+    else
+    if (mpz_size1((pGetCoeff(ph)->z))<=s)
+    {
+      s2=s;
+      d2=d;
+      d=pGetCoeff(ph);
+      s=mpz_size1(d->z);
+    }
+  }
+  return nlGcd(d,d2,r->cf);
+}
+#endif
+
+number p_InitContent_a(poly ph, const ring r)
+// only for coefficients in K(a) anf K(a,...)
+{
+  number d=pGetCoeff(ph);
+  int s=naParDeg(d);
+  if (s /* naParDeg(d)*/ <=1) return naCopy(d);
+  int s2=-1;
+  number d2;
+  int ss;
+  loop
+  {
+    pIter(ph);
+    if(ph==NULL)
+    {
+      if (s2==-1) return naCopy(d);
+      break;
+    }
+    if ((ss=naParDeg(pGetCoeff(ph)))<s)
+    {
+      s2=s;
+      d2=d;
+      s=ss;
+      d=pGetCoeff(ph);
+      if (s2<=1) break;
+    }
+  }
+  return naGcd(d,d2,r->cf);
+}
+
+
+//void pContent(poly ph)
+//{
+//  number h,d;
+//  poly p;
+//
+//  p = ph;
+//  if(pNext(p)==NULL)
+//  {
+//    pSetCoeff(p,nInit(1));
+//  }
+//  else
+//  {
+//#ifdef PDEBUG
+//    if (!pTest(p)) return;
+//#endif
+//    nNormalize(pGetCoeff(p));
+//    if(!nGreaterZero(pGetCoeff(ph)))
+//    {
+//      ph = pNeg(ph);
+//      nNormalize(pGetCoeff(p));
+//    }
+//    h=pGetCoeff(p);
+//    pIter(p);
+//    while (p!=NULL)
+//    {
+//      nNormalize(pGetCoeff(p));
+//      if (nGreater(h,pGetCoeff(p))) h=pGetCoeff(p);
+//      pIter(p);
+//    }
+//    h=nCopy(h);
+//    p=ph;
+//    while (p!=NULL)
+//    {
+//      d=nGcd(h,pGetCoeff(p));
+//      nDelete(&h);
+//      h = d;
+//      if(nIsOne(h))
+//      {
+//        break;
+//      }
+//      pIter(p);
+//    }
+//    p = ph;
+//    //number tmp;
+//    if(!nIsOne(h))
+//    {
+//      while (p!=NULL)
+//      {
+//        d = nIntDiv(pGetCoeff(p),h);
+//        pSetCoeff(p,d);
+//        pIter(p);
+//      }
+//    }
+//    nDelete(&h);
+//#ifdef HAVE_FACTORY
+//    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+//    {
+//      pTest(ph);
+//      singclap_divide_content(ph);
+//      pTest(ph);
+//    }
+//#endif
+//  }
+//}
+#if 0
+void p_Content(poly ph, const ring r)
+{
+  number h,d;
+  poly p;
+
+  if(pNext(ph)==NULL)
+  {
+    p_SetCoeff(ph,n_Init(1,r->cf),r);
+  }
+  else
+  {
+    n_Normalize(pGetCoeff(ph),r->cf);
+    if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
+    h=n_Copy(pGetCoeff(ph),r->cf);
+    p = pNext(ph);
+    while (p!=NULL)
+    {
+      n_Normalize(pGetCoeff(p),r->cf);
+      d=n_Gcd(h,pGetCoeff(p),r->cf);
+      n_Delete(&h,r->cf);
+      h = d;
+      if(n_IsOne(h,r->cf))
+      {
+        break;
+      }
+      pIter(p);
+    }
+    p = ph;
+    //number tmp;
+    if(!n_IsOne(h,r->cf))
+    {
+      while (p!=NULL)
+      {
+        //d = nDiv(pGetCoeff(p),h);
+        //tmp = nIntDiv(pGetCoeff(p),h);
+        //if (!nEqual(d,tmp))
+        //{
+        //  StringSetS("** div0:");nWrite(pGetCoeff(p));StringAppendS("/");
+        //  nWrite(h);StringAppendS("=");nWrite(d);StringAppendS(" int:");
+        //  nWrite(tmp);Print(StringAppendS("\n"));
+        //}
+        //nDelete(&tmp);
+        d = n_IntDiv(pGetCoeff(p),h,r->cf);
+        p_SetCoeff(p,d,r->cf);
+        pIter(p);
+      }
+    }
+    n_Delete(&h,r->cf);
+#ifdef HAVE_FACTORY
+    //if ( (n_GetChar(r) == 1) || (n_GetChar(r) < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+    //{
+    //  singclap_divide_content(ph);
+    //  if(!n_GreaterZero(pGetCoeff(ph),r)) ph = p_Neg(ph,r);
+    //}
+#endif
+  }
+}
+#endif
+/* --------------------------------------------------------------------------------*/
+/* cleardenom suff                                                                 */
+poly p_Cleardenom(poly ph, const ring r)
+{
+  poly start=ph;
+  number d, h;
+  poly p;
+
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r))
+  {
+    p_Content(ph,r);
+    return start;
+  }
+#endif
+  if (rField_is_Zp(r) && TEST_OPT_INTSTRATEGY) return start;
+  p = ph;
+  if(pNext(p)==NULL)
+  {
+    if (TEST_OPT_CONTENTSB)
+    {
+      number n=n_GetDenom(pGetCoeff(p),r->cf);
+      if (!n_IsOne(n,r->cf))
+      {
+        number nn=n_Mult(pGetCoeff(p),n,r->cf);
+        n_Normalize(nn,r->cf);
+        p_SetCoeff(p,nn,r);
+      }
+      n_Delete(&n,r->cf);
+    }
+    else
+      p_SetCoeff(p,n_Init(1,r->cf),r);
+  }
+  else
+  {
+    h = n_Init(1,r->cf);
+    while (p!=NULL)
+    {
+      n_Normalize(pGetCoeff(p,r->cf));
+      d=n_Lcm(h,pGetCoeff(p),r->cf);
+      n_Delete(&h,r->cf);
+      h=d;
+      pIter(p);
+    }
+    /* contains the 1/lcm of all denominators */
+    if(!n_IsOne(h,r->cf))
+    {
+      p = ph;
+      while (p!=NULL)
+      {
+        /* should be:
+        * number hh;
+        * nGetDenom(p->coef,&hh);
+        * nMult(&h,&hh,&d);
+        * nNormalize(d);
+        * nDelete(&hh);
+        * nMult(d,p->coef,&hh);
+        * nDelete(&d);
+        * nDelete(&(p->coef));
+        * p->coef =hh;
+        */
+        d=n_Mult(h,pGetCoeff(p),r->cf);
+        n_Normalize(d,r->cf);
+        p_SetCoeff(p,d,r);
+        pIter(p);
+      }
+      n_Delete(&h,r->cf);
+      if (nGetChar()==1)
+      {
+        loop
+        {
+          h = n_Init(1,r->cf);
+          p=ph;
+          while (p!=NULL)
+          {
+            d=n_Lcm(h,pGetCoeff(p),r->cf);
+            n_Delete(&h,r->cf);
+            h=d;
+            pIter(p);
+          }
+          /* contains the 1/lcm of all denominators */
+          if(!n_IsOne(h,r->cf))
+          {
+            p = ph;
+            while (p!=NULL)
+            {
+              /* should be:
+              * number hh;
+              * nGetDenom(p->coef,&hh);
+              * nMult(&h,&hh,&d);
+              * nNormalize(d);
+              * nDelete(&hh);
+              * nMult(d,p->coef,&hh);
+              * nDelete(&d);
+              * nDelete(&(p->coef));
+              * p->coef =hh;
+              */
+              d=n_Mult(h,pGetCoeff(p),r->cf);
+              n_Normalize(d,r->cf);
+              p_SetCoeff(p,d,r);
+              pIter(p);
+            }
+            n_Delete(&h,r->cf);
+          }
+          else
+          {
+            n_Delete(&h,r->cf);
+            break;
+          }
+        }
+      }
+    }
+    if (h!=NULL) n_Delete(&h,r->cf);
+  
+    p_Content(ph,r);
+#ifdef HAVE_RATGRING
+    if (rIsRatGRing(r))
+    {
+      /* quick unit detection in the rational case is done in gr_nc_bba */
+      pContentRat(ph);
+      start=ph;
+    }
+#endif
+  }
+  return start;
+}
+
+void p_Cleardenom_n(poly ph,const ring r,number &c)
+{
+  number d, h;
+  poly p;
+
+  p = ph;
+  if(pNext(p)==NULL)
+  {
+    c=n_Invers(pGetCoeff(p),r->cf);
+    p_SetCoeff(p,n_Init(1,r->cf),r);
+  }
+  else
+  {
+    h = n_Init(1,r->cf);
+    while (p!=NULL)
+    {
+      n_Normalize(pGetCoeff(p),r->cf);
+      d=n_Lcm(h,pGetCoeff(p),r->cf);
+      n_Delete(&h,r->cf);
+      h=d;
+      pIter(p);
+    }
+    c=h;
+    /* contains the 1/lcm of all denominators */
+    if(!n_IsOne(h,r->cf))
+    {
+      p = ph;
+      while (p!=NULL)
+      {
+        /* should be:
+        * number hh;
+        * nGetDenom(p->coef,&hh);
+        * nMult(&h,&hh,&d);
+        * nNormalize(d);
+        * nDelete(&hh);
+        * nMult(d,p->coef,&hh);
+        * nDelete(&d);
+        * nDelete(&(p->coef));
+        * p->coef =hh;
+        */
+        d=n_Mult(h,pGetCoeff(p),r->cf);
+        n_Normalize(d,r->cf);
+        p_SetCoeff(p,d,r);
+        pIter(p);
+      }
+      if (rField_is_Q_a(r))
+      {
+        loop
+        {
+          h = n_Init(1,r->cf);
+          p=ph;
+          while (p!=NULL)
+          {
+            d=n_Lcm(h,pGetCoeff(p),r->cf);
+            n_Delete(&h,r->cf);
+            h=d;
+            pIter(p);
+          }
+          /* contains the 1/lcm of all denominators */
+          if(!n_IsOne(h,r->cf))
+          {
+            p = ph;
+            while (p!=NULL)
+            {
+              /* should be:
+              * number hh;
+              * nGetDenom(p->coef,&hh);
+              * nMult(&h,&hh,&d);
+              * nNormalize(d);
+              * nDelete(&hh);
+              * nMult(d,p->coef,&hh);
+              * nDelete(&d);
+              * nDelete(&(p->coef));
+              * p->coef =hh;
+              */
+              d=n_Mult(h,pGetCoeff(p),r->cf);
+              n_Normalize(d,r->cf);
+              p_SetCoeff(p,d,r);
+              pIter(p);
+            }
+            number t=n_Mult(c,h,r->cf);
+            n_Delete(&c,r->cf);
+            c=t;
+          }
+          else
+          {
+            break;
+          }
+          n_Delete(&h,r->cf);
+        }
+      }
+    }
+  }
+}
+
+number p_GetAllDenom(poly ph, const ring r)
+{
+  number d=n_Init(1,r->cf);
+  poly p = ph;
+
+  while (p!=NULL)
+  {
+    number h=n_GetDenom(pGetCoeff(p),r->cf);
+    if (!n_IsOne(h,r->cf))
+    {
+      number dd=n_Mult(d,h,r->cf);
+      n_Delete(&d,r->cf);
+      d=dd;
+    }
+    n_Delete(&h,r->cf);
+    pIter(p);
+  }
+  return d;
+}
+
 /***************************************************************
  *
  * p_ShallowDelete

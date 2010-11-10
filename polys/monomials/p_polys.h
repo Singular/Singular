@@ -296,6 +296,15 @@ poly      p_Power(poly p, int i, const ring r);
  * Misc stuff
  *
  ***************************************************************/
+void      p_Normalize(poly p,const ring r);
+
+void      p_Content(poly p, const ring r);
+void      p_SimpleContent(poly p, int s, const ring r);
+
+poly      p_Cleardenom(poly p, const ring r);
+void      p_Cleardenom_n(poly p, const ring r,number &c);
+number    p_GetAllDenom(poly ph, const ring r);
+
 static inline void p_Setm(poly p, const ring r);
 p_SetmProc p_GetSetmProc(ring r);
 
