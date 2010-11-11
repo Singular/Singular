@@ -3825,7 +3825,7 @@ static BOOLEAN jjBAREISS(leftv res, leftv v)
   //lists l=mpBareiss(m,FALSE);
   intvec *iv;
   ideal m;
-  smCallNewBareiss((ideal)v->Data(),0,0,m,&iv);
+  smCallBareiss((ideal)v->Data(),0,0,m,&iv);
   lists l=(lists)omAllocBin(slists_bin);
   l->Init(2);
   l->m[0].rtyp=MODUL_CMD;
@@ -5759,7 +5759,7 @@ static BOOLEAN jjBAREISS3(leftv res, leftv u, leftv v, leftv w)
   int k=(int)(long)w->Data();
   if (k>=0)
   {
-    smCallNewBareiss((ideal)u->Data(),(int)(long)v->Data(),(int)(long)w->Data(),m,&iv);
+    smCallBareiss((ideal)u->Data(),(int)(long)v->Data(),(int)(long)w->Data(),m,&iv);
     l->Init(2);
     l->m[0].rtyp=MODUL_CMD;
     l->m[1].rtyp=INTVEC_CMD;
