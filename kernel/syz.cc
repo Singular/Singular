@@ -26,17 +26,6 @@
 
 #include <kernel/sca.h>
 
-void syDeleteRes(resolvente * res,int length)
-{
-  for (int i=0;i<length;i++)
-  {
-    if (!idIs0((*res)[i]))
-      idDelete(&((*res)[i]));
-  }
-  omFreeSize((ADDRESS)res,length*sizeof(ideal));
-  *res = NULL;
-}
-
 static intvec * syPrepareModComp(ideal arg,intvec ** w)
 {
   intvec *w1 = NULL;
@@ -1183,31 +1172,4 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
     PrintLn();
   }
   return result;
-}
-
-/*2
-* is looking for the minimal minimized module of a resolvente
-* i.e. returns 0 if res comes from a mres-command and 1 in the
-* case of res-commands
-*/
-int syIsMinimizedFrom(resolvente res,int length)
-{
-  poly p;
-  int i,j=length;
-
-  while ((j>0) && (res[j-1]==NULL)) j--;
-  while (j>0)
-  {
-    for (i=0;i<IDELEMS(res[j-1]);i++)
-    {
-      p = res[j-1]->m[i];
-      while (p!=NULL)
-      {
-        if (pLmIsConstantComp(p)) return j;
-        p = pNext(p);
-      }
-    }
-    j--;
-  }
-  return j;
 }
