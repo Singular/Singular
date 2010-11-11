@@ -389,46 +389,7 @@ poly smCallDet(ideal I)
   return res;
 }
 
-void smCallBareiss(ideal I, int x, int y, ideal &M, intvec ** iv)
-{
-  int r=idRankFreeModule(I),t=r;
-  int c=IDELEMS(I),s=c;
-  long bound;
-  ring origR;
-  ring tmpR;
-  sparse_mat *bareiss;
-
-  if ((x>0) && (x<t))
-    t-=x;
-  if ((y>1) && (y<s))
-    s-=y;
-  if (t>s) t=s;
-  bound=2*smExpBound(I,c,r,t);
-  tmpR=smRingChange(&origR,bound);
-  ideal II = idrCopyR(I, origR);
-  bareiss = new sparse_mat(II);
-  if (bareiss->smGetAct() == NULL)
-  {
-    delete bareiss;
-    *iv=new intvec(1,pVariables);
-    rChangeCurrRing(origR);
-  }
-  else
-  {
-    idDelete(&II);
-    bareiss->smBareiss(x, y);
-    II = bareiss->smRes2Mod();
-    *iv = new intvec(bareiss->smGetRed());
-    bareiss->smToIntvec(*iv);
-    delete bareiss;
-    rChangeCurrRing(origR);
-    II = idrMoveR(II,tmpR);
-  }
-  smKillModifiedRing(tmpR);
-  M=II;
-}
-
-void smCallNewBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
+void smCallBareiss(ideal I, int x, int y, ideal & M, intvec **iv)
 {
   int r=idRankFreeModule(I),t=r;
   int c=IDELEMS(I),s=c;
