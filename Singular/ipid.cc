@@ -726,56 +726,6 @@ void paCleanUp(package pack)
   }
 }
 
-char *idhdl2id(idhdl pck, idhdl h)
-{
-  char *name = (char *)omAlloc(strlen(pck->id) + strlen(h->id) + 3);
-  sprintf(name, "%s::%s", pck->id, h->id);
-  return(name);
-}
-
-void iiname2hdl(const char *name, idhdl *pck, idhdl *h)
-{
-  const char *q = strchr(name, ':');
-  char *p, *i;
-
-  if(q==NULL)
-  {
-    p = omStrDup("");
-    i = (char *)omAlloc(strlen(name)+1);
-    *i = '\0';
-    sscanf(name, "%s", i);
-  }
-  else {
-    if( *(q+1) != ':') return;
-    i = (char *)omAlloc(strlen(name)+1);
-    *i = '\0';
-    if(name == q)
-    {
-      p = omStrDup("");
-      sscanf(name, "::%s", i);
-    }
-    else
-    {
-      p = (char *)omAlloc(strlen(name)+1);
-      sscanf(name, "%[^:]::%s", p, i);
-    }
-  }
-  //printf("Package: '%s'\n", p);
-  //printf("Id Rec : '%s'\n", i);
-  omFree(p);
-  omFree(i);
-}
-
-#if 0
-char *getnamelev()
-{
-  char buf[256];
-  sprintf(buf, "(%s:%d)", namespaceroot->name,namespaceroot->lev);
-  return(buf);
-}
-// warning: address of local variable `buf' returned
-#endif
-
 void proclevel::push(char *n)
 {
   //Print("push %s\n",n);
