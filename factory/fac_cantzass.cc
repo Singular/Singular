@@ -61,7 +61,7 @@ CFFList FpFactorizeUnivariateCZ( const CanonicalForm& f, bool issqrfree, int num
         else
             n = getMipo( alpha ).degree() * getMipo( beta ).degree();
         mpz_init( &qq );
-        mpz_mypow_ui( &qq, q, n );
+        mpz_ui_pow_ui ( &qq, q, n );
     }
     if ( LC( f ).isOne() )
         if ( issqrfree )
@@ -234,7 +234,7 @@ CanonicalForm powerMod( const CanonicalForm & f, int p, int s, const CanonicalFo
     MP_INT m;
 
     mpz_init( &m );
-    mpz_mypow_ui( &m, p, s );
+    mpz_ui_pow_ui ( &m, p, s );
     while ( mpz_cmp_si( &m, 0 ) != 0 )
     {
         odd = mpz_fdiv_q_ui( &m, &m, 2 );
@@ -256,7 +256,7 @@ CanonicalForm powerMod2( const CanonicalForm & f, int p, int s, const CanonicalF
     MP_INT m;
 
     mpz_init( &m );
-    mpz_mypow_ui( &m, p, s );
+    mpz_ui_pow_ui ( &m, p, s );
     mpz_sub_ui( &m, &m, 1 );
     mpz_fdiv_q_ui( &m, &m, 2 );
     while ( mpz_cmp_si( &m, 0 ) != 0 )
@@ -280,7 +280,7 @@ CanonicalForm powerMod2( const CanonicalForm & f, MP_INT * q, int s, const Canon
     MP_INT m;
 
     mpz_init( &m );
-    mpz_mypow( &m, q, s );
+    mpz_pow_ui( &m, q, s );
     mpz_sub_ui( &m, &m, 1 );
     mpz_fdiv_q_ui( &m, &m, 2 );
     while ( mpz_cmp_si( &m, 0 ) != 0 )
