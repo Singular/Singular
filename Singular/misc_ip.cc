@@ -912,7 +912,7 @@ void p_SetRingOfLeftv(leftv l, ring r)
 #endif
 #endif
 
-#if 0
+#if 0 /* debug only */
 void listall(int showproc)
 {
       idhdl hh=basePack->idroot;
@@ -967,7 +967,7 @@ void listall(int showproc)
       Print("currRing:%lx, currPack:%lx,basePack:%lx\n",(long)currRing,(long)currPack,(long)basePack);
       iiCheckPack(currPack);
 }
-#ifndef NDEBUG
+
 void checkall()
 {
       idhdl hh=basePack->idroot;
@@ -995,7 +995,6 @@ void checkall()
         hh=IDNEXT(hh);
       }
 }
-#endif
 #endif
 
 #include <sys/types.h>
