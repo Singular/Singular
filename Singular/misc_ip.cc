@@ -380,6 +380,7 @@ lists primeFactorisation(const number n, const number pBound)
 //#endif /* HAVE_LIBPARSER */
 
 #ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 // libfac:
   extern const char * libfac_version;
