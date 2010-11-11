@@ -164,7 +164,6 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 //#include <python_wrapper.h>
 #endif
 
-void piShowProcList();
 #ifndef MAKE_DISTRIBUTION
 static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h);
 #endif
@@ -2528,6 +2527,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   /*==================== listall ===================================*/
       if(strcmp(sys_cmd,"listall")==0)
       {
+        void listall(int showproc);
         int showproc=0;
         if ((h!=NULL) && (h->Typ()==INT_CMD)) showproc=(int)((long)h->Data());
         listall(showproc);
@@ -2539,6 +2539,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   /*==================== proclist =================================*/
       if(strcmp(sys_cmd,"proclist")==0)
       {
+        void piShowProcList();
         piShowProcList();
         return FALSE;
       }
