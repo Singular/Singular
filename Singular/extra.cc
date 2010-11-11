@@ -2524,6 +2524,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
+  #if 0 /* debug only */
   /*==================== listall ===================================*/
       if(strcmp(sys_cmd,"listall")==0)
       {
@@ -2533,6 +2534,8 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
+  #endif
+  #if 0 /* debug only */
   /*==================== proclist =================================*/
       if(strcmp(sys_cmd,"proclist")==0)
       {
@@ -2540,6 +2543,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         return FALSE;
       }
       else
+  #endif
   /* ==================== newton ================================*/
   #ifdef HAVE_NEWTON
       if(strcmp(sys_cmd,"newton")==0)

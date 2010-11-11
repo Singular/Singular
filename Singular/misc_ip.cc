@@ -81,17 +81,6 @@ static inline void divTimes_ui_ui(unsigned long *n, unsigned long d, int* times)
   }
 }
 
-/* returns an object of type lists which contains the entries
-   theInts[0..(length-1)] as INT_CMDs */
-lists makeListsObject(const int* theInts, int length)
-{
-  lists L=(lists)omAllocBin(slists_bin);
-  L->Init(length);
-  for (int i = 0; i < length; i++)
-    { L->m[i].rtyp = INT_CMD; L->m[i].data = (void*)theInts[i]; }
-  return L;
-}
-
 void setListEntry(lists L, int index, mpz_t n)
 { /* assumes n > 0 */
   /* try to fit nn into an int: */
@@ -923,6 +912,7 @@ void p_SetRingOfLeftv(leftv l, ring r)
 #endif
 #endif
 
+#if 0
 void listall(int showproc)
 {
       idhdl hh=basePack->idroot;
@@ -1005,6 +995,7 @@ void checkall()
         hh=IDNEXT(hh);
       }
 }
+#endif
 #endif
 
 #include <sys/types.h>

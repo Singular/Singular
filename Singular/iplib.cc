@@ -1095,6 +1095,7 @@ char *iiConvName(const char *libname)
 }
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+#if 0 /* debug only */
 void piShowProcList()
 {
   idhdl h;
@@ -1128,6 +1129,7 @@ void piShowProcList()
     }
   }
 }
+#endif
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 //char *iiLineNo(char *procname, int lineno)
