@@ -842,6 +842,7 @@ static void idShift(ideal arg,int index)
   }
 }
 
+#if 0 /*debug only */
 static void syPrintResolution(resolvente res,int start,int length)
 {
   while ((start < length) && (res[start]))
@@ -852,6 +853,7 @@ static void syPrintResolution(resolvente res,int start,int length)
     start++;
   }
 }
+#endif
 
 resolvente sySchreyerResolvente(ideal arg, int maxlength, int * length,
                                 BOOLEAN isMonomial, BOOLEAN notReplace)
