@@ -2432,21 +2432,19 @@ static float smPolyWeight(smpoly a)
 static BOOLEAN smHaveDenom(poly a)
 {
   BOOLEAN sw;
-  number x,o=nInit(1);
+  number x;
 
   while (a != NULL)
   {
     x = nGetDenom(pGetCoeff(a));
-    sw = nEqual(x,o);
+    sw = nIsOne(x);
     nDelete(&x);
     if (!sw)
     {
-      nDelete(&o);
       return TRUE;
     }
     pIter(a);
   }
-  nDelete(&o);
   return FALSE;
 }
 
@@ -2511,7 +2509,6 @@ private:
   int sing;            // indicator for singular problem
   int rpiv;            // row-position of the pivot
   int *perm;           // permutation of rows
-  number one;          // the "1"
   number *sol;         // field for solution
   int *wrw, *wcl;      // weights of rows and columns
   smnumber * m_act;    // unreduced columns
@@ -2604,7 +2601,6 @@ sparse_number_mat::sparse_number_mat(ideal smat)
   }
   omFreeSize((ADDRESS)pmat,smat->ncols*sizeof(poly));
   omFreeBin((ADDRESS)smat, sip_sideal_bin);
-  one = nInit(1);
 }
 
 /*
@@ -2622,7 +2618,6 @@ sparse_number_mat::~sparse_number_mat()
   omFreeSize((ADDRESS)wrw, sizeof(int)*i);
   omFreeSize((ADDRESS)m_row, sizeof(smnumber)*i);
   omFreeSize((ADDRESS)perm, sizeof(int)*i);
-  nDelete(&one);
 }
 
 /*
@@ -2808,7 +2803,7 @@ void sparse_number_mat::smRealPivot()
 /* one step of Gauss-elimination */
 void sparse_number_mat::smGElim()
 {
-  number p = nDiv(one,piv->m);  // pivotelement
+  number p = nInvers(piv->m);  // pivotelement
   smnumber c = m_act[act];      // pivotcolumn
   smnumber r = red;             // row to reduce
   smnumber res, a, b;
