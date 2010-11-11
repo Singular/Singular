@@ -162,58 +162,6 @@ void syCompactify1(SSet sPairs, int* sPlength, int first)
 * compares with components of currcomponents instead of the
 * exp[0]
 */
-static int syzcomp0dpc(poly p1, poly p2)
-{
-  /*4 compare monomials by order then revlex*/
-    int i = pVariables;
-    if ((pGetExp(p1,i) == pGetExp(p2,i)))
-    {
-      do
-      {
-        i--;
-        if (i <= 1)
-        {
-           /*4 handle module case:*/
-           if (pGetComp(p1)==pGetComp(p2)) return 0;
-           else if
-              (currcomponents[pGetComp(p1)]>currcomponents[pGetComp(p2)])
-                return 1;
-           else return -1;
-        }
-      } while ((pGetExp(p1,i) == pGetExp(p2,i)));
-    }
-    if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
-    return -1;
-}
-
-/*3
-* replaces comp1dpc during homogeneous syzygy-computations
-* compares with components of currcomponents instead of the
-* exp[0]
-*/
-int syzcomp1dpc(poly p1, poly p2)
-{
-  int i = pVariables;
-  while ((i>1) && (pGetExp(p1,i)==pGetExp(p2,i)))
-    i--;
-  if (i>1)
-  {
-    if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
-    return -1;
-  }
-  int o1=pGetComp(p1);
-  int o2=pGetComp(p2);
-  if (o1==o2/*pGetComp(p1)==pGetComp(p2)*/) return 0;
-  if (currcomponents[o1]>currcomponents[o2]) return 1;
-  return -1;
-
-}
-
-/*3
-* replaces comp1dpc during homogeneous syzygy-computations
-* compares with components of currcomponents instead of the
-* exp[0]
-*/
 
 #ifdef PDEBUG
 static int syzcomp2dpc_test(poly p1, poly p2)
@@ -275,33 +223,6 @@ static int syzcomp2dpc_test(poly p1, poly p2)
   return -1;
 }
 #endif // PDEBUG
-
-/*3
-* compares only the monomial without component
-*/
-static int syzcompmonomdp(poly p1, poly p2)
-{
-  int i;
-
-  /*4 compare monomials by order then revlex*/
-  if (pGetOrder(p1) == pGetOrder(p2))
-  {
-    i = pVariables;
-    if ((pGetExp(p1,i) == pGetExp(p2,i)))
-    {
-      do
-      {
-        i--;
-        if (i <= 1)
-          return 0;
-      } while ((pGetExp(p1,i) == pGetExp(p2,i)));
-    }
-    if (pGetExp(p1,i) < pGetExp(p2,i)) return 1;
-    return -1;
-  }
-  else if (pGetOrder(p1) > pGetOrder(p2)) return 1;
-  return -1;
-}
 
 poly syRedtail (poly p, syStrategy syzstr, int index)
 {

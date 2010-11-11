@@ -118,7 +118,6 @@ void syKillEmptyEntres(resolvente res,int length);
 extern int *  currcomponents;
 extern long *  currShiftedComponents;
 
-int syzcomp1dpc(poly p1, poly p2);
 void syDeletePair(SObject * so);
 void syInitializePair(SObject * so);
 void syCopyPair(SObject * argso, SObject * imso);
