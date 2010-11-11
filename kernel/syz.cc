@@ -1042,6 +1042,7 @@ ideal syMinBase(ideal arg)
   return result;
 }
 
+#if 0  /* currently used: syBetti */
 /*2
 * computes Betti-numbers from a resolvente of
 * (non-)homogeneous objects
@@ -1173,3 +1174,5 @@ intvec * syNewBetti(resolvente res, intvec ** weights, int length)
   }
   return result;
 }
+#endif
+
