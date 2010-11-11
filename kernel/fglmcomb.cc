@@ -25,7 +25,6 @@
 #include <factory/factory.h>
 
 #include <kernel/fglm.h>
-#include <factory/templates/ftmpl_list.h>
 
 #ifndef NOSTREAMIO
 #  ifdef HAVE_IOSTREAM

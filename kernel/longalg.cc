@@ -19,6 +19,7 @@
 #include <kernel/ideals.h>
 #include <kernel/ring.h>
 #ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
 #include <kernel/clapsing.h>
 #include <kernel/clapconv.h>

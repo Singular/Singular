@@ -31,6 +31,7 @@
 #include <kernel/maps.h>
 #include <kernel/matpol.h>
 #ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
 #  include <factory/factory.h>
 #endif
 
