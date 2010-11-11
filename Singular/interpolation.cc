@@ -14,15 +14,11 @@
 #include <Singular/ipid.h>
 #include <kernel/ring.h>
 #ifdef HAVE_FACTORY
+#define SI_DONT_HAVE_GLOBAL_VARS
 #  include <factory/factory.h>
 #endif /* HAVE_FACTORY */
 
-//memory management
-#define mdmALLOC(x) omAlloc0(x)
-#define mdmFREE(x) omFree(x)
-
 // parameters to debug
-//#define debb
 //#define shmat
 //#define checksize
 //#define writemsg
@@ -143,6 +139,7 @@ bool protocol; // true to show the protocol
 int maximal_size=0;
 #endif
 
+#if 0  /* only for debuggig*/
 void WriteMono (mono_type m) // Writes a monomial on the screen - only for debug
 {
      int i;
@@ -150,7 +147,6 @@ void WriteMono (mono_type m) // Writes a monomial on the screen - only for debug
      PrintS(" ");
 }
 
-#ifdef debb
 void WriteMonoList (mon_list_entry *list)
 {
      mon_list_entry *ptr;
@@ -227,7 +223,8 @@ modp_number OneInverse(modp_number a,modp_number p) // computes inverse of d mod
    long  u, v, u0, u1, u2, q, r;
    u1=1; u2=0;
    u = a; v = p;
-   while (v != 0) {
+   while (v != 0)
+   {
       q = u / v;
       r = u % v;
       u = v;
@@ -309,14 +306,18 @@ mon_list_entry* MonListAdd (mon_list_entry *list, mono_type mon)  // adds one en
            if (EqualMon (mon,(*curptr).mon)) return list;
            if (Greater ((*curptr).mon,mon)) break;
            prevptr=curptr;
-           curptr=curptr->next;}
-     temp=(mon_list_entry*)mdmALLOC(sizeof(mon_list_entry));
+           curptr=curptr->next;
+     }
+     temp=(mon_list_entry*)omAlloc0(sizeof(mon_list_entry));
      (*temp).next=curptr;
-     (*temp).mon=(exponent*)mdmALLOC(sizeof(exponent)*variables);
+     (*temp).mon=(exponent*)omAlloc0(sizeof(exponent)*variables);
      memcpy(temp->mon,mon,sizeof(exponent)*variables);
-     if (prevptr==NULL) return temp; else {
+     if (prevptr==NULL) return temp;
+     else
+     {
           prevptr->next=temp;
-          return list;}
+          return list;
+     }
 }
 
 mono_type MonListElement (mon_list_entry *list, int n)  // returns ith element from list of monomials - no error checking!
@@ -330,7 +331,7 @@ mono_type MonListElement (mon_list_entry *list, int n)  // returns ith element f
 mono_type ZeroMonomial ()  // allocates memory for new monomial with all enries equal 0
 {
      mono_type m;
-     m=(exponent*)mdmALLOC(sizeof(exponent)*variables);
+     m=(exponent*)omAlloc0(sizeof(exponent)*variables);
      int i;
      for (i=0;i<variables;i++) m[i]=0;
      return m;
@@ -339,46 +340,46 @@ mono_type ZeroMonomial ()  // allocates memory for new monomial with all enries 
 void GeneralInit ()  // general initialization
 {
      int i,j,k;
-     points=(coordinates*)mdmALLOC(sizeof(coordinates)*n_points);
+     points=(coordinates*)omAlloc0(sizeof(coordinates)*n_points);
      for (i=0;i<n_points;i++)
      {
-         points[i]=(coordinate_products*)mdmALLOC(sizeof(coordinate_products)*variables);
-         for (j=0;j<variables;j++) points[i][j]=(modp_number*)mdmALLOC(sizeof(modp_number)*(max_coord));
+         points[i]=(coordinate_products*)omAlloc0(sizeof(coordinate_products)*variables);
+         for (j=0;j<variables;j++) points[i][j]=(modp_number*)omAlloc0(sizeof(modp_number)*(max_coord));
      }
-     condition_list=(condition_type*)mdmALLOC(sizeof(condition_type)*final_base_dim);
-     for (i=0;i<final_base_dim;i++) condition_list[i].mon=(exponent*)mdmALLOC(sizeof(exponent)*variables);
-     modp_points=(modp_coordinates*)mdmALLOC(sizeof(modp_coordinates)*n_points);
-     for (i=0;i<n_points;i++) modp_points[i]=(modp_number*)mdmALLOC(sizeof(modp_number)*variables);
+     condition_list=(condition_type*)omAlloc0(sizeof(condition_type)*final_base_dim);
+     for (i=0;i<final_base_dim;i++) condition_list[i].mon=(exponent*)omAlloc0(sizeof(exponent)*variables);
+     modp_points=(modp_coordinates*)omAlloc0(sizeof(modp_coordinates)*n_points);
+     for (i=0;i<n_points;i++) modp_points[i]=(modp_number*)omAlloc0(sizeof(modp_number)*variables);
      if (!only_modp)
      {
-        q_points=(q_coordinates*)mdmALLOC(sizeof(q_coordinates)*n_points);
+        q_points=(q_coordinates*)omAlloc0(sizeof(q_coordinates)*n_points);
         for (i=0;i<n_points;i++)
         {
-            q_points[i]=(mpq_t*)mdmALLOC(sizeof(mpq_t)*variables);
+            q_points[i]=(mpq_t*)omAlloc0(sizeof(mpq_t)*variables);
             for (j=0;j<variables;j++) mpq_init(q_points[i][j]);
         }
-        int_points=(int_coordinates*)mdmALLOC(sizeof(int_coordinates)*n_points);
+        int_points=(int_coordinates*)omAlloc0(sizeof(int_coordinates)*n_points);
         for (i=0;i<n_points;i++)
         {
-            int_points[i]=(mpz_t*)mdmALLOC(sizeof(mpz_t)*variables);
+            int_points[i]=(mpz_t*)omAlloc0(sizeof(mpz_t)*variables);
             for (j=0;j<variables;j++) mpz_init(int_points[i][j]);
         }
      }
-     coord_exist=(coord_exist_table*)mdmALLOC(sizeof(coord_exist_table)*n_points);
+     coord_exist=(coord_exist_table*)omAlloc0(sizeof(coord_exist_table)*n_points);
      for (i=0;i<n_points;i++)
      {
-         coord_exist[i]=(bool*)mdmALLOC(sizeof(bool)*variables);
+         coord_exist[i]=(bool*)omAlloc0(sizeof(bool)*variables);
          for (j=0;j<variables;j++) coord_exist[i][j]=false;
      }
-     generic_column_name=(mono_type*)mdmALLOC(sizeof(mono_type)*final_base_dim);
+     generic_column_name=(mono_type*)omAlloc0(sizeof(mono_type)*final_base_dim);
      for (i=0;i<final_base_dim;i++) generic_column_name[i]=ZeroMonomial ();
      good_primes=0;
      bad_primes=1;
      generic_n_generators=0;
      if (!only_modp)
      {
-        polycoef=(mpz_t*)mdmALLOC(sizeof(mpz_t)*(final_base_dim+1));
-        polyexp=(mono_type*)mdmALLOC(sizeof(mono_type)*(final_base_dim+1));
+        polycoef=(mpz_t*)omAlloc0(sizeof(mpz_t)*(final_base_dim+1));
+        polyexp=(mono_type*)omAlloc0(sizeof(mono_type)*(final_base_dim+1));
         for (i=0;i<=final_base_dim;i++)
         {
              mpz_init(polycoef[i]);
@@ -402,18 +403,18 @@ void InitProcData ()  // initialization for procedures which do computations mod
 {
      int i,j;
      check_list=MonListAdd (check_list,ZeroMonomial ());
-     my_row=(modp_number*)mdmALLOC(sizeof(modp_number)*final_base_dim);
-     my_solve_row=(modp_number*)mdmALLOC(sizeof(modp_number)*final_base_dim);
-     column_name=(mono_type*)mdmALLOC(sizeof(mono_type)*final_base_dim);
+     my_row=(modp_number*)omAlloc0(sizeof(modp_number)*final_base_dim);
+     my_solve_row=(modp_number*)omAlloc0(sizeof(modp_number)*final_base_dim);
+     column_name=(mono_type*)omAlloc0(sizeof(mono_type)*final_base_dim);
      for (i=0;i<final_base_dim;i++) column_name[i]=ZeroMonomial ();
      last_solve_column=0;
      modp_number *gen_table;
      modp_number pos_gen;
      bool gen_ok;
-     modp_Reverse=(modp_number*)mdmALLOC(sizeof(modp_number)*myp);
+     modp_Reverse=(modp_number*)omAlloc0(sizeof(modp_number)*myp);
 
 // produces table of modp inverts by finding a generator of (Z_myp*,*)
-     gen_table=(modp_number*)mdmALLOC(sizeof(modp_number)*myp);
+     gen_table=(modp_number*)omAlloc0(sizeof(modp_number)*myp);
      gen_table[1]=1;
      for (pos_gen=2;pos_gen<myp;pos_gen++)
      {
@@ -431,7 +432,7 @@ void InitProcData ()  // initialization for procedures which do computations mod
      }
      for (i=2;i<myp;i++) modp_Reverse[gen_table[i]]=gen_table[myp-i+1];
      modp_Reverse[1]=1;
-     mdmFREE(gen_table);
+     omFree(gen_table);
 }
 
 mon_list_entry* FreeMonList (mon_list_entry *list)  // destroys a list of monomials, returns NULL pointer
@@ -442,8 +443,8 @@ mon_list_entry* FreeMonList (mon_list_entry *list)  // destroys a list of monomi
      while (ptr!=NULL)
      {
            pptr=ptr->next;
-           mdmFREE(ptr->mon);
-           mdmFREE(ptr);
+           omFree(ptr->mon);
+           omFree(ptr);
            ptr=pptr;}
      return NULL;
 }
@@ -455,46 +456,46 @@ void GeneralDone ()  // to be called before exit to free memory
      {
          for (j=0;j<variables;j++)
          {
-             mdmFREE(points[i][j]);
+             omFree(points[i][j]);
          }
-         mdmFREE(points[i]);
+         omFree(points[i]);
      }
-     mdmFREE(points);
-     for (i=0;i<final_base_dim;i++) mdmFREE(condition_list[i].mon);
-     mdmFREE(condition_list);
-     for (i=0;i<n_points;i++) mdmFREE(modp_points[i]);
-     mdmFREE(modp_points);
+     omFree(points);
+     for (i=0;i<final_base_dim;i++) omFree(condition_list[i].mon);
+     omFree(condition_list);
+     for (i=0;i<n_points;i++) omFree(modp_points[i]);
+     omFree(modp_points);
      if (!only_modp)
      {
         for (i=0;i<n_points;i++)
         {
             for (j=0;j<variables;j++) mpq_clear(q_points[i][j]);
-            mdmFREE(q_points[i]);
+            omFree(q_points[i]);
         }
-        mdmFREE(q_points);
+        omFree(q_points);
         for (i=0;i<n_points;i++)
         {
             for (j=0;j<variables;j++) mpz_clear(int_points[i][j]);
-            mdmFREE(int_points[i]);
+            omFree(int_points[i]);
         }
-        mdmFREE(int_points);
+        omFree(int_points);
         generic_lt=FreeMonList (generic_lt);
         for (i=0;i<=final_base_dim;i++)
         {
             mpz_clear(polycoef[i]);
-            mdmFREE(polyexp[i]);
+            omFree(polyexp[i]);
         }
-        mdmFREE(polycoef);
-        mdmFREE(polyexp);
+        omFree(polycoef);
+        omFree(polyexp);
         if (!only_modp) mpz_clear(common_denom);
      }
      for (i=0;i<final_base_dim;i++)
      {
-         mdmFREE(generic_column_name[i]);
+         omFree(generic_column_name[i]);
      }
-     mdmFREE(generic_column_name);
-     for (i=0;i<n_points;i++) mdmFREE(coord_exist[i]);
-     mdmFREE(coord_exist);
+     omFree(generic_column_name);
+     for (i=0;i<n_points;i++) omFree(coord_exist[i]);
+     omFree(coord_exist);
      pDelete(&comparizon_p1);
      pDelete(&comparizon_p2);
 }
@@ -507,23 +508,23 @@ void FreeProcData ()  // to be called after one modp computation to free memory
      check_list=FreeMonList (check_list);
      lt_list=FreeMonList (lt_list);
      base_list=FreeMonList (base_list);
-     mdmFREE(my_row);
+     omFree(my_row);
      my_row=NULL;
-     mdmFREE(my_solve_row);
+     omFree(my_solve_row);
      my_solve_row=NULL;
      ptr=row_list;
      while (ptr!=NULL)
      {
            pptr=ptr->next;
-           mdmFREE(ptr->row_matrix);
-           mdmFREE(ptr->row_solve);
-           mdmFREE(ptr);
+           omFree(ptr->row_matrix);
+           omFree(ptr->row_solve);
+           omFree(ptr);
            ptr=pptr;
      }
      row_list=NULL;
-     for (i=0;i<final_base_dim;i++) mdmFREE(column_name[i]);
-     mdmFREE(column_name);
-     mdmFREE(modp_Reverse);
+     for (i=0;i<final_base_dim;i++) omFree(column_name[i]);
+     omFree(column_name);
+     omFree(modp_Reverse);
 }
 
 void modp_Evaluate(modp_number *ev, mono_type mon, condition_type con)  // evaluates monomial on condition (modp)
@@ -535,7 +536,7 @@ void modp_Evaluate(modp_number *ev, mono_type mon, condition_type con)  // evalu
     *ev=1;
     int j,k;
     mono_type mn;
-    mn=(exponent*)mdmALLOC(sizeof(exponent)*variables);
+    mn=(exponent*)omAlloc0(sizeof(exponent)*variables);
     memcpy(mn,mon,sizeof(exponent)*variables);
     for (k=0;k<variables;k++)
     {
@@ -546,7 +547,7 @@ void modp_Evaluate(modp_number *ev, mono_type mon, condition_type con)  // evalu
         }
         *ev=modp_mul(*ev,points[con.point_ref][k][mn[k]]);
     }
-    mdmFREE(mn);
+    omFree(mn);
 }
 
 void int_Evaluate(mpz_t ev, mono_type mon, condition_type con) // (***) evaluates monomial on condition for integer numbers
@@ -560,7 +561,7 @@ void int_Evaluate(mpz_t ev, mono_type mon, condition_type con) // (***) evaluate
     mpz_init(mon_conv);
     int j,k;
     mono_type mn;
-    mn=(exponent*)mdmALLOC(sizeof(exponent)*variables);
+    mn=(exponent*)omAlloc0(sizeof(exponent)*variables);
     memcpy(mn,mon,sizeof(exponent)*variables);
     for (k=0;k<variables;k++)
     {
@@ -572,7 +573,7 @@ void int_Evaluate(mpz_t ev, mono_type mon, condition_type con) // (***) evaluate
         }
         for (j=1;j<=mn[k];j++) mpz_mul(ev,ev,int_points[con.point_ref][k]);  // this loop computes the product of coordinate
     }
-    mdmFREE(mn);
+    omFree(mn);
     mpz_clear(mon_conv);
 }
 
@@ -692,7 +693,7 @@ void MakeConditions ()  // prepares a list of conditions from list of multiplici
              }
          }
      }
-     mdmFREE(mon);
+     omFree(mon);
 }
 
 void ReduceRow ()  // reduces my_row by previous rows, does the same for solve row
@@ -764,7 +765,7 @@ void ReduceRow ()  // reduces my_row by previous rows, does the same for solve r
               }
            }
            row_ptr=row_ptr->next;
-#ifdef debb
+#if 0 /* only debugging */
            PrintS("reduction by row ");
            Info ();
 #endif
@@ -804,13 +805,13 @@ void ReduceCheckListByMon (mono_type m)  // from check_list monomials divisible 
      {
           if (DivisibleMon (m,c_ptr->mon))
           {
-             if (p_ptr==NULL) 
+             if (p_ptr==NULL)
                 check_list=c_ptr->next;
              else
                 p_ptr->next=c_ptr->next;
              n_ptr=c_ptr->next;
-             mdmFREE(c_ptr->mon);
-             mdmFREE(c_ptr);
+             omFree(c_ptr->mon);
+             omFree(c_ptr);
              c_ptr=n_ptr;
           }
           else
@@ -828,8 +829,8 @@ void TakeNextMonomial (mono_type mon)  // reads first monomial from check_list, 
      {
         memcpy(mon,check_list->mon,sizeof(exponent)*variables);
         n_check_list=check_list->next;
-        mdmFREE(check_list->mon);
-        mdmFREE(check_list);
+        omFree(check_list->mon);
+        omFree(check_list);
         check_list=n_check_list;
      }
 }
@@ -871,10 +872,10 @@ void RowListAdd (int first_col, mono_type mon) // puts a row into matrix
          pptr=ptr;
          ptr=ptr->next;
      }
-     temp=(row_list_entry*)mdmALLOC(sizeof(row_list_entry));
-     (*temp).row_matrix=(modp_number*)mdmALLOC(sizeof(modp_number)*final_base_dim);
+     temp=(row_list_entry*)omAlloc0(sizeof(row_list_entry));
+     (*temp).row_matrix=(modp_number*)omAlloc0(sizeof(modp_number)*final_base_dim);
      memcpy((*temp).row_matrix,my_row,sizeof(modp_number)*(final_base_dim));
-     (*temp).row_solve=(modp_number*)mdmALLOC(sizeof(modp_number)*final_base_dim);
+     (*temp).row_solve=(modp_number*)omAlloc0(sizeof(modp_number)*final_base_dim);
      memcpy((*temp).row_solve,my_solve_row,sizeof(modp_number)*(final_base_dim));
      (*temp).first_col=first_col;
      temp->next=ptr;
@@ -940,7 +941,7 @@ void NewResultEntry ()  // creates an entry for new modp result
 {
     modp_result_entry *temp;
     int i;
-    temp=(modp_result_entry*)mdmALLOC(sizeof(modp_result_entry));
+    temp=(modp_result_entry*)omAlloc0(sizeof(modp_result_entry));
     if (cur_result==NULL)
     {
        modp_result=temp;
@@ -967,12 +968,12 @@ void FreeResultEntry (modp_result_entry *e) // destroys the result entry, withou
      while (cur_gen!=NULL)
      {
          next_gen=cur_gen->next;
-         mdmFREE(cur_gen->coef);
-         mdmFREE(cur_gen->lt);
-         mdmFREE(cur_gen);
+         omFree(cur_gen->coef);
+         omFree(cur_gen->lt);
+         omFree(cur_gen);
          cur_gen=next_gen;
      }
-     mdmFREE(e);
+     omFree(e);
 }
 
 
@@ -989,10 +990,10 @@ void NewGenerator (mono_type mon)  // new generator in modp comp found, shoul be
          prev_ptr=cur_ptr;
          cur_ptr=cur_ptr->next;
      }
-     temp=(generator_entry*)mdmALLOC(sizeof(generator_entry));
+     temp=(generator_entry*)omAlloc0(sizeof(generator_entry));
      if (prev_ptr==NULL) cur_result->generator=temp; else prev_ptr->next=temp;
      temp->next=NULL;
-     temp->coef=(modp_number*)mdmALLOC(sizeof(modp_number)*final_base_dim);
+     temp->coef=(modp_number*)omAlloc0(sizeof(modp_number)*final_base_dim);
      memcpy(temp->coef,my_solve_row,sizeof(modp_number)*final_base_dim);
      temp->lt=ZeroMonomial ();
      memcpy(temp->lt,mon,sizeof(exponent)*variables);
@@ -1008,14 +1009,14 @@ void MultGenerators () // before reconstructing, all denominators must be cancel
      cur_ptr=cur_result->generator;
      while (cur_ptr!=NULL)
      {
-         for (i=0;i<final_base_dim;i++) 
+         for (i=0;i<final_base_dim;i++)
              cur_ptr->coef[i]=modp_mul(cur_ptr->coef[i],modp_denom);
          cur_ptr->ltcoef=modp_denom;
          cur_ptr=cur_ptr->next;
      }
 #endif
 }
-
+#if 0 /* only debbuging */
 void PresentGenerator (int i)  // only for debuging, writes a generator in its form in program
 {
      int j;
@@ -1036,6 +1037,7 @@ void PresentGenerator (int i)  // only for debuging, writes a generator in its f
         cur_ptr=cur_ptr->next;
      }
 }
+#endif
 
 modp_number TakePrime (modp_number p)  // takes "previous" (smaller) prime
 {
@@ -1054,8 +1056,8 @@ void PrepareChinese (int n) // initialization for CRA
      cur_ptr=modp_result;
      modp_number *congr_ptr;
      modp_number prod;
-     in_gamma=(modp_number*)mdmALLOC(sizeof(modp_number)*n);
-     congr=(modp_number*)mdmALLOC(sizeof(modp_number)*n);
+     in_gamma=(modp_number*)omAlloc0(sizeof(modp_number)*n);
+     congr=(modp_number*)omAlloc0(sizeof(modp_number)*n);
      congr_ptr=congr;
      while (cur_ptr!=NULL)
      {
@@ -1076,8 +1078,8 @@ void PrepareChinese (int n) // initialization for CRA
 
 void CloseChinese (int n) // after CRA
 {
-     mdmFREE(in_gamma);
-     mdmFREE(congr);
+     omFree(in_gamma);
+     omFree(congr);
      mpz_clear(bigcongr);
 }
 
@@ -1110,7 +1112,7 @@ void ReconstructGenerator (int ngen,int n,bool show) // recostruction of generat
      int i,j,k;
      int coef;
      char *str=NULL;
-     str=(char*)mdmALLOC(sizeof(char)*1000);
+     str=(char*)omAlloc0(sizeof(char)*1000);
      modp_result_entry *cur_ptr;
      generator_entry *cur_gen;
      modp_number *u;
@@ -1120,8 +1122,8 @@ void ReconstructGenerator (int ngen,int n,bool show) // recostruction of generat
      mpz_t nsol;
      mpz_init(sol);
      mpz_init(nsol);
-     u=(modp_number*)mdmALLOC(sizeof(modp_number)*n);
-     v=(modp_number*)mdmALLOC(sizeof(modp_number)*n);
+     u=(modp_number*)omAlloc0(sizeof(modp_number)*n);
+     v=(modp_number*)omAlloc0(sizeof(modp_number)*n);
      for (coef=0;coef<=final_base_dim;coef++)
      {
          i=0;
@@ -1162,9 +1164,9 @@ void ReconstructGenerator (int ngen,int n,bool show) // recostruction of generat
          if (size>maximal_size) maximal_size=size;
 #endif
      }
-     mdmFREE(u);
-     mdmFREE(v);
-     mdmFREE(str);
+     omFree(u);
+     omFree(v);
+     omFree(str);
      ClearGCD ();
      mpz_clear(sol);
      mpz_clear(nsol);
@@ -1283,11 +1285,11 @@ void CheckColumnSequence () // checks if scheme of computations is as generic on
      }
      good_primes++;
 }
-
+#if 0 /* only debuggig */
 void WriteGenerator () // writes generator (only for debugging)
 {
      char *str;
-     str=(char*)mdmALLOC(sizeof(char)*1000);
+     str=(char*)omAlloc0(sizeof(char)*1000);
      int i;
      for (i=0;i<=final_base_dim;i++)
      {
@@ -1297,9 +1299,10 @@ void WriteGenerator () // writes generator (only for debugging)
          WriteMono(polyexp[i]);
          PrintS(" ");
      }
-     mdmFREE(str);
+     omFree(str);
      PrintLn();
 }
+#endif
 
 bool CheckGenerator () // evaluates generator to check whether it is good
 {
@@ -1338,11 +1341,11 @@ void ClearGenList ()
          for (i=0;i<=final_base_dim;i++)
          {
              mpz_clear(gen_list->polycoef[i]);
-             mdmFREE(gen_list->polyexp[i]);
+             omFree(gen_list->polyexp[i]);
          }
-         mdmFREE(gen_list->polycoef);
-         mdmFREE(gen_list->polyexp);
-         mdmFREE(gen_list);
+         omFree(gen_list->polycoef);
+         omFree(gen_list->polyexp);
+         omFree(gen_list);
          gen_list=temp;
       }
 }
@@ -1368,11 +1371,11 @@ void UpdateGenList ()
          prev=temp;
          temp=temp->next;
      }
-     temp=(gen_list_entry*)mdmALLOC(sizeof(gen_list_entry));
+     temp=(gen_list_entry*)omAlloc0(sizeof(gen_list_entry));
      if (prev==NULL) gen_list=temp; else prev->next=temp;
      temp->next=NULL;
-     temp->polycoef=(mpz_t*)mdmALLOC(sizeof(mpz_t)*(final_base_dim+1));
-     temp->polyexp=(mono_type*)mdmALLOC(sizeof(mono_type)*(final_base_dim+1));
+     temp->polycoef=(mpz_t*)omAlloc0(sizeof(mpz_t)*(final_base_dim+1));
+     temp->polyexp=(mono_type*)omAlloc0(sizeof(mono_type)*(final_base_dim+1));
      for (i=0;i<=final_base_dim;i++)
      {
          mpz_init(temp->polycoef[i]);
@@ -1382,12 +1385,13 @@ void UpdateGenList ()
      }
 }
 
+#if 0 /* only debugging */
 void ShowGenList ()
 {
      gen_list_entry *temp;
      int i;
      char *str;
-     str=(char*)mdmALLOC(sizeof(char)*1000);
+     str=(char*)omAlloc0(sizeof(char)*1000);
      temp=gen_list;
      while (temp!=NULL)
      {
@@ -1402,8 +1406,9 @@ void ShowGenList ()
          PrintLn();
          temp=temp->next;
      }
-     mdmFREE(str);
+     omFree(str);
 }
+#endif
 
 
 void modp_Main ()
@@ -1413,7 +1418,7 @@ void modp_Main ()
      modp_denom=1;
      bool row_is_zero;
 
-#ifdef debb
+#if 0 /* only debugging */
      Info ();
 #endif
 
@@ -1421,7 +1426,7 @@ void modp_Main ()
      {
            TakeNextMonomial (cur_mon);
            ProduceRow (cur_mon);
-#ifdef debb
+#if 0 /* only debugging */
            cout << "row produced for monomial ";
            WriteMono (cur_mon);
            cout << endl;
@@ -1434,7 +1439,7 @@ void modp_Main ()
               lt_list=MonListAdd (lt_list,cur_mon);
               ReduceCheckListByMon (cur_mon);
               NewGenerator (cur_mon);
-#ifdef debb
+#if 0 /* only debugging */
               cout << "row is zero - linear dependence found (should be seen in my_solve_row)" << endl;
               cout << "monomial added to leading terms list" << endl;
               cout << "check list updated" << endl;
@@ -1446,7 +1451,7 @@ void modp_Main ()
               base_list= MonListAdd (base_list,cur_mon);
               UpdateCheckList (cur_mon);
               ReduceCheckListByLTs ();
-#ifdef debb
+#if 0 /* only debugging */
               cout << "row is non-zero" << endl;
               cout << "monomial added to quotient basis list" << endl;
               cout << "new monomials added to check list" << endl;
@@ -1454,13 +1459,13 @@ void modp_Main ()
               Info ();
 #endif
               PrepareRow (cur_mon);
-#ifdef debb
+#if 0 /* only debugging */
               cout << "row prepared and put into matrix" << endl;
               Info ();
 #endif
            }
         }
-        mdmFREE(cur_mon);
+        omFree(cur_mon);
 }
 
 void ResolveCoeff (mpq_t c, number m)
