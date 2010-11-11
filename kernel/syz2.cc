@@ -452,6 +452,7 @@ static poly syRed_Hilb(poly toRed,syStrategy syzstr,int index)
   return result;
 }
 
+#ifdef USE_HEURISTIC1
 intvec *ivStrip(intvec* arg)
 {
   int l=arg->rows()*arg->cols(),i=0,ii=0;
@@ -480,6 +481,7 @@ intvec *ivStrip(intvec* arg)
   delete tempV;
   return result;
 }
+#endif
 
 /*3
 * reduces all pairs of degree deg in the module index
