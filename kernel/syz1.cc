@@ -1425,6 +1425,7 @@ static SSet syChosePairsIH(syStrategy syzstr, int *index,
 *  else return NULL;
 *}
 */
+#if 0 /* only debugging */
 /*3
 * statistics of the resolution
 */
@@ -1454,6 +1455,7 @@ static void syStatistics(resolvente res,int length)
     j++;
   }
 }
+#endif
 
 /*3
 * initialize a module
