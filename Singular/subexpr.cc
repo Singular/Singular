@@ -453,7 +453,6 @@ void sleftv::CleanUp(ring r)
       case VSHORTOUT:
       case VNOETHER:
       case VMINPOLY:
-      case LIB_CMD:
       case 0:
       case INT_CMD:
         break;
@@ -664,8 +663,6 @@ void * sleftv::CopyD(int t)
     if (iiCheckRing(t)) return NULL;
     void *x=data;
     if (rtyp==VNOETHER) x=(void *)pCopy(ppNoether);
-    else if (rtyp==LIB_CMD)
-      x=(void *)omStrDup((char *)Data());
     else if ((rtyp==VMINPOLY)&& (currRing->minpoly!=NULL)&&(!rField_is_GF()))
       x=(void *)nCopy(currRing->minpoly);
     data=NULL;
@@ -965,8 +962,6 @@ int  sleftv::Typ()
       case TRACE:
       case VSHORTOUT:
         return INT_CMD;
-      case LIB_CMD:
-        return STRING_CMD;
       case VMINPOLY:
         return NUMBER_CMD;
       case VNOETHER:
@@ -1056,18 +1051,6 @@ int  sleftv::LTyp()
   return Typ();
 }
 
-void sleftv::SetData(void* what)
-{
-  if (rtyp == IDHDL)
-  {
-    IDDATA((idhdl)data) = (char *)what;
-  }
-  else
-  {
-    data = what;
-  }
-}
-
 void * sleftv::Data()
 {
   if ((rtyp!=IDHDL) && iiCheckRing(rtyp))
@@ -1098,9 +1081,6 @@ void * sleftv::Data()
                        else
                          return (void *)nNULL;
       case VNOETHER:   return (void *) ppNoether;
-      case LIB_CMD:    {
-                         return (void *)sNoName;
-                       }
       case IDHDL:
         return IDDATA((idhdl)data);
       case POINTER_CMD:

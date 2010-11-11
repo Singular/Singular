@@ -75,7 +75,6 @@ class sleftv
     int  Typ();
     int  LTyp(); /* returns LIST_CMD for l[i], otherwise returns Typ() */
     void * Data();
-    void SetData(void* value);
     leftv LData(); /* returns &(l[i]) for l[i], otherwise returns this */
     leftv LHdl();
     attr * Attribute();
