@@ -967,7 +967,9 @@ void listall(int showproc)
       Print("currRing:%lx, currPack:%lx,basePack:%lx\n",(long)currRing,(long)currPack,(long)basePack);
       iiCheckPack(currPack);
 }
+#endif
 
+#ifndef NDEBUG
 void checkall()
 {
       idhdl hh=basePack->idroot;
