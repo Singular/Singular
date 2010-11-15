@@ -3224,9 +3224,10 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 #else 
 			SearchListRoot=gcTmp->enqueueNewFacets(SearchListRoot);
 #endif //ifdef SHALLOW
-			gcTmp->writeConeToFile(*gcTmp);
+// 			gcTmp->writeConeToFile(*gcTmp);
  			if(gfanHeuristic==1)
  			{
+				gcTmp->writeConeToFile(*gcTmp);
  				idDelete((ideal*)&gcTmp->gcBasis);//Whonder why?
 				rDelete(gcTmp->baseRing);
  			}			
