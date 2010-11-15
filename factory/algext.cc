@@ -568,7 +568,7 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
     for(int i=1; i<=mv; i++)
       other[i] = 0; // reset (this is necessary, because some entries may not be updated by call to leadDeg)
     other = leadDeg(Dp,other);
-    
+
     if(isEqual(bound, other, 1, mv)) // equal
     {
       chineseRemainder( D, q, replacevar( mapinto(Dp), a, b ), p, tmp, newq );

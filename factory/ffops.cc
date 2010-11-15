@@ -18,10 +18,10 @@ short * ff_invtab = new short [32767];
 void ff_setprime ( const int p )
 {
     if ( p != ff_prime ) {
-	ff_prime = p;
-	ff_halfprime = ff_prime / 2;
-	if ( ! ff_big )
-	    memset( ff_invtab, 0, ff_prime*sizeof(short) );
+        ff_prime = p;
+        ff_halfprime = ff_prime / 2;
+        if ( ! ff_big )
+            memset( ff_invtab, 0, ff_prime*sizeof(short) );
     }
 }
 
@@ -29,7 +29,7 @@ int ff_newinv ( const int a )
 {
     int p, q, r1, r2, y1, y2;
     if (a < 2)
-	  return (ff_invtab[a] = a);
+          return (ff_invtab[a] = a);
     r1 = p = ff_prime;
     q = r1 / a;
     y1 = -q;

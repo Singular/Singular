@@ -14,9 +14,9 @@ int cf_getPrime( int i )
 {
     ASSERT( i >= 0 && i < NUMPRIMES, "index to primes too high" );
     if ( i >= NUMSMALLPRIMES )
-	return bigprimes[i-NUMSMALLPRIMES];
+        return bigprimes[i-NUMSMALLPRIMES];
     else
-	return smallprimes[i];
+        return smallprimes[i];
 }
 
 int cf_getNumPrimes()

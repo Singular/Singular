@@ -116,8 +116,8 @@ remainder( const CanonicalForm & f, const CanonicalForm & g, const modpk & pk )
             result=pk(result);
           }
         }
-        else 
-	// no inverse found
+        else
+        // no inverse found
         {
           CanonicalForm ic=icontent(g);
           if (!ic.isOne())
@@ -127,7 +127,7 @@ remainder( const CanonicalForm & f, const CanonicalForm & g, const modpk & pk )
           }
           while ( result.degree() >= degg )
           {
-	    if (gg.lc().isZero()) return result;
+            if (gg.lc().isZero()) return result;
             CanonicalForm lcgf = result.lc() / gg.lc();
             if (lcgf.inZ())
               gg = pk( g*lcgf );

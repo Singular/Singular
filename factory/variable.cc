@@ -26,11 +26,11 @@ public:
     ~ext_entry () {};
     ext_entry & operator= ( const ext_entry & e )
     {
-	if ( this != &e ) {
-	    _mipo = e._mipo;
-	    _reduce = e._reduce;
-	}
-	return *this;
+        if ( this != &e ) {
+            _mipo = e._mipo;
+            _reduce = e._reduce;
+        }
+        return *this;
     }
     InternalPoly * mipo () { return _mipo; }
     void setmipo( InternalPoly * p ) { _mipo = p; }
@@ -58,40 +58,40 @@ Variable::Variable( char name )
     bool isext = false;
     int n, i;
     if ( var_names_ext != 0 ) {
-	n = strlen( var_names_ext );
-	i = 1;
-	while ( i < n && var_names_ext[i] != name ) i++;
-	if ( i < n ) {
-	    _level = -i;
-	    isext = true;
-	}
+        n = strlen( var_names_ext );
+        i = 1;
+        while ( i < n && var_names_ext[i] != name ) i++;
+        if ( i < n ) {
+            _level = -i;
+            isext = true;
+        }
     }
     if ( ! isext ) {
-	if ( var_names == 0 ) {
-	    var_names = new char [3];
-	    var_names[0] = '@';
-	    var_names[1] = name;
-	    var_names[2] = '\0';
-	    _level = 1;
-	}
-	else {
-	    n = strlen( var_names );
-	    i = 1;
-	    while ( i < n && var_names[i] != name ) i++;
-	    if ( i < n )
-		_level = i;
-	    else {
-		ASSERT( name != '@', "illegal variable name" );
-		char * newvarnames = new char [n+2];
-		for ( i = 0; i < n; i++ )
-		    newvarnames[i] = var_names[i];
-		newvarnames[n] = name;
-		newvarnames[n+1] = 0;
-		delete [] var_names;
-		var_names = newvarnames;
-		_level = n;
-	    }
-	}
+        if ( var_names == 0 ) {
+            var_names = new char [3];
+            var_names[0] = '@';
+            var_names[1] = name;
+            var_names[2] = '\0';
+            _level = 1;
+        }
+        else {
+            n = strlen( var_names );
+            i = 1;
+            while ( i < n && var_names[i] != name ) i++;
+            if ( i < n )
+                _level = i;
+            else {
+                ASSERT( name != '@', "illegal variable name" );
+                char * newvarnames = new char [n+2];
+                for ( i = 0; i < n; i++ )
+                    newvarnames[i] = var_names[i];
+                newvarnames[n] = name;
+                newvarnames[n+1] = 0;
+                delete [] var_names;
+                var_names = newvarnames;
+                _level = n;
+            }
+        }
     }
 }
 
@@ -100,20 +100,20 @@ Variable::Variable( int l, char name ) : _level(l)
     ASSERT( l > 0 && l != LEVELQUOT, "illegal level" );
     int n;
     if ( (n = (var_names == 0 ? 0 : strlen( var_names ))) <= l ) {
-	char * newvarnames = new char [l+2];
-	int i;
-	for ( i = 0; i < n; i++ )
-	    newvarnames[i] = var_names[i];
-	for ( i = n; i < l; i++ )
-	    newvarnames[i] = '@';
-	newvarnames[l] = name;
-	newvarnames[l+1] = 0;
-	delete [] var_names;
-	var_names = newvarnames;
+        char * newvarnames = new char [l+2];
+        int i;
+        for ( i = 0; i < n; i++ )
+            newvarnames[i] = var_names[i];
+        for ( i = n; i < l; i++ )
+            newvarnames[i] = '@';
+        newvarnames[l] = name;
+        newvarnames[l+1] = 0;
+        delete [] var_names;
+        var_names = newvarnames;
     }
     else {
-	ASSERT( var_names[l] == '@', "illegal name" );
-	var_names[l] = name;
+        ASSERT( var_names[l] == '@', "illegal name" );
+        var_names[l] = name;
     }
 }
 
@@ -121,30 +121,30 @@ char
 Variable::name() const
 {
     if ( _level > 0 && _level < (int)strlen( var_names ) )
-	return( var_names[_level] );
+        return( var_names[_level] );
     else if ( _level < 0 && -_level < (int)strlen( var_names_ext ) )
-	return( var_names_ext[-_level] );
+        return( var_names_ext[-_level] );
     else
-	return '@';
+        return '@';
 }
 
 #ifndef NOSTREAMIO
 OSTREAM & operator << ( OSTREAM & os, const Variable & v )
 {
     if ( v._level == LEVELBASE )
-	os << "1";
+        os << "1";
     else {
-	char * vn = ( v._level > 0 ) ? var_names : var_names_ext;
-	char dn = ( v._level > 0 ) ? default_name : default_name_ext;
-	int l = v._level;
+        char * vn = ( v._level > 0 ) ? var_names : var_names_ext;
+        char dn = ( v._level > 0 ) ? default_name : default_name_ext;
+        int l = v._level;
 
-	if ( l < 0 ) l = -l;
-	if ( (vn == 0) || ((int)strlen( vn ) <= l) )
-	    os << dn << "_" << l;
-	else  if ( vn[l] == '@' )
-	    os << dn << "_" << l;
-	else
-	    os << vn[l];
+        if ( l < 0 ) l = -l;
+        if ( (vn == 0) || ((int)strlen( vn ) <= l) )
+            os << dn << "_" << l;
+        else  if ( vn[l] == '@' )
+            os << dn << "_" << l;
+        else
+            os << vn[l];
     }
     return os;
 }
@@ -155,7 +155,7 @@ OSTREAM & operator << ( OSTREAM & os, const Variable & v )
 //    ASSERT( mipo.inPolyDomain(), "not a legal extension" );
 //    bool ok = true;
 //    for ( CFIterator i = mipo; ok && i.hasTerms(); i++ )
-//	ok = i.coeff().inBaseDomain();
+//        ok = i.coeff().inBaseDomain();
 //    return ok;
 //}
 
@@ -163,7 +163,7 @@ static CanonicalForm conv2mipo ( const CanonicalForm & mipo, const Variable alph
 {
     CanonicalForm result;
     for ( CFIterator i = mipo; i.hasTerms(); i++ )
-	result += i.coeff() * power( alpha, i.exp() );
+        result += i.coeff() * power( alpha, i.exp() );
     return result;
 }
 
@@ -173,36 +173,36 @@ Variable rootOf( const CanonicalForm & mipo, char name )
 
     int l;
     if ( var_names_ext == 0 ) {
-	var_names_ext = new char [3];
-	var_names_ext[0] = '@';
-	var_names_ext[1] = name;
-	var_names_ext[2] = '\0';
-	l = 1;
-	Variable result( -l, true );
-	algextensions = new ext_entry [2];
-	algextensions[1] = ext_entry( 0, false );
-	algextensions[1] = ext_entry( (InternalPoly*)(conv2mipo( mipo, result ).getval()), true );
-	return result;
+        var_names_ext = new char [3];
+        var_names_ext[0] = '@';
+        var_names_ext[1] = name;
+        var_names_ext[2] = '\0';
+        l = 1;
+        Variable result( -l, true );
+        algextensions = new ext_entry [2];
+        algextensions[1] = ext_entry( 0, false );
+        algextensions[1] = ext_entry( (InternalPoly*)(conv2mipo( mipo, result ).getval()), true );
+        return result;
     }
     else {
-	int i, n = strlen( var_names_ext );
-	char * newvarnames = new char [n+2];
-	for ( i = 0; i < n; i++ )
-	    newvarnames[i] = var_names_ext[i];
-	newvarnames[n] = name;
-	newvarnames[n+1] = 0;
-	delete [] var_names_ext;
-	var_names_ext = newvarnames;
-	l = n;
-	Variable result( -l, true );
-	ext_entry * newalgext = new ext_entry [n+1];
-	for ( i = 0; i < n; i++ )
-	    newalgext[i] = algextensions[i];
-	newalgext[n] = ext_entry( 0, false );
-	delete [] algextensions;
-	algextensions = newalgext;
-	algextensions[n] = ext_entry( (InternalPoly*)(conv2mipo( mipo, result ).getval()), true );
-	return result;
+        int i, n = strlen( var_names_ext );
+        char * newvarnames = new char [n+2];
+        for ( i = 0; i < n; i++ )
+            newvarnames[i] = var_names_ext[i];
+        newvarnames[n] = name;
+        newvarnames[n+1] = 0;
+        delete [] var_names_ext;
+        var_names_ext = newvarnames;
+        l = n;
+        Variable result( -l, true );
+        ext_entry * newalgext = new ext_entry [n+1];
+        for ( i = 0; i < n; i++ )
+            newalgext[i] = algextensions[i];
+        newalgext[n] = ext_entry( 0, false );
+        delete [] algextensions;
+        algextensions = newalgext;
+        algextensions[n] = ext_entry( (InternalPoly*)(conv2mipo( mipo, result ).getval()), true );
+        return result;
     }
 }
 

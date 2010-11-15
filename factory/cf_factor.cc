@@ -128,28 +128,28 @@ void out_cf(const char *s1,const CanonicalForm &f,const char *s2)
       if (f.inZ())
       {
         mpz_t m;
-	gmp_numerator(f,m);
+        gmp_numerator(f,m);
         char * str = new char[mpz_sizeinbase( m, 10 ) + 2];
         str = mpz_get_str( str, 10, m );
         printf("%s",str);
         delete[] str;
-	mpz_clear(m);
+        mpz_clear(m);
       }
       else if (f.inQ())
       {
         mpz_t m;
-	gmp_numerator(f,m);
+        gmp_numerator(f,m);
         char * str = new char[mpz_sizeinbase( m, 10 ) + 2];
         str = mpz_get_str( str, 10, m );
         printf("%s/",str);
         delete[] str;
-	mpz_clear(m);
+        mpz_clear(m);
         gmp_denominator(f,m);
         str = new char[mpz_sizeinbase( m, 10 ) + 2];
         str = mpz_get_str( str, 10, m );
         printf("%s",str);
         delete[] str;
-	mpz_clear(m);
+        mpz_clear(m);
       }
     #else
        std::cout << f;

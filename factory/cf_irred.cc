@@ -23,9 +23,9 @@ find_irreducible ( int deg, CFRandom & gen, const Variable & x )
     CanonicalForm result;
     int i;
     do {
-	result = power( x, deg );
-	for ( i = deg-1; i >= 0; i-- )
-	    result += gen.generate() * power( x, i );
+        result = power( x, deg );
+        for ( i = deg-1; i >= 0; i-- )
+            result += gen.generate() * power( x, i );
     } while ( ! is_irreducible( result ) );
     return result;
 }

@@ -25,7 +25,7 @@
 CFSwitches::CFSwitches ()
 {
     for ( int i = 0; i < CFSwitchesMax; i++ )
-	switches[i] = false;
+        switches[i] = false;
 // and set the default (recommended) On-values:
 #ifdef HAVE_NTL
   On(SW_USE_NTL);

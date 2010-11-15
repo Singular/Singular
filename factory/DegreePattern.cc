@@ -1,9 +1,9 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file DegreePattern.cc
- * 
- * This file provides functions for manipulating DegreePatterns      
+ *
+ * This file provides functions for manipulating DegreePatterns
  *
  * @author Martin Lee
  *
@@ -14,21 +14,21 @@
 
 #include <config.h>
 
-#include "DegreePattern.h" 
+#include "DegreePattern.h"
 #include "cf_iter.h"
 #include "ftmpl_functions.h"
 #include "gfops.h"
 
 
-DegreePattern::DegreePattern (const CFList& l) 
-{ 
+DegreePattern::DegreePattern (const CFList& l)
+{
   m_data = NULL;
 
   if (l.length() == 0)
     m_data = new Pattern();
   else
   {
-  
+
   Variable x= Variable (1);
   int p= getCharacteristic();
   int d= getGFDegree();
@@ -41,10 +41,10 @@ DegreePattern::DegreePattern (const CFList& l)
 
   int j= 0;
   for (CFIterator i= buf; i.hasTerms(); i++, j++)
-    ; 
+    ;
 
   ASSERT ( j > 1, "j > 1 expected" );
-  
+
   m_data = new Pattern( j - 1 );
 
   int i= 0;
@@ -61,7 +61,7 @@ DegreePattern::DegreePattern (const CFList& l)
 
 void DegreePattern::intersect (const DegreePattern& degPat)
 {
-  if (degPat.getLength() < getLength()) 
+  if (degPat.getLength() < getLength())
   {
     DegreePattern bufDeg= *this;
     *this= degPat;
@@ -71,10 +71,10 @@ void DegreePattern::intersect (const DegreePattern& degPat)
   int count= 0;
   int length= tmin (getLength(), degPat.getLength());
   int* buf= new int [length];
-  for (int i= 0; i < length; i++) 
+  for (int i= 0; i < length; i++)
   {
-    if (degPat.find ((*this)[i])) 
-    { 
+    if (degPat.find ((*this)[i]))
+    {
       buf[i]= (*this)[i];
       count++;
     }
@@ -85,9 +85,9 @@ void DegreePattern::intersect (const DegreePattern& degPat)
 
   init (count);
   count= 0;
-  for (int i= 0; i < length; i++) 
+  for (int i= 0; i < length; i++)
   {
-    if (buf[i] != -1) 
+    if (buf[i] != -1)
     {
       (*this) [count]= buf[i];
       count++;
@@ -95,7 +95,7 @@ void DegreePattern::intersect (const DegreePattern& degPat)
   }
   delete[] buf;
 }
-   
+
 void DegreePattern::refine ()
 {
   if (getLength() <= 1)
@@ -106,11 +106,11 @@ void DegreePattern::refine ()
   int pos;
   for (int i= 0; i < getLength(); i++)
     buf[i]= -1;
-  for (int i= 1; i < getLength(); i++) 
+  for (int i= 1; i < getLength(); i++)
   {
     pos= (*this).find (d - (*this)[i]);
-    if (pos) 
-    { 
+    if (pos)
+    {
       buf[i]= (*this)[i];
       count++;
     }
@@ -126,9 +126,9 @@ void DegreePattern::refine ()
   ASSERT ( count > 0, "count > 0 expected" );
   init (count);
   count= 0;
-  for (int i= 0; i < length; i++) 
+  for (int i= 0; i < length; i++)
   {
-    if (buf[i] != -1) 
+    if (buf[i] != -1)
     {
       (*this)[count]= buf[i];
       count++;

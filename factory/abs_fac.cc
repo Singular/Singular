@@ -35,9 +35,9 @@ CanonicalForm MyContent( const CanonicalForm& F, const Variable& x)
   CanonicalForm one=1;
 
   if( F.isZero() ) return 0;
-  if( F.inBaseDomain() )  return F; 
+  if( F.inBaseDomain() )  return F;
 
-  if( level(F) < 0 )  return 1;  
+  if( level(F) < 0 )  return 1;
 
   r = LC( F, x);
 
@@ -46,10 +46,10 @@ CanonicalForm MyContent( const CanonicalForm& F, const Variable& x)
   while( g.isZero() != 1 && r!= 1 && r!=-1 )
   {
     t = LC(g, x);
-    if( t == 1 || t == -1 ) return 1; 
+    if( t == 1 || t == -1 ) return 1;
     r = MYGCD( r, t);
-    if( r == 1 ) return 1; 
-    g = g - power(x,degree(g,x))*t; 
+    if( r == 1 ) return 1;
+    g = g - power(x,degree(g,x))*t;
   }
   return r;
 }
@@ -612,7 +612,7 @@ CFFList FactorizeNorm (const CanonicalForm & h, const int & i )
    }
    CFFListIterator J=Result;
    for ( ; J.hasItem(); J++)
-    { 
+    {
      Factor_Norm = J.getItem().factor();
      Factor_Norm = Factor_Norm(x+k*l,x);   // die Störungen werden rückgänig gemacht
      dummy.append(CFFactor(Factor_Norm));
@@ -860,8 +860,8 @@ CanonicalForm Bigcd( const CanonicalForm& f, const CanonicalForm& g)
 
     F = A[i];
 
-    if( degree(F,x) == 0 )  
-  if( c.level() < 0 ) return 1; else return c; 
+    if( degree(F,x) == 0 )
+  if( c.level() < 0 ) return 1; else return c;
 
     F = gamma*F/LC(F, x);
     F = F/content(F,x);
@@ -907,16 +907,16 @@ CanonicalForm MYGCD( const CanonicalForm& f, const CanonicalForm& g)
  for (i=1; i<= level(g); i++)
   if( g != g(0,i) )
      L.append(i);
-  
+
  int nvg = L.length();
 
- 
+
 
  if( f.level() < 0 && g.level() < 0 )  { ;
   return 1; }
-    
+
  CFArray A;
-    
+
  i=0;
     int r;
 
@@ -939,7 +939,7 @@ CanonicalForm MYGCD( const CanonicalForm& f, const CanonicalForm& g)
 
  if( nvf <= 1 && nvg <=1 )
  {
-  gamma = MyGCDmod( LC(F,x), LC(G,x) ); 
+  gamma = MyGCDmod( LC(F,x), LC(G,x) );
   c = MyGCDmod( Cf, Cg );
  }
  else
@@ -955,8 +955,8 @@ CanonicalForm MYGCD( const CanonicalForm& f, const CanonicalForm& g)
 
     F = A[i];
 
-    if( degree(F,x) == 0 )  
-  if( c.level() < 0 ) return 1; else return c; 
+    if( degree(F,x) == 0 )
+  if( c.level() < 0 ) return 1; else return c;
 
     F = gamma*F/LC(F, x);
     F = F/MyContent(F,x);
@@ -1006,7 +1006,7 @@ CFFList Mysqrfree_local( const CanonicalForm& F, const Variable& v)
   while( !temp4.isZero() )
   {
    CanonicalForm qi = MYGCD( temp2, temp4);
-   if( qi != 1 ) L.append( CFFactor( qi, i ) ); 
+   if( qi != 1 ) L.append( CFFactor( qi, i ) );
    i++;
    temp2 = temp2/qi;
    temp3 = temp4/qi;
@@ -1036,21 +1036,21 @@ CFFList Mysqrfree( const CanonicalForm& F )
  for ( int i = 0; i <= n; i++ ) vars[i] = 0;
  for ( CFIterator I = F; I.hasTerms(); ++I ) fillVarsRec( I.coeff(), vrs );
 
- N.append( CFFactor(F,1) ); 
+ N.append( CFFactor(F,1) );
 
  int i = n+1;
 
  while( i >= 0 )
  {
-  b = 0; 
+  b = 0;
 
   if( i == 0 ){  v = mvar(F); b=1 ;}
   else
-  if( vrs[i] != 0 ){ b=1; v= Variable(i);} 
-  if( vrs[i] == 0 )  i--; 
+  if( vrs[i] != 0 ){ b=1; v= Variable(i);}
+  if( vrs[i] == 0 )  i--;
 
   if( b )
-  { 
+  {
    for( CFFListIterator J = L; J.hasItem(); J++ )
    {
     M = Mysqrfree_local(  J.getItem().factor() , v );
@@ -1064,7 +1064,7 @@ CFFList Mysqrfree( const CanonicalForm& F )
     N.removeFirst();
    }
    if( N.length() == L.length() ) i -= 1;
-   L=N; 
+   L=N;
   }
  }
 

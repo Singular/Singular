@@ -46,9 +46,9 @@
 #define Alloc(L) malloc(L)
 #define Free(A,L) free(A)
 #endif
- 
+
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
-	
+
 
 int fac_NTL_char=-1;            // the current characterstic for NTL calls
                                 // -1: undefined
@@ -624,7 +624,7 @@ CanonicalForm convertZZ2CF(ZZ coefficient)
     }
 
     //reverse the list to obtain the correct string
-    //NTL_SNS 
+    //NTL_SNS
     for (int i=l-1;i>=0;i--) // l ist the position of \0
     {
       cf_stringtemp2[l-i-1+minusremainder]=cf_stringtemp[i];
@@ -1068,14 +1068,14 @@ zz_pEX convertFacCF2NTLzz_pEX(CanonicalForm f, zz_pX mipo)
   return result;
 }
 
-CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha) 
+CanonicalForm convertNTLzz_pEX2CF (zz_pEX f, Variable x, Variable alpha)
 {
   CanonicalForm bigone;
   if (deg (f) > 0)
   {
     bigone= 0;
     bigone.mapinto();
-    for (int j=0;j<deg(f)+1;j++) 
+    for (int j=0;j<deg(f)+1;j++)
     {
       if (coeff(f,j)!=0)
       {

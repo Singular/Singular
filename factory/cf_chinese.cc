@@ -161,7 +161,7 @@ CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
 //         and |a|,|b|<(P/2)^{1/2}
 {
    //assume(P>0);
-   // assume !isOn(SW_RATIONAL): mod is a no-op otherwise 
+   // assume !isOn(SW_RATIONAL): mod is a no-op otherwise
    if (N<0) N +=P;
    CanonicalForm A,B,C,D,E;
    E=P;
@@ -170,9 +170,9 @@ CanonicalForm Farey_n (CanonicalForm N, const CanonicalForm P)
    {
         if (2*N*N<P)
         {
-	   On(SW_RATIONAL);
-	   N /=B;
-	   Off(SW_RATIONAL);
+           On(SW_RATIONAL);
+           N /=B;
+           Off(SW_RATIONAL);
            return(N);
         }
         D=mod(E , N);

@@ -43,7 +43,7 @@ class BIFAC
 {
 ////////////////////////////////////////////////////////////////
   public:
-////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////
 
   // === KONST-/ DESTRUKTOREN ====
   BIFAC         ( void );  // Konstruktor
@@ -77,19 +77,19 @@ class BIFAC
 
   void     unifac(CanonicalForm f, int grad);
   CanonicalForm RationalFactor (CanonicalForm phi, CanonicalForm f, \
-				CanonicalForm fx, CanonicalForm g);
+                                CanonicalForm fx, CanonicalForm g);
   void   RationalFactorizationOnly (CFFList Phis, CanonicalForm f, CanonicalForm g);
   CFList getAbsoluteFactors (CanonicalForm f1, CanonicalForm phi);
   void   AbsoluteFactorization (CFFList Phis, CanonicalForm f, CanonicalForm g);
   void   bifacSqrFree( CanonicalForm f );
   void   bifacMain(CanonicalForm f);
-  
+
 
   // === Variable =======
   CFFList gl_RL;    // where to store the rational factorization
   CFList  gl_AL;    // where to store the absolute factorization
-  bool   absolute;  // Compute an absolute factorization as well? 
-  int    exponent;  // 
+  bool   absolute;  // Compute an absolute factorization as well?
+  int    exponent;  //
 };
 
 /*ENDPUBLIC*/

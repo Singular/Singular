@@ -79,22 +79,22 @@ interpol( const CFArray & values, const CanonicalForm & point, const CFArray & p
   for ( i = 1 ; i <= d+1 ; i++ )
     {
       if ( i == 1 )
-	{
-	  punkte[i] = point;
-	}
+        {
+          punkte[i] = point;
+        }
       else
-	{
-	  punkte[i] = points[i-1];
-	}
+        {
+          punkte[i] = points[i-1];
+        }
     }
 
   // calculate Newton coefficients alpha[i]
   for ( k = 2 ; k <= d+1 ; k++ )
     {
       for ( j = d+1 ; j >= k ; j-- )
-	{
-	  alpha[j] = (alpha[j] - alpha[j-1]) / (punkte[j] - punkte[j-k+1]);
-	}
+        {
+          alpha[j] = (alpha[j] - alpha[j-1]) / (punkte[j] - punkte[j-k+1]);
+        }
     }
 
   // calculate f from Newton coefficients
@@ -131,10 +131,10 @@ countmonome( const CanonicalForm & f )
       int result = 0;
 
       while ( I.hasTerms() )
-	{
-	  result += countmonome( I.coeff() );
-	  I++;
-	}
+        {
+          result += countmonome( I.coeff() );
+          I++;
+        }
       return result;
     }
 }
@@ -212,13 +212,13 @@ ChinesePoly( int arraylength, const CFArray & Polys, const CFArray & primes, Can
   for ( i = 1 ; i <= bound ; i++ )
     {
       mono[i] = fmonome( polis[1] );
-      koeffi[1] = lc( polis[1] );		// maybe better use Leitkoeffizient ??
+      koeffi[1] = lc( polis[1] );                // maybe better use Leitkoeffizient ??
       polis[1] -= mono[i] * koeffi[1];
       for ( j = 2 ; j <= arraylength ; j++ )
-	{
-	  koeffi[j] = lc( polis[j] );		// see above
-	  polis[j] -= mono[i] * koeffi[j];
-	}
+        {
+          koeffi[j] = lc( polis[j] );                // see above
+          polis[j] -= mono[i] * koeffi[j];
+        }
 
       // calculate interpolating poly for each monomial
       chineseRemainder( koeffi, Primes, h, unnecessaryforme );
@@ -253,7 +253,7 @@ dinterpol( int d, const CanonicalForm & gi, const CFArray & zwischen, const REva
     }
 
   CFArray mono( 1, ni ), koeffi( 1, d+1 );
-  CanonicalForm h , f = 0; 
+  CanonicalForm h , f = 0;
 
   for ( i = 1 ; i <= ni ; i++ )
     {
@@ -263,10 +263,10 @@ dinterpol( int d, const CanonicalForm & gi, const CFArray & zwischen, const REva
       polis[1] -= mono[i] * koeffi[1];
 
       for ( j = 2 ; j <= d+1 ; j++ )
-	{
-	  koeffi[j] = Leitkoeffizient( polis[j] );
-	  polis[j] -= mono[i] * koeffi[j];
-	}
+        {
+          koeffi[j] = Leitkoeffizient( polis[j] );
+          polis[j] -= mono[i] * koeffi[j];
+        }
 
       // calculate interpolating poly for each monomial
       h = interpol( koeffi, alpha[s] , beta, x , d , CHAR );
@@ -307,14 +307,14 @@ sinterpol( const CanonicalForm & gi, const Array<REvaluation> & xi, CanonicalFor
   for ( i = 1 ; i <= n ; i++ )
     for ( j = 1 ; j <= n + 1 ; j++ )
       {
-	if ( j == n+1 )
-	  {
-	    a[i][j] = zwischen[i];
-	  }
-	else
-	  {
-	    a[i][j] = xi[i]( mono[j] );
-	  }
+        if ( j == n+1 )
+          {
+            a[i][j] = zwischen[i];
+          }
+        else
+          {
+            a[i][j] = xi[i]( mono[j] );
+          }
       }
 
   // sove a*y=zwischen and get soultions y1, .., yn mod p

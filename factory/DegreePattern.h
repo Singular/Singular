@@ -1,9 +1,9 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file DegreePattern.h
- * 
- * This file provides a class to handle degree patterns.           
+ *
+ * This file provides a class to handle degree patterns.
  *
  * @author Martin Lee
  *
@@ -24,11 +24,11 @@
 #include "gfops.h"
 
 /** @class DegreePattern DegreePattern.h "factory/DegreePattern.h"
- * 
+ *
  * DegreePattern provides a functionality to create, intersect and refine
  * degree patterns.
  *
- * 
+ *
  */
 class DegreePattern
 {
@@ -51,10 +51,10 @@ private:
   {
     ASSERT ( m_data != NULL, "non-null pointer expected");
     ASSERT ( m_data->m_refCounter == 0, "ref count of 0 expected");
-    if( m_data->m_pattern != NULL ) 
+    if( m_data->m_pattern != NULL )
       delete[] m_data->m_pattern;
     m_data->m_pattern = NULL;
-    
+
     delete m_data;
     m_data = NULL;
   }
@@ -66,7 +66,7 @@ private:
 
     if( (--m_data->m_refCounter) < 1 )
       release();
-    
+
     m_data = new Pattern(n);
   }
 
@@ -93,7 +93,7 @@ public:
 
   /// operator []
   ///
-  /// @return @a operator[] returns the element at @a index 
+  /// @return @a operator[] returns the element at @a index
   inline int operator[] (const int index ///< [in] some int >= 0, < getLength()
                         ) const
   {
@@ -105,7 +105,7 @@ public:
 
   /// operator []
   ///
-  /// @return @a operator[] sets the element at @a index  
+  /// @return @a operator[] sets the element at @a index
   inline int& operator[] (const int index ///< [in] some int >= 0, < getLength()
                          )
   {
@@ -120,7 +120,7 @@ public:
 
   /// copy constructor
   DegreePattern (const DegreePattern& degPat ///< [in] some degree pattern
-                ): m_data( degPat.m_data ) 
+                ): m_data( degPat.m_data )
   {
     ASSERT( degPat.m_data != NULL, "non-null pointer expected"  );
     m_data->m_refCounter++;
@@ -129,7 +129,7 @@ public:
   /// construct a degree pattern from a list of (univariate) polys
   DegreePattern (const CFList& l ///< [in] some list of (univariate) polys
                 );
- 
+
   /// assignment
   DegreePattern& operator= (const DegreePattern& degPat ///< [in] some degree
                                                         ///< pattern
@@ -147,16 +147,16 @@ public:
   }
 
   /// destructor
-  ~DegreePattern () 
+  ~DegreePattern ()
   {
     ASSERT( m_data !=  NULL, "non-null pointer expected"  );
-    if( (--m_data->m_refCounter) < 1 ) 
+    if( (--m_data->m_refCounter) < 1 )
       release();
   }
 
-  /// find an element @a x 
+  /// find an element @a x
   ///
-  /// @return @a find returns the index + 1 of @a x, if @a x is an element of 
+  /// @return @a find returns the index + 1 of @a x, if @a x is an element of
   ///         the degree pattern, 0 otherwise
   int find (const int x ///< [in] some int
            ) const
@@ -166,13 +166,13 @@ public:
       if ((*this)[i] == x) return i + 1;
     return 0;
   };
-  
-  /// intersect two degree patterns 
+
+  /// intersect two degree patterns
   void intersect (const DegreePattern& degPat ///< [in] some degree pattern
                  );
   /// Refine a degree pattern. Assumes that (*this)[0]:= @a d is the degree
   /// of the poly to be factored. Now for every other entry @a a there should be
-  /// some entry @a b such that @a a+b= d. Elements which do not satisfy this 
+  /// some entry @a b such that @a a+b= d. Elements which do not satisfy this
   /// relation are removed.
   void refine ();
 };

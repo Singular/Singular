@@ -1,8 +1,8 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file facFqFactorizeUtil.cc
- * 
+ *
  * This file provides utility functions for multivariate factorization
  *
  * @author Martin Lee
@@ -17,26 +17,26 @@
 #include "canonicalform.h"
 #include "cf_map.h"
 
-static inline 
+static inline
 void appendSwap (CFList& factors1, const CFList& factors2, const int
-                  swapLevel1, const int swapLevel2, const Variable& x) 
+                  swapLevel1, const int swapLevel2, const Variable& x)
 {
-  for (CFListIterator i= factors2; i.hasItem(); i++) 
-  { 
-    if (swapLevel1) 
+  for (CFListIterator i= factors2; i.hasItem(); i++)
+  {
+    if (swapLevel1)
     {
       if (swapLevel2)
-	factors1.append (swapvar (swapvar (i.getItem(), x, 
+        factors1.append (swapvar (swapvar (i.getItem(), x,
                          Variable (swapLevel2)), Variable (swapLevel1), x));
       else
-	factors1.append (swapvar (i.getItem(), Variable (swapLevel1), x));
+        factors1.append (swapvar (i.getItem(), Variable (swapLevel1), x));
     }
-    else 
+    else
     {
       if (swapLevel2)
-	factors1.append (swapvar (i.getItem(), x, Variable (swapLevel2)));
-      else 
-	factors1.append (i.getItem());
+        factors1.append (swapvar (i.getItem(), x, Variable (swapLevel2)));
+      else
+        factors1.append (i.getItem());
     }
   }
   return;
@@ -44,61 +44,61 @@ void appendSwap (CFList& factors1, const CFList& factors2, const int
 
 
 void swap (CFList& factors, const int swapLevel1, const int swapLevel2, const
-           Variable& x) 
+           Variable& x)
 {
-  for (CFListIterator i= factors; i.hasItem(); i++) 
-  { 
-    if (swapLevel1) 
+  for (CFListIterator i= factors; i.hasItem(); i++)
+  {
+    if (swapLevel1)
     {
       if (swapLevel2)
-	i.getItem()= swapvar (swapvar (i.getItem(), x, Variable (swapLevel2)),
+        i.getItem()= swapvar (swapvar (i.getItem(), x, Variable (swapLevel2)),
                               Variable (swapLevel1), x);
       else
-	i.getItem()= swapvar (i.getItem(), Variable (swapLevel1), x);
+        i.getItem()= swapvar (i.getItem(), Variable (swapLevel1), x);
     }
-    else 
+    else
     {
       if (swapLevel2)
-	i.getItem()= swapvar (i.getItem(), x, Variable (swapLevel2));
+        i.getItem()= swapvar (i.getItem(), x, Variable (swapLevel2));
     }
   }
   return;
 }
 
-void appendSwapDecompress (CFList& factors1, const CFList& factors2, 
+void appendSwapDecompress (CFList& factors1, const CFList& factors2,
                              const CFMap& N, const int swapLevel, const
-                             Variable& x) 
+                             Variable& x)
 {
-  for (CFListIterator i= factors1; i.hasItem(); i++) 
+  for (CFListIterator i= factors1; i.hasItem(); i++)
   {
-    if (swapLevel)   
+    if (swapLevel)
       i.getItem()= swapvar (i.getItem(), Variable (swapLevel), x);
     i.getItem()= N(i.getItem());
   }
-  for (CFListIterator i= factors2; i.hasItem(); i++) 
+  for (CFListIterator i= factors2; i.hasItem(); i++)
   {
-    if (!i.getItem().inCoeffDomain()) 
+    if (!i.getItem().inCoeffDomain())
       factors1.append (N (i.getItem()));
   }
   return;
 }
 
-void appendSwapDecompress (CFList& factors1, const CFList& factors2, 
-                             const CFMap& N, const int swapLevel1, 
-                             const int swapLevel2, const Variable& x) 
+void appendSwapDecompress (CFList& factors1, const CFList& factors2,
+                             const CFMap& N, const int swapLevel1,
+                             const int swapLevel2, const Variable& x)
 {
-  for (CFListIterator i= factors1; i.hasItem(); i++) 
+  for (CFListIterator i= factors1; i.hasItem(); i++)
   {
-    if (swapLevel1) 
+    if (swapLevel1)
     {
-      if (swapLevel2) 
+      if (swapLevel2)
         i.getItem()=
         N (swapvar (swapvar (i.getItem(), Variable (swapLevel2), x), x,
                     Variable (swapLevel1)));
-      else 
+      else
         i.getItem()= N (swapvar (i.getItem(), x, Variable (swapLevel1)));
     }
-    else 
+    else
     {
       if (swapLevel2)
         i.getItem()= N (swapvar (i.getItem(), Variable (swapLevel2), x));
@@ -106,22 +106,22 @@ void appendSwapDecompress (CFList& factors1, const CFList& factors2,
         i.getItem()= N (i.getItem());
     }
   }
-  for (CFListIterator i= factors2; i.hasItem(); i++) 
-  { 
-    if (!i.getItem().inCoeffDomain())  
+  for (CFListIterator i= factors2; i.hasItem(); i++)
+  {
+    if (!i.getItem().inCoeffDomain())
       factors1.append (N (i.getItem()));
   }
   return;
 }
 
-int* liftingBounds (const CanonicalForm& A, const int& bivarLiftBound) 
+int* liftingBounds (const CanonicalForm& A, const int& bivarLiftBound)
 {
   int j= A.level() - 1;
   int* liftBounds= new int [j];
   liftBounds[0]= bivarLiftBound;
-  for (int i= 1; i < j; i++) 
+  for (int i= 1; i < j; i++)
   {
-    liftBounds[i]= degree (A, Variable (i + 2)) + 1 + 
+    liftBounds[i]= degree (A, Variable (i + 2)) + 1 +
                             degree (LC (A, 1), Variable (i + 2));
   }
   return liftBounds;

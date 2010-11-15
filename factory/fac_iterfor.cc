@@ -12,9 +12,9 @@ void
 IteratedFor::fill ( int from, int max )
 {
     while ( from < N ) {
-	imax[from] = max;
-	index[from] = 0;
-	from++;
+        imax[from] = max;
+        index[from] = 0;
+        from++;
     }
     index[N] = max;
 }
@@ -32,8 +32,8 @@ IteratedFor::IteratedFor( const IteratedFor & I ) : MAX( I.MAX ), FROM( I.FROM )
     index = new int[N+1];
     imax = new int[N+1];
     for ( int i = 0; i <= N; i++ ) {
-	index[i] = I.index[i];
-	imax[i] = I.imax[i];
+        index[i] = I.index[i];
+        imax[i] = I.imax[i];
     }
 }
 
@@ -47,21 +47,21 @@ IteratedFor&
 IteratedFor::operator= ( const IteratedFor & I )
 {
     if ( this != &I ) {
-	if ( N != I.N ) {
-	    N = I.N;
-	    delete [] index;
-	    delete [] imax;
-	    index = new int[N+1];
-	    imax = new int[N+1];
-	}
-	FROM = I.FROM;
-	TO = I.TO;
-	MAX = I.MAX;
-	last = I.last;
-	for ( int i = 0; i<= N; i++ ) {
-	    index[i] = I.index[i];
-	    imax[i] = I.imax[i];
-	}
+        if ( N != I.N ) {
+            N = I.N;
+            delete [] index;
+            delete [] imax;
+            index = new int[N+1];
+            imax = new int[N+1];
+        }
+        FROM = I.FROM;
+        TO = I.TO;
+        MAX = I.MAX;
+        last = I.last;
+        for ( int i = 0; i<= N; i++ ) {
+            index[i] = I.index[i];
+            imax[i] = I.imax[i];
+        }
     }
     return *this;
 }
@@ -71,21 +71,21 @@ IteratedFor::nextiteration()
 {
     ASSERT( ! last, "no more iterations" );
     if ( index[0] == MAX )
-	last = true;
+        last = true;
     else {
-	if ( index[N-1] != imax[N-1] ) {
-	    index[N-1]++;
-	    index[N]--;
-	}
-	else {
-	    int i = N-1, m = index[N];
-	    while ( i > 0 && index[i] == imax[i] ) {
-		m += imax[i];
-		i--;
-	    }
-	    index[i]++; m--;
-	    fill( i+1, m );
-	}
+        if ( index[N-1] != imax[N-1] ) {
+            index[N-1]++;
+            index[N]--;
+        }
+        else {
+            int i = N-1, m = index[N];
+            while ( i > 0 && index[i] == imax[i] ) {
+                m += imax[i];
+                i--;
+            }
+            index[i]++; m--;
+            fill( i+1, m );
+        }
     }
 }
 
@@ -101,7 +101,7 @@ OSTREAM& operator<< ( OSTREAM& os, const IteratedFor & I )
 {
     os << "( " << I[I.from()];
     for ( int i = I.from()+1; i <= I.to(); i++ )
-	os << ", " << I[i];
+        os << ", " << I[i];
     os << " )";
     return os;
 }

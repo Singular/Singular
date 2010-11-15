@@ -3,7 +3,7 @@
 #include "lgs.h"
 #include "bifacConfig.h"
 
-#define BIFAC_BASIS_OF_G_CHECK	1
+#define BIFAC_BASIS_OF_G_CHECK        1
 void Reduce( bool );
 CanonicalForm Bigcd( const CanonicalForm& f, const CanonicalForm& g);
 
@@ -27,7 +27,7 @@ Variable e( 'e' );
 ///////////////////////////////////////////////////////
 
 //==================================================
-class PolyVector 
+class PolyVector
 //==================================================
 {
 public:
@@ -52,17 +52,17 @@ public:
       ASSERT( m>0 || n>0, "Input is not a polynomial");
       int correction = 1;  // univariate polynomials
       if( n==0) correction = n+1;
-      
+
       value = new CanonicalForm[m*(n+1)+n+1];
       for(int i=0; i<=m*(n+1)+n; i++) value[i]=0;
 
-      
-      for ( CFIterator i = f; i.hasTerms(); i++ ) { 
-	for ( CFIterator j = i.coeff(); j.hasTerms(); j++ ){
-		if( i.coeff().mvar().level()< 0 ){ 
-			value[ 0*(n+1) + i.exp()*correction ] = j.coeff();}
-	    else{ 
-			value[ j.exp()*(n+1) + i.exp()*correction ] = j.coeff();}}}
+
+      for ( CFIterator i = f; i.hasTerms(); i++ ) {
+        for ( CFIterator j = i.coeff(); j.hasTerms(); j++ ){
+                if( i.coeff().mvar().level()< 0 ){
+                        value[ 0*(n+1) + i.exp()*correction ] = j.coeff();}
+            else{
+                        value[ j.exp()*(n+1) + i.exp()*correction ] = j.coeff();}}}
     }
   }
 
@@ -83,7 +83,7 @@ public:
     {
       s << "[";
       for (int j=0;j<=V.n;j++)
-	s << V.value[i*(V.n+1)+j] << ", ";
+        s << V.value[i*(V.n+1)+j] << ", ";
       s << "]\n";
     }
     return s;
@@ -119,7 +119,7 @@ BIFAC::BIFAC( void )// KONSTRUKTOR
 BIFAC::~BIFAC( void )// DESTRUKTOR
 //--<>---------------------------------
 {
-} 
+}
 
 
 /////////////////////////////////////////////////////////
@@ -136,14 +136,14 @@ BIFAC::~BIFAC( void )// DESTRUKTOR
 //    char* name="matrix.ppm";
 
 //    // === Datei löschen ===
-  
-//    ofstream* aus = new ofstream(name, ios::out); 
+
+//    ofstream* aus = new ofstream(name, ios::out);
 //    delete aus;
 
 
 //    // === Jetzt immer nur anhängen ===
 
-//    aus  = new ofstream(name, ios::app); 
+//    aus  = new ofstream(name, ios::app);
 //    *aus << "// Zeilen Spalten\n"
 //         << "// x-Koord. y-Koord.  Wert\n";
 
@@ -156,13 +156,13 @@ BIFAC::~BIFAC( void )// DESTRUKTOR
 //      for( j=0; j<M.columns(); j++)
 //        *aus << i << " " << j << " " << M(i+1,j+1) << endl;;
 //    delete aus;
-//  }   
+//  }
 
 //=======================================================
 void  BIFAC::passedTime()
 //=======================================================
 {
-	;
+        ;
 }
 
 
@@ -173,11 +173,11 @@ long int  BIFAC::anz_terme(  CanonicalForm & f )
   long int z=0;
 
   for ( CFIterator i = f; i.hasTerms(); i++ )
-    for ( CFIterator j = i.coeff(); j.hasTerms(); j++ ) 
+    for ( CFIterator j = i.coeff(); j.hasTerms(); j++ )
       z++;
   return( z );
 }
- 
+
 //=======================================================
 void BIFAC::biGanzMachen(  CanonicalForm & f )
 //=======================================================
@@ -187,35 +187,35 @@ void BIFAC::biGanzMachen(  CanonicalForm & f )
   Off( SW_RATIONAL );
 
   for ( CFIterator i = f; i.hasTerms(); i++ )
-    for ( CFIterator j = i.coeff(); j.hasTerms(); j++ ) 
+    for ( CFIterator j = i.coeff(); j.hasTerms(); j++ )
     {
       if( !init )
-      { 
-	ggT = j.coeff();
-	init = true;
+      {
+        ggT = j.coeff();
+        init = true;
       }
-      else           
-	ggT = gcd(j.coeff(), ggT);
+      else
+        ggT = gcd(j.coeff(), ggT);
     }
   f /= ggT;
   On( SW_RATIONAL );
 }
 
 //=======================================================
-void  BIFAC::biNormieren( CanonicalForm & f ) 
+void  BIFAC::biNormieren( CanonicalForm & f )
 //=======================================================
 {
   if ( getCharacteristic() == 0 )
   {
     for ( CFIterator i = f; i.hasTerms(); i++ )
-      for ( CFIterator j = i.coeff(); j.hasTerms(); j++ ) 
-	if( j.coeff().den() != 1 )
-	{
-	  f  *= j.coeff().den();
-	  biNormieren( f );
-	}
+      for ( CFIterator j = i.coeff(); j.hasTerms(); j++ )
+        if( j.coeff().den() != 1 )
+        {
+          f  *= j.coeff().den();
+          biNormieren( f );
+        }
     biGanzMachen( f );
-  } 
+  }
   else
   {
     f /= LC(f);
@@ -241,7 +241,7 @@ CFList BIFAC::matrix2basis(CFMatrix A, int dim, int m, int n, CanonicalForm f)
     g=0;
     for(i=0; i<=m-1; i++)
       for(j=0; j<=n; j++)
-	g += A(k, i*(n+1)+j+1)* power(x,i) * power(y,j);
+        g += A(k, i*(n+1)+j+1)* power(x,i) * power(y,j);
     Lg.append(g);
   }
 
@@ -254,11 +254,11 @@ CFList BIFAC::matrix2basis(CFMatrix A, int dim, int m, int n, CanonicalForm f)
     {
       h=0;
       for(i=0; i<=m; i++)
-	for(j=0; j<n; j++)
-	  h += A(k, i*n+j+1 +m*(n+1))* power(x,i) * power(y,j);
+        for(j=0; j<n; j++)
+          h += A(k, i*n+j+1 +m*(n+1))* power(x,i) * power(y,j);
       Lh.append(h);
     }
-    
+
     // === Is the solution correct? ===
     CFListIterator itg=Lg;
     CFListIterator ith=Lh;
@@ -267,16 +267,16 @@ CFList BIFAC::matrix2basis(CFMatrix A, int dim, int m, int n, CanonicalForm f)
       g = itg.getItem();
       h = ith.getItem();
       ff = f*(deriv(g,y)-deriv(h,x)) +h*deriv(f,x) -g*deriv(f,y);
-      if( !ff.isZero()) {  
+      if( !ff.isZero()) {
       #ifndef NOSTREAMIO
-	AUSGABE_ERR("* Falsche Polynome!"); 
-	exit (1); 
+        AUSGABE_ERR("* Falsche Polynome!");
+        exit (1);
       #else
         printf("wrong polys\n");
         break;
       #endif
       }
-    } 
+    }
   }
   ///////////  END VALIDATION ////////////////////////////////////
 
@@ -301,14 +301,14 @@ CFList BIFAC::basisOfG(CanonicalForm f)
   int m = degree(f,x);
   int n = degree(f,y);
   int r,s, ii,jj;
-  
+
 
   // ======= Creation of the system of linear equations for G =============
   int rows    = 4*m*n;
   int columns = m*(n+1) + (m+1)*n;
 
   CFMatrix M(rows, columns); // Remember: The first index is (1,1) -- not (0,0)!
-  
+
   for ( CFIterator i = f; i.hasTerms(); i++ )  // All coeffizients of y
   {
     for ( CFIterator j = i.coeff(); j.hasTerms(); j++ )  // All coeffizients of x
@@ -318,19 +318,19 @@ CFList BIFAC::basisOfG(CanonicalForm f)
 
       // Now we regard g_{ii,jj)
       for( ii=0; ii<m; ii++)
-	for( jj=0; jj<=n; jj++)
-	{
-	  if(  s>= 1) M( (r+ii)*2*n +(jj+s-1)+1, ii*(n+1)+jj +1) += -j.coeff() * s;
-	  if( jj>= 1) M( (r+ii)*2*n +(jj+s-1)+1, ii*(n+1)+jj +1) +=  j.coeff() * jj;
-	}
+        for( jj=0; jj<=n; jj++)
+        {
+          if(  s>= 1) M( (r+ii)*2*n +(jj+s-1)+1, ii*(n+1)+jj +1) += -j.coeff() * s;
+          if( jj>= 1) M( (r+ii)*2*n +(jj+s-1)+1, ii*(n+1)+jj +1) +=  j.coeff() * jj;
+        }
 
       // Now we regard h_{ii,jj}
       for( ii=0; ii<=m; ii++)
-	for( jj=0; jj<n; jj++)
-	{
-	  if(  r>= 1) M( (r+ii-1)*2*n +(jj+s)+1, (ii*n)+jj +m*(n+1) +1) += j.coeff() * r;
-	  if( ii>= 1) M( (r+ii-1)*2*n +(jj+s)+1, (ii*n) +jj +m*(n+1) +1) +=  -j.coeff() * ii;
-	}
+        for( jj=0; jj<n; jj++)
+        {
+          if(  r>= 1) M( (r+ii-1)*2*n +(jj+s)+1, (ii*n)+jj +m*(n+1) +1) += j.coeff() * r;
+          if( ii>= 1) M( (r+ii-1)*2*n +(jj+s)+1, (ii*n) +jj +m*(n+1) +1) +=  -j.coeff() * ii;
+        }
     }
   }
   // ========= Solving the  system of linear equations for G =============
@@ -363,9 +363,9 @@ CFList BIFAC::basisOfG(CanonicalForm f)
     {
       tmp =0;
       for(int j=1; j<=columns; j++)
-	tmp += M(i,j) * basis(k,j);
+        tmp += M(i,j) * basis(k,j);
       if( tmp!= 0) {
-	exit(17);
+        exit(17);
       }
     }
   // ============= TEST AUF KORREKTHEIT (ende) ====
@@ -373,11 +373,11 @@ CFList BIFAC::basisOfG(CanonicalForm f)
 }
 
 //=======================================================
-//   Compute a   r x r - matrix A=(a_ij) for 
+//   Compute a   r x r - matrix A=(a_ij) for
 //     gg_i = SUM a_ij * g_j * f_x (mod f)
-//  Return a list consisting of 
+//  Return a list consisting of
 //    r x (r+1) Matrix A
-//    the last columns contains only the indices of the 
+//    the last columns contains only the indices of the
 //    first r linear independent lines
 // REMARK: this is used by BIFAC::createEg but NOT by createEgUni!!
 //=======================================================
@@ -389,8 +389,8 @@ CFMatrix BIFAC::createA (CFList G, CanonicalForm f)
   int i,j,e;
   int r = G.length();  // number of factors
 
-  LGS       L(r,r,true);      
-//  LGS       L(r,r);      
+  LGS       L(r,r,true);
+//  LGS       L(r,r);
   CFMatrix  Z(1,r);
   CFMatrix  A(r,r+2);  // the last two column contain the bi-degree
 
@@ -401,7 +401,7 @@ CFMatrix BIFAC::createA (CFList G, CanonicalForm f)
   i=0;
   CanonicalForm q;
 
-  for( CFListIterator it=G; it.hasItem(); it++, i++){ 
+  for( CFListIterator it=G; it.hasItem(); it++, i++){
 
     gifx[i].init( (it.getItem()*fx)%f );
   }
@@ -409,7 +409,7 @@ CFMatrix BIFAC::createA (CFList G, CanonicalForm f)
   // === Search linear independent lines ===
 
   e=1; // row number of A
-  n=0; // 
+  n=0; //
   m=0; //
   while (L.rank() != r )
   {
@@ -460,7 +460,7 @@ CanonicalForm BIFAC::create_g (CFList G)
 
       g += rand_coeff1[i]  * it.getItem();
     }
-  
+
   delete[] rand_coeff1;
 
   return g;
@@ -482,7 +482,7 @@ CFList BIFAC::createEg (CFList G, CanonicalForm f)
 //  passedTime();
 
   bool suitable1 = false; // Is Eg by chance unsuitable?
-  bool suitable2 = false;  // Is on of g*g_i or g_i*f_x zero? 
+  bool suitable2 = false;  // Is on of g*g_i or g_i*f_x zero?
 
   // === (0) Preparation ===
   CanonicalForm g;
@@ -510,7 +510,7 @@ CFList BIFAC::createEg (CFList G, CanonicalForm f)
   while ( !suitable1 )
   {
 
-     suitable2 = false; 
+     suitable2 = false;
     // === (1) Creating g ===
     while ( !suitable2 )
     {
@@ -518,42 +518,42 @@ CFList BIFAC::createEg (CFList G, CanonicalForm f)
 //        g=0;
 //        for( CFListIterator it=G; it.hasItem(); it++, i++)
 //        {
-//  	gi[i] =  it.getItem();
-//  	rand_coeff[i] =  RANDOM.generate().intval();
-//  	g += rand_coeff[i] * it.getItem();
+//          gi[i] =  it.getItem();
+//          rand_coeff[i] =  RANDOM.generate().intval();
+//          g += rand_coeff[i] * it.getItem();
 //        }
       g = create_g( G );
-    
-      // === (2) Computing g_i * g ===
-	  //
-      for(i=0; i<r; i++){ 
 
-	  ggi[i]  = (g*gi[i])%f;   // seite 10
+      // === (2) Computing g_i * g ===
+          //
+      for(i=0; i<r; i++){
+
+          ggi[i]  = (g*gi[i])%f;   // seite 10
       }
-      
+
       // ===  Check if all polynomials are <> 0  ===
       suitable2 = true;    // It should be fine, but ...
-      if( g.isZero() ) 
-	suitable2 = false;
+      if( g.isZero() )
+        suitable2 = false;
 //        else
-//  	for(i=0; i<r; i++)
-//  	  if(  ggi[i].isZero() )
-//  	    suitable2 = false;
+//          for(i=0; i<r; i++)
+//            if(  ggi[i].isZero() )
+//              suitable2 = false;
 
     } // end of  ´while ( !suitable2 )´
-    
+
     // === (3) Computing Eg(x) ===
-   
+
     for(i=0;i<r;i++)  // Get Polynomials as vectors
       v_ggi[i].init(ggi[i]);
 
     // Matrix A
-    for(i=1; i<=r; i++) 
+    for(i=1; i<=r; i++)
       for( j=1; j<=r; j++)
       {
-	A(i,j) = 0;
-	for( e=1; e<=r; e++)
-	{
+        A(i,j) = 0;
+        for( e=1; e<=r; e++)
+        {
 
 
    A(i,j) += ( NEU(j,e ) * v_ggi[i-1].get(NEU(e,r+1).intval(),(NEU(e,r+2).intval() )));
@@ -561,7 +561,7 @@ CFList BIFAC::createEg (CFList G, CanonicalForm f)
 
 //
 
-	}
+        }
       }
 
     for(j=1; j<=r; j++)
@@ -604,9 +604,9 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
   int i,ii,k;
   CanonicalForm ff, ffx,g, gg, Eg;
 
-  
+
   bool suitable1 = false;  // Is Eg unsuitable?
-  bool suitable2 = false;  // Is on of g*g_i or g_i*f_x zero? 
+  bool suitable2 = false;  // Is on of g*g_i or g_i*f_x zero?
   bool suitable3 = false;  // Is 'konst' unsuitable?
 
   // ========================
@@ -626,8 +626,8 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
   CFMatrix  A(r,r);     // We have to find the matrix A,
   CFMatrix  Z(1,r);     // `Vector` for data transportation
   CFMatrix  AA(m,r);    // but first we generate AA.
-  CFMatrix  AI(r,r+1);  // 
-  LGS       L(r,r,true);  
+  CFMatrix  AI(r,r+1);  //
+  LGS       L(r,r,true);
   IntRandom RANDOM(S);
 
 
@@ -641,14 +641,14 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
   {
     ff  = f(konst,'y');
     ffx = fx(konst,'y');
-    
+
     if( gcd(ff, ffx) == 1)
       suitable3 = true;
     else
     {
       konst *= -1;
       if( konst >= 0 )
-	konst++;
+        konst++;
     }
   }
 
@@ -659,20 +659,20 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
   i=0;
   for( CFListIterator it=G; it.hasItem(); it++, i++)
   {
-    gi[i] =  it.getItem()(konst,'y'); 
+    gi[i] =  it.getItem()(konst,'y');
   }
 
   // ===============================================
   // =   (3) Compute the matrices 'AA' and 'AI'    =
   // ===============================================
-  
+
 
   for( i=0; i<r; i++) // First store all coeffizients in AA.
   {
     ggi[i] = (gi[i]*ffx)%ff;   // now we have degree < m.
     //biNormieren(ggi[i]);
     for ( CFIterator j = ggi[i]; j.hasTerms(); j++ )
-      AA( j.exp()+1, i+1) = j.coeff();  
+      AA( j.exp()+1, i+1) = j.coeff();
   }
 
 
@@ -683,7 +683,7 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
   {
     ASSERT( i<=m, "Too few linear independent rows!");
 
-    for (k=1; k<=r; k++) 
+    for (k=1; k<=r; k++)
       Z(1,k) =  AA(i,k);
     if( L.new_row(Z,0) )  // linear independent row?
     {
@@ -700,7 +700,7 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
   // ==============================================
   // =   (4) Big loop to find a suitable 'Eg(x)   =
   // ==============================================
-   
+
   while ( !suitable1 )    // Is Eg(x) suitable? -> Check at the end of this procedure!
   {
     suitable2 = false;   // In case we need a second loop
@@ -710,7 +710,7 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
     // ================================================
 //    rand_coeff[0] = 0;
 //    rand_coeff[1] = 4;
-    
+
 
     while ( !suitable2 )
     {
@@ -719,39 +719,39 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
       g=0;
       for( CFListIterator it=G; it.hasItem(); it++, i++)
       {
- 	rand_coeff[i] =  RANDOM.generate().intval();
-	g += rand_coeff[i] * it.getItem();
+         rand_coeff[i] =  RANDOM.generate().intval();
+        g += rand_coeff[i] * it.getItem();
       }
       gg = g(konst,'y');   // univariate!
       for(i=0; i<r; i++)  ggi[i] = (gi[i]*gg)%ff; // !! Redefinition of ggi !!
 
       // ===  (ii) Check if all polynomials are <> 0  ===
       suitable2 = true;    // It should be fine, but ...
-      if( gg.isZero() ) 
-	suitable2 = false;
+      if( gg.isZero() )
+        suitable2 = false;
 //        else
-//  	for(i=0; i<r; i++)
-//  	  if(  ggi[i].isZero() )
-//  	    suitable2 = false;
+//          for(i=0; i<r; i++)
+//            if(  ggi[i].isZero() )
+//              suitable2 = false;
     } // end of  ´while ( !suitable2 )´
-  
+
 //    createRg(g,f);
 
     // ===============================================
     // =    (b) Compute matrix 'A'                   =
     // ===============================================
-    for(i=1; i<=r; i++) 
+    for(i=1; i<=r; i++)
     {
-      for( ii=1; ii<=m; ii++) 
-	AA (ii,1) = 0;  // !! Redefinition of AA !!
+      for( ii=1; ii<=m; ii++)
+        AA (ii,1) = 0;  // !! Redefinition of AA !!
       for ( CFIterator j = ggi[i-1]; j.hasTerms(); j++ )
-	AA( j.exp()+1, 1) = j.coeff();  
+        AA( j.exp()+1, 1) = j.coeff();
 
       for( ii=1; ii<=r; ii++)
       {
-	A(i,ii) = 0;
-	for( k=1; k<=r; k++)
-	  A(i,ii) += ( AI(ii,k ) *  AA( AI(k, r+1 ).intval(),1) ); 
+        A(i,ii) = 0;
+        for( k=1; k<=r; k++)
+          A(i,ii) += ( AI(ii,k ) *  AA( AI(k, r+1 ).intval(),1) );
       }
     }
     for(i=1; i<=r; i++)
@@ -760,7 +760,7 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
     // ===============================================
     // =    (c) Compute Eg(x) and check it           =
     // ===============================================
- 
+
     Eg = determinant(A,r);
     if( gcd(Eg, deriv(Eg,x)) == 1 )
     {
@@ -768,7 +768,7 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
     }
   } // end of  ´while ( !suitable1 )´
 
-  
+
   // ==============================================
   // =   (5) Prepare for leaving                  =
   // ==============================================
@@ -776,7 +776,7 @@ CFList BIFAC::createEgUni (CFList G, CanonicalForm f)
   delete[] gi;
   delete[] ggi;
   delete[] rand_coeff;
-  
+
   CFList LL;
   LL.append(Eg);
   LL.append(g);
@@ -804,11 +804,11 @@ CFList BIFAC::createRg (CFList G, CanonicalForm f)
   // =   (1) Find a suitable constant              =
   // ===============================================
 
-  CanonicalForm alpha=1; 
+  CanonicalForm alpha=1;
 
-  while(  resultant( f, fx, x)(alpha) == 0 ) 
+  while(  resultant( f, fx, x)(alpha) == 0 )
   {
-	//while( resultant( f, fx, x)(alpha).inCoeffDomain() != true ) 
+        //while( resultant( f, fx, x)(alpha).inCoeffDomain() != true )
     //alpha +=1;
   }
 
@@ -816,9 +816,9 @@ CFList BIFAC::createRg (CFList G, CanonicalForm f)
   // ===============================================
   // =   (2) Find a suitable constant              =
   // ===============================================
-  
+
   Rg = resultant( f(alpha,y), g(alpha,y)-z*fx(alpha,y), x);
-  
+
 
   CFList LL;
   LL.append(Rg(x,z));
@@ -837,7 +837,7 @@ void BIFAC::unifac (CanonicalForm ff, int grad)
   CFFList factorsAbs;
   CanonicalForm tmp;
 
-  factorsUni = AbsFactorize(ff); 
+  factorsUni = AbsFactorize(ff);
 
   for( CFFListIterator l=factorsUni; l.hasItem(); l++)
     if( ! l.getItem().factor().inBaseDomain() )
@@ -853,7 +853,7 @@ void BIFAC::unifac (CanonicalForm ff, int grad)
 // Compute the rational factor of f belonging to phi
 //=======================================================
 CanonicalForm BIFAC::RationalFactor (CanonicalForm phi, CanonicalForm ff, \
-				     CanonicalForm fx, CanonicalForm g)
+                                     CanonicalForm fx, CanonicalForm g)
 //=======================================================
 {
 
@@ -865,7 +865,7 @@ CanonicalForm BIFAC::RationalFactor (CanonicalForm phi, CanonicalForm ff, \
 
 
   hh = Bigcd(ff,  h);
-  
+
   return(hh);
 }
 //=======================================================
@@ -879,7 +879,7 @@ void BIFAC::RationalFactorizationOnly (CFFList Phis, CanonicalForm f0, Canonical
   {
     ASSERT( i.getItem().exp() == 1 , "Wrong factor of Eg"); // degree must be 1
     CanonicalForm phi = i.getItem().factor();
-    
+
     if( ! phi.inBaseDomain())
     {
       h = RationalFactor(phi,f0,fx,g);
@@ -907,8 +907,8 @@ CFList BIFAC::getAbsoluteFactors (CanonicalForm f1, CanonicalForm phi)
       root = 0;
     else
       root = -tailcoeff(fac)/lc(fac);
- 
- 
+
+
     AbsFac.append( f1(root,e) );
     AbsFac.append( i.getItem().exp() * exponent);
     AbsFac.append( phi ); // Polynomial of the field extension
@@ -932,69 +932,69 @@ void BIFAC::AbsoluteFactorization (CFFList Phis, CanonicalForm ff, CanonicalForm
   CanonicalForm phi;
   CanonicalForm h, h_abs, h_res, h_rat;
   CanonicalForm fx = deriv(ff,x);
-  
+
 
   for( CFFListIterator i=Phis; i.hasItem(); i++)
   {
     ASSERT( i.getItem().exp() == 1 , "Wrong factor of Eg"); // degree must be 1
     phi = i.getItem().factor();
-    
+
     if( ! phi.inBaseDomain())
     {
 
       // === Case 1:  phi has degree 1 ===
       if( phi.degree() == 1 )
       {
-	if( taildegree(phi) > 0 )  // case: phi = a * x
-	  h = gcd( ff,g );
-	else                       // case: phi = a * x + c
-	{
-	  h =  gcd( ff, g+tailcoeff(phi)/lc(phi)*fx);
-	}
-	
-	//biNormieren( h );
-	gl_AL.append(h); // Factor of degree 1 
- 	gl_AL.append(exponent); // Multiplicity (exponent)
-	gl_AL.append(0); // No field extension
+        if( taildegree(phi) > 0 )  // case: phi = a * x
+          h = gcd( ff,g );
+        else                       // case: phi = a * x + c
+        {
+          h =  gcd( ff, g+tailcoeff(phi)/lc(phi)*fx);
+        }
+
+        //biNormieren( h );
+        gl_AL.append(h); // Factor of degree 1
+         gl_AL.append(exponent); // Multiplicity (exponent)
+        gl_AL.append(0); // No field extension
       } else
       {
-	// === Case 2:  phi has degree > 1 ===
-	e=rootOf(phi, 'e');
-	h =  gcd( ff, g-e*fx);
-	//biNormieren( h );
+        // === Case 2:  phi has degree > 1 ===
+        e=rootOf(phi, 'e');
+        h =  gcd( ff, g-e*fx);
+        //biNormieren( h );
 
-	AbsFac = getAbsoluteFactors(h, phi);
-	for( CFListIterator l=AbsFac; l.hasItem(); l++)
-	  gl_AL.append( l.getItem() );
-
-
-	// ===  (1) Get the rational factor by multi-  ===
-	// ===      plication of the absolute factor.  ===
-	h_abs=1;
-	ii = 0;
-	
-	for( CFListIterator l=AbsFac; l.hasItem(); l++)
-	{
-	  ii++;
-	  if (ii%3 == 1 )
-	    h_abs *= l.getItem();
-	}
-	//biNormieren( h_abs );
+        AbsFac = getAbsoluteFactors(h, phi);
+        for( CFListIterator l=AbsFac; l.hasItem(); l++)
+          gl_AL.append( l.getItem() );
 
 
-	// === (2) Compute the rational factor  ===
-	// ===     by using the resultant.      ===
-	h_res =  resultant(phi(z,x), h(z,e), z);
-	//biNormieren( h_res );
+        // ===  (1) Get the rational factor by multi-  ===
+        // ===      plication of the absolute factor.  ===
+        h_abs=1;
+        ii = 0;
+
+        for( CFListIterator l=AbsFac; l.hasItem(); l++)
+        {
+          ii++;
+          if (ii%3 == 1 )
+            h_abs *= l.getItem();
+        }
+        //biNormieren( h_abs );
 
 
-	// === (3) Compute the rational factor by ignoring  ===
-	// ===     all knowledge of absolute factors.       === 
-	h_rat = RationalFactor(phi, ff,fx, g); 
-	//biNormieren( h_rat );
+        // === (2) Compute the rational factor  ===
+        // ===     by using the resultant.      ===
+        h_res =  resultant(phi(z,x), h(z,e), z);
+        //biNormieren( h_res );
 
-	ASSERT(  (h_abs == h_res) && (h_res == h_rat), "Wrong rational factor ?!?");
-	h = h_abs;
+
+        // === (3) Compute the rational factor by ignoring  ===
+        // ===     all knowledge of absolute factors.       ===
+        h_rat = RationalFactor(phi, ff,fx, g);
+        //biNormieren( h_rat );
+
+        ASSERT(  (h_abs == h_res) && (h_res == h_rat), "Wrong rational factor ?!?");
+        h = h_abs;
       }
       // End of absolute factorization.
       gl_RL.append(CFFactor( h,exponent )); // Save the rational factor
@@ -1004,12 +1004,12 @@ void BIFAC::AbsoluteFactorization (CFFList Phis, CanonicalForm ff, CanonicalForm
 }
 
 
-//====================================================== 
+//======================================================
 //  Factorization of a squarefree bivariate polynomial
 //  in which every factor appears only once.
 //  Do we need a complete factorization ('absolute' is true)
 //  or only a rational factorization ('absolute' false)?
-//====================================================== 
+//======================================================
 void BIFAC::bifacSqrFree(CanonicalForm ff)
 //=======================================================
 {
@@ -1034,44 +1034,44 @@ void BIFAC::bifacSqrFree(CanonicalForm ff)
   {
 //    LL  = createEg(G,ff);
 //   LL = createEgUni(G,ff); // Hier ist noch ein FEHLER !!!!
-        
+
    LL = createRg( G, ff);  // viel langsamer als EgUni
-   
-   
+
+
     Eg  =  LL.getFirst();
-	Eg  =  Eg/LC(Eg); 
-   
+        Eg  =  Eg/LC(Eg);
+
    g   =  LL.getLast();
 
 //      g = G.getFirst();
 
-    
-    CFFList PHI = AbsFactorize( Eg ); 
 
-	CFFListIterator J=PHI; 
-	CanonicalForm Eg2=1;
- 	for ( ; J.hasItem(); J++)
-	{ Eg2 = Eg2 * J.getItem().factor(); }
+    CFFList PHI = AbsFactorize( Eg );
+
+        CFFListIterator J=PHI;
+        CanonicalForm Eg2=1;
+         for ( ; J.hasItem(); J++)
+        { Eg2 = Eg2 * J.getItem().factor(); }
 
     // === Is Eg(x) irreducible ? ===
     anz=0;
 
-	// PHI =  AbsFactorize( Eg) ; 
-	//
-	
-    for( CFFListIterator i=PHI; i.hasItem(); i++) { 
+        // PHI =  AbsFactorize( Eg) ;
+        //
+
+    for( CFFListIterator i=PHI; i.hasItem(); i++) {
       if( !i.getItem().factor().inBaseDomain())
-	anz++;
-	 }
+        anz++;
+         }
 
     /* if( absolute ) // Only for a absolute factorization
       AbsoluteFactorization( PHI,ff, g);
-    else         // only for a rational factorization  
+    else         // only for a rational factorization
     { */
       if( anz==1 ){ ;
-	gl_RL.append( CFFactor(ff,exponent));}
-      else          
-	RationalFactorizationOnly( PHI,ff, g);
+        gl_RL.append( CFFactor(ff,exponent));}
+      else
+        RationalFactorizationOnly( PHI,ff, g);
    /* } */
   }
 }
@@ -1106,10 +1106,10 @@ void BIFAC::bifacMain(CanonicalForm  f)
   // =       STEP: Squarefree decomposition        =
   // ===============================================
 
- 
-	CFFList Q =Mysqrfree(f);
-//	
-//	cout << Q << endl;
+
+        CFFList Q =Mysqrfree(f);
+//
+//        cout << Q << endl;
 //
 
 
@@ -1122,19 +1122,19 @@ void BIFAC::bifacMain(CanonicalForm  f)
   for( CFFListIterator i=Q; i.hasItem(); i++)
   {
 
-	if( i.getItem().factor().level() < 0 ) ;
-	else
-	{
+        if( i.getItem().factor().level() < 0 ) ;
+        else
+        {
     if( ( degree(i.getItem().factor(),x) == 0 || degree( i.getItem().factor(),y) == 0) ) {
       // case: univariate
       unifac( i.getItem().factor(), i.getItem().exp()  ); }
     else // case: bivariate
     {
-      exponent =  i.getItem().exp();       // global variable  
-	  CanonicalForm dumm = i.getItem().factor();
-	  dumm = dumm.LC();
-	  if( dumm.level() > 0 ){ dumm =  1;  }
-      bifacSqrFree(i.getItem().factor()/dumm ); 
+      exponent =  i.getItem().exp();       // global variable
+          CanonicalForm dumm = i.getItem().factor();
+          dumm = dumm.LC();
+          if( dumm.level() > 0 ){ dumm =  1;  }
+      bifacSqrFree(i.getItem().factor()/dumm );
     }
   }}
 
@@ -1155,7 +1155,7 @@ int BIFAC::findCharacteristic(CanonicalForm f)
   int nr=0;
 
   if( min >= 32003 ) return ( 32003 ); // this is the maximum
-  
+
   // Find the smallest poosible prime
   while ( cf_getPrime(nr) < min)  { nr++;  }
   return ( cf_getPrime(nr) );
@@ -1183,25 +1183,25 @@ void BIFAC::convertResult(CanonicalForm & f, int ch, int sw)
 
   //cout << gl_RL<<endl;
 
-	if( sw )
-	{
-		Variable W('W');
-		for( CFFListIterator i=gl_RL; i.hasItem(); i++)
-	    {
-			c = i.getItem().factor();
-			c = c(W,y); 
-			c = c(y,x); 
-			c = c(x,W);
-			aL.append( CFFactor( c, i.getItem().exp() ));
-		}
+        if( sw )
+        {
+                Variable W('W');
+                for( CFFListIterator i=gl_RL; i.hasItem(); i++)
+            {
+                        c = i.getItem().factor();
+                        c = c(W,y);
+                        c = c(y,x);
+                        c = c(x,W);
+                        aL.append( CFFactor( c, i.getItem().exp() ));
+                }
 
-		f = f(W,y); f=f(y,x); f=f(x,W);
-	}
-	else aL = gl_RL;
+                f = f(W,y); f=f(y,x); f=f(x,W);
+        }
+        else aL = gl_RL;
 
-	gl_RL = aL;
+        gl_RL = aL;
 
-	//cout << aL;
+        //cout << aL;
 
 
 
@@ -1216,13 +1216,13 @@ void BIFAC::convertResult(CanonicalForm & f, int ch, int sw)
 
 
 //  cout << "\n* Test auf Korrektheit ...";
-  
- 
+
+
   for( CFFListIterator i=aL; i.hasItem(); i++)
     {
       ff *= power(i.getItem().factor(),  i.getItem().exp() );
       //      cout << " ff = " << ff
-      //	   << "\n a^b = " << i.getItem().factor() << "  ^ " <<   i.getItem().exp() << endl;
+      //           << "\n a^b = " << i.getItem().factor() << "  ^ " <<   i.getItem().exp() << endl;
     }
   c = f.LC()/ff.LC();
 
@@ -1230,17 +1230,17 @@ void BIFAC::convertResult(CanonicalForm & f, int ch, int sw)
 
 
 //   cout << "\n\nOriginal f = " << f << "\n\nff = " << ff
-//	   << "\n\nDiff = " << f-ff << endl << "Quot "<< f/ff <<endl;
+//           << "\n\nDiff = " << f-ff << endl << "Quot "<< f/ff <<endl;
 //  cout << "degree 0: " << c << endl;
-  
-  
+
+
 #ifndef NOSTREAMIO
-  if( f != ff ) cout << "\n\nOriginal f = " << f << "\n\nff = " << ff 
-		     << "\n\nDiff = " << f-ff << endl << "Quot "<< f/ff <<endl;
+  if( f != ff ) cout << "\n\nOriginal f = " << f << "\n\nff = " << ff
+                     << "\n\nDiff = " << f-ff << endl << "Quot "<< f/ff <<endl;
 #endif
   ASSERT( f==ff, "Wrong rational factorization. Abborting!");
 //  cout << "  [OK]\n";
-   
+
 }
 //--<>---------------------------------
 void BIFAC::bifac(CanonicalForm f, bool abs)
@@ -1253,10 +1253,10 @@ void BIFAC::bifac(CanonicalForm f, bool abs)
 
 
   ASSERT( ch==0 && !isOn(SW_RATIONAL), "Integer numbers not allowed" );
-  
+
 
   // === Check the characteristic ===
-  if( ch != 0 ) 
+  if( ch != 0 )
   {
     ch2 = findCharacteristic(f);
     if( ch <  ch2 )
@@ -1266,23 +1266,23 @@ void BIFAC::bifac(CanonicalForm f, bool abs)
 
       // PROVISORISCH
       //cerr << "\n Characteristic is too small!"
-	 //  << "\n The result might be wrong!\n\n";
+         //  << "\n The result might be wrong!\n\n";
       exit(1);
 
     } else ;
   }
 
- 	Variable W('W');
-  	CanonicalForm l;
-	int sw = 0;
+         Variable W('W');
+          CanonicalForm l;
+        int sw = 0;
 
-	if( degree(f,x) < degree(f,y) ) {
-		f = f(W,x);   f = f(x,y); f=f(y,W);  
-		sw = 1;
-	}
-		l = f.LC();
+        if( degree(f,x) < degree(f,y) ) {
+                f = f(W,x);   f = f(x,y); f=f(y,W);
+                sw = 1;
+        }
+                l = f.LC();
 
-		if( l.level()<0 ) { f = f/f.LC(); gl_RL.append( CFFactor(l,1) ); }
+                if( l.level()<0 ) { f = f/f.LC(); gl_RL.append( CFFactor(l,1) ); }
 
 
   bifacMain(f);                   // start the computation

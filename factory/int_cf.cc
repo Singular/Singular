@@ -52,9 +52,9 @@ int
 InternalCF::degree ()
 {
     if ( isZero() )
-	return -1;
+        return -1;
     else
-	return 0;
+        return 0;
 }
 //}}}
 
@@ -70,9 +70,9 @@ int
 InternalCF::taildegree ()
 {
     if ( isZero() )
-	return -1;
+        return -1;
     else
-	return 0;
+        return 0;
 }
 //}}}
 
@@ -117,9 +117,9 @@ CanonicalForm
 InternalCF::coeff ( int i )
 {
     if ( i == 0 )
-	return CanonicalForm( copyObject() );
+        return CanonicalForm( copyObject() );
     else
-	return CanonicalForm( 0 );
+        return CanonicalForm( 0 );
 }
 //}}}
 

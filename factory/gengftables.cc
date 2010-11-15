@@ -78,8 +78,8 @@ exponent ( const CanonicalForm & f, int q )
     int e = 1;
     CanonicalForm prod = x;
     while ( e <= q && ! prod.isOne() ) {
-	e++;
-	prod = ( prod * x ) % f;
+        e++;
+        prod = ( prod * x ) % f;
     }
     return e;
 }
@@ -107,38 +107,38 @@ exponent ( const CanonicalForm & f, int q )
 //}}}
 bool
 findGenRec ( int d, int n, int q,
-	     const CanonicalForm & m, const Variable & x,
-	     CanonicalForm & result )
+             const CanonicalForm & m, const Variable & x,
+             CanonicalForm & result )
 {
     int i, p = getCharacteristic();
     if ( n < 0 ) {
-	cerr << "."; cerr.flush();
-	// check whether m is irreducible
-	if ( isIrreducible( m ) ) {
-	    cerr << "*"; cerr.flush();
-	    // check whether m generates multiplicative group
-	    if ( exponent( m, q ) == q - 1 ) {
-		result = m;
-		return true;
-	    }
-	    else
-		return false;
-	}
-	else
-	    return false;
+        cerr << "."; cerr.flush();
+        // check whether m is irreducible
+        if ( isIrreducible( m ) ) {
+            cerr << "*"; cerr.flush();
+            // check whether m generates multiplicative group
+            if ( exponent( m, q ) == q - 1 ) {
+                result = m;
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+            return false;
     }
     // for each monomial x^0, ..., x^n, ..., x^d, try all possible coefficients
     else  if ( n == d || n == 0 ) {
-	// we want to have a leading coefficient and a constant term,
-	// so start with coefficient >= 1
-	for ( i = 1; i < p; i++ )
-	    if ( findGenRec( d, n-1, q, m + i * power( x, n ), x, result ) )
-		return true;
+        // we want to have a leading coefficient and a constant term,
+        // so start with coefficient >= 1
+        for ( i = 1; i < p; i++ )
+            if ( findGenRec( d, n-1, q, m + i * power( x, n ), x, result ) )
+                return true;
     }
     else {
-	for ( i = 0; i < p; i++ )
-	    if ( findGenRec( d, n-1, q, m + i * power( x, n ), x, result ) )
-		return true;
+        for ( i = 0; i < p; i++ )
+            if ( findGenRec( d, n-1, q, m + i * power( x, n ), x, result ) )
+                return true;
     }
     return false;
 }
@@ -163,9 +163,9 @@ findGen ( int d, int q )
     bool ok = findGenRec( d, d, q, 0, x, result );
     cerr << endl;
     if ( ! ok )
-	return 0;
+        return 0;
     else
-	return result;
+        return result;
 }
 //}}}
 
@@ -205,7 +205,7 @@ printTable ( int d, int q, CanonicalForm mipo )
     // fill T with powers of x
     T[0] = 1;
     for ( i = 1; i < q; i++ )
-	T[i] = ( T[i-1] * x ) % mipo;
+        T[i] = ( T[i-1] * x ) % mipo;
 
     cerr << "generating addition table ... ";
     cerr.flush();
@@ -215,10 +215,10 @@ printTable ( int d, int q, CanonicalForm mipo )
     CanonicalForm f;
 
     for ( i = 0; i < q; i++ ) {
-	f = T[i] + 1;
-	int j = 0;
-	while ( j < q && T[j] != f ) j++;
-	table[i] = j;
+        f = T[i] + 1;
+        int j = 0;
+        while ( j < q && T[j] != f ) j++;
+        table[i] = j;
     }
 
     cerr << "writing table ... ";
@@ -231,10 +231,10 @@ printTable ( int d, int q, CanonicalForm mipo )
     outfile << d;
     CFIterator MiPo = mipo;
     for ( i = d; MiPo.hasTerms(); i--, MiPo++ ) {
-	int exp;
-	for ( exp = MiPo.exp(); exp < i; i-- )
-	    outfile << " 0";
-	outfile << " " << MiPo.coeff();
+        int exp;
+        for ( exp = MiPo.exp(); exp < i; i-- )
+            outfile << " 0";
+        outfile << " " << MiPo.coeff();
     }
     // since mipo is irreducible, it has a constant term,
     // so i == 0 at this point
@@ -245,19 +245,19 @@ printTable ( int d, int q, CanonicalForm mipo )
     outstr[30*m] = '\0';
     i = 1;
     while ( i < q ) {
-	int k = 0;
-	char * sptr = outstr;
-	while ( i < q && k < 30 ) {
-	    convert62( table[i], m, sptr );
-	    sptr += m;
-	    k++; i++;
-	}
-	while ( k < 30 ) {
-	    convert62( 0, m, sptr );
-	    sptr += m;
-	    k++;
-	}
-	outfile << outstr << endl;
+        int k = 0;
+        char * sptr = outstr;
+        while ( i < q && k < 30 ) {
+            convert62( table[i], m, sptr );
+            sptr += m;
+            k++; i++;
+        }
+        while ( k < 30 ) {
+            convert62( 0, m, sptr );
+            sptr += m;
+            k++;
+        }
+        outfile << outstr << endl;
     }
     outfile.close();
 
@@ -274,15 +274,15 @@ main()
 {
     int i, p, q, n;
     for ( i = 0; i < primes_len; i++ ) {
-	p = primes[i];
-	q = p*p;
-	n = 2;
-	setCharacteristic( p );
-	while ( q < maxtable ) {
-	    CanonicalForm f = findGen( n, q );
-	    ASSERT( f != 0, "no generator found" );
-	    printTable( n, q, f );
-	    n++; q *= p;
-	}
+        p = primes[i];
+        q = p*p;
+        n = 2;
+        setCharacteristic( p );
+        while ( q < maxtable ) {
+            CanonicalForm f = findGen( n, q );
+            ASSERT( f != 0, "no generator found" );
+            printTable( n, q, f );
+            n++; q *= p;
+        }
     }
 }

@@ -54,11 +54,11 @@ void GFGenerator::next()
 {
     ASSERT( current != gf_q + 1, "no more items" );
     if ( gf_iszero( current ) )
-	current = 0;
+        current = 0;
     else  if ( current == gf_q1 - 1 )
-	current = gf_q + 1;
+        current = gf_q + 1;
     else
-	current++;
+        current++;
 }
 
 AlgExtGenerator::AlgExtGenerator()
@@ -136,12 +136,12 @@ CanonicalForm AlgExtGenerator::item() const
     if ( getGFDegree() > 1 )
     {
       for ( int i = 0; i < n; i++ )
-	    result += power( algext, i ) * gensg[i]->item();
+            result += power( algext, i ) * gensg[i]->item();
     }
     else
     {
       for ( int i = 0; i < n; i++ )
-	    result += power( algext, i ) * gensf[i]->item();
+            result += power( algext, i ) * gensf[i]->item();
     }
     return result;
 }
@@ -155,39 +155,39 @@ void AlgExtGenerator::next()
     {
       while ( ! stop && i < n )
       {
-    	gensg[i]->next();
-	    if ( ! gensg[i]->hasItems() )
+            gensg[i]->next();
+            if ( ! gensg[i]->hasItems() )
         {
-	      gensg[i]->reset();
-	      i++;
-	    }
-	    else
-	      stop = true;
+              gensg[i]->reset();
+              i++;
+            }
+            else
+              stop = true;
       }
     }
     else
     {
       while ( ! stop && i < n )
       {
-    	gensf[i]->next();
-	    if ( ! gensf[i]->hasItems() )
+            gensf[i]->next();
+            if ( ! gensf[i]->hasItems() )
         {
-	      gensf[i]->reset();
-	      i++;
-	    }
-	    else
-	      stop = true;
+              gensf[i]->reset();
+              i++;
+            }
+            else
+              stop = true;
       }
     }
     if ( ! stop )
-	nomoreitems = true;
+        nomoreitems = true;
 }
 
 CFGenerator * CFGenFactory::generate()
 {
     ASSERT( getCharacteristic() > 0, "not a finite field" );
     if ( getGFDegree() > 1 )
-	return new GFGenerator();
+        return new GFGenerator();
     else
-	return new FFGenerator();
+        return new FFGenerator();
 }

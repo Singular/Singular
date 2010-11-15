@@ -42,8 +42,8 @@ static unsigned short primes [] =
      59,  61,  67,  71,  73,  79,  83,  89,
      97, 101, 103, 107, 109, 113, 127, 131,
     137, 139, 149, 151, 157, 163, 167, 173,
-    179, 181, 191, 193, 197, 199, 211, 223, 
-	227, 229, 233, 239, 241, 251
+    179, 181, 191, 193, 197, 199, 211, 223,
+        227, 229, 233, 239, 241, 251
 };
 //}}}
 
@@ -76,8 +76,8 @@ exponent ( const CanonicalForm & f, int q )
     int e = 1;
     CanonicalForm prod = x;
     while ( e <= q && ! prod.isOne() ) {
-	e++;
-	prod = ( prod * x ) % f;
+        e++;
+        prod = ( prod * x ) % f;
     }
     return e;
 }
@@ -105,38 +105,38 @@ exponent ( const CanonicalForm & f, int q )
 //}}}
 bool
 findGenRec ( int d, int n, int q,
-	     const CanonicalForm & m, const Variable & x,
-	     CanonicalForm & result )
+             const CanonicalForm & m, const Variable & x,
+             CanonicalForm & result )
 {
     int i, p = getCharacteristic();
     if ( n < 0 ) {
-	cerr << "."; cerr.flush();
-	// check whether m is irreducible
-	if ( isIrreducible( m ) ) {
-	    cerr << "*"; cerr.flush();
-	    // check whether m generates multiplicative group
-	    if ( exponent( m, q ) == q - 1 ) {
-		result = m;
-		return true;
-	    }
-	    else
-		return false;
-	}
-	else
-	    return false;
+        cerr << "."; cerr.flush();
+        // check whether m is irreducible
+        if ( isIrreducible( m ) ) {
+            cerr << "*"; cerr.flush();
+            // check whether m generates multiplicative group
+            if ( exponent( m, q ) == q - 1 ) {
+                result = m;
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+            return false;
     }
     // for each monomial x^0, ..., x^n, ..., x^d, try all possible coefficients
     else  if ( n == d || n == 0 ) {
-	// we want to have a leading coefficient and a constant term,
-	// so start with coefficient >= 1
-	for ( i = 1; i < p; i++ )
-	    if ( findGenRec( d, n-1, q, m + i * power( x, n ), x, result ) )
-		return true;
+        // we want to have a leading coefficient and a constant term,
+        // so start with coefficient >= 1
+        for ( i = 1; i < p; i++ )
+            if ( findGenRec( d, n-1, q, m + i * power( x, n ), x, result ) )
+                return true;
     }
     else {
-	for ( i = 0; i < p; i++ )
-	    if ( findGenRec( d, n-1, q, m + i * power( x, n ), x, result ) )
-		return true;
+        for ( i = 0; i < p; i++ )
+            if ( findGenRec( d, n-1, q, m + i * power( x, n ), x, result ) )
+                return true;
     }
     return false;
 }
@@ -161,9 +161,9 @@ findGen ( int d, int q )
     bool ok = findGenRec( d, d, q, 0, x, result );
     cerr << endl;
     if ( ! ok )
-	return 0;
+        return 0;
     else
-	return result;
+        return result;
 }
 //}}}
 
@@ -185,7 +185,7 @@ printTable ( int d, int q, CanonicalForm mipo )
     int i, p = getCharacteristic();
 
     // open file to write to
-	ostrstream fname;
+        ostrstream fname;
     fname << "gftables/gftable." << p << "." << d << '\0';
     char * fn = fname.str();
     ofstream outfile;
@@ -203,7 +203,7 @@ printTable ( int d, int q, CanonicalForm mipo )
     // fill T with powers of x
     T[0] = 1;
     for ( i = 1; i < q; i++ )
-	T[i] = ( T[i-1] * x ) % mipo;
+        T[i] = ( T[i-1] * x ) % mipo;
 
     cerr << "generating addition table ... ";
     cerr.flush();
@@ -213,10 +213,10 @@ printTable ( int d, int q, CanonicalForm mipo )
     CanonicalForm f;
 
     for ( i = 0; i < q; i++ ) {
-	f = T[i] + 1;
-	int j = 0;
-	while ( j < q && T[j] != f ) j++;
-	table[i] = j;
+        f = T[i] + 1;
+        int j = 0;
+        while ( j < q && T[j] != f ) j++;
+        table[i] = j;
     }
 
     cerr << "writing table ... ";
@@ -229,10 +229,10 @@ printTable ( int d, int q, CanonicalForm mipo )
     outfile << d;
     CFIterator MiPo = mipo;
     for ( i = d; MiPo.hasTerms(); i--, MiPo++ ) {
-	int exp;
-	for ( exp = MiPo.exp(); exp < i; i-- )
-	    outfile << " 0";
-	outfile << " " << MiPo.coeff();
+        int exp;
+        for ( exp = MiPo.exp(); exp < i; i-- )
+            outfile << " 0";
+        outfile << " " << MiPo.coeff();
     }
     // since mipo is irreducible, it has a constant term,
     // so i == 0 at this point
@@ -243,19 +243,19 @@ printTable ( int d, int q, CanonicalForm mipo )
     outstr[30*m] = '\0';
     i = 1;
     while ( i < q ) {
-	int k = 0;
-	char * sptr = outstr;
-	while ( i < q && k < 30 ) {
-	    convert62( table[i], m, sptr );
-	    sptr += m;
-	    k++; i++;
-	}
-	while ( k < 30 ) {
-	    convert62( 0, m, sptr );
-	    sptr += m;
-	    k++;
-	}
-	outfile << outstr << endl;
+        int k = 0;
+        char * sptr = outstr;
+        while ( i < q && k < 30 ) {
+            convert62( table[i], m, sptr );
+            sptr += m;
+            k++; i++;
+        }
+        while ( k < 30 ) {
+            convert62( 0, m, sptr );
+            sptr += m;
+            k++;
+        }
+        outfile << outstr << endl;
     }
     outfile.close();
 
@@ -269,73 +269,73 @@ printTable ( int d, int q, CanonicalForm mipo )
 
 // The new function for getting the minimal polynomials.
 // It uses the Conway polynomials.
-// It reads the polynomials from a file. 
+// It reads the polynomials from a file.
 // The file contains all poynomials with p^k <= 2^16
 // but currently only polynomials with p^k <= 2^14 are used.
 static CanonicalForm findGenNew(int n, int q)
 // n is the exponent
 // parameter q is not used. It is added to respect the old version
 {
-	CanonicalForm conway = 0;
-	Variable x( 1 );
-	int p = getCharacteristic();
-	int ntmp,ptmp,pos1,pos2,ii;
-	string ns, ps;
-	string LineSe,coef,PC;
-	int flag=1;
-	ifstream in("./ConwayList.txt");
-	getline(in,LineSe); // For the first line
+        CanonicalForm conway = 0;
+        Variable x( 1 );
+        int p = getCharacteristic();
+        int ntmp,ptmp,pos1,pos2,ii;
+        string ns, ps;
+        string LineSe,coef,PC;
+        int flag=1;
+        ifstream in("./ConwayList.txt");
+        getline(in,LineSe); // For the first line
 
-	string err="END"; //to check if we are at the end of the file
-	while((flag) && (err != LineSe))
-	{
-		getline(in,LineSe); //for the line: allConwayPolynomials := [	
-		if(LineSe == err){
-			break;
-		}
-		pos1 = LineSe.find( ",", 0 );
-		pos2 = LineSe.find( ",", pos1 + 1);	// we check where are the "," to now p and n of this line
-		ps = LineSe.substr(0, pos1);
-		ns = LineSe.substr(pos1 + 1,pos2 - pos1);
-		ptmp = std::atoi(ps.c_str());		//we have the value of p and n of these line
-		ntmp = std::atoi(ns.c_str());
+        string err="END"; //to check if we are at the end of the file
+        while((flag) && (err != LineSe))
+        {
+                getline(in,LineSe); //for the line: allConwayPolynomials := [
+                if(LineSe == err){
+                        break;
+                }
+                pos1 = LineSe.find( ",", 0 );
+                pos2 = LineSe.find( ",", pos1 + 1);        // we check where are the "," to now p and n of this line
+                ps = LineSe.substr(0, pos1);
+                ns = LineSe.substr(pos1 + 1,pos2 - pos1);
+                ptmp = std::atoi(ps.c_str());                //we have the value of p and n of these line
+                ntmp = std::atoi(ns.c_str());
 
-        if((ntmp==n)&&(ptmp==p)){flag=0;}	// we check if they are our p and n to stop the search
-			
-	}	
- 	
-	if (err==LineSe) // If the Conway Polynomial is not in the list, there is an error.
-	{
-		//cout << "Error: This Conway polinomial is not in the list" << endl;
-		return(0);		
-	}
+        if((ntmp==n)&&(ptmp==p)){flag=0;}        // we check if they are our p and n to stop the search
 
-	// Read the polynomial from the file
-	pos1 = pos2 + 1; 
-	pos2 = LineSe.find(",", pos1 + 1);
-	conway = std::atoi(LineSe.substr(pos1, pos2 - pos1).c_str()); // value of the constant term in PC=Conway Polynomial
+        }
+
+        if (err==LineSe) // If the Conway Polynomial is not in the list, there is an error.
+        {
+                //cout << "Error: This Conway polinomial is not in the list" << endl;
+                return(0);
+        }
+
+        // Read the polynomial from the file
+        pos1 = pos2 + 1;
+        pos2 = LineSe.find(",", pos1 + 1);
+        conway = std::atoi(LineSe.substr(pos1, pos2 - pos1).c_str()); // value of the constant term in PC=Conway Polynomial
     pos1 = pos2;
-	pos2 = LineSe.find(",", pos1 + 1);
+        pos2 = LineSe.find(",", pos1 + 1);
 
-	for(ii = 2; ii <= n; ii++)
-	{
-		coef = LineSe.substr(pos1 + 1,pos2 - pos1 - 1); //Coefficient of the monomial of degree ii-1
+        for(ii = 2; ii <= n; ii++)
+        {
+                coef = LineSe.substr(pos1 + 1,pos2 - pos1 - 1); //Coefficient of the monomial of degree ii-1
         if(coef != "0")
-		{
-			conway = conway + std::atoi(coef.c_str()) * power(x, ii - 1) ; //We add this monomial to the Conway Polynomial
-		}
-		pos1 = pos2;
-		pos2 = LineSe.find( ",", pos1+1);
-	}
+                {
+                        conway = conway + std::atoi(coef.c_str()) * power(x, ii - 1) ; //We add this monomial to the Conway Polynomial
+                }
+                pos1 = pos2;
+                pos2 = LineSe.find( ",", pos1+1);
+        }
 
-	pos2 = LineSe.find( ",END", pos1 + 1); // To obtain the last coefficient we search "END" instead of ","
-	coef = LineSe.substr(pos1 + 1,pos2 - pos1 - 1);
-	conway = conway + std::atoi(coef.c_str()) * power(x, ii - 1) ; //We add the last monomial to the Conway Polynomial 
+        pos2 = LineSe.find( ",END", pos1 + 1); // To obtain the last coefficient we search "END" instead of ","
+        coef = LineSe.substr(pos1 + 1,pos2 - pos1 - 1);
+        conway = conway + std::atoi(coef.c_str()) * power(x, ii - 1) ; //We add the last monomial to the Conway Polynomial
 
-	in.close();
-	
-	return(conway);	
-	
+        in.close();
+
+        return(conway);
+
 }
 
 
@@ -344,16 +344,16 @@ main()
 {
     int i, p, q, n;
     for ( i = 0; i < primes_len; i++ ) {
-		p = primes[i];
-		q = p*p;
-		n = 2;
-		setCharacteristic( p );
-		while ( q < maxtable ) {
-			CanonicalForm f = findGenNew( n, q );
-			ASSERT( f != 0, "no generator found" );
-			printTable( n, q, f );
-			n++; q *= p;
-		}
+                p = primes[i];
+                q = p*p;
+                n = 2;
+                setCharacteristic( p );
+                while ( q < maxtable ) {
+                        CanonicalForm f = findGenNew( n, q );
+                        ASSERT( f != 0, "no generator found" );
+                        printTable( n, q, f );
+                        n++; q *= p;
+                }
     }
 }
 

@@ -14,7 +14,7 @@ LGS::LGS( int r, int c, bool inv )// KONSTRUKTOR
   INVERSE = inv;
 
   max_columns = c;
-  max_rows    = (r>c) ? c : r ; 
+  max_rows    = (r>c) ? c : r ;
 
   if( INVERSE )
   {
@@ -36,26 +36,26 @@ LGS::~LGS( void )// DESTRUKTOR
 //--<>---------------------------------
 {
   delete[] pivot;
-} 
+}
 
 //--<>---------------------------------
 void LGS::reset(void)
 //--<>---------------------------------
 { // Clear the matrix for a new computation
   now_row=1;
-  for( int i=0; i<=max_columns; i++)    
+  for( int i=0; i<=max_columns; i++)
     pivot[i]=0;
 }
 
 //--<>---------------------------------
 bool LGS::new_row( const CFMatrix Z, const CanonicalForm bb)
 //--<>---------------------------------
-{ // Insert a new row 
+{ // Insert a new row
   ASSERT ( (1 <= now_row && now_row <=max_rows), "wrong number of rows => Matrix has max. rank");
   int i;
 
 //    if (INVERSE)
-//    cout << "* Integriere Zeile "<<now_row << " (max " <<max_rows<<" x " 
+//    cout << "* Integriere Zeile "<<now_row << " (max " <<max_rows<<" x "
 //         <<  max_columns << ")\n"
 //         << "Z = " << Z << "\nb = " << bb << endl << flush;
 
@@ -65,16 +65,16 @@ bool LGS::new_row( const CFMatrix Z, const CanonicalForm bb)
   // === Insert a new row ===
   for(i=1; i<=max_columns; i++)
     A(now_row, i) = Z(1,i);
-  b(now_row, 1) = bb; 
+  b(now_row, 1) = bb;
 
- 
+
   //  cout << "* reduzierte Matrix (vor lin_dep) " << A << endl;
   // === check linear dependency ===
-  if ( ! lin_dep() )  
+  if ( ! lin_dep() )
     now_row++;
-  else 
+  else
     return(false);
-  
+
   // === Reduce the previous rows ===
   for(i=1; i<now_row-1; i++)
     reduce(now_row-1,i );
@@ -85,8 +85,8 @@ bool LGS::new_row( const CFMatrix Z, const CanonicalForm bb)
 //    if( INVERSE ) cout << A;
 //  cout << "* Verlasse new_row!\n" << "* Z = " << Z << endl << flush;
   return(true); // row was linear independent
-} 
- 
+}
+
 
 //--<>---------------------------------
 bool LGS::lin_dep( void )
@@ -103,11 +103,11 @@ bool LGS::lin_dep( void )
 
   // === Quest for a pivot ===
   for ( i=1; i<=max_columns; i++)
-    if( A(now_row,i) != 0 ) 
+    if( A(now_row,i) != 0 )
     {
       pivot[now_row] = i;
       break;//      i = max_columns;
-      
+
     }
 //  cout << "* pivot["<<now_row<<"] = " << pivot[now_row] << endl << flush;
 
@@ -116,7 +116,7 @@ bool LGS::lin_dep( void )
   {
     if( INVERSE )
       for ( i=1; i<=max_columns; i++)
-	A(now_row, max_columns+i) = 0;
+        A(now_row, max_columns+i) = 0;
     return (true);
   }
   // === The row is linear independent ====
@@ -138,7 +138,7 @@ void LGS::reduce(int fix, int row)
   CanonicalForm mul =  A(row, pivot[fix]) / A(fix, pivot[fix]);
 
 //    cout << "* Multiplikationsfaktor ist " << mul << endl;
-//    cout << "* Aktuelle Matrix ist " << A 
+//    cout << "* Aktuelle Matrix ist " << A
 //         << "\n  b = " << b << endl;
 //    cout << "max_columns = "<< max_columns << endl;
 //    cout << "* now_row = " << now_row <<", row=" << row << endl << flush;
@@ -147,16 +147,16 @@ void LGS::reduce(int fix, int row)
 
 
   for (int i=1; i<=max_columns; i++)
-    if( A(fix,i) != 0 ) 
+    if( A(fix,i) != 0 )
       A(row, i) -= mul* A(fix,i);
-  if( b(fix,1) != 0 ) 
+  if( b(fix,1) != 0 )
     b(row,1) -= mul * b(fix,1);
 
 
   if ( INVERSE )
     for (int i=max_columns+1; i<=2*max_columns; i++)
-      if( A(fix,i) != 0 ) 
-	A(row, i) -= (mul* A(fix,i));
+      if( A(fix,i) != 0 )
+        A(row, i) -= (mul* A(fix,i));
 //      A(row,i) = 777;
 
 //   cout << "* reduzierte Matrix ist " << A << endl;
@@ -169,7 +169,7 @@ void LGS::reduce(int fix, int row)
 //--<>---------------------------------
 void LGS::inverse( CFMatrix & I )
 //--<>---------------------------------
-{ 
+{
   int i,j;
   CanonicalForm mul;
 
@@ -178,7 +178,7 @@ void LGS::inverse( CFMatrix & I )
   {
     for( j=max_columns+1; j<=2*max_columns; j++)
       if( A(i,j)!=0 )
-	A(i,j) /= A( i, pivot[i]);
+        A(i,j) /= A( i, pivot[i]);
     A( i, pivot[i]) = 1;
   }
 // cout << "* Inverse Matrix ist " << A << endl;
@@ -220,7 +220,7 @@ int LGS::corank(void)
 //--<>---------------------------------
 int LGS::ErgCol(int row, int basis[])
 //--<>---------------------------------
-{ 
+{
   bool state = false;
 
   for( int i=1; i<=max_columns; i++)
@@ -229,10 +229,10 @@ int LGS::ErgCol(int row, int basis[])
     {
       state = true;
       for( int j=1; j<=basis[0]; j++)
-	if( i==basis[j] )
-	  state = false;
-      if( state == true ) 
-	return (i);
+        if( i==basis[j] )
+          state = false;
+      if( state == true )
+        return (i);
     }
   }
   // A row contains only pivot entry/-ies
@@ -240,7 +240,7 @@ int LGS::ErgCol(int row, int basis[])
     if(  A(row, basis[j]) != 0 )
       return( -basis[j] );
 
-  
+
   AUSGABE_LGS("Zeile ist " << row << endl);
   AUSGABE_ERR("* Mistake in [lgs.cc]! Impossible result. Aborting!\n");
   exit (1);
@@ -252,18 +252,18 @@ CFMatrix LGS::GetKernelBasis(void)
 //--<>---------------------------------
 {
   int i,z;
-  int dim = corank(); 
+  int dim = corank();
 
   bool* tmp_vec = new bool[max_columns+1];
   int*  basis   = new int [dim+1];
   basis[0]=1;
   CFMatrix erg  (dim, max_columns); // Each row is one solution
-  
+
   // === Searching free parameters ===
-  for( i=1; i<=max_rows; i++)  
+  for( i=1; i<=max_rows; i++)
     tmp_vec[i]=false;
   for( i=1; i<now_row; i++)
-    if( pivot[i] != 0 ) 
+    if( pivot[i] != 0 )
       tmp_vec[pivot[i]] = true;
 
   for( i=1; i<=max_columns; i++)
@@ -286,7 +286,7 @@ CFMatrix LGS::GetKernelBasis(void)
       erg(i, basis[i]) = 1;
       erg(i, pivot[z]) = -(A(z, basis[i]) / A(z,pivot[z]));
     }
-  
+
 //  cout << "Kernbasis ist " << erg;
   return erg;
 }
@@ -296,8 +296,8 @@ CFMatrix LGS::GetSolutionVector(void)
 //--<>---------------------------------
 { // Ax=b has exactly one solution vector x
   int z;
-  CFMatrix erg  (1, max_columns); 
-  
+  CFMatrix erg  (1, max_columns);
+
   // === Creating the basis vectors ===
   for(z=1; z<=max_columns; z++)
   {

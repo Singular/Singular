@@ -48,7 +48,7 @@ class InternalCF;
 
 inline int is_imm ( const InternalCF * const ptr )
 {
-    // returns 0 if ptr is not immediate       
+    // returns 0 if ptr is not immediate
     return ( ((int)((long)ptr)) & 3 );
 }
 
@@ -324,9 +324,9 @@ inline CanonicalForm
 head ( const CanonicalForm & f )
 {
     if ( f.level() > 0 )
-	return power( f.mvar(), f.degree() ) * f.LC();
+        return power( f.mvar(), f.degree() ) * f.LC();
     else
-	return f;
+        return f;
 }
 
 inline int

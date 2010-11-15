@@ -1,14 +1,14 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file facFqBivar.h
- * 
- * This file provides functions for factorizing a bivariate polynomial over
- * \f$ F_{p} \f$ , \f$ F_{p}(\alpha ) \f$ or GF.   
  *
- * ABSTRACT: In contrast to biFactorizer() in facFqFactorice.cc we evaluate and 
- * factorize the polynomial in both variables. So far factor recombination is 
- * done naive!          
+ * This file provides functions for factorizing a bivariate polynomial over
+ * \f$ F_{p} \f$ , \f$ F_{p}(\alpha ) \f$ or GF.
+ *
+ * ABSTRACT: In contrast to biFactorizer() in facFqFactorice.cc we evaluate and
+ * factorize the polynomial in both variables. So far factor recombination is
+ * done naive!
  *
  * @author Martin Lee
  *
@@ -32,29 +32,29 @@
 
 static const double log2exp= 1.442695041;
 
-/// Factorization of a squarefree bivariate polynomials over an arbitrary finite 
+/// Factorization of a squarefree bivariate polynomials over an arbitrary finite
 /// field, information on the current field we work over is in @a info. @a info
 /// may also contain information about the initial field if initial and current
-/// field do not coincide. In this case the current field is an extension of the 
+/// field do not coincide. In this case the current field is an extension of the
 /// initial field and the factors returned are factors of F over the initial
-/// field. 
-/// 
+/// field.
+///
 /// @return @a biFactorize returns a list of factors of F. If F is not monic
-///         its leading coefficient is not outputted. 
+///         its leading coefficient is not outputted.
 /// @sa extBifactorize()
-CFList 
+CFList
 biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
              const ExtensionInfo& info     ///< [in] information about extension
             );
 
 /// factorize a squarefree bivariate polynomial over \f$ F_{p} \f$.
 ///
-/// @return @a FpBiSqrfFactorize returns a list of monic factors, the first 
-///         element is the leading coefficient.     
+/// @return @a FpBiSqrfFactorize returns a list of monic factors, the first
+///         element is the leading coefficient.
 /// @sa FqBiSqrfFactorize(), GFBiSqrfFactorize()
 inline
 CFList FpBiSqrfFactorize (const CanonicalForm & F ///< [in] a bivariate poly
-                         ) 
+                         )
 {
   ExtensionInfo info= ExtensionInfo (false);
   CFList result= biFactorize (F, info);
@@ -64,13 +64,13 @@ CFList FpBiSqrfFactorize (const CanonicalForm & F ///< [in] a bivariate poly
 
 /// factorize a squarefree bivariate polynomial over \f$ F_{p}(\alpha ) \f$.
 ///
-/// @return @a FqBiSqrfFactorize returns a list of monic factors, the first 
-///         element is the leading coefficient.      
+/// @return @a FqBiSqrfFactorize returns a list of monic factors, the first
+///         element is the leading coefficient.
 /// @sa FpBiSqrfFactorize(), GFBiSqrfFactorize()
 inline
 CFList FqBiSqrfFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
                           const Variable& alpha    ///< [in] algebraic variable
-                         ) 
+                         )
 {
   ExtensionInfo info= ExtensionInfo (alpha, false);
   CFList result= biFactorize (F, info);
@@ -80,14 +80,14 @@ CFList FqBiSqrfFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
 
 /// factorize a squarefree bivariate polynomial over GF
 ///
-/// @return @a GFBiSqrfFactorize returns a list of monic factors, the first 
-///         element is the leading coefficient.      
-/// @sa FpBiSqrfFactorize(), FqBiSqrfFactorize() 
+/// @return @a GFBiSqrfFactorize returns a list of monic factors, the first
+///         element is the leading coefficient.
+/// @sa FpBiSqrfFactorize(), FqBiSqrfFactorize()
 inline
 CFList GFBiSqrfFactorize (const CanonicalForm & F ///< [in] a bivariate poly
-                         ) 
+                         )
 {
-  ASSERT (CFFactory::gettype() == GaloisFieldDomain, 
+  ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
   CFList result= biFactorize (F, info);
@@ -97,16 +97,16 @@ CFList GFBiSqrfFactorize (const CanonicalForm & F ///< [in] a bivariate poly
 
 /// factorize a bivariate polynomial over \f$ F_{p} \f$
 ///
-/// @return @a FpBiFactorize returns a list of monic factors with 
-///         multiplicity, the first element is the leading coefficient.      
-/// @sa FqBiFactorize(), GFBiFactorize() 
+/// @return @a FpBiFactorize returns a list of monic factors with
+///         multiplicity, the first element is the leading coefficient.
+/// @sa FqBiFactorize(), GFBiFactorize()
 inline
 CFFList FpBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
-                      ) 
+                      )
 {
   ExtensionInfo info= ExtensionInfo (false);
   bool GF= false;
-  CanonicalForm LcF= Lc (F); 
+  CanonicalForm LcF= Lc (F);
   CanonicalForm pthRoot, A;
   CanonicalForm sqrfP= sqrfPart (F/Lc(F), pthRoot, info.getAlpha());
   CFList buf, bufRoot;
@@ -124,7 +124,7 @@ CFFList FpBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
     return result;
   }
   else
-  {  
+  {
     buf= biFactorize (sqrfP, info);
     A= F/LcF;
     result= multiplicity (A, buf);
@@ -141,9 +141,9 @@ CFFList FpBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
 
 /// factorize a bivariate polynomial over \f$ F_{p}(\alpha ) \f$
 ///
-/// @return @a FqBiFactorize returns a list of monic factors with 
-///         multiplicity, the first element is the leading coefficient.      
-/// @sa FpBiFactorize(), FqBiFactorize() 
+/// @return @a FqBiFactorize returns a list of monic factors with
+///         multiplicity, the first element is the leading coefficient.
+/// @sa FpBiFactorize(), FqBiFactorize()
 inline
 CFFList FqBiFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
                        const Variable & alpha   ///< [in] algebraic variable
@@ -151,7 +151,7 @@ CFFList FqBiFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
 {
   ExtensionInfo info= ExtensionInfo (alpha, false);
   bool GF= false;
-  CanonicalForm LcF= Lc (F); 
+  CanonicalForm LcF= Lc (F);
   CanonicalForm pthRoot, A;
   CanonicalForm sqrfP= sqrfPart (F/Lc(F), pthRoot, alpha);
   CFList buf, bufRoot;
@@ -170,7 +170,7 @@ CFFList FqBiFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
     return result;
   }
   else
-  {  
+  {
     buf= biFactorize (sqrfP, info);
     A= F/LcF;
     result= multiplicity (A, buf);
@@ -186,15 +186,15 @@ CFFList FqBiFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
 }
 
 /// factorize a bivariate polynomial over GF
-/// 
-/// @return @a GFBiFactorize returns a list of monic factors with 
-///         multiplicity, the first element is the leading coefficient.      
-/// @sa FpBiFactorize(), FqBiFactorize() 
+///
+/// @return @a GFBiFactorize returns a list of monic factors with
+///         multiplicity, the first element is the leading coefficient.
+/// @sa FpBiFactorize(), FqBiFactorize()
 inline
 CFFList GFBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
-                      ) 
+                      )
 {
-  ASSERT (CFFactory::gettype() == GaloisFieldDomain, 
+  ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
   bool GF= true;
@@ -236,62 +236,62 @@ CFFList GFBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
 ///
 /// @return @a prodMod0 computes the above defined product
 /// @sa prodMod()
-CanonicalForm prodMod0 (const CFList& L,       ///< [in] a list of compressed, 
+CanonicalForm prodMod0 (const CFList& L,       ///< [in] a list of compressed,
                                                ///< bivariate polynomials
                         const CanonicalForm& M ///< [in] a power of Variable (2)
                        );
 
-/// find an evaluation point p, s.t. F(p,y) is squarefree and 
-/// \f$ deg_{y} (F(p,y))= deg_{y} (F(x,y)) \f$.  
+/// find an evaluation point p, s.t. F(p,y) is squarefree and
+/// \f$ deg_{y} (F(p,y))= deg_{y} (F(x,y)) \f$.
 ///
 /// @return @a evalPoint returns an evaluation point, which is valid if and only
 ///         if fail == false.
-CanonicalForm 
-evalPoint (const CanonicalForm& F, ///< [in] compressed, bivariate poly 
+CanonicalForm
+evalPoint (const CanonicalForm& F, ///< [in] compressed, bivariate poly
            CanonicalForm & eval,   ///< [in,out] F (p, y)
            const Variable& alpha,  ///< [in] algebraic variable
            CFList& list,           ///< [in] list of points already considered
            const bool& GF,         ///< [in] GaloisFieldDomain?
            bool& fail              ///< [in,out] equals true, if there is no
-                                   ///< valid evaluation point 
+                                   ///< valid evaluation point
           );
 
 /// Univariate factorization of squarefree monic polys over finite fields via
-/// NTL. If the characteristic is even special GF2 routines of NTL are used.  
+/// NTL. If the characteristic is even special GF2 routines of NTL are used.
 ///
 /// @return @a uniFactorizer returns a list of monic factors
-inline CFList 
+inline CFList
 uniFactorizer (const CanonicalForm& A, ///< [in] squarefree univariate poly
                const Variable& alpha,  ///< [in] algebraic variable
-               const bool& GF          ///< [in] GaloisFieldDomain? 
+               const bool& GF          ///< [in] GaloisFieldDomain?
               );
 
-/// naive factor recombination over an extension of the initial field. 
+/// naive factor recombination over an extension of the initial field.
 /// Uses precomputed data to exclude combinations that are not possible.
 ///
 /// @return @a extFactorRecombination returns a list of factors over the initial
-///         field, whose shift to zero is reversed. 
-/// @sa factorRecombination(), extEarlyFactorDetection()   
-inline CFList 
+///         field, whose shift to zero is reversed.
+/// @sa factorRecombination(), extEarlyFactorDetection()
+inline CFList
 extFactorRecombination (
-         const CFList& factors,     ///< [in] list of lifted factors that are 
+         const CFList& factors,     ///< [in] list of lifted factors that are
                                     ///< monic wrt Variable (1)
-         const CanonicalForm& F,    ///< [in] poly to be factored 
+         const CanonicalForm& F,    ///< [in] poly to be factored
          const CanonicalForm& M,    ///< [in] Variable (2)^liftBound
-         const ExtensionInfo& info, ///< [in] contains information about 
+         const ExtensionInfo& info, ///< [in] contains information about
                                     ///< extension
          const CanonicalForm& eval  ///< [in] evaluation point
                        );
 
-/// naive factor recombination. 
+/// naive factor recombination.
 /// Uses precomputed data to exclude combinations that are not possible.
 ///
 /// @return @a factorRecombination returns a list of factors of F.
 /// @sa extFactorRecombination(), earlyFactorDetectection()
-inline CFList 
+inline CFList
 factorRecombination (
                 const CFList& factors,      ///< [in] list of lifted factors
-                                            ///< that are monic wrt Variable (1) 
+                                            ///< that are monic wrt Variable (1)
                 const CanonicalForm& F,     ///< [in] poly to be factored
                 const CanonicalForm& M,     ///< [in] Variable (2)^liftBound
                 const DegreePattern& degs   ///< [in] degree pattern
@@ -304,25 +304,25 @@ factorRecombination (
 Variable chooseExtension (
                       const CanonicalForm & A, ///< [in] some bivariate poly
                       const Variable & beta    ///< [in] some algebraic
-                                               ///< variable 
+                                               ///< variable
                          );
 
 /// detects factors of @a F at stage @a deg of Hensel lifting.
 /// No combinations of more than one factor are tested. Lift bound and possible
-/// degree pattern are updated. 
-/// 
+/// degree pattern are updated.
+///
 /// @return @a earlyFactorDetection returns a list of factors of F (possibly in-
 ///         complete), in case of success. Otherwise an empty list.
 /// @sa factorRecombination(), extEarlyFactorDetection()
-inline CFList 
+inline CFList
 earlyFactorDetection (
            CanonicalForm& F,       ///< [in,out] poly to be factored, returns
                                    ///< poly divided by detected factors in case
                                    ///< of success
-           CFList& factors,        ///< [in,out] list of factors lifted up to 
+           CFList& factors,        ///< [in,out] list of factors lifted up to
                                    ///< @a deg, returns a list of factors
                                    ///< without detected factors
-           int& adaptedLiftBound,  ///< [in,out] adapted lift bound 
+           int& adaptedLiftBound,  ///< [in,out] adapted lift bound
            DegreePattern& degs,    ///< [in,out] degree pattern, is updated
                                    ///< whenever we find a factor
            bool& success,          ///< [in,out] indicating success
@@ -331,18 +331,18 @@ earlyFactorDetection (
 
 /// detects factors of @a F at stage @a deg of Hensel lifting.
 /// No combinations of more than one factor are tested. Lift bound and possible
-/// degree pattern are updated. 
-/// 
-/// @return @a extEarlyFactorDetection returns a list of factors of F (possibly 
+/// degree pattern are updated.
+///
+/// @return @a extEarlyFactorDetection returns a list of factors of F (possibly
 ///         incomplete), whose shift to zero is reversed, in case of success.
 ///         Otherwise an empty list.
 /// @sa factorRecombination(), earlyFactorDetection()
-inline CFList 
+inline CFList
 extEarlyFactorDetection (
-        CanonicalForm& F,          ///< [in,out] poly to be factored, returns  
-                                   ///< poly divided by detected factors in case 
+        CanonicalForm& F,          ///< [in,out] poly to be factored, returns
+                                   ///< poly divided by detected factors in case
                                    ///< of success
-        CFList& factors,           ///< [in,out] list of factors lifted up to 
+        CFList& factors,           ///< [in,out] list of factors lifted up to
                                    ///< @a deg, returns a list of factors
                                    ///< without detected factors
         int& adaptedLiftBound,     ///< [in,out] adapted lift bound
@@ -354,22 +354,22 @@ extEarlyFactorDetection (
         int deg                    ///< [in] stage of Hensel lifting
                       );
 
-/// hensel Lifting and early factor detection 
+/// hensel Lifting and early factor detection
 ///
-/// @return @a henselLiftAndEarly returns monic (wrt Variable (1)) lifted 
+/// @return @a henselLiftAndEarly returns monic (wrt Variable (1)) lifted
 ///         factors without factors which have been detected at an early stage
 ///         of Hensel lifting
-/// @sa earlyFactorDetection(), extEarlyFactorDetection()  
+/// @sa earlyFactorDetection(), extEarlyFactorDetection()
 
 inline CFList
 henselLiftAndEarly (
-        CanonicalForm& A,          ///< [in,out] poly to be factored,                                     
-                                   ///< returns poly divided by detected factors  
+        CanonicalForm& A,          ///< [in,out] poly to be factored,
+                                   ///< returns poly divided by detected factors
                                    ///< in case of success
         bool& earlySuccess,        ///< [in,out] indicating success
         CFList& earlyFactors,      ///< [in,out] list of factors detected
-                                   ///< at early stage of Hensel lifting 
-        DegreePattern& degs,       ///< [in,out] degree pattern 
+                                   ///< at early stage of Hensel lifting
+        DegreePattern& degs,       ///< [in,out] degree pattern
         int& liftBound,            ///< [in,out] (adapted) lift bound
         const CFList& uniFactors,  ///< [in] univariate factors
         const ExtensionInfo& info, ///< [in] information about extension
@@ -380,9 +380,9 @@ henselLiftAndEarly (
 ///
 /// @return @a extBiFactorize returns factorization of F over initial field
 /// @sa biFactorize()
-inline CFList 
-extBiFactorize (const CanonicalForm& F,    ///< [in] poly to be factored 
-                const ExtensionInfo& info  ///< [in] info about extension 
+inline CFList
+extBiFactorize (const CanonicalForm& F,    ///< [in] poly to be factored
+                const ExtensionInfo& info  ///< [in] info about extension
                );
 
 

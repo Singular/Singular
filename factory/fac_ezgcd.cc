@@ -135,7 +135,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
                 lcDD[1] = lcF;
                 lcDD[2] = lcF;
                 B *= lcF;
-		B_is_F=true;
+                B_is_F=true;
             }
             //else  if ( gcd( (DD[1] = Gb / Db), Db ) == 1 ) {
             else
@@ -152,7 +152,7 @@ ezgcd ( const CanonicalForm & FF, const CanonicalForm & GG, REvaluation & b, boo
                 lcDD[1] = lcG;
                 lcDD[2] = lcG;
                 B *= lcG;
-		B_is_F=false;
+                B_is_F=false;
               }
               else
               {

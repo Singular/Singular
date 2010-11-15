@@ -143,7 +143,7 @@ CanonicalForm AlgExtRandomF::generate() const
 {
     CanonicalForm result;
     for ( int i = 0; i < n; i++ )
-	result += power( algext, i ) * gen->generate();
+      result += power( algext, i ) * gen->generate();
     return result;
 };
 
@@ -155,19 +155,19 @@ CFRandom * AlgExtRandomF::clone () const
 CFRandom * CFRandomFactory::generate()
 {
     if ( getCharacteristic() == 0 )
-	return new IntRandom();
+        return new IntRandom();
     if ( getGFDegree() > 1 )
-	return new GFRandom();
+        return new GFRandom();
     else
-	return new FFRandom();
+        return new FFRandom();
 }
 
 int factoryrandom( int n )
 {
     if ( n == 0 )
-	return (int)ranGen.generate();
+        return (int)ranGen.generate();
     else
-	return ranGen.generate() % n;
+        return ranGen.generate() % n;
 }
 
 void factoryseed ( int s )

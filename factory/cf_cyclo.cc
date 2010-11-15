@@ -10,7 +10,7 @@
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
- * @internal 
+ * @internal
  * @version \$Id$
  *
 **/
@@ -30,10 +30,10 @@
 /// integer factorization using table look-ups,
 /// function may fail if integer contains primes which exceed the largest prime
 /// in our table
-int* integerFactorizer (const long integer, int& length, bool& fail) 
+int* integerFactorizer (const long integer, int& length, bool& fail)
 {
-  ASSERT (integer != 0 && integer != 1 && integer != -1, 
-          "non-zero non-unit expected"); 
+  ASSERT (integer != 0 && integer != 1 && integer != -1,
+          "non-zero non-unit expected");
   int* result;
   length= 0;
   fail= false;
@@ -42,41 +42,41 @@ int* integerFactorizer (const long integer, int& length, bool& fail)
     i = -integer;
 
   int exp= 0;
-  while ((i != 1) && (i%2 == 0)) 
+  while ((i != 1) && (i%2 == 0))
   {
     i /= 2;
     exp++;
   }
-  if (exp != 0) 
+  if (exp != 0)
   {
     result= new int [exp];
     for (int k= 0; k < exp; k++)
       result[k]= 2;
     length += exp;
-  } 
+  }
   if (i == 1) return result;
 
   long j= 0;
   exp= 0;
   int* buf;
   int next_prime;
-  while ((i != 1) && (j < 31937)) 
+  while ((i != 1) && (j < 31937))
   {
     next_prime= cf_getPrime (j);
-    while ((i != 1) && (i%next_prime == 0)) 
+    while ((i != 1) && (i%next_prime == 0))
     {
       i /= next_prime;
       exp++;
-    } 
-    if (exp != 0) 
+    }
+    if (exp != 0)
     {
-      buf= result; 
+      buf= result;
       result= new int [length + exp];
-      for (int k= 0; k < length; k++) 
+      for (int k= 0; k < length; k++)
         result [k]= buf[k];
       for (int k= 0; k < exp; k++)
         result [k + length]= next_prime;
-      length += exp; 
+      length += exp;
     }
     exp= 0;
     j++;
@@ -95,16 +95,16 @@ int* makeDistinct (int* factors, const int factors_length, int& length)
   int* result= new int [length];
   int* buf;
   result[0]= factors [0];
-  for (int i= 1; i < factors_length; i++) 
+  for (int i= 1; i < factors_length; i++)
   {
-    if (factors[i - 1] != factors[i]) 
+    if (factors[i - 1] != factors[i])
     {
       buf= result;
       result= new int [length + 1];
       for (int j= 0; j < length; j++)
         result[j]= buf [j];
-      result[length]= factors[i]; 
-      length++;   
+      result[length]= factors[i];
+      length++;
     }
   }
   return result;
@@ -112,7 +112,7 @@ int* makeDistinct (int* factors, const int factors_length, int& length)
 
 /// compute the n-th cyclotomic polynomial,
 /// function may fail if integer_factorizer fails to factorize n
-CanonicalForm cyclotomicPoly (int n, bool& fail) 
+CanonicalForm cyclotomicPoly (int n, bool& fail)
 {
   fail= false;
   Variable x= Variable (1);
@@ -132,15 +132,15 @@ CanonicalForm cyclotomicPoly (int n, bool& fail)
   for (int i= 0; i < distinct_factors_length; i++)
   {
     result= result (power (x, distinct_factors[i]), x)/result;
-    prod *= distinct_factors[i]; 
+    prod *= distinct_factors[i];
   }
   return result (power (x, n/prod), x);
 }
 
 #ifdef HAVE_NTL
 /// checks if alpha is a primitive element, alpha is assumed to be an algebraic
-/// variable over some finite prime field 
-bool isPrimitive (const Variable& alpha, bool& fail) 
+/// variable over some finite prime field
+bool isPrimitive (const Variable& alpha, bool& fail)
 {
   int p= getCharacteristic();
   CanonicalForm mipo= getMipo (alpha);

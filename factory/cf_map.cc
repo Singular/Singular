@@ -380,7 +380,7 @@ compress ( const CanonicalForm & f, const CanonicalForm & g, CFMap & M, CFMap & 
     degsf = degrees( f, degsf );
     degsg = degrees( g, degsg );
     optvalues( degsf, degsg, n, p1, pe );
-    
+
     i = 1; k = 1;
     if ( pe > 1 )
     {

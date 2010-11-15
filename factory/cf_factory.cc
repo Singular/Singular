@@ -28,24 +28,24 @@ InternalCF *
 CFFactory::basic ( int value )
 {
     if ( currenttype == IntegerDomain )
-	if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
-	    return int2imm( value );
-	else
-	    return new InternalInteger( value );
+        if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
+            return int2imm( value );
+        else
+            return new InternalInteger( value );
 //     else  if ( currenttype == RationalDomain )
-// 	if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
-// 	    return int2imm( value );
-// 	else
-// 	    return new InternalRational( value );
+//         if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
+//             return int2imm( value );
+//         else
+//             return new InternalRational( value );
     else  if ( currenttype == FiniteFieldDomain )
-	return int2imm_p( ff_norm( value ) );
+        return int2imm_p( ff_norm( value ) );
     else  if ( currenttype == GaloisFieldDomain )
-	return int2imm_gf( gf_int2gf( value ) );
+        return int2imm_gf( gf_int2gf( value ) );
     else  if ( currenttype == PrimePowerDomain )
-	return new InternalPrimePower( value );
+        return new InternalPrimePower( value );
     else {
-	ASSERT( 0, "illegal basic domain!" );
-	return 0;
+        ASSERT( 0, "illegal basic domain!" );
+        return 0;
     }
 }
 
@@ -53,24 +53,24 @@ InternalCF *
 CFFactory::basic ( int type, int value )
 {
     if ( type == IntegerDomain )
-	if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
-	    return int2imm( value );
-	else
-	    return new InternalInteger( value );
+        if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
+            return int2imm( value );
+        else
+            return new InternalInteger( value );
 //     else  if ( type == RationalDomain )
-// 	if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
-// 	    return int2imm( value );
-// 	else
-// 	    return new InternalRational( value );
+//         if ( value >= MINIMMEDIATE && value <= MAXIMMEDIATE )
+//             return int2imm( value );
+//         else
+//             return new InternalRational( value );
     else  if ( type == FiniteFieldDomain )
-	return int2imm_p( ff_norm( value ) );
+        return int2imm_p( ff_norm( value ) );
     else  if ( type == GaloisFieldDomain )
-	return int2imm_gf( gf_int2gf( value ) );
+        return int2imm_gf( gf_int2gf( value ) );
     else  if ( type == PrimePowerDomain )
-	return new InternalPrimePower( value );
+        return new InternalPrimePower( value );
     else {
-	ASSERT1( 0, "illegal basic domain (type = %d)!", type );
-	return 0;
+        ASSERT1( 0, "illegal basic domain (type = %d)!", type );
+        return 0;
     }
 }
 
@@ -78,42 +78,42 @@ InternalCF *
 CFFactory::basic ( const char * str )
 {
     if ( currenttype == IntegerDomain ) {
-	InternalInteger * dummy = new InternalInteger( str );
-	if ( dummy->is_imm() ) {
-	    InternalCF * res = int2imm( dummy->intval() );
-	    delete dummy;
-	    return res;
-	}
-	else
-	    return dummy;
+        InternalInteger * dummy = new InternalInteger( str );
+        if ( dummy->is_imm() ) {
+            InternalCF * res = int2imm( dummy->intval() );
+            delete dummy;
+            return res;
+        }
+        else
+            return dummy;
     }
 //     else  if ( currenttype == RationalDomain ) {
-// 	InternalRational * dummy = new InternalRational( str );
-// 	if ( dummy->is_imm() ) {
-// 	    InternalCF * res = int2imm( dummy->intval() );
-// 	    delete dummy;
-// 	    return res;
-// 	}
-// 	else
-// 	    return dummy;
+//         InternalRational * dummy = new InternalRational( str );
+//         if ( dummy->is_imm() ) {
+//             InternalCF * res = int2imm( dummy->intval() );
+//             delete dummy;
+//             return res;
+//         }
+//         else
+//             return dummy;
 //     }
     else  if ( currenttype == FiniteFieldDomain ) {
-	InternalInteger * dummy = new InternalInteger( str );
-	InternalCF * res = int2imm_p( dummy->intmod( ff_prime ) );
-	delete dummy;
-	return res;
+        InternalInteger * dummy = new InternalInteger( str );
+        InternalCF * res = int2imm_p( dummy->intmod( ff_prime ) );
+        delete dummy;
+        return res;
     }
     else  if ( currenttype == GaloisFieldDomain ) {
-	InternalInteger * dummy = new InternalInteger( str );
-	InternalCF * res = int2imm_gf( gf_int2gf( dummy->intmod( ff_prime ) ) );
-	delete dummy;
-	return res;
+        InternalInteger * dummy = new InternalInteger( str );
+        InternalCF * res = int2imm_gf( gf_int2gf( dummy->intmod( ff_prime ) ) );
+        delete dummy;
+        return res;
     }
     else  if ( currenttype == PrimePowerDomain )
-	return new InternalPrimePower( str );
+        return new InternalPrimePower( str );
     else {
-	ASSERT( 0, "illegal basic domain!" );
-	return 0;
+        ASSERT( 0, "illegal basic domain!" );
+        return 0;
     }
 }
 
@@ -121,42 +121,42 @@ InternalCF *
 CFFactory::basic ( const char * str, int base )
 {
     if ( currenttype == IntegerDomain ) {
-	InternalInteger * dummy = new InternalInteger( str, base );
-	if ( dummy->is_imm() ) {
-	    InternalCF * res = int2imm( dummy->intval() );
-	    delete dummy;
-	    return res;
-	}
-	else
-	    return dummy;
+        InternalInteger * dummy = new InternalInteger( str, base );
+        if ( dummy->is_imm() ) {
+            InternalCF * res = int2imm( dummy->intval() );
+            delete dummy;
+            return res;
+        }
+        else
+            return dummy;
     }
 //     else  if ( currenttype == RationalDomain ) {
-// 	InternalRational * dummy = new InternalRational( str );
-// 	if ( dummy->is_imm() ) {
-// 	    InternalCF * res = int2imm( dummy->intval() );
-// 	    delete dummy;
-// 	    return res;
-// 	}
-// 	else
-// 	    return dummy;
+//         InternalRational * dummy = new InternalRational( str );
+//         if ( dummy->is_imm() ) {
+//             InternalCF * res = int2imm( dummy->intval() );
+//             delete dummy;
+//             return res;
+//         }
+//         else
+//             return dummy;
 //     }
     else  if ( currenttype == FiniteFieldDomain ) {
-	InternalInteger * dummy = new InternalInteger( str, base );
-	InternalCF * res = int2imm_p( dummy->intmod( ff_prime ) );
-	delete dummy;
-	return res;
+        InternalInteger * dummy = new InternalInteger( str, base );
+        InternalCF * res = int2imm_p( dummy->intmod( ff_prime ) );
+        delete dummy;
+        return res;
     }
     else  if ( currenttype == GaloisFieldDomain ) {
-	InternalInteger * dummy = new InternalInteger( str, base );
-	InternalCF * res = int2imm_gf( gf_int2gf( dummy->intmod( ff_prime ) ) );
-	delete dummy;
-	return res;
+        InternalInteger * dummy = new InternalInteger( str, base );
+        InternalCF * res = int2imm_gf( gf_int2gf( dummy->intmod( ff_prime ) ) );
+        delete dummy;
+        return res;
     }
     else  if ( currenttype == PrimePowerDomain )
-	return new InternalPrimePower( str, base );
+        return new InternalPrimePower( str, base );
     else {
-	ASSERT( 0, "illegal basic domain!" );
-	return 0;
+        ASSERT( 0, "illegal basic domain!" );
+        return 0;
     }
 }
 
@@ -164,42 +164,42 @@ InternalCF *
 CFFactory::basic ( int type, const char * const str )
 {
     if ( type == IntegerDomain ) {
-	InternalInteger * dummy = new InternalInteger( str );
-	if ( dummy->is_imm() ) {
-	    InternalCF * res = int2imm( dummy->intval() );
-	    delete dummy;
-	    return res;
-	}
-	else
-	    return dummy;
+        InternalInteger * dummy = new InternalInteger( str );
+        if ( dummy->is_imm() ) {
+            InternalCF * res = int2imm( dummy->intval() );
+            delete dummy;
+            return res;
+        }
+        else
+            return dummy;
     }
 //     else  if ( type == RationalDomain ) {
-// 	InternalRational * dummy = new InternalRational( str );
-// 	if ( dummy->is_imm() ) {
-// 	    InternalCF * res = int2imm( dummy->intval() );
-// 	    delete dummy;
-// 	    return res;
-// 	}
-// 	else
-// 	    return dummy;
+//         InternalRational * dummy = new InternalRational( str );
+//         if ( dummy->is_imm() ) {
+//             InternalCF * res = int2imm( dummy->intval() );
+//             delete dummy;
+//             return res;
+//         }
+//         else
+//             return dummy;
 //     }
     else  if ( type == FiniteFieldDomain ) {
-	InternalInteger * dummy = new InternalInteger( str );
-	InternalCF * res = int2imm( dummy->intmod( ff_prime ) );
-	delete dummy;
-	return res;
+        InternalInteger * dummy = new InternalInteger( str );
+        InternalCF * res = int2imm( dummy->intmod( ff_prime ) );
+        delete dummy;
+        return res;
     }
     else  if ( type == GaloisFieldDomain ) {
-	InternalInteger * dummy = new InternalInteger( str );
-	InternalCF * res = int2imm_gf( gf_int2gf( dummy->intmod( ff_prime ) ) );
-	delete dummy;
-	return res;
+        InternalInteger * dummy = new InternalInteger( str );
+        InternalCF * res = int2imm_gf( gf_int2gf( dummy->intmod( ff_prime ) ) );
+        delete dummy;
+        return res;
     }
     else  if ( type == PrimePowerDomain )
-	return new InternalPrimePower( str );
+        return new InternalPrimePower( str );
     else {
-	ASSERT( 0, "illegal basic domain!" );
-	return 0;
+        ASSERT( 0, "illegal basic domain!" );
+        return 0;
     }
 }
 
@@ -207,27 +207,27 @@ InternalCF *
 CFFactory::basic ( int type, int value, bool nonimm )
 {
     if ( nonimm )
-	if ( type == IntegerDomain )
-	    return new InternalInteger( value );
- 	else  if ( type == RationalDomain )
- 	    return new InternalRational( value );
-	else {
-	    ASSERT( 0, "illegal basic domain!" );
-	    return 0;
-	}
+        if ( type == IntegerDomain )
+            return new InternalInteger( value );
+         else  if ( type == RationalDomain )
+             return new InternalRational( value );
+        else {
+            ASSERT( 0, "illegal basic domain!" );
+            return 0;
+        }
     else
-	return CFFactory::basic( type, value );
+        return CFFactory::basic( type, value );
 }
 
 InternalCF *
 CFFactory::basic ( const MP_INT & num )
 {
     if ( currenttype != IntegerDomain ) {
-	InternalPrimePower * dummy = new InternalPrimePower( num );
-	return (InternalCF*)(dummy->normalize_myself());
+        InternalPrimePower * dummy = new InternalPrimePower( num );
+        return (InternalCF*)(dummy->normalize_myself());
     }
     else
-	return new InternalInteger( num );
+        return new InternalInteger( num );
 }
 
 InternalCF *
@@ -241,29 +241,29 @@ InternalCF *
 CFFactory::rational ( const MP_INT & num, const MP_INT & den, bool normalize )
 {
     if ( normalize ) {
-	InternalRational * result = new InternalRational( num, den );
-	return result->normalize_myself();
+        InternalRational * result = new InternalRational( num, den );
+        return result->normalize_myself();
     }
     else
-	return new InternalRational( num, den );
+        return new InternalRational( num, den );
 }
 
 InternalCF *
 CFFactory::poly (  const Variable & v, int exp, const CanonicalForm & c )
 {
     if ( v.level() == LEVELBASE )
-	return c.getval();
+        return c.getval();
     else
-	return new InternalPoly( v, exp, c );
+        return new InternalPoly( v, exp, c );
 }
 
 InternalCF *
 CFFactory::poly ( const Variable & v, int exp )
 {
     if ( v.level() == LEVELBASE )
-	return CFFactory::basic( 1 );
+        return CFFactory::basic( 1 );
     else
-	return new InternalPoly( v, exp, 1 );
+        return new InternalPoly( v, exp, 1 );
 }
 
 MP_INT getmpi ( InternalCF * value, bool symmetric )
@@ -271,15 +271,15 @@ MP_INT getmpi ( InternalCF * value, bool symmetric )
     ASSERT( ! is_imm( value ) && ( value->levelcoeff() == PrimePowerDomain || value->levelcoeff() == IntegerDomain ), "illegal operation" );
     MP_INT dummy;
     if ( value->levelcoeff() == IntegerDomain )
-	mpz_init_set( &dummy, &InternalInteger::MPI( value ) );
+        mpz_init_set( &dummy, &InternalInteger::MPI( value ) );
     else  if ( symmetric ) {
-	mpz_init( &dummy );
-	if ( mpz_cmp( &InternalPrimePower::primepowhalf, &InternalPrimePower::MPI( value ) ) < 0 )
-	    mpz_sub( &dummy, &InternalPrimePower::MPI( value ), &InternalPrimePower::primepow );
-	else
-	    mpz_set( &dummy, &InternalPrimePower::MPI( value ) );
+        mpz_init( &dummy );
+        if ( mpz_cmp( &InternalPrimePower::primepowhalf, &InternalPrimePower::MPI( value ) ) < 0 )
+            mpz_sub( &dummy, &InternalPrimePower::MPI( value ), &InternalPrimePower::primepow );
+        else
+            mpz_set( &dummy, &InternalPrimePower::MPI( value ) );
     }
     else
-	mpz_init_set( &dummy, &InternalPrimePower::MPI( value ) );
+        mpz_init_set( &dummy, &InternalPrimePower::MPI( value ) );
     return dummy;
 }

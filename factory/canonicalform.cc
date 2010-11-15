@@ -1441,7 +1441,7 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
         if ( what == 0 )
             return g.value->bgcdcoeff( f.value );
         else if ( what == INTMARK && ! cf_glob_switches.isOn( SW_RATIONAL ) )
-	{
+        {
             // calculate gcd using standard integer
             // arithmetic
             int fInt = imm2int( f.value );
@@ -1451,7 +1451,7 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
             if ( gInt < 0 ) gInt = -gInt;
             // swap fInt and gInt
             if ( gInt > fInt )
-	    {
+            {
                 int swap = gInt;
                 gInt = fInt;
                 fInt = swap;
@@ -1459,7 +1459,7 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
 
             // now, 0 <= gInt <= fInt.  Start the loop.
             while ( gInt )
-	    {
+            {
                 // calculate (fInt, gInt) = (gInt, fInt%gInt)
                 int r = fInt % gInt;
                 fInt = gInt;
@@ -1468,7 +1468,7 @@ bgcd ( const CanonicalForm & f, const CanonicalForm & g )
 
             return CanonicalForm( fInt );
         }
-	else
+        else
             // we do not go for maximal speed for these stupid
             // special cases
             return CanonicalForm( f.isZero() && g.isZero() ? 0 : 1 );

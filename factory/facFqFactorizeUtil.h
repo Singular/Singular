@@ -1,9 +1,9 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file facFqFactorizeUtil.h
- * 
- * This file provides utility functions for multivariate factorization       
+ *
+ * This file provides utility functions for multivariate factorization
  *
  * @author Martin Lee
  *
@@ -22,16 +22,16 @@
 
 /// append @a factors2 to @a factors1 and decompress
 ///
-static inline 
+static inline
 void decompressAppend (CFList& factors1,       ///< [in,out] a list of polys,
                                                ///< returns @a factors2 appended
-                                               ///< to it and everything is 
+                                               ///< to it and everything is
                                                ///< decompressed
                        const CFList& factors2, ///< [in] a list of polys
                        const CFMap& N          ///< [in] a map
                       )
 {
-  for (CFListIterator i= factors1; i.hasItem(); i++) 
+  for (CFListIterator i= factors1; i.hasItem(); i++)
     i.getItem()= N (i.getItem());
   for (CFListIterator i= factors2; i.hasItem(); i++)
     factors1.append (N (i.getItem()));
@@ -39,37 +39,37 @@ void decompressAppend (CFList& factors1,       ///< [in,out] a list of polys,
 
 
 /// swap elements in @a factors2 and append them to @a factors1
-/// 
+///
 void appendSwap (CFList& factors1,       ///< [in,out] a list of polys,
-                                         ///< returns swapped elements of @a 
+                                         ///< returns swapped elements of @a
                                          ///< factors2 appended to it
                  const CFList& factors2, ///< [in] a list of polys
-                 const int swapLevel1,   ///< [in] level of variable to be 
+                 const int swapLevel1,   ///< [in] level of variable to be
                                          ///< swapped with x, 0 if no swapping
-                 const int swapLevel2,   ///< [in] level of variable to be 
+                 const int swapLevel2,   ///< [in] level of variable to be
                                          ///< swapped with x, 0 if no swapping
                  const Variable& x       ///< [in] a variable
                 );
 
 /// swap elements in @a factors
-void swap (CFList& factors,       ///< [in] a list of polys, returns swapped 
+void swap (CFList& factors,       ///< [in] a list of polys, returns swapped
                                   ///< elements of factors
-           const int swapLevel1, ///< [in] level of variable to be 
+           const int swapLevel1, ///< [in] level of variable to be
                                   ///< swapped with x, 0 if no swapping
-           const int swapLevel2, ///< [in] level of variable to be 
+           const int swapLevel2, ///< [in] level of variable to be
                                   ///< swapped with x, 0 if no swapping
            const Variable& x      ///< [in] a variable
           );
 
 /// swap elements of @a factors2, append them to @a factors1 and decompress
-void appendSwapDecompress ( 
+void appendSwapDecompress (
                   CFList& factors1,       ///< [in,out] a list of polys,
-                                          ///< returns swapped elements of @a 
-                                          ///< factors2 appended to it and 
+                                          ///< returns swapped elements of @a
+                                          ///< factors2 appended to it and
                                           ///< everything is decompressed
                   const CFList& factors2, ///< [in] a list of polys
                   const CFMap& N,         ///< [in] a map
-                  const int swapLevel,    ///< [in] level of variable to be 
+                  const int swapLevel,    ///< [in] level of variable to be
                                           ///< swapped with x, 0 if no swapping
                   const Variable& x       ///< [in] a variable
                           );
@@ -77,31 +77,31 @@ void appendSwapDecompress (
 /// swap elements of @a factors2, append them to @a factors1 and decompress
 void appendSwapDecompress (
                   CFList& factors1,       ///< [in,out] a list of polys,
-                                          ///< returns swapped elements of @a 
-                                          ///< factors2 appended to it and 
+                                          ///< returns swapped elements of @a
+                                          ///< factors2 appended to it and
                                           ///< everything is decompressed
                   const CFList& factors2, ///< [in] a list of polys
                   const CFMap& N,         ///< [in] a map
-                  const int swapLevel1,   ///< [in] level of variable to be 
+                  const int swapLevel1,   ///< [in] level of variable to be
                                           ///< swapped with x, 0 if no swapping
-                  const int swapLevel2,   ///< [in] level of variable to be 
+                  const int swapLevel2,   ///< [in] level of variable to be
                                           ///< swapped with x, 0 if no swapping
                   const Variable& x       ///< [in] a variable
-                          ); 
+                          );
 
 
 /// compute lifting bounds
 ///
-/// @return @a liftingBounds returns an array containing the lift bounds for A 
-int* liftingBounds (const CanonicalForm& A,    ///< [in] a compressed poly    
-                    const int& bivarLiftBound  ///< [in] lift bound for 
+/// @return @a liftingBounds returns an array containing the lift bounds for A
+int* liftingBounds (const CanonicalForm& A,    ///< [in] a compressed poly
+                    const int& bivarLiftBound  ///< [in] lift bound for
                                                ///< @a biFactorizer()
                    );
 
 /// shift evaluation point to zero
-/// @return @a shift2Zero returns @a F shifted by @a evaluation s.t. 0 is a 
+/// @return @a shift2Zero returns @a F shifted by @a evaluation s.t. 0 is a
 ///         valid evaluation point
-/// @sa evalPoints(), reverseShift() 
+/// @sa evalPoints(), reverseShift()
 CanonicalForm
 shift2Zero (const CanonicalForm& F,  ///< [in] a compressed poly
             CFList& Feval,           ///< [in,out] an empty list, returns
@@ -115,7 +115,7 @@ shift2Zero (const CanonicalForm& F,  ///< [in] a compressed poly
 /// @return @a reverseShift returns a poly whose shift to zero is reversed
 /// @sa shift2Zero(), evalPoints()
 CanonicalForm reverseShift (const CanonicalForm& F,  ///< [in] a compressed poly
-                            const CFList& evaluation ///< [in] a valid 
+                            const CFList& evaluation ///< [in] a valid
                                                      ///< evaluation point
                            );
 

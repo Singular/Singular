@@ -40,7 +40,7 @@ static CanonicalForm GFMapDown(const CanonicalForm & A, int k);
 
 
 
-static CanonicalForm 
+static CanonicalForm
 contentWRT0(const CanonicalForm & F, const int lev, const int lev0)
 // Computes the content of a polynomial, considering the variables of level
 // larger than lev as as parameters.
@@ -63,7 +63,7 @@ contentWRT0(const CanonicalForm & F, const int lev, const int lev0)
       for(; i.hasTerms(); i++)
       {
         CanonicalForm cc=i.coeff();
-        if (cc.level() > lev0) 
+        if (cc.level() > lev0)
           pol = contentWRT0(cc, lev, lev0-1 );
         else
           pol = contentWRT(cc, lev -1);
@@ -78,7 +78,7 @@ contentWRT0(const CanonicalForm & F, const int lev, const int lev0)
   }
 }
 
-static CanonicalForm 
+static CanonicalForm
 contentWRT(const CanonicalForm & F, const int lev)
 // Computes the content of a polynomial, considering the variables of level
 // larger than lev as as parameters.
@@ -107,7 +107,7 @@ contentWRT(const CanonicalForm & F, const int lev)
       for(; i.hasTerms(); i++)
       {
         CanonicalForm cc=i.coeff();
-        if (cc.level() > lev) 
+        if (cc.level() > lev)
           pol = contentWRT0(cc, lev, cc.level());
         else
           pol = contentWRT(i.coeff(), lev - 1);
@@ -363,7 +363,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
   //  cout << "fieldSize: " << fieldSize << endl;
   //  cout << "pow: " << ipower(p, k) << endl;
   //}
-  
+
   CFMap M,N;
   compress(A,B,M,N);
   A=M(A);
@@ -537,7 +537,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
           CanonicalForm temp=N(gcd( A, B));
           On(SW_USE_GCD_P);
           return temp;
-        } 
+        }
       }
       else
       {
@@ -559,7 +559,7 @@ CanonicalForm newGCD(CanonicalForm A, CanonicalForm B)
           CanonicalForm temp=N(gcd( A, B));
           On(SW_USE_GCD_P);
           return temp;
-        } 
+        }
       }
     }
     else

@@ -89,9 +89,9 @@ CFIterator::coeff () const
 {
     ASSERT( hasterms, "lib error: iterator out of terms" );
     if ( ispoly )
-	return cursor->coeff;
+        return cursor->coeff;
     else
-	return data;
+        return data;
 }
 //}}}
 
@@ -108,9 +108,9 @@ CFIterator::exp () const
 {
     ASSERT( hasterms, "lib error: iterator out of terms" );
     if ( ispoly )
-	return cursor->exp;
+        return cursor->exp;
     else
-	return 0;
+        return 0;
 }
 //}}}
 
@@ -131,10 +131,10 @@ CFIterator::operator ++ ()
 {
     ASSERT( hasterms, "lib error: iterator out of terms" );
     if ( ispoly ) {
-	cursor = cursor->next;
-	hasterms = cursor != 0;
+        cursor = cursor->next;
+        hasterms = cursor != 0;
     } else
-	hasterms = false;
+        hasterms = false;
 
     return *this;
 }
@@ -144,10 +144,10 @@ CFIterator::operator ++ ( int )
 {
     ASSERT( hasterms, "lib error: iterator out of terms" );
     if ( ispoly ) {
-	cursor = cursor->next;
-	hasterms = cursor != 0;
+        cursor = cursor->next;
+        hasterms = cursor != 0;
     } else
-	hasterms = false;
+        hasterms = false;
 
     return *this;
 }

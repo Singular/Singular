@@ -252,7 +252,7 @@ CF_INLINE
 CanonicalForm::~CanonicalForm ()
 {
     if ( (! is_imm( value )) && value->deleteObject() )
-	delete value;
+        delete value;
 }
 //}}}
 #endif
@@ -272,9 +272,9 @@ CF_INLINE CanonicalForm &
 CanonicalForm::operator = ( const CanonicalForm & cf )
 {
     if ( this != &cf ) {
-	if ( (! is_imm( value )) && value->deleteObject() )
-	    delete value;
-	value = (is_imm( cf.value )) ? cf.value : cf.value->copyObject();
+        if ( (! is_imm( value )) && value->deleteObject() )
+            delete value;
+        value = (is_imm( cf.value )) ? cf.value : cf.value->copyObject();
     }
     return *this;
 }
@@ -305,7 +305,7 @@ CF_INLINE CanonicalForm &
 CanonicalForm::operator = ( const int cf )
 {
     if ( (! is_imm( value )) && value->deleteObject() )
-	delete value;
+        delete value;
     value = CFFactory::basic( cf );
     return *this;
 }
@@ -350,7 +350,7 @@ CanonicalForm::operator = ( const int cf )
 // InternalPrimePower::isOne(), isZero()
 // Use `mpz_cpm_ui()' resp. `mpz_sgn()' to check the underlying
 // mpi.
-// 
+//
 //}}}
 CF_INLINE bool
 CanonicalForm::isOne () const
@@ -358,13 +358,13 @@ CanonicalForm::isOne () const
     int what = is_imm( value );
 
     if ( ! what )
-	return value->isOne();
+        return value->isOne();
     else  if ( what == INTMARK )
-	return imm_isone( value );
+        return imm_isone( value );
     else if ( what == FFMARK )
-	return imm_isone_p( value );
+        return imm_isone_p( value );
     else
-	return imm_isone_gf( value );
+        return imm_isone_gf( value );
 }
 
 CF_INLINE bool
@@ -373,13 +373,13 @@ CanonicalForm::isZero () const
     int what = is_imm( value );
 
     if ( what == 0 )
-	return value->isZero();
+        return value->isZero();
     else  if ( what == INTMARK )
-	return imm_iszero( value );
+        return imm_iszero( value );
     else if ( what == FFMARK )
-	return imm_iszero_p( value );
+        return imm_iszero_p( value );
     else
-	return imm_iszero_gf( value );
+        return imm_iszero_gf( value );
 }
 //}}}
 #endif
@@ -395,7 +395,7 @@ CanonicalForm::isZero () const
 // that to negate a canonical form a complete (deep) copy of it
 // has to be created.
 //
-// Type info: 
+// Type info:
 // ----------
 // cf: CurrentPP
 //
@@ -440,13 +440,13 @@ operator - ( const CanonicalForm & cf )
     int what = is_imm( result.value );
 
     if ( ! what )
-	result.value = result.value->neg();
+        result.value = result.value->neg();
     else  if ( what == INTMARK )
-	result.value = imm_neg( result.value );
+        result.value = imm_neg( result.value );
     else if ( what == FFMARK )
-	result.value = imm_neg_p( result.value );
+        result.value = imm_neg_p( result.value );
     else
-	result.value = imm_neg_gf( result.value );
+        result.value = imm_neg_gf( result.value );
 
     return result;
 }

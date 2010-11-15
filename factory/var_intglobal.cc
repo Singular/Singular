@@ -40,35 +40,35 @@ PrimitiveArray<T>::operator [] ( int i )
 {
     ASSERT( i >= 0, "array index less than zero" );
     if ( i < _size ) {
-	_initializedFlags[ i ] = true;
-	return _array[ i ];
+        _initializedFlags[ i ] = true;
+        return _array[ i ];
     } else {
-	// resize arrays
-	T * newArray = new T[ i+1 ];
-	bool * newFlags = new bool[ i+1 ];
-	int j = 0;
-	// copy old contents
-	while ( j < _size ) {
-	    newArray[ j ] = _array[ j ];
-	    newFlags[ j ] = _initializedFlags[ j ];
-	    j++;
-	}
-	// mark rest as uninitialized
-	while ( j < i ) {
-	    newFlags[ j ] = false;
-	    j++;
-	}
-	// actual element mark as initialized
-	newFlags[ i ] = true;
+        // resize arrays
+        T * newArray = new T[ i+1 ];
+        bool * newFlags = new bool[ i+1 ];
+        int j = 0;
+        // copy old contents
+        while ( j < _size ) {
+            newArray[ j ] = _array[ j ];
+            newFlags[ j ] = _initializedFlags[ j ];
+            j++;
+        }
+        // mark rest as uninitialized
+        while ( j < i ) {
+            newFlags[ j ] = false;
+            j++;
+        }
+        // actual element mark as initialized
+        newFlags[ i ] = true;
 
-	// make new arrays actual ones
-	delete [] _array;
-	delete [] _initializedFlags;
-	_array = newArray;
-	_initializedFlags = newFlags;
-	_size = i + 1;
+        // make new arrays actual ones
+        delete [] _array;
+        delete [] _initializedFlags;
+        _array = newArray;
+        _initializedFlags = newFlags;
+        _size = i + 1;
 
-	return _array[ i ];
+        return _array[ i ];
     }
 }
 //}}}
@@ -86,9 +86,9 @@ PrimitiveArray<T>::isInitialized ( int i ) const
 {
     ASSERT( i >= 0, "array index less than zero" );
     if ( i >= _size )
-	return false;
+        return false;
     else
-	return _initializedFlags[ i ];
+        return _initializedFlags[ i ];
 }
 //}}}
 
@@ -105,7 +105,7 @@ PrimitiveArray<T>::getFirstUninitialized () const
 {
     int i = 0;
     while ( i < _size && _initializedFlags[ i ] )
-	i++;
+        i++;
     return i;
 }
 //}}}
@@ -128,10 +128,10 @@ globalVarData::initializeLongName( char * longName )
 {
     delete [] _longName;
     if ( ! longName )
-	_longName = 0;
+        _longName = 0;
     else {
-	_longName = new char[ strlen( longName ) + 1 ];
-	strcpy( _longName, longName );
+        _longName = new char[ strlen( longName ) + 1 ];
+        strcpy( _longName, longName );
     }
 }
 //}}}
@@ -172,8 +172,8 @@ globalVarData &
 globalVarData::operator = ( const globalVarData & d )
 {
     if ( this != &d ) {
-	initializeLongName( d._longName );
-	_name = d._name;
+        initializeLongName( d._longName );
+        _name = d._name;
     }
     return *this;
 }
@@ -191,11 +191,11 @@ bool
 operator == ( const globalVarData & lhs, const globalVarData & rhs )
 {
     if ( ! lhs._longName && ! rhs._longName )
-	return true;
+        return true;
     if ( lhs._longName && rhs._longName )
-	return ! strcmp ( lhs._longName, rhs._longName );
+        return ! strcmp ( lhs._longName, rhs._longName );
     else
-	return false;
+        return false;
 }
 
 bool
@@ -215,9 +215,9 @@ globalAlgData &
 globalAlgData::operator = ( const globalAlgData & d )
 {
     if ( this != &d ) {
-	globalVarData::operator= ( d );
-	_mipo = d._mipo;
-	_reduce = d._reduce;
+        globalVarData::operator= ( d );
+        _mipo = d._mipo;
+        _reduce = d._reduce;
     }
     return *this;
 }
@@ -233,8 +233,8 @@ globalAlgNumData &
 globalAlgNumData::operator = ( const globalAlgNumData & d )
 {
     if ( this != &d ) {
-	(globalVarData)*this = d;
-	_prim = d._prim;
+        (globalVarData)*this = d;
+        _prim = d._prim;
     }
     return *this;
 }

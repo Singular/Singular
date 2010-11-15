@@ -3,7 +3,7 @@
 /** @file facAlgExt.cc
  *
  * @author Martin Lee
- * @date 
+ * @date
  *
  * Univariate factorization over algebraic extension of Q using Trager's
  * algorithm
@@ -11,7 +11,7 @@
  * @par Copyright:
  *   (c) by The SINGULAR Team, see LICENSE file
  *
- * @internal 
+ * @internal
  * @version \$Id$
  *
 **/
@@ -37,7 +37,7 @@ sqrfPart (const CanonicalForm& F)
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
   CanonicalForm G= deriv (F, F.mvar());
   G= gcd (F, G);
-  return F/G; 
+  return F/G;
 }
 
 // i is an integer such that Norm (F (x-i*alpha)) is squarefree
@@ -48,7 +48,7 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
   CanonicalForm g= F (x, alpha);
   CanonicalForm mipo= getMipo (alpha);
   mipo= mipo (x, alpha);
-  
+
   CanonicalForm norm= resultant (g, mipo, x);
   i= 0;
   int k;
@@ -87,9 +87,9 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
 {
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
-  
+
   On (SW_RATIONAL);
-  CanonicalForm f= F; 
+  CanonicalForm f= F;
   int shift;
   CanonicalForm norm= sqrfNorm (f, alpha, shift);
   ASSERT (degree (norm, alpha) <= 0, "wrong norm computed");
@@ -97,13 +97,13 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   CFList factors;
   if (normFactors.length() <= 2)
     return CFList (f);
-    
+
   normFactors.removeFirst();
   CanonicalForm buf;
   if (shift != 0)
     buf= f (f.mvar() - shift*alpha, f.mvar());
   else
-    buf= f;   
+    buf= f;
   CanonicalForm factor;
   for (CFFListIterator i= normFactors; i.hasItem(); i++)
   {
@@ -111,20 +111,20 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
     factor= gcd (buf, i.getItem().factor());
     buf /= factor;
     if (shift != 0)
-      factor= factor (f.mvar() + shift*alpha, f.mvar());      
+      factor= factor (f.mvar() + shift*alpha, f.mvar());
     factors.append (factor);
-  }  
+  }
   ASSERT (degree (buf) <= 0, "incomplete factorization");
   Off (SW_RATIONAL);
   return factors;
 }
 
-CFFList 
+CFFList
 AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
 {
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
-  
+
   if (F.inCoeffDomain())
     return CFFList (CFFactor (F, 1));
 
@@ -134,7 +134,7 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
   On (SW_RATIONAL);
   CanonicalForm buf= F/Lc (F);
   CFFList factors;
-  int multi; 
+  int multi;
   for (CFListIterator i= sqrfFactors; i.hasItem(); i++)
   {
     multi= 0;
@@ -145,10 +145,10 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
       multi++;
     }
     factors.append (CFFactor (i.getItem(), multi));
-  }  
+  }
   Off (SW_RATIONAL);
   factors.insert (CFFactor (Lc(F), 1));
   ASSERT (degree (buf) <= 0, "bug in AlgExtFactorize");
-  return factors;  
+  return factors;
 }
 

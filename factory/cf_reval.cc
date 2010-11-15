@@ -14,16 +14,16 @@
 REvaluation::REvaluation( const REvaluation & e )
 {
     if ( e.gen == 0 )
-	gen = 0;
+        gen = 0;
     else
-	gen = e.gen->clone();
+        gen = e.gen->clone();
     values = e.values;
 }
 
 REvaluation::~REvaluation()
 {
     if ( gen != 0 )
-	delete gen;
+        delete gen;
 }
 
 REvaluation&
@@ -31,12 +31,12 @@ REvaluation::operator= ( const REvaluation & e )
 {
     if ( this != &e ) {
         if (gen!=0)
-	  delete gen;
-	values = e.values;
-	if ( e.gen == 0 )
-	    gen = 0;
-	else
-	    gen = e.gen->clone();
+          delete gen;
+        values = e.values;
+        if ( e.gen == 0 )
+            gen = 0;
+        else
+            gen = e.gen->clone();
     }
     return *this;
 }
@@ -46,5 +46,5 @@ REvaluation::nextpoint()
 {
     int n = values.max();
     for ( int i = values.min(); i <= n; i++ )
-	values[i] = gen->generate();
+        values[i] = gen->generate();
 }

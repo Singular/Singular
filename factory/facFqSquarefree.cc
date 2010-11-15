@@ -1,11 +1,11 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file facFqSquarefree.cc
- * 
+ *
  * This file provides functions for squarefrees factorizing over
- * \f$ F_{p} \f$ , \f$ F_{p}(\alpha ) \f$ or GF, as decribed in "Factoring 
- * multivariate polynomials over a finite field" by L. Bernardin          
+ * \f$ F_{p} \f$ , \f$ F_{p}(\alpha ) \f$ or GF, as decribed in "Factoring
+ * multivariate polynomials over a finite field" by L. Bernardin
  *
  * @author Martin Lee
  *
@@ -25,21 +25,21 @@
 #include "cf_factory.h"
 #include "facFqSquarefree.h"
 
-static inline 
-CanonicalForm 
-pthRoot (const CanonicalForm & F, const int & q) 
+static inline
+CanonicalForm
+pthRoot (const CanonicalForm & F, const int & q)
 {
   CanonicalForm A= F;
   int p= getCharacteristic ();
-  if (A.inCoeffDomain()) 
+  if (A.inCoeffDomain())
   {
     A= power (A, q/p);
     return A;
   }
-  else 
+  else
   {
     CanonicalForm buf= 0;
-    for (CFIterator i= A; i.hasTerms(); i++) 
+    for (CFIterator i= A; i.hasTerms(); i++)
       buf= buf + power(A.mvar(), i.exp()/p)*pthRoot (i.coeff(), q);
     return buf;
   }
@@ -67,21 +67,21 @@ maxpthRoot (const CanonicalForm & F, const int & q, int& l)
     l++;
   }
   return result;
-} 
+}
 
-static inline 
-CFFList 
-sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & k, 
-            const Variable & alpha, CanonicalForm & c) 
-{ 
+static inline
+CFFList
+sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & k,
+            const Variable & alpha, CanonicalForm & c)
+{
   Variable buf= alpha;
   CanonicalForm b= deriv (F, x);
   bool GF= (CFFactory::gettype() == GaloisFieldDomain);
-  if (GF) 
+  if (GF)
     c= GCD_GF (F, b);
-  else if (GF == false && k != 1) 
+  else if (GF == false && k != 1)
     c= GCD_Fp_extension (F, b, buf);
-  else 
+  else
     c= GCD_small_p (F, b);
   CanonicalForm w= F/c;
   CanonicalForm v= b/c;
@@ -90,15 +90,15 @@ sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & k,
   int p= getCharacteristic();
   CanonicalForm g;
   CFFList result;
-  while (j < p - 1 && degree(u) >= 0) 
+  while (j < p - 1 && degree(u) >= 0)
   {
-    if (GF) 
+    if (GF)
       g= GCD_GF (w, u);
     else if (GF == false && k != 1)
-      g= GCD_Fp_extension (w, u, buf); 
-    else 
+      g= GCD_Fp_extension (w, u, buf);
+    else
       g= GCD_small_p (w, u);
-    if (degree(g) > 0) 
+    if (degree(g) > 0)
       result.append (CFFactor (g, j));
     w= w/g;
     c= c/w;
@@ -111,8 +111,8 @@ sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & k,
   return result;
 }
 
-CFFList 
-squarefreeFactorization (const CanonicalForm & F, const Variable & alpha) 
+CFFList
+squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
 {
   int p= getCharacteristic();
   CanonicalForm A= F;
@@ -122,44 +122,44 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   int l= x.level();
   int k;
   bool GF= false;
-  if (CFFactory::gettype() == GaloisFieldDomain) 
+  if (CFFactory::gettype() == GaloisFieldDomain)
   {
     k= getGFDegree();
     GF= true;
   }
-  if (alpha != Variable(1)) 
+  if (alpha != Variable(1))
     k= degree (getMipo (alpha));
-  else 
+  else
     k= 1;
   Variable buf, buf2;
   CanonicalForm tmp;
 
   CFFList tmp1, tmp2;
   bool found;
-  for (int i= l; i > 0; i--) 
+  for (int i= l; i > 0; i--)
   {
     buf= Variable (i);
-    if (degree (deriv (A, buf)) >= 0) 
+    if (degree (deriv (A, buf)) >= 0)
     {
       if (GF)
         tmp1= sqrfPosDer (A, buf, k, alpha, tmp);
-      else if (GF == false && alpha != Variable(1)) 
+      else if (GF == false && alpha != Variable(1))
         tmp1= sqrfPosDer (A, buf, k, alpha, tmp);
-      else 
+      else
         tmp1= sqrfPosDer (A, buf, 1, alpha, tmp);
-      A= tmp; 
-      for (CFFListIterator j= tmp1; j.hasItem(); j++) 
+      A= tmp;
+      for (CFFListIterator j= tmp1; j.hasItem(); j++)
       {
         found= false;
         CFFListIterator k= tmp2;
         if (!k.hasItem()) tmp2.append (j.getItem());
-        else 
-        { 
-          for (; k.hasItem(); k++) 
+        else
+        {
+          for (; k.hasItem(); k++)
           {
-            if (k.getItem().exp() == j.getItem().exp()) 
+            if (k.getItem().exp() == j.getItem().exp())
             {
-              k.getItem()= CFFactor (k.getItem().factor()*j.getItem().factor(), 
+              k.getItem()= CFFactor (k.getItem().factor()*j.getItem().factor(),
                                      j.getItem().exp());
               found= true;
             }
@@ -183,23 +183,23 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
 
   tmp1= squarefreeFactorization (buffer, alpha);
 
-  CFFList result;  
+  CFFList result;
   buf= alpha;
-  for (CFFListIterator i= tmp2; i.hasItem(); i++) 
+  for (CFFListIterator i= tmp2; i.hasItem(); i++)
   {
-    for (CFFListIterator j= tmp1; j.hasItem(); j++) 
+    for (CFFListIterator j= tmp1; j.hasItem(); j++)
     {
       if (GF)
-        tmp= GCD_GF (i.getItem().factor(), j.getItem().factor());      
-      else if (GF == false && buf == Variable (1)) 
-        tmp= GCD_small_p (i.getItem().factor(), j.getItem().factor()); 
-      else 
+        tmp= GCD_GF (i.getItem().factor(), j.getItem().factor());
+      else if (GF == false && buf == Variable (1))
+        tmp= GCD_small_p (i.getItem().factor(), j.getItem().factor());
+      else
         tmp= GCD_Fp_extension (i.getItem().factor(),j.getItem().factor(),buf);
       i.getItem()= CFFactor (i.getItem().factor()/tmp, i.getItem().exp());
       j.getItem()= CFFactor (j.getItem().factor()/tmp, j.getItem().exp());
       if (degree (tmp) > 0 && tmp.level() > 0)
-        result.append (CFFactor (M (tmp), 
-                       j.getItem().exp()*p + i.getItem().exp()));   
+        result.append (CFFactor (M (tmp),
+                       j.getItem().exp()*p + i.getItem().exp()));
     }
   }
   for (CFFListIterator i= tmp2; i.hasItem(); i++)
@@ -208,11 +208,11 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   for (CFFListIterator j= tmp1; j.hasItem(); j++)
     if (degree (j.getItem().factor()) > 0 && j.getItem().factor().level() >= 0)
       result.append (CFFactor (M (j.getItem().factor()), j.getItem().exp()*p));
-  return result;  
+  return result;
 }
 
-CanonicalForm 
-sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower, 
+CanonicalForm
+sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower,
           const Variable& alpha)
 {
   if (F.inCoeffDomain())
@@ -235,7 +235,7 @@ sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower,
     {
       allZero= false;
       break;
-    } 
+    }
   }
   if (allZero)
   {
@@ -246,7 +246,7 @@ sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower,
     w= GCD_GF (A, deriv (A, Variable (i)));
   else if (GF == false && alpha == Variable (1))
     w= GCD_small_p (A, deriv (A, Variable (i)));
-  else 
+  else
     w= GCD_Fp_extension (A, deriv (A, Variable (i)), vBuf);
 
   b= A/w;
@@ -263,7 +263,7 @@ sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower,
         w= GCD_GF (w, deriv (w, Variable (i)));
       else if (GF == false && vBuf == Variable (1))
         w= GCD_small_p (w, deriv (w, Variable (i)));
-      else 
+      else
         w= GCD_Fp_extension (w, deriv (w, Variable (i)), vBuf);
       b /= w;
       if (degree (b) < 1)
@@ -273,7 +273,7 @@ sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower,
         g= GCD_GF (b, result);
       else if (GF == false && vBuf == Variable (1))
         g= GCD_small_p (b, result);
-      else 
+      else
         g= GCD_Fp_extension (b, result, vBuf);
       if (degree (g) > 0)
         result *= b/g;

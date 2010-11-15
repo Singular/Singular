@@ -27,12 +27,12 @@ InternalPrimePower::InternalPrimePower( const int i )
 {
     mpz_init_set_si( &thempi, i );
     if ( mpz_cmp_si( &thempi, 0 ) < 0 ) {
-	mpz_neg( &thempi, &thempi );
-	mpz_mod( &thempi, &thempi, &primepow );
-	mpz_sub( &thempi, &primepow, &thempi );
+        mpz_neg( &thempi, &thempi );
+        mpz_mod( &thempi, &thempi, &primepow );
+        mpz_sub( &thempi, &primepow, &thempi );
     }
     else
-	mpz_mod( &thempi, &thempi, &primepow );
+        mpz_mod( &thempi, &thempi, &primepow );
 }
 
 InternalPrimePower::InternalPrimePower( const MP_INT & mpi ) : thempi( mpi ) {}
@@ -41,12 +41,12 @@ InternalPrimePower::InternalPrimePower( const char * str, const int base )
 {
     mpz_init_set_str( &thempi, str, base );
     if ( mpz_cmp_si( &thempi, 0 ) < 0 ) {
-	mpz_neg( &thempi, &thempi );
-	mpz_mod( &thempi, &thempi, &primepow );
-	mpz_sub( &thempi, &primepow, &thempi );
+        mpz_neg( &thempi, &thempi );
+        mpz_mod( &thempi, &thempi, &primepow );
+        mpz_sub( &thempi, &primepow, &thempi );
     }
     else
-	mpz_mod( &thempi, &thempi, &primepow );
+        mpz_mod( &thempi, &thempi, &primepow );
 }
 
 InternalPrimePower::~InternalPrimePower()
@@ -65,12 +65,12 @@ InternalCF * InternalPrimePower::normalize_myself()
 {
     ASSERT( getRefCount() == 1, "illegal operation" );
     if ( mpz_cmp_si( &thempi, 0 ) < 0 ) {
-	mpz_neg( &thempi, &thempi );
-	mpz_mod( &thempi, &thempi, &primepow );
-	mpz_sub( &thempi, &primepow, &thempi );
+        mpz_neg( &thempi, &thempi );
+        mpz_mod( &thempi, &thempi, &primepow );
+        mpz_sub( &thempi, &primepow, &thempi );
     }
     else
-	mpz_mod( &thempi, &thempi, &primepow );
+        mpz_mod( &thempi, &thempi, &primepow );
     return this;
 }
 
@@ -88,11 +88,11 @@ InternalPrimePower::setPrimePower( int p, int k )
 {
     ASSERT( p > 1 && k > 0, "illegal prime power" );
     if ( p != prime || k != exp ) {
-	mpz_set_si( &primepow, p );
-	mpz_pow_ui( &primepow, &primepow, (unsigned int)k );
-	mpz_fdiv_q_ui( &primepowhalf, &primepow, 2 );
-	prime = p;
-	exp = k;
+        mpz_set_si( &primepow, p );
+        mpz_pow_ui( &primepow, &primepow, (unsigned int)k );
+        mpz_fdiv_q_ui( &primepowhalf, &primepow, 2 );
+        prime = p;
+        exp = k;
     }
 }
 
@@ -112,14 +112,14 @@ InternalPrimePower::getk()
 void InternalPrimePower::print( OSTREAM & os, char * c )
 {
     if ( *c == '*' && mpz_cmp_si( &thempi, 1 ) == 0 )
-	os << c+1;
+        os << c+1;
     else if ( *c == '*' && mpz_cmp_si( &thempi, -1 ) == 0 )
-	os << '-' << c+1;
+        os << '-' << c+1;
     else {
-	char * str = new char[mpz_sizeinbase( &thempi, 10 ) + 2];
-	str = mpz_get_str( str, 10, &thempi );
-	os << str << c;
-	delete [] str;
+        char * str = new char[mpz_sizeinbase( &thempi, 10 ) + 2];
+        str = mpz_get_str( str, 10, &thempi );
+        os << str << c;
+        delete [] str;
     }
 }
 #endif /* NOSTREAMIO */
@@ -147,17 +147,17 @@ bool InternalPrimePower::is_imm() const
 InternalCF* InternalPrimePower::genZero()
 {
     if ( isZero() )
-	return copyObject();
+        return copyObject();
     else
-	return new InternalPrimePower();
+        return new InternalPrimePower();
 }
 
 InternalCF* InternalPrimePower::genOne()
 {
     if ( isOne() )
-	return copyObject();
+        return copyObject();
     else
-	return new InternalPrimePower();
+        return new InternalPrimePower();
 }
 
 //{{{ InternalCF * InternalPrimePower::neg ()
@@ -166,14 +166,14 @@ InternalCF *
 InternalPrimePower::neg ()
 {
     if ( getRefCount() > 1 ) {
-	decRefCount();
-	MP_INT dummy;
-	mpz_init( &dummy );
-	mpz_sub( &dummy, &primepow, &thempi );
-	return new InternalPrimePower( dummy );
+        decRefCount();
+        MP_INT dummy;
+        mpz_init( &dummy );
+        mpz_sub( &dummy, &primepow, &thempi );
+        return new InternalPrimePower( dummy );
     } else {
-	mpz_sub( &thempi, &primepow, &thempi );
-	return this;
+        mpz_sub( &thempi, &primepow, &thempi );
+        return this;
     }
 }
 //}}}
@@ -182,55 +182,55 @@ InternalPrimePower::neg ()
 InternalCF* InternalPrimePower::addsame( InternalCF * c )
 {
     if ( getRefCount() > 1 ) {
-	decRefCount();
-	MP_INT dummy;
-	mpz_init( &dummy );
-	mpz_add( &dummy, &thempi, &MPI( c ) );
-	if ( mpz_cmp( &dummy, &primepow ) >= 0 )
-	    mpz_sub( &dummy, &dummy, &primepow );
-	return new InternalPrimePower( dummy );
+        decRefCount();
+        MP_INT dummy;
+        mpz_init( &dummy );
+        mpz_add( &dummy, &thempi, &MPI( c ) );
+        if ( mpz_cmp( &dummy, &primepow ) >= 0 )
+            mpz_sub( &dummy, &dummy, &primepow );
+        return new InternalPrimePower( dummy );
     }
     else {
-	mpz_add( &thempi, &thempi, &MPI( c ) );
-	if ( mpz_cmp( &thempi, &primepow ) >= 0 )
-	    mpz_sub( &thempi, &thempi, &primepow );
-	return this;
+        mpz_add( &thempi, &thempi, &MPI( c ) );
+        if ( mpz_cmp( &thempi, &primepow ) >= 0 )
+            mpz_sub( &thempi, &thempi, &primepow );
+        return this;
     }
 }
 
 InternalCF* InternalPrimePower::subsame( InternalCF * c )
 {
     if ( getRefCount() > 1 ) {
-	decRefCount();
-	MP_INT dummy;
-	mpz_init( &dummy );
-	mpz_sub( &dummy, &thempi, &MPI( c ) );
-	if ( mpz_cmp_si( &dummy, 0 ) < 0 )
-	    mpz_add( &dummy, &dummy, &primepow );
-	return new InternalPrimePower( dummy );
+        decRefCount();
+        MP_INT dummy;
+        mpz_init( &dummy );
+        mpz_sub( &dummy, &thempi, &MPI( c ) );
+        if ( mpz_cmp_si( &dummy, 0 ) < 0 )
+            mpz_add( &dummy, &dummy, &primepow );
+        return new InternalPrimePower( dummy );
     }
     else {
-	mpz_sub( &thempi, &thempi, &MPI( c ) );
-	if ( mpz_cmp_si( &thempi, 0 ) < 0 )
-	    mpz_add( &thempi, &thempi, &primepow );
-	return this;
+        mpz_sub( &thempi, &thempi, &MPI( c ) );
+        if ( mpz_cmp_si( &thempi, 0 ) < 0 )
+            mpz_add( &thempi, &thempi, &primepow );
+        return this;
     }
 }
 
 InternalCF* InternalPrimePower::mulsame( InternalCF * c )
 {
     if ( getRefCount() > 1 ) {
-	decRefCount();
-	MP_INT dummy;
-	mpz_init( &dummy );
-	mpz_mul( &dummy, &thempi, &MPI( c ) );
-	mpz_mod( &dummy, &dummy, &primepow );
-	return new InternalPrimePower( dummy );
+        decRefCount();
+        MP_INT dummy;
+        mpz_init( &dummy );
+        mpz_mul( &dummy, &thempi, &MPI( c ) );
+        mpz_mod( &dummy, &dummy, &primepow );
+        return new InternalPrimePower( dummy );
     }
     else {
-	mpz_mul( &thempi, &thempi, &MPI( c ) );
-	mpz_mod( &thempi, &thempi, &primepow );
-	return this;
+        mpz_mul( &thempi, &thempi, &MPI( c ) );
+        mpz_mod( &thempi, &thempi, &primepow );
+        return this;
     }
 }
 
@@ -242,33 +242,33 @@ InternalCF* InternalPrimePower::dividesame( InternalCF * c )
 InternalCF* InternalPrimePower::divsame( InternalCF * c )
 {
     if ( c == this ) {
-	if ( deleteObject() ) delete this;
-	return CFFactory::basic( 1 );
+        if ( deleteObject() ) delete this;
+        return CFFactory::basic( 1 );
     }
     if ( getRefCount() > 1 ) {
-	decRefCount();
-	MP_INT dummy, a, b;
-	mpz_init( &dummy ); mpz_init( &a ); mpz_init( &b );
-	mpz_gcdext( &dummy, &a, &b, &primepow, &MPI( c ) );
-	ASSERT( mpz_cmp_si( &dummy, 1 ) == 0, "illegal inversion" );
-	mpz_clear( &dummy ); mpz_clear( &a );
-	if ( mpz_cmp_si( &b, 0 ) < 0 )
-	    mpz_add( &b, &b, &primepow );
-	mpz_mul( &b, &b, &thempi );
-	mpz_mod( &b, &b, &primepow );
-	return new InternalPrimePower( b );
+        decRefCount();
+        MP_INT dummy, a, b;
+        mpz_init( &dummy ); mpz_init( &a ); mpz_init( &b );
+        mpz_gcdext( &dummy, &a, &b, &primepow, &MPI( c ) );
+        ASSERT( mpz_cmp_si( &dummy, 1 ) == 0, "illegal inversion" );
+        mpz_clear( &dummy ); mpz_clear( &a );
+        if ( mpz_cmp_si( &b, 0 ) < 0 )
+            mpz_add( &b, &b, &primepow );
+        mpz_mul( &b, &b, &thempi );
+        mpz_mod( &b, &b, &primepow );
+        return new InternalPrimePower( b );
     }
     else {
-	MP_INT dummy, a, b;
-	mpz_init( &dummy ); mpz_init( &a ); mpz_init( &b );
-	mpz_gcdext( &dummy, &a, &b, &primepow, &MPI( c ) );
-	ASSERT( mpz_cmp_si( &dummy, 1 ) == 0, "illegal inversion" );
-	if ( mpz_cmp_si( &b, 0 ) < 0 )
-	    mpz_add( &b, &b, &primepow );
-	mpz_mul( &thempi, &b, &thempi );
-	mpz_mod( &thempi, &thempi, &primepow );
-	mpz_clear( &dummy ); mpz_clear( &a ); mpz_clear( &b );
-	return this;
+        MP_INT dummy, a, b;
+        mpz_init( &dummy ); mpz_init( &a ); mpz_init( &b );
+        mpz_gcdext( &dummy, &a, &b, &primepow, &MPI( c ) );
+        ASSERT( mpz_cmp_si( &dummy, 1 ) == 0, "illegal inversion" );
+        if ( mpz_cmp_si( &b, 0 ) < 0 )
+            mpz_add( &b, &b, &primepow );
+        mpz_mul( &thempi, &b, &thempi );
+        mpz_mod( &thempi, &thempi, &primepow );
+        mpz_clear( &dummy ); mpz_clear( &a ); mpz_clear( &b );
+        return this;
     }
 }
 
@@ -290,21 +290,21 @@ void
 InternalPrimePower::divremsame ( InternalCF * c, InternalCF * & quot, InternalCF * & rem )
 {
     if ( c == this ) {
-	quot = CFFactory::basic( 1 );
-	rem = CFFactory::basic( 0 );
+        quot = CFFactory::basic( 1 );
+        rem = CFFactory::basic( 0 );
     }
     else {
-	MP_INT dummy, a, b;
-	mpz_init( &dummy ); mpz_init( &a ); mpz_init( &b );
-	mpz_gcdext( &dummy, &a, &b, &primepow, &MPI( c ) );
-	ASSERT( mpz_cmp_si( &dummy, 1 ) == 0, "illegal inversion" );
-	mpz_clear( &dummy ); mpz_clear( &a );
-	if ( mpz_cmp_si( &b, 0 ) < 0 )
-	    mpz_add( &b, &b, &primepow );
-	mpz_mul( &b, &b, &thempi );
-	mpz_mod( &b, &b, &primepow );
-	quot = new InternalPrimePower( b );
-	rem = CFFactory::basic( 0 );
+        MP_INT dummy, a, b;
+        mpz_init( &dummy ); mpz_init( &a ); mpz_init( &b );
+        mpz_gcdext( &dummy, &a, &b, &primepow, &MPI( c ) );
+        ASSERT( mpz_cmp_si( &dummy, 1 ) == 0, "illegal inversion" );
+        mpz_clear( &dummy ); mpz_clear( &a );
+        if ( mpz_cmp_si( &b, 0 ) < 0 )
+            mpz_add( &b, &b, &primepow );
+        mpz_mul( &b, &b, &thempi );
+        mpz_mod( &b, &b, &primepow );
+        quot = new InternalPrimePower( b );
+        rem = CFFactory::basic( 0 );
     }
 }
 
