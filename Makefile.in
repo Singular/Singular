@@ -19,7 +19,7 @@ SUBDIRS		= @SUBDIRS@
 
 PERL		= @PERL@
 TMP_DIR		= @TMP_DIR@
-MYGZIP		= @MYGZIP@
+MYGZIP		= @MYGZIP@ -9
 GUNZIP		= @GUNZIP@
 
 ##############################################################
