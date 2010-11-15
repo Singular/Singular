@@ -587,16 +587,6 @@ evaluate( int maxtries, int sametries, int failtries, const CanonicalForm &f , c
   return minfactors;
 }
 
-#ifdef EXPERIMENTAL
-static int
-find_evaluation(int maxtries, int sametries, int failtries, const CanonicalForm &f , const Variable & Extension, SFormList & BestEvaluationpoint, CFFList & BestFactorisation ){
-  int success;
-
-  success=evaluate( maxtries, sametries, failtries, f , Extension, BestEvaluationpoint, BestFactorisation );
-  return success;
-}
-#endif
-
 ///////////////////////////////////////////////////////////////
 // A factorization routine for a sqrfree polynomial.         //
 // Returns the list of factors.                              //
@@ -819,7 +809,6 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
   }
 }
 
-// for debuggig:
 int cmpCF( const CFFactor & f, const CFFactor & g );
 
 ///////////////////////////////////////////////////////////////

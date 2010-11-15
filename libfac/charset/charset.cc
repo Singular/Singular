@@ -322,40 +322,6 @@ sort( const ListCFList & list_to_sort ){
   return output;
 }
 
-#ifdef EXPERIMENTAL
-static CFList
-getItemNr( int nr, const ListCFList & copy){
-  int i =1;
-  CFList elem;
-
-  for ( ListCFListIterator j=copy; j.hasItem(); j++ )
-    if ( i == nr ) { elem=j.getItem(); break; }
-    else { i+= 1; }
-  return elem;
-}
-
-static int
-choosefrom(){
-int choice;
-    CERR << "choose from qhi! ->";
-    CIN >> choice;
-return choice;
-}
-
-static ListCFList
-msort( const ListCFList & list_to_sort ){
-  int nr, number = list_to_sort.length();
-  ListCFList output;
-
-  CERR << "Sort: list to sort is: " <<  list_to_sort << "\n";
-  for (int i=1; i<= number; i++){
-    CERR << " Next elem = "; CIN >> nr;
-    output.append(getItemNr(nr,list_to_sort));
-  }
-  return output;
-}
-#endif
-
 #ifdef IRRCHARSERIESDEBUG
 #  define DEBUGOUTPUT
 #else
@@ -369,9 +335,6 @@ IrrCharSeries( const CFList &PS, int opt ){
   CFList qs,cs,factorset,is,ts;
   ListCFList pi,ppi,qqi,qsi,iss,qhi= ListCFList(PS);
   int nr_of_iteration=0,ts2,highestlevel=0;
-#ifdef EXPERIMENTAL
-  int choice=1;;
-#endif
 
 //  CERR << getCharacteristic() << "\n";
   for ( CFListIterator Ps=PS; Ps.hasItem(); Ps++ )
@@ -385,13 +348,7 @@ IrrCharSeries( const CFList &PS, int opt ){
   while ( ! qhi.isEmpty() ) {
     qhi=sort(qhi);
     DEBOUTLN(CERR, "qhi is: ", qhi);
-#ifdef EXPERIMENTAL
-    choice=choosefrom();
-    CERR <<"/n Choose " << choice << "\n";
-    qs= getItemNr(choice, qhi);
-#else
     qs=qhi.getFirst();
-#endif
     DEBOUTLN(CERR, "qs  is: ", qs);
     DEBOUTLN(CERR, "ppi is: ", ppi);
     ListCFList ppi1,ppi2;
