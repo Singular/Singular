@@ -5,7 +5,6 @@
 #ifndef HELPSTUFF_H
 #define HELPSTUFF_H
 bool mydivremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
-void mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b );
 ///////////////////////////////////////////////////////////////
 // Now some procedures used in MVMultiHensel and in Truefactors
 ///////////////////////////////////////////////////////////////

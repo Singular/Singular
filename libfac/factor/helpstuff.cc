@@ -10,7 +10,8 @@
 #include "helpstuff.h"
 
 bool
-mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
+mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b )
+{
   bool retvalue;
   CanonicalForm aa,bb;
   retvalue = divremt(f,g,a,bb);
@@ -18,16 +19,6 @@ mydivremt ( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, Ca
   if ( aa==bb ) { b=bb; }
   else { b=aa; }
   return retvalue;
-}
-
-void
-mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, CanonicalForm& b ){
-  bool retvalue;
-  CanonicalForm aa,bb;
-  retvalue = divremt(f,g,a,bb);
-  aa= f-g*a;
-  if ( aa==bb ) { b=bb; }
-  else { b=aa; }
 }
 
 // Now some procedures used in SqrFree and in Factor
@@ -39,13 +30,15 @@ mydivrem( const CanonicalForm& f, const CanonicalForm& g, CanonicalForm& a, Cano
 // e.g.: SqrFree( f^3 ) with char <> 3                       //
 ///////////////////////////////////////////////////////////////
 CFFList
-myappend( const CFFList & Inputlist, const CFFactor & TheFactor){
+myappend( const CFFList & Inputlist, const CFFactor & TheFactor)
+{
   CFFList Outputlist ;
   CFFactor copy;
   CFFListIterator i;
   int exp=0;
 
-  for ( i=Inputlist ; i.hasItem() ; i++ ){
+  for ( i=Inputlist ; i.hasItem() ; i++ )
+  {
     copy = i.getItem();
     if ( copy.factor() == TheFactor.factor() )
       exp += copy.exp();
@@ -57,7 +50,8 @@ myappend( const CFFList & Inputlist, const CFFactor & TheFactor){
 }
 
 CFFList
-myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2){
+myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2)
+{
   CFFList Outputlist;
   CFFListIterator i;
 
@@ -70,7 +64,8 @@ myUnion(const CFFList & Inputlist1,const CFFList & Inputlist2){
 }
 
 int
-Powerup( const int base , const int exp){
+Powerup( const int base , const int exp)
+{
   int retvalue=1;
   if ( exp == 0 )  return retvalue ;
   else for ( int i=1 ; i <= exp; i++ ) retvalue *= base ;
@@ -90,7 +85,8 @@ Powerup( const int base , const int exp){
 ///////////////////////////////////////////////////////////////
 static void
 modpower( const CanonicalForm & f, int k , int td,
-          const CanonicalForm & t, CanonicalForm & result){
+          const CanonicalForm & t, CanonicalForm & result)
+{
 
   if ( td >= k ) return;
   if ( getNumVars(f) == 0 ) result += f*t;
@@ -102,14 +98,17 @@ modpower( const CanonicalForm & f, int k , int td,
 }
 
 CanonicalForm
-mod_power( const CanonicalForm & f, int k, int levelU){
+mod_power( const CanonicalForm & f, int k, int levelU)
+{
   CanonicalForm result,dummy;
   Variable x(levelU);
 
   if ( levelU > level(f) )
     modpower(f,k,0,1,result);
-  else{
-    for ( CFIterator i=f; i.hasTerms(); i++){
+  else
+  {
+    for ( CFIterator i=f; i.hasTerms(); i++)
+    {
       dummy = 0;
       modpower(i.coeff(),k,0,1,dummy);
       result += dummy * power(x,i.exp());
@@ -127,10 +126,12 @@ mod_power( const CanonicalForm & f, int k, int levelU){
 // Return the deg of F in the Variables x_1,..,x_(levelF-1)  //
 ///////////////////////////////////////////////////////////////
 int
-subvardegree( const CanonicalForm & F, int levelF ){
+subvardegree( const CanonicalForm & F, int levelF )
+{
   int n=0,m=degree(F,levelF),newn=0;
 
-  for ( int k=0; k<=m; k++ ){
+  for ( int k=0; k<=m; k++ )
+  {
     newn = totaldegree( F[k] );
     if ( newn > n ) n=newn;
   }
@@ -141,12 +142,14 @@ subvardegree( const CanonicalForm & F, int levelF ){
 // Change poly:  x_i <- x_i +- a_i    for i= 1,..,level(f)-1 //
 ///////////////////////////////////////////////////////////////
 CanonicalForm
-change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int directionback ){
+change_poly( const CanonicalForm & f , const SFormList & Substitutionlist ,int directionback )
+{
   CanonicalForm F=f,g,k;
   int level_i;
 //  Variable x;
 
-  for ( SFormListIterator i=Substitutionlist; i.hasItem(); i++){
+  for ( SFormListIterator i=Substitutionlist; i.hasItem(); i++)
+  {
   // now we can access: i.getItem().factor()  -> level(~) gives x_i
   //                    i.getItem().exp()     -> gives a_i
   // ==> g = x_i ; k = a_i
