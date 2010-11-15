@@ -116,40 +116,6 @@ resultante( const CanonicalForm & f, const CanonicalForm& g, const Variable & v 
   if (!on_rational)  Off(SW_RATIONAL);
 
 return resultant(fz,gz,v);
-
-  CanonicalForm h, beta, help, F, G;
-  int delta;
-
-  DEBOUTLN( CERR, "resultante: called  f= ", f);
-  DEBOUTLN( CERR, "resultante: called  g= ", g);
-  DEBOUTLN( CERR, "resultante: called  v= ", v);
-  if ( f.mvar() < v || g.mvar() < v ){
-    DEBOUTMSG(CERR, "resultante: f.mvar() < v || g.mvar() < v");
-    return 1;
-  }
-
-  if ( f.degree( v ) < 1 || g.degree( v ) < 1 ){
-    DEBOUTMSG(CERR, "resultante: f.degree( v ) < 1 || g.degree( v ) < 1");
-    // If deg(F,v) == 0 , then resultante(F,G,v) = F^n, where n=deg(G,v)
-    if ( f.degree( v ) < 1 ) return power(f,degree(g,v));
-    else return power(g,degree(f,v));
-  }
-
-   if ( f.degree( v ) >= g.degree( v ) ) { F = f; G = g; }
-   else { G = f; F = g; }
-
-  h = CanonicalForm(1);
-  while ( G != G.genZero() ) {
-     delta= degree(F,v) -degree(G,v);
-     beta = power(CanonicalForm(-1), delta+1) * LC(F,v)* power(h, delta);
-     h= (h * power(LC(G,v), delta)) / power(h, delta);
-     help= G;
-     G= mypsr(F,G,v);
-     G= G/beta;
-     F=help;
-   }
-   if ( degree(F,v) != 0 ) F= CanonicalForm(0);
-   return F;
 }
 
 // sqr-free routine for algebraic extensions
@@ -529,26 +495,11 @@ alg_factor( const CanonicalForm & f, const CFList & Astar, const Variable & vmin
       }
       if (degree(i.getItem().factor()) > 0 )
       {
-        // undo linear transformation!!!! and then gcd!
-        //CERR << "algcd(" << g << "," << fnew << ",as" << as << ")" << "\n";
-        //out_cf("g=",g,"\n");
-        //out_cf("fnew=",fnew,"\n");
-        //h= algcd(g,fnew, as, oldord);
-        //if (as.length() >1)
-        //  h= algcd(g,fnew, as, oldord);
-        //else
           h=alg_gcd(g,fnew,as);
-        //out_cf(" -> algcd=",algcd(g,fnew, as, oldord),"\n");
-        //out_cf(" -> alg_gcd=",alg_gcd(g,fnew,as),"\n");
-        //CERR << "algcd result:" << h << "\n";
         DEBOUTLN(CERR, "  alg_factor: h= ", h);
         DEBOUTLN(CERR, "  alg_factor: oldord= ", oldord);
         if ( degree(h) > 0 )
         { //otherwise it's a constant
-          //CanonicalForm c=LC(h,g.mvar());
-          //out_cf("new lc h:",c,"\n");
-          //h= divide(h,c,as);
-          //out_cf("new factor h/c:",h,"\n");
           g= divide(g, h,as);
           DEBOUTLN(CERR, "alg_factor: g/h= ", g);
           DEBOUTLN(CERR, "alg_factor: s= ", s);
@@ -735,16 +686,8 @@ newfactoras( const CanonicalForm & f, const CFList & as, int &success){
   CFFList Factorlist;
   Varlist gcdord= Union(ord,newuord); gcdord.append(f.mvar());
   // This is for now. we need alg_sqrfree implemented!
-  //CERR << "algcd(" << f << "," << f.deriv() << " as:" << Astar <<"\n";
-  //CanonicalForm Fgcd= algcd(f,f.deriv(),Astar,gcdord);
   CanonicalForm Fgcd;
-        //if (Astar.length() >1)
-        //  Fgcd= algcd(f,f.deriv(),Astar,gcdord);
-        //else
           Fgcd= alg_gcd(f,f.deriv(),Astar);
-        //out_cf("algcd:",algcd(f,f.deriv(),Astar,gcdord),"\n");
-        //out_cf("alg_gcd:",alg_gcd(f,f.deriv(),Astar),"\n");
- // CERR << "algcd result:"  << Fgcd << "\n";
   if ( Fgcd == 0 ) DEBOUTMSG(CERR, "WARNING: p'th root ?");
   if (( degree(Fgcd, f.mvar()) > 0) && (!(f.deriv().isZero())) ){
     DEBOUTLN(CERR, "Nontrivial GCD found of ", f);
