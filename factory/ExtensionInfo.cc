@@ -65,7 +65,6 @@ ExtensionInfo::ExtensionInfo (const Variable& alpha, const bool extension)
   m_extension= extension;
 }
 
-#if 0
 ExtensionInfo::ExtensionInfo (const Variable& alpha)
 {
   m_alpha= alpha;
@@ -76,7 +75,6 @@ ExtensionInfo::ExtensionInfo (const Variable& alpha)
   m_GFName= 'Z';
   m_extension= true;
 }
-#endif
 
 ExtensionInfo::ExtensionInfo (const int nGFDegree, const char cGFName, const
                               bool extension)

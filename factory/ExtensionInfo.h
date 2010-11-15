@@ -98,8 +98,8 @@ public:
                  const bool extension   ///< [in] some bool
                 );
 
-  //ExtensionInfo (const Variable& alpha ///< [in] some algebraic variable
-  //              );
+  ExtensionInfo (const Variable& alpha ///< [in] some algebraic variable
+                );
 
   /// GF as initial field
   ExtensionInfo (const int nGFDegree,   ///< [in] GF degree of initial field
