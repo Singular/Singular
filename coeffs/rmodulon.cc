@@ -6,20 +6,20 @@
 * ABSTRACT: numbers modulo n
 */
 
-#include "config.h"
+#include <coeffs/config.h>
 #include <misc/auxiliary.h>
 
 #ifdef HAVE_RINGS
 
 #include <misc/mylimits.h>
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
-#include "numbers.h"
-#include "longrat.h"
-#include "mpr_complex.h"
-#include "rmodulon.h"
-#include "si_gmp.h"
+#include <coeffs/numbers.h>
+#include <coeffs/longrat.h>
+#include <coeffs/mpr_complex.h>
+#include <coeffs/rmodulon.h>
+#include <coeffs/si_gmp.h>
 
 #include <string.h>
 

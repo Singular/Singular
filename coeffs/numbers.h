@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 

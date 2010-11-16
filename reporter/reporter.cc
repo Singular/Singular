@@ -6,7 +6,7 @@
 * ABSTRACT: output system
 */
 
-#include "config.h"
+#include <reporter/config.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,10 +17,10 @@
 #include <unistd.h>
 
 #ifdef HAVE_PWD_H
-#include "pwd.h"
+#include <pwd.h>
 #endif
 
-#include "reporter.h"
+#include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
 //#include "options.h"
 

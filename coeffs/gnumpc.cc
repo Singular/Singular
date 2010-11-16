@@ -8,20 +8,20 @@
 * ngc == number gnu complex
 */
 
-#include "config.h"
+#include <coeffs/config.h>
 
-#include "coeffs.h"
-#include "numbers.h"
-#include "longrat.h"
-#include "modulop.h"
-#include "gnumpc.h"
-#include "gnumpfl.h"
-#include "mpr_complex.h"
+#include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
+#include <coeffs/longrat.h>
+#include <coeffs/modulop.h>
+#include <coeffs/gnumpc.h>
+#include <coeffs/gnumpfl.h>
+#include <coeffs/mpr_complex.h>
 #include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
 
 
-#include "shortfl.h"
+#include <coeffs/shortfl.h>
 
 /// Our Type!
 static const n_coeffType ID = n_long_C;

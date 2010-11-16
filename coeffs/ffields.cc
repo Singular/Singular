@@ -8,12 +8,12 @@
 
 #include <misc/auxiliary.h>
 #include <string.h>
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 #include <misc/mylimits.h>
 #include <omalloc/omalloc.h>
 #include <reporter/reporter.h>
-#include "numbers.h"
-#include "ffields.h"
+#include <coeffs/numbers.h>
+#include <coeffs/ffields.h>
 #include <resources/feFopen.h>
 #include <math.h>
 

@@ -8,7 +8,7 @@
 * ABSTRACT: numbers modulo n
 */
 #ifdef HAVE_RINGS
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 
 extern int nrzExp;
 extern NATNUMBER nrzModul;

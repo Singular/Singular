@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 
 /// Get a mapping function from src into the domain of this type: 
 nMapFunc  ngfSetMap(const coeffs src, const coeffs dst);

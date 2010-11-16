@@ -5,15 +5,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "config.h"
+#include <resources/config.h>
 
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
 #include <reporter/reporter.h>
 
-#include "feFopen.h"
-#include "feResource.h"
+#include <resources/feFopen.h>
+#include <resources/feResource.h>
 
 
 

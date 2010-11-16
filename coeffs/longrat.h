@@ -7,9 +7,9 @@
 /*
 * ABSTRACT: computation with long rational numbers
 */
-#include "coeffs.h"
-// #include "config.h"
-#include "si_gmp.h"
+#include <coeffs/coeffs.h>
+// #include <coeffs/config.h>
+#include <coeffs/si_gmp.h>
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 

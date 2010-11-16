@@ -7,14 +7,14 @@
 * ABSTRACT:
 */
 
-#include "shortfl.h"
+#include <coeffs/shortfl.h>
 
 #include <string.h>
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
-#include "numbers.h"
-#include "longrat.h"
-#include "mpr_complex.h"
+#include <coeffs/numbers.h>
+#include <coeffs/longrat.h>
+#include <coeffs/mpr_complex.h>
 
 #include <misc/mylimits.h>
 

@@ -1,21 +1,21 @@
-#include "config.h"
+#include <coeffs/config.h>
 
 #include <misc/auxiliary.h>
 
-#include <coeffs.h>
-#include <numbers.h>
+#include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
 #include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
 
-#include <longrat.h>
-#include <gnumpfl.h>
-#include <gnumpc.h>
-#include <shortfl.h>
-#include <ffields.h>
-#include <modulop.h>
-#include <rmodulon.h>
-#include <rmodulo2m.h>
-#include <rintegers.h>
+#include <coeffs/longrat.h>
+#include <coeffs/gnumpfl.h>
+#include <coeffs/gnumpc.h>
+#include <coeffs/shortfl.h>
+#include <coeffs/ffields.h>
+#include <coeffs/modulop.h>
+#include <coeffs/rmodulon.h>
+#include <coeffs/rmodulo2m.h>
+#include <coeffs/rintegers.h>
 
 #include <iostream>
 
