@@ -12,8 +12,8 @@
 #define DERROR_C
 #include <stdarg.h>
 #include <stdio.h>
-#include "config.h"
-#include "reporter.h"
+#include <reporter/config.h>
+#include <reporter/reporter.h>
 #ifdef HAVE_CONFIG_H
 #include <omalloc/omalloc.h>
 #endif

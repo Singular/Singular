@@ -7,17 +7,17 @@
 */
 
 #include <string.h>
-#include "config.h"
+#include <coeffs/config.h>
 #include <omalloc/omalloc.h>
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
-#include "numbers.h"
-#include "longrat.h"
-#include "mpr_complex.h"
+#include <coeffs/numbers.h>
+#include <coeffs/longrat.h>
+#include <coeffs/mpr_complex.h>
 #include <misc/mylimits.h>
-#include "modulop.h"
+#include <coeffs/modulop.h>
 #ifdef HAVE_FACTORY
-#include <factory.h>
+#include <factory/factory.h>
 #endif
 
 // int npGen=0;

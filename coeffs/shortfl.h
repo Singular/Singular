@@ -7,7 +7,7 @@
 * ABSTRACT
 */
 /* $Id$ */
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 
 
 /// Get a mapping function from src into the domain of this type: n_R

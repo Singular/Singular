@@ -9,12 +9,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "config.h"
+#include <coeffs/config.h>
 #include <reporter/reporter.h>
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 #include <omalloc/omalloc.h>
-#include "longrat.h"
-#include "numbers.h"
+#include <coeffs/longrat.h>
+#include <coeffs/numbers.h>
 
 #define SR_HDL(A) ((long)(A))
 //#define SR_INT    1 // already in longrat.h

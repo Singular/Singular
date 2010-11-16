@@ -44,15 +44,15 @@ static inline number nlShort3(number x) // assume x->s==3
 
 #include <string.h>
 #include <float.h>
-#include "config.h"
-#include "coeffs.h"
+#include <coeffs/config.h>
+#include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
-#include "numbers.h"
-#include "modulop.h"
-#include "shortfl.h"
-#include "mpr_complex.h"
-#include "longrat.h"
+#include <coeffs/numbers.h>
+#include <coeffs/modulop.h>
+#include <coeffs/shortfl.h>
+#include <coeffs/mpr_complex.h>
+#include <coeffs/longrat.h>
 
 
 #ifndef BYTES_PER_MP_LIMB

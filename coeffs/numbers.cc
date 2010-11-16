@@ -7,29 +7,28 @@
 * ABSTRACT: interface to coefficient aritmetics
 */
 
-#include "config.h"
+#include <coeffs/config.h>
 #include <misc/auxiliary.h>
 
 
 
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 
-#include "numbers.h"
+#include <coeffs/numbers.h>
 
 #include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
-#include "numbers.h"
-#include "longrat.h"
-#include "modulop.h"
-#include "gnumpfl.h"
-#include "gnumpc.h"
-#include "ffields.h"
-#include "shortfl.h"
-#include "longtrans.h"
+#include <coeffs/numbers.h>
+#include <coeffs/longrat.h>
+#include <coeffs/modulop.h>
+#include <coeffs/gnumpfl.h>
+#include <coeffs/gnumpc.h>
+#include <coeffs/ffields.h>
+#include <coeffs/shortfl.h>
 #ifdef HAVE_RINGS
-#include <rmodulo2m.h>
-#include <rmodulon.h>
-#include <rintegers.h>
+#include <coeffs/rmodulo2m.h>
+#include <coeffs/rmodulon.h>
+#include <coeffs/rintegers.h>
 #endif
 #include <string.h>
 #include <stdlib.h>

@@ -8,17 +8,17 @@
 * ngf == number gnu floats
 */
 
-#include "config.h"
-#include "coeffs.h"
+#include <coeffs/config.h>
+#include <coeffs/coeffs.h>
 #include <omalloc/omalloc.h>
 #include <reporter/reporter.h>
-#include "numbers.h"
-#include "modulop.h"
-#include "longrat.h"
-#include "shortfl.h"
+#include <coeffs/numbers.h>
+#include <coeffs/modulop.h>
+#include <coeffs/longrat.h>
+#include <coeffs/shortfl.h>
 
-#include <gnumpfl.h>
-#include <mpr_complex.h>
+#include <coeffs/gnumpfl.h>
+#include <coeffs/mpr_complex.h>
 
 extern size_t gmp_output_digits;
 //ring ngfMapRing; // to be used also in gnumpc.cc

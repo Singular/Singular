@@ -11,7 +11,7 @@
 #include <misc/auxiliary.h>
 /* for assume: */
 #include <reporter/reporter.h>
-#include <si_gmp.h>
+#include <coeffs/si_gmp.h>
 
 enum n_coeffType
 {

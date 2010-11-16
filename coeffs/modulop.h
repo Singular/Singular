@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
-#include "coeffs.h"
+#include <coeffs/coeffs.h>
 
 // defines are in struct.h
 // define if a*b is with mod instead of tables
