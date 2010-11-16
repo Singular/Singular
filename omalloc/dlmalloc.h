@@ -635,7 +635,7 @@ do {                                                                          \
 
 #if HAVE_USR_INCLUDE_MALLOC_H
 #include <malloc.h>
-#include <mylimits.h>
+#include <omalloc/mylimits.h>
 #else
 
 /* SVID2/XPG mallinfo structure */
