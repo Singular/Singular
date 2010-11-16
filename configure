@@ -5,6 +5,7 @@ PACKAGES="omalloc misc reporter resources coeffs"
 _PWD="$(pwd)"
 _TOP_ARGS="$@"
 _ARGS0="--prefix=$_PWD"
+prefix="/tmp/my"
 #_ARGS0="--libdir=$(pwd)/lib --includedir=$(pwd)/include"
 for d in $PACKAGES
 
