@@ -811,7 +811,7 @@ EXAMPLE: example rowred; shows an example
    matrix b = A;
    if (size(#) != 0) { b = concat(b,unitmat(m)); }
       for (l=1;l<=n;l=l+1)
-   {  pmat(d);
+   {
       k  = findfirst(ideal(d[l]),rk+1);
       if (k)
       {  rk = rk+1;
