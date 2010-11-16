@@ -19,7 +19,7 @@
 #include "longrat.h"
 #include "mpr_complex.h"
 #include "rmodulo2m.h"
-#include "si_gmp.h"
+#include <coeffs/si_gmp.h>
 
 #include <string.h>
 

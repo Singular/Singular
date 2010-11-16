@@ -9,12 +9,14 @@ SHELL		= /bin/sh
 ##
 ## various paths
 ##
-srcdir		= .
+top_srcdir	= @top_srcdir@
+top_builddir	= @top_builddir@
+srcdir		= @srcdir@
 prefix 		= @prefix@
 exec_prefix 	= @exec_prefix@
 libdir 		= @libdir@
 # includes are taken from here
-includedir	= @includedir@
+includedir	= @includedir@/coeffs
 
 ##
 ## various programs
@@ -34,12 +36,12 @@ PIPE		= -pipe
 CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ ${PIPE} -g
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-CPPFLAGS	= -I${srcdir} -I${includedir} -I${prefix}/include -I${prefix}/include/@project@
-LDFLAGS		= -L${libdir} -L${prefix}/lib -L${srcdir} -L${prefix}/lib/@project@
+CPPFLAGS	= -I${top_srcdir}/.. -I${top_builddir}/.. -I${srcdir}
+LDFLAGS		= -L${top_builddir}/../coeffs -L${top_builddir}/../reporter -L${top_builddir}/../resources -L${top_builddir}/../omalloc @LDFLAGS@
 DEFS		= -DNDEBUG -DOM_NDEBUG @DEFS@
 
-LIBS		=  @LIBPREFIX@ -lcoeffs -lreporter -lresource -lgmp -lomalloc_ndebug
-LIBSG		=  @LIBPREFIX@ -lcoeffs_g -lreporter -lresource -lgmp -lomalloc
+LIBS		=  @LIBPREFIX@ -lcoeffs -lreporter -lresources -lgmp -lomalloc_ndebug
+LIBSG		=  @LIBPREFIX@ -lcoeffs_g -lreporter -lresources -lgmp -lomalloc
 
 #-DHAVE_RINGS 
 # -DHAVE_RINGS # Doesn't work :(
@@ -86,7 +88,7 @@ libcoeffs.a: ${OBJS}
 ## ----------------------------------------------------------------------------
 ## debug version:
 FLAGSG         = -g ${PIPE}
-CXXFLAGSG       = -g ${PIPE}
+CXXFLAGSG       = -g ${PIPE} ${CXXFLAGS}
 DEFSG           = @DEFS@
 
 CCG             = ${CC}
