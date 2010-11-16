@@ -426,7 +426,7 @@ do
     cd $d || exit 1; 
     _ARGS="$_ARGS0 $_TOP_ARGS";
     if [ -e ./configure ]; then 
-      echo "./configure $_ARGS" && ./configure $_ARGS || exit 1;
+      echo "./configure --includedir=${prefix}/include/Singular/ --libdir=${prefix}/lib/Singular/ $_ARGS" && ./configure --includedir=${prefix}/include/Singular/ --libdir=${prefix}/lib/Singular/ $_ARGS || exit 1;
     fi
     cd ..;
    } || exit 1
