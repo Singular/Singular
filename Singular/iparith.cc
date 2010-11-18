@@ -206,40 +206,8 @@ extern BOOLEAN expected_parms;
 int iiOp; /* the current operation*/
 
 /*=================== operations with 2 args.: static proc =================*/
-static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
-{
-  lists Lforks = (lists)u->Data();
-  int t = (int)(long)v->Data();
-  int i = slStatusSsiL(Lforks, t*1000);
-  if ( i < 0 ) i = 0;
-  res->data = (void*)(long)i;
-  return FALSE;
-}
-/* returns 1 iff all forks are finished; 0 otherwise */
-static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
-{
-  lists Lforks = (lists)u->Data();
-  int timeout = 1000*(int)(long)v->Data();
-  lists oneFork=(lists)omAllocBin(slists_bin);
-  oneFork->Init(1);
-  int i;
-  int t = getTimer();
-  int ret = 1;
-  for (int j = 0; j <= Lforks->nr; j++)
-  {
-    oneFork->m[0].Copy(&Lforks->m[j]);
-    i = slStatusSsiL(oneFork, timeout);
-    if (i == 1)
-    {
-      timeout = timeout - getTimer() + t;
-    }
-    else { ret = 0; j = Lforks->nr+1; /* terminate the for loop */ }
-    omFreeSize((ADDRESS)oneFork->m,sizeof(sleftv));
-  }
-  omFreeBin((ADDRESS)oneFork, slists_bin);
-  res->data = (void*)(long)ret;
-  return FALSE;
-}
+/* must be ordered: first operations for chars (infix ops),
+ * then alphabetically */
 
 static BOOLEAN jjOP_IV_I(leftv res, leftv u, leftv v)
 {
@@ -2340,6 +2308,10 @@ static BOOLEAN jjLIFTSTD(leftv res, leftv u, leftv v)
   setFlag(res,FLAG_STD); v->flag=0;
   return FALSE;
 }
+static BOOLEAN jjLOAD2(leftv res, leftv u,leftv v)
+{
+  return jjLOAD(res, v,TRUE);
+}
 static BOOLEAN jjLOAD_E(leftv res, leftv v, leftv u)
 {
   char * s=(char *)u->Data();
@@ -3707,6 +3679,40 @@ static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
+{
+  lists Lforks = (lists)u->Data();
+  int t = (int)(long)v->Data();
+  int i = slStatusSsiL(Lforks, t*1000);
+  if ( i < 0 ) i = 0;
+  res->data = (void*)(long)i;
+  return FALSE;
+}
+static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
+{
+/* returns 1 iff all forks are finished; 0 otherwise */
+  lists Lforks = (lists)u->Data();
+  int timeout = 1000*(int)(long)v->Data();
+  lists oneFork=(lists)omAllocBin(slists_bin);
+  oneFork->Init(1);
+  int i;
+  int t = getTimer();
+  int ret = 1;
+  for (int j = 0; j <= Lforks->nr; j++)
+  {
+    oneFork->m[0].Copy(&Lforks->m[j]);
+    i = slStatusSsiL(oneFork, timeout);
+    if (i == 1)
+    {
+      timeout = timeout - getTimer() + t;
+    }
+    else { ret = 0; j = Lforks->nr+1; /* terminate the for loop */ }
+    omFreeSize((ADDRESS)oneFork->m,sizeof(sleftv));
+  }
+  omFreeBin((ADDRESS)oneFork, slists_bin);
+  res->data = (void*)(long)ret;
+  return FALSE;
+}
 static BOOLEAN jjWEDGE(leftv res, leftv u, leftv v)
 {
   res->data = (char *)mpWedge((matrix)u->Data(),(int)(long)v->Data());
@@ -3720,32 +3726,8 @@ static BOOLEAN jjWRONG(leftv res, leftv u)
 }
 
 /*=================== operations with 1 arg.: static proc =================*/
-
-BOOLEAN jjWAIT1ST1(leftv res, leftv a)
-{
-  lists Lforks = (lists)a->Data();
-  int i = slStatusSsiL(Lforks, -1);
-  while (i <= 0) i = slStatusSsiL(Lforks, 10000000); /* redo this all 10 seconds */
-  res->data = (void*)(long)i;
-  return FALSE;
-}
-
-BOOLEAN jjWAITALL1(leftv res, leftv a)
-{
-  lists Lforks = (lists)a->Data();
-  lists oneFork=(lists)omAllocBin(slists_bin);
-  oneFork->Init(1);
-  int i;
-  for (int j = 0; j <= Lforks->nr; j++)
-  {
-    oneFork->m[0].Copy(&Lforks->m[j]);
-    i = slStatusSsiL(oneFork, -1);
-    while (i != 1) i = slStatusSsiL(oneFork, 10000000); /* redo this all 10 seconds */
-    omFreeSize((ADDRESS)oneFork->m,sizeof(sleftv));
-  }
-  omFreeBin((ADDRESS)oneFork, slists_bin);
-  return FALSE;
-}
+/* must be ordered: first operations for chars (infix ops),
+ * then alphabetically */
 
 static BOOLEAN jjDUMMY(leftv res, leftv u)
 {
@@ -4458,6 +4440,10 @@ static BOOLEAN jjLEADMONOM(leftv res, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjLOAD1(leftv res, leftv v)
+{
+  return jjLOAD(res, v,FALSE);
+}
 static BOOLEAN jjLISTRING(leftv res, leftv v)
 {
   ring r=rCompose((lists)v->Data());
@@ -5088,6 +5074,32 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
   res->data = (char *)(long)scMult0Int((ideal)v->Data(),currQuotient);
   return FALSE;
 }
+BOOLEAN jjWAIT1ST1(leftv res, leftv a)
+{
+  lists Lforks = (lists)a->Data();
+  int i = slStatusSsiL(Lforks, -1);
+  while (i <= 0) i = slStatusSsiL(Lforks, 10000000); /* redo this all 10 seconds */
+  res->data = (void*)(long)i;
+  return FALSE;
+}
+
+BOOLEAN jjWAITALL1(leftv res, leftv a)
+{
+  lists Lforks = (lists)a->Data();
+  lists oneFork=(lists)omAllocBin(slists_bin);
+  oneFork->Init(1);
+  int i;
+  for (int j = 0; j <= Lforks->nr; j++)
+  {
+    oneFork->m[0].Copy(&Lforks->m[j]);
+    i = slStatusSsiL(oneFork, -1);
+    while (i != 1) i = slStatusSsiL(oneFork, 10000000); /* redo this all 10 seconds */
+    omFreeSize((ADDRESS)oneFork->m,sizeof(sleftv));
+  }
+  omFreeBin((ADDRESS)oneFork, slists_bin);
+  return FALSE;
+}
+
 #ifdef HAVE_FANS
 static BOOLEAN jjCONERAYS1(leftv res, leftv v)
 {
@@ -5233,10 +5245,6 @@ static BOOLEAN jjADJACENCY1(leftv res, leftv v)
   return FALSE;
 }*/
 #endif /* HAVE_FANS */
-static BOOLEAN jjLOAD1(leftv res, leftv v)
-{
-  return jjLOAD(res, v,iiOp==LIB_CMD);
-}
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 {
   char * s=(char *)v->CopyD();
@@ -5512,6 +5520,8 @@ static BOOLEAN jjnlInt(leftv res, leftv u)
   return FALSE;
 }
 /*=================== operations with 3 args.: static proc =================*/
+/* must be ordered: first operations for chars (infix ops),
+ * then alphabetically */
 static BOOLEAN jjBRACK_S(leftv res, leftv u, leftv v,leftv w)
 {
   char *s= (char *)u->Data();
@@ -6753,6 +6763,8 @@ static BOOLEAN jjSTD_HILB_W(leftv res, leftv u, leftv v, leftv w)
 }
 
 /*=================== operations with many arg.: static proc =================*/
+/* must be ordered: first operations for chars (infix ops),
+ * then alphabetically */
 static BOOLEAN jjBREAK0(leftv res, leftv v)
 {
 #ifdef HAVE_SDB
@@ -7919,6 +7931,8 @@ static Subexpr jjMakeSub(leftv e)
 #include <iparith.inc>
 
 /*=================== operations with 2 args. ============================*/
+/* must be ordered: first operations for chars (infix ops),
+ * then alphabetically */
 
 BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 {
@@ -8132,6 +8146,8 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
 }
 
 /*==================== operations with 1 arg. ===============================*/
+/* must be ordered: first operations for chars (infix ops),
+ * then alphabetically */
 
 BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 {
@@ -8325,6 +8341,8 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
 }
 
 /*=================== operations with 3 args. ============================*/
+/* must be ordered: first operations for chars (infix ops),
+ * then alphabetically */
 
 BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
 {
@@ -8537,6 +8555,8 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
   return TRUE;
 }
 /*==================== operations with many arg. ===============================*/
+/* must be ordered: first operations for chars (infix ops),
+ * then alphabetically */
 
 BOOLEAN jjANY2LIST(leftv res, leftv v, int cnt)
 {
