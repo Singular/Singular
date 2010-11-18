@@ -1,9 +1,25 @@
 #ifdef IPARITH
+// additional to the usual types: INT_CMD etc.
+// thre are special types:
+// for the input:
+// IDHDL: argument must have a name
+// DEF_CMD: no restriktions on the argument
+// ANY_TYPE: changes to pseudo data (for "defined", "typeof", etc.)
+// with the following subfields
+//        - name !=NULL
+//        - data := original type id
+
+// for the output:
+// NONE: does not return a value
+// ANY_TYPE: various types, the routines have to set it
+
+// the procedures have to be wrapped into the macro D(...)
+// with the exception of jjWRONG... (which always fails)
 /*=================== operations with 1 arg.: table =================*/
 struct sValCmd1 dArith1[]=
 {
 // operations:
-// proc         cmd               res             arg           plural
+// proc            cmd               res             arg            context
  {D(jjPLUSPLUS),   PLUSPLUS,        NONE,           IDHDL         , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjPLUSPLUS),   MINUSMINUS,      NONE,           IDHDL         , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjUMINUS_I),   '-',             INT_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
@@ -15,7 +31,6 @@ struct sValCmd1 dArith1[]=
 ,{D(jjUMINUS_IV),  '-',             INTVEC_CMD,     INTVEC_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjUMINUS_IV),  '-',             INTMAT_CMD,     INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjPROC1),      '(',             ANY_TYPE/*set by p*/,PROC_CMD , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLOAD1),      '(',             NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
 // and the procedures with 1 argument:
 ,{D(atATTRIB1),    ATTRIB_CMD,      NONE,           DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjBAREISS_IM), BAREISS_CMD,     INTMAT_CMD,     INTMAT_CMD  , NO_PLURAL |ALLOW_RING}
@@ -153,7 +168,6 @@ struct sValCmd1 dArith1[]=
 ,{D(jjLEADEXP),    LEADEXP_CMD,     INTVEC_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLEADMONOM),  LEADMONOM_CMD,   POLY_CMD,       POLY_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLEADMONOM),  LEADMONOM_CMD,   VECTOR_CMD,     VECTOR_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLOAD1),      LIB_CMD,         NONE,           STRING_CMD    , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjDUMMY),      LINK_CMD,        LINK_CMD,       LINK_CMD      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL1MANY),  LIST_CMD,        LIST_CMD,       DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
 ,{  jjWRONG ,      MAP_CMD,         0,              ANY_TYPE      , ALLOW_PLURAL |ALLOW_RING}
@@ -285,7 +299,7 @@ struct sValCmd1 dArith1[]=
 struct sValCmd2 dArith2[]=
 {
 // operations:
-// proc        cmd              res             arg1        arg2   plural
+// proc           cmd              res             arg1        arg2   context
  {D(jjCOLCOL),    COLONCOLON,     ANY_TYPE,       DEF_CMD,    DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_I),    '+',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPLUS_BI),   '+',            BIGINT_CMD,     BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -391,7 +405,7 @@ struct sValCmd2 dArith2[]=
 ,{D(jjLT_I),      '<',            INT_CMD,        INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjLT_BI),     '<',            INT_CMD,        BIGINT_CMD, BIGINT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjLT_N),      '<',            INT_CMD,        NUMBER_CMD, NUMBER_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{D(jjCOMPARE_IV_I),'<',           INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjCOMPARE_IV_I),'<',          INT_CMD,        INTVEC_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_IV),'<',            INT_CMD,        INTVEC_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_S), '<',            INT_CMD,        STRING_CMD, STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOMPARE_P), '<',            INT_CMD,        POLY_CMD,   POLY_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -459,12 +473,12 @@ struct sValCmd2 dArith2[]=
 ,{D(jjINDEX_V_IV),'[',            VECTOR_CMD,     VECTOR_CMD, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjPROC),      '(',            ANY_TYPE/*set by p*/,PROC_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjMAP),       '(',            ANY_TYPE/*set by p*/,MAP_CMD, DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
+,{D(jjLOAD2),     '(',            NONE,             LIB_CMD,    STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjKLAMMER),   '(',            ANY_TYPE/*set by p*/,ANY_TYPE, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjKLAMMER_IV),'(',            ANY_TYPE/*set by p*/,ANY_TYPE, INTVEC_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjCOLON),     ':',            INTVEC_CMD,     INT_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 // and the procedures with 2 arguments:
 ,{D(atATTRIB2),   ATTRIB_CMD,     NONE/*set by p*/,DEF_CMD,   STRING_CMD, ALLOW_PLURAL | ALLOW_RING}
-,{  jjWRONG2 ,    BAREISS_CMD,    0,              DEF_CMD,    DEF_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjBETTI2),    BETTI_CMD,      INTMAT_CMD,     LIST_CMD,   INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(syBetti2),    BETTI_CMD,      INTMAT_CMD,     RESOLUTION_CMD, INT_CMD, ALLOW_PLURAL | ALLOW_RING}
 ,{D(jjBETTI2_ID), BETTI_CMD,      INTMAT_CMD,     IDEAL_CMD,  INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -669,7 +683,7 @@ struct sValCmd2 dArith2[]=
 struct sValCmd3 dArith3[]=
 {
 // operations:
-// proc             cmd          res         arg1        arg2        arg3   plural
+// proc                cmd          res         arg1        arg2        arg3   context
  {D(jjBRACK_S),        '[',        STRING_CMD, STRING_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Im),       '[',        INT_CMD,    INTMAT_CMD, INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBRACK_Ma_I_IV),  '[',        INT_CMD,    INTMAT_CMD, INT_CMD,    INTVEC_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -784,7 +798,7 @@ struct sValCmd3 dArith3[]=
 struct sValCmdM dArithM[]=
 {
 // operations:
-// proc         cmd               res            number_of_args plural
+// proc            cmd               res        number_of_args   context
  {D(jjKLAMMER_PL),  '(',           ANY_TYPE,           -2      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK0),    BREAKPOINT_CMD,  NONE,               0       , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjBREAK1),    BREAKPOINT_CMD,  NONE,               -2      , ALLOW_PLURAL |ALLOW_RING}
@@ -804,6 +818,7 @@ struct sValCmdM dArithM[]=
 ,{D(jjCALL2ARG),  JET_CMD,         POLY_CMD,/*or set by p*/ 2  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3ARG),  JET_CMD,         POLY_CMD,/*or set by p*/ 3  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjJET4),      JET_CMD,         POLY_CMD,/*or set by p*/ 4  , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCALL1ARG),  LIB_CMD,         NONE,                1  , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIST_PL),   LIST_CMD,        LIST_CMD,           -1      , ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLU_INVERSE),LUI_CMD,         LIST_CMD,           -2      , NO_PLURAL |NO_RING}
 ,{D(jjLU_SOLVE),  LUS_CMD,         LIST_CMD,           -2      , NO_PLURAL |NO_RING}
@@ -867,7 +882,7 @@ cmdnames cmds[] =
   { "alias",       0, ALIAS_CMD ,         PARAMETER},
   { "and",         0, '&' ,               LOGIC_OP},
   { "attrib",      0, ATTRIB_CMD ,        CMD_123},
-  { "bareiss",     0, BAREISS_CMD ,       CMD_123},
+  { "bareiss",     0, BAREISS_CMD ,       CMD_13},
   { "betti",       0, BETTI_CMD ,         CMD_12},
   { "bigint",      0, BIGINT_CMD ,        ROOT_DECL},
   #ifdef HAVE_PLURAL
