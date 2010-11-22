@@ -2936,6 +2936,43 @@ void pRestoreDegProcs(ring r, pFDegProc old_FDeg, pLDegProc old_lDeg)
   r->pLDeg = old_lDeg;
 }
 
+/*-------- several access procedures to monomials -------------------- */
+/*
+* the module weights for std
+*/
+static pFDegProc pOldFDeg;
+static pLDegProc pOldLDeg;
+static intvec * pModW;
+static BOOLEAN pOldLexOrder;
+
+static long pModDeg(poly p, ring r = currRing)
+{
+  long d=pOldFDeg(p, r);
+  int c=p_GetComp(p, r);
+  if ((c>0) && ((r->pModW)->range(c-1))) d+= (*(r->pModW))[c-1];
+  return d;
+  //return pOldFDeg(p, r)+(*pModW)[p_GetComp(p, r)-1];
+}
+
+void p_SetModDeg(intvec *w, ring r)
+{
+  if (w!=NULL)
+  {
+    r->pModW = w;
+    pOldFDeg = r->pFDeg;
+    pOldLDeg = r->pLDeg;
+    pOldLexOrder = r->pLexOrder;
+    pSetDegProcs(r,pModDeg);
+    r->pLexOrder = TRUE;
+  }
+  else
+  {
+    r->pModW = NULL;
+    pRestoreDegProcs(pOldFDeg, pOldLDeg);
+    r->pLexOrder = pOldLexOrder;
+  }
+}
+
 
 /***************************************************************
  *

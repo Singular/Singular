@@ -32,43 +32,6 @@
 #include <kernel/ratgring.h>
 #endif
 
-/*-------- several access procedures to monomials -------------------- */
-/*
-* the module weights for std
-*/
-static pFDegProc pOldFDeg;
-static pLDegProc pOldLDeg;
-static intvec * pModW;
-static BOOLEAN pOldLexOrder;
-
-static long pModDeg(poly p, ring r = currRing)
-{
-  long d=pOldFDeg(p, r);
-  int c=p_GetComp(p, r);
-  if ((c>0) && (pModW->range(c-1))) d+= (*pModW)[c-1];
-  return d;
-  //return pOldFDeg(p, r)+(*pModW)[p_GetComp(p, r)-1];
-}
-
-void pSetModDeg(intvec *w)
-{
-  if (w!=NULL)
-  {
-    pModW = w;
-    pOldFDeg = pFDeg;
-    pOldLDeg = pLDeg;
-    pOldLexOrder = pLexOrder;
-    pSetDegProcs(pModDeg);
-    pLexOrder = TRUE;
-  }
-  else
-  {
-    pModW = NULL;
-    pRestoreDegProcs(pOldFDeg, pOldLDeg);
-    pLexOrder = pOldLexOrder;
-  }
-}
-
 
 /*3
 *  create binomial coef.
