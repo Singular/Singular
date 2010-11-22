@@ -2897,6 +2897,23 @@ void p_DeleteComp(poly * p,int k, const ring r)
     }
   }
 }
+/* -------------------------------------------------------- */
+/*2
+* change all global variables to fit the description of the new ring
+*/
+
+void p_SetGlobals(const ring r, BOOLEAN complete)
+{
+  int i;
+  if (r->ppNoether!=NULL) p_Delete(&ppNoether,r);
+
+  if (complete)
+  {
+    test &= ~ TEST_RINGDEP_OPTS;
+    test |= r->options;
+  }
+}
+
 /***************************************************************
  *
  * p_ShallowDelete
