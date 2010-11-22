@@ -697,14 +697,18 @@ static BOOLEAN jjPLUS_ID(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjMINUS_I(leftv res, leftv u, leftv v)
 {
-  unsigned int a=(unsigned int)(unsigned long)u->Data();
-  unsigned int b=(unsigned int)(unsigned long)v->Data();
+  void *ap=u->Data(); void *bp=v->Data();
+  int aa=(int)(long)ap;
+  int bb=(int)(long)bp;
+  int cc=aa-bb;
+  unsigned int a=(unsigned int)(unsigned long)ap;
+  unsigned int b=(unsigned int)(unsigned long)bp;
   unsigned int c=a-b;
   if (((Sy_bit(31)&a)!=(Sy_bit(31)&b))&&((Sy_bit(31)&a)!=(Sy_bit(31)&c)))
   {
     WarnS("int overflow(-), result may be wrong");
   }
-  res->data = (char *)((long)c);
+  res->data = (char *)((long)cc);
   return jjPLUSMINUS_Gen(res,u,v);
 }
 static BOOLEAN jjMINUS_BI(leftv res, leftv u, leftv v)
