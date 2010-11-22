@@ -247,13 +247,6 @@ static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 #define pWTotaldegree(p) p_WTotaldegree(p,currRing)
 #define pWDegree(poly p) p_WDegree(p,currRing)
 
-/*-------------pComp for syzygies:-------------------*/
-
-void pSetModDeg(intvec *w);
-
-
-
-
 /*-------------operations on polynomials:------------*/
 #define   pSub(a,b) p_Sub(a,b,currRing)
 

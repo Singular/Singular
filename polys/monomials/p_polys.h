@@ -1814,6 +1814,8 @@ void pSetDegProcs(ring r. pFDegProc new_FDeg, pLDegProc new_lDeg = NULL);
 // restores pFDeg and pLDeg:
 void pRestoreDegProcs(ring r. pFDegProc old_FDeg, pLDegProc old_lDeg);
 
+/*-------------pComp for syzygies:-------------------*/
+void p_SetModDeg(intvec *w, ring r);
 
 #endif // P_POLYS_H
 
