@@ -1804,5 +1804,16 @@ void      p_DeleteComp(poly * p,int k, const ring r);
 /*-------------ring management:----------------------*/
 void p_SetGlobals(const ring r, BOOLEAN complete = TRUE);
 
+// resets the pFDeg and pLDeg: if pLDeg is not given, it is
+// set to currRing->pLDegOrig, i.e. to the respective LDegProc which
+// only uses pFDeg (and not pDeg, or pTotalDegree, etc).
+// If you use this, make sure your procs does not make any assumptions
+// on ordering and/or OrdIndex -- otherwise they might return wrong results
+// on strat->tailRing
+void pSetDegProcs(ring r. pFDegProc new_FDeg, pLDegProc new_lDeg = NULL);
+// restores pFDeg and pLDeg:
+void pRestoreDegProcs(ring r. pFDegProc old_FDeg, pLDegProc old_lDeg);
+
+
 #endif // P_POLYS_H
 

@@ -24,14 +24,6 @@
 #include <sca.h>
 #endif
 
-/* ----------- global variables, set by pSetGlobals --------------------- */
-/* computes length and maximal degree of a POLYnomial */
-pLDegProc pLDeg;
-/* computes the degree of the initial term, used for std */
-pFDegProc pFDeg;
-/* the monomial ordering of the head monomials a and b */
-/* returns -1 if a comes before b, 0 if a=b, 1 otherwise */
-
 /* 1 for polynomial ring, -1 otherwise */
 int     pOrdSgn;
 // it is of type int, not BOOLEAN because it is also in ip
@@ -41,33 +33,6 @@ BOOLEAN pLexOrder;
 /* ----------- global variables, set by procedures from hecke/kstd1 ----- */
 /* the highest monomial below pHEdge */
 poly      ppNoether = NULL;
-
-// resets the pFDeg and pLDeg: if pLDeg is not given, it is
-// set to currRing->pLDegOrig, i.e. to the respective LDegProc which
-// only uses pFDeg (and not pDeg, or pTotalDegree, etc)
-void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg)
-{
-  assume(new_FDeg != NULL);
-  pFDeg = new_FDeg;
-  currRing->pFDeg = new_FDeg;
-
-  if (new_lDeg == NULL)
-    new_lDeg = currRing->pLDegOrig;
-
-  pLDeg = new_lDeg;
-  currRing->pLDeg = new_lDeg;
-}
-
-
-// restores pFDeg and pLDeg:
-extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg)
-{
-  assume(old_FDeg != NULL && old_lDeg != NULL);
-  pFDeg = old_FDeg;
-  currRing->pFDeg = old_FDeg;
-  pLDeg = old_lDeg;
-  currRing->pLDeg = old_lDeg;
-}
 
 #ifdef HAVE_RINGS   //TODO Oliver
 #define pDiv_nn(p, n)              p_Div_nn(p, n, currRing)
