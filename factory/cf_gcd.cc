@@ -565,7 +565,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     }
     else if (isOn( SW_USE_EZGCD_P ) && (!fc_and_gc_Univariate))
     {
-      if ( pe == 1 )
+      /*if ( pe == 1 )
         fc = fin_ezgcd( fc, gc );
       else if ( pe > 0 )// no variable at position 1
       {
@@ -579,7 +579,8 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
         fc = swapvar( fc, Variable(pe), Variable(1) );
         gc = swapvar( gc, Variable(pe), Variable(1) );
         fc = swapvar( fin_ezgcd( fc, gc ), Variable(1), Variable(pe) );
-      }
+      }*/
+      fc= EZGCD_P (fc, gc);
     }
     else if (isOn(SW_USE_GCD_P))
     {

@@ -54,7 +54,7 @@ int main(          /* main entry to Singular */
   On(SW_USE_CHINREM_GCD);
   //On(SW_USE_FF_MOD_GCD);
   //On(SW_USE_fieldGCD);
-  Off(SW_USE_EZGCD_P);
+  On(SW_USE_EZGCD_P);
   On(SW_USE_QGCD);
   Off(SW_USE_NTL_SORT); // may be changed by an command line option
 #endif

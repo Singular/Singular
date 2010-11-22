@@ -62,6 +62,38 @@ static inline CanonicalForm GCD_GF (const CanonicalForm& A, const CanonicalForm&
   return GCD_GF (A, B, list, top_level);
 }
 
+CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
+                           bool& topLevel, CFList& l);
+
+/// Zippel's sparse GCD over Fp
+static inline
+CanonicalForm sparseGCDFp (const CanonicalForm& A, const CanonicalForm& B)
+{
+  ASSERT (CFFactory::gettype() == GaloisFieldDomain, 
+          "GF as base field expected");
+  CFList list;
+  bool topLevel= true;
+  return sparseGCDFp (A, B, topLevel, list);
+}
+
+/// Zippel's sparse GCD over Fq
+CanonicalForm
+sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
+             const Variable& alpha, CFList& l, bool& topLevel);
+
+static inline
+CanonicalForm sparseGCDFq (const CanonicalForm& A, const CanonicalForm& B,
+                           const Variable& alpha)
+{
+  CFList list;
+  bool topLevel= true;
+  return sparseGCDFq (A, B, alpha, list, topLevel);
+}
+
+/// extended Zassenhaus GCD
+CanonicalForm
+EZGCD_P (const CanonicalForm& A, const CanonicalForm& B);
+
 CanonicalForm
 randomIrredpoly (int i, const Variable & x) ;
 #endif

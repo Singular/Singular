@@ -64,7 +64,9 @@ CFRandom * FFRandom::clone () const
 
 CanonicalForm GFRandom::generate () const
 {
-    return CanonicalForm( int2imm_gf( factoryrandom( gf_q ) ) );
+    int i= factoryrandom( gf_q );
+    if ( i == gf_q1 ) i++;
+    return CanonicalForm( int2imm_gf( i ) );
 }
 
 CFRandom * GFRandom::clone () const

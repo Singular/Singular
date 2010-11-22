@@ -363,6 +363,45 @@ henselLift (const CFList& eval,    ///< [in] a list of polynomials the last
             const int lLength     ///< [in] length of l
            );
 
+/// two factor Hensel lifting from univariate to bivariate, factors need not to
+/// be monic
+void
+henselLift122 (const CanonicalForm& F,///< [in] a bivariate poly
+               CFList& factors,       ///< [in, out] a list of univariate polys
+                                      ///< lifted factors
+               int l,                 ///< [in] lift bound
+               CFArray& Pi,           ///< [in, out] stores intermediate results
+               CFList& diophant,      ///< [in, out] result of diophantine
+               CFMatrix& M,           ///< [in, out] stores intermediate results
+               const CFArray& LCs,    ///< [in] leading coefficients
+               bool sort              ///< [in] if true factors are sorted by
+                                      ///< their degree
+              );
+
+/// two factor Hensel lifting from bivariate to multivariate, factors need not
+/// to be monic
+///
+/// @return @a henselLift122 returns a list of lifted factors
+CFList
+henselLift2 (const CFList& eval,   ///< [in] a list of polynomials the last
+                                   ///< element is a compressed multivariate
+                                   ///< poly, last but one element equals the
+                                   ///< last elements modulo its main variable
+                                   ///< and so on. The first element is a
+                                   ///< compressed bivariate poly.
+             const CFList& factors,///< [in] bivariate factors
+             int* l,               ///< [in] lift bounds
+             const int lLength,    ///< [in] length of l
+             bool sort,            ///< [in] if true factors are sorted by
+                                   ///< their degree in Variable(1)
+             const CFList& LCs1,   ///< [in] a list of evaluated LC of first
+                                   ///< factor
+             const CFList& LCs2,   ///< [in] a list of evaluated LC of second
+                                   ///< factor
+             const CFArray& Pi,    ///< [in] intermediate result
+             const CFList& diophant///< [in] result of diophantine
+            );
+
 #endif
 /* FAC_HENSEL_H */
 
