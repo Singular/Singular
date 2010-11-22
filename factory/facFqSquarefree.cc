@@ -127,7 +127,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
     k= getGFDegree();
     GF= true;
   }
-  if (alpha != Variable(1))
+  if (alpha.level() != 1)
     k= degree (getMipo (alpha));
   else
     k= 1;
@@ -143,7 +143,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
     {
       if (GF)
         tmp1= sqrfPosDer (A, buf, k, alpha, tmp);
-      else if (GF == false && alpha != Variable(1))
+      else if (GF == false && alpha.level() != 1)
         tmp1= sqrfPosDer (A, buf, k, alpha, tmp);
       else
         tmp1= sqrfPosDer (A, buf, 1, alpha, tmp);

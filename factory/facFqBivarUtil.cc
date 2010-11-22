@@ -184,9 +184,9 @@ void appendTestMapDown (CFList& factors, const CanonicalForm& f,
   CanonicalForm gamma= info.getGamma();
   CanonicalForm g= f;
   int degMipoBeta;
-  if (!k && beta == Variable(1))
+  if (!k && beta.level() == 1)
     degMipoBeta= 1;
-  else if (!k && beta != Variable(1))
+  else if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
   if (k > 1)
   {

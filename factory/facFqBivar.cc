@@ -76,7 +76,7 @@ CanonicalForm evalPoint (const CanonicalForm& F, CanonicalForm & eval,
   CanonicalForm random, mipo;
   double bound;
   int p= getCharacteristic ();
-  if (alpha != Variable(1))
+  if (alpha.level() != 1)
   {
     mipo= getMipo (alpha);
     int d= degree (mipo);
@@ -172,7 +172,7 @@ uniFactorizer (const CanonicalForm& A, const Variable& alpha, const bool& GF)
       i.getItem()= CFFactor (buf, i.getItem().exp());
     }
   }
-  else if (alpha != Variable(1))
+  else if (alpha.level() != 1)
   {
     if (getCharacteristic() > 2)
     {
@@ -247,9 +247,9 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
   DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, M) == F " <<
             (LC (F, 1)*prodMod (factors, M) == F));
   int degMipoBeta;
-  if (!k && beta == Variable(1))
+  if (!k && beta.level() == 1)
     degMipoBeta= 1;
-  else if (!k && beta != Variable(1))
+  else if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
   CFList T, S, Diff;
@@ -615,9 +615,9 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
     d= degree (F) + degree (LCBuf);
   CFList source, dest;
   int degMipoBeta;
-  if (!k && beta == Variable(1))
+  if (!k && beta.level() == 1)
     degMipoBeta= 1;
-  else if (!k && beta != Variable(1))
+  else if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
   for (CFListIterator i= factors; i.hasItem(); i++)
   {

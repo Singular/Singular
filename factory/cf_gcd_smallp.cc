@@ -1777,7 +1777,7 @@ evaluationPoints (const CanonicalForm& F, const CanonicalForm& G,
         result.append (genGF.generate());
         random += result.getLast()*power (x, i);
       }
-      else if (alpha != Variable(1))
+      else if (alpha.level() != 1)
       {
         AlgExtRandomF genAlgExt (alpha);
         result.append (genAlgExt.generate());

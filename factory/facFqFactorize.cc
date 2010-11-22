@@ -701,9 +701,9 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     return CFList();
 
   int degMipoBeta;
-  if (!k && beta == Variable(1))
+  if (!k && beta.level() == 1)
     degMipoBeta= 1;
-  else if (!k && beta != Variable(1))
+  else if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
   CFList T, S;
@@ -986,9 +986,9 @@ extLiftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
   int e= 0;
   int nBuf;
   int degMipoBeta;
-  if (!k && beta == Variable(1))
+  if (!k && beta.level() == 1)
     degMipoBeta= 1;
-  else if (!k && beta != Variable(1))
+  else if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
   for (CFListIterator i= factors; i.hasItem(); i++)
@@ -1135,9 +1135,9 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   CFList source, dest;
 
   int degMipoBeta;
-  if (!k && beta == Variable(1))
+  if (!k && beta.level() == 1)
     degMipoBeta= 1;
-  else if (!k && beta != Variable(1))
+  else if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
   for (CFListIterator i= factors; i.hasItem(); i++)
@@ -1237,7 +1237,7 @@ evalPoints (const CanonicalForm& F, CFList & eval, const Variable& alpha,
         result.append (genGF.generate());
         random += result.getLast()*power (x, i);
       }
-      else if (alpha != Variable(1))
+      else if (alpha.level() != 1)
       {
         AlgExtRandomF genAlgExt (alpha);
         result.append (genAlgExt.generate());
