@@ -65,8 +65,6 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
 #define pLmDelete(p)    p_LmDelete(p, currRing)
 // like pLmDelete, returns pNext(p)
 #define pLmDeleteAndNext(p) p_LmDeleteAndNext(p, currRing)
-// used by iparith.cc (pHead as proc)
-extern poly pHeadProc(poly p);
 
 /***************************************************************
  *
@@ -80,7 +78,6 @@ extern poly pHeadProc(poly p);
 #define pExpVectorAddSub(p1, p2, p3)p_ExpVectorAddSub(p1, p2, p3, currRing)
 #define pExpVectorSum(pr, p1, p2)   p_ExpVectorSum(pr, p1, p2, currRing)
 #define pExpVectorDiff(pr, p1, p2)  p_ExpVectorDiff(pr, p1, p2, currRing)
-#define pExpVectorEqual(p1, p2)     p_ExpVectorEqual(p1, p2, currRing)
 
 // Gets a copy of (resp. set) the exponent vector, where e is assumed
 // to point to (r->N +1)*sizeof(long) memory. Exponents are
@@ -100,7 +97,7 @@ extern poly pHeadProc(poly p);
 #define pLmCmpAction(p,q, actionE, actionG, actionS)  \
   _p_LmCmpAction(p,q,currRing, actionE, actionG,actionS)
 
-#define pLmEqual(p1, p2)     pExpVectorEqual(p1, p2)
+#define pLmEqual(p1, p2)     p_ExpVectorEqual(p1, p2, currRing)
 
 // pCmp: args may be NULL
 // returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
@@ -233,7 +230,6 @@ extern BOOLEAN  pVectorOut;
 
 
 /*-------------ring management:----------------------*/
-extern void pSetGlobals(const ring r, BOOLEAN complete = TRUE);
 
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which

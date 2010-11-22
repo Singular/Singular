@@ -42,27 +42,6 @@ BOOLEAN pLexOrder;
 /* the highest monomial below pHEdge */
 poly      ppNoether = NULL;
 
-/* -------------------------------------------------------- */
-/*2
-* change all global variables to fit the description of the new ring
-*/
-
-
-void pSetGlobals(const ring r, BOOLEAN complete)
-{
-  if (ppNoether!=NULL) pDelete(&ppNoether);
-  //pOrdSgn = r->OrdSgn;
-  //pFDeg=r->pFDeg;
-  //pLDeg=r->pLDeg;
-  //pLexOrder=r->LexOrder;
-
-  if (complete)
-  {
-    test &= ~ TEST_RINGDEP_OPTS;
-    test |= r->options;
-  }
-}
-
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which
 // only uses pFDeg (and not pDeg, or pTotalDegree, etc)

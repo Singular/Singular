@@ -1801,5 +1801,8 @@ poly      p_TakeOutComp(poly * p, int k);
 
 void      p_DeleteComp(poly * p,int k, const ring r);
 
+/*-------------ring management:----------------------*/
+void p_SetGlobals(const ring r, BOOLEAN complete = TRUE);
+
 #endif // P_POLYS_H
 
