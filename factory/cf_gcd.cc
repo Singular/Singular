@@ -563,7 +563,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     {
       return fieldGCD(f,g);
     }
-    else if (isOn( SW_USE_EZGCD_P ) && (!fc_and_gc_Univariate))
+    else if ((!fc_and_gc_Univariate) && (isOn( SW_USE_EZGCD_P )))
     {
       /*if ( pe == 1 )
         fc = fin_ezgcd( fc, gc );
