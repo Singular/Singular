@@ -1,11 +1,5 @@
 LIB "tst.lib";
-tst_ignore("CVS ID $Id$");
 tst_init();
-
-// tst_status();
-
-
-// killall();
 
 LIB "brnoeth.lib";
 
