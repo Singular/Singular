@@ -2913,6 +2913,29 @@ void p_SetGlobals(const ring r, BOOLEAN complete)
     test |= r->options;
   }
 }
+//
+// resets the pFDeg and pLDeg: if pLDeg is not given, it is
+// set to currRing->pLDegOrig, i.e. to the respective LDegProc which
+// only uses pFDeg (and not pDeg, or pTotalDegree, etc)
+void pSetDegProcs(ring r, pFDegProc new_FDeg, pLDegProc new_lDeg)
+{
+  assume(new_FDeg != NULL);
+  r->pFDeg = new_FDeg;
+
+  if (new_lDeg == NULL)
+    new_lDeg = r->pLDegOrig;
+
+  r->pLDeg = new_lDeg;
+}
+
+// restores pFDeg and pLDeg:
+void pRestoreDegProcs(ring r, pFDegProc old_FDeg, pLDegProc old_lDeg)
+{
+  assume(old_FDeg != NULL && old_lDeg != NULL);
+  r->pFDeg = old_FDeg;
+  r->pLDeg = old_lDeg;
+}
+
 
 /***************************************************************
  *

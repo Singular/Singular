@@ -229,18 +229,6 @@ extern BOOLEAN  pVectorOut;
 
 
 
-/*-------------ring management:----------------------*/
-
-// resets the pFDeg and pLDeg: if pLDeg is not given, it is
-// set to currRing->pLDegOrig, i.e. to the respective LDegProc which
-// only uses pFDeg (and not pDeg, or pTotalDegree, etc).
-// If you use this, make sure your procs does not make any assumptions
-// on ordering and/or OrdIndex -- otherwise they might return wrong results
-// on strat->tailRing
-extern void pSetDegProcs(pFDegProc new_FDeg, pLDegProc new_lDeg = NULL);
-// restores pFDeg and pLDeg:
-extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg);
-
 /*-----------the ordering of monomials:-------------*/
 #define pSetm(p)    p_Setm(p, currRing)
 // TODO:
@@ -251,8 +239,8 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg);
  * Degree stuff -- see p_polys.cc for explainations
  *
  ***************************************************************/
-extern pLDegProc pLDeg;
-extern pFDegProc pFDeg;
+static inline long  pFDeg(const poly p, const ring r)  { return r->pFDeg(p,r); }
+static inline long  pLDeg(const poly p,  int *l, const ring r)  { return r->pLDeg(p,l,r); }
 #define pWeight(c) p_Weight(c,currRing)
 #define pDeg(p)    p_Deg(p,currRing)
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
