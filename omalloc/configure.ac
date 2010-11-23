@@ -102,6 +102,7 @@ AC_PROG_CPP
 AC_PROG_RANLIB
 AC_PROG_LN_S
 AC_PROG_INSTALL
+AM_PROG_CC_C_O
 AC_C_CONST
 AC_C_INLINE
 
@@ -143,7 +144,7 @@ fi
 
 AC_CHECK_PROG(ADDR2LINE, addr2line, addr2line, no)
 if test "$ac_cv_prog_ADDR2LINE" = addr2line; then
-  AC_DEFINE_UNQUOTED(OM_PROG_ADDR2LINE, "$ac_cv_prog_ADDR2LINE")
+  AC_DEFINE_UNQUOTED(OM_PROG_ADDR2LINE, "$ac_cv_prog_ADDR2LINE", "Name of addr2line")
 fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -198,7 +199,7 @@ if test $ac_cv_pagesize -gt 8192; then
 fi
 AC_MSG_RESULT($ac_cv_pagesize)
 if test "$ac_cv_pagesize" = 4096 || test "$ac_cv_pagesize" = 8192; then
-  AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize)
+  AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize, "Page-size of the build-system")
 else
 AC_MSG_ERROR(need sytem page to be of size 4096 or 8192, but is $ac_cv_pagesize)
 fi
@@ -220,7 +221,7 @@ main()
 }], ac_cv_working_mmap=yes, ac_cv_working_mmap=no, ac_cv_working_mmap=no))
 AC_MSG_RESULT($ac_cv_working_mmap)
 if test "$ac_cv_working_mmap" = yes; then
-  AC_DEFINE(HAVE_WORKING_MMAP)
+  AC_DEFINE(HAVE_WORKING_MMAP,1,"Whether we have a working mmap")
 fi
 fi
 
@@ -246,13 +247,13 @@ dnl external config files
 dnl
 AC_MSG_CHECKING(for external config files)
 if test "${with_external_config_h+set}" = set; then
-    AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_H)
+    AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_H,1,"Whether we have external config.h")
     EXTERNAL_CONFIG_HEADER=${with_external_config_h}
     rm -f omExternalConfig.h
     cp ${with_external_config_h} omExternalConfig.h
 fi
 if test "${with_external_config_c+set}" = set; then
-    AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_C)
+    AC_DEFINE(OM_HAVE_EXTERNAL_CONFIG_C,1,"Wether we have an external config.c")
     EXTERNAL_CONFIG_SOURCE=${with_external_config_c}
 fi
 AC_SUBST(EXTERNAL_CONFIG_HEADER)
@@ -269,7 +270,7 @@ dnl
 AC_MSG_CHECKING(which malloc to use)
 if test "${with_malloc}" = system; then
   OM_MALLOC_HEADER=omMallocSystem.h
-  AC_DEFINE(OMALLOC_USES_MALLOC)
+  AC_DEFINE(OMALLOC_USES_MALLOC,1,"Whether omalloc uses malloc ()")
   if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
     AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
   fi
@@ -288,14 +289,14 @@ elif test "${with_malloc}" = external; then
   fi
   OM_MALLOC_HEADER=$with_external_malloc_h
   OM_MALLOC_SOURCE=$with_external_malloc_c
-  AC_DEFINE(OMALLOC_USES_MALLOC)
+  AC_DEFINE(OMALLOC_USES_MALLOC,1,"Whether omalloc uses malloc ()")
 elif test "${with_malloc}" = dlmalloc; then
   with_malloc=dlmalloc
   OM_MALLOC_HEADER=dlmalloc.h
   OM_MALLOC_SOURCE=dlmalloc.c
 else
   OM_MALLOC_HEADER=omMallocSystem.h
-  AC_DEFINE(OMALLOC_USES_MALLOC)
+  AC_DEFINE(OMALLOC_USES_MALLOC,1,"Whether omalloc uses malloc ()")
   if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
     AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
   fi
@@ -305,7 +306,7 @@ AC_MSG_RESULT($with_malloc)
 AC_SUBST(OM_MALLOC_HEADER)
 AC_SUBST(OM_MALLOC_SOURCE)
 if test "${OM_MALLOC_SOURCE+set}" = set; then
-  AC_DEFINE(OM_HAVE_MALLOC_SOURCE)
+  AC_DEFINE(OM_HAVE_MALLOC_SOURCE,1,"Whether we have the source for malloc ()")
 fi
 
 AC_MSG_CHECKING(whether malloc provides SizeOfAddr)
@@ -335,17 +336,17 @@ AC_MSG_RESULT(yes)
 fi
 fi
 if test "$ac_cv_malloc_sizeof_addr" != no; then
-AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR)
+AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR,1,"Whether malloc provides SIZEOF_ADDR")
 fi
 
 if test "${with_provide_malloc}" = malloc; then
-   AC_DEFINE(OM_PROVIDE_MALLOC, 3)
+   AC_DEFINE(OM_PROVIDE_MALLOC, 3, "Malloc type 3")
 elif test "${with_provide_malloc}" = debug; then
-   AC_DEFINE(OM_PROVIDE_MALLOC, 2)
+   AC_DEFINE(OM_PROVIDE_MALLOC, 2, "Malloc debug-mode")
 elif test "${with_provide_malloc}" = yes; then
-  AC_DEFINE(OM_PROVIDE_MALLOC, 1)
+  AC_DEFINE(OM_PROVIDE_MALLOC, 1, "Malloc type 1")
 else
-  AC_DEFINE(OM_PROVIDE_MALLOC, 0)
+  AC_DEFINE(OM_PROVIDE_MALLOC, 0, "No malloc")
 fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -386,14 +387,14 @@ AC_MSG_CHECKING(which valloc to use)
 if test "${with_valloc+set}" != set || test "${with_valloc}" = mmap; then
   if test "${ac_cv_working_mmap}" = yes; then
     with_valloc=mmap
-    AC_DEFINE(OM_HAVE_VALLOC_MMAP)
+    AC_DEFINE(OM_HAVE_VALLOC_MMAP,1,"Have valloc")
   else
     with_valloc=malloc
   fi
 fi
 if test "${with_valloc}" = malloc; then
   if test "${ac_cv_working_valloc}" != no; then
-    AC_DEFINE(OM_HAVE_VALLOC_MALLOC)
+    AC_DEFINE(OM_HAVE_VALLOC_MALLOC,1,"Have valloc")
   else
     with_valloc=emulate
   fi
@@ -405,7 +406,7 @@ dnl emulation
 dnl
 AC_MSG_CHECKING(whether to emulate omalloc)
 if test "${with_emulate_omalloc}" = yes; then
-  AC_DEFINE(OM_EMULATE_OMALLOC)
+  AC_DEFINE(OM_EMULATE_OMALLOC,1,"Emulate omalloc")
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
@@ -417,10 +418,10 @@ dnl
 AC_MSG_CHECKING(how to align)
 if test "$with_align" = 8 || test "$ac_cv_sizeof_long" = 8; then
   ac_cv_align=8
-  AC_DEFINE(OM_ALIGN_8)
+  AC_DEFINE(OM_ALIGN_8,1,"Align to 8 bytes")
 else
 if test "$ac_cv_align_need_strict" = "yes" || test "$with_align" = "strict"; then
-  AC_DEFINE(OM_ALIGNMENT_NEEDS_WORK)
+  AC_DEFINE(OM_ALIGNMENT_NEEDS_WORK,1,"Whether alignment needs work")
   ac_cv_align="strict"
 else
   ac_cv_align="sloppy"
@@ -434,7 +435,7 @@ dnl
 AC_MSG_CHECKING(whether to use dense bins)
 if test "$with_dense_bins" = yes; then
 AC_MSG_RESULT(yes)
-AC_DEFINE(OM_HAVE_DENSE_BIN_DISTRIBUTION)
+AC_DEFINE(OM_HAVE_DENSE_BIN_DISTRIBUTION,1,"Whether we have dense bins")
 else
 AC_MSG_RESULT(no)
 fi
@@ -447,14 +448,14 @@ if test "$with_debug" != no; then
 AC_MSG_RESULT(no)
 else
 AC_MSG_RESULT(yes)
-AC_DEFINE(OM_NDEBUG)
+AC_DEFINE(OM_NDEBUG,1,"Disable debug")
 with_track=no
 fi
 
 AC_MSG_CHECKING(whether to have tracking debug functionality)
 if test "$with_track" != no; then
 AC_MSG_RESULT(yes)
-AC_DEFINE(OM_HAVE_TRACK)
+AC_DEFINE(OM_HAVE_TRACK,1,"Have track")
 else
 AC_MSG_RESULT(no)
 fi
@@ -462,7 +463,7 @@ fi
 AC_MSG_CHECKING(whether to use internal debug)
 if test "$with_internal_debug" = yes; then
 AC_MSG_RESULT(yes)
-AC_DEFINE(OM_INTERNAL_DEBUG)
+AC_DEFINE(OM_INTERNAL_DEBUG,1,"Internal debug")
 with_inline=no
 else
 AC_MSG_RESULT(no)
@@ -470,15 +471,15 @@ fi
 
 AC_MSG_CHECKING(whether to inline)
 if test "$ac_cv_c_inline" != no && test "$with_inline" != no; then
-  AC_DEFINE_UNQUOTED(OM_INLINE, static $ac_cv_c_inline)
-  AC_DEFINE_UNQUOTED(OM_INLINE_DECL, static $ac_cv_c_inline)
-  AC_DEFINE_UNQUOTED(OM_INLINE_IMPL, static $ac_cv_c_inline)
-  AC_DEFINE_UNQUOTED(OM_INLINE_LOCAL, static $ac_cv_c_inline)
+  AC_DEFINE_UNQUOTED(OM_INLINE, static $ac_cv_c_inline, "inline-declaration")
+  AC_DEFINE_UNQUOTED(OM_INLINE_DECL, static $ac_cv_c_inline, "inline-declaration")
+  AC_DEFINE_UNQUOTED(OM_INLINE_IMPL, static $ac_cv_c_inline, "inline-declaration")
+  AC_DEFINE_UNQUOTED(OM_INLINE_LOCAL, static $ac_cv_c_inline, "inline-declaration")
   AC_MSG_RESULT(yes)
 else
-  AC_DEFINE_UNQUOTED(OM_INLINE_DECL, extern)
-  AC_DEFINE_UNQUOTED(OM_INLINE_IMPL,)
-  AC_DEFINE_UNQUOTED(OM_INLINE_LOCAL, static)
+  AC_DEFINE_UNQUOTED(OM_INLINE_DECL, extern, "inline-declaration")
+  AC_DEFINE_UNQUOTED(OM_INLINE_IMPL,, "inline-declaration")
+  AC_DEFINE_UNQUOTED(OM_INLINE_LOCAL, static, "inline-declaration")
   AC_MSG_RESULT(no)
 fi
 
@@ -504,7 +505,7 @@ int main()
    ac_cv_get_return_addr_works=no))
 AC_MSG_RESULT($ac_cv_get_return_addr_works)
 if test "$ac_cv_get_return_addr_works" = yes; then
-AC_DEFINE(OM_GET_RETURN_ADDR_WORKS)
+AC_DEFINE(OM_GET_RETURN_ADDR_WORKS,1, "Whether get return address works")
 fi
 
 AC_MSG_CHECKING(whether omGetBackTrace works)
@@ -531,7 +532,7 @@ int main()
    ac_cv_get_backtrace_works=no))
 AC_MSG_RESULT($ac_cv_get_backtrace_works)
 if test "$ac_cv_get_backtrace_works" = yes; then
-AC_DEFINE(OM_GET_BACKTRACE_WORKS)
+AC_DEFINE(OM_GET_BACKTRACE_WORKS,1,"Whether omInitGetBackTrace () works")
 fi
 
 AC_MSG_CHECKING(whether addr2line works)
@@ -573,7 +574,7 @@ AC_MSG_CHECKING(whether to track return addresses)
 if test "$with_track_return" = no || test "$ac_cv_get_return_addr_works" = no || test "$ac_cv_prog_addr2line_works" != yes; then
   with_track_return=no
 else
-  AC_DEFINE(OM_TRACK_RETURN)
+  AC_DEFINE(OM_TRACK_RETURN,1,"Whether to track return")
   with_track_return=yes
 fi
 AC_MSG_RESULT($with_track_return)
@@ -591,13 +592,13 @@ if test "${with_track_fl+set}" != set; then
 fi
 AC_MSG_RESULT($with_track_fl)
 if test "$with_track_fl" = yes; then
-  AC_DEFINE(OM_TRACK_FILE_LINE)
+  AC_DEFINE(OM_TRACK_FILE_LINE,1,"Whether to track file-line")
 fi
 
 AC_MSG_CHECKING(whether to track stack backtraces)
 if test "$with_track" != no && test "$ac_cv_get_backtrace_works" = yes && test "$with_track_backtrace" != no && test "$ac_cv_prog_addr2line_works" = yes; then
   with_track_backtrace=yes
-  AC_DEFINE(OM_TRACK_BACKTRACE)
+  AC_DEFINE(OM_TRACK_BACKTRACE,1,"Whether to track backtrace")
 else
   with_track_backtrace=no
 fi
@@ -605,7 +606,7 @@ AC_MSG_RESULT($with_track_backtrace)
 
 AC_MSG_CHECKING(whether to track custom values)
 if test "$with_track" != no && test "$with_track_custom" = yes; then
-  AC_DEFINE(OM_TRACK_CUSTOM)
+  AC_DEFINE(OM_TRACK_CUSTOM,1,"Enable custom tracking")
 else
   with_track_custom=no
 fi
@@ -622,8 +623,8 @@ AC_TRY_LINK(
 ,
 void *sbrk();
 ,
-AC_DEFINE(Void_t,void),
-AC_DEFINE(Void_t,char),
+AC_DEFINE(Void_t,void,"Type of void"),
+AC_DEFINE(Void_t,char,"Type of void"),
 )
 AC_MSG_RESULT(Void_t)
 

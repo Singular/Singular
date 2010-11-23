@@ -19,6 +19,8 @@ omAllocSystem.c   omError.c        omStats.c	    omRet2Info.c     \
 omBin.c           omFindExec.c     omDebugTrack.c                    \
 omalloc_provide.c omAllocFunc.c
 
+INCLUDES=-I${top_srcdir}/.. -I${top_builddir}/..
+
 libomalloc_a_SOURCES=$(SOURCES) $(noinst_HEADERS)
 libomalloc_debug_a_SOURCES=$(SOURCES) $(noinst_HEADERS)
 
@@ -26,6 +28,8 @@ nodist_libomalloc_a_SOURCES = omConfig.h omlimits.h mylimits.h omTables.h omallo
 nodist_libomalloc_debug_a_SOURCES = omConfig.h omlimits.h omTables.h omalloc.h omTables.inc
 
 libomalloc_a_CPPFLAGS= -DOM_NDEBUG
+
+BUILT_SOURCES = omalloc.h omTables.inc
 
 omalloc.h: $(noinst_HEADERS) omTables.h
 	./makeheader om_Alloc.h $@
