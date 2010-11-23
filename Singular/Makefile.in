@@ -91,12 +91,15 @@ STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 # lib -- if you really want to do this, use -lm as the _last_ thing on the
 # arguments to link
 ifneq ($(SINGUNAME),ix86-Win)
+## for cones & fans if not under Win OS:
+## put "-lgfan -lcddgmp " behind "-lncurses" in next three lines
 LIBS		= -lm @NEED_LIBS@
 LIBSG		= -lm @NEED_LIBSG@
 LIBSP		= -lm @NEED_LIBSG@
 else
+## for cones & fans if under Win OS:
+## put "-lgfan -lcddgmp " before "-Xlinker" in definition of LIBS and LIBSG
 LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lomalloc_ndebug -lncurses
-## with cdd and gfan: LIBS		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -lgfan -lcddgmp -Xlinker -Bdynamic -lgmp -lomalloc_ndebug -lncurses
 ## -lpython_module -lpython2.4 /usr/local/lib/libboost_python-gcc-d-1_32.dll
 LIBSG		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -Xlinker -Bdynamic -lgmp -lncurses
 ## with cdd and gfan: LIBSG		= -lsingfac -lsingcf -lntl  -static -lreadline -lhtmlhelp -lgfan -lcddgmp -Xlinker -Bdynamic -lgmp -lncurses
