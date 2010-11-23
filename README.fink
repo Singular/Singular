@@ -1,0 +1,3 @@
+if you use fink then invoke configure using
+
+LDFLAGS=-L/sw/lib CXXFLAGS=-I/sw/include ./configure ...
