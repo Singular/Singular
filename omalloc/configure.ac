@@ -6,9 +6,15 @@ dnl Created: 11/99
 dnl Version: $Id$
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
-AC_INIT(om_Alloc.c)
-
 VERSION=0.9.6
+
+AC_INIT(omalloc,VERSION)
+AC_CONFIG_SRCDIR(om_Alloc.c)
+
+AC_CONFIG_AUX_DIR([.])
+
+AM_INIT_AUTOMAKE
+
 AC_SUBST(VERSION)
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -626,7 +632,7 @@ AC_MSG_RESULT(Void_t)
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
 dnl
-AC_CONFIG_HEADER(omConfig.h omlimits.h omMalloc.h:${OM_MALLOC_HEADER})
+AC_CONFIG_HEADER(omConfig.h omlimits.h)
 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)
