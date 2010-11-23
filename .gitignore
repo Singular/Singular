@@ -1,3 +1,4 @@
+LIB
 *.d
 *.dd
 *.[oa]
@@ -58,6 +59,11 @@ ntl/setup4
 ntl/src/MakeDesc
 ntl/src/gen_gmp_aux
 ntl/src/gen_lip_gmp_aux
-
-
-
+aclocal.m4
+autom4te.cache/
+.deps
+compile
+depcomp
+missing
+stamp-h1
+stamp-h2
