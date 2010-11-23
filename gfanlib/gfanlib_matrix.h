@@ -581,6 +581,33 @@ inline ZMatrix QToZMatrixPrimitive(QMatrix const &m)
   for(int i=0;i<m.getHeight();i++)ret[i]=QToZVectorPrimitive(m[i]);
   return ret;
 }
+
+inline QMatrix canonicalizeSubspace(QMatrix const &m)
+{
+  QMatrix temp=m;
+  temp.reduce();
+  temp.REformToRREform();
+  temp.removeZeroRows();
+  return temp;
+}
+
+inline ZMatrix canonicalizeSubspace(ZMatrix const &m)
+{
+  return QToZMatrixPrimitive(canonicalizeSubspace(ZToQMatrix(m)));
+}
+
+
+inline QMatrix kernel(QMatrix const &m)
+{
+  QMatrix temp=m;
+  return temp.reduceAndComputeKernel();
+}
+
+inline ZMatrix kernel(ZMatrix const &m)
+{
+  return QToZMatrixPrimitive(kernel(ZToQMatrix(m)));
+}
+
 }
 
 

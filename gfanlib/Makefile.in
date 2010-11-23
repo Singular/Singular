@@ -46,14 +46,14 @@ DEFS		= -DGMPRATIONAL
 ###
 
 # normal C++ source files
-CXXSOURCES= gfanlib_zcone.cpp
+CXXSOURCES= gfanlib_zcone.cpp gfanlib_symmetry.cpp gfanlib_symmetriccomplex.cpp gfanlib_polyhedralfan.cpp gfanlib_zfan.cpp gfanlib_polymakefile.cpp
 
 # normal C source files
 CSOURCES=
 
 SOURCES=${CSOURCES} ${CXXSOURCES}
 
-HEADERS=gfanlib_z.h gfanlib_q.h gfanlib_vector.h gfanlib_matrix.h gfanlib_zcone.h gfanlib.h
+HEADERS=gfanlib_z.h gfanlib_q.h gfanlib_vector.h gfanlib_matrix.h gfanlib_zcone.h gfanlib.h gfanlib_polyhedralfan.h gfanlib_polymakefile.h gfanlib_symmetriccomplex.h gfanlib_zfan.h
 
 DISTFILES=${SOURCES} ${HEADERS}
 

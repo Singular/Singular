@@ -306,6 +306,7 @@ public:
 
 typedef Vector<Integer> ZVector;
 typedef Vector<Rational> QVector;
+typedef Vector<int> IntVector;
 
 inline QVector ZToQVector(ZVector const &v)
 {
