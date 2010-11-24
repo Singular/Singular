@@ -1817,5 +1817,10 @@ void pRestoreDegProcs(ring r. pFDegProc old_FDeg, pLDegProc old_lDeg);
 /*-------------pComp for syzygies:-------------------*/
 void p_SetModDeg(intvec *w, ring r);
 
+
+
+poly      p_PermPoly (poly p, int * perm,const ring OldRing, const ring dst,
+                     nMapFunc nMap, int *par_perm=NULL, int OldPar=0);
+
 #endif // P_POLYS_H
 

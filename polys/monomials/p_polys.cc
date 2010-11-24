@@ -2973,6 +2973,172 @@ void p_SetModDeg(intvec *w, ring r)
   }
 }
 
+/*2
+*returns a re-ordered copy of a polynomial, with permutation of the variables
+*/
+poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
+       nMapFunc nMap, int *par_perm, int OldPar)
+{
+  int OldpVariables = oldRing->N;
+  poly result = NULL;
+  poly result_last = NULL;
+  poly aq=NULL; /* the map coefficient */
+  poly qq; /* the mapped monomial */
+
+  while (p != NULL)
+  {
+    if ((OldPar==0)||(rField_is_GF(oldRing)))
+    {
+      qq = p_Init(dst);
+      number n=nMap(pGetCoeff(p));
+      if ((dst->minpoly!=NULL)
+      && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
+      {
+        n_Normalize(n,dst->cf);
+      }
+      pGetCoeff(qq)=n;
+    // coef may be zero:  pTest(qq);
+    }
+    else
+    {
+      qq=p_One(dst);
+      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
+      if ((dst->minpoly!=NULL)
+      && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
+      {
+        poly tmp=aq;
+        while (tmp!=NULL)
+        {
+          number n=pGetCoeff(tmp);
+          n_Normalize(n,dst->cf);
+          pGetCoeff(tmp)=n;
+          pIter(tmp);
+        }
+      }
+      pTest(aq);
+    }
+    if (rRing_has_Comp(dst)) p_SetComp(qq, p_GetComp(p,oldRing),dst);
+    if (n_IsZero(pGetCoeff(qq),dst->cf))
+    {
+      p_LmDelete(&qq,dst);
+    }
+    else
+    {
+      int i;
+      int mapped_to_par=0;
+      for(i=1; i<=OldpVariables; i++)
+      {
+        int e=p_GetExp(p,i,oldRing);
+        if (e!=0)
+        {
+          if (perm==NULL)
+          {
+            p_SetExp(qq,i, e, dst);
+          }
+          else if (perm[i]>0)
+            p_AddExp(qq,perm[i], e/*p_GetExp( p,i,oldRing)*/, dst);
+          else if (perm[i]<0)
+          {
+            if (rField_is_GF(dst))
+            {
+              number c=pGetCoeff(qq);
+              number ee=nfPar(1);
+              number eee;nfPower(ee,e,&eee); //nfDelete(ee,currRing);
+              ee=nfMult(c,eee);
+              //nfDelete(c,currRing);nfDelete(eee,currRing);
+              pSetCoeff0(qq,ee);
+            }
+            else
+            {
+              lnumber c=(lnumber)pGetCoeff(qq);
+              if (c->z->next==NULL)
+                napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
+              else /* more difficult: we have really to multiply: */
+              {
+                lnumber mmc=(lnumber)naInit(1,currRing);
+                napSetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
+                napSetm(mmc->z);
+                pGetCoeff(qq)=naMult((number)c,(number)mmc);
+                n_Delete((number *)&c,dst->cf);
+                n_Delete((number *)&mmc,dst->cf); 
+              }
+              mapped_to_par=1;
+            }
+          }
+          else
+          {
+            /* this variable maps to 0 !*/
+            p_LmDelete(&qq,dst);
+            break;
+          }
+        }
+      }
+      if (mapped_to_par
+      && (dst->minpoly!=NULL))
+      {
+        number n=pGetCoeff(qq);
+        n_Normalize(n,dst->cf);
+        pGetCoeff(qq)=n;
+      }
+    }
+    pIter(p);
+#if 1
+    if (qq!=NULL)
+    {
+      p_Setm(qq,dst);
+      p_Test(aq,dst);
+      p_Test(qq,dst);
+      if (aq!=NULL) qq=p_Mult(aq,qq,dst);
+      aq = qq;
+      while (pNext(aq) != NULL) pIter(aq);
+      if (result_last==NULL)
+      {
+        result=qq;
+      }
+      else
+      {
+        pNext(result_last)=qq;
+      }
+      result_last=aq;
+      aq = NULL;
+    }
+    else if (aq!=NULL)
+    {
+      p_Delete(&aq,dst);
+    }
+  }
+  result=p_SortAdd(result,dst);
+#else
+  //  if (qq!=NULL)
+  //  {
+  //    pSetm(qq);
+  //    pTest(qq);
+  //    pTest(aq);
+  //    if (aq!=NULL) qq=pMult(aq,qq);
+  //    aq = qq;
+  //    while (pNext(aq) != NULL) pIter(aq);
+  //    pNext(aq) = result;
+  //    aq = NULL;
+  //    result = qq;
+  //  }
+  //  else if (aq!=NULL)
+  //  {
+  //    pDelete(&aq);
+  //  }
+  //}
+  //p = result;
+  //result = NULL;
+  //while (p != NULL)
+  //{
+  //  qq = p;
+  //  pIter(p);
+  //  qq->next = NULL;
+  //  result = pAdd(result, qq);
+  //}
+#endif
+  p_Test(result,dst);
+  return result;
+}
 
 /***************************************************************
  *

@@ -79,11 +79,6 @@ static void pnFreeBin(number *bin, int exp)
   omFreeSize((ADDRESS)bin, h*sizeof(number));
 }
 
-int pMaxCompProc(poly p)
-{
-  return pMaxComp(p);
-}
-
 /*2
 * handle memory request for sets of polynomials (ideals)
 * l is the length of *p, increment is the difference (may be negative)
