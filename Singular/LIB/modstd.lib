@@ -74,12 +74,12 @@ EXAMPLE: example isIncluded; shows an example
    {
       int n = #[1];
       if(n >= ncols(I)) { n = ncols(I); }
-      if((n > 1) && system("with","MP"))
+      if(n > 1)
       {
          for(i = 1; i <= n - 1; i++)
          {
-            link l(i) = "MPtcp:fork";
-            //link l(i) = "ssi:fork";
+            //link l(i) = "MPtcp:fork";
+            link l(i) = "ssi:fork";
             open(l(i));
 
             write(l(i), quote(redFork(eval(I[ncols(I)-i]), eval(J), 1)));
@@ -624,10 +624,7 @@ example
 proc modStd(ideal I, list #)
 "USAGE:  modStd(I); I ideal
 ASSUME:  If size(#) > 0, then # contains either 1, 2 or 4 integers such that
-@*       - #[1] is the number of available processors for the computation
-                (parallelization is just applicable using 32-bit Singular
-                version since MP-links are not compatible with 64-bit Singular
-                version),
+@*       - #[1] is the number of available processors for the computation,
 @*       - #[2] is an optional parameter for the exactness of the computation,
                 if #[2] = 1, the procedure computes a standard basis for sure,
 @*       - #[3] is the number of primes until the first lifting,
@@ -683,14 +680,6 @@ EXAMPLE: example modStd; shows an example
       if(size(#) == 1)
       {
          int n1 = #[1];
-         if((n1 > 1) && (1 - system("with","MP")))
-         {
-     "========================================================================";
-     "There is no MP available on your system. Since this is necessary to     ";
-     "parallelize the algorithm, the computation will be done without forking.";
-     "========================================================================";
-            n1 = 1;
-         }
          int exactness = 1;
          int n2 = 10;
          int n3 = 10;
@@ -698,14 +687,6 @@ EXAMPLE: example modStd; shows an example
       if(size(#) == 2)
       {
          int n1 = #[1];
-         if((n1 > 1) && (1 - system("with","MP")))
-         {
-     "========================================================================";
-     "There is no MP available on your system. Since this is necessary to     ";
-     "parallelize the algorithm, the computation will be done without forking.";
-     "========================================================================";
-            n1 = 1;
-         }
          int exactness = #[2];
          int n2 = 10;
          int n3 = 10;
@@ -713,14 +694,6 @@ EXAMPLE: example modStd; shows an example
       if(size(#) == 4)
       {
          int n1 = #[1];
-         if((n1 > 1) && (1 - system("with","MP")))
-         {
-     "========================================================================";
-     "There is no MP available on your system. Since this is necessary to     ";
-     "parallelize the algorithm, the computation will be done without forking.";
-     "========================================================================";
-            n1 = 1;
-         }
          int exactness = #[2];
          int n2 = #[3];
          int n3 = #[4];
@@ -946,7 +919,8 @@ EXAMPLE: example modStd; shows an example
 
       for(i = 1; i <= n1; i++)
       {
-         link l(i) = "MPtcp:fork";
+         //link l(i) = "MPtcp:fork";
+         link l(i) = "ssi:fork";
          open(l(i));
          if((variant == 1) || (variant == 3) ||
             (variant == 4) || (variant == 6))
