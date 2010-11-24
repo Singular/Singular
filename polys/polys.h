@@ -261,7 +261,6 @@ static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 
 #define   pMaxComp(p)   p_MaxComp(p, currRing)
 #define   pMinComp(p)   p_MinComp(p, currRing)
-int pMaxCompProc(poly p);
 
 #define   pOneComp(p)       p_OneComp(p, currRing)
 #define   pSetCompP(a,i)    p_SetCompP(a, i, currRing)
@@ -291,9 +290,6 @@ BOOLEAN   pIsHomogeneous (poly p);
 // // the same powers of n, utility for dehomogenization
 // #define   pDehomogen(p1,p2,n) p_Dehomgen(p1,p2,n,currRing)
 // #define   pIsHomogen(p)       p_IsHomggen(p,currRing)
-
-poly      pPermPoly (poly p, int * perm,const ring OldRing, nMapFunc nMap,
-                     int *par_perm=NULL, int OldPar=0);
 
 /*BOOLEAN   pVectorHasUnitM(poly p, int * k);*/
 #define   pVectorHasUnitB(p,k) p_VectorHasUnitB(p,k,currRing)
