@@ -154,39 +154,8 @@ static char *object_name(char *p)
 /*========================================================================*/
 /*===  Machine depend Makefile creation                                ===*/
 /*========================================================================*/
-#if defined(ix86_Linux)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(ix86_Linux_libc5)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(ix86_freebsd)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(x86_64_Linux)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(IRIX_6)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(sparc64_Linux)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(IA64_Linux)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(DecAlpha_Linux)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(ppc_Linux)
+// relying on gcc to define __ELF__, check with cpp -dM /dev/null
+#if defined(__ELF__)
 #define HAVE_ELF_SYSTEM
 #endif
 
