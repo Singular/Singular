@@ -356,7 +356,7 @@ libsingular.a: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
 	ar x ../../$(SINGUNAME)/lib/libsingfac.a; \
 	ar x ../../$(SINGUNAME)/lib/libsingcf.a; \
 	ar x ../../$(SINGUNAME)/lib/libntl.a; \
-	ar x ../../$(SINGUNAME)/lib/libomalloc_ndebug.a; \
+	ar x ../../$(SINGUNAME)/lib/libomalloc.a; \
 	cd ..)
 	ar cr libsingular.a \
 	iparith.o mpsr_Tok.o claptmpl.o \
