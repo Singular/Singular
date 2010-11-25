@@ -651,11 +651,9 @@ fi
 
 echo "$ac_t""$ac_cv_singuname" 1>&6
 if test "$ac_cv_singuname" = unknown; then
-  { echo "configure: error: Unknown architecture: Check singuname.sh" 1>&2; exit 1; }
-else
-  SINGUNAME=$ac_cv_singuname
-  
+  { echo "configure: warning: Unknown architecture: Check singuname.sh" 1>&2; }
 fi
+SINGUNAME=$ac_cv_singuname
 
 SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 

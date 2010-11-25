@@ -154,6 +154,7 @@ extern "C" {
  * SECTION generic ELF: ix86-linux / alpha-linux / IA64-linux /x86_64_Linux  *
  *                      SunOS-5 / IRIX-6 / ppcMac-Darwin / FreeeBSD          *
  *****************************************************************************/
+// relying on gcc to define __ELF__, check with cpp -dM /dev/null
 #if defined(__ELF__)
 #define HAVE_ELF_SYSTEM
 #endif

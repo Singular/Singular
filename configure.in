@@ -70,11 +70,10 @@ fi
 )
 AC_MSG_RESULT($ac_cv_singuname)
 if test "$ac_cv_singuname" = unknown; then
-  AC_MSG_ERROR(Unknown architecture: Check singuname.sh)
-else
-  SINGUNAME=$ac_cv_singuname
-  AC_SUBST(SINGUNAME)
+  AC_MSG_WARN(Unknown architecture: Check singuname.sh)
 fi
+SINGUNAME=$ac_cv_singuname
+AC_SUBST(SINGUNAME)
 
 SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
 AC_SUBST(SING_UNAME)
