@@ -23,6 +23,24 @@
 
 CFMatrix* cf_HNF(CFMatrix& A);
 
+// performs LLL reduction.
+
+// B is an m x n matrix, viewed as m rows of n-vectors.  m may be less
+// than, equal to, or greater than n, and the rows need not be
+// linearly independent.  B is transformed into an LLL-reduced basis,
+// and the return value is the rank r of B.  The first m-r rows of B
+// are zero.  
+
+// More specifically, elementary row transformations are performed on
+// B so that the non-zero rows of new-B form an LLL-reduced basis
+// for the lattice spanned by the rows of old-B.
+// The default reduction parameter is delta=3/4, which means
+// that the squared length of the first non-zero basis vector
+// is no more than 2^{r-1} times that of the shortest vector in
+// the lattice.
+
+CFMatrix* cf_LLL(CFMatrix& A);
+
 /*ENDPUBLIC*/
 
 #endif

@@ -3450,6 +3450,26 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
+      if (strcmp(sys_cmd, "LLL") == 0)
+      {
+        if (h!=NULL)
+        {
+          res->rtyp=h->Typ();
+          if (h->Typ()==MATRIX_CMD)
+          {
+            res->data=(char *)singntl_LLL((matrix)h->Data());
+            return FALSE;
+          }
+          else if (h->Typ()==INTMAT_CMD)
+          {
+            res->data=(char *)singntl_LLL((intvec*)h->Data());
+            return FALSE;
+          }
+          else return TRUE;
+        }
+        else return TRUE;
+      }
+      else
   /*================= factoras =========================*/
       if (strcmp (sys_cmd, "factoras") == 0)
       {

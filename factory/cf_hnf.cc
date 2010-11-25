@@ -18,6 +18,7 @@
 #include "cf_hnf.h"
 #include <NTL/mat_ZZ.h>
 #include <NTL/HNF.h>
+#include <NTL/LLL.h>
 
 // The input matrix A is an n x m matrix of rank m (so n >= m), and D
 // is a multiple of the determinant of the lattice L spanned by the
@@ -38,5 +39,14 @@ CFMatrix* cf_HNF(CFMatrix& A)
   HNF(WW,*AA,DD);
   delete AA;
   return convertNTLmat_ZZ2FacCFMatrix(WW);
+}
+CFMatrix* cf_LLL(CFMatrix& A)
+{
+  mat_ZZ *AA=convertFacCFMatrix2NTLmat_ZZ(A);
+  LLL_RR(*AA);
+  delete AA;
+  CFMatrix *r= convertNTLmat_ZZ2FacCFMatrix(*AA);
+  delete AA;
+  return r;
 }
 #endif

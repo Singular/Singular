@@ -1576,13 +1576,6 @@ matrix singntl_HNF(matrix  m )
         M(i,j)=convSingPFactoryP(MATELEM(m,i,j));
       }
     }
-    for(i=r;i>0;i--)
-    {
-      for(j=r;j>0;j--)
-      {
-        M(i,j)=convSingPFactoryP(MATELEM(m,i,j));
-      }
-    }
     CFMatrix *MM=cf_HNF(M);
     for(i=r;i>0;i--)
     {
@@ -1618,6 +1611,60 @@ intvec* singntl_HNF(intvec*  m )
   for(i=r;i>0;i--)
   {
     for(j=r;j>0;j--)
+    {
+      IMATELEM(*mm,i,j)=convFactoryISingI((*MM)(i,j));
+    }
+  }
+  delete MM;
+  return mm;
+}
+matrix singntl_LLL(matrix  m )
+{  
+  int r=m->rows();
+  int c=m->cols();
+  matrix res=mpNew(r,c);
+  if (rField_is_Q(currRing))
+  {
+    CFMatrix M(r,c);
+    int i,j;
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {
+        M(i,j)=convSingPFactoryP(MATELEM(m,i,j));
+      }
+    }
+    CFMatrix *MM=cf_LLL(M);
+    for(i=r;i>0;i--)
+    {
+      for(j=c;j>0;j--)
+      {  
+        MATELEM(res,i,j)=convFactoryPSingP((*MM)(i,j));
+      }
+    }
+    delete MM;
+  }
+  return res;
+}
+intvec* singntl_LLL(intvec*  m )
+{
+  int r=m->rows();
+  int c=m->cols();
+  setCharacteristic( 0 );
+  CFMatrix M(r,c);
+  int i,j;
+  for(i=r;i>0;i--)
+  {
+    for(j=r;j>0;j--)
+    {
+      M(i,j)=IMATELEM(*m,i,j);
+    }
+  }
+  CFMatrix *MM=cf_LLL(M);
+  intvec *mm=ivCopy(m);
+  for(i=r;i>0;i--)
+  {
+    for(j=c;j>0;j--)
     {
       IMATELEM(*mm,i,j)=convFactoryISingI((*MM)(i,j));
     }
