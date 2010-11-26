@@ -3197,7 +3197,8 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			gcTmp->getConeNormals(gcTmp->gcBasis/*, FALSE*/);
 // 			gcTmp->getCodim2Normals(*gcTmp);
 			gcTmp->getExtremalRays(*gcTmp);
-			
+			//NOTE Order rays lex here
+			gcTmp->orderRays();			
 // 			//NOTE If flip2 is used we need to get an interior point of gcTmp
 // 			// and replace gcTmp->baseRing with an appropriate ring with only
 // 			// one weight
