@@ -360,7 +360,6 @@ LIB "all.lib";
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
 * intprog_lib:: Integer Programming
-* lll_lib:: Integral LLL-Algorithm
 * modstd_lib:: Groebner basis of ideals via modular computations
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
@@ -406,15 +405,11 @@ LIB "all.lib";
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node intprog_lib, lll_lib, homolog_lib, Commutative algebra
+@node intprog_lib, modstd_lib, homolog_lib, Commutative algebra
 @subsection intprog_lib
 @c lib intprog.lib
 @c ---------------------------------------------------------
-@node lll_lib, modstd_lib, intprog_lib, Commutative algebra
-@subsection lll_lib
-@c lib lll.lib
-@c ---------------------------------------------------------
-@node modstd_lib, mprimdec_lib, lll_lib, Commutative algebra
+@node modstd_lib, mprimdec_lib, intprog_lib, Commutative algebra
 @subsection modstd_lib
 @c lib modstd.lib
 @c ---------------------------------------------------------
@@ -876,6 +871,7 @@ Comments should be send to the author of the library directly.
 * fpadim_lib::  Algorithms for quotient algebras in the letterplace case
 * findiff_lib:: finite difference schemes for linear differential equations
 * integralbasis_lib:: Integral basis in algebraic function fields
+* lll_lib:: Integral LLL-Algorithm
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
 * multigrading_lib:: Multigradings and related computations
 * paraplanecurves_lib:: Rational parametrization of rational plane curves
@@ -913,14 +909,18 @@ Issues:
 
 @c ----------------------------------------------------------
 
-@node integralbasis_lib, monomialideal_lib,findiff_lib, Experimental libraries
+@node integralbasis_lib, lll_lib,findiff_lib, Experimental libraries
 @subsection integralbasis_lib
 @cindex integralbasis_lib
 
 @c lib integralbasis.lib
 
 @c ---------------------------------------------------------
-@node monomialideal_lib, multigrading_lib, integralbasis_lib,  Experimental libraries
+@node lll_lib, monomialideal_lib, integralbasis_lib, Experimental libraries
+@subsection lll_lib
+@c lib lll.lib
+@c ---------------------------------------------------------
+@node monomialideal_lib, multigrading_lib, lll_lib,  Experimental libraries
 @subsection monomialideal_lib
 @c lib monomialideal.lib
 @c ----------------------------------------------------------
