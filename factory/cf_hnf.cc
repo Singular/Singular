@@ -43,8 +43,12 @@ CFMatrix* cf_HNF(CFMatrix& A)
 CFMatrix* cf_LLL(CFMatrix& A)
 {
   mat_ZZ *AA=convertFacCFMatrix2NTLmat_ZZ(A);
+  #if 0
   LLL_RR(*AA);
-  delete AA;
+  #else
+  ZZ det2;
+  LLL(det2,*AA,0L);
+  #endif
   CFMatrix *r= convertNTLmat_ZZ2FacCFMatrix(*AA);
   delete AA;
   return r;
