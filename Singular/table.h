@@ -879,7 +879,7 @@ cmdnames cmds[] =
   { "cone_via_rays",0, CONERAYS_CMD,      CMD_123},
   { "cone_via_normals",0,CONENORMALS_CMD, CMD_123},
   { "fan_empty",   0, FANEMPTY_CMD,       CMD_1},
-  { "fan_full",    0, FANEMPTY_CMD,       CMD_1},
+  { "fan_full",    0, FANFULL_CMD,        CMD_1},
   { "insert_cone", 0, INSERTCONE_CMD,     CMD_2},
   { "cone_intersect",0,INTERSC_CMD,       CMD_2},
   { "cone_link",   0, CONELINK_CMD,       CMD_2},

@@ -392,6 +392,12 @@ bool Permutation::isPermutation(IntVector const &a)
 }
 
 
+bool Permutation::arePermutations(IntMatrix const &m)
+{
+  for(int i=0;i<m.getHeight();i++)if(!isPermutation(m[i]))return false;
+  return true;
+}
+
 int SymmetryGroup::orbitSize(ZVector const &stable)const
 {
   int groupSize=elements.size();

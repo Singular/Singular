@@ -5110,6 +5110,21 @@ BOOLEAN jjWAITALL1(leftv res, leftv a)
   return FALSE;
 }
 #ifdef HAVE_FANS
+/* returns 1 iff all rows consist of entries 1..n,
+   where n is the number of columns of the provided
+   intmat; 0 otherwise */
+static gfan::IntMatrix permutationIntMatrix(const intvec* iv)
+{
+	int cc = iv->cols();
+	int rr = iv->rows();
+	intvec* ivCopy = new intvec(rr, cc, 0);
+	for (int r = 1; r <= rr; r++)
+	  for (int c = 1; c <= cc; c++)
+	    IMATELEM(*ivCopy, r, c) = IMATELEM(*iv, r, c) - 1;
+	gfan::ZMatrix zm = intmat2ZMatrix(ivCopy);
+	gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(zm));
+	return *im;
+}
 static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
 {
 	int ambientDim = (int)(long)v->Data();
@@ -5124,11 +5139,14 @@ static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
 static BOOLEAN jjFANEMPTY_IM(leftv res, leftv v)
 {
 	intvec* permutations = (intvec*)v->Data();
-	// todo: check that permutations contains sensible elements of S_n
 	int ambientDim = permutations->cols();
+	gfan::IntMatrix im = permutationIntMatrix(permutations);
+	if (!gfan::Permutation::arePermutations(im))
+	{
+		Werror("provided intmat contains invalid permutations of {1, ..., %d}", ambientDim);
+		return TRUE;
+	}
 	gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
-	gfan::ZMatrix zm = intmat2ZMatrix(permutations);
-	gfan::IntMatrix im = gfan::ZToIntMatrix(zm);
 	sg.computeClosure(im);
 	res->data = (char*)(new gfan::ZFan(sg));
 	return FALSE;
@@ -5148,11 +5166,14 @@ static BOOLEAN jjFANFULL_I(leftv res, leftv v)
 static BOOLEAN jjFANFULL_IM(leftv res, leftv v)
 {
 	intvec* permutations = (intvec*)v->Data();
-	// todo: check that permutations contains sensible elements of S_n
 	int ambientDim = permutations->cols();
+	gfan::IntMatrix im = permutationIntMatrix(permutations);
+	if (!gfan::Permutation::arePermutations(im))
+	{
+		Werror("provided intmat contains invalid permutations of {1, ..., %d}", ambientDim);
+		return TRUE;
+	}
 	gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
-	gfan::ZMatrix zm = intmat2ZMatrix(permutations);
-	gfan::IntMatrix im = gfan::ZToIntMatrix(zm);
 	sg.computeClosure(im);
 	gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(sg));
 	res->data = (char*)zf;

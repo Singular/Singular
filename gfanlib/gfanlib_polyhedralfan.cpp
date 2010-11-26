@@ -162,7 +162,9 @@ PolyhedralFan product(const PolyhedralFan &a, const PolyhedralFan &b)
 */
 void PolyhedralFan::insert(ZCone const &c)
 {
-  cones.insert(c);
+  ZCone temp=c;
+  temp.canonicalize();
+  cones.insert(temp);
 }
 
 void PolyhedralFan::remove(ZCone const &c)

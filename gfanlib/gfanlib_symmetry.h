@@ -26,6 +26,10 @@ public:
    */
   static bool isPermutation(IntVector const &a);
   /**
+   * Returns true if all rows of the matrix are pemutations
+   */
+  static bool arePermutations(IntMatrix const &m);
+  /**
    * Generates the identity permutation on n elements.
    */
   Permutation(int n):
