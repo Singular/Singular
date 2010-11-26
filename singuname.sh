@@ -104,6 +104,18 @@ then
         echo ${prefix}-Unknown
         exit 1
     fi
+# AMD-Opteron ########################################################
+elif (echo $uname_m | $egrep "amd64" > $devnull)
+then
+    prefix=x86_64
+    if (echo $uname_a | $egrep "FreeBSD" > $devnull)
+    then
+        echo ${prefix}-freebsd
+        exit 0
+    else
+        echo ${prefix}-Unknown
+        exit 1
+    fi
 # HPPA ################################################################
 elif (echo $uname_m | $egrep "hppa" > $devnull)
 then
