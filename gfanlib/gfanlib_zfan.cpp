@@ -6,6 +6,9 @@
  */
 
 #include "gfanlib_zfan.h"
+#include "gfanlib_polymakefile.h"
+
+using namespace std;
 
 namespace gfan
 {
@@ -53,12 +56,132 @@ namespace gfan
       {
         assert(coneCollection);
         complex = new SymmetricComplex(coneCollection->toSymmetricComplex());
+        std::cerr<<"D"<<std::endl;
         complex->buildConeLists(false,false,&cones);
+        std::cerr<<"D"<<std::endl;
         complex->buildConeLists(true,false,&maximalCones);
+        std::cerr<<"D"<<std::endl;
         complex->buildConeLists(false,true,&coneOrbits);
+        std::cerr<<"D"<<std::endl;
         complex->buildConeLists(true,true,&maximalConeOrbits);
+        std::cerr<<"D"<<std::endl;
       }
   }
+  ZFan::ZFan(std::istream &f):
+    coneCollection(0),
+    complex(0)
+  {
+//    PolyhedralFan PolyhedralFan::readFan(string const &filename, bool onlyMaximal, IntegerVector *w, set<int> const *coneIndices, SymmetryGroup const *sym, bool readCompressedIfNotSym)
+    PolymakeFile inFile;
+    //assert(0);
+     inFile.open(f);
+
+    int n=inFile.readCardinalProperty("AMBIENT_DIM").toInt();
+    int nRays=inFile.readCardinalProperty("N_RAYS").toInt();
+    ZMatrix rays=inFile.readMatrixProperty("RAYS",nRays,n);
+    int linealityDim=inFile.readCardinalProperty("LINEALITY_DIM").toInt();
+    ZMatrix linealitySpace=inFile.readMatrixProperty("LINEALITY_SPACE",linealityDim,n);
+
+    SymmetryGroup sym(n);
+    bool readingSymmetricComplex=false;
+    if(inFile.hasProperty("SYMMETRY_GENERATORS"))
+      {
+        sym.computeClosure(ZToIntMatrix(inFile.readMatrixProperty("SYMMETRY_GENERATORS",-1,n)));
+        readingSymmetricComplex=true;
+      }
+
+
+    const char *sectionName=0;
+    const char *sectionNameMultiplicities=0;
+    if(readingSymmetricComplex)
+      {
+        if(inFile.hasProperty("MAXIMAL_CONES_ORBITS"))
+          {
+            sectionName="MAXIMAL_CONES_ORBITS";
+            sectionNameMultiplicities="MULTIPLICITIES_ORBITS";
+          }
+        else
+          {
+            sectionName="CONES_ORBITS";
+          }
+      }
+    else
+      {
+        if(inFile.hasProperty("MAXIMAL_CONES"))
+          {
+            sectionName="MAXIMAL_CONES";
+            sectionNameMultiplicities="MULTIPLICITIES";
+          }
+        else
+          {
+            sectionName="CONES";
+          }
+      }
+
+    /*    if(sym || readCompressedIfNotSym)
+      {
+        sectionName=(onlyMaximal)?"MAXIMAL_CONES_ORBITS":"CONES_ORBITS";
+        sectionNameMultiplicities=(onlyMaximal)?"MULTIPLICITIES_ORBITS":"DUMMY123";
+      }
+    else
+*/
+    /*{
+        sectionName="MAXIMAL_CONES";//(onlyMaximal)?"MAXIMAL_CONES":"CONES";
+        sectionNameMultiplicities="MULTIPLICITIES";//(onlyMaximal)?"MULTIPLICITIES":"DUMMY123";
+      }
+*/
+//    ZVector w2(n);
+//    if(w==0)w=&w2;
+
+ //       SymmetryGroup sym2(n);
+ //       if(sym==0)sym=&sym2;
+
+/*  sectionName=0;
+  if(inFile.hasProperty("MAXIMAL_CONES"))
+    sectionName="MAXIMAL_CONES";
+  else
+    {  if(inFile.hasProperty("CONES"))
+      sectionName="CONES";
+    else
+      assert(0);
+    }*/
+
+  vector<list<int> > cones=inFile.readMatrixIncidenceProperty(sectionName);
+//        IntegerVectorList r;
+
+        bool hasMultiplicities=inFile.hasProperty(sectionNameMultiplicities);
+        ZMatrix multiplicities(0,0);
+        if(hasMultiplicities)multiplicities=inFile.readMatrixProperty(sectionNameMultiplicities,cones.size(),1);
+
+        ZFan ret(sym);
+
+//        log2 cerr<< "Number of orbits to expand "<<cones.size()<<endl;
+        for(int i=0;i<cones.size();i++)
+        //  if(coneIndices==0 || coneIndices->count(i))
+            {
+//              log2 cerr<<"Expanding symmetries of cone"<<endl;
+              {
+                ZMatrix coneRays(0,n);
+                for(list<int>::const_iterator j=cones[i].begin();j!=cones[i].end();j++)
+                  coneRays.appendRow((rays[*j]));
+                ZCone C=ZCone::givenByRays(coneRays,linealitySpace);
+                if(hasMultiplicities)C.setMultiplicity(multiplicities[i][0]);
+//                for(SymmetryGroup::ElementContainer::const_iterator perm=sym->elements.begin();perm!=sym->elements.end();perm++)
+                  {
+//                    if(C.contains(perm.applyInverse(*w)))
+//                      {
+ //                       PolyhedralCone C2=C.permuted(*perm);
+//                        C2.canonicalize();
+//                        ret.insert(C2);
+ //                     }
+                    ret.insert(C);
+                  }
+              }
+            }
+//        return ret;
+        *this=ret;
+  }
+
   ZFan::~ZFan()
   {
     if(coneCollection)
@@ -89,24 +212,29 @@ namespace gfan
   {
     if(this!=&f)
       {
+std::cerr<<"COPYING\n";
         if(complex)
           {
             delete complex;
             complex=0;
           }
+        std::cerr<<"1COPYING\n";
         if(coneCollection)
           {
             delete coneCollection;
             coneCollection=0;
           }
+        std::cerr<<"2COPYING\n";
         if(f.coneCollection)
           {
             coneCollection=new PolyhedralFan(*f.coneCollection);
           }
+        std::cerr<<"3COPYING\n";
         if(f.complex)
           {
             complex=new SymmetricComplex(*f.complex);
           }
+        std::cerr<<"DONE COPYING\n";
       }
     return *this;
   }
@@ -164,6 +292,7 @@ std::string ZFan::toString(int flags)const
   ensureComplex();
   return complex->toString(flags);//complex->getMinDim(),complex->getMaxDim(),0,0);
 //  return "NEEDTOFIXTHIS";
+
   //return theFan.toString();
 }
 

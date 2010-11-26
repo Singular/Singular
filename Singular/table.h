@@ -290,8 +290,12 @@ struct sValCmd1 dArith1[]=
 //,{D(jjLINSPACE),   LINSPACE_CMD,    INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjMAXCONE1),   MAXCONE_CMD,     LIST_CMD,       FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
 //,{D(jjADJACENCY1), ADJACENCY_CMD,   INTMAT_CMD,     FAN_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCONERAYS1),  CONERAYS_CMD,    CONE_CMD,      INTMAT_CMD       , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjCONENORMALS1),CONENORMALS_CMD,CONE_CMD,      INTMAT_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONERAYS1),  CONERAYS_CMD,    CONE_CMD,       INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjCONENORMALS1),CONENORMALS_CMD,CONE_CMD,       INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjFANEMPTY_I),  FANEMPTY_CMD,   FAN_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjFANEMPTY_IM), FANEMPTY_CMD,   FAN_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjFANFULL_I),   FANFULL_CMD,    FAN_CMD,        INT_CMD       , ALLOW_PLURAL |ALLOW_RING}
+,{D(jjFANFULL_IM),  FANFULL_CMD,    FAN_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
 #endif /* HAVE_FANS */
 ,{NULL,             0,               0,              0             , NO_PLURAL |NO_RING}
 };
@@ -669,6 +673,7 @@ struct sValCmd2 dArith2[]=
 ,{D(jjCONELINK),  CONELINK_CMD,   CONE_CMD,       CONE_CMD,   INTMAT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCONTAINS2), CONTAINS_CMD,   INT_CMD,        CONE_CMD,   CONE_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjGETPROPC),  GETPROP_CMD,    ANY_TYPE/*set by p*/,CONE_CMD,STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjINSERTCONE),INSERTCONE_CMD, NONE,           FAN_CMD,    CONE_CMD, ALLOW_PLURAL | ALLOW_RING}
 //,{D(jjADDMCONE1), ADDMCONE_CMD,   NONE,           FAN_CMD,    CONE_CMD, ALLOW_PLURAL | ALLOW_RING}
 //,{D(jjADDMCONE2), ADDMCONE_CMD,   NONE,           FAN_CMD,    LIST_CMD, ALLOW_PLURAL | ALLOW_RING}
 //,{D(jjDELMCONE2), DELMCONE_CMD,   NONE,           FAN_CMD,    INT_CMD, ALLOW_PLURAL | ALLOW_RING}
@@ -873,11 +878,15 @@ cmdnames cmds[] =
   { "cone",        0, CONE_CMD,           ROOT_DECL},
   { "cone_via_rays",0, CONERAYS_CMD,      CMD_123},
   { "cone_via_normals",0,CONENORMALS_CMD, CMD_123},
+  { "fan_empty",   0, FANEMPTY_CMD,       CMD_1},
+  { "fan_full",    0, FANEMPTY_CMD,       CMD_1},
+  { "insert_cone", 0, INSERTCONE_CMD,     CMD_2},
   { "cone_intersect",0,INTERSC_CMD,       CMD_2},
   { "cone_link",   0, CONELINK_CMD,       CMD_2},
   { "contains",    0, CONTAINS_CMD,       CMD_23},
   { "getprop",     0, GETPROP_CMD,        CMD_2},
   { "setprop",     0, SETPROP_CMD,        CMD_3},
+  { "fan",         0, FAN_CMD,            ROOT_DECL},
   #endif /* HAVE_FANS */
   { "alias",       0, ALIAS_CMD ,         PARAMETER},
   { "and",         0, '&' ,               LOGIC_OP},
@@ -1238,7 +1247,7 @@ struct sValAssign dAssign[]=
 ,{D(jiA_LINK),     LINK_CMD,       STRING_CMD }
 ,{D(jiA_LINK),     LINK_CMD,       LINK_CMD }
 #ifdef HAVE_FANS
-//,{D(jiA_FAN),      FAN_CMD,        FAN_CMD }
+,{D(jiA_FAN),      FAN_CMD,        FAN_CMD }
 ,{D(jiA_CONE),     CONE_CMD,       CONE_CMD }
 #endif /* HAVE_FANS */
 ,{D(jiA_PACKAGE),  PACKAGE_CMD,    PACKAGE_CMD }

@@ -211,6 +211,13 @@ int SymmetryGroup::sizeOfBaseSet()const
   return elements.begin()->size();
 }
 
+IntMatrix SymmetryGroup::getGenerators()const
+{
+  IntMatrix ret(0,this->sizeOfBaseSet());
+  for(ElementContainer::const_iterator i=elements.begin();i!=elements.end();i++)ret.appendRow(i->toIntVector());
+  return ret;
+}
+
 void SymmetryGroup::computeClosure(Permutation const &v) //does this work??
 {
   ElementContainer newOnes;
@@ -219,9 +226,6 @@ void SymmetryGroup::computeClosure(Permutation const &v) //does this work??
 
   while(!newOnes.empty())
     {
-      static int i;
-      i++;
-
       Permutation v=*newOnes.begin();
       for(ElementContainer::const_iterator i=elements.begin();i!=elements.end();i++)
         {
@@ -231,7 +235,7 @@ void SymmetryGroup::computeClosure(Permutation const &v) //does this work??
               newOnes.insert(n);
           }
           {
-            Permutation n=v.apply(*i);
+            Permutation n=v.apply(v);
             if(0==elements.count(n))
               newOnes.insert(n);
           }
@@ -242,36 +246,11 @@ void SymmetryGroup::computeClosure(Permutation const &v) //does this work??
 }
 
 
-/*
-
-void SymmetryGroup::computeClosure(IntegerVectorList const &l)
+void SymmetryGroup::computeClosure(IntMatrix const &l)
 {
-  //  for(IntegerVectorList::const_iterator i=l.begin();i!=l.end();i++)
-  //  computeClosure(*i);
-
-  bool growing=true;
-  while(growing)
-    {
-      growing=false;
-      for(ElementContainer::const_iterator i=elements.begin();i!=elements.end();i++)
-        {
-          for(IntegerVectorList::const_iterator j=l.begin();j!=l.end();j++)
-            {
-              {
-                IntegerVector n(compose(*i,*j));
-                growing|=(0==elements.count(n));
-                elements.insert(n);
-              }
-              {
-                IntegerVector n(compose(*i,*j));
-                growing|=(0==elements.count(n));
-                elements.insert(n);
-              }
-            }
-        }
-    }
+  for(int i=0;i<l.getHeight();i++)computeClosure(Permutation(l[i]));
 }
-*/
+
 
 /*
 void SymmetryGroup::print(FILE *f)

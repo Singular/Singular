@@ -22,7 +22,6 @@
 #include "fieldGCD.h"
 #include "cf_gcd_smallp.h"
 
-
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
 #include "NTLconvert.h"

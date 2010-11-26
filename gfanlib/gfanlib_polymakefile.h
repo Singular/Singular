@@ -35,7 +35,8 @@ class PolymakeFile
   void writeProperty(const char *p, const std::string &data);
   bool isXml;
  public:
-  void open(const char *fileName_);
+//   void open(const char *fileName_);
+   void open(std::istream &f);
   void create(const char *fileName_, const char *application_, const char *type_, bool isXml_=false);
   void writeStream(std::ostream &file);
   void close();

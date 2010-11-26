@@ -203,11 +203,10 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
       IDPACKAGE(h)->loaded = FALSE;
     }
 #ifdef HAVE_FANS
-/*
     else if (t == FAN_CMD)
     {
-      IDSTRING(h) = (char*)(new Fan());
-    }*/
+      IDSTRING(h) = (char*)(new gfan::ZFan(0));
+    }
     else if (t == CONE_CMD)
     {
       IDSTRING(h) = (char*)(new gfan::ZCone());
@@ -478,12 +477,12 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   }
 #ifdef HAVE_FANS
   // fan -------------------------------------------------------------
-/*  else if (IDTYP(h) == FAN_CMD)
+  else if (IDTYP(h) == FAN_CMD)
   {
-    Fan* fff = (Fan*)IDDATA(h);
-    delete fff;
+    gfan::ZFan* zf = (gfan::ZFan*)IDDATA(h);
+    delete zf;
     IDDATA(h) = NULL;
-  }*/
+  }
   // cone ------------------------------------------------------------
   else if (IDTYP(h) == CONE_CMD)
   {

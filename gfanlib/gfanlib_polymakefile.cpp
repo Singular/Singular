@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <sstream>
+#include <istream>
 
 using namespace std;
 
@@ -30,16 +31,19 @@ static void eatComment(stringstream &s)
   s.unget();
 }
 
-static string readUntil(FILE *f, int c)
+static string readUntil(istream &f, int c)
 {
   stringstream ret;
   int c2;
-  c2=fgetc(f);
-  while(c2!=c && c2!=EOF)
-    {
+  c2=f.get();
+//  c2=fgetc(f);
+//  while(c2!=c && c2!=EOF)
+  while(c2!=c && !f.eof())
+  {
       ret<<char(c2);
-      c2=fgetc(f);
-    }
+      //c2=fgetc(f);
+      c2=f.get();
+  }
   return ret.str();
 }
 
@@ -66,7 +70,43 @@ PolymakeProperty::PolymakeProperty(const std::string &name_, const std::string &
 }
 
 
-void PolymakeFile::open(const char *fileName_)
+void PolymakeFile::open(std::istream &f)
+{
+  isXml=false;
+//  fileName=string(fileName_);
+
+//  FILE *f=fopen(fileName.c_str(),"r");
+//  if(!f)//fprintf(Stderr,"Could not open file:\"%s\"\n",fileName_);
+//  assert(f);
+
+  int c=f.get();//fgetc(f);
+  while(!f.eof())
+    {
+      if(c=='_')
+        {
+          readUntil(f,'\n');
+        }
+      else if(c!='\n')
+        {
+          f.unget();
+          //          ungetc(c,f);
+          string name=readUntil(f,'\n');
+
+//          fprintf(Stderr,"Reading:\"%s\"\n",name.c_str());
+          stringstream value;
+          while(1)
+            {
+              string l=readUntil(f,'\n');
+              if(l.size()==0)break;
+              value << l <<endl;
+            }
+          properties.push_back(PolymakeProperty(name.c_str(),value.str().c_str()));
+        }
+      c=f.get();//fgetc(f);
+    }
+}
+
+/*void PolymakeFile::open(const char *fileName_)
 {
   isXml=false;
   fileName=string(fileName_);
@@ -100,8 +140,7 @@ void PolymakeFile::open(const char *fileName_)
       c=fgetc(f);
     }
 }
-
-
+*/
 void PolymakeFile::create(const char *fileName_, const char *application_, const char *type_, bool isXml_)
 {
   fileName=string(fileName_);
@@ -243,19 +282,35 @@ void PolymakeFile::writeBooleanProperty(const char *p, bool n)
 
 ZMatrix PolymakeFile::readMatrixProperty(const char *p, int height, int width)
 {
-  ZMatrix ret(height,width);
+  ZMatrix ret(0,width);
 
   assert(hasProperty(p,true));
   list<PolymakeProperty>::iterator prop=findProperty(p);
   stringstream s(prop->value);
-  for(int i=0;i<height;i++)
+//  for(int i=0;i<height;i++)
+  for(int i=0;;i++)
+  {
+    if(i==height)break;
+    ZVector w(width);
     for(int j=0;j<width;j++)
-      {
-        int v;
-        eatComment(s);
-        s>>v;
-        ret[i][j]=v;
-      }
+        {
+          int v;
+          eatComment(s);
+          s>>v;
+          if(s.eof())goto done;
+          w[j]=v;
+        }
+    ret.appendRow(w);
+  }
+  done:
+
+  if(height>=0)assert(ret.getHeight()==height);
+//  cerr<<p;
+ //   eatComment(s);
+   // int v;
+   // s>>v;
+//  while(!s.eof())std::cerr<<char(s.get());
+ // assert(s.eof());
 
   return ret;
 }

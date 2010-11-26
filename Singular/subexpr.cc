@@ -126,6 +126,7 @@ std::string toString(gfan::ZCone const &c)
   return s.str();
 }
 
+/* not used */
 std::string toPrintString(gfan::ZCone const &c, char *nameOfCone)
 {
   std::stringstream s;
@@ -233,7 +234,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
 #ifdef HAVE_FANS
        case CONE_CMD:
-       //case FAN_CMD:
+       case FAN_CMD:
           PrintNSpaces(spaces);
           {
             char *s = String();
@@ -575,12 +576,12 @@ static inline void * s_internalCopy(const int t,  void *d)
         return d;
       }
 #ifdef HAVE_FANS
-/*    case FAN_CMD:
+    case FAN_CMD:
       {
-        Fan* fff = (Fan*)d;
-        Fan* ggg = new Fan(*fff);
-        return ggg;
-      }*/
+        gfan::ZFan* zf = (gfan::ZFan*)d;
+        gfan::ZFan* newZf = new gfan::ZFan(*zf);
+        return newZf;
+      }
     case CONE_CMD:
       {
         gfan::ZCone* zc = (gfan::ZCone*)d;
@@ -873,16 +874,15 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           }
           return s;
 #ifdef HAVE_FANS
-/*        case FAN_CMD:
+        case FAN_CMD:
         {
-          Fan* fff = (Fan*)d;
-          s = fff->toString();
-          char* ns = (char*) omAlloc(strlen(s) + 10);
-          sprintf(ns, "%s", s);
+          gfan::ZFan* zf = (gfan::ZFan*)d;
+          std::string s = zf->toString();
+          char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
+          sprintf(ns, "%s", s.c_str());
           omCheckAddr(ns);
-          omFree(s);
           return ns;
-        }*/
+        }
         case CONE_CMD:
         {
           gfan::ZCone* zc = (gfan::ZCone*)d;

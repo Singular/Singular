@@ -117,7 +117,8 @@ public:
   ZMatrix fundamentalDomainInequalities()const;
   SymmetryGroup(int n);
   void computeClosure(Permutation const &v);
-  void computeClosure(ZMatrix const &l);
+  void computeClosure(IntMatrix const &l);
+  IntMatrix getGenerators()const;
   int orbitSize(ZVector const &stable)const;
   bool isTrivial()const;
   /**

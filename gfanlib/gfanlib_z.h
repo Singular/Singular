@@ -162,6 +162,28 @@ public:
   {
     return mpz_get_si(value);
   }
+  bool fitsInInt()const
+  {
+    mpz_t v;
+    mpz_init(v);
+    this->setGmp(v);
+    bool ret=(mpz_fits_sint_p(v)!=0);
+    mpz_clear(v);
+    return ret;
+  }
+  int toInt()const
+  {
+    mpz_t v;
+    mpz_init(v);
+    this->setGmp(v);
+    int ret=0;
+    if(mpz_fits_sint_p(v))
+      ret=mpz_get_si(v);
+//    else
+//      ok=false;
+    mpz_clear(v);
+    return ret;
+  }
 };
 
 

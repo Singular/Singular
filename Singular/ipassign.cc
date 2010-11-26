@@ -323,7 +323,6 @@ static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr e)
   return FALSE;
 }
 #ifdef HAVE_FANS
-/*
 static BOOLEAN jiA_FAN(leftv res, leftv a, Subexpr e)
 {
   if (e != NULL)
@@ -333,14 +332,14 @@ static BOOLEAN jiA_FAN(leftv res, leftv a, Subexpr e)
   }
   if (res->data!=NULL)
   {
-    Fan* fff = (Fan*)res->data;
+    gfan::ZFan* zf = (gfan::ZFan*)res->data;
     res->data = NULL;
-    delete fff;
+    delete zf;
   }
-  Fan* fff = (Fan*)a->CopyD(FAN_CMD);
-  res->data=(void*)fff;
+  gfan::ZFan* zf = (gfan::ZFan*)a->CopyD(FAN_CMD);
+  res->data=(void*)zf;
   return FALSE;
-}*/
+}
 static BOOLEAN jiA_CONE(leftv res, leftv a, Subexpr e)
 {
   if (e != NULL)
@@ -1338,75 +1337,34 @@ static BOOLEAN jiAssign_rec(leftv l, leftv r)
   return b;
 }
 #ifdef HAVE_FANS
-/*
 BOOLEAN jjAssignFan(leftv l, leftv r)
-{*/
+{
   /* method for generating a fan;
-     valid parametrizations: (intmat or 0, intmat or 0, intmat or 0),
-     The intmat's capture the maximal rays, facet normals and the
-     lineality space of the new fan.
-     Any of the arguments may be the int 0. But either the 1st or
-     2nd argument must be an intmat, thus not both simultaneously
-     the int 0.
+     valid parametrizations: int (ambient dimension),
      Errors will be invoked in the following cases:
-     - 1st and 2nd argument simultaneously the int 0,
-     - numbers of rows in 1st, 2nd, and/or 3rd argument intmat
-       disagree */
-//  intvec* maxRays = NULL;    /* maximal rays */
-//  intvec* facetNs = NULL;    /* facet normals */
-//  intvec* linSpace = NULL;   /* lineality space */
-/*
-  leftv x = r;
-  if (x->Typ() == INTMAT_CMD) maxRays = (intvec*)x->Data();
-  else if ((x->Typ() != INT_CMD) ||
-           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
+     - argument < 0
+     The resulting fan has no cones, its lineality space
+     is the entire ambient space. */
+  if (r->Typ() != INT_CMD)
   {
-    WerrorS("expected '0' or an intmat as 1st argument");
+    WerrorS("expected an int as argument");
     return TRUE;
   }
-  x = x->next;
-  if (x->Typ() == INTMAT_CMD) facetNs = (intvec*)x->Data();
-  else if ((x->Typ() != INT_CMD) ||
-           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
+  int ambientDim = (int)(long)r->Data();
+  if (ambientDim < 0)
   {
-    WerrorS("expected '0' or an intmat as 2nd argument");
+    Werror("expected an int >= 0, but got %d", ambientDim);
     return TRUE;
   }
-  if ((maxRays == NULL) && (facetNs == NULL))
-  {
-    WerrorS("expected 1st or 2nd argument to be a valid intmat");
-    return TRUE;
-  }
-  x = x->next;
-  if (x->Typ() == INTMAT_CMD) linSpace = (intvec*)x->Data();
-  else if ((x->Typ() != INT_CMD) ||
-           ((x->Typ() == INT_CMD) && ((int)(long)x->Data() != 0)))
-  {
-    WerrorS("expected '0' or an intmat as 3rd argument");
-    return TRUE;
-  }
-  if ((maxRays != NULL) && (facetNs != NULL) &&
-      (maxRays->rows() != facetNs->rows()))
-  {
-    WerrorS("vector space dims do not agree (1st vs. 2nd argument)");
-    return TRUE;
-  }
-  if ((maxRays != NULL) && (linSpace != NULL) &&
-      (maxRays->rows() != linSpace->rows()))
-  {
-    WerrorS("vector space dims do not agree (1st vs. 3rd argument)");
-    return TRUE;
-  }
-
   if (IDDATA((idhdl)l->data) != NULL)
   {
-    Fan* fff = (Fan*)IDDATA((idhdl)l->data);
-    delete fff;
+    gfan::ZFan* zf = (gfan::ZFan*)IDDATA((idhdl)l->data);
+    delete zf;
   }
-  Fan* fff = new Fan(maxRays, facetNs, linSpace);
-  IDDATA((idhdl)l->data) = (char*)fff;
+  gfan::ZFan* zf = new gfan::ZFan(ambientDim);
+  IDDATA((idhdl)l->data) = (char*)zf;
   return FALSE;
-}*/
+}
 BOOLEAN jjAssignCone(leftv l, leftv r)
 {
   /* method for generating a cone;
@@ -1497,6 +1455,8 @@ BOOLEAN iiAssign(leftv l, leftv r)
 #ifdef HAVE_FANS
       if ((l->Typ() == CONE_CMD) && (r->Typ() == INT_CMD))
         return jjAssignCone(l, r);
+      if ((l->Typ() == FAN_CMD) && (r->Typ() == INT_CMD))
+        return jjAssignFan(l, r);
 #endif
       /* system variables = ... */
       if(((l->rtyp>=VECHO)&&(l->rtyp<=VPRINTLEVEL))

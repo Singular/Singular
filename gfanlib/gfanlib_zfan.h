@@ -61,6 +61,15 @@ class ZFan
 public:
   ~ZFan();
   ZFan(ZFan const& f);
+  /**
+   *
+   * To read from string, do the following:
+   *       std::string test="TEST";
+   *   std::istringstream s(test);
+   *   ZFan G(s);
+   *
+   */
+  ZFan(std::istream  &f);
   ZFan& operator=(ZFan const &f);
   /**
    * Creates an empty fan in the ambient space of dimension n.

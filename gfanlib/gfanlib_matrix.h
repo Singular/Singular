@@ -567,6 +567,7 @@ public:
 
 typedef Matrix<Integer> ZMatrix;
 typedef Matrix<Rational> QMatrix;
+typedef Matrix<int> IntMatrix;
 
 inline QMatrix ZToQMatrix(ZMatrix const &m)
 {
@@ -579,6 +580,22 @@ inline ZMatrix QToZMatrixPrimitive(QMatrix const &m)
 {
   ZMatrix ret(m.getHeight(),m.getWidth());
   for(int i=0;i<m.getHeight();i++)ret[i]=QToZVectorPrimitive(m[i]);
+  return ret;
+}
+
+
+inline IntMatrix ZToIntMatrix(ZMatrix const &m)
+{
+  IntMatrix ret(m.getHeight(),m.getWidth());
+  for(int i=0;i<m.getHeight();i++)ret[i]=ZToIntVector(m[i]);
+  return ret;
+}
+
+
+inline ZMatrix IntToZMatrix(IntMatrix const &m)
+{
+  ZMatrix ret(m.getHeight(),m.getWidth());
+  for(int i=0;i<m.getHeight();i++)ret[i]=IntToZVector(m[i]);
   return ret;
 }
 

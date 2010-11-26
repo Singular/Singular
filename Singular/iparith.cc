@@ -3474,6 +3474,13 @@ static BOOLEAN jjGETPROP1(leftv res, leftv u, leftv v)
   res->data = (void*)result;
   return FALSE;
 }*/
+static BOOLEAN jjINSERTCONE(leftv res, leftv u, leftv v)
+{
+	gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+	gfan::ZCone* zc = (gfan::ZCone*)v->Data();
+	zf->insert(*zc);
+	return FALSE;
+}
 static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
 {
   /* method for retrieving cone properties;
@@ -5024,7 +5031,7 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
     case LINK_CMD:       res->data=omStrDup("link"); break;
     case RESOLUTION_CMD: res->data=omStrDup("resolution");break;
 #ifdef HAVE_FANS
-//    case FAN_CMD:        res->data=omStrDup("fan");break;
+    case FAN_CMD:        res->data=omStrDup("fan");break;
     case CONE_CMD:       res->data=omStrDup("cone");break;
 #endif /* HAVE_FANS */
     case DEF_CMD:
@@ -5086,7 +5093,6 @@ BOOLEAN jjWAIT1ST1(leftv res, leftv a)
   res->data = (void*)(long)i;
   return FALSE;
 }
-
 BOOLEAN jjWAITALL1(leftv res, leftv a)
 {
   lists Lforks = (lists)a->Data();
@@ -5103,8 +5109,55 @@ BOOLEAN jjWAITALL1(leftv res, leftv a)
   omFreeBin((ADDRESS)oneFork, slists_bin);
   return FALSE;
 }
-
 #ifdef HAVE_FANS
+static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
+{
+	int ambientDim = (int)(long)v->Data();
+	if (ambientDim < 0)
+	{
+	  Werror("expected non-negative ambient dim but got %d", ambientDim);
+	  return TRUE;
+	}
+	res->data = (char*)(new gfan::ZFan(ambientDim));
+	return FALSE;
+}
+static BOOLEAN jjFANEMPTY_IM(leftv res, leftv v)
+{
+	intvec* permutations = (intvec*)v->Data();
+	// todo: check that permutations contains sensible elements of S_n
+	int ambientDim = permutations->cols();
+	gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
+	gfan::ZMatrix zm = intmat2ZMatrix(permutations);
+	gfan::IntMatrix im = gfan::ZToIntMatrix(zm);
+	sg.computeClosure(im);
+	res->data = (char*)(new gfan::ZFan(sg));
+	return FALSE;
+}
+static BOOLEAN jjFANFULL_I(leftv res, leftv v)
+{
+	int ambientDim = (int)(long)v->Data();
+	if (ambientDim < 0)
+	{
+	  Werror("expected non-negative ambient dim but got %d", ambientDim);
+	  return TRUE;
+	}
+	gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(ambientDim));
+	res->data = (char*)zf;
+	return FALSE;
+}
+static BOOLEAN jjFANFULL_IM(leftv res, leftv v)
+{
+	intvec* permutations = (intvec*)v->Data();
+	// todo: check that permutations contains sensible elements of S_n
+	int ambientDim = permutations->cols();
+	gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
+	gfan::ZMatrix zm = intmat2ZMatrix(permutations);
+	gfan::IntMatrix im = gfan::ZToIntMatrix(zm);
+	sg.computeClosure(im);
+	gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(sg));
+	res->data = (char*)zf;
+	return FALSE;
+}
 static BOOLEAN jjCONERAYS1(leftv res, leftv v)
 {
   /* method for generating a cone object from half-lines

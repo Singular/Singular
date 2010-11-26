@@ -246,8 +246,8 @@ void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::ve
 {
   int dimLow=this->linealitySpace.getHeight();
   int dimHigh=this->getMaxDim();
+  if(dimHigh<dimLow)dimHigh=dimLow-1;
   if(conelist)*conelist=std::vector<std::vector<IntVector> >(dimHigh-dimLow+1);
-
   for(int d=dimLow;d<=dimHigh;d++)
     {
       int numberOfOrbitsOutput=0;
@@ -291,7 +291,6 @@ void SymmetricComplex::buildConeLists(bool onlyMaximal, bool compressed, std::ve
                     }
         }
     }
-
 
 }
 
@@ -363,7 +362,9 @@ std::string SymmetricComplex::toStringJustCones(int dimLow, int dimHigh, bool on
 ZVector SymmetricComplex::fvector(bool boundedPart)const
 {
   int min=getMinDim();
-  ZVector ret(getMaxDim()-min+1);
+  int dimHigh=getMaxDim();
+  if(dimHigh<min)dimHigh=min-1;
+  ZVector ret(dimHigh-min+1);
 
   for(ConeContainer::const_iterator i=cones.begin();i!=cones.end();i++)
     {
@@ -522,8 +523,8 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
     polymakeFile.writeCardinalProperty("N_RAYS",vertices.getHeight());
 
 
-    polymakeFile.writeMatrixProperty("LINEALITY_SPACE",kernel(linealitySpace),n);
-    polymakeFile.writeMatrixProperty("ORTH_LINEALITY_SPACE",linealitySpace,n);
+    polymakeFile.writeMatrixProperty("LINEALITY_SPACE",linealitySpace,n);
+    polymakeFile.writeMatrixProperty("ORTH_LINEALITY_SPACE",kernel(linealitySpace),n);
 
 /*
     if(flags & FPF_primitiveRays)
@@ -584,6 +585,17 @@ IntegerMatrix SymmetricComplex::boundaryMap(int d)
     polymakeFile.writeCardinalProperty("SIMPLICIAL",isSimplicial());
     polymakeFile.writeCardinalProperty("PURE",isPure());
   //  log1 fprintf(Stderr,"Done checking.\n");
+
+
+    polymakeFile.writeStringProperty("CONES",toStringJustCones(getMinDim(),getMaxDim(),false,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
+    polymakeFile.writeStringProperty("MAXIMAL_CONES",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,false,flags&FPF_tPlaneSort));
+    polymakeFile.writeStringProperty("CONES_ORBITS",toStringJustCones(getMinDim(),getMaxDim(),false,flags&FPF_group, 0,true,flags&FPF_tPlaneSort));
+    polymakeFile.writeStringProperty("MAXIMAL_CONES_ORBITS",toStringJustCones(getMinDim(),getMaxDim(),true,flags&FPF_group, 0,true,flags&FPF_tPlaneSort));
+
+    if(!sym.isTrivial())
+      {
+        polymakeFile.writeMatrixProperty("SYMMETRY_GENERATORS",IntToZMatrix(sym.getGenerators()));
+      }
 
     std::stringstream s;
     polymakeFile.writeStream(s);
