@@ -179,7 +179,7 @@ HEADERS=hutil.h idrec.h stairc.h ideals.h \
 DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
         Makefile.in \
 	mod2.h.in testgh install-sh mkinstalldirs \
-	check_aso.pl prCopy.pl
+	prCopy.pl
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o) #$(CXXSOURCES2:.cpp=.o)
 OBJS2 := $(ESOURCES:.cc=.o)
