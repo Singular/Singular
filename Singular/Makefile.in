@@ -244,8 +244,7 @@ HEADERS=lists.h attrib.h \
 
 DISTFILES=${SOURCES} ${HEADERS} ${ESOURCES} \
         Makefile.in configure.in configure \
-	mod2.h.in grammar.h testgh install-sh mkinstalldirs \
-	check_aso.pl
+	mod2.h.in grammar.h testgh install-sh mkinstalldirs
 
 OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 
