@@ -22,7 +22,8 @@ $Id$
 #endif
 extern int gfanHeuristic;
 
-lists gfan(ideal inputIdeal, int heuristic);
+lists gfan(ideal inputIdeal, int heuristic, bool singleCone);
+lists grcone_by_intvec(ideal inputIdeal);
 
 class facet
 {
@@ -222,6 +223,7 @@ class gcone
 		void getConeNormals(const ideal &I, bool compIntPoint=FALSE);
 		void getCodim2Normals(const gcone &gc);
 		void getExtremalRays(const gcone &gc);
+		void orderRays();
 		void flip(ideal gb, facet *f);
 		void flip2(const ideal &gb, facet *f);
 		void computeInv(const ideal &gb, ideal &inv, const int64vec &f);

@@ -19,7 +19,7 @@ $Id$
 #include <kernel/GMPrat.h>
 //#include "fast_maps.h"	//Mapping of ideals
 // #include "maps.h"
-// #include "ring.h"	//apparently not needed
+#include "ring.h"	//apparently not needed
 // #include "structs.h"
 #include <Singular/lists.h>
 #include <kernel/prCopy.h>
@@ -1206,10 +1206,10 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		dd_FreeMatrix(posRestr);
 	}	
 	//Clean up but don't delete the return value!	
-	dd_FreeMatrix(ddineq);	
+	//dd_FreeMatrix(ddineq);	
 	set_free(ddredrows);//check
 	set_free(ddlinset);//check
-	free(ddnewpos);//<-- NOTE Here the crash occurs omAlloc issue?
+	//free(ddnewpos);//<-- NOTE Here the crash occurs omAlloc issue?
 #ifdef gfanp
 	gettimeofday(&end, 0);
 	time_getConeNormals += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
@@ -1707,7 +1707,13 @@ void gcone::getExtremalRays(const gcone &gc)
 	gettimeofday(&end, 0);
 	t_getExtremalRays += (end.tv_sec - start.tv_sec + 1e-6*(end.tv_usec - start.tv_usec));
 #endif	
-}		
+}
+
+/** Order the spanning rays in a lex way hopefully using qsort()*/
+void gcone::orderRays()
+{
+//   qsort(gcRays,sizeof(int64vec),int64vec::compare);
+}
 	
 inline bool gcone::iv64isStrictlyPositive(const int64vec * iv64)
 {
@@ -1722,7 +1728,7 @@ inline bool gcone::iv64isStrictlyPositive(const int64vec * iv64)
 	}
 	return res;
 }
-	
+
 /** \brief Compute the Groebner Basis on the other side of a shared facet 
  *
  * Implements algorithm 4.3.2 from Anders' thesis.
@@ -4412,7 +4418,10 @@ int gcone::numVars;
 bool gcone::hasHomInput=FALSE;
 int64vec *gcone::ivZeroVector;
 // ideal gfan(ideal inputIdeal, int h)
-lists gfan(ideal inputIdeal, int h)
+/** Main routine 
+ * The first and second parameter are mandatory. The third (and maybe fourth) parameter is for Janko :)
+ */
+lists gfan(ideal inputIdeal, int h, bool singleCone=FALSE)
 {
 	lists lResList; //this is the object we return	
 
@@ -4470,7 +4479,10 @@ lists gfan(ideal inputIdeal, int h)
 			gcAct->getConeNormals(gcAct->gcBasis);
 			gcone::dd_LinealitySpace = gcAct->computeLinealitySpace();
 			gcAct->getExtremalRays(*gcAct);
-			gcAct->noRevS(*gcAct);	//Here we go!
+			if(singleCone==FALSE)//Is Janko here?
+			{//Compute the whole fan
+			  gcAct->noRevS(*gcAct);	//Here we go!
+			}			    
 			//Switch back to the ring the computation was started in
 // 			rChangeCurrRing(inputRing);
 			//res=gcAct->gcBasis;
@@ -4549,4 +4561,18 @@ pointOfNoReturn:
 	return lResList;
 }
 
+/** Compute a single Gröbner cone by specifying an ideal and a weight vector.
+ * NOTE: We do NOT check whether the vector is from the relative interior of the cone.
+ * That is upon the user to assure.
+ */
+lists grcone_by_intvec(ideal inputIdeal)
+{
+  if( (rRingOrder_t)currRing->order[0] == ringorder_wp)
+  {
+    lists lResList;
+    lResList=gfan(inputIdeal, 0, TRUE);
+  }
+  else
+    WerrorS("Need wp ordering");
+}
 #endif

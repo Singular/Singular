@@ -3609,7 +3609,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       heuristic=(int)(long)h->next->Data();
       ideal I=((ideal)h->Data());
       res->rtyp=LIST_CMD;
-      res->data=(lists) gfan(I,heuristic);
+      res->data=(lists) gfan(I,heuristic,FALSE);
       return FALSE;
     }
     else
@@ -3618,7 +3618,19 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       return TRUE;
     }
   }
+  //Possibility to have only one Gröbner cone computed by specifying a weight vector FROM THE RELATIVE INTERIOR!
+  //Needs wp as ordering!
+  if(strcmp(sys_cmd,"grcone")==0)
+  {
+    if(h!=NULL && h->Typ()==IDEAL_CMD && h->next!=NULL && h->next->Typ()==INT_CMD)
+    {
+      ideal I=((ideal)h->Data());
+      res->rtyp=LIST_CMD;
+      res->data=(lists)grcone_by_intvec(I);
+    }
+  }
   else
+    
 #endif
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
