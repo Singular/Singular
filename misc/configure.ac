@@ -83,35 +83,5 @@ if test "$ac_cv_singcpuname" = ppc; then
   AC_SUBST(SI_CPU_PPC)
 fi
 
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl path stuff
-dnl
-
-project=singular
-component=misc
-
-dnl set exec_prefix, libdir, includedir to some sensible values
-dnl if they are not yet already set
-
-# expand prefix
-test "x$prefix" = xNONE && prefix=$ac_default_prefix
-if test "${with_rootdir+set}" != set; then
-  AC_DEFINE_UNQUOTED(S_ROOT_DIR, "${prefix}", "Root-directory")
-else
-  AC_DEFINE_UNQUOTED(S_ROOT_DIR, "${with_rootdir}", "Root-directory")
-fi
-
-
-# expand exec_prefixad
-if test "x$exec_prefix" = xNONE; then
- exec_prefix=${prefix}
-fi
-
-# expand libdir
-test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${project}/${component}"
-
-# expand includedir
-test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include/${project}/${component}"
-
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
