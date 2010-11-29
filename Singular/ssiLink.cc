@@ -31,6 +31,7 @@
 #include <kernel/polys.h>
 #include <kernel/longrat.h>
 #include <kernel/ideals.h>
+#include <kernel/intvec.h>
 #include "subexpr.h"
 #include "silink.h"
 #include "lists.h"
@@ -247,6 +248,15 @@ void ssiWriteList(si_link l,lists dd)
   for(i=0;i<=dd->nr;i++)
   {
     ssiWrite(l,&(dd->m[i]));
+  }
+}
+void ssiWriteIntvec(ssiInfo *d,intvec * v)
+{
+  fprintf(d->f_write,"%d ",v->length());
+  int i;
+  for(i=0;i<v->length();i++)
+  {
+    fprintf(d->f_write,"%d ",(*v)[i]);
   }
 }
 
@@ -504,6 +514,17 @@ lists ssiReadList(si_link l)
   }
   return L;
 }
+intvec* ssiReadIntvec(ssiInfo *d)
+{
+  int nr;
+  fscanf(d->f_read,"%d",&nr);
+  intvec *v=new intvec(nr);
+  for(int i=0;i<nr;i++)
+  {
+    fscanf(d->f_read,"%d",&((*v)[i]));
+  }
+  return v;
+}
 
 //**************************************************************************/
 BOOLEAN ssiOpen(si_link l, short flag, leftv u)
@@ -548,7 +569,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       if (pid==0) /*child*/
       {
         link_list hh=(link_list)ssiToBeClosed->next;
-	/* we know: l is the first entry in ssiToBeClosed-list */
+        /* we know: l is the first entry in ssiToBeClosed-list */
         while(hh!=NULL)
         {
           ssiInfo *dd=(ssiInfo*)hh->l->data;
@@ -558,11 +579,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
           omFreeSize((ADDRESS)dd,(sizeof *dd));
           hh->l->data=NULL;
           SI_LINK_SET_CLOSE_P(hh->l);
-	  link_list nn=(link_list)hh->next;
-	  omFree(hh);
-	  hh=nn;
+          link_list nn=(link_list)hh->next;
+          omFree(hh);
+          hh=nn;
         }
-	ssiToBeClosed->next=NULL;
+        ssiToBeClosed->next=NULL;
         close(pc[1]); close(cp[0]);
         d->f_read=fdopen(pc[0],"r");
         d->fd_read=pc[0];
@@ -934,6 +955,9 @@ LINKAGE leftv ssiRead1(si_link l)
              break;
     case 16: res->rtyp=NONE; res->data=NULL;
              break;
+    case 17: res->rtyp=INTVEC_CMD;
+             res->data=ssiReadIntvec(d);
+             break;
     case 99: ssiClose(l); exit(0);
     case 0: if (feof(d->f_read))
             {
@@ -1029,6 +1053,10 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
           case LIST_CMD:
                    fprintf(d->f_write,"14 ");
                    ssiWriteList(l,(lists)dd);
+                   break;
+          case INTVEC_CMD:
+                   fprintf(d->f_write,"17 ");
+                   ssiWriteIntvec(d,(intvec *)dd);
                    break;
           default: Werror("not implemented (t:%d, rtyp:%d)",tt, data->rtyp);
                    d->level=0;
@@ -1222,5 +1250,6 @@ int ssiBatch(const char *host, const char * port)
 // 14 list %d <elem1> ....
 // 15 setring .......
 // 16 nothing
+// 17 intvec <len> ...
 //
 // 99: quit Singular
