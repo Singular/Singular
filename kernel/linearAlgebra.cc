@@ -860,16 +860,7 @@ number hessenbergStep(
     else nDelete(&t1);
   }
   nDelete(&denominator);
-			  /*
-			  // inspect the following for inaccuracies in the computation;
-			  // norm of u should be 2 by construction
-				poly o = NULL;
-				for (int j = 1; j <= rr; j++)
-				  o = pAdd(o, ppMult_qq(MATELEM(uVec, j, 1), MATELEM(uVec, j, 1)));	
-				printf("norm of u = %s\n", pString(o));
-				printMatrix(vVec); printMatrix(uVec);
-				pDelete(&o);
-			  */
+
   /* finished building vector u; now turn to pMat */
   pMat = mpNew(rr, rr);
   /* we set P := E - u * u^T, as desired */
@@ -1271,10 +1262,87 @@ lists qrDoubleShift(const matrix A, const number tol1, const number tol2,
   return result;
 }
 
+/* This codes makes no assumption about the monomial ordering in the current
+   base ring. */
 void henselFactors(const poly h, const poly f0, const poly g0, const int d,
                    poly &f, poly &g)
 {
-  f = NULL;
-  g = NULL;
+  int n = (int)pDeg(f0);
+  int m = (int)pDeg(g0);
+  matrix fMat = mpNew(n, d + 1); /* fMat[i, j] is the coefficient of
+                                    x^(j-1) * y^(i-1) in f */
+  matrix gMat = mpNew(m, d + 1); /* gMat[i, j] is the coefficient of
+                                    x^(j-1) * y^(i-1) in g */
+  
+  f = pOne(); pSetExp(f, 2, n); pSetm(f);   // initialization: f = y^n
+  g = pOne(); pSetExp(g, 2, m); pSetm(g);   // initialization: g = y^m
+  
+  /* initial step: read off coefficients of f0 and g0 */
+  poly l = pAdd(pCopy(f0), pNeg(pCopy(f)));   // l = f0 - f = f0 - y^n
+  while (l != NULL)
+  {
+    int e = pGetExp(l, 2);
+    number c = pGetCoeff(l);
+    poly matEntry = pOne(); pSetCoeff(matEntry, nCopy(c));
+    MATELEM(fMat, e + 1, 1) = matEntry;
+    l = pNext(l);
+  }
+  l = pAdd(pCopy(g0), pNeg(pCopy(g)));        // l = g0 - g = g0 - y^m
+  while (l != NULL)
+  {
+    int e = pGetExp(l, 2);
+    number c = pGetCoeff(l);
+    poly matEntry = pOne(); pSetCoeff(matEntry, nCopy(c));
+    MATELEM(gMat, e + 1, 1) = matEntry;
+    l = pNext(l);
+  }
+  
+  /* loop for computing entries of fMat and gMat in columns 2..(d+1)
+     which correspond to the x-exponents 1..d */
+  int p = m; if (n < m) p = n;   // p = min{m, n}
+  for (int exp = 1; exp <= d; exp++)
+  {
+    matrix aMat = mpNew(p, n + m);   // container for matrix A of linear system
+    matrix xVec = mpNew(n + m, 1);   // container for unknowns of linear system
+    matrix bVec = mpNew(p, 1);       // container for result vector
+    
+    // continue here
+    
+    
+    /* clean-up */
+    idDelete((ideal*)&aMat);
+    idDelete((ideal*)&xVec);
+    idDelete((ideal*)&bVec);
+  }
+ 
+  /* build f and g from fMat and gMat, respectively */
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j <= d; j++)
+    {
+      poly term = pCopy(MATELEM(fMat, i + 1, j + 1));   // coeff
+      if (term != NULL)
+      {
+        pSetExp(term, 1, j);                            // ... * x^j
+        pSetExp(term, 2, i);                            // ... * y^i
+        pSetm(term);
+        f = pAdd(f, term);
+      }
+    }
+  for (int i = 0; i < m; i++)
+    for (int j = 0; j <= d; j++)
+    {
+      poly term = pCopy(MATELEM(gMat, i + 1, j + 1));   // coeff
+      if (term != NULL)
+      {
+        pSetExp(term, 1, j);                            // ... * x^j
+        pSetExp(term, 2, i);                            // ... * y^i
+        pSetm(term);
+        g = pAdd(g, term);
+      }
+    }
+  
+  /* clean-up */
+  idDelete((ideal*)&fMat);
+  idDelete((ideal*)&gMat);
 }
 

@@ -218,7 +218,7 @@ int luRank(
           );
 
 /**
- * Solves the linear system A*x = b, where A is an (n x n)-matrix
+ * Solves the linear system A * x = b, where A is an (m x n)-matrix
  * which is given by its LU-decomposition.
  *
  * The method expects the LU-decomposition of A, that is,
@@ -460,9 +460,9 @@ lists qrDoubleShift(
  * The algorithm is based on Hensel's lemma: Let h(x, y) denote a monic
  * polynomial in y of degree m + n with coefficients in K[[x]]. Suppose there
  * are two monic factors f_0(y) (of degree n) and g_0(y) of degree (m) such
- * that h(0, y) = f_0(y) * g_0(y), and an integer d >= 0. Then there are
- * monic polynomials in y with coefficients in K[[x]], namely f(x, y) of
- * degree n and g(x, y) of degree m such that
+ * that h(0, y) = f_0(y) * g_0(y) and <f_0, g_0> = K[y]. Fix an integer d >= 0.
+ * Then there are monic polynomials in y with coefficients in K[[x]], namely
+ * f(x, y) of degree n and g(x, y) of degree m such that
  *    h(x, y) = f(x, y) * g(x, y) modulo <x^(d+1)>   (*).
  *
  * This implementation expects h, f0, g0, and d as described and computes the
@@ -470,6 +470,11 @@ lists qrDoubleShift(
  * all terms of h with x-degree larger than d can be ignored due to (*).
  * The method expects the ground ring to contain at least two variables; then
  * x is the first ring variable and y the second one.
+ *
+ * This code was place here since the algorithm works by successively solving
+ * d linear equation systems. It is hence an application of other methods
+ * defined in this h-file and its corresponding cc-file.
+ * 
  **/
 void henselFactors(
        const poly h,      /**< [in]  the polynomial h(x, y) to be factorized */
