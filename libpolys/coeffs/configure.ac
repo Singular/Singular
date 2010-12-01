@@ -1,8 +1,9 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.63])
+AC_PREREQ([2.65])
 AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([rmodulon.h])
 AC_CONFIG_HEADERS([config.h])
 
@@ -13,13 +14,12 @@ case $host_os in
   * ) LIBPREFIX="";;
 esac
 
-
-
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_INSTALL
+AC_PROG_RANLIB
 
 # Checks for libraries.
 

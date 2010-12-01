@@ -14,27 +14,27 @@ prefix 		= @prefix@
 exec_prefix 	= @exec_prefix@
 libdir 		= @libdir@
 # includes are taken from here
-includedir	= @includedir@/reporter
+includedir	= @includedir@/resources
 
 ##
 ## various programs
 ##
 
-CXX		= g++
+CXX		= @CXX@
 INSTALL		= @INSTALL@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@
 INSTALL_DATA	= @INSTALL_DATA@
-MKINSTALLDIRS   = ./mkinstalldirs
+MKINSTALLDIRS   = ../mkinstalldirs
 LN_S		= ln -s
 
 ##
 ## compiler and linker options
 ##
 PIPE		= -pipe
-CFLAGS		= -O3 -w -fomit-frame-pointer ${PIPE}
-CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE}
+CFLAGS		= @CFLAGS@ ${PIPE}
+CXXFLAGS	= @CXXFLAGS@ ${PIPE}
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-CPPFLAGS	= -I${top_srcdir}/..
+CPPFLAGS	= -I${top_srcdir}/.. -I${top_srcdir}/../..
 DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
 
 ## End configuration dependend stuff
@@ -45,14 +45,14 @@ DEFS		= -DNDEBUG -DOM_NDEBUG -Dix86_Linux -DHAVE_CONFIG_H
 ###
 
 # normal C++ source files
-CXXSOURCES=reporter.cc
+CXXSOURCES=feFopen.cc feResource.cc
 
 # normal C source files
-CSOURCES=dError.c
+CSOURCES=
 
 SOURCES=${CSOURCES} ${CXXSOURCES}
 
-HEADERS=reporter.h
+HEADERS=feFopen.h feResource.h
 
 DISTFILES=${SOURCES} ${HEADERS}
 
@@ -63,17 +63,17 @@ OBJS := $(CXXSOURCES:.cc=.o) $(CSOURCES:.c=.o)
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -c $<
 
-libreporter.a: ${OBJS}
-	-rm -f libreporter.a
-	ar cr $@ $^
+libresources.a: ${OBJS}
+	 -rm -f $@
+	 ar cr $@ $^
 
-all: libreporter.a
+all:  libresources.a
 
 install: all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
-	${INSTALL_DATA} libreporter.a ${libdir}/libreporter.a
-	${INSTALL_DATA} reporter.h ${includedir}/reporter.h
+	${INSTALL_DATA} feFopen.h ${includedir}/feFopen.h
+	${INSTALL_DATA} libresources.a ${libdir}/libresources.a
 
 ##
 ## clean targest
