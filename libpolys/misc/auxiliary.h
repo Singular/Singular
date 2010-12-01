@@ -16,6 +16,8 @@
 
 #ifndef MISC_AUXILIARY_H
 #define MISC_AUXILIARY_H
+
+#include "misc/config.h"
      
 // ----------------- which parts/extensions of Singular to build
 #define HAVE_RINGS

@@ -1,8 +1,7 @@
 ALLOC=omalloc
 
-#PACKAGES=$(ALLOC) ntl factory libfac misc resources reporter coeffs polys
-PACKAGES=$(ALLOC) misc reporter resources coeffs
+PACKAGES=$(ALLOC) libpolys
 
 SUBDIRS=$(PACKAGES)
 
-TESTDIRS=coeffs
+TESTDIRS=libpolys

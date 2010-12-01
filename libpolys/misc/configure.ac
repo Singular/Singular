@@ -5,7 +5,7 @@ AC_PREREQ([2.65])
 AC_INIT([misc], [3.1.2.sw])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([mylimits.h])
-AC_CONFIG_HEADERS([auxiliary.h])
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC
