@@ -1198,8 +1198,8 @@ int similar(
 		w3 = nSub(ni, ii); w4 = nMult(w3, w3);
 		w5 = nAdd(w2, w4);
 		if (!nGreater(w5, tt)) result = i;
-		nDelete(&w1); nDelete(&w2); nDelete(&w3); nDelete(&w4); nDelete(&w5);
-		nDelete(&rr); nDelete(&ii);
+		nDelete(&w1); nDelete(&w2); nDelete(&w3); nDelete(&w4);
+                nDelete(&w5); nDelete(&rr); nDelete(&ii);
 		if (result != -1) break;
 	}
 	nDelete(&tt); nDelete(&nr); nDelete(&ni);
@@ -1226,7 +1226,8 @@ lists qrDoubleShift(const matrix A, const number tol1, const number tol2,
   	delete [] queue;
   	result->Init(1);
   	result->m[0].rtyp = INT_CMD;
-	  result->m[0].data = (void*)0;   /* a list with a single entry (int 0) */
+	  result->m[0].data = (void*)0;   /* a list with a single entry
+                                             which is the int zero */
   }
   else
   {
@@ -1269,3 +1270,11 @@ lists qrDoubleShift(const matrix A, const number tol1, const number tol2,
   }
   return result;
 }
+
+void henselFactors(const poly h, const poly f0, const poly g0, const int d,
+                   poly &f, poly &g)
+{
+  f = NULL;
+  g = NULL;
+}
+

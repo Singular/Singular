@@ -453,5 +453,32 @@ lists qrDoubleShift(
                                       eigenvalues                  */
                    );
 
+/**
+ * Computes a factorization of a polynomial h(x, y) in K[[x]][y] up to a
+ * certain degree in x, whenever a factorization of h(0, y) is given.
+ *
+ * The algorithm is based on Hensel's lemma: Let h(x, y) denote a monic
+ * polynomial in y of degree m + n with coefficients in K[[x]]. Suppose there
+ * are two monic factors f_0(y) (of degree n) and g_0(y) of degree (m) such
+ * that h(0, y) = f_0(y) * g_0(y), and an integer d >= 0. Then there are
+ * monic polynomials in y with coefficients in K[[x]], namely f(x, y) of
+ * degree n and g(x, y) of degree m such that
+ *    h(x, y) = f(x, y) * g(x, y) modulo <x^(d+1)>   (*).
+ *
+ * This implementation expects h, f0, g0, and d as described and computes the
+ * factors f and g. Effectively, h will be given as an element of K[x, y] since
+ * all terms of h with x-degree larger than d can be ignored due to (*).
+ * The method expects the ground ring to contain at least two variables; then
+ * x is the first ring variable and y the second one.
+ **/
+void henselFactors(
+       const poly h,      /**< [in]  the polynomial h(x, y) to be factorized */
+       const poly f0,     /**< [in]  the first univariate factor of h(0, y)  */
+       const poly g0,     /**< [in]  the second univariate factor of h(0, y) */
+       const int d,       /**< [in]  the degree bound, d >= 0                */
+       poly &f,           /**< [out] the first factor of h(x, y)             */
+       poly &g            /**< [out] the second factor of h(x, y)            */
+                              );
+
 #endif
 /* LINEAR_ALGEBRA_H */

@@ -136,6 +136,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 #include <kernel/maps.h>
 
 #include <kernel/shiftgb.h>
+#include <kernel/linearAlgebra.h>
 
 #ifdef HAVE_EIGENVAL
 #include <Singular/eigenval_ip.h>
@@ -625,6 +626,35 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         else
         {
           Werror( "expected valid file name as a string");
+          return TRUE;
+        }
+      }
+  /*==================== Hensel's lemma ======================*/
+      if(strcmp(sys_cmd, "henselfactors")==0)
+      {
+        if ((h != NULL) && (h->Typ() == POLY_CMD) &&
+            (h->next != NULL) && (h->next->Typ() == POLY_CMD) &&
+            (h->next->next != NULL) && (h->next->next->Typ() == POLY_CMD) &&
+            (h->next->next->next != NULL) &&
+                                     (h->next->next->next->Typ() == INT_CMD))
+        {
+          poly hh = (poly)h->Data();
+          poly f0 = (poly)h->next->Data();
+          poly g0 = (poly)h->next->next->Data();
+          int d   = (int)(long)h->next->next->next->Data();
+          poly f; poly g;
+          henselFactors(hh, f0, g0, d, f, g);
+          lists L = (lists)omAllocBin(slists_bin);
+          L->Init(2);
+          L->m[0].rtyp = POLY_CMD; L->m[0].data=(void*)f;
+          L->m[1].rtyp = POLY_CMD; L->m[1].data=(void*)g;
+          res->rtyp = LIST_CMD;
+          res->data = (char *)L;
+          return FALSE;
+        }
+        else
+        {
+          Werror( "expected argument list (poly, poly, poly, int)");
           return TRUE;
         }
       }
