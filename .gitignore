@@ -10,6 +10,8 @@ depend
 tags
 Makefile
 GNUMakefile
+confdefs.h
+configure
 config.status
 config.log
 tags
@@ -19,6 +21,8 @@ ix86-Win/*
 x86_64-Linux/*
 ix86Mac-darwin/*
 misc/auxiliary.h
+omalloc/Makefile.in
+omalloc/omConfig.h.in
 omalloc/omTables
 omalloc/omTables.h
 omalloc/omTables.inc
