@@ -145,6 +145,7 @@ void p_Write(poly p, ring lmRing, ring tailRing)
   PrintLn();
 }
 
+#if !defined(__OPTIMIZE__) || defined(KDEBUG)
 /*2
 *the standard debugging output:
 *print the first two monomials of the poly (wrp) or only the lead term (wrp0),
@@ -168,8 +169,7 @@ void p_wrp0(poly p, ring ri)
     }
   }
 }
-//#if !defined(__OPTIMIZE__) || defined(KDEBUG): used in list1
-#if 1
+#endif
 void p_wrp(poly p, ring lmRing, ring tailRing)
 {
   poly r;
@@ -188,21 +188,3 @@ void p_wrp(poly p, ring lmRing, ring tailRing)
     }
   }
 }
-#else
-// this is for use with buckets
-void p_wrp(poly p, ring lmRing, ring tailRing)
-{
-  poly r;
-
-  if (p==NULL) PrintS("NULL");
-  else if (pNext(p)==NULL) p_Write0(p, lmRing);
-  else
-  {
-    r = pNext(p);
-    pNext(p) = NULL;
-    p_Write0(p, lmRing, tailRing);
-    pNext(p) = r;
-  }
-}
-#endif
-//#endif
