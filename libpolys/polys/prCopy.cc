@@ -32,7 +32,6 @@ prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
 #include <kernel/prCopy.inc>
 
 /////////////////////////////////////////////////////////////////////////
-
 poly prCopyR(poly p, ring src_r, ring dest_r)
 {
   poly res;
