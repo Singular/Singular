@@ -131,8 +131,7 @@ int    rChar(ring r=currRing);
 #define rPar(r) (r->P)
 #define rVar(r) (r->N)
 char * rParStr(ring r);
-int    rIsExtension(ring r);
-int    rIsExtension();
+int    rIsExtension(const ring r=currRing);
 int    rSum(ring r1, ring r2, ring &sum);
 int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp);
 

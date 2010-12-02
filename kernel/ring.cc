@@ -735,17 +735,12 @@ char * rString(ring r)
   return res;
 }
 
-int  rIsExtension(ring r)
+int  rIsExtension(const ring r)
 {
   return (r->parameter!=NULL); /* R, Q, Fp: FALSE */
 }
 
-int  rIsExtension()
-{
-  return rIsExtension( currRing );
-}
-
-int binaryPower (const int a, const int b)
+static int binaryPower (const int a, const int b)
 {
   /* computes a^b according to the binary representation of b,
      i.e., a^7 = a^4 * a^2 * a^1. This saves some multiplications. */
