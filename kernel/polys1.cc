@@ -649,7 +649,6 @@ void p_Content(poly ph, const ring r)
   }
 }
 
-#if 0 // currently not used
 void pSimpleContent(poly ph,int smax)
 {
   if(TEST_OPT_CONTENTSB) return;
@@ -704,7 +703,6 @@ void pSimpleContent(poly ph,int smax)
   }
   nlDelete(&h,currRing);
 }
-#endif
 
 number pInitContent(poly ph)
 // only for coefficients in Q
