@@ -632,18 +632,25 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
   /*==================== Hensel's lemma ======================*/
       if(strcmp(sys_cmd, "henselfactors")==0)
       {
-        if ((h != NULL) && (h->Typ() == POLY_CMD) &&
-            (h->next != NULL) && (h->next->Typ() == POLY_CMD) &&
+        if ((h != NULL) && (h->Typ() == INT_CMD) &&
+            (h->next != NULL) && (h->next->Typ() == INT_CMD) &&
             (h->next->next != NULL) && (h->next->next->Typ() == POLY_CMD) &&
             (h->next->next->next != NULL) &&
-                                     (h->next->next->next->Typ() == INT_CMD))
+               (h->next->next->next->Typ() == POLY_CMD) &&
+            (h->next->next->next->next != NULL) &&
+               (h->next->next->next->next->Typ() == POLY_CMD) &&
+            (h->next->next->next->next->next != NULL) &&
+               (h->next->next->next->next->next->Typ() == INT_CMD) &&
+            (h->next->next->next->next->next->next == NULL))
         {
-          poly hh = (poly)h->Data();
-          poly f0 = (poly)h->next->Data();
-          poly g0 = (poly)h->next->next->Data();
-          int d   = (int)(long)h->next->next->next->Data();
+          int xIndex = (int)(long)h->Data();
+          int yIndex = (int)(long)h->next->Data();
+          poly hh    = (poly)h->next->next->Data();
+          poly f0    = (poly)h->next->next->next->Data();
+          poly g0    = (poly)h->next->next->next->next->Data();
+          int d      = (int)(long)h->next->next->next->next->next->Data();
           poly f; poly g;
-          henselFactors(hh, f0, g0, d, f, g);
+          henselFactors(xIndex, yIndex, hh, f0, g0, d, f, g);
           lists L = (lists)omAllocBin(slists_bin);
           L->Init(2);
           L->m[0].rtyp = POLY_CMD; L->m[0].data=(void*)f;
@@ -654,7 +661,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         }
         else
         {
-          Werror( "expected argument list (poly, poly, poly, int)");
+          Werror( "expected argument list (int, int, poly, poly, poly, int)");
           return TRUE;
         }
       }

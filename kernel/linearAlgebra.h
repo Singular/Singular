@@ -469,7 +469,8 @@ lists qrDoubleShift(
  * factors f and g. Effectively, h will be given as an element of K[x, y] since
  * all terms of h with x-degree larger than d can be ignored due to (*).
  * The method expects the ground ring to contain at least two variables; then
- * x is the first ring variable and y the second one.
+ * x is the first ring variable, specified by the input index xIndex, and y the
+ * second one, specified by yIndex.
  *
  * This code was place here since the algorithm works by successively solving
  * d linear equation systems. It is hence an application of other methods
@@ -477,6 +478,8 @@ lists qrDoubleShift(
  * 
  **/
 void henselFactors(
+       const int xIndex,  /**< [in]  index of x in {1, ..., nvars(basering)} */
+       const int yIndex,  /**< [in]  index of y in {1, ..., nvars(basering)} */
        const poly h,      /**< [in]  the polynomial h(x, y) to be factorized */
        const poly f0,     /**< [in]  the first univariate factor of h(0, y)  */
        const poly g0,     /**< [in]  the second univariate factor of h(0, y) */
