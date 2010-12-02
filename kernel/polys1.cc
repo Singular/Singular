@@ -1539,6 +1539,7 @@ long pDegW(poly p, const short *w)
 }
 
 /*-----------type conversions ----------------------------*/
+#if 0
 /*2
 * input: a set of polys (len elements: p[0]..p[len-1])
 * output: a vector
@@ -1561,6 +1562,7 @@ poly  pPolys2Vec(polyset p, int len)
   }
  return v;
 }
+#endif
 
 /*2
 * convert a vector to a set of polys,

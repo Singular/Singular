@@ -392,7 +392,7 @@ poly      pInvers(int n, poly p,intvec *w=NULL);
 long      pDegW(poly p, const short *w);
 
 /*-----------type conversions ----------------------------*/
-poly  pPolys2Vec(polyset p, int len);
+//poly  pPolys2Vec(polyset p, int len);
 void  pVec2Polys(poly v, polyset *p, int *len);
 int   p_Var(poly mi,const ring r);
 #define   pVar(m) p_Var(m,currRing)
