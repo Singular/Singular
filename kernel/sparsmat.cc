@@ -143,7 +143,6 @@ private:
   void smToredElim();
   void smCopToRes();
   void smSelectPR();
-  void smElim();
   void sm1Elim();
   void smHElim();
   void smMultCol();
@@ -163,7 +162,6 @@ public:
   int smGetRed() { return tored; }
   ideal smRes2Mod();
   poly smDet();
-  void smBareiss(int, int);
   void smNewBareiss(int, int);
   void smToIntvec(intvec *);
 };
