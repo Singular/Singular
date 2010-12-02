@@ -1324,26 +1324,8 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
     matrix xVec = mpNew(n + m, 1);     /* x */
     matrix bVec = mpNew(n + m, 1);     /* b */
     
-    /* setup A */
-    for (int row = 1; row <= n + m; row++)
-    {
-      int k = row;
-      for (int col = 1; col <= n; col++)
-      {
-        if (k <= m + 1) MATELEM(aMat, row, col) = pCopy(MATELEM(gMat, k, 1));
-        k--;
-        if (k == 0) break;
-      }
-      k = row;
-      for (int col = n + 1; col <= n + m; col++)
-      {
-        if (k <= n + 1) MATELEM(aMat, row, col) = pCopy(MATELEM(fMat, k, 1));
-        k--;
-        if (k == 0) break;
-      }
-    }
-
     /* setup b */
+    bool isZeroVector = true;
     for (int row = 1; row <= n + m; row++)
     {
       poly p = pCopy(MATELEM(hMat, row, xExp + 1));
@@ -1362,12 +1344,40 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
         }
       }
       MATELEM(bVec, row, 1) = p;
+      if (p != NULL) isZeroVector = false;
+    }
+    
+    /* setup A (only if b is not the zero vector) */
+    if (!isZeroVector)
+    {
+      for (int row = 1; row <= n + m; row++)
+      {
+        int k = row;
+        for (int col = 1; col <= n; col++)
+        {
+          if (k <= m + 1) MATELEM(aMat, row, col) = pCopy(MATELEM(gMat, k, 1));
+          k--;
+          if (k == 0) break;
+        }
+        k = row;
+        for (int col = n + 1; col <= n + m; col++)
+        {
+          if (k <= n + 1) MATELEM(aMat, row, col) = pCopy(MATELEM(fMat, k, 1));
+          k--;
+          if (k == 0) break;
+        }
+      }
     }
 
     /* computation of x */
-    matrix pMat; matrix lMat; matrix uMat; matrix wMat;
-    luDecomp(aMat, pMat, lMat, uMat);
-    luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, wMat);
+    if (!isZeroVector)
+    {
+      matrix pMat; matrix lMat; matrix uMat; matrix wMat;
+      luDecomp(aMat, pMat, lMat, uMat);
+      luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, wMat);
+      idDelete((ideal*)&pMat); idDelete((ideal*)&lMat);
+      idDelete((ideal*)&uMat); idDelete((ideal*)&wMat);
+    }
 
     /* fill (xExp + 1)-columns of fMat and gMat */
     for (int row = 1; row <= n; row++)
@@ -1377,8 +1387,6 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
     
     /* clean-up */
     idDelete((ideal*)&aMat); idDelete((ideal*)&xVec); idDelete((ideal*)&bVec);
-    idDelete((ideal*)&pMat); idDelete((ideal*)&lMat); idDelete((ideal*)&uMat);
-    idDelete((ideal*)&wMat);
   }
  
   /* build f and g from fMat and gMat, respectively */
