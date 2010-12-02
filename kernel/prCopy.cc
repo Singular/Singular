@@ -32,17 +32,6 @@ prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
 #include <kernel/prCopy.inc>
 
 /////////////////////////////////////////////////////////////////////////
-// prCopy
-poly prCopy(poly p, ring dest_r)
-{
-  poly res;
-  if (rField_has_simple_Alloc(dest_r))
-    res = pr_Copy_REqual_NSimple_NoSort(p, dest_r, dest_r);
-  else
-    res = pr_Copy_REqual_NoNSimple_NoSort(p, dest_r, dest_r);
-  p_Test(res, dest_r);
-  return res;
-}
 
 poly prCopyR(poly p, ring src_r, ring dest_r)
 {
