@@ -156,11 +156,16 @@ extern "C" {
  *****************************************************************************/
 // relying on gcc to define __ELF__, check with cpp -dM /dev/null
 // Mac OsX is an ELF system, but does not define __ELF__
+// Solaris is an ELF system, but does not define __ELF__
 #if defined(__ELF__)
 #define HAVE_ELF_SYSTEM
 #endif
 
 #if defined(ix86Mac_darwin)
+#define HAVE_ELF_SYSTEM
+#endif
+
+#if defined(SunOS_5)
 #define HAVE_ELF_SYSTEM
 #endif
 
