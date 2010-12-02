@@ -1867,6 +1867,7 @@ void p_Content(poly ph, const ring r)
     }
   }
 }
+#if 0 // currently not used
 void p_SimpleContent(poly ph,int smax, const ring r)
 {
   if(TEST_OPT_CONTENTSB) return;
@@ -1921,6 +1922,7 @@ void p_SimpleContent(poly ph,int smax, const ring r)
   }
   nlDelete(&h,r->cf);
 }
+#endif
 
 static number p_InitContent(poly ph, const ring r)
 // only for coefficients in Q
