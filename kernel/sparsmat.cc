@@ -586,64 +586,6 @@ poly sparse_mat::smDet()
 }
 
 /*
-* the Bareiss elimination:
-*   - with x unreduced last rows, pivots from here are not allowed
-*   - the method will finish for number of unreduced columns < y
-*/
-void sparse_mat::smBareiss(int x, int y)
-{
-  if ((x > 0) && (x < nrows))
-  {
-    tored -= x;
-    this->smToredElim();
-  }
-  if (y < 1) y = 1;
-  if (act <= y)
-  {
-    this->smCopToRes();
-    return;
-  }
-  normalize = this->smCheckNormalize();
-  if (normalize) this->smNormalize();
-  this->smPivot();
-  this->smSelectPR();
-  this->smElim();
-  crd++;
-  this->smColToRow();
-  act--;
-  this->smRowToCol();
-  this->smZeroElim();
-  if (tored != nrows)
-    this->smToredElim();
-  if (act < y)
-  {
-    this->smCopToRes();
-    return;
-  }
-  loop
-  {
-    if (normalize) this->smNormalize();
-    this->smPivot();
-    oldpiv = piv;
-    this->smSelectPR();
-    this->smElim();
-    crd++;
-    this->smColToRow();
-    act--;
-    this->smRowToCol();
-    this->smZeroElim();
-    if (tored != nrows)
-      this->smToredElim();
-    if (act < y)
-    {
-      if (TEST_OPT_PROT) PrintS(".\n");
-      this->smCopToRes();
-      return;
-    }
-  }
-}
-
-/*
 * the new Bareiss elimination:
 *   - with x unreduced last rows, pivots from here are not allowed
 *   - the method will finish for number of unreduced columns < y
