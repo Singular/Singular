@@ -1013,8 +1013,6 @@ poly kBucket_ExtractLarger(kBucket_pt bucket, poly q, poly append)
 // Hmm... for now I'm too lazy to implement those independent of currRing
 // But better declare it extern than including polys.h
 extern void pTakeOutComp(poly *p, long comp, poly *q, int *lq);
-void pDecrOrdTakeOutComp(poly *p, long comp, long order,
-                         poly *q, int *lq);
 
 void kBucketTakeOutComp(kBucket_pt bucket,
                         long comp,
@@ -1049,38 +1047,6 @@ void kBucketTakeOutComp(kBucket_pt bucket,
   *l = lp;
 
   kbTest(bucket);
-}
-
-void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
-                               long comp, long order,
-                               poly *r_p, int *l)
-{
-  poly p = NULL, q;
-  int i, lp = 0, lq;
-
-#ifndef HAVE_PSEUDO_BUCKETS
-  kBucketMergeLm(bucket);
-  for (i=1; i<=bucket->buckets_used; i++)
-  {
-    if (bucket->buckets[i] != NULL)
-    {
-      MULTIPLY_BUCKET(bucket,i);
-      pDecrOrdTakeOutComp(&(bucket->buckets[i]), comp, order, &q, &lq);
-      if (q != NULL)
-      {
-        bucket->buckets_length[i] -= lq;
-        p = p_Add_q(p, q, lp, lq, bucket->bucket_ring);
-      }
-    }
-  }
-  kBucketAdjustBucketsUsed(bucket);
-#else
-  pDecrOrdTakeOutComp(&(bucket->p), comp, order, &p, &lp);
-  (bucket->l) -= lp;
-#endif
-
-  *r_p = p;
-  *l = lp;
 }
 
 /////////////////////////////////////////////////////////////////////////////

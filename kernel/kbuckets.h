@@ -99,14 +99,6 @@ void kBucketTakeOutComp(kBucket_pt bucket,
                         long comp,
                         poly *p, int *l);
 
-// Here we only extract such monoms which have component == comp and
-// degree == order
-// ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
-//         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
-void kBucketDecrOrdTakeOutComp(kBucket_pt bucket,
-                               long comp, long order,
-                               poly *p, int *l);
-
 //////////////////////////////////////////////////////////////////////////
 ///
 /// Multiply Bucket by number ,i.e. Bpoly == n*Bpoly

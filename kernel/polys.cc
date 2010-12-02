@@ -466,60 +466,6 @@ void pTakeOutComp(poly *r_p, long comp, poly *r_q, int *lq)
   pTest(*r_q);
 }
 
-void pDecrOrdTakeOutComp(poly *r_p, long comp, long order,
-                         poly *r_q, int *lq)
-{
-  spolyrec pp, qq;
-  poly p, q, p_prev;
-  int l = 0;
-
-  pNext(&pp) = *r_p;
-  p = *r_p;
-  p_prev = &pp;
-  q = &qq;
-
-#ifdef HAVE_ASSUME
-  if (p != NULL)
-  {
-    while (pNext(p) != NULL)
-    {
-      assume(pGetOrder(p) >= pGetOrder(pNext(p)));
-      pIter(p);
-    }
-  }
-  p = *r_p;
-#endif
-
-  while (p != NULL && pGetOrder(p) > order) pIter(p);
-
-  while(p != NULL && pGetOrder(p) == order)
-  {
-    while (pGetComp(p) == comp)
-    {
-      pNext(q) = p;
-      pIter(q);
-      pIter(p);
-      pSetComp(p, 0);
-      pSetmComp(p);
-      l++;
-      if (p == NULL || pGetOrder(p) != order)
-      {
-        pNext(p_prev) = p;
-        goto Finish;
-      }
-    }
-    pNext(p_prev) = p;
-    p_prev = p;
-    pIter(p);
-  }
-
-  Finish:
-  pNext(q) = NULL;
-  *r_p = pNext(&pp);
-  *r_q = pNext(&qq);
-  *lq = l;
-}
-
 #if 1
 poly pTakeOutComp1(poly * p, int k)
 {
