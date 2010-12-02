@@ -348,7 +348,7 @@ poly p_One(const ring r);
 #define   pOne()   p_One(currRing)
 
 void      p_Content(poly p, const ring r);
-void      pSimpleContent(poly p, int s);
+//void      pSimpleContent(poly p, int s);
 poly      p_Cleardenom(poly p, const ring r);
 void      p_Cleardenom_n(poly p, const ring r,number &c);
 void      p_Normalize(poly p,const ring r);
