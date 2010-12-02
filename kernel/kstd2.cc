@@ -169,16 +169,6 @@ int kFindNextDivisibleByInS(const kStrategy strat, int start,int max_ind, LObjec
 }
 
 #ifdef HAVE_RINGS
-static NATNUMBER factorial(NATNUMBER arg)
-{
-   NATNUMBER tmp = 1; arg++;
-   for (int i = 2; i < arg; i++)
-   {
-     tmp *= i;
-   }
-   return tmp;
-}
-
 poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
 {
   // m = currRing->ch
