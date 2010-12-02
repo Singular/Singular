@@ -373,12 +373,7 @@ poly      pTakeOutComp1(poly * p, int k);
 // component == comp and *p of all other monoms *lq == pLength(*q)
 // On return all components pf *q == 0
 void pTakeOutComp(poly *p, long comp, poly *q, int *lq);
-// Similar to pTakeOutComp, except that only those components are
-// taken out whose Order == order
-// ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
-//         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
-void pDecrOrdTakeOutComp(poly *p, long comp, long order,
-                         poly *q, int *lq);
+
 // This is something weird -- Don't use it, unless you know what you are doing
 poly      pTakeOutComp(poly * p, int k);
 void      pSetPolyComp(poly p, int comp);
