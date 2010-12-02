@@ -276,11 +276,6 @@ poly kFindZeroPoly(poly input_p, ring leadRing, ring tailRing)
   } */
   return NULL;
 }
-
-poly kFindDivisibleByZeroPoly(LObject* h)
-{
-  return kFindZeroPoly(h->GetLmCurrRing(), currRing, h->tailRing);
-}
 #endif
 
 
