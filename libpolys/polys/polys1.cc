@@ -263,30 +263,6 @@ long pDegW(poly p, const short *w)
 /*-----------type conversions ----------------------------*/
 #if 0
 /*2
-* input: a set of polys (len elements: p[0]..p[len-1])
-* output: a vector
-* p will not be changed
-*/
-poly  pPolys2Vec(polyset p, int len)
-{
-  poly v=NULL;
-  poly h;
-  int i;
-
-  for (i=len-1; i>=0; i--)
-  {
-    if (p[i])
-    {
-      h=pCopy(p[i]);
-      pSetCompP(h,i+1);
-      v=pAdd(v,h);
-    }
-  }
- return v;
-}
-#endif
-
-/*2
 * convert a vector to a set of polys,
 * allocates the polyset, (entries 0..(*len)-1)
 * the vector will not be changed
