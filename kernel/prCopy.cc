@@ -122,7 +122,6 @@ poly prHeadR(poly p, ring src_r, ring dest_r)
 }
 
 /////////////////////////////////////////////////////////////////////////
-// idrCopy
 /// Copy leading terms of id[i] via prHeeadR into dest_r
 ideal idrHeadR(ideal id, ring r, ring dest_r)
 {
@@ -142,7 +141,6 @@ ideal idrHeadR(ideal id, ring r, ring dest_r)
 }
 
 
-
 static inline ideal
 idrCopy(ideal id, ring src_r, ring dest_r, prCopyProc_t prproc)
 {
@@ -157,18 +155,6 @@ idrCopy(ideal id, ring src_r, ring dest_r, prCopyProc_t prproc)
     res->m[i] = prproc(p, src_r, dest_r);
     p_Test(res->m[i], dest_r);
   }
-  return res;
-}
-
-ideal idrCopy(ideal id, ring dest_r)
-{
-  ideal res;
-  prCopyProc_t prproc;
-  if (rField_has_simple_Alloc(dest_r))
-    prproc = pr_Copy_REqual_NSimple_NoSort;
-  else
-    prproc = pr_Copy_REqual_NoNSimple_NoSort;
-  res =  idrCopy(id, dest_r, dest_r, prproc);
   return res;
 }
 
