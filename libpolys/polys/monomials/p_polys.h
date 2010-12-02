@@ -1787,13 +1787,6 @@ poly      p_TakeOutComp1(poly * p, int k, const ring r);
 // On return all components pf *q == 0
 void p_TakeOutComp(poly *p, long comp, poly *q, int *lq, const ring r);
 
-// Similar to pTakeOutComp, except that only those components are
-// taken out whose Order == order
-// ASSUME: monomial ordering is Order compatible, i.e., if m1, m2 Monoms then
-//         m1 >= m2 ==> pGetOrder(m1) >= pGetOrder(m2)
-void p_DecrOrdTakeOutComp(poly *r_p, long comp, long order,
-                         poly *r_q, int *lq, const ring r)
-
 // This is something weird -- Don't use it, unless you know what you are doing
 poly      p_TakeOutComp(poly * p, int k);
 
