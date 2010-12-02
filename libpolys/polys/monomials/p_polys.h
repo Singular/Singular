@@ -309,9 +309,7 @@ int       pSize( poly p, const ring r );
 
 // homogenizes p by multiplying certain powers of the varnum-th variable
 poly      p_Homogen (poly p, int varnum, const ring r);
-// replaces the maximal powers of the leading monomial of p2 in p1 by
-// the same powers of n, utility for dehomogenization
-poly      p_Dehomogen (poly p1,poly p2,number n, const ring r);
+
 BOOLEAN   p_IsHomogeneous (poly p, const ring r);
 
 static inline void p_Setm(poly p, const ring r);

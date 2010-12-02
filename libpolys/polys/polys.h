@@ -290,6 +290,7 @@ BOOLEAN   pIsHomogeneous (poly p);
 // // the same powers of n, utility for dehomogenization
 // #define   pDehomogen(p1,p2,n) p_Dehomgen(p1,p2,n,currRing)
 // #define   pIsHomogen(p)       p_IsHomggen(p,currRing)
+#define   pIsHomogen(p)       p_IsHomogen(p,currRing)
 
 /*BOOLEAN   pVectorHasUnitM(poly p, int * k);*/
 #define   pVectorHasUnitB(p,k) p_VectorHasUnitB(p,k,currRing)
