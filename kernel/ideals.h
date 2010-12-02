@@ -113,9 +113,6 @@ ideal idMinBase (ideal h1);
   /*returns a minimized set of generators of h1*/
 int pLowVar (poly p);
   /*-the minimal index of used variables - 1-*/
-ideal idDehomogen (ideal id1,poly p,number n);
-  /*dehomogenized the generators of the ideal id1 with the leading
-  monomial of p replaced by n*/
 void pShift (poly * p,int i);
   /*- verschiebt die Indizes der Modulerzeugenden um i -*/
 void    idInitChoise (int r,int beg,int end,BOOLEAN *endch,int * choise);

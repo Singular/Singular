@@ -431,41 +431,6 @@ static void pCancelPolyByMonom (poly p1,poly p2,polyset * P,int * SizeOfSet)
     p = qp;
   }
 }
-/*2
-*replaces the maximal powers of the leading monomial of p2 in p1 by
-*the same powers of n, utility for dehomogenization
-*/
-poly pDehomogen (poly p1,poly p2,number n)
-{
-  polyset P;
-  int     SizeOfSet=5;
-  int     i;
-  poly    p;
-  number  nn;
-
-  P = (polyset)omAlloc0(5*sizeof(poly));
-  //for (i=0; i<5; i++)
-  //{
-  //  P[i] = NULL;
-  //}
-  pCancelPolyByMonom(p1,p2,&P,&SizeOfSet);
-  p = P[0];
-  //P[0] = NULL ;// for safety, may be removed later
-  for (i=1; i<SizeOfSet; i++)
-  {
-    if (P[i] != NULL)
-    {
-      nPower(n,i,&nn);
-      pMult_nn(P[i],nn);
-      p = pAdd(p,P[i]);
-      //P[i] =NULL; // for safety, may be removed later
-      nDelete(&nn);
-    }
-  }
-  omFreeSize((ADDRESS)P,SizeOfSet*sizeof(poly));
-  return p;
-}
-
 
 /*----------utilities for syzygies--------------*/
 poly pTakeOutComp(poly * p, int k)

@@ -941,27 +941,6 @@ static poly pMultWithT (poly p,BOOLEAN cas)
 }
 
 /*2
-*dehomogenized the generators of the ideal id1 with the leading
-*monomial of p replaced by n
-*/
-ideal idDehomogen (ideal id1,poly p,number n)
-{
-  int i;
-  ideal result;
-
-  if (idIs0(id1))
-  {
-    return idInit(1,id1->rank);
-  }
-  result=idInit(IDELEMS(id1),id1->rank);
-  for (i=0; i<IDELEMS(id1); i++)
-  {
-    result->m[i] = pDehomogen(id1->m[i],p,n);
-  }
-  return result;
-}
-
-/*2
 * verschiebt die Indizees der Modulerzeugenden um i
 */
 void pShift (poly * p,int i)

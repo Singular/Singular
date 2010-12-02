@@ -360,9 +360,6 @@ int       pSize( poly p );
 // homogenizes p by multiplying certain powers of the varnum-th variable
 poly      pHomogen (poly p, int varnum);
 
-// replaces the maximal powers of the leading monomial of p2 in p1 by
-// the same powers of n, utility for dehomogenization
-poly      pDehomogen (poly p1,poly p2,number n);
 BOOLEAN   pIsHomogeneous (poly p);
 
 poly      pPermPoly (poly p, int * perm,const ring OldRing, nMapFunc nMap,
