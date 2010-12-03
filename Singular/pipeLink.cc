@@ -181,15 +181,15 @@ const char* slStatusPipe(si_link l, const char* request)
     {
       case 0: /* not ready */ return "not ready";
       case -1: /*error*/      return "error";
-      case 1: /*ready ? */    return "ready";;
+      default: /*1: ready ? */return "ready";
     }
   }
   else if (strcmp(request, "write") == 0)
   {
     if (SI_LINK_W_OPEN_P(l)) return "ready";
-    else return "not ready";
+    return "not ready";
   }
-  else return "unknown status request";
+  return "unknown status request";
 }
 
 si_link_extension slInitPipeExtension(si_link_extension s)
