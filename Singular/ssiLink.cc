@@ -152,7 +152,7 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
       fprintf(d->f_write,"8 ");
       mpz_out_str (d->f_write,32, n->z);
       fprintf(d->f_write," ");
-      
+
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
     }
   }
@@ -1220,6 +1220,10 @@ int ssiBatch(const char *host, const char * port)
   slInit(l, buf);
   slOpen(l,SI_LINK_OPEN,NULL);
   SI_LINK_SET_RW_OPEN_P(l);
+
+  idhdl id = enterid(omStrDup("link_ll"), 0, LINK_CMD, &IDROOT, FALSE);
+  IDLINK(id) = l;
+
   loop
   {
     leftv h=ssiRead1(l); /*contains an exit.... */

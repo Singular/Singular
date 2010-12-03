@@ -486,7 +486,7 @@ static int Batch_ReadEval(si_link silink)
 {
   leftv v = NULL;
   // establish top-level identifier for link
-  idhdl id = enterid(omStrDup("mp_ll"), 0, LINK_CMD, &IDROOT, FALSE);
+  idhdl id = enterid(omStrDup("link_ll"), 0, LINK_CMD, &IDROOT, FALSE);
   IDLINK(id) = silink;
 
   // the main read-eval-write loop
