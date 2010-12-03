@@ -185,10 +185,13 @@ BOOLEAN nrzGreaterZero (number k)
 
 int nrzDivComp(number a, number b)
 {
-  if (nrzEqual(a, b)) return 0;
-  if (nrzDivBy(a, b)) return -1;
+  if (nrzDivBy(a, b)) 
+  {
+    if (nrzDivBy(b, a)) return 2;
+    return -1;
+  }    
   if (nrzDivBy(b, a)) return 1;
-  return 2;
+  return 0;
 }
 
 BOOLEAN nrzDivBy (number a,number b)

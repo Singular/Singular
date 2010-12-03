@@ -252,7 +252,7 @@ int nr2mDivComp(number as, number bs)
   {
     if (b % 2 == 1)
     {
-      return 0;
+      return 2;
     }
     else
     {

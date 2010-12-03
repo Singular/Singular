@@ -286,10 +286,10 @@ BOOLEAN nrnDivBy (number a,number b)
 
 int nrnDivComp(number a, number b)
 {
-  if (nrnEqual(a, b)) return 0;
+  if (nrnEqual(a, b)) return 2;
   if (mpz_divisible_p((int_number) a, (int_number) b)) return -1;
   if (mpz_divisible_p((int_number) b, (int_number) a)) return 1;
-  return 2;
+  return 0;
 }
 
 number nrnDiv (number a,number b)
