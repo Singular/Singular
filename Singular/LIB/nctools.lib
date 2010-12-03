@@ -23,8 +23,9 @@ makeHeisenberg(N, [p,d]); return n-th Heisenberg algebra in (x(i),y(i),h) realiz
 Exterior();               return qring, the exterior algebra of a basering,
 findimAlgebra(M,[r]);     create finite dimensional algebra structure from the basering and the multiplication matrix M,
 superCommutative([b,e,Q]);  return qring, a super-commutative algebra over a basering,
-rightStd(I);              compute a right Groebner basis of an ideal,
-
+rightStd(I);              compute right Groebner basis of an ideal,
+rightNF(f,I);             compute right normal form wrt a submodule,
+rightModulo(M,N);         compute kernel of a homomorphism of right modules,
 moduloSlim(A,B);     compute modulo command via slimgb
 ncRelations(r);      recover the non-commutative relations of a G-algebra,
 isCentral(p);        check for the commutativity of a polynomial in the G-algebra,
@@ -1778,3 +1779,55 @@ example
   def r2 = makeModElimRing(r4); setring r2; r2;
 }
 
+proc isLieType()
+"USAGE:  isLieType();
+RETURN:  int, 1 if basering is a G-algebra of Lie type, 0 otherwise
+PURPOSE: G-algebra of Lie type has relations of the kind Y*X=X*Y+D
+EXAMPLE: example isLieType; shows an example
+"
+{
+  def @B    = basering; //save the name of basering
+  int NVars = nvars(@B); //number of variables in basering
+  int i, j;
+
+  int answer = 1;  
+
+  // check basering is of Lie type:
+  matrix @@CC[NVars][NVars];
+  for(i=1; i<NVars; i++)
+  {
+    for(j=i+1; j<=NVars; j++)
+    {
+      @@CC[i,j]=leadcoef(var(j)*var(i));
+    };
+  };
+  ideal @C@ = simplify(ideal(@@CC),2+4);// skip zeroes and repeated entries
+  if (  (size(@C@) >1 ) || ( (size(@C@)==1) && (@C@[1]!=1) )  )
+  {
+    answer = 0;
+  };
+  return(answer);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  y*x;
+  isLieType(); //yes
+  def D = Weyl(); setring D;
+  y*x;
+  isLieType(); //yes
+  setring r;
+  def R = nc_algebra(-3,0); setring R;
+  y*x;
+  isLieType(); // no
+  kill R; kill r;
+  ring s = (0,q),(x,y),dp;
+  def S = nc_algebra(q,0); setring S;
+  y*x;
+  isLieType(); //no
+  kill S; setring s;
+  def S = nc_algebra(q,y^2); setring S;
+  y*x;
+  isLieType(); //no
+}
