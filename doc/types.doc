@@ -1763,11 +1763,12 @@ a local evaluation is prevented. Otherwise, the expression is evaluated
 first, and the result of the evaluation is written, instead of the
 expression which is to be evaluated.
 
+@index link_ll
 If @sc{Singular} is in server mode, the value of the variable
-@code{mp_ll} is the MPtcp link connecting to the client and
+@code{link_ll} is the MPtcp link connecting to the client and
 @sc{Singular} is in an infinite read-eval-write loop until the
 connection is closed from the client side (by closing its connecting
-link). Reading and writing is done to the link @code{mp_ll}: After an
+link). Reading and writing is done to the link @code{link_ll}: After an
 expression is read, it is evaluated and the result of the evaluation is
 written back.  That is, for each expression which was written to the
 server, there is exactly one expression written back. This might be an
@@ -1792,12 +1793,12 @@ is data to read.
   write (l,quote(std(eval(i))));   // std(i) is computed on server
   def j = read(l);j; // result of computation on server is read
 
-  write(l, quote(getdump(mp_ll))); // server reads dump
+  write(l, quote(getdump(link_ll))); // server reads dump
   dump(l);           //  dump is written to server (includes proc's)
   read(l);           // result of previous write-command is read
   killall("not", "link"); killall("proc"); // kills everything, but links
 
-  write(l, quote(dump(mp_ll)));    // server writes dump
+  write(l, quote(dump(link_ll)));    // server writes dump
   getdump(l);        // dump is read from server
   read(l);           // result of previous write-command is read
 
@@ -1807,7 +1808,7 @@ is data to read.
   l = "MPtcp:";      // fork link declaration
   open(l); l;        // Notice that name is "parent"
 
-  write(l, quote(status(mp_ll, "name")));
+  write(l, quote(status(link_ll, "name")));
   read(l);           // and name of forked link is "child"
   write(l,quote(i)); // Child inherited vars and their values
   read(l);
@@ -1960,10 +1961,14 @@ a local evaluation is prevented. Otherwise, the expression is evaluated
 first, and the result of the evaluation is written, instead of the
 expression which is to be evaluated.
 
-If @sc{Singular} is in server mode,
+@index link_ll
+If @sc{Singular} is in server mode, the value of the variable
+@code{link_ll} is the ssi link connecting to the client and
 @sc{Singular} is in an infinite read-eval-write loop until the
 connection is closed from the client side (by closing its connecting
-link). After an
+link).
+Reading and writing is done to the link @code{link_ll}:
+After an
 expression is read, it is evaluated and the result of the evaluation is
 written back.  That is, for each expression which was written to the
 server, there is exactly one expression written back. This might be an
