@@ -1162,7 +1162,7 @@ int slStatusSsiL(lists L, int timeout)
     if(SI_LINK_OPEN_P(l)==0)
     { WerrorS("all links must be open"); return -2;}
     if ((strcmp(l->m->type,"ssi")!=0)
-    || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=NULL)))
+    || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)))
     { WerrorS("all links must be of type ssi:fork or ssi:tcp"); return -2;}
     d=(ssiInfo*)l->data;
     FD_SET(d->fd_read, &mask);
