@@ -737,18 +737,24 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         WerrorS("ERROR: no host specified");
         l->data=NULL;
         omFree(d);
+        omFree(path);
+        omFree(cli_host);
         return TRUE;
       }
       else if(r == 1)
       {
-        path = "Singular";
+        strcmp(path,"Singular");
       }
       char* ssh_command = (char*)omAlloc(256);
       char* ser_host = (char*)omAlloc(64);
       gethostname(ser_host,64);
       sprintf(ssh_command,"ssh %s %s -q --batch --link=ssi --MPhost=%s --MPport=%d &",cli_host,path,ser_host,portno);
-      system(ssh_command);
       //Print("client on %s started:%s\n",cli_host,path);
+      omFree(path);
+      omFree(cli_host);
+      system(ssh_command);
+      omFree(ssh_command);
+      omFree(ser_host);
       clilen = sizeof(cli_addr);
       newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, (socklen_t *)&clilen);
       if(newsockfd < 0)
