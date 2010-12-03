@@ -94,6 +94,7 @@ bug_tr239
 ; do not try bug_tr280 without MP
 ; bug_tr280
 bug_tr288
+bug_tr300
 brnoeth_s
 cyc5_lp
 bug_sres
