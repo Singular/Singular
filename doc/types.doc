@@ -1763,7 +1763,6 @@ a local evaluation is prevented. Otherwise, the expression is evaluated
 first, and the result of the evaluation is written, instead of the
 expression which is to be evaluated.
 
-@index link_ll
 If @sc{Singular} is in server mode, the value of the variable
 @code{link_ll} is the MPtcp link connecting to the client and
 @sc{Singular} is in an infinite read-eval-write loop until the
@@ -1961,7 +1960,6 @@ a local evaluation is prevented. Otherwise, the expression is evaluated
 first, and the result of the evaluation is written, instead of the
 expression which is to be evaluated.
 
-@index link_ll
 If @sc{Singular} is in server mode, the value of the variable
 @code{link_ll} is the ssi link connecting to the client and
 @sc{Singular} is in an infinite read-eval-write loop until the
