@@ -140,6 +140,7 @@ intdet_s
 intersect_s
 invar
 invarlib
+janet
 latex
 lift_s
 liftstd_s
