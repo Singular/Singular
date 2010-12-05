@@ -349,7 +349,7 @@ EXAMPLE: example CenCharDec; shows examples
   list L = @M(@CharKer);
   list R,@R;
   dbprint(ppl,"// -4- compute the central saturations");
-  dbprint(ppl-1,@CharKer);
+  dbprint(ppl-1,L);
   for(i=1; i<=sL; i++)
   {
     @R[1] = L[i];
