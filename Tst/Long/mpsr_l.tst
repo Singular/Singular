@@ -324,9 +324,9 @@ link ll = "MPtcp:fork";
 open(ll);
 if (status(ll, "openwrite", "yes"))
 {
-  write(ll, quote(getdump(mp_ll))); dump(ll); read(ll);
+  write(ll, quote(getdump(link_ll))); dump(ll); read(ll);
   killall("not", "link");
-  write(ll, quote(dump(mp_ll))); getdump(ll); read(ll); 
+  write(ll, quote(dump(link_ll))); getdump(ll); read(ll); 
 
   checkdump(ll);
 }
@@ -357,9 +357,9 @@ if (size(sing))
     if (status(ll, "openwrite", "yes"))
     {
       kill sing;
-      write(ll, quote(getdump(mp_ll))); dump(ll); read(ll);
+      write(ll, quote(getdump(link_ll))); dump(ll); read(ll);
       killall("not", "link");
-      write(ll, quote(dump(mp_ll))); getdump(ll); read(ll); 
+      write(ll, quote(dump(link_ll))); getdump(ll); read(ll); 
 
       checkdump(ll);
     }
