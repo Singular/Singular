@@ -223,8 +223,8 @@ EXAMPLE: example QuotientEquations; shows an example
   variety = EquationsOfEmbedding(embedding, nvars(basering) - size(Gaction));
 
   if(size(variety) == 0) {    // use Hilbert function !
-    //for(i = 1; i <= ncols(Gaction); i ++) { wt[i] = 1;};
-    for(i = 1; i <= nvars(basering); i ++) { wt[i] = 1;};
+    //for(i = 1; i <= ncols(Gaction); i ++) { wt[i] = 1;}
+    for(i = 1; i <= nvars(basering); i ++) { wt[i] = 1;}
   }
   def RQER = InvariantRing(Gf, Gaction, primaryDec);    // compute the nullcone of the linear action
 

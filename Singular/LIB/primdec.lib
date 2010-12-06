@@ -1024,7 +1024,7 @@ EXAMPLE: example zero_decomp; shows an example
     }
   }
 
-  if(voice>=8){primary=extF(primary);};
+  if(voice>=8){primary=extF(primary);}
 
 //test whether all ideals in the decomposition are primary and
 //in general position

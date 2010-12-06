@@ -2181,10 +2181,10 @@ KEYWORDS: extended Euclidean algorithm.
 "
 {
   list l = 0; bigint temp;
-  if (a == 0)         { l = b, 0, 1; if (b < 0) { l = -b, 0, -1; }; }
-  if (b == 0)         { l = a, 1, 0; if (a < 0) { l = -a, -1, 0; }; }
-  if ((a mod b) == 0) { l = b, 0, 1; if (b < 0) { l = -b, 0, -1; }; }
-  if ((b mod a) == 0) { l = a, 1, 0; if (a < 0) { l = -a, -1, 0; }; }
+  if (a == 0)         { l = b, 0, 1; if (b < 0) { l = -b, 0, -1; } }
+  if (b == 0)         { l = a, 1, 0; if (a < 0) { l = -a, -1, 0; } }
+  if ((a mod b) == 0) { l = b, 0, 1; if (b < 0) { l = -b, 0, -1; } }
+  if ((b mod a) == 0) { l = a, 1, 0; if (a < 0) { l = -a, -1, 0; } }
   if (size(l) > 1) { return (l); }
 
   temp = a mod b;
@@ -2204,8 +2204,8 @@ returns the Legendre symbol (r/p), that is
 "
 {
   bigint rr = r mod p;
-  if (rr == 0) { return (0) };
-  if (rr == 1) { return (1) };
+  if (rr == 0) { return (0) }
+  if (rr == 1) { return (1) }
   /* now, p must be at least 3 */
   bigint e = (p - 1) / bigint(2);
   bigint result = 1;
@@ -2573,9 +2573,9 @@ EXAMPLE: example testParametrization; shows an example
   ideal f = fetch(Roriginal,f);
   ideal ftest = imap(Relim,J);
   poly g = reduce(f[1],std(ftest));
-  if(g!=0){return(0)};
+  if(g!=0){return(0)}
   g = reduce(ftest[1],std(ideal(f)));
-  if(g!=0){return(0)};
+  if(g!=0){return(0)}
   return (1);
 }
 

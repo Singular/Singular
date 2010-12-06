@@ -203,7 +203,7 @@ static proc buildFP(list embR,ideal NoetherN, map phi){
     kill J,R,R2,m;
   }
   return(fibreP);
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
@@ -446,7 +446,7 @@ static proc resolve2(list BO){
     safety++;
   }
   return(result);
-};
+}
 ///////////////////////////////////////////////////////////////////////////////
 static proc jungfib(ideal id, int noeth)
 "USAGE:  jungfib(ideal J, int i);

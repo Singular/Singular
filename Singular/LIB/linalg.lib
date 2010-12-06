@@ -806,7 +806,7 @@ EXAMPLE: example gaussred; shows an example"
   if(n>m){mr=m;} //max. rang
 
   for(i=1;i<=mr;i=i+1){
-    if((i+k)>m){break};
+    if((i+k)>m){break;}
 
     //Test: Diagonalelement=0
     if(A[i,i+k]==0){
@@ -896,7 +896,7 @@ EXAMPLE:   example gaussred_pivot; shows an example"
   if(n>m){mr=m;} //max. rang
 
   for(i=1;i<=mr;i=i+1){
-    if((i+k)>m){break};
+    if((i+k)>m){break;}
 
     //Pivotisierung
     pivo=absValue(A[i,i+k]);jp=i;

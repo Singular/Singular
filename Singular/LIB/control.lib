@@ -62,9 +62,9 @@ NOTE:  the procedure is used in the procedure 'view' to have a better formatted 
   for(i=1;i<=n;i++)
   {
     s=s+" ";
-  };
+  }
   return(s);
-};
+}
 //-----------------------------------------------------------------------------
 proc view(M)
 "USAGE:  view(M);   M is of any type
@@ -72,54 +72,49 @@ RETURN:  no return value
 PURPOSE:  procedure for (well-) formatted output of modules, matrices, lists of modules, matrices; shows everything even if entries are long
 NOTE:  in case of other types( not 'module', 'matrix', 'list') works just as standard 'print' procedure
 EXAMPLE:  example view; shows an example
-"{
+"
+{
   // to be replaced with something more feasible
   if ( (typeof(M)=="module")||(typeof(M)=="matrix") )
   {
-  int @R=nrows(M);
-  int @C=ncols(M);
-  int i;
-  int j;
-  list MaxLength=list();
-  int Size=0;
-  int max;
-  string s;
+    int @R=nrows(M);
+    int @C=ncols(M);
+    int i;
+    int j;
+    list MaxLength=list();
+    int Size=0;
+    int max;
+    string s;
 
-  for(i=1;i<=@C;i++)
-  {
-    max=0;
-
-    for(j=1;j<=@R;j++)
+    for(i=1;i<=@C;i++)
     {
-      Size=size( string( M[j,i] ) );
-      if( Size>max )
+      max=0;
+      for(j=1;j<=@R;j++)
       {
-        max=Size;
-      };
-    };
-    MaxLength[i] = max;
-  };
-
-  for(i=1;i<=@R;i++)
-  {
-    s="";
-    for(j=1;j<@C;j++)
+        Size=size( string( M[j,i] ) );
+        if( Size>max )
+        {
+          max=Size;
+        }
+      }
+      MaxLength[i] = max;
+    }
+    for(i=1;i<=@R;i++)
     {
-      s=s+string(M[i,j])+space( MaxLength[j]-size( string( M[i,j] ) ) ) +",";
-    };
-
-    s=s+string(M[i,j])+space( MaxLength[j]-size( string( M[i,j] ) ) );
-
-    if (i!=@R)
-    {
-      s=s+",";
-    };
-    print(s);
-  };
-
-  return();
-  };
-
+      s="";
+      for(j=1;j<@C;j++)
+      {
+        s=s+string(M[i,j])+space( MaxLength[j]-size( string( M[i,j] ) ) ) +",";
+      }
+      s=s+string(M[i,j])+space( MaxLength[j]-size( string( M[i,j] ) ) );
+      if (i!=@R)
+      {
+        s=s+",";
+      }
+      print(s);
+    }
+    return();
+  }
   if(typeof(M)=="list")
   {
     int sz=size(M);
@@ -128,10 +123,9 @@ EXAMPLE:  example view; shows an example
     {
       view(M[i]);
       print("");
-    };
-
+    }
     return();
-  };
+  }
   print(M);
   return();
 }
@@ -145,7 +139,7 @@ example
   L[3] = "an ideal:";
   L[4] = ideal(M);
   view(L);
-};
+}
 //--------------------------------------------------------------------------
 proc rightKernel(matrix M)
 "USAGE:  rightKernel(M);   M a matrix
@@ -164,7 +158,7 @@ example
   print(R);
   // check:
   print(M*R);
-};
+}
 //-------------------------------------------------------------------------
 proc leftKernel(matrix M)
 "USAGE:  leftKernel(M);   M a matrix
@@ -184,7 +178,7 @@ example
   print(L);
   // check:
   print(L*M);
-};
+}
 //------------------------------------------------------------------------
 proc leftInverse(module M)
 "USAGE:  leftInverse(M);  M a module
@@ -234,7 +228,7 @@ example
   print(L);
   // check
   print(L*M);
-};
+}
 //-----------------------------------------------------------------------
 proc rightInverse(module R)
 "USAGE:  rightInverse(M);  M a module
@@ -277,7 +271,7 @@ example
   print(L);
   // check
   print(M*L);
-};
+}
 //-----------------------------------------------------------------------
 static proc dim_Our(module R)
 {
@@ -317,7 +311,7 @@ static proc is_zero_Our
   if( size(#) >1 ) { list L=a,d; return(L); }
   return(a);
   //  return( is_zero(R) ) ;
-};
+}
 //------------------------------------------------------------------------
 static proc control_output(int i, int NVars, module R, module Ext_1, list Gen)
 "USAGE:  control_output(i, NVars, R, Ext_1),
@@ -355,7 +349,7 @@ NOTE:  this procedure is used in 'control' procedure
                    d
                  )
           );
-  };
+  }
 
   if(i>NVars)
   {
@@ -370,7 +364,7 @@ NOTE:  this procedure is used in 'control' procedure
                    Gen_mes,
                    Gen)
           );
-  };
+  }
 
   //
   //now i<=NVars
@@ -387,7 +381,7 @@ NOTE:  this procedure is used in 'control' procedure
                   Gen_mes,
                   Gen)
           );
-  };
+  }
 
   if( (i>=3) )
   {
@@ -400,8 +394,8 @@ NOTE:  this procedure is used in 'control' procedure
                       Gen_mes,
                    Gen)
           );
-  };
-};
+  }
+}
 //-------------------------------------------------------------------------
 
 proc control(module R)
@@ -426,7 +420,7 @@ EXAMPLE:  example control; shows an example
   {
     i++;
     ExtIsZero = is_zero_Our( Ext_Our(i,R_std) );
-  };
+  }
   matrix T=lift(R,R_std);
   list l=genericity(T);
   option(set,v);
@@ -444,7 +438,7 @@ example
   R=transpose(R);
   view(R);
   view(control(R));
-};
+}
 //--------------------------------------------------------------------------
 proc controlDim(module R)
 "USAGE:  controlDim(R); R a module (R is the matrix of the system of equations to be investigated)
@@ -482,7 +476,7 @@ example
   R=transpose(R);
   view(R);
   view(controlDim(R));
-};
+}
 //------------------------------------------------------------------------
 proc colrank(module M)
 "USAGE: colrank(M); M a matrix/module
@@ -506,7 +500,7 @@ example
     [-D(2),D(1),0];
   R=transpose(R);
   colrank(R);
-};
+}
 
 //------------------------------------------------------------------------
 static proc autonom_output( int i, int NVars, module RC, int R_rank )
@@ -536,7 +530,7 @@ NOTE:  this procedure is used in 'autonom' procedure
                    DofS,
                    d )
           );
-  };
+  }
 
   if( i>NVars )
   {
@@ -546,7 +540,7 @@ NOTE:  this procedure is used in 'autonom' procedure
                   DofS,
                   d )
           );
-  };
+  }
 
   //
   //now i<=NVars
@@ -564,7 +558,7 @@ NOTE:  this procedure is used in 'autonom' procedure
                    DofS,
                    d )
           );
-  };
+  }
 
   if( i==NVars )
   {
@@ -574,7 +568,7 @@ NOTE:  this procedure is used in 'autonom' procedure
                    DofS,
                    d)
           );
-  };
+  }
 
   if( i<NVars )
   {
@@ -584,8 +578,8 @@ NOTE:  this procedure is used in 'autonom' procedure
                    DofS,
                    d)
           );
-  };
-};
+  }
+}
 //--------------------------------------------------------------------------
 proc autonomDim(module R)
 "USAGE:  autonomDim(R);   R a module (R is a matrix of the system of equations which is to be investigated)
@@ -621,7 +615,7 @@ example
   R=transpose(R);
   view( R );
   view( autonomDim(R) );
-};
+}
 //----------------------------------------------------------
 proc autonom(module R)
 "USAGE:  autonom(R);   R a module (R is a matrix of the system of equations which is to be investigated)
@@ -642,7 +636,7 @@ EXAMPLE: example autonom; shows an example
   {
     i++;
     ExtIsZero = is_zero_Our(Ext_Our(i,RT));
-  };
+  }
   if (i==0)
   {
     RC = leftKernel(rightKernel(R));
@@ -661,7 +655,7 @@ example
   R=transpose(R);
   view( R );
   view( autonom(R) );
-};
+}
 
 
 //----------------------------------------------------------
@@ -1008,7 +1002,7 @@ example
    [0, 0, 0, 0, 0, Dt+K2/Te, -Kc/Te*delta, -Kc/Te*delta, -Kp/Te*delta];
  module R = transpose(RR);
  view(iostruct(R));
-};
+}
 
 //---------------------------------------------------------------
 static proc smdeg(matrix N)

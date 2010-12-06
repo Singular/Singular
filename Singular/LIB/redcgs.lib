@@ -213,7 +213,7 @@ EXAMPLE:  setglobalrings; shows an example"
   exportto(Top,@P);      // global ring K[a]
   exportto(Top,@RP);     // global ring K[x,a] with product order
   setring(@R);
-};
+}
 example
 { "EXAMPLE:"; echo = 2;
   ring R=(0,a,b),(x,y,z),dp;
@@ -246,7 +246,7 @@ proc cld(ideal J)
   setring(RR);
   def Jc=imap(@RP,Jb);
   return(Jc);
-};
+}
 
 proc memberpos(f,J)
 "USAGE:  memberpos(f,J);
@@ -413,7 +413,7 @@ proc elimintfromideal(ideal J)
   if (size(J)==0){return(ideal(0));}
   for (i=1;i<=ncols(J);i++){if (size(variables(J[i])) !=0){j++; K[j]=J[i];}}
   return(K);
-};
+}
 
 // simpqcoeffs : simplifies a quotient of two polynomials of @R
 //               for ring @R
@@ -426,7 +426,7 @@ proc simpqcoeffs(poly n,poly m)
   def gc=gcd(nc,mc);
   ideal s=n/gc,m/gc;
   return (s);
-};
+}
 
 
 // pdivi : pseudodivision of a polynomial f by an ideal F in @R
@@ -454,7 +454,7 @@ EXAMPLE:  pdivi; shows an example"
   poly mu=1;
   def p=f;
   ideal q;
-  for (i=1; i<=size(F); i++){q[i]=0;};
+  for (i=1; i<=size(F); i++){q[i]=0;}
   ideal lpf;
   ideal lcf;
   for (i=1;i<=size(F);i++){lpf[i]=leadmonom(F[i]);}
@@ -529,7 +529,7 @@ proc pspol(poly f,poly g)
   def vg=lpg/v;
   poly S=s[2]*vg*f-s[1]*vf*g;
   return(S);
-};
+}
 
 // facvar: Returns all the free-square factors of the elements
 //         of ideal J (non repeated). Integer factors are ignored,
@@ -574,7 +574,7 @@ EXAMPLE:  facvar; shows an example"
   setring(RR);
   def Jc=imap(@P,Jb);
   return(Jc);
-};
+}
 example
 { "EXAMPLE:"; echo = 2;
   ring R=(0,a,b,c),(x,y,z),dp;
@@ -608,7 +608,7 @@ proc Wred(poly f, ideal W)
   setring(RR);
   def f2=imap(@RP,f1);
   return(f2);
-};
+}
 
 // pnormalform: reduces a polynomial w.r.t. a red-spec dividing by N and eliminating factors in W.
 //              called in the ring @R
@@ -645,7 +645,7 @@ EXAMPLE:  pnormalform; shows an example"
     setring(RR);
     def f2=imap(@RP,f1);
     return(f2)
-};
+}
 example
 { "EXAMPLE:"; echo = 2;
   ring R=(0,a,b,c),(x,y),dp;
@@ -808,7 +808,7 @@ EXAMPLE:  redspec; shows an example"
     list LNb;
     return(list(Nd,Wc,LNb))
   }
-};
+}
 example
 { "EXAMPLE:"; echo = 2;
   ring r=(0,a,b,c),(x,y),dp;
@@ -833,7 +833,7 @@ proc lesspol(poly f, poly g)
       else {return(0);}
     }
   }
-};
+}
 
 // delfromideal: deletes the i-th polynomial from the ideal F
 proc delfromideal(ideal F, int i)
@@ -842,7 +842,7 @@ proc delfromideal(ideal F, int i)
   ideal G;
   if (size(F)<i){ERROR("delfromideal was called incorrect arguments");}
   if (size(F)<=1){return(ideal(0));}
-  if (i==0){return(F)};
+  if (i==0){return(F)}
   for (j=1;j<=size(F);j++)
   {
     if (j!=i){G[size(G)+1]=F[j];}
@@ -893,7 +893,7 @@ proc sortideal(ideal Fi)
   setring(RR);
   def GG=imap(@RP,G);
   return(GG);
-};
+}
 
 // mingb: given a basis (gb reducing) it
 // order the polynomials is ascending order and
@@ -918,7 +918,7 @@ proc mingb(ideal F)
     if (t) {G[size(G)+1]=H[i];}
   }
   return(G);
-};
+}
 
 
 // redgb: given a minimal bases (gb reducing) it
@@ -935,7 +935,7 @@ proc redgb(ideal F, ideal N, ideal W)
     G[i]=pnormalform(pdivi(F[i],H)[1],N,W);
   }
   return(G);
-};
+}
 
 
 //********************Main routines for buildtree******************
@@ -974,7 +974,7 @@ proc splitspec(poly fi, list ri)
   def ra1=imap(@P,r1);
   def cond=imap(@P,f);
   return (list(ra0,ra1,cond));
-};
+}
 
 // discusspolys: given a basis B and a red-spec (N,W), it analyzes the
 //               leadcoef of the polynomials in B until it finds
@@ -1033,7 +1033,7 @@ proc discusspolys(ideal B, list r)
   M1=N1,W1,LN1;
   M=M0,M1,Ba,cond;
   return(M);
-};
+}
 
 
 // lcmlmonoms: computes the lcm of the leading monomials
@@ -1045,7 +1045,7 @@ proc lcmlmonoms(poly f,poly g)
   def lg=leadmonom(g);
   def gls=gcd(lf,lg);
   return((lf*lg)/gls);
-};
+}
 
 // placepairinlist
 // input:  given a new pair of the form (i,j,lmij)
@@ -1066,11 +1066,11 @@ proc placepairinlist(list pair,list P)
   while((i<=size(P)) and (loc==0))
   {
     if (pair[3]>=P[i][3]){j=i; i++;}
-    else{loc=1; j=i-1};
+    else{loc=1; j=i-1}
   }
   Pr=insert(P,pair,j);
   return(Pr);
-};
+}
 
 // orderingpairs:
 // input:  ideal F
@@ -1103,7 +1103,7 @@ proc orderingpairs(ideal F)
     }
   }
   return(P);
-};
+}
 
 // Buchberger 2nd criterion
 // input:  integers i,j
@@ -1129,7 +1129,7 @@ proc criterion(int i, int j, list P, ideal B)
     k++;
   }
   return(crit);
-};
+}
 
 // discussSpolys: given a basis B and a red-spec (N,W), it analyzes the
 //                leadcoef of the polynomials in B until it finds
@@ -1271,7 +1271,7 @@ proc discussSpolys(ideal B, list r, list P)
   M1=N1,W1,LN1;
   M=M0,M1,F,Pa,cond;
   return(M);
-};
+}
 
 
 // buildtree: Basic routine generating a first reduced CGS
@@ -1381,7 +1381,7 @@ EXAMPLE:  buildtree; shows an example"
   def T=@T;
   kill @T;
   return(T)
-};
+}
 example
 { "EXAMPLE:"; echo = 2;
   ring R=(0,a1,a2,a3,a4),(x1,x2,x3,x4),dp;
@@ -1523,7 +1523,7 @@ proc recbuildtree(list v, list P)
     vertex[8]=cond;
     @T[pos]=vertex;
   }
-};
+}
 
 //****************End of BuildTree*************************************
 
@@ -1837,7 +1837,7 @@ proc comp(int n,int p)
     }
   }
   return(L);
-};
+}
 
 // given the matrices of coefficients and monomials m amd m1 of
 // two polynomials (the first one contains all the terms of f
@@ -1853,7 +1853,7 @@ proc adaptcoef(matrix m, matrix m1)
   ideal T;
   for (i=1;i<=ncm;i++){T[i]=m[1,i];}
   ideal C;
-  for (i=1;i<=ncm;i++){C[i]=0;};
+  for (i=1;i<=ncm;i++){C[i]=0;}
   for (i=1;i<=ncm;i++)
   {
     j=1;
@@ -1898,7 +1898,7 @@ proc WPred(poly f, ideal W)
     else{f1=f1*((l[1][i])^(l[2][i]));}
   }
   return(f1);
-};
+}
 
 //genimage
 // ring @R
@@ -2139,7 +2139,7 @@ proc genimage(poly f1, ideal N1, ideal W1, poly f2, ideal N2, ideal W2)
   }
   else{GG=ideal(0);}
   return(GG);
-};
+}
 
 // purpose: given a polynomial f (in the reduced basis)
 //          the null-conditions ideal N in the segment

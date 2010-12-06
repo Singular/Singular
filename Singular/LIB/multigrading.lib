@@ -1517,12 +1517,7 @@ example
   module DDD = [0, 0];
   DDD = setModuleGrading(DDD, B);
   print( mDeg( DDD ) );
-
-};
-
-
-
-
+}
 
 /******************************************************/
 proc mDegPartition(def p)
@@ -1801,9 +1796,7 @@ example
   print(L);
   // check:
   print(L*M);
-};
-
-
+}
 
 /******************************************************/
 // the following is taken from "sing4ti2.lib" as we need 'hilbert' from 4ti2

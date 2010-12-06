@@ -237,7 +237,7 @@ KEYWORDS: truncated module
   if (attrib(M,"isSB")!=1)
   {
     ERROR("M must be a standard basis!");
-  };
+  }
 
   dbprint(PL-1, "// M is a SB! ");
 
@@ -625,7 +625,7 @@ static proc showResult( def R, int l, int h )
     if(typeof(R)!="intmat")
     {
       ERROR("Wrong input!!!");
-    };
+    }
 
     Betti = R;
   }
@@ -879,7 +879,7 @@ EXAMPLE: example sheafCohBGG2; shows an example
     RE;
     "Betti numbers for Tate resolution (diagonal cohomology table):";
     print(Betti, "betti"); // Diagonal form!
-  };
+  }
 
 //  printlevel = printlevel + 1;
   Betti = showResult(Betti, l, h ); // Show usual form of cohomology table
@@ -904,7 +904,7 @@ EXAMPLE: example sheafCohBGG2; shows an example
       Total Time: ", tEnd - tBegin, "
       ---------------------------------------------------------
       ";
-  };
+  }
 
   setring R;
 
@@ -1246,7 +1246,7 @@ proc getStructureSheaf(list #)
 
 //     attrib(M);
     return(M);
-  };
+  }
 
   if( typeof(#[1]) == "ideal")
   {
@@ -1341,7 +1341,7 @@ proc getCotangentialBundle()
   attrib(M, "isCoker", 1);
   // attrib(M);
   return (M);
-};
+}
 
 proc getIdealSheafPullback(ideal I, ideal pi)
 {
@@ -1361,7 +1361,7 @@ proc getIdealSheaf(ideal I)
   attrib(M, "isCoker", 1);
   //  attrib(M);
   return(M);
-};
+}
 
 
 

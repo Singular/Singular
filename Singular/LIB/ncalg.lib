@@ -57,10 +57,10 @@ static proc defInt ( list # )
     if ( typeof( #[1] ) == "int" )
     {
       @p = #[1];
-    };
-  };
+    }
+  }
   return (@p);
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 proc makeUsl2(list #)
@@ -299,7 +299,7 @@ EXAMPLE: example makeUgl; shows examples
   {
     print("Incorrect input");
     return(0);
-  };
+  }
   int @p = defInt(#);
   int i, j;
   string vs = "";
@@ -310,10 +310,10 @@ EXAMPLE: example makeUgl; shows examples
             if ( vs != "" )
             {
                 vs = vs + ", ";
-            };
+            }
             vs = vs + "e_" + string(i) + "_" + string(j);
-        };
-  };
+        }
+  }
   string strRING = "ring RING_MAKEUGL=(" + string (@p) + "), (" + vs + "),dp;";
   execute( strRING );
   int N = nvars( RING_MAKEUGL ); // n*n
@@ -334,14 +334,14 @@ EXAMPLE: example makeUgl; shows examples
         if( jl == ik )
         {
             p = p + var ( (il-1)*n + jk );
-        };
+        }
         if( jk == il )
         {
             p = p - var ( (ik-1)*n + jl );
-        };
+        }
         D[k,l]=p;
-    };
-  };
+    }
+  }
   def @@RR=nc_algebra(1,D);
   return(@@RR);
 }
@@ -349,7 +349,7 @@ example
 { "EXAMPLE:"; echo = 2;
    def a=makeUgl(3);
    setring a; a;
-};
+}
 
 
 
@@ -612,7 +612,7 @@ EXAMPLE: example GKZsystem; shows examples
       "Wrong type of the optional argument. Intvec expected.";
       return();
     }
-  };
+  }
   string sord2 = "(a(0:" + string(n) + ")," + sord + ")";
   execute("ring GR = (0,b(1..@d)),(x(1..n),d(1..n)),"+sord2+";");
   def W=Weyl(); setring W;

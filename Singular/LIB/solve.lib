@@ -413,7 +413,7 @@ static proc splitsqrfree(poly p, poly x)
     if(j==dd){break;}
     if(j>dd){return(p);}
     high=exdiv(high,h[1],x);
-    if(deg(high)==0){return(p);};
+    if(deg(high)==0){return(p);}
     i++;
   }
   return(split);

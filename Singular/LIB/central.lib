@@ -148,7 +148,7 @@ RETURN: the same as input
 PURPOSE: make 'nice' polynomials, kill scalars
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "makeNice", l ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "makeNice", l ); } /*4DEBUG*/
 
   poly p;
 
@@ -186,7 +186,7 @@ PURPOSE: make 'nice' polynomials, kill scalars
           }
       }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "makeNice", l ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "makeNice", l ); } /*4DEBUG*/
   return( l );
 }
 
@@ -199,7 +199,7 @@ static proc monomialForm( def p )
 RETURN: polynomial with all monomials from p but without coefficients.
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "monomialForm", p ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "monomialForm", p ); } /*4DEBUG*/
 
   poly result = 0; int k, j; poly m;
 
@@ -235,7 +235,7 @@ RETURN: polynomial with all monomials from p but without coefficients.
           }
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "monomialForm", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "monomialForm", result ); } /*4DEBUG*/
   return( result );
 }
 
@@ -245,7 +245,7 @@ static proc uni_poly( poly p )
     returns polynomial with the same monomials but without coefficients.
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "uni_poly", p ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "uni_poly", p ); } /*4DEBUG*/
 
   poly result = 0;
 
@@ -254,7 +254,7 @@ static proc uni_poly( poly p )
       result = result + leadmonom( p[k] );
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "uni_poly", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "uni_poly", result ); } /*4DEBUG*/
   return( result );
 }
 
@@ -268,7 +268,7 @@ static proc smoothQideal( ideal I, list #)
 PURPOSE: smooths the ideal in a current QUOTIENT(!) ring.
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "smoothQideal", I ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "smoothQideal", I ); } /*4DEBUG*/
 
   ideal A = matrix(I) - matrix(NF( I, twostd(DefaultIdeal(#)), 1 )); // component wise
 
@@ -288,7 +288,7 @@ PURPOSE: smooths the ideal in a current QUOTIENT(!) ring.
       I = T;
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "smoothQideal", I ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "smoothQideal", I ); } /*4DEBUG*/
 
   return( I );
 }
@@ -312,7 +312,7 @@ RETURN: ideal consisting of found elements.
 NOTE: unit is omitted. Weights are ignored!
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_maxDeg", MaxDeg ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_maxDeg", MaxDeg ); } /*4DEBUG*/
 
   ideal Basis = 0;
 
@@ -323,7 +323,7 @@ NOTE: unit is omitted. Weights are ignored!
 
   Basis = smoothQideal( Basis );
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_maxDeg", Basis ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_maxDeg", Basis ); } /*4DEBUG*/
   return( Basis );
 }
 example
@@ -349,11 +349,11 @@ RETURN: ideal consisting of found elements.
 NOTE: Unit is omitted. Weights are ignored!
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_eqDeg", Deg ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_eqDeg", Deg ); } /*4DEBUG*/
 
   ideal Basis = smoothQideal( maxideal( Deg ) );
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_eqDeg", Basis ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_eqDeg", Basis ); } /*4DEBUG*/
   return( Basis );
 }
 example
@@ -378,7 +378,7 @@ RETURN: ideal consisting of found elements.
 NOTE: Unit is omitted. Weights are ignored!
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_maxMonom", MaxMonom ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "PBW_maxMonom", MaxMonom ); } /*4DEBUG*/
 
   ideal K = 0;
 
@@ -397,7 +397,7 @@ NOTE: Unit is omitted. Weights are ignored!
 
   K = smoothQideal( K );
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_maxMonom", K ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "PBW_maxMonom", K ); } /*4DEBUG*/
 
   return( K );
 }
@@ -433,7 +433,7 @@ NOTE:  Ad_f(v) := [f, v] = f*v - v*f
 SEE ALSO:   linearMapKernel; linearMapKernel
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "applyAdF", I, p ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "applyAdF", I, p ); } /*4DEBUG*/
 
   poly t; ideal II = 0;
 
@@ -445,7 +445,7 @@ SEE ALSO:   linearMapKernel; linearMapKernel
 
   II = NF( II, twostd(0) ); // ... now!
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "applyAdF", II ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "applyAdF", II ); } /*4DEBUG*/
   return( II );
 }
 example
@@ -488,7 +488,7 @@ RETURN: syzygy module, or int(0) if all images are zeroes
 SEE ALSO:   applyAdF; linearMapKernel
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "linearMapKernel", Images ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "linearMapKernel", Images ); } /*4DEBUG*/
 
   // This must be a list of monomials in a form of polynomial (sum with coeffs == 1)
   poly Monomials = monomialForm( Images );
@@ -499,7 +499,7 @@ SEE ALSO:   applyAdF; linearMapKernel
     {
       int result = 0;
 
-      /*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "linearMapKernel", result ); }; /*4DEBUG*/
+      /*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "linearMapKernel", result ); } /*4DEBUG*/
       return( result );
     }
 
@@ -565,7 +565,7 @@ SEE ALSO:   applyAdF; linearMapKernel
   // restore options
   option( set, v );
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "linearMapKernel", MD ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "linearMapKernel", MD ); } /*4DEBUG*/
 
   return( MD );
 }
@@ -613,7 +613,7 @@ SEE ALSO:   linearMapKernel; applyAdF
 "
 {
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "linearCombinations", Basis, KER ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "linearCombinations", Basis, KER ); } /*4DEBUG*/
 
 
   number c;
@@ -648,7 +648,7 @@ SEE ALSO:   linearMapKernel; applyAdF
   // no reduction in quotient algebras is needed. No multiplications were done!
 
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "linearCombinations", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "linearCombinations", result ); } /*4DEBUG*/
 
   return( result );
 }
@@ -689,13 +689,13 @@ static proc LINEAR_MAP_KERNEL(ideal Basis, ideal Images ) // Ker of the linear m
 PURPOSE: Computation of the kernel basis of the linear map given by the list @given
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "LINEAR_MAP_KERNEL", Basis, Images ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "LINEAR_MAP_KERNEL", Basis, Images ); } /*4DEBUG*/
 
   ideal result = 0;
 
   if ( size( Basis ) == 0 )
     {
-      /*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", result ); }; /*4DEBUG*/
+      /*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", result ); } /*4DEBUG*/
       return( result );
     }
 
@@ -709,7 +709,7 @@ PURPOSE: Computation of the kernel basis of the linear map given by the list @gi
     if( T == 0 )
     {
       // All zeroes! Return Basis:
-      /*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", Basis ); }; /*4DEBUG*/
+      /*4DEBUG*/        if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", Basis ); } /*4DEBUG*/
       return( Basis );
     }
   }
@@ -723,7 +723,7 @@ PURPOSE: Computation of the kernel basis of the linear map given by the list @gi
 
   result = linearCombinations( Basis, T );
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "LINEAR_MAP_KERNEL", result ); } /*4DEBUG*/
   return( result );
 }
 
@@ -737,7 +737,7 @@ PURPOSE: Computes VS Basis of a Kernel of the linear map AD_h, when h is a Carta
 NOTE: the result is a set of all basis vectors having a zero image
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "ZeroKer", Basis, Images ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "ZeroKer", Basis, Images ); } /*4DEBUG*/
 
   ideal result = 0;
 
@@ -749,7 +749,7 @@ NOTE: the result is a set of all basis vectors having a zero image
         }
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "ZeroKer", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "ZeroKer", result ); } /*4DEBUG*/
   return( result );
 }
 
@@ -773,11 +773,11 @@ SEE ALSO:   variablesSorted
 EXAMPLE:    example variablesStandard; shows an example
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "variablesStandard" ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "variablesStandard" ); } /*4DEBUG*/
 
   ideal result = maxideal(1);
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "variablesStandard", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "variablesStandard", result ); } /*4DEBUG*/
   return( result );
 }
 example
@@ -805,7 +805,7 @@ NOTE:       This is a heuristics for the computation of the center:
 SEE ALSO:   variablesStandard
 EXAMPLE:    example variablesSorted; shows an example
 "{
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "variablesSorted" ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "variablesSorted" ); } /*4DEBUG*/
 
   ideal V   = variablesStandard();
   int  N    = size( V ); // == nvars( basering )
@@ -832,7 +832,7 @@ EXAMPLE:    example variablesSorted; shows an example
           }
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "variablesSorted", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "variablesSorted", result ); } /*4DEBUG*/
   return( result );
 }
 example
@@ -873,7 +873,7 @@ SEE ALSO:   centralizerVS; centralizer; inCentralizer
 EXAMPLE:    example centralizeSet; shows an example
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizeSet", F, V ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizeSet", F, V ); } /*4DEBUG*/
 
   int  N = size(F);
 
@@ -907,7 +907,7 @@ EXAMPLE:    example centralizeSet; shows an example
 
   V = makeNice(V);
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizeSet", V ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizeSet", V ); } /*4DEBUG*/
 
   return( V );
 }
@@ -951,7 +951,7 @@ SEE ALSO:   centerVS; centralizer; inCentralizer
 EXAMPLE:    example centralizerVS; shows an example
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizerVS", F, d ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizerVS", F, d ); } /*4DEBUG*/
 
   if( size(F) == 0)
     {
@@ -960,7 +960,7 @@ EXAMPLE:    example centralizerVS; shows an example
 
   ideal V = centralizeSet( F, PBW_maxDeg( d ) ); // basis of the Centralizer of S in PBW basis
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizerVS", V ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizerVS", V ); } /*4DEBUG*/
 
   return( V );
 }
@@ -1000,7 +1000,7 @@ SEE ALSO:   centralizerVS; center; inCenter
 EXAMPLE:    example centerVS; shows an example
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centerVS", D ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centerVS", D ); } /*4DEBUG*/
 
 
   if( nameof( basering ) == "basering" )
@@ -1015,7 +1015,7 @@ EXAMPLE:    example centerVS; shows an example
 
   ideal result = centralizerVS( variablesSorted(), D );
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centerVS", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centerVS", result ); } /*4DEBUG*/
 
   return( result );
 }
@@ -1055,7 +1055,7 @@ SEE ALSO:   centralizerVS; centerRed; centralizer; inCentralizer
 EXAMPLE:    example centralizerRed; shows an example
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizerRed", F, D, # ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centralizerRed", F, D, # ); } /*4DEBUG*/
 
   if( nameof( basering ) == "basering" )
     {
@@ -1283,7 +1283,7 @@ EXAMPLE:    example centralizerRed; shows an example
     {
       typeof(@Delta); @Delta;
       typeof(D); D;
-    };
+    }
 */
           // And set new Bound
           D = D + @Delta;
@@ -1294,7 +1294,7 @@ EXAMPLE:    example centralizerRed; shows an example
 
   result = makeNice(result);
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizerRed", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centralizerRed", result ); } /*4DEBUG*/
 
   return( result );
 }
@@ -1332,7 +1332,7 @@ SEE ALSO:   centralizerRed; centerVS; center; inCenter
 EXAMPLE:    example centerRed; shows an example
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centerRed", D, # ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "centerRed", D, # ); } /*4DEBUG*/
 
   if( nameof( basering ) == "basering" )
     {
@@ -1341,7 +1341,7 @@ EXAMPLE:    example centerRed; shows an example
 
   ideal result = centralizerRed( variablesSorted(), D, # );
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centerRed", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "centerRed", result ); } /*4DEBUG*/
 
   return( result );
 }
@@ -1381,7 +1381,7 @@ PURPOSE:     interreduction without monomial multiplication,
     just make every leading monomial occur in a single polynomial
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "INTERRED", S ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "INTERRED", S ); } /*4DEBUG*/
 
   ideal result = S;
 
@@ -1429,7 +1429,7 @@ PURPOSE:     interreduction without monomial multiplication,
   // We are done! No common leading monomials!
   // The result is sorted
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "INTERRED", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "INTERRED", result ); } /*4DEBUG*/
 
   return( result );
 }
@@ -1441,7 +1441,7 @@ static proc SANF( poly p, list FOUND_LEADING_MONOMIALS )
     reduce p w.r.t. found multiples without ANY polynomial multiplications!
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "SANF", p, FOUND_LEADING_MONOMIALS); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "SANF", p, FOUND_LEADING_MONOMIALS); } /*4DEBUG*/
 
   poly q = p;
   poly head = 0;
@@ -1481,7 +1481,7 @@ static proc SANF( poly p, list FOUND_LEADING_MONOMIALS )
 
 
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "SANF", head ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "SANF", head ); } /*4DEBUG*/
 
   return( head );
 }
@@ -1490,7 +1490,7 @@ static proc SANF( poly p, list FOUND_LEADING_MONOMIALS )
 /******************************************************/
 static proc maxdegInt( ideal I )
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "maxdegInt", I ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "maxdegInt", I ); } /*4DEBUG*/
 
   intmat D = maxdeg(I);
 
@@ -1506,7 +1506,7 @@ static proc maxdegInt( ideal I )
         }
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "maxdegInt", max ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "maxdegInt", max ); } /*4DEBUG*/
 
   return( max );
 }
@@ -1515,7 +1515,7 @@ static proc maxdegInt( ideal I )
 /******************************************************/
 static proc mindegInt( ideal I )
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "mindegInt", I ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "mindegInt", I ); } /*4DEBUG*/
 
   intmat D = mindeg(I);
 
@@ -1531,7 +1531,7 @@ static proc mindegInt( ideal I )
         }
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "mindegInt", min ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "mindegInt", min ); } /*4DEBUG*/
 
   return( min );
 }
@@ -1548,7 +1548,7 @@ SEE ALSO:   sa_poly_reduce
 EXAMPLE:    example sa_reduce; shows an example
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "sa_reduce", V ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "sa_reduce", V ); } /*4DEBUG*/
 
   ideal result = ideal();
 
@@ -1643,7 +1643,7 @@ EXAMPLE:    example sa_reduce; shows an example
 
   result = makeNice(result);
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_reduce", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_reduce", result ); } /*4DEBUG*/
 
   return( result );
 }
@@ -1672,7 +1672,7 @@ SEE ALSO:   sa_reduce
 EXAMPLE:    example sa_poly_reduce; shows an example
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_poly_reduce", p, V ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_poly_reduce", p, V ); } /*4DEBUG*/
   // As previous...
 
   ideal FLM = INTERRED( V ); // The output is sorted "[1]<[2]<[3]<..."
@@ -1755,7 +1755,7 @@ EXAMPLE:    example sa_poly_reduce; shows an example
   result = makeNice( result );
 
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_poly_reduce", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "sa_poly_reduce", result ); } /*4DEBUG*/
 
   return( result );
 }
@@ -1840,7 +1840,7 @@ PURPOSE: check whether the elements of E are in the centralizer(S)
 EXAMPLE: example inCentralizer; shows examples
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "inCentralizer", a, S ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "inCentralizer", a, S ); } /*4DEBUG*/
 
   if( nameof( basering ) == "basering" )
     {
@@ -1869,7 +1869,7 @@ EXAMPLE: example inCentralizer; shows examples
       ERROR( "Wrong argument!" );
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "inCentralizer", res ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "inCentralizer", res ); } /*4DEBUG*/
 
   return (res);
 }
@@ -1904,7 +1904,7 @@ PURPOSE: check whether the elements of E are central
 EXAMPLE: example inCenter; shows examples
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "inCenter", a ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "inCenter", a ); } /*4DEBUG*/
 
   if( nameof( basering ) == "basering" )
     {
@@ -1913,7 +1913,7 @@ EXAMPLE: example inCenter; shows examples
 
   int result = inCentralizer( a, variablesStandard() );
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "inCenter", result ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "inCenter", result ); } /*4DEBUG*/
 
   return( result );
 }
@@ -1949,7 +1949,7 @@ NOTE:        f is a Cartan element of the algebra A
 @* if and only if for all variables v_i there exist C in K such that [f, v_i] = C * v_i.
 "
 {
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "isCartan", f ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ BCall( "isCartan", f ); } /*4DEBUG*/
 
   if( nameof( basering ) == "basering" )
     {
@@ -1984,7 +1984,7 @@ NOTE:        f is a Cartan element of the algebra A
         } // else \alpha = 0
     }
 
-  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "isCartan", r ); }; /*4DEBUG*/
+  /*4DEBUG*/    if( defined( @@@DEBUG ) ){ ECall( "isCartan", r ); } /*4DEBUG*/
   return( r );
 }
 example
