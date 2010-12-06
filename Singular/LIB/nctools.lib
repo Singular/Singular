@@ -1790,7 +1790,7 @@ EXAMPLE: example isLieType; shows an example
   int NVars = nvars(@B); //number of variables in basering
   int i, j;
 
-  int answer = 1;  
+  int answer = 1;
 
   // check basering is of Lie type:
   matrix @@CC[NVars][NVars];
@@ -1799,13 +1799,13 @@ EXAMPLE: example isLieType; shows an example
     for(j=i+1; j<=NVars; j++)
     {
       @@CC[i,j]=leadcoef(var(j)*var(i));
-    };
-  };
+    }
+  }
   ideal @C@ = simplify(ideal(@@CC),2+4);// skip zeroes and repeated entries
   if (  (size(@C@) >1 ) || ( (size(@C@)==1) && (@C@[1]!=1) )  )
   {
     answer = 0;
-  };
+  }
   return(answer);
 }
 example

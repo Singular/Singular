@@ -386,17 +386,17 @@ static proc new_var()
       if(i*j!=1)
       {
         s = s+ ","+NVAR(i,j);
-      };
-    };
-  };
+      }
+    }
+  }
   return(s);
-};
+}
 
 static proc NVAR(int i, int j)
 {
   //  return("@_"+string(i)+"_"+string(j));
   return("a"+string(i)+string(j));
-};
+}
 ///////////////////////////////////////////////////////////////////////////////////
 static proc new_var_special()
 //generates a string of new variables
@@ -408,9 +408,9 @@ static proc new_var_special()
   for(i=2; i<=NVars; i++)
   {
     s = s+ ","+NVAR(i,i);
-  };
+  }
   return(s);
-};
+}
 ///////////////////////////////////////////////////////////////////////////////////
 static proc RelMatr()
 // returns the matrix of relations
@@ -424,10 +424,10 @@ static proc RelMatr()
     for(j=i+1; j<=NVars; j++)
     {
       Rel[i,j]=var(j)*var(i)-var(i)*var(j);
-    };
-  };
+    }
+  }
   return(Rel);
-};
+}
 /////////////////////////////////////////////////////////////////
 proc findInvo()
 "USAGE: findInvo();
@@ -465,7 +465,7 @@ EXAMPLE: example findInvo; shows examples
   else //if there exist parameters
   {
      execute("ring @@@KK=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
-  };
+  }
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
 
@@ -478,8 +478,8 @@ EXAMPLE: example findInvo; shows examples
     for(j=i+1; j<=NVars; j++)
     {
       M[i,j] = Rel[i,j];
-    };
-  };
+    }
+  }
 
   def @@K = nc_algebra(1, M); setring @@K; //now new ring @@K become a noncommutative ring
 
@@ -491,9 +491,9 @@ EXAMPLE: example findInvo; shows examples
     for(j=1; j<=NVars; j++)
     {
       execute( "@@F = @@F+"+NVAR(i,j)+"*"+string( var(j) )+";" );
-    };
+    }
     l=l+list(@@F);
-  };
+  }
 
   matrix N = imap(@@@KK,Rel);
 
@@ -502,8 +502,8 @@ EXAMPLE: example findInvo; shows examples
     for(j=i+1; j<=NVars; j++)
     {
       N[i,j]= l[j]*l[i] - l[i]*l[j] + In_Poly( N[i,j], l, NVars);
-    };
-  };
+    }
+  }
   kill l;
   //---------------------------------------------
   //get the ideal of coefficients of N
@@ -513,7 +513,7 @@ EXAMPLE: example findInvo; shows examples
   for(i=2; i<=NVars; i++)
   {
     J = ideal( coeffs( J, var(i) ) );
-  };
+  }
   J = simplify(J,2);
   //-------------------------------------------------
   if ( Par=="" ) //initializes the ring of relations
@@ -523,7 +523,7 @@ EXAMPLE: example findInvo; shows examples
   else
   {
     execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
-  };
+  }
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
   string snv = "["+string(NVars)+"]";
   execute("matrix @@D"+snv+snv+"="+@ss+";"); // matrix with entries=new variables
@@ -603,7 +603,7 @@ EXAMPLE: example findInvoDiag; shows examples
   else //if there exist parameters
   {
     execute("ring @@@KK=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
-  };
+  }
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
 
@@ -615,8 +615,8 @@ EXAMPLE: example findInvoDiag; shows examples
     for(j=i+1; j<=NVars; j++)
     {
       M[i,j] = Rel[i,j];
-    };
-  };
+    }
+  }
 
   def @@K = nc_algebra(1, M); setring @@K; //now new ring @@K become a noncommutative ring
 
@@ -626,7 +626,7 @@ EXAMPLE: example findInvoDiag; shows examples
   {
     execute( "l["+string(i)+"]="+NVAR(i,i)+"*"+string( var(i) )+";" );
 
-  };
+  }
   matrix N = imap(@@@KK,Rel);
 
   for(i=1; i<NVars; i++)//get matrix by applying the involution to relations
@@ -634,8 +634,8 @@ EXAMPLE: example findInvoDiag; shows examples
     for(j=i+1; j<=NVars; j++)
     {
       N[i,j]= l[j]*l[i] - l[i]*l[j] + In_Poly( N[i,j], l, NVars);
-    };
-  };
+    }
+  }
   kill l;
   //---------------------------------------------
   //get the ideal of coefficients of N
@@ -646,7 +646,7 @@ EXAMPLE: example findInvoDiag; shows examples
   for(i=2; i<=NVars; i++)
   {
     J = ideal( coeffs( J, var(i) ) );
-  };
+  }
   J = simplify(J,2);
   //-------------------------------------------------
 
@@ -657,7 +657,7 @@ EXAMPLE: example findInvoDiag; shows examples
   else
   {
     execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
-  };
+  }
 
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
 
@@ -665,7 +665,7 @@ EXAMPLE: example findInvoDiag; shows examples
   for(i=1;i<=NVars;i++)
   {
     execute("@@D["+string(i)+","+string(i)+"]="+NVAR(i,i)+";");
-  };
+  }
   J = J, ideal( @@D*@@D - matrix( freemodule(NVars) ) ); // add the condition that involution to square is just identity
   J = simplify(J,2); // without extra zeros
 
@@ -753,7 +753,7 @@ EXAMPLE: example findAuto; shows examples
   else //if there exist parameters
   {
      execute("ring @@@K=(0,"+Par+") ,("+varstr(@B)+","+@ss+"), dp;");//new ring with new variables
-  };
+  }
 
   matrix Rel = imap(@B, Rel); //consider the matrix of relations in new ring
 
@@ -766,8 +766,8 @@ EXAMPLE: example findAuto; shows examples
     for(j=i+1; j<=NVars; j++)
     {
       M[i,j] = Rel[i,j];
-    };
-  };
+    }
+  }
 
   def @@K = nc_algebra(1, M); setring @@K; //now new ring @@K become a noncommutative ring
 
@@ -779,9 +779,9 @@ EXAMPLE: example findAuto; shows examples
     for(j=1; j<=NVars; j++)
     {
       execute( "@@F = @@F+"+NVAR(i,j)+"*"+string( var(j) )+";" );
-    };
+    }
     l=l+list(@@F);
-  };
+  }
 
   matrix N = imap(@@@K,Rel);
 
@@ -790,8 +790,8 @@ EXAMPLE: example findAuto; shows examples
     for(j=i+1; j<=NVars; j++)
     {
       N[i,j]= l[j]*l[i] - l[i]*l[j] - Hom_Poly( N[i,j], l, NVars);
-    };
-  };
+    }
+  }
   kill l;
   //---------------------------------------------
   //get the ideal of coefficients of N
@@ -801,7 +801,7 @@ EXAMPLE: example findAuto; shows examples
   for(i=2; i<=NVars; i++)
   {
     J = ideal( coeffs( J, var(i) ) );
-  };
+  }
   J = simplify(J,2);
   //-------------------------------------------------
   if (( Par=="" ) && (n!=0)) //initializes the ring of relations
@@ -815,7 +815,7 @@ EXAMPLE: example findAuto; shows examples
   if ( Par!="" )
   {
     execute("ring @@KK=(0,"+Par+"),("+@ss+"), dp;");
-  };
+  }
   //  execute("setring @@KK;");
   //  basering;
   ideal J = imap(@@K,J); // ideal, considered in @@KK now
@@ -891,14 +891,14 @@ SEE ALSO: isInvolution, involution, findInvo
 EXAMPLE: example isAntiEndo; shows examples
 "
 {
-  // assumes: 
+  // assumes:
   // (1) F is from br to br
   // I don't see how to check it; in case of error it will happen in the body
   // (2) do not assume: F is linear, F is bijective
   int n = nvars(basering);
   int i,j;
   poly pi,pj,q;
-  int answer=1; 
+  int answer=1;
   ideal @f = ideal(F); list L=@f[1..ncols(@f)];
   for (i=1; i<n; i++)
   {
@@ -911,7 +911,7 @@ EXAMPLE: example isAntiEndo; shows examples
       q = In_Poly(pj*pi,L,n) - F[i]*F[j];
       if (q!=0)
       {
-	answer=0; return(answer);
+        answer=0; return(answer);
       }
     }
   }
@@ -926,7 +926,7 @@ example
   isAntiEndo(J);
   map K = A,f,e,-h; // not antiendo
   isAntiEndo(K);
-};
+}
 
 
 proc isInvolution(def F)
@@ -971,6 +971,4 @@ example
   isInvolution(J);
   map K = A,f,e,-h; // not antiauto
   isInvolution(K);
-};
-
-
+}
