@@ -3828,7 +3828,7 @@ bool Hensel_P (const CanonicalForm & U, CFArray & G, const Evaluation & A,
   int * liftBounds;
   if (U.level() > 2)
   {
-    liftBounds= new int [U.level() - 1];
+    liftBounds= new int [U.level()]; /* index: 0.. U.level() */
     liftBounds[0]= liftBound;
     for (int i= 1; i < U.level() - 1; i++)
       liftBounds[i]= degree (shiftedU, Variable (i + 2)) + 1;
