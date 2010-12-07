@@ -1542,7 +1542,7 @@ henselLift (const CFList& eval, const CFList& factors, const int* l, const int
   bufEval.append (j.getItem());
   j++;
 
-  for (int i= 2; i <= lLength && j.hasItem(); i++, j++)
+  for (int i= 2; i < lLength && j.hasItem(); i++, j++)
   {
     result.insert (LC (bufEval.getFirst(), 1));
     bufEval.append (j.getItem());
@@ -2326,7 +2326,7 @@ henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
   bufLCs2.append (jjj.getItem());
   jj++, jjj++;
 
-  for (int i= 2; i <= lLength && j.hasItem(); i++, j++, jj++, jjj++)
+  for (int i= 2; i < lLength && j.hasItem(); i++, j++, jj++, jjj++)
   {
     bufEval.append (j.getItem());
     bufLCs1.append (jj.getItem());
