@@ -25,7 +25,7 @@
 #endif
 
 #ifdef WINNT
-#include <omalloc/om_Alloc.h>
+#include <omalloc/omalloc.h>
 #endif
 
 /* ABSOLUTE_FILENAME_P (fname): True if fname is an absolute filename */
