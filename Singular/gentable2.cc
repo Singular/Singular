@@ -104,6 +104,8 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
+  // we do not blackbox objects during table generation:
+  // if (tok>MAX_TOK) return getBlackboxName(tok);
   while (cmds[i].tokval!=0)
   {
     if ((cmds[i].tokval == tok)&&(cmds[i].alias==0))
