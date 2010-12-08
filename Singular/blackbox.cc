@@ -99,10 +99,6 @@ int blackboxIsCmd(const char *n, int & tok)
   }
   return 0;
 }
-void * loadNewBlackbox(char *type_name,const char *id_name)
-{
-    return NULL;
-}
 
 void printBlackboxTypes()
 {
@@ -111,5 +107,3 @@ void printBlackboxTypes()
     Print("blackbox %d: %s\n",i,blackboxName[i]);
   }
 }
-
-
