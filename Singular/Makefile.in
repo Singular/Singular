@@ -172,7 +172,7 @@ endif
 
 # normal C++ source files
 CXXSOURCES=grammar.cc scanner.cc attrib.cc \
-    eigenval_ip.cc\
+    blackbox.cc eigenval_ip.cc\
     extra.cc fehelp.cc feOpt.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc \
@@ -189,7 +189,8 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     calcSVD.cc pipeLink.cc \
     Minor.cc \
     MinorProcessor.cc \
-    MinorInterface.cc
+    MinorInterface.cc \
+    bigintm.cc
 
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
@@ -237,7 +238,7 @@ HEADERS=lists.h attrib.h \
 	mpsr_Get.h janet.h\
 	mpsr_Put.h walk.h\
 	dbm_sl.h libparse.h pipeLink.h \
-	gms.h pcv.h eigenval_ip.h \
+	gms.h pcv.h eigenval_ip.h blackbox.h \
 	distrib.h walk.h \
         static.h \
         omSingularConfig.h

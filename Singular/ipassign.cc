@@ -39,6 +39,7 @@
 #include <Singular/silink.h>
 #include <Singular/ipshell.h>
 #include <kernel/sca.h>
+#include <Singular/blackbox.h>
 
 #ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
@@ -765,6 +766,12 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   leftv ld=l;
   if ((l->rtyp==IDHDL)&&(lt!=QRING_CMD)&&(lt!=RING_CMD))
     ld=(leftv)l->data;
+  if (lt>MAX_TOK)
+  {
+    blackbox *bb=getBlackboxStuff(lt);
+    Print("bb-assign: bb=%lx\n",bb);
+    return (bb==NULL) || bb->blackbox_Assign(l,r);
+  }
   while (((dAssign[i].res!=lt)
       || (dAssign[i].arg!=rt))
     && (dAssign[i].res!=0)) i++;

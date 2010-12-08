@@ -31,6 +31,7 @@
 #include <Singular/version.h>
 #include <Singular/slInit.h>
 #include <Singular/ssiLink.h>
+#include <Singular/bigintm.h>
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -127,6 +128,7 @@ int main(          /* main entry to Singular */
     IDPACKAGE(h)=basePack;
     currPackHdl=h;
     basePackHdl=h;
+    bigintm_setup();
   }
 #endif
   if (TEST_V_QUIET)

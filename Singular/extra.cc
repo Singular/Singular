@@ -15,6 +15,7 @@
 #include <signal.h>
 #include <kernel/mod2.h>
 #include <misc_ip.h>
+#include <blackbox.h>
 
 #ifdef TIME_WITH_SYS_TIME
 # include <time.h>
@@ -3667,8 +3668,14 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
     }
   }
   else
-    
 #endif
+/*==================== listing all blackbox types (debug stuff) =========*/
+  if(strcmp(sys_cmd,"blackbox")==0)
+  {
+    printBlackboxTypes();
+    return FALSE;
+  }
+  else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

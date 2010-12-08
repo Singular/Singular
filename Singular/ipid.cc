@@ -28,6 +28,7 @@
 #include <Singular/silink.h>
 #include <kernel/syz.h>
 #include <Singular/ipid.h>
+#include <Singular/blackbox.h>
 
 #ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
@@ -123,7 +124,6 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
 {
   //printf("define %s, %x, lev: %d, typ: %d\n", s,s,lev,t);
   idhdl h = (idrec *)omAlloc0Bin(idrec_bin);
-  int   len = 0;
   IDID(h)   = s;
   IDTYP(h)  = t;
   IDLEV(h)  = lev;
@@ -155,7 +155,7 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
         IDMAP(h)->preimage = omStrDup(IDID(currRingHdl));
         break;
       case STRING_CMD:
-        len=1;
+        IDSTRING(h) = (char *)omAlloc0(1);
         break;
       case LIST_CMD:
         IDLIST(h)=(lists)omAllocBin(slists_bin);
@@ -175,13 +175,28 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
         break;
         //the types with the standard init: set the struct to zero
       case RESOLUTION_CMD:
-        len=sizeof(ssyStrategy);
+        IDSTRING(h) = (char *)omAlloc0(sizeof(ssyStrategy));
         break;
     //other types: without init (int,script,poly,def,package)
-    }
-    if (len!=0)
-    {
-      IDSTRING(h) = (char *)omAlloc0(len);
+       case INT_CMD:
+       case DEF_CMD:
+       case POLY_CMD:
+       case VECTOR_CMD:
+       case QRING_CMD:
+         break;
+       default:
+         {
+	   if (t>MAX_TOK)
+	   {
+             Print("bb-type %d\n",t);
+	     blackbox *bb=getBlackboxStuff(t);
+	     if (bb!=NULL)
+	       IDSTRING(h)=(char *)bb->blackbox_Init();
+	   }
+	   else
+	     Werror("unknown type %d",t);
+	   break;
+	 }
     }
     // additional settings:--------------------------------------
 #if 0
@@ -474,6 +489,13 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     assume(r!=NULL);
     if (IDDATA(h)!=NULL)
       syKillComputation((syStrategy)IDDATA(h),r);
+  }
+  // blackbox -------------------------------------------------------------
+  else if (IDTYP(h)>MAX_TOK)
+  {
+    blackbox *bb=getBlackboxStuff(IDTYP(h));
+    if (bb!=NULL) bb->blackbox_destroy(bb,IDDATA(h));
+    IDDATA(h)=NULL;
   }
 #ifdef HAVE_FANS
   // fan -------------------------------------------------------------

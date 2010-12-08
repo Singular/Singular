@@ -68,6 +68,7 @@
 
 #include <Singular/ipshell.h>
 #include <kernel/mpr_inout.h>
+#include <Singular/blackbox.h>
 
 #ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
@@ -3270,7 +3271,7 @@ static BOOLEAN jjFACECONT(leftv res, leftv u, leftv v)
   return FALSE;
 }
 static BOOLEAN jjINTERSC(leftv res, leftv u, leftv v)
-{ 
+{
   gfan::ZCone* zc1 = (gfan::ZCone*)u->Data();
   gfan::ZCone* zc2 = (gfan::ZCone*)v->Data();
   int d1 = zc1->ambientDimension();
@@ -3476,10 +3477,10 @@ static BOOLEAN jjGETPROP1(leftv res, leftv u, leftv v)
 }*/
 static BOOLEAN jjINSERTCONE(leftv res, leftv u, leftv v)
 {
-	gfan::ZFan* zf = (gfan::ZFan*)u->Data();
-	gfan::ZCone* zc = (gfan::ZCone*)v->Data();
-	zf->insert(*zc);
-	return FALSE;
+        gfan::ZFan* zf = (gfan::ZFan*)u->Data();
+        gfan::ZCone* zc = (gfan::ZCone*)v->Data();
+        zf->insert(*zc);
+        return FALSE;
 }
 static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
 {
@@ -5009,7 +5010,8 @@ static BOOLEAN jjTWOSTD(leftv res, leftv a)
 
 static BOOLEAN jjTYPEOF(leftv res, leftv v)
 {
-  switch ((int)(long)v->data)
+  int t=(int)(long)v->data;
+  switch (t)
   {
     case INT_CMD:        res->data=omStrDup("int"); break;
     case POLY_CMD:       res->data=omStrDup("poly"); break;
@@ -5036,7 +5038,14 @@ static BOOLEAN jjTYPEOF(leftv res, leftv v)
 #endif /* HAVE_FANS */
     case DEF_CMD:
     case NONE:           res->data=omStrDup("none"); break;
-    default:             res->data=omStrDup("?unknown type?");
+    default:
+    {
+      if (t>MAX_TOK)
+        res->data=omStrDup(getBlackboxName(t));
+      else
+        res->data=omStrDup("?unknown type?");
+      break;
+    }
   }
   return FALSE;
 }
@@ -5115,69 +5124,69 @@ BOOLEAN jjWAITALL1(leftv res, leftv a)
    intmat; 0 otherwise */
 static gfan::IntMatrix permutationIntMatrix(const intvec* iv)
 {
-	int cc = iv->cols();
-	int rr = iv->rows();
-	intvec* ivCopy = new intvec(rr, cc, 0);
-	for (int r = 1; r <= rr; r++)
-	  for (int c = 1; c <= cc; c++)
-	    IMATELEM(*ivCopy, r, c) = IMATELEM(*iv, r, c) - 1;
-	gfan::ZMatrix zm = intmat2ZMatrix(ivCopy);
-	gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(zm));
-	return *im;
+        int cc = iv->cols();
+        int rr = iv->rows();
+        intvec* ivCopy = new intvec(rr, cc, 0);
+        for (int r = 1; r <= rr; r++)
+          for (int c = 1; c <= cc; c++)
+            IMATELEM(*ivCopy, r, c) = IMATELEM(*iv, r, c) - 1;
+        gfan::ZMatrix zm = intmat2ZMatrix(ivCopy);
+        gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(zm));
+        return *im;
 }
 static BOOLEAN jjFANEMPTY_I(leftv res, leftv v)
 {
-	int ambientDim = (int)(long)v->Data();
-	if (ambientDim < 0)
-	{
-	  Werror("expected non-negative ambient dim but got %d", ambientDim);
-	  return TRUE;
-	}
-	res->data = (char*)(new gfan::ZFan(ambientDim));
-	return FALSE;
+        int ambientDim = (int)(long)v->Data();
+        if (ambientDim < 0)
+        {
+          Werror("expected non-negative ambient dim but got %d", ambientDim);
+          return TRUE;
+        }
+        res->data = (char*)(new gfan::ZFan(ambientDim));
+        return FALSE;
 }
 static BOOLEAN jjFANEMPTY_IM(leftv res, leftv v)
 {
-	intvec* permutations = (intvec*)v->Data();
-	int ambientDim = permutations->cols();
-	gfan::IntMatrix im = permutationIntMatrix(permutations);
-	if (!gfan::Permutation::arePermutations(im))
-	{
-		Werror("provided intmat contains invalid permutations of {1, ..., %d}", ambientDim);
-		return TRUE;
-	}
-	gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
-	sg.computeClosure(im);
-	res->data = (char*)(new gfan::ZFan(sg));
-	return FALSE;
+        intvec* permutations = (intvec*)v->Data();
+        int ambientDim = permutations->cols();
+        gfan::IntMatrix im = permutationIntMatrix(permutations);
+        if (!gfan::Permutation::arePermutations(im))
+        {
+                Werror("provided intmat contains invalid permutations of {1, ..., %d}", ambientDim);
+                return TRUE;
+        }
+        gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
+        sg.computeClosure(im);
+        res->data = (char*)(new gfan::ZFan(sg));
+        return FALSE;
 }
 static BOOLEAN jjFANFULL_I(leftv res, leftv v)
 {
-	int ambientDim = (int)(long)v->Data();
-	if (ambientDim < 0)
-	{
-	  Werror("expected non-negative ambient dim but got %d", ambientDim);
-	  return TRUE;
-	}
-	gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(ambientDim));
-	res->data = (char*)zf;
-	return FALSE;
+        int ambientDim = (int)(long)v->Data();
+        if (ambientDim < 0)
+        {
+          Werror("expected non-negative ambient dim but got %d", ambientDim);
+          return TRUE;
+        }
+        gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(ambientDim));
+        res->data = (char*)zf;
+        return FALSE;
 }
 static BOOLEAN jjFANFULL_IM(leftv res, leftv v)
 {
-	intvec* permutations = (intvec*)v->Data();
-	int ambientDim = permutations->cols();
-	gfan::IntMatrix im = permutationIntMatrix(permutations);
-	if (!gfan::Permutation::arePermutations(im))
-	{
-		Werror("provided intmat contains invalid permutations of {1, ..., %d}", ambientDim);
-		return TRUE;
-	}
-	gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
-	sg.computeClosure(im);
-	gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(sg));
-	res->data = (char*)zf;
-	return FALSE;
+        intvec* permutations = (intvec*)v->Data();
+        int ambientDim = permutations->cols();
+        gfan::IntMatrix im = permutationIntMatrix(permutations);
+        if (!gfan::Permutation::arePermutations(im))
+        {
+                Werror("provided intmat contains invalid permutations of {1, ..., %d}", ambientDim);
+                return TRUE;
+        }
+        gfan::SymmetryGroup sg = gfan::SymmetryGroup(ambientDim);
+        sg.computeClosure(im);
+        gfan::ZFan* zf = new gfan::ZFan(gfan::ZFan::fullFan(sg));
+        res->data = (char*)zf;
+        return FALSE;
 }
 static BOOLEAN jjCONERAYS1(leftv res, leftv v)
 {
@@ -5441,9 +5450,7 @@ void jjInitTab1()
         case (int)jjCOUNT_RES:    dArith1[i].p=(proc1)sySize; break;
         case (int)jjDIM_R:        dArith1[i].p=(proc1)syDim; break;
         case (int)jjidTransp:     dArith1[i].p=(proc1)idTransp; break;
-#ifdef GENTABLE
         default: Werror("missing proc1-definition for %d",(int)(long)dArith1[i].p);
-#endif
       }
     }
   }
@@ -8036,6 +8043,12 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
     }
 #endif
     int at=a->Typ();
+    if (at>MAX_TOK)
+    {
+      blackbox *bb=getBlackboxStuff(at);
+      if (bb!=NULL) return bb->blackbox_Op2(op,res,a,b);
+      else          return TRUE;
+    }
     int bt=b->Typ();
     int i=iiTabIndex(dArithTab2,JJTAB2LEN,op);
     int index=i;
@@ -8249,8 +8262,14 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
     }
 #endif
     int at=a->Typ();
-    BOOLEAN failed=FALSE;
+    if (at>MAX_TOK)
+    {
+      blackbox *bb=getBlackboxStuff(at);
+      if (bb!=NULL) return bb->blackbox_Op1(op,res,a);
+      else          return TRUE;
+    }
 
+    BOOLEAN failed=FALSE;
     iiOp=op;
     int i=iiTabIndex(dArithTab1,JJTAB1LEN,op);
     int ti = i;
@@ -8448,6 +8467,12 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
     }
 #endif
     int at=a->Typ();
+    if (at>MAX_TOK)
+    {
+      blackbox *bb=getBlackboxStuff(at);
+      if (bb!=NULL) return bb->blackbox_Op3(op,res,a,b,c);
+      else          return TRUE;
+    }
     int bt=b->Typ();
     int ct=c->Typ();
 
@@ -8698,6 +8723,12 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
       return FALSE;
     }
 #endif
+    if ((a!=NULL) && (a->Typ()>MAX_TOK))
+    {
+      blackbox *bb=getBlackboxStuff(a->Typ());
+      if (bb!=NULL) return bb->blackbox_OpM(op,res,a);
+      else          return TRUE;
+    }
     BOOLEAN failed=FALSE;
     int args=0;
     if (a!=NULL) args=a->listLength();
@@ -8797,7 +8828,9 @@ int IsCmd(const char *n, int & tok)
       }
       else
       {
-        return 0;
+        // -- blackbox extensions:
+	// return 0;
+	return blackboxIsCmd(n,tok);
       }
     }
     i=(an+en)/2;
@@ -8904,6 +8937,7 @@ const char * Tok2Cmdname(int tok)
   //if (tok==OBJECT) return "object";
   //if (tok==PRINT_EXPR) return "print_expr";
   if (tok==IDHDL) return "identifier";
+  if (tok>MAX_TOK) return getBlackboxName(tok);
   for(i=0; i<sArithBase.nCmdUsed; i++)
     //while (sArithBase.sCmds[i].tokval!=0)
   {

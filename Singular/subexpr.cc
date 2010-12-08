@@ -37,6 +37,7 @@
 #include <kernel/syz.h>
 #include <Singular/attrib.h>
 #include <Singular/subexpr.h>
+#include <Singular/blackbox.h>
 
 #ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
@@ -321,10 +322,17 @@ void sleftv::Print(leftv store, int spaces)
           }
           break;
         }
-#ifdef TEST
+
         default:
+	  if (t>MAX_TOK)
+	  {
+	    blackbox * bb=getBlackboxStuff(t);
+            PrintNSpaces(spaces);
+	    if (bb!=NULL) { bb->blackbox_Print(bb,d); }
+	    else          { ::Print("Print: blackbox %d(bb=NULL)",t); }
+	  }
+	  else
           ::Print("Print:unknown type %s(%d)", Tok2Cmdname(t),t);
-#endif
       } /* end switch: (Typ()) */
   }
   if (next!=NULL)
@@ -436,7 +444,6 @@ void sleftv::CleanUp(ring r)
       case RESOLUTION_CMD:
         if (r!=NULL) syKillComputation((syStrategy)data,r);
         break;
-#ifdef TEST
       // the following types do not take memory
       // or are not copied
       case IDHDL:
@@ -458,8 +465,16 @@ void sleftv::CleanUp(ring r)
       case INT_CMD:
         break;
       default:
+      {
+        if (rtyp<=MAX_TOK)
         ::Print("CleanUp: unknown type %d\n",rtyp);  /* DEBUG */
-#endif
+        else if (data!=NULL)
+        {
+           blackbox *b=getBlackboxStuff(rtyp);
+           if (b!=NULL) b->blackbox_destroy(b,data);
+           data=NULL;
+        }
+      }
     } /* end switch: (rtyp) */
     //data=NULL; // will be done by Init() at the end
   }
@@ -591,15 +606,22 @@ static inline void * s_internalCopy(const int t,  void *d)
 #endif /* HAVE_FANS */
     case RESOLUTION_CMD:
       return (void*)syCopy((syStrategy)d);
-#ifdef TEST
     case DEF_CMD:
     case NONE:
       break; /* error recovery: do nothing */
     //case COMMAND:
     default:
+    {
+      if (t>MAX_TOK)
+      {
+        blackbox *b=getBlackboxStuff(t);
+	if (b!=NULL) return b->blackbox_Copy(b,d);
+        return NULL;
+      }
+      else
       Warn("s_internalCopy: cannot copy type %s(%d)",
             Tok2Cmdname(t),t);
-#endif
+    }
   }
   return NULL;
 }
@@ -932,6 +954,13 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
 
         case LIST_CMD:
           return lString((lists) d, typed, dim);
+
+        default:
+	  if(t> MAX_TOK)
+	  {
+	    blackbox *bb=getBlackboxStuff(t);
+	    if (bb!=NULL) return bb->blackbox_String(bb,d);
+	  }
     } /* end switch: (Typ()) */
   }
   return omStrDup("");
