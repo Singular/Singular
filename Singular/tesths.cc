@@ -128,7 +128,8 @@ int main(          /* main entry to Singular */
     IDPACKAGE(h)=basePack;
     currPackHdl=h;
     basePackHdl=h;
-    bigintm_setup();
+    //for official version: not active
+    //bigintm_setup();
   }
 #endif
   if (TEST_V_QUIET)
