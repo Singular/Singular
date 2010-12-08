@@ -51,7 +51,6 @@ ntl/src/makefile
 ntl/src/mfileout
 omalloc/omConfig.h
 omalloc/omExternalConfig.h
-omalloc/omMalloc.h
 omalloc/omlimits.h
 doc/NTL
 factory/cf_gmp.h
