@@ -535,10 +535,11 @@ EXAMPLE: example invariantRing; shows an example
     { string pau=#[1];
     }
     if( size(#)>1 )
-    {  if( typeof(#[2]) == "string")
-       { string pau=#[2];
-       }
-       if( typeof(#[2]) == "int")
+    {
+      if( typeof(#[2]) == "string")
+      { string pau=#[2];
+      }
+      if( typeof(#[2]) == "int")
       { ll=ll+list(#[2]);
       }
     }
