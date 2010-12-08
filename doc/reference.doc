@@ -65,7 +65,7 @@ and @code{LIB} no brackets are allowed.
 * close::
 * coef::
 * coeffs::
-* contract:: 
+* contract::
 * datetime::
 * dbprint::
 * defined::
@@ -5308,8 +5308,8 @@ an ideal under a given map.
 and the ideal has to be an ideal in the given ring.
 @item @strong{Note:}
 As @code{preimage} is handling ideals (not polynomials), the result of a preimage
-calculation of a principal ideal, whose generator is not in the image of the map,
-is the zero ideal.
+calculation of a principal ideal is (the closure of) the preimage of the ideal,
+not that of the polynomial.
 @item @strong{Example:}
 @smallexample
 @c example
