@@ -6,9 +6,7 @@ dnl Created: 11/99
 dnl Version: $Id$
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
-VERSION=0.9.6
-
-AC_INIT(omalloc,VERSION)
+AC_INIT(omalloc,0.9.6)
 AC_CONFIG_SRCDIR(om_Alloc.c)
 
 AC_CONFIG_AUX_DIR([.])
@@ -105,30 +103,6 @@ AC_PROG_INSTALL
 AM_PROG_CC_C_O
 AC_C_CONST
 AC_C_INLINE
-
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl path stuff
-dnl
-
-project=singular
-component=omalloc
-
-dnl set exec_prefix, libdir, includedir to some sensible values
-dnl if they are not yet already set
-
-# expand prefix
-test "x$prefix" = xNONE && prefix=$ac_default_prefix
-
-# expand exec_prefixad
-if test "x$exec_prefix" = xNONE; then
- exec_prefix=${prefix}
-fi
-
-# expand libdir
-test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${project}/${component}"
-
-# expand includedir
-test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include/${project}/${component}"
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for programs

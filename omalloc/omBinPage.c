@@ -6,7 +6,7 @@
  *  Version: $Id$
  *******************************************************************/
 #include <mylimits.h>
-#include <omalloc/om_Alloc.h>
+#include <omalloc/omalloc.h>
 #include <omalloc/omDefaultConfig.h>
 
 /*******************************************************************

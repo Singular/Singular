@@ -1,16 +1,22 @@
 lib_LIBRARIES=libomalloc.a libomalloc_debug.a
 
+libomalloc_a_includedir=$(includedir)/omalloc
+
+libomalloc_a_include_HEADERS=\
+omalloc.h		omConfig.h		omDerivedConfig.h	\
+omError.h		omStructs.h		omAllocDecl.h		\
+omInlineDecl.h		omBin.h			omMemOps.h		\
+omList.h		omFindExec.h		omGetBackTrace.h	\
+omRet2Info.h		omStats.h		omOpts.h		\
+omBinPage.h		omAllocSystem.h		omTables.h		\
+omAllocPrivate.h	omDebug.h		omInline.h		\
+omAllocFunc.h
+
+
+
 noinst_HEADERS=\
-mylimits.h             omlimits.h \
-om_Alloc.h             omList.h  	      omDerivedConfig.h \
-omAllocDecl.h          omConfig.h             omMemOps.h	\
-omDebug.h              omOpts.h		      omInlineDecl.h    \
-omAllocPrivate.h       omError.h              omPage.h		\
-omAllocSystem.h        omFindExec.h           omStats.h		\
-omBin.h                omDefaultConfig.h      omStructs.h	\
-omBinPage.h            omInline.h             omGetBackTrace.h  \
-omReturn.h	       omRet2Info.h	      omAllocFunc.h     \
-omTables.h
+mylimits.h		omlimits.h		omPage.h		\
+omDefaultConfig.h	omReturn.h
 
 SOURCES=\
 omBinPage.c       omList.c         omAllocEmulate.c omDebug.c        \
@@ -29,10 +35,7 @@ nodist_libomalloc_debug_a_SOURCES = omConfig.h omlimits.h omTables.h omalloc.h o
 
 libomalloc_a_CPPFLAGS= -DOM_NDEBUG
 
-BUILT_SOURCES = omalloc.h omTables.inc
-
-omalloc.h: $(noinst_HEADERS) omTables.h
-	./makeheader om_Alloc.h $@
+BUILT_SOURCES = omTables.inc
 
 omTables.inc: omTables omalloc.h
 	./omTables > omTables.xx && mv omTables.xx  $@

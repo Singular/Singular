@@ -12,7 +12,7 @@
 
 #ifdef OM_HAVE_TRACK
 #include <omalloc/omDefaultConfig.h>
-#include <omalloc/om_Alloc.h>
+#include <omalloc/omalloc.h>
 
 /*******************************************************************
  *
@@ -732,7 +732,7 @@ void* omGetCustomOfTrackAddr(void* addr)
 #ifndef OM_NDEBUG
 
 #ifndef OM_HAVE_TRACK
-#include <omalloc/om_Alloc.h>
+#include <omalloc/omalloc.h>
 #endif
 
 int omIsInKeptAddrList(void* addr)

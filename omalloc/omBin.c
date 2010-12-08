@@ -6,7 +6,7 @@
  *  Version: $Id$
  *******************************************************************/
 
-#include <omalloc/om_Alloc.h>
+#include <omalloc/omalloc.h>
 /* this should go away */
 
 #ifdef OM_INTERNAL_DEBUG

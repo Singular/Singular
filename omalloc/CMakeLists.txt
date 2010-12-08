@@ -176,10 +176,11 @@ omalloc_create_omtables_inc(OMTABLES_TARGET OMTABLES_INC
 omalloc_create_omtables_h(TARGET_OMTABLES OMTABLES_H
   ${CMAKE_CURRENT_BINARY_DIR}/omTables omTables)
 
+## Hello Kai: we finally got rid of makeheader :) please adapt the line below
 set(OMALLOC_H "${CMAKE_CURRENT_BINARY_DIR}/omalloc.h")
 omalloc_create_omalloc_h(gen-omalloc-h ${OMALLOC_H}
   ${CMAKE_CURRENT_SOURCE_DIR}/makeheader
-  ${CMAKE_CURRENT_SOURCE_DIR}/om_Alloc.h ${OMTABLES_H} ${TARGET_OMTABLES})
+  ${CMAKE_CURRENT_SOURCE_DIR}/omalloc.h ${OMTABLES_H} ${TARGET_OMTABLES})
 set(OMALLOC_H ${OMALLOC_H} PARENT_SCOPE)
 
 message(STATUS "Header file omalloc: '${OMALLOC_H}'")
@@ -200,7 +201,7 @@ set(omalloc_c_srcs
 set(omalloc_hdrs
   ${CMAKE_CURRENT_BINARY_DIR}/omlimits.h
   ${CMAKE_CURRENT_BINARY_DIR}/omConfig.h
-  mylimits.h om_Alloc.h omList.h omDerivedConfig.h omAllocDecl.h
+  mylimits.h omalloc.h omList.h omDerivedConfig.h omAllocDecl.h
   omMemOps.h omDebug.h omOpts.h omInlineDecl.h omAllocPrivate.h
   omError.h omPage.h omAllocSystem.h omFindExec.h omStats.h omBin.h
   omDefaultConfig.h omStructs.h omBinPage.h omInline.h omGetBackTrace.h

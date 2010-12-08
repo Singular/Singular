@@ -15,7 +15,7 @@
 #include <omalloc/omConfig.h>
 #include <omalloc/omDefaultConfig.h>
 #include <omalloc/omMalloc.h>
-#include <omalloc/om_Alloc.h>
+#include <omalloc/omalloc.h>
 /* include after omMalloc.h */
 #include <string.h>
 

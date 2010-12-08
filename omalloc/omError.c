@@ -7,7 +7,7 @@
  *******************************************************************/
 
 #include <stdarg.h>
-#include <omalloc/om_Alloc.h>
+#include <omalloc/omalloc.h>
 
 omError_t om_ErrorStatus = omError_NoError;
 omError_t om_InternalErrorStatus = omError_NoError;
