@@ -5,8 +5,8 @@
  *  Created: 11/99
  *  Version: $Id$
  *******************************************************************/
-#ifndef OM_MALLOC_SYSTEM_H
-#define OM_MALLOC_SYSTEM_H
+#ifndef OM_PMALLOC_H
+#define OM_PMALLOC_H
 
 #include <omalloc/omConfig.h>
 
@@ -29,4 +29,4 @@
 #define OM_MALLOC_FREE     free
 #define OM_MALLOC_VFREE(addr, size) OM_MALLOC_FREE(addr)
 
-#endif /* OM_MALLOC_SYSTEM_H */
+#endif /* OM_PMALLOC_H */

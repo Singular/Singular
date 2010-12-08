@@ -246,14 +246,17 @@ dnl
 AC_MSG_CHECKING(which malloc to use)
 if test "${with_malloc}" = system; then
   OM_MALLOC_HEADER=omMallocSystem.h
-  AC_DEFINE(OMALLOC_USES_MALLOC,1,"Whether omalloc uses malloc ()")
+  AC_DEFINE(OMALLOC_USES_MALLOC,1,the system allocator is called malloc)
+  AC_DEFINE(OMALLOC_USES_SYSTEM_MALLOC,1,use system malloc as system allocator)
   if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
     AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
   fi
 elif test "${with_malloc}" = gmalloc; then
+  AC_DEFINE(OMALLOC_USES_GMALLOC,1,use gmalloc as system allocator)
   OM_MALLOC_HEADER=gmalloc.h
   OM_MALLOC_SOURCE=gmalloc.c
 elif test "${with_malloc}" = pmalloc; then
+  AC_DEFINE(OMALLOC_USES_PMALLOC,1,use pmalloc as system allocator)
   OM_MALLOC_HEADER=pmalloc.h
   OM_MALLOC_SOURCE=pmalloc.c
 elif test "${with_malloc}" = external; then
@@ -263,16 +266,19 @@ elif test "${with_malloc}" = external; then
   if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
     AC_MSG_ERROR("can not provide malloc for --with_malloc=external")
   fi
+  AC_DEFINE(OMALLOC_USES_EXTERNAL_MALLOC,1,use external malloc as system allocator)
   OM_MALLOC_HEADER=$with_external_malloc_h
   OM_MALLOC_SOURCE=$with_external_malloc_c
-  AC_DEFINE(OMALLOC_USES_MALLOC,1,"Whether omalloc uses malloc ()")
+  AC_DEFINE(OMALLOC_USES_MALLOC,1,the system allocator is called malloc)
 elif test "${with_malloc}" = dlmalloc; then
   with_malloc=dlmalloc
+  AC_DEFINE(OMALLOC_USES_DLMALLOC,1,use dlmalloc as system allocator)
   OM_MALLOC_HEADER=dlmalloc.h
   OM_MALLOC_SOURCE=dlmalloc.c
-else
+else	## default
   OM_MALLOC_HEADER=omMallocSystem.h
-  AC_DEFINE(OMALLOC_USES_MALLOC,1,"Whether omalloc uses malloc ()")
+  AC_DEFINE(OMALLOC_USES_MALLOC,1,the system allocator is called malloc)
+  AC_DEFINE(OMALLOC_USES_SYSTEM_MALLOC,1,use system malloc as system allocator)
   if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
     AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
   fi
