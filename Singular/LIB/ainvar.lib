@@ -413,7 +413,7 @@ EXAMPLE: example furtherInvar; shows an example
   {  ll = ll+list(#[1]);
   }
   int i;
-  ideal null;
+  ideal null,eins;
   int z=ncols(id);
   intvec v;
   def br=basering;
@@ -466,6 +466,7 @@ EXAMPLE: example furtherInvar; shows an example
            {
               karl[j+1]=rel[i];
               rel[i]=0;
+              eins=1;
            }
            setring r1;
         }
@@ -473,7 +474,9 @@ EXAMPLE: example furtherInvar; shows an example
 
   }
   setring br;
-  list l=rel+null,karl;
+  rel=rel+null;
+  if(size(rel)==0){rel=eins;}
+  list l=rel,karl;
   return(l);
 }
 example
@@ -577,29 +580,31 @@ EXAMPLE: example invariantRing; shows an example
     k2=furtherInvar(m,j,karl,q);
     k1=k2[1];
     karl=k2[2];
-    k1=sortier(k1);
-    z=size(k1);
-
-    for (i=1;i<=z;i++)
+    if(k1[1]!=1)
     {
-      k1[i]= completeReduction(k1[i],karl,ll);
-      if (k1[i]!=0)
-      {
-        karl=karl+simplify(k1[i],1);
-      }
-    }
-    if( defined(pau) == voice)
-    {
+       k1=sortier(k1);
+       z=size(k1);
+       for (i=1;i<=z;i++)
+       {
+          k1[i]= completeReduction(k1[i],karl,ll);
+          if (k1[i]!=0)
+          {
+            karl=karl+simplify(k1[i],1);
+          }
+       }
+       if( defined(pau) == voice)
+       {
        "// the invariants after",it,"iteration(s):"; "";
        karl;"";
        pause("// hit return key to continue!");
        "";
-    }
-    if( (bou>0) && (size(k1)>0) )
-    {
-      if( deg(k1[size(k1)])>bou )
-      {
-         return(karl);
+       }
+       if( (bou>0) && (size(k1)>0) )
+       {
+         if( deg(k1[size(k1)])>bou )
+        {
+            return(karl);
+        }
       }
     }
   }
@@ -630,7 +635,6 @@ example
   ideal in=invariantRing(m,x(4),x(1),6);      //all invariants up to degree 6
   in;
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 /*             Further examplex
 
