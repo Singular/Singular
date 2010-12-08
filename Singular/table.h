@@ -862,6 +862,7 @@ struct sValCmdM dArithM[]=
 ,{NULL,           0,               0,                   0      , NO_PLURAL |NO_RING}
 };
 #ifdef GENTABLE
+// this table MUST be order alphabetically by its first entry:
 cmdnames cmds[] =
 {  // name-string alias tokval          toktype
   { "$INVALID$",   0, -1,                 0},
