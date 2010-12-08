@@ -204,6 +204,8 @@ else
 AC_MSG_ERROR(need sytem page to be of size 4096 or 8192, but is $ac_cv_pagesize)
 fi
 
+AC_DEFINE_UNQUOTED(SIZEOF_OM_PAGE,SIZEOF_SYSTEM_PAGE,Page-size of the build-system)
+
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check whether mmap actually works
 dnl
