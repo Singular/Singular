@@ -21,7 +21,6 @@ PROCEDURES:
  sort(ideal/module);    sort generators according to monomial ordering
  sum(vector/id/..[,v]); add components of vector/ideal/...[with indices v]
  watchdog(i,cmd);       only wait for result of command cmd for i seconds
- which(command);        search for command and return absolute path, if found
  primecoeffs(J[,q]);    primefactors <= min(p,32003) of coeffs of J
  timeStd(i,d)           std(i) if the standard basis computation finished
                         after d-1 seconds and i otherwhise
@@ -922,64 +921,6 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 
-///////////////////////////////////////////////////////////////////////////////
-
-proc which (command)
-"USAGE:    which(command); command = string expression
-RETURN:   Absolute pathname of command, if found in search path.
-          Empty string, otherwise.
-NOTE:     Based on the Unix command 'which'.
-EXAMPLE:  example which; shows an example
-"
-{
-   int rs;
-   int i;
-   string fn = "which_" + string(system("pid"));
-   string pn;
-   string cmd;
-   if( typeof(command) != "string")
-   {
-     return (pn);
-   }
-   if (system("uname") != "ix86-Win")
-   {
-     cmd = "which ";
-   }
-   else
-   {
-     // unfortunately, it does not take -path
-     cmd = "type ";
-   }
-   i = system("sh", cmd + command + " > " + fn);
-   pn = read(fn);
-   if (system("uname") != "ix86-Win")
-   {
-     // TBC: Hmm... should parse output to get rid of 'command is '
-     pn[size(pn)] = "";
-     i = 1;
-     while ((pn[i] != " ") and (pn[i] != ""))
-     {
-       i = i+1;
-     }
-     if (pn[i] == " ") {pn[i] = "";}
-     rs = system("sh", "ls " + pn + " > " + fn + " 2>&1 ");
-   }
-   else
-   {
-     rs = 0;
-   }
-   i = system("sh", "rm " + fn);
-   if (rs == 0) {return (pn);}
-   else
-   {
-     print (command + " not found ");
-     return ("");
-   }
-}
-example
-{  "EXAMPLE:"; echo = 2;
-    which("sh");
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 proc watchdog(int i, string cmd)
