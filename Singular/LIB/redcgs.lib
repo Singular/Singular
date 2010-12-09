@@ -1066,7 +1066,7 @@ proc placepairinlist(list pair,list P)
   while((i<=size(P)) and (loc==0))
   {
     if (pair[3]>=P[i][3]){j=i; i++;}
-    else{loc=1; j=i-1}
+    else{loc=1; j=i-1;}
   }
   Pr=insert(P,pair,j);
   return(Pr);
