@@ -134,7 +134,7 @@ BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
   }
   return TRUE;
 }
-void bigintm_destroy(void *b, void *d)
+void bigintm_destroy(blackbox *b, void *d)
 {
   if (d!=NULL)
   {

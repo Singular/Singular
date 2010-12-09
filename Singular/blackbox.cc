@@ -13,7 +13,7 @@ blackbox* getBlackboxStuff(const int t)
 }
 
 
-void blackbox_default_destroy(void  *b, void *d)
+void blackbox_default_destroy(blackbox  *b, void *d)
 {
   Werror("missing blackbox_destroy");
 }
