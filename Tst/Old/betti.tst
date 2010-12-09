@@ -21,4 +21,4 @@ M=A;
 betti(nres(M,0));
 betti(mres(M,0));
 betti(sres(M,0));
-$
+LIB "tst.lib";tst_status(1);$;
