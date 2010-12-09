@@ -1269,157 +1269,114 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
 {
   int n = (int)pDeg(f0);
   int m = (int)pDeg(g0);
-  matrix fMat = mpNew(n + 1, d + 1);   /* fMat[i, j] is the coefficient of
-                                          x^(j-1) * y^(i-1) in f */
-  matrix gMat = mpNew(m + 1, d + 1);   /* gMat[i, j] is the coefficient of
-                                          x^(j-1) * y^(i-1) in g */
-  matrix hMat = mpNew(n + m, d + 1);   /* hMat[i, j] is the coefficient of
-                                          x^(j-1) * y^(i-1) in h */
+  matrix aMat = mpNew(n + m, n + m);     /* matrix A for linear system */
+  matrix pMat; matrix lMat; matrix uMat; /* for the decomposition of A */
+  f = pCopy(f0); g = pCopy(g0);          /* initially: h = f*g mod <x^1> */
   
-  /* initial step: read off coefficients of f0, g0, and h */
-  poly l = f0;
-  while (l != NULL)
+  /* initial step: read off coefficients of f0, and g0 */
+  poly p = f0; poly matEntry; number c;
+  while (p != NULL)
   {
-    int e = pGetExp(l, yIndex);
-    number c = pGetCoeff(l);
-    poly matEntry = pOne(); pSetCoeff(matEntry, nCopy(c));
-    MATELEM(fMat, e + 1, 1) = matEntry;
-    l = pNext(l);
+    c = nCopy(pGetCoeff(p));
+    matEntry = pOne(); pSetCoeff(matEntry, c);
+    MATELEM(aMat, pGetExp(p, yIndex) + 1, 1) = matEntry;
+    p = pNext(p);
   }
-  l = g0;
-  while (l != NULL)
+  p = g0;
+  while (p != NULL)
   {
-    int e = pGetExp(l, yIndex);
-    number c = pGetCoeff(l);
-    poly matEntry = pOne(); pSetCoeff(matEntry, nCopy(c));
-    MATELEM(gMat, e + 1, 1) = matEntry;
-    l = pNext(l);
+    c = nCopy(pGetCoeff(p));
+    matEntry = pOne(); pSetCoeff(matEntry, c);
+    MATELEM(aMat, pGetExp(p, yIndex) + 1, m + 1) = matEntry;
+    p = pNext(p);
   }
-  l = h;
-  while (l != NULL)
-  {
-    int eX = pGetExp(l, xIndex);
-    if (eX <= d) /* we forget about terms with x-exponents > d */
+  /* fill the rest of A */
+  for (int row = 2; row <= n + 1; row++)
+    for (int col = 2; col <= m; col++)
     {
-      int eY = pGetExp(l, yIndex);
-      if (eY <= n + m - 1) /* we forget about the leading term y^(n + m) */
-      {
-        number c = pGetCoeff(l);
-        poly matEntry = pOne(); pSetCoeff(matEntry, nCopy(c));
-        MATELEM(hMat, eY + 1, eX + 1) = matEntry;
-      }
+      if (col > row) break;
+      MATELEM(aMat, row, col) = pCopy(MATELEM(aMat, row - 1, col - 1));
     }
-    l = pNext(l);
-  }
+  for (int row = n + 2; row <= n + m; row++)
+    for (int col = row - n; col <= m; col++)
+      MATELEM(aMat, row, col) = pCopy(MATELEM(aMat, row - 1, col - 1));
+  for (int row = 2; row <= n + 1; row++)
+    for (int col = m + 2; col <= m + n; col++)
+    {
+      if (col - m > row) break;
+      MATELEM(aMat, row, col) = pCopy(MATELEM(aMat, row - 1, col - 1));
+    }
+  for (int row = n + 2; row <= n + m; row++)
+    for (int col = m + row - n; col <= m + n; col++)
+      MATELEM(aMat, row, col) = pCopy(MATELEM(aMat, row - 1, col - 1));
   
-  /* loop for computing entries of fMat and gMat in columns 2..(d+1)
-     which correspond to the x-exponents 1..d */
+  /* constructing the LU-decomposition of A */
+  luDecomp(aMat, pMat, lMat, uMat);
+  
+  /* Before the xExp-th loop, we know that h = f*g mod <x^xExp>.
+     Afterwards the algorithm ensures      h = f*g mod <x^(xExp + 1)>.
+     Hence in the end we obtain f and g as required, i.e.,
+                                           h = f*g mod <x^(d+1)>.
+     The algorithm works by solving a (m+n)x(m+n) linear equation system
+     A*x = b with constant matrix A (as decomposed above). By theory, the
+     system is guaranteed to have a unique solution. */
   for (int xExp = 1; xExp <= d; xExp++)
   {
-    /* We are going to setup and solve a linear equation system A * x = b,
-       where the resulting x will give us all matrix entries fMat[i, xExp],
-       i = 1, 2, ..., n; and gMat[j, xExp], j = 1, 2, ..., m.
-       (Theory ensures that the system is uniquely solvable.) */
-    matrix aMat = mpNew(n + m, n + m); /* A */
-    matrix xVec = mpNew(n + m, 1);     /* x */
     matrix bVec = mpNew(n + m, 1);     /* b */
+    matrix xVec = mpNew(n + m, 1);     /* x */
     
-    /* setup b */
-    bool isZeroVector = true;
-    for (int row = 1; row <= n + m; row++)
+    p = ppMult_qq(f, g);
+    p = pAdd(pCopy(h), pNeg(p));       /* p = h - f*g */
+    /* we collect all terms in p with x-exponent = xExp and use their
+       coefficients to build the vector b */
+    int bIsZeroVector = true;
+    while (p != NULL)
     {
-      poly p = pCopy(MATELEM(hMat, row, xExp + 1));
-      for (int j = 1; j <= row; j++)
+      if (pGetExp(p, xIndex) == xExp)
       {
-        if (j > m + 1) break;
-        if (row + 1 - j <= n + 1)
+        number c = nCopy(pGetCoeff(p));
+        poly matEntry = pOne(); pSetCoeff(matEntry, c);
+        MATELEM(bVec, pGetExp(p, yIndex) + 1, 1) = matEntry;
+        if (matEntry != NULL) bIsZeroVector = false;
+      }
+      pLmDelete(&p); /* destruct leading term of p and move to next term */
+    }
+    /* solve the linear equation system */
+    if (!bIsZeroVector) /* otherwise x = 0 and f, g do not change */
+    {
+      matrix notUsedMat;
+      luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, notUsedMat);
+      idDelete((ideal*)&notUsedMat);
+      /* augment f and g by newly computed terms */
+      for (int row = 1; row <= m; row++)
+      {
+        if (MATELEM(xVec, row, 1) != NULL)
         {
-          for (int i = 1; i <= xExp + 1; i++)
-          {
-            poly q = ppMult_qq(MATELEM(fMat, row + 1 - j, xExp + 2 - i),
-                               MATELEM(gMat, j, i));
-            q = pNeg(q);
-            p = pAdd(p, q);
-          }
+          p = pCopy(MATELEM(xVec, row, 1));   /* p = c                  */
+          pSetExp(p, xIndex, xExp);           /* p = c * x^xExp         */
+          pSetExp(p, yIndex, row - 1);        /* p = c * x^xExp * y^i   */
+          pSetm(p);
+          g = pAdd(g, p);
         }
       }
-      MATELEM(bVec, row, 1) = p;
-      if (p != NULL) isZeroVector = false;
-    }
-    
-    /* setup A (only if b is not the zero vector) */
-    if (!isZeroVector)
-    {
-      for (int row = 1; row <= n + m; row++)
+      for (int row = m + 1; row <= m + n; row++)
       {
-        int k = row;
-        for (int col = 1; col <= n; col++)
+        if (MATELEM(xVec, row, 1) != NULL)
         {
-          if (k <= m + 1) MATELEM(aMat, row, col) = pCopy(MATELEM(gMat, k, 1));
-          k--;
-          if (k == 0) break;
-        }
-        k = row;
-        for (int col = n + 1; col <= n + m; col++)
-        {
-          if (k <= n + 1) MATELEM(aMat, row, col) = pCopy(MATELEM(fMat, k, 1));
-          k--;
-          if (k == 0) break;
+          p = pCopy(MATELEM(xVec, row, 1));   /* p = c                  */
+          pSetExp(p, xIndex, xExp);           /* p = c * x^xExp         */
+          pSetExp(p, yIndex, row - m - 1);    /* p = c * x^xExp * y^i   */
+          pSetm(p);
+          f = pAdd(f, p);
         }
       }
     }
-
-    /* computation of x */
-    if (!isZeroVector)
-    {
-      matrix pMat; matrix lMat; matrix uMat; matrix wMat;
-      luDecomp(aMat, pMat, lMat, uMat);
-      luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, wMat);
-      idDelete((ideal*)&pMat); idDelete((ideal*)&lMat);
-      idDelete((ideal*)&uMat); idDelete((ideal*)&wMat);
-    }
-
-    /* fill (xExp + 1)-columns of fMat and gMat */
-    for (int row = 1; row <= n; row++)
-      MATELEM(fMat, row, xExp + 1) = pCopy(MATELEM(xVec, row, 1));
-    for (int row = 1; row <= m; row++)
-      MATELEM(gMat, row, xExp + 1) = pCopy(MATELEM(xVec, n + row, 1));
-    
-    /* clean-up */
-    idDelete((ideal*)&aMat); idDelete((ideal*)&xVec); idDelete((ideal*)&bVec);
+    /* clean-up loop-dependent vectors */
+    idDelete((ideal*)&bVec); idDelete((ideal*)&xVec);
   }
- 
-  /* build f and g from fMat and gMat, respectively */
-  f = NULL;
-  for (int i = 0; i <= n; i++)
-    for (int j = 0; j <= d; j++)
-    {
-      poly term = pCopy(MATELEM(fMat, i + 1, j + 1));   // coeff
-      if (term != NULL)
-      {
-        pSetExp(term, xIndex, j);                       // ... * x^j
-        pSetExp(term, yIndex, i);                       // ... * y^i
-        pSetm(term);
-        f = pAdd(f, term);
-      }
-    }
-  g = NULL;
-  for (int i = 0; i <= m; i++)
-    for (int j = 0; j <= d; j++)
-    {
-      poly term = pCopy(MATELEM(gMat, i + 1, j + 1));   // coeff
-      if (term != NULL)
-      {
-        pSetExp(term, xIndex, j);                       // ... * x^j
-        pSetExp(term, yIndex, i);                       // ... * y^i
-        pSetm(term);
-        g = pAdd(g, term);
-      }
-    }
   
-  /* clean-up */
-  idDelete((ideal*)&fMat);
-  idDelete((ideal*)&gMat);
-  idDelete((ideal*)&hMat);
+  /* clean-up matrices A, P, L and U */
+  idDelete((ideal*)&aMat); idDelete((ideal*)&pMat);
+  idDelete((ideal*)&lMat); idDelete((ideal*)&uMat);
 }
 
