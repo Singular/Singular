@@ -20,10 +20,7 @@ OVERVIEW:
     Algorithms for the computation of the radical based on the ideas of
     Krick, Logar, Laplagne and Kemper (implementation by Gerhard Pfister and Santiago Laplagne).
     They work in any characteristic.@*
-    Some of the algorithms in this library require a global ordering.
-    qrings are not possible as baserings in this library.
-    For local or mixed orderings, most procedures handle the appropriate
-    ring changes internally; otherwise an error message will be printed.
+    Baserings must have a global ordering and no quotient ideal.
 
 
 PROCEDURES:
@@ -1024,7 +1021,7 @@ EXAMPLE: example zero_decomp; shows an example
     }
   }
 
-  if(voice>=8){primary=extF(primary);}
+  if(voice>=8){primary=extF(primary);};
 
 //test whether all ideals in the decomposition are primary and
 //in general position
@@ -2862,6 +2859,7 @@ EXAMPLE: example decomp; shows an example
     {
       string newva;
       string newma;
+      poly f;
       for(@k=1;@k<=nvars(basering);@k++)
       {
         @n1=0;
@@ -2881,6 +2879,9 @@ EXAMPLE: example decomp; shows an example
         else
         {
           newma=newma+string(0)+",";
+          fried[@n]=fried[@n]/leadcoef(fried[@n]);
+          f=fried[@n]-lead(fried[@n]);
+          @j=subst(@j,var(@k),-f);
         }
       }
       newva[size(newva)]=")";
@@ -2888,8 +2889,8 @@ EXAMPLE: example decomp; shows an example
       execute("ring @deirf=("+charstr(gnir)+"),("+newva+",lp;");
       execute("map @kappa=gnir,"+newma);
       ideal @j= @kappa(@j);
-      @j=simplify(@j,2);
-      attrib(@j,"isSB",1);
+      @j=std(@j);
+
       list pr=decomp(@j);
       setring gnir;
       list pr=imap(@deirf,pr);
