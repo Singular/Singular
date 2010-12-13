@@ -1320,12 +1320,13 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
      The algorithm works by solving a (m+n)x(m+n) linear equation system
      A*x = b with constant matrix A (as decomposed above). By theory, the
      system is guaranteed to have a unique solution. */
+  poly fg = ppMult_qq(f, g);   /* for storing the product of f and g */
   for (int xExp = 1; xExp <= d; xExp++)
   {
     matrix bVec = mpNew(n + m, 1);     /* b */
     matrix xVec = mpNew(n + m, 1);     /* x */
     
-    p = ppMult_qq(f, g);
+    p = pCopy(fg);
     p = pAdd(pCopy(h), pNeg(p));       /* p = h - f*g */
     /* we collect all terms in p with x-exponent = xExp and use their
        coefficients to build the vector b */
@@ -1347,7 +1348,8 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
       matrix notUsedMat;
       luSolveViaLUDecomp(pMat, lMat, uMat, bVec, xVec, notUsedMat);
       idDelete((ideal*)&notUsedMat);
-      /* augment f and g by newly computed terms */
+      /* update f and g by newly computed terms, and update f*g */
+      poly fNew = NULL; poly gNew = NULL;
       for (int row = 1; row <= m; row++)
       {
         if (MATELEM(xVec, row, 1) != NULL)
@@ -1356,7 +1358,7 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
           pSetExp(p, xIndex, xExp);           /* p = c * x^xExp         */
           pSetExp(p, yIndex, row - 1);        /* p = c * x^xExp * y^i   */
           pSetm(p);
-          g = pAdd(g, p);
+          gNew = pAdd(gNew, p);
         }
       }
       for (int row = m + 1; row <= m + n; row++)
@@ -1367,16 +1369,22 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
           pSetExp(p, xIndex, xExp);           /* p = c * x^xExp         */
           pSetExp(p, yIndex, row - m - 1);    /* p = c * x^xExp * y^i   */
           pSetm(p);
-          f = pAdd(f, p);
+          fNew = pAdd(fNew, p);
         }
       }
+      fg = pAdd(fg, ppMult_qq(f, gNew));
+      fg = pAdd(fg, ppMult_qq(g, fNew));
+      fg = pAdd(fg, ppMult_qq(fNew, gNew));
+      f = pAdd(f, fNew);
+      g = pAdd(g, gNew);
     }
     /* clean-up loop-dependent vectors */
     idDelete((ideal*)&bVec); idDelete((ideal*)&xVec);
   }
   
-  /* clean-up matrices A, P, L and U */
+  /* clean-up matrices A, P, L and U, and polynomial fg */
   idDelete((ideal*)&aMat); idDelete((ideal*)&pMat);
   idDelete((ideal*)&lMat); idDelete((ideal*)&uMat);
+  pDelete(&fg);
 }
 
