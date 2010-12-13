@@ -508,9 +508,16 @@ elemexpr:
           }
         | elemexpr '(' exprlist ')'
           {
-            $1.next=(leftv)omAllocBin(sleftv_bin);
-            memcpy($1.next,&$3,sizeof(sleftv));
-            if(iiExprArithM(&$$,&$1,'(')) YYERROR;
+	    if ($1.Typ()==UNKNOWN)
+	    { // for x(i)(j)
+	      if(iiExprArith2(&$$,&$1,'(',&$3)) YYERROR;
+	    }
+	    else
+	    {
+              $1.next=(leftv)omAllocBin(sleftv_bin);
+              memcpy($1.next,&$3,sizeof(sleftv));
+              if(iiExprArithM(&$$,&$1,'(')) YYERROR;
+	    }
           }
         | '[' exprlist ']'
           {
