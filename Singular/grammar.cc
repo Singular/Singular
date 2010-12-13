@@ -2532,7 +2532,7 @@ yyreduce:
   case 34:
 #line 510 "grammar.y"
     {
-	    if ((yyvsp[(1) - (4)].lv).Typ()==UNKNOWN)
+	    if ((yyvsp[(1) - (4)].lv).rtyp==UNKNOWN)
 	    { // for x(i)(j)
 	      if(iiExprArith2(&(yyval.lv),&(yyvsp[(1) - (4)].lv),'(',&(yyvsp[(3) - (4)].lv))) YYERROR;
 	    }

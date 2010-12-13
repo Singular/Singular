@@ -508,7 +508,7 @@ elemexpr:
           }
         | elemexpr '(' exprlist ')'
           {
-	    if ($1.Typ()==UNKNOWN)
+	    if ($1.rtyp==UNKNOWN)
 	    { // for x(i)(j)
 	      if(iiExprArith2(&$$,&$1,'(',&$3)) YYERROR;
 	    }
