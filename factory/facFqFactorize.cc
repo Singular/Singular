@@ -48,31 +48,12 @@ myContent (const CanonicalForm& F)
 {
   CanonicalForm G= swapvar (F, F.mvar(), Variable (1));
   CFList L;
-  Variable alpha;
-  bool algExt= hasFirstAlgVar (G, alpha);
   for (CFIterator i= G; i.hasTerms(); i++)
     L.append (i.coeff());
   if (L.length() == 2)
-  {
-    bool GF= (CFFactory::gettype() == GaloisFieldDomain);
-    if (GF)
-    {
-      return swapvar (GCD_GF (L.getFirst(), L.getLast()), F.mvar(),
-                      Variable (1));
-    }
-    else if (!GF && algExt)
-    {
-      return swapvar (GCD_Fp_extension (L.getFirst(), L.getLast(), alpha),
-                                       F.mvar(), Variable (1));
-    }
-    else
-      return swapvar (GCD_small_p (L.getFirst(), L.getLast()), F.mvar(),
-                     Variable (1));
-  }
+    return swapvar (gcd (L.getFirst(), L.getLast()), F.mvar(), Variable (1));
   if (L.length() == 1)
-  {
     return LC (F, Variable (1));
-  }
   return swapvar (listGCD (L), F.mvar(), Variable (1));
 }
 
@@ -82,28 +63,13 @@ listGCD (const CFList& L)
 {
   if (L.length() == 1)
     return L.getFirst();
-  Variable alpha;
   if (L.length() == 2)
-  {
-    bool GF= (CFFactory::gettype() == GaloisFieldDomain);
-    if (GF)
-    {
-      return GCD_GF (L.getFirst(), L.getLast());
-    }
-    else if (!GF && (hasFirstAlgVar (L.getFirst(), alpha) ||
-                     hasFirstAlgVar (L.getLast(), alpha)))
-    {
-      return GCD_Fp_extension (L.getFirst(), L.getLast(), alpha);
-    }
-    else
-      return GCD_small_p (L.getFirst(), L.getLast());
-  }
+    return gcd (L.getFirst(), L.getLast());
   else
   {
     CFList lHi, lLo;
     CanonicalForm resultHi, resultLo;
     int length= L.length()/2;
-    bool GF= (CFFactory::gettype() == GaloisFieldDomain);
     int j= 0;
     for (CFListIterator i= L; j < length; i++, j++)
       lHi.append (i.getItem());
@@ -112,17 +78,7 @@ listGCD (const CFList& L)
     resultLo= listGCD (lLo);
     if (resultHi.isOne() || resultLo.isOne())
       return 1;
-    if (GF)
-    {
-      return GCD_GF (resultHi, resultLo);
-    }
-    else if (!GF && (hasFirstAlgVar (resultHi, alpha) ||
-                     hasFirstAlgVar (resultLo, alpha)))
-    {
-      return GCD_Fp_extension (resultHi, resultLo, alpha);
-    }
-    else
-      return GCD_small_p (resultHi, resultLo);
+    return gcd (resultHi, resultLo);
   }
 }
 
@@ -146,30 +102,10 @@ myContent (const CanonicalForm& F, const Variable& x)
     L.append (i.coeff());
   if (L.length() == 2)
   {
-    bool GF= (CFFactory::gettype() == GaloisFieldDomain);
-    if (GF)
-    {
-      if (swap)
-        return swapvar(GCD_GF (L.getFirst(), L.getLast()), F.mvar(), x);
-      else
-        return GCD_GF (L.getFirst(), L.getLast());
-    }
-    else if (!GF && algExt)
-    {
-      if (swap)
-        return swapvar(GCD_Fp_extension (L.getFirst(), L.getLast(), alpha),
-                                         F.mvar(), x);
-      else
-        return GCD_Fp_extension (L.getFirst(), L.getLast(), alpha);
-    }
+    if (swap)
+      return swapvar (gcd (L.getFirst(), L.getLast()), F.mvar(), x);
     else
-    {
-      if (swap)
-        return swapvar (GCD_small_p (L.getFirst(), L.getLast()), F.mvar(),
-                        x);
-      else
-        return GCD_small_p (L.getFirst(), L.getLast());
-    }
+      return gcd (L.getFirst(), L.getLast());
   }
   if (L.length() == 1)
   {
@@ -180,27 +116,6 @@ myContent (const CanonicalForm& F, const Variable& x)
   else
     return listGCD (L);
 }
-
-static inline
-CanonicalForm
-myLcm (const CanonicalForm& F, const CanonicalForm& G)
-{
-  if ( F.isZero() || G.isZero() )
-    return 0;
-  else
-  {
-    Variable alpha;
-    bool GF= (CFFactory::gettype() == GaloisFieldDomain);
-    if (GF)
-      return (F/GCD_GF (F, G))*G;
-    else if (!GF && (hasFirstAlgVar (F, alpha) ||
-                     hasFirstAlgVar (G, alpha)))
-      return (F/GCD_Fp_extension (F, G, alpha))*G;
-    else
-      return (F/GCD_small_p (F, G))*G;
-  }
-}
-
 
 static inline
 CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
@@ -1345,11 +1260,11 @@ CanonicalForm lcmContent (const CanonicalForm& A, CFList& contentAi)
   int i= A.level();
   contentAi.append (myContent (A, i));
   contentAi.append (myContent (A, i - 1));
-  CanonicalForm result= myLcm (contentAi.getFirst(), contentAi.getLast());
+  CanonicalForm result= lcm (contentAi.getFirst(), contentAi.getLast());
   for (i= i - 2; i > 0; i--)
   {
     contentAi.append (content (A, i));
-    result= myLcm (result, contentAi.getLast());
+    result= lcm (result, contentAi.getLast());
   }
   return result;
 }
@@ -1749,12 +1664,7 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         swapLevel= i;
         A= swapvar (A, x, z);
       }
-      if (GF)
-        gcdDerivZ= GCD_GF (bufA, derivZ);
-      else if (alpha == Variable (1))
-        gcdDerivZ= GCD_small_p (bufA, derivZ);
-      else
-        gcdDerivZ= GCD_Fp_extension (bufA, derivZ, alpha);
+      gcdDerivZ= gcd (bufA, derivZ);
       if (degree (gcdDerivZ) > 0 && !derivZ.isZero())
       {
         CanonicalForm g= bufA/gcdDerivZ;

@@ -859,12 +859,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     derivXZero= true;
   else
   {
-    if (GF)
-      gcdDerivX= GCD_GF (A, derivX);
-    else if (alpha == x)
-      gcdDerivX= GCD_small_p (A, derivX);
-    else
-      gcdDerivX= GCD_Fp_extension (A, derivX, alpha);
+    gcdDerivX= gcd (A, derivX);
     if (degree (gcdDerivX) > 0)
     {
       CanonicalForm g= A/gcdDerivX;
@@ -884,12 +879,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     derivYZero= true;
   else
   {
-    if (GF)
-      gcdDerivY= GCD_GF (A, derivY);
-    else if (alpha == x)
-      gcdDerivY= GCD_small_p (A, derivY);
-    else
-      gcdDerivY= GCD_Fp_extension (A, derivY, alpha);
+    gcdDerivY= gcd (A, derivY);
     if (degree (gcdDerivY) > 0)
     {
       CanonicalForm g= A/gcdDerivY;

@@ -76,13 +76,7 @@ sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & k,
 {
   Variable buf= alpha;
   CanonicalForm b= deriv (F, x);
-  bool GF= (CFFactory::gettype() == GaloisFieldDomain);
-  if (GF)
-    c= GCD_GF (F, b);
-  else if (GF == false && k != 1)
-    c= GCD_Fp_extension (F, b, buf);
-  else
-    c= GCD_small_p (F, b);
+  c= gcd (F, b);
   CanonicalForm w= F/c;
   CanonicalForm v= b/c;
   CanonicalForm u= v - deriv (w, x);
@@ -92,12 +86,7 @@ sqrfPosDer (const CanonicalForm & F, const Variable & x, const int & k,
   CFFList result;
   while (j < p - 1 && degree(u) >= 0)
   {
-    if (GF)
-      g= GCD_GF (w, u);
-    else if (GF == false && k != 1)
-      g= GCD_Fp_extension (w, u, buf);
-    else
-      g= GCD_small_p (w, u);
+    g= gcd (w, u);
     if (degree(g) > 0)
       result.append (CFFactor (g, j));
     w= w/g;
@@ -189,12 +178,7 @@ squarefreeFactorization (const CanonicalForm & F, const Variable & alpha)
   {
     for (CFFListIterator j= tmp1; j.hasItem(); j++)
     {
-      if (GF)
-        tmp= GCD_GF (i.getItem().factor(), j.getItem().factor());
-      else if (GF == false && buf == Variable (1))
-        tmp= GCD_small_p (i.getItem().factor(), j.getItem().factor());
-      else
-        tmp= GCD_Fp_extension (i.getItem().factor(),j.getItem().factor(),buf);
+      tmp= gcd (i.getItem().factor(), j.getItem().factor());
       i.getItem()= CFFactor (i.getItem().factor()/tmp, i.getItem().exp());
       j.getItem()= CFFactor (j.getItem().factor()/tmp, j.getItem().exp());
       if (degree (tmp) > 0 && tmp.level() > 0)
@@ -242,12 +226,7 @@ sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower,
     pthPower= F;
     return 1;
   }
-  if (GF)
-    w= GCD_GF (A, deriv (A, Variable (i)));
-  else if (GF == false && alpha == Variable (1))
-    w= GCD_small_p (A, deriv (A, Variable (i)));
-  else
-    w= GCD_Fp_extension (A, deriv (A, Variable (i)), vBuf);
+  w= gcd (A, deriv (A, Variable (i)));
 
   b= A/w;
   result= b;
@@ -259,22 +238,12 @@ sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower,
     if (!deriv (w, Variable (i)).isZero())
     {
       b= w;
-      if (GF)
-        w= GCD_GF (w, deriv (w, Variable (i)));
-      else if (GF == false && vBuf == Variable (1))
-        w= GCD_small_p (w, deriv (w, Variable (i)));
-      else
-        w= GCD_Fp_extension (w, deriv (w, Variable (i)), vBuf);
+      w= gcd (w, deriv (w, Variable (i)));
       b /= w;
       if (degree (b) < 1)
         break;
       CanonicalForm g;
-      if (GF)
-        g= GCD_GF (b, result);
-      else if (GF == false && vBuf == Variable (1))
-        g= GCD_small_p (b, result);
-      else
-        g= GCD_Fp_extension (b, result, vBuf);
+      g= gcd (b, result);
       if (degree (g) > 0)
         result *= b/g;
       if (degree (g) <= 0)
