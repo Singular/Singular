@@ -77,8 +77,9 @@ poly result;
 
 tst_InitTimer();
 // this takes too long, yet
-// result = phi(res1);
-// tst_ReportTimer("N");
+option(prot);
+result = phi(res1);
+tst_ReportTimer("N");
 tst_OutTimer(1000000, "N: killed");
 
 kill R;
