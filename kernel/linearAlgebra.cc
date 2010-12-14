@@ -1300,14 +1300,14 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
   for (int row = n + 2; row <= n + m; row++)
     for (int col = row - n; col <= m; col++)
       MATELEM(aMat, row, col) = pCopy(MATELEM(aMat, row - 1, col - 1));
-  for (int row = 2; row <= n + 1; row++)
+  for (int row = 2; row <= m + 1; row++)
     for (int col = m + 2; col <= m + n; col++)
     {
       if (col - m > row) break;
       MATELEM(aMat, row, col) = pCopy(MATELEM(aMat, row - 1, col - 1));
     }
-  for (int row = n + 2; row <= n + m; row++)
-    for (int col = m + row - n; col <= m + n; col++)
+  for (int row = m + 2; row <= n + m; row++)
+    for (int col = row; col <= m + n; col++)
       MATELEM(aMat, row, col) = pCopy(MATELEM(aMat, row - 1, col - 1));
   
   /* constructing the LU-decomposition of A */
