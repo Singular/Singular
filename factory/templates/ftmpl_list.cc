@@ -531,6 +531,7 @@ void ListIterator<T>::remove ( int moveright )
             delete current;
             current = ( moveright ) ? dummynext : dummyprev;
         }
+        theList->_length--;
     }
 }
 
