@@ -20,7 +20,7 @@
 
 #include "canonicalform.h"
 #include "cf_iter.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 #include "gfops.h"
 
 /** @class DegreePattern DegreePattern.h "factory/DegreePattern.h"

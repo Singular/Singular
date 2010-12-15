@@ -16,7 +16,7 @@
 #include "cf_primes.h"
 #include "cf_algorithm.h"
 #include "fac_util.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 #include "ffreval.h"
 #include "algext.h"
 #include "fieldGCD.h"

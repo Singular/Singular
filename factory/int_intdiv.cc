@@ -16,7 +16,7 @@
 #include "int_rat.h"
 #include "cf_gmp.h"
 #include "gmpext.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 
 //{{{ InternalCF * InternalInteger::dividesame, dividecoeff ( InternalCF * c )
 // docu: see CanonicalForm::operator /()

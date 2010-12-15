@@ -27,8 +27,8 @@
 #include "cf_algorithm.h"
 #include "sm_util.h"
 #include "sm_sparsemod.h"
-#include "ftmpl_array.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_array.h"
+#include "templates/ftmpl_functions.h"
 
 static CanonicalForm
 smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm & lcggt, const REvaluation & alpha, CFRandom & gen, int CHAR, const Variable & extension )

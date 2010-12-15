@@ -8,7 +8,7 @@
 #include "cf_random.h"
 #include "cf_primes.h"
 #include "fac_distrib.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 #include "ffreval.h"
 #include "cf_binom.h"
 #include "fac_iterfor.h"

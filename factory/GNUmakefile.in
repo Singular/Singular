@@ -260,9 +260,6 @@ basefactoryincl := \
 		fieldGCD.h \
 		ffops.h \
 		ffreval.h \
-		ftmpl_array.h \
-		ftmpl_factor.h \
-		ftmpl_functions.h \
 		ftmpl_list.h \
 		ftmpl_matrix.h \
 		gf_tabutil.h \

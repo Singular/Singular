@@ -16,7 +16,7 @@
 
 #include "DegreePattern.h"
 #include "cf_iter.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 #include "gfops.h"
 
 

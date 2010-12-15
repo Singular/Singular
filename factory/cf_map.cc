@@ -14,7 +14,7 @@
 #include "canonicalform.h"
 #include "cf_map.h"
 #include "cf_iter.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 
 //{{{ MapPair & MapPair::operator = ( const MapPair & p )
 //{{{ docu

@@ -420,6 +420,7 @@ int
 CanonicalForm::degree( const Variable & v ) const
 {
     int what = is_imm( value );
+#if 0
     if ( what )
         if ( what == FFMARK )
             return imm_iszero_p( value ) ? -1 : 0;
@@ -429,6 +430,17 @@ CanonicalForm::degree( const Variable & v ) const
             return imm_iszero_gf( value ) ? -1 : 0;
     else if ( value->inBaseDomain() )
         return value->degree();
+#else
+    switch(what)
+    {
+      case FFMARK: return imm_iszero_p( value ) ? -1 : 0;
+      case INTMARK: return imm_iszero( value ) ? -1 : 0;
+      case GFMARK:  return imm_iszero_gf( value ) ? -1 : 0;
+      case 0: if ( value->inBaseDomain() )
+              return value->degree();
+	      break;
+    }
+#endif
 
     Variable x = value->variable();
     if ( v == x )

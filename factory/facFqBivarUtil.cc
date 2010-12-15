@@ -16,7 +16,7 @@
 
 #include "cf_map.h"
 #include "cf_map_ext.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 #include "ExtensionInfo.h"
 #include "cf_algorithm.h"
 #include "cf_factory.h"

@@ -25,7 +25,7 @@
 
 #include "canonicalform.h"
 #include "cf_iter.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 #include "algext.h"
 
 CanonicalForm mul (const CanonicalForm& F, const CanonicalForm& G);

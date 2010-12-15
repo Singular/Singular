@@ -22,7 +22,7 @@
 #include "cf_reval.h"
 #include "canonicalform.h"
 #include "variable.h"
-#include "ftmpl_array.h"
+#include "templates/ftmpl_array.h"
 
 //{{{ static CanonicalForm fmonome( const CanonicalForm & f  )
 //{{{ docu

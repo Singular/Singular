@@ -14,7 +14,7 @@
 #include "cf_random.h"
 #include "cf_primes.h"
 #include "fac_distrib.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 
 static void findeval( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db, REvaluation & b, int delta, int degF, int degG );
 

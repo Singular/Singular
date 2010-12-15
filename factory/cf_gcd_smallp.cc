@@ -27,7 +27,7 @@
 #include "canonicalform.h"
 #include "cf_map.h"
 #include "cf_util.h"
-#include "ftmpl_functions.h"
+#include "templates/ftmpl_functions.h"
 #include "cf_random.h"
 #include "ffreval.h"
 #include "facHensel.h"
