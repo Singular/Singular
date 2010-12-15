@@ -2966,8 +2966,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
     if (!find (l, random_element))
       l.append (random_element);
 
-    if (getCharacteristic () > 3 && size (skeleton) < 100
-        || size (skeleton) < 10)
+    if (getCharacteristic () > 3 && size (skeleton) < 100)
     {
       CFArray Monoms;
       CFArray *coeffMonoms= NULL;
@@ -3412,8 +3411,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
     if (!find (l, random_element))
       l.append (random_element);
 
-    if ((getCharacteristic() > 3 && size (skeleton) < 100) ||
-         size (skeleton) < 10)
+    if ((getCharacteristic() > 3 && size (skeleton) < 100))
     {
       CFArray Monoms;
       CFArray* coeffMonoms= NULL;
