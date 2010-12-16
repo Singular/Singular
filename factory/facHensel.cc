@@ -397,6 +397,153 @@ CanonicalForm prodMod (const CFList& L, const CFList& M)
   }
 }
 
+
+CanonicalForm reverse (const CanonicalForm& F, int d)
+{
+  if (d == 0)
+    return F;
+  CanonicalForm A= F;
+  Variable y= F.mvar();
+  Variable x= Variable (1);
+  A= swapvar (A, x, y);
+  CanonicalForm result= 0;
+  CFIterator i= A;
+  while (d - i.exp() < 0)
+    i++;
+
+  for (; i.hasTerms() && (d - i.exp() >= 0); i++)
+    result += swapvar (i.coeff(),x,y)*power (x, d - i.exp());
+  return result;
+}
+
+CanonicalForm
+newtonInverse (const CanonicalForm& F, const int n, const CanonicalForm& M)
+{
+  int l= ilog2(n);
+
+  CanonicalForm g= mod (F, M)[0] [0];
+
+  ASSERT (!g.isZero(), "expected a unit");
+
+  Variable alpha;
+
+  if (!g.isOne())
+    g = 1/g;
+  Variable x= Variable (1);
+  CanonicalForm result;
+  int exp= 0;
+  if (n & 1)
+  {
+    result= g;
+    exp= 1;
+  }
+  CanonicalForm h;
+
+  for (int i= 1; i <= l; i++)
+  {
+    h= mulMod2 (g, mod (F, power (x, (1 << i))), M);
+    h= mod (h, power (x, (1 << i)) - 1);
+    h= div (h, power (x, (1 << (i - 1))));
+    h= mod (h, M);
+    g -= power (x, (1 << (i - 1)))*
+         mod (mulMod2 (g, h, M), power (x, (1 << (i - 1))));
+
+    if (n & (1 << i))
+    {
+      if (exp)
+      {
+        h= mulMod2 (result, mod (F, power (x, exp + (1 << i))), M);
+        h= mod (h, power (x, exp + (1 << i)) - 1);
+        h= div (h, power (x, exp));
+        h= mod (h, M);
+        result -= power(x, exp)*mod (mulMod2 (g, h, M),
+                                       power (x, (1 << i)));
+        exp += (1 << i);
+      }
+      else
+      {
+        exp= (1 << i);
+        result= g;
+      }
+    }
+  }
+
+  return result;
+}
+
+CanonicalForm
+newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
+           M)
+{
+  ASSERT (getCharacteristic() > 0, "positive characteristic expected");
+  ASSERT (CFFactory::gettype() != GaloisFieldDomain, "no GF expected");
+
+  CanonicalForm A= mod (F, M);
+  CanonicalForm B= mod (G, M);
+
+  Variable x= Variable (1);
+  int degA= degree (A, x);
+  int degB= degree (B, x);
+  int m= degA - degB;
+  if (m < 0)
+    return 0;
+
+  CanonicalForm Q;
+  if (degB <= 1)
+  {
+    CanonicalForm R;
+    divrem2 (A, B, Q, R, M);
+  }
+  else
+  {
+    CanonicalForm R= reverse (A, degA);
+    CanonicalForm revB= reverse (B, degB);
+    revB= newtonInverse (revB, m + 1, M);
+    Q= mulMod2 (R, revB, M);
+    Q= mod (Q, power (x, m + 1));
+    Q= reverse (Q, m);
+  }
+
+  return Q;
+}
+
+void
+newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
+              CanonicalForm& R, const CanonicalForm& M)
+{
+  CanonicalForm A= mod (F, M);
+  CanonicalForm B= mod (G, M);
+  Variable x= Variable (1);
+  int degA= degree (A, x);
+  int degB= degree (B, x);
+  int m= degA - degB;
+
+  if (m < 0)
+  {
+    R= A;
+    Q= 0;
+    return;
+  }
+
+  if (degB <= 1)
+  {
+     divrem2 (A, B, Q, R, M);
+  }
+  else
+  {
+    R= reverse (A, degA);
+
+    CanonicalForm revB= reverse (B, degB);
+    revB= newtonInverse (revB, m + 1, M);
+    Q= mulMod2 (R, revB, M);
+
+    Q= mod (Q, power (x, m + 1));
+    Q= reverse (Q, m);
+
+    R= A - mulMod2 (Q, B, M);
+  }
+}
+
 static inline
 CFList split (const CanonicalForm& F, const int m, const Variable& x)
 {

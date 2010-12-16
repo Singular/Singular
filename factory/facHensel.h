@@ -28,8 +28,6 @@
 #include "templates/ftmpl_functions.h"
 #include "algext.h"
 
-CanonicalForm mul (const CanonicalForm& F, const CanonicalForm& G);
-CanonicalForm mulMod3 (const CanonicalForm& F, const CanonicalForm& G, const CFList& MOD);
 /// multiplication of univariate polys over a finite field using NTL, if we are
 /// in GF factory's default multiplication is used.
 ///
@@ -138,6 +136,34 @@ void divrem (
            const CFList& MOD       ///< [in] only contains powers of
                                    ///< Variables of level higher than 1
             );
+
+
+/// division with remainder of @a F by
+/// @a G wrt Variable (1) modulo @a M using Newton inversion
+///
+/// @return @a Q returns the dividend, @a R returns the remainder.
+/// @sa divrem2(), newtonDiv()
+void
+newtonDivrem (const CanonicalForm& F, ///< [in] bivariate, compressed polynomial
+              const CanonicalForm& G, ///< [in] bivariate, compressed polynomial
+                                      ///< which is monic in Variable (1)
+              CanonicalForm& Q,       ///< [in,out] dividend
+              CanonicalForm& R,       ///< [in,out] remainder, degree (R, 1) <
+                                      ///< degree (G, 1)
+              const CanonicalForm& M  ///< [in] power of Variable (2)
+             );
+
+/// division of @a F by
+/// @a G wrt Variable (1) modulo @a M using Newton inversion
+///
+/// @return @a newtonDiv returns the dividend
+/// @sa divrem2(), newtonDivrem()
+CanonicalForm
+newtonDiv (const CanonicalForm& F, ///< [in] bivariate, compressed polynomial
+           const CanonicalForm& G, ///< [in] bivariate, compressed polynomial
+                                   ///< which is monic in Variable (1)
+           const CanonicalForm& M  ///< [in] power of Variable (2)
+          );
 
 /// reduce @a F modulo elements in @a M.
 ///
