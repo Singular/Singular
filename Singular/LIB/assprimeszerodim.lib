@@ -203,7 +203,7 @@ static proc zeroR(ideal I, list #)
    }
 
    if(k == 0) { return(I); }
-   else { return(std(I + F)); }
+   else { return(modStd(I + F)); }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -710,11 +710,14 @@ static proc findGen(ideal J, list #)
          if(k){ r = r + var(i); break; }
       }
    }
-   for(i = 1; i < n; i++)
+   if((!k) && (n > 2))
    {
-      r = r + var(i);
-      k = specialTest(d,r,J);
-      if(k){break;}
+      for(i = 1; i < n; i++)
+      {
+         r = r + var(i);
+         k = specialTest(d,r,J);
+         if(k){ break; }
+      }
    }
    setring R;
    poly r = randomLast(100)[nvars(R)];
@@ -979,5 +982,57 @@ minAssGTZ (cf. primdec_lib) runs out of memory for Becker-Niermann,
 FourBodyProblem and Reimer_5.
 
 ================================================================================
+
+//=== One component at the origin
+
+ring R = 0, (x,y), dp;
+poly f1 = (y5 + y4x7 + 2x8);
+poly f2 = (y3 + 7x4);
+poly f3 = (y7 + 2x12);
+poly f = f1*f2*f3 + y19;
+ideal I = f, diff(f, x), diff(f, y);
+
+ring R = 0, (x,y), dp;
+poly f1 = (y5 + y4x7 + 2x8);
+poly f2 = (y3 + 7x4);
+poly f3 = (y7 + 2x12);
+poly f4 = (y11 + 2x18);
+poly f = f1*f2*f3*f4 + y30;
+ideal I = f, diff(f, x), diff(f, y);
+
+ring R = 0, (x,y), dp;
+poly f1 = (y15 + y14x7 + 2x18);
+poly f2 = (y13 + 7x14);
+poly f3 = (y17 + 2x22);
+poly f = f1*f2*f3 + y49;
+ideal I = f, diff(f, x), diff(f, y);
+
+ring R = 0, (x,y), dp;
+poly f1 = (y15 + y14x20 + 2x38);
+poly f2 = (y19 + 3y17x50 + 7x52);
+poly f = f1*f2 + y36;
+ideal I = f, diff(f, x), diff(f, y);
+
+//=== Several components
+
+ring R = 0, (x,y), dp;
+poly f1 = (y5 + y4x7 + 2x8);
+poly f2 = (y13 + 7x14);
+poly f = f1*subst(f2, x, x-3, y, y+5);
+ideal I = f, diff(f, x), diff(f, y);
+
+ring R = 0, (x,y), dp;
+poly f1 = (y5  + y4x7 + 2x8);
+poly f2 = (y3 + 7x4);
+poly f3 = (y7 + 2x12);
+poly f = f1*f2*subst(f3, y, y+5);
+ideal I = f, diff(f, x), diff(f, y);
+
+ring R = 0, (x,y), dp;
+poly f1 = (y5  + 2x8);
+poly f2 = (y3 + 7x4);
+poly f3 = (y7 + 2x12);
+poly f = f1*subst(f2,x,x-1)*subst(f3, y, y+5);
+ideal I = f, diff(f, x), diff(f, y);
 */
 
