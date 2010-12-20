@@ -398,7 +398,7 @@ proc findimAlgebra(matrix M, list #)
 "USAGE:   findimAlgebra(M,[r]); M a matrix, r an optional ring
 RETURN:  ring
 PURPOSE: define a finite dimensional algebra structure on a ring
-NOTE:  the matrix M is used to define the relations x(j)*x(i) = M[i,j] in the
+NOTE:  the matrix M is used to define the relations x(i)*x(j) = M[i,j] in the
 basering (by default) or in the optional ring r.
 @* The procedure equips the ring with the noncommutative structure.
 @* The procedure exports the ideal (not a two-sided Groebner basis!), called @code{fdQuot}, for further qring definition.
@@ -429,7 +429,7 @@ EXAMPLE: example findimAlgebra; shows examples
     for (j=i; j<=n; j++)
     {
       p=var(i)*var(j)-M[i,j];
-      if ( (size(I)==1) && (I[1]==0) )   { I=p; }
+      if ( (ncols(I)==1) && (I[1]==0) )   { I=p; }
       else { I=I,p; }
       if (j>i)
       {
@@ -442,13 +442,13 @@ EXAMPLE: example findimAlgebra; shows examples
           c = 1;
         }
         C[i,j]=c;
-        D[i,j]= - M[j,i] +c*M[i,j];
+        D[i,j]= M[j,i] -c*M[i,j];
       }
     }
   }
   def save = basering;
   def S = nc_algebra(C,D); setring S;
-  ideal fdQuot = fetch(save,D);
+  ideal fdQuot = fetch(save,I);
   export fdQuot;
   return(S);
 }
