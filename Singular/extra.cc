@@ -666,6 +666,139 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           return TRUE;
         }
       }
+  /*==================== lduDecomp ======================*/
+      if(strcmp(sys_cmd, "lduDecomp")==0)
+      {
+        if ((h != NULL) && (h->Typ() == MATRIX_CMD) && (h->next == NULL))
+        {
+          matrix aMat = (matrix)h->Data();
+          matrix pMat; matrix lMat; matrix dMat; matrix uMat;
+          poly l; poly u; poly prodLU;
+          lduDecomp(aMat, pMat, lMat, dMat, uMat, l, u, prodLU);
+          lists L = (lists)omAllocBin(slists_bin);
+          L->Init(7);
+          L->m[0].rtyp = MATRIX_CMD; L->m[0].data=(void*)pMat;
+          L->m[1].rtyp = MATRIX_CMD; L->m[1].data=(void*)lMat;
+          L->m[2].rtyp = MATRIX_CMD; L->m[2].data=(void*)dMat;
+          L->m[3].rtyp = MATRIX_CMD; L->m[3].data=(void*)uMat;
+          L->m[4].rtyp = POLY_CMD; L->m[4].data=(void*)l;
+          L->m[5].rtyp = POLY_CMD; L->m[5].data=(void*)u;
+          L->m[6].rtyp = POLY_CMD; L->m[6].data=(void*)prodLU;
+          res->rtyp = LIST_CMD;
+          res->data = (char *)L;
+          return FALSE;
+        }
+        else
+        {
+          Werror( "expected argument list (int, int, poly, poly, poly, int)");
+          return TRUE;
+        }
+      }
+  /*==================== lduSolve ======================*/
+      if(strcmp(sys_cmd, "lduSolve")==0)
+      {
+        /* for solving a linear equation system A * x = b, via the
+           given LDU-decomposition of the matrix A;
+           There is one valid parametrisation:
+           1) exactly eight arguments P, L, D, U, l, u, lTimesU, b;
+              P, L, D, and U realise the LDU-decomposition of A, that is,
+              P * A = L * D^(-1) * U, and P, L, D, and U satisfy the
+              properties decribed in method 'luSolveViaLDUDecomp' in
+              linearAlgebra.h; see there;
+              l, u, and lTimesU are as described in the same location;
+              b is the right-hand side vector of the linear equation system;
+           The method will return a list of either 1 entry or three entries:
+           1) [0] if there is no solution to the system;
+           2) [1, x, H] if there is at least one solution;
+              x is any solution of the given linear system,
+              H is the matrix with column vectors spanning the homogeneous
+              solution space.
+           The method produces an error if matrix and vector sizes do not
+           fit. */
+        if ((h == NULL) || (h->Typ() != MATRIX_CMD) ||
+            (h->next == NULL) || (h->next->Typ() != MATRIX_CMD) ||
+            (h->next->next == NULL) || (h->next->next->Typ() != MATRIX_CMD) ||
+            (h->next->next->next == NULL) ||
+              (h->next->next->next->Typ() != MATRIX_CMD) ||
+            (h->next->next->next->next == NULL) ||
+              (h->next->next->next->next->Typ() != POLY_CMD) ||
+            (h->next->next->next->next->next == NULL) ||
+              (h->next->next->next->next->next->Typ() != POLY_CMD) ||
+            (h->next->next->next->next->next->next == NULL) ||
+              (h->next->next->next->next->next->next->Typ() != POLY_CMD) ||
+            (h->next->next->next->next->next->next->next == NULL) ||
+              (h->next->next->next->next->next->next->next->Typ()
+                != MATRIX_CMD) ||
+            (h->next->next->next->next->next->next->next->next != NULL))
+        {
+          Werror("expected input (matrix, matrix, matrix, matrix, %s",
+                                 "poly, poly, poly, matrix)");
+          return TRUE;
+        }
+        matrix pMat  = (matrix)h->Data();
+        matrix lMat  = (matrix)h->next->Data();
+        matrix dMat  = (matrix)h->next->next->Data();
+        matrix uMat  = (matrix)h->next->next->next->Data();
+        poly l       = (poly)  h->next->next->next->next->Data();
+        poly u       = (poly)  h->next->next->next->next->next->Data();
+        poly lTimesU = (poly)  h->next->next->next->next->next->next
+                                                              ->Data();
+        matrix bVec  = (matrix)h->next->next->next->next->next->next
+                                                        ->next->Data();
+        matrix xVec; int solvable; matrix homogSolSpace;
+        if (pMat->rows() != pMat->cols())
+        {
+          Werror("first matrix (%d x %d) is not quadratic",
+                 pMat->rows(), pMat->cols());
+          return TRUE;
+        }
+        if (lMat->rows() != lMat->cols())
+        {
+          Werror("second matrix (%d x %d) is not quadratic",
+                 lMat->rows(), lMat->cols());
+          return TRUE;
+        }
+        if (dMat->rows() != dMat->cols())
+        {
+          Werror("third matrix (%d x %d) is not quadratic",
+                 dMat->rows(), dMat->cols());
+          return TRUE;
+        }
+        if (dMat->cols() != uMat->rows())
+        {
+          Werror("third matrix (%d x %d) and fourth matrix (%d x %d) %s",
+                 "do not t",
+                 dMat->rows(), dMat->cols(), uMat->rows(), uMat->cols());
+          return TRUE;
+        }
+        if (uMat->rows() != bVec->rows())
+        {
+          Werror("fourth matrix (%d x %d) and vector (%d x 1) do not fit",
+                 uMat->rows(), uMat->cols(), bVec->rows());
+          return TRUE;
+        }
+        solvable = luSolveViaLDUDecomp(pMat, lMat, dMat, uMat, l, u, lTimesU,
+                                       bVec, xVec, homogSolSpace);
+
+        /* build the return structure; a list with either one or
+           three entries */
+        lists ll = (lists)omAllocBin(slists_bin);
+        if (solvable)
+        {
+          ll->Init(3);
+          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+          ll->m[1].rtyp=MATRIX_CMD; ll->m[1].data=(void *)xVec;
+          ll->m[2].rtyp=MATRIX_CMD; ll->m[2].data=(void *)homogSolSpace;
+        }
+        else
+        {
+          ll->Init(1);
+          ll->m[0].rtyp=INT_CMD;    ll->m[0].data=(void *)solvable;
+        }
+        res->rtyp = LIST_CMD;
+        res->data=(char*)ll;
+        return FALSE;
+      }
   /*==================== forking experiments ======================*/
       if(strcmp(sys_cmd, "waitforssilinks")==0)
       {

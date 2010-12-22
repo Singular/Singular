@@ -38,8 +38,9 @@
  * - L is an (m x m) matrix in lower triangular form with all diagonal
  *   entries equal to 1,<br>
  * - U is an (m x n) matrix in upper row echelon form.<br>
- * From these conditions, it easily follows that also A = P * L * U,
+ * From these conditions, it follows immediately that also A = P * L * U,
  * since P is self-inverse.<br>
+ *
  * The method will modify all argument matrices except aMat, so that
  * they will finally contain the matrices P, L, and U as specified
  * above.
@@ -260,6 +261,67 @@ bool luSolveViaLUDecomp(
        matrix &xVec,      /**< [out] solution of A*x = b          */
        matrix &H          /**< [out] matrix with columns spanning
                                      homogeneous solution space   */
+                          );
+
+/**
+ * Solves the linear system A * x = b, where A is an (m x n)-matrix
+ * which is given by its LDU-decomposition.
+ *
+ * The method expects the LDU-decomposition of A, that is,
+ * pMat * A = lMat * dMat^(-1) * uMat, where the argument matrices have
+ * the appropriate proteries; see method
+ * 'lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat,
+ * matrix &dMat, matrix &uMat, poly &l, poly &u, poly &lTimesU)'.<br>
+ * Instead of trying to invert A and return x = A^(-1)*b, this
+ * method
+ * 1) computes b' = l * pMat * b,
+ * 2) solves the simple system L * y = b',
+ * 3) computes y' = u * dMat * y,
+ * 4) solves the simple system U * y'' = y',
+ * 5) computes x = 1/(lTimesU) * y''.
+ * Note that steps 1), 2) and 3) will always work, as L is in any case
+ * invertible. Moreover, y and thus y' are uniquely determined.
+ * Step 4) will only work if and only if y' is in the column span of U.
+ * In that case, there may be infinitely many solutions.
+ * In contrast to luSolveViaLUDecomp, this algorithm guarantees that
+ * all divisions which have to be performed in steps 2) and 4) will
+ * work without remainder. This is due to properties of the given LDU-
+ * decomposition. Only the final step 5) performs a division of a vector
+ * by a member of the ground field. (Suppose the ground field is Q or
+ * some rational function field. Then, if A contains only integers or
+ * polynomials, respectively, then steps 1) - 4) will keep all data
+ * integer or polynomial, respectively. This may speed up computations
+ * considerably.)
+ * For the outcome, there are three cases:<br>
+ * 1) There is no solution. Then the method returns false, and &xVec
+ *    as well as &H remain unchanged.<br>
+ * 2) There is a unique solution. Then the method returns true and
+ *    H is the 1x1 matrix with zero entry.<br>
+ * 3) There are infinitely many solutions. Then the method returns
+ *    true and some solution of the given original linear system.
+ *    Furthermore, the columns of H span the solution space of the
+ *    homogeneous linear system. The dimension of the solution
+ *    space is then the number of columns of H.
+ *
+ * @return true if there is at least one solution, false otherwise
+ **/
+bool luSolveViaLDUDecomp(
+       const matrix pMat,  /**< [in]  permutation matrix of an LDU-
+                                      decomposition                     */
+       const matrix lMat,  /**< [in]  lower left matrix of an LDU-
+                                      decomposition                     */
+       const matrix dMat,  /**< [in]  diagonal matrix of an LDU-
+                                      decomposition                     */
+       const matrix uMat,  /**< [in]  upper right matrix of an LDU-
+                                      decomposition                     */
+       const poly l,       /**< [in]  pivot product l of an LDU decomp. */
+       const poly u,       /**< [in]  pivot product u of an LDU decomp. */
+       const poly lTimesU, /**< [in]  product of l and u                */
+       const matrix bVec,  /**< [in]  right-hand side of the linear
+                                      system to be solved               */
+       matrix &xVec,       /**< [out] solution of A*x = b               */
+       matrix &H           /**< [out] matrix with columns spanning
+                                      homogeneous solution space        */
                           );
 
 /**
@@ -487,6 +549,44 @@ void henselFactors(
        poly &f,           /**< [out] the first factor of h(x, y)             */
        poly &g            /**< [out] the second factor of h(x, y)            */
                               );
+
+/**
+ * LU-decomposition of a given (m x n)-matrix with performing only those
+ * divisions that yield zero remainders.
+ *
+ * Given an (m x n) matrix A, the method computes its LDU-decomposition,
+ * that is, it computes matrices P, L, D, and U such that<br>
+ * - P * A = L * D^(-1) * U,<br>
+ * - P is an (m x m) permutation matrix, i.e., its row/columns form the
+ *   standard basis of K^m,<br>
+ * - L is an (m x m) matrix in lower triangular form of full rank,<br>
+ * - D is an (m x m) diagonal matrix with full rank, and<br>
+ * - U is an (m x n) matrix in upper row echelon form.<br>
+ * From these conditions, it follows immediately that also
+ * A = P * L * D^(-1) * U, since P is self-inverse.<br>
+ *
+ * In contrast to luDecomp, this method only performs those divisions which
+ * yield zero remainders. Hence, when e.g. computing over a rational function
+ * field and starting with polynomial entries only (or over Q and starting
+ * with integer entries only), then any newly computed matrix entry will again
+ * be polynomial (or integer).
+ *
+ * The method will modify all argument matrices except aMat, so that
+ * they will finally contain the matrices P, L, D, and U as specified
+ * above. Moreover, in order to further speed up subsequent calls of
+ * luSolveViaLDUDecomp, the two denominators and their product will also be
+ * returned.
+ **/
+void lduDecomp(
+       const matrix aMat, /**< [in]  the initial matrix A,          */
+       matrix &pMat,      /**< [out] the row permutation matrix P   */
+       matrix &lMat,      /**< [out] the lower triangular matrix L  */
+       matrix &dMat,      /**< [out] the diagonal matrix D          */
+       matrix &uMat,      /**< [out] the upper row echelon matrix U */
+       poly &l,           /**< [out] the product of pivots of L     */
+       poly &u,           /**< [out] the product of pivots of U     */
+       poly &lTimesU      /**< [out] the product of l and u         */
+             );
 
 #endif
 /* LINEAR_ALGEBRA_H */

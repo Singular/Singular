@@ -7461,7 +7461,7 @@ static BOOLEAN jjLU_SOLVE(leftv res, leftv v)
       (v->next->next->next->Typ() != MATRIX_CMD) ||
       (v->next->next->next->next != NULL))
   {
-    Werror("expected exactly three matrices and one vector as input");
+    WerrorS("expected exactly three matrices and one vector as input");
     return TRUE;
   }
   matrix pMat = (matrix)v->Data();
