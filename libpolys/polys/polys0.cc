@@ -12,7 +12,7 @@
 // #include <polys/structs.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/ring.h>
-#include <polys/p_polys.h>
+#include <polys/monomials/p_polys.h>
 // #include <???/febase.h>
 
 /*2

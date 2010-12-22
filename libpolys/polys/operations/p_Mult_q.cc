@@ -17,10 +17,10 @@
  * Assumes: pLength(p) >= 2 pLength(q) >=2
  ***************************************************************/
 // #include <polys/options.h>
-#include <polys/p_polys.h>
-#include <polys/p_Procs.h>
-#include <polys/p_Numbers.h>
-#include <polys/kbuckets.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/templates/p_Procs.h>
+#include <polys/templates/p_Numbers.h>
+// #include <???/kbuckets.h>
 
 #include <polys/operations/p_Mult_q.h>
 

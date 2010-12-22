@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <auxiliary.h>
+#include <misc/auxiliary.h>
 // #include <polys/options.h>
 #include <omalloc/omalloc.h>
 #include <reporter/reporter.h>

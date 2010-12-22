@@ -10,10 +10,10 @@
  *******************************************************************/
 
 
-#include <auxialiary.h>
+#include <misc/auxiliary.h>
 
 #include <polys/monomials/ring.h>
-#include <polys/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 // #include <???/ideals.h>
 // #include <???/int64vec.h>

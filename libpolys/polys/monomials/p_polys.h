@@ -1178,7 +1178,7 @@ static inline void      p_wrp(poly p, ring p_ring)
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#include <mylimits.h>
+#include <misc/mylimits.h>
 #include <polys/templates/p_MemCmp.h>
 // #include <polys/structs.h>
 #include <polys/monomials/ring.h>
@@ -1208,7 +1208,7 @@ while(0)
 
 #include <omalloc/omalloc.h>
 #include <coeffs/coeffs.h>
-#include <polys/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <polys/templates/p_MemAdd.h>
 #include <polys/templates/p_MemCopy.h>
 

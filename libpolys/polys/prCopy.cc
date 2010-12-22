@@ -8,7 +8,7 @@
 
 #include "polys/config.h"
 #include <omalloc/omalloc.h>
-#include <polys/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <coeffs/numbers.h>
 // #include <polys/structs.h>
 #include <polys/monomials/ring.h>
@@ -29,7 +29,7 @@ prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
   p_Setm(dest, dest_r);
 }
 
-#include <polys/prCopy.inc>
+// #include <polys/prCopy.inc>
 
 /////////////////////////////////////////////////////////////////////////
 poly prCopyR(poly p, ring src_r, ring dest_r)
