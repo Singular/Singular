@@ -3,6 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(FULL-PACKAGE-NAME, VERSION, BUG-REPORT-ADDRESS)
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([reporter.h])
 AC_CONFIG_HEADER([config.h])
 
@@ -11,6 +12,7 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_INSTALL
+AC_PROG_RANLIB
 
 # Checks for libraries.
 
@@ -47,30 +49,6 @@ else
   PIPE="-pipe"
 fi
 AC_SUBST(PIPE)
-
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl path stuff
-dnl
-
-project=singular
-component=reporter
-
-dnl set exec_prefix, libdir, includedir to some sensible values
-dnl if they are not yet already set
-
-# expand prefix
-test "x$prefix" = xNONE && prefix=$ac_default_prefix
-
-# expand exec_prefixad
-if test "x$exec_prefix" = xNONE; then
- exec_prefix=${prefix}
-fi
-
-# expand libdir
-test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${project}/${component}"
-
-# expand includedir
-test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include/${project}/${component}"
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
