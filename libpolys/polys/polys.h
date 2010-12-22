@@ -9,7 +9,7 @@
              currRing
 */
 
-#include <kernel/p_polys.h>
+#include <polys/p_polys.h>
 
 /***************************************************************
  *

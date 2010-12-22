@@ -16,7 +16,7 @@
 #undef DO_PINLINE0
 
 
-#include <kernel/pInline0.h>
+#include <polys/pInline0.h>
 
 #endif // PINLINE_CC
 

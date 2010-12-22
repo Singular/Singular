@@ -12,13 +12,13 @@
 
 #include <auxialiary.h>
 
-#include "ring.h"
-#include "p_polys.h"
-#include "ring.h"
-#include "ideals.h"
-#include "int64vec.h"
+#include <polys/monomials/ring.h>
+#include <polys/p_polys.h>
+#include <polys/monomials/ring.h>
+// #include <???/ideals.h>
+// #include <???/int64vec.h>
 #ifndef NDEBUG
-#include <kernel/febase.h>
+// #include <???/febase.h>
 #endif
 
 /***************************************************************
@@ -2989,5 +2989,5 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
 #undef n_Delete
 #define n_Delete(n, r) ((void)0)
 
-#include <kernel/p_Delete__T.cc>
+#include <polys/templates/p_Delete__T.cc>
 

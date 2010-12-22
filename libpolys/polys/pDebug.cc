@@ -22,11 +22,11 @@
 // #undef PDEBUG
 // #define PDEBUG 2
 
-//#include "p_polys.h"
+//#include <polys/p_polys.h>
 #include <output.h>
-#include <omalloc.h>
-#include "monomials/ring.h"
-#include <coeffs.h>
+#include <omalloc/omalloc.h>
+#include <polys/monomials/ring.h>
+#include <coeffs/coeffs.h>
 
 /***************************************************************
  *

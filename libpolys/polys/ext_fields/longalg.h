@@ -7,9 +7,10 @@
 /*
 * ABSTRACT:   algebraic numbers
 */
-#include <kernel/structs.h>
-#include <kernel/longrat.h>
-#include <kernel/polys-impl.h>
+#include <coeffs/coeffs.h>
+#include <coeffs/longrat.h>
+#include <poly/monomials/polys-impl.h>
+#include <polys/ext_fields/longtrans.h>
 
 #define ALLOC_LNUMBER() (lnumber)omAllocBin(rnumber_bin)
 #define ALLOC0_LNUMBER() (lnumber)omAlloc0Bin(rnumber_bin)

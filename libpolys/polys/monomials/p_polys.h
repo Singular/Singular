@@ -12,8 +12,8 @@
 #ifndef P_POLYS_H
 #define P_POLYS_H
 
-#include "ring.h"
-#include "polys-impl.h"
+#include <polys/monomials/ring.h>
+#include <polys/monomials/polys-impl.h>
 
 /***************************************************************
  *
@@ -1179,10 +1179,10 @@ static inline void      p_wrp(poly p, ring p_ring)
  *  Version: $Id$
  *******************************************************************/
 #include <mylimits.h>
-#include "p_MemCmp.h"
-#include "structs.h"
-#include "ring.h"
-#include <coeffs.h>
+#include <polys/templates/p_MemCmp.h>
+// #include <polys/structs.h>
+#include <polys/monomials/ring.h>
+#include <coeffs/coeffs.h>
 
 #if PDEBUG > 0
 
@@ -1206,11 +1206,11 @@ while(0)
 
 #define pDivAssume(x)   ((void)0)
 
-#include <omalloc.h>
-#include <coeffs.h>
-#include "p_polys.h"
-#include "p_MemAdd.h"
-#include "p_MemCopy.h"
+#include <omalloc/omalloc.h>
+#include <coeffs/coeffs.h>
+#include <polys/p_polys.h>
+#include <polys/templates/p_MemAdd.h>
+#include <polys/templates/p_MemCopy.h>
 
 /***************************************************************
  *

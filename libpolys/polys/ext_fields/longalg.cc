@@ -8,23 +8,24 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
+#include "polys/config.h"
+// #include <polys/structs.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/longrat.h>
-#include <kernel/modulop.h>
-#include <kernel/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/ring.h>
+// #include <???/febase.h>
+#include <coeffs/longrat.h>
+#include <polys/modulop.h>
+#include <coeffs/numbers.h>
+#include <polys/polys.h>
+#include <polys/ideals.h>
+#include <polys/monomials/ring.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
-#include <kernel/clapsing.h>
-#include <kernel/clapconv.h>
+#include <polys/clapsing.h>
+#include <polys/clapconv.h>
 #endif
-#include <kernel/longalg.h>
+#include <polys/ext_fields/longtrans.h>
+#include <polys/ext_fields/longalg.h>
 
 struct snaIdeal
 {

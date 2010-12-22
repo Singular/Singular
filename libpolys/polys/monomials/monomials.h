@@ -8,9 +8,9 @@
 * ABSTRACT
 */
 
-#include <omalloc.h>
-#include <coeffs.h>
-#include "ring.h"
+#include <omalloc/omalloc.h>
+#include <coeffs/coeffs.h>
+#include <polys/monomials/ring.h>
 
 /***************************************************************
  *
