@@ -28,11 +28,11 @@
 // #include <gring.h>
 // #include <sca.h>
 #endif
-#include <maps.h>
-#include <matpol.h>
+// #include <???/maps.h>
+// #include <???/matpol.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
-#  include <factory.h>
+#  include <factory/factory.h>
 #endif
 
 #define BITS_PER_LONG 8*SIZEOF_LONG

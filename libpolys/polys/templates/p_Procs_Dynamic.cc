@@ -17,8 +17,8 @@
 #include <polys/p_MemCmp.h>
 #include <polys/p_MemAdd.h>
 #include <polys/p_MemCopy.h>
-#include <polys/kbuckets.h>
-#include <polys/dError.h>
+// #include <polys/kbuckets.h>
+#include <reporter/reporter.h>
 
 #ifdef HAVE_DL
 BOOLEAN p_procs_dynamic = TRUE;

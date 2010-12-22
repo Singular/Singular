@@ -9,7 +9,7 @@
              currRing
 */
 
-#include <polys/p_polys.h>
+#include <polys/monomials/p_polys.h>
 
 /***************************************************************
  *
@@ -245,7 +245,7 @@ static inline long  pLDeg(const poly p,  int *l, const ring r)  { return r->pLDe
 #define pDeg(p)    p_Deg(p,currRing)
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
 #define pWTotaldegree(p) p_WTotaldegree(p,currRing)
-#define pWDegree(poly p) p_WDegree(p,currRing)
+#define pWDegree(p) p_WDegree(p,currRing)
 
 /*-------------operations on polynomials:------------*/
 #define   pSub(a,b) p_Sub(a,b,currRing)

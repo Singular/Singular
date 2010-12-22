@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <auxialiary.h>
+#include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
 #ifdef PDEBUG
@@ -33,7 +33,7 @@
 #include <polys/polys.h>
 #include <polys/monomials/ring.h>
 #include <polys/templates/p_Procs.h>
-#include <dError.h>
+#include <reporter/reporter.h>
 
 #ifdef PDEBUG
 int pDBsyzComp=0;

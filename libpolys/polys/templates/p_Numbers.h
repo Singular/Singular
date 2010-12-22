@@ -38,7 +38,7 @@
 #define n_InpAdd_RingGeneral(n1, n2, r)    n1=ndInpAdd(n1, n2, r)
 #endif
 
-#include <polys/modulop.h>
+#include <coeffs/modulop.h>
 #define n_Copy_FieldZp(n, r)        n
 #define n_Delete_FieldZp(n, r)      ((void)0)
 #define n_Mult_FieldZp(n1, n2, r)   npMultM(n1,n2)

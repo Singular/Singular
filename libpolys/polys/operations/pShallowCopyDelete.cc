@@ -9,7 +9,7 @@
  *  Version: $Id$
  *******************************************************************/
 #include "polys/config.h"
-#include <polys/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 #include <polys/operations/pShallowCopyDelete.h>
 

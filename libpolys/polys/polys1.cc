@@ -16,15 +16,15 @@
 #include <coeffs/ffields.h>
 #include <omalloc/omalloc.h>
 // #include <???/febase.h>
-#include <polys/weight.h>
-#include <polys/intvec.h>
+// #include <???/weight.h>
+// #include <???/intvec.h>
 #include <polys/ext_fields/longalg.h>
 #include <polys/monomials/ring.h>
-#include <polys/ideals.h>
+// #include <???/ideals.h>
 #include <polys/polys.h>
-//#include "ipid.h"
+// #include "ipid.h"
 #ifdef HAVE_FACTORY
-#include <polys/clapsing.h>
+// #include <???/clapsing.h>
 #endif
 
 #ifdef HAVE_RATGRING
