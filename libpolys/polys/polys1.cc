@@ -10,26 +10,25 @@
 
 /* includes */
 #include <string.h>
-#include <kernel/mod2.h>
-#include <kernel/options.h>
-#include <kernel/numbers.h>
-#include <kernel/ffields.h>
+#include "polys/config.h"
+// #include <polys/options.h>
+#include <coeffs/numbers.h>
+#include <coeffs/ffields.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/weight.h>
-#include <kernel/intvec.h>
-#include <kernel/longalg.h>
-#include <kernel/longtrans.h>
-#include <kernel/ring.h>
-#include <kernel/ideals.h>
-#include <kernel/polys.h>
+// #include <???/febase.h>
+#include <polys/weight.h>
+#include <polys/intvec.h>
+#include <polys/ext_fields/longalg.h>
+#include <polys/monomials/ring.h>
+#include <polys/ideals.h>
+#include <polys/polys.h>
 //#include "ipid.h"
 #ifdef HAVE_FACTORY
-#include <kernel/clapsing.h>
+#include <polys/clapsing.h>
 #endif
 
 #ifdef HAVE_RATGRING
-#include <kernel/ratgring.h>
+// #include <polys/ratgring.h>
 #endif
 
 

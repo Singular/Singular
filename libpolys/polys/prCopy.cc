@@ -6,14 +6,14 @@
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
 
-#include <kernel/mod2.h>
+#include "polys/config.h"
 #include <omalloc/omalloc.h>
-#include <kernel/p_polys.h>
-#include <kernel/numbers.h>
-#include <kernel/structs.h>
-#include <kernel/ring.h>
-#include <kernel/ideals.h>
-#include <kernel/sbuckets.h>
+#include <polys/p_polys.h>
+#include <coeffs/numbers.h>
+// #include <polys/structs.h>
+#include <polys/monomials/ring.h>
+// #include <polys/ideals.h>
+// #include <polys/sbuckets.h>
 
 static inline void
 prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
@@ -29,7 +29,7 @@ prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
   p_Setm(dest, dest_r);
 }
 
-#include <kernel/prCopy.inc>
+#include <polys/prCopy.inc>
 
 /////////////////////////////////////////////////////////////////////////
 poly prCopyR(poly p, ring src_r, ring dest_r)

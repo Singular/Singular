@@ -25,14 +25,14 @@
 #undef NO_INLINE3
 #define NO_INLINE3
 #endif
-#include <polys-impl.h>
+#include <polys/monomials/polys-impl.h>
 
-#include "ring.h"
-#include <reporter.h>
-#include <numbers.h>
-#include "polys.h"
-#include "ring.h"
-#include "p_Procs.h"
+#include <polys/monomials/ring.h>
+#include <reporter/reporter.h>
+#include <coeffs/numbers.h>
+#include <polys/polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/templates/p_Procs.h>
 #include <dError.h>
 
 #ifdef PDEBUG

@@ -9,8 +9,8 @@
 /* $Id$ */
 
 /* includes */
-#include <coeffs.h>
-//#include "polys-impl.h"
+#include <coeffs/coeffs.h>
+//#include <polys/monomials/polys-impl.h>
 
 enum tHomog
 {

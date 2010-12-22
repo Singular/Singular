@@ -9,8 +9,8 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
+#include "polys/config.h"
+// #include <polys/structs.h>
 
 // Use buckets if min(pLength(p), pLength(q)) >= MIN_LENGTH_BUCKET
 // Not thoroughly tested what is best

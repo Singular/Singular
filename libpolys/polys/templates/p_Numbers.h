@@ -11,7 +11,7 @@
 #ifndef P_NUMBERS_H
 #define P_NUMBERS_H
 
-#include <coeffs.h>
+#include <coeffs/coeffs.h>
 #define n_Copy_FieldGeneral(n, r)           (r)->cf->cfCopy(n,r)
 #define n_Delete_FieldGeneral(n, r)         (r)->cf->cfDelete(n,r)
 #define n_Mult_FieldGeneral(n1, n2, r)      (r)->cf->nMult(n1, n2)
@@ -38,7 +38,7 @@
 #define n_InpAdd_RingGeneral(n1, n2, r)    n1=ndInpAdd(n1, n2, r)
 #endif
 
-#include <kernel/modulop.h>
+#include <polys/modulop.h>
 #define n_Copy_FieldZp(n, r)        n
 #define n_Delete_FieldZp(n, r)      ((void)0)
 #define n_Mult_FieldZp(n1, n2, r)   npMultM(n1,n2)
@@ -51,7 +51,7 @@
 #define n_InpAdd_FieldZp(n1, n2, r)  n1=npAddM(n1, n2)
 
 #define DO_LINLINE
-#include <kernel/longrat.cc>
+#include "coeffs/longrat.cc"
 #define n_Copy_FieldQ(n, r)        nlCopy(n)
 #define n_Delete_FieldQ(n, r)      nlDelete(n,r)
 #define n_Mult_FieldQ(n1, n2, r)   nlMult(n1,n2)

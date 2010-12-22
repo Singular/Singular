@@ -8,17 +8,17 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/p_polys.h>
-#include <kernel/ring.h>
-#include <kernel/p_Procs.h>
-#include <kernel/p_Numbers.h>
-#include <kernel/p_MemCmp.h>
-#include <kernel/p_MemAdd.h>
-#include <kernel/p_MemCopy.h>
-#include <kernel/kbuckets.h>
-#include <kernel/dError.h>
+#include "polys/config.h"
+// #include <polys/structs.h>
+#include <polys/p_polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/p_Procs.h>
+#include <polys/p_Numbers.h>
+#include <polys/p_MemCmp.h>
+#include <polys/p_MemAdd.h>
+#include <polys/p_MemCopy.h>
+#include <polys/kbuckets.h>
+#include <polys/dError.h>
 
 BOOLEAN p_procs_dynamic = FALSE;
 
@@ -26,9 +26,9 @@ BOOLEAN p_procs_dynamic = FALSE;
 #include "p_Procs_Static.inc"
 
 // include generated configuration
-#include <kernel/p_Procs_Static.h>
+#include <polys/p_Procs_Static.h>
 // include general p_Proc stuff
-#include <kernel/p_Procs_Impl.h>
+#include <polys/p_Procs_Impl.h>
 
 // define DoSetProc and InitSetProcs
 #define SetStaticProcFromArray(what, type, field, length, ord) \
@@ -54,7 +54,7 @@ while(0)
 
 // include routines for setting p_ProcsSet
 
-#include <kernel/p_Procs_Set.h>
+#include <polys/p_Procs_Set.h>
 
 
 

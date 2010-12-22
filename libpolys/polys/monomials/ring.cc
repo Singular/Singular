@@ -9,23 +9,24 @@
 
 /* includes */
 #include <math.h>
-#include "options.h"
-#include "omalloc.h"
-#include "polys.h"
-#include "numbers.h"
-#include "febase.h"
-#include "intvec.h"
-#include "longalg.h"
-#include "longtrans.h"
-#include "ffields.h"
-#include "ideals.h"
-#include "ring.h"
-#include "prCopy.h"
-#include "../Singular/ipshell.h"
-#include "p_Procs.h"
+
+// #include <polys/options.h>
+#include <omalloc/omalloc.h>
+#include <polys/polys.h>
+#include <coeffs/numbers.h>
+// #include <???/febase.h>
+// #include <???/intvec.h>
+#include <polys/ext_fields/longalg.h>
+#include <polys/ext_fields/longtrans.h>
+#include <coeffs/ffields.h>
+// #include <???/ideals.h>
+#include <polys/monomials/ring.h>
+#include <polys/prCopy.h>
+// #include "../Singular/ipshell.h"
+#include <polys/templates/p_Procs.h>
 #ifdef HAVE_PLURAL
-#include <gring.h>
-#include <sca.h>
+// #include <gring.h>
+// #include <sca.h>
 #endif
 #include <maps.h>
 #include <matpol.h>

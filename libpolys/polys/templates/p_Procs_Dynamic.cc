@@ -8,17 +8,17 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/p_polys.h>
-#include <kernel/ring.h>
-#include <kernel/p_Procs.h>
-#include <kernel/p_Numbers.h>
-#include <kernel/p_MemCmp.h>
-#include <kernel/p_MemAdd.h>
-#include <kernel/p_MemCopy.h>
-#include <kernel/kbuckets.h>
-#include <kernel/dError.h>
+#include "polys/config.h"
+// #include <polys/structs.h>
+#include <polys/p_polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/p_Procs.h>
+#include <polys/p_Numbers.h>
+#include <polys/p_MemCmp.h>
+#include <polys/p_MemAdd.h>
+#include <polys/p_MemCopy.h>
+#include <polys/kbuckets.h>
+#include <polys/dError.h>
 
 #ifdef HAVE_DL
 BOOLEAN p_procs_dynamic = TRUE;
@@ -31,10 +31,10 @@ BOOLEAN p_procs_dynamic = TRUE;
 #define p_Procs_Kernel
 #include "p_Procs_Dynamic.inc"
 
-#include <kernel/p_Procs_Dynamic.h>
+#include <polys/p_Procs_Dynamic.h>
 // include general p_Proc stuff
-#include <kernel/p_Procs_Impl.h>
-#include <kernel/mod_raw.h>
+#include <polys/p_Procs_Impl.h>
+#include <polys/mod_raw.h>
 
 // define to bound for length of p_Proc name
 #define MAX_PROCNAME_LEN 200
@@ -117,7 +117,7 @@ static void* GetGeneralProc(p_Proc proc)
 }
 
 #ifdef RDEBUG
-#include <omalloc.h>
+#include <omalloc/omalloc.h>
 
 static const char* GetGeneralProcName(p_Proc proc)
 {
@@ -221,6 +221,6 @@ while(0)
 #endif
 
 
-#include <kernel/p_Procs_Set.h>
+#include <polys/p_Procs_Set.h>
 
 #endif

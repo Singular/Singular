@@ -12,16 +12,16 @@
 #include <string.h>
 #include <ctype.h>
 #include <auxiliary.h>
-#include "options.h"
-#include "omalloc.h"
-#include "reporter.h"
-#include "numbers.h"
-#include "polys.h"
-#include "ring.h"
+// #include <polys/options.h>
+#include <omalloc/omalloc.h>
+#include <reporter/reporter.h>
+#include <coeffs/numbers.h>
+#include <polys/polys.h>
+#include <polys/monomials/ring.h>
 
 #ifdef HAVE_PLURAL
-#include <gring.h>
-#include <sca.h>
+// #include <gring.h>
+// #include <sca.h>
 #endif
 
 /* 1 for polynomial ring, -1 otherwise */
