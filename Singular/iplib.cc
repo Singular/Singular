@@ -938,7 +938,6 @@ procinfo *iiInitSingularProcinfo(procinfov pi, const char *libname,
   return(pi);
 }
 
-#ifdef HAVE_DYNAMIC_LOADING
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v))
@@ -965,6 +964,7 @@ int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
   return(0);
 }
 
+#ifdef HAVE_DYNAMIC_LOADING
 int iiAddCprocTop(char *libname, char *procname, BOOLEAN pstatic,
                BOOLEAN(*func)(leftv res, leftv v))
 {

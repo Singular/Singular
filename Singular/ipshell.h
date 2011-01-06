@@ -182,6 +182,9 @@ void  singular_example(char *str);
 
 BOOLEAN iiTryLoadLib(leftv v, const char *id);
 
+int iiAddCproc(char *libname, char *procname, BOOLEAN pstatic,
+               BOOLEAN(*func)(leftv res, leftv v));
+
 void iiCheckPack(package &p);
 #ifndef NDEBUG
 void checkall();

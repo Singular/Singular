@@ -60,7 +60,7 @@ System dependicies:
 - always provide a general version also
 - if NTL is included, one may also use:
   NTL_AVOID_BRANCHING (currently not used, substituted by SI_CPU_*)
-- only for dependicies on the OS, use
+- only for dependencies on the OS, use
   the result of  singuname (#ifdef ix86_Linux etc.)
 
 Misc. remarks:
