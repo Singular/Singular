@@ -438,7 +438,6 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
         MATELEM(N, w, dim) = pNeg(pCopy(MATELEM(uMat, r, nonZeroC)));
         MATELEM(N, nonZeroC, dim) = pCopy(MATELEM(uMat, r, w));
       }
-      number z;
       for (int d = 1; d <= dim; d++)
       {
         /* here we fill the entry of N at [r, d], for each valid vector
@@ -449,27 +448,17 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
         for (int c = nonZeroC + 1; c <= n; c++)
           if (MATELEM(N, c, d) != NULL)
             p = pAdd(p, ppMult_qq(MATELEM(uMat, r, c), MATELEM(N, c, d)));
-        MATELEM(N, nonZeroC, d) = pNeg(p);
-        if (MATELEM(N, nonZeroC, d) != NULL)
-        {
-          z = nDiv(pGetCoeff(MATELEM(N, nonZeroC, d)),
-                   pGetCoeff(MATELEM(uMat, r, nonZeroC)));
-          nNormalize(z); pDelete(&MATELEM(N, nonZeroC, d));
-          MATELEM(N, nonZeroC, d) = pNSet(z);
-        }
+        q = pNSet(nInvers(pGetCoeff(MATELEM(uMat, r, nonZeroC))));
+        MATELEM(N, nonZeroC, d) = pMult(pNeg(p), q);
+        pNormalize(MATELEM(N, nonZeroC, d));
       }
       p = pNeg(pCopy(MATELEM(yVec, r, 1)));
       for (int c = nonZeroC + 1; c <= n; c++)
         if (MATELEM(xVec, c, 1) != NULL)
           p = pAdd(p, ppMult_qq(MATELEM(uMat, r, c), MATELEM(xVec, c, 1)));
-      MATELEM(xVec, nonZeroC, 1) = pNeg(p);
-      if (MATELEM(xVec, nonZeroC, 1) != NULL)
-      {
-        z = nDiv(pGetCoeff(MATELEM(xVec, nonZeroC, 1)),
-                 pGetCoeff(MATELEM(uMat, r, nonZeroC)));
-        nNormalize(z); pDelete(&MATELEM(xVec, nonZeroC, 1));
-        MATELEM(xVec, nonZeroC, 1) = pNSet(z);       
-      }
+      q = pNSet(nInvers(pGetCoeff(MATELEM(uMat, r, nonZeroC))));
+      MATELEM(xVec, nonZeroC, 1) = pMult(pNeg(p), q);
+      pNormalize(MATELEM(xVec, nonZeroC, 1));
       lastNonZeroC = nonZeroC;
     }
     if (dim == 0)
@@ -1536,24 +1525,19 @@ bool luSolveViaLDUDecomp(const matrix pMat, const matrix lMat,
 
   /* solve lMat * yVec = cVec; this will always work as lMat is invertible;
      moreover, all divisions are guaranteed to be without remainder */
-  number z;
+  poly p; poly q;
   for (int r = 1; r <= m; r++)
   {
-    poly p = pNeg(pCopy(MATELEM(cVec, r, 1)));
+    p = pNeg(pCopy(MATELEM(cVec, r, 1)));
     for (int c = 1; c < r; c++)
       p = pAdd(p, ppMult_qq(MATELEM(lMat, r, c), MATELEM(yVec, c, 1) ));
-    MATELEM(yVec, r, 1) = pNeg(p);
-    if (MATELEM(yVec, r, 1) != NULL)
-    {
-      z = nDiv(pGetCoeff(MATELEM(yVec, r, 1)), pGetCoeff(MATELEM(lMat, r, r)));
-      nNormalize(z);   /* division is without remainder */
-      pDelete(&MATELEM(yVec, r, 1));
-      MATELEM(yVec, r, 1) = pNSet(z);
-    }
+    /* The following division is without remainder. */
+    q = pNSet(nInvers(pGetCoeff(MATELEM(lMat, r, r))));
+    MATELEM(yVec, r, 1) = pMult(pNeg(p), q);
+    pNormalize(MATELEM(yVec, r, 1));    
   }
   
   /* compute u * dMat * yVec and put result into yVec */
-  poly p;
   for (int r = 1; r <= m; r++)
   {
     p = ppMult_qq(u, MATELEM(dMat, r, r));
@@ -1579,7 +1563,6 @@ bool luSolveViaLDUDecomp(const matrix pMat, const matrix lMat,
   {
     xVec = mpNew(n, 1);
     matrix N = mpNew(n, n); int dim = 0;
-    poly p; poly q;
     /* solve uMat * xVec = yVec and determine a basis of the solution
        space of the homogeneous system uMat * xVec = 0;
        We do not know in advance what the dimension (dim) of the latter
@@ -1609,45 +1592,31 @@ bool luSolveViaLDUDecomp(const matrix pMat, const matrix lMat,
         for (int c = nonZeroC + 1; c <= n; c++)
           if (MATELEM(N, c, d) != NULL)
             p = pAdd(p, ppMult_qq(MATELEM(uMat, r, c), MATELEM(N, c, d)));
-        MATELEM(N, nonZeroC, d) = pNeg(p);
-        if (MATELEM(N, nonZeroC, d) != NULL)
-        {
-          z = nDiv(pGetCoeff(MATELEM(N, nonZeroC, d)),
-                   pGetCoeff(MATELEM(uMat, r, nonZeroC)));
-          nNormalize(z);   /* division may be with remainder but only takes
-                              place for dim > 0 */
-          pDelete(&MATELEM(N, nonZeroC, d));
-          MATELEM(N, nonZeroC, d) = pNSet(z);
-        }
+        /* The following division may be with remainder but only takes place
+           when dim > 0. */
+        q = pNSet(nInvers(pGetCoeff(MATELEM(uMat, r, nonZeroC))));
+        MATELEM(N, nonZeroC, d) = pMult(pNeg(p), q);
+        pNormalize(MATELEM(N, nonZeroC, d));
       }
       p = pNeg(pCopy(MATELEM(yVec, r, 1)));
       for (int c = nonZeroC + 1; c <= n; c++)
         if (MATELEM(xVec, c, 1) != NULL)
           p = pAdd(p, ppMult_qq(MATELEM(uMat, r, c), MATELEM(xVec, c, 1)));
-      MATELEM(xVec, nonZeroC, 1) = pNeg(p);
-      if (MATELEM(xVec, nonZeroC, 1) != NULL)
-      {
-        z = nDiv(pGetCoeff(MATELEM(xVec, nonZeroC, 1)),
-                 pGetCoeff(MATELEM(uMat, r, nonZeroC)));
-        nNormalize(z);   /* division is without remainder */
-        pDelete(&MATELEM(xVec, nonZeroC, 1));
-        MATELEM(xVec, nonZeroC, 1) = pNSet(z);
-      }
+      /* The following division is without remainder. */
+      q = pNSet(nInvers(pGetCoeff(MATELEM(uMat, r, nonZeroC))));
+      MATELEM(xVec, nonZeroC, 1) = pMult(pNeg(p), q);
+      pNormalize(MATELEM(xVec, nonZeroC, 1));
       lastNonZeroC = nonZeroC;
     }
     
     /* divide xVec by l*u = lTimesU and put result in xVec */
-    number zz = pGetCoeff(lTimesU);
+    number z = nInvers(pGetCoeff(lTimesU));
     for (int c = 1; c <= n; c++)
     {
-      if (MATELEM(xVec, c, 1) != NULL)
-      {
-        z = nDiv(pGetCoeff(MATELEM(xVec, c, 1)), zz);
-        nNormalize(z);
-        pDelete(&MATELEM(xVec, c, 1));
-        MATELEM(xVec, c, 1) = pNSet(z);
-      }
+      pMult_nn(MATELEM(xVec, c, 1), z);
+      pNormalize(MATELEM(xVec, c, 1));
     }
+    nDelete(&z);
     
     if (dim == 0)
     {
