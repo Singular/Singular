@@ -1,5 +1,6 @@
 /*******************************************************************
  *  File:    omSingularConfig.h
+ *  Purpose: declaration of External Config stuff for omalloc
  *           This file is inlcuded by omDefaultConfig.h, i.e., at the the time
  *           the omalloc library is built. Any changes to the default config 
  *           of omalloc should be done here (and, of course, you need to 
@@ -46,7 +47,7 @@ do                                                                            \
                    om_sing_last_reported_size - _current_bytes);              \
     if (_diff >= SING_REPORT_THRESHOLD)                                       \
     {                                                                         \
-      fprintf(stdout, "[%ldk]", (_current_bytes + 1023)/1024);                \
+      fprintf(stdout, "[%ldk]", (long)(_current_bytes + 1023)/1024);                \
       fflush(stdout);                                                         \
       om_sing_last_reported_size = _current_bytes;                            \
     }                                                                         \
