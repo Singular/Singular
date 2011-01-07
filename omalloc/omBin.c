@@ -670,7 +670,7 @@ static void omPrintBinStat(FILE * fd, omBin bin, int track, int* pages, int* use
     fprintf(fd, "%s%ld\t%ld\t", (omIsStaticNormalBin(bin) ? " " :
                                 (omIsStickyBin(bin) ? "S" :
                                  (omIsTrackBin(bin) ? "T" : "*"))),
-            bin->sizeW, bin->max_blocks);
+            (long)bin->sizeW, bin->max_blocks);
   }
   omGetTotalBinStat(bin, pages, used_blocks, free_blocks);
   fprintf(fd, "%d\t%d\t%d\n", *pages, *free_blocks, *used_blocks);

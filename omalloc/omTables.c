@@ -67,7 +67,7 @@ void OutputSize2Bin(size_t *binSize, size_t max_block_size, int track)
 {
   long i, j;
   printf("omBin om_Size2%sBin[/*%ld*/] = {\n",
-         (track? "Track" : ""), max_block_size / SIZEOF_OM_ALIGNMENT);
+         (track? "Track" : ""), (long)(max_block_size / SIZEOF_OM_ALIGNMENT));
   i=0;
   j=SIZEOF_OM_ALIGNMENT;
   while (j < max_block_size)
@@ -88,7 +88,7 @@ void OutputSize2AlignedBin(size_t *binSize, size_t max_block_size, int track)
     _exit(1);
   }
   printf("omBin om_Size2%sBin[/*%ld*/] = {\n",
-         (track ? "Track" : "Aligned"), max_block_size / SIZEOF_OM_ALIGNMENT);
+         (track ? "Track" : "Aligned"), (long)(max_block_size / SIZEOF_OM_ALIGNMENT));
   i=0;
   while (binSize[i] % SIZEOF_STRICT_ALIGNMENT != 0) i++;
   j=SIZEOF_OM_ALIGNMENT;
@@ -113,12 +113,12 @@ void OutputStaticBin(size_t *binSize, int max_bin_index, int track)
   for (i=0;  i< max_bin_index; i++)
   {
     printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0},\n",
-           binSize[i] / SIZEOF_LONG,
-           SIZEOF_OM_BIN_PAGE/binSize[i]);
+           (long)(binSize[i] / SIZEOF_LONG),
+           (long)(SIZEOF_OM_BIN_PAGE/binSize[i]));
   }
   printf("{om_ZeroPage, NULL, NULL, %ld, %ld, 0}\n};\n\n",
-         binSize[i] / SIZEOF_LONG,
-         SIZEOF_OM_BIN_PAGE/binSize[i]);
+         (long)(binSize[i] / SIZEOF_LONG),
+         (long)(SIZEOF_OM_BIN_PAGE/binSize[i]));
 }
 
 int GetMaxBlockThreshold()

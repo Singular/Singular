@@ -423,13 +423,14 @@ void _omPrintAddrInfo(FILE* fd, omError_t error, void* addr, void* bin_size, omT
   int x;
   if (! (x=omCheckPtr(addr, omError_MaxError, OM_FLR)))
   {
-    fprintf(fd, "%s addr:%p size:%ld", s, addr, omSizeOfAddr(addr));
+    fprintf(fd, "%s addr:%p size:%ld", s, addr, (long)omSizeOfAddr(addr));
 
   if (error == omError_WrongSize && (flags & OM_FSIZE))
-    fprintf(fd, " specified size:%ld", (size_t) bin_size);
+    fprintf(fd, " specified size:%ld", (long) bin_size);
 
   if (error == omError_WrongBin && (flags & OM_FBIN))
-    fprintf(fd, " specified bin is of size:%ld", ((omBin) bin_size)->sizeW << LOG_SIZEOF_LONG);
+    fprintf(fd, " specified bin is of size:%ld",
+                 (long)((omBin) bin_size)->sizeW << LOG_SIZEOF_LONG);
 
   if (omIsTrackAddr(addr))
     omPrintTrackAddrInfo(fd, addr, frames);
@@ -562,7 +563,7 @@ void omPrintUsedAddrs(FILE* fd, int max)
   om_print_frames = max;
   omIterateTroughAddrs(1, 1, _omPrintUsedAddr, NULL);
   fprintf(fd, "UsedAddrs Summary: UsedBlocks:%ld  TotalSize:%ld\n",
-          om_total_used_blocks, om_total_used_size);
+          om_total_used_blocks, (long)om_total_used_size);
 }
 
 void omPrintUsedTrackAddrs(FILE* fd, int max)
@@ -573,6 +574,6 @@ void omPrintUsedTrackAddrs(FILE* fd, int max)
   om_print_frames = max;
   omIterateTroughAddrs(0, 1 ,  _omPrintUsedAddr, NULL);
   fprintf(fd, "UsedTrackAddrs Summary: UsedBlocks:%ld  TotalSize:%ld\n",
-          om_total_used_blocks, om_total_used_size);
+          om_total_used_blocks, (long)om_total_used_size);
 }
 #endif /* ! OM_NDEBUG */
