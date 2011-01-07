@@ -349,7 +349,6 @@ lists primeFactorisation(const number n, const number pBound)
 #include <kernel/timer.h>
 #include <kernel/intvec.h>
 #include <kernel/ring.h>
-#include <Singular/omSingularConfig.h>
 #include <kernel/p_Procs.h>
 /* Needed for debug Version of p_SetRingOfLeftv, Oliver */
 #ifdef PDEBUG
@@ -699,6 +698,7 @@ BOOLEAN setOption(leftv res, leftv v)
     v=v->next;
   } while (v!=NULL);
   // set global variable to show memory usage
+  extern int om_sing_opt_show_mem;
   if (BVERBOSE(V_SHOW_MEM)) om_sing_opt_show_mem = 1;
   else om_sing_opt_show_mem = 0;
   return FALSE;
