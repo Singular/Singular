@@ -74,9 +74,6 @@ ifdef OM_MALLOC_SOURCE
 GSOURCES := ${GSOURCES} omMalloc.c
 endif
 
-# ASO_SOURCES
-ASO_SOURCES =
-
 HEADERS= 	       mylimits.h             omlimits.h \
 om_Alloc.h             omList.h  	      omDerivedConfig.h \
 omAllocDecl.h          omConfig.h             omMemOps.h	\
@@ -95,8 +92,6 @@ SOURCES=${CSOURCES} omGetPageSize.h omMallocSystem.h gmalloc.c dlmalloc.h dlmall
         omMmap.c gmalloc.c omTables.c pmalloc.h pmalloc.c omalloc.c omalloc_debug.c  \
 	$(TESTSOURCES) omtTestAlloc.c
 
-ASO_OBJS := $(ASO_SOURCES:.aso.cc=.aso)
-
 DISTFILES=$(SOURCES) $(HEADERS) omtTest.h makeheader Makefile.in \
            omConfig.h.in omlimits.h.in mylimits.h configure.in mkinstalldirs install-sh configure
 
@@ -108,13 +103,6 @@ DISTFILES=$(SOURCES) $(HEADERS) omtTest.h makeheader Makefile.in \
 
 %.o_ndebug: %.c omConfig.h omlimits.h mylimits.h omTables.h omalloc.h omTables.inc
 	${CC} ${CFLAGS} ${CPPFLAGS} ${DEFS} -DOM_NDEBUG -c $< -o $@
-
-%.aso.o: %.aso.cc mmtables.inc
-	${CXX} ${CXXFLAGS} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFS} $< -o $@
-.PRECIOUS: %.aso.o
-
-%.aso: %.aso.o
-	./$< > $@
 
 all:	libomalloc.a libomalloc_ndebug.a omalloc.h omalloc.o omalloc_debug.o
 
@@ -206,7 +194,6 @@ install: all
 	$(INSTALL_DATA) omalloc.o $(libdir)
 	$(INSTALL_DATA) omalloc_debug.o $(libdir)
 	$(INSTALL_DATA) omalloc.h $(includedir)
-	$(INSTALL_DATA) omalloc.c $(includedir)
 	$(INSTALL_DATA) omlimits.h $(includedir)
 	$(INSTALL_DATA) mylimits.h $(includedir)
 
@@ -221,12 +208,11 @@ install_min: libomalloc_ndebug.a omalloc.o
 	$(RANLIB) $(libdir)/libomalloc_ndebug.a
 	$(INSTALL_DATA) omalloc.o $(libdir)
 	$(INSTALL_DATA) omalloc.h $(includedir)
-	$(INSTALL_DATA) omalloc.c $(includedir)
 	$(INSTALL_DATA) omlimits.h $(includedir)
 	$(INSTALL_DATA) mylimits.h $(includedir)
 
 uninstall:
-	rm -f $(includedir)/omalloc.h $(includedir)/omalloc.c
+	rm -f $(includedir)/omalloc.h
 	rm -f $(libdir)/libomalloc.a $(libdir)/libomalloc_ndebug.a $(libdir)/libomalloc_p.a $(libdir)/omalloc.o $(libdir)/omalloc_debug.o
 
 ##
