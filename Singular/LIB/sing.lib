@@ -924,7 +924,7 @@ EXAMPLE: example codim; shows an example
 }
 example
 { "EXAMPLE:"; echo = 2;
-   ring r  = 0,(x,y,z),dp;
+   ring r  = 0,(x,y),dp;
    ideal j = y6,x4;
    ideal m = x,y;
    attrib(m,"isSB",1);  //let Singular know that ideals are a standard basis
