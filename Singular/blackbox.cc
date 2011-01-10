@@ -33,7 +33,7 @@ void blackbox_default_Print(blackbox *b,void *d)
   PrintS(s);
   omFree(s);
 }
-void *blackbox_default_Init()
+void *blackbox_default_Init(blackbox *b)
 {
   return NULL;
 }
@@ -58,7 +58,7 @@ BOOLEAN blackbox_default_OpM(int op,leftv l, leftv r)
   return TRUE;
 }
 
-int setBlackboxStuff(blackbox *bb, char *n)
+int setBlackboxStuff(blackbox *bb, const char *n)
 {
   blackboxTable[blackboxTableCnt]=bb;
   blackboxName[blackboxTableCnt]=omStrDup(n);

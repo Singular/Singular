@@ -191,7 +191,7 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
              Print("bb-type %d\n",t);
 	     blackbox *bb=getBlackboxStuff(t);
 	     if (bb!=NULL)
-	       IDSTRING(h)=(char *)bb->blackbox_Init();
+	       IDSTRING(h)=(char *)bb->blackbox_Init(bb);
 	   }
 	   else
 	     Werror("unknown type %d",t);

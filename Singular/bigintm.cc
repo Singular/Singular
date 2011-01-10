@@ -9,7 +9,7 @@
 
 // as this is only a demo,
 // we do not included compiled code:
-#if 1
+#if 0
 char * bigintm_String(blackbox *b, void *d);
 void * bigintm_Copy(blackbox*b, void *d);
 BOOLEAN bigintm_Assign(leftv l, leftv r);
