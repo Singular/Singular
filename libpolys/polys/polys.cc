@@ -34,27 +34,6 @@ BOOLEAN pLexOrder;
 /* the highest monomial below pHEdge */
 poly      ppNoether = NULL;
 
-#ifdef HAVE_RINGS   //TODO Oliver
-#define pDiv_nn(p, n)              p_Div_nn(p, n, currRing)
-
-poly p_Div_nn(poly p, const number n, const ring r)
-{
-  pAssume(!n_IsZero(n,r));
-  p_Test(p, r);
-
-  poly q = p;
-  while (p != NULL)
-  {
-    number nc = pGetCoeff(p);
-    pSetCoeff0(p, n_Div(nc, n, r));
-    n_Delete(&nc, r);
-    pIter(p);
-  }
-  p_Test(q, r);
-  return q;
-}
-#endif
-
 #ifdef HAVE_RINGS
 /* TRUE iff LT(f) | LT(g) */
 BOOLEAN pDivisibleByRingCase(poly f, poly g)

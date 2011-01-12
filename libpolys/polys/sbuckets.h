@@ -14,15 +14,15 @@
 #ifndef S_BUCKETS_H
 #define S_BUCKETS_H
 
-#include <kernel/structs.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 
 
-
+class sBucket;
+typedef sBucket*           sBucket_pt;
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
 //
-sBucket_pt    sBucketCreate(ring r = currRing);
+sBucket_pt    sBucketCreate(ring r);
 void          sBucketDestroy(sBucket_pt *bucket);
 
 

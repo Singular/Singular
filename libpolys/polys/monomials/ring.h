@@ -10,7 +10,291 @@
 
 /* includes */
 #include <coeffs/coeffs.h>
+#include <omalloc/omalloc.h>
 //#include <polys/monomials/polys-impl.h>
+//
+
+/* constants */
+#define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
+
+/* forward declaration of types */
+class idrec;
+typedef idrec *   idhdl;
+struct sip_sideal;
+typedef struct sip_sideal *       ideal;
+struct ip_sring;
+typedef struct ip_sring *         ring;
+struct  spolyrec;
+typedef struct spolyrec    polyrec;
+typedef polyrec *          poly;
+class intvec;
+struct p_Procs_s;
+typedef struct p_Procs_s p_Procs_s;
+class slists;
+typedef slists *           lists;
+class kBucket;
+typedef kBucket*           kBucket_pt;
+
+#if SIZEOF_LONG == 4
+typedef long long int64;
+#elif SIZEOF_LONG == 8
+typedef long int64;
+#else
+#error int64 undefined
+#endif
+
+/* the function pointer types */
+
+typedef long     (*pLDegProc)(poly p, int *length, ring r);
+typedef long     (*pFDegProc)(poly p, ring r);
+typedef void     (*p_SetmProc)(poly p, const ring r);
+
+typedef enum
+{
+  ro_dp, // ordering is a degree ordering
+  ro_wp, // ordering is a weighted degree ordering
+  ro_wp64, // ordering is a weighted64 degree ordering
+  ro_wp_neg, // ordering is a weighted degree ordering
+             // with possibly negative weights
+  ro_cp,    // ordering duplicates variables
+  ro_syzcomp, // ordering indicates "subset" of component number (ringorder_S)
+  ro_syz, // ordering  with component number >syzcomp is lower (ringorder_s)
+  ro_isTemp, ro_is, // Induced Syzygy (Schreyer) ordering (and prefix data placeholder dummy) (ringorder_IS)
+  ro_none
+}
+ro_typ;
+
+// ordering is a degree ordering
+struct sro_dp
+{
+  short place;  // where degree is stored (in L):
+  short start;  // bounds of ordering (in E):
+  short end;
+};
+typedef struct sro_dp sro_dp;
+
+// ordering is a weighted degree ordering
+struct sro_wp
+{
+  short place;  // where weighted degree is stored (in L)
+  short start;  // bounds of ordering (in E)
+  short end;
+  int *weights; // pointers into wvhdl field
+};
+typedef struct sro_wp sro_wp;
+
+// ordering is a weighted degree ordering
+struct sro_wp64
+{
+    short place;  // where weighted degree is stored (in L)
+    short start;  // bounds of ordering (in E)
+    short end;
+    int64 *weights64; // pointers into wvhdl field
+};
+typedef struct sro_wp64 sro_wp64;
+
+// ordering duplicates variables
+struct sro_cp
+{
+  short place;  // where start is copied to (in E)
+  short start;  // bounds of sources of copied variables (in E)
+  short end;
+};
+typedef struct sro_cp sro_cp;
+
+// ordering indicates "subset" of component number
+struct sro_syzcomp
+{
+  short place;  // where the index is stored (in L)
+  long *ShiftedComponents; // pointer into index field
+  int* Components;
+#ifdef PDEBUG
+  long length;
+#endif
+};
+typedef struct sro_syzcomp sro_syzcomp;
+
+// ordering  with component number >syzcomp is lower
+struct sro_syz
+{
+  short place;       // where the index is stored (in L)
+  int limit;         // syzcomp
+  int* syz_index;    // mapping Component -> SyzIndex for Comp <= limit
+  int  curr_index;   // SyzIndex for Component > limit
+};
+
+typedef struct sro_syz sro_syz;
+// Induced Syzygy (Schreyer) ordering is built inductively as follows:
+// we look for changes made by ordering blocks which are between prefix/suffix markers:
+// that is: which variables where placed by them and where (judging by v)
+
+// due to prefix/suffix nature we need some placeholder:
+// prefix stores here initial state
+// suffix cleares this up
+struct sro_ISTemp
+{
+  short start; // 1st member SHOULD be short "place"
+  int   suffixpos;
+  int*  pVarOffset; // copy!
+};
+
+// So this is the actuall thing!
+// suffix uses last sro_ISTemp (cleares it up afterwards) and
+// creates this block
+struct sro_IS
+{
+  short start, end;  // which part of L we want to want to update...
+  int*  pVarOffset; // same as prefix!
+
+  int limit; // first referenced component
+
+  // reference poly set?? // Should it be owned by ring?!!!
+  ideal F; // reference leading (module)-monomials set. owned by ring...
+  const intvec* componentWeights; // component weights! owned by ring...
+};
+
+typedef struct sro_IS sro_IS;
+typedef struct sro_ISTemp sro_ISTemp;
+
+struct sro_ord
+{
+  ro_typ  ord_typ;
+  int     order_index; // comes from r->order[order_index]
+  union
+  {
+     sro_dp dp;
+     sro_wp wp;
+     sro_wp64 wp64;
+     sro_cp cp;
+     sro_syzcomp syzcomp;
+     sro_syz syz;
+     sro_IS is;
+     sro_ISTemp isTemp;
+  } data;
+};
+struct ip_sring
+{
+// each entry must have a description and a procedure defining it,
+// general ordering: pointer/structs, long, int, short, BOOLEAN/char/enum
+// general defining procedures: rInit, rComplete, interpreter, ??
+  idhdl      idroot; /* local objects , interpreter*/
+  int*       order;  /* array of orderings, rInit/rSleftvOrdering2Ordering */
+  int*       block0; /* starting pos., rInit/rSleftvOrdering2Ordering*/
+  int*       block1; /* ending pos., rInit/rSleftvOrdering2Ordering*/
+  char**     parameter; /* names of parameters, rInit */
+  number     minpoly;  /* for Q_a/Zp_a, rInit */
+  ideal      minideal;
+  int**      wvhdl;  /* array of weight vectors, rInit/rSleftvOrdering2Ordering */
+  char **    names;  /* array of variable names, rInit */
+
+  // what follows below here should be set by rComplete, _only_
+  long      *ordsgn;  /* array of +/- 1 (or 0) for comparing monomials */
+                       /*  ExpL_Size entries*/
+
+  // is NULL for lp or N == 1, otherwise non-NULL (with OrdSize > 0 entries) */
+  sro_ord*   typ;   /* array of orderings + sizes, OrdSize entries */
+  /* if NegWeightL_Size > 0, then NegWeightL_Offset[0..size_1] is index of longs
+  in ExpVector whose values need an offset due to negative weights */
+  /* array of NegWeigtL_Size indicies */
+  int*      NegWeightL_Offset;
+
+  int*     VarOffset;
+
+  ideal      qideal; /* extension to the ring structure: qring, rInit */
+
+  int*     firstwv;
+
+  omBin    PolyBin; /* Bin from where monoms are allocated */
+#ifdef HAVE_RINGS
+  unsigned int  ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
+  int_number    ringflaga; /* Z/(ringflag^ringflagb)=Z/nrnModul*/
+  unsigned long ringflagb;
+  unsigned long nr2mModul;  /* Z/nr2mModul */
+  int_number    nrnModul;
+#endif
+  unsigned long options; /* ring dependent options */
+
+  int        ch;  /* characteristic, rInit */
+  int        ref; /* reference counter to the ring, interpreter */
+
+  short      float_len; /* additional char-flags, rInit */
+  short      float_len2; /* additional char-flags, rInit */
+
+  short      N;      /* number of vars, rInit */
+
+  short      P;      /* number of pars, rInit */
+  short      OrdSgn; /* 1 for polynomial rings, -1 otherwise, rInit */
+
+  short     firstBlockEnds;
+#ifdef HAVE_PLURAL
+  short     real_var_start, real_var_end;
+#endif
+
+#ifdef HAVE_SHIFTBBA
+  short          isLPring; /* 0 for non-letterplace rings, otherwise the number of LP blocks, at least 1, known also as lV */
+#endif
+
+  BOOLEAN   VectorOut;
+  BOOLEAN   ShortOut;
+  BOOLEAN   CanShortOut;
+  BOOLEAN   LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
+  BOOLEAN   MixedOrder; // TRUE for global/local mixed orderings, FALSE otherwise
+
+  BOOLEAN   ComponentOrder; // ???
+
+  // what follows below here should be set by rComplete, _only_
+  // contains component, but no weight fields in E */
+  short      ExpL_Size; // size of exponent vector in long
+  short      CmpL_Size; // portions which need to be compared
+  /* number of long vars in exp vector:
+     long vars are those longs in the exponent vector which are
+     occupied by variables, only */
+  short      VarL_Size;
+  short      BitsPerExp; /* number of bits per exponent */
+  short      ExpPerLong; /* maximal number of Exponents per long */
+  short      pCompIndex; /* p->exp.e[pCompIndex] is the component */
+  short      pOrdIndex; /* p->exp[pOrdIndex] is pGetOrd(p) */
+  short      OrdSize; /* size of ord vector (in sro_ord) */
+
+  /* if >= 0, long vars in exp vector are consecutive and start there
+     if <  0, long vars in exp vector are not consecutive */
+  short     VarL_LowIndex;
+  // number of exponents in r->VarL_Offset[0]
+  // is minimal number of exponents in a long var
+  short     MinExpPerLong;
+
+  short     NegWeightL_Size;
+  /* array of size VarL_Size,
+     VarL_Offset[i] gets i-th long var in exp vector */
+  int*      VarL_Offset;
+
+  /* mask for getting single exponents */
+  unsigned long bitmask;
+  /* mask used for divisiblity tests */
+  unsigned long divmask; // rComplete
+
+  p_Procs_s*    p_Procs; // rComplete/p_ProcsSet
+
+  /* FDeg and LDeg */
+  pFDegProc     pFDeg; // rComplete/rSetDegStuff
+  pLDegProc     pLDeg; // rComplete/rSetDegStuff
+
+  /* as it was determined by rComplete */
+  pFDegProc     pFDegOrig;
+  /* and as it was determined before rOptimizeLDeg */
+  pLDegProc     pLDegOrig;
+
+  p_SetmProc    p_Setm;
+  n_Procs_s*    cf;
+  ring          algring;
+#ifdef HAVE_PLURAL
+  private:
+    nc_struct*    _nc; // private
+  public:
+    inline const nc_struct* GetNC() const { return _nc; }; // public!!!
+    inline nc_struct*& GetNC() { return _nc; }; // public!!!
+#endif
+};
 
 enum tHomog
 {
@@ -41,7 +325,7 @@ static inline bool rIsPluralRing(const ring r)
 {
 #ifdef HAVE_PLURAL
   nc_struct *n;
-  return (r != NULL) && ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/; 
+  return (r != NULL) && ((n=r->GetNC()) != NULL) /*&& (n->type != nc_error)*/;
 #else
   return false;
 #endif
@@ -52,7 +336,7 @@ static inline bool rIsRatGRing(const ring r)
 #ifdef HAVE_PLURAL
   /* nc_struct *n; */
   return (r != NULL) /* && ((n=r->GetNC()) != NULL) */
-	  && (r->real_var_start>1);
+          && (r->real_var_start>1);
 #else
   return false;
 #endif
@@ -68,18 +352,18 @@ static inline bool rIsRatGRing(const ring r)
 void rDBChangeSComps(int* currComponents,
                      long* currShiftedComponents,
                      int length,
-                     ring r = currRing);
+                     ring r);
 void rDBGetSComps(int** currComponents,
                   long** currShiftedComponents,
                   int *length,
-                  ring r = currRing);
+                  ring r);
 #else
 #define rChangeSComps(c,s,l) rNChangeSComps(c,s)
 #define rGetSComps(c,s,l) rNGetSComps(c,s)
 #endif
 
-void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r = currRing);
-void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r = currRing);
+void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r);
+void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r);
 
 //idhdl  rFindHdl(ring r, idhdl n, idhdl w);
 //idhdl rSimpleFindHdl(ring r, idhdl root, idhdl n);
@@ -93,7 +377,7 @@ int    rChar(ring r);
 #define rPar(r) (r->P)
 #define rVar(r) (r->N)
 char * rParStr(ring r);
-int    rIsExtension(const ring r=currRing);
+int    rIsExtension(const ring r);
 int    rSum(ring r1, ring r2, ring &sum);
 int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp);
 
@@ -270,15 +554,11 @@ static inline int rBlocks(ring r)
 }
 
 // misc things
-static inline char* rRingVar(short i)
-{
-  return currRing->names[i];
-}
-static inline char* rRingVar(short i, ring r)
+static inline char* rRingVar(short i, const ring r)
 {
   return r->names[i];
 }
-static inline BOOLEAN rShortOut(ring r)
+static inline BOOLEAN rShortOut(const ring r)
 {
   return (r->ShortOut);
 }
@@ -331,7 +611,7 @@ typedef enum rOrderType_t
 static inline BOOLEAN rIsSyzIndexRing(const ring r)
 { return r->order[0] == ringorder_s;}
 
-static inline int rGetCurrSyzLimit(const ring r = currRing)
+static inline int rGetCurrSyzLimit(const ring r)
 { return (rIsSyzIndexRing(r)? r->typ[0].data.syz.limit : 0);}
 
 // Ring Manipulations
@@ -374,7 +654,7 @@ BOOLEAN rOrd_SetCompRequiresSetm(ring r);
 rOrderType_t    rGetOrderType(ring r);
 
 /// returns TRUE if var(i) belongs to p-block
-BOOLEAN rIsPolyVar(int i, ring r = currRing);
+BOOLEAN rIsPolyVar(int i, ring r);
 
 static inline BOOLEAN rOrd_is_Comp_dp(ring r)
 {
