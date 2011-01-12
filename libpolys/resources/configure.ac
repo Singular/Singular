@@ -26,35 +26,9 @@ if test "$ac_cv_singuname" = unknown; then
   AC_MSG_WARN(Unknown architecture: Check singuname.sh)
   ac_cv_singuname="unknown"
 fi
-AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname")
+AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname", Singular's own uname\, believe it or not)
 SINGUNAME=$ac_cv_singuname
 AC_SUBST(SINGUNAME)
-
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl path stuff
-dnl
-
-project=singular
-component=resources
-
-AC_SUBST(project)
-
-dnl set exec_prefix, libdir, includedir to some sensible values
-dnl if they are not yet already set
-
-# expand prefix
-test "x$prefix" = xNONE && prefix=$ac_default_prefix
-
-# expand exec_prefixad
-if test "x$exec_prefix" = xNONE; then
- exec_prefix=${prefix}
-fi
-
-# expand libdir
-test "x$libdir" = 'x${exec_prefix}/lib'&& libdir="${exec_prefix}/lib/${project}/${component}"
-
-# expand includedir
-test "x$includedir" = 'x${prefix}/include' && includedir="${exec_prefix}/include/${project}/${component}"
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

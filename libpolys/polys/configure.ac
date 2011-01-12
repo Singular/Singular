@@ -27,4 +27,15 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([memset])
 
 AC_CONFIG_FILES([Makefile])
+
+case $DL_KERNEL in
+ static)        DL_KERNEL_OBJECT='p_Procs_Static.$(OBJEXT)'
+ 		DL_KERNEL_OBJECT_DEBUG='p_Procs_Static.$(OBJEXT)g' ;;
+ dynamic)       DL_KERNEL_OBJECT='p_Procs_Dynamic.$(OBJEXT)'
+ 	        DL_KERNEL_OBJECT_DEBUG='p_Procs_Dynamic.$(OBJEXT)g' ;;
+esac
+
+AC_SUBST([DL_KERNEL_OBJECT])
+AC_SUBST([DL_KERNEL_OBJECT_DEBUG])
+
 AC_OUTPUT
