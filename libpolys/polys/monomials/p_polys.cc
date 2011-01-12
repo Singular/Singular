@@ -9,12 +9,14 @@
  *  Version: $Id$
  *******************************************************************/
 
+#include <ctype.h>
 
 #include <misc/auxiliary.h>
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
+#include <coeffs/longrat.h>
 // #include <???/ideals.h>
 // #include <???/int64vec.h>
 #ifndef NDEBUG
@@ -535,7 +537,7 @@ long p_WDegree(poly p, const ring r)
     j+=p_GetExp(p, i, r)*r->firstwv[i-1];
 
   for (;i<=r->N;i++)
-    j+=p_GetExp(p,i, r)*pWeight(i, r);
+    j+=p_GetExp(p,i, r)*p_Weight(i, r);
 
   return j;
 }
@@ -1116,8 +1118,8 @@ poly p_ISet(int i, const ring r)
   if (i!=0)
   {
     rc = p_Init(r);
-    pSetCoeff0(rc,n_Init(i,r));
-    if (r->cf->nIsZero(p_GetCoeff(rc,r)))
+    pSetCoeff0(rc,n_Init(i,r->cf));
+    if (n_IsZero(pGetCoeff(rc),r->cf))
       p_LmDelete(&rc,r);
   }
   return rc;
@@ -1129,7 +1131,7 @@ poly p_ISet(int i, const ring r)
 poly p_One(const ring r)
 {
   poly rc = p_Init(r);
-  pSetCoeff0(rc,n_Init(1,r));
+  pSetCoeff0(rc,n_Init(1,r->cf));
   return rc;
 }
 
@@ -1166,7 +1168,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
   if (r==NULL) { rc=NULL;return st;}
   int i,j;
   rc = p_Init(r);
-  const char *s = r->cf->nRead(st,&(rc->coef));
+  const char *s = r->cf->cfRead(st,&(rc->coef),r->cf);
   if (s==st)
   /* i.e. it does not start with a coeff: test if it is a ringvar*/
   {
@@ -1205,7 +1207,7 @@ const char * p_Read(const char *st, poly &rc, const ring r)
     }
   }
 done:
-  if (r->cf->nIsZero(pGetCoeff(rc))) p_LmDelete(&rc,r);
+  if (n_IsZero(pGetCoeff(rc),r->cf)) p_LmDelete(&rc,r);
   else
   {
 #ifdef HAVE_PLURAL
@@ -1259,9 +1261,9 @@ poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
 */
 poly p_NSet(number n, const ring r)
 {
-  if (r->cf->nIsZero(n))
+  if (n_IsZero(n,r->cf))
   {
-    r->cf->cfDelete(&n, r);
+    n_Delete(&n, r->cf);
     return NULL;
   }
   else
@@ -1282,7 +1284,7 @@ poly p_Divide(poly a, poly b, const ring r)
 {
   assume((p_GetComp(a,r)==p_GetComp(b,r)) || (p_GetComp(b,r)==0));
   int i;
-  poly result = pInit();
+  poly result = p_Init(r);
 
   for(i=(int)r->N; i; i--)
     p_SetExp(result,i, p_GetExp(a,i,r)- p_GetExp(b,i,r),r);
@@ -1290,6 +1292,26 @@ poly p_Divide(poly a, poly b, const ring r)
   p_Setm(result,r);
   return result;
 }
+
+#ifdef HAVE_RINGS   //TODO Oliver
+
+poly p_Div_nn(poly p, const number n, const ring r)
+{
+  pAssume(!n_IsZero(n,r));
+  p_Test(p, r);
+
+  poly q = p;
+  while (p != NULL)
+  {
+    number nc = pGetCoeff(p);
+    pSetCoeff0(p, n_Div(nc, n, r->cf));
+    n_Delete(&nc, r->cf);
+    pIter(p);
+  }
+  p_Test(q, r);
+  return q;
+}
+#endif
 
 /*2
 * divides a by the monomial b, ignores monomials which are not divisible
@@ -1322,12 +1344,12 @@ poly p_DivideM(poly a, poly b, const ring r)
     {
       if (prev==NULL)
       {
-        p_DeleteLm(&result,r);
+        p_LmDelete(&result,r);
         a=result;
       }
       else
       {
-        p_DeleteLm(&pNext(prev),r);
+        p_LmDelete(&pNext(prev),r);
         a=pNext(prev);
       }
     }
@@ -1405,7 +1427,7 @@ poly p_Diff(poly a, int k, const ring r)
   return res;
 }
 
-static poly pDiffOpM(poly a, poly b,BOOLEAN multiply, const ring r)
+static poly p_DiffOpM(poly a, poly b,BOOLEAN multiply, const ring r)
 {
   int i,j,s;
   number n,h,hh;
@@ -1475,12 +1497,12 @@ static poly p_MonPower(poly p, int exp, const ring r)
 {
   int i;
 
-  if(!n_IsOne(pGetCoeff(p),r))
+  if(!n_IsOne(pGetCoeff(p),r->cf))
   {
     number x, y;
     y = pGetCoeff(p);
-    n_Power(y,exp,&x,r);
-    n_Delete(&y,r);
+    n_Power(y,exp,&x,r->cf);
+    n_Delete(&y,r->cf);
     pSetCoeff0(p,x);
   }
   for (i=rVar(r); i!=0; i--)
@@ -1501,8 +1523,8 @@ static void p_MonMult(poly p, poly q, const ring r)
   int i;
 
   y = pGetCoeff(p);
-  x = n_Mult(y,pGetCoeff(q),r);
-  n_Delete(&y,r);
+  x = n_Mult(y,pGetCoeff(q),r->cf);
+  n_Delete(&y,r->cf);
   pSetCoeff0(p,x);
   //for (i=pVariables; i!=0; i--)
   //{
@@ -1522,7 +1544,7 @@ static poly p_MonMultC(poly p, poly q, const ring rr)
   int i;
   poly r = p_Init(rr);
 
-  x = n_Mult(pGetCoeff(p),pGetCoeff(q),rr);
+  x = n_Mult(pGetCoeff(p),pGetCoeff(q),rr->cf);
   pSetCoeff0(r,x);
   p_ExpVectorSum(r,p, q, rr);
   return r;
@@ -1565,7 +1587,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   for (e=exp-1; e>eh; e--)
   {
     h = a[e];
-    x = n_Mult(bin[exp-e],pGetCoeff(h),r);
+    x = n_Mult(bin[exp-e],pGetCoeff(h),r->cf);
     p_SetCoeff(h,x,r);
     p_MonMult(h,b,r);
     res = pNext(res) = h;
@@ -1574,7 +1596,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   for (e=eh; e!=0; e--)
   {
     h = a[e];
-    x = n_Mult(bin[e],pGetCoeff(h),r);
+    x = n_Mult(bin[e],pGetCoeff(h),r->cf);
     p_SetCoeff(h,x,r);
     p_MonMult(h,b,r);
     res = pNext(res) = h;
@@ -1709,7 +1731,7 @@ void p_Content(poly ph, const ring r)
   {
     if ((ph!=NULL) && rField_has_Units(r))
     {
-      number k = nGetUnit(pGetCoeff(ph));
+      number k = n_GetUnit(pGetCoeff(ph),r->cf);
       if (!n_IsOne(k,r->cf))
       {
         number tmpGMP = k;
@@ -1734,13 +1756,13 @@ void p_Content(poly ph, const ring r)
   if(TEST_OPT_CONTENTSB) return;
   if(pNext(ph)==NULL)
   {
-    p_SetCoeff(ph,n_Init(1,r),r->cf);
+    p_SetCoeff(ph,n_Init(1,r->cf),r);
   }
   else
   {
     n_Normalize(pGetCoeff(ph),r->cf);
     if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);
-    if (rField_is_Q())
+    if (rField_is_Q(r))
     {
       h=p_InitContent(ph,r);
       p=ph;
@@ -1804,7 +1826,7 @@ void p_Content(poly ph, const ring r)
       while (p!=NULL)
       { // each monom: coeff in Q_a
         lnumber c_n_n=(lnumber)pGetCoeff(p);
-        napoly c_n=c_n_n->z;
+        poly c_n=c_n_n->z;
         while (c_n!=NULL)
         { // each monom: coeff in Q
           d=nlLcm(hzz,pGetCoeff(c_n),r->algring);
@@ -1842,7 +1864,7 @@ void p_Content(poly ph, const ring r)
         while (p!=NULL)
         { // each monom: coeff in Q_a
           lnumber c_n_n=(lnumber)pGetCoeff(p);
-          napoly c_n=c_n_n->z;
+          poly c_n=c_n_n->z;
           while (c_n!=NULL)
           { // each monom: coeff in Q
             d=nlMult(h,pGetCoeff(c_n));
@@ -2200,7 +2222,7 @@ poly p_Cleardenom(poly ph, const ring r)
     h = n_Init(1,r->cf);
     while (p!=NULL)
     {
-      n_Normalize(pGetCoeff(p,r->cf));
+      n_Normalize(pGetCoeff(p),r->cf);
       d=n_Lcm(h,pGetCoeff(p),r->cf);
       n_Delete(&h,r->cf);
       h=d;
@@ -2479,7 +2501,7 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
     d=p_Totaldegree;
   else 
     d=pFDeg;
-  o = d(p,currRing);
+  o = d(p,r);
   do
   {
     if (d(qp,r) != o) return FALSE;
@@ -2782,7 +2804,7 @@ static pLDegProc pOldLDeg;
 static intvec * pModW;
 static BOOLEAN pOldLexOrder;
 
-static long pModDeg(poly p, ring r = currRing)
+static long pModDeg(poly p, ring r)
 {
   long d=pOldFDeg(p, r);
   int c=p_GetComp(p, r);
@@ -2880,9 +2902,9 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
             {
               number c=pGetCoeff(qq);
               number ee=nfPar(1);
-              number eee;nfPower(ee,e,&eee); //nfDelete(ee,currRing);
+              number eee;nfPower(ee,e,&eee); //nfDelete(ee,dst);
               ee=nfMult(c,eee);
-              //nfDelete(c,currRing);nfDelete(eee,currRing);
+              //nfDelete(c,dst);nfDelete(eee,dst);
               pSetCoeff0(qq,ee);
             }
             else
@@ -2892,7 +2914,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
                 napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
               else /* more difficult: we have really to multiply: */
               {
-                lnumber mmc=(lnumber)naInit(1,currRing);
+                lnumber mmc=(lnumber)naInit(1,dst);
                 napSetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
                 napSetm(mmc->z);
                 pGetCoeff(qq)=naMult((number)c,(number)mmc);

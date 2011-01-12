@@ -12,7 +12,8 @@ SOURCES = \
 	pDebug.cc pInline0.cc pInline1.cc pInline2.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	p_Procs_Lib.cc polys-impl.cc polys.cc \
-	polys0.cc polys1.cc prCopy.cc prCopyTemplate.cc
+	polys0.cc polys1.cc prCopy.cc prCopyTemplate.cc \
+	sbucktes.cc
 
 noinst_HEADERS =
 
@@ -21,7 +22,8 @@ include_HEADERS = \
 	pInline0.h pInline1.h pInline2.h operations/pShallowCopyDelete.h \
 	p_MemAdd.h p_MemCmp.h p_MemCopy.h operations/p_Mult_q.h p_Numbers.h p_Procs.h \
 	p_Procs_Dynamic.h p_Procs_Impl.h p_Procs_Set.h p_Procs_Static.h \
-	monomials/p_polys.h monomials/polys-impl.h monomials/polys.h prCopy.h prCopyMacros.h
+	monomials/p_polys.h monomials/polys-impl.h monomials/polys.h prCopy.h prCopyMacros.h \
+	sbuckets.h
 
 lib_LIBRARIES=libpolys.a libpolys_g.a
 
