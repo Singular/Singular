@@ -1,4 +1,4 @@
-PACKAGES=misc reporter resources coeffs
+PACKAGES=misc reporter resources coeffs polys
 
 SUBDIRS=$(PACKAGES)
 
