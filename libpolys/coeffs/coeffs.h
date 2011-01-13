@@ -283,6 +283,8 @@ static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
 #ifdef HAVE_RINGS
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 { return r->cfIsUnit(n,r); }
+static inline number n_GetUnit(number n, const coeffs r)
+{ return r->cfGetUnit(n,r); }
 static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 { return r->cfDivBy(a,b,r); }
 #endif
@@ -347,6 +349,9 @@ static inline number n_ExactDiv(number a, number b, const coeffs r)
 static inline number n_Gcd(number a, number b, const coeffs r)
 { return (r)->cfGcd(a,b,r); }
 
+static inline number n_Lcm(number a, number b, const coeffs r)
+{ return (r)->cfLcm(a,b,r); }
+
 /// Tests whether n is a correct number: only used if LDEBUG is defined
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 {
@@ -361,8 +366,8 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
 // Missing wrappers for:
-// cfIntMod, cfPar, cfParDeg, cfInt, cfRePart, cfImPart, cfRead, cfLcm, cfSetMap, cfName, cfInit_bigint
-// HAVE_RINGS: cfDivComp, cfIsUnit, cfGetUnit, cfExtGcd... cfDivBy
+// cfIntMod, cfPar, cfParDeg, cfInt, cfRePart, cfImPart, cfRead, cfSetMap, cfName, cfInit_bigint
+// HAVE_RINGS: cfDivComp, cfExtGcd... cfDivBy
 
 
 // Deprecated:

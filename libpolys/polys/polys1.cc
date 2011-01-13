@@ -32,40 +32,6 @@
 #endif
 
 
-/*3
-*  create binomial coef.
-*/
-static number* pnBin(int exp)
-{
-  int e, i, h;
-  number x, y, *bin=NULL;
-
-  x = nInit(exp);
-  if (nIsZero(x))
-  {
-    nDelete(&x);
-    return bin;
-  }
-  h = (exp >> 1) + 1;
-  bin = (number *)omAlloc0(h*sizeof(number));
-  bin[1] = x;
-  if (exp < 4)
-    return bin;
-  i = exp - 1;
-  for (e=2; e<h; e++)
-  {
-      x = nInit(i);
-      i--;
-      y = nMult(x,bin[e-1]);
-      nDelete(&x);
-      x = nInit(e);
-      bin[e] = nIntDiv(y,x);
-      nDelete(&x);
-      nDelete(&y);
-  }
-  return bin;
-}
-
 static void pnFreeBin(number *bin, int exp)
 {
   int e, h = (exp >> 1) + 1;

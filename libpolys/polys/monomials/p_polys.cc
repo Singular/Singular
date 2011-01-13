@@ -1550,6 +1550,40 @@ static poly p_MonMultC(poly p, poly q, const ring rr)
   return r;
 }
 
+/*3
+*  create binomial coef.
+*/
+static number* pnBin(int exp, const ring r)
+{
+  int e, i, h;
+  number x, y, *bin=NULL;
+
+  x = n_Init(exp,r->cf);
+  if (n_IsZero(x,r->cf))
+  {
+    n_Delete(&x,r->cf);
+    return bin;
+  }
+  h = (exp >> 1) + 1;
+  bin = (number *)omAlloc0(h*sizeof(number));
+  bin[1] = x;
+  if (exp < 4)
+    return bin;
+  i = exp - 1;
+  for (e=2; e<h; e++)
+  {
+      x = n_Init(i,r->cf);
+      i--;
+      y = n_Mult(x,bin[e-1],r->cf);
+      n_Delete(&x,r->cf);
+      x = n_Init(e,r->cf);
+      bin[e] = n_IntDiv(y,x,r->cf);
+      n_Delete(&x,r->cf);
+      n_Delete(&y,r->cf);
+  }
+  return bin;
+}
+
 /*
 *  compute for a poly p = head+tail, tail is monomial
 *          (head + tail)^exp, exp > 1
@@ -1829,16 +1863,16 @@ void p_Content(poly ph, const ring r)
         poly c_n=c_n_n->z;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(hzz,pGetCoeff(c_n),r->algring);
-          n_Delete(&hzz,r->algring);
+          d=nlLcm(hzz,pGetCoeff(c_n),r->algring->cf);
+          n_Delete(&hzz,r->algring->cf);
           hzz=d;
           pIter(c_n);
         }
         c_n=c_n_n->n;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(h,pGetCoeff(c_n),r->algring);
-          n_Delete(&h,r->algring);
+          d=nlLcm(h,pGetCoeff(c_n),r->algring->cf);
+          n_Delete(&h,r->algring->cf);
           h=d;
           pIter(c_n);
         }
@@ -1846,19 +1880,19 @@ void p_Content(poly ph, const ring r)
       }
       /* hzz contains the 1/lcm of all denominators in c_n_n->z*/
       /* h contains the 1/lcm of all denominators in c_n_n->n*/
-      number htmp=nlInvers(h);
-      number hzztmp=nlInvers(hzz);
-      number hh=nlMult(hzz,h);
-      nlDelete(&hzz,r->algring);
-      nlDelete(&h,r->algring);
-      number hg=nlGcd(hzztmp,htmp,r->algring);
-      nlDelete(&hzztmp,r->algring);
-      nlDelete(&htmp,r->algring);
-      h=nlMult(hh,hg);
-      nlDelete(&hg,r->algring);
-      nlDelete(&hh,r->algring);
-      nlNormalize(h);
-      if(!nlIsOne(h))
+      number htmp=nlInvers(h,r->algring->cf);
+      number hzztmp=nlInvers(hzz,r->algring->cf);
+      number hh=nlMult(hzz,h,r->algring->cf);
+      nlDelete(&hzz,r->algring->cf);
+      nlDelete(&h,r->algring->cf);
+      number hg=nlGcd(hzztmp,htmp,r->algring->cf);
+      nlDelete(&hzztmp,r->algring->cf);
+      nlDelete(&htmp,r->algring->cf);
+      h=nlMult(hh,hg,r->algring->cf);
+      nlDelete(&hg,r->algring->cf);
+      nlDelete(&hh,r->algring->cf);
+      nlNormalize(h,r->algring->cf);
+      if(!nlIsOne(h,r->algring->cf))
       {
         p=ph;
         while (p!=NULL)
@@ -1867,25 +1901,25 @@ void p_Content(poly ph, const ring r)
           poly c_n=c_n_n->z;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=nlMult(h,pGetCoeff(c_n));
-            nlNormalize(d);
-            nlDelete(&pGetCoeff(c_n),r->algring);
+            d=nlMult(h,pGetCoeff(c_n),r->algring->cf);
+            nlNormalize(d,r->algring->cf);
+            nlDelete(&pGetCoeff(c_n),r->algring->cf);
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
           c_n=c_n_n->n;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=nlMult(h,pGetCoeff(c_n));
-            nlNormalize(d);
-            nlDelete(&pGetCoeff(c_n),r->algring);
+            d=nlMult(h,pGetCoeff(c_n),r->algring->cf);
+            nlNormalize(d,r->algring->cf);
+            nlDelete(&pGetCoeff(c_n),r->algring->cf);
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
           pIter(p);
         }
       }
-      nlDelete(&h,r->algring);
+      nlDelete(&h,r->algring->cf);
     }
   }
 }
@@ -2251,7 +2285,7 @@ poly p_Cleardenom(poly ph, const ring r)
         pIter(p);
       }
       n_Delete(&h,r->cf);
-      if (nGetChar()==1)
+      if (n_GetChar(r->cf)==1)
       {
         loop
         {
@@ -2444,7 +2478,7 @@ int p_Size(poly p, const ring r)
 poly p_Homogen (poly p, int varnum, const ring r)
 {
   pFDegProc deg;
-  if (pLexOrder && (r->order[0]==ringorder_lp))
+  if (r->pLexOrder && (r->order[0]==ringorder_lp))
     deg=p_Totaldegree;
   else
     deg=pFDeg;
@@ -2497,7 +2531,7 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
 
   if ((p == NULL) || (pNext(p) == NULL)) return TRUE;
   pFDegProc d;
-  if (pLexOrder && (r->order[0]==ringorder_lp))
+  if (r->pLexOrder && (r->order[0]==ringorder_lp))
     d=p_Totaldegree;
   else 
     d=pFDeg;
@@ -2764,7 +2798,7 @@ void p_DeleteComp(poly * p,int k, const ring r)
 void p_SetGlobals(const ring r, BOOLEAN complete)
 {
   int i;
-  if (r->ppNoether!=NULL) p_Delete(&ppNoether,r);
+  if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r);
 
   if (complete)
   {
@@ -2827,7 +2861,7 @@ void p_SetModDeg(intvec *w, ring r)
   else
   {
     r->pModW = NULL;
-    pRestoreDegProcs(pOldFDeg, pOldLDeg);
+    pRestoreDegProcs(r,pOldFDeg, pOldLDeg);
     r->pLexOrder = pOldLexOrder;
   }
 }
@@ -2849,7 +2883,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
     if ((OldPar==0)||(rField_is_GF(oldRing)))
     {
       qq = p_Init(dst);
-      number n=nMap(pGetCoeff(p));
+      number n=nMap(pGetCoeff(p),dst->cf);
       if ((dst->minpoly!=NULL)
       && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
       {
@@ -2911,7 +2945,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
             {
               lnumber c=(lnumber)pGetCoeff(qq);
               if (c->z->next==NULL)
-                napAddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
+                p_AddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->algring);
               else /* more difficult: we have really to multiply: */
               {
                 lnumber mmc=(lnumber)naInit(1,dst);
@@ -2947,7 +2981,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
       p_Setm(qq,dst);
       p_Test(aq,dst);
       p_Test(qq,dst);
-      if (aq!=NULL) qq=p_Mult(aq,qq,dst);
+      if (aq!=NULL) qq=p_Mult_q(aq,qq,dst);
       aq = qq;
       while (pNext(aq) != NULL) pIter(aq);
       if (result_last==NULL)
