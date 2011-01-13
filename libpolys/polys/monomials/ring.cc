@@ -12,7 +12,9 @@
 
 // #include <polys/options.h>
 #include <omalloc/omalloc.h>
-#include <polys/polys.h>
+#include <misc/sy_bit.h>
+#include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
 #include <coeffs/numbers.h>
 // #include <???/febase.h>
 // #include <???/intvec.h>
@@ -37,7 +39,7 @@
 
 #define BITS_PER_LONG 8*SIZEOF_LONG
 
-omBin sip_sring_bin = omGetSpecBin(sizeof(sip_sring));
+omBin sip_sring_bin = omGetSpecBin(sizeof(ip_sring));
 
 static const char * const ringorder_name[] =
 {
@@ -101,8 +103,8 @@ void rChangeCurrRing(ring r)
  //   omCheckAddr(currRing->minpoly);
  // }
   /*------------ set global ring vars --------------------------------*/
-  currRing = r;
-  currQuotient=NULL;
+  //currRing = r;
+  //currQuotient=NULL;
   if (r != NULL)
   {
     rTest(r);
@@ -110,10 +112,10 @@ void rChangeCurrRing(ring r)
     currQuotient=r->qideal;
 
     /*------------ global variables related to coefficients ------------*/
-    nSetChar(r);
+    nSetChar(r->cf);
 
     /*------------ global variables related to polys -------------------*/
-    pSetGlobals(r);
+    p_SetGlobals(r);
     /*------------ global variables related to factory -------------------*/
 #ifdef HAVE_FACTORY
     //int c=ABS(nGetChar());
@@ -137,7 +139,7 @@ ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *
     r->names[i]  = omStrDup(n[i]);
   }
   /*weights: entries for 2 blocks: NULL*/
-  r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int_ptr));
+  r->wvhdl = (int **)omAlloc0((ord_size+1) * sizeof(int *));
   r->order = ord;
   r->block0 = block0;
   r->block1 = block1;
@@ -249,7 +251,7 @@ void rWrite(ring r)
   omCheckAddrSize(r->order,nblocks*sizeof(int));
   omCheckAddrSize(r->block0,nblocks*sizeof(int));
   omCheckAddrSize(r->block1,nblocks*sizeof(int));
-  omCheckAddrSize(r->wvhdl,nblocks*sizeof(int_ptr));
+  omCheckAddrSize(r->wvhdl,nblocks*sizeof(int *));
   omCheckAddrSize(r->names,r->N*sizeof(char_ptr));
 
   nblocks--;
@@ -259,11 +261,8 @@ void rWrite(ring r)
   {
     Print("//   # ground field : %d\n",rInternalChar(r));
     Print("//   primitive element : %s\n", r->parameter[0]);
-    if (r==currRing)
-    {
-      StringSetS("//   minpoly        : ");
-      nfShowMipo();PrintS(StringAppendS("\n"));
-    }
+    StringSetS("//   minpoly        : ");
+    nfShowMipo();PrintS(StringAppendS("\n"));
   }
 #ifdef HAVE_RINGS
   else if (rField_is_Ring(r))
@@ -312,18 +311,13 @@ void rWrite(ring r)
       {
         PrintS("0\n");
       }
-      else if (r==currRing)
-      {
-        StringSetS(""); nWrite(r->minpoly); PrintS(StringAppendS("\n"));
-      }
       else
       {
-        PrintS("...\n");
+        StringSetS(""); n_Write(r->minpoly,r->cf); PrintS(StringAppendS("\n"));
       }
       if (r->minideal!=NULL)
       {
-        if (r==currRing) iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,0);
-        else PrintS("//   minpolys=...");
+        iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,0);
         PrintLn();
       }
     }
@@ -447,13 +441,8 @@ void rWrite(ring r)
 #endif
   if (r->qideal!=NULL)
   {
-    PrintS("\n// quotient ring from ideal");
-    if (r==currRing)
-    {
-      PrintLn();
-      iiWriteMatrix((matrix)r->qideal,"_",1);
-    }
-    else PrintS(" ...");
+    PrintS("\n// quotient ring from ideal\n");
+    iiWriteMatrix((matrix)r->qideal,"_",1);
   }
 }
 
@@ -1181,7 +1170,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     tmpR.order=(int*)omAlloc(4*sizeof(int));
     tmpR.block0=(int*)omAlloc0(4*sizeof(int));
     tmpR.block1=(int*)omAlloc0(4*sizeof(int));
-    tmpR.wvhdl=(int**)omAlloc0(4*sizeof(int_ptr));
+    tmpR.wvhdl=(int**)omAlloc0(4*sizeof(int *));
     tmpR.order[0]=ringorder_dp;
     tmpR.block0[0]=1;
     tmpR.block1[0]=rVar(r1);
@@ -1219,7 +1208,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       tmpR.order=(int*)omAlloc(3*sizeof(int));
       tmpR.block0=(int*)omAlloc(3*sizeof(int));
       tmpR.block1=(int*)omAlloc(3*sizeof(int));
-      tmpR.wvhdl=(int**)omAlloc0(3*sizeof(int_ptr));
+      tmpR.wvhdl=(int**)omAlloc0(3*sizeof(int *));
       tmpR.order[0]=ringorder_unspec;
       tmpR.order[1]=ringorder_C;
       tmpR.order[2]=0;
@@ -1252,7 +1241,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       tmpR.order=(int*)omAlloc0(b*sizeof(int));
       tmpR.block0=(int*)omAlloc0(b*sizeof(int));
       tmpR.block1=(int*)omAlloc0(b*sizeof(int));
-      tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int_ptr));
+      tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int *));
       /* weights not implemented yet ...*/
       if (rb!=NULL)
       {
@@ -1312,7 +1301,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       tmpR.order=(int*)omAlloc0(b*sizeof(int));
       tmpR.block0=(int*)omAlloc0(b*sizeof(int));
       tmpR.block1=(int*)omAlloc0(b*sizeof(int));
-      tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int_ptr));
+      tmpR.wvhdl=(int**)omAlloc0(b*sizeof(int *));
       /* weights not implemented yet ...*/
       for (i=0;i<b;i++)
       {
@@ -1670,7 +1659,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   if (copy_ordering == TRUE)
   {
     i=rBlocks(r);
-    res->wvhdl   = (int **)omAlloc(i * sizeof(int_ptr));
+    res->wvhdl   = (int **)omAlloc(i * sizeof(int *));
     res->order   = (int *) omAlloc(i * sizeof(int));
     res->block0  = (int *) omAlloc(i * sizeof(int));
     res->block1  = (int *) omAlloc(i * sizeof(int));
@@ -2065,7 +2054,7 @@ BOOLEAN rOrd_is_Totaldegree_Ordering(ring r)
 }
 
 // return TRUE if p->exp[r->pOrdIndex] holds a weighted degree of p */
-BOOLEAN rOrd_is_WeightedDegree_Ordering(ring r =currRing)
+BOOLEAN rOrd_is_WeightedDegree_Ordering(ring r )
 {
   // Hmm.... what about Syz orderings?
   return ((rVar(r) > 1) &&
@@ -2741,7 +2730,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
   int *order=(int*)omAlloc0((nblocks+1)*sizeof(int));
   int *block0=(int*)omAlloc0((nblocks+1)*sizeof(int));
   int *block1=(int*)omAlloc0((nblocks+1)*sizeof(int));
-  int **wvhdl=(int**)omAlloc0((nblocks+1)*sizeof(int_ptr));
+  int **wvhdl=(int**)omAlloc0((nblocks+1)*sizeof(int *));
 
   int i=0;
   int j=0; /*  i index in r, j index in res */
@@ -2870,7 +2859,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
     omFreeSize(order,(nblocks+1)*sizeof(int));
     omFreeSize(block0,(nblocks+1)*sizeof(int));
     omFreeSize(block1,(nblocks+1)*sizeof(int));
-    omFreeSize(wvhdl,(nblocks+1)*sizeof(int_ptr));
+    omFreeSize(wvhdl,(nblocks+1)*sizeof(int *));
     return r;
   }
   ring res=(ring)omAlloc0Bin(sip_sring_bin);
@@ -2983,7 +2972,7 @@ ring rModifyRing_Wp(ring r, int* weights)
 #endif
 
   /*weights: entries for 3 blocks: NULL*/
-  res->wvhdl = (int **)omAlloc0(3 * sizeof(int_ptr));
+  res->wvhdl = (int **)omAlloc0(3 * sizeof(int *));
   /*order: Wp,C,0*/
   res->order = (int *) omAlloc(3 * sizeof(int *));
   res->block0 = (int *)omAlloc0(3 * sizeof(int *));
@@ -3040,7 +3029,7 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     int *order=(int*)omAlloc0((nblocks+1)*sizeof(int));
     int *block0=(int*)omAlloc0((nblocks+1)*sizeof(int));
     int *block1=(int*)omAlloc0((nblocks+1)*sizeof(int));
-    int **wvhdl=(int**)omAlloc0((nblocks+1)*sizeof(int_ptr));
+    int **wvhdl=(int**)omAlloc0((nblocks+1)*sizeof(int *));
 
     order[0]=ringorder_lp;
     block0[0]=1;
@@ -4230,10 +4219,6 @@ void p_DebugPrint(poly p, const ring r)
   }
 }
 
-void pDebugPrint(poly p)
-{
-  p_DebugPrint(p, currRing);
-}
 #endif // RDEBUG
 
 /// debug-print monomial poly/vector p, assuming that it lives in the ring R
@@ -4287,7 +4272,7 @@ void p_DebugPrint(const poly p, const ring lmRing, const ring tailRing, const in
 
 //    F = system("ISUpdateComponents", F, V, MIN );
 //    // replace gen(i) -> gen(MIN + V[i-MIN]) for all i > MIN in all terms from F!
-void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r = currRing)
+void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r )
 {
   assume( V != NULL );
   assume( MIN >= 0 );
@@ -4588,7 +4573,7 @@ ring rAssure_HasComp(ring r)
 
   ring new_r = rCopy0(r, FALSE, FALSE);
   i+=2;
-  new_r->wvhdl=(int **)omAlloc0(i * sizeof(int_ptr));
+  new_r->wvhdl=(int **)omAlloc0(i * sizeof(int *));
   new_r->order   = (int *) omAlloc0(i * sizeof(int));
   new_r->block0   = (int *) omAlloc0(i * sizeof(int));
   new_r->block1   = (int *) omAlloc0(i * sizeof(int));
@@ -4980,7 +4965,7 @@ int rGetISPos(const int p = 0, const ring r = currRing)
 /// F belong to r, we will DO a copy! (same to componentWeights)
 /// We will use it AS IS!
 /// returns true is everything was allright!
-bool rSetISReference(const ideal F, const int i = 0, const int p = 0, const intvec * componentWeights = NULL, const ring r = currRing)
+bool rSetISReference(const ideal F, const ring r,const int i = 0, const int p = 0, const intvec * componentWeights = NULL)
 {
   // Put the reference set F into the ring -ordering -recor
 
@@ -5188,9 +5173,9 @@ n_coeffType rFieldType(ring r)
   if (rField_is_long_C(r)) return n_long_C;
   #ifdef HAVE_RINGS
    if (rField_is_Ring_Z(r)) return n_Z;
-   if (rField_is_Ring_ModN(r)) return n_Zm;
+   if (rField_is_Ring_ModN(r)) return n_Zn;
    if (rField_is_Ring_PtoM(r)) return n_Zpn;
-   if (rField_is_Ring_2toM(r)) return  n_Z2n;
+   if (rField_is_Ring_2toM(r)) return  n_Z2m;
   #endif
 
   return n_unknown;
@@ -5221,7 +5206,7 @@ static int rRealloc1(ring r, int size, int pos)
   r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size+1)*sizeof(int));
   r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size+1)*sizeof(int));
   r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size+1)*sizeof(int));
-  r->wvhdl=(int_ptr*)omReallocSize(r->wvhdl,size*sizeof(int_ptr), (size+1)*sizeof(int_ptr));
+  r->wvhdl=(int **)omReallocSize(r->wvhdl,size*sizeof(int *), (size+1)*sizeof(int *));
   for(int k=size; k>pos; k--) r->wvhdl[k]=r->wvhdl[k-1];
   r->order[size]=0;
   size++;
@@ -5232,7 +5217,7 @@ static int rRealloc1(ring r, int size, int pos)
 //  r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size-1)*sizeof(int));
 //  r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size-1)*sizeof(int));
 //  r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size-1)*sizeof(int));
-//  r->wvhdl=(int_ptr*)omReallocSize(r->wvhdl,size*sizeof(int_ptr), (size-1)*sizeof(int_ptr));
+//  r->wvhdl=(int **)omReallocSize(r->wvhdl,size*sizeof(int *), (size-1)*sizeof(int *));
 //  for(int k=pos+1; k<size; k++) r->wvhdl[k]=r->wvhdl[k+1];
 //  size--;
 //  return size;
