@@ -566,7 +566,7 @@ static inline int rGetCurrSyzLimit(const ring r)
 // Ring Manipulations
 ring   rAssure_HasComp(ring r);
 ring   rCurrRingAssure_SyzComp();
-void   rSetSyzComp(int k);
+void   rSetSyzComp(int k, const ring r);
 ring   rCurrRingAssure_dp_S();
 ring   rCurrRingAssure_dp_C();
 ring   rCurrRingAssure_C_dp();
