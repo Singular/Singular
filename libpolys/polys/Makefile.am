@@ -9,20 +9,21 @@ AM_LDFLAGS	= -L${top_builddir}/../coeffs -L${top_builddir}/../reporter -L${top_b
 
 SOURCES = \
 	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc \
-	pDebug.cc pInline0.cc pInline1.cc pInline2.cc \
+	pDebug.cc pInline0.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
-	p_Procs_Lib.cc polys-impl.cc polys.cc \
+	templates/p_Procs_Lib.cc polys.cc \
 	polys0.cc polys1.cc prCopy.cc prCopyTemplate.cc \
-	sbucktes.cc
+	sbuckets.cc
 
 noinst_HEADERS =
 
 include_HEADERS = \
 	monomials/ring.h \
-	pInline0.h pInline1.h pInline2.h operations/pShallowCopyDelete.h \
-	p_MemAdd.h p_MemCmp.h p_MemCopy.h operations/p_Mult_q.h p_Numbers.h p_Procs.h \
-	p_Procs_Dynamic.h p_Procs_Impl.h p_Procs_Set.h p_Procs_Static.h \
-	monomials/p_polys.h monomials/polys-impl.h monomials/polys.h prCopy.h prCopyMacros.h \
+	pInline0.h operations/pShallowCopyDelete.h \
+	templates/p_MemAdd.h templates/p_MemCmp.h templates/p_MemCopy.h operations/p_Mult_q.h \
+	templates/p_Numbers.h templates/p_Procs.h \
+	templates/p_Procs_Dynamic.h templates/p_Procs_Impl.h templates/p_Procs_Set.h templates/p_Procs_Static.h \
+	monomials/p_polys.h monomials/polys-impl.h polys.h prCopy.h prCopyMacros.h \
 	sbuckets.h
 
 lib_LIBRARIES=libpolys.a libpolys_g.a
