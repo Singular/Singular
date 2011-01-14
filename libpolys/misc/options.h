@@ -8,15 +8,14 @@
  * ABSTRACT: macros for global options
  */
 
-#include <kernel/structs.h>
 /*the general set of std-options : test */
 /*the general set of verbose-options : verbose */
 #ifdef __cplusplus
-extern "C" BITSET test;
-extern "C" BITSET verbose;
+extern "C" unsigned test;
+extern "C" unsigned verbose;
 #else
-extern BITSET test;
-extern BITSET verbose;
+extern unsigned test;
+extern unsigned verbose;
 #endif
 
 /*

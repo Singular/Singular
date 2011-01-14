@@ -12,7 +12,7 @@
 
 // #include <polys/options.h>
 #include <omalloc/omalloc.h>
-#include <misc/sy_bit.h>
+#include <misc/options.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <coeffs/numbers.h>
@@ -1796,10 +1796,7 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if (r1->minpoly != NULL)
   {
     if (r2->minpoly == NULL) return FALSE;
-    if (currRing == r1 || currRing == r2)
-    {
-      if (! nEqual(r1->minpoly, r2->minpoly)) return FALSE;
-    }
+    if (! n_Equal(r1->minpoly, r2->minpoly, r1->cf)) return FALSE;
   }
   else if (r2->minpoly != NULL) return FALSE;
 
@@ -1814,7 +1811,6 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
       if (id2 == NULL) return FALSE;
       if ((n = IDELEMS(id1)) != IDELEMS(id2)) return FALSE;
 
-      if (currRing == r1 || currRing == r2)
       {
         m1 = id1->m;
         m2 = id2->m;
@@ -3451,7 +3447,6 @@ static void rCheckOrdSgn(ring r,int i/*current block*/);
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
-  nInitChar(r);
   rSetOutParams(r);
   int n=rBlocks(r)-1;
   int i;
@@ -4726,7 +4721,7 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
     rChangeCurrRing(new_r);
     if (old_r->qideal != NULL)
     {
-      new_r->qideal = idrCopyR(old_r->qideal, old_r);
+      new_r->qideal = idrCopyR(old_r->qideal, old_r, new_r);
       currQuotient = new_r->qideal;
 
 #ifdef HAVE_PLURAL
@@ -5040,7 +5035,7 @@ bool rSetISReference(const ideal F, const ring r,const int i = 0, const int p = 
 }
 
 
-void rSetSyzComp(int k)
+void rSetSyzComp(int k, const ring r)
 {
   if(k < 0)
   {
@@ -5050,54 +5045,54 @@ void rSetSyzComp(int k)
 
   assume( k >= 0 );
   if (TEST_OPT_PROT) Print("{%d}", k);
-  if ((currRing->typ!=NULL) && (currRing->typ[0].ord_typ==ro_syz))
+  if ((r->typ!=NULL) && (r->typ[0].ord_typ==ro_syz))
   {
-    if( k == currRing->typ[0].data.syz.limit )
+    if( k == r->typ[0].data.syz.limit )
       return; // nothing to do
 
     int i;
-    if (currRing->typ[0].data.syz.limit == 0)
+    if (r->typ[0].data.syz.limit == 0)
     {
-      currRing->typ[0].data.syz.syz_index = (int*) omAlloc0((k+1)*sizeof(int));
-      currRing->typ[0].data.syz.syz_index[0] = 0;
-      currRing->typ[0].data.syz.curr_index = 1;
+      r->typ[0].data.syz.syz_index = (int*) omAlloc0((k+1)*sizeof(int));
+      r->typ[0].data.syz.syz_index[0] = 0;
+      r->typ[0].data.syz.curr_index = 1;
     }
     else
     {
-      currRing->typ[0].data.syz.syz_index = (int*)
-        omReallocSize(currRing->typ[0].data.syz.syz_index,
-                (currRing->typ[0].data.syz.limit+1)*sizeof(int),
+      r->typ[0].data.syz.syz_index = (int*)
+        omReallocSize(r->typ[0].data.syz.syz_index,
+                (r->typ[0].data.syz.limit+1)*sizeof(int),
                 (k+1)*sizeof(int));
     }
-    for (i=currRing->typ[0].data.syz.limit + 1; i<= k; i++)
+    for (i=r->typ[0].data.syz.limit + 1; i<= k; i++)
     {
-      currRing->typ[0].data.syz.syz_index[i] =
-        currRing->typ[0].data.syz.curr_index;
+      r->typ[0].data.syz.syz_index[i] =
+        r->typ[0].data.syz.curr_index;
     }
-    if(k < currRing->typ[0].data.syz.limit) // ?
+    if(k < r->typ[0].data.syz.limit) // ?
     {
 #ifndef NDEBUG
-      Warn("rSetSyzComp called with smaller limit (%d) as before (%d)", k, currRing->typ[0].data.syz.limit);
+      Warn("rSetSyzComp called with smaller limit (%d) as before (%d)", k, r->typ[0].data.syz.limit);
 #endif
-      currRing->typ[0].data.syz.curr_index = 1 + currRing->typ[0].data.syz.syz_index[k];
+      r->typ[0].data.syz.curr_index = 1 + r->typ[0].data.syz.syz_index[k];
     }
 
 
-    currRing->typ[0].data.syz.limit = k;
-    currRing->typ[0].data.syz.curr_index++;
+    r->typ[0].data.syz.limit = k;
+    r->typ[0].data.syz.curr_index++;
   }
   else if(
-            (currRing->typ!=NULL) &&
-            (currRing->typ[0].ord_typ==ro_isTemp)
+            (r->typ!=NULL) &&
+            (r->typ[0].ord_typ==ro_isTemp)
            )
   {
-//      (currRing->typ[currRing->typ[0].data.isTemp.suffixpos].data.is.limit == k)
+//      (r->typ[currRing->typ[0].data.isTemp.suffixpos].data.is.limit == k)
 #ifndef NDEBUG
     Warn("rSetSyzComp(%d) in an IS ring! Be careful!", k);
 #endif
   }
   else
-  if ((currRing->order[0]!=ringorder_c) && (k!=0)) // ???
+  if ((r->order[0]!=ringorder_c) && (k!=0)) // ???
   {
     dReportError("syzcomp in incompatible ring");
   }
