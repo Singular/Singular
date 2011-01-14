@@ -126,16 +126,18 @@ int pGetExp_Var(poly p, int i)
   return m;
 }
 
+// destroys f,g,x
 poly singclap_resultant ( poly f, poly g , poly x)
 {
+  poly res=NULL;
   int i=pIsPurePower(x);
   if (i==0)
   {
     WerrorS("3rd argument must be a ring variable");
-    return NULL;
+    goto resultant_returns_res;
   }
   if ((f==NULL) || (g==NULL))
-    return NULL;
+    goto resultant_returns_res;
   // for now there is only the possibility to handle polynomials over
   // Q and Fp ...
   if (rField_is_Zp() || rField_is_Q())
@@ -143,16 +145,15 @@ poly singclap_resultant ( poly f, poly g , poly x)
     Variable X(i);
     setCharacteristic( nGetChar() );
     CanonicalForm F( convSingPFactoryP( f ) ), G( convSingPFactoryP( g ) );
-    poly res=convFactoryPSingP( resultant( F, G, X ) );
+    res=convFactoryPSingP( resultant( F, G, X ) );
     Off(SW_RATIONAL);
-    return res;
+    goto resultant_returns_res;
   }
   // and over Q(a) / Fp(a)
   else if (rField_is_Extension())
   {
     if (rField_is_Q_a()) setCharacteristic( 0 );
     else               setCharacteristic( -nGetChar() );
-    poly res;
     Variable X(i+rPar(currRing));
     if (currRing->minpoly!=NULL)
     {
@@ -198,11 +199,15 @@ poly singclap_resultant ( poly f, poly g , poly x)
       nDelete(&ng);
     }
     Off(SW_RATIONAL);
-    return res;
+    goto resultant_returns_res;
   }
   else
     WerrorS( feNotImplemented );
-  return NULL;
+resultant_returns_res:
+  pDelete(&f);
+  pDelete(&g);
+  pDelete(&x);
+  return res;
 }
 //poly singclap_resultant ( poly f, poly g , poly x)
 //{
@@ -346,7 +351,7 @@ BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb )
     PrintS("gcd, co-factors:");pWrite(res); pWrite(pa);pWrite(pb);
     pDelete(&dummy);
   }
-#endif  
+#endif
   return FALSE;
 }
 
@@ -377,7 +382,7 @@ BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const
     Off(SW_RATIONAL);
   }
   // and over Q(a) / Fp(a)
-  else if ( rField_is_Extension(r)) 
+  else if ( rField_is_Extension(r))
   {
     if (rField_is_Q_a(r)) setCharacteristic( 0 );
     else                 setCharacteristic( -n_GetChar(r) );
@@ -1556,7 +1561,7 @@ int singclap_det_i( intvec * m )
   return res;
 }
 matrix singntl_HNF(matrix  m )
-{  
+{
   int r=m->rows();
   if (r!=m->cols())
   {
@@ -1566,7 +1571,7 @@ matrix singntl_HNF(matrix  m )
   matrix res=mpNew(r,r);
   if (rField_is_Q(currRing))
   {
-   
+
     CFMatrix M(r,r);
     int i,j;
     for(i=r;i>0;i--)
@@ -1580,7 +1585,7 @@ matrix singntl_HNF(matrix  m )
     for(i=r;i>0;i--)
     {
       for(j=r;j>0;j--)
-      {  
+      {
         MATELEM(res,i,j)=convFactoryPSingP((*MM)(i,j));
       }
     }
@@ -1619,7 +1624,7 @@ intvec* singntl_HNF(intvec*  m )
   return mm;
 }
 matrix singntl_LLL(matrix  m )
-{  
+{
   int r=m->rows();
   int c=m->cols();
   matrix res=mpNew(r,c);
@@ -1638,7 +1643,7 @@ matrix singntl_LLL(matrix  m )
     for(i=r;i>0;i--)
     {
       for(j=c;j>0;j--)
-      {  
+      {
         MATELEM(res,i,j)=convFactoryPSingP((*MM)(i,j));
       }
     }

@@ -2676,7 +2676,7 @@ BOOLEAN jjIS_SQR_FREE(leftv res, leftv u)
 #ifdef HAVE_FACTORY
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w)
 {
-  res->data=singclap_resultant((poly)u->Data(),(poly)v->Data(), (poly)w->Data());
+  res->data=singclap_resultant((poly)u->CopyD(),(poly)v->CopyD(), (poly)w->CopyD());
   return errorreported;
 }
 BOOLEAN jjCHARSERIES(leftv res, leftv u)
