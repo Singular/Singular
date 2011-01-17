@@ -24,7 +24,7 @@ include_HEADERS = \
 	templates/p_Numbers.h templates/p_Procs.h \
 	templates/p_Procs_Dynamic.h templates/p_Procs_Impl.h templates/p_Procs_Set.h templates/p_Procs_Static.h \
 	monomials/p_polys.h monomials/polys-impl.h polys.h prCopy.h prCopyMacros.h \
-	sbuckets.h
+	sbuckets.h simpleideals.h
 
 lib_LIBRARIES=libpolys.a libpolys_g.a
 
