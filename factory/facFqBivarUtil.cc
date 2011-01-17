@@ -388,3 +388,193 @@ CFFList multiplicity (CanonicalForm& F, const CFList& factors)
   return result;
 }
 
+static int
+substituteCheck (const CanonicalForm& F, const CanonicalForm& G)
+{
+  if (F.inCoeffDomain() || G.inCoeffDomain())
+    return 0;
+  Variable x= Variable (1);
+  if (degree (F, x) <= 1 || degree (G, x) <= 1)
+    return 0;
+  CanonicalForm f= swapvar (F, F.mvar(), x);
+  CanonicalForm g= swapvar (G, G.mvar(), x);
+  int sizef= 0;
+  int sizeg= 0;
+  for (CFIterator i= f; i.hasTerms(); i++, sizef++)
+  {
+    if (i.exp() == 1)
+      return 0;
+  }
+  for (CFIterator i= g; i.hasTerms(); i++, sizeg++)
+  {
+    if (i.exp() == 1)
+      return 0;
+  }
+  int * expf= new int [sizef];
+  int * expg= new int [sizeg];
+  int j= 0;
+  for (CFIterator i= f; i.hasTerms(); i++, j++)
+  {
+    expf [j]= i.exp();
+  }
+  j= 0;
+  for (CFIterator i= g; i.hasTerms(); i++, j++)
+  {
+    expg [j]= i.exp();
+  }
+
+  int indf= sizef - 1;
+  int indg= sizeg - 1;
+  if (expf[indf] == 0)
+    indf--;
+  if (expg[indg] == 0)
+    indg--;
+
+  if ((expg[indg]%expf [indf] != 0 && expf[indf]%expg[indg] != 0) ||
+      (expg[indg] == 1 && expf[indf] == 1))
+  {
+    delete [] expg;
+    delete [] expf;
+    return 0;
+  }
+
+  int result;
+  if (expg [indg]%expf [indf] == 0)
+    result= expf[indf];
+  else
+    result= expg[indg];
+  for (int i= indf - 1; i >= 0; i--)
+  {
+    if (expf [i]%result != 0)
+    {
+      delete [] expf;
+      delete [] expg;
+      return 0;
+    }
+  }
+
+  for (int i= indg - 1; i >= 0; i--)
+  {
+    if (expg [i]%result != 0)
+    {
+      delete [] expf;
+      delete [] expg;
+      return 0;
+    }
+  }
+
+  delete [] expg;
+  delete [] expf;
+  return result;
+}
+
+int recSubstituteCheck (const CanonicalForm& F, const int d)
+{
+  if (F.inCoeffDomain())
+    return 0;
+  Variable x= Variable (1);
+  if (degree (F, x) <= 1)
+    return 0;
+  CanonicalForm f= swapvar (F, F.mvar(), x);
+  int sizef= 0;
+  for (CFIterator i= f; i.hasTerms(); i++, sizef++)
+  {
+    if (i.exp() == 1)
+      return 0;
+  }
+  int * expf= new int [sizef];
+  int j= 0;
+  for (CFIterator i= f; i.hasTerms(); i++, j++)
+  {
+    expf [j]= i.exp();
+  }
+
+  int indf= sizef - 1;
+  if (expf[indf] == 0)
+    indf--;
+
+  if ((d%expf [indf] != 0 && expf[indf]%d != 0) || (expf[indf] == 1))
+  {
+    delete [] expf;
+    return 0;
+  }
+
+  int result;
+  if (d%expf [indf] == 0)
+    result= expf[indf];
+  else
+    result= d;
+  for (int i= indf - 1; i >= 0; i--)
+  {
+    if (expf [i]%result != 0)
+    {
+      delete [] expf;
+      return 0;
+    }
+  }
+
+  delete [] expf;
+  return result;
+}
+
+int substituteCheck (const CFList& L)
+{
+  ASSERT (L.length() > 1, "expected a list of at least two elements");
+  if (L.length() < 2)
+    return 0;
+  CFListIterator i= L;
+  i++;
+  int result= substituteCheck (L.getFirst(), i.getItem());
+  if (result <= 1)
+    return result;
+  i++;
+  for (;i.hasItem(); i++)
+  {
+    result= recSubstituteCheck (i.getItem(), result);
+    if (result <= 1)
+      return result;
+  }
+  return result;
+}
+
+void
+subst (const CanonicalForm& F, CanonicalForm& A, const int d, const Variable& x)
+{
+  if (d <= 1)
+  {
+    A= F;
+    return;
+  }
+  if (degree (F, x) <= 0)
+  {
+    A= F;
+    return;
+  }
+  CanonicalForm C= 0;
+  CanonicalForm f= swapvar (F, x, F.mvar());
+  for (CFIterator i= f; i.hasTerms(); i++)
+    C += i.coeff()*power (f.mvar(), i.exp()/ d);
+  A= swapvar (C, x, F.mvar());
+}
+
+CanonicalForm
+reverseSubst (const CanonicalForm& F, const int d, const Variable& x)
+{
+  if (d <= 1)
+    return F;
+  if (degree (F, x) <= 0)
+    return F;
+  CanonicalForm f= swapvar (F, x, F.mvar());
+  CanonicalForm result= 0;
+  for (CFIterator i= f; i.hasTerms(); i++)
+    result += i.coeff()*power (f.mvar(), d*i.exp());
+  return swapvar (result, x, F.mvar());
+}
+
+void
+reverseSubst (CFList& L, const int d, const Variable& x)
+{
+  for (CFListIterator i= L; i.hasItem(); i++)
+    i.getItem()= reverseSubst (i.getItem(), d, x);
+}
+

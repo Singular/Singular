@@ -157,6 +157,39 @@ CFFList multiplicity (CanonicalForm& F,     ///< [in] a poly
                       const CFList& factors ///< [in] a list of factors of F
                      );
 
+/// checks if a substitution x^n->x is possible
+///
+/// @return an integer n > 1, if a substitution described as above is possible
+///         else n <= 1
+int substituteCheck (const CFList& L ///< [in] a list of univariate polys
+                    );
+
+/// substitute x^d by x in F
+void
+subst (const CanonicalForm& F, ///< [in] a polynomial 
+       CanonicalForm& A,       ///< [in,out] returns F with x^d replaced by x
+       const int d,            ///< d > 1 such that a substitution x^d -> x
+                               ///< [in] is possible
+       const Variable& x       ///< [in] a Variable
+      );
+
+/// reverse a substitution x^d->x
+///
+/// @return a poly with x replaced by x^d
+CanonicalForm
+reverseSubst (const CanonicalForm& F, ///< [in] a poly
+              const int d,            ///< [in] an integer > 0
+              const Variable& x       ///< [in] a Variable
+             );
+
+/// reverse a substitution x^d->x
+void
+reverseSubst (CFList& L,        ///< [in,out] a list of polys, returns the 
+                                ///< given list with x replaced by x^d
+              const int d,      ///< [in] an integer > 0
+              const Variable& x ///< [in] a Variable
+             );
+
 #endif
 /* FAC_FQ_BIVAR_UTIL_H */
 

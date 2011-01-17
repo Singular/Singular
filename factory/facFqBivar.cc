@@ -1006,6 +1006,39 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       return factors;
     }
 
+    if (i == 0)
+    {
+      int subCheck= substituteCheck (bufUniFactors);
+
+      if (subCheck > 1)
+      {
+        CanonicalForm bufA= A;
+        subst (bufA, bufA, subCheck, x);
+        factors= biFactorize (bufA, info);
+        reverseSubst (factors, subCheck, x);
+        appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
+                              swap, swap2, N);
+        normalize (factors);
+        return factors;
+      }
+
+      if (!derivXZero && !fail2)
+      {
+        subCheck= substituteCheck (bufUniFactors2);
+        if (subCheck > 1)
+        {
+          CanonicalForm bufA= A;
+          subst (bufA, bufA, subCheck, y);
+          factors= biFactorize (bufA, info);
+          reverseSubst (factors, subCheck, x);
+          appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
+                                swap, swap2, N);
+          normalize (factors);
+          return factors;
+        }
+      }
+    }
+
     // degree analysis
     bufDegs = DegreePattern (bufUniFactors);
     if (!derivXZero && !fail2)
