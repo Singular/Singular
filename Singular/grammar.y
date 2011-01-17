@@ -502,11 +502,11 @@ elemexpr:
           {
             if(iiExprArith2(&$$, &$1, COLONCOLON, &$3)) YYERROR;
           }
-        | expr '('  ')'
+        | elemexpr '('  ')'
           {
             if(iiExprArith1(&$$,&$1,'(')) YYERROR;
           }
-        | expr '(' exprlist ')'
+        | elemexpr '(' exprlist ')'
           {
 	    if ($1.rtyp==UNKNOWN)
 	    { // for x(i)(j)
@@ -582,6 +582,10 @@ elemexpr:
             memset(&$$,0,sizeof($$));
             $$.rtyp  = STRING_CMD;
             $$.data = $1;
+          }
+        | PROC_CMD '(' expr ')'
+          {
+            if(iiExprArith1(&$$,&$3,$1)) YYERROR;
           }
         ;
 
