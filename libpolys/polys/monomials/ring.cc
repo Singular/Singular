@@ -15,6 +15,7 @@
 #include <misc/options.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
+#include <polys/simpleideals.h>
 #include <coeffs/numbers.h>
 // #include <???/febase.h>
 // #include <???/intvec.h>
@@ -213,13 +214,6 @@ int rTypeOfMatrixOrder(intvec * order)
   }
   return typ;
 }
-
-// set R->order, R->block, R->wvhdl, r->OrdSgn from sleftv
-BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R);
-
-// get array of strings from list of sleftv's
-BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p);
-
 
 /*2
  * set a new ring from the data:
@@ -453,7 +447,7 @@ void rDelete(ring r)
     nc_rKill(r);
 #endif
 
-  nKillChar(r);
+  nKillChar(r->cf);
   rUnComplete(r);
   // delete order stuff
   if (r->order != NULL)
@@ -824,11 +818,11 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           // HANNES: TODO: delete nSetChar
           rChangeCurrRing(r1);
           if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
-              && n_Equal(r1->minpoly,r2->minpoly, r1))
+              && n_Equal(r1->minpoly,r2->minpoly, r1->cf))
           {
             tmpR.parameter=(char **)omAllocBin(char *);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
-            tmpR.minpoly=n_Copy(r1->minpoly, r1);
+            tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
             tmpR.P=1;
             // HANNES: TODO: delete nSetChar
           }
@@ -847,7 +841,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
             tmpR.parameter=(char **)omAllocBin(char *);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
-            tmpR.minpoly=n_Copy(r1->minpoly, r1);
+            tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
           }
           else
           {
@@ -866,7 +860,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
             tmpR.parameter=(char **)omAllocBin(char *);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
-            tmpR.minpoly=n_Copy(r2->minpoly, r2);
+            tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
           }
           else
           {
@@ -960,7 +954,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         }
         if (r1->minpoly!=NULL)
         {
-          tmpR.minpoly=n_Copy(r1->minpoly, r1);
+          tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
         }
       }
       else  /* R, Q(a),Z/q,Z/p(a),GF(p,n) */
@@ -988,7 +982,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         }
         if (r2->minpoly!=NULL)
         {
-          tmpR.minpoly=n_Copy(r2->minpoly, r2);
+          tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
         }
       }
       else if (r2->ch>1) /* Z/p,GF(p,n) */
@@ -1021,7 +1015,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         }
         if (r1->minpoly!=NULL)
         {
-          tmpR.minpoly=n_Copy(r1->minpoly, r1);
+          tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
         }
       }
       else  /* R, Z/p,GF(p,n) */
@@ -1048,7 +1042,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         }
         if (r2->minpoly!=NULL)
         {
-          tmpR.minpoly=n_Copy(r2->minpoly, r2);
+          tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
         }
       }
       else
@@ -4351,26 +4345,7 @@ void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 // where R has a certain property. R might be equal r in which case r
 // had already this property
 //
-// Without argument, these functions work on currRing and change it,
-// if necessary
-
-// for the time being, this is still here
-static ring rAssure_SyzComp(const ring r, BOOLEAN complete = TRUE);
-
-ring rCurrRingAssure_SyzComp()
-{
-  ring r = rAssure_SyzComp(currRing, TRUE);
-
-  if( r != currRing )
-  {
-    rChangeCurrRing(r);
-    assume(currRing == r);
-  }
-
-  return r;
-}
-
-static ring rAssure_SyzComp(const ring r, BOOLEAN complete)
+ring rAssure_SyzComp(const ring r, BOOLEAN complete)
 {
   if ( (r->order[0] == ringorder_s) ) return r;
 
@@ -4544,7 +4519,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
   return res;
 }
 
-ring rAssure_HasComp(ring r)
+ring rAssure_HasComp(const ring r)
 {
   int last_block;
   int i=0;
@@ -4653,50 +4628,15 @@ static ring rAssure_CompLastBlock(ring r, BOOLEAN complete = TRUE)
   return r;
 }
 
-ring rCurrRingAssure_CompLastBlock()
-{
-  ring new_r = rAssure_CompLastBlock(currRing);
-  if (currRing != new_r)
-  {
-    ring old_r = currRing;
-    rChangeCurrRing(new_r);
-    if (old_r->qideal != NULL)
-    {
-      new_r->qideal = idrCopyR(old_r->qideal, old_r);
-      currQuotient = new_r->qideal;
-#ifdef HAVE_PLURAL
-      if( rIsPluralRing(new_r) )
-        if( nc_SetupQuotient(new_r, old_r, true) )
-        {
-#ifndef NDEBUG
-          WarnS("error in nc_SetupQuotient"); // cleanup?      rDelete(res);       return r;  // just go on...?
-#endif
-        }
-#endif
-    }
-
-#ifdef HAVE_PLURAL
-    assume((new_r->qideal==NULL) == (old_r->qideal==NULL));
-    assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
-    assume(rIsSCA(new_r) == rIsSCA(old_r));
-    assume(ncRingType(new_r) == ncRingType(old_r));
-#endif
-
-    rTest(new_r);
-    rTest(old_r);
-  }
-  return new_r;
-}
-
 // Moves _c or _C ordering to the last place AND adds _s on the 1st place
-ring rCurrRingAssure_SyzComp_CompLastBlock()
+ring rAssure_SyzComp_CompLastBlock(const ring r)
 {
-  ring new_r_1 = rAssure_CompLastBlock(currRing, FALSE); // due to this FALSE - no completion!
+  ring new_r_1 = rAssure_CompLastBlock(r, FALSE); // due to this FALSE - no completion!
   ring new_r = rAssure_SyzComp(new_r_1, FALSE); // new_r_1 is used only here!!!
 
-  if (new_r != currRing)
+  if (new_r != r)
   {
-    ring old_r = currRing;
+    ring old_r = r;
     if (new_r_1 != new_r && new_r_1 != old_r) rDelete(new_r_1);
     rComplete(new_r, 1);
 #ifdef HAVE_PLURAL
@@ -4715,7 +4655,7 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
     if (old_r->qideal != NULL)
     {
       new_r->qideal = idrCopyR(old_r->qideal, old_r, new_r);
-      currQuotient = new_r->qideal;
+      //currQuotient = new_r->qideal;
 
 #ifdef HAVE_PLURAL
       if( rIsPluralRing(old_r) )
@@ -4742,19 +4682,19 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
 }
 
 // use this for global orderings consisting of two blocks
-static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
+static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
 {
-  int r_blocks = rBlocks(currRing);
+  int r_blocks = rBlocks(r);
 
   assume(b1 == ringorder_c || b1 == ringorder_C ||
          b2 == ringorder_c || b2 == ringorder_C ||
          b2 == ringorder_S);
   if ((r_blocks == 3) &&
-      (currRing->order[0] == b1) &&
-      (currRing->order[1] == b2) &&
-      (currRing->order[2] == 0))
-    return currRing;
-  ring res = rCopy0(currRing, TRUE, FALSE);
+      (r->order[0] == b1) &&
+      (r->order[1] == b2) &&
+      (r->order[2] == 0))
+    return r;
+  ring res = rCopy0(r, TRUE, FALSE);
   res->order = (int*)omAlloc0(3*sizeof(int));
   res->block0 = (int*)omAlloc0(3*sizeof(int));
   res->block1 = (int*)omAlloc0(3*sizeof(int));
@@ -4764,20 +4704,20 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   if (b1 == ringorder_c || b1 == ringorder_C)
   {
     res->block0[1] = 1;
-    res->block1[1] = currRing->N;
+    res->block1[1] = r->N;
   }
   else
   {
     res->block0[0] = 1;
-    res->block1[0] = currRing->N;
+    res->block1[0] = r->N;
   }
   // HANNES: This sould be set in rComplete
   res->OrdSgn = 1;
   rComplete(res, 1);
 #ifdef HAVE_PLURAL
-  if (rIsPluralRing(currRing))
+  if (rIsPluralRing(r))
   {
-    if ( nc_rComplete(currRing, res, false) ) // no qideal!
+    if ( nc_rComplete(r, res, false) ) // no qideal!
     {
 #ifndef NDEBUG
       WarnS("error in nc_rComplete");
@@ -4900,19 +4840,19 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
   return res;
 }
 
-ring rCurrRingAssure_dp_S()
+ring rAssure_dp_S(const ring r)
 {
-  return rCurrRingAssure_Global(ringorder_dp, ringorder_S);
+  return rAssure_Global(ringorder_dp, ringorder_S,r);
 }
 
-ring rCurrRingAssure_dp_C()
+ring rAssure_dp_C(const ring r)
 {
-  return rCurrRingAssure_Global(ringorder_dp, ringorder_C);
+  return rAssure_Global(ringorder_dp, ringorder_C,r);
 }
 
-ring rCurrRingAssure_C_dp()
+ring rAssure_C_dp(const ring r)
 {
-  return rCurrRingAssure_Global(ringorder_C, ringorder_dp);
+  return rAssure_Global(ringorder_C, ringorder_dp,r);
 }
 
 
@@ -5611,7 +5551,7 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
   {
     for (int j = i + 1; j <= N; j++)
     {
-      const number n = n_Copy(p_GetCoeff(MATELEM(C0,i,j), srcBase), srcBase); // src, mapping for coeffs into currRing = dest!
+      const number n = n_Copy(p_GetCoeff(MATELEM(C0,i,j), srcBase), srcBase->cf); // src, mapping for coeffs into currRing = dest!
       const poly   p = p_NSet(n, dest);
       MATELEM(C,i,j) = p;
       if (MATELEM(D0,i,j) != NULL)

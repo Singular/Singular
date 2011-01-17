@@ -564,18 +564,17 @@ static inline int rGetCurrSyzLimit(const ring r)
 { return (rIsSyzIndexRing(r)? r->typ[0].data.syz.limit : 0);}
 
 // Ring Manipulations
-ring   rAssure_HasComp(ring r);
-ring   rCurrRingAssure_SyzComp();
+ring   rAssure_HasComp(const ring r);
+ring   rAssure_SyzComp(const ring r, BOOLEAN complete = TRUE);
 void   rSetSyzComp(int k, const ring r);
-ring   rCurrRingAssure_dp_S();
-ring   rCurrRingAssure_dp_C();
-ring   rCurrRingAssure_C_dp();
-
+ring   rAssure_dp_S(const ring r);
+ring   rAssure_dp_C(const ring r);
+ring   rAssure_C_dp(const ring r);
 /// makes sure that c/C ordering is last ordering
-ring   rCurrRingAssure_CompLastBlock();
+ring rAssure_CompLastBlock(const ring r);
 
 /// makes sure that c/C ordering is last ordering and SyzIndex is first
-ring   rCurrRingAssure_SyzComp_CompLastBlock();
+ring   rAssure_SyzComp_CompLastBlock(const ring r);
 ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos);
 
 /// return the max-comonent wchich has syzIndex i

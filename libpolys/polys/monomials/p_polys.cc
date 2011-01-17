@@ -17,6 +17,7 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 #include <coeffs/longrat.h>
+#include <misc/options.h>
 // #include <???/ideals.h>
 // #include <???/int64vec.h>
 #ifndef NDEBUG
@@ -1596,7 +1597,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   poly *a;
   poly tail, b, res, h;
   number x;
-  number *bin = pnBin(exp);
+  number *bin = pnBin(exp,r);
 
   tail = pNext(p);
   if (bin == NULL)
@@ -2070,7 +2071,7 @@ number p_InitContent_a(poly ph, const ring r)
 {
   number d=pGetCoeff(ph);
   int s=naParDeg(d);
-  if (s /* naParDeg(d)*/ <=1) return naCopy(d);
+  if (s /* naParDeg(d)*/ <=1) return n_Copy(d,r->cf);
   int s2=-1;
   number d2;
   int ss;
@@ -2908,7 +2909,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
           pIter(tmp);
         }
       }
-      pTest(aq);
+      p_Test(aq,dst);
     }
     if (rRing_has_Comp(dst)) p_SetComp(qq, p_GetComp(p,oldRing),dst);
     if (n_IsZero(pGetCoeff(qq),dst->cf))
@@ -2949,8 +2950,8 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
               else /* more difficult: we have really to multiply: */
               {
                 lnumber mmc=(lnumber)naInit(1,dst);
-                napSetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/);
-                napSetm(mmc->z);
+                p_SetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->algring);
+                p_Setm(mmc->z,dst->algring->cf);
                 pGetCoeff(qq)=naMult((number)c,(number)mmc);
                 n_Delete((number *)&c,dst->cf);
                 n_Delete((number *)&mmc,dst->cf); 
