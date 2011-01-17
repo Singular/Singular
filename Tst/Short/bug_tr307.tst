@@ -12,7 +12,7 @@ proc hihi()
 hihi()(1);
 
 list ll=(huhu);
-ll[1](2);
+proc(ll[1])(2);
 def ll_1=ll[1];
 ll_1(3);
 
@@ -26,10 +26,10 @@ proc hihi1(int i)
 {
  return(huhu1);
 }
-hihi1(1)();
+proc(hihi1(1))();
 
 ll=(huhu1);
-ll[1]();
+proc(ll[1])();
 def ll_2=ll[1];
 ll_2();
 
