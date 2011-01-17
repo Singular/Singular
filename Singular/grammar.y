@@ -502,11 +502,11 @@ elemexpr:
           {
             if(iiExprArith2(&$$, &$1, COLONCOLON, &$3)) YYERROR;
           }
-        | elemexpr '('  ')'
+        | expr '('  ')'
           {
             if(iiExprArith1(&$$,&$1,'(')) YYERROR;
           }
-        | elemexpr '(' exprlist ')'
+        | expr '(' exprlist ')'
           {
 	    if ($1.rtyp==UNKNOWN)
 	    { // for x(i)(j)

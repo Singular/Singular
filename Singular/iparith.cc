@@ -1437,7 +1437,7 @@ BOOLEAN jjPROC(leftv res, leftv u, leftv v)
   Subexpr e;
   int typ;
   BOOLEAN t=FALSE;
-  if (u->rtyp!=IDHDL)
+  if ((u->rtyp!=IDHDL)||(u->e!=NULL))
   {
     idrec tmp_proc;
     tmp_proc.id="_auto";
