@@ -265,20 +265,20 @@ void           nNew(number * a);
 
 /// return a copy of a
 static inline number n_Copy(number n,    const coeffs r)
-{ return (r)->cfCopy(n, r); }
+{ return r->cfCopy(n, r); }
 static inline void   n_Delete(number* p, const coeffs r)
-{ return (r)->cfDelete(p, r); }
+{ return r->cfDelete(p, r); }
 
 static inline BOOLEAN n_Equal(number a, number b, const coeffs r)
-{ return (r)->cfEqual(a, b, r); }
+{ return r->cfEqual(a, b, r); }
 static inline BOOLEAN n_IsZero(number n, const coeffs r)
-{ return (r)->cfIsZero(n,r); }
+{ return r->cfIsZero(n,r); }
 static inline BOOLEAN n_IsOne(number n,  const coeffs r)
-{ return (r)->cfIsOne(n,r); }
+{ return r->cfIsOne(n,r); }
 static inline BOOLEAN n_IsMOne(number n, const coeffs r)
-{ return (r)->cfIsMOne(n,r); }
+{ return r->cfIsMOne(n,r); }
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
-{ return (r)->cfGreaterZero(n,r); }
+{ return r->cfGreaterZero(n,r); }
 // cfGreater?
 #ifdef HAVE_RINGS
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)
@@ -291,66 +291,72 @@ static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 
 /// init with an integer
 static inline number n_Init(int i,       const coeffs r)
-{ return (r)->cfInit(i,r); }
+{ return r->cfInit(i,r); }
 
 /// changes argument  inline: a:= -a
 static inline number n_Neg(number n,     const coeffs r)
-{ return (r)->cfNeg(n,r); }
+{ return r->cfNeg(n,r); }
 
 /// return 1/a
 static inline number n_Invers(number a,  const coeffs r)
-{ return (r)->cfInvers(a,r); }
+{ return r->cfInvers(a,r); }
 
 /// use for pivot strategies, (0) => 0, otherwise positive
 static inline int    n_Size(number n,    const coeffs r)
-{ return (r)->cfSize(n,r); }
+{ return r->cfSize(n,r); }
 
 /// normalize the number. i.e. go to some canonnical representation (inplace)
 static inline void   n_Normalize(number& n, const coeffs r)
-{ return (r)->cfNormalize(n,r); }
+{ return r->cfNormalize(n,r); }
 
 /// Normalize and Write to the output buffer of reporter
 static inline void   n_Write(number& n,  const coeffs r)
-{ return (r)->cfWrite(n,r); }
+{ return r->cfWrite(n,r); }
 
 /// Normalize and get denomerator
 static inline number n_GetDenom(number& n, const coeffs r)
-{ return (r)->cfGetDenom(n, r); }
+{ return r->cfGetDenom(n, r); }
 
 /// Normalize and get numerator
 static inline number n_GetNumerator(number& n, const coeffs r)
-{ return (r)->cfGetNumerator(n, r); }
+{ return r->cfGetNumerator(n, r); }
 
 static inline void   n_Power(number a, int b, number *res, const coeffs r)
-{ return (r)->cfPower(a,b,res,r); }
+{ return r->cfPower(a,b,res,r); }
 
 static inline number n_Mult(number a, number b, const coeffs r)
-{ return (r)->cfMult(a, b, r); }
+{ return r->cfMult(a, b, r); }
 
 /// Inplace multiplication: a := a * b
 static inline void n_InpMult(number &a, number b, const coeffs r)
-{ return (r)->cfInpMult(a,b,r); }
+{ return r->cfInpMult(a,b,r); }
 
 static inline number n_Sub(number a, number b, const coeffs r)
-{ return (r)->cfSub(a, b, r); }
+{ return r->cfSub(a, b, r); }
 
 static inline number n_Add(number a, number b, const coeffs r)
-{ return (r)->cfAdd(a, b, r); }
+{ return r->cfAdd(a, b, r); }
 
 static inline number n_Div(number a, number b, const coeffs r)
-{ return (r)->cfDiv(a,b,r); }
+{ return r->cfDiv(a,b,r); }
 
 static inline number n_IntDiv(number a, number b, const coeffs r)
-{ return (r)->cfIntDiv(a,b,r); }
+{ return r->cfIntDiv(a,b,r); }
 
 static inline number n_ExactDiv(number a, number b, const coeffs r)
-{ return (r)->cfExactDiv(a,b,r); }
+{ return r->cfExactDiv(a,b,r); }
 
 static inline number n_Gcd(number a, number b, const coeffs r)
-{ return (r)->cfGcd(a,b,r); }
+{ return r->cfGcd(a,b,r); }
 
 static inline number n_Lcm(number a, number b, const coeffs r)
-{ return (r)->cfLcm(a,b,r); }
+{ return r->cfLcm(a,b,r); }
+
+static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
+{ return dst->cfSetMap(src,dst); }
+
+static inline int n_ParDeg(number n, const coeffs r)
+{ return r->cfParDeg(n,r); }
 
 /// Tests whether n is a correct number: only used if LDEBUG is defined
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
@@ -366,7 +372,7 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
 // Missing wrappers for:
-// cfIntMod, cfPar, cfParDeg, cfInt, cfRePart, cfImPart, cfRead, cfSetMap, cfName, cfInit_bigint
+// cfIntMod, cfPar, cfParDeg, cfInt, cfRePart, cfImPart, cfRead, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfExtGcd... cfDivBy
 
 

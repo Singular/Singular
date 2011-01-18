@@ -1585,6 +1585,18 @@ static number* pnBin(int exp, const ring r)
   return bin;
 }
 
+static void pnFreeBin(number *bin, int exp,const coeffs r)
+{
+  int e, h = (exp >> 1) + 1;
+
+  if (bin[1] != NULL)
+  {
+    for (e=1; e<h; e++)
+      n_Delete(&(bin[e]),r);
+  }
+  omFreeSize((ADDRESS)bin, h*sizeof(number));
+}
+
 /*
 *  compute for a poly p = head+tail, tail is monomial
 *          (head + tail)^exp, exp > 1
@@ -1642,7 +1654,7 @@ static poly p_TwoMonPower(poly p, int exp, const ring r)
   pNext(b) = NULL;
   res = a[exp];
   omFreeSize((ADDRESS)a, al);
-  pnFreeBin(bin, exp);
+  pnFreeBin(bin, exp, r->cf);
 //  tail=res;
 // while((tail!=NULL)&&(pNext(tail)!=NULL))
 // {
@@ -2070,8 +2082,8 @@ number p_InitContent_a(poly ph, const ring r)
 // only for coefficients in K(a) anf K(a,...)
 {
   number d=pGetCoeff(ph);
-  int s=naParDeg(d);
-  if (s /* naParDeg(d)*/ <=1) return n_Copy(d,r->cf);
+  int s=n_ParDeg(d,r->cf);
+  if (s /* n_ParDeg(d)*/ <=1) return n_Copy(d,r->cf);
   int s2=-1;
   number d2;
   int ss;
@@ -2080,10 +2092,10 @@ number p_InitContent_a(poly ph, const ring r)
     pIter(ph);
     if(ph==NULL)
     {
-      if (s2==-1) return naCopy(d);
+      if (s2==-1) return n_Copy(d,r->cf);
       break;
     }
-    if ((ss=naParDeg(pGetCoeff(ph)))<s)
+    if ((ss=n_ParDeg(pGetCoeff(ph),r->cf))<s)
     {
       s2=s;
       d2=d;
@@ -2092,7 +2104,7 @@ number p_InitContent_a(poly ph, const ring r)
       if (s2<=1) break;
     }
   }
-  return naGcd(d,d2,r->cf);
+  return n_Gcd(d,d2,r->cf);
 }
 
 
@@ -2936,9 +2948,9 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
             if (rField_is_GF(dst))
             {
               number c=pGetCoeff(qq);
-              number ee=nfPar(1);
-              number eee;nfPower(ee,e,&eee); //nfDelete(ee,dst);
-              ee=nfMult(c,eee);
+              number ee=n_Par(1,dst->cf);
+              number eee;n_Power(ee,e,&eee,dst->cf); //nfDelete(ee,dst);
+              ee=n_Mult(c,eee,dst->cf);
               //nfDelete(c,dst);nfDelete(eee,dst);
               pSetCoeff0(qq,ee);
             }
@@ -2952,7 +2964,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
                 lnumber mmc=(lnumber)naInit(1,dst);
                 p_SetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->algring);
                 p_Setm(mmc->z,dst->algring->cf);
-                pGetCoeff(qq)=naMult((number)c,(number)mmc);
+                pGetCoeff(qq)=n_Mult((number)c,(number)mmc,dst->cf);
                 n_Delete((number *)&c,dst->cf);
                 n_Delete((number *)&mmc,dst->cf); 
               }
