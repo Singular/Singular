@@ -32,18 +32,6 @@
 #endif
 
 
-static void pnFreeBin(number *bin, int exp)
-{
-  int e, h = (exp >> 1) + 1;
-
-  if (bin[1] != NULL)
-  {
-    for (e=1; e<h; e++)
-      nDelete(&(bin[e]));
-  }
-  omFreeSize((ADDRESS)bin, h*sizeof(number));
-}
-
 /*2
 * handle memory request for sets of polynomials (ideals)
 * l is the length of *p, increment is the difference (may be negative)

@@ -579,7 +579,7 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos);
 
 /// return the max-comonent wchich has syzIndex i
 /// Assume: i<= syzIndex_limit
-int rGetMaxSyzComp(int i);
+int rGetMaxSyzComp(int i, const ring r);
 
 BOOLEAN rHasSimpleOrder(const ring r);
 

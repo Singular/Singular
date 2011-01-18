@@ -309,11 +309,11 @@ void rWrite(ring r)
       {
         StringSetS(""); n_Write(r->minpoly,r->cf); PrintS(StringAppendS("\n"));
       }
-      if (r->minideal!=NULL)
-      {
-        iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,0);
-        PrintLn();
-      }
+      //if (r->minideal!=NULL)
+      //{
+      //  iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,0);
+      //  PrintLn();
+      //}
     }
   }
   Print("//   number of vars : %d",r->N);
@@ -429,11 +429,11 @@ void rWrite(ring r)
 #endif
   }
 #endif
-  if (r->qideal!=NULL)
-  {
-    PrintS("\n// quotient ring from ideal\n");
-    iiWriteMatrix((matrix)r->qideal,"_",1);
-  }
+  //if (r->qideal!=NULL)
+  //{
+  //  PrintS("\n// quotient ring from ideal\n");
+  //  iiWriteMatrix((matrix)r->qideal,"_",1);
+  //}
 }
 
 void rDelete(ring r)
@@ -1389,8 +1389,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
       idTest((ideal)C);
 
-      nMapFunc nMap1 = nSetMap(R1); /* can change something global: not usable
-                                       after the next nSetMap call :( */
+      nMapFunc nMap1 = n_SetMap(R1,sum); /* can change something global: not usable
+					    after the next nSetMap call :( */
       // Create blocked C and D matrices:
       for (i=1; i<= rVar(R1); i++)
         for (j=i+1; j<=rVar(R1); j++)
@@ -1406,8 +1406,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       idTest((ideal)D);
 
 
-      nMapFunc nMap2 = nSetMap(R2); /* can change something global: not usable
-                                       after the next nSetMap call :( */
+      nMapFunc nMap2 = n_SetMap(R2,sum); /* can change something global: not usable
+					    after the next nSetMap call :( */
       for (i=1; i<= rVar(R2); i++)
         for (j=i+1; j<=rVar(R2); j++)
         {
@@ -1473,10 +1473,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     maFindPerm(r1->names,  rVar(r1),  r1->parameter,  rPar(r1),
                sum->names, rVar(sum), sum->parameter, rPar(sum),
                perm1, par_perm1, sum->ch);
-    nMapFunc nMap1 = nSetMap(r1);
+    nMapFunc nMap1 = n_SetMap(r1,sum);
     Q1 = idInit(IDELEMS(r1->qideal),1);
     for (int for_i=0;for_i<IDELEMS(r1->qideal);for_i++)
-      Q1->m[for_i] = pPermPoly(r1->qideal->m[for_i],perm1,r1,nMap1,par_perm1,rPar(r1));
+      Q1->m[for_i] = p_PermPoly(r1->qideal->m[for_i],perm1,r1,nMap1,par_perm1,rPar(r1),sum);
     omFree((ADDRESS)perm1);
   }
 
@@ -1490,7 +1490,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     maFindPerm(r2->names,  rVar(r2),  r2->parameter,  rPar(r2),
                sum->names, rVar(sum), sum->parameter, rPar(sum),
                perm2, par_perm2, sum->ch);
-    nMapFunc nMap2 = nSetMap(r2);
+    nMapFunc nMap2 = n_SetMap(r2,sum);
     Q2 = idInit(IDELEMS(r2->qideal),1);
     for (int for_i=0;for_i<IDELEMS(r2->qideal);for_i++)
       Q2->m[for_i] = p_PermPoly(r2->qideal->m[for_i],perm2,r2,nMap2,par_perm2,rPar(r2),sum);
@@ -3223,7 +3223,7 @@ static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
 
 static void rOptimizeLDeg(ring r)
 {
-  if (r->pFDeg == pDeg)
+  if (r->pFDeg == p_Deg)
   {
     if (r->pLDeg == pLDeg1)
       r->pLDeg = pLDeg1_Deg;
@@ -5036,23 +5036,23 @@ void rSetSyzComp(int k, const ring r)
 }
 
 // return the max-comonent wchich has syzIndex i
-int rGetMaxSyzComp(int i)
+int rGetMaxSyzComp(int i, const ring r)
 {
-  if ((currRing->typ!=NULL) && (currRing->typ[0].ord_typ==ro_syz) &&
-      currRing->typ[0].data.syz.limit > 0 && i > 0)
+  if ((r->typ!=NULL) && (r->typ[0].ord_typ==ro_syz) &&
+      r->typ[0].data.syz.limit > 0 && i > 0)
   {
-    assume(i <= currRing->typ[0].data.syz.limit);
+    assume(i <= r->typ[0].data.syz.limit);
     int j;
-    for (j=0; j<currRing->typ[0].data.syz.limit; j++)
+    for (j=0; j<r->typ[0].data.syz.limit; j++)
     {
-      if (currRing->typ[0].data.syz.syz_index[j] == i  &&
-          currRing->typ[0].data.syz.syz_index[j+1] != i)
+      if (r->typ[0].data.syz.syz_index[j] == i  &&
+          r->typ[0].data.syz.syz_index[j+1] != i)
       {
-        assume(currRing->typ[0].data.syz.syz_index[j+1] == i+1);
+        assume(r->typ[0].data.syz.syz_index[j+1] == i+1);
         return j;
       }
     }
-    return currRing->typ[0].data.syz.limit;
+    return r->typ[0].data.syz.limit;
   }
   else
   {
@@ -5175,8 +5175,7 @@ ring rOpposite(ring src)
   rTest(src);
 #endif
 
-  ring save = currRing;
-  rChangeCurrRing(src);
+  //rChangeCurrRing(src);
 
 #ifdef RDEBUG
   rTest(src);
@@ -5185,10 +5184,8 @@ ring rOpposite(ring src)
 #endif
 
 
-//  ring r = rCopy0(src,TRUE); /* TRUE for copy the qideal: Why??? */
   ring r = rCopy0(src,FALSE); /* qideal will be deleted later on!!! */
 
-  /*  rChangeCurrRing(r); */
   // change vars v1..vN -> vN..v1
   int i;
   int i2 = (rVar(r)-1)/2;
@@ -5403,7 +5400,7 @@ ring rOpposite(ring src)
   rTest(r);
 #endif
 
-  rChangeCurrRing(r);
+  //rChangeCurrRing(r);
 
 #ifdef RDEBUG
   rTest(r);
@@ -5420,7 +5417,7 @@ ring rOpposite(ring src)
 
     int *perm       = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
     int *par_perm   = NULL;
-    nMapFunc nMap   = nSetMap(src);
+    nMapFunc nMap   = n_SetMap(src,r);
     int ni,nj;
     for(i=1; i<=r->N; i++)
     {
@@ -5471,7 +5468,7 @@ ring rOpposite(ring src)
 #ifdef HAVE_PLURAL
     r->qideal = idOppose(src, src->qideal); // into the currRing: r
 #else
-    r->qideal = id_Copy(src->qideal, currRing); // ?
+    r->qideal = id_Copy(src->qideal, r); // ?
 #endif
 
 #ifdef HAVE_PLURAL
@@ -5492,7 +5489,6 @@ ring rOpposite(ring src)
 #endif
   rTest(r);
 
-  rChangeCurrRing(save);
   return r;
 }
 
@@ -5538,7 +5534,7 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 
   const ring srcBase = src;
 
-  assume( nSetMap(srcBase) == nSetMap(currRing) ); // currRing is important here!
+  assume( n_SetMap(srcBase,dest) == n_SetMap(dest,dest) ); // currRing is important here!
 
   matrix C = mpNew(N,N); // ring independent
   matrix D = mpNew(N,N);
