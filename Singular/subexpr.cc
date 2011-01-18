@@ -463,6 +463,10 @@ void sleftv::CleanUp(ring r)
       case VMINPOLY:
       case 0:
       case INT_CMD:
+#ifdef HAVE_FANS
+      case CONE_CMD:
+      case FAN_CMD:
+#endif
         break;
       default:
       {

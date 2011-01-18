@@ -348,7 +348,7 @@ public:
    // PolyhedralCone projection(int newn)const;
     friend std::ostream &operator<<(std::ostream &f, ZCone const &c);
 };
-
+ZCone intersection(const ZCone &a, const ZCone &b);
 };
 
 
