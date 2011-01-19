@@ -642,6 +642,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
   int subsetDeg;
   TT= copy (factors);
   bool recombination= false;
+  bool trueFactor= false;
   while (T.length() >= 2*s)
   {
     while (noSubset == false)
@@ -686,6 +687,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
             buf /= g;
             LCBuf= LC (buf, Variable (1));
             recombination= true;
+            trueFactor= true;
           }
         }
         else
@@ -696,20 +698,26 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
             buf /= g;
             LCBuf= LC (buf, Variable (1));
             recombination= true;
+            trueFactor= true;
           }
         }
-        T= Difference (T, S);
 
-        if (T.length() < 2*s || T.length() == s)
+        if (trueFactor)
         {
-          buf= reverseShift (buf, evaluation);
-          buf /= Lc (buf);
-          appendTestMapDown (result, buf, info, source, dest);
-          return result;
+          T= Difference (T, S);
+
+          if (T.length() < 2*s || T.length() == s)
+          {
+            buf= reverseShift (buf, evaluation);
+            buf /= Lc (buf);
+            appendTestMapDown (result, buf, info, source, dest);
+            return result;
+          }
+          trueFactor= false;
+          TT= copy (T);
+          indexUpdate (v, s, T.length(), noSubset);
+          if (noSubset) break;
         }
-        TT= copy (T);
-        indexUpdate (v, s, T.length(), noSubset);
-        if (noSubset) break;
       }
     }
     s++;
@@ -1063,31 +1071,32 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
     {
       gg= reverseShift (g, eval);
       gg /= Lc (gg);
-          if (!k && beta == Variable (1))
-          {
-            if (degree (gg, alpha) < degMipoBeta)
-            {
-              appendTestMapDown (result, gg, info, source, dest);
-              buf /= g;
-              nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
-              d -= nBuf;
-              e= tmax (e, nBuf);
-              LCBuf= LC (buf, Variable (1));
-            }
-          }
-          else
-          {
-            if (!isInExtension (gg, delta, k))
-            {
-              appendTestMapDown (result, gg, info, source, dest);
-              buf /= g;
-              nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
-              d -= nBuf;
-              e= tmax (e, nBuf);
-              LCBuf= LC (buf, Variable (1));
-            }
-          }
-      T= Difference (T, CFList (i.getItem()));
+      if (!k && beta == Variable (1))
+      {
+        if (degree (gg, alpha) < degMipoBeta)
+        {
+          appendTestMapDown (result, gg, info, source, dest);
+          buf /= g;
+          nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
+          d -= nBuf;
+          e= tmax (e, nBuf);
+          LCBuf= LC (buf, Variable (1));
+          T= Difference (T, CFList (i.getItem()));
+        }
+      }
+      else
+      {
+        if (!isInExtension (gg, delta, k))
+        {
+          appendTestMapDown (result, gg, info, source, dest);
+          buf /= g;
+          nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
+          d -= nBuf;
+          e= tmax (e, nBuf);
+          LCBuf= LC (buf, Variable (1));
+          T= Difference (T, CFList (i.getItem()));
+         }
+      }
     }
   }
   adaptedLiftBound= d;
