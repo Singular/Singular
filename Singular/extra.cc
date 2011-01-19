@@ -634,7 +634,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       /* Given two non-empty intvecs, the call
             'system("intvecMatchingSegments", ivec, jvec);'
          computes all occurences of jvec in ivec, i.e., it returns
-         a list of int indices k such that ivec[k..size(jvec)] = jvec.
+         a list of int indices k such that ivec[k..size(jvec)+k-1] = jvec.
          If no such k exists (e.g. when ivec is shorter than jvec), an
          intvec with the single entry 0 is being returned. */
       if(strcmp(sys_cmd, "intvecMatchingSegments")==0)
