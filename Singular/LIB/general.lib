@@ -796,6 +796,13 @@ example
    // terms use one of the following equivalent commands:
    module( M[ sort(lead(M), "c,dp")[2] ] );
    sort( M, sort(lead(M), "c,dp")[2] )[1];
+
+   // BUG: Please, don't use this sort for integer vectors or lists 
+   // with them if there can be negative integers!
+   // TODO: for some HiWi
+   sort(3..-3)[1]; 
+   sort(list(-v, v))[1]; 
+
 }
 ///////////////////////////////////////////////////////////////////////////////
 

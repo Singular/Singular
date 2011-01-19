@@ -496,8 +496,7 @@ EXAMPLE: example Ext_R; shows an example
   int j,k,max,ii,t1,t2,di,leadComp,shift;
   intvec A1,A2,A3;
   int s = size(v);
-  intvec v1 = sort(v)[1];
-  max = v1[s];                 // the maximum integer occurring in intvec v
+  max = Max(v);                // the maximum integer occurring in intvec v
   int p = printlevel-voice+3;  // p=printlevel+1 (default: p=1)
   // --------------- Variante mit sres
   for( ii=1; ii<=size(#); ii++ )
@@ -809,8 +808,7 @@ EXAMPLE: example Ext; shows an example
   ideal  test1;
   intmat Be;
   int s = size(v);
-  intvec v1 = sort(v)[1];
-  max = v1[s];                    // the maximum integer occurring in intvec v
+  max = Max(v);                   // the maximum integer occurring in intvec v
   int p = printlevel-voice+3;     // p=printlevel+1 (default: p=1)
 //---------- test: coker(N)=basering, coker(N)=0 ? ----------------------------
   if( max<0 ) { dbprint(p,"// Ext^i=0 for i<0!"); return([1]); }
@@ -1293,8 +1291,7 @@ EXAMPLE: example Tor; shows an example
   ideal  test1;
   intmat Be;
   int s = size(v);
-  intvec v1 = sort(v)[1];
-  max = v1[s];                   // maximum integer occurring in intvec v
+  max = Max(v);                  // maximum integer occurring in intvec v
   int p = printlevel-voice+3;    // p=printlevel+1 (default: p=1)
 
 //---------- test: coker(M)=basering, coker(M)=0 ? ----------------------------
@@ -1928,3 +1925,24 @@ example
    canonMap(p2);
 }
 
+// taken from qhmoduli.lib
+static proc Max(data)
+"USAGE:   Max(data); intvec/list of integers
+PURPOSE: find the maximal integer contained in 'data'
+RETURN:  list
+ASSUME:  'data' contians only integers and is not empty
+"
+{
+  int i;
+  int max = data[1];
+
+  for(i = size(data); i>1;i--)
+  {
+    if(data[i] > max) { max = data[i]; }
+  }
+  return(max);
+}
+example
+{"EXAMPLE:";  echo = 2;
+  Max(list(1,2,3));
+}
