@@ -630,6 +630,76 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           return TRUE;
         }
       }
+  /*==================== intvec matching ======================*/
+      /* Given two non-empty intvecs, the call
+            'system("intvecMatchingSegments", ivec, jvec);'
+         computes all occurences of jvec in ivec, i.e., it returns
+         a list of int indices k such that ivec[k..size(jvec)] = jvec.
+         If no such k exists (e.g. when ivec is shorter than jvec), an
+         intvec with the single entry 0 is being returned. */
+      if(strcmp(sys_cmd, "intvecMatchingSegments")==0)
+      {
+        if ((h       != NULL) && (h->Typ()       == INTVEC_CMD) &&
+            (h->next != NULL) && (h->next->Typ() == INTVEC_CMD) &&
+            (h->next->next == NULL))
+        {
+          intvec* ivec = (intvec*)h->Data();
+          intvec* jvec = (intvec*)h->next->Data();
+          intvec* r = new intvec(1); (*r)[0] = 0;
+          int validEntries = 0;
+          for (int k = 0; k <= ivec->rows() - jvec->rows(); k++)
+          {
+            if (memcmp(&(*ivec)[k], &(*jvec)[0],
+                       sizeof(int) * jvec->rows()) == 0)
+            {
+              if (validEntries == 0)
+                (*r)[0] = k + 1;
+              else
+              {
+                r->resize(validEntries + 1);
+                (*r)[validEntries] = k + 1;
+              }
+              validEntries++;
+            }
+          }
+          res->rtyp = INTVEC_CMD;
+          res->data = (void*)r;
+          return FALSE;
+        }
+        else
+        {
+          Werror("expected two non-empty intvecs as arguments");
+          return TRUE;
+        }
+      }
+      /* Given two non-empty intvecs, the call
+            'system("intvecOverlap", ivec, jvec);'
+         computes the longest intvec kvec such that ivec ends with kvec
+         and jvec starts with kvec. The length of this overlap is being
+         returned. If there is no overlap at all, then 0 is being returned. */
+      if(strcmp(sys_cmd, "intvecOverlap")==0)
+      {
+        if ((h       != NULL) && (h->Typ()       == INTVEC_CMD) &&
+            (h->next != NULL) && (h->next->Typ() == INTVEC_CMD) &&
+            (h->next->next == NULL))
+        {
+          intvec* ivec = (intvec*)h->Data();
+          intvec* jvec = (intvec*)h->next->Data();
+          int ir = ivec->rows(); int jr = jvec->rows();
+          int r = jr; if (ir < jr) r = ir;   /* r = min{ir, jr} */
+          while ((r >= 1) && (memcmp(&(*ivec)[ir - r], &(*jvec)[0],
+                                     sizeof(int) * r) != 0))
+            r--;
+          res->rtyp = INT_CMD;
+          res->data = (void*)r;
+          return FALSE;
+        }
+        else
+        {
+          Werror("expected two non-empty intvecs as arguments");
+          return TRUE;
+        }
+      }
   /*==================== Hensel's lemma ======================*/
       if(strcmp(sys_cmd, "henselfactors")==0)
       {
