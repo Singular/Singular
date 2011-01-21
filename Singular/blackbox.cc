@@ -3,6 +3,8 @@
 #include <Singular/subexpr.h>
 #include <Singular/blackbox.h>
 
+//#define BLACKBOX_DEVEL 1
+
 static blackbox* blackboxTable[100];
 static char *    blackboxName[100];
 static int blackboxTableCnt=0;
@@ -62,7 +64,9 @@ int setBlackboxStuff(blackbox *bb, const char *n)
 {
   blackboxTable[blackboxTableCnt]=bb;
   blackboxName[blackboxTableCnt]=omStrDup(n);
+#ifdef BLACKBOX_DEVEL
   Print("define bb:name=%s:rt=%d (table:cnt=%d)\n",blackboxName[blackboxTableCnt],blackboxTableCnt+BLACKBOX_OFFSET,blackboxTableCnt);
+#endif
   if (bb->blackbox_destroy==NULL) bb->blackbox_destroy=blackbox_default_destroy;
   if (bb->blackbox_String==NULL)  bb->blackbox_String=blackbox_default_String;
   if (bb->blackbox_Print==NULL)   bb->blackbox_Print=blackbox_default_Print;
@@ -92,7 +96,9 @@ int blackboxIsCmd(const char *n, int & tok)
   {
     if(strcmp(n,blackboxName[i])==0)
     {
+#ifdef BLACKBOX_DEVEL
       Print("found bb:%s:%d (table:%d)\n",n,i+BLACKBOX_OFFSET,i);
+#endif
       tok=i+BLACKBOX_OFFSET;
       return ROOT_DECL;
     }
