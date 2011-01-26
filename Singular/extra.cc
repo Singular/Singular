@@ -837,8 +837,8 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
         if (dMat->cols() != uMat->rows())
         {
           Werror("third matrix (%d x %d) and fourth matrix (%d x %d) %s",
-                 "do not t",
-                 dMat->rows(), dMat->cols(), uMat->rows(), uMat->cols());
+                 dMat->rows(), dMat->cols(), uMat->rows(), uMat->cols(),
+                 "do not t");
           return TRUE;
         }
         if (uMat->rows() != bVec->rows())
