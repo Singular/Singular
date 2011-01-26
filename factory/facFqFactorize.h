@@ -108,7 +108,7 @@ CFFList FpFactorize (const CanonicalForm& F ///< [in] a multivariate poly
     result= FpFactorize (pthRoot);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor (i.getItem().factor(), i.getItem().exp()*l*p);
+      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
     result.insert (CFFactor (LcF, 1));
     return result;
   }
@@ -153,7 +153,7 @@ CFFList FqFactorize (const CanonicalForm& F, ///< [in] a multivariate poly
     result= FqFactorize (pthRoot, alpha);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor (i.getItem().factor(), i.getItem().exp()*l*p);
+      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
     result.insert (CFFactor (LcF, 1));
     return result;
   }
@@ -200,7 +200,7 @@ CFFList GFFactorize (const CanonicalForm& F ///< [in] a multivariate poly
     result= GFFactorize (pthRoot);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor (i.getItem().factor(), i.getItem().exp()*(l-1)*p);
+      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
     result.insert (CFFactor (LcF, 1));
     return result;
   }
