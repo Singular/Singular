@@ -115,7 +115,7 @@ if ( (! (-e $singular)) || (! (-x $singular)))
   $singular = $curr_dir."/../Singular$ext";
 }
 # sed scripts which are applied to res files before they are diff'ed
-$sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id:/d' -e '/error occurred in/d' -e '/tst_status/d' -e'/init >>/d' -e 's/\\[[0-9]*:[0-9]*\\]//g'";
+$sed_scripts = "-e '/used time:/d' -e '/tst_ignore:/d' -e '/Id[:\$]/d' -e '/error occurred in/d' -e '/tst_status/d' -e'/init >>/d' -e 's/\\[[0-9]*:[0-9]*\\]//g'";
 # default value (in %) above which differences are reported on -r
 $report_val = 5;
 # default value (in %) above which differences cause an error on -e

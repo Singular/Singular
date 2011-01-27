@@ -614,6 +614,10 @@ static BOOLEAN DumpAsciiIdhdl(FILE *fd, idhdl h)
   if (type_id == QRING_CMD)
     return DumpQring(fd, h, type_str);
 
+  // C-proc not to be dumped
+  if ((type_id == PROC_CMD) && (IDPROC(h)->language == LANG_C))
+    return FALSE;
+
   // put type and name
   if (fprintf(fd, "%s %s", type_str, IDID(h)) == EOF)
     return TRUE;

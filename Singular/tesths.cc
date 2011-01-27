@@ -32,6 +32,8 @@
 #include <Singular/slInit.h>
 #include <Singular/ssiLink.h>
 #include <Singular/bigintm.h>
+#include <Singular/pyobject_setup.h>
+
 
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
@@ -130,6 +132,7 @@ int main(          /* main entry to Singular */
     basePackHdl=h;
     //for official version: not active
     //bigintm_setup();
+    pyobject_setup();
   }
 #endif
   if (TEST_V_QUIET)

@@ -352,6 +352,7 @@ void yyerror(const char * fmt)
 %left '(' ')'
 %left PLUSPLUS MINUSMINUS
 %left COLONCOLON
+%left '.'
 
 %%
 lines:
@@ -501,6 +502,10 @@ elemexpr:
         | elemexpr COLONCOLON elemexpr
           {
             if(iiExprArith2(&$$, &$1, COLONCOLON, &$3)) YYERROR;
+          }
+        | elemexpr '.' elemexpr
+          {
+            if(iiExprArith2(&$$, &$1, '.', &$3)) YYERROR;
           }
         | elemexpr '('  ')'
           {

@@ -159,6 +159,8 @@
 #undef SI_CPU_IA64
 /* CPU type: x86_64: */
 #undef SI_CPU_X86_64
+/* whether development version of python is available */
+#undef HAVE_PYTHON
 
 /*******************************************************************
  * Defines which are not set by configure
@@ -609,5 +611,8 @@ while (0)
 #ifndef __GNUC__
 #  define  __attribute__(x)  /*NOTHING*/
 #endif
+
+#define STRINGIFY(name) #name
+#define EXPANDED_STRINGIFY(name) STRINGIFY(name)
 
 #endif /* MOD2_H  */

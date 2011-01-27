@@ -32,6 +32,17 @@
 #define SI_MAX_NEST 1000
 #endif
 
+#if defined(ix86Mac_darwin) || defined(ppcMac_darwin)
+#  define MODULE_SUFFIX bundle
+#elif defined(ix86_Win)
+#  define MODULE_SUFFIX dll
+#else
+#  define MODULE_SUFFIX so
+#endif
+
+#define MODULE_SUFFIX_STRING EXPANDED_STRINGIFY(MODULE_SUFFIX)
+
+
 #ifdef HAVE_DYNAMIC_LOADING
 BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport);
 #endif
@@ -1055,6 +1066,35 @@ BOOLEAN load_modules(char *newlib, char *fullname, BOOLEAN autoexport)
   return RET;
 #endif /*STATIC */
 }
+
+// loads a dynamic module from the binary path and returns a named function
+// returns NULL, if something fails
+void* binary_module_function(const char* newlib, const char* funcname)
+{
+  void* result = NULL;
+
+#ifdef HAVE_STATIC
+  WerrorS("static version can not load function from dynamic modules");
+#else
+  const char* bin_dir = feGetResource('b');
+  if (!bin_dir)  { return NULL; }
+  
+  char path_name[MAXPATHLEN]; 
+  sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, newlib, MODULE_SUFFIX_STRING);
+
+  void* openlib = dynl_open(path_name);
+  if(!openlib)
+  {
+    Werror("dynl_open of %s failed:%s", path_name, dynl_error());
+    return NULL;
+  }
+  result = dynl_sym(openlib, funcname);
+  if (!result) Werror("%s: %s\n", funcname, dynl_error());
+#endif
+
+  return result;
+}
+
 #endif /* HAVE_DYNAMIC_LOADING */
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/

@@ -769,7 +769,9 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
   if (lt>MAX_TOK)
   {
     blackbox *bb=getBlackboxStuff(lt);
+#ifdef BLACKBOX_DEVEL
     Print("bb-assign: bb=%lx\n",bb);
+#endif
     return (bb==NULL) || bb->blackbox_Assign(l,r);
   }
   while (((dAssign[i].res!=lt)

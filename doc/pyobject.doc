@@ -1,0 +1,327 @@
+@c -*-texinfo-*-
+
+@c ----------------------------------------------------------------------------
+@node  pyobject, Data types, 
+@section pyobject
+@cindex pyobject
+@cindex blackbox
+
+The pyobject is a black box data type in @sc{Singular}
+for handling objects from the programming language @code{python}. It
+needs the @code{python} support of @sc{Singular} to be installed.
+
+Together with some basic operations and funtions, pyobject instances
+access @code{python} functionality from within @sc{Singular} and store
+the results for re-use:
+
+@smallexample
+@c example
+pyobject pystr = "Hello";
+pyobject pyint = 2;
+string singstr = string(pystr + " World!");
+singstr;
+pystr + pyint;  // Error: not possible
+pystr * pyint;  // But this is allowed,
+pystr * 3;      // as well as this;
+
+python_run("def newfunc(*args): return list(args)");  // syncs contexts!
+newfunc(1, 2, 3);          // newfunc also knowd to SINGULAR
+
+def pylst = python_eval("[3, 7, 1]");
+proc(attrib(pylst, "sort"))(); // Access python member routines as attributes
+pylst.sort();             // <- equivalent short-notation
+pylst."sort"();           // <- alternative short-notation
+pylst;
+
+python_import("os");       // Gets stuff from python module 'os'
+name;                      // The identifier of the operating system
+@c example
+@end smallexample
+
+@menu
+* pyobject declarations::
+* pyobject expressions::
+* pyobject operations::
+* pyobject related functions::
+@end menu
+
+@c ------------------------------
+@node pyobject declarations, pyobject expressions, pyobject, pyobject
+@subsection pyobject declarations
+@cindex pyobject declarations
+
+@table @strong
+@item Syntax:
+pyobject name @code{=} pyobject_expression @code{;}
+
+@item Purpose:
+defines a @code{python} object.
+
+@item Default:
+@code{None}
+
+@item Example:
+@smallexample
+@c example
+  pyobject empty;
+  empty;
+
+  pyobject pystr = "Hello World!"; 
+  pyobject pyone = 17;
+  pyobject pylst = list(pystr, pyone);
+  pylst;
+@c example
+@end smallexample
+@end table
+@c ------------------------------
+@node pyobject expressions, pyobject operations, pyobject declarations, pyobject
+@subsection pyobject expressions
+@cindex pyobject expressions
+
+A pyobject expression is (optional parts in square brackets):
+@enumerate
+@item
+an identifier of type pyobject
+@item
+a function returning pyobject
+@item
+pyobject expressions combined by the arithmetic operations
+@code{+}, @code{-}, @code{*}, @code{/}, or @code{^}, and the member-of
+operators  @code{.} and @code{::}
+@item
+an list expression with elements made of pyobject expressions
+(see @ref{Type conversion and casting}) 
+@item
+an string expression (see @ref{Type conversion and casting})
+@item
+an int expression (see @ref{Type conversion and casting})
+@end enumerate
+
+@*@strong{Example:}
+@smallexample
+@c example
+  pyobject pystr = "python string ";
+  pystr;
+  pyobject pyint = 2;
+  pyint;
+  pyobject pylst = list(pystr, pyint);
+  pylst;
+  pyint + pyint;
+  pyint * pyint;
+  pystr + pystr;
+  pystr * pyint;
+  python_eval("17 + 4");
+  typeof(_)
+@c example
+@end smallexample
+
+@c ------------------------------
+@node pyobject operations, pyobject related functions, pyobject expressions, pyobject
+@subsection pyobject operations
+@cindex pyobject operations
+
+@table @asis
+@item @code{+}
+addition
+
+@item @code{-}
+negation or subtraction
+
+@item @code{*}
+multiplication
+
+@item @code{/}
+division
+
+@item @code{^}, @code{**}
+power by a positive integer
+
+@item @code{<}, @code{<=}, @code{>}, @code{>=}, @code{==}, @code{<>}
+comparators (considering leading monomials w.r.t. monomial ordering)
+
+@item pyobject_expression @code{[} int_expression @code{]}
+get the  item from the pyobject by index
+@item pyobject_expression @code{(} pyobject_expression_sequence @code{)}
+call the pyobject with a sequence of python arguments (the latter
+may be empty)
+
+@item pyobject_expression @code{.} ( string_expression | name ), 
+      pyobject_expression @code{::} ( string_expression | name )
+get attribute (class member) of a python object
+@end table
+
+@*@strong{Example:}
+@smallexample
+@c example
+pyobject two = 2;
+pyobject three = 3;
+
+two + three;
+two - three;
+two * three;
+two / three;
+two ^ three;
+two ** three;
+
+three < two;
+two < three;
+three <= two;
+two <= three;
+two == three;
+two == two;
+three > two;
+two > three;
+three >= two;
+two >= three;
+two != two;
+two != three;
+
+pyobject pystr = "Hello";
+pystr + " World!";
+pystr * 3;
+pystr[1];
+
+python_run("def newfunc(*args): return list(args)");
+newfunc();
+newfunc(two, three);
+
+newfunc."__class__";
+newfunc::"__class__";
+newfunc.func_name;
+newfunc::func_name;
+
+@c example
+@end smallexample
+
+@c ------------------------------
+@node pyobject related functions,  , pyobject operations, pyobject
+@subsection pyobject related functions
+@cindex pyobject related functions
+
+@table @code
+@item attrib
+list, get and set attributes (class members) of a pyobject (see @ref{attrib})
+
+@*@strong{Example:}
+@smallexample
+@c example
+  pyobject pystr = "Kublai Khan";
+
+  // Additional functionality through attrib
+  attrib(pystr, "__doc__");
+  proc(attrib(pystr, "count"))("K");
+
+  pystr."__doc__";           // <- Short notations
+  pystr.count("a");          // Even shorter (if attribute's name is valid and unused)
+
+  python_run("def func(): return 17");
+  attrib(func);
+  attrib(func, "func_name");
+  attrib(func, "func_name", "byAnyOtherName");
+  attrib(func, "func_name");
+@c example
+@end smallexample
+
+@item killattrib
+deletes an attribute from a pyobject (see @ref{killattrib})
+
+@*@strong{Example:}
+@smallexample
+@c example
+python_run("def new_pyobj(): pass");
+attrib(new_pyobj, "new_attr", "something");
+attrib(new_pyobj, "new_attr");
+attrib(new_pyobj);
+
+killattrib(new_pyobj, "new_attr");
+attrib(new_pyobj);
+@c example
+@end smallexample
+
+@item python_run
+execute string-given @code{python} commands and import new symbols from
+@code{python} to @sc{Singular}'s context (see @ref{python_run}).
+@item python_eval
+evaluate a string-given @code{python} expression and return the result
+to @sc{Singular} (see @ref{python_eval}).
+@item python_import
+import @code{python} module into @sc{Singular}'s context
+(see @ref{python_import})
+@end table
+
+@c ---------------------------------------
+@menu
+* python_eval::
+* python_import::
+* python_run::
+@end menu
+@c ---------------------------------------
+@node python_eval, python_import, , pyobject related functions
+@subsection python_eval
+@cindex python_eval
+
+@table @code
+@item @strong{Syntax:}
+@code{python_eval (} string_expression @code{)}
+@item @strong{Type:}
+pyobject
+@item @strong{Purpose:}
+Evaluates a python expression (given as a string) and returns the result
+as pyobject.
+@item @strong{Example:}
+@smallexample
+@c example
+  python_eval("17 + 4");
+  typeof(_);
+  list ll = python_eval("range(10)");
+@c example
+@end smallexample
+@end table
+@c ---------------------------------------
+@node python_import, python_run, python_eval, pyobject related functions
+@subsection python_import
+@cindex python_import
+
+@table @code
+@item @strong{Syntax:}
+@code{python_import (} string_expression @code{)}
+@item @strong{Type:}
+pyobject
+@item @strong{Purpose:}
+Imports python module (given as a string) in the @sc{Singular} context.
+@item @strong{Example:}
+@smallexample
+@c example
+  python_import("os");
+  name;                         // e. g. 'posix'
+  sep;                          // pathname separator
+  linesep;                      // end of line marker
+@c example
+@end smallexample
+@end table
+@c ---------------------------------------
+@node python_run, , python_import, pyobject related functions
+@subsection python_run
+@cindex python_run
+
+@table @code
+@item @strong{Syntax:}
+@code{python_run (} string_expression @code{)}
+@item @strong{Type:}
+none
+@item @strong{Purpose:}
+Executes python commands (given as a string) in @code{python} context
+and syncs the contexts afterwards.
+@item @strong{Example:}
+@smallexample
+@c example
+  python_run("def newfunc(*args): return list(args)");
+  newfunc(1, 2, 3);          // newfunc also known to SINGULAR now
+
+  python_run("import os");
+  os;
+  attrib(os, "name");
+@c example
+@end smallexample
+@end table
+@c ---------------------------------------
