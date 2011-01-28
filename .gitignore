@@ -24,6 +24,8 @@ ix86Mac-darwin/*
 libpolys/Makefile.in
 libpolys/misc/auxiliary.h
 libpolys/coeffs/test
+libpolys/*/COPYING
+libpolys/*/INSTALL
 omalloc/Makefile.in
 omalloc/omConfig.h.in
 omalloc/omTables
