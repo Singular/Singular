@@ -612,6 +612,7 @@ static inline void * s_internalCopy(const int t,  void *d)
       return (void*)syCopy((syStrategy)d);
     case DEF_CMD:
     case NONE:
+    case 0: /* type in error case */
       break; /* error recovery: do nothing */
     //case COMMAND:
     default:
