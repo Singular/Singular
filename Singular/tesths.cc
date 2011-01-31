@@ -132,7 +132,6 @@ int main(          /* main entry to Singular */
     basePackHdl=h;
     //for official version: not active
     //bigintm_setup();
-    pyobject_setup();
   }
 #endif
   if (TEST_V_QUIET)
@@ -171,6 +170,7 @@ int main(          /* main entry to Singular */
     iiLibCmd(omStrDup("standard.lib"), TRUE,TRUE,TRUE);
     verbose=vv;
   }
+  pyobject_setup();
   errorreported = 0;
 
   // and again, ifdef OM_NDEBUG this call is undef'ed
