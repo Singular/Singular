@@ -6154,17 +6154,21 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
       k = (int)(long)u->next->next->Data();
       noK = false;
       assume(k != 0);
-      if ((u->next->next->next != NULL) && (u->next->next->next->Typ() == STRING_CMD))
+      if ((u->next->next->next != NULL) &&
+          (u->next->next->next->Typ() == STRING_CMD))
       {
         algorithm = (char*)u->next->next->next->Data();
         noAlgorithm = false;
-        if ((u->next->next->next->next != NULL) && (u->next->next->next->next->Typ() == INT_CMD))
+        if ((u->next->next->next->next != NULL) &&
+            (u->next->next->next->next->Typ() == INT_CMD))
         {
           cacheMinors = (int)(long)u->next->next->next->next->Data();
           noCacheMinors = false;
-          if ((u->next->next->next->next->next != NULL) && (u->next->next->next->next->next->Typ() == INT_CMD))
+          if ((u->next->next->next->next->next != NULL) &&
+              (u->next->next->next->next->next->Typ() == INT_CMD))
           {
-            cacheMonomials = (int)(long)u->next->next->next->next->next->Data();
+            cacheMonomials =
+               (int)(long)u->next->next->next->next->next->Data();
             noCacheMonomials = false;
           }
         }
@@ -6180,11 +6184,13 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     {
       algorithm = (char*)u->next->next->Data();
       noAlgorithm = false;
-      if ((u->next->next->next != NULL) && (u->next->next->next->Typ() == INT_CMD))
+      if ((u->next->next->next != NULL) &&
+          (u->next->next->next->Typ() == INT_CMD))
       {
         cacheMinors = (int)(long)u->next->next->next->Data();
         noCacheMinors = false;
-        if ((u->next->next->next->next != NULL) && (u->next->next->next->next->Typ() == INT_CMD))
+        if ((u->next->next->next->next != NULL) &&
+            (u->next->next->next->next->Typ() == INT_CMD))
         {
           cacheMonomials = (int)(long)u->next->next->next->next->Data();
           noCacheMonomials = false;
@@ -6200,7 +6206,8 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     {
       cacheMinors = (int)(long)u->next->next->Data();
       noCacheMinors = false;
-      if ((u->next->next->next != NULL) && (u->next->next->next->Typ() == INT_CMD))
+      if ((u->next->next->next != NULL) &&
+          (u->next->next->next->Typ() == INT_CMD))
       {
         cacheMonomials = (int)(long)u->next->next->next->Data();
         noCacheMonomials = false;
@@ -6231,7 +6238,8 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
     return TRUE;
   }
   if ((!noAlgorithm) && (strcmp(algorithm, "Bareiss") != 0)
-      && (strcmp(algorithm, "Laplace") != 0) && (strcmp(algorithm, "Cache") != 0))
+      && (strcmp(algorithm, "Laplace") != 0)
+      && (strcmp(algorithm, "Cache") != 0))
   {
     WerrorS("Expected as algorithm one of 'B/bareiss', 'L/laplace', or 'C/cache'.");
     return TRUE;
@@ -6239,7 +6247,14 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   if ((!noAlgorithm) && (strcmp(algorithm, "Bareiss") == 0)
       && (!currRingIsOverIntegralDomain()))
   {
-    WerrorS("Bareiss algorithm not defined over coefficient rings with zero divisors.");
+    Werror("Bareiss algorithm not defined over coefficient rings %s",
+           "with zero divisors.");
+    return TRUE;
+  }
+  if ((mk < 1) || (mk > m->rows()) || (mk > m->cols()))
+  {
+    Werror("invalid size of minors: %d (matrix is (%d x %d))", mk,
+           m->rows(), m->cols());
     return TRUE;
   }
   if ((!noAlgorithm) && (strcmp(algorithm, "Cache") == 0)
@@ -6251,11 +6266,15 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
 
   /* here come the actual procedure calls */
   if (noAlgorithm)
-    res->data = getMinorIdealHeuristic(m, mk, (noK ? 0 : k), (noIdeal ? 0 : IasSB), false);
+    res->data = getMinorIdealHeuristic(m, mk, (noK ? 0 : k),
+                                       (noIdeal ? 0 : IasSB), false);
   else if (strcmp(algorithm, "Cache") == 0)
-    res->data = getMinorIdealCache(m, mk, (noK ? 0 : k), (noIdeal ? 0 : IasSB), 3, cacheMinors, cacheMonomials, false);
+    res->data = getMinorIdealCache(m, mk, (noK ? 0 : k),
+                                   (noIdeal ? 0 : IasSB), 3, cacheMinors,
+                                   cacheMonomials, false);
   else
-    res->data = getMinorIdeal(m, mk, (noK ? 0 : k), algorithm, (noIdeal ? 0 : IasSB), false);
+    res->data = getMinorIdeal(m, mk, (noK ? 0 : k), algorithm,
+                              (noIdeal ? 0 : IasSB), false);
   if (v_typ!=MATRIX_CMD) idDelete((ideal *)&m);
   res->rtyp = IDEAL_CMD;
   return FALSE;
