@@ -36,6 +36,7 @@ void pyobject_setup()
 {
   void* fktn = binary_module_function("pyobject", "mod_init");
   if (fktn) (* reinterpret_cast<void (*)()>(fktn) )();
+  else Werror("python related functions are not avialable");
 }
 
 # endif
