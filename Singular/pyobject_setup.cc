@@ -13,6 +13,7 @@
 //*****************************************************************************
 
 #include <Singular/mod2.h>
+#include <kernel/febase.h>
 #include "static.h"
 
 /* whether development version of python is linked statically or dynamically */
