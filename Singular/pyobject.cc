@@ -47,7 +47,7 @@ public:
 
   /// Initialize unique (singleton) python interpreter instance, 
   /// and set Singular type identifier
-  static void init(id_type num = MAX_TOK) { instance().m_id = num; }
+  static void init(id_type num ) { instance().m_id = num; }
 
   /// Get Singular type identitfier 
   static id_type id() { return instance().m_id; }
@@ -337,7 +337,7 @@ private:
       //    case UNKNOWN:    return PythonCastStatic<const char*>((void*)value->Name());
     }
     
-    Werror("Iype # %d incompatible with pyobject", typeId);
+    Werror("type # %d incompatible with pyobject", typeId);
     return PythonObject();
   }
 };
