@@ -24,12 +24,12 @@ LINKAGE poly p_Copy(poly s_p, const ring r)
   {
     p_AllocBin(pNext(d_p), bin, r);
     pIter(d_p);
-    pSetCoeff0(d_p, n_Copy(pGetCoeff(s_p), r));
+    pSetCoeff0(d_p, n_Copy__T(pGetCoeff(s_p), r));
     // it is better to iter here,
     // for MemCopy advances goes from low to high addresses
     h = s_p;
     s_p = pNext(s_p);
-    p_MemCopy(d_p->exp, h->exp, length);
+    p_MemCopy__T(d_p->exp, h->exp, length);
   }
   pNext(d_p) = NULL;
 

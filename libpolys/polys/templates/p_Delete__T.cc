@@ -15,7 +15,7 @@ LINKAGE void p_Delete(poly* pp, const ring r)
 
   while (p != NULL)
   {
-    n_Delete(&(p->coef), r);
+    n_Delete__T(&(p->coef), r);
     p = p_LmFreeAndNext(p, r);
   }
   *pp = NULL;

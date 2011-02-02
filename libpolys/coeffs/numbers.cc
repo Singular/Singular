@@ -51,12 +51,11 @@ void   ndInpMult(number &a, number b, const coeffs r)
   n_Delete(&a,r);
   a=n;
 }
-number ndInpAdd(number &a, number b, const coeffs r)
+void ndInpAdd(number &a, number b, const coeffs r)
 {
   number n=n_Add(a,b,r);
   n_Delete(&a,r);
   a=n;
-  return a;
 }
 
 #ifdef LDEBUG

@@ -1,0 +1,21 @@
+#define n_Copy	n_Copy_FieldGeneral
+#define n_Delete	n_Delete_FieldGeneral
+#define n_Mult	n_Mult_FieldGeneral
+#define n_Add	n_Add_FieldGeneral
+#define n_Sub	n_Sub_FieldGeneral
+#define n_IsZero	n_IsZero_FieldGeneral
+#define n_Equal	n_Equal_FieldGeneral
+#define n_Neg	n_Neg_FieldGeneral
+#define n_InpMult	n_InpMult_FieldGeneral
+#define n_InpAdd	n_InpAdd_FieldGeneral
+#define p_MemCopy	p_MemCopy_LengthGeneral
+#define p_MemAdd	p_MemAdd_LengthGeneral
+#define p_MemSum	p_MemSum_LengthGeneral
+#define p_MemDiff	p_MemDiff_LengthGeneral
+#define p_MemCmp	p_MemCmp_LengthGeneral_OrdGeneral
+#define DECLARE_LENGTH(what) what
+#define p_MemAddAdjust(p, r) p_MemAdd_NegWeightAdjust(p, r)
+#define DECLARE_ORDSGN(what) what
+#define p_Copy p_Copy__FieldGeneral_LengthGeneral_OrdGeneral
+
+add extra suffix __T
