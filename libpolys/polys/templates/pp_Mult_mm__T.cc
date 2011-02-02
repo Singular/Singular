@@ -15,7 +15,7 @@
  *   Const:    p, m
  *
  ***************************************************************/
-LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
+LINKAGE poly pp_Mult_mm__T(poly p, const poly m, const ring ri, poly &last)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
@@ -33,25 +33,25 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   const unsigned long* m_e = m->exp;
-  pAssume(!n_IsZero(ln,ri));
+  pAssume(!n_IsZero__T(ln,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
   number tmp;
 
   do
   {
-    tmp = n_Mult(ln, pGetCoeff(p), ri);
+    tmp = n_Mult__T(ln, pGetCoeff(p), ri);
 #ifdef HAVE_ZERODIVISORS
-    if (! n_IsZero(tmp, ri))
+    if (! n_IsZero__T(tmp, ri))
     {
 #endif
       p_AllocBin( pNext(q), bin, ri);
       q = pNext(q);
       pSetCoeff0(q, tmp);
-      p_MemSum(q->exp, p->exp, m_e, length);
-      p_MemAddAdjust(q, ri);
+      p_MemSum__T(q->exp, p->exp, m_e, length);
+      p_MemAddAdjust__T(q, ri);
 #ifdef HAVE_ZERODIVISORS
     }
-    else n_Delete(&tmp, ri);
+    else n_Delete__T(&tmp, ri);
 #endif
     p = pNext(p);
   }

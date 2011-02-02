@@ -15,7 +15,7 @@
  * Assumes:  Monoms of p are from
  * Returns:
  ***************************************************************/
-LINKAGE poly p_ShallowCopyDelete(poly s_p, const ring r, omBin d_bin)
+LINKAGE poly p_ShallowCopyDelete__T(poly s_p, const ring r, omBin d_bin)
 {
   spolyrec dp;
   poly d_p = &dp;
@@ -30,7 +30,7 @@ LINKAGE poly p_ShallowCopyDelete(poly s_p, const ring r, omBin d_bin)
     pSetCoeff0(d_p, pGetCoeff(s_p));
     h = s_p;
     s_p =  pNext(s_p);
-    p_MemCopy(d_p->exp, h->exp, length);
+    p_MemCopy__T(d_p->exp, h->exp, length);
     p_FreeBinAddr(h, r);
   }
   pNext(d_p) = NULL;

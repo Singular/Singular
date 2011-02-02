@@ -15,7 +15,7 @@
  * Destroys: p, q
  *
  ***************************************************************/
-LINKAGE poly p_Merge_q(poly p, poly q, const ring r)
+LINKAGE poly p_Merge_q__T(poly p, poly q, const ring r)
 {
   assume(p != NULL && q != NULL);
   p_Test(p, r);
@@ -30,7 +30,7 @@ LINKAGE poly p_Merge_q(poly p, poly q, const ring r)
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
 
   Top:     // compare p and q w.r.t. monomial ordering
-  p_MemCmp(p->exp, q->exp, length, ordsgn, goto Equal, goto Greater , goto Smaller);
+  p_MemCmp__T(p->exp, q->exp, length, ordsgn, goto Equal, goto Greater , goto Smaller);
 
   Equal:
   // should never get here

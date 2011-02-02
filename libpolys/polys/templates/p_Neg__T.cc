@@ -15,12 +15,12 @@
  *   Destroys: p
  *
  ***************************************************************/
-LINKAGE poly p_Neg(poly p, const ring r)
+LINKAGE poly p_Neg__T(poly p, const ring r)
 {
   poly q = p;
   while (p != NULL)
   {
-    pSetCoeff0(p, n_Neg(pGetCoeff(p), r));
+    pSetCoeff0(p, n_Neg__T(pGetCoeff(p), r));
     pIter(p);
   }
   return q;

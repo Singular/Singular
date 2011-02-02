@@ -18,15 +18,14 @@
  *   Const:    p, m, a, b
  *
  ***************************************************************/
-LINKAGE poly pp_Mult_Coeff_mm_DivSelectMult
-  (poly p,const poly m, const poly a, const poly b, int &shorter,const ring r)
+LINKAGE poly pp_Mult_Coeff_mm_DivSelectMult__T(poly p,const poly m, const poly a, const poly b, int &shorter,const ring r)
 {
   assume(rOrd_is_Comp_dp(r) && r->ExpL_Size > 2);
   p_Test(p, r);
   if (p == NULL) return NULL;
   number n = pGetCoeff(m);
   number nc;
-  pAssume(!n_IsZero(n,r));
+  pAssume(!n_IsZero__T(n,r));
 
   spolyrec rp;
   omBin bin = r->PolyBin;
@@ -39,7 +38,7 @@ LINKAGE poly pp_Mult_Coeff_mm_DivSelectMult
   p_AllocBin(ab, bin, r);
   unsigned long* ab_e = &(ab->exp[0]);
 
-  p_MemDiff(ab_e, ((unsigned long*) &(a->exp[0])), ((unsigned long*) &(b->exp[0])),
+  p_MemDiff__T(ab_e, ((unsigned long*) &(a->exp[0])), ((unsigned long*) &(b->exp[0])),
             length);
 
   int Shorter = 0;
@@ -60,8 +59,8 @@ LINKAGE poly pp_Mult_Coeff_mm_DivSelectMult
     p_AllocBin(pNext(q), bin, r);
     q = pNext(q);
     nc = pGetCoeff(p);
-    pSetCoeff0(q, n_Mult(n, nc, r));
-    p_MemSum(q->exp, p->exp, ab_e, length);
+    pSetCoeff0(q, n_Mult__T(n, nc, r));
+    p_MemSum__T(q->exp, p->exp, ab_e, length);
 
     Iter:
     pIter(p);
