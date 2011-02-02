@@ -20,12 +20,12 @@
 
 
 #ifdef p_Procs_Static
-#include <polys/p_Procs_Static.h>
+#include <polys/templates/p_Procs_Static.h>
 #else
-#include <polys/p_Procs_Dynamic.h>
+#include <polys/templates/p_Procs_Dynamic.h>
 #endif
 
-#include <polys/p_Procs_Impl.h>
+#include <polys/templates/p_Procs_Impl.h>
 
 #ifndef p_Procs_Static
 int FieldGeneralProcs = 0,
@@ -127,40 +127,40 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   i = 0;
   while (macros_field[i] != NULL)
   {
-    printf("#undef %s\n#define %s\t%s_%s\n",
+    printf("#undef %s__T\n#define %s__T\t%s_%s\n",
            macros_field[i], macros_field[i],  macros_field[i], s_field);
     i++;
   }
   i = 0;
   while (macros_length[i] != NULL)
   {
-    printf("#undef %s\n#define %s\t%s_%s\n",
+    printf("#undef %s__T\n#define %s__T\t%s_%s\n",
            macros_length[i], macros_length[i], macros_length[i], s_length);
     i++;
   }
   i = 0;
   while (macros_length_ord[i] != NULL)
   {
-    printf("#undef %s\n#define %s\t%s_%s_%s\n",
+    printf("#undef %s__T\n#define %s__T\t%s_%s_%s\n",
            macros_length_ord[i], macros_length_ord[i], macros_length_ord[i], s_length, s_ord);
     i++;
   }
 
   // define DECLARE_LENGTH
   printf("#undef DECLARE_LENGTH\n");
-  printf("#undef p_MemAddAdjust\n");
+  printf("#undef p_MemAddAdjust__T\n");
   if (length != LengthGeneral)
   {
     printf("#define DECLARE_LENGTH(what) ((void)0)\n");
-    printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
+    printf("#define p_MemAddAdjust__T(p, r) ((void)0)\n");
   }
   else
   {
     printf("#define DECLARE_LENGTH(what) what\n");
     if (proc != pp_Mult_Coeff_mm_DivSelectMult_Proc)
-      printf("#define p_MemAddAdjust(p, r) p_MemAdd_NegWeightAdjust(p, r)\n");
+      printf("#define p_MemAddAdjust__T(p, r) p_MemAdd_NegWeightAdjust(p, r)\n");
     else
-      printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
+      printf("#define p_MemAddAdjust__T(p, r) ((void)0)\n");
   }
 
   // define DECLARE_ORDSGN
@@ -189,12 +189,12 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
     }
 
 
-    printf("#undef p_MemAddAdjust\n");
-    printf("#define p_MemAddAdjust(p, r) ((void)0)\n");
+    printf("#undef p_MemAddAdjust__T\n");
+    printf("#define p_MemAddAdjust__T(p, r) ((void)0)\n");
   }
 
-  printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
-  printf("#include polys/1\n", s_what);
+  printf("#undef %s\n#define %s__T %s\n", s_what, s_what, s_full_proc_name);
+  printf("#include \"polys/templates/%s__T.cc\"\n", s_what);
   printf("#undef %s\n", s_what);
 #ifdef HAVE_RINGS
   if (strcmp(s_field, "RingGeneral") == 0)

@@ -27,7 +27,7 @@ number ndReturn0(number n, const coeffs r);
 number ndIntMod(number a, number b, const coeffs r);
 
 void   ndInpMult(number &a, number b, const coeffs r);
-number ndInpAdd(number &a, number b, const coeffs r);
+void   ndInpAdd(number &a, number b, const coeffs r);
 
 #ifdef LDEBUG
 void nDBDummy1(number* d,char *f, int l);

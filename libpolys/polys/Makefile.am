@@ -13,7 +13,9 @@ SOURCES = \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc polys.cc \
 	polys0.cc polys1.cc prCopy.cc prCopyTemplate.cc \
-	sbuckets.cc
+	sbuckets.cc templates/p_Procs.cc
+
+BUILT_SOURCES = templates/p_Procs.inc
 
 noinst_HEADERS =
 
@@ -31,18 +33,16 @@ lib_LIBRARIES=libpolys.a libpolys_g.a
 libpolys_a_SOURCES = ${SOURCES}
 libpolys_g_a_SOURCES = ${SOURCES}
 
-EXTRA_libpolys_a_SOURCES = p_Procs_Dynamic.cc p_Procs_Static.cc
-
 libpolys_a_LIBADD = $(DL_KERNEL_OBJECT)
 libpolys_a_DEPENDENCIES = $(DL_KERNEL_OBJECT)
 
 libpolys_g_a_LIBADD = $(DL_KERNEL_OBJECT_DEBUG)
 libpolys_g_a_DEPENDENCIES = $(DL_KERNEL_OBJECT_DEBUG)
 
-EXTRA_PROGRAMS = p_Procs_Generate
-p_Procs_Generate_SOURCES = p_Procs_Generate.cc
+EXTRA_PROGRAMS = templates/p_Procs_Generate
+templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
 
-p_Procs.inc: p_Procs_Generate
-	${builddir}/p_Procs_Generate > ${builddir}/p_Procs.inc
+templates/p_Procs.inc: templates/p_Procs_Generate
+	${builddir}/templates/p_Procs_Generate > ${builddir}/templates/p_Procs.inc
 
 libpolys_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -fdiagnostics-show-option -Wno-long-long

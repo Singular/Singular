@@ -3055,8 +3055,8 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
 #define LINKAGE
 #undef p_Delete
 #define p_Delete p_ShallowDelete
-#undef n_Delete
-#define n_Delete(n, r) ((void)0)
+#undef n_Delete__T
+#define n_Delete__T(n, r) ((void)0)
 
 #include <polys/templates/p_Delete__T.cc>
 

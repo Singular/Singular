@@ -267,7 +267,7 @@ void           nNew(number * a);
 static inline number n_Copy(number n,    const coeffs r)
 { return r->cfCopy(n, r); }
 static inline void   n_Delete(number* p, const coeffs r)
-{ return r->cfDelete(p, r); }
+{ r->cfDelete(p, r); }
 
 static inline BOOLEAN n_Equal(number a, number b, const coeffs r)
 { return r->cfEqual(a, b, r); }
@@ -322,14 +322,14 @@ static inline number n_GetNumerator(number& n, const coeffs r)
 { return r->cfGetNumerator(n, r); }
 
 static inline void   n_Power(number a, int b, number *res, const coeffs r)
-{ return r->cfPower(a,b,res,r); }
+{ r->cfPower(a,b,res,r); }
 
 static inline number n_Mult(number a, number b, const coeffs r)
 { return r->cfMult(a, b, r); }
 
 /// Inplace multiplication: a := a * b
 static inline void n_InpMult(number &a, number b, const coeffs r)
-{ return r->cfInpMult(a,b,r); }
+{ r->cfInpMult(a,b,r); }
 
 static inline number n_Sub(number a, number b, const coeffs r)
 { return r->cfSub(a, b, r); }
