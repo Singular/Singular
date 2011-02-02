@@ -26,7 +26,7 @@ PYTHON_EXTRA_LIBS	= @PYTHON_EXTRA_LIBS@
 PYTHON_EXTRA_LDFLAGS	= @PYTHON_EXTRA_LDFLAGS@
 
 # Note: compiler(!) flags for linking to python
-# todo: need flags for statically linking shared modules
+# todo: need flags for statically linking dependencies to shared modules
 PYTHON_LINKFLAGS	= ${PYTHON_LDFLAGS} ${PYTHON_EXTRA_LIBS} ${PYTHON_EXTRA_LDFLAGS}
 
 ##
