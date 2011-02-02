@@ -3053,8 +3053,8 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
  ***************************************************************/
 #undef LINKAGE
 #define LINKAGE
-#undef p_Delete
-#define p_Delete p_ShallowDelete
+#undef p_Delete__T
+#define p_Delete__T p_ShallowDelete
 #undef n_Delete__T
 #define n_Delete__T(n, r) ((void)0)
 

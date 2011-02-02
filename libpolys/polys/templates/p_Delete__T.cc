@@ -9,7 +9,7 @@
  *  Version: $Id$
  *******************************************************************/
 
-LINKAGE void p_Delete(poly* pp, const ring r)
+LINKAGE void p_Delete__T(poly* pp, const ring r)
 {
   poly p = *pp;
 

@@ -16,9 +16,9 @@
  *   Const:    n
  *
  ***************************************************************/
-LINKAGE poly p_Mult_nn(poly p, const number n, const ring r)
+LINKAGE poly p_Mult_nn__T(poly p, const number n, const ring r)
 {
-  pAssume(!n_IsZero(n,r));
+  pAssume(!n_IsZero__T(n,r));
   p_Test(p, r);
 
   poly q = p;
@@ -28,21 +28,21 @@ LINKAGE poly p_Mult_nn(poly p, const number n, const ring r)
   while (p != NULL)
   {
 #ifndef HAVE_ZERODIVISORS
-    n_InpMult(pGetCoeff(p), n, r);
+    n_InpMult__T(pGetCoeff(p), n, r);
     pIter(p);
 #else
-    number tmp = n_Mult(n, pGetCoeff(p), r);
+    number tmp = n_Mult__T(n, pGetCoeff(p), r);
     if (!nIsZero(tmp))
     {
        number nc = pGetCoeff(p);
        p_SetCoeff0(p, tmp, r);
-       n_Delete(&nc, r);
+       n_Delete__T(&nc, r);
        old = p;
        pIter(p);
     }
     else
     {
-      n_Delete(&tmp, r);
+      n_Delete__T(&tmp, r);
       if (old == NULL)
       {
         pIter(p);

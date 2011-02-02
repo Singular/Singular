@@ -193,7 +193,7 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
     printf("#define p_MemAddAdjust__T(p, r) ((void)0)\n");
   }
 
-  printf("#undef %s\n#define %s__T %s\n", s_what, s_what, s_full_proc_name);
+  printf("#undef %s__T\n#define %s__T %s\n", s_what, s_what, s_full_proc_name);
   printf("#include \"polys/templates/%s__T.cc\"\n", s_what);
   printf("#undef %s\n", s_what);
 #ifdef HAVE_RINGS

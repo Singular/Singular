@@ -16,7 +16,7 @@
  * Destroys: p, q
  *
  ***************************************************************/
-LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
+LINKAGE poly p_Add_q__T(poly p, poly q, int &Shorter, const ring r)
 {
   p_Test(p, r);
   p_Test(q, r);
@@ -37,24 +37,25 @@ LINKAGE poly p_Add_q(poly p, poly q, int &Shorter, const ring r)
   DECLARE_ORDSGN(const long* ordsgn = r->ordsgn);
 
   Top:     // compare p and q w.r.t. monomial ordering
-  p_MemCmp(p->exp, q->exp, length, ordsgn, goto Equal, goto Greater , goto Smaller);
+  p_MemCmp__T(p->exp, q->exp, length, ordsgn, goto Equal, goto Greater , goto Smaller);
 
   Equal:
   n1 = pGetCoeff(p);
   n2 = pGetCoeff(q);
   #if 0
-  t = n_Add(n1,n2, r);
-  n_Delete(&n1, r);
+  t = n_Add__T(n1,n2, r);
+  n_Delete__T(&n1, r);
   #else
-  t=n_InpAdd(n1,n2,r);
+  n_InpAdd__T(n1,n2,r);
+  t = n1;
   #endif
-  n_Delete(&n2, r);
+  n_Delete__T(&n2, r);
   q = p_LmFreeAndNext(q, r);
 
-  if (n_IsZero(t, r))
+  if (n_IsZero__T(t, r))
   {
     shorter += 2;
-    n_Delete(&t, r);
+    n_Delete__T(&t, r);
     p = p_LmFreeAndNext(p, r);
   }
   else

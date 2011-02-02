@@ -25,7 +25,7 @@
 #define MULTIPLY_BUCKET(B,I)
 #endif
 #ifndef USE_COEF_BUCKETS
-LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
+LINKAGE void p_kBucketSetLm__T(kBucket_pt bucket)
 {
   int j = 0;
   poly lt;
@@ -51,13 +51,13 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
           goto Continue;
         }
         assume(p != NULL);
-        p_MemCmp(bucket->buckets[i]->exp, p->exp, length, ordsgn, goto Equal, goto Greater, goto Continue);
+        p_MemCmp__T(bucket->buckets[i]->exp, p->exp, length, ordsgn, goto Equal, goto Greater, goto Continue);
 
         Greater:
         {
-          if (n_IsZero(pGetCoeff(p), r))
+          if (n_IsZero__T(pGetCoeff(p), r))
           {
-            n_Delete(&pGetCoeff(p), r);
+            n_Delete__T(&pGetCoeff(p), r);
             pIter(bucket->buckets[j]);
             p_FreeBinAddr(p, r);
             (bucket->buckets_length[j])--;
@@ -71,14 +71,15 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
           MULTIPLY_BUCKET(bucket,i);
           number tn = pGetCoeff(p);
           #if 0
-          pSetCoeff0(p, n_Add(pGetCoeff(bucket->buckets[i]), tn, r));
-          n_Delete(&tn, r);
+          pSetCoeff0(p, n_Add__T(pGetCoeff(bucket->buckets[i]), tn, r));
+          n_Delete__T(&tn, r);
           #else
-          pSetCoeff0(p, n_InpAdd(tn,pGetCoeff(bucket->buckets[i]), r));
+          n_InpAdd__T(tn,pGetCoeff(bucket->buckets[i]), r);
+          pSetCoeff0(p, tn);
           #endif
           p = bucket->buckets[i];
           pIter(bucket->buckets[i]);
-          n_Delete(&pGetCoeff(p), r);
+          n_Delete__T(&pGetCoeff(p), r);
           p_FreeBinAddr(p, r);
           (bucket->buckets_length[i])--;
         }
@@ -87,9 +88,9 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
       }
     }
     p = bucket->buckets[j];
-    if (j > 0 && n_IsZero(pGetCoeff(p), r))
+    if (j > 0 && n_IsZero__T(pGetCoeff(p), r))
     {
-      n_Delete(&pGetCoeff(p), r);
+      n_Delete__T(&pGetCoeff(p), r);
       pIter(bucket->buckets[j]);
       p_FreeBinAddr(p, r);
       (bucket->buckets_length[j])--;
@@ -114,7 +115,7 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
   kBucketAdjustBucketsUsed(bucket);
 }
 #else
-LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
+LINKAGE void p_kBucketSetLm__T(kBucket_pt bucket)
 {
   //int j = 0;
   poly lt;
@@ -137,7 +138,7 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
                 continue;
             }
             assume(p != NULL);
-            p_MemCmp(bucket->buckets[i]->exp, p->exp, length, ordsgn, goto Continue, goto Greater, goto Continue);
+            p_MemCmp__T(bucket->buckets[i]->exp, p->exp, length, ordsgn, goto Continue, goto Greater, goto Continue);
             //assume(p_LmCmp(bucket->buckets[i],p,r)==1);
           Greater:
             //if (p_LmCmp(bucket->buckets[i],p,r)!=1) continue;

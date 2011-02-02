@@ -15,9 +15,9 @@
  *   Const:    p, n
  *
  ***************************************************************/
-LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
+LINKAGE poly pp_Mult_nn__T(poly p, const number n, const ring r)
 {
-  pAssume(!n_IsZero(n,r));
+  pAssume(!n_IsZero__T(n,r));
   p_Test(p, r);
   if (p == NULL) return NULL;
   spolyrec rp;
@@ -34,20 +34,20 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
     p_AllocBin(pNext(q), bin, r);
     pIter(q);
     number nc = pGetCoeff(p);
-    pSetCoeff0(q, n_Mult(n, nc, r));
-    p_MemCopy(q->exp, p->exp, length);
+    pSetCoeff0(q, n_Mult__T(n, nc, r));
+    p_MemCopy__T(q->exp, p->exp, length);
 #else
     number nc = pGetCoeff(p);
-    number tmp = n_Mult(n, nc, r);
+    number tmp = n_Mult__T(n, nc, r);
     if (! nIsZero(tmp))
     {
       p_AllocBin(pNext(q), bin, r);
       pIter(q);
       pSetCoeff0(q, tmp);
-      p_MemCopy(q->exp, p->exp, length);
+      p_MemCopy__T(q->exp, p->exp, length);
     }
     else
-      n_Delete(&tmp,r);
+      n_Delete__T(&tmp,r);
 #endif
     pIter(p);
   }

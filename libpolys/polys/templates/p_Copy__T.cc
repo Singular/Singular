@@ -3,13 +3,13 @@
 ****************************************/
 /***************************************************************
  *  File:    p_Copy__Template.cc
- *  Purpose: template for p_Copy
+ *  Purpose: template for p_Copy__T
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
 
-LINKAGE poly p_Copy(poly s_p, const ring r)
+LINKAGE poly p_Copy__T(poly s_p, const ring r)
 {
   // let's not do tests here -- but instead allow
   // to be sloppy

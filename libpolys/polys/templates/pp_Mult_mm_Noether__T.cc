@@ -17,7 +17,7 @@
  *   Const:    p, m
  *
  ***************************************************************/
-LINKAGE poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int &ll, const ring ri, poly &last)
+LINKAGE poly pp_Mult_mm_Noether__T(poly p, const poly m, const poly spNoether, int &ll, const ring ri, poly &last)
 {
   p_Test(p, ri);
   p_LmTest(m, ri);
@@ -36,17 +36,17 @@ LINKAGE poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int 
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);
   DECLARE_ORDSGN(const long* ordsgn = ri->ordsgn);
   const unsigned long* m_e = m->exp;
-  pAssume(!n_IsZero(ln,ri));
+  pAssume(!n_IsZero__T(ln,ri));
   pAssume1(p_GetComp(m, ri) == 0 || p_MaxComp(p, ri) == 0);
   int l = 0;
 
   do
   {
     p_AllocBin(r, bin, ri);
-    p_MemSum(r->exp, p->exp, m_e, length);
-    p_MemAddAdjust(r, ri);
+    p_MemSum__T(r->exp, p->exp, m_e, length);
+    p_MemAddAdjust__T(r, ri);
 
-    p_MemCmp(r->exp, spNoether_exp, length, ordsgn, goto Continue, goto Continue, goto Break);
+    p_MemCmp__T(r->exp, spNoether_exp, length, ordsgn, goto Continue, goto Continue, goto Break);
 
     Break:
     p_FreeBinAddr(r, ri);
@@ -55,7 +55,7 @@ LINKAGE poly pp_Mult_mm_Noether(poly p, const poly m, const poly spNoether, int 
     Continue:
     l++;
     q = pNext(q) = r;
-    pSetCoeff0(q, n_Mult(ln, pGetCoeff(p), ri));
+    pSetCoeff0(q, n_Mult__T(ln, pGetCoeff(p), ri));
     pIter(p);
   } while (p != NULL);
 
