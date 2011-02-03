@@ -495,6 +495,11 @@ static BOOLEAN jjPOWER_N(leftv res, leftv u, leftv v)
 static BOOLEAN jjPOWER_P(leftv res, leftv u, leftv v)
 {
   int v_i=(int)(long)v->Data();
+  if (v_i<0)
+  {
+    Werror("negative exponent %d of a poly",v_i);
+    return TRUE;
+  }
   poly u_p=(poly)u->CopyD(POLY_CMD);
   int dummy;
   if ((u_p!=NULL)

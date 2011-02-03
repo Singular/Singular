@@ -653,7 +653,7 @@ example
 ///////////////////////////////////////////////////////////////////////////////
 
 proc sort (id, list #)
-"USAGE:   sort(id[,v,o,n]); id = ideal/module/intvec/list(of intvec's or int's)
+"USAGE:   sort(id[,v,o,n]); id = ideal/module/intvec/list
 @*       sort may be called with 1, 2 or 3 arguments in the following way:
 @*       sort(id[,v,n]); v=intvec of positive integers, n=integer,
 @*       sort(id[,o,n]); o=string (any allowed ordstr of a ring), n=integer
@@ -666,18 +666,7 @@ RETURN:  a list l of two elements:
              actual monomial ordering (if no o is given):
              NOTE: generators with SMALLER(!) leading term come FIRST
              (e.g. sort(id); sorts backwards to actual monomial ordering)
-           - if id=list of intvec's or int's: consider a list element, say
-             id[1]=3,2,5, as exponent vector of the monomial x^3*y^2*z^5;
-             the corresponding monomials are ordered w.r.t. intvec v (s.a.).
-             If no v is present, the monomials are sorted w.r.t. ordering o
-             (if o is given) or w.r.t. lexicographical ordering (if no o is
-             given). The corresponding ordered list of exponent vectors is
-             returned.
-             (e.g. sort(id); sorts lexicographically, smaller int's come first)
-             WARNING: Since negative exponents create the 0 polynomial in
-             Singular, id should not contain negative integers: the result
-             might not be as expected
-           - if id=intvec: id is treated as list of integers
+           - if id=list or intvec: sorted w.r.t. < (indep. of other arguments)
            - if n!=0 the ordering is inverse, i.e. w.r.t. v(size(v)..1)
              default: n=0
          l[2]: intvec, describing the permutation of the input (hence l[2]=v
@@ -717,40 +706,29 @@ EXAMPLE: example sort; shows an example
          n=2;
       }
    }
-   if ( typeof(id)=="intvec" or typeof(id)=="list" and n==0 )
+   if ( typeof(id)=="intvec" or typeof(id)=="list" )
    {
-      string o;
-      if ( size(#)==0 ) { o = "lp"; n=1; }
-      if ( size(#)>=1 )
+      int Bn,Bi,Bj,Bb;
+      intvec pivot;
+      for(Bi=size(id);Bi>0;Bi--) { pivot[Bi]=Bi; }
+      while(Bj==0)
       {
-         if ( typeof(#[1])=="string" ) { o = #[1]; n=1; }
+        Bi++;
+        Bj=1;
+        for(Bn=1;Bn<=size(id)-Bi;Bn++)
+        {
+          if(id[pivot[Bn]]>id[pivot[Bn+1]])
+          {
+            Bb=pivot[Bn];
+            pivot[Bn]=pivot[Bn+1];
+            pivot[Bn+1]=Bb;
+            Bj=0;
+          }
+        }
       }
-   }
-   if ( typeof(id)=="intvec" or typeof(id)=="list" and n==1 )
-   {
-      if ( typeof(id)=="list" )
-      {
-         for (ii=1; ii<=size(id); ii++)
-         {
-            if (typeof(id[ii]) != "intvec" and typeof(id[ii]) != "int")
-               { ERROR("// list elements must be intvec/int"); }
-            else
-               { s=size(id[ii])*(s < size(id[ii])) + s*(s >= size(id[ii])); }
-         }
-      }
-      execute("ring r=0,x(1..s),("+o+");");
-      ideal i;
-      poly f;
-      for (ii=1; ii<=size(id); ii++)
-      {
-         f=1;
-         for (jj=1; jj<=size(id[ii]); jj++)
-         {
-            f=f*x(jj)^(id[ii])[jj];
-         }
-         i[ii]=f;
-      }
-      v = sort(i)[2];
+      def Br=id;
+      for(Bi=size(id);Bi>0;Bi--) { Br[Bi]=id[pivot[Bi]]; }
+      return(list(Br,pivot));
    }
    if ( size(#)!=0 and n==0 ) { v = #[1]; }
    if( size(#)==2 )
@@ -797,11 +775,11 @@ example
    module( M[ sort(lead(M), "c,dp")[2] ] );
    sort( M, sort(lead(M), "c,dp")[2] )[1];
 
-   // BUG: Please, don't use this sort for integer vectors or lists 
+   // BUG: Please, don't use this sort for integer vectors or lists
    // with them if there can be negative integers!
    // TODO: for some HiWi
-   sort(3..-3)[1]; 
-   sort(list(-v, v))[1]; 
+   sort(3..-3)[1];
+   sort(list(-v, v))[1];
 
 }
 ///////////////////////////////////////////////////////////////////////////////
