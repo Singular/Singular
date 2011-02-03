@@ -743,7 +743,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       }
       else if(r == 1)
       {
-        strcmp(path,"Singular");
+        strcpy(path,"/usr/local/bin/Singular");
       }
       char* ssh_command = (char*)omAlloc(256);
       char* ser_host = (char*)omAlloc(64);
@@ -858,21 +858,24 @@ LINKAGE BOOLEAN ssiClose(si_link l)
     {
       fprintf(d->f_write,"99\n");fflush(d->f_write);
       link_list hh=ssiToBeClosed;
-      if (hh->l==l)
+      if (hh!=NULL)
       {
-         ssiToBeClosed=(link_list)hh->next;
-         omFreeSize(hh,sizeof(link_struct));
-      }
-      else while(hh!=NULL)
-      {
-        link_list hhh=(link_list)hh->next;
-        if (hhh->l==l)
+        if (hh->l==l)
         {
-          hh->next=hhh->next;
-          omFreeSize(hhh,sizeof(link_struct));
-          break;
+           ssiToBeClosed=(link_list)hh->next;
+           omFreeSize(hh,sizeof(link_struct));
         }
-        hh=(link_list)hh->next;
+        else while(hh!=NULL)
+        {
+          link_list hhh=(link_list)hh->next;
+          if (hhh->l==l)
+          {
+            hh->next=hhh->next;
+            omFreeSize(hhh,sizeof(link_struct));
+            break;
+          }
+          hh=(link_list)hh->next;
+        }
       }
     }
     if (d->f_read!=NULL) fclose(d->f_read);
