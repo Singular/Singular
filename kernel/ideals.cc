@@ -2541,10 +2541,6 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     if (origR->order[k]!=0) ordersize++;
     else break;
   }
-  ord=(int*)omAlloc0(ordersize*sizeof(int));
-  block0=(int*)omAlloc0(ordersize*sizeof(int));
-  block1=(int*)omAlloc0(ordersize*sizeof(int));
-  wv=(int**) omAlloc0(ordersize*sizeof(int**));
 #if 0
   if (rIsPluralRing(origR)) // we have too keep the odering: it may be needed
                             // for G-algebra
@@ -2577,23 +2573,81 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     ord[3]=0;
   }
 #else
-  for (k=0;k<ordersize-1; k++)
-  {
-    block0[k+1] = origR->block0[k];
-    block1[k+1] = origR->block1[k];
-    ord[k+1] = origR->order[k];
-    if (origR->wvhdl[k]!=NULL) wv[k+1] = (int*) omMemDup(origR->wvhdl[k]);
-  }
 #endif
-  block0[0] = 1;
-  block1[0] = rVar(origR);
-  wv[0]=(int*)omAlloc((rVar(origR) + 1)*sizeof(int));
-  memset(wv[0],0,(rVar(origR) + 1)*sizeof(int));
-  for (j=0;j<rVar(origR);j++)
-    if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
-  // use this special ordering: like ringorder_a, except that pFDeg, pWeights
-  // ignore it
-  ord[0] = ringorder_aa;
+  if ((hom==TRUE) && (origR->OrdSgn==1) && (!rIsPluralRing(origR)))
+  {
+    #if 1
+    // we change to an ordering:
+    // aa(1,1,1,...,0,0,0),wp(...),C
+    ord=(int*)omAlloc0(4*sizeof(int));
+    block0=(int*)omAlloc0(4*sizeof(int));
+    block1=(int*)omAlloc0(4*sizeof(int));
+    wv=(int**) omAlloc0(4*sizeof(int**));
+    block0[0] = block0[1] = 1;
+    block1[0] = block1[1] = rVar(origR);
+    wv[0]=(int*)omAlloc0((rVar(origR) + 1)*sizeof(int));
+    // use this special ordering: like ringorder_a, except that pFDeg, pWeights
+    // ignore it
+    ord[0] = ringorder_aa;
+    for (j=0;j<rVar(origR);j++)
+      if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
+    BOOLEAN wp=FALSE;
+    for (j=0;j<rVar(origR);j++)
+      if (pWeight(j+1,origR)!=1) { wp=TRUE;break; }
+    if (wp)
+    {
+      wv[1]=(int*)omAlloc0((rVar(origR) + 1)*sizeof(int));
+      for (j=0;j<rVar(origR);j++)
+        wv[1][j]=pWeight(j+1,origR);
+      ord[1] = ringorder_wp;
+    }
+    else
+      ord[1] = ringorder_dp;
+    #else
+    // we change to an ordering:
+    // a(w1,...wn),wp(1,...0.....),C
+    ord=(int*)omAlloc0(4*sizeof(int));
+    block0=(int*)omAlloc0(4*sizeof(int));
+    block1=(int*)omAlloc0(4*sizeof(int));
+    wv=(int**) omAlloc0(4*sizeof(int**));
+    block0[0] = block0[1] = 1;
+    block1[0] = block1[1] = rVar(origR);
+    wv[0]=(int*)omAlloc0((rVar(origR) + 1)*sizeof(int));
+    wv[1]=(int*)omAlloc0((rVar(origR) + 1)*sizeof(int));
+    ord[0] = ringorder_a;
+    for (j=0;j<rVar(origR);j++)
+      wv[0][j]=pWeight(j+1,origR);
+    ord[1] = ringorder_wp;
+    for (j=0;j<rVar(origR);j++)
+      if (pGetExp(delVar,j+1)!=0) wv[1][j]=1;
+    #endif
+    ord[2] = ringorder_C;
+    ord[3] = 0;
+  }
+  else
+  {
+    // we change to an ordering:
+    // aa(....),orig_ordering
+    ord=(int*)omAlloc0(ordersize*sizeof(int));
+    block0=(int*)omAlloc0(ordersize*sizeof(int));
+    block1=(int*)omAlloc0(ordersize*sizeof(int));
+    wv=(int**) omAlloc0(ordersize*sizeof(int**));
+    for (k=0;k<ordersize-1; k++)
+    {
+      block0[k+1] = origR->block0[k];
+      block1[k+1] = origR->block1[k];
+      ord[k+1] = origR->order[k];
+      if (origR->wvhdl[k]!=NULL) wv[k+1] = (int*) omMemDup(origR->wvhdl[k]);
+    }
+    block0[0] = 1;
+    block1[0] = rVar(origR);
+    wv[0]=(int*)omAlloc0((rVar(origR) + 1)*sizeof(int));
+    for (j=0;j<rVar(origR);j++)
+      if (pGetExp(delVar,j+1)!=0) wv[0][j]=1;
+    // use this special ordering: like ringorder_a, except that pFDeg, pWeights
+    // ignore it
+    ord[0] = ringorder_aa;
+  }
   // fill in tmp ring to get back the data later on
   tmpR  = rCopy0(origR,FALSE,FALSE); // qring==NULL
   //rUnComplete(tmpR);
