@@ -355,6 +355,9 @@ static inline number n_Lcm(number a, number b, const coeffs r)
 static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
 { return dst->cfSetMap(src,dst); }
 
+static inline number n_Par(int n, const coeffs r)
+{ return r->cfPar(n,r); }
+
 static inline int n_ParDeg(number n, const coeffs r)
 { return r->cfParDeg(n,r); }
 
@@ -372,7 +375,7 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
 // Missing wrappers for:
-// cfIntMod, cfPar, cfParDeg, cfInt, cfRePart, cfImPart, cfRead, cfName, cfInit_bigint
+// cfIntMod, cfInt, cfRePart, cfImPart, cfRead, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfExtGcd... cfDivBy
 
 

@@ -2896,7 +2896,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
     if ((OldPar==0)||(rField_is_GF(oldRing)))
     {
       qq = p_Init(dst);
-      number n=nMap(pGetCoeff(p),dst->cf);
+      number n=nMap(pGetCoeff(p),oldRing->cf,dst->cf);
       if ((dst->minpoly!=NULL)
       && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
       {
@@ -2908,6 +2908,8 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
     else
     {
       qq=p_One(dst);
+      WerrorS("longalg missing");
+      #if 0
       aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
       if ((dst->minpoly!=NULL)
       && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
@@ -2922,6 +2924,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
         }
       }
       p_Test(aq,dst);
+      #endif
     }
     if (rRing_has_Comp(dst)) p_SetComp(qq, p_GetComp(p,oldRing),dst);
     if (n_IsZero(pGetCoeff(qq),dst->cf))
@@ -2956,6 +2959,8 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
             }
             else
             {
+	      WerrorS("longalg missing");
+	      #if 0
               lnumber c=(lnumber)pGetCoeff(qq);
               if (c->z->next==NULL)
                 p_AddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->algring);
@@ -2969,6 +2974,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
                 n_Delete((number *)&mmc,dst->cf); 
               }
               mapped_to_par=1;
+	      #endif
             }
           }
           else
