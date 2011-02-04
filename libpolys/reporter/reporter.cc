@@ -374,3 +374,28 @@ void PrintNSpaces(const int n)
 
 /* end extern "C" */
 }
+
+const char* eati(const char *s, int *i)
+{
+  int l=0;
+
+  if    (*s >= '0' && *s <= '9')
+  {
+    *i = 0;
+    while (*s >= '0' && *s <= '9')
+    {
+      *i *= 10;
+      *i += *s++ - '0';
+      l++;
+      if ((l>=MAX_INT_LEN)||((*i) <0))
+      {
+        s-=l;
+        Werror("`%s` greater than %d(max. integer representation)",
+                s,MAX_INT_VAL);
+        return s;
+      }
+    }
+  }
+  else *i = 1;
+  return s;
+}

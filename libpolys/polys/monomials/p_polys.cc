@@ -18,6 +18,7 @@
 #include <polys/monomials/ring.h>
 #include <coeffs/longrat.h>
 #include <misc/options.h>
+#include <misc/intvec.h>
 // #include <???/ideals.h>
 // #include <???/int64vec.h>
 #ifndef NDEBUG
@@ -1870,6 +1871,8 @@ void p_Content(poly ph, const ring r)
       number hzz = nlInit(1, r->cf);
       h = nlInit(1, r->cf);
       p=ph;
+      Werror("longalg missing");
+      #if 0
       while (p!=NULL)
       { // each monom: coeff in Q_a
         lnumber c_n_n=(lnumber)pGetCoeff(p);
@@ -1933,6 +1936,7 @@ void p_Content(poly ph, const ring r)
         }
       }
       nlDelete(&h,r->algring->cf);
+      #endif
     }
   }
 }

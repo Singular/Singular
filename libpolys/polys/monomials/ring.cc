@@ -13,6 +13,7 @@
 // #include <polys/options.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
+#include <misc/intvec.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>

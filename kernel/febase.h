@@ -243,7 +243,6 @@ const  char * VoiceName();
 void    VoiceBackTrack();
 void    Warn(const char *fmt, ...);
 BOOLEAN contBuffer(feBufferTypes typ);
-const char *  eati(const char *s, int *i);
 BOOLEAN exitBuffer(feBufferTypes typ);
 BOOLEAN exitVoice();
 void    monitor(void *F, int mode); /* FILE*, int */
