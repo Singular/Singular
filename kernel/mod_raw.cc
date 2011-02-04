@@ -165,6 +165,10 @@ extern "C" {
 #define HAVE_ELF_SYSTEM
 #endif
 
+#if defined(x86_64Mac_darwin)
+#define HAVE_ELF_SYSTEM
+#endif
+
 #if defined(SunOS_5)
 #define HAVE_ELF_SYSTEM
 #endif

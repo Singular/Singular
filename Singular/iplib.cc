@@ -32,7 +32,7 @@
 #define SI_MAX_NEST 1000
 #endif
 
-#if defined(ix86Mac_darwin) || defined(ppcMac_darwin)
+#if defined(ix86Mac_darwin) || defined(x86_64Mac_darwin) || defined(ppcMac_darwin)
 #  define MODULE_SUFFIX bundle
 #elif defined(ix86_Win)
 #  define MODULE_SUFFIX dll

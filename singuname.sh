@@ -100,6 +100,10 @@ then
     then
         echo ${prefix}-Linux
         exit 0
+    elif (echo $uname_a | $egrep "Darwin" >$devnull)
+    then
+        echo x86_64Mac-darwin
+        exit 0
     else
         echo ${prefix}-Unknown
         exit 1
