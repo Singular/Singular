@@ -2579,6 +2579,8 @@ ideal idElimination (ideal h1,poly delVar,intvec *hilb)
     #if 1
     // we change to an ordering:
     // aa(1,1,1,...,0,0,0),wp(...),C
+    // this seems to be better than version 2 below,
+    // according to Tst/../elimiate_[3568].tat (- 17 %)
     ord=(int*)omAlloc0(4*sizeof(int));
     block0=(int*)omAlloc0(4*sizeof(int));
     block1=(int*)omAlloc0(4*sizeof(int));
