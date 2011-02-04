@@ -792,7 +792,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   if ((rFieldType(r1)==rFieldType(r2))
   && (rInternalChar(r1)==rInternalChar(r2)))
   {
-    tmpR.ch=rInternalChar(r1);
+    tmpR.ch=r1->ch;
     if (rField_is_Q(r1)||rField_is_Zp(r1)||rField_is_GF(r1)) /*Q, Z/p, GF(p,n)*/
     {
       if (r1->parameter!=NULL)
@@ -945,7 +945,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       if ((r2->ch==0) /* Q */
           || (r2->ch==-r1->ch)) /* Z/p */
       {
-        tmpR.ch=rInternalChar(r1);
+        tmpR.ch=r1->ch;
         tmpR.P=rPar(r1);
         tmpR.parameter=(char **)omAlloc(rPar(r1)*sizeof(char *));
         int i;
@@ -1006,7 +1006,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     {
       if (r2->ch==0) /* Q */
       {
-        tmpR.ch=rInternalChar(r1);
+        tmpR.ch=r1->ch;
         tmpR.P=rPar(r1);
         tmpR.parameter=(char **)omAlloc(rPar(r1)*sizeof(char *));
         int i;
@@ -1390,8 +1390,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
       idTest((ideal)C);
 
-      nMapFunc nMap1 = n_SetMap(R1,sum); /* can change something global: not usable
-					    after the next nSetMap call :( */
+      nMapFunc nMap1 = n_SetMap(R1->cf,sum->cf); /* can change something global: not usable
+						    after the next nSetMap call :( */
       // Create blocked C and D matrices:
       for (i=1; i<= rVar(R1); i++)
         for (j=i+1; j<=rVar(R1); j++)
@@ -1407,8 +1407,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       idTest((ideal)D);
 
 
-      nMapFunc nMap2 = n_SetMap(R2,sum); /* can change something global: not usable
-					    after the next nSetMap call :( */
+      nMapFunc nMap2 = n_SetMap(R2->cf,sum->cf); /* can change something global: not usable
+						    after the next nSetMap call :( */
       for (i=1; i<= rVar(R2); i++)
         for (j=i+1; j<=rVar(R2); j++)
         {
@@ -1474,7 +1474,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     maFindPerm(r1->names,  rVar(r1),  r1->parameter,  rPar(r1),
                sum->names, rVar(sum), sum->parameter, rPar(sum),
                perm1, par_perm1, sum->ch);
-    nMapFunc nMap1 = n_SetMap(r1,sum);
+    nMapFunc nMap1 = n_SetMap(r1->cf,sum->cf);
     Q1 = idInit(IDELEMS(r1->qideal),1);
     for (int for_i=0;for_i<IDELEMS(r1->qideal);for_i++)
       Q1->m[for_i] = p_PermPoly(r1->qideal->m[for_i],perm1,r1,nMap1,par_perm1,rPar(r1),sum);
@@ -1491,7 +1491,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     maFindPerm(r2->names,  rVar(r2),  r2->parameter,  rPar(r2),
                sum->names, rVar(sum), sum->parameter, rPar(sum),
                perm2, par_perm2, sum->ch);
-    nMapFunc nMap2 = n_SetMap(r2,sum);
+    nMapFunc nMap2 = n_SetMap(r2->cf,sum->cf);
     Q2 = idInit(IDELEMS(r2->qideal),1);
     for (int for_i=0;for_i<IDELEMS(r2->qideal);for_i++)
       Q2->m[for_i] = p_PermPoly(r2->qideal->m[for_i],perm2,r2,nMap2,par_perm2,rPar(r2),sum);
@@ -5418,7 +5418,7 @@ ring rOpposite(ring src)
 
     int *perm       = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
     int *par_perm   = NULL;
-    nMapFunc nMap   = n_SetMap(src,r);
+    nMapFunc nMap   = n_SetMap(src->cf,r->cf);
     int ni,nj;
     for(i=1; i<=r->N; i++)
     {
@@ -5535,7 +5535,7 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 
   const ring srcBase = src;
 
-  assume( n_SetMap(srcBase,dest) == n_SetMap(dest,dest) ); // currRing is important here!
+  assume( n_SetMap(srcBase->cf,dest->cf) == n_SetMap(dest->cf,dest->cf) ); // currRing is important here!
 
   matrix C = mpNew(N,N); // ring independent
   matrix D = mpNew(N,N);
