@@ -62,6 +62,8 @@ char *  StringAppendS(const char *s);
 char *  StringSetS(const char* s);
 void    Warn(const char *fmt, ...);
 
+const char *  eati(const char *s, int *i);
+
 #endif /* c++ only */
 
 /* everything in between calls to these procedures is printed into a string
