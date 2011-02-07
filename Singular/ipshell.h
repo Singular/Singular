@@ -31,7 +31,6 @@ extern const char *singular_date; /* tesths.cc, set by final compile */
 extern BOOLEAN yyInRingConstruction; /* 1: during ring construction */
 
 int     IsCmd(const char *n, int & tok);
-short   IsCmdToken(short tok);
 
 BOOLEAN iiPStart(idhdl pn, sleftv * sl);
 BOOLEAN iiEStart(char* example, procinfo *pi);
