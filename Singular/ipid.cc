@@ -76,7 +76,7 @@ int iiS2I(const char *s)
       }
     }
   }
-  return i;  
+  return i;
 }
 
 idhdl idrec::get(const char * s, int lev)
@@ -190,19 +190,19 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
          break;
        default:
          {
-	   if (t>MAX_TOK)
-	   {
+           if (t>MAX_TOK)
+           {
 #ifdef BLACKBOX_DEVEL
              Print("bb-type %d\n",t);
 #endif
-	     blackbox *bb=getBlackboxStuff(t);
-	     if (bb!=NULL)
-	       IDSTRING(h)=(char *)bb->blackbox_Init(bb);
-	   }
-	   else
-	     Werror("unknown type %d",t);
-	   break;
-	 }
+             blackbox *bb=getBlackboxStuff(t);
+             if (bb!=NULL)
+               IDSTRING(h)=(char *)bb->blackbox_Init(bb);
+           }
+           else
+             Werror("unknown type %d",t);
+           break;
+         }
     }
     // additional settings:--------------------------------------
 #if 0
@@ -401,7 +401,6 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
   {
     // any objects defined for this ring ? -> done by rKill
-    
     rKill(h);
   }
   // package -------------------------------------------------------------
@@ -521,8 +520,8 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
 #endif /* HAVE_FANS */
 #ifdef TEST
   else if ((IDTYP(h)!= INT_CMD)
-  &&(IDTYP(h)!=DEF_CMD) 
-  &&(IDTYP(h)!=ALIAS_CMD) 
+  &&(IDTYP(h)!=DEF_CMD)
+  &&(IDTYP(h)!=ALIAS_CMD)
   &&(IDTYP(h)!=NONE))
     Warn("unknown type to kill: %s(%d)",Tok2Cmdname(IDTYP(h)),IDTYP(h));
 #endif
