@@ -1,6 +1,7 @@
 #include <Singular/mod2.h>
 #include <Singular/tok.h>
 #include <Singular/subexpr.h>
+#include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 
 //#define BLACKBOX_DEVEL 1
@@ -41,22 +42,26 @@ void *blackbox_default_Init(blackbox *b)
 }
 BOOLEAN blackbox_default_Op1(int op,leftv l, leftv r)
 {
-  Werror("blackbox_Op1  of type %d for op %d not implemented",r->Typ(),op);
+  Werror("blackbox_Op1 of type %s(%d) for op %s(%d) not implemented",
+     getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
   return TRUE;
 }
 BOOLEAN blackbox_default_Op2(int op,leftv l, leftv r1, leftv r2)
 {
-  Werror("blackbox_Op2  of type %d for op %d not implemented",r1->Typ(),op);
+  Werror("blackbox_Op2 of type %s(%d) for op %s(%d) not implemented",
+     getBlackboxName(r1->Typ()),r1->Typ(),Tok2Cmdname(op),op);
   return TRUE;
 }
 BOOLEAN blackbox_default_Op3(int op,leftv l, leftv r1,leftv r2, leftv r3)
 {
-  Werror("blackbox_Op3 of type %d for op %d not implemented",r1->Typ(),op);
+  Werror("blackbox_Op3 of type %s(%d) for op %s(%d) not implemented",
+     getBlackboxName(r1->Typ()),r1->Typ(),Tok2Cmdname(op),op);
   return TRUE;
 }
 BOOLEAN blackbox_default_OpM(int op,leftv l, leftv r)
 {
-  Werror("blackbox_OpM of type %d for op %d not implemented",r->Typ(),op);
+  Werror("blackbox_OpM of type %s(%d) for op %s(%d) not implemented",
+     getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
   return TRUE;
 }
 
