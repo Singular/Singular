@@ -444,9 +444,11 @@ void sleftv::CleanUp(ring r)
       case RESOLUTION_CMD:
         if (r!=NULL) syKillComputation((syStrategy)data,r);
         break;
+      case IDHDL:
+        attribute=NULL; // is only a pointer to attribute of id
+	break;
       // the following types do not take memory
       // or are not copied
-      case IDHDL:
       case PACKAGE_CMD:
       case ANY_TYPE:
       case VECHO:
