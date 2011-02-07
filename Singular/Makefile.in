@@ -360,7 +360,7 @@ Singular-static: version.h
 	sleep 1
 	echo "#define HAVE_STATIC" > static.h
 	rm -f pyobject_setup.o
-	(cd ../kernel;rm -f mod_raw.o;${MAKE} LD_STATIC=1 depend install-bindist;cd ../Singular)
+	(cd ../kernel;rm -f mod_raw.o;${MAKE} LD_STATIC=1 depend;${MAKE} LD_STATIC=1 install-bindist;cd ../Singular)
 	${MAKE} LD_STATIC=1 S_EXT="-static" depend Singular-static
 	echo "#undef HAVE_STATIC" > static.h
 
