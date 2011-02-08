@@ -96,7 +96,7 @@ public:
         v=NULL;
       }
     }
-  inline void ivTEST()
+  inline void ivTEST() const
     {
       omCheckAddrSize((ADDRESS)v,sizeof(int)*row*col);
     }
@@ -139,12 +139,13 @@ intvec * ivMult(intvec * a, intvec * b);
 void     ivTriangIntern(intvec * imat, int &ready, int &all);
 intvec * ivSolveKern(intvec * imat, int ready);
 
-
+inline void ivTest(intvec * v)
+{
 #ifdef MDEBUG
-#define ivTest(v) v->ivTEST()
-#else
-#define ivTest(v)   ((void)0)
+  v->ivTEST();
 #endif
+}
+
 #undef INLINE_THIS
 
 #endif

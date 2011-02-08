@@ -7966,8 +7966,13 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
     poly h0 = pSubst(pCopy(h), xIndex, NULL);
     intvec* v = NULL;
     ideal i = singclap_factorize(h0, &v, 0);
+
+    ivTest(v);
+
     if (i == NULL) return TRUE;
-    ivTest(i);
+
+    idTest(i);
+    
     if ((v->rows() != 3) || ((*v)[0] =! 1) || (!nIsOne(pGetCoeff(i->m[0]))))
     {
       WerrorS("expected h(0,y) to have exactly two distinct monic factors");
