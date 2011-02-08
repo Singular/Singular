@@ -139,12 +139,14 @@ intvec * ivMult(intvec * a, intvec * b);
 void     ivTriangIntern(intvec * imat, int &ready, int &all);
 intvec * ivSolveKern(intvec * imat, int ready);
 
+#ifdef MDEBUG
 inline void ivTest(intvec * v)
 {
-#ifdef MDEBUG
   v->ivTEST();
-#endif
 }
+#else
+#define ivTest(v) ((void)0)
+#endif
 
 #undef INLINE_THIS
 
