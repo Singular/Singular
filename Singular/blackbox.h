@@ -35,6 +35,8 @@ struct  blackbox_struct
   /// additional type info
   void *data;
 } ;
+/// default procedure blackboxDefaultOp1, to be called as "default:" branch
+BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r);
 
 /// return the structure to the type given by t
 blackbox* getBlackboxStuff(const int t);

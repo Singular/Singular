@@ -40,8 +40,14 @@ void *blackbox_default_Init(blackbox *b)
 {
   return NULL;
 }
-BOOLEAN blackbox_default_Op1(int op,leftv l, leftv r)
+BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
 {
+  if (op==TYPEOF_CMD)
+  {
+    l->data=omStrDup(getBlackboxName(r->Typ()));
+    l->rtyp=STRING_CMD;
+    return FALSE;
+  }
   Werror("blackbox_Op1 of type %s(%d) for op %s(%d) not implemented",
      getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
   return TRUE;
@@ -77,7 +83,7 @@ int setBlackboxStuff(blackbox *bb, const char *n)
   if (bb->blackbox_Print==NULL)   bb->blackbox_Print=blackbox_default_Print;
   if (bb->blackbox_Init==NULL)    bb->blackbox_Init=blackbox_default_Init;
   if (bb->blackbox_Copy==NULL)    bb->blackbox_Copy=blackbox_default_Copy;
-  if (bb->blackbox_Op1==NULL)     bb->blackbox_Op1=blackbox_default_Op1;
+  if (bb->blackbox_Op1==NULL)     bb->blackbox_Op1=blackboxDefaultOp1;
   if (bb->blackbox_Op2==NULL)     bb->blackbox_Op2=blackbox_default_Op2;
   if (bb->blackbox_Op3==NULL)     bb->blackbox_Op3=blackbox_default_Op3;
   if (bb->blackbox_OpM==NULL)     bb->blackbox_OpM=blackbox_default_OpM;

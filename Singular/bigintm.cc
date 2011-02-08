@@ -29,7 +29,7 @@ void bigintm_setup()
   //b->blackbox_Init=blackbox_default_Init;
   b->blackbox_Copy=bigintm_Copy;
   b->blackbox_Assign=bigintm_Assign;
-  //b->blackbox_Op1=blackbox_default_Op1;
+  //b->blackbox_Op1=blackboxDefaultOp1;
   b->blackbox_Op2=bigintm_Op2;
   //b->blackbox_Op3=blackbox_default_Op3;
   b->blackbox_OpM=bigintm_OpM;
