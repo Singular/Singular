@@ -7863,7 +7863,135 @@ extern "C"
   void usleep(unsigned long usec);
 };
 #endif
-
+static BOOLEAN jjFactModD_M(leftv res, leftv v)
+{
+  /* compute two factors of h(x,y) modulo x^(d+1) in K[[x]][y],
+     see doc in /kernel/linearAlgebra.h
+     
+     valid argument lists:
+     - (poly h, int d),
+     - (poly h, int d, poly f0, poly g0),       optional: factors of h(0,y),
+     - (poly h, int d, int xIndex, int yIndex), optional: indices of vars x & y
+                                                          in list of ring vars,
+     - (poly h, int d, poly f0, poly g0, int xIndex, int yIndec),
+                                                optional: all 4 optional args
+     result:
+     - list with the two factors f and g such that
+       h(x,y) = f(x,y)*g(x,y) mod x^(d+1)   */
+  
+  poly h      = NULL;
+  int  d      =    1;
+  poly f0     = NULL;
+  poly g0     = NULL;
+  int  xIndex =    1;   /* default index if none provided */
+  int  yIndex =    2;   /* default index if none provided */
+  
+  leftv u = v; int factorsGiven = 0;
+  if ((u == NULL) || (u->Typ() != POLY_CMD))
+  {
+    WerrorS("expected arguments (poly, int [, poly, poly] [, int, int])");
+    return TRUE;
+  }
+  else h = (poly)u->Data();
+  u = u->next;
+  if ((u == NULL) || (u->Typ() != INT_CMD))
+  {
+    WerrorS("expected arguments (poly, int [, poly, poly] [, int, int])");
+    return TRUE;
+  }
+  else d = (int)(long)u->Data();
+  u = u->next;
+  if ((u != NULL) && (u->Typ() == POLY_CMD))
+  {
+    if ((u->next == NULL) || (u->next->Typ() != POLY_CMD))
+    {
+      WerrorS("expected arguments (poly, int [, poly, poly] [, int, int])");
+      return TRUE;
+    }
+    else
+    {
+      f0 = (poly)u->Data();
+      g0 = (poly)u->next->Data();
+      factorsGiven = 1;
+      u = u->next->next;
+    }
+  }
+  if ((u != NULL) && (u->Typ() == INT_CMD))
+  {
+    if ((u->next == NULL) || (u->next->Typ() != INT_CMD))
+    {
+      WerrorS("expected arguments (poly, int [, poly, poly] [, int, int])");
+      return TRUE;
+    }
+    else
+    {
+      xIndex = (int)(long)u->Data();
+      yIndex = (int)(long)u->next->Data();
+      u = u->next->next;
+    }
+  }
+  if (u != NULL)
+  {
+    WerrorS("expected arguments (poly, int [, poly, poly] [, int, int])");
+    return TRUE;
+  }
+  
+  /* checks for provided arguments */
+  if (pIsConstant(h) || (factorsGiven && (pIsConstant(f0) || pIsConstant(g0))))
+  {
+    WerrorS("expected non-constant polynomial argument(s)");
+    return TRUE;
+  }
+  int n = rVar(currRing);
+  if ((xIndex < 1) || (n < xIndex))
+  {
+    Werror("index for variable x (%d) out of range [1..%d]", xIndex, n);
+    return TRUE;
+  }
+  if ((yIndex < 1) || (n < yIndex))
+  {
+    Werror("index for variable y (%d) out of range [1..%d]", yIndex, n);
+    return TRUE;
+  }
+  if (xIndex == yIndex)
+  {
+    WerrorS("expected distinct indices for variables x and y");
+    return TRUE;
+  }
+  
+  /* computation of f0 and g0 if missing */
+  if (factorsGiven == 0)
+  {
+#ifdef HAVE_FACTORY
+    poly h0 = pSubst(pCopy(h), xIndex, NULL);
+    intvec* v = NULL;
+    ideal i = singclap_factorize(h0, &v, 0);
+    if (i == NULL) return TRUE;
+    ivTest(i);
+    if ((v->rows() != 3) || ((*v)[0] =! 1) || (!nIsOne(pGetCoeff(i->m[0]))))
+    {
+      WerrorS("expected h(0,y) to have exactly two distinct monic factors");
+      return TRUE;
+    }
+    f0 = pPower(pCopy(i->m[1]), (*v)[1]);
+    g0 = pPower(pCopy(i->m[2]), (*v)[2]);
+    idDelete(&i);
+#else
+    WerrorS("cannot factorize h(0,y) due to missing module 'factory'");
+    return TRUE;
+#endif
+  }
+  
+  poly f; poly g;
+  henselFactors(xIndex, yIndex, h, f0, g0, d, f, g);
+  lists L = (lists)omAllocBin(slists_bin);
+  L->Init(2);
+  L->m[0].rtyp = POLY_CMD; L->m[0].data=(void*)f;
+  L->m[1].rtyp = POLY_CMD; L->m[1].data=(void*)g;
+  res->rtyp = LIST_CMD;
+  res->data = (char*)L;
+  return FALSE;
+}
 static BOOLEAN jjSTATUS_M(leftv res, leftv v)
 {
   if ((v->Typ() != LINK_CMD) ||
