@@ -32,6 +32,8 @@ struct  blackbox_struct
   BOOLEAN (*blackbox_Op3)(int op,leftv l, leftv r1,leftv r2, leftv r3);
   /// interpreter: operations with undefined number of operands
   BOOLEAN (*blackbox_OpM)(int op,leftv l, leftv r);
+  /// check internal structure
+  BOOLEAN (*blackbox_Check)(blackbox *b,void *d);
   /// additional type info
   void *data;
   /// addtinional gneral properties
@@ -39,6 +41,8 @@ struct  blackbox_struct
 } ;
 /// default procedure blackboxDefaultOp1, to be called as "default:" branch
 BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r);
+/// default procedure blackboxDefaultOp2, to be called as "default:" branch
+BOOLEAN blackboxDefaultOp2(int op,leftv l, leftv r1, leftv r2);
 
 /// return the structure to the type given by t
 blackbox* getBlackboxStuff(const int t);

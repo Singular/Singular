@@ -123,11 +123,8 @@ BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       }
       return TRUE;
     }
-    default:
-      Werror("op %d not implemented for type %d",op,a1->Typ());
-      break;
   }
-  return TRUE;
+  return blackboxDefaultOp2(op,res,a1,a2);
 }
 // BOOLEAN opM(int op, leftv res, leftv args)
 BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
