@@ -34,6 +34,8 @@ struct  blackbox_struct
   BOOLEAN (*blackbox_OpM)(int op,leftv l, leftv r);
   /// additional type info
   void *data;
+  /// addtinional gneral properties
+  char like_lists; // 1:blackbox is only a wrapper for lists
 } ;
 /// default procedure blackboxDefaultOp1, to be called as "default:" branch
 BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r);
