@@ -120,6 +120,78 @@ idhdl idrec::get(const char * s, int lev)
 //  /* much more !! */
 //}
 
+void *idrecDataInit(int t)
+{
+  switch (t)
+  {
+    //the type with init routines:
+    case INTVEC_CMD:
+    case INTMAT_CMD:
+      return (void *)new intvec();
+    case NUMBER_CMD:
+      return (void *) nInit(0);
+    case BIGINT_CMD:
+      return (void *) nlInit(0, NULL /* dummy for nlInit*/);
+    case IDEAL_CMD:
+    case MODUL_CMD:
+    case MATRIX_CMD:
+      return (void*) idInit(1,1);
+    case MAP_CMD:
+    {
+      map m = (map)idInit(1,1);
+      m->preimage = omStrDup(IDID(currRingHdl));
+      return (void *)m;
+    }
+    case STRING_CMD:
+      return (void *)omAlloc0(1);
+    case LIST_CMD:
+    {
+      lists l=(lists)omAllocBin(slists_bin);
+      l->Init();
+      return (void*)l;
+    }
+#ifdef HAVE_FANS
+    case FAN_CMD:
+      return (void*)(new gfan::ZFan(0));
+    case CONE_CMD:
+      return (void*)(new gfan::ZCone());
+#endif
+    //the types with the standard init: set the struct to zero
+    case LINK_CMD:
+      return (void*) omAlloc0Bin(sip_link_bin);
+    case RING_CMD:
+      return (void*) omAlloc0Bin(sip_sring_bin);
+    case PACKAGE_CMD:
+      return (void*) omAlloc0Bin(sip_package_bin);
+    case PROC_CMD:
+      return (void *) omAlloc0Bin(procinfo_bin);
+    case RESOLUTION_CMD:
+      return  (void *)omAlloc0(sizeof(ssyStrategy));
+    //other types: without init (int,script,poly,def,package)
+    case INT_CMD:
+    case DEF_CMD:
+    case POLY_CMD:
+    case VECTOR_CMD:
+    case QRING_CMD:
+       return (void*)0L;
+    default:
+      {
+        if (t>MAX_TOK)
+        {
+#ifdef BLACKBOX_DEVEL
+          Print("bb-type %d\n",t);
+#endif
+          blackbox *bb=getBlackboxStuff(t);
+          if (bb!=NULL)
+             return (void *)bb->blackbox_Init(bb);
+        }
+        else
+          Werror("unknown type %d",t);
+        break;
+      }
+  }
+  return (void *)0L;
+}
 idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
 {
   //printf("define %s, %x, lev: %d, typ: %d\n", s,s,lev,t);
@@ -131,108 +203,28 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
   h->id_i=iiS2I(s);
   if (init)
   {
-    switch (t)
-    {
-      //the type with init routines:
-      case INTVEC_CMD:
-      case INTMAT_CMD:
-        IDINTVEC(h) = new intvec();
-        break;
-      case NUMBER_CMD:
-        IDNUMBER(h) = nInit(0);
-        break;
-      case BIGINT_CMD:
-        IDNUMBER(h) = nlInit(0, NULL /* dummy for nlInit*/);
-        break;
-      case IDEAL_CMD:
-      case MODUL_CMD:
-        IDFLAG(h) = Sy_bit(FLAG_STD);
-      case MATRIX_CMD:
-        IDIDEAL(h) = idInit(1,1);
-        break;
-      case MAP_CMD:
-        IDIDEAL(h) = idInit(1,1);
-        IDMAP(h)->preimage = omStrDup(IDID(currRingHdl));
-        break;
-      case STRING_CMD:
-        IDSTRING(h) = (char *)omAlloc0(1);
-        break;
-      case LIST_CMD:
-        IDLIST(h)=(lists)omAllocBin(slists_bin);
-        IDLIST(h)->Init();
-        break;
-      case LINK_CMD:
-        IDLINK(h)=(si_link) omAlloc0Bin(sip_link_bin);
-        break;
-      case RING_CMD:
-        IDRING(h) = (ring) omAlloc0Bin(sip_sring_bin);
-        break;
-      case PACKAGE_CMD:
-        IDPACKAGE(h) = (package) omAlloc0Bin(sip_package_bin);
-        break;
-      case PROC_CMD:
-        IDPROC(h) = (procinfo*) omAlloc0Bin(procinfo_bin);
-        break;
-        //the types with the standard init: set the struct to zero
-      case RESOLUTION_CMD:
-        IDSTRING(h) = (char *)omAlloc0(sizeof(ssyStrategy));
-        break;
-    //other types: without init (int,script,poly,def,package)
-       case INT_CMD:
-       case DEF_CMD:
-       case POLY_CMD:
-       case VECTOR_CMD:
-       case QRING_CMD:
-#ifdef HAVE_FANS
-       case FAN_CMD:
-       case CONE_CMD:
-#endif
-         break;
-       default:
-         {
-           if (t>MAX_TOK)
-           {
-#ifdef BLACKBOX_DEVEL
-             Print("bb-type %d\n",t);
-#endif
-             blackbox *bb=getBlackboxStuff(t);
-             if (bb!=NULL)
-               IDSTRING(h)=(char *)bb->blackbox_Init(bb);
-           }
-           else
-             Werror("unknown type %d",t);
-           break;
-         }
-    }
-    // additional settings:--------------------------------------
+    if ((t==IDEAL_CMD)||(t==MODUL_CMD))
+      IDFLAG(h) = Sy_bit(FLAG_STD);
+    IDSTRING(h)=(char *)idrecDataInit(t);
+  }
+  // additional settings:--------------------------------------
 #if 0
-    // this leads to a memory leak
-    if (t == QRING_CMD)
-    {
-      // IDRING(h)=rCopy(currRing);
-      /* QRING_CMD is ring dep => currRing !=NULL */
-    }
-    else
+  // this leads to a memory leak
+  if (t == QRING_CMD)
+  {
+    // IDRING(h)=rCopy(currRing);
+    /* QRING_CMD is ring dep => currRing !=NULL */
+  }
+  else
 #endif
-      if (t == PROC_CMD)
-    {
-      IDPROC(h)->language=LANG_NONE;
-    }
-    else if (t == PACKAGE_CMD)
-    {
-      IDPACKAGE(h)->language=LANG_NONE;
-      IDPACKAGE(h)->loaded = FALSE;
-    }
-#ifdef HAVE_FANS
-    else if (t == FAN_CMD)
-    {
-      IDSTRING(h) = (char*)(new gfan::ZFan(0));
-    }
-    else if (t == CONE_CMD)
-    {
-      IDSTRING(h) = (char*)(new gfan::ZCone());
-    }
-#endif /* HAVE_FANS */
+  if (t == PROC_CMD)
+  {
+    IDPROC(h)->language=LANG_NONE;
+  }
+  else if (t == PACKAGE_CMD)
+  {
+    IDPACKAGE(h)->language=LANG_NONE;
+    IDPACKAGE(h)->loaded = FALSE;
   }
   // --------------------------------------------------------
   return  h;

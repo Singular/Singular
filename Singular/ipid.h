@@ -93,6 +93,7 @@ BOOLEAN checkPackage(package pack);
 idhdl packFindHdl(package r);
 void jjNormalizeQRingId(leftv I);
 void jjNormalizeQRingP(leftv I);
+void *idrecDataInit(int t);
 
 #define FLAG_STD   0
 #define FLAG_TWOSTD  3
