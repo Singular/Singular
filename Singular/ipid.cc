@@ -206,25 +206,25 @@ idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
     if ((t==IDEAL_CMD)||(t==MODUL_CMD))
       IDFLAG(h) = Sy_bit(FLAG_STD);
     IDSTRING(h)=(char *)idrecDataInit(t);
-  }
-  // additional settings:--------------------------------------
+    // additional settings:--------------------------------------
 #if 0
-  // this leads to a memory leak
-  if (t == QRING_CMD)
-  {
-    // IDRING(h)=rCopy(currRing);
-    /* QRING_CMD is ring dep => currRing !=NULL */
-  }
-  else
+    // this leads to a memory leak
+    if (t == QRING_CMD)
+    {
+      // IDRING(h)=rCopy(currRing);
+      /* QRING_CMD is ring dep => currRing !=NULL */
+    }
+    else
 #endif
-  if (t == PROC_CMD)
-  {
-    IDPROC(h)->language=LANG_NONE;
-  }
-  else if (t == PACKAGE_CMD)
-  {
-    IDPACKAGE(h)->language=LANG_NONE;
-    IDPACKAGE(h)->loaded = FALSE;
+    if (t == PROC_CMD)
+    {
+      IDPROC(h)->language=LANG_NONE;
+    }
+    else if (t == PACKAGE_CMD)
+    {
+      IDPACKAGE(h)->language=LANG_NONE;
+      IDPACKAGE(h)->loaded = FALSE;
+    }
   }
   // --------------------------------------------------------
   return  h;
