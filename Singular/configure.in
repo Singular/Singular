@@ -187,8 +187,9 @@ print conf('LOCALMODLIBS'), conf('LIBS')"`
         else
           AC_DEFINE(HAVE_PYTHON)
           HAVE_PYTHON_VALUE=1
-          AC_SUBST(HAVE_PYTHON_VALUE)      
+          AC_SUBST(HAVE_PYTHON_VALUE)
 	fi
+
 #	AC_LANG_POP
 	# turn back to default flags
 	CPPFLAGS="$ac_save_CPPFLAGS_for_python"
@@ -197,6 +198,54 @@ print conf('LOCALMODLIBS'), conf('LIBS')"`
 	#
 	# all done!
 	#
+])
+
+
+dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+dnl check whethe python-based module can be build statically
+dnl
+AC_DEFUN([AC_PYTHON_TEST_STATIC],[
+        ac_save_LIBS_for_python="${LIBS}"
+        ac_save_CPPFLAGS_for_python="${CPPFLAGS}"
+
+        AC_MSG_CHECKING([${try_python_shared_static_flags} for linking \
+python statically])
+        all_cppflags="${ac_save_CPPFLAGS} ${PYTHON_CPPFLAGS}"
+
+        CPPFLAGS="-static ${all_cppflags}"
+        LIBS="$ac_save_LIBS $PYTHON_LDFLAGS $PYTHON_EXTRA_LIBS -lc -lm $PYTHON_EXTRA_LDFLAGS"
+
+        AC_TRY_LINK([
+              #include <Python.h>
+        ],[
+              Py_Initialize();
+        ],[pythonstaticexists=yes],[pythonstaticexists=no])
+
+        AC_MSG_RESULT([$pythonstaticexists])
+
+        if test "$pythonstaticexists" == yes ; then
+          AC_DEFINE(HAVE_STATIC_PYTHON)
+          PYTHON_STATIC_LIBS="$PYTHON_LDFLAGS $PYTHON_EXTRA_LIBS"
+          AC_SUBST(PYTHON_STATIC_LIBS)
+    
+          try_flags="-Xlinker -static -nodefaultlibs" 
+          CPPFLAGS="-shared -fPIC ${try_flags} ${all_cppflags}"
+          AC_MSG_CHECKING([$try_flags for linking python module statically])
+          AC_TRY_LINK([
+                #include <Python.h>
+          ],[
+                Py_Initialize();
+          ],[pythonsharedstaticexists=yes],[pythonsharedstaticexists=no])
+          AC_MSG_RESULT([$pythonsharedstaticexists])
+  
+          if test "$pythonsharedstaticexists" = yes; then
+            PYTHON_MODULE_FLAGS="${try_flags}"
+          fi
+        fi
+
+        AC_SUBST(PYTHON_MODULE_FLAGS)
+ 	CPPFLAGS="$ac_save_CPPFLAGS_for_python"
+	LIBS="$ac_save_LIBS_for_python"
 ])
 
 
@@ -578,27 +627,65 @@ AC_PROG_LN_S
 AC_CHECK_PROGS(PERL, perl5 perl)
 
 # python
-if test "${with_python+set}" != set; then
-dnl Default value here!
-  PYTHON_EXE="no"
-else
-  if test "${with_python}" = yes; then 
-    PYTHON_EXE="python"
-  else
-    PYTHON_EXE="${with_python}"
-  fi
+dnl Default values here!
+python_exe_name="no"
+PYTHON_PLUGIN="module"
+PYTHON_LINKAGE="static"
+
+if test "${with_python+set}" == set; then
+  case "${with_python}" in
+    yes|static*|dynamic*|shared*|module*|embed*)
+      python_exe_name="python"
+    ;;
+    *)
+    python_exe_name="${with_python%%,*}" 
+    ;;
+  esac
+
+  case ",${with_python}," in
+    *,dynamic,*|*,shared,*)
+      PYTHON_LINKAGE="dynamic"
+    ;;
+    *,static,*)
+      PYTHON_LINKAGE="static"
+    ;;
+  esac
+
+  case ",${with_python}," in
+    *,embed,*|*,embedded,*)
+      PYTHON_PLUGIN="embed"
+    ;;
+    *,static,*)
+      PYTHON_PLUGIN="module"
+    ;;
+  esac
 fi
+
+PYTHON_EXE=`basename "${python_exe_name}"`
+PYTHON_PATH=`dirname "${python_exe_name}"`
 
 if test "${PYTHON_EXE}" = no; then
   AC_MSG_WARN(building without python support)
 else
-  AC_PATH_PROG([PYTHON],[$PYTHON_EXE])
+  AC_PATH_PROG([PYTHON],[$PYTHON_EXE],, "$PYTHON_PATH:$PATH")
   if test -z "$PYTHON"; then
     AC_MSG_WARN([Cannot find $PYTHON_EXE in your system path - skipping python support])
   else
     AC_PYTHON_DEVEL_SINGULAR(>= '2.4', "${PYTHON}")
+    AC_PYTHON_TEST_STATIC()
+
+    if test "${PYTHON_PLUGIN}" = embed; then
+      AC_DEFINE(EMBED_PYTHON)
+      EMBED_PYTHON_VALUE=1
+
+      PYTHON_EMBED_LIBS="$PYTHON_LDFLAGS $PYTHON_EXTRA_LIBS"
+      AC_SUBST(PYTHON_EMBED_LIBS)
+    fi
+
   fi
 fi
+AC_SUBST(EMBED_PYTHON_VALUE)
+
 
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check for general libraries, header files, typedefs, etc
@@ -844,7 +931,9 @@ AC_ARG_WITH(
                         do use dynamic/static/no readline for fancy display])
 AC_ARG_WITH(
   python,
-  [  --with-python=[PYTHON,no]     uses PYTHON as python executable, default is python])
+  [  --with-python[=PYTHON[,embed|module[,static|dynamic]]]
+                        uses PYTHON as python executable, default is python;
+                        optionally set plug-in and linkage type])
 AC_ARG_WITH(
   Boost,
   [  --without-Boost         do not use Boost ])
@@ -1076,6 +1165,7 @@ SAVE_LIBS=$LIBS
 AC_CHECK_LIB(c_nonshared,__stack_chk_fail_local,GLIBC_DYN_FIX="-lc_nonshared",GLIBC_DYN_FIX="")
 LIBS=$SAVE_LIBS
 AC_SUBST(GLIBC_DYN_FIX)
+
 
 # evaluate results
 dnl llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll

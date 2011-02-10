@@ -161,6 +161,10 @@
 #undef SI_CPU_X86_64
 /* whether development version of python is available */
 #undef HAVE_PYTHON
+/* whether static development version of python is available */
+#undef HAVE_STATIC_PYTHON
+/* whether python should be embedded */
+#undef EMBED_PYTHON
 
 /*******************************************************************
  * Defines which are not set by configure

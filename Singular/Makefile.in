@@ -1,4 +1,4 @@
-################################################################
+#################################################################
 ###
 ### Makefile for Singular
 ###
@@ -20,14 +20,20 @@ HAVE_PLURAL             = @PLURAL@
 ##
 HAVE_PYTHON             = @HAVE_PYTHON_VALUE@
 PYTHON_CPPFLAGS		= @PYTHON_CPPFLAGS@
-PYTHON_LDFLAGS		= @PYTHON_LDFLAGS@
-PYTHON_SITE_PKG		= @PYTHON_SITE_PKG@
-PYTHON_EXTRA_LIBS	= @PYTHON_EXTRA_LIBS@
-PYTHON_EXTRA_LDFLAGS	= @PYTHON_EXTRA_LDFLAGS@
+PYTHON_MODULE_LIBS 	= @PYTHON_LDFLAGS@ @PYTHON_EXTRA_LIBS@
+PYTHON_MODULE_LDFLAGS   = @PYTHON_MODULE_FLAGS@ @PYTHON_EXTRA_LDFLAGS@
 
-# Note: compiler(!) flags for linking to python
-# todo: need flags for statically linking dependencies to shared modules
-PYTHON_LINKFLAGS	= ${PYTHON_LDFLAGS} ${PYTHON_EXTRA_LIBS} ${PYTHON_EXTRA_LDFLAGS}
+MODULE_SUFFIX = so
+
+ifdef LD_STATIC
+PYTHON_LIBS = @PYTHON_STATIC_LIBS@
+else
+PYTHON_LIBS = @PYTHON_EMBED_LIBS@
+ifeq (${HAVE_PYTHON},1)
+PYOBJECT_MODULE = pyobject.${MODULE_SUFFIX}
+endif 
+
+endif
 
 ##
 ## various paths
@@ -70,23 +76,23 @@ CFLAGS		= @CFLAGS@ ${PIPE}
 CXXFLAGS	= @CXXFLAGS@ -I.. -I@prefix@ ${PIPE}
 CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@ -I.. -I@prefix@
 ifneq ($(SINGUNAME),ix86-Win)
-CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ ${PYTHON_CPPFLAGS}
+CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@
 else
 ## Dirs after @CPPFLAGS@ are for PySingular
-CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ 
+CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@
 ## -I/usr/include/python2.4 -I/usr/local/include -I../modules/python
 endif
 DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
 LDFLAGS2	= @LDFLAGS@
 ifneq ($(SINGUNAME),ix86-Win)
-LDFLAGS		= -L@prefix@/kernel -L../kernel -lkernel @LDFLAGS@
-LDFLAGSG	= -L@prefix@/kernel -L../kernel -lkernel_g @LDFLAGS@
-LDFLAGSP	= -L@prefix@/kernel -L../kernel -lkernel_p @LDFLAGS@
+LDFLAGS		= -L@prefix@/kernel -L../kernel -lkernel @LDFLAGS@ 
+LDFLAGSG	= -L@prefix@/kernel -L../kernel -lkernel_g @LDFLAGS@ 
+LDFLAGSP	= -L@prefix@/kernel -L../kernel -lkernel_p @LDFLAGS@ 
 else
 ## -L/usr/local/lib -L@prefix@/modules/python --> PySingular
-LDFLAGS		= -L@prefix@/kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python
-LDFLAGSG	= -L@prefix@/kernel -L/bin -lkernel_g @LDFLAGS@
-LDFLAGSP	= -L@prefix@/kernel -L/bin -lkernel_p @LDFLAGS@
+LDFLAGS		= -L@prefix@/kernel -L/bin -lkernel @LDFLAGS@ -L/usr/local/lib -L../modules/python 
+LDFLAGSG	= -L@prefix@/kernel -L/bin -lkernel_g @LDFLAGS@ 
+LDFLAGSP	= -L@prefix@/kernel -L/bin -lkernel_p @LDFLAGS@ 
 endif
 LD_DYN_FLAGS	= @LD_DYN_FLAGS@
 SFLAGS		= @SFLAGS@
@@ -101,7 +107,7 @@ WIN_LIBS        =
 endif
 
 LD_LIBC	        = -lc
-STATIC_LDFLAGS	= ${PYTHON_LINKFLAGS} @STATIC_LDFLAGS@
+STATIC_LDFLAGS	= @STATIC_LDFLAGS@
 # under cygwin, do not explicitly link against -lm, for it is the cygwin
 # lib -- if you really want to do this, use -lm as the _last_ thing on the
 # arguments to link
@@ -128,7 +134,6 @@ HAVE_MPSR       = @HAVE_MPSR@
 LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc
 
 SO_SUFFIX = so
-MODULE_SUFFIX = so
 
 #LIBSINGULAR_FLAGS = -export-dynamic 
 LIBSINGULAR_LD = $(CXX)
@@ -170,23 +175,19 @@ endif
 ifdef LD_STATIC
 LDFLAGS  := ${STATIC_LDFLAGS} ${LDFLAGS}
 SING_EXEC = Singular-static
-LIBS := ${MP_LIBS} ${LIBS}
-LIBSG := ${MP_LIBS} ${LIBSG}
+LIBS := ${MP_LIBS} ${LIBS} ${PYTHON_LIBS}
+LIBSG := ${MP_LIBS} ${LIBSG} ${PYTHON_LIBS}
 DL_KERNEL =
 GLIBC_DYN_FIX=
 else
 LDFLAGS  := ${LD_DYN_FLAGS} ${LDFLAGS}
 SING_EXEC = Singular
+LIBS := ${LIBS} ${PYTHON_LIBS}
+LIBSG := ${LIBSG} ${PYTHON_LIBS}
 DL_KERNEL	= @DL_KERNEL@
 GLIBC_DYN_FIX= @GLIBC_DYN_FIX@
 endif
 
-
-ifeq (${HAVE_PYTHON},1)
-PYOBJECT_MODULE	= pyobject.${MODULE_SUFFIX}
-else
-PYOBJECT_MODULE	= 
-endif
 
 # CXXFLAGS =  -g -Wall -Wno-unused
 # CFLAGS =  -g -Wall -Wno-unused
@@ -369,7 +370,7 @@ Singular${S_EXT}: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
 	  -o Singular${S_EXT} \
 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
-	  ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
+	  ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o 
 
 libsingular: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
          iparith.o libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) 
@@ -485,7 +486,7 @@ dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
 # dynamic module for python bject support
 pyobject.${MODULE_SUFFIX}: pyobject.dl_o
 	@echo "build dynamic module pyobject..."
-	$(CXX) ${SLDFLAGS} ${PYTHON_LINKFLAGS} -o $@ $^ ${GLIBC_DYN_FIX}
+	$(CXX) $^ ${PYTHON_MODULE_LDFLAGS} ${SLDFLAGS} ${PYTHON_MODULE_LIBS} ${LD_LIBC} -o $@
 
 src: scanner.cc grammar.h grammar.cc libparse.cc
 
