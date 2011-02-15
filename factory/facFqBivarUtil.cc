@@ -171,7 +171,7 @@ mapDown (const CanonicalForm& F, const ExtensionInfo& info, CFList& source,
   else if (!k && beta == Variable (1))
     return F;
   else if (!k && beta != Variable (1))
-    return mapDown (F, primElem, imPrimElem, beta, source, dest);
+    return mapDown (F, imPrimElem, primElem, beta, source, dest);
 }
 
 void appendTestMapDown (CFList& factors, const CanonicalForm& f,
@@ -210,7 +210,7 @@ void appendTestMapDown (CFList& factors, const CanonicalForm& f,
   {
     if (!isInExtension (g, delta, k))
     {
-      g= mapDown (g, gamma, delta, alpha, source, dest);
+      g= mapDown (g, delta, gamma, alpha, source, dest);
       factors.append (g);
     }
   }
@@ -233,7 +233,7 @@ appendMapDown (CFList& factors, const CanonicalForm& g,
   else if (!k && beta == Variable (1))
     factors.append (g);
   else if (!k && beta != Variable (1))
-    factors.append (mapDown (g, gamma, delta, alpha, source, dest));
+    factors.append (mapDown (g, delta, gamma, alpha, source, dest));
   return;
 }
 

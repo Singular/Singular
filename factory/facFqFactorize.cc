@@ -1908,7 +1908,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         if (primFail)
           ; //ERROR
         else
-          imPrimElem= mapPrimElem (primElem, vBuf, v);
+          imPrimElem= mapPrimElem (primElem, alpha, v);
 
         CFList source, dest;
         CanonicalForm bufA= mapUp (A, alpha, v, primElem, imPrimElem,
@@ -1926,7 +1926,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         if (primFail)
           ; //ERROR
         else
-          imPrimElem= mapPrimElem (delta, beta, v); //oder mapPrimElem (primElem, vBuf, v);
+          imPrimElem= mapPrimElem (delta, beta, v);
 
         CFList source, dest;
         CanonicalForm bufA= mapDown (A, info, source, dest);
@@ -1988,15 +1988,11 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         Variable vBuf;
         primElem= primitiveElement (v1, vBuf, primFail);
         if (primFail)
-        {
           ; //ERROR
-        }
         else
-        {
-          imPrimElem= mapPrimElem (primElem, vBuf, v2);
-        }
+          imPrimElem= mapPrimElem (primElem, v1, v2);
         CFList source, dest;
-        CanonicalForm bufA= mapUp (A, alpha, beta, primElem, imPrimElem,
+        CanonicalForm bufA= mapUp (A, v1, v2, primElem, imPrimElem,
                                      source, dest);
         ExtensionInfo info= ExtensionInfo (v2, v1, imPrimElem, primElem);
         factors= multiFactorize (bufA, info);

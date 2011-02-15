@@ -44,4 +44,15 @@ mapPrimElem (const CanonicalForm& prim_elem, const Variable& alpha,
 CanonicalForm GF2FalphaRep (const CanonicalForm& F, const Variable& alpha);
 
 CanonicalForm Falpha2GFRep (const CanonicalForm& F);
+
+#ifdef HAVE_NTL
+/// compute minimal polynomial of \f$ F\in\F_p(\alpha)\backslash\F_p \f$ via NTL
+///
+/// @return @a findMinPoly computes the minimal polynomial of F
+CanonicalForm
+findMinPoly (const CanonicalForm& F, ///< [in] an element of 
+                                     ///< \f$ \F_p(\alpha)\backslash\F_p \f$
+             const Variable& alpha   ///< [in] algebraic variable
+            );
+#endif
 #endif

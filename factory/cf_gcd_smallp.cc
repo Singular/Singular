@@ -1549,6 +1549,7 @@ gaussianElimFp (CFMatrix& M, CFArray& L)
   for (int i= 0; i < M.rows(); i++)
     L[i]= (*N) (i + 1, M.columns() + 1);
   M= (*N) (1, M.rows(), 1, M.columns());
+  delete N;
   return rk;
 }
 
@@ -1579,6 +1580,8 @@ gaussianElimFq (CFMatrix& M, CFArray& L, const Variable& alpha)
   L= CFArray (M.rows());
   for (int i= 0; i < M.rows(); i++)
     L[i]= (*N) (i + 1, M.columns() + 1);
+
+  delete N;
   return rk;
 }
 
@@ -1601,12 +1604,15 @@ solveSystemFp (const CFMatrix& M, const CFArray& L)
   mat_zz_p *NTLN= convertFacCFMatrix2NTLmat_zz_p(*N);
   long rk= gauss (*NTLN);
   if (rk != M.columns())
+  {
+    delete N;
     return CFArray();
-
+  }
   N= convertNTLmat_zz_p2FacCFMatrix (*NTLN);
 
   CFArray A= readOffSolution (*N, rk);
 
+  delete N;
   return A;
 }
 
@@ -1630,12 +1636,15 @@ solveSystemFq (const CFMatrix& M, const CFArray& L, const Variable& alpha)
   mat_zz_pE *NTLN= convertFacCFMatrix2NTLmat_zz_pE(*N);
   long rk= gauss (*NTLN);
   if (rk != M.columns())
+  {
+    delete N;
     return CFArray();
-
+  }
   N= convertNTLmat_zz_pE2FacCFMatrix (*NTLN, alpha);
 
   CFArray A= readOffSolution (*N, rk);
 
+  delete N;
   return A;
 }
 
@@ -2450,7 +2459,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     delete [] pMat;
     pMat= new CFMatrix [skelSize];
     pL[minimalColumnsIndex]= bufArray; 
-    CFList* bufpEvalPoints;
+    CFList* bufpEvalPoints= NULL;
     CFArray bufGcds;
     if (biggestSize != biggestSize2)
     {
@@ -2476,6 +2485,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
           delete[] pL;
           delete[] coeffMonoms;
           delete[] pM;
+          if (bufpEvalPoints != NULL)
+            delete [] bufpEvalPoints;
           fail= true;
           return 0;
         }
@@ -2489,6 +2500,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
             delete[] pL;
             delete[] coeffMonoms;
             delete[] pM;
+            if (bufpEvalPoints != NULL)
+              delete [] bufpEvalPoints;
             fail= true;
             return 0;
           }
@@ -2576,6 +2589,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
         delete[] pL;
         delete[] coeffMonoms;
         delete[] pM;
+        if (bufpEvalPoints != NULL)
+          delete [] bufpEvalPoints;
         fail= true;
         return 0;
       }
@@ -2620,6 +2635,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       delete[] pL;
       delete[] coeffMonoms;
       delete[] pM;
+      if (bufpEvalPoints != NULL)
+        delete [] bufpEvalPoints;
       fail= true;
       return 0;
     }
@@ -2640,9 +2657,24 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     }
     result= N(result);
     if (fdivides (result, F) && fdivides (result, G))
+    {
+      delete[] pEvalPoints;
+      delete[] pMat;
+      delete[] pL;
+      delete[] pM;
+      if (bufpEvalPoints != NULL)
+        delete [] bufpEvalPoints;
       return result;
+    }
     else
     {
+      delete[] pEvalPoints;
+      delete[] pMat;
+      delete[] pL;
+      delete[] coeffMonoms;
+      delete[] pM;
+      if (bufpEvalPoints != NULL)
+        delete [] bufpEvalPoints;
       fail= true;
       return 0;
     }
@@ -3658,7 +3690,12 @@ int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
     }
   }
 
-  if (both_non_zero == 0) return 0;
+  if (both_non_zero == 0)
+  {
+    delete [] degsf;
+    delete [] degsg;
+    return 0;
+  }
 
   // map Variables which do not occur in both polynomials to higher levels
   int k= 1;

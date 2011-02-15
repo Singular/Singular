@@ -114,12 +114,12 @@ mapDown (const CanonicalForm& F, const Variable& alpha, const
     ASSERT (counter >= bound, "alpha is not primitive");
     if (pos == 0)
     {
-      alpha_power= power (alpha, counter);
+      alpha_power= buf*power (alpha, counter);
       dest.append (alpha_power);
     }
     else
       alpha_power= getItem (dest, pos);
-    result = alpha_power*buf;
+    result = alpha_power;
     return result;
   }
   else
@@ -285,12 +285,12 @@ CanonicalForm mapUp (const CanonicalForm& F, const CanonicalForm& G,
     ASSERT (counter >= bound, "alpha is not primitive");
     if (pos == 0)
     {
-      H_power= power (H, counter);
+      H_power= buf*power (H, counter);
       dest.append (H_power);
     }
     else
       H_power= getItem (dest, pos);
-    result = H_power*buf;
+    result = H_power;
     return result;
   }
   else
@@ -365,19 +365,54 @@ mapUp (const CanonicalForm& F, const Variable& alpha, const Variable& beta,
 }
 
 CanonicalForm
-mapPrimElem (const CanonicalForm& prim_elem, const Variable& alpha,
+mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
              const Variable& beta)
 {
-  if (prim_elem == alpha)
+  if (primElem == alpha)
     return mapUp (alpha, beta);
   else
   {
-    CanonicalForm im_alpha= mapUp (alpha, beta);
-    CanonicalForm result= 0;
-    for (CFIterator i= prim_elem; i.hasTerms(); i++)
-      result += power (im_alpha, i.exp())*i.coeff();
-    return result;
+    CanonicalForm primElemMipo= findMinPoly (primElem, alpha);
+    int p= getCharacteristic ();
+    zz_p::init (p);
+    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (beta)); 
+    zz_pE::init (NTLMipo);
+    zz_pEX NTLPrimElemMipo= convertFacCF2NTLzz_pEX (primElemMipo, NTLMipo);
+    zz_pE root= FindRoot (NTLPrimElemMipo);
+    return convertNTLzzpE2CF (root, beta);
   }
+}
+
+CanonicalForm
+findMinPoly (const CanonicalForm& F, const Variable& alpha)
+{
+  ASSERT (F.isUnivariate() && F.mvar()==alpha,"expected element of F_p(alpha)");
+
+  zz_p::init (getCharacteristic());
+  zz_pX NTLF= convertFacCF2NTLzzpX (F);
+  int d= degree (getMipo (alpha));
+
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo(alpha));
+  zz_pE::init (NTLMipo);
+  vec_zz_p pows;
+  pows.SetLength (2*d);
+
+  zz_pE powNTLF;
+  set (powNTLF);
+  zz_pE NTLFE= to_zz_pE (NTLF);
+  zz_pX buf;
+  for (int i= 0; i < 2*d; i++)
+  {
+    buf= rep (powNTLF);
+    buf.rep.SetLength (d);
+    pows [i]= buf.rep[0];
+    powNTLF *= NTLFE;
+  }
+
+  zz_pX NTLMinPoly;
+  MinPolySeq (NTLMinPoly, pows, d);
+
+  return convertNTLzzpX2CF (NTLMinPoly, Variable (1));
 }
 
 #endif
