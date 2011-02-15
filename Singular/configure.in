@@ -172,7 +172,7 @@ print conf('LOCALMODLIBS'), conf('LIBS')"`
 	AC_MSG_RESULT([$pythonexists])
 
         if test ! "$pythonexists" = "yes"; then
-	   AC_MSG_ERROR([
+	   AC_MSG_RESULT([
   Could not link test program to Python. Maybe the main Python library has been
   installed in some non-standard library path. If so, pass it to configure,
   via the LDFLAGS environment variable.
@@ -184,6 +184,7 @@ print conf('LOCALMODLIBS'), conf('LIBS')"`
   ============================================================================
 	   ])
 	  PYTHON_VERSION=""
+	  pythonexists=no
         else
           AC_DEFINE(HAVE_PYTHON)
           HAVE_PYTHON_VALUE=1
