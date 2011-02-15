@@ -20,10 +20,11 @@
 #include <netdb.h>
 
 
-#include "mod2.h"
+#include <kernel/mod2.h>
+// #include "mod2.h"
 
-#include "tok.h"
-#include "ipid.h"
+#include <Singular/tok.h>
+#include <Singular/ipid.h>
 #include <omalloc/omalloc.h>
 #include <kernel/ring.h>
 #include <kernel/matpol.h>
@@ -32,10 +33,10 @@
 #include <kernel/longrat.h>
 #include <kernel/ideals.h>
 #include <kernel/intvec.h>
-#include "subexpr.h"
-#include "silink.h"
-#include "lists.h"
-#include "ssiLink.h"
+#include <Singular/subexpr.h>
+#include <Singular/silink.h>
+#include <Singular/lists.h>
+#include <Singular/ssiLink.h>
 
 typedef struct
 {
