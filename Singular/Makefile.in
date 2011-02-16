@@ -205,7 +205,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     extra.cc fehelp.cc feOpt.cc \
     ipassign.cc ipconv.cc ipid.cc iplib.cc \
     ipprint.cc ipshell.cc \
-    lists.cc \
+    newstruct.cc lists.cc \
     sdb.cc \
     fglm.cc interpolation.cc\
     silink.cc ssiLink.cc \
@@ -257,7 +257,7 @@ SOURCES=${CSOURCES} ${CXXSOURCES} \
 
 HEADERS=lists.h attrib.h \
 	mpsr_Tok.h \
-	ipconv.h \
+	ipconv.h newstruct.h \
 	subexpr.h ipid.h \
 	cntrlc.h ipprint.h sdb.h \
 	ipshell.h tok.h \
