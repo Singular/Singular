@@ -8,7 +8,7 @@ AM_LDFLAGS	= -L${top_builddir}/../coeffs -L${top_builddir}/../reporter -L${top_b
 ## we removed -Dix86_Linux from AM_CPPFLAGS
 
 SOURCES = \
-	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc \
+	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
 	pDebug.cc pInline0.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc polys.cc \
@@ -25,7 +25,7 @@ include_HEADERS = \
 	templates/p_MemAdd.h templates/p_MemCmp.h templates/p_MemCopy.h operations/p_Mult_q.h \
 	templates/p_Numbers.h templates/p_Procs.h \
 	templates/p_Procs_Dynamic.h templates/p_Procs_Impl.h templates/p_Procs_Set.h templates/p_Procs_Static.h \
-	monomials/p_polys.h monomials/polys-impl.h polys.h prCopy.h prCopyMacros.h \
+	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
 	sbuckets.h simpleideals.h
 
 lib_LIBRARIES=libpolys.a libpolys_g.a
