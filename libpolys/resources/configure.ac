@@ -3,6 +3,7 @@
 
 AC_PREREQ([2.65])
 AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([feFopen.h])
 AC_CONFIG_HEADERS([config.h])
 
@@ -11,6 +12,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LN_S
 AC_PROG_INSTALL
+AC_PROG_RANLIB
 
 # Checks for libraries.
 
@@ -29,6 +31,7 @@ fi
 AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname", Singular's own uname\, believe it or not)
 SINGUNAME=$ac_cv_singuname
 AC_SUBST(SINGUNAME)
+
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
