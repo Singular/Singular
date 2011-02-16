@@ -1029,28 +1029,36 @@ int  sleftv::Typ()
     case STRING_CMD:
       r=STRING_CMD;
       break;
-    case LIST_CMD:
+    default:
     {
-      lists l;
-      if (rtyp==IDHDL) l=IDLIST((idhdl)data);
-      else             l=(lists)data;
-      if ((0<e->start)&&(e->start<=l->nr+1))
+      blackbox *b=NULL;
+      if (t>MAX_TOK)
       {
-        Subexpr tmp=l->m[e->start-1].e;
-        l->m[e->start-1].e=e->next;
-        r=l->m[e->start-1].Typ();
-        e->next=l->m[e->start-1].e;
-        l->m[e->start-1].e=tmp;
+        b=getBlackboxStuff(t);
+      }
+      if ((t==LIST_CMD)||((b!=NULL)&&BB_LIKE_LIST(b)))
+      {
+        lists l;
+        if (rtyp==IDHDL) l=IDLIST((idhdl)data);
+        else             l=(lists)data;
+        if ((0<e->start)&&(e->start<=l->nr+1))
+        {
+          Subexpr tmp=l->m[e->start-1].e;
+          l->m[e->start-1].e=e->next;
+          r=l->m[e->start-1].Typ();
+          e->next=l->m[e->start-1].e;
+          l->m[e->start-1].e=tmp;
+        }
+        else
+        {
+          //Warn("out of range: %d not in 1..%d",e->start,l->nr+1);
+          r=NONE;
+        }
       }
       else
-      {
-        //Warn("out of range: %d not in 1..%d",e->start,l->nr+1);
-        r=NONE;
-      }
+        Werror("cannot index type %s(%d)",Tok2Cmdname(t),t);
       break;
     }
-    default:
-      Werror("cannot index type %d",t);
   }
   return r;
 }
@@ -1247,45 +1255,51 @@ void * sleftv::Data()
         r=(char *)MATELEM((matrix)d,index,e->next->start);
       break;
     }
-    case LIST_CMD:
+    default:
     {
-      lists l=(lists)d;
-      if ((0<index)&&(index<=l->nr+1))
+      blackbox *b=NULL;
+      if (t>MAX_TOK)
       {
-        if ((e->next!=NULL)
-        && (l->m[index-1].rtyp==STRING_CMD))
-        // string[..].Data() modifies sleftv, so let's do it ourself
+        b=getBlackboxStuff(t);
+      }
+      if ((t==LIST_CMD)||((b!=NULL)&&(BB_LIKE_LIST(b))))
+      {
+        lists l=(lists)d;
+        if ((0<index)&&(index<=l->nr+1))
         {
-          char *dd=(char *)l->m[index-1].data;
-          int j=e->next->start-1;
-          r=(char *)omAllocBin(size_two_bin);
-          if ((j>=0) && (j<(int)strlen(dd)))
+          if ((e->next!=NULL)
+          && (l->m[index-1].rtyp==STRING_CMD))
+          // string[..].Data() modifies sleftv, so let's do it ourself
           {
-            r[0]=*(dd+j);
-            r[1]='\0';
+            char *dd=(char *)l->m[index-1].data;
+            int j=e->next->start-1;
+            r=(char *)omAllocBin(size_two_bin);
+            if ((j>=0) && (j<(int)strlen(dd)))
+            {
+              r[0]=*(dd+j);
+              r[1]='\0';
+            }
+            else
+            {
+              r[0]='\0';
+            }
           }
           else
           {
-            r[0]='\0';
+            Subexpr tmp=l->m[index-1].e;
+            l->m[index-1].e=e->next;
+            r=(char *)l->m[index-1].Data();
+            e->next=l->m[index-1].e;
+            l->m[index-1].e=tmp;
           }
         }
-        else
-        {
-          Subexpr tmp=l->m[index-1].e;
-          l->m[index-1].e=e->next;
-          r=(char *)l->m[index-1].Data();
-          e->next=l->m[index-1].e;
-          l->m[index-1].e=tmp;
-        }
+        else //if (!errorreported)
+          Werror("wrong range[%d] in list(%d)",index,l->nr+1);
       }
-      else //if (!errorreported)
-        Werror("wrong range[%d] in list(%d)",index,l->nr+1);
+      else
+        Werror("cannot index type %s(%d)",Tok2Cmdname(t),t);
       break;
     }
-#ifdef TEST
-    default:
-      Werror("cannot index type %s(%d)",Tok2Cmdname(t),t);
-#endif
   }
   return r;
 }

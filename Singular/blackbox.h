@@ -37,7 +37,8 @@ struct  blackbox_struct
   /// additional type info
   void *data;
   /// addtinional gneral properties
-  char like_lists; // 1:blackbox is only a wrapper for lists
+  int properties; // bit 0:blackbox is only a wrapper for lists
+#define  BB_LIKE_LIST(B) ((B)->properties &1)
 } ;
 /// default procedure blackboxDefaultOp1, to be called as "default:" branch
 BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r);

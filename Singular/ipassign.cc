@@ -1432,32 +1432,53 @@ BOOLEAN iiAssign(leftv l, leftv r)
   if (ll==1)
   {
     /* l[..] = ... */
-    if((l->e!=NULL)
-    && (((l->rtyp==IDHDL) && (IDTYP((idhdl)l->data)==LIST_CMD))
-      || (l->rtyp==LIST_CMD)))
+    if(l->e!=NULL)
     {
-       if (TEST_V_ALLWARN) PrintS("assign list[..]=...\n");
-       b=jiAssign_list(l,r);
-       if(!b)
-       {
-         //Print("jjA_L_LIST: - 2 \n");
-         if((l->rtyp==IDHDL) && (l->data!=NULL))
-         {
-           ipMoveId((idhdl)l->data);
-           l->attribute=IDATTR((idhdl)l->data);
-           l->flag=IDFLAG((idhdl)l->data);
-         }
-       }
-       r->CleanUp();
-       Subexpr h;
-       while (l->e!=NULL)
-       {
-         h=l->e->next;
-         omFreeBin((ADDRESS)l->e, sSubexpr_bin);
-         l->e=h;
-       }
-       return b;
+      BOOLEAN like_lists=0;
+      blackbox *bb=NULL;
+      int bt;
+      if (((bt=l->rtyp)>MAX_TOK)
+      || ((l->rtyp==IDHDL) && ((bt=IDTYP((idhdl)l->data))>MAX_TOK)))
+      {
+        bb=getBlackboxStuff(bt);
+        like_lists=BB_LIKE_LIST(bb);
+      }
+      else if (((l->rtyp==IDHDL) && (IDTYP((idhdl)l->data)==LIST_CMD))
+        || (l->rtyp==LIST_CMD))
+      {
+        like_lists=2;
+      }
+      if(like_lists)
+      {
+        if (TEST_V_ALLWARN) PrintS("assign list[..]=...or similiar\n");
+        b=jiAssign_list(l,r);
+        if((!b) && (like_lists==2))
+        {
+          //Print("jjA_L_LIST: - 2 \n");
+          if((l->rtyp==IDHDL) && (l->data!=NULL))
+          {
+            ipMoveId((idhdl)l->data);
+            l->attribute=IDATTR((idhdl)l->data);
+            l->flag=IDFLAG((idhdl)l->data);
+          }
+        }
+        r->CleanUp();
+        Subexpr h;
+        while (l->e!=NULL)
+        {
+          h=l->e->next;
+          omFreeBin((ADDRESS)l->e, sSubexpr_bin);
+          l->e=h;
+        }
+	if ((!b) && (like_lists==1))
+	{
+	  // check blackbox/newtype type:
+	  if(bb->blackbox_Check(bb,l->Data())) return TRUE;
+	}
+        return b;
+      }
     }
+    // end of handling elems of list and similiar
     rl=r->listLength();
     if (rl==1)
     {               
