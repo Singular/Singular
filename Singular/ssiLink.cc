@@ -33,6 +33,7 @@
 #include <kernel/longrat.h>
 #include <kernel/ideals.h>
 #include <kernel/intvec.h>
+#include <kernel/options.h>
 #include <Singular/subexpr.h>
 #include <Singular/silink.h>
 #include <Singular/lists.h>
@@ -744,6 +745,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       }
       else if(r == 1)
       {
+        WarnS("program not specified, using /usr/local/bin/Singular");
         strcpy(path,"/usr/local/bin/Singular");
       }
       char* ssh_command = (char*)omAlloc(256);
@@ -753,6 +755,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       //Print("client on %s started:%s\n",cli_host,path);
       omFree(path);
       omFree(cli_host);
+      if (TEST_OPT_PROT) { Print("running >>%s<<\n",ssh_command); }
       system(ssh_command);
       omFree(ssh_command);
       omFree(ser_host);
