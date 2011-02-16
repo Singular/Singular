@@ -25,6 +25,7 @@
 #include <coeffs/ffields.h>
 // #include <???/ideals.h>
 #include <polys/monomials/ring.h>
+#include <polys/monomials/maps.h>
 #include <polys/prCopy.h>
 // #include "../Singular/ipshell.h"
 #include <polys/templates/p_Procs.h>

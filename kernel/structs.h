@@ -109,7 +109,6 @@ enum nc_type
 struct snumber;
 typedef struct snumber *   number;
 typedef number (*numberfunc)(number a,number b);
-typedef number (*nMapFunc)(number a);
 
 /* C++-part */
 #ifdef __cplusplus
@@ -139,8 +138,6 @@ typedef ip_package *       package;
 
 // forward for ideals.h:
 struct sip_sideal;
-struct sip_smap;
-typedef struct sip_smap *         map;
 typedef struct sip_sideal *       ideal;
 
 
