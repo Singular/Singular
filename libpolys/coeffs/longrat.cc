@@ -6,9 +6,7 @@
 * ABSTRACT: computation with long rational numbers (Hubert Grassmann)
 */
 
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/longrat.h>
+#include <coeffs/longrat.h>
 
 // 64 bit version:
 #if 0
