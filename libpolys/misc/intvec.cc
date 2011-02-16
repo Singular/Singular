@@ -7,10 +7,8 @@
 */
 #ifndef INTVEC_CC
 #define INTVEC_CC
-#include <kernel/mod2.h>
-#include <kernel/febase.h>
-#include <kernel/options.h>
-#include <kernel/intvec.h>
+// #include <resources/feFopen.h>
+#include <misc/intvec.h>
 #include <omalloc/omalloc.h>
 
 /*0 implementation*/
@@ -653,8 +651,8 @@ static intvec * ivOptimizeKern(intvec *kern)
   int i,l,j,c=kern->cols(),r=kern->rows();
   intvec *res=new intvec(c);
 
-  if (TEST_OPT_PROT)
-    Warn(" %d linear independent solutions\n",r);
+  //if (TEST_OPT_PROT)
+  //  Warn(" %d linear independent solutions\n",r);
   for (i=r;i>1;i--)
   {
     for (j=c;j>0;j--)
