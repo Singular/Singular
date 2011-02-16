@@ -5,9 +5,10 @@
 #include <Singular/blackbox.h>
 
 //#define BLACKBOX_DEVEL 1
+#define MAX_BB_TYPES 256
 
-static blackbox* blackboxTable[100];
-static char *    blackboxName[100];
+static blackbox* blackboxTable[MAX_BB_TYPES];
+static char *    blackboxName[MAX_BB_TYPES];
 static int blackboxTableCnt=0;
 #define BLACKBOX_OFFSET (MAX_TOK+1)
 blackbox* getBlackboxStuff(const int t)
@@ -77,26 +78,49 @@ BOOLEAN blackbox_default_Check(blackbox *b, void *d)
 }
 int setBlackboxStuff(blackbox *bb, const char *n)
 {
-  blackboxTable[blackboxTableCnt]=bb;
-  blackboxName[blackboxTableCnt]=omStrDup(n);
+  int where=-1;
+  if (MAX_BB_TYPES<=blackboxTableCnt)
+  {
+    // second try, find empty slot from removed bb:
+    for (int i=0;i<MAX_BB_TYPES;i++)
+    {
+      if (blackboxTable[i]==NULL) { where=i; break; }
+    }
+  }
+  else
+  {
+    where=blackboxTableCnt;
+    blackboxTableCnt++;
+  }
+  if (where==-1)
+  {
+    WerrorS("too many bb types defined");
+    return 0;
+  }
+  else
+  {
+    blackboxTable[where]=bb;
+    blackboxName[where]=omStrDup(n);
 #ifdef BLACKBOX_DEVEL
-  Print("define bb:name=%s:rt=%d (table:cnt=%d)\n",blackboxName[blackboxTableCnt],blackboxTableCnt+BLACKBOX_OFFSET,blackboxTableCnt);
+    Print("define bb:name=%s:rt=%d (table:cnt=%d)\n",blackboxName[where],where+BLACKBOX_OFFSET,where);
 #endif
-  if (bb->blackbox_destroy==NULL) bb->blackbox_destroy=blackbox_default_destroy;
-  if (bb->blackbox_String==NULL)  bb->blackbox_String=blackbox_default_String;
-  if (bb->blackbox_Print==NULL)   bb->blackbox_Print=blackbox_default_Print;
-  if (bb->blackbox_Init==NULL)    bb->blackbox_Init=blackbox_default_Init;
-  if (bb->blackbox_Copy==NULL)    bb->blackbox_Copy=blackbox_default_Copy;
-  if (bb->blackbox_Op1==NULL)     bb->blackbox_Op1=blackboxDefaultOp1;
-  if (bb->blackbox_Op2==NULL)     bb->blackbox_Op2=blackboxDefaultOp2;
-  if (bb->blackbox_Op3==NULL)     bb->blackbox_Op3=blackbox_default_Op3;
-  if (bb->blackbox_OpM==NULL)     bb->blackbox_OpM=blackbox_default_OpM;
-  if (bb->blackbox_Check==NULL)   bb->blackbox_Check=blackbox_default_Check;
-  blackboxTableCnt++;
-  return blackboxTableCnt+BLACKBOX_OFFSET-1;
+    if (bb->blackbox_destroy==NULL) bb->blackbox_destroy=blackbox_default_destroy;
+    if (bb->blackbox_String==NULL)  bb->blackbox_String=blackbox_default_String;
+    if (bb->blackbox_Print==NULL)   bb->blackbox_Print=blackbox_default_Print;
+    if (bb->blackbox_Init==NULL)    bb->blackbox_Init=blackbox_default_Init;
+    if (bb->blackbox_Copy==NULL)    bb->blackbox_Copy=blackbox_default_Copy;
+    if (bb->blackbox_Op1==NULL)     bb->blackbox_Op1=blackboxDefaultOp1;
+    if (bb->blackbox_Op2==NULL)     bb->blackbox_Op2=blackboxDefaultOp2;
+    if (bb->blackbox_Op3==NULL)     bb->blackbox_Op3=blackbox_default_Op3;
+    if (bb->blackbox_OpM==NULL)     bb->blackbox_OpM=blackbox_default_OpM;
+    if (bb->blackbox_Check==NULL)   bb->blackbox_Check=blackbox_default_Check;
+    return where+BLACKBOX_OFFSET;
+  }
 }
 void removeBlackboxStuff(const int rt)
 {
+  omfree(blackboxTable[rt-BLACKBOX_OFFSET]);
+  omfree(blackboxName[rt-BLACKBOX_OFFSET]);
   blackboxTable[rt-BLACKBOX_OFFSET]=NULL;
   blackboxName[rt-BLACKBOX_OFFSET]=NULL;
 }
