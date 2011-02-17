@@ -4417,6 +4417,19 @@ defines a new type with elemnts given by the string_expression.
 The name of the new type is the first argument (of type string) and must
 be longer than one character.
 
+@item Operations:
+the only operations of user defined types are:
+@table
+@item
+assignment
+@item
+@code{typeof}
+@item
+@code{string} and printing
+@item
+operator @code{.} to access the elements
+@end table
+
 @item Example:
 @smallexample
 @c example
@@ -4425,7 +4438,6 @@ be longer than one character.
   nt B;
   A.a=3;
   A.c=string(A.a);
-  ring r; // we need a ring for A.b, B,b:
   B=A;
 @c example
 @end smallexample
@@ -4436,11 +4448,15 @@ be longer than one character.
 @subsection Declaration of objects of a user defined type
 @cindex Declaration of objects of a user defined type
 
-@c @*@strong{Example:}
-@c @smallexample
-@c @c example
-@c @c example
-@c @end smallexample
+@*@strong{Example:}
+@smallexample
+@c example
+  newstruct("nt","int a,poly b,string c");
+  nt A;
+  // as long as there is no value assigned to A.b, no ring is needed
+  nt B=A;
+@c example
+@end smallexample
 
 @c @c ref
 @c See
@@ -4453,10 +4469,17 @@ be longer than one character.
 @subsection Access to elements of a user defined type
 @cindex Access to elements of a user defined type
 
-@c @*@strong{Example:}
-@c @smallexample
-@c @c example
-@c @c example
-@c @end smallexample
+@*@strong{Example:}
+@smallexample
+@c example
+  newstruct("nt","int a,poly b,string c");
+  nt A;
+  3+A.a;
+  A.c="example string";
+  ring r;
+  A.b=poly(1); // assignment: expression must be of the given type
+  A;
+@c example
+@end smallexample
 
 @c ------------------------------
