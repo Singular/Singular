@@ -605,6 +605,7 @@ struct sValCmd2 dArith2[]=
 //,{D(jjRES),       MRES_CMD,       LIST_CMD,       IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
 //,{D(jjRES),       MRES_CMD,       LIST_CMD,       MODUL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
 ,{D(nuMPResMat),  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD, NO_PLURAL |NO_RING}
+,{D(jjNEWSTRUCT2),NEWSTRUCT_CMD,  NONE,           STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRES),       MRES_CMD,       RESOLUTION_CMD, IDEAL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRES),       MRES_CMD,       RESOLUTION_CMD, MODUL_CMD,  INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 //,{D(nuMPResMat),  MPRES_CMD,      MODUL_CMD,      IDEAL_CMD,  INT_CMD, NO_PLURAL |ALLOW_RING}
@@ -733,6 +734,8 @@ struct sValCmd3 dArith3[]=
 ,{D(jjJET_ID_M),       JET_CMD,    MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{  jjWRONG3 ,         JET_CMD,    POLY_CMD,   POLY_CMD,   INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(mpKoszul),         KOSZUL_CMD, MATRIX_CMD, INT_CMD,    INT_CMD,    IDEAL_CMD, NO_PLURAL |NO_RING}
+,{D(jjLIFT3),          LIFT_CMD,   MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjLIFT3),          LIFT_CMD,   MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFTSTD3),       LIFTSTD_CMD,IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjLIFTSTD3),       LIFTSTD_CMD,MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, MODUL_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjCALL3MANY),      LIST_CMD,   LIST_CMD,   DEF_CMD,    DEF_CMD,    DEF_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -744,8 +747,7 @@ struct sValCmd3 dArith3[]=
 ,{D(jjRES3),           MRES_CMD,   NONE,       IDEAL_CMD,  INT_CMD,    ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRES3),           MRES_CMD,   NONE,       MODUL_CMD,  INT_CMD,    ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 #endif
-,{D(jjLIFT3),          LIFT_CMD,   MATRIX_CMD, IDEAL_CMD,  IDEAL_CMD,  MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
-,{D(jjLIFT3),          LIFT_CMD,   MATRIX_CMD, MODUL_CMD,  MODUL_CMD,  MATRIX_CMD, ALLOW_PLURAL |ALLOW_RING}
+,{D(jjNEWSTRUCT3),     NEWSTRUCT_CMD, NONE,     STRING_CMD, STRING_CMD, STRING_CMD, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjPREIMAGE),       PREIMAGE_CMD, IDEAL_CMD, RING_CMD,  ANY_TYPE,   ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjPREIMAGE),       PREIMAGE_CMD, IDEAL_CMD, QRING_CMD, ANY_TYPE,   ANY_TYPE, ALLOW_PLURAL |ALLOW_RING}
 ,{D(jjRANDOM_Im),      RANDOM_CMD, INTMAT_CMD, INT_CMD,    INT_CMD,    INT_CMD, ALLOW_PLURAL |ALLOW_RING}
@@ -868,6 +870,7 @@ struct sValCmdM dArithM[]=
 cmdnames cmds[] =
 {  // name-string alias tokval          toktype
   { "$INVALID$",   0, -1,                 0},
+  { "LIB",         0, LIB_CMD ,           SYSVAR},
   #ifdef HAVE_FANS
 //  { "addadj",      0, ADDADJ_CMD,         CMD_M},
 //  { "addmaxcone",  0, ADDMCONE_CMD,       CMD_2},
@@ -985,7 +988,6 @@ cmdnames cmds[] =
   { "leadcoef",    0, LEADCOEF_CMD ,      CMD_1},
   { "leadexp",     0, LEADEXP_CMD ,       CMD_1},
   { "leadmonom",   0, LEADMONOM_CMD ,     CMD_1},
-  { "LIB",         0, LIB_CMD ,           SYSVAR},
   { "lift",        0, LIFT_CMD ,          CMD_23},
   { "liftstd",     0, LIFTSTD_CMD ,       CMD_23},
   { "link",        0, LINK_CMD ,          ROOT_DECL},
@@ -1018,6 +1020,7 @@ cmdnames cmds[] =
   { "mstd",        0, MSTD_CMD ,          CMD_1},
   { "nameof",      0, NAMEOF_CMD ,        CMD_1},
   { "names",       0, NAMES_CMD ,         CMD_M},
+  { "newstruct",   0, NEWSTRUCT_CMD ,     CMD_23},
   #ifdef HAVE_PLURAL
   { "ncalgebra",   2, NCALGEBRA_CMD ,     CMD_2},
   { "nc_algebra",  0, NC_ALGEBRA_CMD ,    CMD_2},

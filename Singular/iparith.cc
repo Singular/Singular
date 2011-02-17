@@ -66,9 +66,10 @@
 #endif /* HAVE_FACTORY */
 #include <Singular/interpolation.h>
 
+#include <Singular/blackbox.h>
+#include <Singular/newstruct.h>
 #include <Singular/ipshell.h>
 #include <kernel/mpr_inout.h>
-#include <Singular/blackbox.h>
 
 #ifdef HAVE_FANS
 #include <gfanlib/gfanlib.h>
@@ -2470,6 +2471,14 @@ static BOOLEAN jjMONOM(leftv res, leftv v)
   res->data=(char*)p;
   if(err) { pDelete(&p); WerrorS("no negative exponent allowed"); }
   return err;
+}
+static BOOLEAN jjNEWSTRUCT2(leftv res, leftv u, leftv v)
+{
+  // u: the name of the new type
+  // v: the elements
+  newstruct_desc d=newstructFromString((const char *)v->Data());
+  if (d!=NULL) newstruct_setup((const char *)u->Data(),d);
+  return d==NULL;
 }
 static BOOLEAN jjPARSTR2(leftv res, leftv u, leftv v)
 {
@@ -6284,6 +6293,16 @@ static BOOLEAN jjMINOR_M(leftv res, leftv v)
   res->rtyp = IDEAL_CMD;
   return FALSE;
 }
+static BOOLEAN jjNEWSTRUCT3(leftv res, leftv u, leftv v, leftv w)
+{
+  // u: the name of the new type
+  // v: the parent type
+  // w: the elements
+  newstruct_desc d=newstructChildFromString((const char *)v->Data(),
+                                            (const char *)w->Data());
+  if (d!=NULL) newstruct_setup((const char *)u->Data(),d);
+  return d==NULL;
+}
 static BOOLEAN jjPREIMAGE(leftv res, leftv u, leftv v, leftv w)
 {
   // handles preimage(r,phi,i) and kernel(r,phi)
@@ -7808,6 +7827,7 @@ static BOOLEAN jjRESERVED0(leftv res, leftv v)
     PrintLn();
   }
   PrintLn();
+  printBlackboxTypes();
   return FALSE;
 }
 static BOOLEAN jjSTRING_PL(leftv res, leftv v)
@@ -8986,8 +9006,8 @@ int IsCmd(const char *n, int & tok)
       else
       {
         // -- blackbox extensions:
-	// return 0;
-	return blackboxIsCmd(n,tok);
+        // return 0;
+        return blackboxIsCmd(n,tok);
       }
     }
     i=(an+en)/2;

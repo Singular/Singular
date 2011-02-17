@@ -59,10 +59,32 @@ char * newstruct_String(blackbox *b, void *d)
     return omStrDup(StringAppendS(""));
   }
 }
+lists lCopy_newstruct(lists L)
+{
+  lists N=(lists)omAlloc0Bin(slists_bin);
+  int n=L->nr;
+  ring save_ring=currRing;
+  N->Init(n+1);
+  for(;n>=0;n--)
+  {
+    if (RingDependend(L->m[n].rtyp)
+    && (L->m[n].data!=NULL))
+    {
+      assume(L->m[n-1].rtyp==RING_CMD);
+      if((L->m[n-1].data!=NULL)&&(L->m[n-1].data!=(void*)currRing))
+        rChangeCurrRing((ring)(L->m[n-1].data));
+      N->m[n].Copy(&L->m[n]);
+    }
+    else
+      N->m[n].Copy(&L->m[n]);
+  }
+  if (currRing!=save_ring) rChangeCurrRing(save_ring);
+  return N;
+}
 void * newstruct_Copy(blackbox*b, void *d)
 {
   lists n1=(lists)d;
-  return (void*)lCopy(n1);
+  return (void*)lCopy_newstruct(n1);
 }
 
 BOOLEAN newstruct_Assign(leftv l, leftv r)
@@ -78,7 +100,8 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
         lists n1=(lists)l->Data();
         n1->Clean(); n1=NULL;
       }
-      lists n2=(lists)r->CopyD();
+      lists n2=(lists)r->Data();
+      n2=lCopy_newstruct(n2);
       if (l->rtyp==IDHDL)
       {
         IDDATA((idhdl)l->data)=(char *)n2;
@@ -94,8 +117,6 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
         Tok2Cmdname(l->Typ()),l->Typ(),Tok2Cmdname(r->Typ()),r->Typ());
   return TRUE;
 }
-BOOLEAN newstruct_OpM(int op, leftv res, leftv args);
-
 
 BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
 {
@@ -169,6 +190,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
   }
   return blackboxDefaultOp2(op,res,a1,a2);
 }
+
 // BOOLEAN opM(int op, leftv res, leftv args)
 BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
 {
@@ -188,6 +210,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
   }
   return TRUE;
 }
+
 void newstruct_destroy(blackbox *b, void *d)
 {
   if (d!=NULL)
@@ -231,6 +254,7 @@ BOOLEAN newstruct_Check(blackbox *b, void *d)
   }
   return FALSE;
 }
+
 void newstruct_setup(const char *n, newstruct_desc d )
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -322,4 +346,8 @@ newstruct_desc newstructFromString(const char *s)
   currRingHdl=save_ring;
   return res;
 }
-
+newstruct_desc newstructChildFromString(const char *p, const char *s)
+{
+  // not yet
+  return NULL;
+}
