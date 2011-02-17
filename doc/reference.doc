@@ -85,6 +85,7 @@ and @code{LIB} no brackets are allowed.
 * exit::
 * extgcd::
 * facstd::
+* factmodd::
 * factorize::
 * farey::
 * fetch::
@@ -1739,7 +1740,7 @@ See
 @ref{poly}
 @c ref
 @c ---------------------------------------
-@node facstd, factorize, extgcd, Functions
+@node facstd, factmodd, extgcd, Functions
 @subsection facstd
 @cindex facstd
 
@@ -1784,7 +1785,61 @@ See
 @ref{ideal}.
 @c ref
 @c ---------------------------------------
-@node factorize, farey, facstd, Functions
+@node factmodd, factorize, facstd, Functions
+@subsection factmodd
+@cindex factmodd
+
+@table @code
+@item @strong{Syntax:}
+@code{factmodd (} poly_expression, int_expression
+@*@code{[}, poly_expression, poly_expression @code{]}
+@*@code{[}, int_expression, int_expression @code{]}
+@*@code{)}
+@item @strong{Type:}
+list of polys
+@item @strong{Purpose:}
+Computes a factorization of a polynomial h(x, y) in K[[x]][y] up to a
+certain degree in x, whenever a factorization of h(0, y) is provided or can
+be computed.
+@*The algorithm is based on Hensel's lemma: Let h(x, y) denote a monic
+polynomial in y of degree m + n with coefficients in K[[x]]. Suppose there
+are two monic factors f_0(y) (of degree n) and g_0(y) of degree (m) such
+that
+@*h(0, y) = f_0(y) * g_0(y) and <f_0, g_0> = K[y].
+@*Fix an integer d >= 0.
+Then there are monic polynomials in y with coefficients in K[[x]], namely
+f(x, y) of degree n and g(x, y) of degree m such that
+@*h(x, y) = f(x, y) * g(x, y) modulo <x^(d+1)>   (*).
+@*The function's six arguments are h, d, f_0, g_0, xIndex, and yIndex, where
+xIndex and yIndex denote indices of ring variables that are to play the roles
+of x and y as above. h must be provided as an element of K[x,y] since all terms
+of h with x-degree larger than d can be ignored due to (*).
+@*If f_0 and g_0 are not given, the algorithm computes the factorization of
+h(0, y) and is expected to find exactly two distinct factors (which may appear
+with multiplicities larger than 1) and uses these as f_0 and g_0.
+@*If xIndex and yIndex are missing they will be expected to be 1 and 2,
+respectively.
+@item @strong{Note:}
+The function expects the ground ring to contain at least two variables.
+@item @strong{Example:}
+@smallexample
+@c example
+  ring r = 0, (x,y), dp;
+  poly f0 = y240; poly g0 = y102+1;
+  poly h = y342+14x260+7x140y110+2x120y130+y240;
+  int d = 260;
+  list L = factmodd(h, d, f0, g0); L;
+  // check result: next output should be zero
+  reduce(h - L[1] * L[2], std(x^(d+1)));
+@c example
+@end smallexample
+@end table
+@c ref
+See
+@ref{factorize}.
+@c ref
+@c ---------------------------------------
+@node factorize, farey, factmodd, Functions
 @subsection factorize
 @cindex factorize
 
