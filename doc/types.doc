@@ -54,6 +54,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * ring::
 * string::
 * vector::
+* User defined types::
 @end menu
 
 @c ---------------------------------------
@@ -4204,7 +4205,7 @@ name of the n-th ring variable (see @ref{varstr})
 @c @end example
 
 @c ---------------------------------------
-@node vector,  , string, Data types
+@node vector, User defined types , string, Data types
 @section vector
 @cindex vector
 
@@ -4382,3 +4383,79 @@ substitute a ring variable (see @ref{subst})
 @c @*@strong{Example:}
 @c @example
 @c @end example
+@c ---------------------------------------
+@node User defined types,, vector, Data types
+@section User defined types
+@cindex User defined types
+@cindex newstruct
+
+User defined types are (non-empty) lists with a fixed size
+whose element can be accessed by names (and not indices).
+Thse elements have a predefined type (which can also be a user defined type).
+If these elemnts depend on a ring they can only be accessed if
+their base ring ist the current base ring.
+In contrast to usual lists the elements of a user defined type may
+belong to diffrent rings.
+
+@menu
+* Definition of a user defined type::
+* Declaration of objects of a user defined type::
+* Access to elements of a user defined type::
+@end menu
+
+@c ------------------------------
+@node Definition of a user defined type, Declaration of objects of a user defined type, User defined types, User defined types
+@subsection Definition of a user defined type
+@cindex Definition of a user defined type
+
+@table @strong
+@item Syntax:
+@code{newstruct("} name @code{",} string_expression @code{);}
+
+@item Purpose:
+defines a new type with elemnts given by the string_expression.
+The name of the new type is the first argument (of type string) and must 
+be longer than one character.
+
+@item Example:
+@smallexample
+@c example
+  newtype("nt","int a,poly b,string c");
+  nt A;
+  nt B;
+  A.a=3;
+  A.c=string(A.a);
+  B=A;
+@c example
+@end smallexample
+@end table
+
+@c ------------------------------
+@node Declaration of objects of a user defined type, Access to elements of a user defined type, Definition of a user defined type, User defined types
+@subsection Declaration of objects of a user defined type
+@cindex Declaration of objects of a user defined type
+
+@c @*@strong{Example:}
+@c @smallexample
+@c @c example
+@c @c example
+@c @end smallexample
+
+@c @c ref
+@c See
+@c @ref{ring};
+@c @ref{Type conversion and casting}.
+@c @c ref
+
+@c ------------------------------
+@node Access to elements of a user defined type, , Declaration of objects of a user defined type, User defined types
+@subsection Access to elements of a user defined type
+@cindex Access to elements of a user defined type
+
+@c @*@strong{Example:}
+@c @smallexample
+@c @c example
+@c @c example
+@c @end smallexample
+
+@c ------------------------------
