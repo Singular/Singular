@@ -944,9 +944,9 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       {
         if (!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
         {
-          tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
-          tmpR.parameter[0]=omStrDup(r1->parameter[0]);
-          tmpR.P=1;
+          //tmpR.parameter=(char **)omAllocBin(char *);
+          //tmpR.parameter[0]=omStrDup(r1->parameter[0]);
+          //tmpR.P=1;
         }
         else
         {
@@ -969,10 +969,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && n_Equal(r1->minpoly,r2->minpoly, r1->cf))
           {
-            tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
-            tmpR.parameter[0]=omStrDup(r1->parameter[0]);
-            tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
-            tmpR.P=1;
+            //tmpR.parameter=(char **)omAllocBin(char *);
+            //tmpR.parameter[0]=omStrDup(r1->parameter[0]);
+            //tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
+            //tmpR.P=1;
             // HANNES: TODO: delete nSetChar
           }
           else
@@ -987,10 +987,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && (rPar(r2)==1))
           {
-            tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
-            tmpR.parameter[0]=omStrDup(r1->parameter[0]);
-            tmpR.P=1;
-            tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
+            //tmpR.parameter=(char **)omAllocBin(char *);
+            //tmpR.parameter[0]=omStrDup(r1->parameter[0]);
+            //tmpR.P=1;
+            //tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
           }
           else
           {
@@ -1006,10 +1006,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && (rPar(r1)==1))
           {
-            tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
-            tmpR.parameter[0]=omStrDup(r1->parameter[0]);
-            tmpR.P=1;
-            tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
+            //tmpR.parameter=(char **)omAllocBin(char *);
+            //tmpR.parameter[0]=omStrDup(r1->parameter[0]);
+            //tmpR.P=1;
+            //tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
           }
           else
           {
@@ -1121,7 +1121,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     {
       if ((r2->ch<-1)||(r2->ch==1)) /* Z/p(a),Q(a) */
       {
-        tmpR.ch=rInternalChar(r2);
+        tmpR.ch=r2->ch;
         tmpR.P=rPar(r2);
         tmpR.parameter=(char **)omAlloc(rPar(r2)*sizeof(char *));
         int i;
@@ -1181,7 +1181,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       }
       else if (r2->ch==-r1->ch) /* Z/p(a) */
       {
-        tmpR.ch=rInternalChar(r2);
+        tmpR.ch=r2->ch;
         tmpR.P=rPar(r2);
         tmpR.parameter=(char **)omAlloc(rPar(r2)*sizeof(char *));
         int i;
@@ -1600,7 +1600,6 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
   ideal Q=NULL;
   ideal Q1=NULL, Q2=NULL;
-//  ring old_ring2 = currRing;
   if (r1->qideal!=NULL)
   {
 //    rChangeCurrRing(sum);
@@ -1656,7 +1655,6 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   if ( (Q1!=NULL) || ( Q2!=NULL))
   {
     Q = idSimpleAdd(Q1,Q2);
-    //rChangeCurrRing(old_ring2);
   }
   sum->qideal = Q;
 
@@ -3380,7 +3378,7 @@ static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
 
 static void rOptimizeLDeg(ring r)
 {
-  if (r->pFDeg == p_Deg)
+  if (r->pFDeg == pDeg)
   {
     if (r->pLDeg == pLDeg1)
       r->pLDeg = pLDeg1_Deg;
@@ -3517,7 +3515,7 @@ static void rSetDegStuff(ring r)
     {
       r->pLDeg = pLDeg1;
     }
-    r->pFDeg = pWTotaldegree; // may be improved: p_Totaldegree for lp/dp/ls/.. blocks
+    r->pFDeg = p_WTotaldegree; // may be improved: p_Totaldegree for lp/dp/ls/.. blocks
   }
   
   if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
