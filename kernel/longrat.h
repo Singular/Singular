@@ -14,7 +14,7 @@
 #define SR_HDL(A) ((long)(A))
 
 #define SR_INT    1L
-#define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))
+#define INT_TO_SR(INT)  ((number) ((((long)INT) << 2) + SR_INT))
 #define SR_TO_INT(SR)   (((long)SR) >> 2)
 
 
@@ -107,7 +107,7 @@ number nlFarey(number nP, number nN);
 #define nlTest(a) nlDBTest(a,__FILE__,__LINE__)
 BOOLEAN nlDBTest(number a, char *f,int l);
 #else
-#define nlTest(a) ((void)0)
+#define nlTest(a) ((void)1)
 #endif
 
 #endif
