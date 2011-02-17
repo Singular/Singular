@@ -252,7 +252,7 @@ new library: freegb.lib (see @nref{freegb_lib}): Twosided Non-commutative Groebn
 @item
 new library: jacobson.lib (see @nref{jacobson_lib}): Algorithms for Smith and Jacobson Normal Form
 @item
-contributed library: cimonom.lib (see @nref{cimonom_lib}): determines if the toric ideal of an affine monomial curve is a complete intersection
+contributed library: cimonom.lib (see cimonom_lib): determines if the toric ideal of an affine monomial curve is a complete intersection
 @item
 contributed library: phindex.lib (see @nref{phindex_lib}): Poincare-Hopf index of a real analytic vector field
 @end itemize
@@ -363,7 +363,7 @@ new library: sagbi.lib (@nref{sagbi_lib}): subalgebras bases analogous to Groebn
 @item
 new library: surfex.lib (@nref{surfex_lib}): visualizing and rotating surfaces
 @item
-new library: cimonom.lib (@nref{cimonom_lib}): determines if the toric ideal of an affine monomial curve is a complete intersection.
+new library: cimonom.lib (cimonom_lib): determines if the toric ideal of an affine monomial curve is a complete intersection.
 @item
 @nref{sheafcoh_lib}: new experimental functions, in particular @nref{sheafCohBGG2}
 @item
