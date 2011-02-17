@@ -22,6 +22,32 @@
 
 @heading News for version @value{VERSION}
 
+@heading User defined types
+New types can be defined, see @nref{User defined types}.
+
+@heading New @sc{Singular} functions
+@itemize @bullet
+@item
+new command: @code{factmodd} (see @nref{factmodd})
+@item
+new command: @code{waitall} (see @nref{waitall})
+@item
+new command: @code{waitfirst} (see @nref{waitfirst})
+@end itemize
+
+@heading New @sc{Singular} libraries
+@itemize @bullet
+@item
+new library: cisimplicial.lib (see @nref{cisimplicial_lib}: Is the toric ideal of
+a simplicial toric variety a complete intersection?) - extends and susbtitute cimonom.lib
+@item
+new library: grobcov.lib  extends and susbtitute redcgs.lib
+@end itemize
+
+@heading --------------------------------------------------------------------
+@heading Older versions:
+@heading News for version 3-1-2
+
 This version starts some reorganization: a section for new libraries:
 (see @nref{Experimental libraries}), preparations for parallel computations
 (see @nref{modstd_lib}, @nref{Ssi links}), some linear algebra (see below),
@@ -102,8 +128,6 @@ new gcd code
 new factorization code
 @end itemize
 
-@heading --------------------------------------------------------------------
-@heading Older versions:
 @heading News for version 3-1-1
 
 @itemize @bullet
