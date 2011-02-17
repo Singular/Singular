@@ -67,13 +67,25 @@ lists lCopy_newstruct(lists L)
   N->Init(n+1);
   for(;n>=0;n--)
   {
-    if (RingDependend(L->m[n].rtyp)
-    && (L->m[n].data!=NULL))
+    if (RingDependend(L->m[n].rtyp))
     {
-      assume(L->m[n-1].rtyp==RING_CMD);
-      if((L->m[n-1].data!=NULL)&&(L->m[n-1].data!=(void*)currRing))
-        rChangeCurrRing((ring)(L->m[n-1].data));
-      N->m[n].Copy(&L->m[n]);
+      assume((L->m[n-1].rtyp==RING_CMD) || (L->m[n-1].data==NULL));
+      if(L->m[n-1].data!=NULL)
+      {
+        if (L->m[n-1].data!=(void*)currRing)
+          rChangeCurrRing((ring)(L->m[n-1].data));
+        N->m[n].Copy(&L->m[n]);
+      }
+      else
+      {
+        N->m[n].rtyp=L->m[n].rtyp;
+        N->m[n].data=idrecDataInit(L->m[n].rtyp);
+      }
+    }
+    else if((L->m[n].rtyp>MAX_TOK)||(L->m[n].rtyp==LIST_CMD))
+    {
+      N->m[n].rtyp=L->m[n].rtyp;
+      N->m[n].data=(void *)lCopy_newstruct((lists)(L->m[n].data));
     }
     else
       N->m[n].Copy(&L->m[n]);
@@ -140,16 +152,16 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
         if (RingDependend(nm->typ))
         {
           if (al->m[nm->pos].data==NULL)
-	  {
-	    // NULL belongs to any ring
-	    ring r=(ring)al->m[nm->pos-1].data;
-	    if (r!=NULL)
-	    {
-	      r->ref--;
-	      al->m[nm->pos-1].data=NULL;
-	      al->m[nm->pos-1].rtyp=DEF_CMD;
-	    }
-	  }
+          {
+            // NULL belongs to any ring
+            ring r=(ring)al->m[nm->pos-1].data;
+            if (r!=NULL)
+            {
+              r->ref--;
+              al->m[nm->pos-1].data=NULL;
+              al->m[nm->pos-1].rtyp=DEF_CMD;
+            }
+          }
           else
           {
             //Print("checking ring at pos %d for dat at pos %d\n",nm->pos-1,nm->pos);
@@ -161,12 +173,12 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             }
           }
           if ((currRing!=NULL)&&(al->m[nm->pos-1].data==NULL))
-	  {
-	    // remember the ring, if not already set
-	    al->m[nm->pos-1].data=(void *)currRing;
-	    al->m[nm->pos-1].rtyp=RING_CMD;
-	    currRing->ref++;
-	  }
+          {
+            // remember the ring, if not already set
+            al->m[nm->pos-1].data=(void *)currRing;
+            al->m[nm->pos-1].rtyp=RING_CMD;
+            currRing->ref++;
+          }
         }
         Subexpr r=(Subexpr)omAlloc0Bin(sSubexpr_bin);
         r->start = nm->pos+1;
@@ -247,7 +259,7 @@ BOOLEAN newstruct_Check(blackbox *b, void *d)
     {
       Werror("type change in member %s (%s(%d) -> %s(%d))",nm->name,
           Tok2Cmdname(nm->typ),nm->typ,
-	  Tok2Cmdname(l->m[nm->pos].rtyp),l->m[nm->pos].rtyp);
+          Tok2Cmdname(l->m[nm->pos].rtyp),l->m[nm->pos].rtyp);
       return TRUE;
     }
     nm=nm->next;
