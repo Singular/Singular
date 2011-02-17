@@ -4416,6 +4416,8 @@ belong to diffrent rings.
 defines a new type with elemnts given by the string_expression.
 The name of the new type is the first argument (of type string) and must
 be longer than one character.
+@*The string expression must be an comma separated list of
+a type followed by a name.
 
 @item Operations:
 the only operations of user defined types are:

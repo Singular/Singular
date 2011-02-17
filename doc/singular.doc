@@ -355,7 +355,7 @@ LIB "all.lib";
 * absfact_lib:: absolute factorization for characteristic 0
 * algebra_lib:: procedures for computing with algebras and maps
 * assprimeszerodim_lib:: associated primes of a zero-dimensional ideal
-* cimonom_lib:: is the toric ideal of an affine monomial curve a complete intersection ?
+* cisimplicial_lib:: is the toric ideal of a simplicial toric variety a complete intersection?
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
@@ -385,15 +385,15 @@ LIB "all.lib";
 @subsection algebra_lib
 @c lib algebra.lib
 @c ---------------------------------------------------------
-@node assprimeszerodim_lib, cimonom_lib, algebra_lib, Commutative algebra
+@node assprimeszerodim_lib, cisimplicial_lib, algebra_lib, Commutative algebra
 @subsection assprimeszerodim_lib
 @c lib assprimeszerodim.lib
 @c ---------------------------------------------------------
-@node cimonom_lib, elim_lib, assprimeszerodim_lib, Commutative algebra
-@subsection cimonom_lib
-@c lib cimonom.lib
+@node cisimplicial_lib, elim_lib, assprimeszerodim_lib, Commutative algebra
+@subsection cisimplicial_lib
+@c lib cisimplicial.lib
 @c ----------------------------------------------------------
-@node elim_lib, grwalk_lib, cimonom_lib, Commutative algebra
+@node elim_lib, grwalk_lib, cisimplicial_lib, Commutative algebra
 @subsection elim_lib
 @c lib elim.lib
 @c ----------------------------------------------------------
