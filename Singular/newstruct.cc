@@ -275,7 +275,7 @@ void newstruct_setup(const char *n, newstruct_desc d )
   b->data=d;
   b->properties=1; // list_like
   int rt=setBlackboxStuff(b,n);
-  Print("create type %d (%s)\n",rt,n);
+  //Print("create type %d (%s)\n",rt,n);
 }
 
 newstruct_desc newstructFromString(const char *s)
@@ -341,7 +341,7 @@ newstruct_desc newstructFromString(const char *s)
     if (*p!=',') break;
     p++;
   }
-  Print("new type with %d elements\n",res->size);
+  //Print("new type with %d elements\n",res->size);
   omFree(ss);
   currRingHdl=save_ring;
   return res;
