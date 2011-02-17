@@ -35,7 +35,7 @@ nodist_libomalloc_debug_a_SOURCES = omConfig.h omlimits.h omTables.h omalloc.h o
 
 libomalloc_a_CPPFLAGS= -DOM_NDEBUG
 
-BUILT_SOURCES = omTables.inc
+BUILT_SOURCES = omTables.inc omTables.h
 
 omTables.inc: omTables omalloc.h
 	./omTables > omTables.xx && mv omTables.xx  $@
