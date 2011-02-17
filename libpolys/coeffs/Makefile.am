@@ -29,8 +29,8 @@ check_PROGRAMS=test test-g
 test_SOURCES=test.cc
 test_g_SOURCES=test.cc
 
-test_LDADD = -lreporter -lresources -lgmp -lomalloc_ndebug libcoeffs.a
-test_g_LDADD = -lreporter -lresources -lgmp -lomalloc_ndebug libcoeffs_g.a
+test_LDADD = libcoeffs.a -lresources -lreporter -lgmp -lomalloc_debug
+test_g_LDADD = libcoeffs_g.a -lresources -lreporter -lgmp -lomalloc_debug
 
 test_g_CXXFLAGS = -g -Wextra -Wall -pedantic -fdiagnostics-show-option -Wno-long-long
 
