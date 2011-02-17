@@ -534,7 +534,7 @@ lists qrDoubleShift(
  * x is the first ring variable, specified by the input index xIndex, and y the
  * second one, specified by yIndex.
  *
- * This code was place here since the algorithm works by successively solving
+ * This code was placed here since the algorithm works by successively solving
  * d linear equation systems. It is hence an application of other methods
  * defined in this h-file and its corresponding cc-file.
  * 
@@ -542,7 +542,7 @@ lists qrDoubleShift(
 void henselFactors(
        const int xIndex,  /**< [in]  index of x in {1, ..., nvars(basering)} */
        const int yIndex,  /**< [in]  index of y in {1, ..., nvars(basering)} */
-       const poly h,      /**< [in]  the polynomial h(x, y) to be factorized */
+       const poly h,      /**< [in]  the polynomial h(x, y) as above         */
        const poly f0,     /**< [in]  the first univariate factor of h(0, y)  */
        const poly g0,     /**< [in]  the second univariate factor of h(0, y) */
        const int d,       /**< [in]  the degree bound, d >= 0                */

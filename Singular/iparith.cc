@@ -7886,7 +7886,7 @@ extern "C"
 static BOOLEAN jjFactModD_M(leftv res, leftv v)
 {
   /* compute two factors of h(x,y) modulo x^(d+1) in K[[x]][y],
-     see doc in /kernel/linearAlgebra.h
+     see a detailed documentation in /kernel/linearAlgebra.h
      
      valid argument lists:
      - (poly h, int d),
@@ -7895,6 +7895,9 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
                                                           in list of ring vars,
      - (poly h, int d, poly f0, poly g0, int xIndex, int yIndec),
                                                 optional: all 4 optional args
+     (The defaults are xIndex = 1, yIndex = 2, f0 and g0 polynomials as found
+      by singclap_factorize in the case that HAVE_FACTORY is defined and h(0, y)
+      has exactly two distinct monic factors [possibly with exponent > 1].)
      result:
      - list with the two factors f and g such that
        h(x,y) = f(x,y)*g(x,y) mod x^(d+1)   */
