@@ -4419,7 +4419,7 @@ be longer than one character.
 
 @item Operations:
 the only operations of user defined types are:
-@table
+@table @asis
 @item
 assignment
 @item
