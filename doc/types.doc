@@ -1948,7 +1948,7 @@ contained in the search path. The launched application acts as a server,
 whereas the @sc{Singular} that actually opened the link acts as a
 client.
 The client "listens" at the some free port until the server
-application does a connect call. 
+application does a connect call.
 
 If the ssi tcp link is opened in fork mode a child of the current
 @sc{Singular} is forked. All variables and their values are inherited by
@@ -3608,19 +3608,19 @@ using the command @code{LIB}. For more information on libraries see
    <sequence_of_commands>
 @*@code{@}}]
 @item Purpose:
-Defines a new function, the @code{proc} proc_name. Once loaded in a 
-@sc{Singular} session, the information provided in the help string will be 
-displayed upon entering @code{help proc_name;}, while the @code{example} 
+Defines a new function, the @code{proc} proc_name. Once loaded in a
+@sc{Singular} session, the information provided in the help string will be
+displayed upon entering @code{help proc_name;}, while the @code{example}
 section will be executed  upon entering @code{example proc_name;}.
-@xref{Parameter list}, @ref{Help string}, and the example in 
+@xref{Parameter list}, @ref{Help string}, and the example in
 @ref{Procedures in a library}.
 @* The help string, the parameter list, and the example section are optional.
 They are, however, mandatory for the procedures listed in the header of a library.
 The help string is ignored and no example section is allowed if the procedure is defined
-interactively, i.e., if it is not loaded from a file by the @code{LIB} or @code{load}  
+interactively, i.e., if it is not loaded from a file by the @code{LIB} or @code{load}
 command (@pxref{LIB} and @pxref{load} ).
-@* In the body of a library, each procedure not meant to be accessible by 
-users should be declared static. @xref{Procedures in a library}. 
+@* In the body of a library, each procedure not meant to be accessible by
+users should be declared static. @xref{Procedures in a library}.
 
 @item Example:
 @smallexample
@@ -4414,17 +4414,18 @@ belong to diffrent rings.
 
 @item Purpose:
 defines a new type with elemnts given by the string_expression.
-The name of the new type is the first argument (of type string) and must 
+The name of the new type is the first argument (of type string) and must
 be longer than one character.
 
 @item Example:
 @smallexample
 @c example
-  newtype("nt","int a,poly b,string c");
+  newstruct("nt","int a,poly b,string c");
   nt A;
   nt B;
   A.a=3;
   A.c=string(A.a);
+  ring r; // we need a ring for A.b, B,b:
   B=A;
 @c example
 @end smallexample
