@@ -7529,9 +7529,12 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{waitall (} list_expression @code{)}
+@item @strong{Type:}
+none
+@item @strong{Syntax:}
 @code{waitall (} list_expression @code{, } int_expression @code{)}
 @item @strong{Type:}
-none/int
+int
 @item @strong{Purpose:}
 Expects a list of open ssi links of mode fork or tcp and waits until all of
 them are finished, i.e., are ready to be read.
@@ -7570,7 +7573,7 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{waitfirst (} list_expression @code{)}
-@code{waitfirst (} list_expression @code{, } int_expression @code{)}
+@*@code{waitfirst (} list_expression @code{, } int_expression @code{)}
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
