@@ -55,6 +55,7 @@ For the general syntax of a declaration see @ref{General command syntax}.
 * string::
 * vector::
 * User defined types::
+* pyobject::
 @end menu
 
 @c ---------------------------------------
@@ -4384,7 +4385,7 @@ substitute a ring variable (see @ref{subst})
 @c @example
 @c @end example
 @c ---------------------------------------
-@node User defined types,, vector, Data types
+@node User defined types, pyobject, vector, Data types
 @section User defined types
 @cindex User defined types
 @cindex newstruct
@@ -4485,3 +4486,4 @@ operator @code{.} to access the elements
 @end smallexample
 
 @c ------------------------------
+@include pyobject.tex

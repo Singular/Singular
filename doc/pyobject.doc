@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
 
 @c ----------------------------------------------------------------------------
-@node  pyobject, Data types, 
+@node  pyobject,,User defined types, Data types, 
 @section pyobject
 @cindex pyobject
 @cindex blackbox
@@ -15,7 +15,7 @@ access @code{python} functionality from within @sc{Singular} and store
 the results for re-use:
 
 @smallexample
-@c example
+@c example error
 pyobject pystr = "Hello";
 pyobject pyint = 2;
 string singstr = string(pystr + " World!");
@@ -111,7 +111,7 @@ an int expression (see @ref{Type conversion and casting})
   pystr + pystr;
   pystr * pyint;
   python_eval("17 + 4");
-  typeof(_)
+  typeof(_);
 @c example
 @end smallexample
 
