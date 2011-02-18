@@ -18,6 +18,9 @@
 #include <Singular/tok.h>
 #include <Singular/grammar.h>
 
+// to produce convert_table.texi for doc:
+//#define CONVERT_TABLE 1
+
   #define ALLOW_PLURAL     1
   #define NO_PLURAL        0
   #define COMM_PLURAL      2
@@ -344,6 +347,11 @@ void ttGen1()
   }
 /*-------------------------------------------------------------------*/
   fprintf(outfile,"/*---------------------------------------------*/\n");
+  #ifdef CONVERT_TABLE
+  FILE *doctable=fopen("convert_table.texi","w");
+  fprintf(doctable,"@multitable @columnfractions .05 .18 .81\n");
+  int doc_nr=1;
+  #endif
   for (j=257;j<=MAX_TOK+1;j++)
   {
     for(i=257;i<=MAX_TOK+1;i++)
@@ -353,10 +361,20 @@ void ttGen1()
       {
         fprintf(outfile,"// convert %s -> %s\n",
           Tok2Cmdname(i), Tok2Cmdname(j));
+  #ifdef CONVERT_TABLE
+	fprintf(doctable,
+	"@item\n@   %d. @tab @code{%s}  @tab @expansion{} @code{%s}\n",
+        doc_nr,Tok2Cmdname(i),Tok2Cmdname(j));
+	doc_nr++;
+  #endif
         if (j==ANY_TYPE) break;
       }
     }
   }
+  #ifdef CONVERT_TABLE
+  fprintf(doctable,"@end multitable\n");
+  fclose(doctable);
+  #endif
   fprintf(outfile,"/*---------------------------------------------*/\n");
   char ops[]="=><+*/[.^,%(;";
   for(i=0;ops[i]!='\0';i++)
