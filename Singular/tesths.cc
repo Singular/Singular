@@ -31,7 +31,7 @@
 #include <Singular/version.h>
 #include <Singular/slInit.h>
 #include <Singular/ssiLink.h>
-#include <Singular/bigintm.h>
+#include <Singular/bbcone.h>
 #include <Singular/pyobject_setup.h>
 
 
@@ -131,7 +131,7 @@ int main(          /* main entry to Singular */
     currPackHdl=h;
     basePackHdl=h;
     //for official version: not active
-    //bigintm_setup();
+    bbcone_setup();
   }
 #endif
   if (TEST_V_QUIET)
