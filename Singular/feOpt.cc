@@ -100,7 +100,7 @@ struct fe_option feOptSpec[] =
    0,          "// Sort NTL results",                                  feOptBool,    0,      0},
 
   {"random",            required_argument,  'r',
-   "SEED",     "Seed random generator with integer (integer) SEED",    feOptInt,    0,      0},
+   "SEED",     "Seed random generator with (integer) SEED",            feOptInt,    0,      0},
 
   {"no-tty",            no_argument,        't',
    0,          "Do not redefine the terminal characteristics",         feOptBool,    0,      0},
