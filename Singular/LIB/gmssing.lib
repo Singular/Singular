@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id: gmssing.lib 13548 2010-10-19 07:45:40Z hannes $";
+version="$Id$";
 category="Singularities";
 
 info="
@@ -7,19 +7,19 @@ LIBRARY: gmssing.lib  Gauss-Manin System of Isolated Singularities
 
 AUTHOR:  Mathias Schulze, mschulze at mathematik.uni-kl.de
 
-OVERVIEW: 
-A library for computing invariants related to the Gauss-Manin system of an 
+OVERVIEW:
+A library for computing invariants related to the Gauss-Manin system of an
 isolated hypersurface singularity.
 
 REFERENCES:
-[Sch01] M. Schulze: Algorithms for the Gauss-Manin connection. J. Symb. Comp. 
+[Sch01] M. Schulze: Algorithms for the Gauss-Manin connection. J. Symb. Comp.
         32,5 (2001), 549-564.
-[Sch02] M. Schulze: The differential structure of the Brieskorn lattice. 
-        In: A.M. Cohen et al.: Mathematical Software - ICMS 2002. 
+[Sch02] M. Schulze: The differential structure of the Brieskorn lattice.
+        In: A.M. Cohen et al.: Mathematical Software - ICMS 2002.
         World Scientific (2002).
-[Sch03] M. Schulze: Monodromy of Hypersurface Singularities. 
+[Sch03] M. Schulze: Monodromy of Hypersurface Singularities.
         Acta Appl. Math. 75 (2003), 3-13.
-[Sch04] M. Schulze: A normal form algorithm for the Brieskorn lattice. 
+[Sch04] M. Schulze: A normal form algorithm for the Brieskorn lattice.
         J. Symb. Comp. 38,4 (2004), 1207-1225.
 
 PROCEDURES:
@@ -49,7 +49,7 @@ SEE ALSO: mondromy_lib, spectrum_lib, gmspoly_lib, dmod_lib
 
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration;
-          Bernstein-Sato polynomial; monodromy; spectrum; spectral pairs; 
+          Bernstein-Sato polynomial; monodromy; spectrum; spectral pairs;
           good basis
 ";
 
