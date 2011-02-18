@@ -436,6 +436,8 @@ proc adjointIdeal(poly f, list #)
          1: compute integral basis via normalization. @*
          2: make local analysis of singularities first and apply normalization
             separately. @*
+         3: normalization via ideal quotient. @*
+         4: normalization via local ideal quotient. @*
          The default is 2. @*
          Optional string may contain substrings: @*
          - rattestyes -> causes error message if curve is not rational. @*
@@ -562,6 +564,8 @@ static proc adjointIdealAtWork(poly f, list choices)
          1: compute integral basis via normalization. @*
          2: make local analysis of singularities first and apply normalization
             separately. @*
+         3: normalization via ideal quotient. @*
+         4: normalization via local ideal quotient. @*
          The default is 2. @*
          string  may contain substring: @*
          - rattestyes -> causes error message if curve is not rational. @*
@@ -586,7 +590,11 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
   int n = deg(f);
   if((choices[1]==1) || (choices[1]==3)) // no local analysis of singularities
     {
-      ideal AI = adjointIdealIB(f,insert(choices,ideal(0),size(choices)));
+      ideal AI;
+      if (choices[1]==1)
+      { AI = adjointIdealIB(f,insert(choices,ideal(0),size(choices))); }
+      else
+      { AI = adjointIdealIQ(f,insert(choices,ideal(0),size(choices))); }
       AI = homog(std(AI),var(3));
       AI = sat(AI, maxideal(1))[1];
       AI = minbase(AI);
@@ -694,8 +702,12 @@ RETURN:  ideal, the adjoint ideal of the curve defined by f.
   ideal AI = 1;
   for(k=1;k<=pd;k++)
     {
-       AI = intersect(AI,adjointIdealIB(f,insert(choices,PD[k][1],
-                                                 size(choices))));
+      if (choices[1]==2)
+      { AI = intersect(AI,adjointIdealIB(f,insert(choices,PD[k][1],
+                                                 size(choices)))); }
+      else
+      { AI = intersect(AI,adjointIdealIQ(f,insert(choices,PD[k][1],
+                                                 size(choices)))); }
     }
   AI = homog(std(AI),var(3));
   AI = intersect(AI,B);
@@ -748,13 +760,14 @@ RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
   rl[3] = list(list("dp",1),list("C",0));
   def QF = ring(rl);   // make var(1) transcendental
   list LIntB;
-  if((DATA[1] == 1) || (DATA[1] == 2))  // use normalization algorithm
+  if(DATA[1] <= 4)  // use normalization algorithm
     {
       LIntB = integralBasis(f, 2, list(list("inputC", DATA[3]),"isIrred"));
     }
   else                                 // use van Hoeij's algorithm
     {
       LIntB = integralBasisVH(f,DATA[3],2);  // van Hoeij in future version
+                                             // used when DATA[1] = 5
     }
   if(find(DATA[2],"rattestyes") && (DATA[3]==0))
     {
@@ -828,6 +841,56 @@ RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
   setring Roriginal;
   ideal AI = imap(QF,LL);
   return(AI);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+static proc adjointIdealIQ(poly f, list choices)
+{
+  poly dhf = subst(f,var(3),1);
+  def Roriginal = basering;
+  list rl = ringlist(Roriginal);
+  rl[2] = list(var(1), var(2));
+  rl[3] = list(list("dp",1:2),list("C",0));
+  def Rdummy = ring(rl);
+  setring Rdummy;
+  list DATA = imap(Roriginal,choices);
+  poly f = imap(Roriginal,dhf);
+  list LIntB;
+int t = timer;
+  if(DATA[1] <= 4)  // use normalization algorithm
+    {
+      LIntB = integralBasis(f, 2, list(list("inputC", DATA[3]),"isIrred"));
+    }
+  else                                 // use van Hoeij's algorithm
+    {
+      LIntB = integralBasisVH(f,DATA[3],2);  // van Hoeij in future version
+                                             // used when DATA[1] = 5
+    }
+  if(find(DATA[2],"rattestyes") && (DATA[3]==0))
+    {
+      setring Roriginal;
+      int gg = geomGenusIB(f,imap(Rdummy, LIntB));
+      if(gg!=0){ERROR("not a rational curve");}
+      setring Rdummy;
+    }
+t = timer - t;
+"#############################################";
+"### IB-time:", t, "msec";
+  int i,j,k,l;
+  ideal IB = LIntB[1];
+  poly d = LIntB[2];
+  ideal fd = f, d;
+  ideal IBf = IB, f;
+t = timer;
+  ideal AI = quotient(fd, IBf);
+t = timer - t;
+"### quot-time:", t, "msec";
+//"#### IB:"; IB;
+//"#### d:", d;
+  setring Roriginal;
+  ideal AI = imap(Rdummy,AI);
+//"#### AI:"; AI;
+  return(AI); 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
