@@ -1,18 +1,41 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: gmspoly.lib 12529 2010-02-08 15:57:48Z seelisch $";
 category="Singularities";
 
 info="
 LIBRARY:  gmspoly.lib  Gauss-Manin System of Tame Polynomials
 
-AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
+AUTHOR:   Mathias Schulze, mschulze at mathematik.uni-kl.de
 
-OVERVIEW: A library to compute invariants related to the Gauss-Manin system
-          of a cohomologically tame polynomial
+OVERVIEW: 
+A library for computing the Gauss-Manin system of a cohomologically tame 
+polynomial f. Schulze's algorithm [Sch05], based on Sabbah's theory [Sab98], 
+is used to compute a good basis of (the Brieskorn lattice of) the Gauss-Manin system and the differential operation of f in terms of this basis. 
+In addition, there is a test for tameness in the sense of Broughton.
+Tame polynomials can be considered as an affine algebraic analogue of local 
+analytic isolated hypersurface singularities. They have only finitely many 
+citical points, and those at infinity do not give rise to atypical values 
+in a sense depending on the precise notion of tameness considered. Well-known 
+notions of tameness like tameness, M-tameness, Malgrange-tameness, and 
+cohomological tameness, and their relations, are reviewed in [Sab98,§8]. 
+For ordinary tameness, see Broughton [Bro88,§3].
+Sabbah [Sab98] showed that the Gauss-Manin system, the D-module direct image 
+of the structure sheaf, of a cohomologically tame polynomial carries a 
+similar structure as in the isolated singularity case, coming from a Mixed 
+Hodge structure on the cohomology of the Milnor (typical) fibre (see 
+gmssing.lib). The data computed by this library encodes the differential structure of the Gauss-Manin system, and the Mixed Hodge structure of the Milnor fibre over the complex numbers. As a consequence, it yields the Hodge numbers, spectral pairs, and monodromy at infinity.
+
+REFERENCES:
+[Bro88] S. Broughton: Milnor numbers and the topology of polynomial 
+        hypersurfaces. Inv. Math. 92 (1988) 217-241.
+[Sab98] C. Sabbah: Hypergeometric periods for a tame polynomial. 
+        arXiv.org math.AG/9805077.
+[Sch05] M. Schulze: Good bases for tame polynomials. 
+        J. Symb. Comp. 39,1 (2005), 103-126.
 
 PROCEDURES:
-  isTame(f);  test if the polynomial f is tame
-  goodBasis(f);  a good basis of the Brieskorn lattice of a cohomologically tame f
+  isTame(f);     test whether the polynomial f is tame
+  goodBasis(f);  good basis of Brieskorn lattice of cohom. tame polynomial f
 
 SEE ALSO: gmssing_lib
 
@@ -59,9 +82,10 @@ ASSUME:   basering has no variables named w(1),w(2),...
 RETURN:
 @format
 int k=
+  1;  if f is tame in the sense of Broughton [Bro88,§3]
   0;  if f is not tame
-  1;  if f is tame
 @end format
+REMARKS:  procedure implements Proposition 3.1 in [Bro88]
 KEYWORDS: tame polynomial
 EXAMPLE:  example isTame; shows examples
 "
@@ -137,7 +161,7 @@ static proc pidbasis(module M0,module M)
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-static proc vfiltTuple(matrix B,int d)
+static proc vfiltmat(matrix B,int d)
 {
   int mu=ncols(B);
 
@@ -425,16 +449,18 @@ static proc glift(ideal e,module V,matrix B,module G)
 
 proc goodBasis(poly f)
 "USAGE:    goodBasis(f); poly f
-ASSUME:   f is cohomologically tame
+ASSUME:   f is cohomologically tame in the sense of Sabbah [Sab98,§8]
 RETURN:
 @format
 ring R;  basering with new variable s
   ideal b;  [matrix(b)] is a good basis of the Brieskorn lattice
   matrix A;  A(s)=A0+s*A1 and t[matrix(b)]=[matrix(b)](A(s)+s^2*(d/ds))
 @end format
+REMARKS:  procedure implements Algorithm 6 in [Sch05]
 KEYWORDS: tame polynomial; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration;
           monodromy; spectrum; spectral pairs; good basis
+SEE ALSO: gmssing_lib
 EXAMPLE:  example goodBasis; shows examples
 "
 {
@@ -516,6 +542,7 @@ EXAMPLE:  example goodBasis; shows examples
 
         B=pidbasis(K2,L2);
       }
+
       B0=std(coeffs(reduce(matrix(K,nrows(K),nrows(B))*B,JS),b0));
       b=matrix(K,nrows(K),nrows(B))*B;
     }
@@ -526,7 +553,7 @@ EXAMPLE:  example goodBasis; shows examples
 
     setring(@S);
 
-    e0,s0,V,B=vfiltTuple(imap(@XS,A),d);
+    e0,s0,V,B=vfiltmat(imap(@XS,A),d);
     a,e0,e,s,V,B,G=spec(e0,s0,V,B);
 
     a0=leadcoef(a[1]);

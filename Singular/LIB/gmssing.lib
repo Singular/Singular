@@ -1,14 +1,26 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: gmssing.lib 13548 2010-10-19 07:45:40Z hannes $";
 category="Singularities";
 
 info="
 LIBRARY: gmssing.lib  Gauss-Manin System of Isolated Singularities
 
-AUTHOR:   Mathias Schulze, email: mschulze@mathematik.uni-kl.de
+AUTHOR:  Mathias Schulze, mschulze at mathematik.uni-kl.de
 
-OVERVIEW: A library to compute invariants related to the the Gauss-Manin system
-          of an isolated hypersurface singularity
+OVERVIEW: 
+A library for computing invariants related to the Gauss-Manin system of an 
+isolated hypersurface singularity.
+
+REFERENCES:
+[Sch01] M. Schulze: Algorithms for the Gauss-Manin connection. J. Symb. Comp. 
+        32,5 (2001), 549-564.
+[Sch02] M. Schulze: The differential structure of the Brieskorn lattice. 
+        In: A.M. Cohen et al.: Mathematical Software - ICMS 2002. 
+        World Scientific (2002).
+[Sch03] M. Schulze: Monodromy of Hypersurface Singularities. 
+        Acta Appl. Math. 75 (2003), 3-13.
+[Sch04] M. Schulze: A normal form algorithm for the Brieskorn lattice. 
+        J. Symb. Comp. 38,4 (2004), 1207-1225.
 
 PROCEDURES:
  gmsring(t,s);              Gauss-Manin system of t with variable s
@@ -37,8 +49,8 @@ SEE ALSO: mondromy_lib, spectrum_lib, gmspoly_lib, dmod_lib
 
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
           mixed Hodge structure; V-filtration; weight filtration;
-          Bernstein-Sato polynomial; local Bernstein-Sato polynomial;
-          monodromy; spectrum; spectral pairs; good basis
+          Bernstein-Sato polynomial; monodromy; spectrum; spectral pairs; 
+          good basis
 ";
 
 LIB "linalg.lib";
@@ -589,7 +601,7 @@ list bs;  Bernstein-Sato polynomial b(s) of t
     int bs[2][i];  multiplicity of i-th root of b(s)
 @end format
 KEYWORDS: singularities; Gauss-Manin system; Brieskorn lattice;
-          Bernstein-Sato polynomial; local Bernstein-Sato polynomial
+          Bernstein-Sato polynomial
 EXAMPLE:  example bernstein; shows examples
 "
 {
@@ -1239,7 +1251,7 @@ example
 
 proc sppnf(list sp)
 "USAGE:   sppnf(list(a,w[,m])); ideal a, intvec w, intvec m
-ASSUME:  ncols(e)==size(w)==size(m)
+ASSUME:  ncols(a)==size(w)==size(m)
 RETURN:  order (a[i][,w[i]]) with multiplicity m[i] lexicographically
 EXAMPLE: example sppnf; shows examples
 "
