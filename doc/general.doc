@@ -2705,57 +2705,65 @@ conversions are:
 @c ------------------------------------------------
 @multitable @columnfractions .05 .18 .81
 @item
-@   1. @tab @code{int}  @tab @expansion{} @code{ideal}
+@   1. @tab @code{intvec}  @tab @expansion{} @code{intmat}
 @item
 @   2. @tab @code{poly}  @tab @expansion{} @code{ideal}
 @item
-@   3. @tab @code{intvec}  @tab @expansion{} @code{intmat}
+@   3. @tab @code{bigint}  @tab @expansion{} @code{ideal}
 @item
-@   4. @tab @code{int}  @tab @expansion{} @code{intvec}
+@   4. @tab @code{int}  @tab @expansion{} @code{ideal}
 @item
-@   5. @tab @code{int}  @tab @expansion{} @code{intmat}
+@   5. @tab @code{intmat}  @tab @expansion{} @code{matrix}
 @item
-@   6. @tab @code{string}  @tab @expansion{} @code{link}
+@   6. @tab @code{ideal}  @tab @expansion{} @code{matrix}
 @item
-@   7. @tab @code{resolution} @tab @expansion{} @code{list}
+@   7. @tab @code{module}  @tab @expansion{} @code{matrix}
 @item
-@   8. @tab @code{ideal}  @tab @expansion{} @code{matrix}
+@   8. @tab @code{number}  @tab @expansion{} @code{matrix}
 @item
-@   9. @tab @code{int}  @tab @expansion{} @code{matrix}
+@   9. @tab @code{poly}  @tab @expansion{} @code{matrix}
 @item
-@  10. @tab @code{intmat}  @tab @expansion{} @code{matrix}
+@   10. @tab @code{vector}  @tab @expansion{} @code{matrix}
 @item
-@  11. @tab @code{intvec}  @tab @expansion{} @code{matrix}
+@   11. @tab @code{bigint}  @tab @expansion{} @code{matrix}
 @item
-@  12. @tab @code{module}  @tab @expansion{} @code{matrix}
+@   12. @tab @code{int}  @tab @expansion{} @code{matrix}
 @item
-@  13. @tab @code{number}  @tab @expansion{} @code{matrix}
+@   13. @tab @code{intvec}  @tab @expansion{} @code{matrix}
 @item
-@  14. @tab @code{poly}  @tab @expansion{} @code{matrix}
+@   14. @tab @code{ideal}  @tab @expansion{} @code{module}
 @item
-@  15. @tab @code{vector}  @tab @expansion{} @code{matrix}
+@   15. @tab @code{matrix}  @tab @expansion{} @code{module}
 @item
-@  16. @tab @code{ideal}  @tab @expansion{} @code{module}
+@   16. @tab @code{vector}  @tab @expansion{} @code{module}
 @item
-@  17. @tab @code{matrix}  @tab @expansion{} @code{module}
+@   17. @tab @code{bigint}  @tab @expansion{} @code{number}
 @item
-@  18. @tab @code{vector}  @tab @expansion{} @code{module}
+@   18. @tab @code{int}  @tab @expansion{} @code{number}
 @item
-@  19. @tab @code{int}  @tab @expansion{} @code{number}
+@   19. @tab @code{number}  @tab @expansion{} @code{poly}
 @item
-@  20. @tab @code{int}  @tab @expansion{} @code{poly}
+@   20. @tab @code{bigint}  @tab @expansion{} @code{poly}
 @item
-@  21. @tab @code{number}  @tab @expansion{} @code{poly}
+@   21. @tab @code{int}  @tab @expansion{} @code{poly}
 @item
-@  22. @tab @code{string}  @tab @expansion{} @code{proc}
+@   22. @tab @code{list}  @tab @expansion{} @code{resolution}
 @item
-@  23. @tab @code{list}  @tab @expansion{} @code{resolution}
+@   23. @tab @code{poly}  @tab @expansion{} @code{vector}
+(p @expansion{} p*@code{gen(1)})
 @item
-@  24. @tab @code{int}  @tab @expansion{} @code{vector}
-  (i @expansion{} i*@code{gen(1)})
+@   24. @tab @code{bigint}  @tab @expansion{} @code{vector}
 @item
-@  25. @tab @code{poly}  @tab @expansion{} @code{vector}
-  (p @expansion{} p*@code{gen(1)})
+@   25. @tab @code{int}  @tab @expansion{} @code{vector}
+(i @expansion{} i*@code{gen(1)})
+@item
+@   26. @tab @code{int}  @tab @expansion{} @code{bigint}
+@item
+@   27. @tab @code{int}  @tab @expansion{} @code{intvec}
+@item
+@   28. @tab @code{string}  @tab @expansion{} @code{link}
+@item
+@   29. @tab @code{resolution}  @tab @expansion{} @code{list}
 @end multitable
 
 @subsubheading Type casting
