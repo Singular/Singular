@@ -131,7 +131,7 @@ int main(          /* main entry to Singular */
     IDPACKAGE(h)=basePack;
     currPackHdl=h;
     basePackHdl=h;
-    bbcone_setup();
+    //bbcone_setup();
     //for official version: not active
     //bigintm_setup();
   }
