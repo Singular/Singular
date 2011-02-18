@@ -18,7 +18,7 @@ LIB "arcpoint.lib";
 LIB "assprimeszerodim.lib";
 LIB "atkins.lib";
 LIB "brnoeth.lib";
-LIB "cimonom.lib";
+LIB "cisimplicial.lib";
 LIB "classify.lib";
 LIB "compregb.lib";
 LIB "control.lib";
