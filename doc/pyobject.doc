@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
 
 @c ----------------------------------------------------------------------------
-@node  pyobject,,User defined types, Data types, 
+@node  pyobject,,User defined types, Data types
 @section pyobject
 @cindex pyobject
 @cindex blackbox
@@ -66,7 +66,7 @@ defines a @code{python} object.
   pyobject empty;
   empty;
 
-  pyobject pystr = "Hello World!"; 
+  pyobject pystr = "Hello World!";
   pyobject pyone = 17;
   pyobject pylst = list(pystr, pyone);
   pylst;
@@ -90,7 +90,7 @@ pyobject expressions combined by the arithmetic operations
 operators  @code{.} and @code{::}
 @item
 an list expression with elements made of pyobject expressions
-(see @ref{Type conversion and casting}) 
+(see @ref{Type conversion and casting})
 @item
 an string expression (see @ref{Type conversion and casting})
 @item
@@ -145,7 +145,7 @@ get the  item from the pyobject by index
 call the pyobject with a sequence of python arguments (the latter
 may be empty)
 
-@item pyobject_expression @code{.} ( string_expression | name ), 
+@item pyobject_expression @code{.} ( string_expression | name ),
       pyobject_expression @code{::} ( string_expression | name )
 get attribute (class member) of a python object
 @end table
