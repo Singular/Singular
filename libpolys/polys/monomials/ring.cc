@@ -778,6 +778,9 @@ int rChar(ring r)
   }
 }
 
+typedef char *             char_ptr;
+omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr)); // deallocation?
+
 /*2
  *returns -1 for not compatible, (sum is undefined)
  *         1 for compatible (and sum)
@@ -800,7 +803,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       {
         if (!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
         {
-          tmpR.parameter=(char **)omAllocBin(char *);
+          tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
           tmpR.parameter[0]=omStrDup(r1->parameter[0]);
           tmpR.P=1;
         }
@@ -822,7 +825,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && n_Equal(r1->minpoly,r2->minpoly, r1->cf))
           {
-            tmpR.parameter=(char **)omAllocBin(char *);
+            tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
             tmpR.P=1;
@@ -840,7 +843,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && (rPar(r2)==1))
           {
-            tmpR.parameter=(char **)omAllocBin(char *);
+            tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
             tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
@@ -859,7 +862,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && (rPar(r1)==1))
           {
-            tmpR.parameter=(char **)omAllocBin(char *);
+            tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
             tmpR.parameter[0]=omStrDup(r1->parameter[0]);
             tmpR.P=1;
             tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
@@ -992,7 +995,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         tmpR.ch=r2->ch;
         if (r2->parameter!=NULL)
         {
-          tmpR.parameter=(char **)omAllocBin(char *);
+          tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
           tmpR.P=1;
           tmpR.parameter[0]=omStrDup(r2->parameter[0]);
         }
