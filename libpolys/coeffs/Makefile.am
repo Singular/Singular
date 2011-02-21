@@ -13,8 +13,8 @@ lib_LIBRARIES=libcoeffs.a libcoeffs_g.a
 libcoeffs_a_SOURCES = ${SOURCES}
 libcoeffs_g_a_SOURCES = ${SOURCES}
 
-libcoeffs_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -fdiagnostics-show-option -Wno-long-long
-
+libcoeffs_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+# -fdiagnostics-show-option
 noinst_HEADERS= \
 	gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h \
 	mpr_complex.h mpr_global.h \
@@ -32,5 +32,5 @@ test_g_SOURCES=test.cc
 test_LDADD = libcoeffs.a -lresources -lreporter -lgmp -lomalloc
 test_g_LDADD = libcoeffs_g.a -lresources -lreporter -lgmp -lomalloc_debug
 
-test_g_CXXFLAGS = -g -Wextra -Wall -pedantic -fdiagnostics-show-option -Wno-long-long
-
+test_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+#  -fdiagnostics-show-option
