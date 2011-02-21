@@ -99,29 +99,32 @@ static void rOptimizeLDeg(ring r);
 //  return FALSE;
 //}
 
+/*
+
 /// internally changes the gloabl ring and resets the relevant
 /// global variables:
+/// SHOULD BE DEPRECATED NOW...?
 void rChangeCurrRing(ring r)
 {
  // if ((currRing!=NULL) && (currRing->minpoly!=NULL))
  // {
  //   omCheckAddr(currRing->minpoly);
  // }
-  /*------------ set global ring vars --------------------------------*/
+  //------------ set global ring vars --------------------------------
   //currRing = r;
   //currQuotient=NULL;
   if (r != NULL)
   {
     rTest(r);
-    /*------------ set global ring vars --------------------------------*/
+    //------------ set global ring vars --------------------------------
     //currQuotient=r->qideal;
 
-    /*------------ global variables related to coefficients ------------*/
+    //------------ global variables related to coefficients ------------
     nSetChar(r->cf);
 
-    /*------------ global variables related to polys -------------------*/
+    //------------ global variables related to polys -------------------
     p_SetGlobals(r);
-    /*------------ global variables related to factory -------------------*/
+    //------------ global variables related to factory -----------------
 #ifdef HAVE_FACTORY
     //int c=ABS(nGetChar());
     //if (c==1) c=0;
@@ -129,6 +132,7 @@ void rChangeCurrRing(ring r)
 #endif
   }
 }
+*/
 
 ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
 {
@@ -420,12 +424,13 @@ void rWrite(ring r)
 
       if (Q!=NULL)
       {
-        if (r==currRing)
-        {
-          PrintLn();
-          iiWriteMatrix((matrix)Q,"scaQ",1);
-        }
-        else PrintS(" ...");
+//        if (r==currRing)
+//        {
+//          PrintLn();
+//          iiWriteMatrix((matrix)Q,"scaQ",1);
+//        }
+//        else 
+            PrintS(" ...");
       }
       else
         PrintS(" (NULL)");
@@ -783,6 +788,26 @@ int rChar(ring r)
 typedef char *             char_ptr;
 omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr)); // deallocation?
 
+// creates a commutative nc extension; "converts" comm.ring to a Plural ring
+ring nc_rCreateNCcomm_rCopy(ring r)
+{
+  r = rCopy(r);
+  if (rIsPluralRing(r)) 
+    return r;
+
+  matrix C = mpNew(r->N,r->N); // ring-independent!?!
+  matrix D = mpNew(r->N,r->N);
+
+  for(int i=1; i<r->N; i++)
+    for(int j=i+1; j<=r->N; j++)
+      MATELEM(C,i,j) = p_One( r);
+
+  if (nc_CallPlural(C, D, NULL, NULL, r, false, true, false, r/*??currRing??*/, TRUE)) // TODO: what about quotient ideal?
+    WarnS("Error initializing multiplication!"); // No reaction!???
+
+  return r;
+}
+
 /*2
  *returns -1 for not compatible, (sum is undefined)
  *         1 for compatible (and sum)
@@ -823,7 +848,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         if (r2->minpoly!=NULL)
         {
           // HANNES: TODO: delete nSetChar
-          rChangeCurrRing(r1);
+          
+          // TODO: eliminate rChangeCurrRing
+//	  rChangeCurrRing(r1);
+	   
           if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
               && n_Equal(r1->minpoly,r2->minpoly, r1->cf))
           {
@@ -1325,19 +1353,20 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 //  rDebugPrint(sum);
 //#endif
 
+
+
 #ifdef HAVE_PLURAL
   if(1)
   {
-    ring old_ring = currRing;
+//    ring old_ring = currRing;
 
     BOOLEAN R1_is_nc = rIsPluralRing(r1);
     BOOLEAN R2_is_nc = rIsPluralRing(r2);
 
     if ( (R1_is_nc) || (R2_is_nc))
     {
-      rChangeCurrRing(r1); /* since rCopy works well only in currRing */
-      ring R1 = rCopy(r1);
-      if ( !R1_is_nc ) nc_rCreateNCcomm(R1);
+      ring R1 = nc_rCreateNCcomm_rCopy(r1);
+      assume( rIsPluralRing(R1) );
 
 #if 0
 #ifdef RDEBUG
@@ -1345,10 +1374,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       rDebugPrint(R1);
 #endif
 #endif
-      rChangeCurrRing(r2);
-      ring R2 = rCopy(r2);
-      if ( !R2_is_nc ) nc_rCreateNCcomm(R2);
-
+      ring R2 = nc_rCreateNCcomm_rCopy(r2);
 #if 0
 #ifdef RDEBUG
       rWrite(R2);
@@ -1356,7 +1382,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 #endif
 #endif
 
-      rChangeCurrRing(sum); // ?
+//      rChangeCurrRing(sum); // ?
 
       // Projections from R_i into Sum:
       /* multiplication matrices business: */
@@ -1382,8 +1408,6 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       matrix D1 = R1->GetNC()->D, D2 = R2->GetNC()->D;
 
       // !!!! BUG? C1 and C2 might live in different baserings!!!
-      // it cannot be both the currRing! :)
-      // the currRing is sum!
 
       int l = rVar(R1) + rVar(R2);
 
@@ -1392,7 +1416,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
       for (i = 1; i <= rVar(R1); i++)
         for (j= rVar(R1)+1; j <= l; j++)
-          MATELEM(C,i,j) = p_One( sum); // in 'sum'
+          MATELEM(C,i,j) = p_One(sum); // in 'sum'
 
       idTest((ideal)C);
 
@@ -1403,10 +1427,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         for (j=i+1; j<=rVar(R1); j++)
         {
           assume(MATELEM(C1,i,j) != NULL);
-          MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j), perm1, R1, nMap1, par_perm1, rPar(R1)); // need ADD + CMP ops.
+          MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j), perm1, R1, sum, nMap1, par_perm1, rPar(R1)); // need ADD + CMP ops.
 
           if (MATELEM(D1,i,j) != NULL)
-            MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j),perm1,R1,nMap1,par_perm1,rPar(R1));
+            MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j), perm1, R1, sum, nMap1, par_perm1, rPar(R1));
         }
 
       idTest((ideal)C);
@@ -1454,7 +1478,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       if (par_perm1!=NULL) omFree((ADDRESS)par_perm1);
       if (par_perm2!=NULL) omFree((ADDRESS)par_perm2);
 
-      rChangeCurrRing(old_ring);
+//      rChangeCurrRing(old_ring);
     }
 
   }
@@ -1462,10 +1486,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
   ideal Q=NULL;
   ideal Q1=NULL, Q2=NULL;
-  ring old_ring2 = currRing;
+//  ring old_ring2 = currRing;
   if (r1->qideal!=NULL)
   {
-    rChangeCurrRing(sum);
+//    rChangeCurrRing(sum);
 //     if (r2->qideal!=NULL)
 //     {
 //       WerrorS("todo: qring+qring");
@@ -1482,8 +1506,14 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
                perm1, par_perm1, sum->ch);
     nMapFunc nMap1 = n_SetMap(r1->cf,sum->cf);
     Q1 = idInit(IDELEMS(r1->qideal),1);
+
     for (int for_i=0;for_i<IDELEMS(r1->qideal);for_i++)
-      Q1->m[for_i] = p_PermPoly(r1->qideal->m[for_i],perm1,r1,nMap1,par_perm1,rPar(r1),sum);
+      Q1->m[for_i] = p_PermPoly(
+				r1->qideal->m[for_i], perm1,
+				r1, sum,
+				nMap1, 
+				par_perm1, rPar(r1));
+    
     omFree((ADDRESS)perm1);
   }
 
@@ -1499,8 +1529,14 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
                perm2, par_perm2, sum->ch);
     nMapFunc nMap2 = n_SetMap(r2->cf,sum->cf);
     Q2 = idInit(IDELEMS(r2->qideal),1);
+     
     for (int for_i=0;for_i<IDELEMS(r2->qideal);for_i++)
-      Q2->m[for_i] = p_PermPoly(r2->qideal->m[for_i],perm2,r2,nMap2,par_perm2,rPar(r2),sum);
+      Q2->m[for_i] = p_PermPoly( 
+		  r2->qideal->m[for_i], perm2, 
+		  r2, sum, 
+		  nMap2, 
+		  par_perm2, rPar(r2));
+    
     omFree((ADDRESS)perm2);
   }
   if ( (Q1!=NULL) || ( Q2!=NULL))
@@ -4511,7 +4547,8 @@ ring rAssure_TDeg(ring r, int start_var, int end_var, int &pos)
 #ifdef HAVE_PLURAL
      if (rIsPluralRing(res))
      {
-       nc_SetupQuotient(res, currRing);
+//       nc_SetupQuotient(res, currRing);
+       nc_SetupQuotient(res, r); // ?
      }
      assume((res->qideal==NULL) == (r->qideal==NULL));
 #endif
@@ -4658,7 +4695,7 @@ ring rAssure_SyzComp_CompLastBlock(const ring r)
     }
     assume(rIsPluralRing(new_r) == rIsPluralRing(old_r));
 #endif
-    rChangeCurrRing(new_r);
+///?    rChangeCurrRing(new_r);
     if (old_r->qideal != NULL)
     {
       new_r->qideal = idrCopyR(old_r->qideal, old_r, new_r);
@@ -4732,7 +4769,7 @@ static ring rAssure_Global(rRingOrder_t b1, rRingOrder_t b2, const ring r)
     }
   }
 #endif
-  rChangeCurrRing(res);
+//  rChangeCurrRing(res);
   return res;
 }
 
@@ -5420,7 +5457,7 @@ ring rOpposite(ring src)
   // now, we initialize a non-comm structure on r
   if (rIsPluralRing(src))
   {
-    assume( currRing == r);
+//    assume( currRing == r);
 
     int *perm       = (int *)omAlloc0((rVar(r)+1)*sizeof(int));
     int *par_perm   = NULL;
@@ -5473,7 +5510,7 @@ ring rOpposite(ring src)
     id_Delete(&(r->qideal), r);
 
 #ifdef HAVE_PLURAL
-    r->qideal = idOppose(src, src->qideal); // into the currRing: r
+    r->qideal = idOppose(src, src->qideal, r); // into the currRing: r
 #else
     r->qideal = id_Copy(src->qideal, r); // ?
 #endif
@@ -5534,10 +5571,10 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 
   assume(src->N == N);
 
-  ring save = currRing;
+//  ring save = currRing;
 
-  if (dest != save)
-    rChangeCurrRing(dest);
+//  if (dest != save)
+//    rChangeCurrRing(dest);
 
   const ring srcBase = src;
 
@@ -5574,8 +5611,8 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
     mpDelete(&C, dest);
     mpDelete(&D, dest);
 
-    if (currRing != save)
-       rChangeCurrRing(save);
+//    if (currRing != save)
+//       rChangeCurrRing(save);
 
     return TRUE;
   }
@@ -5583,8 +5620,8 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 //  mpDelete(&C, dest); // used by nc_CallPlural!
 //  mpDelete(&D, dest);
 
-  if (dest != save)
-    rChangeCurrRing(save);
+//  if (dest != save)
+//    rChangeCurrRing(save);
 
   assume(rIsPluralRing(dest));
   return FALSE;
