@@ -16,4 +16,5 @@ libmisc_a_include_HEADERS = auxiliary.h mylimits.h options.h intvec.h
 
 libmisc_g_a_SOURCES = $(SOURCES)
 
-libmisc_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -fdiagnostics-show-option -Wno-long-long
+libmisc_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+# -fdiagnostics-show-option 

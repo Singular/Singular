@@ -16,4 +16,5 @@ libresources_a_include_HEADERS = feFopen.h feResource.h
 
 libresources_g_a_SOURCES = $(SOURCES)
 
-libresources_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -fdiagnostics-show-option -Wno-long-long
+libresources_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+# -fdiagnostics-show-option

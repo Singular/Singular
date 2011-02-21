@@ -16,4 +16,5 @@ libreporter_a_include_HEADERS = reporter.h
 
 libreporter_g_a_SOURCES = $(SOURCES)
 
-libreporter_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -fdiagnostics-show-option -Wno-long-long
+libreporter_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+# -fdiagnostics-show-option 

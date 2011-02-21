@@ -45,4 +45,5 @@ templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
 templates/p_Procs.inc: templates/p_Procs_Generate
 	${builddir}/templates/p_Procs_Generate > ${builddir}/templates/p_Procs.inc
 
-libpolys_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -fdiagnostics-show-option -Wno-long-long
+libpolys_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
+#  -fdiagnostics-show-option
