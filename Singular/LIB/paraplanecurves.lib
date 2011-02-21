@@ -890,7 +890,7 @@ t = timer - t;
   setring Roriginal;
   ideal AI = imap(Rdummy,AI);
 //"#### AI:"; AI;
-  return(AI); 
+  return(AI);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

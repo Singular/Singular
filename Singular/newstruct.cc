@@ -21,7 +21,9 @@ struct  newstruct_member_s
 struct newstruct_desc_s
 {
   newstruct_member member;
+  newstruct_desc   parent;
   int            size; // number of mebers +1
+  int            id;   // the type id assigned to this bb
 };
 
 
@@ -43,11 +45,18 @@ char * newstruct_String(blackbox *b, void *d)
       || ((l->m[a->pos-1].data==(void *)currRing)
          && (currRing!=NULL)))
       {
-        StringSetS("");
-        char *tmp2=omStrDup(l->m[a->pos].String());
-        StringSetS(tmp);
-        StringAppendS(tmp2);
-        omFree(tmp2);
+        if (l->m[a->pos].rtyp==LIST_CMD)
+        {
+          StringAppendS("<list>");
+        }
+        else
+        {
+          StringSetS("");
+          char *tmp2=omStrDup(l->m[a->pos].String());
+          StringSetS(tmp);
+          StringAppendS(tmp2);
+          omFree(tmp2);
+        }
       }
       else StringAppendS("??");
       omFree(tmp);
@@ -105,6 +114,23 @@ BOOLEAN newstruct_Assign(leftv l, leftv r)
   if (r->Typ()>MAX_TOK)
   {
     blackbox *rr=getBlackboxStuff(r->Typ());
+    if (l->Typ()!=r->Typ())
+    {
+      newstruct_desc rrn=(newstruct_desc)rr->data;
+      newstruct_desc rrp=rrn->parent;
+      while ((rrp!=NULL)&&(rrp->id!=l->Typ())) rrp=rrp->parent;
+      if (rrp!=NULL)
+      {
+        if (l->rtyp==IDHDL)
+        {
+          IDTYP((idhdl)l->data)=r->Typ();
+        }
+        else
+        {
+          l->rtyp=r->Typ();
+        }
+      }
+    }
     if (l->Typ()==r->Typ())
     {
       if (l->Data()!=NULL)
@@ -287,22 +313,21 @@ void newstruct_setup(const char *n, newstruct_desc d )
   b->data=d;
   b->properties=1; // list_like
   int rt=setBlackboxStuff(b,n);
+  d->id=rt;
   //Print("create type %d (%s)\n",rt,n);
 }
 
-newstruct_desc newstructFromString(const char *s)
+static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
 {
   char *ss=omStrDup(s);
   char *p=ss;
   char *start;
-  newstruct_desc res=(newstruct_desc)omAlloc0(sizeof(*res));
-  res->size=0;
   int t;
   char c;
   newstruct_member elem;
+
   idhdl save_ring=currRingHdl;
   currRingHdl=(idhdl)1; // fake ring detection
-
   loop
   {
     // read type:
@@ -353,13 +378,41 @@ newstruct_desc newstructFromString(const char *s)
     if (*p!=',') break;
     p++;
   }
-  //Print("new type with %d elements\n",res->size);
   omFree(ss);
   currRingHdl=save_ring;
+  //Print("new type with %d elements\n",res->size);
   return res;
 }
-newstruct_desc newstructChildFromString(const char *p, const char *s)
+newstruct_desc newstructFromString(const char *s)
 {
-  // not yet
-  return NULL;
+  newstruct_desc res=(newstruct_desc)omAlloc0(sizeof(*res));
+  res->size=0;
+
+  return scanNewstructFromString(s,res);
+}
+newstruct_desc newstructChildFromString(const char *parent, const char *s)
+{
+  // find parent:
+  int parent_id=0;
+  blackboxIsCmd(parent,parent_id);
+  if (parent_id<MAX_TOK)
+  {
+    Werror(">>%s< not found",parent);
+    return NULL;
+  }
+  blackbox *parent_bb=getBlackboxStuff(parent_id);
+  // check for the correct type:
+  if (parent_bb->blackbox_destroy!=newstruct_destroy)
+  {
+    Werror(">>%s< is not a user defined type",parent);
+    return NULL;
+  }
+  // setup for scanNewstructFromString:
+  newstruct_desc res=(newstruct_desc)omAlloc0(sizeof(*res));
+  newstruct_desc parent_desc=(newstruct_desc)parent_bb->data;
+  res->size=parent_desc->size;
+  res->member=parent_desc->member;
+  res->parent=parent_desc;
+
+  return scanNewstructFromString(s,res);
 }
