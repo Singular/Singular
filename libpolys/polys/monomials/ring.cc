@@ -72,6 +72,8 @@ static const char * const ringorder_name[] =
   " _" ///< ringorder_unspec
 };
 
+#define  rInternalChar(r) ((r)->ch)
+
 const char * rSimpleOrdStr(int ord)
 {
   return ringorder_name[ord];
