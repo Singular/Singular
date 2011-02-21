@@ -4392,11 +4392,11 @@ substitute a ring variable (see @ref{subst})
 
 User defined types are (non-empty) lists with a fixed size
 whose element can be accessed by names (and not indices).
-Thse elements have a predefined type (which can also be a user defined type).
+These elements have a predefined type (which can also be a user defined type).
 If these elemnts depend on a ring they can only be accessed if
 their base ring ist the current base ring.
 In contrast to usual lists the elements of a user defined type may
-belong to diffrent rings.
+belong to different rings.
 
 @menu
 * Definition of a user defined type::
@@ -4411,20 +4411,25 @@ belong to diffrent rings.
 
 @table @strong
 @item Syntax:
-@code{newstruct("} name @code{",} string_expression @code{);}
+@code{newstruct(} name @code{,} string_expression @code{);}
+@*@code{newstruct(} name @code{,} name @code{,} string_expression @code{);}
+
 
 @item Purpose:
-defines a new type with elemnts given by the string_expression.
+defines a new type with elemnts given by the last argmuent (string_expression).
 The name of the new type is the first argument (of type string) and must
 be longer than one character.
-@*The string expression must be an comma separated list of
+@*The second name (of type string) is an already defined type
+which should be extended by the new type.
+@*The last argument (of type string) must be an comma separated list of
 a type followed by a name.
+If there are duplicate member names, the last one wins.
 
 @item Operations:
 the only operations of user defined types are:
 @table @asis
 @item
-assignment
+assignment (between objects of the same or extended type)
 @item
 @code{typeof}
 @item
@@ -4442,6 +4447,11 @@ operator @code{.} to access the elements
   A.a=3;
   A.c=string(A.a);
   B=A;
+  newstruct("t2","nt","string c");
+  t2 C; C.c="t2-c";
+  A=C;
+  typeof(A);
+  A;
 @c example
 @end smallexample
 @end table
