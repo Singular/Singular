@@ -179,6 +179,12 @@ struct sro_ord
      sro_ISTemp isTemp;
   } data;
 };
+
+#ifdef HAVE_PLURAL
+struct nc_struct;
+typedef struct nc_struct   nc_struct;
+#endif
+
 struct ip_sring
 {
 // each entry must have a description and a procedure defining it,
