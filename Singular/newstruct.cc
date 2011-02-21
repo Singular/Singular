@@ -41,7 +41,6 @@ char * newstruct_String(blackbox *b, void *d)
       StringAppendS(a->name);
       char *tmp=omStrDup(StringAppendS("="));
       if ((!RingDependend(a->typ))
-      || (l->m[a->pos].data==NULL)
       || ((l->m[a->pos-1].data==(void *)currRing)
          && (currRing!=NULL)))
       {
