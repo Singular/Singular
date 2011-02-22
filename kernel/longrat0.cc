@@ -18,7 +18,7 @@
 
 #define SR_HDL(A) ((long)(A))
 //#define SR_INT    1 // already in longrat.h
-#define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))
+//#define INT_TO_SR(INT)  ((number) (((long)INT << 2) + SR_INT))
 #define SR_TO_INT(SR)   (((long)SR) >> 2)
 
 
@@ -84,19 +84,15 @@ const char * nlRead (const char *s, number *a)
     }
     if (mpz_cmp_si(z,(long)0)==0)
     {
+      mpz_clear(z);
+      omFreeBin(*a,rnumber_bin);
       *a=INT_TO_SR(0);
     }
     else
     if ((*a)->s==3)
     {
-      int ui=(int)mpz_get_si((*a)->z);
-      if ((((ui<<3)>>3)==ui)
-      && (mpz_cmp_si((*a)->z,(long)ui)==0))
-      {
-        mpz_clear((*a)->z);
-        omFreeBin((ADDRESS)(*a), rnumber_bin);
-        (*a)=INT_TO_SR(ui);
-      }
+      number nlShort3_noinline(number x);
+      *a=nlShort3_noinline(*a);
     }
     else
       nlNormalize(*a);
@@ -112,7 +108,7 @@ void nlWrite (number &a, const ring r)
   char *s,*z;
   if (SR_HDL(a) & SR_INT)
   {
-    StringAppend("%d",SR_TO_INT(a));
+    StringAppend("%ld",SR_TO_INT(a));
   }
   else if (a==NULL)
   {

@@ -1519,6 +1519,13 @@ ideal idSyzygies (ideal  h1, tHomog h,intvec **w, BOOLEAN setSyzComp,
     rChangeCurrRing(orig_ring);
     s_h3 = idrMoveR_NoSort(s_h3, syz_ring);
     rKill(syz_ring);
+    #ifdef HAVE_PLURAL
+    if (rIsPluralRing(currRing))
+    {
+      idDelMultiples(s_h3);
+      idSkipZeroes(s_h3);
+    }
+    #endif
     idTest(s_h3);
     return s_h3;
   }
