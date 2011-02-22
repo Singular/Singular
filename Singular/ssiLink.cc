@@ -697,7 +697,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       omFree(d);
       return TRUE;
     }
-  } 
+  }
   // =========================================================================
   else /*l->name=NULL*/
   {
@@ -994,9 +994,13 @@ LINKAGE leftv ssiRead1(si_link l)
                   Print("incompatible versions of ssi: %d/%d vs %d/%d",
                                   SSI_VERSION,MAX_TOK,n98_v,n98_m);
                 }
+                #ifndef NDEBUG
+                if (TEST_OPT_DEBUG)
+                  Print("// opening ssi-%d, MAX_TOK=%d\n",n98_v,n98_m);
+                #endif
                 test=n98_o1;
                 verbose=n98_o2;
-                break;
+                return ssiRead1(l);
              }
     case 99: ssiClose(l); exit(0);
     case 0: if (feof(d->f_read))
