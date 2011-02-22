@@ -193,7 +193,8 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
             if ((al->m[nm->pos-1].data!=(void *)currRing)
             &&(al->m[nm->pos-1].data!=(void*)0L))
             {
-              Werror("different ring %lx(data) - %lx(basering)", al->m[nm->pos-1].data,currRing);
+              Werror("different ring %lx(data) - %lx(basering)",
+                (long unsigned)(al->m[nm->pos-1].data),(long unsigned)currRing);
               return TRUE;
             }
           }

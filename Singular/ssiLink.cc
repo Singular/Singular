@@ -39,6 +39,9 @@
 #include <Singular/lists.h>
 #include <Singular/ssiLink.h>
 
+
+#define SSI_VERSION 1
+
 typedef struct
 {
   FILE *f_read;
@@ -637,6 +640,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         return TRUE;
       }
     }
+    // ---------------------------------------------------------------------
     else if (strcmp(mode,"tcp")==0)
     {
       int sockfd, newsockfd, portno, clilen;
@@ -685,18 +689,16 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       SI_LINK_SET_RW_OPEN_P(l);
       close(sockfd);
     }
-    // stdin or stdout
-    else if (flag == SI_LINK_READ)
-    {
-      d->f_read = stdin;
-      mode = "r";
-    }
+    // no ssi-Link on stdin or stdout
     else
     {
-      d->f_write = stdout;
-      mode = "a";
+      Werror("invalid mode >>%s<< for ssi",mode);
+      l->data=NULL;
+      omFree(d);
+      return TRUE;
     }
-  }
+  } 
+  // =========================================================================
   else /*l->name=NULL*/
   {
     // tcp mode
@@ -775,7 +777,9 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       d->f_write = fdopen(newsockfd, "w");
       SI_LINK_SET_RW_OPEN_P(l);
       close(sockfd);
+      fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,test,verbose);
     }
+    // ----------------------------------------------------------------------
     else if(strcmp(mode,"connect")==0)
     {
       char* host = (char*)omAlloc(256);
@@ -814,9 +818,10 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         return TRUE;
       }
     }
+    // ======================================================================
     else
     {
-      // normal ascii link to a file
+      // normal link to a file
       FILE *outfile;
       char *filename=l->name;
 
@@ -837,7 +842,11 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       if (outfile!=NULL)
       {
         if (strcmp(l->mode,"r")==0) d->f_read = outfile;
-        else d->f_write = outfile;
+        else
+        {
+          d->f_write = outfile;
+          fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,test,verbose);
+        }
       }
       else
       {
@@ -974,6 +983,21 @@ LINKAGE leftv ssiRead1(si_link l)
     case 17: res->rtyp=INTVEC_CMD;
              res->data=ssiReadIntvec(d);
              break;
+    // ------------
+    case 98: // version
+             {
+                int n98_v,n98_m;
+                BITSET n98_o1,n98_o2;
+                fscanf(d->f_read,"%d %d %u %u\n",&n98_v,&n98_m,&n98_o1,&n98_o2);
+                if ((n98_v!=SSI_VERSION) ||(n98_m!=MAX_TOK))
+                {
+                  Print("incompatible versions of ssi: %d/%d vs %d/%d",
+                                  SSI_VERSION,MAX_TOK,n98_v,n98_m);
+                }
+                test=n98_o1;
+                verbose=n98_o2;
+                break;
+             }
     case 99: ssiClose(l); exit(0);
     case 0: if (feof(d->f_read))
             {
@@ -1274,4 +1298,5 @@ int ssiBatch(const char *host, const char * port)
 // 16 nothing
 // 17 intvec <len> ...
 //
+// 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular
