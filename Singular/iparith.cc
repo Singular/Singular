@@ -3188,7 +3188,7 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   return FALSE;
 }
 #ifdef HAVE_FANS
-int integerToInt(gfan::Integer const &V, bool &ok)
+int _integerToInt(gfan::Integer const &V, bool &ok)
 {
   mpz_t v;
   mpz_init(v);
@@ -3201,17 +3201,17 @@ int integerToInt(gfan::Integer const &V, bool &ok)
   mpz_clear(v);
   return ret;
 }
-intvec* zVector2Intvec(const gfan::ZVector zv)
+intvec* _zVector2Intvec(const gfan::ZVector zv)
 {
   int d=zv.size();
   intvec* iv = new intvec(1, d, 0);
   bool ok = true;
   for(int i=1;i<=d;i++)
-    IMATELEM(*iv, 1, i) = integerToInt(zv[i-1], ok);
+    IMATELEM(*iv, 1, i) = _integerToInt(zv[i-1], ok);
   if (!ok) WerrorS("overflow while converting a gfan::ZVector to an intvec");
   return iv;
 }
-intvec* zMatrix2Intvec(const gfan::ZMatrix zm)
+intvec* _zMatrix2Intvec(const gfan::ZMatrix zm)
 {
   int d=zm.getHeight();
   int n=zm.getWidth();
@@ -3219,11 +3219,11 @@ intvec* zMatrix2Intvec(const gfan::ZMatrix zm)
   bool ok = true;
   for(int i=1;i<=d;i++)
     for(int j=1;j<=n;j++)
-      IMATELEM(*iv, i, j) = integerToInt(zm[i-1][j-1], ok);
+      IMATELEM(*iv, i, j) = _integerToInt(zm[i-1][j-1], ok);
   if (!ok) WerrorS("overflow while converting a gfan::ZMatrix to an intmat");
   return iv;
 }
-gfan::ZMatrix intmat2ZMatrix(const intvec* iMat)
+gfan::ZMatrix _intmat2ZMatrix(const intvec* iMat)
 {
   int d=iMat->rows();
   int n=iMat->cols();
@@ -3234,7 +3234,7 @@ gfan::ZMatrix intmat2ZMatrix(const intvec* iMat)
   return ret;
 }
 /* expects iMat to have just one row */
-gfan::ZVector intvec2ZVector(const intvec* iVec)
+gfan::ZVector _intvec2ZVector(const intvec* iVec)
 {
   int n =iVec->rows();
   gfan::ZVector ret(n);
@@ -3260,8 +3260,8 @@ static BOOLEAN jjCONERAYS2(leftv res, leftv u, leftv v)
            rays->cols(), linSpace->cols());
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZMatrix zm1 = _intmat2ZMatrix(rays);
+  gfan::ZMatrix zm2 = _intmat2ZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(zm1, zm2);
   res->data = (char *)zc;
@@ -3271,7 +3271,7 @@ static BOOLEAN jjFACECONT(leftv res, leftv u, leftv v)
 {
   gfan::ZCone* zc = (gfan::ZCone*)u->Data();
   intvec* iv = (intvec*)v->Data();
-  gfan::ZVector zv = intvec2ZVector(iv);
+  gfan::ZVector zv = _intvec2ZVector(iv);
   int d1 = zc->ambientDimension();
   int d2 = zv.size();
   if (d1 != d2)
@@ -3301,7 +3301,7 @@ static BOOLEAN jjCONELINK(leftv res, leftv u, leftv v)
 {
   gfan::ZCone* zc = (gfan::ZCone*)u->Data();
   intvec* iv = (intvec*)v->Data();
-  gfan::ZVector zv= intvec2ZVector(iv);
+  gfan::ZVector zv= _intvec2ZVector(iv);
   int d1 = zc->ambientDimension();
   int d2 = zv.size();
   if (d1 != d2)
@@ -3341,8 +3341,8 @@ static BOOLEAN jjCONENORMALS2(leftv res, leftv u, leftv v)
            inequs->cols(), equs->cols());
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
+  gfan::ZMatrix zm1 = _intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm2 = _intmat2ZMatrix(equs);
   gfan::ZCone* zc = new gfan::ZCone(zm1, zm2);
   res->data = (char *)zc;
   return FALSE;
@@ -3575,7 +3575,7 @@ static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
   else if (strcmp(prop, "MULTIPLICITY") == 0)
   {
     bool ok = true;
-    retInt = integerToInt(zc->getMultiplicity(), ok);
+    retInt = _integerToInt(zc->getMultiplicity(), ok);
     if (!ok)
       WerrorS("overflow while converting a gfan::Integer to an int");
     typeInfo = INT_CMD;
@@ -3651,7 +3651,7 @@ static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
   switch(typeInfo)
   {
     case INTMAT_CMD:
-      res->data = (void*)zMatrix2Intvec(retMat);
+      res->data = (void*)_zMatrix2Intvec(retMat);
       break;
     case INT_CMD:
       res->data = (void*)retInt;
@@ -3660,7 +3660,7 @@ static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
       res->data = (void*)new gfan::ZCone(retCone);
       break;
     case INTVEC_CMD:
-      res->data = (void*)zVector2Intvec(retVec);
+      res->data = (void*)_zVector2Intvec(retVec);
       break;
     default: ; /* should never be reached */
   }
@@ -5144,7 +5144,7 @@ static gfan::IntMatrix permutationIntMatrix(const intvec* iv)
         for (int r = 1; r <= rr; r++)
           for (int c = 1; c <= cc; c++)
             IMATELEM(*ivCopy, r, c) = IMATELEM(*iv, r, c) - 1;
-        gfan::ZMatrix zm = intmat2ZMatrix(ivCopy);
+        gfan::ZMatrix zm = _intmat2ZMatrix(ivCopy);
         gfan::IntMatrix* im = new gfan::IntMatrix(gfan::ZToIntMatrix(zm));
         return *im;
 }
@@ -5209,7 +5209,7 @@ static BOOLEAN jjCONERAYS1(leftv res, leftv v)
      entire lines in the cone);
      valid parametrizations: (intmat) */
   intvec* rays = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(rays);
+  gfan::ZMatrix zm = _intmat2ZMatrix(rays);
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
   res->data = (char *)zc;
@@ -5220,7 +5220,7 @@ static BOOLEAN jjCONENORMALS1(leftv res, leftv v)
   /* method for generating a cone object from inequalities;
      valid parametrizations: (intmat) */
   intvec* inequs = (intvec *)v->CopyD(INTVEC_CMD);
-  gfan::ZMatrix zm = intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm = _intmat2ZMatrix(inequs);
   gfan::ZCone* zc = new gfan::ZCone(zm, gfan::ZMatrix(0, zm.getWidth()));
   res->data = (char *)zc;
   return FALSE;
@@ -6678,7 +6678,7 @@ static BOOLEAN jjSETPROPC2(leftv res, leftv u, leftv v, leftv w)
   gfan::ZCone* zc = (gfan::ZCone*)u->Data();
   char* prop = (char*)v->Data();
   intvec* mat = (intvec*)w->Data();
-  gfan::ZMatrix zm = intmat2ZMatrix(mat);
+  gfan::ZMatrix zm = _intmat2ZMatrix(mat);
   int val = (int)(long)w->Data();
 
   if (strcmp(prop, "LINEAR_FORMS") == 0)
@@ -6697,7 +6697,7 @@ static BOOLEAN jjCONTAINS3(leftv res, leftv u, leftv v, leftv w)
   gfan::ZCone* zc = (gfan::ZCone*)u->Data();
   intvec* vec = (intvec*)v->Data();
   int flag = (int)(long)w->Data();
-  gfan::ZVector zv = intvec2ZVector(vec);
+  gfan::ZVector zv = _intvec2ZVector(vec);
   int d1 = zc->ambientDimension();
   int d2 = zv.size();
   if (d1 != d2)
@@ -6737,8 +6737,8 @@ static BOOLEAN jjCONERAYS3(leftv res, leftv u, leftv v, leftv w)
     WerrorS("expected int argument in [0..3]");
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(rays);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(linSpace);
+  gfan::ZMatrix zm1 = _intmat2ZMatrix(rays);
+  gfan::ZMatrix zm2 = _intmat2ZMatrix(linSpace);
   gfan::ZCone* zc = new gfan::ZCone();
   *zc = gfan::ZCone::givenByRays(zm1, zm2);
   //k should be passed on to zc; not available yet
@@ -6768,8 +6768,8 @@ static BOOLEAN jjCONENORMALS3(leftv res, leftv u, leftv v, leftv w)
     WerrorS("expected int argument in [0..3]");
     return TRUE;
   }
-  gfan::ZMatrix zm1 = intmat2ZMatrix(inequs);
-  gfan::ZMatrix zm2 = intmat2ZMatrix(equs);
+  gfan::ZMatrix zm1 = _intmat2ZMatrix(inequs);
+  gfan::ZMatrix zm2 = _intmat2ZMatrix(equs);
   gfan::ZCone* zc = new gfan::ZCone(zm1, zm2, k);
   res->data = (char *)zc;
   return FALSE;

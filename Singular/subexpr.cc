@@ -69,7 +69,7 @@ int sleftv::listLength()
 
 #ifdef HAVE_FANS
 #include <sstream>
-std::string toString(gfan::ZMatrix const &m, char *tab=0)
+std::string _toString(gfan::ZMatrix const &m, char *tab=0)
 {
   std::stringstream s;
 
@@ -113,7 +113,7 @@ std::string toPrintString(gfan::ZMatrix const &m, int fieldWidth, char *tab=0)
   return s.str();
 }
 
-std::string toString(gfan::ZCone const &c)
+std::string _toString(gfan::ZCone const &c)
 {
   std::stringstream s;
   gfan::ZMatrix i=c.getInequalities();
@@ -121,9 +121,9 @@ std::string toString(gfan::ZCone const &c)
   s<<"AMBIENT_DIM"<<std::endl;
   s<<c.ambientDimension()<<std::endl;
   s<<"INEQUALITIES"<<std::endl;
-  s<<toString(i);
+  s<<_toString(i);
   s<<"EQUATIONS"<<std::endl;
-  s<<toString(e);
+  s<<_toString(e);
   return s.str();
 }
 
@@ -915,7 +915,7 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
         case CONE_CMD:
         {
           gfan::ZCone* zc = (gfan::ZCone*)d;
-          std::string s = toString(*zc);
+          std::string s = _toString(*zc);
           char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
           sprintf(ns, "%s", s.c_str());
           omCheckAddr(ns);
