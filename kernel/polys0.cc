@@ -34,7 +34,9 @@ static void writemon(poly p, int ko, ring r)
   )
   {
     n_Write(p->coef,r);
-    wroteCoef=(rShortOut(r) == FALSE ||(r->parameter!=NULL));
+    wroteCoef=(rShortOut(r) == FALSE) 
+    || (r->parameter!=NULL)
+    || rField_is_R(r) || (rField_is_long_R(r)) || (rField_is_long_C(r));
     writeGen=TRUE;
   }
   else if (n_IsMOne(pGetCoeff(p),r))
@@ -42,7 +44,9 @@ static void writemon(poly p, int ko, ring r)
     if (n_GreaterZero(pGetCoeff(p),r))
     {
       n_Write(p->coef,r);
-      wroteCoef=(rShortOut(r) == FALSE ||(r->parameter!=NULL));
+      wroteCoef=(rShortOut(r) == FALSE)
+      || (r->parameter!=NULL)
+      || rField_is_R(r) || (rField_is_long_R(r)) || (rField_is_long_C(r));
       writeGen=TRUE;
     }
     else
