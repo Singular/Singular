@@ -30,10 +30,6 @@
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 
-#ifdef HAVE_FANS
-#include <gfanlib/gfanlib.h>
-#endif
-
 #ifdef HAVE_DYNAMIC_LOADING
 #include <kernel/mod_raw.h>
 #endif /* HAVE_DYNAMIC_LOADING */
@@ -150,12 +146,6 @@ void *idrecDataInit(int t)
       l->Init();
       return (void*)l;
     }
-#ifdef HAVE_FANS
-    case FAN_CMD:
-      return (void*)(new gfan::ZFan(0));
-    case CONE_CMD:
-      return (void*)(new gfan::ZCone());
-#endif
     //the types with the standard init: set the struct to zero
     case LINK_CMD:
       return (void*) omAlloc0Bin(sip_link_bin);
@@ -494,22 +484,6 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     if (bb!=NULL) bb->blackbox_destroy(bb,IDDATA(h));
     IDDATA(h)=NULL;
   }
-#ifdef HAVE_FANS
-  // fan -------------------------------------------------------------
-  else if (IDTYP(h) == FAN_CMD)
-  {
-    gfan::ZFan* zf = (gfan::ZFan*)IDDATA(h);
-    delete zf;
-    IDDATA(h) = NULL;
-  }
-  // cone ------------------------------------------------------------
-  else if (IDTYP(h) == CONE_CMD)
-  {
-    gfan::ZCone* zc = (gfan::ZCone*)IDDATA(h);
-    delete zc;
-    IDDATA(h) = NULL;
-  }
-#endif /* HAVE_FANS */
 #ifdef TEST
   else if ((IDTYP(h)!= INT_CMD)
   &&(IDTYP(h)!=DEF_CMD)

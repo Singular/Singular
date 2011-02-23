@@ -41,10 +41,6 @@
 #include <kernel/sca.h>
 #include <Singular/blackbox.h>
 
-#ifdef HAVE_FANS
-#include <gfanlib/gfanlib.h>
-#endif
-
 /*=================== proc =================*/
 static BOOLEAN jjECHO(leftv res, leftv a)
 {
@@ -323,42 +319,6 @@ static BOOLEAN jiA_LIST(leftv res, leftv a,Subexpr e)
   jiAssignAttr(res,a);
   return FALSE;
 }
-#ifdef HAVE_FANS
-static BOOLEAN jiA_FAN(leftv res, leftv a, Subexpr e)
-{
-  if (e != NULL)
-  {
-    WerrorS("unexpectedly encountered subexpression in jiA_FAN");
-    return TRUE;
-  }
-  if (res->data!=NULL)
-  {
-    gfan::ZFan* zf = (gfan::ZFan*)res->data;
-    res->data = NULL;
-    delete zf;
-  }
-  gfan::ZFan* zf = (gfan::ZFan*)a->CopyD(FAN_CMD);
-  res->data=(void*)zf;
-  return FALSE;
-}
-static BOOLEAN jiA_CONE(leftv res, leftv a, Subexpr e)
-{
-  if (e != NULL)
-  {
-    WerrorS("unexpectedly encountered subexpression in jiA_CONE");
-    return TRUE;
-  }
-  if (res->data!=NULL)
-  {
-    gfan::ZCone* zc = (gfan::ZCone*)res->data;
-    res->data = NULL;
-    delete zc;
-  }
-  gfan::ZCone* zc = (gfan::ZCone*)a->CopyD(CONE_CMD);
-  res->data=(void*)zc;
-  return FALSE;
-}
-#endif /* HAVE_FANS */
 static BOOLEAN jiA_POLY(leftv res, leftv a,Subexpr e)
 {
   poly p=(poly)a->CopyD(POLY_CMD);
@@ -1345,62 +1305,6 @@ static BOOLEAN jiAssign_rec(leftv l, leftv r)
   r1->CleanUp();
   return b;
 }
-#ifdef HAVE_FANS
-BOOLEAN jjAssignFan(leftv l, leftv r)
-{
-  /* method for generating a fan;
-     valid parametrizations: int (ambient dimension),
-     Errors will be invoked in the following cases:
-     - argument < 0
-     The resulting fan has no cones, its lineality space
-     is the entire ambient space. */
-  if (r->Typ() != INT_CMD)
-  {
-    WerrorS("expected an int as argument");
-    return TRUE;
-  }
-  int ambientDim = (int)(long)r->Data();
-  if (ambientDim < 0)
-  {
-    Werror("expected an int >= 0, but got %d", ambientDim);
-    return TRUE;
-  }
-  if (IDDATA((idhdl)l->data) != NULL)
-  {
-    gfan::ZFan* zf = (gfan::ZFan*)IDDATA((idhdl)l->data);
-    delete zf;
-  }
-  gfan::ZFan* zf = new gfan::ZFan(ambientDim);
-  IDDATA((idhdl)l->data) = (char*)zf;
-  return FALSE;
-}
-BOOLEAN jjAssignCone(leftv l, leftv r)
-{
-  /* method for generating a cone;
-     valid parametrizations: int (ambient dimension),
-     Errors will be invoked in the following cases:
-     - argument < 0 */
-  if (r->Typ() != INT_CMD)
-  {
-    WerrorS("expected an int as argument");
-    return TRUE;
-  }
-  int ambientDim = (int)(long)r->Data();
-  if (ambientDim < 0)
-  {
-    Werror("expected an int >= 0, but got %d", ambientDim);
-    return TRUE;
-  }
-  if (IDDATA((idhdl)l->data) != NULL)
-  {
-    gfan::ZCone* zc = (gfan::ZCone*)IDDATA((idhdl)l->data);
-    delete zc;
-  }
-  gfan::ZCone* zc = new gfan::ZCone(ambientDim);
-  IDDATA((idhdl)l->data) = (char*)zc;
-  return FALSE;
-}
-#endif /* HAVE_FANS */
 BOOLEAN iiAssign(leftv l, leftv r)
 {
   if (errorreported) return TRUE;
@@ -1482,12 +1386,6 @@ BOOLEAN iiAssign(leftv l, leftv r)
     rl=r->listLength();
     if (rl==1)
     {               
-#ifdef HAVE_FANS
-      if ((l->Typ() == CONE_CMD) && (r->Typ() == INT_CMD))
-        return jjAssignCone(l, r);
-      if ((l->Typ() == FAN_CMD) && (r->Typ() == INT_CMD))
-        return jjAssignFan(l, r);
-#endif
       /* system variables = ... */
       if(((l->rtyp>=VECHO)&&(l->rtyp<=VPRINTLEVEL))
       ||((l->rtyp>=VALTVARS)&&(l->rtyp<=VMINPOLY)))
@@ -1548,13 +1446,6 @@ BOOLEAN iiAssign(leftv l, leftv r)
         return b;
       }
     }
-#ifdef HAVE_FANS
-/*
-    else if ((lt == FAN_CMD) && (rl == 3))
-    {
-      return jjAssignFan(l, r);
-    }*/
-#endif /* HAVE_FANS */
     if (rt==NONE) rt=r->Typ();
   }
   else if (ll==(rl=r->listLength()))

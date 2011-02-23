@@ -135,7 +135,7 @@ int main(          /* main entry to Singular */
 #ifdef HAVE_FANS
     bbcone_setup();
     bbfan_setup();
-#endif
+#endif /* HAVE_FANS */
     //for official version: not active
     //bigintm_setup();
   }

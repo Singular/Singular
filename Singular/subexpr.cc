@@ -39,10 +39,6 @@
 #include <Singular/subexpr.h>
 #include <Singular/blackbox.h>
 
-#ifdef HAVE_FANS
-#include <gfanlib/gfanlib.h>
-#endif
-
 omBin sSubexpr_bin = omGetSpecBin(sizeof(_ssubexpr));
 omBin sleftv_bin = omGetSpecBin(sizeof(sleftv));
 omBin procinfo_bin = omGetSpecBin(sizeof(procinfo));
@@ -66,82 +62,6 @@ int sleftv::listLength()
   }
   return n;
 }
-
-#ifdef HAVE_FANS
-#include <sstream>
-std::string _toString(gfan::ZMatrix const &m, char *tab=0)
-{
-  std::stringstream s;
-
-  for(int i=0;i<m.getHeight();i++)
-    {
-      if(tab)s<<tab;
-      for(int j=0;j<m.getWidth();j++)
-	{
-	  s<<m[i][j];
-	  if(i+1!=m.getHeight() || j+1!=m.getWidth())
-	    {
-	      s<<",";
-	    }
-	}
-      s<<std::endl;
-    }
-  return s.str();
-}
-
-std::string toPrintString(gfan::ZMatrix const &m, int fieldWidth, char *tab=0)
-{
-  std::stringstream s;
-
-  for(int i=0;i<m.getHeight();i++)
-    {
-      if(tab)s<<tab;
-      for(int j=0;j<m.getWidth();j++)
-	{
-	  std::stringstream temp;
-	  temp<<m[i][j];
-	  std::string temp2=temp.str();
-	  for(int k=temp2.size();k<fieldWidth;k++)s<<" ";
-	  s<<temp2;  
-	  if(i+1!=m.getHeight() || j+1!=m.getWidth())
-	    {
-	      s<<" ";
-	    }
-	}
-      s<<std::endl;
-    }
-  return s.str();
-}
-
-std::string _toString(gfan::ZCone const &c)
-{
-  std::stringstream s;
-  gfan::ZMatrix i=c.getInequalities();
-  gfan::ZMatrix e=c.getEquations();
-  s<<"AMBIENT_DIM"<<std::endl;
-  s<<c.ambientDimension()<<std::endl;
-  s<<"INEQUALITIES"<<std::endl;
-  s<<_toString(i);
-  s<<"EQUATIONS"<<std::endl;
-  s<<_toString(e);
-  return s.str();
-}
-
-/* not used */
-std::string toPrintString(gfan::ZCone const &c, char *nameOfCone)
-{
-  std::stringstream s;
-  gfan::ZMatrix i=c.getInequalities();
-  gfan::ZMatrix e=c.getEquations();
-  s<<nameOfCone<<"[1]:"<<std::endl;
-  s<<c.ambientDimension()<<std::endl;
-  s<<nameOfCone<<"[2]:"<<std::endl;
-  s<<toPrintString(i,6,"   ");
-  s<<nameOfCone<<"[3]:"<<std::endl;
-  s<<toPrintString(e,6,"   ");
-  return s.str();
-}
-#endif
 
 void sleftv::Print(leftv store, int spaces)
 {
@@ -233,17 +153,6 @@ void sleftv::Print(leftv store, int spaces)
           PrintNSpaces(spaces);
           ::Print("%d",(int)(long)d);
           break;
-#ifdef HAVE_FANS
-       case CONE_CMD:
-       case FAN_CMD:
-          PrintNSpaces(spaces);
-          {
-            char *s = String();
-            ::PrintS(s);
-            omFree(s);
-          }
-          break;
-#endif /* HAVE_FANS */
        case PROC_CMD:
          {
            procinfov pi=(procinfov)d;
@@ -465,10 +374,6 @@ void sleftv::CleanUp(ring r)
       case VMINPOLY:
       case 0:
       case INT_CMD:
-#ifdef HAVE_FANS
-      case CONE_CMD:
-      case FAN_CMD:
-#endif
         break;
       default:
       {
@@ -596,20 +501,6 @@ static inline void * s_internalCopy(const int t,  void *d)
         r->ref++;
         return d;
       }
-#ifdef HAVE_FANS
-    case FAN_CMD:
-      {
-        gfan::ZFan* zf = (gfan::ZFan*)d;
-        gfan::ZFan* newZf = new gfan::ZFan(*zf);
-        return newZf;
-      }
-    case CONE_CMD:
-      {
-        gfan::ZCone* zc = (gfan::ZCone*)d;
-        gfan::ZCone* newZc = new gfan::ZCone(*zc);
-        return newZc;
-      }
-#endif /* HAVE_FANS */
     case RESOLUTION_CMD:
       return (void*)syCopy((syStrategy)d);
     case DEF_CMD:
@@ -902,26 +793,6 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
             return ns;
           }
           return s;
-#ifdef HAVE_FANS
-        case FAN_CMD:
-        {
-          gfan::ZFan* zf = (gfan::ZFan*)d;
-          std::string s = zf->toString();
-          char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
-          sprintf(ns, "%s", s.c_str());
-          omCheckAddr(ns);
-          return ns;
-        }
-        case CONE_CMD:
-        {
-          gfan::ZCone* zc = (gfan::ZCone*)d;
-          std::string s = _toString(*zc);
-          char* ns = (char*) omAlloc(strlen(s.c_str()) + 10);
-          sprintf(ns, "%s", s.c_str());
-          omCheckAddr(ns);
-          return ns;
-        }
-#endif /* HAVE_FANS */
         case RESOLUTION_CMD:
         {
           lists l = syConvRes((syStrategy)d);
