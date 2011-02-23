@@ -491,17 +491,17 @@ static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
   else if (strcmp(prop, "LINEALITY_SPACE") == 0)
   {
     retCone = zc->linealitySpace();
-    typeInfo = CONE_CMD;
+    typeInfo = coneID;
   }
   else if (strcmp(prop, "DUAL_CONE") == 0)
   {
     retCone = zc->dualCone();
-    typeInfo = CONE_CMD;
+    typeInfo = coneID;
   }
   else if (strcmp(prop, "NEGATED") == 0)
   {
     retCone = zc->negated();
-    typeInfo = CONE_CMD;
+    typeInfo = coneID;
   }
   /* ################ properties with return type intvec: ################## */
   else if (strcmp(prop, "SEMI_GROUP_GENERATOR") == 0)
@@ -535,21 +535,18 @@ static BOOLEAN jjGETPROPC(leftv res, leftv u, leftv v)
   }
 
   res->rtyp = typeInfo;
-  switch(typeInfo)
+  if (typeInfo == INT_CMD)
+    res->data = (void*)retInt;
+  else if (typeInfo == INTMAT_CMD)
+    res->data = (void*)zMatrix2Intvec(retMat);
+  else if (typeInfo == coneID)
+    res->data = (void*)new gfan::ZCone(retCone);
+  else if (typeInfo == INTVEC_CMD)
+    res->data = (void*)zVector2Intvec(retVec);
+  else
   {
-    case INTMAT_CMD:
-      res->data = (void*)zMatrix2Intvec(retMat);
-      break;
-    case INT_CMD:
-      res->data = (void*)retInt;
-      break;
-    case CONE_CMD:
-      res->data = (void*)new gfan::ZCone(retCone);
-      break;
-    case INTVEC_CMD:
-      res->data = (void*)zVector2Intvec(retVec);
-      break;
-    default: ; /* should never be reached */
+    WerrorS("implementation error in bbcone.cc::jjGETPROPC");
+    return TRUE;
   }
   return FALSE;
 }
