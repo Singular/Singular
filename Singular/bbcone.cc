@@ -11,6 +11,8 @@
 #include <kernel/intvec.h>
 #include <sstream>
 
+#ifdef HAVE_FANS
+
 int coneID;
 
 int integerToInt(gfan::Integer const &V, bool &ok)
@@ -687,8 +689,8 @@ static BOOLEAN jjSETPROPC3A(leftv res, leftv u, leftv v, leftv w)
     Werror("unexpected cone property '%s'", prop);
     return TRUE;
   }
-  res->rtyp = INT_CMD;
-  res->data = (void *) 1;
+  res->rtyp = NONE;
+  res->data = NULL;
   return FALSE;
 }
 static BOOLEAN jjSETPROPC3B(leftv res, leftv u, leftv v, leftv w)
@@ -707,8 +709,8 @@ static BOOLEAN jjSETPROPC3B(leftv res, leftv u, leftv v, leftv w)
     Werror("unexpected cone property '%s'", prop);
     return TRUE;
   }
-  res->rtyp = INT_CMD;
-  res->data = (void *) 1;
+  res->rtyp = NONE;
+  res->data = NULL;
   return FALSE;
 }
 
@@ -752,3 +754,6 @@ void bbcone_setup()
   coneID=setBlackboxStuff(b,"cone");
   Print("created type %d (cone)\n",coneID); 
 }
+
+#endif
+/* HAVE_FANS */

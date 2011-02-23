@@ -33,6 +33,7 @@
 #include <Singular/ssiLink.h>
 #include <Singular/bigintm.h>
 #include <Singular/bbcone.h>
+#include <Singular/bbfan.h>
 #include <Singular/pyobject_setup.h>
 
 
@@ -131,7 +132,10 @@ int main(          /* main entry to Singular */
     IDPACKAGE(h)=basePack;
     currPackHdl=h;
     basePackHdl=h;
-    //bbcone_setup();
+#ifdef HAVE_FANS
+    bbcone_setup();
+    bbfan_setup();
+#endif
     //for official version: not active
     //bigintm_setup();
   }
