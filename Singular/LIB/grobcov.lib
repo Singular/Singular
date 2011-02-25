@@ -690,7 +690,7 @@ static proc idint(ideal I, ideal J)
 //   DGN = the list of prime ideals associated to Na (uses primASSGTZ in "primdec.lib")
 //   none of the polynomials in facvar(Wa) are contained in none of the ideals in DGN
 //   If the given conditions are not compatible, then N=ideal(1) and DGN=list(ideal(1))
-static proc redspec(ideal Ni, ideal Wi)
+proc redspec(ideal Ni, ideal Wi)
 //"USAGE:   redspec(N,W);
 //          N: null conditions ideal
 //          W: set of non-null polynomials (ideal)
