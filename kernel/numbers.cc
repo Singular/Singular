@@ -16,6 +16,7 @@
 #include <kernel/numbers.h>
 #include <kernel/longrat.h>
 #include <kernel/longalg.h>
+#include <kernel/longtrans.h>
 #include <kernel/modulop.h>
 #include <kernel/gnumpfl.h>
 #include <kernel/gnumpc.h>
@@ -138,9 +139,18 @@ void nSetChar(ring r)
   /*--------------------- Q_a/ Zp_a -----------------*/
   else if (rField_is_Extension(r))
   {
-    naSetChar(c,r);
-    if (rField_is_Q_a()) nInit_bigint=naMap00;
-    if (rField_is_Zp_a()) nInit_bigint=naMap0P;
+    if (r->minpoly == NULL)
+    {
+      naSetChar(c,r);
+      if (rField_is_Q_a()) nInit_bigint=naMap00;
+      if (rField_is_Zp_a()) nInit_bigint=naMap0P;
+    }
+    else
+    {
+      ntSetChar(c,r);
+      if (rField_is_Q_a()) nInit_bigint=ntMap00;
+      if (rField_is_Zp_a()) nInit_bigint=ntMap0P;
+    }
   }
 #ifdef HAVE_RINGS
   /*----------------------ring Z / 2^m----------------*/
@@ -311,40 +321,40 @@ void nInitChar(ring r)
   if (rField_is_Extension(r))
   {
     //naInitChar(c,TRUE,r);
-    n->cfDelete = naDelete;
-    n-> nNormalize = naNormalize;
-    n->cfInit      = naInit;
-    n->nPar        = naPar;
-    n->nParDeg     = naParDeg;
-    n->n_Int       = naInt;
-    n->nAdd        = naAdd;
-    n->nSub        = naSub;
-    n->nMult       = naMult;
-    n->nDiv        = naDiv;
-    n->nExactDiv   = naDiv;
-    n->nIntDiv     = naIntDiv;
-    n->nNeg        = naNeg;
-    n->nInvers     = naInvers;
-    n->nCopy       = naCopy;
-    n->cfCopy      = na_Copy;
-    n->nGreater    = naGreater;
-    n->nEqual      = naEqual;
-    n->nIsZero     = naIsZero;
-    n->nIsOne      = naIsOne;
-    n->nIsMOne     = naIsMOne;
-    n->nGreaterZero= naGreaterZero;
-    n->cfWrite     = naWrite;
-    n->nRead       = naRead;
-    n->nPower      = naPower;
-    n->nGcd        = naGcd;
-    n->nLcm        = naLcm;
-    n->cfSetMap    = naSetMap;
-    n->nName       = naName;
-    n->nSize       = naSize;
-    n->cfGetDenom   = naGetDenom;
-    n->cfGetNumerator= naGetNumerator;
+    n->cfDelete       = naDelete;
+    n-> nNormalize    = naNormalize;
+    n->cfInit         = naInit;
+    n->nPar           = naPar;
+    n->nParDeg        = naParDeg;
+    n->n_Int          = naInt;
+    n->nAdd           = naAdd;
+    n->nSub           = naSub;
+    n->nMult          = naMult;
+    n->nDiv           = naDiv;
+    n->nExactDiv      = naDiv;
+    n->nIntDiv        = naIntDiv;
+    n->nNeg           = naNeg;
+    n->nInvers        = naInvers;
+    n->nCopy          = naCopy;
+    n->cfCopy         = na_Copy;
+    n->nGreater       = naGreater;
+    n->nEqual         = naEqual;
+    n->nIsZero        = naIsZero;
+    n->nIsOne         = naIsOne;
+    n->nIsMOne        = naIsMOne;
+    n->nGreaterZero   = naGreaterZero;
+    n->cfWrite        = naWrite;
+    n->nRead          = naRead;
+    n->nPower         = naPower;
+    n->nGcd           = naGcd;
+    n->nLcm           = naLcm;
+    n->cfSetMap       = naSetMap;
+    n->nName          = naName;
+    n->nSize          = naSize;
+    n->cfGetDenom     = naGetDenom;
+    n->cfGetNumerator = naGetNumerator;
 #ifdef LDEBUG
-    n->nDBTest     = naDBTest;
+    n->nDBTest        = naDBTest;
 #endif
   }
 #ifdef HAVE_RINGS

@@ -218,9 +218,10 @@ static void napMultN(napoly p, number z)
 }
 
 /*3
-*  division with rest; f = g*q + r, returns r and destroy f
+*  division with remainder: f = g*q + r,
+*  returns r and destroys f
 */
-napoly napRemainder(napoly f, const napoly  g)
+napoly napRemainder(napoly f, const napoly g)
 {
   napoly a, h, qq;
 

@@ -114,7 +114,8 @@ CXXSOURCES=clapconv.cc \
     pDebug.cc pInline2.cc pInline1.cc pInline0.cc \
     pShallowCopyDelete.cc fast_mult.cc digitech.cc \
     tgb.cc tgbgauss.cc ringgb.cc f5data.cc f5lists.cc f5gb.cc \
-    f5c.cc F5cLists.cc ratgring.cc shiftgb.cc gfan.cc linearAlgebra.cc
+    f5c.cc F5cLists.cc ratgring.cc shiftgb.cc gfan.cc \
+    linearAlgebra.cc longtrans.cc
 CXXSOURCES2	= SingularBuilder.cpp
 
 # normal C source files

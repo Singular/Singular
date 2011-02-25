@@ -25,7 +25,7 @@ struct slnumber
 
 extern napoly naMinimalPoly;
 extern ring nacRing;
-
+extern int naNumbOfPar;
 
 void naSetChar(int p, ring r);
 void    naDelete (number *p, const ring r);
@@ -78,9 +78,9 @@ poly naPermNumber(number z, int * par_perm, int P, ring r);
 #define napNew()               (p_Init(currRing->algring))
 #define napAdd(p1,p2)          (p_Add_q(p1,p2,currRing->algring))
 #define napSetm(p)             p_Setm(p,currRing->algring)
-#define nanumber               lnumber
+// #define nanumber               lnumber
 napoly napRemainder(napoly f, const napoly  g);
-number   naGetDenom(number &n, const ring r);
-number   naGetNumerator(number &n, const ring r);
+number naGetDenom(number &n, const ring r);
+number naGetNumerator(number &n, const ring r);
 #endif
 
