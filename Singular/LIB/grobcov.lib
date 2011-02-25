@@ -6197,7 +6197,7 @@ static proc polyinparamsonly(poly f)
 static proc monoms(poly f)
 {
   list L;
-  if (f!=0) { L(size(f)]=list();}
+  if (f!=0) { L[size(f)]=list();}
   poly lm; poly lc; poly lp; poly Q; poly mQ;
   def p=f;
   int i=1;
