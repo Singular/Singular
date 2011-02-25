@@ -856,7 +856,7 @@ installp: Singularp
 	echo $(@:.d=.og) $(@:.d=.op)" " \\ > $@
 	$(CCM) ${CPPFLAGS} ${DEFSG} $< >> $@
 
-depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h claptmpl.dd
+depend:   $(CXXSOURCES:.cc=.dd) $(ESOURCES:.cc=.dd) $(CSOURCES:.c=.d) mod2.h claptmpl.dd pyobject.dd
 	-cat *.dd >depend
 
 ifeq (depend,$(wildcard depend))
