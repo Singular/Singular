@@ -41,7 +41,7 @@ new command: @code{waitfirst} (see @nref{waitfirst})
 new library: cisimplicial.lib (see @nref{cisimplicial_lib}: Is the toric ideal of
 a simplicial toric variety a complete intersection?) - extends and susbtitute cimonom.lib
 @item
-new library: grobcov.lib  extends and susbtitute redcgs.lib
+new library: grobcov.lib (see @nref{grobcov_lib}: Groebner Cover for parametric ideals, extends and susbtitute redcgs.lib
 @end itemize
 
 @heading --------------------------------------------------------------------
@@ -232,7 +232,7 @@ operator @code{new(size_t,const std::nothrow_t&)} now also overloaded
 @item
 surfex: new version 0.90 (see @nref{surfex_lib}).
 @item
-new library: redcgs.lib (see @nref{redcgs_lib}: Reduced Comprehensive Groebner Systems)
+new library: redcgs.lib (see @code{redcgs_lib}: Reduced Comprehensive Groebner Systems)
 @item
 new library: tropical.lib (see @nref{tropical_lib}: Computations in Tropical Geometry)
 @item

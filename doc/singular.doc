@@ -277,10 +277,10 @@ with the @code{--no-stdlib} command line option (see
 * all_lib:: load all other libraries
 * compregb_lib:: comprehensive Groebner base system
 * general_lib:: procedures of general type
+* grobcov_lib:: Groebner Cover for parametric ideals
 * inout_lib:: procedures for manipulating in- and output
 * poly_lib:: procedures for manipulating polynomials and ideals
 * random_lib:: procedures of random/sparse  matrix and polynomial operations
-* redcgs_lib:: procedures for reduced comprehesive Groebner systems
 * ring_lib:: procedures for manipulating rings and maps
 @end menu
 
@@ -305,11 +305,15 @@ LIB "all.lib";
 @subsection compregb_lib
 @c lib compregb.lib
 @c ----------------------------------------------------------
-@node general_lib, inout_lib, compregb_lib, General purpose
+@node general_lib, grobcov_lib, compregb_lib, General purpose
 @subsection general_lib
 @c lib general.lib
 @c ----------------------------------------------------------
-@node inout_lib, poly_lib, general_lib, General purpose
+@node grobcov_lib, inout_lib, general_lib, General purpose
+@subsection grobcov_lib
+@c lib grobcov.lib
+@c ----------------------------------------------------------
+@node inout_lib, poly_lib, grobcov_lib, General purpose
 @subsection inout_lib
 @c lib inout.lib
 @c ----------------------------------------------------------
@@ -317,15 +321,11 @@ LIB "all.lib";
 @subsection poly_lib
 @c lib poly.lib
 @c ----------------------------------------------------------
-@node random_lib, redcgs_lib, poly_lib, General purpose
+@node random_lib, ring_lib, poly_lib, General purpose
 @subsection random_lib
 @c lib random.lib
 @c ----------------------------------------------------------
-@node redcgs_lib, ring_lib, random_lib, General purpose
-@subsection redcgs_lib
-@c lib redcgs.lib
-@c ----------------------------------------------------------
-@node ring_lib, , redcgs_lib, General purpose
+@node ring_lib, , random_lib, General purpose
 @subsection ring_lib
 @c lib ring.lib
 @c ----------------------------------------------------------------------------
