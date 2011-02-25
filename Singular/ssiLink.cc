@@ -39,6 +39,10 @@
 #include <Singular/lists.h>
 #include <Singular/ssiLink.h>
 
+#ifdef HAVE_MPSR
+#include <Singular/mpsr.h>
+#endif
+
 
 #define SSI_VERSION 1
 
@@ -1180,10 +1184,15 @@ const char* slStatusSsi(si_link l, const char* request)
   }
   else return "unknown status request";
 }
+
 int slStatusSsiL(lists L, int timeout)
 {
   si_link l;
   ssiInfo *d;
+  #ifdef HAVE_MPSR
+  MP_Link_pt dd;
+  #endif
+  int d_fd;
   fd_set  mask, fdmask;
   FD_ZERO(&mask);
   int max_fd=0; /* max fd in fd_set */
@@ -1196,12 +1205,26 @@ int slStatusSsiL(lists L, int timeout)
     l=(si_link)L->m[i].Data();
     if(SI_LINK_OPEN_P(l)==0)
     { WerrorS("all links must be open"); return -2;}
-    if ((strcmp(l->m->type,"ssi")!=0)
+    if (((strcmp(l->m->type,"ssi")!=0) && (strcmp(l->m->type,"MPtcp")!=0))
     || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)))
-    { WerrorS("all links must be of type ssi:fork or ssi:tcp"); return -2;}
+    { WerrorS("all links must be of type ssi:fork or ssi:tcp or MPtcp:fork"); return -2;}
+    #ifdef HAVE_MPSR
+    if (strcmp(l->m->type,"ssi")==0)
+    {
+      d=(ssiInfo*)l->data;
+      d_fd=d->fd_read;
+    }
+    else
+    {
+      dd=(MP_Link_pt)l->data;
+      d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
+    }
+    #else
     d=(ssiInfo*)l->data;
-    FD_SET(d->fd_read, &mask);
-    if (d->fd_read> max_fd) max_fd=d->fd_read;
+    d_fd=d->fd_read;
+    #endif
+    FD_SET(d_fd, &mask);
+    if (d_fd > max_fd) max_fd=d_fd;
   }
   max_fd++;
   struct timeval *wt_ptr=&wt;
@@ -1228,9 +1251,27 @@ int slStatusSsiL(lists L, int timeout)
     for(i=L->nr; i>=0; i--)
     {
       l=(si_link)L->m[i].Data();
+      #ifdef HAVE_MPSR
+      if (strcmp(l->m->type,"ssi")!=0)
+      {
+        // for MP links, return here:
+        dd=(MP_Link_pt)l->data;
+        d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
+        if(j==d_fd) return i+1;
+      }
+      else
+      {
+        d=(ssiInfo*)l->data;
+        d_fd=d->fd_read;
+        if(j==d_fd) break;
+      }
+      #else
       d=(ssiInfo*)l->data;
-      if(j==d->fd_read) break;
+      d_fd=d->fd_read;
+      if(j==d_fd) break;
+      #endif
     }
+    // only ssi links:
     if (d->ungetc_buf) return i+1;
     loop
     {
