@@ -12,7 +12,8 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	cisimplicial.lib  classify.lib \
 	compregb.lib  control.lib  crypto.lib  curvepar.lib  decodegb.lib \
 	deform.lib elim.lib  equising.lib  finvar.lib  general.lib gmspoly.lib \
-	gmssing.lib  graphics.lib  groups.lib  grwalk.lib  hnoether.lib \
+	gmssing.lib  graphics.lib  grobcov.lib groups.lib  grwalk.lib \
+	hnoether.lib \
 	homolog.lib  hyperel.lib  inout.lib  intprog.lib  jacobson.lib \
 	kskernel.lib  latex.lib  linalg.lib  lll.lib  makedbm.lib \
 	matrix.lib  modstd.lib  mondromy.lib  monomialideal.lib \
@@ -21,7 +22,7 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	pointid.lib poly.lib \
 	polymake.lib presolve.lib  primdec.lib  primitiv.lib  qhmoduli.lib \
         random.lib \
-	realrad.lib  redcgs.lib  reesclos.lib  resbin.lib \
+	realrad.lib  reesclos.lib  resbin.lib \
 	resgraph.lib  resolve.lib \
 	reszeta.lib  ring.lib  rinvar.lib  rootsmr.lib  rootsur.lib \
 	sagbi.lib  sheafcoh.lib  sing.lib  sing4ti2.lib  signcond.lib \
