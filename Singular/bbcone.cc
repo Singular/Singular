@@ -1,4 +1,7 @@
 #include <Singular/mod2.h>
+
+#ifdef HAVE_FANS
+
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 #include <omalloc/omalloc.h>
@@ -11,7 +14,6 @@
 #include <kernel/intvec.h>
 #include <sstream>
 
-#ifdef HAVE_FANS
 
 int coneID;
 
