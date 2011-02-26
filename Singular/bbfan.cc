@@ -1,18 +1,18 @@
 #include <Singular/mod2.h>
+#ifdef HAVE_FANS
+
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
 #include <omalloc/omalloc.h>
 #include <kernel/febase.h>
 #include <kernel/longrat.h>
 #include <Singular/subexpr.h>
-#include <gfanlib/gfanlib.h>
 #include <Singular/bbfan.h>
 #include <Singular/bbcone.h>
 #include <ipshell.h>
 #include <kernel/intvec.h>
 #include <sstream>
-
-#ifdef HAVE_FANS
+#include <gfanlib/gfanlib.h>
 
 int fanID;
 
