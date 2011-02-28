@@ -10,24 +10,19 @@
 #include <kernel/structs.h>
 #include <kernel/longrat.h>
 #include <kernel/polys-impl.h>
+#include <kernel/longtrans.h>
 
-typedef polyrec *   napoly;
-
-struct slnumber;
-typedef struct slnumber * lnumber;
-
-struct slnumber
+struct snaIdeal
 {
-  napoly z;
-  napoly n;
-  BOOLEAN s;
+  int anz;
+  napoly *liste;
 };
-
+typedef struct snaIdeal * naIdeal;
+extern omBin snaIdeal_bin;
+extern naIdeal naI;
 extern napoly naMinimalPoly;
-extern ring nacRing;
-extern int naNumbOfPar;
 
-void naSetChar(int p, ring r);
+void    naSetChar(int p, ring r);
 void    naDelete (number *p, const ring r);
 number  naInit(int i, const ring r);                /* z := i */
 number  naPar(int i);                               /* z := par(i) */
@@ -63,24 +58,10 @@ number naMap00(number c);
 #ifdef LDEBUG
 BOOLEAN naDBTest(number a, const char *f,const int l);
 #endif
-
+napoly naRemainder(napoly f, const napoly  g);
 void    naSetIdeal(ideal I);
+extern number (*naMap)(number from);
+void naCoefNormalize(number pp);
 
-// external access to the interna
-poly naPermNumber(number z, int * par_perm, int P, ring r);
-#define napAddExp(p,i,e)       (p_AddExp(p,i,e,currRing->algring))
-#define napLength(p)           pLength(p)
-#define napNeg(p)              (p_Neg(p,currRing->algring))
-#define napVariables           naNumbOfPar
-#define napGetCoeff(p)         pGetCoeff(p)
-#define napGetExpFrom(p,i,r)   (p_GetExp(p,i,r->algring))
-#define napSetExp(p,i,e)       (p_SetExp(p,i,e,currRing->algring))
-#define napNew()               (p_Init(currRing->algring))
-#define napAdd(p1,p2)          (p_Add_q(p1,p2,currRing->algring))
-#define napSetm(p)             p_Setm(p,currRing->algring)
-// #define nanumber               lnumber
-napoly napRemainder(napoly f, const napoly  g);
-number naGetDenom(number &n, const ring r);
-number naGetNumerator(number &n, const ring r);
 #endif
 

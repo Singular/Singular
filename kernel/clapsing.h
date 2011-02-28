@@ -16,7 +16,7 @@
 #include <kernel/ideals.h>
 #include <kernel/intvec.h>
 #include <kernel/matpol.h>
-#include <kernel/longalg.h>
+#include <kernel/longtrans.h>
 
 poly singclap_gcd ( poly f, poly g );
 poly singclap_gcd_r ( poly f, poly g, const ring r );

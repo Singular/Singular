@@ -17,7 +17,7 @@
 #include <kernel/numbers.h>
 #include <kernel/febase.h>
 #include <kernel/intvec.h>
-#include <kernel/longalg.h>
+#include <kernel/longtrans.h>
 #include <kernel/ffields.h>
 #include <kernel/ideals.h>
 #include <kernel/ring.h>

@@ -601,7 +601,7 @@ void singclap_divide_content ( poly f )
       for ( i = L, p = f; i.hasItem(); i++, p=pNext(p) )
       {
         lnumber c=(lnumber)pGetCoeff(p);
-        p_Delete(&c->z,nacRing);
+        p_Delete(&c->z,currRing->algring); // 2nd arg used to be nacRing
         c->z=convFactoryPSingP( i.getItem() / g, currRing->algring );
         //nTest((number)c);
         //#ifdef LDEBUG

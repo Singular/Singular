@@ -12,7 +12,7 @@
 #define INCL_SINGCONV_H
 
 #include <kernel/structs.h>
-#include <kernel/longalg.h>
+#include <kernel/longtrans.h>
 #include <kernel/ring.h>
 #ifdef HAVE_FACTORY
 #  include <factory/factory.h>

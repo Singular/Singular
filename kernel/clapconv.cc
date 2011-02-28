@@ -17,6 +17,7 @@
 #include <kernel/numbers.h>
 #include <kernel/modulop.h>
 #include <kernel/longalg.h>
+#include <kernel/longtrans.h>
 #include <kernel/polys.h>
 #include <kernel/febase.h>
 #include <kernel/ring.h>
@@ -397,7 +398,7 @@ napoly convFactoryASingA ( const CanonicalForm & f, const ring r )
     {
       lnumber l=(lnumber)r->minpoly;
       if (p_GetExp(a,1,r->algring) >= p_GetExp(l->z,1,r->algring))
-        a = napRemainder( a, l->z);
+        a = naRemainder( a, l->z);
     }
   }
   return a;

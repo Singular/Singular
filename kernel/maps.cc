@@ -16,7 +16,7 @@
 #include <kernel/matpol.h>
 #include <omalloc/omalloc.h>
 #include <kernel/kstd1.h>
-#include <kernel/longalg.h>
+#include <kernel/longtrans.h>
 #include <kernel/maps.h>
 #include <kernel/prCopy.h>
 

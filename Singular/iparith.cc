@@ -24,6 +24,7 @@
 #include <kernel/febase.h>
 #include <Singular/sdb.h>
 #include <kernel/longalg.h>
+#include <kernel/longtrans.h>
 #include <kernel/ideals.h>
 #include <kernel/matpol.h>
 #include <kernel/kstd1.h>

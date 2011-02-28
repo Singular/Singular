@@ -56,7 +56,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
     case NUMBER_CMD:
       if (P!=0)
       {
-        res->data=(void *)naPermNumber((number)data,par_perm,P, preimage_r);
+        res->data=(void *)napPermNumber((number)data,par_perm,P, preimage_r);
         res->rtyp=POLY_CMD;
         if (currRing->minpoly!=NULL)
           res->data=(void *)pMinPolyNormalize((poly)res->data);

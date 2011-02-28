@@ -19,6 +19,7 @@
 #include <kernel/weight.h>
 #include <kernel/intvec.h>
 #include <kernel/longalg.h>
+#include <kernel/longtrans.h>
 #include <kernel/ring.h>
 #include <kernel/ideals.h>
 #include <kernel/polys.h>
@@ -1236,7 +1237,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
     else
     {
       qq=pOne();
-      aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
+      aq=napPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
       if ((currRing->minpoly!=NULL)
       && ((rField_is_Zp_a()) || (rField_is_Q_a())))
       {
