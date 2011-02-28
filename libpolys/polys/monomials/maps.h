@@ -15,8 +15,8 @@ typedef number (*nMapFunc)(number a, coeffs src, coeffs dst);
 struct sip_smap;
 typedef struct sip_smap *         map;
 
-poly maEval(map theMap, poly p, ring dst_ring, nMapFunc nMap); //,matrix s=NULL);
-map maCopy(map theMap, ring dst_ring);
+poly maEval(map theMap, poly p, ring dst_ring, nMapFunc nMap, ideal s=NULL);
+map maCopy(map theMap, const ring dst_ring);
 
 ideal maGetPreimage(ring theImageRing, map theMap,ideal id);
 

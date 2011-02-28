@@ -54,8 +54,21 @@ struct sip_sideal
   int nrows;
   int ncols;
   #define IDELEMS(i) ((i)->ncols)
+  #define MATCOLS(i) ((i)->ncols)
+  #define MATROWS(i) ((i)->nrows)
+  #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
 };
 typedef struct sip_sideal *       ideal;
+
+struct sip_smap
+{
+  poly *m;
+  char *preimage;
+  int nrows;
+  int ncols;
+};
+typedef struct sip_smap *         map;
+
 typedef enum
 {
   ro_dp, // ordering is a degree ordering

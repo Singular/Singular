@@ -32,24 +32,6 @@
 #endif
 
 
-/*2
-* handle memory request for sets of polynomials (ideals)
-* l is the length of *p, increment is the difference (may be negative)
-*/
-void pEnlargeSet(polyset *p, int l, int increment)
-{
-  polyset h;
-
-  h=(polyset)omReallocSize((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
-  if (increment>0)
-  {
-    //for (i=l; i<l+increment; i++)
-    //  h[i]=NULL;
-    memset(&(h[l]),0,increment*sizeof(poly));
-  }
-  *p=h;
-}
-
 poly ppJet(poly p, int m)
 {
   poly r=NULL;
