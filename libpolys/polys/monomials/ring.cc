@@ -3378,7 +3378,7 @@ static void rSetFirstWv(ring r, int i, int* order, int* block1, int** wvhdl)
 
 static void rOptimizeLDeg(ring r)
 {
-  if (r->pFDeg == pDeg)
+  if (r->pFDeg == p_Deg)
   {
     if (r->pLDeg == pLDeg1)
       r->pLDeg = pLDeg1_Deg;
@@ -3519,7 +3519,7 @@ static void rSetDegStuff(ring r)
   }
   
   if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
-    r->pFDeg = pDeg;
+    r->pFDeg = p_Deg;
 
   r->pFDegOrig = r->pFDeg;
   r->pLDegOrig = r->pLDeg;

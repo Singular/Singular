@@ -272,7 +272,6 @@ inline void    pWrite(poly p)     {p_Write(p, currRing, currRing);}
 inline void    pWrite0(poly p)    {p_Write0(p, currRing, currRing);}
 inline void    wrp(poly p)        {p_wrp(p, currRing, currRing);}
 
-void      pEnlargeSet(polyset *p, int length, int increment);
 #define   pISet(i) p_ISet(i,currRing)
 #define   pNSet(n) p_NSet(n,currRing)
 

@@ -2884,6 +2884,24 @@ void p_SetModDeg(intvec *w, ring r)
 }
 
 /*2
+* handle memory request for sets of polynomials (ideals)
+* l is the length of *p, increment is the difference (may be negative)
+*/
+void pEnlargeSet(poly* *p, int l, int increment)
+{
+  poly* h;
+
+  h=(poly*)omReallocSize((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
+  if (increment>0)
+  {
+    //for (i=l; i<l+increment; i++)
+    //  h[i]=NULL;
+    memset(&(h[l]),0,increment*sizeof(poly));
+  }
+  *p=h;
+}
+
+/*2
 *returns a re-ordered copy of a polynomial, with permutation of the variables
 */
 poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,

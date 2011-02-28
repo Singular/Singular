@@ -338,6 +338,7 @@ static inline int       pLength(poly a);
 static inline poly      pLast(poly a, int &length);
 inline   poly      pLast(poly a) { int l; return pLast(a, l);}
 static inline poly pReverse(poly p);
+void      pEnlargeSet(poly**p, int length, int increment);
 
 
 /***************************************************************
@@ -380,6 +381,8 @@ long pLDeg1c_Totaldegree(poly p,int *l, ring r);
 long pLDeg1_WFirstTotalDegree(poly p,int *l, ring r);
 long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r);
 BOOLEAN p_EqualPolys(poly p1, poly p2, const ring r);
+
+long p_Deg(poly a, const ring r);
 /***************************************************************
  *
  * PDEBUG stuff
