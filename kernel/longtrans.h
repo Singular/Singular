@@ -79,8 +79,6 @@ extern number   (*ntcLcm)(number a, number b, const ring r);
 extern number   (*ntcInit)(int i, const ring r);
 extern int      (*ntcInt)(number &n, const ring r);
 extern void     (*ntcDelete)(number *a, const ring r);
-#undef n_Delete
-#define n_Delete(A,R) ntcDelete(A,R)
 extern void     (*ntcNormalize)(number &a);
 extern number   (*ntcNeg)(number a);
 extern number   (*ntcCopy)(number a);
