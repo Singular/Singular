@@ -183,37 +183,6 @@ void napMultN(napoly p, number z)
 }
 
 /*3
-*  division with remainder: f = g*q + r,
-*  returns r and destroys f
-*/
-napoly naRemainder(napoly f, const napoly g)
-{
-  napoly a, h, qq;
-
-  qq = (napoly)p_Init(nacRing);
-  pNext(qq) = NULL;
-  p_Normalize(g, nacRing);
-  p_Normalize(f, nacRing);
-  a = f;
-  do
-  {
-    napSetExp(qq,1, p_GetExp(a,1,nacRing) - p_GetExp(g,1,nacRing));
-    napSetm(qq);
-    pGetCoeff(qq) = nacDiv(pGetCoeff(a), pGetCoeff(g));
-    pGetCoeff(qq) = nacNeg(pGetCoeff(qq));
-    nacNormalize(pGetCoeff(qq));
-    h = napCopy(g);
-    napMultT(h, qq);
-    p_Normalize(h,nacRing);
-    n_Delete(&pGetCoeff(qq),nacRing);
-    a = napAdd(a, h);
-  }
-  while ((a!=NULL) && (p_GetExp(a,1,nacRing) >= p_GetExp(g,1,nacRing)));
-  omFreeBinAddr(qq);
-  return a;
-}
-
-/*3
 *  division with rest; f = g*q + r,  destroy f
 */
 void napDivMod(napoly f, napoly  g, napoly *q, napoly *r)
