@@ -22,6 +22,8 @@ extern omBin snaIdeal_bin;
 extern naIdeal naI;
 extern napoly naMinimalPoly;
 
+void redefineFunctionPointers();
+
 void    naSetChar(int p, ring r);
 void    naDelete (number *p, const ring r);
 number  naInit(int i, const ring r);                /* z := i */

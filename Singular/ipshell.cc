@@ -2269,11 +2269,13 @@ ring rCompose(const lists  L)
         {
           if (IDELEMS(R->algring->qideal)==1)
           {
-            R->minpoly=naInit(1,R);
+            R->minpoly=naInit(1,R);            
             lnumber n=(lnumber)R->minpoly;
             n->z=R->algring->qideal->m[0];
+            naMinimalPoly=n->z;
             R->algring->qideal->m[0]=NULL;
             idDelete(&(R->algring->qideal));
+            redefineFunctionPointers();
           }
           else
           {

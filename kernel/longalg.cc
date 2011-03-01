@@ -39,6 +39,73 @@ napoly naMinimalPoly;
 omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
 number (*naMap)(number from);
 
+void redefineFunctionPointers()
+{
+  n_Procs_s* n = currRing->cf;
+  /* re-defining function pointers */
+  n->cfDelete       = naDelete;
+  n->nNormalize     = naNormalize;
+  n->cfInit         = naInit;
+  n->nPar           = naPar;
+  n->nParDeg        = naParDeg;
+  n->n_Int          = naInt;
+  n->nAdd           = naAdd;
+  n->nSub           = naSub;
+  n->nMult          = naMult;
+  n->nDiv           = naDiv;
+  n->nExactDiv      = naDiv;
+  n->nIntDiv        = naIntDiv;
+  n->nNeg           = naNeg;
+  n->nInvers        = naInvers;
+  n->nCopy          = naCopy;
+  n->cfCopy         = na_Copy;
+  n->nGreater       = naGreater;
+  n->nEqual         = naEqual;
+  n->nIsZero        = naIsZero;
+  n->nIsOne         = naIsOne;
+  n->nIsMOne        = naIsMOne;
+  n->nGreaterZero   = naGreaterZero;
+  n->cfWrite        = naWrite;
+  n->nRead          = naRead;
+  n->nPower         = naPower;
+  n->nGcd           = naGcd;
+  n->nLcm           = naLcm;
+  n->cfSetMap       = naSetMap;
+  n->nName          = naName;
+  n->nSize          = naSize;
+  n->cfGetDenom     = napGetDenom;
+  n->cfGetNumerator = napGetNumerator;
+#ifdef LDEBUG
+  n->nDBTest        = naDBTest;
+#endif
+  /* re-defining global function pointers */
+  nNormalize=naNormalize;
+  nPar   = naPar;
+  nParDeg= nParDeg;
+  n_Int  = naInt;
+  nAdd   = naAdd;
+  nSub   = naSub;
+  nMult  = naMult;
+  nDiv   = naDiv;
+  nExactDiv= naDiv;
+  nIntDiv= naIntDiv;
+  nNeg   = naNeg;
+  nInvers= naInvers;
+  nCopy  = naCopy;
+  nGreater = naGreater;
+  nEqual = naEqual;
+  nIsZero = naIsZero;
+  nIsOne = naIsOne;
+  nIsMOne = naIsMOne;
+  nGreaterZero = naGreaterZero;
+  nRead = naRead;
+  nPower = naPower;
+  nGcd  = naGcd;
+  nLcm  = naLcm;
+  nName= naName;
+  nSize  = naSize;
+}
+
 static number nadGcd( number a, number b, const ring r) { return ntcInit(1,r); }
 /*2
 *  sets the appropriate operators
