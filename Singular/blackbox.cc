@@ -4,8 +4,8 @@
 #include <Singular/ipshell.h>
 #include <Singular/blackbox.h>
 
-//#define BLACKBOX_DEVEL 1
 #define MAX_BB_TYPES 256
+// #define BLACKBOX_DEVEL 1
 
 static blackbox* blackboxTable[MAX_BB_TYPES];
 static char *    blackboxName[MAX_BB_TYPES];
@@ -102,7 +102,7 @@ int setBlackboxStuff(blackbox *bb, const char *n)
     blackboxTable[where]=bb;
     blackboxName[where]=omStrDup(n);
 #ifdef BLACKBOX_DEVEL
-    Print("define bb:name=%s:rt=%d (table:cnt=%d)\n",blackboxName[where],where+BLACKBOX_OFFSET,where);
+  Print("setBlackboxStuff: define bb:name=%s:rt=%d (table:cnt=%d)\n",blackboxName[where],where+BLACKBOX_OFFSET,where);
 #endif
     if (bb->blackbox_destroy==NULL) bb->blackbox_destroy=blackbox_default_destroy;
     if (bb->blackbox_String==NULL)  bb->blackbox_String=blackbox_default_String;
@@ -137,7 +137,7 @@ int blackboxIsCmd(const char *n, int & tok)
     if(strcmp(n,blackboxName[i])==0)
     {
 #ifdef BLACKBOX_DEVEL
-      Print("found bb:%s:%d (table:%d)\n",n,i+BLACKBOX_OFFSET,i);
+      Print("blackboxIsCmd: found bb:%s:%d (table:%d)\n",n,i+BLACKBOX_OFFSET,i);
 #endif
       tok=i+BLACKBOX_OFFSET;
       return ROOT_DECL;
@@ -151,6 +151,6 @@ void printBlackboxTypes()
   for(int i=blackboxTableCnt-1;i>=0;i--)
   {
     if (blackboxName[i]!=NULL)
-      Print("type %d: %s\n",i,blackboxName[i]);
+      Print("printBlackboxTypes: blackbox-type %d: %s\n",i,blackboxName[i]);
   }
 }

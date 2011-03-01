@@ -161,6 +161,8 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 //#endif /* not HAVE_DYNAMIC_LOADING */
 
+#include <Singular/bigintm.h>
+
 #ifdef ix86_Win
 //#include <Python.h>
 //#include <python_wrapper.h>
@@ -174,6 +176,32 @@ extern BOOLEAN jjJanetBasis(leftv res, leftv v);
 
 #ifdef ix86_Win  /* PySingular initialized? */
 static int PyInitialized = 0;
+#endif
+
+#if SIZEOF_LONG == 8
+static number jjLONG2N(long d)
+{
+  int i=(int)d;
+  if ((long)i == d)
+  {
+    return nlInit(i, NULL);
+  }
+  else
+  {
+#if !defined(OM_NDEBUG) && !defined(NDEBUG)
+    omCheckBin(rnumber_bin);
+#endif
+    number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+    z->debug=123456;
+#endif
+    z->s=3;
+    mpz_init_set_si(z->z,d);
+    return z;
+  }
+}
+#else
+#define jjLONG2N(D) nlInit((int)D, NULL)
 #endif
 
 //void emStart();
@@ -3877,8 +3905,12 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
   {
     printBlackboxTypes();
     return FALSE;
-  }
-  else
+  } else
+/*==================== init the bigintm (a sample blackbox) type =========*/
+  if(strcmp(sys_cmd,"bigintm_setup") == 0)
+  {
+    return bigintm_setup();
+  } else
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

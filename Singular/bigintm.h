@@ -1,6 +1,6 @@
 #ifndef BIGINTM_H
 #define BIGINTM_H
 
-void bigintm_setup();
+BOOLEAN bigintm_setup();
 
 #endif
