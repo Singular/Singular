@@ -18,8 +18,6 @@ typedef struct sip_smap *         map;
 poly maEval(map theMap, poly p, ring dst_ring, nMapFunc nMap, ideal s=NULL);
 map maCopy(map theMap, const ring dst_ring);
 
-ideal maGetPreimage(ring theImageRing, map theMap,ideal id);
-
 poly maIMap(ring src_ring, ring dst_ring, poly p);
 
 /*
