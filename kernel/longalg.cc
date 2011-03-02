@@ -112,6 +112,9 @@ static number nadGcd( number a, number b, const ring r) { return nacInit(1,r); }
 */
 void naSetChar(int i, ring r)
 {
+  assume((r->minpoly  != NULL) ||
+         (r->minideal != NULL)    );
+  
   if (naI!=NULL)
   {
     int j;
@@ -132,6 +135,7 @@ void naSetChar(int i, ring r)
   }
   else
     naMinimalPoly = NULL;
+    
   if (r->minideal!=NULL)
   {
     naI=(naIdeal)omAllocBin(snaIdeal_bin);
@@ -147,9 +151,7 @@ void naSetChar(int i, ring r)
 
   ntNumbOfPar=rPar(r);
   if (i == 1)
-  {
     ntIsChar0 = 1;
-  }
   else if (i < 0)
   {
     ntIsChar0 = 0;
@@ -465,9 +467,10 @@ number naMult(number la, number lb)
   if (naMinimalPoly!=NULL)
   {
     if (p_GetExp(lo->z,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
-      lo->z = naRemainder(lo->z, naMinimalPoly);
-    if ((x!=NULL) && (p_GetExp(x,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing)))
-      x = naRemainder(x, naMinimalPoly);
+      lo->z = napRemainder(lo->z, naMinimalPoly);
+    if ((x!=NULL) &&
+        (p_GetExp(x,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing)))
+      x = napRemainder(x, naMinimalPoly);
   }
   if (naI!=NULL)
   {
@@ -565,9 +568,9 @@ number naDiv(number la, number lb)
   if (naMinimalPoly!=NULL)
   {
     if (p_GetExp(lo->z,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
-      lo->z = naRemainder(lo->z, naMinimalPoly);
+      lo->z = napRemainder(lo->z, naMinimalPoly);
     if (p_GetExp(x,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
-      x = naRemainder(x, naMinimalPoly);
+      x = napRemainder(x, naMinimalPoly);
   }
   if (naI!=NULL)
   {
@@ -649,7 +652,7 @@ number naInvers(number a)
     x = napInvers(x, naMinimalPoly);
     x = p_Mult_q(x, lo->z,nacRing);
     if (p_GetExp(x,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
-      x = naRemainder(x, naMinimalPoly);
+      x = napRemainder(x, naMinimalPoly);
     lo->z = x;
     lo->n = NULL;
     while (x!=NULL)
@@ -762,7 +765,7 @@ const char  *naRead(const char *s, number *p)
   a = (lnumber)*p;
   if ((naMinimalPoly!=NULL)
   && (p_GetExp(x,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing)))
-    a->z = naRemainder(x, naMinimalPoly);
+    a->z = napRemainder(x, naMinimalPoly);
   else if (naI!=NULL)
   {
     a->z = napRedp(x);
@@ -1114,37 +1117,6 @@ void naCoefNormalize(number pp)
   }
 }
 
-/*3
-*  division with remainder: f = g*q + r,
-*  returns r and destroys f
-*/
-napoly naRemainder(napoly f, const napoly g)
-{
-  napoly a, h, qq;
-
-  qq = (napoly)p_Init(nacRing);
-  pNext(qq) = NULL;
-  p_Normalize(g, nacRing);
-  p_Normalize(f, nacRing);
-  a = f;
-  do
-  {
-    napSetExp(qq,1, p_GetExp(a,1,nacRing) - p_GetExp(g,1,nacRing));
-    napSetm(qq);
-    pGetCoeff(qq) = nacDiv(pGetCoeff(a), pGetCoeff(g));
-    pGetCoeff(qq) = nacNeg(pGetCoeff(qq));
-    nacNormalize(pGetCoeff(qq));
-    h = napCopy(g);
-    napMultT(h, qq);
-    p_Normalize(h,nacRing);
-    n_Delete(&pGetCoeff(qq),nacRing);
-    a = napAdd(a, h);
-  }
-  while ((a!=NULL) && (p_GetExp(a,1,nacRing) >= p_GetExp(g,1,nacRing)));
-  omFreeBinAddr(qq);
-  return a;
-}
-
 void naNormalize(number &pp)
 {
 
@@ -1165,7 +1137,7 @@ void naNormalize(number &pp)
     y = napInvers(y, naMinimalPoly);
     x = p_Mult_q(x, y,nacRing);
     if (p_GetExp(x,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
-      x = naRemainder(x, naMinimalPoly);
+      x = napRemainder(x, naMinimalPoly);
     p->z = x;
     p->n = y = NULL;
     norm=ntIsChar0;
@@ -1176,7 +1148,7 @@ void naNormalize(number &pp)
   && (p_GetExp(x,1,nacRing)>p_GetExp(naMinimalPoly,1,nacRing)))
   // DO NOT REDUCE naMinimalPoly with itself
   {
-    x = naRemainder(x, naMinimalPoly);
+    x = napRemainder(x, naMinimalPoly);
     p->z = x;
     norm=ntIsChar0;
   }
@@ -1247,7 +1219,7 @@ void naNormalize(number &pp)
     napoly r;
     loop
     {
-      r = naRemainder(x1, y1);
+      r = napRemainder(x1, y1);
       if ((r==NULL) || (pNext(r)==NULL)) break;
       x1 = y1;
       y1 = r;
@@ -1382,12 +1354,6 @@ number naLcm(number la, number lb, const ring r)
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
   result = (lnumber)omAlloc0Bin(rnumber_bin);
-  //if (((naMinimalPoly==NULL) && (naI==NULL)) || !ntIsChar0)
-  //{
-  //  result->z = p_ISet(1,nacRing);
-  //  return (number)result;
-  //}
-  //naNormalize(lb);
   naTest(la);
   naTest(lb);
   napoly x = p_Copy(a->z, r->algring);
@@ -1561,7 +1527,7 @@ number naMapQaQb(number c)
   {
     if (p_GetExp(erg->z,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
     {
-      erg->z = naRemainder(erg->z, naMinimalPoly);
+      erg->z = napRemainder(erg->z, naMinimalPoly);
       if (erg->z==NULL)
       {
         number t_erg=(number)erg;
@@ -1572,7 +1538,7 @@ number naMapQaQb(number c)
     if (erg->n!=NULL)
     {
       if (p_GetExp(erg->n,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
-        erg->n = naRemainder(erg->n, naMinimalPoly);
+        erg->n = napRemainder(erg->n, naMinimalPoly);
       if ((p_IsConstant(erg->n,nacRing)) && nacIsOne(pGetCoeff(erg->n)))
         p_Delete(&(erg->n),nacRing);
     }
@@ -1673,7 +1639,7 @@ BOOLEAN naDBTest(number a, const char *f,const int l)
   }
   while(p!=NULL)
   {
-    if ((ntIsChar0 && nlIsZero(pGetCoeff(p)))
+    if (( ntIsChar0  && nlIsZero(pGetCoeff(p)))
     || ((!ntIsChar0) && npIsZero(pGetCoeff(p))))
     {
       Print("coeff 0 in %s:%d\n",f,l);

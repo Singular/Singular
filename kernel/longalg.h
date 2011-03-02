@@ -95,7 +95,6 @@ number        naMap00(number c);
 #ifdef LDEBUG
 BOOLEAN       naDBTest(number a, const char *f,const int l);
 #endif
-napoly        naRemainder(napoly f, const napoly  g);
 void          naSetIdeal(ideal I);
 void          naCoefNormalize(number pp);
 extern number (*naMap)(number from);

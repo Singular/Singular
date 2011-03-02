@@ -398,7 +398,7 @@ napoly convFactoryASingA ( const CanonicalForm & f, const ring r )
     {
       lnumber l=(lnumber)r->minpoly;
       if (p_GetExp(a,1,r->algring) >= p_GetExp(l->z,1,r->algring))
-        a = naRemainder( a, l->z);
+        a = napRemainder( a, l->z);
     }
   }
   return a;

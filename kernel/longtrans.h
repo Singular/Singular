@@ -55,7 +55,8 @@ struct slnumber
 
 extern int  ntNumbOfPar;
 #define     ntParNames (currRing->parameter)
-extern int  ntIsChar0;
+extern int  ntIsChar0;                                  /* == 1 iff char = 0,
+                                                           == 0 otherwise */ 
 extern ring ntMapRing;
 extern int  ntParsToCopy;
 
@@ -142,9 +143,10 @@ number  napGetDenom(number &n, const ring r);
 number  napGetNumerator(number &n, const ring r);
 void    napTest(napoly p);
 napoly  napInitz(number z);
-napoly  napCopyNeg(napoly p);
-void    napMultN(napoly p, number z);
-void    napDivMod(napoly f, napoly  g, napoly *q, napoly *r);
+napoly  napCopyNeg(const napoly p);
+void    napMultN(napoly p, const number z);
+void    napDivMod(napoly f, const napoly g, napoly *q, napoly *r);
+napoly  napRemainder(napoly f, const napoly g);
 napoly  napInvers(napoly x, const napoly c);
 int     napMaxDeg(napoly p);
 int     napMaxDegLen(napoly p, int &l);
@@ -162,9 +164,9 @@ napoly  napTailred (napoly q);
 napoly  napMap(napoly p);
 napoly  napPerm(napoly p, const int *par_perm, const ring src_ring,
                 const nMapFunc nMap);
-const char *napHandleMons(const char *s, int i, napoly ex);
-const char *napHandlePars(const char *s, int i, napoly ex);
-const char *napRead(const char *s, napoly *b);
+const char* napHandleMons(const char *s, int i, napoly ex);
+const char* napHandlePars(const char *s, int i, napoly ex);
+const char* napRead(const char *s, napoly *b);
 
 #endif
 
