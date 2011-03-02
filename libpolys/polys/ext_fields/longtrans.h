@@ -8,9 +8,8 @@
 * ABSTRACT:   numbers in transcendental field extensions,
               i.e., in rational function fields
 */
-#include <kernel/structs.h>
-#include <kernel/longrat.h>
-#include <kernel/polys-impl.h>
+#include <coeffs/longrat.h>
+#include <polys/monomials/polys-impl.h>
 
 /* 
    IMPORTANT INFORMATION:

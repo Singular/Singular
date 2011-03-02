@@ -9,24 +9,22 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
 #include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/longrat.h>
-#include <kernel/modulop.h>
-#include <kernel/numbers.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/ring.h>
+#include <resources/feFopen.h>
+#include <coeffs/longrat.h>
+#include <coeffs/modulop.h>
+#include <coeffs/numbers.h>
+#include <polys/polys.h>
+#include <polys/simpleideals.h>
+#include <polys/monomials/ring.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <factory/factory.h>
-#include <kernel/clapsing.h>
-#include <kernel/clapconv.h>
+//#include <kernel/clapsing.h>
+//#include <kernel/clapconv.h>
 #endif
-#include <kernel/longtrans.h>
-#include <kernel/longalg.h>
+#include <polys/ext_fields/longtrans.h>
+#include <polys/ext_fields/longalg.h>
 
 ring nacRing;
 int  ntIsChar0;

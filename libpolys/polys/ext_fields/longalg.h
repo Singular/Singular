@@ -9,7 +9,7 @@
 */
 #include <coeffs/coeffs.h>
 #include <coeffs/longrat.h>
-#include <poly/monomials/polys-impl.h>
+#include <polys/monomials/polys-impl.h>
 #include <polys/ext_fields/longtrans.h>
 
 /* 
