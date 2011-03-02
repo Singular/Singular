@@ -151,6 +151,6 @@ void printBlackboxTypes()
   for(int i=blackboxTableCnt-1;i>=0;i--)
   {
     if (blackboxName[i]!=NULL)
-      Print("printBlackboxTypes: blackbox-type %d: %s\n",i,blackboxName[i]);
+       Print("type %d: %s\n",i,blackboxName[i]);
   }
 }
