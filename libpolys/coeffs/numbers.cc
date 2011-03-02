@@ -186,7 +186,6 @@ coeffs nInitChar(n_coeffType t, void * parameter)
 #endif
   }
   #endif
-    cf_root=n;
     
     BOOLEAN nOK=TRUE;
     // init
@@ -195,10 +194,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     else
        Werror("coeff init missing for %d",(int)t);
     if (nOK)
-      {
-	omFreeSize(n,sizeof(*n));
-	return NULL;
-      }
+    {
+      omFreeSize(n,sizeof(*n));
+      return NULL;
+    }
     cf_root=n;
     // post init settings:
     if (n->cfRePart==NULL) n->cfRePart=n->cfCopy;
