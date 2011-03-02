@@ -1,3 +1,8 @@
+// as this file provides only example code,
+// no trace of it must appear in Singular and Singularg
+//
+#if 0
+//
 #include <Singular/mod2.h>
 #include <Singular/ipid.h>
 #include <Singular/blackbox.h>
@@ -8,14 +13,6 @@
 #include <Singular/bigintm.h>
 
 
-#define HAVE_BIGINTM 1
-
-#ifdef HAVE_BIGINTM
-static int bigintm_type_id = -1;
-#endif
-
-
-#ifdef HAVE_BIGINTM
 static char * bigintm_String(blackbox *b, void *d)
 { if (d==NULL) return omStrDup("oo");
    else
@@ -30,13 +27,11 @@ static void * bigintm_Copy(blackbox*b, void *d)
 
 static BOOLEAN bigintm_Assign(leftv l, leftv r)
 {
-  assume( l->Typ() == bigintm_type_id );
-  
   blackbox *ll=getBlackboxStuff(l->Typ());
   
   if (r->Typ()>MAX_TOK)
   {
-    if (bigintm_type_id == r->Typ())
+    if (l->Typ() == r->Typ())
     {
       blackbox *rr=getBlackboxStuff(r->Typ());
       
@@ -84,7 +79,6 @@ static BOOLEAN bigintm_OpM(int op, leftv res, leftv args);
 static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
 {
   // interpreter: a1 is ist bigintm
-  assume( a1->Typ() == bigintm_type_id );
   
   blackbox *a=getBlackboxStuff(a1->Typ());
   number n1=(number)a1->Data(); 
@@ -111,8 +105,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       return TRUE;
     }
     default:
-      Werror("bigintm_Op2: op %d not implemented for type %s (%d)", op, getBlackboxName(a1->Typ()), a1->Typ());
-      break;
+      return blackboxDefaultOp2(op,res,a1,a2);
   }
   return blackboxDefaultOp2(op,res,a1,a2);
 }
@@ -120,7 +113,6 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
 static BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
 {
   // interpreter: args->1. arg is ist bigintm
-  assume( args->Typ() == bigintm_type_id );
   blackbox *a=getBlackboxStuff(args->Typ());
   switch(op)
   {
@@ -131,10 +123,10 @@ static BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
       return FALSE;
     }
     default:
-      Werror("bigintm_OpM: op %d not implemented for type %s (%d)", op, getBlackboxName(args->Typ()), args->Typ());
+      return blackboxDefaultOpM(op,res,args);
       break;
   }
-  return TRUE;
+  return blackboxDefaultOpM(op,res,args);
 }
 static void bigintm_destroy(blackbox *b, void *d)
 {
@@ -145,50 +137,36 @@ static void bigintm_destroy(blackbox *b, void *d)
   }
 }
 
-#endif
 
-
-
-
-// this is only a demo
 BOOLEAN bigintm_setup()
 {
-#ifndef HAVE_BIGINTM
-  Werror("bigintm_setup: Sorry BIGINTM was not compiled in!");
-  return TRUE; // ok, TRUE = error!
-#else
+  // it is not very usefull to call this setup routine twice,
+  // but (as this is an example) it is possible.
+  // Other blackbox type really require multiple setup calls 
+  // (with different names).
+  // Also the format of this setup routine is not fixed,
+  // it may take additional parameters, it may return a value or not
+  // - it really depends.
 
-  if( bigintm_type_id == -1 )
-  {
-    blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
-    // all undefined entries will be set to default in setBlackboxStuff
-    // the default Print is quite usefule,
-    // all other are simply error messages
-    b->blackbox_destroy=bigintm_destroy;
-    b->blackbox_String=bigintm_String;
-    //b->blackbox_Print=blackbox_default_Print;
-    //b->blackbox_Init=blackbox_default_Init;
-    b->blackbox_Copy=bigintm_Copy;
-    b->blackbox_Assign=bigintm_Assign;
-    //b->blackbox_Op1=blackboxDefaultOp1;
-    b->blackbox_Op2=bigintm_Op2;
-    //b->blackbox_Op3=blackbox_default_Op3;
-    b->blackbox_OpM=bigintm_OpM;
+  blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
+  // all undefined entries will be set to default in setBlackboxStuff
+  // the default Print is quite usefule,
+  // all other are simply error messages
+  b->blackbox_destroy=bigintm_destroy;
+  b->blackbox_String=bigintm_String;
+  //b->blackbox_Print=blackbox_default_Print;
+  //b->blackbox_Init=blackbox_default_Init;
+  b->blackbox_Copy=bigintm_Copy;
+  b->blackbox_Assign=bigintm_Assign;
+  //b->blackbox_Op1=blackboxDefaultOp1;
+  b->blackbox_Op2=bigintm_Op2;
+  //b->blackbox_Op3=blackbox_default_Op3;
+  b->blackbox_OpM=bigintm_OpM;
+  int rt=setBlackboxStuff(b,"bigintm");
 
-    bigintm_type_id = setBlackboxStuff(b,"bigintm");
+  Print("bigintm_setup: create type %d (%s)\n",rt, getBlackboxName(rt));
 
-    Print("bigintm_setup: create type %d (%s)",bigintm_type_id, getBlackboxName(bigintm_type_id));
-    PrintLn();
-
-    return FALSE; // ok, TRUE = error!
-  } else
-  {
-    Werror("bigintm_setup: Sorry should NOT be run twice!");
-    return TRUE; // ok, TRUE = error!
-  }
-
-#endif
+  return FALSE; // ok, TRUE = error!: this example never fails
 }
 
-
-
+#endif
