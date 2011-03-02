@@ -371,11 +371,14 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
     // next ?
     *p=c;
     while (*p==' ') p++;
-    if (*p!=',') break;
-    if (*p!='\0')
+    if (*p!=',')
     {
-      Werror("unknown character in newstruct:>>%s<<",p);
-      goto error_in_newstruct_def;
+      if (*p!='\0')
+      {
+        Werror("unknown character in newstruct:>>%s<<",p);
+        goto error_in_newstruct_def;
+      }
+      break; // end-of-list
     }
     p++;
   }
