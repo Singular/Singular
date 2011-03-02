@@ -360,11 +360,7 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
     if (*start=='\0') /*empty name*/
     {
       WerrorS("empty name for element");
-      omFree(elem);
-      omFree(ss);
-      omFree(res);
-      currRingHdl=save_ring;
-      return NULL;
+      goto error_in_newstruct_def;
     }
     elem->name=omStrDup(start);
     //Print(" name:%s\n",start);
@@ -376,12 +372,23 @@ static newstruct_desc scanNewstructFromString(const char *s, newstruct_desc res)
     *p=c;
     while (*p==' ') p++;
     if (*p!=',') break;
+    if (*p!='\0')
+    {
+      Werror("unknown character in newstruct:>>%s<<",p);
+      goto error_in_newstruct_def;
+    }
     p++;
   }
   omFree(ss);
   currRingHdl=save_ring;
   //Print("new type with %d elements\n",res->size);
   return res;
+error_in_newstruct_def:
+   omFree(elem);
+   omFree(ss);
+   omFree(res);
+   currRingHdl=save_ring;
+   return NULL;
 }
 newstruct_desc newstructFromString(const char *s)
 {
