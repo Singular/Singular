@@ -162,13 +162,14 @@ namespace
 
 bool Test(const n_coeffType type, void* p = NULL)
 {
-  cout  << endl << "----------------------- Testing coeffs: [" << type <<
+  cout  << endl << "----------------------- Testing coeffs: [" << type << ", " << p << 
                 "]: -----------------------" << endl;
 
   const coeffs r = nInitChar( type, p );
 
-  if( r == NULL ) { cout << "error"; return false; };
+  if( r == NULL ) { cout << "Test: could not get the specified coeff. domain for type: " << type << " and the parameter: " << p << endl; return false; };
 
+  assume( r != NULL );
   nSetChar( r );
   assume( getCoeffType(r) == type );
 
@@ -286,10 +287,9 @@ int main()
   if( Test(type) )
     c ++;
 #endif
-
+   GFInfo param;
    type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
 
-   GFInfo param;
 
    param.GFChar= 5;
    param.GFDegree= 12;
@@ -297,13 +297,15 @@ int main()
 
    if( Test(type, (void*) &param) )
      c ++;
-  
+
+
    param.GFChar= 5;
    param.GFDegree= 2;
    param.GFPar_name= (const char*)"Q";
 
    if( Test(type, (void*) &param) )
      c ++;
+
 
   TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Please fix it!);
 
