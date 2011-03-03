@@ -1091,16 +1091,10 @@ void nlNormalize (number &x)
 {
   if ((SR_HDL(x) & SR_INT) ||(x==NULL))
     return;
-#ifdef LDEBUG
-  if (!nlTest(x))
-  { 
-    if (x->s!=3) x->s=1; 
-    return;
-  }
-#endif
   if (x->s==3)
   {
     x=nlShort3_noinline(x);
+    nlTest(x);
     return;
   }
   else if (x->s==0)
