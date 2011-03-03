@@ -1206,8 +1206,12 @@ int slStatusSsiL(lists L, int timeout)
     if(SI_LINK_OPEN_P(l)==0)
     { WerrorS("all links must be open"); return -2;}
     if (((strcmp(l->m->type,"ssi")!=0) && (strcmp(l->m->type,"MPtcp")!=0))
-    || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)))
-    { WerrorS("all links must be of type ssi:fork or ssi:tcp or MPtcp:fork"); return -2;}
+    || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
+       && (strcmp(l->mode,"launch")!=0)))
+    {
+      WerrorS("all links must be of type ssi:fork, ssi:tcp, MPtcp:fork or MPtcp:launch");
+      return -2;
+    }
     #ifdef HAVE_MPSR
     if (strcmp(l->m->type,"ssi")==0)
     {
