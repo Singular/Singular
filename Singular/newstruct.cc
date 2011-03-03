@@ -53,7 +53,11 @@ char * newstruct_String(blackbox *b, void *d)
           StringSetS("");
           char *tmp2=omStrDup(l->m[a->pos].String());
           StringSetS(tmp);
-          StringAppendS(tmp2);
+          if ((strlen(tmp2)>80)||(strchr(tmp2,'\n')!=NULL))
+          {
+            StringAppend("<%s>",Tok2Cmdname(l->m[a->pos].rtyp));
+          }
+          else StringAppendS(tmp2);
           omFree(tmp2);
         }
       }
