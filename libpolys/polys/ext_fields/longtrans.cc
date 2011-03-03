@@ -32,6 +32,50 @@ ring ntMapRing;
 int  ntParsToCopy;
 int  ntNumbOfPar;
 
+
+  #if 0 /*vertagt*/
+  if (nField_is_Extension(r))
+  {
+    //ntInitChar(c,TRUE,r);
+    n->cfDelete       = ntDelete;
+    n->nNormalize     = ntNormalize;
+    n->cfInit         = ntInit;
+    n->nPar           = ntPar;
+    n->nParDeg        = ntParDeg;
+    n->n_Int          = ntInt;
+    n->nAdd           = ntAdd;
+    n->nSub           = ntSub;
+    n->nMult          = ntMult;
+    n->nDiv           = ntDiv;
+    n->nExactDiv      = ntDiv;
+    n->nIntDiv        = ntIntDiv;
+    n->nNeg           = ntNeg;
+    n->nInvers        = ntInvers;
+    //n->nCopy          = ntCopy;
+    n->cfCopy         = nt_Copy;
+    n->nGreater       = ntGreater;
+    n->nEqual         = ntEqual;
+    n->nIsZero        = ntIsZero;
+    n->nIsOne         = ntIsOne;
+    n->nIsMOne        = ntIsMOne;
+    n->nGreaterZero   = ntGreaterZero;
+    n->cfWrite        = ntWrite;
+    n->nRead          = ntRead;
+    n->nPower         = ntPower;
+    n->nGcd           = ntGcd;
+    n->nLcm           = ntLcm;
+    n->cfSetMap       = ntSetMap;
+    n->nName          = ntName;
+    n->nSize          = ntSize;
+    n->cfGetDenom     = napGetDenom;
+    n->cfGetNumerator = napGetNumerator;
+#ifdef LDEBUG
+    n->nDBTest        = ntDBTest;
+#endif
+  }
+  #endif
+
+
 numberfunc  nacMult, nacSub, nacAdd, nacDiv, nacIntDiv;
 number      (*ntMap)(number from);
 number      (*nacGcd)(number a, number b, const ring r);

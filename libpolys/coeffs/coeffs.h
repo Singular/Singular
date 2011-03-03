@@ -247,8 +247,10 @@ static inline int nInternalChar(const coeffs r)
 /// one-time initialisations for new coeffs
 /// in case of an error return NULL
 coeffs nInitChar(n_coeffType t, void * parameter);
+
 /// undo all initialisations
 void nKillChar(coeffs r);
+
 /// initialisations after each ring change
 static inline void nSetChar(const coeffs r)
 {
@@ -256,7 +258,6 @@ static inline void nSetChar(const coeffs r)
   if (r->cfSetChar!=NULL) r->cfSetChar(r);
 }
 
-// nach einer heissen Diskussion
 void           nNew(number * a);
 #define n_New(n, r)           nNew(n)
 
@@ -266,25 +267,33 @@ void           nNew(number * a);
 /// return a copy of a
 static inline number n_Copy(number n,    const coeffs r)
 { return r->cfCopy(n, r); }
+
 static inline void   n_Delete(number* p, const coeffs r)
 { r->cfDelete(p, r); }
 
 static inline BOOLEAN n_Equal(number a, number b, const coeffs r)
 { return r->cfEqual(a, b, r); }
+
 static inline BOOLEAN n_IsZero(number n, const coeffs r)
 { return r->cfIsZero(n,r); }
+
 static inline BOOLEAN n_IsOne(number n,  const coeffs r)
 { return r->cfIsOne(n,r); }
+
 static inline BOOLEAN n_IsMOne(number n, const coeffs r)
 { return r->cfIsMOne(n,r); }
+
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
 { return r->cfGreaterZero(n,r); }
 // cfGreater?
+
 #ifdef HAVE_RINGS
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)
 { return r->cfIsUnit(n,r); }
+
 static inline number n_GetUnit(number n, const coeffs r)
 { return r->cfGetUnit(n,r); }
+
 static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 { return r->cfDivBy(a,b,r); }
 #endif
