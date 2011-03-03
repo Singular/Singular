@@ -94,6 +94,7 @@ number convFactoryNSingN( const CanonicalForm & n)
       gmp_denominator( n, z->n );
       z->s = 0;
     }
+    nlNormalize(z);
     return z;
   }
 }
