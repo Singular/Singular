@@ -2371,6 +2371,9 @@ number nlFarey(number nN, number nP)
     {
        // return N/B
        z=(number)omAllocBin(rnumber_bin);
+       #ifdef LDEBUG
+       z->debug=123456;
+       #endif
        if (mpz_isNeg(B))
        {
          mpz_neg(B,B);
