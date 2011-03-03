@@ -255,8 +255,8 @@ napoly napInvers(napoly x, const napoly c)
     x = napRemainder(x, c);
   if (x == NULL)
   {
-    WerrorS("x is not invertible modulo c");
-    return x;
+    WerrorS("zero divisor found - your minpoly is not irreducible");
+    return NULL;
   }
   if (p_GetExp(x, 1, nacRing) == 0)
   {
