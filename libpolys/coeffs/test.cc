@@ -24,49 +24,67 @@ using namespace std;
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
-bool Test(const coeffs r)
+void Print(/*const*/ number a, const coeffs r, BOOLEAN eoln = TRUE)
+{
+  n_Test(a,r);
+
+  StringSetS("");
+  n_Write(a, r);
+
+  char* s = NULL; 
+
+  if( eoln ) 
+    s = StringAppend("\n");
+  else
+    s = StringAppend("");
+
+  PrintS(s);
+
+  // free s?
+}
+
+
+void PrintSized(/*const*/ number a, const coeffs r, BOOLEAN eoln = TRUE)
+{
+  Print(a, r, FALSE);
+  Print(", of size: %d", n_Size(a, r));
+  
+  if( eoln ) 
+    PrintLn();
+}
+  
+
+
+bool TestArith(const coeffs r)
 {
   number a = n_Init(66666, r);
    
-  StringSetS("a: ");
-  n_Test(a,r);
-  n_Write(a, r);
-  PrintS(StringAppend("\n"));
+  PrintS("a: "); PrintSized(a, r);
 
   number two = n_Init(2, r);
   
-  StringSetS("two: ");
-  n_Test(two,r);
-  n_Write(two, r);
-  PrintS(StringAppend("\n"));
+  PrintS("two: "); PrintSized(two, r);
 
   if (getCoeffType(r) == n_GF) //some special test for GF
   {
-    number z = nfPar (0, r); // also any integer instead of 0
-    StringSetS("Generator: ");
-    n_Test(z,r); n_Write (z,r);
-    PrintS(StringAppend("\n"));
+    number z = nfPar (0, r); // also any integer instead of 0//?
+
+    PrintS("Generator: "); PrintSized(z, r);
+    
     n_Delete(&z, r);    
   }
   
   number aa = n_Add(a, a, r);
 
-  StringSetS("aa = a + a: ");
-  n_Test(aa,r); n_Write(aa, r);
-  PrintS(StringAppend("\n"));
+  PrintS("aa = a + a: "); PrintSized(aa, r);
   
   number aa2 = n_Mult(a, two, r);
 
-  StringSetS("aa2 = a * 2: ");
-  n_Test(aa2, r); n_Write(aa2, r);
-  PrintS(StringAppend("\n"));
+  PrintS("aa2 = a * 2: "); PrintSized(aa2, r);
 
   number aa1 = n_Mult(two, a, r);
  
-  StringSetS("aa1 = 2 * a: ");
-  n_Test(aa1,r); n_Write(aa1, r);
-  PrintS(StringAppend("\n"));
-
+  PrintS("aa1 = 2 * a: "); PrintSized(aa1, r);
 
   n_Delete(&a, r);
   n_Delete(&two, r);
@@ -74,50 +92,42 @@ bool Test(const coeffs r)
 
   a = n_Sub( aa, aa1, r );
   
-  StringSetS("a = aa - aa1: ");
-  n_Test(a,r); n_Write(a, r);
-  PrintS(StringAppend("\n"));
+  PrintS("a = aa - aa1: "); PrintSized(a, r);
 
   if( !n_IsZero(a, r) )
-    WarnS("ERROR: a != 0 !!!\n");
+    WarnS("TestArith: ERROR: a != 0 !!!\n");
 
   n_Delete(&a, r);
 
-
-
   a = n_Sub( aa, aa2, r );
 
-  StringSetS("a = aa - aa2: ");
-  n_Test(a,r); n_Write(a, r);
-  PrintS(StringAppend("\n"));
+  PrintS("a = aa - aa2: "); PrintSized(a, r);
 
   if( !n_IsZero(a, r) )
-    WarnS("ERROR: a != 0 !!!\n");
+    WarnS("TestArith: ERROR: a != 0 !!!\n");
 
   n_Delete(&a, r);
 
 
   a = n_Sub( aa1, aa2, r );
 
-  StringSetS("a = aa1 - aa2: ");
-  n_Test(a,r); n_Write(a, r);
-  PrintS(StringAppend("\n"));
+  PrintS("a = aa1 - aa2: "); PrintSized(a, r);
 
   if( !n_IsZero(a, r) )
-    WarnS("ERROR: a != 0 !!!\n");
+    WarnS("TestArith: ERROR: a != 0 !!!\n");
 
   n_Delete(&a, r);
 
 
   
   if( !n_Equal(aa, aa1, r) )
-    WarnS("ERROR: aa != aa1  !!!\n");
+    WarnS("TestArith: ERROR: aa != aa1  !!!\n");
 
   if( !n_Equal(aa, aa2, r) )
-    WarnS("ERROR: aa != aa2  !!!\n");
+    WarnS("TestArith: ERROR: aa != aa2  !!!\n");
 
   if( !n_Equal(aa1, aa2, r) )
-    WarnS("ERROR: aa1 != aa2  !!!\n");
+    WarnS("TestArith: ERROR: aa1 != aa2  !!!\n");
   
 
   
@@ -234,7 +244,7 @@ bool Test(const n_coeffType type, void* p = NULL)
     // ...
   }
 
-  bool ret = Test( r );
+  bool ret = TestArith( r );
 
   nKillChar( r );
 
@@ -250,27 +260,25 @@ int main()
   
   n_coeffType type;
 
-  // rings needed for: n_Zp_a, n_Q_a ?
+
 #ifdef HAVE_RINGS
-  TODO(Frank, Segmentation fault! (if used wihout omalloc???). Please_ investigate!);
-/*
+//  TODO(Frank, Segmentation fault! (if used wihout omalloc???). Please_ investigate!);
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m ); 
-  if( Test(type, (void*) 2) )
+  if( Test(type, (void*) 4) )
     c ++;
-*/
 #endif
 
   type = nRegister( n_Zp, npInitChar); assume( type == n_Zp );
-  if( Test(type, (void*) 11) )
+  if( Test(type, (void*) 101) )
     c ++;
 
 #ifdef HAVE_RINGS
-  TODO(Frank, memmory corruption_ if used wihout omalloc??? Please_ investigate!);
-/*
+//  TODO(Frank, memmory corruption_ if used wihout omalloc??? Please_ investigate!);
+
   type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m ); 
-  if( Test(type, (void*) 2) )
+  if( Test(type, (void*) 8) )
     c ++;
-*/    
+
 #endif
 
   
@@ -287,40 +295,48 @@ int main()
   if( Test(type) )
     c ++;
 #endif
-   GFInfo param;
    type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
 
 
-   param.GFChar= 5;
-   param.GFDegree= 12;
-   param.GFPar_name= (const char*)"q";
+   GFInfo* param = new GFInfo();
 
-   if( Test(type, (void*) &param) )
+   param->GFChar= 5;
+   param->GFDegree= 12;
+   param->GFPar_name= (const char*)"q";
+
+   if( Test(type, (void*) param) )
      c ++;
 
+   // it should not be used by numbers... right? 
+   // TODO: what is our policy wrt param-pointer-ownership?
+   delete param; 
+   // Q: no way to deRegister a type?
 
-   param.GFChar= 5;
-   param.GFDegree= 2;
-   param.GFPar_name= (const char*)"Q";
+   param = new GFInfo();
 
-   if( Test(type, (void*) &param) )
+   param->GFChar= 5;
+   param->GFDegree= 2;
+   param->GFPar_name= (const char*)"Q";
+
+   if( Test(type, (void*) param) )
      c ++;
 
+   delete param;
 
-  TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Please fix it!);
 
 
 
 #ifdef HAVE_RINGS
-  TODO(Somebody, This will result in memory corruption at Z_2^m later on (due to the succs. setGMPFloatDigits?)...!?);
-/*
+//  TODO(Somebody, This will result in memory corruption at Z_2^m later on (due to the succs. setGMPFloatDigits?)...!?); // ????
+
   type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
 
   if( Test(type, (void*) 3) )
     c ++;
-*/
+
 #endif
 
+  TODO(Somebody, floating arithmetics via GMP rely on two global variables (see setGMPFloatDigits). Please fix it!);
   setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
 
 
@@ -346,6 +362,7 @@ int main()
     c ++;
 #endif
   
+  // polynomial rings needed for: n_Zp_a, n_Q_a ?
   
   return c;
 
