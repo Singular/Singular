@@ -259,6 +259,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l)
     if ((mpz_size1(a->n) ==1) && (mpz_cmp_si(a->n,(long)1)==0))
     {
       Print("!!longrat:integer as rational in %s:%d\n",f,l);
+      mpz_clear(a->n); a->s=3;
       return FALSE;
     }
     else if (mpz_isNeg(a->n))
