@@ -371,8 +371,8 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
 
   if (h->attribute!=NULL)
   {
-    at_KillAll(h,r);
-    //h->attribute=NULL;
+    //at_KillAll(h,r);
+    h->attribute=NULL;
   }
   if ((IDTYP(h) == PACKAGE_CMD) && (strcmp(IDID(h),"Top")==0))
   {
