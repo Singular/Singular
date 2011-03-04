@@ -84,28 +84,6 @@ LIB "dmodapp.lib";  // for initialIdealW etc
 LIB "nctools.lib";  // for isWeyl etc
 LIB "presolve.lib"; // for valvars
 
-///////////////////////////////////////////////////////////////////////////////
-// testing for consistency of the library:
-proc testbfunlib ()
-{
-  // tests all procs for consistency
-  "AUXILIARY PROCEDURES:";
-  example allPositive;
-  example scalarProd;
-  example vec2poly;
-  "MAIN PROCEDURES:";
-  example bfct;
-  example bfctSyz;
-  example bfctAnn;
-  example bfctOneGB;
-  example bfctIdeal;
-  example pIntersect;
-  example pIntersectSyz;
-  example linReduce;
-  example linReduceIdeal;
-  example linSyzSolve;
-}
-
 //--------------- auxiliary procedures ----------------------------------------
 
 /*
@@ -1440,7 +1418,7 @@ static proc bfctengine (poly f, int inorann, int whichengine, int addPD, int std
   }
   dbprint(ppl,"// ...done"); // with the intersection
   poly pb = vec2poly(b);
-  if (inorann == 0) 
+  if (inorann == 0)
   {
     pb = subst(pb,var(1),-var(1)-1);
   }
