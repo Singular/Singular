@@ -274,7 +274,7 @@ napoly napInvers(napoly x, const napoly c)
   napDivMod(y, x, &qa, &r);
   if (r == NULL)
   {
-    WerrorS("x is not invertible modulo c");
+    WerrorS("x is not invertible modulo c(1)");
     return x;
   }
   if (p_GetExp(r, 1, nacRing) == 0)
@@ -295,7 +295,7 @@ napoly napInvers(napoly x, const napoly c)
   napDivMod(y, x, &q, &r);
   if (r == NULL)
   {
-    WerrorS("x is not invertible modulo c");
+    WerrorS("x is not invertible modulo c(2)");
     return x;
   }
   if (p_GetExp(r, 1, nacRing) == 0)
@@ -323,7 +323,7 @@ napoly napInvers(napoly x, const napoly c)
     napDivMod(y, x, &qn, &r);
     if (r == NULL)
     {
-      WerrorS("x is not invertible modulo c");
+      WerrorS("zero divisor found - your minpoly is not irreducible");
       return x;
     }
     if (p_GetExp(r, 1, nacRing) == 0)
