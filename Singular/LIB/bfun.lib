@@ -40,15 +40,20 @@ Noro: An Efficient Modular Algorithm for Computing the Global b-function,
 
 PROCEDURES:
 bfct(f[,s,t,v]);            compute the BS polynomial of f with linear reductions
-bfctSyz(f[,r,s,t,u,v]);  compute the BS polynomial of f with syzygy-solver
-bfctAnn(f[,s]);           compute the BS polynomial of f via Ann f^s + f
-bfctOneGB(f[,s,t]);     compute the BS polynomial of f by just one GB computation
-bfctIdeal(I,w[,s,t]);     compute the b-function of ideal w.r.t. weight
-pIntersect(f,I[,s]);      intersection of ideal with subalgebra K[f] for a polynomial f
+bfctSyz(f[,r,s,t,u,v]);     compute the BS polynomial of f with syzygy-solver
+bfctAnn(f[,s]);             compute the BS polynomial of f via Ann f^s + f
+bfctOneGB(f[,s,t]);         compute the BS polynomial of f by just one GB computation
+bfctIdeal(I,w[,s,t]);       compute the b-function of ideal w.r.t. weight
+pIntersect(f,I[,s]);        intersection of ideal with subalgebra K[f] for a polynomial f
 pIntersectSyz(f,I[,p,s,t]); intersection of ideal with subalgebra K[f] with syz-solver
 linReduce(f,I[,s]);         reduce a polynomial by linear reductions w.r.t. ideal
-linReduceIdeal(I,[s,t]);  interreduce generators of ideal by linear reductions
+linReduceIdeal(I,[s,t]);    interreduce generators of ideal by linear reductions
 linSyzSolve(I[,s]);         compute a linear dependency of elements of ideal I
+
+allPositive(v);             checks whether all entries of an intvec are positive
+scalarProd(v,w);            computes the standard scalar product of two intvecs
+vec2poly(v[,i]);            constructs an univariate polynomial with given coefficients
+
 
 SEE ALSO: dmod_lib, dmodapp_lib, dmodvar_lib, gmssing_lib
 
@@ -57,11 +62,20 @@ graded Weyl algebra; initial ideal; initial form; principal intersection; linear
 initial ideal approach
 ";
 
-//AUXILIARY PROCEDURES:
-//
-//allPositive(v);  checks whether all entries of an intvec are positive
-//scalarProd(v,w); computes the standard scalar product of two intvecs
-//vec2poly(v[,i]); constructs an univariate polynomial with given coefficients
+
+
+/*
+CHANGELOG
+
+03.03.11:
+- simplified scalarProd
+- fixed bug in bfct when user used vars t,Dt
+- now bFactor is used by bfct, bfctAnn, i.e. the static procs
+  addRoot, listofroots are superfluous
+- fixed printlevel/debug message issue in bfct, bfctAnn
+- fixed small issue for zero ideal input in linReduceIdeal
+*/
+
 
 
 LIB "qhmoduli.lib"; // for Max
@@ -241,19 +255,15 @@ ASSUME:  the arguments are of the same size
 EXAMPLE: example scalarProd; shows examples
 "
 {
-  int i; int sp;
   if (size(v)!=size(w))
   {
     ERROR("non-matching dimensions");
   }
   else
   {
-    for (i=1; i<=size(v);i++)
-    {
-      sp = sp + v[i]*w[i];
-    }
+    intvec u = transpose(v)*w;
   }
-  return(sp);
+  return(u[1]);
 }
 example
 {
@@ -454,6 +464,10 @@ EXAMPLE: example linReduceIdeal; shows examples
         }
       }
     }
+  }
+  if (sI == sZeros) // if I=0,0,...,0, we now have one too much by construction due to sort
+  {
+    J = J[1..sZeros];
   }
   if (remembercoeffs <> 0) { return(list(J,M)); }
   else { return(J); }
@@ -1205,104 +1219,111 @@ example
   vec2poly(iv);
 }
 
-static proc listofroots (list #)
-{
-  def save = basering;
-  int n = nvars(save);
-  int i;
-  poly p;
-  if (typeof(#[1])=="vector")
-  {
-    vector b = #[1];
-    for (i=1; i<=nrows(b); i++)
-    {
-      p = p + b[i]*(var(1))^(i-1);
-    }
-  }
-  else
-  {
-    p = #[1];
-  }
-  int substitution = int(#[2]);
-  string s = safeVarName("s");
-  list RL = ringlist(save); RL = RL[1..4];
-  RL[2] = list(s); RL[3] = list(list("dp",intvec(1)),list("C",0));
-  def S = ring(RL); setring S;
-  ideal J;
-  for (i=1; i<=n; i++)
-  {
-    J[i] = var(1);
-  }
-  map @m = save,J;
-  poly p = @m(p);
-  if (substitution == 1)
-  {
-    p = subst(p,var(1),-var(1)-1);
-  }
-  // the rest of this proc is nicked from bernsteinBM from dmod.lib
-  list P = factorize(p);//with constants and multiplicities
-  ideal bs; intvec m;   //the BS polynomial is monic, so we are not interested in constants
-  for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
-  {
-    bs[i-1] = P[1][i];
-    m[i-1]  = P[2][i];
-  }
-  bs =  normalize(bs);
-  bs = -subst(bs,var(1),0);
-  setring save;
-  ideal bs = imap(S,bs);
-  kill S;
-  list BS = bs,m;
-  return(BS);
-}
-
-static proc addRoot(number q, list L)
-{
-  // add root to list in bFactor format
-  int i,qInL;
-  ideal I = L[1];
-  intvec v = L[2];
-  list LL;
-  if (v == 0)
-  {
-    I = poly(q);
-    v = 1;
-    LL = I,v;
-  }
-  else
-  {
-    for (i=1; i<=ncols(I); i++)
-    {
-      if (I[i] == q)
-      {
-        qInL = i;
-        break;
-      }
-    }
-    if (qInL)
-    {
-      v[qInL] = v[qInL] + 1;
-    }
-    else
-    {
-      I = q,I;
-      v = 1,v;
-    }
-  }
-  LL = I,v;
-  if (size(L) == 3) // irreducible factor
-  {
-    if (L[3] <> "0" && L[3] <> "1")
-    {
-      LL = LL + list(L[3]);
-    }
-  }
-  return(LL);
-}
+/*
+// // listofroots and addRoots aren't needed anymore due to some modifications
+//
+// static proc listofroots (list #)
+// {
+//   def save = basering;
+//   int n = nvars(save);
+//   int i;
+//   poly p;
+//   if (typeof(#[1])=="vector")
+//   {
+//     vector b = #[1];
+//     for (i=1; i<=nrows(b); i++)
+//     {
+//       p = p + b[i]*(var(1))^(i-1);
+//     }
+//   }
+//   else
+//   {
+//     p = #[1];
+//   }
+//   int substitution = int(#[2]);
+//   string s = safeVarName("s");
+//   list RL = ringlist(save); RL = RL[1..4];
+//   RL[2] = list(s); RL[3] = list(list("dp",intvec(1)),list("C",0));
+//   def S = ring(RL); setring S;
+//   ideal J;
+//   for (i=1; i<=n; i++)
+//   {
+//     J[i] = var(1);
+//   }
+//   map @m = save,J;
+//   poly p = @m(p);
+//   if (substitution == 1)
+//   {
+//     p = subst(p,var(1),-var(1)-1);
+//   }
+//   // the rest of this proc is nicked from bernsteinBM from dmod.lib
+//   list P = factorize(p);//with constants and multiplicities
+//   ideal bs; intvec m;   //the BS polynomial is monic, so we are not interested in constants
+//   for (i=2; i<= size(P[1]); i++)  //we delete P[1][1] and P[2][1]
+//   {
+//     bs[i-1] = P[1][i];
+//     m[i-1]  = P[2][i];
+//   }
+//   bs =  normalize(bs);
+//   bs = -subst(bs,var(1),0);
+//   setring save;
+//   ideal bs = imap(S,bs);
+//   kill S;
+//   list BS = bs,m;
+//   return(BS);
+// }
+//
+//
+// static proc addRoot(number q, list L)
+// {
+//   // add root to list in bFactor format
+//   int i,qInL;
+//   ideal I = L[1];
+//   intvec v = L[2];
+//   list LL;
+//   if (v == 0)
+//   {
+//     I = poly(q);
+//     v = 1;
+//     LL = I,v;
+//   }
+//   else
+//   {
+//     for (i=1; i<=ncols(I); i++)
+//     {
+//       if (I[i] == q)
+//       {
+//         qInL = i;
+//         break;
+//       }
+//     }
+//     if (qInL)
+//     {
+//       v[qInL] = v[qInL] + 1;
+//     }
+//     else
+//     {
+//       I = q,I;
+//       v = 1,v;
+//     }
+//   }
+//   LL = I,v;
+//   if (size(L) == 3) // irreducible factor
+//   {
+//     if (L[3] <> "0" && L[3] <> "1")
+//     {
+//       LL = LL + list(L[3]);
+//     }
+//   }
+//   return(LL);
+// }
+*/
 
 static proc bfctengine (poly f, int inorann, int whichengine, int addPD, int stdsum, int methodord, int methodpIntersect, int pIntersectchar, int modengine, intvec u0)
 {
-  int ppl = printlevel - voice +2;
+  int printlevelsave = printlevel;
+  printlevel = printlevel + 1;
+  int ppl = printlevel - voice + 2;
   int i;
   def save = basering;
   int n = nvars(save);
@@ -1334,21 +1355,26 @@ static proc bfctengine (poly f, int inorann, int whichengine, int addPD, int std
     kill varL,iv,L;
     setring newr;
     poly f = imap(save,f);
+    dbprint(ppl,"// starting computation of the initial ideal of the Malgrange ideal...");
     def D = initialMalgrange(f,whichengine,methodord,u0);
+    dbprint(ppl,"// ...done");
     setring D;
     ideal J = inF;
     kill inF;
-    poly s = t*Dt;
+    poly s = var(1)*var(n+2);
   }
   else // bfct using Ann(f^s)
   {
+    dbprint(ppl,"// starting computation of the s-parametric annihilator...");
     def D = SannfsBFCT(f,addPD,whichengine,stdsum);
+    dbprint(ppl,"// ...done");
     setring D;
     ideal J = LD;
     kill LD;
     poly s = var(1);
   }
   vector b;
+  dbprint(ppl,"// starting to intersect with subalgebra...");
   // try it modular
   if (methodpIntersect <> 0) // pIntersectSyz
   {
@@ -1412,17 +1438,23 @@ static proc bfctengine (poly f, int inorann, int whichengine, int addPD, int std
   {
     b = pIntersect(s,J);
   }
-  if (inorann == 0) { list l = listofroots(b,1); }
+  dbprint(ppl,"// ...done"); // with the intersection
+  poly pb = vec2poly(b);
+  if (inorann == 0) 
+  {
+    pb = subst(pb,var(1),-var(1)-1);
+  }
   else // bfctAnn
   {
-    list l = listofroots(b,0);
     if (addPD)
     {
-      l = addRoot(-1,l);
+      pb = pb*(var(1)+1);
     }
   }
+  list l = bFactor(pb);
   setring save;
   list l = imap(D,l);
+  printlevel = printlevelsave;
   return(l);
 }
 
@@ -1529,7 +1561,7 @@ EXAMPLE: example bfctSyz; shows examples
   int n = nvars(basering);
   int whichengine = 0; // default
   int methodord   = 0; // default
-  int pIntersectchar  = 0; // default
+  int pIntersectchar = 0; // default
   int modengine   = 1; // default
   intvec u0       = 0; // default
   if (size(#)>0)
@@ -1820,7 +1852,8 @@ EXAMPLE: example bfctOneGB; shows examples
   map @m = Dh,J;
   ideal I = @m(I);
   poly p = I[1];
-  list l = listofroots(p,1);
+  p = subst(p,var(1),-var(1)-1);
+  list l = bFactor(p);
   if (qr == 1)
   {
     setring save;

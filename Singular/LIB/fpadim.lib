@@ -37,7 +37,7 @@ OVERVIEW: Given the free algebra A = K<x_1,...,x_n> and a (finite) Groebner basi
 @*      number, so variable one is represented as 1, variable two as 2 and so
 @*      on. The monomial x_1*x_3*x_2 for example will be stored as (1,3,2).
 @*      Multiplication is concatenation. Note that there is no algorithm for
-@*      computing the normal form yet, but for our case it is not needed.
+@*      computing the normal form needed for our case.
 @*
 
 References:
@@ -63,6 +63,7 @@ ivDHilbertSickle(L,n[,d]); computes mistletoes, K-dimension and Hilbert series
 ivDimCheck(L,n);           checks if the K-dimension of A/<L> is infinite
 ivHilbert(L,n[,d]);        computes the Hilbert series of A/<L> in intvec format
 ivKDim(L,n[,d]);           computes the K-dimension of A/<L> in intvec format
+ivMis2Base(M);             computes a K-basis of the factor algebra
 ivMis2Dim(M);              computes the K-dimension of the factor algebra
 ivOrdMisLex(M);            orders a list of intvecs lexicographically
 ivSickle(L,n[,d]);         computes the mistletoes of A/<L> in intvec format
@@ -73,6 +74,7 @@ lpDHilbertSickle(G[,d,n]); computes mistletoes, K-dimension and Hilbert series
 lpHilbert(G[,d,n]);        computes the Hilbert series of A/<G> in lp format
 lpDimCheck(G);             checks if the K-dimension of A/<G> is infinite
 lpKDim(G[,d,n]);           computes the K-dimension of A/<G> in lp format
+lpMis2Base(M);             computes a K-basis of the factor algebra
 lpMis2Dim(M);              computes the K-dimension of the factor algebra
 lpOrdMisLex(M);            orders an ideal of lp-monomials lexicographically
 lpSickle(G[,d,n]);         computes the mistletoes of A/<G> in lp format
@@ -163,7 +165,8 @@ RETURN: intmat, with all variables except those in M
 static proc entryViolation(intmat M, int n)
 "PURPOSE:checks, if all entries in M are variable-related
 "
-{int i,j;
+{if ((nrows(M) == 1) && (ncols(M) == 1)) {if (M[1,1] == 0){return(0);}}
+ int i,j;
   for (i = 1; i <= nrows(M); i++)
   {for (j = 1; j <= ncols(M); j++)
     {if(!((1<=M[i,j])&&(M[i,j]<=n))) {return(1);}}
@@ -1228,6 +1231,59 @@ example
   ivKDim(I,2,5); // invokes the procedure with degree bound 5
 }
 
+proc ivMis2Base(list M)
+"USAGE: ivMis2Base(M); M a list of intvecs
+RETURN: ideal, a K-base of the given algebra
+PURPOSE:Computing the K-base out of given mistletoes
+ASSUME: - The mistletoes have to be ordered lexicographically -> OrdMisLex.
+@*        Otherwise there might some elements missing.
+@*      - basering is a Letterplace ring.
+EXAMPLE: example ivMis2Base; shows examples
+"
+{
+//checkAssumptions(0,M);
+  intvec L,A;
+  if (size(M) == 0){ERROR("There are no mistletoes, so it appears your dimension is infinite!");}
+  if (isInList(L,M) > 0) {print("1 is a mistletoe, therefore 1 is the only basis element"); return(list(intvec(0)));}
+  int i,j,d,s;
+  list Rt;
+  Rt[1] = intvec(0);
+  L = M[1];
+  for (i = size(L); 1 <= i; i--) {Rt = insert(Rt,intvec(L[1..i]));}
+  for (i = 2; i <= size(M); i++)
+  {A = M[i]; L = M[i-1];
+   s = size(A);
+   if (s > size(L))
+   {d = size(L);
+    for (j = s; j > d; j--) {Rt = insert(Rt,intvec(A[1..j]));}
+    A = A[1..d];
+   }
+   if (size(L) > s){L = L[1..s];}
+   while (A <> L)
+   {Rt = insert(Rt, intvec(A));
+    if (size(A) > 1)
+    {A = A[1..(size(A)-1)];
+     L = L[1..(size(L)-1)];
+    }
+    else {break;}
+   }
+  }
+  return(Rt);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  R;
+  setring R; // sets basering to Letterplace ring
+  intvec i1 = 1,2; intvec i2 = 2,1,2;
+  // the mistletoes are xy and yxy, which are already ordered lexicographically
+  list L = i1,i2;
+  ivMis2Base(L); // returns the basis of the factor algebra
+}
+
+
 proc ivMis2Dim(list M)
 "USAGE: ivMis2Dim(M); M a list of intvecs
 RETURN: int, the K-dimension of the given algebra
@@ -1594,7 +1650,7 @@ ASSUME: - basering is a Letterplace ring.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) holds.
 NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
-@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal,
+@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal, 
 @*      the mistletoes
 @*    - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering,uptodeg).
@@ -1728,6 +1784,30 @@ example
   // the factor algebra is finite, so the degree bound given by the Letterplace
   // ring is not necessary
   lpKDim(G,0); // procedure without any degree bound
+}
+
+proc lpMis2Base(ideal M)
+"USAGE: lpMis2Base(M); M an ideal
+RETURN: ideal, a K-basis of the factor algebra
+PURPOSE:Computing a K-basis out of given mistletoes
+ASSUME: - basering is a Letterplace ring.
+@*      - M contains only monomials
+NOTE:   - The mistletoes have to be ordered lexicographically -> OrdMisLex.
+EXAMPLE: example lpMis2Base; shows examples
+"
+{list L;
+  L = lpId2ivLi(M);
+  return(ivL2lpI(ivMis2Base(L)));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(x,y),dp;
+  def R = makeLetterplaceRing(5); // constructs a Letterplace ring
+  setring R; // sets basering to Letterplace ring
+  ideal L = x(1)*y(2),y(1)*x(2)*y(3);
+  // ideal containing the mistletoes
+  lpMis2Base(L); // returns the K-basis of the factor algebra
 }
 
 proc lpMis2Dim(ideal M)
@@ -1967,6 +2047,7 @@ proc tst_fpadim()
   example ivDimCheck;
   example ivHilbert;
   example ivKDim;
+  example ivMis2Base;
   example ivMis2Dim;
   example ivOrdMisLex;
   example ivSickle;
@@ -1977,6 +2058,7 @@ proc tst_fpadim()
   example lpHilbert;
   example lpDimCheck;
   example lpKDim;
+  example lpMis2Base;
   example lpMis2Dim;
   example lpOrdMisLex;
   example lpSickle;
