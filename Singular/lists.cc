@@ -95,7 +95,10 @@ lists lInsert0(lists ul, leftv v, int pos)
   l->m[pos].rtyp=v->Typ();
   l->m[pos].data=v->CopyD();
   l->m[pos].flag=v->flag;
-  l->m[pos].attribute=v->CopyA();
+  if (v->attribute!=NULL)
+  {
+    l->m[pos].attribute=v->attribute->Copy();
+  }
   if (ul->m != NULL)
     omFreeSize((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
   omFreeBin((ADDRESS)ul, slists_bin);

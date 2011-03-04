@@ -59,7 +59,7 @@ class sleftv
     void CleanUp(ring r=currRing);
     char * String(void *d=NULL, BOOLEAN typed = FALSE, int dim = 1);
     void Copy(leftv e);
-    attr CopyA();
+    //attr CopyA();
     void * CopyD(int t);
     void * CopyD() { return CopyD(Typ()); }
     inline const char * Name()

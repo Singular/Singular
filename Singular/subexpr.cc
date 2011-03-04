@@ -271,12 +271,12 @@ void sleftv::Print(leftv store, int spaces)
     {
       store->rtyp=t/*Typ()*/;
       store->data=CopyD();
-      if((e!=NULL)||(attribute!=NULL))
+      if(e!=NULL)
       {
-        store->attribute=CopyA();
-      }
-      if (e==NULL)
-      {
+        if(attribute!=NULL)
+        {
+          store->attribute=attribute->Copy();
+        }
         store->flag=flag;
       }
       //else
@@ -560,10 +560,10 @@ void sleftv::Copy(leftv source)
   if(!errorreported)
   {
     data=s_internalCopy(rtyp,d);
-    if ((source->attribute!=NULL)||(source->e!=NULL))
-      attribute=source->CopyA();
     if(source->e==NULL)
     {
+      if (source->attribute!=NULL)
+        attribute=source->attribute->Copy();
       flag=source->flag;
     }
     //else
@@ -606,13 +606,13 @@ void * sleftv::CopyD(int t)
 //  return CopyD(Typ());
 //}
 
-attr sleftv::CopyA()
-{
-  attr *a=Attribute();
-  if ((a!=NULL) && (*a!=NULL))
-    return (*a)->Copy();
-  return NULL;
-}
+//attr sleftv::CopyA()
+//{
+//  attr *a=Attribute();
+//  if ((a!=NULL) && (*a!=NULL))
+//    return (*a)->Copy();
+//  return NULL;
+//}
 
 char *  sleftv::String(void *d, BOOLEAN typed, int dim)
 {
@@ -1177,7 +1177,11 @@ void * sleftv::Data()
 
 attr * sleftv::Attribute()
 {
-  if (e==NULL) return &attribute;
+  if (e==NULL) 
+  {
+    if (rtyp==IDHDL) return(&(IDATTR((idhdl)data)));
+    return &attribute;
+  }
   if ((rtyp==LIST_CMD)
   ||((rtyp==IDHDL)&&(IDTYP((idhdl)data)==LIST_CMD)))
   {
