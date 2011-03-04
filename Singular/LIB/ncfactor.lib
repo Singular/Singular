@@ -30,14 +30,6 @@ LIB "nctools.lib";
 LIB "involut.lib";
 LIB "freegb.lib"; // for isVar
 
-proc tst_ncfactor()
-{
-  example facFirstWeyl;
-  example facFirstShift;
-  example facSubWeyl;
-  example testNCfac;
-}
-
 /////////////////////////////////////////////////////
 //==================================================*
 //deletes double-entries in a list of factorization
@@ -1983,7 +1975,7 @@ proc triangNum(int n)
 {
      if (n == 0)
      {
-	  return(0);
+          return(0);
      }
      return (n*(n+1)/2);
 }
@@ -2068,10 +2060,10 @@ SEE ALSO: homogfacFirstWeyl
     for (j = 0; j<leadexp(mons[i])[2];j++)
     {
 //"j:";j;
-	 tempSummand = (q^j-1)/(q-1);
-	 entry = entry * theta-tempSummand*entry;
+         tempSummand = (q^j-1)/(q-1);
+         entry = entry * theta-tempSummand*entry;
     }
-//~;   
+//~;
  mons[i] = entry*leadcoef(mons[i]) * q^(-triangNum(leadexp(mons[i])[2]-1));
   }//transforming the monomials as monomials in theta
   dbprint(p,"==> Done");
@@ -2224,11 +2216,11 @@ SEE ALSO: homogfacFirstWeyl
     }
     for (j = 1 ; j<=size(tempmons);j++)
     {
-	 //entry = leadcoef(tempmons[j]);
-	 entry = leadcoef(tempmons[j]) * q^(-triangNum(leadexp(tempmons[j])[2]-1));
+         //entry = leadcoef(tempmons[j]);
+         entry = leadcoef(tempmons[j]) * q^(-triangNum(leadexp(tempmons[j])[2]-1));
       for (k = 0; k < leadexp(tempmons[j])[2];k++)
       {
-	   entry = entry*(theta-(q^k-1)/(q-1));
+           entry = entry*(theta-(q^k-1)/(q-1));
       }
       tempmons[j] = entry;
     }
@@ -2264,28 +2256,28 @@ SEE ALSO: homogfacFirstWeyl
         }
         else
         {
-	     if (shift < 0)
-	     {//We have two distict formulas for x and y. In this case use formula for y
-		  if (shift == -1)
-		  {
-		       result[i][j] = subst(result[i][j],theta,1/q*(theta - 1));
-		  }
-		  else
-		  {
-		       result[i][j] = subst(result[i][j],theta,1/q*((theta - 1)/q^(absValue(shift)-1) - (q^(shift +2)-q)/(1-q)));
-		  }
-	     }//We have two distict formulas for x and y. In this case use formula for y
-	     if (shift > 0)
-	     {//We have two distict formulas for x and y. In this case use formula for x
-		  if (shift == 1)
-		  {
-		       result[i][j] = subst(result[i][j],theta,q*theta + 1);
-		  }
-		  else
-		  {
-		       result[i][j] = subst(result[i][j],theta,q^shift*theta+(q^shift-1)/(q-1));
-		  }
-	     }//We have two distict formulas for x and y. In this case use formula for x
+             if (shift < 0)
+             {//We have two distict formulas for x and y. In this case use formula for y
+                  if (shift == -1)
+                  {
+                       result[i][j] = subst(result[i][j],theta,1/q*(theta - 1));
+                  }
+                  else
+                  {
+                       result[i][j] = subst(result[i][j],theta,1/q*((theta - 1)/q^(absValue(shift)-1) - (q^(shift +2)-q)/(1-q)));
+                  }
+             }//We have two distict formulas for x and y. In this case use formula for y
+             if (shift > 0)
+             {//We have two distict formulas for x and y. In this case use formula for x
+                  if (shift == 1)
+                  {
+                       result[i][j] = subst(result[i][j],theta,q*theta + 1);
+                  }
+                  else
+                  {
+                       result[i][j] = subst(result[i][j],theta,q^shift*theta+(q^shift-1)/(q-1));
+                  }
+             }//We have two distict formulas for x and y. In this case use formula for x
         }
       }
     }//adjust the a_0-parts
@@ -2364,14 +2356,14 @@ SEE ALSO: homogfacFirstWeyl
           break;
         }//stop here
         //Here, we can only have a a0- part
-	if (shift_sign<0)
-	{
-	     leftpart[j] = subst(leftpart[j-1],theta, 1/q*(theta +shift_sign));
-	}
-	if (shift_sign>0)
-	{
-	     leftpart[j] = subst(leftpart[j-1],theta, q*theta + shift_sign);
-	}
+        if (shift_sign<0)
+        {
+             leftpart[j] = subst(leftpart[j-1],theta, 1/q*(theta +shift_sign));
+        }
+        if (shift_sign>0)
+        {
+             leftpart[j] = subst(leftpart[j-1],theta, q*theta + shift_sign);
+        }
         leftpart[j-1] = shiftvar;
         lparts = lparts + list(leftpart);
       }//drip x resp. y
@@ -2397,14 +2389,14 @@ SEE ALSO: homogfacFirstWeyl
         {
           break;
         }
-	if (shift_sign<0)
-	{
-	     rightpart[j] = subst(rightpart[j+1], theta, q*theta - shift_sign);
-	}
-	if (shift_sign>0)
-	{
-	     rightpart[j] = subst(rightpart[j+1], theta, 1/q*(theta - shift_sign));
-	}
+        if (shift_sign<0)
+        {
+             rightpart[j] = subst(rightpart[j+1], theta, q*theta - shift_sign);
+        }
+        if (shift_sign>0)
+        {
+             rightpart[j] = subst(rightpart[j+1], theta, 1/q*(theta - shift_sign));
+        }
         rightpart[j+1] = shiftvar;
         rparts = rparts + list(rightpart);
       }
