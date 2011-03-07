@@ -1321,20 +1321,14 @@ BOOLEAN iiAssign(leftv l, leftv r)
     Werror("`%s` is read-only",l->Name());
   }
 
-  if(l->attribute!=NULL)
+  if (l->rtyp==IDHDL)
   {
-    if (l->rtyp==IDHDL)
-    {
-      atKillAll((idhdl)l->data);
-      l->attribute=NULL;
-    }
-    else
-      atKillAll((idhdl)l);
-  }
-  if(l->rtyp==IDHDL)
-  {
+    atKillAll((idhdl)l->data);
     IDFLAG((idhdl)l->data)=0;
+    l->attribute=NULL;
   }
+  else if (l->attribute!=NULL)
+    atKillAll((idhdl)l);
   l->flag=0;
   if (ll==1)
   {

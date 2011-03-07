@@ -197,7 +197,7 @@ void atSet(leftv root,const char * name,void * data,int typ)
       {
         idhdl h=(idhdl)root->data;
         h->attribute=h->attribute->set(name,data,typ);
-        root->attribute=h->attribute;
+        //??// root->attribute=h->attribute;
       }
       else
       {
@@ -257,12 +257,17 @@ BOOLEAN atATTRIB1(leftv res,leftv a)
 {
   leftv v=a;
   int t;
+  attr at;
   if (a->e!=NULL)
   {
     v=a->LData();
     if (v==NULL) return TRUE;
   }
-  attr at=v->attribute;
+  at=v->attribute;
+  if ((a->rtyp==IDHDL)&&(a->e==NULL))
+  {
+    at=IDATTR((idhdl)v->data);
+  }
   BOOLEAN haveNoAttribute=TRUE;
   if (hasFlag(v,FLAG_STD))
   {
@@ -324,7 +329,11 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
 #endif
   else
   {
-    attr at=v->attribute->get(name);
+    attr at;
+    if (v->rtyp==IDHDL)
+      at=IDATTR((idhdl)v->data);
+    else
+      at=v->attribute->get(name);
     if (at!=NULL)
     {
       res->rtyp=at->atyp;
@@ -349,7 +358,10 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
     if (v==NULL) return TRUE;
     h=NULL;
   }
+  if (a->rtyp!=IDHDL) h=NULL;
+
   attr *at=&(v->attribute);
+  if (h!=NULL) at=&(IDATTR(h));
   char *name=(char *)b->Data();
   if (strcmp(name,"isSB")==0)
   {
@@ -419,8 +431,8 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
   else
   {
     int typ=c->Typ();
-    atSet(v,omStrDup(name),c->CopyD(typ),typ/*c->T(yp()*/);
-    if (h!=NULL) IDATTR(h)=v->attribute;
+    if (h!=NULL) atSet(h,omStrDup(name),c->CopyD(typ),typ/*c->T(yp()*/);
+    else         atSet(v,omStrDup(name),c->CopyD(typ),typ/*c->T(yp()*/);
   }
   return FALSE;
 }

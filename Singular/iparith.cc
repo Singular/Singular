@@ -1214,7 +1214,6 @@ static BOOLEAN jjINDEX_I(leftv res, leftv u, leftv v)
   res->rtyp=u->rtyp; u->rtyp=0;
   res->data=u->data; u->data=NULL;
   res->name=u->name; u->name=NULL;
-  res->attribute=u->attribute; u->attribute=NULL;
   res->e=u->e;       u->e=NULL;
   if (res->e==NULL) res->e=jjMakeSub(v);
   else
@@ -1254,7 +1253,6 @@ static BOOLEAN jjINDEX_IV(leftv res, leftv u, leftv v)
     p->data=u->data;
     p->name=u->name;
     p->flag=u->flag;
-    p->attribute=u->attribute;
     p->e=jjMakeSub(&t);
   }
   u->rtyp=0;
@@ -4925,7 +4923,6 @@ static BOOLEAN jjBRACK_Im(leftv res, leftv u, leftv v,leftv w)
   res->data=u->data; u->data=NULL;
   res->rtyp=u->rtyp; u->rtyp=0;
   res->name=u->name; u->name=NULL;
-  res->attribute=u->attribute; u->attribute=NULL;
   Subexpr e=jjMakeSub(v);
           e->next=jjMakeSub(w);
   if (u->e==NULL) res->e=e;
@@ -4954,7 +4951,6 @@ static BOOLEAN jjBRACK_Ma(leftv res, leftv u, leftv v,leftv w)
   res->data=u->data; u->data=NULL;
   res->rtyp=u->rtyp; u->rtyp=0;
   res->name=u->name; u->name=NULL;
-  res->attribute=u->attribute; u->attribute=NULL;
   Subexpr e=jjMakeSub(v);
           e->next=jjMakeSub(w);
   if (u->e==NULL)
