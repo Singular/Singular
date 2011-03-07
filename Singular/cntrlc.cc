@@ -72,6 +72,7 @@
 #endif
 
 si_link pipeLastLink=NULL;
+BOOLEAN singular_in_batchmode=FALSE;
 
 void sig_pipe_hdl(int sig)
 {

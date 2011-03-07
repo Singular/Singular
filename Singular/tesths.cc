@@ -236,6 +236,7 @@ int main(          /* main entry to Singular */
   /* start shell */
   if (fe_fgets_stdin==fe_fgets_dummy)
   {
+    singular_in_batchmode=TRUE;
     char *linkname=(char*) feOptValue(FE_OPT_LINK);
     if((linkname!=NULL)&&(strcmp(linkname,"ssi")==0))
     {

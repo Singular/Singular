@@ -16,4 +16,7 @@ extern int siRandomStart;
 extern BOOLEAN siCntrlc;
 void init_signals();
 
+extern BOOLEAN singular_in_batchmode;
+/* TRUE for child of a fork or started with --batch*/
+
 #endif
