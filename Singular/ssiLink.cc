@@ -1195,6 +1195,15 @@ const char* slStatusSsi(si_link l, const char* request)
 
 int slStatusSsiL(lists L, int timeout)
 {
+// input: L: a list with snks of type 
+//           si-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
+//        timeout: timeout for select in micro-seconds
+//           or -1 for infinity
+//           or 0 for polling
+// returns: ERROR (via Werror): L has wrong elements or link not open
+//           -2: select returns an error
+//           0: timeout or (polling): none ready
+//           i>0: (at least) L[i] is ready
   si_link l;
   ssiInfo *d;
   #ifdef HAVE_MPSR
@@ -1254,7 +1263,7 @@ int slStatusSsiL(lists L, int timeout)
   if (s==-1) return -2; /*error*/
   if (s==0)
   {
-    return -1; /*poll: not ready */
+    return 0; /*poll: not ready */
   }
   else /* s>0, at least one ready */
   {
