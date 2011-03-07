@@ -49,26 +49,42 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
     l->rtyp=STRING_CMD;
     return FALSE;
   }
-  Werror("blackbox_Op1 of type %s(%d) for op %s(%d) not implemented",
-     getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
+  if (op<127)
+    Werror("blackbox_Op1 of type %s(%d) for op '%c' not implemented",
+      getBlackboxName(r->Typ()),r->Typ(),op);
+  else
+    Werror("blackbox_Op1 of type %s(%d) for op %s(%d) not implemented",
+      getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
   return TRUE;
 }
 BOOLEAN blackboxDefaultOp2(int op,leftv l, leftv r1, leftv r2)
 {
-  Werror("blackbox_Op2 of type %s(%d) for op %s(%d) not implemented",
-     getBlackboxName(r1->Typ()),r1->Typ(),Tok2Cmdname(op),op);
+  if (op<127)
+    Werror("blackbox_Op2 of type %s(%d) for op '%c' not implemented",
+      getBlackboxName(r1->Typ()),r1->Typ(),op);
+  else
+    Werror("blackbox_Op2 of type %s(%d) for op %s(%d) not implemented",
+      getBlackboxName(r1->Typ()),r1->Typ(),Tok2Cmdname(op),op);
   return TRUE;
 }
 BOOLEAN blackbox_default_Op3(int op,leftv l, leftv r1,leftv r2, leftv r3)
 {
-  Werror("blackbox_Op3 of type %s(%d) for op %s(%d) not implemented",
-     getBlackboxName(r1->Typ()),r1->Typ(),Tok2Cmdname(op),op);
+  if (op<127)
+    Werror("blackbox_Op3 of type %s(%d) for op '%c' not implemented",
+      getBlackboxName(r1->Typ()),r1->Typ(),op);
+  else
+    Werror("blackbox_Op3 of type %s(%d) for op %s(%d) not implemented",
+      getBlackboxName(r1->Typ()),r1->Typ(),Tok2Cmdname(op),op);
   return TRUE;
 }
 BOOLEAN blackbox_default_OpM(int op,leftv l, leftv r)
 {
-  Werror("blackbox_OpM of type %s(%d) for op %s(%d) not implemented",
-     getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
+  if (op<127)
+    Werror("blackbox_OpM of type %s(%d) for op '%c' not implemented",
+      getBlackboxName(r->Typ()),r->Typ(),op);
+  else
+    Werror("blackbox_OpM of type %s(%d) for op %s(%d) not implemented",
+      getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
   return TRUE;
 }
 
