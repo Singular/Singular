@@ -1059,6 +1059,7 @@ void Print(const char *fmt, ...)
     if ((l==-1)||(s[l]!='\0')||(l!=strlen(s)))
     {
       printf("Print problem: l=%d, fmt=>>%s<<\n",l,fmt);
+      s[l]='\0';
     }
 #else
     vsprintf(s, fmt, ap);
