@@ -55,6 +55,7 @@ typedef struct
   int fd_read,fd_write; /* only valid for fork/tcp mode*/
   char level;
   char ungetc_buf; /* status sets to !=0, if ungetc was used, ssiRead* set to 0*/
+  char send_quit_at_exit;
 
 } ssiInfo;
 
@@ -577,7 +578,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       pipe(pc);
       pipe(cp);
       pid_t pid=fork();
-      if (pid==0) /*child*/
+      if (pid==0) /*fork: child*/
       {
         link_list hh=(link_list)ssiToBeClosed->next;
         /* we know: l is the first entry in ssiToBeClosed-list */
@@ -626,7 +627,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         }
         /* never reached*/
       }
-      else if (pid>0)
+      else if (pid>0) /*fork: parent*/
       {
         d->pid=pid;
         close(pc[0]); close(cp[1]);
@@ -635,6 +636,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         d->f_write=fdopen(pc[1],"w");
         d->fd_write=pc[1];
         SI_LINK_SET_RW_OPEN_P(l);
+        d->send_quit_at_exit=1;
       }
       else
       {
@@ -780,6 +782,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
       d->f_read = fdopen(newsockfd, "r");
       d->f_write = fdopen(newsockfd, "w");
       SI_LINK_SET_RW_OPEN_P(l);
+      d->send_quit_at_exit=1;
       close(sockfd);
       fprintf(d->f_write,"98 %d %d %u %u\n",SSI_VERSION,MAX_TOK,test,verbose);
     }
@@ -873,7 +876,10 @@ LINKAGE BOOLEAN ssiClose(si_link l)
     if ((strcmp(l->mode,"tcp")==0)
     || (strcmp(l->mode,"fork")==0))
     {
-      fprintf(d->f_write,"99\n");fflush(d->f_write);
+      if (d->send_quit_at_exit)
+      {
+        fprintf(d->f_write,"99\n");fflush(d->f_write);
+      }
       link_list hh=ssiToBeClosed;
       if (hh!=NULL)
       {
