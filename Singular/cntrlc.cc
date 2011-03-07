@@ -385,16 +385,23 @@ void sigint_handler(int sig)
   {
     int cnt=0;
     int c;
-    fprintf(stderr,"// ** Interrupt at cmd:`%s` in line:'%s'\n",
-      Tok2Cmdname(iiOp),my_yylinebuf);
-    if (feGetOptValue(FE_OPT_EMACS) == NULL)
+    if(singular_in_batchmode)
     {
-      fputs("abort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
-      c = fgetc(stdin);
+      c = 'q';
     }
     else
     {
-      c = 'a';
+      fprintf(stderr,"// ** Interrupt at cmd:`%s` in line:'%s'\n",
+        Tok2Cmdname(iiOp),my_yylinebuf);
+      if (feGetOptValue(FE_OPT_EMACS) == NULL)
+      {
+        fputs("abort command(a), continue(c) or quit Singular(q) ?",stderr);fflush(stderr);
+        c = fgetc(stdin);
+      }
+      else
+      {
+        c = 'a';
+      }
     }
 
     switch(c)
