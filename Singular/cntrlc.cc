@@ -206,7 +206,11 @@ void sigsegv_handler(int sig, sigcontext s)
   }
 #endif /* __OPTIMIZE__ */
 #ifdef CALL_GDB
-  if (sig!=SIGINT) debug(INTERACTIVE);
+  if (sig!=SIGINT) 
+  {
+    if (singular_in_batchmode) debug(STACK_TRACE);
+    else                       debug(INTERACTIVE);
+  }
 #endif /* CALL_GDB */
   exit(0);
 }
