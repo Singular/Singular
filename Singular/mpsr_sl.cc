@@ -27,6 +27,7 @@
 #include <Singular/subexpr.h>
 #include <Singular/ipid.h>
 #include <Singular/silink.h>
+#include <Singular/cntrlc.h>
 #include <Singular/feOpt.h>
 
 
@@ -291,6 +292,7 @@ LINKAGE MP_Link_pt slOpenMPFork(si_link l, int n_argc, char **n_argv)
       SI_LINK_SET_RW_OPEN_P(l);
       l->data = (void *) link;
       fe_fgets_stdin=fe_fgets_dummy;
+      singular_in_batchmode=TRUE;
       //myynest=0;
       _exit(Batch_ReadEval(slCopy(l)));
     }

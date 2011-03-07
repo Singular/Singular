@@ -36,6 +36,7 @@
 #include <kernel/options.h>
 #include <Singular/subexpr.h>
 #include <Singular/silink.h>
+#include <Singular/cntrlc.h>
 #include <Singular/lists.h>
 #include <Singular/ssiLink.h>
 
@@ -604,6 +605,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         l->data=d;
         omFree(l->mode);
         l->mode = omStrDup(mode);
+	singular_in_batchmode=TRUE;
         SI_LINK_SET_RW_OPEN_P(l);
         //myynest=0;
         fe_fgets_stdin=fe_fgets_dummy;
