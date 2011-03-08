@@ -7,36 +7,37 @@
 /*
 * ABSTRACT: interface to coefficient aritmetics
 */
-#include <kernel/structs.h>
+#include "coeffs.h"
 
-#define n_Copy(n, r)          (r)->cf->cfCopy(n,r)
-#define n_Delete(n, r)        (r)->cf->cfDelete(n,r)
-#define n_Mult(n1, n2, r)     (r)->cf->nMult(n1, n2)
-#define n_Add(n1, n2, r)      (r)->cf->nAdd(n1, n2)
-#define n_IsZero(n, r)        (r)->cf->nIsZero(n)
-#define n_Equal(n1, n2, r)    (r)->cf->nEqual(n1, n2)
-#define n_Neg(n, r)           (r)->cf->nNeg(n)
-#define n_Sub(n1, n2, r)      (r)->cf->nSub(n1, n2)
-//#define n_GetChar(r)          ((r)->cf->nChar)
+#define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
+
+#define n_Copy(n, r)          (r)->cfCopy(n,r)
+#define n_Delete(n, r)        (r)->cfDelete(n,r)
+#define n_Mult(n1, n2, r)     (r)->nMult(n1, n2,r)
+#define n_Add(n1, n2, r)      (r)->nAdd(n1, n2,r)
+#define n_IsZero(n, r)        (r)->nIsZero(n,r)
+#define n_Equal(n1, n2, r)    (r)->nEqual(n1, n2,r)
+#define n_Neg(n, r)           (r)->nNeg(n,r)
+#define n_Sub(n1, n2, r)      (r)->nSub(n1, n2,r)
 #define n_GetChar(r)          ((r)->ch)
-#define n_Init(i, r)          (r)->cf->cfInit(i,r)
-#define n_IsOne(n, r)         (r)->cf->nIsOne(n)
-#define n_IsMOne(n, r)        (r)->cf->nIsMOne(n)
-#define n_GreaterZero(n, r)   (r)->cf->nGreaterZero(n)
-#define n_Write(n, r)         (r)->cf->cfWrite(n,r)
-#define n_Normalize(n, r)     (r)->cf->nNormalize(n)
-#define n_Gcd(a, b, r)        (r)->cf->nGcd(a,b,r)
-#define n_IntDiv(a, b, r)     (r)->cf->nIntDiv(a,b)
-#define n_Div(a, b, r)        (r)->cf->nDiv(a,b)
-#define n_Invers(a, r)     (r)->cf->nInvers(a)
-#define n_ExactDiv(a, b, r)   (r)->cf->nExactDiv(a,b)
-#define n_Test(a,r)           (r)->cf->nDBTest(a,__FILE__,__LINE__)
+#define n_Init(i, r)          (r)->cfInit(i,r)
+#define n_IsOne(n, r)         (r)->nIsOne(n,r)
+#define n_IsMOne(n, r)        (r)->nIsMOne(n,r)
+#define n_GreaterZero(n, r)   (r)->nGreaterZero(n,r)
+#define n_Write(n, r)         (r)->cfWrite(n,r)
+#define n_Normalize(n, r)     (r)->nNormalize(n,r)
+#define n_Gcd(a, b, r)        (r)->nGcd(a,b,r)
+#define n_IntDiv(a, b, r)     (r)->nIntDiv(a,b,r)
+#define n_Div(a, b, r)        (r)->nDiv(a,b,r)
+#define n_Invers(a, r)        (r)->nInvers(a,r)
+#define n_ExactDiv(a, b, r)   (r)->nExactDiv(a,b,r)
+#define n_Test(a,r)           (r)->nDBTest(a,r,__FILE__,__LINE__)
 
-#define n_InpMult(a, b, r)    (r)->cf->nInpMult(a,b,r)
-#define n_Power(a, b, res, r) (r)->cf->nPower(a,b,res)
-#define n_Size(n,r)           (r)->cf->nSize(n)
-#define n_GetDenom(N,r)       (r)->cf->cfGetDenom((N),r)
-#define n_GetNumerator(N,r)   (r)->cf->cfGetNumerator((N),r)
+#define n_InpMult(a, b, r)    (r)->nInpMult(a,b,r)
+#define n_Power(a, b, res, r) (r)->nPower(a,b,res,r)
+#define n_Size(n,r)           (r)->nSize(n,r)
+#define n_GetDenom(N,r)       (r)->cfGetDenom((N),r)
+#define n_GetNumerator(N,r)   (r)->cfGetNumerator((N),r)
 
 #define n_New(n, r)           nNew(n)
 
@@ -44,45 +45,9 @@
 extern unsigned short fftable[];
 
 /* prototypes */
-extern numberfunc nMult, nSub ,nAdd ,nDiv, nIntDiv, nIntMod, nExactDiv;
 void           nNew(number * a);
-extern number  (*nInit_bigint)(number i);
 #define        nInit(i) n_Init(i,currRing)
-extern number  (*nPar)(int i);
-extern int     (*nParDeg)(number n);
-/* size: a measure for the complexity of the represented number n;
-         zero should have size zero; larger size means more complex */
-extern int     (*nSize)(number n);
-extern int     (*n_Int)(number &n, const ring r);
-#ifdef HAVE_RINGS
-extern int     (*nDivComp)(number a,number b);
-extern BOOLEAN (*nIsUnit)(number a);
-extern number  (*nGetUnit)(number a);
-extern number  (*nExtGcd)(number a, number b, number *s, number *t);
-#endif
-// always use in the form    n=nNeg(n) !
-extern number  (*nNeg)(number a);
-extern number  (*nInvers)(number a);
-extern number  (*nCopy)(number a);
-extern number  (*nRePart)(number a);
-extern number  (*nImPart)(number a);
 #define nWrite(A) n_Write(A,currRing)
-extern const char *  (*nRead)(const char * s, number * a);
-extern void    (*nNormalize)(number &a);
-extern BOOLEAN (*nGreater)(number a,number b),
-#ifdef HAVE_RINGS
-               (*nDivBy)(number a,number b),
-#endif
-               (*nEqual)(number a,number b),
-               (*nIsZero)(number a),
-               (*nIsOne)(number a),
-               (*nIsMOne)(number a),
-               (*nGreaterZero)(number a);
-extern void    (*nPower)(number a, int i, number * result);
-extern number (*nGcd)(number a, number b, const ring r);
-extern number (*nLcm)(number a, number b, const ring r);
-
-extern number nNULL; /* the 0 as constant */
 
 #define nTest(a) (1)
 #define nDelete(A) (currRing)->cf->cfDelete(A,currRing)
@@ -90,27 +55,172 @@ extern number nNULL; /* the 0 as constant */
 #define nGetNumerator(N) (currRing->cf->cfGetNumerator((N),currRing))
 
 #define nSetMap(R) (currRing->cf->cfSetMap(R,currRing))
-extern char *  (*nName)(number n);
 
 void nDummy1(number* d);
-void ndDelete(number* d, const ring r);
+void ndDelete(number* d, const coeffs r);
 void nDummy2(number &d);
-number ndGcd(number a, number b, const ring);
-number ndCopy(number a);
-void   ndInpMult(number &a, number b, const ring r);
-number ndInpAdd(number &a, number b, const ring r);
+number ndGcd(number a, number b, const coeffs);
+number ndCopy(number a, const coeffs r);
+void   ndInpMult(number &a, number b, const coeffs r);
+number ndInpAdd(number &a, number b, const coeffs r);
 
 #ifdef LDEBUG
 void nDBDummy1(number* d,char *f, int l);
 #endif
 #define nGetChar() n_GetChar(currRing)
 
-void nInitChar(ring r);
-void nKillChar(ring r);
-void nSetChar(ring r);
+void nInitChar(coeffs r);
+void nKillChar(coeffs r);
+void nSetChar(coeffs r);
 
 #define nDivBy0 "div by 0"
 
 // dummy routines
 void   nDummy2(number& d); // nNormalize...
+
+// Tests:
+#ifdef HAVE_RINGS
+static inline BOOLEAN nField_is_Ring_2toM(const coeffs r)
+{ return (r->ringtype == 1); }
+
+static inline BOOLEAN nField_is_Ring_ModN(const coeffs r)
+{ return (r->ringtype == 2); }
+
+static inline BOOLEAN nField_is_Ring_PtoM(const coeffs r)
+{ return (r->ringtype == 3); }
+
+static inline BOOLEAN nField_is_Ring_Z(const coeffs r)
+{ return (r->ringtype == 4); }
+
+static inline BOOLEAN nField_is_Ring(const coeffs r)
+{ return (r->ringtype != 0); }
+
+static inline BOOLEAN nField_is_Domain(const coeffs r)
+{ return (r->ringtype == 4 || r->ringtype == 0); }
+
+static inline BOOLEAN nField_has_Units(const coeffs r)
+{ return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
+#else
+#define nField_is_Ring(A) (0)
+#endif
+
+#ifdef HAVE_RINGS
+static inline BOOLEAN nField_is_Zp(const coeffs r)
+{ return (r->ringtype == 0) && (r->ch > 1) && (r->parameter==NULL); }
+
+static inline BOOLEAN nField_is_Zp(const coeffs r, int p)
+{ return (r->ringtype == 0) && (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
+
+static inline BOOLEAN nField_is_Q(const coeffs r)
+{ return (r->ringtype == 0) && (r->ch == 0) && (r->parameter==NULL); }
+
+static inline BOOLEAN nField_is_numeric(const coeffs r) /* R, long R, long C */
+{ return (r->ringtype == 0) && (r->ch ==  -1); }
+
+static inline BOOLEAN nField_is_R(const coeffs r)
+{
+  if (nField_is_numeric(r) && (r->float_len <= (short)SHORT_REAL_LENGTH))
+      return (r->ringtype == 0) && (r->parameter==NULL);
+  return FALSE;
+}
+
+static inline BOOLEAN nField_is_GF(const coeffs r)
+{ return (r->ringtype == 0) && (r->ch > 1) && (r->parameter!=NULL); }
+
+static inline BOOLEAN nField_is_GF(const coeffs r, int q)
+{ return (r->ringtype == 0) && (r->ch == q); }
+
+static inline BOOLEAN nField_is_Zp_a(const coeffs r)
+{ return (r->ringtype == 0) && (r->ch < -1); }
+
+static inline BOOLEAN nField_is_Zp_a(const coeffs r, int p)
+{ return (r->ringtype == 0) && (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
+
+static inline BOOLEAN nField_is_Q_a(const coeffs r)
+{ return (r->ringtype == 0) && (r->ch == 1); }
+
+static inline BOOLEAN nField_is_long_R(const coeffs r)
+{
+  if (nField_is_numeric(r) && (r->float_len >(short)SHORT_REAL_LENGTH))
+    return (r->ringtype == 0) && (r->parameter==NULL);
+  return FALSE;
+}
+
+static inline BOOLEAN nField_is_long_C(const coeffs r)
+{
+  if (nField_is_numeric(r))
+    return (r->ringtype == 0) && (r->parameter!=NULL);
+  return FALSE;
+}
+#else
+static inline BOOLEAN nField_is_Zp(const coeffs r)
+{ return (r->ch > 1) && (r->parameter==NULL); }
+
+static inline BOOLEAN nField_is_Zp(const coeffs r, int p)
+{ return (r->ch > 1 && r->ch == ABS(p) && r->parameter==NULL); }
+
+static inline BOOLEAN nField_is_Q(const coeffs r)
+{ return (r->ch == 0) && (r->parameter==NULL); }
+
+static inline BOOLEAN nField_is_numeric(const coeffs r) /* R, long R, long C */
+{ return (r->ch ==  -1); }
+
+static inline BOOLEAN nField_is_R(const coeffs r)
+{
+  if (nField_is_numeric(r) && (r->float_len <= (short)SHORT_REAL_LENGTH))
+    return (r->parameter==NULL);
+  return FALSE;
+}
+
+static inline BOOLEAN nField_is_GF(const coeffs r)
+{ return (r->ch > 1) && (r->parameter!=NULL); }
+
+static inline BOOLEAN nField_is_GF(const coeffs r, int q)
+{ return (r->ch == q); }
+
+static inline BOOLEAN nField_is_Zp_a(const coeffs r)
+{ return (r->ch < -1); }
+
+static inline BOOLEAN nField_is_Zp_a(const coeffs r, int p)
+{ return (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
+
+static inline BOOLEAN nField_is_Q_a(const coeffs r)
+{ return (r->ch == 1); }
+
+static inline BOOLEAN nField_is_long_R(const coeffs r)
+{
+  if (nField_is_numeric(r) && (r->float_len >(short)SHORT_REAL_LENGTH))
+    return (r->parameter==NULL);
+  return FALSE;
+}
+
+static inline BOOLEAN nField_is_long_C(const coeffs r)
+{
+  if (nField_is_numeric(r))
+    return (r->parameter!=NULL);
+  return FALSE;
+}
+#endif
+
+static inline BOOLEAN nField_has_simple_inverse(const coeffs r)
+/* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
+#ifdef HAVE_RINGS
+{ return (r->ringtype > 0) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
+#else
+{ return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
+#endif
+
+static inline BOOLEAN nField_has_simple_Alloc(const coeffs r)
+{ return (nField_is_Zp(r)
+       || nField_is_GF(r)
+#ifdef HAVE_RINGS
+       || nField_is_Ring_2toM(r)
+#endif
+       || nField_is_R(r));
+}
+/* Z/p, GF(p,n), R: nCopy, nNew, nDelete are dummies*/
+
+static inline BOOLEAN nField_is_Extension(const coeffs r)
+{ return (nField_is_Q_a(r)) || (nField_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
+
 #endif

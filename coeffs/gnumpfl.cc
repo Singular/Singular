@@ -381,8 +381,8 @@ void ngfWrite (number &a, const ring r)
   {
     out= floatToStr(*(gmp_float*)a,gmp_output_digits);
     StringAppendS(out);
-    //omFreeSize((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
-    omFree( (ADDRESS)out );
+    //omFreeSize((void *)out, (strlen(out)+1)* sizeof(char) );
+    omFree( (void *)out );
   }
   else
   {

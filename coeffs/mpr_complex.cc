@@ -597,17 +597,17 @@ char *floatToStr( const gmp_float & r, const unsigned int oprec )
   && (exponent < (int)oprec)
   && (strlen(in)-(in[0]=='-'?1:0) == oprec) )
   {
-    omFree( (ADDRESS) in );
+    omFree( (void *) in );
     insize= (exponent+oprec+2) * sizeof(char) + 10;
     in= (char*)omAlloc( insize );
     int newprec= exponent+oprec;
     mpf_get_str(in,&exponent,10,newprec,*(r.mpfp()));
   }
   nout= nicifyFloatStr( in, exponent, oprec, &size, SIGN_EMPTY );
-  omFree( (ADDRESS) in );
+  omFree( (void *) in );
   out= (char*)omAlloc( (strlen(nout)+1) * sizeof(char) );
   strcpy( out, nout );
-  omFree( (ADDRESS) nout );
+  omFree( (void *) nout );
 
   return out;
 #else
@@ -739,8 +739,8 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec )
       else
         sprintf(out,"(%s%s)",c.imag().sign()>=0?"I*":"-I*",in_imag);
     }
-    omFree( (ADDRESS) in_real );
-    omFree( (ADDRESS) in_imag );
+    omFree( (void *) in_real );
+    omFree( (void *) in_imag );
   }
   else
   {

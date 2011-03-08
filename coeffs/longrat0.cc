@@ -138,7 +138,7 @@ void nlWrite (number &a, const ring r)
       z=mpz_get_str(s,10,a->n);
       StringAppendS(z);
     }
-    omFreeSize((ADDRESS)s,l);
+    omFreeSize((void *)s,l);
   }
 }
 

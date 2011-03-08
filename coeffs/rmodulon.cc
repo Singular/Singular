@@ -40,7 +40,7 @@ void nrnDelete(number *a, const ring r)
 {
   if (*a == NULL) return;
   mpz_clear((int_number) *a);
-  omFreeBin((ADDRESS) *a, gmp_nrz_bin);
+  omFreeBin((void *) *a, gmp_nrz_bin);
   *a = NULL;
 }
 

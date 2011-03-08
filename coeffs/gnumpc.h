@@ -7,41 +7,40 @@
 /*
 * ABSTRACT: computations with GMP floating-point numbers
 */
-#include <kernel/structs.h>
+#include "coeffs.h"
 
-BOOLEAN  ngcGreaterZero(number za);      // !!! MAY NOT WORK AS EXPECTED !!!
-BOOLEAN  ngcGreater(number a, number b);
-BOOLEAN  ngcEqual(number a, number b);
-BOOLEAN  ngcIsOne(number a);
-BOOLEAN  ngcIsMOne(number a);
-BOOLEAN  ngcIsZero(number za);
-number   ngcInit(int i, const ring r);
-int      ngcInt(number &n, const ring r);
-number   ngcNeg(number za);
-number   ngcInvers(number a);
-number   ngcPar(int i);
-number   ngcAdd(number la, number li);
-number   ngcSub(number la, number li);
-number   ngcMult(number a, number b);
-number   ngcDiv(number a, number b);
-int      ngcSize(number n);
-void     ngcPower(number x, int exp, number *lu);
+BOOLEAN  ngcGreaterZero(number za, const coeffs r); // !!! MAY NOT WORK AS EXPECTED !!!
+BOOLEAN  ngcGreater(number a, number b, const coeffs r);
+BOOLEAN  ngcEqual(number a, number b, const coeffs r);
+BOOLEAN  ngcIsOne(number a, const coeffs r);
+BOOLEAN  ngcIsMOne(number a, const coeffs r);
+BOOLEAN  ngcIsZero(number za, const coeffs r);
+number   ngcInit(int i, const coeffs r);
+int      ngcInt(number &n, const coeffs r);
+number   ngcNeg(number za, const coeffs r);
+number   ngcInvers(number a, const coeffs r);
+number   ngcPar(int i, const coeffs r);
+number   ngcAdd(number la, number li, const coeffs r);
+number   ngcSub(number la, number li, const coeffs r);
+number   ngcMult(number a, number b, const coeffs r);
+number   ngcDiv(number a, number b, const coeffs r);
+void     ngcPower(number x, int exp, number *lu, const coeffs r);
 number   ngcCopy(number a);
-number   ngc_Copy(number a, ring r);
-const char * ngcRead (const char *s, number *a);
-void     ngcWrite(number &a, const ring r);
-number   ngcRePart(number a);
-number   ngcImPart(number a);
+number   ngc_Copy(number a, coeffs r);
+const char * ngcRead (const char *s, number *a, const coeffs r);
+void     ngcWrite(number &a, const coeffs r);
+number   ngcRePart(number a, const coeffs r);
+number   ngcImPart(number a, const coeffs r);
 
 
 #ifdef LDEBUG
 BOOLEAN  ngcDBTest(number a, const char *f, const int l);
 #endif
-void     ngcDelete(number *a, const ring r);
+void     ngcDelete(number *a, const coeffs r);
 
-nMapFunc  ngcSetMap(const ring src, const ring dst);
+nMapFunc  ngcSetMap(const coeffs src, const coeffs dst);
 
-number ngcMapQ(number from);
+number ngcMapQ(number from, const coeffs r);
 #endif
 
 

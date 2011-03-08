@@ -54,7 +54,7 @@ vandermonde::~vandermonde()
 {
   int j;
   for ( j= 0; j < cn; j++ ) nDelete( x+j );
-  omFreeSize( (ADDRESS)x, cn * sizeof( number ) );
+  omFreeSize( (void *)x, cn * sizeof( number ) );
 }
 
 void vandermonde::init()
@@ -144,7 +144,7 @@ poly vandermonde::numvec2poly( const number * q )
     sum+= exp[n];
   }
 
-  omFreeSize( (ADDRESS) exp, (n+1) * sizeof(int) );
+  omFreeSize( (void *) exp, (n+1) * sizeof(int) );
 
   pSortAdd(pit);
   return pit;
@@ -241,7 +241,7 @@ number * vandermonde::interpolateDense( const number * q )
 
   // free mem
   for ( j= 0; j < cn; j++ ) nDelete( c+j );
-  omFreeSize( (ADDRESS)c, cn * sizeof( number ) );
+  omFreeSize( (void *)c, cn * sizeof( number ) );
 
   nDelete( &tmp1 );
   nDelete( &s );
@@ -288,15 +288,15 @@ rootContainer::~rootContainer()
   if ( ievpoint != NULL )
   {
     for ( i=0; i < anz+2; i++ ) nDelete( ievpoint + i );
-    omFreeSize( (ADDRESS)ievpoint, (anz+2) * sizeof( number ) );
+    omFreeSize( (void *)ievpoint, (anz+2) * sizeof( number ) );
   }
 
   for ( i=0; i <= tdg; i++ ) nDelete( coeffs + i );
-  omFreeSize( (ADDRESS)coeffs, (tdg+1) * sizeof( number ) );
+  omFreeSize( (void *)coeffs, (tdg+1) * sizeof( number ) );
 
   // theroots löschen
   for ( i=0; i < tdg; i++ ) delete theroots[i];
-  omFreeSize( (ADDRESS) theroots, (tdg)*sizeof(gmp_complex*) );
+  omFreeSize( (void *) theroots, (tdg)*sizeof(gmp_complex*) );
 
   //mprPROTnl("~rootContainer()");
 }
@@ -463,7 +463,7 @@ bool rootContainer::solver( const int polishmode )
  
   // free memory
   for ( i=0; i <= tdg; i++ ) delete ad[i];
-  omFreeSize( (ADDRESS) ad, (tdg+1)*sizeof(gmp_complex*) );
+  omFreeSize( (void *) ad, (tdg+1)*sizeof(gmp_complex*) );
 
   return found_roots;
 }
@@ -546,7 +546,7 @@ bool rootContainer::laguer_driver(gmp_complex ** a, gmp_complex ** roots, bool p
 theend:
   mprSTICKYPROT("\n");
   for ( i=0; i <= tdg; i++ ) delete ad[i];
-  omFreeSize( (ADDRESS) ad, (tdg+1)*sizeof( gmp_complex* ));
+  omFreeSize( (void *) ad, (tdg+1)*sizeof( gmp_complex* ));
 
   return ret;
 }
@@ -1006,12 +1006,12 @@ simplex::~simplex()
   int i;
   for( i= 0; i < LiPM_rows; i++ )
   {
-    omFreeSize( (ADDRESS) LiPM[i], LiPM_cols * sizeof(mprfloat) );
+    omFreeSize( (void *) LiPM[i], LiPM_cols * sizeof(mprfloat) );
   }
-  omFreeSize( (ADDRESS) LiPM, LiPM_rows * sizeof(mprfloat *) );
+  omFreeSize( (void *) LiPM, LiPM_rows * sizeof(mprfloat *) );
 
-  omFreeSize( (ADDRESS) iposv, 2*LiPM_rows*sizeof(int) );
-  omFreeSize( (ADDRESS) izrov, 2*LiPM_rows*sizeof(int) );
+  omFreeSize( (void *) iposv, 2*LiPM_rows*sizeof(int) );
+  omFreeSize( (void *) izrov, 2*LiPM_rows*sizeof(int) );
 }
 
 BOOLEAN simplex::mapFromMatrix( matrix mm )
@@ -1128,9 +1128,9 @@ void simplex::compute()
       error(Warn("simplex::compute: in input Matrix row %d, column 1, value %f",i+1,LiPM[i+1][1]);)
       icase=-2;
       // free mem l1,l2,l3;
-      omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
-      omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
-      omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
+      omFreeSize( (void *) l3, (m+1) * sizeof(int) );
+      omFreeSize( (void *) l2, (m+1) * sizeof(int) );
+      omFreeSize( (void *) l1, (n+1) * sizeof(int) );
       return;
     }
     l2[i]= i;
@@ -1155,9 +1155,9 @@ void simplex::compute()
       {
         icase= -1; // no solution found
         // free mem l1,l2,l3;
-        omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
-        omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
-        omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
+        omFreeSize( (void *) l3, (m+1) * sizeof(int) );
+        omFreeSize( (void *) l2, (m+1) * sizeof(int) );
+        omFreeSize( (void *) l1, (n+1) * sizeof(int) );
         return;
       }
       else if ( bmax <= SIMPLEX_EPS && LiPM[m+2][1] <= SIMPLEX_EPS )
@@ -1192,9 +1192,9 @@ void simplex::compute()
       {
         icase = -1; // no solution found
         // free mem l1,l2,l3;
-        omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
-        omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
-        omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
+        omFreeSize( (void *) l3, (m+1) * sizeof(int) );
+        omFreeSize( (void *) l2, (m+1) * sizeof(int) );
+        omFreeSize( (void *) l1, (n+1) * sizeof(int) );
         return;
       }
     one: simp3(LiPM,m+1,n,ip,kp);
@@ -1240,9 +1240,9 @@ void simplex::compute()
     {
       icase=0; // finite solution found
       // free mem l1,l2,l3
-      omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
-      omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
-      omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
+      omFreeSize( (void *) l3, (m+1) * sizeof(int) );
+      omFreeSize( (void *) l2, (m+1) * sizeof(int) );
+      omFreeSize( (void *) l1, (n+1) * sizeof(int) );
       return;
     }
     simp2(LiPM,n,l2,nl2,&ip,kp,&q1);
@@ -1254,9 +1254,9 @@ void simplex::compute()
       // #endif
       icase=1;                /* unbounded */
       // free mem
-      omFreeSize( (ADDRESS) l3, (m+1) * sizeof(int) );
-      omFreeSize( (ADDRESS) l2, (m+1) * sizeof(int) );
-      omFreeSize( (ADDRESS) l1, (n+1) * sizeof(int) );
+      omFreeSize( (void *) l3, (m+1) * sizeof(int) );
+      omFreeSize( (void *) l2, (m+1) * sizeof(int) );
+      omFreeSize( (void *) l1, (n+1) * sizeof(int) );
       return;
     }
     simp3(LiPM,m,n,ip,kp);

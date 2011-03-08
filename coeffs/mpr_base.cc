@@ -428,10 +428,10 @@ pointSet::~pointSet()
   int fdim= lifted ? dim+1 : dim+2;
   for ( i= 0; i <= max; i++ )
   {
-    omFreeSize( (ADDRESS) points[i]->point, fdim * sizeof(Coord_t) );
-    omFreeSize( (ADDRESS) points[i], sizeof(onePoint) );
+    omFreeSize( (void *) points[i]->point, fdim * sizeof(Coord_t) );
+    omFreeSize( (void *) points[i], sizeof(onePoint) );
   }
-  omFreeSize( (ADDRESS) points, (max+1) * sizeof(onePointP) );
+  omFreeSize( (void *) points, (max+1) * sizeof(onePointP) );
 }
 
 inline const onePointP pointSet::operator[] ( const int index_i )
@@ -572,7 +572,7 @@ void pointSet::mergeWithPoly( const poly p )
 
     pIter( piter );
   }
-  omFreeSize( (ADDRESS) vert, (dim+1) * sizeof(int) );
+  omFreeSize( (void *) vert, (dim+1) * sizeof(int) );
 }
 
 int pointSet::getExpPos( const poly p )
@@ -590,7 +590,7 @@ int pointSet::getExpPos( const poly p )
       if ( points[i]->point[j] != (Coord_t) vert[j] ) break;
     if ( j > dim ) break;
   }
-  omFreeSize( (ADDRESS) vert, (dim+1) * sizeof(int) );
+  omFreeSize( (void *) vert, (dim+1) * sizeof(int) );
 
   if ( i > num ) return 0;
   else return i;
@@ -711,7 +711,7 @@ void pointSet::lift( int l[] )
 
   lifted= true;
 
-  if ( !outerL ) omFreeSize( (ADDRESS) l, (dim+1) * sizeof(int) );
+  if ( !outerL ) omFreeSize( (void *) l, (dim+1) * sizeof(int) );
 }
 //<-
 
@@ -810,7 +810,7 @@ pointSet ** convexHull::newtonPolytopesP( const ideal gls )
     mprSTICKYPROT("\n");
   } // i
 
-  omFreeSize( (ADDRESS) vert, (idelem+1) * sizeof(int) );
+  omFreeSize( (void *) vert, (idelem+1) * sizeof(int) );
 
 #ifdef mprDEBUG_PROT
   PrintLn();
@@ -874,7 +874,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
     mprSTICKYPROT("\n");
   } // i
 
-  omFreeSize( (ADDRESS) vert, (idelem+1) * sizeof(int) );
+  omFreeSize( (void *) vert, (idelem+1) * sizeof(int) );
 
 #ifdef mprDEBUG_PROT
   PrintLn();
@@ -1398,7 +1398,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
 #endif
 
   // clean up
-  omFreeSize( (ADDRESS) optSum, (LP->m) * sizeof(struct setID) );
+  omFreeSize( (void *) optSum, (LP->m) * sizeof(struct setID) );
 
   mprSTICKYPROT(ST_SPARSE_RC);
 
@@ -1478,8 +1478,8 @@ int resMatrixSparse::createMatrix( pointSet *E )
   } // for
 
   pDelete( &epp );
-  omFreeSize( (ADDRESS) epp_mon, (n+2) * sizeof(int) );
-  omFreeSize( (ADDRESS) eexp, (pVariables+1)*sizeof(int));
+  omFreeSize( (void *) epp_mon, (n+2) * sizeof(int) );
+  omFreeSize( (void *) eexp, (pVariables+1)*sizeof(int));
 
 #ifdef mprDEBUG_ALL
   if ( E->num <= 40 )
@@ -1541,7 +1541,7 @@ pointSet * resMatrixSparse::minkSumTwo( pointSet *Q1, pointSet *Q2, int dim )
     }
   }
 
-  omFreeSize( (ADDRESS) vert.point, (pVariables+2) * sizeof(Coord_t) );
+  omFreeSize( (void *) vert.point, (pVariables+2) * sizeof(Coord_t) );
 
   return vs;
 }
@@ -1716,7 +1716,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
   {
     delete Qi[i];
   }
-  omFreeSize( (ADDRESS) Qi, idelem * sizeof(pointSet*) );
+  omFreeSize( (void *) Qi, idelem * sizeof(pointSet*) );
 
   delete E;
 
@@ -2096,13 +2096,13 @@ resMatrixDense::~resMatrixDense()
         nDelete( resVectorList[i].numColVector+j );
     }
     // OB: ????? (solve_s.tst)
-    omfreeSize( (ADDRESS)resVectorList[i].numColVector,
+    omfreeSize( (void *)resVectorList[i].numColVector,
                 numVectors * sizeof( number ) );
-    omfreeSize( (ADDRESS)resVectorList[i].numColParNr,
+    omfreeSize( (void *)resVectorList[i].numColParNr,
                 (pVariables+1) * sizeof(int) );
   }
 
-  omFreeSize( (ADDRESS)resVectorList, veclistmax*sizeof( resVector ) );
+  omFreeSize( (void *)resVectorList, veclistmax*sizeof( resVector ) );
 
   // free matrix m
   if ( m != NULL )
@@ -3054,10 +3054,10 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
 
   // free some stuff: pev, presult
   for ( i=0; i < n; i++ ) nDelete( pev + i );
-  omFreeSize( (ADDRESS)pev, n * sizeof( number ) );
+  omFreeSize( (void *)pev, n * sizeof( number ) );
 
   for ( i=0; i <= tdg; i++ ) nDelete( presults+i );
-  omFreeSize( (ADDRESS)presults, (tdg + 1) * sizeof( number ) );
+  omFreeSize( (void *)presults, (tdg + 1) * sizeof( number ) );
 
   return roots;
 }
@@ -3171,7 +3171,7 @@ rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDet
 
   // free some stuff: pev, presult
   for ( i=0; i < n; i++ ) nDelete( pevpoint + i );
-  omFreeSize( (ADDRESS)pevpoint, n * sizeof( number ) );
+  omFreeSize( (void *)pevpoint, n * sizeof( number ) );
 
   return roots;
 }

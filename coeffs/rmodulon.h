@@ -8,7 +8,7 @@
 * ABSTRACT: numbers modulo n
 */
 #ifdef HAVE_RINGS
-#include <kernel/structs.h>
+#include "coeffs.h"
 
 #ifndef NATNUMBER
 #define NATNUMBER unsigned long

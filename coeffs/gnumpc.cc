@@ -8,16 +8,13 @@
 * ngc == number gnu complex
 */
 
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/longrat.h>
-#include <kernel/modulop.h>
-#include <kernel/gnumpc.h>
-#include <kernel/gnumpfl.h>
-#include <kernel/mpr_complex.h>
+#include "coeffs.h"
+#include "numbers.h"
+#include "longrat.h"
+#include "modulop.h"
+#include "gnumpc.h"
+#include "gnumpfl.h"
+#include "mpr_complex.h"
 
 extern size_t gmp_output_digits;
 
@@ -70,7 +67,7 @@ static number ngcMapP(number from)
     return NULL;
 }
 
-nMapFunc ngcSetMap(const ring src,const ring dst)
+nMapFunc ngcSetMap(const coeffs src,const coeffs dst)
 {
   if(rField_is_Q(src))
   {
@@ -105,7 +102,7 @@ number   ngcPar(int i)
 /*2
 * n := i
 */
-number ngcInit (int i, const ring r)
+number ngcInit (int i, const coeffs r)
 {
   gmp_complex* n= new gmp_complex( (long)i, (long)0 );
   return (number)n;
@@ -114,7 +111,7 @@ number ngcInit (int i, const ring r)
 /*2
 * convert number to int
 */
-int ngcInt(number &i, const ring r)
+int ngcInt(number &i, const coeffs r)
 {
   return (int)((gmp_complex*)i)->real();
 }
@@ -137,7 +134,7 @@ int ngcSize(number n)
 /*2
 * delete a
 */
-void ngcDelete (number * a, const ring r)
+void ngcDelete (number * a, const coeffs r)
 {
   if ( *a != NULL )
   {
@@ -154,7 +151,7 @@ number ngcCopy(number a)
   gmp_complex* b= new gmp_complex( *(gmp_complex*)a );
   return (number)b;
 }
-number ngc_Copy(number a, ring r)
+number ngc_Copy(number a, const coeffs r)
 {
   gmp_complex* b=new gmp_complex( *(gmp_complex*)a );
   return (number)b;
@@ -372,7 +369,7 @@ const char * ngcRead (const char * s, number * a)
 /*2
 * write a floating point number
 */
-void ngcWrite (number &a, const ring r)
+void ngcWrite (number &a, const coeffs r)
 {
   if (a==NULL)
     StringAppendS("0");
@@ -381,8 +378,8 @@ void ngcWrite (number &a, const ring r)
     char *out;
     out= complexToStr(*(gmp_complex*)a,gmp_output_digits);
     StringAppendS(out);
-    //    omFreeSize((ADDRESS)out, (strlen(out)+1)* sizeof(char) );
-    omFree( (ADDRESS)out );
+    //    omFreeSize((void *)out, (strlen(out)+1)* sizeof(char) );
+    omFree( (void *)out );
   }
 }
 

@@ -7,7 +7,7 @@
 /*
 * ABSTRACT: numbers modulo p (<=32003)
 */
-#include <kernel/structs.h>
+#include "coeffs.h"
 
 // defines are in struct.h
 // define if a*b is with mod instead of tables
@@ -21,41 +21,40 @@
 #define NV_OPS
 #define NV_MAX_PRIME 32003
 
-extern long npPrimeM;
 extern int npGen;
 extern long npMapPrime;
 
-BOOLEAN npGreaterZero (number k);
-number  npMult        (number a, number b);
-number  npInit        (int i, const ring r);
-int     npInt         (number &n, const ring r);
-number  npAdd         (number a, number b);
-number  npSub         (number a, number b);
-void    npPower       (number a, int i, number * result);
-BOOLEAN npIsZero      (number a);
-BOOLEAN npIsOne       (number a);
-BOOLEAN npIsMOne       (number a);
-number  npDiv         (number a, number b);
-number  npNeg         (number c);
-number  npInvers      (number c);
-BOOLEAN npGreater     (number a, number b);
-BOOLEAN npEqual       (number a, number b);
-void    npWrite       (number &a, const ring r);
-const char *  npRead  (const char *s, number *a);
+BOOLEAN npGreaterZero (number k, const coeffs r);
+number  npMult        (number a, number b, const coeffs r);
+number  npInit        (int i, const coeffs r);
+int     npInt         (number &n, const coeffs r);
+number  npAdd         (number a, number b,const coeffs r);
+number  npSub         (number a, number b,const coeffs r);
+void    npPower       (number a, int i, number * result,const coeffs r);
+BOOLEAN npIsZero      (number a,const coeffs r);
+BOOLEAN npIsOne       (number a,const coeffs r);
+BOOLEAN npIsMOne       (number a,const coeffs r);
+number  npDiv         (number a, number b,const coeffs r);
+number  npNeg         (number c,const coeffs r);
+number  npInvers      (number c,const coeffs r);
+BOOLEAN npGreater     (number a, number b,const coeffs r);
+BOOLEAN npEqual       (number a, number b,const coeffs r);
+void    npWrite       (number &a, const coeffs r);
+const char *  npRead  (const char *s, number *a,const coeffs r);
 #ifdef LDEBUG
-BOOLEAN npDBTest      (number a, const char *f, const int l);
-#define npTest(A)     npDBTest(A,__FILE__,__LINE__)
+BOOLEAN npDBTest      (number a,const coeffs r, const char *f, const int l);
+#define npTest(A,r)     npDBTest(A,r,__FILE__,__LINE__)
 #else
-#define npTest(A)     (0)
+#define npTest(A,r)     (0)
 #endif
-void    npSetChar(int c, ring r);
-void    npInitChar(int c, ring r);
+void    npSetChar(int c, coeffs r);
+void    npInitChar(int c, coeffs r);
 
 //int     npGetChar();
 
-nMapFunc npSetMap(const ring src, const ring dst);
-number  npMapP(number from);
-number  npMap0(number from);
+nMapFunc npSetMap(const coeffs src, const coeffs dst);
+number  npMapP(number from, const coeffs r);
+number  npMap0(number from, const coeffs r);
 /*-------specials for spolys, do NOT use otherwise--------------------------*/
 /* for npMultM, npSubM, npNegM, npEqualM : */
 #ifdef HAVE_DIV_MOD
@@ -85,16 +84,16 @@ inline number npMultM(number a, number b)
 }
 #endif
 #ifdef HAVE_MULT_MOD
-static inline number npMultM(number a, number b)
+static inline number npMultM(number a, number b, const coeffs r)
 {
   return (number) 
-    ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) npPrimeM));
+    ((((unsigned long) a)*((unsigned long) b)) % ((unsigned long) r->npPrimeM));
 }
 #else
-static inline number npMultM(number a, number b)
+static inline number npMultM(number a, number b, const coeffs r)
 {
-  long x = (long)npLogTable[(long)a]+npLogTable[(long)b];
-  return (number)(long)npExpTable[x<npPminus1M ? x : x-npPminus1M];
+  long x = (long)r->npLogTable[(long)a]+ r->npLogTable[(long)b];
+  return (number)(long)r->npExpTable[x<r->npPminus1M ? x : x- r->npPminus1M];
 }
 #endif
 
@@ -119,41 +118,41 @@ inline number npSubAsm(number a, number b, int m)
 }
 #endif
 #ifdef HAVE_GENERIC_ADD
-static inline number npAddM(number a, number b)
+static inline number npAddM(number a, number b, const coeffs r)
 {
-  long r = (long)a + (long)b;
-  return (number)(r >= npPrimeM ? r - npPrimeM : r);
+  long R = (long)a + (long)b;
+  return (number)(R >= r->npPrimeM ? R - r->npPrimeM : R);
 }
-static inline number npSubM(number a, number b)
+static inline number npSubM(number a, number b, const coeffs r)
 {
   return (number)((long)a<(long)b ?
-                       npPrimeM-(long)b+(long)a : (long)a-(long)b);
+                       r->npPrimeM-(long)b+(long)a : (long)a-(long)b);
 }
 #else
-static inline number npAddM(number a, number b)
+static inline number npAddM(number a, number b, const coeffs r)
 {
    long res = ((long)a + (long)b);
-   res -= npPrimeM;
+   res -= r->npPrimeM;
 #if SIZEOF_LONG == 8
-   res += (res >> 63) & npPrimeM;
+   res += (res >> 63) & r->npPrimeM;
 #else
-   res += (res >> 31) & npPrimeM;
+   res += (res >> 31) & r->npPrimeM;
 #endif
    return (number)res;
 }
-static inline number npSubM(number a, number b)
+static inline number npSubM(number a, number b, const coeffs r)
 {
    long res = ((long)a - (long)b);
 #if SIZEOF_LONG == 8
-   res += (res >> 63) & npPrimeM;
+   res += (res >> 63) & r->npPrimeM;
 #else
-   res += (res >> 31) & npPrimeM;
+   res += (res >> 31) & r->npPrimeM;
 #endif
    return (number)res;
 }
 #endif
 
-static inline BOOLEAN npIsZeroM (number  a)
+static inline BOOLEAN npIsZeroM (number  a, const coeffs r)
 {
   return 0 == (long)a;
 }
@@ -165,12 +164,12 @@ static inline BOOLEAN npIsZeroM (number  a)
 *}
 */
 
-#define npNegM(A)      (number)(npPrimeM-(long)(A))
-#define npEqualM(A,B)  ((A)==(B))
+#define npNegM(A,r)      (number)(r->npPrimeM-(long)(A))
+#define npEqualM(A,B,r)  ((A)==(B))
 
 
 #ifdef NV_OPS
-static inline number nvMultM(number a, number b)
+static inline number nvMultM(number a, number b, const coeffs r)
 {
 #if SIZEOF_LONG == 4
 #define ULONG64 (unsigned long long)(unsigned long)
@@ -178,13 +177,12 @@ static inline number nvMultM(number a, number b)
 #define ULONG64 (unsigned long)
 #endif
   return (number) 
-    (unsigned long)((ULONG64 a)*(ULONG64 b) % (ULONG64 npPrimeM));
+    (unsigned long)((ULONG64 a)*(ULONG64 b) % (ULONG64 r->npPrimeM));
 }
-number  nvMult        (number a, number b);
-number  nvDiv         (number a, number b);
-number  nvInvers      (number c);
-void    nvPower       (number a, int i, number * result);
-void    nvInpMult     (number &a, number b, const ring r);
+number  nvMult        (number a, number b, const coeffs r);
+number  nvDiv         (number a, number b, const coeffs r);
+number  nvInvers      (number c, const coeffs r);
+void    nvPower       (number a, int i, number * result, const coeffs r);
 #endif
 
 #endif
