@@ -9,20 +9,16 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <kernel/kstd1.h>
-#include <kernel/numbers.h>
-#include <kernel/longrat.h>
-#include <kernel/longalg.h>
-#include <kernel/longtrans.h>
-#include <kernel/modulop.h>
-#include <kernel/gnumpfl.h>
-#include <kernel/gnumpc.h>
-#include <kernel/ring.h>
-#include <kernel/ffields.h>
-#include <kernel/shortfl.h>
+#include "coeffs.h"
+#include "numbers.h"
+#include "longrat.h"
+#include "longalg.h"
+#include "modulop.h"
+#include "gnumpfl.h"
+#include "gnumpc.h"
+#include "ffields.h"
+#include "shortfl.h"
+#include "longtrans.h"
 #ifdef HAVE_RINGS
 #include <kernel/rmodulo2m.h>
 #include <kernel/rmodulon.h>
@@ -34,51 +30,20 @@ extern omBin gmp_nrz_bin;
 //static int characteristic = 0;
 extern int IsPrime(int p);
 
-number  (*nInit_bigint)(number i);
-number (*nPar)(int i);
-int    (*nParDeg)(number n);
-int    (*nSize)(number n);
-int    (*n_Int)(number &n, const ring r);
-numberfunc nMult, nSub, nAdd, nDiv, nIntDiv, nIntMod, nExactDiv;
-number (*nNeg)(number a);
-number (*nInvers)(number a);
-void   (*nNormalize)(number &a);
-number (*nCopy)(number a);
-number (*nRePart)(number a);
-number (*nImPart)(number a);
-#ifdef HAVE_RINGS
-BOOLEAN (*nDivBy)(number a,number b);
-int     (*nDivComp)(number a,number b);
-BOOLEAN (*nIsUnit)(number a);
-number  (*nGetUnit)(number a);
-number  (*nExtGcd)(number a, number b, number *s, number *t);
-#endif
-BOOLEAN (*nGreater)(number a,number b);
-BOOLEAN (*nEqual)(number a,number b);
-BOOLEAN (*nIsZero)(number a);
-BOOLEAN (*nIsOne)(number a);
-BOOLEAN (*nIsMOne)(number a);
-BOOLEAN (*nGreaterZero)(number a);
-const char* (*nRead)(const char *s,number *a);
-void    (*nPower)(number a, int i, number * result);
-number  (*nGcd)(number a, number b, const ring r);
-number  (*nLcm)(number a, number b, const ring r);
-char * (*nName)(number n);
-
 /*0 implementation*/
 number nNULL; /* the 0 as constant */
 
 n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
-void   ndDelete(number* d, const ring r) { *d=NULL; }
-void   ndInpMult(number &a, number b, const ring r)
+void   ndDelete(number* d, const coeffs r) { *d=NULL; }
+void   ndInpMult(number &a, number b, const coeffs r)
 {
   number n=n_Mult(a,b,r);
   n_Delete(&a,r);
   a=n;
 }
-number ndInpAdd(number &a, number b, const ring r)
+number ndInpAdd(number &a, number b, const coeffs r)
 {
   number n=n_Add(a,b,r);
   n_Delete(&a,r);
@@ -94,27 +59,27 @@ BOOLEAN ndDBTest(number a, const char *f, const int l)
 }
 #endif
 
-void   nDummy2(number& d) { }
+void   nDummy2(number& d, const coeffs r) { }
 
-char * ndName(number n) { return NULL; }
+char * ndName(number n, const coeffs r) { return NULL; }
 
-number ndPar(int i) { return nInit(0); }
+number ndPar(int i, const coeffs r) { return n_Init(0,r); }
 
-number ndReturn0(number n) { return nInit(0); }
+number ndReturn0(number n, const coeffs r) { return n_Init(0,r); }
 
-int    ndParDeg(number n) { return 0; }
+int    ndParDeg(number n, const coeffs r) { return 0; }
 
-number ndGcd(number a, number b, const ring r) { return n_Init(1,r); }
+number ndGcd(number a, number b, const coeffs r) { return n_Init(1,r); }
 
-number ndIntMod(number a, number b) { return nInit(0); }
+number ndIntMod(number a, number b, const coeffs r) { return n_Init(0,r); }
 
-number ndGetDenom(number &n, const ring r) { return n_Init(1,r); }
-number ndGetNumerator(number &a,const ring r) { return r->cf->nCopy(a); }
+number ndGetDenom(number &n, const coeffs r) { return n_Init(1,r); }
+number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
 
-int ndSize(number a) { return (int)nIsZero(a)==FALSE; }
+int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
 
 number ndCopy(number a) { return a; }
-number nd_Copy(number a,const ring r) { return r->cf->nCopy(a); }
+number nd_Copy(number a,const coeffs r) { return r->nCopy(a); }
 
 #ifdef HAVE_RINGS
 BOOLEAN ndDivBy(number a, number b) { return TRUE; } // assume a,b !=0
@@ -127,139 +92,103 @@ number  ndExtGcd (number a, number b, number *s, number *t) { return nInit(1); }
 * init operations for characteristic c (complete==TRUE)
 * init nDelete    for characteristic c (complete==FALSE)
 */
-void nSetChar(ring r)
+void nSetChar(coeffs r)
 {
   int c=rInternalChar(r);
 
   /*--------------------- Q -----------------*/
-  if (rField_is_Q(r))
+  if (nField_is_Q(r))
   {
-    nInit_bigint=nlCopy;
+    r->nInit_bigint=nl_Copy;
   }
   /*--------------------- Q_a/ Zp_a -----------------*/
-  else if (rField_is_Extension(r))
+  else if (nField_is_Extension(r))
   {
     if (r->minpoly != NULL)
     {
       naSetChar(c,r);
-      if (rField_is_Q_a()) nInit_bigint=naMap00;
-      if (rField_is_Zp_a()) nInit_bigint=naMap0P;
+      if (rField_is_Q_a(r)) r->nInit_bigint=naMap00;
+      if (rField_is_Zp_a(r)) r->nInit_bigint=naMap0P;
     }
     else
     {
       ntSetChar(c,r);
-      if (rField_is_Q_a()) nInit_bigint=ntMap00;
-      if (rField_is_Zp_a()) nInit_bigint=ntMap0P;
+      if (rField_is_Q_a(r)) r->nInit_bigint=ntMap00;
+      if (rField_is_Zp_a(r)) r->nInit_bigint=ntMap0P;
     }
   }
 #ifdef HAVE_RINGS
   /*----------------------ring Z / 2^m----------------*/
-  else if (rField_is_Ring_2toM(r))
+  else if (nField_is_Ring_2toM(r))
   {
     nr2mSetExp(c, r);
-    nInit_bigint=nr2mMapQ;
+    r->nInit_bigint=nr2mMapQ;
   }
   /*----------------------ring Z ----------------*/
-  else if (rField_is_Ring_Z(r))
+  else if (nField_is_Ring_Z(r))
   {
     nrzSetExp(c, r);
-    nInit_bigint=nrzMapQ;
+    r->nInit_bigint=nrzMapQ;
   }
   /*----------------------ring Z / n----------------*/
-  else if (rField_is_Ring_ModN(r))
+  else if (nField_is_Ring_ModN(r))
   {
     nrnSetExp(c, r);
-    nInit_bigint=nrnMapQ;
+    r->nInit_bigint=nrnMapQ;
   }
   /*----------------------ring Z / n----------------*/
-  else if (rField_is_Ring_PtoM(r))
+  else if (nField_is_Ring_PtoM(r))
   {
     nrnSetExp(c, r);
-    nInit_bigint=nrnMapQ;
+    r->nInit_bigint=nrnMapQ;
   }
 #endif
-  else if (rField_is_Zp(r))
+  else if (nField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
     npSetChar(c, r);
-    nInit_bigint=npMap0;
+    r->nInit_bigint=npMap0;
   }
   /* -------------- GF(p^m) -----------------------*/
-  else if (rField_is_GF(r))
+  else if (nField_is_GF(r))
   {
     nfSetChar(c,r->parameter);
-    nInit_bigint=ndReturn0; // not impl.
+    r->nInit_bigint=ndReturn0; // not impl.
   }
   /* -------------- R -----------------------*/
   //if (c==(-1))
-  else if (rField_is_R(r))
+  else if (nField_is_R(r))
   {
-    nInit_bigint=nrMapQ;
+    r->nInit_bigint=nrMapQ;
   }
   /* -------------- long R -----------------------*/
   /* -------------- long C -----------------------*/
-  else if ((rField_is_long_R(r))
-  || (rField_is_long_C(r)))
+  else if ((nField_is_long_R(r))
+  || (nField_is_long_C(r)))
   {
     setGMPFloatDigits(r->float_len,r->float_len2);
-    if (rField_is_long_R(r)) nInit_bigint=ngfMapQ;
-    else                     nInit_bigint=ngcMapQ;
+    if (nField_is_long_R(r)) r->nInit_bigint=ngfMapQ;
+    else                     r->nInit_bigint=ngcMapQ;
   }
 #ifdef TEST
   /* -------------- R -----------------------*/
   //if (c==(-1))
-  else if (!rField_is_R(r) && !rField_is_Q(r))
+  else if (!nField_is_R(r) && !nField_is_Q(r))
   {
     WerrorS("unknown field");
   }
 #endif
-  nNormalize=r->cf->nNormalize;
-  nPar   = r->cf->nPar;
-  nParDeg= r->cf->nParDeg;
-  n_Int  = r->cf->n_Int;
-  nAdd   = r->cf->nAdd;
-  nSub   = r->cf->nSub;
-  nMult  = r->cf->nMult;
-  nDiv   = r->cf->nDiv;
-  nExactDiv= r->cf->nExactDiv;
-  nIntDiv= r->cf->nIntDiv;
-  nIntMod= r->cf->nIntMod;
-  nNeg   = r->cf->nNeg;
-  nInvers= r->cf->nInvers;
-  nCopy  = r->cf->nCopy;
-#ifdef HAVE_RINGS
-  nDivComp  = r->cf->nDivComp;
-  nDivBy = r->cf->nDivBy;
-  nIsUnit = r->cf->nIsUnit;
-  nGetUnit = r->cf->nGetUnit;
-  nExtGcd = r->cf->nExtGcd;
-#endif
-  nGreater = r->cf->nGreater;
-  nEqual = r->cf->nEqual;
-  nIsZero = r->cf->nIsZero;
-  nIsOne = r->cf->nIsOne;
-  nIsMOne = r->cf->nIsMOne;
-  nGreaterZero = r->cf->nGreaterZero;
-  nRead = r->cf->nRead;
-  nPower = r->cf->nPower;
-  nGcd  = r->cf->nGcd;
-  nLcm  = r->cf->nLcm;
-  nName= r->cf->nName;
-  nSize  = r->cf->nSize;
-  nRePart = r->cf->nRePart;
-  nImPart = r->cf->nImPart;
-  nNULL=r->cf->nNULL;
 }
 
 /*2
-* init operations for ring r
+* init operations for coeffs r
 */
-void nInitChar(ring r)
+void nInitChar(coeffs r)
 {
-  int c=rInternalChar(r);
-  n_coeffType t=rFieldType(r);
+  int c=nInternalChar(r);
+  n_coeffType t=nFieldType(r);
 
-  if (rField_is_Extension(r))
+  if (nField_is_Extension(r))
   {
     if (r->algring==NULL)
     {
@@ -287,7 +216,7 @@ void nInitChar(ring r)
   else if ((n->nChar==c) && (n->type==t))
   {
     n->ref++;
-    r->cf=n;
+    r=n;
     return;
   }
   else
@@ -295,7 +224,7 @@ void nInitChar(ring r)
     WerrorS("nInitChar failed");
     return;
   }
-  r->cf=n;
+  r=n;
   n->nChar = c;
   n->nPar  = ndPar;
   n->nParDeg=ndParDeg;
@@ -318,7 +247,7 @@ void nInitChar(ring r)
   n->nExtGcd = ndExtGcd;
   n->nGetUnit = (nMapFunc)NULL;
 #endif
-  if (rField_is_Extension(r))
+  if (nField_is_Extension(r))
   {
     //ntInitChar(c,TRUE,r);
     n->cfDelete       = ntDelete;
@@ -359,7 +288,7 @@ void nInitChar(ring r)
   }
 #ifdef HAVE_RINGS
   /* -------------- Z/2^m ----------------------- */
-  else if (rField_is_Ring_2toM(r))
+  else if (nField_is_Ring_2toM(r))
   {
      nr2mInitExp(c,r);
      n->cfInit = nr2mInit;
@@ -398,7 +327,7 @@ void nInitChar(ring r)
 #endif
   }
   /* -------------- Z/n ----------------------- */
-  else if (rField_is_Ring_ModN(r) || rField_is_Ring_PtoM(r)
+  else if (nField_is_Ring_ModN(r) || nField_is_Ring_PtoM(r)
   )
   {
      nrnInitExp(c,r);
@@ -441,7 +370,7 @@ void nInitChar(ring r)
 #endif
   }
   /* -------------- Z ----------------------- */
-  else if (rField_is_Ring_Z(r))
+  else if (nField_is_Ring_Z(r))
   {
      n->cfInit  = nrzInit;
      n->cfDelete= nrzDelete;
@@ -482,7 +411,7 @@ void nInitChar(ring r)
 #endif
   }
 #endif
-  else if (rField_is_Q(r))
+  else if (nField_is_Q(r))
   {
     n->cfDelete= nlDelete;
     n->nNormalize=nlNormalize;
@@ -518,7 +447,7 @@ void nInitChar(ring r)
     n->nDBTest=nlDBTest;
 #endif
   }
-  else if (rField_is_Zp(r))
+  else if (nField_is_Zp(r))
   /*----------------------char. p----------------*/
   {
     npInitChar(c,r);
@@ -560,7 +489,7 @@ void nInitChar(ring r)
 #endif
   }
   /* -------------- GF(p^m) -----------------------*/
-  else if (rField_is_GF(r))
+  else if (nField_is_GF(r))
   {
     //nfSetChar(c,r->parameter);
     n->cfInit = nfInit;
@@ -593,7 +522,7 @@ void nInitChar(ring r)
   }
   /* -------------- R -----------------------*/
   //if (c==(-1))
-  else if (rField_is_R(r))
+  else if (nField_is_R(r))
   {
     n->cfInit = nrInit;
     n->n_Int  = nrInt;
@@ -622,7 +551,7 @@ void nInitChar(ring r)
 #endif
   }
   /* -------------- long R -----------------------*/
-  else if (rField_is_long_R(r))
+  else if (nField_is_long_R(r))
   {
     n->cfDelete= ngfDelete;
     n->cfInit = ngfInit;
@@ -652,7 +581,7 @@ void nInitChar(ring r)
 #endif
   }
   /* -------------- long C -----------------------*/
-  else if (rField_is_long_C(r))
+  else if (nField_is_long_C(r))
   {
     n->cfDelete= ngcDelete;
     n->nNormalize=nDummy2;
@@ -697,65 +626,62 @@ void nInitChar(ring r)
   {
     n->nNULL=n->cfInit(0,r);
     if (n->nRePart==NULL)
-      n->nRePart=n->nCopy;
+      n->nRePart=n->cfCopy;
     if (n->nIntDiv==NULL)
       n->nIntDiv=n->nDiv;
   }
 }
 
-void nKillChar(ring r)
+void nKillChar(coeffs r)
 {
   if (r!=NULL)
   {
-    if (r->cf!=NULL)
+    r->ref--;
+    if (r->ref<=0)
     {
-      r->cf->ref--;
-      if (r->cf->ref<=0)
+      n_Procs_s tmp;
+      n_Procs_s* n=&tmp;
+      tmp.next=cf_root;
+      while((n->next!=NULL) && (n->next!=r)) n=n->next;
+      if (n->next==r)
       {
-        n_Procs_s tmp;
-        n_Procs_s* n=&tmp;
-        tmp.next=cf_root;
-        while((n->next!=NULL) && (n->next!=r->cf)) n=n->next;
-        if (n->next==r->cf)
+        n->next=n->next->next;
+        if (cf_root==r) cf_root=n->next;
+        r->cfDelete(&(r->nNULL),r);
+        switch(r->type)
         {
-          n->next=n->next->next;
-          if (cf_root==r->cf) cf_root=n->next;
-          r->cf->cfDelete(&(r->cf->nNULL),r);
-          switch(r->cf->type)
-          {
-            case n_Zp:
-                 #ifdef HAVE_DIV_MOD
-                 if (r->cf->npInvTable!=NULL)
-                 omFreeSize( (ADDRESS)r->cf->npInvTable,
-                             r->cf->npPrimeM*sizeof(unsigned short) );
-                 #else
-                 if (r->cf->npExpTable!=NULL)
+          case n_Zp:
+               #ifdef HAVE_DIV_MOD
+               if (r->npInvTable!=NULL)
+               omFreeSize( (void *)r->npInvTable,
+                           r->npPrimeM*sizeof(unsigned short) );
+               #else
+               if (r->npExpTable!=NULL)
+               {
+                 omFreeSize( (void *)r->npExpTable,
+                             r->npPrimeM*sizeof(unsigned short) );
+                 omFreeSize( (void *)r->npLogTable,
+                             r->npPrimeM*sizeof(unsigned short) );
+               }
+               #endif
+               break;
+          case n_Zp_a:
+          case n_Q_a:
+               {
+                 number n=r->minpoly;
+                 if (n!=NULL)
                  {
-                   omFreeSize( (ADDRESS)r->cf->npExpTable,
-                               r->cf->npPrimeM*sizeof(unsigned short) );
-                   omFreeSize( (ADDRESS)r->cf->npLogTable,
-                               r->cf->npPrimeM*sizeof(unsigned short) );
+                   r->minpoly=NULL;
+                   naDelete(&n,r);
                  }
-                 #endif
-                 break;
-            case n_Zp_a:
-            case n_Q_a:
-                 {
-                   number n=r->minpoly;
-                   if (n!=NULL)
-                   {
-                     r->minpoly=NULL;
-                     if (r==currRing) naMinimalPoly=NULL;
-                     naDelete(&n,r);
-                   }
-                 }
-                 break;
+               }
+               break;
 
             default:
                  break;
           }
-          omFreeSize((ADDRESS)r->cf, sizeof(n_Procs_s));
-          r->cf=NULL;
+          omFreeSize((void *)r, sizeof(n_Procs_s));
+          r=NULL;
         }
         else
         {
@@ -763,10 +689,10 @@ void nKillChar(ring r)
         }
       }
     }
-    if (r->algring!=NULL)
-    {
-      rKill(r->algring);
-      r->algring=NULL;
-    }
+    //if (r->algring!=NULL)
+    //{
+    //  rKill(r->algring);
+    //  r->algring=NULL;
+    //}
   }
 }

@@ -13,10 +13,9 @@
 
 //-> include & define stuff
 // must have gmp version >= 2
-#include <kernel/si_gmp.h>
-#include <kernel/numbers.h>
-#include <kernel/ring.h>
-#include <kernel/mpr_global.h>
+#include "si_gmp.h"
+#include "numbers.h"
+#include "mpr_global.h"
 
 #define ZTOF 1
 #define QTOF 2
@@ -301,11 +300,14 @@ inline gmp_float abs( const gmp_complex & c )
 
 gmp_complex sqrt( const gmp_complex & x );
 
-inline gmp_complex numberToComplex( number num )
+inline gmp_complex numberToComplex( number num, const coeffs r )
 {
-  if (rField_is_long_C()) {
+  if (nField_is_long_C(r))
+  {
     return *(gmp_complex*)num;
-  } else {
+  }
+  else
+  {
     return gmp_complex( numberToFloat(num) );
   }
 }

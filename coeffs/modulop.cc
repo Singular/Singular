@@ -7,23 +7,13 @@
 */
 
 #include <string.h>
-#include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <omalloc/omalloc.h>
-#include <kernel/numbers.h>
-#include <kernel/longrat.h>
-#include <kernel/mpr_complex.h>
-#include <kernel/ring.h>
-#ifdef HAVE_RINGS
-#include <si_gmp.h>
-#endif
-#include <kernel/modulop.h>
+#include "coeffs.h"
+#include "numbers.h"
+#include "longrat.h"
+#include "mpr_complex.h"
+#include "modulop.h"
 
-long npPrimeM=0;
 int npGen=0;
-long npPminus1M=0;
 long npMapPrime;
 
 #ifdef HAVE_DIV_MOD
@@ -36,10 +26,10 @@ unsigned short *npLogTable=NULL;
 #endif
 
 
-BOOLEAN npGreaterZero (number k)
+BOOLEAN npGreaterZero (number k, const coeffs r)
 {
   int h = (int)((long) k);
-  return ((int)h !=0) && (h <= (npPrimeM>>1));
+  return ((int)h !=0) && (h <= (r->npPrimeM>>1));
 }
 
 //unsigned long npMultMod(unsigned long a, unsigned long b)
@@ -50,18 +40,18 @@ BOOLEAN npGreaterZero (number k)
 //  return c;
 //}
 
-number npMult (number a,number b)
+number npMult (number a,number b, const coeffs r)
 {
   if (((long)a == 0) || ((long)b == 0))
     return (number)0;
   else
-    return npMultM(a,b);
+    return npMultM(a,b, r);
 }
 
 /*2
 * create a number from int
 */
-number npInit (int i, const ring r)
+number npInit (int i, const coeffs r)
 {
   long ii=i;
   while (ii <  0L)                         ii += (long)r->ch;
@@ -72,35 +62,35 @@ number npInit (int i, const ring r)
 /*2
 * convert a number to int (-p/2 .. p/2)
 */
-int npInt(number &n, const ring r)
+int npInt(number &n, const coeffs r)
 {
   if ((long)n > (((long)r->ch) >>1)) return (int)((long)n -((long)r->ch));
   else                               return (int)((long)n);
 }
 
-number npAdd (number a, number b)
+number npAdd (number a, number b, const coeffs r)
 {
-  return npAddM(a,b);
+  return npAddM(a,b, r);
 }
 
-number npSub (number a, number b)
+number npSub (number a, number b, const coeffs r)
 {
-  return npSubM(a,b);
+  return npSubM(a,b,r);
 }
 
-BOOLEAN npIsZero (number  a)
+BOOLEAN npIsZero (number  a, const coeffs r)
 {
   return 0 == (long)a;
 }
 
-BOOLEAN npIsOne (number a)
+BOOLEAN npIsOne (number a, const coeffs r)
 {
   return 1 == (long)a;
 }
 
-BOOLEAN npIsMOne (number a)
+BOOLEAN npIsMOne (number a, const coeffs r)
 {
-  return ((npPminus1M == (long)a)&&((long)1!=(long)a));
+  return ((r->npPminus1M == (long)a)&&((long)1!=(long)a));
 }
 
 #ifdef HAVE_DIV_MOD
@@ -113,19 +103,19 @@ NTL_CLIENT
 #endif
 #endif
 
-long InvMod(long a)
+long InvMod(long a, const coeffs R)
 {
    long d, s, t;
 
 #ifdef USE_NTL_XGCD
-   XGCD(d, s, t, a, npPrimeM);
+   XGCD(d, s, t, a, R->npPrimeM);
    assume (d == 1);
 #else
    long  u, v, u0, v0, u1, v1, u2, v2, q, r;
 
    assume(a>0);
    u1=1; u2=0;
-   u = a; v = npPrimeM;
+   u = a; v = R->npPrimeM;
 
    while (v != 0)
    {
@@ -142,28 +132,28 @@ long InvMod(long a)
    s = u1;
 #endif
    if (s < 0)
-      return s + npPrimeM;
+      return s + R->npPrimeM;
    else
       return s;
 }
 #endif
 
-static inline number npInversM (number c)
+inline number npInversM (number c, const coeffs r)
 {
 #ifndef HAVE_DIV_MOD
-  return (number)(long)npExpTable[npPminus1M - npLogTable[(long)c]];
+  return (number)(long)r->npExpTable[r->npPminus1M - r->npLogTable[(long)c]];
 #else
-  long inv=(long)npInvTable[(long)c];
+  long inv=(long)r->npInvTable[(long)c];
   if (inv==0)
   {
-    inv=InvMod((long)c);
-    npInvTable[(long)c]=inv;
+    inv=InvMod((long)c,r);
+    r->npInvTable[(long)c]=inv;
   }
   return (number)inv;
 #endif
 }
 
-number npDiv (number a,number b)
+number npDiv (number a,number b, const coeffs r)
 {
 //#ifdef NV_OPS
 //  if (npPrimeM>NV_MAX_PRIME)
@@ -179,51 +169,51 @@ number npDiv (number a,number b)
   }
   else
   {
-    int s = npLogTable[(long)a] - npLogTable[(long)b];
+    int s = r->npLogTable[(long)a] - r->npLogTable[(long)b];
     if (s < 0)
-      s += npPminus1M;
-    return (number)(long)npExpTable[s];
+      s += r->npPminus1M;
+    return (number)(long)r->npExpTable[s];
   }
 #else
-  number inv=npInversM(b);
-  return npMultM(a,inv);
+  number inv=npInversM(b,r);
+  return npMultM(a,inv,r);
 #endif
 }
-number  npInvers (number c)
+number  npInvers (number c, const coeffs r)
 {
   if ((long)c==0)
   {
     WerrorS("1/0");
     return (number)0;
   }
-  return npInversM(c);
+  return npInversM(c,r);
 }
 
-number npNeg (number c)
+number npNeg (number c, const coeffs r)
 {
   if ((long)c==0) return c;
-  return npNegM(c);
+  return npNegM(c,r);
 }
 
-BOOLEAN npGreater (number a,number b)
+BOOLEAN npGreater (number a,number b, const coeffs r)
 {
   //return (long)a != (long)b;
   return (long)a > (long)b;
 }
 
-BOOLEAN npEqual (number a,number b)
+BOOLEAN npEqual (number a,number b, const coeffs r)
 {
 //  return (long)a == (long)b;
-  return npEqualM(a,b);
+  return npEqualM(a,b,r);
 }
 
-void npWrite (number &a, const ring r)
+void npWrite (number &a, const coeffs r)
 {
   if ((long)a>(((long)r->ch) >>1)) StringAppend("-%d",(int)(((long)r->ch)-((long)a)));
   else                             StringAppend("%d",(int)((long)a));
 }
 
-void npPower (number a, int i, number * result)
+void npPower (number a, int i, number * result, const coeffs r)
 {
   if (i==0)
   {
@@ -236,12 +226,12 @@ void npPower (number a, int i, number * result)
   }
   else
   {
-    npPower(a,i-1,result);
-    *result = npMultM(a,*result);
+    npPower(a,i-1,result,r);
+    *result = npMultM(a,*result,r);
   }
 }
 
-static const char* npEati(const char *s, int *i)
+static const char* npEati(const char *s, int *i, const coeffs r)
 {
 
   if (((*s) >= '0') && ((*s) <= '9'))
@@ -251,25 +241,25 @@ static const char* npEati(const char *s, int *i)
     {
       (*i) *= 10;
       (*i) += *s++ - '0';
-      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % npPrimeM;
+      if ((*i) >= (MAX_INT_VAL / 10)) (*i) = (*i) % r->npPrimeM;
     }
     while (((*s) >= '0') && ((*s) <= '9'));
-    if ((*i) >= npPrimeM) (*i) = (*i) % npPrimeM;
+    if ((*i) >= r->npPrimeM) (*i) = (*i) % r->npPrimeM;
   }
   else (*i) = 1;
   return s;
 }
 
-const char * npRead (const char *s, number *a)
+const char * npRead (const char *s, number *a, const coeffs r)
 {
   int z;
   int n=1;
 
-  s = npEati(s, &z);
+  s = npEati(s, &z, r);
   if ((*s) == '/')
   {
     s++;
-    s = npEati(s, &n);
+    s = npEati(s, &n, r);
   }
   if (n == 1)
     *a = (number)z;
@@ -279,109 +269,85 @@ const char * npRead (const char *s, number *a)
     else
     {
 #ifdef NV_OPS
-      if (npPrimeM>NV_MAX_PRIME)
-        *a = nvDiv((number)z,(number)n);
+      if (r->npPrimeM>NV_MAX_PRIME)
+        *a = nvDiv((number)z,(number)n,r);
       else
 #endif
-        *a = npDiv((number)z,(number)n);
+        *a = npDiv((number)z,(number)n,r);
     }
   }
   return s;
 }
 
 /*2
-* the last used charcteristic
-*/
-//int npGetChar()
-//{
-//  return npPrimeM;
-//}
-
-/*2
 * set the charcteristic (allocate and init tables)
 */
 
-void npSetChar(int c, ring r)
+void npSetChar(int c, coeffs r)
 {
 
 //  if (c==npPrimeM) return;
   if ((c>1) || (c<(-1)))
   {
-    if (c>1) npPrimeM = c;
-    else     npPrimeM = -c;
-    npPminus1M = npPrimeM - 1;
+    if (c>1) r->npPrimeM = c;
+    else     r->npPrimeM = -c;
+    r->npPminus1M = r->npPrimeM - 1;
 #ifdef NV_OPS
-    if (r->cf->npPrimeM >NV_MAX_PRIME) return;
-#endif
-#ifdef HAVE_DIV_MOD
-    npInvTable=r->cf->npInvTable;
+    if (r->npPrimeM >NV_MAX_PRIME) return;
 #endif
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-    npExpTable=r->cf->npExpTable;
-    npLogTable=r->cf->npLogTable;
     npGen = npExpTable[1];
-#endif
-  }
-  else
-  {
-    npPrimeM=0;
-#ifdef HAVE_DIV_MOD
-    npInvTable=NULL;
-#endif
-#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-    npExpTable=NULL;
-    npLogTable=NULL;
 #endif
   }
 }
 
-void npInitChar(int c, ring r)
+void npInitChar(int c, coeffs r)
 {
   int i, w;
 
   if ((c>1) || (c<(-1)))
   {
-    if (c>1) r->cf->npPrimeM = c;
-    else     r->cf->npPrimeM = -c;
-    r->cf->npPminus1M = r->cf->npPrimeM - 1;
+    if (c>1) r->npPrimeM = c;
+    else     r->npPrimeM = -c;
+    r->npPminus1M = r->npPrimeM - 1;
 #ifdef NV_OPS
-    if (r->cf->npPrimeM <=NV_MAX_PRIME)
+    if (r->npPrimeM <=NV_MAX_PRIME)
 #endif
     {
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-      r->cf->npExpTable=(unsigned short *)omAlloc( r->cf->npPrimeM*sizeof(unsigned short) );
-      r->cf->npLogTable=(unsigned short *)omAlloc( r->cf->npPrimeM*sizeof(unsigned short) );
-      r->cf->npExpTable[0] = 1;
-      r->cf->npLogTable[0] = 0;
-      if (r->cf->npPrimeM > 2)
+      r->npExpTable=(unsigned short *)omAlloc( r->npPrimeM*sizeof(unsigned short) );
+      r->npLogTable=(unsigned short *)omAlloc( r->npPrimeM*sizeof(unsigned short) );
+      r->npExpTable[0] = 1;
+      r->npLogTable[0] = 0;
+      if (r->npPrimeM > 2)
       {
         w = 1;
         loop
         {
-          r->cf->npLogTable[1] = 0;
+          r->npLogTable[1] = 0;
           w++;
           i = 0;
           loop
           {
             i++;
-            r->cf->npExpTable[i] =(int)(((long)w * (long)r->cf->npExpTable[i-1])
-                                 % r->cf->npPrimeM);
-            r->cf->npLogTable[r->cf->npExpTable[i]] = i;
-            if (/*(i == npPrimeM - 1 ) ||*/ (r->cf->npExpTable[i] == 1))
+            r->npExpTable[i] =(int)(((long)w * (long)r->npExpTable[i-1])
+                                 % r->npPrimeM);
+            r->npLogTable[r->npExpTable[i]] = i;
+            if (/*(i == npPrimeM - 1 ) ||*/ (r->npExpTable[i] == 1))
               break;
           }
-          if (i == r->cf->npPrimeM - 1)
+          if (i == r->npPrimeM - 1)
             break;
         }
       }
       else
       {
-        r->cf->npExpTable[1] = 1;
-        r->cf->npLogTable[1] = 0;
+        r->npExpTable[1] = 1;
+        r->npLogTable[1] = 0;
       }
 #endif
 #ifdef HAVE_DIV_MOD
-      r->cf->npInvTable=(unsigned short*)omAlloc0( r->cf->npPrimeM*sizeof(unsigned short) );
+      r->npInvTable=(unsigned short*)omAlloc0( r->npPrimeM*sizeof(unsigned short) );
 #endif
     }
   }
@@ -392,9 +358,9 @@ void npInitChar(int c, ring r)
 }
 
 #ifdef LDEBUG
-BOOLEAN npDBTest (number a, const char *f, const int l)
+BOOLEAN npDBTest (number a, const coeffs r, const char *f, const int l)
 {
-  if (((long)a<0) || ((long)a>npPrimeM))
+  if (((long)a<0) || ((long)a>r->npPrimeM))
   {
     Print("wrong mod p number %ld at %s,%d\n",(long)a,f,l);
     return FALSE;
@@ -403,24 +369,24 @@ BOOLEAN npDBTest (number a, const char *f, const int l)
 }
 #endif
 
-number npMap0(number from)
+number npMap0(number from, const coeffs dst_r)
 {
-  return npInit(nlModP(from,npPrimeM),currRing);
+  return npInit(nlModP(from,dst_r->npPrimeM),dst_r);
 }
 
-number npMapP(number from)
+number npMapP(number from, const coeffs dst_r)
 {
   long i = (long)from;
   if (i>npMapPrime/2)
   {
     i-=npMapPrime;
-    while (i < 0) i+=npPrimeM;
+    while (i < 0) i+=dst_r->npPrimeM;
   }
-  i%=npPrimeM;
+  i%=dst_r->npPrimeM;
   return (number)i;
 }
 
-static number npMapLongR(number from)
+static number npMapLongR(number from, const coeffs dst_r)
 {
   gmp_float *ff=(gmp_float*)from;
   mpf_t *f=ff->_mpfp();
@@ -433,7 +399,7 @@ static number npMapLongR(number from)
 
   size = (*f)[0]._mp_size;
   if (size == 0)
-    return npInit(0,currRing);
+    return npInit(0,dst_r);
   if(size<0)
     size = -size;
 
@@ -444,7 +410,7 @@ static number npMapLongR(number from)
     size--;
   }
 
-  if(npPrimeM>2)
+  if(dst_r->npPrimeM>2)
     e=(*f)[0]._mp_exp-size;
   else
     e=0;
@@ -487,7 +453,7 @@ static number npMapLongR(number from)
   mpz_clear(dest);
   if(res->s==0)
     iz=(long)npDiv((number)iz,(number)in);
-  FREE_RNUMBER(res);
+  omFreeBin((void *)res, rnumber_bin);
   return (number)iz;
 }
 
@@ -504,7 +470,7 @@ number npMapGMP(number from)
   number r = (number) mpz_get_si(erg);
 
   mpz_clear(erg);
-  omFree((ADDRESS) erg);
+  omFree((void *) erg);
   return (number) r;
 }
 
@@ -518,35 +484,35 @@ number npMapMachineInt(number from)
 }
 #endif
 
-nMapFunc npSetMap(const ring src, const ring dst)
+nMapFunc npSetMap(const coeffs src, const coeffs dst)
 {
 #ifdef HAVE_RINGS
-  if (rField_is_Ring_2toM(src))
+  if (nField_is_Ring_2toM(src))
   {
     return npMapMachineInt;
   }
-  if (rField_is_Ring_Z(src) || rField_is_Ring_PtoM(src) || rField_is_Ring_ModN(src))
+  if (nField_is_Ring_Z(src) || nField_is_Ring_PtoM(src) || nField_is_Ring_ModN(src))
   {
     return npMapGMP;
   }
 #endif
-  if (rField_is_Q(src))
+  if (nField_is_Q(src))
   {
     return npMap0;
   }
-  if ( rField_is_Zp(src) )
+  if ( nField_is_Zp(src) )
   {
-    if (rChar(src) == rChar(dst))
+    if (n_GetChar(src) == n_GetChar(dst))
     {
       return ndCopy;
     }
     else
     {
-      npMapPrime=rChar(src);
+      npMapPrime=n_GetChar(src);
       return npMapP;
     }
   }
-  if (rField_is_long_R(src))
+  if (nField_is_long_R(src))
   {
     return npMapLongR;
   }
@@ -558,7 +524,7 @@ nMapFunc npSetMap(const ring src, const ring dst)
 // ----------------------------------------------------------
 #ifdef NV_OPS
 
-number nvMult (number a,number b)
+number nvMult (number a,number b, const coeffs r)
 {
   //if (((long)a == 0) || ((long)b == 0))
   //  return (number)0;
@@ -581,7 +547,7 @@ long nvInvMod(long a)
 
    u1=1; v1=0;
    u2=0; v2=1;
-   u = a; v = npPrimeM;
+   u = a; v = R->npPrimeM;
 
    while (v != 0)
    {
@@ -600,18 +566,18 @@ long nvInvMod(long a)
    s = u1;
    //t = v1;
    if (s < 0)
-      return s + npPrimeM;
+      return s + R->npPrimeM;
    else
       return s;
 }
 
-static inline number nvInversM (number c)
+inline number nvInversM (number c, const coeffs r)
 {
-  long inv=nvInvMod((long)c);
+  long inv=nvInvMod((long)c,r);
   return (number)inv;
 }
 
-number nvDiv (number a,number b)
+number nvDiv (number a,number b, const coeffs r)
 {
   if ((long)a==0)
     return (number)0;
@@ -622,20 +588,20 @@ number nvDiv (number a,number b)
   }
   else
   {
-    number inv=nvInversM(b);
-    return nvMultM(a,inv);
+    number inv=nvInversM(b,r);
+    return nvMultM(a,inv,r);
   }
 }
-number  nvInvers (number c)
+number  nvInvers (number c, const coeffs r)
 {
   if ((long)c==0)
   {
     WerrorS(nDivBy0);
     return (number)0;
   }
-  return nvInversM(c);
+  return nvInversM(c,r);
 }
-void nvPower (number a, int i, number * result)
+void nvPower (number a, int i, number * result, const coeffs r)
 {
   if (i==0)
   {
@@ -648,8 +614,8 @@ void nvPower (number a, int i, number * result)
   }
   else
   {
-    nvPower(a,i-1,result);
-    *result = nvMultM(a,*result);
+    nvPower(a,i-1,result,r);
+    *result = nvMultM(a,*result,r);
   }
 }
 #endif

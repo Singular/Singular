@@ -124,8 +124,8 @@ void naSetChar(int i, ring r)
     int j;
     for (j=naI->anz-1; j>=0; j--)
        p_Delete (&naI->liste[j],nacRing);
-    omFreeSize((ADDRESS)naI->liste,naI->anz*sizeof(napoly));
-    omFreeBin((ADDRESS)naI, snaIdeal_bin);
+    omFreeSize((void *)naI->liste,naI->anz*sizeof(napoly));
+    omFreeBin((void *)naI, snaIdeal_bin);
     naI=NULL;
   }
   naMap = naCopy;
@@ -271,7 +271,7 @@ void naDelete(number *p, const ring r)
     if (l==NULL) return;
     p_Delete(&(l->z),r->algring);
     p_Delete(&(l->n),r->algring);
-    FREE_LNUMBER(l);
+    omFreeBin((void *)l,  rnumber_bin);
   }
   *p = NULL;
 }
@@ -494,7 +494,7 @@ number naMult(number la, number lb)
   lo->s = 0;
   if(lo->z==NULL)
   {
-    FREE_LNUMBER(lo);
+    omFreeBin((void *)lo, rnumber_bin);
     lo=NULL;
   }
   else if (lo->n!=NULL)
@@ -800,7 +800,7 @@ const char  *naRead(const char *s, number *p)
     a->z = x;
   if(a->z==NULL)
   {
-    FREE_LNUMBER(a);
+    omFreeBin((void *)*p, rnumber_bin);
     *p=NULL;
   }
   else
@@ -840,10 +840,10 @@ char * naName(number n)
       }
     }
   }
-  omFreeSize((ADDRESS)t,8);
+  omFreeSize((void *)t,8);
   if (s[0]=='\0')
   {
-    omFree((ADDRESS)s);
+    omFree((void *)s);
     return NULL;
   }
   return s;
@@ -1425,7 +1425,7 @@ void naSetIdeal(ideal I)
   {
     for (i=naI->anz-1; i>=0; i--)
       p_Delete(&naI->liste[i],nacRing);
-    omFreeBin((ADDRESS)naI, snaIdeal_bin);
+    omFreeBin((void *)naI, snaIdeal_bin);
     naI=NULL;
   }
   else

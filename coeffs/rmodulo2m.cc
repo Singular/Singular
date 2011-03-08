@@ -555,11 +555,11 @@ nMapFunc nr2mSetMap(const ring src, const ring dst)
     if (mpz_divisible_2exp_p(modul, dst->ringflagb))
     {
       mpz_clear(modul);
-      omFree((ADDRESS) modul);
+      omFree((void *) modul);
       return nr2mMapGMP;
     }
     mpz_clear(modul);
-    omFree((ADDRESS) modul);
+    omFree((void *) modul);
   }
   return NULL;      // default
 }

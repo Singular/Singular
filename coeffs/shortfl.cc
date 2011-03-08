@@ -8,15 +8,13 @@
 */
 
 #include <string.h>
-#include <kernel/mod2.h>
-#include <omalloc/mylimits.h>
-#include <kernel/structs.h>
-#include <kernel/febase.h>
-#include <kernel/numbers.h>
-#include <kernel/longrat.h>
-#include <kernel/mpr_complex.h>
-#include <kernel/ring.h>
-#include <kernel/shortfl.h>
+#include "coeffs.h"
+#include <mylimits.h>
+#include "febase.h"
+#include "numbers.h"
+#include "longrat.h"
+#include "mpr_complex.h"
+#include "shortfl.h"
 
 static float nrEps = 1.0e-3;
 union nf
@@ -34,12 +32,12 @@ float nrFloat(number n)
   return nf(n).F();
 }
 
-BOOLEAN nrGreaterZero (number k)
+BOOLEAN nrGreaterZero (number k, const coeffs r)
 {
   return nf(k).F() >= 0.0;
 }
 
-number nrMult (number a,number b)
+number nrMult (number a,number b, const coeffs r)
 {
   return nf(nf(a).F() * nf(b).F()).N();
 }
@@ -47,7 +45,7 @@ number nrMult (number a,number b)
 /*2
 * create a number from int
 */
-number nrInit (int i, const ring R)
+number nrInit (int i, const coeffs R)
 {
   float r = (float)i;
   return nf(nf(r).F()).N();
@@ -56,7 +54,7 @@ number nrInit (int i, const ring R)
 /*2
 * convert a number to int
 */
-int nrInt(number &n, const ring R)
+int nrInt(number &n, const coeffs R)
 {
   int i;
   float r = nf(n).F();
@@ -67,7 +65,7 @@ int nrInt(number &n, const ring R)
   return i;
 }
 
-int nrSize(number n)
+int nrSize(number n, const coeffs R)
 {
   float f = nf(n).F();
   int i = (int)f;
@@ -79,7 +77,7 @@ int nrSize(number n)
   return i;
 }
 
-number nrAdd (number a, number b)
+number nrAdd (number a, number b, const coeffs R)
 {
   float x = nf(a).F();
   float y = nf(b).F();
@@ -109,7 +107,7 @@ number nrAdd (number a, number b)
   return nf(r).N();
 }
 
-number nrSub (number a, number b)
+number nrSub (number a, number b, const coeffs R)
 {
   float x = nf(a).F();
   float y = nf(b).F();
@@ -139,26 +137,26 @@ number nrSub (number a, number b)
   return nf(r).N();
 }
 
-BOOLEAN nrIsZero (number  a)
+BOOLEAN nrIsZero (number  a, const coeffs r)
 {
   return (0.0 == nf(a).F());
 }
 
-BOOLEAN nrIsOne (number a)
+BOOLEAN nrIsOne (number a, const coeffs r)
 {
   float aa=nf(a).F()-1.0;
   if (aa<0.0) aa=-aa;
   return (aa<nrEps);
 }
 
-BOOLEAN nrIsMOne (number a)
+BOOLEAN nrIsMOne (number a, const coeffs r)
 {
   float aa=nf(a).F()+1.0;
   if (aa<0.0) aa=-aa;
   return (aa<nrEps);
 }
 
-number nrDiv (number a,number b)
+number nrDiv (number a,number b, const coeffs r)
 {
   float n = nf(b).F();
   if (n == 0.0)
@@ -170,7 +168,7 @@ number nrDiv (number a,number b)
     return nf(nf(a).F() / n).N();
 }
 
-number  nrInvers (number c)
+number  nrInvers (number c, const coeffs r)
 {
   float n = nf(c).F();
   if (n == 0.0)
@@ -181,28 +179,28 @@ number  nrInvers (number c)
   return nf(1.0 / n).N();
 }
 
-number nrNeg (number c)
+number nrNeg (number c, const coeffs r)
 {
   return nf(-nf(c).F()).N();
 }
 
-BOOLEAN nrGreater (number a,number b)
+BOOLEAN nrGreater (number a,number b, const coeffs r)
 {
   return nf(a).F() > nf(b).F();
 }
 
-BOOLEAN nrEqual (number a,number b)
+BOOLEAN nrEqual (number a,number b, const coeffs r)
 {
-  number x = nrSub(a,b);
+  number x = nrSub(a,b,r);
   return nf(x).F() == nf((float)0.0).F();
 }
 
-void nrWrite (number &a, const ring r)
+void nrWrite (number &a, const coeffs r)
 {
   StringAppend("%9.3e", nf(a).F());
 }
 
-void nrPower (number a, int i, number * result)
+void nrPower (number a, int i, number * result, const coeffs r)
 {
   if (i==0)
   {
@@ -214,7 +212,7 @@ void nrPower (number a, int i, number * result)
     *result = nf(nf(a).F()).N();
     return;
   }
-  nrPower(a,i-1,result);
+  nrPower(a,i-1,result,r);
   *result = nf(nf(a).F() * nf(*result).F()).N();
 }
 
@@ -239,7 +237,7 @@ static const char* nrEatr(const char *s, float *r)
 
 const char *nIllegalChar="illegal character in number";
 
-const char * nrRead (const char *s, number *a)
+const char * nrRead (const char *s, number *a, const coeffs r)
 {
   const char *t;
   const char *start=s;
@@ -424,44 +422,44 @@ number nrMapQ(number from)
   return nf(rr).N();
 }
 
-static number nrMapP(number from)
+static number nrMapP(number from, const coeffs R)
 {
   int i = (int)((long)from);
   float r = (float)i;
   return nf(r).N();
 }
 
-static number nrMapLongR(number from)
+static number nrMapLongR(number from, const coeffs R)
 {
   float t =(float)mpf_get_d((mpf_srcptr)from);
   return nf(t).N();
 }
-static number nrMapC(number from)
+static number nrMapC(number from, const coeffs r)
 {
   gmp_float h = ((gmp_complex*)from)->real();
   float t =(float)mpf_get_d((mpf_srcptr)&h);
   return nf(t).N();
 }
 
-nMapFunc nrSetMap(const ring src, const ring dst)
+nMapFunc nrSetMap(const coeffs src, const coeffs dst)
 {
-  if (rField_is_Q(src))
+  if (nField_is_Q(src))
   {
     return nrMapQ;
   }
-  if (rField_is_long_R(src))
+  if (nField_is_long_R(src))
   {
     return nrMapLongR;
   }
-  if (rField_is_R(src))
+  if (nField_is_R(src))
   {
     return ndCopy;
   }
-  if(rField_is_Zp(src))
+  if(nField_is_Zp(src))
   {
     return nrMapP;
   }
-  if (rField_is_long_C(src))
+  if (nField_is_long_C(src))
   {
     return nrMapC;
   }

@@ -44,13 +44,13 @@ static inline number nlShort3(number x) // assume x->s==3
 
 #include <string.h>
 #include <float.h>
-#include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/numbers.h>
-#include <kernel/modulop.h>
-#include <kernel/ring.h>
-#include <kernel/shortfl.h>
-#include <kernel/mpr_complex.h>
+#include "coeffs.h"
+#include "omalloc.h"
+#include "numbers.h"
+#include "modulop.h"
+#include "shortfl.h"
+#include "mpr_complex.h"
+#include "longrat.h"
 
 
 #ifndef BYTES_PER_MP_LIMB
@@ -659,7 +659,7 @@ number   nlExactDiv(number a, number b)
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
-    FREE_RNUMBER(bb);
+    omFreeBin((void *)bb, rnumber_bin);
   }
   u=nlShort3(u);
   nlTest(u);
@@ -725,7 +725,7 @@ number nlIntDiv (number a, number b)
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
-    FREE_RNUMBER(bb);
+    omFreeBin((void *)bb, rnumber_bin);
   }
   u=nlShort3(u);
   nlTest(u);
@@ -802,7 +802,7 @@ number nlIntMod (number a, number b)
 #if defined(LDEBUG)
     bb->debug=654324;
 #endif
-    FREE_RNUMBER(bb);
+    omFreeBin((void *)bb, rnumber_bin);
   }
   if (mpz_isNeg(u->z))
   {
@@ -845,7 +845,7 @@ number nlDiv (number a, number b)
     long r=i%j;
     if (r==0)
     {
-      FREE_RNUMBER(u);
+      omFreeBin((void *)u, rnumber_bin);
       return INT_TO_SR(i/j);
     }
     mpz_init_set_si(u->z,(long)i);
@@ -1395,7 +1395,7 @@ void _nlDelete_NoImm(number *a)
         (*a)->s=2;
 #endif
     }
-    FREE_RNUMBER(*a);
+    omFreeBin((void *) *a, rnumber_bin);
   }
 }
 
@@ -2461,7 +2461,7 @@ number nlMod(number a, number b)
     && (mpz_cmp_si(x->z,(long)ui)==0))
     {
       mpz_clear(&r->z);
-      FREE_RNUMBER(r);
+      omFreeBin((void *)r, rnumber_bin);
       r=INT_TO_SR(ui);
     }
   }
