@@ -605,7 +605,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         l->data=d;
         omFree(l->mode);
         l->mode = omStrDup(mode);
-	singular_in_batchmode=TRUE;
+        singular_in_batchmode=TRUE;
         SI_LINK_SET_RW_OPEN_P(l);
         //myynest=0;
         fe_fgets_stdin=fe_fgets_dummy;
@@ -1169,7 +1169,7 @@ const char* slStatusSsi(si_link l, const char* request)
     /* if \n, check again with select else ungetc(c), ready*/
       int c=fgetc(d->f_read);
       //Print("try c=%d\n",c);
-      if (c== -1) return "eof";
+      if (c== -1) return "eof"; /* eof or error */
       else if (isdigit(c))
       { ungetc(c,d->f_read); d->ungetc_buf='\1'; return "ready"; }
       else if (c>' ')
@@ -1195,8 +1195,8 @@ const char* slStatusSsi(si_link l, const char* request)
 
 int slStatusSsiL(lists L, int timeout)
 {
-// input: L: a list with snks of type 
-//           si-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
+// input: L: a list with links of type
+//           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
 //        timeout: timeout for select in micro-seconds
 //           or -1 for infinity
 //           or 0 for polling
@@ -1261,13 +1261,23 @@ int slStatusSsiL(lists L, int timeout)
   /* check with select: chars waiting: no -> not ready */
   int s= select(max_fd, &mask, NULL, NULL, wt_ptr);
   if (s==-1) return -2; /*error*/
+  int j;
+  int retry_needed=0;
+find_next_fd:
   if (s==0)
   {
-    return 0; /*poll: not ready */
+    if (retry_needed)
+    {
+      // the os reported that one of the (ssi) links is ready,
+      // but it was only white space: this cannot happen again:
+      return slStatusSsiL(L,timeout);
+    }
+    else
+      return 0; /*poll: not ready */
   }
-  else /* s>0, at least one ready */
+  else /* s>0, at least one ready  (the number of fd which are ready is s)*/
   {
-    int j=0;
+    j=0;
     while (j<=max_fd) { if (FD_ISSET(j,&mask)) break; j++; }
     for(i=L->nr; i>=0; i--)
     {
@@ -1301,7 +1311,13 @@ int slStatusSsiL(lists L, int timeout)
       /* setting: d: current ssiInfo, j current fd, i current entry in L*/
       int c=fgetc(d->f_read);
       //Print("try c=%d\n",c);
-      if (c== -1) return 0;
+      if (c== -1) /* eof or error*/
+      {
+        retry_needed=1;
+        FD_CLR(j,&mask);
+        s--;
+        goto find_next_fd;
+      }
       else if (isdigit(c))
       { ungetc(c,d->f_read); d->ungetc_buf='\1'; return i+1; }
       else if (c>' ')
