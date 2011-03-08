@@ -7536,14 +7536,18 @@ none
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-Expects a list of open ssi links of mode fork or tcp and waits until all of
-them are finished, i.e., are ready to be read.
+Expects a list of open links (of mode ssi:fork, ssi:tcp, MPtcp:fork or
+MPtcp:launch)
+and waits until all of them are finished, i.e., are ready to be read.
 @*In the first case, the command waits for all links to finish (and may
 therefore run forever), and does not return anything.
 @*In the second case, a timeout in milliseconds can be provided, forcing
 the command to terminate after the specified time (return value = 0), or
 - in case this happens earlier - when all links are finished (return value
 = 1).
+If the given timeout is 0, the command checks whether all links are
+finished (return value 1) or not (return value 0), but does not wait
+for any link (polling).
 @item @strong{Example:}
 @smallexample
 @c example
@@ -7577,14 +7581,18 @@ See
 @item @strong{Type:}
 int
 @item @strong{Purpose:}
-Expects a list of open ssi links of mode fork or tcp and waits until the
-first of them is finished, i.e., is ready to be read.
+Expects a list of open links (of mode ssi:fork, ssi:tcp, MPtcp:fork or
+MPtcp:launch)
+and waits until the first of them is finished, i.e., is ready to be read.
 @*In the first case, the command waits for the first link to finish (and may
 therefore run forever), and returns the list index of the terminated link.
 @*In the second case, a timeout in milliseconds can be provided, forcing
 the command to terminate after the specified time (return value = 0), or
 - in case this happens earlier - when the first link is finished (return value
-= list index of terminated link).
+= list index of the terminated link).
+If the given timeout is 0, the command checks whether one of the links is
+finished (return value = list index of the terminated link) or not
+(return value 0), but does not wait for any link (polling).
 @item @strong{Example:}
 @smallexample
 @c example

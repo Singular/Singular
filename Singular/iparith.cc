@@ -3199,7 +3199,7 @@ static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
 {
 // input: u: a list with links of type
 //           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
-//        v: timeout for select in seconds
+//        v: timeout for select in milliseconds
 //           or 0 for polling
 // returns: ERROR (via Werror): timeout negative
 //           0: timeout (or polling): none ready
@@ -3218,7 +3218,7 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
 {
 // input: u: a list with links of type
 //           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
-//        v: timeout for select in seconds
+//        v: timeout for select in milliseconds
 //           or 0 for polling
 // returns: ERROR (via Werror): timeout negative
 //           0: timeout (or polling): none ready
@@ -3229,7 +3229,7 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
   {
     WerrorS("negative timeout"); return TRUE;
   }
-  int t = getRTimer()/timer_resolution;
+  int t = 1000*getRTimer()/timer_resolution;
   int i;
   int ret = 1;
   for(int nfinished = 0; nfinished < Lforks->nr; nfinished++)
@@ -3240,7 +3240,7 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
       Lforks->m[i-1].CleanUp();
       Lforks->m[i-1].rtyp=DEF_CMD;
       Lforks->m[i-1].data=NULL;
-      timeout = si_max(0,timeout - getRTimer()/timer_resolution + t);
+      timeout = si_max(0,timeout - 1000*getRTimer()/timer_resolution + t);
     }
     else { ret = 0; break; /* terminate the for loop */ }
   }
