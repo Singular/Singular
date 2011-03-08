@@ -3197,35 +3197,54 @@ static BOOLEAN jjVARSTR2(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
 {
+// input: u: a list with links of type
+//           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
+//        v: timeout for select in seconds
+//           or 0 for polling
+// returns: ERROR (via Werror): timeout negative
+//           0: timeout (or polling): none ready
+//           i>0: (at least) L[i] is ready
   lists Lforks = (lists)u->Data();
   int t = (int)(long)v->Data();
+  if(t < 0)
+  {
+    WerrorS("negative timeout"); return TRUE;
+  }
   int i = slStatusSsiL(Lforks, t*1000);
-  if ( i < 0 ) i = 0;
   res->data = (void*)(long)i;
   return FALSE;
 }
 static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
 {
-/* returns 1 iff all forks are finished; 0 otherwise */
-  lists Lforks = (lists)u->Data();
+// input: u: a list with links of type
+//           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
+//        v: timeout for select in seconds
+//           or 0 for polling
+// returns: ERROR (via Werror): timeout negative
+//           0: timeout (or polling): none ready
+//           1: all links are ready
+  lists Lforks = (lists)u->CopyD();
   int timeout = 1000*(int)(long)v->Data();
-  lists oneFork=(lists)omAllocBin(slists_bin);
-  oneFork->Init(1);
-  int i;
-  int t = getTimer();
-  int ret = 1;
-  for (int j = 0; j <= Lforks->nr; j++)
+  if(timeout < 0)
   {
-    oneFork->m[0].Copy(&Lforks->m[j]);
-    i = slStatusSsiL(oneFork, timeout);
-    if (i == 1)
-    {
-      timeout = timeout - getTimer() + t;
-    }
-    else { ret = 0; j = Lforks->nr+1; /* terminate the for loop */ }
-    omFreeSize((ADDRESS)oneFork->m,sizeof(sleftv));
+    WerrorS("negative timeout"); return TRUE;
   }
-  omFreeBin((ADDRESS)oneFork, slists_bin);
+  int t = getRTimer()/timer_resolution;
+  int i;
+  int ret = 1;
+  for(int nfinished = 0; nfinished < Lforks->nr; nfinished++)
+  {
+    i = slStatusSsiL(Lforks, timeout);
+    if(i > 0)
+    {
+      Lforks->m[i-1].CleanUp();
+      Lforks->m[i-1].rtyp=DEF_CMD;
+      Lforks->m[i-1].data=NULL;
+      timeout = si_max(0,timeout - getRTimer()/timer_resolution + t);
+    }
+    else { ret = 0; break; /* terminate the for loop */ }
+  }
+  Lforks->Clean();
   res->data = (void*)(long)ret;
   return FALSE;
 }
@@ -4596,26 +4615,29 @@ static BOOLEAN jjVDIM(leftv res, leftv v)
 }
 BOOLEAN jjWAIT1ST1(leftv res, leftv a)
 {
+// input: a: a list with links of type
+//           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
+// returns: i>0: (at least) a[i] is ready
   lists Lforks = (lists)a->Data();
   int i = slStatusSsiL(Lforks, -1);
-  while (i <= 0) i = slStatusSsiL(Lforks, 10000000); /* redo this all 10 seconds */
   res->data = (void*)(long)i;
   return FALSE;
 }
 BOOLEAN jjWAITALL1(leftv res, leftv a)
 {
-  lists Lforks = (lists)a->Data();
-  lists oneFork=(lists)omAllocBin(slists_bin);
-  oneFork->Init(1);
+// input: a: a list with links of type
+//           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
+// returns: nothing. All links are ready when finished.
+  lists Lforks = (lists)u->CopyD();
   int i;
-  for (int j = 0; j <= Lforks->nr; j++)
+  for(int nfinished = 0; nfinished < Lforks->nr; nfinished++)
   {
-    oneFork->m[0].Copy(&Lforks->m[j]);
-    i = slStatusSsiL(oneFork, -1);
-    while (i != 1) i = slStatusSsiL(oneFork, 10000000); /* redo this all 10 seconds */
-    omFreeSize((ADDRESS)oneFork->m,sizeof(sleftv));
+    i = slStatusSsiL(Lforks, -1);
+    Lforks->m[i-1].CleanUp();
+    Lforks->m[i-1].rtyp=DEF_CMD;
+    Lforks->m[i-1].data=NULL;
   }
-  omFreeBin((ADDRESS)oneFork, slists_bin);
+  Lforks->Clean();
   return FALSE;
 }
 static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)

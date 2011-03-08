@@ -1217,35 +1217,38 @@ int slStatusSsiL(lists L, int timeout)
   int i;
   for(i=L->nr; i>=0; i--)
   {
-    if (L->m[i].Typ()!=LINK_CMD)
-    { WerrorS("all elements must be of type link"); return -2;}
-    l=(si_link)L->m[i].Data();
-    if(SI_LINK_OPEN_P(l)==0)
-    { WerrorS("all links must be open"); return -2;}
-    if (((strcmp(l->m->type,"ssi")!=0) && (strcmp(l->m->type,"MPtcp")!=0))
-    || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
-       && (strcmp(l->mode,"launch")!=0)))
+    if (L->m[i].Typ()!=DEF_CMD)
     {
-      WerrorS("all links must be of type ssi:fork, ssi:tcp, MPtcp:fork or MPtcp:launch");
-      return -2;
-    }
+      if (L->m[i].Typ()!=LINK_CMD)
+      { WerrorS("all elements must be of type link"); return -2;}
+      l=(si_link)L->m[i].Data();
+      if(SI_LINK_OPEN_P(l)==0)
+      { WerrorS("all links must be open"); return -2;}
+      if (((strcmp(l->m->type,"ssi")!=0) && (strcmp(l->m->type,"MPtcp")!=0))
+      || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
+        && (strcmp(l->mode,"launch")!=0)))
+      {
+        WerrorS("all links must be of type ssi:fork, ssi:tcp, MPtcp:fork or MPtcp:launch");
+        return -2;
+      }
     #ifdef HAVE_MPSR
-    if (strcmp(l->m->type,"ssi")==0)
-    {
+      if (strcmp(l->m->type,"ssi")==0)
+      {
+        d=(ssiInfo*)l->data;
+        d_fd=d->fd_read;
+      }
+      else
+      {
+        dd=(MP_Link_pt)l->data;
+        d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
+      }
+    #else
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
-    }
-    else
-    {
-      dd=(MP_Link_pt)l->data;
-      d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
-    }
-    #else
-    d=(ssiInfo*)l->data;
-    d_fd=d->fd_read;
     #endif
-    FD_SET(d_fd, &mask);
-    if (d_fd > max_fd) max_fd=d_fd;
+      FD_SET(d_fd, &mask);
+      if (d_fd > max_fd) max_fd=d_fd;
+    }
   }
   max_fd++;
   struct timeval *wt_ptr=&wt;
@@ -1285,26 +1288,29 @@ find_next_fd:
     while (j<=max_fd) { if (FD_ISSET(j,&mask)) break; j++; }
     for(i=L->nr; i>=0; i--)
     {
-      l=(si_link)L->m[i].Data();
-      #ifdef HAVE_MPSR
-      if (strcmp(l->m->type,"ssi")!=0)
+      if (L->m[i].rtyp==LINK_CMD)
       {
-        // for MP links, return here:
-        dd=(MP_Link_pt)l->data;
-        d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
-        if(j==d_fd) return i+1;
-      }
-      else
-      {
+        l=(si_link)L->m[i].Data();
+        #ifdef HAVE_MPSR
+        if (strcmp(l->m->type,"ssi")!=0)
+        {
+          // for MP links, return here:
+          dd=(MP_Link_pt)l->data;
+          d_fd=((MP_TCP_t *)dd->transp.private1)->sock;
+          if(j==d_fd) return i+1;
+        }
+        else
+        {
+          d=(ssiInfo*)l->data;
+          d_fd=d->fd_read;
+          if(j==d_fd) break;
+        }
+        #else
         d=(ssiInfo*)l->data;
         d_fd=d->fd_read;
         if(j==d_fd) break;
+        #endif
       }
-      #else
-      d=(ssiInfo*)l->data;
-      d_fd=d->fd_read;
-      if(j==d_fd) break;
-      #endif
     }
     // only ssi links:
     if (d->ungetc_buf) return i+1;
