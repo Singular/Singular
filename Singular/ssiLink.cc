@@ -1260,7 +1260,11 @@ int slStatusSsiL(lists L, int timeout)
   }
   /* check with select: chars waiting: no -> not ready */
   int s= select(max_fd, &mask, NULL, NULL, wt_ptr);
-  if (s==-1) return -2; /*error*/
+  if (s==-1)
+  { 
+    WerrorS("error in select call");
+    return -2; /*error*/
+  }
   int j;
   int retry_needed=0;
 find_next_fd:
