@@ -68,8 +68,11 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
         if (currRing->minpoly!=NULL)
         {
           number a=(number)res->data;
-          nNormalize(a);
-          res->data=(void *)a;
+	  number one=nInit(1);
+          number product = nMult(a,one );
+	  nDelete(&one);
+	  nDelete(&a);
+          res->data=(void *)product;
         }
         #ifdef LDEBUG
         nTest((number) res->data);
