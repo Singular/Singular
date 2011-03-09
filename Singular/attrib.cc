@@ -333,7 +333,8 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
     if (v->rtyp==IDHDL)
       at=IDATTR((idhdl)v->data);
     else
-      at=v->attribute->get(name);
+      at=v->attribute;
+    at=at->get(name);
     if (at!=NULL)
     {
       res->rtyp=at->atyp;
