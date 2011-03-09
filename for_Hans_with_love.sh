@@ -1,5 +1,10 @@
 #!/bin/sh
 
+echo "==============="
+echo "run libtootlize in libpolys/polys/"
+echo "---------------"
+( cd libpolys/polys/; libtoolize; )
+
 autotools (){
 aclocal
 autoheader

@@ -1,3 +1,4 @@
+ACLOCAL_AMFLAGS = -I m4
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 AM_CFLAGS	= -O3 -w -fomit-frame-pointer ${PIPE}
 AM_CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
@@ -28,7 +29,26 @@ include_HEADERS = \
 	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
 	sbuckets.h simpleideals.h
 
+libp_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral
+libp_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep
+libp_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ
+libp_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp
+
+P_PROCS = templates/p_Procs_Lib.cc
+
+libp_Procs_FieldGeneral_la_SOURCES = ${P_PROCS}
+libp_Procs_FieldIndep_la_SOURCES = ${P_PROCS}
+libp_Procs_FieldQ_la_SOURCES = ${P_PROCS}
+libp_Procs_FieldZp_la_SOURCES = ${P_PROCS}
+
+#-g -Wextra -Wall -pedantic -Wno-long-long
+
 lib_LIBRARIES=libpolys.a libpolys_g.a
+
+moduledir = ${libdir}/singular/MOD/
+
+module_LTLIBRARIES=libp_Procs_FieldGeneral.la libp_Procs_FieldIndep.la libp_Procs_FieldQ.la libp_Procs_FieldZp.la
+#		libp_Procs_FieldGeneral_g.la libp_Procs_FieldIndep_g.la libp_Procs_FieldQ_g.la libp_Procs_FieldZp_g.la
 
 libpolys_a_SOURCES = ${SOURCES}
 libpolys_g_a_SOURCES = ${SOURCES}

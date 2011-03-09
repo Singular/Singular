@@ -9,6 +9,7 @@
  *  Version: $Id$
  *******************************************************************/
 #include "polys/config.h"
+#include <misc/auxiliary.h>
 // #include <polys/structs.h>
 #include <polys/p_polys.h>
 #include <polys/monomials/ring.h>
@@ -17,7 +18,7 @@
 #include <polys/p_MemCmp.h>
 #include <polys/p_MemAdd.h>
 #include <polys/p_MemCopy.h>
-#include <polys/kbuckets.h>
+//#include <polys/kbuckets.h>
 
-#include "p_Procs_Dynamic.inc"
+#include "p_Procs.inc"
 
