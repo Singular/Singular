@@ -40,7 +40,6 @@ number      (*nacGcd)(number a, number b, const ring r);
 number      (*nacLcm)(number a, number b, const ring r);
 number      (*nacInit)(int i, const ring r);
 int         (*nacInt)(number &n, const ring r);
-void        (*nacDelete)(number *a, const ring r);
 void        (*nacNormalize)(number &a);
 number      (*nacNeg)(number a);
 number      (*nacCopy)(number a);
@@ -113,7 +112,6 @@ void ntSetChar(int i, ring r)
   nacDiv         = nacRing->cf->nDiv;
   nacIntDiv      = nacRing->cf->nIntDiv;
   nacInvers      = nacRing->cf->nInvers;
-  nacDelete      = nacRing->cf->cfDelete;
 }
 
 /*============= procedure for polynomials: napXXXX =======================*/
@@ -940,7 +938,7 @@ poly napPermNumber(number z, int * par_perm, int P, ring oldRing)
   else
     nMap=currRing->cf->cfSetMap(oldRing->algring, currRing);
   if (nMap==NULL) return NULL; /* emergency exit only */
-  do
+  while(za!=NULL)
   {
     p = pInit();
     pNext(p)=NULL;
@@ -1014,7 +1012,6 @@ poly napPermNumber(number z, int * par_perm, int P, ring oldRing)
     }
     pIter(za);
   }
-  while (za!=NULL);
   pTest(res);
   return res;
 }

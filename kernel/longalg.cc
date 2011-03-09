@@ -182,7 +182,6 @@ void naSetChar(int i, ring r)
   nacDiv         = nacRing->cf->nDiv;
   nacIntDiv      = nacRing->cf->nIntDiv;
   nacInvers      = nacRing->cf->nInvers;
-  nacDelete      = nacRing->cf->cfDelete;
 }
 
 /*================ procedure for rational functions: naXXXX =================*/

@@ -110,7 +110,6 @@ extern number      (*nacGcd)(number a, number b, const ring r);
 extern number      (*nacLcm)(number a, number b, const ring r);
 extern number      (*nacInit)(int i, const ring r);
 extern int         (*nacInt)(number &n, const ring r);
-extern void        (*nacDelete)(number *a, const ring r);
 extern void        (*nacNormalize)(number &a);
 extern number      (*nacNeg)(number a);
 extern number      (*nacCopy)(number a);
