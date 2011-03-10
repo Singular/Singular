@@ -16,7 +16,7 @@
  * Destroys: if !copy then p, q
  * Assumes: pLength(p) >= 2 pLength(q) >=2
  ***************************************************************/
-// #include <polys/options.h>
+#include <misc/options.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/templates/p_Procs.h>
 #include <polys/templates/p_Numbers.h>
@@ -128,11 +128,11 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
 
   Equal:
   n1 = pGetCoeff(rn);
-  n = n_Add(n1, pGetCoeff(qn), r);
-  n_Delete(&n1, r);
-  if (n_IsZero(n, r))
+  n = n_Add(n1, pGetCoeff(qn), r->cf);
+  n_Delete(&n1, r->cf);
+  if (n_IsZero(n, r->cf))
   {
-    n_Delete(&n, r);
+    n_Delete(&n, r->cf);
     p_LmFree(rn, r);
   }
   else
@@ -141,7 +141,7 @@ static poly _p_Mult_q_Bucket(poly p, const int lp,
     rr = rn;
   }
   rn = kBucketExtractLm(bucket);
-  n_Delete(&pGetCoeff(qn),r);
+  n_Delete(&pGetCoeff(qn),r->cf);
   qn = p_LmFreeAndNext(qn, r);
   goto Work;
 
@@ -192,7 +192,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 {
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
 #ifdef HAVE_RINGS
-  assume(rField_is_Domain(r));
+  assume(nField_is_Domain(r->cf));
 #endif
   pAssume1(! pHaveCommonMonoms(p, q));
   p_Test(p, r);
@@ -238,11 +238,11 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
   Equal:
   n1 = pGetCoeff(rn);
-  n = n_Add(n1, pGetCoeff(qn), r);
-  n_Delete(&n1, r);
-  if (n_IsZero(n, r))
+  n = n_Add(n1, pGetCoeff(qn), r->cf);
+  n_Delete(&n1, r->cf);
+  if (n_IsZero(n, r->cf))
   {
-    n_Delete(&n, r);
+    n_Delete(&n, r->cf);
     rn = p_LmFreeAndNext(rn, r);
   }
   else
@@ -251,7 +251,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
     rr = rn;
     pIter(rn);
   }
-  n_Delete(&pGetCoeff(qn),r);
+  n_Delete(&pGetCoeff(qn),r->cf);
   qn = p_LmFreeAndNext(qn, r);
   goto Work;
 
@@ -269,7 +269,7 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 {
 #ifdef HAVE_RINGS
-  if (!rField_is_Domain(currRing))
+  if (!nField_is_Domain(r->cf))
     return _p_Mult_q_Normal_ZeroDiv(p, q, copy, r);
 #endif
   int lp, lq, l;

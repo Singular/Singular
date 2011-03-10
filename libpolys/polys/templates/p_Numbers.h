@@ -22,22 +22,22 @@ static inline void   n_Delete_FieldGeneral(number* p, const ring r)
 { r->cf->cfDelete(p,r->cf); }
 
 static inline number n_Mult_FieldGeneral(number n1, number n2, const ring r)
-{ return r->cf->nMult(n1, n2, r->cf); }
+{ return r->cf->cfMult(n1, n2, r->cf); }
 
 static inline number n_Add_FieldGeneral(number n1, number n2, const ring r)
-{ return r->cf->nAdd(n1, n2, r->cf); }
+{ return r->cf->cfAdd(n1, n2, r->cf); }
 
 static inline BOOLEAN n_IsZero_FieldGeneral(number n, const ring r)
-{ return r->cf->nIsZero(n, r->cf); }
+{ return r->cf->cfIsZero(n, r->cf); }
 
 static inline BOOLEAN n_Equal_FieldGeneral(number n1, number n2, const ring r)
-{ return r->cf->nEqual(n1, n2, r->cf); }
+{ return r->cf->cfEqual(n1, n2, r->cf); }
 
 static inline number n_Neg_FieldGeneral(number n,     const ring r)
-{ return r->cf->nNeg(n, r->cf); }
+{ return r->cf->cfNeg(n, r->cf); }
 
 static inline number n_Sub_FieldGeneral(number n1, number n2, const ring r)
-{ return r->cf->nSub(n1, n2, r->cf); }
+{ return r->cf->cfSub(n1, n2, r->cf); }
 
 static inline void n_InpMult_FieldGeneral(number &n1, number n2, const ring r)
 { ndInpMult(n1, n2, r->cf); }
