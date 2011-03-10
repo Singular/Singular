@@ -239,6 +239,17 @@ static inline n_coeffType getCoeffType(const coeffs r)
   return r->type;
 }
 
+/// returns true for coeffs being a domain
+static inline bool nField_is_Domain(const coeffs r)
+{
+#ifdef HAVE_RINGS
+  return (r->ringtype == 4 || r->ringtype == 0);
+#else
+  return true;
+#endif
+}
+
+
 static inline int nInternalChar(const coeffs r)
 {
   return r->ch;
