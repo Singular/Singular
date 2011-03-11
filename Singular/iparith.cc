@@ -3202,7 +3202,8 @@ static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
 //        v: timeout for select in milliseconds
 //           or 0 for polling
 // returns: ERROR (via Werror): timeout negative
-//           0: timeout (or polling): none ready
+//           -1: the read state of all links is eof
+//            0: timeout (or polling): none ready
 //           i>0: (at least) L[i] is ready
   lists Lforks = (lists)u->Data();
   int t = (int)(long)v->Data();
@@ -3211,6 +3212,10 @@ static BOOLEAN jjWAIT1ST2(leftv res, leftv u, leftv v)
     WerrorS("negative timeout"); return TRUE;
   }
   int i = slStatusSsiL(Lforks, t*1000);
+  if(i == -2) /* error */
+  {
+    return TRUE;
+  }
   res->data = (void*)(long)i;
   return FALSE;
 }
@@ -3221,8 +3226,10 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
 //        v: timeout for select in milliseconds
 //           or 0 for polling
 // returns: ERROR (via Werror): timeout negative
+//           -1: the read state of all links is eof
 //           0: timeout (or polling): none ready
 //           1: all links are ready
+//              (caution: at least one is ready, but some maybe dead)
   lists Lforks = (lists)u->CopyD();
   int timeout = 1000*(int)(long)v->Data();
   if(timeout < 0)
@@ -3231,18 +3238,30 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
   }
   int t = 1000*getRTimer()/TIMER_RESOLUTION;
   int i;
-  int ret = 1;
-  for(int nfinished = 0; nfinished < Lforks->nr; nfinished++)
+  int ret = -1;
+  for(int nfinished = 0; nfinished < Lforks->nr+1; nfinished++)
   {
     i = slStatusSsiL(Lforks, timeout);
-    if(i > 0)
+    if(i > 0) /* Lforks[i] is ready */
     {
+      ret = 1;
       Lforks->m[i-1].CleanUp();
       Lforks->m[i-1].rtyp=DEF_CMD;
       Lforks->m[i-1].data=NULL;
       timeout = si_max(0,timeout - 1000*getRTimer()/TIMER_RESOLUTION + t);
     }
-    else { ret = 0; break; /* terminate the for loop */ }
+    else /* terminate the for loop */
+    {
+      if(i == -2) /* error */
+      {
+        return TRUE;
+      }
+      if(i == 0) /* timeout */
+      {
+        ret = 0;
+      }
+      break;
+    }
   }
   Lforks->Clean();
   res->data = (void*)(long)ret;
@@ -4617,9 +4636,14 @@ BOOLEAN jjWAIT1ST1(leftv res, leftv u)
 {
 // input: u: a list with links of type
 //           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
-// returns: i>0: (at least) a[i] is ready
+// returns: -1:  the read state of all links is eof
+//          i>0: (at least) u[i] is ready
   lists Lforks = (lists)u->Data();
   int i = slStatusSsiL(Lforks, -1);
+  if(i == -2) /* error */
+  {
+    return TRUE;
+  }
   res->data = (void*)(long)i;
   return FALSE;
 }
@@ -4627,16 +4651,29 @@ BOOLEAN jjWAITALL1(leftv res, leftv u)
 {
 // input: u: a list with links of type
 //           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
-// returns: nothing. All links are ready when finished.
+// returns: -1: the read state of all links is eof
+//           1: all links are ready
+//              (caution: at least one is ready, but some maybe dead)
   lists Lforks = (lists)u->CopyD();
   int i;
-  for(int nfinished = 0; nfinished < Lforks->nr; nfinished++)
+  int j = -1;
+  for(int nfinished = 0; nfinished < Lforks->nr+1; nfinished++)
   {
     i = slStatusSsiL(Lforks, -1);
+    if(i == -2) /* error */
+    {
+      return TRUE;
+    }
+    if(i == -1)
+    {
+      break;
+    }
+    j = 1;
     Lforks->m[i-1].CleanUp();
     Lforks->m[i-1].rtyp=DEF_CMD;
     Lforks->m[i-1].data=NULL;
   }
+  res->data = (void*)(long)j;
   Lforks->Clean();
   return FALSE;
 }

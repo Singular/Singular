@@ -7529,9 +7529,6 @@ See
 @table @code
 @item @strong{Syntax:}
 @code{waitall (} list_expression @code{)}
-@item @strong{Type:}
-none
-@item @strong{Syntax:}
 @code{waitall (} list_expression @code{, } int_expression @code{)}
 @item @strong{Type:}
 int
@@ -7539,15 +7536,18 @@ int
 Expects a list of open links (of mode ssi:fork, ssi:tcp, MPtcp:fork or
 MPtcp:launch)
 and waits until all of them are finished, i.e., are ready to be read.
-@*In the first case, the command waits for all links to finish (and may
-therefore run forever), and does not return anything.
+@*In the first case, the command waits for all links to finish
+(or to crash, see below) and may therefore run forever.
 @*In the second case, a timeout in milliseconds can be provided, forcing
-the command to terminate after the specified time (return value = 0), or
-- in case this happens earlier - when all links are finished (return value
-= 1).
+the command to terminate after the specified time.
 If the given timeout is 0, the command checks whether all links are
-finished (return value 1) or not (return value 0), but does not wait
-for any link (polling).
+finished or not, but does not wait for any link (polling).
+@*Return values are:
+@*-1: The read state of all links is @code{"eof"}, see @ref{link}.
+This might happen if all the links crashed.
+@*0: timeout (or polling): None of the links is ready.
+@*1: All links are ready. (Note: There might be links whose read state
+is @code{"eof"}, but at least one link is ready.)
 @item @strong{Example:}
 @smallexample
 @c example
@@ -7584,15 +7584,17 @@ int
 Expects a list of open links (of mode ssi:fork, ssi:tcp, MPtcp:fork or
 MPtcp:launch)
 and waits until the first of them is finished, i.e., is ready to be read.
-@*In the first case, the command waits for the first link to finish (and may
-therefore run forever), and returns the list index of the terminated link.
+@*In the first case, the command waits until the first link is finished
+(or all of them crashed, see below) and may therefore run forever.
 @*In the second case, a timeout in milliseconds can be provided, forcing
-the command to terminate after the specified time (return value = 0), or
-- in case this happens earlier - when the first link is finished (return value
-= list index of the terminated link).
+the command to terminate after the specified time.
 If the given timeout is 0, the command checks whether one of the links is
-finished (return value = list index of the terminated link) or not
-(return value 0), but does not wait for any link (polling).
+finished or not, but does not wait for any link (polling).
+@*Return values are:
+@*-1: The read state of all links is @code{"eof"}, see @ref{link}.
+This might happen if all the links crashed.
+@*0: timeout (or polling): None of the links is ready.
+@*i>1: At least the link whose list index is i is ready.
 @item @strong{Example:}
 @smallexample
 @c example

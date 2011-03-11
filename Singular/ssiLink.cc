@@ -1196,13 +1196,15 @@ const char* slStatusSsi(si_link l, const char* request)
 int slStatusSsiL(lists L, int timeout)
 {
 // input: L: a list with links of type
-//           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch
+//           ssi-fork, ssi-tcp, MPtcp-fork or MPtcp-launch.
+//           Note: Not every entry in L must be set.
 //        timeout: timeout for select in micro-seconds
 //           or -1 for infinity
 //           or 0 for polling
 // returns: ERROR (via Werror): L has wrong elements or link not open
 //           -2: select returns an error
-//           0: timeout or (polling): none ready
+//           -1: the read state of all links is eof
+//           0:  timeout (or polling): none ready,
 //           i>0: (at least) L[i] is ready
   si_link l;
   ssiInfo *d;
@@ -1211,10 +1213,45 @@ int slStatusSsiL(lists L, int timeout)
   #endif
   int d_fd;
   fd_set  mask, fdmask;
+  FD_ZERO(&fdmask);
   FD_ZERO(&mask);
-  int max_fd=0; /* max fd in fd_set */
-  struct timeval wt;
+  int max_fd=0; /* 1 + max fd in fd_set */
+
+  /* timeout */
+  struct timespec wt;
+  int startingtime = getRTimer()/TIMER_RESOLUTION;  // in seconds
+  struct timespec *wt_ptr=&wt;
+  if (timeout== -1)
+  {
+    wt_ptr=NULL;
+  }
+  else
+  {
+    wt.tv_sec  = timeout / 1000000;
+    wt.tv_nsec = 1000 * (timeout % 1000000);
+  }
+
+  /* signal mask for pselect() */
+  sigset_t sigmask;
+  if(sigprocmask(SIG_SETMASK, NULL, &sigmask) < 0)
+  {
+    WerrorS("error in sigprocmask()");
+    return -2;
+  }
+  if(sigaddset(&sigmask, SIGCHLD) < 0)
+  {
+    WerrorS("error in sigaddset()");
+    return -2;
+  }
+
+  /* auxiliary variables */
   int i;
+  int j;
+  int k;
+  int s;
+  char fdmaskempty;
+
+  /* check the links and fill in fdmask */
   for(i=L->nr; i>=0; i--)
   {
     if (L->m[i].Typ()!=DEF_CMD)
@@ -1228,7 +1265,8 @@ int slStatusSsiL(lists L, int timeout)
       || ((strcmp(l->mode,"fork")!=0) && (strcmp(l->mode,"tcp")!=0)
         && (strcmp(l->mode,"launch")!=0)))
       {
-        WerrorS("all links must be of type ssi:fork, ssi:tcp, MPtcp:fork or MPtcp:launch");
+        WerrorS("all links must be of type ssi:fork, ssi:tcp, MPtcp:fork\n");
+        WerrorS("or MPtcp:launch");
         return -2;
       }
     #ifdef HAVE_MPSR
@@ -1246,41 +1284,34 @@ int slStatusSsiL(lists L, int timeout)
       d=(ssiInfo*)l->data;
       d_fd=d->fd_read;
     #endif
-      FD_SET(d_fd, &mask);
+      FD_SET(d_fd, &fdmask);
       if (d_fd > max_fd) max_fd=d_fd;
     }
   }
   max_fd++;
-  struct timeval *wt_ptr=&wt;
-  if (timeout== -1)
+
+do_select:
+  /* copy fdmask to mask */
+  FD_ZERO(&mask);
+  for(k = 0; k < max_fd; k++)
   {
-    wt_ptr=NULL;
+    if(FD_ISSET(k, &fdmask))
+    {
+      FD_SET(k, &mask);
+    }
   }
-  else
-  {
-    wt.tv_sec  = timeout / 1000000;
-    wt.tv_usec = timeout % 1000000;
-  }
+
   /* check with select: chars waiting: no -> not ready */
-  int s= select(max_fd, &mask, NULL, NULL, wt_ptr);
+  s = pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
+Print("\nselect: %d\n", s);
   if (s==-1)
   { 
     WerrorS("error in select call");
     return -2; /*error*/
   }
-  int j;
-  int retry_needed=0;
-find_next_fd:
   if (s==0)
   {
-    if (retry_needed)
-    {
-      // the os reported that one of the (ssi) links is ready,
-      // but it was only white space: this cannot happen again:
-      return slStatusSsiL(L,timeout);
-    }
-    else
-      return 0; /*poll: not ready */
+    return 0; /*poll: not ready */
   }
   else /* s>0, at least one ready  (the number of fd which are ready is s)*/
   {
@@ -1321,13 +1352,32 @@ find_next_fd:
       /* setting: d: current ssiInfo, j current fd, i current entry in L*/
       int c=fgetc(d->f_read);
       //Print("try c=%d\n",c);
-      if (c== -1) /* eof or error*/
+      if (c== -1) /* eof */
       {
-        retry_needed=1;
-        FD_CLR(j,&mask);
-        s--;
-        goto find_next_fd;
+        FD_CLR(j,&fdmask);
+        fdmaskempty = 1;
+        for(k = 0; k < max_fd; k++)
+        {
+          if(FD_ISSET(k, &fdmask))
+          {
+            fdmaskempty = 0;
+            break;
+          }
+        }
+        if(fdmaskempty)
+        {
+          return -1;
+        }
+        if(timeout != -1)
+        {
+          timeout = si_max(0,
+               timeout - 1000000*(getRTimer()/TIMER_RESOLUTION - startingtime));
+          wt.tv_sec  = timeout / 1000000;
+          wt.tv_nsec = 1000 * (timeout % 1000000);
+        }
+        goto do_select;
       }
+
       else if (isdigit(c))
       { ungetc(c,d->f_read); d->ungetc_buf='\1'; return i+1; }
       else if (c>' ')

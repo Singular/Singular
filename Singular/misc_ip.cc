@@ -1058,7 +1058,10 @@ void m2_end(int i)
   }
   else
   {
-      printf("\nhalt %d\n",i);
+      if(!singular_in_batchmode)
+      {
+        printf("\nhalt %d\n",i);
+      }
   }
   #ifdef HAVE_MPSR
   if (MP_Exit_Env_Ptr!=NULL) (*MP_Exit_Env_Ptr)();
