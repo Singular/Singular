@@ -1303,7 +1303,6 @@ do_select:
 
   /* check with select: chars waiting: no -> not ready */
   s = pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
-Print("\nselect: %d\n", s);
   if (s==-1)
   { 
     WerrorS("error in select call");
