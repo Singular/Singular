@@ -44,11 +44,7 @@ CanonicalForm convSingNFactoryN( number n, const ring r )
 {
   CanonicalForm term;
   /* does only work for Zp, Q */
-  if ( getCharacteristic() != 0 )
-  {
-    term = npInt( n,r );
-  }
-  else
+  if ((r==NULL) || rField_is_Q(r))
   {
     if ( SR_HDL(n) & SR_INT )
     {
@@ -73,13 +69,20 @@ CanonicalForm convSingNFactoryN( number n, const ring r )
       }
     }
   }
+  else /*if ( (r!=NULL) && rField_is_Zp(r) ) */
+  {
+    term = npInt( n,r );
+  }
   return term;
 }
 
-number convFactoryNSingN( const CanonicalForm & n)
+number convFactoryNSingN( const CanonicalForm & n, const ring r)
 {
   if (n.isImm())
-    return nInit(n.intval());
+  {
+    if (r==NULL) return nlInit(n.intval(),NULL);
+    else         return n_Init(n.intval(),r);
+  }
   else
   {
     number z=(number)omAllocBin(rnumber_bin);
@@ -98,6 +101,12 @@ number convFactoryNSingN( const CanonicalForm & n)
     return z;
   }
 }
+
+//number convFactoryNSingN( const CanonicalForm & n)
+//{
+//  return convFactoryNSingN(n,currRing);
+//}
+
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r )
 {
@@ -481,22 +490,22 @@ number   nlChineseRemainder(number *x, number *q,int rl)
   int i;
   for(i=rl-1;i>=0;i--)
   {
-    X[i]=convSingNFactoryN(x[i],currRing); // may be larger MAX_INT
-    Q[i]=convSingNFactoryN(q[i],currRing); // may be larger MAX_INT
+    X[i]=convSingNFactoryN(x[i],NULL); // may be larger MAX_INT
+    Q[i]=convSingNFactoryN(q[i],NULL); // may be larger MAX_INT
   }
   CanonicalForm xnew,qnew;
   chineseRemainder(X,Q,xnew,qnew);
-  number n=convFactoryNSingN(xnew);
-  number p=convFactoryNSingN(qnew);
-  number p2=nlIntDiv(p,nlInit(2, currRing));
+  number n=convFactoryNSingN(xnew,NULL);
+  number p=convFactoryNSingN(qnew,NULL);
+  number p2=nlIntDiv(p,nlInit(2, NULL));
   if (nlGreater(n,p2))
   {
      number n2=nlSub(n,p);
-     nlDelete(&n,currRing);
+     nlDelete(&n,NULL);
      n=n2;
   }
-  nlDelete(&p,currRing);
-  nlDelete(&p2,currRing);
+  nlDelete(&p,NULL);
+  nlDelete(&p2,NULL);
   return n;
 #else
   WerrorS("not implemented");
