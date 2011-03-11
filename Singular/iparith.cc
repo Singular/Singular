@@ -1501,30 +1501,26 @@ static BOOLEAN jjCALL2MANY(leftv res, leftv u, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_BI(leftv res, leftv u, leftv v)
 {
-  if (rField_is_Q())
+  intvec *c=(intvec*)u->Data();
+  intvec* p=(intvec*)v->Data();
+  int rl=p->length();
+  number *x=(number *)omAlloc(rl*sizeof(number));
+  number *q=(number *)omAlloc(rl*sizeof(number));
+  int i;
+  for(i=rl-1;i>=0;i--)
   {
-    intvec *c=(intvec*)u->Data();
-    intvec* p=(intvec*)v->Data();
-    int rl=p->length();
-    number *x=(number *)omAlloc(rl*sizeof(number));
-    number *q=(number *)omAlloc(rl*sizeof(number));
-    int i;
-    for(i=rl-1;i>=0;i--)
-    {
-      q[i]=nlInit((*p)[i], NULL);
-      x[i]=nlInit((*c)[i], NULL);
-    }
-    number n=nlChineseRemainder(x,q,rl);
-    for(i=rl-1;i>=0;i--)
-    {
-      nlDelete(&(q[i]),NULL);
-      nlDelete(&(x[i]),NULL);
-    }
-    omFree(x); omFree(q);
-    res->data=(char *)n;
-    return FALSE;
+    q[i]=nlInit((*p)[i], NULL);
+    x[i]=nlInit((*c)[i], NULL);
   }
-  else return TRUE;
+  number n=nlChineseRemainder(x,q,rl);
+  for(i=rl-1;i>=0;i--)
+  {
+    nlDelete(&(q[i]),NULL);
+    nlDelete(&(x[i]),NULL);
+  }
+  omFree(x); omFree(q);
+  res->data=(char *)n;
+  return FALSE;
 }
 #endif
 #if 0
@@ -1593,7 +1589,7 @@ static BOOLEAN jjCHINREM_P(leftv res, leftv u, leftv v)
 #ifdef HAVE_FACTORY
 static BOOLEAN jjCHINREM_ID(leftv res, leftv u, leftv v)
 {
-  if (rField_is_Q())
+  if ((currRing==NULL) || rField_is_Q())
   {
     lists c=(lists)u->CopyD(); // list of ideal
     lists pl=NULL;

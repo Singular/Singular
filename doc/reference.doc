@@ -664,6 +664,7 @@ applies chinese remainder theorem to the first argument w.r.t. the moduli given 
 The elements in the first list must be of same type which can be @code{ideal},
 @code{module} or @code{matrix}.
 The moduli, if given by a list, must be of type @code{bigint} or @code{int}.
+@*If data depending on a ring are involved, the coeffcient field must be @code{Q}.
 @item @strong{Example:}
 @smallexample
 @c example

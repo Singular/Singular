@@ -211,7 +211,6 @@ void yyerror(const char * fmt)
 
 /* ring dependent cmd:*/
 %token <i> BETTI_CMD
-%token <i> CHINREM_CMD
 %token <i> COEFFS_CMD
 %token <i> COEF_CMD
 %token <i> CONTRACT_CMD
