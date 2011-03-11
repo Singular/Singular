@@ -7591,7 +7591,7 @@ the command to terminate after the specified time.
 If the given timeout is 0, the command checks whether one of the links is
 finished or not, but does not wait for any link (polling).
 @*Return values are:
-@*-1: The read state of all links is @code{"eof"}, see @ref{link}i, @ref{status}.
+@*-1: The read state of all links is @code{"eof"}, see @ref{link}, @ref{status}.
 This might happen if all the links crashed.
 @*0: timeout (or polling): None of the links is ready.
 @*i>1: At least the link whose list index is i is ready.
