@@ -3236,7 +3236,7 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
   {
     WerrorS("negative timeout"); return TRUE;
   }
-  int t = 1000*getRTimer()/TIMER_RESOLUTION;
+  int t = getRTimer()/TIMER_RESOLUTION;  // in seconds
   int i;
   int ret = -1;
   for(int nfinished = 0; nfinished < Lforks->nr+1; nfinished++)
@@ -3248,7 +3248,7 @@ static BOOLEAN jjWAITALL2(leftv res, leftv u, leftv v)
       Lforks->m[i-1].CleanUp();
       Lforks->m[i-1].rtyp=DEF_CMD;
       Lforks->m[i-1].data=NULL;
-      timeout = si_max(0,timeout - 1000*getRTimer()/TIMER_RESOLUTION + t);
+      timeout = si_max(0,timeout - 1000*(getRTimer()/TIMER_RESOLUTION - t));
     }
     else /* terminate the for loop */
     {

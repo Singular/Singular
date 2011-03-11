@@ -34,6 +34,7 @@
 #include <kernel/ideals.h>
 #include <kernel/intvec.h>
 #include <kernel/options.h>
+#include <kernel/timer.h>
 #include <Singular/subexpr.h>
 #include <Singular/silink.h>
 #include <Singular/cntrlc.h>
