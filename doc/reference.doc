@@ -6741,7 +6741,7 @@ be put to sleep is one second.
 @item @code{"name"}
 the name string given by the definition of the link (usually the filename)
 @item @code{"type"}
-returns @code{"ASCII"}, @code{"MPfile"}, @code{"MPtcp"} or @code{"DBM"}
+returns @code{"ASCII"}, @code{"MPfile"}, @code{"MPtcp"}, @code{"DBM"} or @code{"ssi"}
 @item @code{"open"}
 returns @code{"yes"} or @code{"no"}
 @item @code{"openread"}
@@ -6756,7 +6756,7 @@ returns @code{"ready"} or @code{"not ready"}
 returns (depending on the type of the link and its status)
 @code{"","w","a","r"} or @code{"rw"}
 @item @code{"exists"}
-returns @code{"yes"} or @code{"no"}: existence of the filename for ASCII/MPfile links
+returns @code{"yes"} or @code{"no"}: existence of the filename for ASCII/MPfile/ssi links
 @end table
 @item @strong{Example:}
 @smallexample
