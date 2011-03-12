@@ -46,7 +46,6 @@ number      (*nacCopy)(number a);
 number      (*nacInvers)(number a);
 BOOLEAN     (*nacIsZero)(number a);
 BOOLEAN     (*nacIsOne)(number a);
-BOOLEAN     (*nacIsMOne)(number a);
 BOOLEAN     (*nacGreaterZero)(number a);
 number      (*nacMap)(number);
 
@@ -103,7 +102,6 @@ void ntSetChar(int i, ring r)
   nacIsZero      = nacRing->cf->nIsZero;
   nacGreaterZero = nacRing->cf->nGreaterZero;
   nacIsOne       = nacRing->cf->nIsOne;
-  nacIsMOne      = nacRing->cf->nIsMOne;
   nacGcd         = nacRing->cf->nGcd;
   nacLcm         = nacRing->cf->nLcm;
   nacMult        = nacRing->cf->nMult;
@@ -1741,7 +1739,7 @@ BOOLEAN ntIsMOne(number za)
 #endif
   if (a->n==NULL)
   {
-    if (p_LmIsConstant(a->z,nacRing)) return nacIsMOne(pGetCoeff(a->z));
+    if (p_LmIsConstant(a->z,nacRing)) return n_IsMOne(pGetCoeff(a->z),nacRing);
     /*else                   return FALSE;*/
   }
   return FALSE;

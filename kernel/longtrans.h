@@ -116,7 +116,6 @@ extern number      (*nacCopy)(number a);
 extern number      (*nacInvers)(number a);
 extern BOOLEAN     (*nacIsZero)(number a);
 extern BOOLEAN     (*nacIsOne)(number a);
-extern BOOLEAN     (*nacIsMOne)(number a);
 extern BOOLEAN     (*nacGreaterZero)(number a);
 extern number      (*nacMap)(number);
 
