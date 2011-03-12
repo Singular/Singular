@@ -48,7 +48,6 @@ BOOLEAN     (*nacIsZero)(number a);
 BOOLEAN     (*nacIsOne)(number a);
 BOOLEAN     (*nacIsMOne)(number a);
 BOOLEAN     (*nacGreaterZero)(number a);
-const char* (*nacRead) (const char *s, number *a);
 number      (*nacMap)(number);
 
 #ifdef LDEBUG
@@ -102,7 +101,6 @@ void ntSetChar(int i, ring r)
   nacNormalize   = nacRing->cf->nNormalize;
   nacNeg         = nacRing->cf->nNeg;
   nacIsZero      = nacRing->cf->nIsZero;
-  nacRead        = nacRing->cf->nRead;
   nacGreaterZero = nacRing->cf->nGreaterZero;
   nacIsOne       = nacRing->cf->nIsOne;
   nacIsMOne      = nacRing->cf->nIsMOne;
@@ -483,7 +481,7 @@ const char* napRead(const char *s, napoly *b)
   a = (napoly)p_Init(nacRing);
   if ((*s >= '0') && (*s <= '9'))
   {
-    s = nacRead(s, &pGetCoeff(a));
+    s = nacRing->cf->nRead(s, &pGetCoeff(a));
     if (nacIsZero(pGetCoeff(a)))
     {
       p_LmDelete(&a, nacRing);

@@ -118,7 +118,6 @@ extern BOOLEAN     (*nacIsZero)(number a);
 extern BOOLEAN     (*nacIsOne)(number a);
 extern BOOLEAN     (*nacIsMOne)(number a);
 extern BOOLEAN     (*nacGreaterZero)(number a);
-extern const char* (*nacRead) (const char *s, number *a);
 extern number      (*nacMap)(number);
 
 /* for computing with polynomials living in nacRing */

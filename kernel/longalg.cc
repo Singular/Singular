@@ -172,7 +172,6 @@ void naSetChar(int i, ring r)
   nacNormalize   = nacRing->cf->nNormalize;
   nacNeg         = nacRing->cf->nNeg;
   nacIsZero      = nacRing->cf->nIsZero;
-  nacRead        = nacRing->cf->nRead;
   nacGreaterZero = nacRing->cf->nGreaterZero;
   nacIsOne       = nacRing->cf->nIsOne;
   nacIsMOne      = nacRing->cf->nIsMOne;
