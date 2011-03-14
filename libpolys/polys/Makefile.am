@@ -12,7 +12,7 @@ SOURCES = \
 	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
 	pDebug.cc pInline0.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
-	templates/p_Procs_Lib.cc polys.cc \
+	templates/p_Procs_Lib.cc \
 	polys0.cc polys1.cc prCopy.cc prCopyTemplate.cc \
 	kbuckets.cc sbuckets.cc templates/p_Procs.cc
 

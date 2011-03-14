@@ -11,13 +11,13 @@
 #include "polys/config.h"
 #include <misc/auxiliary.h>
 // #include <polys/structs.h>
-#include <polys/p_polys.h>
+#include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
-#include <polys/p_Procs.h>
-#include <polys/p_Numbers.h>
-#include <polys/p_MemCmp.h>
-#include <polys/p_MemAdd.h>
-#include <polys/p_MemCopy.h>
+#include <polys/templates/p_Procs.h>
+#include <polys/templates/p_Numbers.h>
+#include <polys/templates/p_MemCmp.h>
+#include <polys/templates/p_MemAdd.h>
+#include <polys/templates/p_MemCopy.h>
 //#include <polys/kbuckets.h>
 
 #include "p_Procs.inc"

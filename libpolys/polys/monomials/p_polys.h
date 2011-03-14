@@ -299,6 +299,7 @@ poly      p_Power(poly p, int i, const ring r);
  * Misc stuff
  *
  ***************************************************************/
+void      p_Norm(poly p1, const ring r);
 void      p_Normalize(poly p,const ring r);
 
 void      p_Content(poly p, const ring r);
@@ -317,6 +318,8 @@ BOOLEAN   p_IsHomogeneous (poly p, const ring r);
 
 static inline void p_Setm(poly p, const ring r);
 p_SetmProc p_GetSetmProc(ring r);
+
+poly      p_Subst(poly p, int n, poly e, const ring r);
 
 // TODO:
 #define p_SetmComp  p_Setm

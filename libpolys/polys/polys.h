@@ -314,8 +314,8 @@ poly      pTakeOutComp(poly * p, int k);
 */
 void      pSetPolyComp(poly p, int comp);
 #define   pDeleteComp(p,k) p_DeleteComp(p,k,currRing)
-void      pNorm(poly p);
-poly      pSubst(poly p, int n, poly e);
+#define   pNorm(p) p_Norm(p,currRing)
+#define   pSubst(p,n,e) p_Subst(p,n.e,currRing)
 poly      ppJet(poly p, int m);
 poly      pJet(poly p, int m);
 poly      ppJetW(poly p, int m, short * iv);

@@ -4,9 +4,8 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Id$ */
-#include <kernel/structs.h>
-#include <kernel/p_Procs.h>
-#include <kernel/pShallowCopyDelete.h>
+#include <polys/templates/p_Procs.h>
+#include <polys/operations/pShallowCopyDelete.h>
 
 //#define HAVE_COEF_BUCKETS
 
@@ -20,7 +19,7 @@
 //////////////////////////////////////////////////////////////////////////
 // Creation/Destruction of buckets
 //
-kBucket_pt kBucketCreate(ring r = currRing);
+kBucket_pt kBucketCreate(ring r);
 // only free memory allocated for bucket
 void kBucketDestroy(kBucket_pt *bucket);
 // frees polys/monomials in bucket and destroys bucket
