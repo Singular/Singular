@@ -2338,7 +2338,9 @@ ring rCompose(const lists  L)
           {
             par_perm_size=rPar(orig_ring);
             BITSET save_test=test;
-            ntSetChar(rInternalChar(orig_ring),orig_ring);
+            if ((orig_ring->minpoly != NULL) || (orig_ring->minideal != NULL))
+              naSetChar(rInternalChar(orig_ring),orig_ring);
+            else ntSetChar(rInternalChar(orig_ring),orig_ring);
             nSetChar(currRing);
             test=save_test;
           }
