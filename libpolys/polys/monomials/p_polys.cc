@@ -222,7 +222,6 @@ void p_Setm_General(poly p, const ring r)
               assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
             }
           }
-	   
 #ifndef NDEBUG
           for( int i = 1; i <= r->N; i++ ) // No v[0] here!!!
           {
@@ -1230,10 +1229,10 @@ done:
         }
     }
 #endif
-    
+
     p_Setm(rc,r);
   }
-finish:  
+finish:
   return s;
 }
 poly p_mInit(const char *st, BOOLEAN &ok, const ring r)
@@ -2348,7 +2347,7 @@ poly p_Cleardenom(poly ph, const ring r)
       }
     }
     if (h!=NULL) n_Delete(&h,r->cf);
-  
+
     p_Content(ph,r);
 #ifdef HAVE_RATGRING
     if (rIsRatGRing(r))
@@ -2550,7 +2549,7 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
   pFDegProc d;
   if (r->pLexOrder && (r->order[0]==ringorder_lp))
     d=p_Totaldegree;
-  else 
+  else
     d=pFDeg;
   o = d(p,r);
   do
@@ -2902,6 +2901,262 @@ void pEnlargeSet(poly* *p, int l, int increment)
 }
 
 /*2
+*divides p1 by its leading coefficient
+*/
+void p_Norm(poly p1, const ring r)
+{
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r))
+  {
+    if (!nIsUnit(pGetCoeff(p1))) return;
+    // Werror("p_Norm not possible in the case of coefficient rings.");
+  }
+  else
+#endif
+  if (p1!=NULL)
+  {
+    if (pNext(p1)==NULL)
+    {
+      p_SetCoeff(p1,n_Init(1,r->cf),r);
+      return;
+    }
+    poly h;
+    if (!n_IsOne(pGetCoeff(p1),r->cf))
+    {
+      number k, c;
+      n_Normalize(pGetCoeff(p1),r->cf);
+      k = pGetCoeff(p1);
+      c = n_Init(1,r->cf);
+      pSetCoeff0(p1,c);
+      h = pNext(p1);
+      while (h!=NULL)
+      {
+        c=n_Div(pGetCoeff(h),k,r->cf);
+        // no need to normalize: Z/p, R
+        // normalize already in nDiv: Q_a, Z/p_a
+        // remains: Q
+        if (rField_is_Q(r) && (!n_IsOne(c,r->cf))) n_Normalize(c,r->cf);
+        p_SetCoeff(h,c,r);
+        pIter(h);
+      }
+      n_Delete(&k,r->cf);
+    }
+    else
+    {
+      //if (r->cf->cfNormalize != nDummy2) //TODO: OPTIMIZE
+      {
+        h = pNext(p1);
+        while (h!=NULL)
+        {
+          n_Normalize(pGetCoeff(h),r->cf);
+          pIter(h);
+        }
+      }
+    }
+  }
+}
+
+/*2
+*normalize all coefficients
+*/
+void p_Normalize(poly p,const ring r)
+{
+  if (rField_has_simple_inverse(r)) return; /* Z/p, GF(p,n), R, long R/C */
+  while (p!=NULL)
+  {
+#ifdef LDEBUG
+    if (currRing==r) {nTest(pGetCoeff(p));}
+#endif
+    n_Normalize(pGetCoeff(p),r->cf);
+    pIter(p);
+  }
+}
+
+// splits p into polys with Exp(n) == 0 and Exp(n) != 0
+// Poly with Exp(n) != 0 is reversed
+static void p_SplitAndReversePoly(poly p, int n, poly *non_zero, poly *zero, const ring r)
+{
+  if (p == NULL)
+  {
+    *non_zero = NULL;
+    *zero = NULL;
+    return;
+  }
+  spolyrec sz;
+  poly z, n_z, next;
+  z = &sz;
+  n_z = NULL;
+
+  while(p != NULL)
+  {
+    next = pNext(p);
+    if (p_GetExp(p, n,r) == 0)
+    {
+      pNext(z) = p;
+      pIter(z);
+    }
+    else
+    {
+      pNext(p) = n_z;
+      n_z = p;
+    }
+    p = next;
+  }
+  pNext(z) = NULL;
+  *zero = pNext(&sz);
+  *non_zero = n_z;
+}
+/*3
+* substitute the n-th variable by 1 in p
+* destroy p
+*/
+static poly p_Subst1 (poly p,int n, const ring r)
+{
+  poly qq=NULL, result = NULL;
+  poly zero=NULL, non_zero=NULL;
+
+  // reverse, so that add is likely to be linear
+  p_SplitAndReversePoly(p, n, &non_zero, &zero,r);
+
+  while (non_zero != NULL)
+  {
+    assume(p_GetExp(non_zero, n,r) != 0);
+    qq = non_zero;
+    pIter(non_zero);
+    qq->next = NULL;
+    p_SetExp(qq,n,0,r);
+    p_Setm(qq,r);
+    result = p_Add_q(result,qq,r);
+  }
+  p = p_Add_q(result, zero,r);
+  p_Test(p,r);
+  return p;
+}
+
+/*3
+* substitute the n-th variable by number e in p
+* destroy p
+*/
+static poly p_Subst2 (poly p,int n, number e, const ring r)
+{
+  assume( ! n_IsZero(e,r->cf) );
+  poly qq,result = NULL;
+  number nn, nm;
+  poly zero, non_zero;
+
+  // reverse, so that add is likely to be linear
+  p_SplitAndReversePoly(p, n, &non_zero, &zero,r);
+
+  while (non_zero != NULL)
+  {
+    assume(p_GetExp(non_zero, nm,r) != 0);
+    qq = non_zero;
+    pIter(non_zero);
+    qq->next = NULL;
+    n_Power(e, p_GetExp(qq, n, r), &nn,r->cf);
+    nm = n_Mult(nn, pGetCoeff(qq),r->cf);
+#ifdef HAVE_RINGS
+    if (n_IsZero(nm,r->cf))
+    {
+      p_LmFree(&qq,r);
+      n_Delete(&nm,r->cf);
+    }
+    else
+#endif
+    {
+      p_SetCoeff(qq, nm,r);
+      p_SetExp(qq, n, 0,r);
+      p_Setm(qq,r);
+      result = p_Add_q(result,qq,r);
+    }
+    n_Delete(&nn,r->cf);
+  }
+  p = p_Add_q(result, zero,r);
+  p_Test(p,r);
+  return p;
+}
+
+
+/* delete monoms whose n-th exponent is different from zero */
+static poly p_Subst0(poly p, int n, const ring r)
+{
+  spolyrec res;
+  poly h = &res;
+  pNext(h) = p;
+
+  while (pNext(h)!=NULL)
+  {
+    if (p_GetExp(pNext(h),n,r)!=0)
+    {
+      p_LmDelete(&pNext(h),r);
+    }
+    else
+    {
+      pIter(h);
+    }
+  }
+  p_Test(pNext(&res),r);
+  return pNext(&res);
+}
+
+/*2
+* substitute the n-th variable by e in p
+* destroy p
+*/
+poly p_Subst(poly p, int n, poly e, const ring r)
+{
+  if (e == NULL) return p_Subst0(p, n,r);
+
+  if (p_IsConstant(e,r))
+  {
+    if (n_IsOne(pGetCoeff(e),r->cf)) return p_Subst1(p,n,r);
+    else return p_Subst2(p, n, pGetCoeff(e),r);
+  }
+
+#ifdef HAVE_PLURAL
+  if (rIsPluralRing(r))
+  {
+    return nc_pSubst(p,n,e,r);
+  }
+#endif
+
+  int exponent,i;
+  poly h, res, m;
+  int *me,*ee;
+  number nu,nu1;
+
+  me=(int *)omAlloc((rVar(r)+1)*sizeof(int));
+  ee=(int *)omAlloc((rVar(r)+1)*sizeof(int));
+  if (e!=NULL) p_GetExpV(e,ee,r);
+  res=NULL;
+  h=p;
+  while (h!=NULL)
+  {
+    if ((e!=NULL) || (p_GetExp(h,n,r)==0))
+    {
+      m=p_Head(h,r);
+      p_GetExpV(m,me,r);
+      exponent=me[n];
+      me[n]=0;
+      for(i=rVar(r);i>0;i--)
+        me[i]+=exponent*ee[i];
+      p_SetExpV(m,me,r);
+      if (e!=NULL)
+      {
+        n_Power(pGetCoeff(e),exponent,&nu,r->cf);
+        nu1=n_Mult(pGetCoeff(m),nu,r->cf);
+        n_Delete(&nu,r->cf);
+        p_SetCoeff(m,nu1,r);
+      }
+      res=p_Add_q(res,m,r);
+    }
+    p_LmDelete(&h,r);
+  }
+  omFreeSize((ADDRESS)me,(rVar(r)+1)*sizeof(int));
+  omFreeSize((ADDRESS)ee,(rVar(r)+1)*sizeof(int));
+  return res;
+}
+/*2
 *returns a re-ordered copy of a polynomial, with permutation of the variables
 */
 poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
@@ -2981,8 +3236,8 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
             }
             else
             {
-	      WerrorS("longalg missing");
-	      #if 0
+              WerrorS("longalg missing");
+              #if 0
               lnumber c=(lnumber)pGetCoeff(qq);
               if (c->z->next==NULL)
                 p_AddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->algring);
@@ -2993,10 +3248,10 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
                 p_Setm(mmc->z,dst->algring->cf);
                 pGetCoeff(qq)=n_Mult((number)c,(number)mmc,dst->cf);
                 n_Delete((number *)&c,dst->cf);
-                n_Delete((number *)&mmc,dst->cf); 
+                n_Delete((number *)&mmc,dst->cf);
               }
               mapped_to_par=1;
-	      #endif
+              #endif
             }
           }
           else
@@ -3088,3 +3343,16 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
 
 #include <polys/templates/p_Delete__T.cc>
 
+#ifdef HAVE_RINGS
+/* TRUE iff LT(f) | LT(g) */
+BOOLEAN p_DivisibleByRingCase(poly f, poly g, const ring r)
+{
+  int exponent;
+  for(int i = (int)r->N; i; i--)
+  {
+    exponent = p_GetExp(g, i, r) - p_GetExp(f, i, r);
+    if (exponent < 0) return FALSE;
+  }
+  return n_DivBy(p_GetCoeff(g,r), p_GetCoeff(f,r),r->cf);
+}
+#endif
