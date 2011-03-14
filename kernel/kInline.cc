@@ -754,11 +754,11 @@ KINLINE long sLObject::pLDeg(BOOLEAN deg_last)
   if (last == NULL || pLength == 0)
     last = pLast(GetLmTailRing(), pLength);
 #ifdef HAVE_ASSUME
-  long fdeg;
-  fdeg = tailRing->pLDeg(GetLmTailRing(), &length, tailRing);
+  long ldeg;
+  ldeg = tailRing->pLDeg(GetLmTailRing(), &length, tailRing);
   assume ( pLength == length || rIsSyzIndexRing(currRing));
-  assume (fdeg == tailRing->pFDeg(last, tailRing));
-  return fdeg;
+  assume (ldeg == tailRing->pFDeg(last,tailRing));
+  return ldeg;
 #else
   length = pLength;
   return tailRing->pFDeg(last, tailRing);
