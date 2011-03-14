@@ -2,9 +2,9 @@
 version="$Id$";
 category="Teaching";
 info="
-LIBRARY:  findiff.lib    procedures to compute finite difference schemes for
-                         linear differential equations
-AUTHOR:                  Christian Dingler
+LIBRARY:  finitediff.lib   procedures to compute finite difference schemes
+                           for linear differential equations
+AUTHOR:                    Christian Dingler
 
 OVERVIEW:
 @texinfo

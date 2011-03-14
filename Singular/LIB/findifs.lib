@@ -33,7 +33,7 @@ magnitude(P); compute the square of the magnitude of a complex expression
 replace(s,what,with);  replace in s all the substrings with a given string
 xchange(w,a,b); exchange two substrings in a given string
 
-SEE ALSO: latex_lib, findiff_lib
+SEE ALSO: latex_lib, finitediff_lib
 ";
 
 
