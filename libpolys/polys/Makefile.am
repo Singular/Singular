@@ -14,7 +14,7 @@ SOURCES = \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc polys.cc \
 	polys0.cc polys1.cc prCopy.cc prCopyTemplate.cc \
-	sbuckets.cc templates/p_Procs.cc
+	kbuckets.cc sbuckets.cc templates/p_Procs.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
 
@@ -27,7 +27,7 @@ include_HEADERS = \
 	templates/p_Numbers.h templates/p_Procs.h \
 	templates/p_Procs_Dynamic.h templates/p_Procs_Impl.h templates/p_Procs_Set.h templates/p_Procs_Static.h \
 	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
-	sbuckets.h simpleideals.h
+	kbuckets.h sbuckets.h simpleideals.h
 
 libp_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral
 libp_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep
