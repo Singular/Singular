@@ -1037,20 +1037,35 @@ number nlGcd(number a, number b, const ring r)
       i=j;
       j=l;
     } while (l!=0L);
-    return INT_TO_SR(i);
+    if (i==POW_2_28)
+      result=nlRInit(POW_2_28);
+    else
+     result=INT_TO_SR(i);
+    nlTest(result);
+    return result;
   }
   if (((!(SR_HDL(a) & SR_INT))&&(a->s<2))
   ||  ((!(SR_HDL(b) & SR_INT))&&(b->s<2))) return INT_TO_SR(1);
   if (SR_HDL(a) & SR_INT)
   {
-    unsigned long t=mpz_gcd_ui(NULL,b->z,ABS(SR_TO_INT(a)));
-    return INT_TO_SR(t);
+    LONG aa=ABS(SR_TO_INT(a));
+    unsigned long t=mpz_gcd_ui(NULL,b->z,(long)aa);
+    if (t==POW_2_28)
+      result=nlRInit(POW_2_28);
+    else
+     result=INT_TO_SR(t);
+    nlTest(result);
   }
   else
   if (SR_HDL(b) & SR_INT)
   {
-    unsigned long t=mpz_gcd_ui(NULL,a->z,ABS(SR_TO_INT(b)));
-    return INT_TO_SR(t);
+    LONG bb=ABS(SR_TO_INT(b));
+    unsigned long t=mpz_gcd_ui(NULL,a->z,(long)bb);
+    if (t==POW_2_28)
+      result=nlRInit(POW_2_28);
+    else
+     result=INT_TO_SR(t);
+    nlTest(result);
   }
   else
   {
@@ -1062,8 +1077,8 @@ number nlGcd(number a, number b, const ring r)
     result->debug=123456;
   #endif
     result=nlShort3(result);
+    nlTest(result);
   }
-  nlTest(result);
   return result;
 }
 
