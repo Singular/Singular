@@ -2012,7 +2012,7 @@ static BOOLEAN jjFETCH(leftv res, leftv u, leftv v)
       {
         par_perm_size=rPar(r);
         BITSET save_test=test;
-        naSetChar(rInternalChar(r),r);
+        ntSetChar(rInternalChar(r),r);
         nSetChar(currRing);
         test=save_test;
       }
