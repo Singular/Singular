@@ -869,7 +869,7 @@ Comments should be send to the author of the library directly.
 
 @menu
 * fpadim_lib::  Algorithms for quotient algebras in the letterplace case
-* findiff_lib:: finite difference schemes for linear differential equations
+* finitediff_lib:: finite difference schemes for linear differential equations
 * integralbasis_lib:: Integral basis in algebraic function fields
 * lll_lib:: Integral LLL-Algorithm
 * monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
@@ -883,16 +883,16 @@ Comments should be send to the author of the library directly.
 @end menu
 @c ----------------------------------------------------------
 
-@node fpadim_lib, findiff_lib, , Experimental libraries
+@node fpadim_lib, finitediff_lib, , Experimental libraries
 @subsection fpadim_lib
 @cindex fpadim_lib
 
 @c lib fpadim.lib
 @c ----------------------------------------------------------
 
-@node findiff_lib, integralbasis_lib,fpadim_lib, Experimental libraries
-@subsection findiff_lib
-@cindex findiff_lib
+@node finitediff_lib, integralbasis_lib,fpadim_lib, Experimental libraries
+@subsection finitediff_lib
+@cindex finitediff_lib
 
 Issues:
 @itemize
@@ -905,11 +905,11 @@ Issues:
 @item u is not a good name for a procedure
 @end itemize
 
-@c lib findiff.lib
+@c lib finitediff.lib
 
 @c ----------------------------------------------------------
 
-@node integralbasis_lib, lll_lib,findiff_lib, Experimental libraries
+@node integralbasis_lib, lll_lib,finitediff_lib, Experimental libraries
 @subsection integralbasis_lib
 @cindex integralbasis_lib
 

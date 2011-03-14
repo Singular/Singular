@@ -82,7 +82,7 @@ new command: @code{rank} (see @nref{rank})
 @heading New @sc{Singular} libraries
 @itemize @bullet
 @item
-new library: findiff.lib (see @nref{findiff_lib}:  finite difference schemes for
+new library: finitediff.lib (see @nref{finitediff_lib}:  finite difference schemes for
 linear differential equations)
 @item
 new library: fpadim.lib (see @nref{fpadim_lib}:  Algorithms for quotient algebras in the letterplace case)
@@ -169,7 +169,7 @@ new library: normaliz.lib (see @nref{normaliz_lib}: Interface to Normaliz 2.2)
 @c @item
 @c new library: binresol.lib (see @nref{binresol_lib}: binomial ideals)
 @c @item
-@c new library: findiff.lib (see @nref{findiff_lib}: finite difference schemes)
+@c new library: finitediff.lib (see @nref{finitediff_lib}: finite difference schemes)
 @end itemize
 
 @heading Changed @sc{Singular} libraries
