@@ -374,11 +374,6 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     //at_KillAll(h,r);
     h->attribute=NULL;
   }
-  if ((IDTYP(h) == PACKAGE_CMD) && (strcmp(IDID(h),"Top")==0))
-  {
-    WarnS("can not kill `Top`");
-    return;
-  }
   // ring / qring  --------------------------------------------------------
   if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
   {
@@ -388,6 +383,11 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
   // package -------------------------------------------------------------
   else if (IDTYP(h) == PACKAGE_CMD)
   {
+    if (strcmp(IDID(h),"Top")==0)
+    {
+      WarnS("can not kill `Top`");
+      return;
+    }
     // any objects defined for this package ?
     if ((IDPACKAGE(h)->ref<=0)  &&  (IDPACKAGE(h)->idroot!=NULL))
     {
