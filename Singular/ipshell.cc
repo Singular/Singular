@@ -2109,6 +2109,7 @@ ring rCompose(const lists  L)
         goto rCompose_err;
       }
       R->order[j]=rOrderName(omStrDup((char*)vv->m[0].Data())); // assume STRING
+
       if (j==0) R->block0[0]=1;
       else
       {
@@ -2510,6 +2511,7 @@ BOOLEAN mpKoszul(leftv res,leftv c/*ip*/, leftv b/*in*/, leftv id)
 BOOLEAN syBetti2(leftv res, leftv u, leftv w)
 {
   syStrategy syzstr=(syStrategy)u->Data();
+
   BOOLEAN minim=(int)(long)w->Data();
   int row_shift=0;
   int add_row_shift=0;
@@ -2521,10 +2523,12 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
      add_row_shift = ww->min_in();
      (*weights) -= add_row_shift;
   }
+  
   res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift,weights);
   //row_shift += add_row_shift;
   //Print("row_shift=%d, add_row_shift=%d\n",row_shift,add_row_shift);
   atSet(res,omStrDup("rowShift"),(void*)add_row_shift,INT_CMD);
+
   return FALSE;
 }
 BOOLEAN syBetti1(leftv res, leftv u)
@@ -2541,30 +2545,38 @@ BOOLEAN syBetti1(leftv res, leftv u)
 */
 lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
 {
-  if ((syzstr->fullres==NULL) && (syzstr->minres==NULL))
+  resolvente fullres = syzstr->fullres;
+  resolvente minres = syzstr->minres;
+
+  const int length = syzstr->length;
+
+  if ((fullres==NULL) && (minres==NULL))
   {
     if (syzstr->hilb_coeffs==NULL)
     {
-      syzstr->fullres = syReorder(syzstr->res,syzstr->length,syzstr);
+      fullres = syReorder(syzstr->res, length, syzstr);
     }
     else
     {
-      syzstr->minres = syReorder(syzstr->orderedRes,syzstr->length,syzstr);
-      syKillEmptyEntres(syzstr->minres,syzstr->length);
+      minres = syReorder(syzstr->orderedRes, length, syzstr);
+      syKillEmptyEntres(minres, length);
     }
   }
+
   resolvente tr;
   int typ0=IDEAL_CMD;
-  if (syzstr->minres!=NULL)
-    tr = syzstr->minres;
+
+  if (minres!=NULL)
+    tr = minres;
   else
-    tr = syzstr->fullres;
-  resolvente trueres=NULL;
-  intvec ** w=NULL;
-  if (syzstr->length>0)
+    tr = fullres;
+  
+  resolvente trueres=NULL; intvec ** w=NULL;
+
+  if (length>0)
   {
-    trueres=(resolvente)omAlloc0((syzstr->length)*sizeof(ideal));
-    for (int i=(syzstr->length)-1;i>=0;i--)
+    trueres = (resolvente)omAlloc0((length)*sizeof(ideal));
+    for (int i=(length)-1;i>=0;i--)
     {
       if (tr[i]!=NULL)
       {
@@ -2575,18 +2587,33 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
       typ0 = MODUL_CMD;
     if (syzstr->weights!=NULL)
     {
-      w = (intvec**)omAlloc0((syzstr->length)*sizeof(intvec*));
-      for (int i=(syzstr->length)-1;i>=0;i--)
+      w = (intvec**)omAlloc0(length*sizeof(intvec*));
+      for (int i=length-1;i>=0;i--)
       {
         if (syzstr->weights[i]!=NULL) w[i] = ivCopy(syzstr->weights[i]);
       }
     }
   }
-  lists li = liMakeResolv(trueres,syzstr->length,syzstr->list_length,typ0,
-                          w,add_row_shift);
-  if (w != NULL) omFreeSize(w, (syzstr->length)*sizeof(intvec*));
-  if (toDel) syKillComputation(syzstr);
+  
+  lists li = liMakeResolv(trueres, length, syzstr->list_length,typ0,
+                          w, add_row_shift);
+
+  if (w != NULL) omFreeSize(w, length*sizeof(intvec*));
+  
+  if (toDel)
+    syKillComputation(syzstr);
+  else
+  {
+    if( fullres != NULL && syzstr->fullres == NULL )
+      syzstr->fullres = fullres;
+
+    if( minres != NULL && syzstr->minres == NULL )
+      syzstr->minres = minres;
+  }
+  
   return li;
+
+  
 }
 
 /*3

@@ -1789,29 +1789,47 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift,
     if (minim || (syzstr->resPairs!=NULL))
       return ivCopy(syzstr->betti);
   }
-  if ((syzstr->fullres==NULL) && (syzstr->minres==NULL))
+
+  resolvente fullres = syzstr->fullres;
+  resolvente minres = syzstr->minres;
+  const int length = syzstr->length;
+  
+  if ((fullres==NULL) && (minres==NULL))
   {
      if (syzstr->hilb_coeffs==NULL)
      {
-        syzstr->fullres = syReorder(syzstr->res,syzstr->length,syzstr);
+        fullres = syReorder(syzstr->res, length, syzstr);
      }
      else
      {
-        syzstr->minres = syReorder(syzstr->orderedRes,syzstr->length,syzstr);
-        syKillEmptyEntres(syzstr->minres,syzstr->length);
+        minres = syReorder(syzstr->orderedRes, length, syzstr);
+        syKillEmptyEntres(minres, length);
      }
-   }
+  }
+  
   intvec *result=NULL;
-  if (syzstr->fullres!=NULL)
-    result = syBetti(syzstr->fullres,syzstr->length,&dummy,weights,minim,row_shift);
+  
+  if (fullres!=NULL)
+    result = syBetti(fullres,length,&dummy,weights,minim,row_shift);
   else
-    result = syBetti(syzstr->minres,syzstr->length,&dummy,weights,minim,row_shift);
+    result = syBetti(minres,length,&dummy,weights,minim,row_shift);
+
+
+  return result; /// Don't change the syzstr???
+
+  // TODO: cleanup thses!
+  if( fullres != NULL && syzstr->fullres == NULL )
+    syzstr->fullres = fullres;
+  if( minres != NULL && syzstr->minres == NULL )
+    syzstr->minres = minres;
+
   if ((result!=NULL)
   && ((minim) || (syzstr->resPairs!=NULL))
   && std_weights)
   {
-    syzstr->betti = ivCopy(result);
+    syzstr->betti = ivCopy(result); // cache the result...
   }
+  
   return result;
 }
 
@@ -1925,92 +1943,94 @@ static int syLengthInt(int i)
 */
 void syPrint(syStrategy syzstr)
 {
-  if ((syzstr->resPairs==NULL) && (syzstr->fullres==NULL)
-     && (syzstr->minres==NULL))
+  if ( (syzstr->resPairs==NULL) &&
+       (syzstr->fullres==NULL)  &&
+       (syzstr->minres==NULL) &&
+       (syzstr->resolution == NULL) )
   {
     PrintS("No resolution defined\n");
     return;
   }
-  int l=0;
-  if (syzstr->resolution==NULL)
+
+  intvec* resolution = syzstr->resolution;
+  
+  if (resolution==NULL)
   {
-    int j;
     if (syzstr->resPairs!=NULL)
     {
-      syzstr->resolution = new intvec(syzstr->length+1);
-      SRes rP=syzstr->resPairs;
-      assume(idRankFreeModule(syzstr->res[1],
-                                 (syzstr->syRing != NULL ? syzstr->syRing : currRing))==syzstr->res[1]->rank);
-      (*syzstr->resolution)[0] = syzstr->res[1]->rank;
-      while ((l<syzstr->length) && (rP[l]!=NULL))
+      resolution = new intvec(syzstr->length+1);
+      SRes rP = syzstr->resPairs;
+//      assume(idRankFreeModule(syzstr->res[1], (syzstr->syRing != NULL ? syzstr->syRing : currRing))==syzstr->res[1]->rank);
+      (*resolution)[0] = syzstr->res[1]->rank;
+      int k=0;
+      while ((k<syzstr->length) && (rP[k]!=NULL))
       {
-        j=0;
-        while ((j<(*syzstr->Tl)[l]) &&
-          ((rP[l][j].lcm!=NULL) || (rP[l][j].syz!=NULL)))
+        int j = 0;
+        while ((j<(*syzstr->Tl)[k]) &&
+          ((rP[k][j].lcm!=NULL) || (rP[k][j].syz!=NULL)))
         {
-          if (rP[l][j].isNotMinimal==NULL)
-            ((*syzstr->resolution)[l+1])++;
+          if (rP[k][j].isNotMinimal==NULL)
+            ((*resolution)[k+1])++;
           j++;
         }
-        l++;
+        k++;
       }
     }
     else
     {
+      resolution = new intvec(syzstr->length+2);
       resolvente rr;
-      syzstr->resolution = new intvec(syzstr->length+2);
       if (syzstr->minres!=NULL)
         rr = syzstr->minres;
       else
         rr = syzstr->fullres;
-      (*syzstr->resolution)[0]
+      (*resolution)[0]
         = si_max(1,(int)idRankFreeModule(rr[0],
                                  (syzstr->syRing != NULL ? syzstr->syRing : currRing)));
-      while ((l<syzstr->length) && (rr[l]!=NULL))
+      int k=0;
+      while ((k<syzstr->length) && (rr[k]!=NULL))
       {
-        j = IDELEMS(rr[l]);
-        while ((j>0) && (rr[l]->m[j-1]==NULL)) j--;
-        ((*syzstr->resolution)[l+1]) = j;
-        l++;
+        (*resolution)[k+1] = idSize(rr[k]);
+        k++;
       }
     }
   }
   const char *sn=currRingHdl->id;
   int sl=strlen(sn);
   syPrintEmptySpaces1(sl);
-  l = 0;
+  int k = 0;
   loop
   {
-    if ((l>=syzstr->resolution->length()) || ((*syzstr->resolution)[l]==0))
+    if ((k>=resolution->length()) || ((*resolution)[k]==0))
       break;
-    Print("%d",(*syzstr->resolution)[l]);
+    Print("%d",(*resolution)[k]);
     syPrintEmptySpaces1(sl+5);
-    l++;
+    k++;
   }
   PrintLn();
-  l = 0;
+  k = 0;
   loop
   {
-    if ((l>=syzstr->resolution->length()) || ((*syzstr->resolution)[l]==0))
+    if ((k>=resolution->length()) || ((*resolution)[k]==0))
       break;
     PrintS(sn);
-    if (((l+1)>=syzstr->resolution->length()) || ((*syzstr->resolution)[(l+1)]==0))
+    if (((k+1)>=resolution->length()) || ((*resolution)[(k+1)]==0))
       break;
     PrintS(" <-- ");
-    syPrintEmptySpaces((*syzstr->resolution)[l]);
-    l++;
+    syPrintEmptySpaces((*resolution)[k]);
+    k++;
   }
   PrintLn();
   PrintLn();
-  l = 0;
+  k = 0;
   loop
   {
-    if ((l>=syzstr->resolution->length()) || ((*syzstr->resolution)[l]==0))
+    if ((k>=resolution->length()) || ((*resolution)[k]==0))
       break;
-    Print("%d",l);
-    syPrintEmptySpaces1(sl+5+syLengthInt((*syzstr->resolution)[l])-
-                         syLengthInt(l));
-    l++;
+    Print("%d",k);
+    syPrintEmptySpaces1(sl+5+syLengthInt((*resolution)[k])-
+                         syLengthInt(k));
+    k++;
   }
   PrintLn();
   if (syzstr->minres==NULL)
@@ -2018,6 +2038,8 @@ void syPrint(syStrategy syzstr)
     PrintS("resolution not minimized yet");
     PrintLn();
   }
+
+  if (syzstr->resolution == NULL) syzstr->resolution = resolution; 
 }
 
 /*2
@@ -2515,7 +2537,14 @@ syStrategy syLaScala3(ideal arg,int * length)
   if (origR != syzstr->syRing)
     rChangeCurrRing(origR);
   pLmDelete(&redpol);
+
   if (TEST_OPT_PROT) PrintLn();
+
+  if (syzstr->minres==NULL)
+      if (syzstr->resPairs!=NULL)
+        if (syzstr->hilb_coeffs==NULL)
+          syzstr->minres = syReadOutMinimalRes(syzstr);
+  
   return syzstr;
 }
 

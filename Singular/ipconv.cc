@@ -235,6 +235,7 @@ static void iiR2L_l(leftv out, leftv in)
   if (weights!=NULL)  add_row_shift=weights->min_in();
 
   syStrategy tmp=(syStrategy)in->CopyD();
+
   out->data=(void *)syConvRes(tmp,TRUE,add_row_shift);
 }
 

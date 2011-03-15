@@ -143,8 +143,11 @@ void sleftv::Print(leftv store, int spaces)
           pWrite0((poly)d);
           break;
         case RESOLUTION_CMD:
-          syPrint((syStrategy)d);
+        {
+          syStrategy tmp=(syStrategy)d; 
+          syPrint(tmp);
           break;
+        }
         case STRING_CMD:
           PrintNSpaces(spaces);
           PrintS((char *)d);

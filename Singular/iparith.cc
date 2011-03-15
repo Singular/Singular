@@ -2982,6 +2982,12 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
       atSet(res,omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
     }
   }
+
+  // test the La Scala case' output
+  assume( (iiOp == LRES_CMD) == (r->syRing != NULL) );
+  assume( (iiOp == LRES_CMD) == (r->resPairs != NULL) );
+  assume( (r->minres != NULL) || (r->fullres != NULL) );
+
   return FALSE;
 }
 #endif
@@ -4189,9 +4195,15 @@ static BOOLEAN jjMULT(leftv res, leftv v)
 static BOOLEAN jjMINRES_R(leftv res, leftv v)
 {
   intvec *weights=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
-  res->data=(char *)syMinimize((syStrategy)v->Data());
+
+  syStrategy tmp=(syStrategy)v->Data();
+  tmp = syMinimize(tmp); // enrich itself!
+
+  res->data=(char *)tmp; 
+  
   if (weights!=NULL)
     atSet(res, omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
+
   return FALSE;
 }
 static BOOLEAN jjN2BI(leftv res, leftv v)

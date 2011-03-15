@@ -815,6 +815,7 @@ int redHoney (LObject* h, kStrategy strat)
     }
   }
 }
+
 /*2
 *  reduction procedure for the normal form
 */

@@ -3339,6 +3339,7 @@ static void rSetDegStuff(ring r)
     }
     r->pFDeg = pWTotaldegree; // may be improved: p_Totaldegree for lp/dp/ls/.. blocks
   }
+  
   if (rOrd_is_Totaldegree_Ordering(r) || rOrd_is_WeightedDegree_Ordering(r))
     r->pFDeg = pDeg;
 
