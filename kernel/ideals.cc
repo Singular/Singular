@@ -12,7 +12,7 @@
 #ifndef NDEBUG
 # define MYTEST 0
 #else /* ifndef NDEBUG */
-# define MYTEST 0
+# define MYTEST 1
 #endif /* ifndef NDEBUG */
 
 #include <kernel/options.h>

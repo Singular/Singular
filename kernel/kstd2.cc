@@ -838,6 +838,18 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
 #ifdef HAVE_RINGS
   BOOLEAN is_ring = rField_is_Ring(currRing);
 #endif
+#ifdef KDEBUG
+  if (TEST_OPT_DEBUG)
+  {
+    PrintS("redNF: starting S: ");
+    for( j = 0; j <= max_ind; j++ )
+    {
+      Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+      pWrite(strat->S[j]);
+    }
+  };
+#endif
+
   loop
   {
     j=kFindDivisibleByInS(strat,&max_ind,&P);
@@ -901,6 +913,19 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       if (h==NULL)
       {
         kBucketDestroy(&P.bucket);
+
+#ifdef KDEBUG
+        if (TEST_OPT_DEBUG)
+        {
+          PrintS("redNF: starting S: ");
+          for( j = 0; j <= max_ind; j++ )
+          {
+            Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+            pWrite(strat->S[j]);
+          }
+        };
+#endif
+        
         return NULL;
       }
       kbTest(P.bucket);
@@ -921,6 +946,19 @@ poly redNF (poly h,int &max_ind,int nonorm,kStrategy strat)
       P.p=kBucketClear(P.bucket);
       kBucketDestroy(&P.bucket);
       pNormalize(P.p);
+
+#ifdef KDEBUG
+      if (TEST_OPT_DEBUG)
+      {
+        PrintS("redNF: starting S: ");
+        for( j = 0; j <= max_ind; j++ )
+        {
+          Print("S[%d] (of size: %d): ", j, pSize(strat->S[j]));
+          pWrite(strat->S[j]);
+        }
+      };
+#endif
+
       return P.p;
     }
   }
