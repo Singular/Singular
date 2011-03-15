@@ -306,7 +306,7 @@ number ssiReadBigInt(ssiInfo *d)
        return n;
      }
    case 4: { int dd; fscanf(d->f_read,"%d",&dd); return INT_TO_SR(dd); }
-   default: Werror("error in reading number: invalid subtype %d",sub_type);
+   default: Werror("error in reading bigint: invalid subtype %d",sub_type);
             return NULL;
    }
 }
