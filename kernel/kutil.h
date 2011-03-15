@@ -634,6 +634,10 @@ BOOLEAN kStratChangeTailRing(kStrategy strat,
 // right before main loop in bba
 void kStratInitChangeTailRing(kStrategy strat);
 
+/// Output some debug info about a given strategy
+void kDebugPrint(kStrategy strat);
+
+
 KINLINE void clearS (poly p, unsigned long p_sev, int* at, int* k,
   kStrategy strat);
 #include <kernel/kInline.cc>

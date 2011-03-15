@@ -1,0 +1,18 @@
+# Emacs edit mode for this file is -*- python -*-
+env = Environment()
+
+import os
+SINGULAR_HOME="./../.."
+
+SING_INCLUDES=[SINGULAR_HOME, SINGULAR_HOME+"/omalloc"]
+# , SINGULAR_HOME+"/factory"
+
+
+sing_psico_int_if = env.SharedLibrary('syzextra',
+                               ["mod_main.cc", "DebugPrint.cc", "myNF.cc"],
+                               SHLIBPREFIX="", LDMODULESUFFIX=".so",
+                               CPPPATH = SING_INCLUDES,
+                               LIBS=[])
+
+Default(sing_psico_int_if)
+
