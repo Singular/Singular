@@ -168,15 +168,21 @@ void p_Setm_General(poly p, const ring r)
         }
         case ro_syz:
         {
-          int c=p_GetComp(p, r);
-          if (c > o->data.syz.limit)
-            p->exp[o->data.syz.place] = o->data.syz.curr_index;
+          const unsigned long c = p_GetComp(p, r);
+          const short place = o->data.syz.place;
+          const int limit = o->data.syz.limit;
+          
+          if (c > limit)
+            p->exp[place] = o->data.syz.curr_index;
           else if (c > 0)
-            p->exp[o->data.syz.place]= o->data.syz.syz_index[c];
+          {
+            assume( (1 <= c) && (c <= limit) );
+            p->exp[place]= o->data.syz.syz_index[c];
+          }
           else
           {
             assume(c == 0);
-            p->exp[o->data.syz.place]= 0;
+            p->exp[place]= 0;
           }
           break;
         }
@@ -187,7 +193,7 @@ void p_Setm_General(poly p, const ring r)
 
 #ifndef NDEBUG
 #if MYTEST
-          Print("isTemp ord in rSetm: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 0);
+          Print("p_Setm_General: isTemp ord: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 1);
 #endif
 #endif
           int c = p_GetComp(p, r);
@@ -250,6 +256,12 @@ void p_Setm_General(poly p, const ring r)
         // Suffix for Induced Schreyer ordering
         case ro_is:
         {
+#ifndef NDEBUG
+#if MYTEST
+          Print("p_Setm_General: ro_is ord: pos: %d, p: ", pos);  p_DebugPrint(p, r, r, 1);
+#endif
+#endif
+
           assume(p != NULL);
 
           int c = p_GetComp(p, r);

@@ -1813,6 +1813,16 @@ lists rDecompose(const ring r)
     LLL->Init(2);
     LLL->m[0].rtyp=STRING_CMD;
     LLL->m[0].data=(void *)omStrDup(rSimpleOrdStr(r->order[i]));
+
+    if(r->order[i] == ringorder_IS) //  || r->order[i] == ringorder_s || r->order[i] == ringorder_S)
+    {
+      assume( r->block0[i] == r->block1[i] );
+      const int s = r->block0[i];
+      assume( -2 < s && s < 2);
+
+      iv=new intvec(1);
+      (*iv)[0] = s;
+    } else
     if (r->block1[i]-r->block0[i] >=0 )
     {
       j=r->block1[i]-r->block0[i];
@@ -2119,6 +2129,8 @@ ring rCompose(const lists  L)
             || (R->order[jj]== ringorder_aa)
             || (R->order[jj]== ringorder_c)
             || (R->order[jj]== ringorder_C)
+            || (R->order[jj]== ringorder_s)
+            || (R->order[jj]== ringorder_S)
          ))
          {
            //Print("jj=%, skip %s\n",rSimpleOrdStr(R->order[jj]));
@@ -2171,6 +2183,23 @@ ring rCompose(const lists  L)
          case ringorder_C:
            R->block1[j]=R->block0[j]=0;
            break;
+
+         case ringorder_s:
+         {
+           break;
+         }
+
+         case ringorder_IS:
+         {
+           R->block1[j] = R->block0[j] = 0;
+           if( iv->length() > 0 )
+           {
+             const int s = (*iv)[0];
+             assume( -2 < s && s < 2 );
+             R->block1[j] = R->block0[j] = s;
+           }
+           break;
+         }
          case 0:
          case ringorder_unspec:
            break;
@@ -4567,13 +4596,43 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
               if (weights[i]==0) weights[i]=typ;
             }
             break;
+
+          case ringorder_s: // no 'rank' params!
+          {
+            
+            if(iv->length() > 3)
+              return TRUE;
+
+            if(iv->length() == 3)
+            {
+              const int s = (*iv)[2];
+              R->block0[n] = s;            
+              R->block1[n] = s;
+            }
+            break;            
+          }
+          case ringorder_IS:
+          {
+            if(iv->length() != 3) return TRUE;
+            
+            const int s = (*iv)[2];
+
+            if( 1 < s || s < -1 ) return TRUE;
+              
+            R->block0[n] = s;            
+            R->block1[n] = s;
+            break;
+          }            
           case ringorder_S:
           case ringorder_c:
           case ringorder_C:
+          {
             if (rCheckIV(iv)) return TRUE;
             break;
+          }
           case ringorder_aa:
           case ringorder_a:
+          {
             R->block0[n] = last+1;
             R->block1[n] = si_min(last+iv->length()-2 , rVar(R));
             R->wvhdl[n] = (int*)omAlloc((iv->length()-1)*sizeof(int));
@@ -4585,6 +4644,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
             }
             last=R->block0[n]-1;
             break;
+          }
           case ringorder_a64:
           {
             R->block0[n] = last+1;
@@ -4634,7 +4694,16 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
   }
 
   // check for complete coverage
-  if ((R->order[n]==ringorder_c) ||  (R->order[n]==ringorder_C)) n--;
+  while ( n >= 0 && (
+          (R->order[n]==ringorder_c)
+      ||  (R->order[n]==ringorder_C)
+      ||  (R->order[n]==ringorder_s)
+      ||  (R->order[n]==ringorder_S)
+      ||  (R->order[n]==ringorder_IS)
+                    )) n--;
+
+  assume( n >= 0 );
+  
   if (R->block1[n] != R->N)
   {
     if (((R->order[n]==ringorder_dp) ||
