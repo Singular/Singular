@@ -1059,121 +1059,6 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
       } else
   #endif
 
-
-  #if 0
-      /// Returns old SyzCompLimit, can set new limit
-      if(strcmp(sys_cmd,"SetSyzComp")==0)
-      {
-        res->rtyp = INT_CMD;
-        res->data = (void *)rGetCurrSyzLimit(currRing);
-        if ((h!=NULL) && (h->Typ()==INT_CMD))
-        {
-          const int iSyzComp = (int)((long)(h->Data()));
-          assume( iSyzComp > 0 );
-          rSetSyzComp( iSyzComp );
-        }
-
-        return FALSE;
-      }
-      /// Endowe the current ring with additional (leading) Syz-component ordering
-      if(strcmp(sys_cmd,"MakeSyzCompOrdering")==0)
-      {
-        extern ring rAssure_SyzComp(const ring r, BOOLEAN complete);
-
-  //    res->data = rCurrRingAssure_SyzComp(); // changes current ring! :(
-        res->data = (void *)rAssure_SyzComp(currRing, TRUE);
-        res->rtyp = RING_CMD; // return new ring!
-
-        return FALSE;
-      }
-  #endif
-
-      /// Same for Induced Schreyer ordering (ordering on components is defined by sign!)
-      if(strcmp(sys_cmd,"MakeInducedSchreyerOrdering")==0)
-      {
-        extern ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete, int sign);
-        int sign = 1;
-        if ((h!=NULL) && (h->Typ()==INT_CMD))
-        {
-          sign = (int)((long)(h->Data()));
-          assume( sign == 1 || sign == -1 );
-        }
-        res->data = (void *)rAssure_InducedSchreyerOrdering(currRing, TRUE, sign);
-        res->rtyp = RING_CMD; // return new ring!
-        return FALSE;
-      }
-
-      /// Returns old SyzCompLimit, can set new limit
-      if(strcmp(sys_cmd,"SetInducedReferrence")==0)
-      {
-        extern void rSetISReference(const ideal F, const int rank, const int p, const intvec * componentWeights, const ring r);
-
-        if ((h!=NULL) && ( (h->Typ()==IDEAL_CMD) || (h->Typ()==MODUL_CMD)))
-        {
-          intvec * componentWeights = (intvec *)atGet(h,"isHomog",INTVEC_CMD); // No copy?!
-
-          const ideal F = (ideal)h->Data(); ; // No copy!
-          h=h->next;
-
-          int rank = idRankFreeModule(F, currRing, currRing); // Starting syz-comp (1st: i+1)
-
-          if ((h!=NULL) && (h->Typ()==INT_CMD))
-          {
-            rank = (int)((long)(h->Data())); h=h->next;
-          }
-
-          int p = 0; // which IS-block? p^th!
-
-          if ((h!=NULL) && (h->Typ()==INT_CMD))
-          {
-            p = (int)((long)(h->Data())); h=h->next;
-          }
-
-          // F & componentWeights belong to that ordering block of currRing now:
-          rSetISReference(F, rank, p, componentWeights, currRing); // F and componentWeights will be copied!
-        }
-        else
-        {
-          WerrorS("`system(\"SetISReferrence\",<ideal/module>, [int, int])` expected");
-          return TRUE;
-        }
-        return FALSE;
-      }
-
-
-  //    F = system("ISUpdateComponents", F, V, MIN );
-  //    // replace gen(i) -> gen(MIN + V[i-MIN]) for all i > MIN in all terms from F!
-  //    extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
-      if(strcmp(sys_cmd,"ISUpdateComponents")==0)
-      {
-
-        PrintS("ISUpdateComponents:.... \n");
-
-        if ((h!=NULL) && (h->Typ()==MODUL_CMD))
-        {
-          ideal F = (ideal)h->Data(); ; // No copy!
-          h=h->next;
-
-          if ((h!=NULL) && (h->Typ()==INTVEC_CMD))
-          {
-            const intvec* const V = (const intvec* const) h->Data();
-            h=h->next;
-
-            if ((h!=NULL) && (h->Typ()==INT_CMD))
-            {
-              const int MIN = (int)((long)(h->Data()));
-
-              extern void pISUpdateComponents(ideal F, const intvec *const V, const int MIN, const ring r);
-              pISUpdateComponents(F, V, MIN, currRing);
-              return FALSE;
-            }
-          }
-        }
-
-        WerrorS("`system(\"ISUpdateComponents\",<module>, intvec, int)` expected");
-        return TRUE;
-      }
-
   ////////////////////////////////////////////////////////////////////////
   /// Additional interface functions to non-commutative subsystem (PLURAL)
   ///
@@ -2462,60 +2347,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
           rComplete(currRing);
           res->rtyp = INT_CMD;
           res->data = 0;
-          return FALSE;
-        }
-        else
-  /*==================== generic debug ==================================*/
-        if(strcmp(sys_cmd,"DetailedPrint")==0)
-        {
-  #ifndef NDEBUG
-          if( h == NULL )
-          {
-            WarnS("DetailedPrint needs arguments...");
-            return TRUE;
-          }
-
-          if( h->Typ() == RING_CMD)
-          {
-            const ring r = (const ring)h->Data();
-            rWrite(r);
-            PrintLn();
-#ifdef RDEBUG
-            rDebugPrint(r);
-#endif
-          }
-#ifdef PDEBUG
-          else
-          if( h->Typ() == POLY_CMD || h->Typ() == VECTOR_CMD)
-          {
-            const int nTerms = 3;
-            const poly p = (const poly)h->Data();
-            p_DebugPrint(p, currRing, currRing, nTerms);
-          }
-          else
-          if( h->Typ() == IDEAL_CMD || h->Typ() == MODUL_CMD)
-          {
-            const ideal id = (const ideal)h->Data();
-
-            h = h->Next();
-
-            int nTerms = 3;
-
-            if( h!= NULL && h->Typ() == INT_CMD )
-            {
-              int n = (int)(long)(h->Data());
-              if( n < 0 )
-              {
-                Warn("Negative int argument: %d", n);
-              }
-              else
-                nTerms = n;
-            }
-
-            idShow(id, currRing, currRing, nTerms);
-          }
-#endif
-#endif
           return FALSE;
         }
         else
@@ -3817,18 +3648,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
                 */
 
   #endif
-
-  // TODO: What about a dynamic module instead? Only Linux? NO:
-  // ONLY: ELF systems and HPUX
-  #ifdef HAVE_SINGULAR_PLUS_PLUS
-    if (strcmp(sys_cmd,"Singular++")==0)
-    {
-  //    using namespace SINGULAR_NS;
-      extern BOOLEAN Main(leftv res, leftv h); // FALSE = Ok, TRUE = Error!
-      return Main(res, h);
-    }
-    else
-  #endif // HAVE_SINGULAR_PLUS_PLUS
 
 #ifdef HAVE_GFAN
   /*======== GFAN ==============*/
