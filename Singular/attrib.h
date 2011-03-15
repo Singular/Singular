@@ -15,7 +15,7 @@ typedef sattr * attr;
 class sattr
 {
   public:
-    void Init() { memset(this,0,sizeof(*this)); }
+    inline void Init() { memset(this,0,sizeof(*this)); }
     const char *  name;
     void *  data;
     attr    next;

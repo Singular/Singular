@@ -371,17 +371,9 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
 
   if (h->attribute!=NULL)
   {
-    //at_KillAll(h,r);
     h->attribute=NULL;
   }
-  // ring / qring  --------------------------------------------------------
-  if ((IDTYP(h) == RING_CMD) || (IDTYP(h) == QRING_CMD))
-  {
-    // any objects defined for this ring ? -> done by rKill
-    rKill(h);
-  }
-  // package -------------------------------------------------------------
-  else if (IDTYP(h) == PACKAGE_CMD)
+  if (IDTYP(h) == PACKAGE_CMD)
   {
     if (strcmp(IDID(h),"Top")==0)
     {
@@ -412,86 +404,10 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
     if (currPackHdl==h) currPackHdl=packFindHdl(currPack);
     iiCheckPack(currPack);
   }
-  // poly / vector -------------------------------------------------------
-  else if ((IDTYP(h) == POLY_CMD) || (IDTYP(h) == VECTOR_CMD))
-  {
-    assume(r!=NULL);
-    p_Delete(&IDPOLY(h),r);
-  }
-  // ideal / module/ matrix / map ----------------------------------------
-  else if ((IDTYP(h) == IDEAL_CMD)
-           || (IDTYP(h) == MODUL_CMD)
-           || (IDTYP(h) == MATRIX_CMD)
-           || (IDTYP(h) == MAP_CMD))
-  {
-    assume(r!=NULL);
-    ideal iid = IDIDEAL(h);
-    if (IDTYP(h) == MAP_CMD)
-    {
-      map im = IDMAP(h);
-      omFree((ADDRESS)im->preimage);
-    }
-    id_Delete(&iid,r);
-  }
-  // string -------------------------------------------------------------
-  else if (IDTYP(h) == STRING_CMD)
-  {
-    omFree((ADDRESS)IDSTRING(h));
-    //IDSTRING(h)=NULL;
-  }
-  // proc ---------------------------------------------------------------
-  else if (IDTYP(h) == PROC_CMD)
-  {
-    if (piKill(IDPROC(h))) return;
-  }
-  // number -------------------------------------------------------------
-  else if (IDTYP(h) == NUMBER_CMD)
-  {
-    assume(r!=NULL);
-    n_Delete(&IDNUMBER(h),r);
-  }
-  // bigint -------------------------------------------------------------
-  else if (IDTYP(h) == BIGINT_CMD)
-  {
-    nlDelete(&IDNUMBER(h),NULL);
-  }
-  // intvec / intmat  ---------------------------------------------------
-  else if ((IDTYP(h) == INTVEC_CMD)||(IDTYP(h) == INTMAT_CMD))
-  {
-    delete IDINTVEC(h);
-  }
-  // list  -------------------------------------------------------------
-  else if (IDTYP(h)==LIST_CMD)
-  {
-    IDLIST(h)->Clean(r);
-    //IDLIST(h)=NULL;
-  }
-  // link  -------------------------------------------------------------
-  else if (IDTYP(h)==LINK_CMD)
-  {
-    slKill(IDLINK(h));
-  }
-  else if(IDTYP(h)==RESOLUTION_CMD)
-  {
-    assume(r!=NULL);
-    if (IDDATA(h)!=NULL)
-      syKillComputation((syStrategy)IDDATA(h),r);
-  }
-  // blackbox -------------------------------------------------------------
-  else if (IDTYP(h)>MAX_TOK)
-  {
-    blackbox *bb=getBlackboxStuff(IDTYP(h));
-    if (bb!=NULL) bb->blackbox_destroy(bb,IDDATA(h));
-    IDDATA(h)=NULL;
-  }
-#ifdef TEST
-  else if ((IDTYP(h)!= INT_CMD)
-  &&(IDTYP(h)!=DEF_CMD)
-  &&(IDTYP(h)!=ALIAS_CMD)
-  &&(IDTYP(h)!=NONE))
-    Warn("unknown type to kill: %s(%d)",Tok2Cmdname(IDTYP(h)),IDTYP(h));
-#endif
-
+  else if ((IDTYP(h)==RING_CMD)||(IDTYP(h)==QRING_CMD))
+    rKill(h);
+  else
+    s_internalDelete(IDTYP(h),IDDATA(h),r);
   //  general  -------------------------------------------------------------
   // now dechain it and delete idrec
   if (IDID(h)!=NULL) // OB: ?????

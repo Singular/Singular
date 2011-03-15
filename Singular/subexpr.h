@@ -119,4 +119,6 @@ extern omBin sSubexpr_bin;
 extern omBin procinfo_bin;
 extern omBin libstack_bin;
 
+void s_internalDelete(const int t,  void *d, const ring r);
+
 #endif

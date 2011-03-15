@@ -57,31 +57,7 @@ attr sattr::Copy()
 
 static void attr_free(attr h, const ring r=currRing)
 {
-  switch (h->atyp)
-  {
-  case INTVEC_CMD:
-  case INTMAT_CMD:
-    delete (intvec *)(h->data);
-    break;
-  case IDEAL_CMD:
-  case MODUL_CMD:
-  case MATRIX_CMD:
-    id_Delete((ideal *)&(h->data),r);
-    break;
-  case POLY_CMD:
-  case VECTOR_CMD:
-    p_Delete((poly *)&(h->data),r);
-    break;
-  case INT_CMD:
-    break;
-  case STRING_CMD:
-    omFree((ADDRESS)(h->data));
-    break;
-#ifdef TEST
-  default:
-    ::Print("atKill: unknown type(%s [%d]) of attribute >>%s<<\n", Tok2Cmdname(h->atyp), h->atyp, h->name);  /* DEBUG */
-#endif
-  } /* end switch: (atyp) */
+  s_internalDelete(h->atyp,h->data,r);
   h->data=NULL;
 }
 
@@ -179,7 +155,12 @@ void atSet(idhdl root,const char * name,void * data,int typ)
 {
   if (root!=NULL)
   {
-    root->attribute=root->attribute->set(name,data,typ);
+    if ((IDTYP(root)!=RING_CMD)
+    && (IDTYP(root)!=QRING_CMD)
+    && (!RingDependend(IDTYP(root)))&&(RingDependend(typ)))
+      WerrorS("cannot set ring-dependend objects at this type");
+    else  
+      root->attribute=root->attribute->set(name,data,typ);
   }
 }
 
@@ -193,11 +174,16 @@ void atSet(leftv root,const char * name,void * data,int typ)
     }
     else
     {
+      int rt=root->Typ();
+      if ((rt!=RING_CMD)
+      && (rt!=QRING_CMD)
+      && (!RingDependend(rt))&&(RingDependend(typ)))
+        WerrorS("cannot set ring-dependend objects at this type");
+      else  
       if (root->rtyp==IDHDL)
       {
         idhdl h=(idhdl)root->data;
         h->attribute=h->attribute->set(name,data,typ);
-        //??// root->attribute=h->attribute;
       }
       else
       {
@@ -222,6 +208,7 @@ void sattr::killAll(const ring r)
   while (temp!=NULL)
   {
     temp1 = temp->next;
+    omCheckAddr(temp);
     temp->kill(r);
     temp = temp1;
   }

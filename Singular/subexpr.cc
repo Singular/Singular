@@ -233,14 +233,14 @@ void sleftv::Print(leftv store, int spaces)
         }
 
         default:
-	  if (t>MAX_TOK)
-	  {
-	    blackbox * bb=getBlackboxStuff(t);
+          if (t>MAX_TOK)
+          {
+            blackbox * bb=getBlackboxStuff(t);
             PrintNSpaces(spaces);
-	    if (bb!=NULL) { bb->blackbox_Print(bb,d); }
-	    else          { ::Print("Print: blackbox %d(bb=NULL)",t); }
-	  }
-	  else
+            if (bb!=NULL) { bb->blackbox_Print(bb,d); }
+            else          { ::Print("Print: blackbox %d(bb=NULL)",t); }
+          }
+          else
           ::Print("Print:unknown type %s(%d)", Tok2Cmdname(t),t);
       } /* end switch: (Typ()) */
   }
@@ -291,96 +291,8 @@ void sleftv::CleanUp(ring r)
   //flag=0;
   if (data!=NULL)
   {
-    switch (rtyp)
-    {
-      case INTVEC_CMD:
-      case INTMAT_CMD:
-        delete (intvec *)data;
-        break;
-      case MAP_CMD:
-        omFree((ADDRESS)((map)data)->preimage);
-        ((map)data)->preimage=NULL;
-        // no break: kill the image as an ideal
-      case MATRIX_CMD:
-      case MODUL_CMD:
-      case IDEAL_CMD:
-        if ((((long)data) & 3)==0)
-        {
-          if(r!=NULL) id_Delete((ideal *)(&data),r);
-        }
-        break;
-      case STRING_CMD:
-        omFree((ADDRESS)data);
-        break;
-      case POLY_CMD:
-      case VECTOR_CMD:
-        if (r!=NULL) p_Delete((poly *)(&data),r);
-        break;
-      case NUMBER_CMD:
-        if (r!=NULL) n_Delete((number *)(&data),r);
-        break;
-      case BIGINT_CMD:
-        nlDelete((number *)(&data),r);
-        break;
-      case LIST_CMD:
-        ((lists)data)->Clean(r); // may contain ring-dep data
-        break;
-      case QRING_CMD:
-      case RING_CMD:
-        rKill((ring)data);
-        break;
-      case PROC_CMD:
-        piKill((procinfov)data);
-        break;
-      case LINK_CMD:
-        slKill((si_link)data);
-        break;
-      case COMMAND:
-      {
-        command cmd=(command)data;
-        if (cmd->arg1.rtyp!=0) cmd->arg1.CleanUp();
-        if (cmd->arg2.rtyp!=0) cmd->arg2.CleanUp();
-        if (cmd->arg3.rtyp!=0) cmd->arg3.CleanUp();
-        omFreeBin((ADDRESS)data, sip_command_bin);
-        break;
-      }
-      case RESOLUTION_CMD:
-        if (r!=NULL) syKillComputation((syStrategy)data,r);
-        break;
-      case IDHDL:
-        attribute=NULL; // is only a pointer to attribute of id
-	break;
-      // the following types do not take memory
-      // or are not copied
-      case PACKAGE_CMD:
-      case ANY_TYPE:
-      case VECHO:
-      case VPRINTLEVEL:
-      case VCOLMAX:
-      case VTIMER:
-      case VRTIMER:
-      case VOICE:
-      case VMAXDEG:
-      case VMAXMULT:
-      case TRACE:
-      case VSHORTOUT:
-      case VNOETHER:
-      case VMINPOLY:
-      case 0:
-      case INT_CMD:
-        break;
-      default:
-      {
-        if (rtyp<=MAX_TOK)
-        ::Print("CleanUp: unknown type %d\n",rtyp);  /* DEBUG */
-        else if (data!=NULL)
-        {
-           blackbox *b=getBlackboxStuff(rtyp);
-           if (b!=NULL) b->blackbox_destroy(b,data);
-           data=NULL;
-        }
-      }
-    } /* end switch: (rtyp) */
+     if (rtyp==IDHDL) attribute=NULL; // is only a pointer to attribute of id
+     else s_internalDelete(rtyp,data,r);
     //data=NULL; // will be done by Init() at the end
   }
   if (attribute!=NULL)
@@ -409,13 +321,7 @@ void sleftv::CleanUp(ring r)
         break;
       default:
       {
-        attr t;
-        while (attribute!=NULL)
-        {
-          t=attribute->next;
-          attribute->kill(currRing);
-          attribute=t;
-        }
+        if (attribute!=NULL) attribute->killAll(r);
       }
     }
   }
@@ -507,7 +413,7 @@ static inline void * s_internalCopy(const int t,  void *d)
       if (t>MAX_TOK)
       {
         blackbox *b=getBlackboxStuff(t);
-	if (b!=NULL) return b->blackbox_Copy(b,d);
+        if (b!=NULL) return b->blackbox_Copy(b,d);
         return NULL;
       }
       else
@@ -518,7 +424,139 @@ static inline void * s_internalCopy(const int t,  void *d)
   return NULL;
 }
 
-
+void s_internalDelete(const int t,  void *d, const ring r)
+{
+  switch (t)
+  {
+    case INTVEC_CMD:
+    case INTMAT_CMD:
+    {
+      intvec *v=(intvec*)d;
+      delete v;
+      break;
+    }
+    case MAP_CMD:
+    {
+      map m=(map)d;
+      omFree((ADDRESS)m->preimage);
+      m->preimage=NULL;
+      /* no break: continue as IDEAL*/
+    }
+    case MATRIX_CMD:
+    case IDEAL_CMD:
+    case MODUL_CMD:
+    {
+      ideal i=(ideal)d;
+      id_Delete(&i,r);
+      break;
+    }
+    case STRING_CMD:
+      omFree(d);
+      break;
+    //case POINTER_CMD:
+    //  return d;
+    //case PACKAGE_CMD:
+    //  return  (void *)paCopy((package) d);
+    case PROC_CMD:
+      piKill((procinfo*)d);
+      break;
+    case POLY_CMD:
+    case VECTOR_CMD:
+    {
+      poly p=(poly)d;
+      p_Delete(&p,r);
+      break;
+    }
+    case NUMBER_CMD:
+    {
+      number n=(number)d;
+      n_Delete(&n,r);
+      break;
+    }
+    case BIGINT_CMD:
+    {
+      number n=(number)d;
+      nlDelete(&n,NULL);
+      break;
+    }
+    case LIST_CMD:
+    {
+      lists l=(lists)d;
+      l->Clean(r);
+      break;
+    }
+    case LINK_CMD:
+    {
+      si_link l=(si_link)d;
+      slKill(l);
+      break;
+    }
+    case RING_CMD:
+    case QRING_CMD:
+    {
+      ring R=(ring)d;
+      #ifdef TEST
+      if (R==currRing)
+        PrintS("currRing?\n");
+      else
+      #endif
+      rKill(R);
+      break;
+    }
+    case RESOLUTION_CMD:
+    {
+      syStrategy s=(syStrategy)d;
+      if (s!=NULL) syKillComputation(s,r);
+      break;
+    }
+    case COMMAND:
+    {
+     command cmd=(command)d;
+     if (cmd->arg1.rtyp!=0) cmd->arg1.CleanUp(r);
+     if (cmd->arg2.rtyp!=0) cmd->arg2.CleanUp(r);
+     if (cmd->arg3.rtyp!=0) cmd->arg3.CleanUp(r);
+     omFreeBin((ADDRESS)d, sip_command_bin);
+     break;
+    }
+    case INT_CMD:
+    case DEF_CMD:
+    case ALIAS_CMD:
+    case POINTER_CMD:
+    case PACKAGE_CMD:
+    case IDHDL:
+    case NONE:
+    case ANY_TYPE:
+    case VECHO:
+    case VPRINTLEVEL:
+    case VCOLMAX:
+    case VTIMER:
+    case VRTIMER:
+    case VOICE:
+    case VMAXDEG:
+    case VMAXMULT:
+    case TRACE:
+    case VSHORTOUT:
+    case VNOETHER:
+    case VMINPOLY:
+    case LIB_CMD:
+    case 0: /* type in error case */
+      break; /* error recovery: do nothing */
+    //case COMMAND:
+    //case COMMAND:
+    default:
+    {
+      if (t>MAX_TOK)
+      {
+        blackbox *b=getBlackboxStuff(t);
+        if (b!=NULL) b->blackbox_destroy(b,d);
+        break;
+      }
+      else
+      Warn("s_internalDelete: cannot delete type %s(%d)",
+            Tok2Cmdname(t),t);
+    }
+  }
+}
 
 void * slInternalCopy(leftv source, const int t, void *d, Subexpr e)
 {
@@ -822,11 +860,11 @@ char *  sleftv::String(void *d, BOOLEAN typed, int dim)
           return lString((lists) d, typed, dim);
 
         default:
-	  if(t> MAX_TOK)
-	  {
-	    blackbox *bb=getBlackboxStuff(t);
-	    if (bb!=NULL) return bb->blackbox_String(bb,d);
-	  }
+          if(t> MAX_TOK)
+          {
+            blackbox *bb=getBlackboxStuff(t);
+            if (bb!=NULL) return bb->blackbox_String(bb,d);
+          }
     } /* end switch: (Typ()) */
   }
   return omStrDup("");
