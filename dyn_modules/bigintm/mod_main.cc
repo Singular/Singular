@@ -14,6 +14,8 @@
 
 #include "bigintm.h"
 
+namespace
+{
 
 static inline void NoReturn(leftv& res)
 {
@@ -23,7 +25,7 @@ static inline void NoReturn(leftv& res)
 
 
 /// listing all blackbox types (debug stuff)
-BOOLEAN printBlackboxTypes0(leftv __res, leftv __v)
+static BOOLEAN printBlackboxTypes0(leftv __res, leftv __v)
 {
   NoReturn(__res);
   printBlackboxTypes();
@@ -31,7 +33,7 @@ BOOLEAN printBlackboxTypes0(leftv __res, leftv __v)
 }
 
 /// init the bigintm (a sample blackbox) type
-BOOLEAN bigintm_setup0(leftv __res, leftv __v)
+static BOOLEAN bigintm_setup0(leftv __res, leftv __v)
 {
   NoReturn(__res);
   return bigintm_setup();
@@ -40,7 +42,7 @@ BOOLEAN bigintm_setup0(leftv __res, leftv __v)
 static long int load_counter = -1;
 
 /// init the bigintm (a sample blackbox) type
-BOOLEAN print_load_counter(leftv __res, leftv __v)
+static BOOLEAN print_load_counter(leftv __res, leftv __v)
 {
   Print("print_load_counter: load counter: %ld", load_counter);
   Print(", printBlackboxTypes: %p", (void*)(printBlackboxTypes0));
@@ -50,6 +52,8 @@ BOOLEAN print_load_counter(leftv __res, leftv __v)
   NoReturn(__res);
   return FALSE;
 }
+
+};
 
 
 extern "C" 

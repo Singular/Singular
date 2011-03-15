@@ -41,6 +41,26 @@ void *blackbox_default_Init(blackbox *b)
 {
   return NULL;
 }
+
+// Tok2Cmdname -> iiTwoOps
+BOOLEAN WrongOp(const char* cmd, int op, leftv bb)
+{
+  assume( bb->Typ() > MAX_TOK ); // it IS a blackbox type, right?!
+  
+  if( op > 127 )
+    Werror("'%s' of type %s(%d) for op %s(%d) not implemented",
+           cmd,
+           getBlackboxName(bb->Typ()),bb->Typ(),
+           iiTwoOps(op), op);
+  else
+    Werror("'%s' of type %s(%d) for op '%c' not implemented",
+           cmd,
+           getBlackboxName(bb->Typ()), bb->Typ(),
+           op);
+
+  return TRUE;
+}
+
 BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
 {
   if (op==TYPEOF_CMD)
@@ -49,43 +69,23 @@ BOOLEAN blackboxDefaultOp1(int op,leftv l, leftv r)
     l->rtyp=STRING_CMD;
     return FALSE;
   }
-  if (op<127)
-    Werror("blackbox_Op1 of type %s(%d) for op '%c' not implemented",
-      getBlackboxName(r->Typ()),r->Typ(),op);
-  else
-    Werror("blackbox_Op1 of type %s(%d) for op %s(%d) not implemented",
-      getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
-  return TRUE;
+
+  return WrongOp("blackbox_Op1", op, r);
 }
+
 BOOLEAN blackboxDefaultOp2(int op,leftv l, leftv r1, leftv r2)
 {
-  if (op<127)
-    Werror("blackbox_Op2 of type %s(%d) for op '%c' not implemented",
-      getBlackboxName(r1->Typ()),r1->Typ(),op);
-  else
-    Werror("blackbox_Op2 of type %s(%d) for op %s(%d) not implemented",
-      getBlackboxName(r1->Typ()),r1->Typ(),Tok2Cmdname(op),op);
-  return TRUE;
+  return WrongOp("blackbox_Op2", op, r1);
 }
+
 BOOLEAN blackbox_default_Op3(int op,leftv l, leftv r1,leftv r2, leftv r3)
 {
-  if (op<127)
-    Werror("blackbox_Op3 of type %s(%d) for op '%c' not implemented",
-      getBlackboxName(r1->Typ()),r1->Typ(),op);
-  else
-    Werror("blackbox_Op3 of type %s(%d) for op %s(%d) not implemented",
-      getBlackboxName(r1->Typ()),r1->Typ(),Tok2Cmdname(op),op);
-  return TRUE;
+  return WrongOp("blackbox_Op3", op, r1);
 }
+
 BOOLEAN blackbox_default_OpM(int op,leftv l, leftv r)
 {
-  if (op<127)
-    Werror("blackbox_OpM of type %s(%d) for op '%c' not implemented",
-      getBlackboxName(r->Typ()),r->Typ(),op);
-  else
-    Werror("blackbox_OpM of type %s(%d) for op %s(%d) not implemented",
-      getBlackboxName(r->Typ()),r->Typ(),Tok2Cmdname(op),op);
-  return TRUE;
+  return WrongOp("blackbox_OpM", op, r);
 }
 
 BOOLEAN blackbox_default_Check(blackbox *b, void *d)

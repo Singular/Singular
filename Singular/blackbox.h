@@ -61,4 +61,7 @@ int setBlackboxStuff(blackbox *bb,const char *name);
 /// list all defined type (for debugging)
 void printBlackboxTypes();
 
+/// Emit an "op not implemented" error message and return TRUE
+BOOLEAN WrongOp(const char* cmd, int op, leftv bb);
+
 #endif

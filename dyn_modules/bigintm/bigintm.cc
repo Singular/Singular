@@ -15,6 +15,9 @@
 
 #define HAVE_BIGINTM 1
 
+namespace
+{
+
 #ifdef HAVE_BIGINTM
 static int bigintm_type_id = -1;
 #endif
@@ -84,23 +87,6 @@ static BOOLEAN bigintm_Assign(leftv l, leftv r)
   return TRUE;
 }
 
-// Tok2Cmdname
-static inline BOOLEAN WrongOp(const char* cmd, int op, leftv bb)
-{
-  assume( bb->Typ() > MAX_TOK ); // it IS a blackbox type, right?!
-  if( op > 127 )
-    Werror("'%s' of type %s(%d) for op %s(%d) not implemented",
-           cmd,
-           getBlackboxName(bb->Typ()),bb->Typ(),
-           iiTwoOps(op), op);
-  else
-    Werror("'%s' of type %s(%d) for op '%c' not implemented",
-           cmd,
-           getBlackboxName(bb->Typ()), bb->Typ(),
-           op);
-
-}
-
 BOOLEAN bigintm_Op1(int op,leftv l, leftv r)
 {
   // interpreter: a1 is ist bigintm
@@ -117,11 +103,10 @@ BOOLEAN bigintm_Op1(int op,leftv l, leftv r)
   
   if( op=='(' ) // <bigintm>  VAR();
   {
-    Werror("bigintm_Op1: What du you mean by '<bigintm>()'?!");
+    Werror("bigintm_Op1: What do you mean by '<bigintm>()'?!");
     return TRUE;  
   }
 
-  WrongOp("bigintm_Op1", op, r);
   return blackboxDefaultOp1(op, l, r);
 }
 
@@ -158,8 +143,7 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
       }
 
       Werror("bigintm_Op2: Op: '+': Sorry unsupported 2nd argument-type: %s in", Tok2Cmdname(a2->Typ()));
-      WrongOp("bigintm_Op2", op, a1);
-      return TRUE;
+      return WrongOp("bigintm_Op2", op, a1);
     }
 
     case '-':
@@ -285,7 +269,7 @@ static BOOLEAN bigintm_OpM(int op, leftv res, leftv args)
     /// TODO: Why is this used for ALL the cases: even for "a(1)"  ???!
     case '(' : // <bigintm>  VAR(b,...);
     {
-      Werror("bigintm_OpM: What du you mean by '<bigintm>(...)'?!");
+      Werror("bigintm_OpM: What do you mean by '<bigintm>(...)'?!");
       return TRUE;  
     }
     
@@ -307,8 +291,7 @@ static void bigintm_destroy(blackbox *b, void *d)
 
 #endif
 
-
-
+};
 
 // this is only a demo
 BOOLEAN bigintm_setup()
