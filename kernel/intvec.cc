@@ -126,6 +126,20 @@ char * intvec::String(int dim) const
   return omStrDup(ivString(1, 0, dim));
 }
 
+void intvec::view () const
+{
+  Print ("intvec: {rows: %d, cols: %d, length: %d, Values: \n", rows(), cols(), length());
+
+  for (int i = 0; i < rows(); i++)
+  {
+    Print ("Row[%3d]:", i);
+    for (int j = 0; j < cols(); j++)
+      Print (" %5d", this->operator[]((i)*cols()+j) );
+    PrintLn ();
+  }
+  PrintS ("}\n");
+}
+
 void intvec::show(int notmat,int spaces) const
 {
   if (spaces>0)

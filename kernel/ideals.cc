@@ -70,7 +70,7 @@ ideal idInit(int idsize, int rank)
   return hh;
 }
 
-#ifndef NDEBUG
+#ifdef PDEBUG
 // this is only for outputting an ideal within the debugger
 void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint)
 {

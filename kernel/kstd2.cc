@@ -1292,6 +1292,7 @@ poly kNF2 (ideal F,ideal Q,poly q,kStrategy strat, int lazyReduce)
   //}
   kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
+  if (BVERBOSE(23)) kDebugPrint(strat);
   int max_ind;
   p = redNF(pCopy(q),max_ind,lazyReduce & KSTD_NF_NONORM,strat);
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))

@@ -1501,7 +1501,9 @@ poly kNF1 (ideal F,ideal Q,poly q, kStrategy strat, int lazyReduce)
   /*- compute------------------------------------------- -*/
   p = pCopy(q);
   deleteHC(&p,&o,&j,strat);
+  kTest(strat);
   if (TEST_OPT_PROT) { PrintS("r"); mflush(); }
+  if (BVERBOSE(23)) kDebugPrint(strat);
   if (p!=NULL) p = redMoraNF(p,strat, lazyReduce & KSTD_NF_ECART);
   if ((p!=NULL)&&((lazyReduce & KSTD_NF_LAZY)==0))
   {

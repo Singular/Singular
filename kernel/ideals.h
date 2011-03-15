@@ -53,18 +53,32 @@ ideal idDBInit (int size, int rank, const char *f, int l);
 ideal idInit (int size, int rank=1);
 #endif
 ideal idCopyFirstK (const ideal ide, const int k);
-/*- deletes an ideal -*/
+
+/// delete an ideal
 #define idDelete(h) id_Delete(h, currRing)
 void id_Delete (ideal* h, ring r);
 void id_ShallowDelete (ideal* h, ring r);
-  /*- initialise an ideal -*/
+/*- initialise an ideal -*/ // ?
+
+/// initialise the maximal ideal (at 0)
 ideal idMaxIdeal (int deg);
-  /*- initialise the maximal ideal (at 0) -*/
+
+/// gives an ideal the minimal possible size
 void idSkipZeroes (ideal ide);
-/* index of generator with leading term in ground ring (if any);
-   otherwise -1 */
+
+/// index of generator with leading term in ground ring (if any); otherwise -1
 int idPosConstant (ideal id);
-  /*gives an ideal the minimal possible size*/
+
+/// Count the effective size of an ideal
+/// (without the trailing allocated zero-elements)
+static inline int idSize(const ideal id)
+{
+  int j = IDELEMS(id) - 1;
+  poly* mm = id->m;
+  while ((j >= 0) && (mm[j] == NULL)) j--;
+  return (j + 1); 
+};
+
 void idNorm(ideal id);
 void idDelMultiples(ideal id);
 void idDelEquals(ideal id);
@@ -206,8 +220,10 @@ ideal idFarey(ideal x, number N);
 
 ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing = currRing); // image of certain map for BGG
 
-#ifndef NDEBUG
+#ifdef PDEBUG
 /* Shows an ideal -- only for debugging */
 void idShow(const ideal id, const ring lmRing = currRing, const ring tailRing = currRing, const int debugPrint = 0);
+#else
+#define idShow(id, lmRing, tailRing, debugPrint) ((void)0)
 #endif
 #endif
