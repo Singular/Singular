@@ -1384,7 +1384,7 @@ See also
    if(homog(m)==1)
    {
       resolution re;
-      if (((i==0) or (i>=nvars(basering))) && typeof(m) != "module")
+      if (((i==0) or (i>=nvars(basering))) && (typeof(m) != "module") && (nvars(basering)>1))
       {
         //LaScala for the homogeneous case and i == 0
         if (p_opt) { "using lres";}

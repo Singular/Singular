@@ -1639,6 +1639,7 @@ void syKillComputation(syStrategy syzstr, ring r)
       delete syzstr->Tl;
     if ((syzstr->syRing != NULL) && (syzstr->syRing != r))
     {
+      rNChangeSComps(NULL, NULL, syzstr->syRing);
       rKill(syzstr->syRing);
     }
     omFreeSize((ADDRESS)syzstr, sizeof(ssyStrategy));
@@ -2593,6 +2594,8 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   // Creare dp,S ring and change to it
   syzstr->syRing = rCurrRingAssure_dp_S();
   assume(syzstr->syRing != origR);
+  assume(syzstr->syRing->typ[1].ord_typ == ro_syzcomp);  
+
 
   // set initial ShiftedComps
   currcomponents = (int*)omAlloc0((arg->rank+1)*sizeof(int));
@@ -2621,15 +2624,21 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   syzstr->resPairs = syInitRes(temp,&maxlength,syzstr->Tl,syzstr->cw);
   omFreeSize((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
   omFreeSize((ADDRESS)currShiftedComponents,(arg->rank+1)*sizeof(long));
+  
   syzstr->res = (resolvente)omAlloc0((maxlength+1)*sizeof(ideal));
   syzstr->orderedRes = (resolvente)omAlloc0((maxlength+1)*sizeof(ideal));
   syzstr->elemLength = (int**)omAlloc0((maxlength+1)*sizeof(int*));
+
   syzstr->truecomponents = (int**)omAlloc0((maxlength+1)*sizeof(int*));
   syzstr->ShiftedComponents = (long**)omAlloc0((maxlength+1)*sizeof(long*));
+
   syzstr->backcomponents = (int**)omAlloc0((maxlength+1)*sizeof(int*));
   syzstr->Howmuch = (int**)omAlloc0((maxlength+1)*sizeof(int*));
   syzstr->Firstelem = (int**)omAlloc0((maxlength+1)*sizeof(int*));
   syzstr->sev = (unsigned long **) omAlloc0((maxlength+1)*sizeof(unsigned long *));
+
+  assume( syzstr->length == maxlength );
+  
   syzstr->bucket = kBucketCreate();
   int len0=idRankFreeModule(temp)+1;
 

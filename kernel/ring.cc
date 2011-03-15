@@ -3675,7 +3675,8 @@ BOOLEAN rComplete(ring r, int force)
         break;
 
       case ringorder_S:
-        assume(typ_i == 0 && j == 0);
+        assume(typ_i == 1); // For LaScala3 only: on the 2nd place ([1])!
+        // TODO: for K[x]: it is 0...?!
         rO_Syzcomp(j, j_bits,prev_ordsgn, tmp_ordsgn,tmp_typ[typ_i]);
         need_to_add_comp=TRUE;
         typ_i++;
@@ -3683,7 +3684,7 @@ BOOLEAN rComplete(ring r, int force)
 
       case ringorder_s:
         assume(typ_i == 0 && j == 0);
-        rO_Syz(j, j_bits, prev_ordsgn, tmp_ordsgn, tmp_typ[typ_i]);
+        rO_Syz(j, j_bits, prev_ordsgn, tmp_ordsgn, tmp_typ[typ_i]); // set syz-limit?
         need_to_add_comp=TRUE;
         typ_i++;
         break;
@@ -3866,8 +3867,11 @@ void rUnComplete(ring r)
         }
         else if (r->typ[i].ord_typ == ro_syzcomp)
         {
+          assume( r->typ[i].data.syzcomp.ShiftedComponents == NULL );
+          assume( r->typ[i].data.syzcomp.Components        == NULL );
+//          WarnS( "rUnComplete : ord_typ == ro_syzcomp was unhandled!!! Possibly memory leak!!!"  );
 #ifndef NDEBUG
-          Warn( "rUnComplete : ord_typ == ro_syzcomp was unhandled!!! Possibly memory leak!!!"  );
+//          assume(0);
 #endif
         }
 
@@ -4297,6 +4301,8 @@ void rDBChangeSComps(int* currComponents,
                      int length,
                      ring r)
 {
+  assume(r->typ[1].ord_typ == ro_syzcomp);
+      
   r->typ[1].data.syzcomp.length = length;
   rNChangeSComps( currComponents, currShiftedComponents, r);
 }
@@ -4305,6 +4311,8 @@ void rDBGetSComps(int** currComponents,
                  int *length,
                  ring r)
 {
+  assume(r->typ[1].ord_typ == ro_syzcomp);
+  
   *length = r->typ[1].data.syzcomp.length;
   rNGetSComps( currComponents, currShiftedComponents, r);
 }
@@ -4312,7 +4320,7 @@ void rDBGetSComps(int** currComponents,
 
 void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r)
 {
-  assume(r->order[1]==ringorder_S);
+  assume(r->typ[1].ord_typ == ro_syzcomp);
 
   r->typ[1].data.syzcomp.ShiftedComponents = currShiftedComponents;
   r->typ[1].data.syzcomp.Components = currComponents;
@@ -4320,7 +4328,7 @@ void rNChangeSComps(int* currComponents, long* currShiftedComponents, ring r)
 
 void rNGetSComps(int** currComponents, long** currShiftedComponents, ring r)
 {
-  assume(r->order[1]==ringorder_S);
+  assume(r->typ[1].ord_typ == ro_syzcomp);
 
   *currShiftedComponents = r->typ[1].data.syzcomp.ShiftedComponents;
   *currComponents =   r->typ[1].data.syzcomp.Components;

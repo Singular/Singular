@@ -100,6 +100,7 @@ static inline bool rIsRatGRing(const ring r)
 
 
 
+// The following are for LaScala3 only!
 #ifdef PDEBUG
 #define rChangeSComps(c,s,l) rDBChangeSComps(c,s,l)
 #define rGetSComps(c,s,l) rDBGetSComps(c,s,l)
