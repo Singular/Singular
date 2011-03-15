@@ -26,6 +26,7 @@
 #include <kernel/longalg.h>
 #include <kernel/longtrans.h>
 #include <kernel/ideals.h>
+#include <kernel/prCopy.h>
 #include <kernel/matpol.h>
 #include <kernel/kstd1.h>
 #include <kernel/timer.h>
@@ -1758,6 +1759,34 @@ static BOOLEAN jjDIFF_ID_ID(leftv res, leftv u, leftv v)
 static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
 {
   assumeStdFlag(v);
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+  {
+    ring origR = currRing;
+    ring tempR = rCopy(origR);
+    tempR->ringtype = 0; tempR->ch = 0;
+    rComplete(tempR);
+    ideal vid = (ideal)v->Data();
+    int i = idPosConstant(vid);
+    if ((i != -1) && (nIsUnit(pGetCoeff(vid->m[i]))))
+    { /* ideal v contains unit; dim = -1 */
+      res->data = (char *)-1;
+      return FALSE;
+    }
+    rChangeCurrRing(tempR);
+    ideal vv = idrCopyR(vid, origR, currRing);
+    ideal ww = idrCopyR((ideal)w->Data(), origR, currRing);
+    /* drop degree zero generator from vv (if any) */
+    if (i != -1) pDelete(&vv->m[i]);
+    long d = (long)scDimInt(vv, ww);    
+    if (rField_is_Ring_Z(origR) && (i == -1)) d++;
+    res->data = (char *)d;
+    idDelete(&vv); idDelete(&ww);
+    rChangeCurrRing(origR);
+    rDelete(tempR);
+    return FALSE;
+  }
+#endif
   if(currQuotient==NULL)
     res->data = (char *)((long)scDimInt((ideal)(v->Data()),(ideal)w->Data()));
   else
@@ -3598,6 +3627,33 @@ static BOOLEAN jjDET_S(leftv res, leftv v)
 static BOOLEAN jjDIM(leftv res, leftv v)
 {
   assumeStdFlag(v);
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+  {
+    ring origR = currRing;
+    ring tempR = rCopy(origR);
+    tempR->ringtype = 0; tempR->ch = 0;
+    rComplete(tempR);
+    ideal vid = (ideal)v->Data();
+    int i = idPosConstant(vid);
+    if ((i != -1) && (nIsUnit(pGetCoeff(vid->m[i]))))
+    { /* ideal v contains unit; dim = -1 */
+      res->data = (char *)-1;
+      return FALSE;
+    }
+    rChangeCurrRing(tempR); rComplete(tempR);
+    ideal vv = idrCopyR(vid, origR, currRing);
+    /* drop degree zero generator from vv (if any) */
+    if (i != -1) pDelete(&vv->m[i]);
+    long d = (long)scDimInt(vv, currQuotient);    
+    if (rField_is_Ring_Z(origR) && (i == -1)) d++;
+    res->data = (char *)d;
+    idDelete(&vv);
+    rChangeCurrRing(origR);
+    rDelete(tempR);
+    return FALSE;
+  }
+#endif
   res->data = (char *)(long)scDimInt((ideal)(v->Data()),currQuotient);
   return FALSE;
 }

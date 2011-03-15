@@ -586,6 +586,10 @@ PINLINE1 BOOLEAN p_IsConstant(const poly p, const ring r)
 PINLINE1 BOOLEAN p_IsUnit(const poly p, const ring r)
 {
   if (p == NULL) return FALSE;
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+    return (p_LmIsConstant(p, r) && nIsUnit(pGetCoeff(p)));
+#endif
   return p_LmIsConstant(p, r);
 }
 

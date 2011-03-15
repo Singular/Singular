@@ -1716,6 +1716,14 @@ BOOLEAN pComparePolys(poly p1,poly p2)
      return FALSE;
   if (pLength(p1) != pLength(p2))
     return FALSE;
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+  {
+    if ((pLength(p1) == 1) && (nEqual(pGetCoeff(p1), pGetCoeff(p2))))
+      return TRUE;
+    if (!nIsUnit(pGetCoeff(p2))) return FALSE;
+  }
+#endif
   n=nDiv(pGetCoeff(p1),pGetCoeff(p2));
   while ((p1 != NULL) /*&& (p2 != NULL)*/)
   {

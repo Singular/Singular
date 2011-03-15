@@ -93,6 +93,19 @@ void idShow(const ideal id, const ring lmRing, const ring tailRing, const int de
 }
 #endif
 
+/* index of generator with leading term in ground ring (if any);
+   otherwise -1 */
+int idPosConstant(ideal id)
+{
+  int k;
+  for (k = IDELEMS(id)-1; k>=0; k--)
+  {
+    if (p_LmIsConstantComp(id->m[k], currRing) == TRUE)
+      return k;
+  }
+  return -1;
+}
+
 /*2
 * initialise the maximal ideal (at 0)
 */
@@ -222,7 +235,7 @@ void idNorm(ideal id)
 }
 
 /*2
-* ideal id = (id[i]), c any number
+* ideal id = (id[i]), c any unit
 * if id[i] = c*id[j] then id[j] is deleted for j > i
 */
 void idDelMultiples(ideal id)
@@ -235,10 +248,25 @@ void idDelMultiples(ideal id)
     {
       for (j=k; j>i; j--)
       {
-        if ((id->m[j]!=NULL)
-        && (pComparePolys(id->m[i], id->m[j])))
+        if (id->m[j]!=NULL)
         {
-          pDelete(&id->m[j]);
+#ifdef HAVE_RINGS
+          if (rField_is_Ring(currRing))
+          {
+            /* if id[j] = c*id[i] then delete id[j].
+               In the below cases of a ground field, we
+               check whether id[i] = c*id[j] and, if so,
+               delete id[j] for historical reasons (so
+               that previous output does not change) */
+            if (pComparePolys(id->m[j], id->m[i])) pDelete(&id->m[j]);
+          }
+          else
+          {
+            if (pComparePolys(id->m[i], id->m[j])) pDelete(&id->m[j]);
+          }
+#else
+          if (pComparePolys(id->m[i], id->m[j])) pDelete(&id->m[j]);
+#endif          
         }
       }
     }

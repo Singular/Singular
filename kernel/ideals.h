@@ -61,6 +61,9 @@ void id_ShallowDelete (ideal* h, ring r);
 ideal idMaxIdeal (int deg);
   /*- initialise the maximal ideal (at 0) -*/
 void idSkipZeroes (ideal ide);
+/* index of generator with leading term in ground ring (if any);
+   otherwise -1 */
+int idPosConstant (ideal id);
   /*gives an ideal the minimal possible size*/
 void idNorm(ideal id);
 void idDelMultiples(ideal id);
