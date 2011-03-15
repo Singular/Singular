@@ -2,6 +2,21 @@ echo = 2;
 
 LIB("./bigintm.so");
 
+bigintm_print_load_counter();
+printBlackboxTypes();
+
+
+LIB("./bigintm.so");
+
+bigintm_print_load_counter();
+printBlackboxTypes();
+
+LIB("./bigintm.so");
+
+bigintm_print_load_counter();
+printBlackboxTypes();
+
+
 printBlackboxTypes();
 
 bigintm_setup();
@@ -80,14 +95,30 @@ c == 666;
 c == -666;
 
 
-a - s;
 
-c == s;
+
+
+
+
 
 c.s;
 c.sss;
-c.0;
+c."a";
 
+
+
+option(yacc);
+c - s;
+c == s; // BUG?
+option(noyacc);
+
+
+
+c.0; // BUG?
+option(yacc);
+c.1; // BUG?
+c. ; // BUG?
+option(noyacc);
 
 
 $$$

@@ -105,13 +105,15 @@ BOOLEAN bigintm_Op1(int op,leftv l, leftv r)
 {
   // interpreter: a1 is ist bigintm
   assume( r->Typ() == bigintm_type_id );
-
+/*
+  // "typeof( <blackbox> )" is handled by 'blackboxDefaultOp1'
   if (op==TYPEOF_CMD)
   {
     l->data=omStrDup(getBlackboxName(r->Typ()));
     l->rtyp=STRING_CMD;
     return FALSE;
   }
+*/
   
   if( op=='(' ) // <bigintm>  VAR();
   {
@@ -245,7 +247,14 @@ static BOOLEAN bigintm_Op2(int op, leftv res, leftv a1, leftv a2)
 
     case '.':
     {
-      Werror("bigintm_Op2: Op: '.': 2nd argument-type: '%s'(%d) in", Tok2Cmdname(a2->Typ()), a2->Typ());      
+
+      if (a2->name==NULL)
+      {
+        Werror("bigintm_Op2: Op: '.': 2nd argument-type: '%s'(%d) should be a NAME", Tok2Cmdname(a2->Typ()), a2->Typ());      
+        return TRUE;
+      }
+      
+      Werror("bigintm_Op2: Op: '.': 2nd argument-type: '%s'(%d) is called '%s' in ", Tok2Cmdname(a2->Typ()), a2->Typ(), a2->name);      
       return blackboxDefaultOp2(op,res,a1,a2);
       return TRUE;
     }
