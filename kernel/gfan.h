@@ -253,7 +253,6 @@ class gcone
 };
 lists lprepareResult(gcone *gc, const int n);
 static int64 int64gcd(const int64 &a, const int64 &b);
-static int intgcd(const int &a, const int &b);
 static int dotProduct(const int64vec &iva, const int64vec &ivb);
 static bool isParallel(const int64vec &a, const int64vec &b);
 static int64vec *ivNeg(/*const*/ int64vec *iv);

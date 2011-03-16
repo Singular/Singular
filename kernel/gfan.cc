@@ -3877,22 +3877,6 @@ static int64 int64gcd(const int64 &a, const int64 &b)
 	return p;
 }
 	
-static int intgcd(const int &a, const int &b)
-{
-	int r, p=a, q=b;
-	if(p < 0)
-		p = -p;
-	if(q < 0)
-		q = -q;
-	while(q != 0)
-	{
-		r = p % q;
-		p = q;
-		q = r;
-	}
-	return p;
-}
-		
 /** \brief Construct a dd_MatrixPtr from a cone's list of facets
  * NO LONGER USED
  */
