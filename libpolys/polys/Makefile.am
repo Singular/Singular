@@ -29,10 +29,11 @@ include_HEADERS = \
 	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
 	kbuckets.h sbuckets.h simpleideals.h
 
-libp_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral
-libp_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep
-libp_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ
-libp_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp
+P_PROCS_CPPFLAGS_COMMON = -DDYNAMIC_VERSION
+libp_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON}
+libp_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
+libp_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
+libp_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
 
 P_PROCS = templates/p_Procs_Lib.cc
 
