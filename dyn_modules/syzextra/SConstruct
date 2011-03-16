@@ -8,11 +8,23 @@ SING_INCLUDES=[SINGULAR_HOME, SINGULAR_HOME+"/omalloc"]
 # , SINGULAR_HOME+"/factory"
 
 
-sing_psico_int_if = env.SharedLibrary('syzextra',
+#env.SharedObject(target = 'mod_main.o', source = 'mod_main.cc')
+
+
+### Works with any Singular
+#syzextra_if = env.SharedLibrary('syzextra',
+#                               ["mod_main.cc", "DebugPrint.cc", "myNF.cc"],
+#                               SHLIBPREFIX="", LDMODULESUFFIX=".so", CPPDEFINES = 'NDEBUG', SHLIBSUFFIX = ".so",
+#                               CPPPATH = SING_INCLUDES,
+#                               LIBS=[])
+
+### Works with Singularg only!
+syzextra_debug_if = env.LoadableModule('syzextra_g',
                                ["mod_main.cc", "DebugPrint.cc", "myNF.cc"],
-                               SHLIBPREFIX="", LDMODULESUFFIX=".so",
+                               SHLIBPREFIX="", LDMODULESUFFIX=".sog", SHLIBSUFFIX = ".sog",
                                CPPPATH = SING_INCLUDES,
                                LIBS=[])
 
-Default(sing_psico_int_if)
+# Default(syzextra_if)
+# Default(syzextra_debug_if)
 

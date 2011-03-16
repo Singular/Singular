@@ -85,6 +85,28 @@ static inline number jjLONG2N(long d)
 #endif
 }
 
+static inline void view(const intvec* v)
+{
+#ifndef NDEBUG
+  v->view();
+#else
+  // This code duplication is only due to Hannes's #ifndef NDEBUG!
+  Print ("intvec: {rows: %d, cols: %d, length: %d, Values: \n", v->rows(), v->cols(), v->length());
+
+  for (int i = 0; i < v->rows(); i++)
+  {
+    Print ("Row[%3d]:", i);
+    for (int j = 0; j < v->cols(); j++)
+      Print (" %5d", (*v)[j + i * (v->cols())] );
+    PrintLn ();
+  }
+  PrintS ("}\n");
+#endif
+
+}
+
+                   
+
 static BOOLEAN DetailedPrint(leftv __res, leftv h)
 {
   NoReturn(__res);
@@ -149,7 +171,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
 
 
 #define PRINT_pINTVECTOR(s, v) Print("intvec '%10s'(%p)", #v, (s)->v); \
-if( (s)->v != NULL ){ PrintS(": "); (s)->v->view(); }; \
+if( (s)->v != NULL ){ PrintS(": "); view((s)->v); }; \
 PrintLn();
 
     PRINT_pINTVECTOR(syzstr, resolution);

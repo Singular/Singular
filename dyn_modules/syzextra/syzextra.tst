@@ -1,6 +1,18 @@
 echo = 2;
 
-LIB("./syzextra.so");
+"ndebug?: ", system("with", "ndebug");
+"om_ndebug?: ", system("with", "om_ndebug");
+
+if( system("with", "ndebug") )
+{
+  "Loading the Release version!";
+  LIB("./syzextra.so");
+}
+else
+{
+  "Loading the Debug version!";
+  LIB("./syzextra.sog");
+}
 
 noop();
 
