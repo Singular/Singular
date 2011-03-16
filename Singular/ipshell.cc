@@ -382,7 +382,7 @@ void list_cmd(int typ, const char* what, const char *prefix,BOOLEAN iterate, BOO
       if (h!=NULL)
       {
         if (iterate) list1(prefix,h,TRUE,fullname);
-	if (IDTYP(h)==ALIAS_CMD) PrintS("A");
+        if (IDTYP(h)==ALIAS_CMD) PrintS("A");
         if ((IDTYP(h)==RING_CMD)
             || (IDTYP(h)==QRING_CMD)
             //|| (IDTYP(h)==PACKE_CMD)
@@ -1863,7 +1863,7 @@ lists rDecompose(const ring r)
     L->m[3].data=(void *)idCopy(r->qideal);
   // ----------------------------------------
   #ifdef HAVE_PLURAL // NC! in rDecompose
-  if (rIsPluralRing(r)) 
+  if (rIsPluralRing(r))
   {
     L->m[4].rtyp=MATRIX_CMD;
     L->m[4].data=(void *)mpCopy(r->GetNC()->C);
@@ -1984,7 +1984,7 @@ void rComposeRing(lists L, ring R)
   {
     R->ch = R->ringflagb;
     if ((mpz_cmp_ui(R->ringflaga, 2) == 0) && (R->ringflagb <= 8*sizeof(NATNUMBER)))
-    {                                          
+    {
       /* this branch should be active for ringflagb = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
       R->ringtype = 1;       // Use Z/2^ch
@@ -2299,7 +2299,7 @@ ring rCompose(const lists  L)
         {
           if (IDELEMS(R->algring->qideal)==1)
           {
-            R->minpoly=naInit(1,R);            
+            R->minpoly=naInit(1,R);
             lnumber n=(lnumber)R->minpoly;
             n->z=R->algring->qideal->m[0];
             naMinimalPoly=n->z;
@@ -4866,7 +4866,7 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     {
       ch = ringflagb;
       if ((mpz_cmp_ui(ringflaga, 2) == 0) && (ringflagb <= 8*sizeof(NATNUMBER)))
-      {                                    
+      {
         /* this branch should be active for ringflagb = 2..32 resp. 2..64,
            depending on the size of a long on the respective platform */
         ringtype = 1;       // Use Z/2^ch
@@ -5034,6 +5034,15 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
   // Complete the initialization
   if (rComplete(R,1))
     goto rInitError;
+
+#ifdef HABE_RINGS
+// currently, coefficients which are ring elements require a global ordering:
+  if (rField_is_Ring(R) && (R->pOrdSgn==-1))
+  {
+    WerrorS("global ordering required for these coefficients");
+    goto rInitError;
+  }
+#endif
 
   rTest(R);
 
