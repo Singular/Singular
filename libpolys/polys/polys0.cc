@@ -24,26 +24,26 @@ static void writemon(poly p, int ko, ring r)
   BOOLEAN wroteCoef=FALSE,writeGen=FALSE;
 
   if (pGetCoeff(p)!=NULL)
-    n_Normalize(pGetCoeff(p),r);
+    n_Normalize(pGetCoeff(p),r->cf);
 
   if (((p_GetComp(p,r) == (short)ko)
     &&(p_LmIsConstantComp(p, r)))
-  || ((!n_IsOne(pGetCoeff(p),r))
-    && (!n_IsMOne(pGetCoeff(p),r))
+  || ((!n_IsOne(pGetCoeff(p),r->cf))
+    && (!n_IsMOne(pGetCoeff(p),r->cf))
   )
   )
   {
-    n_Write(p->coef,r);
+    n_Write(p->coef,r->cf);
     wroteCoef=(rShortOut(r) == FALSE) 
     || (r->parameter!=NULL)
     || rField_is_R(r) || (rField_is_long_R(r)) || (rField_is_long_C(r));
     writeGen=TRUE;
   }
-  else if (n_IsMOne(pGetCoeff(p),r))
+  else if (n_IsMOne(pGetCoeff(p),r->cf))
   {
-    if (n_GreaterZero(pGetCoeff(p),r))
+    if (n_GreaterZero(pGetCoeff(p),r->cf))
     {
-      n_Write(p->coef,r);
+      n_Write(p->coef,r->cf);
       wroteCoef=(rShortOut(r) == FALSE)
       || (r->parameter!=NULL)
       || rField_is_R(r) || (rField_is_long_R(r)) || (rField_is_long_C(r));
@@ -54,7 +54,7 @@ static void writemon(poly p, int ko, ring r)
   }
 
   int i;
-  for (i=0; i<r->N; i++)
+  for (i=0; i<rVar(r); i++)
   {
     {
       long ee = p_GetExp(p,i+1,r);
@@ -94,7 +94,7 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
     p = pNext(p);
     while (p!=NULL)
     {
-      if ((p->coef==NULL)||n_GreaterZero(p->coef,tailRing))
+      if ((p->coef==NULL)||n_GreaterZero(p->coef,tailRing->cf))
         StringAppendS("+");
       writemon(p,0, tailRing);
       p = pNext(p);
@@ -115,7 +115,7 @@ char* p_String0(poly p, ring lmRing, ring tailRing)
     pIter(p);
     while ((p!=NULL) && (k == p_GetComp(p, tailRing)))
     {
-      if (n_GreaterZero(p->coef,tailRing)) StringAppendS("+");
+      if (n_GreaterZero(p->coef,tailRing->cf)) StringAppendS("+");
       writemon(p,k,tailRing);
       pIter(p);
     }
