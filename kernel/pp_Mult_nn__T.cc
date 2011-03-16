@@ -21,16 +21,15 @@ LINKAGE poly pp_Mult_nn(poly p, const number n, const ring r)
   p_Test(p, r);
   if (p == NULL) return NULL;
   spolyrec rp;
-#ifdef HAVE_ZERODIVISORS
+#ifdef HAVE_RINGS
   rp.next = NULL;
 #endif
   poly q = &rp;
   omBin bin = r->PolyBin;
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
-
   do
   {
-#ifndef HAVE_ZERODIVISORS
+#ifndef HAVE_RINGS
     p_AllocBin(pNext(q), bin, r);
     pIter(q);
     number nc = pGetCoeff(p);

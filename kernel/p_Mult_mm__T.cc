@@ -29,14 +29,14 @@ LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
   const unsigned long* m_e = m->exp;
   pAssume(!n_IsZero(ln,ri));
 
-#ifdef HAVE_ZERODIVISORS
+#ifdef HAVE_RINGS
   poly before = p;
 #endif
   while (p != NULL)
   {
     pn = pGetCoeff(p);
     number tmp = n_Mult(ln, pn, ri);
-#ifdef HAVE_ZERODIVISORS
+#ifdef HAVE_RINGS
     if (n_IsZero(tmp, ri))
     {
       n_Delete(&tmp, ri);
@@ -59,7 +59,7 @@ LINKAGE poly p_Mult_mm(poly p, const poly m, const ring ri)
       n_Delete(&pn, ri);
       p_MemAdd(p->exp, m_e, length);
       p_MemAddAdjust(p, ri);
-#ifdef HAVE_ZERODIVISORS
+#ifdef HAVE_RINGS
       before = p;
 #endif
       p = pNext(p);
