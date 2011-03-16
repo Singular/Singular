@@ -9,6 +9,7 @@ LIB
 *.lo
 *.la
 .libs
+libpolys/polys/templates/p_Procs_Generate
 depend
 tags
 ltmain.sh
