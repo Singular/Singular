@@ -373,6 +373,12 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           #ifdef HAVE_GMS
             TEST_FOR("gms");
           #endif
+          #ifdef OM_NDEBUG
+            TEST_FOR("om_ndebug");
+          #endif
+          #ifdef NDEBUG
+            TEST_FOR("ndebug");
+          #endif            
             ;
           return FALSE;
           #undef TEST_FOR
