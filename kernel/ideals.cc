@@ -1200,7 +1200,6 @@ ideal idSect (ideal h1,ideal h2)
   temp1 = kStd(temp,currQuotient,testHomog,&w,NULL,length);
   if (w!=NULL) delete w;
   idDelete(&temp);
-
   if(syz_ring!=orig_ring)
     rChangeCurrRing(orig_ring);
 
@@ -3838,10 +3837,10 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
 }
 
 /*3
-* searches for units in the components of the module arg and
-* returns the first one
+* searches for the next unit in the components of the module arg and
+* returns the first one;
 */
-static int idReadOutUnits(ideal arg,int* comp)
+static int idReadOutPivot(ideal arg,int* comp)
 {
   if (idIs0(arg)) return -1;
   int i=0,j, generator=-1;
@@ -3858,8 +3857,14 @@ static int idReadOutUnits(ideal arg,int* comp)
       j = pGetComp(p);
       if (componentIsUsed[j]==0)
       {
+#ifdef HAVE_RINGS
+        if (pLmIsConstantComp(p) && rField_is_Ring(currRing) &&
+            nIsUnit(pGetCoeff(p)))
+        {
+#else
         if (pLmIsConstantComp(p))
         {
+#endif
           generator = i;
           componentIsUsed[j] = 1;
         }
@@ -3949,7 +3954,6 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   if (idIs0(arg)) return idInit(1,arg->rank);
   int i,next_gen,next_comp;
   ideal res=arg;
-
   if (!inPlace) res = idCopy(arg);
   res->rank=si_max(res->rank,idRankFreeModule(res));
   int *red_comp=(int*)omAlloc((res->rank+1)*sizeof(int));
@@ -3958,7 +3962,7 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
   int del=0;
   loop
   {
-    next_gen = idReadOutUnits(res,&next_comp);
+    next_gen = idReadOutPivot(res,&next_comp);
     if (next_gen<0) break;
     del++;
     syGaussForOne(res,next_gen,next_comp,0,IDELEMS(res));

@@ -600,6 +600,16 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 
   if ((idElem(id)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))
     assumeStdFlag(a);
+    
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+  {
+    int constIndex = idPosConstant(id);
+    if (constIndex != -1)
+    WerrorS("ideal contains constant; please modify ground field/ring instead");
+    return TRUE;
+  }
+#endif
 
   if (currRing->qideal!=NULL) /* we are already in a qring! */
   {
