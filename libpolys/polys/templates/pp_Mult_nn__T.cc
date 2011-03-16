@@ -39,7 +39,7 @@ LINKAGE poly pp_Mult_nn__T(poly p, const number n, const ring r)
 #else
     number nc = pGetCoeff(p);
     number tmp = n_Mult__T(n, nc, r);
-    if (! nIsZero(tmp))
+    if (! n_IsZero__T(tmp,r))
     {
       p_AllocBin(pNext(q), bin, r);
       pIter(q);

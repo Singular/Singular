@@ -4,8 +4,9 @@
 *  Computer Algebra System SINGULAR     *
 ****************************************/
 /* $Id$ */
-#include <polys/templates/p_Procs.h>
 #include <polys/operations/pShallowCopyDelete.h>
+#include <polys/monomials/ring.h>
+#include <polys/templates/p_Procs.h>
 
 //#define HAVE_COEF_BUCKETS
 

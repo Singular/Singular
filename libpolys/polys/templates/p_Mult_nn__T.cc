@@ -32,7 +32,7 @@ LINKAGE poly p_Mult_nn__T(poly p, const number n, const ring r)
     pIter(p);
 #else
     number tmp = n_Mult__T(n, pGetCoeff(p), r);
-    if (!nIsZero(tmp))
+    if (!n_IsZero__T(tmp,r))
     {
        number nc = pGetCoeff(p);
        p_SetCoeff0(p, tmp, r);
