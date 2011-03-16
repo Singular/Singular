@@ -85,7 +85,9 @@ public:
   inline int  rows() const { return row; }
   inline void length(int l) { row = l; col = 1; }
   void show(int mat=0,int spaces=0) const;
+  #ifndef NDEBUG
   void view() const;
+  #endif
 
   inline void makeVector() { row*=col;col=1; }
   char * String(int dim = 2) const;

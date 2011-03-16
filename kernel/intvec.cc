@@ -126,6 +126,8 @@ char * intvec::String(int dim) const
   return omStrDup(ivString(1, 0, dim));
 }
 
+#ifndef NDEBUG
+// debug only
 void intvec::view () const
 {
   Print ("intvec: {rows: %d, cols: %d, length: %d, Values: \n", rows(), cols(), length());
@@ -139,6 +141,7 @@ void intvec::view () const
   }
   PrintS ("}\n");
 }
+#endif
 
 void intvec::show(int notmat,int spaces) const
 {
