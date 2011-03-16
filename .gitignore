@@ -6,6 +6,9 @@ LIB
 *.og
 *.exe
 *.swp
+*.lo
+*.la
+.libs
 depend
 tags
 ltmain.sh
