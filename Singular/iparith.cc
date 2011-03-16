@@ -2293,13 +2293,6 @@ static BOOLEAN jjJET_ID(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjKBASE2(leftv res, leftv u, leftv v)
 {
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-  {
-    WerrorS("kbase: only defined over ground fields");
-    return TRUE;
-  }
-#endif
   assumeStdFlag(u);
   intvec *w_u=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   res->data = (char *)scKBase((int)(long)v->Data(),
@@ -3996,13 +3989,6 @@ static BOOLEAN jjJACOB_M(leftv res, leftv a)
 
 static BOOLEAN jjKBASE(leftv res, leftv v)
 {
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-  {
-    WerrorS("kbase: only defined over ground fields");
-    return TRUE;
-  }
-#endif
   assumeStdFlag(v);
   res->data = (char *)scKBase(-1,(ideal)(v->Data()),currQuotient);
   return FALSE;
@@ -4708,13 +4694,6 @@ static BOOLEAN jjVARSTR1(leftv res, leftv v)
 }
 static BOOLEAN jjVDIM(leftv res, leftv v)
 {
-#ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing))
-  {
-    WerrorS("vdim: only defined over ground fields");
-    return TRUE;
-  }
-#endif
   assumeStdFlag(v);
   res->data = (char *)(long)scMult0Int((ideal)v->Data(),currQuotient);
   return FALSE;
