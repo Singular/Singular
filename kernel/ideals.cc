@@ -3858,8 +3858,8 @@ static int idReadOutPivot(ideal arg,int* comp)
       if (componentIsUsed[j]==0)
       {
 #ifdef HAVE_RINGS
-        if (pLmIsConstantComp(p) && rField_is_Ring(currRing) &&
-            nIsUnit(pGetCoeff(p)))
+        if (pLmIsConstantComp(p) &&
+            (!rField_is_Ring(currRing) || nIsUnit(pGetCoeff(p))))
         {
 #else
         if (pLmIsConstantComp(p))
