@@ -119,6 +119,10 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
     printf("#ifdef p_Procs_%s\n", module);
   }
 #endif
+#ifdef HAVE_RINGS
+  if (strcmp(s_field, "RingGeneral") == 0)
+    printf("#define HAVE_ZERODIVISORS\n");
+#endif
   i = 0;
   while (macros_field[i] != NULL)
   {
@@ -191,6 +195,10 @@ void AddProc(const char* s_what, p_Proc proc, p_Field field, p_Length length, p_
   printf("#undef %s\n#define %s %s\n", s_what, s_what, s_full_proc_name);
   printf("#include <kernel/%s__T.cc>\n", s_what);
   printf("#undef %s\n", s_what);
+#ifdef HAVE_RINGS
+  if (strcmp(s_field, "RingGeneral") == 0)
+    printf("#undef HAVE_ZERODIVISORS\n");
+#endif
 #ifndef p_Procs_Static
   printf("#endif // p_Procs_[Kernel|Field*]\n");
 #endif

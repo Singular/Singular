@@ -22,12 +22,12 @@ LINKAGE poly p_Mult_nn(poly p, const number n, const ring r)
   p_Test(p, r);
 
   poly q = p;
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
   poly old = NULL;
 #endif
   while (p != NULL)
   {
-#ifndef HAVE_RINGS
+#ifndef HAVE_ZERODIVISORS
     number nc = pGetCoeff(p);
     pSetCoeff0(p, n_Mult(n, nc, r));
     n_Delete(&nc, r);

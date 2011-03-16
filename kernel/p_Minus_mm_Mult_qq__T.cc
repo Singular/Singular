@@ -66,7 +66,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
 
   Equal:   // qm equals p
   tb = n_Mult(pGetCoeff(q), tm, r);
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
   if (!nIsZero(tb)) {
 #endif
   tc = pGetCoeff(p);
@@ -85,7 +85,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
     n_Delete(&tc, r);
     p = p_LmFreeAndNext(p, r);
   }
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
   }
   else
   { // coeff itself is zero
@@ -100,14 +100,14 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
 
 
   Greater:
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
   tb = n_Mult(pGetCoeff(q), tneg, r);
   if (!nIsZero(tb))
   {
 #endif
     pSetCoeff0(qm, n_Mult(pGetCoeff(q), tneg, r));
     a = pNext(a) = qm;       // append qm to result and advance q
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
   }
   else
   {

@@ -25,7 +25,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
     return NULL;
   }
   spolyrec rp;
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
   rp.next = NULL;
 #endif
   poly q = &rp, r;
@@ -40,7 +40,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
   do
   {
     tmp = n_Mult(ln, pGetCoeff(p), ri);
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
     if (! n_IsZero(tmp, ri))
     {
 #endif
@@ -49,7 +49,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
       pSetCoeff0(q, tmp);
       p_MemSum(q->exp, p->exp, m_e, length);
       p_MemAddAdjust(q, ri);
-#ifdef HAVE_RINGS
+#ifdef HAVE_ZERODIVISORS
     }
     else n_Delete(&tmp, ri);
 #endif
