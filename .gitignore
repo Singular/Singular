@@ -8,6 +8,10 @@ LIB
 *.swp
 depend
 tags
+ltmain.sh
+libtool
+INSTALL
+COPYING
 Makefile
 Makefile.in
 install-sh
