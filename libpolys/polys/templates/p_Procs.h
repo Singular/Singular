@@ -11,6 +11,7 @@
  *******************************************************************/
 #ifndef P_PROCS_H
 #define P_PROCS_H
+#include <polys/monomials/ring.h>
 // #include <polys/structs.h>
 
 /*------------- p_Proc stuff ----------------------*/

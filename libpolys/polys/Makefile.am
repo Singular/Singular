@@ -68,3 +68,5 @@ templates/p_Procs.inc: templates/p_Procs_Generate
 
 libpolys_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
 #  -fdiagnostics-show-option
+
+dynamic_modules: ${module_LTLIBRARIES}

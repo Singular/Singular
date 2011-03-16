@@ -21,7 +21,7 @@
 #include <polys/ext_fields/longalg.h>
 #include <polys/monomials/ring.h>
 // #include <???/ideals.h>
-#include <polys/polys.h>
+// #include <polys/polys.h>
 // #include "ipid.h"
 #ifdef HAVE_FACTORY
 // #include <???/clapsing.h>

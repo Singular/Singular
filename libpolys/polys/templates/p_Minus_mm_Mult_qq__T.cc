@@ -66,7 +66,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
   Equal:   // qm equals p
   tb = n_Mult__T(pGetCoeff(q), tm, r);
 #ifdef HAVE_ZERODIVISORS
-  if (!nIsZero(tb)) {
+  if (!n_IsZero__T(tb,r)) {
 #endif
   tc = pGetCoeff(p);
   if (!n_Equal__T(tc, tb, r))
@@ -101,7 +101,7 @@ LINKAGE poly p_Minus_mm_Mult_qq__T(poly p, poly m, poly q, int& Shorter, const p
   Greater:
 #ifdef HAVE_ZERODIVISORS
   tb = n_Mult__T(pGetCoeff(q), tneg, r);
-  if (!nIsZero(tb))
+  if (!n_IsZero__T(tb,r))
   {
 #endif
     pSetCoeff0(qm, n_Mult__T(pGetCoeff(q), tneg, r));
