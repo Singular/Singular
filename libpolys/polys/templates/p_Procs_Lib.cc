@@ -8,6 +8,13 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
+
+#ifdef DYNAMIC_VERSION
+#define LINKAGE extern "C"
+#else
+#define LINKAGE
+#endif
+
 #include "polys/config.h"
 #include <misc/auxiliary.h>
 // #include <polys/structs.h>
