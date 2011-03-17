@@ -45,19 +45,19 @@ setModuleGrading(M,v);    attach multiweights of units to a module and return it
 getModuleGrading(M);      get multiweights of module units (attached to M)
 
 isSublattice(A,B);        test whether A is a sublattice of B
-imageLattice(P,L);        computes an integral basis for the image of the lattice L under the linear map P.
+imageLattice(P,L);        computes an integral basis for P(L)
 intRank(A);               computes the rank of the intmat A
 kernelLattice(P);         computes an integral basis for the kernel of the linear map P.
-latticeBasis(B);          compute an integral basis of the lattice B
+latticeBasis(B);          computes an integral basis of the lattice B
 preimageLattice(P,L);     computes an integral basis for the preimage of the lattice L under the linear map P.
-projectLattices(B);       compute a linear map of lattices having the primitive span of B as its kernel.
-intersectLattices(A,B);   compute an integral basis for the intersection of the lattices A and B.
+projectLattices(B);       computes a linear map of lattices having the primitive span of B as its kernel.
+intersectLattices(A,B);   computes an integral basis for the intersection of the lattices A and B.
 isIntegralSurjective(P);  test whether the map P of lattices is surjective.
 isPrimitiveSublattice(A); test whether A generates a primitive sublattice.
-intInverse(A);            compute the integral inverse matrix of the intmat A
+intInverse(A);            computes the integral inverse matrix of the intmat A
 intAdjoint(A,i,j);        delete row i and column j of the intmat A.
 integralSection(P);       for a given linear surjective map P of lattices this procedure returns an integral section of P.
-primitiveSpan(A);         compute a basis for the minimal primitive sublattice that contains the given vectors (by A).
+primitiveSpan(A);         computes a basis for the minimal primitive sublattice that contains the given vectors (by A).
 
 factorgroup(G,H);         create the group G mod H
 productgroup(G,H);        create the group G x H
@@ -327,7 +327,13 @@ EXAMPLE: example createGroup; shows an example
   } else { kill HH; }
 
   list G; // Please, note the order: Generators + Relations:
-  G[1] = S; G[2] = L;
+  G[1] = S;
+  G[2] = L;
+  // And now a quick-and-dirty fix of Singular inability to handle attribs of attribs:
+  // For the use of a group as an attribute for multigraded rings
+  G[3] = attrib(L, attrGroupHNF); 
+  G[4] = attrib(L, attrGroupSNF);
+  
 
   attrib(G, isGroup, (1==1)); // mark it "a group"
 
@@ -412,6 +418,7 @@ RETURN: int, 1 for TRUE, 0 otherwise
 EXAMPLE: example areIsomorphicGroups; shows an example
 "
 {
+  ERROR("areIsomorphicGroups: Not yet implemented!");
   return (1); // TRUE
 }
 example
@@ -435,15 +442,15 @@ proc isGroup(def G)
 
 //  if( !defined(a) ) { return(0); }
 //  if( typeof(a) != "int" ) { return(0); }
-//  if( !a ){ return(0); }
+  if( defined(a) ){ if(typeof(a) == "int") { return(a); } }
 
 
-  if( size(G) != 2 ){ return(0); }
+  if( (size(G) != 2) && (size(G) != 4) ){ return(0); }
   if( typeof(G[1]) != "intmat" ){ return(0); }
   if( typeof(G[2]) != "intmat" ){ return(0); }
   if( nrows(G[1]) != nrows(G[2]) ){ return(0); }
 
-  return(1==1);
+  return(1);
 }
 
 
@@ -824,7 +831,13 @@ EXAMPLE: example getLattice; shows an example
       def M = attrib(T, attrGradingGroupHNF);
       if( (!defined(M)) or (typeof(M) != "intmat") )
       {
-        M = hermiteNormalForm(T);
+        if( size(G) > 2 )
+        {
+          M = G[3];
+        } else
+        {
+          M = hermiteNormalForm(T);
+        }
       }
       return (M);
     }
@@ -834,7 +847,13 @@ EXAMPLE: example getLattice; shows an example
       def M = attrib(T, attrGradingGroupSNF);
       if( (!defined(M)) or (typeof(M) != "intmat") )
       {
-        M = smithNormalForm(T);
+        if( size(G) > 2 )
+        {
+          M = G[4];
+        } else
+        {
+          M = smithNormalForm(T);
+        }
       }
       return (M);
     }
@@ -4805,7 +4824,7 @@ example
     4,8;
 
   // should result in a (2x4)-matrix with columns
-  // [-1, 2], [2, −3], [-1, 0] and [0, 1].
+  // [-1, 2], [2, -3], [-1, 0] and [0, 1]
   intmat U = projectLattice(B);
 
 }
@@ -4935,7 +4954,7 @@ EXAMPLE: example intInverse; shows an example
         s = -1;
       }
 
-      C[i,j] = d * s * intDet(Ad); // mult by d is equal to div by det
+      C[i,j] = d * s * det(Ad); // mult by d is equal to div by det
     }
   }
 
@@ -5062,7 +5081,7 @@ example
     2,4,5,7;
 
   // should be a matrix with two columns
-  // for example: [−2, 1, 0, 0], [3, −3, 0, 1]
+  // for example: [-2, 1, 0, 0], [3, -3, 0, 1]
   intmat U = integralSection(P);
 
   print(U);
