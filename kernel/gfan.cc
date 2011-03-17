@@ -923,7 +923,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 			pDelete(&p);
 		}
 
-		LObject *P = new sLObject();TODO What's the difference between sLObject and LObject?
+		LObject *P = new sLObject();//TODO What's the difference between sLObject and LObject?
 		memset(P,0,sizeof(LObject));
 
 		for(int jj=0;jj<=IDELEMS(initialForm)-2;jj++)
@@ -937,7 +937,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 				ksCreateSpoly(P);
 				if(P->p!=NULL)	spoly non zero=?
 				{
-					poly p;NOTE Don't use pInit here. Evil memleak will follow
+					poly p;//NOTE Don't use pInit here. Evil memleak will follow
 					poly q;
 					poly pDel,qDel;
 					p=pCopy(P->p);
@@ -1205,7 +1205,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 		delete iv;
 		dd_FreeMatrix(posRestr);
 	}
-	Clean up but don't delete the return value!
+	//Clean up but don't delete the return value!
 	dd_FreeMatrix(ddineq);
 	set_free(ddredrows);check
 	set_free(ddlinset);check
@@ -1673,7 +1673,7 @@ void gcone::getExtremalRays(const gcone &gc)
 	Now all extremal rays should be set w.r.t their respective fNormal
 	TODO Not sufficient -> vol2 II/125&127
 	NOTE Sufficient according to cddlibs doc. These ARE rays
-	What the hell... let's just take interior points
+	//What the hell... let's just take interior points
 	if(gcone::hasHomInput==FALSE)
 	{
 		fAct=gc.facetPtr;
@@ -1836,7 +1836,7 @@ inline void gcone::flip(ideal gb, facet *f)		Compute "the other side"
 	ideal srcRing_H;
 	ideal srcRing_HH;
 	srcRing_H=idrCopyR(H,tmpRing);
-	H is needed further below, so don't idDelete here
+	//H is needed further below, so don't idDelete here
  	srcRing_HH=ffG(srcRing_H,this->gcBasis);
  	idDelete(&srcRing_H);
 
@@ -1858,7 +1858,7 @@ inline void gcone::flip(ideal gb, facet *f)		Compute "the other side"
 	dd_rowrange aktrow=0;
 	for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
 	{
-		poly aktpoly=(poly)srcRing_HH->m[ii];This is a pointer, so don't pDelete
+		poly aktpoly=(poly)srcRing_HH->m[ii];//This is a pointer, so don't pDelete
 		iPMatrixRows = iPMatrixRows+pLength(aktpoly);
 	}
 	/* additionally one row for the standard-simplex and another for a row that becomes 0 during
@@ -1870,7 +1870,7 @@ inline void gcone::flip(ideal gb, facet *f)		Compute "the other side"
 	for (int ii=0;ii<IDELEMS(srcRing_HH);ii++)
 	{
 		markingsAreCorrect=FALSE;	crucial to initialise here
-		poly aktpoly=srcRing_HH->m[ii]; Only a pointer, so don't pDelete
+		poly aktpoly=srcRing_HH->m[ii]; //Only a pointer, so don't pDelete
 		/*Comparison of leading monomials is done via exponent vectors*/
 		for (int jj=0;jj<IDELEMS(H);jj++)
 		{
@@ -1964,7 +1964,7 @@ inline void gcone::flip(ideal gb, facet *f)		Compute "the other side"
  	{
  		dd_set_si(intPointMatrix->matrix[aktrow][jj],1);
  	}
-	Let's make sure we compute interior points from the positive orthant
+	//Let's make sure we compute interior points from the positive orthant
  	dd_MatrixPtr posRestr=dd_CreateMatrix(this->numVars,this->numVars+1);
 
  	int jj=1;
@@ -2208,7 +2208,7 @@ inline void gcone::flip2(const ideal &gb, facet *f)
 	ideal srcRing_H;
 	ideal srcRing_HH;
 	srcRing_H=idrCopyR(H,tmpRing);
-	H is needed further below, so don't idDelete here
+	//H is needed further below, so don't idDelete here
 	srcRing_HH=ffG(srcRing_H,this->gcBasis);
 	idDelete(&srcRing_H);
 	Now BBA(srcRing_HH) with (a(),a(),dp)
@@ -2286,7 +2286,7 @@ inline void gcone::flip2(const ideal &gb, facet *f)
 	for (int ii=0;ii<IDELEMS(gb);ii++)
 	{
 		poly initialFormElement;
-		poly aktpoly = (poly)gb->m[ii];Ptr, so don't pDelete(aktpoly)
+		poly aktpoly = (poly)gb->m[ii];//Ptr, so don't pDelete(aktpoly)
 		int *leadExpV=(int *)omAlloc((this->numVars+1)*sizeof(int));
 		pGetExpV(aktpoly,leadExpV);	find the leading exponent in leadExpV[1],...,leadExpV[n], use pNext(p)
 		initialFormElement=pHead(aktpoly);
@@ -2941,7 +2941,7 @@ dd_MatrixPtr gcone::computeLinealitySpace()
 
 	for(int k=1;k<n;k++)
 	{
-		Let's find a j s.t. m[j][k]!=0 && c[j]=0
+		//Let's find a j s.t. m[j][k]!=0 && c[j]=0
 		int condCtr=0;Check each row for zeroness
 		for(int j=1;j<m;j++)
 		{
