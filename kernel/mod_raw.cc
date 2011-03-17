@@ -182,7 +182,7 @@ void *dynl_open(
   )
 {
 // glibc 2.2:
-  if (i(filename==NULL) || (dlopen(filename,RTLD_NOW|RTLD_NOLOAD)==NULL))
+  if ((filename==NULL) || (dlopen(filename,RTLD_NOW|RTLD_NOLOAD)==NULL))
     return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
   else
     Werror("module %s already loaded",filename);
