@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$id reesclos.lib,v 1.32 2001/01/16 hirsch Exp $";
+version="$Id$";
 category="Commutative Algebra";
 
 info="
