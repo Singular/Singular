@@ -144,7 +144,7 @@ void sleftv::Print(leftv store, int spaces)
           break;
         case RESOLUTION_CMD:
         {
-          syStrategy tmp=(syStrategy)d; 
+          syStrategy tmp=(syStrategy)d;
           syPrint(tmp);
           break;
         }
@@ -262,23 +262,22 @@ void sleftv::Print(leftv store, int spaces)
 #endif
   {
     if ((store!=NULL)
-    && (store!=this)
-    && (t/*Typ()*/!=LINK_CMD)
-    && (t/*Typ()*/!=RING_CMD)
-    && (t/*Typ()*/!=QRING_CMD)
-    && (t/*Typ()*/!=POINTER_CMD)
-    && (t/*Typ()*/!=PACKAGE_CMD)
-    && (t/*Typ()*/!=PROC_CMD)
-    && (t/*Typ()*/!=DEF_CMD)
-    )
+    && (store!=this))
     {
-      store->rtyp=t/*Typ()*/;
-      store->data=CopyD();
-      if(attribute!=NULL)
+      if((t/*Typ()*/!=LINK_CMD)
+      && (t/*Typ()*/!=POINTER_CMD)
+      && (t/*Typ()*/!=PACKAGE_CMD)
+      && (t/*Typ()*/!=DEF_CMD)
+      )
       {
-        store->attribute=CopyA();
+        store->rtyp=t/*Typ()*/;
+        store->data=CopyD();
+        if(attribute!=NULL)
+        {
+          store->attribute=CopyA();
+        }
+        store->flag=flag;
       }
-      store->flag=flag;
     }
   }
 }
@@ -402,6 +401,7 @@ static inline void * s_internalCopy(const int t,  void *d)
       {
         ring r=(ring)d;
         r->ref++;
+        //Print("+  ring %d, ref %d\n",r,r->ref);
         return d;
       }
     case RESOLUTION_CMD:
@@ -499,8 +499,8 @@ void s_internalDelete(const int t,  void *d, const ring r)
     {
       ring R=(ring)d;
       #ifdef TEST
-      if (R==currRing)
-        PrintS("currRing?\n");
+      if ((R==currRing)&&(R->ref<=0))
+        Print("currRing? ref=%d\n",R->ref);
       else
       #endif
       rKill(R);
