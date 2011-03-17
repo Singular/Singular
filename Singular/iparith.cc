@@ -75,6 +75,8 @@
 
 #include <kernel/timer.h>
 
+// defaults for all commands: NO_PLURAL | NO_RING | ALLOW_ZERODIVISOR
+
 #ifdef HAVE_PLURAL
   #include <kernel/gring.h>
   #include <kernel/sca.h>
@@ -91,11 +93,17 @@
 
 #ifdef HAVE_RINGS
   #define RING_MASK        4
+  #define ZERODIVISOR_MASK 8
 #else
   #define RING_MASK        0
+  #define ZERODIVISOR_MASK 0
 #endif
 #define ALLOW_RING       4
 #define NO_RING          0
+#define NO_ZERODIVISOR   8
+#define ALLOW_ZERODIVISOR  0
+
+static BOOLEAN check_valid(const int p, const int op);
 
 /*=============== types =====================*/
 struct sValCmdTab
@@ -200,8 +208,6 @@ extern int cmdtok;
 extern BOOLEAN expected_parms;
 
 #define ii_div_by_0 "div. by 0"
-#define ii_not_for_plural "not implemented for non-commutative rings"
-#define ii_not_for_ring "not implemented for rings with rings as coeffients"
 
 int iiOp; /* the current operation*/
 
@@ -1778,7 +1784,7 @@ static BOOLEAN jjDIM2(leftv res, leftv v, leftv w)
     ideal ww = idrCopyR((ideal)w->Data(), origR, currRing);
     /* drop degree zero generator from vv (if any) */
     if (i != -1) pDelete(&vv->m[i]);
-    long d = (long)scDimInt(vv, ww);    
+    long d = (long)scDimInt(vv, ww);
     if (rField_is_Ring_Z(origR) && (i == -1)) d++;
     res->data = (char *)d;
     idDelete(&vv); idDelete(&ww);
@@ -3651,7 +3657,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
     ideal vv = idrCopyR(vid, origR, currRing);
     /* drop degree zero generator from vv (if any) */
     if (i != -1) pDelete(&vv->m[i]);
-    long d = (long)scDimInt(vv, currQuotient);    
+    long d = (long)scDimInt(vv, currQuotient);
     if (rField_is_Ring_Z(origR) && (i == -1)) d++;
     res->data = (char *)d;
     idDelete(&vv);
@@ -4185,8 +4191,8 @@ static BOOLEAN jjMINRES_R(leftv res, leftv v)
   syStrategy tmp=(syStrategy)v->Data();
   tmp = syMinimize(tmp); // enrich itself!
 
-  res->data=(char *)tmp; 
-  
+  res->data=(char *)tmp;
+
   if (weights!=NULL)
     atSet(res, omStrDup("isHomog"),ivCopy(weights),INTVEC_CMD);
 
@@ -6903,7 +6909,7 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
 {
   /* compute two factors of h(x,y) modulo x^(d+1) in K[[x]][y],
      see a detailed documentation in /kernel/linearAlgebra.h
-     
+
      valid argument lists:
      - (poly h, int d),
      - (poly h, int d, poly f0, poly g0),       optional: factors of h(0,y),
@@ -6917,14 +6923,14 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
      result:
      - list with the two factors f and g such that
        h(x,y) = f(x,y)*g(x,y) mod x^(d+1)   */
-  
+
   poly h      = NULL;
   int  d      =    1;
   poly f0     = NULL;
   poly g0     = NULL;
   int  xIndex =    1;   /* default index if none provided */
   int  yIndex =    2;   /* default index if none provided */
-  
+
   leftv u = v; int factorsGiven = 0;
   if ((u == NULL) || (u->Typ() != POLY_CMD))
   {
@@ -6974,7 +6980,7 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
     WerrorS("expected arguments (poly, int [, poly, poly] [, int, int])");
     return TRUE;
   }
-  
+
   /* checks for provided arguments */
   if (pIsConstant(h) || (factorsGiven && (pIsConstant(f0) || pIsConstant(g0))))
   {
@@ -6997,7 +7003,7 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
     WerrorS("expected distinct indices for variables x and y");
     return TRUE;
   }
-  
+
   /* computation of f0 and g0 if missing */
   if (factorsGiven == 0)
   {
@@ -7011,7 +7017,7 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
     if (i == NULL) return TRUE;
 
     idTest(i);
-    
+
     if ((v->rows() != 3) || ((*v)[0] =! 1) || (!nIsOne(pGetCoeff(i->m[0]))))
     {
       WerrorS("expected h(0,y) to have exactly two distinct monic factors");
@@ -7025,7 +7031,7 @@ static BOOLEAN jjFactModD_M(leftv res, leftv v)
     return TRUE;
 #endif
   }
-  
+
   poly f; poly g;
   henselFactors(xIndex, yIndex, h, f0, g0, d, f, g);
   lists L = (lists)omAllocBin(slists_bin);
@@ -7258,32 +7264,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
         res->rtyp=dArith2[i].res;
         if (currRing!=NULL)
         {
-          #ifdef HAVE_PLURAL
-          if (rIsPluralRing(currRing))
-          {
-            if ((dArith2[i].valid_for & PLURAL_MASK)==0 /*NO_PLURAL*/)
-            {
-              WerrorS(ii_not_for_plural);
-              break;
-            }
-            else if ((dArith2[i].valid_for & PLURAL_MASK)==2 /*, COMM_PLURAL */)
-            {
-              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
-            }
-            /* else, ALLOW_PLURAL */
-          }
-          #endif
-          #ifdef HAVE_RINGS
-          if (rField_is_Ring(currRing))
-          {
-            if ((dArith2[i].valid_for & RING_MASK)==0 /*NO_RING*/)
-            {
-              WerrorS(ii_not_for_ring);
-              break;
-            }
-            /* else ALLOW_RING */
-          }
-          #endif
+          if (check_valid(dArith2[i].valid_for,op)) break;
         }
         if (TEST_V_ALLWARN)
           Print("call %s(%s,%s)\n",Tok2Cmdname(iiOp),Tok2Cmdname(at),Tok2Cmdname(bt));
@@ -7317,33 +7298,7 @@ BOOLEAN iiExprArith2(leftv res, leftv a, int op, leftv b, BOOLEAN proccall)
             res->rtyp=dArith2[i].res;
             if (currRing!=NULL)
             {
-              #ifdef HAVE_PLURAL
-              if (rIsPluralRing(currRing))
-              {
-                if ((dArith2[i].valid_for & PLURAL_MASK)==0 /*NO_PLURAL*/)
-                {
-                  WerrorS(ii_not_for_plural);
-                  break;
-                }
-                else if ((dArith2[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
-                {
-                  Warn("assume commutative subalgebra for cmd `%s`",
-                        Tok2Cmdname(i));
-                }
-                /* else, ALLOW_PLURAL */
-              }
-              #endif
-              #ifdef HAVE_RINGS
-              if (rField_is_Ring(currRing))
-              {
-                if ((dArith2[i].valid_for & RING_MASK)==0 /*NO_RING*/)
-                {
-                  WerrorS(ii_not_for_ring);
-                  break;
-                }
-                /* else ALLOW_RING */
-              }
-              #endif
+              if (check_valid(dArith2[i].valid_for,op)) break;
             }
             if (TEST_V_ALLWARN)
               Print("call %s(%s,%s)\n",Tok2Cmdname(iiOp),
@@ -7476,32 +7431,7 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         int r=res->rtyp=dArith1[i].res;
         if (currRing!=NULL)
         {
-          #ifdef HAVE_PLURAL
-          if ((currRing!=NULL) && (rIsPluralRing(currRing)))
-          {
-            if ((dArith1[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
-            {
-              WerrorS(ii_not_for_plural);
-              break;
-            }
-            else if ((dArith1[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
-            {
-              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
-            }
-            /* else, ALLOW_PLURAL */
-          }
-          #endif
-          #ifdef HAVE_RINGS
-          if (rField_is_Ring(currRing))
-          {
-            if ((dArith1[i].valid_for & RING_MASK)==0 /*NO_RING*/)
-            {
-              WerrorS(ii_not_for_ring);
-              break;
-            }
-            /* else ALLOW_RING */
-          }
-          #endif
+          if (check_valid(dArith1[i].valid_for,op)) break;
         }
         if (TEST_V_ALLWARN)
           Print("call %s(%s)\n",Tok2Cmdname(iiOp),Tok2Cmdname(at));
@@ -7541,21 +7471,10 @@ BOOLEAN iiExprArith1(leftv res, leftv a, int op)
         if ((ai=iiTestConvert(at,dArith1[i].arg))!=0)
         {
           int r=res->rtyp=dArith1[i].res;
-          #ifdef HAVE_PLURAL
-          if ((currRing!=NULL) && (rIsPluralRing(currRing)))
+          if (currRing!=NULL)
           {
-            if ((dArith1[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
-            {
-              WerrorS(ii_not_for_plural);
-              break;
-            }
-            else if ((dArith1[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
-            {
-              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
-            }
-            /* else, ALLOW_PLURAL */
+            if (check_valid(dArith1[i].valid_for,op)) break;
           }
-          #endif
           if (r<0)
           {
             res->rtyp=-r;
@@ -7684,32 +7603,7 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
         res->rtyp=dArith3[i].res;
         if (currRing!=NULL)
         {
-          #ifdef HAVE_PLURAL
-          if (rIsPluralRing(currRing))
-          {
-            if ((dArith3[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
-            {
-              WerrorS(ii_not_for_plural);
-              break;
-            }
-            else if ((dArith3[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
-            {
-              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
-            }
-            /* else, ALLOW_PLURAL */
-          }
-          #endif
-          #ifdef HAVE_RINGS
-          if (rField_is_Ring(currRing))
-          {
-            if ((dArith3[i].valid_for & RING_MASK)==0 /*NO_RING*/)
-            {
-              WerrorS(ii_not_for_ring);
-              break;
-            }
-            /* else ALLOW_RING */
-          }
-          #endif
+          if (check_valid(dArith3[i].valid_for,op)) break;
         }
         if (TEST_V_ALLWARN)
           Print("call %s(%s,%s,%s)\n",
@@ -7744,22 +7638,10 @@ BOOLEAN iiExprArith3(leftv res, int op, leftv a, leftv b, leftv c)
             if ((ci=iiTestConvert(ct,dArith3[i].arg3))!=0)
             {
               res->rtyp=dArith3[i].res;
-              #ifdef HAVE_PLURAL
-              if ((currRing!=NULL)
-              && (rIsPluralRing(currRing)))
+              if (currRing!=NULL)
               {
-                if ((dArith3[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
-                {
-                   WerrorS(ii_not_for_plural);
-                   break;
-                 }
-                 else if ((dArith3[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
-                 {
-                   Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
-                 }
-                 /* else, ALLOW_PLURAL */
+                if (check_valid(dArith3[i].valid_for,op)) break;
               }
-              #endif
               if (TEST_V_ALLWARN)
                 Print("call %s(%s,%s,%s)\n",
                   Tok2Cmdname(iiOp),Tok2Cmdname(an->rtyp),
@@ -7941,32 +7823,7 @@ BOOLEAN iiExprArithM(leftv res, leftv a, int op)
         res->rtyp=dArithM[i].res;
         if (currRing!=NULL)
         {
-          #ifdef HAVE_PLURAL
-          if (rIsPluralRing(currRing))
-          {
-            if ((dArithM[i].valid_for &PLURAL_MASK)==0 /*NO_PLURAL*/)
-            {
-              WerrorS(ii_not_for_plural);
-              break;
-            }
-            else if ((dArithM[i].valid_for &PLURAL_MASK)==2 /*, COMM_PLURAL */)
-            {
-              Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(i));
-            }
-            /* else ALLOW_PLURAL */
-          }
-          #endif
-          #ifdef HAVE_RINGS
-          if (rField_is_Ring(currRing))
-          {
-            if ((dArithM[i].valid_for & RING_MASK)==0 /*NO_RING*/)
-            {
-              WerrorS(ii_not_for_ring);
-              break;
-            }
-            /* else ALLOW_RING */
-          }
-          #endif
+          if (check_valid(dArithM[i].valid_for,op)) break;
         }
         if (TEST_V_ALLWARN)
           Print("call %s(... (%d args))\n", Tok2Cmdname(iiOp),args);
@@ -8426,4 +8283,43 @@ int iiArithAddCmd(
     //Print("L=%d\n", sArithBase.nLastIdentifier);
   }
   return 0;
+}
+
+static BOOLEAN check_valid(const int p, const int op)
+{
+  #ifdef HAVE_PLURAL
+  if (rIsPluralRing(currRing))
+  {
+    if ((p & PLURAL_MASK)==0 /*NO_PLURAL*/)
+    {
+      WerrorS("not implemented for non-commutative rings");
+      return TRUE;
+    }
+    else if ((p & PLURAL_MASK)==2 /*, COMM_PLURAL */)
+    {
+      Warn("assume commutative subalgebra for cmd `%s`",Tok2Cmdname(op));
+      return FALSE;
+    }
+    /* else, ALLOW_PLURAL */
+  }
+  #endif
+  #ifdef HAVE_RINGS
+  if (rField_is_Ring(currRing))
+  {
+    if ((p & RING_MASK)==0 /*NO_RING*/)
+    {
+      WerrorS("not implemented for rings with rings as coeffients");
+      return TRUE;
+    }
+    /* else ALLOW_RING */
+    else if (((p & ZERODIVISOR_MASK)==NO_ZERODIVISOR)
+    &&(!rField_is_Domain(currRing)))
+    {
+      WerrorS("domain required as coeffients");
+      return TRUE;
+    }
+    /* else ALLOW_ZERODIVISOR */
+  }
+  #endif
+  return FALSE;
 }
