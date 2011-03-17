@@ -83,7 +83,7 @@ struct sValCmd1 dArith1[]=
 ,{D(jjDEFINED),    DEFINED_CMD,     INT_CMD,        DEF_CMD       , ALLOW_PLURAL |ALLOW_RING}
 #ifdef HAVE_FACTORY
 ,{D(jjDET_I),      DET_CMD,         INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |ALLOW_RING}
-,{D(jjDET),        DET_CMD,         POLY_CMD,       MATRIX_CMD    , NO_PLURAL |NO_RING}
+,{D(jjDET),        DET_CMD,         POLY_CMD,       MATRIX_CMD    , NO_PLURAL |ALLOW_RING}
 ,{D(jjDET_S),      DET_CMD,         POLY_CMD,       MODUL_CMD     , NO_PLURAL |NO_RING}
 #else
 ,{  jjWRONG ,      DET_CMD,         INT_CMD,        INTMAT_CMD    , ALLOW_PLURAL |NO_RING}
