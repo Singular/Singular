@@ -600,6 +600,8 @@ bool MinorKey::selectNextRows (const int k, const MinorKey& mk)
       _numberOfRowBlocks = newBitBlockIndex + 1;
       /* allocate memory for new entries in _rowKey; */
       _rowKey = new unsigned int[_numberOfRowBlocks];
+      /* initializing entries to zero */
+        for (int r = 0; r < _numberOfRowBlocks; r++) _rowKey[r] = 0;
     }
     else
     {
@@ -666,12 +668,12 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
               shift the set of columns in this MinorKey to 11000001 (, and
               return true). */
 
-  /* The next two variables will finally name a columns which is
+  /* The next two variables will finally name a column which is
      (1) currently not yet among the columns in this MinorKey, but
      (2) among the columns in mk, and
-     (3) which is "higher" than the lowest columns in this MinorKey, and
+     (3) which is "higher" than the lowest column in this MinorKey, and
      (4) which is the lowest possible choice such that (1) - (3) hold.
-     If we should not be able to find such a columns, then there is no next
+     If we should not be able to find such a column, then there is no next
      subset of columns. In this case, the method will return false; otherwise
      always true. */
   int newBitBlockIndex = 0;        /* the block index of the bit */
@@ -713,7 +715,7 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
   else
   {
     /* Note that the following must hold when reaching this line of code:
-       (1) The columns with bit newBitToBeSet in
+       (1) The column with bit newBitToBeSet in
            this->getColumnKey(newBitBlockIndex) is currently not among the
            columns in this MinorKey, but
        (2) it is among the columns in mk, and
@@ -730,6 +732,8 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
         _numberOfColumnBlocks = newBitBlockIndex + 1;
         /* allocate memory for new entries in _columnKey; */
         _columnKey = new unsigned int[_numberOfColumnBlocks];
+        /* initializing entries to zero */
+        for (int c = 0; c < _numberOfColumnBlocks; c++) _columnKey[c] = 0;
     }
     else
     {
@@ -748,7 +752,6 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
       for (int i = 0; i < newBitBlockIndex; i++)
         _columnKey[i] = 0;
     }
-
     /* We have now deleted all bits from _columnKey[...] below the bit
        2^newBitToBeSet. In the example we shall have at this point:
        _columnKey[...] = 10000000. Now let's set the new bit: */
@@ -787,12 +790,12 @@ bool MinorKey::selectNextColumns (const int k, const MinorKey& mk)
 
 string MinorKey::toString() const
 {
-  char h[32];
-  string t = "";
+  string t;
   string s = "(";
   unsigned int z = 0;
   for (int r = this->getNumberOfRowBlocks() - 1; r >= 0; r--)
   {
+    t = "";
     z = this->getRowKey(r);
     while (z != 0)
     {
@@ -804,9 +807,9 @@ string MinorKey::toString() const
     s += t;
   }
   s += ", ";
-  t = "";
   for (int c = this->getNumberOfColumnBlocks() - 1; c >= 0; c--)
   {
+    t = "";
     z = this->getColumnKey(c);
     while (z != 0)
     {
