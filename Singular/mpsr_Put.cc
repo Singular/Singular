@@ -245,7 +245,7 @@ mpsr_Status_t mpsr_PutProc(MP_Link_pt link, const char* pname, procinfov proc)
     mp_return(MP_PutStringPacket(link, proc->data.s.body, 0));
   }
   else
-    mp_return(MP_PutStringPacket(link, "", 0));
+    mp_return(MP_PutStringPacket(link, (char*)"", 0));
   mp_return(MP_Success);
 }
 
