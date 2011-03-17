@@ -181,7 +181,14 @@ void *dynl_open(
   char *filename    /* I: filename to load */
   )
 {
-  return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
+// glibc 2.2:
+  if (dlopen(filename,RTLD_NOW|RTLD_NOLOAD)==NULL)
+    return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
+  else
+    Werror("module %s already loaded",filename);
+  return NULL;
+// alternative  
+//    return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
 }
 
 void *dynl_sym(void *handle, const char *symbol)
