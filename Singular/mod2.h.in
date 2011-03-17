@@ -107,6 +107,8 @@
 #undef HAVE_SYSCONF
 /* Define if you have siginterrupt (BSD4.3) */
 #undef HAVE_SIGINTERRUPT
+/* Define if you have pselect */
+#undef HAVE_PSELECT
 /* define for boost includes and lib */
 //////////////////////// #undef HAVE_BOOST_DYNAMIC_BITSET_HPP
 /* define for std:vector includes */

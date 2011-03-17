@@ -1219,9 +1219,14 @@ int slStatusSsiL(lists L, int timeout)
   int max_fd=0; /* 1 + max fd in fd_set */
 
   /* timeout */
+  #ifdef HAVE_PSELECT
   struct timespec wt;
-  int startingtime = getRTimer()/TIMER_RESOLUTION;  // in seconds
   struct timespec *wt_ptr=&wt;
+  #else
+  struct timeval wt;
+  struct timeval *wt_ptr=&wt;
+  #endif
+  int startingtime = getRTimer()/TIMER_RESOLUTION;  // in seconds
   if (timeout== -1)
   {
     wt_ptr=NULL;
@@ -1229,7 +1234,11 @@ int slStatusSsiL(lists L, int timeout)
   else
   {
     wt.tv_sec  = timeout / 1000000;
+  #ifdef HAVE_PSELECT
     wt.tv_nsec = 1000 * (timeout % 1000000);
+  #else
+    wt.tv_usec = timeout % 1000000;
+  #endif
   }
 
   /* signal mask for pselect() */
@@ -1303,7 +1312,16 @@ do_select:
   }
 
   /* check with select: chars waiting: no -> not ready */
+  #ifdef HAVE_PSELECT
   s = pselect(max_fd, &mask, NULL, NULL, wt_ptr, &sigmask);
+  #else
+   sigset_t origsigmask;
+
+   sigprocmask(SIG_SETMASK, &sigmask, &origsigmask);
+   s = select(max_fd, &mask, NULL, NULL, wt_ptr);
+   sigprocmask(SIG_SETMASK, &origsigmask, NULL);
+   #endif
+
   if (s==-1)
   { 
     WerrorS("error in select call");
@@ -1373,7 +1391,11 @@ do_select:
           timeout = si_max(0,
                timeout - 1000000*(getRTimer()/TIMER_RESOLUTION - startingtime));
           wt.tv_sec  = timeout / 1000000;
+          #ifdef HAVE_PSELECT
           wt.tv_nsec = 1000 * (timeout % 1000000);
+          #else
+          wt.tv_usec = (timeout % 1000000);
+          #endif
         }
         goto do_select;
       }

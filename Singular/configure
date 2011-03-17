@@ -4021,7 +4021,7 @@ else :
   
 fi
 for ac_func in gettimeofday atexit bcopy getcwd getwd vsnprintf readlink \
- sleep usleep getpwnam popen setenv siginterrupt sysconf
+ sleep usleep getpwnam popen setenv siginterrupt sysconf pselect
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:4027: checking for $ac_func" >&5
