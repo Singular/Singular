@@ -28,7 +28,8 @@
 
 #define ALLOW_RING       4
 #define NO_RING          0
-
+#define NO_ZERODIVISOR   8
+#define ALLOW_ZERODIVISOR  0
 
 /*=============== types =====================*/
 struct _scmdnames
