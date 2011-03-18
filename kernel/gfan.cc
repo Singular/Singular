@@ -12,27 +12,20 @@ $Id$
 #include <kernel/options.h>
 #include <kernel/kstd1.h>
 #include <kernel/kutil.h>
-// #include "int64vec.h"
 #include <kernel/polys.h>
 #include <kernel/ideals.h>
 #include <kernel/kmatrix.h>
 #include <kernel/GMPrat.h>
 
 #include "ring.h"	//apparently not needed
-// #include "structs.h"
 #include <Singular/lists.h>
 #include <kernel/prCopy.h>
 #include <kernel/stairc.h>
-// #include <bitset>
 #include <fstream>	//read-write cones to files
-// #include <gmp.h>
 #include <string>
 #include <sstream>
-// #include <time.h>
 #include <stdlib.h>
 #include <assert.h>
-// #include <Singular/bbfan.h>
-// #include <Singular/bbcone.h>
 #include <gfanlib/gfanlib.h>
 
 /*DO NOT REMOVE THIS*/
@@ -60,16 +53,17 @@ $Id$
 //Only good for very coarse profiling
 // #define gfanp
 #ifdef gfanp
-#include <sys/time.h>
-#include <iostream>
+  #include <sys/time.h>
+  #include <iostream>
 #endif
 
+//NOTE DO NOT REMOVE THIS
 #ifndef SHALLOW
-#define SHALLOW
+  #define SHALLOW
 #endif
 
 #ifndef USE_ZFAN
-#define USE_ZFAN
+  #define USE_ZFAN
 #endif
 
 #include <gfan.h>
@@ -194,7 +188,7 @@ facet* facet::shallowCopy(const facet& f)
 
 void facet::shallowDelete()
 {
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 	printf("shallowdel@UCN %i\n", this->getUCN());
 #endif
 	this->fNormal=NULL;
@@ -212,7 +206,7 @@ void facet::shallowDelete()
 /** The default destructor */
 facet::~facet()
 {
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 	printf("~facet@UCN %i\n",this->getUCN());
 #endif
 	if(this->fNormal!=NULL)
@@ -988,7 +982,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 	}//for(ii<ddineq-rowsize
 // 	delete gamma;
 	int offset=0;//needed for correction of redRowsArray[ii]
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 	printf("Removed %i of %i in preprocessing step\n",num_elts,ddineq->rowsize);
 #endif
 	for( int ii=0;ii<num_elts;ii++ )
@@ -1120,7 +1114,7 @@ void gcone::getConeNormals(const ideal &I, bool compIntPoint)
 				fAct->isFlippable=FALSE;
 				fAct->setFacetNormal(load);
 				fAct->setUCN(this->getUCN());
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 				printf("Marking facet (");load->show(1,0);printf(") as non flippable\n");		
 #endif
 			}
@@ -1698,7 +1692,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 #endif		
 	int64vec *fNormal;// = new int64vec(this->numVars);	//facet normal, check for parallelity			
 	fNormal = f->getFacetNormal();	//read this->fNormal;
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 	std::cout << "running gcone::flip" << std::endl;
 	printf("flipping UCN %i over facet",this->getUCN());
 	fNormal->show(1,0);
@@ -1715,7 +1709,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	
 	computeInv(gb,initialForm,*fNormal);
 
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 /*	cout << "Initial ideal is: " << endl;
 	idShow(initialForm);
 	//f->printFlipGB();*/
@@ -1833,7 +1827,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 			bool expVAreEqual=TRUE;
 			for (int kk=1;kk<=this->numVars;kk++)
 			{
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 				cout << src_ExpV[kk] << "," << dst_ExpV[kk] << endl;
 #endif
 				if (src_ExpV[kk]!=dst_ExpV[kk])
@@ -1844,7 +1838,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 			if (expVAreEqual==TRUE)
 			{
 				markingsAreCorrect=TRUE; //everything is fine
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 				cout << "correct markings" << endl;
 #endif
 			}//if (pHead(aktpoly)==pHead(H->m[jj])
@@ -2008,7 +2002,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	BITSET save=test;
 	test|=Sy_bit(OPT_REDSB);
 	test|=Sy_bit(OPT_REDTAIL);
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 	test|=Sy_bit(6);	//OPT_DEBUG
 #endif
 	ideal tmpI;
@@ -2036,7 +2030,7 @@ inline void gcone::flip(ideal gb, facet *f)		//Compute "the other side"
 	f->setFlipGB(dstRing_I);//store the flipped GB
 // 	idDelete(&dstRing_I);
 	f->flipRing=rCopy(dstRing);	//store the ring on the other side
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
  	printf("Flipped GB is UCN %i:\n",counter+1);
  	idDebugPrint(dstRing_I);
 	printf("\n");
@@ -2073,7 +2067,7 @@ inline void gcone::flip2(const ideal &gb, facet *f)
 #endif
 	const int64vec *fNormal;
 	fNormal = f->getRef2FacetNormal();/*->getFacetNormal();*/	//read this->fNormal;
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 	printf("flipping UCN %i over facet(",this->getUCN());
 	fNormal->show(1,0);
 	printf(") with UCN %i\n",f->getUCN());	
@@ -2267,7 +2261,7 @@ inline void gcone::flip2(const ideal &gb, facet *f)
 			delete check;
 		}//while
 // 		omFree(v);
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 //  		cout << "Initial Form=";				
 //  		pWrite(initialFormElement[ii]);
 //  		cout << "---" << endl;
@@ -2504,13 +2498,13 @@ void gcone::interiorPoint( dd_MatrixPtr &M, int64vec &iv) //no const &M here sin
 	lp=dd_Matrix2LP(M, &err);
 	if (err!=dd_NoError){WerrorS("Error during dd_Matrix2LP in gcone::interiorPoint");}
 	if (lp==NULL){WerrorS("LP is NULL");}
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 //			dd_WriteLP(stdout,lp);
 #endif	
 					
 	lpInt=dd_MakeLPforInteriorFinding(lp);
 	if (err!=dd_NoError){WerrorS("Error during dd_MakeLPForInteriorFinding in gcone::interiorPoint");}
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 			dd_WriteLP(stdout,lpInt);
 #endif			
 // 	dd_FindRelativeInterior(M,&ddlinset,&ddredrows,&lpSol,&err);
@@ -2523,7 +2517,7 @@ void gcone::interiorPoint( dd_MatrixPtr &M, int64vec &iv) //no const &M here sin
 // 	if (err!=dd_NoError){WerrorS("Error during dd_LPSolve");}									
 	lpSol=dd_CopyLPSolution(lpInt);
 // 	if (err!=dd_NoError){WerrorS("Error during dd_CopyLPSolution");}
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 	printf("Interior point: ");
 	for (int ii=1; ii<(lpSol->d)-1;ii++)
 	{
@@ -2555,7 +2549,7 @@ void gcone::interiorPoint( dd_MatrixPtr &M, int64vec &iv) //no const &M here sin
 		iv[ii-1]=(int)mpz_get_d(mpq_numref(product));
 		mpq_clear(product);
 	}
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 			iv.show();
 // 			cout << endl;
 #endif
@@ -2590,7 +2584,7 @@ void gcone::interiorPoint( dd_MatrixPtr &M, int64vec &iv) //no const &M here sin
 */
 // void gcone::interiorPoint2()
 // {//idPrint(this->gcBasis);
-// #ifdef gfan_DEBUG
+// #ifndef NDEBUG
 // 	if(this->ivIntPt!=NULL)
 // 		WarnS("Interior point already exists - ovrewriting!");
 // #endif
@@ -2999,7 +2993,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 	ring rAct;
 	rAct = currRing;
 	int UCNcounter=gcAct->getUCN();	
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 	printf("NoRevs\n");
 	printf("Facets are:\n");
 	gcAct->showFacets();
@@ -3160,17 +3154,17 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			gcTmp->replaceDouble_ringorder_a_ByASingleOne();
 			//gcTmp->ddFacets should not be needed anymore, so
 			dd_FreeMatrix(gcTmp->ddFacets);
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 			gcTmp->showFacets(1);
 #endif
 			/*add facets to SLA here*/
 #ifdef SHALLOW
-  #ifdef gfan_DEBUG
+  #ifndef NDEBUG
 			printf("fActUCN before enq2: %i\n",fAct->getUCN());
   #endif
 			facet *tmp;
 			tmp=gcTmp->enqueue2(SearchListRoot);
-  #ifdef gfan_DEBUG
+  #ifndef NDEBUG
 			printf("\nheadUCN=%i\n",tmp->getUCN());
 			printf("fActUCN after enq2: %i\n",fAct->getUCN());
   #endif
@@ -3186,7 +3180,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
  				idDelete((ideal*)&gcTmp->gcBasis);//Whonder why?
 				rDelete(gcTmp->baseRing);
  			}			
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 			if(SearchListRoot!=NULL)
 				showSLA(*SearchListRoot);
 #endif			
@@ -3499,7 +3493,7 @@ facet * gcone::enqueueNewFacets(facet *f)
 				int64vec *slNormal=NULL;
 				removalOccured=FALSE;
 				slNormal = slAct->getFacetNormal();
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 				printf("Checking facet (");fNormal->show(1,1);printf(") against (");slNormal->show(1,1);printf(")\n");
 #endif				
 // 				if( (areEqual(fAct,slAct) && (!areEqual2(fAct,slAct)) ))
@@ -3530,7 +3524,7 @@ facet * gcone::enqueueNewFacets(facet *f)
 // 						delete deleteMarker;
 // 						deleteMarker=NULL;
 					}
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 					printf("Removing (");fNormal->show(1,1);printf(") from list\n");
 #endif
 					delete slNormal;
@@ -3552,7 +3546,7 @@ facet * gcone::enqueueNewFacets(facet *f)
 			}//while(slAct!=NULL)
 			if(removalOccured==FALSE)
 			{
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 // 				cout << "Adding facet (";fNormal->show(1,0);cout << ") to SLA " << endl;
 #endif
 				//Add fAct to SLA
@@ -3679,7 +3673,7 @@ facet * gcone::enqueue2(facet *f)
 			while(slAct!=NULL)
 			{
 				removalOccured=FALSE;
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 	printf("Checking facet (");fAct->fNormal->show(1,1);printf(") against (");slAct->fNormal->show(1,1);printf(")\n");
 #endif	
 				if(areEqual2(fAct,slAct))
@@ -3715,7 +3709,7 @@ facet * gcone::enqueue2(facet *f)
 					}
 					removalOccured=TRUE;
 					gcone::lengthOfSearchList--;
-#ifdef gfan_DEBUG
+#ifndef NDEBUG
 printf("Removing (");fAct->fNormal->show(1,1);printf(") from list\n");
 #endif
 					break;//leave the while loop, since we found fAct=slAct thus delete slAct and do not add fAct
