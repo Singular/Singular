@@ -2194,6 +2194,47 @@ static BOOLEAN jjGCD_P(leftv res, leftv u, leftv v)
 #endif /* HAVE_FACTORY */
 static BOOLEAN jjHILBERT2(leftv res, leftv u, leftv v)
 {
+#ifdef HAVE_RINGS
+  if (rField_is_Ring_Z(currRing))
+  {
+    ring origR = currRing;
+    ring tempR = rCopy(origR);
+    tempR->ringtype = 0; tempR->ch = 0;
+    rComplete(tempR);
+    ideal uid = (ideal)u->Data();
+    rChangeCurrRing(tempR);
+    ideal uu = idrCopyR(uid, origR, currRing);
+    sleftv uuAsLeftv; memset(&uuAsLeftv, 0, sizeof(uuAsLeftv));
+    uuAsLeftv.rtyp = IDEAL_CMD;
+    uuAsLeftv.data = uu; uuAsLeftv.next = NULL;
+    if (hasFlag(u, FLAG_STD)) setFlag(&uuAsLeftv,FLAG_STD);
+    assumeStdFlag(&uuAsLeftv);
+    Print("// NOTE: computation of Hilbert series etc. is being\n");
+    Print("//       performed for generic fibre, that is, over Q\n");
+    intvec *module_w=(intvec*)atGet(&uuAsLeftv,"isHomog",INTVEC_CMD);
+    intvec *iv=hFirstSeries(uu,module_w,currQuotient);
+    int returnWithTrue = 1;
+    switch((int)(long)v->Data())
+    {
+      case 1:
+        res->data=(void *)iv;
+        returnWithTrue = 0;
+      case 2:
+        res->data=(void *)hSecondSeries(iv);
+        delete iv;
+        returnWithTrue = 0;
+    }
+    if (returnWithTrue)
+    {
+      WerrorS(feNotImplemented);
+      delete iv;
+    }
+    idDelete(&uu);
+    rChangeCurrRing(origR);
+    rDelete(tempR);
+    if (returnWithTrue) return TRUE; else return FALSE;
+  }
+#endif
   assumeStdFlag(u);
   intvec *module_w=(intvec*)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currQuotient);
@@ -3653,7 +3694,7 @@ static BOOLEAN jjDIM(leftv res, leftv v)
       res->data = (char *)-1;
       return FALSE;
     }
-    rChangeCurrRing(tempR); rComplete(tempR);
+    rChangeCurrRing(tempR);
     ideal vv = idrCopyR(vid, origR, currRing);
     /* drop degree zero generator from vv (if any) */
     if (i != -1) pDelete(&vv->m[i]);
@@ -3823,6 +3864,32 @@ static BOOLEAN jjHIGHCORNER_M(leftv res, leftv v)
 }
 static BOOLEAN jjHILBERT(leftv res, leftv v)
 {
+#ifdef HAVE_RINGS
+  if (rField_is_Ring_Z(currRing))
+  {
+    ring origR = currRing;
+    ring tempR = rCopy(origR);
+    tempR->ringtype = 0; tempR->ch = 0;
+    rComplete(tempR);
+    ideal vid = (ideal)v->Data();
+    rChangeCurrRing(tempR);
+    ideal vv = idrCopyR(vid, origR, currRing);
+    sleftv vvAsLeftv; memset(&vvAsLeftv, 0, sizeof(vvAsLeftv));
+    vvAsLeftv.rtyp = IDEAL_CMD;
+    vvAsLeftv.data = vv; vvAsLeftv.next = NULL;
+    if (hasFlag(v, FLAG_STD)) setFlag(&vvAsLeftv,FLAG_STD);
+    assumeStdFlag(&vvAsLeftv);
+    Print("// NOTE: computation of Hilbert series etc. is being\n");
+    Print("//       performed for generic fibre, that is, over Q\n");
+    intvec *module_w=(intvec*)atGet(&vvAsLeftv,"isHomog",INTVEC_CMD);
+    //scHilbertPoly(vv,currQuotient);
+    hLookSeries(vv,module_w,currQuotient);
+    idDelete(&vv);
+    rChangeCurrRing(origR);
+    rDelete(tempR);
+    return FALSE;
+  }
+#endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   //scHilbertPoly((ideal)v->Data(),currQuotient);
@@ -3831,6 +3898,13 @@ static BOOLEAN jjHILBERT(leftv res, leftv v)
 }
 static BOOLEAN jjHILBERT_IV(leftv res, leftv v)
 {
+#ifdef HAVE_RINGS
+  if (rField_is_Ring_Z(currRing))
+  {
+    Print("// NOTE: computation of Hilbert series etc. is being\n");
+    Print("//       performed for generic fibre, that is, over Q\n");
+  }
+#endif
   res->data=(void *)hSecondSeries((intvec *)v->Data());
   return FALSE;
 }
@@ -5382,8 +5456,6 @@ static BOOLEAN jjFWALK3(leftv res, leftv u, leftv v, leftv w)
 }
 static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
 {
-  assumeStdFlag(u);
-  intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   intvec *wdegree=(intvec*)w->Data();
   if (wdegree->length()!=pVariables)
   {
@@ -5391,6 +5463,49 @@ static BOOLEAN jjHILBERT3(leftv res, leftv u, leftv v, leftv w)
            pVariables,wdegree->length());
     return TRUE;
   }
+#ifdef HAVE_RINGS
+  if (rField_is_Ring_Z(currRing))
+  {
+    ring origR = currRing;
+    ring tempR = rCopy(origR);
+    tempR->ringtype = 0; tempR->ch = 0;
+    rComplete(tempR);
+    ideal uid = (ideal)u->Data();
+    rChangeCurrRing(tempR);
+    ideal uu = idrCopyR(uid, origR, currRing);
+    sleftv uuAsLeftv; memset(&uuAsLeftv, 0, sizeof(uuAsLeftv));
+    uuAsLeftv.rtyp = IDEAL_CMD;
+    uuAsLeftv.data = uu; uuAsLeftv.next = NULL;
+    if (hasFlag(u, FLAG_STD)) setFlag(&uuAsLeftv,FLAG_STD);
+    assumeStdFlag(&uuAsLeftv);
+    Print("// NOTE: computation of Hilbert series etc. is being\n");
+    Print("//       performed for generic fibre, that is, over Q\n");
+    intvec *module_w=(intvec*)atGet(&uuAsLeftv,"isHomog",INTVEC_CMD);
+    intvec *iv=hFirstSeries(uu,module_w,currQuotient,wdegree);
+    int returnWithTrue = 1;
+    switch((int)(long)v->Data())
+    {
+      case 1:
+        res->data=(void *)iv;
+        returnWithTrue = 0;
+      case 2:
+        res->data=(void *)hSecondSeries(iv);
+        delete iv;
+        returnWithTrue = 0;
+    }
+    if (returnWithTrue)
+    {
+      WerrorS(feNotImplemented);
+      delete iv;
+    }
+    idDelete(&uu);
+    rChangeCurrRing(origR);
+    rDelete(tempR);
+    if (returnWithTrue) return TRUE; else return FALSE;
+  }
+#endif
+  assumeStdFlag(u);
+  intvec *module_w=(intvec *)atGet(u,"isHomog",INTVEC_CMD);
   intvec *iv=hFirstSeries((ideal)u->Data(),module_w,currQuotient,wdegree);
   switch((int)(long)v->Data())
   {
