@@ -2536,6 +2536,14 @@ w.r.t.@: these weights w (by default all weights are set to 1).
 @item @strong{Caution:}
 The last entry of the returned intvec is not part of the actual Hilbert series,
 but is used in the Hilbert driven standard basis computation (see @ref{stdhilb}).
+@item @strong{Syntax:}
+@code{hilb (} intvec_expression @code{)}
+@item @strong{Type:}
+intvec
+@item @strong{Purpose:}
+computes the second Hilbert series from the first, i.e.
+if @code{intvec v=hilb(I,1);} then @code{hilb(v)} yields the same result
+as @code{hilb(I,2)}.
 @item @strong{Note:}
 If the input is homogeneous w.r.t.@: the weights and a standard basis, the result is
 the (weighted) Hilbert series of the original ideal, resp.@: module.@*
