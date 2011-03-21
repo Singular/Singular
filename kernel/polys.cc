@@ -135,19 +135,6 @@ poly p_Div_nn(poly p, const number n, const ring r)
 }
 #endif
 
-static void printNumber(const number z)
-{
-  if (nIsZero(z)) printf("number = 0\n");
-  else
-  {
-    poly p = pOne();
-    pSetCoeff(p, nCopy(z));
-    pSetm(p);
-    printf("number = %s\n", pString(p));
-    pDelete(&p);
-  }
-}
-
 #ifdef HAVE_RINGS
 /* TRUE iff LT(f) | LT(g) */
 BOOLEAN pDivisibleByRingCase(poly f, poly g)
