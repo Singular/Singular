@@ -207,9 +207,10 @@ BOOLEAN nr2mGreater (number a, number b)
   return nr2mDivBy(a, b);
 }
 
-/* This does not seem to be the predicate whether a
-   is divisible by b in Z/2^m: if a is NULL then
-   the answer is not necessarily TRUE. */
+/* Is a divisible by b? There are two cases:
+   1) a = 0 mod 2^m; then TRUE iff b = 0 or b is a power of 2
+   2) a, b <> 0; then TRUE iff b/gcd(a, b) is a unit mod 2^m
+   TRUE iff b(gcd(a, b) is a unit */
 BOOLEAN nr2mDivBy (number a, number b)
 {
   if (a == NULL)
@@ -220,7 +221,7 @@ BOOLEAN nr2mDivBy (number a, number b)
     else
     {
       /* overflow: we need to check whether b
-         is a power of 2: */
+         is zero or a power of 2: */
       c = (NATNUMBER)b;
       while (c != 0)
       {
@@ -231,7 +232,11 @@ BOOLEAN nr2mDivBy (number a, number b)
     }
   }
   else
-    return ((NATNUMBER)a % (NATNUMBER)b) == 0;
+  {
+    number n = nr2mGcd(a, b, currRing);
+    n = nr2mDiv(b, n);
+    return nr2mIsUnit(n);
+  }
 }
 
 int nr2mDivComp(number as, number bs)
