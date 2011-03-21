@@ -298,7 +298,7 @@ void idDelEquals(ideal id)
 }
 
 //
-// Delete id[j], if Lm(j) == Lm(i) and j > i
+// Delete id[j], if Lm(j) == Lm(i) and both LC(j), LC(i) are units and j > i
 //
 void idDelLmEquals(ideal id)
 {
@@ -311,7 +311,11 @@ void idDelLmEquals(ideal id)
       for (j=k; j>i; j--)
       {
         if ((id->m[j] != NULL)
-        && pLmEqual(id->m[i], id->m[j]))
+        && pLmEqual(id->m[i], id->m[j])
+#ifdef HAVE_RINGS
+        && nIsUnit(pGetCoeff(id->m[i])) && nIsUnit(pGetCoeff(id->m[j]))
+#endif
+        )
         {
           pDelete(&id->m[j]);
         }
@@ -320,6 +324,10 @@ void idDelLmEquals(ideal id)
   }
 }
 
+//
+// delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, i.e.,
+// delete id[i], if LT(i) == coeff*mon*LT(j)
+//
 void idDelDiv(ideal id)
 {
   int i, j;
@@ -332,15 +340,35 @@ void idDelDiv(ideal id)
       {
         if (id->m[j]!=NULL)
         {
-          if(pDivisibleBy(id->m[i], id->m[j]))
+#ifdef HAVE_RINGS
+          if (rField_is_Ring(currRing))
           {
-            pDelete(&id->m[j]);
-          }
-          else if(pDivisibleBy(id->m[j], id->m[i]))
+            if (pDivisibleByRingCase(id->m[i], id->m[j]))
+            {
+              pDelete(&id->m[j]);
+            }
+            else if (pDivisibleByRingCase(id->m[j], id->m[i]))
           {
             pDelete(&id->m[i]);
             break;
           }
+          }
+          else
+          {
+#endif
+          /* the case of a ground field: */
+          if (pDivisibleBy(id->m[i], id->m[j]))
+          {
+            pDelete(&id->m[j]);
+          }
+          else if (pDivisibleBy(id->m[j], id->m[i]))
+          {
+            pDelete(&id->m[i]);
+            break;
+          }
+#ifdef HAVE_RINGS
+          }
+#endif          
         }
       }
     }

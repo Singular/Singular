@@ -98,6 +98,9 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg)
 /*2
 * assumes that the head term of b is a multiple of the head term of a
 * and return the multiplicant *m
+* Frank's observation: If LM(b) = LM(a)*m, then we may actually set
+* negative(!) exponents in the below loop. I suspect that the correct
+* comment should be "assumes that LM(a) = LM(b)*m, for some monomial m..."
 */
 poly pDivide(poly a, poly b)
 {
@@ -129,6 +132,33 @@ poly p_Div_nn(poly p, const number n, const ring r)
   }
   p_Test(q, r);
   return q;
+}
+#endif
+
+static void printNumber(const number z)
+{
+  if (nIsZero(z)) printf("number = 0\n");
+  else
+  {
+    poly p = pOne();
+    pSetCoeff(p, nCopy(z));
+    pSetm(p);
+    printf("number = %s\n", pString(p));
+    pDelete(&p);
+  }
+}
+
+#ifdef HAVE_RINGS
+/* TRUE iff LT(f) | LT(g) */
+BOOLEAN pDivisibleByRingCase(poly f, poly g)
+{
+  int exponent;
+  for(int i = (int)pVariables; i; i--)
+  {
+    exponent = pGetExp(g, i) - pGetExp(f, i);
+    if (exponent < 0) return FALSE;
+  }
+  return nDivBy(pGetCoeff(g), pGetCoeff(f));
 }
 #endif
 
@@ -566,16 +596,16 @@ BOOLEAN pHasNotCF(poly p1, poly p2)
 }
 
 /*2
-*divides p1 by its leading coefficient
+* divides p1 by its leading coefficient if it is a unit
+* (this will always be true over fields; but not over coefficient rings)
 */
 void pNorm(poly p1)
 {
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
-    Werror("pNorm not possible in the case of coefficient rings.");
+    if (!nIsUnit(pGetCoeff(p1))) return;
   }
-  else
 #endif
   if (p1!=NULL)
   {

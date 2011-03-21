@@ -269,19 +269,18 @@ number  nrnGetUnit (number k)
   return (number) unit;
 }
 
-BOOLEAN nrnDivBy (number a,number b)
+BOOLEAN nrnDivBy (number a, number b)
 {
   if (a == NULL)
-    return mpz_divisible_p(currRing->nrnModul, (int_number) b);
+    return mpz_divisible_p(currRing->nrnModul, (int_number)b);
   else
-    return mpz_divisible_p((int_number) a, (int_number) b);
-  /*
-  number bs = nrnGcd(a, b, currRing);
-  mpz_tdiv_q((int_number) bs, (int_number) b, (int_number) bs);
-  bool res = nrnIsUnit(bs);
-  nrnDelete(&bs, NULL);
-  return res;
-  */
+  { /* b divides a iff b/gcd(a, b) is a unit in the given ring: */
+    number n = nrnGcd(a, b, currRing);
+    mpz_tdiv_q((int_number)n, (int_number)b, (int_number)n);
+    bool result = nrnIsUnit(n);
+    nrnDelete(&n, NULL);
+    return result;
+  }
 }
 
 int nrnDivComp(number a, number b)

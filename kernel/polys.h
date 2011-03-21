@@ -168,6 +168,13 @@ extern poly pHeadProc(poly p);
 // returns the "Short Exponent Vector" -- used to speed up divisibility
 // tests (see polys-impl.cc )
 #define pGetShortExpVector(a)   p_GetShortExpVector(a, currRing)
+#ifdef HAVE_RINGS
+/* divisibility check over ground ring (which may contain zero divisors);
+   TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
+   coefficient c and some monomial m;
+   does not take components into account */
+BOOLEAN pDivisibleByRingCase(poly f, poly g);
+#endif
 
 /***************************************************************
  *

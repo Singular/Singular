@@ -6399,26 +6399,23 @@ See
 @item @strong{Type:}
 the type of the first argument
 @item @strong{Purpose:}
-returns the "simplified" first argument depending on the simplification rule
-given as the second argument.
-The simplification rules are the sum of the following
+returns the "simplified" first argument depending on the simplification rules
+specified by the second argument.
+The simplification rules are the following
 functions:
 @table @code
 @item 1
-normalize (make leading coefficients 1).
+normalize (divide by leading coefficient if this is a unit of the ground field/ring).
 @item 2
 erase zero generators/columns.
 @item 4
-keep only the first one of identical generators/columns.
+erase copies of earlier listed generators/columns.
 @item 8
-keep only the first one of generators/columns which differ only by a factor
-in the ground field.
+erase generators/columns which a skalar multiples (w.r.t. ground field/ring) of earlier listed generators/columns.
 @item 16
-keep only those generators/columns whose leading monomials
-differ.
+erase generators/columns whose leading monomials are copies of leading monomials of earlier listed generators/columns such that the coefficients of both leading terms are units in the ground field/ring.
 @item 32
-keep only those generators/columns whose leading monomials are
-not divisible by other ones.
+erase generators/columns whose leading terms are divisible by leading terms of other (not necessarily earlier) listed generators/columns.
 @end table
 @item @strong{Example:}
 @smallexample
