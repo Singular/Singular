@@ -9,7 +9,7 @@ proc sortPDZ(list l)
    list K;
    intvec save_opt=option(get);
    option(redSB,redTail);
-   for(i=1;i<=size(l);i++){"start";l[i][1]=std(l[i][1]);l[i][2]=std(l[i][2]);"end";}
+   for(i=1;i<=size(l);i++){l[i][1]=std(l[i][1]);l[i][2]=std(l[i][2]);}
    option(set,save_opt); 
    notReady=1;
    while(notReady)
