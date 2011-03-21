@@ -45,6 +45,9 @@
 #include <Singular/mpsr.h>
 #endif
 
+//#if (_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)
+//#define HAVE_PSELECT
+//#endif
 
 #define SSI_VERSION 1
 

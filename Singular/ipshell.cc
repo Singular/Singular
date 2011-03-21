@@ -2328,8 +2328,16 @@ ring rCompose(const lists  L)
     goto rCompose_err;
   }
   rRenameVars(R);
-  // ------------------------ Q-IDEAL ------------------------
   rComplete(R);
+#ifdef HABE_RINGS
+// currently, coefficients which are ring elements require a global ordering:
+  if (rField_is_Ring(R) && (R->pOrdSgn==-1))
+  {
+    WerrorS("global ordering required for these coefficients");
+    goto rCompose_err;
+  }
+#endif
+  // ------------------------ Q-IDEAL ------------------------
 
   if (L->m[3].Typ()==IDEAL_CMD)
   {
@@ -4765,10 +4773,6 @@ BOOLEAN rSleftvList2StringArray(sleftv* sl, char** p)
   return FALSE;
 }
 
-#ifdef HAVE_RINGS
-char ring_warn_done=0;
-#endif
-
 ////////////////////
 //
 // rInit itself:
@@ -4890,23 +4894,6 @@ ring rInit(sleftv* pn, sleftv* rv, sleftv* ord)
     goto rInitError;
   }
   pn=pn->next;
-
-#ifdef HAVE_RINGS
-  if ((ringtype > 0)&&(ring_warn_done==0))
-  {
-    WarnS("You are using coefficient rings which are not fields.");
-    WarnS("Please note that only limited functionality is available");
-    WarnS("for these coefficients.");
-    WarnS("");
-    WarnS("The following commands are meant to work:");
-    WarnS("- basic polynomial arithmetic");
-    WarnS("- std");
-    WarnS("- syz");
-    WarnS("- lift");
-    WarnS("- reduce");
-    ring_warn_done=1;
-  }
-#endif
 
   int l, last;
   sleftv * sl;
