@@ -3615,6 +3615,31 @@ static BOOLEAN jjDEG_M(leftv res, leftv u)
 }
 static BOOLEAN jjDEGREE(leftv res, leftv v)
 {
+#ifdef HAVE_RINGS
+  if (rField_is_Ring_Z(currRing))
+  {
+    ring origR = currRing;
+    ring tempR = rCopy(origR);
+    tempR->ringtype = 0; tempR->ch = 0;
+    rComplete(tempR);
+    ideal vid = (ideal)v->Data();
+    rChangeCurrRing(tempR);
+    ideal vv = idrCopyR(vid, origR, currRing);
+    sleftv vvAsLeftv; memset(&vvAsLeftv, 0, sizeof(vvAsLeftv));
+    vvAsLeftv.rtyp = IDEAL_CMD;
+    vvAsLeftv.data = vv; vvAsLeftv.next = NULL;
+    if (hasFlag(v, FLAG_STD)) setFlag(&vvAsLeftv,FLAG_STD);
+    assumeStdFlag(&vvAsLeftv);
+    Print("// NOTE: computation of degree is being performed for\n");
+    Print("//       generic fibre, that is, over Q\n");
+    intvec *module_w=(intvec*)atGet(&vvAsLeftv,"isHomog",INTVEC_CMD);
+    scDegree(vv,module_w,currQuotient);
+    idDelete(&vv);
+    rChangeCurrRing(origR);
+    rDelete(tempR);
+    return FALSE;
+  }
+#endif
   assumeStdFlag(v);
   intvec *module_w=(intvec*)atGet(v,"isHomog",INTVEC_CMD);
   scDegree((ideal)v->Data(),module_w,currQuotient);
