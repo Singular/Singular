@@ -3,17 +3,16 @@
 ****************************************/
 /* $Id$ */
 
-#include <kernel/mod2.h>
-#include <kernel/structs.h>
+//#include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
-#include <kernel/p_polys.h>
-#include <kernel/febase.h>
-#include <kernel/pShallowCopyDelete.h>
-#include <kernel/numbers.h>
-#include <kernel/ring.h>
-#include <kernel/p_Procs.h>
-#include <kernel/kutil.h>
-#include <kernel/kbuckets.h>
+#include <polys/monomials/p_polys.h>
+//#include <kernel/febase.h>
+//#include <kernel/pShallowCopyDelete.h>
+#include <coeffs/coeffs.h>
+#include <polys/monomials/ring.h>
+//#include <kernel/p_Procs.h>
+//#include <kernel/kutil.h>
+#include <polys/kbuckets.h>
 
 #ifdef HAVE_COEF_BUCKETS
 #define USE_COEF_BUCKETS
@@ -29,7 +28,7 @@
       B->coef[I]=NULL;                                                 \
     }                                                                  \
   } while(0)                                                           \
-    if (rField_is_Ring(currRing)) B->buckets_length[i] = pLength(B->buckets[i]);
+    if (rField_is_Ring(B->bucket_ring)) B->buckets_length[i] = pLength(B->buckets[i]);
 #else
 #define MULTIPLY_BUCKET(B,I) do                                        \
   { if (B->coef[I]!=NULL)                                              \
@@ -593,7 +592,8 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
            Question: Should the following "if" also only be
            performed when "(i<coef_start)" is true?
            For the time being, I leave it as it is. */
-        if (rField_is_Ring(r) && !(rField_is_Domain(r))) {
+        if (rField_is_Ring(r) && !(rField_is_Domain(r)))
+	{
           bucket->buckets_length[i] = pLength(bucket->buckets[i]);
           kBucketAdjust(bucket, i);
         }
@@ -610,7 +610,8 @@ void kBucket_Mult_n(kBucket_pt bucket, number n)
 #else
       bucket->buckets[i] = p_Mult_nn(bucket->buckets[i], n, r);
 #ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing))) {
+      if (rField_is_Ring(r) && !(rField_is_Domain(r)))
+      {
         bucket->buckets_length[i] = pLength(bucket->buckets[i]);
         kBucketAdjust(bucket, i);
       }
@@ -737,7 +738,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     bucket->buckets[i] = NULL;
     bucket->buckets_length[i] = 0;
 #ifdef HAVE_RINGS
-    if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing)))
+    if (rField_is_Ring(r) && !(rField_is_Domain(r)))
     {
       l1 = pLength(p1);
       assume(pLength(p1) == l1);
@@ -747,7 +748,7 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
   }
   else
   {
-    pSetCoeff0(m, nNeg(pGetCoeff(m)));
+    pSetCoeff0(m, n_Neg(pGetCoeff(m),r->cf));
     if (spNoether != NULL)
     {
       l1 = -1;
@@ -757,14 +758,14 @@ void kBucket_Minus_m_Mult_p(kBucket_pt bucket, poly m, poly p, int *l,
     else {
       p1 = r->p_Procs->pp_Mult_mm(p1, m, r, last);
 #ifdef HAVE_RINGS
-      if (rField_is_Ring(currRing) && !(rField_is_Domain(currRing)))
+      if (rField_is_Ring(r) && !(rField_is_Domain(r)))
       {
         l1 = pLength(p1);
         i = pLogLength(l1);
       }
 #endif
     }
-    pSetCoeff0(m, nNeg(pGetCoeff(m)));
+    pSetCoeff0(m, n_Neg(pGetCoeff(m),r->cf));
   }
 
   while (bucket->buckets[i] != NULL)
@@ -819,7 +820,7 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   kbTest(bucket);
   i = pLogLength(l1);
   #ifdef USE_COEF_BUCKETS
-  number n=n_Init(1,r);
+  number n=n_Init(1,r->cf);
   #endif
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
   {
@@ -1061,9 +1062,10 @@ number kBucketPolyRed(kBucket_pt bucket,
                       poly p1, int l1,
                       poly spNoether)
 {
-  assume((!rIsPluralRing(bucket->bucket_ring))||p_LmEqual(p1,kBucketGetLm(bucket), bucket->bucket_ring));
+  ring r=bucket->bucket_ring;
+  assume((!rIsPluralRing(r))||p_LmEqual(p1,kBucketGetLm(bucket), r));
   assume(p1 != NULL &&
-         p_DivisibleBy(p1,  kBucketGetLm(bucket), bucket->bucket_ring));
+         p_DivisibleBy(p1,  kBucketGetLm(bucket), r));
   assume(pLength(p1) == (int) l1);
 
   poly a1 = pNext(p1), lm = kBucketExtractLm(bucket);
@@ -1075,11 +1077,11 @@ number kBucketPolyRed(kBucket_pt bucket,
      we already know: an|bn and t|lm */
   if(a1==NULL)
   {
-    p_LmDelete(&lm, bucket->bucket_ring);
-    return nInit(1);
+    p_LmDelete(&lm, r);
+    return n_Init(1,r->cf);
   }
 
-  if (! nIsOne(pGetCoeff(p1)))
+  if (! n_IsOne(pGetCoeff(p1),r->cf))
   {
     number an = pGetCoeff(p1), bn = pGetCoeff(lm);
 //StringSetS("##### an = "); nWrite(an); PrintS(StringAppend("\n"));
@@ -1090,7 +1092,7 @@ number kBucketPolyRed(kBucket_pt bucket,
        note: an is now 1 or -1 */
 
     /* setup factor for p1 which cancels leading terms */
-    p_SetCoeff(lm, bn, bucket->bucket_ring);
+    p_SetCoeff(lm, bn, r);
     if ((ct == 0) || (ct == 2))
     {
       /* next line used to be here before but is WRONG:
@@ -1099,8 +1101,8 @@ number kBucketPolyRed(kBucket_pt bucket,
         in the reduction */
 
       /* correct factor for cancelation by changing sign if an=-1 */
-      if (rField_is_Ring())
-        lm = p_Mult_nn(lm, an, bucket->bucket_ring);
+      if (rField_is_Ring(r))
+        lm = p_Mult_nn(lm, an, r);
       else
         kBucket_Mult_n(bucket, an);
     }
@@ -1108,18 +1110,18 @@ number kBucketPolyRed(kBucket_pt bucket,
   }
   else
   {
-    rn = nInit(1);
+    rn = n_Init(1,r->cf);
   }
 
-  if (p_GetComp(p1, bucket->bucket_ring) != p_GetComp(lm, bucket->bucket_ring))
+  if (p_GetComp(p1, r) != p_GetComp(lm, r))
   {
-    p_SetCompP(a1, p_GetComp(lm, bucket->bucket_ring), bucket->bucket_ring);
+    p_SetCompP(a1, p_GetComp(lm, r), r);
     reset_vec = TRUE;
-    p_SetComp(lm, p_GetComp(p1, bucket->bucket_ring), bucket->bucket_ring);
-    p_Setm(lm, bucket->bucket_ring);
+    p_SetComp(lm, p_GetComp(p1, r), r);
+    p_Setm(lm, r);
   }
 
-  p_ExpVectorSub(lm, p1, bucket->bucket_ring);
+  p_ExpVectorSub(lm, p1, r);
   l1--;
 
   assume(l1==pLength(a1));
@@ -1129,13 +1131,13 @@ number kBucketPolyRed(kBucket_pt bucket,
   //@Viktor, don't ignore coefficients on monomials
   if(l1==1) {
 
-    //if (rField_is_Q(bucket->bucket_ring)) {
+    //if (rField_is_Q(r)) {
       //avoid this for function fields, as gcds are expensive at the moment
 
 
-      coef=p_GetCoeff(a1,bucket->bucket_ring);
-      lm=p_Mult_nn(lm, coef, bucket->bucket_ring);
-      p_SetCoeff0(a1, n_Init(1,bucket->bucket_ring), bucket->bucket_ring);
+      coef=p_GetCoeff(a1,r);
+      lm=p_Mult_nn(lm, coef, r);
+      p_SetCoeff0(a1, n_Init(1,r), r);
       backuped=TRUE;
       //WARNING: not thread_safe
     //deletes coef as side effect
@@ -1146,9 +1148,9 @@ number kBucketPolyRed(kBucket_pt bucket,
   kBucket_Minus_m_Mult_p(bucket, lm, a1, &l1, spNoether);
 
   if (backuped)
-    p_SetCoeff0(a1,coef,bucket->bucket_ring);
-  p_LmDelete(&lm, bucket->bucket_ring);
-  if (reset_vec) p_SetCompP(a1, 0, bucket->bucket_ring);
+    p_SetCoeff0(a1,coef,r);
+  p_LmDelete(&lm, r);
+  if (reset_vec) p_SetCompP(a1, 0, r);
   kbTest(bucket);
   return rn;
 }
@@ -1158,10 +1160,10 @@ static BOOLEAN nIsPseudoUnit(number n, ring r)
     return TRUE;
   if (r->parameter==NULL)
   {
-    return (r->cf->nSize(n)==1);
+    return (r->cf->cfSize(n,r->cf)==1);
   }
   //if (r->parameter!=NULL)
-  return ((n_IsOne(n,r)) || (n_IsMOne(n,r)));
+  return (n_IsOne(n,r->cf) || n_IsMOne(n,r->cf));
 }
 
 void kBucketSimpleContent(kBucket_pt bucket)
