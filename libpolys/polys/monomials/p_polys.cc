@@ -16,6 +16,7 @@
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
+#include <polys/weight.h>
 #include <coeffs/longrat.h>
 #include <misc/options.h>
 #include <misc/intvec.h>
@@ -3327,6 +3328,103 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
 #endif
   p_Test(result,dst);
   return result;
+}
+/**************************************************************
+ *
+ * Jet
+ *
+ **************************************************************/
+
+poly pp_Jet(poly p, int m, const ring R)
+{
+  poly r=NULL;
+  poly t=NULL;
+
+  while (p!=NULL)
+  {
+    if (p_Totaldegree(p,R)<=m)
+    {
+      if (r==NULL)
+        r=p_Head(p,R);
+      else
+      if (t==NULL)
+      {
+        pNext(r)=p_Head(p,R);
+        t=pNext(r);
+      }
+      else
+      {
+        pNext(t)=p_Head(p,R);
+        pIter(t);
+      }
+    }
+    pIter(p);
+  }
+  return r;
+}
+
+poly p_Jet(poly p, int m,const ring R)
+{
+  poly t=NULL;
+
+  while((p!=NULL) && (p_Totaldegree(p,R)>m)) p_LmDelete(&p,R);
+  if (p==NULL) return NULL;
+  poly r=p;
+  while (pNext(p)!=NULL)
+  {
+    if (p_Totaldegree(pNext(p),R)>m)
+    {
+      p_LmDelete(&pNext(p),R);
+    }
+    else
+      pIter(p);
+  }
+  return r;
+}
+
+poly pp_JetW(poly p, int m, short *w, const ring R)
+{
+  poly r=NULL;
+  poly t=NULL;
+  while (p!=NULL)
+  {
+    if (totaldegreeWecart_IV(p,R,w)<=m)
+    {
+      if (r==NULL)
+        r=p_Head(p,R);
+      else
+      if (t==NULL)
+      {
+        pNext(r)=p_Head(p,R);
+        t=pNext(r);
+      }
+      else
+      {
+        pNext(t)=p_Head(p,R);
+        pIter(t);
+      }
+    }
+    pIter(p);
+  }
+  return r;
+}
+
+poly p_JetW(poly p, int m, short *w, const ring R)
+{
+  poly t=NULL;
+  while((p!=NULL) && (totaldegreeWecart_IV(p,R,w)>m)) p_LmDelete(&p,R);
+  if (p==NULL) return NULL;
+  poly r=p;
+  while (pNext(p)!=NULL)
+  {
+    if (totaldegreeWecart_IV(pNext(p),R,w)>m)
+    {
+      p_LmDelete(&pNext(p),R);
+    }
+    else
+      pIter(p);
+  }
+  return r;
 }
 
 /***************************************************************

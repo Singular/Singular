@@ -225,7 +225,7 @@ static inline poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin);
 // simply deletes monomials, does not free coeffs
 void p_ShallowDelete(poly *p, const ring r);
 
-  
+
 
 /***************************************************************
  *
@@ -1315,7 +1315,7 @@ static inline poly p_Head(poly p, const ring r)
   pSetCoeff0(np, n_Copy(pGetCoeff(p), r->cf));
   return np;
 }
-// set all exponents l..k to 0, assume exp. k+1..n and 1..l-1 are in 
+// set all exponents l..k to 0, assume exp. k+1..n and 1..l-1 are in
 // different blocks
 // set coeff to 1
 static inline poly p_GetExp_k_n(poly p, int l, int k, const ring r)
@@ -1816,6 +1816,11 @@ void pRestoreDegProcs(ring r, pFDegProc old_FDeg, pLDegProc old_lDeg);
 /*-------------pComp for syzygies:-------------------*/
 void p_SetModDeg(intvec *w, ring r);
 
+/*------------ Jet ----------------------------------*/
+poly pp_Jet(poly p, int m, const ring R);
+poly p_Jet(poly p, int m,const ring R);
+poly pp_JetW(poly p, int m, short *w, const ring R);
+poly p_JetW(poly p, int m, short *w, const ring R);
 
 
 poly      p_PermPoly (poly p, int * perm,const ring OldRing, const ring dst,
