@@ -1092,7 +1092,7 @@ number kBucketPolyRed(kBucket_pt bucket,
     if ((ct == 0) || (ct == 2))
     {
       /* next line used to be here before but is WRONG:
-      kBucket_Mult_n(bucket, an); 
+      kBucket_Mult_n(bucket, an);
         its use would result in a wrong sign for the tail of bucket
         in the reduction */
 
@@ -1100,7 +1100,7 @@ number kBucketPolyRed(kBucket_pt bucket,
       if (rField_is_Ring())
         lm = p_Mult_nn(lm, an, bucket->bucket_ring);
       else
-        kBucket_Mult_n(bucket, an); 
+        kBucket_Mult_n(bucket, an);
     }
     rn = an;
   }
