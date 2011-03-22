@@ -42,13 +42,12 @@
           polynomials living in nacRing (defined in longtrans.*)
 */
 
-typedef polyrec * napoly;
 struct slnumber;
 typedef struct slnumber * lnumber;
 struct slnumber
 {
-  napoly z;
-  napoly n;
+  poly z;
+  poly n;
   BOOLEAN s;
 };
 
@@ -96,7 +95,7 @@ number      ntMap00(number c);
 #ifdef LDEBUG
 BOOLEAN     ntDBTest(number a, const char *f,const int l);
 #endif
-napoly      ntRemainder(napoly f, const napoly  g);
+poly      ntRemainder(poly f, const poly  g);
 void        ntSetIdeal(ideal I);
 void        ntCoefNormalize(number pp);
 extern number (*ntMap)(number from);
@@ -134,36 +133,36 @@ poly    napPermNumber(number z, int * par_perm, int P, ring r);
 #define napCopy(p)             p_Copy(p,nacRing)
 #define napSetCoeff(p,n)       {n_Delete(&pGetCoeff(p),nacRing);pGetCoeff(p)=n;}
 #define napComp(p,q)           p_LmCmp((poly)p,(poly)q, nacRing)
-#define napMultT(A,E)          A=(napoly)p_Mult_mm((poly)A,(poly)E,nacRing)
+#define napMultT(A,E)          A=(poly)p_Mult_mm((poly)A,(poly)E,nacRing)
 #define napDeg(p)              (int)p_Totaldegree(p, nacRing)
 number  napGetDenom(number &n, const ring r);
 number  napGetNumerator(number &n, const ring r);
-void    napTest(napoly p);
-napoly  napInitz(number z);
-napoly  napCopyNeg(const napoly p);
-void    napMultN(napoly p, const number z);
-void    napDivMod(napoly f, const napoly g, napoly *q, napoly *r);
-napoly  napRemainder(napoly f, const napoly g);
-napoly  napInvers(napoly x, const napoly c);
-int     napMaxDeg(napoly p);
-int     napMaxDegLen(napoly p, int &l);
-void    napWrite(napoly p,const BOOLEAN has_denom, const ring r);
-int     napExp(napoly a, napoly b);
-int     napExpi(int i, napoly a, napoly b);
-void    napContent(napoly ph);
-void    napCleardenom(napoly ph);
-napoly  napGcd0(napoly a, napoly b);
-napoly  napGcd(napoly a, napoly b);
-number  napLcm(napoly a);
-BOOLEAN napDivPoly (napoly p, napoly q);
-napoly  napRedp (napoly q);
-napoly  napTailred (napoly q);
-napoly  napMap(napoly p);
-napoly  napPerm(napoly p, const int *par_perm, const ring src_ring,
+void    napTest(poly p);
+poly  napInitz(number z);
+poly  napCopyNeg(const poly p);
+void    napMultN(poly p, const number z);
+void    napDivMod(poly f, const poly g, poly *q, poly *r);
+poly  napRemainder(poly f, const poly g);
+poly  napInvers(poly x, const poly c);
+int     napMaxDeg(poly p);
+int     napMaxDegLen(poly p, int &l);
+void    napWrite(poly p,const BOOLEAN has_denom, const ring r);
+int     napExp(poly a, poly b);
+int     napExpi(int i, poly a, poly b);
+void    napContent(poly ph);
+void    napCleardenom(poly ph);
+poly  napGcd0(poly a, poly b);
+poly  napGcd(poly a, poly b);
+number  napLcm(poly a);
+BOOLEAN napDivPoly (poly p, poly q);
+poly  napRedp (poly q);
+poly  napTailred (poly q);
+poly  napMap(poly p);
+poly  napPerm(poly p, const int *par_perm, const ring src_ring,
                 const nMapFunc nMap);
-const char* napHandleMons(const char *s, int i, napoly ex);
-const char* napHandlePars(const char *s, int i, napoly ex);
-const char* napRead(const char *s, napoly *b);
+const char* napHandleMons(const char *s, int i, poly ex);
+const char* napHandlePars(const char *s, int i, poly ex);
+const char* napRead(const char *s, poly *b);
 
 #endif
 

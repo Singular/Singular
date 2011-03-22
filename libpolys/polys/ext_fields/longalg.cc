@@ -30,7 +30,7 @@
 struct snaIdeal
 {
   int anz;
-  napoly *liste;
+  poly *liste;
 };
 typedef struct snaIdeal * naIdeal;
 
@@ -39,7 +39,7 @@ naIdeal naI=NULL;
 omBin snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
 
 int naNumbOfPar;
-napoly naMinimalPoly;
+poly naMinimalPoly;
 #define naParNames (currRing->parameter)
 static int naIsChar0;
 static ring naMapRing;
@@ -52,7 +52,7 @@ BOOLEAN naDBTest(number a, const char *f,const int l);
 #endif
 
 naIdeal naI = NULL;
-napoly  naMinimalPoly;
+poly  naMinimalPoly;
 omBin   snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
 number  (*naMap)(number from);
 //omBin lnumber_bin = omGetSpecBin(sizeof(slnumber));
@@ -141,7 +141,7 @@ void naSetChar(int i, ring r)
     int j;
     for (j=naI->anz-1; j>=0; j--)
        p_Delete (&naI->liste[j],nacRing);
-    omFreeSize((void *)naI->liste,naI->anz*sizeof(napoly));
+    omFreeSize((void *)naI->liste,naI->anz*sizeof(poly));
     omFreeBin((void *)naI, snaIdeal_bin);
     naI=NULL;
   }
@@ -161,7 +161,7 @@ void naSetChar(int i, ring r)
   {
     naI=(naIdeal)omAllocBin(snaIdeal_bin);
     naI->anz=IDELEMS(r->minideal);
-    naI->liste=(napoly*)omAlloc(naI->anz*sizeof(napoly));
+    naI->liste=(poly*)omAlloc(naI->anz*sizeof(poly));
     int j;
     for (j=naI->anz-1; j>=0; j--)
     {
@@ -328,7 +328,7 @@ number naAdd(number la, number lb)
   if (la==NULL) return naCopy(lb);
   if (lb==NULL) return naCopy(la);
 
-  napoly x, y;
+  poly x, y;
   lnumber lu;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
@@ -340,7 +340,7 @@ number naAdd(number la, number lb)
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = pp_Mult_qq(b->z, a->n,nacRing);
   else            y = napCopy(b->z);
-  napoly res = napAdd(x, y);
+  poly res = napAdd(x, y);
   if (res==NULL)
   {
     return (number)NULL;
@@ -405,12 +405,12 @@ number naSub(number la, number lb)
   omCheckAddrSize(b,sizeof(slnumber));
   #endif
 
-  napoly x, y;
+  poly x, y;
   if (b->n!=NULL) x = pp_Mult_qq(a->z, b->n,nacRing);
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = p_Mult_q(napCopy(b->z), napCopyNeg(a->n),nacRing);
   else            y = napCopyNeg(b->z);
-  napoly res = napAdd(x, y);
+  poly res = napAdd(x, y);
   if (res==NULL)
   {
     return (number)NULL;
@@ -454,7 +454,7 @@ number naMult(number la, number lb)
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
   lnumber lo;
-  napoly x;
+  poly x;
 
   #ifdef LDEBUG
   omCheckAddrSize(a,sizeof(slnumber));
@@ -563,7 +563,7 @@ number naDiv(number la, number lb)
   lnumber lo;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  napoly x;
+  poly x;
 
   if (a==NULL)
     return NULL;
@@ -643,7 +643,7 @@ number naInvers(number a)
 {
   lnumber lo;
   lnumber b = (lnumber)a;
-  napoly x;
+  poly x;
 
   if (b==NULL)
   {
@@ -794,7 +794,7 @@ BOOLEAN naGreater (number a, number b)
 */
 const char  *naRead(const char *s, number *p)
 {
-  napoly x;
+  poly x;
   lnumber a;
   s = napRead(s, &x);
   if (x==NULL)
@@ -893,7 +893,7 @@ void naWrite(number &phn, const ring r)
 BOOLEAN naIsOne(number za)
 {
   lnumber a = (lnumber)za;
-  napoly x, y;
+  poly x, y;
   number t;
   if (a==NULL) return FALSE;
 #ifdef LDEBUG
@@ -951,7 +951,7 @@ BOOLEAN naIsOne(number za)
 BOOLEAN naIsMOne(number za)
 {
   lnumber a = (lnumber)za;
-  napoly x, y;
+  poly x, y;
   number t;
   if (a==NULL) return FALSE;
 #ifdef LDEBUG
@@ -1014,7 +1014,7 @@ number naGcd(number a, number b, const ring r)
     if (c==1) c=0;
     setCharacteristic( c );
 
-    napoly rz=napGcd(x->z, y->z);
+    poly rz=napGcd(x->z, y->z);
     CanonicalForm F, G, R;
     R=convSingPFactoryP(rz,r->algring);
     p_Normalize(x->z,nacRing);
@@ -1168,8 +1168,8 @@ void naNormalize(number &pp)
     return;
   naCoefNormalize(pp);
   p->s = 2;
-  napoly x = p->z;
-  napoly y = p->n;
+  poly x = p->z;
+  poly y = p->n;
 
   BOOLEAN norm=FALSE;
 
@@ -1207,8 +1207,8 @@ void naNormalize(number &pp)
     int i;
     for (i=ntNumbOfPar-1; i>=0; i--)
     {
-      napoly xx=x;
-      napoly yy=y;
+      poly xx=x;
+      poly yy=y;
       int m = napExpi(i, yy, xx);
       if (m != 0)          // in this case xx!=NULL!=yy
       {
@@ -1246,7 +1246,7 @@ void naNormalize(number &pp)
 #ifndef FACTORY_GCD_TEST
   if (ntNumbOfPar == 1) /* apply built-in gcd */
   {
-    napoly x1,y1;
+    poly x1,y1;
     if (p_GetExp(x,1,nacRing) >= p_GetExp(y,1,nacRing))
     {
       x1 = napCopy(x);
@@ -1257,7 +1257,7 @@ void naNormalize(number &pp)
       x1 = napCopy(y);
       y1 = napCopy(x);
     }
-    napoly r;
+    poly r;
     loop
     {
       r = napRemainder(x1, y1);
@@ -1318,7 +1318,7 @@ void naNormalize(number &pp)
   else
 #endif
   {
-    napoly xx,yy;
+    poly xx,yy;
     singclap_algdividecontent(x,y,xx,yy);
     if (xx!=NULL)
     {
@@ -1397,12 +1397,12 @@ number naLcm(number la, number lb, const ring r)
   result = ALLOC0_LNUMBER();
   naTest(la);
   naTest(lb);
-  napoly x = p_Copy(a->z, r->algring);
+  poly x = p_Copy(a->z, r->algring);
   number t = napLcm(b->z); // get all denom of b->z
   if (!nacIsOne(t))
   {
     number bt, rr;
-    napoly xx=x;
+    poly xx=x;
     while (xx!=NULL)
     {
       bt = nacGcd(t, pGetCoeff(xx), r->algring);
@@ -1449,11 +1449,11 @@ void naSetIdeal(ideal I)
   {
     lnumber h;
     number a;
-    napoly x;
+    poly x;
 
     naI=(naIdeal)omAllocBin(snaIdeal_bin);
     naI->anz=IDELEMS(I);
-    naI->liste=(napoly*)omAlloc(naI->anz*sizeof(napoly));
+    naI->liste=(poly*)omAlloc(naI->anz*sizeof(poly));
     for (i=IDELEMS(I)-1; i>=0; i--)
     {
       h=(lnumber)pGetCoeff(I->m[i]);
@@ -1482,7 +1482,7 @@ number naMapP0(number c)
   if (npIsZero(c)) return NULL;
   lnumber l=ALLOC_LNUMBER();
   l->s=2;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   int i=(int)((long)c);
   if (i>((long)ntMapRing->ch>>2)) i-=(long)ntMapRing->ch;
   pGetCoeff(l->z)=nlInit(i, nacRing);
@@ -1498,7 +1498,7 @@ number naMap00(number c)
   if (nlIsZero(c)) return NULL;
   lnumber l=ALLOC_LNUMBER();
   l->s=0;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   pGetCoeff(l->z)=nlCopy(c);
   l->n=NULL;
   return (number)l;
@@ -1512,7 +1512,7 @@ number naMapPP(number c)
   if (npIsZero(c)) return NULL;
   lnumber l=ALLOC_LNUMBER();
   l->s=2;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   pGetCoeff(l->z)=c; /* omit npCopy, because npCopy is a no-op */
   l->n=NULL;
   return (number)l;
@@ -1530,7 +1530,7 @@ number naMapPP1(number c)
   if (npIsZero(n)) return NULL;
   lnumber l=ALLOC_LNUMBER();
   l->s=2;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   pGetCoeff(l->z)=n;
   l->n=NULL;
   return (number)l;
@@ -1547,7 +1547,7 @@ number naMap0P(number c)
   npTest(n);
   lnumber l=ALLOC_LNUMBER();
   l->s=2;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   pGetCoeff(l->z)=n;
   l->n=NULL;
   return (number)l;
@@ -1672,7 +1672,7 @@ BOOLEAN naDBTest(number a, const char *f,const int l)
   #ifdef LDEBUG
   omCheckAddrSize(a, sizeof(slnumber));
   #endif
-  napoly p = x->z;
+  poly p = x->z;
   if (p==NULL)
   {
     Print("0/* in %s:%d\n",f,l);

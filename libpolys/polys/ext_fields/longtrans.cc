@@ -113,7 +113,7 @@ void ntSetChar(int i, ring r)
     int j;
     for (j=naI->anz-1; j>=0; j--)
        p_Delete (&naI->liste[j],nacRing);
-    omFreeSize((ADDRESS)naI->liste,naI->anz*sizeof(napoly));
+    omFreeSize((ADDRESS)naI->liste,naI->anz*sizeof(poly));
     omFreeBin((ADDRESS)naI, snaIdeal_bin);
     naI=NULL;
   }
@@ -157,7 +157,7 @@ void ntSetChar(int i, ring r)
 /*============= procedure for polynomials: napXXXX =======================*/
 
 #ifdef LDEBUG
-void napTest(napoly p)
+void napTest(poly p)
 {
   if (ntIsChar0)
   {
@@ -172,30 +172,30 @@ void napTest(napoly p)
 #define napTest(p) ((void) 0)
 #endif
 
-/* creates a new napoly that consists of a
+/* creates a new poly that consists of a
    single coefficient (provided as a number);
    the provided number is NOT const */
-napoly napInitz(number z)
+poly napInitz(number z)
 {
-  napoly a = (napoly)p_Init(nacRing);
+  poly a = (poly)p_Init(nacRing);
   pGetCoeff(a) = z;
   return a;
 }
 
-/* creates a new napoly which is the
+/* creates a new poly which is the
    negative inverse of the argument;
    keeps p */
-napoly napCopyNeg(const napoly p)
+poly napCopyNeg(const poly p)
 {
-  napoly r = napCopy(p);
-  r = (napoly)p_Neg((poly)r, nacRing);
+  poly r = napCopy(p);
+  r = (poly)p_Neg((poly)r, nacRing);
   return r;
 }
 
-/* modifies the napoly p to p*z, i.e.
+/* modifies the poly p to p*z, i.e.
    in-place multiplication of p with the number z;
    keeps z */
-void napMultN(napoly p, const number z)
+void napMultN(poly p, const number z)
 {
   number t;
   while (p != NULL)
@@ -214,11 +214,11 @@ void napMultN(napoly p, const number z)
    assumes that the exponent of the first variable
    in f is greater than or equal to that in g
    sets q, r; destroys f; keeps g */
-void napDivMod(napoly f, const napoly  g, napoly *q, napoly *r)
+void napDivMod(poly f, const poly  g, poly *q, poly *r)
 {
-  napoly a, h, b, qq;
+  poly a, h, b, qq;
 
-  qq = (napoly)p_Init(nacRing);
+  qq = (poly)p_Init(nacRing);
   pNext(qq) = b = NULL;
   p_Normalize(g, nacRing);
   p_Normalize(f, nacRing);
@@ -251,11 +251,11 @@ void napDivMod(napoly f, const napoly  g, napoly *q, napoly *r)
    assumes that the exponent of the first variable
    in f is greater than or equal to that in g
    destroys f; keeps g; returns r */
-napoly napRemainder(napoly f, const napoly g)
+poly napRemainder(poly f, const poly g)
 {
-  napoly a, h, qq;
+  poly a, h, qq;
 
-  qq = (napoly)p_Init(nacRing);
+  qq = (poly)p_Init(nacRing);
   pNext(qq) = NULL;
   p_Normalize(g, nacRing);
   p_Normalize(f, nacRing);
@@ -284,9 +284,9 @@ napoly napRemainder(napoly f, const napoly g)
    if there is no solution, an error is reported and
    some intermediate version of x is returned;
    modifies x; keeps c */
-napoly napInvers(napoly x, const napoly c)
+poly napInvers(poly x, const poly c)
 {
-  napoly y, r, qa, qn, q;
+  poly y, r, qa, qn, q;
   number t;
 
   if (p_GetExp(x, 1, nacRing) >= p_GetExp(c, 1, nacRing))
@@ -389,10 +389,10 @@ napoly napInvers(napoly x, const napoly c)
   }
 }
 
-/* the degree of a napoly, i.e. the
+/* the degree of a poly, i.e. the
    maximum of all terms' degrees;
    keeps p */
-int napMaxDeg(napoly p)
+int napMaxDeg(poly p)
 {
   int  d = 0;
   while (p != NULL)
@@ -403,11 +403,11 @@ int napMaxDeg(napoly p)
   return d;
 }
 
-/* the degree of a napoly, i.e. the
+/* the degree of a poly, i.e. the
    maximum of all terms' degrees;
    fills l with the number of terms;
    keeps p */
-int napMaxDegLen(napoly p, int &l)
+int napMaxDegLen(poly p, int &l)
 {
   int d = 0;
   l = 0;
@@ -421,13 +421,13 @@ int napMaxDegLen(napoly p, int &l)
 }
 
 
-/* writes a napoly, i.e. a number in the ground field;
+/* writes a poly, i.e. a number in the ground field;
    if has_denom is TRUE, the output is ready to be
    followed by a non-trivial denominator;
    r is assumed to be a polynomial ring over an algebraic
    or transcendental field extension;
    keeps all arguments */
-void napWrite(napoly p, const BOOLEAN has_denom, const ring r)
+void napWrite(poly p, const BOOLEAN has_denom, const ring r)
 {
   ring nacring = r->algring;
   if (p == NULL) StringAppendS("0");
@@ -482,7 +482,7 @@ void napWrite(napoly p, const BOOLEAN has_denom, const ring r)
 }
 
 /* helper for napRead */
-const char* napHandleMons(const char* s, int i, napoly ex)
+const char* napHandleMons(const char* s, int i, poly ex)
 {
   int j;
   if (strncmp(s, ntParNames[i], strlen(ntParNames[i])) == 0)
@@ -500,7 +500,7 @@ const char* napHandleMons(const char* s, int i, napoly ex)
 }
 
 /* helper for napRead */
-const char* napHandlePars(const char *s, int i, napoly ex)
+const char* napHandlePars(const char *s, int i, poly ex)
 {
   if (strcmp(s, ntParNames[i]) == 0)
   {
@@ -510,16 +510,16 @@ const char* napHandlePars(const char *s, int i, napoly ex)
   return s;
 }
 
-/* reads a monomial into the napoly b;
+/* reads a monomial into the poly b;
    returns the latter portion of s which
    comes "after" the monomial that has
    just been read;
    modifies b */
-const char* napRead(const char *s, napoly *b)
+const char* napRead(const char *s, poly *b)
 {
-  napoly a;
+  poly a;
   int i;
-  a = (napoly)p_Init(nacRing);
+  a = (poly)p_Init(nacRing);
   if ((*s >= '0') && (*s <= '9'))
   {
     s = nacRing->cf->nRead(s, &pGetCoeff(a));
@@ -562,7 +562,7 @@ const char* napRead(const char *s, napoly *b)
    first variable in la and lb;
    assumes a != NULL, b != NULL;
    keeps a and b */
-int napExp(napoly a, napoly b)
+int napExp(poly a, poly b)
 {
   assume(a != NULL);
   assume(b != NULL);
@@ -578,7 +578,7 @@ int napExp(napoly a, napoly b)
 /* returns the smallest i-th exponent in a and b;
    used to find it in a fraction;
    keeps a and b */
-int napExpi(int i, napoly a, napoly b)
+int napExpi(int i, poly a, poly b)
 {
   if (a == NULL || b == NULL) return 0;
   int m = p_GetExp(a, i+1, nacRing);
@@ -608,10 +608,10 @@ int napExpi(int i, napoly a, napoly b)
 /* divides out the content of the given napoly;
    assumes that ph != NULL;
    modifies ph */
-void napContent(napoly ph)
+void napContent(poly ph)
 {
   number h, d;
-  napoly p;
+  poly p;
 
   assume(ph != NULL);
   p = ph;
@@ -648,10 +648,10 @@ void napContent(napoly ph)
    by multiplication with lcm of those;
    if char != 0, then nothing is done;
    modifies ph */
-void napCleardenom(napoly ph)
+void napCleardenom(poly ph)
 {
   number d, h;
-  napoly p;
+  poly p;
 
   if (!ntIsChar0) return;
   p = ph;
@@ -682,7 +682,7 @@ void napCleardenom(napoly ph)
 /* returns the gcd of all coefficients in a and b;
    assumes a != NULL, b != NULL;
    keeps a, keeps b */
-napoly napGcd0(napoly a, napoly b)
+poly napGcd0(poly a, poly b)
 {
   number x, y;
   assume(a != NULL);
@@ -717,16 +717,24 @@ napoly napGcd0(napoly a, napoly b)
    if a = 0 != b, then b is returned;
    if a != 0 = b, then a is returned;
    keeps a, keeps b */
-napoly napGcd(napoly a, napoly b)
+poly napGcd(poly a, poly b)
 {
   int i;
-  napoly g, x, y, h;
-  if (a == NULL)
+  poly g, x, y, h;
+  if ((a==NULL)
+  || ((pNext(a)==NULL)&&(nacIsZero(pGetCoeff(a)))))
   {
-    if (b == NULL)    return p_ISet(1,nacRing);
-    else              return napCopy(b);
+    if ((b==NULL)
+    || ((pNext(b)==NULL)&&(nacIsZero(pGetCoeff(b)))))
+    {
+      return p_ISet(1,nacRing);
+    }
+    return napCopy(b);
   }
-  else if (b == NULL) return napCopy(a);
+  else
+  if ((b==NULL)
+  || ((pNext(b)==NULL)&&(nacIsZero(pGetCoeff(b)))))
+    return napCopy(a);
   
   if (naMinimalPoly != NULL)
   { // we have an algebraic extension
@@ -789,13 +797,14 @@ napoly napGcd(napoly a, napoly b)
    if char != 0, then the constant poly 1 is returned;
    if a = 0, then the constant poly 1 is returned;
    keeps a */
-number napLcm(napoly a)
+number napLcm(poly a)
 {
   number h = nacInit(1,nacRing);
   if (ntIsChar0)
   {
     number d;
-    napoly b = a;
+    poly b = a;
+
     while (b!=NULL)
     {
       d = nacLcm(h, pGetCoeff(b), nacRing); // uses denominator of pGetCoeff(b)
@@ -812,7 +821,7 @@ number napLcm(napoly a)
 * checks if head of p divides head of q
 * doesn't delete p and q
 */
-BOOLEAN napDivPoly (napoly p, napoly q)
+BOOLEAN napDivPoly (poly p, poly q)
 {
   int j=1;   /* evtl. von naNumber.. -1 abwaerts zaehlen */
 
@@ -831,9 +840,9 @@ BOOLEAN napDivPoly (napoly p, napoly q)
  * reduces the tail of poly q which is required to be != NULL;
  * modifies q and returns it
  */
-napoly napRedp (napoly q)
+poly napRedp (poly q)
 {
-  napoly h = (napoly)p_Init(nacRing);
+  poly h = (poly)p_Init(nacRing);
   int i=0,j;
 
   loop
@@ -876,9 +885,9 @@ napoly napRedp (napoly q)
  * reduces the tail of poly q which is required to be != NULL;
  * modifies q and returns it
  */
-napoly napTailred (napoly q)
+poly napTailred (poly q)
 {
-  napoly h;
+  poly h;
 
   h = pNext(q);
   while (h != NULL)
@@ -891,12 +900,12 @@ napoly napTailred (napoly q)
   return q;
 }
 
-napoly napMap(napoly p)
+poly napMap(poly p)
 {
-  napoly w, a;
+  poly w, a;
 
   if (p==NULL) return NULL;
-  a = w = (napoly)p_Init(nacRing);
+  a = w = (poly)p_Init(nacRing);
   int i;
   for(i=1;i<=ntParsToCopy;i++)
     napSetExp(a,i,napGetExpFrom(p,i,ntMapRing));
@@ -906,7 +915,7 @@ napoly napMap(napoly p)
   {
     pIter(p);
     if (p==NULL) break;
-    pNext(a) = (napoly)p_Init(nacRing);
+    pNext(a) = (poly)p_Init(nacRing);
     pIter(a);
     for(i=1;i<=ntParsToCopy;i++)
       napSetExp(a,i,napGetExpFrom(p,i,ntMapRing));
@@ -917,12 +926,12 @@ napoly napMap(napoly p)
   return w;
 }
 
-napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMapFunc nMap)
+poly napPerm(poly p,const int *par_perm,const ring src_ring,const nMapFunc nMap)
 {
-  napoly w;
+  poly w;
 
   if (p==NULL) return NULL;
-  w = (napoly)p_Init(nacRing);
+  w = (poly)p_Init(nacRing);
   int i;
   BOOLEAN not_null=TRUE;
   loop
@@ -964,15 +973,15 @@ napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMapFunc n
 }
 
 /*2
-* convert a napoly number into a poly
+* convert a poly number into a poly
 */
 poly napPermNumber(number z, int * par_perm, int P, ring oldRing)
 {
   if (z==NULL) return NULL;
   poly res=NULL;
   poly p;
-  napoly za=((lnumber)z)->z;
-  napoly zb=((lnumber)z)->n;
+  poly za=((lnumber)z)->z;
+  poly zb=((lnumber)z)->n;
   nMapFunc nMap=naSetMap(oldRing,currRing); /* todo: check naSetMap
                                                      vs. ntSetMap */
   if (currRing->parameter!=NULL)
@@ -988,7 +997,7 @@ poly napPermNumber(number z, int * par_perm, int P, ring oldRing)
     int i;
     //for(i=pVariables;i;i--) pSetExp(p,i, 0); // done by pInit
     //if (rRing_has_Comp(currRing)) pSetComp(p, 0); // done by pInit
-    napoly pa=NULL;
+    poly pa=NULL;
     lnumber pan;
     if (currRing->parameter!=NULL)
     {
@@ -1114,11 +1123,11 @@ number ntInit(int i, const ring r)
 *  division with remainder: f = g*q + r,
 *  returns r and destroys f
 */
-napoly ntRemainder(napoly f, const napoly g)
+poly ntRemainder(poly f, const poly g)
 {
-  napoly a, h, qq;
+  poly a, h, qq;
 
-  qq = (napoly)p_Init(nacRing);
+  qq = (poly)p_Init(nacRing);
   pNext(qq) = NULL;
   p_Normalize(g, nacRing);
   p_Normalize(f, nacRing);
@@ -1240,7 +1249,7 @@ number ntAdd(number la, number lb)
   if (la==NULL) return ntCopy(lb);
   if (lb==NULL) return ntCopy(la);
 
-  napoly x, y;
+  poly x, y;
   lnumber lu;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
@@ -1252,7 +1261,7 @@ number ntAdd(number la, number lb)
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = pp_Mult_qq(b->z, a->n,nacRing);
   else            y = napCopy(b->z);
-  napoly res = napAdd(x, y);
+  poly res = napAdd(x, y);
   if (res==NULL)
   {
     return (number)NULL;
@@ -1317,12 +1326,12 @@ number ntSub(number la, number lb)
   omCheckAddrSize(b,sizeof(slnumber));
   #endif
 
-  napoly x, y;
+  poly x, y;
   if (b->n!=NULL) x = pp_Mult_qq(a->z, b->n,nacRing);
   else            x = napCopy(a->z);
   if (a->n!=NULL) y = p_Mult_q(napCopy(b->z), napCopyNeg(a->n),nacRing);
   else            y = napCopyNeg(b->z);
-  napoly res = napAdd(x, y);
+  poly res = napAdd(x, y);
   if (res==NULL)
   {
     return (number)NULL;
@@ -1365,7 +1374,7 @@ number ntMult(number la, number lb)
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
   lnumber lo;
-  napoly x;
+  poly x;
 
   #ifdef LDEBUG
   omCheckAddrSize(a,sizeof(slnumber));
@@ -1459,7 +1468,7 @@ number ntDiv(number la, number lb)
   lnumber lo;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  napoly x;
+  poly x;
 
   if (a==NULL)
     return NULL;
@@ -1520,7 +1529,7 @@ number ntInvers(number a)
 {
   lnumber lo;
   lnumber b = (lnumber)a;
-  napoly x;
+  poly x;
 
   if (b==NULL)
   {
@@ -1655,7 +1664,7 @@ BOOLEAN ntGreater (number a, number b)
 */
 const char  *ntRead(const char *s, number *p)
 {
-  napoly x;
+  poly x;
   lnumber a;
   s = napRead(s, &x);
   if (x==NULL)
@@ -1853,7 +1862,7 @@ number ntGcd(number a, number b, const ring r)
   if (c==1) c=0;
   setCharacteristic( c );
 
-  napoly rz=napGcd(x->z, y->z);
+  poly rz=napGcd(x->z, y->z);
   CanonicalForm F, G, R;
   R=convSingPFactoryP(rz,r->algring);
   p_Normalize(x->z,nacRing);
@@ -2006,8 +2015,8 @@ void ntNormalize(number &pp)
     return;
   ntCoefNormalize(pp);
   p->s = 2;
-  napoly x = p->z;
-  napoly y = p->n;
+  poly x = p->z;
+  poly y = p->n;
 
   if (y==NULL) return;
 
@@ -2016,8 +2025,8 @@ void ntNormalize(number &pp)
     int i;
     for (i=ntNumbOfPar-1; i>=0; i--)
     {
-      napoly xx=x;
-      napoly yy=y;
+      poly xx=x;
+      poly yy=y;
       int m = napExpi(i, yy, xx);
       if (m != 0)          // in this case xx!=NULL!=yy
       {
@@ -2055,7 +2064,7 @@ void ntNormalize(number &pp)
 #ifndef FACTORY_GCD_TEST
   if (ntNumbOfPar == 1) /* apply built-in gcd */
   {
-    napoly x1,y1;
+    poly x1,y1;
     if (p_GetExp(x,1,nacRing) >= p_GetExp(y,1,nacRing))
     {
       x1 = napCopy(x);
@@ -2066,7 +2075,7 @@ void ntNormalize(number &pp)
       x1 = napCopy(y);
       y1 = napCopy(x);
     }
-    napoly r;
+    poly r;
     loop
     {
       r = ntRemainder(x1, y1);
@@ -2127,7 +2136,7 @@ void ntNormalize(number &pp)
   else
 #endif
   {
-    napoly xx,yy;
+    poly xx,yy;
     singclap_algdividecontent(x,y,xx,yy);
     if (xx!=NULL)
     {
@@ -2206,12 +2215,12 @@ number ntLcm(number la, number lb, const ring r)
   result = ALLOC0_LNUMBER();
   ntTest(la);
   ntTest(lb);
-  napoly x = p_Copy(a->z, r->algring);
+  poly x = p_Copy(a->z, r->algring);
   number t = napLcm(b->z); // get all denom of b->z
   if (!nacIsOne(t))
   {
     number bt, rr;
-    napoly xx=x;
+    poly xx=x;
     while (xx!=NULL)
     {
       bt = nacGcd(t, pGetCoeff(xx), r->algring);
@@ -2247,7 +2256,7 @@ number ntMapP0(number c)
   if (npIsZero(c)) return NULL;
   lnumber l=ALLOC_LNUMBER();
   l->s=2;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   int i=(int)((long)c);
   if (i>((long)ntMapRing->ch>>2)) i-=(long)ntMapRing->ch;
   pGetCoeff(l->z)=nlInit(i, nacRing);
@@ -2263,7 +2272,7 @@ number ntMap00(number c)
   if (nlIsZero(c)) return NULL;
   lnumber l=ALLOC_LNUMBER();
   l->s=0;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   pGetCoeff(l->z)=nlCopy(c);
   l->n=NULL;
   return (number)l;
@@ -2277,7 +2286,7 @@ number ntMapPP(number c)
   if (npIsZero(c)) return NULL;
   lnumber l=ALLOC_LNUMBER();
   l->s=2;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   pGetCoeff(l->z)=c; /* omit npCopy, because npCopy is a no-op */
   l->n=NULL;
   return (number)l;
@@ -2295,7 +2304,7 @@ number ntMapPP1(number c)
   if (npIsZero(n)) return NULL;
   lnumber l=ALLOC_LNUMBER();
   l->s=2;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   pGetCoeff(l->z)=n;
   l->n=NULL;
   return (number)l;
@@ -2312,7 +2321,7 @@ number ntMap0P(number c)
   npTest(n);
   lnumber l=ALLOC_LNUMBER();
   l->s=2;
-  l->z=(napoly)p_Init(nacRing);
+  l->z=(poly)p_Init(nacRing);
   pGetCoeff(l->z)=n;
   l->n=NULL;
   return (number)l;
@@ -2409,15 +2418,15 @@ nMapFunc ntSetMap(const ring src, const ring dst)
 }
 
 /*2
-* convert a napoly number into a poly
+* convert a poly number into a poly
 */
 poly ntPermNumber(number z, int * par_perm, int P, ring oldRing)
 {
   if (z==NULL) return NULL;
   poly res=NULL;
   poly p;
-  napoly za=((lnumber)z)->z;
-  napoly zb=((lnumber)z)->n;
+  poly za=((lnumber)z)->z;
+  poly zb=((lnumber)z)->n;
   nMapFunc nMap=ntSetMap(oldRing,currRing);
   if (currRing->parameter!=NULL)
     nMap=currRing->algring->cf->cfSetMap(oldRing->algring, nacRing);
@@ -2433,7 +2442,7 @@ poly ntPermNumber(number z, int * par_perm, int P, ring oldRing)
     for(i=pVariables;i;i--)
        pSetExp(p,i, 0);
     if (rRing_has_Comp(currRing)) pSetComp(p, 0);
-    napoly pa=NULL;
+    poly pa=NULL;
     lnumber pan;
     if (currRing->parameter!=NULL)
     {
@@ -2534,7 +2543,7 @@ BOOLEAN ntDBTest(number a, const char *f,const int l)
   #ifdef LDEBUG
   omCheckAddrSize(a, sizeof(slnumber));
   #endif
-  napoly p = x->z;
+  poly p = x->z;
   if (p==NULL)
   {
     Print("0/* in %s:%d\n",f,l);

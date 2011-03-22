@@ -9,6 +9,7 @@
 */
 #include <coeffs/coeffs.h>
 #include <coeffs/longrat.h>
+#include <polys/monomials/ring.h>
 #include <polys/monomials/polys-impl.h>
 #include <polys/ext_fields/longtrans.h>
 
@@ -46,12 +47,12 @@
 struct snaIdeal
 {
   int anz;
-  napoly *liste;
+  poly *liste;
 };
 typedef struct snaIdeal * naIdeal;
 extern omBin snaIdeal_bin;
 extern naIdeal naI;
-extern napoly naMinimalPoly;
+extern poly naMinimalPoly;
 
 /* for re-defining function pointers when switching from
    transcendental to algebraic extension (by providing
