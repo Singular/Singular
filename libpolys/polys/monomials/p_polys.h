@@ -331,10 +331,49 @@ poly      p_Subst(poly p, int n, poly e, const ring r);
 // sets component of poly a to i, returns length of a
 static inline   void p_SetCompP(poly a, int i, ring r);
 static inline   void p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
-static inline   long p_MaxComp(poly p, ring lmRing, ring tailRing);
-inline long p_MaxComp(poly p,ring lmRing) {return p_MaxComp(p,lmRing,lmRing);}
-static inline   long p_MinComp(poly p, ring lmRing, ring tailRing);
-inline long p_MinComp(poly p,ring lmRing) {return p_MinComp(p,lmRing,lmRing);}
+
+// returns maximal column number in the modul element a (or 0)
+static inline long p_MaxComp(poly p, ring lmRing, ring tailRing)
+{
+  long result,i;
+
+  if(p==NULL) return 0;
+  result = p_GetComp(p, lmRing);
+  if (result != 0)
+  {
+    loop
+    {
+      pIter(p);
+      if(p==NULL) break;
+      i = p_GetComp(p, tailRing);
+      if (i>result) result = i;
+    }
+  }
+  return result;
+}
+
+static inline long p_MaxComp(poly p,ring lmRing) {return p_MaxComp(p,lmRing,lmRing);}
+
+static inline   long p_MinComp(poly p, ring lmRing, ring tailRing)
+{
+  long result,i;
+
+  if(p==NULL) return 0;
+  result = p_GetComp(p,lmRing);
+  if (result != 0)
+  {
+    loop
+    {
+      pIter(p);
+      if(p==NULL) break;
+      i = p_GetComp(p,tailRing);
+      if (i<result) result = i;
+    }
+  }
+  return result;
+}
+
+static inline long p_MinComp(poly p,ring lmRing) {return p_MinComp(p,lmRing,lmRing);}
 
 /***************************************************************
  *

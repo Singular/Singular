@@ -72,45 +72,6 @@ PINLINE0 void p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
 }
 
 // returns minimal column number in the modul element a (or 0)
-PINLINE0 long p_MinComp(poly p, ring lmRing, ring tailRing)
-{
-  long result,i;
-
-  if(p==NULL) return 0;
-  result = p_GetComp(p,lmRing);
-  if (result != 0)
-  {
-    loop
-    {
-      pIter(p);
-      if(p==NULL) break;
-      i = p_GetComp(p,tailRing);
-      if (i<result) result = i;
-    }
-  }
-  return result;
-}
-
-// returns maximal column number in the modul element a (or 0)
-PINLINE0 long p_MaxComp(poly p, ring lmRing, ring tailRing)
-{
-  long result,i;
-
-  if(p==NULL) return 0;
-  result = p_GetComp(p, lmRing);
-  if (result != 0)
-  {
-    loop
-    {
-      pIter(p);
-      if(p==NULL) break;
-      i = p_GetComp(p, tailRing);
-      if (i>result) result = i;
-    }
-  }
-  return result;
-}
-
 BOOLEAN   p_IsConstantPoly(const poly p, const ring r)
 {
   poly pp=p;
