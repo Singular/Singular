@@ -11,15 +11,17 @@ AUTHORS:  Benjamin Bechtold, benjamin.bechtold@googlemail.com
 @*        Lars Kastner, lkastner@math.fu-berlin.de
 @*        Simon Keicher, keicher@mail.mathematik.uni-tuebingen.de
 @*        Oleksandr Motsak, U@D, where U={motsak}, D={mathematik.uni-kl.de}
+@*        Anna-Lena Winz, anna-lena.winz@math.fu-berlin.de
 
-
-OVERVIEW: This library allows one to virtually add multigradings to Singular.
+OVERVIEW: This library allows one to virtually add multigradings to Singular:
+grade multivariate polynomial rings with arbitrary (fin. gen. Abelian) groups. 
 For more see http://code.google.com/p/convex-singular/wiki/Multigrading
 For theoretical references see:
-E. Miller, B. Sturmfels: 'Combinatorial Commutative Algebra' and
-M. Kreuzer, L. Robbiano: 'Computational Commutative Algebra'.
+@* E. Miller, B. Sturmfels: 'Combinatorial Commutative Algebra'
+and
+@* M. Kreuzer, L. Robbiano: 'Computational Commutative Algebra'.
 
-NOTE: 'mDegBasis' relies on 4ti2 for computing Hilbert Bases.
+NOTE: 'multiDegBasis' relies on 4ti2 for computing Hilbert Bases.
 All groups are finitely generated Abelian
 
 PROCEDURES:
@@ -50,7 +52,7 @@ intRank(A);               computes the rank of the intmat A
 kernelLattice(P);         computes an integral basis for the kernel of the linear map P.
 latticeBasis(B);          computes an integral basis of the lattice B
 preimageLattice(P,L);     computes an integral basis for the preimage of the lattice L under the linear map P.
-projectLattices(B);       computes a linear map of lattices having the primitive span of B as its kernel.
+projectLattice(B);        computes a linear map of lattices having the primitive span of B as its kernel.
 intersectLattices(A,B);   computes an integral basis for the intersection of the lattices A and B.
 isIntegralSurjective(P);  test whether the map P of lattices is surjective.
 isPrimitiveSublattice(A); test whether A generates a primitive sublattice.
@@ -62,9 +64,9 @@ primitiveSpan(A);         computes a basis for the minimal primitive sublattice 
 factorgroup(G,H);         create the group G mod H
 productgroup(G,H);        create the group G x H
 
-mDeg(A);                  compute the multidegree of A
-mDegBasis(d);             compute all monomials of multidegree d
-mDegPartition(p);         compute the multigraded-homogeneous components of p
+multiDeg(A);                  compute the multidegree of A
+multiDegBasis(d);             compute all monomials of multidegree d
+multiDegPartition(p);         compute the multigraded-homogeneous components of p
 
 isTorsionFree();          test whether the current multigrading is  free
 isPositive();             test whether the current multigrading is positive
@@ -72,14 +74,14 @@ isZeroElement(p);         test whether p has zero multidegree
 areZeroElements(M);       test whether an integer matrix M considered as a collection of columns has zero multidegree
 isHomogeneous(a);         test whether 'a' is multigraded-homogeneous
 
-equalMDeg(e1,e2[,V]);     test whether e1==e2 in the current multigrading
+equalMultiDeg(e1,e2[,V]);     test whether e1==e2 in the current multigrading
 
-mDegGroebner(M);          compute the multigraded GB/SB of M
-mDegSyzygy(M);            compute the multigraded syzygies of M
-mDegModulo(I,J);          compute the multigraded 'modulo' module of I and J
-mDegResolution(M,l[,m]);  compute the multigraded resolution of M
-mDegTensor(m,n);          compute the tensor product of multigraded modules m,n
-mDegTor(i,m,n);           compute the Tor_i(m,n) for multigraded modules m,n
+multiDegGroebner(M);          compute the multigraded GB/SB of M
+multiDegSyzygy(M);            compute the multigraded syzygies of M
+multiDegModulo(I,J);          compute the multigraded 'modulo' module of I and J
+multiDegResolution(M,l[,m]);  compute the multigraded resolution of M
+multiDegTensor(m,n);          compute the tensor product of multigraded modules m,n
+multiDegTor(i,m,n);           compute the Tor_i(m,n) for multigraded modules m,n
 
 defineHomogeneous(p);     get a grading group wrt which p becomes homogeneous
 pushForward(f);           find the finest grading on the image ring, homogenizing f
@@ -103,7 +105,7 @@ KEYWORDS:  multigrading, multidegree, multiweights, multigraded-homogeneous, int
 
 LIB "standard.lib"; // for groebner
 LIB "lll.lib"; // for lll_matrix
-LIB "matrix.lib"; // for mDegTor
+LIB "matrix.lib"; // for multiDegTor
 
 /******************************************************/
 
@@ -173,19 +175,19 @@ EXAMPLE: example isGradedRingHomomorphism; shows an example
 {
   def dst = basering;
 
-  intmat result_degs = mDeg(Im);
-  print(result_degs);
+  intmat result_degs = multiDeg(Im);
+//  print(result_degs);
 
   setring src;
 
-  intmat input_degs = mDeg(maxideal(1));
-  print(input_degs);
+  intmat input_degs = multiDeg(maxideal(1));
+//  print(input_degs);
 
   def image_degs = A * input_degs;
-  print( image_degs );
+//  print( image_degs );
 
   def df = image_degs - result_degs;
-  print(df);
+//  print(df);
 
   setring dst;
 
@@ -244,10 +246,10 @@ example
      0, 0, 0;
   print(B);
 
-  isGradedRingHomomorphism(r, ideal(F), B);
-  def hh = createGradedRingHomomorphism(r, ideal(F), B);
+  isGradedRingHomomorphism(r, ideal(F), B); // FALSE: there is no such homomorphism!
+  // Therefore: the following command should return an error
+  // createGradedRingHomomorphism(r, ideal(F), B);
 
-  if( defined(hh) ) { ERROR("That input was not valid"); }
 }
 
 
@@ -457,7 +459,7 @@ proc isGroup(def G)
 
 /******************************************************/
 proc setBaseMultigrading(intmat M, list #)
-"USAGE: setBaseMultigrading(M[, G]); M is an intege matrix, G is a group (or lattice)
+"USAGE: setBaseMultigrading(M[, G]); M is an integer matrix, G is a group (or lattice)
 PURPOSE: attaches weights of variables and grading group to the basering.
 NOTE: M encodes the weights of variables column-wise.
 RETURN: nothing
@@ -491,8 +493,6 @@ EXAMPLE: example setBaseMultigrading; shows an example
 
   if( !defined(L) ){ ERROR("Wrong arguments: no group given?"); }
 
-
-
   attrib(basering, attrMgrad, M);
   attrib(basering, attrGradingGroup, L);
 
@@ -501,9 +501,6 @@ EXAMPLE: example setBaseMultigrading; shows an example
   {
     "Warning: your quotient ideal is not homogenous (multigrading was set anyway)!";
   }
-
-
-
 
 }
 example
@@ -1008,7 +1005,7 @@ example
    ideal I = x, y, xy^5;
    isHomogeneous(I);
 
-   intmat V = mDeg(I); print(V);
+   intmat V = multiDeg(I); print(V);
 
    module S = syz(I); print(S);
 
@@ -1019,10 +1016,10 @@ example
    vector v = getGradedGenerator(S, 1);
    getModuleGrading(v) == V;
    isHomogeneous(v);
-   print( mDeg(v) );
+   print( multiDeg(v) );
 
    isHomogeneous(S);
-   print( mDeg(S) );
+   print( multiDeg(S) );
 }
 
 /******************************************************/
@@ -1059,7 +1056,7 @@ example
    setBaseMultigrading(M, T);
 
    ideal I = x, y, xy^5;
-   intmat V = mDeg(I);
+   intmat V = multiDeg(I);
 
    // V == M; modulo T
    print(V);
@@ -1074,15 +1071,15 @@ example
    vector v = getGradedGenerator(S, 1);
    getModuleGrading(v) == V;
 
-   print( mDeg(v) );
+   print( multiDeg(v) );
 
    isHomogeneous(S);
 
-   print( mDeg(S) );
+   print( multiDeg(S) );
 }
 
 
-proc mDegTensor(module m, module n){
+proc multiDegTensor(module m, module n){
   matrix M = m;
   matrix N = n;
   intmat gm = getModuleGrading(m);
@@ -1139,7 +1136,7 @@ intmat gm[2][5]=1,2,3,4,5,0,0,0,0,0;
 intmat gn[2][3]=0,0,0,1,2,3;
 mm = setModuleGrading(mm, gm);
 nn = setModuleGrading(nn, gn);
-module mmtnn = mDegTensor(mm, nn);
+module mmtnn = multiDegTensor(mm, nn);
 print(mmtnn);
 getModuleGrading(mmtnn);
 LIB "homolog.lib";
@@ -1158,7 +1155,7 @@ intmat gm[2][7] = 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0;
 intmat gn[2][2] = 0, 0, 1, 2;
 mm = setModuleGrading(mm, gm);
 nn = setModuleGrading(nn, gn);
-module mmtnn = mDegTensor(mm, nn);
+module mmtnn = multiDegTensor(mm, nn);
 print(mmtnn);
 getModuleGrading(mmtnn);
 matrix a = mmtnn;
@@ -1167,9 +1164,9 @@ print(a-b);
 
 }
 
-proc mDegTor(int i, module m, module n)
+proc multiDegTor(int i, module m, module n)
 {
-  def res = mDegResolution(n, 0, 1);
+  def res = multiDegResolution(n, 0, 1);
   //print(res);
   list l = res;
   if(size(l)<i){ return(0);}
@@ -1188,14 +1185,14 @@ proc mDegTor(int i, module m, module n)
     freedim2 = setModuleGrading(freedim2,getModuleGrading(l[i+1]));
     freedim3 = setModuleGrading(freedim3, getModuleGrading(l[i]));
 
-    module mimag = mDegTensor(freedim3, m);
+    module mimag = multiDegTensor(freedim3, m);
     //"mimag ok.";
-    module mf = mDegTensor(l[i], freedim);
+    module mf = multiDegTensor(l[i], freedim);
     //"mf ok.";
-    module mim1 = mDegTensor(freedim2 ,m);
-    module mim2 = mDegTensor(l[i+1],freedim);
+    module mim1 = multiDegTensor(freedim2 ,m);
+    module mim2 = multiDegTensor(l[i+1],freedim);
     //"mim1+2 ok.";
-    module mker = mDegModulo(mf,mimag);
+    module mker = multiDegModulo(mf,mimag);
     //"mker ok.";
     module mim = mim1,mim2;
     mim = setModuleGrading(mim, getModuleGrading(mim1));
@@ -1205,7 +1202,7 @@ proc mDegTor(int i, module m, module n)
     //matrix mimmat = mim;
     //matrix mimmat1[16][4]=mimmat[1..16,25..28];
     //print(mimmat1-matrix(mim2));
-    return(mDegModulo(mker,mim));
+    return(multiDegModulo(mker,mim));
     //return(0);
   }
   return(0);
@@ -1218,10 +1215,10 @@ ring r = 0,(x_(1..4)),dp;
 intmat g[2][4]=1,1,0,0,0,1,1,-1;
 setBaseMultigrading(g);
 ideal i = maxideal(1);
-module m = mDegSyzygy(i);
+module m = multiDegSyzygy(i);
 module rt = Tor(2,m,m);
-module mDegT = mDegTor(2,m,m);
-print(matrix(rt)-matrix(mDegT));
+module multiDegT = multiDegTor(2,m,m);
+print(matrix(rt)-matrix(multiDegT));
 /*
 ring r = 0,(x),dp;
 intmat g[2][1]=1,1;
@@ -1236,7 +1233,7 @@ mm = setModuleGrading(mm, gm);
 nn = setModuleGrading(nn, gn);
 isHomogeneous(mm,"checkGens");
 isHomogeneous(nn,"checkGens");
-mDegTor(1,mm, nn);
+multiDegTor(1,mm, nn);
 
 kill m, mm, n, nn, gm, gn;
 
@@ -1250,7 +1247,7 @@ intmat gm[2][7] = 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0;
 intmat gn[2][2] = 0, 0, 1, 2;
 mm = setModuleGrading(mm, gm);
 nn = setModuleGrading(nn, gn);
-module mmtnn = mDegTensor(mm, nn);
+module mmtnn = multiDegTensor(mm, nn);
 */
 }
 
@@ -1439,14 +1436,11 @@ a matrix and return it.
     }
     m= system ("LLL", m);
     list result= list();
+    intvec buf;
 
     for (i= 1; i <= sizeA; i++)
     {
-      intvec buf= intvec (m[i , 1]);
-      for (j= 2; j <= columns; j++)
-      {
-        buf= buf,intvec (m [i, j]);
-      }
+      buf = intvec (m[i , 1..columns]);
       result= result+ list (buf);
 
     }
@@ -1725,7 +1719,7 @@ example
   poly e = x2y2;
   poly f = z2;
 
- intmat m[5][2]=mDeg(a)-mDeg(b),mDeg(b)-mDeg(c),mDeg(c)-mDeg(d),mDeg(d)-mDeg(e),mDeg(e)-mDeg(f);
+ intmat m[5][2]=multiDeg(a)-multiDeg(b),multiDeg(b)-multiDeg(c),multiDeg(c)-multiDeg(d),multiDeg(d)-multiDeg(e),multiDeg(e)-multiDeg(f);
  m=transpose(m);
  areZeroElements(m);
  areZeroElements(m,tt);
@@ -1815,22 +1809,22 @@ example
   poly e = x2y2;
   poly f = z2;
 
-  intvec v1 = mDeg(a) - mDeg(b);
+  intvec v1 = multiDeg(a) - multiDeg(b);
   v1;
   isZeroElement(v1);
   isZeroElement(v1, tt);
 
-  intvec v2 = mDeg(a) - mDeg(c);
+  intvec v2 = multiDeg(a) - multiDeg(c);
   v2;
   isZeroElement(v2);
   isZeroElement(v2, tt);
 
-  intvec v3 = mDeg(e) - mDeg(f);
+  intvec v3 = multiDeg(e) - multiDeg(f);
   v3;
   isZeroElement(v3);
   isZeroElement(v3, tt);
 
-  intvec v4 = mDeg(c) - mDeg(d);
+  intvec v4 = multiDeg(c) - multiDeg(d);
   v4;
   isZeroElement(v4);
   isZeroElement(v4, tt);
@@ -2098,13 +2092,13 @@ example
 
 
 /******************************************************/
-proc equalMDeg(intvec exp1, intvec exp2, list #)
-"USAGE: equalMDeg(exp1, exp2[, V]); intvec exp1, exp2, intmat V
+proc equalMultiDeg(intvec exp1, intvec exp2, list #)
+"USAGE: equalMultiDeg(exp1, exp2[, V]); intvec exp1, exp2, intmat V
 PURPOSE: Tests if the exponent vectors of two monomials (given by exp1 and exp2)
 represent the same multidegree.
 NOTE: the integer matrix V encodes multidegrees of module components,
 if module component is present in exp1 and exp2
-EXAMPLE: example equalMDeg; shows an example
+EXAMPLE: example equalMultiDeg; shows an example
 "
 {
   if( size(exp1) != size(exp2) )
@@ -2175,25 +2169,25 @@ example
   poly f = z2;
 
 
-  equalMDeg(leadexp(a), leadexp(b));
-  equalMDeg(leadexp(a), leadexp(c));
-  equalMDeg(leadexp(a), leadexp(d));
-  equalMDeg(leadexp(a), leadexp(e));
-  equalMDeg(leadexp(a), leadexp(f));
+  equalMultiDeg(leadexp(a), leadexp(b));
+  equalMultiDeg(leadexp(a), leadexp(c));
+  equalMultiDeg(leadexp(a), leadexp(d));
+  equalMultiDeg(leadexp(a), leadexp(e));
+  equalMultiDeg(leadexp(a), leadexp(f));
 
-  equalMDeg(leadexp(b), leadexp(c));
-  equalMDeg(leadexp(b), leadexp(d));
-  equalMDeg(leadexp(b), leadexp(e));
-  equalMDeg(leadexp(b), leadexp(f));
+  equalMultiDeg(leadexp(b), leadexp(c));
+  equalMultiDeg(leadexp(b), leadexp(d));
+  equalMultiDeg(leadexp(b), leadexp(e));
+  equalMultiDeg(leadexp(b), leadexp(f));
 
-  equalMDeg(leadexp(c), leadexp(d));
-  equalMDeg(leadexp(c), leadexp(e));
-  equalMDeg(leadexp(c), leadexp(f));
+  equalMultiDeg(leadexp(c), leadexp(d));
+  equalMultiDeg(leadexp(c), leadexp(e));
+  equalMultiDeg(leadexp(c), leadexp(f));
 
-  equalMDeg(leadexp(d), leadexp(e));
-  equalMDeg(leadexp(d), leadexp(f));
+  equalMultiDeg(leadexp(d), leadexp(e));
+  equalMultiDeg(leadexp(d), leadexp(f));
 
-  equalMDeg(leadexp(e), leadexp(f));
+  equalMultiDeg(leadexp(e), leadexp(f));
 
 }
 
@@ -2221,7 +2215,7 @@ EXAMPLE: example isHomogeneous; shows an example
 {
   if( (typeof(a) == "poly") or (typeof(a) == "vector") )
   {
-    return ( size(mDegPartition(a)) <= 1 )
+    return ( size(multiDegPartition(a)) <= 1 )
   }
 
   if( (typeof(a) == "ideal") or (typeof(a) == "module") )
@@ -2251,7 +2245,7 @@ EXAMPLE: example isHomogeneous; shows an example
     {
       aa = getGradedGenerator(a, i);
 
-      b = mDegPartition(aa);
+      b = multiDegPartition(aa);
       for( j = ncols(b); j > 0; j-- )
       {
         if(NF(b[j],g) != 0)
@@ -2284,14 +2278,14 @@ example
 
   poly f = x-yz;
 
-  mDegPartition(f);
-  print(mDeg(_));
+  multiDegPartition(f);
+  print(multiDeg(_));
 
   isHomogeneous(f);   // f: is not homogeneous
 
   poly g = 1-xy2z3;
   isHomogeneous(g); // g: is homogeneous
-  mDegPartition(g);
+  multiDegPartition(g);
 
   kill T;
   /////////////////////////////////////////////////////////
@@ -2305,12 +2299,12 @@ example
 
   f;
   isHomogeneous(f);
-  mDegPartition(f);
+  multiDegPartition(f);
 
   // ---------------------
   g;
   isHomogeneous(g);
-  mDegPartition(g);
+  multiDegPartition(g);
 
   kill r, T, M;
 
@@ -2329,8 +2323,8 @@ example
   isHomogeneous(ideal(x+y, x2 - y2)); // 0
 
   // Degree partition:
-  mDegPartition(x2 - y3 -xy +z);
-  mDegPartition(x3 -y2z + x2 -y3 + z + 1);
+  multiDegPartition(x2 - y3 -xy +z);
+  multiDegPartition(x3 -y2z + x2 -y3 + z + 1);
 
 
   module N = gen(1) + (x+y) * gen(2), z*gen(3);
@@ -2340,16 +2334,16 @@ example
   vector v1, v2;
 
   v1 = setModuleGrading(N[1], V); v1;
-  mDegPartition(v1);
-  print( mDeg(_) );
+  multiDegPartition(v1);
+  print( multiDeg(_) );
 
   v2 = setModuleGrading(N[2], V); v2;
-  mDegPartition(v2);
-  print( mDeg(_) );
+  multiDegPartition(v2);
+  print( multiDeg(_) );
 
   N = setModuleGrading(N, V);
   isHomogeneous(N);
-  print( mDeg(N) );
+  print( multiDeg(N) );
 
   ///////////////////////////////////////
 
@@ -2358,16 +2352,16 @@ example
     4, 5, 6;
 
   v1 = setModuleGrading(N[1], V); v1;
-  mDegPartition(v1);
-  print( mDeg(_) );
+  multiDegPartition(v1);
+  print( multiDeg(_) );
 
   v2 = setModuleGrading(N[2], V); v2;
-  mDegPartition(v2);
-  print( mDeg(_) );
+  multiDegPartition(v2);
+  print( multiDeg(_) );
 
   N = setModuleGrading(N, V);
   isHomogeneous(N);
-  print( mDeg(N) );
+  print( multiDeg(N) );
 
   ///////////////////////////////////////
 
@@ -2378,20 +2372,20 @@ example
   N = gen(1) + x * gen(2), z*gen(3);
   N = setModuleGrading(N, V); print(N);
   isHomogeneous(N);
-  print( mDeg(N) );
+  print( multiDeg(N) );
   v1 = getGradedGenerator(N,1); print(v1);
-  mDegPartition(v1);
-  print( mDeg(_) );
+  multiDegPartition(v1);
+  print( multiDeg(_) );
   N = setModuleGrading(N, V); print(N);
   isHomogeneous(N);
-  print( mDeg(N) );
+  print( multiDeg(N) );
 }
 
 /******************************************************/
-proc mDeg(def A)
-"USAGE: mDeg(A); polynomial/vector/ideal/module A
+proc multiDeg(def A)
+"USAGE: multiDeg(A); polynomial/vector/ideal/module A
 PURPOSE: compute multidegree
-EXAMPLE: example mDeg; shows an example
+EXAMPLE: example multiDeg; shows an example
 "
 {
   if( defined(attrib(A, "grad")) > 0 )
@@ -2478,7 +2472,7 @@ EXAMPLE: example mDeg; shows an example
     intmat G[ r ] [ ncols(A)];
     for( i = ncols(A); i > 0; i-- )
     {
-      d = mDeg( A[i] );
+      d = multiDeg( A[i] );
 
       for( j = 1; j <= r; j++ ) // see ticket: 253
       {
@@ -2498,7 +2492,7 @@ EXAMPLE: example mDeg; shows an example
       v = getGradedGenerator(A, i);
 
       // G[1..r, i]
-      d = mDeg(v);
+      d = multiDeg(v);
 
       for( j = 1; j <= r; j++ ) // see ticket: 253
       {
@@ -2529,65 +2523,65 @@ example
   setBaseMultigrading(A);
 
 
-  mDeg( x*x, A );
-  mDeg( y*y*y, A );
+  multiDeg( x*x, A );
+  multiDeg( y*y*y, A );
 
   setBaseMultigrading(A, Ta);
 
-  mDeg( x*x*y );
+  multiDeg( x*x*y );
 
-  mDeg( y*y*y*x );
+  multiDeg( y*y*y*x );
 
-  mDeg( x*y + x + 1 );
+  multiDeg( x*y + x + 1 );
 
-  mDegPartition(x*y + x + 1);
+  multiDegPartition(x*y + x + 1);
 
-  print ( mDeg(0) );
+  print ( multiDeg(0) );
   poly zero = 0;
-  print ( mDeg(zero) );
+  print ( multiDeg(zero) );
 
 //  "ideal:";
 
   ideal I = y*x*x, x*y*y*y;
-  print( mDeg(I) );
+  print( multiDeg(I) );
 
-  print ( mDeg(ideal(0)) );
-  print ( mDeg(ideal(0,0,0)) );
+  print ( multiDeg(ideal(0)) );
+  print ( multiDeg(ideal(0,0,0)) );
 
 //  "vectors:";
 
   intmat B[2][2] = 0, 1, 1, 0;
   print(B);
 
-  mDeg( setModuleGrading(y*y*y*gen(2), B ));
-  mDeg( setModuleGrading(x*x*gen(1), B ));
+  multiDeg( setModuleGrading(y*y*y*gen(2), B ));
+  multiDeg( setModuleGrading(x*x*gen(1), B ));
 
 
   vector V = x*gen(1) + y*gen(2);
   V = setModuleGrading(V, B);
-  mDeg( V );
+  multiDeg( V );
 
   vector v1 = setModuleGrading([0, 0, 0], B);
-  print( mDeg( v1 ) );
+  print( multiDeg( v1 ) );
 
   vector v2 = setModuleGrading([0], B);
-  print( mDeg( v2 ) );
+  print( multiDeg( v2 ) );
 
 //  "module:";
 
   module D = x*gen(1), y*gen(2);
   D;
   D = setModuleGrading(D, B);
-  print( mDeg( D ) );
+  print( multiDeg( D ) );
 
 
   module DD = [0, 0],[0, 0, 0];
   DD = setModuleGrading(DD, B);
-  print( mDeg( DD ) );
+  print( multiDeg( DD ) );
 
   module DDD = [0, 0];
   DDD = setModuleGrading(DDD, B);
-  print( mDeg( DDD ) );
+  print( multiDeg( DDD ) );
 
 };
 
@@ -2596,10 +2590,10 @@ example
 
 
 /******************************************************/
-proc mDegPartition(def p)
-"USAGE: mDegPartition(def p), p polynomial/vector
+proc multiDegPartition(def p)
+"USAGE: multiDegPartition(def p), p polynomial/vector
 RETURNS: an ideal/module consisting of multigraded-homogeneous parts of p
-EXAMPLE: example mDegPartition; shows an example
+EXAMPLE: example multiDegPartition; shows an example
 "
 { // TODO: What about an ideal or module???
 
@@ -2645,7 +2639,7 @@ EXAMPLE: example mDegPartition; shows an example
       {
         // TODO: we do not cache matrices (M,T,H,V), which remain the same :(
         // TODO: we need some low-level procedure with all these arguments...!
-        if( equalMDeg( leadexp(tt), m, V  ) )
+        if( equalMultiDeg( leadexp(tt), m, V  ) )
         {
           mp = mp + lead(tt); // "mp", mp;
         }
@@ -2691,14 +2685,14 @@ example
 
   poly f = x10yz+x8y2z-x4z2+y5+x2y2-z2+x17z3-y6;
 
-  mDegPartition(f);
+  multiDegPartition(f);
 
   vector v = xy*gen(1)-x3y2*gen(2)+x4y*gen(3);
   intmat B[2][3]=1,-1,-2,0,0,1;
   v = setModuleGrading(v,B);
   getModuleGrading(v);
 
-  mDegPartition(v, B);
+  multiDegPartition(v, B);
 }
 
 
@@ -3053,12 +3047,12 @@ static proc getMonomByExponent(intvec exp)
 }
 
 /******************************************************/
-proc mDegBasis(intvec d)
+proc multiDegBasis(intvec d)
 "
 USAGE: multidegree d
 ASSUME: current ring is multigraded, monomial ordering is global
 PURPOSE: compute all monomials of multidegree d
-EXAMPLE: example mDegBasis; shows an example
+EXAMPLE: example multiDegBasis; shows an example
 "
 {
   def R = basering;  // setring R;
@@ -3188,22 +3182,22 @@ example
   setBaseMultigrading(g3);
   intvec v3=4:1;
   v3;
-  mDegBasis(v3);
+  multiDegBasis(v3);
 
   setBaseMultigrading(g1,l);
-  mDegBasis(v1);
+  multiDegBasis(v1);
   setBaseMultigrading(g2);
-  mDegBasis(v2);
+  multiDegBasis(v2);
 
   intmat M[2][2] = 1, -1, -1, 1;
   intvec d = -2, 2;
 
   setBaseMultigrading(M);
 
-  mDegBasis(d);
+  multiDegBasis(d);
   attrib(_, "ZeroPart");
 
-  kill R;
+  kill R, M, d;
   ring R = 0, (x, y, z), dp;
 
   intmat M[2][3] = 1, -2, 1,     1, 1, 0;
@@ -3214,11 +3208,11 @@ example
 
   setBaseMultigrading(M, L);
 
-  mDegBasis(d);
+  multiDegBasis(d);
   attrib(_, "ZeroPart");
 
 
-  kill R;
+  kill R, M, d;
 
   ring R = 0, (x, y, z), dp;
   qring Q = std(ideal( y^6+ x*y^3*z-x^2*z^2 ));
@@ -3227,15 +3221,15 @@ example
   intmat M[2][3] = 1, 1, 2,     2, 1, 1;
   //  intmat T[2][1] = 0, 2;
 
-  setBaseMultigrading(M);
+  setBaseMultigrading(M); // BUG????
 
   intvec d = 6, 6;
-  mDegBasis(d);
+  multiDegBasis(d);
   attrib(_, "ZeroPart");
 
 
 
-  kill R;
+  kill R, Q, M, d;
   ring R = 0, (x, y, z), dp;
   qring Q = std(ideal( x*z^3 - y *z^6, x*y*z  - x^4*y^2 ));
 
@@ -3245,19 +3239,19 @@ example
 
   intvec d = 4, 1;
 
-  setBaseMultigrading(M, T);
+  setBaseMultigrading(M, T); // BUG????
 
-  mDegBasis(d);
+  multiDegBasis(d);
   attrib(_, "ZeroPart");
 }
 
 
-proc mDegSyzygy(def I)
-"USAGE: mDegSyzygy(I); I is a ideal or a module
+proc multiDegSyzygy(def I)
+"USAGE: multiDegSyzygy(I); I is a ideal or a module
 PURPOSE: computes the multigraded syzygy module of I
 RETURNS: module, the syzygy module of I
 NOTE: generators of I must be multigraded homogeneous
-EXAMPLE: example mDegSyzygy; shows an example
+EXAMPLE: example multiDegSyzygy; shows an example
 "
 {
   if( isHomogeneous(I, "checkGens") == 0)
@@ -3265,7 +3259,7 @@ EXAMPLE: example mDegSyzygy; shows an example
     ERROR ("Sorry: inhomogeneous input!");
   }
   module S = syz(I);
-  S = setModuleGrading(S, mDeg(I));
+  S = setModuleGrading(S, multiDeg(I));
   return (S);
 }
 example
@@ -3288,24 +3282,24 @@ example
   M = setModuleGrading(M, v);
 
   isHomogeneous(M);
-  "Multidegrees: "; print(mDeg(M));
+  "Multidegrees: "; print(multiDeg(M));
   // Let's compute syzygies!
-  def S = mDegSyzygy(M); S;
+  def S = multiDegSyzygy(M); S;
   "Module Units Multigrading: "; print( getModuleGrading(S) );
-  "Multidegrees: "; print(mDeg(S));
+  "Multidegrees: "; print(multiDeg(S));
 
   isHomogeneous(S);
 }
 
 
 
-proc mDegModulo(def I, def J)
-"USAGE: mDegModulo(I); I, J are ideals or modules
+proc multiDegModulo(def I, def J)
+"USAGE: multiDegModulo(I); I, J are ideals or modules
 PURPOSE: computes the multigraded 'modulo' module of I and J
 RETURNS: module, see 'modulo' command
 NOTE: I and J should have the same multigrading, and their
 generators must be multigraded homogeneous
-EXAMPLE: example mDegModulo; shows an example
+EXAMPLE: example multiDegModulo; shows an example
 "
 {
   if( (isHomogeneous(I, "checkGens") == 0) or (isHomogeneous(J, "checkGens") == 0) )
@@ -3313,7 +3307,7 @@ EXAMPLE: example mDegModulo; shows an example
     ERROR ("Sorry: inhomogeneous input!");
   }
   module K = modulo(I, J);
-  K = setModuleGrading(K, mDeg(I));
+  K = setModuleGrading(K, multiDeg(I));
   return (K);
 }
 example
@@ -3329,24 +3323,24 @@ example
   ideal h1 = x, y, z;
   ideal h2 = x;
 
-  "Multidegrees: "; print(mDeg(h1));
+  "Multidegrees: "; print(multiDeg(h1));
 
   // Let's compute modulo(h1, h2):
-  def K = mDegModulo(h1, h2); K;
+  def K = multiDegModulo(h1, h2); K;
 
   "Module Units Multigrading: "; print( getModuleGrading(K) );
-  "Multidegrees: "; print(mDeg(K));
+  "Multidegrees: "; print(multiDeg(K));
 
   isHomogeneous(K);
 }
 
 
-proc mDegGroebner(def I)
-"USAGE: mDegGroebner(I); I is a poly/vector/ideal/module
+proc multiDegGroebner(def I)
+"USAGE: multiDegGroebner(I); I is a poly/vector/ideal/module
 PURPOSE: computes the multigraded standard/groebner basis of I
 NOTE: I must be multigraded homogeneous
 RETURNS: ideal/module, the computed basis
-EXAMPLE: example mDegGroebner; shows an example
+EXAMPLE: example multiDegGroebner; shows an example
 "
 {
   if( isHomogeneous(I) == 0)
@@ -3388,40 +3382,40 @@ example
 
   /////////////////////////////////////////////////////////////////////////////
   // GB:
-  M = mDegGroebner(M); M;
+  M = multiDegGroebner(M); M;
   "Module Units Multigrading: "; print( getModuleGrading(M) );
-  "Multidegrees: "; print(mDeg(M));
+  "Multidegrees: "; print(multiDeg(M));
 
   isHomogeneous(M);
 
   /////////////////////////////////////////////////////////////////////////////
   // Let's compute Syzygy!
-  def S = mDegSyzygy(M); S;
+  def S = multiDegSyzygy(M); S;
   "Module Units Multigrading: "; print( getModuleGrading(S) );
-  "Multidegrees: "; print(mDeg(S));
+  "Multidegrees: "; print(multiDeg(S));
 
   isHomogeneous(S);
 
   /////////////////////////////////////////////////////////////////////////////
   // GB:
-  S = mDegGroebner(S); S;
+  S = multiDegGroebner(S); S;
   "Module Units Multigrading: "; print( getModuleGrading(S) );
-  "Multidegrees: "; print(mDeg(S));
+  "Multidegrees: "; print(multiDeg(S));
 
   isHomogeneous(S);
 }
 
 
 /******************************************************/
-proc mDegResolution(def I, int ll, list #)
-"USAGE: mDegResolution(I,l,[f]); I is poly/vector/ideal/module; l,f are integers
+proc multiDegResolution(def I, int ll, list #)
+"USAGE: multiDegResolution(I,l,[f]); I is poly/vector/ideal/module; l,f are integers
 PURPOSE: computes the multigraded resolution of I of the length l,
 or the whole resolution if l is zero. Returns minimal resolution if an optional
 argument 1 is supplied
 NOTE: input must have multigraded-homogeneous generators.
 The returned list is truncated beginning with the first zero differential.
 RETURNS: list, the computed resolution
-EXAMPLE: example mDegResolution; shows an example
+EXAMPLE: example multiDegResolution; shows an example
 "
 {
   if( isHomogeneous(I, "checkGens") == 0)
@@ -3441,7 +3435,7 @@ EXAMPLE: example mDegResolution; shows an example
   {
     if( size(L[i]) > 0 )
     {
-      L[i] = setModuleGrading( L[i], mDeg(L[i-1]) );
+      L[i] = setModuleGrading( L[i], multiDeg(L[i-1]) );
     } else
     {
       return (L[1..(i-1)]);
@@ -3475,7 +3469,7 @@ example
 
   for(j=1; j<=ncols(A); j++)
   {
-    mDegPartition(A[j]);
+    multiDegPartition(A[j]);
   }
 
   intmat v[2][1]=
@@ -3485,38 +3479,38 @@ example
   m = setModuleGrading(m, v);
 
   // Let's compute Syzygy!
-  def S = mDegSyzygy(m); S;
+  def S = multiDegSyzygy(m); S;
   "Module Units Multigrading: "; print( getModuleGrading(S) );
-  "Multidegrees: "; print(mDeg(S));
+  "Multidegrees: "; print(multiDeg(S));
 
   /////////////////////////////////////////////////////////////////////////////
 
-  S = mDegGroebner(S); S;
+  S = multiDegGroebner(S); S;
   "Module Units Multigrading: "; print( getModuleGrading(S) );
-  "Multidegrees: "; print(mDeg(S));
+  "Multidegrees: "; print(multiDeg(S));
 
   /////////////////////////////////////////////////////////////////////////////
 
-  def L = mDegResolution(m, 0, 1);
+  def L = multiDegResolution(m, 0, 1);
 
   for( j =1; j<=size(L); j++)
   {
     "----------------------------------- ", j, " -----------------------------";
     L[j];
     "Module Multigrading: "; print( getModuleGrading(L[j]) );
-    "Multigrading: "; print(mDeg(L[j]));
+    "Multigrading: "; print(multiDeg(L[j]));
   }
 
   /////////////////////////////////////////////////////////////////////////////
 
-  L = mDegResolution(maxideal(1), 0, 1);
+  L = multiDegResolution(maxideal(1), 0, 1);
 
   for( j =1; j<=size(L); j++)
   {
     "----------------------------------- ", j, " -----------------------------";
     L[j];
     "Module Multigrading: "; print( getModuleGrading(L[j]) );
-    "Multigrading: "; print(mDeg(L[j]));
+    "Multigrading: "; print(multiDeg(L[j]));
   }
 
   kill v;
@@ -3541,11 +3535,11 @@ example
 /******************************************************/
 proc hilbertSeries(def I)
 "USAGE: hilbertSeries(I); I is poly/vector/ideal/module
-PURPOSE: computes the multigraded Hilbert Series of M
+PURPOSE: computes the multigraded Hilbert Series of I
 NOTE: input must have multigraded-homogeneous generators.
 Multigrading should be positive.
 RETURNS: a ring in variables t_(i), s_(i), with polynomials
-numerator1 and denominator1 and muturally prime numerator2
+numerator1 and denominator1 and mutually prime numerator2
 and denominator2, quotients of which give the series.
 EXAMPLE: example hilbertSeries; shows an example
 "
@@ -3569,7 +3563,7 @@ EXAMPLE: example hilbertSeries; shows an example
     ERROR("Error: wrong Variable Weights?");
   }
 
-  list RES = mDegResolution(I,0,1);
+  list RES = multiDegResolution(I,0,1);
 
   int l = size(RES);
 
@@ -3587,7 +3581,7 @@ EXAMPLE: example hilbertSeries; shows an example
 
   for( j = 1; j <= l; j++)
   {
-    L[j + 1] = mDeg(RES[j]);
+    L[j + 1] = multiDeg(RES[j]);
   }
 
   l++;
@@ -3734,17 +3728,17 @@ example
 
   ideal I = x^2, y, z^3;
   I = std(I);
-  def L = mDegResolution(I, 0, 1);
+  def L = multiDegResolution(I, 0, 1);
 
   for( int j = 1; j<=size(L); j++)
   {
     "----------------------------------- ", j, " -----------------------------";
     L[j];
     "Module Multigrading: "; print( getModuleGrading(L[j]) );
-    "Multigrading: "; print(mDeg(L[j]));
+    "Multigrading: "; print(multiDeg(L[j]));
   }
 
-  mDeg(I);
+  multiDeg(I);
   def h = hilbertSeries(I); setring h;
 
   factorize(numerator2);
@@ -4096,7 +4090,7 @@ RETURNS: true if the multigrading is positive
 EXAMPLE: example isPositive; shows an example
 "
 {
-ideal I = mDegBasis(0);
+ideal I = multiDegBasis(0);
 ideal J = attrib(I,"ZeroPart");
 /*
 I am not quite sure what this ZeroPart is anymore. I thought it
@@ -4113,9 +4107,9 @@ example
   setBaseMultigrading(A);
   isPositive();
 
-  intmat A[1][2]=1,1;
-  setBaseMultigrading(A);
-  isPositive(A);
+  intmat B[1][2]=1,1;
+  setBaseMultigrading(B);
+  isPositive(B);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4131,8 +4125,8 @@ proc testMultigradingLib ()
   example getModuleGrading;
 
 
-  example mDeg;
-  example mDegPartition;
+  example multiDeg;
+  example multiDegPartition;
 
 
   example hermiteNormalForm;
@@ -4141,22 +4135,22 @@ proc testMultigradingLib ()
   example pushForward;
   example defineHomogeneous;
 
-  example equalMDeg;
+  example equalMultiDeg;
   example isZeroElement;
 
-  example mDegResolution;
+  example multiDegResolution;
 
   "// ******************* example hilbertSeries ************************//";
   example hilbertSeries;
 
 
-// example mDegBasis; // needs 4ti2!
+// example multiDegBasis; // needs 4ti2!
 
   "The End!";
 }
 
 
-proc mDegTruncate(def M, intvec md)
+static proc multiDegTruncate(def M, intvec md)
 {
   "d: ";
   print(md);
@@ -4164,7 +4158,7 @@ proc mDegTruncate(def M, intvec md)
   "M: ";
   module LL = M; // + L for d+1
   LL;
-  print(mDeg(LL));
+  print(multiDeg(LL));
 
 
   intmat V = getModuleGrading(M);
@@ -4179,7 +4173,7 @@ proc mDegTruncate(def M, intvec md)
     vi = V[1..r, i];
     "v[i]: "; vi;
 
-    B = mDegBasis(md - vi); // ZeroPart is always the same...
+    B = multiDegBasis(md - vi); // ZeroPart is always the same...
     "B: "; B;
 
     L = L, B*gen(i);
@@ -4188,22 +4182,22 @@ proc mDegTruncate(def M, intvec md)
   L = setModuleGrading(L,V);
 
   "L: "; L;
-  print(mDeg(L));
+  print(multiDeg(L));
 
-  L = mDegModulo(L, LL);
-  L = mDegGroebner(L);
+  L = multiDegModulo(L, LL);
+  L = multiDegGroebner(L);
 //  L = minbase(prune(L));
 
   "??????????";
   print(L);
-  print(mDeg(L));
+  print(multiDeg(L));
 
   V = getModuleGrading(L);
 
   // take out other degrees
   for(i = ncols(L); i > 0; i-- )
   {
-    if( !equalMDeg( mDeg(getGradedGenerator(L, i)), md ) )
+    if( !equalMultiDeg( multiDeg(getGradedGenerator(L, i)), md ) )
     {
       L[i] = 0;
     }
@@ -4212,7 +4206,7 @@ proc mDegTruncate(def M, intvec md)
   L = simplify(L, 2);
   L = setModuleGrading(L, V);
   print(L);
-  print(mDeg(L));
+  print(multiDeg(L));
 
   return(L);
 }
@@ -4236,15 +4230,15 @@ example
   "X:";
   module h1 = x;
   h1 = setModuleGrading(h1, V);
-  mDegTruncate(h1, mDeg(x));
-  mDegTruncate(h1, mDeg(y));
+  multiDegTruncate(h1, multiDeg(x));
+  multiDegTruncate(h1, multiDeg(y));
 
   "XY:";
   module h2 = ideal(x, y);
   h2 = setModuleGrading(h2, V);
-  mDegTruncate(h2, mDeg(x));
-  mDegTruncate(h2, mDeg(y));
-  mDegTruncate(h2, mDeg(xy));
+  multiDegTruncate(h2, multiDeg(x));
+  multiDegTruncate(h2, multiDeg(y));
+  multiDegTruncate(h2, multiDeg(xy));
 }
 
 
@@ -4266,9 +4260,9 @@ EXAMPLE: example imageLattice; shows an example
 "
 {
   intmat Mul = Q*L;
-  intmat L = latticeBasis(Mul);
+  intmat LL = latticeBasis(Mul);
 
-  return(L);
+  return(LL);
 }
 example
 {
@@ -4531,7 +4525,8 @@ example
     2,5,10,
     3,6,12;
 
-  intmat B = latticeBasis(B); // should be a matrix with columns [1,2,3] and [0,3,6]
+  intmat B = latticeBasis(B); 
+  print(B); // should be a matrix with columns [1,2,3] and [0,3,6]
 
   kill B,L;
 }
@@ -4640,14 +4635,14 @@ EXAMPLE: example preimageLattice; shows an example
   }
 
 
-  print(Con);
+//  print(Con);
 
   intmat L = kernelLattice(Con);
-
+/*
   print(L);
   print(ncols(P));
   print(ncols(L));
-
+*/
   // delete rows ncols(P)+1 to nrows(L) out of L
   intmat Del[ncols(P)][ncols(L)];
   int k;
@@ -4678,10 +4673,10 @@ example
     1,
     0;
 
-  // should be a 2x2 matrix with columns
-  // [1,1,-1] and [-2,1,0]
   intmat L = preimageLattice(P,B);
 
+  print(L); // should be a 2x2? matrix with columns [1,1,-1] and [-2,1,0]?
+  
   kill B, P, L;
 
 }
@@ -4722,6 +4717,9 @@ example
 
   // should be 0
   int b = isPrimitiveSublattice(A);
+  b;
+
+  if( b != 0 ){ ERROR("Sorry, something went wrong..."); }
 
   kill A,b;
 }
@@ -4915,10 +4913,11 @@ example
     7,10,
     8,11;
 
-  // should result in a (2x4)-matrix with columns
-  // [3, 3, 3], [0, 3, 6]
   intmat U = intersectLattices(A,B);
 
+  // should result in a (2x4)-matrix with columns
+  // [3, 3, 3], [0, 3, 6]
+  print(U);
 }
 
 proc intInverse(intmat A);
@@ -5241,7 +5240,7 @@ EXAMPLE: example isIntegralSurjective; shows an example
     list L = smithNormalForm(V, "transform"); // L = [A,S,B] where S is the smith-NF and S = A*S*B
     intmat P = intInverse(L[1]);
 
-    print(L);
+//    print(L);
 
     if ( r < m )
     {
