@@ -9,6 +9,7 @@
 */
 #include <coeffs/coeffs.h>
 #include <coeffs/longrat.h>
+#include <polys/monomials/ring.h>
 #include <polys/monomials/polys-impl.h>
 #include <polys/ext_fields/longtrans.h>
 
@@ -24,14 +25,13 @@ typedef struct slnumber * lnumber;
 
 struct slnumber
 {
-  napoly z;
-  napoly n;
-  BOOLEAN s;
+  int anz;
+  poly *liste;
 };
-
-extern napoly naMinimalPoly;
-extern ring nacRing;
-
+typedef struct snaIdeal * naIdeal;
+extern omBin snaIdeal_bin;
+extern naIdeal naI;
+extern poly naMinimalPoly;
 
 void naSetChar(int p, ring r);
 void    naDelete (number *p, const ring r);
