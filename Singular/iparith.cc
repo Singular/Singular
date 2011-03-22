@@ -2975,6 +2975,8 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
        ("`lres` not implemented for inhomogeneous input or qring");
        return TRUE;
     }
+    if(currRing->N == 1)
+      WarnS("the current implementation of `lres` may not work in the case of a single variable");
     r=syLaScala3(u_id,&dummy);
   }
   else if (iiOp == KRES_CMD)
@@ -3024,10 +3026,15 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   }
 
   // test the La Scala case' output
-  assume( (iiOp == LRES_CMD) == (r->syRing != NULL) );
-  assume( (iiOp == LRES_CMD) == (r->resPairs != NULL) );
-  assume( (r->minres != NULL) || (r->fullres != NULL) );
+  assume( ((iiOp == LRES_CMD) || (iiOp == HRES_CMD)) == (r->syRing != NULL) );
+  assume( (r->syRing != NULL) == (r->resPairs != NULL) );
 
+  if(iiOp != HRES_CMD)
+    assume( (r->minres != NULL) || (r->fullres != NULL) ); // is wrong for HRES_CMD...
+  else
+    assume( (r->orderedRes != NULL) || (r->res != NULL) ); // analog for hres...
+
+  
   return FALSE;
 }
 #endif
