@@ -5984,7 +5984,7 @@ static BOOLEAN jjSUBST_P(leftv res, leftv u, leftv v,leftv w)
     if ((monomexpr!=NULL) && (p!=NULL) && (pTotaldegree(p)!=0) &&
     ((unsigned long)pTotaldegree(monomexpr) > (currRing->bitmask / (unsigned long)pTotaldegree(p))))
     {
-      Warn("possible OVERFLOW in subst, max exponent is %ld",currRing->bitmask);
+      Warn("possible OVERFLOW in subst, max exponent is %ld, subtituting deg %d by deg %d",currRing->bitmask, pTotaldegree(monomexpr), pTotaldegree(p));
       //return TRUE;
     }
     if ((monomexpr==NULL)||(pNext(monomexpr)==NULL))
