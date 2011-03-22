@@ -8,15 +8,15 @@
 */
 
 #include <math.h>
-#include <kernel/mod2.h>
-#include <kernel/options.h>
+//#include <kernel/mod2.h>
 #include <omalloc/omalloc.h>
-#include <kernel/polys.h>
-#include <kernel/intvec.h>
-#include <kernel/febase.h>
-#include <kernel/ideals.h>
-#include <kernel/ring.h>
-#include <kernel/weight.h>
+#include <misc/options.h>
+#include <polys/monomials/p_polys.h>
+#include <misc/intvec.h>
+//#include <kernel/febase.h>
+//#include <kernel/ideals.h>
+#include <polys/monomials/ring.h>
+#include <polys/weight.h>
 
 /*0 implementation*/
 extern "C" double (*wFunctional)(int *degw, int *lpol, int npol,
@@ -33,7 +33,7 @@ extern "C" void wSecondSearch(int *A, int *x, int *lpol,
         int npol, int mons, double *rel, double *fk, double wNsqr);
 extern "C" void wGcd(int *x, int n);
 
-static void wDimensions(polyset s, int sl, int *lpol, int *npol, int *mons)
+static void wDimensions(poly* s, int sl, int *lpol, int *npol, int *mons)
 {
   int  i, i1, j, k;
   poly p, q;
@@ -63,14 +63,14 @@ static void wDimensions(polyset s, int sl, int *lpol, int *npol, int *mons)
 }
 
 
-static void wInit(polyset s, int sl, int mons, int *A)
+static void wInit(poly* s, int sl, int mons, int *A, const ring R)
 {
   int  n, a, i, j, *B, *C;
   poly p, q;
   int *pl;
 
   B = A;
-  n = pVariables;
+  n = rVar(R);
   a = (n + 1) * sizeof(int);
   pl = (int *)omAlloc(a);
   for (i = 0; i <= sl; i++)
@@ -83,7 +83,7 @@ static void wInit(polyset s, int sl, int mons, int *A)
       {
         C = B;
         B++;
-        pGetExpV(p, pl);
+        p_GetExpV(p, pl,R);
         for (j = 0; j < n; j++)
         {
           *C = pl[j+1];
@@ -94,7 +94,7 @@ static void wInit(polyset s, int sl, int mons, int *A)
       {
         C = B;
         B++;
-        pGetExpV(q, pl);
+        p_GetExpV(q, pl,R);
         for (j = 0; j < n; j++)
         {
           *C = pl[j+1];
@@ -107,14 +107,14 @@ static void wInit(polyset s, int sl, int mons, int *A)
   omFreeSize((ADDRESS)pl, a);
 }
 
-void wCall(polyset s, int sl, int *x, double wNsqr)
+void wCall(poly* s, int sl, int *x, double wNsqr, const ring R)
 {
   int  n, q, npol, mons, i;
   int  *A, *xopt, *lpol, *degw;
   double  f1, fx, eps, *rel;
   void *adr;
 
-  n = pVariables;
+  n = rVar(R);
   lpol = (int * )omAlloc((sl + 1) * sizeof(int));
   wDimensions(s, sl, lpol, &npol, &mons);
   xopt = x + (n + 1);
@@ -129,7 +129,7 @@ void wCall(polyset s, int sl, int *x, double wNsqr)
   rel = (double*)adr;
   q = (n + 1) * mons * sizeof(int);
   A = (int * )omAlloc(q);
-  wInit(s, sl, mons, A);
+  wInit(s, sl, mons, A, R);
   degw = A + (n * mons);
   memset(degw, 0, mons * sizeof(int));
   for (i = n; i!=0; i--)
@@ -181,27 +181,27 @@ void wCall(polyset s, int sl, int *x, double wNsqr)
 }
 
 
-void kEcartWeights(polyset s, int sl, short *eweight)
+void kEcartWeights(poly* s, int sl, short *eweight, const ring R)
 {
   int  n, i;
   int  *x;
 
   *eweight = 0;
-  n = pVariables;
-  if (rHasLocalOrMixedOrdering_currRing())
+  n = rVar(R);
+  if (rHasLocalOrMixedOrdering(R))
     wFunctional = wFunctionalMora;
   else
     wFunctional = wFunctionalBuch;
   x = (int * )omAlloc(2 * (n + 1) * sizeof(int));
-  wCall(s, sl, x, (double)2.0 / (double)n);
+  wCall(s, sl, x, (double)2.0 / (double)n, R);
   for (i = n; i!=0; i--)
     eweight[i] = x[i + n + 1];
   omFreeSize((ADDRESS)x, 2 * (n + 1) * sizeof(int));
 }
 
-short * iv2array(intvec * iv)
+short * iv2array(intvec * iv, const ring R)
 {
-  short *s=(short *)omAlloc0((pVariables+1)*sizeof(short));
+  short *s=(short *)omAlloc0((rVar(R)+1)*sizeof(short));
   int len=0;
   if(iv!=NULL)
     len=iv->length();
