@@ -179,6 +179,10 @@ static inline unsigned long p_GetTotalDegree(const unsigned long l, const ring r
 // return the total degree of the long var l containing number_of_exp exponents
 static inline unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps);
 
+int p_MinDeg(poly p,intvec *w, const ring R);
+
+long p_DegW(poly p, const short *w, const ring R);
+
 
 // like the respective p_LmIs* routines, except that p might be empty
 static inline BOOLEAN p_IsConstantComp(const poly p, const ring r);

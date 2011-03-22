@@ -519,6 +519,19 @@ long p_WTotaldegree(poly p, const ring r)
   return  j;
 }
 
+long p_DegW(poly p, const short *w, const ring R)
+{
+  long r=~0L;
+
+  while (p!=NULL)
+  {
+    long t=totaldegreeWecart_IV(p,R,w);
+    if (t>r) r=t;
+    pIter(p);
+  }
+  return r;
+}
+
 int p_Weight(int i, const ring r)
 {
   if ((r->firstwv==NULL) || (i>r->firstBlockEnds))
@@ -3425,6 +3438,27 @@ poly p_JetW(poly p, int m, short *w, const ring R)
       pIter(p);
   }
   return r;
+}
+
+/*************************************************************/
+int p_MinDeg(poly p,intvec *w, const ring R)
+{
+  if(p==NULL)
+    return -1;
+  int d=-1;
+  while(p!=NULL)
+  {
+    int d0=0;
+    for(int j=0;j<rVar(R);j++)
+      if(w==NULL||j>=w->length())
+        d0+=p_GetExp(p,j+1,R);
+      else
+        d0+=(*w)[j]*p_GetExp(p,j+1,R);
+    if(d0<d||d==-1)
+      d=d0;
+    pIter(p);
+  }
+  return d;
 }
 
 /***************************************************************

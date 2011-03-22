@@ -316,16 +316,16 @@ void      pSetPolyComp(poly p, int comp);
 #define   pDeleteComp(p,k) p_DeleteComp(p,k,currRing)
 #define   pNorm(p) p_Norm(p,currRing)
 #define   pSubst(p,n,e) p_Subst(p,n.e,currRing)
-poly      ppJet(poly p, int m);
-poly      pJet(poly p, int m);
-poly      ppJetW(poly p, int m, short * iv);
-poly      pJetW(poly p, int m, short * iv);
-int pMinDeg(poly p,intvec *w=NULL);
+#define   ppJet(p,m) pp_Jet(p,m,currRing)
+#define   pJet(p,m)  p_Jet(p,m,currRing)
+#define   ppJetW(p,m,iv) pp_JetW(p,m,iv,currRing)
+#define   pJetW(p,m,iv) p_JetW(p,m,iv,currRing)
+#define   pMinDeg(p,w) p_MinDeg(p,w,currRing)
 poly      pSeries(int n,poly p,poly u=NULL,intvec *w=NULL);
 poly      pInvers(int n, poly p,intvec *w=NULL);
 // maximum weigthed degree of all monomials of p, w is indexed from
 // 1..pVariables
-long      pDegW(poly p, const short *w);
+#define    pDegW(p,w) p_DegW(p,w,currRing)
 
 /*-----------type conversions ----------------------------*/
 void  pVec2Polys(poly v, polyset *p, int *len);

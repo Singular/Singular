@@ -32,26 +32,6 @@
 #endif
 
 
-int pMinDeg(poly p,intvec *w)
-{
-  if(p==NULL)
-    return -1;
-  int d=-1;
-  while(p!=NULL)
-  {
-    int d0=0;
-    for(int j=0;j<pVariables;j++)
-      if(w==NULL||j>=w->length())
-        d0+=pGetExp(p,j+1);
-      else
-        d0+=(*w)[j]*pGetExp(p,j+1);
-    if(d0<d||d==-1)
-      d=d0;
-    pIter(p);
-  }
-  return d;
-}
-
 poly pSeries(int n,poly p,poly u, intvec *w)
 {
   short *ww=iv2array(w);
@@ -89,19 +69,6 @@ poly pInvers(int n,poly u,intvec *w)
   pDelete(&v1);
   omFreeSize((ADDRESS)ww,(pVariables+1)*sizeof(short));
   return v;
-}
-
-long pDegW(poly p, const short *w)
-{
-  long r=-LONG_MAX;
-
-  while (p!=NULL)
-  {
-    long t=totaldegreeWecart_IV(p,currRing,w);
-    if (t>r) r=t;
-    pIter(p);
-  }
-  return r;
 }
 
 /*-----------type conversions ----------------------------*/
