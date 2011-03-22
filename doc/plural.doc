@@ -3047,8 +3047,8 @@ For a detailed commutative example see @ref{slim Groebner bases}.
 @item @strong{Example:}
 @smallexample
 @c example
-LIB "ncalg.lib";
 LIB "nctools.lib";
+LIB "ncalg.lib";
 def U = makeUsl(2);
 // U is the U(sl_2) algebra
 setring U;
