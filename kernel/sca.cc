@@ -599,6 +599,8 @@ static poly sca_mm_Mult_pp(const poly pMonom, const poly pPoly, const ring rRing
   p_Test(pMonom, rRing);
 #endif
 
+  if ((pPoly==NULL) || (pMonom==NULL)) return NULL;
+
   assume( (pPoly != NULL) && (pMonom !=NULL));
 
   const int iComponentMonomM = p_GetComp(pMonom, rRing);

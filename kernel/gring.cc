@@ -1619,6 +1619,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
   {
 #ifdef PDEBUG
     Werror("gnc_CreateSpolyNew: different non-zero components!");
+    assume(0);
 #endif
     return(NULL);
   }

@@ -463,17 +463,17 @@ struct nc_struct
         { assume(ncRingType() == nc_exterior); return (data.sca.idSCAQuotient); };
 
     inline CGlobalMultiplier* GetGlobalMultiplier() const
-        { assume(ncRingType() != nc_exterior); return (m_Multiplier); };
+        { return (m_Multiplier); };
 
     inline CGlobalMultiplier*& GetGlobalMultiplier()
-        { assume(ncRingType() != nc_exterior); return (m_Multiplier); };
+        { return (m_Multiplier); };
 
 
     inline CFormulaPowerMultiplier* GetFormulaPowerMultiplier() const
-        { assume(ncRingType() != nc_exterior); return (m_PowerMultiplier); };
+        { return (m_PowerMultiplier); };
 
     inline CFormulaPowerMultiplier*& GetFormulaPowerMultiplier()
-        { assume(ncRingType() != nc_exterior); return (m_PowerMultiplier); };
+        { return (m_PowerMultiplier); };
     
   public:
     nc_pProcs p_Procs; // NC procedures.
