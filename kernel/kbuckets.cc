@@ -1156,21 +1156,10 @@ static BOOLEAN nIsPseudoUnit(number n, ring r)
     return TRUE;
   if (r->parameter==NULL)
   {
-    if (r->cf->nSize(n)==1)
-      return TRUE;
-    else
-      return FALSE;
+    return (r->cf->nSize(n)==1);
   }
   //if (r->parameter!=NULL)
-  if (n_IsOne(n,r))
-  {
-    return TRUE;
-  }
-  if (n_IsMOne(n,r))
-  {
-    return TRUE;
-  }
-  return FALSE;
+  return ((n_IsOne(n,r)) || (n_IsMOne(n,r)));
 }
 
 void kBucketSimpleContent(kBucket_pt bucket)
@@ -1231,10 +1220,11 @@ void kBucketSimpleContent(kBucket_pt bucket)
       assume(!(n_IsZero(coef,r)));
     }
   }
-  if (n_IsZero(coef,r)){
+  if (n_IsZero(coef,r))
+  {
     n_Delete(&coef,r);
     return;
-    }
+  }
   if (TEST_OPT_PROT)
     PrintS("S");
   for(i=0;i<=MAX_BUCKET;i++)
