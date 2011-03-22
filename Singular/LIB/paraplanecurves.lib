@@ -227,11 +227,11 @@ RETURN:  1 if assumptions are satisfied, 0 otherwise.@*
 
 ///////////////////////////////////////////////////////////////////////////////
 proc paraPlaneCurve(poly f, list #)
-"USAGE:  paraPlaneCurve(f [, c]); f poly , c optional integer@*
-         optional integer c can be: @*
-         1: compute integral basis via normalization. @*
-         2: make local analysis of singularities first and apply normalization
-            separately. @*
+"USAGE:  paraPlaneCurve(f [, s]); f poly , s optional string@*
+         optional string s can be: @*
+         'normal': compute integral basis via normalization. @*
+         'local':  make local analysis of singularities first and apply
+                   normalization separately. @*
          The default is 2. @*
 ASSUME:  The basering must be a polynomial ring in three variables, say x,y,z,
          with coefficients in Q. @*
@@ -239,7 +239,11 @@ ASSUME:  The basering must be a polynomial ring in three variables, say x,y,z,
          The curve C = {f = 0} must be rational, i.e., have geometric genus 0
          (see @ref{genus}). @*
          These conditions will be checked automatically.
-RETURN:  ring with an ideal PARA.
+RETURN:  ring with an ideal PARA which contains a rational parametrization of
+         the rational plane curve given by f; the ground field of the returned
+         polynomial ring is either Q or some algebraic extension Q(a); PARA
+         consists of three generators that parametrize the three coordinates
+         of the rational curve
 THEORY:  After a first step, realized by a projective automorphism in the
          procedure adjointIdeal, C satisfies: @*
 - C does not have singularities at infinity z=0. @*
@@ -271,7 +275,22 @@ KEYWORDS: rational curves, rational parametrization of rational curves.
 EXAMPLE:  example paraPlaneCurve; shows an example
 "
 {
-  if(size(#)==0) {int choice = 2;} else {int choice = #[1];}
+  int choice = 2;
+  if (size(#) != 0)
+  {
+    if (typeof(#[1]) == "string")
+    {
+      string s = string(#[1]);
+      if (s == "normal") { choice = 1; }
+      else
+      {
+        if (s == "local") { choice = 2; }
+        else { ERROR("expected optional argument to be either"
+                   + " 'local' or 'normal'"); }
+      }
+    }
+    else { ERROR("expected optional argument to be a string"); }
+  }
   def Roriginal = basering;
   /*checking assumptions and handling the conic case*/
   checkAssumptions(f);
