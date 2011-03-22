@@ -691,7 +691,7 @@ BOOLEAN kTest_T(TObject * T, ring strat_tailRing, int i, char TN)
     pFalseReturn(p_Test(T->p, currRing));
   }
 
-  if (i >= 0 && T->pLength != 0 
+  if (i >= 0 && T->pLength != 0
   && ! rIsSyzIndexRing(currRing) && T->pLength != pLength(p))
   {
     int l=T->pLength;
@@ -5438,6 +5438,7 @@ void updateS(BOOLEAN toT,kStrategy strat)
         else assume(strat->sevS[i] == pGetShortExpVector(h.p));
         h.sev = strat->sevS[i];
         /*puts the elements of S also to T*/
+        strat->initEcart(&h);
         enterT(h,strat);
         strat->S_2_R[i] = strat->tl;
       }
@@ -6266,7 +6267,7 @@ BOOLEAN kStratChangeTailRing(kStrategy strat, LObject *L, TObject* T, unsigned l
 #else
                                   (strat->homog && pFDeg == pDeg), // omit_degree
 #endif
-                                  (strat->ak==0), // omit_comp if the input is an ideal 
+                                  (strat->ak==0), // omit_comp if the input is an ideal
                                   expbound); // exp_limit
 
   if (new_tailRing == currRing) return TRUE;

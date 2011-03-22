@@ -1123,6 +1123,10 @@ ideal bba (ideal F, ideal Q,intvec *w,intvec *hilb,kStrategy strat)
     {
       // get the polynomial (canonicalize bucket, make sure P.p is set)
       strat->P.GetP(strat->lmBin);
+      // in the homogeneous case FDeg >= pFDeg (sugar/honey)
+      // but now, for entering S, T, we reset it
+      // in the inhomogeneous case: FDeg == pFDeg
+      if (strat->homog) strat->initEcart(&(strat->P));
 
       /* statistic */
       if (TEST_OPT_PROT) PrintS("s");
