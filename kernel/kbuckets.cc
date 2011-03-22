@@ -24,12 +24,12 @@
 #define MULTIPLY_BUCKET(B,I) do                                        \
   { if (B->coef[I]!=NULL)                                              \
     {                                                                  \
-      assume(p_IsConstant(b->Coef[i],bucket->bucket->ring));           \
+      assume(p_IsConstant(B->Coef[i],B->bucket->ring));           \
       B->buckets[I]=p_Mult_q(B->buckets[I],B->coef[I],B->bucket_ring); \
       B->coef[I]=NULL;                                                 \
     }                                                                  \
   } while(0)                                                           \
-    if (rField_is_Ring(currRing)) bucket->buckets_length[i] = pLength(bucket->buckets[i]);
+    if (rField_is_Ring(currRing)) B->buckets_length[i] = pLength(B->buckets[i]);
 #else
 #define MULTIPLY_BUCKET(B,I) do                                        \
   { if (B->coef[I]!=NULL)                                              \
@@ -1162,17 +1162,12 @@ static BOOLEAN nIsPseudoUnit(number n, ring r)
       return FALSE;
   }
   //if (r->parameter!=NULL)
-  number one=n_Init(1,r);
-  if (n_Equal(n,one,r))
+  if (n_IsOne(n,r))
   {
-    n_Delete(&one,r);
     return TRUE;
   }
-  n_Delete(&one,r);
-  number minus_one=n_Init(-1,r);
-  if (n_Equal(n,minus_one,r))
+  if (n_IsMOne(n,r))
   {
-    n_Delete(&minus_one,r);
     return TRUE;
   }
   return FALSE;
