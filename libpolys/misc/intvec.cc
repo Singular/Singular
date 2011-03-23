@@ -7,6 +7,10 @@
 */
 #ifndef INTVEC_CC
 #define INTVEC_CC
+
+#include "config.h"
+#include <misc/auxiliary.h>
+
 // #include <resources/feFopen.h>
 #include <misc/intvec.h>
 #include <omalloc/omalloc.h>
