@@ -303,6 +303,20 @@ poly      p_Power(poly p, int i, const ring r);
  * Misc stuff
  *
  ***************************************************************/
+/*2
+* returns the length of a (numbers of monomials)
+*/
+static inline int pLength(poly a)
+{
+  int l = 0;
+  while (a!=NULL)
+  {
+    pIter(a);
+    l++;
+  }
+  return l;
+}
+
 void      p_Norm(poly p1, const ring r);
 void      p_Normalize(poly p,const ring r);
 
