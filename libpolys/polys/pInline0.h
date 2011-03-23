@@ -20,57 +20,6 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 
-PINLINE0 void p_SetCompP(poly p, int i, ring r)
-{
-  if (p != NULL)
-  {
-#ifdef PDEBUG
-    poly q = p;
-    int l = 0;
-#endif
-
-    if (rOrd_SetCompRequiresSetm(r))
-    {
-      do
-      {
-        p_SetComp(p, i, r);
-        p_SetmComp(p, r);
-#ifdef PDEBUG
-        l++;
-#endif
-        pIter(p);
-      }
-      while (p != NULL);
-    }
-    else
-    {
-      do
-      {
-        p_SetComp(p, i, r);
-#ifdef PDEBUG
-        l++;
-#endif
-        pIter(p);
-      }
-      while(p != NULL);
-    }
-#ifdef PDEBUG
-    p_Test(q, r);
-    assume(l == pLength(q));
-#endif
-  }
-}
-
-PINLINE0 void p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
-{
-  if (p != NULL)
-  {
-    p_SetComp(p, i, lmRing);
-    p_SetmComp(p, lmRing);
-    p_SetCompP(pNext(p), i, tailRing);
-  }
-}
-
 // returns minimal column number in the modul element a (or 0)
 BOOLEAN   p_IsConstantPoly(const poly p, const ring r)
 {
