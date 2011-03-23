@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AC_INIT([coeffs], [3.1.2.sw])
 AM_INIT_AUTOMAKE
-AC_CONFIG_SRCDIR([rmodulon.h])
+AC_CONFIG_SRCDIR([coeffs.h])
 AC_CONFIG_HEADERS([config.h])
 
 #check for host:
@@ -20,6 +20,7 @@ AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AM_PROG_CC_C_O
 
 # Checks for libraries.
 

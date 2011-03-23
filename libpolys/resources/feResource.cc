@@ -10,8 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <resources/config.h>
-
+#include "config.h"
 #include <misc/auxiliary.h>
 
 #include <resources/feResource.h>

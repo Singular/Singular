@@ -1384,7 +1384,6 @@ number _nlNeg_NoImm(number a)
       a=nlShort3(a);
     }
   }
-  nlTest(a, r);
   return a;
 }
 
@@ -1551,7 +1550,6 @@ number _nlAdd_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
-  nlTest(u, r);
   return u;
 }
 
@@ -1775,7 +1773,6 @@ number _nlSub_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
-  nlTest(u, r);
   return u;
 }
 
@@ -1789,7 +1786,6 @@ number _nlMult_aImm_bImm_rNoImm(number a, number b)
   u->s=3;
   mpz_init_set_si(u->z,SR_TO_INT(a));
   mpz_mul_si(u->z,u->z,SR_TO_INT(b));
-  nlTest(u, r);
   return u;
 }
 
@@ -1892,7 +1888,6 @@ number _nlMult_aNoImm_OR_bNoImm(number a, number b)
       }
     }
   }
-  nlTest(u, r);
   return u;
 }
 
@@ -2094,7 +2089,10 @@ LINLINE number nlNeg (number a, const coeffs R)
     else               a=INT_TO_SR(-r);
     return a;
   }
-  return _nlNeg_NoImm(a);
+  a = _nlNeg_NoImm(a);
+  nlTest(a, R);
+  return a;
+
 }
 
 /*2
@@ -2102,7 +2100,6 @@ LINLINE number nlNeg (number a, const coeffs R)
 */
 LINLINE number nlAdd (number a, number b, const coeffs R)
 {
-  number u;
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
     LONG r=SR_HDL(a)+SR_HDL(b)-1L;
@@ -2111,7 +2108,9 @@ LINLINE number nlAdd (number a, number b, const coeffs R)
     else
       return nlRInit(SR_TO_INT(r));
   }
-  return _nlAdd_aNoImm_OR_bNoImm(a, b);
+  number u =  _nlAdd_aNoImm_OR_bNoImm(a, b);
+  nlTest(u, R);
+  return u;
 }
 
 number nlShort1(number a);
@@ -2283,9 +2282,15 @@ LINLINE number nlMult (number a, number b, const coeffs R)
       if (((((LONG)SR_HDL(u))<<1)>>1)==SR_HDL(u)) return (u);
       return nlRInit(SR_HDL(u)>>2);
     }
-    return _nlMult_aImm_bImm_rNoImm(a, b);
+    number u = _nlMult_aImm_bImm_rNoImm(a, b);
+    nlTest(u, R);
+    return u;
+    
   }
-  return _nlMult_aNoImm_OR_bNoImm(a, b);
+  number u = _nlMult_aNoImm_OR_bNoImm(a, b);
+  nlTest(u, R);
+  return u;
+  
 }
 
 
@@ -2304,7 +2309,10 @@ LINLINE number nlSub (number a, number b, const coeffs r)
     else
       return nlRInit(SR_TO_INT(r));
   }
-  return _nlSub_aNoImm_OR_bNoImm(a, b);
+  number u = _nlSub_aNoImm_OR_bNoImm(a, b);
+  nlTest(u, r);
+  return u;
+  
 }
 
 LINLINE void nlInpMult(number &a, number b, const coeffs r)
