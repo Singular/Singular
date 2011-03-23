@@ -59,21 +59,6 @@ PINLINE0 poly pReverse(poly p)
 
 /*2
 * returns the length of a (numbers of monomials)
-*/
-PINLINE0 int pLength(poly a)
-{
-  int l = 0;
-
-  while (a!=NULL)
-  {
-    pIter(a);
-    l++;
-  }
-  return l;
-}
-
-/*2
-* returns the length of a (numbers of monomials)
 * respect syzComp
 */
 poly pLast(poly a, int &l);
