@@ -35,96 +35,17 @@
 #define pSetCoeff0(p,n)     (p)->coef=(n)
 #define p_GetCoeff(p,r)     pGetCoeff(p)
 #define p_SetCoeff0(p,n,r)  pSetCoeff0(p,n)
-// deletes old p->coef and sets new one
-static inline number p_SetCoeff(poly p, number n, ring r);
-
-// get Order
-static inline long p_GetOrder(poly p, ring r);
-
-// Component
-static inline unsigned long p_SetComp(poly p, unsigned long c, ring r);
-static inline unsigned long p_AddComp(poly p, unsigned long v, ring r);
-static inline unsigned long p_SubComp(poly p, unsigned long v, ring r);
-
-// Exponent
-static inline long p_GetExp(poly p, int v, ring r);
-static inline long p_SetExp(poly p, int v, long e, ring r);
-static inline long p_IncrExp(poly p, int v, ring r);
-static inline long p_DecrExp(poly p, int v, ring r);
-static inline long p_AddExp(poly p, int v, long ee, ring r);
-static inline long p_SubExp(poly p, int v, long ee, ring r);
-static inline long p_MultExp(poly p, int v, long ee, ring r);
-static inline long p_GetExpSum(poly p1, poly p2, int i, ring r);
-static inline long p_GetExpDiff(poly p1, poly p2, int i, ring r);
-
-/***************************************************************
- *
- * Allocation/Initalization/Deletion
- * except for pHead, all polys must be != NULL
- *
- ***************************************************************/
-static inline poly p_New(ring r);
-static inline poly p_New(ring r, omBin bin);
-static inline poly p_Init(ring r);
-static inline poly p_Init(ring r, omBin bin);
-static inline poly p_LmInit(poly p, ring r);
-static inline poly p_LmInit(poly s_p, ring s_r, ring d_p);
-static inline poly p_LmInit(poly s_p, ring s_r, ring d_p, omBin d_bin);
-static inline poly p_Head(poly p, ring r);
-static inline void p_LmFree(poly p, ring r);
-static inline void p_LmFree(poly *p, ring r);
-static inline poly p_LmFreeAndNext(poly p, ring r);
-static inline void p_LmDelete(poly p, ring r);
-static inline void p_LmDelete(poly *p, ring r);
-static inline poly p_LmDeleteAndNext(poly p, ring r);
-
-/***************************************************************
- *
- * Operation on ExpVectors: assumes polys != NULL
- *
- ***************************************************************/
-// ExpVextor(d_p) = ExpVector(s_p)
-static inline void p_ExpVectorCopy(poly d_p, poly s_p, ring r);
-// adjustments for negative weights
-static inline void p_MemAdd_NegWeightAdjust(poly p, ring r);
-static inline void p_MemSub_NegWeightAdjust(poly p, ring r);
-// ExpVector(p1) += ExpVector(p2)
-static inline void p_ExpVectorAdd(poly p1, poly p2, ring r);
-// ExpVector(p1) -= ExpVector(p2)
-static inline void p_ExpVectorSub(poly p1, poly p2, ring r);
-// ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
-static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, ring r);
-// ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
-static inline void p_ExpVectorSum(poly pr, poly p1, poly p2, ring r);
-/// ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
-static inline void p_ExpVectorDiff(poly pr, poly p1, poly p2, ring r);
-/// returns TRUE if ExpVector(p1) == ExpVector(p2), FALSE, otherwise
-static inline BOOLEAN p_ExpVectorEqual(poly p1, poly p2, ring r);
-/// compute the degree of the leading monomial of p
-/// with respect to weigths 1
-/// the ordering may not be compatible with degree so do not use p->Order
-static inline long p_Totaldegree(poly p, ring r);
-
-static inline void p_GetExpV(poly p, int *ev, ring r);
-static inline void p_SetExpV(poly p, int *ev, ring r);
-
 
 /***************************************************************
  *
  * Comparisons: they are all done without regarding coeffs
  *
  ***************************************************************/
-static inline int p_LmCmp(poly p, poly q, ring r);
 #define p_LmCmpAction(p, q, r, actionE, actionG, actionS) \
   _p_LmCmpAction(p, q, r, actionE, actionG, actionS)
 
 // returns 1 if ExpVector(p)==ExpVector(q): does not compare numbers !!
 #define p_LmEqual(p1, p2, r) p_ExpVectorEqual(p1, p2, r)
-
-// pCmp: args may be NULL
-// returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
-static inline int p_Cmp(poly p1, poly p2, ring r);
-
 
 /***************************************************************
  *
@@ -132,47 +53,18 @@ static inline int p_Cmp(poly p1, poly p2, ring r);
  * pDivisbleBy
  *
  ***************************************************************/
-static inline BOOLEAN p_DivisibleBy(poly a, poly b, ring r);
-static inline BOOLEAN p_LmDivisibleBy(poly a, poly b, ring r);
-static inline BOOLEAN p_LmDivisibleByNoComp(poly a, poly b, ring r);
 unsigned long p_GetShortExpVector(poly a, ring r);
-static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a,
-                                      poly b, unsigned long not_sev_b, ring r);
-
-static inline BOOLEAN p_DivisibleBy(poly a, ring r_a, poly b, ring r_b);
-static inline BOOLEAN p_LmDivisibleBy(poly a, ring r_a, poly b, ring r_b);
-static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, ring r_a,
-                                      poly b, unsigned long not_sev_b, ring r_b);
-
-/***************************************************************
- *
- * Misc things on Lm
- *
- ***************************************************************/
-// test if the monomial is a constant as a vector component
-// i.e., test if all exponents are zero
-static inline BOOLEAN p_LmIsConstantComp(const poly p, const ring r);
-static inline BOOLEAN p_LmIsConstant(const poly p, const ring r);
-
-// return TRUE, if p_LmExpVectorAdd stays within ExpBound of ring r,
-//       FALSE, otherwise
-static inline BOOLEAN p_LmExpVectorAddIsOk(const poly p1, const poly p2, ring r);
 
 /***************************************************************
  *
  * Misc things on polys
  *
  ***************************************************************/
-// return the maximal exponent of p
-static inline unsigned long p_GetMaxExp(poly p, ring r);
 // return the maximal exponent of p in form of the maximal long var
 unsigned long p_GetMaxExpL(poly p, const ring r, unsigned long l_max = 0);
 // return monomial r such that GetExp(r,i) is maximum of all
 // monomials in p; coeff == 0, next == NULL, ord is not set
 poly p_GetMaxExpP(poly p, ring r);
-
-// suppose that l is a long var in r, return maximal exponent of l
-static inline unsigned long p_GetMaxExp(const unsigned long l, const ring r);
 
 // return the TotalDegree of the long var l
 static inline unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
@@ -182,23 +74,6 @@ static inline unsigned long p_GetTotalDegree(const unsigned long l, const ring r
 int p_MinDeg(poly p,intvec *w, const ring R);
 
 long p_DegW(poly p, const short *w, const ring R);
-
-
-// like the respective p_LmIs* routines, except that p might be empty
-static inline BOOLEAN p_IsConstantComp(const poly p, const ring r);
-static inline BOOLEAN p_IsConstant(const poly p, const ring r);
-static inline BOOLEAN p_IsConstantPoly(const poly p, const ring r)
-{
-  poly pp=p;
-  while(pp!=NULL)
-  {
-    if (! p_LmIsConstantComp(pp, r))
-      return FALSE;
-    pIter(pp);
-  }
-  return TRUE;
-}
-
 
 // return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, ring r);
@@ -224,19 +99,7 @@ poly      p_NSet(number n, ring r);
  * Copying/Deletion of polys: args may be NULL
  *
  ***************************************************************/
-// returns a copy of p
-static inline poly p_Copy(poly p, const ring r);
-// returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
-static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing);
-// deletes *p, and sets *p to NULL
-static inline void p_Delete(poly *p, const ring r);
-static inline void p_Delete(poly *p, const ring lmRing, const ring tailRing);
 
-// copys monomials of p, allocates new monomials from bin,
-// deletes monomoals of p
-static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin);
-// simial but does it only for leading monomial
-static inline poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin);
 // simply deletes monomials, does not free coeffs
 void p_ShallowDelete(poly *p, const ring r);
 
@@ -252,61 +115,8 @@ void p_ShallowDelete(poly *p, const ring r);
  *  - p (resp, q, m, n)     means arg is destroyed
  *
  ***************************************************************/
-// returns -p, p is destroyed
-static inline poly p_Neg(poly p, const ring r);
-
-// returns p*n, p is const (i.e. copied)
-static inline poly pp_Mult_nn(poly p, number n, const ring r);
-// returns p*n, destroys p
-static inline poly p_Mult_nn(poly p, number n, const ring r);
-static inline poly p_Mult_nn(poly p, number n, const ring lmRing, const ring tailRing);
-
-// returns p*m, does neither destroy p nor m
-static inline poly pp_Mult_mm(poly p, poly m, const ring r);
-// returns p*m, destroys p, const: m
-static inline poly p_Mult_mm(poly p, poly m, const ring r);
-
-/// returns p+q, destroys p and q
-static inline poly p_Add_q(poly p, poly q, const ring r);
-/// like p_Add_q, except that if lp == pLength(lp) lq == pLength(lq) then lp == pLength(p+q)
-static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r);
 
 poly      p_Sub(poly a, poly b, const ring r);
-
-// return p - m*q, destroys p; const: q,m
-static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
-// like p_Minus_mm_Mult_qq, except that if lp == pLength(lp) lq == pLength(lq)
-// then lp == pLength(p -m*q)
-static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
-                                 poly spNoether, const ring r);
-// returns p + m*q destroys p, const: q, m
-static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r);
-
-// returns p + m*q destroys p, const: q, m
-static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
-                                const ring r);
-
-// returns p*q, destroys p and q
-static inline poly p_Mult_q(poly p, poly q, const ring r);
-// returns p*q, does neither destroy p nor q
-static inline poly pp_Mult_qq(poly p, poly q, const ring r);
-
-// returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
-static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r);
-
-// returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
-// if lp is length of p on input then lp is length of returned poly on output
-static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, int &lp, const poly m, const ring r);
-
-// returns merged p and q, assumes p and q have no monomials which are equal
-static inline poly p_Merge_q(poly p, poly c, const ring r);
-// sorts p using bucket sort: returns sorted poly
-// assumes that monomials of p are all different
-// reverses it first, if revert == TRUE, use this if input p is "almost" sorted
-// correctly
-static inline poly p_SortMerge(poly p, const ring r, BOOLEAN revert = FALSE);
-// like SortMerge, except that p may have equal monimals
-static inline poly p_SortAdd(poly p, const ring r, BOOLEAN revert = FALSE);
 
 poly      p_Power(poly p, int i, const ring r);
 /***************************************************************
@@ -353,6 +163,14 @@ poly      p_Subst(poly p, int n, poly e, const ring r);
 // TODO:
 #define p_SetmComp  p_Setm
 
+// component
+static inline  unsigned long p_SetComp(poly p, unsigned long c, ring r)
+{
+  p_LmCheckPolyRing2(p, r);
+  pAssume2(rRing_has_Comp(r));
+  __p_GetComp(p,r) = c;
+  return c;
+}
 // sets component of poly a to i, returns length of p
 static inline   void p_SetCompP(poly p, int i, ring r)
 {
@@ -453,10 +271,25 @@ static inline long p_MinComp(poly p,ring lmRing) {return p_MinComp(p,lmRing,lmRi
  * poly things which are independent of ring
  *
  ***************************************************************/
-static inline int       pLength(poly a);
 static inline poly      pLast(poly a, int &length);
 inline   poly      pLast(poly a) { int l; return pLast(a, l);}
-static inline poly pReverse(poly p);
+static inline poly pReverse(poly p)
+{
+  if (p == NULL || pNext(p) == NULL) return p;
+
+  poly q = pNext(p), // == pNext(p)
+    qn;
+  pNext(p) = NULL;
+  do
+  {
+    qn = pNext(q);
+    pNext(q) = p;
+    p = q;
+    q = qn;
+  }
+  while (qn != NULL);
+  return p;
+}
 void      pEnlargeSet(poly**p, int length, int increment);
 
 
@@ -602,14 +435,7 @@ static inline void p_Setm(poly p, const ring r)
   r->p_Setm(p, r);
 }
 
-// component
-static inline  unsigned long p_SetComp(poly p, unsigned long c, ring r)
-{
-  p_LmCheckPolyRing2(p, r);
-  pAssume2(rRing_has_Comp(r));
-  __p_GetComp(p,r) = c;
-  return c;
-}
+
 static inline unsigned long p_AddComp(poly p, unsigned long v, ring r)
 {
   p_LmCheckPolyRing2(p, r);
@@ -889,6 +715,9 @@ static inline poly p_LmDeleteAndNext(poly p, const ring r)
  * Misc routines
  *
  ***************************************************************/
+
+// pCmp: args may be NULL
+// returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
 static inline int p_Cmp(poly p1, poly p2, ring r)
 {
   if (p2==NULL)
@@ -970,6 +799,20 @@ static inline poly p_Copy(poly p, const ring r)
 #endif
 }
 
+static inline poly p_Head(poly p, const ring r)
+{
+  if (p == NULL) return NULL;
+  p_LmCheckPolyRing1(p, r);
+  poly np;
+  omTypeAllocBin(poly, np, r->PolyBin);
+  p_SetRingOfLm(np, r);
+  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
+  pNext(np) = NULL;
+  pSetCoeff0(np, n_Copy(pGetCoeff(p), r->cf));
+  return np;
+}
+
+// returns a copy of p with Lm(p) from lmRing and Tail(p) from tailRing
 static inline poly p_Copy(poly p, const ring lmRing, const ring tailRing)
 {
 #ifndef PDEBUG
@@ -1009,6 +852,8 @@ static inline void p_Delete(poly *p,  const ring lmRing, const ring tailRing)
   }
 }
 
+// copys monomials of p, allocates new monomials from bin,
+// deletes monomoals of p
 static inline poly p_ShallowCopyDelete(poly p, const ring r, omBin bin)
 {
   p_LmCheckPolyRing2(p, r);
@@ -1023,6 +868,7 @@ static inline poly p_Add_q(poly p, poly q, const ring r)
   return r->p_Procs->p_Add_q(p, q, shorter, r);
 }
 
+/// like p_Add_q, except that if lp == pLength(lp) lq == pLength(lq) then lp == pLength(p+q)
 static inline poly p_Add_q(poly p, poly q, int &lp, int lq, const ring r)
 {
   int shorter;
@@ -1065,6 +911,32 @@ static inline poly pp_Mult_nn(poly p, number n, const ring r)
     return r->p_Procs->pp_Mult_nn(p, n, r);
 }
 
+// test if the monomial is a constant as a vector component
+// i.e., test if all exponents are zero
+static inline BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
+{
+  //p_LmCheckPolyRing(p, r);
+  int i = r->VarL_Size - 1;
+
+  do
+  {
+    if (p->exp[r->VarL_Offset[i]] != 0)
+      return FALSE;
+    i--;
+  }
+  while (i >= 0);
+  return TRUE;
+}
+
+// test if monomial is a constant, i.e. if all exponents and the component
+// is zero
+static inline BOOLEAN p_LmIsConstant(const poly p, const ring r)
+{
+  if (p_LmIsConstantComp(p, r))
+    return (p_GetComp(p, r) == 0);
+  return FALSE;
+}
+
 // returns Copy(p)*m, does neither destroy p nor m
 static inline poly pp_Mult_mm(poly p, poly m, const ring r)
 {
@@ -1104,6 +976,8 @@ static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   return r->p_Procs->p_Minus_mm_Mult_qq(p, m, q, shorter, NULL, r, last); // !!!
 }
 
+// like p_Minus_mm_Mult_qq, except that if lp == pLength(lp) lq == pLength(lq)
+// then lp == pLength(p -m*q)
 static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
                                  poly spNoether, const ring r)
 {
@@ -1119,12 +993,15 @@ static inline poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int &lp, int lq,
   return res;
 }
 
+// returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
 static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, const poly m, const ring r)
 {
   int shorter;
   return r->p_Procs->pp_Mult_Coeff_mm_DivSelect(p, m, shorter, r);
 }
 
+// returns p*Coeff(m) for such monomials pm of p, for which m is divisble by pm
+// if lp is length of p on input then lp is length of returned poly on output
 static inline poly pp_Mult_Coeff_mm_DivSelect(poly p, int &lp, const poly m, const ring r)
 {
   int shorter;
@@ -1254,18 +1131,24 @@ static inline poly p_Plus_mm_Mult_qq(poly p, poly m, poly q, const ring r)
   return p_Plus_mm_Mult_qq(p, m, q, lp, lq, r);
 }
 
+// returns merged p and q, assumes p and q have no monomials which are equal
 static inline poly p_Merge_q(poly p, poly q, const ring r)
 {
   return r->p_Procs->p_Merge_q(p, q, r);
 }
 
-static inline poly p_SortAdd(poly p, const ring r, BOOLEAN revert)
+// like p_SortMerge, except that p may have equal monimals
+static inline poly p_SortAdd(poly p, const ring r, BOOLEAN revert= FALSE)
 {
   if (revert) p = pReverse(p);
   return sBucketSortAdd(p, r);
 }
 
-static inline poly p_SortMerge(poly p, const ring r, BOOLEAN revert)
+// sorts p using bucket sort: returns sorted poly
+// assumes that monomials of p are all different
+// reverses it first, if revert == TRUE, use this if input p is "almost" sorted
+// correctly
+static inline poly p_SortMerge(poly p, const ring r, BOOLEAN revert= FALSE)
 {
   if (revert) p = pReverse(p);
   return sBucketSortMerge(p, r);
@@ -1419,18 +1302,7 @@ static inline poly p_LmInit(poly s_p, const ring s_r, const ring d_r)
   pAssume1(d_r != NULL);
   return p_LmInit(s_p, s_r, d_r, d_r->PolyBin);
 }
-static inline poly p_Head(poly p, const ring r)
-{
-  if (p == NULL) return NULL;
-  p_LmCheckPolyRing1(p, r);
-  poly np;
-  omTypeAllocBin(poly, np, r->PolyBin);
-  p_SetRingOfLm(np, r);
-  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
-  pNext(np) = NULL;
-  pSetCoeff0(np, n_Copy(pGetCoeff(p), r->cf));
-  return np;
-}
+
 // set all exponents l..k to 0, assume exp. k+1..n and 1..l-1 are in
 // different blocks
 // set coeff to 1
@@ -1454,6 +1326,7 @@ static inline poly p_GetExp_k_n(poly p, int l, int k, const ring r)
   return np;
 }
 
+// simialar to p_ShallowCopyDelete but does it only for leading monomial
 static inline poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
 {
   p_LmCheckPolyRing1(p, r);
@@ -1824,30 +1697,7 @@ static inline BOOLEAN p_LmShortDivisibleBy(poly a, unsigned long sev_a, const ri
  * Misc things on Lm
  *
  ***************************************************************/
-// test if the monomial is a constant as a vector component
-// i.e., test if all exponents are zero
-static inline BOOLEAN p_LmIsConstantComp(const poly p, const ring r)
-{
-  //p_LmCheckPolyRing(p, r);
-  int i = r->VarL_Size - 1;
 
-  do
-  {
-    if (p->exp[r->VarL_Offset[i]] != 0)
-      return FALSE;
-    i--;
-  }
-  while (i >= 0);
-  return TRUE;
-}
-// test if monomial is a constant, i.e. if all exponents and the component
-// is zero
-static inline BOOLEAN p_LmIsConstant(const poly p, const ring r)
-{
-  if (p_LmIsConstantComp(p, r))
-    return (p_GetComp(p, r) == 0);
-  return FALSE;
-}
 
 // like the respective p_LmIs* routines, except that p might be empty
 static inline BOOLEAN p_IsConstantComp(const poly p, const ring r)
@@ -1860,6 +1710,18 @@ static inline BOOLEAN p_IsConstant(const poly p, const ring r)
 {
   if (p == NULL) return TRUE;
   return (pNext(p)==NULL) && p_LmIsConstant(p, r);
+}
+
+static inline BOOLEAN p_IsConstantPoly(const poly p, const ring r)
+{
+  poly pp=p;
+  while(pp!=NULL)
+  {
+    if (! p_LmIsConstantComp(pp, r))
+      return FALSE;
+    pIter(pp);
+  }
+  return TRUE;
 }
 
 static inline BOOLEAN p_IsUnit(const poly p, const ring r)
