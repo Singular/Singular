@@ -328,8 +328,8 @@ poly      p_Subst(poly p, int n, poly e, const ring r);
 // TODO:
 #define p_SetmComp  p_Setm
 
-// sets component of poly a to i, returns length of a
-static inline   void p_SetCompP(poly a, int i, ring r)
+// sets component of poly a to i, returns length of p
+static inline   void p_SetCompP(poly p, int i, ring r)
 {
   if (p != NULL)
   {
@@ -370,7 +370,7 @@ static inline   void p_SetCompP(poly a, int i, ring r)
   }
 }
 
-static inline   void p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
+static inline   void p_SetCompP(poly p, int i, ring lmRing, ring tailRing)
 {
   if (p != NULL)
   {
