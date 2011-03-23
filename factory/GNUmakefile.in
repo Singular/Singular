@@ -132,14 +132,15 @@ basefactorysrc := \
 		cf_binom.cc \
 		cf_char.cc \
 		cf_chinese.cc \
-                cf_cyclo.cc \
+		cf_cyclo.cc \
 		cf_eval.cc \
 		cf_factor.cc \
 		cf_factory.cc \
 		cf_gcd.cc \
 		cf_gcd_charp.cc \
-                cf_gcd_smallp.cc \
+		cf_gcd_smallp.cc \
 		cf_generator.cc \
+		cfGEval.cc \
 		cf_globals.cc \
 		cf_hnf.cc \
 		cf_inline.cc \
@@ -148,7 +149,7 @@ basefactorysrc := \
 		cf_iter_inline.cc \
 		cf_linsys.cc \
 		cf_map.cc \
-                cf_map_ext.cc \
+		cf_map_ext.cc \
 		cf_ops.cc \
 		cf_primes.cc \
 		cf_random.cc \
@@ -157,9 +158,9 @@ basefactorysrc := \
 		cf_switches.cc \
 		cf_util.cc \
 		debug.cc \
-                DegreePattern.cc \
-                ExtensionInfo.cc \
-                facAlgExt.cc \
+		DegreePattern.cc \
+		ExtensionInfo.cc \
+		facAlgExt.cc \
 		fac_berlekamp.cc \
 		fac_cantzass.cc \
 		fac_distrib.cc \
@@ -170,12 +171,12 @@ basefactorysrc := \
 		fac_sqrfree.cc \
 		fac_univar.cc \
 		fac_util.cc \
-                facFqBivar.cc \
-                facFqBivarUtil.cc \
-                facFqFactorize.cc \
-                facFqFactorizeUtil.cc \
-                facFqSquarefree.cc \
-                facHensel.cc \
+		facFqBivar.cc \
+		facFqBivarUtil.cc \
+		facFqFactorize.cc \
+		facFqFactorizeUtil.cc \
+		facFqSquarefree.cc \
+		facHensel.cc \
 		fieldGCD.cc \
 		ffops.cc \
 		ffreval.cc \
@@ -193,7 +194,7 @@ basefactorysrc := \
 		sm_util.cc \
 		variable.cc \
 		NTLconvert.cc \
-                abs_fac.cc \
+		abs_fac.cc \
 		bifac.cc \
 		lgs.cc \
 		singext.cc
@@ -227,8 +228,9 @@ basefactoryincl := \
 		cf_eval.h \
 		cf_factory.h \
 		cf_generator.h \
+		cfGEval.h \
 		cf_globals.h \
-                cf_gcd_smallp.h \
+		cf_gcd_smallp.h \
 		cf_hnf.h \
 		cf_irred.h \
 		cf_iter.h \
@@ -240,9 +242,9 @@ basefactoryincl := \
 		cf_switches.h \
 		cf_util.h \
 		debug.h \
-                DegreePattern.h \
-                ExtensionInfo.h \
-                facAlgExt.h \
+		DegreePattern.h \
+		ExtensionInfo.h \
+		facAlgExt.h \
 		fac_berlekamp.h \
 		fac_cantzass.h \
 		fac_distrib.h \
@@ -251,12 +253,12 @@ basefactoryincl := \
 		fac_sqrfree.h \
 		fac_univar.h \
 		fac_util.h \
-                facFqBivar.h \
-                facFqBivarUtil.h \
-                facFqFactorize.h \
-                facFqFactorizeUtil.h \
-                facFqSquarefree.h \
-                facHensel.h \
+		facFqBivar.h \
+		facFqBivarUtil.h \
+		facFqFactorize.h \
+		facFqFactorizeUtil.h \
+		facFqSquarefree.h \
+		facHensel.h \
 		fieldGCD.h \
 		ffops.h \
 		ffreval.h \

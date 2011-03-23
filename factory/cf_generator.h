@@ -19,6 +19,7 @@ public:
     virtual void reset() {};
     virtual CanonicalForm item() const { return 0; }
     virtual void next() {};
+    virtual CFGenerator * clone() const { return new CFGenerator();}
 };
 
 class FFGenerator : public CFGenerator
@@ -34,6 +35,7 @@ public:
     void next();
     void operator++ () { next(); }
     void operator++ ( int ) { next(); }
+    CFGenerator * clone() const;
 };
 
 class GFGenerator : public CFGenerator
@@ -49,9 +51,10 @@ public:
     void next();
     void operator++ () { next(); }
     void operator++ ( int ) { next(); }
+    CFGenerator * clone() const;
 };
 
-class AlgExtGenerator //??? : public CFGenerator
+class AlgExtGenerator: public CFGenerator
 {
 private:
     Variable algext;
@@ -72,6 +75,7 @@ public:
     void next();
     void operator++ () { next(); }
     void operator++ ( int ) { next(); }
+    CFGenerator * clone() const;
 };
 
 class CFGenFactory

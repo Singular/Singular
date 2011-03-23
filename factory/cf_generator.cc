@@ -28,6 +28,10 @@ void FFGenerator::next()
     current++;
 }
 
+CFGenerator * FFGenerator::clone () const
+{
+    return new FFGenerator();
+}
 
 GFGenerator::GFGenerator()
 {
@@ -59,6 +63,11 @@ void GFGenerator::next()
         current = gf_q + 1;
     else
         current++;
+}
+
+CFGenerator * GFGenerator::clone () const
+{
+    return new GFGenerator();
 }
 
 AlgExtGenerator::AlgExtGenerator()
@@ -181,6 +190,11 @@ void AlgExtGenerator::next()
     }
     if ( ! stop )
         nomoreitems = true;
+}
+
+CFGenerator * AlgExtGenerator::clone () const
+{
+    return new AlgExtGenerator(algext);
 }
 
 CFGenerator * CFGenFactory::generate()
