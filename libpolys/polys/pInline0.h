@@ -25,23 +25,6 @@
  * poly things which are independent of ring
  *
  ***************************************************************/
-PINLINE0 poly pReverse(poly p)
-{
-  if (p == NULL || pNext(p) == NULL) return p;
-
-  poly q = pNext(p), // == pNext(p)
-    qn;
-  pNext(p) = NULL;
-  do
-  {
-    qn = pNext(q);
-    pNext(q) = p;
-    p = q;
-    q = qn;
-  }
-  while (qn != NULL);
-  return p;
-}
 
 
 /*2
