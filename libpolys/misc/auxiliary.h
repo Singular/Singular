@@ -17,10 +17,9 @@
 #ifndef MISC_AUXILIARY_H
 #define MISC_AUXILIARY_H
 
-#include "misc/config.h"
-     
 // ----------------- which parts/extensions of Singular to build
 #define HAVE_RINGS
+#define HAVE_PLURAL
 
 // no factory yet...
 // #define HAVE_FACTORY
@@ -29,26 +28,28 @@
 // ----------------  end of parts/extensions
 // -----------------  configure stuff
 
-/* CPU type: i[3456]86: */
+/*
+// CPU type: i[3456]86:
 #undef SI_CPU_I386
-/* CPU type: sparc: */
+// CPU type: sparc:
 #undef SI_CPU_SPARC
-/* CPU type: ppc: */
+// CPU type: ppc:
 #undef SI_CPU_PPC
-/* CPU type: IA64: */
+// CPU type: IA64:
 #undef SI_CPU_IA64
-/* CPU type: x86_64: */
+// CPU type: x86_64:
 #undef SI_CPU_X86_64
-
-/* Define sizeof(long) */
+// Define sizeof(long)
 #define SIZEOF_LONG 4
+*/
+
+
 
 /* Define version as a string */
 #define S_VERSION1 "spielwiese"
 
 /* Absolute pathname of root directory of Singular source */
 #define S_ROOT_DIR ""
-
 
 // ----------------- end of configure stuff
 
