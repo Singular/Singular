@@ -3461,6 +3461,50 @@ int p_MinDeg(poly p,intvec *w, const ring R)
   return d;
 }
 
+/***************************************************************/
+
+poly p_Series(int n,poly p,poly u, intvec *w, const ring R)
+{
+  short *ww=iv2array(w,R);
+  if(p!=NULL)
+  {
+    if(u==NULL)
+      p=p_JetW(p,n,ww,R);
+    else
+      p=p_JetW(p_Mult_q(p,p_Invers(n-p_MinDeg(p,w,R),u,w,R),R),n,ww,R);
+  }
+  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
+  return p;
+}
+
+poly p_Invers(int n,poly u,intvec *w, const ring R)
+{
+  if(n<0)
+    return NULL;
+  number u0=n_Invers(pGetCoeff(u),R->cf);
+  poly v=p_NSet(u0,R);
+  if(n==0)
+    return v;
+  short *ww=iv2array(w,R);
+  poly u1=p_JetW(p_Sub(p_One(R),p_Mult_nn(u,u0,R),R),n,ww,R);
+  if(u1==NULL)
+  {
+    omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
+    return v;
+  }
+  poly v1=p_Mult_nn(p_Copy(u1,R),u0,R);
+  v=p_Add_q(v,p_Copy(v1,R),R);
+  for(int i=n/p_MinDeg(u1,w,R);i>1;i--)
+  {
+    v1=p_JetW(p_Mult_q(v1,p_Copy(u1,R),R),n,ww,R);
+    v=p_Add_q(v,p_Copy(v1,R),R);
+  }
+  p_Delete(&u1,R);
+  p_Delete(&v1,R);
+  omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
+  return v;
+}
+
 /***************************************************************
  *
  * p_ShallowDelete

@@ -13,7 +13,7 @@ SOURCES = \
 	pDebug.cc pInline0.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc \
-	polys0.cc polys1.cc prCopy.cc prCopyTemplate.cc \
+	polys0.cc prCopy.cc prCopyTemplate.cc \
 	kbuckets.cc sbuckets.cc templates/p_Procs.cc weight.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
