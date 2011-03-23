@@ -6,7 +6,7 @@
 * ABSTRACT: output system
 */
 
-#include <reporter/config.h>
+#include "config.h"
 
 #include <stdlib.h>
 #include <stdio.h>

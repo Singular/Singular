@@ -10,9 +10,12 @@
  *******************************************************************/
 #ifndef DERROR_C
 #define DERROR_C
+
 #include <stdarg.h>
 #include <stdio.h>
-#include <reporter/config.h>
+
+#include "config.h"
+
 #include <reporter/reporter.h>
 #ifdef HAVE_CONFIG_H
 #include <omalloc/omalloc.h>
