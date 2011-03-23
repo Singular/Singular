@@ -329,8 +329,56 @@ poly      p_Subst(poly p, int n, poly e, const ring r);
 #define p_SetmComp  p_Setm
 
 // sets component of poly a to i, returns length of a
-static inline   void p_SetCompP(poly a, int i, ring r);
+static inline   void p_SetCompP(poly a, int i, ring r)
+{
+  if (p != NULL)
+  {
+#ifdef PDEBUG
+    poly q = p;
+    int l = 0;
+#endif
+
+    if (rOrd_SetCompRequiresSetm(r))
+    {
+      do
+      {
+        p_SetComp(p, i, r);
+        p_SetmComp(p, r);
+#ifdef PDEBUG
+        l++;
+#endif
+        pIter(p);
+      }
+      while (p != NULL);
+    }
+    else
+    {
+      do
+      {
+        p_SetComp(p, i, r);
+#ifdef PDEBUG
+        l++;
+#endif
+        pIter(p);
+      }
+      while(p != NULL);
+    }
+#ifdef PDEBUG
+    p_Test(q, r);
+    assume(l == pLength(q));
+#endif
+  }
+}
+
 static inline   void p_SetCompP(poly a, int i, ring lmRing, ring tailRing);
+{
+  if (p != NULL)
+  {
+    p_SetComp(p, i, lmRing);
+    p_SetmComp(p, lmRing);
+    p_SetCompP(pNext(p), i, tailRing);
+  }
+}
 
 // returns maximal column number in the modul element a (or 0)
 static inline long p_MaxComp(poly p, ring lmRing, ring tailRing)
