@@ -1,20 +1,29 @@
 lib_LIBRARIES=libresources.a libresources_g.a
 
-AM_CFLAGS	= -O3 -w -fomit-frame-pointer ${PIPE}
-CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
-AM_CXXFLAGS	= -O3 -w -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
-INCLUDES	= -I${top_srcdir}/.. -I${top_srcdir}/../.. -I${top_builddir}/..
-AM_CPPFLAGS	= -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
+CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
+
+libresources_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
+libresources_g_a_CFLAGS = ${PIPE}
+
+libresources_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+libresources_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
+# -fdiagnostics-show-option 
+
+libresources_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
+libresources_g_a_CPPFLAGS = -DHAVE_CONFIG_H
+
+INCLUDES = -I${top_srcdir}/.. -I${top_srcdir}/../.. -I${top_builddir}/..
 
 SOURCES = feFopen.cc feResource.cc
-
-libresources_a_SOURCES = $(SOURCES)
-
-libresources_a_includedir=$(includedir)/libpolys/resources
-
-libresources_a_include_HEADERS = feFopen.h feResource.h
-
+libresources_a_SOURCES   = $(SOURCES)
 libresources_g_a_SOURCES = $(SOURCES)
 
-libresources_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
-# -fdiagnostics-show-option
+libresources_a_includedir  =$(includedir)/libpolys/resources
+libresources_g_a_includedir=$(includedir)/libpolys/resources
+
+RESOURCESHEADERS  = feFopen.h feResource.h
+libresources_a_include_HEADERS   = $(RESOURCESHEADERS)
+libresources_g_a_include_HEADERS = $(RESOURCESHEADERS)
+
+
+

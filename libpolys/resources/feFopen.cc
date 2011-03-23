@@ -5,8 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <resources/config.h>
-
+#include "config.h"
 #include <misc/auxiliary.h>
 
 #include <omalloc/omalloc.h>
