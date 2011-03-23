@@ -13,7 +13,7 @@ SOURCES = \
 	pDebug.cc pInline0.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc \
-	polys0.cc prCopy.cc prCopyTemplate.cc \
+	polys0.cc prCopy.cc \
 	kbuckets.cc sbuckets.cc templates/p_Procs.cc weight.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
@@ -70,3 +70,8 @@ libpolys_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long
 #  -fdiagnostics-show-option
 
 dynamic_modules: ${module_LTLIBRARIES}
+
+prCopy.inc: prCopy.pl
+	perl prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
+
+prCopy.o: prCopy.inc
