@@ -20,19 +20,6 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 
-// returns minimal column number in the modul element a (or 0)
-BOOLEAN   p_IsConstantPoly(const poly p, const ring r)
-{
-  poly pp=p;
-  while(pp!=NULL)
-  {
-    if (! p_LmIsConstantComp(pp, r))
-      return FALSE;
-    pIter(pp);
-  }
-  return TRUE;
-}
-
 /***************************************************************
  *
  * poly things which are independent of ring
