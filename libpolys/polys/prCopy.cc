@@ -8,11 +8,11 @@
 
 #include "polys/config.h"
 #include <omalloc/omalloc.h>
+#include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <coeffs/numbers.h>
-// #include <polys/structs.h>
 #include <polys/monomials/ring.h>
-// #include <polys/ideals.h>
+#include <polys/simpleideals.h>
 // #include <polys/sbuckets.h>
 
 static inline void
@@ -29,7 +29,7 @@ prCopyEvector(poly dest, ring dest_r, poly src, ring src_r,int max)
   p_Setm(dest, dest_r);
 }
 
-// #include <polys/prCopy.inc>
+#include <polys/prCopy.inc>
 
 /////////////////////////////////////////////////////////////////////////
 poly prCopyR(poly p, ring src_r, ring dest_r)
@@ -83,7 +83,7 @@ poly prShallowCopyR_NoSort(poly p, ring r, ring dest_r)
   return pr_Copy_NoREqual_NSimple_NoSort(p, r, dest_r);
 }
 
-poly prShallowCopyR(poly p, ring r, ring dest_r = currRing)
+poly prShallowCopyR(poly p, ring r, ring dest_r)
 {
   return pr_Copy_NoREqual_NSimple_Sort(p, r, dest_r);
 }
