@@ -321,8 +321,8 @@ void      pSetPolyComp(poly p, int comp);
 #define   ppJetW(p,m,iv) pp_JetW(p,m,iv,currRing)
 #define   pJetW(p,m,iv) p_JetW(p,m,iv,currRing)
 #define   pMinDeg(p,w) p_MinDeg(p,w,currRing)
-poly      pSeries(int n,poly p,poly u=NULL,intvec *w=NULL);
-poly      pInvers(int n, poly p,intvec *w=NULL);
+#define   pSeries(n,p,u,w) p_series(n,p,u,w,currRing)
+#define   pInvers(n,p,w) p_Invers(n,p,w,currRing)
 // maximum weigthed degree of all monomials of p, w is indexed from
 // 1..pVariables
 #define    pDegW(p,w) p_DegW(p,w,currRing)

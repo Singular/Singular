@@ -1869,5 +1869,10 @@ poly p_JetW(poly p, int m, short *w, const ring R);
 poly      p_PermPoly (poly p, int * perm,const ring OldRing, const ring dst,
                      nMapFunc nMap, int *par_perm=NULL, int OldPar=0);
 
+/*----------------------------------------------------*/
+poly p_Series(int n,poly p,poly u, intvec *w, const ring R);
+poly p_Invers(int n,poly u,intvec *w, const ring R);
+
+
 #endif // P_POLYS_H
 
