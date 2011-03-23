@@ -187,7 +187,18 @@ long p_DegW(poly p, const short *w, const ring R);
 // like the respective p_LmIs* routines, except that p might be empty
 static inline BOOLEAN p_IsConstantComp(const poly p, const ring r);
 static inline BOOLEAN p_IsConstant(const poly p, const ring r);
-static inline BOOLEAN p_IsConstantPoly(const poly p, const ring r);
+static inline BOOLEAN p_IsConstantPoly(const poly p, const ring r)
+{
+  poly pp=p;
+  while(pp!=NULL)
+  {
+    if (! p_LmIsConstantComp(pp, r))
+      return FALSE;
+    pIter(pp);
+  }
+  return TRUE;
+}
+
 
 // return TRUE if all monoms have the same component
 BOOLEAN   p_OneComp(poly p, ring r);
