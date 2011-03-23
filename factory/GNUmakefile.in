@@ -177,6 +177,7 @@ basefactorysrc := \
 		facFqFactorizeUtil.cc \
 		facFqSquarefree.cc \
 		facHensel.cc \
+		facIrredTest.cc \
 		fieldGCD.cc \
 		ffops.cc \
 		ffreval.cc \
@@ -259,6 +260,7 @@ basefactoryincl := \
 		facFqFactorizeUtil.h \
 		facFqSquarefree.h \
 		facHensel.h \
+		facIrredTest.h \
 		fieldGCD.h \
 		ffops.h \
 		ffreval.h \

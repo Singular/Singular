@@ -106,6 +106,9 @@
 /*MAKEHEADER PUBLIC ONLY*/
 #include "cf_util.h"
 
+/*MAKEHEADER PUBLIC ONLY*/
+#include "facIrredTest.h"
+
 #ifdef HAVE_BIFAC
 /*MAKEHEADER PUBLIC ONLY*/
 #include "bifac.h"

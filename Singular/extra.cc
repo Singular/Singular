@@ -3599,6 +3599,22 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         }
       }
       else
+  /*================= probIrredTest ======================*/
+      if (strcmp (sys_cmd, "probIrredTest") == 0)
+      {
+        if (h!=NULL && (h->Typ()== POLY_CMD) && ((h->next != NULL) && h->next->Typ() == STRING_CMD))
+        {
+          CanonicalForm F= convSingPFactoryP((poly)(h->Data()));
+          char *s=(char *)h->next->Data();
+          double error= atof (s);
+          int irred= probIrredTest (F, error);
+          res->rtyp= INT_CMD;
+          res->data= (void*)irred;
+          return FALSE;
+        }
+        else return TRUE;
+      }
+      else
   #endif
   #ifdef ix86_Win
   /*==================== Python Singular =================*/
