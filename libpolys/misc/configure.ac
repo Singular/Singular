@@ -13,6 +13,7 @@ AC_PROG_CXX
 AC_PROG_LN_S
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AM_PROG_CC_C_O
 
 # Checks for libraries.
 
