@@ -68,7 +68,7 @@ LIB "qhmoduli.lib";
 LIB "random.lib";
 LIB "realrad.lib";
 LIB "reesclos.lib";
-LIB "resbin.lib";
+LIB "resbinomial.lib";
 LIB "resgraph.lib";
 LIB "resolve.lib";
 LIB "reszeta.lib";

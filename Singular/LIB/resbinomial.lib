@@ -2,7 +2,7 @@
 version="$Id: resbin.lib$";
 category="Resolution of singularities";
 info="
-LIBRARY: resbin.lib    Combinatorial algorithm of resolution of singularities
+LIBRARY: resbinomial.lib  Combinatorial algorithm of resolution of singularities
                         of binomial ideals in arbitrary characteristic.
                         Binomial resolution algorithm of Blanco
 
