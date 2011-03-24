@@ -2803,7 +2803,9 @@ example
   deltaLoc(f,qr[6]);
 }
 ///////////////////////////////////////////////////////////////////////////////
-// compute the weighted degree of p
+// compute the weighted degree of p;
+// this code is an exact copy of the proc in paraplanecurves.lib
+// (since we do not want to make it non-static)
 static proc w_deg(poly p, intvec v)
 {
    if(p==0){return(-1);}

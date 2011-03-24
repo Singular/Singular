@@ -412,6 +412,19 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// compute the weighted degree of p;
+// this code is an exact copy of the proc in paraplanecurves.lib
+// (since we do not want to make it non-static)
+static proc w_deg(poly p, intvec v)
+{
+   if(p==0){return(-1);}
+   int d=0;
+   while(jet(p,d,v)==0){d++;}
+   d=(transpose(leadexp(jet(p,d,v)))*v)[1];
+   return(d);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 static proc findCoordChange(poly f, ideal JAC)
 "USAGE:  findCoordChange(f, JAC); f poly, JAC ideal.
 ASSUME:  The polynomial f is homogeneous in three variables, JAC is
