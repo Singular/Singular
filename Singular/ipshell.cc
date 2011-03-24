@@ -5384,7 +5384,7 @@ ideal kGroebner(ideal F, ideal Q)
   return resid;
 }
 
-void jjINT_S_TO_ID(int n,int *e, leftv res)
+static void jjINT_S_TO_ID(int n,int *e, leftv res)
 {
   if (n==0) n=1;
   ideal l=idInit(n,1);
@@ -5403,6 +5403,7 @@ void jjINT_S_TO_ID(int n,int *e, leftv res)
     }
   }
   res->data=(char*)l;
+  setFlag(res,FLAG_STD);
   omFreeSize((ADDRESS)e,(pVariables+1)*sizeof(int));
 }
 BOOLEAN jjVARIABLES_P(leftv res, leftv u)
