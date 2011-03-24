@@ -600,7 +600,7 @@ static BOOLEAN jiA_QRING(leftv res, leftv a,Subexpr e)
 
   if ((idElem(id)>1) || rIsSCA(currRing) || (currRing->qideal!=NULL))
     assumeStdFlag(a);
-    
+
 #ifdef HAVE_RINGS
   if (rField_is_Ring(currRing))
   {
@@ -780,7 +780,7 @@ static BOOLEAN jiAssign_1(leftv l, leftv r)
         {
           failed= dAssign[i].p(ld,rn,l->e);
           if (TEST_V_ALLWARN)
-	    Print("assign %s=%s ok? %d\n",Tok2Cmdname(lt),Tok2Cmdname(rn->rtyp),!failed);
+            Print("assign %s=%s ok? %d\n",Tok2Cmdname(lt),Tok2Cmdname(rn->rtyp),!failed);
         }
         // everything done, clean up temp. variables
         rn->CleanUp();
@@ -1042,7 +1042,15 @@ static BOOLEAN jjA_L_INTVEC(leftv l,leftv r,intvec *iv)
   int i = 0;
   while (hh!=NULL)
   {
-    if (i>=iv->length()) break;
+    if (i>=iv->length())
+    {
+      if (TEST_V_ALLWARN)
+      {
+        Warn("expression list length(%d) does not match intmat size(%d)",
+	      iv->length()+exprlist_length(hh),iv->length());
+      }
+      break;
+    }
     if (hh->Typ() == INT_CMD)
     {
       (*iv)[i++] = (int)((long)(hh->Data()));
@@ -1381,18 +1389,18 @@ BOOLEAN iiAssign(leftv l, leftv r)
           omFreeBin((ADDRESS)l->e, sSubexpr_bin);
           l->e=h;
         }
-	if ((!b) && (like_lists==1))
-	{
-	  // check blackbox/newtype type:
-	  if(bb->blackbox_Check(bb,l->Data())) return TRUE;
-	}
+        if ((!b) && (like_lists==1))
+        {
+          // check blackbox/newtype type:
+          if(bb->blackbox_Check(bb,l->Data())) return TRUE;
+        }
         return b;
       }
     }
     // end of handling elems of list and similiar
     rl=r->listLength();
     if (rl==1)
-    {               
+    {
       /* system variables = ... */
       if(((l->rtyp>=VECHO)&&(l->rtyp<=VPRINTLEVEL))
       ||((l->rtyp>=VALTVARS)&&(l->rtyp<=VMINPOLY)))
@@ -1537,6 +1545,11 @@ BOOLEAN iiAssign(leftv l, leftv r)
       {
         num=olm->cols()*olm->rows();
         lm=mpNew(olm->rows(),olm->cols());
+        int el;
+        if ((TEST_V_ALLWARN) && (num!=(el=exprlist_length(hh))))
+        {
+          Warn("expression list length(%d) does not match matrix size(%d)",el,num);
+        }
       }
       else /* IDEAL_CMD or MODUL_CMD */
       {
