@@ -4500,7 +4500,7 @@ poly redtail (LObject* L, int pos, kStrategy strat)
   all_done:
   if (strat->redTailChange)
   {
-    L->last = 0;
+    L->last = NULL;
     L->pLength = 0;
   }
   strat->kHEdgeFound = save_HE;
