@@ -3973,6 +3973,12 @@ static BOOLEAN jjHOMOG1(leftv res, leftv v)
   }
   return FALSE;
 }
+static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
+{
+  res->data = (char *)idMaxIdeal((int)(long)v->Data());
+  setFlag(res,FLAG_STD);
+  return FALSE;
+}
 static BOOLEAN jjIDEAL_Ma(leftv res, leftv v)
 {
   matrix mat=(matrix)v->CopyD(MATRIX_CMD);
@@ -4925,7 +4931,6 @@ static BOOLEAN jjLOAD(leftv res, leftv v, BOOLEAN autoexport)
 #define jjpHead        (proc1)8
 #endif
 #define jjidHead       (proc1)9
-#define jjidMaxIdeal   (proc1)10
 #define jjidMinBase    (proc1)11
 #define jjsyMinBase    (proc1)12
 #define jjpMaxComp     (proc1)13
@@ -4961,7 +4966,6 @@ void jjInitTab1()
         case (int)jjpHead:        dArith1[i].p=(proc1)pHeadProc; break;
 #endif
         case (int)jjidHead:       dArith1[i].p=(proc1)idHead; break;
-        case (int)jjidMaxIdeal:   dArith1[i].p=(proc1)idMaxIdeal; break;
         case (int)jjidMinBase:    dArith1[i].p=(proc1)idMinBase; break;
         case (int)jjsyMinBase:    dArith1[i].p=(proc1)syMinBase; break;
         case (int)jjpMaxComp:     dArith1[i].p=(proc1)pMaxCompProc; break;
@@ -5026,11 +5030,6 @@ static BOOLEAN jjpHead(leftv res, leftv v)
 static BOOLEAN jjidHead(leftv res, leftv v)
 {
   res->data = (char *)idHead((ideal)v->Data());
-  return FALSE;
-}
-static BOOLEAN jjidMaxIdeal(leftv res, leftv v)
-{
-  res->data = (char *)idMaxIdeal((int)(long)v->Data());
   return FALSE;
 }
 static BOOLEAN jjidMinBase(leftv res, leftv v)
