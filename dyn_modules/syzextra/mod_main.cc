@@ -53,7 +53,7 @@ static int getOptionalInteger(const leftv& h, const int _n)
   return (_n);  
 }
 
-BOOLEAN noop(leftv __res, leftv __v)
+BOOLEAN noop(leftv __res, leftv /*__v*/)
 {
   NoReturn(__res);
   return FALSE;
@@ -148,14 +148,14 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
 
   if( h->Typ() == RESOLUTION_CMD )
   {
-    const syStrategy syzstr = reinterpret_cast<syStrategy>(h->Data());
+    const syStrategy syzstr = reinterpret_cast<const syStrategy>(h->Data());
 
     h = h->Next();
 
     int nTerms = getOptionalInteger(h, 1);
 
 
-    Print("RESOLUTION_CMD(%p): ", reinterpret_cast<void*>(syzstr)); PrintLn();
+    Print("RESOLUTION_CMD(%p): ", reinterpret_cast<const void*>(syzstr)); PrintLn();
 
     const ring save = currRing;
     const ring r = syzstr->syRing;
@@ -170,7 +170,7 @@ static BOOLEAN DetailedPrint(leftv __res, leftv h)
     Print("short 'references': %hd", syzstr->references); PrintLn();
 
 
-#define PRINT_pINTVECTOR(s, v) Print("intvec '%10s'(%p)", #v, (s)->v); \
+#define PRINT_pINTVECTOR(s, v) Print("intvec '%10s'(%p)", #v, reinterpret_cast<const void*>((s)->v)); \
 if( (s)->v != NULL ){ PrintS(": "); view((s)->v); }; \
 PrintLn();
 
@@ -198,7 +198,7 @@ PrintLn();
     PrintLn();
 
     const SRes rP = syzstr->resPairs;
-    Print("SRes 'resPairs': %p", rP); PrintLn();
+    Print("SRes 'resPairs': %p", reinterpret_cast<const void*>(rP)); PrintLn();
 
     if (rP != NULL)
       for (int iLevel = 0; (iLevel < iLength) && (rP[iLevel] != NULL) && ((*syzstr->Tl)[iLevel] >= 0); iLevel++)
@@ -215,12 +215,12 @@ PrintLn();
 
 
     //  const ring rrr = (iLevel > 0) ? rr : save; ?
-#define PRINT_RESOLUTION(s, v) Print("resolution '%12s': %p", #v, (s)->v); PrintLn(); \
+#define PRINT_RESOLUTION(s, v) Print("resolution '%12s': %p", #v, reinterpret_cast<const void*>((s)->v)); PrintLn(); \
 if ((s)->v != NULL) \
   for (int iLevel = 0; (iLevel < iLength) && ( ((s)->v)[iLevel] != NULL ); iLevel++) \
   { \
-    const ring rrr = (iLevel > 0) ? save : save; \
-    Print("id '%10s'[%d]: (%p) ncols = %d / size: %d; nrows = %d, rank = %ld / rk: %ld", #v, iLevel, ((s)->v)[iLevel], ((s)->v)[iLevel]->ncols, idSize(((s)->v)[iLevel]), ((s)->v)[iLevel]->nrows, ((s)->v)[iLevel]->rank, -1L/*idRankFreeModule(((s)->v)[iLevel], rrr)*/ ); \
+    /* const ring rrr = (iLevel > 0) ? save : save; */ \
+    Print("id '%10s'[%d]: (%p) ncols = %d / size: %d; nrows = %d, rank = %ld / rk: %ld", #v, iLevel, reinterpret_cast<const void*>(((s)->v)[iLevel]), ((s)->v)[iLevel]->ncols, idSize(((s)->v)[iLevel]), ((s)->v)[iLevel]->nrows, ((s)->v)[iLevel]->rank, -1L/*idRankFreeModule(((s)->v)[iLevel], rrr)*/ ); \
     PrintLn(); \
   } \
   PrintLn();
@@ -235,7 +235,7 @@ if ((s)->v != NULL) \
     PRINT_RESOLUTION(syzstr, orderedRes);
 #undef PRINT_RESOLUTION
 
-#define PRINT_POINTER(s, v) Print("pointer '%17s': %p", #v, (s)->v); PrintLn();
+#define PRINT_POINTER(s, v) Print("pointer '%17s': %p", #v, reinterpret_cast<const void*>((s)->v)); PrintLn();
     // 2d arrays:
     PRINT_POINTER(syzstr, truecomponents);
     PRINT_POINTER(syzstr, ShiftedComponents);
@@ -257,7 +257,7 @@ if ((s)->v != NULL) \
       PrintLn();
     } else
     {
-      Print("resolution 'fullres': (%p) => resolution seems to be computed already", syzstr->fullres);
+      Print("resolution 'fullres': (%p) => resolution seems to be computed already", reinterpret_cast<const void*>(syzstr->fullres));
       PrintLn();
       dPrint(*syzstr->fullres, save, save, nTerms);
     }
@@ -271,7 +271,7 @@ if ((s)->v != NULL) \
       PrintLn();
     } else
     {
-      Print("resolution 'minres': (%p) => resolution seems to be minimized already", syzstr->minres);
+      Print("resolution 'minres': (%p) => resolution seems to be minimized already", reinterpret_cast<const void*>(syzstr->minres));
       PrintLn();
       dPrint(*syzstr->minres, save, save, nTerms);
     }
@@ -395,7 +395,7 @@ static BOOLEAN leadrawexp(leftv res, leftv h)
 
     const int iExpSize = r->ExpL_Size;
 
-    intvec *iv = new intvec(iExpSize);
+//    intvec *iv = new intvec(iExpSize);
 
     lists l=(lists)omAllocBin(slists_bin);
     l->Init(iExpSize);
@@ -417,7 +417,7 @@ static BOOLEAN leadrawexp(leftv res, leftv h)
 
 
 /// Endowe the current ring with additional (leading) Syz-component ordering
-static BOOLEAN MakeSyzCompOrdering(leftv res, leftv h)
+static BOOLEAN MakeSyzCompOrdering(leftv res, leftv /*h*/)
 {
 
   NoReturn(res);

@@ -1,30 +1,23 @@
 echo = 2;
 
-LIB("./bigintm.so");
+"ndebug?: ", system("with", "ndebug");
+"om_ndebug?: ", system("with", "om_ndebug");
 
-bigintm_print_load_counter();
-printBlackboxTypes();
-
-
-LIB("./bigintm.so");
-
-bigintm_print_load_counter();
-printBlackboxTypes();
-
-LIB("./bigintm.so");
-
-bigintm_print_load_counter();
-printBlackboxTypes();
-
+if( system("with", "ndebug") )
+{
+  "Loading the Release version!";
+  LIB("./bigintm.so");
+}
+else
+{
+  "Loading the Debug version!";
+  LIB("./bigintm_g.sog");
+}
 
 printBlackboxTypes();
-
 bigintm_setup();
-
 printBlackboxTypes();
-
 bigintm_setup();
-
 printBlackboxTypes();
 
 

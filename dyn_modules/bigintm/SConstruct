@@ -1,4 +1,8 @@
 # Emacs edit mode for this file is -*- python -*-
+
+MODNAME = 'bigintm'
+SRCS = ["bigintm.cc", "mod_main.cc"]
+
 env = Environment()
 
 import os
@@ -8,11 +12,39 @@ SING_INCLUDES=[SINGULAR_HOME, SINGULAR_HOME+"/omalloc"]
 # , SINGULAR_HOME+"/factory"
 
 
-sing_psico_int_if = env.SharedLibrary('bigintm',
-                               ["bigintm.cc", "mod_main.cc"],
-                               SHLIBPREFIX="", LDMODULESUFFIX=".so",
-                               CPPPATH = SING_INCLUDES,
-                               LIBS=[])
+#env.SharedObject(target = 'mod_main.o', source = 'mod_main.cc')
 
-Default(sing_psico_int_if)
+CXXTEMPLFLAGS = "-fno-implicit-templates --no-exceptions"
 
+
+
+
+### for the use with "scons debug=1"
+if ARGUMENTS.get('debug', 0):
+    ### Works with Singularg only!
+    syzextra_debug_if = env.LoadableModule( MODNAME + '_g',
+        SRCS,
+        SHLIBPREFIX="",
+        LDMODULESUFFIX=".sog",
+        SHLIBSUFFIX = ".sog",
+        CPPPATH = SING_INCLUDES,
+        CXXFLAGS = "-g -Wextra -Wall -pedantic -Wno-long-long " + CXXTEMPLFLAGS,
+        LIBS=[])
+    Default(syzextra_debug_if)
+else:
+    ### Works with any Singular
+    syzextra_if = env.SharedLibrary(MODNAME,
+        SRCS,
+        SHLIBPREFIX="",
+        LDMODULESUFFIX=".so",
+        SHLIBSUFFIX = ".so",
+        CPPPATH = SING_INCLUDES,
+        CPPDEFINES = ["NDEBUG", "OM_NDEBUG"],
+        CXXFLAGS = "-O3 -fomit-frame-pointer --no-rtti " + CXXTEMPLFLAGS,
+        CCFLAGS="-O3 -fomit-frame-pointer ",
+        LIBS=[])
+    Default(syzextra_if)
+
+
+
+### clean with "scons -c ."

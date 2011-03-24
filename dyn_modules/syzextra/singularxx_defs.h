@@ -26,7 +26,7 @@
 #define SINGULAR_singular_defs_h_
 
 #define BEGIN_NAMESPACE(a) namespace a {
-#define END_NAMESPACE };
+#define END_NAMESPACE }
 #define USING_NAMESPACE(a) using namespace a;
 
 #define SINGULARXXNAME Singular

@@ -1,4 +1,8 @@
 # Emacs edit mode for this file is -*- python -*-
+
+MODNAME = 'syzextra'
+SRCS = ["mod_main.cc", "DebugPrint.cc", "myNF.cc"]
+
 env = Environment()
 
 import os
@@ -10,21 +14,37 @@ SING_INCLUDES=[SINGULAR_HOME, SINGULAR_HOME+"/omalloc"]
 
 #env.SharedObject(target = 'mod_main.o', source = 'mod_main.cc')
 
+CXXTEMPLFLAGS = "-fno-implicit-templates --no-exceptions"
 
-### Works with any Singular
-#syzextra_if = env.SharedLibrary('syzextra',
-#                               ["mod_main.cc", "DebugPrint.cc", "myNF.cc"],
-#                               SHLIBPREFIX="", LDMODULESUFFIX=".so", CPPDEFINES = 'NDEBUG', SHLIBSUFFIX = ".so",
-#                               CPPPATH = SING_INCLUDES,
-#                               LIBS=[])
 
-### Works with Singularg only!
-syzextra_debug_if = env.LoadableModule('syzextra_g',
-                               ["mod_main.cc", "DebugPrint.cc", "myNF.cc"],
-                               SHLIBPREFIX="", LDMODULESUFFIX=".sog", SHLIBSUFFIX = ".sog",
-                               CPPPATH = SING_INCLUDES,
-                               LIBS=[])
 
-# Default(syzextra_if)
-# Default(syzextra_debug_if)
 
+### for the use with "scons debug=1"
+if ARGUMENTS.get('debug', 0):
+    ### Works with Singularg only!
+    syzextra_debug_if = env.LoadableModule( MODNAME + '_g',
+        SRCS,
+        SHLIBPREFIX="",
+        LDMODULESUFFIX=".sog",
+        SHLIBSUFFIX = ".sog",
+        CPPPATH = SING_INCLUDES,
+        CXXFLAGS = "-g -Wextra -Wall -pedantic -Wno-long-long " + CXXTEMPLFLAGS,
+        LIBS=[])
+    Default(syzextra_debug_if)
+else:
+    ### Works with any Singular
+    syzextra_if = env.SharedLibrary(MODNAME,
+        SRCS,
+        SHLIBPREFIX="",
+        LDMODULESUFFIX=".so",
+        SHLIBSUFFIX = ".so",
+        CPPPATH = SING_INCLUDES,
+        CPPDEFINES = ["NDEBUG", "OM_NDEBUG"],
+        CXXFLAGS = "-O3 -fomit-frame-pointer --no-rtti " + CXXTEMPLFLAGS,
+        CCFLAGS="-O3 -fomit-frame-pointer ",
+        LIBS=[])
+    Default(syzextra_if)
+
+
+
+### clean with "scons -c ."
