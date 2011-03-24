@@ -2887,23 +2887,26 @@ BOOLEAN gnc_CheckOrdCondition(matrix D, ring r)
 }
 
 
-BOOLEAN nc_CallPlural(
-                      matrix CCC, matrix DDD,
+
+/// returns TRUE if there were errors
+/// analyze inputs, check them for consistency
+/// detects nc_type, DO NOT initialize multiplication but call for it at the end
+/// checks the ordering condition and evtl. NDC
+/// NOTE: all the data belong to the curr,
+/// we change r which may be the same ring, and must have the same representation!
+BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
                       poly CCN, poly DDN,
                       ring r,
                       bool bSetupQuotient, bool bCopyInput, bool bBeQuiet,
-                      ring curr, BOOLEAN dummy_ring /*=FALSE*/)
-  /* returns TRUE if there were errors */
-  /* analyze inputs, check them for consistency */
-  /* detects nc_type, DO NOT initialize multiplication but call for it at the end*/
-  /* checks the ordering condition and evtl. NDC */
-// NOTE: all the data belong to the curr,
-// we change r which may be the same ring, and must have the same representation!
+                      ring curr, bool dummy_ring /*=false*/)
 {
-  assume( r->qideal == NULL ); // The basering must NOT be a qring!
+  assume( r != NULL );
+  assume( curr != NULL );
 
-//  assume( curr != r );
-  assume( rSamePolyRep(r, curr) );
+  if( !bSetupQuotient) 
+    assume( (r->qideal == NULL) ); // The basering must NOT be a qring!??
+
+  assume( rSamePolyRep(r, curr) || bCopyInput ); // wrong assumption?
 
 
   if( r->N == 1 ) // clearly commutative!!!
@@ -2959,13 +2962,6 @@ BOOLEAN nc_CallPlural(
 
   if( currRing != r )
     rChangeCurrRing(r);
-
-#ifndef NDEBUG
-  idTest((ideal)CCC);
-  idTest((ideal)DDD);
-  pTest(CCN);
-  pTest(DDN);
-#endif
 
   matrix CC = NULL;
   poly CN = NULL;
@@ -3053,6 +3049,11 @@ BOOLEAN nc_CallPlural(
     for(i=1; i<r->N; i++)
       for(j=i+1; j<=r->N; j++)
         MATELEM(C,i,j) = prCopyR_NoSort(CN, curr, r); // nc_p_CopyPut(CN, r); // copy CN from curr into r
+
+#ifndef NDEBUG
+    idTest((ideal)C);
+#endif
+    
   } else
   if ( (CN == NULL) && (CC != NULL) ) /* copy matrix C */
   {
@@ -3090,6 +3091,9 @@ BOOLEAN nc_CallPlural(
     if( bCopyInput )
     {
       C = mpCopy(CC, curr, r); // Copy C into r!!!???
+#ifndef NDEBUG
+      idTest((ideal)C);
+#endif
       bCnew = true;
     }
     else
@@ -3119,6 +3123,9 @@ BOOLEAN nc_CallPlural(
       for(i=1; i<r->N; i++)
         for(j=i+1; j<=r->N; j++)
           MATELEM(D,i,j) = prCopyR_NoSort(DN, curr, r); // project DN into r->GetNC()->basering!
+#ifndef NDEBUG
+  idTest((ideal)D);
+#endif
   }
   else /* DD != NULL */
   {
@@ -3143,11 +3150,13 @@ BOOLEAN nc_CallPlural(
     if( bCopyInput )
     {
       D = mpCopy(DD, curr, r); // Copy DD into r!!!
+#ifndef NDEBUG
+      idTest((ideal)D);
+#endif
       bDnew = true;
     }
     else
       D = DD;
-
   }
 
   assume( C != NULL );
@@ -3162,8 +3171,6 @@ BOOLEAN nc_CallPlural(
 
   Print("\nTemporary: type = %d, IsSkewConstant = %d\n", nctype, IsSkewConstant);
 #endif
-
-
 
 
   // check the ordering condition for D (both matrix and poly cases):

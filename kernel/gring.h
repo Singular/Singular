@@ -22,7 +22,7 @@ BOOLEAN nc_CallPlural(matrix cc, matrix dd, poly cn, poly dn, ring r,
                       bool bCopyInput = true,
                       bool bBeQuiet = false,
                       ring curr = currRing,
-                      BOOLEAN dummy_ring=FALSE 
+                      bool dummy_ring = false 
 		      /* allow to create a nc-ring with 1 variable*/);
 
 // BOOLEAN nc_CheckOrdCondition(matrix D, ring r);

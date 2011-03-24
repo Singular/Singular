@@ -108,12 +108,11 @@ matrix mpCopy(const matrix a, const ring rSrc, const ring rDst)
 {
   const ring save = currRing;
 
-  if( save != currRing )
+#ifndef NDEBUG
+  if( currRing != rSrc )
     rChangeCurrRing(rSrc);
-
   idTest((ideal)a);
-
-  rChangeCurrRing(rDst);
+#endif
 
   poly t;
   int i, m=MATROWS(a), n=MATCOLS(a);
@@ -131,7 +130,11 @@ matrix mpCopy(const matrix a, const ring rSrc, const ring rDst)
   }
   b->rank=a->rank;
 
+#ifndef NDEBUG
+  if( currRing != rDst )
+    rChangeCurrRing(rDst);
   idTest((ideal)b);
+#endif
 
   if( save != currRing )
     rChangeCurrRing(save);

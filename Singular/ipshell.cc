@@ -2438,7 +2438,13 @@ ring rCompose(const lists  L)
   #ifdef HAVE_PLURAL
   if (L->nr==5)
   {
-    if (nc_CallPlural((matrix)L->m[4].Data(),(matrix)L->m[5].Data(),NULL,NULL,R, true)) goto rCompose_err;
+    if (nc_CallPlural((matrix)L->m[4].Data(),
+                      (matrix)L->m[5].Data(),
+                      NULL,NULL,
+                      R,
+                      true, // !!!
+                      true, false,
+                      currRing, FALSE)) goto rCompose_err;
     // takes care about non-comm. quotient! i.e. calls "nc_SetupQuotient" due to last true
   }
   #endif
