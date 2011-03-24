@@ -876,7 +876,7 @@ Comments should be send to the author of the library directly.
 * multigrading_lib:: Multigradings and related computations
 * paraplanecurves_lib:: Rational parametrization of rational plane curves
 * primdecint_lib:: primary decomposition over the integers
-* resbin_lib:: Resolution of singularities of binomial ideals
+* resbinomial_lib:: Resolution of singularities of binomial ideals
 * resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
 * surfacesignature_lib:: signature of surface singularities
 * ncfactor_lib::Tools for factorization in some noncommutative algebras
@@ -943,28 +943,28 @@ Todos/Issues:
 @c lib paraplanecurves.lib
 
 @c ----------------------------------------------------------
-@node primdecint_lib,resbin_lib,paraplanecurves_lib, Experimental libraries
+@node primdecint_lib,resbinomial_lib,paraplanecurves_lib, Experimental libraries
 @subsection primdecint_lib
 @cindex primdecint_lib
 
 @c lib primdecint.lib
 
 @c ---------------------------------------------------------
-@node resbin_lib, resjung_lib, primdecint_lib, Experimental libraries
-@subsection resbin_lib
+@node resbinomial_lib, resjung_lib, primdecint_lib, Experimental libraries
+@subsection resbinomial_lib
 
 Todos/Issues:
 @itemize
 @item formatting is inapprociate
 @item avoid export
 @item bad names(or should be static):
-inidata, data, identifyvars, elimrep, convertdata, lcmofall, genoutput, salida,
-iniD, reslist, sumlist, dividelist, createlist, list0
+identifyvars, elimrep, convertdata, lcmofall, genoutput, salida,
+iniD, reslist, sumlist, dividelist, createlist
 @end itemize
 
-@c lib resbin.lib
+@c lib resbinomial.lib
 @c ---------------------------------------------------------
-@node resjung_lib, surfacesignature_lib, resbin_lib, Experimental libraries
+@node resjung_lib, surfacesignature_lib, resbinomial_lib, Experimental libraries
 @subsection resjung_lib
 
 @c lib resjung.lib

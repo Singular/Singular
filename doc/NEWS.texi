@@ -103,7 +103,7 @@ new library: paraplanecurves.lib (see @nref{paraplanecurves_lib}: Rational param
 @item
 new library: primdecint.lib (see @nref{primdecint_lib}: primary decomposition over the integers)
 @item
-new library: resbin.lib (see @nref{resbin_lib}: resolution of singularities of binomial ideals
+new library: resbinomial.lib (see @nref{resbinomial}: resolution of singularities of binomial ideals
 @item
 new library: resjung.lib (see @nref{resjung_lib}: resolution of surface singularities by Jung's Algorithm
 @item
