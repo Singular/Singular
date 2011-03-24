@@ -25,6 +25,10 @@
 @heading User defined types
 New types can be defined, see @nref{User defined types}.
 
+@heading Handling objects from @code{python}
+(Experimental) The new data type @code{pyobject} allows to access some
+@code{python} funtionality within @sc{Singular}, see @nref{pyobject}.
+
 @heading New @sc{Singular} functions
 @itemize @bullet
 @item
