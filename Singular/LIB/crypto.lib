@@ -1625,7 +1625,7 @@ EXAMPLE:example testElliptic; shows an example
 {
    int pr=printlevel;
    def R=basering;
-   ring S=q,(y,x),lp;
+   ring S=q,(y,x),(L(100000),lp);
    number a=imap(R,a);
    number b=imap(R,b);
    poly F=y2-x3-a*x-b;       // the curve C
