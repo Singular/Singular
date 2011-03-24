@@ -771,8 +771,6 @@ ASSUME:  The basering must be a polynomial ring in three variables, say x,y,z,
 RETURN:  ideal containing the adjoint ideal of the curve defined by f. @*
 "
 {
-"#############################################";
-int totalTime = timer;
   poly dhf = subst(f,var(3),1);
   def Roriginal = basering;
   list rl = ringlist(Roriginal);
@@ -794,7 +792,6 @@ int totalTime = timer;
   rl[3] = list(list("dp",1),list("C",0));
   def QF = ring(rl);   // make var(1) transcendental
   list LIntB;
-int t = timer;
   if(DATA[1] <= 4)  // use normalization algorithm
     {
       LIntB = integralBasis(f, 2, list(list("inputC", DATA[3]),"isIrred"));
@@ -811,8 +808,6 @@ int t = timer;
       if(gg!=0){ERROR("not a rational curve");}
       setring Rdummy;
     }
-t = timer - t;
-"### adjointIdealIB, IB-time:", t, "msec";
   int i,j,k,l;
   ideal IB = LIntB[1];
   poly d = LIntB[2];
@@ -826,10 +821,7 @@ t = timer - t;
   matrix M = imap(Rred,M);
   poly d = imap(Rdummy,d);
   M=1/d*M;
-t = timer;
   list LUM = ludecomp(M);
-t = timer - t;
-"### adjointIdealIB, time for 1st ludecomp:", t, "msec";
   list LS;
   matrix dummyvector[sL][1];
   matrix Gij[sL][sL];
@@ -838,7 +830,6 @@ t = timer - t;
   poly eiej;
   list Iij, empty;
   matrix Gij[sL][sL];
-t = timer;
   for(i = 1; i <= sL; i++)
      {
        for(j = i; j <= sL; j++)
@@ -869,12 +860,7 @@ t = timer;
              Tr[i,j] = Tr[j,i];
           }
      }
-t = timer - t;
-"### adjointIdealIB, time for linear solving:", t, "msec";
-t = timer;
   LUM = ludecomp(Tr);
-t = timer - t;
-"### adjointIdealIB, time for 2nd ludecomp:", t, "msec";
   setring Rred;
   poly d2f = imap(Rdummy,d2f);
   IB = d2f*IB;
@@ -886,16 +872,12 @@ t = timer - t;
   ideal LL = ideal(LS[2]);
   setring Roriginal;
   ideal AI = imap(QF,LL);
-totalTime = timer - totalTime;
-"### adjointIdealIB, total time:", totalTime, "msec";
   return(AI);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 static proc adjointIdealIQ(poly f, list choices)
 {
-"#############################################";
-int totalTime = timer;
   poly dhf = subst(f,var(3),1);
   def Roriginal = basering;
   list rl = ringlist(Roriginal);
@@ -906,7 +888,6 @@ int totalTime = timer;
   list DATA = imap(Roriginal,choices);
   poly f = imap(Roriginal,dhf);
   list LIntB;
-int t = timer;
   if(DATA[1] <= 4)  // use normalization algorithm
     {
       LIntB = integralBasis(f, 2, list(list("inputC", DATA[3]),"isIrred"));
@@ -923,24 +904,17 @@ int t = timer;
       if(gg!=0){ERROR("not a rational curve");}
       setring Rdummy;
     }
-t = timer - t;
-"### adjointIdealIQ, IB-time:", t, "msec";
   int i,j,k,l;
   ideal IB = LIntB[1];
   poly d = LIntB[2];
   ideal fd = f, d;
   ideal IBf = IB, f;
-t = timer;
   ideal AI = quotient(fd, IBf);
-t = timer - t;
-"### adjointIdealIQ, quot-time:", t, "msec";
 //"#### IB:"; IB;
 //"#### d:", d;
   setring Roriginal;
   ideal AI = imap(Rdummy,AI);
 //"#### AI:"; AI;
-totalTime = timer - totalTime;
-"### adjointIdealIQ, total time:", totalTime, "msec";
   return(AI);
 }
 
@@ -2405,14 +2379,11 @@ NOTE:    This method calles rationalPointConic, measures time consumption
   else                         { "p is not quadratic.";   return (0); }
   if (isIrreducible(pp) == 1)  { "p is irreducible."; }
   else                         { "p is not irreducible."; return (0); }
-  int tps = system("--ticks-per-sec");
-  system("--ticks-per-sec", 1000);
   def rOrig = basering;
   int t = rtimer;
   def rNew = rationalPointConic(pp);
   t = rtimer - t;
-  "time for finding a point on the conic [msec] =", t;
-  system("--ticks-per-sec", tps);
+  "time for finding a point on the conic [sec] =", t;
   setring rNew;
   poly ff = fetch(rOrig, pp);
   if (minpoly == 0)
