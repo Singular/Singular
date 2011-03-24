@@ -362,15 +362,15 @@ example
    ideal I4=13a2,17b4;
    ideal I5=9c5,6d5;
    ideal I6=17,a15,b15,c15,d15;
-   ideal I=intersect(I1,I2);
-   I=intersect(I,I3);
-   I=intersect(I,I4);
-   I=intersect(I,I5);
-   I=intersect(I,I6);
+   ideal I=intersectZ(I1,I2);
+   I=intersectZ(I,I3);
+   I=intersectZ(I,I4);
+   I=intersectZ(I,I5);
+   I=intersectZ(I,I6);
    primdecZ(I);
-   ideal J=intersect(ideal(17,a),ideal(17,a2,b));
+   ideal J=intersectZ(ideal(17,a),ideal(17,a2,b));
    primdecZ(J);
-   ideal K=intersect(ideal(9,a+3),ideal(9,b+3));
+   ideal K=intersectZ(ideal(9,a+3),ideal(9,b+3));
    primdecZ(K);
 }
 
