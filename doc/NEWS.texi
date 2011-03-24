@@ -46,6 +46,8 @@ new library: cisimplicial.lib (see @nref{cisimplicial_lib}: Is the toric ideal o
 a simplicial toric variety a complete intersection?) - extends and susbtitute cimonom.lib
 @item
 new library: grobcov.lib (see @nref{grobcov_lib}: Groebner Cover for parametric ideals, extends and susbtitutes redcgs.lib
+@item
+renamed @code{resbin.lib} to @code(resbinomial.lib}, see @nref{resbinomial_lib}.
 @end itemize
 
 @heading --------------------------------------------------------------------
