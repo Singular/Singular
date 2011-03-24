@@ -11,16 +11,44 @@ AUTHORS:  Gerhard Pfister             pfister@mathematik.uni-kl.de
 OVERVIEW:
 
   A library for computing the signature of irreducible surface singularity.
-  The signature of a surface singularity is defined in [Durfee, A.: The
-  Signature of Smoothings of Complex Surface Singularities, Math. Ann., 232,
-  85-98 (1978)]. The algorithm we use has been proposed in [Nemethi, A.: The
-  signature of f(x,y)+z^N, Proceedings of Singularity Conference (C.T.C. Wall's
-  60th birthday meeting), Liverpool 1996, London Math.Soc. LN 263(1999),
-  131-149].
+  The signature of a surface singularity is defined in [3]. The algorithm we
+  use has been proposed in [9].
+  Let g in C[x,y] define an isolated curve singularity at 0 in C^2 and
+  f:=z^N+g(x,y). The zero-set V:=V(f) in C^3 of f has an isolated singularity
+  at 0. For a small e>0 let V_e:=V(f-e) in C^3 be the Milnor fibre of (V,0) and
+  s: H_2(V_e,R) x H_2(V_e,R) ---> R be the intersection form (cf. [1],[7]).
+  H_2(V_e,R) is an m-dimensional R-vector space, m the Milnor number of (V,0)
+  (cf. [1],[4],[5],[6]), and s is a symmetric bilinear form.
+  Let sigma(f) be the signature of s, called the signature of the surface
+  singularity (V,0). Formulaes to compute the signature are given by Nemethi
+  (cf. [8],[9]) and van Doorn, Steenbrink (cf. [2]).
+  We have implemented three approaches using Puiseux expansions, the resolution
+  of singularities resp. the spectral pairs of the singularity.
+  
+REFERENCES:
+
+ [1] Arnold, V.I.; Gusein-Zade, S.M.; Varchenko, A.N.: Singularities of
+     Differentiable Mappings. Vol. 1,2, Birkh\"auser (1988).
+ [2] van Doorn, M.G.M.; Steenbrink, J.H.M.: A supplement to the monodromy
+     theorem. Abh. Math. Sem. Univ. Hamburg 59, 225-233 (1989).
+ [3] Durfee, A.H.: The Signature of Smoothings of Complex Surface
+     Singularities. Mathematische Annalen 232, 85-98 (1978).
+ [4] de Jong, T.; Pfister, G.: Local Analytic Geometry. Vieweg (2000).
+ [5] Kerner, D.; Nemethi, A.: The Milnor fibre signature is not semi-continous.
+     arXiv:0907.5252 (2009).
+ [6] Kulikov, V.S.: Mixed Hodge Structures and Singularities. Cambridge Tracts
+     in Mathematics 132, Cambridge University Press (1998).
+ [7] Nemethi, A.: The real Seifert form and the spectral pairs of isolated
+     hypersurface singularities. Compositio Mathematica 98, 23-41 (1995).
+ [8] Nemethi, A.: Dedekind sums and the signature of f(x,y)+z^N. Selecta
+     Mathematica, New series, Vol. 4, 361-376 (1998).
+ [9] Nemethi, A.: The Signature of f(x,y)+z^$. Proceedings of Real and Complex
+     Singularities (C.T.C. Wall's 60th birthday meeting, Liverpool (England),
+     August 1996), London Math. Soc. Lecture Notes Series 263, 131--149 (1999).
 
 PROCEDURES:
- brieskornSign(a1,a2,a3);  signature of Brieskorn singularity x^a1+y^a2+z^a3
- signature(N,f);           signature of singularity z^N+f(x,y)=0, f irreducible
+ signatureBrieskorn(a1,a2,a3);  signature of singularity x^a1+y^a2+z^a3
+ signatureNemethi(N,f);         signature of singularity z^N+f(x,y)=0, f irred.
 ";
 
 LIB "hnoether.lib";
@@ -68,10 +96,10 @@ example
 
 ///////////////////////////////////////////////////////////////////////////////
 
-proc brieskornSign(a1,a2,a3)
-"USAGE:  brieskornSign(a1,a2,a3); a1,a2,a3 = integers
+proc signatureBrieskorn(a1,a2,a3)
+"USAGE:  signatureBrieskorn(a1,a2,a3); a1,a2,a3 = integers
 RETURN:  signature of Brieskorn singularity x^a1+y^a2+z^a3
-EXAMPLE: example brieskornSign; shows an example
+EXAMPLE: example signatureBrieskorn; shows an example
 "
 {
    int a_temp, t, k1, k2, k3, s_t, sigma;
@@ -114,7 +142,7 @@ EXAMPLE: example brieskornSign; shows an example
 example
 { "EXAMPLE:"; echo = 2;
    ring R = 0,x,dp;
-   brieskornSign(11,3,5);
+   signatureBrieskorn(11,3,5);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -131,16 +159,16 @@ EXAMPLE: example signatureP; shows an example
 
    if(s == 1)
    {
-      return(brieskornSign(L[1][1], L[2][1], N));
+      return(signatureBrieskorn(L[1][1], L[2][1], N));
    }
 
    prod = 1;
-   sigma = brieskornSign(L[1][s], L[2][s], N);
+   sigma = signatureBrieskorn(L[1][s], L[2][s], N);
    for(i = s - 1; i >= 1; i--)
    {
       prod = prod * L[2][i+1];
       d = gcd(N, prod);
-      sigma = sigma + d * brieskornSign(L[1][i], L[2][i], N/d);
+      sigma = sigma + d * signatureBrieskorn(L[1][i], L[2][i], N/d);
    }
 
    return(sigma);
@@ -358,15 +386,16 @@ static proc etaSpec(list L, int N)
 ///////////////////////////////////////////////////////////////////////////////
 //---------------- Consolidation of the three former variants -----------------
 
-proc signature(int N, poly f, list #)
-"USAGE:  signature(N,f); N = integer, f = reduced poly in 2 variables,
-                         # empty or 1,2,3
+proc signatureNemethi(int N, poly f, list #)
+"USAGE:  signatureNemethi(N,f); N = integer, f = reduced poly in 2 variables,
+                                # empty or 1,2,3
 @*       - if # is empty or #[1] = 2 then resolution of singularities is used
 @*       - if #[1] = 1 then f has to be analytically irreducible and Puiseux
                        expansions are used
 @*       - if #[1] = 3 then spectral pairs are used
 RETURN:  signature of surface singularity defined by z^N + f(x,y) = 0
-EXAMPLE: example signature; shows an example
+REMARK:  computes the signature of some special surface singularities
+EXAMPLE: example signatureNemethi; shows an example
 "
 {
    if(size(#) == 0)
@@ -404,8 +433,8 @@ example
    int N  = 3;
    poly f = x15-21x14+8x13y-6x13-16x12y+20x11y2-x12+8x11y-36x10y2
             +24x9y3+4x9y2-16x8y3+26x7y4-6x6y4+8x5y5+4x3y6-y8;
-   signature(N,f,1);
-   signature(N,f,2);
+   signatureNemethi(N,f,1);
+   signatureNemethi(N,f,2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
