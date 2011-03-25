@@ -1004,7 +1004,7 @@ example
   ring r = 0,(x(1..4)),dp;
   list flag=identifyvar();
   ideal J=x(1)^2-x(2)^2*x(3)^5, x(1)*x(3)^3+x(4)^6;
-  list Lmb=1,list0(4),list0(4),list0(4),iniD(4),iniD(4),list0(4),-1;
+  list Lmb=1,Resbinomial::list0(4),Resbinomial::list0(4),Resbinomial::list0(4),iniD(4),iniD(4),Resbinomial::list0(4),-1;
   list L=data(J,2,4);
   list LL=determinecenter(L[1],L[2],2,4,0,0,Lmb,flag,0,-1); // Compute the first center
   LL[1];  // index of variables in the center
@@ -1021,7 +1021,7 @@ example
   ring r= 0,(x(1..4)),dp;
   list flag=identifyvar();
   ideal J=x(1)^3-x(2)^2*x(3)^5, x(1)*x(3)^3+x(4)^5;
-  list Lmb=2,list0(4),list0(4),list0(4),iniD(4),iniD(4),list0(4),-1;
+  list Lmb=2,Resbinomial::list0(4),Resbinomial::list0(4),Resbinomial::list0(4),iniD(4),iniD(4),Resbinomial::list0(4),-1;
   list L2=data(J,2,4);
   list L3=determinecenter(L2[1],L2[2],2,4,0,0,Lmb,flag,0,-1); // Example with rational exponents in E-Coeff
   L3[1]; // index of variables in the center
