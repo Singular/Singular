@@ -12,7 +12,6 @@ $Id$
 #define GFAN_H
 
 #include <kernel/int64vec.h>
-// #include "int64vec.h"
 
 #define p800
 #ifdef p800
@@ -28,10 +27,10 @@ extern int gfanHeuristic;
 #define USE_ZFAN
 #endif
 #ifndef USE_ZFAN
-lists grfan(ideal inputIdeal, int heuristic, bool singleCone);
+  lists grfan(ideal inputIdeal, int heuristic, bool singleCone);
 #else
-#include <../gfanlib/gfanlib.h>
-gfan::ZFan *grfan(ideal inputIdeal, int h, bool singleCone);
+  #include <../gfanlib/gfanlib.h>
+  gfan::ZFan *grfan(ideal inputIdeal, int h, bool singleCone);
 #endif
 // lists grcone_by_intvec(ideal inputIdeal);
 
