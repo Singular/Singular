@@ -47,7 +47,7 @@ a simplicial toric variety a complete intersection?) - extends and susbtitute ci
 @item
 new library: grobcov.lib (see @nref{grobcov_lib}: Groebner Cover for parametric ideals, extends and susbtitutes redcgs.lib
 @item
-renamed @code{resbin.lib} to @code(resbinomial.lib}, see @nref{resbinomial_lib}.
+renamed @code{resbin.lib} to @code{resbinomial.lib}, see @nref{resbinomial_lib}.
 @end itemize
 
 @heading --------------------------------------------------------------------
@@ -105,7 +105,7 @@ new library: paraplanecurves.lib (see @nref{paraplanecurves_lib}: Rational param
 @item
 new library: primdecint.lib (see @nref{primdecint_lib}: primary decomposition over the integers)
 @item
-new library: resbinomial.lib (see @nref{resbinomial}: resolution of singularities of binomial ideals
+new library: resbinomial.lib (see @nref{resbinomial_lib}: resolution of singularities of binomial ideals
 @item
 new library: resjung.lib (see @nref{resjung_lib}: resolution of surface singularities by Jung's Algorithm
 @item
