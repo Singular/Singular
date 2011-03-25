@@ -4673,12 +4673,8 @@ example
     1,
     0;
 
-  intmat L = preimageLattice(P,B);
-
-  print(L); // should be a (3x2)-matrix with columns e.g. [1,1,-1] and [0,3,-2] (the generated lattice should be identical)
-  
-  kill B, P, L;
-
+  // should be a (3x2)-matrix with columns e.g. [1,1,-1] and [0,3,-2] (the generated lattice should be identical)
+  print(preimageLattice(P,B));
 }
 
 /******************************************************/
@@ -4783,14 +4779,16 @@ EXAMPLE: example projectLattice; shows an example
   {
     if ( r == n )
     {
-      intmat U[n][1]; // U now is the n-dim zero-vector
+      intmat U[1][n]; // U now is the n-dim zero-vector
     }
     else
     {
       // we want a matrix with column operations so we transpose
-      list L = hermiteNormalForm(B, "transform"); //hermite(transpose(B), "transform");
+      intmat BB = transpose(B);
+      list L = hermiteNormalForm(BB, "transform"); 
       intmat U = transpose(L[2]);
 
+ 
       // delete rows 1 to r
       intmat Udel[nrows(U) - r][ncols(U)];
       int k;
@@ -4821,9 +4819,31 @@ example
     3,7,
     4,8;
 
-  // should result in a (2x4)-matrix with columns
-  // [-1, 2], [2, -3], [-1, 0] and [0, 1]
-  intmat U = projectLattice(B);
+  // should result in a (2x4)-matrix such that the corresponding lattice is created by
+  // [-1, 2], [-2, 3], [-1, 0] and [0, 1]
+  print(projectLattice(B));
+
+  // another example
+
+  intmat BB[4][2] =
+    1,0,
+    0,1,
+    0,0,
+    0,0;
+
+  // should result in a (2x4)-matrix such that the corresponding lattice is created by
+  // [0,0],[0,0],[1,0],[0,1]
+  print(projectLattice(BB));
+
+  // one more example
+
+  intmat BBB[3][4] =
+    1,0,1,2,
+    1,1,0,0,
+    3,0,0,3;
+
+  // should result in the (1x3)-matrix that consists of just zeros
+  print(projectLattice(BBB));
 
 }
 
@@ -4913,11 +4933,9 @@ example
     7,10,
     8,11;
 
-  intmat U = intersectLattices(A,B);
-
-  // should result in a (2x4)-matrix with columns
+  // should result in a (3x2)-matrix with columns
   //  e.g. [3, 3, 3], [-3, 0, 3] (the lattice should be the same)
-  print(U);
+  print(intersectLattices(A,B));
 }
 
 proc intInverse(intmat A);
