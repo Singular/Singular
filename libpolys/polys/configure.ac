@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
+AC_INIT([polys], [3.1.2.sw])
 AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([pDebug.cc])
@@ -16,6 +16,7 @@ AC_PROG_LN_S
 #AC_PROG_RANLIB
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
+AM_PROG_CC_C_O
 
 # Checks for libraries.
 
