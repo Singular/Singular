@@ -1859,7 +1859,7 @@ static void mpElimBar(matrix a0, matrix re, poly div, int lr, int lc)
         if (q1 != NULL)
         {
           if (div)
-            SM_DIV(q1, div);                                
+            SM_DIV(q1, div);
           q[j] = q1;
         }
       }
@@ -1872,7 +1872,7 @@ static void mpElimBar(matrix a0, matrix re, poly div, int lr, int lc)
         {
           q1 = SM_MULT(a[j], piv, div);
           if (div)
-            SM_DIV(q1, div);                                
+            SM_DIV(q1, div);
           q[j] = q1;
         }
       }

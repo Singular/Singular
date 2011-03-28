@@ -1155,6 +1155,72 @@ ideal idFreeModule (int i)
   return h;
 }
 
+ideal idSectWithElim (ideal h1,ideal h2)
+// does not destroy h1,h2
+{
+  assume(!idIs0(h1));
+  assume(!idIs0(h2));
+  assume(IDELEMS(h1)<=IDELEMS(h2));
+  assume(idRankFreeModule(h1)==0);
+  assume(idRankFreeModule(h2)==0);
+  // add a new variable:
+  int j;
+  ring origRing=currRing;
+  ring r=rCopy0(origRing);
+  r->N++;
+  r->block0[0]=1;
+  r->block1[0]= r->N;
+  omFree(r->order);
+  r->order=(int*)omAlloc0(3*sizeof(int*));
+  r->order[0]=ringorder_dp;
+  r->order[1]=ringorder_C;
+  char **names=(char**)omAlloc0(rVar(r) * sizeof(char_ptr));
+  for (j=0;j<r->N-1;j++) names[j]=r->names[j];
+  names[r->N-1]=omStrDup("@");
+  omFree(r->names);
+  r->names=names;
+  rComplete(r,TRUE);
+  // fetch h1, h2
+  ideal h;
+  h1=idrCopyR(h1,origRing,r);
+  h2=idrCopyR(h2,origRing,r);
+  // switch to temp. ring r
+  rChangeCurrRing(r);
+  // create 1-t, t
+  poly omt=pOne();
+  pSetExp(omt,r->N,1);
+  poly t=pCopy(omt);
+  pSetm(omt);
+  omt=pNeg(omt);
+  omt=pAdd(omt,pOne());
+  // compute (1-t)*h1
+  h1=(ideal)mpMultP((matrix)h1,omt);
+  // compute t*h2
+  h2=(ideal)mpMultP((matrix)h2,pCopy(t));
+  // (1-t)h1 + t*h2
+  h=idInit(IDELEMS(h1)+IDELEMS(h2),1);
+  int l;
+  for (l=IDELEMS(h1)-1; l>=0; l--)
+  {
+    h->m[l] = h1->m[l];  h1->m[l]=NULL;
+  }
+  j=IDELEMS(h1);
+  for (l=IDELEMS(h2)-1; l>=0; l--)
+  {
+    h->m[l+j] = h2->m[l];  h2->m[l]=NULL;
+  }
+  idDelete(&h1);
+  idDelete(&h2);
+  // eliminate t:
+
+  ideal res=idElimination(h,t);
+  // cleanup 
+  idDelete(&h);
+  res=idrMoveR(res,r,origRing);
+  rChangeCurrRing(origRing);
+  rKill(r);
+  return res;
+}
 /*2
 * h3 := h1 intersect h2
 */
@@ -1183,7 +1249,11 @@ ideal idSect (ideal h1,ideal h2)
   length  = si_max(flength,slength);
   if (length==0)
   {
-    length = 1;
+    if ((currQuotient==NULL)
+    && (currRing->OrdSgn==1)
+    && (!rIsPluralRing(currRing)))
+      return idSectWithElim(first,second);
+    else length = 1;
   }
   j = IDELEMS(first);
 
