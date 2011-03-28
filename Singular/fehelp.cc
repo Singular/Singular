@@ -88,28 +88,8 @@ static int heCurrentHelpBrowserIndex= -1;
  *
  *****************************************************************/
 // order is improtant -- first possible help is choosen
-#if 1
+// moved to LIB/help.cnf
 static heBrowser_s *heHelpBrowsers=NULL;
-#else
-static heBrowser_s heHelpBrowsers[] =
-{
-#ifdef ix86_Win
-//  { "html",     heDummyInit,    heHtmlHelp, NULL, NULL},
-//  { "winhlp",   heDummyInit,    heWinHelp, NULL, NULL},
-#endif
-  { "mozilla",  heGenInit,      heGenHelp, "xDhE:mozilla:", "(mozilla -remote \"openURL(%h)\")||(mozilla %h)"},
-  { "netscape", heGenInit,      heGenHelp, "xDhE:netscape:", "(netscape -remote \"openURL(%h)\")||(netscape %h)"},
-  { "tkinfo",   heGenInit,      heGenHelp, "xDiE:tkinfo:", "tkinfo '(%i)%n' &"},
-  { "xinfo",    heGenInit,      heGenHelp, "xDiE:xterm:E:info:", "xterm -e info -f %i --node='%n' &"},
-  { "mac",      heGenInit,      heGenHelp,  "xhE:open:","open %h" },
-  { "machtml",  heGenInit,      heGenHelp,  "xE:open:","open %H" },
-  { "info",     heGenInit,      heGenHelp, "xiE:info:", "info -f %i --node='%n' &"},
-  { "builtin",  heGenInit,      heBuiltinHelp, "i", NULL},
-  { "dummy",    heDummyInit,    heDummyHelp, NULL, NULL},
-  { "emacs",    heEmacsInit,    heEmacsHelp, NULL, NULL},
-  { NULL, NULL, NULL, NULL, NULL} // must be the last record
-};
-#endif
 
 /*****************************************************************
  *
