@@ -1945,7 +1945,7 @@ static void DefRingPar(intvec* va)
 
   ring res=(ring)omAllocBin(sip_sring_bin);
 
-  memcpy4(res,currRing,sizeof(ip_sring));
+  memcpy(res,currRing,sizeof(ip_sring));
 
   res->VarOffset = NULL;
   res->ref=0;
@@ -2024,7 +2024,7 @@ static void DefRingParlp(void)
 
   ring r=(ring)omAllocBin(sip_sring_bin);
 
-  memcpy4(r,currRing,sizeof(ip_sring));
+  memcpy(r,currRing,sizeof(ip_sring));
 
   r->VarOffset = NULL;
   r->ref=0;

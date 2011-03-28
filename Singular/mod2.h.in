@@ -292,8 +292,6 @@ int hpux9_system(const char* system);
 
 #define HALT() m2_end(2)
 
-#define memcpy4 memcpy
-
 /* define OLD_RES for res/sres/mres(i,j,k) */
 #undef OLD_RES
 

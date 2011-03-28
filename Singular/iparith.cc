@@ -6054,7 +6054,7 @@ static BOOLEAN jjMATRIX_Id(leftv res, leftv u, leftv v,leftv w)
   //  m->m[i]=I->m[i];
   //  I->m[i]=NULL;
   //}
-  memcpy4(m->m,I->m,i*sizeof(poly));
+  memcpy(m->m,I->m,i*sizeof(poly));
   memset(I->m,0,i*sizeof(poly));
   idDelete(&I);
   res->data = (char *)m;
