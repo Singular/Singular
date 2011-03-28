@@ -517,9 +517,12 @@ const char* napRead(const char *s, napoly *b)
 /* considers the lowest terms la of a and lb of b;
    returns the minimum of the two exponents of the
    first variable in la and lb;
+   assumes a != NULL, b != NULL;
    keeps a and b */
 int napExp(napoly a, napoly b)
 {
+  assume(a != NULL);
+  assume(b != NULL);
   while (pNext(a) != NULL) pIter(a);
   int m = p_GetExp(a, 1, nacRing);
   if (m == 0) return 0;
@@ -560,18 +563,19 @@ int napExpi(int i, napoly a, napoly b)
 }
 
 /* divides out the content of the given napoly;
-   modifies the argument */
+   assumes that ph != NULL;
+   modifies ph */
 void napContent(napoly ph)
 {
   number h, d;
   napoly p;
 
-  assume(p != NULL);
+  assume(ph != NULL);
   p = ph;
   if (nacIsOne(pGetCoeff(p))) return;
   h = nacCopy(pGetCoeff(p));
   pIter(p);
-  do
+  while (p != NULL)
   {
     d = nacGcd(pGetCoeff(p), h, nacRing);
     if (nacIsOne(d))
@@ -584,7 +588,6 @@ void napContent(napoly ph)
     h = d;
     pIter(p);
   }
-  while (p != NULL);
   h = nacInvers(d);
   n_Delete(&d, nacRing);
   p = ph;
@@ -598,6 +601,10 @@ void napContent(napoly ph)
   n_Delete(&h, nacRing);
 }
 
+/* removes denominators of coefficients in ph
+   by multiplication with lcm of those;
+   if char != 0, then nothing is done;
+   modifies ph */
 void napCleardenom(napoly ph)
 {
   number d, h;
@@ -608,7 +615,7 @@ void napCleardenom(napoly ph)
   h = nacInit(1,nacRing);
   while (p!=NULL)
   {
-    d = nacLcm(h, pGetCoeff(p), nacRing);
+    d = nacLcm(h, pGetCoeff(p), nacRing); // uses denominator of pGetCoeff(p)
     n_Delete(&h,nacRing);
     h = d;
     pIter(p);
@@ -624,65 +631,62 @@ void napCleardenom(napoly ph)
       pGetCoeff(p) = d;
       pIter(p);
     }
-    n_Delete(&h,nacRing);
   }
+  n_Delete(&h,nacRing);
   napContent(ph);
 }
 
+/* returns the gcd of all coefficients in a and b;
+   assumes a != NULL, b != NULL;
+   keeps a, keeps b */
 napoly napGcd0(napoly a, napoly b)
 {
   number x, y;
+  assume(a != NULL);
+  assume(b != NULL);
   if (!ntIsChar0) return p_ISet(1, nacRing);
   x = nacCopy(pGetCoeff(a));
-  if (nacIsOne(x))
-    return napInitz(x);
-  while (pNext(a)!=NULL)
+  if (nacIsOne(x)) return napInitz(x);
+  pIter(a);
+  while (a!=NULL)
   {
-    pIter(a);
     y = nacGcd(x, pGetCoeff(a), nacRing);
     n_Delete(&x,nacRing);
     x = y;
-    if (nacIsOne(x))
-      return napInitz(x);
+    if (nacIsOne(x)) return napInitz(x);
+    pIter(a);
   }
   do
   {
     y = nacGcd(x, pGetCoeff(b), nacRing);
     n_Delete(&x,nacRing);
     x = y;
-    if (nacIsOne(x))
-      return napInitz(x);
+    if (nacIsOne(x)) return napInitz(x);
     pIter(b);
   }
   while (b!=NULL);
   return napInitz(x);
 }
 
-/*3
-* result =gcd(a,b)
-*/
+/* returns the gcd of a and b;
+   if char != 0, then the constant poly 1 is returned;
+   if a = b = 0, then the constant poly 1 is returned;
+   if a = 0 != b, then b is returned;
+   if a != 0 = b, then a is returned;
+   keeps a, keeps b */
 napoly napGcd(napoly a, napoly b)
 {
   int i;
   napoly g, x, y, h;
-  if ((a==NULL)
-  || ((pNext(a)==NULL)&&(nacIsZero(pGetCoeff(a)))))
+  if (a == NULL)
   {
-    if ((b==NULL)
-    || ((pNext(b)==NULL)&&(nacIsZero(pGetCoeff(b)))))
-    {
-      return p_ISet(1,nacRing);
-    }
-    return napCopy(b);
+    if (b == NULL)    return p_ISet(1,nacRing);
+    else              return napCopy(b);
   }
-  else
-  if ((b==NULL)
-  || ((pNext(b)==NULL)&&(nacIsZero(pGetCoeff(b)))))
-  {
-    return napCopy(a);
-  }
+  else if (b == NULL) return napCopy(a);
+  
   if (naMinimalPoly != NULL)
-  {
+  { // we have an algebraic extension
     if (p_GetExp(a,1,nacRing) >= p_GetExp(b,1,nacRing))
     {
       x = a;
@@ -725,33 +729,33 @@ napoly napGcd(napoly a, napoly b)
     p_Setm(g,nacRing);
     return g;
   }
-  // Hmm ... this is a memory leak
-  // x = (napoly)p_Init(nacRing);
-  g=a;
-  h=b;
-  if (!ntIsChar0) x = p_ISet(1,nacRing);
-  else            x = napGcd0(g,h);
-  for (i=(ntNumbOfPar-1); i>=0; i--)
-  {
-    napSetExp(x,i+1, napExpi(i,a,b));
-    p_Setm(x,nacRing);
+  else
+  { // we have ntNumbOfPar transcendental variables 
+    if (!ntIsChar0) x = p_ISet(1,nacRing);
+    else            x = napGcd0(a,b);
+    for (i=(ntNumbOfPar-1); i>=0; i--)
+    {
+      napSetExp(x,i+1, napExpi(i,a,b));
+      p_Setm(x,nacRing);
+    }
+    return x;
   }
-  return x;
 }
 
-
+/* returns the lcm of all denominators in the coefficients of a;
+   if char != 0, then the constant poly 1 is returned;
+   if a = 0, then the constant poly 1 is returned;
+   keeps a */
 number napLcm(napoly a)
 {
   number h = nacInit(1,nacRing);
-
   if (ntIsChar0)
   {
     number d;
     napoly b = a;
-
     while (b!=NULL)
     {
-      d = nacLcm(h, pGetCoeff(b), nacRing);
+      d = nacLcm(h, pGetCoeff(b), nacRing); // uses denominator of pGetCoeff(b)
       n_Delete(&h,nacRing);
       h = d;
       pIter(b);
@@ -759,7 +763,6 @@ number napLcm(napoly a)
   }
   return h;
 }
-
 
 /*2
 * meins  (for reduction in algebraic extension)
