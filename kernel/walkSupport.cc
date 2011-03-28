@@ -1014,7 +1014,7 @@ void rCopyAndChangeA(int64vec* w)
 //int64vec wv64 added in front of the current order
 //i.e. if old order was O, then the new one will be (A(w),O)
 ///////////////////////////////////////////////////////////////////
-//Uses: omAllocBin,memcpy4,sizeof,nCopy,omStrDup,omMemDup,
+//Uses: omAllocBin,memcpy,sizeof,nCopy,omStrDup,omMemDup,
 //idrCopyR_NoSort
 ///////////////////////////////////////////////////////////////////
 
@@ -1026,7 +1026,7 @@ ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal,
   int i,j;
   ring res=(ring)omAllocBin(sip_sring_bin);
 
-  memcpy4(res,r,sizeof(ip_sring));
+  memcpy(res,r,sizeof(ip_sring));
   res->VarOffset = NULL;
   res->ref=0;
   if (r->algring!=NULL)

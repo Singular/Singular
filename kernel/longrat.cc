@@ -312,7 +312,7 @@ static number nlMapR(number from)
   }
   number r=nlRInit(1);
   mpz_set_d(r->z,f);
-  memcpy4(&(r->n),&h1,sizeof(h1));
+  memcpy(&(r->n),&h1,sizeof(h1));
   r->s=0; /* not normalized */
   if(f_sign==-1) r=nlNeg(r);
   nlNormalize(r);
@@ -419,7 +419,7 @@ static number nlMapLongR(number from)
 //  }
 //  number r=nlRInit(1);
 //  mpz_set_d(&(r->z),f);
-//  memcpy4(&(r->n),&h1,sizeof(h1));
+//  memcpy(&(r->n),&h1,sizeof(h1));
 //  r->s=0; /* not normalized */
 //  nlNormalize(r);
 //  return r;
@@ -434,7 +434,7 @@ static number nlMapLongR(number from)
 //    mpz_setbit(&r->n,f_shift*BYTES_PER_MP_LIMB*8);
 //    mpz_setbit(&r->z,f_size*BYTES_PER_MP_LIMB*8-1);
 //    // now r->z has enough space
-//    memcpy4(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
+//    memcpy(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
 //    nlNormalize(r);
 //  }
 //  else
@@ -444,13 +444,13 @@ static number nlMapLongR(number from)
 //    {
 //      mpz_setbit(&r->z,f_size*BYTES_PER_MP_LIMB*8-1);
 //      // now r->z has enough space
-//      memcpy4(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
+//      memcpy(mpz_limb_d(&r->z),((*f)[0]._mp_d),f_size*BYTES_PER_MP_LIMB);
 //    }
 //    else /* f_shift < 0 */
 //    {
 //      mpz_setbit(&r->z,(f_size-f_shift)*BYTES_PER_MP_LIMB*8-1);
 //      // now r->z has enough space
-//      memcpy4(mpz_limb_d(&r->z)-f_shift,((*f)[0]._mp_d),
+//      memcpy(mpz_limb_d(&r->z)-f_shift,((*f)[0]._mp_d),
 //        f_size*BYTES_PER_MP_LIMB);
 //    }
 //  }

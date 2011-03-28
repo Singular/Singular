@@ -217,7 +217,7 @@ void wFirstSearch(int *A, int *x, int mons,
     if (fmax < fy)
     {
       fy = fmax;
-      memcpy4(xopt, x + 1, a);
+      memcpy(xopt, x + 1, a);
     }
     t--;
   } /* end loop */
@@ -326,7 +326,7 @@ int npol, int mons, double *rel, double *fk, double wNsqr)
       if (s0!=0)
       {
         x[s0]--;
-        memcpy4(xopt, x + 1, n * sizeof(int));
+        memcpy(xopt, x + 1, n * sizeof(int));
         if (s1==0)
           break;
       }
@@ -334,7 +334,7 @@ int npol, int mons, double *rel, double *fk, double wNsqr)
       {
         x[s1]--;
         x[s2]--;
-        memcpy4(xopt, x + 1, n * sizeof(int));
+        memcpy(xopt, x + 1, n * sizeof(int));
       }
       else
         break;

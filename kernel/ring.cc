@@ -810,7 +810,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   ip_sring tmpR;
   memset(&tmpR,0,sizeof(tmpR));
   /* check coeff. field =====================================================*/
-  if (rInternalChar(r1)==rInternalChar(r2))
+  if ((rFieldType(r1)==rFieldType(r2))
+  && (rInternalChar(r1)==rInternalChar(r2)))
   {
     tmpR.ch=rInternalChar(r1);
     if (rField_is_Q(r1)||rField_is_Zp(r1)||rField_is_GF(r1)) /*Q, Z/p, GF(p,n)*/
@@ -830,7 +831,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         }
       }
     }
-    else if ((r1->ch==1)||(r1->ch<-1)) /* Q(a),Z/p(a) */
+    else if (rField_is_Extension(r1)) /* Q(a),Z/p(a) */
     {
       if (r1->minpoly!=NULL)
       {
@@ -927,6 +928,13 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         }
       }
     }
+    #ifdef HAVE_RINGS
+    else if (rField_is_Ring(r1)||rField_is_Ring(r2))
+    {
+      Werror("rSumInternal for rings coeffs");
+      return -1;
+    }
+    #endif
   }
   else /* r1->ch!=r2->ch */
   {
@@ -1529,7 +1537,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   int i,j;
   ring res=(ring)omAllocBin(sip_sring_bin);
   memset(res,0,sizeof(ip_sring));
-  //memcpy4(res,r,sizeof(ip_sring));
+  //memcpy(res,r,sizeof(ip_sring));
   //memset: res->idroot=NULL; /* local objects */
   //ideal      minideal;
   res->options=r->options; /* ring dependent options */
@@ -1649,9 +1657,9 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
       else
         res->wvhdl[j]=NULL;
     }
-    memcpy4(res->order,r->order,i * sizeof(int));
-    memcpy4(res->block0,r->block0,i * sizeof(int));
-    memcpy4(res->block1,r->block1,i * sizeof(int));
+    memcpy(res->order,r->order,i * sizeof(int));
+    memcpy(res->block0,r->block0,i * sizeof(int));
+    memcpy(res->block1,r->block1,i * sizeof(int));
   }
   //memset: else
   //memset: {
@@ -4592,9 +4600,9 @@ ring rAssure_HasComp(ring r)
   new_r->order   = (int *) omAlloc0(i * sizeof(int));
   new_r->block0   = (int *) omAlloc0(i * sizeof(int));
   new_r->block1   = (int *) omAlloc0(i * sizeof(int));
-  memcpy4(new_r->order,r->order,(i-1) * sizeof(int));
-  memcpy4(new_r->block0,r->block0,(i-1) * sizeof(int));
-  memcpy4(new_r->block1,r->block1,(i-1) * sizeof(int));
+  memcpy(new_r->order,r->order,(i-1) * sizeof(int));
+  memcpy(new_r->block0,r->block0,(i-1) * sizeof(int));
+  memcpy(new_r->block1,r->block1,(i-1) * sizeof(int));
   for (int j=0; j<=last_block; j++)
   {
     if (r->wvhdl[j]!=NULL)
