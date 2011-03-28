@@ -10,10 +10,10 @@ module N=B[1],B[2],V[1],V[2];
 module Re=syz(N);
 module Ker;
 int i;
-for(i=1;i<=size(Re);i++){Ker=Ker+Re[i][1..2];}
+for(i=1;i<=ncols(Re);i++){Ker=Ker+Re[i][1..2];}
 Ker;
 
-reduce(M*Ker,std(V));
+reduce(B*Ker,std(V));
 
 modulo(B,V);
 
