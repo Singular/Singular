@@ -221,6 +221,8 @@ string
 test_c_dp
 triang_s
 tst_s
+waitall
+waitfirst
 zerodim_11_32003_lp_slimgb
 zerodim_12_32003_lp_slimgb
 zerodim_13_32003_lp_slimgb
