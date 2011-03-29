@@ -66,11 +66,6 @@ unsigned long p_GetMaxExpL(poly p, const ring r, unsigned long l_max = 0);
 // monomials in p; coeff == 0, next == NULL, ord is not set
 poly p_GetMaxExpP(poly p, ring r);
 
-// return the TotalDegree of the long var l
-static inline unsigned long p_GetTotalDegree(const unsigned long l, const ring r);
-// return the total degree of the long var l containing number_of_exp exponents
-static inline unsigned long p_GetTotalDegree(const unsigned long l, const ring r, const int number_of_exps);
-
 int p_MinDeg(poly p,intvec *w, const ring R);
 
 long p_DegW(poly p, const short *w, const ring R);
@@ -303,13 +298,6 @@ char*     p_String0(poly p, ring lmRing, ring tailRing);
 void      p_Write(poly p, ring lmRing, ring tailRing);
 void      p_Write0(poly p, ring lmRing, ring tailRing);
 void      p_wrp(poly p, ring lmRing, ring tailRing);
-
-static inline char*     p_String(poly p, ring p_ring);
-static inline char*     p_String0(poly p, ring p_ring);
-static inline void      p_Write(poly p, ring p_ring);
-static inline void      p_Write0(poly p, ring p_ring);
-static inline void      p_wrp(poly p, ring p_ring);
-
 
 /***************************************************************
  *
