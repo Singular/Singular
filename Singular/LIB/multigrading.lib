@@ -307,8 +307,6 @@ EXAMPLE: example createGroup; shows an example
       } else { ERROR("Wrong optional argument: 2"); }
     }
   }
-  if( !defined(S) )
-  {}
 */
 
   if( nrows(L) != nrows(S) )
@@ -317,13 +315,13 @@ EXAMPLE: example createGroup; shows an example
   }
 
   def H = attrib(L, attrGroupHNF);
-  if( !defined(H) || typeof(H) != "intmat")
+  if( typeof(H) != "intmat")
   {
     attrib(L, attrGroupHNF, hermiteNormalForm(L));
   } else { kill H; }
 
   def HH = attrib(L, attrGroupSNF);
-  if( !defined(HH) || typeof(HH) != "intmat")
+  if( typeof(HH) != "intmat")
   {
     attrib(L, attrGroupSNF, smithNormalForm(L));
   } else { kill HH; }
@@ -469,35 +467,40 @@ EXAMPLE: example setBaseMultigrading; shows an example
   string attrMgrad   = "mgrad";
   string attrGradingGroup = "gradingGroup";
 
-  if( size(#) > 0 )
+  int i = 1;
+  if( size(#) >= i )
   {
-    if( typeof(#[1]) == "intmat" )
+    def a = #[i];
+    if( typeof(a) == "intmat" )
     {
-      def L = createGroup(M, #[1]);
+      def L = createGroup(M, a);
+      i++;
     }
 
-    if( isGroup(#[1]) )
+    if( isGroup(a) )
     {
-      def L = #[1];
+      def L = a;
 
       if( !isSublattice(M, L[1]) )
       {
         ERROR("Multigrading is not contained in the grading group!");
       }
+      i++;
     }
+    if( i == 1 ){ ERROR("Wrong arguments: no group given?"); }
+    kill a;
   }
   else
   {
     def L = createTorsionFreeGroup(M);
   }
 
-  if( !defined(L) ){ ERROR("Wrong arguments: no group given?"); }
 
   attrib(basering, attrMgrad, M);
   attrib(basering, attrGradingGroup, L);
 
-  ideal Q = ideal(basering);
-  if( !isHomogeneous(Q) ) // easy now, but would be hard before setting ring attributes!
+  ideal Q = ideal(basering); // quotient ideal is assumed to be a GB!
+  if( !isHomogeneous(Q, "checkGens") ) // easy now, but would be hard before setting ring attributes!
   {
     "Warning: your quotient ideal is not homogenous (multigrading was set anyway)!";
   }
@@ -703,7 +706,7 @@ EXAMPLE: example getGradingGroup; shows an example
     }
   }
 
-  if( !defined(R) )
+  if( i == 1 )
   {
     def R = basering;
   }
@@ -804,10 +807,12 @@ EXAMPLE: example getLattice; shows an example
   int i = 1;
   if( size(#) >= i )
   {
-    if( ( typeof(#[i]) == "ring" ) or ( typeof(#[i]) == "qring" ) )
+    def a = #[i];
+    if( ( typeof(a) == "ring" ) or ( typeof(a) == "qring" ) )
     {
       i++;
     }
+    kill a;
   }
 
   string attrGradingGroupHNF = "hermite";
@@ -819,14 +824,21 @@ EXAMPLE: example getLattice; shows an example
 
 
 
-  def T = G[2];
+  def T = G[2]; 
 
   if( size(#) >= i )
   {
-    if( #[i] == "hermite" )
+    def a = #[i];
+
+    if( typeof(a) != "string" )
+    {
+      ERROR("Sorry wrong arguments!");
+    }
+    
+    if( a == "hermite" )
     {
       def M = attrib(T, attrGradingGroupHNF);
-      if( (!defined(M)) or (typeof(M) != "intmat") )
+      if( typeof(M) != "intmat" )
       {
         if( size(G) > 2 )
         {
@@ -839,10 +851,10 @@ EXAMPLE: example getLattice; shows an example
       return (M);
     }
 
-    if( #[i] == "smith" )
+    if( a == "smith" )
     {
       def M = attrib(T, attrGradingGroupSNF);
-      if( (!defined(M)) or (typeof(M) != "intmat") )
+      if( typeof(M) != "intmat" )
       {
         if( size(G) > 2 )
         {
@@ -1735,27 +1747,30 @@ group (either set globally or given as an optional argument), i.e. if it is zero
 EXAMPLE: example isZeroElement; shows an example
 "
 {
-  if( size(#) > 0 )
+  int i = 1;
+  if( size(#) >= i )
   {
-    if( typeof(#[1]) == "intmat" )
+    def a = #[1];
+    if( typeof(a) == "intmat" )
     {
-      intmat H = hermiteNormalForm(#[1]);
-    } else
-    {
-      if( typeof(#[1]) == "list" )
-      {
-        list L = #[1];
-        intmat H = attrib(L, "hermite"); // todo
-      }
+      intmat H = hermiteNormalForm(a);
+      i++;
     }
-
+    if( typeof(a) == "list" )
+    {
+      list L = a;
+      intmat H = attrib(L, "hermite"); // todo
+      i++;
+    }
+    kill a;
   }
-  if( !defined(H) )
+  
+  if( i == 1 )
   {
     intmat H = getLattice("hermite");
   }
 
-  int x, k, i, row;
+  int x, k, row;
 
   int r = nrows(H);
   int c = ncols(H);
@@ -1839,21 +1854,25 @@ polynomial f homogeneous in the grading by grad.
 EXAMPLE: example defineHomogeneous; shows an example
 "
 {
-  if( size(#) > 0 )
+  int i = 1;
+  if( size(#) >= i )
   {
-    if( typeof(#[1]) == "intmat" )
+    def a = #[1];
+    if( typeof(a) == "intmat" )
     {
-      intmat grad = #[1];
+      intmat grad = a;
+      i++;
     }
+    kill a;
   }
 
-  if( !defined(grad) )
+  if( i == 1 )
   {
     intmat grad = getVariableWeights();
   }
 
   intmat newgg[nrows(grad)][size(f)-1];
-  int i,j;
+  int j;
   intvec l = grad*leadexp(f);
   intvec v;
   for(i=2; i <= size(f); i++)
@@ -1960,7 +1979,7 @@ EXAMPLE: example pushForward; shows an example
 //  "pre: ";  pre;
 
   intmat oldgrad=getVariableWeights(pre);
-  intmat oldtor=getLattice(pre);
+  intmat oldlat=getLattice(pre);
 
   int n=nvars(pre);
   int np=nvars(basering);
@@ -1969,13 +1988,14 @@ EXAMPLE: example pushForward; shows an example
 
   intmat newgrad[pp][np];
 
+  //This will set the finest grading on the image ring. We will proceed by coarsening this grading until f becomes homogeneous. 
   for(i=1;i<=np;i++){ newgrad[p+i,i]=1;}
 
   //newgrad;
 
 
 
-  list newtor;
+  list newlat;
   intmat toadd;
   int columns=0;
 
@@ -1986,22 +2006,23 @@ EXAMPLE: example pushForward; shows an example
   for(i=1;i<=p;i++){
     for(j=1;j<=n;j++){ toadd1[i,j]=oldgrad[i,j];}
   }
-
+  
+  // This will make the images of homogeneous elements homogeneous, namely the variables of the preimage ring.
   for(i=1;i<=n;i++){
     im=f[i];
     //im;
     toadd = defineHomogeneous(im, newgrad);
-    newtor=insert(newtor,toadd);
+    newlat=insert(newlat,toadd);
     columns=columns+ncols(toadd);
 
     v=leadexp(f[i]);
     for(j=p+1;j<=p+np;j++){ toadd1[j,i]=-v[j-p];}
   }
 
-  newtor=insert(newtor,toadd1);
+  newlat=insert(newlat,toadd1);
   columns=columns+ncols(toadd1);
 
-
+  //If the image ring is a quotient ring by some ideal, we have to coarsen the grading in order to make the ideal homogeneous.
   if(typeof(basering)=="qring"){
     //"Entering qring";
     ideal a=ideal(basering);
@@ -2009,30 +2030,31 @@ EXAMPLE: example pushForward; shows an example
       toadd = defineHomogeneous(a[i], newgrad);
       //toadd;
       columns=columns+ncols(toadd);
-      newtor=insert(newtor,toadd);
+      newlat=insert(newlat,toadd);
     }
   }
 
-  //newtor;
-  intmat imofoldtor[pp][ncols(oldtor)];
-  for(i=1; i<=nrows(oldtor);i++){
-    for(j=1; j<=ncols(oldtor); j++){
-      imofoldtor[i,j]=oldtor[i,j];
+  //The grading group of the preimage ring might not have been torsion free. We have to add this torsion to the grading group of the image ring.
+  intmat imofoldlat[pp][ncols(oldlat)];
+  for(i=1; i<=nrows(oldlat);i++){
+    for(j=1; j<=ncols(oldlat); j++){
+      imofoldlat[i,j]=oldlat[i,j];
     }
   }
 
-  columns=columns+ncols(oldtor);
-  newtor=insert(newtor, imofoldtor);
+  columns=columns+ncols(oldlat);
+  newlat=insert(newlat, imofoldlat);
 
   intmat gragr[pp][columns];
   columns=0;
-  for(k=1;k<=size(newtor);k++){
+  for(k=1;k<=size(newlat);k++){
     for(i=1;i<=pp;i++){
-      for(j=1;j<=ncols(newtor[k]);j++){gragr[i,j+columns]=newtor[k][i,j];}
+      for(j=1;j<=ncols(newlat[k]);j++){gragr[i,j+columns]=newlat[k][i,j];}
     }
-    columns=columns+ncols(newtor[k]);
+    columns=columns+ncols(newlat[k]);
   }
-
+  
+  //The following is just for reducing the size of the matrices.
   gragr=hermiteNormalForm(gragr);
   intmat result[pp][pp];
   for(i=1;i<=pp;i++){
@@ -2388,9 +2410,10 @@ PURPOSE: compute multidegree
 EXAMPLE: example multiDeg; shows an example
 "
 {
-  if( defined(attrib(A, "grad")) > 0 )
+  def a = attrib(A, "grad");
+  if( typeof(a) == "intvec" || typeof(a) == "intmat" )
   {
-    return (attrib(A, "grad"));
+    return (a);
   }
 
   intmat M = getVariableWeights();
@@ -2601,6 +2624,7 @@ EXAMPLE: example multiDegPartition; shows an example
   {
     ideal I;
     poly mp, t, tt;
+    intmat V;
   }
   else
   {
@@ -2608,20 +2632,12 @@ EXAMPLE: example multiDegPartition; shows an example
     {
       module I;
       vector mp, t, tt;
+      intmat V = getModuleGrading(p);
     }
     else
     {
       ERROR("Wrong ARGUMENT type!");
     }
-  }
-
-  if( typeof(p) == "vector" )
-  {
-    intmat V = getModuleGrading(p);
-  }
-  else
-  {
-    intmat V;
   }
 
   if( size(p) > 1)
@@ -2831,9 +2847,11 @@ PURPOSE: computes left kernel of matrix M (a module of all elements v such that 
 EXAMPLE: example leftKernel; shows an example
 "
 {
+  int @bf = 0;
   if( nameof(basering) != "basering" )
   {
-    def save = basering;
+    @bf = 1;
+    def @save@ = basering;
   }
 
   ring r = integer, (x), dp;
@@ -2848,9 +2866,9 @@ EXAMPLE: example leftKernel; shows an example
 
   intmat R = (  matrix2intmat( MM ) ); // transpose
 
-  if( defined(save) > 0 )
+  if( @bf == 1 )
   {
-    setring save;
+    setring @save@;
   }
 
   kill r;
