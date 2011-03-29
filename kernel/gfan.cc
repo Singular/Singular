@@ -2019,9 +2019,9 @@ inline void gcone::flip2(const ideal &gb, facet *f)
 	const int64vec *fNormal;
 	fNormal = f->getRef2FacetNormal();/*->getFacetNormal();*/	//read this->fNormal;
 #ifndef NDEBUG
-	printf("flipping UCN %i over facet(",this->getUCN());
-	fNormal->show(1,0);
-	printf(") with UCN %i\n",f->getUCN());	
+// 	printf("flipping UCN %i over facet(",this->getUCN());
+// 	fNormal->show(1,0);
+// 	printf(") with UCN %i\n",f->getUCN());	
 #endif
 	if(this->getUCN() != f->getUCN())
 	{	printf("%i vs %i\n",this->getUCN(), f->getUCN() );
@@ -4264,6 +4264,7 @@ void prepareGfanLib(gcone *gc, gfan::ZFan *fan)
     ZCone *zc = new ZCone();
     *zc = ZCone::givenByRays(zm, gfan::ZMatrix(0, zm.getWidth()));
 //     delete &zm;
+    zc->canonicalize();//As per Anders' hint
     fan->insert(*zc);
 //     delete zc;
     gcAct=gcAct->next;
