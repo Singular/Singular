@@ -13,9 +13,9 @@ WARNING:
    help string of the procedures.
 
 NOTE:
-   Even though this is a @sc{Singular} library for computing polytopes and fans
+   Even though this is a Singular library for computing polytopes and fans
    such as the Newton polytope or the Groebner fan of a polynomial, most of
-   the hard computations are NOT done by @sc{Singular} but by the program
+   the hard computations are NOT done by Singular but by the program
 @* - polymake by Ewgenij Gawrilow, TU Berlin and Michael Joswig, TU Darmstadt
 @*   (see http://www.math.tu-berlin.de/polymake/),
 @* respectively (only in the procedure triangularions) by the program
@@ -24,8 +24,8 @@ NOTE:
 @*   This library should rather be seen as an interface which allows to use a
      (very limited) number of options which polymake respectively topcom offers
      to compute with polytopes and fans and to make the results available in
-     @sc{Singular} for further computations;
-     moreover, the user familiar with @sc{Singular} does not have to learn the syntax
+     Singular for further computations;
+     moreover, the user familiar with Singular does not have to learn the syntax
      of polymake or topcom, if the options offered here are sufficient for his
      purposes.
 @*   Note, though, that the procedures concerned with planar polygons are
