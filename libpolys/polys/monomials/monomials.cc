@@ -18,9 +18,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <misc/auxiliary.h>
+
+#include "config.h"
 
 #include <omalloc/omalloc.h>
+#include <misc/auxiliary.h>
+
 #ifdef PDEBUG
 #undef NO_INLINE3
 #define NO_INLINE3
