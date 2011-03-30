@@ -56,11 +56,9 @@
 // ---------------- Singular standard types etc.
 // BOOLEAN
 
-#include <omalloc/omalloc.h>
-
 #ifndef SIZEOF_LONG
 
-#include <climits>
+#include <limits.h>
 
 #ifndef LONG_BIT
 #if ULONG_MAX == 0xffffffffUL
@@ -73,8 +71,12 @@
 #endif
 
 #define SIZEOF_LONG (LONG_BIT/CHAR_BIT)
+// another option for SIZEOF_LONG: use omConfig included in <omalloc/omalloc.h>...
 
 #endif
+
+
+
 
 
 #if (SIZEOF_LONG == 8)
