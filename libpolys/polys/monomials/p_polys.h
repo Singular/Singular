@@ -52,12 +52,6 @@ unsigned long p_GetShortExpVector(poly a, ring r);
  * Misc things on polys
  *
  ***************************************************************/
-// return the maximal exponent of p in form of the maximal long var
-unsigned long p_GetMaxExpL(poly p, const ring r, unsigned long l_max = 0);
-// return monomial r such that GetExp(r,i) is maximum of all
-// monomials in p; coeff == 0, next == NULL, ord is not set
-poly p_GetMaxExpP(poly p, ring r);
-
 int p_MinDeg(poly p,intvec *w, const ring R);
 
 long p_DegW(poly p, const short *w, const ring R);
@@ -697,11 +691,12 @@ static inline poly p_LmDeleteAndNext(poly p, const ring r)
  *
  ***************************************************************/
 
+/// return the maximal exponent of p in form of the maximal long var
+unsigned long p_GetMaxExpL(poly p, const ring r, unsigned long l_max = 0);
 
-static inline unsigned long p_GetMaxExp(const poly p, const ring r)
-{
-  return p_GetMaxExp(p_GetMaxExpL(p, r), r);
-}
+/// return monomial r such that GetExp(r,i) is maximum of all
+/// monomials in p; coeff == 0, next == NULL, ord is not set
+poly p_GetMaxExpP(poly p, ring r);
 
 static inline unsigned long p_GetMaxExp(const unsigned long l, const ring r)
 {
@@ -724,6 +719,11 @@ static inline unsigned long p_GetMaxExp(const unsigned long l, const ring r)
     }
   }
   return max;
+}
+
+static inline unsigned long p_GetMaxExp(const poly p, const ring r)
+{
+  return p_GetMaxExp(p_GetMaxExpL(p, r), r);
 }
 
 static inline unsigned long
