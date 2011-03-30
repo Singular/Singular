@@ -41,17 +41,6 @@
 
 /***************************************************************
  *
- * Comparisons: they are all done without regarding coeffs
- *
- ***************************************************************/
-#define p_LmCmpAction(p, q, r, actionE, actionG, actionS) \
-  _p_LmCmpAction(p, q, r, actionE, actionG, actionS)
-
-// returns 1 if ExpVector(p)==ExpVector(q): does not compare numbers !!
-#define p_LmEqual(p1, p2, r) p_ExpVectorEqual(p1, p2, r)
-
-/***************************************************************
- *
  * Divisiblity tests, args must be != NULL, except for
  * pDivisbleBy
  *
@@ -708,16 +697,6 @@ static inline poly p_LmDeleteAndNext(poly p, const ring r)
  *
  ***************************************************************/
 
-// pCmp: args may be NULL
-// returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
-static inline int p_Cmp(poly p1, poly p2, ring r)
-{
-  if (p2==NULL)
-    return 1;
-  if (p1==NULL)
-    return -1;
-  return p_LmCmp(p1,p2,r);
-}
 
 static inline unsigned long p_GetMaxExp(const poly p, const ring r)
 {
@@ -1476,6 +1455,30 @@ static inline int p_LmCmp(poly p, poly q, const ring r)
 
   p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->CmpL_Size, r->ordsgn,
                                     return 0, return 1, return -1);
+}
+
+
+
+/***************************************************************
+ *
+ * Comparisons: they are all done without regarding coeffs
+ *
+ ***************************************************************/
+#define p_LmCmpAction(p, q, r, actionE, actionG, actionS) \
+  _p_LmCmpAction(p, q, r, actionE, actionG, actionS)
+
+// returns 1 if ExpVector(p)==ExpVector(q): does not compare numbers !!
+#define p_LmEqual(p1, p2, r) p_ExpVectorEqual(p1, p2, r)
+
+// pCmp: args may be NULL
+// returns: (p2==NULL ? 1 : (p1 == NULL ? -1 : p_LmCmp(p1, p2)))
+static inline int p_Cmp(poly p1, poly p2, ring r)
+{
+  if (p2==NULL)
+    return 1;
+  if (p1==NULL)
+    return -1;
+  return p_LmCmp(p1,p2,r);
 }
 
 
