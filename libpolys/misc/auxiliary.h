@@ -43,7 +43,7 @@
 #define SIZEOF_LONG 4
 */
 
-
+// TODO: the following should go to some config.h... no?
 
 /* Define version as a string */
 #define S_VERSION1 "spielwiese"
@@ -55,6 +55,27 @@
 
 // ---------------- Singular standard types etc.
 // BOOLEAN
+
+#include <omalloc/omalloc.h>
+
+#ifndef SIZEOF_LONG
+
+#include <climits>
+
+#ifndef LONG_BIT
+#if ULONG_MAX == 0xffffffffUL
+#define LONG_BIT 32
+#elif ULONG_MAX == 0xffffffffffffffffULL
+#define LONG_BIT 64
+#else
+#error "Unexpected max for unsigned long"
+#endif
+#endif
+
+#define SIZEOF_LONG (LONG_BIT/CHAR_BIT)
+
+#endif
+
 
 #if (SIZEOF_LONG == 8)
 typedef int BOOLEAN;
