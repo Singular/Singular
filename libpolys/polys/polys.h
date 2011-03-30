@@ -17,6 +17,7 @@
  * poly must be != NULL
  *
  ***************************************************************/
+/*
 // deletes old coeff before setting the new one
 #define pSetCoeff(p,n)      p_SetCoeff(p,n,currRing)
 
@@ -37,6 +38,7 @@
 #define pMultExp(p,i,v)     p_MultExp(p,i,v, currRing)
 #define pGetExpSum(p1, p2, i)    p_GetExpSum(p1, p2, i, currRing)
 #define pGetExpDiff(p1, p2, i)   p_GetExpDiff(p1, p2, i, currRing)
+*/
 
 /***************************************************************
  *

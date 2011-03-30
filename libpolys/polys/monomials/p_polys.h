@@ -36,6 +36,9 @@
 #define p_GetCoeff(p,r)     pGetCoeff(p)
 #define p_SetCoeff0(p,n,r)  pSetCoeff0(p,n)
 
+#define __p_GetComp(p, r)   (p)->exp[r->pCompIndex]
+#define p_GetComp(p, r)    ((long) (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0))
+
 /***************************************************************
  *
  * Comparisons: they are all done without regarding coeffs
@@ -114,6 +117,62 @@ void p_ShallowDelete(poly *p, const ring r);
 poly      p_Sub(poly a, poly b, const ring r);
 
 poly      p_Power(poly p, int i, const ring r);
+
+
+/***************************************************************
+ *
+ * PDEBUG stuff
+ *
+ ***************************************************************/
+#ifdef PDEBUG
+// Returns TRUE if m is monom of p, FALSE otherwise
+BOOLEAN pIsMonomOf(poly p, poly m);
+// Returns TRUE if p and q have common monoms
+BOOLEAN pHaveCommonMonoms(poly p, poly q);
+
+// p_Check* routines return TRUE if everything is ok,
+// else, they report error message and return false
+
+// check if Lm(p) is from ring r
+BOOLEAN p_LmCheckIsFromRing(poly p, ring r);
+// check if Lm(p) != NULL, r != NULL and initialized && Lm(p) is from r
+BOOLEAN p_LmCheckPolyRing(poly p, ring r);
+// check if all monoms of p are from ring r
+BOOLEAN p_CheckIsFromRing(poly p, ring r);
+// check r != NULL and initialized && all monoms of p are from r
+BOOLEAN p_CheckPolyRing(poly p, ring r);
+// check if r != NULL and initialized
+BOOLEAN p_CheckRing(ring r);
+// only do check if cond
+
+
+#define pIfThen(cond, check) do {if (cond) {check;}} while (0)
+
+BOOLEAN _p_Test(poly p, ring r, int level);
+BOOLEAN _p_LmTest(poly p, ring r, int level);
+BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
+
+#define p_Test(p,r)     _p_Test(p, r, PDEBUG)
+#define p_LmTest(p,r)   _p_LmTest(p, r, PDEBUG)
+#define pp_Test(p, lmRing, tailRing)    _pp_Test(p, lmRing, tailRing, PDEBUG)
+
+#else // ! PDEBUG
+
+#define pIsMonomOf(p, q)        (TRUE)
+#define pHaveCommonMonoms(p, q) (TRUE)
+#define p_LmCheckIsFromRing(p,r)  ((void)0)
+#define p_LmCheckPolyRing(p,r)    ((void)0)
+#define p_CheckIsFromRing(p,r)  ((void)0)
+#define p_CheckPolyRing(p,r)    ((void)0)
+#define p_CheckRing(r)          ((void)0)
+#define P_CheckIf(cond, check)  ((void)0)
+
+#define p_Test(p,r)     (1)
+#define p_LmTest(p,r)   (1)
+#define pp_Test(p, lmRing, tailRing) (1)
+
+#endif
+
 /***************************************************************
  *
  * Misc stuff
@@ -323,59 +382,7 @@ long pLDeg1c_WFirstTotalDegree(poly p,int *l, ring r);
 BOOLEAN p_EqualPolys(poly p1, poly p2, const ring r);
 
 long p_Deg(poly a, const ring r);
-/***************************************************************
- *
- * PDEBUG stuff
- *
- ***************************************************************/
-#ifdef PDEBUG
-// Returns TRUE if m is monom of p, FALSE otherwise
-BOOLEAN pIsMonomOf(poly p, poly m);
-// Returns TRUE if p and q have common monoms
-BOOLEAN pHaveCommonMonoms(poly p, poly q);
 
-// p_Check* routines return TRUE if everything is ok,
-// else, they report error message and return false
-
-// check if Lm(p) is from ring r
-BOOLEAN p_LmCheckIsFromRing(poly p, ring r);
-// check if Lm(p) != NULL, r != NULL and initialized && Lm(p) is from r
-BOOLEAN p_LmCheckPolyRing(poly p, ring r);
-// check if all monoms of p are from ring r
-BOOLEAN p_CheckIsFromRing(poly p, ring r);
-// check r != NULL and initialized && all monoms of p are from r
-BOOLEAN p_CheckPolyRing(poly p, ring r);
-// check if r != NULL and initialized
-BOOLEAN p_CheckRing(ring r);
-// only do check if cond
-
-
-#define pIfThen(cond, check) do {if (cond) {check;}} while (0)
-
-BOOLEAN _p_Test(poly p, ring r, int level);
-BOOLEAN _p_LmTest(poly p, ring r, int level);
-BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
-
-#define p_Test(p,r)     _p_Test(p, r, PDEBUG)
-#define p_LmTest(p,r)   _p_LmTest(p, r, PDEBUG)
-#define pp_Test(p, lmRing, tailRing)    _pp_Test(p, lmRing, tailRing, PDEBUG)
-
-#else // ! PDEBUG
-
-#define pIsMonomOf(p, q)        (TRUE)
-#define pHaveCommonMonoms(p, q) (TRUE)
-#define p_LmCheckIsFromRing(p,r)  ((void)0)
-#define p_LmCheckPolyRing(p,r)    ((void)0)
-#define p_CheckIsFromRing(p,r)  ((void)0)
-#define p_CheckPolyRing(p,r)    ((void)0)
-#define p_CheckRing(r)          ((void)0)
-#define P_CheckIf(cond, check)  ((void)0)
-
-#define p_Test(p,r)     (1)
-#define p_LmTest(p,r)   (1)
-#define pp_Test(p, lmRing, tailRing) (1)
-
-#endif
 
 /***************************************************************
  *
@@ -436,20 +443,6 @@ static inline unsigned long p_SubComp(poly p, unsigned long v, ring r)
   pAssume2(rRing_has_Comp(r));
   _pPolyAssume2(__p_GetComp(p,r) >= v,p,r);
   return __p_GetComp(p,r) -= v;
-}
-static inline int p_Comp_k_n(poly a, poly b, int k, ring r)
-{
-  if ((a==NULL) || (b==NULL) ) return FALSE;
-  p_LmCheckPolyRing2(a, r);
-  p_LmCheckPolyRing2(b, r);
-  pAssume2(k > 0 && k <= r->N);
-  int i=k;
-  for(;i<=r->N;i++)
-  {
-    if (p_GetExp(a,i,r) != p_GetExp(b,i,r)) return FALSE;
-    //    if (a->exp[(r->VarOffset[i] & 0xffffff)] != b->exp[(r->VarOffset[i] & 0xffffff)]) return FALSE;
-  }
-  return TRUE;
 }
 
 #ifndef HAVE_EXPSIZES
@@ -581,10 +574,6 @@ static inline long p_SetExp(poly p, const int v, const long e, const ring r)
   return p_SetExp(p, e, r->bitmask, r->VarOffset[v]);
 }
 
-
-
-
-
 // the following should be implemented more efficiently
 static inline  long p_IncrExp(poly p, int v, ring r)
 {
@@ -633,6 +622,21 @@ static inline long p_GetExpSum(poly p1, poly p2, int i, ring r)
 static inline long p_GetExpDiff(poly p1, poly p2, int i, ring r)
 {
   return p_GetExp(p1,i,r) - p_GetExp(p2,i,r);
+}
+
+static inline int p_Comp_k_n(poly a, poly b, int k, ring r)
+{
+  if ((a==NULL) || (b==NULL) ) return FALSE;
+  p_LmCheckPolyRing2(a, r);
+  p_LmCheckPolyRing2(b, r);
+  pAssume2(k > 0 && k <= r->N);
+  int i=k;
+  for(;i<=r->N;i++)
+  {
+    if (p_GetExp(a,i,r) != p_GetExp(b,i,r)) return FALSE;
+    //    if (a->exp[(r->VarOffset[i] & 0xffffff)] != b->exp[(r->VarOffset[i] & 0xffffff)]) return FALSE;
+  }
+  return TRUE;
 }
 
 
