@@ -9,15 +9,36 @@
  *  Created: 9/00
  *  Version: $Id$
  *******************************************************************/
+/***************************************************************
+ *  Purpose: implementation of poly procs which iter over ExpVector
+ *  Author:  obachman (Olaf Bachmann)
+ *  Created: 8/00
+ *  Version: $Id$
+ *******************************************************************/
 #ifndef P_POLYS_H
 #define P_POLYS_H
+
+#include <omalloc/omalloc.h>
+#include <misc/mylimits.h>
+#include <coeffs/coeffs.h>
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/monomials.h>
 #include <polys/monomials/polys-impl.h>
+
+#include <polys/templates/p_MemCmp.h>
+#include <polys/templates/p_MemAdd.h>
+#include <polys/templates/p_MemCopy.h>
 #include <polys/templates/p_Procs.h>
-#include <polys/templates/p_Procs.h>
+
+// #include <polys/monomials/p_polys.h>
+
 #include <polys/sbuckets.h>
+
+#ifdef HAVE_PLURAL
+#include <polys/nc/nc.h>
+#endif
+
 
 /***************************************************************
  *
@@ -1151,17 +1172,6 @@ static inline void      p_wrp(poly p, ring p_ring)
   p_wrp(p, p_ring, p_ring);
 }
 
-/***************************************************************
- *  Purpose: implementation of poly procs which iter over ExpVector
- *  Author:  obachman (Olaf Bachmann)
- *  Created: 8/00
- *  Version: $Id$
- *******************************************************************/
-#include <misc/mylimits.h>
-#include <polys/templates/p_MemCmp.h>
-// #include <polys/structs.h>
-#include <polys/monomials/ring.h>
-#include <coeffs/coeffs.h>
 
 #if PDEBUG > 0
 
@@ -1185,11 +1195,7 @@ while(0)
 
 #define pDivAssume(x)   ((void)0)
 
-#include <omalloc/omalloc.h>
-#include <coeffs/coeffs.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/templates/p_MemAdd.h>
-#include <polys/templates/p_MemCopy.h>
+
 
 /***************************************************************
  *

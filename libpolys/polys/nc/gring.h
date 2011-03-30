@@ -57,15 +57,6 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient = true); // 
 
 bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
 
-// for p_Minus_mm_Mult_qq in pInline2.h
-poly nc_p_Minus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
-                                    const int, const poly, const ring r);
-
-// // for p_Plus_mm_Mult_qq in pInline2.h
-// returns p + m*q destroys p, const: q, m
-poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
-                              const int, const ring r);
-
 
 // poly _gnc_p_Mult_q(poly p, poly q, const int copy, const ring r);
 
