@@ -17,9 +17,10 @@
 
 #ifdef HAVE_PLURAL
 // for nc_p_ProcsSet:
-// #include <polys/gring.h>
+// #include <polys/nc/....h>
 #endif
 
+#include <reporter/reporter.h>
 
 // extract p_Procs properties from a ring
 static inline p_Field p_FieldIs(ring r)
