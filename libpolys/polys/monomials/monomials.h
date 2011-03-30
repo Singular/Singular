@@ -27,17 +27,19 @@ struct  spolyrec
   unsigned long exp[1];     // make sure that exp is aligned
 };
 
+
 /***************************************************************
  *
  * Macros for access/iteration
  *
  ***************************************************************/
-#define pNext(p)           ((p)->next)
-#define pIter(p)           ((p) = (p)->next)
+// #define pNext(p)           ((p)->next)
+// #define pIter(p)           ((p) = (p)->next)
 
 // coeff
-#define pGetCoeff(p)       ((p)->coef)
-#define pSetCoeff0(p,n)    (p)->coef=n
+//#define pGetCoeff(p)       ((p)->coef)
+//#define pSetCoeff0(p,n)    (p)->coef=n
+
 #define __p_GetComp(p, r)   (p)->exp[r->pCompIndex]
 #define p_GetComp(p, r)    ((long) (r->pCompIndex >= 0 ? __p_GetComp(p, r) : 0))
 
