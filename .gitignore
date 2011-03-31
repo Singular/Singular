@@ -10,6 +10,8 @@ LIB
 *.la
 .libs
 libpolys/polys/templates/p_Procs_Generate
+libpolys/polys/m4/
+libpolys/coeffs/test
 depend
 tags
 ltmain.sh
