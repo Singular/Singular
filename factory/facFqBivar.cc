@@ -1047,7 +1047,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
           CanonicalForm bufA= A;
           subst (bufA, bufA, subCheck, y);
           factors= biFactorize (bufA, info);
-          reverseSubst (factors, subCheck, x);
+          reverseSubst (factors, subCheck, y);
           appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
                                 swap, swap2, N);
           normalize (factors);
