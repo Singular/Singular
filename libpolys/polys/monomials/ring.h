@@ -33,6 +33,13 @@ typedef slists *           lists;
 class kBucket;
 typedef kBucket*           kBucket_pt;
 
+struct sip_sideal;
+typedef struct sip_sideal *       ideal;
+
+struct sip_smap;
+typedef struct sip_smap *         map;
+
+
 #if SIZEOF_LONG == 4
 typedef long long int64;
 #elif SIZEOF_LONG == 8
@@ -47,27 +54,7 @@ typedef long     (*pLDegProc)(poly p, int *length, ring r);
 typedef long     (*pFDegProc)(poly p, ring r);
 typedef void     (*p_SetmProc)(poly p, const ring r);
 
-struct sip_sideal
-{
-  poly*  m;
-  long rank;
-  int nrows;
-  int ncols;
-  #define IDELEMS(i) ((i)->ncols)
-  #define MATCOLS(i) ((i)->ncols)
-  #define MATROWS(i) ((i)->nrows)
-  #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
-};
-typedef struct sip_sideal *       ideal;
 
-struct sip_smap
-{
-  poly *m;
-  char *preimage;
-  int nrows;
-  int ncols;
-};
-typedef struct sip_smap *         map;
 
 typedef enum
 {
@@ -324,6 +311,8 @@ struct ip_sring
     inline const nc_struct* GetNC() const { return _nc; }; // public!!!
     inline nc_struct*& GetNC() { return _nc; }; // public!!!
 #endif
+ public:
+  operator coeffs() const { return cf; }
 };
 
 enum tHomog

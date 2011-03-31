@@ -15,16 +15,6 @@
 #include <kernel/ring.h>
 #include <kernel/matpol.h>
 
-// the part, related to the interface
-// Changes r, Assumes that all other input belongs to curr
-BOOLEAN nc_CallPlural(matrix cc, matrix dd, poly cn, poly dn, ring r,
-                      bool bSetupQuotient = false,
-                      bool bCopyInput = true,
-                      bool bBeQuiet = false,
-                      ring curr = currRing,
-                      bool dummy_ring = false 
-		      /* allow to create a nc-ring with 1 variable*/);
-
 // BOOLEAN nc_CheckOrdCondition(matrix D, ring r);
 // BOOLEAN nc_CheckOrdCondition(ring r); // with D == r->GetNC()->D
 
@@ -41,21 +31,11 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate);
 // this should be used by p_ProcsSet in p_Procs_Set.h
 void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
-// this function should be used inside QRing definition!
-// we go from rG into factor ring rGR with factor ideal rGR->qideal.
-bool nc_SetupQuotient(ring rGR, const ring rG = NULL, bool bCopy = false); // rG == NULL means that there is no base G-algebra
-
 
 // used by "rSum" from ring.cc only! 
 // purpose init nc structure for initially commutative ring:
 // "creates a commutative nc extension; "converts" comm.ring to a Plural ring"
 ring nc_rCreateNCcomm(ring r); 
-
-void nc_rKill(ring r); // complete destructor
-
-BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient = true); // in ring.cc
-
-bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
 
 
 // poly _gnc_p_Mult_q(poly p, poly q, const int copy, const ring r);
@@ -64,9 +44,6 @@ bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
 poly _nc_p_Mult_q(poly p, poly q, const ring r);
 poly _nc_pp_Mult_qq(const poly p, const poly q, const ring r);
 
-
-/* subst: */
-poly nc_pSubst(poly p, int n, poly e);
 
 /* copy : */
 poly nc_p_CopyGet(poly a, const ring r);
@@ -92,8 +69,6 @@ ideal Approx_Step(ideal L);
 matrix nc_PrintMat(int a, int b, ring r, int metric);
 
 poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift);
-poly pOppose(ring Rop, poly p);
-ideal idOppose(ring Rop, ideal I);
 
 
 // const int GRMASK = 1 << 1;
@@ -242,8 +217,6 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 }
 
 
-// Macros used to access upper triangle matrices C,D... (which are actually ideals) // afaik
-#define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
 
 
 // inline const nc_struct* GetNC() const { return GetBasering()->GetNC(); } 

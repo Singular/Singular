@@ -20,18 +20,6 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 
-/***************************************************************
- *
- * poly things which are independent of ring
- *
- ***************************************************************/
-
-
-/*2
-* returns the length of a (numbers of monomials)
-* respect syzComp
-*/
-poly pLast(poly a, int &l);
 
 #endif // PINLINE_CC
 

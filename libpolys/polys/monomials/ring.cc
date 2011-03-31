@@ -29,9 +29,13 @@
 #include <polys/prCopy.h>
 // #include "../Singular/ipshell.h"
 #include <polys/templates/p_Procs.h>
+
+#include <polys/matpol.h>
+#include <polys/ideals.h>
+
 #ifdef HAVE_PLURAL
-// #include <gring.h>
-// #include <sca.h>
+#include <polys/nc/nc.h>
+#include <polys/nc/sca.h>
 #endif
 // #include <???/maps.h>
 // #include <???/matpol.h>
@@ -404,7 +408,7 @@ void rWrite(ring r)
     {
       for (j = i+1; j<=r->N; j++)
       {
-        nl = nIsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r->GetNC()->basering));
+        nl = n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r->GetNC()->basering), r->cf);
         if ( (MATELEM(r->GetNC()->D,i,j)!=NULL) || (!nl) )
         {
           Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
@@ -1431,10 +1435,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         for (j=i+1; j<=rVar(R1); j++)
         {
           assume(MATELEM(C1,i,j) != NULL);
-          MATELEM(C,i,j) = pPermPoly(MATELEM(C1,i,j), perm1, R1, sum, nMap1, par_perm1, rPar(R1)); // need ADD + CMP ops.
+          MATELEM(C,i,j) = p_PermPoly(MATELEM(C1,i,j), perm1, R1, sum, nMap1, par_perm1, rPar(R1)); // need ADD + CMP ops.
 
           if (MATELEM(D1,i,j) != NULL)
-            MATELEM(D,i,j) = pPermPoly(MATELEM(D1,i,j), perm1, R1, sum, nMap1, par_perm1, rPar(R1));
+            MATELEM(D,i,j) = p_PermPoly(MATELEM(D1,i,j), perm1, R1, sum, nMap1, par_perm1, rPar(R1));
         }
 
       idTest((ideal)C);
@@ -1447,10 +1451,10 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         for (j=i+1; j<=rVar(R2); j++)
         {
           assume(MATELEM(C2,i,j) != NULL);
-          MATELEM(C,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(C2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
+          MATELEM(C,rVar(R1)+i,rVar(R1)+j) = p_PermPoly(MATELEM(C2,i,j),perm2,R2,sum, nMap2,par_perm2,rPar(R2));
 
           if (MATELEM(D2,i,j) != NULL)
-            MATELEM(D,rVar(R1)+i,rVar(R1)+j) = pPermPoly(MATELEM(D2,i,j),perm2,R2,nMap2,par_perm2,rPar(R2));
+            MATELEM(D,rVar(R1)+i,rVar(R1)+j) = p_PermPoly(MATELEM(D2,i,j),perm2,R2,sum, nMap2,par_perm2,rPar(R2));
         }
 
       idTest((ideal)C);
@@ -4215,9 +4219,9 @@ void rDebugPrint(ring r)
     Print("\npFDeg   : ");
     
     pFDeg_CASE(p_Totaldegree); else
-      pFDeg_CASE(pWFirstTotalDegree); else
-      pFDeg_CASE(pWTotaldegree); else
-      pFDeg_CASE(pDeg); else
+      pFDeg_CASE(p_WFirstTotalDegree); else
+      pFDeg_CASE(p_WTotaldegree); else
+      pFDeg_CASE(p_Deg); else
       Print("(%p)", r->pFDeg); // default case
     
     PrintS("\n");
@@ -4905,7 +4909,7 @@ ring rAssure_C_dp(const ring r)
 
 /// Finds p^th IS ordering, and returns its position in r->typ[]
 /// returns -1 if something went wrong!
-int rGetISPos(const int p = 0, const ring r = currRing)
+int rGetISPos(const int p, const ring r)
 {
   // Put the reference set F into the ring -ordering -recor
 #if MYTEST
@@ -5481,10 +5485,10 @@ ring rOpposite(ring src)
         nj = r->N +1 - j; /* i<j ==>   nj < ni */
 
         assume(MATELEM(src->GetNC()->C,i,j) != NULL);
-        MATELEM(C,nj,ni) = pPermPoly(MATELEM(src->GetNC()->C,i,j),perm,src,nMap,par_perm,src->P);
+        MATELEM(C,nj,ni) = p_PermPoly(MATELEM(src->GetNC()->C,i,j),perm,src,r, nMap,par_perm,src->P);
 
         if(MATELEM(src->GetNC()->D,i,j) != NULL)
-          MATELEM(D,nj,ni) = pPermPoly(MATELEM(src->GetNC()->D,i,j),perm,src,nMap,par_perm,src->P);
+          MATELEM(D,nj,ni) = p_PermPoly(MATELEM(src->GetNC()->D,i,j),perm,src,r, nMap,par_perm,src->P);
       }
     }
 

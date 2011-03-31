@@ -73,6 +73,9 @@ unsigned long p_GetShortExpVector(poly a, ring r);
  * Misc things on polys
  *
  ***************************************************************/
+
+poly p_One(const ring r);
+
 int p_MinDeg(poly p,intvec *w, const ring R);
 
 long p_DegW(poly p, const short *w, const ring R);

@@ -36,6 +36,11 @@ enum nc_type
 
 // //////////////////////////////////////////////////////
 
+// Macros used to access upper triangle matrices C,D... (which are actually ideals) // afaik
+#define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
+
+/// complete destructor
+void nc_rKill(ring r);
 
 
 // NC pProcs:
@@ -301,6 +306,29 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 poly nc_pSubst(poly p, int n, poly e, const ring r);
 
 
+
+// the part, related to the interface
+// Changes r, Assumes that all other input belongs to curr
+BOOLEAN nc_CallPlural(matrix cc, matrix dd, poly cn, poly dn, ring r,
+                      bool bSetupQuotient, //< false
+                      bool bCopyInput, //< true
+                      bool bBeQuiet, //< false
+                      ring curr,
+                      bool dummy_ring = false 
+		      /* allow to create a nc-ring with 1 variable*/);
+
+
+BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient = true); // in ring.cc
+
+// this function should be used inside QRing definition!
+// we go from rG into factor ring rGR with factor ideal rGR->qideal.
+bool nc_SetupQuotient(ring rGR, const ring rG = NULL, bool bCopy = false); // rG == NULL means that there is no base G-algebra
+
+
+bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
+
+poly pOppose(ring Rop_src, poly p, const ring Rop_dst);
+ideal idOppose(ring Rop_src, ideal I, const ring Rop_dst);
 
 #endif /* HAVE_PLURAL */
 
