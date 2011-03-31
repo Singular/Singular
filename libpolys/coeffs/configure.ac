@@ -6,6 +6,7 @@ AC_INIT([coeffs], [3.1.2.sw])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([coeffs.h])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([../../m4])
 
 #check for host:
 AC_CANONICAL_HOST
@@ -23,6 +24,7 @@ AC_PROG_RANLIB
 AM_PROG_CC_C_O
 
 # Checks for libraries.
+LB_CHECK_GMP(,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 # Checks for header files.
 AC_CHECK_HEADERS([float.h stdlib.h string.h])
