@@ -329,8 +329,13 @@ static inline long p_MinComp(poly p,ring lmRing) {return p_MinComp(p,lmRing,lmRi
  * poly things which are independent of ring
  *
  ***************************************************************/
-static inline poly      pLast(poly a, int &length);
-inline   poly      pLast(poly a) { int l; return pLast(a, l);}
+
+// returns the length of a (numbers of monomials)
+// respect syzComp
+// static inline poly pLast(poly a, int &length);
+// static inline poly pLast(poly a) { int l; return pLast(a, l); }
+
+
 static inline poly pReverse(poly p)
 {
   if (p == NULL || pNext(p) == NULL) return p;

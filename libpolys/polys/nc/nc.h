@@ -1,6 +1,7 @@
 #ifndef POLYS_NC_H
 #define POLYS_NC_H
 
+
 #ifdef HAVE_PLURAL
 
 
@@ -34,6 +35,8 @@ enum nc_type
 
 
 // //////////////////////////////////////////////////////
+
+
 
 // NC pProcs:
 typedef poly (*mm_Mult_p_Proc_Ptr)(const poly m, poly p, const ring r);
@@ -180,6 +183,18 @@ inline void ncRingType(ring r, nc_type t) // Set
 };
 
 
+
+// //////////////////////////////////////////////////////////////////////// //
+// we must always have this test!?
+inline bool rIsSCA(const ring r)
+{
+#ifdef HAVE_PLURAL
+  return rIsPluralRing(r) && (ncRingType(r) == nc_exterior);
+#else
+  return false;
+#endif
+}
+
 // //////////////////////////////////////////////////////////////////////// //
 // NC inlines
 
@@ -279,6 +294,13 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
   assume(r->GetNC()->p_Procs.GB!=NULL);
   return r->GetNC()->p_Procs.GB(F, Q, w, hilb, strat, r);
 }
+
+
+
+/* subst: */
+poly nc_pSubst(poly p, int n, poly e, const ring r);
+
+
 
 #endif /* HAVE_PLURAL */
 
