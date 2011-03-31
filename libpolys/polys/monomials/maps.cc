@@ -6,19 +6,21 @@
 * ABSTRACT - the mapping of polynomials to other rings
 */
 
+#include <omalloc/omalloc.h>
 #include <misc/options.h>
-#include <monomials/p_polys.h>
+
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
-#include <monomials/ring.h>
-#include <simpleideals.h>
-#include <omalloc/omalloc.h>
+
+#include <polys/monomials/p_polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/simpleideals.h>
 #include <polys/prCopy.h>
-#include <polys/ext_fields/longtrans.h>
+// #include <polys/ext_fields/longtrans.h>
 #include <polys/monomials/maps.h>
 
 #ifdef HAVE_PLURAL
-#include <kernel/gring.h>
+#include <polys/nc/nc.h>
 #endif
 
 // This is a very dirty way to "normalize" numbers w.r.t. a

@@ -7,8 +7,9 @@
 /*
 * ABSTRACT
 */
-#include <kernel/structs.h>
-#include <kernel/ring.h>
+
+// #include <kernel/structs.h>
+#include <polys/monomials/ring.h>
 
 // THIS IS REALLY DIRTY: ip_smatrix HAS TO BE IDENTICAL TO ip_sideal
 // SO, DON'T CHANGE THE DECLARATION OF ip_smatrix
@@ -31,8 +32,8 @@ class ip_smatrix
 
 matrix mpNew(int r, int c);
 matrix mpCopy(matrix a);
-void   mpDelete(matrix* a, const ring r = currRing);
-matrix mpCopy(const matrix a, const ring rSrc, const ring rDst = currRing);
+void   mpDelete(matrix* a, const ring r);
+matrix mpCopy(const matrix a, const ring rSrc, const ring rDst);
 matrix mpInitP(int r, int c, poly p);
 matrix mpInitI(int r, int c, int v);
 matrix mpMultI(matrix a, int f);
@@ -48,8 +49,8 @@ poly TraceOfProd ( matrix a, matrix b, int n);
 
 poly mpDet (matrix m);
 matrix mpWedge(matrix a, int ar);
-BOOLEAN mpJacobi(leftv res,leftv a);
-BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/, leftv id=NULL);
+// BOOLEAN mpJacobi(leftv res,leftv a);
+// BOOLEAN mpKoszul(leftv res,leftv b/*in*/, leftv c/*ip*/, leftv id=NULL);
 poly mpDetBareiss (matrix a);
 
 //matrix mpHomogen(matrix a, int v);

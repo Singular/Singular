@@ -7,8 +7,9 @@
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
-#include <kernel/structs.h>
-#include <kernel/ring.h>
+// #include <kernel/structs.h>
+
+#include <polys/monomials/ring.h>
 
 struct sip_sideal
 {
@@ -17,6 +18,10 @@ struct sip_sideal
   int nrows;
   int ncols;
   #define IDELEMS(i) ((i)->ncols)
+  #define MATCOLS(i) ((i)->ncols)
+  #define MATROWS(i) ((i)->nrows)
+  #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
+   
 };
 
 struct sip_smap
@@ -27,8 +32,12 @@ struct sip_smap
   int ncols;
 };
 
+class ip_smatrix;
+typedef ip_smatrix *       matrix;
+
 struct sideal_list;
 typedef struct sideal_list *      ideal_list;
+
 struct sideal_list
 {
   ideal_list next;
@@ -50,7 +59,7 @@ ideal idInit (int size, int rank=1);
 ideal idCopyFirstK (const ideal ide, const int k);
 
 /// delete an ideal
-#define idDelete(h) id_Delete(h, currRing)
+// #define idDelete(h) id_Delete(h, currRing)
 void id_Delete (ideal* h, ring r);
 void id_ShallowDelete (ideal* h, ring r);
 /*- initialise an ideal -*/ // ?
@@ -91,7 +100,15 @@ void idDBTest(ideal h1, int level, const char *f,const int l);
 #endif
 
 ideal id_Copy (ideal h1,const ring r);
-#define idCopy(A) id_Copy(A,currRing)
+#ifdef PDEBUG
+ideal idDBCopy(ideal h1,const char *f,int l,const ring r);
+#define id_DBCopy(A,r) idDBCopy(A,__FILE__,__LINE__,r)
+#define idCopy(A,r) id_DBCopy(A,r)
+#else
+#define idCopy(A,r) id_Copy(A,r)
+#endif
+
+
   /*adds two ideals without simplifying the result*/
 ideal idSimpleAdd (ideal h1,ideal h2);
   /*adds the quotient ideal*/
@@ -108,10 +125,11 @@ ideal idMult (ideal h1,ideal h2);
 BOOLEAN idIs0 (ideal h);
 
 long idRankFreeModule(ideal m, ring lmRing, ring tailRing);
-inline long idRankFreeModule(ideal m, ring r = currRing)
-{return idRankFreeModule(m, r, r);}
+
+static inline long idRankFreeModule(ideal m, ring r){ return idRankFreeModule(m, r, r); }
+
 // returns TRUE, if idRankFreeModule(m) > 0
-BOOLEAN idIsModule(ideal m, ring r = currRing);
+BOOLEAN idIsModule(ideal m, const ring r);
 BOOLEAN idHomIdeal (ideal id, ideal Q=NULL);
 BOOLEAN idHomModule(ideal m, ideal Q,intvec **w);
 BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w);
@@ -194,7 +212,7 @@ matrix  idCoeffOfKBase(ideal arg, ideal kbase, poly how);
 // transpose a module
 ideal   idTransp(ideal a);
 // version of "ideal idTransp(ideal)" which works within a given ring.
-ideal id_Transp(ideal a, const ring rRing = currRing);
+ideal id_Transp(ideal a, const ring rRing);
 
 intvec *idQHomWeight(ideal id);
 
@@ -208,11 +226,11 @@ ideal idChineseRemainder(ideal *x, number *q, int rl);
 //ideal idChineseRemainder(ideal *x, intvec *iv); /* currently unused */
 ideal idFarey(ideal x, number N);
 
-ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing = currRing); // image of certain map for BGG
+ideal id_TensorModuleMult(const int m, const ideal M, const ring rRing); // image of certain map for BGG
 
 #ifdef PDEBUG
 /* Shows an ideal -- only for debugging */
-void idShow(const ideal id, const ring lmRing = currRing, const ring tailRing = currRing, const int debugPrint = 0);
+void idShow(const ideal id, const ring lmRing, const ring tailRing, const int debugPrint = 0);
 #else
 #define idShow(id, lmRing, tailRing, debugPrint) ((void)0)
 #endif
