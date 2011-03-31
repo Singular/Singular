@@ -58,7 +58,7 @@
 
 #ifndef SIZEOF_LONG
 
-#include <limits.h>
+#include <misc/mylimits.h>
 
 #ifndef LONG_BIT
 #if ULONG_MAX == 0xffffffffUL

@@ -1,29 +1,10 @@
 #ifndef SCA_H
 #define SCA_H
 
-/****************************************
-*  Computer Algebra System SINGULAR     *
-****************************************/
-/* $Id$ */
-
-#include <kernel/ring.h>
-#include <kernel/gring.h>
-#include <kernel/structs.h>
-#include <kernel/intvec.h>
-
-
-// we must always have this test!
-inline bool rIsSCA(const ring r)
-{
 #ifdef HAVE_PLURAL
-  return rIsPluralRing(r) && (ncRingType(r) == nc_exterior);
-#else
-  return false;
-#endif
-}
 
+#include <polys/nc/nc.h>
 
-#ifdef HAVE_PLURAL
 // we must always have this test!
 inline ideal SCAQuotient(const ring r)
 {
@@ -31,7 +12,6 @@ inline ideal SCAQuotient(const ring r)
   return r->GetNC()->SCAQuotient();
 }
 
-#include <kernel/gring.h>
 
 
 inline unsigned int scaFirstAltVar(ring r)

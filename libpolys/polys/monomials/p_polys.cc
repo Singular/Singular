@@ -3,7 +3,7 @@
 ****************************************/
 /***************************************************************
  *  File:    p_polys.cc
- *  Purpose: implementation of currRing independent poly procedures
+ *  Purpose: implementation of ring independent poly procedures?
  *  Author:  obachman (Olaf Bachmann)
  *  Created: 8/00
  *  Version: $Id$
@@ -11,19 +11,29 @@
 
 #include <ctype.h>
 
+
+#include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
+#include <misc/options.h>
+#include <misc/intvec.h>
+
+#include <coeffs/longrat.h> // ???
+
+#include <polys/weight.h>
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
-#include <polys/monomials/ring.h>
-#include <polys/weight.h>
-#include <coeffs/longrat.h>
-#include <misc/options.h>
-#include <misc/intvec.h>
+
 // #include <???/ideals.h>
 // #include <???/int64vec.h>
+
 #ifndef NDEBUG
 // #include <???/febase.h>
+#endif
+
+#ifdef HAVE_PLURAL
+#include <polys/nc/nc.h>
+#include <polys/nc/sca.h>
 #endif
 
 /***************************************************************
@@ -743,7 +753,7 @@ long pLDeg1c(poly p,int *l, const ring r)
 // like pLDeg1, only pFDeg == pDeg
 long pLDeg1_Deg(poly p,int *l, const ring r)
 {
-  assume(r->pFDeg == pDeg);
+  assume(r->pFDeg == p_Deg);
   p_CheckPolyRing(p, r);
   long k= p_GetComp(p, r);
   int ll=1;
@@ -774,7 +784,7 @@ long pLDeg1_Deg(poly p,int *l, const ring r)
 
 long pLDeg1c_Deg(poly p,int *l, const ring r)
 {
-  assume(r->pFDeg == pDeg);
+  assume(r->pFDeg == p_Deg);
   p_CheckPolyRing(p, r);
   int ll=1;
   long  t,max;
@@ -1312,7 +1322,7 @@ poly p_Divide(poly a, poly b, const ring r)
 
 poly p_Div_nn(poly p, const number n, const ring r)
 {
-  pAssume(!n_IsZero(n,r));
+  pAssume(!n_IsZero(n,r->cf));
   p_Test(p, r);
 
   poly q = p;
@@ -2839,7 +2849,7 @@ void p_SetGlobals(const ring r, BOOLEAN complete)
 //
 // resets the pFDeg and pLDeg: if pLDeg is not given, it is
 // set to currRing->pLDegOrig, i.e. to the respective LDegProc which
-// only uses pFDeg (and not pDeg, or pTotalDegree, etc)
+// only uses pFDeg (and not p_Deg, or pTotalDegree, etc)
 void pSetDegProcs(ring r, pFDegProc new_FDeg, pLDegProc new_lDeg)
 {
   assume(new_FDeg != NULL);
@@ -2922,7 +2932,7 @@ void p_Norm(poly p1, const ring r)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
-    if (!nIsUnit(pGetCoeff(p1))) return;
+    if (!n_IsUnit(pGetCoeff(p1), r->cf)) return;
     // Werror("p_Norm not possible in the case of coefficient rings.");
   }
   else
@@ -2979,7 +2989,7 @@ void p_Normalize(poly p,const ring r)
   while (p!=NULL)
   {
 #ifdef LDEBUG
-    if (currRing==r) {nTest(pGetCoeff(p));}
+    n_Test(pGetCoeff(p), r->cf);
 #endif
     n_Normalize(pGetCoeff(p),r->cf);
     pIter(p);
@@ -3063,7 +3073,7 @@ static poly p_Subst2 (poly p,int n, number e, const ring r)
 
   while (non_zero != NULL)
   {
-    assume(p_GetExp(non_zero, nm,r) != 0);
+    assume(p_GetExp(non_zero, n, r) != 0);
     qq = non_zero;
     pIter(non_zero);
     qq->next = NULL;
