@@ -197,7 +197,7 @@ class MinorProcessor
     * The default constructor
     */
     MinorProcessor ();
-    
+
     /**
      * A destructor for deleting an instance. We must make this destructor
      * virtual so that destructors of all derived classes will automatically
@@ -289,7 +289,7 @@ class MinorProcessor
 
 /*! \class IntMinorProcessor
     \brief Class IntMinorProcessor is derived from class MinorProcessor.
-    
+
     This class implements the special case of integer matrices.
     \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
 */
@@ -300,7 +300,7 @@ class IntMinorProcessor : public MinorProcessor
     * private store for integer matrix entries
     */
     int* _intMatrix;
-    
+
     /**
     * A method for retrieving the matrix entry.
     * @param rowIndex the absolute (zero-based) row index
@@ -361,7 +361,7 @@ class IntMinorProcessor : public MinorProcessor
     *         corresponding minor
     * @see MinorProcessor::getMinorPrivateLaplace (const int k,
                                                    const MinorKey& mk,
-                                                   const bool multipleMinors, 
+                                                   const bool multipleMinors,
                                                    Cache<MinorKey,
                                                          IntMinorValue>& c,
                                                    int characteristic,
@@ -550,7 +550,7 @@ class IntMinorProcessor : public MinorProcessor
 
 /*! \class PolyMinorProcessor
     \brief Class PolyMinorProcessor is derived from class MinorProcessor.
-    
+
     This class implements the special case of polynomial matrices.
     \author Frank Seelisch, http://www.mathematik.uni-kl.de/~seelisch
 */
@@ -561,7 +561,7 @@ class PolyMinorProcessor : public MinorProcessor
     * private store for polynomial matrix entries
     */
     poly* _polyMatrix;
-    
+
     /**
     * A method for retrieving the matrix entry.
     * @param rowIndex the absolute (zero-based) row index
@@ -616,7 +616,7 @@ class PolyMinorProcessor : public MinorProcessor
     */
     PolyMinorValue getMinorPrivateLaplace (const int k, const MinorKey& mk,
                                            const ideal& iSB);
-    
+
     /**
     * A method for computing the value of a minor, without using a cache.<br>
     * The sub-matrix is specified by \c mk. Computation works
