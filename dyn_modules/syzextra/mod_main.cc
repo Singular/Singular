@@ -8,6 +8,8 @@
 #include <kernel/longrat.h>
 #include <kernel/kstd1.h>
 
+#include <kernel/polys.h>
+
 #include <Singular/tok.h>
 #include <Singular/ipid.h>
 #include <Singular/lists.h>
@@ -759,7 +761,31 @@ static BOOLEAN idPrepare(leftv res, leftv h)
   res->data = reinterpret_cast<void *>(J);
   return FALSE;
 }
-      
+
+/// Get raw syzygies (idPrepare)
+static BOOLEAN _p_Content(leftv res, leftv h)
+{
+  if ( !( (h!=NULL) && (h->Typ()==POLY_CMD) && (h->Data() != NULL) ) )
+  {
+    WerrorS("`system(\"p_Content\",<poly-var>)` expected");
+    return TRUE;
+  }
+
+
+  const poly p = reinterpret_cast<poly>(h->Data());
+
+  
+  pTest(p);  pWrite(p); PrintLn();
+
+  
+  p_Content( p, currRing);      
+
+  pTest(p);
+  pWrite(p); PrintLn();
+  
+  NoReturn(res);
+}
+
 END_NAMESPACE
 
 extern "C"
@@ -786,7 +812,9 @@ int mod_init(SModulFunctions* psModulFunctions)
   psModulFunctions->iiAddCproc(currPack->libname,(char*)"idPrepare",FALSE, idPrepare);
   psModulFunctions->iiAddCproc(currPack->libname,(char*)"reduce_syz",FALSE, reduce_syz);
 
-//  psModulFunctions->iiAddCproc(currPack->libname,(char*)"",FALSE, );
+  psModulFunctions->iiAddCproc(currPack->libname,(char*)"p_Content",FALSE, _p_Content);
+
+  //  psModulFunctions->iiAddCproc(currPack->libname,(char*)"",FALSE, );
   
   return 0;
 }

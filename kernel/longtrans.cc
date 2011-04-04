@@ -1371,6 +1371,8 @@ number ntMult(number la, number lb)
 
 number ntIntDiv(number la, number lb)
 {
+  ntTest(la);
+  ntTest(lb);
   lnumber res;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
@@ -1383,6 +1385,10 @@ number ntIntDiv(number la, number lb)
     WerrorS(nDivBy0);
     return NULL;
   }
+#ifdef LDEBUG
+  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(b,sizeof(snumber));
+#endif
   assume(a->z!=NULL && b->z!=NULL);
   assume(a->n==NULL && b->n==NULL);
   res = (lnumber)omAllocBin(rnumber_bin);
