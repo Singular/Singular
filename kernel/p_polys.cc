@@ -410,7 +410,6 @@ p_SetmProc p_GetSetmProc(ring r)
 long pDeg(poly a, const ring r)
 {
   p_LmCheckPolyRing(a, r);
-  assume(p_GetOrder(a, r) == pWTotaldegree(a, r));
   return p_GetOrder(a, r);
 }
 
