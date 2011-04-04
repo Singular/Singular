@@ -3151,7 +3151,7 @@ static void rSetOutParams(ring r)
 }
 
 /*2
-* sets pMixedOrder and pComponentOrder for orderings with more than one block
+* sets r->MixedOrder and r->ComponentOrder for orderings with more than one block
 * block of variables (ip is the block number, o_r the number of the ordering)
 * o is the position of the orderingering in r
 */
@@ -3193,7 +3193,7 @@ static void rHighSet(ring r, int o_r, int o)
       r->ComponentOrder=-1;
       break;
     case ringorder_M:
-      r->MixedOrder=TRUE;
+      r->LexOrder=TRUE;
       break;
     case ringorder_IS:
     { // TODO: What is r->ComponentOrder???
@@ -4148,6 +4148,7 @@ void rDebugPrint(ring r)
     else
       PrintLn();
   }
+  Print("LexOrder:%d, MixedOrder:%d\n",r->LexOrder, r->MixedOrder);
 
   // p_Procs stuff
   p_Procs_s proc_names;

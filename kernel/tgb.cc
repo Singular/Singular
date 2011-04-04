@@ -809,7 +809,8 @@ BOOLEAN lenS_correct(kStrategy strat){
 }
 
 
-static void cleanS(kStrategy strat, slimgb_alg* c){
+static void cleanS(kStrategy strat, slimgb_alg* c)
+{
   int i=0;
   LObject P;
   while(i<=strat->sl)
@@ -833,7 +834,7 @@ static void cleanS(kStrategy strat, slimgb_alg* c){
         }
       }
       if (!found)
-  pDelete(&P.p);
+        pDelete(&P.p);
       //remember additional reductors
     }
     else i++;
