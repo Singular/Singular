@@ -3234,8 +3234,8 @@ int posInS (const kStrategy strat, const int length,const poly p,
 #endif
   )
   {
-    int o=pWTotaldegree(p);
-    int oo=pWTotaldegree(set[length]);
+    int o=pDeg(p);
+    int oo=pDeg(set[length]);
 
     if ((oo<o)
     || ((o==oo) && (pLmCmp(set[length],p)!= cmp_int)))
@@ -3245,14 +3245,14 @@ int posInS (const kStrategy strat, const int length,const poly p,
     {
       if (an >= en-1)
       {
-        if ((pWTotaldegree(set[an])>=o) && (pLmCmp(set[an],p) == cmp_int))
+        if ((pDeg(set[an])>=o) && (pLmCmp(set[an],p) == cmp_int))
         {
           return an;
         }
         return en;
       }
       i=(an+en) / 2;
-      if ((pWTotaldegree(set[i])>=o) && (pLmCmp(set[i],p) == cmp_int)) en=i;
+      if ((pDeg(set[i])>=o) && (pLmCmp(set[i],p) == cmp_int)) en=i;
       else                              an=i;
     }
   }
