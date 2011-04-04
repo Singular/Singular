@@ -2268,7 +2268,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   int   srmax,lrmax, red_result = 1;
   int   olddeg,reduc;
   BOOLEAN withT = FALSE;
-  BOOLEAN b=pLexOrder;
   BOOLEAN toReset=FALSE;
   kStrategy strat=new skStrategy;
   tHomog h;
@@ -2292,7 +2291,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
   {
     h = (tHomog)idHomModule(F,Q,&w);
   }
-  pLexOrder=b;
   if (h==isHomog)
   {
     if (strat->ak > 0 && (w!=NULL) && (w!=NULL))
@@ -2303,7 +2301,6 @@ ideal kInterRedBba (ideal F, ideal Q, int &need_retry)
       pSetDegProcs(kModDeg);
       toReset = TRUE;
     }
-    pLexOrder = TRUE;
     strat->LazyPass*=2;
   }
   strat->homog=h;
