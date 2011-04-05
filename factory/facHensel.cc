@@ -1765,8 +1765,8 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
   two= bufFactors [1];
   if (degBuf0 > 0 && degBuf1 > 0)
   {
-    while (one.exp() > j) one++;
-    while (two.exp() > j) two++;
+    while (one.hasTerms() && one.exp() > j) one++;
+    while (two.hasTerms() && two.exp() > j) two++;
     for (k= 1; k <= (int) ceil (j/2.0); k++)
     {
       if (k != j - k + 1)
@@ -1794,19 +1794,30 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
       else
         tmp[0] += M (k + 1, 1);
     }
-
-    if (j + 2 <= M.rows())
-    {
-      if (degBuf0 >= j + 1 && degBuf1 >= j + 1)
-        tmp [0] += mulNTL ((bufFactors [0] [j + 1]+ bufFactors [0] [0]),
-                           (bufFactors [1] [j + 1] + bufFactors [1] [0]))
-                           - M(1,1) - M (j + 2,1);
-      else if (degBuf0 >= j + 1)
-        tmp[0] += mulNTL (bufFactors [0] [j+1], bufFactors [1] [0]);
-      else if (degBuf1 >= j + 1)
-        tmp[0] += mulNTL (bufFactors [0] [0], bufFactors [1] [j + 1]);
-    }
   }
+
+  if (degBuf0 >= j + 1 && degBuf1 >= j + 1)
+  {
+    if (j + 2 <= M.rows())
+      tmp [0] += mulNTL ((bufFactors [0] [j + 1]+ bufFactors [0] [0]),
+                         (bufFactors [1] [j + 1] + bufFactors [1] [0]))
+                         - M(1,1) - M (j + 2,1);
+  }
+  else if (degBuf0 >= j + 1)
+  {
+    if (degBuf1 > 0)
+      tmp[0] += mulNTL (bufFactors [0] [j+1], bufFactors [1] [0]);
+    else
+      tmp[0] += mulNTL (bufFactors [0] [j+1], bufFactors [1]);
+  }
+  else if (degBuf1 >= j + 1)
+  {
+    if (degBuf0 > 0)
+      tmp[0] += mulNTL (bufFactors [0] [0], bufFactors [1] [j + 1]);
+    else
+      tmp[0] += mulNTL (bufFactors [0], bufFactors [1] [j + 1]);
+  }
+
   Pi [0] += tmp[0]*xToJ*F.mvar();
 
   /*// update Pi [l]
@@ -2168,16 +2179,16 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
   }
   CanonicalForm uIZeroJ;
 
-    if (degBuf0 > 0 && degBuf1 > 0)
-      uIZeroJ= mulMod (bufFactors[0] [0], buf[1], MOD) +
-               mulMod (bufFactors[1] [0], buf[0], MOD);
-    else if (degBuf0 > 0)
-      uIZeroJ= mulMod (buf[0], bufFactors[1], MOD);
-    else if (degBuf1 > 0)
-      uIZeroJ= mulMod (bufFactors[0], buf[1], MOD);
-    else
-      uIZeroJ= 0;
-    Pi [0] += xToJ*uIZeroJ; 
+  if (degBuf0 > 0 && degBuf1 > 0)
+    uIZeroJ= mulMod (bufFactors[0] [0], buf[1], MOD) +
+             mulMod (bufFactors[1] [0], buf[0], MOD);
+  else if (degBuf0 > 0)
+    uIZeroJ= mulMod (buf[0], bufFactors[1], MOD);
+  else if (degBuf1 > 0)
+    uIZeroJ= mulMod (bufFactors[0], buf[1], MOD);
+  else
+    uIZeroJ= 0;
+  Pi [0] += xToJ*uIZeroJ; 
 
   CFArray tmp= CFArray (factors.length() - 1);
   for (k= 0; k < factors.length() - 1; k++)
@@ -2187,8 +2198,8 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
   two= bufFactors [1];
   if (degBuf0 > 0 && degBuf1 > 0)
   {
-    while (one.exp() > j) one++;
-    while (two.exp() > j) two++;
+    while (one.hasTerms() && one.exp() > j) one++;
+    while (two.hasTerms() && two.exp() > j) two++;
     for (k= 1; k <= (int) ceil (j/2.0); k++)
     {
       if (k != j - k + 1)
@@ -2219,18 +2230,28 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
         tmp[0] += M (k + 1, 1);
       }
     }
+  }
 
+  if (degBuf0 >= j + 1 && degBuf1 >= j + 1)
+  {
     if (j + 2 <= M.rows())
-    {
-      if (degBuf0 >= j + 1 && degBuf1 >= j + 1)
-        tmp [0] += mulMod ((bufFactors [0] [j + 1]+ bufFactors [0] [0]),
-                           (bufFactors [1] [j + 1] + bufFactors [1] [0]), MOD)
-                   - M(1,1) - M (j + 2,1);
-      else if (degBuf0 >= j + 1)
-        tmp[0] += mulMod (bufFactors [0] [j+1], bufFactors [1] [0], MOD);
-      else if (degBuf1 >= j + 1)
-        tmp[0] += mulMod (bufFactors [0] [0], bufFactors [1] [j + 1], MOD);
-    }
+      tmp [0] += mulMod ((bufFactors [0] [j + 1]+ bufFactors [0] [0]),
+                         (bufFactors [1] [j + 1] + bufFactors [1] [0]), MOD)
+                         - M(1,1) - M (j + 2,1);
+  }
+  else if (degBuf0 >= j + 1)
+  {
+    if (degBuf1 > 0)
+      tmp[0] += mulMod (bufFactors [0] [j+1], bufFactors [1] [0], MOD);
+    else
+      tmp[0] += mulMod (bufFactors [0] [j+1], bufFactors [1], MOD);
+  }
+  else if (degBuf1 >= j + 1)
+  {
+    if (degBuf0 > 0)
+      tmp[0] += mulMod (bufFactors [0] [0], bufFactors [1] [j + 1], MOD);
+    else
+      tmp[0] += mulMod (bufFactors [0], bufFactors [1] [j + 1], MOD);
   }
   Pi [0] += tmp[0]*xToJ*F.mvar();
 
