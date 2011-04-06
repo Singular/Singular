@@ -4969,6 +4969,7 @@ progress during the following computations:
 @code{facstd},
 @code{fglm},
 @code{groebner},
+@code{intersect},
 @code{lres},
 @code{mres},
 @code{minres},
@@ -5023,6 +5024,16 @@ avoids to divide polynomials by non-constant units in @code{std} in the local ca
 @cindex contentSB, option
 avoids to divide by the content of a polynomial in @code{std} and related
 algorithms. Should usually not be used.
+@c ---------
+@item @code{intersectElim}
+@cindex intersectElim, option
+prefers elimination to compute intersections (experimental, will be removed in the next release).
+Should usually not be used.
+@c ---------
+@item @code{intersectSyz}
+@cindex intersectSyz, option
+prefers syzygy methods to compute intersections (experimental, will be removed in the next release).
+Should usually not be used.
 @c ---------
 @c @item @code{modpsolve}
 @c @cindex modpsolve, option
