@@ -2,28 +2,36 @@
 version="$Id$";
 category="Noncommutative";
 info="
-LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via letterplace
-AUTHOR: Viktor Levandovskyy,     levandov@math.rwth-aachen.de
+LIBRARY: freegb.lib   Compute two-sided Groebner bases in free algebras via
+@*                    letterplace
+AUTHORS: Viktor Levandovskyy,     viktor.levandovskyy@math.rwth-aachen.de
+@*       Grischa Studzinski,      grischa.studzinski@math.rwth-aachen.de
 
-OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual.
+OVERVIEW: For the theory, see chapter 'Letterplace' in the @sc{Singular} Manual
 
 PROCEDURES:
-makeLetterplaceRing(d);    creates a ring with d blocks of shifted original variables
-letplaceGBasis(I); computes two-sided Groebner basis of a letterplace ideal I up to a degree bound
-freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via list L, up to degree n
-setLetterplaceAttributes(R,d,b);  supplies ring R with the letterplace structure
+makeLetterplaceRing(d);    creates a ring with d blocks of shifted original
+@*                         variables
+letplaceGBasis(I); computes two-sided Groebner basis of a letterplace ideal I
+@*                 up to a degree bound
+lpNF(f,I);      normal form of f with respect to ideal I
+freeGBasis(L, n);  computes two-sided Groebner basis of an ideal, encoded via
+@*                 list L, up to degree n
+setLetterplaceAttributes(R,d,b); supplies ring R with the letterplace structure
 
 
-lpMult(f,g);        letterplace multiplication of letterplace polynomials
-shiftPoly(p,i);    compute the i-th shift of letterplace polynomial p
-lpPower(f,n);     natural power of a letterplace polynomial
+lpMult(f,g);    letterplace multiplication of letterplace polynomials
+shiftPoly(p,i); compute the i-th shift of letterplace polynomial p
+lpPower(f,n);   natural power of a letterplace polynomial
 lp2lstr(K, s);      convert letter-place ideal to a list of modules
-lst2str(L[, n]);     convert a list (of modules) into polynomials in free algebra
+lst2str(L[, n]);   convert a list (of modules) into polynomials in free algebra
 mod2str(M[, n]); convert a module into a polynomial in free algebra
 vct2str(M[, n]);   convert a vector into a word in free algebra
-lieBracket(a,b[, N]);    compute Lie bracket ab-ba of two letterplace polynomials
-serreRelations(A,z);   compute the homogeneous part of Serre's relations associated to a generalized Cartan matrix A
-fullSerreRelations(A,N,C,P,d); compute the ideal of all Serre's relations associated to a generalized Cartan matrix A
+lieBracket(a,b[, N]);  compute Lie bracket ab-ba of two letterplace polynomials
+serreRelations(A,z);   compute the homogeneous part of Serre's relations
+@*                     associated to a generalized Cartan matrix A
+fullSerreRelations(A,N,C,P,d); compute the ideal of all Serre's relations
+@*                             associated to a generalized Cartan matrix A
 isVar(p);                   check whether p is a power of a single variable
 ademRelations(i,j);    compute the ideal of Adem relations for i<2j in char 0
 
@@ -466,9 +474,12 @@ static proc mono2word(poly p, int d)
 proc letplaceGBasis(ideal I)
 "USAGE: letplaceGBasis(I);  I an ideal
 RETURN: ideal
-ASSUME: basering is a Letterplace ring, an ideal consists of Letterplace polynomials
-PURPOSE: compute the two-sided Groebner basis of an ideal I via Letterplace algorithm
-NOTE: the degree bound for this computation is read off the letterplace structure of basering
+ASSUME: basering is a Letterplace ring, an ideal consists of Letterplace
+@*      polynomials
+PURPOSE: compute the two-sided Groebner basis of an ideal I via Letterplace
+@*       algorithm
+NOTE: the degree bound for this computation is read off the letterplace
+@*    structure of basering
 EXAMPLE: example letplaceGBasis; shows examples
 "
 {
@@ -526,14 +537,17 @@ proc freeGBasis(list LM, int d)
 RETURN:  ring
 ASSUME: L has a special form. Namely, it is a list of modules, where
 
- - each generator of every module stands for a monomial times coefficient in free algebra,
+ - each generator of every module stands for a monomial times coefficient in
+@* free algebra,
 
- - in such a vector generator, the 1st entry is a nonzero coefficient from the ground field
+ - in such a vector generator, the 1st entry is a nonzero coefficient from the
+@* ground field
 
  - and each next entry hosts a variable from the basering.
 PURPOSE: compute the two-sided Groebner basis of an ideal, encoded by L
 @* in the free associative algebra, up to degree d
-NOTE: Apply @code{lst2str} to the output in order to obtain a better readable presentation
+NOTE: Apply @code{lst2str} to the output in order to obtain a better readable
+@*    presentation
 EXAMPLE: example freeGBasis; shows examples
 "
 {
@@ -953,7 +967,8 @@ proc makeLetterplaceRing(int d, list #)
 "USAGE:  makeLetterplaceRing(d [,h]); d an integer, h an optional integer
 RETURN:  ring
 PURPOSE: creates a ring with the ordering, used in letterplace computations
-NOTE: if h is given and nonzero, the pure homogeneous letterplace block ordering will be used.
+NOTE: if h is given and nonzero, the pure homogeneous letterplace block
+@*    ordering will be used.
 EXAMPLE: example makeLetterplaceRing; shows examples
 "
 {
@@ -2355,8 +2370,9 @@ proc lieBracket(poly a, poly b, list #)
 "USAGE:  lieBracket(a,b[,N]); a,b letterplace polynomials, N an optional integer
 RETURN:  poly
 ASSUME: basering has a letterplace ring structure
-PURPOSE: compute the Lie bracket [a,b] = ab - ba between letterplace polynomials
-NOTE: if N>1 is specified, then the left normed bracket [a,[...[a,b]]]] is computed.
+PURPOSE:compute the Lie bracket [a,b] = ab - ba between letterplace polynomials
+NOTE: if N>1 is specified, then the left normed bracket [a,[...[a,b]]]] is
+@*    computed.
 EXAMPLE: example lieBracket; shows examples
 "
 {
@@ -2546,10 +2562,12 @@ example
 proc fullSerreRelations(intmat A, ideal rNegative, ideal rCartan, ideal rPositive, int uptodeg)
 "USAGE:  fullSerreRelations(A,N,C,P,d); A an intmat, N,C,P ideals, d an int
 RETURN:  ring (and ideal)
-PURPOSE: compute the inhomogeneous Serre's relations associated to A in given variable names
-ASSUME: three ideals in the input are of the same sizes and contain merely variables
-@* which are interpreted as follows: N resp. P stand for negative resp. positive roots,
-@* C stand for Cartan elements. d is the degree bound for letterplace ring, which will be returned.
+PURPOSE: compute the inhomogeneous Serre's relations associated to A in given
+@*       variable names
+ASSUME: three ideals in the input are of the same sizes and contain merely 
+@* variables which are interpreted as follows: N resp. P stand for negative
+@* resp. positive roots, C stand for Cartan elements. d is the degree bound for
+@* letterplace ring, which will be returned.
 @* The matrix A is a generalized Cartan matrix with integer entries
 @* The result is the ideal called 'fsRel' in the returned ring.
 EXAMPLE: example fullSerreRelations; shows examples
@@ -3142,6 +3160,310 @@ example
   poly a = x(1)*y(2) + y(1); poly b = y(1) - 1;
   lpPower(a,2);
   lpPower(b,4);
+}
+
+// new: lp normal from by using shift-invariant data by Grischa Studzinski
+
+/////////////////////////////////////////////////////////
+//   ASSUMPTIONS: every polynomial is an element of V',
+//@* else there wouldn't be an dvec representation
+
+//Mainprocedure for the user
+
+proc lpNF(poly p, ideal G)
+"USAGE: lpNF(p,G); f letterplace polynomial, ideal I
+RETURN: poly
+PURPOSE: computation of the normalform of p with respect to G
+ASSUME: p is a Letterplace polynomial, G is a set Letterplace polynomials, 
+being a Letterplace Groebner basis (no check for this will be done)
+NOTE: Strategy: take the smallest monomial wrt ordering for reduction
+@*     For homogenous ideals the shift does not matter
+@*     For non-homogenous ideals the first shift will be the smallest monomial
+EXAMPLE: example lpNF; shows examples
+"
+{if ((p==0) || (size(G) == 0)){return(p);}
+ checkAssumptions(p,G);
+ G = sort(G)[1];
+ list L = makeDVecI(G);
+ return(normalize(lpNormalForm1(p,G,L)));
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+ring r = 0,(x,y,z),dp;
+int d =5; // degree
+def R = makeLetterplaceRing(d);
+setring R;
+ideal I = y(1)*x(2)*y(3) - z(1)*y(2)*z(3), x(1)*y(2)*x(3) - z(1)*x(2)*y(3), z(1)*x(2)*z(3) - y(1)*z(2)*x(3), x(1)*x(2)*x(3) + y(1)*y(2)*y(3) + z(1)*z(2)*z(3) + x(1)*y(2)*z(3);
+ideal J = letplaceGBasis(I); // compute a Letterplace Groebner basis
+poly p = y(1)*x(2)*y(3)*z(4)*y(5) - y(1)*z(2)*z(3)*y(4) + z(1)*y(2)*z(3);
+poly q = z(1)*x(2)*z(3)*y(4)*z(5) - y(1)*z(2)*x(3)*y(4)*z(5);
+lpNF(p,J);
+lpNF(q,J);
+}
+
+//procedures to convert monomials into the DVec representation, all static
+////////////////////////////////////////////////////////
+
+
+static proc getExpVecs(ideal G)
+"USUAGE: getExpVecs(G);
+RETURN: list of intvecs
+PURPOSE: convert G into a list of intvecs, corresponding to the exponent vector
+@* of the leading monomials of G
+"
+{int i; list L;
+ for (i = 1; i <= size(G); i++) {L[i] = leadexp(G[i]); }
+ return(L);
+}
+
+
+static proc delSupZero(intvec I)
+"USUAGE:delSupZero(I);
+RETURN: intvec
+PURPOSE: Deletes superfluous zero blocks of an exponent vector
+ASSUME: Intvec is an exponent vector of a letterplace monomial contained in V'
+"
+{if (I==intvec(0)) {return(intvec(0));}
+ int j,k,l;
+ int n = attrib(basering,"lV"); int d = attrib(basering,"uptodeg");
+ intvec w; j = 1;
+ while (j <= d)
+ {w = I[1..n];
+  if (w<>intvec(0)){break;}
+   else {I = I[(n+1)..(n*d)]; d = d-1; j++;}
+ }
+ for (j = 1; j <= d; j++)
+  {l=(j-1)*n+1; k= j*n; 
+   w = I[l..k];
+   if (w==intvec(0)){w = I[1..(l-1)]; return(w);}//if a zero block is found there are only zero blocks left,
+                                                 //otherwise there would be a hole in the monomial
+                                                 // shrink should take care that this will not happen
+  }
+ return(I);
+}
+
+
+static proc delSupZeroList(list L)
+"USUAGE:delSupZeroList(L); L a list, containing intvecs
+RETURN: list, containing intvecs
+PURPOSE: Deletes all superfluous zero blocks for a list of exponent vectors
+ASSUME: All intvecs are exponent vectors of letterplace monomials contained in V'
+"
+{int i;
+ for (i = size(L); 0 < i; i--){L[i] = delSupZero(L[i]);}
+ return(L);
+}
+
+
+static proc makeDVec(intvec V)
+"USUAGE:makeDVec(V);
+RETURN: intvec
+PURPOSE: Converts an modified exponent vector into an Dvec
+NOTE: Superfluos zero blocks must have been deleted befor using this procedure
+"
+{int i,j,k,r1,r2; intvec D;
+ int n = attrib(basering,"lV");
+ k = size(V)/n; r1 = 0; r2 = 0;
+ for (i=1; i<= k; i++)
+  {for (j=(1+((i-1)*n)); j <= (i*n); j++)
+   {if (V[j]>0){r2 = j - ((i-1)*n); j = (j mod n); break;}
+   }
+   D[size(D)+1] = r1+r2;
+   if (j == 0) {r1 = 0;} else{r1= n-j;}
+  }
+ D = D[2..size(D)];
+ return(D);
+}
+
+static proc makeDVecL(list L)
+"USUAGE:makeDVecL(L); L, a list containing intvecs
+RETURN: list, containing intvecs
+ASSUME:
+"
+{int i; list R;
+ for (i=1; i <= size(L); i++) {R[i] = makeDVec(L[i]);}
+ return(R);
+}
+
+static proc makeDVecI(ideal G)
+"USUAGE:makeDVecI(G);
+RETURN:list, containing intvecs
+PURPOSE:computing the DVec representation for lead(G)
+ASSUME:
+"
+{list L = delSupZeroList(getExpVecs(G));
+ return(makeDVecL(L));
+}
+
+
+//procedures, which are dealing with the DVec representation, all static
+
+static proc dShiftDiv(intvec V, intvec W)
+"USUAGE: dShiftDiv(V,W);
+RETURN: a list,containing integers, or -1, if no shift of W divides V
+PURPOSE: find all possible shifts s, such that s.W|V
+ASSUME: V,W are DVecs of monomials contained in V'
+"
+{if(size(V)<size(W)){return(list(-1));}
+
+ int i,j,r; intvec T; list R;
+ int n = attrib(basering,"lV");
+ int k = size(V) - size(W) + 1;
+ if (intvec(V[1..size(W)])-W == 0){R[1]=0;}
+ for (i =2; i <=k; i++)
+ {r = 0; kill T; intvec T;
+  for (j =1; j <= i; j++) {r = r + V[j];}
+  //if (i==1) {T[1] = r-(i-1)*n;} else
+  T[1] = r-(i-1)*n; if (size(W)>1) {T[2..size(W)] = V[(i+1)..(size(W)+i-1)];}
+  if (T-W == 0) {R[size(R)+1] = i-1;}
+ }
+ if (size(R)>0) {return(R);}
+ else {return(list(-1));}
+}
+
+
+
+//the actual normalform procedure, if a user want not to presort the ideal, just make it not static
+
+
+static proc lpNormalForm1(poly p, ideal G, list L)
+"USUAGE:lpNormalForm1(p,G);
+RETURN:poly
+PURPOSE:computation of the normalform of p w.r.t. G
+ASSUME: p is a Letterplace polynomial, G is a set of Letterplace polynomials
+NOTE: Taking the first possible reduction
+"
+{
+ if (deg(p) <1) {return(p);}
+ else
+  {
+  int i; int s;
+  intvec V = makeDVec(delSupZero(leadexp(p)));
+  for (i = 1; i <= size(L); i++)
+  {s = dShiftDiv(V, L[i])[1];
+   if (s <> -1)
+   {p = lpReduce(p,G[i],s); 
+    p = lpNormalForm1(p,G,L);
+    break;
+   }
+  }
+  p = p[1] + lpNormalForm1(p-p[1],G,L);
+  return(p);
+ }
+}
+
+
+
+
+//secundary procedures, all static
+
+static proc getlpCoeffs(poly q, poly p)
+"
+"
+{list R; poly m; intvec cq,t,lv,rv,bla;
+ int n = attrib(basering,"lV"); int d = attrib(basering,"uptodeg");
+ int i;
+ m = p/q;
+ cq = leadexp(m);
+ for (i = 1; i<= d; i++)
+ {bla = cq[((i-1)*n+1)..(i*n)];
+  if (bla == 0) {lv = cq[1..i*n]; cq = cq[(i*n+1)..(d*n)]; break;}
+ }
+ 
+ d = size(cq)/n;
+ for (i = 1; i<= d; i++)
+ {bla = cq[((i-1)*n+1)..(i*n)];
+  if (bla <> 0){rv = cq[((i-1)*n+1)..(d*n)]; break;}
+ }
+ return(list(monomial(lv),monomial(rv)));
+}
+
+static proc lpReduce(poly p, poly g, int s)
+"NOTE: shift can not exceed the degree bound, because s*g | p
+"
+{poly l,r,qt; int i;
+ g = shiftPoly(g,s);
+ list K = getlpCoeffs(lead(g),lead(p));
+ l = K[1]; r = K[2];
+ kill K;
+ for (i = 1; i <= size(g); i++)
+ {qt = qt + lpMult(lpMult(l,g[i]),r);
+ }
+ return((leadcoef(qt)*p - leadcoef(p)*qt));
+}
+
+
+static proc lpShrink(poly p)
+"
+"
+{int n;
+ if (typeof(attrib(basering,"isLetterplaceRing"))=="int")
+ {n = attrib(basering,"lV");
+  return(system("shrinktest",p,n));
+ }
+ else {ERROR("Basering is not a Letterplace ring!");}
+}
+
+static proc checkAssumptions(poly p, ideal G)
+"
+"
+{checkLPRing();
+ checkAssumptionPoly(p);
+ checkAssumptionIdeal(G);
+ return();
+}
+
+static proc checkLPRing();
+"
+"
+{if (typeof(attrib(basering,"isLetterplaceRing"))=="string") {ERROR("Basering is not a Letterplace ring!");}
+ return();
+}
+
+static proc checkAssumptionIdeal(ideal G)
+"PURPOSE:Check if all elements of ideal are elements of V'
+"
+{ideal L = lead(normalize(G));
+ int i;
+ for (i = 1; i <= ncols(G); i++) {if (!isContainedInVp(G[i])) {ERROR("Ideal containes elements not contained in V'");}}
+ return();
+}
+
+static proc checkAssumptionPoly(poly p)
+"PURPOSE:Check if p is an element of V'
+"
+{poly l = lead(normalize(p));
+ if (!isContainedInVp(l)) {ERROR("Polynomial is not contained in V'");}
+ return();
+}
+
+static proc isContainedInVp(poly p)
+"PURPOSE: Check monomial for holes in the places
+"
+{int r = 0; intvec w;
+ intvec l = leadexp(p);
+ int n = attrib(basering,"lV"); int d = attrib(basering,"uptodeg");
+ int i,j,c,c1;
+ while (1 <= d)
+ {w = l[1..n];
+  if (w<>intvec(0)){break;}
+   else {l = l[(n+1)..(n*d)]; d = d-1;}
+ }
+ 
+ while (1 <= d)
+  {for (j = 1; j <= n; j++)
+   {if (l[j]<>0)
+    {if (c1<>0){return(0);}
+     if (c<>0){return(0);}
+     if (l[j]<>1){return(0);}
+     c=1;
+    }
+   }
+   if (c == 0){c1=1;if (1 < d){l = l[(n+1)..(n*d)]; d = d-1;} else {d = d -1;}}
+    else {c = 0; if (1 < d){l = l[(n+1)..(n*d)]; d = d-1;} else {d = d -1;}}
+  }
+ return(1);
 }
 
 // under development for Roberto
