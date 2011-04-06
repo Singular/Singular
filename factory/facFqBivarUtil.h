@@ -190,6 +190,15 @@ reverseSubst (CFList& L,        ///< [in,out] a list of polys, returns the
               const Variable& x ///< [in] a Variable
              );
 
+/// check if a substitution x^n->x is possible
+///
+/// @return an integer n > 1, if a substitution described as above is possible
+///         else n <= 1
+int
+substituteCheck (const CanonicalForm& F, ///<[in] a polynomial
+                 const Variable& x       ///<[in] some variable
+                );
+
 #endif
 /* FAC_FQ_BIVAR_UTIL_H */
 

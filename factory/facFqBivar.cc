@@ -945,6 +945,8 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   logarithm= ceil (logarithm);
   if (factorNums < (int) logarithm)
     factorNums= (int) logarithm;
+  int subCheck1= substituteCheck (A, x);
+  int subCheck2= substituteCheck (A, y);
   for (int i= 0; i < factorNums; i++)
   {
     bufAeval= A;
@@ -965,6 +967,9 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
       if (!fail)
       {
+        int dummy= subCheck2;
+        subCheck2= subCheck1;
+        subCheck1= dummy;
         A= buf;
         swap2= true;
       }
@@ -1025,24 +1030,28 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
     if (i == 0)
     {
-      int subCheck= substituteCheck (bufUniFactors);
-
-      if (subCheck > 1)
+      if (subCheck1 > 0)
       {
-        CanonicalForm bufA= A;
-        subst (bufA, bufA, subCheck, x);
-        factors= biFactorize (bufA, info);
-        reverseSubst (factors, subCheck, x);
-        appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
-                              swap, swap2, N);
-        normalize (factors);
-        return factors;
+        int subCheck= substituteCheck (bufUniFactors);
+
+        if (subCheck > 1 && (subCheck1%subCheck == 0))
+        {
+          CanonicalForm bufA= A;
+          subst (bufA, bufA, subCheck, x);
+          factors= biFactorize (bufA, info);
+          reverseSubst (factors, subCheck, x);
+          appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
+                                swap, swap2, N);
+          normalize (factors);
+          return factors;
+        }
       }
 
-      if (!derivXZero && !fail2)
+      if (!derivXZero && !fail2 && subCheck2 > 0)
       {
-        subCheck= substituteCheck (bufUniFactors2);
-        if (subCheck > 1)
+        int subCheck= substituteCheck (bufUniFactors2);
+
+        if (subCheck > 1 && (subCheck2%subCheck == 0))
         {
           CanonicalForm bufA= A;
           subst (bufA, bufA, subCheck, y);

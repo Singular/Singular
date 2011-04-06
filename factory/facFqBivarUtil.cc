@@ -388,6 +388,43 @@ CFFList multiplicity (CanonicalForm& F, const CFList& factors)
   return result;
 }
 
+int
+substituteCheck (const CanonicalForm& F, const Variable& x)
+{
+  if (F.inCoeffDomain())
+    return 0;
+  if (degree (F, x) < 0)
+    return 0;
+  CanonicalForm f= swapvar (F, F.mvar(), x);
+  int sizef= 0;
+  for (CFIterator i= f; i.hasTerms(); i++, sizef++)
+  {
+    if (i.exp() == 1)
+      return 0;
+  }
+  int * expf= new int [sizef];
+  int j= 0;
+  for (CFIterator i= f; i.hasTerms(); i++, j++)
+    expf [j]= i.exp();
+
+  int indf= sizef - 1;
+  if (expf[indf] == 0)
+    indf--;
+
+  int result= expf[indf];
+  for (int i= indf - 1; i >= 0; i--)
+  {
+    if (expf [i]%result != 0)
+    {
+      delete [] expf;
+      return 0;
+    }
+  }
+
+  delete [] expf;
+  return result;
+}
+
 static int
 substituteCheck (const CanonicalForm& F, const CanonicalForm& G)
 {
