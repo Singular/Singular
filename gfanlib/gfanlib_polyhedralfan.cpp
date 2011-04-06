@@ -307,16 +307,16 @@ ZMatrix PolyhedralFan::getRaysInPrintingOrder(bool upToSymmetry)const
    * just the first extreme ray from the orbit that appeared. Now it is gotten using "orbitRepresentative"
    * which causes the ordering in which the different orbits appear to change.
    */
-
   if(cones.empty())return ZMatrix(0,n);
 ZMatrix generatorsOfLinealitySpace=cones.begin()->generatorsOfLinealitySpace();//all cones have the same lineality space
+
 
   std::set<ZVector> rays;//(this->getAmbientDimension());
 //  log1 fprintf(Stderr,"Computing rays of %i cones\n",cones.size());
   for(PolyhedralConeList::const_iterator i=cones.begin();i!=cones.end();i++)
     {
       ZMatrix temp=i->extremeRays(&generatorsOfLinealitySpace);
-      std::cerr<<temp;
+ //     std::cerr<<temp;
       for(int j=0;j<temp.getHeight();j++)
         rays.insert(symmetries.orbitRepresentative(temp[j]));
     }
@@ -489,9 +489,7 @@ SymmetricComplex PolyhedralFan::toSymmetricComplex()const
           ZMatrix rays=getRaysInPrintingOrder();
 
           ZMatrix generatorsOfLinealitySpace=cones.empty()?ZMatrix::identity(getAmbientDimension()):cones.begin()->generatorsOfLinealitySpace();
-          std::cerr<<generatorsOfLinealitySpace;
           SymmetricComplex symCom(rays,generatorsOfLinealitySpace,symmetries);
-
 
           for(PolyhedralConeList::const_iterator i=cones.begin();i!=cones.end();i++)
             {
@@ -507,6 +505,7 @@ SymmetricComplex PolyhedralFan::toSymmetricComplex()const
 //          log1 cerr<<"Remapping";
           symCom.remap();
 //          log1 cerr<<"Done remapping";
+
           return symCom;
 }
 

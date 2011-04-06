@@ -412,7 +412,7 @@ public:
       for(int i=numberOfInequalities;i<numberOfRows;i++)
         set_addelem(A->linset,i+1);
 
-      A->objective-dd_LPmax;
+      A->objective=dd_LPmax;
       lp=dd_Matrix2LP(A, &err);
       if (err!=dd_NoError) goto _L99;
 
@@ -716,7 +716,8 @@ void ZCone::ensureStateAsMinimum(int s)const
       inequalities.sortRows();
       equations=QToZMatrixPrimitive(equations2);
     }
-  state=s;
+  if(state<s)
+    state=s;
 }
 
 std::ostream &operator<<(std::ostream &f, ZCone const &c)

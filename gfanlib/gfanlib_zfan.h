@@ -57,6 +57,7 @@ class ZFan
    */
   void ensureConeCollection()const;
   void ensureComplex()const;
+  void killComplex()const;
   std::vector<std::vector<IntVector> > &table(bool orbit, bool maximal)const;
 public:
   ~ZFan();

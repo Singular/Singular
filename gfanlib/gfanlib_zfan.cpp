@@ -56,17 +56,21 @@ namespace gfan
       {
         assert(coneCollection);
         complex = new SymmetricComplex(coneCollection->toSymmetricComplex());
-        std::cerr<<"D"<<std::endl;
         complex->buildConeLists(false,false,&cones);
-        std::cerr<<"D"<<std::endl;
         complex->buildConeLists(true,false,&maximalCones);
-        std::cerr<<"D"<<std::endl;
         complex->buildConeLists(false,true,&coneOrbits);
-        std::cerr<<"D"<<std::endl;
         complex->buildConeLists(true,true,&maximalConeOrbits);
-        std::cerr<<"D"<<std::endl;
       }
   }
+  void ZFan::killComplex()const
+  {
+    if(complex)
+      {
+        delete complex;
+        complex=0;
+      }
+  }
+
   ZFan::ZFan(std::istream &f):
     coneCollection(0),
     complex(0)
@@ -212,29 +216,24 @@ namespace gfan
   {
     if(this!=&f)
       {
-std::cerr<<"COPYING\n";
         if(complex)
           {
             delete complex;
             complex=0;
           }
-        std::cerr<<"1COPYING\n";
         if(coneCollection)
           {
             delete coneCollection;
             coneCollection=0;
           }
-        std::cerr<<"2COPYING\n";
         if(f.coneCollection)
           {
             coneCollection=new PolyhedralFan(*f.coneCollection);
           }
-        std::cerr<<"3COPYING\n";
         if(f.complex)
           {
             complex=new SymmetricComplex(*f.complex);
           }
-        std::cerr<<"DONE COPYING\n";
       }
     return *this;
   }
@@ -272,6 +271,7 @@ std::cerr<<"COPYING\n";
   void ZFan::insert(ZCone const &c)
   {
     ensureConeCollection();
+    killComplex();
     coneCollection->insert(c);
   }
 
@@ -290,6 +290,10 @@ ZFan::ZFan(SymmetryGroup const &sym):
 std::string ZFan::toString(int flags)const
 {
   ensureComplex();
+
+  //  std::string s=complex->toString(flags);
+//  killComplex();
+//  return s;//complex->getMinDim(),complex->getMaxDim(),0,0);
   return complex->toString(flags);//complex->getMinDim(),complex->getMaxDim(),0,0);
 //  return "NEEDTOFIXTHIS";
 

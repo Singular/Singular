@@ -26,7 +26,7 @@ public:
    */
   static bool isPermutation(IntVector const &a);
   /**
-   * Returns true if all rows of the matrix are pemutations
+   * Returns true if all rows of the matrix contains the elements 0 up to m.getWidth()-1.
    */
   static bool arePermutations(IntMatrix const &m);
   /**
@@ -101,7 +101,6 @@ public:
  */
 
 class SymmetryGroup{
-//  unsigned char *byteTable;
   int byteTableHeight;
   class Trie *trie;
 public:
@@ -141,10 +140,7 @@ public:
   ZVector orbitRepresentativeFixing(ZVector const &v, ZVector const &fixed)const;
 
   // Methods for highly optimized symmetry group computations:
-//  void createByteTable();//Can only be called once. SymmetryGroup is not allowed to be changed afterwards or to be copied. Leaks memory at destruction.
   void createTrie();
-//  unsigned char *getByteTable()const;
-//  int getByteTableHeight()const;
 };
 /**
  * Sorts v and returns the number of swaps performed.

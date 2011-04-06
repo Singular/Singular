@@ -89,6 +89,8 @@ enum PolyhedralConePreassumptions{
   PCP_facetsKnown=2
 };
 
+class ZCone;
+ZCone intersection(const ZCone &a, const ZCone &b);
 class ZCone
 {
   int preassumptions;
@@ -348,7 +350,7 @@ public:
    // PolyhedralCone projection(int newn)const;
     friend std::ostream &operator<<(std::ostream &f, ZCone const &c);
 };
-ZCone intersection(const ZCone &a, const ZCone &b);
+
 };
 
 
