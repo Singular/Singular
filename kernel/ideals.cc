@@ -1158,6 +1158,7 @@ ideal idFreeModule (int i)
 ideal idSectWithElim (ideal h1,ideal h2)
 // does not destroy h1,h2
 {
+  if (TEST_OPT_PROT) PrintS("intersect by elimination method\n");
   assume(!idIs0(h1));
   assume(!idIs0(h2));
   assume(IDELEMS(h1)<=IDELEMS(h2));
@@ -1251,10 +1252,12 @@ ideal idSect (ideal h1,ideal h2)
   {
     if ((currQuotient==NULL)
     && (currRing->OrdSgn==1)
-    && (!rIsPluralRing(currRing)))
+    && (!rIsPluralRing(currRing))
+    && ((TEST_V_INTERSECT_ELIM) || (!TEST_V_INTERSECT_SYZ)))
       return idSectWithElim(first,second);
     else length = 1;
   }
+  if (TEST_OPT_PROT) PrintS("intersect by syzygy methods\n");
   j = IDELEMS(first);
 
   ring orig_ring=currRing;
