@@ -204,6 +204,14 @@ static BOOLEAN jjFANFULL_IM(leftv res, leftv v)
 
 BOOLEAN fan_full(leftv res, leftv args)
 {
+  /*  {
+    gfan::ZFan f(2);
+    std::cout<<f.toString();
+    f.insert(gfan::ZCone::positiveOrthant(2));
+    std::cout<<f.toString();
+    }*/
+
+
   leftv u = args;
   if (u == NULL)
   {
@@ -233,6 +241,7 @@ BOOLEAN insert_cone(leftv res, leftv args)
     {
       gfan::ZFan* zf = (gfan::ZFan*)u->Data();
       gfan::ZCone* zc = (gfan::ZCone*)v->Data();
+      zc->canonicalize();
       zf->insert(*zc);
       res->rtyp = NONE;
       res->data = NULL;
