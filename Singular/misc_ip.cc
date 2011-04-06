@@ -556,6 +556,8 @@ struct soptionStruct verboseStruct[]=
   {"coefStrat",Sy_bit(V_COEFSTRAT), ~Sy_bit(V_COEFSTRAT)},
   {"qringNF",  Sy_bit(V_QRING),     ~Sy_bit(V_QRING)},
   {"warn",     Sy_bit(V_ALLWARN),   ~Sy_bit(V_ALLWARN)},
+  {"interedSyz",Sy_bit(V_INTERSECT_SYZ), ~Sy_bit(V_INTERSECT_SYZ)},
+  {"interedElim",Sy_bit(V_INTERSECT_ELIM), ~Sy_bit(V_INTERSECT_ELIM)},
 /*special for "none" and also end marker for showOption:*/
   {"ne",         0,          0 }
 };
