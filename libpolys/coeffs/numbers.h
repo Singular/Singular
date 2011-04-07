@@ -5,9 +5,47 @@
 ****************************************/
 /* $Id$ */
 /*
-* ABSTRACT: interface to coefficient aritmetics
+* ABSTRACT: compatility interface to coeffs
 */
 #include <coeffs/coeffs.h>
+
+// the access methods
+//
+// the routines w.r.t. currRing:
+// (should only be used in the context of currRing, i.e. in t
+#define nCopy(n)          n_Copy(n, currRing->cf)
+#define nDelete(n)        n_Delete(n, currRing->cf)
+#define nMult(n1, n2)     n_Mult(n1, n2, currRing->cf)
+#define nAdd(n1, n2)      n_Add(n1, n2, currRing->cf)
+#define nIsZero(n)        n_IsZero(n, currRing->cf)
+#define nEqual(n1, n2)    n_Equal(n1, n2, currRing->cf)
+#define nNeg(n)           n_Neg(n, currRing->cf)
+#define nSub(n1, n2)      n_Sub(n1, n2, currRing->cf)
+#define nGetChar()        nInternalChar(currRing->cf)
+#define nInit(i)          n_Init(i, currRing->cf)
+#define nIsOne(n)         n_IsOne(n, currRing->cf)
+#define nIsMOne(n)        n_IsMOne(n, currRing->cf)
+#define nGreaterZero(n)   n_GreaterZero(n, currRing->cf)
+#define nWrite(n)         n_Write(n,currRing->cf)
+#define nNormalize(n)     n_Normalize(n,currRing->cf)
+#define nGcd(a, b)        n_Gcd(a,b,currRing->cf)
+#define nIntDiv(a, b)     n_IntDiv(a,b,currRing->cf)
+#define nDiv(a, b)        n_Div(a,b,currRing->cf)
+#define nInvers(a)        n_Invers(a,currRing->cf)
+#define nExactDiv(a, b)   n_ExactDiv(a,b,currRing->cf)
+#define nTest(a)          n_Test(a,currRing->cf)
+
+#define nInpMult(a, b)    n_InpMult(a,b,currRing->cf)
+#define nPower(a, b, res) n_Power(a,b,res,currRing->cf)
+#define nSize(n)          n_Size(n,currRing->cf)
+#define nGetDenom(N)      n_GetDenom((N),currRing->cf)
+#define nGetNumerator(N)  n_GetNumerator((N),currRing->cf)
+
+#define nSetMap(R)        n_SetMap(R,currRing->cf)
+
+
+// --------------------------------------------------------------
+// internal to coeffs, but public for all realizations
 
 #define SHORT_REAL_LENGTH 6 // use short reals for real <= 6 digits
 
@@ -38,78 +76,6 @@ BOOLEAN ndDBTest(number a, const char *f, const int l, const coeffs r);
 
 // dummy routines
 void   ndNormalize(number& d, const coeffs); // nNormalize...
-
-// Tests:
-static inline BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)
-{ return (r->ringtype == 1); }
-
-static inline BOOLEAN nCoeff_is_Ring_ModN(const coeffs r)
-{ return (r->ringtype == 2); }
-
-static inline BOOLEAN nCoeff_is_Ring_PtoM(const coeffs r)
-{ return (r->ringtype == 3); }
-
-static inline BOOLEAN nCoeff_is_Ring_Z(const coeffs r)
-{ return (r->ringtype == 4); }
-
-static inline BOOLEAN nCoeff_is_Ring(const coeffs r)
-{ return (r->ringtype != 0); }
-
-static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
-{ return (r->ringtype == 4 || r->ringtype == 0); }
-
-static inline BOOLEAN nCoeff_has_Units(const coeffs r)
-{ return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
-
-static inline BOOLEAN nCoeff_is_Zp(const coeffs r)
-{ return getCoeffType(r)==n_Zp; }
-
-static inline BOOLEAN nCoeff_is_Zp(const coeffs r, int p)
-{ return (getCoeffType(r)  && (r->ch == ABS(p))); }
-
-static inline BOOLEAN nCoeff_is_Q(const coeffs r)
-{ return getCoeffType(r)==n_Q; }
-
-static inline BOOLEAN nCoeff_is_numeric(const coeffs r) /* R, long R, long C */
-{  return (getCoeffType(r)==n_R) || (getCoeffType(r)==n_long_R) || (getCoeffType(r)==n_long_C); }
-
-static inline BOOLEAN nCoeff_is_R(const coeffs r)
-{ return getCoeffType(r)==n_R; }
-
-static inline BOOLEAN nCoeff_is_GF(const coeffs r)
-{ return getCoeffType(r)==n_GF; }
-
-static inline BOOLEAN nCoeff_is_GF(const coeffs r, int q)
-{ return (getCoeffType(r)==n_GF) && (r->ch == q); }
-
-static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
-{ return (r->ringtype == 0) && (r->ch < -1); }
-
-static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
-{ return (r->ringtype == 0) && (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
-
-static inline BOOLEAN nCoeff_is_Q_a(const coeffs r)
-{ return (r->ringtype == 0) && (r->ch == 1); }
-
-static inline BOOLEAN nCoeff_is_long_R(const coeffs r)
-{ return getCoeffType(r)==n_long_R; }
-
-static inline BOOLEAN nCoeff_is_long_C(const coeffs r)
-{ return getCoeffType(r)==n_long_C; }
-
-static inline BOOLEAN nCoeff_is_CF(const coeffs r)
-{ return getCoeffType(r)==n_CF; }
-
-static inline BOOLEAN nCoeff_has_simple_inverse(const coeffs r)
-{ return r->has_simple_Inverse; }
-/* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
-
-static inline BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
-{ return r->has_simple_Alloc; }
-/* Z/p, GF(p,n), R, Ring_2toM: nCopy, nNew, nDelete are dummies*/
-
-static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
-{ return (nCoeff_is_Q_a(r)) || (nCoeff_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
 /// initialize an object of type coeff, return FALSE in case of success
 typedef BOOLEAN (*cfInitCharProc)(coeffs, void *);
