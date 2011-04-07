@@ -83,9 +83,14 @@ BOOLEAN blackbox_default_Op3(int op,leftv l, leftv r1,leftv r2, leftv r3)
   return WrongOp("blackbox_Op3", op, r1);
 }
 
-BOOLEAN blackbox_default_OpM(int op,leftv l, leftv r)
+BOOLEAN blackbox_default_OpM(int op,leftv res, leftv args)
 {
-  return WrongOp("blackbox_OpM", op, r);
+  if (op==LIST_CMD)
+  {
+    res->rtyp=LIST_CMD;
+    return jjLIST_PL(res,args);
+  }
+  return WrongOp("blackbox_OpM", op, args);
 }
 
 BOOLEAN blackbox_default_Check(blackbox *b, void *d)

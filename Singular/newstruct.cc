@@ -247,7 +247,7 @@ BOOLEAN newstruct_OpM(int op, leftv res, leftv args)
       return FALSE;
     }
     default:
-      Werror("op %d not implemented for type %d",op,args->Typ());
+      return blackbox_default_OpM(op,res,args);
       break;
   }
   return TRUE;

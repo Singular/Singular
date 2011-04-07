@@ -6809,7 +6809,7 @@ static BOOLEAN jjKLAMMER_PL(leftv res, leftv u)
   }
   return b;
 }
-static BOOLEAN jjLIST_PL(leftv res, leftv v)
+BOOLEAN jjLIST_PL(leftv res, leftv v)
 {
   int sl=0;
   if (v!=NULL) sl = v->listLength();

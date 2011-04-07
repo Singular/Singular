@@ -67,6 +67,7 @@ BOOLEAN jjBETTI(leftv res, leftv v);
 BOOLEAN jjBETTI2(leftv res, leftv u, leftv v);
 BOOLEAN jjBETTI2_ID(leftv res, leftv u, leftv v);
 BOOLEAN jjIMPORTFROM(leftv res, leftv u, leftv v);
+BOOLEAN jjLIST_PL(leftv res, leftv v);
 
 BOOLEAN jjVARIABLES_P(leftv res, leftv u);
 BOOLEAN jjVARIABLES_ID(leftv res, leftv u);
