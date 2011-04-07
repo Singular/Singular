@@ -65,6 +65,7 @@ void redefineFunctionPointers()
   n->nIsOne         = naIsOne;
   n->nIsMOne        = naIsMOne;
   n->nGreaterZero   = naGreaterZero;
+  n->nGreater       = naGreater;
   n->cfWrite        = naWrite;
   n->nRead          = naRead;
   n->nPower         = naPower;
@@ -98,6 +99,7 @@ void redefineFunctionPointers()
   nIsOne = naIsOne;
   nIsMOne = naIsMOne;
   nGreaterZero = naGreaterZero;
+  nGreater = naGreater;
   nRead = naRead;
   nPower = naPower;
   nGcd  = naGcd;
@@ -173,6 +175,7 @@ void naSetChar(int i, ring r)
   nacNeg         = nacRing->cf->nNeg;
   nacIsZero      = nacRing->cf->nIsZero;
   nacGreaterZero = nacRing->cf->nGreaterZero;
+  nacGreater     = nacRing->cf->nGreater;
   nacIsOne       = nacRing->cf->nIsOne;
   nacGcd         = nacRing->cf->nGcd;
   nacLcm         = nacRing->cf->nLcm;
@@ -736,13 +739,33 @@ BOOLEAN naEqual (number a, number b)
 }
 
 
+/* This method will only consider the numerators of a and b.
+   Moreover it may return TRUE only if one or both numerators
+   are zero or if their degrees are equal. Then TRUE is returned iff
+   coeff(numerator(a)) > coeff(numerator(b));
+   In all other cases, FALSE will be returned. */
 BOOLEAN naGreater (number a, number b)
 {
-  if (naIsZero(a))
-    return FALSE;
-  if (naIsZero(b))
-    return TRUE; /* a!= 0)*/
-  return napDeg(((lnumber)a)->z)>napDeg(((lnumber)b)->z);
+  int az = 0; int ad = 0;
+  if (naIsZero(a)) az = 1;
+  else ad = napDeg(((lnumber)a)->z);
+  int bz = 0; int bd = 0;
+  if (naIsZero(b)) bz = 1;
+  else bd = napDeg(((lnumber)b)->z);
+  
+  if ((az == 1) && (bz == 1)) /* a = b = 0 */ return FALSE;
+  if (az == 1) /* a = 0, b != 0 */
+  {
+    return (!nacGreaterZero(pGetCoeff(((lnumber)b)->z)));
+  }
+  if (bz == 1) /* a != 0, b = 0 */
+  {
+    return (nacGreaterZero(pGetCoeff(((lnumber)a)->z)));
+  }
+  if (ad == bd)  
+    return nacGreater(pGetCoeff(((lnumber)a)->z),
+                      pGetCoeff(((lnumber)b)->z));
+  return FALSE;
 }
 
 /*2

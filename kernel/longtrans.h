@@ -117,6 +117,7 @@ extern number      (*nacInvers)(number a);
 extern BOOLEAN     (*nacIsZero)(number a);
 extern BOOLEAN     (*nacIsOne)(number a);
 extern BOOLEAN     (*nacGreaterZero)(number a);
+extern BOOLEAN     (*nacGreater)(number a, number b);
 extern number      (*nacMap)(number);
 
 /* for computing with polynomials living in nacRing */

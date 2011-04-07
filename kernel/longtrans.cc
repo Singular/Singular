@@ -47,6 +47,7 @@ number      (*nacInvers)(number a);
 BOOLEAN     (*nacIsZero)(number a);
 BOOLEAN     (*nacIsOne)(number a);
 BOOLEAN     (*nacGreaterZero)(number a);
+BOOLEAN     (*nacGreater)(number a, number b);
 number      (*nacMap)(number);
 
 #ifdef LDEBUG
@@ -101,6 +102,7 @@ void ntSetChar(int i, ring r)
   nacNeg         = nacRing->cf->nNeg;
   nacIsZero      = nacRing->cf->nIsZero;
   nacGreaterZero = nacRing->cf->nGreaterZero;
+  nacGreater     = nacRing->cf->nGreater;
   nacIsOne       = nacRing->cf->nIsOne;
   nacGcd         = nacRing->cf->nGcd;
   nacLcm         = nacRing->cf->nLcm;
@@ -1573,14 +1575,33 @@ BOOLEAN ntEqual (number a, number b)
   return bo;
 }
 
-
+/* This method will only consider the numerators of a and b.
+   Moreover it may return TRUE only if one or both numerators
+   are zero or if their degrees are equal. Then TRUE is returned iff
+   coeff(numerator(a)) > coeff(numerator(b));
+   In all other cases, FALSE will be returned. */
 BOOLEAN ntGreater (number a, number b)
 {
-  if (ntIsZero(a))
-    return FALSE;
-  if (ntIsZero(b))
-    return TRUE; /* a!= 0)*/
-  return napDeg(((lnumber)a)->z)>napDeg(((lnumber)b)->z);
+  int az = 0; int ad = 0;
+  if (ntIsZero(a)) az = 1;
+  else ad = napDeg(((lnumber)a)->z);
+  int bz = 0; int bd = 0;
+  if (ntIsZero(b)) bz = 1;
+  else bd = napDeg(((lnumber)b)->z);
+  
+  if ((az == 1) && (bz == 1)) /* a = b = 0 */ return FALSE;
+  if (az == 1) /* a = 0, b != 0 */
+  {
+    return (!nacGreaterZero(pGetCoeff(((lnumber)b)->z)));
+  }
+  if (bz == 1) /* a != 0, b = 0 */
+  {
+    return (nacGreaterZero(pGetCoeff(((lnumber)a)->z)));
+  }
+  if (ad == bd)  
+    return nacGreater(pGetCoeff(((lnumber)a)->z),
+                      pGetCoeff(((lnumber)b)->z));
+  return FALSE;
 }
 
 /*2
