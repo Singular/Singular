@@ -9,9 +9,18 @@ LIB
 *.lo
 *.la
 .libs
+configure
+config.h.in
+config.sub
+config.guess
+config.h
+config.status
+ntl/*
 libpolys/polys/templates/p_Procs_Generate
 libpolys/polys/m4/
 libpolys/coeffs/test
+libpolys/coeffs/test-g
+libpolys/polys/templates/.dirstamp
 depend
 tags
 ltmain.sh
@@ -21,7 +30,6 @@ COPYING
 Makefile
 Makefile.in
 install-sh
-config*
 !configure.ac
 GNUMakefile
 confdefs.h
@@ -31,8 +39,8 @@ ix86-Linux/*
 ix86-Win/*
 x86_64-Linux/*
 ix86Mac-darwin/*
+omalloc/stamp-h3
 omalloc/Makefile.in
-omalloc/omConfig.h.in
 omalloc/omTables
 omalloc/omTables.h
 omalloc/omTables.inc

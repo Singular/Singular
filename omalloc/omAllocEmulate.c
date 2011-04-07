@@ -39,32 +39,3 @@ void* omEmulateRealloc0(void* o_addr, size_t n_size)
 #endif
   return addr;
 }
-
-#if defined(OM_EMULATE_OMALLOC) && defined(OM_PROVIDE_MALLOC)
-
-#undef calloc
-#undef malloc
-#undef realloc
-#undef free
-
-void* calloc(size_t n, size_t s)
-{
-  return omEmulateAlloc0(n*s);
-}
-
-void* malloc(size_t size)
-{
-  return OM_MALLOC_MALLOC(size);
-}
-
-void* realloc(void* o_addr, size_t n_size);
-{
-  return OM_MALLOC_REALLOC(size);
-}
-
-void free(void* addr)
-{
-  OM_MALLOC_FREE(addr);
-}
-
-#endif /* defined(OM_EMULATE_OMALLOC) && defined(OM_PROVIDE_MALLOC) */

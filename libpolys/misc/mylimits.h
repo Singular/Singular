@@ -13,7 +13,7 @@
 */
 
 #ifndef _MYLIMITS_H
-
+#define _MYLIMITS_H
 #ifdef IRIX
 #include <omalloc/omlimits.h>
 #else

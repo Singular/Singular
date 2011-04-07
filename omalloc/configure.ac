@@ -43,15 +43,6 @@ AC_ARG_WITH(
   [ --with-valloc=mmap|system|emulate
                     how to get page-aligned memory, default: use first possible])
 AC_ARG_WITH(
-  provide-malloc,
-  [ --with-provide-malloc=yes|debug|malloc
-                    provide normal|debug|underlying malloc ANSI-C conforming
-                    versions of malloc|calloc|realloc|free])
-AC_ARG_WITH(
-  emulate-omalloc,
-  [ --with-emulate-omalloc
-                    provide only omallocs interface, but do not use its features])
-AC_ARG_WITH(
   align,
   [ --with-align=8|sloppy|strict
                     how memory is aligned,
@@ -248,9 +239,6 @@ if test "${with_malloc}" = system; then
   OM_MALLOC_HEADER=omMallocSystem.h
   AC_DEFINE(OMALLOC_USES_MALLOC,1,the system allocator is called malloc)
   AC_DEFINE(OMALLOC_USES_SYSTEM_MALLOC,1,use system malloc as system allocator)
-  if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
-    AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
-  fi
 elif test "${with_malloc}" = gmalloc; then
   AC_DEFINE(OMALLOC_USES_GMALLOC,1,use gmalloc as system allocator)
   OM_MALLOC_HEADER=gmalloc.h
@@ -262,9 +250,6 @@ elif test "${with_malloc}" = pmalloc; then
 elif test "${with_malloc}" = external; then
   if test "${with_external_malloc_h+set}" != set; then
     AC_MSG_ERROR(need --with_external_malloc_h for external malloc)
-  fi
-  if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
-    AC_MSG_ERROR("can not provide malloc for --with_malloc=external")
   fi
   AC_DEFINE(OMALLOC_USES_EXTERNAL_MALLOC,1,use external malloc as system allocator)
   OM_MALLOC_HEADER=$with_external_malloc_h
@@ -279,9 +264,6 @@ else	## default
   OM_MALLOC_HEADER=omMallocSystem.h
   AC_DEFINE(OMALLOC_USES_MALLOC,1,the system allocator is called malloc)
   AC_DEFINE(OMALLOC_USES_SYSTEM_MALLOC,1,use system malloc as system allocator)
-  if test "${with_provide_malloc}" = yes || test "${with_provide_malloc}" = debug; then
-    AC_MSG_ERROR("can not provide malloc for --with-malloc=system")
-  fi
 fi
 AC_MSG_RESULT($with_malloc)
 
@@ -319,16 +301,6 @@ fi
 fi
 if test "$ac_cv_malloc_sizeof_addr" != no; then
 AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR,1,"Whether malloc provides SIZEOF_ADDR")
-fi
-
-if test "${with_provide_malloc}" = malloc; then
-   AC_DEFINE(OM_PROVIDE_MALLOC, 3, "Malloc type 3")
-elif test "${with_provide_malloc}" = debug; then
-   AC_DEFINE(OM_PROVIDE_MALLOC, 2, "Malloc debug-mode")
-elif test "${with_provide_malloc}" = yes; then
-  AC_DEFINE(OM_PROVIDE_MALLOC, 1, "Malloc type 1")
-else
-  AC_DEFINE(OM_PROVIDE_MALLOC, 0, "No malloc")
 fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
@@ -382,17 +354,6 @@ if test "${with_valloc}" = malloc; then
   fi
 fi
 AC_MSG_RESULT($with_valloc)
-
-dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-dnl emulation
-dnl
-AC_MSG_CHECKING(whether to emulate omalloc)
-if test "${with_emulate_omalloc}" = yes; then
-  AC_DEFINE(OM_EMULATE_OMALLOC,1,"Emulate omalloc")
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-fi
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl alignment
@@ -615,7 +576,7 @@ AC_MSG_RESULT(Void_t)
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl wrap it up
 dnl
-AC_CONFIG_HEADER(omConfig.h omlimits.h)
+AC_CONFIG_HEADER(config.h omConfig.h omlimits.h)
 
 AC_OUTPUT(Makefile, \
  if test "$CONFIG_HEADERS"; then echo timestamp > stamp-h; fi)

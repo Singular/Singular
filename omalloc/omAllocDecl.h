@@ -20,7 +20,7 @@
 #endif
 
 
-#if (!defined(OM_EMULATE_OMALLOC) && !defined(OM_NDEBUG) && (defined(OM_CHECK) || (defined(OM_HAVE_TRACK) && defined(OM_TRACK)))) || defined(OM_T1)
+#if (!defined(OM_NDEBUG) && (defined(OM_CHECK) || (defined(OM_HAVE_TRACK) && defined(OM_TRACK)))) || defined(OM_T1)
 
 /*******************************************************************
  *
@@ -207,7 +207,7 @@
 #endif
 #endif /* OM_ALIGNMENT_NEEDS_WORK */
 
-#elif !defined(OM_EMULATE_OMALLOC)
+#else
 /*******************************************************************
  *
  * Alloc/Free -- the real thing
@@ -276,49 +276,6 @@
 #define omStrDup(s)         _omStrDup(s)
 #define omMemDup(s)         _omMemDup(s)
 
-
-
-#else /* OM_EMULATE_OMALLOC */
-/*******************************************************************
- *
- * Emulation of omalloc's Alloc/Free interface
- *
- *******************************************************************/
-
-#include <omalloc/omMalloc.h>
-
-extern void* omEmulateCalloc(size_t size);
-extern void* omEmulateRealloc0Size(void* o_addr, size_t o_size, size_t n_size);
-extern void* omEmulateRealloc0(void* o_addr, size_t n_size);
-
-#define omTypeAllocBin(type,addr,bin)           addr=(type) OM_MALLOC_MALLOC(bin->sizeW << LOG_SIZEOF_LONG)
-#define omTypeAlloc0Bin(type,addr,bin)          addr=(type) omEmulateAlloc0(bin->sizeW << LOG_SIZEOF_LONG)
-#define omAllocBin(bin)                         OM_MALLOC_MALLOC(bin->sizeW << LOG_SIZEOF_LONG)
-#define omAlloc0Bin(bin)                        omEmulateAlloc0(bin->sizeW << LOG_SIZEOF_LONG)
-
-#define omTypeAlloc(type,addr,size)             addr=(type) OM_MALLOC_MALLOC(size)
-#define omTypeAlloc0(type,addr,size)            addr=(type) omEmulateAlloc0(size)
-#define omAlloc(size)                           OM_MALLOC_MALLOC(size)
-#define omAlloc0(size)                          omEmulateAlloc0(size)
-
-#define omTypeReallocBin(o_addr,o_bin,type,addr,bin)            addr=(type)OM_MALLOC_REALLOC(o_addr,bin->sizeW << LOG_SIZEOF_LONG)
-#define omTypeRealloc0Bin(o_addr,o_bin,type,addr,bin)           addr=(type)omEmulateRealloc0Size(o_addr,o_bin->sizeW << LOG_SIZEOF_LONG,bin->sizeW << LOG_SIZEOF_LONG)
-#define omReallocBin(o_addr,o_bin,bin)                          OM_MALLOC_REALLOC(o_addr,bin->sizeW << LOG_SIZEOF_LONG)
-#define omRealloc0Bin(o_addr,o_bin,bin)                         omEmulateRealloc0Size(o_addr,o_bin->sizeW << LOG_SIZEOF_LONG,bin->sizeW << LOG_SIZEOF_LONG)
-
-#define omTypeReallocSize(o_addr,o_size,type,addr,size)         addr=(type)OM_MALLOC_REALLOC(o_addr,size)
-#define omTypeRealloc0Size(o_addr,o_size,type,addr,size)        addr=(type)omEmulateRealloc0Size(o_addr,o_size,size)
-#define omReallocSize(addr,o_size,size)                         OM_MALLOC_REALLOC(addr,size)
-#define omRealloc0Size(addr,o_size,size)                        omEmulateRealloc0Size(addr,o_size,size)
-
-#define omTypeRealloc(o_addr,type,addr,size)                    addr=(type)OM_MALLOC_REALLOC(o_addr,size)
-#define omTypeRealloc0(o_addr,type,addr,size)                   addr=(type)omEmulateRealloc0(o_addr,size)
-#define omRealloc(addr,size)                                    OM_MALLOC_REALLOC(addr,size)
-#define omRealloc0(addr,size)                                   omEmulateRealloc0(addr,size)
-
-#define omFreeBin(addr,bin)     OM_MALLOC_FREE(addr)
-#define omFreeSize(addr,size)   OM_MALLOC_FREE(addr)
-#define omFree(addr)            OM_MALLOC_FREE(addr)
 #endif /* ! debug && ! the real thing */
 
 
@@ -390,7 +347,7 @@ extern void* omEmulateRealloc0(void* o_addr, size_t n_size);
 
 
 
-#if !defined(OM_NDEBUG) && !defined(OM_EMULATE_MALLOC)
+#if !defined(OM_NDEBUG)
 omError_t omTestAddrBin(void* addr, omBin bin, int check_level);
 omError_t omTestBinAddr(void* addr, int check_level);
 omError_t omTestBinAddrSize(void* addr, size_t size, int check_level);
