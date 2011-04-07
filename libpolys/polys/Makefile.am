@@ -16,13 +16,25 @@ AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 INCLUDES	= -I${top_srcdir}/.. -I${top_srcdir}/../.. -I${top_builddir}/.. -I${srcdir} -I${includedir} ${GMP_CFLAGS}
 AM_LDFLAGS	= -L${top_builddir}/../coeffs -L${top_builddir}/../reporter -L${top_builddir}/../resources -L${top_builddir}/../../omalloc -L${builddir}
 
+if ENABLE_P_PROCS_STATIC
+  USE_P_PROCS_STATIC_CC = templates/p_Procs_Static.cc
+else
+  USE_P_PROCS_STATIC_CC =
+endif
+
+if ENABLE_P_PROCS_DYNAMIC
+  USE_P_PROCS_DYNAMIC_CC = templates/p_Procs_Dynamic.cc
+else
+  USE_P_PROCS_DYNAMIC_CC =
+endif
+
 SOURCES = \
 	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
 	pDebug.cc pInline0.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc \
 	polys0.cc prCopy.cc \
-	kbuckets.cc sbuckets.cc templates/p_Procs.cc weight.cc
+	kbuckets.cc sbuckets.cc ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} weight.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
 
@@ -83,6 +95,8 @@ module_LTLIBRARIES=libp_Procs_FieldGeneral.la libp_Procs_FieldIndep.la libp_Proc
 
 libpolys_a_SOURCES = ${SOURCES}
 libpolys_g_a_SOURCES = ${SOURCES}
+
+EXTRA_libpolys_a_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
 
 libpolys_a_LIBADD = $(DL_KERNEL_OBJECT)
 libpolys_a_DEPENDENCIES = $(DL_KERNEL_OBJECT)
