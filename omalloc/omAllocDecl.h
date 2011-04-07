@@ -20,15 +20,6 @@
 #endif
 
 
-#if !defined(OMALLOC_C) && !defined(OM_NO_MALLOC_MACROS)
-#define calloc      omcalloc
-#define malloc      omalloc
-#define free        omfree
-#define realloc     omrealloc
-#define freeSize    omfreeSize
-#define reallocSize omreallocSize
-#endif
-
 #if (!defined(OM_EMULATE_OMALLOC) && !defined(OM_NDEBUG) && (defined(OM_CHECK) || (defined(OM_HAVE_TRACK) && defined(OM_TRACK)))) || defined(OM_T1)
 
 /*******************************************************************
@@ -62,7 +53,6 @@
 
 #define omalloc(size)   _omDebugAlloc((void*)(size),OM_FSIZE|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
 #define omalloc0(size)  _omDebugAlloc((void*)(size),OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
-#define omcalloc(n,size)_omDebugAlloc((void*) ((size)*n),OM_FSIZE|OM_FZERO|OM_FSLOPPY|OM_FALIGN|_OM_FKEEP,OM_CTFL)
 
 #else
 #define omTypeAllocBin(type,addr,bin)           __omTypeAllocBin(type,addr,bin)
@@ -77,7 +67,6 @@
 
 #define omalloc(size)   _omalloc(size)
 #define omalloc0(size)  _omalloc0(size)
-#define omcalloc(n,size)_omalloc0(n*size)
 
 #endif
 
@@ -251,7 +240,6 @@
 
 #define omalloc(size)   _omalloc(size)
 #define omalloc0(size)  _omalloc0(size)
-#define omcalloc(n,size)_omalloc0(n*size)
 
 #define omreallocSize(addr,o_size,size) _omreallocSize(addr,o_size,size)
 #define omrealloc0Size(addr,o_size,size)_omrealloc0Size(addr,o_size,size)
