@@ -18,11 +18,13 @@ Use the @code{LIB} command for loading of single libraries.
 * dmod_lib::
 * dmodapp_lib::
 * dmodvar_lib::
+* fpadim_lib::  Algorithms for quotient algebras in the letterplace case
 * freegb_lib::
 * involut_lib::
 * gkdim_lib::
 * ncalg_lib::
 * ncdecomp_lib::
+* ncfactor_lib::Tools for factorization in some noncommutative algebras
 * nctools_lib::
 * perron_lib::
 * qmatrix_lib::
@@ -34,107 +36,63 @@ Use the @code{LIB} command for loading of single libraries.
 @c ----------------------------------------------------------
 @node bfun_lib, central_lib, , Non-commutative libraries
 @section bfun_lib
-@cindex bfun_lib
-@cindex bfun.lib
-
 @c lib bfun.lib
-
 @c ----------------------------------------------------------
 @node central_lib, dmod_lib, bfun_lib, Non-commutative libraries
 @section central_lib
-@cindex central_lib
-@cindex central.lib
-
 @c lib central.lib
-
 @c ----------------------------------------------------------
 @node dmod_lib, dmodapp_lib, central_lib, Non-commutative libraries
 @section dmod_lib
-@cindex dmod_lib
-@cindex dmod.lib
-
 @c lib dmod.lib
-
 @c ----------------------------------------------------------
 @node dmodapp_lib, dmodvar_lib, dmod_lib, Non-commutative libraries
 @section dmodapp_lib
-@cindex dmodapp_lib
-@cindex dmodapp.lib
-
 @c lib dmodapp.lib
-
 @c ----------------------------------------------------------
-@node dmodvar_lib, freegb_lib, dmodapp_lib, Non-commutative libraries
+@node dmodvar_lib, fpadim_lib, dmodapp_lib, Non-commutative libraries
 @section dmodvar_lib
-@cindex dmodvar_lib
-@cindex dmodvar.lib
-
 @c lib dmodvar.lib
-
 @c ----------------------------------------------------------
-@node freegb_lib, involut_lib, dmodvar_lib, Non-commutative libraries
+@node fpadim_lib, freegb_lib, dmodapp_lib, Non-commutative libraries
+@section fpadim_lib
+@c lib fpadim.lib
+@c ----------------------------------------------------------
+@node freegb_lib, involut_lib, fpadim_lib, Non-commutative libraries
 @section freegb_lib
-@cindex freegb_lib
-@cindex freegb.lib
-
 @c lib freegb.lib
-
 @c ----------------------------------------------------------
 @node involut_lib,  gkdim_lib, freegb_lib, Non-commutative libraries
 @section involut_lib
-@cindex involut_lib
-@cindex involut.lib
-
 @c lib involut.lib
-
 @c ----------------------------------------------------------
 @node gkdim_lib, ncalg_lib, involut_lib, Non-commutative libraries
 @section gkdim_lib
-@cindex gkdim_lib
-@cindex gkdim.lib
-
 @c lib gkdim.lib
-
 @c ----------------------------------------------------------
 @node ncalg_lib, ncdecomp_lib, gkdim_lib, Non-commutative libraries
 @section ncalg_lib
-@cindex ncalg_lib
-@cindex ncalg.lib
-
 @c lib ncalg.lib
-
 @c ----------------------------------------------------------
-@node ncdecomp_lib, nctools_lib, ncalg_lib, Non-commutative libraries
+@node ncdecomp_lib, ncfactor_lib, ncalg_lib, Non-commutative libraries
 @section ncdecomp_lib
-@cindex ncdecomp_lib
-@cindex ncdecomp.lib
-
 @c lib ncdecomp.lib
-
 @c ----------------------------------------------------------
-@node nctools_lib, perron_lib, ncdecomp_lib, Non-commutative libraries
+@node ncfactor_lib, nctools_lib, ncdecomp_lib, Non-commutative libraries
+@section ncfactor_lib
+@c lib ncfactor.lib
+@c ----------------------------------------------------------
+@node nctools_lib, perron_lib, ncfactor_lib, Non-commutative libraries
 @section nctools_lib
-@cindex nctools_lib
-@cindex nctools.lib
-
 @c lib nctools.lib
-
 @c ----------------------------------------------------------
 @node perron_lib, qmatrix_lib, nctools_lib, Non-commutative libraries
 @section perron_lib
-@cindex perron_lib
-@cindex perron.lib
-
 @c lib perron.lib
-
 @c ---------------------------------------------------------
 @node qmatrix_lib,  , perron_lib, Non-commutative libraries
 @section qmatrix_lib
-@cindex qmatrix_lib
-@cindex qmatrix.lib
-
 @c lib qmatrix.lib
-
 @c ----------------------------------------------------------
 @raisesections
 

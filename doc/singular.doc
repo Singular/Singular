@@ -359,8 +359,10 @@ LIB "all.lib";
 * elim_lib:: procedures for elimination, saturation and blowing up
 * grwalk_lib:: Groebner walk and Fraktal walk
 * homolog_lib:: procedures for homological algebra
+* integralbasis_lib:: Integral basis in algebraic function fields
 * intprog_lib:: Integer Programming
 * modstd_lib:: Groebner basis of ideals via modular computations
+* monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
 * mprimdec_lib:: procedures for primary decomposition of modules
 * mregular_lib:: procedures for Castelnuovo-Mumford regularity
 * noether_lib:: Noether normalization of an ideal
@@ -368,6 +370,7 @@ LIB "all.lib";
 * normaliz_lib:: integral closure, normalization for monomial ideals, toric ideals
 * pointid_lib:: factorized lex GB of the vanishing ideal of a set of points
 * primdec_lib:: procedures for primary decomposition
+* primdecint_lib:: primary decomposition over the integers
 * primitiv_lib:: procedures for finding a primitive element
 * realrad_lib:: procedures for finding the real radical
 * reesclos_lib:: Rees Algebra and integral closure of an ideal
@@ -401,19 +404,27 @@ LIB "all.lib";
 @subsection grwalk_lib
 @c lib grwalk.lib
 @c ----------------------------------------------------------
-@node homolog_lib, intprog_lib, grwalk_lib, Commutative algebra
+@node homolog_lib, integralbasis_lib, grwalk_lib, Commutative algebra
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node intprog_lib, modstd_lib, homolog_lib, Commutative algebra
+@node integralbasis_lib, intprog_lib, grwalk_lib, Commutative algebra
+@subsection integralbasis_lib
+@c lib integralbasis.lib
+@c ----------------------------------------------------------
+@node intprog_lib, modstd_lib, integralbasis_lib, Commutative algebra
 @subsection intprog_lib
 @c lib intprog.lib
 @c ---------------------------------------------------------
-@node modstd_lib, mprimdec_lib, intprog_lib, Commutative algebra
+@node modstd_lib, monomialideal_lib, intprog_lib, Commutative algebra
 @subsection modstd_lib
 @c lib modstd.lib
 @c ---------------------------------------------------------
-@node mprimdec_lib, mregular_lib, modstd_lib, Commutative algebra
+@node monomialideal_lib, mprimdec_lib, intprog_lib, Commutative algebra
+@subsection monomialideal_lib
+@c lib monomialideal.lib
+@c ---------------------------------------------------------
+@node mprimdec_lib, mregular_lib, monomialideal_lib, Commutative algebra
 @subsection mprimdec_lib
 @c lib mprimdec.lib
 @c ----------------------------------------------------------
@@ -437,11 +448,15 @@ LIB "all.lib";
 @subsection pointid_lib
 @c lib pointid.lib
 @c ----------------------------------------------------------
-@node primdec_lib, primitiv_lib, pointid_lib, Commutative algebra
+@node primdec_lib, primdecint_lib, pointid_lib, Commutative algebra
 @subsection primdec_lib
 @c lib primdec.lib
 @c ---------------------------------------------------------
-@node primitiv_lib, realrad_lib, primdec_lib, Commutative algebra
+@node primdecint_lib, primitiv_lib, pointid_lib, Commutative algebra
+@subsection primdecint_lib
+@c lib primdecint.lib
+@c ---------------------------------------------------------
+@node primitiv_lib, realrad_lib, primdecint_lib, Commutative algebra
 @subsection primitiv_lib
 @c lib primitiv.lib
 @c ---------------------------------------------------------
@@ -470,18 +485,43 @@ LIB "all.lib";
 @cindex Algebraic geometry
 
 @menu
+* paraplanecurves_lib:: Rational parametrization of rational plane curves
+* resbinomial_lib:: Resolution of singularities of binomial ideals
 * resgraph_lib:: Visualization of Resolution data
+* resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
 * resolve_lib:: Resolution of Singularities
 * reszeta_lib:: Applications of Resolution of Singularities
 * sheafcoh_lib:: Procedures for Computing Sheaf Cohomology
 @end menu
 
 @c ---------------------------------------------------------
-@node resgraph_lib, resolve_lib, Algebraic geometry, Algebraic geometry
+@node paraplanecurves_lib, resbinomial_lib, Algebraic geometry, Algebraic geometry
+@subsection paraplanecurves_lib
+@c lib paraplanecurves.lib
+@c ---------------------------------------------------------
+@node resbinomial_lib, resgraph_lib, Algebraic geometry, Algebraic geometry
+@subsection resbinomial_lib
+ 
+Todos/Issues:
+@itemize
+@item formatting is inapprociate
+@item avoid export
+@item bad names(or should be static):
+identifyvars, elimrep, convertdata, lcmofall, genoutput, salida,
+iniD, reslist, sumlist, dividelist, createlist
+@end itemize
+
+@c lib resbinomial.lib
+@c ---------------------------------------------------------
+@node resgraph_lib, resjung_lib, resbinomial_lib, Algebraic geometry
 @subsection resgraph_lib
 @c lib resgraph.lib
 @c ---------------------------------------------------------
-@node resolve_lib, reszeta_lib, resgraph_lib, Algebraic geometry
+@node resjung_lib, resolve_lib, resbinomial_lib, Algebraic geometry
+@subsection resjung_lib
+@c lib resjung.lib
+@c ---------------------------------------------------------
+@node resolve_lib, reszeta_lib, resjung_lib, Algebraic geometry
 @subsection resolve_lib
 @c lib resolve.lib
 @c ---------------------------------------------------------
@@ -513,6 +553,7 @@ LIB "all.lib";
 * sing_lib:: procedures for computing invariants of singularities
 * spcurve_lib:: procedures for cm codimension 2 singularities
 * spectrum_lib:: procedures for computing singularity spectra
+* surfacesignature_lib:: signature of surface singularities
 @end menu
 
 @c ---------------------------------------------------------
@@ -572,9 +613,13 @@ LIB "all.lib";
 @subsection spcurve_lib
 @c lib spcurve.lib
 @c ---------------------------------------------------------
-@node spectrum_lib, , spcurve_lib, Singularities
+@node spectrum_lib, surfacesignature_lib, spcurve_lib, Singularities
 @subsection spectrum_lib
 @c lib spectrum.lib
+@c ---------------------------------------------------------
+@node surfacesignature_lib, , spectrum_lib, Singularities
+@subsection surfacesignature_lib
+@c lib surfacesignature.lib
 @c ----------------------------------------------------------------------------
 @node Invariant theory, Symbolic-numerical solving, Singularities, SINGULAR libraries
 @section Invariant theory
@@ -829,13 +874,11 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node polymake_lib,tropical_lib,Tropical Geometry, Tropical Geometry
 @subsection polymake_lib
-@cindex polymake_lib
 @c lib polymake.lib no_ex
 
 @c ----------------------------------------------------------
 @node tropical_lib,, polymake_lib, Tropical Geometry
 @subsection tropical_lib
-@cindex tropical_lib
 
 @c lib tropical.lib no_ex
 
@@ -850,7 +893,6 @@ but not for serious computations.
 @c ----------------------------------------------------------
 @node phindex_lib,,, Miscellaneous libraries
 @subsection phindex_lib
-@cindex phindex_lib
 
 @c lib phindex.lib
 
@@ -868,31 +910,14 @@ see @ref{Libraries}.
 Comments should be send to the author of the library directly.
 
 @menu
-* fpadim_lib::  Algorithms for quotient algebras in the letterplace case
 * finitediff_lib:: finite difference schemes for linear differential equations
-* integralbasis_lib:: Integral basis in algebraic function fields
 * lll_lib:: Integral LLL-Algorithm
-* monomialideal_lib:: Primary and irreducible decompositions of monomial ideals
 * multigrading_lib:: Multigradings and related computations
-* paraplanecurves_lib:: Rational parametrization of rational plane curves
-* primdecint_lib:: primary decomposition over the integers
-* resbinomial_lib:: Resolution of singularities of binomial ideals
-* resjung_lib:: Resolution of Surface Singularities by Jung's Algorithm
-* surfacesignature_lib:: signature of surface singularities
-* ncfactor_lib::Tools for factorization in some noncommutative algebras
 @end menu
 @c ----------------------------------------------------------
 
-@node fpadim_lib, finitediff_lib, , Experimental libraries
-@subsection fpadim_lib
-@cindex fpadim_lib
-
-@c lib fpadim.lib
-@c ----------------------------------------------------------
-
-@node finitediff_lib, integralbasis_lib,fpadim_lib, Experimental libraries
+@node finitediff_lib,lll_lib, , Experimental libraries
 @subsection finitediff_lib
-@cindex finitediff_lib
 
 Issues:
 @itemize
@@ -908,25 +933,12 @@ Issues:
 @c lib finitediff.lib
 
 @c ----------------------------------------------------------
-
-@node integralbasis_lib, lll_lib,finitediff_lib, Experimental libraries
-@subsection integralbasis_lib
-@cindex integralbasis_lib
-
-@c lib integralbasis.lib
-
-@c ---------------------------------------------------------
-@node lll_lib, monomialideal_lib, integralbasis_lib, Experimental libraries
+@node lll_lib, multigrading_lib, finitediff_lib, Experimental libraries
 @subsection lll_lib
 @c lib lll.lib
-@c ---------------------------------------------------------
-@node monomialideal_lib, multigrading_lib, lll_lib,  Experimental libraries
-@subsection monomialideal_lib
-@c lib monomialideal.lib
 @c ----------------------------------------------------------
-@node multigrading_lib,paraplanecurves_lib,monomialideal_lib, Experimental libraries
+@node multigrading_lib,,lll_lib, Experimental libraries
 @subsection multigrading_lib
-@cindex multigrading_lib
 
 Todos/Issues:
 @itemize
@@ -934,53 +946,6 @@ Todos/Issues:
 @end itemize
 
 @c lib multigrading.lib
-
-@c ----------------------------------------------------------
-@node paraplanecurves_lib,primdecint_lib,multigrading_lib, Experimental libraries
-@subsection paraplanecurves_lib
-@cindex paraplanecurves_lib
-
-@c lib paraplanecurves.lib
-
-@c ----------------------------------------------------------
-@node primdecint_lib,resbinomial_lib,paraplanecurves_lib, Experimental libraries
-@subsection primdecint_lib
-@cindex primdecint_lib
-
-@c lib primdecint.lib
-
-@c ---------------------------------------------------------
-@node resbinomial_lib, resjung_lib, primdecint_lib, Experimental libraries
-@subsection resbinomial_lib
-
-Todos/Issues:
-@itemize
-@item formatting is inapprociate
-@item avoid export
-@item bad names(or should be static):
-identifyvars, elimrep, convertdata, lcmofall, genoutput, salida,
-iniD, reslist, sumlist, dividelist, createlist
-@end itemize
-
-@c lib resbinomial.lib
-@c ---------------------------------------------------------
-@node resjung_lib, surfacesignature_lib, resbinomial_lib, Experimental libraries
-@subsection resjung_lib
-
-@c lib resjung.lib
-@c ----------------------------------------------------------
-@node surfacesignature_lib,ncfactor_lib,resjung_lib, Experimental libraries
-@subsection surfacesignature_lib
-@cindex surfacesignature_lib
-
-@c lib surfacesignature.lib
-
-@c ----------------------------------------------------------
-@node ncfactor_lib,,surfacesignature_lib, Experimental libraries
-@subsection ncfactor_lib
-@cindex ncfactor_lib
-
-@c lib ncfactor.lib
 
 @c ----------------------------------------------------------
 @node Release Notes, Index, SINGULAR libraries, Top
