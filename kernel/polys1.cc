@@ -489,14 +489,15 @@ void p_Content(poly ph, const ring r)
 #ifdef HAVE_RINGS
   if (rField_is_Ring(r))
   {
-    if ((ph!=NULL) && rField_has_Units(r))
+    if (ph!=NULL)
     {
       number k = nGetUnit(pGetCoeff(ph));
+      if (!nGreaterZero(pGetCoeff(ph))) k = nNeg(k); // in-place negation
       if (!nIsOne(k))
       {
-        number tmpGMP = k;
+        number tmpNumber = k;
         k = nInvers(k);
-        nDelete(&tmpGMP);
+        nDelete(&tmpNumber);
         poly h = pNext(ph);
         pSetCoeff(ph, nMult(pGetCoeff(ph), k));
         while (h != NULL)
