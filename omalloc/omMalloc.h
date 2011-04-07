@@ -8,7 +8,7 @@
 #ifndef OM_MALLOC_H
 #define OM_MALLOC_H
 
-#include <omalloc/omConfig.h>
+#include "config.h"
 
 #ifdef OMALLOC_USES_SYSTEM_MALLOC
 #include "omalloc/omMallocSystem.h"

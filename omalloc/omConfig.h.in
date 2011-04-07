@@ -1,0 +1,164 @@
+/* omConfig.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to 1 if you have the <limits.h> header file. */
+#ifndef HAVE_LIMITS_H
+#undef HAVE_LIMITS_H
+#endif
+
+/* Define to 1 if you have the <strings.h> header file. */
+#ifndef HAVE_STRINGS_H
+#undef HAVE_STRINGS_H
+#endif
+
+/* Define to 1 if you have the <string.h> header file. */
+#ifndef HAVE_STRING_H
+#undef HAVE_STRING_H
+#endif
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#ifndef HAVE_UNISTD_H
+#undef HAVE_UNISTD_H
+#endif
+
+/* Define to 1 if you have the </usr/include/malloc.h> header file. */
+#ifndef HAVE__USR_INCLUDE_MALLOC_H
+#undef HAVE__USR_INCLUDE_MALLOC_H
+#endif
+
+/* "Whether alignment needs work" */
+#ifndef OM_ALIGNMENT_NEEDS_WORK
+#undef OM_ALIGNMENT_NEEDS_WORK
+#endif
+
+/* "Align to 8 bytes" */
+#ifndef OM_ALIGN_8
+#undef OM_ALIGN_8
+#endif
+
+/* "Emulate omalloc" */
+#ifndef OM_EMULATE_OMALLOC
+#undef OM_EMULATE_OMALLOC
+#endif
+
+/* "Whether omInitGetBackTrace () works" */
+#ifndef OM_GET_BACKTRACE_WORKS
+#undef OM_GET_BACKTRACE_WORKS
+#endif
+
+/* "Whether get return address works" */
+#ifndef OM_GET_RETURN_ADDR_WORKS
+#undef OM_GET_RETURN_ADDR_WORKS
+#endif
+
+/* "Whether we have dense bins" */
+#ifndef OM_HAVE_DENSE_BIN_DISTRIBUTION
+#undef OM_HAVE_DENSE_BIN_DISTRIBUTION
+#endif
+
+/* "Wether we have an external config.c" */
+#ifndef OM_HAVE_EXTERNAL_CONFIG_C
+#undef OM_HAVE_EXTERNAL_CONFIG_C
+#endif
+
+/* "Whether we have external config.h" */
+#ifndef OM_HAVE_EXTERNAL_CONFIG_H
+#undef OM_HAVE_EXTERNAL_CONFIG_H
+#endif
+
+/* "Have track" */
+#ifndef OM_HAVE_TRACK
+#undef OM_HAVE_TRACK
+#endif
+
+/* "inline-declaration" */
+#ifndef OM_INLINE
+#undef OM_INLINE
+#endif
+
+/* "inline-declaration" */
+#ifndef OM_INLINE_DECL
+#undef OM_INLINE_DECL
+#endif
+
+/* "inline-declaration" */
+#ifndef OM_INLINE_IMPL
+#undef OM_INLINE_IMPL
+#endif
+
+/* "inline-declaration" */
+#ifndef OM_INLINE_LOCAL
+#undef OM_INLINE_LOCAL
+#endif
+
+/* "Whether malloc provides SIZEOF_ADDR" */
+#ifndef OM_MALLOC_PROVIDES_SIZEOF_ADDR
+#undef OM_MALLOC_PROVIDES_SIZEOF_ADDR
+#endif
+
+/* "Disable debug" */
+#ifndef OM_NDEBUG
+#undef OM_NDEBUG
+#endif
+
+/* "Whether to track backtrace" */
+#ifndef OM_TRACK_BACKTRACE
+#undef OM_TRACK_BACKTRACE
+#endif
+
+/* "Enable custom tracking" */
+#ifndef OM_TRACK_CUSTOM
+#undef OM_TRACK_CUSTOM
+#endif
+
+/* "Whether to track file-line" */
+#ifndef OM_TRACK_FILE_LINE
+#undef OM_TRACK_FILE_LINE
+#endif
+
+/* "Whether to track return" */
+#ifndef OM_TRACK_RETURN
+#undef OM_TRACK_RETURN
+#endif
+
+/* The size of `double', as computed by sizeof. */
+#ifndef SIZEOF_DOUBLE
+#undef SIZEOF_DOUBLE
+#endif
+
+/* The size of `long', as computed by sizeof. */
+#ifndef SIZEOF_LONG
+#undef SIZEOF_LONG
+#endif
+
+/* Page-size of the build-system */
+#ifndef SIZEOF_OM_PAGE
+#undef SIZEOF_OM_PAGE
+#endif
+
+/* The size of `size_t', as computed by sizeof. */
+#ifndef SIZEOF_SIZE_T
+#undef SIZEOF_SIZE_T
+#endif
+
+/* "Page-size of the build-system" */
+#ifndef SIZEOF_SYSTEM_PAGE
+#undef SIZEOF_SYSTEM_PAGE
+#endif
+
+/* The size of `void*', as computed by sizeof. */
+#ifndef SIZEOF_VOIDP
+#undef SIZEOF_VOIDP
+#endif
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#ifndef const
+#undef const
+#endif
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#ifndef inline
+#undef inline
+#endif
+#endif
