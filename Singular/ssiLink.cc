@@ -1004,7 +1004,6 @@ LINKAGE BOOLEAN ssiClose(si_link l)
     {
       int status;
       kill(d->pid,15);
-      kill(d->pid,9);
       waitpid(d->pid,&status,0);
     }
     omFreeSize((ADDRESS)d,(sizeof *d));
