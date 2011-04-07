@@ -12,8 +12,6 @@
 #include <mylimits.h>
 
 
-/* disable our malloc macros */
-#define OM_NO_MALLOC_MACROS
 #include <omalloc/omConfig.h>
 #include <omalloc/omDefaultConfig.h>
 #include <omalloc/omMalloc.h>

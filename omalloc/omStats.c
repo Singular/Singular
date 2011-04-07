@@ -6,7 +6,6 @@
  *  Version: $Id$
  *******************************************************************/
 #include <unistd.h>
-#define OM_NO_MALLOC_MACROS
 #include <omalloc/omConfig.h>
 #include <omalloc/omDefaultConfig.h>
 #include <omalloc/omMalloc.h>
