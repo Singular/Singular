@@ -55,9 +55,6 @@ test_g_LDADD = libcoeffs_g.a -lresources_g -lreporter_g -lomalloc_debug ${GMP_LI
 test_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 test_g_CFLAGS = ${PIPE}
 
-test_LDADD = libcoeffs.a -lresources -lreporter -lgmp -lomalloc_debug
-test_g_LDADD = libcoeffs_g.a -lresources -lreporter -lgmp -lomalloc_debug
-
 test_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
 test_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
