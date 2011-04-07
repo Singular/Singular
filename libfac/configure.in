@@ -14,10 +14,10 @@ dnl
 dnl Change libfac variables here:
 libfac_name="\"Factorization and characteristic sets library\""
 AC_SUBST(libfac_name)
-libfac_version="3.1.2"
+libfac_version="3.1.3"
 AC_DEFINE_UNQUOTED(LIBFAC_VERSION,"$libfac_version")
 AC_SUBST(libfac_version)
-libfac_date="\"Oct 2010\""
+libfac_date="\"March 2011\""
 AC_DEFINE_UNQUOTED(LIBFAC_DATE,$libfac_date)
 AC_SUBST(libfac_date)
 libfac_author="\"M. Messollen\""
