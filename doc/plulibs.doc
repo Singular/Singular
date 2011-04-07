@@ -54,7 +54,7 @@ Use the @code{LIB} command for loading of single libraries.
 @section dmodvar_lib
 @c lib dmodvar.lib
 @c ----------------------------------------------------------
-@node fpadim_lib, freegb_lib, dmodapp_lib, Non-commutative libraries
+@node fpadim_lib, freegb_lib, dmodvar_lib, Non-commutative libraries
 @section fpadim_lib
 @c lib fpadim.lib
 @c ----------------------------------------------------------

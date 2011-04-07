@@ -408,7 +408,7 @@ LIB "all.lib";
 @subsection homolog_lib
 @c lib homolog.lib
 @c ----------------------------------------------------------
-@node integralbasis_lib, intprog_lib, grwalk_lib, Commutative algebra
+@node integralbasis_lib, intprog_lib, homolog_lib, Commutative algebra
 @subsection integralbasis_lib
 @c lib integralbasis.lib
 @c ----------------------------------------------------------
@@ -420,7 +420,7 @@ LIB "all.lib";
 @subsection modstd_lib
 @c lib modstd.lib
 @c ---------------------------------------------------------
-@node monomialideal_lib, mprimdec_lib, intprog_lib, Commutative algebra
+@node monomialideal_lib, mprimdec_lib, modstd_lib, Commutative algebra
 @subsection monomialideal_lib
 @c lib monomialideal.lib
 @c ---------------------------------------------------------
@@ -452,7 +452,7 @@ LIB "all.lib";
 @subsection primdec_lib
 @c lib primdec.lib
 @c ---------------------------------------------------------
-@node primdecint_lib, primitiv_lib, pointid_lib, Commutative algebra
+@node primdecint_lib, primitiv_lib, primdec_lib, Commutative algebra
 @subsection primdecint_lib
 @c lib primdecint.lib
 @c ---------------------------------------------------------
@@ -499,7 +499,7 @@ LIB "all.lib";
 @subsection paraplanecurves_lib
 @c lib paraplanecurves.lib
 @c ---------------------------------------------------------
-@node resbinomial_lib, resgraph_lib, Algebraic geometry, Algebraic geometry
+@node resbinomial_lib, resgraph_lib, paraplanecurves_lib, Algebraic geometry
 @subsection resbinomial_lib
  
 Todos/Issues:
@@ -517,7 +517,7 @@ iniD, reslist, sumlist, dividelist, createlist
 @subsection resgraph_lib
 @c lib resgraph.lib
 @c ---------------------------------------------------------
-@node resjung_lib, resolve_lib, resbinomial_lib, Algebraic geometry
+@node resjung_lib, resolve_lib, resgraph_lib, Algebraic geometry
 @subsection resjung_lib
 @c lib resjung.lib
 @c ---------------------------------------------------------
