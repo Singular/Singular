@@ -9,7 +9,6 @@
 
 #include <kernel/mod2.h>
 
-#define OM_NO_MALLOC_MACROS
 #include <omalloc/omalloc.h>
 #include <Singular/static.h>
 

@@ -13,8 +13,6 @@
 
 #undef USE_READLINE4
 
-#define OM_NO_MALLOC_MACROS
-
 //----------------------------------------
 #ifdef ix86_Win
 #define READLINE_STATIC
