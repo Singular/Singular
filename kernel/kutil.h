@@ -396,6 +396,8 @@ int posInL17 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
 int posInL10 (const LSet set, const int length,
              LObject* L,const kStrategy strat);
+int posInL110 (const LSet set, const int length,
+             LObject* L,const kStrategy strat);
 KINLINE poly redtailBba (poly p,int pos,kStrategy strat,BOOLEAN normalize=FALSE);
 #ifdef HAVE_RINGS
 KINLINE poly redtailBba_Z (poly p,int pos,kStrategy strat);
