@@ -29,6 +29,10 @@ New types can be defined, see @nref{User defined types}.
 (Experimental) The new data type @code{pyobject} allows to access some
 @code{python} funtionality within @sc{Singular}, see @nref{pyobject}.
 
+Currently, it is only available for those who build Singular from the sources:
+Please activate it by typing @code{./configure --with-python}
+See @code{./configure --help} for details.
+
 @heading New @sc{Singular} functions
 @itemize @bullet
 @item
