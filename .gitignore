@@ -10,13 +10,15 @@ LIB
 *.la
 .libs
 configure
-config.h.in
+config.h.in*
 config.sub
+config.log
 config.guess
 config.h
 config.status
 ntl/*
 libpolys/polys/templates/p_Procs_Generate
+libpolys/polys/templates/p_Procs.inc
 libpolys/polys/m4/
 libpolys/coeffs/test
 libpolys/coeffs/test-g
