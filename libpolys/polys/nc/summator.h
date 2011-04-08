@@ -7,8 +7,8 @@
 
 // #include <summator.h> // for CPolynomialSummator class
 
-#include <kernel/structs.h>
-// #include <p_polys.h> // due to p_Copy :(
+#include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
 
 
 // //////////////////////////////////////////////////////////////////////// //

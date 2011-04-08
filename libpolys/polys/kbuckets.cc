@@ -1209,7 +1209,7 @@ void kBucketSimpleContent(kBucket_pt bucket)
       assume(!(n_IsZero(pGetCoeff(bucket->coef[i]),r)));
 
       //in this way it should crash on programming errors, yeah
-      number temp=nGcd(coef, pGetCoeff(bucket->coef[i]),r);
+      number temp=n_Gcd(coef, pGetCoeff(bucket->coef[i]),r);
       n_Delete(&coef,r );
       coef=temp;
       if (nIsPseudoUnit(coef,r))

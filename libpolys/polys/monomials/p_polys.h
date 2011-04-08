@@ -1471,6 +1471,9 @@ static inline int p_LmCmp(poly p, poly q, const ring r)
                                     return 0, return 1, return -1);
 }
 
+/// returns TRUE if p1 is a skalar multiple of p2
+/// assume p1 != NULL and p2 != NULL
+BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r);
 
 
 /***************************************************************

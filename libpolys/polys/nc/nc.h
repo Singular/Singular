@@ -73,6 +73,9 @@ public:
 //                                         LocalGB;  // MORA
 };
 
+class CGlobalMultiplier;
+class CFormulaPowerMultiplier;
+
 struct nc_struct
 {
   nc_type type;
@@ -129,27 +132,25 @@ struct nc_struct
 
     inline ideal& SCAQuotient() 
         { assume(ncRingType() == nc_exterior); return (data.sca.idSCAQuotient); };
-/*
   private:
 
-   CGlobalMultiplier* m_Multiplier;
+    CGlobalMultiplier* m_Multiplier;
     CFormulaPowerMultiplier* m_PowerMultiplier;
 
   public:
  
     inline CGlobalMultiplier* GetGlobalMultiplier() const
-        { assume(ncRingType() != nc_exterior); return (m_Multiplier); };
+        { return (m_Multiplier); };
 
     inline CGlobalMultiplier*& GetGlobalMultiplier()
-        { assume(ncRingType() != nc_exterior); return (m_Multiplier); };
+        { return (m_Multiplier); };
 
 
     inline CFormulaPowerMultiplier* GetFormulaPowerMultiplier() const
-        { assume(ncRingType() != nc_exterior); return (m_PowerMultiplier); };
+        { return (m_PowerMultiplier); };
 
     inline CFormulaPowerMultiplier*& GetFormulaPowerMultiplier()
-        { assume(ncRingType() != nc_exterior); return (m_PowerMultiplier); };
-*/
+        { return (m_PowerMultiplier); };
    
   public:
     nc_pProcs p_Procs; // NC procedures.
@@ -162,36 +163,43 @@ struct nc_struct
 // //////////////////////////////////////////////////////////////////////// //
 // NC inlines
 
-inline nc_struct*& GetNC(ring r)
+static inline nc_struct*& GetNC(ring r)
 {
   return r->GetNC();
-}; 
+}
 
-inline nc_type& ncRingType(nc_struct* p)
+static inline nc_type& ncRingType(nc_struct* p)
 {
   assume(p!=NULL);
   return (p->ncRingType());
-};
+}
 
-inline nc_type ncRingType(ring r) // Get
+static inline nc_type ncRingType(ring r) // Get
 {
   if(rIsPluralRing(r))
     return (ncRingType(r->GetNC()));
   else
     return (nc_error);
-};
+}
 
-inline void ncRingType(ring r, nc_type t) // Set
+static inline void ncRingType(ring r, nc_type t) // Set
 {
   assume((r != NULL) && (r->GetNC() != NULL));
   ncRingType(r->GetNC()) = t;
-};
+}
+
+static inline void ncRingType(nc_struct* p, nc_type t) // Set
+{
+  assume(p!=NULL);
+  ncRingType(p) = t;
+}
+
 
 
 
 // //////////////////////////////////////////////////////////////////////// //
 // we must always have this test!?
-inline bool rIsSCA(const ring r)
+static inline bool rIsSCA(const ring r)
 {
 #ifdef HAVE_PLURAL
   return rIsPluralRing(r) && (ncRingType(r) == nc_exterior);
@@ -225,7 +233,7 @@ poly nc_p_Plus_mm_Mult_qq(poly p, const poly m, const poly q, int &lp,
 
 
 // returns m*p, does neither destroy p nor m
-inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
+static inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
 {
   assume(rIsPluralRing(r));
   assume(r->GetNC()->p_Procs.mm_Mult_pp!=NULL);
@@ -235,7 +243,7 @@ inline poly nc_mm_Mult_pp(const poly m, const poly p, const ring r)
 
 
 // returns m*p, does destroy p, preserves m
-inline poly nc_mm_Mult_p(const poly m, poly p, const ring r)
+static inline poly nc_mm_Mult_p(const poly m, poly p, const ring r)
 {
   assume(rIsPluralRing(r));
   assume(r->GetNC()->p_Procs.mm_Mult_p!=NULL);
@@ -243,14 +251,14 @@ inline poly nc_mm_Mult_p(const poly m, poly p, const ring r)
 //   return p_Mult_mm( p, m, r);
 }
 
-inline poly nc_CreateSpoly(const poly p1, const poly p2, const ring r)
+static inline poly nc_CreateSpoly(const poly p1, const poly p2, const ring r)
 {
   assume(rIsPluralRing(r));
   assume(r->GetNC()->p_Procs.SPoly!=NULL);
   return r->GetNC()->p_Procs.SPoly(p1, p2, r);
 }
 
-inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
+static inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
 {
   assume(rIsPluralRing(r));
   assume(r->GetNC()->p_Procs.ReduceSPoly!=NULL);
@@ -261,7 +269,7 @@ inline poly nc_ReduceSpoly(const poly p1, poly p2, const ring r)
 }
 
 /*
-inline void nc_PolyReduce(poly &b, const poly p, number *c, const ring r) // nc_PolyPolyRed
+static inline void nc_PolyReduce(poly &b, const poly p, number *c, const ring r) // nc_PolyPolyRed
 {
   assume(rIsPluralRing(r));
 //  assume(r->GetNC()->p_Procs.PolyReduce!=NULL);
@@ -269,7 +277,7 @@ inline void nc_PolyReduce(poly &b, const poly p, number *c, const ring r) // nc_
 }
 */
 
-inline void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
+static inline void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
 {
   const ring r = b->bucket_ring;
   assume(rIsPluralRing(r));
@@ -280,7 +288,7 @@ inline void nc_kBucketPolyRed(kBucket_pt b, poly p, number *c)
   return r->GetNC()->p_Procs.BucketPolyRed(b, p, c);
 }
 
-inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
+static inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
 {
   const ring r = b->bucket_ring;
   assume(rIsPluralRing(r));
@@ -292,7 +300,7 @@ inline void nc_BucketPolyRed_Z(kBucket_pt b, poly p, number *c)
 
 }
 
-inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat, const ring r)
+static inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *hilb, kStrategy strat, const ring r)
 {
   assume(rIsPluralRing(r));
 
@@ -305,6 +313,9 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 /* subst: */
 poly nc_pSubst(poly p, int n, poly e, const ring r);
 
+// set pProcs table for rGR and global variable p_Procs
+// this should be used by p_ProcsSet in p_Procs_Set.h
+void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
 
 // the part, related to the interface
@@ -329,6 +340,17 @@ bool nc_rCopy(ring res, const ring r, bool bSetupQuotient);
 
 poly pOppose(ring Rop_src, poly p, const ring Rop_dst);
 ideal idOppose(ring Rop_src, ideal I, const ring Rop_dst);
+
+
+
+// returns the LCM of the head terms of a and b with the given component 
+// NOTE: coeff will be created but remains undefined(zero?) 
+poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r);
+
+// returns the LCM of the head terms of a and b with component = max comp. of a & b
+// NOTE: coeff will be created but remains undefined(zero?) 
+poly p_Lcm(const poly a, const poly b, const ring r);
+
 
 #endif /* HAVE_PLURAL */
 

@@ -27,9 +27,6 @@ BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r);
 BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate);
 
 
-// set pProcs table for rGR and global variable p_Procs
-// this should be used by p_ProcsSet in p_Procs_Set.h
-void nc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs);
 
 
 // used by "rSum" from ring.cc only! 
@@ -44,10 +41,6 @@ ring nc_rCreateNCcomm(ring r);
 poly _nc_p_Mult_q(poly p, poly q, const ring r);
 poly _nc_pp_Mult_qq(const poly p, const poly q, const ring r);
 
-
-/* copy : */
-poly nc_p_CopyGet(poly a, const ring r);
-poly nc_p_CopyPut(poly a, const ring r);
 
 void nc_PolyPolyRed(poly &b, poly p, number *c);
 
@@ -83,50 +76,10 @@ int  setNCExtensions(int iMask);
 bool ncExtensions(int iMask); //  = 0x0FFFF
 
 
-// returns the LCM of the head terms of a and b with the given component 
-// NOTE: coeff will be created but remains undefined(zero?) 
-poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r);
-
-// returns the LCM of the head terms of a and b with component = max comp. of a & b
-// NOTE: coeff will be created but remains undefined(zero?) 
-poly p_Lcm(const poly a, const poly b, const ring r);
-
 
 
 // //////////////////////////////////////////////////////////////////////// //
 // NC inlines
-
-inline nc_struct*& GetNC(ring r)
-{
-  return r->GetNC();
-} 
-
-inline nc_type& ncRingType(nc_struct* p)
-{
-  assume(p!=NULL);
-  return (p->ncRingType());
-}
-
-inline nc_type ncRingType(ring r) // Get
-{
-  if(rIsPluralRing(r))
-    return (ncRingType(r->GetNC()));
-  else
-    return (nc_error);
-}
-
-inline void ncRingType(ring r, nc_type t) // Set
-{
-  assume((r != NULL) && (r->GetNC() != NULL));
-  ncRingType(r->GetNC()) = t;
-}
-
-inline void ncRingType(nc_struct* p, nc_type t) // Set
-{
-  assume(p!=NULL);
-  ncRingType(p) = t;
-}
-
 
 // //////////////////////////////////////////////////////
 

@@ -10,8 +10,7 @@
 
 // //////////////////////////////////////////////////////////////////////// //
 
-#include <kernel/structs.h>
-#include <kernel/ring.h>
+#include <polys/monomials/ring.h>
 
 bool ncInitSpecialPowersMultiplication(ring r);
 
@@ -27,7 +26,7 @@ enum Enum_ncSAType
 };
 
 
-inline CFormulaPowerMultiplier* GetFormulaPowerMultiplier(const ring r = currRing)
+inline CFormulaPowerMultiplier* GetFormulaPowerMultiplier(const ring r)
 {
   return r->GetNC()->GetFormulaPowerMultiplier();
 }

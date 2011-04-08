@@ -37,6 +37,8 @@
 #include <polys/nc/sca.h>
 #endif
 
+#include <polys/coeffrings.h>
+
 /***************************************************************
  *
  * Completing what needs to be set for the monomial
@@ -2169,7 +2171,7 @@ number p_InitContent_a(poly ph, const ring r)
 //    p=ph;
 //    while (p!=NULL)
 //    {
-//      d=nGcd(h,pGetCoeff(p));
+//      d=n_Gcd(h,pGetCoeff(p));
 //      nDelete(&h);
 //      h = d;
 //      if(nIsOne(h))
@@ -3515,6 +3517,54 @@ poly p_Invers(int n,poly u,intvec *w, const ring R)
   omFreeSize((ADDRESS)ww,(rVar(R)+1)*sizeof(short));
   return v;
 }
+
+
+/*2
+*returns TRUE if p1 is a skalar multiple of p2
+*assume p1 != NULL and p2 != NULL
+*/
+BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
+{
+  number n,nn;
+  int i;
+  pAssume(p1 != NULL && p2 != NULL);
+
+  if (!p_LmEqual(p1,p2,r)) //compare leading mons
+      return FALSE;
+  if ((pNext(p1)==NULL) && (pNext(p2)!=NULL))
+     return FALSE;
+  if ((pNext(p2)==NULL) && (pNext(p1)!=NULL))
+     return FALSE;
+  if (pLength(p1) != pLength(p2))
+    return FALSE;
+#ifdef HAVE_RINGS
+  if (rField_is_Ring(r))
+  {
+    if (!n_DivBy(p_GetCoeff(p1, r), p_GetCoeff(p2, r), r)) return FALSE;
+  }
+#endif
+  n=n_Div(p_GetCoeff(p1,r),p_GetCoeff(p2,r),r);
+  while ((p1 != NULL) /*&& (p2 != NULL)*/)
+  {
+    if ( ! p_LmEqual(p1, p2,r))
+    {
+        n_Delete(&n, r);
+        return FALSE;
+    }
+    if (!n_Equal(p_GetCoeff(p1, r), nn = n_Mult(p_GetCoeff(p2, r),n, r), r))
+    {
+      n_Delete(&n, r);
+      n_Delete(&nn, r);
+      return FALSE;
+    }
+    n_Delete(&nn, r);
+    pIter(p1);
+    pIter(p2);
+  }
+  n_Delete(&n, r);
+  return TRUE;
+}
+
 
 /***************************************************************
  *

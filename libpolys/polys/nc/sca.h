@@ -4,6 +4,7 @@
 #ifdef HAVE_PLURAL
 
 #include <polys/nc/nc.h>
+#include <misc/intvec.h>
 
 // we must always have this test!
 inline ideal SCAQuotient(const ring r)
@@ -96,7 +97,7 @@ intvec *ivGetSCAXVarWeights(const ring r);
 intvec *ivGetSCAYVarWeights(const ring r);
 
 
-inline bool p_IsSCAHomogeneous(const poly p,
+static inline bool p_IsSCAHomogeneous(const poly p,
   const intvec *wCx, const intvec *wCy,
   const ring r)
 {
@@ -115,7 +116,7 @@ inline bool p_IsSCAHomogeneous(const poly p,
 }
 
 
-inline bool id_IsSCAHomogeneous(const ideal id,
+static inline bool id_IsSCAHomogeneous(const ideal id,
   const intvec *wCx, const intvec *wCy,
   const ring r)
 {

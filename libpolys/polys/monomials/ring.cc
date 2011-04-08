@@ -1424,7 +1424,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         for (j= rVar(R1)+1; j <= l; j++)
           MATELEM(C,i,j) = p_One(sum); // in 'sum'
 
-      idTest((ideal)C);
+      id_Test((ideal)C, sum);
 
       nMapFunc nMap1 = n_SetMap(R1->cf,sum->cf); /* can change something global: not usable
 						    after the next nSetMap call :( */
@@ -1439,8 +1439,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
             MATELEM(D,i,j) = p_PermPoly(MATELEM(D1,i,j), perm1, R1, sum, nMap1, par_perm1, rPar(R1));
         }
 
-      idTest((ideal)C);
-      idTest((ideal)D);
+      id_Test((ideal)C, sum);
+      id_Test((ideal)D, sum);
 
 
       nMapFunc nMap2 = n_SetMap(R2->cf,sum->cf); /* can change something global: not usable
@@ -1455,8 +1455,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
             MATELEM(D,rVar(R1)+i,rVar(R1)+j) = p_PermPoly(MATELEM(D2,i,j),perm2,R2,sum, nMap2,par_perm2,rPar(R2));
         }
 
-      idTest((ideal)C);
-      idTest((ideal)D);
+      id_Test((ideal)C, sum);
+      id_Test((ideal)D, sum);
 
       // Now sum is non-commutative with blocked structure constants!
       if (nc_CallPlural(C, D, NULL, NULL, sum, false, false, true, sum))
@@ -5490,8 +5490,8 @@ ring rOpposite(ring src)
       }
     }
 
-    idTest((ideal)C);
-    idTest((ideal)D);
+    id_Test((ideal)C, r);
+    id_Test((ideal)D, r);
 
     if (nc_CallPlural(C, D, NULL, NULL, r, false, false, true, r)) // no qring setup!
       WarnS("Error initializing non-commutative multiplication!");
@@ -5604,8 +5604,8 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
   }
   /* One must test C and D _only_ in r->GetNC()->basering!!! not in r!!! */
 
-  idTest((ideal)C); // in dest!
-  idTest((ideal)D);
+  id_Test((ideal)C, dest); 
+  id_Test((ideal)D, dest);
 
   if (nc_CallPlural(C, D, NULL, NULL, dest, bSetupQuotient, false, true, dest)) // also takes care about quotient ideal
   {

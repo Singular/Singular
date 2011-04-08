@@ -60,12 +60,12 @@ void idSkipZeroes (ideal ide);
   /*gives an ideal the minimal possible size*/
 
 #ifdef PDEBUG
-void idDBTest(ideal h1, int level, const char *f,const int l);
-#define idTest(A) idDBTest(A, PDEBUG, __FILE__,__LINE__)
-#define idPrint(id) idShow(id)
+void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r);
+#define id_Test(A, r) id_DBTest(A, PDEBUG, __FILE__,__LINE__, r)
+// #define id_Print(id, r) id_Show(id, r)
 #else
-#define idTest(A)  (TRUE)
-#define idPrint(A) ((void)0)
+#define id_Test(A, r)  (TRUE)
+// #define id_Print(A, r) ((void)0)
 #endif
 
 ideal id_Copy (ideal h1,const ring r);

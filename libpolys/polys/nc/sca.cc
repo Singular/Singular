@@ -19,38 +19,47 @@
 #endif
 
 // #define PDEBUG 2
-#include <kernel/mod2.h>
+#include "config.h"
+#include <misc/auxiliary.h>
 
 #ifdef HAVE_PLURAL
+
 // for
 #define PLURAL_INTERNAL_DECLARATIONS
-#include <kernel/sca.h>
-#include <kernel/gring.h>
+#include <polys/nc/sca.h>
+#include <polys/nc/nc.h>
+// #include <polys/gring.h>
 
 
-#include <kernel/febase.h>
-#include <kernel/options.h>
+#include <coeffs/numbers.h>
+#include <polys/coeffrings.h>
 
-#include <kernel/p_polys.h>
-#include <kernel/kutil.h>
+
+// #include <polys/febase.h>
+#include <misc/options.h>
+
+#include <polys/monomials/p_polys.h>
+
+// #include <polys/kutil.h>
 #include <polys/simpleideals.h>
-#include <kernel/intvec.h>
-#include <kernel/polys.h>
+#include <misc/intvec.h>
+// #include <polys/polys.h>
 
-#include <kernel/ring.h>
-#include <kernel/numbers.h>
-#include <kernel/matpol.h>
-#include <kernel/kbuckets.h>
-#include <kernel/kstd1.h>
-#include <kernel/sbuckets.h>
-#include <kernel/prCopy.h>
-#include <kernel/p_Mult_q.h>
-#include <kernel/p_MemAdd.h>
+#include <polys/monomials/ring.h>
+#include <polys/matpol.h>
+#include <polys/kbuckets.h>
+// #include <polys/kstd1.h>
+#include <polys/sbuckets.h>
 
-#include <kernel/kutil.h>
-#include <kernel/kstd1.h>
+#include <polys/prCopy.h>
 
-#include <kernel/weight.h>
+#include <polys/operations/p_Mult_q.h>
+#include <polys/templates/p_MemAdd.h>
+
+// #include <polys/kutil.h>
+// #include <polys/kstd1.h>
+
+#include <polys/weight.h>
 
 
 // poly functions defined in p_Procs :
@@ -73,13 +82,13 @@ poly sca_SPoly(const poly p1, const poly p2, const ring r);
 poly sca_ReduceSpoly(const poly p1, poly p2, const ring r);
 
 // Modified Plural's Buchberger's algorithmus.
-ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat);
+ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing);
 
 // Modified modern Sinuglar Buchberger's algorithm.
-ideal sca_bba(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat);
+ideal sca_bba(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat, const ring _currRing);
 
 // Modified modern Sinuglar Mora's algorithm.
-ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat);
+ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat, const ring _currRing);
 
 
 
@@ -87,7 +96,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 // Super Commutative Algebra extension by Oleksandr
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+/*
 static inline ring assureCurrentRing(ring r)
 {
   ring save = currRing;
@@ -97,6 +106,7 @@ static inline ring assureCurrentRing(ring r)
 
   return save;
 }
+*/
 
 
 
@@ -806,7 +816,7 @@ poly sca_SPoly( const poly p1, const poly p2, const ring r )
   number C1  = n_Copy(p_GetCoeff(p1,r),r);      // C1 = lc(p1)
   number C2  = n_Copy(p_GetCoeff(p2,r),r);      // C2 = lc(p2)
 
-  number C = nGcd(C1,C2,r);                     // C = gcd(C1, C2)
+  number C = n_Gcd(C1,C2,r);                     // C = gcd(C1, C2)
 
   if (!n_IsOne(C, r))                              // if C != 1
   {
@@ -881,7 +891,7 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
   number C2 = n_Copy( p_GetCoeff(p2, r), r);
 
   /* GCD stuff */
-  number C = nGcd(C1, C2, r);
+  number C = n_Gcd(C1, C2, r);
 
   if (!n_IsOne(C, r))
   {
@@ -920,7 +930,7 @@ poly sca_ReduceSpoly(const poly p1, poly p2, const ring r)
   return(p2);
 }
 
-
+/*
 void addLObject(LObject& h, kStrategy& strat)
 {
   if(h.IsNull()) return;
@@ -965,7 +975,7 @@ void addLObject(LObject& h, kStrategy& strat)
 
     if(h.IsNull()) return;
 
-    /* statistic */
+    // statistic
     if (TEST_OPT_PROT)
     {
       PrintS("s\n");
@@ -994,12 +1004,13 @@ void addLObject(LObject& h, kStrategy& strat)
 
 }
 
+*/
 
 
 
-
-ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat)
+ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing)
 {
+/*
 #if MYTEST
    PrintS("<sca_gr_bba>\n");
 #endif
@@ -1079,7 +1090,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   reduc = olddeg = lrmax = 0;
 
 
-  /* compute------------------------------------------------------- */
+  // compute-------------------------------------------------------
   for(; strat->Ll >= 0;
 #ifdef KDEBUG
     strat->P.lcm = NULL,
@@ -1087,7 +1098,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     kTest(strat)
     )
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
+    if (strat->Ll > lrmax) lrmax =strat->Ll;// stat.
 
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -1100,16 +1111,14 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
        || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
-      /*
-      *stops computation if
-      * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
-      *a predefined number Kstd1_deg
-      */
+      // stops computation if
+      // 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
+      // a predefined number Kstd1_deg
       while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       break;
     }
 
-    /* picks the last element from the lazyset L */
+    // picks the last element from the lazyset L
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
 
@@ -1235,7 +1244,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
     completeReduce(strat); // ???
   }
 
-  /* release temp data-------------------------------- */
+  // release temp data--------------------------------
   exitBuchMora(strat);
 
   if (TEST_OPT_WEIGHTM)
@@ -1256,7 +1265,7 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
   id_Delete(&tempF, currRing);
 
 
-  /* complete reduction of the standard basis--------- */
+  // complete reduction of the standard basis---------
   if (TEST_OPT_REDSB){
     ideal I = strat->Shdl;
     ideal erg = kInterRedOld(I,tempQ);
@@ -1271,7 +1280,9 @@ ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, k
 #endif
 
   return (strat->Shdl);
+*/
 }
+
 
 
 // should be used only inside nc_SetupQuotient!
@@ -1304,17 +1315,9 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   PrintS("sca_SetupQuotient(rGR, rG, bCopy)");
 
   {
-    ring rSaveRing = assureCurrentRing(rG);
-
     PrintS("\nrG: \n"); rWrite(rG);
-
-    assureCurrentRing(rGR);
-
     PrintS("\nrGR: \n"); rWrite(rGR);
-
     PrintLn();
-
-    assureCurrentRing(rSaveRing);
   }
 #endif
 
@@ -1448,7 +1451,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
   assume( iAltVarEnd   <= N            );
 
 
-  ring rSaveRing = assureCurrentRing(rG);
+//  ring rSaveRing = assureCurrentRing(rG);
 
 
   assume(rGR->qideal != NULL);
@@ -1493,7 +1496,9 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
     // square = NF( var(i)^2 | Q )
     // NOTE: rSaveRing == currRing now!
     // NOTE: there is no better way to check this in general!
-    square = kNF(idQuotient, NULL, square, 0, 1); // must ran in currRing == rG!
+    extern poly kNF(ideal I, ideal Q, poly f, int a, int b, const ring r);
+
+    square = kNF(idQuotient, NULL, square, 0, 1, rG); // must ran in currRing == rG!
 
     if( square != NULL ) // var(i)^2 is not in Q?
     {
@@ -1503,7 +1508,7 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
     }
   }
 
-  assureCurrentRing(rSaveRing);
+//  assureCurrentRing(rSaveRing);
 
   if(!bSCA) return false;
 
@@ -1561,10 +1566,9 @@ bool sca_Force(ring rGR, int b, int e)
 
   const int N = rGR->N;
 
-  ring rSaveRing = currRing;
-
-  if(rSaveRing != rGR)
-    rChangeCurrRing(rGR);
+//  ring rSaveRing = currRing;
+//  if(rSaveRing != rGR)
+//    rChangeCurrRing(rGR);
 
   const ideal idQuotient = rGR->qideal;
 
@@ -1589,8 +1593,8 @@ bool sca_Force(ring rGR, int b, int e)
 
   nc_p_ProcsSet(rGR, rGR->p_Procs);
 
-  if(rSaveRing != rGR)
-    rChangeCurrRing(rSaveRing);
+//  if(rSaveRing != rGR)
+//    rChangeCurrRing(rSaveRing);
 
   return true;
 }
@@ -1626,6 +1630,7 @@ poly sca_pp_Mult_xi_pp(unsigned int i, const poly pPoly, const ring rRing)
 // Under development!!!
 ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*hilb*/, kStrategy strat)
 {
+/*
 #if MYTEST
   PrintS("\n\n<sca_bba>\n\n");
 #endif
@@ -1703,7 +1708,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 //  nc_gr_initBba(F,strat);
   initBba(tempF, strat); // set enterS, red, initEcart, initEcartPair
 
-  /*set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair*/
+  // set enterS, spSpolyShort, reduce, red, initEcart, initEcartPair
   // ?? set spSpolyShort, reduce ???
   initBuchMora(tempF, tempQ, strat); // tempQ = Q without squares!!!
 
@@ -1796,10 +1801,10 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
     }
   }
 
-  /* compute------------------------------------------------------- */
+  // compute-------------------------------------------------------
   while (strat->Ll >= 0)
   {
-    if (strat->Ll > lrmax) lrmax =strat->Ll;/*stat.*/
+    if (strat->Ll > lrmax) lrmax =strat->Ll;// stat.
 
 #ifdef KDEBUG
 //     loop_count++;
@@ -1817,11 +1822,9 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 //      if (TEST_OPT_DEBUG){PrintS("^^^^?");}
 #endif
 
-      /*
-       *stops computation if
-       * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
-       *a predefined number Kstd1_deg
-       */
+      // *stops computation if
+      // * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
+      // *a predefined number Kstd1_deg
       while ((strat->Ll >= 0)
         && ( (strat->homog==isHomog) || strat->L[strat->Ll].is_special || ((strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)) )
         && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
@@ -1838,7 +1841,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       else strat->noClearS=TRUE;
     }
 
-    /* picks the last element from the lazyset L */
+    // picks the last element from the lazyset L
     strat->P = strat->L[strat->Ll];
     strat->Ll--;
 
@@ -1873,14 +1876,14 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
       message((strat->honey ? strat->P.ecart : 0) + strat->P.pFDeg(),
               &olddeg,&reduc,strat, red_result);
 
-    /* reduction of the element choosen from L */
+    // reduction of the element choosen from L
     red_result = strat->red(&strat->P,strat);
 
 
     // reduction to non-zero new poly
     if (red_result == 1)
     {
-      /* statistic */
+      // statistic
       if (TEST_OPT_PROT) PrintS("s");
 
       // get the polynomial (canonicalize bucket, make sure P.p is set)
@@ -1990,7 +1993,11 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
           pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
-/*
+
+ 
+ 
+ 
+#if 0   
         h.sev = pGetShortExpVector(h.p);
         strat->initEcart(&h);
 
@@ -2036,7 +2043,9 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
         else
           pos = strat->posInL(strat->L,strat->Ll,&h,strat);
 
-         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);*/
+         enterL(&strat->L,&strat->Ll,&strat->Lmax,h,pos);
+// the end of "#if 0" (comment) 
+#endif 
 
       } // for all x_i \in Ann(lm(P))
     } // if red(P) != NULL
@@ -2060,14 +2069,14 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
   if (TEST_OPT_DEBUG) messageSets(strat);
 #endif
 
-  /* complete reduction of the standard basis--------- */
+  // complete reduction of the standard basis---------
 
   if (TEST_OPT_REDSB)
   {
     completeReduce(strat);
   }
 
-  /* release temp data-------------------------------- */
+  //release temp data--------------------------------
 
   exitBuchMora(strat); // cleanT!
 
@@ -2105,12 +2114,13 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 #endif
 
   return (strat->Shdl);
+*/
 }
-
 
 // //////////////////////////////////////////////////////////////////////////////
 // sca mora...
 
+/*
 // returns TRUE if mora should use buckets, false otherwise
 static BOOLEAN kMoraUseBucket(kStrategy strat)
 {
@@ -2136,7 +2146,7 @@ static BOOLEAN kMoraUseBucket(kStrategy strat)
 #endif
   return FALSE;
 }
-
+*/
 
 #ifdef HAVE_ASSUME
 static int sca_mora_count = 0;
@@ -2144,8 +2154,9 @@ static int sca_mora_loop_count;
 #endif
 
 // ideal sca_mora (ideal F, ideal Q, intvec *w, intvec *, kStrategy strat)
-ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat)
+ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat, const ring _currRing)
 {
+/*
   assume(rIsSCA(currRing));
 
   const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
@@ -2166,7 +2177,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 
 #ifdef PDEBUG
   assume( strat->homog == bIdHomog );
-#endif /*PDEBUG*/
+#endif 
 
 #ifdef HAVE_ASSUME
   sca_mora_count++;
@@ -2179,15 +2190,16 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 
 
   strat->update = TRUE;
-  /*- setting global variables ------------------- -*/
+  //- setting global variables ------------------- -
   initBuchMoraCrit(strat);
 //   initHilbCrit(F,NULL,&hilb,strat); // no Q!
   initMora(tempF, strat);
   initBuchMoraPos(strat);
-  /*Shdl=*/initBuchMora(tempF, tempQ, strat); // temp Q, F!
+  //Shdl=
+    initBuchMora(tempF, tempQ, strat); // temp Q, F!
 //   if (TEST_OPT_FASTHC) missingAxis(&strat->lastAxis,strat);
-  /*updateS in initBuchMora has Hecketest
-  * and could have put strat->kHEdgdeFound FALSE*/
+  // updateS in initBuchMora has Hecketest
+  // * and could have put strat->kHEdgdeFound FALSE
 #if 0
   if (ppNoether!=NULL)
   {
@@ -2222,7 +2234,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   int hilbcount=0;
 
 
-  /*- compute-------------------------------------------*/
+  //- compute-------------------------------------------
 
 #undef HAVE_TAIL_RING
 
@@ -2296,7 +2308,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
 #ifdef HAVE_ASSUME
     sca_mora_loop_count++;
 #endif
-    if (lrmax< strat->Ll) lrmax=strat->Ll; /*stat*/
+    if (lrmax< strat->Ll) lrmax=strat->Ll; // stat
     //test_int_std(strat->kIdeal);
 #ifdef KDEBUG
     if (TEST_OPT_DEBUG) messageSets(strat);
@@ -2304,11 +2316,9 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
     if (TEST_OPT_DEGBOUND
     && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg))
     {
-      /*
-      * stops computation if
-      * - 24 (degBound)
-      *   && upper degree is bigger than Kstd1_deg
-      */
+      // * stops computation if
+      // * - 24 (degBound)
+      // *   && upper degree is bigger than Kstd1_deg
       while ((strat->Ll >= 0)
         && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
         && (strat->L[strat->Ll].ecart+strat->L[strat->Ll].GetpFDeg()> Kstd1_deg)
@@ -2323,7 +2333,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       if (strat->Ll<0) break;
       else strat->noClearS=TRUE;
     }
-    strat->P = strat->L[strat->Ll];/*- picks the last element from the lazyset L -*/
+    strat->P = strat->L[strat->Ll];// - picks the last element from the lazyset L -
     if (strat->Ll==0) strat->interpt=TRUE;
     strat->Ll--;
 
@@ -2391,7 +2401,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       if (strat->P.lcm!=NULL) pLmFree(strat->P.lcm);
       strat->P.lcm=NULL;
 
-      if (strat->sl>srmax) srmax = strat->sl; /*stat.*/
+      if (strat->sl>srmax) srmax = strat->sl; // stat.
       if (strat->Ll>lrmax) lrmax = strat->Ll;
 
 
@@ -2448,25 +2458,23 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
       || ((TEST_OPT_MULTBOUND) && (scMult0Int((strat->Shdl)) < mu)))
       {
         // obachman: is this still used ???
-        /*
-        * stops computation if strat->kHEdgeFound and
-        * - 27 (finiteDeterminacyTest)
-        * or
-        * - 23
-        *   (multBound)
-        *   && multiplicity of the ideal is smaller then a predefined number mu
-        */
+        // * stops computation if strat->kHEdgeFound and
+        // * - 27 (finiteDeterminacyTest)
+        // * or
+        // * - 23
+        // *   (multBound)
+        // *   && multiplicity of the ideal is smaller then a predefined number mu
         while (strat->Ll >= 0) deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
       }
     }
 #endif
     kTest_TS(strat);
   }
-  /*- complete reduction of the standard basis------------------------ -*/
+  // - complete reduction of the standard basis------------------------ -
   if (TEST_OPT_REDSB) completeReduce(strat);
-  /*- release temp data------------------------------- -*/
+  // - release temp data------------------------------- -
   exitBuchMora(strat);
-  /*- polynomials used for HECKE: HC, noether -*/
+  // - polynomials used for HECKE: HC, noether -
   if (TEST_OPT_FINDET)
   {
     if (strat->kHEdge!=NULL)
@@ -2495,6 +2503,7 @@ ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kS
   id_Delete( &tempF, currRing);
 
   return (strat->Shdl);
+*/
 }
 
 
