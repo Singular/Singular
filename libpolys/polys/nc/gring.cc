@@ -144,8 +144,8 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c);
 
 // void nc_kBucketPolyRed(kBucket_pt b, poly p);
 
-ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy); // Not yet!
-ideal gnc_gr_bba (const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat);
+// ideal gnc_gr_mora(const ideal, const ideal, const intvec *, const intvec *, kStrategy, const ring r); // Not yet!
+// ideal gnc_gr_bba (const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring r);
 
 
 void nc_CleanUp(nc_struct* p); // just free memory!
@@ -2934,6 +2934,9 @@ BOOLEAN gnc_CheckOrdCondition(matrix D, ring r)
 }
 
 
+BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient = false); // just for a moment
+
+
 
 /// returns TRUE if there were errors
 /// analyze inputs, check them for consistency
@@ -3285,8 +3288,7 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
   }
 
 //  ring save = currRing;
-
-  int WeChangeRing = 0;
+//  int WeChangeRing = 0;
 
 //  if (currRing!=r)
 //  {
@@ -3300,7 +3302,7 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
   r->GetNC()->MT = (matrix *)omAlloc0((r->N*(r->N-1))/2*sizeof(matrix));
   r->GetNC()->MTsize = (int *)omAlloc0((r->N*(r->N-1))/2*sizeof(int));
   id_Test((ideal)r->GetNC()->C, r);
-  matrix COM = mpCopy(r->GetNC()->C, r);
+  matrix COM = mp_Copy(r->GetNC()->C, r);
   poly p,q;
   short DefMTsize=7;
   int IsNonComm=0;
@@ -3373,8 +3375,8 @@ BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient)
     ncInitSpecialPowersMultiplication(r);
 
 
-  if (save != currRing)
-    rChangeCurrRing(save);
+//  if (save != currRing)
+//    rChangeCurrRing(save);
 
   return FALSE;
 }
@@ -3393,7 +3395,7 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
   rGR->GetNC()->p_Procs.mm_Mult_p   = gnc_mm_Mult_p;
   rGR->GetNC()->p_Procs.mm_Mult_pp  = gnc_mm_Mult_pp;
 
-  rGR->GetNC()->p_Procs.GB          = gnc_gr_bba; // bba even for local case!
+///////////  rGR->GetNC()->p_Procs.GB          = gnc_gr_bba; // bba even for local case!
 
 //   rGR->GetNC()->p_Procs.GlobalGB    = gnc_gr_bba;
 //   rGR->GetNC()->p_Procs.LocalGB     = gnc_gr_mora;
@@ -3432,7 +3434,7 @@ void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
     r->GetNC()->mmMultP()       = gnc_mm_Mult_p;
     r->GetNC()->mmMultPP()      = gnc_mm_Mult_pp;
 
-    r->GetNC()->GB()            = gnc_gr_bba;
+//////////////    r->GetNC()->GB()            = gnc_gr_bba;
 
     r->GetNC()->SPoly()         = gnc_CreateSpoly;
     r->GetNC()->ReduceSPoly()   = gnc_ReduceSpoly;
@@ -3502,16 +3504,17 @@ poly nc_pSubst(poly p, int n, poly e, const ring r)
       res = p_Head(p, r);
     }
     p   = p_LmDeleteAndNext(p, r);
-    out = p_Add(out,res, r);
+    out = p_Add_q(out,res, r);
   }
   freeT(PRE,rN);
   freeT(SUF,rN);
   return(out);
 }
 
+/*
 static ideal idPrepareStd(ideal T, ideal s,  int k)
 {
-  /* T is a left SB, without zeros, s is a list with zeros */
+  // T is a left SB, without zeros, s is a list with zeros
 #ifdef PDEBUG
   if (IDELEMS(s)!=IDELEMS(T))
   {
@@ -3557,13 +3560,16 @@ static ideal idPrepareStd(ideal T, ideal s,  int k)
   res->rank = 1+idElem(T);
   return(res);
 }
+*/
 
+/*  
 ideal Approx_Step(ideal L)
 {
   int N=currRing->N;
   int i,j; // k=syzcomp
   int flag, flagcnt=0, syzcnt=0;
   int syzcomp = 0;
+  int k=1; // for ideals not modules
   ideal I = kStd(L, currQuotient,testHomog,NULL,NULL,0,0,NULL);
   idSkipZeroes(I);
   ideal s_I;
@@ -3583,9 +3589,9 @@ ideal Approx_Step(ideal L)
   matrix MI;
   poly x=pOne();
   var[0]=x;
-  ideal   h2, s_h2, s_h3;
-  poly    p,q;
-  /* init vars */
+  ideal   h2, h3, s_h2, s_h3;
+  poly    p,q,qq;
+  // init vars
   for (i=1; i<=N; i++ )
   {
     x = pOne();
@@ -3593,7 +3599,7 @@ ideal Approx_Step(ideal L)
     pSetm(x);
     var[i]=pCopy(x);
   }
-  /* init NF's */
+  // init NF's 
   for (i=1; i<=N; i++ )
   {
     h2 = idInit(idI,1);
@@ -3612,10 +3618,10 @@ ideal Approx_Step(ideal L)
       else
     h2->m[j]=0;
     }
-    /* W[1..idElems(I)] */
+    // W[1..idElems(I)] 
     if (flag >0)
     {
-      /* compute syzygies with values in I*/
+      // compute syzygies with values in I
       //      idSkipZeroes(h2);
       //      h2 = idSimpleAdd(h2,I);
       //      h2->rank=flag+idI+1;
@@ -3659,7 +3665,7 @@ ideal Approx_Step(ideal L)
         {
           if (s_h3->m[j] != NULL)
           {
-            if (p_MinComp(s_h3->m[j],syz_ring) > syzcomp) /* i.e. it is a syzygy */
+            if (p_MinComp(s_h3->m[j],syz_ring) > syzcomp) // i.e. it is a syzygy
               pShift(&s_h3->m[j], -syzcomp);
             else
               pDelete(&s_h3->m[j]);
@@ -3676,7 +3682,7 @@ ideal Approx_Step(ideal L)
       S[syzcnt]=kStd(s_h3,currQuotient,(tHomog)FALSE,NULL,NULL);
       syzcnt++;
       idDelete(&s_h3);
-    } /* end if flag >0 */
+    } // end if flag >0 
     else
     {
       flagcnt++;
@@ -3722,38 +3728,40 @@ ideal Approx_Step(ideal L)
     return(I);
   }
 }
-
+*/
 
 // creates a commutative nc extension; "converts" comm.ring to a Plural ring
 ring nc_rCreateNCcomm(ring r)
 {
   if (rIsPluralRing(r)) return r;
 
-  matrix C = mpNew(r->N,r->N); // ring-independent!?!
-  matrix D = mpNew(r->N,r->N);
+  ring rr = rCopy(r);
 
-  for(int i=1; i<r->N; i++)
-    for(int j=i+1; j<=r->N; j++)
-      MATELEM(C,i,j) = p_One( r);
+  matrix C = mpNew(rr->N,rr->N); // ring-independent!?!
+  matrix D = mpNew(rr->N,rr->N);
 
-  if (nc_CallPlural(C, D, NULL, NULL, r, false, true, false, currRing, TRUE)) // TODO: what about quotient ideal?
+  for(int i=1; i<rr->N; i++)
+    for(int j=i+1; j<=rr->N; j++)
+      MATELEM(C,i,j) = p_One(rr);
+
+  if (nc_CallPlural(C, D, NULL, NULL, rr, false, true, false, rr, TRUE)) // TODO: what about quotient ideal?
     WarnS("Error initializing multiplication!"); // No reaction!???
 
-  return r;
+  return rr;
 }
 
-poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift)
   /* NOT USED ANYMORE: replaced by maFindPerm in ring.cc */
   /* for use with embeddings: currRing is a sum of smaller rings */
   /* and srcRing is one of such smaller rings */
   /* shift defines the position of a subring in srcRing */
   /* par_shift defines the position of a subfield in basefield of CurrRing */
+poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift, ring dstRing)
 {
-  if (currRing == srcRing)
+  if (dstRing == srcRing)
   {
-    return(p_Copy(p,currRing));
+    return(p_Copy(p,dstRing));
   }
-  nMapFunc nMap=nSetMap(srcRing);
+  nMapFunc nMap=n_SetMap(srcRing->cf, dstRing->cf);
   poly q;
   //  if ( nMap == nCopy)
   //  {
@@ -3770,7 +3778,7 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift)
     //      for (i=0; i<srcRing->P; i++)
     //  par_perm[i]=-i;
     //    }
-    if ((shift<0) || (shift > currRing->N))
+    if ((shift<0) || (shift > srcRing->N)) // ???
     {
       Werror("bad shifts in p_CopyEmbed");
       return(0);
@@ -3779,72 +3787,24 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift)
     {
       perm[i] = shift+i;
     }
-    q = pPermPoly(p,perm,srcRing,nMap,par_perm,srcRing->P);
+    q = p_PermPoly(p,perm,srcRing, dstRing, nMap,par_perm,srcRing->P);
   }
   return(q);
 }
 
-poly pOppose(ring Rop, poly p)
-  /* opposes a vector p from Rop to currRing */
-{
-  /* the simplest case:*/
-  if (  Rop == currRing )  return(pCopy(p));
-  /* check Rop == rOpposite(currRing) */
-  if ( !rIsLikeOpposite(currRing, Rop) )
-  {
-    WarnS("an opposite ring should be used");
-    return NULL;
-  }
-  /* nMapFunc nMap = nSetMap(Rop);*/
-  /* since we know that basefields coinside! */
-  int *perm=(int *)omAlloc0((Rop->N+1)*sizeof(int));
-  if (!p_IsConstantPoly(p, Rop))
-  {
-    /* we know perm exactly */
-    int i;
-    for(i=1; i<=Rop->N; i++)
-    {
-      perm[i] = Rop->N+1-i;
-    }
-  }
-  poly res = pPermPoly(p, perm, Rop, nCopy);
-  omFreeSize((ADDRESS)perm,(Rop->N+1)*sizeof(int));
-  return res;
-}
-
-ideal idOppose(ring Rop, ideal I)
-  /* opposes a module I from Rop to currRing */
-{
-  /* the simplest case:*/
-  if ( Rop == currRing ) return idCopy(I);
-  /* check Rop == rOpposite(currRing) */
-  if (!rIsLikeOpposite(currRing, Rop))
-  {
-    WarnS("an opposite ring should be used");
-    return NULL;
-  }
-  int i;
-  ideal idOp = idInit(I->ncols, I->rank);
-  for (i=0; i< (I->ncols)*(I->nrows); i++)
-  {
-    idOp->m[i] = pOppose(Rop,I->m[i]);
-  }
-  idTest(idOp);
-  return idOp;
-}
-
-BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
   /* checks whether rings rBase and rCandidate */
   /* could be opposite to each other */
   /* returns TRUE if it is so */
+BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
 {
   /* the same basefield */
   int diagnose = TRUE;
-  ring save = currRing;
-  rChangeCurrRing(rBase);
-  nMapFunc nMap = nSetMap(rCandidate);
-  if (nMap != nCopy) diagnose = FALSE;
-  rChangeCurrRing(save);
+  nMapFunc nMap = n_SetMap(rCandidate->cf, rBase->cf); // reverse?
+
+//////  if (nMap != nCopy) diagnose = FALSE;
+  if (nMap == NULL) diagnose = FALSE;
+  
+
   /* same number of variables */
   if (rBase->N != rCandidate->N) diagnose = FALSE;
   /* nc and comm ring */
@@ -3858,6 +3818,69 @@ BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate)
   return diagnose;
 }
 
+
+
+
+/// opposes a vector p from Rop to currRing (dst!)
+poly pOppose(ring Rop, poly p, const ring dst)
+{
+  /* the simplest case:*/
+  if (  Rop == dst )  return(p_Copy(p, dst));
+  /* check Rop == rOpposite(currRing) */
+
+  
+  if ( !rIsLikeOpposite(dst, Rop) )
+  {
+    WarnS("an opposite ring should be used");
+    return NULL;
+  }
+
+  nMapFunc nMap = n_SetMap(Rop->cf, dst->cf); // reverse?
+
+  /* nMapFunc nMap = nSetMap(Rop);*/
+  /* since we know that basefields coinside! */
+
+  // coinside???
+  
+  int *perm=(int *)omAlloc0((Rop->N+1)*sizeof(int));
+  if (!p_IsConstantPoly(p, Rop))
+  {
+    /* we know perm exactly */
+    int i;
+    for(i=1; i<=Rop->N; i++)
+    {
+      perm[i] = Rop->N+1-i;
+    }
+  }
+  poly res = p_PermPoly(p, perm, Rop, dst, nMap);
+  omFreeSize((ADDRESS)perm,(Rop->N+1)*sizeof(int));
+
+  p_Test(res, dst);
+
+  return res;
+}
+
+/// opposes a module I from Rop to currRing(dst)
+ideal idOppose(ring Rop, ideal I, const ring dst)
+{
+  /* the simplest case:*/
+  if ( Rop == dst ) return id_Copy(I, dst);
+
+  /* check Rop == rOpposite(currRing) */
+  if (!rIsLikeOpposite(dst, Rop))
+  {
+    WarnS("an opposite ring should be used");
+    return NULL;
+  }
+  int i;
+  ideal idOp = idInit(I->ncols, I->rank);
+  for (i=0; i< (I->ncols)*(I->nrows); i++)
+  {
+    idOp->m[i] = pOppose(Rop,I->m[i], dst);
+  }
+  id_Test(idOp, dst);
+  return idOp;
+}
 
 
 bool nc_SetupQuotient(ring rGR, const ring rG, bool bCopy)
