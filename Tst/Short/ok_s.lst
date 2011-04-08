@@ -170,6 +170,8 @@ mora_7
 mora_9
 ; mpsr_s
 mres_s
+ncfactor_example_all_procedures_s
+ncfactor_inhomog_s
 normal
 paraplan_s
 pAddManyVarsManyL_s

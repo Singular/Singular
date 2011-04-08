@@ -19,16 +19,28 @@ a list of all found factorizations is returned. It may contain factorizations, w
 are further reducible.
 
 PROCEDURES:
-  facFirstWeyl(h);    factorization in the first Weyl algebra
-  testNCfac(l[,h]);   tests factorizations from a given list for correctness
-  facSubWeyl(h,X,D);  factorization in the first Weyl algebra as a subalgebra
-  facFirstShift(h);   factorization in the first shift algebra
+  facFirstWeyl(h);           factorization in the first Weyl algebra
+  testNCfac(l[,h[,1]]);      tests factorizations from a given list for correctness
+  facSubWeyl(h,X,D);         factorization in the first Weyl algebra as a subalgebra
+  facFirstShift(h);          factorization in the first shift algebra
+  homogfacFirstQWeyl(h);     [-1,1]-homogeneous factorization in the first Q-Weyl algebra
+  homogfacFirstQWeyl_all(h); [-1,1] homogeneous factorization(complete) in the first Q-Weyl algebra
 ";
 
 LIB "general.lib";
 LIB "nctools.lib";
 LIB "involut.lib";
 LIB "freegb.lib"; // for isVar
+
+proc tst_ncfactor()
+{
+  example facFirstWeyl;
+  example facFirstShift;
+  example facSubWeyl;
+  example testNCfac;
+  example homogfacFirstQWeyl;
+  example homogfacFirstQWeyl_all;
+}
 
 /////////////////////////////////////////////////////
 //==================================================*
@@ -944,7 +956,7 @@ proc facFirstWeyl(poly h)
 RETURN: list
 PURPOSE: compute all factorizations of a polynomial in the first Weyl algebra
 THEORY: Implements the new algorithm by A. Heinle and V. Levandovskyy, see the thesis of A. Heinle
-ASSUME: basering in the first Weyl algebra
+ASSUME: basering is the first Weyl algebra
 NOTE: Every entry of the output list is a list with factors for one possible factorization.
 The first factor is always a constant (1, if no nontrivial constant could be excluded).
 EXAMPLE: example facFirstWeyl; shows examples
@@ -1058,7 +1070,7 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
   intvec iv1m1 = intvec(1,-1);
   if(homogwithorder(h,ivm11))
   {
-    dbprint(p,"==> Given polynomial is -1,1 homogeneous. Starting homog. fac. and ret. its result");
+    dbprint(p,"==> Given polynomial is -1,1 homogeneous. Start homog. fac. and ret. its result");
     return(homogfacFirstWeyl_all(h));
   }
   def r = basering;
@@ -1096,6 +1108,8 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
     if (product(M[i]) == h)
     {//We have one factorization
       result = result + list(M[i]);
+      dbprint(p,"Result list updated:");
+      dbprint(p,result);
       M = delete(M,i);
       continue;
     }//We have one factorization
@@ -1208,6 +1222,8 @@ SEE ALSO: homogfacFirstWeyl_all, homogfacFirstWeyl
       if (h == product(M[i]))
       {
         result = result + list(M[i]);
+  dbprint(p,"Result list updated:");
+        dbprint(p,result);
         M = delete(M,i);
         continue;
       }
@@ -1590,7 +1606,7 @@ proc facFirstShift(poly h)
 RETURN: list
 PURPOSE: compute all factorizations of a polynomial in the first shift algebra
 THEORY: Implements the new algorithm by A. Heinle and V. Levandovskyy, see the thesis of A. Heinle
-ASSUME: basering in the first shift algebra
+ASSUME: basering is the first shift algebra
 NOTE: Every entry of the output list is a list with factors for one possible factorization.
 EXAMPLE: example facFirstShift; shows examples
 SEE ALSO: testNCfac, facFirstWeyl, facSubWeyl
@@ -1750,6 +1766,8 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
     if (product(M[i]) == h)
     {//We have one factorization
       result = result + list(M[i]);
+      dbprint(p,"Result list updated:");
+      dbprint(p,result);
       M = delete(M,i);
       continue;
     }//We have one factorization
@@ -1869,6 +1887,8 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
       if (h == product(M[i]))
       {
         result = result + list(M[i]);
+        dbprint(p,"Result list updated:");
+        dbprint(p,result);
         M = delete(M,i);
         continue;
       }
@@ -1889,6 +1909,7 @@ SEE ALSO: homogfacFirstShift_all, homogfacFirstShift
   {//only the trivial factorization could be found
     result = list(list(1,h));
   }//only the trivial factorization could be found
+  dbprint(p,"==> done");
   return(result);
 }//proc facshift
 
@@ -1971,13 +1992,13 @@ example
 
 //==================================================
 //A function to get the i'th triangular number
-proc triangNum(int n)
+static proc triangNum(int n)
 {
-     if (n == 0)
-     {
-          return(0);
-     }
-     return (n*(n+1)/2);
+  if (n == 0)
+  {
+    return(0);
+  }
+  return (n*(n+1)/2);
 }
 
 //==================================================*
@@ -1994,7 +2015,7 @@ THEORY: @code{homogfacFirstQWeyl} returns a list with a factorization of the giv
         k positive, the last k entries in the output list are the second
         variable. If k is positive, the last k entries will be x. The other
         entries will be irreducible polynomials of degree zero or 1 resp. -1.
-SEE ALSO: homogfacFirstWeyl
+SEE ALSO: homogfacFirstWeyl, homogfacFirstQWeyl_all
 "{//proc homogfacFirstQWeyl
   int p = printlevel-voice+2;//for dbprint
   def r = basering;
@@ -2046,25 +2067,28 @@ SEE ALSO: homogfacFirstWeyl
   }//Putting the monomials in a list
   dbprint(p,"==> Done");
   dbprint(p,"==> Mapping this monomials to K(q)[theta]");
-  def characteristic = ringlist(r)[1][1];
-  def qparameter      = ringlist(r)[1][2][1];
-  ring tempRing = (characteristic,q),(x,y,theta),dp; //TODO: How to map a parameter?
+  //Now, map to the commutative ring with theta:
+  list tempRingList = ringlist(r);
+  tempRingList[2] = insert(tempRingList[2],"theta",2); //New variable theta = x*d
+  tempRingList = delete(tempRingList,5);
+  tempRingList = delete(tempRingList,5); //The ring should now be commutative
+  def tempRing = ring(tempRingList);
   setring tempRing;
-  map thetamap = r,x,y;
+  map thetamap = r,var(1),var(2);
   list mons = thetamap(mons);
   poly entry;
   poly tempSummand;
   for (i = 1; i<=size(mons);i++)
   {//transforming the monomials as monomials in theta
-       entry = 1; //leadcoef(mons[i]) * q^(-triangNum(leadexp(mons[i])[2]-1));
+    entry = 1;//leadcoef(mons[i]) * q^(-triangNum(leadexp(mons[i])[2]-1));
     for (j = 0; j<leadexp(mons[i])[2];j++)
     {
-//"j:";j;
-         tempSummand = (q^j-1)/(q-1);
-         entry = entry * theta-tempSummand*entry;
+      tempSummand = (par(1)^j-1)/(par(1)-1);
+      entry = entry * theta-tempSummand*entry;
     }
-//~;
- mons[i] = entry*leadcoef(mons[i]) * q^(-triangNum(leadexp(mons[i])[2]-1));
+    //entry;
+    //leadcoef(mons[i]) * q^(-triangNum(leadexp(mons[i])[2]-1));
+    mons[i] = entry*leadcoef(mons[i]) * par(1)^(-triangNum(leadexp(mons[i])[2]-1));
   }//transforming the monomials as monomials in theta
   dbprint(p,"==> Done");
   dbprint(p,"==> Factorize the A_0-Part in K[theta]");
@@ -2101,19 +2125,35 @@ SEE ALSO: homogfacFirstWeyl
   result = tempresult+result;
   //Correction of the result in the special q-Case:
   for (j = 2 ; j<= size(result);j++)
-  {//Divide the whole Term by the leading coefficient and multiply it to the first entry in result[i]
-       result[1] = result[1] * leadcoef(result[j]);
-       result[j] = 1/leadcoef(result[j]) * result[j];
-  }//Divide the whole Term by the leading coefficient and multiply it to the first entry in result[i]
+  {//Div the whole Term by the leading coefficient and multiply it to the first entry in result[i]
+    result[1] = result[1] * leadcoef(result[j]);
+    result[j] = 1/leadcoef(result[j]) * result[j];
+  }//Div the whole Term by the leading coefficient and multiply it to the first entry in result[i]
   return(result);
 }//proc homogfacFirstQWeyl
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = (0,q),(x,d),dp;
+  def r = nc_algebra (q,1);
+  setring(r);
+  poly h = q^25*x^10*d^10+q^16*(q^4+q^3+q^2+q+1)^2*x^9*d^9+
+           q^9*(q^13+3*q^12+7*q^11+13*q^10+20*q^9+26*q^8+30*q^7+
+           31*q^6+26*q^5+20*q^4+13*q^3+7*q^2+3*q+1)*x^8*d^8+
+           q^4*(q^9+2*q^8+4*q^7+6*q^6+7*q^5+8*q^4+6*q^3+
+     4*q^2+2q+1)*(q^4+q^3+q^2+q+1)*(q^2+q+1)*x^7*d^7+
+           q*(q^2+q+1)*(q^5+2*q^4+2*q^3+3*q^2+2*q+1)*(q^4+q^3+q^2+q+1)*(q^2+1)*(q+1)*x^6*d^6+
+           (q^10+5*q^9+12*q^8+21*q^7+29*q^6+33*q^5+31*q^4+24*q^3+15*q^2+7*q+12)*x^5*d^5+
+           6*x^3*d^3+24;
+  homogfacFirstQWeyl(h);
+}
 
 
 
 //==================================================
 //Computes all possible homogeneous factorizations for an element in the first Q-Weyl Algebra
 proc homogfacFirstQWeyl_all(poly h)
-"USAGE: homogfacFirstWWeyl_all(h); h is a homogeneous polynomial in the first q-Weyl algebra
+"USAGE: homogfacFirstQWeyl_all(h); h is a homogeneous polynomial in the first q-Weyl algebra
         with respect to the weight vector [-1,1]
 RETURN: list
 PURPOSE: Computes all factorizations of a homogeneous polynomial h with respect
@@ -2124,7 +2164,7 @@ THEORY: @code{homogfacFirstQWeyl} returns a list with all factorization of the g
         factor of degree zero is irreducible in K[\theta], but reducible in
         the first q-Weyl algebra, the permutations of this element with the other
         entries will also be computed.
-SEE ALSO: homogfacFirstWeyl
+SEE ALSO: homogfacFirstQWeyl
 "{//proc HomogfacFirstQWeylAll
   int p=printlevel-voice+2;//for dbprint
   intvec iv11= intvec(1,1);
@@ -2181,17 +2221,20 @@ SEE ALSO: homogfacFirstWeyl
   if(deg(h,ivm11)!=0)
   {//list_not_azero is not empty
     list_not_azero =
-      one_hom_fac[(size(one_hom_fac)-absValue(deg(h,ivm11))+1)..size(one_hom_fac)];
+    one_hom_fac[(size(one_hom_fac)-absValue(deg(h,ivm11))+1)..size(one_hom_fac)];
     is_list_not_azero_empty = 0;
   }//list_not_azero is not empty
   //Map list_azero in K[theta]
   dbprint(p,"==> Map list_azero to K[theta]");
-  def characteristic = ringlist(r)[1][1];
-  def qparameter      = ringlist(r)[1][2][1];
-  ring tempRing = (characteristic,q),(x,y,theta),dp; //TODO: How to map a parameter?
+  //Now, map to the commutative ring with theta:
+  list tempRingList = ringlist(r);
+  tempRingList[2] = insert(tempRingList[2],"theta",2); //New variable theta = x*d
+  tempRingList = delete(tempRingList,5);
+  tempRingList = delete(tempRingList,5); //The ring should now be commutative
+  def tempRing = ring(tempRingList);
   setring(tempRing);
   poly entry;
-  map thetamap = r,x,y;
+  map thetamap = r,var(1),var(2);
   if(!is_list_not_azero_empty)
   {//Mapping in Singular is only possible, if the list before
     //contained at least one element of the other ring
@@ -2216,11 +2259,11 @@ SEE ALSO: homogfacFirstWeyl
     }
     for (j = 1 ; j<=size(tempmons);j++)
     {
-         //entry = leadcoef(tempmons[j]);
-         entry = leadcoef(tempmons[j]) * q^(-triangNum(leadexp(tempmons[j])[2]-1));
+      //entry = leadcoef(tempmons[j]);
+      entry = leadcoef(tempmons[j]) * par(1)^(-triangNum(leadexp(tempmons[j])[2]-1));
       for (k = 0; k < leadexp(tempmons[j])[2];k++)
       {
-           entry = entry*(theta-(q^k-1)/(q-1));
+        entry = entry*(theta-(par(1)^k-1)/(par(1)-1));
       }
       tempmons[j] = entry;
     }
@@ -2256,28 +2299,34 @@ SEE ALSO: homogfacFirstWeyl
         }
         else
         {
-             if (shift < 0)
-             {//We have two distict formulas for x and y. In this case use formula for y
-                  if (shift == -1)
-                  {
-                       result[i][j] = subst(result[i][j],theta,1/q*(theta - 1));
-                  }
-                  else
-                  {
-                       result[i][j] = subst(result[i][j],theta,1/q*((theta - 1)/q^(absValue(shift)-1) - (q^(shift +2)-q)/(1-q)));
-                  }
-             }//We have two distict formulas for x and y. In this case use formula for y
-             if (shift > 0)
-             {//We have two distict formulas for x and y. In this case use formula for x
-                  if (shift == 1)
-                  {
-                       result[i][j] = subst(result[i][j],theta,q*theta + 1);
-                  }
-                  else
-                  {
-                       result[i][j] = subst(result[i][j],theta,q^shift*theta+(q^shift-1)/(q-1));
-                  }
-             }//We have two distict formulas for x and y. In this case use formula for x
+          if (shift < 0)
+          {//We have two distict formulas for x and y. In this case use formula for y
+            if (shift == -1)
+            {
+              result[i][j] = subst(result[i][j],theta,1/par(1)*(theta - 1));
+            }
+            else
+            {
+              result[i][j] =
+                subst(result[i][j],
+                  theta,
+                  1/par(1)*((theta - 1)/par(1)^(absValue(shift)-1)
+                    - (par(1)^(shift +2)-par(1))/(1-par(1))));
+            }
+          }//We have two distict formulas for x and y. In this case use formula for y
+          if (shift > 0)
+          {//We have two distict formulas for x and y. In this case use formula for x
+            if (shift == 1)
+            {
+              result[i][j] = subst(result[i][j],theta,par(1)*theta + 1);
+            }
+            else
+            {
+              result[i][j] =
+                subst(result[i][j],
+                theta,par(1)^shift*theta+(par(1)^shift-1)/(par(1)-1));
+            }
+          }//We have two distict formulas for x and y. In this case use formula for x
         }
       }
     }//adjust the a_0-parts
@@ -2315,7 +2364,7 @@ SEE ALSO: homogfacFirstWeyl
         found_theta = 1;
         break;
       }//the jth entry is theta and can be written as x*y
-      if(result[i][j] == q*theta +1)
+      if(result[i][j] == par(1)*theta +1)
       {
         thetapos = j;
         result[i] = insert(result[i],y,j-1);
@@ -2358,11 +2407,11 @@ SEE ALSO: homogfacFirstWeyl
         //Here, we can only have a a0- part
         if (shift_sign<0)
         {
-             leftpart[j] = subst(leftpart[j-1],theta, 1/q*(theta +shift_sign));
+          leftpart[j] = subst(leftpart[j-1],theta, 1/par(1)*(theta +shift_sign));
         }
         if (shift_sign>0)
         {
-             leftpart[j] = subst(leftpart[j-1],theta, q*theta + shift_sign);
+          leftpart[j] = subst(leftpart[j-1],theta, par(1)*theta + shift_sign);
         }
         leftpart[j-1] = shiftvar;
         lparts = lparts + list(leftpart);
@@ -2391,11 +2440,11 @@ SEE ALSO: homogfacFirstWeyl
         }
         if (shift_sign<0)
         {
-             rightpart[j] = subst(rightpart[j+1], theta, q*theta - shift_sign);
+          rightpart[j] = subst(rightpart[j+1], theta, par(1)*theta - shift_sign);
         }
         if (shift_sign>0)
         {
-             rightpart[j] = subst(rightpart[j+1], theta, 1/q*(theta - shift_sign));
+          rightpart[j] = subst(rightpart[j+1], theta, 1/par(1)*(theta - shift_sign));
         }
         rightpart[j+1] = shiftvar;
         rparts = rparts + list(rightpart);
@@ -2430,6 +2479,22 @@ SEE ALSO: homogfacFirstWeyl
   dbprint(p,"==> Done");
   return(result);
 }//proc HomogfacFirstQWeylAll
+example
+{
+  "EXAMPLE:";echo=2;
+  ring R = (0,q),(x,d),dp;
+  def r = nc_algebra (q,1);
+  setring(r);
+  poly h = q^25*x^10*d^10+q^16*(q^4+q^3+q^2+q+1)^2*x^9*d^9+
+           q^9*(q^13+3*q^12+7*q^11+13*q^10+20*q^9+26*q^8+30*q^7+
+           31*q^6+26*q^5+20*q^4+13*q^3+7*q^2+3*q+1)*x^8*d^8+
+           q^4*(q^9+2*q^8+4*q^7+6*q^6+7*q^5+8*q^4+6*q^3+
+           4*q^2+2q+1)*(q^4+q^3+q^2+q+1)*(q^2+q+1)*x^7*d^7+
+           q*(q^2+q+1)*(q^5+2*q^4+2*q^3+3*q^2+2*q+1)*(q^4+q^3+q^2+q+1)*(q^2+1)*(q+1)*x^6*d^6+
+           (q^10+5*q^9+12*q^8+21*q^7+29*q^6+33*q^5+31*q^4+24*q^3+15*q^2+7*q+12)*x^5*d^5+
+           6*x^3*d^3+24;
+  homogfacFirstQWeyl_all(h);
+}
 
 //TODO: FirstQWeyl check the parameters...
 
@@ -2451,7 +2516,11 @@ def S = nc_algebra(1,1); setring S;
 poly a = 10z5x4+26z4x5+47z5x2-97z4x3; //Abgebrochen nach einer Stunde; yes, it takes long
 def l= facFirstWeyl (a); l;
 kill l;
-poly b = -5328z8x5-5328z7x6+720z9x2+720z8x3-16976z7x4-38880z6x5-5184z7x3-5184z6x4-3774z5x5+2080z8x+5760z7x2-6144z6x3-59616z5x4+3108z3x6-4098z6x2-25704z5x3-21186z4x4+8640z6x-17916z4x3+22680z2x5+2040z5x-4848z4x2-9792z3x3+3024z2x4-10704z3x2-3519z2x3+34776zx4+12096zx3+2898x4-5040z2x+8064x3+6048x2; //Abgebrochen nach 1.5 Stunden; seems to be very complicated
+poly b = -5328z8x5-5328z7x6+720z9x2+720z8x3-16976z7x4-38880z6x5
+-5184z7x3-5184z6x4-3774z5x5+2080z8x+5760z7x2-6144z6x3-59616z5x4
++3108z3x6-4098z6x2-25704z5x3-21186z4x4+8640z6x-17916z4x3+22680z2x5
++2040z5x-4848z4x2-9792z3x3+3024z2x4-10704z3x2-3519z2x3+34776zx4
++12096zx3+2898x4-5040z2x+8064x3+6048x2; //Abgebrochen nach 1.5 Stunden;seems to be very complicated
 def l= facFirstWeyl (b); l;
 
 // ex3: there was difference in answers => fixed
