@@ -7,45 +7,6 @@
 */
 
 /* includes */
-#include <kernel/mod2.h>
-
-#ifndef NDEBUG
-# define MYTEST 0
-#else /* ifndef NDEBUG */
-# define MYTEST 1
-#endif /* ifndef NDEBUG */
-
-#include <kernel/options.h>
-#include <omalloc/omalloc.h>
-#include <kernel/febase.h>
-#include <kernel/numbers.h>
-#include <kernel/longrat.h>
-#include <kernel/polys.h>
-#include <kernel/ring.h>
-#include <kernel/kstd1.h>
-#include <kernel/matpol.h>
-#include <kernel/weight.h>
-#include <kernel/intvec.h>
-#include <kernel/syz.h>
-#include <kernel/sparsmat.h>
-#include <kernel/ideals.h>
-#include <kernel/prCopy.h>
-#include <kernel/gring.h>
-
-
-omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
-
-/* #define WITH_OLD_MINOR */
-#define pCopy_noCheck(p) pCopy(p)
-
-static poly * idpower;
-/*collects the monomials in makemonoms, must be allocated befor*/
-static int idpowerpoint;
-/*index of the actual monomial in idpower*/
-static poly * givenideal;
-/*the ideal from which a power is computed*/
-
-/*0 implementation*/
 
 /*2
 * initialise an ideal
