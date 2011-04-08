@@ -92,6 +92,7 @@ void sig_term_hdl(int sig)
    if (ssiToBeClosed==NULL) break;
    ssiToBeClosed=(link_list)ssiToBeClosed->next;
  }
+ exit(1);
 }
 
 /*---------------------------------------------------------------------*
