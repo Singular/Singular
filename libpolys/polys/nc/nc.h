@@ -352,6 +352,24 @@ poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r);
 poly p_Lcm(const poly a, const poly b, const ring r);
 
 
+
+
+
+// const int GRMASK = 1 << 1;
+const int SCAMASK = 1; // For backward compatibility
+const int TESTSYZSCAMASK = 0x0100 | SCAMASK; //
+
+// NCExtensions Mask Property 
+int& getNCExtensions();
+int  setNCExtensions(int iMask);
+
+// Test
+bool ncExtensions(int iMask); //  = 0x0FFFF
+
+
+
+
+
 #endif /* HAVE_PLURAL */
 
 #endif /* POLYS_NC_H */

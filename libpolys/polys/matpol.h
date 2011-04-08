@@ -31,9 +31,12 @@ class ip_smatrix
 };
 
 matrix mpNew(int r, int c);
-matrix mpCopy(matrix a);
+// matrix mpCopy(matrix a);
 void   mpDelete(matrix* a, const ring r);
 matrix mpCopy(const matrix a, const ring rSrc, const ring rDst);
+
+static inline matrix mp_Copy(matrix a, ring r){ return mpCopy(a, r, r); }
+
 matrix mpInitP(int r, int c, poly p);
 matrix mpInitI(int r, int c, int v);
 matrix mpMultI(matrix a, int f);

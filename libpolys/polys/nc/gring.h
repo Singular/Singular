@@ -24,7 +24,6 @@ BOOLEAN nc_CheckSubalgebra(poly PolyVar, ring r);
 // NOTE: instead of constructing nc_struct and calling nc_InitMultiplication yourself - just create C, D and call nc_CallPlural!!!
 
 
-BOOLEAN rIsLikeOpposite(ring rBase, ring rCandidate);
 
 
 
@@ -62,19 +61,6 @@ ideal Approx_Step(ideal L);
 matrix nc_PrintMat(int a, int b, ring r, int metric);
 
 poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift);
-
-
-// const int GRMASK = 1 << 1;
-const int SCAMASK = 1; // For backward compatibility
-const int TESTSYZSCAMASK = 0x0100 | SCAMASK; //
-
-// NCExtensions Mask Property 
-int& getNCExtensions();
-int  setNCExtensions(int iMask);
-
-// Test
-bool ncExtensions(int iMask); //  = 0x0FFFF
-
 
 
 
@@ -203,8 +189,6 @@ inline poly GetD( const ring r, int i, int j )
 
 // we need nc_gr_initBba for sca_gr_bba and gr_bba.
 void nc_gr_initBba(ideal F,kStrategy strat); 
-BOOLEAN gnc_InitMultiplication(ring r, bool bSetupQuotient = false); // just for a moment
-
 #endif // PLURAL_INTERNAL_DECLARATIONS
 
 #endif // HAVE_PLURAL :(
