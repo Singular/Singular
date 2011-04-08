@@ -9,6 +9,7 @@
 */
 #include <coeffs/coeffs.h>
 
+/*
 // the access methods
 //
 // the routines w.r.t. currRing:
@@ -42,6 +43,7 @@
 #define nGetNumerator(N)  n_GetNumerator((N),currRing->cf)
 
 #define nSetMap(R)        n_SetMap(R,currRing->cf)
+*/
 
 
 // --------------------------------------------------------------

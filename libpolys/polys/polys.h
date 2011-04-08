@@ -338,7 +338,6 @@ int   p_Var(poly mi,const ring r);
 BOOLEAN pCompareChain (poly p,poly p1,poly p2,poly lcm);
 BOOLEAN pCompareChainPart (poly p,poly p1,poly p2,poly lcm);
 #define  pEqualPolys(p1,p2) p_EqualPolys(p1,p2,currRing)
-BOOLEAN pComparePolys(poly p1,poly p2);
 
 
 

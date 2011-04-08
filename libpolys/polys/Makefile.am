@@ -34,6 +34,7 @@ SOURCES = \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc \
 	polys0.cc prCopy.cc \
+	nc/sca.cc nc/gring.cc \
 	kbuckets.cc sbuckets.cc ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} weight.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
@@ -41,7 +42,7 @@ BUILT_SOURCES = templates/p_Procs.inc
 noinst_HEADERS =
 
 include_HEADERS = \
-	monomials/ring.h monomials/nc.h \
+	monomials/ring.h nc/nc.h \
 	pInline0.h operations/pShallowCopyDelete.h \
 	templates/p_MemAdd.h templates/p_MemCmp.h templates/p_MemCopy.h operations/p_Mult_q.h \
 	templates/p_Numbers.h templates/p_Procs.h \

@@ -15,7 +15,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/modulop.h>
 #include <coeffs/numbers.h>
-#include <polys/polys.h>
+// #include <polys/polys.h>
 #include <polys/simpleideals.h>
 #include <polys/monomials/ring.h>
 #ifdef HAVE_FACTORY

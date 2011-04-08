@@ -55,7 +55,7 @@ void p_Content(poly ph, const ring r)
     while (p!=NULL)
     {
       nNormalize(pGetCoeff(p));
-      d=nGcd(h,pGetCoeff(p),r);
+      d=n_Gcd(h,pGetCoeff(p),r);
       nDelete(&h);
       h = d;
       if(nIsOne(h))
@@ -375,7 +375,7 @@ number pInitContent_a(poly ph)
 //    p=ph;
 //    while (p!=NULL)
 //    {
-//      d=nGcd(h,pGetCoeff(p));
+//      d=n_Gcd(h,pGetCoeff(p));
 //      nDelete(&h);
 //      h = d;
 //      if(nIsOne(h))

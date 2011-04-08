@@ -7,8 +7,9 @@
 
 // #include <ncSACache.h> // for CCacheHash etc classes
 
-#include <kernel/structs.h>
-#include <kernel/febase.h> // for Print!
+#include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
+#include <reporter/reporter.h> // for Print!
 // //////////////////////////////////////////////////////////////////////// //
 //
 
