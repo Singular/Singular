@@ -89,6 +89,7 @@ void sig_term_hdl(int sig)
  while (ssiToBeClosed!=NULL)
  {
    slClose(ssiToBeClosed->l);
+   if (ssiToBeClosed==NULL) break;
    ssiToBeClosed=(link_list)ssiToBeClosed->next;
  }
 }
