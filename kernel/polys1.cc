@@ -566,7 +566,10 @@ void p_Content(poly ph, const ring r)
         //  nWrite(tmp);Print(StringAppendS("\n"));
         //}
         //nDelete(&tmp);
-        d = nIntDiv(pGetCoeff(p),h);
+        if (rField_is_Zp_a(currRing) || rField_is_Q_a(currRing))
+          d = nDiv(pGetCoeff(p),h);
+        else
+          d = nIntDiv(pGetCoeff(p),h);
         pSetCoeff(p,d);
         pIter(p);
       }
