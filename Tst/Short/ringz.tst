@@ -2,7 +2,7 @@ LIB"tst.lib";
 tst_init();
 proc reduceTail(def p,def I) // poly,ideal or vector,module
 {
-   poly q=lead(p);
+   def q=lead(p);
    p=p-q;
    while(p!=0)
    {
