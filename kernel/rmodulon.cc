@@ -427,7 +427,7 @@ nMapFunc nrnSetMap(const ring src, const ring dst)
   {
     if (   (src->ringtype > 0)
         && (mpz_cmp(src->ringflaga, dst->ringflaga) == 0)
-        && (src->ringflagb == dst->ringflagb)) return nrnMapGMP;
+        && (src->ringflagb == dst->ringflagb)) return nrnCopy;
     else
     {
       int_number nrnMapModul = (int_number) omAllocBin(gmp_nrz_bin);

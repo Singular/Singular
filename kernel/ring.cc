@@ -922,7 +922,9 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           }
           if (i!=len)
           {
-            tmpR.parameter=(char**)omReallocSize(tmpR.parameter,len*sizeof(char_ptr),i*sizeof(char_ptr));
+            tmpR.parameter=(char**)omReallocSize(tmpR.parameter,
+                                                 len*sizeof(char_ptr),
+                                                 i*sizeof(char_ptr));
           }
           tmpR.P=i;
         }
@@ -931,8 +933,31 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     #ifdef HAVE_RINGS
     else if (rField_is_Ring(r1)||rField_is_Ring(r2))
     {
-      Werror("rSumInternal for rings coeffs");
-      return -1;
+      if (r1->ringtype != r2->ringtype)
+      {
+        Werror("rSumInternal not yet implemented for %s",
+               "different coefficient rings");
+        return -1;
+      }
+      else
+      {
+        tmpR.ch        = rInternalChar(r1);
+        tmpR.ringtype  = r1->ringtype;
+        if (r1->ringflaga != NULL)
+        {
+          omBin tmpBin = omGetSpecBin(sizeof(mpz_t));
+          tmpR.ringflaga = (int_number)omAllocBin(tmpBin);
+          mpz_init_set(tmpR.ringflaga, (int_number)r1->ringflaga);
+        }
+        tmpR.ringflagb = r1->ringflagb;
+        tmpR.nr2mModul = r1->nr2mModul;
+        if (r1->nrnModul != NULL)
+        {
+          omBin tmpBin = omGetSpecBin(sizeof(mpz_t));
+          tmpR.nrnModul = (int_number)omAllocBin(tmpBin);
+          mpz_init_set(tmpR.nrnModul, (int_number)r1->nrnModul);
+        }
+      }
     }
     #endif
   }
@@ -1278,7 +1303,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           tmpR.OrdSgn=-1;
       }
     }
-    else if ((k==rVar(r1)) && (k==rVar(r2))) /* r1 and r2 are "quite" the same ring */
+    else if ((k==rVar(r1)) && (k==rVar(r2))) /* r1 and r2 are "quite"
+                                                the same ring */
       /* copy r1, because we have the variables from r1 */
     {
       int b=rBlocks(r1);
@@ -1389,7 +1415,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
       idTest((ideal)C);
 
-      nMapFunc nMap1 = nSetMap(R1); // can change something global: not usable after the next nSetMap call :(
+      nMapFunc nMap1 = nSetMap(R1); /* can change something global: not usable
+                                       after the next nSetMap call :( */
       // Create blocked C and D matrices:
       for (i=1; i<= rVar(R1); i++)
         for (j=i+1; j<=rVar(R1); j++)
@@ -1405,7 +1432,8 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       idTest((ideal)D);
 
 
-      nMapFunc nMap2 = nSetMap(R2); // can change something global: not usable after the next nSetMap call :(
+      nMapFunc nMap2 = nSetMap(R2); /* can change something global: not usable
+                                       after the next nSetMap call :( */
       for (i=1; i<= rVar(R2); i++)
         for (j=i+1; j<=rVar(R2); j++)
         {

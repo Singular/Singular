@@ -230,7 +230,7 @@ ideal maGetPreimage(ring theImageRing, map theMap, ideal id)
 
   if (nSetMap(theImageRing) != nCopy)
   {
-    Werror("Coefficient fields must be equal");
+    Werror("Coefficient fields/rings must be equal");
     return NULL;
   }
 

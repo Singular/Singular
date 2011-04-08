@@ -459,6 +459,11 @@ number nr2mNeg (number c)
   return nr2mNegM(c);
 }
 
+number nr2mCopy(number a)
+{
+  return a;
+}
+
 number nr2mMapMachineInt(number from)
 {
   NATNUMBER i = ((NATNUMBER) from) & currRing->nr2mModul;
@@ -514,7 +519,7 @@ nMapFunc nr2mSetMap(const ring src, const ring dst)
   if (rField_is_Ring_2toM(src)
      && (src->ringflagb >= dst->ringflagb))
   {
-    return nr2mMapMachineInt;
+    return nr2mCopy;
   }
   if (rField_is_Ring_Z(src))
   {

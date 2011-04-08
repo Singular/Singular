@@ -159,7 +159,7 @@ void nSetChar(ring r)
     nr2mSetExp(c, r);
     nInit_bigint=nr2mMapQ;
   }
-  /*----------------------ring Z / 2^m----------------*/
+  /*----------------------ring Z ----------------*/
   else if (rField_is_Ring_Z(r))
   {
     nrzSetExp(c, r);
@@ -363,7 +363,7 @@ void nInitChar(ring r)
   {
      nr2mInitExp(c,r);
      n->cfInit = nr2mInit;
-     n->nCopy  = ndCopy;
+     n->nCopy  = nr2mCopy;
      n->n_Int  = nr2mInt;
      n->nAdd   = nr2mAdd;
      n->nSub   = nr2mSub;
