@@ -7,7 +7,7 @@ dnl Test for the GNU Multiprecision library and define GMP_CFLAGS and GMP_LIBS
 
 AC_DEFUN([LB_CHECK_GMP],
 [
-DEFAULT_CHECKING_PATH="/usr /usr/local"
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 
 AC_ARG_WITH(gmp,
 [  --with-gmp= <path>|yes Use GMP library. This library is mandatory for Singular
