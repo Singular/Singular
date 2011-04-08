@@ -14,7 +14,7 @@ subalgebras of a polynomial ring. Note, that in contrast to Groebner
 bases, SAGBI bases may be infinite.
 
 REFERENCES:
-Ana Bravo: Some Facts About Canonical Subalgebra Bases, 
+Ana Bravo: Some Facts About Canonical Subalgebra Bases,
 MSRI Publications  51, p. 247-254
 
 PROCEDURES:
@@ -136,7 +136,7 @@ static proc spolynomialsGB(ideal algebra,r,int method)
    * 5. Compute the new algebraic relations
    */
   int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
-  dbprint(ppl,"//Spoly-1- initialisation and precomputation");	
+  dbprint(ppl,"//Spoly-1- initialisation and precomputation");
   def br=basering;
   ideal varsBasering=maxideal(1);
   ideal leadTermsAlgebra=lead(algebra);
@@ -168,12 +168,12 @@ static proc spolynomialsGB(ideal algebra,r,int method)
     kernNew[i-nvars(r)+nvars(br)]=leadTermsAlgebra[i]-listOfVariables[i+nvars(br)];
   }
   //--------------- calculate kernel of Phi depending on method choosen ---------------
-  dbprint(ppl,"//Spoly-2- Groebner basis computation");	
+  dbprint(ppl,"//Spoly-2- Groebner basis computation");
   attrib(kernOld,"isSB",1);
   ideal kern=stdKernPhi(kernNew,kernOld,leadTermsAlgebra,method);
-  dbprint(ppl-2,"//Spoly-2-1- ideal kern",kern);	
+  dbprint(ppl-2,"//Spoly-2-1- ideal kern",kern);
   //-------------------------- calulate algebraic relations -----------------------
-  dbprint(ppl,"//Spoly-3- computing new algebraic relations");	
+  dbprint(ppl,"//Spoly-3- computing new algebraic relations");
   ideal algebraicRelations=nselect(kern,1..nvars(br));
   attrib(algebraicRelationsOld,"isSB",1);
   ideal algebraicRelationsNew=reduce(algebraicRelations,algebraicRelationsOld);
@@ -200,7 +200,7 @@ static proc spolynomialsToric(ideal algebra) {
    * K[y_1,...,y_m]->K[x_1,...,x_n], x(i)->x(i), @y(i)->leadterm(algebra[i])
    */
   int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
-  dbprint(ppl,"//Spoly-1- initialisation and precomputation");	
+  dbprint(ppl,"//Spoly-1- initialisation and precomputation");
   def br=basering;
   int m=ncols(algebra);
   int n=nvars(basering);
@@ -240,7 +240,7 @@ static proc spolynomialsToric(ideal algebra) {
    dbprint(ppl,"//Spoly-2- call of toric_ideal");
   ideal algebraicRelations=toric_ideal(A,"ect");
   //Suitable substitution
-	dbprint(ppl,"//Spoly-3- substitutions");	
+        dbprint(ppl,"//Spoly-3- substitutions");
   ideal leadCoefficients=fetch(br,leadCoefficients);
   for (i=1; i<=m; i++)
   {
@@ -249,7 +249,7 @@ static proc spolynomialsToric(ideal algebra) {
       algebraicRelations=subst(algebraicRelations,var(i),1/leadCoefficients[i]*var(i));
     }
   }
-	dbprint(ppl-2,"//Spoly-3-1- algebraic relations",algebraicRelations);	
+        dbprint(ppl-2,"//Spoly-3-1- algebraic relations",algebraicRelations);
   export algebraicRelations;
   return(rNew);
 }
@@ -267,10 +267,10 @@ static proc reductionGB(ideal F, ideal algebra,r, int tailreduction,int method,i
    * When using sagbiReduce,sagbi and sagbiPart the integer parRed will always be zero. Only the procedure
    * algebraicDependence causes this procedure to be called with parRed<>0. The only difference when parRed<>0
    * is that the reduction algorithms returns the non-zero constants it attains (instead of just returning zero as the
-	 * correct remainder), as they will be expressions in parameters for an algebraic dependence.
+         * correct remainder), as they will be expressions in parameters for an algebraic dependence.
    */
   int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
-  dbprint(ppl,"//Red-1- initialisation and precomputation");	
+  dbprint(ppl,"//Red-1- initialisation and precomputation");
   def br=basering;
   int numVarsBasering=nvars(br);
   ideal varsBasering=maxideal(1);
@@ -278,7 +278,7 @@ static proc reductionGB(ideal F, ideal algebra,r, int tailreduction,int method,i
 
   if (numVarsBasering==nvars(r))
   {
-		dbprint(ppl-1,"//Red-1-1- Groebner basis computation");
+                dbprint(ppl-1,"//Red-1-1- Groebner basis computation");
     /* Case that ring r is the same ring as the basering. Using proc extendRing,
      * stdKernPhi
      * one construct the extension of the current baserring with new variables @y, one for each element
@@ -314,8 +314,8 @@ static proc reductionGB(ideal F, ideal algebra,r, int tailreduction,int method,i
   dbprint(ppl,"//Red-2- reduction, polynomial by polynomial");
   for (i=1; i<=ncols(F);i++)
   {
-		dbprint(ppl-1,"//Red-2-"+string(i)+"- starting with new polynomial");
-		dbprint(ppl-2,"//Red-2-"+string(i)+"-1- Polynomial before reduction",F[i]);
+                dbprint(ppl-1,"//Red-2-"+string(i)+"- starting with new polynomial");
+                dbprint(ppl-2,"//Red-2-"+string(i)+"-1- Polynomial before reduction",F[i]);
     normalform=0;
     while (F[i]!=0)
     {
@@ -324,16 +324,16 @@ static proc reductionGB(ideal F, ideal algebra,r, int tailreduction,int method,i
       {
       //K is always contained in the subalgebra,
       //thus the remainder is zero in this case
-        if (parRed) 
-        { 
-				//If parRed<>0 save non-zero constants the reduction algorithms attains.
-					break; 
-				}
-        else 
-        { 
-					F[i]=0; 
-					break; 
-				}
+        if (parRed)
+        {
+                                //If parRed<>0 save non-zero constants the reduction algorithms attains.
+                                        break;
+                                }
+        else
+        {
+                                        F[i]=0;
+                                        break;
+                                }
       }
       //note: as the ordering in br and r might not be compatible
       //it can be that lead(F[i]) in r is
@@ -422,16 +422,16 @@ static proc sagbiConstruction(ideal algebra, int iterations, int tailreduction, 
  * - If the sagbiPart procedure calls this procedure, iterations>=0
  *   and iterations specifies the
  *   number of iterations. A degree boundary is not used here.
- * When this method is called via the procedures sagbi and sagbiPart the integer parRed 
- * will always be zero. Only the procedure algebraicDependence calls this procedure with 
- * parRed<>0. The only difference when parRed<>0 is that the reduction algorithms returns 
- * the non-zero constants it attains (instead of just returning zero as the correct 
- * remainder), as they will be expressions in parameters for an algebraic dependence. 
+ * When this method is called via the procedures sagbi and sagbiPart the integer parRed
+ * will always be zero. Only the procedure algebraicDependence calls this procedure with
+ * parRed<>0. The only difference when parRed<>0 is that the reduction algorithms returns
+ * the non-zero constants it attains (instead of just returning zero as the correct
+ * remainder), as they will be expressions in parameters for an algebraic dependence.
  * These constants are saved in the ideal reducedParameters.
  */
 {
   int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
-  dbprint(ppl,"// -0- initialisation and precomputation");	
+  dbprint(ppl,"// -0- initialisation and precomputation");
   def br=basering;
   int i=1;
 
@@ -873,20 +873,20 @@ proc algebraicDependence(ideal I,int iterations)
 "USAGE: algebraicDependence(I,it); I an an ideal, it is an integer
 RETURN: ring
 ASSUME: basering is not a qring
-PURPOSE: Returns a ring containing the ideal @code{algDep}, which contains possibly 
-@* 		some algebraic dependencies of the elements of I obtained through @code{it}
-@* 		iterations of the SAGBI construction algorithms. See the example on how 
-@* 		to access these objects. 
+PURPOSE: Returns a ring containing the ideal @code{algDep}, which contains possibly
+@*                 some algebraic dependencies of the elements of I obtained through @code{it}
+@*                 iterations of the SAGBI construction algorithms. See the example on how
+@*                 to access these objects.
 EXAMPLE: example algebraicDependence; shows an example"
 {
-	assumeQring();
-	int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
-  dbprint(ppl,"//AlgDep-1- initialisation and precomputation");	
+        assumeQring();
+        int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
+  dbprint(ppl,"//AlgDep-1- initialisation and precomputation");
   def br=basering;
   int i;
   I=simplify(I,2); //avoid that I contains zeros
 
-	//Create two polynomial rings, which both are extensions of the current basering.
+        //Create two polynomial rings, which both are extensions of the current basering.
   //The first ring will contain the additional paramteres @c(1),...,@c(m), the second one
   //will contain the additional variables @c(1),...,@c(m), where m=ncols(I).
   string parameterName=uniqueVariableName("@c");
@@ -952,7 +952,7 @@ EXAMPLE: example algebraicDependence; shows an example"
   //           def parameterRing=pr;
   //         }
 
-	//Compute a partial SAGBI basis of the algebra generated by I[1]-@c(1),...,I[m]-@c(m),
+        //Compute a partial SAGBI basis of the algebra generated by I[1]-@c(1),...,I[m]-@c(m),
   //where the @c(n) are parameters
   ideal I=fetch(br,I);
   ideal algebra;
@@ -960,9 +960,9 @@ EXAMPLE: example algebraicDependence; shows an example"
   {
     algebra[i]=I[i]-par(i);
   }
-  dbprint(ppl,"//AlgDep-2- call of SAGBI construction algorithm");	
+  dbprint(ppl,"//AlgDep-2- call of SAGBI construction algorithm");
   algebra=sagbiConstruction(algebra, iterations,0,0,1);
-  dbprint(ppl,"//AlgDep-3- postprocessing of results");	
+  dbprint(ppl,"//AlgDep-3- postprocessing of results");
   int j=1;
   //If K[x_1,...,x_n] was the basering, then algebra is in K(@c(1),...,@c(m))[x_1,...x_n]. We intersect
   //elements in algebra with K(@c(1),..,@c(n)) to get algDep. Note that @c(i) can only appear in the numerator,
@@ -984,12 +984,12 @@ EXAMPLE: example algebraicDependence; shows an example"
   //Now get rid of constants in K that may have been added to algDep.
   for (i=1; i<=ncols(algDep); i++)
   {
-		if(leadmonom(algDep[i])==1) 
-		{
-				algDep[i]=0;
-		}
-	}
-	algDep=simplify(algDep,2);
+                if(leadmonom(algDep[i])==1)
+                {
+                                algDep[i]=0;
+                }
+        }
+        algDep=simplify(algDep,2);
   export algDep,algebra;
   setring br;
   return(extendVarRing);
@@ -1017,7 +1017,7 @@ static proc interreduced(ideal I)
 {
   /* performs subalgebra interreduction of a set of subalgebra generators */
   int ppl = printlevel-voice+3; //variable for additional printlevel-dependend information
-  dbprint(ppl,"//Interred-1- starting interreduction");	
+  dbprint(ppl,"//Interred-1- starting interreduction");
   ideal J,B;
   int i,j,k;
   poly f;
@@ -1030,7 +1030,7 @@ static proc interreduced(ideal I)
     I[k]=f;
   }
   I=simplify(I,2);
-  dbprint(ppl,"//Interred-2- interreduction completed");	
+  dbprint(ppl,"//Interred-2- interreduction completed");
   return(I);
 }
 ///////////////////////////////////////////////////////////////////////////////

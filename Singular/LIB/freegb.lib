@@ -2564,7 +2564,7 @@ proc fullSerreRelations(intmat A, ideal rNegative, ideal rCartan, ideal rPositiv
 RETURN:  ring (and ideal)
 PURPOSE: compute the inhomogeneous Serre's relations associated to A in given
 @*       variable names
-ASSUME: three ideals in the input are of the same sizes and contain merely 
+ASSUME: three ideals in the input are of the same sizes and contain merely
 @* variables which are interpreted as follows: N resp. P stand for negative
 @* resp. positive roots, C stand for Cartan elements. d is the degree bound for
 @* letterplace ring, which will be returned.
@@ -3174,7 +3174,7 @@ proc lpNF(poly p, ideal G)
 "USAGE: lpNF(p,G); f letterplace polynomial, ideal I
 RETURN: poly
 PURPOSE: computation of the normalform of p with respect to G
-ASSUME: p is a Letterplace polynomial, G is a set Letterplace polynomials, 
+ASSUME: p is a Letterplace polynomial, G is a set Letterplace polynomials,
 being a Letterplace Groebner basis (no check for this will be done)
 NOTE: Strategy: take the smallest monomial wrt ordering for reduction
 @*     For homogenous ideals the shift does not matter
@@ -3234,7 +3234,7 @@ ASSUME: Intvec is an exponent vector of a letterplace monomial contained in V'
    else {I = I[(n+1)..(n*d)]; d = d-1; j++;}
  }
  for (j = 1; j <= d; j++)
-  {l=(j-1)*n+1; k= j*n; 
+  {l=(j-1)*n+1; k= j*n;
    w = I[l..k];
    if (w==intvec(0)){w = I[1..(l-1)]; return(w);}//if a zero block is found there are only zero blocks left,
                                                  //otherwise there would be a hole in the monomial
@@ -3343,7 +3343,7 @@ NOTE: Taking the first possible reduction
   for (i = 1; i <= size(L); i++)
   {s = dShiftDiv(V, L[i])[1];
    if (s <> -1)
-   {p = lpReduce(p,G[i],s); 
+   {p = lpReduce(p,G[i],s);
     p = lpNormalForm1(p,G,L);
     break;
    }
@@ -3370,7 +3370,7 @@ static proc getlpCoeffs(poly q, poly p)
  {bla = cq[((i-1)*n+1)..(i*n)];
   if (bla == 0) {lv = cq[1..i*n]; cq = cq[(i*n+1)..(d*n)]; break;}
  }
- 
+
  d = size(cq)/n;
  for (i = 1; i<= d; i++)
  {bla = cq[((i-1)*n+1)..(i*n)];
@@ -3450,7 +3450,7 @@ static proc isContainedInVp(poly p)
   if (w<>intvec(0)){break;}
    else {l = l[(n+1)..(n*d)]; d = d-1;}
  }
- 
+
  while (1 <= d)
   {for (j = 1; j <= n; j++)
    {if (l[j]<>0)
