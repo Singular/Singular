@@ -519,7 +519,8 @@ nMapFunc nr2mSetMap(const ring src, const ring dst)
   if (rField_is_Ring_2toM(src)
      && (src->ringflagb >= dst->ringflagb))
   {
-    return nr2mCopy;
+    //return nr2mCopy;
+    return nr2mMapMachineInt;
   }
   if (rField_is_Ring_Z(src))
   {
