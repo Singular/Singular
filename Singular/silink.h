@@ -102,4 +102,15 @@ extern omBin sip_link_bin;
 extern omBin ip_link_bin;
 
 int slStatusSsiL(lists L, int timeout);
+
+typedef struct
+{
+  leftv u;
+  si_link l;
+  void * next;
+} link_struct;
+
+typedef link_struct* link_list;
+
+extern link_list ssiToBeClosed;
 #endif // SILINK_H

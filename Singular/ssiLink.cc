@@ -67,15 +67,6 @@ typedef struct
 } ssiInfo;
 
 
-typedef struct
-{
-  leftv u;
-  si_link l;
-  void * next;
-} link_struct;
-
-typedef link_struct* link_list;
-
 link_list ssiToBeClosed=NULL;
 sigset_t ssi_sigmask;
 sigset_t ssi_oldmask;

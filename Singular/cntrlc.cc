@@ -84,6 +84,15 @@ void sig_pipe_hdl(int sig)
  }
 }
 
+void sig_term_hdl(int sig)
+{
+ while (ssiToBeClosed!=NULL)
+ {
+   slClose(ssiToBeClosed->l);
+   ssiToBeClosed=(link_list)ssiToBeClosed->next;
+ }
+}
+
 /*---------------------------------------------------------------------*
  * File scope Variables (Variables share by several functions in
  *                       the same file )
@@ -229,7 +238,7 @@ void sigsegv_handler(int sig, sigcontext s)
  @param[in] sig
 **/
 /*---------------------------------------------------------------------*/
-void sig_ign_hdl(int sig)
+void sig_chld_hdl(int sig)
 {
  waitpid(-1,NULL,WNOHANG);  
 }
@@ -260,8 +269,9 @@ void init_signals()
   {
     PrintS("cannot set signal handler for INT\n");
   }
-  si_set_signal(SIGCHLD, (si_hdl_typ)sig_ign_hdl);
+  si_set_signal(SIGCHLD, (si_hdl_typ)sig_chld_hdl);
   si_set_signal(SIGPIPE, (si_hdl_typ)sig_pipe_hdl);
+  si_set_signal(SIGTERM, (si_hdl_typ)sig_term_hdl);
 }
 
 /*---------------------------------------------------------------------*/
