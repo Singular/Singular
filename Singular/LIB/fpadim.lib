@@ -30,15 +30,18 @@ OVERVIEW: Given the free algebra A = K<x_1,...,x_n> and a (finite) Groebner basi
 @*      the endpoints of the graph. Since there is a unique path to every
 @*      monomial in V the whole graph can be described only from the knowledge
 @*      of the mistletoes. Note that V corresponds to a basis of A/<GB>, so
-@*      knowing the mistletoes we know a K-basis. For more details see
-@*      [studzins]. This package uses the Letterplace format introduced by
-@*      [lls]. The algebra can either be represented as a Letterplace ring or
-@*      via integer vectors: Every variable will only be represented by its
-@*      number, so variable one is represented as 1, variable two as 2 and so
-@*      on. The monomial x_1*x_3*x_2 for example will be stored as (1,3,2).
-@*      Multiplication is concatenation. Note that there is no algorithm for
-@*      computing the normal form needed for our case.
-@*
+@*      knowing the mistletoes we know a K-basis. The name mistletoes was given
+@*      to those points because of these miraculous value and the algorithm is 
+@*      named sickle, because a sickle is the tool to harvest mistletoes.
+@*      For more details see [studzins]. This package uses the Letterplace 
+@*      format introduced by [lls]. The algebra can either be represented as a
+@*      Letterplace ring or via integer vectors: Every variable will only be
+@*      represented by its number, so variable one is represented as 1,
+@*      variable two as 2 and so on. The monomial x_1*x_3*x_2 for example will
+@*      be stored as (1,3,2). Multiplication is concatenation. Note that there
+@*      is no algorithm for computing the normal form needed for our case.
+@*      Note that the name fpadim.lib is short for dimensions of finite 
+@*      presented algebras.
 
 References:
 
@@ -52,7 +55,7 @@ Assumptions:
 @* - basering is always a Letterplace ring
 @* - all intvecs correspond to Letterplace monomials
 @* - if you specify a different degree bound d,
-     d <= attrib(basering,uptodeg) holds
+     d <= attrib(basering,uptodeg) should hold.
 @* In the procedures below, 'iv' stands for intvec representation
   and 'lp' for the letterplace representation of monomials
 
@@ -141,9 +144,9 @@ NOTE:   d has to be > 0
     while (i2 <= (n^d))
     {for (i3 = 1; i3 <= n; i3++)
       {for (i4 = 1; i4 <= (n^(i1-1)); i4++)
-        {M[i2,i1] = i3;
-          i2 = i2 + 1;
-        }
+	{M[i2,i1] = i3;
+	  i2 = i2 + 1;
+	}
       }
     }
   }
@@ -190,15 +193,15 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0) {return(0);}
@@ -206,8 +209,8 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-        dimen = dimen + 1 + findDimen(Vt,n,L,P);
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	dimen = dimen + 1 + findDimen(Vt,n,L,P);
       }
       return(dimen);
     }
@@ -219,14 +222,14 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
       }
       if (w == 0) {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0) {return(0);}
@@ -234,8 +237,8 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-        dimen = dimen + 1 + findDimen(Vt,n,L,P,degbound);
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	dimen = dimen + 1 + findDimen(Vt,n,L,P,degbound);
       }
       return(dimen);
     }
@@ -254,10 +257,10 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0)
-          {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0)
+	  {w = 1; break;}
+	}
       }
       if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
       if (r == 1) {break;}
@@ -271,31 +274,31 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
       intmat Mt[j][nrows(M)];
       for (it = 1; it <= j; it++)
       { for(it2 = 1; it2 <= nrows(M);it2++)
-        {Mt[it,it2] = int(leadcoef(M[it2,it]));}
+	{Mt[it,it2] = int(leadcoef(M[it2,it]));}
       }
       Vt = V[(size(V)-ld+1)..size(V)];
       //Mt; type(Mt);Vt;type(Vt);
       if (isInMat(Vt,Mt) > 0) {return(1);}
       else
       {vector Vtt;
-        for (it =1; it <= size(Vt); it++)
-        {Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
-        for (i = 1; i <= n; i++)
-        {Vt = V,i; w = 0;
-          for (j = 1; j <= size(P); j++)
-          {if (P[j] <= size(Vt))
-            {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-              //L[j]; type(L[j]);Vt2;type(Vt2);
-              if (isInMat(Vt2,L[j]) > 0)
-              {w = 1; break;}
-            }
-          }
-          if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-          if (r == 1) {break;}
-        }
-        return(r);
+	for (it =1; it <= size(Vt); it++)
+	{Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
+	for (i = 1; i <= n; i++)
+	{Vt = V,i; w = 0;
+	  for (j = 1; j <= size(P); j++)
+	  {if (P[j] <= size(Vt))
+	    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	      //L[j]; type(L[j]);Vt2;type(Vt2);
+	      if (isInMat(Vt2,L[j]) > 0)
+	      {w = 1; break;}
+	    }
+	  }
+	  if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+	  if (r == 1) {break;}
+	}
+	return(r);
       }
     }
     else
@@ -307,16 +310,16 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
       kill Vtt;
       for (i = 1; i <= n; i++)
       {Vt = V,i; w = 0;
-        for (j = 1; j <= size(P); j++)
-        {if (P[j] <= size(Vt))
-          {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-            //L[j]; type(L[j]);Vt2;type(Vt2);
-            if (isInMat(Vt2,L[j]) > 0)
-            {w = 1; break;}
-          }
-        }
-        if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-        if (r == 1) {break;}
+	for (j = 1; j <= size(P); j++)
+	{if (P[j] <= size(Vt))
+	  {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	    //L[j]; type(L[j]);Vt2;type(Vt2);
+	    if (isInMat(Vt2,L[j]) > 0)
+	    {w = 1; break;}
+	  }
+	}
+	if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+	if (r == 1) {break;}
       }
       return(r);
     }
@@ -341,15 +344,15 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0) {return(H);}
@@ -357,8 +360,8 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++) {Vt[j] =  int(leadcoef(M[i][j]));}
-        h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1);
+	for (j =1; j <= size(M[i]); j++) {Vt[j] =  int(leadcoef(M[i][j]));}
+	h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1);
       }
       if (size(H1) < (size(V)+2)) {H1[(size(V)+2)] = h1;}
       else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
@@ -373,15 +376,15 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0) {return(H);}
@@ -389,9 +392,9 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++)
-        {Vt[j] =  int(leadcoef(M[i][j]));}
-        h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1,degbound);
+	for (j =1; j <= size(M[i]); j++)
+	{Vt[j] =  int(leadcoef(M[i][j]));}
+	h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1,degbound);
       }
       if (size(H1) < (size(V)+2)) { H1[(size(V)+2)] = h1;}
       else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
@@ -418,15 +421,15 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
@@ -434,12 +437,12 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++)
-        {Vt[j] =  int(leadcoef(M[i][j]));}
-        if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
-        else
-        {R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
-        R = findHCoeffMis(Vt,n,L,P,R);
+	for (j =1; j <= size(M[i]); j++)
+	{Vt[j] =  int(leadcoef(M[i][j]));}
+	if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+	else
+	{R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
+	R = findHCoeffMis(Vt,n,L,P,R);
       }
       return(R);
     }
@@ -455,15 +458,15 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
@@ -471,12 +474,12 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {M = simplify(M,2);
       for (i = 1; i <= ncols(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++)
-        {Vt[j] =  int(leadcoef(M[i][j]));}
-        if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
-        else
-        {R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
-        R = findHCoeffMis(Vt,n,L,P,R,degbound);
+	for (j =1; j <= size(M[i]); j++)
+	{Vt[j] =  int(leadcoef(M[i][j]));}
+	if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+	else
+	{R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
+	R = findHCoeffMis(Vt,n,L,P,R,degbound);
       }
       return(R);
     }
@@ -499,15 +502,15 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0)
@@ -519,8 +522,8 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-        R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R);
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R);
       }
       return(R);
     }
@@ -536,15 +539,15 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0)
@@ -556,8 +559,8 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-        R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R,degbound);
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R,degbound);
       }
       return(R);
 
@@ -585,16 +588,16 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0)
-          {w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0)
+	  {w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M)==0) {R = V; return(R);}
@@ -602,8 +605,8 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-        R = R + findmistletoes(Vt,n,L,P);
+	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+	R = R + findmistletoes(Vt,n,L,P);
       }
       return(R);
     }
@@ -616,15 +619,15 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-          if (isInMat(Vt2,L[j]) > 0){w = 1; break;}
-        }
+	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+	  if (isInMat(Vt2,L[j]) > 0){w = 1; break;}
+	}
       }
       if (w == 0)
       {vector Vtt;
-        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-        M = M,Vtt;
-        kill Vtt;
+	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+	M = M,Vtt;
+	kill Vtt;
       }
     }
     if (size(M) == 0) {R = V; return(R);}
@@ -632,10 +635,10 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {M = simplify(M,2);
       for (i = 1; i <= ncols(M); i++)
       {kill Vt; intvec Vt;
-        for (j =1; j <= size(M[i]); j++)
-        {Vt[j] =  int(leadcoef(M[i][j]));}
-        //Vt; typeof(Vt); size(Vt);
-        R = R + findmistletoes(Vt,n,L,P,degbound);
+	for (j =1; j <= size(M[i]); j++)
+	{Vt[j] =  int(leadcoef(M[i][j]));}
+	//Vt; typeof(Vt); size(Vt);
+	R = R + findmistletoes(Vt,n,L,P,degbound);
       }
       return(R);
     }
@@ -682,7 +685,8 @@ PURPOSE:Finding the position of v in V, returns 0, if v is not in V
 proc ivL2lpI(list L)
 "USAGE: ivL2lpI(L); L a list of intvecs
 RETURN: ideal
-PURPOSE:Transforming a list of intvecs into an ideal of Letterplace monomials
+PURPOSE:Transforming a list of intvecs into an ideal of Letterplace monomials.
+@*      For the encoding of the variables see the overview.
 ASSUME: - Intvec corresponds to a Letterplace monomial
 @*      - basering has to be a Letterplace ring
 EXAMPLE: example ivL2lpI; shows examples
@@ -712,6 +716,7 @@ proc iv2lp(intvec I)
 "USAGE: iv2lp(I); I an intvec
 RETURN: poly
 PURPOSE:Transforming an intvec into the corresponding Letterplace polynomial
+@*      For the encoding of the variables see the overview.
 ASSUME: - Intvec corresponds to a Letterplace monomial
 @*      - basering has to be a Letterplace ring
 NOTE:   - Assumptions will not be checked!
@@ -741,6 +746,9 @@ proc iv2lpList(list L)
 "USAGE: iv2lpList(L); L a list of intmats
 RETURN: ideal
 PURPOSE:Converting a list of intmats into an ideal of corresponding monomials
+@*      The rows of the intmat corresponds to an intvec, which stores the 
+@*      monomial.
+@*      For the encoding of the variables see the overview.
 ASSUME: - The rows of each intmat in L must correspond to a Letterplace monomial
 @*      - basering has to be a Letterplace ring
 EXAMPLE: example iv2lpList; shows examples
@@ -769,7 +777,10 @@ example
 proc iv2lpMat(intmat M)
 "USAGE: iv2lpMat(M); M an intmat
 RETURN: ideal
-PURPOSE:Converting an intmat into an ideal of the corresponding monomials
+PURPOSE:Converting an intmat into an ideal of the corresponding monomials.
+@*      The rows of the intmat corresponds to an intvec, which stores the 
+@*      monomial.
+@*      For the encoding of the variables see the overview.
 ASSUME: - The rows of M must correspond to Letterplace monomials
 @*      - basering has to be a Letterplace ring
 EXAMPLE: example iv2lpMat; shows examples
@@ -803,7 +814,8 @@ example
 proc lpId2ivLi(ideal G)
 "USAGE: lpId2ivLi(G); G an ideal
 RETURN: list
-PURPOSE:Transforming an ideal into the corresponding list of intvecs
+PURPOSE:Transforming an ideal into the corresponding list of intvecs.
+@*      For the encoding of the variables see the overview.
 ASSUME: - basering has to be a Letterplace ring
 EXAMPLE: example lpId2ivLi; shows examples
 "
@@ -826,7 +838,8 @@ example
 proc lp2iv(poly p)
 "USAGE: lp2iv(p); p a poly
 RETURN: intvec
-PURPOSE:Transforming a monomial into the corresponding intvec
+PURPOSE:Transforming a monomial into the corresponding intvec.
+@*      For the encoding of the variables see the overview.
 ASSUME: - basering has to be a Letterplace ring
 NOTE:   - Assumptions will not be checked!
 EXAMPLE: example lp2iv; shows examples
@@ -868,7 +881,8 @@ proc lp2ivId(ideal G)
 "USAGE: lp2ivId(G); G an ideal
 RETURN: list
 PURPOSE:Converting an ideal into an list of intmats,
-@*      the corresponding intvecs forming the rows
+@*      the corresponding intvecs forming the rows.
+@*      For the encoding of the variables see the overview.
 ASSUME: - basering has to be a Letterplace ring
 EXAMPLE: example lp2ivId; shows examples
 "
@@ -916,8 +930,9 @@ RETURN: list
 PURPOSE:Computing the K-dimension and the Hilbert series
 ASSUME: - basering is a Letterplace ring
 @*      - all rows of each intmat correspond to a Letterplace monomial
+@*        for the encoding of the variables see the overview
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an integer corresponding to the
 @*      dimension, L[2] is an intvec which contains the coefficients of the
 @*      Hilbert series
@@ -967,8 +982,9 @@ RETURN: list
 PURPOSE:Computing K-dimension, Hilbert series and mistletoes
 ASSUME: - basering is a Letterplace ring.
 @*      - All rows of each intmat correspond to a Letterplace monomial.
+@*        for the encoding of the variables see the overview
 @*      - If you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an integer, L[2] is an intvec
 @*      which contains the coefficients of the Hilbert series and L[3]
 @*      is a list, containing the mistletoes as intvecs.
@@ -1013,9 +1029,10 @@ proc ivDimCheck(list L, int n)
 "USAGE: ivDimCheck(L,n); L a list of intmats, n an integer
 RETURN: int, 0 if the dimension is finite, or 1 otherwise
 PURPOSE:Decides, whether the K-dimension is finite or not
-ASSUME: - basering is a Letterplace ring.
-@*      - All rows of each intmat correspond to a Letterplace monomial.
-NOTE:   - n is the number of variables.
+ASSUME: - basering is a Letterplace ring
+@*      - All rows of each intmat correspond to a Letterplace monomial
+@*        For the encoding of the variables see the overview.
+NOTE:   - n is the number of variables
 EXAMPLE: example ivDimCheck; shows examples
 "
 {checkAssumptions(0,L);
@@ -1071,8 +1088,9 @@ RETURN: intvec, containing the coefficients of the Hilbert series
 PURPOSE:Computing the Hilbert series
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
+@*        for the encoding of the variables see the overview
 @*      - if you specify a different degree bound degbound,
-@*       degbound <= attrib(basering,uptodeg) holds.
+@*       degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If degbound is set, a degree bound  will be added. By default there
 @*      is no degree bound.
 @*    - n is the number of variables.
@@ -1156,8 +1174,9 @@ RETURN: int, the K-dimension of A/<L>
 PURPOSE:Computing the K-dimension of A/<L>
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
+@*        for the encoding of the variables see the overview
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If degbound is set, a degree bound will be added. By default there
 @*      is no degree bound.
 @*    - n is the number of variables.
@@ -1238,6 +1257,7 @@ PURPOSE:Computing the K-base out of given mistletoes
 ASSUME: - The mistletoes have to be ordered lexicographically -> OrdMisLex.
 @*        Otherwise there might some elements missing.
 @*      - basering is a Letterplace ring.
+@*      - mistletoes are stored as intvecs, as described in the overview
 EXAMPLE: example ivMis2Base; shows examples
 "
 {
@@ -1291,6 +1311,7 @@ PURPOSE:Computing the K-dimension out of given mistletoes
 ASSUME: - The mistletoes have to be ordered lexicographically -> OrdMisLex.
 @*        Otherwise the returned value may differ from the K-dimension.
 @*      - basering is a Letterplace ring.
+@*      - mistletoes are stored as intvecs, as described in the overview
 EXAMPLE: example ivMis2Dim; shows examples
 "
 {checkAssumptions(0,M);
@@ -1298,12 +1319,12 @@ EXAMPLE: example ivMis2Dim; shows examples
   if (size(M) == 0){ERROR("There are no mistletoes, so it appears your dimension is infinite!");}
   if (isInList(L,M) > 0) {print("1 is a mistletoe, therefore dim = 1"); return(1);}
   int i,j,d,s;
-  j = 1;
   d = 1 + size(M[1]);
   for (i = 1; i < size(M); i++)
-  {s = size(M[i]); if (s > size(M[i+1])){s = size(M[i+1]);}
-    while ((M[i][j] == M[i+1][j]) && (j <= s)){j = j + 1;}
-    d = d + size(M[i+1])- j + 1;
+  {j = 1;
+   s = size(M[i]); if (s > size(M[i+1])){s = size(M[i+1]);}
+   while ((M[i][j] == M[i+1][j]) && (j <= s)){j = j + 1;}
+   d = d + size(M[i+1])- j + 1;
   }
   return(d);
 }
@@ -1325,7 +1346,7 @@ proc ivOrdMisLex(list M)
 RETURN: list, containing the ordered intvecs of M
 PURPOSE:Orders a given set of mistletoes lexicographically
 ASSUME: - basering is a Letterplace ring.
-       - intvecs correspond to monomials
+@*      - intvecs correspond to monomials, as explained in the overview
 NOTE:   - This is preprocessing, it's not needed if the mistletoes are returned
 @*        from the sickle algorithm.
 @*      - Each entry of the list returned is an intvec.
@@ -1351,11 +1372,12 @@ proc ivSickle(list L, int n, list #)
 "USAGE: ivSickle(L,n,[degbound]); L a list of intmats, n an int, degbound an
 @*      optional integer
 RETURN: list, containing intvecs, the mistletoes of A/<L>
-PURPOSE:Computing the mistletoes for a given Groebner basis L
+PURPOSE:Computing the mistletoes for a given Groebner basis L, given by intmats
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
+@*        as explained in the overview
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If degbound is set, a degree bound will be added. By default there
 @*      is no degree bound.
 @*    - n is the number of variables.
@@ -1433,8 +1455,9 @@ RETURN: list
 PURPOSE:Computing mistletoes and the K-dimension
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
+@*        as explained in the overview
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an integer, L[2] is a list,
 @*      containing the mistletoes as intvecs.
 @*    - If degbound is set, a degree bound will be added. By default there
@@ -1520,8 +1543,9 @@ RETURN: list
 PURPOSE:Computing the mistletoes and the Hilbert series
 ASSUME: - basering is a Letterplace ring.
 @*      - all rows of each intmat correspond to a Letterplace monomial
+@*        as explained in the overview
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an intvec, L[2] is a list,
 @*      containing the mistletoes as intvecs.
 @*    - If degbound is set, a degree bound will be added. By default there
@@ -1604,9 +1628,9 @@ proc lpDHilbert(ideal G, list #)
 "USAGE: lpDHilbert(G[,degbound,n]); G an ideal, degbound, n optional integers
 RETURN: list
 PURPOSE:Computing K-dimension and Hilbert series, starting with a lp-ideal
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an integer corresponding to the
 @*      dimension, L[2] is an intvec which contains the coefficients of the
 @*      Hilbert series
@@ -1646,11 +1670,11 @@ proc lpDHilbertSickle(ideal G, list #)
 @*      integers
 RETURN: list
 PURPOSE:Computing K-dimension, Hilbert series and mistletoes at once
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring.  G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
-@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal,
+@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal, 
 @*      the mistletoes
 @*    - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering,uptodeg).
@@ -1689,9 +1713,9 @@ proc lpHilbert(ideal G, list #)
 "USAGE: lpHilbert(G[,degbound,n]); G an ideal, degbound, n optional integers
 RETURN: intvec, containing the coefficients of the Hilbert series
 PURPOSE:Computing the Hilbert series
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring.  G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering,uptodeg).
 @*    - n is the number of variables, which can be set to a different number.
@@ -1727,7 +1751,7 @@ proc lpDimCheck(ideal G)
 "USAGE: lpDimCheck(G);
 RETURN: int, 1 if K-dimension of the factor algebra is infinite, 0 otherwise
 PURPOSE:Checking a factor algebra for finiteness of the K-dimension
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring.  G is a Letterplace ideal.
 EXAMPLE: example lpDimCheck; shows examples
 "
 {int n = attrib(basering,"lV");
@@ -1755,9 +1779,9 @@ proc lpKDim(ideal G, list #)
 "USAGE: lpKDim(G[,degbound, n]); G an ideal, degbound, n optional integers
 RETURN: int, the K-dimension of the factor algebra
 PURPOSE:Computing the K-dimension of a factor algebra, given via an ideal
-ASSUME: - basering is a Letterplace ring
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering, uptodeg).
 @*    - n is the number of variables, which can be set to a different number.
@@ -1790,7 +1814,7 @@ proc lpMis2Base(ideal M)
 "USAGE: lpMis2Base(M); M an ideal
 RETURN: ideal, a K-basis of the factor algebra
 PURPOSE:Computing a K-basis out of given mistletoes
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 @*      - M contains only monomials
 NOTE:   - The mistletoes have to be ordered lexicographically -> OrdMisLex.
 EXAMPLE: example lpMis2Base; shows examples
@@ -1814,7 +1838,7 @@ proc lpMis2Dim(ideal M)
 "USAGE: lpMis2Dim(M); M an ideal
 RETURN: int, the K-dimension of the factor algebra
 PURPOSE:Computing the K-dimension out of given mistletoes
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 @*      - M contains only monomials
 NOTE:   - The mistletoes have to be ordered lexicographically -> OrdMisLex.
 EXAMPLE: example lpMis2Dim; shows examples
@@ -1838,7 +1862,7 @@ proc lpOrdMisLex(ideal M)
 "USAGE: lpOrdMisLex(M); M an ideal of mistletoes
 RETURN: ideal, containing the mistletoes, ordered lexicographically
 PURPOSE:A given set of mistletoes is ordered lexicographically
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 NOTE:   This is preprocessing, it is not needed if the mistletoes are returned
 @*      from the sickle algorithm.
 EXAMPLE: example lpOrdMisLex; shows examples
@@ -1859,9 +1883,9 @@ proc lpSickle(ideal G,  list #)
 "USAGE: lpSickle(G[,degbound,n]); G an ideal, degbound, n optional integers
 RETURN: ideal
 PURPOSE:Computing the mistletoes of K[X]/<G>
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering,uptodeg).
 @*    - n is the number of variables, which can be set to a different number.
@@ -1897,9 +1921,9 @@ proc lpSickleDim(ideal G, list #)
 "USAGE: lpSickleDim(G[,degbound,n]); G an ideal, degbound, n optional integers
 RETURN: list
 PURPOSE:Computing the K-dimension and the mistletoes
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
 @*      L[2] is an ideal, the mistletoes.
 @*    - If degbound is set, there will be a degree bound added. 0 means no
@@ -1936,9 +1960,9 @@ proc lpSickleHil(ideal G, list #)
 "USAGE: lpSickleHil(G);
 RETURN: list
 PURPOSE:Computing the Hilbert series and the mistletoes
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an intvec, corresponding to the
 @*      Hilbert series, L[2] is an ideal, the mistletoes.
 @*    - If degbound is set, there will be a degree bound added. 0 means no
@@ -1978,9 +2002,9 @@ proc sickle(ideal G, list #)
 @*      integers
 RETURN: list
 PURPOSE:Allowing the user to access all procs with one command
-ASSUME: - basering is a Letterplace ring.
+ASSUME: - basering is a Letterplace ring. G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
-@*        degbound <= attrib(basering,uptodeg) holds.
+@*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE:   The returned object will always be a list, but the entries of the
 @*      returned list may be very different
 @* case m=1,d=1,h=1: see lpDHilbertSickle
@@ -2038,6 +2062,44 @@ example
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+
+proc tst_fpadim()
+{
+  example ivDHilbert;
+  example ivDHilbertSickle;
+  example ivDimCheck;
+  example ivHilbert;
+  example ivKDim;
+  example ivMis2Base;
+  example ivMis2Dim;
+  example ivOrdMisLex;
+  example ivSickle;
+  example ivSickleHil;
+  example ivSickleDim;
+  example lpDHilbert;
+  example lpDHilbertSickle;
+  example lpHilbert;
+  example lpDimCheck;
+  example lpKDim;
+  example lpMis2Base;
+  example lpMis2Dim;
+  example lpOrdMisLex;
+  example lpSickle;
+  example lpSickleHil;
+  example lpSickleDim;
+  example sickle;
+  example ivL2lpI;
+  example iv2lp;
+  example iv2lpList;
+  example iv2lpMat;
+  example lp2iv;
+  example lp2ivId;
+  example lpId2ivLi;
+}
+
+
+
 
 
 /*
