@@ -20,7 +20,7 @@
 #include <coeffs/longrat.h> // ???
 
 #include <polys/weight.h>
-#include <polys/ideals.h>
+#include <polys/simpleideals.h>
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>

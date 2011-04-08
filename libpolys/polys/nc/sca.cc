@@ -33,7 +33,7 @@
 
 #include <kernel/p_polys.h>
 #include <kernel/kutil.h>
-#include <kernel/ideals.h>
+#include <polys/simpleideals.h>
 #include <kernel/intvec.h>
 #include <kernel/polys.h>
 

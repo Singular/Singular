@@ -10,8 +10,8 @@
  *******************************************************************/
 #include "polys/config.h"
 // #include <polys/structs.h>
-#include <polys/p_polys.h>
 #include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
 #include <polys/p_Procs.h>
 #include <polys/p_Numbers.h>
 #include <polys/p_MemCmp.h>

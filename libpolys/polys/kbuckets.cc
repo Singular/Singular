@@ -114,10 +114,6 @@ BOOLEAN kbTest(kBucket_pt bucket)
   poly lm = bucket->buckets[0];
 
   omCheckAddrBin(bucket, kBucket_bin);
-  if (bucket->bucket_ring!=currRing)
-  {
-     rTest(bucket->bucket_ring);
-  }
   assume(bucket->buckets_used <= MAX_BUCKET);
   if (! kbTest_i(bucket, 0)) return FALSE;
   for (i=1; i<= (int) bucket->buckets_used; i++)

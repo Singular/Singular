@@ -9,6 +9,42 @@
 */
 #include <polys/monomials/ring.h>
 
+struct sip_sideal
+{
+  poly*  m;
+  long rank;
+  int nrows;
+  int ncols;
+  #define IDELEMS(i) ((i)->ncols)
+  #define MATCOLS(i) ((i)->ncols)
+  #define MATROWS(i) ((i)->nrows)
+  #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
+   
+};
+
+struct sip_smap
+{
+  poly *m;
+  char *preimage;
+  int nrows;
+  int ncols;
+};
+
+class ip_smatrix;
+typedef ip_smatrix *       matrix;
+
+struct sideal_list;
+typedef struct sideal_list *      ideal_list;
+
+struct sideal_list
+{
+  ideal_list next;
+  ideal      d;
+#ifndef NDEBUG
+  int nr;
+#endif
+};
+
 #ifdef PDEBUG
 ideal idDBInit (int size, int rank, const char *f, int l);
 #define idInit(A,B) idDBInit(A,B,__FILE__,__LINE__)

@@ -16,7 +16,7 @@
 #include <polys/modulop.h>
 #include <coeffs/numbers.h>
 #include <polys/polys.h>
-#include <polys/ideals.h>
+#include <polys/simpleideals.h>
 #include <polys/monomials/ring.h>
 #ifdef HAVE_FACTORY
 #define SI_DONT_HAVE_GLOBAL_VARS

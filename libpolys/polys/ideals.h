@@ -9,44 +9,6 @@
 */
 // #include <kernel/structs.h>
 
-#include <polys/monomials/ring.h>
-
-struct sip_sideal
-{
-  poly*  m;
-  long rank;
-  int nrows;
-  int ncols;
-  #define IDELEMS(i) ((i)->ncols)
-  #define MATCOLS(i) ((i)->ncols)
-  #define MATROWS(i) ((i)->nrows)
-  #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
-   
-};
-
-struct sip_smap
-{
-  poly *m;
-  char *preimage;
-  int nrows;
-  int ncols;
-};
-
-class ip_smatrix;
-typedef ip_smatrix *       matrix;
-
-struct sideal_list;
-typedef struct sideal_list *      ideal_list;
-
-struct sideal_list
-{
-  ideal_list next;
-  ideal      d;
-#ifndef NDEBUG
-  int nr;
-#endif
-};
-
 //typedef struct sip_sideal *        ideal;
 //typedef struct sip_smap *          map;
 typedef ideal *            resolvente;
@@ -123,10 +85,6 @@ ideal idMult (ideal h1,ideal h2);
   /*hh := h1 * h2*/
 
 BOOLEAN idIs0 (ideal h);
-
-long idRankFreeModule(ideal m, ring lmRing, ring tailRing);
-
-static inline long idRankFreeModule(ideal m, ring r){ return idRankFreeModule(m, r, r); }
 
 // returns TRUE, if idRankFreeModule(m) > 0
 BOOLEAN idIsModule(ideal m, const ring r);

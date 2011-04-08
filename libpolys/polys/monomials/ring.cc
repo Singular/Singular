@@ -23,7 +23,6 @@
 #include <polys/ext_fields/longalg.h>
 #include <polys/ext_fields/longtrans.h>
 #include <coeffs/ffields.h>
-// #include <???/ideals.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/maps.h>
 #include <polys/prCopy.h>
@@ -31,7 +30,6 @@
 #include <polys/templates/p_Procs.h>
 
 #include <polys/matpol.h>
-#include <polys/ideals.h>
 
 #ifdef HAVE_PLURAL
 #include <polys/nc/nc.h>
@@ -4127,7 +4125,7 @@ void rDebugPrint(ring r)
 
       Print("  limit %d\n",r->typ[j].data.is.limit);
       #ifndef NDEBUG
-      PrintS("  F: ");idShow(r->typ[j].data.is.F, r, r, 1);
+      //PrintS("  F: ");idShow(r->typ[j].data.is.F, r, r, 1);
       #endif
 
       PrintS("weights: ");
@@ -4453,7 +4451,7 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
     {
       res->qideal= idrCopyR_NoSort(r->qideal, r, res);
 
-      assume(idRankFreeModule(res->qideal, res) == 0);
+      assume(id_RankFreeModule(res->qideal, res) == 0);
 
 #ifdef HAVE_PLURAL
       if( rIsPluralRing(res) )
@@ -4463,7 +4461,7 @@ ring rAssure_SyzComp(const ring r, BOOLEAN complete)
         }
 
 #endif
-      assume(idRankFreeModule(res->qideal, res) == 0);
+      assume(id_RankFreeModule(res->qideal, res) == 0);
     }
 
 #ifdef HAVE_PLURAL
@@ -4866,7 +4864,7 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
     {
       res->qideal= idrCopyR_NoSort(r->qideal, r, res);
 
-      assume(idRankFreeModule(res->qideal, res) == 0);
+      assume(id_RankFreeModule(res->qideal, res) == 0);
 
 #ifdef HAVE_PLURAL
       if( rIsPluralRing(res) )
@@ -4876,7 +4874,7 @@ ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int 
         }
 
 #endif
-      assume(idRankFreeModule(res->qideal, res) == 0);
+      assume(id_RankFreeModule(res->qideal, res) == 0);
     }
 
 #ifdef HAVE_PLURAL
