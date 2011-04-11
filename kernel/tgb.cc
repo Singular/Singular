@@ -1540,7 +1540,7 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
     {
       if(!pLmEqual(nodes[lower]->lcm_of_lm,nodes[upper]->lcm_of_lm))
       {
-  break;
+        break;
       }
       if (has_t_rep(nodes[upper]->i,nodes[upper]->j,c))
         has=TRUE;
@@ -2864,9 +2864,9 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
   pair_top+=s;
   omfree(si_array);
 }
-slimgb_alg::slimgb_alg(ideal I, int ssyz_comp,BOOLEAN F4,int ddeg_pos)
+slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos)
 {
-  this->deg_pos=ddeg_pos;
+  this->deg_pos=deg_pos;
   lastCleanedDeg=-1;
   completed=FALSE;
   this->syz_comp=ssyz_comp;
@@ -3002,9 +3002,9 @@ slimgb_alg::slimgb_alg(ideal I, int ssyz_comp,BOOLEAN F4,int ddeg_pos)
   {
     poly* array_arg=I->m;
     array_arg++;
-    introduceDelayedPairs(array_arg,nn-1);
+    introduceDelayedPairs(array_arg,n-1);
     /*
-    for (i=1;i<nn;i++)//the 1 is wanted, because first element is added to basis
+    for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
     {
       //     add_to_basis(I->m[i],-1,-1,c);
       si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
@@ -3021,7 +3021,8 @@ slimgb_alg::slimgb_alg(ideal I, int ssyz_comp,BOOLEAN F4,int ddeg_pos)
       //      c->apairs[nn-1-i]=si;
       apairs[nn-i-1]=si;
       ++(pair_top);
-    }*/
+    }
+    */
   }
   else
   {
@@ -3067,7 +3068,6 @@ slimgb_alg::~slimgb_alg()
           pos++;
         }
       }
-
       free_sorted_pair_node(s,r);
       apairs[piter]=NULL;
     }
@@ -3150,7 +3150,6 @@ slimgb_alg::~slimgb_alg()
   omFree(c->strat->sevS);
 //   initsevS(i);
   omFree(c->strat->S_2_R);
-
   omFree(c->strat->lenS);
 
   if(c->strat->lenSw)  omFree(c->strat->lenSw);
@@ -3167,8 +3166,6 @@ slimgb_alg::~slimgb_alg()
   {
     //Print("calculated %d NFs\n",c->normal_forms);
       Print("\nNF:%i product criterion:%i, ext_product criterion:%i \n", c->normal_forms, c->easy_product_crit, c->extended_product_crit);
-
-
   }
   int deleted_form_c_s=0;
 
@@ -3238,59 +3235,57 @@ slimgb_alg::~slimgb_alg()
   omUnGetSpecBin(&lm_bin);
   delete c->strat;
 }
-ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode){
+ideal t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode)
+{
+  assume(r==currRing);
+  ring orig_ring=r;
+  int pos;
+  ring new_ring=rAssure_TDeg(orig_ring,1,rVar(orig_ring),pos);
 
-    assume(r==currRing);
-    ring orig_ring=r;
-    int pos;
-    ring new_ring=rAssure_TDeg(orig_ring,1,rVar(orig_ring),pos);
+  ideal s_h;
+  if (orig_ring != new_ring)
+  {
+    rChangeCurrRing(new_ring);
+    s_h=idrCopyR_NoSort(arg_I,orig_ring);
+    idTest(s_h);
+    /*int i;
 
-
-    ideal s_h;
-    if (orig_ring != new_ring)
+    for(i=0;i<IDELEMS(s_h);i++)
     {
-        rChangeCurrRing(new_ring);
-        s_h=idrCopyR_NoSort(arg_I,orig_ring);
-        idTest(s_h);
-        /*int i;
-
-        for(i=0;i<IDELEMS(s_h);i++){
-            poly p=s_h->m[i];
-            while(p){
+      poly p=s_h->m[i];
+      while(p)
+      {
                 p_Setm(p,new_ring);
                 pIter(p);
-            }
-        }*/
+      }
     }
-    else
-    {
-        s_h = id_Copy(arg_I,orig_ring);
-    }
+    */
+  }
+  else
+  {
+    s_h = id_Copy(arg_I,orig_ring);
+  }
 
-    ideal s_result=do_t_rep_gb(new_ring,s_h,syz_comp,F4_mode,pos);
-    ideal result;
-    if(orig_ring != new_ring)
-    {
+  ideal s_result=do_t_rep_gb(new_ring,s_h,syz_comp,F4_mode,pos);
+  ideal result;
+  if(orig_ring != new_ring)
+  {
+    idTest(s_result);
+    rChangeCurrRing(orig_ring);
+    result = idrMoveR_NoSort(s_result, new_ring);
 
-        idTest(s_result);
-        rChangeCurrRing(orig_ring);
-        result = idrMoveR_NoSort(s_result, new_ring);
-
-        idTest(result);
-        //rChangeCurrRing(new_ring);
-        rKill(new_ring);
-        //rChangeCurrRing(orig_ring);
-    }
-    else
-        result=s_result;
     idTest(result);
-    return result;
+    //rChangeCurrRing(new_ring);
+    rKill(new_ring);
+    //rChangeCurrRing(orig_ring);
+  }
+  else
+    result=s_result;
+  idTest(result);
+  return result;
 }
 
-
-
 ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos){
-
   //  Print("QlogSize(0) %d, QlogSize(1) %d,QlogSize(-2) %d, QlogSize(5) %d\n", QlogSize(nlInit(0)),QlogSize(nlInit(1)),QlogSize(nlInit(-2)),QlogSize(nlInit(5)));
 
   if (TEST_OPT_PROT)
@@ -3310,20 +3305,17 @@ ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos)
     simplify_poly(I->m[i],currRing);
   }
 
-
   qsort(I->m,IDELEMS(I),sizeof(poly),poly_crit);
   //Print("Idelems %i \n----------\n",IDELEMS(I));
   //slimgb_alg* c=(slimgb_alg*) omalloc(sizeof(slimgb_alg));
   //int syz_comp=arg_I->rank;
   slimgb_alg* c=new slimgb_alg(I, syz_comp,F4_mode,deg_pos);
 
-
   while ((c->pair_top>=0) && ((!(TEST_OPT_DEGBOUND)) || (c->apairs[c->pair_top]->deg<=Kstd1_deg)))
   {
     #ifdef HAVE_F4
     if(F4_mode)
       go_on_F4(c);
-
     else
     #endif
       go_on(c);
@@ -3343,22 +3335,28 @@ ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos)
   assume(I->rank>=idRankFreeModule(I));
   return(I);
 }
-void now_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c){
+void now_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c)
+{
   int i,j;
-  if (arg_i==arg_j){
+  if (arg_i==arg_j)
+  {
     return;
   }
-  if (arg_i>arg_j){
+  if (arg_i>arg_j)
+  {
     i=arg_j;
     j=arg_i;
-  } else {
+  }
+  else
+  {
     i=arg_i;
     j=arg_j;
   }
   c->states[j][i]=HASTREP;
 }
 
-static BOOLEAN has_t_rep(const int & arg_i, const  int & arg_j, slimgb_alg* state){
+static BOOLEAN has_t_rep(const int & arg_i, const  int & arg_j, slimgb_alg* state)
+{
   assume(0<=arg_i);
   assume(0<=arg_j);
   assume(arg_i<state->n);
@@ -3370,7 +3368,8 @@ static BOOLEAN has_t_rep(const int & arg_i, const  int & arg_j, slimgb_alg* stat
   if (arg_i>arg_j)
   {
     return (state->states[arg_i][arg_j]==HASTREP);
-  } else
+  }
+  else
   {
     return (state->states[arg_j][arg_i]==HASTREP);
   }
@@ -3384,10 +3383,7 @@ static int pLcmDeg(poly a, poly b)
     n+=si_max( pGetExp(a,i), pGetExp(b,i));
   }
   return n;
-
 }
-
-
 
 static void shorten_tails(slimgb_alg* c, poly monom)
 {
@@ -3396,7 +3392,6 @@ static void shorten_tails(slimgb_alg* c, poly monom)
   for(int i=0;i<c->n;i++)
   {
     //enter tail
-
     if (c->S->m[i]==NULL) continue;
     poly tail=c->S->m[i]->next;
     poly prev=c->S->m[i];
@@ -3456,73 +3451,86 @@ static void shorten_tails(slimgb_alg* c, poly monom)
     }
   }
 }
-static sorted_pair_node* pop_pair(slimgb_alg* c){
+static sorted_pair_node* pop_pair(slimgb_alg* c)
+{
   clean_top_of_pair_list(c);
 
   if(c->pair_top<0) return NULL;
   else return (c->apairs[c->pair_top--]);
 }
-void slimgb_alg::cleanDegs(int lower, int upper){
+void slimgb_alg::cleanDegs(int lower, int upper)
+{
   assume(is_homog);
   int deg;
-  if (TEST_OPT_PROT){
+  if (TEST_OPT_PROT)
+  {
     PrintS("C");
   }
-  for(deg=lower;deg<=upper;deg++){
+  for(deg=lower;deg<=upper;deg++)
+  {
     int i;
-    for(i=0;i<n;i++){
-      if (T_deg[i]==deg){
-          poly h;
-          h=S->m[i];
-          h=redNFTail(h,strat->sl,strat,lengths[i]);
-          if (!rField_is_Zp(r))
-          {
-            p_Cleardenom(h,r);
-            //p_Content(h,r);
-
-          }
-          else pNorm(h);
+    for(i=0;i<n;i++)
+    {
+      if (T_deg[i]==deg)
+      {
+        poly h;
+        h=S->m[i];
+        h=redNFTail(h,strat->sl,strat,lengths[i]);
+        if (!rField_is_Zp(r))
+        {
+          p_Cleardenom(h,r);
+          //p_Content(h,r);
+        }
+        else pNorm(h);
           //TODO:GCD of TERMS
-          poly got=::gcd_of_terms(h,r);
-          p_Delete(&gcd_of_terms[i],r);
-          gcd_of_terms[i]=got;
-          int len=pLength(h);
-          wlen_type wlen=pQuality(h,this,len);
-          if (weighted_lengths)
-            weighted_lengths[i]=wlen;
-          lengths[i]=len;
-          assume(h==S->m[i]);
-          int j;
-          for(j=0;j<=strat->sl;j++){
-            if (h==strat->S[j]){
-              int new_pos=simple_posInS(strat, h,len, wlen);
-              if (strat->lenS){
-                strat->lenS[j]=len;
-              }
-              if (strat->lenSw){
-                strat->lenSw[j]=wlen;
-              }
-              if (new_pos<j){
-                move_forward_in_S(j,new_pos,strat);
-              }else{
-                if (new_pos>j)
-                 new_pos=new_pos-1;//is identical with one element
-                if (new_pos>j)
-                  move_backward_in_S(j,new_pos,strat);
-              }
-              break;
+        poly got=::gcd_of_terms(h,r);
+        p_Delete(&gcd_of_terms[i],r);
+        gcd_of_terms[i]=got;
+        int len=pLength(h);
+        wlen_type wlen=pQuality(h,this,len);
+        if (weighted_lengths)
+          weighted_lengths[i]=wlen;
+        lengths[i]=len;
+        assume(h==S->m[i]);
+        int j;
+        for(j=0;j<=strat->sl;j++)
+        {
+          if (h==strat->S[j])
+          {
+            int new_pos=simple_posInS(strat, h,len, wlen);
+            if (strat->lenS)
+            {
+              strat->lenS[j]=len;
             }
+            if (strat->lenSw)
+            {
+              strat->lenSw[j]=wlen;
+            }
+            if (new_pos<j)
+            {
+              move_forward_in_S(j,new_pos,strat);
+            }
+            else
+            {
+              if (new_pos>j)
+                new_pos=new_pos-1;//is identical with one element
+              if (new_pos>j)
+                move_backward_in_S(j,new_pos,strat);
+            }
+            break;
           }
         }
-
+      }
     }
-
   }
   {
     int i,j;
-    for(i=0;i<this->n;i++){
-      for(j=0;j<i;j++){
-        if (T_deg[i]+T_deg[j]<=upper){
+    for(i=0;i<this->n;i++)
+    {
+      for(j=0;j<i;j++)
+      {
+        if (T_deg[i]+T_deg[j]<=upper)
+        {
           now_t_rep(i,j,this);
         }
       }
@@ -3531,50 +3539,51 @@ void slimgb_alg::cleanDegs(int lower, int upper){
   //TODO resort and update strat->S,strat->lenSw
   //TODO mark pairs
 }
-sorted_pair_node* top_pair(slimgb_alg* c){
-  while(c->pair_top>=0){
+sorted_pair_node* top_pair(slimgb_alg* c)
+{
+  while(c->pair_top>=0)
+  {
     super_clean_top_of_pair_list(c);//yeah, I know, it's odd that I use a different proc here
-    if ((c->is_homog)&&(c->pair_top>=0)&&(c->apairs[c->pair_top]->deg>=c->lastCleanedDeg+2)){
+    if ((c->is_homog)&&(c->pair_top>=0)&&(c->apairs[c->pair_top]->deg>=c->lastCleanedDeg+2))
+    {
       int upper=c->apairs[c->pair_top]->deg-1;
       c->cleanDegs(c->lastCleanedDeg+1,upper);
       c->lastCleanedDeg=upper;
-    } else{
+    }
+    else
+    {
       break;
     }
-
   }
-
-
   if(c->pair_top<0) return NULL;
   else return (c->apairs[c->pair_top]);
 }
-sorted_pair_node* quick_pop_pair(slimgb_alg* c){
+sorted_pair_node* quick_pop_pair(slimgb_alg* c)
+{
   if(c->pair_top<0) return NULL;
   else return (c->apairs[c->pair_top--]);
 }
 
-
-
-static void super_clean_top_of_pair_list(slimgb_alg* c){
+static void super_clean_top_of_pair_list(slimgb_alg* c)
+{
   while((c->pair_top>=0)
   && (c->apairs[c->pair_top]->i>=0)
   && (good_has_t_rep(c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c)))
   {
-
     free_sorted_pair_node(c->apairs[c->pair_top],c->r);
     c->pair_top--;
-
   }
 }
-void clean_top_of_pair_list(slimgb_alg* c){
-  while((c->pair_top>=0) && (c->apairs[c->pair_top]->i>=0) && (!state_is(UNCALCULATED,c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c))){
-
+void clean_top_of_pair_list(slimgb_alg* c)
+{
+  while((c->pair_top>=0) && (c->apairs[c->pair_top]->i>=0) && (!state_is(UNCALCULATED,c->apairs[c->pair_top]->j, c->apairs[c->pair_top]->i,c)))
+  {
     free_sorted_pair_node(c->apairs[c->pair_top],c->r);
     c->pair_top--;
-
   }
 }
-static BOOLEAN state_is(calc_state state, const int & arg_i, const  int & arg_j, slimgb_alg* c){
+static BOOLEAN state_is(calc_state state, const int & arg_i, const  int & arg_j, slimgb_alg* c)
+{
   assume(0<=arg_i);
   assume(0<=arg_j);
   assume(arg_i<c->n);
@@ -3590,16 +3599,16 @@ static BOOLEAN state_is(calc_state state, const int & arg_i, const  int & arg_j,
   else return(c->states[arg_j][arg_i]==state);
 }
 
-
-void free_sorted_pair_node(sorted_pair_node* s, ring r){
+void free_sorted_pair_node(sorted_pair_node* s, ring r)
+{
   if (s->i>=0)
     p_Delete(&s->lcm_of_lm,r);
   omfree(s);
 }
-static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, slimgb_alg* c){
+static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, slimgb_alg* c)
+{
   if (a->deg<b->deg) return TRUE;
   if (a->deg>b->deg) return FALSE;
-
 
   int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
   if (comp==1) return FALSE;
@@ -3613,8 +3622,8 @@ static BOOLEAN pair_better(sorted_pair_node* a,sorted_pair_node* b, slimgb_alg* 
   return TRUE;
 }
 
-static int tgb_pair_better_gen(const void* ap,const void* bp){
-
+static int tgb_pair_better_gen(const void* ap,const void* bp)
+{
   sorted_pair_node* a=*((sorted_pair_node**)ap);
   sorted_pair_node* b=*((sorted_pair_node**)bp);
   assume((a->i>a->j) || (a->i < 0));
@@ -3622,23 +3631,21 @@ static int tgb_pair_better_gen(const void* ap,const void* bp){
   if (a->deg<b->deg) return -1;
   if (a->deg>b->deg) return 1;
 
-
-
- int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
+  int comp=pLmCmp(a->lcm_of_lm, b->lcm_of_lm);
 
   if (comp==1) return 1;
   if (-1==comp) return -1;
-   if (a->expected_length<b->expected_length) return -1;
+  if (a->expected_length<b->expected_length) return -1;
   if (a->expected_length>b->expected_length) return 1;
   if (a->i+a->j<b->i+b->j) return -1;
-   if (a->i+a->j>b->i+b->j) return 1;
+  if (a->i+a->j>b->i+b->j) return 1;
   if (a->i<b->i) return -1;
-   if (a->i>b->i) return 1;
+  if (a->i>b->i) return 1;
   return 0;
 }
 
-
-static poly gcd_of_terms(poly p, ring r){
+static poly gcd_of_terms(poly p, ring r)
+{
   int max_g_0=0;
   assume(p!=NULL);
   int i;
@@ -3646,24 +3653,24 @@ static poly gcd_of_terms(poly p, ring r){
   poly t;
   for (i=pVariables; i; i--)
   {
-      pSetExp(m,i, pGetExp(p,i));
-      if (max_g_0==0)
-  if (pGetExp(m,i)>0)
-    max_g_0=i;
+    pSetExp(m,i, pGetExp(p,i));
+    if (max_g_0==0)
+      if (pGetExp(m,i)>0)
+        max_g_0=i;
   }
-
   t=p->next;
-  while (t!=NULL){
-
+  while (t!=NULL)
+  {
     if (max_g_0==0) break;
     for (i=max_g_0; i; i--)
     {
       pSetExp(m,i, si_min(pGetExp(t,i),pGetExp(m,i)));
       if (max_g_0==i)
-  if (pGetExp(m,i)==0)
-    max_g_0=0;
-      if ((max_g_0==0) && (pGetExp(m,i)>0)){
-  max_g_0=i;
+        if (pGetExp(m,i)==0)
+          max_g_0=0;
+      if ((max_g_0==0) && (pGetExp(m,i)>0))
+      {
+        max_g_0=i;
       }
     }
     t=t->next;
@@ -3676,7 +3683,6 @@ static poly gcd_of_terms(poly p, ring r){
 }
 static inline BOOLEAN pHasNotCFExtended(poly p1, poly p2, poly m)
 {
-
   if (pGetComp(p1) > 0 || pGetComp(p2) > 0)
     return FALSE;
   int i = 1;
@@ -3690,19 +3696,20 @@ static inline BOOLEAN pHasNotCFExtended(poly p1, poly p2, poly m)
 
 
 //for impl reasons may return false if the the normal product criterion matches
-static inline BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, slimgb_alg* c){
+static inline BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, slimgb_alg* c)
+{
   if (c->nc)
     return FALSE;
   if(gcd1==NULL) return FALSE;
-        if(gcd2==NULL) return FALSE;
-        gcd1->next=gcd2; //may ordered incorrect
-        poly m=gcd_of_terms(gcd1,c->r);
-        gcd1->next=NULL;
-        if (m==NULL) return FALSE;
+  if(gcd2==NULL) return FALSE;
+  gcd1->next=gcd2; //may ordered incorrect
+  poly m=gcd_of_terms(gcd1,c->r);
+  gcd1->next=NULL;
+  if (m==NULL) return FALSE;
 
-        BOOLEAN erg=pHasNotCFExtended(p1,p2,m);
-        pDelete(&m);
-        return erg;
+  BOOLEAN erg=pHasNotCFExtended(p1,p2,m);
+  pDelete(&m);
+  return erg;
 }
 static poly kBucketGcd(kBucket* b, ring r)
 {
@@ -3712,37 +3719,37 @@ static poly kBucketGcd(kBucket* b, ring r)
   BOOLEAN initialized=FALSE;
   for (i=MAX_BUCKET-1;i>=0;i--)
   {
-    if (b->buckets[i]!=NULL){
-      if (!initialized){
-  m=gcd_of_terms(b->buckets[i],r);
-  initialized=TRUE;
-  if (m==NULL) return NULL;
+    if (b->buckets[i]!=NULL)
+    {
+      if (!initialized)
+      {
+        m=gcd_of_terms(b->buckets[i],r);
+        initialized=TRUE;
+        if (m==NULL) return NULL;
       }
       else
-  {
-    n=gcd_of_terms(b->buckets[i],r);
-    if (n==NULL) {
-      pDelete(&m);
-      return NULL;
-    }
-    n->next=m;
-    poly t=gcd_of_terms(n,r);
-    n->next=NULL;
-    pDelete(&m);
-    pDelete(&n);
-    m=t;
-    if (m==NULL) return NULL;
-
-  }
+      {
+        n=gcd_of_terms(b->buckets[i],r);
+        if (n==NULL)
+        {
+          pDelete(&m);
+          return NULL;
+        }
+        n->next=m;
+        poly t=gcd_of_terms(n,r);
+        n->next=NULL;
+        pDelete(&m);
+        pDelete(&n);
+        m=t;
+        if (m==NULL) return NULL;
+      }
     }
   }
   return m;
 }
 
-
-
-
-static inline wlen_type quality_of_pos_in_strat_S(int pos, slimgb_alg* c){
+static inline wlen_type quality_of_pos_in_strat_S(int pos, slimgb_alg* c)
+{
   if (c->strat->lenSw!=NULL) return c->strat->lenSw[pos];
   return c->strat->lenS[pos];
 }
@@ -3760,10 +3767,12 @@ static inline wlen_type quality_of_pos_in_strat_S_mult_high(int pos, poly high, 
 }
 #endif
 
-static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,find_erg & erg){
+static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,find_erg & erg)
+{
   erg.expand=NULL;
   BOOLEAN swap_roles; //from reduce_by, to_reduce_u if fromS
-  if(erg.fromS){
+  if(erg.fromS)
+  {
     if(pLmEqual(c->strat->S[erg.reduce_by],los[erg.to_reduce_u].p))
     {
       int i;
@@ -3777,235 +3786,241 @@ static void multi_reduction_lls_trick(red_object* los, int losl,slimgb_alg* c,fi
     quality_a=qc;
   }
       }
-      if(best!=erg.to_reduce_u+1){*/
+      if(best!=erg.to_reduce_u+1){
+*/
       wlen_type qc;
       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
-      if(qc<quality_a){
-  los[best].flatten();
-  int b_pos=kBucketCanonicalize(los[best].bucket);
-  los[best].p=los[best].bucket->buckets[b_pos];
-  qc=pQuality(los[best].bucket->buckets[b_pos],c);
-  if(qc<quality_a){
-    red_object h=los[erg.to_reduce_u];
-    los[erg.to_reduce_u]=los[best];
-    los[best]=h;
-    swap_roles=TRUE;
-  }
-  else
-    swap_roles=FALSE;
-      }
-      else{
-
-  swap_roles=FALSE;
-      }
-
-    }
-      else
-    {
-      if (erg.to_reduce_u>erg.to_reduce_l){
-
-  int i;
-  wlen_type quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
-  #ifdef HAVE_PLURAL
-  if ((c->nc) && (!(rIsSCA(c->r))))
-    quality_a=quality_of_pos_in_strat_S_mult_high(erg.reduce_by, los[erg.to_reduce_u].p, c);
-  #endif
-  int best=erg.to_reduce_u+1;
-  wlen_type qc;
-  best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
-  assume(qc==los[best].guess_quality(c));
-  if(qc<quality_a){
-    los[best].flatten();
-    int b_pos=kBucketCanonicalize(los[best].bucket);
-    los[best].p=los[best].bucket->buckets[b_pos];
-    qc==pQuality(los[best].bucket->buckets[b_pos],c);
-    //(best!=erg.to_reduce_u+1)
-    if(qc<quality_a){
-    red_object h=los[erg.to_reduce_u];
-    los[erg.to_reduce_u]=los[best];
-    los[best]=h;
-    erg.reduce_by=erg.to_reduce_u;
-    erg.fromS=FALSE;
-    erg.to_reduce_u--;
-    }
-  }
+      if(qc<quality_a)
+      {
+        los[best].flatten();
+        int b_pos=kBucketCanonicalize(los[best].bucket);
+        los[best].p=los[best].bucket->buckets[b_pos];
+        qc=pQuality(los[best].bucket->buckets[b_pos],c);
+        if(qc<quality_a)
+        {
+          red_object h=los[erg.to_reduce_u];
+          los[erg.to_reduce_u]=los[best];
+          los[best]=h;
+          swap_roles=TRUE;
+        }
+        else
+          swap_roles=FALSE;
       }
       else
       {
-  assume(erg.to_reduce_u==erg.to_reduce_l);
-  wlen_type quality_a=
-        quality_of_pos_in_strat_S(erg.reduce_by,c);
-  wlen_type qc=los[erg.to_reduce_u].guess_quality(c);
-  if (qc<0) PrintS("Wrong wlen_type");
-  if(qc<quality_a){
-    int best=erg.to_reduce_u;
-    los[best].flatten();
-    int b_pos=kBucketCanonicalize(los[best].bucket);
-    los[best].p=los[best].bucket->buckets[b_pos];
-    qc=pQuality(los[best].bucket->buckets[b_pos],c);
-    assume(qc>=0);
-    if(qc<quality_a){
-      BOOLEAN exp=FALSE;
-      if(qc<=2){
-         //Print("\n qc is %lld \n",qc);
-         exp=TRUE;
+        swap_roles=FALSE;
       }
-
-      else {
-         if (qc<quality_a/2)
-          exp=TRUE;
-         else
-       if(erg.reduce_by<c->n/4)
-          exp=TRUE;
-      }
-      if (exp){
-        poly clear_into;
-        los[erg.to_reduce_u].flatten();
-        kBucketClear(los[erg.to_reduce_u].bucket,&clear_into,&erg.expand_length);
-        erg.expand=pCopy(clear_into);
-        kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
-        if (TEST_OPT_PROT)
-    PrintS("e");
-
-      }
-    }
-  }
-
-
-      }
-
-      swap_roles=FALSE;
-      return;
-      }
-
-  }
-  else{
-    if(erg.reduce_by>erg.to_reduce_u){
-      //then lm(rb)>= lm(tru) so =
-      assume(erg.reduce_by==erg.to_reduce_u+1);
-      int best=erg.reduce_by;
-      wlen_type quality_a=los[erg.reduce_by].guess_quality(c);
-      wlen_type qc;
-      best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
-
-      int i;
-      if(qc<quality_a){
-    red_object h=los[erg.reduce_by];
-    los[erg.reduce_by]=los[best];
-    los[best]=h;
-  }
-  swap_roles=FALSE;
-  return;
-
-
     }
     else
     {
-      assume(!pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p));
-      assume(erg.to_reduce_u==erg.to_reduce_l);
-      //further assume, that reduce_by is the above all other polys
-      //with same leading term
-      int il=erg.reduce_by;
-      wlen_type quality_a =los[erg.reduce_by].guess_quality(c);
-      wlen_type qc;
-      while((il>0) && pLmEqual(los[il-1].p,los[il].p)){
-  il--;
-  qc=los[il].guess_quality(c);
-  if (qc<quality_a){
-    quality_a=qc;
-    erg.reduce_by=il;
-  }
-      }
-      swap_roles=FALSE;
-    }
-
-  }
-  if(swap_roles)
-  {
-    if (TEST_OPT_PROT)
-      PrintS("b");
-    poly clear_into;
-    int dummy_len;
-    int new_length;
-    int bp=erg.to_reduce_u;//bucket_positon
-    //kBucketClear(los[bp].bucket,&clear_into,&new_length);
-    new_length=los[bp].clear_to_poly();
-    clear_into=los[bp].p;
-    poly p=c->strat->S[erg.reduce_by];
-    int j=erg.reduce_by;
-    int old_length=c->strat->lenS[j];// in view of S
-    los[bp].p=p;
-    if (c->eliminationProblem){
-        los[bp].sugar=c->pTotaldegree_full(p);
-    }
-    kBucketInit(los[bp].bucket,p,old_length);
-    wlen_type qal=pQuality(clear_into,c,new_length);
-    int pos_in_c=-1;
-    int z;
-    int new_pos;
-    new_pos=simple_posInS(c->strat,clear_into,new_length, qal);
-    assume(new_pos<=j);
-    for (z=c->n;z;z--)
-    {
-      if(p==c->S->m[z-1])
+      if (erg.to_reduce_u>erg.to_reduce_l)
       {
-  pos_in_c=z-1;
-  break;
-      }
-    }
-
-    int tdeg_full=-1;
-    int tdeg=-1;
-    if(pos_in_c>=0)
-    {
-      #ifdef TGB_RESORT_PAIRS
-      c->used_b=TRUE;
-      c->replaced[pos_in_c]=TRUE;
-      #endif
-      tdeg=c->T_deg[pos_in_c];
-      c->S->m[pos_in_c]=clear_into;
-      c->lengths[pos_in_c]=new_length;
-      c->weighted_lengths[pos_in_c]=qal;
-      if (c->gcd_of_terms[pos_in_c]==NULL)
-        c->gcd_of_terms[pos_in_c]=gcd_of_terms(clear_into,c->r);
-      if (c->T_deg_full)
-        tdeg_full=c->T_deg_full[pos_in_c]=c->pTotaldegree_full(clear_into);
-      else tdeg_full=tdeg;
-      c_S_element_changed_hook(pos_in_c,c);
-    } else {
-      if (c->eliminationProblem){
-        tdeg_full=c->pTotaldegree_full(clear_into);
-        tdeg=c->pTotaldegree(clear_into);
-      }
-    }
-    c->strat->S[j]=clear_into;
-    c->strat->lenS[j]=new_length;
-
-    assume(pLength(clear_into)==new_length);
-    if(c->strat->lenSw!=NULL)
-      c->strat->lenSw[j]=qal;
-    if (!rField_is_Zp(c->r))
-    {
-      p_Cleardenom(clear_into,c->r);//should be unnecessary
-      //p_Content(clear_into, c->r);
-    }
-    else
-      pNorm(clear_into);
-#ifdef FIND_DETERMINISTIC
-    erg.reduce_by=j;
-    //resort later see diploma thesis, find_in_S must be deterministic
-    //during multireduction if spolys are only in the span of the
-    //input polys
-#else
-
-    if (new_pos<j)
-    {
-      if (c->strat->honey) c->strat->ecartS[j]=tdeg_full-tdeg;
-      move_forward_in_S(j,new_pos,c->strat);
-      erg.reduce_by=new_pos;
-    }
+        int i;
+        wlen_type quality_a=quality_of_pos_in_strat_S(erg.reduce_by,c);
+#ifdef HAVE_PLURAL
+        if ((c->nc) && (!(rIsSCA(c->r))))
+         quality_a=quality_of_pos_in_strat_S_mult_high(erg.reduce_by, los[erg.to_reduce_u].p, c);
 #endif
-  }
+        int best=erg.to_reduce_u+1;
+        wlen_type qc;
+        best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
+        assume(qc==los[best].guess_quality(c));
+        if(qc<quality_a)
+        {
+          los[best].flatten();
+          int b_pos=kBucketCanonicalize(los[best].bucket);
+          los[best].p=los[best].bucket->buckets[b_pos];
+          qc==pQuality(los[best].bucket->buckets[b_pos],c);
+          //(best!=erg.to_reduce_u+1)
+          if(qc<quality_a)
+          {
+            red_object h=los[erg.to_reduce_u];
+            los[erg.to_reduce_u]=los[best];
+            los[best]=h;
+            erg.reduce_by=erg.to_reduce_u;
+            erg.fromS=FALSE;
+            erg.to_reduce_u--;
+          }
+        }
+      }
+      else
+      {
+        assume(erg.to_reduce_u==erg.to_reduce_l);
+        wlen_type quality_a=
+          quality_of_pos_in_strat_S(erg.reduce_by,c);
+         wlen_type qc=los[erg.to_reduce_u].guess_quality(c);
+         if (qc<0) PrintS("Wrong wlen_type");
+         if(qc<quality_a)
+         {
+           int best=erg.to_reduce_u;
+           los[best].flatten();
+           int b_pos=kBucketCanonicalize(los[best].bucket);
+           los[best].p=los[best].bucket->buckets[b_pos];
+           qc=pQuality(los[best].bucket->buckets[b_pos],c);
+           assume(qc>=0);
+           if(qc<quality_a)
+           {
+             BOOLEAN exp=FALSE;
+             if(qc<=2)
+             {
+               //Print("\n qc is %lld \n",qc);
+               exp=TRUE;
+             }
+             else
+             {
+               if (qc<quality_a/2)
+                 exp=TRUE;
+               else
+                 if(erg.reduce_by<c->n/4)
+                   exp=TRUE;
+             }
+             if (exp)
+             {
+               poly clear_into;
+               los[erg.to_reduce_u].flatten();
+               kBucketClear(los[erg.to_reduce_u].bucket,&clear_into,&erg.expand_length);
+               erg.expand=pCopy(clear_into);
+               kBucketInit(los[erg.to_reduce_u].bucket,clear_into,erg.expand_length);
+               if (TEST_OPT_PROT) PrintS("e");
+             }
+           }
+         }
+       }
+       swap_roles=FALSE;
+       return;
+     }
+   }
+   else
+   {
+     if(erg.reduce_by>erg.to_reduce_u)
+     {
+       //then lm(rb)>= lm(tru) so =
+       assume(erg.reduce_by==erg.to_reduce_u+1);
+       int best=erg.reduce_by;
+       wlen_type quality_a=los[erg.reduce_by].guess_quality(c);
+       wlen_type qc;
+       best=find_best(los,erg.to_reduce_l,erg.to_reduce_u,qc,c);
+
+       int i;
+       if(qc<quality_a)
+       {
+         red_object h=los[erg.reduce_by];
+         los[erg.reduce_by]=los[best];
+         los[best]=h;
+       }
+       swap_roles=FALSE;
+       return;
+     }
+     else
+     {
+       assume(!pLmEqual(los[erg.reduce_by].p,los[erg.to_reduce_l].p));
+       assume(erg.to_reduce_u==erg.to_reduce_l);
+       //further assume, that reduce_by is the above all other polys
+       //with same leading term
+       int il=erg.reduce_by;
+       wlen_type quality_a =los[erg.reduce_by].guess_quality(c);
+       wlen_type qc;
+       while((il>0) && pLmEqual(los[il-1].p,los[il].p))
+       {
+         il--;
+         qc=los[il].guess_quality(c);
+         if (qc<quality_a)
+         {
+           quality_a=qc;
+           erg.reduce_by=il;
+         }
+       }
+       swap_roles=FALSE;
+     }
+   }
+   if(swap_roles)
+   {
+     if (TEST_OPT_PROT) PrintS("b");
+     poly clear_into;
+     int dummy_len;
+     int new_length;
+     int bp=erg.to_reduce_u;//bucket_positon
+     //kBucketClear(los[bp].bucket,&clear_into,&new_length);
+     new_length=los[bp].clear_to_poly();
+     clear_into=los[bp].p;
+     poly p=c->strat->S[erg.reduce_by];
+     int j=erg.reduce_by;
+     int old_length=c->strat->lenS[j];// in view of S
+     los[bp].p=p;
+     if (c->eliminationProblem)
+     {
+        los[bp].sugar=c->pTotaldegree_full(p);
+     }
+     kBucketInit(los[bp].bucket,p,old_length);
+     wlen_type qal=pQuality(clear_into,c,new_length);
+     int pos_in_c=-1;
+     int z;
+     int new_pos;
+     new_pos=simple_posInS(c->strat,clear_into,new_length, qal);
+     assume(new_pos<=j);
+     for (z=c->n;z;z--)
+     {
+       if(p==c->S->m[z-1])
+       {
+         pos_in_c=z-1;
+         break;
+       }
+     }
+
+     int tdeg_full=-1;
+     int tdeg=-1;
+     if(pos_in_c>=0)
+     {
+       #ifdef TGB_RESORT_PAIRS
+       c->used_b=TRUE;
+       c->replaced[pos_in_c]=TRUE;
+       #endif
+       tdeg=c->T_deg[pos_in_c];
+       c->S->m[pos_in_c]=clear_into;
+       c->lengths[pos_in_c]=new_length;
+       c->weighted_lengths[pos_in_c]=qal;
+       if (c->gcd_of_terms[pos_in_c]==NULL)
+         c->gcd_of_terms[pos_in_c]=gcd_of_terms(clear_into,c->r);
+       if (c->T_deg_full)
+         tdeg_full=c->T_deg_full[pos_in_c]=c->pTotaldegree_full(clear_into);
+       else tdeg_full=tdeg;
+       c_S_element_changed_hook(pos_in_c,c);
+     }
+     else
+     {
+       if (c->eliminationProblem)
+       {
+         tdeg_full=c->pTotaldegree_full(clear_into);
+         tdeg=c->pTotaldegree(clear_into);
+       }
+     }
+     c->strat->S[j]=clear_into;
+     c->strat->lenS[j]=new_length;
+
+     assume(pLength(clear_into)==new_length);
+     if(c->strat->lenSw!=NULL)
+       c->strat->lenSw[j]=qal;
+     if (!rField_is_Zp(c->r))
+     {
+       p_Cleardenom(clear_into,c->r);//should be unnecessary
+       //p_Content(clear_into, c->r);
+     }
+     else
+       pNorm(clear_into);
+#ifdef FIND_DETERMINISTIC
+     erg.reduce_by=j;
+     //resort later see diploma thesis, find_in_S must be deterministic
+     //during multireduction if spolys are only in the span of the
+     //input polys
+#else
+     if (new_pos<j)
+     {
+       if (c->strat->honey) c->strat->ecartS[j]=tdeg_full-tdeg;
+       move_forward_in_S(j,new_pos,c->strat);
+       erg.reduce_by=new_pos;
+     }
+#endif
+   }
 }
 static int fwbw(red_object* los, int i){
    int i2=i;
