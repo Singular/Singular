@@ -175,7 +175,7 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
         while ((nm!=NULL)&&(strcmp(nm->name,a2->name)!=0)) nm=nm->next;
         if (nm==NULL)
         {
-          Werror("member %s nor found");
+          Werror("member %s nor found", a2->name);
           return TRUE;
         }
         if (RingDependend(nm->typ))
