@@ -459,15 +459,20 @@ number nr2mNeg (number c)
   return nr2mNegM(c);
 }
 
-number nr2mCopy(number a)
-{
-  return a;
-}
-
 number nr2mMapMachineInt(number from)
 {
   NATNUMBER i = ((NATNUMBER) from) & currRing->nr2mModul;
   return (number) i;
+}
+
+number nr2mCopy(number a)
+{
+  /* This method is obviously redundant. But in /kernel/maps.cc a check
+     is performed whether nSetMap(some ring) and nCopy are identical
+     function pointers. For that check to work correctly, we need to
+     implement a version of nCopy for rings of the form Z/2^m*Z, i.e.
+     this method. */
+  return nr2mMapMachineInt(a);
 }
 
 number nr2mMapZp(number from)
@@ -519,8 +524,7 @@ nMapFunc nr2mSetMap(const ring src, const ring dst)
   if (rField_is_Ring_2toM(src)
      && (src->ringflagb >= dst->ringflagb))
   {
-    //return nr2mCopy;
-    return nr2mMapMachineInt;
+    return nr2mCopy;
   }
   if (rField_is_Ring_Z(src))
   {
