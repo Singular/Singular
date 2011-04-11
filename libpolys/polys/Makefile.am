@@ -32,7 +32,7 @@ SOURCES = \
 	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc \
-	nc/gring.cc nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc \
+	nc/gring.cc nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc nc/ncSAMult.cc \
 	pDebug.cc pInline0.cc polys0.cc prCopy.cc \
 	kbuckets.cc sbuckets.cc ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} weight.cc \
   simpleideals.cc matpol.cc

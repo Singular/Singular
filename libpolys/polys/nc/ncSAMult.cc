@@ -18,9 +18,11 @@
 #endif
 
 
-#include <kernel/mod2.h>
+#include "config.h"
+#include <misc/auxiliary.h>
 
 #ifdef HAVE_PLURAL
+
 
 #ifndef NDEBUG
 #define OUTPUT 1
@@ -28,15 +30,24 @@
 #define OUTPUT 0
 #endif
 
+# define PLURAL_INTERNAL_DECLARATIONS
+#include "nc/nc.h"
+#include "nc/sca.h"
 
-#include <kernel/options.h>
-#include <kernel/p_Procs.h>
-#include <kernel/ncSAMult.h> // for CMultiplier etc classes
-#include <kernel/sca.h> // for SCA
-#include <kernel/polys.h> // for p_One
+#include <misc/options.h>
+#include <coeffs/numbers.h>
+#include "coeffrings.h"
 
 
-namespace 
+// #include <kernel/p_Procs.h>
+#include "monomials/ring.h"
+#include "monomials/p_polys.h"
+
+#include "nc/ncSAMult.h" // for CMultiplier etc classes
+// #include "nc/sca.h" // for SCA
+
+
+namespace
 {
 
 // poly functions defined in p_Procs: ;

@@ -16,6 +16,8 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/operations/p_Mult_q.h>
 
+#include <polys/coeffrings.h>
+
 //#include <polys/nc/ncSACache.h> // for CCacheHash etc classes
 #include <polys/nc/ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
