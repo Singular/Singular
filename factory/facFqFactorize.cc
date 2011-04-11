@@ -197,7 +197,7 @@ monicFactorRecombi (const CFList& factors,const CanonicalForm& F, const
   CanonicalForm buf= F;
   CanonicalForm LCBuf= LC (buf, Variable (1));
   CanonicalForm g, gg;
-  int v [T.length()];
+  int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
   bool noSubset= false;
@@ -212,6 +212,7 @@ monicFactorRecombi (const CFList& factors,const CanonicalForm& F, const
       if (T.length() == s)
       {
         result.append (prodMod (T, M));
+        delete [] v;
         return result;
       }
       S= subset (v, s, TT, noSubset);
@@ -243,6 +244,7 @@ monicFactorRecombi (const CFList& factors,const CanonicalForm& F, const
                 bufDegs1.getLength() == 1)
             {
               result.append (prodMod (T, M));
+              delete [] v;
               return result;
             }
             TT= copy (T);
@@ -256,9 +258,9 @@ monicFactorRecombi (const CFList& factors,const CanonicalForm& F, const
     if (T.length() < 2*s || T.length() == s)
     {
       result.append (prodMod (T, M));
+      delete [] v;
       return result;
     }
-    int v [T.length()];
     for (int i= 0; i < T.length(); i++)
       v[i]= 0;
     noSubset= false;
@@ -266,6 +268,7 @@ monicFactorRecombi (const CFList& factors,const CanonicalForm& F, const
   if (T.length() < 2*s)
     result.append (prodMod (T, M));
 
+  delete [] v;
   return result;
 }
 
@@ -634,7 +637,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
 
   CanonicalForm g, LCBuf= LC (buf, Variable (1));
   CanonicalForm buf2;
-  int v [T.length()];
+  int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
   bool noSubset= false;
@@ -649,6 +652,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     {
       if (T.length() == s)
       {
+        delete [] v;
         if (recombination)
         {
           T.insert (LCBuf);
@@ -665,7 +669,6 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
           buf= reverseShift (buf, evaluation);
           return CFList (buf);
         }
-        return result;
       }
 
       S= subset (v, s, TT, noSubset);
@@ -711,6 +714,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
             buf= reverseShift (buf, evaluation);
             buf /= Lc (buf);
             appendTestMapDown (result, buf, info, source, dest);
+            delete [] v;
             return result;
           }
           trueFactor= false;
@@ -725,9 +729,9 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     {
       buf= reverseShift (buf, evaluation);
       appendTestMapDown (result, buf, info, source, dest);
+      delete [] v;
       return result;
     }
-    int v [T.length()];
     for (int i= 0; i < T.length(); i++)
       v[i]= 0;
     noSubset= false;
@@ -738,6 +742,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     appendMapDown (result, buf, info, source, dest);
   }
 
+  delete [] v;
   return result;
 }
 
@@ -758,7 +763,7 @@ factorRecombination (const CanonicalForm& F, const CFList& factors,
   CFList result;
   CanonicalForm LCBuf= LC (F, Variable (1));
   CanonicalForm g, buf= F;
-  int v [T.length()];
+  int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
   bool noSubset= false;
@@ -774,6 +779,7 @@ factorRecombination (const CanonicalForm& F, const CFList& factors,
     {
       if (T.length() == s)
       {
+        delete [] v;
         if (recombination)
         {
           T.insert (LC (buf));
@@ -800,6 +806,7 @@ factorRecombination (const CanonicalForm& F, const CFList& factors,
         if (T.length() < 2*s || T.length() == s)
         {
           result.append (buf);
+          delete [] v;
           return result;
         }
         TT= copy (T);
@@ -811,9 +818,9 @@ factorRecombination (const CanonicalForm& F, const CFList& factors,
     if (T.length() < 2*s || T.length() == s)
     {
       result.append (buf);
+      delete [] v;
       return result;
     }
-    int v [T.length()];
     for (int i= 0; i < T.length(); i++)
       v[i]= 0;
     noSubset= false;
@@ -821,6 +828,7 @@ factorRecombination (const CanonicalForm& F, const CFList& factors,
   if (T.length() < 2*s)
     result.append (F);
 
+  delete [] v;
   return result;
 }
 

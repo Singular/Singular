@@ -317,7 +317,7 @@ void indexUpdate (int index [], const int& subsetSize, const int& setSize,
     noSubset= true;
     return;
   }
-  int v [setSize];
+  int * v= new int [setSize];
   for (int i= 0; i < setSize; i++)
     v[i]= index[i];
   if (subsetSize == 1)
@@ -326,6 +326,7 @@ void indexUpdate (int index [], const int& subsetSize, const int& setSize,
     if (v[0] >= setSize)
     {
       noSubset= true;
+      delete [] v;
       return;
     }
   }
@@ -336,6 +337,7 @@ void indexUpdate (int index [], const int& subsetSize, const int& setSize,
       if (v[0] + subsetSize - 1 > setSize)
       {
         noSubset= true;
+        delete [] v;
         return;
       }
       v[0]= v[0] - 1;
@@ -348,6 +350,7 @@ void indexUpdate (int index [], const int& subsetSize, const int& setSize,
       if (v[0] + subsetSize - 1 > setSize)
       {
         noSubset= true;
+        delete [] v;
         return;
       }
       for (int i= 1; i < subsetSize - 1; i++)
@@ -357,7 +360,7 @@ void indexUpdate (int index [], const int& subsetSize, const int& setSize,
   }
   for (int i= 0; i < setSize; i++)
     index[i]= v[i];
-  return;
+  delete [] v;
 }
 
 int subsetDegree (const CFList& S)

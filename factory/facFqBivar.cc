@@ -264,7 +264,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     buf= F;
 
   CanonicalForm g, LCBuf= LC (buf, Variable (1));
-  int v [T.length()];
+  int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
 
@@ -282,6 +282,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     {
       if (T.length() == s)
       {
+        delete [] v;
         if (recombination)
         {
           T.insert (LCBuf);
@@ -353,6 +354,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
               if (T.length() < 2*s || T.length() == s ||
                   bufDegs1.getLength() == 1)
               {
+                delete [] v;
                 if (recombination)
                 {
                   appendTestMapDown (result, buf (y - eval, y), info, source,
@@ -377,6 +379,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     s++;
     if (T.length() < 2*s || T.length() == s)
     {
+      delete [] v;
       if (recombination)
       {
         appendTestMapDown (result, buf (y - eval, y), info, source, dest);
@@ -388,7 +391,6 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
         return result;
       }
     }
-    int v [T.length()];
     for (int i= 0; i < T.length(); i++)
       v[i]= 0;
     nosubset= false;
@@ -396,6 +398,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
   if (T.length() < 2*s)
     appendMapDown (result, F (y - eval, y), info, source, dest);
 
+  delete [] v;
   return result;
 }
 
@@ -418,7 +421,7 @@ factorRecombination (const CFList& factors, const CanonicalForm& F,
   CFList result;
   CanonicalForm LCBuf= LC (F, Variable (1));
   CanonicalForm g, buf= F;
-  int v [T.length()];
+  int * v= new int [T.length()];
   for (int i= 0; i < T.length(); i++)
     v[i]= 0;
   bool nosubset= false;
@@ -434,6 +437,7 @@ factorRecombination (const CFList& factors, const CanonicalForm& F,
     {
       if (T.length() == s)
       {
+        delete [] v;
         if (recombination)
         {
           T.insert (LCBuf);
@@ -477,6 +481,7 @@ factorRecombination (const CFList& factors, const CanonicalForm& F,
             if (T.length() < 2*s || T.length() == s ||
                 bufDegs1.getLength() == 1)
             {
+              delete [] v;
               if (recombination)
               {
                 result.append (buf);
@@ -495,6 +500,7 @@ factorRecombination (const CFList& factors, const CanonicalForm& F,
     s++;
     if (T.length() < 2*s || T.length() == s)
     {
+      delete [] v;
       if (recombination)
       {
         result.append (buf);
@@ -503,7 +509,6 @@ factorRecombination (const CFList& factors, const CanonicalForm& F,
       else
         return CFList (F);
     }
-    int v [T.length()];
     for (int i= 0; i < T.length(); i++)
       v[i]= 0;
     nosubset= false;
@@ -511,6 +516,7 @@ factorRecombination (const CFList& factors, const CanonicalForm& F,
   if (T.length() < 2*s)
     result.append (F);
 
+  delete [] v;
   return result;
 }
 
