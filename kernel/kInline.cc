@@ -18,6 +18,7 @@
 #include <kernel/p_Procs.h>
 #include <kernel/kbuckets.h>
 #include <omalloc/omalloc.h>
+#include <kernel/options.h>
 
 #define HAVE_TAIL_BIN
 // This doesn't really work, fixme, if necessary
@@ -422,19 +423,47 @@ extern void pNorm(poly p);
 KINLINE void  sTObject::pCleardenom()
 {
   assume(p != NULL);
-  if (t_p != NULL)
-  {
-    p_Cleardenom(t_p, tailRing);
-    pSetCoeff0(p, pGetCoeff(t_p));
-  }
+  if (TEST_OPT_CONTENTSB)
+    {
+      number n;
+      if (t_p != NULL)
+	{
+	  p_Cleardenom_n(t_p, tailRing, n);
+	  pSetCoeff0(p, pGetCoeff(t_p));
+	}
+      else
+	{
+#ifdef HAVE_RATGRING
+	  p= p_Cleardenom_n(p, currRing, n);
+#else
+	  p_Cleardenom_n(p, currRing, n);
+#endif
+	}
+      if (!nIsOne(n))
+	{
+	  denominator_list denom=(denominator_list)omAlloc(sizeof(denominator_list_s));
+	  denom->n=nInvers(n);
+	  denom->next=DENOMINATOR_LIST;
+	  DENOMINATOR_LIST=denom;
+	}
+      nDelete(&n);
+    }
   else
-  {
-    #ifdef HAVE_RATGRING
-    p= p_Cleardenom(p, currRing);
-    #else
-    p_Cleardenom(p, currRing);
-    #endif
-  }
+    {
+      if (t_p != NULL)
+	{
+	  p_Cleardenom(t_p, tailRing);
+	  pSetCoeff0(p, pGetCoeff(t_p));
+	}
+      else
+	{
+#ifdef HAVE_RATGRING
+	  p= p_Cleardenom(p, currRing);
+#else
+	  p_Cleardenom(p, currRing);
+#endif
+	}
+    }
 }
 
 KINLINE void  sTObject::pNorm()

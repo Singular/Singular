@@ -514,7 +514,7 @@ void p_Content(poly ph, const ring r)
   number h,d;
   poly p;
 
-  if(TEST_OPT_CONTENTSB) return;
+  //  if(TEST_OPT_CONTENTSB) return;
   if(pNext(ph)==NULL)
   {
     pSetCoeff(ph,nInit(1));
@@ -656,7 +656,7 @@ void p_Content(poly ph, const ring r)
 
 void pSimpleContent(poly ph,int smax)
 {
-  if(TEST_OPT_CONTENTSB) return;
+  //if(TEST_OPT_CONTENTSB) return;
   if (ph==NULL) return;
   if (pNext(ph)==NULL)
   {
@@ -713,7 +713,7 @@ number pInitContent(poly ph)
 // only for coefficients in Q
 #if 0
 {
-  assume(!TEST_OPT_CONTENTSB);
+  //assume(!TEST_OPT_CONTENTSB);
   assume(ph!=NULL);
   assume(pNext(ph)!=NULL);
   assume(rField_is_Q());
@@ -965,6 +965,7 @@ poly p_Cleardenom(poly ph, const ring r)
   p = ph;
   if(pNext(p)==NULL)
   {
+    /*
     if (TEST_OPT_CONTENTSB)
     {
       number n=nGetDenom(pGetCoeff(p));
@@ -977,6 +978,7 @@ poly p_Cleardenom(poly ph, const ring r)
       nDelete(&n);
     }
     else
+    */
       pSetCoeff(p,nInit(1));
   }
   else

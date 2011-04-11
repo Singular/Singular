@@ -55,6 +55,12 @@ typedef class sLObject LObject;
 typedef TObject * TSet;
 typedef LObject * LSet;
 
+typedef struct denominator_list_s denominator_list_s;
+typedef denominator_list_s *denominator_list;
+
+struct denominator_list_s{number n; denominator_list next;};
+extern denominator_list DENOMINATOR_LIST;
+
 class sTObject
 {
 public:

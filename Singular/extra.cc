@@ -3722,6 +3722,13 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
 //   }
   else
 #endif
+    if (strcmp(sys_cmd,"denom_list")==0)
+      {
+	res->rtyp=LIST_CMD;
+	extern lists get_denom_list();
+	res->data=(lists)get_denom_list();
+	return FALSE;
+      }
 /*==================== Error =================*/
       Werror( "(extended) system(\"%s\",...) %s", sys_cmd, feNotImplemented );
   }

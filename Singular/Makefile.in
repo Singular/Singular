@@ -220,7 +220,7 @@ CXXSOURCES=grammar.cc scanner.cc attrib.cc \
     MinorProcessor.cc \
     MinorInterface.cc \
     bigintm.cc pyobject_setup.cc \
-    bbcone.cc bbfan.cc
+    bbcone.cc bbfan.cc denom_list.cc
 
 # stuff for MP
 MPSR_SOURCES = mpsr_Put.cc mpsr_PutPoly.cc mpsr_GetPoly.cc mpsr_sl.cc\
