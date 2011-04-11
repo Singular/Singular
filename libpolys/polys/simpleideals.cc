@@ -6,7 +6,12 @@
 * ABSTRACT - all basic methods to manipulate ideals
 */
 
+
 /* includes */
+#include "config.h"
+#include <misc/auxiliary.h>
+
+#include "simpleideals.h"
 
 /*2
 * initialise an ideal
@@ -3108,7 +3113,7 @@ ideal idMatrix2Module(matrix mat)
 }
 #else
 
-#include <kernel/sbuckets.h>
+#include "sbuckets.h"
 
 // converts mat to module, destroys mat
 ideal idMatrix2Module(matrix mat)
@@ -4107,7 +4112,7 @@ void idNormalize(ideal I)
   }
 }
 
-#include <kernel/clapsing.h>
+// #include <kernel/clapsing.h>
 
 #ifdef HAVE_FACTORY
 poly id_GCD(poly f, poly g, const ring r)
