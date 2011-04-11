@@ -34,7 +34,7 @@ SOURCES = \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc \
 	polys0.cc prCopy.cc \
-	nc/sca.cc nc/gring.cc \
+	nc/gring.cc nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc \
 	kbuckets.cc sbuckets.cc ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} weight.cc
 
 BUILT_SOURCES = templates/p_Procs.inc

@@ -368,7 +368,34 @@ bool ncExtensions(int iMask); //  = 0x0FFFF
 
 
 
+#ifdef PLURAL_INTERNAL_DECLARATIONS
 
+#include <polys/matpol.h>
+
+// read only access to NC matrices C/D:
+// get C_{i,j}, 1 <= row = i < j = col <= N
+static inline poly GetC( const ring r, int i, int j ) 
+{
+  assume(r!= NULL && rIsPluralRing(r));
+  const matrix C = GetNC(r)->C;
+  assume(C != NULL);
+  const int ncols = C->ncols;
+  assume( (i > 0) && (i < j) && (j <= ncols) );
+  return ( C->m[ncols * ((i)-1) + (j)-1] );
+}
+
+// get D_{i,j}, 1 <= row = i < j = col <= N
+static inline poly GetD( const ring r, int i, int j ) 
+{
+  assume(r!= NULL && rIsPluralRing(r));
+  const matrix D = GetNC(r)->D;
+  assume(D != NULL);
+  const int ncols = D->ncols;
+  assume( (i > 0) && (i < j) && (j <= ncols) );
+  return ( D->m[ncols * ((i)-1) + (j)-1] );
+}
+
+#endif /* PLURAL_INTERNAL_DECLARATIONS */
 
 #endif /* HAVE_PLURAL */
 

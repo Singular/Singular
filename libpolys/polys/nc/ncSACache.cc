@@ -18,7 +18,8 @@
 #endif
 
 
-#include <kernel/mod2.h>
+#include "config.h"
+#include <misc/auxiliary.h>
 
 #ifndef NDEBUG
 #define OUTPUT 1
@@ -31,10 +32,14 @@ namespace
   static char* m_Typenames[2] = {"lookup", "store"};
 }
 
-#include <kernel/ring.h>
-#include <kernel/p_polys.h>
+#include <coeffs/numbers.h>
+#include "coeffrings.h"
 
-#include <kernel/ncSACache.h> // for CCacheHash etc classes
+#include "nc/ncSACache.h" // for CCacheHash etc classes
+
+#include "monomials/ring.h"
+#include "monomials/p_polys.h"
+
 
 
 void CGlobalCacheHash::History(const EHistoryType t, const CGlobalCacheHash::CExponent a, const CGlobalCacheHash::CExponent b, const poly p)

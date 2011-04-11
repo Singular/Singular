@@ -26,6 +26,7 @@
 
 // for
 #define PLURAL_INTERNAL_DECLARATIONS
+
 #include <polys/nc/sca.h>
 #include <polys/nc/nc.h>
 // #include <polys/gring.h>
@@ -46,7 +47,6 @@
 // #include <polys/polys.h>
 
 #include <polys/monomials/ring.h>
-#include <polys/matpol.h>
 #include <polys/kbuckets.h>
 // #include <polys/kstd1.h>
 #include <polys/sbuckets.h>
