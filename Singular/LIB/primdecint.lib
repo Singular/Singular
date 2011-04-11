@@ -21,6 +21,7 @@ PROCEDURES:
  radicalZ(I);       compute the radical of I
  heightZ(I);        compute the height of I
  equidimZ(I);       compute the equidimensional part of I
+ intersectZ(I,J)    compute the intersection of I and J
 ";
 
 LIB "crypto.lib";
@@ -231,7 +232,8 @@ EXAMPLE: example primdecZ; shows an example
                //=== test for useless primaries
                if(size(reduce(TES,Q))>0)
                {
-                  TQ=intersect(TQ,Q);
+                  TQ=intersectZ(TQ,Q);
+                  //TQ=intersect(TQ,Q);
                   P[size(P)+1]=list(Q,K);
                }
             }
@@ -250,7 +252,7 @@ EXAMPLE: example primdecZ; shows an example
                Q=stdZ(Q);
                if(size(reduce(TES,Q))>0)
                {
-                  //TQ=intersect(TQ,Q);
+                  //TQ=intersectZ(TQ,Q);
                   P[size(P)+1]=list(Q,K);
                }
             }
@@ -259,7 +261,8 @@ EXAMPLE: example primdecZ; shows an example
                JJ=imap(S,J);
                JJ=JJ,p;
                JJ=stdZ(JJ);
-               TQ=intersect(TQ,JJ);
+               TQ=intersectZ(TQ,JJ);
+               //TQ=intersect(TQ,JJ);
             }
          }
          kill S;
@@ -272,14 +275,16 @@ EXAMPLE: example primdecZ; shows an example
       setring R;
       if(!ex){return(P);}
       J=stdZ(J);
-      TQ=intersect(TQ,TES);
+      TQ=intersectZ(TQ,TES);
+      //TQ=intersect(TQ,TES);
       if(size(reduce(TQ,J))!=0)
       {
          //=== taking care about embedded components
          K=stdZ(quotientZ(J,TQ));
          ideal W=K;
          m++;
-         while(size(reduce(intersect(W,TQ),J))!=0)
+         while(size(reduce(intersectZ(W,TQ),J))!=0)
+         //while(size(reduce(intersect(W,TQ),J))!=0)
          {
             //W=stdZ(addIdealZ(I,K^m));
             W=stdZ(addIdealZ(I,specialPowerZ(K,m)));
@@ -357,15 +362,15 @@ example
    ideal I4=13a2,17b4;
    ideal I5=9c5,6d5;
    ideal I6=17,a15,b15,c15,d15;
-   ideal I=intersect(I1,I2);
-   I=intersect(I,I3);
-   I=intersect(I,I4);
-   I=intersect(I,I5);
-   I=intersect(I,I6);
+   ideal I=intersectZ(I1,I2);
+   I=intersectZ(I,I3);
+   I=intersectZ(I,I4);
+   I=intersectZ(I,I5);
+   I=intersectZ(I,I6);
    primdecZ(I);
-   ideal J=intersect(ideal(17,a),ideal(17,a2,b));
+   ideal J=intersectZ(ideal(17,a),ideal(17,a2,b));
    primdecZ(J);
-   ideal K=intersect(ideal(9,a+3),ideal(9,b+3));
+   ideal K=intersectZ(ideal(9,a+3),ideal(9,b+3));
    primdecZ(K);
 }
 
@@ -493,15 +498,15 @@ example
    ideal I4=13a2,17b4;
    ideal I5=9c5,6d5;
    ideal I6=17,a15,b15,c15,d15;
-   ideal I=intersect(I1,I2);
-   I=intersect(I,I3);
-   I=intersect(I,I4);
-   I=intersect(I,I5);
-   I=intersect(I,I6);
+   ideal I=intersectZ(I1,I2);
+   I=intersectZ(I,I3);
+   I=intersectZ(I,I4);
+   I=intersectZ(I,I5);
+   I=intersectZ(I,I6);
    minAssZ(I);
-   ideal J=intersect(ideal(17,a),ideal(17,a2,b));
+   ideal J=intersectZ(ideal(17,a),ideal(17,a2,b));
    minAssZ(J);
-   ideal K=intersect(ideal(9,a+3),ideal(9,b+3));
+   ideal K=intersectZ(ideal(9,a+3),ideal(9,b+3));
    minAssZ(K);
 }
 
@@ -589,11 +594,11 @@ example
    ideal I4=13a2,17b4;
    ideal I5=9c5,6d5;
    ideal I6=17,a15,b15,c15,d15;
-   ideal I=intersect(I1,I2);
-   I=intersect(I,I3);
-   I=intersect(I,I4);
-   I=intersect(I,I5);
-   I=intersect(I,I6);
+   ideal I=intersectZ(I1,I2);
+   I=intersectZ(I,I3);
+   I=intersectZ(I,I4);
+   I=intersectZ(I,I5);
+   I=intersectZ(I,I6);
    heightZ(I);
 }
 
@@ -646,7 +651,8 @@ EXAMPLE: example radicalZ; shows an example
          kill S;
          B=B,p;
          B=stdZ(B);
-         K=stdZ(intersect(K,B));
+         K=stdZ(intersectZ(K,B));
+         //K=stdZ(intersect(K,B));
          setring Rhelp;
       }
       setring R;
@@ -674,7 +680,8 @@ EXAMPLE: example radicalZ; shows an example
    if(h!=1)
    {
       ideal M=radicalZ(J);
-      K=intersect(K,M);
+      K=intersectZ(K,M);
+      //K=intersect(K,M);
    }
    return(K);
 }
@@ -687,13 +694,13 @@ example
    ideal I4=13a2,17b4;
    ideal I5=9c5,6d5;
    ideal I6=17,a15,b15,c15,d15;
-   ideal I=intersect(I1,I2);
-   I=intersect(I,I3);
-   I=intersect(I,I4);
-   I=intersect(I,I5);
-   I=intersect(I,I6);
+   ideal I=intersectZ(I1,I2);
+   I=intersectZ(I,I3);
+   I=intersectZ(I,I4);
+   I=intersectZ(I,I5);
+   I=intersectZ(I,I6);
    radicalZ(I);
-   ideal J=intersect(ideal(17,a),ideal(17,a2,b));
+   ideal J=intersectZ(ideal(17,a),ideal(17,a2,b));
    radicalZ(J);
 }
 
@@ -803,7 +810,8 @@ EXAMPLE: example equidimZ; shows an example
                   N=J,s;
                   N=stdZ(N);
                   Q=extractZ(N,j,IS,B);
-                  TQ=intersect(TQ,Q);
+                  TQ=intersectZ(TQ,Q);
+                  //TQ=intersect(TQ,Q);
                }
                setring Rhelp;
             }
@@ -816,7 +824,8 @@ EXAMPLE: example equidimZ; shows an example
                E=imap(S,E);
                E=E,p;
                E=stdZ(E);
-               TQ=intersect(TQ,E);
+               TQ=intersectZ(TQ,E);
+               //TQ=intersect(TQ,E);
             }
          }
          kill S;
@@ -853,7 +862,8 @@ EXAMPLE: example equidimZ; shows an example
        M=equidimZ(J);
        if(he==heightZ(M))
        {
-          E=intersect(M,E);
+          E=intersectZ(M,E);
+          //E=intersect(M,E);
        }
    }
    return(E);
@@ -867,12 +877,53 @@ example
    ideal I4=13a2,17b4;
    ideal I5=9c5,6d5;
    ideal I6=17,a15,b15,c15,d15;
-   ideal I=intersect(I1,I2);
-   I=intersect(I,I3);
-   I=intersect(I,I4);
-   I=intersect(I,I5);
-   I=intersect(I,I6);
+   ideal I=intersectZ(I1,I2);
+   I=intersectZ(I,I3);
+   I=intersectZ(I,I4);
+   I=intersectZ(I,I5);
+   I=intersectZ(I,I6);
    equidimZ(I);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+proc intersectZ(ideal I, ideal J)
+"USAGE:  intersectZ(I,J); I,J ideals
+RETURN:  the intersection of the input ideals
+NOTE:    this is needed because intersect(I,J) does not work, should be replaced
+         by intersect later
+EXAMPLE: example intersectZ; shows an example
+{
+   def R = basering;
+   execute("ring S=integer,(t,"+varstr(R)+"),(dp(1),dp(nvars(R)));");
+   ideal I=imap(R,I);
+   ideal J=imap(R,J);
+   ideal K=addIdealZ(t*I,(1-t)*J);
+   K=stdZ(K);
+   int i;
+   ideal L;
+   for(i=1;i<=size(K);i++)
+   {
+      if(lead(K[i])/t==0){L[size(L)+1]=K[i];}
+   }
+   setring R;
+   ideal L=imap(S,L);
+   return(L);
+}
+example
+{ "EXAMPLE:";  echo = 2;
+   ring R=integer,(a,b,c,d),dp;
+   ideal I1=9,a,b;
+   ideal I2=3,c;
+   ideal I3=11,2a,7b;
+   ideal I4=13a2,17b4;
+   ideal I5=9c5,6d5;
+   ideal I6=17,a15,b15,c15,d15;
+   ideal I=intersectZ(I1,I2); I;
+   I=intersectZ(I,I3); I;
+   I=intersectZ(I,I4); I;
+   I=intersectZ(I,I5); I;
+   I=intersectZ(I,I6); I;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1218,7 +1269,8 @@ static proc quotientOneZ(ideal I, poly f)
 //=== replaced by quotient later
    def R=basering;
    int i;
-   ideal K=intersect(I,ideal(f));
+   ideal K=intersectZ(I,ideal(f));
+   //ideal K=intersect(I,ideal(f));
    //=== K[i]/f; does not work in rings with integer! This should be replaced
    //=== later
    execute("ring Rhelp=0,("+varstr(R)+"),dp;");
@@ -1243,7 +1295,8 @@ static proc quotientZ(ideal I, ideal J)
    ideal K=quotientOneZ(I,J[1]);
    for(i=2;i<=size(J);i++)
    {
-      K=intersect(K,quotientOneZ(I,J[i]));
+      K=intersectZ(K,quotientOneZ(I,J[i]));
+      //K=intersect(K,quotientOneZ(I,J[i]));
    }
    return(K);
 }
@@ -1335,7 +1388,8 @@ static proc testPrimaryZ(ideal I, list L)
    ideal K=L[1][1];
    for(i=2;i<=size(L);i++)
    {
-      K=intersect(K,L[i][1]);
+      K=intersectZ(K,L[i][1]);
+      //K=intersect(K,L[i][1]);
    }
    i=size(reduce(K,stdZ(I)))+size(reduce(I,stdZ(K)));
    if(!i){return(1);}
@@ -1486,7 +1540,7 @@ ideal I=x(5)^5,
         x(1)*x(2)*x(4)^2*x(5),
         x(1)*x(4)^3*x(5),
         x(4)^4*x(5);
-      I=intersect(I,ideal(64*181,x(1)^2));
+      I=intersectZ(I,ideal(64*181,x(1)^2));
 
 ring R17=integer,(x,y,z),dp;
 ideal I=374,
