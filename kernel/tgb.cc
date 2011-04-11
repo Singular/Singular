@@ -2869,7 +2869,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos)
   this->deg_pos=deg_pos;
   lastCleanedDeg=-1;
   completed=FALSE;
-  this->syz_comp=ssyz_comp;
+  this->syz_comp=syz_comp;
   r=currRing;
   nc=rIsPluralRing(r);
   this->lastDpBlockStart=get_last_dp_block_start(r);
