@@ -517,14 +517,19 @@ number nr2mMapGMP(number from)
 nMapFunc nr2mSetMap(const ring src, const ring dst)
 {
   if (rField_is_Ring_2toM(src)
-     && (src->ringflagb <= dst->ringflagb))
+     && (src->ringflagb == dst->ringflagb))
   {
     return nr2mCopy;
   }
   if (rField_is_Ring_2toM(src)
-     && (src->ringflagb > dst->ringflagb))
-  {
+     && (src->ringflagb < dst->ringflagb))
+  { /* i.e. map an integer mod 2^s into Z mod 2^t, where t < s */
     return nr2mMapMachineInt;
+  }
+  if (rField_is_Ring_2toM(src)
+     && (src->ringflagb > dst->ringflagb))
+  { /* i.e. map an integer mod 2^s into Z mod 2^t, where t > s */
+    // to be done
   }
   if (rField_is_Ring_Z(src))
   {
