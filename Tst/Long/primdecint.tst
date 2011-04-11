@@ -142,7 +142,7 @@ ideal I = x(5)^5, x(1)*x(5)^4, x(1)*x(2)*x(5)^3, x(2)^2*x(5)^3,
           x(1)*x(2)*x(3)*x(4)*x(5), x(2)^2*x(3)*x(4)*x(5),
           x(2)^2*x(4)^2*x(5), x(1)*x(2)*x(4)^2*x(5), x(1)*x(4)^3*x(5),
           x(4)^4*x(5);
-I = intersectZ(I,ideal(64*181,x(1)^2));
+I = intersect(I,ideal(64*181,x(1)^2));
 I;
 sortPDZ(primdecZ(I,1));
 sortPDZ(primdecZ(I,2));
