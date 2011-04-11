@@ -158,33 +158,6 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 
 
 
-// inline const nc_struct* GetNC() const { return GetBasering()->GetNC(); } 
-
-
-// read only access to NC matrices C/D:
-// get C_{i,j}, 1 <= row = i < j = col <= N
-inline poly GetC( const ring r, int i, int j ) 
-{
-  assume(r!= NULL && rIsPluralRing(r));
-  const matrix C = GetNC(r)->C;
-  assume(C != NULL);
-  const int ncols = C->ncols;
-  assume( (i > 0) && (i < j) && (j <= ncols) );
-  return ( C->m[ncols * ((i)-1) + (j)-1] );
-}
-
-// get D_{i,j}, 1 <= row = i < j = col <= N
-inline poly GetD( const ring r, int i, int j ) 
-{
-  assume(r!= NULL && rIsPluralRing(r));
-  const matrix D = GetNC(r)->D;
-  assume(D != NULL);
-  const int ncols = D->ncols;
-  assume( (i > 0) && (i < j) && (j <= ncols) );
-  return ( D->m[ncols * ((i)-1) + (j)-1] );
-}
-
-
 #ifdef PLURAL_INTERNAL_DECLARATIONS
 
 // we need nc_gr_initBba for sca_gr_bba and gr_bba.

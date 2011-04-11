@@ -11,6 +11,7 @@
 // //////////////////////////////////////////////////////////////////////// //
 
 #include <polys/monomials/ring.h>
+#include <polys/nc/nc.h>
 
 bool ncInitSpecialPowersMultiplication(ring r);
 
@@ -24,12 +25,6 @@ enum Enum_ncSAType
   _ncSA_1xy0xBy0 = 20, // shift 2
   _ncSA_1xy0x0yG = 30 // Weyl  
 };
-
-
-inline CFormulaPowerMultiplier* GetFormulaPowerMultiplier(const ring r)
-{
-  return r->GetNC()->GetFormulaPowerMultiplier();
-}
 
 class CFormulaPowerMultiplier
 {
@@ -95,6 +90,11 @@ class CFormulaPowerMultiplier
 
 };
 
+
+static inline CFormulaPowerMultiplier* GetFormulaPowerMultiplier(const ring r)
+{
+  return r->GetNC()->GetFormulaPowerMultiplier();
+}
 
 
 

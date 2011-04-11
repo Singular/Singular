@@ -18,9 +18,12 @@
 #endif
 
 
-#include <kernel/mod2.h>
+#include "config.h"
+#include <misc/auxiliary.h>
 
 #ifdef HAVE_PLURAL
+
+#define PLURAL_INTERNAL_DECLARATIONS
 
 #ifndef NDEBUG
 #define OUTPUT 1
@@ -28,14 +31,18 @@
 #define OUTPUT 0
 #endif
 
+#include <reporter/reporter.h>
 
-#include <ncSAFormula.h> // for CFormulaPowerMultiplier
+#include <coeffs/numbers.h>
+#include "coeffrings.h"
 
-#include <ring.h>
-#include <p_polys.h>
-#include <febase.h>
-#include <sca.h> // for SCA
-#include <polys.h> // for p_One
+#include "nc/ncSAFormula.h"
+// for CFormulaPowerMultiplier
+
+#include "monomials/ring.h"
+#include "monomials/p_polys.h"
+
+#include "nc/sca.h"
 
 
 
