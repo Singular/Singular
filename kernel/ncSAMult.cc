@@ -36,6 +36,8 @@
 #include <kernel/polys.h> // for p_One
 
 
+namespace 
+{
 
 // poly functions defined in p_Procs: ;
 static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
@@ -248,6 +250,8 @@ static void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
   rGR->GetNC()->p_Procs.mm_Mult_pp  = gnc_mm_Mult_pp;
 
 }
+
+};
 
 bool ncInitSpecialPairMultiplication(ring r)
 {
@@ -988,6 +992,9 @@ poly CPowerMultiplier::MultiplyEE(const CExponent expLeft, const CExponent expRi
     {
       // Perform general NC Multiplication:
       // TODO
+      
+      WerrorS("Sorry the general case is not implemented this way yet!!!");
+      assume(0);
 
 //      product = NULL;
     }
