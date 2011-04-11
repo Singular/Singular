@@ -820,6 +820,10 @@ int fe_init_dyn_rl()
 /* ===================================================================*/
 /* =          fe_reset_input_mode (all possibilities)               = */
 /* ===================================================================*/
+#if defined(HAVE_READLINE) && !defined(HAVE_FEREAD) && !defined(HAVE_DYN_RL)
+extern int history_total_bytes();
+extern int write_history (const char *);
+#endif    
 void fe_reset_input_mode ()
 {
 #if defined(HAVE_DYN_RL)

@@ -1017,7 +1017,7 @@ simplex::~simplex()
   omFreeSize( (ADDRESS) izrov, 2*LiPM_rows*sizeof(int) );
 }
 
-BOOLEAN simplex::mapFromMatrix( matrix m )
+BOOLEAN simplex::mapFromMatrix( matrix mm )
 {
   int i,j;
 //    if ( MATROWS( m ) > LiPM_rows ||  MATCOLS( m ) > LiPM_cols ) {
@@ -1026,13 +1026,13 @@ BOOLEAN simplex::mapFromMatrix( matrix m )
 //    }
 
   number coef;
-  for ( i= 1; i <= MATROWS( m ); i++ )
+  for ( i= 1; i <= MATROWS( mm ); i++ )
   {
-     for ( j= 1; j <= MATCOLS( m ); j++ )
+     for ( j= 1; j <= MATCOLS( mm ); j++ )
      {
-        if ( MATELEM(m,i,j) != NULL )
+        if ( MATELEM(mm,i,j) != NULL )
         {
-           coef= pGetCoeff( MATELEM(m,i,j) );
+           coef= pGetCoeff( MATELEM(mm,i,j) );
            if ( coef != NULL && !nIsZero(coef) )
               LiPM[i][j]= (double)(*(gmp_float*)coef);
            //#ifdef mpr_DEBUG_PROT
@@ -1046,37 +1046,37 @@ BOOLEAN simplex::mapFromMatrix( matrix m )
   return TRUE;
 }
 
-matrix simplex::mapToMatrix( matrix m )
+matrix simplex::mapToMatrix( matrix mm )
 {
   int i,j;
-//    if ( MATROWS( m ) < LiPM_rows-3 ||  MATCOLS( m ) < LiPM_cols-2 ) {
+//    if ( MATROWS( mm ) < LiPM_rows-3 ||  MATCOLS( m ) < LiPM_cols-2 ) {
 //      WarnS("");
 //      return NULL;
 //    }
 
-//Print(" %d x %d\n",MATROWS( m ),MATCOLS( m ));
+//Print(" %d x %d\n",MATROWS( mm ),MATCOLS( mm ));
 
   number coef;
   gmp_float * bla;
-  for ( i= 1; i <= MATROWS( m ); i++ )
+  for ( i= 1; i <= MATROWS( mm ); i++ )
   {
-    for ( j= 1; j <= MATCOLS( m ); j++ )
+    for ( j= 1; j <= MATCOLS( mm ); j++ )
     {
-       pDelete( &(MATELEM(m,i,j)) );
-       MATELEM(m,i,j)= NULL;
+       pDelete( &(MATELEM(mm,i,j)) );
+       MATELEM(mm,i,j)= NULL;
 //Print(" %3.0f ",LiPM[i][j]);
        if ( LiPM[i][j] != 0.0 )
        {
           bla= new gmp_float(LiPM[i][j]);
           coef= (number)bla;
-          MATELEM(m,i,j)= pOne();
-          pSetCoeff( MATELEM(m,i,j), coef );
+          MATELEM(mm,i,j)= pOne();
+          pSetCoeff( MATELEM(mm,i,j), coef );
        }
     }
 //PrintLn();
   }
 
-  return m;
+  return mm;
 }
 
 intvec * simplex::posvToIV()
@@ -1304,7 +1304,7 @@ void simplex::simp1( mprfloat **a, int mm, int ll[], int nll, int iabf, int *kp,
   }
 }
 
-void simplex::simp2( mprfloat **a, int n, int l2[], int nl2, int *ip, int kp, mprfloat *q1 )
+void simplex::simp2( mprfloat **a, int nn, int l2[], int nl2, int *ip, int kp, mprfloat *q1 )
 {
   int k,ii,i;
   mprfloat qp,q0,q;
@@ -1329,7 +1329,7 @@ void simplex::simp2( mprfloat **a, int n, int l2[], int nl2, int *ip, int kp, mp
           }
           else if (q - *q1 < SIMPLEX_EPS)
           {
-            for ( k=1; k<= n; k++ )
+            for ( k=1; k<= nn; k++ )
             {
               qp= -a[*ip+1][k+1]/a[*ip+1][kp+1];
               q0= -a[ii+1][k+1]/a[ii+1][kp+1];

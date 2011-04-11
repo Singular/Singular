@@ -434,10 +434,10 @@ pointSet::~pointSet()
   omFreeSize( (ADDRESS) points, (max+1) * sizeof(onePointP) );
 }
 
-inline const onePointP pointSet::operator[] ( const int index )
+inline const onePointP pointSet::operator[] ( const int index_i )
 {
-  assume( index > 0 && index <= num );
-  return points[index];
+  assume( index_i > 0 && index_i <= num );
+  return points[index_i];
 }
 
 inline bool pointSet::checkMem()
@@ -906,7 +906,7 @@ pointSet * mayanPyramidAlg::getInnerPoints( pointSet **_Qi, mprfloat _shift[] )
   return E;
 }
 
-mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
+mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords_a, int dim )
 {
   int i, ii, j, k, col, r;
   int numverts, cols;
@@ -932,7 +932,7 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   }
   for( i=1; i<=dim; i++)
   {
-    pLP->LiPM[n+2+i][1] = (mprfloat)(acoords[i-1]);
+    pLP->LiPM[n+2+i][1] = (mprfloat)(acoords_a[i-1]);
     pLP->LiPM[n+2+i][2] = -shift[i];
   }
 
@@ -966,7 +966,7 @@ mprfloat mayanPyramidAlg::vDistance( Coord_t * acoords, int dim )
   Print("vDistance LP, known koords dim=%d, constr %d, cols %d, acoords= ",
         dim,pLP->m,cols);
   for( i= 0; i < dim; i++ )
-    Print(" %d",acoords[i]);
+    Print(" %d",acoords_a[i]);
   PrintLn();
   print_mat( pLP->LiPM, pLP->m+1, cols);
 #endif
@@ -1217,9 +1217,9 @@ void mayanPyramidAlg::runMayanPyramid( int dim )
 //-> resMatrixSparse::*
 bool resMatrixSparse::remapXiToPoint( const int indx, pointSet **pQ, int *set, int *pnt )
 {
-  int i,n= pVariables;
+  int i,nn= pVariables;
   int loffset= 0;
-  for ( i= 0; i <= n; i++ )
+  for ( i= 0; i <= nn; i++ )
   {
     if ( (loffset < indx) && (indx <= pQ[i]->num + loffset) )
     {
@@ -2182,11 +2182,11 @@ void resMatrixDense::createMatrix()
 // mprSTICKYPROT:
 // ST_DENSE_MEM: more mem allocated
 // ST_DENSE_NMON: new monom added
-void resMatrixDense::generateMonoms( poly m, int var, int deg )
+void resMatrixDense::generateMonoms( poly mm, int var, int deg )
 {
   if ( deg == 0 )
   {
-    poly mon = pCopy( m );
+    poly mon = pCopy( mm );
 
     if ( numVectors == veclistmax )
     {
@@ -2208,7 +2208,7 @@ void resMatrixDense::generateMonoms( poly m, int var, int deg )
   else
   {
     if ( var == pVariables+1 ) return;
-    poly newm = pCopy( m );
+    poly newm = pCopy( mm );
     while ( deg >= 0 )
     {
       generateMonoms( newm, var+1, deg );
@@ -2718,15 +2718,15 @@ uResultant::~uResultant( )
   delete resMat;
 }
 
-ideal uResultant::extendIdeal( const ideal gls, poly linPoly, const resMatType rmt )
+ideal uResultant::extendIdeal( const ideal igls, poly linPoly, const resMatType rrmt )
 {
-  ideal newGls= idCopy( gls );
+  ideal newGls= idCopy( igls );
   newGls->m= (poly *)omReallocSize( newGls->m,
-                              IDELEMS(gls) * sizeof(poly),
-                              (IDELEMS(gls) + 1) * sizeof(poly) );
+                              IDELEMS(igls) * sizeof(poly),
+                              (IDELEMS(igls) + 1) * sizeof(poly) );
   IDELEMS(newGls)++;
 
-  switch ( rmt )
+  switch ( rrmt )
   {
   case sparseResMat:
   case denseResMat:
@@ -2746,7 +2746,7 @@ ideal uResultant::extendIdeal( const ideal gls, poly linPoly, const resMatType r
   return( newGls );
 }
 
-poly uResultant::linearPoly( const resMatType rmt )
+poly uResultant::linearPoly( const resMatType rrmt )
 {
   int i,j;
 
@@ -2764,7 +2764,7 @@ poly uResultant::linearPoly( const resMatType rmt )
   actlp->next= NULL;
   pDelete( &newlp );
 
-  if ( rmt == sparseResMat )
+  if ( rrmt == sparseResMat )
   {
     newlp= pOne();
     actlp->next= newlp;

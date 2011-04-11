@@ -1185,20 +1185,20 @@ void piShowProcList()
 //}
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 #ifdef HAVE_LIBPARSER
-void libstack::push(char *p, char *libname)
+void libstack::push(char *p, char *libn)
 {
   libstackv lp;
-  if( !iiGetLibStatus(libname))
+  if( !iiGetLibStatus(libn))
   {
     for(lp = this;lp!=NULL;lp=lp->next)
     {
-      if(strcmp(lp->get(), libname)==0) break;
+      if(strcmp(lp->get(), libn)==0) break;
     }
     if(lp==NULL)
     {
       libstackv ls = (libstack *)omAlloc0Bin(libstack_bin);
       ls->next = this;
-      ls->libname = omStrDup(libname);
+      ls->libname = omStrDup(libn);
       ls->to_be_done = TRUE;
       if(this != NULL) ls->cnt = this->cnt+1; else ls->cnt = 0;
       library_stack = ls;

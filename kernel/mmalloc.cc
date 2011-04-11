@@ -15,6 +15,9 @@
 /* We define those, so that our values of
    OM_TRACK and OM_CHECK are used  */
 void* operator new ( size_t size )
+#ifndef __GNUC__
+throw (std::bad_alloc)
+#endif
 {
   void* addr;
   if (size==(size_t)0) size = 1;
@@ -23,11 +26,17 @@ void* operator new ( size_t size )
 }
 
 void operator delete ( void* block )
+#ifndef __GNUC__
+throw ()
+#endif
 {
   omfree( block );
 }
 
 void* operator new[] ( size_t size )
+#ifndef __GNUC__
+throw (std::bad_alloc)
+#endif
 {
   void* addr;
   if (size==(size_t)0) size = (size_t)1;
@@ -36,6 +45,9 @@ void* operator new[] ( size_t size )
 }
 
 void operator delete[] ( void* block )
+#ifndef __GNUC__
+throw ()
+#endif
 {
   omfree( block );
 }

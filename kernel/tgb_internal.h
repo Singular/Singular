@@ -279,14 +279,14 @@ class slimgb_alg
   }
   int pTotaldegree_full(poly p)
   {
-    int r=0;
+    int rr=0;
     while(p)
     {
       int d=this->pTotaldegree(p);
-      r=si_max(r,d);
+      rr=si_max(rr,d);
       pIter(p);
     }
-    return r;
+    return rr;
   }
 };
 class red_object
@@ -377,13 +377,13 @@ class simple_reducer:public reduction_step
   kBucket_pt fill_back;
   int p_len;
   int reducer_deg;
-  simple_reducer(poly p, int p_len,int reducer_deg, slimgb_alg* c =NULL)
+  simple_reducer(poly pp, int pp_len,int pp_reducer_deg, slimgb_alg* pp_c =NULL)
   {
-    this->p=p;
-    this->reducer_deg=reducer_deg;
-    assume(p_len==pLength(p));
-    this->p_len=p_len;
-    this->c=c;
+    this->p=pp;
+    this->reducer_deg=pp_reducer_deg;
+    assume(pp_len==pLength(pp));
+    this->p_len=pp_len;
+    this->c=pp_c;
   }
   virtual void pre_reduce(red_object* r, int l, int u);
   virtual void reduce(red_object* r, int l, int u);
@@ -1502,15 +1502,16 @@ public:
   friend class ModPMatrixBackSubstProxyOnArray<number_type>;
 
   int ncols,nrows;
-  ModPMatrixProxyOnArray(number_type* array, int nrows, int ncols){
-    this->ncols=ncols;
-    this->nrows=nrows;
-    rows=(number_type**) omalloc(nrows*sizeof(number_type*));
-    startIndices=(int*)omalloc(nrows*sizeof(int));
+  ModPMatrixProxyOnArray(number_type* array, int nnrows, int nncols)
+  {
+    this->ncols=nncols;
+    this->nrows=nnrows;
+    rows=(number_type**) omalloc(nnrows*sizeof(number_type*));
+    startIndices=(int*)omalloc(nnrows*sizeof(int));
     int i;
-    for(i=0;i<nrows;i++)
+    for(i=0;i<nnrows;i++)
     {
-      rows[i]=array+(i*ncols);
+      rows[i]=array+(i*nncols);
       updateStartIndex(i,-1);
     }
   }

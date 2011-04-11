@@ -81,9 +81,9 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
   /* setting up a MinorProcessor for matrices with integer entries: */
   IntMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, intMatrix);
-  int myRowIndices[rowCount];
+  int *myRowIndices=new int[rowCount];
   for (int j = 0; j < rowCount; j++) myRowIndices[j] = j;
-  int myColumnIndices[columnCount];
+  int *myColumnIndices=new int[columnCount];
   for (int j = 0; j < columnCount; j++) myColumnIndices[j] = j;
   mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
   mp.setMinorSize(minorSize);
@@ -119,6 +119,8 @@ ideal getMinorIdeal_Int (const int* intMatrix, const int rowCount,
   if (collectedMinors == 0) jjj = idInit(1, 0);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
+  delete[] myColumnIndices;
+  delete[] myRowIndices;
   return jjj;
 }
 
@@ -134,9 +136,9 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
   /* setting up a MinorProcessor for matrices with polynomial entries: */
   PolyMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, polyMatrix);
-  int myRowIndices[rowCount];
+  int *myRowIndices=new int[rowCount];
   for (int j = 0; j < rowCount; j++) myRowIndices[j] = j;
-  int myColumnIndices[columnCount];
+  int *myColumnIndices=new int[columnCount];
   for (int j = 0; j < columnCount; j++) myColumnIndices[j] = j;
   mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
   mp.setMinorSize(minorSize);
@@ -182,6 +184,8 @@ ideal getMinorIdeal_Poly (const poly* polyMatrix, const int rowCount,
   if (collectedMinors == 0) jjj = idInit(1, 0);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
+  delete[] myColumnIndices;
+  delete[] myRowIndices;
   return jjj;
 }
 
@@ -301,9 +305,9 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
   /* setting up a MinorProcessor for matrices with integer entries: */
   IntMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, intMatrix);
-  int myRowIndices[rowCount];
+  int *myRowIndices=new int[rowCount];
   for (int j = 0; j < rowCount; j++) myRowIndices[j] = j;
-  int myColumnIndices[columnCount];
+  int *myColumnIndices=new int[columnCount];
   for (int j = 0; j < columnCount; j++) myColumnIndices[j] = j;
   mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
   mp.setMinorSize(minorSize);
@@ -341,6 +345,8 @@ ideal getMinorIdealCache_Int(const int* intMatrix, const int rowCount,
   if (collectedMinors == 0) jjj = idInit(1, 0);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
+  delete[] myColumnIndices;
+  delete[] myRowIndices;
   return jjj;
 }
 
@@ -357,9 +363,9 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
   /* setting up a MinorProcessor for matrices with polynomial entries: */
   PolyMinorProcessor mp;
   mp.defineMatrix(rowCount, columnCount, polyMatrix);
-  int myRowIndices[rowCount];
+  int *myRowIndices=new int[rowCount];
   for (int j = 0; j < rowCount; j++) myRowIndices[j] = j;
-  int myColumnIndices[columnCount];
+  int *myColumnIndices=new int[columnCount];
   for (int j = 0; j < columnCount; j++) myColumnIndices[j] = j;
   mp.defineSubMatrix(rowCount, myRowIndices, columnCount, myColumnIndices);
   mp.setMinorSize(minorSize);
@@ -407,6 +413,8 @@ ideal getMinorIdealCache_Poly(const poly* polyMatrix, const int rowCount,
   if (collectedMinors == 0) jjj = idInit(1, 0);
   else                      jjj = idCopyFirstK(iii, collectedMinors);
   idDelete(&iii);
+  delete[] myColumnIndices;
+  delete[] myRowIndices;
   return jjj;
 }
 

@@ -260,7 +260,7 @@ evalPoint (const CanonicalForm& F, ///< [in] compressed, bivariate poly
 /// NTL. If the characteristic is even special GF2 routines of NTL are used.
 ///
 /// @return @a uniFactorizer returns a list of monic factors
-inline CFList
+CFList
 uniFactorizer (const CanonicalForm& A, ///< [in] squarefree univariate poly
                const Variable& alpha,  ///< [in] algebraic variable
                const bool& GF          ///< [in] GaloisFieldDomain?

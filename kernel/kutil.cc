@@ -7004,7 +7004,7 @@ void enterOnePairManyShifts (int i, poly p, int ecart, int isFromQ, kStrategy st
   poly q, s;
 
   // for the 0th shift: insert the orig. pair
-  enterOnePairShift(qq, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, j, i, uptodeg, lV);
+  enterOnePairShift(qq, p, ecart, isFromQ, strat, -1, ecartq, qfromQ, 0, i, uptodeg, lV);
 
   for (j=1; j<= toInsert; j++)
   {

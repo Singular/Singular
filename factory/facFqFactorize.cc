@@ -741,6 +741,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     buf= reverseShift (F, evaluation);
     appendMapDown (result, buf, info, source, dest);
   }
+  delete[] v;
 
   delete [] v;
   return result;

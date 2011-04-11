@@ -61,7 +61,7 @@ static void attr_free(attr h, const ring r=currRing)
   h->data=NULL;
 }
 
-attr sattr::set(const char * s, void * data, int t)
+attr sattr::set(const char * s, void * d, int t)
 {
   attr h = get(s);
   attr result=this;
@@ -76,7 +76,7 @@ attr sattr::set(const char * s, void * data, int t)
     result=h;
   }
   h->name = s;
-  h->data = data;
+  h->data = d;
   h->atyp = t;
 #ifdef TEST
   //::Print("set attr >>%s<< of type %s\n",h->name, Tok2Cmdname(t));

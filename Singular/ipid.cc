@@ -75,28 +75,28 @@ int iiS2I(const char *s)
   return i;
 }
 
-idhdl idrec::get(const char * s, int lev)
+idhdl idrec::get(const char * s, int level)
 {
   assume(s!=NULL);
-  assume((lev>=0) && (lev<=1000)); //not really, but if it isnt in that bounds..
+  assume((level>=0) && (level<=1000)); //not really, but if it isnt in that bounds..
   idhdl h = this;
   idhdl found=NULL;
   int l;
-  const char *id;
+  const char *id_;
   int i=iiS2I(s);
   int less4=(i < (1<<24));
   while (h!=NULL)
   {
     omCheckAddr((ADDRESS)IDID(h));
     l=IDLEV(h);
-    if ((l==0)||(l==lev))
+    if ((l==0)||(l==level))
     {
       if (i==h->id_i)
       {
-        id=IDID(h);
-        if (less4 || (0 == strcmp(s+4,id+4)))
+        id_=IDID(h);
+        if (less4 || (0 == strcmp(s+4,id_+4)))
         {
-          if (l==lev) return h;
+          if (l==level) return h;
           found=h;
         }
       }
@@ -182,13 +182,13 @@ void *idrecDataInit(int t)
   }
   return (void *)0L;
 }
-idhdl idrec::set(const char * s, int lev, int t, BOOLEAN init)
+idhdl idrec::set(const char * s, int level, int t, BOOLEAN init)
 {
-  //printf("define %s, %x, lev: %d, typ: %d\n", s,s,lev,t);
+  //printf("define %s, %x, level: %d, typ: %d\n", s,s,level,t);
   idhdl h = (idrec *)omAlloc0Bin(idrec_bin);
   IDID(h)   = s;
   IDTYP(h)  = t;
-  IDLEV(h)  = lev;
+  IDLEV(h)  = level;
   IDNEXT(h) = this;
   h->id_i=iiS2I(s);
   if (init)

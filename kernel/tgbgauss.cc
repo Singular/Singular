@@ -468,8 +468,8 @@ tgb_matrix::tgb_matrix(int i, int j)
       n[z][z2]=nInit(0);
     }
   }
-  this->columns=j;
-  this->rows=i;
+  columns=j;
+  rows=i;
   free_numbers=FALSE;
 }
 
@@ -514,11 +514,11 @@ void tgb_matrix::print()
 }
 
 //transfers ownership of n to the matrix
-void tgb_matrix::set(int i, int j, number n)
+void tgb_matrix::set(int i, int j, number nn)
 {
   assume(i<rows);
   assume(j<columns);
-  this->n[i][j]=n;
+  n[i][j]=nn;
 }
 
 int tgb_matrix::get_rows()
@@ -648,8 +648,8 @@ tgb_sparse_matrix::tgb_sparse_matrix(int i, int j, ring rarg)
   {
     mp[z]=NULL;
   }
-  this->columns=j;
-  this->rows=i;
+  columns=j;
+  rows=i;
   free_numbers=FALSE;
   r=rarg;
 }
@@ -763,31 +763,31 @@ number tgb_sparse_matrix::get(int i, int j)
 {
   assume(i<rows);
   assume(j<columns);
-  mac_poly r=mp[i];
-  while((r!=NULL)&&(r->exp<j))
-    r=r->next;
-  if ((r==NULL)||(r->exp>j))
+  mac_poly rr=mp[i];
+  while((rr!=NULL)&&(rr->exp<j))
+    rr=rr->next;
+  if ((rr==NULL)||(rr->exp>j))
   {
     number n=nInit(0);
     return n;
   }
-  assume(r->exp==j);
-  return r->coef;
+  assume(rr->exp==j);
+  return rr->coef;
 }
 
 BOOLEAN tgb_sparse_matrix::is_zero_entry(int i, int j)
 {
   assume(i<rows);
   assume(j<columns);
-  mac_poly r=mp[i];
-  while((r!=NULL)&&(r->exp<j))
-    r=r->next;
-  if ((r==NULL)||(r->exp>j))
+  mac_poly rr=mp[i];
+  while((rr!=NULL)&&(rr->exp<j))
+    rr=rr->next;
+  if ((rr==NULL)||(rr->exp>j))
   {
     return TRUE;
   }
-  assume(!nIsZero(r->coef));
-  assume(r->exp==j);
+  assume(!nIsZero(rr->coef));
+  assume(rr->exp==j);
   return FALSE;
 }
 
@@ -804,13 +804,13 @@ int tgb_sparse_matrix::min_col_not_zero_in_row(int row)
 
 int tgb_sparse_matrix::next_col_not_zero(int row,int pre)
 {
-  mac_poly r=mp[row];
-  while((r!=NULL)&&(r->exp<=pre))
-    r=r->next;
-  if(r!=NULL)
+  mac_poly rr=mp[row];
+  while((rr!=NULL)&&(rr->exp<=pre))
+    rr=rr->next;
+  if(rr!=NULL)
   {
-    assume(!nIsZero(r->coef));
-    return r->exp;
+    assume(!nIsZero(rr->coef));
+    return rr->exp;
   }
   return columns;//error code
 }

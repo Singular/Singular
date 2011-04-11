@@ -798,9 +798,9 @@ fglmDdata::fglmDdata( int dimension )
     basis= (polyset)omAlloc( (dimen+1)*sizeof( poly ) );
     varpermutation = (int*)omAlloc( (pVariables+1)*sizeof(int) );
     // Sort ring variables by increasing values (because of weighted orderings)
-    ideal perm = idMaxIdeal(1);
-    intvec *iv = idSort(perm,TRUE);
-    idDelete(&perm);
+    ideal perm_id = idMaxIdeal(1);
+    intvec *iv = idSort(perm_id,TRUE);
+    idDelete(&perm_id);
     for(int i = pVariables; i > 0; i--) varpermutation[pVariables+1-i] = (*iv)[i-1];
     delete iv;
 

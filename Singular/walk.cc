@@ -2671,7 +2671,7 @@ static intvec* TranPertVector_lp(ideal G)
   mpz_init_set_ui(sing_int,  2147483647);
 
   intvec* repr_vector = new intvec(nV);
-  int ntrue;
+  int ntrue=0;
   for(i=0; i<nV; i++)
   {
     (*repr_vector)[i] = mpz_get_si(ivres[i]);
@@ -2755,7 +2755,7 @@ static intvec* RepresentationMatrix_Dp(ideal G, intvec* M)
   mpz_t sing_int;
   mpz_init_set_ui(sing_int,  2147483647);
 
-  int ntrue;
+  int ntrue=0;
   intvec* repvector = new intvec(nV);
   for(i=0; i<nV; i++)
   {

@@ -1104,8 +1104,10 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
 
   int* i_con =make_connections(i,j,lm,c);
 
-  for (int n=0;((n<c->n) && (i_con[n]>=0));n++){
-    if (i_con[n]==j){
+  for (int n=0;((n<c->n) && (i_con[n]>=0));n++)
+  {
+    if (i_con[n]==j)
+    {
       now_t_rep(i,j,c);
       omfree(i_con);
       p_Delete(&lm,c->r);
@@ -1126,38 +1128,38 @@ static void replace_pair(int & i, int & j,slimgb_alg* c)
 
   int sugar=c->pTotaldegree(lm);
   p_Delete(&lm, c->r);
-    if(c->T_deg_full)//Sugar
+  if(c->T_deg_full)//Sugar
+  {
+    int t_i=c->T_deg_full[i]-c->T_deg[i];
+    int t_j=c->T_deg_full[j]-c->T_deg[j];
+    sugar+=si_max(t_i,t_j);
+    //Print("\n max: %d\n",max(t_i,t_j));
+  }
+
+  for (int m=0;((m<c->n) && (i_con[m]>=0));m++)
+  {
+    if(c->T_deg_full!=NULL)
     {
-      int t_i=c->T_deg_full[i]-c->T_deg[i];
-      int t_j=c->T_deg_full[j]-c->T_deg[j];
-      sugar+=si_max(t_i,t_j);
-      //Print("\n max: %d\n",max(t_i,t_j));
-    }
-
-
-
-
-
-  for (int m=0;((m<c->n) && (i_con[m]>=0));m++){
-    if(c->T_deg_full!=NULL){
         int s1=c->T_deg_full[i_con[m]]+syz_deg-c->T_deg[i_con[m]];
         if (s1>sugar) continue;
     }
     if (c->weighted_lengths[i_con[m]]<c->weighted_lengths[i])
         i=i_con[m];
+  }
+  for (int m=0;((m<c->n) && (j_con[m]>=0));m++)
+  {
+    if (c->T_deg_full!=NULL)
+    {
+      int s1=c->T_deg_full[j_con[m]]+syz_deg-c->T_deg[j_con[m]];
+      if (s1>sugar) continue;
     }
-    for (int m=0;((m<c->n) && (j_con[m]>=0));m++){
-        if (c->T_deg_full!=NULL){
-        int s1=c->T_deg_full[j_con[m]]+syz_deg-c->T_deg[j_con[m]];
-        if (s1>sugar) continue;}
-        if (c->weighted_lengths[j_con[m]]<c->weighted_lengths[j])
-            j=j_con[m];
-    }
+    if (c->weighted_lengths[j_con[m]]<c->weighted_lengths[j])
+      j=j_con[m];
+  }
 
-     //can also try dependend search
+  //can also try dependend search
   omfree(i_con);
   omfree(j_con);
-  return;
 }
 
 
@@ -1209,8 +1211,8 @@ static inline void clearS (poly p, unsigned long p_sev,int l, int* at, int* k,
 
 
 
-static int iq_crit(const void* ap,const void* bp){
-
+static int iq_crit(const void* ap,const void* bp)
+{
   sorted_pair_node* a=*((sorted_pair_node**)ap);
   sorted_pair_node* b=*((sorted_pair_node**)bp);
   assume(a->i>a->j);
@@ -1536,14 +1538,12 @@ sorted_pair_node** add_to_basis_ideal_quotient(poly h, slimgb_alg* c, int* ip)
     BOOLEAN has=FALSE;
     for(upper=lower+1;upper<spc;upper++)
     {
-
       if(!pLmEqual(nodes[lower]->lcm_of_lm,nodes[upper]->lcm_of_lm))
       {
   break;
       }
       if (has_t_rep(nodes[upper]->i,nodes[upper]->j,c))
-  has=TRUE;
-
+        has=TRUE;
     }
     upper=upper-1;
     int z;
@@ -2864,11 +2864,12 @@ void slimgb_alg::introduceDelayedPairs(poly* pa,int s){
   pair_top+=s;
   omfree(si_array);
 }
-slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
-  this->deg_pos=deg_pos;
+slimgb_alg::slimgb_alg(ideal I, int ssyz_comp,BOOLEAN F4,int ddeg_pos)
+{
+  this->deg_pos=ddeg_pos;
   lastCleanedDeg=-1;
   completed=FALSE;
-  this->syz_comp=syz_comp;
+  this->syz_comp=ssyz_comp;
   r=currRing;
   nc=rIsPluralRing(r);
   this->lastDpBlockStart=get_last_dp_block_start(r);
@@ -2876,7 +2877,8 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   is_homog=TRUE;
   {
     int hzz;
-    for(hzz=0;hzz<IDELEMS(I);hzz++){
+    for(hzz=0;hzz<IDELEMS(I);hzz++)
+    {
       assume(I->m[hzz]!=NULL);
       int d=this->pTotaldegree(I->m[hzz]);
       poly t=I->m[hzz]->next;
@@ -2929,19 +2931,18 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   apairs=(sorted_pair_node**) omalloc(sizeof(sorted_pair_node*)*max_pairs);
   pair_top=-1;
 
-  int n=IDELEMS(I);
-  array_lengths=n;
-
+  int nn=IDELEMS(I);
+  array_lengths=nn;
 
   i=0;
   this->n=0;
-  T_deg=(int*) omalloc(n*sizeof(int));
+  T_deg=(int*) omalloc(nn*sizeof(int));
   if(eliminationProblem)
-    T_deg_full=(int*) omalloc(n*sizeof(int));
+    T_deg_full=(int*) omalloc(nn*sizeof(int));
   else
     T_deg_full=NULL;
-  tmp_pair_lm=(poly*) omalloc(n*sizeof(poly));
-  tmp_spn=(sorted_pair_node**) omalloc(n*sizeof(sorted_pair_node*));
+  tmp_pair_lm=(poly*) omalloc(nn*sizeof(poly));
+  tmp_spn=(sorted_pair_node**) omalloc(nn*sizeof(sorted_pair_node*));
   lm_bin=omGetSpecBin(POLYSIZE + (r->ExpL_Size)*sizeof(long));
 #ifdef HEAD_BIN
   HeadBin=omGetSpecBin(POLYSIZE + (currRing->ExpL_Size)*sizeof(long));
@@ -2950,19 +2951,19 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   #ifndef HAVE_BOOST
   #ifdef USE_STDVECBOOL
   #else
-  h=omalloc(n*sizeof(char*));
+  h=omalloc(nn*sizeof(char*));
 
   states=(char**) h;
   #endif
   #endif
   h=omalloc(n*sizeof(int));
   lengths=(int*) h;
-  weighted_lengths=(wlen_type*)omalloc(n*sizeof(wlen_type));
-  gcd_of_terms=(poly*) omalloc(n*sizeof(poly));
+  weighted_lengths=(wlen_type*)omalloc(nn*sizeof(wlen_type));
+  gcd_of_terms=(poly*) omalloc(nn*sizeof(poly));
 
-  short_Exps=(long*) omalloc(n*sizeof(long));
+  short_Exps=(long*) omalloc(nn*sizeof(long));
   if (F4_mode)
-    S=idInit(n,I->rank);
+    S=idInit(nn,I->rank);
   else
     S=idInit(1,I->rank);
   strat=new skStrategy;
@@ -2975,7 +2976,7 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   strat->tailRing=r;
   strat->enterS = enterSBba;
   strat->sl = -1;
-  i=n;
+  i=nn;
   i=1;//some strange bug else
   /* initS(c->S,NULL,c->strat); */
   /* intS start: */
@@ -2993,17 +2994,17 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   else
     strat->lenSw=NULL;
   sorted_pair_node* si;
-  assume(n>0);
+  assume(nn>0);
   add_to_basis_ideal_quotient(I->m[0],this,NULL);
 
   assume(strat->sl==IDELEMS(strat->Shdl)-1);
   if(!(F4_mode))
   {
-        poly* array_arg=I->m;
-        array_arg++;
-        introduceDelayedPairs(array_arg,n-1);
-        /*
-    for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
+    poly* array_arg=I->m;
+    array_arg++;
+    introduceDelayedPairs(array_arg,nn-1);
+    /*
+    for (i=1;i<nn;i++)//the 1 is wanted, because first element is added to basis
     {
       //     add_to_basis(I->m[i],-1,-1,c);
       si=(sorted_pair_node*) omalloc(sizeof(sorted_pair_node));
@@ -3017,14 +3018,14 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
       }
       si->lcm_of_lm=I->m[i];
 
-      //      c->apairs[n-1-i]=si;
-      apairs[n-i-1]=si;
+      //      c->apairs[nn-1-i]=si;
+      apairs[nn-i-1]=si;
       ++(pair_top);
     }*/
   }
   else
   {
-    for (i=1;i<n;i++)//the 1 is wanted, because first element is added to basis
+    for (i=1;i<nn;i++)//the 1 is wanted, because first element is added to basis
       add_to_basis_ideal_quotient(I->m[i],this,NULL);
   }
   for(i=0;i<IDELEMS(I);i++)
@@ -3036,7 +3037,8 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   #ifdef USE_NORO
   use_noro=((!(nc))&&(S->rank<=1)&&(rField_is_Zp(r)) &&(!(eliminationProblem))&&(npPrimeM<=32003));
   use_noro_last_block=false;
-  if ((!(use_noro))&&(lastDpBlockStart<=pVariables)){
+  if ((!(use_noro))&&(lastDpBlockStart<=pVariables))
+  {
       use_noro_last_block=((!(nc))&&(S->rank<=1)&&(rField_is_Zp(r)) &&(npPrimeM<=32003));
   }
   #else
@@ -3046,40 +3048,45 @@ slimgb_alg::slimgb_alg(ideal I, int syz_comp,BOOLEAN F4,int deg_pos){
   //Print("NORO last block %i",use_noro_last_block);
   memset(add_later->m,0,ADD_LATER_SIZE*sizeof(poly));
 }
-slimgb_alg::~slimgb_alg(){
-
-  if (!(completed)){
-      poly* add=(poly*) omalloc((pair_top+2)*sizeof(poly));
-      int piter;
-      int pos=0;
-      for(piter=0;piter<=pair_top;piter++){
-        sorted_pair_node* s=apairs[piter];
-        if (s->i<0){
-            //delayed element
-            if (s->lcm_of_lm!=NULL){
-                add[pos]=s->lcm_of_lm;
-                pos++;
-
-            }
+slimgb_alg::~slimgb_alg()
+{
+  if (!(completed))
+  {
+    poly* add=(poly*) omalloc((pair_top+2)*sizeof(poly));
+    int piter;
+    int pos=0;
+    for(piter=0;piter<=pair_top;piter++)
+    {
+      sorted_pair_node* s=apairs[piter];
+      if (s->i<0)
+      {
+        //delayed element
+        if (s->lcm_of_lm!=NULL)
+        {
+          add[pos]=s->lcm_of_lm;
+          pos++;
         }
+      }
 
-        free_sorted_pair_node(s,r);
-        apairs[piter]=NULL;
-      }
-      pair_top=-1;
-      add[pos]=NULL;
-      pos=0;
-      while(add[pos]!=NULL){
-        add_to_basis_ideal_quotient(add[pos],this,NULL);
-        pos++;
-      }
-      for(piter=0;piter<=pair_top;piter++){
-        sorted_pair_node* s=apairs[piter];
-        assume(s->i>=0);
-        free_sorted_pair_node(s,r);
-        apairs[piter]=NULL;
-      }
-      pair_top=-1;
+      free_sorted_pair_node(s,r);
+      apairs[piter]=NULL;
+    }
+    pair_top=-1;
+    add[pos]=NULL;
+    pos=0;
+    while(add[pos]!=NULL)
+    {
+      add_to_basis_ideal_quotient(add[pos],this,NULL);
+      pos++;
+    }
+    for(piter=0;piter<=pair_top;piter++)
+    {
+      sorted_pair_node* s=apairs[piter];
+      assume(s->i>=0);
+      free_sorted_pair_node(s,r);
+      apairs[piter]=NULL;
+    }
+    pair_top=-1;
   }
   id_Delete(&add_later,r);
   int i,j;
@@ -3093,7 +3100,8 @@ slimgb_alg::~slimgb_alg(){
   }
   while(c->F)
   {
-    for(i=0;i<c->F->size;i++){
+    for(i=0;i<c->F->size;i++)
+    {
       pDelete(&(c->F->mp[i].m));
     }
     omfree(c->F->mp);
@@ -3104,7 +3112,8 @@ slimgb_alg::~slimgb_alg(){
   }
   while(c->F_minus)
   {
-    for(i=0;i<c->F_minus->size;i++){
+    for(i=0;i<c->F_minus->size;i++)
+    {
       pDelete(&(c->F_minus->p[i]));
     }
     omfree(c->F_minus->p);
@@ -3115,7 +3124,8 @@ slimgb_alg::~slimgb_alg(){
   }
   #ifndef HAVE_BOOST
   #ifndef USE_STDVECBOOL
-  for(int z=1 /* zero length at 0 */;z<c->n;z++){
+  for(int z=1 /* zero length at 0 */;z<c->n;z++)
+  {
     omfree(c->states[z]);
   }
   omfree(c->states);
@@ -3141,15 +3151,12 @@ slimgb_alg::~slimgb_alg(){
 //   initsevS(i);
   omFree(c->strat->S_2_R);
 
-
   omFree(c->strat->lenS);
 
   if(c->strat->lenSw)  omFree(c->strat->lenSw);
 
-
-
-
-  for(i=0;i<c->n;i++){
+  for(i=0;i<c->n;i++)
+  {
     if(c->gcd_of_terms[i])
       pDelete(&(c->gcd_of_terms[i]));
   }
@@ -3165,11 +3172,14 @@ slimgb_alg::~slimgb_alg(){
   }
   int deleted_form_c_s=0;
 
-  for(i=0;i<=c->strat->sl;i++){
+  for(i=0;i<=c->strat->sl;i++)
+  {
     if (!c->strat->S[i]) continue;
     BOOLEAN found=FALSE;
-    for(j=0;j<c->n;j++){
-      if (c->S->m[j]==c->strat->S[i]){
+    for(j=0;j<c->n;j++)
+    {
+      if (c->S->m[j]==c->strat->S[i])
+      {
         found=TRUE;
         break;
       }
@@ -3189,32 +3199,32 @@ slimgb_alg::~slimgb_alg(){
 //     }
 //   }
 
-  if (completed){
-  for(i=0;i<c->n;i++)
+  if (completed)
   {
-    assume(c->S->m[i]!=NULL);
-    if (p_GetComp(c->S->m[i],currRing)>this->syz_comp) continue;
-    for(j=0;j<c->n;j++)
+    for(i=0;i<c->n;i++)
     {
-      if((c->S->m[j]==NULL)||(i==j))
-        continue;
-      assume(p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
+      assume(c->S->m[i]!=NULL);
+      if (p_GetComp(c->S->m[i],currRing)>this->syz_comp) continue;
+      for(j=0;j<c->n;j++)
+      {
+        if((c->S->m[j]==NULL)||(i==j))
+          continue;
+        assume(p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
              c->S->m[i],~c->short_Exps[i],
              c->r)==p_LmDivisibleBy(c->S->m[j],
              c->S->m[i],
              c->r));
-      if (p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
+        if (p_LmShortDivisibleBy(c->S->m[j],c->short_Exps[j],
           c->S->m[i],~c->short_Exps[i],
           c->r))
-      {
-        pDelete(&c->S->m[i]);
-        break;
+        {
+          pDelete(&c->S->m[i]);
+          break;
+        }
       }
     }
   }
-  }
   omfree(c->short_Exps);
-
 
   ideal I=c->S;
 

@@ -128,7 +128,10 @@ extern char     my_yylinebuf[80];
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#ifndef __GNUC__
+#undef __attribute__
+#define __attribute__(A)
+#endif
 
 extern void (*WerrorS_callback)(const char *s);
 

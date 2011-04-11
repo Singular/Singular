@@ -132,7 +132,7 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows,
   _containerRows = numberOfRows;
   int highestRowIndex = rowIndices[numberOfRows - 1];
   int rowBlockCount = (highestRowIndex / 32) + 1;
-  unsigned int rowBlocks[rowBlockCount];
+  unsigned int *rowBlocks=new unsigned int[rowBlockCount];
   for (int i = 0; i < rowBlockCount; i++) rowBlocks[i] = 0;
   for (int i = 0; i < numberOfRows; i++)
   {
@@ -144,7 +144,7 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows,
   _containerColumns = numberOfColumns;
   int highestColumnIndex = columnIndices[numberOfColumns - 1];
   int columnBlockCount = (highestColumnIndex / 32) + 1;
-  unsigned int columnBlocks[columnBlockCount];
+  unsigned *columnBlocks=new unsigned[columnBlockCount];
   for (int i = 0; i < columnBlockCount; i++) columnBlocks[i] = 0;
   for (int i = 0; i < numberOfColumns; i++)
   {
@@ -154,6 +154,8 @@ void MinorProcessor::defineSubMatrix(const int numberOfRows,
   }
 
   _container.set(rowBlockCount, rowBlocks, columnBlockCount, columnBlocks);
+  delete[] columnBlocks;
+  delete[] rowBlocks;
 }
 
 bool MinorProcessor::setNextKeys(const int k)
@@ -558,8 +560,8 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
 {
   assert(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
-  int theRows[k]; mk.getAbsoluteRowIndices(theRows);
-  int theColumns[k]; mk.getAbsoluteColumnIndices(theColumns);
+  int *theRows=new int[k]; mk.getAbsoluteRowIndices(theRows);
+  int *theColumns=new int[k]; mk.getAbsoluteColumnIndices(theColumns);
   /* the next line provides the return value for the case k = 1 */
   int e = getEntry(theRows[0], theColumns[0]);
   if (characteristic != 0) e = e % characteristic;
@@ -568,7 +570,7 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
   if (k > 1)
   {
     /* the matrix to perform Bareiss with */
-    long tempMatrix[k * k];
+    long *tempMatrix=new long[k * k];
     /* copy correct set of entries from _intMatrix to tempMatrix */
     int i = 0;
     for (int r = 0; r < k; r++)
@@ -581,9 +583,10 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
     /* Bareiss algorithm operating on tempMatrix which is at least 2x2 */
     int sign = 1;   /* This will store the correct sign resulting
                        from permuting the rows of tempMatrix. */
-    int rowPermutation[k];   /* This is for storing the permutation of rows
-                                resulting from searching for a non-zero
-                                pivot element. */
+    int *rowPermutation=new int[k];
+                    /* This is for storing the permutation of rows
+                       resulting from searching for a non-zero
+                       pivot element. */
     for (int i = 0; i < k; i++) rowPermutation[i] = i;
     int divisor = 1;   /* the Bareiss divisor */
     for (int r = 0; r <= k - 2; r++)
@@ -622,11 +625,15 @@ IntMinorValue IntMinorProcessor::getMinorPrivateBareiss(
           if (characteristic != 0)
             tempMatrix[e] = tempMatrix[e] % characteristic;
         }
+      delete[] rowPermutation;
+      delete[] tempMatrix;
     }
     int theValue = sign * tempMatrix[rowPermutation[k - 1] * k + k - 1];
     if (iSB != 0) theValue = getReduction(theValue, iSB);
     mv = IntMinorValue(theValue, 0, 0, 0, 0, -1, -1);
   }
+  delete [] theRows;
+  delete [] theColumns;
   return mv;
 }
 
@@ -1376,11 +1383,16 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
 {
   assert(k > 0); /* k is the minor's dimension; the minor must be at least
                     1x1 */
-  int theRows[k]; mk.getAbsoluteRowIndices(theRows);
-  int theColumns[k]; mk.getAbsoluteColumnIndices(theColumns);
+  int *theRows=new int[k]; mk.getAbsoluteRowIndices(theRows);
+  int *theColumns=new int[k]; mk.getAbsoluteColumnIndices(theColumns);
   if (k == 1)
-    return PolyMinorValue(getEntry(theRows[0], theColumns[0]),
+  {
+    PolyMinorValue tmp=PolyMinorValue(getEntry(theRows[0], theColumns[0]),
                           0, 0, 0, 0, -1, -1);
+    delete[] theColumns;
+    delete[] theRows;
+    return tmp;
+  }
   else /* k > 0 */
   {
     /* the matrix to perform Bareiss with */
@@ -1394,7 +1406,7 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
     /* Bareiss algorithm operating on tempMatrix which is at least 2x2 */
     int sign = 1; /* This will store the correct sign resulting from
                      permuting the rows of tempMatrix. */
-    int rowPermutation[k];   /* This is for storing the permutation of rows
+    int *rowPermutation=new int[k];   /* This is for storing the permutation of rows
                                 resulting from searching for a non-zero pivot
                                 element. */
     for (int i = 0; i < k; i++) rowPermutation[i] = i;
@@ -1519,6 +1531,9 @@ PolyMinorValue PolyMinorProcessor::getMinorPrivateBareiss(const int k,
     PolyMinorValue mv(result, 0, 0, 0, 0, -1, -1);
     for (int i = 0; i < k * k; i++) pDelete(&tempMatrix[i]);
     omFreeSize(tempMatrix, k * k * sizeof(poly));
+    delete[] rowPermutation;
+    delete[] theColumns;
+    delete[] theRows;
     return mv;
   }
 }
