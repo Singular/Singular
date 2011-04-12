@@ -8,6 +8,7 @@
 * ABSTRACT - all basic methods to manipulate ideals
 */
 #include <polys/monomials/ring.h>
+#include <omalloc/omalloc.h>
 
 struct sip_sideal
 {
@@ -44,6 +45,8 @@ struct sideal_list
   int nr;
 #endif
 };
+
+extern omBin sip_sideal_bin;
 
 #ifdef PDEBUG
 ideal idDBInit (int size, int rank, const char *f, int l);
@@ -89,4 +92,7 @@ static inline long id_RankFreeModule(ideal m, ring r)
 BOOLEAN id_IsModule(ideal m, ring r);
 ideal   idFreeModule (int i);
 int     idElem(const ideal F);
+int id_PosConstant(ideal id, const ring r);
+ideal id_MaxIdeal (const ring r);
+ideal id_CopyFirstK (const ideal ide, const int k,const ring r);
 #endif
