@@ -40,7 +40,7 @@ namespace
 {
 
 // poly functions defined in p_Procs: ;
-static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
+static poly ggnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
 {
   if( (p == NULL) || (m == NULL) )
     return NULL;
@@ -48,7 +48,7 @@ static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
 #if OUTPUT  
-  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_pp_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
+  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ggnc_pp_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
@@ -72,7 +72,7 @@ static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
 #if OUTPUT  
   p_Test(pResult, r);
 
-  PrintS("gnc_pp_Mult_mm(p, m) => "); p_Write(pResult, r);
+  PrintS("ggnc_pp_Mult_mm(p, m) => "); p_Write(pResult, r);
   PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
   PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
@@ -83,7 +83,7 @@ static poly gnc_pp_Mult_mm(const poly p, const poly m, const ring r, poly& last)
 
 }
 
-static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
+static poly ggnc_p_Mult_mm(poly p, const poly m, const ring r)
 {
   if( (p == NULL) || (m == NULL) )
   {
@@ -94,7 +94,7 @@ static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
   assume( (p != NULL) && (m != NULL) && (r != NULL) );
 
 #if OUTPUT  
-  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_p_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
+  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ggnc_p_Mult_mm(p, m) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("p: ");
   p_Write(p, r);    
@@ -121,7 +121,7 @@ static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
 #if OUTPUT  
   p_Test(pResult, r);
 
-  PrintS("gnc_p_Mult_mm(p, m) => "); p_Write(pResult, r);      
+  PrintS("ggnc_p_Mult_mm(p, m) => "); p_Write(pResult, r);      
 //  PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
   PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
@@ -132,7 +132,7 @@ static poly gnc_p_Mult_mm(poly p, const poly m, const ring r)
 
 }
 
-static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
+static poly ggnc_mm_Mult_p(const poly m, poly p, const ring r)
 {
   if( (p == NULL) || (m == NULL) )
   {
@@ -146,7 +146,7 @@ static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
   p_Test(p, r);
 
 #if OUTPUT  
-  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_mm_Mult_p(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
+  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ggnc_mm_Mult_p(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("m: "); p_Write(m, r);      
   PrintS("p: "); p_Write(p, r);    
@@ -171,7 +171,7 @@ static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
 #if OUTPUT  
   p_Test(pResult, r);
 
-  PrintS("gnc_mm_Mult_p(m, p) => "); p_Write(pResult, r);      
+  PrintS("ggnc_mm_Mult_p(m, p) => "); p_Write(pResult, r);      
 //  PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
   PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
@@ -181,7 +181,7 @@ static poly gnc_mm_Mult_p(const poly m, poly p, const ring r)
   return pResult;
 }
 
-static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
+static poly ggnc_mm_Mult_pp(const poly m, const poly p, const ring r)
 {
   if( (p == NULL) || (m == NULL) )
   {
@@ -194,7 +194,7 @@ static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
   p_Test(p, r);
   
 #if OUTPUT  
-  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV gnc_mm_Mult_pp(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
+  PrintS("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ggnc_mm_Mult_pp(m, p) VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV ");
   PrintLn();
   PrintS("m: "); p_Write(m, r);      
   PrintS("p: "); p_Write(p, r);    
@@ -219,7 +219,7 @@ static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
 #if OUTPUT  
   p_Test(pResult, r);
 
-  PrintS("gnc_mm_Mult_pp(m, p) => "); p_Write(pResult, r);      
+  PrintS("ggnc_mm_Mult_pp(m, p) => "); p_Write(pResult, r);      
   PrintS("p: "); p_Write(p, r);    
   PrintS("m: "); p_Write(m, r);      
   PrintS("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ");
@@ -229,10 +229,10 @@ static poly gnc_mm_Mult_pp(const poly m, const poly p, const ring r)
   return pResult;
 }
 
-static void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
+static void ggnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
 {
 #if OUTPUT  
-  PrintS("|gnc_p_ProcsSet()");
+  PrintS("|ggnc_p_ProcsSet()");
   PrintLn();
 #endif
 
@@ -240,14 +240,14 @@ static void gnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
     p_Procs = rGR->p_Procs;
   
   // "commutative"
-  p_Procs->p_Mult_mm  = rGR->p_Procs->p_Mult_mm  = gnc_p_Mult_mm;
-  p_Procs->pp_Mult_mm = rGR->p_Procs->pp_Mult_mm = gnc_pp_Mult_mm;
+  p_Procs->p_Mult_mm  = rGR->p_Procs->p_Mult_mm  = ggnc_p_Mult_mm;
+  p_Procs->pp_Mult_mm = rGR->p_Procs->pp_Mult_mm = ggnc_pp_Mult_mm;
 
   p_Procs->p_Minus_mm_Mult_qq = rGR->p_Procs->p_Minus_mm_Mult_qq = NULL;
 
   // non-commutaitve multiplication by monomial from the left
-  rGR->GetNC()->p_Procs.mm_Mult_p   = gnc_mm_Mult_p;
-  rGR->GetNC()->p_Procs.mm_Mult_pp  = gnc_mm_Mult_pp;
+  rGR->GetNC()->p_Procs.mm_Mult_p   = ggnc_mm_Mult_p;
+  rGR->GetNC()->p_Procs.mm_Mult_pp  = ggnc_mm_Mult_pp;
 
 }
 
@@ -272,7 +272,7 @@ bool ncInitSpecialPairMultiplication(ring r)
 
   r->GetNC()->GetGlobalMultiplier() = new CGlobalMultiplier(r);
 
-  gnc_p_ProcsSet(r);
+  ggnc_p_ProcsSet(r);
   return true;
 }
 
@@ -407,7 +407,7 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
 
     if( PairType == _ncSA_notImplemented )
       product = m_powers->MultiplyEE( CPower(j, ej), CPower(i, ei) );
-//    return gnc_uu_Mult_ww_vert(i, a, j, b, r);
+//    return ggnc_uu_Mult_ww_vert(i, a, j, b, r);
     else
  //    return m_RingFormulaMultiplier->Multiply(j, i, b, a);
       product = CFormulaPowerMultiplier::Multiply( PairType, i, j, ei, ej, GetBasering());
