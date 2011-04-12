@@ -3562,11 +3562,13 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_ls:
         rO_LexVars_neg(j, j_bits, r->block0[i],r->block1[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
+        r->OrdSgn=-1;
         break;
 
       case ringorder_rs:
         rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
+        r->OrdSgn=-1;
         break;
 
       case ringorder_rp:
@@ -3620,6 +3622,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i]+1,
                          prev_ordsgn,tmp_ordsgn,v,bits, r->block0[i]);
         }
+        r->OrdSgn=-1;
         break;
 
       case ringorder_Ds:
@@ -3636,6 +3639,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars(j, j_bits, r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
         }
+        r->OrdSgn=-1;
         break;
 
       case ringorder_wp:
@@ -3697,6 +3701,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
                          tmp_ordsgn, v,bits, r->block0[i]);
         }
+        r->OrdSgn=-1;
         break;
 
       case ringorder_Ws:
@@ -3708,6 +3713,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars(j, j_bits,r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
         }
+        r->OrdSgn=-1;
         break;
 
       case ringorder_S:
