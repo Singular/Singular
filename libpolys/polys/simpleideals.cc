@@ -344,12 +344,12 @@ void id_DelDiv(ideal id, const ring r)
 /*2
 *test if the ideal has only constant polynomials
 */
-BOOLEAN idIsConstant(ideal id)
+BOOLEAN id_IsConstant(ideal id, const ri ng r)
 {
   int k;
   for (k = IDELEMS(id)-1; k>=0; k--)
   {
-    if (pIsConstantPoly(id->m[k]) == FALSE)
+    if (!p_IsConstantPoly(id->m[k],r))
       return FALSE;
   }
   return TRUE;
