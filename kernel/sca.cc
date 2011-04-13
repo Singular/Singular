@@ -1729,8 +1729,16 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
 #undef HAVE_TAIL_RING
 
 #ifdef HAVE_TAIL_RING
-  kStratInitChangeTailRing(strat);
+  if(!idIs0(F) &&(!rField_is_Ring()))  // create strong gcd poly computes with tailring and S[i] ->to be fixed
+    kStratInitChangeTailRing(strat);
 #endif
+  if (BVERBOSE(23))
+  {
+    if (test_PosInT!=NULL) strat->posInT=test_PosInT;
+    if (test_PosInL!=NULL) strat->posInL=test_PosInL;
+    kDebugPrint(strat);
+  }
+  
 
   ///////////////////////////////////////////////////////////////
   // SCA:
@@ -1767,6 +1775,7 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
               if( p_new == NULL) continue;
 
               LObject h(p_new); // h = x_i * strat->P
+              h.is_special = TRUE;
 
               if (TEST_OPT_INTSTRATEGY)
                 h.pCleardenom(); // also does a p_Content
@@ -1803,17 +1812,28 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
         && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
             || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))))
     {
+
+#ifdef KDEBUG
+//      if (TEST_OPT_DEBUG){PrintS("^^^^?");}
+#endif
+
       /*
        *stops computation if
        * 24 IN test and the degree +ecart of L[strat->Ll] is bigger then
        *a predefined number Kstd1_deg
        */
       while ((strat->Ll >= 0)
-  && (strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)
+        && ( (strat->homog==isHomog) || strat->L[strat->Ll].is_special || ((strat->L[strat->Ll].p1!=NULL) && (strat->L[strat->Ll].p2!=NULL)) )
         && ((strat->honey && (strat->L[strat->Ll].ecart+pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg))
             || ((!strat->honey) && (pFDeg(strat->L[strat->Ll].p,currRing)>Kstd1_deg)))
-  )
+            )
+      {
+#ifdef KDEBUG
+//        if (TEST_OPT_DEBUG){PrintS("^^^^^^^^^^^^!!!!");}
+#endif
         deleteInL(strat->L,&strat->Ll,strat->Ll,strat);
+//        if (TEST_OPT_PROT) PrintS("^!");
+      }
       if (strat->Ll<0) break;
       else strat->noClearS=TRUE;
     }
@@ -1948,6 +1968,8 @@ ideal sca_bba (const ideal F, const ideal Q, const intvec *w, const intvec * /*h
         if( p_new == NULL) continue;
 
         LObject h(p_new); // h = x_i * strat->P
+
+        h.is_special = TRUE;
 
         if (TEST_OPT_INTSTRATEGY)
         {

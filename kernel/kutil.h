@@ -75,6 +75,10 @@ public:
     i_r;        // index of TObject in R set, or -1 if not in T
   BOOLEAN is_normalized; // true, if pNorm was called on p, false otherwise
 
+#ifdef HAVE_PLURAL  
+  BOOLEAN is_special; // true, it is a new special S-poly (e.g. for SCA)
+#endif
+  
   // initialization
   KINLINE void Init(ring r = currRing);
   KINLINE sTObject(ring tailRing = currRing);
