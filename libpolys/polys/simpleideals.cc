@@ -429,34 +429,34 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r)
 /*3
 * for idSort: compare a and b revlex inclusive module comp.
 */
-static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring r)
+static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring R)
 {
   if (b==NULL) return 1;
   if (a==NULL) return -1;
 
   if (nolex)
   {
-    int r=p_LmCmp(a,b,r);
+    int r=p_LmCmp(a,b,R);
     if (r!=0) return r;
-    number h=n_Sub(pGetCoeff(a),pGetCoeff(b),r->cf);
-    r = -1+n_IsZero(h,r->cf)+2*n_GreaterZero(h,r->cf); /* -1: <, 0:==, 1: > */
-    n_Delete(&h, r->cf);
+    number h=n_Sub(pGetCoeff(a),pGetCoeff(b),R->cf);
+    r = -1+n_IsZero(h,R->cf)+2*n_GreaterZero(h,R->cf); /* -1: <, 0:==, 1: > */
+    n_Delete(&h, R->cf);
     return r;
   }
-  int l=rVar(r);
-  while ((l>0) && (p_GetExp(a,l,r)==pGetExp(b,l,r))) l--;
+  int l=rVar(R);
+  while ((l>0) && (p_GetExp(a,l,R)==p_GetExp(b,l,R))) l--;
   if (l==0)
   {
-    if (p_GetComp(a,r)==p_GetComp(b,r))
+    if (p_GetComp(a,R)==p_GetComp(b,R))
     {
-      number h=n_Sub(pGetCoeff(a),pGetCoeff(b),r->cf);
-      int r = -1+n_IsZero(h,r->cf)+2*n_GreaterZero(h,r->cf); /* -1: <, 0:==, 1: > */
-      n_Delete(&h,r->cf);
+      number h=n_Sub(pGetCoeff(a),pGetCoeff(b),R->cf);
+      int r = -1+n_IsZero(h,R->cf)+2*n_GreaterZero(h,R->cf); /* -1: <, 0:==, 1: > */
+      n_Delete(&h,R->cf);
       return r;
     }
-    if (p_GetComp(a,r)>p_GetComp(b,r)) return 1;
+    if (p_GetComp(a,R)>p_GetComp(b,R)) return 1;
   }
-  else if (p_GetExp(a,l,r)>p_GetExp(b,l,r))
+  else if (p_GetExp(a,l,R)>p_GetExp(b,l,R))
     return 1;
   return -1;
 }
