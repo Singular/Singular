@@ -70,10 +70,11 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r);
 // #define id_Print(A, r) ((void)0)
 #endif
 
-ideal id_Copy (ideal h1,const ring r);
 #ifdef PDEBUG
 ideal id_DBCopy(ideal h1,const char *f,int l, const ring r);
 #define id_Copy(A,R) id_DBCopy(A,__FILE__,__LINE__,R)
+#else
+ideal id_Copy (ideal h1,const ring r);
 #endif
   /*adds two ideals without simplifying the result*/
 ideal idSimpleAdd (ideal h1,ideal h2);
@@ -98,5 +99,6 @@ void id_DelEquals(ideal id, const ring r);
 void id_DelLmEquals(ideal id, const ring r);
 void id_DelDiv(ideal id, const ring r);
 BOOLEAN id_IsConstant(ideal id, const ring r);
+intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r);
 
 #endif
