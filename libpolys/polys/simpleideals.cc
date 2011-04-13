@@ -279,7 +279,7 @@ void id_DelLmEquals(ideal id, const ring r)
         if ((id->m[j] != NULL)
         && p_LmEqual(id->m[i], id->m[j],r)
 #ifdef HAVE_RINGS
-        && n_IsUnit(pGetCoeff(id->m[i],r->cf)) && n_IsUnit(pGetCoeff(id->m[j]),r->cf)
+        && n_IsUnit(pGetCoeff(id->m[i]),r->cf) && n_IsUnit(pGetCoeff(id->m[j]),r->cf)
 #endif
         )
         {
