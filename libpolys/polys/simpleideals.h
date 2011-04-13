@@ -101,4 +101,7 @@ void id_DelDiv(ideal id, const ring r);
 BOOLEAN id_IsConstant(ideal id, const ring r);
 intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r);
 
+
+int     binom (int n,int r);
+
 #endif
