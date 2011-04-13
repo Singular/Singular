@@ -67,6 +67,13 @@
  *
  ***************************************************************/
 unsigned long p_GetShortExpVector(poly a, ring r);
+/* divisibility check over ground ring (which may contain zero divisors);
+   TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
+   coefficient c and some monomial m;
+   does not take components into account */
+#ifdef HAVE_RINGS
+BOOLEAN p_DivisibleByRingCase(poly f, poly g, const ring r);
+#endif
 
 /***************************************************************
  *

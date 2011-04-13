@@ -1401,6 +1401,20 @@ poly p_DivideM(poly a, poly b, const ring r)
   return result;
 }
 
+#ifdef HAVE_RINGS
+/* TRUE iff LT(f) | LT(g) */
+BOOLEAN p_DivisibleByRingCase(poly f, poly g, const ring r)
+{
+  int exponent;
+  for(int i = (int)rVar(r); i>0; i--)
+  {
+    exponent = p_GetExp(g, i, r) - p_GetExp(f, i, r);
+    if (exponent < 0) return FALSE;
+  }
+  return n_DivBy(pGetCoeff(g), pGetCoeff(f), r->cf);
+}
+#endif
+
 /*2
 * returns the LCM of the head terms of a and b in *m
 */
