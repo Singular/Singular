@@ -56,7 +56,6 @@ ideal idDBInit (int size, int rank, const char *f, int l);
 ideal idInit (int size, int rank=1);
 #endif
 /*- deletes an ideal -*/
-#define idDelete(h) id_Delete(h, currRing)
 void id_Delete (ideal* h, ring r);
 void id_ShallowDelete (ideal* h, ring r);
 void idSkipZeroes (ideal ide);
@@ -73,10 +72,8 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r);
 
 ideal id_Copy (ideal h1,const ring r);
 #ifdef PDEBUG
-ideal idDBCopy(ideal h1,const char *f,int l);
-#define idCopy(A) idDBCopy(A,__FILE__,__LINE__)
-#else
-#define idCopy(A) id_Copy(A,currRing)
+ideal id_DBCopy(ideal h1,const char *f,int l, const ring r);
+#define id_Copy(A,R) id_DBCopy(A,__FILE__,__LINE__,R)
 #endif
   /*adds two ideals without simplifying the result*/
 ideal idSimpleAdd (ideal h1,ideal h2);
@@ -100,7 +97,6 @@ void id_Norm(ideal id, const ring r);
 void id_DelEquals(ideal id, const ring r);
 void id_DelLmEquals(ideal id, const ring r);
 void id_DelDiv(ideal id, const ring r);
-BOOLEAN id_IsConstant(ideal id, const ri ng r);
-
+BOOLEAN id_IsConstant(ideal id, const ring r);
 
 #endif
