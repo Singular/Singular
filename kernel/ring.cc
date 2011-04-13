@@ -3481,6 +3481,8 @@ static void rSetOption(ring r)
     r->options |= Sy_bit(OPT_REDTAIL);
 }
 
+static void rCheckOrdSgn(ring r,int i/*current block*/);
+
 BOOLEAN rComplete(ring r, int force)
 {
   if (r->VarOffset!=NULL && force == 0) return FALSE;
@@ -3562,13 +3564,13 @@ BOOLEAN rComplete(ring r, int force)
       case ringorder_ls:
         rO_LexVars_neg(j, j_bits, r->block0[i],r->block1[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
-        r->OrdSgn=-1;
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_rs:
         rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i], prev_ordsgn,
                        tmp_ordsgn,v, bits, -1);
-        r->OrdSgn=-1;
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_rp:
@@ -3622,7 +3624,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars_neg(j, j_bits, r->block1[i],r->block0[i]+1,
                          prev_ordsgn,tmp_ordsgn,v,bits, r->block0[i]);
         }
-        r->OrdSgn=-1;
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_Ds:
@@ -3639,7 +3641,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars(j, j_bits, r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
         }
-        r->OrdSgn=-1;
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_wp:
@@ -3672,11 +3674,11 @@ BOOLEAN rComplete(ring r, int force)
                    tmp_typ[typ_i], r->wvhdl[i]);
         typ_i++;
         { // check for weights <=0
-          int j;
+          int jj;
           BOOLEAN have_bad_weights=FALSE;
-          for(j=r->block1[i]-r->block0[i];j>=0; j--)
+          for(jj=r->block1[i]-r->block0[i];jj>=0; jj--)
           {
-            if (r->wvhdl[i][j]<=0) have_bad_weights=TRUE;
+            if (r->wvhdl[i][jj]<=0) have_bad_weights=TRUE;
           }
           if (have_bad_weights)
           {
@@ -3701,7 +3703,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars_neg(j, j_bits,r->block1[i],r->block0[i]+1, prev_ordsgn,
                          tmp_ordsgn, v,bits, r->block0[i]);
         }
-        r->OrdSgn=-1;
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_Ws:
@@ -3713,7 +3715,7 @@ BOOLEAN rComplete(ring r, int force)
           rO_LexVars(j, j_bits,r->block0[i],r->block1[i]-1, prev_ordsgn,
                      tmp_ordsgn,v, bits, r->block1[i]);
         }
-        r->OrdSgn=-1;
+        rCheckOrdSgn(r,i);
         break;
 
       case ringorder_S:
@@ -3874,6 +3876,22 @@ BOOLEAN rComplete(ring r, int force)
   r->p_Procs = (p_Procs_s*)omAlloc(sizeof(p_Procs_s));
   p_ProcsSet(r, r->p_Procs);
   return FALSE;
+}
+
+static void rCheckOrdSgn(ring r,int i/*current block*/)
+{ // set r->OrdSgn
+  int oo=-1;
+  int jj;
+  for(jj=i-1;jj>=0;jj--)
+  {
+    if(((r->order[jj]=ringorder_a)
+      ||(r->order[jj]=ringorder_aa)
+      ||(r->order[jj]=ringorder_a64))
+    &&(r->block0[jj]<=r->block0[i])
+    &&(r->block1[jj]>=r->block1[i]))
+    { oo=1; break;}
+  }
+  r->OrdSgn=oo;
 }
 
 void rUnComplete(ring r)
