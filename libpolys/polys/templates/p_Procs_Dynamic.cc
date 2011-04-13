@@ -220,7 +220,7 @@ while(0)
 #define DoSetProc DoReallySetProc
 #endif
 
-
-#include <polys/p_Procs_Set.h>
+#include "templates/p_Procs_Set.h"
 
 #endif
+
