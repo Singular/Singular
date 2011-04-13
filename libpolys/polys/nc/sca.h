@@ -15,14 +15,14 @@ inline ideal SCAQuotient(const ring r)
 
 
 
-inline unsigned int scaFirstAltVar(ring r)
+static inline unsigned int scaFirstAltVar(ring r)
 {
   assume(rIsSCA(r));
 
   return (r->GetNC()->FirstAltVar());
 }
 
-inline unsigned int scaLastAltVar(ring r)
+static inline unsigned int scaLastAltVar(ring r)
 {
   assume(rIsSCA(r));
 
@@ -31,14 +31,14 @@ inline unsigned int scaLastAltVar(ring r)
 
 
 // The following inlines are just helpers for setup functions.
-inline void scaFirstAltVar(ring r, int n)
+static inline void scaFirstAltVar(ring r, int n)
 {
   assume(rIsSCA(r));
 
   r->GetNC()->FirstAltVar() = n;
 }
 
-inline void scaLastAltVar(ring r, int n)
+static inline void scaLastAltVar(ring r, int n)
 {
   assume(rIsSCA(r));
 
