@@ -13,7 +13,7 @@
  *  Created: 12/00
  *  Version: $Id$
  *******************************************************************/
-#include <polys/modulop.h>
+#include <coeffs/modulop.h>
 
 #ifdef HAVE_PLURAL
 // for nc_p_ProcsSet:
