@@ -13,6 +13,7 @@
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <polys/monomials/p_polys.h>
+#include <misc/intvec.h>
 
 #include "simpleideals.h"
 
@@ -203,7 +204,7 @@ void idNorm(ideal id)
 * ideal id = (id[i]), c any unit
 * if id[i] = c*id[j] then id[j] is deleted for j > i
 */
-void idDelMultiples(ideal id)
+void id_DelMultiples(ideal id, const ring r)
 {
   int i, j;
   int k = IDELEMS(id)-1;
@@ -216,21 +217,21 @@ void idDelMultiples(ideal id)
         if (id->m[j]!=NULL)
         {
 #ifdef HAVE_RINGS
-          if (rField_is_Ring(currRing))
+          if (rField_is_Ring(r))
           {
             /* if id[j] = c*id[i] then delete id[j].
                In the below cases of a ground field, we
                check whether id[i] = c*id[j] and, if so,
                delete id[j] for historical reasons (so
                that previous output does not change) */
-            if (pComparePolys(id->m[j], id->m[i])) pDelete(&id->m[j]);
+            if (p_ComparePolys(id->m[j], id->m[i],r)) p_Delete(&id->m[j],r);
           }
           else
           {
-            if (pComparePolys(id->m[i], id->m[j])) pDelete(&id->m[j]);
+            if (p_ComparePolys(id->m[i], id->m[j],r)) p_Delete(&id->m[j],r);
           }
 #else
-          if (pComparePolys(id->m[i], id->m[j])) pDelete(&id->m[j]);
+          if (p_ComparePolys(id->m[i], id->m[j],r)) p_Delete(&id->m[j],r);
 #endif          
         }
       }
