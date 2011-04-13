@@ -93,7 +93,7 @@ CXXSOURCES=clapconv.cc \
     clapsing.cc \
     febase.cc feread.cc feResource.cc \
     ffields.cc hdegree.cc hilb.cc hutil.cc \
-    sca.cc gring.cc gr_kstd2.cc summator.cc ncSAMult.cc ncSACache.cc ncSAFormula.cc \
+    sca.cc gring.cc gr_kstd2.cc summator.cc ncSAMult.cc ncSAFormula.cc \
     ideals.cc intvec.cc int64vec.cc \
     khstd.cc kstdfac.cc \
     kstd1.cc kstd2.cc kutil.cc \

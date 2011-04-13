@@ -229,7 +229,7 @@ static poly ggnc_mm_Mult_pp(const poly m, const poly p, const ring r)
   return pResult;
 }
 
-static void ggnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs = NULL)
+static void ggnc_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 {
 #if OUTPUT  
   PrintS("|ggnc_p_ProcsSet()");
@@ -272,7 +272,7 @@ bool ncInitSpecialPairMultiplication(ring r)
 
   r->GetNC()->GetGlobalMultiplier() = new CGlobalMultiplier(r);
 
-  ggnc_p_ProcsSet(r);
+  ggnc_p_ProcsSet(r, NULL);
   return true;
 }
 
@@ -285,7 +285,7 @@ CGlobalMultiplier::CGlobalMultiplier(ring r):
   PrintLn();
 #endif
 
-  m_cache = new CGlobalCacheHash(r);
+//  m_cache = new CGlobalCacheHash(r);
   m_powers = new CPowerMultiplier(r);
 }
 
@@ -297,7 +297,7 @@ CGlobalMultiplier::~CGlobalMultiplier()
   PrintLn();
 #endif
 
-  delete m_cache;
+//  delete m_cache;
   delete m_powers;
 
   // we cannot delete m_RingFormulaMultiplier as it belongs to the ring!
@@ -319,13 +319,13 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
   PrintS("expR: "); p_Write(expRight, GetBasering());    
 #endif
 
-  CCacheHash<poly>::CCacheItem* pLookup;
-  
-  int b = m_cache->LookupEE(expLeft, expRight, pLookup);
-  // TODO!!!
-
-  // up to now:
-  assume( b == -1 );
+//  CCacheHash<poly>::CCacheItem* pLookup;
+//  
+//  int b = m_cache->LookupEE(expLeft, expRight, pLookup);
+//  // TODO!!!
+//
+//  // up to now:
+//  assume( b == -1 );
 
   // TODO: use PowerMultiplier!!!!
 
@@ -468,11 +468,10 @@ poly CGlobalMultiplier::MultiplyEE(const CGlobalMultiplier::CExponent expLeft, c
 
   }
 
-  // TODO!      
-  
-
-  m_cache->StoreEE( expLeft, expRight, product);
-  // up to now:
+//  // TODO!      
+//
+//  m_cache->StoreEE( expLeft, expRight, product);
+//  // up to now:
   return product; 
 }
 

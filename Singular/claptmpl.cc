@@ -200,15 +200,15 @@ template    static  void    print_rational( OSTREAM&,int,const Rational& );
 
 #ifdef HAVE_PLURAL
 
-#include <kernel/ncSACache.h> // for CCacheHash etc classes
 #include <kernel/ncSAMult.h> // for CMultiplier etc classes
 
 template class CMultiplier<int>;
 template class CMultiplier<poly>;
 template class CMultiplier<CPower>;
 
-template class CCacheHash<poly>;
-template class CCacheHash<int>;
+// #include <kernel/ncSACache.h> // for CCacheHash etc classes
+// template class CCacheHash<poly>;
+// template class CCacheHash<int>;
 
 #endif
 

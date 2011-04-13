@@ -15,7 +15,7 @@
 #include <kernel/p_polys.h>
 #include <kernel/p_Mult_q.h>
 
-#include <kernel/ncSACache.h> // for CCacheHash etc classes
+// #include <kernel/ncSACache.h> // for CCacheHash etc classes
 #include <kernel/ncSAFormula.h> // for CFormulaPowerMultiplier and enum Enum_ncSAType
 
 // //////////////////////////////////////////////////////////////////////// //
@@ -266,7 +266,7 @@ class CPowerMultiplier: public CMultiplier<CPower>
 class CGlobalMultiplier: public CMultiplier<poly>
 {
   private:
-    CGlobalCacheHash* m_cache;
+//    CGlobalCacheHash* m_cache;
     CPowerMultiplier* m_powers;
     const CFormulaPowerMultiplier* m_RingFormulaMultiplier;
 

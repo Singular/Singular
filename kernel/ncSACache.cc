@@ -26,14 +26,16 @@
 #define OUTPUT 0
 #endif
 
+namespace 
+{
+  static char* m_Typenames[2] = {"lookup", "store"};
+}
 
+#include <kernel/ring.h>
+#include <kernel/p_polys.h>
 
-#include <ncSACache.h> // for CCacheHash etc classes
+#include <kernel/ncSACache.h> // for CCacheHash etc classes
 
-#include <ring.h>
-#include <p_polys.h>
-
-static const char* m_Typenames[2] = {"lookup", "store"};
 
 void CGlobalCacheHash::History(const EHistoryType t, const CGlobalCacheHash::CExponent a, const CGlobalCacheHash::CExponent b, const poly p)
 {
