@@ -3050,7 +3050,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
       return TRUE;
     }
   }
-  if (( CCC != NULL) && (CC == NULL)) CC = CCC; // mpCopy(CCC); // bug!?
+  if (( CCC != NULL) && (CC == NULL)) CC = CCC; // mp_Copy(CCC, ?); // bug!?
   if (( CCN != NULL) && (CN == NULL)) CN = CCN;
 
   // check D
@@ -3070,7 +3070,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
     }
   }
 
-  if (( DDD != NULL) && (DD == NULL)) DD = DDD; // mpCopy(DDD); // ???
+  if (( DDD != NULL) && (DD == NULL)) DD = DDD; // mp_Copy(DDD, ?); // ???
   if (( DDN != NULL) && (DN == NULL)) DN = DDN;
 
   // further checks and some analysis:
@@ -3141,7 +3141,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
     if( bCopyInput )
     {
-      C = mpCopy(CC, curr, r); // Copy C into r!!!???
+      C = mp_Copy(CC, curr, r); // Copy C into r!!!???
 #ifndef NDEBUG
       id_Test((ideal)C, r);
 #endif
@@ -3200,7 +3200,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 
     if( bCopyInput )
     {
-      D = mpCopy(DD, curr, r); // Copy DD into r!!!
+      D = mp_Copy(DD, curr, r); // Copy DD into r!!!
 #ifndef NDEBUG
       id_Test((ideal)D, r);
 #endif
@@ -3227,8 +3227,8 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   // check the ordering condition for D (both matrix and poly cases):
   if ( gnc_CheckOrdCondition(D, r) )
   {
-    if( bCnew ) mpDelete( &C, r );
-    if( bDnew ) mpDelete( &D, r );
+    if( bCnew ) mp_Delete( &C, r );
+    if( bDnew ) mp_Delete( &D, r );
 
     Werror("Matrix of polynomials violates the ordering condition");
 

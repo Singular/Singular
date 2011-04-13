@@ -5612,8 +5612,8 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
     //WarnS("Error transferring non-commutative structure");
     // error message should be in the interpreter interface
 
-    mpDelete(&C, dest);
-    mpDelete(&D, dest);
+    mp_Delete(&C, dest);
+    mp_Delete(&D, dest);
 
 //    if (currRing != save)
 //       rChangeCurrRing(save);
@@ -5621,8 +5621,8 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
     return TRUE;
   }
 
-//  mpDelete(&C, dest); // used by nc_CallPlural!
-//  mpDelete(&D, dest);
+//  mp_Delete(&C, dest); // used by nc_CallPlural!
+//  mp_Delete(&D, dest);
 
 //  if (dest != save)
 //    rChangeCurrRing(save);

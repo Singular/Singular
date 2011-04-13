@@ -89,10 +89,8 @@ matrix mpNew(int r, int c)
   return rc;
 }
 
-/*2
-*copies matrix a to b
-*/
-matrix mpCopy (matrix a)
+/// copies matrix a to b
+matrix mpCopy (matrix a, const ring r)
 {
   idTest((ideal)a);
   poly t;
