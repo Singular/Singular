@@ -243,7 +243,7 @@ void id_DelMultiples(ideal id, const ring r)
 * ideal id = (id[i])
 * if id[i] = id[j] then id[j] is deleted for j > i
 */
-void idDelEquals(ideal id)
+void id_DelEquals(ideal id, const ring r)
 {
   int i, j;
   int k = IDELEMS(id)-1;
@@ -254,9 +254,9 @@ void idDelEquals(ideal id)
       for (j=k; j>i; j--)
       {
         if ((id->m[j]!=NULL)
-        && (pEqualPolys(id->m[i], id->m[j])))
+        && (p_EqualPolys(id->m[i], id->m[j],r)))
         {
-          pDelete(&id->m[j]);
+          p_Delete(&id->m[j],r);
         }
       }
     }
