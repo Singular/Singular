@@ -11,6 +11,7 @@ AC_MSG_CHECKING(whether system supports dynamic modules)
 AS_CASE([$host],
   [*linux-gnu], [SUPPORTS_DYNAMIC_MODULES=yes],
   [*-sun-solaris2*], [SUPPORTS_DYNAMIC_MODULES=yes],
+  [*-apple-darwin*], [SUPPORTS_DYNAMIC_MODULES=yes],
   [SUPPORTS_DYNAMIC_MODULES=no]
 )
 AC_MSG_RESULT($SUPPORTS_DYNAMIC_MODULES)
