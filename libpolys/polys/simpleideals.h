@@ -96,5 +96,5 @@ int id_PosConstant(ideal id, const ring r);
 ideal id_MaxIdeal (const ring r);
 ideal id_CopyFirstK (const ideal ide, const int k,const ring r);
 void id_DelMultiples(ideal id, const ring r);
-
+void id_Norm(ideal id, const ring r);
 #endif

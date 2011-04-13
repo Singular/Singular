@@ -189,13 +189,13 @@ ideal id_CopyFirstK (const ideal ide, const int k,const ring r)
 * ideal id = (id[i])
 * result is leadcoeff(id[i]) = 1
 */
-void idNorm(ideal id)
+void id_Norm(ideal id, const ring r)
 {
   for (int i=IDELEMS(id)-1; i>=0; i--)
   {
     if (id->m[i] != NULL)
     {
-      pNorm(id->m[i]);
+      p_Norm(id->m[i],r);
     }
   }
 }
