@@ -134,7 +134,7 @@ static inline void pLmFree(poly *p)   {p_LmFree(p, currRing);}
    TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
    coefficient c and some monomial m;
    does not take components into account */
-BOOLEAN pDivisibleByRingCase(poly f, poly g);
+#define  pDivisibleByRingCase(f,g) p_DivisibleByRingCase(f,g,currRing)
 #endif
 
 /***************************************************************

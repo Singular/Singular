@@ -232,7 +232,7 @@ void id_DelMultiples(ideal id, const ring r)
           }
 #else
           if (p_ComparePolys(id->m[i], id->m[j],r)) p_Delete(&id->m[j],r);
-#endif          
+#endif    
         }
       }
     }
@@ -294,7 +294,7 @@ void id_DelLmEquals(ideal id, const ring r)
 // delete id[j], if LT(j) == coeff*mon*LT(i) and vice versa, i.e.,
 // delete id[i], if LT(i) == coeff*mon*LT(j)
 //
-void idDelDiv(ideal id)
+void id_DelDiv(ideal id, const ring r)
 {
   int i, j;
   int k = IDELEMS(id)-1;
@@ -307,34 +307,34 @@ void idDelDiv(ideal id)
         if (id->m[j]!=NULL)
         {
 #ifdef HAVE_RINGS
-          if (rField_is_Ring(currRing))
+          if (rField_is_Ring(r))
           {
-            if (pDivisibleByRingCase(id->m[i], id->m[j]))
+            if (p_DivisibleByRingCase(id->m[i], id->m[j],r))
             {
-              pDelete(&id->m[j]);
+              p_Delete(&id->m[j],r);
             }
-            else if (pDivisibleByRingCase(id->m[j], id->m[i]))
-          {
-            pDelete(&id->m[i]);
-            break;
-          }
+            else if (p_DivisibleByRingCase(id->m[j], id->m[i],r))
+            {
+              p_Delete(&id->m[i],r);
+              break;
+            }
           }
           else
           {
 #endif
           /* the case of a ground field: */
-          if (pDivisibleBy(id->m[i], id->m[j]))
+          if (p_DivisibleBy(id->m[i], id->m[j],r))
           {
-            pDelete(&id->m[j]);
+            p_Delete(&id->m[j],r);
           }
-          else if (pDivisibleBy(id->m[j], id->m[i]))
+          else if (p_DivisibleBy(id->m[j], id->m[i],r))
           {
-            pDelete(&id->m[i]);
+            p_Delete(&id->m[i],r);
             break;
           }
 #ifdef HAVE_RINGS
           }
-#endif          
+#endif    
         }
       }
     }
@@ -412,7 +412,7 @@ static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring r)
   if (b==NULL) return 1;
   if (a==NULL) return -1;
 
-  if (nolex) 
+  if (nolex)
   {
     int r=pLmCmp(a,b);
     if (r!=0) return r;
@@ -1080,7 +1080,7 @@ ideal idSectWithElim (ideal h1,ideal h2)
   // eliminate t:
 
   ideal res=idElimination(h,t);
-  // cleanup 
+  // cleanup
   idDelete(&h);
   res=idrMoveR(res,r,origRing);
   rChangeCurrRing(origRing);
