@@ -1,7 +1,7 @@
 LIB "tst.lib";
 tst_init();
 
-LIB "assprimeszerodim.lib"
+LIB "assprimeszerodim.lib";
 
 ring R1 = 0,x(1..6),dp;
 ideal I = cyclic(6);
