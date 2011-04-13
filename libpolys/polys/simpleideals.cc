@@ -402,7 +402,7 @@ ideal id_Copy(ideal h1, const ring r)
 #endif
 
 #ifdef PDEBUG
-void idDBTest(ideal h1, int level, const char *f,const int l)
+void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r)
 {
   int i;
 
@@ -413,8 +413,8 @@ void idDBTest(ideal h1, int level, const char *f,const int l)
     omdebugAddrSize(h1->m,h1->ncols*h1->nrows*sizeof(poly));
     /* to be able to test matrices: */
     for (i=(h1->ncols*h1->nrows)-1; i>=0; i--)
-      _p_Test(h1->m[i], currRing, level);
-    int new_rk=idRankFreeModule(h1);
+      _p_Test(h1->m[i], r, level);
+    int new_rk=id_RankFreeModule(h1,r);
     if(new_rk > h1->rank)
     {
       dReportError("wrong rank %d (should be %d) in %s:%d\n",
@@ -436,27 +436,27 @@ static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring r)
 
   if (nolex)
   {
-    int r=pLmCmp(a,b);
+    int r=p_LmCmp(a,b,r);
     if (r!=0) return r;
-    number h=nSub(pGetCoeff(a),pGetCoeff(b));
-    r = -1+nIsZero(h)+2*nGreaterZero(h); /* -1: <, 0:==, 1: > */
-    nDelete(&h);
+    number h=n_Sub(pGetCoeff(a),pGetCoeff(b),r->cf);
+    r = -1+n_IsZero(h,r->cf)+2*n_GreaterZero(h,r->cf); /* -1: <, 0:==, 1: > */
+    n_Delete(&h, r->cf);
     return r;
   }
   int l=rVar(r);
-  while ((l>0) && (pGetExp(a,l)==pGetExp(b,l))) l--;
+  while ((l>0) && (p_GetExp(a,l,r)==pGetExp(b,l,r))) l--;
   if (l==0)
   {
-    if (pGetComp(a)==pGetComp(b))
+    if (p_GetComp(a,r)==p_GetComp(b,r))
     {
-      number h=nSub(pGetCoeff(a),pGetCoeff(b));
-      int r = -1+nIsZero(h)+2*nGreaterZero(h); /* -1: <, 0:==, 1: > */
-      nDelete(&h);
+      number h=n_Sub(pGetCoeff(a),pGetCoeff(b),r->cf);
+      int r = -1+n_IsZero(h,r->cf)+2*n_GreaterZero(h,r->cf); /* -1: <, 0:==, 1: > */
+      n_Delete(&h,r->cf);
       return r;
     }
-    if (pGetComp(a)>pGetComp(b)) return 1;
+    if (p_GetComp(a,r)>p_GetComp(b,r)) return 1;
   }
-  else if (pGetExp(a,l)>pGetExp(b,l))
+  else if (p_GetExp(a,l,r)>p_GetExp(b,l,r))
     return 1;
   return -1;
 }
@@ -465,7 +465,7 @@ static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring r)
 *sorts the ideal w.r.t. the actual ringordering
 *uses lex-ordering when nolex = FALSE
 */
-intvec *idSort(ideal id,BOOLEAN nolex)
+intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r)
 {
   poly p,q;
   intvec * result = new intvec(IDELEMS(id));
@@ -481,7 +481,7 @@ intvec *idSort(ideal id,BOOLEAN nolex)
       newpos = actpos / 2;
       diff = (actpos+1) / 2;
       diff = (diff+1) / 2;
-      lastcomp = pComp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex);
+      lastcomp = p_Comp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex,r);
       if (lastcomp<0)
       {
         newpos -= diff;
@@ -497,7 +497,7 @@ intvec *idSort(ideal id,BOOLEAN nolex)
       //while ((newpos>=0) && (newpos<actpos) && (notFound))
       while (notFound && (newpos>=0) && (newpos<actpos))
       {
-        newcomp = pComp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex);
+        newcomp = p_Comp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex,r);
         olddiff = diff;
         if (diff>1)
         {
@@ -544,7 +544,7 @@ intvec *idSort(ideal id,BOOLEAN nolex)
       }
       if (newpos<0) newpos = 0;
       if (newpos>actpos) newpos = actpos;
-      while ((newpos<actpos) && (pComp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex)==0))
+      while ((newpos<actpos) && (p_Comp_RevLex(id->m[i],id->m[(*result)[newpos]],nolex,r)==0))
         newpos++;
       for (j=actpos;j>newpos;j--)
       {
