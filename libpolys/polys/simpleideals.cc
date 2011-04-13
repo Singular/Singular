@@ -266,7 +266,7 @@ void id_DelEquals(ideal id, const ring r)
 //
 // Delete id[j], if Lm(j) == Lm(i) and both LC(j), LC(i) are units and j > i
 //
-void idDelLmEquals(ideal id)
+void id_DelLmEquals(ideal id, const ring r)
 {
   int i, j;
   int k = IDELEMS(id)-1;
@@ -277,13 +277,13 @@ void idDelLmEquals(ideal id)
       for (j=k; j>i; j--)
       {
         if ((id->m[j] != NULL)
-        && pLmEqual(id->m[i], id->m[j])
+        && p_LmEqual(id->m[i], id->m[j],r)
 #ifdef HAVE_RINGS
-        && nIsUnit(pGetCoeff(id->m[i])) && nIsUnit(pGetCoeff(id->m[j]))
+        && n_IsUnit(pGetCoeff(id->m[i],r->cf)) && n_IsUnit(pGetCoeff(id->m[j]),r->cf)
 #endif
         )
         {
-          pDelete(&id->m[j]);
+          p_Delete(&id->m[j],r);
         }
       }
     }
