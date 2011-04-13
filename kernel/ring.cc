@@ -3882,18 +3882,21 @@ BOOLEAN rComplete(ring r, int force)
 
 static void rCheckOrdSgn(ring r,int i/*current block*/)
 { // set r->OrdSgn
-  int oo=-1;
-  int jj;
-  for(jj=i-1;jj>=0;jj--)
+  if ( r->OrdSgn==1)
   {
-    if(((r->order[jj]==ringorder_a)
-      ||(r->order[jj]==ringorder_aa)
-      ||(r->order[jj]==ringorder_a64))
-    &&(r->block0[jj]<=r->block0[i])
-    &&(r->block1[jj]>=r->block1[i]))
-    { oo=1; break;}
+    int oo=-1;
+    int jj;
+    for(jj=i-1;jj>=0;jj--)
+    {
+      if(((r->order[jj]==ringorder_a)
+        ||(r->order[jj]==ringorder_aa)
+        ||(r->order[jj]==ringorder_a64))
+      &&(r->block0[jj]<=r->block0[i])
+      &&(r->block1[jj]>=r->block1[i]))
+      { oo=1; break;}
+    }
+    r->OrdSgn=oo;
   }
-  r->OrdSgn=oo;
 }
 
 
