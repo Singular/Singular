@@ -645,7 +645,7 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
           MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
         }
       }
-      p = mpDetBareiss(tmp);
+      p = mp_DetBareiss(tmp, R);
       if ((k+l) & 1) p=p_Neg(p, R);
       MATELEM(result,l,k) = p;
       k++;
@@ -660,7 +660,7 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
   {
     for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
   }
-  idDelete((ideal *) &tmp);
+  id_Delete((ideal *) &tmp, R);
   return (result);
 }
 
@@ -772,7 +772,7 @@ void   mp_Monomials(matrix c, int r, int var, matrix m, const ring R)
       MATELEM(m,k,k*(p+1)-l)=p_Copy(h, R);
     }
   }
-  p_Delete(&h), R;
+  p_Delete(&h, R);
 }
 
 matrix mp_CoeffProc (poly f, poly vars, const ring R)
@@ -790,10 +790,11 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
     MATELEM(co,2,1) = NULL;
     return co;
   }
-  sel = mpSelect(f, vars);
+  sel = mp_Select(f, vars, R);
   l = pLength(sel);
   co = mpNew(2, l);
-  if (pOrdSgn==-1)
+  
+  if (rHasLocalOrMixedOrdering(R))
   {
     for (i=l; i>=1; i--)
     {
@@ -802,7 +803,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
       pNext(h)=NULL;
       MATELEM(co,1,i) = h;
       MATELEM(co,2,i) = NULL;
-      if (pIsConstant(h)) pos_of_1 = i;
+      if (p_IsConstant(h, R)) pos_of_1 = i;
     }
   }
   else
@@ -814,7 +815,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
       pNext(h)=NULL;
       MATELEM(co,1,i) = h;
       MATELEM(co,2,i) = NULL;
-      if (pIsConstant(h)) pos_of_1 = i;
+      if (p_IsConstant(h, R)) pos_of_1 = i;
     }
   }
   while (f!=NULL)
@@ -824,7 +825,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
     {
       if (i!=pos_of_1)
       {
-        h = mpExdiv(f, MATELEM(co,1,i),vars);
+        h = mp_Exdiv(f, MATELEM(co,1,i),vars, R);
         if (h!=NULL)
         {
           MATELEM(co,2,i) = p_Add_q(MATELEM(co,2,i), h, R);
@@ -836,7 +837,7 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
         // check monom 1 last:
         if (pos_of_1 != -1)
         {
-          h = mpExdiv(f, MATELEM(co,1,pos_of_1),vars);
+          h = mp_Exdiv(f, MATELEM(co,1,pos_of_1),vars, R);
           if (h!=NULL)
           {
             MATELEM(co,2,pos_of_1) = p_Add_q(MATELEM(co,2,pos_of_1), h, R);
@@ -859,12 +860,12 @@ matrix mp_CoeffProc (poly f, poly vars, const ring R)
 static poly mp_Exdiv ( poly m, poly d, poly vars, const ring _R)
 {
   int i;
-  poly h = pHead(m);
-  for (i=1; i<=pVariables; i++)
+  poly h = p_Head(m, _R);
+  for (i=1; i<=rVar(_R); i++)
   {
-    if (pGetExp(vars,i) > 0)
+    if (p_GetExp(vars,i, _R) > 0)
     {
-      if (pGetExp(d,i) != pGetExp(h,i))
+      if (p_GetExp(d,i, _R) != p_GetExp(h,i, _R))
       {
         p_Delete(&h, _R);
         return NULL;
@@ -882,9 +883,9 @@ void mp_Coef2(poly v, poly mon, matrix *c, matrix *m, const ring _R)
   poly p;
   int sl,i,j;
   int l=0;
-  poly sel=mpSelect(v,mon);
+  poly sel=mp_Select(v,mon, _R);
 
-  pVec2Polys(sel,&s,&sl);
+  p_Vec2Polys(sel,&s,&sl, _R);
   for (i=0; i<sl; i++)
     l=si_max(l,pLength(s[i]));
   *c=mpNew(sl,l);
@@ -894,7 +895,7 @@ void mp_Coef2(poly v, poly mon, matrix *c, matrix *m, const ring _R)
   for (j=1; j<=sl;j++)
   {
     p=s[j-1];
-    if (pIsConstant(p)) /*p != NULL */
+    if (p_IsConstant(p, _R)) /*p != NULL */
     {
       isConst=-1;
       i=l;
@@ -906,7 +907,7 @@ void mp_Coef2(poly v, poly mon, matrix *c, matrix *m, const ring _R)
     }
     while(p!=NULL)
     {
-      h = pHead(p);
+      h = p_Head(p, _R);
       MATELEM(*m,j,i) = h;
       i+=isConst;
       p = p->next;
@@ -915,13 +916,13 @@ void mp_Coef2(poly v, poly mon, matrix *c, matrix *m, const ring _R)
   while (v!=NULL)
   {
     i = 1;
-    j = pGetComp(v);
+    j = p_GetComp(v, _R);
     loop
     {
       poly mp=MATELEM(*m,j,i);
       if (mp!=NULL)
       {
-        h = mpExdiv(v, mp /*MATELEM(*m,j,i)*/, mp);
+        h = mp_Exdiv(v, mp /*MATELEM(*m,j,i)*/, mp, _R);
         if (h!=NULL)
         {
           p_SetComp(h,0, _R);
@@ -1021,7 +1022,7 @@ mp_permmatrix::mp_permmatrix(mp_permmatrix *M)
       p = aM[M->qcol[j]];
       if (p)
       {
-        athis[j] = pCopy(p);
+        athis[j] = p_Copy(p, _R);
       }
     }
   }
@@ -1096,7 +1097,7 @@ void mp_permmatrix::mpElimBareiss(poly div)
           if (a[jj] != NULL)
           {
             q1 = SM_MULT(a[jj], piv, div);
-            p_Delete(&a[jj]), _R;
+            p_Delete(&a[jj], _R);
             q2 = p_Add_q(q2, q1, _R);
           }
         }
@@ -1532,7 +1533,7 @@ static poly mp_Leibnitz(matrix a, const ring _R)
       if (z[0] > 0)
         d = p_Add_q(d, p, _R);
       else
-        d = p_Sub_q(d, p, _R);
+        d = p_Sub(d, p, _R);
     }
   }
   return d;
@@ -1565,7 +1566,7 @@ static poly p_Insert(poly p1, poly p2, const ring R)
   a = p  = p_One(R);
   loop
   {
-    c = pCmp(a1, a2);
+    c = p_Cmp(a1, a2, R);
     if (c == 1)
     {
       a = pNext(a) = a1;
@@ -1588,7 +1589,7 @@ static poly p_Insert(poly p1, poly p2, const ring R)
     }
     else
     {
-      pLmDelete(&a2);
+      p_LmDelete(&a2, R);
       a = pNext(a) = a1;
       pIter(a1);
       if (a1==NULL)
@@ -1603,7 +1604,7 @@ static poly p_Insert(poly p1, poly p2, const ring R)
       }
     }
   }
-  pLmDelete(&p);
+  p_LmDelete(&p, R);
   return p;
 }
 
@@ -1619,7 +1620,7 @@ static poly mp_Select (poly fro, poly what, const ring _R)
   while (fro!=NULL)
   {
     h = p_One(_R);
-    for (i=1; i<=pVariables; i++)
+    for (i=1; i<=rVar(_R); i++)
       p_SetExp(h,i, p_GetExp(fro,i, _R) * p_GetExp(what, i, _R), _R);
     p_SetComp(h, p_GetComp(fro, _R), _R);
     p_Setm(h, _R);
@@ -1760,7 +1761,7 @@ static float mp_PolyWeight(poly p, const ring _R)
   if (pNext(p) == NULL)
   {
     res = (float)n_Size(p_GetCoeff(p, _R), _R);
-    for (i=pVariables;i>0;i--)
+    for (i=rVar(_R);i>0;i--)
     {
       if(p_GetExp(p,i, _R)!=0)
       {
@@ -1786,7 +1787,8 @@ static void mpSwapRow(matrix a, int pos, int lr, int lc)
 {
   poly sw;
   int j;
-  poly* a2 = a->m, a1 = &a2[a->ncols*(pos-1)];
+  poly* a2 = a->m;
+  poly* a1 = &a2[a->ncols*(pos-1)];
 
   a2 = &a2[a->ncols*(lr-1)];
   for (j=lc-1; j>=0; j--)
@@ -1801,7 +1803,8 @@ static void mpSwapCol(matrix a, int pos, int lr, int lc)
 {
   poly sw;
   int j;
-  poly* a2 = a->m, a1 = &a2[pos-1];
+  poly* a2 = a->m;
+  poly* a1 = &a2[pos-1];
 
   a2 = &a2[lc-1];
   for (j=a->ncols*(lr-1); j>=0; j-=a->ncols)
@@ -1907,7 +1910,7 @@ void iiWriteMatrix(matrix im, const char *n, int dim, const ring r, int spaces)
   }
 }
 
-char * iiStringMatrix(matrix im, int dim, , const ring r, char ch)
+char * iiStringMatrix(matrix im, int dim, const ring r, char ch)
 {
   int i,ii = MATROWS(im);
   int j,jj = MATCOLS(im);

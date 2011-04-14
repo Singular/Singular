@@ -66,7 +66,8 @@
  * pDivisbleBy
  *
  ***************************************************************/
-unsigned long p_GetShortExpVector(poly a, ring r);
+unsigned long p_GetShortExpVector(poly a, const ring r);
+
 /* divisibility check over ground ring (which may contain zero divisors);
    TRUE iff LT(f) divides LT(g), i.e., LT(f)*c*m = LT(g), for some
    coefficient c and some monomial m;
@@ -88,7 +89,7 @@ int p_MinDeg(poly p,intvec *w, const ring R);
 long p_DegW(poly p, const short *w, const ring R);
 
 // return TRUE if all monoms have the same component
-BOOLEAN   p_OneComp(poly p, ring r);
+BOOLEAN   p_OneComp(poly p, const ring r);
 
 // return i, if head depends only on var(i)
 int       p_IsPurePower(const poly p, const ring r);
@@ -101,10 +102,13 @@ int       p_IsUnivariate(poly p, const ring r);
 int      p_GetVariables(poly p, int * e, const ring r);
 
 // returns the poly representing the integer i
-poly      p_ISet(int i, ring r);
+poly      p_ISet(int i, const ring r);
 
 // returns the poly representing the number n, destroys n
-poly      p_NSet(number n, ring r);
+poly      p_NSet(number n, const ring r);
+
+/// TODO: the following procedure got lost... and is not defined anywhere!
+void  p_Vec2Polys(poly v, poly**p, int *len, const ring r);
 
 /***************************************************************
  *

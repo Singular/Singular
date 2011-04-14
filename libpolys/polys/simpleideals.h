@@ -104,4 +104,9 @@ intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r);
 
 int     binom (int n,int r);
 
+  /*- verschiebt die Indizes der Modulerzeugenden um i -*/
+void    idInitChoise (int r,int beg,int end,BOOLEAN *endch,int * choise);
+void    idGetNextChoise (int r,int end,BOOLEAN *endch,int * choise);
+int     idGetNumberOfChoise(int t, int d, int begin, int end, int * choise);
+
 #endif
