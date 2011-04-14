@@ -11,7 +11,7 @@
 
 // WARNING! ALWAYS use omAlloc and FreeL when alloc. memory for some char* !!
 
-#include <coeffs/config.h>
+#include "config.h"
 //#ifdef HAVE_MPR
 #include <coeffs/coeffs.h>
 #include <reporter/reporter.h>

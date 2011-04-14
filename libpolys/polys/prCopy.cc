@@ -6,7 +6,7 @@
 * ABSTRACT - implementation of functions for Copy/Move/Delete for Polys
 */
 
-#include "polys/config.h"
+#include "config.h"
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>

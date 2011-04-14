@@ -9,7 +9,7 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#include "polys/config.h"
+#include "config.h"
 // #include <polys/structs.h>
 
 // Use buckets if min(pLength(p), pLength(q)) >= MIN_LENGTH_BUCKET

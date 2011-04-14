@@ -8,7 +8,7 @@
 * ngf == number gnu floats
 */
 
-#include <coeffs/config.h>
+#include "config.h"
 #include <coeffs/coeffs.h>
 #include <omalloc/omalloc.h>
 #include <reporter/reporter.h>

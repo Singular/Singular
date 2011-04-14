@@ -6,7 +6,7 @@
 * ABSTRACT: numbers modulo 2^m
 */
 
-#include <coeffs/config.h>
+#include "config.h"
 #include <misc/auxiliary.h>
 
 #ifdef HAVE_RINGS

@@ -8,7 +8,7 @@
  *  Created: 8/00
  *  Version: $Id$
  *******************************************************************/
-#include "polys/config.h"
+#include "config.h"
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 #include <polys/operations/pShallowCopyDelete.h>

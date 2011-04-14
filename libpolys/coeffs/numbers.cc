@@ -7,7 +7,7 @@
 * ABSTRACT: interface to coefficient aritmetics
 */
 
-#include <coeffs/config.h>
+#include "config.h"
 #include <misc/auxiliary.h>
 
 

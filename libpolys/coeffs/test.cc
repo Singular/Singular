@@ -1,4 +1,4 @@
-#include <coeffs/config.h>
+#include "config.h"
 
 #include <misc/auxiliary.h>
 
