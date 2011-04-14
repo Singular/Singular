@@ -651,7 +651,7 @@ ideal id_Add (ideal h1,ideal h2, const ring r)
 /*2
 * h1 * h2
 */
-ideal  idMult (ideal h1,ideal  h2)
+ideal  id_Mult (ideal h1,ideal  h2, const ring r)
 {
   int i,j,k;
   ideal  hh;
@@ -679,14 +679,14 @@ ideal  idMult (ideal h1,ideal  h2)
       {
         if (h2->m[j] != NULL)
         {
-          hh->m[k] = ppMult_qq(h1->m[i],h2->m[j]);
+          hh->m[k] = pp_Mult_qq(h1->m[i],h2->m[j],r);
           k++;
         }
       }
     }
   }
   {
-    idCompactify(hh);
+    id_Compactify(hh,r);
     return hh;
   }
 }
@@ -757,7 +757,7 @@ BOOLEAN idIsModule(ideal id, ring r)
 /*2
 *returns true if id is homogenous with respect to the aktual weights
 */
-BOOLEAN idHomIdeal (ideal id, ideal Q)
+BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r)
 {
   int i;
   BOOLEAN     b;
@@ -766,7 +766,7 @@ BOOLEAN idHomIdeal (ideal id, ideal Q)
   b = TRUE;
   while ((i < IDELEMS(id)) && b)
   {
-    b = pIsHomogeneous(id->m[i]);
+    b = p_IsHomogeneous(id->m[i],r);
     i++;
   }
   if ((b) && (Q!=NULL) && (IDELEMS(Q)>0))
@@ -774,7 +774,7 @@ BOOLEAN idHomIdeal (ideal id, ideal Q)
     i=0;
     while ((i < IDELEMS(Q)) && b)
     {
-      b = pIsHomogeneous(Q->m[i]);
+      b = p_IsHomogeneous(Q->m[i],r);
       i++;
     }
   }
@@ -784,7 +784,7 @@ BOOLEAN idHomIdeal (ideal id, ideal Q)
 /*2
 *the minimal index of used variables - 1
 */
-int pLowVar (poly p)
+int p_LowVar (poly p, const ring r)
 {
   int k,l,lex;
 
@@ -794,11 +794,11 @@ int pLowVar (poly p)
   while (p != NULL)
   {
     l = 1;
-    lex = pGetExp(p,l);
-    while ((l < pVariables) && (lex == 0))
+    lex = p_GetExp(p,l,r);
+    while ((l < rVar(r)) && (lex == 0))
     {
       l++;
-      lex = pGetExp(p,l);
+      lex = p_GetExp(p,l,r);
     }
     l--;
     if (l < k) k = l;
@@ -812,7 +812,7 @@ int pLowVar (poly p)
 *the index of t is:1, so we have to shift all variables
 *p is NOT in the actual ring, it has no t
 */
-static poly pMultWithT (poly p,BOOLEAN cas)
+static poly p_MultWithT (poly p,BOOLEAN cas, const ring r)
 {
   /*qp is the working pointer in p*/
   /*result is the result, qresult is the working pointer*/
@@ -831,45 +831,45 @@ static poly pMultWithT (poly p,BOOLEAN cas)
     i = 0;
     if (result == NULL)
     {/*first monomial*/
-      result = pInit();
+      result = p_Init(r);
       qresult = result;
     }
     else
     {
-      qresult->next = pInit();
+      qresult->next = p_Init(r);
       pIter(qresult);
     }
-    for (j=pVariables-1; j>0; j--)
+    for (j=rVar(r)-1; j>0; j--)
     {
-      lex = pGetExp(qp,j);
-      pSetExp(qresult,j+1,lex);/*copy all variables*/
+      lex = p_GetExp(qp,j,r);
+      p_SetExp(qresult,j+1,lex,r);/*copy all variables*/
     }
-    lex = pGetComp(qp);
-    pSetComp(qresult,lex);
-    n=nCopy(pGetCoeff(qp));
+    lex = p_GetComp(qp,r);
+    p_SetComp(qresult,lex,r);
+    n=n_Copy(pGetCoeff(qp),r->cf);
     pSetCoeff0(qresult,n);
     qresult->next = NULL;
-    pSetm(qresult);
+    p_Setm(qresult,r);
     /*qresult is now qp brought into the actual ring*/
     if (cas)
     { /*case: mult with t-1*/
-      pSetExp(qresult,1,0);
-      pSetm(qresult);
+      p_SetExp(qresult,1,0,r);
+      p_Setm(qresult,r);
       if (pp == NULL)
       { /*first monomial*/
-        pp = pCopy(qresult);
+        pp = p_Copy(qresult,r);
         qpp = pp;
       }
       else
       {
-        qpp->next = pCopy(qresult);
+        qpp->next = p_Copy(qresult,r);
         pIter(qpp);
       }
-      pGetCoeff(qpp)=nNeg(pGetCoeff(qpp));
+      pGetCoeff(qpp)=n_Neg(pGetCoeff(qpp),r->cf);
       /*now qpp contains -1*qp*/
     }
-    pSetExp(qresult,1,1);/*this is mult. by t*/
-    pSetm(qresult);
+    p_SetExp(qresult,1,1,r);/*this is mult. by t*/
+    p_Setm(qresult,r);
     pIter(qp);
   }
   /*
@@ -1164,7 +1164,7 @@ static void makemonoms(int vars,int actvar,int deg,int monomdeg)
 /*2
 *returns the deg-th power of the maximal ideal of 0
 */
-ideal idMaxIdeal(int deg)
+ideal id_MaxIdeal(int deg, const ring r)
 {
   if (deg < 0)
   {
@@ -1178,10 +1178,10 @@ ideal idMaxIdeal(int deg)
   }
   if (deg == 1)
   {
-    return idMaxIdeal();
+    return idMaxIdeal(r);
   }
 
-  int vars = currRing->N;
+  int vars = rVar(r);
   int i = binom(vars+deg-1,deg);
   if (i<=0) return idInit(1,1);
   ideal id=idInit(i,1);
@@ -1965,7 +1965,7 @@ ideal idJetW(ideal i,int d, intvec * iv)
     {
       r->m[k]=ppJetW(i->m[k],d,w);
     }
-    omFreeSize((ADDRESS)w,(pVariables+1)*sizeof(short));
+    omFreeSize((ADDRESS)w,(rVar(r)+1)*sizeof(short));
   }
   return r;
 }
@@ -2082,7 +2082,7 @@ int idIndexOfKBase(poly monom, ideal kbase)
 
   while ((j>0) && (kbase->m[j-1]==NULL)) j--;
   if (j==0) return -1;
-  int i=pVariables;
+  int i=rVar(r);
   while (i>0)
   {
     loop
@@ -2117,7 +2117,7 @@ poly idDecompose(poly monom, poly how, ideal kbase, int * pos)
   int i;
   poly coeff=p_One(r), base=p_One(r);
 
-  for (i=1;i<=pVariables;i++)
+  for (i=1;i<=rVar(r);i++)
   {
     if (pGetExp(how,i)>0)
     {
@@ -2339,7 +2339,7 @@ intvec * idQHomWeight(ideal id)
   poly head, tail;
   int k;
   int in=IDELEMS(id)-1, ready=0, all=0,
-      coldim=pVariables, rowmax=2*coldim;
+      coldim=rVar(r), rowmax=2*coldim;
   if (in<0) return NULL;
   intvec *imat=new intvec(rowmax+1,coldim,0);
 
@@ -2383,7 +2383,7 @@ intvec * idQHomWeight(ideal id)
 
 BOOLEAN idIsZeroDim(ideal I)
 {
-  BOOLEAN *UsedAxis=(BOOLEAN *)omAlloc0(pVariables*sizeof(BOOLEAN));
+  BOOLEAN *UsedAxis=(BOOLEAN *)omAlloc0(rVar(r)*sizeof(BOOLEAN));
   int i,n;
   poly po;
   BOOLEAN res=TRUE;
@@ -2392,11 +2392,11 @@ BOOLEAN idIsZeroDim(ideal I)
     po=I->m[i];
     if ((po!=NULL) &&((n=pIsPurePower(po))!=0)) UsedAxis[n-1]=TRUE;
   }
-  for(i=pVariables-1;i>=0;i--)
+  for(i=rVar(r)-1;i>=0;i--)
   {
     if(UsedAxis[i]==FALSE) {res=FALSE; break;} // not zero-dim.
   }
-  omFreeSize(UsedAxis,pVariables*sizeof(BOOLEAN));
+  omFreeSize(UsedAxis,rVar(r)*sizeof(BOOLEAN));
   return res;
 }
 
@@ -2415,7 +2415,7 @@ void id_Normalize(ideal I,const ring r)
 #ifdef HAVE_FACTORY
 poly id_GCD(poly f, poly g, const ring r)
 {
-  ring save_r=currRing;
+  ring save_r=r;
   rChangeCurrRing(r);
   ideal I=idInit(2,1); I->m[0]=f; I->m[1]=g;
   intvec *w = NULL;
@@ -2438,7 +2438,7 @@ poly id_GCD(poly f, poly g, const ring r)
 * destroys xx
 */
 #ifdef HAVE_FACTORY
-ideal idChineseRemainder(ideal *xx, number *q, int rl)
+ideal idChineseRemainder(ideal *xx, number *q, int rl, const ring r)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
   ideal result=idInit(cnt,xx[0]->rank);
@@ -2472,7 +2472,7 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl)
           xx[j]->m[i]=hh;
         }
         else
-          x[j]=nlInit(0, currRing);
+          x[j]=nlInit(0, r);
       }
       number n=nlChineseRemainder(x,q,rl);
       for(j=rl-1;j>=0;j--)
