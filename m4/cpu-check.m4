@@ -1,35 +1,15 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
+# Check the cpu type
 
-AC_PREREQ([2.65])
-AC_INIT([misc], [3.1.2.sw])
-AM_INIT_AUTOMAKE
-AC_CONFIG_SRCDIR([mylimits.h])
-AC_CONFIG_HEADERS([config.h])
+dnl SING_CHECK_CPU
+dnl
+dnl check the cpu and define EXEC_EXT and SI_CPU*
 
-# Checks for programs.
-AC_PROG_CC
-AC_PROG_CXX
-AC_PROG_LN_S
-AC_PROG_INSTALL
-AC_PROG_RANLIB
-AM_PROG_CC_C_O
-
-# Checks for libraries.
-
-# Checks for header files.
-AC_CHECK_HEADERS([limits.h])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_C_INLINE
-
+AC_DEFUN([SING_CHECK_CPU],
+[
 # Checks for library functions.
 AC_MSG_CHECKING(CPU for singular)
 
-# check for cpu properties:
-AC_CHECK_SIZEOF(long,4)
-
-# UNAME and PATH
+# CPUUNAME and PATH
 ac_cv_singcpuname=`uname -m`
 AC_MSG_RESULT($ac_cv_singcpuname)
 
@@ -85,5 +65,15 @@ if test "$ac_cv_singcpuname" = ppc; then
   AC_SUBST(SI_CPU_PPC)
 fi
 
-AC_CONFIG_FILES([Makefile])
-AC_OUTPUT
+# UNAME and PATH
+AC_MSG_CHECKING(uname for Singular)
+
+#ac_cv_singuname=`singuname.sh`
+AC_MSG_RESULT($ac_cv_singuname)
+if test "$ac_cv_singuname" = unknown; then
+  AC_MSG_WARN(Unknown architecture: Check singuname.sh)
+  ac_cv_singuname="unknown"
+fi
+AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname", Singular's own uname\, believe it or not)
+
+])

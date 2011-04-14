@@ -1,14 +1,44 @@
 AC_INIT([singular], [3.1.2.sw])
 AM_INIT_AUTOMAKE
 AC_CONFIG_MACRO_DIR([../m4])
+AC_CONFIG_SRCDIR([reporter/reporter.h])
+AC_CONFIG_HEADER([config.h])
 
-AC_PROG_CC
+# misc/auxiliary.h
+
+# Checks for programs.
 AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_LN_S
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+AM_PROG_CC_C_O
 
 # Checks for libraries.
 LB_CHECK_GMP(,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h limits.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+
+SING_CHECK_PIPE
+
+# Checks for library functions.
+AC_FUNC_VPRINTF
+AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1],
+                               [Define if vsnprintf exists.])])
+# check for cpu properties
+AC_CHECK_SIZEOF(long,4)
+SING_CHECK_CPU
+
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([misc/Makefile])
+AC_CONFIG_FILES([reporter/Makefile])
+AC_CONFIG_FILES([resources/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_SUBDIRS([misc reporter resources coeffs polys])
+AC_CONFIG_SUBDIRS([coeffs polys])
 AC_OUTPUT

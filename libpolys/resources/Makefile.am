@@ -12,7 +12,7 @@ libresources_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${
 libresources_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 libresources_g_a_CPPFLAGS = -DHAVE_CONFIG_H
 
-INCLUDES = -I${top_srcdir}/.. -I${top_srcdir}/../.. -I${top_builddir}/..
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir}
 
 SOURCES = feFopen.cc feResource.cc
 libresources_a_SOURCES   = $(SOURCES)
