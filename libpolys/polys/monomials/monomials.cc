@@ -82,7 +82,7 @@ static inline unsigned long GetBitFields(long e,
 // This way, we have:
 // exp1 / exp2 ==> (ev1 & ~ev2) == 0, i.e.,
 // if (ev1 & ~ev2) then exp1 does not divide exp2
-unsigned long p_GetShortExpVector(poly p, ring r)
+unsigned long p_GetShortExpVector(poly p, const ring r)
 {
   assume(p != NULL);
   if (p == NULL) return 0;
