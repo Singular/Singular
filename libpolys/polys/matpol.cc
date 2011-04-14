@@ -29,7 +29,6 @@
 
 #include "monomials/ring.h"
 #include "monomials/p_polys.h"
-// #include <kernel/sparsmat.h>
 
 #include "coeffrings.h"
 #include "simpleideals.h"
@@ -364,7 +363,7 @@ class mp_permmatrix
   int       a_m, a_n, s_m, s_n, sign, piv_s;
   int       *qrow, *qcol;
   poly      *Xarray;
-  ring      _R;
+  const ring      _R;
   
   void mpInitMat();
   poly * mpRowAdr(int);
@@ -1093,20 +1092,20 @@ void mp_permmatrix::mpElimBareiss(poly div)
         jj = qcol[j];
         if (ap[jj] != NULL)
         {
-          q2 = SM_MULT(ap[jj], elim, div);
+          q2 = SM_MULT(ap[jj], elim, div, _R);
           if (a[jj] != NULL)
           {
-            q1 = SM_MULT(a[jj], piv, div);
+            q1 = SM_MULT(a[jj], piv, div, _R);
             p_Delete(&a[jj], _R);
             q2 = p_Add_q(q2, q1, _R);
           }
         }
         else if (a[jj] != NULL)
         {
-          q2 = SM_MULT(a[jj], piv, div);
+          q2 = SM_MULT(a[jj], piv, div, _R);
         }
         if ((q2!=NULL) && div)
-          SM_DIV(q2, div);
+          SM_DIV(q2, div, _R);
         a[jj] = q2;
       }
       p_Delete(&a[qcol[s_n]], _R);
@@ -1118,10 +1117,10 @@ void mp_permmatrix::mpElimBareiss(poly div)
         jj = qcol[j];
         if (a[jj] != NULL)
         {
-          q2 = SM_MULT(a[jj], piv, div);
+          q2 = SM_MULT(a[jj], piv, div, _R);
           p_Delete(&a[jj], _R);
           if (div)
-            SM_DIV(q2, div);
+            SM_DIV(q2, div, _R);
           a[jj] = q2;
         }
       }
@@ -1838,19 +1837,19 @@ static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const rin
         q1 = NULL;
         if (a[j] != NULL)
         {
-          q1 = SM_MULT(a[j], piv, div);
+          q1 = SM_MULT(a[j], piv, div, _R);
           if (ap[j] != NULL)
           {
-            q2 = SM_MULT(ap[j], elim, div);
+            q2 = SM_MULT(ap[j], elim, div, _R);
             q1 = p_Add_q(q1,q2, _R);
           }
         }
         else if (ap[j] != NULL)
-          q1 = SM_MULT(ap[j], elim, div);
+          q1 = SM_MULT(ap[j], elim, div, _R);
         if (q1 != NULL)
         {
           if (div)
-            SM_DIV(q1, div);
+            SM_DIV(q1, div, _R);
           q[j] = q1;
         }
       }
@@ -1861,9 +1860,9 @@ static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const rin
       {
         if (a[j] != NULL)
         {
-          q1 = SM_MULT(a[j], piv, div);
+          q1 = SM_MULT(a[j], piv, div, _R);
           if (div)
-            SM_DIV(q1, div);
+            SM_DIV(q1, div, _R);
           q[j] = q1;
         }
       }

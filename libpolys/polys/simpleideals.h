@@ -7,8 +7,8 @@
 /*
 * ABSTRACT - all basic methods to manipulate ideals
 */
-#include <polys/monomials/ring.h>
 #include <omalloc/omalloc.h>
+#include <polys/monomials/ring.h>
 
 struct sip_sideal
 {

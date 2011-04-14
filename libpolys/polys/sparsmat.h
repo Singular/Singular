@@ -10,27 +10,27 @@
 /* $Id$ */
 
 
-poly smMult(poly, poly);
-void smPolyDiv(poly, poly);
-poly smMultDiv(poly, poly, const poly);
-void smSpecialPolyDiv(poly, poly);
+poly sm_Mult(poly, poly, const ring);
+void sm_PolyDiv(poly, poly, const ring);
+poly sm_MultDiv(poly, poly, const poly, const ring);
+void sm_SpecialPolyDiv(poly, poly, const ring);
 /* ----------------- macros ------------------ */
 /* #define OLD_DIV 1 */
 
 #ifdef OLD_DIV
-#define SM_MULT(A,B,C) smMult(A,B)
-#define SM_DIV smPolyDiv
+#define SM_MULT(A,B,C, R) sm_Mult(A,B,R)
+#define SM_DIV sm_PolyDiv
 #else
-#define SM_MULT smMultDiv
-#define SM_DIV smSpecialPolyDiv
+#define SM_MULT sm_MultDiv
+#define SM_DIV sm_SpecialPolyDiv
 #endif
 
-poly smCallDet(ideal I);
-void smCallBareiss(ideal smat, int x, int y, ideal & M, intvec ** iv);
-ideal smCallSolv(ideal I);
+poly sm_CallDet(ideal I, const ring);
+void sm_CallBareiss(ideal smat, int x, int y, ideal & M, intvec ** iv, const ring);
+ideal sm_CallSolv(ideal I, const ring);
 
-ring smRingChange(ring *, long);
-void smKillModifiedRing(ring r);
-long smExpBound(ideal, int, int, int);
-BOOLEAN smCheckDet(ideal, int, BOOLEAN);
+ring sm_RingChange(const ring, long);
+void sm_KillModifiedRing(ring r);
+long sm_ExpBound(ideal, int, int, int, const ring);
+BOOLEAN sm_CheckDet(ideal, int, BOOLEAN, const ring);
 #endif
