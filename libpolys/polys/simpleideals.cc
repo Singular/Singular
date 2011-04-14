@@ -14,8 +14,7 @@
 #include <omalloc/omalloc.h>
 #include <polys/monomials/p_polys.h>
 #include <misc/intvec.h>
-
-#include "simpleideals.h"
+#include <polys/simpleideals.h>
 
 /*2
 * initialise an ideal
@@ -561,13 +560,13 @@ intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r)
 /*2
 * concat the lists h1 and h2 without zeros
 */
-ideal idSimpleAdd (ideal h1,ideal h2)
+ideal id_SimpleAdd (ideal h1,ideal h2, const ring R)
 {
   int i,j,r,l;
   ideal result;
 
-  if (h1==NULL) return idCopy(h2);
-  if (h2==NULL) return idCopy(h1);
+  if (h1==NULL) return id_Copy(h2,R);
+  if (h2==NULL) return id_Copy(h1,R);
   j = IDELEMS(h1)-1;
   while ((j >= 0) && (h1->m[j] == NULL)) j--;
   i = IDELEMS(h2)-1;
@@ -579,12 +578,12 @@ ideal idSimpleAdd (ideal h1,ideal h2)
     result=idInit(i+j+2,r);
   for (l=j; l>=0; l--)
   {
-    result->m[l] = pCopy(h1->m[l]);
+    result->m[l] = p_Copy(h1->m[l],R);
   }
   r = i+j+1;
   for (l=i; l>=0; l--, r--)
   {
-    result->m[r] = pCopy(h2->m[l]);
+    result->m[r] = p_Copy(h2->m[l],R);
   }
   return result;
 }
@@ -615,8 +614,8 @@ BOOLEAN idInsertPoly (ideal h1, poly h2)
 *   already present in h1
 * return TRUE iff h2 was indeed inserted
 */
-BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries,
-  const poly h2, const bool zeroOk, const bool duplicateOk)
+BOOLEAN id_InsertPolyWithTests (ideal h1, const int validEntries,
+  const poly h2, const bool zeroOk, const bool duplicateOk, const ring r)
 {
   if ((!zeroOk) && (h2 == NULL)) return FALSE;
   if (!duplicateOk)
@@ -625,7 +624,7 @@ BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries,
     int i = 0;
     while ((i < validEntries) && (!h2FoundInH1))
     {
-      h2FoundInH1 = pEqualPolys(h1->m[i], h2);
+      h2FoundInH1 = p_EqualPolys(h1->m[i], h2,r);
       i++;
     }
     if (h2FoundInH1) return FALSE;
@@ -642,10 +641,10 @@ BOOLEAN idInsertPolyWithTests (ideal h1, const int validEntries,
 /*2
 * h1 + h2
 */
-ideal idAdd (ideal h1,ideal h2)
+ideal id_Add (ideal h1,ideal h2, const ring r)
 {
-  ideal result = idSimpleAdd(h1,h2);
-  idCompactify(result);
+  ideal result = id_SimpleAdd(h1,h2,r);
+  id_Compactify(result,r);
   return result;
 }
 
@@ -1035,7 +1034,7 @@ ideal idFreeModule (int i)
   h=idInit(i,i);
   for (j=0; j<i; j++)
   {
-    h->m[j] = pOne();
+    h->m[j] = p_One(r);
     pSetComp(h->m[j],j+1);
     pSetmComp(h->m[j]);
   }
@@ -1075,12 +1074,12 @@ ideal idSectWithElim (ideal h1,ideal h2)
   // switch to temp. ring r
   rChangeCurrRing(r);
   // create 1-t, t
-  poly omt=pOne();
+  poly omt=p_One(r);
   pSetExp(omt,r->N,1);
   poly t=pCopy(omt);
   pSetm(omt);
   omt=pNeg(omt);
-  omt=pAdd(omt,pOne());
+  omt=pAdd(omt,p_One(r));
   // compute (1-t)*h1
   h1=(ideal)mpMultP((matrix)h1,omt);
   // compute t*h2
@@ -1129,7 +1128,7 @@ static void makemonoms(int vars,int actvar,int deg,int monomdeg)
 
   if ((idpowerpoint == 0) && (actvar ==1))
   {
-    idpower[idpowerpoint] = pOne();
+    idpower[idpowerpoint] = p_One(r);
     monomdeg = 0;
   }
   while (i<=deg)
@@ -1174,7 +1173,7 @@ ideal idMaxIdeal(int deg)
   if (deg < 1)
   {
     ideal I=idInit(1,1);
-    I->m[0]=pOne();
+    I->m[0]=p_One(r);
     return I;
   }
   if (deg == 1)
@@ -1209,7 +1208,7 @@ static void makepotence(int elms,int actelm,int deg,int gendeg)
 
   if ((idpowerpoint == 0) && (actelm ==1))
   {
-    idpower[idpowerpoint] = pOne();
+    idpower[idpowerpoint] = p_One(r);
     gendeg = 0;
   }
   while (i<=deg)
@@ -1285,25 +1284,25 @@ static void idNextPotence(ideal given, ideal result,
   idNextPotence(given, result, begin+1, end, deg, restdeg, ap);
 }
 
-ideal idPower(ideal given,int exp)
+ideal id_Power(ideal given,int exp, const ring r)
 {
   ideal result,temp;
   poly p1;
   int i;
 
   if (idIs0(given)) return idInit(1,1);
-  temp = idCopy(given);
+  temp = id_Copy(given,r);
   idSkipZeroes(temp);
   i = binom(IDELEMS(temp)+exp-1,exp);
   result = idInit(i,1);
   result->nrows = 0;
 //Print("ideal contains %d elements\n",i);
-  p1=pOne();
+  p1=p_One(r);
   idNextPotence(temp,result,0,IDELEMS(temp)-1,exp,exp,p1);
-  pDelete(&p1);
-  idDelete(&temp);
+  p_Delete(&p1,r);
+  id_Delete(&temp,r);
   result->nrows = 1;
-  idDelEquals(result);
+  id_DelEquals(result,r);
   idSkipZeroes(result);
   return result;
 }
@@ -1511,7 +1510,7 @@ ideal idMinors(matrix a, int ar, ideal R)
 /*2
 *skips all zeroes and double elements, searches also for units
 */
-void idCompactify(ideal id)
+void id_Compactify(ideal id, const ring r)
 {
   int i,j;
   BOOLEAN b=FALSE;
@@ -1519,17 +1518,17 @@ void idCompactify(ideal id)
   i = IDELEMS(id)-1;
   while ((! b) && (i>=0))
   {
-    b=pIsUnit(id->m[i]);
+    b=p_IsUnit(id->m[i],r);
     i--;
   }
   if (b)
   {
-    for(i=IDELEMS(id)-1;i>=0;i--) pDelete(&id->m[i]);
-    id->m[0]=pOne();
+    for(i=IDELEMS(id)-1;i>=0;i--) p_Delete(&id->m[i],r);
+    id->m[0]=p_One(r);
   }
   else
   {
-    idDelMultiples(id);
+    id_DelMultiples(id,r);
   }
   idSkipZeroes(id);
 }
@@ -2116,7 +2115,7 @@ int idIndexOfKBase(poly monom, ideal kbase)
 poly idDecompose(poly monom, poly how, ideal kbase, int * pos)
 {
   int i;
-  poly coeff=pOne(), base=pOne();
+  poly coeff=p_One(r), base=p_One(r);
 
   for (i=1;i<=pVariables;i++)
   {
@@ -2188,7 +2187,7 @@ matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
 * searches for the next unit in the components of the module arg and
 * returns the first one;
 */
-static int idReadOutPivot(ideal arg,int* comp)
+static int id_ReadOutPivot(ideal arg,int* comp, const ring r)
 {
   if (idIs0(arg)) return -1;
   int i=0,j, generator=-1;
@@ -2202,15 +2201,15 @@ static int idReadOutPivot(ideal arg,int* comp)
     p = arg->m[i];
     while (p!=NULL)
     {
-      j = pGetComp(p);
+      j = p_GetComp(p,r);
       if (componentIsUsed[j]==0)
       {
 #ifdef HAVE_RINGS
-        if (pLmIsConstantComp(p) &&
-            (!rField_is_Ring(currRing) || nIsUnit(pGetCoeff(p))))
+        if (p_LmIsConstantComp(p,r) &&
+            (!rField_is_Ring(r) || n_IsUnit(pGetCoeff(p),r->cf)))
         {
 #else
-        if (pLmIsConstantComp(p))
+        if (p_LmIsConstantComp(p,r))
         {
 #endif
           generator = i;
@@ -2297,13 +2296,13 @@ static void idDeleteComps(ideal arg,int* red_comp,int del)
 * returns the presentation of an isomorphic, minimally
 * embedded  module (arg represents the quotient!)
 */
-ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
+ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w, const ring r)
 {
   if (idIs0(arg)) return idInit(1,arg->rank);
   int i,next_gen,next_comp;
   ideal res=arg;
-  if (!inPlace) res = idCopy(arg);
-  res->rank=si_max(res->rank,idRankFreeModule(res));
+  if (!inPlace) res = id_Copy(arg,r);
+  res->rank=si_max(res->rank,id_RankFreeModule(res,r));
   int *red_comp=(int*)omAlloc((res->rank+1)*sizeof(int));
   for (i=res->rank;i>=0;i--) red_comp[i]=i;
 
@@ -2333,30 +2332,6 @@ ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w)
     *w=wtmp;
   }
   return res;
-}
-
-/*2
-* transpose a module
-*/
-ideal idTransp(ideal a)
-{
-  int r = a->rank, c = IDELEMS(a);
-  ideal b =  idInit(r,c);
-
-  for (int i=c; i>0; i--)
-  {
-    poly p=a->m[i-1];
-    while(p!=NULL)
-    {
-      poly h=pHead(p);
-      int co=pGetComp(h)-1;
-      pSetComp(h,i);
-      pSetmComp(h);
-      b->m[co]=pAdd(b->m[co],h);
-      pIter(p);
-    }
-  }
-  return b;
 }
 
 intvec * idQHomWeight(ideal id)
@@ -2425,13 +2400,13 @@ BOOLEAN idIsZeroDim(ideal I)
   return res;
 }
 
-void idNormalize(ideal I)
+void id_Normalize(ideal I,const ring r)
 {
-  if (rField_has_simple_inverse()) return; /* Z/p, GF(p,n), R, long R/C */
+  if (rField_has_simple_inverse(r)) return; /* Z/p, GF(p,n), R, long R/C */
   int i;
   for(i=IDELEMS(I)-1;i>=0;i--)
   {
-    pNormalize(I->m[i]);
+    p_Normalize(I->m[i],r);
   }
 }
 
@@ -2536,7 +2511,7 @@ ideal idChineseRemainder(ideal *xx, intvec *iv)
 /*
  * lift ideal with coeffs over Z (mod N) to Q via Farey
  */
-ideal idFarey(ideal x, number N)
+ideal id_Farey(ideal x, number N, const ring r)
 {
   int cnt=IDELEMS(x)*x->nrows;
   ideal result=idInit(cnt,x->rank);
@@ -2546,25 +2521,25 @@ ideal idFarey(ideal x, number N)
   int i;
   for(i=cnt-1;i>=0;i--)
   {
-    poly h=pCopy(x->m[i]);
+    poly h=p_Copy(x->m[i],r);
     result->m[i]=h;
     while(h!=NULL)
     {
       number c=pGetCoeff(h);
       pSetCoeff0(h,nlFarey(c,N));
-      nDelete(&c);
+      n_Delete(&c,r->cf);
       pIter(h);
     }
-    while((result->m[i]!=NULL)&&(nIsZero(pGetCoeff(result->m[i]))))
+    while((result->m[i]!=NULL)&&(n_IsZero(pGetCoeff(result->m[i]),r->cf)))
     {
-      pLmDelete(&(result->m[i]));
+      p_LmDelete(&(result->m[i]),r);
     }
     h=result->m[i];
     while((h!=NULL) && (pNext(h)!=NULL))
     {
-      if(nIsZero(pGetCoeff(pNext(h))))
+      if(n_IsZero(pGetCoeff(pNext(h)),r->cf))
       {
-        pLmDelete(&pNext(h));
+        p_LmDelete(&pNext(h),r);
       }
       else pIter(h);
     }
@@ -2574,7 +2549,6 @@ ideal idFarey(ideal x, number N)
 
 /*2
 * transpose a module
-* NOTE: just a version of "ideal idTransp(ideal)" which works within specified ring.
 */
 ideal id_Transp(ideal a, const ring rRing)
 {

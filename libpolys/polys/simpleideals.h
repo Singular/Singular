@@ -77,9 +77,9 @@ ideal id_DBCopy(ideal h1,const char *f,int l, const ring r);
 ideal id_Copy (ideal h1,const ring r);
 #endif
   /*adds two ideals without simplifying the result*/
-ideal idSimpleAdd (ideal h1,ideal h2);
+ideal id_SimpleAdd (ideal h1,ideal h2,const ring r);
   /*adds the quotient ideal*/
-ideal idAdd (ideal h1,ideal h2);
+ideal id_Add (ideal h1,ideal h2,const ring r);
   /* h1 + h2 */
 BOOLEAN idIs0 (ideal h);
 
@@ -100,7 +100,8 @@ void id_DelLmEquals(ideal id, const ring r);
 void id_DelDiv(ideal id, const ring r);
 BOOLEAN id_IsConstant(ideal id, const ring r);
 intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r);
-
+ideal id_Transp(ideal a, const ring rRing);
+void id_Compactify(ideal id, const ring r);
 
 int     binom (int n,int r);
 
