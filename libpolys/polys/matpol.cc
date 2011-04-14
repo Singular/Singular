@@ -646,7 +646,7 @@ matrix mp_Wedge(matrix a, int ar, const ring R)
         }
       }
       p = mpDetBareiss(tmp);
-      if ((k+l) & 1) p=pNeg(p);
+      if ((k+l) & 1) p=p_Neg(p, R);
       MATELEM(result,l,k) = p;
       k++;
       idGetNextChoise(ar,a->ncols,&colch,colchoise);
@@ -751,7 +751,7 @@ void   mp_Monomials(matrix c, int r, int var, matrix m, const ring R)
   }
   omfreeSize((ADDRESS)m->m,MATROWS(m)*MATCOLS(m)*sizeof(poly));
   /* allocate monoms in the right size r x MATROWS(c)*/
-  m->m=(polyset)omAlloc0(r*MATROWS(c)*sizeof(poly));
+  m->m=(poly*)omAlloc0(r*MATROWS(c)*sizeof(poly));
   MATROWS(m)=r;
   MATCOLS(m)=MATROWS(c);
   m->rank=r;
@@ -765,8 +765,8 @@ void   mp_Monomials(matrix c, int r, int var, matrix m, const ring R)
   }
   for(l=p;l>=0; l--)
   {
-    pSetExp(h,var,p-l);
-    pSetm(h);
+    p_SetExp(h,var,p-l, R);
+    p_Setm(h, R);
     for(k=r;k>0; k--)
     {
       MATELEM(m,k,k*(p+1)-l)=p_Copy(h, R);
@@ -869,16 +869,16 @@ static poly mp_Exdiv ( poly m, poly d, poly vars, const ring _R)
         p_Delete(&h, _R);
         return NULL;
       }
-      pSetExp(h,i,0);
+      p_SetExp(h,i,0, _R);
     }
   }
-  pSetm(h);
+  p_Setm(h, _R);
   return h;
 }
 
 void mp_Coef2(poly v, poly mon, matrix *c, matrix *m, const ring _R)
 {
-  polyset s;
+  poly* s;
   poly p;
   int sl,i,j;
   int l=0;
@@ -924,7 +924,7 @@ void mp_Coef2(poly v, poly mon, matrix *c, matrix *m, const ring _R)
         h = mpExdiv(v, mp /*MATELEM(*m,j,i)*/, mp);
         if (h!=NULL)
         {
-          pSetComp(h,0);
+          p_SetComp(h,0, _R);
           MATELEM(*c,j,i) = p_Add_q(MATELEM(*c,j,i), h, _R);
           break;
         }
@@ -1085,7 +1085,7 @@ void mp_permmatrix::mpElimBareiss(poly div)
     elim = a[qcol[s_n]];
     if (elim != NULL)
     {
-      elim = pNeg(elim);
+      elim = p_Neg(elim, _R);
       for (j=s_n-1; j>=0; j--)
       {
         q2 = NULL;
@@ -1153,7 +1153,7 @@ int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
       p = this->mpRowAdr(i)[qcol[0]];
       if (p)
       {
-        f1 = mpPolyWeight(p);
+        f1 = mp_PolyWeight(p, _R);
         if (f1 < fo)
         {
           fo = f1;
@@ -1183,7 +1183,7 @@ int mp_permmatrix::mpPivotBareiss(row_col_weight *C)
       p = a[qcol[j]];
       if (p)
       {
-        lp = mpPolyWeight(p);
+        lp = mp_PolyWeight(p, _R);
         ro = r - lp;
         f1 = ro * (dc[j]-lp);
         if (f1 != 0.0)
@@ -1232,7 +1232,7 @@ int mp_permmatrix::mpPivotRow(row_col_weight *C, int row)
     p = this->mpRowAdr(row)[qcol[0]];
     if (p)
     {
-      f1 = mpPolyWeight(p);
+      f1 = mp_PolyWeight(p, _R);
       if (f1 < fo)
       {
         fo = f1;
@@ -1259,7 +1259,7 @@ int mp_permmatrix::mpPivotRow(row_col_weight *C, int row)
     p = a[qcol[j]];
     if (p)
     {
-      lp = mpPolyWeight(p);
+      lp = mp_PolyWeight(p, _R);
       ro = r - lp;
       f1 = ro * (dc[j]-lp);
       if (f1 != 0.0)
@@ -1372,7 +1372,7 @@ void mp_permmatrix::mpRowWeight(float *wrow)
     {
       p = a[qcol[j]];
       if (p)
-        count += mpPolyWeight(p);
+        count += mp_PolyWeight(p, _R);
     }
     wrow[i] = count;
   }
@@ -1392,7 +1392,7 @@ void mp_permmatrix::mpColWeight(float *wcol)
     {
       p = a[a_n*qrow[i]];
       if (p)
-        count += mpPolyWeight(p);
+        count += mp_PolyWeight(p, _R);
     }
     wcol[j] = count;
   }
@@ -1822,7 +1822,7 @@ static void mp_ElimBar(matrix a0, matrix re, poly div, int lr, int lc, const rin
   ap = &b[r*a0->ncols];
   piv = ap[c];
   for(j=c-1; j>=0; j--)
-    if (ap[j] != NULL) ap[j] = pNeg(ap[j]);
+    if (ap[j] != NULL) ap[j] = p_Neg(ap[j], _R);
   for(i=r-1; i>=0; i--)
   {
     a = &b[i*a0->ncols];
