@@ -1,6 +1,4 @@
-ACLOCAL_AMFLAGS = -I ../../m4
 lib_LIBRARIES=libcoeffs.a libcoeffs_g.a
-
 CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
 
 libcoeffs_a_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
@@ -21,7 +19,7 @@ noinst_HEADERS= \
 	rintegers.h rmodulo2m.h rmodulon.h shortfl.h \
 	mpr_complex.h mpr_global.h
 
-INCLUDES = -I${top_srcdir}/.. -I${top_srcdir}/../.. -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} ${GMP_CFLAGS}
 
 SOURCES = \
 	numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc \

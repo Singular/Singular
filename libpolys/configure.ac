@@ -17,13 +17,19 @@ AM_PROG_CC_C_O
 # Checks for libraries.
 LB_CHECK_GMP(,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_CHECK_FUNCS([memmove memset pow sqrt strchr])
+
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h limits.h])
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h limits.h float.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
+AC_HEADER_STDBOOL
+AC_TYPE_SIZE_T
 
 SING_CHECK_PIPE
 
@@ -35,10 +41,20 @@ AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1],
 AC_CHECK_SIZEOF(long,4)
 SING_CHECK_CPU
 
+#check for host:
+AC_CANONICAL_HOST
+case $host_os in
+  *cygwin* ) LIBPREFIX="-Xlinker -Bdynamic";;
+  * ) LIBPREFIX="";;
+esac
+
+AC_SUBST(LIBPREFIX)
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([misc/Makefile])
 AC_CONFIG_FILES([reporter/Makefile])
 AC_CONFIG_FILES([resources/Makefile])
+AC_CONFIG_FILES([coeffs/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_SUBDIRS([coeffs polys])
+AC_CONFIG_SUBDIRS([polys])
 AC_OUTPUT
