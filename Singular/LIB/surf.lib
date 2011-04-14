@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-version="$Id$";
+version="$Id: surf.lib 13499 2010-10-15 09:55:26Z hannes $";
 category="Visualization";
 info="
 LIBRARY: surf.lib    Procedures for Graphics with Surf
-AUTHOR: Hans Schoenemann
+AUTHOR: Hans Schoenemann, Frank Seelisch
 
 NOTE:
  @texinfo
@@ -64,8 +64,8 @@ proc plot(ideal I,list #)
 "USAGE:   plot(I);  I ideal or poly
 ASSUME: I defines a plane curve or a surface given by one equation
 RETURN: nothing
-NOTE: requires the external program 'surf' to be installed,
-      to close the graphical interface just press 'Q'
+NOTE: requires the external program `surf` to be installed,
+      to close the graphical interface just press `Q`
 EXAMPLE: example plot; shows an example
 "
 {
@@ -138,22 +138,44 @@ EXAMPLE: example plot; shows an example
     }
   }
 
-  string surf_call;
-
+  string surf_call; i = 0;
   if (isWindows())
   {
-    surf_call = "((xwin -multiwindow -clipboard -silent-dup-error";
-    surf_call = surf_call + " >/dev/null 2>&1 &) && sleep 5 && (surf";
-    if (defined(extra_surf_opts))
-    {
-      surf_call = surf_call + " " + extra_surf_opts;
+    string surferPath = getShellOutput("which surfer");
+    if (find(surferPath, "no surfer in") != 0)
+    { /* did not find surfer: either not installed or
+         not yet included in $PATH variable */
+      err_mes = "calling `surfer` failed" + newline
+      + " (Either the program Surfer is not installed," + newline
+      + "  or it has not yet been included in $PATH.)";
+      ERROR(err_mes);
     }
-    surf_call = surf_call + l + ">/dev/null 2>&1))";
-    surf_call = surf_call + "&& /bin/rm " + l;
-    "Press q to exit from 'surf'.";
-    "(You may leave the XServer running for further invocations"
-    + " of 'plot'.)";
-    i = system("sh", surf_call);
+    else
+    {
+      surf_call = "((xwin -multiwindow -clipboard -silent-dup-error";
+      surf_call = surf_call + " >/dev/null 2>&1 &) && sleep 5 && (surf";
+      if (defined(extra_surf_opts))
+      {
+        surf_call = surf_call + " " + extra_surf_opts;
+      }
+      surf_call = surf_call + l + ">/dev/null 2>&1))";
+      surf_call = surf_call + "&& /bin/rm " + l;
+      "Press q to exit from `surf`.";
+        " (You may leave the XServer running for further" + newline
+      + "  invocations of `plot`.)";
+      i = system("sh", surf_call);
+      if (i != 0)
+      {
+        err_mes = "calling `surf` failed" + newline
+                + " (The shell returned the error code "
+                + string(i) + "." + newline
+                + "  Perhaps the XServer was not properly set up, so" + newline
+                + "  try your plot command again. If `plot` fails" + newline
+                + "  again, then make sure that the program Surfer" + newline
+                + "  is installed and included in your $PATH variable.)";
+        ERROR(err_mes);
+      }
+    }
   }
   else
   {
@@ -164,25 +186,24 @@ EXAMPLE: example plot; shows an example
     }
     surf_call = surf_call + l + " >/dev/null 2>&1";
 
-    if ("ppcMac-darwin" == system("uname"))
+    if (system("uname") == "ppcMac-darwin")
     {
        surf_call = surf_call + " || " + "singularsurf "
                    + extra_surf_opts + " " + l + " >/dev/null 2>&1";
     }
 
-    "Press q to exit from 'surf'";
+    "Press q to exit from `surf`.";
     i = system("sh", surf_call);
-    system("sh", "/bin/rm " + l);
-  }
-
-  if (i != 0)
-  {
-    err_mes = "calling `surf` failed" + newline
+    if (i != 0)
+    {
+      err_mes = "calling `surf` failed" + newline
               + " (The shell returned the error code "
               + string(i) + "." + newline
-              + "Probably, the executable `surf` was not found.)";
-    ERROR(err_mes);
+              + "  Make sure that the program Surfer is installed.)";
+      ERROR(err_mes);
+    }
   }
+  system("sh", "/bin/rm " + l);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -214,16 +235,18 @@ example
   plot(z^2-x^2*y);
 
 }
+
 proc surfer(ideal I)
 "USAGE:   surfer(f);  f poly
 ASSUME: f defines a surface given by one equation
 RETURN: nothing
-NOTE: requires the external program 'surfer' to be installed,
+NOTE: requires the external program `surfer` to be installed,
       to close the graphical interface just close the window of surfer
 EXAMPLE: example surfer; shows an example
 "
 {
-  string l = "./surfer" + string(system("pid"));
+  string lForWindows = "surfer" + string(system("pid"));
+  string l = "./" + lForWindows;
   string err_mes; // string containing error messages
   def base=basering;
   intvec v=num_of_vars(I);
@@ -262,20 +285,47 @@ EXAMPLE: example surfer; shows an example
             + string(n) + " variables";
     ERROR(err_mes);
   }
-  string surf_call;
 
-  surf_call = "surfer";
-  surf_call = surf_call + " " + l + " >/dev/null 2>&1";
-  "Close window to exit from 'surfer'";
-  i = system("sh", surf_call);
+  string surf_call; i = 0;
+  if (isWindows())
+  {
+    string surferPath = getShellOutput("which surfer");
+    if (find(surferPath, "no surfer in") != 0)
+    { /* did not find surfer: either not installed or
+         not yet included in $PATH variable */
+      err_mes = "calling `surfer` failed" + newline
+      + " (Either the program Surfer is not installed," + newline
+      + "  or it has not yet been included in $PATH.)";
+      ERROR(err_mes);
+    }
+    else
+    {
+      string singularPath = getShellOutput("pwd");
+      surferPath = windowsCorrection(surferPath);
+      surferPath = surferPath[1..size(surferPath)-size("/surfer")];
+      singularPath = windowsCorrection(singularPath);
+      singularPath = "c:"
+         + singularPath[size("/cygdrive/c/")..size(singularPath)];
+      surf_call = "cygstart -w -d " + surferPath + " ";
+      surf_call = surf_call + surferPath + "/surfer ";
+      surf_call = surf_call + singularPath + "/" + lForWindows;
+      "Close window to exit from `surfer`.";
+      i = system("sh", surf_call);
+    }
+  }
+  else
+  {
+    surf_call = "surfer " + l + " >/dev/null 2>&1";
+    "Close window to exit from `surfer`.";
+    i = system("sh", surf_call);
+  }
   system("sh", "/bin/rm " + l);
 
   if (i != 0)
   {
     err_mes = "calling `surfer` failed" + newline
               + " (The shell returned the error code "
-              + string(i) + "." + newline
-              + "Probably, the executable `surfer` was not found.)";
+              + string(i) + ".";
     ERROR(err_mes);
   }
 }
@@ -294,9 +344,9 @@ example
 
   // Whitney umbrella
   surfer(z^2-x^2*y);
-
 }
-proc isWindows()
+
+static proc isWindows()
 "returns 1 if this SINGULAR instance runs under (some) Windows OS;
 0 otherwise"
 {
@@ -315,5 +365,34 @@ proc isWindows()
     }
   }
   return (0);
+}
+
+static proc getShellOutput(string shellCommand)
+"returns the console output when executing the given shellCommand"
+{
+   int s;
+   string tempFilename = "tmp" + string(system("pid"));
+   s = system("sh", shellCommand + " > " + tempFilename + " 2>&1");
+   string r1 = read(tempFilename);
+   s = size(r1) - 1;
+   string r2 = r1[1..s];
+   s = system("sh", "/bin/rm " + tempFilename);
+   return (r2);
+}
+
+static proc windowsCorrection(string windowsPath)
+"puts a backslash in front of each space and each special character
+and returns the resulting string"
+{
+  string s = ""; int i;
+  for (i = 1; i <= size(windowsPath); i++)
+  {
+    if (find(" ()", windowsPath[i]) != 0)
+    {
+      s = s + "\\";
+    }
+    s = s + windowsPath[i];
+  }
+  return (s);
 }
 ///////////////////////////////////////////////////////////////////////////////
