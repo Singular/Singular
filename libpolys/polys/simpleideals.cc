@@ -16,6 +16,13 @@
 #include <misc/intvec.h>
 #include <polys/simpleideals.h>
 
+static poly * idpower;
+/*collects the monomials in makemonoms, must be allocated befor*/
+static int idpowerpoint;
+/*index of the actual monomial in idpower*/
+static poly * givenideal;
+/*the ideal from which a power is computed*/
+
 /*2
 * initialise an ideal
 */
@@ -713,7 +720,7 @@ BOOLEAN idIs0 (ideal h)
 /*2
 * return the maximal component number found in any polynomial in s
 */
-long idRankFreeModule (ideal s, ring lmRing, ring tailRing)
+long id_RankFreeModule (ideal s, ring lmRing, ring tailRing)
 {
   if (s!=NULL)
   {
@@ -805,118 +812,6 @@ int p_LowVar (poly p, const ring r)
     pIter(p);
   }
   return k;
-}
-
-/*3
-*multiplies p with t (!cas) or  (t-1)
-*the index of t is:1, so we have to shift all variables
-*p is NOT in the actual ring, it has no t
-*/
-static poly p_MultWithT (poly p,BOOLEAN cas, const ring r)
-{
-  /*qp is the working pointer in p*/
-  /*result is the result, qresult is the working pointer*/
-  /*pp is p in the actual ring(shifted), qpp the working pointer*/
-  poly result,qp,pp;
-  poly qresult=NULL;
-  poly qpp=NULL;
-  int  i,j,lex;
-  number n;
-
-  pp = NULL;
-  result = NULL;
-  qp = p;
-  while (qp != NULL)
-  {
-    i = 0;
-    if (result == NULL)
-    {/*first monomial*/
-      result = p_Init(r);
-      qresult = result;
-    }
-    else
-    {
-      qresult->next = p_Init(r);
-      pIter(qresult);
-    }
-    for (j=rVar(r)-1; j>0; j--)
-    {
-      lex = p_GetExp(qp,j,r);
-      p_SetExp(qresult,j+1,lex,r);/*copy all variables*/
-    }
-    lex = p_GetComp(qp,r);
-    p_SetComp(qresult,lex,r);
-    n=n_Copy(pGetCoeff(qp),r->cf);
-    pSetCoeff0(qresult,n);
-    qresult->next = NULL;
-    p_Setm(qresult,r);
-    /*qresult is now qp brought into the actual ring*/
-    if (cas)
-    { /*case: mult with t-1*/
-      p_SetExp(qresult,1,0,r);
-      p_Setm(qresult,r);
-      if (pp == NULL)
-      { /*first monomial*/
-        pp = p_Copy(qresult,r);
-        qpp = pp;
-      }
-      else
-      {
-        qpp->next = p_Copy(qresult,r);
-        pIter(qpp);
-      }
-      pGetCoeff(qpp)=n_Neg(pGetCoeff(qpp),r->cf);
-      /*now qpp contains -1*qp*/
-    }
-    p_SetExp(qresult,1,1,r);/*this is mult. by t*/
-    p_Setm(qresult,r);
-    pIter(qp);
-  }
-  /*
-  *now p is processed:
-  *result contains t*p
-  * if cas: pp contains -1*p (in the new ring)
-  */
-  if (cas)  qresult->next = pp;
-  /*  else      qresult->next = NULL;*/
-  return result;
-}
-
-/*2
-* verschiebt die Indizees der Modulerzeugenden um i
-*/
-void pShift (poly * p,int i)
-{
-  poly qp1 = *p,qp2 = *p;/*working pointers*/
-  int     j = pMaxComp(*p),k = pMinComp(*p);
-
-  if (j+i < 0) return ;
-  while (qp1 != NULL)
-  {
-    if ((pGetComp(qp1)+i > 0) || ((j == -i) && (j == k)))
-    {
-      pAddComp(qp1,i);
-      pSetmComp(qp1);
-      qp2 = qp1;
-      pIter(qp1);
-    }
-    else
-    {
-      if (qp2 == *p)
-      {
-        pIter(*p);
-        pLmDelete(&qp2);
-        qp2 = *p;
-        qp1 = *p;
-      }
-      else
-      {
-        qp2->next = qp1->next;
-        if (qp1!=NULL) pLmDelete(&qp1);
-        qp1 = qp2->next;
-      }
-    }
-  }
 }
 
 /*2
@@ -1026,7 +921,7 @@ int binom (int n,int r)
 /*2
 *the free module of rank i
 */
-ideal idFreeModule (int i)
+ideal id_FreeModule (int i, const ring r)
 {
   int j;
   ideal h;
@@ -1035,78 +930,10 @@ ideal idFreeModule (int i)
   for (j=0; j<i; j++)
   {
     h->m[j] = p_One(r);
-    pSetComp(h->m[j],j+1);
-    pSetmComp(h->m[j]);
+    p_SetComp(h->m[j],j+1,r);
+    p_SetmComp(h->m[j],r);
   }
   return h;
-}
-
-ideal idSectWithElim (ideal h1,ideal h2)
-// does not destroy h1,h2
-{
-  if (TEST_OPT_PROT) PrintS("intersect by elimination method\n");
-  assume(!idIs0(h1));
-  assume(!idIs0(h2));
-  assume(IDELEMS(h1)<=IDELEMS(h2));
-  assume(idRankFreeModule(h1)==0);
-  assume(idRankFreeModule(h2)==0);
-  // add a new variable:
-  int j;
-  ring origRing=currRing;
-  ring r=rCopy0(origRing);
-  r->N++;
-  r->block0[0]=1;
-  r->block1[0]= r->N;
-  omFree(r->order);
-  r->order=(int*)omAlloc0(3*sizeof(int*));
-  r->order[0]=ringorder_dp;
-  r->order[1]=ringorder_C;
-  char **names=(char**)omAlloc0(rVar(r) * sizeof(char_ptr));
-  for (j=0;j<r->N-1;j++) names[j]=r->names[j];
-  names[r->N-1]=omStrDup("@");
-  omFree(r->names);
-  r->names=names;
-  rComplete(r,TRUE);
-  // fetch h1, h2
-  ideal h;
-  h1=idrCopyR(h1,origRing,r);
-  h2=idrCopyR(h2,origRing,r);
-  // switch to temp. ring r
-  rChangeCurrRing(r);
-  // create 1-t, t
-  poly omt=p_One(r);
-  pSetExp(omt,r->N,1);
-  poly t=pCopy(omt);
-  pSetm(omt);
-  omt=pNeg(omt);
-  omt=pAdd(omt,p_One(r));
-  // compute (1-t)*h1
-  h1=(ideal)mpMultP((matrix)h1,omt);
-  // compute t*h2
-  h2=(ideal)mpMultP((matrix)h2,pCopy(t));
-  // (1-t)h1 + t*h2
-  h=idInit(IDELEMS(h1)+IDELEMS(h2),1);
-  int l;
-  for (l=IDELEMS(h1)-1; l>=0; l--)
-  {
-    h->m[l] = h1->m[l];  h1->m[l]=NULL;
-  }
-  j=IDELEMS(h1);
-  for (l=IDELEMS(h2)-1; l>=0; l--)
-  {
-    h->m[l+j] = h2->m[l];  h2->m[l]=NULL;
-  }
-  idDelete(&h1);
-  idDelete(&h2);
-  // eliminate t:
-
-  ideal res=idElimination(h,t);
-  // cleanup
-  idDelete(&h);
-  res=idrMoveR(res,r,origRing);
-  rChangeCurrRing(origRing);
-  rKill(r);
-  return res;
 }
 
 /*2
@@ -1121,7 +948,7 @@ ideal idSectWithElim (ideal h1,ideal h2)
 *deg is the degree of the monomials to compute
 *monomdeg is the actual degree of the monomial in consideration
 */
-static void makemonoms(int vars,int actvar,int deg,int monomdeg)
+static void makemonoms(int vars,int actvar,int deg,int monomdeg, const ring r)
 {
   poly p;
   int i=0;
@@ -1135,28 +962,28 @@ static void makemonoms(int vars,int actvar,int deg,int monomdeg)
   {
     if (deg == monomdeg)
     {
-      pSetm(idpower[idpowerpoint]);
+      p_Setm(idpower[idpowerpoint],r);
       idpowerpoint++;
       return;
     }
     if (actvar == vars)
     {
-      pSetExp(idpower[idpowerpoint],actvar,deg-monomdeg);
-      pSetm(idpower[idpowerpoint]);
-      pTest(idpower[idpowerpoint]);
+      p_SetExp(idpower[idpowerpoint],actvar,deg-monomdeg,r);
+      p_Setm(idpower[idpowerpoint],r);
+      p_Test(idpower[idpowerpoint],r);
       idpowerpoint++;
       return;
     }
     else
     {
-      p = pCopy(idpower[idpowerpoint]);
-      makemonoms(vars,actvar+1,deg,monomdeg);
+      p = p_Copy(idpower[idpowerpoint],r);
+      makemonoms(vars,actvar+1,deg,monomdeg,r);
       idpower[idpowerpoint] = p;
     }
     monomdeg++;
-    pSetExp(idpower[idpowerpoint],actvar,pGetExp(idpower[idpowerpoint],actvar)+1);
-    pSetm(idpower[idpowerpoint]);
-    pTest(idpower[idpowerpoint]);
+    p_SetExp(idpower[idpowerpoint],actvar,p_GetExp(idpower[idpowerpoint],actvar,r)+1,r);
+    p_Setm(idpower[idpowerpoint],r);
+    p_Test(idpower[idpowerpoint],r);
     i++;
   }
 }
@@ -1178,7 +1005,7 @@ ideal id_MaxIdeal(int deg, const ring r)
   }
   if (deg == 1)
   {
-    return idMaxIdeal(r);
+    return id_MaxIdeal(r);
   }
 
   int vars = rVar(r);
@@ -1187,7 +1014,7 @@ ideal id_MaxIdeal(int deg, const ring r)
   ideal id=idInit(i,1);
   idpower = id->m;
   idpowerpoint = 0;
-  makemonoms(vars,1,deg,0);
+  makemonoms(vars,1,deg,0,r);
   idpower = NULL;
   idpowerpoint = 0;
   return id;
@@ -1201,7 +1028,7 @@ ideal id_MaxIdeal(int deg, const ring r)
 *deg is the degree of the power to compute
 *gendeg is the actual degree of the generator in consideration
 */
-static void makepotence(int elms,int actelm,int deg,int gendeg)
+static void makepotence(int elms,int actelm,int deg,int gendeg, const ring r)
 {
   poly p;
   int i=0;
@@ -1220,19 +1047,19 @@ static void makepotence(int elms,int actelm,int deg,int gendeg)
     }
     if (actelm == elms)
     {
-      p=pPower(pCopy(givenideal[actelm-1]),deg-gendeg);
-      idpower[idpowerpoint]=pMult(idpower[idpowerpoint],p);
+      p=p_Power(p_Copy(givenideal[actelm-1],r),deg-gendeg,r);
+      idpower[idpowerpoint]=p_Mult_q(idpower[idpowerpoint],p,r);
       idpowerpoint++;
       return;
     }
     else
     {
-      p = pCopy(idpower[idpowerpoint]);
-      makepotence(elms,actelm+1,deg,gendeg);
+      p = p_Copy(idpower[idpowerpoint],r);
+      makepotence(elms,actelm+1,deg,gendeg,r);
       idpower[idpowerpoint] = p;
     }
     gendeg++;
-    idpower[idpowerpoint]=pMult(idpower[idpowerpoint],pCopy(givenideal[actelm-1]));
+    idpower[idpowerpoint]=p_Mult_q(idpower[idpowerpoint],p_Copy(givenideal[actelm-1],r),r);
     i++;
   }
 }
