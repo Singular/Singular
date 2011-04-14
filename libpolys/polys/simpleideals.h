@@ -88,7 +88,7 @@ static inline long id_RankFreeModule(ideal m, ring r)
 {return id_RankFreeModule(m, r, r);}
 // returns TRUE, if idRankFreeModule(m) > 0
 BOOLEAN id_IsModule(ideal m, ring r);
-ideal   idFreeModule (int i);
+ideal   id_FreeModule (int i, const ring r);
 int     idElem(const ideal F);
 int id_PosConstant(ideal id, const ring r);
 ideal id_MaxIdeal (const ring r);
