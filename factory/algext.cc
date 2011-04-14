@@ -5,10 +5,12 @@
 #else
 #include <stdio.h>
 #endif
+#ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM_H
 #include <iostream.h>
-#else
+#elif defined(HAVE_IOSTREAM)
 #include <iostream>
+#endif
 #endif
 
 #include "cf_defs.h"
