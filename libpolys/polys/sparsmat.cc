@@ -7,19 +7,33 @@
 * ABSTRACT: operations with sparse matrices (bareiss, ...)
 */
 
-#include <kernel/mod2.h>
-#include <kernel/options.h>
-#include <kernel/febase.h>
-#include <kernel/intvec.h>
-#include <kernel/ring.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/numbers.h>
-#include <kernel/sparsmat.h>
-#include <kernel/prCopy.h>
-#include <kernel/p_Procs.h>
-#include <kernel/kbuckets.h>
-#include <kernel/p_Mult_q.h>
+#include "config.h"
+#include <misc/auxiliary.h>
+
+#include <omalloc/omalloc.h>
+#include <misc/mylimits.h>
+
+#include <misc/options.h>
+
+#include <reporter/reporter.h>
+#include <misc/intvec.h>
+
+#include <coeffs/numbers.h>
+#include "coeffrings.h"
+
+#include "monomials/ring.h"
+#include "monomials/p_polys.h"
+
+#include "simpleideals.h"
+
+
+#include "sparsmat.h"
+#include "prCopy.h"
+
+#include "templates/p_Procs.h"
+
+#include "kbuckets.h"
+#include "operations/p_Mult_q.h"
 
 // define SM_NO_BUCKETS, if sparsemat stuff should not use buckets
 // #define SM_NO_BUCKETS
@@ -66,7 +80,7 @@ static void smExpMultDiv(poly t, const poly b, const poly c)
 }
 
 static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m,
-                                               poly a, poly b)
+                                               poly a, poly b, const ring currRing)
 {
   if (rOrd_is_Comp_dp(currRing) && currRing->ExpL_Size > 2)
   {
@@ -82,15 +96,15 @@ static poly pp_Mult_Coeff_mm_DivSelect_MultDiv(poly p, int &lp, poly m,
   else
   {
     p = pp_Mult_Coeff_mm_DivSelect(p, lp, m, currRing);
-    smExpMultDiv(p, a, b);
+    sm_ExpMultDiv(p, a, b, currRing);
   }
   return p;
 }
 
-static poly smSelectCopy_ExpMultDiv(poly p, poly m, poly a, poly b)
+static poly sm_SelectCopy_ExpMultDiv(poly p, poly m, poly a, poly b, const ring currRing)
 {
   int lp = 0;
-  return pp_Mult_Coeff_mm_DivSelect_MultDiv(p, lp, m, a, b);
+  return pp_Mult_Coeff_mm_DivSelect_MultDiv(p, lp, m, a, b, currRing);
 }
 
 
@@ -132,6 +146,8 @@ private:
   smpoly red;          // row to reduce
   smpoly piv, oldpiv;  // pivot and previous pivot
   smpoly dumm;         // allocated dummy
+  const ring _R;
+  
   void smColToRow();
   void smRowToCol();
   void smFinalMult();
@@ -156,7 +172,7 @@ private:
   int smCheckNormalize();
   void smNormalize();
 public:
-  sparse_mat(ideal);
+  sparse_mat(ideal, const ring);
   ~sparse_mat();
   int smGetSign() { return sign; }
   smpoly * smGetAct() { return m_act; }
@@ -174,7 +190,8 @@ public:
 * we have di,ra >= t
 */
 static void smMinSelect(long *, int, int);
-long smExpBound( ideal m, int di, int ra, int t)
+
+long sm_ExpBound( ideal m, int di, int ra, int t, const ring currRing)
 {
   poly p;
   long kr, kc;
@@ -192,14 +209,14 @@ long smExpBound( ideal m, int di, int ra, int t)
     p = m->m[i];
     while(p!=NULL)
     {
-      k = pGetComp(p)-1;
+      k = p_GetComp(p, currRing)-1;
       kr = r[k];
-      for (j=pVariables;j>0;j--)
+      for (j=rVar(currRing);j>0;j--)
       {
-        if(pGetExp(p,j)>kc)
-          kc=pGetExp(p,j);
-        if(pGetExp(p,j)>kr)
-          kr=pGetExp(p,j);
+        if(p_GetExp(p,j, currRing)>kc)
+          kc=p_GetExp(p,j, currRing);
+        if(p_GetExp(p,j, currRing)>kr)
+          kr=p_GetExp(p,j, currRing);
       }
       r[k] = kr;
       pIter(p);
@@ -243,9 +260,9 @@ static void smMinSelect(long *c, int t, int d)
 }
 
 /* ----------------- ops with rings ------------------ */
-ring smRingChange(ring *origR, long bound)
+ring sm_RingChange(const ring currRing, long bound)
 {
-  *origR =currRing;
+//  *origR =currRing;
   ring tmpR=rCopy0(currRing,FALSE,FALSE);
   int *ord=(int*)omAlloc0(3*sizeof(int));
   int *block0=(int*)omAlloc(3*sizeof(int));
@@ -267,15 +284,15 @@ ring smRingChange(ring *origR, long bound)
   rComplete(tmpR,1);
   if ((*origR)->qideal!=NULL)
   {
-    tmpR->qideal= idrCopyR_NoSort((*origR)->qideal, (*origR), tmpR);
+    tmpR->qideal= idrCopyR_NoSort((*origR)->qideal, currRing, tmpR);
   }
-  rChangeCurrRing(tmpR);
+//  rChangeCurrRing(tmpR);
   if (TEST_OPT_PROT)
     Print("[%ld:%d]", (long) tmpR->bitmask, tmpR->ExpL_Size);
   return tmpR;
 }
 
-void smKillModifiedRing(ring r)
+void sm_KillModifiedRing(ring r)
 {
   if (r->qideal!=NULL) id_Delete(&(r->qideal),r);
   rKillModifiedRing(r);
