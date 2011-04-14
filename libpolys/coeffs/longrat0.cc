@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <coeffs/config.h>
+#include "config.h"
 #include <reporter/reporter.h>
 #include <coeffs/coeffs.h>
 #include <omalloc/omalloc.h>

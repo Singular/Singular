@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "polys/config.h"
+#include "config.h"
 #include <reporter/reporter.h>
 
 

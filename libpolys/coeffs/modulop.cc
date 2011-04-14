@@ -7,7 +7,7 @@
 */
 
 #include <string.h>
-#include <coeffs/config.h>
+#include "config.h"
 #include <omalloc/omalloc.h>
 #include <coeffs/coeffs.h>
 #include <reporter/reporter.h>

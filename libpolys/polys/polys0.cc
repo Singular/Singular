@@ -8,7 +8,7 @@
 */
 
 /* includes */
-#include "polys/config.h"
+#include "config.h"
 // #include <polys/structs.h>
 #include <coeffs/numbers.h>
 #include <polys/monomials/ring.h>

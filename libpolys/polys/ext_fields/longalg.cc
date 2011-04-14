@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "polys/config.h"
+#include "config.h"
 // #include <polys/structs.h>
 #include <omalloc/omalloc.h>
 // #include <???/febase.h>

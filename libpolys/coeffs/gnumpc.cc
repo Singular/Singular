@@ -8,7 +8,7 @@
 * ngc == number gnu complex
 */
 
-#include <coeffs/config.h>
+#include "config.h"
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
