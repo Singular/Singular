@@ -1546,7 +1546,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
   }
   if ( (Q1!=NULL) || ( Q2!=NULL))
   {
-    Q = idSimpleAdd(Q1,Q2);
+    Q = id_SimpleAdd(Q1,Q2,sum);
   }
   sum->qideal = Q;
 

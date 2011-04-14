@@ -77,7 +77,7 @@ ideal id_DBCopy(ideal h1,const char *f,int l, const ring r);
 ideal id_Copy (ideal h1,const ring r);
 #endif
   /*adds two ideals without simplifying the result*/
-ideal id_SimpleAdd (ideal h1,ideal h2,const ring r);
+ideal id_SimpleAdd (ideal h1,ideal h2, const ring r);
   /*adds the quotient ideal*/
 ideal id_Add (ideal h1,ideal h2,const ring r);
   /* h1 + h2 */
@@ -92,6 +92,7 @@ ideal   idFreeModule (int i);
 int     idElem(const ideal F);
 int id_PosConstant(ideal id, const ring r);
 ideal id_MaxIdeal (const ring r);
+ideal id_MaxIdeal(int deg, const ring r);
 ideal id_CopyFirstK (const ideal ide, const int k,const ring r);
 void id_DelMultiples(ideal id, const ring r);
 void id_Norm(ideal id, const ring r);
@@ -102,6 +103,8 @@ BOOLEAN id_IsConstant(ideal id, const ring r);
 intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r);
 ideal id_Transp(ideal a, const ring rRing);
 void id_Compactify(ideal id, const ring r);
+ideal  id_Mult (ideal h1,ideal  h2, const ring r);
+BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r);
 
 int     binom (int n,int r);
 
