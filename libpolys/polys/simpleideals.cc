@@ -13,8 +13,11 @@
 #include <misc/options.h>
 #include <omalloc/omalloc.h>
 #include <polys/monomials/p_polys.h>
+#include <polys/weight.h>
+#include <polys/matpol.h>
 #include <misc/intvec.h>
 #include <polys/simpleideals.h>
+#include "sbuckets.h"
 
 static poly * idpower;
 /*collects the monomials in makemonoms, must be allocated befor*/
@@ -789,32 +792,6 @@ BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r)
 }
 
 /*2
-*the minimal index of used variables - 1
-*/
-int p_LowVar (poly p, const ring r)
-{
-  int k,l,lex;
-
-  if (p == NULL) return -1;
-
-  k = 32000;/*a very large dummy value*/
-  while (p != NULL)
-  {
-    l = 1;
-    lex = p_GetExp(p,l,r);
-    while ((l < rVar(r)) && (lex == 0))
-    {
-      l++;
-      lex = p_GetExp(p,l,r);
-    }
-    l--;
-    if (l < k) k = l;
-    pIter(p);
-  }
-  return k;
-}
-
-/*2
 *initialized a field with r numbers between beg and end for the
 *procedure idNextChoise
 */
@@ -1084,15 +1061,15 @@ static void makepotence(int elms,int actelm,int deg,int gendeg, const ring r)
 //  idpowerpoint = 0;
 //  return id;
 //}
-static void idNextPotence(ideal given, ideal result,
-  int begin, int end, int deg, int restdeg, poly ap)
+static void id_NextPotence(ideal given, ideal result,
+  int begin, int end, int deg, int restdeg, poly ap, const ring r)
 {
   poly p;
   int i;
 
-  p = pPower(pCopy(given->m[begin]),restdeg);
+  p = p_Power(p_Copy(given->m[begin],r),restdeg,r);
   i = result->nrows;
-  result->m[i] = pMult(pCopy(ap),p);
+  result->m[i] = p_Mult_q(p_Copy(ap,r),p,r);
 //PrintS(".");
   (result->nrows)++;
   if (result->nrows >= IDELEMS(result))
@@ -1103,12 +1080,12 @@ static void idNextPotence(ideal given, ideal result,
   if (begin == end) return;
   for (i=restdeg-1;i>0;i--)
   {
-    p = pPower(pCopy(given->m[begin]),i);
-    p = pMult(pCopy(ap),p);
-    idNextPotence(given, result, begin+1, end, deg, restdeg-i, p);
-    pDelete(&p);
+    p = p_Power(p_Copy(given->m[begin],r),i,r);
+    p = p_Mult_q(p_Copy(ap,r),p,r);
+    id_NextPotence(given, result, begin+1, end, deg, restdeg-i, p,r);
+    p_Delete(&p,r);
   }
-  idNextPotence(given, result, begin+1, end, deg, restdeg, ap);
+  id_NextPotence(given, result, begin+1, end, deg, restdeg, ap,r);
 }
 
 ideal id_Power(ideal given,int exp, const ring r)
@@ -1125,7 +1102,7 @@ ideal id_Power(ideal given,int exp, const ring r)
   result->nrows = 0;
 //Print("ideal contains %d elements\n",i);
   p1=p_One(r);
-  idNextPotence(temp,result,0,IDELEMS(temp)-1,exp,exp,p1);
+  id_NextPotence(temp,result,0,IDELEMS(temp)-1,exp,exp,p1,r);
   p_Delete(&p1,r);
   id_Delete(&temp,r);
   result->nrows = 1;
@@ -1133,206 +1110,6 @@ ideal id_Power(ideal given,int exp, const ring r)
   idSkipZeroes(result);
   return result;
 }
-
-/*2
-* compute the which-th ar-minor of the matrix a
-*/
-poly idMinor(matrix a, int ar, unsigned long which, ideal R)
-{
-  int     i,j,k,size;
-  unsigned long curr;
-  int *rowchoise,*colchoise;
-  BOOLEAN rowch,colch;
-  ideal result;
-  matrix tmp;
-  poly p,q;
-
-  i = binom(a->rows(),ar);
-  j = binom(a->cols(),ar);
-
-  rowchoise=(int *)omAlloc(ar*sizeof(int));
-  colchoise=(int *)omAlloc(ar*sizeof(int));
-  if ((i>512) || (j>512) || (i*j >512)) size=512;
-  else size=i*j;
-  result=idInit(size,1);
-  tmp=mpNew(ar,ar);
-  k = 0; /* the index in result*/
-  curr = 0; /* index of current minor */
-  idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
-  while (!rowch)
-  {
-    idInitChoise(ar,1,a->cols(),&colch,colchoise);
-    while (!colch)
-    {
-      if (curr == which)
-      {
-        for (i=1; i<=ar; i++)
-        {
-          for (j=1; j<=ar; j++)
-          {
-            MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
-          }
-        }
-        p = mpDetBareiss(tmp);
-        if (p!=NULL)
-        {
-          if (R!=NULL)
-          {
-            q = p;
-            p = kNF(R,currQuotient,q);
-            pDelete(&q);
-          }
-          /*delete the matrix tmp*/
-          for (i=1; i<=ar; i++)
-          {
-            for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
-          }
-          idDelete((ideal*)&tmp);
-          omFreeSize((ADDRESS)rowchoise,ar*sizeof(int));
-          omFreeSize((ADDRESS)colchoise,ar*sizeof(int));
-          return (p);
-        }
-      }
-      curr++;
-      idGetNextChoise(ar,a->cols(),&colch,colchoise);
-    }
-    idGetNextChoise(ar,a->rows(),&rowch,rowchoise);
-  }
-  return (poly) 1;
-}
-
-#ifdef WITH_OLD_MINOR
-/*2
-* compute all ar-minors of the matrix a
-*/
-ideal idMinors(matrix a, int ar, ideal R)
-{
-  int     i,j,k,size;
-  int *rowchoise,*colchoise;
-  BOOLEAN rowch,colch;
-  ideal result;
-  matrix tmp;
-  poly p,q;
-
-  i = binom(a->rows(),ar);
-  j = binom(a->cols(),ar);
-
-  rowchoise=(int *)omAlloc(ar*sizeof(int));
-  colchoise=(int *)omAlloc(ar*sizeof(int));
-  if ((i>512) || (j>512) || (i*j >512)) size=512;
-  else size=i*j;
-  result=idInit(size,1);
-  tmp=mpNew(ar,ar);
-  k = 0; /* the index in result*/
-  idInitChoise(ar,1,a->rows(),&rowch,rowchoise);
-  while (!rowch)
-  {
-    idInitChoise(ar,1,a->cols(),&colch,colchoise);
-    while (!colch)
-    {
-      for (i=1; i<=ar; i++)
-      {
-        for (j=1; j<=ar; j++)
-        {
-          MATELEM(tmp,i,j) = MATELEM(a,rowchoise[i-1],colchoise[j-1]);
-        }
-      }
-      p = mpDetBareiss(tmp);
-      if (p!=NULL)
-      {
-        if (R!=NULL)
-        {
-          q = p;
-          p = kNF(R,currQuotient,q);
-          pDelete(&q);
-        }
-        if (p!=NULL)
-        {
-          if (k>=size)
-          {
-            pEnlargeSet(&result->m,size,32);
-            size += 32;
-          }
-          result->m[k] = p;
-          k++;
-        }
-      }
-      idGetNextChoise(ar,a->cols(),&colch,colchoise);
-    }
-    idGetNextChoise(ar,a->rows(),&rowch,rowchoise);
-  }
-  /*delete the matrix tmp*/
-  for (i=1; i<=ar; i++)
-  {
-    for (j=1; j<=ar; j++) MATELEM(tmp,i,j) = NULL;
-  }
-  idDelete((ideal*)&tmp);
-  if (k==0)
-  {
-    k=1;
-    result->m[0]=NULL;
-  }
-  omFreeSize((ADDRESS)rowchoise,ar*sizeof(int));
-  omFreeSize((ADDRESS)colchoise,ar*sizeof(int));
-  pEnlargeSet(&result->m,size,k-size);
-  IDELEMS(result) = k;
-  return (result);
-}
-#else
-/*2
-* compute all ar-minors of the matrix a
-* the caller of mpRecMin
-* the elements of the result are not in R (if R!=NULL)
-*/
-ideal idMinors(matrix a, int ar, ideal R)
-{
-  int elems=0;
-  int r=a->nrows,c=a->ncols;
-  int i;
-  matrix b;
-  ideal result,h;
-  ring origR;
-  ring tmpR;
-  long bound;
-
-  if((ar<=0) || (ar>r) || (ar>c))
-  {
-    Werror("%d-th minor, matrix is %dx%d",ar,r,c);
-    return NULL;
-  }
-  h = idMatrix2Module(mpCopy(a));
-  bound = smExpBound(h,c,r,ar);
-  idDelete(&h);
-  tmpR=smRingChange(&origR,bound);
-  b = mpNew(r,c);
-  for (i=r*c-1;i>=0;i--)
-  {
-    if (a->m[i])
-      b->m[i] = prCopyR(a->m[i],origR);
-  }
-  if (R!=NULL)
-  {
-    R = idrCopyR(R,origR);
-    //if (ar>1) // otherwise done in mpMinorToResult
-    //{
-    //  matrix bb=(matrix)kNF(R,currQuotient,(ideal)b);
-    //  bb->rank=b->rank; bb->nrows=b->nrows; bb->ncols=b->ncols;
-    //  idDelete((ideal*)&b); b=bb;
-    //}
-  }
-  result=idInit(32,1);
-  if(ar>1) mpRecMin(ar-1,result,elems,b,r,c,NULL,R);
-  else mpMinorToResult(result,elems,b,r,c,R);
-  idDelete((ideal *)&b);
-  if (R!=NULL) idDelete(&R);
-  idSkipZeroes(result);
-  rChangeCurrRing(origR);
-  result = idrMoveR(result,tmpR);
-  smKillModifiedRing(tmpR);
-  idTest(result);
-  return result;
-}
-#endif
 
 /*2
 *skips all zeroes and double elements, searches also for units
@@ -1361,100 +1138,45 @@ void id_Compactify(ideal id, const ring r)
 }
 
 /*2
-*returns TRUE if id1 is a submodule of id2
-*/
-BOOLEAN idIsSubModule(ideal id1,ideal id2)
-{
-  int i;
-  poly p;
-
-  if (idIs0(id1)) return TRUE;
-  for (i=0;i<IDELEMS(id1);i++)
-  {
-    if (id1->m[i] != NULL)
-    {
-      p = kNF(id2,currQuotient,id1->m[i]);
-      if (p != NULL)
-      {
-        pDelete(&p);
-        return FALSE;
-      }
-    }
-  }
-  return TRUE;
-}
-
-/*2
 * returns the ideals of initial terms
 */
-ideal idHead(ideal h)
+ideal id_Head(ideal h,const ring r)
 {
   ideal m = idInit(IDELEMS(h),h->rank);
   int i;
 
   for (i=IDELEMS(h)-1;i>=0; i--)
   {
-    if (h->m[i]!=NULL) m->m[i]=pHead(h->m[i]);
+    if (h->m[i]!=NULL) m->m[i]=p_Head(h->m[i],r);
   }
   return m;
 }
 
-ideal idHomogen(ideal h, int varnum)
+ideal id_Homogen(ideal h, int varnum,const ring r)
 {
   ideal m = idInit(IDELEMS(h),h->rank);
   int i;
 
   for (i=IDELEMS(h)-1;i>=0; i--)
   {
-    m->m[i]=pHomogen(h->m[i],varnum);
+    m->m[i]=p_Homogen(h->m[i],varnum,r);
   }
   return m;
 }
 
 /*------------------type conversions----------------*/
-ideal idVec2Ideal(poly vec)
+ideal id_Vec2Ideal(poly vec, const ring R)
 {
    ideal result=idInit(1,1);
    omFree((ADDRESS)result->m);
    result->m=NULL; // remove later
-   pVec2Polys(vec, &(result->m), &(IDELEMS(result)));
+   p_Vec2Polys(vec, &(result->m), &(IDELEMS(result)),R);
    return result;
 }
 
-#define NEW_STUFF
-#ifndef NEW_STUFF
-// converts mat to module, destroys mat
-ideal idMatrix2Module(matrix mat)
-{
-  int mc=MATCOLS(mat);
-  int mr=MATROWS(mat);
-  ideal result = idInit(si_max(mc,1),si_max(mr,1));
-  int i,j;
-  poly h;
-
-  for(j=0;j<mc /*MATCOLS(mat)*/;j++) /* j is also index in result->m */
-  {
-    for (i=1;i<=mr /*MATROWS(mat)*/;i++)
-    {
-      h = MATELEM(mat,i,j+1);
-      if (h!=NULL)
-      {
-        MATELEM(mat,i,j+1)=NULL;
-        pSetCompP(h,i);
-        result->m[j] = pAdd(result->m[j],h);
-      }
-    }
-  }
-  // obachman: need to clean this up
-  idDelete((ideal*) &mat);
-  return result;
-}
-#else
-
-#include "sbuckets.h"
 
 // converts mat to module, destroys mat
-ideal idMatrix2Module(matrix mat)
+ideal id_Matrix2Module(matrix mat, const ring R)
 {
   int mc=MATCOLS(mat);
   int mr=MATROWS(mat);
@@ -1462,7 +1184,7 @@ ideal idMatrix2Module(matrix mat)
   int i,j, l;
   poly h;
   poly p;
-  sBucket_pt bucket = sBucketCreate(currRing);
+  sBucket_pt bucket = sBucketCreate(R);
 
   for(j=0;j<mc /*MATCOLS(mat)*/;j++) /* j is also index in result->m */
   {
@@ -1473,7 +1195,7 @@ ideal idMatrix2Module(matrix mat)
       {
         l=pLength(h);
         MATELEM(mat,i,j+1)=NULL;
-        p_SetCompP(h,i, currRing);
+        p_SetCompP(h,i, R);
         sBucket_Merge_p(bucket, h, l);
       }
     }
@@ -1482,15 +1204,14 @@ ideal idMatrix2Module(matrix mat)
   sBucketDestroy(&bucket);
 
   // obachman: need to clean this up
-  idDelete((ideal*) &mat);
+  id_Delete((ideal*) &mat,R);
   return result;
 }
-#endif
 
 /*2
 * converts a module into a matrix, destroyes the input
 */
-matrix idModule2Matrix(ideal mod)
+matrix id_Module2Matrix(ideal mod, const ring R)
 {
   matrix result = mpNew(mod->rank,IDELEMS(mod));
   int i,cp;
@@ -1506,9 +1227,9 @@ matrix idModule2Matrix(ideal mod)
       pIter(p);
       pNext(h)=NULL;
 //      cp = si_max(1,pGetComp(h));     // if used for ideals too
-      cp = pGetComp(h);
-      pSetComp(h,0);
-      pSetmComp(h);
+      cp = p_GetComp(h,R);
+      p_SetComp(h,0,R);
+      p_SetmComp(h,R);
 #ifdef TEST
       if (cp>mod->rank)
       {
@@ -1524,22 +1245,22 @@ matrix idModule2Matrix(ideal mod)
             MATELEM(result,l,k)=NULL;
           }
         }
-        idDelete((ideal *)&result);
+        id_Delete((ideal *)&result,R);
         result=d;
       }
 #endif
-      MATELEM(result,cp,i+1) = pAdd(MATELEM(result,cp,i+1),h);
+      MATELEM(result,cp,i+1) = p_Add_q(MATELEM(result,cp,i+1),h,R);
     }
   }
   // obachman 10/99: added the following line, otherwise memory leack!
-  idDelete(&mod);
+  id_Delete(&mod,R);
   return result;
 }
 
-matrix idModule2formatedMatrix(ideal mod,int rows, int cols)
+matrix id_Module2formatedMatrix(ideal mod,int rows, int cols, const ring R)
 {
   matrix result = mpNew(rows,cols);
-  int i,cp,r=idRankFreeModule(mod),c=IDELEMS(mod);
+  int i,cp,r=id_RankFreeModule(mod,R),c=IDELEMS(mod);
   poly p,h;
 
   if (r>rows) r = rows;
@@ -1553,18 +1274,18 @@ matrix idModule2formatedMatrix(ideal mod,int rows, int cols)
       h=p;
       pIter(p);
       pNext(h)=NULL;
-      cp = pGetComp(h);
+      cp = p_GetComp(h,R);
       if (cp<=r)
       {
-        pSetComp(h,0);
-        pSetmComp(h);
-        MATELEM(result,cp,i+1) = pAdd(MATELEM(result,cp,i+1),h);
+        p_SetComp(h,0,R);
+        p_SetmComp(h,R);
+        MATELEM(result,cp,i+1) = p_Add_q(MATELEM(result,cp,i+1),h,R);
       }
       else
-        pDelete(&h);
+        p_Delete(&h,R);
     }
   }
-  idDelete(&mod);
+  id_Delete(&mod,R);
   return result;
 }
 
@@ -1572,7 +1293,7 @@ matrix idModule2formatedMatrix(ideal mod,int rows, int cols)
 * substitute the n-th variable by the monomial e in id
 * destroy id
 */
-ideal  idSubst(ideal id, int n, poly e)
+ideal  id_Subst(ideal id, int n, poly e, const ring r)
 {
   int k=MATROWS((matrix)id)*MATCOLS((matrix)id);
   ideal res=(ideal)mpNew(MATROWS((matrix)id),MATCOLS((matrix)id));
@@ -1580,17 +1301,17 @@ ideal  idSubst(ideal id, int n, poly e)
   res->rank = id->rank;
   for(k--;k>=0;k--)
   {
-    res->m[k]=pSubst(id->m[k],n,e);
+    res->m[k]=p_Subst(id->m[k],n,e,r);
     id->m[k]=NULL;
   }
-  idDelete(&id);
+  id_Delete(&id,r);
   return res;
 }
 
-BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
+BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R)
 {
   if (w!=NULL) *w=NULL;
-  if ((Q!=NULL) && (!idHomIdeal(Q,NULL))) return FALSE;
+  if ((Q!=NULL) && (!id_HomIdeal(Q,NULL,R))) return FALSE;
   if (idIs0(m))
   {
     if (w!=NULL) (*w)=new intvec(m->rank);
@@ -1602,17 +1323,17 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   int i,j;
   poly p=NULL;
   pFDegProc d;
-  if (pLexOrder && (currRing->order[0]==ringorder_lp))
+  if (R->pLexOrder && (R->order[0]==ringorder_lp))
      d=p_Totaldegree;
   else
      d=pFDeg;
   int length=IDELEMS(m);
-  polyset P=m->m;
-  polyset F=(polyset)omAlloc(length*sizeof(poly));
+  poly* P=m->m;
+  poly* F=(poly*)omAlloc(length*sizeof(poly));
   for (i=length-1;i>=0;i--)
   {
     p=F[i]=P[i];
-    cmax=si_max(cmax,(long)pMaxComp(p));
+    cmax=si_max(cmax,(long)p_MaxComp(p,R));
   }
   cmax++;
   diff = (long *)omAlloc0(cmax*sizeof(long));
@@ -1624,7 +1345,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
     if (i<length)
     {
       p=F[i];
-      while ((p!=NULL) && (iscom[pGetComp(p)]==0)) pIter(p);
+      while ((p!=NULL) && (iscom[p_GetComp(p,R)]==0)) pIter(p);
     }
     if ((p==NULL) && (i<length))
     {
@@ -1644,7 +1365,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
       //else
       //  order = p->order;
       //  order = pFDeg(p,currRing);
-      order = d(p,currRing) +diff[pGetComp(p)];
+      order = d(p,R) +diff[p_GetComp(p,R)];
       //order += diff[pGetComp(p)];
       p = F[i];
 //Print("Actual p=F[%d]: ",i);pWrite(p);
@@ -1653,15 +1374,15 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
     }
     while (p!=NULL)
     {
-      if (pLexOrder && (currRing->order[0]==ringorder_lp))
-        ord=pTotaldegree(p);
+      if (R->pLexOrder && (R->order[0]==ringorder_lp))
+        ord=p_Totaldegree(p,R);
       else
       //  ord = p->order;
-        ord = pFDeg(p,currRing);
-      if (iscom[pGetComp(p)]==0)
+        ord = pFDeg(p,R);
+      if (iscom[p_GetComp(p,R)]==0)
       {
-        diff[pGetComp(p)] = order-ord;
-        iscom[pGetComp(p)] = 1;
+        diff[p_GetComp(p,R)] = order-ord;
+        iscom[p_GetComp(p,R)] = 1;
 /*
 *PrintS("new diff: ");
 *for (j=0;j<cmax;j++) Print("%d ",diff[j]);
@@ -1680,7 +1401,7 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
 *PrintLn();
 *Print("order %d, ord %d, diff %d\n",order,ord,diff[pGetComp(p)]);
 */
-        if (order != (ord+diff[pGetComp(p)]))
+        if (order != (ord+diff[p_GetComp(p,R)]))
         {
           omFreeSize((ADDRESS) iscom,cmax*sizeof(int));
           omFreeSize((ADDRESS) diff,cmax*sizeof(long));
@@ -1710,60 +1431,61 @@ BOOLEAN idHomModule(ideal m, ideal Q, intvec **w)
   return TRUE;
 }
 
-BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
-{
-  if ((Q!=NULL) && (!idHomIdeal(Q,NULL)))  { PrintS(" Q not hom\n"); return FALSE;}
-  if (idIs0(m)) return TRUE;
+// uses glabl vars via pSetModDeg
+//BOOLEAN idTestHomModule(ideal m, ideal Q, intvec *w)
+//{
+//  if ((Q!=NULL) && (!idHomIdeal(Q,NULL)))  { PrintS(" Q not hom\n"); return FALSE;}
+//  if (idIs0(m)) return TRUE;
+//
+//  int cmax=-1;
+//  int i;
+//  poly p=NULL;
+//  int length=IDELEMS(m);
+//  poly* P=m->m;
+//  for (i=length-1;i>=0;i--)
+//  {
+//    p=P[i];
+//    if (p!=NULL) cmax=si_max(cmax,(int)pMaxComp(p)+1);
+//  }
+//  if (w != NULL)
+//  if (w->length()+1 < cmax)
+//  {
+//    // Print("length: %d - %d \n", w->length(),cmax);
+//    return FALSE;
+//  }
+//
+//  if(w!=NULL)
+//    pSetModDeg(w);
+//
+//  for (i=length-1;i>=0;i--)
+//  {
+//    p=P[i];
+//    poly q=p;
+//    if (p!=NULL)
+//    {
+//      int d=pFDeg(p,currRing);
+//      loop
+//      {
+//        pIter(p);
+//        if (p==NULL) break;
+//        if (d!=pFDeg(p,currRing))
+//        {
+//          //pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p,currRing));
+//          if(w!=NULL)
+//            pSetModDeg(NULL);
+//          return FALSE;
+//        }
+//      }
+//    }
+//  }
+//
+//  if(w!=NULL)
+//    pSetModDeg(NULL);
+//
+//  return TRUE;
+//}
 
-  int cmax=-1;
-  int i;
-  poly p=NULL;
-  int length=IDELEMS(m);
-  polyset P=m->m;
-  for (i=length-1;i>=0;i--)
-  {
-    p=P[i];
-    if (p!=NULL) cmax=si_max(cmax,(int)pMaxComp(p)+1);
-  }
-  if (w != NULL)
-  if (w->length()+1 < cmax)
-  {
-    // Print("length: %d - %d \n", w->length(),cmax);
-    return FALSE;
-  }
-
-  if(w!=NULL)
-    pSetModDeg(w);
-
-  for (i=length-1;i>=0;i--)
-  {
-    p=P[i];
-    poly q=p;
-    if (p!=NULL)
-    {
-      int d=pFDeg(p,currRing);
-      loop
-      {
-        pIter(p);
-        if (p==NULL) break;
-        if (d!=pFDeg(p,currRing))
-        {
-          //pWrite(q); wrp(p); Print(" -> %d - %d\n",d,pFDeg(p,currRing));
-          if(w!=NULL)
-            pSetModDeg(NULL);
-          return FALSE;
-        }
-      }
-    }
-  }
-
-  if(w!=NULL)
-    pSetModDeg(NULL);
-
-  return TRUE;
-}
-
-ideal idJet(ideal i,int d)
+ideal id_Jet(ideal i,int d, const ring R)
 {
   ideal r=idInit((i->nrows)*(i->ncols),i->rank);
   r->nrows = i-> nrows;
@@ -1772,12 +1494,12 @@ ideal idJet(ideal i,int d)
   int k;
   for(k=(i->nrows)*(i->ncols)-1;k>=0; k--)
   {
-    r->m[k]=ppJet(i->m[k],d);
+    r->m[k]=pp_Jet(i->m[k],d,R);
   }
   return r;
 }
 
-ideal idJetW(ideal i,int d, intvec * iv)
+ideal id_JetW(ideal i,int d, intvec * iv, const ring R)
 {
   ideal r=idInit(IDELEMS(i),i->rank);
   if (ecartWeights!=NULL)
@@ -1786,228 +1508,15 @@ ideal idJetW(ideal i,int d, intvec * iv)
   }
   else
   {
-    short *w=iv2array(iv);
+    short *w=iv2array(iv,R);
     int k;
     for(k=0; k<IDELEMS(i); k++)
     {
-      r->m[k]=ppJetW(i->m[k],d,w);
+      r->m[k]=pp_JetW(i->m[k],d,w,R);
     }
-    omFreeSize((ADDRESS)w,(rVar(r)+1)*sizeof(short));
+    omFreeSize((ADDRESS)w,(rVar(R)+1)*sizeof(short));
   }
   return r;
-}
-
-int idMinDegW(ideal M,intvec *w)
-{
-  int d=-1;
-  for(int i=0;i<IDELEMS(M);i++)
-  {
-    int d0=pMinDeg(M->m[i],w);
-    if(-1<d0&&(d0<d||d==-1))
-      d=d0;
-  }
-  return d;
-}
-
-ideal idSeries(int n,ideal M,matrix U,intvec *w)
-{
-  for(int i=IDELEMS(M)-1;i>=0;i--)
-  {
-    if(U==NULL)
-      M->m[i]=pSeries(n,M->m[i],NULL,w);
-    else
-    {
-      M->m[i]=pSeries(n,M->m[i],MATELEM(U,i+1,i+1),w);
-      MATELEM(U,i+1,i+1)=NULL;
-    }
-  }
-  if(U!=NULL)
-    idDelete((ideal*)&U);
-  return M;
-}
-
-matrix idDiff(matrix i, int k)
-{
-  int e=MATCOLS(i)*MATROWS(i);
-  matrix r=mpNew(MATROWS(i),MATCOLS(i));
-  r->rank=i->rank;
-  int j;
-  for(j=0; j<e; j++)
-  {
-    r->m[j]=pDiff(i->m[j],k);
-  }
-  return r;
-}
-
-matrix idDiffOp(ideal I, ideal J,BOOLEAN multiply)
-{
-  matrix r=mpNew(IDELEMS(I),IDELEMS(J));
-  int i,j;
-  for(i=0; i<IDELEMS(I); i++)
-  {
-    for(j=0; j<IDELEMS(J); j++)
-    {
-      MATELEM(r,i+1,j+1)=pDiffOp(I->m[i],J->m[j],multiply);
-    }
-  }
-  return r;
-}
-
-int idElem(const ideal F)
-{
-  int i=0,j=IDELEMS(F)-1;
-
-  while(j>=0)
-  {
-    if ((F->m)[j]!=NULL) i++;
-    j--;
-  }
-  return i;
-}
-
-/*
-*computes module-weights for liftings of homogeneous modules
-*/
-intvec * idMWLift(ideal mod,intvec * weights)
-{
-  if (idIs0(mod)) return new intvec(2);
-  int i=IDELEMS(mod);
-  while ((i>0) && (mod->m[i-1]==NULL)) i--;
-  intvec *result = new intvec(i+1);
-  while (i>0)
-  {
-    (*result)[i]=pFDeg(mod->m[i],currRing)+(*weights)[pGetComp(mod->m[i])];
-  }
-  return result;
-}
-
-/*2
-*sorts the kbase for idCoef* in a special way (lexicographically
-*with x_max,...,x_1)
-*/
-ideal idCreateSpecialKbase(ideal kBase,intvec ** convert)
-{
-  int i;
-  ideal result;
-
-  if (idIs0(kBase)) return NULL;
-  result = idInit(IDELEMS(kBase),kBase->rank);
-  *convert = idSort(kBase,FALSE);
-  for (i=0;i<(*convert)->length();i++)
-  {
-    result->m[i] = pCopy(kBase->m[(**convert)[i]-1]);
-  }
-  return result;
-}
-
-/*2
-*returns the index of a given monom in the list of the special kbase
-*/
-int idIndexOfKBase(poly monom, ideal kbase)
-{
-  int j=IDELEMS(kbase);
-
-  while ((j>0) && (kbase->m[j-1]==NULL)) j--;
-  if (j==0) return -1;
-  int i=rVar(r);
-  while (i>0)
-  {
-    loop
-    {
-      if (pGetExp(monom,i)>pGetExp(kbase->m[j-1],i)) return -1;
-      if (pGetExp(monom,i)==pGetExp(kbase->m[j-1],i)) break;
-      j--;
-      if (j==0) return -1;
-    }
-    if (i==1)
-    {
-      while(j>0)
-      {
-        if (pGetComp(monom)==pGetComp(kbase->m[j-1])) return j-1;
-        if (pGetComp(monom)>pGetComp(kbase->m[j-1])) return -1;
-        j--;
-      }
-    }
-    i--;
-  }
-  return -1;
-}
-
-/*2
-*decomposes the monom in a part of coefficients described by the
-*complement of how and a monom in variables occuring in how, the
-*index of which in kbase is returned as integer pos (-1 if it don't
-*exists)
-*/
-poly idDecompose(poly monom, poly how, ideal kbase, int * pos)
-{
-  int i;
-  poly coeff=p_One(r), base=p_One(r);
-
-  for (i=1;i<=rVar(r);i++)
-  {
-    if (pGetExp(how,i)>0)
-    {
-      pSetExp(base,i,pGetExp(monom,i));
-    }
-    else
-    {
-      pSetExp(coeff,i,pGetExp(monom,i));
-    }
-  }
-  pSetComp(base,pGetComp(monom));
-  pSetm(base);
-  pSetCoeff(coeff,nCopy(pGetCoeff(monom)));
-  pSetm(coeff);
-  *pos = idIndexOfKBase(base,kbase);
-  if (*pos<0)
-    pDelete(&coeff);
-  pDelete(&base);
-  return coeff;
-}
-
-/*2
-*returns a matrix A of coefficients with kbase*A=arg
-*if all monomials in variables of how occur in kbase
-*the other are deleted
-*/
-matrix idCoeffOfKBase(ideal arg, ideal kbase, poly how)
-{
-  matrix result;
-  ideal tempKbase;
-  poly p,q;
-  intvec * convert;
-  int i=IDELEMS(kbase),j=IDELEMS(arg),k,pos;
-#if 0
-  while ((i>0) && (kbase->m[i-1]==NULL)) i--;
-  if (idIs0(arg))
-    return mpNew(i,1);
-  while ((j>0) && (arg->m[j-1]==NULL)) j--;
-  result = mpNew(i,j);
-#else
-  result = mpNew(i, j);
-  while ((j>0) && (arg->m[j-1]==NULL)) j--;
-#endif
-
-  tempKbase = idCreateSpecialKbase(kbase,&convert);
-  for (k=0;k<j;k++)
-  {
-    p = arg->m[k];
-    while (p!=NULL)
-    {
-      q = idDecompose(p,how,tempKbase,&pos);
-      if (pos>=0)
-      {
-        MATELEM(result,(*convert)[pos],k+1) =
-            pAdd(MATELEM(result,(*convert)[pos],k+1),q);
-      }
-      else
-        pDelete(&q);
-      pIter(p);
-    }
-  }
-  idDelete(&tempKbase);
-  return result;
 }
 
 /*3
@@ -2096,72 +1605,7 @@ static void idDeleteComp(ideal arg,int red_comp)
 }
 #endif
 
-static void idDeleteComps(ideal arg,int* red_comp,int del)
-// red_comp is an array [0..args->rank]
-{
-  int i,j;
-  poly p;
-
-  for (i=IDELEMS(arg)-1;i>=0;i--)
-  {
-    p = arg->m[i];
-    while (p!=NULL)
-    {
-      j = pGetComp(p);
-      if (red_comp[j]!=j)
-      {
-        pSetComp(p,red_comp[j]);
-        pSetmComp(p);
-      }
-      pIter(p);
-    }
-  }
-  (arg->rank) -= del;
-}
-
-/*2
-* returns the presentation of an isomorphic, minimally
-* embedded  module (arg represents the quotient!)
-*/
-ideal idMinEmbedding(ideal arg,BOOLEAN inPlace, intvec **w, const ring r)
-{
-  if (idIs0(arg)) return idInit(1,arg->rank);
-  int i,next_gen,next_comp;
-  ideal res=arg;
-  if (!inPlace) res = id_Copy(arg,r);
-  res->rank=si_max(res->rank,id_RankFreeModule(res,r));
-  int *red_comp=(int*)omAlloc((res->rank+1)*sizeof(int));
-  for (i=res->rank;i>=0;i--) red_comp[i]=i;
-
-  int del=0;
-  loop
-  {
-    next_gen = idReadOutPivot(res,&next_comp);
-    if (next_gen<0) break;
-    del++;
-    syGaussForOne(res,next_gen,next_comp,0,IDELEMS(res));
-    for(i=next_comp+1;i<=arg->rank;i++) red_comp[i]--;
-    if ((w !=NULL)&&(*w!=NULL))
-    {
-      for(i=next_comp;i<(*w)->length();i++) (**w)[i-1]=(**w)[i];
-    }
-  }
-
-  idDeleteComps(res,red_comp,del);
-  idSkipZeroes(res);
-  omFree(red_comp);
-
-  if ((w !=NULL)&&(*w!=NULL) &&(del>0))
-  {
-    intvec *wtmp=new intvec((*w)->length()-del);
-    for(i=0;i<res->rank;i++) (*wtmp)[i]=(**w)[i];
-    delete *w;
-    *w=wtmp;
-  }
-  return res;
-}
-
-intvec * idQHomWeight(ideal id)
+intvec * id_QHomWeight(ideal id, const ring r)
 {
   poly head, tail;
   int k;
@@ -2180,7 +1624,7 @@ intvec * idQHomWeight(ideal id)
       {
         all++;
         for (k=1;k<=coldim;k++)
-          IMATELEM(*imat,all,k) = pGetExpDiff(head,tail,k);
+          IMATELEM(*imat,all,k) = p_GetExpDiff(head,tail,k,r);
         if (all==rowmax)
         {
           ivTriangIntern(imat, ready, all);
@@ -2208,7 +1652,7 @@ intvec * idQHomWeight(ideal id)
   return result;
 }
 
-BOOLEAN idIsZeroDim(ideal I)
+BOOLEAN id_IsZeroDim(ideal I, const ring r)
 {
   BOOLEAN *UsedAxis=(BOOLEAN *)omAlloc0(rVar(r)*sizeof(BOOLEAN));
   int i,n;
@@ -2217,7 +1661,7 @@ BOOLEAN idIsZeroDim(ideal I)
   for(i=IDELEMS(I)-1;i>=0;i--)
   {
     po=I->m[i];
-    if ((po!=NULL) &&((n=pIsPurePower(po))!=0)) UsedAxis[n-1]=TRUE;
+    if ((po!=NULL) &&((n=p_IsPurePower(po,r))!=0)) UsedAxis[n-1]=TRUE;
   }
   for(i=rVar(r)-1;i>=0;i--)
   {
@@ -2322,57 +1766,6 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl, const ring r)
   return result;
 }
 #endif
-/* currently unsed:
-ideal idChineseRemainder(ideal *xx, intvec *iv)
-{
-  int rl=iv->length();
-  number *q=(number *)omAlloc(rl*sizeof(number));
-  int i;
-  for(i=0; i<rl; i++)
-  {
-    q[i]=nInit((*iv)[i]);
-  }
-  return idChineseRemainder(xx,q,rl);
-}
-*/
-/*
- * lift ideal with coeffs over Z (mod N) to Q via Farey
- */
-ideal id_Farey(ideal x, number N, const ring r)
-{
-  int cnt=IDELEMS(x)*x->nrows;
-  ideal result=idInit(cnt,x->rank);
-  result->nrows=x->nrows; // for lifting matrices
-  result->ncols=x->ncols; // for lifting matrices
-
-  int i;
-  for(i=cnt-1;i>=0;i--)
-  {
-    poly h=p_Copy(x->m[i],r);
-    result->m[i]=h;
-    while(h!=NULL)
-    {
-      number c=pGetCoeff(h);
-      pSetCoeff0(h,nlFarey(c,N));
-      n_Delete(&c,r->cf);
-      pIter(h);
-    }
-    while((result->m[i]!=NULL)&&(n_IsZero(pGetCoeff(result->m[i]),r->cf)))
-    {
-      p_LmDelete(&(result->m[i]),r);
-    }
-    h=result->m[i];
-    while((h!=NULL) && (pNext(h)!=NULL))
-    {
-      if(n_IsZero(pGetCoeff(pNext(h)),r->cf))
-      {
-        p_LmDelete(&pNext(h),r);
-      }
-      else pIter(h);
-    }
-  }
-  return result;
-}
 
 /*2
 * transpose a module

@@ -81,6 +81,8 @@ ideal id_SimpleAdd (ideal h1,ideal h2, const ring r);
   /*adds the quotient ideal*/
 ideal id_Add (ideal h1,ideal h2,const ring r);
   /* h1 + h2 */
+
+ideal id_Power(ideal given,int exp, const ring r);
 BOOLEAN idIs0 (ideal h);
 
 long id_RankFreeModule(ideal m, ring lmRing, ring tailRing);
@@ -91,6 +93,7 @@ BOOLEAN id_IsModule(ideal m, ring r);
 ideal   id_FreeModule (int i, const ring r);
 int     idElem(const ideal F);
 int id_PosConstant(ideal id, const ring r);
+ideal id_Head(ideal h,const ring r);
 ideal id_MaxIdeal (const ring r);
 ideal id_MaxIdeal(int deg, const ring r);
 ideal id_CopyFirstK (const ideal ide, const int k,const ring r);
@@ -104,7 +107,18 @@ intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r);
 ideal id_Transp(ideal a, const ring rRing);
 void id_Compactify(ideal id, const ring r);
 ideal  id_Mult (ideal h1,ideal  h2, const ring r);
+ideal id_Homogen(ideal h, int varnum,const ring r);
 BOOLEAN id_HomIdeal (ideal id, ideal Q, const ring r);
+BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R);
+BOOLEAN id_IsZeroDim(ideal I, const ring r);
+ideal id_Jet(ideal i,int d, const ring R);
+ideal id_JetW(ideal i,int d, intvec * iv, const ring R);
+ideal  id_Subst(ideal id, int n, poly e, const ring r);
+matrix id_Module2Matrix(ideal mod, const ring R);
+matrix id_Module2formatedMatrix(ideal mod,int rows, int cols, const ring R);
+ideal id_Matrix2Module(matrix mat, const ring R);
+ideal id_Vec2Ideal(poly vec, const ring R);
+
 
 int     binom (int n,int r);
 
