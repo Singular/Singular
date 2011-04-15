@@ -47,13 +47,14 @@ write(l1,"Key4", "NewValue4");
 read(l1,"Key4");
 write(l1,"Key2");
 read(l1,"Key2");
-l2="DBM:r db2";
-write(l2,"Key4"); // should fail
+//l2="DBM:r db2";
+//write(l2,"Key4"); // should fail
 l1="DBM: db1";
 write(l1,"Key4"); // should not fail
 close(l1);
 close(l2);
-kill l1,l2;
+kill l1;
+kill l2;
 "**********************************************";
 string s="12345678901234567890123456789012345678901234567890";
 string t500=s+s+s+s+s+s+s+s+s+s;
