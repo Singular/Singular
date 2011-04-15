@@ -434,7 +434,7 @@ KINLINE void  sTObject::pCleardenom()
       else
 	{
 #ifdef HAVE_RATGRING
-	  p= p_Cleardenom_n(p, currRing, n);
+	  p_Cleardenom_n(p, currRing, n);
 #else
 	  p_Cleardenom_n(p, currRing, n);
 #endif
@@ -458,7 +458,7 @@ KINLINE void  sTObject::pCleardenom()
       else
 	{
 #ifdef HAVE_RATGRING
-	  p= p_Cleardenom(p, currRing);
+	  p_Cleardenom(p, currRing);
 #else
 	  p_Cleardenom(p, currRing);
 #endif
