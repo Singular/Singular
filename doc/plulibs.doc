@@ -17,6 +17,8 @@ Use the @code{LIB} command for loading of single libraries.
 
 @strong{Note:} For any computation in @sc{Plural}, the monomial ordering must be a global ordering.
 
+See also @ref{jacobson_lib} for the diagonalization of matrices over Ore Euclidean domains.
+
 @menu
 * bfun_lib::  Algorithms for b-functions and Bernstein-Sato polynomial
 * central_lib:: Computation of centralizer and center in GR-algebras
