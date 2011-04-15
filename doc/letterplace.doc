@@ -58,7 +58,7 @@ quotient of @math{K}< @math{x_1},@dots{},@math{x_n} > modulo a two-sided ideal.
 @cindex Groebner bases in free associative algebras
 
 @tex
-We call a total ordering $<$ on the free monoid $X := \langle x_1,\dots,x_n \rangle$ (where @math{1} is identified with the identity element) a
+We call a total ordering $<$ on the free monoid $X := \langle x_1,\dots,x_n \rangle$ (where $1$ is identified with the identity element) a
 \textbf{monomial ordering} if the following conditions hold:
 @end tex
 @ifinfo
@@ -214,7 +214,7 @@ lst2str(@LN,1); // output the string presentation
 @c example
 @end smallexample
 
-There are various conversion routines in the library @code{freegb.lib} (see @ref{freegb_lib}).
+There are various conversion routines in the library @code{freegb_lib} (see @ref{freegb_lib}).
 We work further on implementing more algorithms for non-commutative ideals and modules over free associative algebra.
 
 @c ---------------------------------------------------------------------------
@@ -241,10 +241,10 @@ in order to see the activity journal as well as the memory usage
 
 Further functionality is provided in the libraries for the @sc{Letterpace} subsystem.
 
-In the @ref{freegb.lib} one finds e.g. letterplace arithmetics procedures, conversion tools,
+In the @ref{freegb_lib} one finds e.g. letterplace arithmetics procedures, conversion tools,
 procedures for creating some common ideals of relations as well as the normal form 
 procedure, providing effective ideal memnership test.
 
 
-The @ref{fpadim.lib} contains procedures for computations with vector space basis 
+The @ref{fpadim_lib} contains procedures for computations with vector space basis 
 of a factor algebra including finiteness check and dimension computation.
