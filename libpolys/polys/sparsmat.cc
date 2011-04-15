@@ -276,7 +276,7 @@ ring sm_RingChange(const ring currRing, long bound)
   block1[1]=tmpR->N;
   tmpR->block1=block1;
   tmpR->bitmask = 2*bound;
-  tmpR->wvhdl = (int **)omAlloc0((3) * sizeof(int_ptr));
+  tmpR->wvhdl = (int **)omAlloc0((3) * sizeof(int*));
 
 // ???
 //  if (tmpR->bitmask > currRing->bitmask) tmpR->bitmask = currRing->bitmask;
