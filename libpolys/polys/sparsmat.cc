@@ -62,16 +62,16 @@ struct smprec
 /* declare internal 'C' stuff */
 static void sm_ExactPolyDiv(poly, poly, const ring);
 static BOOLEAN sm_IsNegQuot(poly, const poly, const poly, const ring);
-static void smExpMultDiv(poly, const poly, const poly, const ring);
+static void sm_ExpMultDiv(poly, const poly, const poly, const ring);
 static void sm_PolyDivN(poly, const number, const ring);
 static BOOLEAN sm_Smaller(poly, poly, const ring);
 static void sm_CombineChain(poly *, poly, const ring);
 static void sm_FindRef(poly *, poly *, poly, const ring);
 
 static void sm_ElemDelete(smpoly *, const ring);
-static sm_poly smElemCopy(smpoly, const ring);
+static smpoly smElemCopy(smpoly, const ring);
 static float sm_PolyWeight(smpoly, const ring);
-static sm_poly smPoly2Smpoly(poly, const ring);
+static smpoly smPoly2Smpoly(poly, const ring);
 static poly sm_Smpoly2Poly(smpoly, const ring);
 static BOOLEAN sm_HaveDenom(poly, const ring);
 static number sm_Cleardenom(ideal, const ring);
@@ -275,7 +275,7 @@ ring sm_RingChange(const ring currRing, long bound)
   block1[1]=tmpR->N;
   tmpR->block1=block1;
   tmpR->bitmask = 2*bound;
-  tmpR->wvhdl = (int **)omAlloc0((3) * sizeof(int_ptr));
+  tmpR->wvhdl = (int **)omAlloc0((3) * sizeof(int*));
 
 // ???
 //  if (tmpR->bitmask > currRing->bitmask) tmpR->bitmask = currRing->bitmask;
