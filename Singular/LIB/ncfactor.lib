@@ -2015,7 +2015,7 @@ THEORY: @code{homogfacFirstQWeyl} returns a list with a factorization of the giv
         k positive, the last k entries in the output list are the second
         variable. If k is positive, the last k entries will be x. The other
         entries will be irreducible polynomials of degree zero or 1 resp. -1.
-SEE ALSO: homogfacFirstWeyl, homogfacFirstQWeyl_all
+SEE ALSO: homogfacFirstQWeyl_all
 "{//proc homogfacFirstQWeyl
   int p = printlevel-voice+2;//for dbprint
   def r = basering;
