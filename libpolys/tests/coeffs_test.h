@@ -21,74 +21,12 @@
 #include <coeffs/rintegers.h>
 
 
-#include <iostream>
+#include "common.h"
 using namespace std;
 
 
-#pragma GCC diagnostic ignored "-Wwrite-strings"
 namespace
 {
-  static inline ostream& operator<< (ostream& o, const n_coeffType& type)
-  {
-#define CASE(A) case A: return o << (" " # A) << " ";
-    switch( type )
-    {
-      CASE(n_unknown);
-      CASE(n_Zp);
-      CASE(n_Q);
-      CASE(n_R);
-      CASE(n_GF);
-      CASE(n_long_R);
-      CASE(n_Zp_a);
-      CASE(n_Q_a);
-      CASE(n_long_C);
-      CASE(n_Z);
-      CASE(n_Zn);
-      CASE(n_Zpn);
-      CASE(n_Z2m);
-      CASE(n_CF);
-      default: return o << "Unknown type: [" << (const unsigned long) type << "]";  
-    }   
-#undef CASE
-    return o;
-  }
-
-  template<typename T>
-      static inline std::string _2S(T i)
-  {
-    std::stringstream ss;
-    ss << i;
-//    std::string s = ss.str();
-    return ss.str();
-  }
-
-
-  static inline std::string _2S(number a, const coeffs r)
-  {
-    n_Test(a,r);
-    StringSetS("");  
-    n_Write(a, r);
-
-    const char* s = StringAppendS("");
-    
-    std::stringstream ss;  ss << s;
-
-    StringSetS("");  
-    return ss.str();
-    
-  }
-  
-
-}
-
-void PrintSized(/*const*/ number a, const coeffs r, BOOLEAN eoln = TRUE)
-{
-  clog << _2S(a, r) << ", of size: " << n_Size(a, r);
-  
-  if( eoln ) 
-    clog << endl;  
-}
-  
 
 void TestSum(const coeffs r, const unsigned long N)
 {
@@ -364,17 +302,13 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
 }
 
 
+}
+
 
 class CoeffsTestSuite : public CxxTest::TestSuite 
 {
  public:
-   void test_dummy()
-   {
-     float fnum = 2.00001f;		
-     TS_ASSERT_DELTA (fnum, 2.0f, 0.0001f);
-     
-   }
-
+//   void test_dummy() { float fnum = 2.00001f; TS_ASSERT_DELTA (fnum, 2.0f, 0.0001f);  }
 
    void test_Z2m4()
    {
