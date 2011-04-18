@@ -100,6 +100,10 @@ typedef short BOOLEAN;
 #define NULL        (0)
 #endif
 
+#ifndef NULLp
+#define NULLp        ((void*)NULL)
+#endif
+
 // #ifdef _TRY
 #ifndef ABS
 #define ABS(x) ((x)<0?(-(x)):(x))

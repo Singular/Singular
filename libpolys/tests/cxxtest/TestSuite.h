@@ -328,7 +328,7 @@ namespace CxxTest
 
     // TS_ASSERT_PREDICATE
 #   define ___ETS_ASSERT_PREDICATE(f,l,p,x,m) \
-        CxxTest::doAssertPredicate( (f), (l), #p, p(), #x, (x), (m) )
+        CxxTest::doAssertPredicate( (f), (l), #p, p, #x, (x), (m) )
 #   define ___TS_ASSERT_PREDICATE(f,l,p,x,m) \
         { _TS_TRY { ___ETS_ASSERT_PREDICATE(f,l,p,x,m); } __TS_CATCH(f,l) }
 

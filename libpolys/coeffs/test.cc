@@ -1,11 +1,11 @@
 #include "config.h"
-
 #include <misc/auxiliary.h>
+#include <omalloc/omalloc.h>
+
+#include <reporter/reporter.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
-#include <reporter/reporter.h>
-#include <omalloc/omalloc.h>
 
 #include <coeffs/longrat.h>
 #include <coeffs/gnumpfl.h>
