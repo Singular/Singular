@@ -90,5 +90,3 @@ depcomp
 missing
 stamp-h1
 stamp-h2
-libpolys/tests/simple_test
-libpolys/tests/simple_test_runner.cpp

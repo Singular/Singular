@@ -38,15 +38,15 @@ libcoeffs_g_a_include_HEADERS = $(COEFFSHEADERS)
 
 
 ## for testing...
-AM_LDFLAGS	= -L${top_builddir}/../coeffs -L${top_builddir}/../reporter -L${top_builddir}/../resources -L${top_builddir}/../../omalloc
+AM_LDFLAGS	= -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc -L${top_builddir}/../omalloc
 
 check_PROGRAMS = test test-g
 
 test_SOURCES   = test.cc
 test_g_SOURCES = test.cc
 
-test_LDADD   = libcoeffs.a -lresources -lreporter -lomalloc ${GMP_LIBS}
-test_g_LDADD = libcoeffs_g.a -lresources_g -lreporter_g -lomalloc_debug ${GMP_LIBS}
+test_LDADD   = -lcoeffs ${GMP_LIBS} -lresources -lreporter -lmisc -lomalloc
+test_g_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lomalloc_debug
 
 
 
