@@ -35,7 +35,7 @@ SOURCES = \
 	nc/gring.cc nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc nc/ncSAMult.cc \
 	pDebug.cc pInline0.cc polys0.cc prCopy.cc \
 	kbuckets.cc sbuckets.cc ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} weight.cc \
-  simpleideals.cc matpol.cc sparsmat.cc
+  simpleideals.cc matpol.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
 
@@ -50,7 +50,7 @@ include_HEADERS = \
 	templates/p_Procs_Dynamic.h templates/p_Procs_Impl.h templates/p_Procs_Set.h templates/p_Procs_Static.h \
 	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h \
-  matpol.h sparsmat.h
+  matpol.h
 
 P_PROCS_CPPFLAGS_COMMON = -DHAVE_CONFIG_H -DDYNAMIC_VERSION 
 
