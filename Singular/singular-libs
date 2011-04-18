@@ -14,20 +14,22 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 	deform.lib elim.lib  equising.lib  finvar.lib  general.lib gmspoly.lib \
 	gmssing.lib  graphics.lib  grobcov.lib groups.lib  grwalk.lib \
 	hnoether.lib \
-	homolog.lib  hyperel.lib  inout.lib  intprog.lib  jacobson.lib \
+	homolog.lib  hyperel.lib  integralbasis.lib inout.lib  intprog.lib\
+	jacobson.lib \
 	kskernel.lib  latex.lib  linalg.lib  lll.lib  makedbm.lib \
 	matrix.lib  modstd.lib  mondromy.lib  monomialideal.lib \
 	mprimdec.lib  mregular.lib \
-	noether.lib normal.lib normaliz.lib   ntsolve.lib phindex.lib \
+	noether.lib normal.lib normaliz.lib   ntsolve.lib \
+	paraplanecurves.lib phindex.lib \
 	pointid.lib poly.lib \
-	polymake.lib presolve.lib  primdec.lib  primitiv.lib  qhmoduli.lib \
-        random.lib \
+	polymake.lib presolve.lib  primdec.lib  primdecint.lib \
+	primitiv.lib  qhmoduli.lib random.lib \
 	realrad.lib  reesclos.lib  resbinomial.lib \
-	resgraph.lib  resolve.lib \
+	resgraph.lib  resjung.lib resolve.lib \
 	reszeta.lib  ring.lib  rinvar.lib  rootsmr.lib  rootsur.lib \
 	sagbi.lib  sheafcoh.lib  sing.lib  sing4ti2.lib  signcond.lib \
 	solve.lib  spcurve.lib  spectrum.lib  standard.lib  stratify.lib \
-	surf.lib  surfex.lib \
+	surf.lib  surfacesignature.lib surfex.lib \
 	teachstd.lib  toric.lib  triang.lib \
 	tropical.lib weierstr.lib  zeroset.lib
 
@@ -38,10 +40,10 @@ SLIB0 = absfact.lib  ainvar.lib  aksaka.lib  alexpoly.lib  algebra.lib \
 # svn propset svn:keywords "Id" yourlib.lib
 # for new libs
 
-SLIB1 = finitediff.lib integralbasis.lib multigrading.lib paraplanecurves.lib \
-         primdecint.lib resjung.lib surfacesignature.lib fpadim.lib
+SLIB1 = findifs.lib finitediff.lib multigrading.lib \
+        lll.lib 
 
-PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib dmodvar.lib \
+PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib dmodvar.lib fpadim.lib \
 	freegb.lib  gkdim.lib  involut.lib  ncalg.lib  ncdecomp.lib \
 	nctools.lib  perron.lib  qmatrix.lib
 

@@ -910,13 +910,18 @@ see @ref{Libraries}.
 Comments should be send to the author of the library directly.
 
 @menu
+* findifs_lib:: Tools for the finite difference schemes
 * finitediff_lib:: finite difference schemes for linear differential equations
 * lll_lib:: Integral LLL-Algorithm
 * multigrading_lib:: Multigradings and related computations
 @end menu
 @c ----------------------------------------------------------
+@node findifs_lib, finitediff_lib, , Experimental libraries
+@subsection findifs_lib
 
-@node finitediff_lib,lll_lib, , Experimental libraries
+@c lib findifs.lib
+@c ----------------------------------------------------------
+@node finitediff_lib,lll_lib, findifs_lib, Experimental libraries
 @subsection finitediff_lib
 
 Issues:
