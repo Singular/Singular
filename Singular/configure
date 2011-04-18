@@ -2850,6 +2850,13 @@ fi
 esac
 
 
+if test $ac_cv_c_cpp = unknown;
+then
+  LD_DYN_FLAGS=
+  SFLAGS=
+  SLDFLAGS=
+fi
+
 
 
 LIBS="${SAVE_LIBS} ${MP_LIBS}"

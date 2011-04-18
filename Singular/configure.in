@@ -794,6 +794,12 @@ case "$ac_cv_singuname" in
 	  fi
 	;;
 esac
+if test $ac_cv_c_cpp = unknown;
+then
+  LD_DYN_FLAGS=
+  SFLAGS=
+  SLDFLAGS=
+fi
 AC_SUBST(LD_DYN_FLAGS)
 AC_SUBST(SFLAGS)
 AC_SUBST(SLDFLAGS)
