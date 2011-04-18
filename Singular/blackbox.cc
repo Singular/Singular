@@ -42,12 +42,12 @@ void *blackbox_default_Init(blackbox *b)
   return NULL;
 }
 
-BOOLEAN blackbox_default_serialize(blackbox *b, void *d, FILE *f)
+BOOLEAN blackbox_default_serialize(blackbox *b, void *d, si_link f)
 {
   return TRUE;
 }
 
-BOOLEAN blackbox_default_deserialize(blackbox *b, void **d, FILE *f)
+BOOLEAN blackbox_default_deserialize(blackbox *b, void **d, si_link f)
 {
   return TRUE;
 }

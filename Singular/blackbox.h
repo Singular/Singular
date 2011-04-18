@@ -3,6 +3,7 @@
 #include <omalloc.h>
 #include <kernel/structs.h>
 #include <kernel/febase.h>
+#include <Singular/silink.h>
 
 void removeBlackboxStuff(const int rt);
 
@@ -35,9 +36,9 @@ struct  blackbox_struct
   /// check internal structure
   BOOLEAN (*blackbox_Check)(blackbox *b,void *d);
   /// serialize
-  BOOLEAN (*blackbox_serialize)(blackbox *b,void *d, FILE *f);
+  BOOLEAN (*blackbox_serialize)(blackbox *b,void *d, si_link f);
   /// deserialize
-  BOOLEAN (*blackbox_deserialize)(blackbox *b,void **d, FILE *f);
+  BOOLEAN (*blackbox_deserialize)(blackbox *b,void **d, si_link f);
   /// additional type info
   void *data;
   /// addtinional gneral properties

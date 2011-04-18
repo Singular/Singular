@@ -297,6 +297,20 @@ BOOLEAN newstruct_Check(blackbox *b, void *d)
   return FALSE;
 }
 
+BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
+{
+  newstruct_desc dd=(newstruct_desc)b->data;
+  // write string(getBlackboxName(dd->id),
+  lists ll=(lists)d;
+  // write(ll)
+  return FALSE;
+}
+
+BOOLEAN newstruct_deserialize(blackbox *b, void **d, si_link f)
+{
+  return TRUE;
+}
+
 void newstruct_setup(const char *n, newstruct_desc d )
 {
   blackbox *b=(blackbox*)omAlloc0(sizeof(blackbox));
@@ -314,6 +328,8 @@ void newstruct_setup(const char *n, newstruct_desc d )
   //b->blackbox_Op3=blackbox_default_Op3;
   b->blackbox_OpM=newstruct_OpM;
   b->blackbox_Check=newstruct_Check;
+  b->blackbox_serialize=newstruct_serialize;
+  b->blackbox_deserialize=newstruct_deserialize;
   b->data=d;
   b->properties=1; // list_like
   int rt=setBlackboxStuff(b,n);
