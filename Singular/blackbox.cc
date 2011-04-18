@@ -42,6 +42,16 @@ void *blackbox_default_Init(blackbox *b)
   return NULL;
 }
 
+BOOLEAN blackbox_default_serialize(blackbox *b, void *d, FILE *f)
+{
+  return TRUE;
+}
+
+BOOLEAN blackbox_default_deserialize(blackbox *b, void **d, FILE *f)
+{
+  return TRUE;
+}
+
 // Tok2Cmdname -> iiTwoOps
 BOOLEAN WrongOp(const char* cmd, int op, leftv bb)
 {
@@ -135,9 +145,12 @@ int setBlackboxStuff(blackbox *bb, const char *n)
     if (bb->blackbox_Op3==NULL)     bb->blackbox_Op3=blackbox_default_Op3;
     if (bb->blackbox_OpM==NULL)     bb->blackbox_OpM=blackbox_default_OpM;
     if (bb->blackbox_Check==NULL)   bb->blackbox_Check=blackbox_default_Check;
+    if (bb->blackbox_serialize==NULL) bb->blackbox_serialize=blackbox_default_serialize;
+    if (bb->blackbox_deserialize==NULL) bb->blackbox_deserialize=blackbox_default_deserialize;
     return where+BLACKBOX_OFFSET;
   }
 }
+
 void removeBlackboxStuff(const int rt)
 {
   omfree(blackboxTable[rt-BLACKBOX_OFFSET]);

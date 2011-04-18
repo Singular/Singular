@@ -34,6 +34,10 @@ struct  blackbox_struct
   BOOLEAN (*blackbox_OpM)(int op,leftv l, leftv r);
   /// check internal structure
   BOOLEAN (*blackbox_Check)(blackbox *b,void *d);
+  /// serialize
+  BOOLEAN (*blackbox_serialize)(blackbox *b,void *d, FILE *f);
+  /// deserialize
+  BOOLEAN (*blackbox_deserialize)(blackbox *b,void **d, FILE *f);
   /// additional type info
   void *data;
   /// addtinional gneral properties
