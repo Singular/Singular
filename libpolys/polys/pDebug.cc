@@ -16,6 +16,7 @@
 
 
 #include "config.h"
+#include <misc/auxiliary.h>
 #ifdef PDEBUG
 
 // do the following to always enforce checking of pSetm
@@ -23,9 +24,10 @@
 // #define PDEBUG 2
 
 //#include <polys/monomials/p_polys.h>
-#include <output.h>
+//#include <output.h>
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
+#include <polys/monomials/p_polys.h>
 #include <coeffs/coeffs.h>
 
 /***************************************************************
@@ -48,16 +50,9 @@ BOOLEAN dPolyReportError(poly p, ring r, const char* fmt, ...)
   omPrintCurrentBackTraceMax(stderr, 8);
   if (p != NULL)
   {
-    if (r == currRing)
-    {
-      fprintf(stderr, " occured for poly: ");
-      p_wrp(p, r);
-      omPrintAddrInfo(stderr, p, " ");
-    }
-    else
-    {
-      omPrintAddrInfo(stderr, p, " occured for poly: ");
-    }
+    fprintf(stderr, " occured for poly: ");
+    p_wrp(p, r);
+    omPrintAddrInfo(stderr, p, " ");
   }
   dErrorBreak();
   d_poly_error_reporting = FALSE;
@@ -89,7 +84,7 @@ BOOLEAN p_LmCheckIsFromRing(poly p, ring r)
     else
     #endif
     {
-      pPolyAssumeReturn(omIsBinPageAddr(p) && omSizeWOfAddr(p)==r->PolyBin->sizeW,p,r);
+      _pPolyAssumeReturn(omIsBinPageAddr(p) && omSizeWOfAddr(p)==r->PolyBin->sizeW,p,r);
       return TRUE;
     }
     return FALSE;
@@ -142,7 +137,7 @@ BOOLEAN p_DebugLmDivisibleByNoComp(poly a, poly b, ring r)
   }
   while (i);
 #ifdef HAVE_RINGS
-  return nDivBy(pGetCoeff(b), pGetCoeff(a));
+  return n_DivBy(pGetCoeff(b), pGetCoeff(a), r->cf);
 #else
   return TRUE;
 #endif
@@ -212,7 +207,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
 
   #ifndef OM_NDEBUG
   // check addr with level+1 so as to check bin/page of addr
-  pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, level+1)
+  _pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, level+1)
                         == omError_NoError, "memory error",p,r);
   #endif
 
@@ -232,20 +227,20 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     pFalseReturn(p_LmCheckIsFromRing(p, r));
     #ifndef OM_NDEBUG
     // omAddr check
-    pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, 1)
+    _pPolyAssumeReturnMsg(omTestBinAddrSize(p, (r->PolyBin->sizeW)*SIZEOF_LONG, 1)
                      == omError_NoError, "memory error",p,r);
     #endif
     // number/coef check
-    pPolyAssumeReturnMsg(p->coef != NULL || (n_GetChar(r) >= 2), "NULL coef",p,r);
+    _pPolyAssumeReturnMsg(p->coef != NULL || (n_GetChar(r->cf) >= 2), "NULL coef",p,r);
     #ifdef LDEBUG
-    r->cf->nDBTest(p->coef,__FILE__,__LINE__);
+    r->cf->cfDBTest(p->coef,__FILE__,__LINE__,r->cf);
     #endif
-    pPolyAssumeReturnMsg(!n_IsZero(p->coef, r), "Zero coef",p,r);
+    _pPolyAssumeReturnMsg(!n_IsZero(p->coef, r->cf), "Zero coef",p,r);
 
     // check for valid comp
-    pPolyAssumeReturnMsg(p_GetComp(p, r) >= 0 && (p_GetComp(p, r)<65000), "component out of range ?",p,r);
+    _pPolyAssumeReturnMsg(p_GetComp(p, r) >= 0 && (p_GetComp(p, r)<65000), "component out of range ?",p,r);
     // check for mix poly/vec representation
-    pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) != 0), "mixed poly/vector",p,r);
+    _pPolyAssumeReturnMsg(ismod == (p_GetComp(p, r) != 0), "mixed poly/vector",p,r);
 
     // special check for ringorder_s/S
     if ((r->typ!=NULL) && (r->typ[0].ord_typ == ro_syzcomp))
@@ -260,8 +255,8 @@ BOOLEAN _p_Test(poly p, ring r, int level)
         ccc1 = o->data.syzcomp.ShiftedComponents[cc1];
       }
       else { cc1=0; ccc1=0; }
-      pPolyAssumeReturnMsg(c1 == 0 || cc1 != 0, "Component <-> TrueComponent zero mismatch",p,r);
-      pPolyAssumeReturnMsg(c1 == 0 || ccc1 != 0,"Component <-> ShiftedComponent zero mismatch",p,r);
+      _pPolyAssumeReturnMsg(c1 == 0 || cc1 != 0, "Component <-> TrueComponent zero mismatch",p,r);
+      _pPolyAssumeReturnMsg(c1 == 0 || ccc1 != 0,"Component <-> ShiftedComponent zero mismatch",p,r);
       ec1 = p->exp[o->data.syzcomp.place];
       //pPolyAssumeReturnMsg(ec1 == ccc1, "Shifted comp out of sync. should %d, is %d");
       if (ec1 != ccc1)
@@ -275,7 +270,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
     if (level > 0)
     {
       poly p_should_equal = p_DebugInit(p, r, r);
-      pPolyAssumeReturnMsg(p_ExpVectorEqual(p, p_should_equal, r), "p_Setm field(s) out of sync",p,r);
+      _pPolyAssumeReturnMsg(p_ExpVectorEqual(p, p_should_equal, r), "p_Setm field(s) out of sync",p,r);
       p_LmFree(p_should_equal, r);
     }
 
@@ -285,10 +280,10 @@ BOOLEAN _p_Test(poly p, ring r, int level)
       int cmp = p_LmCmp(p_prev, p, r);
       if (cmp == 0)
       {
-        pPolyAssumeReturnMsg(0, "monoms p and p->next are equal", p_prev, r);
+        _pPolyAssumeReturnMsg(0, "monoms p and p->next are equal", p_prev, r);
       }
       else
-        pPolyAssumeReturnMsg(p_LmCmp(p_prev, p, r) == 1, "wrong order", p_prev, r);
+        _pPolyAssumeReturnMsg(p_LmCmp(p_prev, p, r) == 1, "wrong order", p_prev, r);
 
       // check that compare worked sensibly
       if (level > 1 && p_GetComp(p_prev, r) == p_GetComp(p, r))
@@ -298,7 +293,7 @@ BOOLEAN _p_Test(poly p, ring r, int level)
         {
           if (p_GetExp(p_prev, i, r) != p_GetExp(p, i, r)) break;
         }
-        pPolyAssumeReturnMsg(i > 0, "Exponents equal but compare different", p_prev, r);
+        _pPolyAssumeReturnMsg(i > 0, "Exponents equal but compare different", p_prev, r);
       }
     }
     p_prev = p;
@@ -352,8 +347,8 @@ static unsigned long pDivisibleBy_ShortFalse = 1;
 BOOLEAN pDebugLmShortDivisibleBy(poly p1, unsigned long sev_1, ring r_1,
                                poly p2, unsigned long not_sev_2, ring r_2)
 {
-  pPolyAssume(p_GetShortExpVector(p1, r_1) == sev_1, p1, r_1);
-  pPolyAssume(p_GetShortExpVector(p2, r_2) == ~ not_sev_2, p2, r_2);
+  _pPolyAssume(p_GetShortExpVector(p1, r_1) == sev_1, p1, r_1);
+  _pPolyAssume(p_GetShortExpVector(p2, r_2) == ~ not_sev_2, p2, r_2);
 
   pDivisibleBy_number++;
   BOOLEAN ret;
