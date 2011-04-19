@@ -70,7 +70,7 @@ bool ncInitSpecialPowersMultiplication(ring r)
 
   return true;
   
-};
+}
 
 
 
@@ -137,7 +137,7 @@ static inline Enum_ncSAType AnalyzePairType(const ring r, int i, int j)
   }
 
   return _ncSA_notImplemented;
-};
+}
 
 
 
@@ -550,7 +550,7 @@ poly CFormulaPowerMultiplier::ncSA_Mxy0x0y0(const int i, const int j, const int 
 poly CFormulaPowerMultiplier::ncSA_Qxy0x0y0(const int i, const int j, const int n, const int m, const number m_q, const ring r)
 {
   return ::ncSA_Qxy0x0y0(i, j, n, m, m_q, r);
-};
+}
 
 poly CFormulaPowerMultiplier::ncSA_1xy0x0yG(const int i, const int j, const int n, const int m, const number m_g, const ring r)
 {

@@ -193,7 +193,7 @@ poly p_Lcm(const poly a, const poly b, const long lCompM, const ring r)
   n_New(&(p_GetCoeff(m, r)), r);
 
   return(m);
-};
+}
 
 poly p_Lcm(const poly a, const poly b, const ring r)
 {
@@ -211,7 +211,7 @@ poly p_Lcm(const poly a, const poly b, const ring r)
 //  p_Test(m,r);
 #endif
   return(m);
-};
+}
 
 
 
