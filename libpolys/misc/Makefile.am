@@ -14,7 +14,7 @@ libmisc_g_a_CPPFLAGS = -DHAVE_CONFIG_H
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir}
 
-SOURCES  = intvec.cc
+SOURCES  = intvec.cc options.c
 libmisc_a_SOURCES   = $(SOURCES)
 libmisc_g_a_SOURCES = $(SOURCES)
 
