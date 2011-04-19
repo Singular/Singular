@@ -31,7 +31,7 @@ public:
      rDebugPrint(r);
 #endif
      
-     rKill(r);
+     rDelete(r);
    }
 };
 

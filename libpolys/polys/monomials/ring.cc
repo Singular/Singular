@@ -266,7 +266,7 @@ void rWrite(ring r)
     Print("//   # ground field : %d\n",r->ch);
     Print("//   primitive element : %s\n", r->parameter[0]);
     StringSetS("//   minpoly        : ");
-    nfShowMipo();PrintS(StringAppendS("\n"));
+    nfShowMipo(r->cf);PrintS(StringAppendS("\n"));
   }
 #ifdef HAVE_RINGS
   else if (rField_is_Ring(r))

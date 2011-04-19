@@ -152,14 +152,14 @@ char* feResource(const char* key, int warn)
   return feResource(feGetResourceConfig(key), warn);
 }
 
-char* feGetResource(const char id)
-{
-  return feResource(feGetResourceConfig(id), -1);
-}
-
 char* feResource(const char id, int warn)
 {
   return feResource(feGetResourceConfig(id), warn);
+}
+
+char* feGetResource(const char id)
+{
+  return feResource(feGetResourceConfig(id), -1);
 }
 
 char* feResourceDefault(const char id)
