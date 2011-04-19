@@ -9,25 +9,23 @@
 
 #include <math.h>
 #include <string.h>
-#include <kernel/mod2.h>
+#include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
-#include <kernel/structs.h>
 
 double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx, double wwNsqr);
 double wFunctionalBuch(int *degw, int *lpol, int npol,
        double *rel, double wx, double wwNsqr);
-void wAdd(int *A, int mons, int kn, int xx);
+void wAdd(int *A, int mons, int kn, int xx, int rvar);
 void wNorm(int *degw, int *lpol, int npol, double *rel);
 void wFirstSearch(int *A, int *x, int mons,
-        int *lpol, int npol, double *rel, double *fopt, double wNsqr);
+        int *lpol, int npol, double *rel, double *fopt, double wNsqr, int rvar);
 void wSecondSearch(int *A, int *x, int *lpol,
-        int npol, int mons, double *rel, double *fk, double wNsqr);
+        int npol, int mons, double *rel, double *fk, double wNsqr, int rvar);
 void wGcd(int *x, int n);
 /*0 implementation*/
 
 short * ecartWeights=NULL;
-extern int pVariables;
 
 double (*wFunctional)(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
@@ -111,12 +109,12 @@ double wFunctionalBuch(int *degw, int *lpol, int npol,
 }
 
 
-static void wSub(int *A, int mons, int kn, int xx)
+static void wSub(int *A, int mons, int kn, int xx,int rvar)
 {
   int  i, *B, *ex;
 
   B = A + ((kn - 1) * mons);
-  ex = A + (pVariables * mons);
+  ex = A + (rvar * mons);
   i = mons;
   if (xx == 1)
   {
@@ -131,12 +129,12 @@ static void wSub(int *A, int mons, int kn, int xx)
 }
 
 
-void wAdd(int *A, int mons, int kn, int xx)
+void wAdd(int *A, int mons, int kn, int xx, int rvar)
 {
   int  i, *B, *ex;
 
   B = A + ((kn - 1) * mons);
-  ex = A + (pVariables * mons);
+  ex = A + (rvar * mons);
   i = mons;
   if (xx == 1)
   {
@@ -152,7 +150,7 @@ void wAdd(int *A, int mons, int kn, int xx)
 
 
 void wFirstSearch(int *A, int *x, int mons,
-  int *lpol, int npol, double *rel, double *fopt, double wNsqr)
+  int *lpol, int npol, double *rel, double *fopt, double wNsqr, int rvar)
 {
   int  a0, a, n, xn, t, xx, y1;
   int  *y, *degw, *xopt;
@@ -161,7 +159,7 @@ void wFirstSearch(int *A, int *x, int mons,
   void *adr;
 
   fy = *fopt;
-  n = pVariables;
+  n = rvar;
   xn = n + 6 + (21 / n);
   a0 = n * sizeof(double);
   a = n * sizeof(int);
@@ -186,7 +184,7 @@ void wFirstSearch(int *A, int *x, int mons,
         y[t] = y1;
         x[t] = xx;
         if (xx > 1)
-          wAdd(A, mons, t, 1);
+          wAdd(A, mons, t, 1, rvar);
         t++;
       }
       else
@@ -194,7 +192,7 @@ void wFirstSearch(int *A, int *x, int mons,
         xx = x[t] - 1;
         x[t] = 0;
         if (xx!=0)
-          wSub(A, mons, t, xx);
+          wSub(A, mons, t, xx, rvar);
         t--;
         if (t==0)
         {
@@ -210,10 +208,10 @@ void wFirstSearch(int *A, int *x, int mons,
     x[t] = xx;
     xx--;
     if (xx!=0)
-      wAdd(A, mons, t, xx);
+      wAdd(A, mons, t, xx, rvar);
     fmax = (*wFunctional)(degw, lpol, npol, rel, wx,wNsqr);
     if (xx!=0)
-      wSub(A, mons, t, xx);
+      wSub(A, mons, t, xx, rvar);
     if (fmax < fy)
     {
       fy = fmax;
@@ -237,20 +235,20 @@ static double wPrWeight(int *x, int n)
 
 
 static void wEstimate(int *A, int *x, int *lpol, int npol, int mons,
-double wx, double *rel, double *fopt, int *s0, int *s1, int *s2, double wNsqr)
+double wx, double *rel, double *fopt, int *s0, int *s1, int *s2, double wNsqr, int rvar)
 {
   int  n, i1, i2, k0 = 0, k1 = 0, k2 = 0;
   int  *degw;
   double fo1, fo2, fmax, wx1, wx2;
 
-  n = pVariables;
+  n = rvar;
   degw = A + (n * mons);
   fo2 = fo1 = (double)1.0e10;
   for (i1 = n; i1!=0 ; i1--)
   {
     if (x[i1] > 1)
     {
-      wSub(A, mons, i1, 1);
+      wSub(A, mons, i1, 1, rvar);
       wx1 = wx - wx / (double)x[i1];
       x[i1]--;
       fmax = (*wFunctional)(degw, lpol, npol, rel, wx1,wNsqr);
@@ -263,7 +261,7 @@ double wx, double *rel, double *fopt, int *s0, int *s1, int *s2, double wNsqr)
       {
         if (x[i2] > 1)
         {
-          wSub(A, mons, i2, 1);
+          wSub(A, mons, i2, 1, rvar);
           wx2 = wx1 - wx1 / (double)x[i2];
           fmax = (*wFunctional)(degw, lpol, npol, rel, wx2, wNsqr);
           if (fmax < fo2)
@@ -272,10 +270,10 @@ double wx, double *rel, double *fopt, int *s0, int *s1, int *s2, double wNsqr)
             k1 = i1;
             k2 = i2;
           }
-          wAdd(A, mons, i2, 1);
+          wAdd(A, mons, i2, 1, rvar);
         }
       }
-      wAdd(A, mons, i1, 1);
+      wAdd(A, mons, i1, 1, rvar);
       x[i1]++;
     }
   }
@@ -295,19 +293,19 @@ double wx, double *rel, double *fopt, int *s0, int *s1, int *s2, double wNsqr)
 
 
 void wSecondSearch(int *A, int *x, int *lpol,
-int npol, int mons, double *rel, double *fk, double wNsqr)
+int npol, int mons, double *rel, double *fk, double wNsqr, int rvar)
 {
   int  n, s0, s1, s2, *xopt;
   double  one, fx, fopt, wx;
 
-  n = pVariables;
+  n = rvar;
   xopt = x + (n + 2);
   fopt = *fk * (double)0.999999999999;
   wx = wPrWeight(x, n);
   one = (double)1.0;
   loop
   {
-    wEstimate(A, x, lpol, npol, mons, wx, rel, &fx, &s0, &s1, &s2, wNsqr);
+    wEstimate(A, x, lpol, npol, mons, wx, rel, &fx, &s0, &s1, &s2, wNsqr, rvar);
     if (fx > fopt)
     {
       if (s0!=0)
@@ -340,11 +338,11 @@ int npol, int mons, double *rel, double *fk, double wNsqr)
         break;
     }
     if (s0!=0)
-      wSub(A, mons, s0, 1);
+      wSub(A, mons, s0, 1, rvar);
     else
     {
-      wSub(A, mons, s1, 1);
-      wSub(A, mons, s2, 1);
+      wSub(A, mons, s1, 1, rvar);
+      wSub(A, mons, s2, 1, rvar);
     }
     wx = wPrWeight(x, n);
   }

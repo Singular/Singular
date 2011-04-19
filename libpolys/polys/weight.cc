@@ -25,12 +25,12 @@ extern "C" double wFunctionalMora(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
 extern "C" double wFunctionalBuch(int *degw, int *lpol, int npol,
        double *rel, double wx, double wNsqr);
-extern "C" void wAdd(int *A, int mons, int kn, int xx);
+extern "C" void wAdd(int *A, int mons, int kn, int xx, int rvar);
 extern "C" void wNorm(int *degw, int *lpol, int npol, double *rel);
 extern "C" void wFirstSearch(int *A, int *x, int mons,
-        int *lpol, int npol, double *rel, double *fopt, double wNsqr);
+        int *lpol, int npol, double *rel, double *fopt, double wNsqr, int rvar);
 extern "C" void wSecondSearch(int *A, int *x, int *lpol,
-        int npol, int mons, double *rel, double *fk, double wNsqr);
+        int npol, int mons, double *rel, double *fk, double wNsqr, int rvar);
 extern "C" void wGcd(int *x, int n);
 
 static void wDimensions(poly* s, int sl, int *lpol, int *npol, int *mons)
@@ -133,23 +133,23 @@ void wCall(poly* s, int sl, int *x, double wNsqr, const ring R)
   degw = A + (n * mons);
   memset(degw, 0, mons * sizeof(int));
   for (i = n; i!=0; i--)
-    wAdd(A, mons, i, 1);
+    wAdd(A, mons, i, 1, rVar(R));
   wNorm(degw, lpol, npol, rel);
   f1 = (*wFunctional)(degw, lpol, npol, rel, (double)1.0, wNsqr);
   if (TEST_OPT_PROT) Print("// %e\n",f1);
   eps = f1;
   fx = (double)2.0 * eps;
   memset(x, 0, (n + 1) * sizeof(int));
-  wFirstSearch(A, x, mons, lpol, npol, rel, &fx, wNsqr);
+  wFirstSearch(A, x, mons, lpol, npol, rel, &fx, wNsqr, rVar(R));
   if (TEST_OPT_PROT) Print("// %e\n",fx);
   memcpy(x + 1, xopt + 1, n * sizeof(int));
   memset(degw, 0, mons * sizeof(int));
   for (i = n; i!=0; i--)
   {
     x[i] *= 16;
-    wAdd(A, mons, i, x[i]);
+    wAdd(A, mons, i, x[i], rVar(R));
   }
-  wSecondSearch(A, x, lpol, npol, mons, rel, &fx, wNsqr);
+  wSecondSearch(A, x, lpol, npol, mons, rel, &fx, wNsqr, rVar(R));
   if (TEST_OPT_PROT) Print("// %e\n",fx);
   if (fx >= eps)
   {
@@ -165,7 +165,7 @@ void wCall(poly* s, int sl, int *x, double wNsqr, const ring R)
 //      wSimple(x, n);
 //      memset(degw, 0, mons * sizeof(int));
 //      for (i = n; i!=0; i--)
-//        wAdd(A, mons, i, x[i]);
+//        wAdd(A, mons, i, x[i], rVar(R));
 //      eps = wPrWeight(x, n);
 //      fx = (*wFunctional)(degw, lpol, npol, rel, eps);
 //      if (fx < f1)
