@@ -35,7 +35,7 @@ SOURCES = \
 	nc/gring.cc nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc nc/ncSAMult.cc \
 	pDebug.cc pInline0.cc polys0.cc prCopy.cc \
 	kbuckets.cc sbuckets.cc ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} weight.cc \
-  simpleideals.cc matpol.cc
+        weight0.c simpleideals.cc matpol.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
 
