@@ -5,14 +5,14 @@ AC_CONFIG_SRCDIR([reporter/reporter.h])
 AC_CONFIG_HEADER([config.h misc/auxiliary.h])
 AM_INIT_AUTOMAKE
 
+LT_INIT(dlopen disable-static)
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_INSTALL
 AM_PROG_CC_C_O
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
 
 # Checks for libraries.
 LB_CHECK_GMP(,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
