@@ -9,6 +9,8 @@
  *  Version: $Id$
  *******************************************************************/
 #include "config.h"
+#include <misc/auxiliary.h>
+
 // #include <polys/structs.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
