@@ -1,4 +1,3 @@
-ACLOCAL_AMFLAGS = -I m4 -I ../../m4
 CXXTEMPLFLAGS	= -fno-implicit-templates --no-exceptions
 
 
@@ -13,8 +12,8 @@ AM_CPPFLAGS	= -DHAVE_CONFIG_H
 AM_CFLAGS	= ${PIPE}
 AM_CXXFLAGS	= ${PIPE} ${CXXTEMPLFLAGS}
 
-INCLUDES	= -I${top_srcdir}/.. -I${top_srcdir}/../.. -I${top_builddir}/.. -I${srcdir} -I${includedir} ${GMP_CFLAGS}
-AM_LDFLAGS	= -L${top_builddir}/../coeffs -L${top_builddir}/../reporter -L${top_builddir}/../resources -L${top_builddir}/../../omalloc -L${builddir}
+INCLUDES	= -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} -I${includedir} ${GMP_CFLAGS}
+AM_LDFLAGS	= -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/../omalloc -L${builddir}
 
 if ENABLE_P_PROCS_STATIC
   USE_P_PROCS_STATIC_CC = templates/p_Procs_Static.cc
@@ -100,13 +99,6 @@ libpolys_a_SOURCES = ${SOURCES}
 libpolys_g_a_SOURCES = ${SOURCES}
 
 EXTRA_libpolys_a_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
-
-libpolys_a_LIBADD = $(DL_KERNEL_OBJECT)
-libpolys_a_DEPENDENCIES = $(DL_KERNEL_OBJECT)
-
-libpolys_g_a_LIBADD = $(DL_KERNEL_OBJECT_DEBUG)
-libpolys_g_a_DEPENDENCIES = $(DL_KERNEL_OBJECT_DEBUG)
-
 
 libpolys_a_includedir  =$(includedir)/libpolys/polys
 libpolys_g_a_includedir=$(includedir)/libpolys/polys

@@ -1,10 +1,5 @@
 #!/bin/sh
 
-echo "==============="
-echo "run libtoolize in libpolys/polys/"
-echo "---------------"
-( cd libpolys/polys/; libtoolize; )
-
 autotools (){
 autoheader
 autoconf
@@ -25,17 +20,6 @@ for d in .; do
   echo
 done
 
-for d in libpolys; do
-  echo "==============="
-  echo "run aclocal -I $TOP_DIR/m4, autotools in $d"
-  echo "---------------"
-  cd $d;
-  aclocal -I $TOP_DIR/m4
-  autotools
-  cd $TOP_DIR
-  echo
-done
-
 for d in omalloc; do
   echo "==============="
   echo "run aclocal -I $TOP_DIR/m4, autotools in $d"
@@ -47,11 +31,12 @@ for d in omalloc; do
   echo
 done
 
-for d in libpolys/polys; do
+for d in libpolys; do
   echo "==============="
-  echo "run aclocal -I $TOP_DIR/m4 -I m4, autotools in $d"
+  echo "run libtoolize --force, aclocal -I $TOP_DIR/m4, autotools in $d"
   echo "---------------"
   cd $d;
+  libtoolize --force
   aclocal -I $TOP_DIR/m4 -I m4
   autotools
   cd $TOP_DIR
