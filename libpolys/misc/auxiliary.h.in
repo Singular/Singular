@@ -26,6 +26,11 @@
 #define HAVE_PLURAL
 #endif
 
+#ifndef HAVE_DL
+#define HAVE_DL
+#endif
+
+
 // no factory yet...
 // #ifndef HAVE_FACTORY
 // #define HAVE_FACTORY

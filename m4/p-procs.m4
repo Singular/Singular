@@ -59,6 +59,10 @@ elif test x$NO_P_PROCS_DYNAMIC_GIVEN = xyes -a x$NO_P_PROCS_STATIC_GIVEN = xyes;
   fi
 fi
 
+if test x$ENABLE_P_PROCS_DYNAMIC = xyes; then
+  AC_DEFINE(HAVE_DL,1,enable dynamic modules)
+fi
+
 AM_CONDITIONAL([ENABLE_P_PROCS_DYNAMIC],[test x$ENABLE_P_PROCS_DYNAMIC = xyes])
 AM_CONDITIONAL([ENABLE_P_PROCS_STATIC],[test x$ENABLE_P_PROCS_STATIC = xyes])
 
