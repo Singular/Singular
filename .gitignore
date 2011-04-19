@@ -10,6 +10,11 @@ LIB
 *.la
 .libs
 doc/
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
 Singular/Singularg
 Singular/mpsr_Tok.xx
 Singular/ndbm.dl_og
