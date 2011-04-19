@@ -388,6 +388,10 @@ void      p_wrp(poly p, ring lmRing, ring tailRing);
  ***************************************************************/
 extern pLDegProc pLDeg;
 extern pFDegProc pFDeg;
+
+static inline long  p_FDeg(const poly p, const ring r)  { return r->pFDeg(p,r); }
+static inline long  p_LDeg(const poly p, int *l, const ring r)  { return r->pLDeg(p,l,r); }
+
 long p_WFirstTotalDegree(poly p, ring r);
 long p_WTotaldegree(poly p, const ring r);
 long p_WDegree(poly p,const ring r);
@@ -1830,6 +1834,11 @@ poly      p_PermPoly (poly p, int * perm,const ring OldRing, const ring dst,
 /*----------------------------------------------------*/
 poly p_Series(int n,poly p,poly u, intvec *w, const ring R);
 poly p_Invers(int n,poly u,intvec *w, const ring R);
+
+
+
+/*----------------------------------------------------*/
+int   p_Var(poly mi,const ring r);
 
 
 #endif // P_POLYS_H

@@ -241,8 +241,6 @@ extern BOOLEAN  pVectorOut;
  * Degree stuff -- see p_polys.cc for explainations
  *
  ***************************************************************/
-static inline long  pFDeg(const poly p, const ring r)  { return r->pFDeg(p,r); }
-static inline long  pLDeg(const poly p,  int *l, const ring r)  { return r->pLDeg(p,l,r); }
 #define pWeight(c) p_Weight(c,currRing)
 #define pDeg(p)    p_Deg(p,currRing)
 static inline long pTotaldegree(poly p) { return p_Totaldegree(p,currRing); }
@@ -331,7 +329,6 @@ void      pSetPolyComp(poly p, int comp);
 
 /*-----------type conversions ----------------------------*/
 void  pVec2Polys(poly v, polyset *p, int *len);
-int   p_Var(poly mi,const ring r);
 #define   pVar(m) p_Var(m,currRing)
 
 /*-----------specials for spoly-computations--------------*/
