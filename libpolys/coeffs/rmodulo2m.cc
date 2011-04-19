@@ -243,7 +243,7 @@ BOOLEAN nr2mIsMOne(number a, const coeffs r)
 
 BOOLEAN nr2mEqual(number a, number b, const coeffs r)
 {
-  return a == b;
+  return (a == b);
 }
 
 BOOLEAN nr2mGreater(number a, number b, const coeffs r)
@@ -622,6 +622,7 @@ void nr2mSetExp(int m, coeffs r)
     /* code unexpectedly called with m = 1; we go on with m = 2: */
     r->mod2mMask = 3; /* i.e., '11' in binary representation */
   }
+  r->ch = r->mod2mMask + 1;
 }
 
 void nr2mInitExp(int m, coeffs r)

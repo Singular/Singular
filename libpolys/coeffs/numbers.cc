@@ -66,6 +66,22 @@ BOOLEAN ndDBTest(number a, const char *f, const int l, const coeffs r)
 }
 #endif
 
+
+BOOLEAN ndIsZeroDivisor( number a, const coeffs r)
+{
+  int c = n_GetChar(r);
+  BOOLEAN ret = n_IsZero(a, r);
+  if( (c != 0) && !ret )
+  {
+    number ch = n_Init( c, r ); 
+    number g = n_Gcd( ch, a, r );
+    ret = !n_IsOne (g, r);
+    n_Delete(&ch, r);
+    n_Delete(&g, r);
+  }
+  return ret; 
+}
+
 void   ndNormalize(number& d, const coeffs r) { }
 
 char * ndName(number n, const coeffs r) { return NULL; }

@@ -69,6 +69,10 @@ number ndIntMod(number a, number b, const coeffs r);
 void   ndInpMult(number &a, number b, const coeffs r);
 void   ndInpAdd(number &a, number b, const coeffs r);
 
+/// Test whether a is a zero divisor in r
+/// i.e. not coprime with char. of r
+BOOLEAN ndIsZeroDivisor( number a, const coeffs r);
+
 #ifdef LDEBUG
 void nDBDummy1(number* d,char *f, int l);
 BOOLEAN ndDBTest(number a, const char *f, const int l, const coeffs r);
