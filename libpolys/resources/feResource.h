@@ -5,8 +5,15 @@
 #include <sys/param.h>
 #endif
 
+#include <omalloc/mylimits.h>
+
 #define DIR_SEP '/'
 #define DIR_SEPP "/"
+
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+
 
 /*****************************************************************
  *
@@ -20,6 +27,13 @@
 // Always quiet if warn == 0
 char* feResource(const char id, int warn = -1);
 char* feResource(const char* key, int warn = -1);
+
+char* feGetResource(const char id);
+
+// char* feResourceDefault(const char id);
+// char* feResourceDefault(const char* key);
+
+
 // This needs to be called before the first call to feResource
 // Initializes Resources, SearchPath, and extends PATH
 void feInitResources(char* argv0);
@@ -27,6 +41,7 @@ void feInitResources(char* argv0);
 void feReInitResources();
 // Prints resources into string with StringAppend, etc
 void feStringAppendResources(int warn = -1);
+
 
 
 

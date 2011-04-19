@@ -29,12 +29,14 @@ BOOLEAN p_procs_dynamic = TRUE;
 #undef LINKAGE
 #define LINKAGE extern "C"
 #define p_Procs_Kernel
-#include "p_Procs.inc"
 
-#include <polys/p_Procs_Dynamic.h>
+#include "templates/p_Procs.inc"
+
+#include "templates/p_Procs_Dynamic.h"
 // include general p_Proc stuff
-#include <polys/p_Procs_Impl.h>
-#include <polys/mod_raw.h>
+#include "templates/p_Procs_Impl.h"
+
+#include "templates/mod_raw.h"
 
 // define to bound for length of p_Proc name
 #define MAX_PROCNAME_LEN 200

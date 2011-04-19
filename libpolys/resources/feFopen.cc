@@ -11,8 +11,8 @@
 #include <omalloc/omalloc.h>
 #include <reporter/reporter.h>
 
-#include <resources/feFopen.h>
-#include <resources/feResource.h>
+#include "feFopen.h"
+#include "feResource.h"
 
 
 

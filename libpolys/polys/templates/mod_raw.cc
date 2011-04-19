@@ -17,11 +17,18 @@
 #include <sys/stat.h>
 
 
-#include <kernel/mod2.h>
-#include <Singular/static.h>
+#include "config.h"
+#include <misc/auxiliary.h>
 
-#include <kernel/mod_raw.h>
-#include <kernel/febase.h>
+// #include <kernel/mod2.h>
+// #include <Singular/static.h>
+
+#include <reporter/reporter.h>
+
+#include <resources/feResource.h>
+#include <resources/feFopen.h>
+
+#include "templates/mod_raw.h"
 
 #ifdef HAVE_STATIC
 #undef HAVE_DL
