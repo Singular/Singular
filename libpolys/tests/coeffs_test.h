@@ -38,7 +38,7 @@ void TestSum(const coeffs r, const unsigned long N)
   const unsigned long ssss = (N * (N+1)) / 2;
   
   number sum1 = n_Init(ssss, r);
-  clog<< "sum1(int): "; PrintSized(sum1, r);
+  clog<< "N*(N+1)/2 (int: " << ssss << "): "; PrintSized(sum1, r);
 
   number s, ss, i, res;
 
@@ -47,17 +47,26 @@ void TestSum(const coeffs r, const unsigned long N)
   ndInpMult(s, i, r);
   n_Delete(&i, r);
   
+  clog<< "N*(N+1): ("<< N*(N+1) << ")"; PrintSized(s, r);  
+  
   i = n_Init(2, r);
+  clog<< "2: "; PrintSized(i, r);  
 
   if( !n_IsZero( i, r) )
   {
     TS_ASSERT( n_DivBy(s, i, r) );
     res = n_Div(s, i, r);
   
-    clog<< "res: "; PrintSized(res, r);
-
-    TS_ASSERT( n_Equal(sum1, res, r) );
-    TS_ASSERT( n_Equal(res, sum1, r) );
+    clog<< "N*(N+1)/2: "; PrintSized(res, r);
+    number d = n_Sub(res, sum1, r);
+    
+    TS_ASSERT( ndIsZeroDivisor(d, r) );
+    
+    if( n_GetChar(r) == 0 )
+    {
+      TS_ASSERT( n_Equal(sum1, res, r) );
+      TS_ASSERT( n_Equal(res, sum1, r) );
+    }
   } else
     TS_ASSERT_EQUALS( n_GetChar(r), 2);
   
@@ -81,16 +90,19 @@ void TestSum(const coeffs r, const unsigned long N)
   }
 
   ss = n_Neg(ss, r); // ss = -ss
-  
-  
+ 
+  clog<< "real sum    : "; PrintSized(s, r);
+  clog<< "real sum(--): "; PrintSized(ss, r);  
+
   TS_ASSERT( n_Equal(s, ss, r) );
   TS_ASSERT( n_Equal(ss, s, r) );
 
-  clog<< "s: "; PrintSized(s, r);
-  clog<< "ss: "; PrintSized(ss, r);  
-
   n_Delete(&s, r);    
   n_Delete(&ss, r);    
+
+  clog << ( " >>> TEST DONE!" );
+  clog << endl;
+
 }
 
 
@@ -160,6 +172,11 @@ void TestArith(const coeffs r)
   n_Delete(&aa, r);
   n_Delete(&aa1, r);
   n_Delete(&aa2, r);
+
+
+  clog << ( " >>> TEST DONE!" );
+  clog << endl;
+
 }
 
 
@@ -211,9 +228,10 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
       
       TS_ASSERT(  nCoeff_is_Q( r ));
       TS_ASSERT(  nCoeff_is_Domain( r ));
-      TS_ASSERT(  nCoeff_has_Units( r ));
-      TS_ASSERT(  nCoeff_has_simple_inverse( r ));// ?
-      TS_ASSERT(  nCoeff_has_simple_Alloc( r )); // ?
+
+      TS_ASSERT( !nCoeff_has_Units( r )); // ?
+      TS_ASSERT( !nCoeff_has_simple_inverse( r ));// ?
+      TS_ASSERT( !nCoeff_has_simple_Alloc( r )); // ?
 
       TS_ASSERT( !nCoeff_is_Ring_2toM( r ));
       TS_ASSERT( !nCoeff_is_Ring_ModN( r ));
@@ -290,13 +308,13 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
   }
 
   TestArith( r );
+  TestSum( r, 10 );
   TestSum( r, 100 );
-  TestSum( r, 1000 );
+  TestSum( r, 101 );
+  TestSum( r, 1001 );
+  TestSum( r, 9000 );
 
   nKillChar( r );
-
-  clog << ( " >>> TEST DONE!" );
-  clog << endl;
 
   return TRUE;
 }
