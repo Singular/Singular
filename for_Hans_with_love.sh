@@ -37,7 +37,7 @@ for d in libpolys; do
   echo "---------------"
   cd $d;
   libtoolize --force
-  aclocal -I $TOP_DIR/m4 -I m4
+  aclocal -I $TOP_DIR/m4
   autotools
   cd $TOP_DIR
   echo

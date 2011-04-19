@@ -1,8 +1,9 @@
 AC_INIT([singular], [3.1.2.sw])
-AM_INIT_AUTOMAKE
-AC_CONFIG_MACRO_DIR([../m4],[m4])
+AC_CONFIG_MACRO_DIR([../m4])
+AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_SRCDIR([reporter/reporter.h])
 AC_CONFIG_HEADER([config.h])
+AM_INIT_AUTOMAKE
 
 # misc/auxiliary.h
 
