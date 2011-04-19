@@ -4,4 +4,4 @@ PACKAGES=misc reporter resources coeffs polys tests
 
 SUBDIRS=$(PACKAGES)
 
-TESTDIRS=coeffs
+TESTDIRS=coeffs tests

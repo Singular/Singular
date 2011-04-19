@@ -9,6 +9,17 @@ LIB
 *.lo
 *.la
 .libs
+doc/
+Singular/Singularg
+Singular/mpsr_Tok.xx
+Singular/ndbm.dl_og
+Singular/sing_dbm.dl_og
+Singular/svnver
+dyn_modules/modgen/modgen
+dyn_modules/modgen/pathnames.h
+emacs/cmd-cmpl.el
+emacs/lib-cmpl.el
+emacs/lib-temp
 configure
 config.h.in*
 config.sub
