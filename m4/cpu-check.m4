@@ -6,7 +6,7 @@ dnl check the cpu and define EXEC_EXT and SI_CPU*
 
 AC_DEFUN([SING_CHECK_CPU],
 [
-# Checks for library functions.
+AC_CANONICAL_HOST
 AC_MSG_CHECKING(CPU for singular)
 
 # CPUUNAME and PATH
@@ -74,6 +74,24 @@ if test "$ac_cv_singuname" = unknown; then
   AC_MSG_WARN(Unknown architecture: Check singuname.sh)
   ac_cv_singuname="unknown"
 fi
-AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname", Singular's own uname\, believe it or not)
+AC_DEFINE_UNQUOTED(S_UNAME, "$ac_cv_singuname", Singular\'s own uname\, believe it or not)
+
+
+AS_CASE([$host_cpu],
+dnl the following settings seems to be better on i386 and x86_64 processors
+  [i*86*|x86_64*], [AC_DEFINE(HAVE_MULT_MOD,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)],
+dnl the following settings seems to be better on itanium processors
+dnl AC_DEFINE(HAVE_MULT_MOD,1,)
+  [ia64*], [AC_DEFINE(HAVE_GENERIC_ADD,1,use branch for addition in Z/p otherwise it uses a generic add)],
+dnl the following settings seems to be better on sparc processors
+  [sparc*], [
+  	    AC_DEFINE(HAVE_MULT_MOD,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)
+	    AC_DEFINE(HAVE_DIV_MOD,1,division using extend euclidian algorithm otherwise using tables of logartihms)
+	    ],
+dnl the following settings seems to be better on ppc processors
+dnl testet on: ppc_Linux, 740/750 PowerMac G3, 512k L2 cache
+  [powerpc*|ppc*], [AC_DEFINE(HAVE_MULT_MOD,1,multiplication is fast on the cpu: a*b is with mod otherwise using tables of logartihms)],
+  []
+)
 
 ])

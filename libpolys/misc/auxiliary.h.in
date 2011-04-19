@@ -1,4 +1,3 @@
-/* misc/auxiliary.h.  Generated from auxiliary.h.in by configure.  */
 /*****************************************************************************\
  * Computer Algebra System SINGULAR    
 \*****************************************************************************/
@@ -66,7 +65,7 @@
 #endif
 #endif
 
-#define SIZEOF_LONG 8
+#define SIZEOF_LONG (LONG_BIT/CHAR_BIT)
 // another option for SIZEOF_LONG: use omConfig included in <omalloc/omalloc.h>...
 
 #endif
@@ -128,15 +127,15 @@ static inline unsigned long si_min(const unsigned long a, const unsigned long b)
 // ---------------- defines which depend on the settings above
 
 #ifndef HAVE_MULT_MOD
-#define HAVE_MULT_MOD 1
+#undef HAVE_MULT_MOD
 #endif
 
 #ifndef HAVE_DIV_MOD
-/* #undef HAVE_DIV_MOD */
+#undef HAVE_DIV_MOD
 #endif
 
 #ifndef HAVE_GENERIC_ADD
-/* #undef HAVE_GENERIC_ADD */
+#undef HAVE_GENERIC_ADD
 #endif
 
 /*******************************************************************
