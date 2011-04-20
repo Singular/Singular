@@ -38,7 +38,7 @@ struct  blackbox_struct
   /// serialize
   BOOLEAN (*blackbox_serialize)(blackbox *b,void *d, si_link f);
   /// deserialize
-  BOOLEAN (*blackbox_deserialize)(blackbox *b,void **d, si_link f);
+  BOOLEAN (*blackbox_deserialize)(blackbox **b,void **d, si_link f);
   /// additional type info
   void *data;
   /// addtinional gneral properties

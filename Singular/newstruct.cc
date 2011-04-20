@@ -300,15 +300,30 @@ BOOLEAN newstruct_Check(blackbox *b, void *d)
 BOOLEAN newstruct_serialize(blackbox *b, void *d, si_link f)
 {
   newstruct_desc dd=(newstruct_desc)b->data;
-  // write string(getBlackboxName(dd->id),
+  sleftv l;
+  memset(&l,0,sizeof(l));
+  l.rtyp=STRING_CMD;
+  l.data=(void*)getBlackboxName(dd->id);
+  f->m->Write(f, &l);
   lists ll=(lists)d;
-  // write(ll)
+  memset(&l,0,sizeof(l));
+  l.rtyp=LIST_CMD;
+  l.data=ll;
+  f->m->Write(f, &l);
   return FALSE;
 }
 
-BOOLEAN newstruct_deserialize(blackbox *b, void **d, si_link f)
+BOOLEAN newstruct_deserialize(blackbox **b, void **d, si_link f)
 {
-  return TRUE;
+  // newstruct is serialiazed as a list,
+  // just read a list and take data,
+  // rtyp must be set correctly (to the blackbox id) by routine calling
+  // newstruct_deserialize
+  leftv l=f->m->Read(f);
+  //newstruct_desc n=(newstruct_desc)b->data;
+  //TODO: check compatibility of list l->data with description in n
+  *d=l->data;
+  return FALSE;
 }
 
 void newstruct_setup(const char *n, newstruct_desc d )

@@ -47,7 +47,7 @@ BOOLEAN blackbox_default_serialize(blackbox *b, void *d, si_link f)
   return TRUE;
 }
 
-BOOLEAN blackbox_default_deserialize(blackbox *b, void **d, si_link f)
+BOOLEAN blackbox_default_deserialize(blackbox **b, void **d, si_link f)
 {
   return TRUE;
 }

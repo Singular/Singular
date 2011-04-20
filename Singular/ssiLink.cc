@@ -41,6 +41,7 @@
 #include <Singular/silink.h>
 #include <Singular/cntrlc.h>
 #include <Singular/lists.h>
+#include <Singular/blackbox.h>
 #include <Singular/ssiLink.h>
 
 #ifdef HAVE_MPSR
@@ -51,7 +52,7 @@
 //#define HAVE_PSELECT
 //#endif
 
-#define SSI_VERSION 1
+#define SSI_VERSION 2
 
 typedef struct
 {
@@ -621,6 +622,28 @@ intvec* ssiReadIntvec(ssiInfo *d)
   return v;
 }
 
+void ssiReadBlackbox(leftv res, si_link l)
+{
+  ssiInfo *d=(ssiInfo*)l->data;
+  int throwaway;
+  SSI_BLOCK_CHLD;
+  fscanf(d->f_read,"%d ",&throwaway);
+  SSI_UNBLOCK_CHLD;
+  char *name=ssiReadString(d);
+  int tok;
+  blackboxIsCmd(name,tok);
+  if (tok>MAX_TOK)
+  {
+    blackbox *b=getBlackboxStuff(tok);
+    res->rtyp=tok;
+    b->blackbox_deserialize(&b,&(res->data),l);
+  }
+  else
+  {
+    Werror("blackbox %s not found",name);
+  }
+}
+
 //**************************************************************************/
 
 BOOLEAN ssiOpen(si_link l, short flag, leftv u)
@@ -1087,6 +1110,8 @@ LINKAGE leftv ssiRead1(si_link l)
     case 17: res->rtyp=INTVEC_CMD;
              res->data=ssiReadIntvec(d);
              break;
+    case 20: ssiReadBlackbox(res,l);
+             break;
     // ------------
     case 98: // version
              {
@@ -1209,9 +1234,20 @@ LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
                    fprintf(d->f_write,"17 ");
                    ssiWriteIntvec(d,(intvec *)dd);
                    break;
-          default: Werror("not implemented (t:%d, rtyp:%d)",tt, data->rtyp);
-                   d->level=0;
-                   return TRUE;
+          default:
+            if (tt>MAX_TOK)
+            {
+              blackbox *b=getBlackboxStuff(tt);
+              fprintf(d->f_write,"20 ");
+              b->blackbox_serialize(b,dd,l);
+            }
+            else
+            {
+              Werror("not implemented (t:%d, rtyp:%d)",tt, data->rtyp);
+              d->level=0;
+              return TRUE;
+            }
+            break;
     }
     if (d->level<=1) { fprintf(d->f_write,"\n"); fflush(d->f_write); }
     data=data->next;
@@ -1553,6 +1589,8 @@ int ssiBatch(const char *host, const char * port)
 // 15 setring .......
 // 16 nothing
 // 17 intvec <len> ...
+//
+// 20 blackbox <name> ...
 //
 // 98: verify version: <ssi-version> <MAX_TOK> <OPT1> <OPT2>
 // 99: quit Singular
