@@ -44,10 +44,12 @@ proc normal(ideal id, list #)
 "USAGE:  normal(id [,choose]); id = radical ideal, choose = list of options. @*
          Optional parameters in list choose (can be entered in any order):@*
          Decomposition:@*
-         - \"equidim\" -> computes first an equidimensional decomposition,
-         and then the normalization of each component (default).@*
-         - \"prim\" -> computes first the minimal associated primes, and then
-         the normalization of each prime. @*
+         - \"equidim\" -> computes first an equidimensional decomposition of the
+         input ideal, and then the normalization of each component (default).@*
+         - \"prim\" -> computes first the minimal associated primes of the input
+         ideal, and then the normalization of each prime. (When the input ideal
+         is not prime and the minimal associated primes are easy to compute,
+         this method is usually faster than \"equidim\".)@*
          - \"noDeco\" -> no preliminary decomposition is done. If the ideal is
          not equidimensional radical, output might be wrong.@*
          - \"isPrim\" -> assumes that the ideal is prime. If this assumption
