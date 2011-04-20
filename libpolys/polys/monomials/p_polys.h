@@ -387,7 +387,6 @@ void      p_wrp(poly p, ring lmRing, ring tailRing);
  *
  ***************************************************************/
 extern pLDegProc pLDeg;
-extern pFDegProc pFDeg;
 
 static inline long  p_FDeg(const poly p, const ring r)  { return r->pFDeg(p,r); }
 static inline long  p_LDeg(const poly p, int *l, const ring r)  { return r->pLDeg(p,l,r); }

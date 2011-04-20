@@ -2538,7 +2538,7 @@ poly p_Homogen (poly p, int varnum, const ring r)
   if (r->pLexOrder && (r->order[0]==ringorder_lp))
     deg=p_Totaldegree;
   else
-    deg=pFDeg;
+    deg=r->pFDeg;
 
   poly q=NULL, qn;
   int  o,ii;
@@ -2591,7 +2591,7 @@ BOOLEAN p_IsHomogeneous (poly p, const ring r)
   if (r->pLexOrder && (r->order[0]==ringorder_lp))
     d=p_Totaldegree;
   else
-    d=pFDeg;
+    d=r->pFDeg;
   o = d(p,r);
   do
   {
