@@ -1011,7 +1011,7 @@ poly kBucket_ExtractLarger(kBucket_pt bucket, poly q, poly append)
 
 // Hmm... for now I'm too lazy to implement those independent of currRing
 // But better declare it extern than including polys.h
-extern void pTakeOutComp(poly *p, long comp, poly *q, int *lq);
+extern void p_TakeOutComp(poly *p, long comp, poly *q, int *lq, const ring r);
 
 void kBucketTakeOutComp(kBucket_pt bucket,
                         long comp,
@@ -1027,7 +1027,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
     if (bucket->buckets[i] != NULL)
     {
       MULTIPLY_BUCKET(bucket,i);
-      pTakeOutComp(&(bucket->buckets[i]), comp, &q, &lq);
+      p_TakeOutComp(&(bucket->buckets[i]), comp, &q, &lq, bucket->bucket_ring);
       if (q != NULL)
       {
         assume(pLength(q) == lq);
@@ -1039,7 +1039,7 @@ void kBucketTakeOutComp(kBucket_pt bucket,
   }
   kBucketAdjustBucketsUsed(bucket);
 #else
-  pTakeOutComp(&(bucket->p), comp, &p, &lp);
+  p_TakeOutComp(&(bucket->p), comp, &p, &lp,bucket->bucket_ring);
   (bucket->l) -= lp;
 #endif
   *r_p = p;
