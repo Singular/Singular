@@ -19,6 +19,8 @@
 #include <polys/simpleideals.h>
 #include "sbuckets.h"
 
+omBin sip_sideal_bin;
+
 static poly * idpower;
 /*collects the monomials in makemonoms, must be allocated befor*/
 static int idpowerpoint;
@@ -1326,7 +1328,7 @@ BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R)
   if (R->pLexOrder && (R->order[0]==ringorder_lp))
      d=p_Totaldegree;
   else
-     d=pFDeg;
+     d=R->pFDeg;
   int length=IDELEMS(m);
   poly* P=m->m;
   poly* F=(poly*)omAlloc(length*sizeof(poly));
@@ -1378,7 +1380,7 @@ BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R)
         ord=p_Totaldegree(p,R);
       else
       //  ord = p->order;
-        ord = pFDeg(p,R);
+        ord = R->pFDeg(p,R);
       if (iscom[p_GetComp(p,R)]==0)
       {
         diff[p_GetComp(p,R)] = order-ord;
