@@ -135,11 +135,12 @@ void rChangeCurrRing(ring r)
 }
 */
 
-ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
+ring rDefault(coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
 {
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
-  r->ch    = ch;
+  r->ch    = n_GetChar(cf);
   r->N     = N;
+  r->cf = cf;
   /*r->P     = 0; Alloc0 */
   /*names*/
   r->names = (char **) omAlloc0(N * sizeof(char *));
@@ -160,9 +161,15 @@ ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *
   rComplete(r);
   return r;
 }
-
-ring rDefault(int ch, int N, char **n)
+ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
 {
+  coeffs cf;
+  if (ch==0) cf=nInitChar(n_Q,NULL);
+  else       cf=nInitChar(n_Zp,(void*)(long)ch);
+  return rDefault(cf,N,n,ord_size,ord,block0,block1);
+}
+ring   rDefault(coeffs cf, int N, char **n)
+{  
   /*order: lp,0*/
   int *order = (int *) omAlloc(2* sizeof(int));
   int *block0 = (int *)omAlloc0(2 * sizeof(int));
@@ -174,7 +181,15 @@ ring rDefault(int ch, int N, char **n)
   /* the last block: everything is 0 */
   order[1]  = 0;
 
-  return rDefault(ch,N,n,2,order,block0,block1);
+  return rDefault(cf,N,n,2,order,block0,block1);
+}
+
+ring rDefault(int ch, int N, char **n)
+{
+  coeffs cf;
+  if (ch==0) cf=nInitChar(n_Q,NULL);
+  else       cf=nInitChar(n_Zp,(void*)(long)ch);
+  return rDefault(cf,N,n);
 }
 
 ///////////////////////////////////////////////////////////////////////////
