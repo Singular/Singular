@@ -2847,6 +2847,30 @@ void p_DeleteComp(poly * p,int k, const ring r)
     }
   }
 }
+
+/*2
+* convert a vector to a set of polys,
+* allocates the polyset, (entries 0..(*len)-1)
+* the vector will not be changed
+*/
+void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
+{
+  poly h;
+  int k;
+
+  *len=p_MaxComp(v,r);
+  if (*len==0) *len=1;
+  *p=(poly*)omAlloc0((*len)*sizeof(poly));
+  while (v!=NULL)
+  {
+    h=p_Head(v,r);
+    k=p_GetComp(h,r);
+    p_SetComp(h,0,r);
+    (*p)[k-1]=p_Add_q((*p)[k-1],h,r);
+    pIter(v);
+  }
+}
+
 /* -------------------------------------------------------- */
 /*2
 * change all global variables to fit the description of the new ring

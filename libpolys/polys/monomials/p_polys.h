@@ -107,7 +107,6 @@ poly      p_ISet(int i, const ring r);
 // returns the poly representing the number n, destroys n
 poly      p_NSet(number n, const ring r);
 
-/// TODO: the following procedure got lost... and is not defined anywhere!
 void  p_Vec2Polys(poly v, poly**p, int *len, const ring r);
 
 /***************************************************************
