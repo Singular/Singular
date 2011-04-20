@@ -598,19 +598,6 @@ void ksCreateSpoly(LObject* Pair, poly spNoether = NULL,
 poly ksCreateShortSpoly(poly p1, poly p2, ring tailRing);
 
 
-/*
-* input - output: a, b
-* returns:
-*   a := a/gcd(a,b), b := b/gcd(a,b)
-*   and return value
-*       0  ->  a != 1,  b != 1
-*       1  ->  a == 1,  b != 1
-*       2  ->  a != 1,  b == 1
-*       3  ->  a == 1,  b == 1
-*   this value is used to control the spolys
-*/
-int ksCheckCoeff(number *a, number *b);
-
 // old stuff
 KINLINE poly ksOldSpolyRed(poly p1, poly p2, poly spNoether = NULL);
 KINLINE poly ksOldSpolyRedNew(poly p1, poly p2, poly spNoether = NULL);
