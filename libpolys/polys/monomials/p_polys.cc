@@ -3532,6 +3532,19 @@ poly p_Invers(int n,poly u,intvec *w, const ring R)
   return v;
 }
 
+BOOLEAN p_EqualPolys(poly p1,poly p2, const ring r)
+{
+  while ((p1 != NULL) && (p2 != NULL))
+  {
+    if (! p_LmEqual(p1, p2,r))
+      return FALSE;
+    if (! n_Equal(p_GetCoeff(p1,r), p_GetCoeff(p2,r),r ))
+      return FALSE;
+    pIter(p1);
+    pIter(p2);
+  }
+  return (p1==p2);
+}
 
 /*2
 *returns TRUE if p1 is a skalar multiple of p2
