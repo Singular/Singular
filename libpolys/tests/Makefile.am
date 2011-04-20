@@ -22,7 +22,7 @@ coeffs_test_SOURCES = coeffs_test_runner.cpp
 polys_test_SOURCES = polys_test_runner.cpp
 
 coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc -lomalloc_debug
-polys_test_LDADD = -lpolys_g $(coeffs_test_LDADD)
+polys_test_LDADD = -lpolys_g -ldl $(coeffs_test_LDADD)
 
 
 BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(polys_test_SOURCES)

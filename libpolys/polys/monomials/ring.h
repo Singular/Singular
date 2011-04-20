@@ -9,8 +9,9 @@
 /* $Id$ */
 
 /* includes */
-#include <coeffs/coeffs.h>
 #include <omalloc/omalloc.h>
+#include <misc/auxiliary.h>
+#include <coeffs/coeffs.h>
 //#include <polys/monomials/polys-impl.h>
 //
 
@@ -662,6 +663,8 @@ ring rCompose(const lists  L);
 /////////////////////////////
 // Auxillary functions
 //
+
+BOOLEAN rSetISReference(const ring r, const ideal F, const int i = 0, const int p = 0, const intvec * componentWeights = NULL);
 
 BOOLEAN rCheckIV(intvec *iv);
 int rTypeOfMatrixOrder(intvec * order);

@@ -81,6 +81,7 @@ static poly sca_mm_Mult_p(const poly pMonom, poly pPoly, const ring rRing);
 poly sca_SPoly(const poly p1, const poly p2, const ring r);
 poly sca_ReduceSpoly(const poly p1, poly p2, const ring r);
 
+/*
 // Modified Plural's Buchberger's algorithmus.
 ideal sca_gr_bba(const ideal F, const ideal Q, const intvec *, const intvec *, kStrategy strat, const ring _currRing);
 
@@ -89,6 +90,7 @@ ideal sca_bba(const ideal F, const ideal Q, const intvec *w, const intvec *, kSt
 
 // Modified modern Sinuglar Mora's algorithm.
 ideal sca_mora(const ideal F, const ideal Q, const intvec *w, const intvec *, kStrategy strat, const ring _currRing);
+*/
 
 
 
@@ -1496,9 +1498,10 @@ bool sca_SetupQuotient(ring rGR, ring rG, bool bCopy)
     // square = NF( var(i)^2 | Q )
     // NOTE: rSaveRing == currRing now!
     // NOTE: there is no better way to check this in general!
-    extern poly kNF(ideal I, ideal Q, poly f, int a, int b, const ring r);
 
-    square = kNF(idQuotient, NULL, square, 0, 1, rG); // must ran in currRing == rG!
+//////    TODO!!!!!
+//////    extern poly kNF(ideal I, ideal Q, poly f, int a, int b, const ring r);
+//////    square = kNF(idQuotient, NULL, square, 0, 1, rG); // must ran in currRing == rG!
 
     if( square != NULL ) // var(i)^2 is not in Q?
     {
@@ -2531,14 +2534,14 @@ void sca_p_ProcsSet(ring rGR, p_Procs_s* p_Procs)
 #ifdef PDEBUG
 //           Print("Local case => GB == mora!\n");
 #endif
-    rGR->GetNC()->p_Procs.GB          = sca_mora; // local ordering => Mora, otherwise - Buchberger!
+    rGR->GetNC()->p_Procs.GB          = NULL; // sca_mora; // local ordering => Mora, otherwise - Buchberger!
   }
   else
   {
 #ifdef PDEBUG
 //           Print("Global case => GB == bba!\n");
 #endif
-    rGR->GetNC()->p_Procs.GB          = sca_bba; // sca_gr_bba; // sca_bba? // sca_bba;
+    rGR->GetNC()->p_Procs.GB          = NULL; // sca_bba; // sca_gr_bba; // sca_bba? // sca_bba;
   }
 
 

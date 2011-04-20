@@ -13,7 +13,6 @@
 // #include <polys/options.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
-#include <misc/intvec.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
@@ -2732,9 +2731,6 @@ static unsigned long rGetExpSize(unsigned long bitmask, int & bits, int N)
 }
 
 
-bool rSetISReference(const ideal F, const int i, const int p, const intvec * componentWeights, const ring r);
-
-
 /*2
  * create a copy of the ring r, which must be equivalent to currRing
  * used for std computations
@@ -2948,12 +2944,12 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
         {
           ideal F = idrHeadR(r->typ[i].data.is.F, r, res); // Copy F from r into res!
           assume(
-            rSetISReference(
+            rSetISReference( res, 
               F,  // WILL BE COPIED!
               r->typ[i].data.is.limit,
               j++,
-              r->typ[i].data.is.componentWeights, // WILL BE COPIED
-              res)
+              r->typ[i].data.is.componentWeights // WILL BE COPIED
+              )
             );
           id_Delete(&F, res);
           iNeedInducedOrderingSetup--;
@@ -4941,7 +4937,7 @@ int rGetISPos(const int p, const ring r)
 /// F belong to r, we will DO a copy! (same to componentWeights)
 /// We will use it AS IS!
 /// returns true is everything was allright!
-bool rSetISReference(const ideal F, const ring r,const int i = 0, const int p = 0, const intvec * componentWeights = NULL)
+BOOLEAN rSetISReference(const ring r, const ideal F, const int i, const int p, const intvec * componentWeights)
 {
   // Put the reference set F into the ring -ordering -recor
 
@@ -4956,7 +4952,7 @@ bool rSetISReference(const ideal F, const ring r,const int i = 0, const int p = 
   if (r->typ==NULL)
   {
     dReportError("Error: WRONG USE of rSetISReference: wrong ring! (typ == NULL)");
-    return false;
+    return FALSE;
   }
 
 
@@ -4965,7 +4961,7 @@ bool rSetISReference(const ideal F, const ring r,const int i = 0, const int p = 
   if( pos == -1 )
   {
     dReportError("Error: WRONG USE of rSetISReference: specified ordering block was not found!!!" );
-    return false;
+    return FALSE;
   }
 
 #if MYTEST
@@ -5012,7 +5008,7 @@ bool rSetISReference(const ideal F, const ring r,const int i = 0, const int p = 
   PrintS("New reference set FF : \n");        idShow(FF, r, r, 1);         PrintLn();
 #endif
 
-  return true;
+  return TRUE;
 }
 
 
