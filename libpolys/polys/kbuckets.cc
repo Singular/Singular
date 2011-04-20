@@ -1083,7 +1083,7 @@ number kBucketPolyRed(kBucket_pt bucket,
 //StringSetS("##### an = "); nWrite(an); PrintS(StringAppend("\n"));
 //StringSetS("##### bn = "); nWrite(bn); PrintS(StringAppend("\n"));
     /* ksCheckCoeff: divide out gcd from an and bn: */
-    int ct = ksCheckCoeff(&an, &bn);
+    int ct = ksCheckCoeff(&an, &bn,r->cf);
     /* the previous command returns ct=0 or ct=2 iff an!=1
        note: an is now 1 or -1 */
 
@@ -1280,3 +1280,48 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
     return p;
   }
 }
+
+/*
+* input - output: a, b
+* returns:
+*   a := a/gcd(a,b), b := b/gcd(a,b)
+*   and return value
+*       0  ->  a != 1,  b != 1
+*       1  ->  a == 1,  b != 1
+*       2  ->  a != 1,  b == 1
+*       3  ->  a == 1,  b == 1
+*   this value is used to control the spolys
+*/
+int ksCheckCoeff(number *a, number *b, const coeffs r)
+{
+  int c = 0;
+  number an = *a, bn = *b;
+  n_Test(an,r);
+  n_Test(bn,r);
+
+  number cn = n_Gcd(an, bn, r);
+
+  if(n_IsOne(cn, r))
+  {
+    an = n_Copy(an, r);
+    bn = n_Copy(bn, r);
+  }
+  else
+  {
+    an = n_IntDiv(an, cn, r);
+    bn = n_IntDiv(bn, cn, r);
+  }
+  n_Delete(&cn, r);
+  if (n_IsOne(an, r))
+  {
+    c = 1;
+  }
+  if (n_IsOne(bn, r))
+  {
+    c += 2;
+  }
+  *a = an;
+  *b = bn;
+  return c;
+}
+

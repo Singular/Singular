@@ -346,50 +346,6 @@ int ksReducePolyTail(LObject* PR, TObject* PW, poly Current, poly spNoether)
  *
  ***************************************************************/
 
-/*
-* input - output: a, b
-* returns:
-*   a := a/gcd(a,b), b := b/gcd(a,b)
-*   and return value
-*       0  ->  a != 1,  b != 1
-*       1  ->  a == 1,  b != 1
-*       2  ->  a != 1,  b == 1
-*       3  ->  a == 1,  b == 1
-*   this value is used to control the spolys
-*/
-int ksCheckCoeff(number *a, number *b)
-{
-  int c = 0;
-  number an = *a, bn = *b;
-  nTest(an);
-  nTest(bn);
-
-  number cn = nGcd(an, bn, currRing);
-
-  if(nIsOne(cn))
-  {
-    an = nCopy(an);
-    bn = nCopy(bn);
-  }
-  else
-  {
-    an = nIntDiv(an, cn);
-    bn = nIntDiv(bn, cn);
-  }
-  nDelete(&cn);
-  if (nIsOne(an))
-  {
-    c = 1;
-  }
-  if (nIsOne(bn))
-  {
-    c += 2;
-  }
-  *a = an;
-  *b = bn;
-  return c;
-}
-
 /*2
 * creates the leading term of the S-polynomial of p1 and p2
 * do not destroy p1 and p2
