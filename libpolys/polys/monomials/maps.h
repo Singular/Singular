@@ -31,7 +31,7 @@ void maFindPerm(char **preim_names, int preim_n, char **preim_par, int preim_p,
 poly pSubstPoly(poly p, int var, poly image);
 ideal  idSubstPoly(ideal id, int n, poly e);
 
-poly pMinPolyNormalize(poly p);
+poly p_MinPolyNormalize(poly p, const ring r);
 int maMaxDeg_P(poly p,ring preimage_r);
 int maMaxDeg_Ma(ideal a,ring preimage_r);
 #endif
