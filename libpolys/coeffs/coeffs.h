@@ -377,9 +377,11 @@ static inline BOOLEAN nCoeff_is_Ring_Z(const coeffs r)
 static inline BOOLEAN nCoeff_is_Ring(const coeffs r)
 { return (r->ringtype != 0); }
 
+/// returns TRUE, if r is not a field and r has no zero divisors (i.e is a domain)
 static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
 { return (r->ringtype == 4 || r->ringtype == 0); }
 
+/// returns TRUE, if r is not a field and r has non-trivial units
 static inline BOOLEAN nCoeff_has_Units(const coeffs r)
 { return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
 
@@ -422,10 +424,12 @@ static inline BOOLEAN nCoeff_is_long_C(const coeffs r)
 static inline BOOLEAN nCoeff_is_CF(const coeffs r)
 { return getCoeffType(r)==n_CF; }
 
+/// TRUE, if the computation of the inverse is fast (i.e. prefer leading coeff. 1 over content)
 static inline BOOLEAN nCoeff_has_simple_inverse(const coeffs r)
 { return r->has_simple_Inverse; }
 /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
 
+/// TRUE if n_Delete/n_New are empty operations
 static inline BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
 { return r->has_simple_Alloc; }
 /* Z/p, GF(p,n), R, Ring_2toM: nCopy, nNew, nDelete are dummies*/
