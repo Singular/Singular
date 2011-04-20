@@ -32,7 +32,7 @@ char * newstruct_String(blackbox *b, void *d)
   if (d==NULL) return omStrDup("oo");
   else
   {
-    newstruct_desc ad=(newstruct_desc)b->data;
+    newstruct_desc ad=(newstruct_desc)(b->data);
     lists l=(lists)d;
     newstruct_member a=ad->member;
     StringSetS("");
@@ -171,14 +171,35 @@ BOOLEAN newstruct_Op2(int op, leftv res, leftv a1, leftv a2)
     {
       if (a2->name!=NULL)
       {
+        BOOLEAN search_ring=FALSE;
         newstruct_member nm=nt->member;
         while ((nm!=NULL)&&(strcmp(nm->name,a2->name)!=0)) nm=nm->next;
+        if ((nm==NULL) && (strncmp(a2->name,"r_",2)==0))
+        {
+          nm=nt->member;
+          while ((nm!=NULL)&&(strcmp(nm->name,a2->name+2)!=0)) nm=nm->next;
+          if ((nm!=NULL)&&(RingDependend(nm->typ)))
+            search_ring=TRUE;
+          else
+            nm=NULL;
+        }
         if (nm==NULL)
         {
           Werror("member %s nor found", a2->name);
           return TRUE;
         }
-        if (RingDependend(nm->typ))
+        if (search_ring)
+        {
+          ring r;
+          res->rtyp=RING_CMD;
+          res->data=al->m[nm->pos-1].data;
+          r=(ring)res->data;
+          if (r==NULL) { res->data=(void *)currRing; r=currRing; }
+          if (r!=NULL) r->ref++;
+          else Werror("ring of this member is not set and no basering found");
+          return r==NULL;
+        }
+        else if (RingDependend(nm->typ))
         {
           if (al->m[nm->pos].data==NULL)
           {
