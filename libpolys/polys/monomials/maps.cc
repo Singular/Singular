@@ -154,7 +154,7 @@ poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap, ideal s, const rin
       }
       omFreeSize((ADDRESS)monoms,l*sizeof(poly));
     }
-    if (dst_r->minpoly!=NULL) result=pMinPolyNormalize(result);
+    if (dst_r->minpoly!=NULL) result=p_MinPolyNormalize(result, dst_r);
   }
   return result;
 }
@@ -351,9 +351,9 @@ max_deg_fertig_p:
 
 // This is a very dirty way to cancel monoms whose number equals the
 // MinPoly
-poly pMinPolyNormalize(poly p, const ring r)
+poly p_MinPolyNormalize(poly p, const ring r)
 {
-  number one = n_Init(1,r->cf);
+  number one = n_Init(1, r->cf);
   spolyrec rp;
 
   poly q = &rp;
