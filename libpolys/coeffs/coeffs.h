@@ -206,22 +206,13 @@ struct n_Procs_s
 /// Returns the type of coeffs domain
 static inline n_coeffType getCoeffType(const coeffs r)
 {
+  assume(r != NULL);
   return r->type;
 }
 
-/// returns true for coeffs being a domain
-static inline bool nField_is_Domain(const coeffs r)
-{
-#ifdef HAVE_RINGS
-  return (r->ringtype == 4 || r->ringtype == 0);
-#else
-  return true;
-#endif
-}
-
-
 static inline int nInternalChar(const coeffs r)
 {
+  assume(r != NULL);
   return r->ch;
 }
 
@@ -247,113 +238,114 @@ void           nNew(number * a);
 
 /// return a copy of a
 static inline number n_Copy(number n,    const coeffs r)
-{ return r->cfCopy(n, r); }
+{   assume(r != NULL); return r->cfCopy(n, r); }
 
 static inline void   n_Delete(number* p, const coeffs r)
-{ r->cfDelete(p, r); }
+{   assume(r != NULL); r->cfDelete(p, r); }
 
 static inline BOOLEAN n_Equal(number a, number b, const coeffs r)
-{ return r->cfEqual(a, b, r); }
+{ assume(r != NULL); return r->cfEqual(a, b, r); }
 
 static inline BOOLEAN n_IsZero(number n, const coeffs r)
-{ return r->cfIsZero(n,r); }
+{ assume(r != NULL); return r->cfIsZero(n,r); }
 
 static inline BOOLEAN n_IsOne(number n,  const coeffs r)
-{ return r->cfIsOne(n,r); }
+{ assume(r != NULL); return r->cfIsOne(n,r); }
 
 static inline BOOLEAN n_IsMOne(number n, const coeffs r)
-{ return r->cfIsMOne(n,r); }
+{ assume(r != NULL); return r->cfIsMOne(n,r); }
 
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
-{ return r->cfGreaterZero(n,r); }
+{ assume(r != NULL); return r->cfGreaterZero(n,r); }
 // cfGreater?
 
 #ifdef HAVE_RINGS
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)
-{ return r->cfIsUnit(n,r); }
+{ assume(r != NULL); return r->cfIsUnit(n,r); }
 
 static inline number n_GetUnit(number n, const coeffs r)
-{ return r->cfGetUnit(n,r); }
+{ assume(r != NULL); return r->cfGetUnit(n,r); }
 
 static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
-{ return r->cfDivBy(a,b,r); }
+{ assume(r != NULL); return r->cfDivBy(a,b,r); }
 #endif
 
 /// init with an integer
 static inline number n_Init(int i,       const coeffs r)
-{ return r->cfInit(i,r); }
+{ assume(r != NULL); return r->cfInit(i,r); }
 
 /// changes argument  inline: a:= -a
 static inline number n_Neg(number n,     const coeffs r)
-{ return r->cfNeg(n,r); }
+{ assume(r != NULL); return r->cfNeg(n,r); }
 
 /// return 1/a
 static inline number n_Invers(number a,  const coeffs r)
-{ return r->cfInvers(a,r); }
+{ assume(r != NULL); return r->cfInvers(a,r); }
 
 /// use for pivot strategies, (0) => 0, otherwise positive
 static inline int    n_Size(number n,    const coeffs r)
-{ return r->cfSize(n,r); }
+{ assume(r != NULL); return r->cfSize(n,r); }
 
 /// normalize the number. i.e. go to some canonnical representation (inplace)
 static inline void   n_Normalize(number& n, const coeffs r)
-{ return r->cfNormalize(n,r); }
+{ assume(r != NULL); return r->cfNormalize(n,r); }
 
 /// Normalize and Write to the output buffer of reporter
 static inline void   n_Write(number& n,  const coeffs r)
-{ return r->cfWrite(n,r); }
+{ assume(r != NULL); return r->cfWrite(n,r); }
 
 /// Normalize and get denomerator
 static inline number n_GetDenom(number& n, const coeffs r)
-{ return r->cfGetDenom(n, r); }
+{ assume(r != NULL); return r->cfGetDenom(n, r); }
 
 /// Normalize and get numerator
 static inline number n_GetNumerator(number& n, const coeffs r)
-{ return r->cfGetNumerator(n, r); }
+{ assume(r != NULL); return r->cfGetNumerator(n, r); }
 
 static inline void   n_Power(number a, int b, number *res, const coeffs r)
-{ r->cfPower(a,b,res,r); }
+{ assume(r != NULL); r->cfPower(a,b,res,r); }
 
 static inline number n_Mult(number a, number b, const coeffs r)
-{ return r->cfMult(a, b, r); }
+{ assume(r != NULL); return r->cfMult(a, b, r); }
 
 /// Inplace multiplication: a := a * b
 static inline void n_InpMult(number &a, number b, const coeffs r)
-{ r->cfInpMult(a,b,r); }
+{ assume(r != NULL); r->cfInpMult(a,b,r); }
 
 static inline number n_Sub(number a, number b, const coeffs r)
-{ return r->cfSub(a, b, r); }
+{ assume(r != NULL); return r->cfSub(a, b, r); }
 
 static inline number n_Add(number a, number b, const coeffs r)
-{ return r->cfAdd(a, b, r); }
+{ assume(r != NULL); return r->cfAdd(a, b, r); }
 
 static inline number n_Div(number a, number b, const coeffs r)
-{ return r->cfDiv(a,b,r); }
+{ assume(r != NULL); return r->cfDiv(a,b,r); }
 
 static inline number n_IntDiv(number a, number b, const coeffs r)
-{ return r->cfIntDiv(a,b,r); }
+{ assume(r != NULL); return r->cfIntDiv(a,b,r); }
 
 static inline number n_ExactDiv(number a, number b, const coeffs r)
-{ return r->cfExactDiv(a,b,r); }
+{ assume(r != NULL); return r->cfExactDiv(a,b,r); }
 
 static inline number n_Gcd(number a, number b, const coeffs r)
-{ return r->cfGcd(a,b,r); }
+{ assume(r != NULL); return r->cfGcd(a,b,r); }
 
 static inline number n_Lcm(number a, number b, const coeffs r)
-{ return r->cfLcm(a,b,r); }
+{ assume(r != NULL); return r->cfLcm(a,b,r); }
 
 static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
-{ return dst->cfSetMap(src,dst); }
+{ assume(src != NULL && dst != NULL); return dst->cfSetMap(src,dst); }
 
 static inline number n_Par(int n, const coeffs r)
-{ return r->cfPar(n,r); }
+{ assume(r != NULL); return r->cfPar(n,r); }
 
 static inline int n_ParDeg(number n, const coeffs r)
-{ return r->cfParDeg(n,r); }
+{ assume(r != NULL); return r->cfParDeg(n,r); }
 
 /// Tests whether n is a correct number: only used if LDEBUG is defined
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 {
+  assume(r != NULL); 
 #ifdef LDEBUG
   return (r)->cfDBTest(n, filename, linenumber, r);
 #else
@@ -363,79 +355,103 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
 
 // Tests:
 static inline BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)
-{ return (r->ringtype == 1); }
+{ assume(r != NULL); return (r->ringtype == 1); }
 
 static inline BOOLEAN nCoeff_is_Ring_ModN(const coeffs r)
-{ return (r->ringtype == 2); }
+{ assume(r != NULL); return (r->ringtype == 2); }
 
 static inline BOOLEAN nCoeff_is_Ring_PtoM(const coeffs r)
-{ return (r->ringtype == 3); }
+{ assume(r != NULL); return (r->ringtype == 3); }
 
 static inline BOOLEAN nCoeff_is_Ring_Z(const coeffs r)
-{ return (r->ringtype == 4); }
+{ assume(r != NULL); return (r->ringtype == 4); }
 
 static inline BOOLEAN nCoeff_is_Ring(const coeffs r)
-{ return (r->ringtype != 0); }
+{ assume(r != NULL); return (r->ringtype != 0); }
 
 /// returns TRUE, if r is not a field and r has no zero divisors (i.e is a domain)
 static inline BOOLEAN nCoeff_is_Domain(const coeffs r)
-{ return (r->ringtype == 4 || r->ringtype == 0); }
+{
+  assume(r != NULL); 
+#ifdef HAVE_RINGS
+  return (r->ringtype == 4 || r->ringtype == 0);
+#else
+  return TRUE;
+#endif
+}
 
 /// returns TRUE, if r is not a field and r has non-trivial units
 static inline BOOLEAN nCoeff_has_Units(const coeffs r)
-{ return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
+{ assume(r != NULL); return ((r->ringtype == 1) || (r->ringtype == 2) || (r->ringtype == 3)); }
 
 static inline BOOLEAN nCoeff_is_Zp(const coeffs r)
-{ return getCoeffType(r)==n_Zp; }
+{ assume(r != NULL); return getCoeffType(r)==n_Zp; }
 
 static inline BOOLEAN nCoeff_is_Zp(const coeffs r, int p)
-{ return (getCoeffType(r)  && (r->ch == ABS(p))); }
+{ assume(r != NULL); return (getCoeffType(r)  && (r->ch == ABS(p))); }
 
 static inline BOOLEAN nCoeff_is_Q(const coeffs r)
-{ return getCoeffType(r)==n_Q; }
+{ assume(r != NULL); return getCoeffType(r)==n_Q; }
 
 static inline BOOLEAN nCoeff_is_numeric(const coeffs r) /* R, long R, long C */
-{  return (getCoeffType(r)==n_R) || (getCoeffType(r)==n_long_R) || (getCoeffType(r)==n_long_C); }
+{ assume(r != NULL);  return (getCoeffType(r)==n_R) || (getCoeffType(r)==n_long_R) || (getCoeffType(r)==n_long_C); }
+// (r->ringtype == 0) && (r->ch ==  -1); ??
+
 
 static inline BOOLEAN nCoeff_is_R(const coeffs r)
-{ return getCoeffType(r)==n_R; }
+{ assume(r != NULL); return getCoeffType(r)==n_R; }
 
 static inline BOOLEAN nCoeff_is_GF(const coeffs r)
-{ return getCoeffType(r)==n_GF; }
+{ assume(r != NULL); return getCoeffType(r)==n_GF; }
 
 static inline BOOLEAN nCoeff_is_GF(const coeffs r, int q)
-{ return (getCoeffType(r)==n_GF) && (r->ch == q); }
+{ assume(r != NULL); return (getCoeffType(r)==n_GF) && (r->ch == q); }
 
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
-{ return (r->ringtype == 0) && (r->ch < -1); }
+{ assume(r != NULL); return (r->ringtype == 0) && (r->ch < -1); }
 
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
-{ return (r->ringtype == 0) && (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
+{ assume(r != NULL); return (r->ringtype == 0) && (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
 
 static inline BOOLEAN nCoeff_is_Q_a(const coeffs r)
-{ return (r->ringtype == 0) && (r->ch == 1); }
+{ assume(r != NULL); return (r->ringtype == 0) && (r->ch == 1); }
 
 static inline BOOLEAN nCoeff_is_long_R(const coeffs r)
-{ return getCoeffType(r)==n_long_R; }
+{ assume(r != NULL); return getCoeffType(r)==n_long_R; }
 
 static inline BOOLEAN nCoeff_is_long_C(const coeffs r)
-{ return getCoeffType(r)==n_long_C; }
+{ assume(r != NULL); return getCoeffType(r)==n_long_C; }
 
 static inline BOOLEAN nCoeff_is_CF(const coeffs r)
-{ return getCoeffType(r)==n_CF; }
+{ assume(r != NULL); return getCoeffType(r)==n_CF; }
 
 /// TRUE, if the computation of the inverse is fast (i.e. prefer leading coeff. 1 over content)
 static inline BOOLEAN nCoeff_has_simple_inverse(const coeffs r)
-{ return r->has_simple_Inverse; }
+{ assume(r != NULL); return r->has_simple_Inverse; }
 /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
+// /* { return (r->ch>1) || (r->ch== -1); } *//* Z/p, GF(p,n), R, long_R, long_C*/
+// #ifdef HAVE_RINGS
+// { return (r->ringtype > 0) || (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/2^n, Z/p, GF(p,n), R, long_R, long_C*/
+// #else
+// { return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
+// #endif
+
+
 
 /// TRUE if n_Delete/n_New are empty operations
 static inline BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
-{ return r->has_simple_Alloc; }
+{ assume(r != NULL); return r->has_simple_Alloc; }
 /* Z/p, GF(p,n), R, Ring_2toM: nCopy, nNew, nDelete are dummies*/
+// return (rField_is_Zp(r)
+//         || rField_is_GF(r)
+// #ifdef HAVE_RINGS
+//             || rField_is_Ring_2toM(r)
+// #endif
+//             || rField_is_R(r)); }
+
 
 static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
-{ return (nCoeff_is_Q_a(r)) || (nCoeff_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
+{ assume(r != NULL); return (nCoeff_is_Q_a(r)) || (nCoeff_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
 
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
@@ -447,7 +463,7 @@ static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
 
 // Deprecated:
 static inline int n_GetChar(const coeffs r)
-{ return nInternalChar(r); }
+{ assume(r != NULL); return nInternalChar(r); }
 
 
 

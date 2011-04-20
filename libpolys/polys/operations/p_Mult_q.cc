@@ -190,11 +190,12 @@ static poly _p_Mult_q_Normal_ZeroDiv(poly p, poly q, const int copy, const ring 
 
 static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 {
+  assume(r != NULL);
   assume(p != NULL && pNext(p) != NULL && q != NULL && pNext(q) != NULL);
 #ifdef HAVE_RINGS
-  assume(nField_is_Domain(r->cf));
+  assume(nCoeff_is_Domain(r->cf));
 #endif
-  pAssume1(! pHaveCommonMonoms(p, q));
+  pAssume1(! p_HaveCommonMonoms(p, q, r));
   p_Test(p, r);
   p_Test(q, r);
 
@@ -268,8 +269,9 @@ static poly _p_Mult_q_Normal(poly p, poly q, const int copy, const ring r)
 
 poly _p_Mult_q(poly p, poly q, const int copy, const ring r)
 {
+  assume(r != NULL);
 #ifdef HAVE_RINGS
-  if (!nField_is_Domain(r->cf))
+  if (!nCoeff_is_Domain(r->cf))
     return _p_Mult_q_Normal_ZeroDiv(p, q, copy, r);
 #endif
   int lp, lq, l;

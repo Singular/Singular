@@ -137,6 +137,7 @@ void rChangeCurrRing(ring r)
 
 ring rDefault(coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1)
 {
+  assume( cf != NULL);
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
   r->ch    = n_GetChar(cf);
   r->N     = N;
@@ -166,10 +167,12 @@ ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *
   coeffs cf;
   if (ch==0) cf=nInitChar(n_Q,NULL);
   else       cf=nInitChar(n_Zp,(void*)(long)ch);
+  assume( cf != NULL);
   return rDefault(cf,N,n,ord_size,ord,block0,block1);
 }
 ring   rDefault(coeffs cf, int N, char **n)
 {  
+  assume( cf != NULL);
   /*order: lp,0*/
   int *order = (int *) omAlloc(2* sizeof(int));
   int *block0 = (int *)omAlloc0(2 * sizeof(int));
@@ -189,6 +192,7 @@ ring rDefault(int ch, int N, char **n)
   coeffs cf;
   if (ch==0) cf=nInitChar(n_Q,NULL);
   else       cf=nInitChar(n_Zp,(void*)(long)ch);
+  assume( cf != NULL);
   return rDefault(cf,N,n);
 }
 
@@ -285,8 +289,11 @@ void rWrite(ring r)
 #ifdef HAVE_RINGS
   else if (rField_is_Ring(r))
   {
+    TODO(Frank, "Please consider addapting the variable names...");
+    
     PrintS("//   coeff. ring is : ");
     if (rField_is_Ring_Z(r)) PrintS("Integers\n");
+/*
     long l = (long)mpz_sizeinbase(r->ringflaga, 10) + 2;
     char* s = (char*) omAlloc(l);
     mpz_get_str(s,10,r->ringflaga);
@@ -294,6 +301,7 @@ void rWrite(ring r)
     if (rField_is_Ring_2toM(r)) Print("Z/2^%lu\n", r->ringflagb);
     if (rField_is_Ring_PtoM(r)) Print("Z/%s^%lu\n", s, r->ringflagb);
     omFreeSize((ADDRESS)s, l);
+*/  
   }
 #endif
   else
@@ -520,6 +528,8 @@ void rDelete(ring r)
     omFreeSize((ADDRESS)r->parameter,rPar(r)*sizeof(char *));
   }
 #ifdef HAVE_RINGS
+  TODO(Frank, "Please consider addapting the variable names...");
+/*
   if (r->ringflaga != NULL)
   {
     mpz_clear(r->ringflaga);
@@ -530,6 +540,7 @@ void rDelete(ring r)
     mpz_clear(r->nrnModul);
     omFree((ADDRESS)r->nrnModul);
   }
+*/
 #endif
   omFreeBin(r, sip_sring_bin);
 }
@@ -648,9 +659,11 @@ char * rCharStr(ring r)
   int i;
 
 #ifdef HAVE_RINGS
+  TODO(Frank, "Please consider addapting the variable names...");
+/*
   if (rField_is_Ring_Z(r))
   {
-    s=omStrDup("integer");                   /* Z */
+    s=omStrDup("integer");                   // Z
     return s;
   }
   if(rField_is_Ring_2toM(r))
@@ -673,6 +686,7 @@ char * rCharStr(ring r)
     gmp_sprintf(s,"integer,%Zd^%lu",r->ringflaga,r->ringflagb);
     return s;
   }
+*/
 #endif
   if (r->parameter==NULL)
   {
@@ -776,6 +790,8 @@ static int binaryPower (const int a, const int b)
 int rChar(ring r)
 {
 #ifdef HAVE_RINGS
+  TODO(Frank, "Please consider addapting the variable names...");
+/*
   if (rField_is_Ring_2toM(r))
     return binaryPower(2, (int)(unsigned long)r->ringflagb);
   if (rField_is_Ring_ModN(r))
@@ -783,6 +799,7 @@ int rChar(ring r)
   if (rField_is_Ring_PtoM(r))
     return binaryPower((int)mpz_get_ui(r->ringflaga),
                        (int)(unsigned long)r->ringflagb);
+*/
 #endif
   if (rField_is_numeric(r))
     return 0;
@@ -1596,6 +1613,8 @@ int rSum(ring r1, ring r2, ring &sum)
  */
 ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 {
+  TODO(Hans, "Please consider the change to '->cf'...");
+  
   if (r == NULL) return NULL;
   int i,j;
   ring res=(ring)omAllocBin(sip_sring_bin);
@@ -1614,7 +1633,9 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->PolyBin=NULL; // rComplete
   res->ch=r->ch;     /* characteristic */
 #ifdef HAVE_RINGS
-  res->ringtype=r->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
+  TODO(Frank, "Please consider addapting the variable names...");
+/*
+  res->ringtype=r->ringtype;  // cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m
   if (r->ringflaga!=NULL)
   {
     res->ringflaga = (int_number) omAlloc(sizeof(mpz_t));
@@ -1626,6 +1647,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
     res->nrnModul = (int_number) omAlloc(sizeof(mpz_t));
     mpz_init_set(res->nrnModul,r->nrnModul);
   }
+*/
 #endif
   //memset: res->ref=0; /* reference counter to the ring */
 
@@ -1681,9 +1703,10 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->p_Setm=NULL;
   //memset: res->cf=NULL;
   res->options=r->options;
-  #ifdef HAVE_RINGS
-  res->ringtype=r->ringtype;
-  #endif
+#ifdef HAVE_RINGS
+  TODO(Frank, "Please consider addapting the variable names...");
+//  res->ringtype=r->ringtype;
+#endif
   //
   if (r->algring!=NULL)
     r->algring->ref++;
@@ -3472,7 +3495,10 @@ static void rSetOption(ring r)
 
   // set intStrategy
 #ifdef HAVE_RINGS
-  if (rField_is_Extension(r) || rField_is_Q(r) || rField_is_Ring(r))
+  if (
+         rField_is_Extension(r)
+      || rField_is_Q(r)
+      || rField_is_Ring(r))
 #else
   if (rField_is_Extension(r) || rField_is_Q(r))
 #endif
