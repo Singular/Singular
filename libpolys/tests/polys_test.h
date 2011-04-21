@@ -192,8 +192,8 @@ public:
      TS_ASSERT( !rField_is_Zp(r, 13) );
      TS_ASSERT( rField_is_GF(r) );
 
-     TS_ASSERT( !rField_is_GF(r, 5) );
-     TS_ASSERT( rField_is_GF(r, 25) );
+     TS_ASSERT( rField_is_GF(r, 5) );
+     TS_ASSERT( !rField_is_GF(r, 25) );
 
      TS_ASSERT_EQUALS( rVar(r), 1);
 
