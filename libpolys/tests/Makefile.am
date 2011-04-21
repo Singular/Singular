@@ -25,14 +25,18 @@ polys_test_SOURCES = polys_test_runner.cpp
 if ENABLE_P_PROCS_DYNAMIC
   ### TODO -> ${LD_LIBS} ??? instead of -ldl, 
   ### add it to AM_LDFLAGS?
-  USE_P_PROCS_DYNAMIC_LD = -ldl 
+  USEPPROCSDYNAMICLD = -ldl
+  USEPPROCSDYNAMICLDFLAGS =  -rdynamic
 else
-  USE_P_PROCS_DYNAMIC_LD =
+  USEPPROCSDYNAMICLD =
+  USEPPROCSDYNAMICLDFLAGS =
 endif
 
+polys_test_LDFLAGS = $(USEPPROCSDYNAMICLDFLAGS)
 
-coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc -lomalloc_debug
-polys_test_LDADD = -lpolys_g $(USE_P_PROCS_DYNAMIC_LD) $(coeffs_test_LDADD)
+coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lomalloc_debug
+polys_test_LDADD = -lpolys_g $(USEPPROCSDYNAMICLD) $(coeffs_test_LDADD)
+
 
 
 BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(polys_test_SOURCES)

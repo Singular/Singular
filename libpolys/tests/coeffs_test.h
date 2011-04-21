@@ -206,6 +206,7 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
 
   if( r->cfCoeffWrite != NULL )
   {
+    clog << "Coeff-domain: "  << endl; 
     n_CoeffWrite(r); PrintLn();
   }
 
