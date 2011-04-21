@@ -106,8 +106,10 @@ lib_LIBRARIES=libpolys.a libpolys_g.a
 
 moduledir = ${libdir}/singular/MOD/
 
-module_LTLIBRARIES=p_Procs_FieldGeneral.la p_Procs_FieldIndep.la p_Procs_FieldQ.la p_Procs_FieldZp.la \
-                   p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
+if ENABLE_P_PROCS_DYNAMIC
+  module_LTLIBRARIES=p_Procs_FieldGeneral.la p_Procs_FieldIndep.la p_Procs_FieldQ.la p_Procs_FieldZp.la \
+                     p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
+endif
 
 libpolys_a_SOURCES = ${SOURCES}
 libpolys_g_a_SOURCES = ${SOURCES}
