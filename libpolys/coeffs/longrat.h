@@ -88,6 +88,7 @@ int      nlSize(number n, const coeffs r);
 number   nlGetDenom(number &n, const coeffs r);
 number   nlGetNumerator(number &n, const coeffs r);
 number   nlChineseRemainder(number *x, number *q,int rl);
+void     nlCoeffWrite(const coeffs r);
 #ifdef LDEBUG
 BOOLEAN  nlDBTest(number a, const char *f, const int l);
 #endif
