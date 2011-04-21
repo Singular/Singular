@@ -17,8 +17,10 @@ AM_LDFLAGS	= -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddi
 
 if ENABLE_P_PROCS_STATIC
   USE_P_PROCS_STATIC_CC = templates/p_Procs_Static.cc
+  USE_P_PROCS_STATIC = -Dp_Procs_Static
 else
   USE_P_PROCS_STATIC_CC =
+  USE_P_PROCS_STATIC =
 endif
 
 if ENABLE_P_PROCS_DYNAMIC
@@ -123,7 +125,7 @@ templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc
 
 templates_p_Procs_Generate_CFLAGS   = ${NODEBUGCFLAGS}
 templates_p_Procs_Generate_CXXFLAGS = ${NODEBUGCXXFLAGS}
-templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGCPPFLAGS}
+templates_p_Procs_Generate_CPPFLAGS = ${NODEBUGCPPFLAGS} ${USE_P_PROCS_STATIC}
 templates_p_Procs_Generate_LDADD    = -lreporter
 
 

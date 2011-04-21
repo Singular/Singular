@@ -22,6 +22,8 @@
 
 BOOLEAN p_procs_dynamic = FALSE;
 
+#define LINKAGE
+
 #define p_Procs_Static
 #include "templates/p_Procs.inc"
 
