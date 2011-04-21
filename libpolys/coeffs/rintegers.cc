@@ -372,6 +372,12 @@ const char * nrzRead (const char *s, number *a, const coeffs r)
   return s;
 }
 
+void    nrzCoeffWrite  (const coeffs r)
+{
+  PrintS("//   characteristic : 0 (Integers)\n");
+}
+
+
 BOOLEAN nrzInitChar(coeffs r,  void * parameter)
 {
   r->cfSetChar= NULL;
@@ -385,13 +391,13 @@ BOOLEAN nrzInitChar(coeffs r,  void * parameter)
   r->cfInit = nrzInit;
   r->cfSize  = nrzSize;
   r->cfInt  = nrzInt;
-  #ifdef HAVE_RINGS
-  //r->cfDivComp = nrzDivComp; // only for ring stuff
-  //r->cfIsUnit = nrzIsUnit; // only for ring stuff
-  //r->cfGetUnit = nrzGetUnit; // only for ring stuff
-  //r->cfExtGcd = nrzExtGcd; // only for ring stuff
-  //r->cfDivBy = nrzDivBy; // only for ring stuff
-  #endif
+  //#ifdef HAVE_RINGS
+  r->cfDivComp = nrzDivComp; // only for ring stuff
+  r->cfIsUnit = nrzIsUnit; // only for ring stuff
+  r->cfGetUnit = nrzGetUnit; // only for ring stuff
+  r->cfExtGcd = nrzExtGcd; // only for ring stuff
+  r->cfDivBy = nrzDivBy; // only for ring stuff
+  //#endif
   r->cfNeg   = nrzNeg;
   r->cfInvers= nrzInvers;
   r->cfCopy  = nrzCopy;
@@ -408,6 +414,7 @@ BOOLEAN nrzInitChar(coeffs r,  void * parameter)
   r->cfLcm  = nrzGcd;
   r->cfDelete= nrzDelete;
   r->cfSetMap = nrzSetMap;
+  r->cfCoeffWrite = nrzCoeffWrite;
   // debug stuff
 
 #ifdef LDEBUG

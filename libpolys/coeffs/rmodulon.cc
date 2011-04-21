@@ -25,6 +25,15 @@
 
 extern omBin gmp_nrz_bin;
 
+void    nrnCoeffWrite  (const coeffs r)
+{
+  long l = (long)mpz_sizeinbase(r->modBase, 10) + 2;
+  char* s = (char*) omAlloc(l);
+  if (nCoeff_is_Ring_ModN(r)) Print("//  Z/%s\n", s);
+  else if (nCoeff_is_Ring_PtoM(r)) Print("//  Z/%s^%lu\n", s, r->modExponent);
+  omFreeSize((ADDRESS)s, l);
+}
+
 /* for initializing function pointers */
 BOOLEAN nrnInitChar (coeffs r, void* p)
 {
@@ -64,6 +73,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfGetUnit     = nrnGetUnit;
   r->cfExtGcd      = nrnExtGcd;
   r->cfName        = ndName;
+  r->cfCoeffWrite  = nrnCoeffWrite;
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif

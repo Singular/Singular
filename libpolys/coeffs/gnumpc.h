@@ -43,6 +43,7 @@ number   ngcRePart(number a, const coeffs r);
 number   ngcImPart(number a, const coeffs r);
 
 void     ngcDelete(number *a, const coeffs r);
+void     ngcCoeffWrite(const coeffs r);
 
 #ifdef LDEBUG
 BOOLEAN  ngcDBTest(number a, const char *f, const int l, const coeffs r);

@@ -37,6 +37,7 @@ void     ngfPower(number x, int exp, number *lu, const coeffs r);
 number   ngfCopy(number a, const coeffs r);
 number   ngf_Copy(number a, coeffs r);
 void     ngfWrite(number &a, const coeffs r);
+void     ngfCoeffWrite(const coeffs r);
 
 void     ngfDelete(number *a, const coeffs r);
 

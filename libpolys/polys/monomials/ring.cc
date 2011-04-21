@@ -280,27 +280,6 @@ void rWrite(ring r)
 
   n_CoeffWrite(r->cf);
 #if 0
-  if (rField_is_GF(r))
-  {
-    Print("//   # ground field : %d\n",r->cf->ch);
-    Print("//   primitive element : %s\n", r->parameter[0]);
-    StringSetS("//   minpoly        : ");
-    nfShowMipo(r->cf);PrintS(StringAppendS("\n"));
-  }
-#ifdef HAVE_RINGS
-  else if (rField_is_Ring(r))
-  {
-    PrintS("//   coeff. ring is : ");
-    if (rField_is_Ring_Z(r)) PrintS("Integers\n");
-    long l = (long)mpz_sizeinbase(r->cf->modBase, 10) + 2;
-    char* s = (char*) omAlloc(l);
-    mpz_get_str(s,10,r->cf->modBase);
-    if (rField_is_Ring_ModN(r)) Print("Z/%s\n", s);
-    if (rField_is_Ring_2toM(r)) Print("Z/2^%lu\n", r->cf->modExponent);
-    if (rField_is_Ring_PtoM(r)) Print("Z/%s^%lu\n", s, r->cf->modExponent);
-    omFreeSize((ADDRESS)s, l);
-  }
-#endif
   else
   {
     PrintS("//   characteristic : ");
