@@ -42,7 +42,7 @@ void p_Content(poly ph, const ring r)
       p=ph;
     }
     else if ((rField_is_Extension(r))
-    && ((rPar(r)>1)||(r->minpoly==NULL)))
+    && ((rPar(r)>1)||(r->cf->minpoly==NULL)))
     {
       h=pInitContent_a(ph);
       p=ph;
@@ -750,7 +750,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
     {
       qq = pInit();
       number n=nMap(pGetCoeff(p));
-      if ((currRing->minpoly!=NULL)
+      if ((currRing->cf->minpoly!=NULL)
       && ((rField_is_Zp_a()) || (rField_is_Q_a())))
       {
         nNormalize(n);
@@ -762,7 +762,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
     {
       qq=pOne();
       aq=napPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
-      if ((aq!=NULL) && (currRing->minpoly!=NULL)
+      if ((aq!=NULL) && (currRing->cf->minpoly!=NULL)
       && ((rField_is_Zp_a()) || (rField_is_Q_a())))
       {
         pNormalize(aq);
@@ -828,7 +828,7 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
         }
       }
       if (mapped_to_par
-      && (currRing->minpoly!=NULL))
+      && (currRing->cf->minpoly!=NULL))
       {
         number n=pGetCoeff(qq);
         nNormalize(n);

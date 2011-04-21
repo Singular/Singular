@@ -154,7 +154,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   SetProcs(field, length, ord);
   extern poly p_Mult_nn_pthread(poly p, const number n, const ring r);
   #ifdef NV_OPS
-  if ((field==FieldZp) && (r->ch>NV_MAX_PRIME))
+  if ((field==FieldZp) && (r->cf->ch>NV_MAX_PRIME))
   {
     // set all (mult/div.) routines to FieldGeneral-variants
     SetProcs(FieldGeneral, length,ord); // p_Mult_nn, ...

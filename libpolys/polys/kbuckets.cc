@@ -1154,7 +1154,7 @@ static BOOLEAN nIsPseudoUnit(number n, ring r)
 {
   if (rField_is_Zp(r))
     return TRUE;
-  if (r->parameter==NULL)
+  if (r->cf->parameter==NULL)
   {
     return (r->cf->cfSize(n,r->cf)==1);
   }

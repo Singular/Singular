@@ -73,7 +73,7 @@ static const char * const ringorder_name[] =
   " _" ///< ringorder_unspec
 };
 
-#define  rInternalChar(r) ((r)->ch)
+#define  rInternalChar(r) ((r)->cf->ch)
 
 const char * rSimpleOrdStr(int ord)
 {
@@ -93,7 +93,7 @@ static void rOptimizeLDeg(ring r);
 /*0 implementation*/
 //BOOLEAN rField_is_R(ring r)
 //{
-//  if (r->ch== -1)
+//  if (r->cf->ch== -1)
 //  {
 //    if (r->float_len==(short)0) return TRUE;
 //  }
@@ -107,9 +107,9 @@ static void rOptimizeLDeg(ring r);
 /// SHOULD BE DEPRECATED NOW...?
 void rChangeCurrRing(ring r)
 {
- // if ((currRing!=NULL) && (currRing->minpoly!=NULL))
+ // if ((currRing!=NULL) && (currRing->cf->minpoly!=NULL))
  // {
- //   omCheckAddr(currRing->minpoly);
+ //   omCheckAddr(currRing->cf->minpoly);
  // }
   //------------ set global ring vars --------------------------------
   //currRing = r;
@@ -139,10 +139,10 @@ ring rDefault(coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, in
 {
   assume( cf != NULL);
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
-  r->ch    = n_GetChar(cf);
+  r->cf->ch    = n_GetChar(cf);
   r->N     = N;
   r->cf = cf;
-  /*r->P     = 0; Alloc0 */
+  /*rPar(r)  = 0; Alloc0 */
   /*names*/
   r->names = (char **) omAlloc0(N * sizeof(char *));
   int i;
@@ -278,10 +278,11 @@ void rWrite(ring r)
 
   nblocks--;
 
-
+  n_CoeffWrite(r->cf);
+#if 0
   if (rField_is_GF(r))
   {
-    Print("//   # ground field : %d\n",r->ch);
+    Print("//   # ground field : %d\n",r->cf->ch);
     Print("//   primitive element : %s\n", r->parameter[0]);
     StringSetS("//   minpoly        : ");
     nfShowMipo(r->cf);PrintS(StringAppendS("\n"));
@@ -312,10 +313,10 @@ void rWrite(ring r)
              r->float_len, r->float_len2);  /* long C */
     else
       Print ("%d\n",rChar(r)); /* Fp(a) */
-    if (r->parameter!=NULL)
+    if (r->cf->parameter!=NULL)
     {
       Print ("//   %d parameter    : ",rPar(r));
-      char **sp=r->parameter;
+      char **sp=r->cf->parameter;
       int nop=0;
       while (nop<rPar(r))
       {
@@ -327,15 +328,15 @@ void rWrite(ring r)
       if ( rField_is_long_C(r) )
       {
         // i^2+1:
-        Print("(%s^2+1)\n",r->parameter[0]);
+        Print("(%s^2+1)\n",r->cf->parameter[0]);
       }
-      else if (r->minpoly==NULL)
+      else if (r->cf->minpoly==NULL)
       {
         PrintS("0\n");
       }
       else
       {
-        StringSetS(""); n_Write(r->minpoly,r->cf); PrintS(StringAppendS("\n"));
+        StringSetS(""); n_Write(r->cf->minpoly,r->cf); PrintS(StringAppendS("\n"));
       }
       //if (r->minideal!=NULL)
       //{
@@ -344,6 +345,7 @@ void rWrite(ring r)
       //}
     }
   }
+#endif  
   Print("//   number of vars : %d",r->N);
 
   //for (nblocks=0; r->order[nblocks]; nblocks++);
@@ -476,7 +478,7 @@ void rDelete(ring r)
     nc_rKill(r);
 #endif
 
-  nKillChar(r->cf);
+  nKillChar(r->cf); r->cf = NULL;
   rUnComplete(r);
   // delete order stuff
   if (r->order != NULL)
@@ -511,9 +513,9 @@ void rDelete(ring r)
   }
 
   // delete parameter
-  if (r->parameter!=NULL)
+  if (r->cf->parameter!=NULL)
   {
-    char **s=r->parameter;
+    char **s=r->cf->parameter;
     j = 0;
     while (j < rPar(r))
     {
@@ -521,20 +523,8 @@ void rDelete(ring r)
       s++;
       j++;
     }
-    omFreeSize((ADDRESS)r->parameter,rPar(r)*sizeof(char *));
+    omFreeSize((ADDRESS)r->cf->parameter,rPar(r)*sizeof(char *));
   }
-#ifdef HAVE_RINGS
-  if (r->cf->modBase != NULL)
-  {
-    mpz_clear(r->cf->modBase);
-    omFree((ADDRESS)r->cf->modBase);
-  }
-  if (r->cf->modNumber != NULL)
-  {
-    mpz_clear(r->cf->modNumber);
-    omFree((ADDRESS)r->cf->modNumber);
-  }
-#endif
   omFreeBin(r, sip_sring_bin);
 }
 
@@ -678,9 +668,9 @@ char * rCharStr(ring r)
     return s;
   }
 #endif
-  if (r->parameter==NULL)
+  if (r->cf->parameter==NULL)
   {
-    i=r->ch;
+    i=r->cf->ch;
     if(i==-1)
       s=omStrDup("real");                    /* R */
     else
@@ -692,22 +682,22 @@ char * rCharStr(ring r)
   }
   if (rField_is_long_C(r))
   {
-    s=(char *)omAlloc(21+strlen(r->parameter[0]));
-    sprintf(s,"complex,%d,%s",r->float_len,r->parameter[0]);   /* C */
+    s=(char *)omAlloc(21+strlen(r->cf->parameter[0]));
+    sprintf(s,"complex,%d,%s",r->float_len,r->cf->parameter[0]);   /* C */
     return s;
   }
   int l=0;
   for(i=0; i<rPar(r);i++)
   {
-    l+=(strlen(r->parameter[i])+1);
+    l+=(strlen(r->cf->parameter[i])+1);
   }
   s=(char *)omAlloc((long)(l+MAX_INT_LEN+1));
   s[0]='\0';
-  if (r->ch<0)       sprintf(s,"%d",-r->ch); /* Fp(a) */
-  else if (r->ch==1) sprintf(s,"0");         /* Q(a)  */
+  if (r->cf->ch<0)       sprintf(s,"%d",-r->cf->ch); /* Fp(a) */
+  else if (r->cf->ch==1) sprintf(s,"0");         /* Q(a)  */
   else
   {
-    sprintf(s,"%d,%s",r->ch,r->parameter[0]); /* GF(q)  */
+    sprintf(s,"%d,%s",r->cf->ch,r->cf->parameter[0]); /* GF(q)  */
     return s;
   }
   char tt[2];
@@ -716,30 +706,30 @@ char * rCharStr(ring r)
   for(i=0; i<rPar(r);i++)
   {
     strcat(s,tt);
-    strcat(s,r->parameter[i]);
+    strcat(s,r->cf->parameter[i]);
   }
   return s;
 }
 
 char * rParStr(ring r)
 {
-  if ((r==NULL)||(r->parameter==NULL)) return omStrDup("");
+  if ((r==NULL)||(r->cf->parameter==NULL)) return omStrDup("");
 
   int i;
   int l=2;
 
   for (i=0; i<rPar(r); i++)
   {
-    l+=strlen(r->parameter[i])+1;
+    l+=strlen(r->cf->parameter[i])+1;
   }
   char *s=(char *)omAlloc((long)l);
   s[0]='\0';
   for (i=0; i<rPar(r)-1; i++)
   {
-    strcat(s,r->parameter[i]);
+    strcat(s,r->cf->parameter[i]);
     strcat(s,",");
   }
-  strcat(s,r->parameter[i]);
+  strcat(s,r->cf->parameter[i]);
   return s;
 }
 
@@ -758,7 +748,7 @@ char * rString(ring r)
 
 int  rIsExtension(const ring r)
 {
-  return (r->parameter!=NULL); /* R, Q, Fp: FALSE */
+  return (r->cf->parameter!=NULL); /* R, Q, Fp: FALSE */
 }
 
 static int binaryPower (const int a, const int b)
@@ -792,16 +782,16 @@ int rChar(ring r)
   if (rField_is_numeric(r))
     return 0;
   if (!rIsExtension(r)) /* Q, Fp */
-    return r->ch;
+    return r->cf->ch;
   if (rField_is_Zp_a(r))  /* Fp(a)  */
-    return -r->ch;
+    return -r->cf->ch;
   if (rField_is_Q_a(r))   /* Q(a)  */
     return 0;
   /*else*/               /* GF(p,n) */
   {
-    if ((r->ch & 1)==0) return 2;
+    if ((r->cf->ch & 1)==0) return 2;
     int i=3;
-    while ((r->ch % i)!=0) i+=2;
+    while ((r->cf->ch % i)!=0) i+=2;
     return i;
   }
 }
@@ -842,21 +832,25 @@ ring nc_rCreateNCcomm_rCopy(ring r)
 */
 int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 {
+
   ip_sring tmpR;
   memset(&tmpR,0,sizeof(tmpR));
   /* check coeff. field =====================================================*/
+
+  TODO(Hans, switch to the use of ->cf);
+  assume( tmpR.cf !=NULL ); // ???!
+  
   if ((rFieldType(r1)==rFieldType(r2))
   && (rInternalChar(r1)==rInternalChar(r2)))
   {
-    tmpR.ch=r1->ch;
     if (rField_is_Q(r1)||rField_is_Zp(r1)||rField_is_GF(r1)) /*Q, Z/p, GF(p,n)*/
     {
-      if (r1->parameter!=NULL)
+      if (r1->cf->parameter!=NULL)
       {
-        if (!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
+        if (!vartest || (strcmp(r1->cf->parameter[0],r2->cf->parameter[0])==0)) /* 1 par */
         {
           //tmpR.parameter=(char **)omAllocBin(char *);
-          //tmpR.parameter[0]=omStrDup(r1->parameter[0]);
+          //tmpR.parameter[0]=omStrDup(r1->cf->parameter[0]);
           //tmpR.P=1;
         }
         else
@@ -865,24 +859,25 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           return -1;
         }
       }
+      tmpR.cf->ch=r1->cf->ch;
     }
     else if (rField_is_Extension(r1)) /* Q(a),Z/p(a) */
     {
-      if (r1->minpoly!=NULL)
+      if (r1->cf->minpoly!=NULL)
       {
-        if (r2->minpoly!=NULL)
+        if (r2->cf->minpoly!=NULL)
         {
           // HANNES: TODO: delete nSetChar
           
           // TODO: eliminate rChangeCurrRing
 //	  rChangeCurrRing(r1);
 	   
-          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
-              && n_Equal(r1->minpoly,r2->minpoly, r1->cf))
+          if ((!vartest || (strcmp(r1->cf->parameter[0],r2->cf->parameter[0])==0)) /* 1 par */
+              && n_Equal(r1->cf->minpoly,r2->cf->minpoly, r1->cf))
           {
             //tmpR.parameter=(char **)omAllocBin(char *);
-            //tmpR.parameter[0]=omStrDup(r1->parameter[0]);
-            //tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
+            //tmpR.parameter[0]=omStrDup(r1->cf->parameter[0]);
+            //tmpR.minpoly=n_Copy(r1->cf->minpoly, r1->cf);
             //tmpR.P=1;
             // HANNES: TODO: delete nSetChar
           }
@@ -895,13 +890,13 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         }
         else
         {
-          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
+          if ((!vartest || (strcmp(r1->cf->parameter[0],r2->cf->parameter[0])==0)) /* 1 par */
               && (rPar(r2)==1))
           {
             //tmpR.parameter=(char **)omAllocBin(char *);
-            //tmpR.parameter[0]=omStrDup(r1->parameter[0]);
+            //tmpR.parameter[0]=omStrDup(r1->cf->parameter[0]);
             //tmpR.P=1;
-            //tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
+            //tmpR.minpoly=n_Copy(r1->cf->minpoly, r1->cf);
           }
           else
           {
@@ -910,17 +905,17 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
           }
         }
       }
-      else /* r1->minpoly==NULL */
+      else /* r1->cf->minpoly==NULL */
       {
-        if (r2->minpoly!=NULL)
+        if (r2->cf->minpoly!=NULL)
         {
-          if ((!vartest || (strcmp(r1->parameter[0],r2->parameter[0])==0)) /* 1 par */
+          if ((!vartest || (strcmp(r1->cf->parameter[0],r2->cf->parameter[0])==0)) /* 1 par */
               && (rPar(r1)==1))
           {
             //tmpR.parameter=(char **)omAllocBin(char *);
-            //tmpR.parameter[0]=omStrDup(r1->parameter[0]);
+            //tmpR.parameter[0]=omStrDup(r1->cf->parameter[0]);
             //tmpR.P=1;
-            //tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
+            //tmpR.minpoly=n_Copy(r2->cf->minpoly, r2->cf);
           }
           else
           {
@@ -931,11 +926,11 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         else
         {
           int len=rPar(r1)+rPar(r2);
-          tmpR.parameter=(char **)omAlloc0(len*sizeof(char *));
+          tmpR.cf->parameter=(char **)omAlloc0(len*sizeof(char *));
           int i;
           for (i=0;i<rPar(r1);i++)
           {
-            tmpR.parameter[i]=omStrDup(r1->parameter[i]);
+            tmpR.cf->parameter[i]=omStrDup(r1->cf->parameter[i]);
           }
           int j,l;
           for(j=0;j<rPar(r2);j++)
@@ -944,7 +939,7 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
             {
               for(l=0;l<i;l++)
               {
-                if(strcmp(tmpR.parameter[l],r2->parameter[j])==0)
+                if(strcmp(tmpR.cf->parameter[l],r2->cf->parameter[j])==0)
                   break;
               }
             }
@@ -952,17 +947,17 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
               l=i;
             if (l==i)
             {
-              tmpR.parameter[i]=omStrDup(r2->parameter[j]);
+              tmpR.cf->parameter[i]=omStrDup(r2->cf->parameter[j]);
               i++;
             }
           }
           if (i!=len)
           {
-            tmpR.parameter=(char**)omReallocSize(tmpR.parameter,
+            tmpR.cf->parameter=(char**)omReallocSize(tmpR.cf->parameter,
                                                  len*sizeof(char *),
                                                  i*sizeof(char *));
           }
-          tmpR.P=i;
+          tmpR.cf->P=i;
         }
       }
     }
@@ -997,24 +992,24 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     }
     #endif
   }
-  else /* r1->ch!=r2->ch */
+  else /* r1->cf->ch!=r2->cf->ch */
   {
-    if (r1->ch<-1) /* Z/p(a) */
+    if (r1->cf->ch<-1) /* Z/p(a) */
     {
-      if ((r2->ch==0) /* Q */
-          || (r2->ch==-r1->ch)) /* Z/p */
+      if ((r2->cf->ch==0) /* Q */
+          || (r2->cf->ch==-r1->cf->ch)) /* Z/p */
       {
-        tmpR.ch=r1->ch;
-        tmpR.P=rPar(r1);
-        tmpR.parameter=(char **)omAlloc(rPar(r1)*sizeof(char *));
+        tmpR.cf->ch=r1->cf->ch;
+        tmpR.cf->P=rPar(r1);
+        tmpR.cf->parameter=(char **)omAlloc(rPar(r1)*sizeof(char *));
         int i;
         for (i=0;i<rPar(r1);i++)
         {
-          tmpR.parameter[i]=omStrDup(r1->parameter[i]);
+          tmpR.cf->parameter[i]=omStrDup(r1->cf->parameter[i]);
         }
-        if (r1->minpoly!=NULL)
+        if (r1->cf->minpoly!=NULL)
         {
-          tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
+          tmpR.cf->minpoly=n_Copy(r1->cf->minpoly, r1->cf);
         }
       }
       else  /* R, Q(a),Z/q,Z/p(a),GF(p,n) */
@@ -1023,36 +1018,36 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         return -1;
       }
     }
-    else if (r1->ch==-1) /* R */
+    else if (r1->cf->ch==-1) /* R */
     {
       WerrorS("R+..");
       return -1;
     }
-    else if (r1->ch==0) /* Q */
+    else if (r1->cf->ch==0) /* Q */
     {
-      if ((r2->ch<-1)||(r2->ch==1)) /* Z/p(a),Q(a) */
+      if ((r2->cf->ch<-1)||(r2->cf->ch==1)) /* Z/p(a),Q(a) */
       {
-        tmpR.ch=r2->ch;
-        tmpR.P=rPar(r2);
-        tmpR.parameter=(char **)omAlloc(rPar(r2)*sizeof(char *));
+        tmpR.cf->ch=r2->cf->ch;
+        tmpR.cf->P=rPar(r2);
+        tmpR.cf->parameter=(char **)omAlloc(rPar(r2)*sizeof(char *));
         int i;
         for (i=0;i<rPar(r2);i++)
         {
-          tmpR.parameter[i]=omStrDup(r2->parameter[i]);
+          tmpR.cf->parameter[i]=omStrDup(r2->cf->parameter[i]);
         }
-        if (r2->minpoly!=NULL)
+        if (r2->cf->minpoly!=NULL)
         {
-          tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
+          tmpR.cf->minpoly=n_Copy(r2->cf->minpoly, r2->cf);
         }
       }
-      else if (r2->ch>1) /* Z/p,GF(p,n) */
+      else if (r2->cf->ch>1) /* Z/p,GF(p,n) */
       {
-        tmpR.ch=r2->ch;
-        if (r2->parameter!=NULL)
+        tmpR.cf->ch=r2->cf->ch;
+        if (r2->cf->parameter!=NULL)
         {
-          tmpR.parameter=(char_ptr *)omAllocBin(char_ptr_bin);
-          tmpR.P=1;
-          tmpR.parameter[0]=omStrDup(r2->parameter[0]);
+          tmpR.cf->parameter=(char_ptr *)omAllocBin(char_ptr_bin);
+          tmpR.cf->P=1;
+          tmpR.cf->parameter[0]=omStrDup(r2->cf->parameter[0]);
         }
       }
       else
@@ -1061,21 +1056,21 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         return -1; /* R */
       }
     }
-    else if (r1->ch==1) /* Q(a) */
+    else if (r1->cf->ch==1) /* Q(a) */
     {
-      if (r2->ch==0) /* Q */
+      if (r2->cf->ch==0) /* Q */
       {
-        tmpR.ch=r1->ch;
-        tmpR.P=rPar(r1);
-        tmpR.parameter=(char **)omAlloc(rPar(r1)*sizeof(char *));
+        tmpR.cf->ch=r1->cf->ch;
+        tmpR.cf->P=rPar(r1);
+        tmpR.cf->parameter=(char **)omAlloc(rPar(r1)*sizeof(char *));
         int i;
         for(i=0;i<rPar(r1);i++)
         {
-          tmpR.parameter[i]=omStrDup(r1->parameter[i]);
+          tmpR.cf->parameter[i]=omStrDup(r1->cf->parameter[i]);
         }
-        if (r1->minpoly!=NULL)
+        if (r1->cf->minpoly!=NULL)
         {
-          tmpR.minpoly=n_Copy(r1->minpoly, r1->cf);
+          tmpR.cf->minpoly=n_Copy(r1->cf->minpoly, r1->cf);
         }
       }
       else  /* R, Z/p,GF(p,n) */
@@ -1084,25 +1079,25 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
         return -1;
       }
     }
-    else /* r1->ch >=2 , Z/p */
+    else /* r1->cf->ch >=2 , Z/p */
     {
-      if (r2->ch==0) /* Q */
+      if (r2->cf->ch==0) /* Q */
       {
-        tmpR.ch=r1->ch;
+        tmpR.cf->ch=r1->cf->ch;
       }
-      else if (r2->ch==-r1->ch) /* Z/p(a) */
+      else if (r2->cf->ch==-r1->cf->ch) /* Z/p(a) */
       {
-        tmpR.ch=r2->ch;
-        tmpR.P=rPar(r2);
-        tmpR.parameter=(char **)omAlloc(rPar(r2)*sizeof(char *));
+        tmpR.cf->ch=r2->cf->ch;
+        tmpR.cf->P=rPar(r2);
+        tmpR.cf->parameter=(char **)omAlloc(rPar(r2)*sizeof(char *));
         int i;
         for(i=0;i<rPar(r2);i++)
         {
-          tmpR.parameter[i]=omStrDup(r2->parameter[i]);
+          tmpR.cf->parameter[i]=omStrDup(r2->cf->parameter[i]);
         }
-        if (r2->minpoly!=NULL)
+        if (r2->cf->minpoly!=NULL)
         {
-          tmpR.minpoly=n_Copy(r2->minpoly, r2->cf);
+          tmpR.cf->minpoly=n_Copy(r2->cf->minpoly, r2->cf);
         }
       }
       else
@@ -1126,13 +1121,13 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
     if (*(r1->names[i]) == '\0')
       b = FALSE;
-    else if ((r2->parameter!=NULL) && (strlen(r1->names[i])==1))
+    else if ((r2->cf->parameter!=NULL) && (strlen(r1->names[i])==1))
     {
       if (vartest)
       {
         for(j=0;j<rPar(r2);j++)
         {
-          if (strcmp(r1->names[i],r2->parameter[j])==0)
+          if (strcmp(r1->names[i],r2->cf->parameter[j])==0)
           {
             b=FALSE;
             break;
@@ -1158,13 +1153,13 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
 
     if (*(r2->names[i]) == '\0')
       b = FALSE;
-    else if ((r1->parameter!=NULL) && (strlen(r2->names[i])==1))
+    else if ((r1->cf->parameter!=NULL) && (strlen(r2->names[i])==1))
     {
       if (vartest)
       {
         for(j=0;j<rPar(r1);j++)
         {
-          if (strcmp(r2->names[i],r1->parameter[j])==0)
+          if (strcmp(r2->names[i],r1->cf->parameter[j])==0)
           {
             b=FALSE;
             break;
@@ -1420,13 +1415,13 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       int *par_perm2 = NULL;
       if (rPar(R2)!=0) par_perm2=(int *)omAlloc0((rPar(R2)+1)*sizeof(int));
 
-      maFindPerm(R1->names,  rVar(R1),  R1->parameter,  rPar(R1),
-                 sum->names, rVar(sum), sum->parameter, rPar(sum),
-                 perm1, par_perm1, sum->ch);
+      maFindPerm(R1->names,  rVar(R1),  R1->cf->parameter,  rPar(R1),
+                 sum->names, rVar(sum), sum->cf->parameter, rPar(sum),
+                 perm1, par_perm1, sum->cf->ch);
 
-      maFindPerm(R2->names,  rVar(R2),  R2->parameter,  rPar(R2),
-                 sum->names, rVar(sum), sum->parameter, rPar(sum),
-                 perm2, par_perm2, sum->ch);
+      maFindPerm(R2->names,  rVar(R2),  R2->cf->parameter,  rPar(R2),
+                 sum->names, rVar(sum), sum->cf->parameter, rPar(sum),
+                 perm2, par_perm2, sum->cf->ch);
 
 
       matrix C1 = R1->GetNC()->C, C2 = R2->GetNC()->C;
@@ -1525,9 +1520,9 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     int *perm1 = (int *)omAlloc0((rVar(r1)+1)*sizeof(int));
     int *par_perm1 = NULL;
     if (rPar(r1)!=0) par_perm1=(int *)omAlloc0((rPar(r1)+1)*sizeof(int));
-    maFindPerm(r1->names,  rVar(r1),  r1->parameter,  rPar(r1),
-               sum->names, rVar(sum), sum->parameter, rPar(sum),
-               perm1, par_perm1, sum->ch);
+    maFindPerm(r1->names,  rVar(r1),  r1->cf->parameter,  rPar(r1),
+               sum->names, rVar(sum), sum->cf->parameter, rPar(sum),
+               perm1, par_perm1, sum->cf->ch);
     nMapFunc nMap1 = n_SetMap(r1->cf,sum->cf);
     Q1 = idInit(IDELEMS(r1->qideal),1);
 
@@ -1548,9 +1543,9 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
     int *perm2 = (int *)omAlloc0((rVar(r2)+1)*sizeof(int));
     int *par_perm2 = NULL;
     if (rPar(r2)!=0) par_perm2=(int *)omAlloc0((rPar(r2)+1)*sizeof(int));
-    maFindPerm(r2->names,  rVar(r2),  r2->parameter,  rPar(r2),
-               sum->names, rVar(sum), sum->parameter, rPar(sum),
-               perm2, par_perm2, sum->ch);
+    maFindPerm(r2->names,  rVar(r2),  r2->cf->parameter,  rPar(r2),
+               sum->names, rVar(sum), sum->cf->parameter, rPar(sum),
+               perm2, par_perm2, sum->cf->ch);
     nMapFunc nMap2 = n_SetMap(r2->cf,sum->cf);
     Q2 = idInit(IDELEMS(r2->qideal),1);
      
@@ -1619,7 +1614,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
 
   //struct omBin   PolyBin; /* Bin from where monoms are allocated */
   //memset: res->PolyBin=NULL; // rComplete
-  res->ch=r->ch;     /* characteristic */
+  res->cf->ch=r->cf->ch;     /* characteristic */
 #ifdef HAVE_RINGS
   res->cf->ringtype = r->cf->ringtype;  // cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m
   if (r->cf->modBase!=NULL)
@@ -1639,8 +1634,8 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->float_len=r->float_len; /* additional char-flags */
   res->float_len2=r->float_len2; /* additional char-flags */
 
-  res->N=r->N;      /* number of vars */
-  res->P=r->P;      /* number of pars */
+  res->N=rVar(r);      /* number of vars */
+  res->cf->P=rPar(r);      /* number of pars */
   res->OrdSgn=r->OrdSgn; /* 1 for polynomial rings, -1 otherwise */
 
   res->firstBlockEnds=r->firstBlockEnds;
@@ -1696,15 +1691,15 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
     r->algring->ref++;
   res->algring=r->algring;
   //memset: res->minideal=NULL;
-  if (r->parameter!=NULL)
+  if (r->cf->parameter!=NULL)
   {
-    if (r->minpoly!=NULL) res->minpoly=n_Copy(r->minpoly,r->cf);
+    if (r->cf->minpoly!=NULL) res->cf->minpoly=n_Copy(r->cf->minpoly,r->cf);
     int l=rPar(r);
-    res->parameter=(char **)omAlloc(l*sizeof(char *));
+    res->cf->parameter=(char **)omAlloc(l*sizeof(char *));
     int i;
     for(i=0;i<rPar(r);i++)
     {
-      res->parameter[i]=omStrDup(r->parameter[i]);
+      res->cf->parameter[i]=omStrDup(r->cf->parameter[i]);
     }
     if (r->minideal!=NULL)
     {
@@ -1844,16 +1839,16 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
 
   for (i=0; i<rPar(r1);i++)
   {
-      if (strcmp(r1->parameter[i], r2->parameter[i])!=0)
+      if (strcmp(r1->cf->parameter[i], r2->cf->parameter[i])!=0)
         return FALSE;
   }
 
-  if (r1->minpoly != NULL)
+  if (r1->cf->minpoly != NULL)
   {
-    if (r2->minpoly == NULL) return FALSE;
-    if (! n_Equal(r1->minpoly, r2->minpoly, r1->cf)) return FALSE;
+    if (r2->cf->minpoly == NULL) return FALSE;
+    if (! n_Equal(r1->cf->minpoly, r2->cf->minpoly, r1->cf)) return FALSE;
   }
-  else if (r2->minpoly != NULL) return FALSE;
+  else if (r2->cf->minpoly != NULL) return FALSE;
 
   if (qr)
   {
@@ -2275,9 +2270,9 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
       }
     }
   }
-  if (r->minpoly!=NULL)
+  if (r->cf->minpoly!=NULL)
   {
-    omCheckAddr(r->minpoly);
+    omCheckAddr(r->cf->minpoly);
   }
   //assume(r->cf!=NULL);
 
@@ -3159,11 +3154,11 @@ static void rSetOutParams(ring r)
   r->ShortOut = TRUE;
   {
     int i;
-    if (r->parameter!=NULL)
+    if (r->cf->parameter!=NULL)
     {
       for (i=0;i<rPar(r);i++)
       {
-        if(strlen(r->parameter[i])>1)
+        if(strlen(r->cf->parameter[i])>1)
         {
           r->ShortOut=FALSE;
           break;
@@ -5504,10 +5499,10 @@ ring rOpposite(ring src)
         nj = r->N +1 - j; /* i<j ==>   nj < ni */
 
         assume(MATELEM(src->GetNC()->C,i,j) != NULL);
-        MATELEM(C,nj,ni) = p_PermPoly(MATELEM(src->GetNC()->C,i,j),perm,src,r, nMap,par_perm,src->P);
+        MATELEM(C,nj,ni) = p_PermPoly(MATELEM(src->GetNC()->C,i,j),perm,src,r, nMap,par_perm,rPar(src));
 
         if(MATELEM(src->GetNC()->D,i,j) != NULL)
-          MATELEM(D,nj,ni) = p_PermPoly(MATELEM(src->GetNC()->D,i,j),perm,src,r, nMap,par_perm,src->P);
+          MATELEM(D,nj,ni) = p_PermPoly(MATELEM(src->GetNC()->D,i,j),perm,src,r, nMap,par_perm,rPar(src));
       }
     }
 
