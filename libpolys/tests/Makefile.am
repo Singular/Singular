@@ -32,7 +32,7 @@ else
   USEPPROCSDYNAMICLDFLAGS =
 endif
 
-polys_test_LDFLAGS = $(USEPPROCSDYNAMICLDFLAGS)
+polys_test_LDFLAGS = ${AM_LDFLAGS} $(USEPPROCSDYNAMICLDFLAGS)
 
 coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lomalloc_debug
 polys_test_LDADD = -lpolys_g $(USEPPROCSDYNAMICLD) $(coeffs_test_LDADD)
