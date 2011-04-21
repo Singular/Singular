@@ -179,6 +179,11 @@ extern "C" {
 #define HAVE_ELF_SYSTEM
 #endif
 
+#if defined(__APPLE__) && defined(__MACH__)
+#define HAVE_ELF_SYSTEM
+#endif
+   
+   
 #if defined(ix86Mac_darwin)
 #define HAVE_ELF_SYSTEM
 #endif
