@@ -535,14 +535,18 @@ sub writeInitialize() {
 
 sub writeMain() {
   if ( $gui ) {
+    print "char* argv0;\n";
     print "int main( int argc, char *argv[] ) {\n";
+    print "argv0 = argv[0];\n";
     $noStaticInit &&
       print " CxxTest::initialize();\n";
     print " return CxxTest::GuiTuiRunner<CxxTest::$gui, CxxTest::$runner>( argc, argv ).run();\n";
     print "}\n";
   }
   elsif ( $runner ) {
-    print "int main() {\n";
+    print "char* argv0;\n";
+    print "int main( int argc, char *argv[] ) {\n";
+    print "argv0 = argv[0];\n";
     $noStaticInit &&
       print " CxxTest::initialize();\n";
     print " return CxxTest::$runner().run();\n";

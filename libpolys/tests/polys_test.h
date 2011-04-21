@@ -36,7 +36,7 @@ class GlobalPrintingFixture : public CxxTest::GlobalFixture
   public:
     bool setUpWorld() {
       clog << ( "<world>" ) << endl;
-      feInitResources();
+      feInitResources(argv0);
       
       TS_ASSERT_EQUALS( nRegister( n_Zp, npInitChar), n_Zp );
       TS_ASSERT_EQUALS( nRegister( n_GF, nfInitChar), n_GF );
