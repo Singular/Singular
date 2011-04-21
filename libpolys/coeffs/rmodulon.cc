@@ -150,8 +150,9 @@ number nrnSub(number a, number b, const coeffs r)
 
 number nrnNeg(number c, const coeffs r)
 {
-  // Attention: This method operates in-place.
-  mpz_sub((int_number)c, r->modNumber, (int_number)c);
+  if( !nrnIsZero(c, r) )
+    // Attention: This method operates in-place.
+    mpz_sub((int_number)c, r->modNumber, (int_number)c);  
   return c;
 }
 
