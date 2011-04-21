@@ -224,11 +224,11 @@ struct ip_sring
 
                             the highest monomial below pHEdge */
 // #ifdef HAVE_RINGS
-//   unsigned int  ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
-//   int_number    ringflaga; /* Z/(ringflag^ringflagb)=Z/nrnModul*/
-//   unsigned long ringflagb;
-//   unsigned long nr2mModul;  /* Z/nr2mModul */
-//   int_number    nrnModul;
+//   unsigned int  cf->ringtype;  /* cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m */
+//   int_number    cf->modBase; /* Z/(ringflag^cf->modExponent)=Z/cf->modNumber*/
+//   unsigned long cf->modExponent;
+//   unsigned long cf->modNumber;  /* Z/cf->modNumber */
+//   int_number    cf->modNumber;
 // #endif
   
   unsigned long options; /* ring dependent options */

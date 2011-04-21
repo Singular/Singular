@@ -289,19 +289,15 @@ void rWrite(ring r)
 #ifdef HAVE_RINGS
   else if (rField_is_Ring(r))
   {
-    TODO(Frank, "Please consider addapting the variable names...");
-    
     PrintS("//   coeff. ring is : ");
     if (rField_is_Ring_Z(r)) PrintS("Integers\n");
-/*
-    long l = (long)mpz_sizeinbase(r->ringflaga, 10) + 2;
+    long l = (long)mpz_sizeinbase(r->cf->modBase, 10) + 2;
     char* s = (char*) omAlloc(l);
-    mpz_get_str(s,10,r->ringflaga);
+    mpz_get_str(s,10,r->cf->modBase);
     if (rField_is_Ring_ModN(r)) Print("Z/%s\n", s);
-    if (rField_is_Ring_2toM(r)) Print("Z/2^%lu\n", r->ringflagb);
-    if (rField_is_Ring_PtoM(r)) Print("Z/%s^%lu\n", s, r->ringflagb);
+    if (rField_is_Ring_2toM(r)) Print("Z/2^%lu\n", r->cf->modExponent);
+    if (rField_is_Ring_PtoM(r)) Print("Z/%s^%lu\n", s, r->cf->modExponent);
     omFreeSize((ADDRESS)s, l);
-*/  
   }
 #endif
   else
@@ -528,19 +524,16 @@ void rDelete(ring r)
     omFreeSize((ADDRESS)r->parameter,rPar(r)*sizeof(char *));
   }
 #ifdef HAVE_RINGS
-  TODO(Frank, "Please consider addapting the variable names...");
-/*
-  if (r->ringflaga != NULL)
+  if (r->cf->modBase != NULL)
   {
-    mpz_clear(r->ringflaga);
-    omFree((ADDRESS)r->ringflaga);
+    mpz_clear(r->cf->modBase);
+    omFree((ADDRESS)r->cf->modBase);
   }
-  if (r->nrnModul != NULL)
+  if (r->cf->modNumber != NULL)
   {
-    mpz_clear(r->nrnModul);
-    omFree((ADDRESS)r->nrnModul);
+    mpz_clear(r->cf->modNumber);
+    omFree((ADDRESS)r->cf->modNumber);
   }
-*/
 #endif
   omFreeBin(r, sip_sring_bin);
 }
@@ -659,8 +652,6 @@ char * rCharStr(ring r)
   int i;
 
 #ifdef HAVE_RINGS
-  TODO(Frank, "Please consider addapting the variable names...");
-/*
   if (rField_is_Ring_Z(r))
   {
     s=omStrDup("integer");                   // Z
@@ -669,24 +660,23 @@ char * rCharStr(ring r)
   if(rField_is_Ring_2toM(r))
   {
     char* s = (char*) omAlloc(7+10+2);
-    sprintf(s,"integer,%lu",r->ringflagb);
+    sprintf(s,"integer,%lu",r->cf->modExponent);
     return s;
   }
   if(rField_is_Ring_ModN(r))
   {
-    long l = (long)mpz_sizeinbase(r->ringflaga, 10) + 2+7;
+    long l = (long)mpz_sizeinbase(r->cf->modBase, 10) + 2+7;
     char* s = (char*) omAlloc(l);
-    gmp_sprintf(s,"integer,%Zd",r->ringflaga);
+    gmp_sprintf(s,"integer,%Zd",r->cf->modBase);
     return s;
   }
   if(rField_is_Ring_PtoM(r))
   {
-    long l = (long)mpz_sizeinbase(r->ringflaga, 10) + 2+7+10;
+    long l = (long)mpz_sizeinbase(r->cf->modBase, 10) + 2+7+10;
     char* s = (char*) omAlloc(l);
-    gmp_sprintf(s,"integer,%Zd^%lu",r->ringflaga,r->ringflagb);
+    gmp_sprintf(s,"integer,%Zd^%lu",r->cf->modBase,r->cf->modExponent);
     return s;
   }
-*/
 #endif
   if (r->parameter==NULL)
   {
@@ -790,16 +780,14 @@ static int binaryPower (const int a, const int b)
 int rChar(ring r)
 {
 #ifdef HAVE_RINGS
-  TODO(Frank, "Please consider addapting the variable names...");
-/*
   if (rField_is_Ring_2toM(r))
-    return binaryPower(2, (int)(unsigned long)r->ringflagb);
+    return binaryPower(2, (int)(unsigned long)r->cf->modExponent);
   if (rField_is_Ring_ModN(r))
-    return (int)mpz_get_ui(r->ringflaga);
+    return (int)mpz_get_ui(r->cf->modBase);
   if (rField_is_Ring_PtoM(r))
-    return binaryPower((int)mpz_get_ui(r->ringflaga),
-                       (int)(unsigned long)r->ringflagb);
-*/
+    return binaryPower((int)mpz_get_ui(r->cf->modBase),
+                       (int)(unsigned long)r->cf->modExponent);
+  
 #endif
   if (rField_is_numeric(r))
     return 0;
@@ -1633,21 +1621,18 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->PolyBin=NULL; // rComplete
   res->ch=r->ch;     /* characteristic */
 #ifdef HAVE_RINGS
-  TODO(Frank, "Please consider addapting the variable names...");
-/*
-  res->ringtype=r->ringtype;  // cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m
-  if (r->ringflaga!=NULL)
+  res->cf->ringtype = r->cf->ringtype;  // cring = 0 => coefficient field, cring = 1 => coeffs from Z/2^m
+  if (r->cf->modBase!=NULL)
   {
-    res->ringflaga = (int_number) omAlloc(sizeof(mpz_t));
-    mpz_init_set(res->ringflaga,r->ringflaga);
+    res->cf->modBase = (int_number) omAlloc(sizeof(mpz_t));
+    mpz_init_set(res->cf->modBase,r->cf->modBase);
   }
-  res->ringflagb=r->ringflagb;
-  if (r->nrnModul!=NULL)
+  res->cf->modExponent=r->cf->modExponent;
+  if (r->cf->modNumber!=NULL)
   {
-    res->nrnModul = (int_number) omAlloc(sizeof(mpz_t));
-    mpz_init_set(res->nrnModul,r->nrnModul);
+    res->cf->modNumber = (int_number) omAlloc(sizeof(mpz_t));
+    mpz_init_set(res->cf->modNumber,r->cf->modNumber);
   }
-*/
 #endif
   //memset: res->ref=0; /* reference counter to the ring */
 
@@ -1704,8 +1689,7 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   //memset: res->cf=NULL;
   res->options=r->options;
 #ifdef HAVE_RINGS
-  TODO(Frank, "Please consider addapting the variable names...");
-//  res->ringtype=r->ringtype;
+  res->cf->ringtype=r->cf->ringtype;
 #endif
   //
   if (r->algring!=NULL)
