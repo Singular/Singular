@@ -50,6 +50,7 @@ nMapFunc nfSetMap     (const coeffs src, const coeffs dst);
 char *  nfName        (number n, const coeffs r);
 void    nfReadTable   (const int c, const coeffs r);
 
+void    nfCoeffWrite(const coeffs r);
 void    nfShowMipo(const coeffs r);
 #endif
 

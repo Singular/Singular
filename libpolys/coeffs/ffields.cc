@@ -803,6 +803,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   r->cfSetMap = nfSetMap;
   //r->cfName = ndName;
   // debug stuff
+  r->cfCoeffWrite=nfCoeffWrite;
 
 #ifdef LDEBUG
   r->cfDBTest=nfDBTest;
@@ -859,3 +860,12 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   return FALSE;
   
 }
+
+void    nfCoeffWrite  (const coeffs r)
+{
+  Print("//   # ground field : %d\n",r->m_nfCharP);
+  Print("//   primitive element : %s\n", r->m_nfParameter);
+  StringSetS("//   minpoly        : ");
+  nfShowMipo(r);PrintS(StringAppendS("\n"));
+}
+

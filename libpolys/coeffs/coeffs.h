@@ -41,10 +41,6 @@ typedef unsigned long NATNUMBER;
 typedef mpz_ptr int_number;
 #endif
 
-
-
-
-
 struct n_Procs_s;
 typedef struct  n_Procs_s  n_Procs_s;
 typedef struct  n_Procs_s  *coeffs;
@@ -68,6 +64,9 @@ struct n_Procs_s
 
    // tests for numbers.cc:
    BOOLEAN (*nCoeffIsEqual)(const coeffs r, n_coeffType n, void * parameter);
+
+   /// output of coeff description via Print
+   void (*cfCoeffWrite)(const coeffs r);
 
    // the union stuff
 
@@ -288,11 +287,11 @@ static inline int    n_Size(number n,    const coeffs r)
 
 /// normalize the number. i.e. go to some canonnical representation (inplace)
 static inline void   n_Normalize(number& n, const coeffs r)
-{ assume(r != NULL); return r->cfNormalize(n,r); }
+{ assume(r != NULL); r->cfNormalize(n,r); }
 
 /// Normalize and Write to the output buffer of reporter
 static inline void   n_Write(number& n,  const coeffs r)
-{ assume(r != NULL); return r->cfWrite(n,r); }
+{ assume(r != NULL); r->cfWrite(n,r); }
 
 /// Normalize and get denomerator
 static inline number n_GetDenom(number& n, const coeffs r)
@@ -352,6 +351,10 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
   return TRUE;
 #endif
 }
+
+/// output the coeff description
+static inline void   n_CoeffWrite(const coeffs r)
+{ assume(r != NULL); r->cfCoeffWrite(r); }
 
 // Tests:
 static inline BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)
@@ -464,8 +467,6 @@ static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
 // Deprecated:
 static inline int n_GetChar(const coeffs r)
 { assume(r != NULL); return nInternalChar(r); }
-
-
 
 #endif
 

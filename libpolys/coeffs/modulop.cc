@@ -388,6 +388,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
     r->cfPower= nvPower;
   }
 #endif
+  r->cfCoeffWrite=npCoeffWrite;
 #ifdef LDEBUG
   // debug stuff
   r->cfDBTest=npDBTest;
@@ -722,3 +723,9 @@ void nvPower (number a, int i, number * result, const coeffs r)
   }
 }
 #endif
+
+void    npCoeffWrite  (const coeffs r)
+{
+  Print("//   characteristic : %d\n",r->npPrimeM);
+}
+
