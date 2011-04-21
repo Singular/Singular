@@ -2466,6 +2466,11 @@ static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   return (n==n_Q);
 }
 
+void    nlCoeffWrite  (const coeffs r)
+{
+  PrintS("//   characteristic : 0\n");
+}
+
 BOOLEAN nlInitChar(coeffs r, void* p)
 {
   const int ch = (int)(long)(p);
@@ -2517,6 +2522,7 @@ BOOLEAN nlInitChar(coeffs r, void* p)
   //r->cfName = ndName;
   r->cfInpMult=nlInpMult;
   r->cfInit_bigint=nlCopyMap;
+  r->cfCoeffWrite=nlCoeffWrite;
 #ifdef LDEBUG
   // debug stuff
   r->cfDBTest=nlDBTest;
