@@ -6,6 +6,7 @@
 #include <omalloc/omalloc.h>
 
 #include <reporter/reporter.h>
+#include <resources/feResource.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
@@ -35,6 +36,8 @@ class GlobalPrintingFixture : public CxxTest::GlobalFixture
   public:
     bool setUpWorld() {
       clog << ( "<world>" ) << endl;
+      feInitResources();
+      
       TS_ASSERT_EQUALS( nRegister( n_Zp, npInitChar), n_Zp );
       TS_ASSERT_EQUALS( nRegister( n_GF, nfInitChar), n_GF );
       TS_ASSERT_EQUALS( nRegister( n_R, nrInitChar), n_R );

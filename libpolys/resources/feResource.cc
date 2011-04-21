@@ -13,8 +13,12 @@
 #include "config.h"
 #include <misc/auxiliary.h>
 
-#include <resources/feResource.h>
+#include "feResource.h"
 
+
+// the following is needed due to 'program_invocation_name'
+#define _GNU_SOURCE
+#include <errno.h>
 
 
 #ifdef AIX_4
@@ -174,6 +178,11 @@ char* feResourceDefault(const char* key)
 
 void feInitResources(char* argv0)
 {
+  if (argv0==NULL)
+  {
+    argv0 = program_invocation_name;
+  }
+  
 #if defined(ix86_Win) && defined(__GNUC__)
   if (cygwin32_posix_path_list_p (getenv("PATH")))
     fePathSep = ':';
