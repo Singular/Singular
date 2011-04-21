@@ -153,9 +153,10 @@ struct n_Procs_s
    int     char_flag;
    int     ref;
    n_coeffType type;
-////-----------------------------------------
-  char**     parameter; /* names of parameters, rInit */
-  number     minpoly;  /* for Q_a/Zp_a, rInit */
+//-------------------------------------------
+  char**     parameter; //< names of parameters, rInit
+  short      P;      //< number of pars, rInit
+  number     minpoly;  //< for Q_a/Zp_a, rInit
 
 #ifdef HAVE_RINGS
   /* The following members are for representing the ring Z/n,

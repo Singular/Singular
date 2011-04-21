@@ -195,8 +195,8 @@ struct ip_sring
   int*       order;  /* array of orderings, rInit/rSleftvOrdering2Ordering */
   int*       block0; /* starting pos., rInit/rSleftvOrdering2Ordering*/
   int*       block1; /* ending pos., rInit/rSleftvOrdering2Ordering*/
-  char**     parameter; /* names of parameters, rInit */
-  number     minpoly;  /* for Q_a/Zp_a, rInit */
+//  char**     parameter; /* names of parameters, rInit */
+//  number     minpoly;  /* for Q_a/Zp_a, rInit */
   ideal      minideal;
   int**      wvhdl;  /* array of weight vectors, rInit/rSleftvOrdering2Ordering */
   char **    names;  /* array of variable names, rInit */
@@ -233,7 +233,7 @@ struct ip_sring
   
   unsigned long options; /* ring dependent options */
 
-  int        ch;  /* characteristic, rInit */
+//  int        ch;  /* characteristic, rInit */
   int        ref; /* reference counter to the ring, interpreter */
 
   short      float_len; /* additional char-flags, rInit */
@@ -241,7 +241,6 @@ struct ip_sring
 
   short      N;      /* number of vars, rInit */
 
-  short      P;      /* number of pars, rInit */
   short      OrdSgn; /* 1 for polynomial rings, -1 otherwise, rInit */
 
   short     firstBlockEnds;
@@ -258,7 +257,7 @@ struct ip_sring
   BOOLEAN   CanShortOut;
   BOOLEAN   LexOrder; // TRUE if the monomial ordering has polynomial and power series blocks
   BOOLEAN   MixedOrder; // TRUE for global/local mixed orderings, FALSE otherwise
-  BOOLEAN pLexOrder; /* TRUE if the monomial ordering is not compatible with pFDeg */
+  BOOLEAN   pLexOrder; /* TRUE if the monomial ordering is not compatible with pFDeg */
 
   BOOLEAN   ComponentOrder; // ???
 
@@ -401,7 +400,7 @@ char * rVarStr(ring r);
 char * rCharStr(ring r);
 char * rString(ring r);
 int    rChar(ring r);
-#define rPar(r) (r->P)
+#define rPar(r) (r->cf->P)
 #define rVar(r) (r->N)
 char * rParStr(ring r);
 int    rIsExtension(const ring r);
@@ -450,7 +449,7 @@ static inline BOOLEAN rField_is_Zp(const ring r)
 { assume(r != NULL); return (getCoeffType(r->cf) == n_Zp); }
 
 static inline BOOLEAN rField_is_Zp(const ring r, int p)
-{ assume(r != NULL); return (getCoeffType(r->cf) == n_Zp) && (r->ch == p); }
+{ assume(r != NULL); return (getCoeffType(r->cf) == n_Zp) && (r->cf->ch == p); }
 
 static inline BOOLEAN rField_is_Q(const ring r)
 { assume(r != NULL); return nCoeff_is_Q(r->cf); }

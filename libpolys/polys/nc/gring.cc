@@ -3770,16 +3770,16 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift, ring dstRing)
   //  }
   //  else
   {
-    int *perm = (int *)omAlloc0((srcRing->N+1)*sizeof(int));
-    int *par_perm = (int *)omAlloc0((srcRing->P+1)*sizeof(int));
-    //    int *par_perm = (int *)omAlloc0((srcRing->P+1)*sizeof(int));
+    int *perm = (int *)omAlloc0((rVar(srcRing)+1)*sizeof(int));
+    int *par_perm = (int *)omAlloc0((rPar(srcRing)+1)*sizeof(int));
+    //    int *par_perm = (int *)omAlloc0((rPar(srcRing)+1)*sizeof(int));
     int i;
     //    if (srcRing->P > 0)
     //    {
     //      for (i=0; i<srcRing->P; i++)
     //  par_perm[i]=-i;
     //    }
-    if ((shift<0) || (shift > srcRing->N)) // ???
+    if ((shift<0) || (shift > rVar(srcRing))) // ???
     {
       Werror("bad shifts in p_CopyEmbed");
       return(0);
@@ -3788,7 +3788,7 @@ poly p_CopyEmbed(poly p, ring srcRing, int shift, int par_shift, ring dstRing)
     {
       perm[i] = shift+i;
     }
-    q = p_PermPoly(p,perm,srcRing, dstRing, nMap,par_perm,srcRing->P);
+    q = p_PermPoly(p,perm,srcRing, dstRing, nMap,par_perm, rPar(srcRing));
   }
   return(q);
 }

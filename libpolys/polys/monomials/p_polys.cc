@@ -1856,7 +1856,7 @@ void p_Content(poly ph, const ring r)
       p=ph;
     }
     else if ((rField_is_Extension(r))
-    && ((rPar(r)>1)||(r->minpoly==NULL)))
+    && ((rPar(r)>1)||(r->cf->minpoly==NULL)))
     {
       h=p_InitContent_a(ph,r);
       p=ph;
@@ -3239,7 +3239,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
     {
       qq = p_Init(dst);
       number n=nMap(pGetCoeff(p),oldRing->cf,dst->cf);
-      if ((dst->minpoly!=NULL)
+      if ((dst->cf->minpoly!=NULL)
       && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
       {
         n_Normalize(n,dst->cf);
@@ -3253,7 +3253,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
       WerrorS("longalg missing");
       #if 0
       aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
-      if ((dst->minpoly!=NULL)
+      if ((dst->cf->minpoly!=NULL)
       && ((rField_is_Zp_a(dst)) || (rField_is_Q_a(dst))))
       {
         poly tmp=aq;
@@ -3328,7 +3328,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
         }
       }
       if (mapped_to_par
-      && (dst->minpoly!=NULL))
+      && (dst->cf->minpoly!=NULL))
       {
         number n=pGetCoeff(qq);
         n_Normalize(n,dst->cf);
