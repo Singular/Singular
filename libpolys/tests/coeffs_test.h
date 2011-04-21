@@ -342,7 +342,7 @@ class GlobalPrintingFixture : public CxxTest::GlobalFixture
   public:
     bool setUpWorld() {
       clog << endl << ( "<world>" ) << endl;
-      feInitResources();
+      feInitResources(argv0);
       return true;
     }
     bool tearDownWorld() { clog << endl <<( "</world>" )  << endl; return true; }
