@@ -414,6 +414,7 @@ BOOLEAN ngfInitChar(coeffs n, void *)
   n->cfRead    = ngfRead;
   n->cfPower   = ngfPower;
   n->cfSetMap = ngfSetMap;
+  n->cfCoeffWrite = ngfCoeffWrite;
 #ifdef LDEBUG
   n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif
@@ -485,3 +486,8 @@ nMapFunc ngfSetMap(const coeffs src, const coeffs dst)
 }
 
 
+void    ngfCoeffWrite  (const coeffs r)
+{
+  Print("//   characteristic : 0 (real:%d digits, additional %d digits)\n",
+               r->float_len,r->float_len2);  /* long R */
+}

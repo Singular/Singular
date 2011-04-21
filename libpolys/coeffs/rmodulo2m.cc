@@ -25,6 +25,11 @@
 
 extern omBin gmp_nrz_bin; /* init in rintegers*/
 
+void    nr2mCoeffWrite  (const coeffs r)
+{
+  Print("//   Z/2^%lu\n", r->modExponent); 
+}
+
 /* for initializing function pointers */
 BOOLEAN nr2mInitChar (coeffs r, void* p)
 {
@@ -62,6 +67,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfGetUnit     = nr2mGetUnit;
   r->cfExtGcd      = nr2mExtGcd;
   r->cfName        = ndName;
+  r->cfCoeffWrite  = nr2mCoeffWrite;
 #ifdef LDEBUG
   r->cfDBTest      = nr2mDBTest;
 #endif

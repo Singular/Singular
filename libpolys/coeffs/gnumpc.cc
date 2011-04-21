@@ -410,6 +410,7 @@ BOOLEAN ngcInitChar(coeffs n, void*)
   n->cfPar     = ngcPar;
   n->cfRePart  = ngcRePart;
   n->cfImPart  = ngcImPart;
+  n->cfCoeffWrite = ngcCoeffWrite;
     // cfSize  = ndSize;
 #ifdef LDEBUG
   n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest
@@ -585,3 +586,8 @@ nMapFunc ngcSetMap(const coeffs src, const coeffs dst)
   return NULL;
 }
 
+void    ngcCoeffWrite  (const coeffs r)
+{
+  Print("//   characteristic : 0 (complex:%d digits, additional %d digits)\n",
+               r->float_len, r->float_len2);  /* long C */
+}
