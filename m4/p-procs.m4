@@ -20,20 +20,22 @@ AC_MSG_RESULT($SUPPORTS_DYNAMIC_MODULES)
 AC_DEFUN([SING_CHECK_P_PROCS],
 [
 AC_ARG_ENABLE(p-procs-static,
-[  --enable-p-procs-static  Enable statically compiled p_Procs-modules
+[  --enable-p-procs-static Enable statically compiled p_Procs-modules
 ],
 [if test $enableval = yes; then
      ENABLE_P_PROCS_STATIC="yes"
+     ENABLE_P_PROCS_DYNAMIC="no"
  else
      ENABLE_P_PROCS_STATIC="no"
  fi
 ],[NO_P_PROCS_STATIC_GIVEN=yes])
 
 AC_ARG_ENABLE(p-procs-dynamic,
-[  --enable-p-procs-dynamic  Enable dynamically compiled p_Procs-modules
+[  --enable-p-procs-dynamic Enable dynamically compiled p_Procs-modules
 ],
 [if test $enableval = yes; then
      ENABLE_P_PROCS_DYNAMIC="yes"
+     ENABLE_P_PROCS_STATIC="no"
  else
      ENABLE_P_PROCS_DYNAMIC="no"
  fi
