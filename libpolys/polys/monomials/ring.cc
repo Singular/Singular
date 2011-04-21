@@ -280,18 +280,8 @@ void rWrite(ring r)
 
   n_CoeffWrite(r->cf);
 #if 0
-  else
   {
     PrintS("//   characteristic : ");
-    if ( rField_is_R(r) )             PrintS("0 (real)\n");  /* R */
-    else if ( rField_is_long_R(r) )
-      Print("0 (real:%d digits, additional %d digits)\n",
-             r->float_len,r->float_len2);  /* long R */
-    else if ( rField_is_long_C(r) )
-      Print("0 (complex:%d digits, additional %d digits)\n",
-             r->float_len, r->float_len2);  /* long C */
-    else
-      Print ("%d\n",rChar(r)); /* Fp(a) */
     if (r->cf->parameter!=NULL)
     {
       Print ("//   %d parameter    : ",rPar(r));
