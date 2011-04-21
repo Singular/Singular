@@ -53,38 +53,50 @@ include_HEADERS = \
 
 P_PROCS_CPPFLAGS_COMMON = -DHAVE_CONFIG_H -DDYNAMIC_VERSION 
 
-libp_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGCPPFLAGS}
-libp_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGCPPFLAGS}
-libp_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGCPPFLAGS}
-libp_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGCPPFLAGS}
+p_Procs_FieldGeneral_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGCPPFLAGS}
+p_Procs_FieldIndep_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGCPPFLAGS}
+p_Procs_FieldQ_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGCPPFLAGS}
+p_Procs_FieldZp_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON} ${NODEBUGCPPFLAGS}
 
-libp_Procs_FieldGeneral_g_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON}
-libp_Procs_FieldIndep_g_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
-libp_Procs_FieldQ_g_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
-libp_Procs_FieldZp_g_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
+p_Procs_FieldGeneral_g_la_CPPFLAGS = -Dp_Procs_FieldGeneral ${P_PROCS_CPPFLAGS_COMMON}
+p_Procs_FieldIndep_g_la_CPPFLAGS = -Dp_Procs_FieldIndep ${P_PROCS_CPPFLAGS_COMMON}
+p_Procs_FieldQ_g_la_CPPFLAGS = -Dp_Procs_FieldQ ${P_PROCS_CPPFLAGS_COMMON}
+p_Procs_FieldZp_g_la_CPPFLAGS = -Dp_Procs_FieldZp ${P_PROCS_CPPFLAGS_COMMON}
 
-libp_Procs_FieldGeneral_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
-libp_Procs_FieldIndep_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
-libp_Procs_FieldQ_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
-libp_Procs_FieldZp_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
+p_Procs_FieldGeneral_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
+p_Procs_FieldIndep_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
+p_Procs_FieldQ_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
+p_Procs_FieldZp_la_CXXFLAGS = ${NODEBUGCXXFLAGS}
 
-libp_Procs_FieldGeneral_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
-libp_Procs_FieldIndep_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
-libp_Procs_FieldQ_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
-libp_Procs_FieldZp_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+p_Procs_FieldGeneral_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+p_Procs_FieldIndep_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+p_Procs_FieldQ_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+p_Procs_FieldZp_g_la_CXXFLAGS = ${DEBUGCXXFLAGS}
+
+P_PROCS_MODULE_LDFLAGS = -module
+
+p_Procs_FieldGeneral_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldIndep_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldQ_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldZp_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+
+p_Procs_FieldGeneral_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldIndep_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldQ_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
+p_Procs_FieldZp_g_la_LDFLAGS = ${P_PROCS_MODULE_LDFLAGS}
 
 
 P_PROCS = templates/p_Procs_Lib.cc
 
-libp_Procs_FieldGeneral_la_SOURCES = ${P_PROCS}
-libp_Procs_FieldIndep_la_SOURCES = ${P_PROCS}
-libp_Procs_FieldQ_la_SOURCES = ${P_PROCS}
-libp_Procs_FieldZp_la_SOURCES = ${P_PROCS}
+p_Procs_FieldGeneral_la_SOURCES = ${P_PROCS}
+p_Procs_FieldIndep_la_SOURCES = ${P_PROCS}
+p_Procs_FieldQ_la_SOURCES = ${P_PROCS}
+p_Procs_FieldZp_la_SOURCES = ${P_PROCS}
 
-libp_Procs_FieldGeneral_g_la_SOURCES = ${P_PROCS}
-libp_Procs_FieldIndep_g_la_SOURCES = ${P_PROCS}
-libp_Procs_FieldQ_g_la_SOURCES = ${P_PROCS}
-libp_Procs_FieldZp_g_la_SOURCES = ${P_PROCS}
+p_Procs_FieldGeneral_g_la_SOURCES = ${P_PROCS}
+p_Procs_FieldIndep_g_la_SOURCES = ${P_PROCS}
+p_Procs_FieldQ_g_la_SOURCES = ${P_PROCS}
+p_Procs_FieldZp_g_la_SOURCES = ${P_PROCS}
 
 
 
@@ -92,8 +104,8 @@ lib_LIBRARIES=libpolys.a libpolys_g.a
 
 moduledir = ${libdir}/singular/MOD/
 
-module_LTLIBRARIES=libp_Procs_FieldGeneral.la libp_Procs_FieldIndep.la libp_Procs_FieldQ.la libp_Procs_FieldZp.la \
-                   libp_Procs_FieldGeneral_g.la libp_Procs_FieldIndep_g.la libp_Procs_FieldQ_g.la libp_Procs_FieldZp_g.la
+module_LTLIBRARIES=p_Procs_FieldGeneral.la p_Procs_FieldIndep.la p_Procs_FieldQ.la p_Procs_FieldZp.la \
+                   p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
 
 libpolys_a_SOURCES = ${SOURCES}
 libpolys_g_a_SOURCES = ${SOURCES}
