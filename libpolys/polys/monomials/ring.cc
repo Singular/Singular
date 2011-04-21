@@ -139,7 +139,6 @@ ring rDefault(coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, in
 {
   assume( cf != NULL);
   ring r=(ring) omAlloc0Bin(sip_sring_bin);
-  r->cf->ch    = n_GetChar(cf);
   r->N     = N;
   r->cf = cf;
   /*rPar(r)  = 0; Alloc0 */
@@ -481,19 +480,19 @@ void rDelete(ring r)
     omFreeSize((ADDRESS)r->names,r->N*sizeof(char *));
   }
 
-  // delete parameter
-  if (r->cf->parameter!=NULL)
-  {
-    char **s=r->cf->parameter;
-    j = 0;
-    while (j < rPar(r))
-    {
-      if (*s != NULL) omFree((ADDRESS)*s);
-      s++;
-      j++;
-    }
-    omFreeSize((ADDRESS)r->cf->parameter,rPar(r)*sizeof(char *));
-  }
+//   // delete parameter
+//   if (r->cf->parameter!=NULL)
+//   {
+//     char **s=r->cf->parameter;
+//     j = 0;
+//     while (j < rPar(r))
+//     {
+//       if (*s != NULL) omFree((ADDRESS)*s);
+//       s++;
+//       j++;
+//     }
+//     omFreeSize((ADDRESS)r->cf->parameter,rPar(r)*sizeof(char *));
+//   }
   omFreeBin(r, sip_sring_bin);
 }
 
@@ -738,6 +737,8 @@ static int binaryPower (const int a, const int b)
 
 int rChar(ring r)
 {
+  TODO(Somabody, move this proc. over to coeffs!?);
+  
 #ifdef HAVE_RINGS
   if (rField_is_Ring_2toM(r))
     return binaryPower(2, (int)(unsigned long)r->cf->modExponent);
