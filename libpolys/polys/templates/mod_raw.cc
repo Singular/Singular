@@ -200,6 +200,11 @@ extern "C" {
 #define HAVE_ELF_SYSTEM
 #endif
 
+#if defined(__ELF__)
+#define HAVE_ELF_SYSTEM
+#endif
+
+   
 #if defined(HAVE_ELF_SYSTEM)
 #include <dlfcn.h>
 
