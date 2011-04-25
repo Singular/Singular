@@ -19,8 +19,13 @@ SING_INCLUDES=[SINGULAR_HOME, SINGULAR_HOME+"/omalloc"]
 
 CXXTEMPLFLAGS = "-fno-implicit-templates --no-exceptions"
 
-## BUNDLETEMPFLAGS = '$LDMODULEFLAGS -flat_namespace -undefined suppress'
-BUNDLETEMPFLAGS = '$LDMODULEFLAGS -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup'
+if env ['PLATFORM'] == "darwin":
+    MACOSXMODULEFLAGS = '-twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup'
+else:
+    MACOSXMODULEFLAGS = ''
+## '-flat_namespace -undefined suppress'
+
+BUNDLETEMPFLAGS = '$LDMODULEFLAGS ' + MACOSXMODULEFLAGS
 
 ### for the use with "scons debug=1"
 if ARGUMENTS.get('debug', 0):
