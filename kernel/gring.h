@@ -133,13 +133,13 @@ poly p_Lcm(const poly a, const poly b, const ring r);
 inline nc_struct*& GetNC(ring r)
 {
   return r->GetNC();
-}; 
+} 
 
 inline nc_type& ncRingType(nc_struct* p)
 {
   assume(p!=NULL);
   return (p->ncRingType());
-};
+}
 
 inline nc_type ncRingType(ring r) // Get
 {
@@ -147,23 +147,19 @@ inline nc_type ncRingType(ring r) // Get
     return (ncRingType(r->GetNC()));
   else
     return (nc_error);
-};
+}
 
 inline void ncRingType(ring r, nc_type t) // Set
 {
   assume((r != NULL) && (r->GetNC() != NULL));
   ncRingType(r->GetNC()) = t;
-};
-
+}
 
 inline void ncRingType(nc_struct* p, nc_type t) // Set
 {
   assume(p!=NULL);
   ncRingType(p) = t;
-};
-
-
-
+}
 
 
 // //////////////////////////////////////////////////////
@@ -259,7 +255,7 @@ inline ideal nc_GB(const ideal F, const ideal Q, const intvec *w, const intvec *
 #define UPMATELEM(i,j,nVar) ( (nVar * ((i)-1) - ((i) * ((i)-1))/2 + (j)-1)-(i) )
 
 
-// inline const nc_struct* GetNC() const { return GetBasering()->GetNC(); }; 
+// inline const nc_struct* GetNC() const { return GetBasering()->GetNC(); } 
 
 
 // read only access to NC matrices C/D:
@@ -272,7 +268,7 @@ inline poly GetC( const ring r, int i, int j )
   const int ncols = C->ncols;
   assume( (i > 0) && (i < j) && (j <= ncols) );
   return ( C->m[ncols * ((i)-1) + (j)-1] );
-};
+}
 
 // get D_{i,j}, 1 <= row = i < j = col <= N
 inline poly GetD( const ring r, int i, int j ) 
@@ -283,7 +279,7 @@ inline poly GetD( const ring r, int i, int j )
   const int ncols = D->ncols;
   assume( (i > 0) && (i < j) && (j <= ncols) );
   return ( D->m[ncols * ((i)-1) + (j)-1] );
-};
+}
 
 
 #ifdef PLURAL_INTERNAL_DECLARATIONS

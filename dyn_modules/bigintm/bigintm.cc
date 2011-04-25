@@ -291,7 +291,7 @@ static void bigintm_destroy(blackbox *b, void *d)
 
 #endif
 
-};
+}
 
 // this is only a demo
 BOOLEAN bigintm_setup()

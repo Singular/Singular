@@ -1,5 +1,8 @@
 # Emacs edit mode for this file is -*- python -*-
 
+from SCons.Defaults import SharedCheck, ProgScan
+from SCons.Script.SConscript import SConsEnvironment
+
 MODNAME = 'syzextra'
 SRCS = ["mod_main.cc", "DebugPrint.cc", "myNF.cc"]
 
@@ -16,8 +19,8 @@ SING_INCLUDES=[SINGULAR_HOME, SINGULAR_HOME+"/omalloc"]
 
 CXXTEMPLFLAGS = "-fno-implicit-templates --no-exceptions"
 
-
-
+## BUNDLETEMPFLAGS = '$LDMODULEFLAGS -flat_namespace -undefined suppress'
+BUNDLETEMPFLAGS = '$LDMODULEFLAGS -twolevel_namespace -weak_reference_mismatches weak -undefined dynamic_lookup'
 
 ### for the use with "scons debug=1"
 if ARGUMENTS.get('debug', 0):
@@ -29,11 +32,12 @@ if ARGUMENTS.get('debug', 0):
         SHLIBSUFFIX = ".sog",
         CPPPATH = SING_INCLUDES,
         CXXFLAGS = "-g -Wextra -Wall -pedantic -Wno-long-long " + CXXTEMPLFLAGS,
+        LDMODULEFLAGS = BUNDLETEMPFLAGS,
         LIBS=[])
     Default(syzextra_debug_if)
 else:
     ### Works with any Singular
-    syzextra_if = env.SharedLibrary(MODNAME,
+    syzextra_if = env.LoadableModule(MODNAME,
         SRCS,
         SHLIBPREFIX="",
         LDMODULESUFFIX=".so",
@@ -42,6 +46,7 @@ else:
         CPPDEFINES = ["NDEBUG", "OM_NDEBUG"],
         CXXFLAGS = "-O3 -fomit-frame-pointer --no-rtti " + CXXTEMPLFLAGS,
         CCFLAGS="-O3 -fomit-frame-pointer ",
+        LDMODULEFLAGS = BUNDLETEMPFLAGS,
         LIBS=[])
     Default(syzextra_if)
 

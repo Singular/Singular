@@ -375,8 +375,8 @@ DEFSG		= -D@SING_UNAME@ @DEFS@ -DDL_TAIL=$(DL_TAILG)
 ## Debug Targets
 ##
 
-p_Procs_%.sog: p_Procs_Lib_%.dl_og 
-	${CXXG} ${CXXFLAGSG} ${SFLAGS} ${SLDFLAGS} $< -o $@
+p_Procs_%.sog: p_Procs_Lib_%.dl_og
+	$(LD) ${SLDFLAGS} -o $@ $^
 
 p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
 	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -Dp_Procs_$* -c $< -o $@

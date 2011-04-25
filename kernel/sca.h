@@ -39,14 +39,14 @@ inline unsigned int scaFirstAltVar(ring r)
   assume(rIsSCA(r));
 
   return (r->GetNC()->FirstAltVar());
-};
+}
 
 inline unsigned int scaLastAltVar(ring r)
 {
   assume(rIsSCA(r));
 
   return (r->GetNC()->LastAltVar());
-};
+}
 
 
 // The following inlines are just helpers for setup functions.
@@ -55,14 +55,14 @@ inline void scaFirstAltVar(ring r, int n)
   assume(rIsSCA(r));
 
   r->GetNC()->FirstAltVar() = n;
-};
+}
 
 inline void scaLastAltVar(ring r, int n)
 {
   assume(rIsSCA(r));
 
   r->GetNC()->LastAltVar() = n;
-};
+}
 
 
 

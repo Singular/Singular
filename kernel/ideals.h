@@ -77,7 +77,7 @@ static inline int idSize(const ideal id)
   poly* mm = id->m;
   while ((j >= 0) && (mm[j] == NULL)) j--;
   return (j + 1); 
-};
+}
 
 void idNorm(ideal id);
 void idDelMultiples(ideal id);
