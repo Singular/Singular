@@ -2800,7 +2800,7 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       case ringorder_S:
       {
 #ifndef NDEBUG
-        dReportError("Error: unhandled ordering in rModifyRing: ringorder_S = [%d]", r_ord);
+        Warn("Error: unhandled ordering in rModifyRing: ringorder_S = [%d]", r_ord);
 #endif
         order[j]=r_ord; /*r->order[i];*/
         break;
@@ -2855,7 +2855,9 @@ ring rModifyRing(ring r, BOOLEAN omit_degree,
       {
         if (omit_comp)
         {
-          dReportError("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d (ringorder_IS)", i, r_ord);
+#ifndef NDEBUG
+          Warn("Error: WRONG USAGE of rModifyRing: cannot omit component due to the ordering block [%d]: %d (ringorder_IS)", i, r_ord);
+#endif
           omit_comp = FALSE;
         }
         order[j]=r_ord; /*r->order[i];*/

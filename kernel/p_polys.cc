@@ -199,22 +199,12 @@ void p_Setm_General(poly p, const ring r)
           int c = p_GetComp(p, r);
 
           assume( c >= 0 );
-          const int limit = o->data.is.limit;
-
-          assume( limit >= 0 );
 
           // Let's simulate case ro_syz above....
           // Should accumulate (by Suffix) and be a level indicator
           const int* const pVarOffset = o->data.isTemp.pVarOffset;
 
           assume( pVarOffset != NULL );
-
-          if( c > limit )
-            p->exp[o->data.isTemp.start] = 1;
-          else
-          {
-            p->exp[o->data.isTemp.start] = 0;
-          }
 
           // TODO: Can this be done in the suffix???
           for( int i = 1; i <= r->N; i++ ) // No v[0] here!!!
@@ -228,9 +218,7 @@ void p_Setm_General(poly p, const ring r)
               assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
             }
           }
-
-        
-
+	   
 #ifndef NDEBUG
           for( int i = 1; i <= r->N; i++ ) // No v[0] here!!!
           {
@@ -241,15 +229,13 @@ void p_Setm_General(poly p, const ring r)
               assume( p_GetExp(p, r, vo) == p_GetExp(p, i, r) ); // copy put them verbatim
             }
           }
-
+#endif
+	   
+#ifndef NDEBUG
 #if MYTEST
-//          if( p->exp[o->data.isTemp.start] > 0 )
-//          {
-//            PrintS("Initial Value: "); p_DebugPrint(p, r, r, 1);
-//          }
+          PrintS("Initial Value: "); p_DebugPrint(p, r, r, 1);
 #endif
 #endif
-
           break;
         }
 
@@ -274,7 +260,7 @@ void p_Setm_General(poly p, const ring r)
           {
 #ifndef NDEBUG
 #if MYTEST
-            Print("is ord in rSetm: pos: %d, c: %d, limit: %d\n", c, pos, limit); // p_DebugPrint(p, r, r, 1);
+            Print("p_Setm_General: ro_is : in rSetm: pos: %d, c: %d >  limit: %d\n", c, pos, limit); // p_DebugPrint(p, r, r, 1);
 #endif
 #endif
 
@@ -295,17 +281,36 @@ void p_Setm_General(poly p, const ring r)
 #endif
 
 
+            assume(pp != NULL);
             if(pp == NULL) break;
 
             const int start = o->data.is.start;
             const int end = o->data.is.end;
 
             assume(start <= end);
-            assume(pp != NULL);
+	     
+//          const int limit = o->data.is.limit;
+          assume( limit >= 0 );
+
+//	  const int st = o->data.isTemp.start;	     
+
+          if( c > limit )
+            p->exp[start] = 1;
+//          else
+//            p->exp[start] = 0;
+
+	     
+#ifndef NDEBUG
+	    Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %d\n", c, limit, start, p->exp[start]);
+#endif	     
+   
 
             for( int i = start; i <= end; i++) // v[0] may be here...
               p->exp[i] += pp->exp[i]; // !!!!!!!! ADD corresponding LT(F)
 
+       
+
+	     
 #ifndef NDEBUG
             const int* const pVarOffset = o->data.is.pVarOffset;
 
@@ -337,7 +342,15 @@ void p_Setm_General(poly p, const ring r)
             const int vo = pVarOffset[0];
             if( vo != -1 )
               p->exp[vo] = c; // initial component v[0]!
+
+#ifndef NDEBUG
+#if MYTEST
+	    Print("p_Setm_General: ro_is :: c: %d <= limit: %d, vo: %d, exp: %d\n", c, limit, vo, p->exp[vo]);
+            p_DebugPrint(p, r, r, 1);
+#endif	     
+#endif	     
           }
+	   
 
           break;
         }
