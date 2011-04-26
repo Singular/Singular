@@ -59,7 +59,7 @@ struct n_Procs_s
    /// TRUE, if nNew/nDelete/nCopy are dummies
    BOOLEAN has_simple_Alloc;
    /// TRUE, if std should make polynomials monic (if nInvers is cheap)
-   /// if false, then a gcd routine is required for a content computation
+   /// if false, then a gcd routine is used for a content computation
    BOOLEAN has_simple_Inverse;
 
    // tests for numbers.cc:
