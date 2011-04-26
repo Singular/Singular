@@ -67,7 +67,7 @@ BOOLEAN ndDBTest(number a, const char *f, const int l, const coeffs r)
 #endif
 
 
-BOOLEAN ndIsZeroDivisor( number a, const coeffs r)
+BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 {
   int c = n_GetChar(r);
   BOOLEAN ret = n_IsZero(a, r);
@@ -226,6 +226,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
    assume(n->cfName!=NULL);
    assume(n->cfInpMult!=NULL);
    assume(n->cfInit_bigint!=NULL);
+   assume(n->cfCoeffWrite != NULL);
 #ifdef LDEBUG
    assume(n->cfDBTest!=NULL);
 #endif

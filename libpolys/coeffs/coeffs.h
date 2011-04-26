@@ -238,116 +238,117 @@ void           nNew(number * a);
 
 /// return a copy of a
 static inline number n_Copy(number n,    const coeffs r)
-{   assume(r != NULL); return r->cfCopy(n, r); }
+{   assume(r != NULL); assume(r->cfCopy!=NULL); return r->cfCopy(n, r); }
 
 static inline void   n_Delete(number* p, const coeffs r)
-{   assume(r != NULL); r->cfDelete(p, r); }
+{   assume(r != NULL); assume(r->cfDelete!= NULL); r->cfDelete(p, r); }
 
 static inline BOOLEAN n_Equal(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfEqual(a, b, r); }
+{ assume(r != NULL); assume(r->cfEqual!=NULL); return r->cfEqual(a, b, r); }
 
 static inline BOOLEAN n_IsZero(number n, const coeffs r)
-{ assume(r != NULL); return r->cfIsZero(n,r); }
+{ assume(r != NULL); assume(r->cfIsZero!=NULL); return r->cfIsZero(n,r); }
 
 static inline BOOLEAN n_IsOne(number n,  const coeffs r)
-{ assume(r != NULL); return r->cfIsOne(n,r); }
+{ assume(r != NULL); assume(r->cfIsOne!=NULL); return r->cfIsOne(n,r); }
 
 static inline BOOLEAN n_IsMOne(number n, const coeffs r)
-{ assume(r != NULL); return r->cfIsMOne(n,r); }
+{ assume(r != NULL); assume(r->cfIsMOne!=NULL); return r->cfIsMOne(n,r); }
 
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
-{ assume(r != NULL); return r->cfGreaterZero(n,r); }
+{ assume(r != NULL); assume(r->cfGreaterZero!=NULL); return r->cfGreaterZero(n,r); }
 // cfGreater?
 
 #ifdef HAVE_RINGS
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)
-{ assume(r != NULL); return r->cfIsUnit(n,r); }
+{ assume(r != NULL); assume(r->cfIsUnit!=NULL); return r->cfIsUnit(n,r); }
 
 static inline number n_GetUnit(number n, const coeffs r)
-{ assume(r != NULL); return r->cfGetUnit(n,r); }
+{ assume(r != NULL); assume(r->cfGetUnit!=NULL); return r->cfGetUnit(n,r); }
 
 static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfDivBy(a,b,r); }
+{ assume(r != NULL); assume(r->cfDivBy!=NULL); return r->cfDivBy(a,b,r); }
 #endif
 
 /// init with an integer
 static inline number n_Init(int i,       const coeffs r)
-{ assume(r != NULL); return r->cfInit(i,r); }
+{ assume(r != NULL); assume(r->cfInit!=NULL); return r->cfInit(i,r); }
 
 /// changes argument  inline: a:= -a
 static inline number n_Neg(number n,     const coeffs r)
-{ assume(r != NULL); return r->cfNeg(n,r); }
+{ assume(r != NULL); assume(r->cfNeg!=NULL); return r->cfNeg(n,r); }
 
 /// return 1/a
 static inline number n_Invers(number a,  const coeffs r)
-{ assume(r != NULL); return r->cfInvers(a,r); }
+{ assume(r != NULL); assume(r->cfInvers!=NULL); return r->cfInvers(a,r); }
 
 /// use for pivot strategies, (0) => 0, otherwise positive
 static inline int    n_Size(number n,    const coeffs r)
-{ assume(r != NULL); return r->cfSize(n,r); }
+{ assume(r != NULL); assume(r->cfSize!=NULL); return r->cfSize(n,r); }
 
 /// normalize the number. i.e. go to some canonnical representation (inplace)
 static inline void   n_Normalize(number& n, const coeffs r)
-{ assume(r != NULL); r->cfNormalize(n,r); }
+{ assume(r != NULL); assume(r->cfNormalize!=NULL); r->cfNormalize(n,r); }
 
 /// Normalize and Write to the output buffer of reporter
 static inline void   n_Write(number& n,  const coeffs r)
-{ assume(r != NULL); r->cfWrite(n,r); }
+{ assume(r != NULL); assume(r->cfWrite!=NULL); r->cfWrite(n,r); }
 
 /// Normalize and get denomerator
 static inline number n_GetDenom(number& n, const coeffs r)
-{ assume(r != NULL); return r->cfGetDenom(n, r); }
+{ assume(r != NULL); assume(r->cfGetDenom!=NULL); return r->cfGetDenom(n, r); }
 
 /// Normalize and get numerator
 static inline number n_GetNumerator(number& n, const coeffs r)
-{ assume(r != NULL); return r->cfGetNumerator(n, r); }
+{ assume(r != NULL); assume(r->cfGetNumerator!=NULL); return r->cfGetNumerator(n, r); }
 
 static inline void   n_Power(number a, int b, number *res, const coeffs r)
-{ assume(r != NULL); r->cfPower(a,b,res,r); }
+{ assume(r != NULL); assume(r->cfPower!=NULL); r->cfPower(a,b,res,r); }
 
 static inline number n_Mult(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfMult(a, b, r); }
+{ assume(r != NULL); assume(r->cfMult!=NULL); return r->cfMult(a, b, r); }
 
 /// Inplace multiplication: a := a * b
 static inline void n_InpMult(number &a, number b, const coeffs r)
-{ assume(r != NULL); r->cfInpMult(a,b,r); }
+{ assume(r != NULL); assume(r->cfInpMult!=NULL); r->cfInpMult(a,b,r); }
 
 static inline number n_Sub(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfSub(a, b, r); }
+{ assume(r != NULL); assume(r->cfSub!=NULL); return r->cfSub(a, b, r); }
 
 static inline number n_Add(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfAdd(a, b, r); }
+{ assume(r != NULL); assume(r->cfAdd!=NULL); return r->cfAdd(a, b, r); }
 
 static inline number n_Div(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfDiv(a,b,r); }
+{ assume(r != NULL); assume(r->cfDiv!=NULL); return r->cfDiv(a,b,r); }
 
 static inline number n_IntDiv(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfIntDiv(a,b,r); }
+{ assume(r != NULL); assume(r->cfIntDiv!=NULL); return r->cfIntDiv(a,b,r); }
 
 static inline number n_ExactDiv(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfExactDiv(a,b,r); }
+{ assume(r != NULL); assume(r->cfExactDiv!=NULL); return r->cfExactDiv(a,b,r); }
 
 static inline number n_Gcd(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfGcd(a,b,r); }
+{ assume(r != NULL); assume(r->cfGcd!=NULL); return r->cfGcd(a,b,r); }
 
 static inline number n_Lcm(number a, number b, const coeffs r)
-{ assume(r != NULL); return r->cfLcm(a,b,r); }
+{ assume(r != NULL); assume(r->cfLcm!=NULL); return r->cfLcm(a,b,r); }
 
 static inline nMapFunc n_SetMap(const coeffs src, const coeffs dst)
-{ assume(src != NULL && dst != NULL); return dst->cfSetMap(src,dst); }
+{ assume(src != NULL && dst != NULL); assume(dst->cfSetMap!=NULL); return dst->cfSetMap(src,dst); }
 
 static inline number n_Par(int n, const coeffs r)
-{ assume(r != NULL); return r->cfPar(n,r); }
+{ assume(r != NULL); assume(r->cfPar!=NULL); return r->cfPar(n,r); }
 
 static inline int n_ParDeg(number n, const coeffs r)
-{ assume(r != NULL); return r->cfParDeg(n,r); }
+{ assume(r != NULL); assume(r->cfParDeg!=NULL); return r->cfParDeg(n,r); }
 
 /// Tests whether n is a correct number: only used if LDEBUG is defined
 static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenumber, const coeffs r)
 {
   assume(r != NULL); 
 #ifdef LDEBUG
-  return (r)->cfDBTest(n, filename, linenumber, r);
+  assume(r->cfDBTest != NULL); 
+  return r->cfDBTest(n, filename, linenumber, r);
 #else
   return TRUE;
 #endif
@@ -355,7 +356,7 @@ static inline BOOLEAN n_DBTest(number n, const char *filename, const int linenum
 
 /// output the coeff description
 static inline void   n_CoeffWrite(const coeffs r)
-{ assume(r != NULL); r->cfCoeffWrite(r); }
+{ assume(r != NULL); assume(r->cfCoeffWrite != NULL); r->cfCoeffWrite(r); }
 
 // Tests:
 static inline BOOLEAN nCoeff_is_Ring_2toM(const coeffs r)
