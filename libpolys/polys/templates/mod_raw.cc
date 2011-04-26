@@ -182,27 +182,14 @@ extern "C" {
 #if defined(__APPLE__) && defined(__MACH__)
 #define HAVE_ELF_SYSTEM
 #endif
-   
-   
-#if defined(ix86Mac_darwin)
-#define HAVE_ELF_SYSTEM
-#endif
-
-#if defined(x86_64Mac_darwin)
-#define HAVE_ELF_SYSTEM
-#endif
 
 #if defined(SunOS_5)
 #define HAVE_ELF_SYSTEM
 #endif
 
-#if defined(__ELF__)
-#define HAVE_ELF_SYSTEM
-#endif
-
-   
 #if defined(HAVE_ELF_SYSTEM)
 #include <dlfcn.h>
+#define DL_IMPLEMENTED
 
 static void* kernel_handle = NULL;
 void *dynl_open(
@@ -215,7 +202,7 @@ void *dynl_open(
   else
     Werror("module %s already loaded",filename);
   return NULL;
-// alternative  
+// alternative
 //    return(dlopen(filename, RTLD_NOW|RTLD_GLOBAL));
 }
 
@@ -245,6 +232,7 @@ const char *dynl_error()
  * SECTION HPUX-9/10                                                         *
  *****************************************************************************/
 #if defined(HPUX_9) || defined(HPUX_10)
+#define DL_IMPLEMENTED
 #include <dl.h>
 
 typedef char *((*func_ptr) ());
@@ -288,30 +276,9 @@ const char *dynl_error()
 #endif /* HPUX_9  or HPUX_10 */
 
 /*****************************************************************************
- * SECTION AIX-4                                                             *
- *****************************************************************************/
-#ifdef AIX_4
-#define DL_NOT_IMPLEMENTED
-#endif
-
-/*****************************************************************************
- * SECTION Sun3OS-4                                                          *
- *****************************************************************************/
-#ifdef Sun3OS_4
-#define DL_NOT_IMPLEMENTED
-#endif
-
-/*****************************************************************************
- * SECTION SunOS-4                                                         *
- *****************************************************************************/
-#if defined(SunOS_4)
-#define DL_NOT_IMPLEMENTED
-#endif
-
-/*****************************************************************************
  * SECTION generic: dynamic madules not available
  *****************************************************************************/
-#ifdef DL_NOT_IMPLEMEMENTED
+#ifndef DL_IMPLEMENTED
 
 void *dynl_open(char *filename)
 {
