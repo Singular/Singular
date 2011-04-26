@@ -45,6 +45,13 @@ float nrFloat(number n)
 }
 
 
+void    nrCoeffWrite  (const coeffs r)
+{
+  assume( getCoeffType(r) == ID );
+  PrintS("//   characteristic : 0 (real)\n");  /* R */
+}
+
+
 BOOLEAN nrGreaterZero (number k, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
@@ -569,7 +576,9 @@ BOOLEAN nrInitChar(coeffs n, void*)
   n->cfWrite = nrWrite;
   n->cfRead = nrRead;
   n->cfPower = nrPower;
-  n->cfSetMap=nrSetMap;
+  n->cfSetMap = nrSetMap;
+  n->cfCoeffWrite  = nrCoeffWrite;
+
     /* nName= ndName; */
     /*nSize  = ndSize;*/
 #ifdef LDEBUG

@@ -63,7 +63,7 @@ void TestSum(const coeffs r, const unsigned long N)
     clog<< "N*(N+1)/2: "; PrintSized(res, r);
     number d = n_Sub(res, sum1, r);
     
-    TS_ASSERT( ndIsZeroDivisor(d, r) );
+    TS_ASSERT( n_IsZeroDivisor(d, r) );
     
     if( n_GetChar(r) == 0 )
     {

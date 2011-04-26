@@ -1,0 +1,73 @@
+  if (rField_is_GF(r))
+  {
+    Print("//   # ground field : %d\n",rInternalChar(r));
+    Print("//   primitive element : %s\n", r->parameter[0]);
+    if (r==currRing)
+    {
+      StringSetS("//   minpoly        : ");
+      nfShowMipo();PrintS(StringAppendS("\n"));
+    }
+  }
+#ifdef HAVE_RINGS
+  else if (rField_is_Ring(r))
+  {
+    PrintS("//   coeff. ring is : ");
+    if (rField_is_Ring_Z(r)) PrintS("Integers\n");
+    long l = (long)mpz_sizeinbase(r->ringflaga, 10) + 2;
+    char* s = (char*) omAlloc(l);
+    mpz_get_str(s,10,r->ringflaga);
+    if (rField_is_Ring_ModN(r)) Print("Z/%s\n", s);
+    if (rField_is_Ring_2toM(r)) Print("Z/2^%lu\n", r->ringflagb);
+    if (rField_is_Ring_PtoM(r)) Print("Z/%s^%lu\n", s, r->ringflagb);
+    omFreeSize((ADDRESS)s, l);
+  }
+#endif
+  else
+  {
+    PrintS("//   characteristic : ");
+    if ( rField_is_R(r) )             PrintS("0 (real)\n");  /* R */
+    else if ( rField_is_long_R(r) )
+      Print("0 (real:%d digits, additional %d digits)\n",
+             r->float_len,r->float_len2);  /* long R */
+    else if ( rField_is_long_C(r) )
+      Print("0 (complex:%d digits, additional %d digits)\n",
+             r->float_len, r->float_len2);  /* long C */
+    else
+      Print ("%d\n",rChar(r)); /* Fp(a) */
+    if (r->parameter!=NULL)
+    {
+      Print ("//   %d parameter    : ",rPar(r));
+      char **sp=r->parameter;
+      int nop=0;
+      while (nop<rPar(r))
+      {
+        PrintS(*sp);
+        PrintS(" ");
+        sp++; nop++;
+      }
+      PrintS("\n//   minpoly        : ");
+      if ( rField_is_long_C(r) )
+      {
+        // i^2+1:
+        Print("(%s^2+1)\n",r->parameter[0]);
+      }
+      else if (r->minpoly==NULL)
+      {
+        PrintS("0\n");
+      }
+      else if (r==currRing)
+      {
+        StringSetS(""); nWrite(r->minpoly); PrintS(StringAppendS("\n"));
+      }
+      else
+      {
+        PrintS("...\n");
+      }
+      if (r->minideal!=NULL)
+      {
+        if (r==currRing) iiWriteMatrix((matrix)r->minideal,"//   minpolys",1,0);
+        else PrintS("//   minpolys=...");
+        PrintLn();
+      }
+    }
+  }
