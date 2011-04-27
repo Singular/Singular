@@ -51,10 +51,27 @@
 #define pIter(p)            ((p) = (p)->next)
 
 // coeff
-#define pGetCoeff(p)        ((p)->coef)
-// deletes old coeff before setting the new one
+// #define pGetCoeff(p)        ((p)->coef)
+static inline number& pGetCoeff(poly p)
+{
+  assume(p != NULL);
+  return p->coef;
+}
+
+// #define p_GetCoeff(p,r)     pGetCoeff(p)
+static inline number& p_GetCoeff(poly p, const ring r)
+{
+  assume(p != NULL);
+  assume(r != NULL);
+  return p->coef;
+}
+
+
+
+// 
+// deletes old coeff before setting the new one???
 #define pSetCoeff0(p,n)     (p)->coef=(n)
-#define p_GetCoeff(p,r)     pGetCoeff(p)
+
 #define p_SetCoeff0(p,n,r)  pSetCoeff0(p,n)
 
 #define __p_GetComp(p, r)   (p)->exp[r->pCompIndex]
