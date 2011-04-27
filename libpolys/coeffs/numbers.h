@@ -71,6 +71,8 @@ void   ndInpAdd(number &a, number b, const coeffs r);
 
 /// Test whether a is a zero divisor in r
 /// i.e. not coprime with char. of r
+/// very inefficient implementation:
+/// should ONLY be used for debug stuff /tests
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r);
 
 #ifdef LDEBUG
