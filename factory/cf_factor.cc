@@ -798,6 +798,7 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
   {
       factoryError("not implemented");
   }
+  if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
   return F;
 }
 
