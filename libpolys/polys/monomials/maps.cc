@@ -154,7 +154,7 @@ poly maEval(map theMap, poly p,ring preimage_r,nMapFunc nMap, ideal s, const rin
       }
       omFreeSize((ADDRESS)monoms,l*sizeof(poly));
     }
-    if (dst_r->cf->minpoly!=NULL) result=p_MinPolyNormalize(result, dst_r);
+    if (!rMinpolyIsNULL(dst_r)) result=p_MinPolyNormalize(result, dst_r);
   }
   return result;
 }
@@ -269,8 +269,8 @@ poly maIMap(ring r, poly p, const ring dst_r)
   nMapFunc nMap=n_SetMap(r->cf,dst_r->cf);
   int *perm=(int *)omAlloc0((r->N+1)*sizeof(int));
   //int *par_perm=(int *)omAlloc0(rPar(r)*sizeof(int));
-  maFindPerm(r->names, rVar(r), r->cf->parameter, rPar(r),
-             dst_r->names, rVar(dst_r),dst_r->cf->parameter, rPar(dst_r),
+  maFindPerm(r->names, rVar(r), rParameter(r), rPar(r),
+             dst_r->names, rVar(dst_r),rParameter(dst_r), rPar(dst_r),
              perm,NULL, dst_r->cf->ch);
   poly res=p_PermPoly(p,perm,r,dst_r, nMap /*,par_perm,rPar(r)*/);
   omFreeSize((ADDRESS)perm,(r->N+1)*sizeof(int));
