@@ -394,7 +394,7 @@ void rWrite(ring r)
     {
       for (j = i+1; j<=r->N; j++)
       {
-        nl = n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r->GetNC()->basering), r->cf);
+        nl = n_IsOne(p_GetCoeff(MATELEM(r->GetNC()->C,i,j),r), r->cf);
         if ( (MATELEM(r->GetNC()->D,i,j)!=NULL) || (!nl) )
         {
           Print("\n//    %s%s=",r->names[j-1],r->names[i-1]);
