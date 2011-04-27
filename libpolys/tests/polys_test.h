@@ -86,10 +86,6 @@ namespace
       std::clog << std::endl;  
   }
 
-template <typename T>
-static inline poly p_Init(T v, const ring r)
-{ assume(r != NULL); return p_ISet(v, r); }
-
 static inline void Delete(poly &p, const ring r)
 {
   if( p != NULL )
@@ -98,7 +94,7 @@ static inline void Delete(poly &p, const ring r)
   p = NULL;
 }
 
-void TestSum(const ring r, const unsigned long N)
+void TestSum(const ring r, const int N)
 {
   TS_ASSERT_DIFFERS( r    , NULLp);
   TS_ASSERT_DIFFERS( r->cf, NULLp);
@@ -109,15 +105,15 @@ void TestSum(const ring r, const unsigned long N)
 
   assume( N > 0 ); // just for now...
 
-  const unsigned long ssss = (N * (N+1)) / 2;
+  const int ssss = (N * (N+1)) / 2;
   
-  poly sum1 = p_Init(ssss, r);
+  poly sum1 = p_ISet(ssss, r);
   clog<< "poly(N*(N+1)/2) (int: " << ssss << "): "; PrintSized(sum1, r);
 
-  poly s, ss, i, res; res = NULL;
+  poly s=NULL, ss=NULL, i=NULL, res=NULL;
 
-  s = p_Init(N  , r);
-  i = p_Init(N+1, r);
+  s = p_ISet(N  , r);
+  i = p_ISet(N+1, r);
 
   i = p_Mult_q(s, i, r); s = NULL;
 
@@ -158,14 +154,14 @@ void TestSum(const ring r, const unsigned long N)
   n_Delete(&t, r->cf);
 
 
-  s = p_Init(0  , r);
-  ss = p_Init(0 , r);
+  s = NULL;
+  ss = NULL;
   for( int k = N; k >= 0; k-- )
   {
-    i = p_Init(k, r);
+    i = p_ISet(k, r);
     s = p_Add_q(s, i, r); // s += i
 
-    i = p_Neg( p_Init(k, r), r );
+    i = p_Neg( p_ISet(k, r), r );
     ss = p_Add_q(ss, i, r); // ss -= i
   }
   
