@@ -535,7 +535,7 @@ sub writeInitialize() {
 
 sub writeMain() {
   if ( $gui ) {
-    print "char* argv0;\n";
+    print "char* argv0 = NULL;\n";
     print "int main( int argc, char *argv[] ) {\n";
     print "argv0 = argv[0];\n";
     $noStaticInit &&
@@ -544,8 +544,8 @@ sub writeMain() {
     print "}\n";
   }
   elsif ( $runner ) {
-    print "char* argv0;\n";
-    print "int main( int argc, char *argv[] ) {\n";
+    print "char* argv0 = NULL;\n";
+    print "int main( int, char *argv[] ) {\n";
     print "argv0 = argv[0];\n";
     $noStaticInit &&
       print " CxxTest::initialize();\n";
