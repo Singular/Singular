@@ -28,7 +28,7 @@ LINKAGE poly pp_Mult_mm(poly p, const poly m, const ring ri, poly &last)
 #ifdef HAVE_ZERODIVISORS
   rp.next = NULL;
 #endif
-  poly q = &rp, r;
+  poly q = &rp;
   number ln = pGetCoeff(m);
   omBin bin = ri->PolyBin;
   DECLARE_LENGTH(const unsigned long length = ri->ExpL_Size);

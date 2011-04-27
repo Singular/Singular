@@ -29,7 +29,6 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
 {
   int j = 0;
   poly lt;
-  BOOLEAN zero = FALSE;
   ring r = bucket->bucket_ring;
   assume(bucket->buckets[0] == NULL && bucket->buckets_length[0] == 0);
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);
@@ -119,7 +118,6 @@ LINKAGE void p_kBucketSetLm(kBucket_pt bucket)
 {
   //int j = 0;
   poly lt;
-  BOOLEAN zero = FALSE;
   ring r = bucket->bucket_ring;
   assume((bucket->buckets[0] == NULL) && (bucket->buckets_length[0] == 0) && (bucket->coef[0]==0));
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);

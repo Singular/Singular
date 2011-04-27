@@ -33,8 +33,7 @@ LINKAGE poly p_Minus_mm_Mult_qq(poly p, poly m, poly q, int& Shorter, const poly
 
   spolyrec rp;
   poly a = &rp,                    // collects the result
-    qm = NULL,                     // stores q*m
-    c;                             // used for temporary storage
+    qm = NULL;                     // stores q*m
 
 
   number tm = pGetCoeff(m),           // coefficient of m
