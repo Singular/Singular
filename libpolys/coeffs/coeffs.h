@@ -35,11 +35,17 @@ enum n_coeffType
 struct snumber;
 typedef struct snumber *   number;
 
+struct snumber;
+typedef struct snumber *   number;
+
 /* standard types */
 #ifdef HAVE_RINGS
 typedef unsigned long NATNUMBER;
 typedef mpz_ptr int_number;
 #endif
+
+struct ip_sring;
+typedef struct ip_sring *         ring;
 
 struct n_Procs_s;
 typedef struct  n_Procs_s  n_Procs_s;
@@ -80,7 +86,7 @@ struct n_Procs_s
    unsigned short *npExpTable;
    unsigned short *npLogTable;
    #endif
-   // Zp_a, Q_a
+
    // ?
    // initialisation:
    //void (*cfInitChar)(coeffs r, int parameter); // do one-time initialisations
@@ -154,9 +160,15 @@ struct n_Procs_s
    int     ref;
    n_coeffType type;
 //-------------------------------------------
-  char**     parameter; //< names of parameters, rInit
-  short      P;      //< number of pars, rInit
-  number     minpoly;  //< for Q_a/Zp_a, rInit
+
+  /// For Zp_a, Q_a we need polynomials (due to polys)
+  ring          algring; //< implementation of extensions needs polynomials...
+  /// for Q_a/Zp_a, rInit
+  number     minpoly;  //< make it a number! (needed for ring.cc) must be set by n???InitChar
+
+
+//-------------------------------------------
+  char* compex_parameter; //< the name of sqrt(-1), i.e. 'i' or 'j' etc...?
 
 #ifdef HAVE_RINGS
   /* The following members are for representing the ring Z/n,

@@ -305,7 +305,6 @@ struct ip_sring
 
   p_SetmProc    p_Setm;
   n_Procs_s*    cf;
-  ring          algring;
 #ifdef HAVE_PLURAL
   private:
     nc_struct*    _nc; // private
@@ -400,10 +399,9 @@ char * rVarStr(ring r);
 char * rCharStr(ring r);
 char * rString(ring r);
 int    rChar(ring r);
-#define rPar(r) (r->cf->P)
-#define rVar(r) (r->N)
+
 char * rParStr(ring r);
-int    rIsExtension(const ring r);
+
 int    rSum(ring r1, ring r2, ring &sum);
 int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp);
 
@@ -517,6 +515,57 @@ static inline BOOLEAN rShortOut(const ring r)
 {
   assume(r != NULL); return (r->ShortOut);
 }
+
+/// #define rVar(r) (r->N)
+static inline short rVar(const ring r)
+{
+  assume(r != NULL);
+  return r->N;
+}
+
+/// (r->cf->P)
+static inline short rPar(const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+
+  if( rField_is_Extension(r) )
+  {
+    const ring R = C->algring;
+    assume( R != NULL );
+    return rVar( R );
+  }
+  return 0;
+}
+
+
+/// (r->cf->parameter)
+static inline char** rParameter(const ring r)
+{
+  assume(r != NULL);
+  const coeffs C = r->cf;
+  assume(C != NULL);
+
+  if( rField_is_Extension(r) )
+  {
+    const ring R = C->algring;
+    assume( R != NULL );
+    return R->names;
+  }
+  return NULL;
+}
+   
+/* R, Q, Fp: FALSE */
+static inline BOOLEAN rIsExtension(const ring r)
+{
+  assume( (rParameter(r)!=NULL) == rField_is_Extension(r) ); // ?
+  return rField_is_Extension(r);
+}
+
+/// Tests whether '(r->cf->minpoly) == NULL'
+BOOLEAN rMinpolyIsNULL(const ring r);
+
 
 /// order stuff
 typedef enum rRingOrder_t
