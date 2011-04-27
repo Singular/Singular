@@ -167,13 +167,13 @@ void TestSum(const ring r, const unsigned long N)
   TS_ASSERT( p_EqualPolys(ss, s, r) );
 
   TODO(somebody, fix the delete method!);
-/*
+
   Delete(sum1, r); 
   Delete(res, r);
 
   Delete(s, r);    
   Delete(ss, r);    
-*/
+
   clog << ( " >>> TEST DONE!" );
   clog << endl;
 
