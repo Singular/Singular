@@ -54,6 +54,7 @@ static MyGlobalPrintingFixture globalPrintingFixture;
 
 namespace
 {
+  
   void PrintRing(const ring r)
   {
     rWrite(r); PrintLn();
@@ -99,6 +100,10 @@ static inline void Delete(poly &p, const ring r)
 
 void TestSum(const ring r, const unsigned long N)
 {
+  TS_ASSERT_DIFFERS( r    , NULLp);
+  TS_ASSERT_DIFFERS( r->cf, NULLp);
+  
+  
   clog << ( _2S("TEST: sum[0..") + _2S(N) + "]: ");
   clog << endl;
 
@@ -109,7 +114,7 @@ void TestSum(const ring r, const unsigned long N)
   poly sum1 = p_Init(ssss, r);
   clog<< "poly(N*(N+1)/2) (int: " << ssss << "): "; PrintSized(sum1, r);
 
-  poly s, ss, i, res;
+  poly s, ss, i, res; res = NULL;
 
   s = p_Init(N  , r);
   i = p_Init(N+1, r);
@@ -119,21 +124,29 @@ void TestSum(const ring r, const unsigned long N)
   clog<< "poly(N)*poly(N+1): (int: "<< N*(N+1) << "): "; PrintSized(i, r);  
 
   number t = n_Init(2, r->cf);
-  clog<< "number(2): "; PrintSized(i, r);  
+  clog<< "number(2): "; PrintSized(t, r->cf);  
 
   if( !n_IsZero( t, r->cf) )
   {
-    TS_ASSERT( n_DivBy(p_GetCoeff(i, r), t, r->cf) );
-    res = p_Div_nn(i, t, r); i = NULL;
-  
-    clog<< "(poly(N)*poly(N+1))/number(2): "; PrintSized(res, r);
-    poly d = p_Sub(res, sum1, r);
+    if( i != NULL )
+    {
+      number ii = p_GetCoeff(i, r);
+      clog<< "number(poly(N)*poly(N+1)): "; PrintSized(ii, r->cf);  
+
+      TS_ASSERT( n_DivBy(ii, t, r->cf) );
+      res = p_Div_nn(i, t, r); i = NULL;
+    }
     
+      
+
+    clog<< "(poly(N)*poly(N+1))/number(2): "; PrintSized(res, r);
+    poly d = p_Sub(p_Copy(res, r), p_Copy(sum1, r), r);
+
     if( d != NULL )
       TS_ASSERT( n_IsZeroDivisor(p_GetCoeff(d, r), r->cf) );
-    
+
     Delete(d, r);
-    
+
     if( n_GetChar(r->cf) == 0 )
     {
       TS_ASSERT( p_EqualPolys(sum1, res, r) );
