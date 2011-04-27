@@ -1,12 +1,21 @@
 #ifndef TESTS_COMMON_H
 #define TESTS_COMMON_H
 
+#include <iostream>
+#include <fstream>
+#include <string.h>
+
+#include <cxxtest/TestSuite.h>
+#include <cxxtest/GlobalFixture.h>
+
+#include <omalloc/omalloc.h>
 #include <misc/auxiliary.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
 
-#include <iostream>
+#include <reporter/reporter.h>
+#include <resources/feResource.h>
 
 
 // #pragma GCC diagnostic ignored "-Wwrite-strings"
@@ -73,6 +82,51 @@ namespace
 
 
 }
+
+class GlobalPrintingFixture : public CxxTest::GlobalFixture
+{
+   std::ofstream _ofs;
+   bool _redirect;
+  public:
+    GlobalPrintingFixture(bool redirect = false): _redirect(redirect){}
+    
+    ~GlobalPrintingFixture()
+    {
+      if( _ofs)
+        _ofs.close();
+    }
+    
+    void Redirect()
+    {
+      const int ll = strlen(argv0);
+      const int l = 5 + ll;
+      char* s = (char *)omAlloc0(l);
+      s = strncpy(s, argv0, ll);
+      strncpy(s + ll, ".log", 4);
+      _ofs.open(s); // , ios_base::out) 
+      omFreeSize((ADDRESS)s, l);
+
+      std::clog.rdbuf(_ofs.rdbuf());
+    }
+
+    virtual bool setUpWorld() 
+    {
+      if( _redirect )
+        Redirect();
+
+      std::clog << std::endl << ( "<world>" ) << std::endl << std::endl;
+      feInitResources(argv0);
+      return true;
+    }
+
+    virtual bool tearDownWorld() 
+    {
+        std::clog << std::endl << std::endl <<( "</world>" )  << std::endl  << std::endl ; 
+        return true; 
+    }
+    virtual bool setUp() { std::clog << std::endl << std::endl <<( "<test>" ) << std::endl  << std::endl; return true; }
+    virtual bool tearDown() { std::clog << std::endl << std::endl <<( "</test>" ) << std::endl  << std::endl; return true; }
+};
 
 
 #endif /* TESTS_COMMON_H */

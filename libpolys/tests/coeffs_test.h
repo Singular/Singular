@@ -1,9 +1,7 @@
-#include <cxxtest/TestSuite.h>
-#include <cxxtest/GlobalFixture.h>
-
 #include "config.h"
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
+
 
 #include <reporter/reporter.h>
 #include <resources/feResource.h>
@@ -61,9 +59,11 @@ void TestSum(const coeffs r, const unsigned long N)
     res = n_Div(s, i, r);
   
     clog<< "N*(N+1)/2: "; PrintSized(res, r);
+
+
     number d = n_Sub(res, sum1, r);
-    
     TS_ASSERT( n_IsZeroDivisor(d, r) );
+    n_Delete(&d, r);
     
     if( n_GetChar(r) == 0 )
     {
@@ -335,23 +335,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
 
 }
 
-
-
-class GlobalPrintingFixture : public CxxTest::GlobalFixture
-{
-  public:
-    bool setUpWorld() {
-      clog << endl << ( "<world>" ) << endl;
-      feInitResources(argv0);
-      return true;
-    }
-    bool tearDownWorld() { clog << endl <<( "</world>" )  << endl; return true; }
-    bool setUp() { clog << endl <<( "<test>" )  << endl; return true; }
-    bool tearDown() { clog << endl <<( "</test>" )  << endl; return true; }
-};
-
-
-//
 // We can rely on this file being included exactly once
 // and declare this global variable in the header file.
 //
