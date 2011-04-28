@@ -34,7 +34,7 @@ void          sBucketDestroy(sBucket_pt *bucket);
 sBucket_pt    sBucketCopy(const sBucket_pt bucket);
 
 /// Returns bucket ring
-const ring sBucketGetRing(const sBucket_pt bucket);
+ring sBucketGetRing(const sBucket_pt bucket);
 
 /////////////////////////////////////////////////////////////////////////////
 // Convertion from/to SBpolys

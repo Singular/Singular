@@ -20,7 +20,7 @@ struct sip_sideal
   #define MATCOLS(i) ((i)->ncols)
   #define MATROWS(i) ((i)->nrows)
   #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
-   
+
 };
 
 struct sip_smap
@@ -48,13 +48,9 @@ struct sideal_list
 
 extern omBin sip_sideal_bin;
 
-#ifdef PDEBUG
-ideal idDBInit (int size, int rank, const char *f, int l);
-#define idInit(A,B) idDBInit(A,B,__FILE__,__LINE__)
-#else
 /*- creates an ideal -*/
 ideal idInit (int size, int rank=1);
-#endif
+
 /*- deletes an ideal -*/
 void id_Delete (ideal* h, ring r);
 void id_ShallowDelete (ideal* h, ring r);
@@ -70,12 +66,8 @@ void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r);
 // #define id_Print(A, r) ((void)0)
 #endif
 
-#ifdef PDEBUG
-ideal id_DBCopy(ideal h1,const char *f,int l, const ring r);
-#define id_Copy(A,R) id_DBCopy(A,__FILE__,__LINE__,R)
-#else
 ideal id_Copy (ideal h1,const ring r);
-#endif
+
   /*adds two ideals without simplifying the result*/
 ideal id_SimpleAdd (ideal h1,ideal h2, const ring r);
   /*adds the quotient ideal*/

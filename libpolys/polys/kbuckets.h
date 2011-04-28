@@ -51,12 +51,6 @@ inline poly kBucketClear(kBucket_pt bucket)
 int kBucketCanonicalize(kBucket_pt bucket);
 
 /////////////////////////////////////////////////////////////////////////////
-// Gets leading monom of bucket, does NOT change Bpoly!!!!!
-// Returned monom is READ ONLY, i.e. no manipulations are allowed !!!!
-//
-inline const poly kBucketGetLm(kBucket_pt bucket);
-
-/////////////////////////////////////////////////////////////////////////////
 // Extracts lm of Bpoly, i.e. Bpoly is changed s.t.
 // Bpoly == Bpoly - Lm(Bpoly)
 //
@@ -203,7 +197,11 @@ inline void kBucketAdjustBucketsUsed(kBucket_pt bucket)
 }
 #endif
 
-inline const poly kBucketGetLm(kBucket_pt bucket)
+/////////////////////////////////////////////////////////////////////////////
+// Gets leading monom of bucket, does NOT change Bpoly!!!!!
+// Returned monom is READ ONLY, i.e. no manipulations are allowed !!!!
+//
+inline poly kBucketGetLm(kBucket_pt bucket)
 {
   #ifdef   HAVE_COEF_BUCKETS
   assume(bucket->coef[0]==NULL);

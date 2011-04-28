@@ -47,7 +47,7 @@ static omBin sBucket_bin = omGetSpecBin(sizeof(sBucket));
 //
 
 /// Returns bucket ring
-const ring sBucketGetRing(const sBucket_pt bucket)
+ring sBucketGetRing(const sBucket_pt bucket)
 { return bucket->bucket_ring; }
 
 /// Copy sBucket non-intrusive!!!
