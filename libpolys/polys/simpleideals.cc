@@ -369,28 +369,6 @@ BOOLEAN id_IsConstant(ideal id, const ring r)
 /*2
 * copy an ideal
 */
-#ifdef PDEBUG
-ideal id_DBCopy(ideal h1,const char *f,int l, const ring r)
-{
-  int i;
-  ideal h2;
-
-  id_DBTest(h1,PDEBUG,f,l,r);
-//#ifdef TEST
-  if (h1 == NULL)
-  {
-    h2=idDBInit(1,1,f,l);
-  }
-  else
-//#endif
-  {
-    h2=idDBInit(IDELEMS(h1),h1->rank,f,l);
-    for (i=IDELEMS(h1)-1; i>=0; i--)
-      h2->m[i] = p_Copy(h1->m[i],r);
-  }
-  return h2;
-}
-#else
 ideal id_Copy(ideal h1, const ring r)
 {
   int i;
@@ -410,7 +388,6 @@ ideal id_Copy(ideal h1, const ring r)
   }
   return h2;
 }
-#endif
 
 #ifdef PDEBUG
 void id_DBTest(ideal h1, int level, const char *f,const int l, const ring r)
