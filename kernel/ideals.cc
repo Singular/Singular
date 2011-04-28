@@ -50,11 +50,7 @@ static poly * givenideal;
 /*2
 * initialise an ideal
 */
-#ifdef PDEBUG
-ideal idDBInit(int idsize, int rank, const char *f, int l)
-#else
 ideal idInit(int idsize, int rank)
-#endif
 {
   /*- initialise an ideal -*/
   ideal hh = (ideal )omAllocBin(sip_sideal_bin);
@@ -392,28 +388,6 @@ BOOLEAN idIsConstant(ideal id)
 /*2
 * copy an ideal
 */
-#ifdef PDEBUG
-ideal idDBCopy(ideal h1,const char *f,int l)
-{
-  int i;
-  ideal h2;
-
-  idDBTest(h1,PDEBUG,f,l);
-//#ifdef TEST
-  if (h1 == NULL)
-  {
-    h2=idDBInit(1,1,f,l);
-  }
-  else
-//#endif
-  {
-    h2=idDBInit(IDELEMS(h1),h1->rank,f,l);
-    for (i=IDELEMS(h1)-1; i>=0; i--)
-      h2->m[i] = pCopy(h1->m[i]);
-  }
-  return h2;
-}
-#endif
 
 ideal id_Copy (ideal h1, const ring r)
 {
@@ -3947,7 +3921,7 @@ static int idReadOutPivot(ideal arg,int* comp)
   int i=0,j, generator=-1;
   int rk_arg=arg->rank; //idRankFreeModule(arg);
   int * componentIsUsed =(int *)omAlloc((rk_arg+1)*sizeof(int));
-  poly p,q;
+  poly p;
 
   while ((generator<0) && (i<IDELEMS(arg)))
   {

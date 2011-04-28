@@ -19,7 +19,6 @@ LINKAGE poly p_ShallowCopyDelete(poly s_p, const ring r, omBin d_bin)
 {
   spolyrec dp;
   poly d_p = &dp;
-  unsigned long* s_e;
   poly h;
 
   DECLARE_LENGTH(const unsigned long length = r->ExpL_Size);

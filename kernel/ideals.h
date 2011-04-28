@@ -45,13 +45,8 @@ typedef ideal *            resolvente;
 
 extern omBin sip_sideal_bin;
 
-#ifdef PDEBUG
-ideal idDBInit (int size, int rank, const char *f, int l);
-#define idInit(A,B) idDBInit(A,B,__FILE__,__LINE__)
-#else
 /*- creates an ideal -*/
 ideal idInit (int size, int rank=1);
-#endif
 ideal idCopyFirstK (const ideal ide, const int k);
 
 /// delete an ideal
@@ -96,12 +91,7 @@ void idDBTest(ideal h1, int level, const char *f,const int l);
 #endif
 
 ideal id_Copy (ideal h1,const ring r);
-#ifdef PDEBUG
-ideal idDBCopy(ideal h1,const char *f,int l);
-#define idCopy(A) idDBCopy(A,__FILE__,__LINE__)
-#else
 #define idCopy(A) id_Copy(A,currRing)
-#endif
   /*adds two ideals without simplifying the result*/
 ideal idSimpleAdd (ideal h1,ideal h2);
   /*adds the quotient ideal*/
