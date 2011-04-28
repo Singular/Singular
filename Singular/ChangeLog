@@ -1,5 +1,6 @@
 Changes since 3-1-3:
-- port to SunStudio complier on linux (./configure --without-dl)
+- port to SolarisStudio compiler on linux
+  (./configure --without-dl;make install;cd Singular;make Singular-static)
 - fixes to ssiLinks: can also transmit newstruct
 - added to newstruct: for each rin-dep. member a an additional,
   read-only member r_a iis added (the ring a is in) 
