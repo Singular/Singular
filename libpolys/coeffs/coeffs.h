@@ -164,15 +164,16 @@ struct n_Procs_s
   /// For Zp_a, Q_a we need polynomials (due to polys)
   ring          algring; //< implementation of extensions needs polynomials...
   /// for Q_a/Zp_a, rInit
-  number     minpoly;  //< make it a number! (needed for ring.cc) must be set by n???InitChar
+  ///number     minpoly;  //< no longer needed: replaced by
+                          //  algring->minideal->[0]
 
 
 //-------------------------------------------
-  char* compex_parameter; //< the name of sqrt(-1), i.e. 'i' or 'j' etc...?
+  char* complex_parameter; //< the name of sqrt(-1), i.e. 'i' or 'j' etc...?
 
 #ifdef HAVE_RINGS
   /* The following members are for representing the ring Z/n,
-     where n is not a prime. We distinguish three cases:
+     where n is not a prime. We distinguish four cases:
      1.) n has at least two distinct prime factors. Then
          modBase stores n, modExponent stores 1, modNumber
          stores n, and mod2mMask is not used;

@@ -196,8 +196,13 @@ struct ip_sring
   int*       block0; /* starting pos., rInit/rSleftvOrdering2Ordering*/
   int*       block1; /* ending pos., rInit/rSleftvOrdering2Ordering*/
 //  char**     parameter; /* names of parameters, rInit */
-//  number     minpoly;  /* for Q_a/Zp_a, rInit */
-  ideal      minideal;
+//  number     minpoly;  /* replaced by minideal->m[0] */
+  ideal      minideal;   /* for Q_a/Zp_a, rInit;
+                            for a start, we assume that there is either no
+                            or exactly one generator in minideal, playing
+                            the role of the former minpoly; minideal may
+                            also be NULL which coincides with the
+                            no-generator-case */
   int**      wvhdl;  /* array of weight vectors, rInit/rSleftvOrdering2Ordering */
   char **    names;  /* array of variable names, rInit */
 
