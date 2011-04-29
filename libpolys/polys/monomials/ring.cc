@@ -1558,7 +1558,8 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if ( !rMinpolyIsNULL(r1) )
   {
     if ( rMinpolyIsNULL(r2) ) return FALSE;
-    if (! n_Equal(r1->cf->minpoly, r2->cf->minpoly, r1->cf)) return FALSE;
+    if (! n_Equal(r1->cf->algring->minideal->m[0],
+                  r2->cf->algring->minideal->m[0], r1->cf)) return FALSE;
   }
   else if (!rMinpolyIsNULL(r2)) return FALSE;
 
@@ -1629,7 +1630,7 @@ BOOLEAN rSamePolyRep(ring r1, ring r2)
   }
   if (r2->order[i] != 0) return FALSE;
 
-  // we do not check minpoly
+  // we do not check minpoly/minideal
   // we do not check qideal
 
   return TRUE;
@@ -1984,7 +1985,7 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
   }
 
   if (!rMinpolyIsNULL(r))
-    omCheckAddr(r->cf->minpoly);
+    omCheckAddr(r->cf->algring->minideal->m[0]);
 
   //assume(r->cf!=NULL);
 
@@ -5393,7 +5394,7 @@ BOOLEAN rMinpolyIsNULL(const ring r)
   {
     const ring R = C->algring;
     assume( R != NULL );
-    return idIs0(R->qideal);
+    return idIs0(R->minideal);
   }
   return TRUE;
 }
