@@ -326,7 +326,8 @@ BOOLEAN ngcIsMOne (number a, const coeffs r)
 const char * ngcRead (const char * s, number * a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
-  assume( r->compex_parameter != NULL );
+  assume( r->complex_parameter != NULL );
+
   if ((*s >= '0') && (*s <= '9'))
   {
     gmp_float *re=NULL;
@@ -335,9 +336,9 @@ const char * ngcRead (const char * s, number * a, const coeffs r)
     *a=(number)aa;
     delete re;
   }
-  else if (strncmp(s, r->compex_parameter,strlen(r->compex_parameter))==0)
+  else if (strncmp(s, r->complex_parameter,strlen(r->complex_parameter))==0)
   {
-    s+=strlen(r->compex_parameter);
+    s+=strlen(r->complex_parameter);
     gmp_complex *aa=new gmp_complex((long)0,(long)1);
     *a=(number)aa;
   }
@@ -486,9 +487,9 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
 
 /// TODO: Any variables?
   if( p == NULL )
-    n->compex_parameter = "i"; //??
+    n->complex_parameter = "i"; //??
   else
-    n->compex_parameter = omStrDup( (char*) p );
+    n->complex_parameter = omStrDup( (char*) p );
     
   return FALSE;
 }

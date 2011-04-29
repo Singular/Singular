@@ -1558,8 +1558,10 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if ( !rMinpolyIsNULL(r1) )
   {
     if ( rMinpolyIsNULL(r2) ) return FALSE;
-    if (! n_Equal(r1->cf->algring->minideal->m[0],
-                  r2->cf->algring->minideal->m[0], r1->cf)) return FALSE;
+    if (! p_EqualPolys(r1->cf->algring->minideal->m[0],
+                  r2->cf->algring->minideal->m[0], 
+		  r1->cf->algring))
+      return FALSE;
   }
   else if (!rMinpolyIsNULL(r2)) return FALSE;
 

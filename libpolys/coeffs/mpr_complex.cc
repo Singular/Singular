@@ -707,7 +707,7 @@ gmp_complex sqrt( const gmp_complex & x )
 //
 char *complexToStr( gmp_complex & c, const unsigned int oprec, const coeffs src )
 {
-  assume( src->compex_parameter != NULL );
+  assume( src->complex_parameter != NULL );
   
   char *out,*in_imag,*in_real;
 
@@ -720,19 +720,19 @@ char *complexToStr( gmp_complex & c, const unsigned int oprec, const coeffs src 
 
     if (nCoeff_is_long_C(src))
     {
-      int len=(strlen(in_real)+strlen(in_imag)+7+strlen(src->compex_parameter))*sizeof(char);
+      int len=(strlen(in_real)+strlen(in_imag)+7+strlen(src->complex_parameter))*sizeof(char);
       out=(char*)omAlloc(len);
       memset(out,0,len);
       if (  !c.real().isZero() )  // (-23-i*5.43) or (15.1+i*5.3)
-        sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",src->compex_parameter,in_imag);
+        sprintf(out,"(%s%s%s*%s)",in_real,c.imag().sign()>=0?"+":"-",src->complex_parameter,in_imag);
       else // (-i*43) or (i*34)
       {
         if (c.imag().isOne())
-          sprintf(out,"%s",src->compex_parameter);
+          sprintf(out,"%s",src->complex_parameter);
         else if (c.imag().isMOne())
-          sprintf(out,"-%s",src->compex_parameter);
+          sprintf(out,"-%s",src->complex_parameter);
         else
-          sprintf(out,"(%s%s*%s)",c.imag().sign()>=0?"":"-",src->compex_parameter,in_imag);
+          sprintf(out,"(%s%s*%s)",c.imag().sign()>=0?"":"-",src->complex_parameter,in_imag);
       }
     }
     else
