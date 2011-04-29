@@ -71,7 +71,7 @@ git clone -v -b $BRANCH --depth 1 -- git://git.berlios.de/singular $SW 1>> $LOG 
 cd $SW  || { echo "Error: cannot cd to the tempdir: $SW" >> $LOG; CleanUp; exit 1; } 
 
 # latest commit?
-git show HEAD >> $LOG 
+git log -1 HEAD >> $LOG 
 
 [ -x ./for_Hans_with_love.sh ] || { echo "Error: cannot find './for_Hans_with_love.sh '" >> $LOG; CleanUp; exit 1; } 
 
