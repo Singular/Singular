@@ -69,7 +69,7 @@ Reset()
 
 
 echo "Creating empty tempdir: $SW" >> $LOG
-[ -d $SW ] && { echo "Error: $SW exists... cleaning up..." >> $LOG; mv -f $SW "$SW.moved" 1>> $LOG 2>&1 && { rm -f -R "$SW.moved" 1>> $LOG 2>&1 || echo "Error: could not remove '$SW.moved'"; } || { echo "Error: could not rename '$SW' -> '$SW.moved'"; exit 1; };  }
+[ -d $SW ] && { echo "Error: $SW exists... cleaning up..." >> $LOG; mv -f $SW "$SW.moved" 1>> $LOG 2>&1 && { rm -f -R "$SW.moved" 1>> $LOG 2>&1 || echo "Error: could not remove '$SW.moved'"; } || { echo "Error: could not rename '$SW' -> '$SW.moved'"; exit 1; }; }
 
 mkdir -p $SW || { echo "Error: cannot create tempdir: $SW" >> $LOG;  exit 1; }
 
@@ -92,14 +92,17 @@ git log -1 HEAD >> $LOG
 #  --enable-p-procs-dynamic Enable dynamically compiled p_Procs-modules
 
 echo "Trying static version... " >> $LOG
-Build "--enable-p-procs-static" || { echo "Error: could not build with '--enable-p-procs-static'" >> $LOG; } && Check
+Build "--enable-p-procs-static" && Check || { echo "Error: could not build with '--enable-p-procs-static'" >> $LOG; } 
 
 # return git repo to the untouched state:
+echo "Resetting the source directory... " >> $LOG
 Reset
 
 echo "Trying dynamic version... " >> $LOG
-Build "--enable-p-procs-dynamic" || { echo "Error: could not build with '--enable-p-procs-dynamic'" >> $LOG; } && Check
+Build "--enable-p-procs-dynamic" && Check || { echo "Error: could not build with '--enable-p-procs-dynamic'" >> $LOG; }
 
 cd - || { CleanUp; exit 1; } 
 
-CleanUp && exit 0 || exit 1
+CleanUp || exit 1
+
+exit 0
