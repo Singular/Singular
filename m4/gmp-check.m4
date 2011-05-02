@@ -36,7 +36,7 @@ for GMP_HOME in ${GMP_HOME_PATH}
   do	
 	if test -r "$GMP_HOME/include/gmp.h"; then
 
-		if test "x$GMP_HOME" != "x/usr" -a "x$GMP_HOME" != "x/usr/local"; then
+		if test "x$GMP_HOME" != "x/usr"; then
 			GMP_CFLAGS="-I${GMP_HOME}/include"
 			GMP_LIBS="-L${GMP_HOME}/lib -lgmp"	
 		else
