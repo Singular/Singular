@@ -2,23 +2,34 @@
 
 PWD=`pwd`
 BRANCH="spielwiese"
+
+# configure' options
 CFGOPTIONS="--with-gmp=yes"
-MKOPTIONS="-j9"
+
+# computer specific make options: e.g. -j9
+#MKOPTIONS="-j9"
+MKOPTIONS="" 
+
+D=`date +%y.%m.%d.%H.%M.%S`
+
 # tempdir (absolute path!)
-SW="$PWD/SW"
+SW="$PWD/SW_$D.dir"
 
 # we try to use log instead of consequent --quiet
-LOG="$PWD/`date`.log"
+LOG="$PWD/SW_$D.log"
 
 # log or no log?
 echo >> $LOG || LOG="/dev/null"
 
 echo "DATE: `date`" >> $LOG
+echo "HOST: `hostname`" >> $LOG
+echo "SYSTEM: `uname -a`" >> $LOG 
+
 
 CleanUp() 
 {
   echo "Deleting tempdir: $SW" >> $LOG
-  rm -f -R $SW 1>> $LOG 2>&1
+  rm -f -R "$SW" 1>> $LOG 2>&1
 }
 
 Build()
@@ -58,7 +69,7 @@ Reset()
 
 
 echo "Creating empty tempdir: $SW" >> $LOG
-[ -d $SW ] && { echo "Error: $SW exists... cleaning up..." >> $LOG; CleanUp; }
+[ -d $SW ] && { echo "Error: $SW exists... cleaning up..." >> $LOG; mv -f $SW "$SW.moved" 1>> $LOG 2>&1 && { rm -f -R "$SW.moved" 1>> $LOG 2>&1 || echo "Error: could not remove '$SW.moved'"; } || { echo "Error: could not rename '$SW' -> '$SW.moved'"; exit 1; };  }
 
 mkdir -p $SW || { echo "Error: cannot create tempdir: $SW" >> $LOG;  exit 1; }
 
