@@ -26,6 +26,7 @@ rings_test_SOURCES = rings_test_runner.cpp
 if ENABLE_P_PROCS_DYNAMIC
   ### TODO -> ${LD_LIBS} ??? instead of -ldl, 
   ### add it to AM_LDFLAGS?
+  # '-ldl' wouldn't work on FreeBSD!!!??? 
   USEPPROCSDYNAMICLD = -ldl
   USEPPROCSDYNAMICLDFLAGS =  -rdynamic
 else
@@ -46,6 +47,7 @@ BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURC
 
 
 # How to generate the test simple_test_runner
+###### $^ needs GNU make : use gmake!
 simple_test_runner.cpp: simple_test.h
 	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer $^
 
