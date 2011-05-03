@@ -21,8 +21,7 @@ enum n_coeffType
   n_R,
   n_GF,
   n_long_R,
-  n_Zp_a,
-  n_Q_a,
+  n_Ext,  // used for all extensions (of Zp, of Q AND OF EXTENSIONS THEREOF)
   n_long_C,
   // only used if HAVE_RINGS is defined
   n_Z,
