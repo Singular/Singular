@@ -154,8 +154,7 @@ namespace
       CASE(n_R);
       CASE(n_GF);
       CASE(n_long_R);
-      CASE(n_Zp_a);
-      CASE(n_Q_a);
+      CASE(n_Ext);
       CASE(n_long_C);
       CASE(n_Z);
       CASE(n_Zn);
@@ -362,7 +361,7 @@ int main()
     c ++;
 #endif
   
-  // polynomial rings needed for: n_Zp_a, n_Q_a ?
+  // polynomial rings needed for: n_Ext !
   
   return c;
 

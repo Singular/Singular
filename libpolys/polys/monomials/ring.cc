@@ -4876,8 +4876,8 @@ n_coeffType rFieldType(ring r)
   if (rField_is_R(r))      return n_R;
   if (rField_is_GF(r))     return n_GF;
   if (rField_is_long_R(r)) return n_long_R;
-  if (rField_is_Zp_a(r))   return n_Zp_a;
-  if (rField_is_Q_a(r))    return n_Q_a;
+  if (rField_is_Zp_a(r))   return n_Ext;
+  if (rField_is_Q_a(r))    return n_Ext;
   if (rField_is_long_C(r)) return n_long_C;
   #ifdef HAVE_RINGS
    if (rField_is_Ring_Z(r)) return n_Z;
