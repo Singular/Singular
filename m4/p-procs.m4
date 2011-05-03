@@ -9,7 +9,7 @@ AC_DEFUN([SING_SYSTEM_SUPPORTS_DYNAMIC_MODULES],
 AC_CANONICAL_HOST
 AC_MSG_CHECKING(whether system supports dynamic modules)
 AS_CASE([$host],
-  [*linux-gnu], [SUPPORTS_DYNAMIC_MODULES=yes],
+  [*linux*], [SUPPORTS_DYNAMIC_MODULES=yes],
   [*freebsd*], [SUPPORTS_DYNAMIC_MODULES=yes],
   [*-sun-solaris2*], [SUPPORTS_DYNAMIC_MODULES=yes],
   [*-apple-darwin*], [SUPPORTS_DYNAMIC_MODULES=yes],
