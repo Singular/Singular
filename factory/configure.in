@@ -48,7 +48,7 @@ AC_ARG_WITH(
   [  --with-omalloc           build for use with omalloc])
 AC_ARG_WITH(
   gmp,
-  [  --with-gmp(=<gmp_inc_path>(,<gmp_lib_path>))
+  [  --with-gmp(=<gmp_path>)
                           specify where to find gmp library.])
 
 AC_ARG_WITH(
@@ -118,7 +118,7 @@ AC_ARG_ENABLE(
   [  --enable-gmp            together with \`--with-Singular' means: installation
                           in process, be graceful when there is no \`gmp.h'],
   [ if test "x$with_Singular" = xyes && test "x$enable_gmp" != xno; then
-      with_gmp='$(includedir)'
+      with_gmp='$(prefix)'
     fi ])
 
 #
@@ -127,18 +127,9 @@ AC_ARG_ENABLE(
 case "$with_gmp" in
   yes|no|"")
     gmp_in_installation=no ;;
-  '$(includedir)'|'${includedir}')
-    gmp_in_installation=yes ;;
-  *,*)
-    saveIFS="$IFS"; IFS="${IFS},"
-    set dummy $with_gmp
-    IFS="$saveIFS"
-    CPPFLAGS="-I$2 $CPPFLAGS"
-    LDFLAGS="-L$3 $LDFLAGS"
-    gmp_in_installation=no ;;
   *)
-    CPPFLAGS="-I$with_gmp $CPPFLAGS" 
-    LDFLAGS="-L$with_gmp/../lib $LDFLAGS"
+    CPPFLAGS="-I$with_gmp/include $CPPFLAGS"
+    LDFLAGS="-L$with_gmp/lib $LDFLAGS"
     gmp_in_installation=no ;;
 esac
 

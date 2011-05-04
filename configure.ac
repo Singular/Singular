@@ -4,5 +4,5 @@ AM_INIT_AUTOMAKE
 AC_PROG_CC
 AC_PROG_CXX
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_SUBDIRS([omalloc libpolys])
+AC_CONFIG_SUBDIRS([omalloc factory libpolys])
 AC_OUTPUT

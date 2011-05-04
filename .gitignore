@@ -87,10 +87,8 @@ omalloc/omConfig.h
 omalloc/omExternalConfig.h
 omalloc/omlimits.h
 doc/NTL
-factory/cf_gmp.h
 factory/factory.h
 factory/factoryconf.h
-factory/gen_cf_gmp.sh
 ntl/include/NTL/gmp_aux.h
 ntl/include/NTL/mach_desc.h
 ntl/setup1
