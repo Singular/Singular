@@ -20,12 +20,16 @@ digraph singular {
 	reporter -> resources;
 	reporter -> coeffs;
 	reporter -> polys;
+	reporter -> misc;	
 	resources -> coeffs;
-	coeffs [ fontcolor=blue ];
+	polys -> ext_fields;
+	coeffs -> ext_fields;	
+        coeffs [ fontcolor=blue ];
 	coeffs -> polys;
 	edge [style=dashed];
 	ntl -> coeffs;
 	polys [ fontcolor=blue ];
+	ext_fields -> coeffs;
 }
 
 // dot -Tpng -o singular.png singular.dot
