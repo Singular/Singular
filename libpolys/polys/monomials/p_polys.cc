@@ -19,11 +19,11 @@
 
 #include <coeffs/longrat.h> // ???
 
-#include <polys/weight.h>
-#include <polys/simpleideals.h>
+#include "weight.h"
+#include "simpleideals.h"
 
-#include <polys/monomials/ring.h>
-#include <polys/monomials/p_polys.h>
+#include "monomials/ring.h"
+#include "monomials/p_polys.h"
 
 // #include <???/ideals.h>
 // #include <???/int64vec.h>
@@ -33,11 +33,13 @@
 #endif
 
 #ifdef HAVE_PLURAL
-#include <polys/nc/nc.h>
-#include <polys/nc/sca.h>
+#include "nc/nc.h"
+#include "nc/sca.h"
 #endif
 
-#include <polys/coeffrings.h>
+#include "coeffrings.h"
+#include "clapsing.h"
+
 
 /***************************************************************
  *

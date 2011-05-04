@@ -10,13 +10,18 @@
 /* includes */
 #include "config.h"
 #include <misc/auxiliary.h>
-#include <misc/options.h>
+
 #include <omalloc/omalloc.h>
-#include <polys/monomials/p_polys.h>
-#include <polys/weight.h>
-#include <polys/matpol.h>
+
+#include <misc/options.h>
 #include <misc/intvec.h>
-#include <polys/simpleideals.h>
+
+#include <coeffs/longrat.h>
+  
+#include "monomials/p_polys.h"
+#include "weight.h"
+#include "matpol.h"
+#include "simpleideals.h"
 #include "sbuckets.h"
 
 omBin sip_sideal_bin;
@@ -1663,13 +1668,16 @@ void id_Normalize(ideal I,const ring r)
 // #include <kernel/clapsing.h>
 
 #ifdef HAVE_FACTORY
+#if 0
 poly id_GCD(poly f, poly g, const ring r)
 {
   ring save_r=r;
   rChangeCurrRing(r);
   ideal I=idInit(2,1); I->m[0]=f; I->m[1]=g;
   intvec *w = NULL;
+
   ideal S=idSyzygies(I,testHomog,&w);
+
   if (w!=NULL) delete w;
   poly gg=pTakeOutComp(&(S->m[0]),2);
   idDelete(&S);
@@ -1678,6 +1686,7 @@ poly id_GCD(poly f, poly g, const ring r)
   rChangeCurrRing(save_r);
   return gcd_p;
 }
+#endif
 #endif
 
 /*2
@@ -1688,7 +1697,7 @@ poly id_GCD(poly f, poly g, const ring r)
 * destroys xx
 */
 #ifdef HAVE_FACTORY
-ideal idChineseRemainder(ideal *xx, number *q, int rl, const ring r)
+ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
   ideal result=idInit(cnt,xx[0]->rank);
@@ -1707,40 +1716,42 @@ ideal idChineseRemainder(ideal *xx, number *q, int rl, const ring r)
       {
         h=xx[j]->m[i];
         if ((h!=NULL)
-        &&((r==NULL)||(pLmCmp(r,h)==-1)))
+        &&((r==NULL)||(p_LmCmp(r,h,R)==-1)))
           r=h;
       }
       if (r==NULL) break;
-      h=pHead(r);
+      h=p_Head(r, R);
       for(j=rl-1;j>=0;j--)
       {
         hh=xx[j]->m[i];
-        if ((hh!=NULL) && (pLmCmp(r,hh)==0))
+        if ((hh!=NULL) && (p_LmCmp(r,hh, R)==0))
         {
-          x[j]=pGetCoeff(hh);
-          hh=pLmFreeAndNext(hh);
+          x[j]=p_GetCoeff(hh, R);
+          hh=p_LmFreeAndNext(hh, R);
           xx[j]->m[i]=hh;
         }
         else
-          x[j]=nlInit(0, r);
+          x[j]=nlInit(0, R->cf); // is R->cf really n_Q???
       }
-      number n=nlChineseRemainder(x,q,rl);
+       
+      number n=nlChineseRemainder(x,q,rl); // kernel/clapconv.cc
+
       for(j=rl-1;j>=0;j--)
       {
         x[j]=NULL; // nlInit(0...) takes no memory
       }
-      if (nlIsZero(n)) pDelete(&h);
+      if (nlIsZero(n, R->cf)) p_Delete(&h, R);
       else
       {
-        pSetCoeff(h,n);
+        p_SetCoeff(h,n, R);
         //Print("new mon:");pWrite(h);
-        res_p=pAdd(res_p,h);
+        res_p=p_Add_q(res_p, h, R);
       }
     }
     result->m[i]=res_p;
   }
   omFree(x);
-  for(i=rl-1;i>=0;i--) idDelete(&(xx[i]));
+  for(i=rl-1;i>=0;i--) id_Delete(&(xx[i]), R);
   omFree(xx);
   return result;
 }
