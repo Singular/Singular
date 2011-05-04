@@ -276,7 +276,7 @@ EXAMPLE: example deleteUnluckyPrimes; shows an example
             c++;
          }
       }
-      if(c > size(T)/2){ lT = cK; }
+      if(c > size(T) div 2){ lT = cK; }
    }
    else
    {

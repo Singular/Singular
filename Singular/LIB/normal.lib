@@ -2354,7 +2354,7 @@ EXAMPLE: example genus; shows an example
 
    kill newR;
 
-   int genus=(d-1)*(d-2)/2;
+   int genus=(d-1)*(d-2) div 2;
    if(w>=1){"the arithmetic genus of the plane curve:";genus;pause();}
 
    int delt,deltaloc,deltainf,tau,tauinf,cusps,iloc,iglob,l,nsing,
@@ -2682,7 +2682,7 @@ EXAMPLE: example deltaLoc;  shows an example
       {
         if(w>=1){"A_k-singularity";"";}
          setring R;
-         delt=(tau+1)/2;
+         delt=(tau+1) div 2;
          option(set,save_opt);
          return(list(d*delt,d*tau,d*(2*delt-tau+1)));
       }
@@ -2691,7 +2691,7 @@ EXAMPLE: example deltaLoc;  shows an example
         if(w>=1){"D_k- singularity";"";}
 
          setring R;
-         delt=(tau+2)/2;
+         delt=(tau+2) div 2;
          option(set,save_opt);
          return(list(d*delt,d*tau,d*(2*delt-tau+1)));
       }
@@ -2712,7 +2712,7 @@ EXAMPLE: example deltaLoc;  shows an example
         }
         if(w>=1){"Newton-Polygon is non-degenerated";"";}
         option(set,save_opt);
-        return(list(d*(mu+nb-1)/2,d*tau,d*nb));
+        return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
       }
 
       if(w>=1){"Newton-Polygon is degenerated";"";}
@@ -2745,7 +2745,7 @@ EXAMPLE: example deltaLoc;  shows an example
          nb=deltaLoc(f1,maxideal(1))[3]+deltaLoc(f2,maxideal(1))[3];
          setring R;
          option(set,save_opt);
-         return(list(d*(mu+nb-1)/2,d*tau,d*nb));
+         return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
       }
 
       f=jet(f,deg(hc)+2);
@@ -2760,7 +2760,7 @@ EXAMPLE: example deltaLoc;  shows an example
          }
          setring R;
          option(set,save_opt);
-         return(list(d*(mu+nb-1)/2,d*tau,d*nb));
+         return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
       }
       list HNEXP=hnexpansion(f);
       if (typeof(HNEXP[1])=="ring") {
@@ -2775,7 +2775,7 @@ EXAMPLE: example deltaLoc;  shows an example
         nb=size(HNEXP);
       }
       option(set,save_opt);
-      return(list(d*(mu+nb-1)/2,d*tau,d*nb));
+      return(list(d*(mu+nb-1) div 2,d*tau,d*nb));
    }
    else             //the case of small characteristic
    {

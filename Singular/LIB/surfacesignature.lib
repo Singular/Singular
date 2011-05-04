@@ -371,7 +371,7 @@ static proc etaSpec(list L, int N)
       h = h + L[3][(n+1)/2];
 
       // sum coming from non-zero spectral numbers in eta function
-      for(i = (n+3)/2; i <= n; i++)
+      for(i = (n+3) div 2; i <= n; i++)
       {
          if(!((denominator(leadcoef(N*L[1][i]))==1)
              ||(denominator(leadcoef(N*L[1][i]))==-1)))

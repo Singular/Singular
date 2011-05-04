@@ -480,7 +480,7 @@ EXAMPLE: example molien; shows an example
     }
   }
   if (ch<>0)
-  { if ((g/r)*r<>g)
+  { if ((g div r)*r<>g)
    { "ERROR:   <int> should divide the group order."
       return();
     }
@@ -561,7 +561,7 @@ EXAMPLE: example molien; shows an example
       M[1,1]=M[1,1]*p+M[1,2];          // expanding M[1,1]/M[1,2] + 1/p
       M[1,2]=M[1,2]*p;
       if (interval<>0)                 // canceling common terms of denominator
-      { if ((j/interval)*interval==j or j==g) // and enumerator -
+      { if ((j div interval)*interval==j or j==g) // and enumerator -
         { s=matrix(syz(ideal(M)));     // once gcd() is faster than syz() these
           M[1,1]=-s[2,1];              // three lines should be replaced by the
           M[1,2]=s[1,1];               // following three
@@ -711,7 +711,7 @@ EXAMPLE: example molien; shows an example
         }
         else
         { if (interval<>0)             // canceling common terms of denominator
-          { if ((i/interval)*interval==i or i==g) // and enumerator
+          { if ((i div interval)*interval==i or i==g) // and enumerator
             { s=matrix(syz(ideal(M))); // once gcd() is faster than syz()
               M[1,1]=-s[2,1];          // these three lines should be
               M[1,2]=s[1,1];           // replaced by the following three
@@ -830,7 +830,7 @@ EXAMPLE: example molien; shows an example
       M[1,1]=M[1,1]*p+M[1,2];          // expanding M[1,1]/M[1,2] + 1/p
       M[1,2]=M[1,2]*p;
       if (interval<>0)                 // canceling common terms of denominator
-      { if ((i/interval)*interval==i or i==g) // and enumerator
+      { if ((i div interval)*interval==i or i==g) // and enumerator
         {
           s=matrix(syz(ideal(M)));     // once gcd() is faster than syz() these
           M[1,1]=-s[2,1];              // three lines should be replaced by the
@@ -1080,7 +1080,7 @@ EXAMPLE: example reynolds_molien; shows an example
         A(2)[1,1]=A(2)[1,1]*p+A(2)[1,2]; // expanding A(2)[1,1]/A(2)[1,2] +1/p
         A(2)[1,2]=A(2)[1,2]*p;
         if (interval<>0)               // canceling common terms of denominator
-        { if ((i/interval)*interval==i) // and enumerator
+        { if ((i div interval)*interval==i) // and enumerator
           {
             s=matrix(syz(ideal(A(2)))); // once gcd() is faster than syz() these
             A(2)[1,1]=-s[2,1];         // three lines should be replaced by the
@@ -1126,7 +1126,7 @@ EXAMPLE: example reynolds_molien; shows an example
           A(2)[1,1]=A(2)[1,1]*p+A(2)[1,2];
           A(2)[1,2]=A(2)[1,2]*p;       // expanding A(2)[1,1]/A(2)[1,2] + 1/p -
           if (interval<>0)             // canceling common terms of denominator
-          { if ((g/interval)*interval==g) // and enumerator
+          { if ((g div interval)*interval==g) // and enumerator
             {
               s=matrix(syz(ideal(A(2)))); // once gcd() is faster than syz()
               A(2)[1,1]=-s[2,1];       // these three lines should be replaced
@@ -1165,7 +1165,7 @@ EXAMPLE: example reynolds_molien; shows an example
       // A(2)[1,2]=A(2)[1,2]/p;
     }
     if (interval<>0)                   // canceling common terms of denominator
-    { if ((g/interval)*interval<>g)    // and enumerator
+    { if ((g div interval)*interval<>g)    // and enumerator
       {
         s=matrix(syz(ideal(A(2))));    // once gcd() is faster than syz()
         A(2)[1,1]=-s[2,1];             // these three lines should be replaced
@@ -1289,7 +1289,7 @@ EXAMPLE: example reynolds_molien; shows an example
         A(2)[1,1]=A(2)[1,1]*p+A(2)[1,2]; // expanding A(2)[1,1]/A(2)[1,2] +1/p
         A(2)[1,2]=A(2)[1,2]*p;
         if (interval<>0)               // canceling common terms of denominator
-        { if ((i/interval)*interval==i) // and enumerator
+        { if ((i div interval)*interval==i) // and enumerator
           {
             s=matrix(syz(ideal(A(2)))); // once gcd() is faster than syz() these
             A(2)[1,1]=-s[2,1];         // three lines should be replaced by the
@@ -1348,7 +1348,7 @@ EXAMPLE: example reynolds_molien; shows an example
           A(2)[1,1]=A(2)[1,1]*p+A(2)[1,2];
           A(2)[1,2]=A(2)[1,2]*p;       // expanding A(2)[1,1]/A(2)[1,2] + 1/p -
           if (interval<>0)             // canceling common terms of denominator
-          { if ((g/interval)*interval==g) // and enumerator
+          { if ((g div interval)*interval==g) // and enumerator
             {
               s=matrix(syz(ideal(A(2)))); // once gcd() is faster than syz()
               A(2)[1,1]=-s[2,1];       // these three lines should be replaced
@@ -1389,7 +1389,7 @@ EXAMPLE: example reynolds_molien; shows an example
       // A(2)[1,2]=A(2)[1,2]/p;
     }
     if (interval<>0)                   // canceling common terms of denominator
-    { if ((g/interval)*interval<>g)    // and enumerator
+    { if ((g div interval)*interval<>g)    // and enumerator
       {
         s=matrix(syz(ideal(A(2))));    // once gcd() is faster than syz()
         A(2)[1,1]=-s[2,1];             // these three lines should be replaced
@@ -6190,7 +6190,7 @@ EXAMPLE:  example secondary_no_molien; shows an example
   for (j=1;j<=n;j++)
   { max=max*deg(P[j]);
   }
-  max=max/nrows(REY);
+  max=max div nrows(REY);
   if (v)
   { "  We need to find ",max," secondary invariants.";
     "";
@@ -6443,7 +6443,7 @@ EXAMPLE: example secondary_and_irreducibles_no_molien; shows an example
   for (j=1;j<=n;j++)
   { max=max*deg(P[j]);
   }
-  max=max/nrows(REY);
+  max=max div nrows(REY);
   if (v)
   { "  We need to find ",max," secondary invariants.";
     "";

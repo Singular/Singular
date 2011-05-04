@@ -272,7 +272,7 @@ ideal J = fglm(R,SI);
 
 size(J);                  // number of generators
 //->   8
-size(string(J))/68;       // number of lines with 68 characters 
+size(string(J)) div 68;   // number of lines with 68 characters 
                           // needed to display J:
 //->   631
 deg(J[1..size(J)]);       // degrees of the generators

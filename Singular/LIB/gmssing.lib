@@ -852,11 +852,11 @@ EXAMPLE:  example vwfilt; shows examples
   for(i=1;i<=mu;i++)
   {
     j=leadexp(H0[i])[nvars(basering)+1];
-    a[i]=A[j,j]+ord(H0[i])/deg(var(1))-1;
+    a[i]=A[j,j]+ord(H0[i]) div deg(var(1))-1;
     w[i]=v[j]+n;
   }
   H=H*H0;
-  H=simplify(jet(H/var(1)^(mindegree(H)/deg(var(1))),0),1);
+  H=simplify(jet(H/var(1)^(mindegree(H) div deg(var(1))),0),1);
 
   kill l;
   list l=sppnf(list(a,w,H))+list(gmsbasis,gmsstd);
@@ -1031,7 +1031,7 @@ static proc glift(ideal e,matrix A,module H,module H0,int K)
   }
 
   H0=H*H0;
-  H0=H0/var(1)^(mindegree(H0)/deg(var(1)));
+  H0=H0/var(1)^(mindegree(H0) div deg(var(1)));
 
   return(A0,H0);
 }

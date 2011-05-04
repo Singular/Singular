@@ -204,7 +204,7 @@ proc extend_orderings(list olist, int j)
   // add product orderings
   if (j > 1)
   {
-    c1 = j / 2;
+    c1 = j div 2;
     if (c1 + c1 == j)
     {
       c2 = c1;
