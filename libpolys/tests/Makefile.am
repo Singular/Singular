@@ -23,22 +23,11 @@ polys_test_SOURCES = polys_test_runner.cpp
 rings_test_SOURCES = rings_test_runner.cpp
 
 
-if ENABLE_P_PROCS_DYNAMIC
-  ### TODO -> ${LD_LIBS} ??? instead of -ldl, 
-  ### add it to AM_LDFLAGS?
-  # '-ldl' wouldn't work on FreeBSD!!!??? 
-  USEPPROCSDYNAMICLD = -ldl
-  USEPPROCSDYNAMICLDFLAGS =  -rdynamic
-else
-  USEPPROCSDYNAMICLD =
-  USEPPROCSDYNAMICLDFLAGS =
-endif
-
-polys_test_LDFLAGS = ${AM_LDFLAGS} $(USEPPROCSDYNAMICLDFLAGS)
+polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
 rings_test_LDFLAGS = $(polys_test_LDFLAGS)
 
 coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lomalloc_debug
-polys_test_LDADD = -lpolys_g $(USEPPROCSDYNAMICLD) $(coeffs_test_LDADD)
+polys_test_LDADD = -lpolys_g ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
 
@@ -46,16 +35,15 @@ rings_test_LDADD = $(polys_test_LDADD)
 BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURCES) $(polys_test_SOURCES)
 
 
-# How to generate the test simple_test_runner
-###### $^ needs GNU make : use gmake!
+# How to generate *_runner.cpp 
 simple_test_runner.cpp: simple_test.h
-	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer $^
+	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer simple_test.h
 
 coeffs_test_runner.cpp: coeffs_test.h
-	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer $^
+	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer coeffs_test.h
 
 polys_test_runner.cpp: polys_test.h
-	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer $^
+	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer polys_test.h
 
 rings_test_runner.cpp: rings_test.h
-	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer $^
+	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer rings_test.h
