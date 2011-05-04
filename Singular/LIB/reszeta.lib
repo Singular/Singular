@@ -3761,7 +3761,7 @@ static proc addSelfInter(list re,intmat Inters,list iden,list iden0,intvec endiv
         {
           for(k=i+offset;k<=i+offset+ncomp-1;k++)
           {
-             intF[k]=intF[k]+(vd/ncomp);
+             intF[k]=intF[k]+(vd div ncomp);
           }
         }
       }
