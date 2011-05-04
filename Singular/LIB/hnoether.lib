@@ -777,7 +777,7 @@ EXAMPLES: example develop;         shows an example
 
       else {                   // e%p == 0
         eps = e;
-        for (l = 0; eps%p == 0; l=l+1) { eps=eps/ p;}
+        for (l = 0; eps%p == 0; l=l+1) { eps=eps div p;}
         if (defined(HNDebugOn)) {e," -> ",eps,"*",p,"^",l;}
         delt = koeff(f,(M div e)*p^l,(N div e)*p^l*(eps-1)) / (-1*eps*c);
 
@@ -1264,7 +1264,7 @@ example
  INV[1];                   // the characteristic exponents
  INV[2];                   // the generators of the semigroup of values
  INV[3],INV[4];            // the Puiseux pairs in packed form
- INV[5] / 2;               // the delta-invariant
+ INV[5] div 2;             // the delta-invariant
  INV[6];                   // the sequence of multiplicities
                            // To display the invariants more 'nicely':
  displayInvariants(Hne);
@@ -2651,7 +2651,7 @@ EXAMPLE: example factorfirst;  shows an example
    if (e%p != 0) { delt = koeff(f,M div e,N - N div e) / (-1*e*c); }
    else {
      eps = e;
-     for (l = 0; eps%p == 0; l=l+1) { eps=eps/ p;}
+     for (l = 0; eps%p == 0; l=l+1) { eps=eps div p;}
      if (defined(HNDebugOn)) {e," -> ",eps,"*",p,"^",l;}
      delt = koeff(f,(M div e)*p^l,(N div e)*p^l*(eps-1)) / (-1*eps*c);
 

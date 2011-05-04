@@ -537,7 +537,7 @@ EXAMPLE: example adjointIdeal; shows an example
     {
        bb1 = 1;
        int a,b,c  = findCoordChange(f,JAC);
-       f = subst(f,var(3),var(3)-a/c*var(1)-b/c*var(2));
+       f = subst(f,var(3),var(3)-number(a)/c*var(1)-number(b)/c*var(2));
     }
   /*applying a change of coordinates if the point (0:1:0) lies on the curve*/
   matrix co = coeffs(f,var(2));
@@ -576,7 +576,7 @@ EXAMPLE: example adjointIdeal; shows an example
     }
   if(bb1==1)
    {
-      AI = mstd(substitute(AI,var(3),var(3)+a/c*var(1)+b/c*var(2)))[2];
+      AI = mstd(substitute(AI,var(3),var(3)+number(a)/c*var(1)+number(b)/c*var(2)))[2];
     }
   return(AI);
 }
@@ -1307,7 +1307,7 @@ SEE ALSO: genus.
   int ud = deg(d);
   int sL = size(IB);
   int k;
-  int gg = (sL-1)*(sL-2)/2-sL*ud;
+  int gg = (sL-1)*(sL-2) div 2-sL*ud;
   for(k = 1; k <= sL; k++)
      {
         gg = gg + deg(gcd(d,IB[k]));
@@ -1349,7 +1349,7 @@ SEE ALSO: genus
    def R = basering;
    execute("ring S=("+charstr(R)+"),(x,y,t),dp;");
    execute("ring C=("+charstr(R)+"),(x,y),ds;");
-   int genus=(d-1)*(d-2)/2;
+   int genus=(d-1)*(d-2) div 2;
    if(w>=1){"the arithmetic genus of the plane curve:";genus;pause();}
 
    int delt,deltaloc,deltainf,tau,tauinf,cusps,iloc,iglob,l,nsing,
@@ -1653,7 +1653,7 @@ KEYWORDS: delta invariant; Tjurina number
       {
         if(w>=1){"A_k-singularity";"";}
          setring R;
-         delt=(tau+1)/2;
+         delt=(tau+1) div 2;
          return(list(d*delt,d*tau,d*(2*delt-tau+1),IntForRet));
       }
       if((lead(f)==var(1)*var(2)^2)||(lead(f)==var(1)^2*var(2)))
@@ -1661,7 +1661,7 @@ KEYWORDS: delta invariant; Tjurina number
         if(w>=1){"D_k- singularity";"";}
 
          setring R;
-         delt=(tau+2)/2;
+         delt=(tau+2) div 2;
          return(list(d*delt,d*tau,d*(2*delt-tau+1),IntForRet));
       }
 
@@ -1680,7 +1680,7 @@ KEYWORDS: delta invariant; Tjurina number
           nb=nb+gcd(NP[i][2]-NP[i+1][2],NP[i][1]-NP[i+1][1]);
         }
         if(w>=1){"Newton-Polygon is non-degenerated";"";}
-        return(list(d*(mu+nb-1)/2,d*tau,d*nb,IntForRet));
+        return(list(d*(mu+nb-1) div 2,d*tau,d*nb,IntForRet));
       }
 
       if(w>=1){"Newton-Polygon is degenerated";"";}
@@ -1712,7 +1712,7 @@ KEYWORDS: delta invariant; Tjurina number
          }
          nb=deltaLocMod(f1,maxideal(1))[3]+deltaLocMod(f2,maxideal(1))[3];
          setring R;
-         return(list(d*(mu+nb-1)/2,d*tau,d*nb,IntForRet));
+         return(list(d*(mu+nb-1) div 2,d*tau,d*nb,IntForRet));
       }
 
       f=jet(f,deg(hc)+2);
@@ -1726,7 +1726,7 @@ KEYWORDS: delta invariant; Tjurina number
             nb=nb+deltaLocMod(fac[i],maxideal(1))[3];
          }
          setring R;
-         return(list(d*(mu+nb-1)/2,d*tau,d*nb,IntForRet));
+         return(list(d*(mu+nb-1) div 2,d*tau,d*nb,IntForRet));
       }
       list HNEXP=hnexpansion(f);
       if (typeof(HNEXP[1])=="ring") {
@@ -1740,7 +1740,7 @@ KEYWORDS: delta invariant; Tjurina number
       {
         nb=size(HNEXP);
       }
-      return(list(d*(mu+nb-1)/2,d*tau,d*nb,IntForRet));
+      return(list(d*(mu+nb-1) div 2,d*tau,d*nb,IntForRet));
    }
    else             //the case of small characteristic
    {
@@ -1915,7 +1915,7 @@ KEYWORDS: prime factorization.
   int i; bigint m = bigint(1); int e; int j;
   for (i = 1; i <= size(L[1]); i++)
   {
-    e = L[2][i] / 2;
+    e = L[2][i] div 2;
     for (j = 1; j <= e; j++) { m = m * bigint(L[1][i]); }
   }
   return (m);
@@ -1993,7 +1993,7 @@ KEYWORDS: Cantor-Zassenhaus algorithm.
   while (root == 0)
   {
     b = bigint(random(1, 2^30));
-    exponent = bigint((p - 1) / 2);
+    exponent = bigint((p - 1) div 2);
     /* We need to compute q^exponent mod (x^2 - a) and mod p: */
     factor = x + b; q = 1;
     while (exponent > 0)
@@ -2004,7 +2004,7 @@ KEYWORDS: Cantor-Zassenhaus algorithm.
         q = reduce(q, redI);
         q = polyModP(q, p);
       }
-      exponent = bigint(exponent / 2);
+      exponent = bigint(exponent div 2);
       factor = factor * factor;
       factor = reduce(factor, redI);
       factor = polyModP(factor, p);

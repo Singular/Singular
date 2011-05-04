@@ -19,7 +19,7 @@ proc pAdd_Test(string rs)
   rs = "ring r = " + rs + ";";
   execute(rs);
   int n_vars = tst_rgen_nvars[tst_rgen_var_index];
-  tst_TestAdd(tst_cyclic(n_vars), 500/(n_vars*n_vars) + 50/n_vars,
+  tst_TestAdd(tst_cyclic(n_vars), 500 div (n_vars*n_vars) + 50 div n_vars,
               size(tst_rgen_comp_orderings[tst_rgen_comp_index]));
   kill r;
 }

@@ -168,7 +168,7 @@ EXAMPLE: example signatureP; shows an example
    {
       prod = prod * L[2][i+1];
       d = gcd(N, prod);
-      sigma = sigma + d * signatureBrieskorn(L[1][i], L[2][i], N/d);
+      sigma = sigma + d * signatureBrieskorn(L[1][i], L[2][i], N div d);
    }
 
    return(sigma);
@@ -348,7 +348,7 @@ static proc etaSpec(list L, int N)
    if((n mod 2) == 0)
    // 0 is not a spectral number, thus f is irreducible
    {
-      for(i = n/2+1; i <= n; i++)
+      for(i = n div 2+1; i <= n; i++)
       {
          e = e + (1 - 2 * fracPart(N * number(L[1][i]))) * L[3][i];
       }
@@ -368,7 +368,7 @@ static proc etaSpec(list L, int N)
       }
 
       // summand coming from spectral number 0 in eta function
-      h = h + L[3][(n+1)/2];
+      h = h + L[3][(n+1) div 2];
 
       // sum coming from non-zero spectral numbers in eta function
       for(i = (n+3) div 2; i <= n; i++)
