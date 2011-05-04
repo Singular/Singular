@@ -1511,7 +1511,7 @@ EXAMPLE: example annfs2; shows examples
   // Add: Plural part
   def @R4@ = ring(L);
   setring @R4@;
-  int N = Nnew/2;
+  int N = Nnew div 2;
   matrix @D[Nnew][Nnew];
   for (i=1; i<=N; i++)
   {
@@ -1587,7 +1587,7 @@ EXAMPLE: example annfsRB; shows examples
   list temp,t2;
   temp[1] = nL[1];
   temp[4] = nL[4];
-  int @n = int((nvars(@R2)-1)/2); // # of x's
+  int @n = int((nvars(@R2)-1) div 2); // # of x's
   int i;
   for (i=1; i<=@n; i++)
   {
@@ -1706,7 +1706,7 @@ EXAMPLE: example annfsRB; shows examples
   // Add: Plural part
   def @R4@ = ring(L);
   setring @R4@;
-  int N = Nnew/2;
+  int N = Nnew div 2;
   matrix @D[Nnew][Nnew];
   for (i=1; i<=N; i++)
   {
@@ -4789,7 +4789,7 @@ EXAMPLE: example annfs0; shows examples
   // Add: Plural part
   def @R4@ = ring(L);
   setring @R4@;
-  int N = Nnew/2;
+  int N = Nnew div 2;
   matrix @D[Nnew][Nnew];
   for (i=1; i<=N; i++)
   {
@@ -5659,7 +5659,7 @@ EXAMPLE: example checkRoot1; shows examples
   def save = basering;
   int N = nvars(basering);
   int Nnew = N-1;
-  int n = Nnew / 2;
+  int n = Nnew div 2;
   int i;
   string s;
   list RL = ringlist(basering);
@@ -5799,7 +5799,7 @@ EXAMPLE: example checkRoot2; shows examples
   dbprint(ppl,"// -0-1- starting the procedure checkRoot2");
   def save = basering;
   int N = nvars(basering);
-  int n = (N-1) / 2;
+  int n = (N-1) div 2;
   int i;
   string s;
   list RL = ringlist(basering);
@@ -6110,7 +6110,7 @@ EXAMPLE: example bernsteinLift; shows examples
   }
   def @R2 = basering;
   int Nnew = nvars(@R2);
-  int N = Nnew/2;
+  int N = Nnew div 2;
   int ppl = printlevel-voice+2;
   // we're in D_n[s], where the elim ord for s is set
   // create D_n(s)

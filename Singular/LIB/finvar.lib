@@ -275,7 +275,7 @@ EXAMPLE: example group_reynolds; shows an example
           { TEST=TEST*G(g);
             o2++;
           }
-          o1=o1*o2/gcd(o1,o2);         // lowest common multiple of the element
+          o1=o1*o2 div gcd(o1,o2);         // lowest common multiple of the element
         }                              // orders -
         REY=concat(REY,P(k)*vars);     // adding new mapping to REY
         if (v)

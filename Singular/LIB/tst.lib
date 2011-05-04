@@ -745,7 +745,7 @@ proc tst_rgen_generate_product_orderings(int n_vars, list simple_orderings, intv
   {
     if (products[i] > 1 && products[i] <= n_vars)
     {
-      nn_vars = n_vars / products[i];
+      nn_vars = n_vars div products[i];
       nb_orderings = tst_rgen_generate_blocks(nn_vars, simple_orderings, extra_weights);
       for (j=1; j<=size(nb_orderings); j++)
       {

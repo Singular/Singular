@@ -4397,7 +4397,7 @@ EXAMPLE:  example prepSV; shows an example
   list Places=EC[3];
   int m=deg_D(G,Places);
   int genusX=EC[2][2];
-  int e=(m+1-3*genusX)/2;
+  int e=(m+1-3*genusX) div 2;
   if (e<1)
   {
     dbprint(printlevel+3,"? the correction capacity of the basic algorithm
@@ -4558,7 +4558,7 @@ EXAMPLE:    example decodeSV; shows an example
       //     is too strong
       // on the other hand, if Hamming_wt(sol) is too large the decoding may
       //     not be acceptable
-      if ( Hamming_wt(sol) <= (K[n+3][2]-1)/2 )
+      if ( Hamming_wt(sol) <= (K[n+3][2]-1) div 2 )
       {
         option(set,opgt);
         return(y-sol);

@@ -318,7 +318,7 @@ static proc getdeltaP2(poly f,int N,int dN)
   def of,jf=pcvmindeg(f),jacob(f);
   list b=pcvbasis(N-of+2,N+dN-of+2);
   list P2;
-  P2[size(b)*((nvars(basering)-1)*nvars(basering))/2]=0;
+  P2[size(b)*((nvars(basering)-1)*nvars(basering)) div 2]=0;
   int i,j,k,l;
   intvec alpha;
   for(k,l=1,1;k<=size(b);k++)

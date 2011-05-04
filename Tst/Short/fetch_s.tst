@@ -11,7 +11,7 @@ proc generate_polys_str(int n)
   string polystr = "poly p = ";
   int i;
 
-  for (i=1; i<=n; i = i + (i / 10) + 1)
+  for (i=1; i<=n; i = i + (i div 10) + 1)
   {
     polystr = polystr + "x(" + string(i) + ") + ";
   }
@@ -38,7 +38,7 @@ proc check_fetch(int n, list olist)
   int i;
   int j;
   
-  for (j=1; j<=n; j = j + (j / 10) + 1)
+  for (j=1; j<=n; j = j + (j div 10) + 1)
   {
     execute(generate_ring_str(j, "r", olist[1]));
     execute(generate_polys_str(j));

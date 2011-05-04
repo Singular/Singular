@@ -475,7 +475,7 @@ proc primaryTest (ideal i, poly p)
         while(e mod char(basering)==0)
         {
           f=f*char(basering);
-          e=e/char(basering);
+          e=e div char(basering);
         }
       }
       t=leadcoef(i[m])*e*var(n)^f+(i[m]-lead(i[m]))/var(n)^((e-1)*f);

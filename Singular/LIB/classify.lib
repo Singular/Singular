@@ -1953,7 +1953,7 @@ static proc Cubic (poly f)
 static proc parity  (int e)
 "USAGE:    parity()"
 {
-  int r = e/2;
+  int r = e div 2;
   if( 2*r == e ) { return(0); }
   return(1);
 }
@@ -1999,22 +1999,22 @@ static proc HKclass3_teil_1 (intvec sg, string SG_Typ, int cnt)
   if(sg[2]>=1) {
     if( parity(sg[2])) { // sg[2] ist ungerade
       if(sg[2]<=sg[3]) {
-        k = (sg[2]+1)/2;
+        k = (sg[2]+1) div 2;
         if(k>1) {
           cnt++;
           SG_Typ=SG_Typ+" J[k,r]=J["+string(k)+","+string(sg[3]+1-2*k)+"]";
         }// J[k,r]
       }
       if(sg[2]==sg[3]+2) {                              // E[6k+2]
-        k = (sg[2]-1)/2;
+        k = (sg[2]-1) div 2;
         if(k>0) {cnt++; SG_Typ=SG_Typ+" E[6k+2]=E[" + string(6*k+2) + "]"; }
       }
     }
     else {              // sg[2] ist gerade
       if( sg[2] == sg[3]+1) {                           // E[6k]
-        k = sg[2]/2; cnt++; SG_Typ=SG_Typ + " E[6k]=E[" + string(6*k) + "]"; }
+        k = sg[2] div 2; cnt++; SG_Typ=SG_Typ + " E[6k]=E[" + string(6*k) + "]"; }
       if( sg[2] == sg[3]) {                             // E[6k+1]
-        k=sg[2]/2; cnt++; SG_Typ=SG_Typ+" E[6k+1]=E["+string(6*k+1)+"]"; }
+        k=sg[2] div 2; cnt++; SG_Typ=SG_Typ+" E[6k+1]=E["+string(6*k+1)+"]"; }
     }
   }
 
@@ -2043,7 +2043,7 @@ static proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
 
   debug_log(2, "entering HKclass5_teil_1", sg);
   if(parity(sg[3])) {  // Dritte Stelle soll ungerade sein
-    k = (sg[3]+1)/2;
+    k = (sg[3]+1) div 2;
     if(sg[3] > sg[4]) {
       k--;
       if( (sg[4]==sg[5]) && (sg[3] == sg[4]+1) && k>0 ) { // W[12k+6]
@@ -2065,25 +2065,25 @@ static proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
 
       if( sg[4] == sg[5]) {
         if(parity(sg[4])) {                                  // Z[k,r,0]
-          r = (sg[4] - sg[3])/2;
+          r = (sg[4] - sg[3]) div 2;
           if( r>0 ) { cnt++;
             SG_Typ = SG_Typ + " Z[k,r,0]=Z["+string(k)+","+string(r)+",0]";
           }
         }
         else {                                                // Z[k,12k+6r]
-          r = (sg[4] - 2*k)/2; cnt++;
+          r = (sg[4] - 2*k) div 2; cnt++;
           SG_Typ = SG_Typ+" Z[k,12k+6r]=Z["+string(k)+","+string(12*k+6*r)+"]";
         }
       }
 
       if( parity(sg[4]) ) {  // 4. Stelle ist ungerade
         if(sg[4] == sg[5]+2) {                              // Z[k,12k+6r+1]
-          r = (sg[4]-2*k-1)/2; cnt++;
+          r = (sg[4]-2*k-1) div 2; cnt++;
           SG_Typ=SG_Typ+" Z[k,12k+6r+1]=Z["+string(k)+",";
           SG_Typ=SG_Typ+string(12*k+6*r+1)+"]";
        }
        if( (sg[5]>sg[4]) && (sg[4]>sg[3]) ) {           // Z[k,r,s]
-          r = (sg[4] - sg[3])/2; cnt++;
+          r = (sg[4] - sg[3]) div 2; cnt++;
           s = sg[5] - sg[4];
           SG_Typ = SG_Typ + " Z[k,r,s]=";
           SG_Typ = SG_Typ + "Z["+string(k)+","+string(r)+","+string(s)+"]";
@@ -2091,7 +2091,7 @@ static proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
       }
       else {  // 4. Stelle ist gerade
         if( sg[4] == sg[5]+1) {                             // Z[k,12k+6r-1]
-          r = (sg[4] - 2*k)/2; cnt++;
+          r = (sg[4] - 2*k) div 2; cnt++;
           SG_Typ=SG_Typ+" Z[k,12k+6r-1]=Z["+string(k)+",";
           SG_Typ=SG_Typ+string(12*k+6*r-1)+"]";
         }
@@ -2107,7 +2107,7 @@ static proc HKclass5_teil_1 (intvec sg, string SG_Typ, int cnt)
     }
   }
   else {  // Dritte Stelle soll gerade sein
-    k = sg[3]/2;
+    k = sg[3] div 2;
     // sortiere verschiedene W's
     if(k>0) {
       if( (sg[4]==2*k-1) && (sg[4]==sg[5]) ) {  // W[12k]
@@ -2156,18 +2156,18 @@ static proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
   if(sg[3]==2) {  // Q[...]
     if(parity(sg[4])) { // 4. Stelle ist ungerade.
       if(sg[4]==sg[5]) {                                // Q[6k+4]
-        k=(sg[4]+1)/2; cnt++; SG_Typ=SG_Typ+" Q[6k+4]=Q["+string(6*k+4)+"]";
+        k=(sg[4]+1) div 2; cnt++; SG_Typ=SG_Typ+" Q[6k+4]=Q["+string(6*k+4)+"]";
       }
       if(sg[4]+1==sg[5]) {                      // Q[6k+5]
-        k=sg[5]/2; cnt++; SG_Typ=SG_Typ+" Q[6k+5]=Q["+string(6*k+5)+"]";
+        k=sg[5] div 2; cnt++; SG_Typ=SG_Typ+" Q[6k+5]=Q["+string(6*k+5)+"]";
       }
     }
     else { // 4. Stelle ist gerade.
       if(sg[4]==sg[5]+1) {                      // Q[6k+6]
-        k=sg[4]/2; cnt++; SG_Typ=SG_Typ+" Q[6k+6]=Q["+string(6*k+6)+"]";
+        k=sg[4] div 2; cnt++; SG_Typ=SG_Typ+" Q[6k+6]=Q["+string(6*k+6)+"]";
       }
       if(sg[4]<sg[5]) {                 // Q[k,r]
-        k = (sg[4]+2)/2;
+        k = (sg[4]+2) div 2;
         if(k>=2) {
           r=sg[5]+1-2*k; cnt++;
           SG_Typ=SG_Typ+" Q[k,r]=Q["+string(k)+","+string(r)+"]";
@@ -2177,7 +2177,7 @@ static proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
   }
   else {           // S[...]
     if(parity(sg[3])) {  // 3. Stelle ist ungerade.
-      k = (sg[3]-1)/2;
+      k = (sg[3]-1) div 2;
       if(sg[3]==sg[4]+3 && sg[3]==sg[5]+2) {    // S[12k-1]
         cnt++; SG_Typ = SG_Typ + " S[12k-1]=S["+string(12*k-1)+"]";
       }
@@ -2199,11 +2199,11 @@ static proc HKclass5_teil_2 (intvec sg, string SG_Typ, int cnt)
     }
     else { // 3. Stelle ist gerade.
       if(sg[3]==sg[5]+1 && sg[5]==sg[4]+3) {    // S[12k+4]
-        k = (sg[3]-2)/2; cnt++;
+        k = (sg[3]-2) div 2; cnt++;
         SG_Typ = SG_Typ + " S[12k+4]=S["+string(12*k+4)+"]";
       }
       if(sg[3]==sg[5]+2 && sg[5]==sg[4]+1) {    // S[12k+5]
-        k = (sg[3]-2)/2; cnt++;
+        k = (sg[3]-2) div 2; cnt++;
         SG_Typ = SG_Typ + " S[12k+5]=S["+string(12*k+5)+"]";
       }
     }
@@ -2706,7 +2706,7 @@ static proc DecodeNormalFormString (string S_in)
     if( Typ == "U[") { t = 12; }
     if( t > 1 ) {
       i = k;
-      k = k/t;
+      k = k div t;
       b = i - t*k;
       if( (s1 == "Q[") && (b==0) ) { k=k-1; b=6; }
       if(Typ == "Z[") {
@@ -2744,7 +2744,7 @@ static proc DecodeNormalFormString (string S_in)
       if(k==0 && Typ=="Z[") { s3 = string(1); }
       if(Typ[2] == "#") {
         i = r+1;
-        r = i/2;
+        r = i div 2;
         b = i - 2*r;
         if( b == 1 ) { s4 = "2r"; }
         else { s4 = "2r-1"; }

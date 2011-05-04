@@ -1525,7 +1525,7 @@ EXAMPLE: example tau_es; shows an example.
   {
     for (j=1;j<=ncols(Mult);j++)
     {
-      conditions=conditions+(Mult[i,j]*(Mult[i,j]+1)/2);
+      conditions=conditions+(Mult[i,j]*(Mult[i,j]+1) div 2);
     }
   }
   int freePts=no_freePoints(M[1],B);

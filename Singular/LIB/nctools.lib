@@ -1588,7 +1588,7 @@ EXAMPLE: example isWeyl; shows an example
   int notW = 0;
   int N = nvars(basering);
   if (N mod 2 <> 0) { return(notW); } // odd number of generators
-  int n = N/2;
+  int n = N div 2;
   list L = ringlist(basering);
   if (size(L) < 6) { return(notW); } // basering is commutative
   matrix C = L[5];

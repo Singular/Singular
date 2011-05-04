@@ -3276,7 +3276,7 @@ static proc pivot (ideal I , poly lcmMin, ideal S)
         }
         else
         {
-          median = xiexp[(size(xiexp) + 1) / 2];
+          median = xiexp[(size(xiexp) + 1) div 2];
         }
       }
       p = var(i)^median;
