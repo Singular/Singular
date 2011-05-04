@@ -1010,7 +1010,7 @@ number naGcd(number a, number b, const ring r)
     result->z = napGcd(x->z, y->z); // change from napGcd0
 #else
   {
-    int c=ABS(nGetChar());
+    int c=ABS(n_GetChar());
     if (c==1) c=0;
     setCharacteristic( c );
 

@@ -89,7 +89,7 @@ void p_Content(poly ph, const ring r)
     }
     nDelete(&h);
 #ifdef HAVE_FACTORY
-    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+    if ( (n_GetChar() == 1) || (n_GetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
     {
       singclap_divide_content(ph);
       if(!nGreaterZero(pGetCoeff(ph))) ph = pNeg(ph);
@@ -397,7 +397,7 @@ number pInitContent_a(poly ph)
 //    }
 //    nDelete(&h);
 //#ifdef HAVE_FACTORY
-//    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+//    if ( (n_GetChar() == 1) || (n_GetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
 //    {
 //      pTest(ph);
 //      singclap_divide_content(ph);
@@ -533,7 +533,7 @@ poly p_Cleardenom(poly ph, const ring r)
         pIter(p);
       }
       nDelete(&h);
-      if (nGetChar()==1)
+      if (n_GetChar()==1)
       {
         loop
         {
@@ -638,7 +638,7 @@ void p_Cleardenom_n(poly ph,const ring r,number &c)
         pSetCoeff(p,d);
         pIter(p);
       }
-      if (nGetChar()==1)
+      if (n_GetChar()==1)
       {
         loop
         {
