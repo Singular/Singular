@@ -733,7 +733,7 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure \
 clean:		ftestclean
 		-rm -f $(libfactory) libcfmem.a libsingcf_g.a libsingcf_p.a \
 		  $(ftestexec) gengftables test_install \
-		  factoryconf.h factory.h *.o *.og *.op *.d *.dtmp cf_gmp.h
+		  factoryconf.h factory.h *.o *.og *.op *.d *.dtmp
 
 # remove gftables only if we built them
 mostlyclean:	clean doxyclean
