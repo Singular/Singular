@@ -6,10 +6,9 @@
 
 #include <config.h>
 
-#include "cf_gmp.h"
-
 #include "cf_defs.h"
 #include "variable.h"
+#include "cf_gmp.h"
 
 class InternalCF;
 class CanonicalForm;

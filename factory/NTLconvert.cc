@@ -1,8 +1,6 @@
 /* $Id$ */
 #include <config.h>
 
-#include "cf_gmp.h"
-
 #include "assert.h"
 
 #include "cf_defs.h"
@@ -14,6 +12,8 @@
 #include "fac_multivar.h"
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
+
+#include "cf_gmp.h"
 
 #ifdef HAVE_NTL
 #ifdef HAVE_CSTDIO

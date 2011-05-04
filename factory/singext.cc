@@ -13,6 +13,9 @@
 #include "imm.h"
 #include "cf_factory.h"
 
+#include "cf_gmp.h"
+
+
 void gmp_numerator ( const CanonicalForm & f, mpz_ptr result )
 {
     InternalCF * ff = f.getval();
