@@ -6,9 +6,8 @@
 
 #include <config.h>
 
-#include "cf_gmp.h"
-
 #include "canonicalform.h"
+#include "cf_gmp.h"
 
 // we need this to copy singulars GF(q) table to ours
 extern int nfCharQ;

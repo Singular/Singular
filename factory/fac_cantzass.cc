@@ -3,8 +3,6 @@
 
 #include <config.h>
 
-#include "cf_gmp.h"
-
 #include "assert.h"
 
 #include "cf_defs.h"
@@ -13,6 +11,8 @@
 #include "fac_cantzass.h"
 #include "fac_sqrfree.h"
 #include "gmpext.h"
+
+#include "cf_gmp.h"
 
 int initializeGMP();
 

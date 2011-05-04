@@ -5,12 +5,13 @@
 
 #include "assert.h"
 
+#include "cf_factory.h"
+
 #include "cf_defs.h"
 #include "cf_globals.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
 #include "int_cf.h"
-#include "cf_factory.h"
 #include "cf_algorithm.h"
 #include "imm.h"
 #include "gfops.h"

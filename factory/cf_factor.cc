@@ -1,4 +1,4 @@
-/* emacs edit mode for this file is -*- C++ -*- */
+/* Emacs edit mode for this file is -*- C++ -*- */
 /* $Id$ */
 
 //{{{ docu
@@ -12,8 +12,6 @@
 //}}}
 
 #include <config.h>
-
-#include "cf_gmp.h"
 
 #include "assert.h"
 
@@ -37,6 +35,8 @@
 #ifdef HAVE_NTL
 #include "NTLconvert.h"
 #endif
+
+#include "cf_gmp.h"
 
 int getExp(); /* cf_char.cc */
 

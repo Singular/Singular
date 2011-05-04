@@ -16,13 +16,12 @@
 #endif
 #endif /* NOSTREAMIO */
 
-#include "cf_gmp.h"
-
 #include "assert.h"
 
 #include "canonicalform.h"
 #include "int_cf.h"
 #include "imm.h"
+#include "cf_gmp.h"
 
 class InternalRational : public InternalCF
 {
