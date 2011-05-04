@@ -330,7 +330,7 @@ RETURN:  list L of two polynomials: q=L[1] is an irreducible polynomial of
     g[i] = subst(e, var(n+1), 0);
     e = diff(e, var(n+1));
   }
-  return(RothsteinTrager(g, p, m, d / degf));
+  return(RothsteinTrager(g, p, m, d div degf));
 }
 
 ////////////////////////////////////////////////////////////////////

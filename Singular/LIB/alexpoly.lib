@@ -1061,7 +1061,7 @@ EXAMPLE:     example charexp2generators;   shows an example"
     gener[i]=charexp[i];
     for (j=2;j<=i-1;j++)
     {
-      gener[i]=gener[i]+((GGT[j-1]-GGT[j])/GGT[i-1])*charexp[j];
+      gener[i]=gener[i]+((GGT[j-1]-GGT[j]) div GGT[i-1])*charexp[j];
     }
   }
   return(gener);
@@ -1372,7 +1372,7 @@ EXAMPLE: example charexp2poly;  shows an example
   for(i=2;i<=n;i++)
   {
     s=v[i] mod v[1];//calculate the position.
-    expo=expo-a[i-1]*var(1)^((v[i]-s)/v[1])*gen(s+1);//save in expo -var(1) to the power the corresponding
+    expo=expo-a[i-1]*var(1)^((v[i]-s) div v[1])*gen(s+1);//save in expo -var(1) to the power the corresponding
                                                      //but only in the right positions
   }
   matrix M[v[1]][v[1]];
@@ -1565,7 +1565,7 @@ EXAMPLE: example tau_es2;  shows an example
     tau=tau+tau_i+d_i;
   }
   // The equisingular Tjurina number is then calculated by adding the following term.
-  tau=tau+((multi*(multi+1))/2)-2;
+  tau=tau+((multi*(multi+1)) div 2)-2;
   return(tau);
 }
 example

@@ -786,7 +786,7 @@ example
 
 static proc lsum (int n, list l)
 { if (n>10)
-  { return( lsum(n/2,list(l[1..(n/2)])) + lsum(n-n/2, list(l[(n/2+1)..n])) );
+  { return( lsum(n div 2,list(l[1..(n div 2)])) + lsum(n-n div 2, list(l[(n div 2+1)..n])) );
   }
   else
   { def Summe=l[1];
@@ -877,7 +877,7 @@ EXAMPLE:  example sum; shows an example
 //-------------------------- finally, add objects  ---------------------------
    n = size(id);
    if (n>10)
-   { return( lsum(n/2,list(id[1..(n/2)])) + lsum(n-n/2, list(id[(n/2+1)..n])) );
+   { return( lsum(n div 2,list(id[1..(n div 2)])) + lsum(n-n div 2, list(id[(n div 2+1)..n])) );
    }
    else
    { def Summe=id[1];

@@ -194,7 +194,7 @@ EXAMPLE: example T2_Transform;  shows an example
 {
  //---------------------- compute gcd and extgcd of N,M -----------------------
   int ggt=gcd(M,N);
-  M=M/ggt; N=N/ggt;
+  M=M div ggt; N=N div ggt;
   list ts=extgcd(M,N);
   int tau,sigma=ts[2],-ts[3];
   int s,t;
@@ -208,7 +208,7 @@ EXAMPLE: example T2_Transform;  shows an example
   int R;
   int M1,N1=M,N;
   for ( R=M1%N1; R!=0; ) { M1=N1; N1=R; R=M1%N1;}
-  int Q=M1 / N1;
+  int Q=M1 div N1;
   map T1 = basering,xp,yp+d*xp^Q;
   map Tstar=basering,xp^(N-Q*tau)*yp^tau,xp^(M-sigma*Q)*yp^sigma;
   if (defined(HNDebugOn)) {
@@ -749,7 +749,7 @@ EXAMPLES: example develop;         shows an example
     return(return_error);       // Abbruch der Prozedur!
   }
   R = M%N;
-  Q = M / N;
+  Q = M div N;
 
  //-------------------- Fall Rest der Division R = 0 : ------------------------
   if (R == 0) {
@@ -758,19 +758,19 @@ EXAMPLES: example develop;         shows an example
     e = gcd(M,N);
  //----------------- Test, ob leitf = c*(y^N - delta*x^(m/e))^e ist -----------
     if (p==0) {
-      delt = koeff(f,M/ e,N - N/ e) / (-1*e*c);
+      delt = koeff(f,M div e,N - N div e) / (-1*e*c);
       if (defined(HNDebugOn)) {"quasihomogeneous leading form:",
-         leit(f,N,M)," = ",c,"* (y -",delt,"* x^"+string(M/ e)+")^",e," ?";}
-      if (leit(f,N,M) != c*(y^(N/ e) - delt*x^(M/ e))^e) {
+         leit(f,N,M)," = ",c,"* (y -",delt,"* x^"+string(M div e)+")^",e," ?";}
+      if (leit(f,N,M) != c*(y^(N div e) - delt*x^(M div e))^e) {
         dbprint(printlevel+1," The given polynomial is reducible !");
         Abbruch=1; Ausgabe=1; }
     }
     else {                     // p!=0
       if (e%p != 0) {
-        delt = koeff(f,M/ e,N - N/ e) / (-1*e*c);
+        delt = koeff(f,M div e,N - N div e) / (-1*e*c);
         if (defined(HNDebugOn)) {"quasihomogeneous leading form:",
-           leit(f,N,M)," = ",c,"* (y -",delt,"* x^"+string(M/ e)+")^",e," ?";}
-        if (leit(f,N,M) != c*(y^(N/ e) - delt*x^(M/ e))^e) {
+           leit(f,N,M)," = ",c,"* (y -",delt,"* x^"+string(M div e)+")^",e," ?";}
+        if (leit(f,N,M) != c*(y^(N div e) - delt*x^(M div e))^e) {
            dbprint(printlevel+1," The given polynomial is reducible !");
            Abbruch=1; Ausgabe=1; }
       }
@@ -779,7 +779,7 @@ EXAMPLES: example develop;         shows an example
         eps = e;
         for (l = 0; eps%p == 0; l=l+1) { eps=eps/ p;}
         if (defined(HNDebugOn)) {e," -> ",eps,"*",p,"^",l;}
-        delt = koeff(f,(M/ e)*p^l,(N/ e)*p^l*(eps-1)) / (-1*eps*c);
+        delt = koeff(f,(M div e)*p^l,(N div e)*p^l*(eps-1)) / (-1*eps*c);
 
         if ((ringchar != string(p)) and (delt != 0)) {
  //- coeff. field is not Z/pZ => we`ve to correct delta by taking (p^l)th root-
@@ -799,15 +799,15 @@ EXAMPLES: example develop;         shows an example
         }
 
         if (defined(HNDebugOn)) {"quasihomogeneous leading form:",
-          leit(f,N,M)," = ",c,"* (y^"+string(N/ e),"-",delt,"* x^"
-          +string(M/ e)+")^",e,"  ?";}
-        if (leit(f,N,M) != c*(y^(N/ e) - delt*x^(M/ e))^e) {
+          leit(f,N,M)," = ",c,"* (y^"+string(N div e),"-",delt,"* x^"
+          +string(M div e)+")^",e,"  ?";}
+        if (leit(f,N,M) != c*(y^(N div e) - delt*x^(M div e))^e) {
           dbprint(printlevel+1," The given polynomial is reducible !");
           Abbruch=1; Ausgabe=1; }
       }
     }
     if (Abbruch == 0) {
-      f = T1_Transform(f,delt,M/ e);
+      f = T1_Transform(f,delt,M div e);
       dbprint(printlevel-voice+2,"a("+string(zeile)+","+string(Q)+") = "
               +string(delt));
       a(zeile)[Q]=delt;
@@ -1161,9 +1161,9 @@ EXAMPLE:  example invariants; shows an example
      }
      // Calculate the delta invariant.
      int inters;
-     int del=Ergebnis[size(hne)][5]/2;
+     int del=Ergebnis[size(hne)][5] div 2;
      for(lauf=1;lauf<=size(hne)-1;lauf++) {
-       del=del+Ergebnis[lauf][5]/2;
+       del=del+Ergebnis[lauf][5] div 2;
        for(Lauf=lauf+1;Lauf<=size(hne);Lauf++) {
          inters=inters+intersectionmatrix[lauf,Lauf];
        }
@@ -1215,8 +1215,8 @@ EXAMPLE:  example invariants; shows an example
  int produkt=1;
  for (i=1; i<=genus; i++) {
    ggT=gcd(beta[1],beta[i+1]*produkt);
-   mpuiseux[i]=beta[i+1]*produkt / ggT;
-   npuiseux[i]=beta[1] / ggT;
+   mpuiseux[i]=beta[i+1]*produkt div ggT;
+   npuiseux[i]=beta[1] div ggT;
    produkt=produkt*npuiseux[i];
  }
  //---------------------- Grad des Konduktors ---------------------------------
@@ -1334,7 +1334,7 @@ EXAMPLE: example displayInvariants;  shows an example
     }}
     " Puiseux pairs             :",Ausgabe;
     " degree of the conductor   :",ergebnis[5];
-    " delta invariant           :",ergebnis[5]/2;
+    " delta invariant           :",ergebnis[5] div 2;
     " sequence of multiplicities:",ergebnis[6];
  }}
  //-------------------- Ausgabe aller Zweige ----------------------------------
@@ -1354,7 +1354,7 @@ EXAMPLE: example displayInvariants;  shows an example
     }}
     " Puiseux pairs             :",Ausgabe;
     " degree of the conductor   :",ergebnis[j][5];
-    " delta invariant           :",ergebnis[j][5]/2;
+    " delta invariant           :",ergebnis[j][5] div 2;
     " sequence of multiplicities:",ergebnis[j][6];
     "";
   }
@@ -1492,8 +1492,8 @@ EXAMPLE: example puiseux2generators;  shows an example
  beta[1]=q; // == q_0
  m=1,m; n=1,n; // m[1] ist damit m_0 usw., genau wie beta[1]==beta_0
  for (i=2; i<=size(n); i++) {
-  beta[i]=m[i]*q/n[i] - m[i-1]*q + n[i-1]*beta[i-1];
-  q=q/n[i]; // == q_i
+  beta[i]=m[i]*q div n[i] - m[i-1]*q + n[i-1]*beta[i-1];
+  q=q div n[i]; // == q_i
  }
  return(beta);
 }
@@ -2330,10 +2330,10 @@ EXAMPLE: example charPoly;  shows an example
 "
 {
  poly charp;
- int Np=N/ gcd(M,N);
+ int Np=N div gcd(M,N);
  f=subst(f,var(1),1);
  for(charp=0; f<>0; f=f-lead(f))
-  { charp=charp+leadcoef(f)*var(2)^(leadexp(f)[2]/ Np);}
+  { charp=charp+leadcoef(f)*var(2)^(leadexp(f)[2] div Np);}
  return(charp);
 }
 example
@@ -2371,8 +2371,8 @@ RETURN:  int Q: M=q1*N+r1, N=q2*r1+r2, ..., ri=Q*r(i+1) (Euclidean alg.)
 EXAMPLE: example get_last_divisor; shows an example
 "
 {
- int R=M%N; int Q=M / N;
- while (R!=0) {M=N; N=R; R=M%N; Q=M / N;}
+ int R=M%N; int Q=M div N;
+ while (R!=0) {M=N; N=R; R=M%N; Q=M div N;}
  return(Q)
 }
 example
@@ -2646,14 +2646,14 @@ EXAMPLE: example factorfirst;  shows an example
  if (c == 0) {"Something has gone wrong! I didn't get N correctly!"; exit;}
  int e = gcd(M,N);
 
- if (p==0) { delt = koeff(f,M/ e,N - N/ e) / (-1*e*c); }
+ if (p==0) { delt = koeff(f,M div e,N - N div e) / (-1*e*c); }
  else {
-   if (e%p != 0) { delt = koeff(f,M/ e,N - N/ e) / (-1*e*c); }
+   if (e%p != 0) { delt = koeff(f,M div e,N - N div e) / (-1*e*c); }
    else {
      eps = e;
      for (l = 0; eps%p == 0; l=l+1) { eps=eps/ p;}
      if (defined(HNDebugOn)) {e," -> ",eps,"*",p,"^",l;}
-     delt = koeff(f,(M/ e)*p^l,(N/ e)*p^l*(eps-1)) / (-1*eps*c);
+     delt = koeff(f,(M div e)*p^l,(N div e)*p^l*(eps-1)) / (-1*eps*c);
 
      if ((charstr(basering) != string(p)) and (delt != 0)) {
  //------ coefficient field is not Z/pZ => (p^l)th root is not identity -------
@@ -2666,8 +2666,8 @@ EXAMPLE: example factorfirst;  shows an example
    }
  }
  if (defined(HNDebugOn)) {"quasihomogeneous leading form:",f," = ",c,
-        "* (y^"+string(N/ e),"-",delt,"* x^"+string(M/ e)+")^",e," ?";}
- if (f != c*(var(2)^(N/ e) - delt*var(1)^(M/ e))^e) {return(0);}
+        "* (y^"+string(N div e),"-",delt,"* x^"+string(M div e)+")^",e," ?";}
+ if (f != c*(var(2)^(N div e) - delt*var(1)^(M div e))^e) {return(0);}
  else {return(delt);}
 }
 example
@@ -3332,7 +3332,7 @@ RETURN: list: first entry = list of HNErings,
     M=Newton[zeiger+1][1]-Newton[zeiger][1];
     N=Newton[zeiger][2]-Newton[zeiger+1][2];
     R = M%N;
-    Q = M / N;
+    Q = M div N;
 
     //-------- 1. Versuch: ist der quasihomogene Leitterm reine Potenz ? ------
     //              (dann geht alles wie im irreduziblen Fall)
@@ -3349,7 +3349,7 @@ RETURN: list: first entry = list of HNErings,
       fvorher=fneu;zeilevorher=zeile;
       if (R==0) {
         //-------- transformiere fneu mit T1, wenn kein Abbruch nachher: ------
-        if (N>1) { fneu = T1_Transform(fneu,delt,M/ e); }
+        if (N>1) { fneu = T1_Transform(fneu,delt,M div e); }
         else     { ende=1; }
         if (defined(HNDebugOn)) {"a("+string(zeile)+","+string(Q)+") =",delt;}
         azeilen[zeile+1][Q]=delt;
@@ -3367,7 +3367,7 @@ RETURN: list: first entry = list of HNErings,
          zeile=zeile+1;
          //-------- Bereitstellung von Speicherplatz fuer eine neue Zeile: ----
          azeilen[zeile+1]=ideal(0);
-         M=N; N=R; R=M%N; Q=M / N;
+         M=N; N=R; R=M%N; Q=M div N;
         }
         if (defined(HNDebugOn)) {"a("+string(zeile)+","+string(Q)+") =",delt;}
         azeilen[zeile+1][Q]=delt;
@@ -3459,7 +3459,7 @@ RETURN: list: first entry = list of HNErings,
    M=Newton[i+1][1]-Newton[i][1];
    N=Newton[i][2]-Newton[i+1][2];
    R = M%N;
-   Q = M / N;
+   Q = M div N;
    e=gcd(M,N);
    needext=1;
    letztringname=nameof(basering);
@@ -3700,7 +3700,7 @@ RETURN: list: first entry = list of HNErings,
 
     //------------------------ Fall R==0: -------------------------------------
     if (R==0) {
-      transformiert = T1_Transform(fneu,number(deltais[j]),M/ e);
+      transformiert = T1_Transform(fneu,number(deltais[j]),M div e);
       if (defined(HNDebugOn)) {
         "a("+string(zeile)+","+string(Q)+") =",deltais[j];
         "transformed polynomial: ",transformiert;
@@ -3746,7 +3746,7 @@ RETURN: list: first entry = list of HNErings,
        //----------------------------------------------------------------------
 
        //----- vollziehe Euklid.Alg. nach, um die HN-Matrix zu berechnen: -----
-       M1=M;N1=N;R1=R;Q1=M1/ N1;
+       M1=M;N1=N;R1=R;Q1=M1 div N1;
        while (R1!=0) {
         if (defined(HNDebugOn)) { "h("+string(zeile+zl-2)+") =",Q1; }
         HNEakut[1][zeile+zl-1]=Q1;
@@ -3756,7 +3756,7 @@ RETURN: list: first entry = list of HNErings,
         //----- Bereitstellung von Speicherplatz fuer eine neue Zeile: --------
         HNEakut[zeile+zl]=ideal(0);
 
-        M1=N1; N1=R1; R1=M1%N1; Q1=M1 / N1;
+        M1=N1; N1=R1; R1=M1%N1; Q1=M1 div N1;
        }
        if (defined(HNDebugOn)) {
          "a("+string(zeile+zl-2)+","+string(Q1)+") =",delt;
@@ -3868,7 +3868,7 @@ RETURN: list: first entry = list of HNErings,
        //------ Zur Bedeutung von zeile, zl: siehe Kommentar weiter oben ------
 
        //----- vollziehe Euklid.Alg. nach, um die HN-Matrix zu berechnen: -----
-       M1=M;N1=N;R1=R;Q1=M1/ N1;
+       M1=M;N1=N;R1=R;Q1=M1 div N1;
        while (R1!=0) {
         if (defined(HNDebugOn)) { "h("+string(zeile+zl-2)+") =",Q1; }
         HNEakut[1][zeile+zl-1]=Q1;
@@ -3876,7 +3876,7 @@ RETURN: list: first entry = list of HNErings,
         zl=zl+1;
         //----- Bereitstellung von Speicherplatz fuer eine neue Zeile: --------
         HNEakut[zeile+zl]=ideal(0);
-        M1=N1; N1=R1; R1=M1%N1; Q1=M1 / N1;
+        M1=N1; N1=R1; R1=M1%N1; Q1=M1 div N1;
        }
        if (defined(HNDebugOn)) {
          "a("+string(zeile+zl-2)+","+string(Q1)+") =",delt;
@@ -4267,7 +4267,7 @@ EXAMPLE: example delta;  shows an example
   }
   if (typeof(#[1])=="matrix")
   { // INPUT = hne of an irreducible curve
-    return(invariants(#)[5]/2);
+    return(invariants(#)[5] div 2);
   }
   else
   { // INPUT = hne of a reducible curve

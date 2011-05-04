@@ -10,7 +10,7 @@ proc fak
 }
 proc binom
 {
-  return (fak(#[1]) / (fak(#[1]-#[2]) * fak(#[2])));
+  return (fak(#[1]) div (fak(#[1]-#[2]) * fak(#[2])));
 }
 "nesting too deep for fak(30)!!!!";fak(30);
 int i;

@@ -545,7 +545,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
   list keepresult,act,keepprime;
   poly @f;
   int sl=size(l);
-  for(i=1;i<=sl/2;i++)
+  for(i=1;i<=sl div 2;i++)
   {
     if(sact[2][i]>1)
     {
@@ -557,7 +557,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
     }
   }
   i=0;
-  while(i<size(l)/2)
+  while(i<size(l) div 2)
   {
     i++;
     if((size(ser)>0)&&(size(reduce(ser,l[2*i-1],1))==0))
@@ -576,7 +576,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
       }
       j=0;
 /*
-      if(i<=sl/2)
+      if(i<=sl div 2)
       {
         j=1;
       }
@@ -605,7 +605,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
         {
           for(k=2;k<=r;k++)
           {
-            keepprime[size(l)/2+k-1]=interred(keepprime[i]+ideal(act[1][k]));
+            keepprime[size(l) div 2+k-1]=interred(keepprime[i]+ideal(act[1][k]));
           }
           keepprime[i]=interred(keepprime[i]+ideal(act[1][1]));
           for(k=1;k<=r;k++)
@@ -632,7 +632,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
           for(k=2;k<=r;k++)
           {
             l[s+2*k-1]=keepresult[k];
-            keepprime[s/2+k]=interred(keepresult[k]+ideal(act[1][k]));
+            keepprime[s div 2+k]=interred(keepresult[k]+ideal(act[1][k]));
             if(vdim(keepresult[k])==deg(act[1][k]))
             {
               l[s+2*k]=keepresult[k];
@@ -641,7 +641,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
             {
               l[s+2*k]=ideal(0);
             }
-            if((homog(keepresult[k])==1)||(homog(keepprime[s/2+k])==1))
+            if((homog(keepresult[k])==1)||(homog(keepprime[s div 2+k])==1))
             {
               l[s+2*k]=maxideal(1);
             }
@@ -665,8 +665,8 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
             {
               l[s+2]=ideal(0);
             }
-            keepprime[s/2+1]=interred(keepprime[i]+ideal(@f));
-            if(homog(keepprime[s/2+1])==1)
+            keepprime[s div 2+1]=interred(keepprime[i]+ideal(@f));
+            if(homog(keepprime[s div 2+1])==1)
             {
               l[s+2]=maxideal(1);
             }
@@ -688,7 +688,7 @@ static proc splitPrimary(list l,ideal ser,int @wr,list sact)
   {
     return(l);
   }
-  for(i=1;i<=size(l)/2;i++)
+  for(i=1;i<=size(l) div 2;i++)
   {
     attrib(l[2*i-1],"isSB",1);
 
@@ -741,7 +741,7 @@ static proc splitCharp(list l)
   poly ni;
   string minp,gnir,va;
   list sa,keep,rp,keep1;
-  for(i=1;i<=size(l)/2;i++)
+  for(i=1;i<=size(l) div 2;i++)
   {
     if(size(l[2*i])==0)
     {
@@ -751,7 +751,7 @@ static proc splitCharp(list l)
       }
     }
   }
-  for(i=1;i<=size(l)/2;i++)
+  for(i=1;i<=size(l) div 2;i++)
   {
     if(size(l[2*i])==0)
     {
@@ -1002,7 +1002,7 @@ EXAMPLE: example zero_decomp; shows an example
   //the prime decomposition of Yokoyama in characteristic p
     list ke,ek;
     @k=0;
-    while(@k<size(primary)/2)
+    while(@k<size(primary) div 2)
     {
       @k++;
       if(size(primary[2*@k])==0)
@@ -1038,7 +1038,7 @@ EXAMPLE: example zero_decomp; shows an example
     randp=randp+var(nvars(basering));
   }
   @k=0;
-  while(@k<(size(primary)/2))
+  while(@k<(size(primary) div 2))
   {
     @k++;
     if (size(primary[2*@k])==0)
@@ -1056,7 +1056,7 @@ EXAMPLE: example zero_decomp; shows an example
 
   @k=0;
   ideal keep;
-  while(@k<(size(primary)/2))
+  while(@k<(size(primary) div 2))
   {
     @k++;
     if (size(primary[2*@k])==0)
@@ -1172,7 +1172,7 @@ EXAMPLE: example zero_decomp; shows an example
       }
       else
       {
-        for(@n=1;@n<=size(lres0)/2;@n++)
+        for(@n=1;@n<=size(lres0) div 2;@n++)
         {
           if(specialIdealsEqual(lres0[2*@n-1],lres0[2*@n])==1)
           {
@@ -1214,7 +1214,7 @@ EXAMPLE: example zero_decomp; shows an example
 //       }
 //       else
 //       {
-//          for(@n=1;@n<=size(@lr)/2;@n++)
+//          for(@n=1;@n<=size(@lr) div 2;@n++)
 //          {
 //             if(specialIdealsEqual(@lr[2*@n-1],@lr[2*@n])==1)
 //             {
@@ -1248,7 +1248,7 @@ EXAMPLE: example zero_decomp; shows an example
 //       }
 //       else
 //       {
-//          for(@n=1;@n<=size(@lr)/2;@n++)
+//          for(@n=1;@n<=size(@lr) div 2;@n++)
 //          {
 //             if(specialIdealsEqual(@lr[2*@n-1],@lr[2*@n])==1)
 //             {
@@ -1278,8 +1278,8 @@ EXAMPLE: example zero_decomp; shows an example
 //
 //       primary[2*@k-1]=lres0[1];
 //       primary[2*@k]=lres0[2];
-//       @s=size(primary)/2;
-//       for(@n=1;@n<=size(lres0)/2-1;@n++)
+//       @s=size(primary) div 2;
+//       for(@n=1;@n<=size(lres0) div 2-1;@n++)
 //       {
 //         primary[2*@s+2*@n-1]=lres0[2*@n+1];
 //         primary[2*@s+2*@n]=lres0[2*@n+2];
@@ -1361,11 +1361,11 @@ proc extF(list l,list #)
   }
   i=0;
   int j;
-  while(i<size(L)/2-1)
+  while(i<size(L) div 2-1)
   {
     i++;
     j=i;
-    while(j<size(L)/2)
+    while(j<size(L) div 2)
     {
       j++;
       if(idealsEqual(L[2*i-1],L[2*j-1]))
@@ -1543,7 +1543,7 @@ proc insepDecomp(ideal i)
     qr=decomp(wo[1],2);
 
     option(redSB);
-    for(k=1;k<=size(qr)/2;k++)
+    for(k=1;k<=size(qr) div 2;k++)
     {
       K=qr[2*k];
       K=phi(K);
@@ -1875,7 +1875,7 @@ static proc cleanPrimary(list l)
 {
    int i,j;
    list lh;
-   for(i=1;i<=size(l)/2;i++)
+   for(i=1;i<=size(l) div 2;i++)
    {
       if(deg(l[2*i-1][1])>0)
       {
@@ -2155,7 +2155,7 @@ EXAMPLE: example minAssPrimes; shows an example
         {
           qr = minAssSL(pr[k]);
         }
-        for(j = 1; j <= size(qr) / 2; j++)
+        for(j = 1; j <= size(qr) div 2; j++)
         {
           re[size(re) + 1] = std(qr[2 * j]);
         }
@@ -2226,7 +2226,7 @@ EXAMPLE: example minAssPrimes; shows an example
       re[j] = minAssSL(q[j]);
     }
     // Debug
-    dbprint(printlevel - voice, "Number of components obtained for this component:", size(re[j]) / 2);
+    dbprint(printlevel - voice, "Number of components obtained for this component:", size(re[j]) div 2);
     dbprint(printlevel - voice, "re[j]:", re[j]);
   }
   re = union(re);
@@ -2258,7 +2258,7 @@ static proc union(list li)
 
   for(k=1;k<=size(l);k++)
   {
-     for(j=1;j<=size(l[k])/2;j++)
+     for(j=1;j<=size(l[k]) div 2;j++)
      {
         if(deg(l[k][2*j][1])!=0)
         {
@@ -2684,8 +2684,8 @@ static proc prepare_absprimdec(list primary)
 {
   list resu,tempo;
   string absotto;
-  resu[size(primary)/2]=list();
-  for(int ab=1;ab<=size(primary)/2;ab++)
+  resu[size(primary) div 2]=list();
+  for(int ab=1;ab<=size(primary) div 2;ab++)
   {
     absotto= absFactorize(primary[2*ab][1],77);
     tempo=primary[2*ab-1],primary[2*ab],absotto,string(var(nvars(basering)));
@@ -2972,7 +2972,7 @@ EXAMPLE: example decomp; shows an example
       map sigma,invsigma;
       ideal II,jmap;
       nn=nvars(basering);
-      for(ab=1;ab<=size(primary)/2;ab++)
+      for(ab=1;ab<=size(primary) div 2;ab++)
       {
         II=primary[2*ab];
         attrib(II,"isSB",1);
@@ -3192,7 +3192,7 @@ EXAMPLE: example decomp; shows an example
         map sigma;
         nn=nvars(basering);
         map invsigma=basering,maxideal(1);
-        for(ab=1;ab<=size(uprimary)/2;ab++)
+        for(ab=1;ab<=size(uprimary) div 2;ab++)
         {
           II=uprimary[2*ab];
           attrib(II,"isSB",1);
@@ -3254,7 +3254,7 @@ EXAMPLE: example decomp; shows an example
     @n2=size(quprimary);
     @n3=@n2;
 
-    for(@n1=1;@n1<=size(collectprimary)/2;@n1++)
+    for(@n1=1;@n1<=size(collectprimary) div 2;@n1++)
     {
       if(deg(collectprimary[2*@n1][1])>0)
       {
@@ -3266,14 +3266,14 @@ EXAMPLE: example decomp; shows an example
         quprimary[@n2]=collectprimary[2*@n1];
         if(abspri)
         {
-          absprimary[@n2/2]=absprimarytmp[@n1];
-          abskeep[@n2/2]=abskeeptmp[@n1];
+          absprimary[@n2 div 2]=absprimarytmp[@n1];
+          abskeep[@n2 div 2]=abskeeptmp[@n1];
         }
       }
     }
     //here the intersection with the polynomialring
     //mentioned above is really computed
-    for(@n=@n3/2+1;@n<=@n2/2;@n++)
+    for(@n=@n3 div 2+1;@n<=@n2 div 2;@n++)
     {
       if(specialIdealsEqual(quprimary[2*@n-1],quprimary[2*@n]))
       {
@@ -3371,7 +3371,7 @@ EXAMPLE: example decomp; shows an example
       {
         ideal htest=hquprimary[2];
 
-        for (@n1=2;@n1<=size(hquprimary)/2;@n1++)
+        for (@n1=2;@n1<=size(hquprimary) div 2;@n1++)
         {
           htest=intersect(htest,hquprimary[2*@n1]);
         }
@@ -3489,7 +3489,7 @@ EXAMPLE: example decomp; shows an example
           map sigma;
           nn=nvars(basering);
           map invsigma=basering,maxideal(1);
-          for(ab=1;ab<=size(uprimary)/2;ab++)
+          for(ab=1;ab<=size(uprimary) div 2;ab++)
           {
             II=uprimary[2*ab];
             attrib(II,"isSB",1);
@@ -3543,7 +3543,7 @@ EXAMPLE: example decomp; shows an example
         @n2=size(quprimary);
         @n3=@n2;
 
-        for(@n1=1;@n1<=size(collectprimary)/2;@n1++)
+        for(@n1=1;@n1<=size(collectprimary) div 2;@n1++)
         {
           if(deg(collectprimary[2*@n1][1])>0)
           {
@@ -3555,8 +3555,8 @@ EXAMPLE: example decomp; shows an example
             quprimary[@n2]=collectprimary[2*@n1];
             if(abspri)
             {
-              absprimary[@n2/2]=absprimarytmp[@n1];
-              abskeep[@n2/2]=abskeeptmp[@n1];
+              absprimary[@n2 div 2]=absprimarytmp[@n1];
+              abskeep[@n2 div 2]=abskeeptmp[@n1];
             }
           }
         }
@@ -3565,7 +3565,7 @@ EXAMPLE: example decomp; shows an example
         //here the intersection with the polynomialring
         //mentioned above is really computed
 
-        for(@n=@n3/2+1;@n<=@n2/2;@n++)
+        for(@n=@n3 div 2+1;@n<=@n2 div 2;@n++)
         {
           if(specialIdealsEqual(quprimary[2*@n-1],quprimary[2*@n]))
           {
@@ -3586,7 +3586,7 @@ EXAMPLE: example decomp; shows an example
           setring @Phelp;
           ser=imap(gnir,ser);
           hquprimary=imap(gnir,quprimary);
-          for(@n=@n3/2+1;@n<=@n2/2;@n++)
+          for(@n=@n3 div 2+1;@n<=@n2 div 2;@n++)
           {
             if(@wr==0)
             {
@@ -3607,7 +3607,7 @@ EXAMPLE: example decomp; shows an example
       if(abspri)
       {
         list resu,tempo;
-        for(ab=1;ab<=size(quprimary)/2;ab++)
+        for(ab=1;ab<=size(quprimary) div 2;ab++)
         {
           if (deg(quprimary[2*ab][1])!=0)
           {
@@ -3644,7 +3644,7 @@ EXAMPLE: example decomp; shows an example
     if(abspri)
     {
       list resu,tempo;
-      for(ab=1;ab<=size(quprimary)/2;ab++)
+      for(ab=1;ab<=size(quprimary) div 2;ab++)
       {
         tempo=quprimary[2*ab-1],quprimary[2*ab],
                    absprimary[ab],abskeep[ab];
@@ -4003,14 +4003,14 @@ static proc AnnExt_R(int n,list re)
 static proc analyze(list pr)
 {
    int ii,jj;
-   for(ii=1;ii<=size(pr)/2;ii++)
+   for(ii=1;ii<=size(pr) div 2;ii++)
    {
       dim(std(pr[2*ii]));
       idealsEqual(pr[2*ii-1],pr[2*ii]);
       "===========================";
    }
 
-   for(ii=size(pr)/2;ii>1;ii--)
+   for(ii=size(pr) div 2;ii>1;ii--)
    {
       for(jj=1;jj<ii;jj++)
       {
@@ -5077,7 +5077,7 @@ static proc convList(list l)
 {
    int i;
    list re,he;
-   for(i=1;i<=size(l)/2;i++)
+   for(i=1;i<=size(l) div 2;i++)
    {
       he=l[2*i-1],l[2*i];
       re[i]=he;
@@ -6498,7 +6498,7 @@ EXAMPLE: example testPrimary; shows an example
    int i;
    pr=reconvList(pr);
    ideal j=pr[1];
-   for (i=2;i<=size(pr)/2;i++)
+   for (i=2;i<=size(pr) div 2;i++)
    {
        j=intersect(j,pr[2*i-1]);
    }
@@ -6969,7 +6969,7 @@ EXAMPLE: example newDecompStep; shows an example
     {
       list resu,tempo;
       string absotto;
-      for(ab=1;ab<=size(primary)/2;ab++)
+      for(ab=1;ab<=size(primary) div 2;ab++)
       {
         absotto= absFactorize(primary[2*ab][1],77);
         tempo=primary[2*ab-1],primary[2*ab],absotto,string(var(nvars(basering)));
@@ -7013,7 +7013,7 @@ EXAMPLE: example newDecompStep; shows an example
     {
       list resu,tempo;
       string absotto;
-      for(ab=1;ab<=size(primary)/2;ab++)
+      for(ab=1;ab<=size(primary) div 2;ab++)
       {
         absotto= absFactorize(primary[2*ab][1],77);
         tempo=primary[2*ab-1],primary[2*ab],absotto,string(var(nvars(basering)));
@@ -7207,7 +7207,7 @@ EXAMPLE: example newDecompStep; shows an example
            ideal htest=@Ptest;
 /*
            ideal htest=hquprimary[1];
-           for (@n1=2;@n1<=size(hquprimary)/2;@n1++)
+           for (@n1=2;@n1<=size(hquprimary) div 2;@n1++)
            {
               htest=intersect(htest,hquprimary[2*@n1-1]);
            }
@@ -7218,7 +7218,7 @@ EXAMPLE: example newDecompStep; shows an example
         {
            ideal htest=hquprimary[2];
 
-           for (@n1=2;@n1<=size(hquprimary)/2;@n1++)
+           for (@n1=2;@n1<=size(hquprimary) div 2;@n1++)
            {
               htest=intersect(htest,hquprimary[2*@n1]);
            }
@@ -7336,7 +7336,7 @@ EXAMPLE: example newDecompStep; shows an example
               map sigma;
               nn=nvars(basering);
               map invsigma=basering,maxideal(1);
-              for(ab=1;ab<=size(uprimary)/2;ab++)
+              for(ab=1;ab<=size(uprimary) div 2;ab++)
               {
                  II=uprimary[2*ab];
                  attrib(II,"isSB",1);
@@ -7395,7 +7395,7 @@ EXAMPLE: example newDecompStep; shows an example
 
            @n3=@n2;
 
-           for(@n1=1;@n1<=size(collectprimary)/2;@n1++)
+           for(@n1=1;@n1<=size(collectprimary) div 2;@n1++)
            {
               if(deg(collectprimary[2*@n1][1])>0)
               {
@@ -7407,8 +7407,8 @@ EXAMPLE: example newDecompStep; shows an example
                  quprimary[@n2]=collectprimary[2*@n1];
                  if(abspri)
                  {
-                   absprimary[@n2/2]=absprimarytmp[@n1];
-                   abskeep[@n2/2]=abskeeptmp[@n1];
+                   absprimary[@n2 div 2]=absprimarytmp[@n1];
+                   abskeep[@n2 div 2]=abskeeptmp[@n1];
                  }
               }
            }
@@ -7417,7 +7417,7 @@ EXAMPLE: example newDecompStep; shows an example
            //here the intersection with the polynomialring
            //mentioned above is really computed
 
-           for(@n=@n3/2+1;@n<=@n2/2;@n++)
+           for(@n=@n3 div 2+1;@n<=@n2 div 2;@n++)
            {
               if(specialIdealsEqual(quprimary[2*@n-1],quprimary[2*@n]))
               {
@@ -7438,7 +7438,7 @@ EXAMPLE: example newDecompStep; shows an example
               setring @Phelp;
               ser=imap(gnir,ser);
               hquprimary=imap(gnir,quprimary);
-              for(@n=@n3/2+1;@n<=@n2/2;@n++)
+              for(@n=@n3 div 2+1;@n<=@n2 div 2;@n++)
               {
                 if(@wr==0)
                 {
@@ -7459,7 +7459,7 @@ EXAMPLE: example newDecompStep; shows an example
         if(abspri)
         {
           list resu,tempo;
-          for(ab=1;ab<=size(quprimary)/2;ab++)
+          for(ab=1;ab<=size(quprimary) div 2;ab++)
           {
              if (deg(quprimary[2*ab][1])!=0)
              {
@@ -7501,7 +7501,7 @@ EXAMPLE: example newDecompStep; shows an example
       if(abspri)
       {
         list resu,tempo;
-        for(ab=1;ab<=size(quprimary)/2;ab++)
+        for(ab=1;ab<=size(quprimary) div 2;ab++)
         {
            tempo=quprimary[2*ab-1],quprimary[2*ab],
                    absprimary[ab],abskeep[ab];
@@ -7697,7 +7697,7 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
        map sigma;
        nn=nvars(basering);
        map invsigma=basering,maxideal(1);
-       for(ab=1;ab<=size(uprimary)/2;ab++)
+       for(ab=1;ab<=size(uprimary) div 2;ab++)
        {
          II=uprimary[2*ab];
          attrib(II,"isSB",1);
@@ -7759,7 +7759,7 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
    @n2=size(quprimary);
    @n3=@n2;
 
-   for(@n1=1;@n1<=size(collectprimary)/2;@n1++)
+   for(@n1=1;@n1<=size(collectprimary) div 2;@n1++)
    {
      if(deg(collectprimary[2*@n1][1])>0)
      {
@@ -7771,15 +7771,15 @@ static proc newReduction(ideal @j, ideal ser, intvec @hilb, intvec @w, int jdim,
        quprimary[@n2]=collectprimary[2*@n1];
        if(abspri)
        {
-         absprimary[@n2/2]=absprimarytmp[@n1];
-         abskeep[@n2/2]=abskeeptmp[@n1];
+         absprimary[@n2 div 2]=absprimarytmp[@n1];
+         abskeep[@n2 div 2]=abskeeptmp[@n1];
        }
      }
    }
 
    //here the intersection with the polynomialring
    //mentioned above is really computed
-   for(@n=@n3/2+1;@n<=@n2/2;@n++)
+   for(@n=@n3 div 2+1;@n<=@n2 div 2;@n++)
    {
      if(specialIdealsEqual(quprimary[2*@n-1],quprimary[2*@n]))
      {
@@ -7910,7 +7910,7 @@ static proc minAssSLIteration(ideal I, ideal P);
 
   primaryDec = newDecompStep(J, "oneIndep", "intersect", 2);
   // Debug
-  dbprint(printlevel - voice, "// Proc decomp has found", size(primaryDec) / 2, "new primary components.");
+  dbprint(printlevel - voice, "// Proc decomp has found", size(primaryDec) div 2, "new primary components.");
 
   return(primaryDec);
 }
@@ -8203,7 +8203,7 @@ EXAMPLE: example newZero_decomp; shows an example
   //the prime decomposition of Yokoyama in characteristic p
     list ke,ek;
     @k=0;
-    while(@k<size(primary)/2)
+    while(@k<size(primary) div 2)
     {
       @k++;
       if(size(primary[2*@k])==0)
@@ -8239,7 +8239,7 @@ EXAMPLE: example newZero_decomp; shows an example
     randp=randp+var(nvars(basering));
   }
   @k=0;
-  while(@k<(size(primary)/2))
+  while(@k<(size(primary) div 2))
   {
     @k++;
     if (size(primary[2*@k])==0)
@@ -8257,7 +8257,7 @@ EXAMPLE: example newZero_decomp; shows an example
 
   @k=0;
   ideal keep;
-  while(@k<(size(primary)/2))
+  while(@k<(size(primary) div 2))
   {
     @k++;
     if (size(primary[2*@k])==0)
@@ -8374,7 +8374,7 @@ EXAMPLE: example newZero_decomp; shows an example
       }
       else
       {
-        for(@n=1;@n<=size(lres0)/2;@n++)
+        for(@n=1;@n<=size(lres0) div 2;@n++)
         {
           if(specialIdealsEqual(lres0[2*@n-1],lres0[2*@n])==1)
           {
@@ -8416,7 +8416,7 @@ EXAMPLE: example newZero_decomp; shows an example
 //       }
 //       else
 //       {
-//          for(@n=1;@n<=size(@lr)/2;@n++)
+//          for(@n=1;@n<=size(@lr) div 2;@n++)
 //          {
 //             if(specialIdealsEqual(@lr[2*@n-1],@lr[2*@n])==1)
 //             {
@@ -8451,7 +8451,7 @@ EXAMPLE: example newZero_decomp; shows an example
 //       }
 //       else
 //       {
-//          for(@n=1;@n<=size(@lr)/2;@n++)
+//          for(@n=1;@n<=size(@lr) div 2;@n++)
 //          {
 //             if(specialIdealsEqual(@lr[2*@n-1],@lr[2*@n])==1)
 //             {
@@ -8481,8 +8481,8 @@ EXAMPLE: example newZero_decomp; shows an example
 //
 //       primary[2*@k-1]=lres0[1];
 //       primary[2*@k]=lres0[2];
-//       @s=size(primary)/2;
-//       for(@n=1;@n<=size(lres0)/2-1;@n++)
+//       @s=size(primary) div 2;
+//       for(@n=1;@n<=size(lres0) div 2-1;@n++)
 //       {
 //         primary[2*@s+2*@n-1]=lres0[2*@n+1];
 //         primary[2*@s+2*@n]=lres0[2*@n+2];

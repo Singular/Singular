@@ -1,7 +1,7 @@
   LIB "matrix.lib"; LIB "sing.lib";
   int n = 4;
   int m = 3;
-  int N = n*(n+1)/2;           // will become number of variables
+  int N = n*(n+1) div 2;       // will become number of variables
   ring R = 32003,x(1..N),dp;
   matrix X = symmat(n);        // proc from matrix.lib
                                // creates the symmetric generic nxn matrix

@@ -79,7 +79,7 @@ LIB "matrix.lib";LIB "homolog.lib";
 
 int n=5;             
 int m=3;
-int N=n*(n+1)/2;       //Anz. der Variablen
+int N=n*(n+1) div 2;       //Anz. der Variablen
 ring R=32003,x(1..N),dp;
 matrix X=symmat(n);    //aus matrix.lib
 ideal J=minor(X,m+1);

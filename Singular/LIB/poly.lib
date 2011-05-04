@@ -438,11 +438,11 @@ EXAMPLE: example maxdeg; shows examples
       int i = d;
       while ( c-jet(c,i) != 0 ) { i = 2*(i+1); }
       int o = i-1;
-      int u = (d != i)*((i /  2)-1);
+      int u = (d != i)*((i div  2)-1);
    //----------------------- "quick search" for maxdeg ------------------------
       while ( (c-jet(c,i)==0)*(c-jet(c,i-1)!=0) == 0)
       {
-         i = (o+1+u) /  2;
+         i = (o+1+u) div  2;
          if (c-jet(c,i)!=0) { u = i+1; }
          else { o = i-1; }
       }
@@ -494,7 +494,7 @@ EXAMPLE: example maxdeg1; shows examples
       {
          i = -d;
          while ( c == jet(c,i,v) ) { i = 2*(i-1); }
-         int o = (d != -i)*((i /  2)+2) - 1;
+         int o = (d != -i)*((i div  2)+2) - 1;
          int u = i+1;
          int e = -1;
       }
@@ -502,13 +502,13 @@ EXAMPLE: example maxdeg1; shows examples
       {
          while ( c != jet(c,i,v) ) { i = 2*(i+1); }
          int o = i-1;
-         int u = (d != i)*((i /  2)-1);
+         int u = (d != i)*((i div  2)-1);
          int e = 1;
       }
    //----------------------- "quick search" for maxdeg ------------------------
       while ( ( c==jet(c,i,v) )*( c!=jet(c,i-1,v) ) == 0 )
       {
-         i = (o+e+u) /  2;
+         i = (o+e+u) div  2;
          if ( c!=jet(c,i,v) ) { u = i+1; }
          else { o = i-1; }
       }
@@ -572,11 +572,11 @@ EXAMPLE: example mindeg; shows examples
       int i = d;
       while ( jet(c,i) == 0 ) { i = 2*(i+1); }
       int o = i-1;
-      int u = (d != i)*((i /  2)-1);
+      int u = (d != i)*((i div  2)-1);
    //----------------------- "quick search" for mindeg ------------------------
       while ( (jet(c,u)==0)*(jet(c,o)!=0) )
       {
-         i = (o+u) / 2;
+         i = (o+u) div 2;
          if (jet(c,i)==0) { u = i+1; }
          else { o = i-1; }
       }
@@ -629,7 +629,7 @@ EXAMPLE: example mindeg1; shows examples
       {
          i = -d;
          while ( jet(c,i,v) != 0 ) { i = 2*(i-1); }
-         int o = (d != -i)*((i /  2)+2) - 1;
+         int o = (d != -i)*((i div  2)+2) - 1;
          int u = i+1;
          int e = -1; i=u;
       }
@@ -637,13 +637,13 @@ EXAMPLE: example mindeg1; shows examples
       {
          while ( jet(c,i,v) == 0 ) { i = 2*(i+1); }
          int o = i-1;
-         int u = (d != i)*((i /  2)-1);
+         int u = (d != i)*((i div  2)-1);
          int e = 1; i=u;
       }
    //----------------------- "quick search" for mindeg ------------------------
       while ( (jet(c,i-1,v)==0)*(jet(c,i,v)!=0) == 0 )
       {
-         i = (o+e+u) /  2;
+         i = (o+e+u) div  2;
          if (jet(c,i,v)==0) { u = i+1; }
          else { o = i-1; }
       }

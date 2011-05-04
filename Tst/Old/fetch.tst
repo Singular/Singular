@@ -8,7 +8,7 @@ proc generate_polys_str(int n)
   string polystr = "poly p = ";
   int i;
 
-  for (i=1; i<=n; i = i + (i / 10) + 1)
+  for (i=1; i<=n; i = i + (i div 10) + 1)
   {
     polystr = polystr + "x(" + string(i) + ") + ";
   }
@@ -74,7 +74,7 @@ proc extend_orderings(list olist, int j)
   // add product orderings
   if (j > 1)
   {
-    c1 = j / 2;
+    c1 = j div 2;
     if (c1 + c1 == j)
     {
       c2 = c1;
@@ -92,7 +92,6 @@ proc extend_orderings(list olist, int j)
   nl = nl + list("M(m)");
   
   return (nl);
-
 }
     
 proc check_fetch(int n, list olist)
@@ -101,7 +100,7 @@ proc check_fetch(int n, list olist)
   int j;
   list e_olist;
   
-  for (j=1; j<=n; j = j + (j / 10) + 1)
+  for (j=1; j<=n; j = j + (j div 10) + 1)
   {
     e_olist = extend_orderings(olist, j);
     execute(generate_ring_str(j, "r", e_olist[1]));
@@ -127,6 +126,3 @@ proc check_fetch(int n, list olist)
 check_fetch(15, orderings);
 
 LIB "tst.lib";tst_status(1);$
-  
-  
-

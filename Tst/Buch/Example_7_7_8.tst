@@ -39,7 +39,7 @@ proc binom (int n, int k)
    }
    for (l=1; l<=k; l++ )
    {
-      r=r*(n+1-l)/l;
+      r=r*(n+1-l) div l;
    }
    return(r);
 }

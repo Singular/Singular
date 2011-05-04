@@ -182,7 +182,7 @@ static proc combinekfinlf(list g, int nof, intvec limits) //nof stands for "numb
       }//iterating over the different solutions of the smaller problem
     }//shifting the window of combinable factors to the left
   }//computing the possibilities that have at least one original factor from g
-  for (i = 2; i<=nofgl/nof;i++)
+  for (i = 2; i<=nofgl div nof;i++)
   {//getting the other possible results
     result = result + combinekfinlf(list(product(list(g[1..i])))+list(g[(i+1)..nofgl]),nof,limits);
   }//getting the other possible results
