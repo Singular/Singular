@@ -20,6 +20,9 @@ AC_MSG_RESULT($SUPPORTS_DYNAMIC_MODULES)
 
 AC_DEFUN([SING_CHECK_P_PROCS],
 [
+USEPPROCSDYNAMICLDFLAGS=""
+USEPPROCSDYNAMICLD=""    
+
 AC_ARG_ENABLE(p-procs-static,
 [  --enable-p-procs-static Enable statically compiled p_Procs-modules
 ],
@@ -47,12 +50,21 @@ if test x$ENABLE_P_PROCS_DYNAMIC = xyes; then
   if test $SUPPORTS_DYNAMIC_MODULES = no; then
     AC_MSG_ERROR([--enable-pprocs-dynamic requested but your system appears not to support dynamic modules properly])
   fi
+
+  AC_CHECK_FUNC(dlopen,,[AC_CHECK_LIB(dl,dlopen,USEPPROCSDYNAMICLD="-ldl", [
+   AC_MSG_WARN(Could not use dlopen)
+  ]) ])  
+  
 elif test x$NO_P_PROCS_DYNAMIC_GIVEN = xyes -a x$NO_P_PROCS_STATIC_GIVEN = xyes; then
   SING_SYSTEM_SUPPORTS_DYNAMIC_MODULES
   if test $SUPPORTS_DYNAMIC_MODULES = yes; then
     AC_MSG_NOTICE([Enabling dynamic modules and disabling static modules])
     ENABLE_P_PROCS_DYNAMIC="yes"
     ENABLE_P_PROCS_STATIC="no"
+    USEPPROCSDYNAMICLDFLAGS="-rdynamic"
+    AC_CHECK_FUNC(dlopen,,[AC_CHECK_LIB(dl,dlopen,USEPPROCSDYNAMICLD="-ldl", [
+      AC_MSG_WARN(Could not use dlopen)
+    ]) ])  
   elif test $SUPPORTS_DYNAMIC_MODULES = no; then
     AC_MSG_NOTICE([Enabling static modules and disabling dynamic modules])
     ENABLE_P_PROCS_DYNAMIC="no"
@@ -65,6 +77,9 @@ fi
 if test x$ENABLE_P_PROCS_DYNAMIC = xyes; then
   AC_DEFINE(HAVE_DL,1,enable dynamic modules)
 fi
+
+AC_SUBST(USEPPROCSDYNAMICLDFLAGS)
+AC_SUBST(USEPPROCSDYNAMICLD)
 
 AM_CONDITIONAL([ENABLE_P_PROCS_DYNAMIC],[test x$ENABLE_P_PROCS_DYNAMIC = xyes])
 AM_CONDITIONAL([ENABLE_P_PROCS_STATIC],[test x$ENABLE_P_PROCS_STATIC = xyes])

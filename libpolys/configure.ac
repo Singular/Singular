@@ -5,6 +5,9 @@ AC_CONFIG_SRCDIR([reporter/reporter.h])
 AC_CONFIG_HEADER([config.h misc/auxiliary.h])
 AM_INIT_AUTOMAKE
 
+dnl Check if build env is sane
+AM_SANITY_CHECK
+
 LT_INIT(dlopen disable-static)
 
 # Checks for programs.
@@ -22,11 +25,11 @@ AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([memmove memset pow sqrt strchr])
 AC_FUNC_VPRINTF
 AC_FUNC_MALLOC
-AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1],
-                               [Define if vsnprintf exists.])])
+AC_CHECK_FUNC([vsnprintf], [AC_DEFINE([HAVE_VSNPRINTF], [1], [Define if vsnprintf exists.])])
 
 # Checks for header files.
 AC_HEADER_STDC
+AC_STDC_HEADERS
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h pwd.h sys/param.h limits.h float.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -47,6 +50,17 @@ case $host_os in
   *cygwin* ) LIBPREFIX="-Xlinker -Bdynamic";;
   * ) LIBPREFIX="";;
 esac
+
+dnl INCLUDES=""
+dnl dnl OS specific flags and options
+dnl case "$host" in
+dnl     *-*-freebsd*)
+dnl         LIBS="$LIBS -L/usr/local/lib -lc"
+dnl 	CFLAGS="$CFLAGS -I/usr/local/include"
+dnl 	INCLUDES="$INCLUDES -I/usr/local/include"
+dnl 	;;
+dnl esac	
+dnl AC_SUBST(INCLUDES)
 
 SING_CHECK_P_PROCS
 
