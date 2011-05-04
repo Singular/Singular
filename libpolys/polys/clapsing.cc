@@ -8,20 +8,28 @@
 */
 
 //#define FACTORIZE2_DEBUG
-#include <kernel/mod2.h>
-#include <omalloc/omalloc.h>
+#include "config.h"
+#include <misc/auxiliary.h>
+
+
+TODO(Martin, Please adapt the following code for the use in SW)
 #ifdef HAVE_FACTORY
+
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <kernel/structs.h>
-#include <kernel/clapsing.h>
-#include <kernel/numbers.h>
-#include <kernel/ring.h>
-#include <kernel/ideals.h>
-#include <kernel/ffields.h>
+#include <omalloc/omalloc.h>
+#include <coeffs/numbers.h>
+#include <coeffs/coeffs.h>
+
+// #include <kernel/ffields.h>
+// #include <kernel/clapconv.h>
+// #include <libfac/factor.h>
+
 #include <factory/factory.h>
-#include <kernel/clapconv.h>
-#include <libfac/factor.h>
-#include <kernel/ring.h>
+
+#include "clapsing.h"
+#include "monomials/ring.h"
+#include "simpleideals.h"
+
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
@@ -1651,8 +1659,7 @@ intvec* singntl_LLL(intvec*  m )
   delete MM;
   return mm;
 }
-#endif
-
+/*
 napoly singclap_alglcm ( napoly f, napoly g )
 {
 
@@ -1734,6 +1741,7 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
 
  Off(SW_RATIONAL);
 }
+*/
 
 #if 0
 lists singclap_chineseRemainder(lists x, lists q)

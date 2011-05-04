@@ -11,17 +11,20 @@
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
 
-#include <kernel/structs.h>
-#include <kernel/polys.h>
-#include <kernel/ideals.h>
-#include <kernel/intvec.h>
-#include <kernel/matpol.h>
-#include <kernel/longtrans.h>
+// #include <kernel/structs.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/monomials/ring.h>
+#include <polys/simpleideals.h>
+#include <misc/intvec.h>
+#include <polys/matpol.h>
+//#include <kernel/longtrans.h>
 
 poly singclap_gcd ( poly f, poly g );
 poly singclap_gcd_r ( poly f, poly g, const ring r );
+/*
 napoly singclap_alglcm ( napoly f, napoly g );
 void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
+*/
 
 poly singclap_resultant ( poly f, poly g , poly x);
 
@@ -52,12 +55,13 @@ char* singclap_neworder ( ideal I);
 
 poly singclap_det( const matrix m );
 int singclap_det_i( intvec * m );
-
+/*
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
 BOOLEAN jjCHARSERIES(leftv res, leftv u);
 #if 0
 BOOLEAN jjIS_SQR_FREE(leftv res, leftv u);
 #endif
+*/
 
 #endif /* INCL_FACTORYSING_H */
 
