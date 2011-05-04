@@ -110,6 +110,7 @@ LIB "gkdim.lib";
 LIB "involut.lib";
 LIB "ncalg.lib";
 LIB "ncdecomp.lib";
+LIB "ncfactor.lib";
 LIB "nctools.lib";
 LIB "perron.lib";
 LIB "qmatrix.lib";

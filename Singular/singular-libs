@@ -45,5 +45,5 @@ SLIB1 = findifs.lib finitediff.lib multigrading.lib \
 
 PLIBS = bfun.lib  central.lib  dmod.lib  dmodapp.lib dmodvar.lib fpadim.lib \
 	freegb.lib  gkdim.lib  involut.lib  ncalg.lib  ncdecomp.lib \
-	nctools.lib  perron.lib  qmatrix.lib
+	ncfactor.lib nctools.lib  perron.lib  qmatrix.lib
 
