@@ -31,10 +31,9 @@
 #endif
 
 
-// no factory yet...
-// #ifndef HAVE_FACTORY
-// #define HAVE_FACTORY
-// #endif
+#ifndef HAVE_FACTORY
+#define HAVE_FACTORY
+#endif
 
 // ----------------  end of parts/extensions
 // -----------------  configure stuff
