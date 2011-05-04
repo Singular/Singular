@@ -1904,7 +1904,7 @@ void p_Content(poly ph, const ring r)
     }
     n_Delete(&h,r->cf);
 #ifdef HAVE_FACTORY
-    if ( (nGetChar() == 1) || (nGetChar() < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
+    if ( (n_GetChar(r) == 1) || (n_GetChar(r) < 0) ) /* Q[a],Q(a),Zp[a],Z/p(a) */
     {
       singclap_divide_content(ph);
       if(!n_GreaterZero(pGetCoeff(ph),r->cf)) ph = p_Neg(ph,r);

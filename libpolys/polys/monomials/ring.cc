@@ -127,7 +127,7 @@ void rChangeCurrRing(ring r)
     p_SetGlobals(r);
     //------------ global variables related to factory -----------------
 #ifdef HAVE_FACTORY
-    //int c=ABS(nGetChar());
+    //int c=ABS(n_GetChar());
     //if (c==1) c=0;
     //setCharacteristic( c );
 #endif
