@@ -112,7 +112,7 @@ EXAMPLE: example makeUsl; shows examples
 
   int @p = defInt(#);
 
-  ring @@@rr=@p,(x(1..n*(n-1)/2),y(1..n*(n-1)/2 ),h(1..n-1)),dp;
+  ring @@@rr=@p,(x(1..n*(n-1) div 2),y(1..n*(n-1) div 2 ),h(1..n-1)),dp;
   matrix TMP[n][n]=0;
   int k,l=1,1;
   int buf=0;
@@ -121,7 +121,7 @@ EXAMPLE: example makeUsl; shows examples
   {
     for(l=k+1; l<=n; l++)
     {
-      buf = (l-k-1)*(2*n-l+k)/2 + k;
+      buf = (l-k-1)*(2*n-l+k) div 2 + k;
       TMP[k,l] = -1; // for conformance with GAP
       X[buf] = TMP;
       TMP = 0;
@@ -156,7 +156,7 @@ EXAMPLE: example makeUsl; shows examples
       {
         for(j=i+1; j<=n; j++)
         {
-          buf=(j-i-1)*(2*n-j+i)/2+i;
+          buf=(j-i-1)*(2*n-j+i) div 2+i;
           if (TMP[i,j]!=0)
           {
             D[k,l]=D[k,l]+(leadcoef(TMP[i,j])/leadcoef(X[buf][i,j]))*x(buf);
@@ -399,7 +399,7 @@ EXAMPLE: example Qso3Casimir; shows examples
   }
   if (n<1) { return(0); }
   number Q = par(1);
-  int N=(n-1)/2;
+  int N=(n-1) div 2;
   int NV=nvars(basering);
   number k1,k2;
   poly p,rs,hlp;
