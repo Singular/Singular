@@ -995,6 +995,7 @@ static BOOLEAN jjLT_N(leftv res, leftv u, leftv v)
 }
 static BOOLEAN jjDIVMOD_I(leftv res, leftv u, leftv v)
 {
+  if (iiOp=='/') WarnS("int division with `/`: use `div` instead");
   int a= (int)(long)u->Data();
   int b= (int)(long)v->Data();
   if (b==0)
