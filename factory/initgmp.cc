@@ -3,9 +3,9 @@
 
 #include <config.h>
 
-#include "cf_gmp.h"
-
 #include "assert.h"
+
+#include "cf_gmp.h"
 
 #include "cf_defs.h"
 #ifdef USE_MEMUTIL
