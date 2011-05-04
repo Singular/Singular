@@ -5427,7 +5427,7 @@ static proc Vielfachheit(ideal J,ideal I)
      vd=vdim(Ip);
   }
   Jp=std(J+ideal(p));
-  return(vdim(Jp)/vdim(Ip));
+  return(vdim(Jp) div vdim(Ip));
 }
 /////////////////////////////////////////////////////////////////////////////
 static proc genus_E(list re, list iden0, intvec Eindex)
