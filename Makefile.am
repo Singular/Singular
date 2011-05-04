@@ -1,6 +1,6 @@
 ALLOC=omalloc
 
-PACKAGES=$(ALLOC) libpolys
+PACKAGES=$(ALLOC) factory libpolys
 
 SUBDIRS=$(PACKAGES)
 

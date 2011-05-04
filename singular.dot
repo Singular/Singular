@@ -1,9 +1,8 @@
 digraph singular {
 	gmp [ color=lightgrey, fontcolor=blue, style=filled, shape=box ];
 	gmp -> ntl;
-	gmp -> cf_gmp;
-	cf_gmp -> factory_libfac;
-	cf_gmp -> coeffs;
+	gmp -> factory_libfac;
+	gmp -> coeffs;
 	ntl [ color=lightgrey, fontcolor=blue, style=filled, shape=box ];
 	ntl -> factory_libfac;
 	omalloc_xalloc [ color=lightgrey, fontcolor=green, style=filled ];
