@@ -752,7 +752,7 @@ EXAMPLE: example freeGBasis; shows examples
       {
         if (x[k] ==1)
         {
-          a = k / s; // block number=a+1, a!=0
+          a = k div s; // block number=a+1, a!=0
           b = k % s; // remainder
           //          printf("a: %s, b: %s",a,b);
           if (b == 0)
@@ -1689,7 +1689,7 @@ EXAMPLE: example freegbold; shows examples
       {
         if (x[k] ==1)
         {
-          a = k / s; // block number=a+1, a!=0
+          a = k div s; // block number=a+1, a!=0
           b = k % s; // remainder
           //          printf("a: %s, b: %s",a,b);
           if (b == 0)
@@ -2845,7 +2845,7 @@ EXAMPLE: example lp2lstr; shows examples
       {
         if (x[k] ==1)
         {
-          a = k / s; // block number=a+1, a!=0
+          a = k div s; // block number=a+1, a!=0
           b = k % s; // remainder
           //          printf("a: %s, b: %s",a,b);
           if (b == 0)
