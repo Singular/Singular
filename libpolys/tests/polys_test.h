@@ -14,12 +14,11 @@ using namespace std;
 #include <coeffs/rmodulo2m.h>
 #include <coeffs/rintegers.h>
 
-
+#include <polys/ext_fields/algext.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 
-
-
+#include <polys/simpleideals.h>
 
 class MyGlobalPrintingFixture : public GlobalPrintingFixture
 {
@@ -334,6 +333,72 @@ public:
 
      rDelete(r); // kills 'cf' as well!
    }
+   
+  void test_Q_Ext_a()
+  {
+    clog << "Start by creating Q[a]..." << endl;
 
+    char* n[] = {"a"};
+    ring r = rDefault( 0, 1, n);   // Q[a]
+    TS_ASSERT_DIFFERS( r, NULLp );
+
+    PrintRing(r);
+
+    TS_ASSERT( rField_is_Domain(r) );
+    TS_ASSERT( rField_is_Q(r) );
+    
+    TS_ASSERT( !rField_is_Zp(r) );
+    TS_ASSERT( !rField_is_Zp(r, 11) );
+
+    TS_ASSERT_EQUALS( rVar(r), 1);
+
+    poly minPoly = p_ISet(1, r);                    // minPoly = 1
+    p_SetExp(minPoly, 1, 2, r); p_Setm(minPoly, r); // minPoly = a^2
+    minPoly = p_Add_q(minPoly, p_ISet(1, r), r);    // minPoly = a^2 + 1
+    ideal minIdeal = idInit(1);                     // minIdeal = < 0 >
+    minIdeal->m[0] = minPoly;                       // minIdeal = < a^2 + 1 >
+
+    n_coeffType type = nRegister(n_Ext, naInitChar); 
+    TS_ASSERT(type == n_Ext);
+
+    ExtInfo extParam;
+    extParam.r = r;
+    extParam.i = minIdeal;
+    
+    clog << "Next create the extension field Q[a]/<a2+1>..." << endl;
+
+    const coeffs cf = nInitChar(type, &extParam);   // Q[a]/<a2+1>
+
+    TS_ASSERT_DIFFERS( cf->cfCoeffWrite, NULLp );
+  
+    if( cf->cfCoeffWrite != NULL )
+    {
+      clog << "Coeff-domain: "  << endl; 
+      n_CoeffWrite(cf); PrintLn();
+    }
+
+    clog << "Finally create the polynomial ring (Q[a]/<a2+1>)[x, y]..."
+         << endl;
+    
+    char* m[] = {"x", "y"};
+    ring s = rDefault(cf, 2, m);   // (Q[a]/<a2+1>)[x, y]
+    TS_ASSERT_DIFFERS(s, NULLp);
+
+    PrintRing(s);
+
+    TS_ASSERT( rField_is_Domain(s) );
+    TS_ASSERT( !rField_is_Q(s) );
+    TS_ASSERT( !rField_is_Zp(s) );
+    TS_ASSERT( !rField_is_Zp(s, 11) );
+    TS_ASSERT( !rField_is_Zp(s, 13) );
+    TS_ASSERT( !rField_is_GF(s) );
+    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( !rField_is_GF(s, 25) );
+    TS_ASSERT_EQUALS(rVar(s), 2);
+
+    //Test(s);
+
+    rDelete(s); // kills 'cf' and 'r' as well
+  }
 };
 

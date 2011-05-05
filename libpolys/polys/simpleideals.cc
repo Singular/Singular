@@ -24,7 +24,7 @@
 #include "simpleideals.h"
 #include "sbuckets.h"
 
-omBin sip_sideal_bin;
+omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 
 static poly * idpower;
 /*collects the monomials in makemonoms, must be allocated befor*/
