@@ -3779,7 +3779,7 @@ static proc addSelfInter(list re,intmat Inters,list iden,list iden0,intvec endiv
    intvec diag=Inters*civ+intF;
    for(i=1;i<=size(diag);i++)
    {
-      Inters[i,i]=-diag[i]/civ[i];
+      Inters[i,i]=-diag[i] div civ[i];
    }
    return(Inters);
 }
@@ -5453,7 +5453,7 @@ static proc genus_E(list re, list iden0, intvec Eindex)
    ideal I2=imap(S,I2);
    I2=homog(I2,@t);
    ge=genus(I2);
-   gel=(ge+(num-1))/num;
+   gel=(ge+(num-1)) div num;
    if(gel*num-ge-num+1!=0){ERROR("genus_E: not divisible by num");}
    setring R;
    return(gel,num);

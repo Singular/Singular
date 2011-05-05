@@ -2074,7 +2074,7 @@ static proc widkbase(int dd)
   poly mo=1;
   if(m1==1)
   {
-    m2=dd/wwtop[1];
+    m2=dd div wwtop[1];
     if((m2*wwtop[1])==dd)
     {
       mo=var(1)^m2;

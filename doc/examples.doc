@@ -465,7 +465,7 @@ j;
 //   - converting j[2] to a string in order to compute the number
 //   of characters
 //   - divide this by the number of monomials:
-size(string(j[2]))/size(j[2]);
+size(string(j[2])) div size(j[2]);
 vdim(j);
 // For a better representation normalize the long coefficients
 // of the polynomial j[2] and map it to real:
@@ -1823,7 +1823,7 @@ could be improved.
   LIB "matrix.lib"; LIB "sing.lib";
   int n = 4;
   int m = 3;
-  int N = n*(n+1)/2;           // will become number of variables
+  int N = n*(n+1) div 2;       // will become number of variables
   ring R = 32003,x(1..N),dp;
   matrix X = symmat(n);        // proc from matrix.lib
                                // creates the symmetric generic nxn matrix
