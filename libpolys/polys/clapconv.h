@@ -11,9 +11,9 @@
 #ifndef INCL_SINGCONV_H
 #define INCL_SINGCONV_H
 
-#include <kernel/structs.h>
-#include <kernel/longtrans.h>
-#include <kernel/ring.h>
+//#include <kernel/structs.h>
+#include <polys/ext_fields/longtrans.h>
+#include <polys/monomials/ring.h>
 #ifdef HAVE_FACTORY
 #  include <factory/factory.h>
 #endif /* HAVE_FACTORY */
