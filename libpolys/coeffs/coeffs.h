@@ -62,7 +62,8 @@ typedef number (*nMapFunc)(number a, const coeffs src, const coeffs dst);
 struct n_Procs_s
 {
    coeffs next;
-   unsigned int  ringtype;  /* 0 => coefficient field, 1 => coeffs from Z/2^m */
+   unsigned int ringtype;  /* =0 => coefficient field,
+                             !=0 => coeffs from one of the rings */
 
    // general properties:
    /// TRUE, if nNew/nDelete/nCopy are dummies
@@ -296,6 +297,10 @@ static inline BOOLEAN n_DivBy(number a, number b, const coeffs r)
 static inline number n_Init(int i,       const coeffs r)
 { assume(r != NULL); assume(r->cfInit!=NULL); return r->cfInit(i,r); }
 
+/// conversion to int; 0 if not possible
+static inline int n_Int(number n,        const coeffs r)
+{ assume(r != NULL); assume(r->cfInt!=NULL); return r->cfInt(n,r); }
+
 /// changes argument  inline: a:= -a
 static inline number n_Neg(number n,     const coeffs r)
 { assume(r != NULL); assume(r->cfNeg!=NULL); return r->cfNeg(n,r); }
@@ -435,13 +440,23 @@ static inline BOOLEAN nCoeff_is_GF(const coeffs r, int q)
 { assume(r != NULL); return (getCoeffType(r)==n_GF) && (r->ch == q); }
 
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
-{ assume(r != NULL); return (r->ringtype == 0) && (r->ch < -1); }
+{
+  assume(r != NULL);
+  return (r->ringtype == 0) && (getCoeffType(r)==n_Ext) && (r->ch < -1);
+}
 
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
-{ assume(r != NULL); return (r->ringtype == 0) && (r->ch < -1 ) && (-(r->ch) == ABS(p)); }
+{
+  assume(r != NULL);
+  return (r->ringtype == 0) && (getCoeffType(r)==n_Ext) && (r->ch < -1 )
+                            && (-(r->ch) == ABS(p));
+}
 
 static inline BOOLEAN nCoeff_is_Q_a(const coeffs r)
-{ assume(r != NULL); return (r->ringtype == 0) && (r->ch == 1); }
+{
+  assume(r != NULL);
+  return (r->ringtype == 0) && (getCoeffType(r)==n_Ext) && (r->ch == 0);
+}
 
 static inline BOOLEAN nCoeff_is_long_R(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_long_R; }
@@ -484,7 +499,7 @@ static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)
 
 // Missing wrappers for:
-// cfIntMod, cfInt, cfRePart, cfImPart, cfRead, cfName, cfInit_bigint
+// cfIntMod, cfRePart, cfImPart, cfRead, cfName, cfInit_bigint
 // HAVE_RINGS: cfDivComp, cfExtGcd... cfDivBy
 
 
