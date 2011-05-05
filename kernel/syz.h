@@ -77,9 +77,6 @@ syStrategy sySchreyer(ideal arg, int maxlength);
 resolvente syResolvente(ideal arg, int maxlength, int * length,
                         intvec *** weights, BOOLEAN minim);
 
-resolvente syReorder(resolvente res,int length,
-        syStrategy syzstr,BOOLEAN toCopy/*=TRUE*/,resolvente totake/*=NULL*/);
-
 syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim);
 
 void syMinimizeResolvente(resolvente res, int length, int first);
@@ -137,5 +134,7 @@ syStrategy syKosz(ideal arg,int * length);
 
 resolvente syReorder(resolvente res,int length,
         syStrategy syzstr,BOOLEAN toCopy=TRUE,resolvente totake=NULL);
+resolvente syReorder(resolvente res,int length,
+        syStrategy syzstr,BOOLEAN toCopy/*=TRUE*/,resolvente totake/*=NULL*/);
 
 #endif

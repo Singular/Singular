@@ -23,7 +23,7 @@
 # define MYTEST 0
 #endif /* ifndef NDEBUG */
 
-#if MYTEST 
+#if MYTEST
 #ifdef HAVE_TAIL_RING
 #undef HAVE_TAIL_RING
 #endif /* ifdef HAVE_TAIL_RING */
@@ -74,8 +74,8 @@ BITSET validOpts=Sy_bit(0)
                 |Sy_bit(5)
                 |Sy_bit(6)
 //                |Sy_bit(7) obachman 11/00 tossed: 12/00 used for redThrough
-  |Sy_bit(OPT_REDTHROUGH)
-//                |Sy_bit(8) obachman 11/00 tossed
+                |Sy_bit(7) // OPT_REDTHROUGH
+                |Sy_bit(8) // obachman 11/00 tossed -> motsak 2011 experimental: OPT_NO_SYZ_MINIM
                 |Sy_bit(9)
                 |Sy_bit(10)
                 |Sy_bit(11)
@@ -1800,8 +1800,8 @@ ideal kStd(ideal F, ideal Q, tHomog h,intvec ** w, intvec *hilb,int syzComp,
   else
 #endif
 #ifdef HAVE_RINGS
-  if (rField_is_Ring(currRing)) 
-    r=bba(F,Q,NULL,hilb,strat); 
+  if (rField_is_Ring(currRing))
+    r=bba(F,Q,NULL,hilb,strat);
   else
 #endif
   {

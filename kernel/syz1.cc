@@ -1641,7 +1641,7 @@ void syKillComputation(syStrategy syzstr, ring r)
     {
       if(syzstr->syRing->typ[1].ord_typ == ro_syzcomp)
         rNChangeSComps(NULL, NULL, syzstr->syRing);
-      
+
       rKill(syzstr->syRing);
     }
     omFreeSize((ADDRESS)syzstr, sizeof(ssyStrategy));
@@ -1796,22 +1796,22 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift,
   resolvente fullres = syzstr->fullres;
   resolvente minres = syzstr->minres;
   const int length = syzstr->length;
-  
+
   if ((fullres==NULL) && (minres==NULL))
   {
      if (syzstr->hilb_coeffs==NULL)
-     {
+     { // LA SCALA
         fullres = syReorder(syzstr->res, length, syzstr);
      }
      else
-     {
+     { //  HRES
         minres = syReorder(syzstr->orderedRes, length, syzstr);
         syKillEmptyEntres(minres, length);
      }
   }
-  
+
   intvec *result=NULL;
-  
+
   if (fullres!=NULL)
     result = syBetti(fullres,length,&dummy,weights,minim,row_shift);
   else
@@ -1832,7 +1832,7 @@ intvec * syBettiOfComputation(syStrategy syzstr, BOOLEAN minim,int * row_shift,
   {
     syzstr->betti = ivCopy(result); // cache the result...
   }
-  
+
   return result;
 }
 
@@ -1956,7 +1956,7 @@ void syPrint(syStrategy syzstr)
   }
 
   intvec* resolution = syzstr->resolution;
-  
+
   if (resolution==NULL)
   {
     if (syzstr->resPairs!=NULL)
@@ -2042,7 +2042,7 @@ void syPrint(syStrategy syzstr)
     PrintLn();
   }
 
-  if (syzstr->resolution == NULL) syzstr->resolution = resolution; 
+  if (syzstr->resolution == NULL) syzstr->resolution = resolution;
 }
 
 /*2
@@ -2410,10 +2410,11 @@ syStrategy syMinimize(syStrategy syzstr)
     {
       if (syzstr->hilb_coeffs==NULL)
       {
+        // La Scala Resolution
         syzstr->minres = syReadOutMinimalRes(syzstr);
       }
       else
-      {
+      { // HRES
         syzstr->minres = syReorder(syzstr->orderedRes,syzstr->length,syzstr);
       }
     }
@@ -2537,17 +2538,22 @@ syStrategy syLaScala3(ideal arg,int * length)
   }
   if (temp!=NULL) idDelete(&temp);
   kBucketDestroy(&(syzstr->bucket));
+
   if (origR != syzstr->syRing)
     rChangeCurrRing(origR);
   pLmDelete(&redpol);
 
   if (TEST_OPT_PROT) PrintLn();
 
-  if (syzstr->minres==NULL)
-      if (syzstr->resPairs!=NULL)
-        if (syzstr->hilb_coeffs==NULL)
-          syzstr->minres = syReadOutMinimalRes(syzstr);
-  
+  assume(syzstr->minres==NULL); assume(syzstr->fullres ==NULL);
+  assume(syzstr->resPairs!=NULL);  assume(syzstr->hilb_coeffs==NULL);
+  assume(syzstr->res!=NULL);
+
+  if(! TEST_OPT_NO_SYZ_MINIM )
+    syzstr->minres = syReadOutMinimalRes(syzstr);
+  else
+    syzstr->fullres = syReorder(syzstr->res, syzstr->length, syzstr); // buggy? (betti...?)
+
   return syzstr;
 }
 
@@ -2569,7 +2575,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   syStrategy syzstr=(syStrategy)omAlloc0(sizeof(ssyStrategy));
   ring origR = currRing;
 
-  if(weights!= NULL) 
+  if(weights!= NULL)
     syzstr->cw = new intvec(weights);
   else
     syzstr->cw = NULL;
@@ -2587,16 +2593,16 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   //crit = 0;
   //euler = -1;
   redpol = pInit();
-  
+
   if( maxlength > 0 )
     syzstr->length = maxlength; //  = pVariables+2;
   else
-    syzstr->length = maxlength = pVariables+2;  
+    syzstr->length = maxlength = pVariables+2;
 
   // Creare dp,S ring and change to it
   syzstr->syRing = rCurrRingAssure_dp_S();
   assume(syzstr->syRing != origR);
-  assume(syzstr->syRing->typ[1].ord_typ == ro_syzcomp);  
+  assume(syzstr->syRing->typ[1].ord_typ == ro_syzcomp);
 
 
   // set initial ShiftedComps
@@ -2626,7 +2632,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   syzstr->resPairs = syInitRes(temp,&maxlength,syzstr->Tl,syzstr->cw);
   omFreeSize((ADDRESS)currcomponents,(arg->rank+1)*sizeof(int));
   omFreeSize((ADDRESS)currShiftedComponents,(arg->rank+1)*sizeof(long));
-  
+
   syzstr->res = (resolvente)omAlloc0((maxlength+1)*sizeof(ideal));
   syzstr->orderedRes = (resolvente)omAlloc0((maxlength+1)*sizeof(ideal));
   syzstr->elemLength = (int**)omAlloc0((maxlength+1)*sizeof(int*));
@@ -2640,7 +2646,7 @@ syStrategy syLaScala(ideal arg, int& maxlength, intvec* weights)
   syzstr->sev = (unsigned long **) omAlloc0((maxlength+1)*sizeof(unsigned long *));
 
   assume( syzstr->length == maxlength );
-  
+
   syzstr->bucket = kBucketCreate();
   int len0=idRankFreeModule(temp)+1;
 

@@ -379,7 +379,7 @@ BOOLEAN jjSYSTEM(leftv res, leftv args)
           #endif
           #ifdef NDEBUG
             TEST_FOR("ndebug");
-          #endif            
+          #endif
             ;
           return FALSE;
           #undef TEST_FOR
@@ -3691,7 +3691,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       heuristic=(int)(long)h->next->Data();
       ideal I=((ideal)h->Data());
       #ifndef USE_ZFAN
-        #define USE_ZFAN    
+        #define USE_ZFAN
       #endif
       #ifndef USE_ZFAN
         res->rtyp=LIST_CMD; //res->rtyp=coneID; res->data(char*)zcone;

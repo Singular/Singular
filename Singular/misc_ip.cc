@@ -512,7 +512,8 @@ struct soptionStruct optionStruct[]=
   {"notSugar",     Sy_bit(OPT_NOT_SUGAR),      ~Sy_bit(OPT_NOT_SUGAR)   },
   {"interrupt",    Sy_bit(OPT_INTERRUPT),      ~Sy_bit(OPT_INTERRUPT)   },
   {"sugarCrit",    Sy_bit(OPT_SUGARCRIT),      ~Sy_bit(OPT_SUGARCRIT)   },
-  {"teach",     Sy_bit(OPT_DEBUG),          ~Sy_bit(OPT_DEBUG)  },
+  {"teach",        Sy_bit(OPT_DEBUG),          ~Sy_bit(OPT_DEBUG)  },
+  {"notSyzMinim",  Sy_bit(OPT_NO_SYZ_MINIM),   ~Sy_bit(OPT_NO_SYZ_MINIM)  },
   /* 9 return SB in syz, quotient, intersect */
   {"returnSB",     Sy_bit(OPT_RETURN_SB),      ~Sy_bit(OPT_RETURN_SB)  },
   {"fastHC",       Sy_bit(OPT_FASTHC),         ~Sy_bit(OPT_FASTHC)  },

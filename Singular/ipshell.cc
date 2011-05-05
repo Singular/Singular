@@ -2566,7 +2566,7 @@ BOOLEAN syBetti2(leftv res, leftv u, leftv w)
      add_row_shift = ww->min_in();
      (*weights) -= add_row_shift;
   }
-  
+
   res->data=(void *)syBettiOfComputation(syzstr,minim,&row_shift,weights);
   //row_shift += add_row_shift;
   //Print("row_shift=%d, add_row_shift=%d\n",row_shift,add_row_shift);
@@ -2596,11 +2596,11 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
   if ((fullres==NULL) && (minres==NULL))
   {
     if (syzstr->hilb_coeffs==NULL)
-    {
+    { // La Scala
       fullres = syReorder(syzstr->res, length, syzstr);
     }
     else
-    {
+    { // HRES
       minres = syReorder(syzstr->orderedRes, length, syzstr);
       syKillEmptyEntres(minres, length);
     }
@@ -2613,7 +2613,7 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
     tr = minres;
   else
     tr = fullres;
-  
+
   resolvente trueres=NULL; intvec ** w=NULL;
 
   if (length>0)
@@ -2637,12 +2637,12 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
       }
     }
   }
-  
+
   lists li = liMakeResolv(trueres, length, syzstr->list_length,typ0,
                           w, add_row_shift);
 
   if (w != NULL) omFreeSize(w, length*sizeof(intvec*));
-  
+
   if (toDel)
     syKillComputation(syzstr);
   else
@@ -2653,10 +2653,10 @@ lists syConvRes(syStrategy syzstr,BOOLEAN toDel,int add_row_shift)
     if( minres != NULL && syzstr->minres == NULL )
       syzstr->minres = minres;
   }
-  
+
   return li;
 
-  
+
 }
 
 /*3
@@ -4613,30 +4613,30 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
 
           case ringorder_s: // no 'rank' params!
           {
-            
+
             if(iv->length() > 3)
               return TRUE;
 
             if(iv->length() == 3)
             {
               const int s = (*iv)[2];
-              R->block0[n] = s;            
+              R->block0[n] = s;
               R->block1[n] = s;
             }
-            break;            
+            break;
           }
           case ringorder_IS:
           {
             if(iv->length() != 3) return TRUE;
-            
+
             const int s = (*iv)[2];
 
             if( 1 < s || s < -1 ) return TRUE;
-              
-            R->block0[n] = s;            
+
+            R->block0[n] = s;
             R->block1[n] = s;
             break;
-          }            
+          }
           case ringorder_S:
           case ringorder_c:
           case ringorder_C:
@@ -4717,7 +4717,7 @@ BOOLEAN rSleftvOrdering2Ordering(sleftv *ord, ring R)
                     )) n--;
 
   assume( n >= 0 );
-  
+
   if (R->block1[n] != R->N)
   {
     if (((R->order[n]==ringorder_dp) ||

@@ -462,7 +462,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
 
 #ifdef HAVE_PLURAL
   if (rIsPluralRing(currRing) && !rIsSCA(currRing) )
-  { 
+  {
 // quick solution; need theory to apply homog GB stuff for G-Algebras
     hom = isNotHomog;
   }
@@ -515,6 +515,7 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
       int rkI=idRankFreeModule(res[syzIndex]);
       rSetSyzComp(rkI);
     }
+    if(! TEST_OPT_NO_SYZ_MINIM )
     if (minim || (syzIndex!=0))
     {
       temp = kInterRedOld(res[syzIndex],currQuotient);
@@ -536,12 +537,16 @@ resolvente syResolvente(ideal arg, int maxlength, int * length,
     completeMinim=(syzIndex!=maxlength) || (maxlength ==-1) || (hom!=isHomog);
     syzIndex++;
     if (TEST_OPT_PROT) Print("[%d]\n",syzIndex);
-    if ((minim)||(syzIndex>1))
-      syMinStep(res[syzIndex-1],res[syzIndex],!completeMinim,NULL,hom);
-    if (!completeMinim)
-    /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
+
+    if(! TEST_OPT_NO_SYZ_MINIM )
     {
-      idDelete(&res[syzIndex]);
+      if ((minim)||(syzIndex>1))
+        syMinStep(res[syzIndex-1],res[syzIndex],!completeMinim,NULL,hom);
+      if (!completeMinim)
+      /*minim is TRUE, we are in the module: maxlength, maxlength <>0*/
+      {
+        idDelete(&res[syzIndex]);
+      }
     }
 /*---creating the iterated weights for module components ---------*/
     if ((hom == isHomog) && (!idIs0(res[syzIndex])))
@@ -633,11 +638,11 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 
     const unsigned int m_iFirstAltVar = scaFirstAltVar(currRing);
     const unsigned int m_iLastAltVar  = scaLastAltVar(currRing);
-    
+
     arg = id_KillSquares(arg, m_iFirstAltVar, m_iLastAltVar, currRing, false); // kill suares in input!
   }
 #endif
-  
+
   int typ0;
   syStrategy result=(syStrategy)omAlloc0(sizeof(ssyStrategy));
 
@@ -680,7 +685,7 @@ syStrategy syResolution(ideal arg, int maxlength,intvec * w, BOOLEAN minim)
 
     if( ncExtensions(TESTSYZSCAMASK) )
     {
-      currQuotient     = idSaveCurrQuotient; 
+      currQuotient     = idSaveCurrQuotient;
       currRing->qideal = idSaveCurrRingQuotient;
     }
 

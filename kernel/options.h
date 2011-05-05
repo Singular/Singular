@@ -71,6 +71,7 @@ extern BITSET verbose;
 #define OPT_SUGARCRIT      5
 #define OPT_DEBUG          6
 #define OPT_REDTHROUGH     7
+#define OPT_NO_SYZ_MINIM   8
 #define OPT_RETURN_SB      9
 #define OPT_FASTHC        10
 #define OPT_OLDSTD        20
@@ -110,6 +111,9 @@ extern BITSET verbose;
 #define TEST_OPT_WEIGHTM           BTEST1(OPT_WEIGHTM)
 #define TEST_OPT_REDTHROUGH        BTEST1(OPT_REDTHROUGH)
 #define TEST_OPT_OLDSTD            BTEST1(OPT_OLDSTD)
+#define TEST_OPT_NO_SYZ_MINIM      BTEST1(OPT_NO_SYZ_MINIM)
+
+
 #define TEST_OPT_CONTENTSB         BVERBOSE(V_CONTENTSB)
 #define TEST_OPT_CANCELUNIT        BVERBOSE(V_CANCELUNIT)
 #define TEST_OPT_IDLIFT            BVERBOSE(V_IDLIFT)
