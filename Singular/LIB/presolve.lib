@@ -1089,17 +1089,17 @@ EXAMPLE: example sortandmap; shows an example
    for ( @ii=4; @ii<=size(@l); @ii=@ii+4 )
    {
       @L2=@L2+list("dp",0);
-      if ( @L2[@ii/2] != 0)
+      if ( @L2[@ii div 2] != 0)
       {
          @v = @l[@ii];
          for ( @jj=1; @jj<=size(@v); @jj++ )
          {
-           @o = @o+@L2[@ii/2 -1]+"("+string(@v[@jj])+"),";
+           @o = @o+@L2[@ii div 2 -1]+"("+string(@v[@jj])+"),";
          }
       }
       else
       {
-         @o = @o+@L2[@ii/2 -1]+"("+string(size(@l[@ii/2]))+"),";
+         @o = @o+@L2[@ii div 2 -1]+"("+string(size(@l[@ii div 2]))+"),";
       }
    }
    @o=@o[1..size(@o)-1];
@@ -1263,7 +1263,7 @@ EXAMPLE: example valvars; shows an example
       }
       if ( size(m)!=0 )
       {
-         l = 2*(l/2)+2;
+         l = 2*(l div 2)+2;
          ideal a(l) = simplify(m,2);
          intvec v(l) = compress(v);
          int n(l);
@@ -1313,7 +1313,7 @@ EXAMPLE: example valvars; shows an example
 //------------------- compare valuation and insert in vec ---------------------
       vec = sort(L)[2];
       if ( n(kk) != 0 ) { vec = vec[size(vec)..1]; }
-      blockvec[kk/2] = vec;
+      blockvec[kk div 2] = vec;
       vec = sort(v(kk),vec)[1];
       varvec = varvec,vec;
    }

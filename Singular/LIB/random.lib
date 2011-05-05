@@ -432,13 +432,13 @@ EXAMPLE: example randomBinomial; shows an example
        r1 = r1 + (r1==0)*random(1,b);
        r2 = random(-b,b);
        r2 = r2 + (r2==0)*random(-b,-1);
-       i = i,r1*m[random(1,s/2)] + r1*m[random(s/2+1,s)];
+       i = i,r1*m[random(1,s div 2)] + r1*m[random(s div 2+1,s)];
        if ( ii < c+u )
        {  r1 = random(-b,b);
           r1 = r1 + (r1==0)*random(1,b);
           r2 = random(-b,b);
           r2 = r2 + (r2==0)*random(-b,-1);
-          i = i,r1*m[random(1,s/2)] + r2*m[random(s/2+1,s)];
+          i = i,r1*m[random(1,s div 2)] + r2*m[random(s div 2+1,s)];
        }
      }
    }

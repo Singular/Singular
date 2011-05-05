@@ -209,7 +209,7 @@ static proc dmodappMoreAssumeViolation()
   }
   // wrong sequence of vars
   int i,n;
-  n = nvars(basering)/2;
+  n = nvars(basering) div 2;
   for (i=1; i<=n; i++)
   {
     if (bracket(var(i+n),var(i))<>1)
@@ -919,7 +919,7 @@ EXAMPLE:  example annRat; shows examples
   def @R2 = ring(tmp);
   setring @R2;
   // now supply with Weyl algebra relations
-  int N = nvars(@R2)/2;
+  int N = nvars(@R2) div 2;
   matrix @D[2*N][2*N];
   for(i=1; i<=N; i++)
   {
@@ -1258,7 +1258,7 @@ EXAMPLE: example DLoc0; shows examples
     // Add: Plural part
     def @R4@ = ring(L);
     setring @R4@;
-    int N = Nnew/2;
+    int N = Nnew div 2;
     matrix @D[Nnew][Nnew];
     for (i=1; i<=N; i++)
     {
@@ -1569,7 +1569,7 @@ EXAMPLE: example GBWeight; shows examples
   dmodappMoreAssumeViolation();
   int ppl = printlevel - voice +2;
   def save = basering;
-  int n = nvars(save)/2;
+  int n = nvars(save) div 2;
   int whichengine = 0;           // default
   int methodord   = 0;           // default
   intvec homogweights = 1:(2*n); // default
@@ -1991,7 +1991,7 @@ static proc restrictionModuleEngine (ideal I, intvec w, list #)
   }
   int ppl = printlevel;
   int i,j,k;
-  int n = nvars(basering)/2;
+  int n = nvars(basering) div 2;
   if (w == 0:size(w))
   {
     ERROR("weight vector must not be zero");
@@ -2121,7 +2121,7 @@ static proc restrictionModuleEngine (ideal I, intvec w, list #)
 static proc restrictionModuleOutput (ideal B, ideal N, intvec w, int eng, string str)
 // returns ring, which contains module "str"
 {
-  int n = nvars(basering)/2;
+  int n = nvars(basering) div 2;
   int i,j;
   def save = basering;
   // 1: create new ring
@@ -2378,7 +2378,7 @@ EXAMPLE: example fourier; shows examples
       v = #[1];
     }
   }
-  int n = nvars(basering)/2;
+  int n = nvars(basering) div 2;
   int i;
   if(v <> 0:size(v))
   {
@@ -2447,7 +2447,7 @@ EXAMPLE: example inverseFourier; shows examples
       v = #[1];
     }
   }
-  int n = nvars(basering)/2;
+  int n = nvars(basering) div 2;
   int i;
   if(v <> 0:size(v))
   {
@@ -2550,7 +2550,7 @@ EXAMPLE: example integralModule; shows examples
   }
   int ppl = printlevel;
   int i;
-  int n = nvars(basering)/2;
+  int n = nvars(basering) div 2;
   intvec v;
   for (i=1; i<=n; i++)
   {
@@ -2689,7 +2689,7 @@ SEE ALSO: deRhamCohom
 EXAMPLE: example deRhamCohomIdeal; shows examples
 "
 {
-  intvec w = 1:(nvars(basering)/2);
+  intvec w = 1:(nvars(basering) div 2);
   int l0,l0set,Gset;
   ideal G;
   int whichengine = 0;         // default
@@ -2733,7 +2733,7 @@ EXAMPLE: example deRhamCohomIdeal; shows examples
   }
   int ppl = printlevel;
   int i,j;
-  int n = nvars(basering)/2;
+  int n = nvars(basering) div 2;
   intvec v;
   for (i=1; i<=n; i++)
   {
@@ -3049,7 +3049,7 @@ EXAMPLE: example charVariety; shows examples
   }
   int ppl = printlevel - voice + 2;
   def save = basering;
-  int n = nvars(save)/2;
+  int n = nvars(save) div 2;
   intvec u = 0:n;
   intvec v = 1:n;
   dbprint(ppl,"// Computing Groebner basis wrt weights...");

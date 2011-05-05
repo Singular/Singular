@@ -3264,7 +3264,7 @@ NOTE: Superfluos zero blocks must have been deleted befor using this procedure
 "
 {int i,j,k,r1,r2; intvec D;
  int n = attrib(basering,"lV");
- k = size(V)/n; r1 = 0; r2 = 0;
+ k = size(V) div n; r1 = 0; r2 = 0;
  for (i=1; i<= k; i++)
   {for (j=(1+((i-1)*n)); j <= (i*n); j++)
    {if (V[j]>0){r2 = j - ((i-1)*n); j = (j mod n); break;}
@@ -3371,7 +3371,7 @@ static proc getlpCoeffs(poly q, poly p)
   if (bla == 0) {lv = cq[1..i*n]; cq = cq[(i*n+1)..(d*n)]; break;}
  }
 
- d = size(cq)/n;
+ d = size(cq) div n;
  for (i = 1; i<= d; i++)
  {bla = cq[((i-1)*n+1)..(i*n)];
   if (bla <> 0){rv = cq[((i-1)*n+1)..(d*n)]; break;}

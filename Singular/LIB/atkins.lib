@@ -371,7 +371,7 @@ EXAMPLE:example sqr; shows an example
   def S=basering;
   ring R=(real,k),var(1),dp;
   poly f=imap(S,f);
-  ideal I=nt_solve(f,1.1,list(k,int(intPart(k/5))));
+  ideal I=nt_solve(f,1.1,list(k,k div 5));
   number c=leadcoef(I[1]);
   setring S;
   number c=imap(R,c);
@@ -426,11 +426,14 @@ EXAMPLE:example jOft; shows an example
   tr=repart(t);
   ti=impart(t);
   if(tr==-1/2){qr1=-1;}
-  if(tr==0){qr1=1;}
-  if((tr!=-1/2)&&(tr!=0))
+  else
   {
-    tr=tr-round(tr);
-    qr1=expo(2*i*pi*tr,10*k);
+    if(tr==0){qr1=1;}
+    else
+    {
+      tr=tr-round(tr);
+      qr1=expo(2*i*pi*tr,10*k);
+    }
   }
 
   qi1=expo(-pi*ti,10*k);
@@ -440,8 +443,8 @@ EXAMPLE:example jOft; shows an example
   int n=1;
   while(n<=k)
   {
-    m1=m1+(-1)^n*(q1^(n*(3*n-1)/2)+q1^(n*(3*n+1)/2));
-    m2=m2+(-1)^n*(q2^(n*(3*n-1)/2)+q2^(n*(3*n+1)/2));
+    m1=m1+(-1)^n*(q1^(n*(3*n-1) div 2)+q1^(n*(3*n+1) div 2));
+    m2=m2+(-1)^n*(q2^(n*(3*n-1) div 2)+q2^(n*(3*n+1) div 2));
     n++;
   }
 
@@ -724,7 +727,7 @@ EXAMPLE:example rootsModp; shows an example
     while((deg(B)==0)||(deg(B)==deg(A)))
     {
       a=random(0,p-1);
-      B=gcd((var(1)+a)^((p-1)/2)-1,A);
+      B=gcd((var(1)+a)^((p-1) div 2)-1,A);
       C=A/B;
     }
 
@@ -819,7 +822,7 @@ EXAMPLE:example Atkin; shows an example
     matrix M;                          // M contains the coefficients of T
 
     if(printlevel>=1) {"List H of possibly suitable discriminants will be calculated.";}
-    H=disc(N,K/2);
+    H=disc(N,K div 2);
     if(printlevel>=1) {"H = "+string(H);pause();"";}
 
     int step=2;

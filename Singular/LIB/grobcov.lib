@@ -1376,7 +1376,7 @@ static proc buildtree(ideal F, list #)
   def W=ideal(1);
   int comment=0;
   list L=#;
-  for(i=1;i<=size(L)/2;i++)
+  for(i=1;i<=size(L) div 2;i++)
   {
     if(L[2*i-1]=="null"){N=L[2*i];}
     else
@@ -2258,13 +2258,13 @@ static proc genimage(poly f1, ideal N1, ideal W1, poly f2, ideal N2, ideal W2)
     while ((r1<=size(compos0)) and not(t))
     {
       comp0=compos0[r1];
-      if (comp0[1]<=bound/2)
+      if (comp0[1]<=bound div 2)
       {
         compos1=comp(comp0[1],ncols(PW1));
         s1=1;
         while ((s1<=size(compos1)) and not(t))
         {
-          if (comp0[2]<=bound/2)
+          if (comp0[2]<=bound div 2)
           {
             compos2=comp(comp0[2],ncols(PW2));
             s2=1;
@@ -3540,7 +3540,7 @@ static proc mrcgs(ideal F, list #)
   def N=ideal(0);
   def W=ideal(1);
   list L=#;
-  for(i=1;i<=size(L)/2;i++)
+  for(i=1;i<=size(L) div 2;i++)
   {
     if(L[2*i-1]=="null"){N=L[2*i];}
     else
@@ -3905,7 +3905,7 @@ static proc rcgs(ideal F, list #)
   def N=ideal(0);
   def W=ideal(1);
   list L=#;
-  for(i=1;i<=size(L)/2;i++)
+  for(i=1;i<=size(L) div 2;i++)
   {
     if(L[2*i-1]=="null"){N=L[2*i];}
     else
@@ -4115,7 +4115,7 @@ static proc crcgs(ideal F, list #)
 //  def N=ideal(0);
 //  def W=ideal(1);
 //  list L=#;
-//  for(i=1;i<=size(L)/2;i++)
+//  for(i=1;i<=size(L) div 2;i++)
 //  {
 //    if(L[2*i-1]=="null"){N=L[2*i];}
 //    else
@@ -4974,7 +4974,7 @@ EXAMPLE:  cgsdr; shows an example"
   def W=ideal(1);
   int comment=0;
   list L=#;
-  for(i=1;i<=size(L)/2;i++)
+  for(i=1;i<=size(L) div 2;i++)
   {
     if(L[2*i-1]=="null"){N=L[2*i];}
     else
@@ -5819,7 +5819,7 @@ EXAMPLE:  grobcov; shows an example"
            // extop=0 if only generic representation of the bases are to be computed
   CGS=1;   // CGS=1 if cgsdr is to be used (default)
            // CGS=0 if buildtree is to be used instead
-  for(i=1;i<=size(L)/2;i++)
+  for(i=1;i<=size(L) div 2;i++)
   {
     if(L[2*i-1]=="can"){canop=L[2*i];}
     else
@@ -7065,7 +7065,7 @@ EXAMPLE:  gencase1; shows an example"
      // compbas==0 the gbasis wrt vars+param is already computed
   def RR=basering; list empty; int i;
   setglobalrings();
-  for(i=1;i<=size(L)/2;i++)
+  for(i=1;i<=size(L) div 2;i++)
   {
     if(L[2*i-1]=="compbas"){compbas=L[2*i];}
   }
@@ -7192,7 +7192,7 @@ EXAMPLE:  multigrobcov; shows an example."
 {
   int i; int comment=1; list L=#; ideal N; list gc; list GC; list GCA;
   int start=timer; int ni; int nw;
-  for(i=1;i<=size(L)/2;i++)
+  for(i=1;i<=size(L) div 2;i++)
   {
     if (L[2*i-1]=="comment"){comment=L[2*i];}
     else
@@ -7348,7 +7348,7 @@ KEYWORDS: CGS, cgsdr, buildtree, buildtreetoMaple, disjoint, reduced,
 EXAMPLE:  cgsdrold; shows an example"
 {
   int i; list L=#; int oldop=1;
-  for(i=1;i<=size(L)/2;i++)
+  for(i=1;i<=size(L) div 2;i++)
   {
     if(L[2*i-1]=="old"){oldop=L[2*i];}
   }
@@ -7530,7 +7530,7 @@ EXAMPLE:  grobcovold; shows an example"
   outop=0; // outop=0 for an output analogous to grobcov (if canop<>2)
            // outop=1 for an output as in the old library redcgs.lib
            //         in form of tree that can be transformed into Maple.
-  for(i=1;i<=size(LL)/2;i++)
+  for(i=1;i<=size(LL) div 2;i++)
   {
     if(LL[2*i-1]=="can"){canop=LL[2*i];}
     else

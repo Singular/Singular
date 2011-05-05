@@ -208,7 +208,7 @@ static proc Cij(intmat M, int i,j)
   if (size(N)>1)
   {
     N=N[2..size(N)]; // Deleting the zero added in the definition of N
-    M=intmat(N,size(N)/nc,nc); // Conversion from vector to matrix
+    M=intmat(N,size(N) div nc,nc); // Conversion from vector to matrix
   }
   else
   {
@@ -251,7 +251,7 @@ static proc Ct(matrix P)
   else
   {
     T=T[2..size(T)]; // Deleting the zero added in the definition of T
-    intmat C = intmat(T,size(T)/k,k); // Conversion from vector to matrix
+    intmat C = intmat(T,size(T) div k,k); // Conversion from vector to matrix
   }
   return (C);
 }

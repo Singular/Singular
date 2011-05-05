@@ -2116,7 +2116,7 @@ static proc weightmon(int va, int drest, poly mm)
   int m2;
   if(va==1)
   {
-    m2=drest/wwtop[1];
+    m2=drest div wwtop[1];
     if((m2*wwtop[1])==drest)
     {
       mm=var(1)^m2*mm;

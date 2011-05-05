@@ -825,7 +825,7 @@ EXAMPLE: example cantormult; shows an example
        exp=exp-1;
      }
      bas=double(bas,h,f);
-     exp=exp/2;
+     exp=exp div 2;
    }
    if ( m < 0 )
    {

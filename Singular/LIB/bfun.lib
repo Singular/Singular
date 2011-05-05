@@ -105,7 +105,7 @@ NOTE:    u[i] is the weight of x(i), v[i] the weight of D(i).
   // todo check assumption
   int i;
   def save = basering;
-  int n = nvars(save)/2;
+  int n = nvars(save) div 2;
   if (nrows(u)<>n || nrows(v)<>n)
   {
     ERROR("weight vectors have wrong dimension");
@@ -1637,7 +1637,7 @@ EXAMPLE: example bfctIdeal; shows examples
   int ppl = printlevel - voice +2;
   int i;
   def save = basering;
-  int n = nvars(save)/2;
+  int n = nvars(save) div 2;
   int whichengine = 0; // default
   int methodord   = 0; // default
   if (size(#)>0)

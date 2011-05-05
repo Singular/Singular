@@ -808,7 +808,7 @@ EXAMPLE: example lcm; shows an example
         if( i[k] !=0)
         {
            q=gcd(p,i[k]);
-           p=p/q;
+           p=p div q;
            p=p*i[k];
         }
      }
@@ -1187,7 +1187,7 @@ EXAMPLE: example newtonDiag; shows examples
     N=N, leadexp(f);
   }
   N = N[2..size(N)]; // Deletes the zero added in the definition of T
-  intmat M=intmat(N,(size(N)/n),n); // Conversion from vector to matrix
+  intmat M=intmat(N,(size(N) div n),n); // Conversion from vector to matrix
   return (M);
 }
 example

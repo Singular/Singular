@@ -54,7 +54,7 @@ EXAMPLE: example ModEqn; shows an example
   dbPrt = printlevel-voice+2;
   if(size(#) > 0) { opt = #[1]; }
   else { opt = 7; }
-  if(opt / 4 > 0) { imageQ = 1; opt = opt - 4;}
+  if(opt div 4 > 0) { imageQ = 1; opt = opt - 4;}
   else { imageQ = 0; }
 
   wt = weight(f);
@@ -214,7 +214,7 @@ EXAMPLE: example QuotientEquations; shows an example
   if(size(#) > 0) { opt = #[1]; }
   else { opt = 3; }
 
-  if(opt / 2 > 0) { primaryDec = 1; opt = opt - 2; }
+  if(opt div 2 > 0) { primaryDec = 1; opt = opt - 2; }
   else { primaryDec = 0; }
   if(opt > 0) { relationsQ = 1;}
   else { relationsQ = 0; }
@@ -878,8 +878,8 @@ NOTE:    used by 'Expand'
     if(size(g) < size(h)) { poly @h = h; h = g; g = @h;@h = 0; }
     maxSIZE = SUBSMAXSIZE / size(h);
     //print(" SUBSMAXSIZE = "+string(SUBSMAXSIZE)+" exceeded by "+string(size(g)*size(h)) + ", maxSIZE = ", string(maxSIZE));
-    nrParts = size(g) / maxSIZE + 1;
-    partSize = size(g) / nrParts;
+    nrParts = size(g) div maxSIZE + 1;
+    partSize = size(g) div nrParts;
     gxh = 0;  // 'g times h'
     for(i = 1; i <= nrParts; i++)
     {
@@ -1355,7 +1355,7 @@ RETURN:  list
     restP = Partitions(n, delete(nr, 1));
 
     parts = parts + restP;
-    for(i = 1; i <= n / nr[1]; i = i + 1)
+    for(i = 1; i <= n div nr[1]; i = i + 1)
     {
       temp = Table(string(nr[1]), "i", 1, i);
       decP = Partitions(n - i*nr[1], delete(nr, 1));
@@ -1382,7 +1382,7 @@ PURPOSE: if b divides a then return b/a, else return 0
 RETURN:  int
 "
 {
-  int c = int(b/a);
+  int c = b div a;
   if(c*a == b) { return(c); }
   else {return(0)}
 }

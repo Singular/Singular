@@ -969,7 +969,7 @@ static proc W(list l)
         }
       }
       nofzeros = 0;
-      lastsign = temp/lastsign;
+      lastsign = temp div lastsign;
     }
     i++;
   }

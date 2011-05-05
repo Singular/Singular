@@ -76,7 +76,7 @@ EXAMPLE: example perron; shows an example
     {
       ERROR( "Wrong set of polynomials!" );
     }
-    D = D / min;
+    D = D div min;
   }
   ////////////////////////////////////////////////////////////////////////
   def NCRING = basering;

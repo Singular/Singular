@@ -1087,7 +1087,7 @@ EXAMPLE:example quadraticSieve; shows an example
       }
       for(l=1;l<=k;l++)
       {
-         y=y*B[l]^(v[l]/2) mod n;
+         y=y*B[l]^(v[l] div 2) mod n;
       }
       d=gcdN(x-y,n);
       if((d>1)&&(d<n)){return(d);}
@@ -1583,27 +1583,23 @@ and m*P=0 if and only if p_m(P)=0
 EXAMPLE:example generateG; shows an example
 "
 {
-   poly f;
-   if(m==0){return(f);}
-   if(m==1){return(1);}
-   if(m==2){f=2*var(1);return(f);}
-   if(m==3){f=3*var(2)^4+6*a*var(2)^2+12*b*var(2)-a^2;return(f);}
+   if(m==0){return(poly(0));}
+   if(m==1){return(poly(1));}
+   if(m==2){return(2*var(1));}
+   if(m==3){return(3*var(2)^4+6*a*var(2)^2+12*b*var(2)-a^2);}
    if(m==4)
    {
-      f=4*var(1)*(var(2)^6+5*a*var(2)^4+20*b*var(2)^3-5*a^2*var(2)^2
-        -4*a*b*var(2)-8*b^2-a^3);
-      return(f);
+      return(4*var(1)*(var(2)^6+5*a*var(2)^4+20*b*var(2)^3-5*a^2*var(2)^2
+        -4*a*b*var(2)-8*b^2-a^3));
    }
    if((m mod 2)==0)
    {
-      f=(generateG(a,b,m/2+2)*generateG(a,b,m/2-1)^2
-        -generateG(a,b,m/2-2)*generateG(a,b,m/2+1)^2)
-        *generateG(a,b,m/2)/(2*var(1));
-      return(f);
+      return((generateG(a,b,m div 2+2)*generateG(a,b,m div 2-1)^2
+        -generateG(a,b,m div 2-2)*generateG(a,b,m div 2+1)^2)
+        *generateG(a,b,m div 2)/(2*var(1)));
    }
-   f=generateG(a,b,(m-1)/2+2)*generateG(a,b,(m-1)/2)^3
-     -generateG(a,b,(m-1)/2-1)*generateG(a,b,(m-1)/2+1)^3;
-   return(f);
+   return(generateG(a,b,(m-1) div 2+2)*generateG(a,b,(m-1) div 2)^3
+     -generateG(a,b,(m-1) div 2-1)*generateG(a,b,(m-1) div 2+1)^3);
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -1783,7 +1779,7 @@ EXAMPLE:example testElliptic; shows an example
       "P2=",P2;
       pause();
    }
-   while(t<(l-1)/2)
+   while(t<(l-1) div 2)
    {
       t++;
       //====  (H1/L1,H2/L2)=[t](x,y)^q ===============================

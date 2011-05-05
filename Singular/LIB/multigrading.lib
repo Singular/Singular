@@ -14,7 +14,7 @@ AUTHORS:  Benjamin Bechtold, benjamin.bechtold@googlemail.com
 @*        Anna-Lena Winz, anna-lena.winz@math.fu-berlin.de
 
 OVERVIEW: This library allows one to virtually add multigradings to Singular:
-grade multivariate polynomial rings with arbitrary (fin. gen. Abelian) groups. 
+grade multivariate polynomial rings with arbitrary (fin. gen. Abelian) groups.
 For more see http://code.google.com/p/convex-singular/wiki/Multigrading
 For theoretical references see:
 @* E. Miller, B. Sturmfels: 'Combinatorial Commutative Algebra'
@@ -424,9 +424,9 @@ EXAMPLE: example createGroup; shows an example
   G[2] = L;
   // And now a quick-and-dirty fix of Singular inability to handle attribs of attribs:
   // For the use of a group as an attribute for multigraded rings
-  G[3] = attrib(L, attrGroupHNF); 
+  G[3] = attrib(L, attrGroupHNF);
   G[4] = attrib(L, attrGroupSNF);
-  
+
 
   attrib(G, isGroup, (1==1)); // mark it "a group"
 
@@ -583,7 +583,7 @@ example
   def G = createGroup(S, L); // (S+L)/L
 
   isGroup(G);
-  
+
   printGroup(G);
 
 }
@@ -959,7 +959,7 @@ EXAMPLE: example getLattice; shows an example
 
 
 
-  def T = G[2]; 
+  def T = G[2];
 
   if( size(#) >= i )
   {
@@ -969,7 +969,7 @@ EXAMPLE: example getLattice; shows an example
     {
       ERROR("Sorry wrong arguments!");
     }
-    
+
     if( a == "hermite" )
     {
       def M = attrib(T, attrGradingGroupHNF);
@@ -1106,7 +1106,7 @@ example
                   1,1,1,1,
                   0,1,3,4;
   setBaseMultigrading(MM);
-  
+
   module M = ideal(  xw-yz, x2z-y3, xz2-y2w, yw2-z3);
 
 
@@ -1130,7 +1130,7 @@ example
   def v = getGradedGenerator(S, 1);
   print(v);
   print(setModuleGrading(v));
-  
+
   isHomogeneous(v);
 
   isHomogeneous(S[1]);
@@ -1572,7 +1572,7 @@ static proc gcdcomb(int a, int b)
   intvec save;
   while(av[1]*bv[1] != 0)
   {
-    bv = bv - (bv[1] - bv[1]%av[1])/av[1] * av;
+    bv = bv - (bv[1] - bv[1]%av[1]) div av[1] * av;
     save = bv;
     bv = av;
     av = save;
@@ -1663,7 +1663,7 @@ example
                   43,2,88,91,100,
                   -46,32,37,42,15;
   lll(m);
-  
+
   list l =
       intvec(13,25,37, 83, 294),
       intvec(12, -33, 9,0,64),
@@ -1697,22 +1697,26 @@ EXAMPLE: example smithNormalForm; shows an example
   int a, b, c;
   // D;
   intvec v;
-  if((cc==1)||(rr==1)){
+  if((cc==1)||(rr==1))
+  {
     if(size(#)==0)
     {
       return(D);
-    } else
+    }
+    else
     {
       return(list(P,D,Q));
     }
   }
-  while(D[k+1,k+1] !=0){
-    if(D[k+1,k+1]%D[k,k]!=0){
+  while(D[k+1,k+1] !=0)
+  {
+    if(D[k+1,k+1]%D[k,k]!=0)
+    {
       b = D[k, k]; c = D[k+1, k+1];
       v = gcdcomb(D[k,k],D[k+1,k+1]);
       transform = unitMatrix(cc);
       transform[k+1,k] = 1;
-      a = -v[3]*D[k+1,k+1]/v[1];
+      a = -v[3]*D[k+1,k+1] div v[1];
       transform[k, k+1] = a;
       transform[k+1, k+1] = a+1;
       //det(transform);
@@ -1722,8 +1726,8 @@ EXAMPLE: example smithNormalForm; shows an example
       transform = unitMatrix(rr);
       transform[k,k] = v[2];
       transform[k,k+1] = v[3];
-      transform[k+1,k] = -c/v[1];
-      transform[k+1,k+1] = b/v[1];
+      transform[k+1,k] = -c div v[1];
+      transform[k+1,k+1] = b div v[1];
       D = transform * D;
       P = transform * P;
       //" ";
@@ -1733,14 +1737,18 @@ EXAMPLE: example smithNormalForm; shows an example
       k=0;
     }
     k++;
-    if((k==rr) || (k==cc)){
+    if((k==rr) || (k==cc))
+    {
       break;
     }
   }
   //"here is the size ",size(#);
-  if(size(#) == 0){
+  if(size(#) == 0)
+  {
     return(D);
-  } else {
+  }
+  else
+  {
     return(list(P, D, Q));
   }
 }
@@ -1820,9 +1828,9 @@ EXAMPLE: example hermiteNormalForm; shows an example
               v1 = A[1..rr,column];
               v2 = A[1..rr,j];
               transform = unitMatrix(cc);
-              transform[j,j] = v1[row]/gcdvec[1];
+              transform[j,j] = v1[row] div gcdvec[1];
               transform[column, column] = gcdvec[2];
-              transform[column,j] = -v2[row]/gcdvec[1];
+              transform[column,j] = -v2[row] div gcdvec[1];
               transform[j,column] = gcdvec[3];
               q = q*transform;
               A = A*transform;
@@ -1839,7 +1847,7 @@ EXAMPLE: example hermiteNormalForm; shows an example
       for( j=1; j<column; j++){
         if(A[row, j]!=0){
           transform = unitMatrix(cc);
-          transform[column, j] = (-A[row,j]+A[row, j]%A[row, column])/A[row, column];
+          transform[column, j] = (-A[row,j]+A[row, j]%A[row, column]) div A[row, column];
           if(A[row,j]<0){
             transform[column,j]=transform[column,j]+1;}
           q = q*transform;
@@ -1929,14 +1937,14 @@ example
 
   ideal I = a, b;
   print(multiDeg(I));
-  
+
   intmat m[5][2]=multiDeg(a),multiDeg(b); m=transpose(m);
 
   print(multiDeg(a));
   print(multiDeg(b));
 
   print(m);
- 
+
   areZeroElements(m);
 
   intmat LL[2][1]=
@@ -1973,7 +1981,7 @@ EXAMPLE: example isZeroElement; shows an example
     }
     kill a;
   }
-  
+
   if( i == 1 )
   {
     intmat H = getLattice("hermite");
@@ -2000,7 +2008,7 @@ EXAMPLE: example isZeroElement; shows an example
       if(H[row,i]!=0)
       {
         v = H[1..r,i];
-        mdeg = mdeg-(mdeg[row]-mdeg[row]%v[row])/v[row]*v;
+        mdeg = mdeg-(mdeg[row]-mdeg[row]%v[row]) div v[row]*v;
       }
     }
   }
@@ -2197,7 +2205,7 @@ EXAMPLE: example pushForward; shows an example
 
   intmat newgrad[pp][np];
 
-  //This will set the finest grading on the image ring. We will proceed by coarsening this grading until f becomes homogeneous. 
+  //This will set the finest grading on the image ring. We will proceed by coarsening this grading until f becomes homogeneous.
   for(i=1;i<=np;i++){ newgrad[p+i,i]=1;}
 
   //newgrad;
@@ -2215,7 +2223,7 @@ EXAMPLE: example pushForward; shows an example
   for(i=1;i<=p;i++){
     for(j=1;j<=n;j++){ toadd1[i,j]=oldgrad[i,j];}
   }
-  
+
   // This will make the images of homogeneous elements homogeneous, namely the variables of the preimage ring.
   for(i=1;i<=n;i++){
     im=f[i];
@@ -2262,7 +2270,7 @@ EXAMPLE: example pushForward; shows an example
     }
     columns=columns+ncols(newlat[k]);
   }
-  
+
   //The following is just for reducing the size of the matrices.
   gragr=hermiteNormalForm(gragr);
   intmat result[pp][pp];
@@ -4761,7 +4769,7 @@ example
     2,5,10,
     3,6,12;
 
-  intmat B = latticeBasis(L); 
+  intmat B = latticeBasis(L);
   print(B); // should result in a matrix whose columns generate the same lattice as  [1,2,3] and [0,3,6]:
 
    // another example
@@ -4842,7 +4850,7 @@ example
   // should be a 4x2 matrix whose columns
   // generate the same lattice as [-1,2,-1,0],[2,-3,0,1]
   intmat B = kernelLattice(LL);
-  
+
   print(B);
 
   // another example
@@ -5070,10 +5078,10 @@ EXAMPLE: example projectLattice; shows an example
     {
       // we want a matrix with column operations so we transpose
       intmat BB = transpose(B);
-      list L = hermiteNormalForm(BB, "transform"); 
+      list L = hermiteNormalForm(BB, "transform");
       intmat U = transpose(L[2]);
 
- 
+
       // delete rows 1 to r
       intmat Udel[nrows(U) - r][ncols(U)];
       int k;
@@ -5297,7 +5305,7 @@ example
   intmat C[2][2] =
     2,1,
     3,2;
-  
+
   intmat D  = intInverse(C);
 
   // should be the unit matrix
@@ -5600,7 +5608,7 @@ example
     3,6;
 
   // should return a (3x2)-matrix whose columns
-  // generate the same lattice as [1, 2, 3] and [0, 1, 2] 
+  // generate the same lattice as [1, 2, 3] and [0, 1, 2]
   intmat R = primitiveSpan(V);
   print(R);
 
@@ -5610,7 +5618,7 @@ example
     0,1;
 
   // should return a (2x2)-matrix whose columns
-  // generate the same lattice as [1, 0] and [0, 1] 
+  // generate the same lattice as [1, 0] and [0, 1]
   intmat S = primitiveSpan(W);
   print(S);
 

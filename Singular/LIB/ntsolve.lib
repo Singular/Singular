@@ -54,7 +54,7 @@ EXAMPLE: example nt_solve; shows an example
 
     int prot = printlevel-voice+2;  // prot=printlevel (default:prot=0)
     if (i1 < 1){itmax = 100;}else{itmax = ipar[1];}
-    if (i1 < 2){acc = prec/2;}else{acc = ipar[2];}
+    if (i1 < 2){acc = prec div 2;}else{acc = ipar[2];}
     if ((acc <= 0)||(acc > prec-1)){acc = prec-1;}
 
     int dpl = di+1;

@@ -323,12 +323,12 @@ EXAMPLE: example makeUgl; shows examples
   poly p ;
   for( k=1; k<=N; k++)
   {
-    ik = 1 + ((k-1)/n);
+    ik = 1 + ((k-1) div n);
     jk = k -  n*(ik-1);
 
     for( l=k+1; l<=N; l++)
     {
-        il = 1 + ((l-1)/n);
+        il = 1 + ((l-1) div n);
         jl = l -  n*(il-1);
         p = 0;
         if( jl == ik )
