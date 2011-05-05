@@ -569,12 +569,12 @@ nMapFunc nr2mSetMap(const coeffs src, const coeffs dst)
     return ndCopyMap;
   }
   if (nCoeff_is_Ring_2toM(src)
-     && (src->ringflagb < dst->ringflagb))
+     && (src->mod2mMask < dst->mod2mMask))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t < s */
     return nr2mMapMachineInt;
   }
   if (nCoeff_is_Ring_2toM(src)
-     && (src->ringflagb > dst->ringflagb))
+     && (src->mod2mMask > dst->mod2mMask))
   { /* i.e. map an integer mod 2^s into Z mod 2^t, where t > s */
     // to be done
   }
