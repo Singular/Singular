@@ -283,7 +283,7 @@ public:
   /** Drive Mayan Pyramid Algorithm.
    * The Alg computes conv(Qi[]+shift[]).
    */
-  pointSet * getInnerPoints( pointSet **_Qi, mprfloat _shift[] );
+  pointSet * getInnerPoints( pointSet **_q_i, mprfloat _shift[] );
 
 private:
 
@@ -888,11 +888,11 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
 //<-
 
 //-> mayanPyramidAlg::*
-pointSet * mayanPyramidAlg::getInnerPoints( pointSet **_Qi, mprfloat _shift[] )
+pointSet * mayanPyramidAlg::getInnerPoints( pointSet **_q_i, mprfloat _shift[] )
 {
   int i;
 
-  Qi= _Qi;
+  Qi= _q_i;
   shift= _shift;
 
   E= new pointSet( Qi[0]->dim ); // E has same dim as Qi[...]

@@ -824,7 +824,7 @@ string MinorKey::toString() const
   return s;
 }
 
-int MinorValue::_RankingStrategy = -1;
+int MinorValue::g_rankingStrategy = -1;
 
 int MinorValue::getWeight () const
 {
@@ -897,8 +897,8 @@ void MinorValue::print() const
 
 void MinorValue::SetRankingStrategy (const int rankingStrategy)
 {
-  _RankingStrategy = rankingStrategy;
-  if (_RankingStrategy == 6)
+  g_rankingStrategy = rankingStrategy;
+  if (g_rankingStrategy == 6)
   {
     /* initialize the random generator with system time */
     srand ( time(NULL) );
@@ -907,7 +907,7 @@ void MinorValue::SetRankingStrategy (const int rankingStrategy)
 
 int MinorValue::GetRankingStrategy()
 {
-  return _RankingStrategy;
+  return g_rankingStrategy;
 }
 
 /* this is for generically accessing the rank measure regardless of

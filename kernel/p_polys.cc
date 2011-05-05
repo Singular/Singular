@@ -27,9 +27,9 @@
  *
  ***************************************************************/
 // this is special for the syz stuff
-static int* _Components = NULL;
-static long* _ShiftedComponents = NULL;
-static int _ExternalComponents = 0;
+static int* _components = NULL;
+static long* _componentsShifted = NULL;
+static int _componentsExternal = 0;
 
 BOOLEAN pSetm_error=0;
 
@@ -152,9 +152,9 @@ void p_Setm_General(poly p, const ring r)
         {
           int c=p_GetComp(p,r);
           long sc = c;
-          int* Components = (_ExternalComponents ? _Components :
+          int* Components = (_componentsExternal ? _components :
                              o->data.syzcomp.Components);
-          long* ShiftedComponents = (_ExternalComponents ? _ShiftedComponents:
+          long* ShiftedComponents = (_componentsExternal ? _componentsShifted:
                                      o->data.syzcomp.ShiftedComponents);
           if (ShiftedComponents != NULL)
           {
@@ -366,11 +366,11 @@ void p_Setm_General(poly p, const ring r)
 
 void p_Setm_Syz(poly p, ring r, int* Components, long* ShiftedComponents)
 {
-  _Components = Components;
-  _ShiftedComponents = ShiftedComponents;
-  _ExternalComponents = 1;
+  _components = Components;
+  _componentsShifted = ShiftedComponents;
+  _componentsExternal = 1;
   p_Setm_General(p, r);
-  _ExternalComponents = 0;
+  _componentsExternal = 0;
 }
 
 // dummy for lp, ls, etc

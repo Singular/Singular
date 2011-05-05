@@ -31,7 +31,7 @@ class LPolyOld {
         poly    term;           //term of signature
         int     index;          //index of signature
         poly    polynomial;     //standard polynomial data
-        RuleOld*   _RuleOld;
+        RuleOld*   _ruleOld;
         bool    del;
     public:
         inline          LPolyOld(poly t, int i, poly p, RuleOld* r=NULL);
@@ -77,7 +77,7 @@ void LPolyOld::setIndex(int i) {
 }
 
 void LPolyOld::setRuleOld(RuleOld* r) {
-    _RuleOld   =   r;
+    _ruleOld   =   r;
 }
 
 void LPolyOld::setDel(bool d) {
@@ -97,7 +97,7 @@ int LPolyOld::getIndex() {
 }
 
 RuleOld* LPolyOld::getRuleOld() {
-    return _RuleOld;
+    return _ruleOld;
 }
 
 bool LPolyOld::getDel() {

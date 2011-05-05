@@ -986,11 +986,11 @@ void Q2TG()
   }
 }
 
-int ComputeBasis(jList *_T,jList *_Q)
+int ComputeBasis(jList *_lT,jList *_lQ)
 {
   int gb_l,i,ret_value=1;
 
-  T=_T; Q=_Q;
+  T=_lT; Q=_lQ;
 
 //  Debug();
 
