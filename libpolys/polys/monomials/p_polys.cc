@@ -1443,30 +1443,80 @@ void p_Lcm(poly a, poly b, poly m, const ring r)
        otherwise NULL is returned (This parametrization can be used when
        one is only interested in the remainder of the division. In this
        case, the method will be faster.) */
-poly p_PolyDiv(poly *p, poly divisor, BOOLEAN needResult, ring r)
+poly p_PolyDiv(poly * p, poly divisor, BOOLEAN needResult, ring r)
 {
   assume(divisor != NULL);
   if (*p == NULL) return NULL;
   
-  /* yet to be implemented by Frank S.;
-     for the time being, this should at least compile */
-  return NULL;
+  poly result = NULL;
+  number divisorLT = p_GetCoeff(divisor, r);
+  int divisorExp = p_GetExp(divisor, 1, r);
+  while (p_Deg(*p, r) > p_Deg(divisor, r))
+  {
+    /* determine t = LT(*p) / LT(divisor) */
+    poly t = p_ISet(1, r);
+    number c = n_Div(p_GetCoeff(*p, r), divisorLT, r->cf);
+    p_SetCoeff(t, c, r);
+    int e = p_GetExp(*p, 1, r) - divisorExp;
+    p_SetExp(t, 1, e, r);
+    p_Setm(t, r);
+    result = p_Add_q(result, p_Copy(t, r), r);
+    *p = p_Add_q(*p, p_Neg(t, r), r);
+  }
+  n_Delete(&divisorLT, r->cf);
+  return result;
+}
+
+/* see p_Gcd;
+   additional assumption: deg(*p) >= deg(*q);
+   must destroy *p and *q (unless one of them is returned) */
+poly p_GcdHelper(poly * p, poly * q, ring r)
+{
+  if (q == NULL) return *p;
+  else
+  {
+    p_PolyDiv(p, *q, FALSE, r);
+    return p_GcdHelper(q, p, r);
+  }
 }
 
 /* assumes that p and q are univariate polynomials in r,
    mentioning the same variable;
    assumes a global monomial ordering in r;
    assumes that not both p and q are NULL;
-   returns the gcd of p and q */
+   returns the gcd of p and q;
+   leaves p and q unmodified */
 poly p_Gcd(poly p, poly q, ring r)
 {
   assume((p != NULL) || (q != NULL));
-  if (p == NULL) return q;
-  if (q == NULL) return p;
   
-  /* yet to be implemented by Frank S.;
-     for the time being, this should at least compile */
-  return NULL;
+  poly a = p; poly b = q;
+  if (p_Deg(a, r) < p_Deg(b, r)) { a = q; b = p; }
+  a = p_Copy(a, r); b = p_Copy(b, r);
+  return p_GcdHelper(&a, &b, r);
+}
+
+/* see p_ExtGcd;
+   additional assumption: deg(*p) >= deg(*q);
+   must destroy *p and *q (unless one of them is returned) */
+poly p_ExtGcdHelper(poly * p, poly * pFactor, poly * q, poly * qFactor,
+                    ring r)
+{
+  if (q == NULL)
+  {
+    *qFactor = NULL; *pFactor = p_ISet(1, r); return *p;
+  }
+  else
+  {
+    poly pDivQ = p_PolyDiv(p, *q, TRUE, r);
+    poly * ppFactor; poly * qqFactor;
+    poly theGcd = p_ExtGcdHelper(q, ppFactor, p, qqFactor, r);
+    pFactor = qqFactor;
+    *qFactor = p_Add_q(*ppFactor,
+                       p_Neg(p_Mult_q(fDivG, p_Copy(*qqFactor, r), r), r),
+                       r);
+    return theGcd;
+  }
 }
 
 /* assumes that p and q are univariate polynomials in r,
@@ -1475,16 +1525,18 @@ poly p_Gcd(poly p, poly q, ring r)
    assumes that not both p and q are NULL;
    returns the gcd of p and q;
    moreover, afterwards *pFactor and *qFactor contain appropriate
-   factors such that gcd(p, q) = p * (*pFactor) + q * (*qFactor) */
-poly p_ExtGcd(poly p, poly *pFactor, poly q, poly *qFactor, ring r)
+   factors such that gcd(p, q) = p * (*pFactor) + q * (*qFactor);
+   leaves p and q unmodified */
+poly p_ExtGcd(poly p, poly * pFactor, poly q, poly * qFactor, ring r)
 {
   assume((p != NULL) || (q != NULL));
-  if (p == NULL) { *pFactor = NULL; *qFactor = p_ISet(1, r); return q; };
-  if (q == NULL) { *qFactor = NULL; *pFactor = p_ISet(1, r); return p; };
   
-  /* yet to be implemented by Frank S.;
-     for the time being, this should at least compile */
-  return NULL;
+  poly a = p; poly b = q;
+  poly * aFactor = pFactor; poly * bFactor = qFactor; 
+  if (p_Deg(a, r) < p_Deg(b, r))
+  { a = q; b = p; aFactor = qFactor, bFactor = pFactor; }
+  a = p_Copy(a, r); b = p_Copy(b, r);
+  return p_ExtGcdHelper(&a, aFactor, &b, bFactor, r);
 }
 
 /*2
