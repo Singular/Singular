@@ -266,6 +266,60 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs r)
 }
 #endif
 
+#ifdef HAVE_FACTORY
+CanonicalForm nlConvSingNFactoryN( number n, const coeffs r )
+{
+  CanonicalForm term;
+  if ( SR_HDL(n) & SR_INT )
+  {
+    term = SR_TO_INT(n);
+  }
+  else
+  {
+    if ( n->s == 3 )
+    {
+      MP_INT dummy;
+      mpz_init_set( &dummy,n->z );
+      term = make_cf( dummy );
+    }
+    else
+    {
+      // assume s==0 or s==1
+      MP_INT num, den;
+      On(SW_RATIONAL);
+      mpz_init_set( &num, n->z );
+      mpz_init_set( &den, n->n );
+      term = make_cf( num, den, ( n->s != 1 ));
+    }
+  }
+  return term;
+}
+
+number nlConvFactoryNSingN( const CanonicalForm n, const coeffs r)
+{
+  if (n.isImm())
+  {
+    return nlInit(n.intval(),r);
+  }
+  else
+  {
+    number z=(number)omAllocBin(rnumber_bin);
+#if defined(LDEBUG)
+    z->debug=123456;
+#endif
+    gmp_numerator( n, z->z );
+    if ( n.den().isOne() )
+      z->s = 3;
+    else
+    {
+      gmp_denominator( n, z->n );
+      z->s = 0;
+    }
+    nlNormalize(z,r);
+    return z;
+  }
+}
+#endif
 number nlRInit (long i);
 
 static number nlMapR(number from, const coeffs src, const coeffs dst)

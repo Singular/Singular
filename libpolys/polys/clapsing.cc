@@ -44,7 +44,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
 
   if((pNext(f)==NULL) && (pNext(g)==NULL))
   {
-    poly p=pOne();
+    poly p=p_One(r);
     for(int i=rVar(r);i>0;i--)
       p_SetExp(p,i,si_min(p_GetExp(f,i,r),p_GetExp(g,i,r)),r);
     p_Setm(p,r);
@@ -56,7 +56,7 @@ poly singclap_gcd_r ( poly f, poly g, const ring r )
   Off(SW_RATIONAL);
   if (rField_is_Q(r) || (rField_is_Zp(r)))
   {
-    setCharacteristic( n_GetChar(r) );
+    setCharacteristic( n_GetChar(r->cf) );
     CanonicalForm F( convSingPFactoryP( f,r ) ), G( convSingPFactoryP( g, r ) );
     res=convFactoryPSingP( gcd( F, G ) , r);
   }

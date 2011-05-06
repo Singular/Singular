@@ -331,7 +331,7 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 {
   if (n.isImm())
   {
-    return n_Init(n.intval(),r);
+    return npInit(n.intval(),r);
   }
   else
   {
