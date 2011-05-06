@@ -13,6 +13,10 @@
 #include <reporter/reporter.h>
 #include <coeffs/si_gmp.h>
 
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
+
 enum n_coeffType
 {
   n_unknown=0,
@@ -23,7 +27,7 @@ enum n_coeffType
   n_long_R,
   n_Ext,  // used for all extensions (of Zp, of Q AND OF EXTENSIONS THEREOF)
   n_long_C,
-  // only used if HAVE_RINGS is defined
+  // only used if HAVE_RINGS is defined:
   n_Z,
   n_Zn,
   n_Zpn, // does no longer exist?
@@ -144,10 +148,16 @@ struct n_Procs_s
    /// For extensions (writes into global string buffer)
    char *  (*cfName)(number n, const coeffs r);
 
-   /// Inline: a := b
+   /// Inplace: a *= b
    void    (*cfInpMult)(number &a, number b, const coeffs r);
    /// maps the bigint i (from dummy) into the coeffs dst
    number  (*cfInit_bigint)(number i, const coeffs dummy, const coeffs dst);
+
+#ifdef HAVE_FACTORY
+   number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
+   CanonicalForm (*convSingNFactoryN)( number n, const coeffs r );
+#endif
+
 
 #ifdef LDEBUG
    /// Test: is "a" a correct number?
