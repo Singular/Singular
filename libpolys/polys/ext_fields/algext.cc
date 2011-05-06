@@ -36,22 +36,6 @@
 
 #include <polys/ext_fields/algext.h>
 
-/// our own type
-static const n_coeffType naID = n_Ext;
-
-/// polynomial ring in which our numbers live; to be set by naInitChar
-static ring naRing = NULL;
-
-/* coeffs object in which the coefficients of our numbers live;
- * to be set by naInitChar;
- * methods attached to naCoeffs may be used to compute with the
- * coefficients of our numbers, e.g., use naCoeffs->nAdd to add
- * coefficients of our numbers */
-static coeffs naCoeffs = NULL;
-
-/// minimal polynomial; to be set by naInitChar
-static poly naMinpoly = NULL;
-
 /// forward declarations
 BOOLEAN  naGreaterZero(number a, const coeffs cf); 
 BOOLEAN  naGreater(number a, number b, const coeffs cf);
@@ -75,28 +59,29 @@ number   naRePart(number a, const coeffs cf);
 number   naImPart(number a, const coeffs cf);
 number   naGetDenom(number a, const coeffs cf);
 number   naGetNumerator(number a, const coeffs cf);
-number   naGcd(number a, const coeffs cf);
-number   naLcm(number a, const coeffs cf);
-number   naSize(number a, const coeffs cf);
+number   naGcd(number a, number b, const coeffs cf);
+number   naLcm(number a, number b, const coeffs cf);
+int      naSize(number a, const coeffs cf);
 void     naDelete(number *a, const coeffs cf);
 void     naCoeffWrite(const coeffs cf);
-number   naIntDiv(number a, number b, const coeffs r);
-number   naPar(int i, const coeffs r);
-number   naInit_bigint(number a, const coeffs src, const coeffs dst);
+number   naIntDiv(number a, number b, const coeffs cf);
 const char * naRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 
 #ifdef LDEBUG
-BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs r)
+BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
 {
-  assume(getCoeffType(r) == naID);
+  assume(getCoeffType(cf) == naID);
   #ifdef LDEBUG
   omCheckAddr(&a);
   #endif
-  /// What else is there to test here?
+  assume(p_Deg((poly)a, naRing) <= p_Deg(naMinpoly, naRing));
   return TRUE;
 }
 #endif
+
+void heuristicReduce(poly p, poly reducer, const coeffs cf);
+void definiteReduce(poly p, poly reducer, const coeffs cf);
 
 BOOLEAN naIsZero(number a, const coeffs cf)
 {
@@ -134,9 +119,10 @@ BOOLEAN naEqual (number a, number b, const coeffs cf)
   return result;
 }
 
-number naGetNumerator(number &a, const coeffs cf)
+number naCopy(number &a, const coeffs cf)
 {
   naTest(a);
+  if (a == NULL) return NULL;
   return (number)p_Copy((poly)a, naRing);
 }
 
@@ -166,12 +152,6 @@ number naNeg(number a, const coeffs cf)
   naTest(a);
   if (a != NULL) a = (number)p_Neg((poly)a, naRing);
   return a;
-}
-
-number naRePart(number a, const coeffs cf)
-{
-  naTest(a);
-  return (number)p_Copy((poly)a, naRing);
 }
 
 number naImPart(number a, const coeffs cf)
@@ -224,26 +204,345 @@ void naCoeffWrite(const coeffs cf)
   PrintS("//   and K: "); n_CoeffWrite(cf->algring->cf);
 }
 
-/////////////////////////////////////////////////////////////////////
-/////// to be corrected --> /////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-
-nMapFunc naSetMap(const coeffs src, const coeffs dst)
+number naPar(int i, const coeffs cf)
 {
-  assume(dst->type == naID);
-  return NULL;
+  assume(i == 1);   // there is only one parameter in this extension field
+  poly p = p_ISet(1, naRing);   // p = 1
+  p_SetExp(p, 1, 1, naRing);    // p = the sole extension variable
+  p_Setm(p, naRing);
+  return (number)p;
+}
+
+number naAdd(number a, number b, const coeffs cf)
+{
+  naTest(a); naTest(b);
+  if (a == NULL) return naCopy(b, cf);
+  if (b == NULL) return naCopy(a, cf);
+  poly aPlusB = p_Add_q(p_Copy((poly)a, naRing),
+                        p_Copy((poly)b, naRing), naRing);
+  definiteReduce(aPlusB, naMinpoly);
+  return (number)aMinusB;
 }
 
 number naSub(number a, number b, const coeffs cf)
 {
-  return naInit(17, cf);
+  naTest(a); naTest(b);
+  if (b == NULL) return naCopy(a, cf);
+  poly minusB = p_Neg(p_Copy((poly)b, naRing), naRing);
+  if (a == NULL) return minusB;
+  poly aMinusB = p_Add_q(p_Copy((poly)a, naRing), minusB, naRing);
+  definiteReduce(aMinusB, naMinpoly);
+  return (number)aMinusB;
 }
 
-/////////////////////////////////////////////////////////////////////
-/////// <-- to be corrected /////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
+number naMult(number a, number b, const coeffs cf)
+{
+  naTest(a); naTest(b);
+  if (a == NULL) return NULL;
+  if (b == NULL) return NULL;
+  poly aTimesB = p_Mult_q(p_Copy((poly)a, naRing),
+                          p_Copy((poly)b, naRing), naRing);
+  definiteReduce(aTimesB, naMinpoly);
+  return (number)aMinusB;
+}
 
-BOOLEAN naInitChar(coeffs cf, void* infoStruct)
+number naDiv(number a, number b, const coeffs cf)
+{
+  naTest(a); naTest(b);
+  if (b == NULL) WerrorS(nDivBy0);
+  if (a == NULL) return NULL;
+  poly bInverse = (poly)naInvers(b, cf);
+  poly aDivB = p_Mult_q(p_Copy((poly)a, naRing), bInverse, naRing);
+  definiteReduce(aDivB, naMinpoly);
+  return (number)aMinusB;
+}
+
+/* 0^0 = 0;
+   for |exp| <= 7 compute power by a simple multiplication loop;
+   for |exp| >= 8 compute power along binary presentation of |exp|, e.g.
+      p^13 = p^1 * p^4 * p^8, where we utilise that
+      p^(2^(k+1)) = p^(2^k) * p^(2^k)
+   intermediate reduction modulo the minimal polynomial is controlled by
+   the in-place method heuristicReduce(poly, poly, coeffs); see there.
+*/
+void naPower(number a, int exp, number *b, const coeffs cf)
+{
+  naTest(a);
+  
+  /* special cases first */
+  if (a == NULL)
+  {
+    if (exp >= 0) return NULL;
+    else          WerrorS(nDivBy0);
+  }
+  else if (exp ==  0) return naInit(1, cf);
+  else if (exp ==  1) return naCopy(a, cf);
+  else if (exp == -1) return naInvers(a, cf);
+  
+  int expAbs = exp; if (expAbs < 0) expAbs = -expAbs;
+  
+  /* now compute 'a' to the 'expAbs'-th power */
+  poly pow; poly aAsPoly = (poly)a;
+  if (expAbs <= 7)
+  {
+    pow = p_Copy(aAsPoly, naRing);
+    for (int i = 2; i <= expAbs; i++)
+    {
+      pow = p_Mult_q(pow, p_Copy(aAsPoly, naRing), naRing);
+      heuristicReduce(pow, naMinpoly, cf);
+    }
+    definiteReduce(pow, naMinpoly, cf);
+  }
+  else
+  {
+    pow = p_ISet(1, naRing);
+    poly factor = p_Copy(aAsPoly, naRing);
+    while (expAbs != 0)
+    {
+      if (expAbs & 1)
+      {
+        pow = p_Mult_q(pow, p_Copy(factor, naRing), naRing);
+        heuristicReduce(pow, naMinpoly, cf);
+      }
+      expAbs = expAbs / 2;
+      if (expAbs != 0)
+      {
+        factor = p_Mult_q(factor, factor, naRing);
+        heuristicReduce(factor, naMinpoly, cf);
+      }
+    }
+    p_Delete(factor, naRing);
+    definiteReduce(pow, naMinpoly, cf);
+  }
+  
+  /* invert if original exponent was negative */
+  number n = (number)pow;
+  if (exp < 0)
+  {
+    number m = naInvers(n, cf);
+    naDelete(&n, cf);
+    n = m;
+  }
+  *b = n;
+}
+
+/* may reduce p module the reducer by calling definiteReduce;
+   the decision is made based on the following heuristic
+   (which should also only be changed here in this method):
+      if (deg(p) > 10*deg(reducer) then perform reduction */
+void heuristicReduce(poly p, poly reducer, const coeffs cf)
+{
+  #ifdef LDEBUG
+  omCheckAddr(p); omCheckAddr(reducer);
+  #endif
+  if (p_Deg(p, naRing) > 10 * p_Deg(reducer, naRing))
+    definiteReduce(p, reducer, cf);
+}
+
+void naWrite(number &a, const coeffs cf)
+{
+  naTest(a);
+  if (a == NULL)
+    StringAppendS("0");
+  else
+  {
+    poly aAsPoly = (poly)a;
+    /* basically, just write aAsPoly using p_Write,
+       but use brackets around the output, if a is not
+       a constant living in naCoeffs = cf->algring->cf */
+    BOOLEAN useBrackets = TRUE;
+    if (p_Deg(aAsPoly, naRing) == 0) useBrackets = FALSE;
+    if (useBrackets) StringAppendS("(");
+    p_Write(aAsPoly, naRing);
+    if (useBrackets) StringAppendS(")");
+  }
+}
+
+const char * naRead(const char *s, number *a, const coeffs cf)
+{
+  poly aAsPoly;
+  const char * result = p_Read(s, aAsPoly, naRing);
+  *a = (number)aAsPoly;
+  return result;
+}
+
+/* implemented by the rule lcm(a, b) = a * b / gcd(a, b) */
+number naLcm(number a, number b, const coeffs cf)
+{
+  naTest(a); naTest(b);
+  if (a == NULL) return NULL;
+  if (b == NULL) return NULL;
+  number theProduct = (number)p_Mult_q(p_Copy((poly)a, naRing),
+                                       p_Copy((poly)b, naRing), naRing);
+  /* note that theProduct needs not be reduced w.r.t. naMinpoly;
+     but the final division will take care of the necessary reduction */
+  number theGcd = naGcd(a, b, cf);
+  return naDiv(product, theGcd);
+}
+
+/* expects *param to be castable to ExtInfo */
+static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
+{
+  if (naID != n) return FALSE;
+  ExtInfo *e = (ExtInfo *)param;
+  /* for extension coefficient fields we expect the underlying
+     polynomials rings to be IDENTICAL, i.e. the SAME OBJECT;
+     this expectation is based on the assumption that we have properly
+     registered cf and perform reference counting rather than creating
+     multiple copies of the same coefficient field/domain/ring */
+  return (naRing == e->r);
+  /* (Note that then also the minimal ideals will necessarily be
+     the same, as they are attached to the ring.) */
+}
+
+int naSize(number a, const coeffs cf)
+{
+  if (a == NULL) return -1;
+  /* this has been taken from the old implementation of field extensions,
+     where we computed the sum of the degree and the number of terms in
+     (poly)a; so we leave it at that, for the time being;
+     maybe, the number of terms alone is a better measure? */
+  poly aAsPoly = (poly)a;
+  int theDegree = 0; int noOfTerms = 0;
+  while (aAsPoly != NULL)
+  {
+    noOfTerms++;
+    int d = 0;
+    for (int i = 1; i <= rVar(r); i++) d += p_GetExp(aAsPoly, i, naRing);
+    if (d > theDegree) theDegree = d;
+    pIter(aAsPoly);
+  }
+  return theDegree + noOfTerms;
+}
+
+/* performs polynomial division and overrides p by the remainder
+   of division of p by the reducer */
+void definiteReduce(poly p, poly reducer, const coeffs cf)
+{
+  #ifdef LDEBUG
+  omCheckAddr(p); omCheckAddr(reducer);
+  #endif
+  p_PolyDiv(*p, reducer, FALSE, naRing);
+}
+
+number naGcd(number a, number b, const coeffs cf)
+{
+  naTest(a); naTest(b);
+  if ((a == NULL) && (b == NULL)) WerrorS(nDivBy0);
+  return (number)p_Gcd((poly)a, (poly)b, naRing);
+}
+
+number naInvers(number a, const coeffs cf)
+{
+  naTest(a);
+  if (a == NULL) WerrorS(nDivBy0);
+  poly *aFactor; poly *mFactor;
+  poly theGcd = p_ExtGcd((poly)a, *aFactor, naMinpoly, *mFactor, naRing);
+  /* the gcd must be one since naMinpoly is irreducible and a != NULL: */
+  assume(naIsOne(theGcd, cf));      
+  pDelete(&theGcd, naRing);
+  pDelete(mFactor, naRing);
+  return aInverse = (number)(*aFactor);
+}
+
+/* assumes that src = Q, dst = Q(a) */
+number naMap00(number a, const coeffs src, const coeffs dst)
+{
+  assume(src == dst->algring->cf);
+  poly result = p_Init(1, dst->algring);
+  p_SetCoeff(result, naCopy(a, src), dst->algRing);
+  return (number)result;
+}
+
+/* assumes that src = Z/p, dst = Q(a) */
+number naMapP0(number a, const coeffs src, const coeffs dst)
+{
+  /* mapping via intermediate int: */
+  int n = n_Int(a, src);
+  number q = n_Init(n, dst->algring->cf);
+  poly result = p_Init(1, dst->algring);
+  p_SetCoeff(result, q, dst->algRing);
+  return (number)result;
+}
+
+/* assumes that either src = Q(a), dst = Q(a), or
+                       src = Zp(a), dst = Zp(a)     */
+number naCopyMap(number a, const coeffs src, const coeffs dst)
+{
+  return naCopy(a, dst);
+}
+
+/* assumes that src = Q, dst = Z/p(a) */
+number naMap0P(number a, const coeffs src, const coeffs dst)
+{
+  int p = rChar(dst);
+  int n = nlModP(a, p, src);
+  number q = n_Init(n, dst->algring->cf);
+  poly result = p_Init(1, dst->algring);
+  p_SetCoeff(result, q, dst->algRing);
+  return (number)result;
+}
+
+/* assumes that src = Z/p, dst = Z/p(a) */
+number naMapPP(number a, const coeffs src, const coeffs dst)
+{
+  assume(src == dst->algring->cf);
+  poly result = p_Init(1, dst->algring);
+  p_SetCoeff(result, naCopy(a, src), dst->algRing);
+  return (number)result;
+}
+
+/* assumes that src = Z/u, dst = Z/p(a), where u != p */
+number naMapUP(number a, const coeffs src, const coeffs dst)
+{
+  /* mapping via intermediate int: */
+  int n = n_Int(a, src);
+  number q = n_Init(n, dst->algring->cf);
+  poly result = p_Init(1, dst->algring);
+  p_SetCoeff(result, q, dst->algRing);
+  return (number)result;
+}
+
+nMapFunc naSetMap(const ring src, const ring dst)
+{
+  /* dst->cf is expected to be an (algebraic) extension field */
+  assume(dst->type == n_Ext);
+  
+  if (rField_is_Q(src) && rField_is_Q_a(dst))
+    return naMap00;                                      /// Q     -->  Q(a)
+  
+  if (rField_is_Zp(src) && rField_is_Q_a(dst))
+    return naMapP0;                                      /// Z/p   -->  Q(a)
+  
+  if (rField_is_Q_a(src) && rField_is_Q_a(dst))
+  {
+    if (strcmp(src->parameter[0], dst->parameter[0]) == 0)
+      return naCopyMap;                                  /// Q(a)   --> Q(a)
+    else
+      return NULL;                                       /// Q(b)   --> Q(a)
+  }
+  
+  if (rField_is_Q(src) && rField_is_Zp_a(dst))
+    return naMap0P;                                      /// Q      --> Z/p(a)
+  
+  if (rField_is_Zp(src) && rField_is_Zp_a(dst))
+  {
+    if (rChar(src) == rChar(dst)) return naMapPP;        /// Z/p    --> Z/p(a)
+    else return naMapUP;                                 /// Z/u    --> Z/p(a)
+  }
+  
+  if (rField_is_Zp_a(src) && rField_is_Zp_a(dst))
+  {
+    if (strcmp(src->parameter[0], dst->parameter[0]) == 0)
+      return naCopyMap;                                  /// Z/p(a) --> Z/p(a)
+    else
+      return NULL;                                       /// Z/p(b) --> Z/p(a)
+  }
+  
+  return NULL;                                           /// default
+}
+
+BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {
   ExtInfo *e = (ExtInfo *)infoStruct;
   /// first check whether cf->algring != NULL and delete old ring???
@@ -257,9 +556,6 @@ BOOLEAN naInitChar(coeffs cf, void* infoStruct)
   assume(cf->algring->cf                 != NULL);      // algring->cf;
   assume(getCoeffType(cf) == naID);                     // coeff type;
   
-  naRing = cf->algring;
-  naCoeffs = cf->algring->cf;
-  naMinpoly = naRing->minideal->m[0];
   #ifdef LDEBUG
   omCheckAddr(naMinpoly);
   #endif
@@ -273,33 +569,30 @@ BOOLEAN naInitChar(coeffs cf, void* infoStruct)
   cf->cfInit         = naInit;
   cf->cfInt          = naInt;
   cf->cfNeg          = naNeg;
-  cf->cfInvers       = NULL; //naInvers;
-  cf->cfPar          = NULL; //naPar;
-  cf->cfAdd          = NULL; //naAdd;
+  cf->cfPar          = naPar;
+  cf->cfAdd          = naAdd;
   cf->cfSub          = naSub;
-  cf->cfMult         = NULL; //naMult;
-  cf->cfDiv          = NULL; //naDiv;
-  cf->cfExactDiv     = NULL; //just write here 'naDiv' when naDiv is available;
-  cf->cfPower        = NULL; //naPower;
-  cf->cfCopy         = NULL; //naCopy;
-  cf->cfWrite        = NULL; //naWrite;
-  cf->cfRead         = NULL; //naRead;
+  cf->cfMult         = naMult;
+  cf->cfDiv          = naDiv;
+  cf->cfExactDiv     = naDiv;
+  cf->cfPower        = naPower;
+  cf->cfCopy         = naCopy;
+  cf->cfWrite        = naWrite;
+  cf->cfRead         = naRead;
   cf->cfDelete       = naDelete;
   cf->cfSetMap       = naSetMap;
   cf->cfGetDenom     = naGetDenom;
-  cf->cfGetNumerator = naGetNumerator;
-  cf->cfRePart       = naRePart;
+  cf->cfGetNumerator = naCopy;
+  cf->cfRePart       = naCopy;
   cf->cfImPart       = naImPart;
-  cf->cfGcd          = NULL; //naGcd;
-  cf->cfLcm          = NULL; //naLcm;
-  cf->cfCoeffWrite   = NULL; //naCoeffWrite;
-  cf->cfSize         = NULL; //naSize;
   cf->cfCoeffWrite   = naCoeffWrite;
-  cf->nCoeffIsEqual  = NULL; //naCoeffIsEqual;
-  cf->cfIntDiv       = NULL; //naCoeffIsEqual;
-  cf->cfPar          = NULL; //naPar;
   cf->cfDBTest       = naDBTest;
-  cf->cfInit_bigint  = NULL; //naInit_bigint;
+  cf->cfGcd          = naGcd;
+  cf->cfLcm          = naLcm;
+  cf->cfSize         = naSize;
+  cf->nCoeffIsEqual  = naCoeffIsEqual;
+  cf->cfInvers       = naInvers;
+  cf->cfIntDiv       = naDiv;
   
   return FALSE;
 }

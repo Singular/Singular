@@ -213,7 +213,7 @@ BOOLEAN _pp_Test(poly p, ring lmRing, ring tailRing, int level);
  *
  ***************************************************************/
 /*2
-* returns the length of a (numbers of monomials)
+* returns the length of a polynomial (numbers of monomials)
 */
 static inline int pLength(poly a)
 {
@@ -360,7 +360,7 @@ static inline long p_MinComp(poly p,ring lmRing) {return p_MinComp(p,lmRing,lmRi
  *
  ***************************************************************/
 
-// returns the length of a (numbers of monomials)
+// returns the length of a polynomial (numbers of monomials)
 // respect syzComp
 // static inline poly pLast(poly a, int &length);
 // static inline poly pLast(poly a) { int l; return pLast(a, l); }
@@ -1806,6 +1806,36 @@ void      p_Lcm(poly a, poly b, poly m, const ring r);
 poly      p_Diff(poly a, int k, const ring r);
 poly      p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r);
 int       p_Weight(int c, const ring r);
+
+/* assumes that *p and divisor are univariate polynomials in r,
+   mentioning the same variable;
+   assumes divisor != NULL;
+   *p may be NULL;
+   assumes a global monomial ordering in r;
+   performs polynomial division of *p by divisor:
+     - afterwards *p contains the remainder of the division, i.e.,
+       *p_before = result * divisor + *p_afterwards;
+     - if needResult == TRUE, then the method computes and returns 'result',
+       otherwise NULL is returned (This parametrization can be used when
+       one is only interested in the remainder of the division. In this
+       case, the method will be faster.) */
+poly      p_PolyDiv(poly *p, poly divisor, BOOLEAN needResult, ring r);
+
+/* assumes that p and q are univariate polynomials in r,
+   mentioning the same variable;
+   assumes a global monomial ordering in r;
+   assumes that not both p and q are NULL;
+   returns the gcd of p and q */
+poly      p_Gcd(poly p, poly q, ring r);
+
+/* assumes that p and q are univariate polynomials in r,
+   mentioning the same variable;
+   assumes a global monomial ordering in r;
+   assumes that not both p and q are NULL;
+   returns the gcd of p and q;
+   moreover, afterwards *pFactor and *qFactor contain appropriate
+   factors such that gcd(p, q) = p * (*pFactor) + q * (*qFactor) */
+poly      p_ExtGcd(poly p, poly *pFactor, poly q, poly *qFactor, ring r);
 
 /* syszygy stuff */
 BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r);

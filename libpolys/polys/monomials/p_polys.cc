@@ -1431,6 +1431,62 @@ void p_Lcm(poly a, poly b, poly m, const ring r)
   /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
+/* assumes that *p and divisor are univariate polynomials in r,
+   mentioning the same variable;
+   assumes divisor != NULL;
+   *p may be NULL;
+   assumes a global monomial ordering in r;
+   performs polynomial division of *p by divisor:
+     - afterwards *p contains the remainder of the division, i.e.,
+       *p_before = result * divisor + *p_afterwards;
+     - if needResult == TRUE, then the method computes and returns 'result',
+       otherwise NULL is returned (This parametrization can be used when
+       one is only interested in the remainder of the division. In this
+       case, the method will be faster.) */
+poly p_PolyDiv(poly *p, poly divisor, BOOLEAN needResult, ring r)
+{
+  assume(divisor != NULL);
+  if (*p == NULL) return NULL;
+  
+  /* yet to be implemented by Frank S.;
+     for the time being, this should at least compile */
+  return NULL;
+}
+
+/* assumes that p and q are univariate polynomials in r,
+   mentioning the same variable;
+   assumes a global monomial ordering in r;
+   assumes that not both p and q are NULL;
+   returns the gcd of p and q */
+poly p_Gcd(poly p, poly q, ring r)
+{
+  assume((p != NULL) || (q != NULL));
+  if (p == NULL) return q;
+  if (q == NULL) return p;
+  
+  /* yet to be implemented by Frank S.;
+     for the time being, this should at least compile */
+  return NULL;
+}
+
+/* assumes that p and q are univariate polynomials in r,
+   mentioning the same variable;
+   assumes a global monomial ordering in r;
+   assumes that not both p and q are NULL;
+   returns the gcd of p and q;
+   moreover, afterwards *pFactor and *qFactor contain appropriate
+   factors such that gcd(p, q) = p * (*pFactor) + q * (*qFactor) */
+poly p_ExtGcd(poly p, poly *pFactor, poly q, poly *qFactor, ring r)
+{
+  assume((p != NULL) || (q != NULL));
+  if (p == NULL) { *pFactor = NULL; *qFactor = p_ISet(1, r); return q; };
+  if (q == NULL) { *qFactor = NULL; *pFactor = p_ISet(1, r); return p; };
+  
+  /* yet to be implemented by Frank S.;
+     for the time being, this should at least compile */
+  return NULL;
+}
+
 /*2
 * returns the partial differentiate of a by the k-th variable
 * does not destroy the input
