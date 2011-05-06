@@ -65,14 +65,12 @@ number   naRePart(number a, const coeffs cf);
 number   naImPart(number a, const coeffs cf);
 number   naGetDenom(number a, const coeffs cf);
 number   naGetNumerator(number a, const coeffs cf);
-number   naGcd(number a, const coeffs cf);
-number   naLcm(number a, const coeffs cf);
+number   naGcd(number a, number b, const coeffs cf);
+number   naLcm(number a, number b, const coeffs cf);
 number   naSize(number a, const coeffs cf);
 void     naDelete(number *a, const coeffs cf);
 void     naCoeffWrite(const coeffs cf);
-number   naIntDiv(number a, number b, const coeffs r);
-number   naPar(int i, const coeffs r);
-number   naInit_bigint(number a, const coeffs src, const coeffs dst);
+number   naIntDiv(number a, number b, const coeffs cf);
 const char * naRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 */
@@ -83,6 +81,21 @@ BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
 #else
 #define naTest(a)
 #endif
+
+/* our own type */
+#define naID n_Ext
+
+/* polynomial ring in which our numbers live */
+#define naRing cf->algring
+
+/* coeffs object in which the coefficients of our numbers live;
+ * methods attached to naCoeffs may be used to compute with the
+ * coefficients of our numbers, e.g., use naCoeffs->nAdd to add
+ * coefficients of our numbers */
+#define naCoeffs cf->algring->cf
+
+/* minimal polynomial */
+#define naMinpoly naRing->minideal->m[0]
 
 #endif
 /* ALGEXT_H */
