@@ -781,7 +781,7 @@ case "$ac_cv_singuname" in
 	        ac_lib_dl=yes
 	  fi
 	;;
-	ix86-freebsd)
+	*-freebsd)
 	  AC_CHECK_LIB(c, dlopen)
           if test "$ac_cv_lib_c_dlopen" = yes; then
 	  	LD_DYN_FLAGS="-Xlinker -E"

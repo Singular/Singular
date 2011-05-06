@@ -2789,7 +2789,7 @@ fi
 	        ac_lib_dl=yes
 	  fi
 	;;
-	ix86-freebsd)
+	*-freebsd)
 	  echo $ac_n "checking for dlopen in -lc""... $ac_c" 1>&6
 echo "configure:2794: checking for dlopen in -lc" >&5
 ac_lib_var=`echo c'_'dlopen | sed 'y%./+-%__p_%'`
