@@ -18,21 +18,21 @@
 #  include <factory/factory.h>
 #endif /* HAVE_FACTORY */
 
-poly convFactoryPSingP ( const CanonicalForm & f, const ring r=currRing );
-CanonicalForm convSingPFactoryP( poly p, const ring r=currRing );
+poly convFactoryPSingP ( const CanonicalForm & f, const ring r );
+CanonicalForm convSingPFactoryP( poly p, const ring r );
 
 CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a, const ring r );
 poly convFactoryAPSingAP ( const CanonicalForm & f, const ring r );
 poly convFactoryAPSingAP_R ( const CanonicalForm & f, int par_start, int var_start );
 
-CanonicalForm convSingGFFactoryGF ( poly p );
-poly convFactoryGFSingGF ( const CanonicalForm & f );
+CanonicalForm convSingGFFactoryGF ( poly p, const ring r );
+poly convFactoryGFSingGF ( const CanonicalForm & f, const ring r );
 
-CanonicalForm convSingAFactoryA ( napoly p , const Variable & a, const ring r );
-napoly convFactoryASingA ( const CanonicalForm & f, const ring r );
+CanonicalForm convSingAFactoryA ( number p , const Variable & a, const ring r );
+number convFactoryASingA ( const CanonicalForm & f, const ring r );
 
-CanonicalForm convSingTrPFactoryP ( poly p, const ring r=currRing );
-poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r=currRing );
+CanonicalForm convSingTrPFactoryP ( poly p, const ring r );
+poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r );
 
 // CanonicalForm convSingIFactoryI( int i);a <- by constructor of CanonicalForm
 int convFactoryISingI( const CanonicalForm & f);

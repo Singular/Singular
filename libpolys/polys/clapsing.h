@@ -20,42 +20,42 @@
 #include <polys/clapconv.h>
 //#include <kernel/longtrans.h>
 
-poly singclap_gcd ( poly f, poly g );
+poly singclap_gcd ( poly f, poly g, const ring r );
 poly singclap_gcd_r ( poly f, poly g, const ring r );
 /*
 napoly singclap_alglcm ( napoly f, napoly g );
 void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
 */
 
-poly singclap_resultant ( poly f, poly g , poly x);
+poly singclap_resultant ( poly f, poly g , poly x, const ring r);
 
-BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb );
+BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb , const ring r);
 BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const ring r );
 
-poly singclap_pdivide ( poly f, poly g );
+poly singclap_pdivide ( poly f, poly g, const ring r );
 poly singclap_pdivide_r ( poly f, poly g, const ring r );
 
-void singclap_divide_content ( poly f );
+void singclap_divide_content ( poly f, const ring r);
 
-ideal singclap_factorize ( poly f, intvec ** v , int with_exps);
+ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r);
 
-ideal singclap_sqrfree ( poly f );
+ideal singclap_sqrfree ( poly f, const ring r );
 
-matrix singclap_irrCharSeries ( ideal I);
+matrix singclap_irrCharSeries ( ideal I, const ring r);
 
 #ifdef HAVE_NTL
-matrix singntl_HNF(matrix A);
-intvec* singntl_HNF(intvec* A);
-matrix singntl_LLL(matrix A);
-intvec* singntl_LLL(intvec* A);
+matrix singntl_HNF(matrix A, const ring r);
+intvec* singntl_HNF(intvec* A, const ring r);
+matrix singntl_LLL(matrix A, const ring r);
+intvec* singntl_LLL(intvec* A, const ring r);
 #endif
 
-BOOLEAN singclap_isSqrFree(poly f);
+BOOLEAN singclap_isSqrFree(poly f, const ring r);
 
-char* singclap_neworder ( ideal I);
+char* singclap_neworder ( ideal I, const ring r);
 
-poly singclap_det( const matrix m );
-int singclap_det_i( intvec * m );
+poly singclap_det( const matrix m, const ring r );
+int singclap_det_i( intvec * m, const ring r );
 /*
 BOOLEAN jjRESULTANT(leftv res, leftv u, leftv v, leftv w);
 BOOLEAN jjCHARSERIES(leftv res, leftv u);
