@@ -34,10 +34,6 @@ napoly convFactoryASingA ( const CanonicalForm & f, const ring r );
 CanonicalForm convSingTrPFactoryP ( poly p, const ring r=currRing );
 poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r=currRing );
 
-CanonicalForm convSingNFactoryN( number n, const ring r );
-number convFactoryNSingN( const CanonicalForm & n, const ring r);
-
-
 // CanonicalForm convSingIFactoryI( int i);a <- by constructor of CanonicalForm
 int convFactoryISingI( const CanonicalForm & f);
 #endif /* INCL_SINGCONV_H */
