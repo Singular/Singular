@@ -119,6 +119,22 @@ BOOLEAN ndIsUnit(number a, const coeffs r) { return !n_IsZero(a,r); }
 number  ndExtGcd (number a, number b, number *s, number *t, const coeffs r) { return n_Init(1,r); }
 #endif
 
+#ifdef HAVE_FACTORY
+CanonicalForm npConvSingNFactoryN( number n, const coeffs r )
+{
+  CanonicalForm term(0);
+  Werror("no conversion to factory");
+  return term;
+}
+
+number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
+{
+  Werror("no conversion from factory");
+  return NULL;
+}
+#endif
+
+
 static n_coeffType nLastCoeffs=n_Z2m;
 static cfInitCharProc *nInitCharTable=NULL;
 /*2
@@ -160,6 +176,11 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfIsUnit = ndIsUnit;
     n->cfExtGcd = ndExtGcd;
     //n->cfGetUnit = (nMapFunc)NULL;
+#endif
+
+#ifdef fACTORY
+    n->convSingNFactoryN=ndConvSingNFactoryN;
+    n->convFactoryNSingN=ndConvFactoryNSingN;
 #endif
     
     BOOLEAN nOK=TRUE;

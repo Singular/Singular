@@ -318,6 +318,26 @@ static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   /* test, if r is an instance of nInitCoeffs(n,parameter) */
   return (n==n_Zp) && (r->ch==(int)(long)parameter);
 }
+#ifdef HAVE_FACTORY
+CanonicalForm npConvSingNFactoryN( number n, const coeffs r )
+{
+  CanonicalForm term(npInt( n,r ));
+  return term;
+}
+
+number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
+{
+  if (n.isImm())
+  {
+    return n_Init(n.intval(),r);
+  }
+  else
+  {
+    assume(0);
+  }
+}
+#endif
+
 
 BOOLEAN npInitChar(coeffs r, void* p)
 {
@@ -392,6 +412,11 @@ BOOLEAN npInitChar(coeffs r, void* p)
 #ifdef LDEBUG
   // debug stuff
   r->cfDBTest=npDBTest;
+#endif
+
+#ifdef HAVE_FACTORY
+  r->convSingNFactoryN=npConvSingNFactoryN;
+  r->convFactoryNSingN=npConvFactoryNSingN;
 #endif
   
   // the variables:
