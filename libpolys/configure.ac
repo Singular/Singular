@@ -73,4 +73,5 @@ AC_CONFIG_FILES([resources/Makefile])
 AC_CONFIG_FILES([coeffs/Makefile])
 AC_CONFIG_FILES([polys/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
+AC_CONFIG_FILES([libpolys-config])
 AC_OUTPUT
