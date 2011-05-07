@@ -40,6 +40,7 @@ libpolys/polys/m4/
 libpolys/coeffs/test
 libpolys/coeffs/test-g
 libpolys/polys/templates/.dirstamp
+libpolys/libpolys-config
 depend
 tags
 ltmain.sh
