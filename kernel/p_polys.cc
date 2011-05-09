@@ -540,7 +540,7 @@ long pWDegree(poly p, const ring r)
 {
   if (r->firstwv==NULL) return p_Totaldegree(p, r);
   p_LmCheckPolyRing(p, r);
-  int i, k;
+  int i;
   long j =0;
 
   for(i=1;i<=r->firstBlockEnds;i++)

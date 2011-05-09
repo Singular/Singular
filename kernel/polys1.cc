@@ -157,13 +157,12 @@ static poly p_MonPower(poly p, int exp, const ring r)
 static void p_MonMult(poly p, poly q, const ring r)
 {
   number x, y;
-  int i;
 
   y = pGetCoeff(p);
   x = n_Mult(y,pGetCoeff(q),r);
   n_Delete(&y,r);
   pSetCoeff0(p,x);
-  //for (i=pVariables; i!=0; i--)
+  //for (int i=pVariables; i!=0; i--)
   //{
   //  pAddExp(p,i, pGetExp(q,i));
   //}
@@ -178,7 +177,6 @@ static void p_MonMult(poly p, poly q, const ring r)
 static poly p_MonMultC(poly p, poly q, const ring rr)
 {
   number x;
-  int i;
   poly r = p_Init(rr);
 
   x = n_Mult(pGetCoeff(p),pGetCoeff(q),rr);
@@ -468,7 +466,6 @@ int pMaxCompProc(poly p)
 */
 void pEnlargeSet(polyset *p, int l, int increment)
 {
-  int i;
   polyset h;
 
   h=(polyset)omReallocSize((poly*)*p,l*sizeof(poly),(l+increment)*sizeof(poly));
@@ -1457,7 +1454,6 @@ poly ppJetW(poly p, int m, short *w)
 
 poly pJetW(poly p, int m, short *w)
 {
-  poly t=NULL;
   while((p!=NULL) && (totaldegreeWecart_IV(p,currRing,w)>m)) pLmDelete(&p);
   if (p==NULL) return NULL;
   poly r=p;
@@ -1711,7 +1707,6 @@ BOOLEAN p_EqualPolys(poly p1,poly p2, const ring r)
 BOOLEAN pComparePolys(poly p1,poly p2)
 {
   number n,nn;
-  int i;
   pAssume(p1 != NULL && p2 != NULL);
 
   if (!pLmEqual(p1,p2)) //compare leading mons

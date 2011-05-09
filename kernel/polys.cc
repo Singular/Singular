@@ -53,7 +53,6 @@ poly      ppNoether = NULL;
 
 void pSetGlobals(const ring r, BOOLEAN complete)
 {
-  int i;
   if (ppNoether!=NULL) pDelete(&ppNoether);
   pVariables = r->N;
   pOrdSgn = r->OrdSgn;
