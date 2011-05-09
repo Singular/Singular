@@ -267,8 +267,10 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs r)
 #endif
 
 #ifdef HAVE_FACTORY
-CanonicalForm nlConvSingNFactoryN( number n, const coeffs r )
+CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
+  if (setChar) setCharacteristic( 0 );
+
   CanonicalForm term;
   if ( SR_HDL(n) & SR_INT )
   {

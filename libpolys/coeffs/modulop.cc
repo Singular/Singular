@@ -319,8 +319,9 @@ static BOOLEAN npCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
   return (n==n_Zp) && (r->ch==(int)(long)parameter);
 }
 #ifdef HAVE_FACTORY
-CanonicalForm npConvSingNFactoryN( number n, const coeffs r )
+CanonicalForm npConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
+  if (setChar) setCharacteristic( r->npPrimeM );
   CanonicalForm term(npInt( n,r ));
   return term;
 }

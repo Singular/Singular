@@ -35,11 +35,7 @@
 #  endif
 #endif /* ! NOSTREAMIO */
 
-#ifdef SINGULAR
 #  include <factory/cf_gmp.h>
-#else
-#  include <gmp.h>
-#endif /* SINGULAR */
 
 #include <factory/templates/ftmpl_array.h>
 #include <factory/templates/ftmpl_factor.h>

@@ -1672,13 +1672,12 @@ static poly p_MonPower(poly p, int exp, const ring r)
 static void p_MonMult(poly p, poly q, const ring r)
 {
   number x, y;
-  int i;
 
   y = pGetCoeff(p);
   x = n_Mult(y,pGetCoeff(q),r->cf);
   n_Delete(&y,r->cf);
   pSetCoeff0(p,x);
-  //for (i=pVariables; i!=0; i--)
+  //for (int i=pVariables; i!=0; i--)
   //{
   //  pAddExp(p,i, pGetExp(q,i));
   //}
@@ -1693,7 +1692,6 @@ static void p_MonMult(poly p, poly q, const ring r)
 static poly p_MonMultC(poly p, poly q, const ring rr)
 {
   number x;
-  int i;
   poly r = p_Init(rr);
 
   x = n_Mult(pGetCoeff(p),pGetCoeff(q),rr->cf);
@@ -2022,7 +2020,7 @@ void p_Content(poly ph, const ring r)
 #endif
     if (rField_is_Q_a(r))
     {
-      number hzz = nlInit(1, r->cf);
+      //number hzz = nlInit(1, r->cf);
       h = nlInit(1, r->cf);
       p=ph;
       Werror("longalg missing");
@@ -2992,7 +2990,6 @@ void  p_Vec2Polys(poly v, poly* *p, int *len, const ring r)
 
 void p_SetGlobals(const ring r, BOOLEAN complete)
 {
-  int i;
   if (r->ppNoether!=NULL) p_Delete(&r->ppNoether,r);
 
   if (complete)
@@ -3589,7 +3586,6 @@ poly pp_JetW(poly p, int m, short *w, const ring R)
 
 poly p_JetW(poly p, int m, short *w, const ring R)
 {
-  poly t=NULL;
   while((p!=NULL) && (totaldegreeWecart_IV(p,R,w)>m)) p_LmDelete(&p,R);
   if (p==NULL) return NULL;
   poly r=p;
@@ -3691,7 +3687,6 @@ BOOLEAN p_EqualPolys(poly p1,poly p2, const ring r)
 BOOLEAN p_ComparePolys(poly p1,poly p2, const ring r)
 {
   number n,nn;
-  int i;
   pAssume(p1 != NULL && p2 != NULL);
 
   if (!p_LmEqual(p1,p2,r)) //compare leading mons

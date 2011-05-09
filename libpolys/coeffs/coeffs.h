@@ -156,7 +156,7 @@ struct n_Procs_s
 
 #ifdef HAVE_FACTORY
    number (*convFactoryNSingN)( const CanonicalForm n, const coeffs r);
-   CanonicalForm (*convSingNFactoryN)( number n, const coeffs r );
+   CanonicalForm (*convSingNFactoryN)( number n, BOOLEAN setChar, const coeffs r );
 #endif
 
 
