@@ -771,7 +771,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         return TRUE;
       }
       memset((char *) &serv_addr,0, sizeof(serv_addr));
-      portno = 1024;
+      portno = 1025;
       serv_addr.sin_family = AF_INET;
       serv_addr.sin_addr.s_addr = INADDR_ANY;
       do
@@ -832,7 +832,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
         return TRUE;
       }
       memset((char *) &serv_addr,0, sizeof(serv_addr));
-      portno = 1024;
+      portno = 1025;
       serv_addr.sin_family = AF_INET;
       serv_addr.sin_addr.s_addr = INADDR_ANY;
       do
