@@ -6,7 +6,7 @@
 #undef __cplusplus
 extern "C" {
 #include <gmp.h>
-};
+}
 #define __cplusplus __cplusplus_backup
 
 
