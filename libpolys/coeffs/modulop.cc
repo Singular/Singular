@@ -23,16 +23,6 @@
 // int npGen=0;
 
 
-#ifdef HAVE_DIV_MOD
-unsigned short *npInvTable=NULL;
-#endif
-
-#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-unsigned short *npExpTable=NULL;
-unsigned short *npLogTable=NULL;
-#endif
-
-
 BOOLEAN npGreaterZero (number k, const coeffs r)
 {
   int h = (int)((long) k);
