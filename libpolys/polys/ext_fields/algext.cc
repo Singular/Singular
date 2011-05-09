@@ -29,6 +29,7 @@
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
+#include <coeffs/longrat.h>
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
@@ -57,8 +58,8 @@ number   naCopy(number a, const coeffs cf);
 void     naWrite(number &a, const coeffs cf);
 number   naRePart(number a, const coeffs cf);
 number   naImPart(number a, const coeffs cf);
-number   naGetDenom(number a, const coeffs cf);
-number   naGetNumerator(number a, const coeffs cf);
+number   naGetDenom(number &a, const coeffs cf);
+number   naGetNumerator(number &a, const coeffs cf);
 number   naGcd(number a, number b, const coeffs cf);
 number   naLcm(number a, number b, const coeffs cf);
 int      naSize(number a, const coeffs cf);
@@ -119,11 +120,16 @@ BOOLEAN naEqual (number a, number b, const coeffs cf)
   return result;
 }
 
-number naCopy(number &a, const coeffs cf)
+number naCopy(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL) return NULL;
   return (number)p_Copy((poly)a, naRing);
+}
+
+number naGetNumerator(number &a, const coeffs cf)
+{
+  return naCopy(a, cf);
 }
 
 number naGetDenom(number &a, const coeffs cf)
@@ -220,8 +226,8 @@ number naAdd(number a, number b, const coeffs cf)
   if (b == NULL) return naCopy(a, cf);
   poly aPlusB = p_Add_q(p_Copy((poly)a, naRing),
                         p_Copy((poly)b, naRing), naRing);
-  definiteReduce(aPlusB, naMinpoly);
-  return (number)aMinusB;
+  definiteReduce(aPlusB, naMinpoly, cf);
+  return (number)aPlusB;
 }
 
 number naSub(number a, number b, const coeffs cf)
@@ -229,9 +235,9 @@ number naSub(number a, number b, const coeffs cf)
   naTest(a); naTest(b);
   if (b == NULL) return naCopy(a, cf);
   poly minusB = p_Neg(p_Copy((poly)b, naRing), naRing);
-  if (a == NULL) return minusB;
+  if (a == NULL) return (number)minusB;
   poly aMinusB = p_Add_q(p_Copy((poly)a, naRing), minusB, naRing);
-  definiteReduce(aMinusB, naMinpoly);
+  definiteReduce(aMinusB, naMinpoly, cf);
   return (number)aMinusB;
 }
 
@@ -242,8 +248,8 @@ number naMult(number a, number b, const coeffs cf)
   if (b == NULL) return NULL;
   poly aTimesB = p_Mult_q(p_Copy((poly)a, naRing),
                           p_Copy((poly)b, naRing), naRing);
-  definiteReduce(aTimesB, naMinpoly);
-  return (number)aMinusB;
+  definiteReduce(aTimesB, naMinpoly, cf);
+  return (number)aTimesB;
 }
 
 number naDiv(number a, number b, const coeffs cf)
@@ -253,8 +259,8 @@ number naDiv(number a, number b, const coeffs cf)
   if (a == NULL) return NULL;
   poly bInverse = (poly)naInvers(b, cf);
   poly aDivB = p_Mult_q(p_Copy((poly)a, naRing), bInverse, naRing);
-  definiteReduce(aDivB, naMinpoly);
-  return (number)aMinusB;
+  definiteReduce(aDivB, naMinpoly, cf);
+  return (number)aDivB;
 }
 
 /* 0^0 = 0;
@@ -272,12 +278,12 @@ void naPower(number a, int exp, number *b, const coeffs cf)
   /* special cases first */
   if (a == NULL)
   {
-    if (exp >= 0) return NULL;
+    if (exp >= 0) *b = NULL;
     else          WerrorS(nDivBy0);
   }
-  else if (exp ==  0) return naInit(1, cf);
-  else if (exp ==  1) return naCopy(a, cf);
-  else if (exp == -1) return naInvers(a, cf);
+  else if (exp ==  0) *b = naInit(1, cf);
+  else if (exp ==  1) *b = naCopy(a, cf);
+  else if (exp == -1) *b = naInvers(a, cf);
   
   int expAbs = exp; if (expAbs < 0) expAbs = -expAbs;
   
@@ -311,7 +317,7 @@ void naPower(number a, int exp, number *b, const coeffs cf)
         heuristicReduce(factor, naMinpoly, cf);
       }
     }
-    p_Delete(factor, naRing);
+    p_Delete(&factor, naRing);
     definiteReduce(pow, naMinpoly, cf);
   }
   
@@ -377,7 +383,7 @@ number naLcm(number a, number b, const coeffs cf)
   /* note that theProduct needs not be reduced w.r.t. naMinpoly;
      but the final division will take care of the necessary reduction */
   number theGcd = naGcd(a, b, cf);
-  return naDiv(product, theGcd);
+  return naDiv(theProduct, theGcd, cf);
 }
 
 /* expects *param to be castable to ExtInfo */
@@ -408,7 +414,8 @@ int naSize(number a, const coeffs cf)
   {
     noOfTerms++;
     int d = 0;
-    for (int i = 1; i <= rVar(r); i++) d += p_GetExp(aAsPoly, i, naRing);
+    for (int i = 1; i <= rVar(naRing); i++)
+      d += p_GetExp(aAsPoly, i, naRing);
     if (d > theDegree) theDegree = d;
     pIter(aAsPoly);
   }
@@ -422,7 +429,7 @@ void definiteReduce(poly p, poly reducer, const coeffs cf)
   #ifdef LDEBUG
   omCheckAddr(p); omCheckAddr(reducer);
   #endif
-  p_PolyDiv(*p, reducer, FALSE, naRing);
+  p_PolyDiv(&p, reducer, FALSE, naRing);
 }
 
 number naGcd(number a, number b, const coeffs cf)
@@ -437,20 +444,20 @@ number naInvers(number a, const coeffs cf)
   naTest(a);
   if (a == NULL) WerrorS(nDivBy0);
   poly *aFactor; poly *mFactor;
-  poly theGcd = p_ExtGcd((poly)a, *aFactor, naMinpoly, *mFactor, naRing);
+  poly theGcd = p_ExtGcd((poly)a, aFactor, naMinpoly, mFactor, naRing);
   /* the gcd must be one since naMinpoly is irreducible and a != NULL: */
-  assume(naIsOne(theGcd, cf));      
-  pDelete(&theGcd, naRing);
-  pDelete(mFactor, naRing);
-  return aInverse = (number)(*aFactor);
+  assume(naIsOne((number)theGcd, cf));      
+  p_Delete(&theGcd, naRing);
+  p_Delete(mFactor, naRing);
+  return (number)(*aFactor);
 }
 
 /* assumes that src = Q, dst = Q(a) */
 number naMap00(number a, const coeffs src, const coeffs dst)
 {
   assume(src == dst->algring->cf);
-  poly result = p_Init(1, dst->algring);
-  p_SetCoeff(result, naCopy(a, src), dst->algRing);
+  poly result = p_One(dst->algring);
+  p_SetCoeff(result, naCopy(a, src), dst->algring);
   return (number)result;
 }
 
@@ -460,8 +467,8 @@ number naMapP0(number a, const coeffs src, const coeffs dst)
   /* mapping via intermediate int: */
   int n = n_Int(a, src);
   number q = n_Init(n, dst->algring->cf);
-  poly result = p_Init(1, dst->algring);
-  p_SetCoeff(result, q, dst->algRing);
+  poly result = p_One(dst->algring);
+  p_SetCoeff(result, q, dst->algring);
   return (number)result;
 }
 
@@ -475,11 +482,11 @@ number naCopyMap(number a, const coeffs src, const coeffs dst)
 /* assumes that src = Q, dst = Z/p(a) */
 number naMap0P(number a, const coeffs src, const coeffs dst)
 {
-  int p = rChar(dst);
+  int p = rChar(dst->algring);
   int n = nlModP(a, p, src);
   number q = n_Init(n, dst->algring->cf);
-  poly result = p_Init(1, dst->algring);
-  p_SetCoeff(result, q, dst->algRing);
+  poly result = p_One(dst->algring);
+  p_SetCoeff(result, q, dst->algring);
   return (number)result;
 }
 
@@ -487,8 +494,8 @@ number naMap0P(number a, const coeffs src, const coeffs dst)
 number naMapPP(number a, const coeffs src, const coeffs dst)
 {
   assume(src == dst->algring->cf);
-  poly result = p_Init(1, dst->algring);
-  p_SetCoeff(result, naCopy(a, src), dst->algRing);
+  poly result = p_One(dst->algring);
+  p_SetCoeff(result, naCopy(a, src), dst->algring);
   return (number)result;
 }
 
@@ -498,15 +505,15 @@ number naMapUP(number a, const coeffs src, const coeffs dst)
   /* mapping via intermediate int: */
   int n = n_Int(a, src);
   number q = n_Init(n, dst->algring->cf);
-  poly result = p_Init(1, dst->algring);
-  p_SetCoeff(result, q, dst->algRing);
+  poly result = p_One(dst->algring);
+  p_SetCoeff(result, q, dst->algring);
   return (number)result;
 }
 
 nMapFunc naSetMap(const ring src, const ring dst)
 {
   /* dst->cf is expected to be an (algebraic) extension field */
-  assume(dst->type == n_Ext);
+  assume(dst->cf->type == n_Ext);
   
   if (rField_is_Q(src) && rField_is_Q_a(dst))
     return naMap00;                                      /// Q     -->  Q(a)
@@ -516,7 +523,7 @@ nMapFunc naSetMap(const ring src, const ring dst)
   
   if (rField_is_Q_a(src) && rField_is_Q_a(dst))
   {
-    if (strcmp(src->parameter[0], dst->parameter[0]) == 0)
+    if (strcmp(rParameter(src)[0], rParameter(dst)[0]) == 0)
       return naCopyMap;                                  /// Q(a)   --> Q(a)
     else
       return NULL;                                       /// Q(b)   --> Q(a)
@@ -533,7 +540,7 @@ nMapFunc naSetMap(const ring src, const ring dst)
   
   if (rField_is_Zp_a(src) && rField_is_Zp_a(dst))
   {
-    if (strcmp(src->parameter[0], dst->parameter[0]) == 0)
+    if (strcmp(rParameter(src)[0], rParameter(dst)[0]) == 0)
       return naCopyMap;                                  /// Z/p(a) --> Z/p(a)
     else
       return NULL;                                       /// Z/p(b) --> Z/p(a)
@@ -582,7 +589,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   cf->cfDelete       = naDelete;
   cf->cfSetMap       = naSetMap;
   cf->cfGetDenom     = naGetDenom;
-  cf->cfGetNumerator = naCopy;
+  cf->cfGetNumerator = naGetNumerator;
   cf->cfRePart       = naCopy;
   cf->cfImPart       = naImPart;
   cf->cfCoeffWrite   = naCoeffWrite;
