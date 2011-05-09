@@ -21,7 +21,6 @@
 //#include <kernel/longtrans.h>
 
 poly singclap_gcd ( poly f, poly g, const ring r );
-poly singclap_gcd_r ( poly f, poly g, const ring r );
 /*
 napoly singclap_alglcm ( napoly f, napoly g );
 void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
@@ -30,10 +29,8 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
 poly singclap_resultant ( poly f, poly g , poly x, const ring r);
 
 BOOLEAN singclap_extgcd ( poly f, poly g, poly &res, poly &pa, poly &pb , const ring r);
-BOOLEAN singclap_extgcd_r ( poly f, poly g, poly &res, poly &pa, poly &pb, const ring r );
 
 poly singclap_pdivide ( poly f, poly g, const ring r );
-poly singclap_pdivide_r ( poly f, poly g, const ring r );
 
 void singclap_divide_content ( poly f, const ring r);
 

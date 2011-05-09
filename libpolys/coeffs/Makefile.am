@@ -38,22 +38,22 @@ libcoeffs_g_a_include_HEADERS = $(COEFFSHEADERS)
 
 
 ## for testing...
-AM_LDFLAGS	= -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc -L${top_builddir}/../omalloc
+AM_LDFLAGS	= -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc -L${top_builddir}/../factory -L${top_builddir}/../omalloc
 
 check_PROGRAMS = test test-g
 
 test_SOURCES   = test.cc
 test_g_SOURCES = test.cc
 
-test_LDADD   = -lcoeffs ${GMP_LIBS} -lresources -lreporter -lmisc -lomalloc
-test_g_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lomalloc_debug
+test_LDADD   = -lcoeffs ${GMP_LIBS} -lresources -lreporter -lmisc -lsingcf -lomalloc
+test_g_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lsingcf_g -lomalloc_debug
 
 
 
 test_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
 test_g_CFLAGS = ${PIPE}
 
-test_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS}
+test_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} -fimplicit-templates
 test_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS}
 # -fdiagnostics-show-option 
 

@@ -37,7 +37,7 @@ SOURCES = \
 	pDebug.cc pInline0.cc polys0.cc prCopy.cc \
 	kbuckets.cc sbuckets.cc weight.cc weight0.c simpleideals.cc matpol.cc \
         ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} templates/mod_raw.cc \
-        clapsing.cc ext_fields/algext.cc
+        ext_fields/algext.cc clapsing.cc clapconv.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
 
@@ -52,7 +52,7 @@ include_HEADERS = \
 	templates/p_Procs_Dynamic.h templates/p_Procs_Impl.h templates/p_Procs_Set.h templates/p_Procs_Static.h \
 	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h matpol.h \
-	clapsing.h ext_fields/algext.h
+	ext_fields/algext.h clapsing.h clapconv.h
 
 P_PROCS_CPPFLAGS_COMMON = -DHAVE_CONFIG_H -DDYNAMIC_VERSION 
 

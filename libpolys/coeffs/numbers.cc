@@ -120,14 +120,14 @@ number  ndExtGcd (number a, number b, number *s, number *t, const coeffs r) { re
 #endif
 
 #ifdef HAVE_FACTORY
-CanonicalForm npConvSingNFactoryN( number n, const coeffs r )
+CanonicalForm ndConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
 {
   CanonicalForm term(0);
   Werror("no conversion to factory");
   return term;
 }
 
-number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
+number ndConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 {
   Werror("no conversion from factory");
   return NULL;

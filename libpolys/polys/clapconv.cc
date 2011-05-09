@@ -8,23 +8,16 @@
 */
 
 
-#include <kernel/mod2.h>
+#include <misc/auxiliary.h>
 #ifdef HAVE_FACTORY
 #include <omalloc/omalloc.h>
-#include <kernel/structs.h>
 #define SI_DONT_HAVE_GLOBAL_VARS
-#include <kernel/clapconv.h>
-#include <kernel/numbers.h>
-#include <kernel/modulop.h>
-#include <kernel/longalg.h>
-#include <kernel/longtrans.h>
-#include <kernel/polys.h>
-#include <kernel/febase.h>
-#include <kernel/ring.h>
-#include <kernel/sbuckets.h>
-#include <kernel/ffields.h>
+#include <coeffs/coeffs.h>
+#include <polys/monomials/p_polys.h>
+#include <polys/sbuckets.h>
+#include <polys/clapconv.h>
 
-typedef __mpz_struct lint;
+//typedef __mpz_struct lint;
 
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
@@ -38,7 +31,6 @@ static number convFactoryNSingAN( const CanonicalForm &f, const ring r);
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r )
 {
-//    cerr << " f = " << f << endl;
   int n = rVar(r)+1;
   /* ASSERT( level( f ) <= pVariables, "illegal number of variables" ); */
   int * exp = (int*)omAlloc0(n*sizeof(int));
@@ -70,28 +62,9 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
     pNext( term ) = NULL;
     for ( int i = 1; i <= r->N; i++ )
       p_SetExp( term, i, exp[i], r);
-    //if (rRing_has_Comp(r)) p_SetComp(term, 0, r); // done by p_Init
-    if ( f.isImm() )
-      pGetCoeff( term ) = n_Init( f.intval(), r );
-    else
-    {
-      number z=ALLOC_RNUMBER();
-#if defined(LDEBUG)
-      z->debug=123456;
-#endif
-      gmp_numerator( f, z->z );
-      if ( f.den().isOne() )
-        z->s = 3;
-      else
-      {
-        gmp_denominator( f, z->n );
-        z->s = 0;
-        nlNormalize(z);
-      }
-      pGetCoeff( term ) = z;
-    }
+    pGetCoeff( term )=r->cf->convFactoryNSingN(f, r->cf);
     p_Setm( term, r );
-    if ( n_IsZero(pGetCoeff(term), r) )
+    if ( n_IsZero(pGetCoeff(term), r->cf) )
     {
       p_Delete(&term,r);
     }
@@ -107,43 +80,14 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
 {
   CanonicalForm result = 0;
   int e, n = rVar(r);
+  BOOLEAN setChar=TRUE;
 
-  while ( p!=NULL)
+  while ( p!=NULL )
   {
     CanonicalForm term;
-    /* does only work for finite fields */
-    if ( rField_is_Zp(r) )
-    {
-      term = npInt( pGetCoeff( p ),r );
-    }
-    else if (rField_is_Q(r))
-    {
-      if ( SR_HDL(pGetCoeff( p )) & SR_INT )
-        term = SR_TO_INT( pGetCoeff( p ) );
-      else
-      {
-        if ( pGetCoeff( p )->s == 3 )
-        {
-          lint dummy;
-          mpz_init_set( &dummy, (pGetCoeff( p )->z) );
-          term = make_cf( dummy );
-        }
-        else
-        {
-          // assume s==0 or s==1
-          lint num, den;
-          On(SW_RATIONAL);
-          mpz_init_set( &num, (pGetCoeff( p )->z) );
-          mpz_init_set( &den, (pGetCoeff( p )->n) );
-          term = make_cf( num, den, ( pGetCoeff( p )->s != 1 ));
-        }
-      }
-    }
-    else
-    {
-      WerrorS("conversion error");
-      return result;
-    }
+    term=r->cf->convSingNFactoryN(pGetCoeff( p ),setChar, r->cf);
+    if (errorreported) break;
+    setChar=FALSE;
     for ( int i = n; i >0; i-- )
     {
       if ( (e = p_GetExp( p, i, r)) != 0 )
@@ -155,6 +99,12 @@ CanonicalForm convSingPFactoryP( poly p, const ring r )
   return result;
 }
 
+int convFactoryISingI( const CanonicalForm & f)
+{
+  if (!f.isImm()) WerrorS("int overflow in det");
+  return f.intval();
+}
+#if 0
 CanonicalForm convSingAPFactoryAP ( poly p , const Variable & a, const ring r)
 {
   CanonicalForm result = 0;
@@ -210,7 +160,7 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
   }
   else
   {
-    napoly z=(napoly)convFactoryASingA( f,r );
+    poly z=(poly)convFactoryASingA( f,r );
     if (z!=NULL)
     {
       poly term = p_Init(r);
@@ -239,7 +189,7 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
   }
 }
 
-CanonicalForm convSingAFactoryA ( napoly p , const Variable & a, const ring r )
+CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r )
 {
   CanonicalForm result = 0;
   int e;
@@ -311,7 +261,7 @@ static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
   }
 }
 
-napoly convFactoryASingA ( const CanonicalForm & f, const ring r )
+poly convFactoryASingA ( const CanonicalForm & f, const ring r )
 {
   poly a=NULL;
   poly t;
@@ -505,9 +455,5 @@ convRecGFGF ( const CanonicalForm & f, int * exp, poly & result )
   }
 }
 
-int convFactoryISingI( const CanonicalForm & f)
-{
-  if (!f.isImm()) WerrorS("int overflow in det");
-  return f.intval();
-}
+#endif
 #endif

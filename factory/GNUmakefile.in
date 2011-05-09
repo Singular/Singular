@@ -186,7 +186,6 @@ basefactorysrc := \
 		gf_tabutil.cc \
 		gfops.cc \
 		imm.cc \
-		initgmp.cc \
 		int_cf.cc \
 		int_int.cc \
 		int_intdiv.cc \
@@ -302,6 +301,7 @@ doxyincl :=	\
 
 # memory manager source files
 basememmansrc := \
+		initgmp.cc \
 		newdelete.cc
 newmemmansrc :=	\
 		mmalloc.c \
@@ -492,14 +492,14 @@ $(factorydep):= $(factorydep:.d=.dtmp)
 #
 all:		$(alltargets)
 
-cf:		factoryconf.h factory.h $(libfactory) libsingcf_g.a
+cf:		factoryconf.h factory.h  libsingcf.a  libsingcf_g.a
 
 mem:		libcfmem.a
 
 #
 # - explicit targets.
 #
-$(libfactory):	$(factoryobj)
+libsingcf.a:	$(factoryobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
@@ -731,7 +731,7 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure \
 # - cleaning up.
 #
 clean:		ftestclean
-		-rm -f $(libfactory) libcfmem.a libsingcf_g.a libsingcf_p.a \
+		-rm -f libsingcf.a libcfmem.a libsingcf_g.a libsingcf_p.a \
 		  $(ftestexec) gengftables test_install \
 		  factoryconf.h factory.h *.o *.og *.op *.d *.dtmp
 
