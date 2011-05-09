@@ -1513,7 +1513,7 @@ poly p_ExtGcdHelper(poly * p, poly * pFactor, poly * q, poly * qFactor,
     poly theGcd = p_ExtGcdHelper(q, ppFactor, p, qqFactor, r);
     pFactor = qqFactor;
     *qFactor = p_Add_q(*ppFactor,
-                       p_Neg(p_Mult_q(fDivG, p_Copy(*qqFactor, r), r), r),
+                       p_Neg(p_Mult_q(pDivQ, p_Copy(*qqFactor, r), r), r),
                        r);
     return theGcd;
   }
