@@ -4,7 +4,6 @@
 #ifndef NOSTREAMIO
 #include<fstream>
 #endif
-#include<math.h>
 #include <sys/timeb.h>
 
 
