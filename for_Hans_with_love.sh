@@ -33,11 +33,11 @@ done
 
 for d in factory; do
   echo "==============="
-  echo "run aclocal -I $TOP_DIR/m4, autoconf in $d"
+  echo "run aclocal -I $TOP_DIR/m4, autotools in $d"
   echo "---------------"
   cd $d;
   aclocal -I $TOP_DIR/m4
-  autoconf
+  autotools
   cd $TOP_DIR
   echo
 done

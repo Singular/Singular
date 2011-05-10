@@ -12,11 +12,14 @@ dnl #
 #
 # - initialisation.
 #
-AC_REVISION($Id$)
-AC_INIT(canonicalform.cc)
+AC_INIT([factory], [3.1.2.sw])
+AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_HEADER(config.h)
-AC_CONFIG_AUX_DIR(bin)
+AC_CONFIG_AUX_DIR([.])
+AM_INIT_AUTOMAKE
+
+AC_PROG_YACC
 
 #
 # Do not change version here!!!
@@ -347,12 +350,12 @@ test "${M4FLAGS+set}" = set || M4FLAGS=
 
 # Singular
 if test "x$with_Singular" = xyes; then
-  AC_DEFINE(SINGULAR)
+  AC_DEFINE([SINGULAR],[1],[SINGULAR])
 fi
 
 # arithmetic shift
 #if test "x$ac_cv_shift" = xyes; then   
-#  AC_DEFINE(HAS_ARITHMETIC_SHIFT)
+#  AC_DEFINE([HAS_ARITHMETIC_SHIFT],[1],[HAS_ARITHMETIC_SHIFT])
 #fi
 
 AC_MSG_CHECKING(whether to use omalloc)
@@ -378,7 +381,7 @@ else
   fi
 fi
 if test "$with_omalloc" = yes; then
-  AC_DEFINE(HAVE_OMALLOC)
+  AC_DEFINE([HAVE_OMALLOC],[1],[HAVE_OMALLOC])
   with_memman=no 
 fi
 AC_MSG_RESULT($with_omalloc)
@@ -392,32 +395,32 @@ if test "x$with_memman" = xyes; then
   alltargets="$alltargets mem"
   installtargets="$installtargets installmem"
   uninstalltargets="$uninstalltargets uninstallmem"
-  AC_DEFINE(USE_MEMUTIL)
+  AC_DEFINE([USE_MEMUTIL],[1],[USE_MEMUTIL])
 
   if test "x$with_memman" != xnew; then
     memmansrc="$memmansrc \$(oldmemmansrc)"
     memmanincl='$(oldmemmanincl)'
-    AC_DEFINE(USE_OLD_MEMMAN)
+    AC_DEFINE([USE_OLD_MEMMAN],[1],[USE_OLD_MEMMAN])
   else
     memmansrc="$memmansrc \$(newmemmansrc)"
     memmanincl='$(newmemmanincl)'
 
     if test "x$enable_memdebug" = xfull; then
-      AC_DEFINE(MDEBUG, 1)
+      AC_DEFINE([MDEBUG], [1], [MDEBUG])
     elif test "x$enable_memdebug" != xno; then
-      AC_DEFINE(MDEBUG, 0)
+      AC_DEFINE([MDEBUG], [0], [MDEBUG])
     fi
   fi
 fi
 
 # "configurable inline methods"
 if test "x$enable_cf_inline" != xno; then
-  AC_DEFINE(CF_USE_INLINE)
+  AC_DEFINE([CF_USE_INLINE],[1],[CF_USE_INLINE])
 fi
 
 # iostream
 if test "x$enable_streamio" = xno; then
-  AC_DEFINE(NOSTREAMIO)
+  AC_DEFINE([NOSTREAMIO],[1],[NOSTREAMIO])
 else
   factorysrc="$factorysrc \$(useiofactorysrc)"
   factoryincl="$factoryincl \$(useiofactoryincl)"
@@ -425,17 +428,17 @@ fi
 
 # assertions
 if test "x$enable_assertions" = xno; then
-  AC_DEFINE(NOASSERT)
+  AC_DEFINE([NOASSERT],[1],[NOASSERT])
 fi
 
 # timing
 if test "x$enable_timing" != xno; then
-  AC_DEFINE(TIMING)
+  AC_DEFINE([TIMING],[1],[TIMING])
 fi
 
 # debugoutput
 if test "x$enable_debugoutput" != xno; then
-  AC_DEFINE(DEBUGOUTPUT)
+  AC_DEFINE([DEBUGOUTPUT],[1],[DEBUGOUTPUT])
 fi
 
 #
@@ -461,8 +464,8 @@ AC_SUBST(alltargets)
 AC_SUBST(installtargets)
 AC_SUBST(uninstalltargets)
 
-AC_DEFINE_UNQUOTED(FACTORYVERSION, "$factory_version")
-AC_DEFINE_UNQUOTED(FACTORYCONFIGURATION, "$factory_configuration")
-AC_DEFINE_UNQUOTED(GFTABLEDIR, "$explicit_gftabledir")
+AC_DEFINE_UNQUOTED([FACTORYVERSION], "$factory_version", [FACTORYVERSION])
+AC_DEFINE_UNQUOTED([FACTORYCONFIGURATION], "$factory_configuration", [FACTORYCONFIGURATION])
+AC_DEFINE_UNQUOTED([GFTABLEDIR], "$explicit_gftabledir", [GFTABLEDIR])
 
-AC_OUTPUT(GNUmakefile ftest/GNUmakefile)
+AC_OUTPUT(Makefile ftest/GNUmakefile)

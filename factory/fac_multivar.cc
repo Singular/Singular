@@ -22,10 +22,10 @@
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 void out_cff(CFFList &L);
 
-TIMING_DEFINE_PRINT(fac_content);
-TIMING_DEFINE_PRINT(fac_findeval);
-TIMING_DEFINE_PRINT(fac_distrib);
-TIMING_DEFINE_PRINT(fac_hensel);
+TIMING_DEFINE_PRINT(fac_content)
+TIMING_DEFINE_PRINT(fac_findeval)
+TIMING_DEFINE_PRINT(fac_distrib)
+TIMING_DEFINE_PRINT(fac_hensel)
 
 static CFArray
 conv_to_factor_array( const CFFList & L )

@@ -15,10 +15,10 @@
 #include "cf_iter.h"
 
 
-TIMING_DEFINE_PRINT(fac_solve);
-TIMING_DEFINE_PRINT(fac_modpk);
-TIMING_DEFINE_PRINT(fac_corrcoeff);
-TIMING_DEFINE_PRINT(fac_extgcd);
+TIMING_DEFINE_PRINT(fac_solve)
+TIMING_DEFINE_PRINT(fac_modpk)
+TIMING_DEFINE_PRINT(fac_corrcoeff)
+TIMING_DEFINE_PRINT(fac_extgcd)
 
 static void
 extgcdrest ( const CanonicalForm & a, const CanonicalForm & b, const CanonicalForm & s, const CanonicalForm & t, const CanonicalForm & c, CanonicalForm & S, CanonicalForm & T, const modpk & pk )
