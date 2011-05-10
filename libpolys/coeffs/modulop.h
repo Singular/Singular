@@ -152,7 +152,7 @@ static inline number npSubM(number a, number b, const coeffs r)
 }
 #endif
 
-static inline BOOLEAN npIsZeroM (number  a, const coeffs r)
+static inline BOOLEAN npIsZeroM (number  a, const coeffs)
 {
   return 0 == (long)a;
 }
