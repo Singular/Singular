@@ -11,7 +11,7 @@ AM_CXXFLAGS = $(AM_CFLAGS) ${CXXTEMPLFLAGS}
 
 AM_CPPFLAGS = -DHAVE_CONFIG_H
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} ${GMP_CFLAGS}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} ${GMP_CFLAGS}  ${NTL_CFLAGS}
 
 
 TESTS = simple_test coeffs_test rings_test polys_test
@@ -26,7 +26,7 @@ rings_test_SOURCES = rings_test_runner.cpp
 polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
 rings_test_LDFLAGS = $(polys_test_LDFLAGS)
 
-coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lfactory_g -lomalloc_debug
+coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} ${NTL_LIBS} -lresources_g -lreporter_g -lmisc_g -lfactory_g -lomalloc_debug
 polys_test_LDADD = -lpolys_g ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 

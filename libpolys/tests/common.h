@@ -17,6 +17,9 @@
 #include <reporter/reporter.h>
 #include <resources/feResource.h>
 
+#ifdef HAVE_FACTORY
+int initializeGMP(){ return 1; }
+#endif
 
 // #pragma GCC diagnostic ignored "-Wwrite-strings"
 namespace
