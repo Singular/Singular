@@ -317,12 +317,12 @@ add_dependencies(cf ${NTL_TARGET})
 # libraries for Singular
 if( WITH_SINGULAR )
   # define libraries
-  message(STATUS "Compiling factory for Singular: creating libsingcf.a")
+  message(STATUS "Compiling factory for Singular: creating libfactory.a")
   add_library(singcf ${basefactory_srcs} ${singfactory_srcs})
   set_target_properties(singcf PROPERTIES COMPILE_DEFINITIONS "${ADD_DEFS}")
   add_dependencies(singcf ${OMALLOC_TARGET} ${NTL_TARGET})
 else( WITH_SINGULAR )
-  message(STATUS "Disabled creation of libsingcf.a")
+  message(STATUS "Disabled creation of libfactory.a")
 endif( WITH_SINGULAR )
 
 

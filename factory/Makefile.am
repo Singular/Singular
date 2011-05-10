@@ -1,4 +1,4 @@
-lib_LIBRARIES = libsingcf.a libsingcf_g.a
+lib_LIBRARIES = libfactory.a libfactory_g.a
 
 # factory source files
 SOURCES := \
@@ -74,8 +74,8 @@ SOURCES := \
 		lgs.cc \
 		singext.cc
 
-libsingcf_a_SOURCES = $(SOURCES)
-libsingcf_g_a_SOURCES = $(SOURCES)
+libfactory_a_SOURCES = $(SOURCES)
+libfactory_g_a_SOURCES = $(SOURCES)
 
 # factory header files
 HEADERS := \

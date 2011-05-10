@@ -499,22 +499,22 @@ $(factorydep):= $(factorydep:.d=.dtmp)
 #
 all:		$(alltargets)
 
-cf:		factoryconf.h factory.h  libsingcf.a  libsingcf_g.a
+cf:		factoryconf.h factory.h  libfactory.a  libfactory_g.a
 
 mem:		libcfmem.a
 
 #
 # - explicit targets.
 #
-libsingcf.a:	$(factoryobj)
+libfactory.a:	$(factoryobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
-libsingcf_g.a:	$(factorygobj)
+libfactory_g.a:	$(factorygobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
-libsingcf_p.a:	$(factorypobj)
+libfactory_p.a:	$(factorypobj)
 		$(AR) $(ARFLAGS) $@ $^
 		$(RANLIB) $@
 
@@ -641,8 +641,8 @@ installtest:	test_install
 #
 install install-libsingular:	$(installtargets)
 
-install_all:    install libsingcf_p.a 
-		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a 
+install_all:    install libfactory_p.a 
+		-$(INSTALL_DATA) libfactory_p.a $(libdir)/libfactory_p.a 
 
 install-nolns: install
 
@@ -651,8 +651,8 @@ installcf:	cf
 		$(MKINSTALLDIRS) $(includedir)
 		$(MKINSTALLDIRS) $(templatedir)
 		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
-		-$(INSTALL_DATA) libsingcf_g.a $(libdir)/libsingcf_g.a
-		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a
+		-$(INSTALL_DATA) libfactory_g.a $(libdir)/libfactory_g.a
+		-$(INSTALL_DATA) libfactory_p.a $(libdir)/libfactory_p.a
 		$(INSTALL_DATA) factory.h $(includedir)/factory.h
 		$(INSTALL_DATA) cf_gmp.h $(includedir)/cf_gmp.h
 		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h
@@ -700,8 +700,8 @@ uninstallcf:
 		-rm -f $(includedir)/factoryconf.h
 		-rm -f $(includedir)/factory.h
 		-rm -f $(libdir)/$(libfactory)
-		-rm -f $(libdir)/libsingcf_g.a
-		-rm -f $(libdir)/libsingcf_p.a
+		-rm -f $(libdir)/libfactory_g.a
+		-rm -f $(libdir)/libfactory_p.a
 		-rmdir $(templatedir)
 		-rmdir $(includedir)
 		-rmdir $(libdir)
@@ -738,7 +738,7 @@ dist:		$(srcdir)/readcf.cc $(srcdir)/configure \
 # - cleaning up.
 #
 clean:		ftestclean
-		-rm -f libsingcf.a libcfmem.a libsingcf_g.a libsingcf_p.a \
+		-rm -f libfactory.a libcfmem.a libfactory_g.a libfactory_p.a \
 		  $(ftestexec) gengftables test_install \
 		  factoryconf.h factory.h *.o *.og *.op *.d *.dtmp
 

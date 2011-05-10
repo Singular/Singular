@@ -273,7 +273,7 @@ templatedir='${includedir}/templates'
 # - the name of the game and the targets to create.
 #
 if test "x$with_Singular" = xyes; then
-  libfactory=libsingcf.a
+  libfactory=libfactory.a
 
   factorysrc='$(basefactorysrc) $(singfactorysrc)'
   factoryincl='$(basefactoryincl) $(singfactoryincl)'

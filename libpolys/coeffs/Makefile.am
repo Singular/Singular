@@ -45,8 +45,8 @@ check_PROGRAMS = test test-g
 test_SOURCES   = test.cc
 test_g_SOURCES = test.cc
 
-test_LDADD   = -lcoeffs ${GMP_LIBS} ${NTL_LIBS} -lresources -lreporter -lmisc -lsingcf -lomalloc
-test_g_LDADD = -lcoeffs_g ${GMP_LIBS} ${NTL_LIBS} -lresources_g -lreporter_g -lmisc_g -lsingcf_g -lomalloc_debug
+test_LDADD   = -lcoeffs ${GMP_LIBS} ${NTL_LIBS} -lresources -lreporter -lmisc -lfactory -lomalloc
+test_g_LDADD = -lcoeffs_g ${GMP_LIBS} ${NTL_LIBS} -lresources_g -lreporter_g -lmisc_g -lfactory_g -lomalloc_debug
 
 
 
