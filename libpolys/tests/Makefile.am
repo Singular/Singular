@@ -1,7 +1,7 @@
 CXXTEMPLFLAGS = -O0 --no-exceptions ## -fno-implicit-templates
 
 ## for testing...
-AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc -L${top_builddir}/../omalloc 
+AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc -L${top_builddir}/../factory -L${top_builddir}/../omalloc 
 
 
 AM_CFLAGS = -g -Wextra -Wall -Wno-long-long ${PIPE}
@@ -26,7 +26,7 @@ rings_test_SOURCES = rings_test_runner.cpp
 polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
 rings_test_LDFLAGS = $(polys_test_LDFLAGS)
 
-coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -llibsingcf_g -lomalloc_debug
+coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lsingcf_g -lomalloc_debug
 polys_test_LDADD = -lpolys_g ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
