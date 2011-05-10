@@ -165,6 +165,7 @@ AC_PROG_MAKE_SET
 AC_CHECK_PROG(AR, ar, ar, where-is-your-ar)
 AC_CHECK_PROG(M4, m4, m4, where-is-your-m4)
 AC_CHECK_PROG(BISON, bison, bison, where-is-your-bison)
+DX_INIT_DOXYGEN($PACKAGE_NAME, MYDOXYGENCONFIG)
 
 # do not use `MKINSTALLDIRS' and `MAKEHEADER' since there may be
 # name clashes with other peoples configure scripts via

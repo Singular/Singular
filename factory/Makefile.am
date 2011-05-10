@@ -1,0 +1,249 @@
+lib_LIBRARIES = libsingcf.a libsingcf_g.a
+
+# factory source files
+SOURCES := \
+		canonicalform.cc \
+		cf_algorithm.cc \
+		cf_binom.cc \
+		cf_char.cc \
+		cf_chinese.cc \
+		cf_cyclo.cc \
+		cf_eval.cc \
+		cf_factor.cc \
+		cf_factory.cc \
+		cf_gcd.cc \
+		cf_gcd_charp.cc \
+		cf_gcd_smallp.cc \
+		cf_generator.cc \
+		cfGEval.cc \
+		cf_globals.cc \
+		cf_hnf.cc \
+		cf_inline.cc \
+		cf_irred.cc \
+		cf_iter.cc \
+		cf_iter_inline.cc \
+		cf_linsys.cc \
+		cf_map.cc \
+		cf_map_ext.cc \
+		cf_ops.cc \
+		cf_primes.cc \
+		cf_random.cc \
+		cf_resultant.cc \
+		cf_reval.cc \
+		cf_switches.cc \
+		cf_util.cc \
+		debug.cc \
+		DegreePattern.cc \
+		ExtensionInfo.cc \
+		facAlgExt.cc \
+		fac_berlekamp.cc \
+		fac_cantzass.cc \
+		fac_distrib.cc \
+		fac_ezgcd.cc \
+		fac_iterfor.cc \
+		fac_multihensel.cc \
+		fac_multivar.cc \
+		fac_sqrfree.cc \
+		fac_univar.cc \
+		fac_util.cc \
+		facFqBivar.cc \
+		facFqBivarUtil.cc \
+		facFqFactorize.cc \
+		facFqFactorizeUtil.cc \
+		facFqSquarefree.cc \
+		facHensel.cc \
+		facIrredTest.cc \
+		fieldGCD.cc \
+		ffops.cc \
+		ffreval.cc \
+		gf_tabutil.cc \
+		gfops.cc \
+		imm.cc \
+		int_cf.cc \
+		int_int.cc \
+		int_intdiv.cc \
+		int_poly.cc \
+		int_pp.cc \
+		int_rat.cc \
+		sm_sparsemod.cc \
+		sm_util.cc \
+		variable.cc \
+		NTLconvert.cc \
+		abs_fac.cc \
+		bifac.cc \
+		lgs.cc \
+		singext.cc
+
+libsingcf_a_SOURCES = $(SOURCES)
+libsingcf_g_a_SOURCES = $(SOURCES)
+
+# factory header files
+HEADERS := \
+		assert.h \
+		canonicalform.h \
+		cf_algorithm.h \
+		cf_binom.h \
+		cf_defs.h \
+		cf_eval.h \
+		cf_factory.h \
+		cf_generator.h \
+		cfGEval.h \
+		cf_globals.h \
+		cf_gcd_smallp.h \
+		cf_hnf.h \
+		cf_irred.h \
+		cf_iter.h \
+		cf_map.h \
+		cf_primes.h \
+		cf_primetab.h \
+		cf_random.h \
+		cf_reval.h \
+		cf_switches.h \
+		cf_util.h \
+		debug.h \
+		DegreePattern.h \
+		ExtensionInfo.h \
+		facAlgExt.h \
+		fac_berlekamp.h \
+		fac_cantzass.h \
+		fac_distrib.h \
+		fac_iterfor.h \
+		fac_multivar.h \
+		fac_sqrfree.h \
+		fac_univar.h \
+		fac_util.h \
+		facFqBivar.h \
+		facFqBivarUtil.h \
+		facFqFactorize.h \
+		facFqFactorizeUtil.h \
+		facFqSquarefree.h \
+		facHensel.h \
+		facIrredTest.h \
+		fieldGCD.h \
+		ffops.h \
+		ffreval.h \
+		ftmpl_list.h \
+		ftmpl_matrix.h \
+		gf_tabutil.h \
+		gfops.h \
+		gmpext.h \
+		imm.h \
+		int_cf.h \
+		int_int.h \
+		int_poly.h \
+		int_pp.h \
+		int_rat.h \
+		sm_sparsemod.h \
+		sm_util.h \
+		timing.h \
+		variable.h \
+		NTLconvert.h \
+		bifac.h \
+		bifacConfig.h \
+		lgs.h \
+		algext.h \
+		singext.h
+
+include_HEADERS = $(HEADERS)
+
+# Documentation
+include $(top_srcdir)/aminclude.am
+
+doxysrc := $(SOURCES) parseutil.cc
+doxyincl := $(HEADERS) parseutil.h
+
+# files and environment variables to export for doxygen
+doxyfiles :=	$(addprefix $(srcdir)/,$(doxysrc) $(doxyincl))
+
+# doxygen targets
+doxy:		factory.cfg $(doxysrc) $(doxyincl)
+		doxygen $<
+
+doxyclean:
+		rm -rf doxygen
+
+# Support for building GF(q)-tables
+
+templatesrc :=	\
+		ftmpl_array.cc \
+		ftmpl_factor.cc \
+		ftmpl_functions.h \
+		ftmpl_list.cc \
+		ftmpl_matrix.cc
+templateincl :=	\
+		ftmpl_array.h \
+		ftmpl_factor.h \
+		ftmpl_list.h \
+		ftmpl_matrix.h
+
+noinst_PROGRAMS = gengftables
+
+gengftables_SOURCES = gengftables-conway.cc ftmpl_inst.cc
+
+gftables:	gengftables
+		@echo "This command will take quite a long time to execute;"
+		@echo "maybe you want to get the tables directly via ftp (see"
+		@echo "the INSTALL file)."
+		$(MKINSTALLDIRS) gftables
+		./gengftables
+
+# These files listed below are not used anywhere but are included in
+# the distribution. So they will be tacked on to EXTRA_DIST.
+
+# header templates
+hdrtemplsrc := \
+		factoryconf.template \
+		factory.template
+
+# FTE source files
+ftestsrc :=	\
+		ftest_io.cc \
+		ftest_util.cc \
+		ntl_util.cc
+
+# FTE header files
+ftestincl :=	\
+		ftest_io.h \
+		ftest_util.h \
+		ntl_util.h
+
+# FTE m4 source files (exported for `GNUmakefile' in `ftest/').
+# The variable `$(ftestm4develsrc)' may be already initialized
+# from the development `GNUmakefile'.
+ftestm4src :=	$(ftestm4develsrc) \
+		commonden.m4 \
+		degree.m4 \
+		deriv.m4 \
+		divides.m4 \
+		divrem.m4 \
+		extgcd.m4 \
+		factorize.m4 \
+		fbinops.m4 \
+		feval.m4 \
+		gcd.m4 \
+		gcd.ntl.m4 \
+		insert.m4 \
+		norm.m4 \
+		resultant.m4 \
+		revert.m4 \
+		sqrfree.m4 \
+		size.m4 \
+		totaldegree.m4
+
+# other files from the FTE
+ftestdistfiles := \
+		ChangeLog \
+		GNUmakefile.in \
+		ftest_util.m4
+
+EXTRA_DIST :=	readcf.cc ftmpl_inst.cc \
+		gengftables.cc gengftables-conway.cc test_install.cc \
+		parseutil.cc \
+		readcf.y \
+		$(templatesrc) $(templateincl) $(hdrtemplsrc) \
+		$(ftestsrc) $(ftestincl) $(ftestm4src) $(ftestdistfiles) \
+		doxygen.cfg factory.cfg gen_cf_gmp.template \
+		examples/application.cc \
+		examples/factorize.cc examples/gcd.cc \
+		bin/folding.el bin/fold-docu.el \
+		bin/makeheader bin/gen-readcf
