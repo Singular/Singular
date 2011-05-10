@@ -431,7 +431,7 @@ distfiles :=	\
 		$(distsrc) $(distincl) $(hdrtemplsrc) \
 		$(addprefix ftest/,$(ftestm4src)) \
 		$(addprefix ftest/,$(ftestdistfiles)) \
-		GNUmakefile.in configure.in config.h.in configure \
+		GNUmakefile.in config.h.in configure \
 		ChangeLog README NEWS INSTALL \
 		factory.cfg gen_cf_gmp.template \
 		$(addprefix winnt/,$(distntfiles)) \
@@ -774,15 +774,6 @@ depend:		$(factorydep) $(memmandep) $(hdrtempldep)
 ifneq ($(wildcard *.d),)
   include $(factorydep) $(memmandep) $(hdrtempldep)
 endif
-
-#
-# - configure stuff.
-#
-$(srcdir)/configure: configure.in
-		@echo "WARNING: You need to rerun autoconf. I am proceeding, for now."
-		touch configure
-
-#		-cd $(srcdir) && autoconf
 
 # seems gmake needs at least a trivial command.  otherwise all
 # files which depend on config.h will be remade even if congig.h
