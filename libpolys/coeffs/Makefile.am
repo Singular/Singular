@@ -19,7 +19,7 @@ noinst_HEADERS= \
 	rintegers.h rmodulo2m.h rmodulon.h shortfl.h \
 	mpr_complex.h mpr_global.h
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} ${GMP_CFLAGS}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 SOURCES = \
 	numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc \
@@ -45,8 +45,8 @@ check_PROGRAMS = test test-g
 test_SOURCES   = test.cc
 test_g_SOURCES = test.cc
 
-test_LDADD   = -lcoeffs ${GMP_LIBS} -lresources -lreporter -lmisc -lsingcf -lomalloc
-test_g_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g -lsingcf_g -lomalloc_debug
+test_LDADD   = -lcoeffs ${GMP_LIBS} ${NTL_LIBS} -lresources -lreporter -lmisc -lsingcf -lomalloc
+test_g_LDADD = -lcoeffs_g ${GMP_LIBS} ${NTL_LIBS} -lresources_g -lreporter_g -lmisc_g -lsingcf_g -lomalloc_debug
 
 
 

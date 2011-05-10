@@ -17,52 +17,12 @@
 #include <coeffs/rmodulo2m.h>
 #include <coeffs/rintegers.h>
 #ifdef HAVE_FACTORY
-#include <factory/factory.h>
+int initializeGMP(){ return 1; }
 #endif
 
 #include <iostream>
 
 using namespace std;
-
-// template stuff
-#ifdef HAVE_FACTORY
-  #include <factory/templates/ftmpl_list.cc>
-  #include <factory/templates/ftmpl_array.cc>
-  #include <factory/templates/ftmpl_factor.cc>
-  #include <factory/templates/ftmpl_functions.h>
-  #include <factory/templates/ftmpl_matrix.cc>
-  template class Factor<CanonicalForm>;
-  template class List<CFFactor>;
-  template class ListItem<CFFactor>;
-  template class ListItem<CanonicalForm>;
-  template class ListIterator<CFFactor>;
-  template class List<CanonicalForm>;
-  template class List<List<CanonicalForm> >;
-  template class ListIterator<CanonicalForm>;
-  template class Array<CanonicalForm>;
-  template class List<MapPair>;
-  template class ListItem<MapPair>;
-  template class ListIterator<MapPair>;
-  template class Matrix<CanonicalForm>;
-  template class SubMatrix<CanonicalForm>;
-  template class Array<REvaluation>;
-  template bool find ( const List<CanonicalForm> &, const CanonicalForm&);
-  template List<CFFactor> Union ( const List<CFFactor>&, const List<CFFactor>& );
-  template int operator == ( const Factor<CanonicalForm>&, const Factor<CanonicalForm>& );
-
-  template CanonicalForm tmax ( const CanonicalForm&, const CanonicalForm& );
-  template CanonicalForm tmin ( const CanonicalForm&, const CanonicalForm& );
-
-  template Variable tmax ( const Variable&, const Variable& );
-  template Variable tmin ( const Variable&, const Variable& );
-
-  template int tmax ( const int&, const int& );
-  template int tmin ( const int&, const int& );
-  template int tabs ( const int& );
-
-  int initializeGMP()
-  { return 1; }
-#endif
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 

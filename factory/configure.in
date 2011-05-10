@@ -388,7 +388,7 @@ fi
 
     
 # memory manager
-if test "x$with_memman" != xno; then
+if test "x$with_memman" = xyes; then
   alltargets="$alltargets mem"
   installtargets="$installtargets installmem"
   uninstalltargets="$uninstalltargets uninstallmem"

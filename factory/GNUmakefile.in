@@ -202,7 +202,8 @@ basefactorysrc := \
 		abs_fac.cc \
 		bifac.cc \
 		lgs.cc \
-		singext.cc
+		singext.cc \
+		ftmpl_inst.cc
 
 useiofactorysrc := \
 		parseutil.cc \
@@ -218,7 +219,8 @@ doxysrc :=	\
 # factory object files and dependencies
 factoryobj1 :=  $(factorysrc:%.cc=%.o)
 factoryobj :=   $(factoryobj1:%.y=%.o)
-factorygobj :=  $(factorysrc:%.cc=%.og)
+factorygobj1 :=  $(factorysrc:%.cc=%.og)
+factorygobj :=  $(factorygobj1:%.y=%.og)
 factorypobj :=  $(factorysrc:%.cc=%.op)
 factorydep :=	$(factorysrc:%.cc=%.d)
 factorydep :=	$(factorydep:%.y=%.d)
