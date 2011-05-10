@@ -128,8 +128,10 @@ void TestSum(const ring r, const int N)
       number ii = p_GetCoeff(i, r);
       clog<< "number(poly(N)*poly(N+1)): "; PrintSized(ii, r->cf);  
 
+#ifdef HAVE_RINGS
       TS_ASSERT( n_DivBy(ii, t, r->cf) );
-      res = p_Div_nn(i, t, r); i = NULL;
+#endif
+       res = p_Div_nn(i, t, r); i = NULL;
     }
     
       
