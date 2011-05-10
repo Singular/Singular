@@ -24,7 +24,7 @@ AC_ARG_WITH(gmp,
 	        fi],
 		[GMP_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
 
-min_gmp_version=ifelse([$1], ,3.1.1,$1)
+min_gmp_version=ifelse([$1], ,1.0,$1)
 
 dnl Check for existence
 BACKUP_CFLAGS=${CFLAGS}

@@ -15,6 +15,7 @@ dnl NTL_CFLAGS and NTL_LIBS
 
 AC_DEFUN([LB_CHECK_NTL],
 [
+DEFAULT_CHECKING_PATH="/usr /usr/local /sw /opt/local"
 
 AC_ARG_WITH(ntl,
 [  --with-ntl=<path>|yes|no  Use NTL library. If argument is no, you do not have
@@ -29,14 +30,16 @@ AC_ARG_WITH(ntl,
 	      elif test "$withval" != no ; then
 			NTL_HOME_PATH="$withval"
 	     fi],
-	     [])
+	     [NTL_HOME_PATH="${DEFAULT_CHECKING_PATH}"])
 
-min_ntl_version=ifelse([$1], ,5.0,$1)
+min_ntl_version=ifelse([$1], ,1.0,$1)
 
 
 dnl Check for existence
 BACKUP_CXXFLAGS=${CXXFLAGS}
 BACKUP_LIBS=${LIBS}
+
+AC_LANG_PUSH(C++)
 
 if test -n "$NTL_HOME_PATH"; then
 AC_MSG_CHECKING(for NTL >= $min_ntl_version)
@@ -46,7 +49,7 @@ for NTL_HOME in ${NTL_HOME_PATH}
  do	
 if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 
-	if test "x$NTL_HOME" != "x/usr" -a "x$NTL_HOME" != "x/usr/local"; then
+	if test "x$NTL_HOME" != "x/usr"; then
 		NTL_CFLAGS="-I${NTL_HOME}/include"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
@@ -106,13 +109,10 @@ elif test -n "$ntl_problem"; then
 	ifelse([$3], , :, [$3])
 elif test   "x$ntl_found" = "xno";  then
 	AC_MSG_RESULT(not found)
-	if test "x$NTL_HOME" != "x/usr" -a "x$NTL_HOME" != "x/usr/local" ; then
-		AC_MSG_WARN(NTL >= $min_ntl_version was not found. LinBox also requires the NTL namespace to be enabled.  Please make sure NTL is compiled correctly.)
-	fi
 	ifelse([$3], , :, [$3])	
 fi	
 
-
+AC_LANG_POP
 
 AM_CONDITIONAL(SING_HAVE_NTL, test "x$HAVE_NTL" = "xyes")
 
