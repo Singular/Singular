@@ -10,14 +10,23 @@
 //
 //}}}
 
+#include <factory.h>
+
+#ifdef HAVE_IOSTREAM
 #include <iostream>
 #include <fstream>
 #include <strstream>
 #include <string>
+#else
+#include <iostream.h>
+#include <fstream.h>
+#include <strstream.h>
+#include <string.h>
+#endif
+
 
 #include <stdlib.h>
 
-#include <factory.h>
 
 #include <cf_assert.h>
 #include <gf_tabutil.h>
