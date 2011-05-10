@@ -75,12 +75,12 @@ number npSub (number a, number b, const coeffs r)
   return npSubM(a,b,r);
 }
 
-BOOLEAN npIsZero (number  a, const coeffs r)
+BOOLEAN npIsZero (number  a, const coeffs)
 {
   return 0 == (long)a;
 }
 
-BOOLEAN npIsOne (number a, const coeffs r)
+BOOLEAN npIsOne (number a, const coeffs)
 {
   return 1 == (long)a;
 }
@@ -192,7 +192,7 @@ number npNeg (number c, const coeffs r)
   return npNegM(c,r);
 }
 
-BOOLEAN npGreater (number a,number b, const coeffs r)
+BOOLEAN npGreater (number a,number b, const coeffs)
 {
   //return (long)a != (long)b;
   return (long)a > (long)b;
@@ -280,7 +280,7 @@ const char * npRead (const char *s, number *a, const coeffs r)
 * set the charcteristic (allocate and init tables)
 */
 
-void npSetChar(const coeffs r)
+void npSetChar(const coeffs)
 {
 #if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
 //    npGen = npExpTable[1];
@@ -325,6 +325,7 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
   else
   {
     assume(0);
+    return NULL;
   }
 }
 #endif
@@ -492,14 +493,14 @@ number npMapP(number from, const coeffs src, const coeffs dst_r)
   return (number)i;
 }
 
-static number npMapLongR(number from, const coeffs src, const coeffs dst_r)
+static number npMapLongR(number from, const coeffs /*src*/, const coeffs dst_r)
 {
   gmp_float *ff=(gmp_float*)from;
   mpf_t *f=ff->_mpfp();
   number res;
   mpz_ptr dest,ndest;
   int size,i;
-  int e,al,bl,in;
+  int e,al,bl;
   long iz;
   mp_ptr qp,dd,nn;
 
@@ -526,6 +527,7 @@ static number npMapLongR(number from, const coeffs src, const coeffs dst_r)
 #endif
   dest = res->z;
 
+  int in=0;
   if (e<0)
   {
     al = dest->_mp_size = size;
@@ -567,7 +569,7 @@ static number npMapLongR(number from, const coeffs src, const coeffs dst_r)
 /*2
 * convert from a GMP integer
 */
-number npMapGMP(number from, const coeffs src, const coeffs dst)
+number npMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
   int_number erg = (int_number) omAlloc(sizeof(mpz_t)); // evtl. spaeter mit bin
   mpz_init(erg);
@@ -583,7 +585,7 @@ number npMapGMP(number from, const coeffs src, const coeffs dst)
 /*2
 * convert from an machine long
 */
-number npMapMachineInt(number from, const coeffs src,const coeffs dst)
+number npMapMachineInt(number from, const coeffs /*src*/,const coeffs dst)
 {
   long i = (long) (((unsigned long) from) % dst->npPrimeM);
   return (number) i;
@@ -591,7 +593,7 @@ number npMapMachineInt(number from, const coeffs src,const coeffs dst)
 #endif
 
 #ifdef HAVE_FACTORY
-number npMapCanonicalForm (number a, const coeffs src, const coeffs dst)
+number npMapCanonicalForm (number a, const coeffs /*src*/, const coeffs dst)
 {
   setCharacteristic (dst ->npPrimeM);
   CanonicalForm f= CanonicalForm ((InternalCF*)(a));
@@ -661,7 +663,7 @@ void   nvInpMult(number &a, number b, const coeffs r)
 
 long nvInvMod(long a, const coeffs R)
 {
-   long  s, t;
+   long  s;
 
    long  u, v, u0, v0, u1, v1, u2, v2, q, r;
 
