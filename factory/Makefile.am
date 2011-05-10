@@ -79,7 +79,7 @@ libsingcf_g_a_SOURCES = $(SOURCES)
 
 # factory header files
 HEADERS := \
-		assert.h \
+		cf_assert.h \
 		canonicalform.h \
 		cf_algorithm.h \
 		cf_binom.h \

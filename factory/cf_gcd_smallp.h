@@ -23,7 +23,7 @@
 //*****************************************************************************
 
 #include <config.h>
-#include "assert.h"
+#include "cf_assert.h"
 
 CanonicalForm GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
                   Variable & alpha, CFList& l, bool& top_level);

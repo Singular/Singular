@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #include "memutil.h"
 

@@ -23,7 +23,7 @@
 
 #include <config.h>
 
-#include "assert.h"
+#include "cf_assert.h"
 
 // regular include file
 #include "canonicalform.h"

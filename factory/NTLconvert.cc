@@ -1,7 +1,7 @@
 /* $Id$ */
 #include <config.h>
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #include "cf_defs.h"
 #include "canonicalform.h"

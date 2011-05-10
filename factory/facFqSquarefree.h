@@ -16,7 +16,7 @@
 #ifndef FAC_FQ_SQUAREFREE_H
 #define FAC_FQ_SQUAREFREE_H
 
-#include "assert.h"
+#include "cf_assert.h"
 
 
 /// squarefree factorization over a finite field

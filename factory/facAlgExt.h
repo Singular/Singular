@@ -21,7 +21,7 @@
 #ifndef FAC_ALG_EXT_H
 #define FAC_ALG_EXT_H
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #include "canonicalform.h"
 

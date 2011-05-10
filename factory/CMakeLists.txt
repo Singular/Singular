@@ -196,7 +196,7 @@ set(doxy_src ${basefactory_srcs} parseutil.cc)
 
 # factory header files
 set(basefactory_hdrs
-                assert.h
+                cf_assert.h
                 canonicalform.h 
                 cf_algorithm.h 
                 cf_binom.h 

@@ -13,7 +13,7 @@
 * installed source files (templates and `factory.h') the same
 * way as `config.h' serves as a configuration file for the
 * source files from which the library is build.  Additionally,
-* we paste a copy of our `assert.h' into this file which is
+* we paste a copy of our `cf_assert.h' into this file which is
 * necessary for the templates to translate.
 *
 */
@@ -101,12 +101,12 @@
 
 #endif /* ! INCL_CONFIG_H */
 
-/* stuff included from ./assert.h */
+/* stuff included from ./cf_assert.h */
 
 /* emacs edit mode for this file is -*- C -*- */
 /* $Id$ */
 
-/* This is for compatibility with standard assert.h */
+/* This is for compatibility with standard cf_assert.h */
 #if defined (NDEBUG) && ! defined (NOASSERT)
 #define NOASSERT
 #endif

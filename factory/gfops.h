@@ -16,7 +16,7 @@
 #endif
 #endif /* NOSTREAMIO */
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #include "cf_defs.h"
 #include "canonicalform.h"

@@ -4,7 +4,7 @@
 #include <config.h>
 #include <new>
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #ifdef USE_OLD_MEMMAN
 #include "memutil.h"

@@ -18,7 +18,7 @@
 #endif
 #endif /* NOSTREAMIO */
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #include "int_cf.h"
 

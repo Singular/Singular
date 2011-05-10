@@ -20,7 +20,7 @@
 
 #include <config.h>
 
-#include "assert.h"
+#include "cf_assert.h"
 #include "debug.h"
 #include "timing.h"
 
