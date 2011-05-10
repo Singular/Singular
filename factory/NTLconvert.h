@@ -19,12 +19,26 @@
 #include "cf_algorithm.h"
 
 
+#include <NTL/config.h>
+#ifdef NTL_STD_CXX
+#ifdef NOSTREAMIO
+#  ifdef HAVE_IOSTREAM
+#    include <iostream>
+#    define OSTREAM std::ostream
+#    define ISTREAM std::istream
+#  elif defined(HAVE_IOSTREAM_H)
+#    include <iostream.h>
+#    define OSTREAM ostream
+#    define ISTREAM istream
+#  endif
+#endif /* ! NOSTREAMIO */
+#endif
+
 #include <NTL/ZZXFactoring.h>
 #include <NTL/ZZ_pXFactoring.h>
 #include <NTL/lzz_pXFactoring.h>
 #include <NTL/GF2XFactoring.h>
 #include "int_int.h"
-#include <limits.h>
 #include <NTL/ZZ_pEXFactoring.h>
 #include <NTL/lzz_pEXFactoring.h>
 #include <NTL/GF2EXFactoring.h>
