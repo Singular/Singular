@@ -132,8 +132,8 @@ factory_headers = \
 		fieldGCD.h \
 		ffops.h \
 		ffreval.h \
-		ftmpl_list.h \
-		ftmpl_matrix.h \
+		templates/ftmpl_list.h \
+		templates/ftmpl_matrix.h \
 		gf_tabutil.h \
 		gfops.h \
 		gmpext.h \
