@@ -4,9 +4,9 @@
 
 #include <config.h>
 
-#include "cf_gmp.h"
+#ifdef HAVE_NTL
 
-#include "cf_assert.h"
+#include "cf_gmp.h"
 
 #include "cf_defs.h"
 #include "canonicalform.h"
@@ -18,7 +18,6 @@
 #include "fac_sqrfree.h"
 #include "cf_algorithm.h"
 
-#ifdef HAVE_NTL
 
 #include <NTL/ZZXFactoring.h>
 #include <NTL/ZZ_pXFactoring.h>
@@ -33,6 +32,7 @@
 #include <NTL/mat_lzz_p.h>
 #include <NTL/mat_lzz_pE.h>
 
+#include "cf_assert.h"
 
 #ifdef NTL_CLIENT               // in <NTL/tools.h>: using of name space NTL
 NTL_CLIENT

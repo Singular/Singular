@@ -17,10 +17,12 @@
 #include <sys/times.h>
 #include <sys/param.h>
 #endif
+#ifndef NOSTREAMIO
 #ifdef HAVE_CSTDIO
 #include <cstdio>
 #else
 #include <stdio.h>
+#endif
 #endif
 
 // need to be adjusted on your machine:
