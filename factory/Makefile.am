@@ -19,7 +19,6 @@ SOURCES = \
 		cf_factor.cc \
 		cf_factory.cc \
 		cf_gcd.cc \
-		cf_gcd_charp.cc \
 		cf_gcd_smallp.cc \
 		cf_generator.cc \
 		cfGEval.cc \
@@ -132,8 +131,8 @@ factory_headers = \
 		fieldGCD.h \
 		ffops.h \
 		ffreval.h \
-		ftmpl_list.h \
-		ftmpl_matrix.h \
+		templates/ftmpl_list.h \
+		templates/ftmpl_matrix.h \
 		gf_tabutil.h \
 		gfops.h \
 		gmpext.h \
