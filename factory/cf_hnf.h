@@ -4,6 +4,8 @@
 
 /*BEGINPUBLIC*/
 
+#ifdef HAVE_NTL
+
 /* $Id$ */
 
 //{{{ docu
@@ -40,6 +42,8 @@ CFMatrix* cf_HNF(CFMatrix& A);
 // the lattice.
 
 CFMatrix* cf_LLL(CFMatrix& A);
+
+#endif
 
 /*ENDPUBLIC*/
 
