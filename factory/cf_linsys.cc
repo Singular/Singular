@@ -16,11 +16,11 @@
 #include "cf_primes.h"
 
 
-TIMING_DEFINE_PRINT(det_mapping);
-TIMING_DEFINE_PRINT(det_determinant);
-TIMING_DEFINE_PRINT(det_chinese);
-TIMING_DEFINE_PRINT(det_bound);
-TIMING_DEFINE_PRINT(det_numprimes);
+TIMING_DEFINE_PRINT(det_mapping)
+TIMING_DEFINE_PRINT(det_determinant)
+TIMING_DEFINE_PRINT(det_chinese)
+TIMING_DEFINE_PRINT(det_bound)
+TIMING_DEFINE_PRINT(det_numprimes)
 
 
 static bool solve ( int **extmat, int nrows, int ncols );

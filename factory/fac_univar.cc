@@ -19,10 +19,10 @@
 #include "cf_primes.h"
 #include "fac_sqrfree.h"
 
-TIMING_DEFINE_PRINT(fac_choosePrimes);
-TIMING_DEFINE_PRINT(fac_facModPrimes);
-TIMING_DEFINE_PRINT(fac_liftFactors);
-TIMING_DEFINE_PRINT(fac_combineFactors);
+TIMING_DEFINE_PRINT(fac_choosePrimes)
+TIMING_DEFINE_PRINT(fac_facModPrimes)
+TIMING_DEFINE_PRINT(fac_liftFactors)
+TIMING_DEFINE_PRINT(fac_combineFactors)
 
 
 const int max_fp_fac = 3;

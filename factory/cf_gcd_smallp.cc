@@ -44,8 +44,8 @@
 
 #ifdef HAVE_NTL
 
-TIMING_DEFINE_PRINT(gcd_recursion);
-TIMING_DEFINE_PRINT(newton_interpolation);
+TIMING_DEFINE_PRINT(gcd_recursion)
+TIMING_DEFINE_PRINT(newton_interpolation)
 
 static const double log2exp= 1.442695041;
 

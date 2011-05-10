@@ -147,7 +147,7 @@ CanonicalForm AlgExtRandomF::generate() const
     for ( int i = 0; i < n; i++ )
       result += power( algext, i ) * gen->generate();
     return result;
-};
+}
 
 CFRandom * AlgExtRandomF::clone () const
 {

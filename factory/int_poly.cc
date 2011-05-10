@@ -55,7 +55,7 @@ InternalPoly::InternalPoly( const Variable & v, const int e, const CanonicalForm
 InternalPoly::InternalPoly( const InternalPoly& )
 {
     ASSERT( 0, "ups there is something wrong in your code" );
-};
+}
 
 InternalPoly::~InternalPoly()
 {

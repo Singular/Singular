@@ -1,7 +1,14 @@
+CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
+
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
+
 lib_LIBRARIES = libfactory.a libfactory_g.a
 
+libfactory_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${CXXTEMPLFLAGS}
+libfactory_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
+
 # factory source files
-SOURCES := \
+SOURCES = \
 		canonicalform.cc \
 		cf_algorithm.cc \
 		cf_binom.cc \
@@ -72,13 +79,16 @@ SOURCES := \
 		abs_fac.cc \
 		bifac.cc \
 		lgs.cc \
-		singext.cc
+		singext.cc \
+		parseutil.cc \
+		readcf.y \
+		ftmpl_inst.cc
 
 libfactory_a_SOURCES = $(SOURCES)
 libfactory_g_a_SOURCES = $(SOURCES)
 
 # factory header files
-HEADERS := \
+factory_headers = \
 		cf_assert.h \
 		canonicalform.h \
 		cf_algorithm.h \
@@ -144,16 +154,13 @@ HEADERS := \
 		algext.h \
 		singext.h
 
-include_HEADERS = $(HEADERS)
+noinst_HEADERS = $(factory_headers)
 
 # Documentation
 include $(top_srcdir)/aminclude.am
 
-doxysrc := $(SOURCES) parseutil.cc
-doxyincl := $(HEADERS) parseutil.h
-
-# files and environment variables to export for doxygen
-doxyfiles :=	$(addprefix $(srcdir)/,$(doxysrc) $(doxyincl))
+doxysrc = $(SOURCES) parseutil.cc
+doxyincl = $(factory_headers) parseutil.h
 
 # doxygen targets
 doxy:		factory.cfg $(doxysrc) $(doxyincl)
@@ -164,19 +171,20 @@ doxyclean:
 
 # Support for building GF(q)-tables
 
-templatesrc :=	\
+templatesrc =	\
 		ftmpl_array.cc \
 		ftmpl_factor.cc \
 		ftmpl_functions.h \
 		ftmpl_list.cc \
 		ftmpl_matrix.cc
-templateincl :=	\
+templateincl =	\
 		ftmpl_array.h \
 		ftmpl_factor.h \
 		ftmpl_list.h \
 		ftmpl_matrix.h
 
 noinst_PROGRAMS = gengftables
+gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
 gengftables_SOURCES = gengftables-conway.cc ftmpl_inst.cc
 
@@ -191,18 +199,18 @@ gftables:	gengftables
 # the distribution. So they will be tacked on to EXTRA_DIST.
 
 # header templates
-hdrtemplsrc := \
+hdrtemplsrc = \
 		factoryconf.template \
 		factory.template
 
 # FTE source files
-ftestsrc :=	\
+ftestsrc =	\
 		ftest_io.cc \
 		ftest_util.cc \
 		ntl_util.cc
 
 # FTE header files
-ftestincl :=	\
+ftestincl =	\
 		ftest_io.h \
 		ftest_util.h \
 		ntl_util.h
@@ -210,7 +218,7 @@ ftestincl :=	\
 # FTE m4 source files (exported for `GNUmakefile' in `ftest/').
 # The variable `$(ftestm4develsrc)' may be already initialized
 # from the development `GNUmakefile'.
-ftestm4src :=	$(ftestm4develsrc) \
+ftestm4src =	$(ftestm4develsrc) \
 		commonden.m4 \
 		degree.m4 \
 		deriv.m4 \
@@ -231,15 +239,10 @@ ftestm4src :=	$(ftestm4develsrc) \
 		totaldegree.m4
 
 # other files from the FTE
-ftestdistfiles := \
-		ChangeLog \
-		GNUmakefile.in \
+ftestdistfiles = \
 		ftest_util.m4
 
-EXTRA_DIST :=	readcf.cc ftmpl_inst.cc \
-		gengftables.cc gengftables-conway.cc test_install.cc \
-		parseutil.cc \
-		readcf.y \
+EXTRA_DIST =	gengftables.cc gengftables-conway.cc test_install.cc \
 		$(templatesrc) $(templateincl) $(hdrtemplsrc) \
 		$(ftestsrc) $(ftestincl) $(ftestm4src) $(ftestdistfiles) \
 		doxygen.cfg factory.cfg gen_cf_gmp.template \

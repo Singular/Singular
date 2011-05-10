@@ -84,9 +84,6 @@
 /* define if you want to have debugging output */
 #undef DEBUGOUTPUT
 
-/* define type of your compilers 64 bit integer type */
-#define INT64 long long int
-
 #undef HAVE_NTL
 
 /************** END OF CONFIGURABLE SECTION **************/

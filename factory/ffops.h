@@ -11,6 +11,11 @@
 #include <NTL/config.h>
 #endif
 
+/* define type of your compilers 64 bit integer type */
+#ifndef INT64
+#define INT64 long long int
+#endif
+
 extern int ff_prime;
 extern int ff_halfprime;
 extern short * ff_invtab;

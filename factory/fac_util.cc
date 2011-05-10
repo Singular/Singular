@@ -82,7 +82,7 @@ modpk::operator() ( const CanonicalForm & f, bool symmetric ) const
         return mapdomain( f, mappksymmetric );
     else
         return mapdomain( f, mappk );
-};
+}
 
 CanonicalForm
 replaceLc( const CanonicalForm & f, const CanonicalForm & c )

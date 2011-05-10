@@ -30,6 +30,11 @@ const int INTMARK = 1;
 const int FFMARK = 2;
 const int GFMARK = 3;
 
+/* define type of your compilers 64 bit integer type */
+#ifndef INT64
+#define INT64 long long int
+#endif
+
 const int MINIMMEDIATE = -268435454; // -2^28-2
 const int MAXIMMEDIATE = 268435454;  // 2^28-2
 #if defined(WINNT) && ! defined(__GNUC__)

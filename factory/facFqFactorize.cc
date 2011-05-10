@@ -35,9 +35,9 @@
 #include <NTL/ZZ_pEX.h>
 #include "NTLconvert.h"
 
-TIMING_DEFINE_PRINT(fac_bi_factorizer);
-TIMING_DEFINE_PRINT(fac_hensel_lift);
-TIMING_DEFINE_PRINT(fac_factor_recombination);
+TIMING_DEFINE_PRINT(fac_bi_factorizer)
+TIMING_DEFINE_PRINT(fac_hensel_lift)
+TIMING_DEFINE_PRINT(fac_factor_recombination)
 
 static inline
 CanonicalForm
