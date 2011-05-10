@@ -24,7 +24,7 @@
 #endif
 
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #include "canonicalform.h"
 #include "cf_defs.h"

@@ -196,7 +196,7 @@ Configure options:
 8. Diagnostic Messages
 ======================
 Factory has three types of diagnostic messages:
-o Assertions (implemented by the "ASSERT macros" in `assert.h') are used to
+o Assertions (implemented by the "ASSERT macros" in `cf_assert.h') are used to
   ensure preconditions before running some algorithm.  A typical example is
   to test f != 0 before dividing by f.
 o Debug output (implemented by the "DEBOUT macros" in `debug.h'/`debug.cc')
@@ -516,7 +516,7 @@ mm*.c
 mm*.h		- "new" Factory memory manager
 newdelete.cc	- C++ interface to the memory managers
 
-assert.h	- the "ASSERT macros"
+cf_assert.h	- the "ASSERT macros"
 debug.h
 debug.cc	- the "DEBOUT macros"
 timing.h	- the "TIMING macros"

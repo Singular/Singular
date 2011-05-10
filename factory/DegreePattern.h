@@ -16,7 +16,7 @@
 
 #include <config.h>
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #include "canonicalform.h"
 #include "cf_iter.h"

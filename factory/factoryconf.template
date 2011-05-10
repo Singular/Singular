@@ -12,7 +12,7 @@
  * installed source files (templates and `factory.h') the same
  * way as `config.h' serves as a configuration file for the
  * source files from which the library is build.  Additionally,
- * we paste a copy of our `assert.h' into this file which is
+ * we paste a copy of our `cf_assert.h' into this file which is
  * necessary for the templates to translate.
  *
  */
@@ -22,6 +22,6 @@
 #include "config.h"
 
 /*MAKEHEADER*/
-#include "assert.h"
+#include "cf_assert.h"
 
 #endif /* ! INCL_FACTORYCONF_H */

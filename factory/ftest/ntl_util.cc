@@ -19,7 +19,7 @@
 
 #include <strstream.h>
 
-#include <assert.h>
+#include <cf_assert.h>
 
 #include "ntl_util.h"
 

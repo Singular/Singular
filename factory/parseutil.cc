@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "assert.h"
+#include "cf_assert.h"
 
 #include "cf_defs.h"
 #include "parseutil.h"

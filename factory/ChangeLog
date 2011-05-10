@@ -919,7 +919,7 @@ Mon Sep 29 08:11:42 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
 Fri Sep 26 12:54:41 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
 
-	* assert.h: prints the function now where the assrtion occured if
+	* cf_assert.h: prints the function now where the assrtion occured if
 	  we are translating with gcc
 
 Thu Sep 25 13:51:01 1997  Jens Schmidt  <schmidt@mathematik.uni-kl.de>
@@ -1605,30 +1605,30 @@ Before Mon Jun  4 1997 Jens Schmidt <schmidt@mathematik.uni-kl.de>
 	Now for the changes at organization level:
 	If we refer to the "DEBOUT macros", the "ASSERT macros", or the
 	"TIMING macros" we mean one (or more) of the macros defined in
-	debug.h, assert.h, and timing.h, resp.
+	debug.h, cf_assert.h, and timing.h, resp.
 
-	* assert.h (NOASSERT, NDEBUG): #define NDEBUG to switch off
+	* cf_assert.h (NOASSERT, NDEBUG): #define NDEBUG to switch off
 	  assertions replaced by #define NOASSERT.  For sake of backward
 	  compatibility NDEBUG works, too.
 
-	* assert.h (DEBINCLEVEL, DEBDECLEVEL, DEBOUTSL, DEBOUT, DEBOUTLN):
+	* cf_assert.h (DEBINCLEVEL, DEBDECLEVEL, DEBOUTSL, DEBOUT, DEBOUTLN):
 	  DEBOUT macros moved to debug.h
 	* assert.cc: renamed to debug.cc
 	* debug.h, debug.cc: new files.  DEBOUT macros moved from
-	  assert.h/assert.cc to debug.h/debug.cc.  All source files which
+	  cf_assert.h/assert.cc to debug.h/debug.cc.  All source files which
  	  need these macros include debug.h.
 
-	* assert.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
-	  PVIRT_CHARCC): PVIRT_*-macros moved from int_cf.h to assert.h
+	* cf_assert.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
+	  PVIRT_CHARCC): PVIRT_*-macros moved from int_cf.h to cf_assert.h
 	* int_cf.h (PVIRT_VOID, PVIRT_INTCF, PVIRT_BOOL, PVIRT_INT,
-	  PVIRT_CHARCC): PVIRT_*-macros moved to assert.h
+	  PVIRT_CHARCC): PVIRT_*-macros moved to cf_assert.h
 
-	* assert.h (__ASSERT, __STICKYASSERT): the preprocessor instead of
+	* cf_assert.h (__ASSERT, __STICKYASSERT): the preprocessor instead of
  	  fprintf() pastes the message into the format string now
 
-	* assert.h (__ASSERT1, ASSERT1, STICKYASSERT1): new macros
+	* cf_assert.h (__ASSERT1, ASSERT1, STICKYASSERT1): new macros
 
-	* assert.h (__WARN, WARN, STICKYWARN): new macros
+	* cf_assert.h (__WARN, WARN, STICKYWARN): new macros
 
 	* canonicalform.cc (operator>>): dependency on #define SINGULAR
 	  removed

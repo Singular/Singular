@@ -227,7 +227,7 @@ factorydep :=	$(factorydep:%.y=%.d)
 
 # factory header files
 basefactoryincl := \
-		assert.h \
+		cf_assert.h \
 		canonicalform.h \
 		cf_algorithm.h \
 		cf_binom.h \

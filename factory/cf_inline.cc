@@ -76,7 +76,7 @@
 
 #include <config.h>
 
-#include "assert.h"
+#include "cf_assert.h"
 
 // temporarily switch off `CF_USE_INLINE' and include
 // `canonicalform.h' if we are being translated.

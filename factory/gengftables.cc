@@ -22,7 +22,7 @@
 
 #include <factory.h>
 
-#include <assert.h>
+#include <cf_assert.h>
 #include <gf_tabutil.h>
 
 //{{{ constants
