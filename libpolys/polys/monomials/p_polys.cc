@@ -38,8 +38,9 @@
 #endif
 
 #include "coeffrings.h"
+#ifdef HAVE_FACTORY
 #include "clapsing.h"
-
+#endif
 
 /***************************************************************
  *
