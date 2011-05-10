@@ -2534,6 +2534,7 @@ BOOLEAN nlInitChar(coeffs r, void* p)
   r->cfKillChar=NULL;
   r->cfSetChar=NULL;
   r->nCoeffIsEqual=nlCoeffsEqual;
+  r->cfKillChar = ndKillChar; /* dummy */
 
   r->cfMult  = nlMult;
   r->cfSub   = nlSub;
