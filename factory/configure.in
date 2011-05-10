@@ -14,6 +14,7 @@ dnl #
 #
 AC_REVISION($Id$)
 AC_INIT(canonicalform.cc)
+AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(bin)
 
@@ -46,28 +47,12 @@ AC_ARG_WITH(
 AC_ARG_WITH(
   omalloc,
   [  --with-omalloc           build for use with omalloc])
-AC_ARG_WITH(
-  gmp,
-  [  --with-gmp(=<gmp_path>)
-                          specify where to find gmp library.])
 
 AC_ARG_WITH(
   Singular,
   [  --with-Singular         build for use with computer algebra system Singular.],
   ,
   with_Singular=no)
-
-AC_ARG_WITH(
-  NTL,
-  [  --with-NTL              build for use with NTL.],
-  with_NTL=yes,
-  )
-
-AC_ARG_ENABLE(
-  NTL,
-  [  --enable-NTL              build for use with NTL.],
-  with_NTL=yes,
-  )
 
 AC_ARG_ENABLE(
   cf-inline,
@@ -111,27 +96,6 @@ AC_ARG_ENABLE(
   [  --enable-debugoutput    build Factory so it will print debugging information],
   ,
   enable_debugoutput=no)
-
-# a tribute to Singular
-AC_ARG_ENABLE(
-  gmp,
-  [  --enable-gmp            together with \`--with-Singular' means: installation
-                          in process, be graceful when there is no \`gmp.h'],
-  [ if test "x$with_Singular" = xyes && test "x$enable_gmp" != xno; then
-      with_gmp='$(prefix)'
-    fi ])
-
-#
-# - check the results of --with-gmp.
-#
-case "$with_gmp" in
-  yes|no|"")
-    gmp_in_installation=no ;;
-  *)
-    CPPFLAGS="-I$with_gmp/include $CPPFLAGS"
-    LDFLAGS="-L$with_gmp/lib $LDFLAGS"
-    gmp_in_installation=no ;;
-esac
 
 #
 # - check for CC and CXX but be careful about CFLAGS.
@@ -225,18 +189,9 @@ AC_MSG_RESULT(done)
 #
 AC_CHECK_LIB(m, atof, , [ AC_MSG_ERROR(libm.a not found) ])
 
-if test "x$gmp_in_installation" != xyes; then
-  AC_CHECK_LIB(gmp, main, ,
-    [
-      # check a second time in `$(libdir)'.  This is a bit tricky,
-      # but I think its worth avoiding long option values.
-      unset ac_cv_lib_gmp_main
-      LDFLAGS="-L$explicit_libdir $LDFLAGS"
-      AC_CHECK_LIB(gmp, main, ,
-        [ AC_MSG_ERROR(libgmp.a not found.  Use option --with-gmp to specify path) ])
-      unset ac_cv_lib_gmp_main
-    ])
-fi
+LB_CHECK_GMP(3.1.1,,AC_MSG_ERROR([Unable to find GMP on your machine: please use --with-gmp=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
+
+LB_CHECK_NTL(5.0,,AC_MSG_WARN([Unable to find NTL (which is strongly recommended) on your machine: please use --with-ntl=PATH_TO_DIR_CONTAINING_LIB_AND_INCLUDE (see also ./configure --help if you do not understand what we are talking about)]))
 
 # arithmetic shift
 #AC_MSG_CHECKING(whether your compiler does arithmetic shifts)
@@ -255,19 +210,6 @@ fi
 # - check for header files.
 #
 AC_LANG_CPLUSPLUS
-
-if test "x$gmp_in_installation" != xyes; then
-  AC_CHECK_HEADERS(gmp.h, ,
-    [
-      # check a second time in `$(includedir)'.  This is a bit tricky,
-      # but I think it's worth avoiding long option values.
-      unset ac_cv_header_gmp_h
-      CPPFLAGS="-I$explicit_includedir $CPPFLAGS"
-      AC_CHECK_HEADERS(gmp.h, ,
-	[ AC_MSG_ERROR(gmp.h not found.  Use option --with-gmp to specify path) ])
-      unset ac_cv_header_gmp_h
-    ])
-fi
 
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h time.h math.h, ,
   [ AC_MSG_ERROR(C header files not found) ])
@@ -408,24 +350,10 @@ if test "x$with_Singular" = xyes; then
   AC_DEFINE(SINGULAR)
 fi
 
-# NTL
-if test "x$with_NTL" = xyes; then
-  AC_DEFINE(HAVE_NTL)
-fi
-
 # arithmetic shift
 #if test "x$ac_cv_shift" = xyes; then   
 #  AC_DEFINE(HAS_ARITHMETIC_SHIFT)
 #fi
-
-# gmp-stuff.  we must not set these flags before the tests
-# are finished!
-if test "x$gmp_in_installation" = xyes; then
-  CPPFLAGS="-I\$(includedir) $CPPFLAGS"
-  if test "x$with_Singular" = xyes; then
-    LDFLAGS="-L\$(libdir) -lgmp $LDFLAGS"
-  fi
-fi
 
 AC_MSG_CHECKING(whether to use omalloc)
 
