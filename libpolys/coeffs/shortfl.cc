@@ -556,6 +556,7 @@ static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, void*)
 BOOLEAN nrInitChar(coeffs n, void*)
 {
   assume( getCoeffType(n) == ID );
+  n->cfKillChar = ndKillChar; /* dummy */
 
   n->cfInit = nrInit;
   n->cfInt  = nrInt;
