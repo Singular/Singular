@@ -26,9 +26,6 @@
 using namespace std;
 
 
-namespace
-{
-
 void TestSum(const coeffs r, const unsigned long N)
 {
   clog << ( _2S("TEST: sum[0..") + _2S(N) + "]: ");
@@ -55,7 +52,10 @@ void TestSum(const coeffs r, const unsigned long N)
 
   if( !n_IsZero( i, r) )
   {
+#ifdef HAVE_RINGS
     TS_ASSERT( n_DivBy(s, i, r) );
+#endif
+     
     res = n_Div(s, i, r);
   
     clog<< "N*(N+1)/2: "; PrintSized(res, r);
@@ -333,7 +333,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
 }
 
 
-}
 
 // We can rely on this file being included exactly once
 // and declare this global variable in the header file.

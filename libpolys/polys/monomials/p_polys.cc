@@ -1324,8 +1324,6 @@ poly p_Divide(poly a, poly b, const ring r)
   return result;
 }
 
-#ifdef HAVE_RINGS   //TODO Oliver
-
 poly p_Div_nn(poly p, const number n, const ring r)
 {
   pAssume(!n_IsZero(n,r->cf));
@@ -1342,7 +1340,6 @@ poly p_Div_nn(poly p, const number n, const ring r)
   p_Test(q, r);
   return q;
 }
-#endif
 
 /*2
 * divides a by the monomial b, ignores monomials which are not divisible
