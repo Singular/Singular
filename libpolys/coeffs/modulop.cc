@@ -282,13 +282,6 @@ const char * npRead (const char *s, number *a, const coeffs r)
 * set the charcteristic (allocate and init tables)
 */
 
-void npSetChar(const coeffs)
-{
-#if !defined(HAVE_DIV_MOD) || !defined(HAVE_MULT_MOD)
-//    npGen = npExpTable[1];
-#endif
-}
-
 void npKillChar(coeffs r)
 {
   #ifdef HAVE_DIV_MOD
@@ -346,7 +339,6 @@ BOOLEAN npInitChar(coeffs r, void* p)
 
   //r->cfInitChar=npInitChar;
   r->cfKillChar=npKillChar;
-  r->cfSetChar=npSetChar;
   r->nCoeffIsEqual=npCoeffsEqual;
 
   r->cfMult  = npMult;

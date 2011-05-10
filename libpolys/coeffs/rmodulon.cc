@@ -34,6 +34,13 @@ void    nrnCoeffWrite  (const coeffs r)
   omFreeSize((ADDRESS)s, l);
 }
 
+static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
+{
+  /* test, if r is an instance of nInitCoeffs(n,parameter) */
+  return (n==n_Zn) && (mpz_cmp(r->modNumber,(mpz_ptr)parameter)==0);
+}
+
+
 /* for initializing function pointers */
 BOOLEAN nrnInitChar (coeffs r, void* p)
 {
@@ -74,6 +81,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   r->cfExtGcd      = nrnExtGcd;
   r->cfName        = ndName;
   r->cfCoeffWrite  = nrnCoeffWrite;
+  r->nCoeffIsEqual = nrnCoeffsEqual;
 #ifdef LDEBUG
   r->cfDBTest      = nrnDBTest;
 #endif
