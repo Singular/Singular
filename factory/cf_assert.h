@@ -29,6 +29,7 @@
 /* }}} */
 
 #ifdef __cplusplus
+#ifndef NOSTREAMIO
 #ifdef HAVE_CSTDIO
 #include <cstdio>
 #else
@@ -40,6 +41,7 @@ extern "C" {
 #else
 #include <stdio.h>
 #include <stdlib.h>
+#endif
 #endif
 
 /* {{{ permanent macro definitions */

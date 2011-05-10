@@ -16,10 +16,12 @@
 #include "cf_gmp.h"
 
 #ifdef HAVE_NTL
+#ifndef NOSTREAMIO
 #ifdef HAVE_CSTDIO
 #include <cstdio>
 #else
 #include <stdio.h>
+#endif
 #endif
 #include <string.h>
 #include <NTL/ZZXFactoring.h>

@@ -1,11 +1,11 @@
 #include "factoryconf.h"
 
+#ifndef NOSTREAMIO
 #ifdef HAVE_CSTDIO
 #include <cstdio>
 #else
 #include <stdio.h>
 #endif
-#ifndef NOSTREAMIO
 #ifdef HAVE_IOSTREAM_H
 #include <iostream.h>
 #elif defined(HAVE_IOSTREAM)
