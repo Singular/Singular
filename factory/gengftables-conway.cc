@@ -10,10 +10,12 @@
 //
 //}}}
 
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <strstream>
 #include <string>
+
+#include <stdlib.h>
 
 #include <factory.h>
 
@@ -21,6 +23,12 @@
 #include <gf_tabutil.h>
 
 using namespace std;
+
+int initializeGMP()
+{
+  return 1;
+}
+
 
 //{{{ constants
 //{{{ docu
@@ -297,8 +305,8 @@ static CanonicalForm findGenNew(int n, int q)
                 pos2 = LineSe.find( ",", pos1 + 1);        // we check where are the "," to now p and n of this line
                 ps = LineSe.substr(0, pos1);
                 ns = LineSe.substr(pos1 + 1,pos2 - pos1);
-                ptmp = std::atoi(ps.c_str());                //we have the value of p and n of these line
-                ntmp = std::atoi(ns.c_str());
+                ptmp = atoi(ps.c_str());                //we have the value of p and n of these line
+                ntmp = atoi(ns.c_str());
 
         if((ntmp==n)&&(ptmp==p)){flag=0;}        // we check if they are our p and n to stop the search
 
@@ -313,7 +321,7 @@ static CanonicalForm findGenNew(int n, int q)
         // Read the polynomial from the file
         pos1 = pos2 + 1;
         pos2 = LineSe.find(",", pos1 + 1);
-        conway = std::atoi(LineSe.substr(pos1, pos2 - pos1).c_str()); // value of the constant term in PC=Conway Polynomial
+        conway = atoi(LineSe.substr(pos1, pos2 - pos1).c_str()); // value of the constant term in PC=Conway Polynomial
     pos1 = pos2;
         pos2 = LineSe.find(",", pos1 + 1);
 
@@ -322,7 +330,7 @@ static CanonicalForm findGenNew(int n, int q)
                 coef = LineSe.substr(pos1 + 1,pos2 - pos1 - 1); //Coefficient of the monomial of degree ii-1
         if(coef != "0")
                 {
-                        conway = conway + std::atoi(coef.c_str()) * power(x, ii - 1) ; //We add this monomial to the Conway Polynomial
+                        conway = conway + atoi(coef.c_str()) * power(x, ii - 1) ; //We add this monomial to the Conway Polynomial
                 }
                 pos1 = pos2;
                 pos2 = LineSe.find( ",", pos1+1);
@@ -330,7 +338,7 @@ static CanonicalForm findGenNew(int n, int q)
 
         pos2 = LineSe.find( ",END", pos1 + 1); // To obtain the last coefficient we search "END" instead of ","
         coef = LineSe.substr(pos1 + 1,pos2 - pos1 - 1);
-        conway = conway + std::atoi(coef.c_str()) * power(x, ii - 1) ; //We add the last monomial to the Conway Polynomial
+        conway = conway + atoi(coef.c_str()) * power(x, ii - 1) ; //We add the last monomial to the Conway Polynomial
 
         in.close();
 
