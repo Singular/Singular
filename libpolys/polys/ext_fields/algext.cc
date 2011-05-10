@@ -510,37 +510,39 @@ number naMapUP(number a, const coeffs src, const coeffs dst)
   return (number)result;
 }
 
-nMapFunc naSetMap(const ring src, const ring dst)
+nMapFunc naSetMap(const coeffs src, const coeffs dst)
 {
-  /* dst->cf is expected to be an (algebraic) extension field */
-  assume(dst->cf->type == n_Ext);
+  /* dst is expected to be an (algebraic) extension field */
+  assume(getCoeffType(dst) == n_Ext);
   
-  if (rField_is_Q(src) && rField_is_Q_a(dst))
+  if (nCoeff_is_Q(src) && nCoeff_is_Q_a(dst))
     return naMap00;                                      /// Q     -->  Q(a)
   
-  if (rField_is_Zp(src) && rField_is_Q_a(dst))
+  if (nCoeff_is_Zp(src) && nCoeff_is_Q_a(dst))
     return naMapP0;                                      /// Z/p   -->  Q(a)
   
-  if (rField_is_Q_a(src) && rField_is_Q_a(dst))
+  if (nCoeff_is_Q_a(src) && nCoeff_is_Q_a(dst))
   {
-    if (strcmp(rParameter(src)[0], rParameter(dst)[0]) == 0)
+    if (strcmp(rParameter(src->algring)[0],
+               rParameter(dst->algring)[0]) == 0)
       return naCopyMap;                                  /// Q(a)   --> Q(a)
     else
       return NULL;                                       /// Q(b)   --> Q(a)
   }
   
-  if (rField_is_Q(src) && rField_is_Zp_a(dst))
+  if (nCoeff_is_Q(src) && nCoeff_is_Zp_a(dst))
     return naMap0P;                                      /// Q      --> Z/p(a)
   
-  if (rField_is_Zp(src) && rField_is_Zp_a(dst))
+  if (nCoeff_is_Zp(src) && nCoeff_is_Zp_a(dst))
   {
-    if (rChar(src) == rChar(dst)) return naMapPP;        /// Z/p    --> Z/p(a)
+    if (src->ch == dst->ch) return naMapPP;              /// Z/p    --> Z/p(a)
     else return naMapUP;                                 /// Z/u    --> Z/p(a)
   }
   
-  if (rField_is_Zp_a(src) && rField_is_Zp_a(dst))
+  if (nCoeff_is_Zp_a(src) && nCoeff_is_Zp_a(dst))
   {
-    if (strcmp(rParameter(src)[0], rParameter(dst)[0]) == 0)
+    if (strcmp(rParameter(src->algring)[0],
+               rParameter(dst->algring)[0]) == 0)
       return naCopyMap;                                  /// Z/p(a) --> Z/p(a)
     else
       return NULL;                                       /// Z/p(b) --> Z/p(a)
