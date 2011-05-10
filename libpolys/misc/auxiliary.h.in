@@ -19,20 +19,23 @@
 
 // ----------------- which parts/extensions of Singular to build
 #ifndef HAVE_RINGS
-#define HAVE_RINGS
+#undef HAVE_RINGS
 #endif
 
 #ifndef HAVE_PLURAL
-#define HAVE_PLURAL
+#undef HAVE_PLURAL
 #endif
 
 #ifndef HAVE_DL
-#define HAVE_DL
+#undef HAVE_DL
 #endif
 
-
 #ifndef HAVE_FACTORY
-#define HAVE_FACTORY
+#undef HAVE_FACTORY
+#endif
+
+#ifndef HAVE_NTL
+#undef HAVE_NTL
 #endif
 
 // ----------------  end of parts/extensions
