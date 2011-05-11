@@ -23,6 +23,7 @@
 #include "matpol.h"
 #include "simpleideals.h"
 #include "sbuckets.h"
+#include "clapsing.h"
 
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 
@@ -1697,7 +1698,6 @@ poly id_GCD(poly f, poly g, const ring r)
 * destroys xx
 */
 #ifdef HAVE_FACTORY
-#if 0
 ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
@@ -1735,13 +1735,13 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
           x[j]=nlInit(0, R->cf); // is R->cf really n_Q???
       }
        
-      number n=nlChineseRemainder(x,q,rl); // kernel/clapconv.cc
+      number n=nChineseRemainder(x,q,rl, R->cf);
 
       for(j=rl-1;j>=0;j--)
       {
         x[j]=NULL; // nlInit(0...) takes no memory
       }
-      if (nlIsZero(n, R->cf)) p_Delete(&h, R);
+      if (n_IsZero(n, R->cf)) p_Delete(&h, R);
       else
       {
         p_SetCoeff(h,n, R);
@@ -1756,7 +1756,6 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
   omFree(xx);
   return result;
 }
-#endif
 #endif
 
 /*2
