@@ -380,14 +380,6 @@ void ngfWrite (number &a, const coeffs r)
   }
 }
 
-/// test, whether r is an instance of nInitCoeffs(n, parameter)
-static BOOLEAN ngfCoeffsEqual(const coeffs r, n_coeffType n, void*)
-{
-  assume( getCoeffType(r) == ID );
-  
-  return (n == ID);
-}
-
 BOOLEAN ngfInitChar(coeffs n, void *)
 {
   assume( getCoeffType(n) == ID );
@@ -420,7 +412,7 @@ BOOLEAN ngfInitChar(coeffs n, void *)
   n->cfDBTest  = ndDBTest; // not yet implemented: ngfDBTest
 #endif
 
-  n->nCoeffIsEqual = ngfCoeffsEqual;
+  n->nCoeffIsEqual = ndCoeffIsEqual;
   return FALSE;
 }
 

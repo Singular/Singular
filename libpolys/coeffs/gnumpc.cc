@@ -41,6 +41,7 @@ BOOLEAN ngcDBTest(number a, const char *f, const int l, const coeffs r)
 number   ngcPar(int i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
+  assume(i==1);
 
   gmp_complex* n= new gmp_complex( (long)0, (long)1 );
   return (number)n;
@@ -372,16 +373,6 @@ void ngcWrite (number &a, const coeffs r)
   }
 }
 
-
-
-/// test, whether r is an instance of nInitCoeffs(n, parameter)
-static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, void*)
-{
-  assume( getCoeffType(r) == ID );
-  
-  return (n == ID);
-}
-
 BOOLEAN ngcInitChar(coeffs n, void* p)
 {
   assume( getCoeffType(n) == ID );
@@ -418,7 +409,7 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
   n->cfDBTest  = ndDBTest; // not yet implemented: ngcDBTest
 #endif
 
-  n->nCoeffIsEqual = ngcCoeffsEqual;
+  n->nCoeffIsEqual = ndCoeffIsEqual;
 
 
   
@@ -488,7 +479,7 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
 
 /// TODO: Any variables?
   if( p == NULL )
-    n->complex_parameter = "i"; //??
+    n->complex_parameter = omStrDup((char*)"i");
   else
     n->complex_parameter = omStrDup( (char*) p );
     

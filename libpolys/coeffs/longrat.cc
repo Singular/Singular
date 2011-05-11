@@ -498,7 +498,7 @@ static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 //  return r;
 //}
 
-int nlSize(number a, const coeffs r)
+int nlSize(number a, const coeffs)
 {
   if (a==INT_TO_SR(0))
      return 0; /* rational 0*/
@@ -2097,7 +2097,7 @@ LINLINE BOOLEAN nlIsOne (number a, const coeffs r)
   return (a==INT_TO_SR(1));
 }
 
-LINLINE BOOLEAN nlIsZero (number a, const coeffs r)
+LINLINE BOOLEAN nlIsZero (number a, const coeffs)
 {
   return (a==INT_TO_SR(0));
   //return (mpz_cmp_si(a->z,(long)0)==0);
@@ -2106,7 +2106,7 @@ LINLINE BOOLEAN nlIsZero (number a, const coeffs r)
 /*2
 * copy a to b
 */
-LINLINE number nlCopy(number a, const coeffs r)
+LINLINE number nlCopy(number a, const coeffs)
 {
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {
@@ -2516,12 +2516,6 @@ number nlFarey(number nN, number nP, const coeffs r)
   return z;
 }
 
-static BOOLEAN nlCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
-{
-  /* test, if r is an instance of nInitCoeffs(n,parameter) */
-  return (n==n_Q);
-}
-
 void    nlCoeffWrite  (const coeffs r)
 {
   PrintS("//   characteristic : 0\n");
@@ -2533,7 +2527,7 @@ BOOLEAN nlInitChar(coeffs r, void* p)
   
   r->cfKillChar=NULL;
   r->cfSetChar=NULL;
-  r->nCoeffIsEqual=nlCoeffsEqual;
+  r->nCoeffIsEqual=ndCoeffIsEqual;
   r->cfKillChar = ndKillChar; /* dummy */
 
   r->cfMult  = nlMult;
@@ -2585,8 +2579,6 @@ BOOLEAN nlInitChar(coeffs r, void* p)
   r->cfDBTest=nlDBTest;
 #endif
 
-  r->nCoeffIsEqual = nlCoeffsEqual;
-  
   // the variables: general stuff (required)
   r->nNULL = INT_TO_SR(0);
   //r->type = n_Q;
