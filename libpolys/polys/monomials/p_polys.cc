@@ -1343,11 +1343,11 @@ poly p_Div_nn(poly p, const number n, const ring r)
 
 /*2
 * divides a by the monomial b, ignores monomials which are not divisible
-* assumes that b is not NULL
+* assumes that b is not NULL, destroyes b
 */
 poly p_DivideM(poly a, poly b, const ring r)
 {
-  if (a==NULL) return NULL;
+  if (a==NULL) { p_Delete(&b,r); return NULL; }
   poly result=a;
   poly prev=NULL;
   int i;
