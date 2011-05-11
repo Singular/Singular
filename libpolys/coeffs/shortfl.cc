@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <coeffs/coeffs.h>
+#include <coeffs/numbers.h>
 #include <reporter/reporter.h>
 #include <coeffs/numbers.h>
 #include <coeffs/longrat.h>
@@ -540,19 +541,6 @@ nMapFunc nrSetMap(const coeffs src, const coeffs dst)
   return NULL;
 }
 
-
-
-
-
-/// test, whether r is an instance of nInitCoeffs(n, parameter)
-static BOOLEAN nrCoeffsEqual(const coeffs r, n_coeffType n, void*)
-{
-  assume( getCoeffType(r) == ID );
-
-  return (n == ID);
-}
-
-
 BOOLEAN nrInitChar(coeffs n, void*)
 {
   assume( getCoeffType(n) == ID );
@@ -586,7 +574,7 @@ BOOLEAN nrInitChar(coeffs n, void*)
   n->cfDBTest=ndDBTest; // not yet implemented: nrDBTest;
 #endif
   
-  n->nCoeffIsEqual = nrCoeffsEqual;
+  n->nCoeffIsEqual = ndCoeffIsEqual;
 
   // TODO: Any variables?
   return FALSE;

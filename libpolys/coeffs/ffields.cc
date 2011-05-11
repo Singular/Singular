@@ -183,8 +183,9 @@ number nfInit (int i, const coeffs r)
 /*
 * the generating element `z`
 */
-number nfPar (int i, const coeffs r)
+number nfPar (int i, const coeffs)
 {
+  assume(i==1);
   return (number)1;
 }
 

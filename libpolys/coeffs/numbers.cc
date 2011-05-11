@@ -92,11 +92,11 @@ number ndReturn0(number n, const coeffs r) { return n_Init(0,r); }
 
 int    ndParDeg(number n, const coeffs r) { return 0; }
 
-number ndGcd(number a, number b, const coeffs r) { return n_Init(1,r); }
+number ndGcd(number, number, const coeffs r) { return n_Init(1,r); }
 
-number ndIntMod(number a, number b, const coeffs r) { return n_Init(0,r); }
+number ndIntMod(number, number, const coeffs r) { return n_Init(0,r); }
 
-number ndGetDenom(number &n, const coeffs r) { return n_Init(1,r); }
+number ndGetDenom(number &, const coeffs r) { return n_Init(1,r); }
 number ndGetNumerator(number &a,const coeffs r) { return n_Copy(a,r); }
 
 int ndSize(number a, const coeffs r) { return (int)n_IsZero(a,r)==FALSE; }
@@ -135,10 +135,18 @@ number ndConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 }
 #endif
 
-number  ndInit_bigint(number i, const coeffs dummy, const coeffs dst)
+number  ndInit_bigint(number, const coeffs, const coeffs)
 {
   Werror("no conversion from bigint to this field");
   return NULL;
+}
+
+
+BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
+{
+  /* test, if r is an instance of nInitCoeffs(n,parameter) */
+  /* if paramater is not needed */
+  return (n==r->type);
 }
 
 static n_coeffType nLastCoeffs=n_Z2m;
