@@ -135,6 +135,11 @@ number ndConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 }
 #endif
 
+number  ndInit_bigint(number i, const coeffs dummy, const coeffs dst)
+{
+  Werror("no conversion from bigint to this field");
+  return NULL;
+}
 
 static n_coeffType nLastCoeffs=n_Z2m;
 static cfInitCharProc *nInitCharTable=NULL;
@@ -170,6 +175,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     n->cfNormalize=ndNormalize;
     n->cfGcd  = ndGcd;
     n->cfLcm  = ndGcd; /* tricky, isn't it ?*/
+    n->cfInit_bigint = ndInit_bigint;
     //n->cfKillChar = ndKillChar; /* dummy */
     // temp. removed to catch all the coeffs which miss to implement this!
 
@@ -249,7 +255,7 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     assume(n->cfSetMap!=NULL);
     assume(n->cfName!=NULL);
     assume(n->cfInpMult!=NULL);
-    assume(n->cfInit_bigint!=NULL);
+    //assume(n->cfInit_bigint!=NULL);
     assume(n->cfCoeffWrite != NULL);
 #ifdef LDEBUG
     assume(n->cfDBTest!=NULL);

@@ -71,6 +71,8 @@ void   ndInpAdd(number &a, number b, const coeffs r);
 
 void ndKillChar(coeffs);
 
+number  ndInit_bigint(number i, const coeffs dummy, const coeffs dst);
+
 /// Test whether a is a zero divisor in r
 /// i.e. not coprime with char. of r
 /// very inefficient implementation:
