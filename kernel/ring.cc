@@ -385,13 +385,13 @@ void rWrite(ring r)
           {
             int64 *w=(int64 *)r->wvhdl[l];
             #if SIZEOF_LONG == 4
-                  Print("%*lld " ,nlen,w[i+j],i+j);
+            Print("%*lld " ,nlen,w[i+j]);
             #else
-            Print(" %*ld"  ,nlen,w[i+j],i+j);
+            Print(" %*ld"  ,nlen,w[i+j]);
             #endif
           }
           else
-            Print(" %*d" ,nlen,r->wvhdl[l][i+j],i+j);
+            Print(" %*d" ,nlen,r->wvhdl[l][i+j]);
         }
         if (r->order[l]!=ringorder_M) break;
       }
@@ -1407,8 +1407,6 @@ int rSumInternal(ring r1, ring r2, ring &sum, BOOLEAN vartest, BOOLEAN dp_dp)
       matrix C  = mpNew(l,l);
       matrix D  = mpNew(l,l);
 
-      int param_shift = 0;
-
       for (i = 1; i <= rVar(R1); i++)
         for (j= rVar(R1)+1; j <= l; j++)
           MATELEM(C,i,j) = p_One( sum); // in 'sum'
@@ -2342,7 +2340,6 @@ static void rO_WDegree64(int &place, int &bitplace, int start, int end,
   o[place]=1;
   place++;
   rO_Align(place,bitplace);
-  int i;
 }
 
 static void rO_WDegree_neg(int &place, int &bitplace, int start, int end,
@@ -5315,7 +5312,7 @@ void rSetWeightVec(ring r, int64 *wv)
 
 #include <ctype.h>
 
-static int rRealloc1(ring r, ring src, int size, int pos)
+static int rRealloc1(ring r, int size, int pos)
 {
   r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size+1)*sizeof(int));
   r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size+1)*sizeof(int));
@@ -5471,7 +5468,7 @@ ring rOpposite(ring src)
         break;
       case ringorder_dp: /* dp -> a(1..1),ls */
       {
-        l=rRealloc1(r,src,l,j);
+        l=rRealloc1(r,l,j);
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
         r->block1[j]=rOppVar(r, src->block0[i]);
@@ -5487,7 +5484,7 @@ ring rOpposite(ring src)
       }
       case ringorder_Dp: /* Dp -> a(1..1),rp */
       {
-        l=rRealloc1(r,src,l,j);
+        l=rRealloc1(r,l,j);
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
         r->block1[j]=rOppVar(r, src->block0[i]);
@@ -5503,7 +5500,7 @@ ring rOpposite(ring src)
       }
       case ringorder_wp: /* wp -> a(...),ls */
       {
-        l=rRealloc1(r,src,l,j);
+        l=rRealloc1(r,l,j);
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
         r->block1[j]=rOppVar(r, src->block0[i]);
@@ -5518,7 +5515,7 @@ ring rOpposite(ring src)
       }
       case ringorder_Wp: /* Wp -> a(...),rp */
       {
-        l=rRealloc1(r,src,l,j);
+        l=rRealloc1(r,l,j);
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
         r->block1[j]=rOppVar(r, src->block0[i]);
