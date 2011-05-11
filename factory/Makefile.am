@@ -187,13 +187,15 @@ templateincl =	\
 noinst_PROGRAMS = gengftables
 gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
-gengftables_SOURCES = gengftables-conway.cc ftmpl_inst.cc
+gengftables_SOURCES = gengftables-conway.cc
 
 data_DATA = gftables
 
 gftables:	gengftables
 		@if test -r ${srcdir}/gftables; then \
-			cp -r ${srcdir}/gftables ${builddir}; \
+			if test ! -r ${builddir}/gftables; then \
+			  cp -r ${srcdir}/gftables ${builddir}; \
+			fi; \
 		else \
 			echo "This command will take quite a long time to execute;"; \
 			echo "maybe you want to get the tables directly via ftp (see"; \

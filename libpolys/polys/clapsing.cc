@@ -1092,6 +1092,7 @@ int singclap_det_i( intvec * m)
 }
 
 #ifdef HAVE_NTL
+#if 0
 matrix singntl_HNF(matrix  m, const ring s )
 {
   int r=m->rows();
@@ -1209,6 +1210,7 @@ intvec* singntl_LLL(intvec*  m)
   delete MM;
   return mm;
 }
+#endif
 #endif
 
 /*
