@@ -42,7 +42,9 @@
 #define MULTIPLY_BUCKET(B,I)
 #endif
 static omBin kBucket_bin = omGetSpecBin(sizeof(kBucket));
+#ifdef USE_COEF_BUCKETS
 static int coef_start=1;
+#endif
 //////////////////////////////////////////////////////////////////////////
 ///
 /// Some internal stuff
@@ -1163,9 +1165,11 @@ static BOOLEAN nIsPseudoUnit(number n, ring r)
   return (n_IsOne(n,r->cf) || n_IsMOne(n,r->cf));
 }
 
+#ifndef USE_COEF_BUCKETS
+void kBucketSimpleContent(kBucket_pt) {}
+#else
 void kBucketSimpleContent(kBucket_pt bucket)
 {
-  #ifdef USE_COEF_BUCKETS
   ring r=bucket->bucket_ring;
   int i;
   //PrintS("HHHHHHHHHHHHH");
@@ -1240,8 +1244,8 @@ void kBucketSimpleContent(kBucket_pt bucket)
     }
   }
   n_Delete(&coef,r);
-  #endif
 }
+#endif
 
 
 poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)

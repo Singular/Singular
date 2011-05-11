@@ -29,7 +29,7 @@
 
 namespace 
 {
-  static char* m_Typenames[2] = {"lookup", "store"};
+  static const char* m_Typenames[2] = {"lookup", "store"};
 }
 
 #include <coeffs/numbers.h>

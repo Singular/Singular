@@ -687,7 +687,11 @@ static inline int p_Comp_k_n(poly a, poly b, int k, ring r)
  * Allocation/Initalization/Deletion
  *
  ***************************************************************/
-static inline poly p_New(ring r, omBin bin)
+#if PDEBUG > 2
+static inline poly p_New(const ring r, omBin bin)
+#else
+static inline poly p_New(const ring, omBin bin)
+#endif
 {
   p_CheckRing2(r);
   pAssume2(bin != NULL && r->PolyBin->sizeW == bin->sizeW);
@@ -702,19 +706,31 @@ static inline poly p_New(ring r)
   return p_New(r, r->PolyBin);
 }
 
+#if PDEBUG > 2
 static inline void p_LmFree(poly p, ring r)
+#else
+static inline void p_LmFree(poly p, ring)
+#endif
 {
   p_LmCheckPolyRing2(p, r);
   omFreeBinAddr(p);
 }
+#if PDEBUG > 2
 static inline void p_LmFree(poly *p, ring r)
+#else
+static inline void p_LmFree(poly *p, ring) 
+#endif
 {
   p_LmCheckPolyRing2(*p, r);
   poly h = *p;
   *p = pNext(h);
   omFreeBinAddr(h);
 }
+#if PDEBUG > 2
 static inline poly p_LmFreeAndNext(poly p, ring r)
+#else
+static inline poly p_LmFreeAndNext(poly p, ring)
+#endif
 {
   p_LmCheckPolyRing2(p, r);
   poly pnext = pNext(p);
@@ -1342,7 +1358,7 @@ static inline poly p_GetExp_k_n(poly p, int l, int k, const ring r)
 }
 
 // simialar to p_ShallowCopyDelete but does it only for leading monomial
-static inline poly p_LmShallowCopyDelete(poly p, const ring r, omBin bin)
+static inline poly p_LmShallowCopyDelete(poly p, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   pAssume1(bin->sizeW == r->PolyBin->sizeW);
