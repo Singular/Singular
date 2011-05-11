@@ -385,6 +385,7 @@ static BOOLEAN ngcCoeffsEqual(const coeffs r, n_coeffType n, void*)
 BOOLEAN ngcInitChar(coeffs n, void* p)
 {
   assume( getCoeffType(n) == ID );
+  n->cfKillChar = ndKillChar; /* dummy */
 
   n->cfDelete  = ngcDelete;
   n->cfNormalize=ndNormalize;
