@@ -81,6 +81,8 @@ SOURCES = \
 		singext.cc \
 		parseutil.cc \
 		readcf.yy \
+		factory.h \
+		factoryconf.h \
 		ftmpl_inst.cc
 
 libfactory_a_SOURCES = $(SOURCES)
@@ -193,6 +195,11 @@ gftables:	gengftables
 		@echo "the INSTALL file)."
 		$(MKINSTALLDIRS) gftables
 		./gengftables
+
+.template.h:
+		${srcdir}/bin/makeheader $< $@
+
+BUILT_SOURCES = factory.h factoryconf.h
 
 # These files listed below are not used anywhere but are included in
 # the distribution. So they will be tacked on to EXTRA_DIST.

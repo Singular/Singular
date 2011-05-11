@@ -10,8 +10,9 @@ LIB
 *.la
 .libs
 doc/
-factory/readcf.c
+factory/readcf.cc
 factory/ylwrap
+factory/gengftables
 m4/libtool.m4
 m4/ltoptions.m4
 m4/ltsugar.m4
