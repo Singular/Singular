@@ -190,12 +190,17 @@ gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
 gengftables_SOURCES = gengftables-conway.cc ftmpl_inst.cc
 
+data_DATA = gftables
+
 gftables:	gengftables
-		@echo "This command will take quite a long time to execute;"
-		@echo "maybe you want to get the tables directly via ftp (see"
-		@echo "the INSTALL file)."
-		$(MKINSTALLDIRS) gftables
-		./gengftables
+		@if test -r ${srcdir}/gftables; then \
+			cp -r ${srcdir}/gftables ${builddir}; \
+		else \
+			echo "This command will take quite a long time to execute;"; \
+			echo "maybe you want to get the tables directly via ftp (see"; \
+			echo "the INSTALL file)."; \
+			${builddir}/gengftables; \
+		fi
 
 .template.h:
 		${srcdir}/bin/makeheader $< $@
@@ -256,6 +261,6 @@ EXTRA_DIST =	gengftables.cc gengftables-conway.cc test_install.cc \
 		examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
-		bin/makeheader bin/gen-readcf
+		bin/makeheader bin/gen-readcf readcf.cc gftables
 
-CLEANFILES = factory.h factoryconf.h readcf.cc
+CLEANFILES = factory.h factoryconf.h

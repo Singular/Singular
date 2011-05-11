@@ -1697,6 +1697,7 @@ poly id_GCD(poly f, poly g, const ring r)
 * destroys xx
 */
 #ifdef HAVE_FACTORY
+#if 0
 ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
 {
   int cnt=IDELEMS(xx[0])*xx[0]->nrows;
@@ -1755,6 +1756,7 @@ ideal id_ChineseRemainder(ideal *xx, number *q, int rl, const ring R)
   omFree(xx);
   return result;
 }
+#endif
 #endif
 
 /*2

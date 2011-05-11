@@ -383,6 +383,7 @@ BOOLEAN nrzInitChar(coeffs r,  void * parameter)
   r->cfSetChar= NULL;
   r->cfMult  = nrzMult;
   r->cfSub   = nrzSub;
+  r->nCoeffIsEqual = ndCoeffIsEqual;
   r->cfAdd   = nrzAdd;
   r->cfDiv   = nrzDiv;
   r->cfIntDiv= nrzDiv;

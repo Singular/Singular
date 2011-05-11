@@ -61,5 +61,7 @@ BOOLEAN jjIS_SQR_FREE(leftv res, leftv u);
 #endif
 */
 
+number   nlChineseRemainder(number *x, number *q,int rl);
+
 #endif /* INCL_FACTORYSING_H */
 
