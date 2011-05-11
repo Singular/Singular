@@ -81,7 +81,7 @@ SOURCES = \
 		lgs.cc \
 		singext.cc \
 		parseutil.cc \
-		readcf.y \
+		readcf.yy \
 		ftmpl_inst.cc
 
 libfactory_a_SOURCES = $(SOURCES)
