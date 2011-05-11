@@ -141,8 +141,9 @@ public:
      
      rDelete(r);
   }
-   void test_QQ_x_y_z()
-   {
+
+  void test_QQ_x_y_z()
+  {
      clog << "Creating  QQ[x, y, z, u]: " << endl;
 
      char* n[] = {"x", "y", "z", "u"};
@@ -203,6 +204,47 @@ public:
 
      rDelete(r); // kills 'cf' as well!
    }
+   
 
+
+
+
+  void test_QQ_x_y_z_ord_2_lp()
+  {
+     clog << "Creating  QQ[x, y, z, u]: " << endl;
+
+     const int N = 4;
+     char* n[N] = {"x", "y", "z", "u"};
+
+
+     const int D = 2;
+     /*order: lp,0*/
+     int *order = (int *) omAlloc0(D* sizeof(int));
+     int *block0 = (int *)omAlloc0(D * sizeof(int));
+     int *block1 = (int *)omAlloc0(D * sizeof(int));
+     /* ringorder dp for the first block: var 1..N */
+     order[0]  = ringorder_dp;
+     block0[0] = 1;
+     block1[0] = N;
+     /* the last block: everything is 0 */
+//     order[1]  = 0;
+
+     ring r = rDefault(0, N, n, D, order, block0, block1);
+     TS_ASSERT_DIFFERS( r, NULLp );
+
+     PrintRing(r);
+
+     TS_ASSERT( rField_is_Domain(r) );
+     TS_ASSERT( rField_is_Q(r) );
+
+     TS_ASSERT( !rField_is_Zp(r) );
+     TS_ASSERT( !rField_is_Zp(r, 11) );
+
+     TS_ASSERT_EQUALS( rVar(r), N);
+
+     Test(r);
+      
+     rDelete(r);
+   }
 };
 
