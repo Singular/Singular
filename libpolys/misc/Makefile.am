@@ -12,7 +12,7 @@ libmisc_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTE
 libmisc_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 libmisc_g_a_CPPFLAGS = -DHAVE_CONFIG_H
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
 SOURCES  = intvec.cc options.c
 libmisc_a_SOURCES   = $(SOURCES)

@@ -12,7 +12,7 @@ libreporter_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${C
 libreporter_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 libreporter_g_a_CPPFLAGS = -DHAVE_CONFIG_H
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/..
 
 SOURCES  = dError.c reporter.cc
 libreporter_a_SOURCES   = $(SOURCES)
