@@ -11,7 +11,7 @@ AM_CXXFLAGS = $(AM_CFLAGS) ${CXXTEMPLFLAGS}
 
 AM_CPPFLAGS = -DHAVE_CONFIG_H
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} ${GMP_CFLAGS}  ${NTL_CFLAGS}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS}  ${NTL_CFLAGS}
 
 
 TESTS = simple_test coeffs_test rings_test polys_test

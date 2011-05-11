@@ -1,6 +1,6 @@
 CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 lib_LIBRARIES = libfactory.a libfactory_g.a
 
@@ -257,3 +257,5 @@ EXTRA_DIST =	gengftables.cc gengftables-conway.cc test_install.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
 		bin/makeheader bin/gen-readcf
+
+CLEANFILES = factory.h factoryconf.h readcf.cc

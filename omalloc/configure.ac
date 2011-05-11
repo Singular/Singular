@@ -142,6 +142,13 @@ if test "$ac_cv_sizeof_double" != 4 && test "$ac_cv_sizeof_double" != 8; then
   AC_MSG_ERROR(need double to be 4 or 8 bytes long)
 fi
 
+dnl Set compiler, linker flags so that we can work with omalloc
+BACKUP_CFLAGS=$CFLAGS
+BACKUP_CXXFLAGS=$CXXFLAGS
+BACKUP_LDFLAGS=$LDFLAGS
+CFLAGS="$CFLAGS -I$srcdir"
+CXXFLAGS="$CXXFLAGS -I$srcdir"
+
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl figure out page size of the system
 dnl
@@ -166,7 +173,7 @@ AC_MSG_RESULT($ac_cv_pagesize)
 if test "$ac_cv_pagesize" = 4096 || test "$ac_cv_pagesize" = 8192; then
   AC_DEFINE_UNQUOTED(SIZEOF_SYSTEM_PAGE, $ac_cv_pagesize, "Page-size of the build-system")
 else
-AC_MSG_ERROR(need sytem page to be of size 4096 or 8192, but is $ac_cv_pagesize)
+AC_MSG_ERROR([need sytem page to be of size 4096 or 8192, but is $ac_cv_pagesize])
 fi
 
 AC_DEFINE_UNQUOTED(SIZEOF_OM_PAGE,SIZEOF_SYSTEM_PAGE,Page-size of the build-system)
@@ -302,6 +309,12 @@ fi
 if test "$ac_cv_malloc_sizeof_addr" != no; then
 AC_DEFINE(OM_MALLOC_PROVIDES_SIZEOF_ADDR,1,"Whether malloc provides SIZEOF_ADDR")
 fi
+
+dnl Restore user-specified CFLAGS, CXXFLAGS, LIBS
+
+CFLAGS=$BACKUP_CFLAGS
+CXXFLAGS=$BACKUP_CXXFLAGS
+LDFLAGS=$BACKUP_LDFLAGS
 
 dnl lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 dnl check whether valloc is provided and that it works
