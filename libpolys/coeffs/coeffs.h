@@ -280,7 +280,8 @@ static inline BOOLEAN n_IsMOne(number n, const coeffs r)
 
 static inline BOOLEAN n_GreaterZero(number n, const coeffs r)
 { assume(r != NULL); assume(r->cfGreaterZero!=NULL); return r->cfGreaterZero(n,r); }
-// cfGreater?
+static inline BOOLEAN n_Greater(number a, number b, const coeffs r)
+{ assume(r != NULL); assume(r->cfGreater!=NULL); return r->cfGreater(a,b,r); }
 
 #ifdef HAVE_RINGS
 static inline BOOLEAN n_IsUnit(number n, const coeffs r)

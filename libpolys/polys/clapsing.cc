@@ -1355,3 +1355,37 @@ lists singclap_chineseRemainder(lists x, lists q)
 }
 #endif
 #endif
+
+number   nChineseRemainder(number *x, number *q,int rl, const coeffs r)
+// elemenst in the array are x[0..(rl-1)], q[0..(rl-1)]
+{
+#ifdef HAVE_FACTORY
+  if (r->type!=n_Q)
+  { Werror("nChineseRemainder only for integers"); return NULL; }
+  setCharacteristic( 0 ); // only in char 0
+  CFArray X(rl), Q(rl);
+  int i;
+  for(i=rl-1;i>=0;i--)
+  {
+    X[i]=r->convSingNFactoryN(x[i],FALSE,r); // may be larger MAX_INT
+    Q[i]=r->convSingNFactoryN(q[i],FALSE,r); // may be larger MAX_INT
+  }
+  CanonicalForm xnew,qnew;
+  chineseRemainder(X,Q,xnew,qnew);
+  number n=r->convFactoryNSingN(xnew,r);
+  number p=r->convFactoryNSingN(qnew,r);
+  number p2=n_IntDiv(p,n_Init(2, r),r);
+  if (n_Greater(n,p2,r))
+  {
+     number n2=n_Sub(n,p,r);
+     n_Delete(&n,r);
+     n=n2;
+  }
+  n_Delete(&p,r);
+  n_Delete(&p2,r);
+  return n;
+#else
+  WerrorS("not implemented");
+  return n_Init(0,r);
+#endif
+}
