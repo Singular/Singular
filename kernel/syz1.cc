@@ -2191,6 +2191,7 @@ static poly syMinimizeP1(int toMin,syStrategy syzstr,intvec * ordn,int index,
         pNext(mp) = NULL;
         ltS = -1;
         kBucket_Minus_m_Mult_p(syzstr->bucket,mp,tempStripped,&ltS);
+        pDelete(&mp);
         mp = p;
       }
       pDelete(&mp);
@@ -2369,6 +2370,7 @@ static resolvente syReadOutMinimalRes(syStrategy syzstr,
         }
       }
       delete Strip;
+      delete ordn;
       Strip = NULL;
     }
   }

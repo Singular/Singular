@@ -150,11 +150,11 @@ BOOLEAN pDivisibleByRingCase(poly f, poly g)
 
 /*2
 * divides a by the monomial b, ignores monomials which are not divisible
-* assumes that b is not NULL
+* assumes that b is not NULL, destroys b
 */
 poly pDivideM(poly a, poly b)
 {
-  if (a==NULL) return NULL;
+  if (a==NULL) { pDelete(&b); return NULL; }
   poly result=a;
   poly prev=NULL;
   int i;
@@ -368,10 +368,6 @@ poly pHomogen (poly p, int varnum)
   return q;
 }
 
-/*4
-*Returns the exponent of the maximal power of the leading monomial of
-*p2 in that of p1
-*/
 /*----------utilities for syzygies--------------*/
 poly pTakeOutComp(poly * p, int k)
 {
