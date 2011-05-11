@@ -27,14 +27,25 @@ extern omBin gmp_nrz_bin; /* init in rintegers*/
 
 void    nr2mCoeffWrite  (const coeffs r)
 {
-  Print("//   Z/2^%lu\n", r->modExponent); 
+  Print("//   Z/2^%lu\n", r->modExponent);
 }
 
+BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
+{
+  if (n==n_Z2m)
+  {
+    int m=(int)(long)(p);
+    unsigned long mm=r->mod2mMask;
+    if ((mm>>m)==1L) return TRUE;
+  }
+  return FALSE;
+}
 /* for initializing function pointers */
 BOOLEAN nr2mInitChar (coeffs r, void* p)
 {
-  
   nr2mInitExp((int)(long)(p), r);
+  r->cfKillChar    = ndKillChar; /* dummy*/
+  r->nCoeffIsEqual = nr2mCoeffIsEqual;
 
   r->cfInit        = nr2mInit;
   r->cfCopy        = ndCopy;
