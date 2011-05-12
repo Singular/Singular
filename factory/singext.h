@@ -9,15 +9,6 @@
 #include "canonicalform.h"
 #include "cf_gmp.h"
 
-// we need this to copy singulars GF(q) table to ours
-extern int nfCharQ;
-extern int nfM1;
-extern int nfMinPoly[];
-extern short nfPlus1Table[];
-
-// used to open the GF(q) tables from Singular
-extern FILE * feFopen ( const char * path, const char * mode, char *where = 0, int useWerror = 0, int path_only = 0);
-
 /*BEGINPUBLIC*/
 
 void gmp_numerator ( const CanonicalForm & f, mpz_ptr result );
