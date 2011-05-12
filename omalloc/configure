@@ -547,6 +547,8 @@ else
   > $cache_file
 fi
 
+CPPFLAGS='-I.. -I.'
+export CPPFLAGS
 ac_ext=c
 # CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
 ac_cpp='$CPP $CPPFLAGS'
