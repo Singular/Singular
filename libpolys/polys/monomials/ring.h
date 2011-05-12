@@ -334,9 +334,9 @@ enum tHomog
 //ring   rInit(sleftv* pn, sleftv* rv, sleftv* ord);
 idhdl  rDefault(const char *s);
 ring   rDefault(int ch, int N, char **n);
-ring   rDefault(coeffs cf, int N, char **n);
+ring   rDefault(const coeffs cf, int N, char **n);
 ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *block1);
-ring rDefault(coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1);
+ring rDefault(const coeffs cf, int N, char **n,int ord_size, int *ord, int *block0, int *block1);
 
 // #define rIsRingVar(A) r_IsRingVar(A,currRing)
 int    r_IsRingVar(const char *n, ring r);

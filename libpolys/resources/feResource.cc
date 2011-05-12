@@ -17,7 +17,6 @@
 
 #include "feResource.h"
 
-
 #ifdef AIX_4
 #define HAVE_PUTENV 1
 #endif
@@ -82,7 +81,9 @@ static feResourceConfig_s feResourceConfigs[] =
    "%r/LIB;"
    "%r/../LIB;"
    "%d/LIB;"
-   "%d/../LIB"
+   "%d/../LIB;"
+   "%b/../../../factory/gftables;"
+   "%b/../../factory/gftables",
    ""},
   {"Singular",  'S',    feResBinary,"SINGULAR_EXECUTABLE",  "%d/"S_UNAME"/Singular",(char *)""},
   {"BinDir",    'b',    feResDir,   "SINGULAR_BIN_DIR",     "%d/"S_UNAME,           (char *)""},
@@ -522,6 +523,9 @@ static char* feCleanUpFile(char* fname)
       {
         if (*(fn+2) == '.' && (*(fn + 3) == '/' || *(fn + 3) == '\0'))
         {
+	#if 0
+	// this does not work: ./../../mmm will be changed to ./../mmm
+	// but we only want to change ././mmm to ./mmm
           *fn = '\0';
           s = strrchr(fname, '/');
           if (s != NULL)
@@ -533,6 +537,7 @@ static char* feCleanUpFile(char* fname)
           {
             *fn = '/';
           }
+	#endif
         }
         else if (*(fn+2) == '/' || *(fn+2) == '\0')
         {

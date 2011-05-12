@@ -16,7 +16,6 @@
 #include <coeffs/ffields.h>
 #include <resources/feFopen.h>
 #include <math.h>
-#include <factory/factory.h>
 
 
 //unsigned short *nfPlus1Table=NULL; /* the table i=log(z^i) -> log(z^i+1) */
@@ -611,7 +610,7 @@ void nfReadTable(const int c, const coeffs r)
     if (c>1) r->m_nfCharQ = c;
     else     r->m_nfCharQ = -c;
     char buf[100];
-    sprintf(buf,GFTABLEDIR "/%d",r->m_nfCharQ);
+    sprintf(buf,"%d",r->m_nfCharQ);
     FILE * fp = feFopen(buf,"r",NULL,TRUE);
     if (fp==NULL)
     {
