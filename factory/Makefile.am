@@ -193,9 +193,9 @@ gengftables_SOURCES = gengftables-conway.cc
 data_DATA = gftables
 
 gftables:	gengftables
-		@if test -r ${srcdir}/gftables; then \
-			if test ! -r ${builddir}/gftables; then \
-			  cp -r ${srcdir}/gftables ${builddir}; \
+		@if test -x ${srcdir}/gftables; then \
+			if test ! -x ${builddir}/gftables; then \
+			  ln -snf ${srcdir}/gftables ${builddir}; \
 			fi; \
 		else \
 			echo "This command will take quite a long time to execute;"; \

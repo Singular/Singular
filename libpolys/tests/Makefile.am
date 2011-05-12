@@ -30,7 +30,22 @@ coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} ${NTL_LIBS} -lresources_g -lreporter_
 polys_test_LDADD = -lpolys_g ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
+noinst_SCRIPTS =	p_Procs_FieldGeneral.so \
+			p_Procs_FieldIndep.so \
+			p_Procs_FieldQ.so \
+			p_Procs_FieldZp.so
 
+p_Procs_FieldGeneral.so:	${top_builddir}/polys/.libs/p_Procs_FieldGeneral.so
+				ln -snf ${top_builddir}/polys/.libs/p_Procs_FieldGeneral.so ${builddir}
+
+p_Procs_FieldIndep.so:	${top_builddir}/polys/.libs/p_Procs_FieldIndep.so
+				ln -snf ${top_builddir}/polys/.libs/p_Procs_FieldIndep.so ${builddir}
+
+p_Procs_FieldQ.so:	${top_builddir}/polys/.libs/p_Procs_FieldQ.so
+				ln -snf ${top_builddir}/polys/.libs/p_Procs_FieldQ.so ${builddir}
+
+p_Procs_FieldZp.so:	${top_builddir}/polys/.libs/p_Procs_FieldZp.so
+				ln -snf ${top_builddir}/polys/.libs/p_Procs_FieldZp.so ${builddir}
 
 BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURCES) $(polys_test_SOURCES)
 

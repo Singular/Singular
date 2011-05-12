@@ -17,6 +17,7 @@ AC_CONFIG_SRCDIR(canonicalform.cc)
 AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR([.])
+AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE
 
 AC_PROG_YACC
@@ -267,7 +268,7 @@ AC_LANG_C
 # note that Singular has its own mechanism to search the tables,
 # hence we do not need to mind it here
 gftabledir='${datadir}/factory/gftables'
-explicit_gftabledir="$explicit_datadir/factory/gftables"
+explicit_gftabledir="$explicit_datadir/gftables"
 
 # for installation of the templates
 templatedir='${includedir}/templates'
