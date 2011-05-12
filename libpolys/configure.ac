@@ -3,6 +3,7 @@ AC_CONFIG_MACRO_DIR([../m4])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_SRCDIR([reporter/reporter.h])
 AC_CONFIG_HEADER([config.h misc/auxiliary.h])
+AM_MAINTAINER_MODE
 AM_INIT_AUTOMAKE
 
 dnl Check if build env is sane
