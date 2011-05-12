@@ -171,22 +171,19 @@ ring rDefault(int ch, int N, char **n,int ord_size, int *ord, int *block0, int *
 }
 ring   rDefault(const coeffs cf, int N, char **n)
 {
-  if( cf != NULL)
-  {
-    /*order: lp,0*/
-    int *order = (int *) omAlloc(2* sizeof(int));
-    int *block0 = (int *)omAlloc0(2 * sizeof(int));
-    int *block1 = (int *)omAlloc0(2 * sizeof(int));
-    /* ringorder dp for the first block: var 1..N */
-    order[0]  = ringorder_lp;
-    block0[0] = 1;
-    block1[0] = N;
-    /* the last block: everything is 0 */
-    order[1]  = 0;
+  assume( cf != NULL);
+  /*order: lp,0*/
+  int *order = (int *) omAlloc(2* sizeof(int));
+  int *block0 = (int *)omAlloc0(2 * sizeof(int));
+  int *block1 = (int *)omAlloc0(2 * sizeof(int));
+  /* ringorder dp for the first block: var 1..N */
+  order[0]  = ringorder_lp;
+  block0[0] = 1;
+  block1[0] = N;
+  /* the last block: everything is 0 */
+  order[1]  = 0;
 
-    return rDefault(cf,N,n,2,order,block0,block1);
-  }
-  else return NULL;
+  return rDefault(cf,N,n,2,order,block0,block1);
 }
 
 ring rDefault(int ch, int N, char **n)
