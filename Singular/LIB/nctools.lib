@@ -35,8 +35,9 @@ isWeyl();            check whether basering is a Weyl algebra
 UpOneMatrix();       return NxN matrix with 1's in the whole upper triagle,
 AltVarStart();       return first alternating variable of a super-commutative algebra,
 AltVarEnd();         return last alternating variable of a super-commutative algebra,
-IsSCA();             check whether current ring is a super-commutative algebra
-makeModElimRing(R);  equip a ring with module elimination ordering
+IsSCA();             check whether current ring is a super-commutative algebra,
+makeModElimRing(R);  equip a ring with module elimination ordering,
+embedMat(M,m,n);     embeds matrix M in a left upper corner of m times n matrix
 ";
 
 
@@ -1632,7 +1633,43 @@ example
 
 //////////////////////////////////////////////////////////////////////
 
-proc moduloSlim (module A, module B)
+proc embedMat(matrix A, int m, int n)
+"USAGE:  embedMat(A,m,n); A,B matrix/module
+RETURN:  matrix
+PURPOSE: embed A in the left upper corner of mxn matrix
+EXAMPLE: example embedMat; shows an example
+"
+{
+  // returns A embedded in the left upper corner of mxn matrix
+  int rA = nrows(A);
+  int cA = ncols(A);
+  if ((rA >m) || (cA>n))
+  {
+    ERROR("wrong dimensions of the new matrix");
+  }
+  matrix @M[m][n];
+  int i,j;
+  for(i=1;i<=rA; i++)
+  {
+    for(j=1;j<=cA; j++)
+    {
+      @M[i,j]=A[i,j];
+    }
+  }
+  return(@M);
+}
+example
+{
+  "EXAMPLE:"; echo = 2;
+  ring r = 0,(a,b,c,d),dp;
+  matrix M[2][3]; M[1,1]=a; M[1,2]=b;M[2,2]=d;M[1,3]=c;
+  print(M);
+  print(embedMat(M,3,4));
+  matrix N = M; N[2,2]=0;
+  print(embedMat(N,3,4));
+}
+
+proc moduloSlim (matrix A, matrix B)
 "USAGE:  moduloSlim(A,B); A,B module/matrix/ideal
 RETURN:  module
 PURPOSE: compute @code{modulo} with slimgb as engine
@@ -1640,17 +1677,26 @@ EXAMPLE: example moduloSlim; shows an example
 "
 {
   def save  = basering;
-  int rA = nrows(A);
-  if (rA != nrows(B))
+  int rA = nrows(A);  int rB = nrows(B);
+  int cA = ncols(A);  int cB = ncols(B);
+  int j;
+  int dab; // difference a,b
+  dab = rA - rB;
+  if (dab <0)
   {
-    // add 0 rows?
-    ERROR("incorrect input: different rank");
+    // rA<rB: add zero rows to A
+    dab = -dab;
+    A = embedMat(A,rB,cA);
+  }
+  else 
+  {
+    // rA>rB: add zero rows to B
+    B = embedMat(B,rA,cB);
   }
   def mering = makeModElimRing(save);
   setring mering;
   module A = imap(save, A);
   module B = imap(save, B);
-  int cA = ncols(A);  int cB = ncols(B);
   // create matrix C
   //  matrix C[2*rA][cA+cB];
   module C;
@@ -1665,23 +1711,41 @@ EXAMPLE: example moduloSlim; shows an example
 //     C = C, B[i];
 //   }
   C = C[2..ncols(C)];
+  print(C);
   matrix D = slimgb(C);
-  module E;
+  module E; int k;
+  // TODO: why only first row? need smth like rA rows...
   for(i=1; i<= ncols(D); i++)
   {
-    if (D[1,i]==0)
+    k=1;
+    // determine first zero in the column
+    while ( (D[k,i]==0) && (k<= cA+rA) )
+    {
+      k++;
+    }
+    // what can that be: k = cA+rA+1=> zero column
+    // k<=rA => column not in ker
+    // rA+1 <= k <= rA+cA => column in ker
+    if ( ( k>=rA+1) && (k<=rA+cA) )
     {
       E = E,D[i];
     }
   }
-  // this E has 1st column and 1st row zero
+//   for(i=1; i<= ncols(D); i++)
+//   {
+//     if (D[1,i]==0)
+//     {
+//       E = E,D[i];
+//     }
+//   }
+//  // this E has 1st column and 1st row zero
   // use submat@matrix.lib
-  E = submat(E,2..nrows(E),2..ncols(E));
-//   E = E[2..ncols(E)]; // skip 1st 0 row  //   E = transpose(E);
-//   E = E[2..ncols(E)]; // skip 1st 0 row //   E = transpose(E);
+  //  E = submat(E,intvec(2..nrows(E)),intvec(2..ncols(E)));
+  E = submat(E,intvec(rA+1..nrows(E)),intvec(2..ncols(E)));
   setring save;
   module E = imap(mering,E);
   kill mering;
+  // TODO: clean components!
   return(E);
 }
 example
@@ -1700,6 +1764,13 @@ example
   ideal T = moduloSlim(H1,H2);
   T = std( NF(std(H2+T),H2) );
   T;
+  // now, a matrix example:
+  ring r2 = 0,(x,d), (dp);
+  def R = nc_algebra(1,1); setring R;
+  matrix M[2][2] = d, 0, 0, d*(x*d);
+  matrix P[2][1] = (8x+7)*d+9x, (x2+1)*d + 5*x;
+  module X = moduloSlim(P,M);
+  print(X);
 }
 
 //////////////////////////////////////////////////////////////////////
