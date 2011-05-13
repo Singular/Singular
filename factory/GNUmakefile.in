@@ -150,6 +150,7 @@ basefactorysrc := \
 		cf_linsys.cc \
 		cf_map.cc \
 		cf_map_ext.cc \
+		cfNewtonPolygon.cc \
 		cf_ops.cc \
 		cf_primes.cc \
 		cf_random.cc \
@@ -236,6 +237,7 @@ basefactoryincl := \
 		cf_irred.h \
 		cf_iter.h \
 		cf_map.h \
+		cfNewtonPolygon.h \
 		cf_primes.h \
 		cf_primetab.h \
 		cf_random.h \
