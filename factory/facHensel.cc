@@ -203,6 +203,568 @@ CanonicalForm mod (const CanonicalForm& F, const CFList& M)
   return A;
 }
 
+zz_pX kronSubFp (const CanonicalForm& A, int d)
+{
+  int degAy= degree (A);
+  zz_pX result;
+  result.rep.SetLength (d*(degAy + 1));
+
+  zz_p *resultp;
+  resultp= result.rep.elts();
+  zz_pX buf;
+  zz_p *bufp;
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+      buf= convertFacCF2NTLzzpX (i.coeff());
+    else
+      buf= convertFacCF2NTLzzpX (i.coeff());
+
+    int k= i.exp()*d;
+    bufp= buf.rep.elts();
+    int bufRepLength= (int) buf.rep.length();
+    for (int j= 0; j < bufRepLength; j++)
+      resultp [j + k]= bufp [j];
+  }
+  result.normalize();
+
+  return result;
+}
+
+zz_pEX kronSub (const CanonicalForm& A, int d, const Variable& alpha)
+{
+  int degAy= degree (A);
+  zz_pEX result;
+  result.rep.SetLength (d*(degAy + 1));
+
+  Variable v;
+  zz_pE *resultp;
+  resultp= result.rep.elts();
+  zz_pEX buf1;
+  zz_pE *buf1p;
+  zz_pX buf2;
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+    {
+      buf2= convertFacCF2NTLzzpX (i.coeff());
+      buf1= to_zz_pEX (to_zz_pE (buf2));
+    }
+    else
+      buf1= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
+
+    int k= i.exp()*d;
+    buf1p= buf1.rep.elts();
+    int buf1RepLength= (int) buf1.rep.length();
+    for (int j= 0; j < buf1RepLength; j++)
+      resultp [j + k]= buf1p [j];
+  }
+  result.normalize();
+
+  return result;
+}
+
+void
+kronSubRecipro (zz_pEX& subA1, zz_pEX& subA2,const CanonicalForm& A, int d,
+                const Variable& alpha)
+{
+  int degAy= degree (A);
+  subA1.rep.SetLength ((long) d*(degAy + 1));
+  subA2.rep.SetLength ((long) d*(degAy + 1));
+
+  Variable v;
+  zz_pE *subA1p;
+  zz_pE *subA2p;
+  subA1p= subA1.rep.elts();
+  subA2p= subA2.rep.elts();
+  zz_pEX buf;
+  zz_pE *bufp;
+  zz_pX buf2;
+  zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    if (i.coeff().inCoeffDomain())
+    {
+      buf2= convertFacCF2NTLzzpX (i.coeff());
+      buf= to_zz_pEX (to_zz_pE (buf2));
+    }
+    else
+      buf= convertFacCF2NTLzz_pEX (i.coeff(), NTLMipo);
+
+    int k= i.exp()*d;
+    int kk= (degAy - i.exp())*d;
+    bufp= buf.rep.elts();
+    int bufRepLength= (int) buf.rep.length();
+    for (int j= 0; j < bufRepLength; j++)
+    {
+      subA1p [j + k]= bufp [j];
+      subA2p [j + kk]= bufp [j];
+    }
+  }
+  subA1.normalize();
+  subA2.normalize();
+}
+
+void
+kronSubRecipro (zz_pX& subA1, zz_pX& subA2,const CanonicalForm& A, int d)
+{
+  int degAy= degree (A);
+  subA1.rep.SetLength ((long) d*(degAy + 1));
+  subA2.rep.SetLength ((long) d*(degAy + 1));
+
+  Variable v;
+  zz_p *subA1p;
+  zz_p *subA2p;
+  subA1p= subA1.rep.elts();
+  subA2p= subA2.rep.elts();
+  zz_pX buf;
+  zz_p *bufp;
+
+  for (CFIterator i= A; i.hasTerms(); i++)
+  {
+    buf= convertFacCF2NTLzzpX (i.coeff());
+
+    int k= i.exp()*d;
+    int kk= (degAy - i.exp())*d;
+    bufp= buf.rep.elts();
+    int bufRepLength= (int) buf.rep.length();
+    for (int j= 0; j < bufRepLength; j++)
+    {
+      subA1p [j + k]= bufp [j];
+      subA2p [j + kk]= bufp [j];
+    }
+  }
+  subA1.normalize();
+  subA2.normalize();
+}
+
+CanonicalForm
+reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
+              const Variable& alpha)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  zz_pEX f= F;
+  zz_pEX g= G;
+  int degf= deg(f);
+  int degg= deg(g);
+
+  zz_pEX buf1;
+  zz_pEX buf2;
+  zz_pEX buf3;
+
+  zz_pE *buf1p;
+  zz_pE *buf2p;
+  zz_pE *buf3p;
+  if (f.rep.length() < (long) d*(k+1)) //zero padding
+    f.rep.SetLength ((long)d*(k+1));
+
+  zz_pE *gp= g.rep.elts();
+  zz_pE *fp= f.rep.elts();
+  CanonicalForm result= 0;
+  int i= 0;
+  int lf= 0;
+  int lg= d*k;
+  int degfSubLf= degf;
+  int deggSubLg= degg-lg;
+  int repLengthBuf2;
+  int repLengthBuf1;
+  int ii;
+  zz_pE zzpEZero= zz_pE();
+
+  while (degf >= lf || lg >= 0)
+  {
+    if (degfSubLf >= d)
+      repLengthBuf1= d;
+    else if (degfSubLf < 0)
+      repLengthBuf1= 0;
+    else
+      repLengthBuf1= degfSubLf + 1;
+    buf1.rep.SetLength((long) repLengthBuf1);
+
+    buf1p= buf1.rep.elts();
+    for (int ind= 0; ind < repLengthBuf1; ind++)
+      buf1p [ind]= fp [ind + lf];
+    buf1.normalize();
+
+    repLengthBuf1= buf1.rep.length();
+
+    if (deggSubLg >= d - 1)
+      repLengthBuf2= d - 1;
+    else if (deggSubLg < 0)
+      repLengthBuf2= 0;
+    else
+      repLengthBuf2= deggSubLg + 1;
+
+    buf2.rep.SetLength ((long) repLengthBuf2);
+    buf2p= buf2.rep.elts();
+    for (int ind= 0; ind < repLengthBuf2; ind++)
+    {
+      buf2p [ind]= gp [ind + lg];
+    }
+    buf2.normalize();
+
+    repLengthBuf2= buf2.rep.length();
+
+    buf3.rep.SetLength((long) repLengthBuf2 + d);
+    buf3p= buf3.rep.elts();
+    buf2p= buf2.rep.elts();
+    buf1p= buf1.rep.elts();
+    for (int ind= 0; ind < repLengthBuf1; ind++)
+      buf3p [ind]= buf1p [ind];
+    for (int ind= repLengthBuf1; ind < d; ind++)
+      buf3p [ind]= zzpEZero;
+    for (int ind= 0; ind < repLengthBuf2; ind++)
+      buf3p [ind + d]= buf2p [ind];
+    buf3.normalize();
+
+    result += convertNTLzz_pEX2CF (buf3, x, alpha)*power (y, i);
+    i++;
+
+
+    lf= i*d;
+    degfSubLf= degf - lf;
+
+    lg= d*(k-i);
+    deggSubLg= degg - lg;
+
+    buf1p= buf1.rep.elts();
+
+    if (lg >= 0 && deggSubLg > 0)
+    {
+      if (repLengthBuf2 > degfSubLf + 1)
+        degfSubLf= repLengthBuf2 - 1;
+      int tmp= tmin (repLengthBuf1, deggSubLg);
+      for (int ind= 0; ind < tmp; ind++)
+        gp [ind + lg] -= buf1p [ind];
+    }
+
+    if (lg < 0)
+      break;
+
+    buf2p= buf2.rep.elts();
+    if (degfSubLf >= 0)
+    {
+      for (int ind= 0; ind < repLengthBuf2; ind++)
+        fp [ind + lf] -= buf2p [ind];
+    }
+  }
+
+  return result;
+}
+
+CanonicalForm
+reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  zz_pX f= F;
+  zz_pX g= G;
+  int degf= deg(f);
+  int degg= deg(g);
+
+  zz_pX buf1;
+  zz_pX buf2;
+  zz_pX buf3;
+
+  zz_p *buf1p;
+  zz_p *buf2p;
+  zz_p *buf3p;
+
+  if (f.rep.length() < (long) d*(k+1)) //zero padding
+    f.rep.SetLength ((long)d*(k+1));
+
+  zz_p *gp= g.rep.elts();
+  zz_p *fp= f.rep.elts();
+  CanonicalForm result= 0;
+  int i= 0;
+  int lf= 0;
+  int lg= d*k;
+  int degfSubLf= degf;
+  int deggSubLg= degg-lg;
+  int repLengthBuf2;
+  int repLengthBuf1;
+  int ii;
+  zz_p zzpZero= zz_p();
+  while (degf >= lf || lg >= 0)
+  {
+    if (degfSubLf >= d)
+      repLengthBuf1= d;
+    else if (degfSubLf < 0)
+      repLengthBuf1= 0;
+    else
+      repLengthBuf1= degfSubLf + 1;
+    buf1.rep.SetLength((long) repLengthBuf1);
+
+    buf1p= buf1.rep.elts();
+    for (int ind= 0; ind < repLengthBuf1; ind++)
+      buf1p [ind]= fp [ind + lf];
+    buf1.normalize();
+
+    repLengthBuf1= buf1.rep.length();
+    
+    if (deggSubLg >= d - 1)
+      repLengthBuf2= d - 1;
+    else if (deggSubLg < 0)
+      repLengthBuf2= 0;
+    else
+      repLengthBuf2= deggSubLg + 1;
+
+    buf2.rep.SetLength ((long) repLengthBuf2);
+    buf2p= buf2.rep.elts();
+    for (int ind= 0; ind < repLengthBuf2; ind++)
+      buf2p [ind]= gp [ind + lg];
+
+    buf2.normalize();
+
+    repLengthBuf2= buf2.rep.length();
+
+
+    buf3.rep.SetLength((long) repLengthBuf2 + d);
+    buf3p= buf3.rep.elts();
+    buf2p= buf2.rep.elts();
+    buf1p= buf1.rep.elts();
+    for (int ind= 0; ind < repLengthBuf1; ind++)
+      buf3p [ind]= buf1p [ind];
+    for (int ind= repLengthBuf1; ind < d; ind++)
+      buf3p [ind]= zzpZero;
+    for (int ind= 0; ind < repLengthBuf2; ind++)
+      buf3p [ind + d]= buf2p [ind];
+    buf3.normalize();
+
+    result += convertNTLzzpX2CF (buf3, x)*power (y, i);
+    i++;
+
+
+    lf= i*d;
+    degfSubLf= degf - lf;
+
+    lg= d*(k-i);
+    deggSubLg= degg - lg;
+
+    buf1p= buf1.rep.elts();
+
+    if (lg >= 0 && deggSubLg > 0)
+    {
+      if (repLengthBuf2 > degfSubLf + 1)
+        degfSubLf= repLengthBuf2 - 1;
+      int tmp= tmin (repLengthBuf1, deggSubLg);
+      for (int ind= 0; ind < tmp; ind++)
+        gp [ind + lg] -= buf1p [ind];
+    }
+    if (lg < 0)
+      break;
+
+    buf2p= buf2.rep.elts();
+    if (degfSubLf >= 0)
+    {
+      for (int ind= 0; ind < repLengthBuf2; ind++)
+        fp [ind + lf] -= buf2p [ind];
+    }
+  }
+
+  return result;
+}
+
+CanonicalForm reverseSubst (const zz_pEX& F, int d, const Variable& alpha)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  zz_pEX f= F;
+  zz_pE *fp= f.rep.elts();
+
+  zz_pEX buf;
+  zz_pE *bufp;
+  CanonicalForm result= 0;
+  int i= 0;
+  int degf= deg(f);
+  int k= 0;
+  int degfSubK;
+  int repLength;
+  while (degf >= k)
+  {
+    degfSubK= degf - k;
+    if (degfSubK >= d)
+      repLength= d;
+    else
+      repLength= degfSubK + 1;
+
+    buf.rep.SetLength ((long) repLength);
+    bufp= buf.rep.elts();
+    for (int j= 0; j < repLength; j++)
+      bufp [j]= fp [j + k];
+    buf.normalize();
+
+    result += convertNTLzz_pEX2CF (buf, x, alpha)*power (y, i);
+    i++;
+    k= d*i;
+  }
+
+  return result;
+}
+
+CanonicalForm reverseSubstFp (const zz_pX& F, int d)
+{
+  Variable y= Variable (2);
+  Variable x= Variable (1);
+
+  zz_pX f= F;
+  zz_p *fp= f.rep.elts();
+
+  zz_pX buf;
+  zz_p *bufp;
+  CanonicalForm result= 0;
+  int i= 0;
+  int degf= deg(f);
+  int k= 0;
+  int degfSubK;
+  int repLength;
+  while (degf >= k)
+  {
+    degfSubK= degf - k;
+    if (degfSubK >= d)
+      repLength= d;
+    else
+      repLength= degfSubK + 1;
+
+    buf.rep.SetLength ((long) repLength);
+    bufp= buf.rep.elts();
+    for (int j= 0; j < repLength; j++)
+      bufp [j]= fp [j + k];
+    buf.normalize();
+
+    result += convertNTLzzpX2CF (buf, x)*power (y, i);
+    i++;
+    k= d*i;
+  }
+
+  return result;
+}
+
+// assumes input to be reduced mod M and to be an element of Fq not Fp
+CanonicalForm
+mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const 
+                  CanonicalForm& M)
+{
+  int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
+  int d2= tmax (degree (F, 2), degree (G, 2));
+
+  zz_pX F1, F2;
+  kronSubRecipro (F1, F2, F, d1);
+  zz_pX G1, G2;
+  kronSubRecipro (G1, G2, G, d1);
+
+  int k= d1*degree (M);
+  MulTrunc (F1, F1, G1, (long) k);
+
+  mul (F2, F2, G2);
+  F2 >>= k;
+
+  return reverseSubst (F1, F2, d1, d2);
+}
+
+//Kronecker substitution
+CanonicalForm
+mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
+              CanonicalForm& M)
+{
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  int p= getCharacteristic();
+
+  int degAx= degree (A, 1);
+  int degAy= degree (A, 2);
+  int degBx= degree (B, 1);
+  int degBy= degree (B, 2);
+  int d1= degAx + 1 + degBx;
+  int d2= tmax (degree (A, 2), degree (B, 2));
+
+  if (d1 > 128 && d2 > 160 && (degAy == degBy))
+    return mulMod2NTLFpReci (A, B, M);
+
+  zz_pX NTLA= kronSubFp (A, d1);
+  zz_pX NTLB= kronSubFp (B, d1);
+
+  int k= d1*degree (M);
+  MulTrunc (NTLA, NTLA, NTLB, (long) k);
+
+  A= reverseSubstFp (NTLA, d1);
+
+  return A;
+}
+
+// assumes input to be reduced mod M and to be an element of Fq not Fp
+CanonicalForm
+mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const 
+                  CanonicalForm& M, const Variable& alpha)
+{
+  int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
+  int d2= tmax (degree (F, 2), degree (G, 2));
+
+  zz_pEX F1, F2;
+  kronSubRecipro (F1, F2, F, d1, alpha);
+  zz_pEX G1, G2;
+  kronSubRecipro (G1, G2, G, d1, alpha);
+
+  int k1= d1*degree (M);
+  MulTrunc (F1, F1, G1, (long) k1);
+
+  mul (F2, F2, G2);
+
+  F2 >>= k1;
+
+  CanonicalForm result= reverseSubst (F1, F2, d1, d2, alpha);
+
+  return result;
+}
+
+CanonicalForm
+mulMod2NTLFq (const CanonicalForm& F, const CanonicalForm& G, const
+              CanonicalForm& M)
+{
+  Variable alpha;
+  CanonicalForm A= F;
+  CanonicalForm B= G;
+
+  if (hasFirstAlgVar (A, alpha) || hasFirstAlgVar (B, alpha))
+  {
+    int degAx= degree (A, 1);
+    int degAy= degree (A, 2);
+    int degBx= degree (B, 1);
+    int degBy= degree (B, 2);
+    int d1= degAx + degBx + 1;
+    int d2= tmax (degree (A, 2), degree (B, 2));
+    zz_p::init (getCharacteristic());
+    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (alpha));
+    zz_pE::init (NTLMipo);
+
+    int degMipo= degree (getMipo (alpha));
+    if ((d1 > 128/degMipo) && (d2 > 160/degMipo) && (degAy == degBy))
+      return mulMod2NTLFqReci (A, B, M, alpha);
+
+    zz_pEX NTLA= kronSub (A, d1, alpha);
+    zz_pEX NTLB= kronSub (B, d1, alpha);
+
+    int k= d1*degree (M);
+
+    MulTrunc (NTLA, NTLA, NTLB, (long) k);
+
+    A= reverseSubst (NTLA, d1, alpha);
+
+    return A;
+  }
+  else
+    return mulMod2NTLFp (A, B, M);
+}
+
 CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
                        const CanonicalForm& M)
 {
@@ -219,17 +781,28 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
   int degF= degree (F, y);
   int degG= degree (G, y);
 
-  if ((degF < 1 && degG < 1) && (F.isUnivariate() && G.isUnivariate()) &&
+  if ((degF < 1 && degG < 1) && (F.isUnivariate() && G.isUnivariate()) && 
       (F.level() == G.level()))
-  {
+  { 
     CanonicalForm result= mulNTL (F, G);
     return mod (result, M);
   }
   else if (degF <= 1 && degG <= 1)
-  {
+  { 
     CanonicalForm result= F*G;
     return mod (result, M);
   }
+
+  int sizeF= size (F);
+  int sizeG= size (G);
+  
+  int fallBackToNaive= 50;
+  if (sizeF < fallBackToNaive || sizeG < fallBackToNaive)
+    return mod (F*G, M);
+
+  if (CFFactory::gettype() != GaloisFieldDomain &&
+      (((degF-degG) < 50 && degF > degG) || ((degG-degF) < 50 && degF <= degG)))
+    return mulMod2NTLFq (F, G, M);
 
   int m= (int) ceil (degree (M)/2.0);
   if (degF >= m || degG >= m)
@@ -403,17 +976,22 @@ CanonicalForm reverse (const CanonicalForm& F, int d)
   if (d == 0)
     return F;
   CanonicalForm A= F;
-  Variable y= F.mvar();
+  Variable y= Variable (2);
   Variable x= Variable (1);
-  A= swapvar (A, x, y);
-  CanonicalForm result= 0;
-  CFIterator i= A;
-  while (d - i.exp() < 0)
-    i++;
+  if (degree (A, x) > 0)
+  {
+    A= swapvar (A, x, y);
+    CanonicalForm result= 0;
+    CFIterator i= A;
+    while (d - i.exp() < 0)
+      i++;
 
-  for (; i.hasTerms() && (d - i.exp() >= 0); i++)
-    result += swapvar (i.coeff(),x,y)*power (x, d - i.exp());
-  return result;
+    for (; i.hasTerms() && (d - i.exp() >= 0); i++)
+      result += swapvar (i.coeff(),x,y)*power (x, d - i.exp());
+    return result;
+  }
+  else
+    return A*power (x, d);
 }
 
 CanonicalForm
@@ -489,7 +1067,7 @@ newtonDiv (const CanonicalForm& F, const CanonicalForm& G, const CanonicalForm&
     return 0;
 
   CanonicalForm Q;
-  if (degB <= 1)
+  if (degB <= 1 || CFFactory::gettype() == GaloisFieldDomain)
   {
     CanonicalForm R;
     divrem2 (A, B, Q, R, M);
@@ -525,7 +1103,7 @@ newtonDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     return;
   }
 
-  if (degB <= 1)
+  if (degB <= 1 || CFFactory::gettype() == GaloisFieldDomain)
   {
      divrem2 (A, B, Q, R, M);
   }
