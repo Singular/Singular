@@ -348,7 +348,6 @@ BOOLEAN ngcIsMOne (number a)
 */
 const char * ngcRead (const char * s, number * a)
 {
-  const char *start= s;
   if ((*s >= '0') && (*s <= '9'))
   {
     gmp_float *re=NULL;

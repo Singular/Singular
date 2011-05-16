@@ -833,6 +833,11 @@ number nlDiv (number a, number b)
   {
     long i=SR_TO_INT(a);
     long j=SR_TO_INT(b);
+    if ((i==-POW_2_28) && (j== -1L))
+    {  
+      omFreeBin((ADDRESS)u, rnumber_bin);
+      return nlRInit(POW_2_28);
+    }
     long r=i%j;
     if (r==0)
     {
