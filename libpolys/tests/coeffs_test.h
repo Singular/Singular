@@ -115,13 +115,34 @@ void TestArith(const coeffs r)
   clog << ("TEST: Simple Arithmetics: ");
   clog << endl;
 
-  number a = n_Init(66666, r);
+  number two = n_Init(2, r);
+
+  number t = n_Init(1, r);  
+  ndInpAdd(t, t, r);  
+  TS_ASSERT( n_Equal(two, t, r) );
+  n_Delete(&t, r);
+  
+  if( getCoeffType(r) == n_Q )
+  {
+    number t = n_Init(1, r);  
+    nlInpAdd(t, t, r);
+    TS_ASSERT( n_Equal(two, t, r) );
+    n_Delete(&t, r);
+  }
+
+
+
+  
+  const int N = 66666;
+
+  number a = n_Init(N, r);
    
   clog<< "a: "; PrintSized(a, r);
 
-  number two = n_Init(2, r);
   
   clog<< "two: "; PrintSized(two, r);
+
+  number aa0 = n_Init(N*2, r);
 
   number aa = n_Add(a, a, r);
 
@@ -167,16 +188,18 @@ void TestArith(const coeffs r)
 
   
   TS_ASSERT( n_Equal(aa, aa1, r) );
-
   TS_ASSERT( n_Equal(aa, aa2, r) );
-
   TS_ASSERT( n_Equal(aa1, aa2, r) );
   
+  TS_ASSERT( n_Equal(aa0, aa, r) );
+  TS_ASSERT( n_Equal(aa0, aa1, r) );
+  TS_ASSERT( n_Equal(aa0, aa2, r) );
 
   n_Delete(&aa, r);
   n_Delete(&aa1, r);
   n_Delete(&aa2, r);
 
+  n_Delete(&aa0, r);
 
   clog << ( " >>> TEST DONE!" );
   clog << endl;
