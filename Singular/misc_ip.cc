@@ -20,6 +20,10 @@
 #include <Singular/lists.h>
 #include <kernel/longrat.h>
 #include <Singular/misc_ip.h>
+#ifdef LIBSINGULAR
+#include <Singular/silink.h>
+#include <Singular/feOpt.h>
+#endif
 
 void number2mpz(number n, mpz_t m)
 {
@@ -1124,8 +1128,10 @@ int mmInit( void )
 #ifdef LIBSINGULAR
 int siInit(char *name)
 {
+
   // hack such that all shared' libs in the bindir are loaded correctly
   feInitResources(name);
+  extern int iiInitArithmetic();
   iiInitArithmetic();
 
 #if 0
