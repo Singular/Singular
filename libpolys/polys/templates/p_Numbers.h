@@ -56,7 +56,8 @@ static inline void n_InpAdd_FieldGeneral(number &n1, number n2, const ring r)
 #define n_Sub_RingGeneral(n1, n2, r)       r->cf->cfSub(n1, n2, r->cf)
 //#define n_InpMult_RingGeneral(n1, n2, r)   r->cf->nInpMult(n1, n2, r->cf)
 #define n_InpMult_RingGeneral(n1, n2, r)   ndInpMult(n1, n2, r->cf)
-#define n_InpAdd_RingGeneral(n1, n2, r)    ndInpAdd(n1, n2, r->cf)
+static inline void n_InpAdd_RingGeneral(number &n1, number n2, const ring r)
+{ assume(rField_is_Ring(r)); ndInpAdd(n1, n2, r->cf); }
 #endif
 
 #include <coeffs/modulop.h>
@@ -71,10 +72,10 @@ static inline void n_InpAdd_FieldGeneral(number &n1, number n2, const ring r)
 #define n_InpMult_FieldZp(n1, n2, r) n1=npMultM(n1, n2, r->cf)
 
 static inline void n_InpAdd_FieldZp(number &n1, number n2, const ring r)
-{ n1=npAddM(n1, n2, r->cf); }
+{ assume(rField_is_Zp(r)); n1=npAddM(n1, n2, r->cf); }
 
 #define DO_LINLINE
-#include "coeffs/longrat.cc"
+#include <coeffs/longrat.cc>
 #define n_Copy_FieldQ(n, r)        nlCopy(n, r->cf)
 #define n_Delete_FieldQ(n, r)      nlDelete(n,r->cf)
 #define n_Mult_FieldQ(n1, n2, r)   nlMult(n1,n2, r->cf)
@@ -84,5 +85,7 @@ static inline void n_InpAdd_FieldZp(number &n1, number n2, const ring r)
 #define n_Neg_FieldQ(n, r)         nlNeg(n, r->cf)
 #define n_Sub_FieldQ(n1, n2, r)    nlSub(n1, n2, r->cf)
 #define n_InpMult_FieldQ(n1, n2, r) nlInpMult(n1, n2, r->cf)
-#define n_InpAdd_FieldQ(n1, n2, r)  nlInpAdd(n1, n2, r->cf)
+
+static inline void n_InpAdd_FieldQ(number &n1, number n2, const ring r)
+{ assume(rField_is_Q(r)); nlInpAdd(n1, n2, r->cf); }
 #endif

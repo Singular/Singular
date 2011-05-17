@@ -2172,7 +2172,7 @@ LINLINE number nlAdd (number a, number b, const coeffs R)
 number nlShort1(number a);
 number nlShort3_noinline(number x);
 
-LINLINE number nlInpAdd (number a, number b, const coeffs r)
+LINLINE number nlInpAdd_(number a, number b, const coeffs r)
 {
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
@@ -2322,6 +2322,12 @@ LINLINE number nlInpAdd (number a, number b, const coeffs r)
     return a;
   }
 }
+
+LINLINE void nlInpAdd(number &a, number b, const coeffs r)
+{
+  a = nlInpAdd_(a, b, r);
+}
+
 
 LINLINE number nlMult (number a, number b, const coeffs R)
 {
