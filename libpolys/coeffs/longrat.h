@@ -105,7 +105,9 @@ extern omBin rnumber_bin;
 // in-place operations
 void nlInpGcd(number &a, number b, const coeffs r);
 void nlInpIntDiv(number &a, number b, const coeffs r);
-LINLINE number nlInpAdd(number la, number li, const coeffs r);
+
+LINLINE number nlInpAdd_(number a, number b, const coeffs r);
+LINLINE void nlInpAdd(number &a, number b, const coeffs r);
 LINLINE void nlInpMult(number &a, number b, const coeffs r);
 
 number nlFarey(number nP, number nN);
