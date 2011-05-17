@@ -978,7 +978,7 @@ BOOLEAN ssiOpen(si_link l, short flag, leftv u)
 }
 
 //**************************************************************************/
-LINKAGE BOOLEAN ssiClose(si_link l)
+BOOLEAN ssiClose(si_link l)
 {
   ssiInfo *d = (ssiInfo *)l->data;
   if (d!=NULL)
@@ -1028,7 +1028,7 @@ LINKAGE BOOLEAN ssiClose(si_link l)
 }
 
 //**************************************************************************/
-LINKAGE leftv ssiRead1(si_link l)
+leftv ssiRead1(si_link l)
 {
   ssiInfo *d = (ssiInfo *)l->data;
   d->ungetc_buf='\0';
@@ -1151,7 +1151,7 @@ no_ring: WerrorS("no ring");
   return NULL;
 }
 //**************************************************************************/
-LINKAGE BOOLEAN ssiWrite(si_link l, leftv data)
+BOOLEAN ssiWrite(si_link l, leftv data)
 {
   if(SI_LINK_W_OPEN_P(l)==0) slOpen(l,SI_LINK_OPEN|SI_LINK_WRITE,NULL);
   ssiInfo *d = (ssiInfo *)l->data;
