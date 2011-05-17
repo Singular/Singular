@@ -592,13 +592,9 @@ install-libsingular: libsingular
 	  ${INSTALL_PROGRAM}  $$file ${libdir}; \
 	done
 	${INSTALL_PROGRAM} libsingular.h ${includedir}
-	${INSTALL_PROGRAM} subexpr.h ${includedir}/singular
-	${INSTALL_PROGRAM} tok.h ${includedir}/singular
-	${INSTALL_PROGRAM} grammar.h ${includedir}/singular
-	${INSTALL_PROGRAM} ipid.h ${includedir}/singular
-	${INSTALL_PROGRAM} ipshell.h ${includedir}/singular
-	${INSTALL_PROGRAM} lists.h ${includedir}/singular
-	${INSTALL_PROGRAM} attrib.h ${includedir}/singular
+	for file in subexpr.h tok.h grammar.h ipid.h lists.h ipshell.h attrib.h; do \
+	sed -e "s:<kernel/:<singular/:" < $$file |sed -e "s:<Singular/:<singular/:"|sed -e "s:<omalloc/:<:"|sed -e "s:<factory/:<:" >${includedir}/singular/$$file ;\
+	done
 
 uninstall: uninstallbin
 

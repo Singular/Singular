@@ -276,7 +276,7 @@ install-nolns: install
 
 install-libsingular:
 	${INSTALL_PROGRAM} kInline.cc ${includedir}/singular
-	-for file in *.h; do ${INSTALL_PROGRAM} $$file ${includedir}/singular; done
+	-for file in *.h; do sed -e "s:<kernel/:<singular/:"< $$file | sed -e "s:<Singular/:<singular/:"|sed -e "s:<omalloc/:<:"|sed -e "s:<factory/:<:" > ${includedir}/singular/$$file; done
 
 install: all installbin
 

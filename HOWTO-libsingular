@@ -1,0 +1,7 @@
+export CC="gcc -fpic -DPIC -DLIBSINGULAR"
+export CXX="gcc -fpic -DPIC -DLIBSINGULAR"
+./configure
+make install
+make libsingular
+make install-libsingular
+
