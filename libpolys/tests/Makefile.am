@@ -52,13 +52,13 @@ BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURC
 
 # How to generate *_runner.cpp 
 simple_test_runner.cpp: simple_test.h
-	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer simple_test.h
+	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer ${srcdir}/simple_test.h
 
 coeffs_test_runner.cpp: coeffs_test.h
-	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer coeffs_test.h
+	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer ${srcdir}/coeffs_test.h
 
 polys_test_runner.cpp: polys_test.h
-	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer polys_test.h
+	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer ${srcdir}/polys_test.h
 
 rings_test_runner.cpp: rings_test.h
-	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer rings_test.h
+	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer ${srcdir}/rings_test.h
