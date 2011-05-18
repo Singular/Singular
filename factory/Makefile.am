@@ -189,7 +189,30 @@ gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
 gengftables_SOURCES = gengftables-conway.cc
 
-data_DATA = gftables
+gftablesdir=$(datadir)/gftables
+gftables_DATA = gftables/10201 gftables/1024 gftables/10609 gftables/11449 \
+gftables/11881 gftables/121 gftables/12167 gftables/125 gftables/12769 \
+gftables/128 gftables/1331 gftables/1369 gftables/14641 \
+gftables/15625 gftables/16 gftables/16129 gftables/16384 \
+gftables/16807 gftables/1681 gftables/169 gftables/17161 gftables/1849 \
+gftables/18769 gftables/19321 gftables/19683 gftables/2048 \
+gftables/2187 gftables/2197 gftables/2209 gftables/22201 \
+gftables/22801 gftables/2401 gftables/243 gftables/24389 \
+gftables/24649 gftables/25 gftables/256 gftables/26569 gftables/27 \
+gftables/27889 gftables/2809 gftables/28561 gftables/289 \
+gftables/29791 gftables/29929 gftables/3125 gftables/32 gftables/32041 \
+gftables/32761 gftables/32768 gftables/343 gftables/3481 gftables/361 \
+gftables/36481 gftables/3721 gftables/37249 gftables/38809 \
+gftables/39601 gftables/4 gftables/4096 gftables/44521 gftables/4489 \
+gftables/49 gftables/4913 gftables/49729 gftables/5041 \
+gftables/50653 gftables/512 gftables/51529 gftables/52441 gftables/529 \
+gftables/5329 gftables/54289 gftables/57121 gftables/58081 \
+gftables/59049 gftables/6241 gftables/625 gftables/63001 \
+gftables/64 gftables/6561 gftables/6859 gftables/6889 gftables/729 \
+gftables/7921 gftables/8 gftables/81 gftables/8192 gftables/841 \
+gftables/9 gftables/9409 gftables/961 
+
+
 
 gftables:	gengftables
 		@if test -x ${srcdir}/gftables; then \
@@ -262,6 +285,6 @@ EXTRA_DIST =	gengftables.cc gengftables-conway.cc test_install.cc \
 		examples/application.cc \
 		examples/factorize.cc examples/gcd.cc \
 		bin/folding.el bin/fold-docu.el \
-		bin/makeheader bin/gen-readcf readcf.cc gftables
+		bin/makeheader bin/gen-readcf readcf.cc $(gftables_DATA)
 
 CLEANFILES = factory.h factoryconf.h
