@@ -1,6 +1,10 @@
 export CC="gcc -fpic -DPIC -DLIBSINGULAR"
 export CXX="g++ -fpic -DPIC -DLIBSINGULAR"
+
 ./configure
+or
+./configure --without-dynamic-kernel
+
 make install-libsingular
 
 ---------------------------------------
