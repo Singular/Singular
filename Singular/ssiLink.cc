@@ -1018,6 +1018,8 @@ BOOLEAN ssiClose(si_link l)
     {
       kill(d->pid,15);
       waitpid(d->pid,NULL,WNOHANG);
+      kill(d->pid,9); // just to be sure
+      waitpid(d->pid,NULL,WNOHANG);
     }
     omFreeSize((ADDRESS)d,(sizeof *d));
   }
