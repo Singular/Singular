@@ -1016,11 +1016,8 @@ BOOLEAN ssiClose(si_link l)
     if (d->f_write!=NULL) fclose(d->f_write);
     if (d->pid!=0)
     {
-      int status;
-      if (kill(d->pid,15)!=0)
-      {
-         waitpid(d->pid,&status,WNOHANG);
-      }
+      kill(d->pid,15);
+      waitpid(d->pid,NULL,WNOHANG);
     }
     omFreeSize((ADDRESS)d,(sizeof *d));
   }
