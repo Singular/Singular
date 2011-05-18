@@ -21,7 +21,7 @@ setup3: setup2
 setup4: setup3
 	(cd src;make setup4 || exit 1;cd ..; touch setup4)
 
-install:	all
+install install-libsingular:	all
 	(cd src;make install || exit 1;cd ..)
 
 install_all: install

@@ -184,7 +184,7 @@ install-libsingular:
 	$(MKINSTALLDIRS) $(includedir)/singular
 	$(INSTALL) omalloc.h $(includedir)/singular
 
-install: all
+install install-libsingular: all
 	$(MKINSTALLDIRS) $(libdir)
 	$(MKINSTALLDIRS) $(includedir)
 	$(INSTALL_DATA) libomalloc.a $(libdir)

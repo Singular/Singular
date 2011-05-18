@@ -64,7 +64,7 @@ install: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4) $(LLL)
 	${INSTALL_PROGRAM} $(MAIN4) ${bindir}
 	${INSTALL_PROGRAM} $(LLL) ${bindir}
 
-install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
+install-bindist install-libsingular: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 	${MKINSTALLDIRS} ${install_bindir}
 	${INSTALL_PROGRAM} -s $(MAIN1) ${install_bindir}
 	${INSTALL_PROGRAM} -s $(MAIN2) ${install_bindir}

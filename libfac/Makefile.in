@@ -146,7 +146,7 @@ libsingfac_p.a:	$(PROFOBJ)
 
 install-nolns: install
 
-install:	all
+install install-libsingular:	all
 	${MKINSTALLDIRS} ${includedir}
 	${MKINSTALLDIRS} ${libdir}
 	${INSTALL_DATA} ${LIBFACINCLUDE} ${includedir}
