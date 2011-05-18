@@ -983,13 +983,10 @@ BOOLEAN ssiClose(si_link l)
   ssiInfo *d = (ssiInfo *)l->data;
   if (d!=NULL)
   {
+    if (d->r!=NULL) rKill(d->r);
     if ((strcmp(l->mode,"tcp")==0)
     || (strcmp(l->mode,"fork")==0))
     {
-      if (d->send_quit_at_exit)
-      {
-        fprintf(d->f_write,"99\n");fflush(d->f_write);
-      }
       link_list hh=ssiToBeClosed;
       if (hh!=NULL)
       {
@@ -1010,15 +1007,20 @@ BOOLEAN ssiClose(si_link l)
           hh=(link_list)hh->next;
         }
       }
+      if (d->send_quit_at_exit)
+      {
+        fprintf(d->f_write,"99\n");fflush(d->f_write);
+      }
     }
     if (d->f_read!=NULL) fclose(d->f_read);
     if (d->f_write!=NULL) fclose(d->f_write);
-    if (d->r!=NULL) rKill(d->r);
     if (d->pid!=0)
     {
       int status;
-      kill(d->pid,15);
-      waitpid(d->pid,&status,WNOHANG);
+      if (kill(d->pid,15)!=0)
+      {
+         waitpid(d->pid,&status,WNOHANG);
+      }
     }
     omFreeSize((ADDRESS)d,(sizeof *d));
   }
