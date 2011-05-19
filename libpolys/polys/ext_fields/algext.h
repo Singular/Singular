@@ -68,7 +68,7 @@ number   naGetNumerator(number &a, const coeffs cf);
 number   naGcd(number a, number b, const coeffs cf);
 number   naLcm(number a, number b, const coeffs cf);
 number   naSize(number a, const coeffs cf);
-void     naDelete(number *a, const coeffs cf);
+void     naDelete(number * a, const coeffs cf);
 void     naCoeffWrite(const coeffs cf);
 number   naIntDiv(number a, number b, const coeffs cf);
 const char * naRead(const char *s, number *a, const coeffs cf);

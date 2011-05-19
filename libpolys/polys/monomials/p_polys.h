@@ -1838,6 +1838,13 @@ int       p_Weight(int c, const ring r);
    leaves divisor unmodified */
 poly      p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r);
 
+/* returns NULL if p == NULL, otherwise makes p monic by dividing
+   by its leading coefficient (only done if this is not already 1);
+   this assumes that we are over a ground field so that division
+   is well-defined;
+   modifies p */
+void      p_Monic(poly &p, ring r);
+
 /* assumes that p and q are univariate polynomials in r,
    mentioning the same variable;
    assumes a global monomial ordering in r;

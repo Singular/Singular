@@ -207,6 +207,175 @@ void Test(const ring r)
 
 class PolysTestSuite : public CxxTest::TestSuite 
 {
+private:
+  void TestArithCf(const coeffs r)
+  {
+    clog << ("TEST: Simple Arithmetics: ");
+    clog << endl;
+
+    number two = n_Init(2, r);
+
+    number t = n_Init(1, r);  
+    ndInpAdd(t, t, r);  
+    TS_ASSERT( n_Equal(two, t, r) );
+    n_Delete(&t, r);
+  
+    if( getCoeffType(r) == n_Q )
+    {
+      number t = n_Init(1, r);  
+      nlInpAdd(t, t, r);
+      TS_ASSERT( n_Equal(two, t, r) );
+      n_Delete(&t, r);
+    }
+  
+    const int N = 66666;
+
+    number a = n_Init(N, r);
+   
+    clog<< "a: "; PrintSized(a, r);
+
+    clog<< "two: "; PrintSized(two, r);
+
+    number aa0 = n_Init(N*2, r);
+
+    number aa = n_Add(a, a, r);
+
+    clog<< "aa = a + a: "; PrintSized(aa, r);
+  
+    number aa2 = n_Mult(a, two, r);
+
+    clog<< "aa2 = a * 2: "; PrintSized(aa2, r);
+
+    number aa1 = n_Mult(two, a, r);
+ 
+    clog<< "aa1 = 2 * a: "; PrintSized(aa1, r);
+
+    n_Delete(&a, r);
+    n_Delete(&two, r);
+
+    a = n_Sub( aa, aa1, r );
+  
+    clog<< "a = aa - aa1: "; PrintSized(a, r);
+
+    TS_ASSERT( n_IsZero(a, r) );
+
+    n_Delete(&a, r);
+
+    a = n_Sub( aa, aa2, r );
+
+    clog<< "a = aa - aa2: "; PrintSized(a, r);
+
+    TS_ASSERT( n_IsZero(a, r) );
+
+    n_Delete(&a, r);
+
+    a = n_Sub( aa1, aa2, r );
+
+    clog<< "a = aa1 - aa2: "; PrintSized(a, r);
+
+    TS_ASSERT( n_IsZero(a, r) );
+
+    n_Delete(&a, r);
+
+    TS_ASSERT( n_Equal(aa, aa1, r) );
+    TS_ASSERT( n_Equal(aa, aa2, r) );
+    TS_ASSERT( n_Equal(aa1, aa2, r) );
+  
+    TS_ASSERT( n_Equal(aa0, aa, r) );
+    TS_ASSERT( n_Equal(aa0, aa1, r) );
+    TS_ASSERT( n_Equal(aa0, aa2, r) );
+
+    n_Delete(&aa, r);
+    n_Delete(&aa1, r);
+    n_Delete(&aa2, r);
+
+    n_Delete(&aa0, r);
+
+    clog << ( " >>> TEST DONE!" );
+    clog << endl;
+  }
+  void TestSumCf(const coeffs r, const unsigned long N)
+  {
+    clog << ( _2S("TEST: sum[0..") + _2S(N) + "]: ");
+    clog << endl;
+
+    assume( N > 0 ); // just for now...
+
+    const unsigned long ssss = (N * (N+1)) / 2;
+    
+    number sum1 = n_Init(ssss, r);
+    clog<< "N*(N+1)/2 (int: " << ssss << "): "; PrintSized(sum1, r);
+
+    number s, ss, i, res;
+
+    s = n_Init(N  , r);
+    i = n_Init(N+1, r);
+    ndInpMult(s, i, r);
+    n_Delete(&i, r);
+    
+    clog<< "N*(N+1): ("<< N*(N+1) << ")"; PrintSized(s, r);  
+    
+    i = n_Init(2, r);
+    clog<< "2: "; PrintSized(i, r);  
+
+    if( !n_IsZero( i, r) )
+    {
+  #ifdef HAVE_RINGS
+      TS_ASSERT( n_DivBy(s, i, r) );
+  #endif
+       
+      res = n_Div(s, i, r);
+    
+      clog<< "N*(N+1)/2: "; PrintSized(res, r);
+
+
+      number d = n_Sub(res, sum1, r);
+      TS_ASSERT( n_IsZeroDivisor(d, r) );
+      n_Delete(&d, r);
+      
+      if( n_GetChar(r) == 0 )
+      {
+        TS_ASSERT( n_Equal(sum1, res, r) );
+        TS_ASSERT( n_Equal(res, sum1, r) );
+      }
+    } else
+      TS_ASSERT_EQUALS( n_GetChar(r), 2);
+    
+
+    n_Delete(&s, r);  n_Delete(&i, r);
+    
+    n_Delete(&sum1, r); n_Delete(&res, r);    
+    
+
+    s = n_Init(0  , r);
+    ss = n_Init(0 , r);
+    for( int k = N; k >= 0; k-- )
+    {
+      i = n_Init(k, r);
+      ndInpAdd(s, i, r); // s += i
+
+      i = n_Neg(i, r);
+      ndInpAdd(ss, i, r); // ss -= i
+      
+      n_Delete(&i, r);    
+    }
+    clog<< "ss: "; PrintSized(ss, r);  
+
+    ss = n_Neg(ss, r); // ss = -ss
+   
+    clog<< "real sum    : "; PrintSized(s, r);
+    clog<< "real sum(--): "; PrintSized(ss, r);  
+
+    TS_ASSERT( n_Equal(s, ss, r) );
+    TS_ASSERT( n_Equal(ss, s, r) );
+
+    n_Delete(&s, r);    
+    n_Delete(&ss, r);    
+
+    clog << ( " >>> TEST DONE!" );
+    clog << endl;
+
+  }
 public:
   void test_Z13_t()
   {
@@ -387,14 +556,20 @@ public:
       TS_FAIL("Could not get needed coeff. domain");
 
     TS_ASSERT_DIFFERS( cf->cfCoeffWrite, NULLp );
-    
-    
   
     if( cf->cfCoeffWrite != NULL )
     {
       clog << "Coeff-domain: "  << endl; 
       n_CoeffWrite(cf); PrintLn();
     }
+    
+    // some tests for the coefficient field represented by cf:
+    TestArithCf(cf);
+    TestSumCf(cf, 10);
+    TestSumCf(cf, 100);
+    TestSumCf(cf, 101);
+    TestSumCf(cf, 1001);
+    TestSumCf(cf, 9000);
 
     clog << "Finally create the polynomial ring (Q[a]/<a2+1>)[x, y]..."
          << endl;
@@ -415,7 +590,7 @@ public:
     TS_ASSERT( !rField_is_GF(s, 25) );
     TS_ASSERT_EQUALS(rVar(s), 2);
 
-    //Test(s);
+    Test(s);
 
     rDelete(s); // kills 'cf' and 'r' as well
   }

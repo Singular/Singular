@@ -1452,7 +1452,7 @@ poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
   number divisorLC = p_GetCoeff(divisor, r);
   int divisorLE = p_GetExp(divisor, 1, r);
 //p_Write(p, r); p_Write(divisor, r);
-  while ((p != NULL) && (p_Deg(p, r) > p_Deg(divisor, r)))
+  while ((p != NULL) && (p_Deg(p, r) >= p_Deg(divisor, r)))
   {
     /* determine t = LT(p) / LT(divisor) */
     poly t = p_ISet(1, r);
@@ -1461,18 +1461,39 @@ poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
     int e = p_GetExp(p, 1, r) - divisorLE;
     p_SetExp(t, 1, e, r);
     p_Setm(t, r);
-//printf("t\n"); p_Write(t, r);
     if (needResult) result = p_Add_q(result, p_Copy(t, r), r);
-//t = p_Mult_q(t, p_Copy(divisor, r), r); p_Write(t, r);
-//t = p_Neg(t, r); p_Write(t, r);
-//printf("p\n"); p_Write(p, r);
-//t = p_Add_q(p, t, r); p_Write(t, r);
-//p = t;
     p = p_Add_q(p, p_Neg(p_Mult_q(t, p_Copy(divisor, r), r), r), r);
-//printf("EXECUTION STOPPED\n"); while (1) { };
   }
   n_Delete(&divisorLC, r->cf);
+//printf("p_PolyDiv result:\n");
+//p_Write(result, r);
   return result;
+}
+
+/* returns NULL if p == NULL, otherwise makes p monic by dividing
+   by its leading coefficient (only done if this is not already 1);
+   this assumes that we are over a ground field so that division
+   is well-defined;
+   modifies p */
+void p_Monic(poly &p, ring r)
+{
+  if (p == NULL) return;
+  poly pp = p;
+  number lc = p_GetCoeff(p, r);
+  if (n_IsOne(lc, r->cf)) return;
+  number n = n_Init(1, r->cf);
+  p_SetCoeff(p, n, r);
+  p = pIter(p);
+  while (p != NULL)
+  {
+    number c = p_GetCoeff(p, r);
+    number n = n_Div(c, lc, r->cf);
+    n_Delete(&c, r->cf);
+    p_SetCoeff(p, n, r);
+    p = pIter(p);
+  }
+  n_Delete(&lc, r->cf);
+  p = pp;
 }
 
 /* see p_Gcd;
@@ -1480,7 +1501,13 @@ poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
    must destroy p and q (unless one of them is returned) */
 poly p_GcdHelper(poly &p, poly &q, ring r)
 {
-  if (q == NULL) return p;
+  if (q == NULL)
+  {
+    /* We have to make p monic before we return it, so that if the
+       gcd is a unit in the ground field, we will actually return 1. */
+    p_Monic(p, r);
+    return p;
+  }
   else
   {
     p_PolyDiv(p, q, FALSE, r);
@@ -1510,21 +1537,36 @@ poly p_Gcd(poly p, poly q, ring r)
 poly p_ExtGcdHelper(poly &p, poly &pFactor, poly &q, poly &qFactor,
                     ring r)
 {
-//printf("p_ExtGcdHelper:\n");
   if (q == NULL)
   {
-    qFactor = NULL; pFactor = p_ISet(1, r); return p;
+    qFactor = NULL;
+    pFactor = p_ISet(1, r);
+    number n = p_GetCoeff(pFactor, r);
+    p_SetCoeff(pFactor, n_Invers(p_GetCoeff(p, r), r->cf), r);
+    n_Delete(&n, r->cf);
+    p_Monic(p, r);
+    return p;
   }
   else
   {
+//printf("p_ExtGcdHelper1:\n");
 //p_Write(p, r); p_Write(q, r);
     poly pDivQ = p_PolyDiv(p, q, TRUE, r);
-    poly ppFactor; poly qqFactor;
-    poly theGcd = p_ExtGcdHelper(q, ppFactor, p, qqFactor, r);
-    pFactor = qqFactor;
-    qFactor = p_Add_q(ppFactor,
-                      p_Neg(p_Mult_q(pDivQ, p_Copy(qqFactor, r), r), r),
+    poly ppFactor = NULL; poly qqFactor = NULL;
+//printf("p_ExtGcdHelper2:\n");
+//p_Write(p, r); p_Write(ppFactor, r);
+//p_Write(q, r); p_Write(qqFactor, r);
+    poly theGcd = p_ExtGcdHelper(q, qqFactor, p, ppFactor, r);
+//printf("p_ExtGcdHelper3:\n");
+//p_Write(q, r); p_Write(qqFactor, r);
+//p_Write(p, r); p_Write(ppFactor, r);
+//p_Write(theGcd, r);
+    pFactor = ppFactor;
+    qFactor = p_Add_q(qqFactor,
+                      p_Neg(p_Mult_q(pDivQ, p_Copy(ppFactor, r), r), r),
                       r);
+//printf("p_ExtGcdHelper4:\n");
+//p_Write(pFactor, r); p_Write(qFactor, r);
     return theGcd;
   }
 }
@@ -1539,15 +1581,18 @@ poly p_ExtGcdHelper(poly &p, poly &pFactor, poly &q, poly &qFactor,
    leaves p and q unmodified */
 poly p_ExtGcd(poly p, poly &pFactor, poly q, poly &qFactor, ring r)
 {
-//printf("p_ExtGcd:\n");
+//printf("p_ExtGcd1:\n");
 //p_Write(p, r); p_Write(q, r);
   assume((p != NULL) || (q != NULL));  
-  poly a = p; poly b = q;
-  poly aFactor = pFactor; poly bFactor = qFactor; 
+  poly a = p; poly b = q; BOOLEAN aCorrespondsToP = TRUE;
   if (p_Deg(a, r) < p_Deg(b, r))
-  { a = q; b = p; aFactor = qFactor, bFactor = pFactor; }
+  { a = q; b = p; aCorrespondsToP = FALSE; }
   a = p_Copy(a, r); b = p_Copy(b, r);
-  return p_ExtGcdHelper(a, aFactor, b, bFactor, r);
+  poly aFactor = NULL; poly bFactor = NULL;
+  poly theGcd = p_ExtGcdHelper(a, aFactor, b, bFactor, r);
+  if (aCorrespondsToP) { pFactor = aFactor; qFactor = bFactor; }
+  else                 { pFactor = bFactor; qFactor = aFactor; }
+  return theGcd;
 }
 
 /*2

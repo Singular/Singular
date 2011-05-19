@@ -101,6 +101,8 @@ ntl/setup4
 ntl/src/MakeDesc
 ntl/src/gen_gmp_aux
 ntl/src/gen_lip_gmp_aux
+libpolys/tests/gftables
+libpolys/tests/p_Procs_*.so
 aclocal.m4
 autom4te.cache/
 .deps

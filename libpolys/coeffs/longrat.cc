@@ -222,14 +222,20 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs r)
     Print("!!longrat:s=%d in %s:%d\n",a->s,f,l);
     return FALSE;
   }
-  // only, if gmp memeory routine are from omalloc:
+  /* TODO: If next line is active, then computations in algebraic field
+           extensions over Q will throw a lot of assume violations although
+           everything is computed correctly and no seg fault appears.
+           Maybe the test is not appropriate in this case. */
   //omCheckAddrSize(a->z[0]._mp_d,a->z[0]._mp_alloc*BYTES_PER_MP_LIMB);
   if (a->z[0]._mp_alloc==0)
     Print("!!longrat:z->alloc=0 in %s:%d\n",f,l);
 
   if (a->s<2)
   {
-    // only, if gmp memeory routine are from omalloc:
+    /* TODO: If next line is active, then computations in algebraic field
+             extensions over Q will throw a lot of assume violations although
+             everything is computed correctly and no seg fault appears.
+             Maybe the test is not appropriate in this case. */
     //omCheckIf(omCheckAddrSize(a->n[0]._mp_d,a->n[0]._mp_alloc*BYTES_PER_MP_LIMB), return FALSE);
     if (a->z[0]._mp_alloc==0)
       Print("!!longrat:n->alloc=0 in %s:%d\n",f,l);

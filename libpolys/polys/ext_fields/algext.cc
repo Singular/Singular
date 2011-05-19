@@ -74,7 +74,7 @@ BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
 {
   assume(getCoeffType(cf) == naID);
   if (a == NULL) return TRUE;
-  p_Test((poly)a, naRing); // cannot use omCheckAddrSize(a, sizeof(*a)) here
+  p_Test((poly)a, naRing);
   assume(p_Deg((poly)a, naRing) <= p_Deg(naMinpoly, naRing));
   return TRUE;
 }
@@ -89,10 +89,11 @@ BOOLEAN naIsZero(number a, const coeffs cf)
   return (a == NULL);
 }
 
-void naDelete(number *a, const coeffs cf)
+void naDelete(number * a, const coeffs cf)
 {
-  if (a == NULL) return;
-  p_Delete((poly *)a, naRing);
+  if (*a == NULL) return;
+  poly aAsPoly = (poly)(*a);
+  p_Delete(&aAsPoly, naRing);
   *a = NULL;
 }
 
@@ -338,7 +339,8 @@ void naPower(number a, int exp, number *b, const coeffs cf)
 void heuristicReduce(poly p, poly reducer, const coeffs cf)
 {
   #ifdef LDEBUG
-  omCheckAddr(p); omCheckAddr(reducer);
+  p_Test((poly)p, naRing);
+  p_Test((poly)reducer, naRing);
   #endif
   if (p_Deg(p, naRing) > 10 * p_Deg(reducer, naRing))
     definiteReduce(p, reducer, cf);
@@ -426,7 +428,8 @@ int naSize(number a, const coeffs cf)
 void definiteReduce(poly p, poly reducer, const coeffs cf)
 {
   #ifdef LDEBUG
-  omCheckAddr(p); omCheckAddr(reducer);
+  p_Test((poly)p, naRing);
+  p_Test((poly)reducer, naRing);
   #endif
   p_PolyDiv(p, reducer, FALSE, naRing);
 }
@@ -442,12 +445,15 @@ number naInvers(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL) WerrorS(nDivBy0);
-  poly aFactor; poly mFactor;
+  poly aFactor = NULL; poly mFactor = NULL;
   poly theGcd = p_ExtGcd((poly)a, aFactor, naMinpoly, mFactor, naRing);
-  /* the gcd must be one since naMinpoly is irreducible and a != NULL: */
+  /* the gcd must be 1 since naMinpoly is irreducible and a != NULL: */
   assume(naIsOne((number)theGcd, cf));      
   p_Delete(&theGcd, naRing);
   p_Delete(&mFactor, naRing);
+  /* printf("naInvers\n");
+     p_Write((poly)a, naRing);
+     p_Write(aFactor, naRing); */
   return (number)(aFactor);
 }
 
@@ -565,7 +571,7 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   assume(getCoeffType(cf) == naID);                     // coeff type;
   
   #ifdef LDEBUG
-  omCheckAddr(naMinpoly);
+  p_Test((poly)naMinpoly, naRing);
   #endif
   
   cf->cfGreaterZero  = naGreaterZero;
