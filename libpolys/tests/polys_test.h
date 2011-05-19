@@ -191,11 +191,16 @@ void TestSum(const ring r, const int N)
    
 void Test(const ring r)
 {
-  TestSum( r, 10 );
-  TestSum( r, 100 );
-  TestSum( r, 101 );
-  TestSum( r, 1001 );
-  TestSum( r, 9000 );
+  if( r == NULL )
+      TS_FAIL("Could not get needed ring");
+  else
+  {
+    TestSum( r, 10 );
+    TestSum( r, 100 );
+    TestSum( r, 101 );
+    TestSum( r, 1001 );
+    TestSum( r, 9000 );
+  }
 }
 
 }
@@ -315,6 +320,9 @@ public:
 
      const coeffs cf = nInitChar( n_GF, &param );
 
+     if( cf == NULL )
+       TS_FAIL("Could not get needed coeff. domain");
+
      TS_ASSERT_DIFFERS( cf, NULLp );
 
      ring r = rDefault( cf, 1, n);  // now cf belongs to r!
@@ -374,8 +382,13 @@ public:
     clog << "Next create the extension field Q[a]/<a2+1>..." << endl;
 
     const coeffs cf = nInitChar(type, &extParam);   // Q[a]/<a2+1>
+    
+    if( cf == NULL )
+      TS_FAIL("Could not get needed coeff. domain");
 
     TS_ASSERT_DIFFERS( cf->cfCoeffWrite, NULLp );
+    
+    
   
     if( cf->cfCoeffWrite != NULL )
     {
