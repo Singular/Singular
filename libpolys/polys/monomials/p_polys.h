@@ -1823,25 +1823,27 @@ poly      p_Diff(poly a, int k, const ring r);
 poly      p_DiffOp(poly a, poly b,BOOLEAN multiply, const ring r);
 int       p_Weight(int c, const ring r);
 
-/* assumes that *p and divisor are univariate polynomials in r,
+/* assumes that p and divisor are univariate polynomials in r,
    mentioning the same variable;
    assumes divisor != NULL;
-   *p may be NULL;
+   p may be NULL;
    assumes a global monomial ordering in r;
-   performs polynomial division of *p by divisor:
-     - afterwards *p contains the remainder of the division, i.e.,
-       *p_before = result * divisor + *p_afterwards;
+   performs polynomial division of p by divisor:
+     - afterwards p contains the remainder of the division, i.e.,
+       p_before = result * divisor + p_afterwards;
      - if needResult == TRUE, then the method computes and returns 'result',
        otherwise NULL is returned (This parametrization can be used when
        one is only interested in the remainder of the division. In this
-       case, the method will be faster.) */
-poly      p_PolyDiv(poly *p, poly divisor, BOOLEAN needResult, ring r);
+       case, the method will be slightly faster.)
+   leaves divisor unmodified */
+poly      p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r);
 
 /* assumes that p and q are univariate polynomials in r,
    mentioning the same variable;
    assumes a global monomial ordering in r;
    assumes that not both p and q are NULL;
-   returns the gcd of p and q */
+   returns the gcd of p and q;
+   leaves p and q unmodified */
 poly      p_Gcd(poly p, poly q, ring r);
 
 /* assumes that p and q are univariate polynomials in r,
@@ -1849,9 +1851,10 @@ poly      p_Gcd(poly p, poly q, ring r);
    assumes a global monomial ordering in r;
    assumes that not both p and q are NULL;
    returns the gcd of p and q;
-   moreover, afterwards *pFactor and *qFactor contain appropriate
-   factors such that gcd(p, q) = p * (*pFactor) + q * (*qFactor) */
-poly      p_ExtGcd(poly p, poly *pFactor, poly q, poly *qFactor, ring r);
+   moreover, afterwards pFactor and qFactor contain appropriate
+   factors such that gcd(p, q) = p * pFactor + q * qFactor;
+   leaves p and q unmodified */
+poly      p_ExtGcd(poly p, poly &pFactor, poly q, poly &qFactor, ring r);
 
 /* syszygy stuff */
 BOOLEAN   p_VectorHasUnitB(poly p, int * k, const ring r);
