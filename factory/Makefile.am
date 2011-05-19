@@ -4,6 +4,12 @@ INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir
 
 lib_LIBRARIES = libfactory.a libfactory_g.a
 
+libfactory_a_includedir=$(includedir)/factory
+libfactory_g_a_includedir=$(includedir)/factory
+
+libfactory_a_libdir=$(libdir)/factory
+libfactory_g_a_libdir=$(libdir)/factory
+
 libfactory_a_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${CXXTEMPLFLAGS}
 libfactory_g_a_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${CXXTEMPLFLAGS}
 
@@ -214,7 +220,7 @@ gftables/9 gftables/9409 gftables/961
 
 
 
-gftables:	gengftables
+gftables: gengftables
 		@if test -x ${srcdir}/gftables; then \
 			if test ! -x ${builddir}/gftables; then \
 			  ln -snf ${srcdir}/gftables ${builddir}; \
@@ -230,6 +236,9 @@ gftables:	gengftables
 		${srcdir}/bin/makeheader $< $@
 
 BUILT_SOURCES = factory.h factoryconf.h
+
+libfactory_a_include_HEADERS=$(BUILT_SOURCES)
+libfactory_g_a_include_HEADERS=$(BUILT_SOURCES)
 
 # These files listed below are not used anywhere but are included in
 # the distribution. So they will be tacked on to EXTRA_DIST.
@@ -288,3 +297,6 @@ EXTRA_DIST =	gengftables.cc gengftables-conway.cc test_install.cc \
 		bin/makeheader bin/gen-readcf readcf.cc $(gftables_DATA)
 
 CLEANFILES = factory.h factoryconf.h
+
+
+

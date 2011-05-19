@@ -32,11 +32,19 @@ AC_ARG_ENABLE(factory,
  else
      ENABLE_FACTORY="no"
  fi
-],[ENABLE_FACTORY="yes"])
+],[ENABLE_FACTORY="no"])
 
 if test x$ENABLE_FACTORY = xyes; then
+  FACTORY_CFLAGS=""
+  FACTORY_LIBS="-lfactory"
+
+  AC_SUBST(FACTORY_CFLAGS)
+  AC_SUBST(FACTORY_LIBS)
+  
   AC_DEFINE(HAVE_FACTORY,1,Enable factory)
 fi
+
+
 
 AM_CONDITIONAL([ENABLE_FACTORY],[test x$ENABLE_FACTORY = xyes])
 AC_MSG_RESULT($ENABLE_FACTORY)

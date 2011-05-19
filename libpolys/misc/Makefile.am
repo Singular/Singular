@@ -21,6 +21,10 @@ libmisc_g_a_SOURCES = $(SOURCES)
 libmisc_a_includedir  =$(includedir)/libpolys/misc
 libmisc_g_a_includedir=$(includedir)/libpolys/misc
 
+###????
+#libmisc_a_libdir  =${libdir}/libpolys
+#libmisc_g_a_libdir=${libdir}/libpolys
+
 MISCHEADERS  = auxiliary.h mylimits.h options.h intvec.h
 libmisc_a_include_HEADERS   = $(MISCHEADERS)
 libmisc_g_a_include_HEADERS = $(MISCHEADERS)
