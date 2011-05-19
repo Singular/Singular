@@ -1,12 +1,14 @@
 #ifndef FEFOPEN_H
 #define FEFOPEN_H
+
+#include <misc/auxiliary.h>
+
 /*****************************************************************
  *
  * File Stuff
  *
  *****************************************************************/
-FILE *  feFopen(const char *path, const char *mode, char *where=NULL,
-                int useWerror=FALSE, int path_only=FALSE);
+FILE*feFopen(const char *path, const char *mode, char *where=NULL, BOOLEAN useWerror=FALSE, BOOLEAN path_only=FALSE);
 
 /*
 // These are our versions of fopen and fread They are very similar to
@@ -16,15 +18,8 @@ FILE *  feFopen(const char *path, const char *mode, char *where=NULL,
 // IMPORTANT: do only use myfopen and myfread when reading text,
 // do never use fopen and fread
 */
-#if (defined(CYGWIN) || defined(ix86_Win))
 
 FILE *myfopen(const char *path, const char *mode);
-
-#else
-
-#define myfopen fopen
-
-#endif
 
 size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 

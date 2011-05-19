@@ -23,7 +23,7 @@
  *****************************************************************/
 
 FILE * feFopen(const char *path, const char *mode, char *where,
-               int useWerror, int path_only)
+               BOOLEAN useWerror, BOOLEAN path_only)
 {
   char longpath[MAXPATHLEN];
   if (path[0]=='~')
@@ -79,7 +79,7 @@ FILE * feFopen(const char *path, const char *mode, char *where,
     char* spath = feResource('s');
     char *s;
 
-    if (where==NULL) s=(char *)omAlloc(250);
+    if (where==NULL) s=(char *)omAlloc(250 * sizeof(char));
     else             s=where;
 
     if (spath!=NULL)
@@ -121,10 +121,10 @@ FILE * feFopen(const char *path, const char *mode, char *where,
   return f;
 }
 
-#ifdef ix86_Win
 // Make sure that mode contains binary option
 FILE* myfopen(const char *path, const char *mode)
 {
+#if (defined(CYGWIN) || defined(ix86_Win))
   char mmode[4];
   int i;
   int done = 0;
@@ -144,8 +144,10 @@ FILE* myfopen(const char *path, const char *mode)
     mmode[i+1] = '\0';
   }
   return fopen(path, mmode);
-}
+#else
+  return fopen(path, mode);
 #endif
+}
 // replace "\r\n" by " \n" and "\r" by "\n"
 
 size_t myfread(void *ptr, size_t size, size_t nmemb, FILE *stream)
