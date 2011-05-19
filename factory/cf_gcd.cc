@@ -12,6 +12,7 @@
 #include "cf_reval.h"
 #include "cf_primes.h"
 #include "cf_algorithm.h"
+#include "cf_factory.h"
 #include "fac_util.h"
 #include "templates/ftmpl_functions.h"
 #include "ffreval.h"
@@ -559,6 +560,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
     {
       return fieldGCD(f,g);
     }
+    #ifdef HAVE_NTL
     else if ((!fc_and_gc_Univariate) && (isOn( SW_USE_EZGCD_P )))
     {
       /*if ( pe == 1 )
@@ -578,10 +580,12 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       }*/
       fc= EZGCD_P (fc, gc);
     }
+    #endif
     else if (isOn(SW_USE_GCD_P))
     {
       fc=newGCD(fc,gc);
     }
+    #ifdef HAVE_NTL
     else if (isOn(SW_USE_FF_MOD_GCD) && !fc_and_gc_Univariate)
     {
       Variable a;
@@ -595,6 +599,7 @@ CanonicalForm gcd_poly ( const CanonicalForm & f, const CanonicalForm & g )
       }
       fc=GCD_small_p (fc, gc);
     }
+    #endif
     else if ( p1 == fc.level() )
       fc = gcd_poly_p( fc, gc );
     else

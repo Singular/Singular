@@ -3508,6 +3508,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       else
   /*==================== HNF =================*/
   #ifdef HAVE_FACTORY
+  #ifdef HAVE_NTL
       if (strcmp(sys_cmd, "HNF") == 0)
       {
         if (h!=NULL)
@@ -3548,6 +3549,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         else return TRUE;
       }
       else
+      #endif
   /*================= factoras =========================*/
       if (strcmp (sys_cmd, "factoras") == 0)
       {

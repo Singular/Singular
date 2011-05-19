@@ -39,10 +39,12 @@ ideal singclap_sqrfree ( poly f );
 
 matrix singclap_irrCharSeries ( ideal I);
 
+#ifdef HAVE_NTL
 matrix singntl_HNF(matrix A);
 intvec* singntl_HNF(intvec* A);
 matrix singntl_LLL(matrix A);
 intvec* singntl_LLL(intvec* A);
+#endif
 
 BOOLEAN singclap_isSqrFree(poly f);
 

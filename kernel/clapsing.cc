@@ -1560,6 +1560,7 @@ int singclap_det_i( intvec * m )
   Off(SW_RATIONAL);
   return res;
 }
+#ifdef HAVE_NTL
 matrix singntl_HNF(matrix  m )
 {
   int r=m->rows();
@@ -1677,6 +1678,7 @@ intvec* singntl_LLL(intvec*  m )
   delete MM;
   return mm;
 }
+#endif
 
 napoly singclap_alglcm ( napoly f, napoly g )
 {

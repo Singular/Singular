@@ -374,6 +374,7 @@ void getMaxMin (int** points, int sizePoints, int& minDiff, int& minSum,
   }
 }
 
+#ifdef HAVE_NTL
 void convexDense(int** points, int sizePoints, mat_ZZ& M, vec_ZZ& A)
 {
   if (sizePoints < 3)
@@ -674,4 +675,4 @@ decompress (const CanonicalForm& F, const mat_ZZ& inverseM, const vec_ZZ& A)
 
   return result/Lc (result); //normalize
 }
-
+#endif
