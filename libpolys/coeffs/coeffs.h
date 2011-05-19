@@ -11,10 +11,12 @@
 #include <misc/auxiliary.h>
 /* for assume: */
 #include <reporter/reporter.h>
+
 #include <coeffs/si_gmp.h>
 
 #ifdef HAVE_FACTORY
-#include <factory/factory.h>
+// #include <factory/factory.h>
+class CanonicalForm;
 #endif
 
 enum n_coeffType

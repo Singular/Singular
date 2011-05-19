@@ -11,11 +11,12 @@
 #ifndef INCL_SINGCONV_H
 #define INCL_SINGCONV_H
 
+#ifdef HAVE_FACTORY
+
 #include <polys/monomials/ring.h>
 #include <polys/ext_fields/longtrans.h>
-#ifdef HAVE_FACTORY
-#  include <factory/factory.h>
-#endif /* HAVE_FACTORY */
+#include <factory/factory.h>
+
 
 poly convFactoryPSingP ( const CanonicalForm & f, const ring r );
 CanonicalForm convSingPFactoryP( poly p, const ring r );
@@ -34,5 +35,8 @@ int convFactoryISingI( const CanonicalForm & f);
 
 //CanonicalForm convSingTrPFactoryP ( poly p, const ring r );
 //poly convFactoryPSingTrP ( const CanonicalForm & f, const ring r );
+
+// HAVE_FACTORY
+#endif 
 
 #endif /* INCL_SINGCONV_H */

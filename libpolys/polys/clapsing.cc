@@ -11,25 +11,27 @@
 #include "config.h"
 #include <misc/auxiliary.h>
 
-
-TODO(Martin, Please adapt the following code for the use in SW)
-#ifdef HAVE_FACTORY
-
 #define SI_DONT_HAVE_GLOBAL_VARS
 #include <omalloc/omalloc.h>
 #include <coeffs/numbers.h>
 #include <coeffs/coeffs.h>
 
 // #include <kernel/ffields.h>
-// #include <kernel/clapconv.h>
-// #include <libfac/factor.h>
+
+#include "monomials/ring.h"
+#include "simpleideals.h"
+//#include "polys.h"
+
+
+TODO(Martin, Please adapt the following code for the use in SW)
+#ifdef HAVE_FACTORY
 
 #include <factory/factory.h>
 
 #include "clapsing.h"
-#include "monomials/ring.h"
-#include "simpleideals.h"
-//#include "polys.h"
+#include "clapconv.h"
+// #include <kernel/clapconv.h>
+// #include <libfac/factor.h>
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
