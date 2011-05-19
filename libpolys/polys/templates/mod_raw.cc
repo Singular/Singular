@@ -20,8 +20,7 @@
 #include "config.h"
 #include <misc/auxiliary.h>
 
-// #include <kernel/mod2.h>
-// #include <Singular/static.h>
+#include <omalloc/omalloc.h>
 
 #include <reporter/reporter.h>
 
@@ -130,19 +129,38 @@ void* dynl_open_binary_warn(const char* binary_name, const char* msg)
   const char* bin_dir = feGetResource('b');
   if (bin_dir != NULL)
   {
-    char path_name[MAXPATHLEN];
-    sprintf(path_name, "%s%s%s.%s", bin_dir, DIR_SEPP, binary_name,
-            DL_TAIL);
-    handle = dynl_open(path_name);
-    if (handle == NULL && ! warn_handle)
-    {
-      Warn("Could not open dynamic library: %s", path_name);
+    const int binary_name_so_length = 3 + strlen(DL_TAIL) + strlen(binary_name) + strlen(DIR_SEPP) + strlen(bin_dir);
+    char* binary_name_so = (char *)omAlloc0( binary_name_so_length * sizeof(char) );
+    snprintf(binary_name_so, binary_name_so_length, "%s%s%s.%s", bin_dir, DIR_SEPP, binary_name, DL_TAIL);
+    handle = dynl_open(binary_name_so);
+    omFreeSize((ADDRESS)binary_name_so, binary_name_so_length * sizeof(char) );
+  }
+
+  if (handle == NULL )
+  {
+    const int binary_name_so_length = 3 + strlen(DL_TAIL) + strlen(binary_name);
+    char* binary_name_so = (char *)omAlloc0( binary_name_so_length * sizeof(char) );
+    snprintf(binary_name_so, binary_name_so_length, "%s.%s", binary_name, DL_TAIL);
+
+    char* pp = (char *)omAlloc0( MAXPATHLEN * sizeof(char) );
+    lib_types type = type_of_LIB( binary_name_so, pp );
+    omFreeSize((ADDRESS)binary_name_so, binary_name_so_length * sizeof(char) );
+
+    if( type == LT_ELF || type == LT_HPUX || type == LT_MACH_O )
+      handle = dynl_open(pp);
+
+    omFreeSize((ADDRESS)pp, MAXPATHLEN * sizeof(char) );
+  }
+
+  if (handle == NULL && ! warn_handle)
+  {
+      Warn("Could not find dynamic library: %s.%s", binary_name, DL_TAIL);
       Warn("Error message from system: %s", dynl_error());
       if (msg != NULL) Warn("%s", msg);
       Warn("See the INSTALL section in the Singular manual for details.");
       warn_handle = TRUE;
-    }
   }
+
   return  handle;
 }
 
