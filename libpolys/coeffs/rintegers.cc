@@ -19,7 +19,7 @@
 #include <coeffs/longrat.h>
 #include <coeffs/mpr_complex.h>
 #include <coeffs/rintegers.h>
-#include <coeffs/si_gmp.h>
+#include "si_gmp.h"
 
 
 omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
