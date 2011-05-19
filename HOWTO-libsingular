@@ -10,7 +10,17 @@ make install-libsingular
 ---------------------------------------
 how to compile and run the the example:
 g++ -I......include -o tt tt.cc -L..../Singular -lsingular
-export LD_LIBRARY_PATH=...../Singular
+export SINGULAR="..../Singular-3-1-3/"
+export SINGULAR_SYSTEM_TYPE="ix86Mac-darwin/lib"
+if [ "${SINGULAR_SYSTEM_TYPE}" = "ix86Mac-darwin/lib" ]; then
+  export
+DYLD_LIBRARY_PATH="${SINGULAR}/${SINGULAR_SYSTEM_TYPE}:${DYLD_LIBRARY_PATH}"
+else
+  export
+LD_LIBRARY_PATH="${SINGULAR}/${SINGULAR_SYSTEM_TYPE}:${LD_LIBRARY_PATH}"
+fi
+unset SINGULAR_SYSTEM_TYPE
+
 ./tt
 --------------------------------------
 the example:
