@@ -85,6 +85,7 @@ static feResourceConfig_s feResourceConfigs[] =
    "%d/../LIB;"
    "%b/gftables;"
    "%b/../share/gftables;"
+   "%b/../factory/gftables;"
    "%b/../../../factory/gftables;"
    "%b/../../factory/gftables",
    ""},
