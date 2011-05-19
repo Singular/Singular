@@ -1,0 +1,7 @@
+*.o
+*.og
+*.so
+MOD/
+gftables/
+test
+libpolys-config
