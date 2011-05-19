@@ -1,9 +1,12 @@
-#! /bin/sh
+#! /bin/bash
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 includedir=@includedir@
 libdir=@libdir@
+
+ECHO="echo"
+ECHOn="printf"
 
 usage()
 {
@@ -32,7 +35,7 @@ libs=false
 
 while test $# -gt 0; do
     case "$1" in
-    -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    -*=*) optarg=`${ECHO} "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
     *) optarg= ;;
     esac
 
@@ -42,11 +45,11 @@ while test $# -gt 0; do
 	;;
 
     --prefix)
-	echo $prefix
+	${ECHO} $prefix
 	;;
 
     --version)
-	echo @VERSION@
+	${ECHO} @VERSION@
 	exit 0
 	;;
 
@@ -55,11 +58,11 @@ while test $# -gt 0; do
 	;;
 
     --cflags)
-       	echo -n " -I${includedir} @GMP_CFLAGS@"
+       	${ECHOn} " -I${includedir} -I${includedir}/libpolys @GMP_CFLAGS@ @NTL_CFLAGS@ @FACTORY_CFLAGS@"
 	;;
 
     --libs)
-	echo -n " -L${libdir} -lpolys @GMP_LIBS@"
+	${ECHOn} " -L${libdir} -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lomalloc_g @USEPPROCSDYNAMICLD@ @GMP_LIBS@ @NTL_LIBS@ @FACTORY_LIBS@" 
 	;;
 
     *)
@@ -69,6 +72,6 @@ while test $# -gt 0; do
     esac
     shift
 done
-echo
+${ECHO}
 
 exit 0

@@ -29,6 +29,11 @@ else
   USE_P_PROCS_DYNAMIC_CC =
 endif
 
+lib_LIBRARIES=libpolys.a libpolys_g.a
+
+libpolys_a_includedir=$(includedir)/libpolys/polys
+libpolys_g_a_includedir=$(includedir)/libpolys/polys
+
 SOURCES = \
 	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
@@ -43,9 +48,8 @@ BUILT_SOURCES = templates/p_Procs.inc
 
 noinst_HEADERS =
 
-include_HEADERS = \
-	monomials/ring.h nc/nc.h \
-  nc/sca.h nc/summator.h nc/ncSAFormula.h nc/ncSACache.h nc/ncSAMult.h \
+LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
+	nc/nc.h nc/sca.h nc/summator.h nc/ncSAFormula.h nc/ncSACache.h nc/ncSAMult.h \
 	pInline0.h operations/pShallowCopyDelete.h \
 	templates/p_MemAdd.h templates/p_MemCmp.h templates/p_MemCopy.h operations/p_Mult_q.h \
 	templates/p_Numbers.h templates/p_Procs.h templates/mod_raw.h \
@@ -53,6 +57,10 @@ include_HEADERS = \
 	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h matpol.h \
 	ext_fields/algext.h clapsing.h clapconv.h
+
+### nobase_include_HEADERS = $(LIBPOLYSHEADERS)
+
+
 
 P_PROCS_CPPFLAGS_COMMON = -DHAVE_CONFIG_H -DDYNAMIC_VERSION 
 
@@ -102,23 +110,25 @@ p_Procs_FieldQ_g_la_SOURCES = ${P_PROCS}
 p_Procs_FieldZp_g_la_SOURCES = ${P_PROCS}
 
 
-
-lib_LIBRARIES=libpolys.a libpolys_g.a
-
-moduledir = ${libdir}/singular/MOD/
+moduledir = $(libdir)/libpolys/MOD/
 
 if ENABLE_P_PROCS_DYNAMIC
   module_LTLIBRARIES=p_Procs_FieldGeneral.la p_Procs_FieldIndep.la p_Procs_FieldQ.la p_Procs_FieldZp.la \
                      p_Procs_FieldGeneral_g.la p_Procs_FieldIndep_g.la p_Procs_FieldQ_g.la p_Procs_FieldZp_g.la
 endif
 
+
+nobase_libpolys_a_include_HEADERS = $(LIBPOLYSHEADERS)
+nobase_libpolys_g_a_include_HEADERS = $(LIBPOLYSHEADERS)
+
+
 libpolys_a_SOURCES = ${SOURCES}
 libpolys_g_a_SOURCES = ${SOURCES}
 
-EXTRA_libpolys_a_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
+## libpolys_adir = $(libdir)/libpolys
+## libpolys_g_adir = $(libdir)/libpolys
 
-libpolys_a_includedir  =$(includedir)/libpolys/polys
-libpolys_g_a_includedir=$(includedir)/libpolys/polys
+EXTRA_libpolys_a_SOURCES = templates/p_Procs_Static.cc templates/p_Procs_Dynamic.cc
 
 EXTRA_PROGRAMS = templates/p_Procs_Generate
 templates_p_Procs_Generate_SOURCES = templates/p_Procs_Generate.cc

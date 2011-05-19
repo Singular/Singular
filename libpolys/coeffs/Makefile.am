@@ -12,14 +12,12 @@ libcoeffs_a_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 libcoeffs_g_a_CPPFLAGS = -DHAVE_CONFIG_H
 
 
-include_HEADERS = coeffs.h numbers.h
-
 noinst_HEADERS= \
 	gnumpc.h gnumpfl.h longrat.h modulop.h ffields.h \
 	rintegers.h rmodulo2m.h rmodulon.h shortfl.h \
 	mpr_complex.h mpr_global.h
 
-INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
+INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${FACTORY_CFLAGS} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
 SOURCES = \
 	numbers.cc rintegers.cc rmodulo2m.cc rmodulon.cc shortfl.cc \
@@ -28,10 +26,13 @@ SOURCES = \
 libcoeffs_a_SOURCES   = $(SOURCES)
 libcoeffs_g_a_SOURCES = $(SOURCES)
 
+
+## include_HEADERS = coeffs.h numbers.h
+
 libcoeffs_a_includedir  =$(includedir)/libpolys/coeffs
 libcoeffs_g_a_includedir=$(includedir)/libpolys/coeffs
 
-COEFFSHEADERS  = coeffs.h numbers.h
+COEFFSHEADERS  = coeffs.h numbers.h si_gmp.h
 libcoeffs_a_include_HEADERS   = $(COEFFSHEADERS)
 libcoeffs_g_a_include_HEADERS = $(COEFFSHEADERS)
 
@@ -45,8 +46,8 @@ check_PROGRAMS = test test-g
 test_SOURCES   = test.cc
 test_g_SOURCES = test.cc
 
-test_LDADD   = -lcoeffs ${GMP_LIBS} ${NTL_LIBS} -lresources -lreporter -lmisc -lfactory -lomalloc
-test_g_LDADD = -lcoeffs_g ${GMP_LIBS} ${NTL_LIBS} -lresources_g -lreporter_g -lmisc_g -lfactory_g -lomalloc_debug
+test_LDADD   = -lcoeffs ${GMP_LIBS} ${NTL_LIBS} -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc
+test_g_LDADD = -lcoeffs_g ${GMP_LIBS} ${NTL_LIBS} ${FACTORY_LIBS} -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g
 
 
 
