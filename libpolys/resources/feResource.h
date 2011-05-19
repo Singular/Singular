@@ -5,7 +5,8 @@
 #include <sys/param.h>
 #endif
 
-#include <omalloc/mylimits.h>
+#include <misc/auxiliary.h>
+#include <misc/mylimits.h>
 
 #define DIR_SEP '/'
 #define DIR_SEPP "/"
