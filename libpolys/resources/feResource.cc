@@ -78,11 +78,13 @@ static feResourceConfig_s feResourceConfigs[] =
    "$SINGULARPATH;"
    "%b/LIB;"
    "%b/MOD;"
+   "%b/../lib/libpolys/MOD;"
    "%r/LIB;"
    "%r/../LIB;"
    "%d/LIB;"
    "%d/../LIB;"
    "%b/gftables;"
+   "%b/../share/gftables;"
    "%b/../../../factory/gftables;"
    "%b/../../factory/gftables",
    ""},
