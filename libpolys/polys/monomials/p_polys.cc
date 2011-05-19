@@ -1482,9 +1482,18 @@ void p_Monic(poly &p, ring r)
   poly pp = p;
   number lc = p_GetCoeff(p, r);
   if (n_IsOne(lc, r->cf)) return;
-  number n = n_Init(1, r->cf);
-  p_SetCoeff(p, n, r);
+
+  if( pNext(p) == NULL )
+  { 
+     p_SetCoeff(p, n_Init(1, r->cf), r); // will delete the leading coeff 1st!
+     return;
+  }
+   
+  // TODO: consider unsing 1xn_Inverse + n_Mult instead of multiple n_Div
+  p_SetCoeff0(p, n_Init(1, r->cf), r); // no coeff destruction!
+   
   p = pIter(p);
+   
   while (p != NULL)
   {
     number c = p_GetCoeff(p, r);
