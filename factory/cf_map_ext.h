@@ -20,6 +20,10 @@
 
 #include <config.h>
 
+int findItem (const CFList& list, const CanonicalForm& item);
+
+CanonicalForm getItem (const CFList& list, const int& pos);
+
 CanonicalForm GFMapUp (const CanonicalForm & F, int k);
 
 CanonicalForm GFMapDown (const CanonicalForm & F, int k);
@@ -45,7 +49,23 @@ CanonicalForm GF2FalphaRep (const CanonicalForm& F, const Variable& alpha);
 
 CanonicalForm Falpha2GFRep (const CanonicalForm& F);
 
-#ifdef HAVE_NTL
+/// map from \f$ F_p(\alpha) \f$ to \f$ F_p(\beta) \f$ such that 
+/// \f$ F\in\F_p(\alpha) \f$ is mapped onto \f$ \beta \f$
+///
+/// @return @a map returns the image of @a primElem such that the above 
+/// described properties hold
+CanonicalForm
+map (const CanonicalForm& primElem,///< [in] primitive element of 
+                                   ///< \f$ F_p (\alpha) \f$
+     const Variable& alpha,        ///< [in] algebraic variable
+     const CanonicalForm& F,       ///< [in] an element of \f$ F_p (\alpha) \f$,
+                                   ///< whose minimal polynomial defines a field
+                                   ///< extension of \f$ F_p \f$ of degree
+                                   ///< \f$ \[F_p (\alpha):F_p\] \f$
+     const Variable& beta          ///< [in] algebraic variable, root of \a F's
+                                   ///< minimal polynomial
+    );
+
 /// compute minimal polynomial of \f$ F\in\F_p(\alpha)\backslash\F_p \f$ via NTL
 ///
 /// @return @a findMinPoly computes the minimal polynomial of F
@@ -54,5 +74,5 @@ findMinPoly (const CanonicalForm& F, ///< [in] an element of
                                      ///< \f$ \F_p(\alpha)\backslash\F_p \f$
              const Variable& alpha   ///< [in] algebraic variable
             );
-#endif
+
 #endif
