@@ -9,6 +9,7 @@
 */
 #include <omalloc/omalloc.h>
 #include <polys/monomials/ring.h>
+#include <polys/matpol.h>
 
 struct sip_sideal
 {
@@ -30,9 +31,6 @@ struct sip_smap
   int nrows;
   int ncols;
 };
-
-class ip_smatrix;
-typedef ip_smatrix *       matrix;
 
 struct sideal_list;
 typedef struct sideal_list *      ideal_list;

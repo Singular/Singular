@@ -30,6 +30,8 @@ class ip_smatrix
   #define MATELEM(mat,i,j) ((mat)->m)[MATCOLS((mat)) * ((i)-1) + (j)-1]
 };
 
+typedef ip_smatrix *       matrix;
+
 matrix mpNew(int r, int c);
 static inline matrix mp_New(int r, int c){ return mpNew(r,c); }
 

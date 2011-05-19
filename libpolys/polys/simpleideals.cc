@@ -16,14 +16,15 @@
 #include <misc/options.h>
 #include <misc/intvec.h>
 
-#include <coeffs/longrat.h>
-  
+// #include <coeffs/longrat.h>
+#include "matpol.h"
+ 
 #include "monomials/p_polys.h"
 #include "weight.h"
-#include "matpol.h"
-#include "simpleideals.h"
 #include "sbuckets.h"
 #include "clapsing.h"
+
+#include "simpleideals.h"
 
 omBin sip_sideal_bin = omGetSpecBin(sizeof(sip_sideal));
 

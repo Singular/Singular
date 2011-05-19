@@ -10,18 +10,20 @@
 /* includes */
 #include <math.h>
 
-// #include <polys/options.h>
 #include <omalloc/omalloc.h>
 #include <misc/options.h>
-#include <polys/monomials/ring.h>
+#include <misc/intvec.h>
+
+#include <coeffs/numbers.h>
+#include <coeffs/coeffs.h>
+
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
-#include <coeffs/numbers.h>
 // #include <???/febase.h>
 // #include <???/intvec.h>
 #include <polys/ext_fields/longalg.h>
 #include <polys/ext_fields/longtrans.h>
-#include <coeffs/ffields.h>
+// #include <coeffs/ffields.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/maps.h>
 #include <polys/prCopy.h>
@@ -29,6 +31,8 @@
 #include <polys/templates/p_Procs.h>
 
 #include <polys/matpol.h>
+
+#include <polys/monomials/ring.h>
 
 #ifdef HAVE_PLURAL
 #include <polys/nc/nc.h>
