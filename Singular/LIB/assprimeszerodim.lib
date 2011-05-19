@@ -261,24 +261,29 @@ EXAMPLE: example assPrimes; shows an example
       int n = 1;
    }
 
+   int T = timer;
+   int RT = rtimer;
+   int TT;
+
    def SPR = basering;
+   if(printlevel >= 10) { "========== Start modStd =========="; }
    I = modStd(I,n);
+   if(printlevel >= 10) { "=========== End modStd ==========="; }
+   if(printlevel >= 9) { "modStd takes "+string(rtimer-RT)+" seconds."; }
    int d = vdim(I);
    if(d == -1) { ERROR("Ideal is not zero-dimensional."); }
    if(homog(I) == 1){ return(list(maxideal(1))); }
    poly f = findGen(I);
+   if(printlevel >= 9) { "Coordinate change: "+string(f); }
 
-   int T = timer;
-   int RT = rtimer;
-   int TT;
    if(size(f) == nvars(SPR))
    {
       TT = timer;
       int spT = pTestRad(d,f,I);
-      if(printlevel>=10)
+      if(printlevel >= 9)
       {
-         "pTestRad(d,f,I) = "+string(spT)+" and takes
-         "+string(timer-TT)+" seconds.";
+         "pTestRad(d,f,I) = "+string(spT)+" and takes "
+         +string(timer-TT)+" seconds.";
       }
       if(!spT)
       {
@@ -288,13 +293,13 @@ EXAMPLE: example assPrimes; shows an example
             {
                TT = timer;
                I = zeroR(I,n);
-               if(printlevel>=10)
+               if(printlevel >= 9)
                {
                   "zeroR(I,n) takes "+string(timer-TT)+" seconds.";
                }
                TT = timer;
                I = std(I);
-               if(printlevel>=10)
+               if(printlevel >= 9)
                {
                   "std(I) takes "+string(timer-TT)+" seconds.";
                }
@@ -306,13 +311,13 @@ EXAMPLE: example assPrimes; shows an example
          {
             TT = timer;
             I = zeroR(I,n);
-            if(printlevel>=10)
+            if(printlevel >= 9)
             {
                "zeroR(I,n) takes "+string(timer-TT)+" seconds.";
             }
             TT = timer;
             I = std(I);
-            if(printlevel>=10)
+            if(printlevel >= 9)
             {
                "std(I) takes "+string(timer-TT)+" seconds.";
             }
@@ -321,7 +326,7 @@ EXAMPLE: example assPrimes; shows an example
          }
       }
    }
-   if(printlevel>=10)
+   if(printlevel >= 9)
    {
       "Real-time for radical-check is "+string(rtimer - RT)+" seconds.";
       "CPU-time for radical-check is "+string(timer - T)+" seconds.";
@@ -340,12 +345,12 @@ EXAMPLE: example assPrimes; shows an example
    list Re;
 
    ring rHelp = 0,T,dp;
-   list CO1,CO2,P;
+   list CO1,CO2,P,H;
    ideal F,G,testF;
    bigint N;
 
    list ringL = ringlist(SPR);
-   int i,k,e,int_break;
+   int i,k,e,int_break,s;
    int j = 1;
    int index = 1;
 
@@ -436,7 +441,7 @@ EXAMPLE: example assPrimes; shows an example
             j++;
          }
       }
-      if(printlevel>=10)
+      if(printlevel >= 9)
       {
          "Real-time for computing list in assPrimes is "+string(rtimer - rt)+
          " seconds.";
@@ -451,18 +456,16 @@ EXAMPLE: example assPrimes; shows an example
       F = farey(G,N);
       if(F[1]-testF[1]==0)
       {
-         if(printlevel>=10)
-         {
-            "size(L) = "+string(size(L));
-         }
+         if(printlevel >= 9) { "size(L) = "+string(size(L)); }
+         
          F = cleardenom(F[1]);
 
          e = deg(F[1]);
          if(e == d)
          {
-            list H = factorize(F[1]);
+            H = factorize(F[1]);
 
-            int s = size(H[1]);
+            s = size(H[1]);
             for(i = 1; i <= s; i++)
             {
                if(H[2][i] != 1)
@@ -476,7 +479,7 @@ EXAMPLE: example assPrimes; shows an example
                setring SPR;
                map phi = rHelp,var(nvars(SPR));
                list H = phi(H);
-               if(printlevel>=10)
+               if(printlevel >= 9)
                {
                   "Real-time without test is "+string(rtimer - RT)+" seconds.";
                   "CPU-time without test is "+string(timer - T)+" seconds.";
@@ -524,7 +527,7 @@ EXAMPLE: example assPrimes; shows an example
                      }
                      if(F1 != 0) { int_break = 1; }
                   }
-                  if(printlevel>=10)
+                  if(printlevel >= 9)
                   {
                      "Real-time for test is "+string(rtimer - RT)+" seconds.";
                      "CPU-time for test is "+string(timer - T)+" seconds.";
@@ -578,6 +581,7 @@ example
    2fa+f+2eb+2dc;
    assPrimes(I);
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static proc specialAlgDepEHV(poly p, ideal I)
