@@ -80,8 +80,8 @@ BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
 }
 #endif
 
-void heuristicReduce(poly p, poly reducer, const coeffs cf);
-void definiteReduce(poly p, poly reducer, const coeffs cf);
+void heuristicReduce(poly &p, poly reducer, const coeffs cf);
+void definiteReduce(poly &p, poly reducer, const coeffs cf);
 
 BOOLEAN naIsZero(number a, const coeffs cf)
 {
@@ -335,8 +335,9 @@ void naPower(number a, int exp, number *b, const coeffs cf)
 /* may reduce p module the reducer by calling definiteReduce;
    the decision is made based on the following heuristic
    (which should also only be changed here in this method):
-      if (deg(p) > 10*deg(reducer) then perform reduction */
-void heuristicReduce(poly p, poly reducer, const coeffs cf)
+      if (deg(p) > 10*deg(reducer) then perform reduction;
+   modifies p */
+void heuristicReduce(poly &p, poly reducer, const coeffs cf)
 {
   #ifdef LDEBUG
   p_Test((poly)p, naRing);
@@ -424,8 +425,9 @@ int naSize(number a, const coeffs cf)
 }
 
 /* performs polynomial division and overrides p by the remainder
-   of division of p by the reducer */
-void definiteReduce(poly p, poly reducer, const coeffs cf)
+   of division of p by the reducer;
+   modifies p */
+void definiteReduce(poly &p, poly reducer, const coeffs cf)
 {
   #ifdef LDEBUG
   p_Test((poly)p, naRing);
@@ -447,6 +449,7 @@ number naInvers(number a, const coeffs cf)
   if (a == NULL) WerrorS(nDivBy0);
   poly aFactor = NULL; poly mFactor = NULL;
   poly theGcd = p_ExtGcd((poly)a, aFactor, naMinpoly, mFactor, naRing);
+  naTest((number)theGcd); naTest((number)aFactor); naTest((number)mFactor);
   /* the gcd must be 1 since naMinpoly is irreducible and a != NULL: */
   assume(naIsOne((number)theGcd, cf));      
   p_Delete(&theGcd, naRing);

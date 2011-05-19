@@ -208,6 +208,15 @@ void Test(const ring r)
 class PolysTestSuite : public CxxTest::TestSuite 
 {
 private:
+  void checkInverse(number n, const coeffs cf)
+  {
+    clog << "n = "; n_Write(n, cf);
+    number n1 = n_Invers(n, cf);
+    clog << "==> n^(-1) = "; n_Write(n1, cf);
+    number n2 = n_Mult(n, n1, cf);
+    clog << "(check: n * n^(-1) = "; n_Write(n2, cf);
+    n_Delete(&n1, cf); n_Delete(&n2, cf);
+  }
   void TestArithCf(const coeffs r)
   {
     clog << ("TEST: Simple Arithmetics: ");
@@ -591,6 +600,27 @@ public:
     TS_ASSERT_EQUALS(rVar(s), 2);
 
     Test(s);
+    
+    clog << endl
+         << "Now let's compute some inverses in Q[a]/<a2+1>..."
+         << endl;
+         
+    number a = n_Par(1, cf);
+    number n1 = n_Init(1, cf);
+    number n5 = n_Init(5, cf);
+    number n17 = n_Init(17, cf);
+    number u; number v;
+    
+    u = n_Add(a, n1, cf); checkInverse(u, cf); n_Delete(&u, cf); // a + 1
+    u = n_Sub(a, n1, cf); checkInverse(u, cf); n_Delete(&u, cf); // a - 1
+    u = n_Add(a, n5, cf); checkInverse(u, cf); n_Delete(&u, cf); // a + 5
+    u = n_Sub(a, n5, cf); checkInverse(u, cf); n_Delete(&u, cf); // a - 5
+    v = n_Mult(a, n17, cf);
+    u = n_Add(v, n5, cf); n_Delete(&v, cf);                      // 17a + 5
+       checkInverse(u, cf); n_Delete(&u, cf);
+    
+    n_Delete(&a, cf); n_Delete(&n1, cf); n_Delete(&n5, cf);
+    n_Delete(&n17, cf);
 
     rDelete(s); // kills 'cf' and 'r' as well
   }
