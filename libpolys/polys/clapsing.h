@@ -11,7 +11,6 @@
 #ifndef INCL_FACTORYSING_H
 #define INCL_FACTORYSING_H
 
-// #include <kernel/structs.h>
 #include <polys/monomials/p_polys.h>
 #include <polys/monomials/ring.h>
 #include <polys/simpleideals.h>
