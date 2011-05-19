@@ -121,6 +121,8 @@ BOOLEAN simple(const n_coeffType _type, cfInitCharProc p, void* param = NULLp)
   return ( Test(type, param) );
 }
 
+
+
 int main( int, char *argv[] ) 
 {
   feInitResources(argv[0]);
@@ -128,20 +130,39 @@ int main( int, char *argv[] )
   StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
   feStringAppendResources(0);
   PrintS(StringAppendS("\n"));
-
-  extern BOOLEAN nlInitChar(coeffs, void*);
-  extern BOOLEAN npInitChar(coeffs, void*);
-
-
+  // longrat
+  extern BOOLEAN nlInitChar(coeffs, void*); // Q
   if( simple(n_Q, nlInitChar) )
     PrintS("Q: Test Passed!");
   else 
     PrintS("Q: Test: Failed!");
   PrintLn();
 
+  // modulop
+  extern BOOLEAN npInitChar(coeffs, void*); // Zp
   if( simple(n_Zp, npInitChar, (void*)7) )
     PrintS("Zp: Test Passed!");
   else 
     PrintS("Zp: Test: Failed!");
   PrintLn();
+  
+  // due to coeffs/ffields.h
+  extern BOOLEAN nfInitChar(coeffs, void*); // GF
+  struct 
+  {
+    int GFChar;
+    int GFDegree;
+    char* GFPar_name;
+  } param;
+
+  param.GFChar= 5;
+  param.GFDegree= 2;
+  param.GFPar_name= (const char*)"Q";
+
+  if( simple(n_GF, nfInitChar, (void*)&param) )
+    PrintS("GF: Test Passed!");
+  else 
+    PrintS("GF: Test: Failed!");
+  PrintLn();
+ 
 }
