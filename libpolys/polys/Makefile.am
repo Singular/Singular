@@ -151,6 +151,6 @@ libpolys_g_a_CXXFLAGS = ${DEBUGCXXFLAGS}
 dynamic_modules: ${module_LTLIBRARIES}
 
 prCopy.inc: prCopy.pl
-	perl prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
+	perl ${srcdir}/prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
 
 prCopy.o: prCopy.inc
