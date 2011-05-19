@@ -1429,51 +1429,61 @@ void p_Lcm(poly a, poly b, poly m, const ring r)
   /* Don't do a pSetm here, otherwise hres/lres chockes */
 }
 
-/* assumes that *p and divisor are univariate polynomials in r,
+/* assumes that p and divisor are univariate polynomials in r,
    mentioning the same variable;
    assumes divisor != NULL;
-   *p may be NULL;
+   p may be NULL;
    assumes a global monomial ordering in r;
-   performs polynomial division of *p by divisor:
-     - afterwards *p contains the remainder of the division, i.e.,
-       *p_before = result * divisor + *p_afterwards;
+   performs polynomial division of p by divisor:
+     - afterwards p contains the remainder of the division, i.e.,
+       p_before = result * divisor + p_afterwards;
      - if needResult == TRUE, then the method computes and returns 'result',
        otherwise NULL is returned (This parametrization can be used when
        one is only interested in the remainder of the division. In this
-       case, the method will be faster.) */
-poly p_PolyDiv(poly * p, poly divisor, BOOLEAN needResult, ring r)
+       case, the method will be slightly faster.)
+   leaves divisor unmodified */
+poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
 {
+//printf("p_PolyDiv:\n");
   assume(divisor != NULL);
-  if (*p == NULL) return NULL;
+  if (p == NULL) return NULL;
   
   poly result = NULL;
-  number divisorLT = p_GetCoeff(divisor, r);
-  int divisorExp = p_GetExp(divisor, 1, r);
-  while (p_Deg(*p, r) > p_Deg(divisor, r))
+  number divisorLC = p_GetCoeff(divisor, r);
+  int divisorLE = p_GetExp(divisor, 1, r);
+//p_Write(p, r); p_Write(divisor, r);
+  while ((p != NULL) && (p_Deg(p, r) > p_Deg(divisor, r)))
   {
-    /* determine t = LT(*p) / LT(divisor) */
+    /* determine t = LT(p) / LT(divisor) */
     poly t = p_ISet(1, r);
-    number c = n_Div(p_GetCoeff(*p, r), divisorLT, r->cf);
+    number c = n_Div(p_GetCoeff(p, r), divisorLC, r->cf);
     p_SetCoeff(t, c, r);
-    int e = p_GetExp(*p, 1, r) - divisorExp;
+    int e = p_GetExp(p, 1, r) - divisorLE;
     p_SetExp(t, 1, e, r);
     p_Setm(t, r);
-    result = p_Add_q(result, p_Copy(t, r), r);
-    *p = p_Add_q(*p, p_Neg(t, r), r);
+//printf("t\n"); p_Write(t, r);
+    if (needResult) result = p_Add_q(result, p_Copy(t, r), r);
+//t = p_Mult_q(t, p_Copy(divisor, r), r); p_Write(t, r);
+//t = p_Neg(t, r); p_Write(t, r);
+//printf("p\n"); p_Write(p, r);
+//t = p_Add_q(p, t, r); p_Write(t, r);
+//p = t;
+    p = p_Add_q(p, p_Neg(p_Mult_q(t, p_Copy(divisor, r), r), r), r);
+//printf("EXECUTION STOPPED\n"); while (1) { };
   }
-  n_Delete(&divisorLT, r->cf);
+  n_Delete(&divisorLC, r->cf);
   return result;
 }
 
 /* see p_Gcd;
-   additional assumption: deg(*p) >= deg(*q);
-   must destroy *p and *q (unless one of them is returned) */
-poly p_GcdHelper(poly * p, poly * q, ring r)
+   additional assumption: deg(p) >= deg(q);
+   must destroy p and q (unless one of them is returned) */
+poly p_GcdHelper(poly &p, poly &q, ring r)
 {
-  if (q == NULL) return *p;
+  if (q == NULL) return p;
   else
   {
-    p_PolyDiv(p, *q, FALSE, r);
+    p_PolyDiv(p, q, FALSE, r);
     return p_GcdHelper(q, p, r);
   }
 }
@@ -1491,28 +1501,30 @@ poly p_Gcd(poly p, poly q, ring r)
   poly a = p; poly b = q;
   if (p_Deg(a, r) < p_Deg(b, r)) { a = q; b = p; }
   a = p_Copy(a, r); b = p_Copy(b, r);
-  return p_GcdHelper(&a, &b, r);
+  return p_GcdHelper(a, b, r);
 }
 
 /* see p_ExtGcd;
-   additional assumption: deg(*p) >= deg(*q);
-   must destroy *p and *q (unless one of them is returned) */
-poly p_ExtGcdHelper(poly * p, poly * pFactor, poly * q, poly * qFactor,
+   additional assumption: deg(p) >= deg(q);
+   must destroy p and q (unless one of them is returned) */
+poly p_ExtGcdHelper(poly &p, poly &pFactor, poly &q, poly &qFactor,
                     ring r)
 {
+//printf("p_ExtGcdHelper:\n");
   if (q == NULL)
   {
-    *qFactor = NULL; *pFactor = p_ISet(1, r); return *p;
+    qFactor = NULL; pFactor = p_ISet(1, r); return p;
   }
   else
   {
-    poly pDivQ = p_PolyDiv(p, *q, TRUE, r);
-    poly * ppFactor; poly * qqFactor;
+//p_Write(p, r); p_Write(q, r);
+    poly pDivQ = p_PolyDiv(p, q, TRUE, r);
+    poly ppFactor; poly qqFactor;
     poly theGcd = p_ExtGcdHelper(q, ppFactor, p, qqFactor, r);
     pFactor = qqFactor;
-    *qFactor = p_Add_q(*ppFactor,
-                       p_Neg(p_Mult_q(pDivQ, p_Copy(*qqFactor, r), r), r),
-                       r);
+    qFactor = p_Add_q(ppFactor,
+                      p_Neg(p_Mult_q(pDivQ, p_Copy(qqFactor, r), r), r),
+                      r);
     return theGcd;
   }
 }
@@ -1522,19 +1534,20 @@ poly p_ExtGcdHelper(poly * p, poly * pFactor, poly * q, poly * qFactor,
    assumes a global monomial ordering in r;
    assumes that not both p and q are NULL;
    returns the gcd of p and q;
-   moreover, afterwards *pFactor and *qFactor contain appropriate
-   factors such that gcd(p, q) = p * (*pFactor) + q * (*qFactor);
+   moreover, afterwards pFactor and qFactor contain appropriate
+   factors such that gcd(p, q) = p * pFactor + q * qFactor;
    leaves p and q unmodified */
-poly p_ExtGcd(poly p, poly * pFactor, poly q, poly * qFactor, ring r)
+poly p_ExtGcd(poly p, poly &pFactor, poly q, poly &qFactor, ring r)
 {
-  assume((p != NULL) || (q != NULL));
-  
+//printf("p_ExtGcd:\n");
+//p_Write(p, r); p_Write(q, r);
+  assume((p != NULL) || (q != NULL));  
   poly a = p; poly b = q;
-  poly * aFactor = pFactor; poly * bFactor = qFactor; 
+  poly aFactor = pFactor; poly bFactor = qFactor; 
   if (p_Deg(a, r) < p_Deg(b, r))
   { a = q; b = p; aFactor = qFactor, bFactor = pFactor; }
   a = p_Copy(a, r); b = p_Copy(b, r);
-  return p_ExtGcdHelper(&a, aFactor, &b, bFactor, r);
+  return p_ExtGcdHelper(a, aFactor, b, bFactor, r);
 }
 
 /*2

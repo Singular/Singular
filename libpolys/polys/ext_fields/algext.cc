@@ -73,9 +73,8 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
 {
   assume(getCoeffType(cf) == naID);
-  #ifdef LDEBUG
-  omCheckAddr(&a);
-  #endif
+  if (a == NULL) return TRUE;
+  p_Test((poly)a, naRing); // cannot use omCheckAddrSize(a, sizeof(*a)) here
   assume(p_Deg((poly)a, naRing) <= p_Deg(naMinpoly, naRing));
   return TRUE;
 }
@@ -429,7 +428,7 @@ void definiteReduce(poly p, poly reducer, const coeffs cf)
   #ifdef LDEBUG
   omCheckAddr(p); omCheckAddr(reducer);
   #endif
-  p_PolyDiv(&p, reducer, FALSE, naRing);
+  p_PolyDiv(p, reducer, FALSE, naRing);
 }
 
 number naGcd(number a, number b, const coeffs cf)
@@ -443,13 +442,13 @@ number naInvers(number a, const coeffs cf)
 {
   naTest(a);
   if (a == NULL) WerrorS(nDivBy0);
-  poly *aFactor; poly *mFactor;
+  poly aFactor; poly mFactor;
   poly theGcd = p_ExtGcd((poly)a, aFactor, naMinpoly, mFactor, naRing);
   /* the gcd must be one since naMinpoly is irreducible and a != NULL: */
   assume(naIsOne((number)theGcd, cf));      
   p_Delete(&theGcd, naRing);
-  p_Delete(mFactor, naRing);
-  return (number)(*aFactor);
+  p_Delete(&mFactor, naRing);
+  return (number)(aFactor);
 }
 
 /* assumes that src = Q, dst = Q(a) */
