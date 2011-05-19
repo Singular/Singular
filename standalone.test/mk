@@ -1,0 +1,27 @@
+#! /bin/sh
+
+
+#############################################################################################################
+# !!!!!!!!!!!!!!!!! Please put a copy of the installed '$PREFIX/bin/libpolys-config' here !!!!!!!!!!!!!!!!!!!
+#############################################################################################################
+
+
+
+NAME="test"
+
+LIBPOLYSCFLAGS="`sh libpolys-config --cflags` -g -Wextra -Wall -Wno-long-long  -O0 --no-exceptions"
+LIBPOLYSLIBS=`sh libpolys-config --libs`
+LIBPOLYSPREFIX=`sh libpolys-config --prefix`
+
+echo "Using libpolys from: '$LIBPOLYSPREFIX'"
+echo "Using        CFLAGS: '$LIBPOLYSCFLAGS'"
+echo "Using          LIBS: '$LIBPOLYSLIBS'"
+
+CMD="g++ $LIBPOLYSCFLAGS -c $NAME.cc " 
+echo "executing '$CMD':"
+$CMD
+
+
+CMD="g++ -g -Wextra -Wall -Wno-long-long -O0 --no-exceptions -rdynamic $NAME.o -o $NAME $LIBPOLYSLIBS" 
+echo "executing '$CMD':"
+$CMD
