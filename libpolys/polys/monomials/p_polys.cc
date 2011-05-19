@@ -1461,12 +1461,13 @@ poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
     int e = p_GetExp(p, 1, r) - divisorLE;
     p_SetExp(t, 1, e, r);
     p_Setm(t, r);
+//printf("t\n");
+//p_Write(t, r);
     if (needResult) result = p_Add_q(result, p_Copy(t, r), r);
     p = p_Add_q(p, p_Neg(p_Mult_q(t, p_Copy(divisor, r), r), r), r);
+//printf("p\n");
+//p_Write(p, r);
   }
-  n_Delete(&divisorLC, r->cf);
-//printf("p_PolyDiv result:\n");
-//p_Write(result, r);
   return result;
 }
 
@@ -1542,6 +1543,8 @@ poly p_ExtGcdHelper(poly &p, poly &pFactor, poly &q, poly &qFactor,
     qFactor = NULL;
     pFactor = p_ISet(1, r);
     number n = p_GetCoeff(pFactor, r);
+//printf("p_ExtGcdHelper0:\n");
+//p_Write(p, r);
     p_SetCoeff(pFactor, n_Invers(p_GetCoeff(p, r), r->cf), r);
     n_Delete(&n, r->cf);
     p_Monic(p, r);
