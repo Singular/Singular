@@ -208,7 +208,7 @@ EXAMPLE: example pTestSB; shows an example
    j = 1;
    if(isIncluded(I,J) == 0) { j = 0; }
 
-   if(printlevel >= 10)
+   if(printlevel >= 11)
    {
       "isIncluded(I,J) takes "+string(timer - t)+" seconds";
       "j = "+string(j);
@@ -228,7 +228,7 @@ EXAMPLE: example pTestSB; shows an example
       t = timer;
       if(isIncluded(J,K) == 0) { j = 0; }
 
-      if(printlevel >= 10)
+      if(printlevel >= 11)
       {
          "isIncluded(K,J) takes "+string(timer - t)+" seconds";
          "j = "+string(j);
@@ -1035,8 +1035,6 @@ EXAMPLE: example modStd; shows an example
          "Real-time for computing list is "+string(rtimer - rt)+" seconds.";
       }
 
-      if(pd > 2) { "lifting"; }
-
 //------------------------  Delete unlucky primes  -----------------------------
 //-------------  unlucky if and only if the leading ideal is wrong  ------------
 
@@ -1047,15 +1045,17 @@ EXAMPLE: example modStd; shows an example
 //-------------------  Now all leading ideals are the same  --------------------
 //-------------------  Lift results to basering via farey  ---------------------
 
+      tt = timer;     
       N = T2[1];
-      for(i = 2; i <= size(T2); i++){N = N*T2[i];}
+      for(i = 2; i <= size(T2); i++) { N = N*T2[i]; }
       H = chinrem(T1,T2);
       J = farey(H,N);
+      if(printlevel >= 10) { "Lifting-process takes "+string(timer - tt)
+                             +" seconds"; }
 
 //----------------  Test if we already have a standard basis of I --------------
 
       tt = timer; rt = rtimer;
-      if(pd > 2) { "list of primes:"; L; "pTest"; }
       if((variant == 1) || (variant == 3) || (variant == 4) || (variant == 6))
       {
          pTest = pTestSB(I,J,L,variant,hi);
@@ -1075,10 +1075,10 @@ EXAMPLE: example modStd; shows an example
       {
          if(printlevel >= 10)
          {
-            "CPU-time for computation without final tests is
-            "+string(timer - TT)+" seconds.";
-            "Real-time for computation without final tests is
-            "+string(rtimer - RT)+" seconds.";
+            "CPU-time for computation without final tests is "
+            +string(timer - TT)+" seconds.";
+            "Real-time for computation without final tests is "
+            +string(rtimer - RT)+" seconds.";
          }
 
          attrib(J,"isSB",1);
@@ -1087,10 +1087,10 @@ EXAMPLE: example modStd; shows an example
 
          if(printlevel >= 10)
          {
-            "CPU-time for checking if I subset <G> is
-            "+string(timer - tt)+" seconds.";
-            "Real-time for checking if I subset <G> is
-            "+string(rtimer - rt)+" seconds.";
+            "CPU-time for checking if I subset <G> is "
+            +string(timer - tt)+" seconds.";
+            "Real-time for checking if I subset <G> is "
+            +string(rtimer - rt)+" seconds.";
          }
 
          if(sizeTest == 0)
@@ -1111,10 +1111,10 @@ EXAMPLE: example modStd; shows an example
 
                if(printlevel >= 10)
                {
-                  "CPU-time for last std-computation is
-                  "+string(timer - tt)+" seconds.";
-                  "Real-time for last std-computation is
-                  "+string(rtimer - rt)+" seconds.";
+                  "CPU-time for last std-computation is "
+                  +string(timer - tt)+" seconds.";
+                  "Real-time for last std-computation is "
+                  +string(rtimer - rt)+" seconds.";
                }
 
                if(size(reduce(K,J)) == 0)
