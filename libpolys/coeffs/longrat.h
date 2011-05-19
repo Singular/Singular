@@ -9,7 +9,7 @@
 */
 #include <coeffs/coeffs.h>
 // #include "config.h"
-#include <coeffs/si_gmp.h>
+#include "si_gmp.h"
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
 

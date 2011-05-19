@@ -11,9 +11,7 @@
 #include <misc/auxiliary.h>
 
 
-
-#include <coeffs/coeffs.h>
-
+#include "coeffs.h"
 #include <coeffs/numbers.h>
 
 #include <reporter/reporter.h>
