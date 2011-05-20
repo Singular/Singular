@@ -208,6 +208,27 @@ void Test(const ring r)
 class PolysTestSuite : public CxxTest::TestSuite 
 {
 private:
+  /* replaces n by n + c * var^exp (in-place);
+     expects exp >= 0 */
+  void plusTerm(number &n, int c, int exp, const coeffs cf)
+  {
+    number x = n_Par(1, cf);
+    number pow = n_Init(1, cf);
+    number temp;
+    for (int i = 1; i <= exp; i++)
+    {
+      temp = n_Mult(pow, x, cf);
+      n_Delete(&pow, cf);
+      pow = temp;
+    }
+    n_Delete(&x, cf);
+    number m = n_Init(c, cf);
+    number t = n_Mult(m, pow, cf);
+    n_Delete(&m, cf); n_Delete(&pow, cf);
+    temp = n_Add(n, t, cf);
+    n_Delete(&n, cf); n_Delete(&t, cf);
+    n = temp;
+  }
   void checkInverse(number n, const coeffs cf)
   {
     clog << "n = "; n_Write(n, cf);
@@ -215,6 +236,7 @@ private:
     clog << "==> n^(-1) = "; n_Write(n1, cf);
     number n2 = n_Mult(n, n1, cf);
     clog << "(check: n * n^(-1) = "; n_Write(n2, cf);
+    TS_ASSERT( n_IsOne(n2, cf) );
     n_Delete(&n1, cf); n_Delete(&n2, cf);
   }
   void TestArithCf(const coeffs r)
@@ -602,25 +624,156 @@ public:
     Test(s);
     
     clog << endl
-         << "Now let's compute some inverses in Q[a]/<a2+1>..."
+         << "Now let's compute some inverses in Q[a]/<a^2+1>..."
+         << endl;
+    
+    number u;
+    u = NULL; plusTerm(u, 1, 1, cf); plusTerm(u, 1, 0, cf);  // a + 1
+    checkInverse(u, cf); n_Delete(&u, cf);
+    u = NULL; plusTerm(u, 1, 1, cf); plusTerm(u, -1, 0, cf); // a - 1
+    checkInverse(u, cf); n_Delete(&u, cf);
+    u = NULL; plusTerm(u, 1, 1, cf); plusTerm(u, 5, 0, cf);  // a + 5
+    checkInverse(u, cf); n_Delete(&u, cf);
+    u = NULL; plusTerm(u, 1, 1, cf); plusTerm(u, -5, 0, cf); // a - 5
+    checkInverse(u, cf); n_Delete(&u, cf);
+    u = NULL; plusTerm(u, 17, 1, cf); plusTerm(u, 5, 0, cf); // 17a + 5
+    checkInverse(u, cf); n_Delete(&u, cf);
+
+    rDelete(s); // kills 'cf' and 'r' as well
+  }
+  void test_Q_Ext_b()
+  {
+    clog << "Start by creating Q[b]..." << endl;
+
+    char* n[] = {"b"};
+    ring r = rDefault( 0, 1, n);   // Q[b]
+    TS_ASSERT_DIFFERS( r, NULLp );
+
+    PrintRing(r);
+
+    TS_ASSERT( rField_is_Domain(r) );
+    TS_ASSERT( rField_is_Q(r) );
+    
+    TS_ASSERT( !rField_is_Zp(r) );
+    TS_ASSERT( !rField_is_Zp(r, 11) );
+
+    TS_ASSERT_EQUALS( rVar(r), 1);
+
+    poly minPoly = p_ISet(1, r);                    // minPoly = 1
+    p_SetExp(minPoly, 1, 7, r); p_Setm(minPoly, r); // minPoly = b^7
+    minPoly = p_Add_q(minPoly, p_ISet(17, r), r);   // minPoly = b^7 + 17
+    ideal minIdeal = idInit(1);                     // minIdeal = < 0 >
+    minIdeal->m[0] = minPoly;                       // minIdeal = < b^7 + 17 >
+
+    n_coeffType type = nRegister(n_Ext, naInitChar); 
+    TS_ASSERT(type == n_Ext);
+
+    ExtInfo extParam;
+    extParam.r = r;
+    extParam.i = minIdeal;
+    
+    clog << "Next create the extension field Q[b]/<b^7+17>..." << endl;
+
+    const coeffs cf = nInitChar(type, &extParam);   // Q[b]/<b^7+17>
+    
+    if( cf == NULL )
+      TS_FAIL("Could not get needed coeff. domain");
+
+    TS_ASSERT_DIFFERS( cf->cfCoeffWrite, NULLp );
+  
+    if( cf->cfCoeffWrite != NULL )
+    {
+      clog << "Coeff-domain: "  << endl; 
+      n_CoeffWrite(cf); PrintLn();
+    }
+    
+    // some tests for the coefficient field represented by cf:
+    TestArithCf(cf);
+    TestSumCf(cf, 10);
+    TestSumCf(cf, 100);
+    TestSumCf(cf, 101);
+    TestSumCf(cf, 1001);
+    TestSumCf(cf, 9000);
+
+    clog << "Finally create the polynomial ring (Q[b]/<b^7+17>)[u, v, w]..."
+         << endl;
+    
+    char* m[] = {"u", "v", "w"};
+    ring s = rDefault(cf, 3, m);   // (Q[b]/<b^7+17>)[u, v, w]
+    TS_ASSERT_DIFFERS(s, NULLp);
+
+    PrintRing(s);
+
+    TS_ASSERT( rField_is_Domain(s) );
+    TS_ASSERT( !rField_is_Q(s) );
+    TS_ASSERT( !rField_is_Zp(s) );
+    TS_ASSERT( !rField_is_Zp(s, 11) );
+    TS_ASSERT( !rField_is_Zp(s, 13) );
+    TS_ASSERT( !rField_is_GF(s) );
+    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( !rField_is_GF(s, 25) );
+    TS_ASSERT_EQUALS(rVar(s), 3);
+
+    Test(s);
+    
+    clog << endl
+         << "Now let's compute some inverses in Q[b]/<b^7+17>..."
          << endl;
          
-    number a = n_Par(1, cf);
-    number n1 = n_Init(1, cf);
-    number n5 = n_Init(5, cf);
-    number n17 = n_Init(17, cf);
-    number u; number v;
+    number u;
+    u = NULL; plusTerm(u, 1, 2, cf); plusTerm(u, 33, 0, cf);    // b^2 + 33
+    checkInverse(u, cf); n_Delete(&u, cf);
+    u = NULL; plusTerm(u, 1, 5, cf); plusTerm(u, -137, 0, cf);  // b^5 - 137
+    checkInverse(u, cf); n_Delete(&u, cf);
+
+    clog << endl
+         << "Now let's check a gcd computation in Q[b]..."
+         << endl;
     
-    u = n_Add(a, n1, cf); checkInverse(u, cf); n_Delete(&u, cf); // a + 1
-    u = n_Sub(a, n1, cf); checkInverse(u, cf); n_Delete(&u, cf); // a - 1
-    u = n_Add(a, n5, cf); checkInverse(u, cf); n_Delete(&u, cf); // a + 5
-    u = n_Sub(a, n5, cf); checkInverse(u, cf); n_Delete(&u, cf); // a - 5
-    v = n_Mult(a, n17, cf);
-    u = n_Add(v, n5, cf); n_Delete(&v, cf);                      // 17a + 5
-       checkInverse(u, cf); n_Delete(&u, cf);
+    number v;
+    v = NULL; plusTerm(v, 1, 2, cf); plusTerm(v, 7, 1, cf);
+    plusTerm(v, 1, 0, cf);        // b^2 + 7b + 1
+    number w = n_Mult(v, v, cf);  // (b^2 + 7b + 1)^2
+    number y = n_Mult(v, w, cf);  // (b^2 + 7b + 1)^3
+    n_Delete(&v, cf);
+    v = NULL; plusTerm(v, 2, 2, cf); plusTerm(v, -61, 1, cf);   // 2b^2 - 61b
+    number z = n_Mult(w, v, cf);   // (b^2 + 7b + 1)^2 * (2b^2 - 61b)
+    n_Delete(&v, cf);
     
-    n_Delete(&a, cf); n_Delete(&n1, cf); n_Delete(&n5, cf);
-    n_Delete(&n17, cf);
+    clog << "z = "; n_Write(z, cf);
+    clog << "y = "; n_Write(y, cf);
+    number theGcd = n_Gcd(z, y, cf);   // should yield w = (b^2 + 7b + 1)^2
+    clog << "gcd(z, y) = "; n_Write(theGcd, cf);
+    
+    v = n_Sub(theGcd, w, cf);
+    TS_ASSERT( v == NULL );
+    n_Delete(&v, cf);
+    
+    clog << endl
+         << "Now let's check an ext_gcd computation in Q[b]..."
+         << endl;
+         
+    poly zFactor; poly yFactor;
+    poly ppp = p_ExtGcd((poly)z, zFactor, (poly)y, yFactor, cf->algring);
+    v = n_Sub(theGcd, (number)ppp, cf);
+    TS_ASSERT( v == NULL );
+    clog << "z = "; n_Write(z, cf);
+    clog << "zFactor = "; p_Write(zFactor, cf->algring);
+    clog << "y = "; n_Write(y, cf);
+    clog << "yFactor = "; p_Write(yFactor, cf->algring);
+    number v1 = n_Mult(z, (number)zFactor, cf);
+    number v2 = n_Mult(y, (number)yFactor, cf);
+    number v3 = n_Add(v1, v2, cf);
+    clog << "z * zFactor + y * yFactor = "; n_Write(v3, cf);
+    clog << "gcd(z, y) = "; p_Write(ppp, cf->algring);
+    number v4 = n_Sub(v3, w, cf);
+    TS_ASSERT( v4 == NULL );
+    
+    p_Delete(&ppp, cf->algring); p_Delete(&zFactor, cf->algring);
+    p_Delete(&yFactor, cf->algring);
+    n_Delete(&z, cf); n_Delete(&y, cf); n_Delete(&w, cf);
+    n_Delete(&theGcd, cf); n_Delete(&v, cf); n_Delete(&v1, cf);
+    n_Delete(&v2, cf); n_Delete(&v3, cf); n_Delete(&v4, cf);
 
     rDelete(s); // kills 'cf' and 'r' as well
   }
