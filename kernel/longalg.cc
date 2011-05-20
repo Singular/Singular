@@ -428,7 +428,8 @@ number naSub(number la, number lb)
 */
 number naMult(number la, number lb)
 {
-  if ((la==NULL) || (lb==NULL))
+  if ((la==NULL) || (lb==NULL))   /* never occurs even when la or lb
+                                     represents zero??? */
     return NULL;
 
   lnumber a = (lnumber)la;
@@ -466,7 +467,8 @@ number naMult(number la, number lb)
   }
   if (naMinimalPoly!=NULL)
   {
-    if (p_GetExp(lo->z,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing))
+    if ((lo->z != NULL) &&
+        (p_GetExp(lo->z,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing)))
       lo->z = napRemainder(lo->z, naMinimalPoly);
     if ((x!=NULL) &&
         (p_GetExp(x,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing)))
