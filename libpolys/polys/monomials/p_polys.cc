@@ -1444,14 +1444,12 @@ void p_Lcm(poly a, poly b, poly m, const ring r)
    leaves divisor unmodified */
 poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
 {
-//printf("p_PolyDiv:\n");
   assume(divisor != NULL);
   if (p == NULL) return NULL;
   
   poly result = NULL;
   number divisorLC = p_GetCoeff(divisor, r);
   int divisorLE = p_GetExp(divisor, 1, r);
-//p_Write(p, r); p_Write(divisor, r);
   while ((p != NULL) && (p_Deg(p, r) >= p_Deg(divisor, r)))
   {
     /* determine t = LT(p) / LT(divisor) */
@@ -1461,12 +1459,8 @@ poly p_PolyDiv(poly &p, poly divisor, BOOLEAN needResult, ring r)
     int e = p_GetExp(p, 1, r) - divisorLE;
     p_SetExp(t, 1, e, r);
     p_Setm(t, r);
-//printf("t\n");
-//p_Write(t, r);
     if (needResult) result = p_Add_q(result, p_Copy(t, r), r);
     p = p_Add_q(p, p_Neg(p_Mult_q(t, p_Copy(divisor, r), r), r), r);
-//printf("p\n");
-//p_Write(p, r);
   }
   return result;
 }
@@ -1482,27 +1476,17 @@ void p_Monic(poly &p, ring r)
   poly pp = p;
   number lc = p_GetCoeff(p, r);
   if (n_IsOne(lc, r->cf)) return;
-
-  if( pNext(p) == NULL )
-  { 
-     p_SetCoeff(p, n_Init(1, r->cf), r); // will delete the leading coeff 1st!
-     return;
-  }
-   
-  // TODO: consider unsing 1xn_Inverse + n_Mult instead of multiple n_Div
-  p_SetCoeff0(p, n_Init(1, r->cf), r); // no coeff destruction!
-   
+  number lcInverse = n_Invers(lc, r->cf);
+  number n = n_Init(1, r->cf);
+  p_SetCoeff(p, n, r);   // destroys old leading coefficient!
   p = pIter(p);
-   
   while (p != NULL)
   {
-    number c = p_GetCoeff(p, r);
-    number n = n_Div(c, lc, r->cf);
-    n_Delete(&c, r->cf);
-    p_SetCoeff(p, n, r);
+    number n = n_Mult(p_GetCoeff(p, r), lcInverse, r->cf);
+    p_SetCoeff(p, n, r);   // destroys old leading coefficient!
     p = pIter(p);
   }
-  n_Delete(&lc, r->cf);
+  n_Delete(&lcInverse, r->cf);
   p = pp;
 }
 
@@ -1551,34 +1535,19 @@ poly p_ExtGcdHelper(poly &p, poly &pFactor, poly &q, poly &qFactor,
   {
     qFactor = NULL;
     pFactor = p_ISet(1, r);
-    number n = p_GetCoeff(pFactor, r);
-//printf("p_ExtGcdHelper0:\n");
-//p_Write(p, r);
     p_SetCoeff(pFactor, n_Invers(p_GetCoeff(p, r), r->cf), r);
-    n_Delete(&n, r->cf);
     p_Monic(p, r);
     return p;
   }
   else
   {
-//printf("p_ExtGcdHelper1:\n");
-//p_Write(p, r); p_Write(q, r);
     poly pDivQ = p_PolyDiv(p, q, TRUE, r);
     poly ppFactor = NULL; poly qqFactor = NULL;
-//printf("p_ExtGcdHelper2:\n");
-//p_Write(p, r); p_Write(ppFactor, r);
-//p_Write(q, r); p_Write(qqFactor, r);
     poly theGcd = p_ExtGcdHelper(q, qqFactor, p, ppFactor, r);
-//printf("p_ExtGcdHelper3:\n");
-//p_Write(q, r); p_Write(qqFactor, r);
-//p_Write(p, r); p_Write(ppFactor, r);
-//p_Write(theGcd, r);
     pFactor = ppFactor;
     qFactor = p_Add_q(qqFactor,
                       p_Neg(p_Mult_q(pDivQ, p_Copy(ppFactor, r), r), r),
                       r);
-//printf("p_ExtGcdHelper4:\n");
-//p_Write(pFactor, r); p_Write(qFactor, r);
     return theGcd;
   }
 }
@@ -1593,8 +1562,6 @@ poly p_ExtGcdHelper(poly &p, poly &pFactor, poly &q, poly &qFactor,
    leaves p and q unmodified */
 poly p_ExtGcd(poly p, poly &pFactor, poly q, poly &qFactor, ring r)
 {
-//printf("p_ExtGcd1:\n");
-//p_Write(p, r); p_Write(q, r);
   assume((p != NULL) || (q != NULL));  
   poly a = p; poly b = q; BOOLEAN aCorrespondsToP = TRUE;
   if (p_Deg(a, r) < p_Deg(b, r))

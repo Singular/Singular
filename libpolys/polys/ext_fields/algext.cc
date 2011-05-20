@@ -436,6 +436,12 @@ void definiteReduce(poly &p, poly reducer, const coeffs cf)
   p_PolyDiv(p, reducer, FALSE, naRing);
 }
 
+/* IMPORTANT NOTE: Since an algebraic field extension is again a field,
+                   the gcd of two elements is not very interesting. (It
+                   is actually any unit in the field, i.e., any non-
+                   zero element.) Note that the below method does not operate
+                   in this strong sense but rather computes the gcd of
+                   two given elements in the underlying polynomial ring. */
 number naGcd(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
@@ -454,9 +460,6 @@ number naInvers(number a, const coeffs cf)
   assume(naIsOne((number)theGcd, cf));      
   p_Delete(&theGcd, naRing);
   p_Delete(&mFactor, naRing);
-  /* printf("naInvers\n");
-     p_Write((poly)a, naRing);
-     p_Write(aFactor, naRing); */
   return (number)(aFactor);
 }
 
