@@ -37,14 +37,21 @@ libcoeffs_a_include_HEADERS   = $(COEFFSHEADERS)
 libcoeffs_g_a_include_HEADERS = $(COEFFSHEADERS)
 
 
+if ENABLE_FACTORY
+  USE_FACTORY = -L${top_builddir}/../factory
+else
+  USE_FACTORY =
+endif
 
 ## for testing...
-AM_LDFLAGS	= -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc -L${top_builddir}/../factory -L${top_builddir}/../omalloc
+AM_LDFLAGS = -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc
 
-check_PROGRAMS = test test-g
 
-test_SOURCES   = test.cc
-test_g_SOURCES = test.cc
+TESTS = test test-g
+check_PROGRAMS = $(TESTS)
+
+test_SOURCES   = test.cc gftables
+test_g_SOURCES = test.cc gftables
 
 test_LDADD   = -lcoeffs ${GMP_LIBS} ${NTL_LIBS} -lresources -lreporter -lmisc ${FACTORY_LIBS} -lomalloc
 test_g_LDADD = -lcoeffs_g ${GMP_LIBS} ${NTL_LIBS} ${FACTORY_LIBS} -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} -lomalloc_g
@@ -60,3 +67,6 @@ test_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFL
 
 test_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
 test_g_CPPFLAGS = -DHAVE_CONFIG_H
+
+gftables: ${top_srcdir}/../factory/gftables
+	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
