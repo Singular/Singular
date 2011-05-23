@@ -1,6 +1,13 @@
 ALLOC=omalloc
 
-PACKAGES=$(ALLOC) factory libpolys
+
+if ENABLE_FACTORY
+  USE_FACTORY = factory 
+else
+  USE_FACTORY =
+endif
+ 
+PACKAGES=$(ALLOC) $(USE_FACTORY) libpolys
 
 SUBDIRS=$(PACKAGES)
 
