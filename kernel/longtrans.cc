@@ -1008,8 +1008,14 @@ poly napPermNumber(number z, int * par_perm, int P, ring oldRing)
         else
           pDelete(&p);
       }
-      pTest(p);
-      res=pAdd(res,p);
+      nNormalize(pGetCoeff(p));
+      if (nIsZero(pGetCoeff(p)))
+        pDelete(&p);
+      else
+      {
+        pTest(p);
+        res=pAdd(res,p);
+      }
     }
     pIter(za);
   }
