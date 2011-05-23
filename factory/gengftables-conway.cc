@@ -10,8 +10,6 @@
 //
 //}}}
 
-#include "factory.h"
-
 #ifdef HAVE_IOSTREAM
 #include <iostream>
 #include <fstream>
@@ -30,6 +28,8 @@
 
 #include "cf_assert.h"
 #include "gf_tabutil.h"
+#include "cf_algorithm.h"
+#include "cf_iter.h"
 
 using namespace std;
 

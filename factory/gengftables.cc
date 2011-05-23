@@ -20,7 +20,8 @@
 #include <strstream.h>
 #endif
 
-#include "factory.h"
+
+#include "cf_algorithm.h"
 
 #include "cf_assert.h"
 #include "gf_tabutil.h"
