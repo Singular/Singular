@@ -103,6 +103,7 @@ extern void pRestoreDegProcs(pFDegProc old_FDeg, pLDegProc old_lDeg)
 */
 poly pDivide(poly a, poly b)
 {
+  assume((pGetComp(a)==pGetComp(b)) || (pGetComp(b)==0));
   int i;
   poly result = pInit();
 
@@ -168,6 +169,7 @@ poly pDivideM(poly a, poly b)
   {
     if (pDivisibleBy(b,a))
     {
+      assume((pGetComp(a)==pGetComp(b)) || (pGetComp(b)==0));
       for(i=(int)pVariables; i; i--)
          pSubExp(a,i, pGetExp(b,i));
       pSubComp(a, pGetComp(b));
