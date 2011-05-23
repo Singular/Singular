@@ -7,11 +7,10 @@
 /*
 * ABSTRACT: computation with long rational numbers
 */
-#include <coeffs/coeffs.h>
-// #include "config.h"
-#include "si_gmp.h"
 #include <misc/auxiliary.h>
 #include <omalloc/omalloc.h>
+#include <coeffs/si_gmp.h>
+#include <coeffs/coeffs.h>
 
 #define SR_HDL(A) ((long)(A))
 

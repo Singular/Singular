@@ -8,6 +8,7 @@
 
 #include <coeffs/longrat.h>
 
+
 // 64 bit version:
 #if 0
 #define MAX_NUM_SIZE 60
@@ -42,16 +43,20 @@ static inline number nlShort3(number x) // assume x->s==3
 
 #include <string.h>
 #include <float.h>
+
 #include "config.h"
 #include <coeffs/coeffs.h>
 #include <reporter/reporter.h>
 #include <omalloc/omalloc.h>
+
 #include <coeffs/numbers.h>
 #include <coeffs/modulop.h>
 #include <coeffs/shortfl.h>
 #include <coeffs/mpr_complex.h>
-#include <coeffs/longrat.h>
 
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
 
 #ifndef BYTES_PER_MP_LIMB
 #define BYTES_PER_MP_LIMB sizeof(mp_limb_t)
