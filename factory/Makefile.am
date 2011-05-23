@@ -2,7 +2,6 @@ CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
-
 lib_LIBRARIES = libfactory.a libfactory_g.a
 
 libfactory_a_includedir=$(includedir)/factory
@@ -197,15 +196,11 @@ templateincl =	\
 # somehow the current deps. seem to be broken... 
 # moreover factory.h needs a lot more generated headers, which wouldn't be installed yet
 
-noinst_PROGRAMS = gengftables
+EXTRA_PROGRAMS = gengftables
+
 gengftables_SOURCES = gengftables-conway.cc
 
-#### TODO: the following would not work...???!
-####gengftables_includedir=-I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
-
 gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
-
-gengftables: factory.h factoryconf.h
 
 gftablesdir=$(datadir)/gftables
 gftables_DATA = gftables/10201 gftables/1024 gftables/10609 gftables/11449 \
@@ -229,7 +224,6 @@ gftables/59049 gftables/6241 gftables/625 gftables/63001 \
 gftables/64 gftables/6561 gftables/6859 gftables/6889 gftables/729 \
 gftables/7921 gftables/8 gftables/81 gftables/8192 gftables/841 \
 gftables/9 gftables/9409 gftables/961 
-
 
 
 gftables: gengftables
@@ -299,7 +293,8 @@ ftestm4src =	$(ftestm4develsrc) \
 ftestdistfiles = \
 		ftest_util.m4
 
-EXTRA_DIST =	gengftables.cc gengftables-conway.cc test_install.cc \
+# gengftables.cc gengftables-conway.cc 
+EXTRA_DIST =	test_install.cc \
 		$(templatesrc) $(templateincl) $(hdrtemplsrc) \
 		$(ftestsrc) $(ftestincl) $(ftestm4src) $(ftestdistfiles) \
 		doxygen.cfg factory.cfg gen_cf_gmp.template \
@@ -309,6 +304,3 @@ EXTRA_DIST =	gengftables.cc gengftables-conway.cc test_install.cc \
 		bin/makeheader bin/gen-readcf readcf.cc $(gftables_DATA)
 
 CLEANFILES = factory.h factoryconf.h
-
-
-
