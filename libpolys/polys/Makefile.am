@@ -29,6 +29,12 @@ else
   USE_P_PROCS_DYNAMIC_CC =
 endif
 
+prCopy.inc: prCopy.pl
+	perl ${srcdir}/prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
+
+prCopy.o: prCopy.inc
+
+
 lib_LIBRARIES=libpolys.a libpolys_g.a
 
 libpolys_a_includedir=$(includedir)/libpolys/polys
@@ -150,7 +156,3 @@ libpolys_g_a_CXXFLAGS = ${DEBUGCXXFLAGS}
 
 dynamic_modules: ${module_LTLIBRARIES}
 
-prCopy.inc: prCopy.pl
-	perl ${srcdir}/prCopy.pl > prCopy.xx && mv prCopy.xx prCopy.inc
-
-prCopy.o: prCopy.inc
