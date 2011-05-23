@@ -32,7 +32,7 @@ AC_ARG_ENABLE(factory,
  else
      ENABLE_FACTORY="no"
  fi
-],[ENABLE_FACTORY="no"])
+],[ENABLE_FACTORY="yes"])
 
 if test x$ENABLE_FACTORY = xyes; then
   FACTORY_CFLAGS=""
