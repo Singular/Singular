@@ -28,6 +28,11 @@
 #include <coeffs/rmodulon.h>
 #include <coeffs/rintegers.h>
 #endif
+
+#ifdef HAVE_FACTORY
+#include <factory/factory.h>
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 

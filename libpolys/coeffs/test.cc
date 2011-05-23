@@ -3,6 +3,7 @@
 #include <omalloc/omalloc.h>
 
 #include <reporter/reporter.h>
+#include <resources/feResource.h>
 
 #include <coeffs/coeffs.h>
 #include <coeffs/numbers.h>
@@ -16,6 +17,8 @@
 #include <coeffs/rmodulon.h>
 #include <coeffs/rmodulo2m.h>
 #include <coeffs/rintegers.h>
+
+
 #ifdef HAVE_FACTORY
 int initializeGMP(){ return 1; }
 #endif
@@ -253,10 +256,15 @@ bool Test(const n_coeffType type, void* p = NULL)
 }
 
 
-
-
-int main()
+int main( int, char *argv[] ) 
 {
+  feInitResources(argv[0]);
+
+  StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
+  feStringAppendResources(0);
+  PrintS(StringAppendS("\n"));
+
+
   int c = 0;
   
   n_coeffType type;
