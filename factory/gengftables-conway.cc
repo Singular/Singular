@@ -10,6 +10,8 @@
 //
 //}}}
 
+#include "config.h"
+
 #ifdef HAVE_IOSTREAM
 #include <iostream>
 #include <fstream>
@@ -24,7 +26,6 @@
 
 
 #include <stdlib.h>
-
 
 #include "cf_assert.h"
 #include "gf_tabutil.h"

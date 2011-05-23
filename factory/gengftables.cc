@@ -10,21 +10,25 @@
 //
 //}}}
 
+#include "config.h"
+
 #ifdef HAVE_IOSTREAM
 #include <iostream>
 #include <fstream>
 #include <strstream>
+using namespace std;
 #elif defined(HAVE_IOSTREAM_H)
 #include <iostream.h>
 #include <fstream.h>
 #include <strstream.h>
 #endif
 
-
-#include "cf_algorithm.h"
-
 #include "cf_assert.h"
 #include "gf_tabutil.h"
+#include "cf_algorithm.h"
+#include "cf_iter.h"
+
+int initializeGMP(){ return 1; }
 
 //{{{ constants
 //{{{ docu
