@@ -1,7 +1,13 @@
 CXXTEMPLFLAGS = -O0 --no-exceptions ## -fno-implicit-templates
 
+if ENABLE_FACTORY
+  USE_FACTORY = -L${top_builddir}/../factory
+else
+  USE_FACTORY =
+endif
+
 ## for testing...
-AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc -L${top_builddir}/../factory -L${top_builddir}/../omalloc 
+AM_LDFLAGS = -L${top_builddir}/polys -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc 
 
 
 AM_CFLAGS = -g -Wextra -Wall -Wno-long-long ${PIPE}
@@ -17,10 +23,11 @@ INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir
 TESTS = simple_test coeffs_test rings_test polys_test
 check_PROGRAMS = $(TESTS)
 
-simple_test_SOURCES = simple_test_runner.cpp gftables
+simple_test_SOURCES = simple_test_runner.cpp
 coeffs_test_SOURCES = coeffs_test_runner.cpp gftables
 polys_test_SOURCES = polys_test_runner.cpp gftables
 rings_test_SOURCES = rings_test_runner.cpp gftables
+
 
 
 polys_test_LDFLAGS = ${AM_LDFLAGS} ${USEPPROCSDYNAMICLDFLAGS}
