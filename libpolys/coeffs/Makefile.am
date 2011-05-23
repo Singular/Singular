@@ -46,28 +46,27 @@ endif
 ## for testing...
 AM_LDFLAGS = -L${top_builddir}/coeffs -L${top_builddir}/reporter -L${top_builddir}/resources -L${top_builddir}/misc ${USE_FACTORY} -L${top_builddir}/../omalloc
 
-
-TESTS = test test-g
+TESTS = tt-g tt-r
 check_PROGRAMS = $(TESTS)
 
-test_SOURCES   = test.cc 
-test_g_SOURCES = test.cc
+tt_r_SOURCES = test.cc
+tt_g_SOURCES = test.cc
 
-test_LDADD   = -lcoeffs ${GMP_LIBS} -lresources -lreporter -lmisc ${FACTORY_LIBS} ${NTL_LIBS} -lomalloc
-test_g_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} ${NTL_LIBS} -lomalloc_g
+tt_r_LDADD = -lcoeffs ${GMP_LIBS} -lresources -lreporter -lmisc ${FACTORY_LIBS} ${NTL_LIBS} -lomalloc
+tt_g_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g ${FACTORY_LIBS} ${NTL_LIBS} -lomalloc_g
 
-test: gftables
-test_g: gftables
+tt_r: gftables
+tt_g: gftables
 
-test_CFLAGS   = -O3 -fomit-frame-pointer ${PIPE}
-test_g_CFLAGS = ${PIPE}
+tt_r_CFLAGS = -O3 -fomit-frame-pointer ${PIPE}
+tt_g_CFLAGS = ${PIPE}
 
-test_CXXFLAGS   = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} -fimplicit-templates
-test_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS} -fimplicit-templates
+tt_r_CXXFLAGS = -O3 -fomit-frame-pointer --no-rtti ${PIPE} ${CXXTEMPLFLAGS} -fimplicit-templates
+tt_g_CXXFLAGS = -g -Wextra -Wall -pedantic -Wno-long-long ${PIPE} ${CXXTEMPLFLAGS} -fimplicit-templates
 # -fdiagnostics-show-option 
 
-test_CPPFLAGS   = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
-test_g_CPPFLAGS = -DHAVE_CONFIG_H
+tt_r_CPPFLAGS = -DNDEBUG -DOM_NDEBUG -DHAVE_CONFIG_H
+tt_g_CPPFLAGS = -DHAVE_CONFIG_H
 
 gftables: ${top_srcdir}/../factory/gftables
 	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
