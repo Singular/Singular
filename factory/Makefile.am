@@ -2,6 +2,7 @@ CXXTEMPLFLAGS      = -fno-implicit-templates --no-exceptions
 
 INCLUDES = -I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
 
+
 lib_LIBRARIES = libfactory.a libfactory_g.a
 
 libfactory_a_includedir=$(includedir)/factory
@@ -191,10 +192,20 @@ templateincl =	\
 		ftmpl_list.h \
 		ftmpl_matrix.h
 
+# TODO:
+# gengftables needs libfactory.a and factory.h AND is needed for generating gftable...
+# somehow the current deps. seem to be broken... 
+# moreover factory.h needs a lot more generated headers, which wouldn't be installed yet
+
 noinst_PROGRAMS = gengftables
+gengftables_SOURCES = gengftables-conway.cc
+
+#### TODO: the following would not work...???!
+####gengftables_includedir=-I${top_srcdir} -I${top_srcdir}/.. -I${top_builddir} -I${top_builddir}/.. -I${srcdir} ${GMP_CFLAGS} ${NTL_CFLAGS}
+
 gengftables_LDADD = -L${builddir} -lfactory $(GMP_LIBS) $(NTL_LIBS)
 
-gengftables_SOURCES = gengftables-conway.cc
+gengftables: factory.h factoryconf.h
 
 gftablesdir=$(datadir)/gftables
 gftables_DATA = gftables/10201 gftables/1024 gftables/10609 gftables/11449 \
@@ -234,7 +245,7 @@ gftables: gengftables
 		fi
 
 .template.h:
-		${srcdir}/bin/makeheader $< $@
+	${srcdir}/bin/makeheader $< $@
 
 BUILT_SOURCES = factory.h factoryconf.h
 

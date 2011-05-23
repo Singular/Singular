@@ -17,7 +17,7 @@
 #define CERR cerr
 #endif
 #endif
-#include <cf_factory.h>
+#include "cf_factory.h"
 #include <variable.h>
 #include <canonicalform.h>
 #include <cf_iter.h>

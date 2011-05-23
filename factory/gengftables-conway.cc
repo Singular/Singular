@@ -10,7 +10,7 @@
 //
 //}}}
 
-#include <factory.h>
+#include "factory.h"
 
 #ifdef HAVE_IOSTREAM
 #include <iostream>
@@ -28,8 +28,8 @@
 #include <stdlib.h>
 
 
-#include <cf_assert.h>
-#include <gf_tabutil.h>
+#include "cf_assert.h"
+#include "gf_tabutil.h"
 
 using namespace std;
 
