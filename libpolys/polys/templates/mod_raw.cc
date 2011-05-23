@@ -38,7 +38,7 @@
 lib_types type_of_LIB(char *newlib, char *libnamebuf)
 {
   const unsigned char mach_o[]={0xfe,0xed,0xfa,0xce,0};
-  const unsigned char mach_o_module[]={0xce,0xfa,0xed,0xfe,0};
+  const unsigned char mach_O[]={0xce,0xfa,0xed,0xfe,0};
   char        buf[BYTES_TO_CHECK+1];        /* one extra for terminating '\0' */
   struct stat sb;
   int nbytes = 0;
@@ -75,7 +75,7 @@ lib_types type_of_LIB(char *newlib, char *libnamebuf)
     goto lib_type_end;
   }
 
-  if( (strncmp(buf, (const char *)mach_o, 4)==0)) /* generic Mach-O module */
+  if( (strncmp(buf, (const char *)mach_o, 4)==0) || (strncmp(buf, (const char *)mach_O, 4)==0)) /* generic Mach-O module */
   {
     LT = LT_MACH_O;
     //omFree(newlib);
@@ -146,7 +146,7 @@ void* dynl_open_binary_warn(const char* binary_name, const char* msg)
     lib_types type = type_of_LIB( binary_name_so, pp );
     omFreeSize((ADDRESS)binary_name_so, binary_name_so_length * sizeof(char) );
 
-    if( type == LT_ELF || type == LT_HPUX || type == LT_MACH_O )
+    if( type != LT_SINGULAR && type != LT_NONE && type != LT_NOTFOUND )
       handle = dynl_open(pp);
 
     omFreeSize((ADDRESS)pp, MAXPATHLEN * sizeof(char) );
