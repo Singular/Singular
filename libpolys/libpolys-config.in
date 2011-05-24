@@ -58,11 +58,11 @@ while test $# -gt 0; do
 	;;
 
     --cflags)
-       	${ECHOn} " -I${includedir} -I${includedir}/libpolys @GMP_CFLAGS@ @NTL_CFLAGS@ @FACTORY_CFLAGS@"
+       	${ECHOn} " -I${includedir} -I${includedir}/libpolys @FACTORY_CFLAGS@ @NTL_CFLAGS@ @GMP_CFLAGS@"
 	;;
 
     --libs)
-	${ECHOn} " -L${libdir} -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g -lomalloc_g @USEPPROCSDYNAMICLD@ @GMP_LIBS@ @NTL_LIBS@ @FACTORY_LIBS@" 
+	${ECHOn} " -L${libdir} -lpolys_g -lcoeffs_g -lresources_g -lreporter_g -lmisc_g @FACTORY_LIBS@ -lomalloc_g @NTL_LIBS@ @USEPPROCSDYNAMICLD@ @GMP_LIBS@" 
 	;;
 
     *)
