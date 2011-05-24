@@ -24,6 +24,8 @@
 #include "imm.h"
 #include "cf_iter.h"
 #include "facFqBivarUtil.h"
+#include "cfNewtonPolygon.h"
+#include "facHensel.h"
 
 
 void append (CFList& factors1, const CFList& factors2)
@@ -40,7 +42,12 @@ void decompress (CFList& factors, const CFMap& N)
 {
   for (CFListIterator i= factors; i.hasItem(); i++)
     i.getItem()= N (i.getItem());
-  return;
+}
+
+void decompress (CFFList& factors, const CFMap& N)
+{
+  for (CFFListIterator i= factors; i.hasItem(); i++)
+    i.getItem()= CFFactor (N (i.getItem().factor()), i.getItem().exp());
 }
 
 void appendSwapDecompress (CFList& factors1, const CFList& factors2,
@@ -112,7 +119,9 @@ bool GFInExtensionHelper (const CanonicalForm& F, const int number)
 }
 
 static inline
-bool FqInExtensionHelper (const CanonicalForm& F, const CanonicalForm& gamma)
+bool FqInExtensionHelper (const CanonicalForm& F, const CanonicalForm& gamma,
+                          const CanonicalForm& delta, CFList& source,
+                          CFList& dest)
 {
   bool result= false;
   if (F.inBaseDomain())
@@ -122,13 +131,32 @@ bool FqInExtensionHelper (const CanonicalForm& F, const CanonicalForm& gamma)
     if (!fdivides (gamma, F))
       return true;
     else
-      return result;
+    {
+      int pos= findItem (source, F);
+      if (pos > 0)
+        return false;
+      Variable a;
+      hasFirstAlgVar (F, a);
+      int bound= ipower (getCharacteristic(), degree (getMipo (a)));
+      CanonicalForm buf= 1;
+      for (int i= 1; i < bound; i++)
+      {
+        buf *= gamma;
+        if (buf == F)
+        {
+          source.append (buf);
+          dest.append (power (delta, i));
+          return false;
+        }
+      }
+      return true;
+    }
   }
   else
   {
     for (CFIterator i= F; i.hasTerms(); i++)
     {
-      result= FqInExtensionHelper (i.coeff(), gamma);
+      result= FqInExtensionHelper (i.coeff(), gamma, delta, source, dest);
       if (result == true)
         return result;
     }
@@ -137,7 +165,8 @@ bool FqInExtensionHelper (const CanonicalForm& F, const CanonicalForm& gamma)
 }
 
 bool isInExtension (const CanonicalForm& F, const CanonicalForm& gamma,
-                    const int k)
+                    const int k, const CanonicalForm& delta,
+                    CFList& source, CFList& dest)
 {
   bool result;
   if (CFFactory::gettype() == GaloisFieldDomain)
@@ -151,7 +180,7 @@ bool isInExtension (const CanonicalForm& F, const CanonicalForm& gamma,
   }
   else
   {
-    result= FqInExtensionHelper (F, gamma);
+    result= FqInExtensionHelper (F, gamma, delta, source, dest);
     return result;
   }
 }
@@ -190,7 +219,7 @@ void appendTestMapDown (CFList& factors, const CanonicalForm& f,
     degMipoBeta= degree (getMipo (beta));
   if (k > 1)
   {
-    if (!isInExtension (g, delta, k))
+    if (!isInExtension (g, gamma, k, delta, source, dest))
     {
       g= GFMapDown (g, k);
       factors.append (g);
@@ -198,7 +227,7 @@ void appendTestMapDown (CFList& factors, const CanonicalForm& f,
   }
   else if (k == 1)
   {
-    if (!isInExtension (g, delta, k));
+    if (!isInExtension (g, gamma, k, delta, source, dest));
       factors.append (g);
   }
   else if (!k && beta == Variable (1))
@@ -208,7 +237,7 @@ void appendTestMapDown (CFList& factors, const CanonicalForm& f,
   }
   else if (!k && beta != Variable (1))
   {
-    if (!isInExtension (g, delta, k))
+    if (!isInExtension (g, gamma, k, delta, source, dest))
     {
       g= mapDown (g, delta, gamma, alpha, source, dest);
       factors.append (g);
@@ -241,6 +270,14 @@ void normalize (CFList& factors)
 {
   for (CFListIterator i= factors; i.hasItem(); i++)
     i.getItem() /= Lc(i.getItem());
+  return;
+}
+
+void normalize (CFFList& factors)
+{
+  for (CFFListIterator i= factors; i.hasItem(); i++) 
+    i.getItem()= CFFactor (i.getItem().factor()/Lc(i.getItem().factor()),
+                           i.getItem().exp());
   return;
 }
 
@@ -388,6 +425,274 @@ CFFList multiplicity (CanonicalForm& F, const CFList& factors)
       result.append (CFFactor (i.getItem(), multi));
     multi= 0;
   }
+  return result;
+}
+
+CFArray
+logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
+                       CanonicalForm& Q
+                      )
+{
+  Variable x= Variable (2);
+  Variable y= Variable (1);
+  CanonicalForm xToL= power (x, l);
+  CanonicalForm q,r;
+  CanonicalForm logDeriv;
+
+  q= newtonDiv (F, G, xToL);
+
+  logDeriv= mulMod2 (q, deriv (G, y), xToL);
+
+  logDeriv= swapvar (logDeriv, x, y);
+  int j= degree (logDeriv) + 1;
+  CFArray result= CFArray (j);
+  for (CFIterator i= logDeriv; i.hasTerms() && !logDeriv.isZero(); i++)
+  {
+    if (i.exp() == j - 1)
+    {
+      result [j - 1]= swapvar (i.coeff(), x, y);
+      j--;
+    }
+    else
+    {
+      for (; i.exp() < j - 1; j--)
+        result [j - 1]= 0;
+      result [j - 1]= swapvar (i.coeff(), x, y);
+      j--;
+    }
+  }
+  for (; j > 0; j--)
+    result [j - 1]= 0;
+  Q= q;
+  return result;
+}
+
+CFArray
+logarithmicDerivative (const CanonicalForm& F, const CanonicalForm& G, int l,
+                       int oldL, const CanonicalForm& oldQ, CanonicalForm& Q
+                      )
+{
+  Variable x= Variable (2);
+  Variable y= Variable (1);
+  CanonicalForm xToL= power (x, l);
+  CanonicalForm xToOldL= power (x, oldL);
+  CanonicalForm xToLOldL= power (x, l-oldL);
+  CanonicalForm q,r;
+  CanonicalForm logDeriv;
+
+  CanonicalForm bufF= mod (F, xToL);
+  CanonicalForm oldF= mulMod2 (G, oldQ, xToL);
+  bufF -= oldF;
+  bufF= div (bufF, xToOldL);
+
+  q= newtonDiv (bufF, G, xToLOldL);
+  q *= xToOldL;
+  q += oldQ;
+
+  logDeriv= mulMod2 (q, deriv (G, y), xToL);
+
+  logDeriv= swapvar (logDeriv, x, y);
+  int j= degree (logDeriv) + 1;
+  CFArray result= CFArray (j);
+  for (CFIterator i= logDeriv; i.hasTerms() && !logDeriv.isZero(); i++)
+  {
+    if (i.exp() == j - 1)
+    {
+      result [j - 1]= swapvar (i.coeff(), x, y);
+      j--;
+    }
+    else
+    {
+      for (; i.exp() < j - 1; j--)
+        result [j - 1]= 0;
+      result [j - 1]= swapvar (i.coeff(), x, y);
+      j--;
+    }
+  }
+  for (; j > 0; j--)
+    result [j - 1]= 0;
+  Q= q;
+  return result;
+}
+
+void
+writeInMatrix (CFMatrix& M, const CFArray& A, const int column,
+               const int startIndex
+              )
+{
+  ASSERT (A.size () - startIndex > 0, "wrong starting index");
+  ASSERT (A.size () - startIndex == M.rows(), "wrong starting index");
+  ASSERT (column > 0 && column <= M.columns(), "wrong column");
+  if (A.size() - startIndex <= 0) return;
+  int j= 1;
+  for (int i= startIndex; i < A.size(); i++, j++)
+    M (j, column)= A [i];
+}
+
+CFArray getCoeffs (const CanonicalForm& F, const int k)
+{
+  ASSERT (F.isUnivariate(), "univariate input expected");
+  if (degree (F, 2) < k)
+    return CFArray();
+
+  CFArray result= CFArray (degree (F) - k + 1);
+  CFIterator j= F;
+  for (int i= degree (F); i >= k; i--)
+  {
+    if (j.exp() == i)
+    {
+      result [i - k]= j.coeff();
+      j++; 
+      if (!j.hasTerms())
+        return result;
+    }
+    else
+      result[i - k]= 0;
+  }
+  return result;
+}
+
+CFArray getCoeffs (const CanonicalForm& F, const int k, const Variable& alpha)
+{
+  ASSERT (F.isUnivariate(), "univariate input expected");
+  if (degree (F, 2) < k)
+    return CFArray ();
+
+  int d= degree (getMipo (alpha));
+  CFArray result= CFArray ((degree (F) - k + 1)*d);
+  CFIterator j= F;
+  CanonicalForm buf;
+  CFIterator iter;
+  for (int i= degree (F); i >= k; i--)
+  {
+    if (j.exp() == i)
+    {
+      iter= j.coeff();
+      for (int l= degree (j.coeff(), alpha); l >= 0; l--)
+      {
+        if (iter.exp() == l)
+        {
+          result [(i - k)*d + l]= iter.coeff();
+          iter++;
+          if (!iter.hasTerms())
+            break;
+        }
+      }
+      j++;
+      if (!j.hasTerms())
+        return result;
+    }
+    else
+    {
+      for (int l= 0; l < d; l++)
+        result[(i - k)*d + l]= 0;
+    }
+  }
+  return result;
+}
+
+#ifdef HAVE_NTL
+CFArray
+getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
+           const Variable& alpha, const CanonicalForm& evaluation,
+           const mat_zz_p& M)
+{
+  ASSERT (G.isUnivariate(), "univariate input expected");
+  CanonicalForm F= G (G.mvar() - evaluation, G.mvar());
+  if (F.isZero())
+    return CFArray ();
+
+  Variable y= Variable (2);
+  F= F (power (y, degMipo), y);
+  F= F (y, alpha);
+  zz_pX NTLF= convertFacCF2NTLzzpX (F);
+  NTLF.rep.SetLength (l*degMipo);
+  NTLF.rep= M*NTLF.rep;
+  NTLF.normalize();
+  F= convertNTLzzpX2CF (NTLF, y);
+  int d= degMipo;
+
+  if (degree (F, 2) < k)
+    return CFArray();
+
+  CFArray result= CFArray (degree (F) - k + 1);
+
+  CFIterator j= F;
+  for (int i= degree (F); i >= k; i--)
+  {
+    if (j.exp() == i)
+    {
+      result [i - k]= j.coeff();
+      j++; 
+      if (!j.hasTerms())
+        return result;
+    }
+    else
+      result[i - k]= 0;
+  }
+  return result;
+}
+#endif
+
+int * computeBounds (const CanonicalForm& F, int& n)
+{
+  n= degree (F, 1);
+  int* result= new int [n];
+  int sizeOfNewtonPolygon;
+  int** newtonPolyg= newtonPolygon (F, sizeOfNewtonPolygon);
+
+  int minXIndex= 0, minYIndex= 0, maxXIndex= 0, maxYIndex= 0;
+  int minX, minY, maxX, maxY;
+  minX= newtonPolyg [0] [0];
+  minY= newtonPolyg [0] [1];
+  maxX= minX;
+  maxY= minY;
+  for (int i= 1; i < sizeOfNewtonPolygon; i++)
+  {
+    if (minX > newtonPolyg [i] [0])
+    {
+      minX= newtonPolyg [i] [0];
+      minXIndex= i;
+    }
+    if (maxX < newtonPolyg [i] [0])
+    {
+      maxX= newtonPolyg [i] [0];
+      maxXIndex= i;
+    }
+    if (minY > newtonPolyg [i] [1])
+    {
+      minY= newtonPolyg [i] [1];
+      minYIndex= i;
+    }
+    if (maxY < newtonPolyg [i] [1])
+    {
+      maxY= newtonPolyg [i] [1];
+      maxYIndex= i;
+    }
+  }
+
+  int k= maxX;
+  bool hitMaxX= false;
+  for (int i= 0; i < n; i++)
+  {
+    if (i + 1 > maxY || i + 1 < minY)
+    {
+      result [i]= 0;
+      continue;
+    }
+    int* point= new int [2];
+    point [0]= k;
+    point [1]= i + 1;
+    while (!isInPolygon (newtonPolyg, sizeOfNewtonPolygon, point) && k > 0)
+    {
+      k--;
+      point [0]= k;
+    }
+    result [i]= k;
+    k= maxX;
+    delete [] point;
+  }
+
   return result;
 }
 

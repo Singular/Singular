@@ -335,7 +335,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
             }
             else
             {
-              if (!isInExtension (buf2, delta, k))
+              if (!isInExtension (buf2, gamma, k, delta, source, dest))
               {
                 buf /= g;
                 LCBuf= LC (buf, Variable (1));
@@ -667,7 +667,7 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
           }
           else
           {
-            if (!isInExtension (buf2, delta, k))
+            if (!isInExtension (buf2, gamma, k, delta, source, dest))
             {
               appendTestMapDown (result, buf2, info, source, dest);
               buf /= g;

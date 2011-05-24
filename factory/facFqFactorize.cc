@@ -695,7 +695,7 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
         }
         else
         {
-          if (!isInExtension (buf2, delta, k))
+          if (!isInExtension (buf2, gamma, k, delta, source, dest))
           {
             appendTestMapDown (result, buf2, info, source, dest);
             buf /= g;
@@ -923,6 +923,7 @@ extLiftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
   else if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
+  CFList source, dest;
   for (CFListIterator i= factors; i.hasItem(); i++)
   {
     g= mulMod (i.getItem(), LCBuf, M);
@@ -944,7 +945,7 @@ extLiftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
       }
       else
       {
-        if (!isInExtension (gg, delta, k))
+        if (!isInExtension (gg, gamma, k, delta, source, dest))
         {
           buf /= g;
           nBuf= degree (g, y) + degree (LC (g, Variable (1)), y);
@@ -1095,7 +1096,7 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
       }
       else
       {
-        if (!isInExtension (gg, delta, k))
+        if (!isInExtension (gg, gamma, k, delta, source, dest))
         {
           appendTestMapDown (result, gg, info, source, dest);
           buf /= g;

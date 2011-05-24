@@ -29,6 +29,8 @@
 #include "ExtensionInfo.h"
 #include "cf_util.h"
 #include "facFqSquarefree.h"
+#include "cf_map.h"
+#include "cfNewtonPolygon.h"
 
 static const double log2exp= 1.442695041;
 
@@ -52,13 +54,47 @@ biFactorize (const CanonicalForm& F,       ///< [in] a bivariate poly
 /// @return @a FpBiSqrfFactorize returns a list of monic factors, the first
 ///         element is the leading coefficient.
 /// @sa FqBiSqrfFactorize(), GFBiSqrfFactorize()
+#ifdef HAVE_NTL
 inline
-CFList FpBiSqrfFactorize (const CanonicalForm & F ///< [in] a bivariate poly
+CFList FpBiSqrfFactorize (const CanonicalForm & G ///< [in] a bivariate poly
                          )
 {
   ExtensionInfo info= ExtensionInfo (false);
+  CFMap N;
+  CanonicalForm F= compress (G, N);
+  CanonicalForm contentX= content (F, 1);
+  CanonicalForm contentY= content (F, 2);
+  F /= (contentX*contentY);
+  CFFList contentXFactors, contentYFactors;
+  contentXFactors= factorize (contentX);
+  contentYFactors= factorize (contentY);
+  if (contentXFactors.getFirst().factor().inCoeffDomain())
+    contentXFactors.removeFirst();
+  if (contentYFactors.getFirst().factor().inCoeffDomain())
+    contentYFactors.removeFirst();
+  if (F.inCoeffDomain())
+  {
+    CFList result;
+    for (CFFListIterator i= contentXFactors; i.hasItem(); i++)
+      result.append (N (i.getItem().factor()));
+    for (CFFListIterator i= contentYFactors; i.hasItem(); i++)
+      result.append (N (i.getItem().factor()));
+    normalize (result);
+    result.insert (Lc (G));
+    return result;
+  }
+  mat_ZZ M;
+  vec_ZZ S;
+  F= compress (F, M, S);
   CFList result= biFactorize (F, info);
-  result.insert (Lc(F));
+  for (CFListIterator i= result; i.hasItem(); i++)
+    i.getItem()= N (decompress (i.getItem(), M, S));
+  for (CFFListIterator i= contentXFactors; i.hasItem(); i++)
+    result.append (N(i.getItem().factor()));
+  for (CFFListIterator i= contentYFactors; i.hasItem(); i++)
+    result.append (N (i.getItem().factor()));
+  normalize (result);
+  result.insert (Lc(G));
   return result;
 }
 
@@ -68,13 +104,46 @@ CFList FpBiSqrfFactorize (const CanonicalForm & F ///< [in] a bivariate poly
 ///         element is the leading coefficient.
 /// @sa FpBiSqrfFactorize(), GFBiSqrfFactorize()
 inline
-CFList FqBiSqrfFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
+CFList FqBiSqrfFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
                           const Variable& alpha    ///< [in] algebraic variable
                          )
 {
   ExtensionInfo info= ExtensionInfo (alpha, false);
+  CFMap N;
+  CanonicalForm F= compress (G, N);
+  CanonicalForm contentX= content (F, 1);
+  CanonicalForm contentY= content (F, 2);
+  F /= (contentX*contentY);
+  CFFList contentXFactors, contentYFactors;
+  contentXFactors= factorize (contentX);
+  contentYFactors= factorize (contentY);
+  if (contentXFactors.getFirst().factor().inCoeffDomain())
+    contentXFactors.removeFirst();
+  if (contentYFactors.getFirst().factor().inCoeffDomain())
+    contentYFactors.removeFirst();
+  if (F.inCoeffDomain())
+  {
+    CFList result;
+    for (CFFListIterator i= contentXFactors; i.hasItem(); i++)
+      result.append (N (i.getItem().factor()));
+    for (CFFListIterator i= contentYFactors; i.hasItem(); i++)
+      result.append (N (i.getItem().factor()));
+    normalize (result);
+    result.insert (Lc (G));
+    return result;
+  }
+  mat_ZZ M;
+  vec_ZZ S;
+  F= compress (F, M, S);
   CFList result= biFactorize (F, info);
-  result.insert (Lc(F));
+  for (CFListIterator i= result; i.hasItem(); i++)
+    i.getItem()= N (decompress (i.getItem(), M, S));
+  for (CFFListIterator i= contentXFactors; i.hasItem(); i++)
+    result.append (N(i.getItem().factor()));
+  for (CFFListIterator i= contentYFactors; i.hasItem(); i++)
+    result.append (N (i.getItem().factor()));
+  normalize (result);
+  result.insert (Lc(G));
   return result;
 }
 
@@ -84,14 +153,47 @@ CFList FqBiSqrfFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
 ///         element is the leading coefficient.
 /// @sa FpBiSqrfFactorize(), FqBiSqrfFactorize()
 inline
-CFList GFBiSqrfFactorize (const CanonicalForm & F ///< [in] a bivariate poly
+CFList GFBiSqrfFactorize (const CanonicalForm & G ///< [in] a bivariate poly
                          )
 {
   ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
+  CFMap N;
+  CanonicalForm F= compress (G, N);
+  CanonicalForm contentX= content (F, 1);
+  CanonicalForm contentY= content (F, 2);
+  F /= (contentX*contentY);
+  CFList contentXFactors, contentYFactors;
+  contentXFactors= biFactorize (contentX, info);
+  contentYFactors= biFactorize (contentY, info);
+  if (contentXFactors.getFirst().inCoeffDomain())
+    contentXFactors.removeFirst();
+  if (contentYFactors.getFirst().inCoeffDomain())
+    contentYFactors.removeFirst();
+  if (F.inCoeffDomain())
+  {
+    CFList result;
+    for (CFListIterator i= contentXFactors; i.hasItem(); i++)
+      result.append (N (i.getItem()));
+    for (CFListIterator i= contentYFactors; i.hasItem(); i++)
+      result.append (N (i.getItem()));
+    normalize (result);
+    result.insert (Lc (G));
+    return result;
+  }
+  mat_ZZ M;
+  vec_ZZ S;
+  F= compress (F, M, S);
   CFList result= biFactorize (F, info);
-  result.insert (Lc(F));
+  for (CFListIterator i= result; i.hasItem(); i++)
+    i.getItem()= N (decompress (i.getItem(), M, S));
+  for (CFListIterator i= contentXFactors; i.hasItem(); i++)
+    result.append (N(i.getItem()));
+  for (CFListIterator i= contentYFactors; i.hasItem(); i++)
+    result.append (N (i.getItem()));
+  normalize (result);
+  result.insert (Lc(G));
   return result;
 }
 
@@ -101,16 +203,40 @@ CFList GFBiSqrfFactorize (const CanonicalForm & F ///< [in] a bivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 /// @sa FqBiFactorize(), GFBiFactorize()
 inline
-CFFList FpBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
+CFFList FpBiFactorize (const CanonicalForm & G ///< [in] a bivariate poly
                       )
 {
   ExtensionInfo info= ExtensionInfo (false);
   bool GF= false;
+  CFMap N;
+  CanonicalForm F= compress (G, N);
   CanonicalForm LcF= Lc (F);
+  CanonicalForm contentX= content (F, 1);
+  CanonicalForm contentY= content (F, 2);
+  F /= (contentX*contentY);
+  CFFList contentXFactors, contentYFactors;
+  contentXFactors= factorize (contentX);
+  contentYFactors= factorize (contentY);
+  if (contentXFactors.getFirst().factor().inCoeffDomain())
+    contentXFactors.removeFirst();
+  if (contentYFactors.getFirst().factor().inCoeffDomain())
+    contentYFactors.removeFirst();
+  decompress (contentXFactors, N);
+  decompress (contentYFactors, N);
+  CFFList result, resultRoot;
+  if (F.inCoeffDomain())
+  {
+    result= Union (contentXFactors, contentYFactors);
+    normalize (result);
+    result.insert (CFFactor (LcF, 1));
+    return result;
+  }
+  mat_ZZ M;
+  vec_ZZ S;
+  F= compress (F, M, S);
   CanonicalForm pthRoot, A;
   CanonicalForm sqrfP= sqrfPart (F/Lc(F), pthRoot, info.getAlpha());
   CFList buf, bufRoot;
-  CFFList result, resultRoot;
   int p= getCharacteristic();
   int l;
   if (degree (pthRoot) > 0)
@@ -119,7 +245,11 @@ CFFList FpBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
     result= FpBiFactorize (pthRoot);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp()*ipower (p,l));
+    result= Union (result, contentXFactors);
+    result= Union (result, contentYFactors);
+    normalize (result);
     result.insert (CFFactor (LcF, 1));
     return result;
   }
@@ -128,13 +258,22 @@ CFFList FpBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
     buf= biFactorize (sqrfP, info);
     A= F/LcF;
     result= multiplicity (A, buf);
+    for (CFFListIterator i= result; i.hasItem(); i++)
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp());
   }
   if (degree (A) > 0)
   {
     resultRoot= FpBiFactorize (A);
     resultRoot.removeFirst();
+    for (CFFListIterator i= resultRoot; i.hasItem(); i++)
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp());
     result= Union (result, resultRoot);
   }
+  result= Union (result, contentXFactors);
+  result= Union (result, contentYFactors);
+  normalize (result);
   result.insert (CFFactor (LcF, 1));
   return result;
 }
@@ -145,17 +284,42 @@ CFFList FpBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 /// @sa FpBiFactorize(), FqBiFactorize()
 inline
-CFFList FqBiFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
+CFFList FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
                        const Variable & alpha   ///< [in] algebraic variable
                       )
 {
   ExtensionInfo info= ExtensionInfo (alpha, false);
   bool GF= false;
+  CFMap N;
+  CanonicalForm F= compress (G, N);
   CanonicalForm LcF= Lc (F);
-  CanonicalForm pthRoot, A;
+  CanonicalForm contentX= content (F, 1);
+  CanonicalForm contentY= content (F, 2);
+  F /= (contentX*contentY);
+  CFFList contentXFactors, contentYFactors;
+  contentXFactors= factorize (contentX);
+  contentYFactors= factorize (contentY);
+  if (contentXFactors.getFirst().factor().inCoeffDomain())
+    contentXFactors.removeFirst();
+  if (contentYFactors.getFirst().factor().inCoeffDomain())
+    contentYFactors.removeFirst();
+  decompress (contentXFactors, N);
+  decompress (contentYFactors, N);
+  CFFList result, resultRoot;
+  if (F.inCoeffDomain())
+  {
+    result= Union (contentXFactors, contentYFactors);
+    normalize (result);
+    result.insert (CFFactor (LcF, 1));
+    return result;
+  }
+  mat_ZZ M;
+  vec_ZZ S;
+  CanonicalForm oldF= F;
+  F= compress (F, M, S);
+  CanonicalForm pthRoot, A, tmp;
   CanonicalForm sqrfP= sqrfPart (F/Lc(F), pthRoot, alpha);
   CFList buf, bufRoot;
-  CFFList result, resultRoot;
   int p= getCharacteristic();
   int q= ipower (p, degree (getMipo (alpha)));
   int l;
@@ -165,7 +329,11 @@ CFFList FqBiFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
     result= FqBiFactorize (pthRoot, alpha);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp()*ipower (p,l));
+    result= Union (result, contentXFactors);
+    result= Union (result, contentYFactors);
+    normalize (result);
     result.insert (CFFactor (LcF, 1));
     return result;
   }
@@ -174,13 +342,22 @@ CFFList FqBiFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
     buf= biFactorize (sqrfP, info);
     A= F/LcF;
     result= multiplicity (A, buf);
+    for (CFFListIterator i= result; i.hasItem(); i++)
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp());
   }
   if (degree (A) > 0)
   {
     resultRoot= FqBiFactorize (A, alpha);
     resultRoot.removeFirst();
+    for (CFFListIterator i= resultRoot; i.hasItem(); i++)
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp());
     result= Union (result, resultRoot);
   }
+  result= Union (result, contentXFactors);
+  result= Union (result, contentYFactors);
+  normalize (result);
   result.insert (CFFactor (LcF, 1));
   return result;
 }
@@ -191,18 +368,42 @@ CFFList FqBiFactorize (const CanonicalForm & F, ///< [in] a bivariate poly
 ///         multiplicity, the first element is the leading coefficient.
 /// @sa FpBiFactorize(), FqBiFactorize()
 inline
-CFFList GFBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
+CFFList GFBiFactorize (const CanonicalForm & G ///< [in] a bivariate poly
                       )
 {
   ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
   bool GF= true;
+  CFMap N;
+  CanonicalForm F= compress (G, N);
   CanonicalForm LcF= Lc (F);
+  CanonicalForm contentX= content (F, 1);
+  CanonicalForm contentY= content (F, 2);
+  F /= (contentX*contentY);
+  CFFList contentXFactors, contentYFactors;
+  contentXFactors= factorize (contentX);
+  contentYFactors= factorize (contentY);
+  if (contentXFactors.getFirst().factor().inCoeffDomain())
+    contentXFactors.removeFirst();
+  if (contentYFactors.getFirst().factor().inCoeffDomain())
+    contentYFactors.removeFirst();
+  decompress (contentXFactors, N);
+  decompress (contentYFactors, N);
+  CFFList result, resultRoot;
+  if (F.inCoeffDomain())
+  {
+    result= Union (contentXFactors, contentYFactors);
+    normalize (result);
+    result.insert (CFFactor (LcF, 1));
+    return result;
+  }
+  mat_ZZ M;
+  vec_ZZ S;
+  F= compress (F, M, S);
   CanonicalForm pthRoot, A;
   CanonicalForm sqrfP= sqrfPart (F/LcF, pthRoot, info.getAlpha());
   CFList buf;
-  CFFList result, resultRoot;
   int p= getCharacteristic();
   int q= ipower (p, getGFDegree());
   int l;
@@ -212,7 +413,11 @@ CFFList GFBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
     result= GFBiFactorize (pthRoot);
     result.removeFirst();
     for (CFFListIterator i= result; i.hasItem(); i++)
-      i.getItem()= CFFactor(i.getItem().factor(),i.getItem().exp()*ipower(p,l));
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp()*ipower (p,l));
+    result= Union (result, contentXFactors);
+    result= Union (result, contentYFactors);
+    normalize (result);
     result.insert (CFFactor (LcF, 1));
     return result;
   }
@@ -221,16 +426,27 @@ CFFList GFBiFactorize (const CanonicalForm & F ///< [in] a bivariate poly
     buf= biFactorize (sqrfP, info);
     A= F/LcF;
     result= multiplicity (A, buf);
+    for (CFFListIterator i= result; i.hasItem(); i++)
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp());
   }
   if (degree (A) > 0)
   {
     resultRoot= GFBiFactorize (A);
     resultRoot.removeFirst();
+    for (CFFListIterator i= resultRoot; i.hasItem(); i++)
+      i.getItem()= CFFactor (N (decompress (i.getItem().factor(), M, S)),
+                             i.getItem().exp());
     result= Union (result, resultRoot);
   }
+  result= Union (result, contentXFactors);
+  result= Union (result, contentYFactors);
+  normalize (result);
   result.insert (CFFactor (LcF, 1));
   return result;
 }
+
+#endif
 
 /// \f$ \prod_{f\in L} {f (0, x)} \ mod\ M \f$ via divide-and-conquer
 ///
