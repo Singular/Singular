@@ -66,7 +66,7 @@
 #ifndef MINPOLY_H
 #define MINPOLY_H
 
-#include<iostream>
+//#include<iostream>
 
 class NewVectorMatrix;
 
@@ -87,7 +87,7 @@ public:
     // reset the matrix, so that we can use it to find another linear dependence
     // Note: there is no need to reinitalize the matrix and vectors!
     void resetMatrix();
-    
+
 
     // return the first nonzero entry in row (only the first n entries are checked,
     // regardless of the size, since we will also apply this for rows with
@@ -98,10 +98,10 @@ public:
     void reduceTmpRow();
 
     void normalizeTmp(unsigned i);
-            
+
     bool findLinearDependency(unsigned long* newRow, unsigned long* dep);
 
-    friend std::ostream& operator<<(std::ostream& out, const LinearDependencyMatrix& mat);
+   //friend std::ostream& operator<<(std::ostream& out, const LinearDependencyMatrix& mat);
 };
 
 
@@ -118,7 +118,7 @@ private:
 public:
     NewVectorMatrix(unsigned n, unsigned long p);
     ~NewVectorMatrix();
-    
+
     // return the first nonzero entry in row (only the first n entries are checked,
     // regardless of the size, since we will also apply this for rows with
     // right hand sides).
@@ -136,7 +136,7 @@ public:
     // If no such number exists, return -1.
     int findSmallestNonpivot();
 };
-                
+
 
 // compute the minimal polynomial of matrix \in \F_p^{n \times n}.
 // The result is an array of length n + 1, where the i-th entry represents the i-th coefficient
@@ -173,7 +173,7 @@ void rem(unsigned long* a, unsigned long* q, unsigned long p, int & dega, int de
 void quo(unsigned long* a, unsigned long* q, unsigned long p, int & dega, int degq);
 
 
-// NOTE: since we don't know the size of result (the list can be longer than the degree of the polynomial), 
+// NOTE: since we don't know the size of result (the list can be longer than the degree of the polynomial),
 // every entry has to be preinitialized to zero!
 void mult(unsigned long* result, unsigned long* a, unsigned long* b, unsigned long p, int dega, int degb);
 
