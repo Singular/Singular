@@ -118,6 +118,11 @@ class GlobalPrintingFixture : public CxxTest::GlobalFixture
 
       std::clog << std::endl << ( "<world>" ) << std::endl << std::endl;
       feInitResources(argv0);
+
+      StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
+      feStringAppendResources(0);
+      PrintS(StringAppendS("\n"));
+      
       return true;
     }
 

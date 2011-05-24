@@ -504,10 +504,6 @@ public:
 
    void test_Z13_t_GF()
    {
-     StringSetS("ressources in use (as reported by feStringAppendResources(0):\n");
-     feStringAppendResources(0);
-     PrintS(StringAppendS("\n"));
-
      clog << "Creating  GF[t]: " << endl;
 
      char* n[] = {"t"};
