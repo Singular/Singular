@@ -56,6 +56,7 @@
 #include <kernel/prCopy.h>
 #include <kernel/mpr_complex.h>
 #include <kernel/ffields.h>
+#include <Singular/minpoly.h>
 
 #ifdef HAVE_RINGS
 #include <kernel/ringgb.h>
@@ -175,6 +176,55 @@ extern BOOLEAN jjJanetBasis(leftv res, leftv v);
 #ifdef ix86_Win  /* PySingular initialized? */
 static int PyInitialized = 0;
 #endif
+
+/* expects a SINGULAR square matrix with number entries
+   where currRing is expected to be over some field F_p;
+   returns a long** matrix with the "same", i.e.,
+   appropriately mapped entries;
+   leaves singularMatrix unmodified */
+unsigned long** singularMatrixToLongMatrix(matrix singularMatrix)
+{
+  int n = singularMatrix->rows();
+  assume(n == singularMatrix->cols());
+  unsigned long **longMatrix = 0;
+  longMatrix = new unsigned long *[n] ;
+  for (int i = 0 ; i < n; i++)
+    longMatrix[i] = new unsigned long [n];
+  number entry;
+  for (int r = 0; r < n; r++)
+    for (int c = 0; c < n; c++)
+    {
+      entry = p_GetCoeff(MATELEM(singularMatrix, r + 1, c + 1), currRing);
+      int entryAsInt = n_Int(entry, currRing);
+      if (entryAsInt < 0) entryAsInt += currRing->ch;
+      longMatrix[r][c] = (unsigned long)entryAsInt;
+    }
+  return longMatrix;
+}
+
+/* expects an array of unsigned longs with valid indices 0..degree;
+   returns the following poly, where x denotes the first ring variable
+   of currRing, and d = degree:
+      polyCoeffs[d] * x^d + polyCoeffs[d-1] * x^(d-1) + ... + polyCoeffs[0]
+   leaves polyCoeffs unmodified */
+poly longCoeffsToSingularPoly(unsigned long *polyCoeffs, const int degree)
+{
+  poly result = NULL;
+  for (int i = 0; i <= degree; i++)
+  {
+    if ((int)polyCoeffs[i] != 0)
+    {
+      poly term = p_ISet((int)polyCoeffs[i], currRing);
+      if (i > 0)
+      {
+        p_SetExp(term, 1, i, currRing);
+        p_Setm(term, currRing);
+      }
+      result = p_Add_q(result, term, currRing);
+    }
+  }
+  return result;
+}
 
 //void emStart();
 /*2
@@ -2714,6 +2764,48 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
   #endif
+  /*==== connection to Sebastian Jambor's code ======*/
+  /* This code connects Sebastian Jambor's code for
+     computing the minimal polynomial of an (n x n) matrix
+     with entries in F_p to SINGULAR. Two conversion methods
+     are needed; see further up in this file:
+        (1) conversion of a matrix with long entries to
+            a SINGULAR matrix with number entries, where
+            the numbers are coefficients in currRing;
+        (2) conversion of an array of longs (encoding the
+            coefficients of the minimal polynomial) to a
+            SINGULAR poly living in currRing. */
+      if (strcmp(sys_cmd, "minpoly") == 0)
+      {
+        if ((h == NULL) || (h->Typ() != MATRIX_CMD) || h->next != NULL)
+        {
+          Werror("expected exactly one argument: %s",
+                 "a square matrix with number entries");
+          return TRUE;
+        }
+        else
+        {
+          matrix m = (matrix)h->Data();
+          int n = m->rows();
+          unsigned long p = (unsigned long)currRing->ch;
+          if (n != m->cols())
+          {
+            Werror("expected exactly one argument: %s",
+                   "a square matrix with number entries");
+            return TRUE;
+          }
+          unsigned long** ml = singularMatrixToLongMatrix(m);
+          unsigned long* polyCoeffs = computeMinimalPolynomial(ml, n, p);
+          poly theMinPoly = longCoeffsToSingularPoly(polyCoeffs, n);
+          res->rtyp = POLY_CMD;
+          res->data = (void *)theMinPoly;
+          for (int i = 0; i < n; i++) delete[] ml[i];
+          delete[] ml;
+          delete[] polyCoeffs;
+          return FALSE;
+        }
+      }
+      else
   /*==================== sdb_flags =================*/
   #ifdef HAVE_SDB
       if (strcmp(sys_cmd, "sdb_flags") == 0)
