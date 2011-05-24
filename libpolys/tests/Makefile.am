@@ -25,8 +25,8 @@ check_PROGRAMS = $(TESTS)
 
 simple_test_SOURCES = simple_test_runner.cpp
 coeffs_test_SOURCES = coeffs_test_runner.cpp gftables
-polys_test_SOURCES = polys_test_runner.cpp gftables
-rings_test_SOURCES = rings_test_runner.cpp gftables
+polys_test_SOURCES = polys_test_runner.cpp gftables MOD
+rings_test_SOURCES = rings_test_runner.cpp gftables MOD
 
 
 
@@ -37,25 +37,11 @@ coeffs_test_LDADD = -lcoeffs_g ${GMP_LIBS} -lresources_g -lreporter_g -lmisc_g $
 polys_test_LDADD = -lpolys_g ${USEPPROCSDYNAMICLD} $(coeffs_test_LDADD)
 rings_test_LDADD = $(polys_test_LDADD)
 
-noinst_SCRIPTS = p_Procs_FieldGeneral.so \
-		 p_Procs_FieldIndep.so \
-		 p_Procs_FieldQ.so \
-		 p_Procs_FieldZp.so
-
 gftables: ${top_srcdir}/../factory/gftables
 	ln -snf ${top_srcdir}/../factory/gftables ${builddir}
 
-p_Procs_FieldGeneral.so:	${top_builddir}/polys/.libs/p_Procs_FieldGeneral.so
-				ln -snf ${top_builddir}/polys/.libs/p_Procs_FieldGeneral.so ${builddir}
-
-p_Procs_FieldIndep.so:	${top_builddir}/polys/.libs/p_Procs_FieldIndep.so
-				ln -snf ${top_builddir}/polys/.libs/p_Procs_FieldIndep.so ${builddir}
-
-p_Procs_FieldQ.so:	${top_builddir}/polys/.libs/p_Procs_FieldQ.so
-				ln -snf ${top_builddir}/polys/.libs/p_Procs_FieldQ.so ${builddir}
-
-p_Procs_FieldZp.so:	${top_builddir}/polys/.libs/p_Procs_FieldZp.so
-				ln -snf ${top_builddir}/polys/.libs/p_Procs_FieldZp.so ${builddir}
+MOD: ${top_builddir}/polys/.libs
+	ln -snf ${top_builddir}/polys/.libs/ ${builddir}/MOD
 
 BUILT_SOURCES = $(simple_test_SOURCES) $(coeffs_test_SOURCES) $(rings_test_SOURCES) $(polys_test_SOURCES)
 
@@ -72,3 +58,5 @@ polys_test_runner.cpp: polys_test.h
 
 rings_test_runner.cpp: rings_test.h
 	${srcdir}/cxxtestgen.pl --no-eh -o $@ --error-printer ${srcdir}/rings_test.h
+
+CLEANFILES = simple_test_runner.cpp coeffs_test_runner.cpp polys_test_runner.cpp rings_test_runner.cpp MOD gftables
