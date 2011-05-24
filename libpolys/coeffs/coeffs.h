@@ -15,6 +15,7 @@
 #include <coeffs/si_gmp.h>
 
 #ifdef HAVE_FACTORY
+#include <factory/factory.h>
 class CanonicalForm;
 #endif
 

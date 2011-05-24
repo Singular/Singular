@@ -19,6 +19,7 @@ using namespace std;
 #include <polys/monomials/p_polys.h>
 
 #include <polys/simpleideals.h>
+#include <polys/clapsing.h>
 
 class MyGlobalPrintingFixture : public GlobalPrintingFixture
 {
@@ -208,26 +209,12 @@ void Test(const ring r)
 class PolysTestSuite : public CxxTest::TestSuite 
 {
 private:
-  /* replaces n by n + c * var^exp (in-place);
+  /* replaces p by p + c * var(i)^exp (in-place);
      expects exp >= 0 */
-  void plusTerm(number &n, int c, int exp, const coeffs cf)
+  void plusTerm(poly &p, int c, int i, int exp, const ring r)
   {
-    number x = n_Par(1, cf);
-    number pow = n_Init(1, cf);
-    number temp;
-    for (int i = 1; i <= exp; i++)
-    {
-      temp = n_Mult(pow, x, cf);
-      n_Delete(&pow, cf);
-      pow = temp;
-    }
-    n_Delete(&x, cf);
-    number m = n_Init(c, cf);
-    number t = n_Mult(m, pow, cf);
-    n_Delete(&m, cf); n_Delete(&pow, cf);
-    temp = n_Add(n, t, cf);
-    n_Delete(&n, cf); n_Delete(&t, cf);
-    n = temp;
+    poly t = p_ISet(c, r); p_SetExp(t, i, exp, r); p_Setm(t, r);
+    p = p_Add_q(p, t, r);
   }
   void checkInverse(number n, const coeffs cf)
   {
@@ -596,7 +583,7 @@ public:
     TestSumCf(cf, 100);
     TestSumCf(cf, 101);
     TestSumCf(cf, 1001);
-    TestSumCf(cf, 9000);
+    TestSumCf(cf, 2000);
 
     clog << "Finally create the polynomial ring (Q[a]/<a2+1>)[x, y]..."
          << endl;
@@ -623,17 +610,22 @@ public:
          << "Now let's compute some inverses in Q[a]/<a^2+1>..."
          << endl;
     
-    number u;
-    u = NULL; plusTerm(u, 1, 1, cf); plusTerm(u, 1, 0, cf);  // a + 1
-    checkInverse(u, cf); n_Delete(&u, cf);
-    u = NULL; plusTerm(u, 1, 1, cf); plusTerm(u, -1, 0, cf); // a - 1
-    checkInverse(u, cf); n_Delete(&u, cf);
-    u = NULL; plusTerm(u, 1, 1, cf); plusTerm(u, 5, 0, cf);  // a + 5
-    checkInverse(u, cf); n_Delete(&u, cf);
-    u = NULL; plusTerm(u, 1, 1, cf); plusTerm(u, -5, 0, cf); // a - 5
-    checkInverse(u, cf); n_Delete(&u, cf);
-    u = NULL; plusTerm(u, 17, 1, cf); plusTerm(u, 5, 0, cf); // 17a + 5
-    checkInverse(u, cf); n_Delete(&u, cf);
+    poly u;
+    u = NULL; plusTerm(u, 1, 1, 1, cf->algring);
+    plusTerm(u, 1, 1, 0, cf->algring);  // a + 1
+    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
+    u = NULL; plusTerm(u, 1, 1, 1, cf->algring);
+    plusTerm(u, -1, 1, 0, cf->algring); // a - 1
+    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
+    u = NULL; plusTerm(u, 1, 1, 1, cf->algring);
+    plusTerm(u, 5, 1, 0, cf->algring);  // a + 5
+    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
+    u = NULL; plusTerm(u, 1, 1, 1, cf->algring);
+    plusTerm(u, -5, 1, 0, cf->algring); // a - 5
+    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
+    u = NULL; plusTerm(u, 17, 1, 1, cf->algring);
+    plusTerm(u, 5, 1, 0, cf->algring); // 17a + 5
+    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
 
     rDelete(s); // kills 'cf' and 'r' as well
   }
@@ -716,34 +708,39 @@ public:
          << "Now let's compute some inverses in Q[b]/<b^7+17>..."
          << endl;
          
-    number u;
-    u = NULL; plusTerm(u, 1, 2, cf); plusTerm(u, 33, 0, cf);    // b^2 + 33
-    checkInverse(u, cf); n_Delete(&u, cf);
-    u = NULL; plusTerm(u, 1, 5, cf); plusTerm(u, -137, 0, cf);  // b^5 - 137
-    checkInverse(u, cf); n_Delete(&u, cf);
+    poly u;
+    u = NULL; plusTerm(u, 1, 1, 2, cf->algring);
+    plusTerm(u, 33, 1, 0, cf->algring);     // b^2 + 33
+    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
+    u = NULL; plusTerm(u, 1, 1, 5, cf->algring);
+    plusTerm(u, -137, 1, 0, cf->algring);   // b^5 - 137
+    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
 
     clog << endl
          << "Now let's check a gcd computation in Q[b]..."
          << endl;
     
-    number v;
-    v = NULL; plusTerm(v, 1, 2, cf); plusTerm(v, 7, 1, cf);
-    plusTerm(v, 1, 0, cf);        // b^2 + 7b + 1
-    number w = n_Mult(v, v, cf);  // (b^2 + 7b + 1)^2
-    number y = n_Mult(v, w, cf);  // (b^2 + 7b + 1)^3
-    n_Delete(&v, cf);
-    v = NULL; plusTerm(v, 2, 2, cf); plusTerm(v, -61, 1, cf);   // 2b^2 - 61b
-    number z = n_Mult(w, v, cf);   // (b^2 + 7b + 1)^2 * (2b^2 - 61b)
-    n_Delete(&v, cf);
+    poly v;
+    v = NULL; plusTerm(v, 1, 1, 2, cf->algring);
+    plusTerm(v, 7, 1, 1, cf->algring);
+    plusTerm(v, 1, 1, 0, cf->algring);            // b^2 + 7b + 1
+    number w = n_Mult((number)v, (number)v, cf);  // (b^2 + 7b + 1)^2
+    number y = n_Mult((number)v, (number)w, cf);  // (b^2 + 7b + 1)^3
+    p_Delete(&v, cf->algring);
+    v = NULL; plusTerm(v, 2, 1, 2, cf->algring);
+    plusTerm(v, -61, 1, 1, cf->algring);          // 2b^2 - 61b
+    number z = n_Mult((number)w,
+                      (number)v, cf);   // (b^2 + 7b + 1)^2 * (2b^2 - 61b)
+    p_Delete(&v, cf->algring);
     
-    clog << "z = "; n_Write(z, cf);
-    clog << "y = "; n_Write(y, cf);
+    clog << "z = "; p_Write((poly)z, cf->algring);
+    clog << "y = "; p_Write((poly)y, cf->algring);
     number theGcd = n_Gcd(z, y, cf);   // should yield w = (b^2 + 7b + 1)^2
-    clog << "gcd(z, y) = "; n_Write(theGcd, cf);
+    clog << "gcd(z, y) = "; p_Write((poly)theGcd, cf->algring);
     
-    v = n_Sub(theGcd, w, cf);
+    v = (poly)n_Sub(theGcd, w, cf);
     TS_ASSERT( v == NULL );
-    n_Delete(&v, cf);
+    p_Delete(&v, cf->algring);
     
     clog << endl
          << "Now let's check an ext_gcd computation in Q[b]..."
@@ -751,16 +748,16 @@ public:
          
     poly zFactor; poly yFactor;
     poly ppp = p_ExtGcd((poly)z, zFactor, (poly)y, yFactor, cf->algring);
-    v = n_Sub(theGcd, (number)ppp, cf);
+    v = (poly)n_Sub(theGcd, (number)ppp, cf);
     TS_ASSERT( v == NULL );
-    clog << "z = "; n_Write(z, cf);
+    clog << "z = "; p_Write((poly)z, cf->algring);
     clog << "zFactor = "; p_Write(zFactor, cf->algring);
-    clog << "y = "; n_Write(y, cf);
-    clog << "yFactor = "; p_Write(yFactor, cf->algring);
+    clog << "y = "; p_Write((poly)y, cf->algring);
+    clog << "yFactor = "; p_Write((poly)yFactor, cf->algring);
     number v1 = n_Mult(z, (number)zFactor, cf);
     number v2 = n_Mult(y, (number)yFactor, cf);
     number v3 = n_Add(v1, v2, cf);
-    clog << "z * zFactor + y * yFactor = "; n_Write(v3, cf);
+    clog << "z * zFactor + y * yFactor = "; p_Write((poly)v3, cf->algring);
     clog << "gcd(z, y) = "; p_Write(ppp, cf->algring);
     number v4 = n_Sub(v3, w, cf);
     TS_ASSERT( v4 == NULL );
@@ -768,9 +765,105 @@ public:
     p_Delete(&ppp, cf->algring); p_Delete(&zFactor, cf->algring);
     p_Delete(&yFactor, cf->algring);
     n_Delete(&z, cf); n_Delete(&y, cf); n_Delete(&w, cf);
-    n_Delete(&theGcd, cf); n_Delete(&v, cf); n_Delete(&v1, cf);
+    n_Delete(&theGcd, cf); p_Delete(&v, cf->algring); n_Delete(&v1, cf);
     n_Delete(&v2, cf); n_Delete(&v3, cf); n_Delete(&v4, cf);
 
+    rDelete(s); // kills 'cf' and 'r' as well
+  }
+  void test_Z_17_Ext_a()
+  {
+    clog << "Start by creating Z_17[a]..." << endl;
+
+    char* n[] = {"a"};
+    ring r = rDefault( 17, 1, n);   // Z/17Z[a]
+    TS_ASSERT_DIFFERS( r, NULLp );
+
+    PrintRing(r);
+
+    TS_ASSERT( rField_is_Domain(r) );
+    TS_ASSERT( !rField_is_Q(r) );
+    
+    TS_ASSERT( rField_is_Zp(r) );
+    TS_ASSERT( rField_is_Zp(r, 17) );
+
+    TS_ASSERT_EQUALS( rVar(r), 1);
+
+    poly minPoly = p_ISet(1, r);                    // minPoly = 1
+    p_SetExp(minPoly, 1, 2, r); p_Setm(minPoly, r); // minPoly = a^2
+    minPoly = p_Add_q(minPoly, p_ISet(3, r), r);    // minPoly = a^2 + 3
+    ideal minIdeal = idInit(1);                     // minIdeal = < 0 >
+    minIdeal->m[0] = minPoly;                       // minIdeal = < a^2 + 3 >
+
+    n_coeffType type = nRegister(n_Ext, naInitChar); 
+    TS_ASSERT(type == n_Ext);
+
+    ExtInfo extParam;
+    extParam.r = r;
+    extParam.i = minIdeal;
+    
+    clog << "Next create the extension field Z_17[a]/<a^2+3>..." << endl;
+
+    const coeffs cf = nInitChar(type, &extParam);   // Z_17[a]/<a^2+3>
+    
+    if( cf == NULL )
+      TS_FAIL("Could not get needed coeff. domain");
+
+    TS_ASSERT_DIFFERS( cf->cfCoeffWrite, NULLp );
+    
+    if( cf->cfCoeffWrite != NULL )
+    {
+      clog << "Coeff-domain: "  << endl; 
+      n_CoeffWrite(cf); PrintLn();
+    }
+    
+    // some tests for the coefficient field represented by cf:
+    TestArithCf(cf);
+    TestSumCf(cf, 10);
+    TestSumCf(cf, 100);
+    TestSumCf(cf, 101);
+    TestSumCf(cf, 1001);
+    TestSumCf(cf, 9000);
+
+    clog << "Finally create the polynomial ring (Z_17[a]/<a^2+3>)[u, v, w]..."
+         << endl;
+    
+    char* m[] = {"u", "v", "w"};
+    ring s = rDefault(cf, 3, m);   // (Z_17[a]/<a^2+3>)[u, v, w]
+    TS_ASSERT_DIFFERS(s, NULLp);
+
+    PrintRing(s);
+
+    TS_ASSERT( rField_is_Domain(s) );
+    TS_ASSERT( !rField_is_Q(s) );
+    TS_ASSERT( !rField_is_Zp(s) );
+    TS_ASSERT( !rField_is_Zp(s, 11) );
+    TS_ASSERT( !rField_is_Zp(s, 17) );
+    TS_ASSERT( !rField_is_GF(s) );
+    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( !rField_is_GF(s, 25) );
+    TS_ASSERT_EQUALS(rVar(s), 3);
+
+    Test(s);
+    
+    poly f = p_ISet(3, s);
+    p_SetExp(f, 1, 3, s);
+    p_SetExp(f, 2, 1, s);
+    p_SetExp(f, 3, 5, s);
+    p_Setm(f, r);   // 3*u^3*v*w^5
+    plusTerm(f, -2, 1, 6, s); // -2*u^6 + 3*u^3*v*w^5
+    p_Write(f, s);
+    poly g = p_ISet(7, s);
+    p_SetExp(g, 1, 5, s);
+    p_SetExp(g, 2, 6, s);
+    p_SetExp(g, 3, 2, s);
+    p_Setm(g, r);   // 7*u^5*v^6*w^2
+    plusTerm(g, 8, 1, 4, s); // 7*u^5*v^6*w^2 + 8*u^4
+    p_Write(g, s);
+    poly h = singclap_gcd(f, g, s);   // u^3*v*w^2, destroys f and g
+    p_Write(h, s);
+    p_Test(h, s);
+    p_Delete(&h, s);
+    
     rDelete(s); // kills 'cf' and 'r' as well
   }
 };

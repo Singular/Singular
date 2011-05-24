@@ -358,10 +358,9 @@ void naWrite(number &a, const coeffs cf)
     /* basically, just write aAsPoly using p_Write,
        but use brackets around the output, if a is not
        a constant living in naCoeffs = cf->algring->cf */
-    BOOLEAN useBrackets = TRUE;
-    if (p_Deg(aAsPoly, naRing) == 0) useBrackets = FALSE;
+    BOOLEAN useBrackets = !(p_IsConstant(aAsPoly, naRing));
     if (useBrackets) StringAppendS("(");
-    p_Write(aAsPoly, naRing);
+    p_String0(aAsPoly, naRing, naRing);
     if (useBrackets) StringAppendS(")");
   }
 }

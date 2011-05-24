@@ -2058,7 +2058,7 @@ void p_Content(poly ph, const ring r)
       //number hzz = nlInit(1, r->cf);
       h = nlInit(1, r->cf);
       p=ph;
-      Werror("longalg missing");
+      Werror("longalg missing 1");
       #if 0
       while (p!=NULL)
       { // each monom: coeff in Q_a
@@ -3396,7 +3396,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
     else
     {
       qq=p_One(dst);
-      WerrorS("longalg missing");
+      WerrorS("longalg missing 2");
       #if 0
       aq=naPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
       if ((!rMinpolyIsNULL(dst))
@@ -3447,7 +3447,7 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
             }
             else
             {
-              WerrorS("longalg missing");
+              WerrorS("longalg missing 3");
               #if 0
               lnumber c=(lnumber)pGetCoeff(qq);
               if (c->z->next==NULL)

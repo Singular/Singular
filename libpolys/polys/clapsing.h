@@ -19,7 +19,9 @@
 #include <polys/clapconv.h>
 //#include <kernel/longtrans.h>
 
+/* destroys f and g */
 poly singclap_gcd ( poly f, poly g, const ring r );
+
 /*
 napoly singclap_alglcm ( napoly f, napoly g );
 void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg );
