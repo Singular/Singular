@@ -19,7 +19,11 @@ using namespace std;
 #include <polys/monomials/p_polys.h>
 
 #include <polys/simpleideals.h>
+
+#ifdef HAVE_FACTORY
 #include <polys/clapsing.h>
+#include <factory/factory.h>
+#endif
 
 class MyGlobalPrintingFixture : public GlobalPrintingFixture
 {
@@ -845,6 +849,7 @@ public:
 
     Test(s);
     
+#ifdef HAVE_FACTORY
     poly f = p_ISet(3, s);
     p_SetExp(f, 1, 3, s);
     p_SetExp(f, 2, 1, s);
@@ -859,11 +864,11 @@ public:
     p_Setm(g, r);   // 7*u^5*v^6*w^2
     plusTerm(g, 8, 1, 4, s); // 7*u^5*v^6*w^2 + 8*u^4
     p_Write(g, s);
-    poly h = singclap_gcd(f, g, s);   // u^3*v*w^2, destroys f and g
+    poly h = singclap_gcd(f, g, s);   // at least u^3, destroys f and g
     p_Write(h, s);
     p_Test(h, s);
     p_Delete(&h, s);
-    
+#endif
     rDelete(s); // kills 'cf' and 'r' as well
   }
 };
