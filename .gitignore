@@ -10,6 +10,7 @@ LIB
 *.la
 .libs
 doc/
+MOD
 factory/readcf.cc
 factory/ylwrap
 factory/gengftables
@@ -40,8 +41,8 @@ libpolys/misc/auxiliary.h
 libpolys/polys/templates/p_Procs_Generate
 libpolys/polys/templates/p_Procs.inc
 libpolys/polys/m4/
-libpolys/coeffs/test
-libpolys/coeffs/test-g
+libpolys/coeffs/tt-r
+libpolys/coeffs/tt-g
 libpolys/polys/templates/.dirstamp
 libpolys/libpolys-config
 depend
