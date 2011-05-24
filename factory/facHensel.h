@@ -32,7 +32,6 @@
 /// in GF factory's default multiplication is used.
 ///
 /// @return @a mulNTL returns F*G
-static inline
 CanonicalForm
 mulNTL (const CanonicalForm& F, ///< [in] a univariate poly
         const CanonicalForm& G  ///< [in] a univariate poly
@@ -42,7 +41,6 @@ mulNTL (const CanonicalForm& F, ///< [in] a univariate poly
 /// in GF factory's default mod is used.
 ///
 /// @return @a modNTL returns F mod G
-static inline
 CanonicalForm
 modNTL (const CanonicalForm& F, ///< [in] a univariate poly
         const CanonicalForm& G  ///< [in] a univariate poly
@@ -52,7 +50,6 @@ modNTL (const CanonicalForm& F, ///< [in] a univariate poly
 /// in GF factory's default division is used.
 ///
 /// @return @a divNTL returns F/G
-static inline
 CanonicalForm
 divNTL (const CanonicalForm& F, ///< [in] a univariate poly
         const CanonicalForm& G  ///< [in] a univariate poly
@@ -60,7 +57,6 @@ divNTL (const CanonicalForm& F, ///< [in] a univariate poly
 
 /*/// division with remainder of univariate polys over a finite field using NTL,
 /// if we are in GF factory's default division with remainder is used.
-static inline
 void
 divremNTL (const CanonicalForm& F, ///< [in] a univariate poly
            const CanonicalForm& G, ///< [in] a univariate poly

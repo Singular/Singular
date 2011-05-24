@@ -32,7 +32,6 @@
 #include <NTL/lzz_pEX.h>
 #include "NTLconvert.h"
 
-static inline
 CanonicalForm
 mulNTL (const CanonicalForm& F, const CanonicalForm& G)
 {
@@ -64,7 +63,6 @@ mulNTL (const CanonicalForm& F, const CanonicalForm& G)
   return result;
 }
 
-static inline
 CanonicalForm
 modNTL (const CanonicalForm& F, const CanonicalForm& G)
 {
@@ -101,7 +99,6 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G)
   return result;
 }
 
-static inline
 CanonicalForm
 divNTL (const CanonicalForm& F, const CanonicalForm& G)
 {
@@ -138,7 +135,7 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G)
   return result;
 }
 
-/*static inline
+/*
 void
 divremNTL (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
            CanonicalForm& R)

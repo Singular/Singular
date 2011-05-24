@@ -1888,7 +1888,8 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     }
     else  // not able to pass to GF, pass to F_p(\alpha)
     {
-      Variable v= chooseExtension (A, beta);
+      CanonicalForm mipo= randomIrredpoly (2, Variable (1));
+      Variable v= rootOf (mipo);
       ExtensionInfo info= ExtensionInfo (v, extension);
       factors= multiFactorize (A, info);
     }
@@ -1909,7 +1910,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     {
       if (beta == Variable (1))
       {
-        Variable v= chooseExtension (A, alpha);
+        Variable v= chooseExtension (alpha, beta, k);
         CanonicalForm primElem, imPrimElem;
         bool primFail= false;
         Variable vBuf;
@@ -1928,7 +1929,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
       }
       else
       {
-        Variable v= chooseExtension (A, alpha);
+        Variable v= chooseExtension (alpha, beta, k);
         CanonicalForm primElem, imPrimElem;
         bool primFail= false;
         Variable vBuf;
@@ -1972,7 +1973,7 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         setCharacteristic (p);
         Variable vBuf= rootOf (gf_mipo);
         A= GF2FalphaRep (A, vBuf);
-        Variable v= chooseExtension (A, beta);
+        Variable v= chooseExtension (vBuf, beta, k);
         ExtensionInfo info= ExtensionInfo (v, extension);
         factors= multiFactorize (A, info);
       }
@@ -1992,11 +1993,11 @@ extFactorize (const CanonicalForm& F, const ExtensionInfo& info)
         setCharacteristic (p);
         Variable v1= rootOf (gf_mipo);
         A= GF2FalphaRep (A, v1);
-        Variable v2= chooseExtension (A, v1);
+        Variable v2= chooseExtension (v1, v1, k);
         CanonicalForm primElem, imPrimElem;
         bool primFail= false;
         Variable vBuf;
-        primElem= primitiveElement (v1, vBuf, primFail);
+        primElem= primitiveElement (v1, v1, primFail);
         if (primFail)
           ; //ERROR
         else

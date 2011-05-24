@@ -490,13 +490,22 @@ uniFactorizer (const CanonicalForm& A, ///< [in] squarefree univariate poly
 /// @sa factorRecombination(), extEarlyFactorDetection()
 inline CFList
 extFactorRecombination (
-         const CFList& factors,     ///< [in] list of lifted factors that are
-                                    ///< monic wrt Variable (1)
-         const CanonicalForm& F,    ///< [in] poly to be factored
-         const CanonicalForm& M,    ///< [in] Variable (2)^liftBound
-         const ExtensionInfo& info, ///< [in] contains information about
-                                    ///< extension
-         const CanonicalForm& eval  ///< [in] evaluation point
+         CFList& factors,          ///< [in,out] list of lifted factors that are 
+                                   ///< monic wrt Variable (1),
+                                   ///< original factors-factors found
+         CanonicalForm& F,         ///< [in,out] poly to be factored,
+                                   ///< F/factors found
+         const CanonicalForm& M,   ///< [in] Variable (2)^liftBound
+         const ExtensionInfo& info,///< [in] contains information about 
+                                   ///< extension
+         DegreePattern& degs,
+         const CanonicalForm& eval,///< [in] evaluation point
+         int s,                    ///< [in] algorithm starts checking subsets
+                                   ///< of size s
+         int thres                 ///< [in] threshold for the size of subsets
+                                   ///< which are checked, for a full factor
+                                   ///< recombination choose 
+                                   ///< thres= factors.length()/2
                        );
 
 /// naive factor recombination.
@@ -506,11 +515,17 @@ extFactorRecombination (
 /// @sa extFactorRecombination(), earlyFactorDetectection()
 inline CFList
 factorRecombination (
-                const CFList& factors,      ///< [in] list of lifted factors
-                                            ///< that are monic wrt Variable (1)
-                const CanonicalForm& F,     ///< [in] poly to be factored
-                const CanonicalForm& M,     ///< [in] Variable (2)^liftBound
-                const DegreePattern& degs   ///< [in] degree pattern
+                CFList& factors,       ///< [in,out] list of lifted factors
+                                       ///< that are monic wrt Variable (1)
+                CanonicalForm& F,      ///< [in,out] poly to be factored
+                const CanonicalForm& M,///< [in] Variable (2)^liftBound
+                DegreePattern& degs,   ///< [in] degree pattern
+                int s,                 ///< [in] algorithm starts checking
+                                       ///< subsets of size s
+                int thres              ///< [in] threshold for the size of
+                                       ///< subsets which are checked, for a
+                                       ///< full factor recombination choose 
+                                       ///< thres= factors.length()/2
                     );
 
 /// chooses a field extension.
@@ -518,9 +533,9 @@ factorRecombination (
 /// @return @a chooseExtension returns an extension specified by @a beta of
 ///         appropiate size
 Variable chooseExtension (
-                      const CanonicalForm & A, ///< [in] some bivariate poly
-                      const Variable & beta    ///< [in] some algebraic
-                                               ///< variable
+                      const Variable & alpha, ///< [in] some algebraic variable
+                      const Variable & beta,  ///< [in] some algebraic variable
+                      int k                   ///< [in] some int
                          );
 
 /// detects factors of @a F at stage @a deg of Hensel lifting.
