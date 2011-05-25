@@ -4834,9 +4834,9 @@ ac_compile='${CXX-g++} -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
 ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 cross_compiling=$ac_cv_prog_cxx_cross
 
-   echo $ac_n "checking for rl_abort in -lreadline""... $ac_c" 1>&6
-echo "configure:4831: checking for rl_abort in -lreadline" >&5
-ac_lib_var=`echo readline'_'rl_abort | sed 'y%./+-%__p_%'`
+   echo $ac_n "checking for readline in -lreadline""... $ac_c" 1>&6
+echo "configure:4831: checking for readline in -lreadline" >&5
+ac_lib_var=`echo readline'_'readline | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4851,10 +4851,10 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
     builtin and then its argument prototype would still apply.  */
-char rl_abort();
+char readline();
 
 int main() {
-rl_abort()
+readline()
 ; return 0; }
 EOF
 if { (eval echo configure:4853: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
@@ -4967,7 +4967,7 @@ else
 fi
 done
 
-   if test "$ac_cv_lib_readline_rl_abort" = yes && \
+   if test "$ac_cv_lib_readline_readline" = yes && \
       test "$ac_cv_header_readline_readline_h" = yes; then
      echo $ac_n "checking whether readline.h is ok""... $ac_c" 1>&6
 echo "configure:4966: checking whether readline.h is ok" >&5
