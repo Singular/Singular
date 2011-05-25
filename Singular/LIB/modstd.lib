@@ -296,7 +296,7 @@ EXAMPLE: example deleteUnluckyPrimes; shows an example
          }
          else
          {
-            if(hc < hl){ lT = cT; hl = hilb(lT,1); c++ }
+            if(hc < hl){ lT = cT; hl = hilb(lT,1); c++; }
          }
       }
    }
