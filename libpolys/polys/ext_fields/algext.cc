@@ -580,8 +580,10 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   assume(cf->algring->cf                 != NULL);      // algring->cf;
   assume(getCoeffType(cf) == naID);                     // coeff type;
   
-  cf->ch = cf->algring->cf->ch;   /* propagate characteristic up so that it
-                                     becomes directly accessible in cf */
+  cf->ch = -cf->algring->cf->ch;   /* propagate characteristic up so that it
+                                      becomes directly accessible in cf;
+                                      negative sign to signal that it's an
+                                      extension field */
   
   #ifdef LDEBUG
   p_Test((poly)naMinpoly, naRing);
