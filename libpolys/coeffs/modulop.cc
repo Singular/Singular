@@ -405,7 +405,7 @@ BOOLEAN npInitChar(coeffs r, void* p)
   
   // the variables:
   r->nNULL = (number)0;
-  //r->type = n_Zp;
+  r->type = n_Zp;
   r->ch = c;
   r->has_simple_Alloc=TRUE;
   r->has_simple_Inverse=TRUE;

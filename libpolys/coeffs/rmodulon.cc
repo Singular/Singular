@@ -46,6 +46,8 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
 {
   
   nrnInitExp((int)(long)(p), r);
+  r->ringtype = 2;
+  r->type = n_Zn;
 
   r->cfInit        = nrnInit;
   r->cfDelete      = nrnDelete;
@@ -487,7 +489,8 @@ nMapFunc nrnSetMap(const coeffs src, const coeffs dst)
     return nrnMapQ;
   }
   // Some type of Z/n ring / field
-  if (nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src) || nCoeff_is_Ring_2toM(src) || nCoeff_is_Zp(src))
+  if (nCoeff_is_Ring_ModN(src) || nCoeff_is_Ring_PtoM(src) ||
+      nCoeff_is_Ring_2toM(src) || nCoeff_is_Zp(src))
   {
     if (   (src->ringtype > 0)
         && (mpz_cmp(src->modBase, dst->modBase) == 0)
