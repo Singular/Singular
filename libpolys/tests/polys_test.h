@@ -559,8 +559,8 @@ public:
     ideal minIdeal = idInit(1);                     // minIdeal = < 0 >
     minIdeal->m[0] = minPoly;                       // minIdeal = < a^2 + 1 >
 
-    n_coeffType type = nRegister(n_Ext, naInitChar); 
-    TS_ASSERT(type == n_Ext);
+    n_coeffType type = nRegister(n_algExt, naInitChar); 
+    TS_ASSERT(type == n_algExt);
 
     ExtInfo extParam;
     extParam.r = r;
@@ -580,6 +580,11 @@ public:
       clog << "Coeff-domain: "  << endl; 
       n_CoeffWrite(cf); PrintLn();
     }
+    
+    TS_ASSERT( nCoeff_is_algExt(cf) );
+    TS_ASSERT( !nCoeff_is_transExt(cf) );
+    TS_ASSERT( nCoeff_is_Q_a(cf) );
+    TS_ASSERT( !nCoeff_is_Zp_a(cf) );
     
     // some tests for the coefficient field represented by cf:
     TestArithCf(cf);
@@ -657,8 +662,8 @@ public:
     ideal minIdeal = idInit(1);                     // minIdeal = < 0 >
     minIdeal->m[0] = minPoly;                       // minIdeal = < b^7 + 17 >
 
-    n_coeffType type = nRegister(n_Ext, naInitChar); 
-    TS_ASSERT(type == n_Ext);
+    n_coeffType type = nRegister(n_algExt, naInitChar); 
+    TS_ASSERT(type == n_algExt);
 
     ExtInfo extParam;
     extParam.r = r;
@@ -678,6 +683,11 @@ public:
       clog << "Coeff-domain: "  << endl; 
       n_CoeffWrite(cf); PrintLn();
     }
+    
+    TS_ASSERT( nCoeff_is_algExt(cf) );
+    TS_ASSERT( !nCoeff_is_transExt(cf) );
+    TS_ASSERT( nCoeff_is_Q_a(cf) );
+    TS_ASSERT( !nCoeff_is_Zp_a(cf) );
     
     // some tests for the coefficient field represented by cf:
     TestArithCf(cf);
@@ -798,8 +808,8 @@ public:
     ideal minIdeal = idInit(1);                     // minIdeal = < 0 >
     minIdeal->m[0] = minPoly;                       // minIdeal = < a^2 + 3 >
 
-    n_coeffType type = nRegister(n_Ext, naInitChar); 
-    TS_ASSERT(type == n_Ext);
+    n_coeffType type = nRegister(n_algExt, naInitChar); 
+    TS_ASSERT(type == n_algExt);
 
     ExtInfo extParam;
     extParam.r = r;
@@ -819,6 +829,11 @@ public:
       clog << "Coeff-domain: "  << endl; 
       n_CoeffWrite(cf); PrintLn();
     }
+    
+    TS_ASSERT( nCoeff_is_algExt(cf) );
+    TS_ASSERT( !nCoeff_is_transExt(cf) );
+    TS_ASSERT( !nCoeff_is_Q_a(cf) );
+    TS_ASSERT( nCoeff_is_Zp_a(cf) );
     
     // some tests for the coefficient field represented by cf:
     TestArithCf(cf);
@@ -848,7 +863,7 @@ public:
     TS_ASSERT_EQUALS(rVar(s), 3);
 
     Test(s);
-    
+    /*
 #ifdef HAVE_FACTORY
     poly f = p_ISet(3, s);
     p_SetExp(f, 1, 3, s);
@@ -869,6 +884,7 @@ public:
     p_Test(h, s);
     p_Delete(&h, s);
 #endif
+    */
     rDelete(s); // kills 'cf' and 'r' as well
   }
 };

@@ -522,8 +522,13 @@ number naMapUP(number a, const coeffs src, const coeffs dst)
 
 nMapFunc naSetMap(const coeffs src, const coeffs dst)
 {
-  /* dst is expected to be an (algebraic) extension field */
-  assume(getCoeffType(dst) == n_Ext);
+  /* dst is expected to be an algebraic extension field */
+  assume(getCoeffType(dst) == n_algExt);
+  
+  /* ATTENTION: This code assumes that dst is an algebraic extension of Q
+                or Zp. So, dst must NOT BE an algebraic extension of some
+                extension etc. This code will NOT WORK for extension
+                towers of height >= 2. */
   
   if (nCoeff_is_Q(src) && nCoeff_is_Q_a(dst))
     return naMap00;                                      /// Q     -->  Q(a)
@@ -574,6 +579,9 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
          (cf->algring->minideal->m[0]    != NULL)    ); // at m[0];
   assume(cf->algring->cf                 != NULL);      // algring->cf;
   assume(getCoeffType(cf) == naID);                     // coeff type;
+  
+  cf->ch = cf->algring->cf->ch;   /* propagate characteristic up so that it
+                                     becomes directly accessible in cf */
   
   #ifdef LDEBUG
   p_Test((poly)naMinpoly, naRing);
