@@ -26,10 +26,10 @@ enum n_coeffType
   n_R,
   n_GF,
   n_long_R,
-  n_algExt,  /* used for all algebraic extensions, i.e.,
+  n_algExt,  /**< used for all algebraic extensions, i.e.,
                 the top-most extension in an extension tower
                 is algebraic */
-  n_transExt,  /* used for all transcendental extensions, i.e.,
+  n_transExt,  /**< used for all transcendental extensions, i.e.,
                   the top-most extension in an extension tower
                   is transcendental */
   n_long_C,
@@ -183,9 +183,9 @@ struct n_Procs_s
 
   /// For Zp_a, Q_a we need polynomials (due to polys)
   ring          algring; //< implementation of extensions needs polynomials...
-  /// for Q_a/Zp_a, rInit
-  ///number     minpoly;  //< no longer needed: replaced by
-                          //  algring->minideal->[0]
+  // // for Q_a/Zp_a, rInit
+  //number     minpoly;  //< no longer needed: replaced by
+  //                     //<  algring->minideal->[0]
 
 
 //-------------------------------------------
