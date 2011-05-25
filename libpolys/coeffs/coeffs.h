@@ -69,7 +69,11 @@ struct n_Procs_s
 {
    coeffs next;
    unsigned int ringtype;  /* =0 => coefficient field,
-                             !=0 => coeffs from one of the rings */
+                             !=0 => coeffs from one of the rings:
+                              =1 => Z/2^mZ
+                              =2 => Z/nZ, n not a prime
+                              =3 => Z/p^mZ
+                              =4 => Z */
 
    // general properties:
    /// TRUE, if nNew/nDelete/nCopy are dummies
@@ -212,7 +216,8 @@ struct n_Procs_s
   int_number    modNumber;
   unsigned long mod2mMask;
 #endif
-  int        ch;  /* characteristic, rInit */
+  int        ch;  /* characteristic, rInit
+                     PLEASE DOCUMENT HERE when this will be negative! */
 
   short      float_len; /* additional char-flags, rInit */
   short      float_len2; /* additional char-flags, rInit */
@@ -451,8 +456,6 @@ static inline BOOLEAN nCoeff_is_GF(const coeffs r, int q)
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
 {
   assume(r != NULL);
-printf("###### %d, %d\n", r->ringtype, r->ch);
-printf("###### %d, %d, %d\n", getCoeffType(r), n_algExt, n_transExt);
   return (r->ringtype == 0) &&
          ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
          (r->ch < -1);

@@ -47,6 +47,9 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
 
+  r->ringtype = 1;
+  r->type = n_Z2m;
+
   r->cfInit        = nr2mInit;
   r->cfCopy        = ndCopy;
   r->cfInt         = nr2mInt;
