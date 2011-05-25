@@ -26,7 +26,12 @@ enum n_coeffType
   n_R,
   n_GF,
   n_long_R,
-  n_Ext,  // used for all extensions (of Zp, of Q AND OF EXTENSIONS THEREOF)
+  n_algExt,  /* used for all algebraic extensions, i.e.,
+                the top-most extension in an extension tower
+                is algebraic */
+  n_transExt,  /* used for all transcendental extensions, i.e.,
+                  the top-most extension in an extension tower
+                  is transcendental */
   n_long_C,
   // only used if HAVE_RINGS is defined:
   n_Z,
@@ -441,23 +446,36 @@ static inline BOOLEAN nCoeff_is_GF(const coeffs r)
 static inline BOOLEAN nCoeff_is_GF(const coeffs r, int q)
 { assume(r != NULL); return (getCoeffType(r)==n_GF) && (r->ch == q); }
 
+/* TRUE iff an extension tower is build upon some Zp, i.e., the bottom
+   field in this tower is Zp */
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
 {
   assume(r != NULL);
-  return (r->ringtype == 0) && (getCoeffType(r)==n_Ext) && (r->ch < -1);
+printf("###### %d, %d\n", r->ringtype, r->ch);
+printf("###### %d, %d, %d\n", getCoeffType(r), n_algExt, n_transExt);
+  return (r->ringtype == 0) &&
+         ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
+         (r->ch < -1);
 }
 
+/* TRUE iff an extension tower is build upon Zp (p as provided), i.e.,
+   the bottom field in this tower is Zp */
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
 {
   assume(r != NULL);
-  return (r->ringtype == 0) && (getCoeffType(r)==n_Ext) && (r->ch < -1 )
-                            && (-(r->ch) == ABS(p));
+  return (r->ringtype == 0) &&
+         ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
+         (r->ch < -1 ) && (-(r->ch) == p);
 }
 
+/* TRUE iff an extension tower is build upon Q, i.e.,
+   the bottom field in this tower is Q */
 static inline BOOLEAN nCoeff_is_Q_a(const coeffs r)
 {
   assume(r != NULL);
-  return (r->ringtype == 0) && (getCoeffType(r)==n_Ext) && (r->ch == 0);
+  return (r->ringtype == 0) &&
+         ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
+         (r->ch == 0);
 }
 
 static inline BOOLEAN nCoeff_is_long_R(const coeffs r)
@@ -493,9 +511,20 @@ static inline BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
 // #endif
 //             || rField_is_R(r)); }
 
-
+/* TRUE iff r represents an algebraic or transcendental extension field */
 static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
-{ assume(r != NULL); return (nCoeff_is_Q_a(r)) || (nCoeff_is_Zp_a(r)); } /* Z/p(a) and Q(a)*/
+{
+  assume(r != NULL);
+  return (getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt);
+}
+
+/* TRUE iff r represents an algebraic extension field */
+static inline BOOLEAN nCoeff_is_algExt(const coeffs r)
+{ assume(r != NULL); return (getCoeffType(r)==n_algExt); }
+
+/* TRUE iff r represents a transcendental extension field */
+static inline BOOLEAN nCoeff_is_transExt(const coeffs r)
+{ assume(r != NULL); return (getCoeffType(r)==n_transExt); }
 
 /// BOOLEAN n_Test(number a, const coeffs r)
 #define n_Test(a,r)  n_DBTest(a, __FILE__, __LINE__, r)

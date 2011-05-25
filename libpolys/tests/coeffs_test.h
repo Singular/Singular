@@ -487,7 +487,7 @@ class CoeffsTestSuite : public CxxTest::TestSuite
    }  
 
    
-   // polynomial rings needed for extentions: n_Ext !
+   // polynomial rings needed for extentions: n_algExt, n_transExt !
    
 };
 

@@ -36,7 +36,7 @@ typedef struct
   ideal i;
 } ExtInfo;
 
-/// Get a mapping function from src into the domain of this type (n_Ext)
+/// Get a mapping function from src into the domain of this type (n_algExt)
 nMapFunc naSetMap(const coeffs src, const coeffs dst);
 
 /// Initialize the coeffs object
@@ -83,7 +83,7 @@ BOOLEAN  naDBTest(number a, const char *f, const int l, const coeffs r);
 #endif
 
 /* our own type */
-#define naID n_Ext
+#define naID n_algExt
 
 /* polynomial ring in which our numbers live */
 #define naRing cf->algring

@@ -35,7 +35,8 @@ namespace
       CASE(n_R);
       CASE(n_GF);
       CASE(n_long_R);
-      CASE(n_Ext);
+      CASE(n_algExt);
+      CASE(n_transExt);
       CASE(n_long_C);
       CASE(n_Z);
       CASE(n_Zn);
