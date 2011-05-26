@@ -37,6 +37,9 @@
 
 #include <polys/ext_fields/algext.h>
 
+/// our type has been defined as a macro in algext.h
+/// and is accessible by 'naID'
+
 /// forward declarations
 BOOLEAN  naGreaterZero(number a, const coeffs cf); 
 BOOLEAN  naGreater(number a, number b, const coeffs cf);
@@ -568,6 +571,8 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
 {
+  assume( getCoeffType(cf) == naID );
+  
   ExtInfo *e = (ExtInfo *)infoStruct;
   /// first check whether cf->algring != NULL and delete old ring???
   cf->algring           = e->r;
@@ -580,10 +585,9 @@ BOOLEAN naInitChar(coeffs cf, void * infoStruct)
   assume(cf->algring->cf                 != NULL);      // algring->cf;
   assume(getCoeffType(cf) == naID);                     // coeff type;
   
-  cf->ch = -cf->algring->cf->ch;   /* propagate characteristic up so that it
-                                      becomes directly accessible in cf;
-                                      negative sign to signal that it's an
-                                      extension field */
+  /* propagate characteristic up so that it becomes
+     directly accessible in cf: */
+  cf->ch = cf->algring->cf->ch;
   
   #ifdef LDEBUG
   p_Test((poly)naMinpoly, naRing);

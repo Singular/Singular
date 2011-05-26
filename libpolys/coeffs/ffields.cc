@@ -812,7 +812,7 @@ BOOLEAN nfInitChar(coeffs r,  void * parameter)
   
   // the variables:
   r->nNULL = (number)0;
-  assume( r->type == n_GF );
+  assume( getCoeffType(r) == n_GF );
 
   GFInfo* p = (GFInfo *)(parameter); 
   const char * name = p->GFPar_name;

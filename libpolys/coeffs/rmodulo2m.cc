@@ -23,6 +23,9 @@
 
 #include <string.h>
 
+/// Our Type!
+static const n_coeffType ID = n_Z2m;
+
 extern omBin gmp_nrz_bin; /* init in rintegers*/
 
 void    nr2mCoeffWrite  (const coeffs r)
@@ -43,12 +46,15 @@ BOOLEAN nr2mCoeffIsEqual(const coeffs r, n_coeffType n, void * p)
 /* for initializing function pointers */
 BOOLEAN nr2mInitChar (coeffs r, void* p)
 {
+  assume( getCoeffType(r) == ID );
   nr2mInitExp((int)(long)(p), r);
   r->cfKillChar    = ndKillChar; /* dummy*/
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
 
   r->ringtype = 1;
-  r->type = n_Z2m;
+  
+  /* next cast may yield an overflow as mod2mMask is an unsigned long */
+  r->ch = (int)r->mod2mMask + 1;
 
   r->cfInit        = nr2mInit;
   r->cfCopy        = ndCopy;
@@ -639,17 +645,16 @@ void nr2mSetExp(int m, coeffs r)
   }
   else
   {
-    /* code unexpectedly called with m = 1; we go on with m = 2: */
+    /* code unexpectedly called with m = 1; we continue with m = 2: */
     r->mod2mMask = 3; /* i.e., '11' in binary representation */
   }
-  r->ch = r->mod2mMask + 1;
 }
 
 void nr2mInitExp(int m, coeffs r)
 {
   nr2mSetExp(m, r);
   if (m < 2)
-    WarnS("nr2mInitExp unexpectedly called with m = 1 (we go on with Z/2^2");
+    WarnS("nr2mInitExp unexpectedly called with m = 1 (we continue with Z/2^2");
 }
 
 #ifdef LDEBUG
