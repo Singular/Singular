@@ -5985,9 +5985,9 @@ static BOOLEAN jjSUBST_Test(leftv v,leftv w,
   {
     if (rField_is_Extension(currRing))
     {
-      assume(currRing->algring!=NULL);
+      assume(currRing->extRing!=NULL);
       lnumber n=(lnumber)pGetCoeff(p);
-      ringvar=-p_Var(n->z,currRing->algring);
+      ringvar=-p_Var(n->z,currRing->extRing);
     }
     if(ringvar==0)
     {

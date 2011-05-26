@@ -106,16 +106,16 @@ void p_Content(poly ph, const ring r)
         napoly c_n=c_n_n->z;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(hzz,pGetCoeff(c_n),r->algring);
-          n_Delete(&hzz,r->algring);
+          d=nlLcm(hzz,pGetCoeff(c_n),r->extRing);
+          n_Delete(&hzz,r->extRing);
           hzz=d;
           pIter(c_n);
         }
         c_n=c_n_n->n;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(h,pGetCoeff(c_n),r->algring);
-          n_Delete(&h,r->algring);
+          d=nlLcm(h,pGetCoeff(c_n),r->extRing);
+          n_Delete(&h,r->extRing);
           h=d;
           pIter(c_n);
         }
@@ -126,14 +126,14 @@ void p_Content(poly ph, const ring r)
       number htmp=nlInvers(h);
       number hzztmp=nlInvers(hzz);
       number hh=nlMult(hzz,h);
-      nlDelete(&hzz,r->algring);
-      nlDelete(&h,r->algring);
-      number hg=nlGcd(hzztmp,htmp,r->algring);
-      nlDelete(&hzztmp,r->algring);
-      nlDelete(&htmp,r->algring);
+      nlDelete(&hzz,r->extRing);
+      nlDelete(&h,r->extRing);
+      number hg=nlGcd(hzztmp,htmp,r->extRing);
+      nlDelete(&hzztmp,r->extRing);
+      nlDelete(&htmp,r->extRing);
       h=nlMult(hh,hg);
-      nlDelete(&hg,r->algring);
-      nlDelete(&hh,r->algring);
+      nlDelete(&hg,r->extRing);
+      nlDelete(&hh,r->extRing);
       nlNormalize(h);
       if(!nlIsOne(h))
       {
@@ -146,7 +146,7 @@ void p_Content(poly ph, const ring r)
           { // each monom: coeff in Q
             d=nlMult(h,pGetCoeff(c_n));
             nlNormalize(d);
-            nlDelete(&pGetCoeff(c_n),r->algring);
+            nlDelete(&pGetCoeff(c_n),r->extRing);
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
@@ -155,14 +155,14 @@ void p_Content(poly ph, const ring r)
           { // each monom: coeff in Q
             d=nlMult(h,pGetCoeff(c_n));
             nlNormalize(d);
-            nlDelete(&pGetCoeff(c_n),r->algring);
+            nlDelete(&pGetCoeff(c_n),r->extRing);
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
           pIter(p);
         }
       }
-      nlDelete(&h,r->algring);
+      nlDelete(&h,r->extRing);
     }
   }
 }

@@ -280,15 +280,15 @@ void singclap_divide_content ( poly f, const ring r )
       }
       pIter(p);
     }
-    g = convSingPFactoryP( ((lnumber)g1)->z, r->cf->algring );
-    g = gcd( g, convSingPFactoryP( ((lnumber)g2)->z , r->cf->algring));
+    g = convSingPFactoryP( ((lnumber)g1)->z, r->cf->extRing );
+    g = gcd( g, convSingPFactoryP( ((lnumber)g2)->z , r->cf->extRing));
 
     // second run: gcd's
 
     p = f;
     while ( (p != NULL) && (g != 1)  && ( g != 0))
     {
-      h = convSingPFactoryP( ((lnumber)pGetCoeff(p))->z, r->cf->algring );
+      h = convSingPFactoryP( ((lnumber)pGetCoeff(p))->z, r->cf->extRing );
       pIter( p );
 
       g = gcd( g, h );
@@ -306,8 +306,8 @@ void singclap_divide_content ( poly f, const ring r )
       for ( i = L, p = f; i.hasItem(); i++, p=pNext(p) )
       {
         lnumber c=(lnumber)pGetCoeff(p);
-        p_Delete(&c->z,r->cf->algring); // 2nd arg used to be nacRing
-        c->z=convFactoryPSingP( i.getItem() / g, r->cf->algring );
+        p_Delete(&c->z,r->cf->extRing); // 2nd arg used to be nacRing
+        c->z=convFactoryPSingP( i.getItem() / g, r->cf->extRing );
         //nTest((number)c);
         //#ifdef LDEBUG
         //number cn=(number)c;
@@ -513,10 +513,10 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
   // and over Q(a) / Fp(a)
   else if (rField_is_Extension(r))
   {
-    if (r->cf->algring->minideal!=NULL)
+    if (r->cf->extRing->minideal!=NULL)
     {
-      CanonicalForm mipo=convSingPFactoryP(r->cf->algring->minideal->m[0],
-                                           r->cf->algring);
+      CanonicalForm mipo=convSingPFactoryP(r->cf->extRing->minideal->m[0],
+                                           r->cf->extRing);
       Variable a=rootOf(mipo);
       CanonicalForm F( convSingPFactoryP( f,r ) );
       if (rField_is_Zp_a(r))
@@ -575,7 +575,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       {
         intvec *w=NULL;
         if (v!=NULL) w=*v;
-        if (r->cf->algring->minideal==NULL)
+        if (r->cf->extRing->minideal==NULL)
         {
           if(!count_Factors(res,w,j,ff,convFactoryPSingP( J.getItem().factor(),r ),r))
           {
@@ -707,7 +707,7 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps, const ring r)
       }
     }
   }
-  if (rField_is_Q_a(r) && (r->cf->algring->minideal!=NULL))
+  if (rField_is_Q_a(r) && (r->cf->extRing->minideal!=NULL))
   {
     int i=IDELEMS(res)-1;
     int stop=1;
@@ -1227,7 +1227,7 @@ napoly singclap_alglcm ( napoly f, napoly g )
  if (currRing->minpoly!=NULL)
  {
    CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
-                                         currRing->algring);
+                                         currRing->extRing);
    Variable a=rootOf(mipo);
    CanonicalForm F( convSingAFactoryA( f,a, currRing ) ),
                  G( convSingAFactoryA( g,a, currRing ) );
@@ -1241,14 +1241,14 @@ napoly singclap_alglcm ( napoly f, napoly g )
  }
  else
  {
-   CanonicalForm F( convSingPFactoryP( f,currRing->algring ) ),
-                 G( convSingPFactoryP( g,currRing->algring ) );
+   CanonicalForm F( convSingPFactoryP( f,currRing->extRing ) ),
+                 G( convSingPFactoryP( g,currRing->extRing ) );
    CanonicalForm GCD;
    // calculate gcd
    GCD = gcd( F, G );
 
    // calculate lcm
-   res= convFactoryPSingP( (F/GCD)*G, currRing->algring );
+   res= convFactoryPSingP( (F/GCD)*G, currRing->extRing );
  }
 
  Off(SW_RATIONAL);
@@ -1266,7 +1266,7 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
  if (currRing->minpoly!=NULL)
  {
    CanonicalForm mipo=convSingPFactoryP(((lnumber)currRing->minpoly)->z,
-                         currRing->algring);
+                         currRing->extRing);
    Variable a=rootOf(mipo);
    CanonicalForm F( convSingAFactoryA( f,a, currRing ) ),
                  G( convSingAFactoryA( g,a, currRing ) );
@@ -1282,16 +1282,16 @@ void singclap_algdividecontent ( napoly f, napoly g, napoly &ff, napoly &gg )
  }
  else
  {
-   CanonicalForm F( convSingPFactoryP( f,currRing->algring ) ),
-                 G( convSingPFactoryP( g,currRing->algring ) );
+   CanonicalForm F( convSingPFactoryP( f,currRing->extRing ) ),
+                 G( convSingPFactoryP( g,currRing->extRing ) );
    CanonicalForm GCD;
 
    GCD=gcd( F, G );
 
    if ((GCD!=1) && (GCD!=0))
    {
-     ff= convFactoryPSingP( F/ GCD, currRing->algring );
-     gg= convFactoryPSingP( G/ GCD, currRing->algring );
+     ff= convFactoryPSingP( F/ GCD, currRing->extRing );
+     gg= convFactoryPSingP( G/ GCD, currRing->extRing );
    }
  }
 

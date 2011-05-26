@@ -2066,16 +2066,16 @@ void p_Content(poly ph, const ring r)
         poly c_n=c_n_n->z;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(hzz,pGetCoeff(c_n),r->algring->cf);
-          n_Delete(&hzz,r->algring->cf);
+          d=nlLcm(hzz,pGetCoeff(c_n),r->extRing->cf);
+          n_Delete(&hzz,r->extRing->cf);
           hzz=d;
           pIter(c_n);
         }
         c_n=c_n_n->n;
         while (c_n!=NULL)
         { // each monom: coeff in Q
-          d=nlLcm(h,pGetCoeff(c_n),r->algring->cf);
-          n_Delete(&h,r->algring->cf);
+          d=nlLcm(h,pGetCoeff(c_n),r->extRing->cf);
+          n_Delete(&h,r->extRing->cf);
           h=d;
           pIter(c_n);
         }
@@ -2083,19 +2083,19 @@ void p_Content(poly ph, const ring r)
       }
       /* hzz contains the 1/lcm of all denominators in c_n_n->z*/
       /* h contains the 1/lcm of all denominators in c_n_n->n*/
-      number htmp=nlInvers(h,r->algring->cf);
-      number hzztmp=nlInvers(hzz,r->algring->cf);
-      number hh=nlMult(hzz,h,r->algring->cf);
-      nlDelete(&hzz,r->algring->cf);
-      nlDelete(&h,r->algring->cf);
-      number hg=nlGcd(hzztmp,htmp,r->algring->cf);
-      nlDelete(&hzztmp,r->algring->cf);
-      nlDelete(&htmp,r->algring->cf);
-      h=nlMult(hh,hg,r->algring->cf);
-      nlDelete(&hg,r->algring->cf);
-      nlDelete(&hh,r->algring->cf);
-      nlNormalize(h,r->algring->cf);
-      if(!nlIsOne(h,r->algring->cf))
+      number htmp=nlInvers(h,r->extRing->cf);
+      number hzztmp=nlInvers(hzz,r->extRing->cf);
+      number hh=nlMult(hzz,h,r->extRing->cf);
+      nlDelete(&hzz,r->extRing->cf);
+      nlDelete(&h,r->extRing->cf);
+      number hg=nlGcd(hzztmp,htmp,r->extRing->cf);
+      nlDelete(&hzztmp,r->extRing->cf);
+      nlDelete(&htmp,r->extRing->cf);
+      h=nlMult(hh,hg,r->extRing->cf);
+      nlDelete(&hg,r->extRing->cf);
+      nlDelete(&hh,r->extRing->cf);
+      nlNormalize(h,r->extRing->cf);
+      if(!nlIsOne(h,r->extRing->cf))
       {
         p=ph;
         while (p!=NULL)
@@ -2104,25 +2104,25 @@ void p_Content(poly ph, const ring r)
           poly c_n=c_n_n->z;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=nlMult(h,pGetCoeff(c_n),r->algring->cf);
-            nlNormalize(d,r->algring->cf);
-            nlDelete(&pGetCoeff(c_n),r->algring->cf);
+            d=nlMult(h,pGetCoeff(c_n),r->extRing->cf);
+            nlNormalize(d,r->extRing->cf);
+            nlDelete(&pGetCoeff(c_n),r->extRing->cf);
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
           c_n=c_n_n->n;
           while (c_n!=NULL)
           { // each monom: coeff in Q
-            d=nlMult(h,pGetCoeff(c_n),r->algring->cf);
-            nlNormalize(d,r->algring->cf);
-            nlDelete(&pGetCoeff(c_n),r->algring->cf);
+            d=nlMult(h,pGetCoeff(c_n),r->extRing->cf);
+            nlNormalize(d,r->extRing->cf);
+            nlDelete(&pGetCoeff(c_n),r->extRing->cf);
             pGetCoeff(c_n)=d;
             pIter(c_n);
           }
           pIter(p);
         }
       }
-      nlDelete(&h,r->algring->cf);
+      nlDelete(&h,r->extRing->cf);
       #endif
     }
   }
@@ -3451,12 +3451,12 @@ poly p_PermPoly (poly p, int * perm, const ring oldRing, const ring dst,
               #if 0
               lnumber c=(lnumber)pGetCoeff(qq);
               if (c->z->next==NULL)
-                p_AddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->algring);
+                p_AddExp(c->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->extRing);
               else /* more difficult: we have really to multiply: */
               {
                 lnumber mmc=(lnumber)naInit(1,dst);
-                p_SetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->algring);
-                p_Setm(mmc->z,dst->algring->cf);
+                p_SetExp(mmc->z,-perm[i],e/*p_GetExp( p,i,oldRing)*/,dst->extRing);
+                p_Setm(mmc->z,dst->extRing->cf);
                 pGetCoeff(qq)=n_Mult((number)c,(number)mmc,dst->cf);
                 n_Delete((number *)&c,dst->cf);
                 n_Delete((number *)&mmc,dst->cf);

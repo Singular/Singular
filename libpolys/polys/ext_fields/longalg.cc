@@ -173,8 +173,8 @@ void naSetChar(int i, ring r)
   }
   else if (i < 0)
   {
-    naIsChar0 = 0;
-    npSetChar(-i, r->algring); // to be changed HS
+    ntIsChar0 = 0;
+    npSetChar(-i, r->extRing); // to be changed HS
   }
 #ifdef TEST
   else
@@ -182,7 +182,7 @@ void naSetChar(int i, ring r)
     Print("naSetChar:c=%d param=%d\n",i,rPar(r));
   }
 #endif
-  nacRing        = r->algring;
+  nacRing        = r->extRing;
   nacInit        = nacRing->cf->cfInit;
   nacInt         = nacRing->cf->n_Int;
   nacCopy        = nacRing->cf->nCopy;
@@ -949,10 +949,10 @@ number naInit(int i, const ring r)
 {
   if (i!=0)
   {
-    number c=n_Init(i,r->algring);
-    if (!n_IsZero(c,r->algring))
+    number c=n_Init(i,r->extRing);
+    if (!n_IsZero(c,r->extRing))
     {
-      poly z=p_Init(r->algring);
+      poly z=p_Init(r->extRing);
       pSetCoeff0(z,c);
       lnumber l = (lnumber)omAllocBin(rnumber_bin);
       l->z = z;
@@ -1006,9 +1006,9 @@ int     naSize(number n)     /* size desc. */
 int naInt(number &n, const ring r)
 {
   lnumber l=(lnumber)n;
-  if ((l!=NULL)&&(l->n==NULL)&&(p_IsConstant(l->z,r->algring)))
+  if ((l!=NULL)&&(l->n==NULL)&&(p_IsConstant(l->z,r->extRing)))
   {
-    return nacInt(pGetCoeff(l->z),r->algring);
+    return nacInt(pGetCoeff(l->z),r->extRing);
   }
   return 0;
 }
@@ -1022,8 +1022,8 @@ void naDelete(number *p, const ring r)
   {
     lnumber l = (lnumber) * p;
     if (l==NULL) return;
-    p_Delete(&(l->z),r->algring);
-    p_Delete(&(l->n),r->algring);
+    p_Delete(&(l->z),r->extRing);
+    p_Delete(&(l->n),r->extRing);
     omFreeBin((void *)l,  rnumber_bin);
   }
   *p = NULL;
@@ -1050,8 +1050,8 @@ number na_Copy(number p, const ring r)
   lnumber erg;
   lnumber src = (lnumber)p;
   erg = (lnumber)omAlloc0Bin(rnumber_bin);
-  erg->z = p_Copy(src->z,r->algring);
-  erg->n = p_Copy(src->n,r->algring);
+  erg->z = p_Copy(src->z,r->extRing);
+  erg->n = p_Copy(src->n,r->extRing);
   erg->s = src->s;
   return (number)erg;
 }
@@ -1714,7 +1714,7 @@ number naGcd(number a, number b, const ring r)
   if ((naNumbOfPar == 1) && (naMinimalPoly!=NULL))
   {
     if (pNext(x->z)!=NULL)
-      result->z = p_Copy(x->z, r->algring);
+      result->z = p_Copy(x->z, r->extRing);
     else
       result->z = napGcd0(x->z, y->z);
   }
@@ -1729,18 +1729,18 @@ number naGcd(number a, number b, const ring r)
 
     poly rz=napGcd(x->z, y->z);
     CanonicalForm F, G, R;
-    R=convSingPFactoryP(rz,r->algring);
+    R=convSingPFactoryP(rz,r->extRing);
     p_Normalize(x->z,nacRing);
-    F=convSingPFactoryP(x->z,r->algring)/R;
+    F=convSingPFactoryP(x->z,r->extRing)/R;
     p_Normalize(y->z,nacRing);
-    G=convSingPFactoryP(y->z,r->algring)/R;
+    G=convSingPFactoryP(y->z,r->extRing)/R;
     F = gcd( F, G );
     if (F.isOne())
       result->z= rz;
     else
     {
-      p_Delete(&rz,r->algring);
-      result->z=convFactoryPSingP( F*R,r->algring );
+      p_Delete(&rz,r->extRing);
+      result->z=convFactoryPSingP( F*R,r->extRing );
       p_Normalize(result->z,nacRing);
     }
   }
@@ -2116,7 +2116,7 @@ number naLcm(number la, number lb, const ring r)
   //naNormalize(lb);
   naTest(la);
   naTest(lb);
-  poly x = p_Copy(a->z, r->algring);
+  poly x = p_Copy(a->z, r->extRing);
   number t = napLcm(b->z); // get all denom of b->z
   if (!nacIsOne(t))
   {
@@ -2124,23 +2124,23 @@ number naLcm(number la, number lb, const ring r)
     poly xx=x;
     while (xx!=NULL)
     {
-      bt = nacGcd(t, pGetCoeff(xx), r->algring);
+      bt = nacGcd(t, pGetCoeff(xx), r->extRing);
       rr = nacMult(t, pGetCoeff(xx));
-      n_Delete(&pGetCoeff(xx),r->algring);
+      n_Delete(&pGetCoeff(xx),r->extRing);
       pGetCoeff(xx) = nacDiv(rr, bt);
       nacNormalize(pGetCoeff(xx));
-      n_Delete(&bt,r->algring);
-      n_Delete(&rr,r->algring);
+      n_Delete(&bt,r->extRing);
+      n_Delete(&rr,r->extRing);
       pIter(xx);
     }
   }
-  n_Delete(&t,r->algring);
+  n_Delete(&t,r->extRing);
   result->z = x;
 #ifdef HAVE_FACTORY
   if (b->n!=NULL)
   {
     result->z=singclap_alglcm(result->z,b->n);
-    p_Delete(&x,r->algring);
+    p_Delete(&x,r->extRing);
   }
 #endif
   naTest(la);

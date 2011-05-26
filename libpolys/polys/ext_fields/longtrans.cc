@@ -127,7 +127,7 @@ void ntSetChar(int i, ring r)
   else if (i < 0)
   {
     ntIsChar0 = 0;
-    npSetChar(-i, r->algring); // to be changed HS
+    npSetChar(-i, r->extRing); // to be changed HS
   }
 #ifdef TEST
   else
@@ -135,7 +135,7 @@ void ntSetChar(int i, ring r)
     Print("ntSetChar:c=%d param=%d\n",i,rPar(r));
   }
 #endif
-  nacRing        = r->algring;
+  nacRing        = r->extRing;
   nacInit        = nacRing->cf->cfInit;
   nacInt         = nacRing->cf->n_Int;
   nacCopy        = nacRing->cf->nCopy;
@@ -430,7 +430,7 @@ int napMaxDegLen(poly p, int &l)
    keeps all arguments */
 void napWrite(poly p, const BOOLEAN has_denom, const ring r)
 {
-  ring nacring = r->algring;
+  ring nacring = r->extRing;
   if (p == NULL) StringAppendS("0");
   else if (p_LmIsConstant(p, nacring))
   {
@@ -986,9 +986,9 @@ poly napPermNumber(number z, int * par_perm, int P, ring oldRing)
   nMapFunc nMap=naSetMap(oldRing,currRing); /* todo: check naSetMap
                                                      vs. ntSetMap */
   if (currRing->parameter!=NULL)
-    nMap=currRing->algring->cf->cfSetMap(oldRing->algring, nacRing);
+    nMap=currRing->extRing->cf->cfSetMap(oldRing->extRing, nacRing);
   else
-    nMap=currRing->cf->cfSetMap(oldRing->algring, currRing);
+    nMap=currRing->cf->cfSetMap(oldRing->extRing, currRing);
   if (nMap==NULL) return NULL; /* emergency exit only */
   while(za!=NULL)
   {
@@ -1002,8 +1002,8 @@ poly napPermNumber(number z, int * par_perm, int P, ring oldRing)
     lnumber pan;
     if (currRing->parameter!=NULL)
     {
-      assume(oldRing->algring!=NULL);
-      pGetCoeff(p)=(number)ALLOC0_LNUMBER();
+      assume(oldRing->extRing!=NULL);
+      pGetCoeff(p)=(number)omAlloc0Bin(rnumber_bin);
       pan=(lnumber)pGetCoeff(p);
       pan->s=2;
       pan->z=napInitz(nMap(pGetCoeff(za)));
@@ -1078,8 +1078,8 @@ number   napGetDenom(number &n, const ring r)
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
-    lnumber rr=ALLOC0_LNUMBER();
-    rr->z=p_Copy(x->n,r->algring);
+    lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+    rr->z=p_Copy(x->n,r->extRing);
     rr->s = 2;
     return (number)rr;
   }
@@ -1089,8 +1089,8 @@ number   napGetDenom(number &n, const ring r)
 number   napGetNumerator(number &n, const ring r)
 {
   lnumber x=(lnumber)n;
-  lnumber rr=ALLOC0_LNUMBER();
-  rr->z=p_Copy(x->z,r->algring);
+  lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+  rr->z=p_Copy(x->z,r->extRing);
   rr->s = 2;
   return (number)rr;
 }
@@ -1104,10 +1104,10 @@ number ntInit(int i, const ring r)
 {
   if (i!=0)
   {
-    number c=n_Init(i,r->algring);
-    if (!n_IsZero(c,r->algring))
+    number c=n_Init(i,r->extRing);
+    if (!n_IsZero(c,r->extRing))
     {
-      poly z=p_Init(r->algring);
+      poly z=p_Init(r->extRing);
       pSetCoeff0(z,c);
       lnumber l = (lnumber)ALLOC_LNUMBER();
       l->z = z;
@@ -1192,9 +1192,9 @@ int     ntSize(number n)     /* size desc. */
 int ntInt(number &n, const ring r)
 {
   lnumber l=(lnumber)n;
-  if ((l!=NULL)&&(l->n==NULL)&&(p_IsConstant(l->z,r->algring)))
+  if ((l!=NULL)&&(l->n==NULL)&&(p_IsConstant(l->z,r->extRing)))
   {
-    return nacInt(pGetCoeff(l->z),r->algring);
+    return nacInt(pGetCoeff(l->z),r->extRing);
   }
   return 0;
 }
@@ -1208,9 +1208,9 @@ void ntDelete(number *p, const ring r)
   {
     lnumber l = (lnumber) * p;
     if (l==NULL) return;
-    p_Delete(&(l->z),r->algring);
-    p_Delete(&(l->n),r->algring);
-    FREE_LNUMBER(l);
+    p_Delete(&(l->z),r->extRing);
+    p_Delete(&(l->n),r->extRing);
+    omFreeBin((ADDRESS)l,  rnumber_bin);
   }
   *p = NULL;
 }
@@ -1235,9 +1235,9 @@ number nt_Copy(number p, const ring r)
   if (p==NULL) return NULL;
   lnumber erg;
   lnumber src = (lnumber)p;
-  erg = ALLOC_LNUMBER();
-  erg->z = p_Copy(src->z,r->algring);
-  erg->n = p_Copy(src->n,r->algring);
+  erg = (lnumber)omAlloc0Bin(rnumber_bin);
+  erg->z = p_Copy(src->z,r->extRing);
+  erg->n = p_Copy(src->n,r->extRing);
   erg->s = src->s;
   return (number)erg;
 }
@@ -1870,18 +1870,18 @@ number ntGcd(number a, number b, const ring r)
 
   poly rz=napGcd(x->z, y->z);
   CanonicalForm F, G, R;
-  R=convSingPFactoryP(rz,r->algring);
+  R=convSingPFactoryP(rz,r->extRing);
   p_Normalize(x->z,nacRing);
-  F=convSingPFactoryP(x->z,r->algring)/R;
+  F=convSingPFactoryP(x->z,r->extRing)/R;
   p_Normalize(y->z,nacRing);
-  G=convSingPFactoryP(y->z,r->algring)/R;
+  G=convSingPFactoryP(y->z,r->extRing)/R;
   F = gcd( F, G );
   if (F.isOne())
     result->z= rz;
   else
   {
-    p_Delete(&rz,r->algring);
-    result->z=convFactoryPSingP( F*R,r->algring );
+    p_Delete(&rz,r->extRing);
+    result->z=convFactoryPSingP( F*R,r->extRing );
     p_Normalize(result->z,nacRing);
   }
 #endif
@@ -2221,7 +2221,7 @@ number ntLcm(number la, number lb, const ring r)
   result = ALLOC0_LNUMBER();
   ntTest(la);
   ntTest(lb);
-  poly x = p_Copy(a->z, r->algring);
+  poly x = p_Copy(a->z, r->extRing);
   number t = napLcm(b->z); // get all denom of b->z
   if (!nacIsOne(t))
   {
@@ -2229,23 +2229,23 @@ number ntLcm(number la, number lb, const ring r)
     poly xx=x;
     while (xx!=NULL)
     {
-      bt = nacGcd(t, pGetCoeff(xx), r->algring);
+      bt = nacGcd(t, pGetCoeff(xx), r->extRing);
       rr = nacMult(t, pGetCoeff(xx));
-      n_Delete(&pGetCoeff(xx),r->algring);
+      n_Delete(&pGetCoeff(xx),r->extRing);
       pGetCoeff(xx) = nacDiv(rr, bt);
       nacNormalize(pGetCoeff(xx));
-      n_Delete(&bt,r->algring);
-      n_Delete(&rr,r->algring);
+      n_Delete(&bt,r->extRing);
+      n_Delete(&rr,r->extRing);
       pIter(xx);
     }
   }
-  n_Delete(&t,r->algring);
+  n_Delete(&t,r->extRing);
   result->z = x;
 #ifdef HAVE_FACTORY
   if (b->n!=NULL)
   {
     result->z=singclap_alglcm(result->z,b->n);
-    p_Delete(&x,r->algring);
+    p_Delete(&x,r->extRing);
   }
 #endif
   ntTest(la);
@@ -2435,9 +2435,9 @@ poly ntPermNumber(number z, int * par_perm, int P, ring oldRing)
   poly zb=((lnumber)z)->n;
   nMapFunc nMap=ntSetMap(oldRing,currRing);
   if (currRing->parameter!=NULL)
-    nMap=currRing->algring->cf->cfSetMap(oldRing->algring, nacRing);
+    nMap=currRing->extRing->cf->cfSetMap(oldRing->extRing, nacRing);
   else
-    nMap=currRing->cf->cfSetMap(oldRing->algring, currRing);
+    nMap=currRing->cf->cfSetMap(oldRing->extRing, currRing);
   if (nMap==NULL) return NULL; /* emergency exit only */
   do
   {
@@ -2452,8 +2452,8 @@ poly ntPermNumber(number z, int * par_perm, int P, ring oldRing)
     lnumber pan;
     if (currRing->parameter!=NULL)
     {
-      assume(oldRing->algring!=NULL);
-      pGetCoeff(p)=(number)ALLOC0_LNUMBER();
+      assume(oldRing->extRing!=NULL);
+      pGetCoeff(p)=(number)omAlloc0Bin(rnumber_bin);
       pan=(lnumber)pGetCoeff(p);
       pan->s=2;
       pan->z=napInitz(nMap(pGetCoeff(za)));
@@ -2523,8 +2523,8 @@ number   ntGetDenom(number &n, const ring r)
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
-    lnumber rr=ALLOC0_LNUMBER();
-    rr->z=p_Copy(x->n,r->algring);
+    lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+    rr->z=p_Copy(x->n,r->extRing);
     rr->s = 2;
     return (number)rr;
   }
@@ -2534,8 +2534,8 @@ number   ntGetDenom(number &n, const ring r)
 number   ntGetNumerator(number &n, const ring r)
 {
   lnumber x=(lnumber)n;
-  lnumber rr=ALLOC0_LNUMBER();
-  rr->z=p_Copy(x->z,r->algring);
+  lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+  rr->z=p_Copy(x->z,r->extRing);
   rr->s = 2;
   return (number)rr;
 }

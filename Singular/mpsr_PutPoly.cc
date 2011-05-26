@@ -195,16 +195,16 @@ static mpsr_Status_t PutAlgNumber(MP_Link_pt link, number a)
     // hence, we use the first case of the union
     mp_failr(IMP_PutUint32(link, 1));
     mp_failr(IMP_PutUint32(link, GetPlength(b->z)));
-    return PutAlgPoly(link, b->z, CurrPutRing->algring);
+    return PutAlgPoly(link, b->z, CurrPutRing->extRing);
   }
   else
   {
     // we use the 2nd case of the union
     mp_failr(IMP_PutUint32(link, 2));
     mp_failr(IMP_PutUint32(link, GetPlength(b->z)));
-    failr(PutAlgPoly(link, b->z, CurrPutRing->algring));
+    failr(PutAlgPoly(link, b->z, CurrPutRing->extRing));
     mp_failr(IMP_PutUint32(link, GetPlength(b->n)));
-    return PutAlgPoly(link, b->n, CurrPutRing->algring);
+    return PutAlgPoly(link, b->n, CurrPutRing->extRing);
   }
 }
 
@@ -418,7 +418,7 @@ static mpsr_Status_t PutProtoTypeAnnot(MP_Link_pt link, ring r,
   {
     // alg numbers
     // create temporary ring for describing the coeeficient domain
-    ring alg_r = r->algring;
+    ring alg_r = r->extRing;
     alg_r->minpoly = r->minpoly;
 
     // Algebraic numbers are

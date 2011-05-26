@@ -543,7 +543,7 @@ static inline short rPar(const ring r)
 
   if( rField_is_Extension(r) )
   {
-    const ring R = C->algring;
+    const ring R = C->extRing;
     assume( R != NULL );
     return rVar( R );
   }
@@ -560,7 +560,7 @@ static inline char** rParameter(const ring r)
 
   if( rField_is_Extension(r) )
   {
-    const ring R = C->algring;
+    const ring R = C->extRing;
     assume( R != NULL );
     return R->names;
   }

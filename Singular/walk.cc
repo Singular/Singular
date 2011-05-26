@@ -1949,8 +1949,8 @@ static void DefRingPar(intvec* va)
 
   res->VarOffset = NULL;
   res->ref=0;
-  if (currRing->algring!=NULL)
-    currRing->algring->ref++;
+  if (currRing->extRing!=NULL)
+    currRing->extRing->ref++;
 
   if (currRing->parameter!=NULL)
   {
@@ -2028,8 +2028,8 @@ static void DefRingParlp(void)
 
   r->VarOffset = NULL;
   r->ref=0;
-  if (currRing->algring!=NULL)
-    currRing->algring->ref++;
+  if (currRing->extRing!=NULL)
+    currRing->extRing->ref++;
 
   if (currRing->parameter!=NULL)
   {
