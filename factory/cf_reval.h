@@ -23,6 +23,7 @@ public:
     ~REvaluation();
     REvaluation& operator= ( const REvaluation & e );
     void nextpoint();
+    void nextpoint(int n);
 };
 
 /*ENDPUBLIC*/

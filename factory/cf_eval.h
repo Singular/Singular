@@ -36,6 +36,7 @@ public:
     CanonicalForm operator[] ( const Variable & v ) const { return operator[](v.level()); }
     CanonicalForm operator() ( const CanonicalForm& f ) const;
     CanonicalForm operator() ( const CanonicalForm & f, int i, int j ) const;
+    void setValue (int i, const CanonicalForm& f);
     virtual void nextpoint();
 #ifndef NOSTREAMIO
     friend OSTREAM& operator<< ( OSTREAM& s, const Evaluation &e );

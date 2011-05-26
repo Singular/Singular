@@ -46,6 +46,14 @@ Evaluation::nextpoint()
         values[i] += 1;
 }
 
+void
+Evaluation::setValue(int i, const CanonicalForm& f)
+{
+  if (i < values.min() || i > values.max())
+    return;
+  values[i]= f;
+}
+
 #ifndef NOSTREAMIO
 OSTREAM&
 operator<< ( OSTREAM& s, const Evaluation &e )

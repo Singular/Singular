@@ -48,3 +48,23 @@ REvaluation::nextpoint()
     for ( int i = values.min(); i <= n; i++ )
         values[i] = gen->generate();
 }
+
+void
+REvaluation::nextpoint (int n)
+{
+  int m= values.max();
+  int t= values.min();
+  for (int i= t; i <= m; i++)
+    values [i]= 0;
+
+  if (m == t)
+  {
+    values [t]= gen->generate();
+    return;
+  }
+  for (int i= 0; i < n; i++)
+  {
+    int l= factoryrandom (m - t + 1) + t;
+    values [l]= gen->generate();
+  }
+}
