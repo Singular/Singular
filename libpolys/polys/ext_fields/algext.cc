@@ -86,6 +86,24 @@ BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
 void heuristicReduce(poly &p, poly reducer, const coeffs cf);
 void definiteReduce(poly &p, poly reducer, const coeffs cf);
 
+/* returns the bottom field in this field extension tower; if the tower
+   is flat, i.e., if there is no extension, then r itself is returned;
+   as a side-effect, the counter 'height' is filled with the height of
+   the extension tower (in case the tower is flat, 'height' is zero) */
+static coeffs nCoeff_bottom(const coeffs r, int &height)
+{
+  assume(r != NULL);
+  coeffs cf = r;
+  height = 0;
+  while (nCoeff_is_Extension(cf))
+  {
+    assume(cf->algring != NULL); assume(cf->algring->cf != NULL);
+    cf = cf->algring->cf;
+    height++;
+  }
+  return cf;
+}
+
 BOOLEAN naIsZero(number a, const coeffs cf)
 {
   naTest(a);
@@ -525,21 +543,37 @@ number naMapUP(number a, const coeffs src, const coeffs dst)
 
 nMapFunc naSetMap(const coeffs src, const coeffs dst)
 {
-  /* dst is expected to be an algebraic extension field */
+  /* dst is expected to be an algebraic field extension */
   assume(getCoeffType(dst) == n_algExt);
   
-  /* ATTENTION: This code assumes that dst is an algebraic extension of Q
-                or Zp. So, dst must NOT BE an algebraic extension of some
-                extension etc. This code will NOT WORK for extension
-                towers of height >= 2. */
+  int h = 0; /* the height of the extension tower given by dst */
+  coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
   
-  if (nCoeff_is_Q(src) && nCoeff_is_Q_a(dst))
+  /* for the time being, we only provide maps if h = 1 and if b is Q or
+     some field Z/pZ: */
+  if (h != 1) return NULL;
+  if ((!nCoeff_is_Zp(bDst)) && (!nCoeff_is_Q(bDst))) return NULL;
+  
+  if (nCoeff_is_Q(src) && nCoeff_is_Q(bDst))
     return naMap00;                                      /// Q     -->  Q(a)
   
-  if (nCoeff_is_Zp(src) && nCoeff_is_Q_a(dst))
+  if (nCoeff_is_Zp(src) && nCoeff_is_Q(bDst))
     return naMapP0;                                      /// Z/p   -->  Q(a)
   
-  if (nCoeff_is_Q_a(src) && nCoeff_is_Q_a(dst))
+  if (nCoeff_is_Q(src) && nCoeff_is_Zp(bDst))
+    return naMap0P;                                      /// Q      --> Z/p(a)
+  
+  if (nCoeff_is_Zp(src) && nCoeff_is_Zp(bDst))
+  {
+    if (src->ch == dst->ch) return naMapPP;              /// Z/p    --> Z/p(a)
+    else return naMapUP;                                 /// Z/u    --> Z/p(a)
+  }
+  
+  coeffs bSrc = nCoeff_bottom(src, h); /* the bottom field in the tower src */
+  if (h != 1) return NULL;
+  if ((!nCoeff_is_Zp(bSrc)) && (!nCoeff_is_Q(bSrc))) return NULL;
+  
+  if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
   {
     if (strcmp(rParameter(src->algring)[0],
                rParameter(dst->algring)[0]) == 0)
@@ -548,16 +582,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
       return NULL;                                       /// Q(b)   --> Q(a)
   }
   
-  if (nCoeff_is_Q(src) && nCoeff_is_Zp_a(dst))
-    return naMap0P;                                      /// Q      --> Z/p(a)
-  
-  if (nCoeff_is_Zp(src) && nCoeff_is_Zp_a(dst))
-  {
-    if (src->ch == dst->ch) return naMapPP;              /// Z/p    --> Z/p(a)
-    else return naMapUP;                                 /// Z/u    --> Z/p(a)
-  }
-  
-  if (nCoeff_is_Zp_a(src) && nCoeff_is_Zp_a(dst))
+  if (nCoeff_is_Zp(bSrc) && nCoeff_is_Zp(bDst))
   {
     if (strcmp(rParameter(src->algring)[0],
                rParameter(dst->algring)[0]) == 0)

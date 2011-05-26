@@ -735,36 +735,9 @@ static int binaryPower (const int a, const int b)
   return result;
 }
 
-int rChar(ring r)
-{
-  TODO(Somabody, move this proc. over to coeffs!?);
-
-#ifdef HAVE_RINGS
-  if (rField_is_Ring_2toM(r))
-    return binaryPower(2, (int)(unsigned long)r->cf->modExponent);
-  if (rField_is_Ring_ModN(r))
-    return (int)mpz_get_ui(r->cf->modBase);
-  if (rField_is_Ring_PtoM(r))
-    return binaryPower((int)mpz_get_ui(r->cf->modBase),
-                       (int)(unsigned long)r->cf->modExponent);
-
-#endif
-  if (rField_is_numeric(r))
-    return 0;
-  if (!rIsExtension(r)) /* Q, Fp */
-    return r->cf->ch;
-  if (rField_is_Zp_a(r))  /* Fp(a)  */
-    return -r->cf->ch;
-  if (rField_is_Q_a(r))   /* Q(a)  */
-    return 0;
-  /*else*/               /* GF(p,n) */
-  {
-    if ((r->cf->ch & 1)==0) return 2;
-    int i=3;
-    while ((r->cf->ch % i)!=0) i+=2;
-    return i;
-  }
-}
+/* we keep this otherwise superfluous method for compatibility reasons
+   towards the SINGULAR svn trunk */
+int rChar(ring r) { return r->cf->ch; }
 
 typedef char *             char_ptr;
 omBin char_ptr_bin = omGetSpecBin(sizeof(char_ptr)); // deallocation?

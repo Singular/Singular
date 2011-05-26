@@ -469,12 +469,18 @@ static inline BOOLEAN rField_is_GF(const ring r)
 static inline BOOLEAN rField_is_GF(const ring r, int q)
 { assume(r != NULL); return nCoeff_is_GF(r->cf, q); }
 
+/* DO NOT USE; just here for compatibility reasons towards
+   the SINGULAR svn trunk */
 static inline BOOLEAN rField_is_Zp_a(const ring r)
 { assume(r != NULL); return nCoeff_is_Zp_a(r->cf); }
 
+/* DO NOT USE; just here for compatibility reasons towards
+   the SINGULAR svn trunk */
 static inline BOOLEAN rField_is_Zp_a(const ring r, int p)
 { assume(r != NULL); return nCoeff_is_Zp_a(r->cf, p); }
 
+/* DO NOT USE; just here for compatibility reasons towards
+   the SINGULAR svn trunk */
 static inline BOOLEAN rField_is_Q_a(const ring r)
 { assume(r != NULL); return nCoeff_is_Q_a(r->cf); }
    
