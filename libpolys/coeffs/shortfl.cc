@@ -545,6 +545,7 @@ BOOLEAN nrInitChar(coeffs n, void*)
 {
   assume( getCoeffType(n) == ID );
   n->cfKillChar = ndKillChar; /* dummy */
+  n->ch = 0;
 
   n->cfInit = nrInit;
   n->cfInt  = nrInt;

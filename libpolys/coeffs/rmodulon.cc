@@ -23,6 +23,9 @@
 
 #include <string.h>
 
+/// Our Type!
+static const n_coeffType ID = n_Zn;
+
 extern omBin gmp_nrz_bin;
 
 void    nrnCoeffWrite  (const coeffs r)
@@ -44,10 +47,13 @@ static BOOLEAN nrnCoeffsEqual(const coeffs r, n_coeffType n, void * parameter)
 /* for initializing function pointers */
 BOOLEAN nrnInitChar (coeffs r, void* p)
 {
-  
+  assume( getCoeffType(r) == ID );
   nrnInitExp((int)(long)(p), r);
   r->ringtype = 2;
-  r->type = n_Zn;
+  
+  /* next computation may yield wrong characteristic as r->modNumber
+     is a GMP number */
+  r->ch = mpz_get_ui(r->modNumber);
 
   r->cfInit        = nrnInit;
   r->cfDelete      = nrnDelete;

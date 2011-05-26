@@ -22,6 +22,8 @@
 
 // int npGen=0;
 
+/// Our Type!
+static const n_coeffType ID = n_Zp;
 
 BOOLEAN npGreaterZero (number k, const coeffs r)
 {
@@ -326,6 +328,7 @@ number npConvFactoryNSingN( const CanonicalForm n, const coeffs r)
 
 BOOLEAN npInitChar(coeffs r, void* p)
 {
+  assume( getCoeffType(r) == ID );
   const int c = (int) (long) p;
 
   assume( c > 0 );

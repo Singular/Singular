@@ -216,8 +216,13 @@ struct n_Procs_s
   int_number    modNumber;
   unsigned long mod2mMask;
 #endif
-  int        ch;  /* characteristic, rInit
-                     PLEASE DOCUMENT HERE when this will be negative! */
+  int        ch;  /* characteristic, set by the local *InitChar methods;
+                     In field extensions or extensions towers, the
+                     characteristic can be accessed from any of the
+                     intermediate extension fields, i.e., in this case
+                     it is redundant along the chain of field extensions;
+                     CONTRARY to SINGULAR as it was, we do NOT LONGER use
+                     negative values for ch. */
 
   short      float_len; /* additional char-flags, rInit */
   short      float_len2; /* additional char-flags, rInit */
@@ -458,7 +463,7 @@ static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
   assume(r != NULL);
   return (r->ringtype == 0) &&
          ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
-         (r->ch < -1);
+         (r->ch != 0);
 }
 
 /* TRUE iff an extension tower is build upon Zp (p as provided), i.e.,
@@ -468,7 +473,7 @@ static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
   assume(r != NULL);
   return (r->ringtype == 0) &&
          ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
-         (r->ch < -1 ) && (-(r->ch) == p);
+         (r->ch != 0) && (r->ch == p);
 }
 
 /* TRUE iff an extension tower is build upon Q, i.e.,

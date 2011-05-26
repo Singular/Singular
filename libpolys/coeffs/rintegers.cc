@@ -21,6 +21,8 @@
 #include <coeffs/rintegers.h>
 #include "si_gmp.h"
 
+/// Our Type!
+static const n_coeffType ID = n_Z;
 
 omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
 
@@ -380,6 +382,7 @@ void    nrzCoeffWrite  (const coeffs r)
 
 BOOLEAN nrzInitChar(coeffs r,  void * parameter)
 {
+  assume( getCoeffType(r) == ID );
   r->cfSetChar= NULL;
   r->nCoeffIsEqual = ndCoeffIsEqual;
   r->cfKillChar = ndKillChar;
@@ -424,7 +427,7 @@ BOOLEAN nrzInitChar(coeffs r,  void * parameter)
 #endif
  
   r->nNULL = 0;
-  r->type = n_Z;
+  r->ch = 0;
   r->ringtype = 4;
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE; 

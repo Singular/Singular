@@ -110,9 +110,10 @@ static inline number nlShort3(number x) // assume x->s==3
 #define MPZ_DIV(A,B,C) mpz_tdiv_q((A),(B),(C))
 #define MPZ_EXACTDIV(A,B,C) mpz_divexact((A),(B),(C))
 
-void    _nlDelete_NoImm(number *a);
+/// Our Type!
+static const n_coeffType ID = n_Q;
 
-static const n_coeffType ID = n_long_R;
+void    _nlDelete_NoImm(number *a);
 
 /***************************************************************
  *
@@ -2544,7 +2545,8 @@ void    nlCoeffWrite  (const coeffs r)
 
 BOOLEAN nlInitChar(coeffs r, void* p)
 {
-  const int ch = (int)(long)(p);
+  assume( getCoeffType(r) == ID );
+  //const int ch = (int)(long)(p);
   
   r->cfKillChar=NULL;
   r->cfSetChar=NULL;

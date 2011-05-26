@@ -384,7 +384,8 @@ BOOLEAN ngfInitChar(coeffs n, void *)
 {
   assume( getCoeffType(n) == ID );
   n->cfKillChar = ndKillChar; /* dummy */
-
+  n->ch = 0;
+  
   n->cfDelete  = ngfDelete;
   n->cfNormalize=ndNormalize;
   n->cfInit   = ngfInit;

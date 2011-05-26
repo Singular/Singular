@@ -73,6 +73,7 @@ BOOLEAN ndDBTest(number a, const char *f, const int l, const coeffs r)
 BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
 {
   int c = n_GetChar(r);
+printf("### c = %d\n", c);
   BOOLEAN ret = n_IsZero(a, r);
   if( (c != 0) && !ret )
   {
