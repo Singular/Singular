@@ -1688,7 +1688,7 @@ EXAMPLE: example moduloSlim; shows an example
     dab = -dab;
     A = embedMat(A,rB,cA);
   }
-  else 
+  else
   {
     // rA>rB: add zero rows to B
     B = embedMat(B,rA,cB);

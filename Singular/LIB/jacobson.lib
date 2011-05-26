@@ -8,23 +8,24 @@ AUTHOR: Kristina Schindelar,     Kristina.Schindelar@math.rwth-aachen.de,
 
 OVERVIEW:
 We work over a ring R, that is an Euclidean principal ideal domain.
-@* If R is commutative, we suppose R to be a polynomial ring in one variable.
-@* If R is non-commutative, we suppose R to have two variables, say x and d.
-@* We treat then the basering as the Ore localization of R
-@* with respect to the mult. closed set S = K[x] without 0.
-@* Thus, we treat basering as principal ideal ring with d a polynomial
-@* variable and x an invertible one.
-@* Note, that in computations no division by x will actually happen.
-@*
-@* Given a rectangular matrix M over R, one can compute unimodular (that is
-@* invertible) square matrices U and V, such that U*M*V=D is a diagonal matrix.
-@* Depending on the ring, the diagonal entries of D have certain properties.
-@*
-@* We call a square matrix D as before 'a weak Jacobson normal form of M'.
-@* It is known, that over the first rational Weyl algebra K(x)<d>, D can be further
-@* transformed into a diagonal matrix (1,1,...,1,f,0,..,0), where f is in K(x)<d>. We call
-@* such a form of D the strong Jacobson normal form. The existence of strong form
-@* in not guaranteed if one works with algebra, which is not rational Weyl algebra.
+If R is commutative, we suppose R to be a polynomial ring in one variable.
+If R is non-commutative, we suppose R to have two variables, say x and d.
+We treat then the basering as the Ore localization of R
+with respect to the mult. closed set S = K[x] without 0.
+Thus, we treat basering as principal ideal ring with d a polynomial
+variable and x an invertible one.
+Note, that in computations no division by x will actually happen.
+
+Given a rectangular matrix M over R, one can compute unimodular (that is
+invertible) square matrices U and V, such that U*M*V=D is a diagonal matrix.
+Depending on the ring, the diagonal entries of D have certain properties.
+
+We call a square matrix D as before 'a weak Jacobson normal form of M'.
+It is known, that over the first rational Weyl algebra K(x)<d>, D can be further
+transformed into a diagonal matrix (1,1,...,1,f,0,..,0), where f is in K(x)<d>.
+We call such a form of D the strong Jacobson normal form.
+The existence of strong form in not guaranteed if one works with algebra,
+which is not rational Weyl algebra.
 
 
 REFERENCES:

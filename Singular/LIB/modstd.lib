@@ -1045,7 +1045,7 @@ EXAMPLE: example modStd; shows an example
 //-------------------  Now all leading ideals are the same  --------------------
 //-------------------  Lift results to basering via farey  ---------------------
 
-      tt = timer;     
+      tt = timer;
       N = T2[1];
       for(i = 2; i <= size(T2); i++) { N = N*T2[i]; }
       H = chinrem(T1,T2);

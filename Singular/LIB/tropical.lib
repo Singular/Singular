@@ -6753,7 +6753,7 @@ NOTE:      - the tropical curve defined by tp will consist of a bunch of
     cc=substitute(bunchoflines[i][1],var(2),0,var(1),0);
     xc=substitute(bunchoflines[i][1]-cc,var(2),0,var(1),1);
     yc=substitute(bunchoflines[i][1]-cc,var(2),1,var(1),0);
-	if (xc!=0) // then there is a point on the line with y-coordinate zero
+    if (xc!=0) // then there is a point on the line with y-coordinate zero
     {
       gr[1]=-cc/leadcoef(xc);
       gr[2]=0;
@@ -7489,18 +7489,18 @@ NOTE:        - the algorithm for the coefficients of the Weierstrass form is due
     +(t0*r0*q2^2+(s1*s0*q1+((-3*t0*r2+s1^2)*q0+s0*r0*r2))*q2
       +(t0*r2*q1^2+s1*r0*r2*q1+s0*r2^2*q0));
   poly a6=(-27*t0^2*q0^2+(9*t0*s0*r0-s0^3)*q0-t0*r0^3)*q3^2+
-	(((9*t0^2*q0-t0*s0*r0)*q1+((-3*t0*s0*r1+(3*t0*s1*r0+
-	2*s1*s0^2))*q0+(t0*r0^2*r1-s1*s0*r0^2)))*q2+(-t0^2*q1^3
-	+(t0*s0*r1+(2*t0*s1*r0-s1*s0^2))*q1^2+((3*t0*s0*r2+
-	(-3*t0*s1*r1+2*s1^2*s0))*q0+((2*t0*r0^2-s0^2*r0)*r2+
-	(-t0*r0*r1^2+s1*s0*r0*r1-s1^2*r0^2)))*q1+((9*t0*s1*r2-
-	s1^3)*q0^2+(((-3*t0*r0+s0^2)*r1-s1*s0*r0)*r2+(t0*r1^3
-	-s1*s0*r1^2+s1^2*r0*r1))*q0)))*q3+(-t0^2*q0*q2^3+
-	(-t0*s1*r0*q1+((2*t0*s0*r2+(t0*s1*r1-s1^2*s0))*q0-
-	t0*r0^2*r2))*q2^2+(-t0*s0*r2*q1^2+(-t0*s1*r2*q0+
-	(t0*r0*r1-s1*s0*r0)*r2)*q1+((2*t0*r0-s0^2)*r2^2+
-	(-t0*r1^2+s1*s0*r1-s1^2*r0)*r2)*q0)*q2+
-	(-t0*r0*r2^2*q1^2+(t0*r1-s1*s0)*r2^2*q0*q1-
+        (((9*t0^2*q0-t0*s0*r0)*q1+((-3*t0*s0*r1+(3*t0*s1*r0+
+        2*s1*s0^2))*q0+(t0*r0^2*r1-s1*s0*r0^2)))*q2+(-t0^2*q1^3
+        +(t0*s0*r1+(2*t0*s1*r0-s1*s0^2))*q1^2+((3*t0*s0*r2+
+        (-3*t0*s1*r1+2*s1^2*s0))*q0+((2*t0*r0^2-s0^2*r0)*r2+
+        (-t0*r0*r1^2+s1*s0*r0*r1-s1^2*r0^2)))*q1+((9*t0*s1*r2-
+        s1^3)*q0^2+(((-3*t0*r0+s0^2)*r1-s1*s0*r0)*r2+(t0*r1^3
+        -s1*s0*r1^2+s1^2*r0*r1))*q0)))*q3+(-t0^2*q0*q2^3+
+        (-t0*s1*r0*q1+((2*t0*s0*r2+(t0*s1*r1-s1^2*s0))*q0-
+        t0*r0^2*r2))*q2^2+(-t0*s0*r2*q1^2+(-t0*s1*r2*q0+
+        (t0*r0*r1-s1*s0*r0)*r2)*q1+((2*t0*r0-s0^2)*r2^2+
+        (-t0*r1^2+s1*s0*r1-s1^2*r0)*r2)*q0)*q2+
+        (-t0*r0*r2^2*q1^2+(t0*r1-s1*s0)*r2^2*q0*q1-
      t0*r2^3*q0^2));
   poly b2=a1^2+4*a2;
   poly b4=2*a4+a1*a3;

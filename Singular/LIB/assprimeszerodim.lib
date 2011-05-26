@@ -457,7 +457,7 @@ EXAMPLE: example assPrimes; shows an example
       if(F[1]-testF[1]==0)
       {
          if(printlevel >= 9) { "size(L) = "+string(size(L)); }
-         
+
          F = cleardenom(F[1]);
 
          e = deg(F[1]);

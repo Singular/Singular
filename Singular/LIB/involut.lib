@@ -9,11 +9,11 @@ AUTHORS:  Oleksandr Iena,       yena@mathematik.uni-kl.de,
 
 OVERVIEW:
 Involution is an anti-automorphism of a non-commutative K-algebra
-@* with the property that applied an involution twice, one gets an identity.
-@* Involution is linear with respect to the ground field. In this library we compute
-@* linear involutions, distinguishing the case of a diagonal matrix (such involutions
-@* are called homothetic) and a general one. Also, linear automorphisms of different
-@* order can be computed.
+with the property that applied an involution twice, one gets an identity.
+Involution is linear with respect to the ground field. In this library we
+compute linear involutions, distinguishing the case of a diagonal matrix
+(such involutions are called homothetic) and a general one.
+Also, linear automorphisms of different order can be computed.
 
 SUPPORT: Forschungsschwerpunkt 'Mathematik und Praxis' (Project of Dr. E. Zerz
 and V. Levandovskyy), Uni Kaiserslautern

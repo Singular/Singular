@@ -10,38 +10,38 @@ Support: Joint projects LE 2697/2-1 and KR 1907/3-1 of the Priority Programme SP
 @* of the German DFG
 
 OVERVIEW: Given the free algebra A = K<x_1,...,x_n> and a (finite) Groebner basis
-@*      GB = {g_1,..,g_w}, one is interested in the K-dimension and in the
-@*      explicit K-basis of A/<GB>.
-@*      Therefore one is interested in the following data:
+      GB = {g_1,..,g_w}, one is interested in the K-dimension and in the
+      explicit K-basis of A/<GB>.
+      Therefore one is interested in the following data:
 @*      - the Ufnarovskij graph induced by GB
 @*      - the mistletoes of A/<GB>
 @*      - the K-dimension of A/<GB>
 @*      - the Hilbert series of A/<GB>
-@*
-@*      The Ufnarovskij graph is used to determine whether A/<GB> has finite
-@*      K-dimension. One has to check if the graph contains cycles.
-@*      For the whole theory we refer to [ufna]. Given a
-@*      reduced set of monomials GB one can define the basis tree, whose vertex
-@*      set V consists of all normal monomials w.r.t. GB. For every two
-@*      monomials m_1, m_2 in V there is a direct edge from m_1 to m_2, if and
-@*      only if there exists x_k in {x_1,..,x_n}, such that m_1*x_k = m_2. The
-@*      set M = {m in V | there is no edge from m to another monomial in V} is
-@*      called the set of mistletoes. As one can easily see it consists of
-@*      the endpoints of the graph. Since there is a unique path to every
-@*      monomial in V the whole graph can be described only from the knowledge
-@*      of the mistletoes. Note that V corresponds to a basis of A/<GB>, so
-@*      knowing the mistletoes we know a K-basis. The name mistletoes was given
-@*      to those points because of these miraculous value and the algorithm is 
-@*      named sickle, because a sickle is the tool to harvest mistletoes.
-@*      For more details see [studzins]. This package uses the Letterplace 
-@*      format introduced by [lls]. The algebra can either be represented as a
-@*      Letterplace ring or via integer vectors: Every variable will only be
-@*      represented by its number, so variable one is represented as 1,
-@*      variable two as 2 and so on. The monomial x_1*x_3*x_2 for example will
-@*      be stored as (1,3,2). Multiplication is concatenation. Note that there
-@*      is no algorithm for computing the normal form needed for our case.
-@*      Note that the name fpadim.lib is short for dimensions of finite 
-@*      presented algebras.
+
+      The Ufnarovskij graph is used to determine whether A/<GB> has finite
+      K-dimension. One has to check if the graph contains cycles.
+      For the whole theory we refer to [ufna]. Given a
+      reduced set of monomials GB one can define the basis tree, whose vertex
+      set V consists of all normal monomials w.r.t. GB. For every two
+      monomials m_1, m_2 in V there is a direct edge from m_1 to m_2, if and
+      only if there exists x_k in {x_1,..,x_n}, such that m_1*x_k = m_2. The
+      set M = {m in V | there is no edge from m to another monomial in V} is
+      called the set of mistletoes. As one can easily see it consists of
+      the endpoints of the graph. Since there is a unique path to every
+      monomial in V the whole graph can be described only from the knowledge
+      of the mistletoes. Note that V corresponds to a basis of A/<GB>, so
+      knowing the mistletoes we know a K-basis. The name mistletoes was given
+      to those points because of these miraculous value and the algorithm is
+      named sickle, because a sickle is the tool to harvest mistletoes.
+      For more details see [studzins]. This package uses the Letterplace
+      format introduced by [lls]. The algebra can either be represented as a
+      Letterplace ring or via integer vectors: Every variable will only be
+      represented by its number, so variable one is represented as 1,
+      variable two as 2 and so on. The monomial x_1*x_3*x_2 for example will
+      be stored as (1,3,2). Multiplication is concatenation. Note that there
+      is no algorithm for computing the normal form needed for our case.
+      Note that the name fpadim.lib is short for dimensions of finite
+      presented algebras.
 
 References:
 
@@ -144,9 +144,10 @@ NOTE:   d has to be > 0
     while (i2 <= (n^d))
     {for (i3 = 1; i3 <= n; i3++)
       {for (i4 = 1; i4 <= (n^(i1-1)); i4++)
-	{M[i2,i1] = i3;
-	  i2 = i2 + 1;
-	}
+      {
+        M[i2,i1] = i3;
+          i2 = i2 + 1;
+       }
       }
     }
   }
@@ -193,15 +194,15 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {return(0);}
@@ -209,8 +210,8 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	dimen = dimen + 1 + findDimen(Vt,n,L,P);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        dimen = dimen + 1 + findDimen(Vt,n,L,P);
       }
       return(dimen);
     }
@@ -222,14 +223,14 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0) {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {return(0);}
@@ -237,8 +238,8 @@ PURPOSE:Computing the K-dimension of the quotient algebra
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	dimen = dimen + 1 + findDimen(Vt,n,L,P,degbound);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        dimen = dimen + 1 + findDimen(Vt,n,L,P,degbound);
       }
       return(dimen);
     }
@@ -257,10 +258,10 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0)
-	  {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0)
+          {w = 1; break;}
+        }
       }
       if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
       if (r == 1) {break;}
@@ -274,31 +275,31 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
       intmat Mt[j][nrows(M)];
       for (it = 1; it <= j; it++)
       { for(it2 = 1; it2 <= nrows(M);it2++)
-	{Mt[it,it2] = int(leadcoef(M[it2,it]));}
+        {Mt[it,it2] = int(leadcoef(M[it2,it]));}
       }
       Vt = V[(size(V)-ld+1)..size(V)];
       //Mt; type(Mt);Vt;type(Vt);
       if (isInMat(Vt,Mt) > 0) {return(1);}
       else
       {vector Vtt;
-	for (it =1; it <= size(Vt); it++)
-	{Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
-	for (i = 1; i <= n; i++)
-	{Vt = V,i; w = 0;
-	  for (j = 1; j <= size(P); j++)
-	  {if (P[j] <= size(Vt))
-	    {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	      //L[j]; type(L[j]);Vt2;type(Vt2);
-	      if (isInMat(Vt2,L[j]) > 0)
-	      {w = 1; break;}
-	    }
-	  }
-	  if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-	  if (r == 1) {break;}
-	}
-	return(r);
+        for (it =1; it <= size(Vt); it++)
+        {Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
+        for (i = 1; i <= n; i++)
+        {Vt = V,i; w = 0;
+          for (j = 1; j <= size(P); j++)
+          {if (P[j] <= size(Vt))
+            {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+              //L[j]; type(L[j]);Vt2;type(Vt2);
+              if (isInMat(Vt2,L[j]) > 0)
+              {w = 1; break;}
+            }
+          }
+          if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+          if (r == 1) {break;}
+        }
+        return(r);
       }
     }
     else
@@ -310,16 +311,16 @@ PURPOSE:Searching the Ufnarovskij graph for cycles
       kill Vtt;
       for (i = 1; i <= n; i++)
       {Vt = V,i; w = 0;
-	for (j = 1; j <= size(P); j++)
-	{if (P[j] <= size(Vt))
-	  {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	    //L[j]; type(L[j]);Vt2;type(Vt2);
-	    if (isInMat(Vt2,L[j]) > 0)
-	    {w = 1; break;}
-	  }
-	}
-	if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
-	if (r == 1) {break;}
+        for (j = 1; j <= size(P); j++)
+        {if (P[j] <= size(Vt))
+          {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+            //L[j]; type(L[j]);Vt2;type(Vt2);
+            if (isInMat(Vt2,L[j]) > 0)
+            {w = 1; break;}
+          }
+        }
+        if (w == 0) {r = findCycle(Vt,L,P,n,ld,M);}
+        if (r == 1) {break;}
       }
       return(r);
     }
@@ -344,15 +345,15 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {return(H);}
@@ -360,8 +361,8 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++) {Vt[j] =  int(leadcoef(M[i][j]));}
-	h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1);
+        for (j =1; j <= size(M[i]); j++) {Vt[j] =  int(leadcoef(M[i][j]));}
+        h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1);
       }
       if (size(H1) < (size(V)+2)) {H1[(size(V)+2)] = h1;}
       else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
@@ -376,15 +377,15 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {return(H);}
@@ -392,9 +393,9 @@ NOTE:   Starting with a part of the Hilbert series we change the coefficient
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++)
-	{Vt[j] =  int(leadcoef(M[i][j]));}
-	h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1,degbound);
+        for (j =1; j <= size(M[i]); j++)
+        {Vt[j] =  int(leadcoef(M[i][j]));}
+        h1 = h1 + 1; H1 = findHCoeff(Vt,n,L,P,H1,degbound);
       }
       if (size(H1) < (size(V)+2)) { H1[(size(V)+2)] = h1;}
       else {H1[(size(V)+2)] = H1[(size(V)+2)] + h1;}
@@ -421,15 +422,15 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
@@ -437,12 +438,12 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++)
-	{Vt[j] =  int(leadcoef(M[i][j]));}
-	if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
-	else
-	{R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
-	R = findHCoeffMis(Vt,n,L,P,R);
+        for (j =1; j <= size(M[i]); j++)
+        {Vt[j] =  int(leadcoef(M[i][j]));}
+        if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+        else
+        {R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
+        R = findHCoeffMis(Vt,n,L,P,R);
       }
       return(R);
     }
@@ -458,15 +459,15 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {if (size(R) < 2){R[2] = list(V);} else {R[2] = R[2] + list(V);} return(R);}
@@ -474,12 +475,12 @@ PURPOSE:Computing the coefficients of the Hilbert series and the Mistletoes all
     {M = simplify(M,2);
       for (i = 1; i <= ncols(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++)
-	{Vt[j] =  int(leadcoef(M[i][j]));}
-	if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
-	else
-	{R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
-	R = findHCoeffMis(Vt,n,L,P,R,degbound);
+        for (j =1; j <= size(M[i]); j++)
+        {Vt[j] =  int(leadcoef(M[i][j]));}
+        if (size(R[1]) < (size(V)+2)) { R[1][(size(V)+2)] = 1;}
+        else
+        {R[1][(size(V)+2)] = R[1][(size(V)+2)] + 1;}
+        R = findHCoeffMis(Vt,n,L,P,R,degbound);
       }
       return(R);
     }
@@ -502,15 +503,15 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0)
@@ -522,8 +523,8 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R);
       }
       return(R);
     }
@@ -539,15 +540,15 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {Vt = V, i; w = 0;
       for (j = 1; j<= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0) {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0)
@@ -559,8 +560,8 @@ PURPOSE:Computing the K-dimension and the Mistletoes all at once
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R,degbound);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        R[1] = R[1] + 1; R = findMisDim(Vt,n,L,P,R,degbound);
       }
       return(R);
 
@@ -588,16 +589,16 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0)
-	  {w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0)
+          {w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M)==0) {R = V; return(R);}
@@ -605,8 +606,8 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {M = simplify(M,2);
       for (i = 1; i <= size(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
-	R = R + findmistletoes(Vt,n,L,P);
+        for (j =1; j <= size(M[i]); j++){Vt[j] =  int(leadcoef(M[i][j]));}
+        R = R + findmistletoes(Vt,n,L,P);
       }
       return(R);
     }
@@ -619,15 +620,15 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {Vt = V,i; w = 0;
       for (j = 1; j <= size(P); j++)
       {if (P[j] <= size(Vt))
-	{Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
-	  if (isInMat(Vt2,L[j]) > 0){w = 1; break;}
-	}
+        {Vt2 = Vt[(size(Vt)-P[j]+1)..size(Vt)];
+          if (isInMat(Vt2,L[j]) > 0){w = 1; break;}
+        }
       }
       if (w == 0)
       {vector Vtt;
-	for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
-	M = M,Vtt;
-	kill Vtt;
+        for (it = 1; it <= size(Vt); it++){Vtt = Vtt + Vt[it]*gen(it);}
+        M = M,Vtt;
+        kill Vtt;
       }
     }
     if (size(M) == 0) {R = V; return(R);}
@@ -635,10 +636,10 @@ NOTE:   V has to be normal w.r.t. L, it will not be checked for being so
     {M = simplify(M,2);
       for (i = 1; i <= ncols(M); i++)
       {kill Vt; intvec Vt;
-	for (j =1; j <= size(M[i]); j++)
-	{Vt[j] =  int(leadcoef(M[i][j]));}
-	//Vt; typeof(Vt); size(Vt);
-	R = R + findmistletoes(Vt,n,L,P,degbound);
+        for (j =1; j <= size(M[i]); j++)
+        {Vt[j] =  int(leadcoef(M[i][j]));}
+        //Vt; typeof(Vt); size(Vt);
+        R = R + findmistletoes(Vt,n,L,P,degbound);
       }
       return(R);
     }
@@ -746,7 +747,7 @@ proc iv2lpList(list L)
 "USAGE: iv2lpList(L); L a list of intmats
 RETURN: ideal
 PURPOSE:Converting a list of intmats into an ideal of corresponding monomials
-@*      The rows of the intmat corresponds to an intvec, which stores the 
+@*      The rows of the intmat corresponds to an intvec, which stores the
 @*      monomial.
 @*      For the encoding of the variables see the overview.
 ASSUME: - The rows of each intmat in L must correspond to a Letterplace monomial
@@ -778,7 +779,7 @@ proc iv2lpMat(intmat M)
 "USAGE: iv2lpMat(M); M an intmat
 RETURN: ideal
 PURPOSE:Converting an intmat into an ideal of the corresponding monomials.
-@*      The rows of the intmat corresponds to an intvec, which stores the 
+@*      The rows of the intmat corresponds to an intvec, which stores the
 @*      monomial.
 @*      For the encoding of the variables see the overview.
 ASSUME: - The rows of M must correspond to Letterplace monomials
@@ -1674,7 +1675,7 @@ ASSUME: - basering is a Letterplace ring.  G is a Letterplace ideal.
 @*      - if you specify a different degree bound degbound,
 @*        degbound <= attrib(basering,uptodeg) should hold.
 NOTE: - If L is the list returned, then L[1] is an integer, the K-dimension,
-@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal, 
+@*      L[2] is an intvec, the Hilbert series and L[3] is an ideal,
 @*      the mistletoes
 @*    - If degbound is set, there will be a degree bound added. 0 means no
 @*      degree bound. Default: attrib(basering,uptodeg).
