@@ -181,7 +181,7 @@ static BOOLEAN jjMINPOLY(leftv res, leftv a)
     nNormalize(p);
     currRing->minpoly=p;
     naMinimalPoly=((lnumber)currRing->minpoly)->z;
-    if (p_GetExp(((lnumber)currRing->minpoly)->z,1,currRing->algring)==0)
+    if (p_GetExp(((lnumber)currRing->minpoly)->z,1,currRing->extRing)==0)
     {
       Werror("minpoly must not be constant");
       currRing->minpoly=NULL;

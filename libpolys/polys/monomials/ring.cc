@@ -1387,10 +1387,10 @@ ring rCopy0(const ring r, BOOLEAN copy_qideal, BOOLEAN copy_ordering)
   res->options=r->options;
 
 /*
-  if (r->algring!=NULL)
-    r->algring->ref++;
+  if (r->extRing!=NULL)
+    r->extRing->ref++;
   
-  res->algring=r->algring;  
+  res->extRing=r->extRing;  
   //memset: res->minideal=NULL;
 */
   
@@ -1535,9 +1535,9 @@ BOOLEAN rEqual(ring r1, ring r2, BOOLEAN qr)
   if ( !rMinpolyIsNULL(r1) )
   {
     if ( rMinpolyIsNULL(r2) ) return FALSE;
-    if (! p_EqualPolys(r1->cf->algring->minideal->m[0],
-                  r2->cf->algring->minideal->m[0], 
-		  r1->cf->algring))
+    if (! p_EqualPolys(r1->cf->extRing->minideal->m[0],
+                  r2->cf->extRing->minideal->m[0], 
+		  r1->cf->extRing))
       return FALSE;
   }
   else if (!rMinpolyIsNULL(r2)) return FALSE;
@@ -1964,7 +1964,7 @@ BOOLEAN rDBTest(ring r, const char* fn, const int l)
   }
 
   if (!rMinpolyIsNULL(r))
-    omCheckAddr(r->cf->algring->minideal->m[0]);
+    omCheckAddr(r->cf->extRing->minideal->m[0]);
 
   //assume(r->cf!=NULL);
 
@@ -5371,7 +5371,7 @@ BOOLEAN rMinpolyIsNULL(const ring r)
 
   if( rField_is_Extension(r) )
   {
-    const ring R = C->algring;
+    const ring R = C->extRing;
     assume( R != NULL );
     return idIs0(R->minideal);
   }

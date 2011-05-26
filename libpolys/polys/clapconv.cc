@@ -168,18 +168,18 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
       int i;
       for ( i = rVar(r); i>0 ; i-- )
         p_SetExp( term, i , exp[i+var_start],r);
-      //if (rRing_has_Comp(currRing->algring)) p_SetComp(term, 0, currRing->algring); // done by pInit
+      //if (rRing_has_Comp(currRing->extRing)) p_SetComp(term, 0, currRing->extRing); // done by pInit
       if (par_start==0)
       {
         for ( i = 1; i <= var_start; i++ )
         //z->e[i-1]+=exp[i];
-          p_AddExp(z,i,exp[i],r->algring);
+          p_AddExp(z,i,exp[i],r->extRing);
       }
       else
       {
         for ( i = par_start+1; i <= var_start+rPar(currRing); i++ )
         //z->e[i-1]+=exp[i];
-          p_AddExp(z,i,exp[i-par_start],r->algring);
+          p_AddExp(z,i,exp[i-par_start],r->extRing);
       }
       pGetCoeff(term)=(number)ALLOC0_LNUMBER();
       ((lnumber)pGetCoeff(term))->z=z;
@@ -225,7 +225,7 @@ CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r )
         }
       }
     }
-    if ( (e = p_GetExp( p, 1, r->algring )) != 0 )
+    if ( (e = p_GetExp( p, 1, r->extRing )) != 0 )
       term *= power( a , e );
     result += term;
     p = pNext( p );
@@ -236,7 +236,7 @@ CanonicalForm convSingAFactoryA ( poly p , const Variable & a, const ring r )
 static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
 {
   if ( f.isImm() )
-    return n_Init( f.intval(), r->algring );
+    return n_Init( f.intval(), r->extRing );
   else
   {
     number z=ALLOC_RNUMBER();
@@ -270,14 +270,14 @@ poly convFactoryASingA ( const CanonicalForm & f, const ring r )
     t=napNew();
     // pNext( t ) = NULL; //already done by napNew
     pGetCoeff(t)=convFactoryNSingAN( i.coeff(), r );
-    if (n_IsZero(napGetCoeff(t),r->algring))
+    if (n_IsZero(napGetCoeff(t),r->extRing))
     {
-      p_Delete(&t,r->algring);
+      p_Delete(&t,r->extRing);
     }
     else
     {
-      p_SetExp(t,1,i.exp(),r->algring);
-      a=p_Add_q(a,t,r->algring);
+      p_SetExp(t,1,i.exp(),r->extRing);
+      a=p_Add_q(a,t,r->extRing);
     }
   }
   if (a!=NULL)
@@ -285,7 +285,7 @@ poly convFactoryASingA ( const CanonicalForm & f, const ring r )
     if (r->minpoly!=NULL)
     {
       lnumber l=(lnumber)r->minpoly;
-      if (p_GetExp(a,1,r->algring) >= p_GetExp(l->z,1,r->algring))
+      if (p_GetExp(a,1,r->extRing) >= p_GetExp(l->z,1,r->extRing))
         a = napRemainder( a, l->z);
     }
   }
@@ -301,7 +301,7 @@ CanonicalForm convSingTrPFactoryP ( poly p, const ring r )
   while ( p!=NULL )
   {
     n_Normalize(pGetCoeff(p),r);
-    CanonicalForm term=convSingPFactoryP(((lnumber)pGetCoeff(p))->z,r->algring);
+    CanonicalForm term=convSingPFactoryP(((lnumber)pGetCoeff(p))->z,r->extRing);
 
     if ((((lnumber)pGetCoeff(p))->n!=NULL)
     && (!errorreported))
@@ -352,8 +352,8 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const
     for ( int i = rVar(r); i>0; i-- )
       p_SetExp( term, i ,exp[i], r);
     //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit
-    pGetCoeff(term)=(number)ALLOC0_LNUMBER();
-    ((lnumber)pGetCoeff(term))->z=convFactoryPSingP( f, r->algring );
+    pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
+    ((lnumber)pGetCoeff(term))->z=convFactoryPSingP( f, r->extRing );
     p_Setm( term,r );
     result = p_Add_q( result, term,r );
   }

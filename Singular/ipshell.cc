@@ -1756,8 +1756,8 @@ lists rDecompose(const ring r)
 #endif
   else if (rIsExtension(r))
   {
-    if (r->algring!=NULL)
-      rDecomposeCF(&(L->m[0]),r->algring,r);
+    if (r->extRing!=NULL)
+      rDecomposeCF(&(L->m[0]),r->extRing,r);
     else
     {
       lists Lc=(lists)omAlloc0Bin(slists_bin);
@@ -2310,31 +2310,31 @@ ring rCompose(const lists  L)
       }
       if (is_gf_char==-1)
       {
-        R->algring=rCompose((lists)L->m[0].Data());
-        if (R->algring==NULL)
+        R->extRing=rCompose((lists)L->m[0].Data());
+        if (R->extRing==NULL)
         {
           WerrorS("could not create rational function coefficient field");
           goto rCompose_err;
         }
-        if (R->algring->ch>0)
-          R->ch= -R->algring->ch;
+        if (R->extRing->ch>0)
+          R->ch= -R->extRing->ch;
         else
           R->ch=1;
-        R->P=R->algring->N;
+        R->P=R->extRing->N;
         R->parameter=(char**)omAlloc0(R->P*sizeof(char_ptr));
         int i;
         for(i=R->P-1;i>=0;i--)
-          R->parameter[i]=omStrDup(R->algring->names[i]);
-        if (R->algring->qideal!=NULL)
+          R->parameter[i]=omStrDup(R->extRing->names[i]);
+        if (R->extRing->qideal!=NULL)
         {
-          if (IDELEMS(R->algring->qideal)==1)
+          if (IDELEMS(R->extRing->qideal)==1)
           {
             R->minpoly=naInit(1,R);
             lnumber n=(lnumber)R->minpoly;
-            n->z=R->algring->qideal->m[0];
+            n->z=R->extRing->qideal->m[0];
             naMinimalPoly=n->z;
-            R->algring->qideal->m[0]=NULL;
-            idDelete(&(R->algring->qideal));
+            R->extRing->qideal->m[0]=NULL;
+            idDelete(&(R->extRing->qideal));
             redefineFunctionPointers();
           }
           else

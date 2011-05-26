@@ -120,16 +120,16 @@ extern number      (*nacMap)(number);
 
 /* for computing with polynomials living in nacRing */
 poly    napPermNumber(number z, int * par_perm, int P, ring r);
-#define napAddExp(p,i,e)       (p_AddExp(p,i,e,currRing->algring))
+#define napAddExp(p,i,e)       (p_AddExp(p,i,e,currRing->extRing))
 #define napLength(p)           pLength(p)
-#define napNeg(p)              (p_Neg(p,currRing->algring))
+#define napNeg(p)              (p_Neg(p,currRing->extRing))
 #define napVariables           naNumbOfPar
 #define napGetCoeff(p)         pGetCoeff(p)
-#define napGetExpFrom(p,i,r)   (p_GetExp(p,i,r->algring))
-#define napSetExp(p,i,e)       (p_SetExp(p,i,e,currRing->algring))
-#define napNew()               (p_Init(currRing->algring))
-#define napAdd(p1,p2)          (p_Add_q(p1,p2,currRing->algring))
-#define napSetm(p)             p_Setm(p,currRing->algring)
+#define napGetExpFrom(p,i,r)   (p_GetExp(p,i,r->extRing))
+#define napSetExp(p,i,e)       (p_SetExp(p,i,e,currRing->extRing))
+#define napNew()               (p_Init(currRing->extRing))
+#define napAdd(p1,p2)          (p_Add_q(p1,p2,currRing->extRing))
+#define napSetm(p)             p_Setm(p,currRing->extRing)
 #define napCopy(p)             p_Copy(p,nacRing)
 #define napSetCoeff(p,n)       {n_Delete(&pGetCoeff(p),nacRing);pGetCoeff(p)=n;}
 #define napComp(p,q)           p_LmCmp((poly)p,(poly)q, nacRing)

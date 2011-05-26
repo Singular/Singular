@@ -203,7 +203,7 @@ BOOLEAN maApplyFetch(int what,map theMap,leftv res, leftv w, ring preimage_r,
 poly pSubstPar(poly p, int par, poly image)
 {
   ideal theMapI=idInit(rPar(currRing),1);
-  nMapFunc nMap=nSetMap(currRing->algring);
+  nMapFunc nMap=nSetMap(currRing->extRing);
 
   int i;
   poly pp;
@@ -213,8 +213,8 @@ poly pSubstPar(poly p, int par, poly image)
     {
       pp=theMapI->m[i-1]=pOne();
       lnumber n=(lnumber)pGetCoeff(pp);
-      p_SetExp(n->z,i,1,currRing->algring);
-      p_Setm(n->z,currRing->algring);
+      p_SetExp(n->z,i,1,currRing->extRing);
+      p_Setm(n->z,currRing->extRing);
     }
     else
       theMapI->m[i-1]=pCopy(image);
@@ -234,7 +234,7 @@ poly pSubstPar(poly p, int par, poly image)
     lnumber n=(lnumber)pGetCoeff(p);
     tmpW.data=n->z;
     if (n->n!=NULL) WarnS("ignoring denominators of coefficients...");
-    if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing->algring,NULL,NULL,0,nMap))
+    if (maApplyFetch(MAP_CMD,theMap,v,&tmpW,currRing->extRing,NULL,NULL,0,nMap))
     {
       WerrorS("map failed");
       v->data=NULL;

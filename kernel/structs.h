@@ -581,7 +581,7 @@ struct sip_sring
 
   p_SetmProc    p_Setm;
   n_Procs_s*    cf;
-  ring          algring;
+  ring          extRing;
 #ifdef HAVE_PLURAL
   private:
     nc_struct*    _nc; // private

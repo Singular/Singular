@@ -3496,7 +3496,7 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
         ring new_ring=rCopy0(currRing); // all variable names, ordering etc.
         new_ring->P=lev;
         new_ring->parameter=names;
-        new_ring->algring=alg_ring;
+        new_ring->extRing=alg_ring;
         new_ring->ch=1;
         rComplete(new_ring,TRUE);
         // set the mipo ===============================================

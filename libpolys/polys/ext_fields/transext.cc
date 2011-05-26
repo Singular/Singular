@@ -3,30 +3,10 @@
 ****************************************/
 /* $Id$ */
 /*
-* ABSTRACT: numbers in an algebraic extension field K[a] / < f(a) >
+* ABSTRACT: numbers in a transcendental extension field K(t_1, .., t_s)
 *           Assuming that we have a coeffs object cf, then these numbers
-*           are polynomials in the polynomial ring K[a] represented by
-*           cf->extRing.
-*           IMPORTANT ASSUMPTIONS:
-*           1.) So far we assume that cf->extRing is a valid polynomial
-*               ring in exactly one variable, i.e., K[a], where K is allowed
-*               to be any field (representable in SINGULAR and which may
-*               itself be some extension field, thus allowing for extension
-*               towers).
-*           2.) Moreover, this implementation assumes that
-*               cf->extRing->minideal is not NULL but an ideal with at
-*               least one non-zero generator which may be accessed by
-*               cf->extRing->minideal->m[0] and which represents the minimal
-*               polynomial f(a) of the extension variable 'a' in K[a].
-*           3.) As soon as an std method for polynomial rings becomes
-*               availabe, all reduction steps modulo f(a) should be replaced
-*               by a call to std. Moreover, in this situation one can finally
-*               move from K[a] / < f(a) > to
-*                  K[a_1, ..., a_s] / I, with I some zero-dimensional ideal
-*                                        in K[a_1, ..., a_s] given by a lex
-*                                        Gröbner basis.
-*               The code in algext.h and algext.cc is then capable of
-*               computing in K[a_1, ..., a_s] / I.
+*           are quotients of polynomials in the polynomial ring
+*           K[t_1, .., t_s] represented by cf->algring.
 */
 
 #include "config.h"
@@ -44,50 +24,52 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
 
-#include <polys/ext_fields/algext.h>
+#include <polys/ext_fields/transext.h>
 
-/// our type has been defined as a macro in algext.h
-/// and is accessible by 'naID'
+/// our type has been defined as a macro in transext.h
+/// and is accessible by 'ntID'
 
 /// forward declarations
-BOOLEAN  naGreaterZero(number a, const coeffs cf); 
-BOOLEAN  naGreater(number a, number b, const coeffs cf);
-BOOLEAN  naEqual(number a, number b, const coeffs cf);
-BOOLEAN  naIsOne(number a, const coeffs cf);
-BOOLEAN  naIsMOne(number a, const coeffs cf);
-BOOLEAN  naIsZero(number a, const coeffs cf);
-number   naInit(int i, const coeffs cf);
-int      naInt(number &a, const coeffs cf);
-number   naNeg(number a, const coeffs cf);
-number   naInvers(number a, const coeffs cf);
-number   naPar(int i, const coeffs cf);
-number   naAdd(number a, number b, const coeffs cf);
-number   naSub(number a, number b, const coeffs cf);
-number   naMult(number a, number b, const coeffs cf);
-number   naDiv(number a, number b, const coeffs cf);
-void     naPower(number a, int exp, number *b, const coeffs cf);
-number   naCopy(number a, const coeffs cf);
-void     naWrite(number &a, const coeffs cf);
-number   naRePart(number a, const coeffs cf);
-number   naImPart(number a, const coeffs cf);
-number   naGetDenom(number &a, const coeffs cf);
-number   naGetNumerator(number &a, const coeffs cf);
-number   naGcd(number a, number b, const coeffs cf);
-number   naLcm(number a, number b, const coeffs cf);
-int      naSize(number a, const coeffs cf);
-void     naDelete(number *a, const coeffs cf);
-void     naCoeffWrite(const coeffs cf);
-number   naIntDiv(number a, number b, const coeffs cf);
-const char * naRead(const char *s, number *a, const coeffs cf);
-static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
+BOOLEAN  ntGreaterZero(number a, const coeffs cf); 
+BOOLEAN  ntGreater(number a, number b, const coeffs cf);
+BOOLEAN  ntEqual(number a, number b, const coeffs cf);
+BOOLEAN  ntIsOne(number a, const coeffs cf);
+BOOLEAN  ntIsMOne(number a, const coeffs cf);
+BOOLEAN  ntIsZero(number a, const coeffs cf);
+number   ntInit(int i, const coeffs cf);
+int      ntInt(number &a, const coeffs cf);
+number   ntNeg(number a, const coeffs cf);
+number   ntInvers(number a, const coeffs cf);
+number   ntPar(int i, const coeffs cf);
+number   ntAdd(number a, number b, const coeffs cf);
+number   ntSub(number a, number b, const coeffs cf);
+number   ntMult(number a, number b, const coeffs cf);
+number   ntDiv(number a, number b, const coeffs cf);
+void     ntPower(number a, int exp, number *b, const coeffs cf);
+number   ntCopy(number a, const coeffs cf);
+void     ntWrite(number &a, const coeffs cf);
+number   ntRePart(number a, const coeffs cf);
+number   ntImPart(number a, const coeffs cf);
+number   ntGetDenom(number &a, const coeffs cf);
+number   ntGetNumerator(number &a, const coeffs cf);
+number   ntGcd(number a, number b, const coeffs cf);
+number   ntLcm(number a, number b, const coeffs cf);
+number   ntSize(number a, const coeffs cf);
+void     ntDelete(number * a, const coeffs cf);
+void     ntCoeffWrite(const coeffs cf);
+number   ntIntDiv(number a, number b, const coeffs cf);
+const char * ntRead(const char *s, number *a, const coeffs cf);
+static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 
 #ifdef LDEBUG
-BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
+BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
 {
-  assume(getCoeffType(cf) == naID);
-  if (a == NULL) return TRUE;
-  p_Test((poly)a, naRing);
-  assume(p_Deg((poly)a, naRing) <= p_Deg(naMinpoly, naRing));
+  assume(getCoeffType(cf) == ntID);
+  fraction f = (fraction)a;
+  if (is0(f)) return TRUE;
+  assume(num(f) != NULL);   /**< f != 0 ==> numerator(f) != 0 */
+  p_Test(num(f), ntRing);
+  if (!denIs1(f)) p_Test(den(f), ntRing);
   return TRUE;
 }
 #endif

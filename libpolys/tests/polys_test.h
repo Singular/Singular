@@ -562,7 +562,7 @@ public:
     n_coeffType type = nRegister(n_algExt, naInitChar); 
     TS_ASSERT(type == n_algExt);
 
-    ExtInfo extParam;
+    AlgExtInfo extParam;
     extParam.r = r;
     extParam.i = minIdeal;
     
@@ -618,21 +618,21 @@ public:
          << endl;
     
     poly u;
-    u = NULL; plusTerm(u, 1, 1, 1, cf->algring);
-    plusTerm(u, 1, 1, 0, cf->algring);  // a + 1
-    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
-    u = NULL; plusTerm(u, 1, 1, 1, cf->algring);
-    plusTerm(u, -1, 1, 0, cf->algring); // a - 1
-    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
-    u = NULL; plusTerm(u, 1, 1, 1, cf->algring);
-    plusTerm(u, 5, 1, 0, cf->algring);  // a + 5
-    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
-    u = NULL; plusTerm(u, 1, 1, 1, cf->algring);
-    plusTerm(u, -5, 1, 0, cf->algring); // a - 5
-    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
-    u = NULL; plusTerm(u, 17, 1, 1, cf->algring);
-    plusTerm(u, 5, 1, 0, cf->algring); // 17a + 5
-    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
+    u = NULL; plusTerm(u, 1, 1, 1, cf->extRing);
+    plusTerm(u, 1, 1, 0, cf->extRing);  // a + 1
+    checkInverse((number)u, cf); p_Delete(&u, cf->extRing);
+    u = NULL; plusTerm(u, 1, 1, 1, cf->extRing);
+    plusTerm(u, -1, 1, 0, cf->extRing); // a - 1
+    checkInverse((number)u, cf); p_Delete(&u, cf->extRing);
+    u = NULL; plusTerm(u, 1, 1, 1, cf->extRing);
+    plusTerm(u, 5, 1, 0, cf->extRing);  // a + 5
+    checkInverse((number)u, cf); p_Delete(&u, cf->extRing);
+    u = NULL; plusTerm(u, 1, 1, 1, cf->extRing);
+    plusTerm(u, -5, 1, 0, cf->extRing); // a - 5
+    checkInverse((number)u, cf); p_Delete(&u, cf->extRing);
+    u = NULL; plusTerm(u, 17, 1, 1, cf->extRing);
+    plusTerm(u, 5, 1, 0, cf->extRing); // 17a + 5
+    checkInverse((number)u, cf); p_Delete(&u, cf->extRing);
 
     rDelete(s); // kills 'cf' and 'r' as well
   }
@@ -663,7 +663,7 @@ public:
     n_coeffType type = nRegister(n_algExt, naInitChar); 
     TS_ASSERT(type == n_algExt);
 
-    ExtInfo extParam;
+    AlgExtInfo extParam;
     extParam.r = r;
     extParam.i = minIdeal;
     
@@ -719,63 +719,63 @@ public:
          << endl;
          
     poly u;
-    u = NULL; plusTerm(u, 1, 1, 2, cf->algring);
-    plusTerm(u, 33, 1, 0, cf->algring);     // b^2 + 33
-    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
-    u = NULL; plusTerm(u, 1, 1, 5, cf->algring);
-    plusTerm(u, -137, 1, 0, cf->algring);   // b^5 - 137
-    checkInverse((number)u, cf); p_Delete(&u, cf->algring);
+    u = NULL; plusTerm(u, 1, 1, 2, cf->extRing);
+    plusTerm(u, 33, 1, 0, cf->extRing);     // b^2 + 33
+    checkInverse((number)u, cf); p_Delete(&u, cf->extRing);
+    u = NULL; plusTerm(u, 1, 1, 5, cf->extRing);
+    plusTerm(u, -137, 1, 0, cf->extRing);   // b^5 - 137
+    checkInverse((number)u, cf); p_Delete(&u, cf->extRing);
 
     clog << endl
          << "Now let's check a gcd computation in Q[b]..."
          << endl;
     
     poly v;
-    v = NULL; plusTerm(v, 1, 1, 2, cf->algring);
-    plusTerm(v, 7, 1, 1, cf->algring);
-    plusTerm(v, 1, 1, 0, cf->algring);            // b^2 + 7b + 1
+    v = NULL; plusTerm(v, 1, 1, 2, cf->extRing);
+    plusTerm(v, 7, 1, 1, cf->extRing);
+    plusTerm(v, 1, 1, 0, cf->extRing);            // b^2 + 7b + 1
     number w = n_Mult((number)v, (number)v, cf);  // (b^2 + 7b + 1)^2
     number y = n_Mult((number)v, (number)w, cf);  // (b^2 + 7b + 1)^3
-    p_Delete(&v, cf->algring);
-    v = NULL; plusTerm(v, 2, 1, 2, cf->algring);
-    plusTerm(v, -61, 1, 1, cf->algring);          // 2b^2 - 61b
+    p_Delete(&v, cf->extRing);
+    v = NULL; plusTerm(v, 2, 1, 2, cf->extRing);
+    plusTerm(v, -61, 1, 1, cf->extRing);          // 2b^2 - 61b
     number z = n_Mult((number)w,
                       (number)v, cf);   // (b^2 + 7b + 1)^2 * (2b^2 - 61b)
-    p_Delete(&v, cf->algring);
+    p_Delete(&v, cf->extRing);
     
-    clog << "z = "; p_Write((poly)z, cf->algring);
-    clog << "y = "; p_Write((poly)y, cf->algring);
+    clog << "z = "; p_Write((poly)z, cf->extRing);
+    clog << "y = "; p_Write((poly)y, cf->extRing);
     number theGcd = n_Gcd(z, y, cf);   // should yield w = (b^2 + 7b + 1)^2
-    clog << "gcd(z, y) = "; p_Write((poly)theGcd, cf->algring);
+    clog << "gcd(z, y) = "; p_Write((poly)theGcd, cf->extRing);
     
     v = (poly)n_Sub(theGcd, w, cf);
     TS_ASSERT( v == NULL );
-    p_Delete(&v, cf->algring);
+    p_Delete(&v, cf->extRing);
     
     clog << endl
          << "Now let's check an ext_gcd computation in Q[b]..."
          << endl;
          
     poly zFactor; poly yFactor;
-    poly ppp = p_ExtGcd((poly)z, zFactor, (poly)y, yFactor, cf->algring);
+    poly ppp = p_ExtGcd((poly)z, zFactor, (poly)y, yFactor, cf->extRing);
     v = (poly)n_Sub(theGcd, (number)ppp, cf);
     TS_ASSERT( v == NULL );
-    clog << "z = "; p_Write((poly)z, cf->algring);
-    clog << "zFactor = "; p_Write(zFactor, cf->algring);
-    clog << "y = "; p_Write((poly)y, cf->algring);
-    clog << "yFactor = "; p_Write((poly)yFactor, cf->algring);
+    clog << "z = "; p_Write((poly)z, cf->extRing);
+    clog << "zFactor = "; p_Write(zFactor, cf->extRing);
+    clog << "y = "; p_Write((poly)y, cf->extRing);
+    clog << "yFactor = "; p_Write((poly)yFactor, cf->extRing);
     number v1 = n_Mult(z, (number)zFactor, cf);
     number v2 = n_Mult(y, (number)yFactor, cf);
     number v3 = n_Add(v1, v2, cf);
-    clog << "z * zFactor + y * yFactor = "; p_Write((poly)v3, cf->algring);
-    clog << "gcd(z, y) = "; p_Write(ppp, cf->algring);
+    clog << "z * zFactor + y * yFactor = "; p_Write((poly)v3, cf->extRing);
+    clog << "gcd(z, y) = "; p_Write(ppp, cf->extRing);
     number v4 = n_Sub(v3, w, cf);
     TS_ASSERT( v4 == NULL );
     
-    p_Delete(&ppp, cf->algring); p_Delete(&zFactor, cf->algring);
-    p_Delete(&yFactor, cf->algring);
+    p_Delete(&ppp, cf->extRing); p_Delete(&zFactor, cf->extRing);
+    p_Delete(&yFactor, cf->extRing);
     n_Delete(&z, cf); n_Delete(&y, cf); n_Delete(&w, cf);
-    n_Delete(&theGcd, cf); p_Delete(&v, cf->algring); n_Delete(&v1, cf);
+    n_Delete(&theGcd, cf); p_Delete(&v, cf->extRing); n_Delete(&v1, cf);
     n_Delete(&v2, cf); n_Delete(&v3, cf); n_Delete(&v4, cf);
 
     rDelete(s); // kills 'cf' and 'r' as well
@@ -807,7 +807,7 @@ public:
     n_coeffType type = nRegister(n_algExt, naInitChar); 
     TS_ASSERT(type == n_algExt);
 
-    ExtInfo extParam;
+    AlgExtInfo extParam;
     extParam.r = r;
     extParam.i = minIdeal;
     

@@ -1029,8 +1029,8 @@ ring rCopy0AndAddA(ring r, int64vec *wv64, BOOLEAN copy_qideal,
   memcpy(res,r,sizeof(ip_sring));
   res->VarOffset = NULL;
   res->ref=0;
-  if (r->algring!=NULL)
-    r->algring->ref++;
+  if (r->extRing!=NULL)
+    r->extRing->ref++;
   if (r->parameter!=NULL)
   {
     res->minpoly=nCopy(r->minpoly);

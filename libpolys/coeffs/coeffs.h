@@ -179,10 +179,10 @@ struct n_Procs_s
 
   /* for extension fields we need to be able to represent polynomials,
      so here is the polynomial ring: */
-  ring          algring;
+  ring          extRing;
 
   //number     minpoly;  //< no longer needed: replaced by
-  //                     //<  algring->minideal->[0]
+  //                     //< extRing->minideal->[0]
 
 
 //-------------------------------------------
