@@ -44,9 +44,6 @@ enum n_coeffType
 struct snumber;
 typedef struct snumber *   number;
 
-struct snumber;
-typedef struct snumber *   number;
-
 /* standard types */
 #ifdef HAVE_RINGS
 typedef unsigned long NATNUMBER;
@@ -57,7 +54,6 @@ struct ip_sring;
 typedef struct ip_sring *         ring;
 
 struct n_Procs_s;
-typedef struct  n_Procs_s  n_Procs_s;
 typedef struct  n_Procs_s  *coeffs;
 
 typedef number (*numberfunc)(number a, number b, const coeffs r);
@@ -181,9 +177,10 @@ struct n_Procs_s
    n_coeffType type;
 //-------------------------------------------
 
-  /// For Zp_a, Q_a we need polynomials (due to polys)
-  ring          algring; //< implementation of extensions needs polynomials...
-  // // for Q_a/Zp_a, rInit
+  /* for extension fields we need to be able to represent polynomials,
+     so here is the polynomial ring: */
+  ring          algring;
+
   //number     minpoly;  //< no longer needed: replaced by
   //                     //<  algring->minideal->[0]
 
@@ -221,8 +218,12 @@ struct n_Procs_s
                      characteristic can be accessed from any of the
                      intermediate extension fields, i.e., in this case
                      it is redundant along the chain of field extensions;
-                     CONTRARY to SINGULAR as it was, we do NOT LONGER use
-                     negative values for ch. */
+                     CONTRARY to SINGULAR as it was, we do NO LONGER use
+                     negative values for ch;
+                     for rings, ch will also be set and is - per def -
+                     the smallest number of 1's that sum up to zero;
+                     however, in this case ch may not fit in an int,
+                     thus ch may contain a faulty value */
 
   short      float_len; /* additional char-flags, rInit */
   short      float_len2; /* additional char-flags, rInit */
@@ -232,7 +233,7 @@ struct n_Procs_s
 // ---------------------------------------------------
   // for n_GF
 
-  int m_nfCharQ;  ///< the number of elemts: q
+  int m_nfCharQ;  ///< the number of elements: q
   int m_nfM1;       ///< representation of -1
   int m_nfCharP;  ///< the characteristic: p
   int m_nfCharQ1; ///< q-1
@@ -437,7 +438,7 @@ static inline BOOLEAN nCoeff_is_Zp(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_Zp; }
 
 static inline BOOLEAN nCoeff_is_Zp(const coeffs r, int p)
-{ assume(r != NULL); return (getCoeffType(r)  && (r->ch == ABS(p))); }
+{ assume(r != NULL); return (getCoeffType(r)  && (r->ch == p)); }
 
 static inline BOOLEAN nCoeff_is_Q(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_Q; }
@@ -445,7 +446,6 @@ static inline BOOLEAN nCoeff_is_Q(const coeffs r)
 static inline BOOLEAN nCoeff_is_numeric(const coeffs r) /* R, long R, long C */
 { assume(r != NULL);  return (getCoeffType(r)==n_R) || (getCoeffType(r)==n_long_R) || (getCoeffType(r)==n_long_C); }
 // (r->ringtype == 0) && (r->ch ==  -1); ??
-
 
 static inline BOOLEAN nCoeff_is_R(const coeffs r)
 { assume(r != NULL); return getCoeffType(r)==n_R; }
@@ -456,34 +456,49 @@ static inline BOOLEAN nCoeff_is_GF(const coeffs r)
 static inline BOOLEAN nCoeff_is_GF(const coeffs r, int q)
 { assume(r != NULL); return (getCoeffType(r)==n_GF) && (r->ch == q); }
 
-/* TRUE iff an extension tower is build upon some Zp, i.e., the bottom
-   field in this tower is Zp */
+/* TRUE iff r represents an algebraic or transcendental extension field */
+static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
+{
+  assume(r != NULL);
+  return (getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt);
+}
+
+/* DO NOT USE (only kept for compatibility reasons towards the SINGULAR
+   svn trunk);
+   intension: should be TRUE iff the given r is an extension field above
+   some Z/pZ;
+   actually: TRUE iff the given r is an extension tower of arbitrary
+   height above some field of characteristic p (may be Z/pZ or some
+   Galois field of characteristic p) */
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r)
 {
   assume(r != NULL);
-  return (r->ringtype == 0) &&
-         ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
-         (r->ch != 0);
+  return ((r->ringtype == 0) && (r->ch != 0) && nCoeff_is_Extension(r));
 }
 
-/* TRUE iff an extension tower is build upon Zp (p as provided), i.e.,
-   the bottom field in this tower is Zp */
+/* DO NOT USE (only kept for compatibility reasons towards the SINGULAR
+   svn trunk);
+   intension: should be TRUE iff the given r is an extension field above
+   Z/pZ (with p as provided);
+   actually: TRUE iff the given r is an extension tower of arbitrary
+   height above some field of characteristic p (may be Z/pZ or some
+   Galois field of characteristic p) */
 static inline BOOLEAN nCoeff_is_Zp_a(const coeffs r, int p)
 {
   assume(r != NULL);
-  return (r->ringtype == 0) &&
-         ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
-         (r->ch != 0) && (r->ch == p);
+  return ((r->ringtype == 0) && (r->ch == p) && nCoeff_is_Extension(r));
 }
 
-/* TRUE iff an extension tower is build upon Q, i.e.,
-   the bottom field in this tower is Q */
+/* DO NOT USE (only kept for compatibility reasons towards the SINGULAR
+   svn trunk);
+   intension: should be TRUE iff the given r is an extension field
+   above Q;
+   actually: TRUE iff the given r is an extension tower of arbitrary
+   height above some field of characteristic 0 (may be Q, R, or C) */
 static inline BOOLEAN nCoeff_is_Q_a(const coeffs r)
 {
   assume(r != NULL);
-  return (r->ringtype == 0) &&
-         ((getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt)) &&
-         (r->ch == 0);
+  return ((r->ringtype == 0) && (r->ch == 0) && nCoeff_is_Extension(r));
 }
 
 static inline BOOLEAN nCoeff_is_long_R(const coeffs r)
@@ -506,8 +521,6 @@ static inline BOOLEAN nCoeff_has_simple_inverse(const coeffs r)
 // { return (r->ch>1) || ((r->ch== -1) && (r->float_len < 10)); } /* Z/p, GF(p,n), R, long_R, long_C*/
 // #endif
 
-
-
 /// TRUE if n_Delete/n_New are empty operations
 static inline BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
 { assume(r != NULL); return r->has_simple_Alloc; }
@@ -518,13 +531,6 @@ static inline BOOLEAN nCoeff_has_simple_Alloc(const coeffs r)
 //             || rField_is_Ring_2toM(r)
 // #endif
 //             || rField_is_R(r)); }
-
-/* TRUE iff r represents an algebraic or transcendental extension field */
-static inline BOOLEAN nCoeff_is_Extension(const coeffs r)
-{
-  assume(r != NULL);
-  return (getCoeffType(r)==n_algExt) || (getCoeffType(r)==n_transExt);
-}
 
 /* TRUE iff r represents an algebraic extension field */
 static inline BOOLEAN nCoeff_is_algExt(const coeffs r)

@@ -583,8 +583,6 @@ public:
     
     TS_ASSERT( nCoeff_is_algExt(cf) );
     TS_ASSERT( !nCoeff_is_transExt(cf) );
-    TS_ASSERT( nCoeff_is_Q_a(cf) );
-    TS_ASSERT( !nCoeff_is_Zp_a(cf) );
     
     // some tests for the coefficient field represented by cf:
     TestArithCf(cf);
@@ -686,8 +684,6 @@ public:
     
     TS_ASSERT( nCoeff_is_algExt(cf) );
     TS_ASSERT( !nCoeff_is_transExt(cf) );
-    TS_ASSERT( nCoeff_is_Q_a(cf) );
-    TS_ASSERT( !nCoeff_is_Zp_a(cf) );
     
     // some tests for the coefficient field represented by cf:
     TestArithCf(cf);
@@ -832,8 +828,6 @@ public:
     
     TS_ASSERT( nCoeff_is_algExt(cf) );
     TS_ASSERT( !nCoeff_is_transExt(cf) );
-    TS_ASSERT( !nCoeff_is_Q_a(cf) );
-    TS_ASSERT( nCoeff_is_Zp_a(cf) );
     
     // some tests for the coefficient field represented by cf:
     TestArithCf(cf);

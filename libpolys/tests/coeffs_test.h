@@ -277,8 +277,6 @@ BOOLEAN Test(const n_coeffType type, void* p = NULLp)
       TS_ASSERT( !nCoeff_is_Zp( r ));
       TS_ASSERT( !nCoeff_is_numeric( r ));
       TS_ASSERT( !nCoeff_is_R( r ));
-      TS_ASSERT( !nCoeff_is_Q_a( r ));
-      TS_ASSERT( !nCoeff_is_Zp_a( r ));
       TS_ASSERT( !nCoeff_is_GF( r ));
       TS_ASSERT( !nCoeff_is_long_R( r ));
       TS_ASSERT( !nCoeff_is_long_C( r ));
