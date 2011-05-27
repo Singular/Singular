@@ -30,14 +30,14 @@ class MyGlobalPrintingFixture : public GlobalPrintingFixture
       GlobalPrintingFixture::setUpWorld();
       
 
-      TS_ASSERT_EQUALS( nRegister( n_Zp, npInitChar), n_Zp );
-      TS_ASSERT_EQUALS( nRegister( n_GF, nfInitChar), n_GF );
-      TS_ASSERT_EQUALS( nRegister( n_R, nrInitChar), n_R );
-      TS_ASSERT_EQUALS( nRegister( n_Q, nlInitChar), n_Q );
-      TS_ASSERT_EQUALS( nRegister( n_R, nrInitChar), n_R );
+      //TS_ASSERT_EQUALS( nRegister( n_Zp, npInitChar), n_Zp );
+      //TS_ASSERT_EQUALS( nRegister( n_GF, nfInitChar), n_GF );
+      //TS_ASSERT_EQUALS( nRegister( n_R, nrInitChar), n_R );
+      //TS_ASSERT_EQUALS( nRegister( n_Q, nlInitChar), n_Q );
+      //TS_ASSERT_EQUALS( nRegister( n_R, nrInitChar), n_R );
       
 #ifdef HAVE_RINGS
-      TS_ASSERT_EQUALS( nRegister( n_Z, nrzInitChar), n_Z ); // these are UNusable at the moment!
+      //TS_ASSERT_EQUALS( nRegister( n_Z, nrzInitChar), n_Z ); // these are UNusable at the moment!
 #endif
       
       return true;

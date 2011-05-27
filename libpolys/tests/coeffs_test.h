@@ -369,55 +369,54 @@ class CoeffsTestSuite : public CxxTest::TestSuite
    void test_Z2m4()
    {
 #ifdef HAVE_RINGS
-     n_coeffType type = nRegister( n_Z2m, nr2mInitChar); TS_ASSERT( type == n_Z2m ); 
+     n_coeffType type = n_Z2m;
      TS_ASSERT( Test(type, (void*) 4) );
 #endif
    }
 
    void test_Zp101()
    {
-     n_coeffType type = nRegister( n_Zp, npInitChar); TS_ASSERT( type == n_Zp );
+     n_coeffType type = n_Zp;
      TS_ASSERT( Test(type, (void*) 101) );
    }
 
    void test_Z2m8()
    {
 #ifdef HAVE_RINGS
-     n_coeffType type = nRegister( n_Z2m, nr2mInitChar); TS_ASSERT( type == n_Z2m ); 
+     n_coeffType type =  n_Z2m;
      TS_ASSERT( Test(type, (void*) 8) );
 #endif
    }
    
-   void simple(const n_coeffType _type, cfInitCharProc p)
+   void simple(const n_coeffType _type)
    {
-     n_coeffType type = nRegister( _type, p);
+     n_coeffType type = _type;
      TS_ASSERT( type == _type ); // ?
      TS_ASSERT( Test(type) );
    }
    
    void test_Q()
    {
-     simple(n_Q, nlInitChar);
+     simple(n_Q);
    }
    
    void test_R()
    {
-     simple(n_R, nrInitChar);
+     simple(n_R);
    }
 
 
    void test_Z()
    {
 #ifdef HAVE_RINGS
-     simple(n_Z, nrzInitChar);  // No need in GMP?
+     simple(n_Z);  // No need in GMP?
 #endif
    }
 
    
    void test_GF_toobig()
    {
-     n_coeffType type = nRegister( n_GF, nfInitChar);
-     TS_ASSERT( type == n_GF );
+     n_coeffType type = n_GF;
 
      GFInfo param;
 
@@ -435,8 +434,7 @@ class CoeffsTestSuite : public CxxTest::TestSuite
    {
      // TODO: what if it was already registered?
      // Q: no way to deRegister a type?
-     n_coeffType type = nRegister( n_GF, nfInitChar);
-     TS_ASSERT( type == n_GF );
+     n_coeffType type = n_GF;
 
      GFInfo param;
 
@@ -455,7 +453,7 @@ class CoeffsTestSuite : public CxxTest::TestSuite
    {
 #ifdef HAVE_RINGS
      //  TODO(Somebody, This will result in memory corruption at Z_2^m later on (due to the succs. setGMPFloatDigits?)...!?); // ????
-     n_coeffType type = nRegister( n_Zn, nrnInitChar); TS_ASSERT( type == n_Zn );
+     n_coeffType type = n_Zn;
 
      TS_ASSERT( Test(type, (void*) 3) );
 #endif
@@ -464,7 +462,7 @@ class CoeffsTestSuite : public CxxTest::TestSuite
    void test_Z2m2()
    {
 #ifdef HAVE_RINGS
-     n_coeffType type = nRegister( n_Z2m, nr2mInitChar); TS_ASSERT( type == n_Z2m );
+     n_coeffType type = n_Z2m;
 
      TS_ASSERT( Test(type, (void*) 2) );
 #endif
@@ -475,13 +473,13 @@ class CoeffsTestSuite : public CxxTest::TestSuite
    void test_LR()
    {
      setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
-     simple(n_long_R, ngfInitChar);
+     simple(n_long_R);
    }
    
    void test_LC()
    {
      setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
-     simple(n_long_C, ngcInitChar);
+     simple(n_long_C);
    }  
 
    

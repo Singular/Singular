@@ -38,6 +38,9 @@
 #undef HAVE_NTL
 #endif
 
+#ifndef HAVE_POLYEXTENSIONS
+#undef HAVE_POLYEXTENSIONS
+#endif
 // ----------------  end of parts/extensions
 // -----------------  configure stuff
 
