@@ -51,7 +51,7 @@ number nNULL; /* the 0 as constant */
 n_Procs_s *cf_root=NULL;
 
 void   nNew(number* d) { *d=NULL; }
-void   ndDelete(number* d, const coeffs r) { *d=NULL; }
+void   ndDelete(number* d, const coeffs) { *d=NULL; }
 void   ndInpMult(number &a, number b, const coeffs r)
 {
   number n=n_Mult(a,b,r);
@@ -66,8 +66,8 @@ void ndInpAdd(number &a, number b, const coeffs r)
 }
 
 #ifdef LDEBUG
-void   nDBDummy1(number* d,char *f, int l) { *d=NULL; }
-BOOLEAN ndDBTest(number a, const char *f, const int l, const coeffs r)
+void   nDBDummy1(number* d,char *, int) { *d=NULL; }
+BOOLEAN ndDBTest(number, const char *, const int, const coeffs)
 {
   return TRUE;
 }
@@ -89,15 +89,15 @@ BOOLEAN n_IsZeroDivisor( number a, const coeffs r)
   return ret; 
 }
 
-void   ndNormalize(number& d, const coeffs r) { }
+void   ndNormalize(number&, const coeffs) { }
 
-char * ndName(number n, const coeffs r) { return NULL; }
+char * ndName(number, const coeffs) { return NULL; }
 
-number ndPar(int i, const coeffs r) { return n_Init(0,r); }
+number ndPar(int, const coeffs r) { return n_Init(0,r); }
 
-number ndReturn0(number n, const coeffs r) { return n_Init(0,r); }
+number ndReturn0(number, const coeffs r) { return n_Init(0,r); }
 
-int    ndParDeg(number n, const coeffs r) { return 0; }
+int    ndParDeg(number, const coeffs) { return 0; }
 
 number ndGcd(number, number, const coeffs r) { return n_Init(1,r); }
 
@@ -121,21 +121,21 @@ void ndKillChar(coeffs) {}
 number nd_Copy(number a, const coeffs r) { return n_Copy(a, r); }
 
 #ifdef HAVE_RINGS
-BOOLEAN ndDivBy(number a, number b, const coeffs r) { return TRUE; } // assume a,b !=0
-int ndDivComp(number a, number b, const coeffs r) { return 2; }
+BOOLEAN ndDivBy(number, number, const coeffs) { return TRUE; } // assume a,b !=0
+int ndDivComp(number, number, const coeffs) { return 2; }
 BOOLEAN ndIsUnit(number a, const coeffs r) { return !n_IsZero(a,r); }
-number  ndExtGcd (number a, number b, number *s, number *t, const coeffs r) { return n_Init(1,r); }
+number  ndExtGcd (number, number, number *, number *, const coeffs r) { return n_Init(1,r); }
 #endif
 
 #ifdef HAVE_FACTORY
-CanonicalForm ndConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
+CanonicalForm ndConvSingNFactoryN( number, BOOLEAN /*setChar*/, const coeffs)
 {
   CanonicalForm term(0);
   Werror("no conversion to factory");
   return term;
 }
 
-number ndConvFactoryNSingN( const CanonicalForm n, const coeffs r)
+number ndConvFactoryNSingN( const CanonicalForm, const coeffs)
 {
   Werror("no conversion from factory");
   return NULL;

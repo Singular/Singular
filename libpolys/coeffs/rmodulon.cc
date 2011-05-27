@@ -50,7 +50,7 @@ BOOLEAN nrnInitChar (coeffs r, void* p)
   assume( getCoeffType(r) == ID );
   nrnInitExp((int)(long)(p), r);
   r->ringtype = 2;
-  
+
   /* next computation may yield wrong characteristic as r->modNumber
      is a GMP number */
   r->ch = mpz_get_ui(r->modNumber);
@@ -107,7 +107,7 @@ number nrnInit(int i, const coeffs r)
   return (number) erg;
 }
 
-void nrnDelete(number *a, const coeffs r)
+void nrnDelete(number *a, const coeffs)
 {
   if (*a == NULL) return;
   mpz_clear((int_number) *a);
@@ -115,14 +115,14 @@ void nrnDelete(number *a, const coeffs r)
   *a = NULL;
 }
 
-number nrnCopy(number a, const coeffs r)
+number nrnCopy(number a, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, (int_number) a);
   return (number) erg;
 }
 
-int nrnSize(number a, const coeffs r)
+int nrnSize(number a, const coeffs)
 {
   if (a == NULL) return 0;
   return sizeof(mpz_t);
@@ -131,7 +131,7 @@ int nrnSize(number a, const coeffs r)
 /*
  * convert a number to int
  */
-int nrnInt(number &n, const coeffs r)
+int nrnInt(number &n, const coeffs)
 {
   return (int)mpz_get_si((int_number) n);
 }
@@ -178,7 +178,7 @@ number nrnNeg(number c, const coeffs r)
 {
   if( !nrnIsZero(c, r) )
     // Attention: This method operates in-place.
-    mpz_sub((int_number)c, r->modNumber, (int_number)c);  
+    mpz_sub((int_number)c, r->modNumber, (int_number)c);
   return c;
 }
 
@@ -252,7 +252,7 @@ number nrnExtGcd(number a, number b, number *s, number *t, const coeffs r)
   return (number)erg;
 }
 
-BOOLEAN nrnIsZero(number a, const coeffs r)
+BOOLEAN nrnIsZero(number a, const coeffs)
 {
 #ifdef LDEBUG
   if (a == NULL) return FALSE;
@@ -260,7 +260,7 @@ BOOLEAN nrnIsZero(number a, const coeffs r)
   return 0 == mpz_cmpabs_ui((int_number)a, 0);
 }
 
-BOOLEAN nrnIsOne(number a, const coeffs r)
+BOOLEAN nrnIsOne(number a, const coeffs)
 {
 #ifdef LDEBUG
   if (a == NULL) return FALSE;
@@ -280,17 +280,17 @@ BOOLEAN nrnIsMOne(number a, const coeffs r)
   return erg;
 }
 
-BOOLEAN nrnEqual(number a, number b, const coeffs r)
+BOOLEAN nrnEqual(number a, number b, const coeffs)
 {
   return 0 == mpz_cmp((int_number)a, (int_number)b);
 }
 
-BOOLEAN nrnGreater(number a, number b, const coeffs r)
+BOOLEAN nrnGreater(number a, number b, const coeffs)
 {
   return 0 < mpz_cmp((int_number)a, (int_number)b);
 }
 
-BOOLEAN nrnGreaterZero(number k, const coeffs r)
+BOOLEAN nrnGreaterZero(number k, const coeffs)
 {
   return 0 < mpz_cmp_si((int_number)k, 0);
 }
@@ -442,12 +442,12 @@ number nrnIntDiv(number a, number b, const coeffs r)
 
 int_number nrnMapCoef = NULL;
 
-number nrnMapModN(number from, const coeffs src, const coeffs dst)
+number nrnMapModN(number from, const coeffs /*src*/, const coeffs dst)
 {
   return nrnMult(from, (number) nrnMapCoef, dst);
 }
 
-number nrnMap2toM(number from, const coeffs src, const coeffs dst)
+number nrnMap2toM(number from, const coeffs /*src*/, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -456,7 +456,7 @@ number nrnMap2toM(number from, const coeffs src, const coeffs dst)
   return (number)erg;
 }
 
-number nrnMapZp(number from, const coeffs src, const coeffs dst)
+number nrnMapZp(number from, const coeffs /*src*/, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -466,7 +466,7 @@ number nrnMapZp(number from, const coeffs src, const coeffs dst)
   return (number)erg;
 }
 
-number nrnMapGMP(number from, const coeffs src, const coeffs dst)
+number nrnMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -474,7 +474,7 @@ number nrnMapGMP(number from, const coeffs src, const coeffs dst)
   return (number)erg;
 }
 
-number nrnMapQ(number from, const coeffs src, const coeffs dst)
+number nrnMapQ(number from, const coeffs src, const coeffs /*dst*/)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -589,7 +589,7 @@ void nrnInitExp(int m, coeffs r)
 }
 
 #ifdef LDEBUG
-BOOLEAN nrnDBTest (number a, const char *f, const int l, const coeffs r)
+BOOLEAN nrnDBTest (number a, const char *, const int, const coeffs r)
 {
   if (a==NULL) return TRUE;
   if ( (mpz_cmp_si((int_number) a, 0) < 0) || (mpz_cmp((int_number) a, r->modNumber) > 0) )
