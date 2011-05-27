@@ -377,7 +377,11 @@ EXAMPLE: example normal; shows an example
       for(j = 1; j <= size(norComp); j++)
       {
         newR = norComp[j][3];
+        def savebasering=basering;
+        setring newR; // must be in a compatible ring to newR
+                      // as ringlist may produce ring-dep. stuff
         newRList = ringlist(newR);
+        setring savebasering;
         U = norComp[j][1];
         c = norComp[j][2];
         if(withDelta)
@@ -399,7 +403,7 @@ EXAMPLE: example normal; shows an example
           setring origR;
           U = fetch(R, U);
           c = fetch(R, c);
-          newRListO = imap(R, newRList);
+          newRListO = imap(newR, newRList);
           // We change the ordering in the new ring.
           if(nvars(newR) > nvars(origR))
           {
