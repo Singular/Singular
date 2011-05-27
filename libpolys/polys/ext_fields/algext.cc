@@ -87,7 +87,7 @@ BOOLEAN naDBTest(number a, const char *f, const int l, const coeffs cf)
   assume(getCoeffType(cf) == naID);
   if (a == NULL) return TRUE;
   p_Test((poly)a, naRing);
-  assume(p_Deg((poly)a, naRing) <= p_Deg(naMinpoly, naRing));
+  assume(p_Totaldegree((poly)a, naRing) <= p_Totaldegree(naMinpoly, naRing));
   return TRUE;
 }
 #endif
@@ -127,7 +127,7 @@ void naDelete(number * a, const coeffs cf)
   *a = NULL;
 }
 
-BOOLEAN naEqual (number a, number b, const coeffs cf)
+BOOLEAN naEqual(number a, number b, const coeffs cf)
 {
   naTest(a); naTest(b);
   
@@ -138,9 +138,9 @@ BOOLEAN naEqual (number a, number b, const coeffs cf)
 
   /// deg test
   int aDeg = 0;
-  if (a != NULL) aDeg = p_Deg((poly)a, naRing);
+  if (a != NULL) aDeg = p_Totaldegree((poly)a, naRing);
   int bDeg = 0;
-  if (b != NULL) bDeg = p_Deg((poly)b, naRing);
+  if (b != NULL) bDeg = p_Totaldegree((poly)b, naRing);
   if (aDeg != bDeg) return FALSE;
   
   /// subtraction test
@@ -171,15 +171,17 @@ number naGetDenom(number &a, const coeffs cf)
 BOOLEAN naIsOne(number a, const coeffs cf)
 {
   naTest(a);
-  if (p_GetExp((poly)a, 1, naRing) != 0) return FALSE;
-  return n_IsOne(p_GetCoeff((poly)a, naRing), naCoeffs);
+  poly aAsPoly = (poly)a;
+  if (!p_IsConstant(aAsPoly, naRing)) return FALSE;
+  return n_IsOne(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
 BOOLEAN naIsMOne(number a, const coeffs cf)
 {
   naTest(a);
-  if (p_GetExp((poly)a, 1, naRing) != 0) return FALSE;
-  return n_IsMOne(p_GetCoeff((poly)a, naRing), naCoeffs);
+  poly aAsPoly = (poly)a;
+  if (!p_IsConstant(aAsPoly, naRing)) return FALSE;
+  return n_IsMOne(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
 /// this is in-place, modifies a
@@ -205,19 +207,21 @@ number naInit(int i, const coeffs cf)
 int naInt(number &a, const coeffs cf)
 {
   naTest(a);
-  if (p_GetExp((poly)a, 1, naRing) != 0) return 0;
-  return n_Int(p_GetCoeff((poly)a, naRing), naCoeffs);
+  poly aAsPoly = (poly)a;
+  if (!p_IsConstant(aAsPoly, naRing)) return 0;
+  return n_Int(p_GetCoeff(aAsPoly, naRing), naCoeffs);
 }
 
 /* TRUE iff (a != 0 and (b == 0 or deg(a) > deg(b))) */
 BOOLEAN naGreater(number a, number b, const coeffs cf)
 {
+  naTest(a); naTest(b);
   if (naIsZero(a, cf)) return FALSE;
   if (naIsZero(b, cf)) return TRUE;
   int aDeg = 0;
-  if (a != NULL) aDeg = p_Deg((poly)a, naRing);
+  if (a != NULL) aDeg = p_Totaldegree((poly)a, naRing);
   int bDeg = 0;
-  if (b != NULL) bDeg = p_Deg((poly)b, naRing);
+  if (b != NULL) bDeg = p_Totaldegree((poly)b, naRing);
   return (aDeg > bDeg);
 }
 
@@ -227,7 +231,7 @@ BOOLEAN naGreaterZero(number a, const coeffs cf)
   naTest(a);
   if (a == NULL)                                            return FALSE;
   if (n_GreaterZero(p_GetCoeff((poly)a, naRing), naCoeffs)) return TRUE;
-  if (p_Deg((poly)a, naRing) > 0)                           return TRUE;
+  if (p_Totaldegree((poly)a, naRing) > 0)                   return TRUE;
   return FALSE;
 }
 
@@ -297,7 +301,7 @@ number naDiv(number a, number b, const coeffs cf)
    for |exp| <= 7 compute power by a simple multiplication loop;
    for |exp| >= 8 compute power along binary presentation of |exp|, e.g.
       p^13 = p^1 * p^4 * p^8, where we utilise that
-      p^(2^(k+1)) = p^(2^k) * p^(2^k)
+      p^(2^(k+1)) = p^(2^k) * p^(2^k);
    intermediate reduction modulo the minimal polynomial is controlled by
    the in-place method heuristicReduce(poly, poly, coeffs); see there.
 */
@@ -317,7 +321,7 @@ void naPower(number a, int exp, number *b, const coeffs cf)
   
   int expAbs = exp; if (expAbs < 0) expAbs = -expAbs;
   
-  /* now compute 'a' to the 'expAbs'-th power */
+  /* now compute a^expAbs */
   poly pow; poly aAsPoly = (poly)a;
   if (expAbs <= 7)
   {
@@ -362,7 +366,7 @@ void naPower(number a, int exp, number *b, const coeffs cf)
   *b = n;
 }
 
-/* may reduce p module the reducer by calling definiteReduce;
+/* may reduce p modulo the reducer by calling definiteReduce;
    the decision is made based on the following heuristic
    (which should also only be changed here in this method):
       if (deg(p) > 10*deg(reducer) then perform reduction;
@@ -373,7 +377,7 @@ void heuristicReduce(poly &p, poly reducer, const coeffs cf)
   p_Test((poly)p, naRing);
   p_Test((poly)reducer, naRing);
   #endif
-  if (p_Deg(p, naRing) > 10 * p_Deg(reducer, naRing))
+  if (p_Totaldegree(p, naRing) > 10 * p_Totaldegree(reducer, naRing))
     definiteReduce(p, reducer, cf);
 }
 
@@ -423,7 +427,7 @@ static BOOLEAN naCoeffIsEqual(const coeffs cf, n_coeffType n, void * param)
   if (naID != n) return FALSE;
   AlgExtInfo *e = (AlgExtInfo *)param;
   /* for extension coefficient fields we expect the underlying
-     polynomials rings to be IDENTICAL, i.e. the SAME OBJECT;
+     polynomial rings to be IDENTICAL, i.e. the SAME OBJECT;
      this expectation is based on the assumption that we have properly
      registered cf and perform reference counting rather than creating
      multiple copies of the same coefficient field/domain/ring */
@@ -444,9 +448,7 @@ int naSize(number a, const coeffs cf)
   while (aAsPoly != NULL)
   {
     noOfTerms++;
-    int d = 0;
-    for (int i = 1; i <= rVar(naRing); i++)
-      d += p_GetExp(aAsPoly, i, naRing);
+    int d = p_GetExp(aAsPoly, 1, naRing);
     if (d > theDegree) theDegree = d;
     pIter(aAsPoly);
   }
@@ -495,6 +497,7 @@ number naInvers(number a, const coeffs cf)
 /* assumes that src = Q, dst = Q(a) */
 number naMap00(number a, const coeffs src, const coeffs dst)
 {
+  if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
   poly result = p_One(dst->extRing);
   p_SetCoeff(result, naCopy(a, src), dst->extRing);
@@ -504,6 +507,7 @@ number naMap00(number a, const coeffs src, const coeffs dst)
 /* assumes that src = Z/p, dst = Q(a) */
 number naMapP0(number a, const coeffs src, const coeffs dst)
 {
+  if (n_IsZero(a, src)) return NULL;
   /* mapping via intermediate int: */
   int n = n_Int(a, src);
   number q = n_Init(n, dst->extRing->cf);
@@ -513,7 +517,7 @@ number naMapP0(number a, const coeffs src, const coeffs dst)
 }
 
 /* assumes that either src = Q(a), dst = Q(a), or
-                       src = Zp(a), dst = Zp(a)     */
+                       src = Z/p(a), dst = Z/p(a)     */
 number naCopyMap(number a, const coeffs src, const coeffs dst)
 {
   return naCopy(a, dst);
@@ -522,6 +526,7 @@ number naCopyMap(number a, const coeffs src, const coeffs dst)
 /* assumes that src = Q, dst = Z/p(a) */
 number naMap0P(number a, const coeffs src, const coeffs dst)
 {
+  if (n_IsZero(a, src)) return NULL;
   int p = rChar(dst->extRing);
   int n = nlModP(a, p, src);
   number q = n_Init(n, dst->extRing->cf);
@@ -533,6 +538,7 @@ number naMap0P(number a, const coeffs src, const coeffs dst)
 /* assumes that src = Z/p, dst = Z/p(a) */
 number naMapPP(number a, const coeffs src, const coeffs dst)
 {
+  if (n_IsZero(a, src)) return NULL;
   assume(src == dst->extRing->cf);
   poly result = p_One(dst->extRing);
   p_SetCoeff(result, naCopy(a, src), dst->extRing);
@@ -542,6 +548,7 @@ number naMapPP(number a, const coeffs src, const coeffs dst)
 /* assumes that src = Z/u, dst = Z/p(a), where u != p */
 number naMapUP(number a, const coeffs src, const coeffs dst)
 {
+  if (n_IsZero(a, src)) return NULL;
   /* mapping via intermediate int: */
   int n = n_Int(a, src);
   number q = n_Init(n, dst->extRing->cf);
@@ -553,7 +560,7 @@ number naMapUP(number a, const coeffs src, const coeffs dst)
 nMapFunc naSetMap(const coeffs src, const coeffs dst)
 {
   /* dst is expected to be an algebraic field extension */
-  assume(getCoeffType(dst) == n_algExt);
+  assume(getCoeffType(dst) == naID);
   
   int h = 0; /* the height of the extension tower given by dst */
   coeffs bDst = nCoeff_bottom(dst, h); /* the bottom field in the tower dst */
@@ -584,8 +591,8 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
   
   if (nCoeff_is_Q(bSrc) && nCoeff_is_Q(bDst))
   {
-    if (strcmp(rParameter(src->extRing)[0],
-               rParameter(dst->extRing)[0]) == 0)
+    if (strcmp(rRingVar(0, src->extRing),
+               rRingVar(0, dst->extRing)) == 0)
       return naCopyMap;                                  /// Q(a)   --> Q(a)
     else
       return NULL;                                       /// Q(b)   --> Q(a)
@@ -604,9 +611,7 @@ nMapFunc naSetMap(const coeffs src, const coeffs dst)
 }
 
 BOOLEAN naInitChar(coeffs cf, void * infoStruct)
-{
-  assume( getCoeffType(cf) == naID );
-  
+{  
   AlgExtInfo *e = (AlgExtInfo *)infoStruct;
   /// first check whether cf->extRing != NULL and delete old ring???
   cf->extRing           = e->r;

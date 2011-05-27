@@ -48,7 +48,7 @@ SOURCES = \
 	pDebug.cc pInline0.cc polys0.cc prCopy.cc \
 	kbuckets.cc sbuckets.cc weight.cc weight0.c simpleideals.cc matpol.cc \
         ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} templates/mod_raw.cc \
-        ext_fields/algext.cc clapsing.cc clapconv.cc
+        ext_fields/algext.cc ext_fields/transext.cc clapsing.cc clapconv.cc
 
 BUILT_SOURCES = templates/p_Procs.inc
 

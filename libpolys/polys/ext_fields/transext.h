@@ -5,10 +5,11 @@
 ****************************************/
 /* $Id$ */
 /*
-* ABSTRACT: numbers in a transcendental extension field K(t_1, .., t_s)
-*           Assuming that we have a coeffs object cf, then these numbers
-*           are quotients of polynomials in the polynomial ring
-*           K[t_1, .., t_s] represented by cf->algring.
+* ABSTRACT: numbers in a rational function field K(t_1, .., t_s) with
+*           transcendental variables t_1, ..., t_s, where s >= 1.
+*           Denoting the implemented coeffs object by cf, then these numbers
+*           are represented as quotients of polynomials in the polynomial
+*           ring K[t_1, .., t_s] represented by cf->algring.
 */
 
 #include <coeffs/coeffs.h>
@@ -19,22 +20,51 @@ typedef struct ip_sring * ring;
 struct sip_sideal;
 typedef struct sip_sideal * ideal;
 
+struct spolyrec;
+typedef struct spolyrec polyrec;
+typedef polyrec * poly;
+
 /// struct for passing initialization parameters to naInitChar
-typedef struct { ring r; } transExtInfo;
+typedef struct { ring r; } TransExtInfo;
 
 /* a number in K(t_1, .., t_s) is represented by either NULL
    (representing the zero number), or a pointer to a fraction which contains
    the numerator polynomial and the denominator polynomial in K[t_1, .., t_s];
    if the denominator is 1, the member 'denominator' is NULL;
    as a consequence of the above we get: if some number n is not NULL, then
-   n->numerator cannot be NULL */
-struct { poly numerator; poly denominator; } ip_fraction;
-typedef struct ip_fraction * fraction;
-/* some useful accessors: */
-#define is0(n) (n == NULL) /**< TRUE iff n represents 0 in K(t_1, .., t_s) */
-#define num(n) n->numerator
-#define den(n) n->denominator
-#define denIs1(n) (n->denominator == NULL) /**< TRUE iff the denom. is 1 */
+   n->numerator cannot be NULL;
+   The member 'complexity' attempts to capture the complexity of any given
+   number n, i.e., starting with a bunch of numbers n_i that have their gcd's
+   cancelled out, n may be constructed from the n_i's by using field
+   arithmetics (+, -, *, /). If we never cancel out gcd's during this process,
+   n will become rather complex. The larger the attribute 'complexity' of n
+   is, the more likely it is that n contains some non-trivial gcd. Thus, this
+   attribute will be used by a heuristic method to cancel out gcd's from time
+   to time. (This heuristic may be set up such that cancellation can be
+   enforced after each arithmetic operation, or such that it will never take
+   place.) Moreover, the 'complexity' of n is zero iff the gcd in n (that is,
+   the gcd of its numerator and denominator) is trivial. */
+struct fractionObject
+{
+  poly numerator;
+  poly denominator;
+  int complexity;
+};
+typedef struct fractionObject * fraction;
+
+omBin fractionObjectBin = omGetSpecBin(sizeof(fractionObject));
+
+/* constants for controlling the complexity of numbers */
+#define ADD_COMPLEXITY 1   /**< complexity increase due to + and - */
+#define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
+#define BOUND_COMPLEXITY 10   /**< maximum complexity of a number */
+
+/* some useful accessors for fractions: */
+#define is0(f) (f == NULL) /**< TRUE iff n represents 0 in K(t_1, .., t_s) */
+#define num(f) f->numerator
+#define den(f) f->denominator
+#define denIs1(f) (f->denominator == NULL) /**< TRUE iff den. represents 1 */
+#define c(f) f->complexity
 
 /// Get a mapping function from src into the domain of this type (n_transExt)
 nMapFunc ntSetMap(const coeffs src, const coeffs dst);
@@ -67,7 +97,7 @@ number   ntGetDenom(number &a, const coeffs cf);
 number   ntGetNumerator(number &a, const coeffs cf);
 number   ntGcd(number a, number b, const coeffs cf);
 number   ntLcm(number a, number b, const coeffs cf);
-number   ntSize(number a, const coeffs cf);
+int      ntSize(number a, const coeffs cf);
 void     ntDelete(number * a, const coeffs cf);
 void     ntCoeffWrite(const coeffs cf);
 number   ntIntDiv(number a, number b, const coeffs cf);
