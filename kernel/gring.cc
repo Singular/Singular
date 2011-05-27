@@ -241,7 +241,6 @@ poly _gnc_p_Mult_q(poly p, poly q, const int copy, const ring r) // not used any
   /* destroy p,q unless copy=1 */
 {
   poly res=NULL;
-  poly ghost=NULL;
   poly qq,pp;
   if (copy)
   {
@@ -588,7 +587,6 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
     return(out);
   }
 
-  number n1=n_Init(1,r);
   int *Prv=(int *)omAlloc0((rN+1)*sizeof(int));
   int *Nxt=(int *)omAlloc0((rN+1)*sizeof(int));
 
@@ -1048,7 +1046,7 @@ poly gnc_uu_Mult_ww_vert (int i, int a, int j, int b, const ring r)
   p_Delete(&y,r);
   t=MATELEM(cMT,a,b);
   assume( t != NULL );
-  
+
   t= nc_p_CopyGet(t,r);
 #ifdef PDEBUG
   p_Test(t,r);
@@ -2095,7 +2093,7 @@ void gnc_kBucketPolyRed_ZOld(kBucket_pt b, poly p, number *c)
   else
   {
     poly pp = nc_mm_Mult_pp(m,p,currRing);
-    number c2,cc;
+    number c2 /*,cc*/;
     p_Cleardenom_n(pp,currRing,c2);
     pDelete(&m);
     ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
@@ -2128,7 +2126,7 @@ void gnc_kBucketPolyRed_ZNew(kBucket_pt b, poly p, number *c)
   else
   {
     poly pp = nc_mm_Mult_pp(m,p,currRing);
-    number c2,cc;
+    number c2;
     p_Cleardenom_n(pp,currRing,c2);
     pDelete(&m);
     ctmp = kBucketPolyRed(b,pp,pLength(pp),NULL);
@@ -2299,10 +2297,11 @@ poly nc_p_Bracket_qq(poly p, const poly q)
   /* Components !? */
   poly Q=NULL;
   number coef=NULL;
-  poly res=NULL;
   poly pres=NULL;
   int UseBuckets=1;
-  if ((pLength(p)< MIN_LENGTH_BUCKET/2) && (pLength(q)< MIN_LENGTH_BUCKET/2) || TEST_OPT_NOT_BUCKETS) UseBuckets=0;
+  if (((pLength(p)< MIN_LENGTH_BUCKET/2) && (pLength(q)< MIN_LENGTH_BUCKET/2))
+  || TEST_OPT_NOT_BUCKETS)
+    UseBuckets=0;
 
 
   CPolynomialSummator sum(currRing, UseBuckets == 0);
@@ -2903,7 +2902,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
   assume( r != NULL );
   assume( curr != NULL );
 
-  if( !bSetupQuotient) 
+  if( !bSetupQuotient)
     assume( (r->qideal == NULL) ); // The basering must NOT be a qring!??
 
   assume( rSamePolyRep(r, curr) || bCopyInput ); // wrong assumption?
@@ -3053,7 +3052,7 @@ BOOLEAN nc_CallPlural(matrix CCC, matrix DDD,
 #ifndef NDEBUG
     idTest((ideal)C);
 #endif
-    
+
   } else
   if ( (CN == NULL) && (CC != NULL) ) /* copy matrix C */
   {
@@ -3418,7 +3417,7 @@ poly nc_pSubst(poly p, int n, poly e)
   int rN=currRing->N;
   int *PRE = (int *)omAlloc0((rN+1)*sizeof(int));
   int *SUF = (int *)omAlloc0((rN+1)*sizeof(int));
-  int i,j,pow;
+  int i,pow;
   number C;
   poly suf,pre;
   poly res = NULL;
@@ -3472,7 +3471,7 @@ static ideal idPrepareStd(ideal T, ideal s,  int k)
   }
 #endif
   ideal t = idCopy(T);
-  int j,rs=idRankFreeModule(s),rt=idRankFreeModule(t);
+  int j,rs=idRankFreeModule(s);
   poly p,q;
 
   ideal res = idInit(2*idElem(t),1+idElem(t));
@@ -3517,12 +3516,11 @@ ideal Approx_Step(ideal L)
   int i,j; // k=syzcomp
   int flag, flagcnt=0, syzcnt=0;
   int syzcomp = 0;
-  int k=1; /* for ideals not modules */
   ideal I = kStd(L, currQuotient,testHomog,NULL,NULL,0,0,NULL);
   idSkipZeroes(I);
   ideal s_I;
   int idI = idElem(I);
-  ideal trickyQuotient,s_trickyQuotient;
+  ideal trickyQuotient;
   if (currQuotient !=NULL)
   {
     trickyQuotient = idSimpleAdd(currQuotient,I);
@@ -3537,8 +3535,8 @@ ideal Approx_Step(ideal L)
   matrix MI;
   poly x=pOne();
   var[0]=x;
-  ideal   h2, h3, s_h2, s_h3;
-  poly    p,q,qq;
+  ideal   h2, s_h2, s_h3;
+  poly    p,q;
   /* init vars */
   for (i=1; i<=N; i++ )
   {

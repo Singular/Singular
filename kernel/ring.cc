@@ -5504,7 +5504,7 @@ ring rOpposite(ring src)
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
         r->block1[j]=rOppVar(r, src->block0[i]);
-        r->wvhdl[j]=r->wvhdl[j+1]; r->wvhdl[j+1]=r->wvhdl[j+1]=NULL;
+        r->wvhdl[j]=r->wvhdl[j+1]; r->wvhdl[j+1]=NULL;
         rOppWeight(r->wvhdl[j], r->block1[j]-r->block0[j]);
         j++;
         r->order[j]=ringorder_ls;

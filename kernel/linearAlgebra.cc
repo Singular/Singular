@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file lineareAlgebra.cc
  *
@@ -107,7 +107,7 @@ void luDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &uMat)
      note that we only make use of the entries [1..rr] */
   int* permut = new int[rr + 1];
   for (int i = 1; i <= rr; i++) permut[i] = i;
-  
+
   /* fill lMat with the (rr x rr) unit matrix */
   unitMatrix(rr, lMat);
 
@@ -233,12 +233,12 @@ int luRank(const matrix aMat, const bool isRowEchelon)
     matrix uMat;
     luDecomp(aMat, pMat, lMat, uMat);
     int result = rankFromRowEchelonForm(uMat);
-  
+
     /* clean-up */
     idDelete((ideal*)&pMat);
     idDelete((ideal*)&lMat);
     idDelete((ideal*)&uMat);
-  
+
     return result;
   }
 }
@@ -347,7 +347,7 @@ bool lowerLeftTriangleInverse(const matrix lMat, matrix &iMat,
 bool luInverseFromLUDecomp(const matrix pMat, const matrix lMat,
                            const matrix uMat, matrix &iMat)
 { /* uMat is guaranteed to be quadratic */
-  int d = uMat->rows();
+  //int d = uMat->rows();
 
   matrix lMatInverse; /* for storing the inverse of lMat;
                          this inversion will always work                */
@@ -360,7 +360,7 @@ bool luInverseFromLUDecomp(const matrix pMat, const matrix lMat,
        entries equal to 1 */
     lowerLeftTriangleInverse(lMat, lMatInverse, true);
     iMat = mpMult(mpMult(uMatInverse, lMatInverse), pMat);
-    
+
     /* clean-up */
     idDelete((ideal*)&lMatInverse);
     idDelete((ideal*)&uMatInverse);
@@ -398,7 +398,7 @@ bool luSolveViaLUDecomp(const matrix pMat, const matrix lMat,
     MATELEM(yVec, r, 1) = pNeg(p);
     pNormalize(MATELEM(yVec, r, 1));
   }
-  
+
   /* determine whether uMat * xVec = yVec is solvable */
   bool isSolvable = true;
   bool isZeroRow; int nonZeroRowIndex;
@@ -540,7 +540,7 @@ number tenToTheMinus(
        const int exponent  /**< [in]  the exponent for 1/10 */
                     )
 {
-  number ten = complexNumber(10.0, 0.0);  
+  number ten = complexNumber(10.0, 0.0);
   number result = complexNumber(1.0, 0.0);
   number tmp;
   /* compute 10^{-exponent} inside result by subsequent divisions by 10 */
@@ -709,8 +709,8 @@ number euclideanNormSquared(const matrix aMat)
  * The method assumes that the coefficient has imaginary part zero. */
 number absValue(poly p)
 {
-	if (p == NULL) return nInit(0);
-	number result = nCopy(pGetCoeff(p));
+  if (p == NULL) return nInit(0);
+  number result = nCopy(pGetCoeff(p));
   if (!nGreaterZero(result)) result = nNeg(result);
   return result;
 }
@@ -1043,7 +1043,7 @@ void mpTrafo(
   /* for applying hessenbergStep, we need to make sure that c[1, 1] is
      not zero */
   if ((MATELEM(c,1,1) != NULL) &&
-      ((MATELEM(c,2,1) != NULL) || (MATELEM(c,3,1) != NULL)))  
+      ((MATELEM(c,2,1) != NULL) || (MATELEM(c,3,1) != NULL)))
   {
     matrix uVec; matrix hMat;
     tmp1 = hessenbergStep(c, uVec, hMat, tolerance); nDelete(&tmp1);
@@ -1081,9 +1081,9 @@ bool qrDS(
        const number tol2
          )
 {
-	bool deflationFound = true;
-	/* we loop until the working queue is empty,
-	   provided we always find deflation */
+  bool deflationFound = true;
+  /* we loop until the working queue is empty,
+     provided we always find deflation */
   while (deflationFound && (queueL > 0))
   {
     /* take out last queue entry */
@@ -1091,65 +1091,65 @@ bool qrDS(
     int m = MATROWS(currentMat);
     if (m == 1)
     {
-    	number newEigenvalue;
-    	/* the entry at [1, 1] is the eigenvalue */
+      number newEigenvalue;
+      /* the entry at [1, 1] is the eigenvalue */
       if (MATELEM(currentMat, 1, 1) == NULL) newEigenvalue = nInit(0);
       else newEigenvalue = nCopy(pGetCoeff(MATELEM(currentMat, 1, 1)));
       eigenValues[eigenValuesL++] = newEigenvalue;
     }
     else if (m == 2)
     {
-    	/* there are two eigenvalues which come as zeros of the characteristic
-    	   polynomial */
-    	poly p; charPoly(currentMat, p);
-    	number s1; number s2;
-    	int nSol = quadraticSolve(p, s1, s2, tol2); pDelete(&p);
-    	assume(nSol >= 2);
-    	eigenValues[eigenValuesL++] = s1;
-    	/* if nSol = 2, then s1 is a double zero, and s2 is invalid: */
-    	if (nSol == 2) s2 = nCopy(s1);
-    	eigenValues[eigenValuesL++] = s2;
+      /* there are two eigenvalues which come as zeros of the characteristic
+         polynomial */
+      poly p; charPoly(currentMat, p);
+      number s1; number s2;
+      int nSol = quadraticSolve(p, s1, s2, tol2); pDelete(&p);
+      assume(nSol >= 2);
+      eigenValues[eigenValuesL++] = s1;
+      /* if nSol = 2, then s1 is a double zero, and s2 is invalid: */
+      if (nSol == 2) s2 = nCopy(s1);
+      eigenValues[eigenValuesL++] = s2;
     }
     else /* m > 2 */
     {
-    	/* bring currentMat into Hessenberg form to fasten computations: */
-    	matrix mm1; matrix mm2;
-    	hessenberg(currentMat, mm1, mm2, tol2);
-    	idDelete((ideal*)&currentMat); idDelete((ideal*)&mm1);
-    	currentMat = mm2;
-    	int it = 1; bool doLoop = true;
-    	while (doLoop && (it <= 30 * m))
+      /* bring currentMat into Hessenberg form to fasten computations: */
+      matrix mm1; matrix mm2;
+      hessenberg(currentMat, mm1, mm2, tol2);
+      idDelete((ideal*)&currentMat); idDelete((ideal*)&mm1);
+      currentMat = mm2;
+      int it = 1; bool doLoop = true;
+      while (doLoop && (it <= 30 * m))
       {
-      	/* search for deflation */
-      	number w1; number w2;
-      	number test1; number test2; bool stopCriterion = false; int k;
-      	for (k = 1; k < m; k++)
-      	{
-        	test1 = absValue(MATELEM(currentMat, k + 1, k));    
+        /* search for deflation */
+        number w1; number w2;
+        number test1; number test2; bool stopCriterion = false; int k;
+        for (k = 1; k < m; k++)
+        {
+          test1 = absValue(MATELEM(currentMat, k + 1, k));
           w1 = absValue(MATELEM(currentMat, k, k));
-      	  w2 = absValue(MATELEM(currentMat, k + 1, k + 1));
+          w2 = absValue(MATELEM(currentMat, k + 1, k + 1));
           test2 = nMult(tol1, nAdd(w1, w2));
           nDelete(&w1); nDelete(&w2);
           if (!nGreater(test1, test2)) stopCriterion = true;
           nDelete(&test1); nDelete(&test2);
           if (stopCriterion) break;
-      	}     
+        }
         if (k < m)   /* found deflation at position (k + 1, k) */
         {
-        	pDelete(&MATELEM(currentMat, k + 1, k)); /* make this entry zero */
-        	subMatrix(currentMat, 1, k, 1, k, queue[queueL++]);
+          pDelete(&MATELEM(currentMat, k + 1, k)); /* make this entry zero */
+          subMatrix(currentMat, 1, k, 1, k, queue[queueL++]);
           subMatrix(currentMat, k + 1, m, k + 1, m, queue[queueL++]);
           doLoop = false;
         }
         else   /* no deflation found yet */
         {
-        	mpTrafo(currentMat, it, tol2);
-        	it++;   /* try again */
+          mpTrafo(currentMat, it, tol2);
+          it++;   /* try again */
         }
       }
       if (doLoop)   /* could not find deflation for currentMat */
       {
-      	deflationFound = false;
+        deflationFound = false;
       }
       idDelete((ideal*)&currentMat);
     }
@@ -1175,26 +1175,26 @@ int similar(
        const number tolerance  /**< [in] tolerance for comparison    */
            )
 {
-	int result = -1;
-	number tt = nMult(tolerance, tolerance);
-	number nr = (number)new gmp_complex(((gmp_complex*)n)->real());
-	number ni = (number)new gmp_complex(((gmp_complex*)n)->imag());
-	number rr; number ii;
-	number w1; number w2; number w3; number w4; number w5;
-	for (int i = 0; i < nnLength; i++)
-	{
-		rr = (number)new gmp_complex(((gmp_complex*)nn[i])->real());
-		ii = (number)new gmp_complex(((gmp_complex*)nn[i])->imag());
-		w1 = nSub(nr, rr); w2 = nMult(w1, w1);
-		w3 = nSub(ni, ii); w4 = nMult(w3, w3);
-		w5 = nAdd(w2, w4);
-		if (!nGreater(w5, tt)) result = i;
-		nDelete(&w1); nDelete(&w2); nDelete(&w3); nDelete(&w4);
+  int result = -1;
+  number tt = nMult(tolerance, tolerance);
+  number nr = (number)new gmp_complex(((gmp_complex*)n)->real());
+  number ni = (number)new gmp_complex(((gmp_complex*)n)->imag());
+  number rr; number ii;
+  number w1; number w2; number w3; number w4; number w5;
+  for (int i = 0; i < nnLength; i++)
+  {
+    rr = (number)new gmp_complex(((gmp_complex*)nn[i])->real());
+    ii = (number)new gmp_complex(((gmp_complex*)nn[i])->imag());
+    w1 = nSub(nr, rr); w2 = nMult(w1, w1);
+    w3 = nSub(ni, ii); w4 = nMult(w3, w3);
+    w5 = nAdd(w2, w4);
+    if (!nGreater(w5, tt)) result = i;
+    nDelete(&w1); nDelete(&w2); nDelete(&w3); nDelete(&w4);
                 nDelete(&w5); nDelete(&rr); nDelete(&ii);
-		if (result != -1) break;
-	}
-	nDelete(&tt); nDelete(&nr); nDelete(&ni);
-	return result;
+    if (result != -1) break;
+  }
+  nDelete(&tt); nDelete(&nr); nDelete(&ni);
+  return result;
 }
 
 lists qrDoubleShift(const matrix A, const number tol1, const number tol2,
@@ -1209,55 +1209,55 @@ lists qrDoubleShift(const matrix A, const number tol1, const number tol2,
   lists result = (lists)omAlloc(sizeof(slists));
   if (!worked)
   {
-  	for (int i = 0; i < eigenL; i++)
-  	  nDelete(&eigenVs[i]);
-  	delete [] eigenVs;
-  	for (int i = 0; i < queueL; i++)
-  	  idDelete((ideal*)&queue[i]);
-  	delete [] queue;
-  	result->Init(1);
-  	result->m[0].rtyp = INT_CMD;
-	  result->m[0].data = (void*)0;   /* a list with a single entry
+    for (int i = 0; i < eigenL; i++)
+      nDelete(&eigenVs[i]);
+    delete [] eigenVs;
+    for (int i = 0; i < queueL; i++)
+      idDelete((ideal*)&queue[i]);
+    delete [] queue;
+    result->Init(1);
+    result->m[0].rtyp = INT_CMD;
+    result->m[0].data = (void*)0;   /* a list with a single entry
                                              which is the int zero */
   }
   else
   {
-  	/* now eigenVs[0..eigenL-1] contain all eigenvalues; among them, there
-  	   may be equal entries */
-  	number* distinctEVs = new number[n]; int distinctC = 0;
-  	int* mults = new int[n];
-  	for (int i = 0; i < eigenL; i++)
+    /* now eigenVs[0..eigenL-1] contain all eigenvalues; among them, there
+       may be equal entries */
+    number* distinctEVs = new number[n]; int distinctC = 0;
+    int* mults = new int[n];
+    for (int i = 0; i < eigenL; i++)
     {
-    	int index = similar(distinctEVs, distinctC, eigenVs[i], tol3);
-    	if (index == -1) /* a new eigenvalue */
-    	{
-    		distinctEVs[distinctC] = nCopy(eigenVs[i]);
-    		mults[distinctC++] = 1;
-    	}
-    	else mults[index]++;
-    	nDelete(&eigenVs[i]);
+      int index = similar(distinctEVs, distinctC, eigenVs[i], tol3);
+      if (index == -1) /* a new eigenvalue */
+      {
+        distinctEVs[distinctC] = nCopy(eigenVs[i]);
+        mults[distinctC++] = 1;
+      }
+      else mults[index]++;
+      nDelete(&eigenVs[i]);
     }
     delete [] eigenVs;
-  	
-	  lists eigenvalues = (lists)omAlloc(sizeof(slists));
-	  eigenvalues->Init(distinctC);
-	  lists multiplicities = (lists)omAlloc(sizeof(slists));
-	  multiplicities->Init(distinctC);
-	  for (int i = 0; i < distinctC; i++)
-	  {
-	  	eigenvalues->m[i].rtyp = NUMBER_CMD;
-	    eigenvalues->m[i].data = (void*)nCopy(distinctEVs[i]);
-	    multiplicities->m[i].rtyp = INT_CMD;
-	    multiplicities->m[i].data = (void*)mults[i];
-	    nDelete(&distinctEVs[i]);
-	  }
-	  delete [] distinctEVs; delete [] mults;
-	  
-	  result->Init(2);
-	  result->m[0].rtyp = LIST_CMD;
-	  result->m[0].data = (char*)eigenvalues;
-	  result->m[1].rtyp = LIST_CMD;
-	  result->m[1].data = (char*)multiplicities;
+
+    lists eigenvalues = (lists)omAlloc(sizeof(slists));
+    eigenvalues->Init(distinctC);
+    lists multiplicities = (lists)omAlloc(sizeof(slists));
+    multiplicities->Init(distinctC);
+    for (int i = 0; i < distinctC; i++)
+    {
+      eigenvalues->m[i].rtyp = NUMBER_CMD;
+      eigenvalues->m[i].data = (void*)nCopy(distinctEVs[i]);
+      multiplicities->m[i].rtyp = INT_CMD;
+      multiplicities->m[i].data = (void*)mults[i];
+      nDelete(&distinctEVs[i]);
+    }
+    delete [] distinctEVs; delete [] mults;
+
+    result->Init(2);
+    result->m[0].rtyp = LIST_CMD;
+    result->m[0].data = (char*)eigenvalues;
+    result->m[1].rtyp = LIST_CMD;
+    result->m[1].data = (char*)multiplicities;
   }
   return result;
 }
@@ -1272,7 +1272,7 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
   matrix aMat = mpNew(n + m, n + m);     /* matrix A for linear system */
   matrix pMat; matrix lMat; matrix uMat; /* for the decomposition of A */
   f = pCopy(f0); g = pCopy(g0);          /* initially: h = f*g mod <x^1> */
-  
+
   /* initial step: read off coefficients of f0, and g0 */
   poly p = f0; poly matEntry; number c;
   while (p != NULL)
@@ -1309,10 +1309,10 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
   for (int row = m + 2; row <= n + m; row++)
     for (int col = row; col <= m + n; col++)
       MATELEM(aMat, row, col) = pCopy(MATELEM(aMat, row - 1, col - 1));
-  
+
   /* constructing the LU-decomposition of A */
   luDecomp(aMat, pMat, lMat, uMat);
-  
+
   /* Before the xExp-th loop, we know that h = f*g mod <x^xExp>.
      Afterwards the algorithm ensures      h = f*g mod <x^(xExp + 1)>.
      Hence in the end we obtain f and g as required, i.e.,
@@ -1325,7 +1325,7 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
   {
     matrix bVec = mpNew(n + m, 1);     /* b */
     matrix xVec = mpNew(n + m, 1);     /* x */
-    
+
     p = pCopy(fg);
     p = pAdd(pCopy(h), pNeg(p));       /* p = h - f*g */
     /* we collect all terms in p with x-exponent = xExp and use their
@@ -1381,7 +1381,7 @@ void henselFactors(const int xIndex, const int yIndex, const poly h,
     /* clean-up loop-dependent vectors */
     idDelete((ideal*)&bVec); idDelete((ideal*)&xVec);
   }
-  
+
   /* clean-up matrices A, P, L and U, and polynomial fg */
   idDelete((ideal*)&aMat); idDelete((ideal*)&pMat);
   idDelete((ideal*)&lMat); idDelete((ideal*)&uMat);
@@ -1406,7 +1406,7 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
     for (int c = 1; c <= cc; c++)
       MATELEM(uMat, r, c) = pCopy(MATELEM(aMat, r, c));
   u = pOne(); l = pOne();
-  
+
   int col = 1; int row = 1;
   while ((col <= cc) & (row < rr))
   {
@@ -1454,7 +1454,7 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
       }
       l = pMult(l, pCopy(MATELEM(lMat, row, row)));
       u = pMult(u, pCopy(MATELEM(uMat, row, col)));
-      
+
       for (int r = row + 1; r <= rr; r++)
       {
         if (MATELEM(uMat, r, col) != NULL)
@@ -1493,13 +1493,13 @@ void lduDecomp(const matrix aMat, matrix &pMat, matrix &lMat, matrix &dMat,
     while ((col <= cc) && (MATELEM(uMat, row, col) == NULL)) col++;
     if (col <= cc) u = pMult(u, pCopy(MATELEM(uMat, row, col)));
   }
-  
+
   /* building the permutation matrix from 'permut' and computing l */
   pMat = mpNew(rr, rr);
   for (int r = 1; r <= rr; r++)
     MATELEM(pMat, r, permut[r]) = pOne();
   delete[] permut;
-  
+
   lTimesU = ppMult_qq(l, u);
 }
 
@@ -1534,16 +1534,16 @@ bool luSolveViaLDUDecomp(const matrix pMat, const matrix lMat,
     /* The following division is without remainder. */
     q = pNSet(nInvers(pGetCoeff(MATELEM(lMat, r, r))));
     MATELEM(yVec, r, 1) = pMult(pNeg(p), q);
-    pNormalize(MATELEM(yVec, r, 1));    
+    pNormalize(MATELEM(yVec, r, 1));
   }
-  
+
   /* compute u * dMat * yVec and put result into yVec */
   for (int r = 1; r <= m; r++)
   {
     p = ppMult_qq(u, MATELEM(dMat, r, r));
     MATELEM(yVec, r, 1) = pMult(p, MATELEM(yVec, r, 1));
   }
-  
+
   /* determine whether uMat * xVec = yVec is solvable */
   bool isSolvable = true;
   bool isZeroRow; int nonZeroRowIndex;
@@ -1608,7 +1608,7 @@ bool luSolveViaLDUDecomp(const matrix pMat, const matrix lMat,
       pNormalize(MATELEM(xVec, nonZeroC, 1));
       lastNonZeroC = nonZeroC;
     }
-    
+
     /* divide xVec by l*u = lTimesU and put result in xVec */
     number z = nInvers(pGetCoeff(lTimesU));
     for (int c = 1; c <= n; c++)
@@ -1617,7 +1617,7 @@ bool luSolveViaLDUDecomp(const matrix pMat, const matrix lMat,
       pNormalize(MATELEM(xVec, c, 1));
     }
     nDelete(&z);
-    
+
     if (dim == 0)
     {
       /* that means the given linear system has exactly one solution;

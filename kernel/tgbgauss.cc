@@ -643,7 +643,6 @@ tgb_sparse_matrix::tgb_sparse_matrix(int i, int j, ring rarg)
 {
   mp=(mac_poly*) omalloc(i*sizeof (mac_poly));;
   int z;
-  int z2;
   for(z=0;z<i;z++)
   {
     mp[z]=NULL;
@@ -831,7 +830,9 @@ void tgb_sparse_matrix::row_normalize(int row)
     mac_poly m=mp[row];
     while (m!=NULL)
     {
+      #ifndef NDEBUG
       if (currRing==r) {nTest(m->coef);}
+      #endif
       n_Normalize(m->coef,r);
       m=m->next;
     }

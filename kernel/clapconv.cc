@@ -28,10 +28,6 @@ typedef __mpz_struct lint;
 
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
-static void convRec( const CanonicalForm & f, int * exp, poly & result );
-
-static void convRecAlg( const CanonicalForm & f, int * exp, napoly & result );
-
 static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, ring r );
 
 static void convRecTrP ( const CanonicalForm & f, int * exp, poly & result, int offs, const ring r );

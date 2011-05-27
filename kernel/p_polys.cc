@@ -301,7 +301,7 @@ void p_Setm_General(poly p, const ring r)
 
 	     
 #ifndef NDEBUG
-	    Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %d\n", c, limit, start, p->exp[start]);
+	    Print("p_Setm_General: is(-Temp-) :: c: %d, limit: %d, [st:%d] ===>>> %ld\n", c, limit, start, p->exp[start]);
 #endif	     
    
 

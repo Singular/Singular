@@ -59,7 +59,7 @@ poly p_LPshiftT(poly p, int sh, int uptodeg, int lV, kStrategy strat, const ring
   poly q   = NULL;
   poly s   = p_mLPshift(p, sh, uptodeg, lV, r); // lm in currRing
   poly pp = pNext(p);
-  
+
   while (pp != NULL)
   {
     q = p_Add_q(q, p_mLPshift(pp,sh,uptodeg,lV,strat->tailRing),strat->tailRing);
@@ -118,7 +118,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
   p_GetExpV(p,e,r);
 
   int j;
-  //  for (j=1; j<=r->N; j++) 
+  //  for (j=1; j<=r->N; j++)
   // L*lV gives the last position of the last block
   for (j=1; j<= L*lV ; j++)
   {
@@ -130,11 +130,11 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
 #endif
     }
 #ifdef PDEBUG
-    else 
+    else
     {
       if (e[j]!=0)
       {
-	//         Print("p_mLPshift: ex[%d]=%d\n",j,e[j]);
+         //         Print("p_mLPshift: ex[%d]=%d\n",j,e[j]);
       }
     }
 #endif
@@ -148,7 +148,7 @@ poly p_mLPshift(poly p, int sh, int uptodeg, int lV, const ring r)
   //  number c = pGetCoeff(p);
   //  p_SetCoeff0(m,p_GetCoeff(p,r),r);
   p_SetComp(m,p_GetComp(p,r),r); // component is preserved
-  p_SetCoeff0(m,p_GetCoeff(p,r),r);  // coeff is preserved 
+  p_SetCoeff0(m,p_GetCoeff(p,r),r);  // coeff is preserved
   return(m);
 }
 
@@ -225,7 +225,7 @@ int pLastVblock(poly p, int lV)
   /* appearing among the monomials of p */
   /* the 0th block is the 1st one */
   poly q = p; //p_Copy(p,currRing); /* need it ? */
-  int ans = 0; 
+  int ans = 0;
   int ansnew = 0;
   while (q!=NULL)
   {
@@ -250,11 +250,11 @@ int pmLastVblock(poly p, int lV)
   int j,b;
   j = currRing->N;
   while ( (!e[j]) && (j>=1) ) j--;
-  if (j==0) 
+  if (j==0)
   {
 #ifdef PDEBUG
     PrintS("pmLastVblock: unexpected zero exponent vector\n");
-#endif   
+#endif
     return(j);
   }
   b = (int)(j/lV) + 1; /* the number of the block, >=1 */
@@ -272,7 +272,7 @@ int p_LastVblockT(poly p, int lV, kStrategy strat, const ring r)
   assume(p_CheckIsFromRing(pNext(p),strat->tailRing));
 
   int ans = p_mLastVblock(p, lV, r); // Block of LM
-  poly q = pNext(p); 
+  poly q = pNext(p);
   int ansnew = 0;
   while (q != NULL)
   {
@@ -290,7 +290,7 @@ int p_LastVblock(poly p, int lV, const ring r)
   /* appearing among the monomials of p */
   /* the 0th block is the 1st one */
   poly q = p; //p_Copy(p,currRing); /* need it ? */
-  int ans = 0; 
+  int ans = 0;
   int ansnew = 0;
   while (q!=NULL)
   {
@@ -315,11 +315,11 @@ int p_mLastVblock(poly p, int lV, const ring r)
   int j,b;
   j = r->N;
   while ( (!e[j]) && (j>=1) ) j--;
-  if (j==0) 
+  if (j==0)
   {
 #ifdef PDEBUG
     PrintS("pmLastVblock: unexpected zero exponent vector\n");
-#endif   
+#endif
     return(j);
   }
   b = (int)((j+lV-1)/lV); /* the number of the block, >=1 */
@@ -333,7 +333,7 @@ int pFirstVblock(poly p, int lV)
   /* appearing among the monomials of p */
   /* the 0th block is the 1st one */
   poly q = p; //p_Copy(p,currRing); /* need it ? */
-  int ans = 0; 
+  int ans = 0;
   int ansnew = 0;
   while (q!=NULL)
   {
@@ -358,11 +358,11 @@ int pmFirstVblock(poly p, int lV)
   int j,b;
   j = 1;
   while ( (!e[j]) && (j<=currRing->N-1) ) j++;
-  if (j==currRing->N + 1) 
+  if (j==currRing->N + 1)
   {
 #ifdef PDEBUG
     PrintS("pmFirstVblock: unexpected zero exponent vector\n");
-#endif   
+#endif
     return(j);
   }
   b = (int)(j/lV)+1; /* the number of the block, 1<= N <= currRing->N  */
@@ -383,7 +383,7 @@ int isInV(poly p, int lV)
   /* lV = the length of V = the number of orig vars */
   int *e = (int *)omAlloc0((currRing->N+1)*sizeof(int));
   int  b = (int)((currRing->N +lV-1)/lV); /* the number of blocks */
-  //int b  = (int)(currRing->N)/lV; 
+  //int b  = (int)(currRing->N)/lV;
   int *B = (int *)omAlloc0((b+1)*sizeof(int)); /* the num of elements in a block */
   pGetExpV(p,e);
   int i,j;
@@ -412,7 +412,7 @@ int isInV(poly p, int lV)
 //     return(1);
 //   }
   /* now B[j] != 0 and we test place-squarefreeness */
-  for (j; j>=1; j--)
+  for (; j>=1; j--)
   {
     if (B[j]!=1)
     {
@@ -471,8 +471,8 @@ int itoInsert(poly p, int uptodeg, int lV, const ring r)
   {
     i = si_max(i, p_LastVblock(pNext(p), lV, r) );
   }
-  //  i = uptodeg  - i +1; 
-  i = uptodeg  - i; 
+  //  i = uptodeg  - i +1;
+  i = uptodeg  - i;
   //  p_wrp(p,currRing,r); Print("----i:%d",i); PrintLn();
   return(i);
 }
@@ -494,7 +494,7 @@ poly p_ShrinkT(poly p, int lV, kStrategy strat, const ring r)
   poly q   = NULL;
   poly s   = p_mShrink(p, lV, r); // lm in currRing
   poly pp = pNext(p);
-  
+
   while (pp != NULL)
   {
     //    q = p_Add_q(q, p_mShrink(pp,uptodeg,lV,strat->tailRing),strat->tailRing);
@@ -516,7 +516,7 @@ poly p_Shrink(poly p, int lV, const ring r)
   assume(p_CheckIsFromRing(p,r));
   poly q = NULL;
   poly pp = p;
-  
+
   while (pp != NULL)
   {
     q = p_Add_q(q, p_mShrink(pp,lV,r),r);
@@ -545,9 +545,9 @@ poly p_mShrink(poly p, int lV, const ring r)
     /* by blocks in lV vars */
     for (i=(j-1)*lV + 1; i<= j*lV; i++)
     {
-      if (e[i]==1) 
+      if (e[i]==1)
       {
-	//      B[j] = B[j]+1; // for control in V?
+         //      B[j] = B[j]+1; // for control in V?
          S[(cnt-1)*lV + (i - (j-1)*lV)] = e[i];
          /* assuming we are in V, can interrupt here */
          cnt++;
@@ -567,7 +567,7 @@ poly p_mShrink(poly p, int lV, const ring r)
   freeT(S, r->N);
   /*  p_Setm(s,r); // done by p_SetExpV */
   p_SetComp(s,p_GetComp(p,r),r); // component is preserved
-  p_SetCoeff(s,p_GetCoeff(p,r),r);  // coeff is preserved 
+  p_SetCoeff(s,p_GetCoeff(p,r),r);  // coeff is preserved
 #ifdef PDEBUG
   //  Print("p_mShrink: from "); p_wrp(p,r); Print(" to "); p_wrp(s,r); PrintLn();
 #endif

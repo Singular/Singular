@@ -313,7 +313,7 @@ enum calc_state
     //UNIMPORTANT,
     //SOONTREP
   };
-static BOOLEAN pair_cmp(sorted_pair_node* a,sorted_pair_node* b);
+//static BOOLEAN pair_cmp(sorted_pair_node* a,sorted_pair_node* b);
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set);
 static int add_to_reductors(slimgb_alg* c, poly h, int len, int ecart, BOOLEAN simplified=FALSE);
 static int bucket_guess(kBucket* bucket);
@@ -323,20 +323,20 @@ void free_sorted_pair_node(sorted_pair_node* s, ring r);
 static void shorten_tails(slimgb_alg* c, poly monom);
 static void replace_pair(int & i, int & j, slimgb_alg* c);
 //static sorted_pair_node** add_to_basis(poly h, int i, int j,slimgb_alg* c, int* ip=NULL);
-static void do_this_spoly_stuff(int i,int j,slimgb_alg* c);
+//static void do_this_spoly_stuff(int i,int j,slimgb_alg* c);
 //ideal t_rep_gb(ring r,ideal arg_I);
 ideal do_t_rep_gb(ring r,ideal arg_I, int syz_comp, BOOLEAN F4_mode,int deg_pos);
 static BOOLEAN has_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* state);
-static int* make_connections(int from, poly bound, slimgb_alg* c);
+//static int* make_connections(int from, poly bound, slimgb_alg* c);
 static int* make_connections(int from, int to, poly bound, slimgb_alg* c);
 void now_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c);
-static void soon_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c);
-static int pLcmDeg(poly a, poly b);
+//static void soon_t_rep(const int & arg_i, const int & arg_j, slimgb_alg* c);
+//static int pLcmDeg(poly a, poly b);
 static int simple_posInS (kStrategy strat, poly p,int len, wlen_type wlen);
-static BOOLEAN find_next_pair(slimgb_alg* c, BOOLEAN go_higher=TRUE);
+//static BOOLEAN find_next_pair(slimgb_alg* c, BOOLEAN go_higher=TRUE);
 
-static sorted_pair_node* pop_pair(slimgb_alg* c);
-static BOOLEAN no_pairs(slimgb_alg* c);
+//static sorted_pair_node* pop_pair(slimgb_alg* c);
+//static BOOLEAN no_pairs(slimgb_alg* c);
 void clean_top_of_pair_list(slimgb_alg* c);
 static void super_clean_top_of_pair_list(slimgb_alg* c);
 static BOOLEAN state_is(calc_state state, const int & i, const int & j, slimgb_alg* c);
@@ -345,7 +345,7 @@ static int tgb_pair_better_gen(const void* ap,const void* bp);
 static poly redTailShort(poly h, kStrategy strat);
 static poly gcd_of_terms(poly p, ring r);
 static BOOLEAN extended_product_criterion(poly p1, poly gcd1, poly p2, poly gcd2, slimgb_alg* c);
-static poly kBucketGcd(kBucket* b, ring r);
+//static poly kBucketGcd(kBucket* b, ring r);
 static void multi_reduction(red_object* los, int & losl, slimgb_alg* c);
 int slim_nsize(number n, ring r);
 sorted_pair_node* quick_pop_pair(slimgb_alg* c);
@@ -408,7 +408,7 @@ struct find_erg
 };
 
 static void multi_reduce_step(find_erg & erg, red_object* r, slimgb_alg* c);
-static void finalize_reduction_step(reduction_step* r);
+//static void finalize_reduction_step(reduction_step* r);
 
 template <class len_type, class set_type>  int pos_helper(kStrategy strat, poly p, len_type len, set_type setL, polyset set)
 {
@@ -1007,11 +1007,11 @@ template <class number_type> void add_dense(number_type* const temp_array,
 int temp_size,const number_type* row, int len)
 {
   //int j;
-  const number_type* const coef_array=row;
+  //const number_type* const coef_array=row;
   //int* const idx_array=row->idx_array;
   //const int len=temp_size;
-  tgb_uint32 buffer[256];
-  const tgb_uint32 prime=npPrimeM;
+  //tgb_uint32 buffer[256];
+  //const tgb_uint32 prime=npPrimeM;
   //const tgb_uint32 c=F4mat_to_number_type(coef);
 
   int i;
@@ -1026,11 +1026,11 @@ template <class number_type> void sub_dense(number_type* const temp_array,
 int temp_size,const number_type* row, int len)
 {
   //int j;
-  const number_type* const coef_array=row;
+  //const number_type* const coef_array=row;
   //int* const idx_array=row->idx_array;
   //const int len=temp_size;
-  tgb_uint32 buffer[256];
-  const tgb_uint32 prime=npPrimeM;
+  //tgb_uint32 buffer[256];
+  //const tgb_uint32 prime=npPrimeM;
   //const tgb_uint32 c=F4mat_to_number_type(coef);
 
   int i;
@@ -1090,7 +1090,6 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_dense(
        {
          SparseRow<number_type>* row=red.ref->row;
          number coef=red.coef;
-         int j;
          if (row->idx_array)
          {
            if (!((coef==(number) 1)||(coef==minus_one)))
@@ -1284,7 +1283,6 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
   cache->ensureTempBufferSize(together*sizeof(CoefIdx<number_type>));
   CoefIdx<number_type>* pairs=(CoefIdx<number_type>*) cache->tempBuffer; //omalloc(together*sizeof(CoefIdx<number_type>));
   int pos=0;
-  int j;
   const number one=npInit(1, currRing);
   const number minus_one=npInit(-1, currRing);
   for(i=0;i<len;i++)
@@ -1392,14 +1390,12 @@ template <class number_type> SparseRow<number_type>* noro_red_to_non_poly_sparse
 }
 template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly p, int &len, NoroCache<number_type>* cache,slimgb_alg* c){
   assume(len==pLength(p));
-  poly orig_p=p;
   if (p==NULL)
   {
     len=0;
     return NULL;
   }
 
-  number zero=npInit(0,currRing);
   MonRedResNP<number_type>* mon=(MonRedResNP<number_type>*) omalloc(len*sizeof(MonRedResNP<number_type>));
   int i=0;
   double max_density=0.0;
@@ -1409,11 +1405,9 @@ template<class number_type> SparseRow<number_type> * noro_red_to_non_poly_t(poly
     pIter(p);
     pNext(t)=NULL;
 
-#ifndef NDEBUG
-    number coef_debug=p_GetCoeff(t,currRing);
-#endif
     MonRedResNP<number_type> red=noro_red_mon_to_non_poly(t,cache,c);
-    if ((red.ref) && (red.ref->row)){
+    if ((red.ref) && (red.ref->row))
+    {
       double act_density=(double) red.ref->row->len;
       act_density/=(double) cache->nIrreducibleMonomials;
       max_density=std::max(act_density,max_density);
@@ -1811,7 +1805,8 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   poly* terms=(poly*) omalloc(n*sizeof(poly));
 
   int* old_to_new_indices=(int*) omalloc(cache.nIrreducibleMonomials*sizeof(int));
-  for(j=0;j<n;j++){
+  for(j=0;j<n;j++)
+  {
     old_to_new_indices[term_nodes[j].node->term_index]=j;
     term_nodes[j].node->term_index=j;
     terms[j]=term_nodes[j].t;
@@ -1822,29 +1817,35 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
   pn=non_zeros;
   number_type* number_array=(number_type*) omalloc(n*pn*sizeof(number_type));
   memset(number_array,0,sizeof(number_type)*n*pn);
-  number zero=npInit(0, currRing);
 
-  for(j=0;j<pn;j++){
+  for(j=0;j<pn;j++)
+  {
     int i;
     number_type* row=number_array+n*j;
-    /*for(i=0;i<n;i++){
+    /*for(i=0;i<n;i++)
+    {
       row[i]=zero;
     }*/
 
     SparseRow<number_type>* srow=srows[j];
 
-    if (srow){
+    if (srow)
+    {
       int* const idx_array=srow->idx_array;
       number_type* const coef_array=srow->coef_array;
       const int len=srow->len;
-      if (srow->idx_array){
-        for(i=0;i<len;i++){
+      if (srow->idx_array)
+      {
+        for(i=0;i<len;i++)
+	{
          int idx=old_to_new_indices[idx_array[i]];
          row[idx]=F4mat_to_number_type(coef_array[i]);
         }
       }
-      else {
-        for(i=0;i<len;i++){
+      else
+      {
+        for(i=0;i<len;i++)
+	{
           row[old_to_new_indices[i]]=F4mat_to_number_type(coef_array[i]);
         }
       }
@@ -1852,7 +1853,7 @@ template <class number_type> void noro_step(poly*p,int &pn,slimgb_alg* c){
     }
   }
 
-  static int export_n=0;
+  //static int export_n=0;
   //export_mat(number_array,pn,n,"mat%i.py",++export_n);
   simplest_gauss_modp(number_array,pn,n);
 
@@ -1884,14 +1885,19 @@ template <class number_type> void NoroCache<number_type>::collectIrreducibleMono
 template <class number_type> void NoroCache<number_type>::collectIrreducibleMonomials(int level, NoroCacheNode* node, std::vector<DataNoroCacheNode<number_type>*>& res){
   assume(level>=0);
   if (node==NULL) return;
-  if (level<pVariables){
-    int i,sum;
-    for(i=0;i<node->branches_len;i++){
+  if (level<pVariables)
+  {
+    int i;
+    for(i=0;i<node->branches_len;i++)
+    {
       collectIrreducibleMonomials(level+1,node->branches[i],res);
     }
-  } else {
+  }
+  else
+  {
     DataNoroCacheNode<number_type>* dn=(DataNoroCacheNode<number_type>*) node;
-    if (dn->value_len==backLinkCode){
+    if (dn->value_len==backLinkCode)
+    {
       res.push_back(dn);
     }
   }

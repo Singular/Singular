@@ -615,14 +615,6 @@ void singclap_divide_content ( poly f )
   }
 }
 
-static int primepower(int c)
-{
-  int p=1;
-  int cc=c;
-  while(cc!= rInternalChar(currRing)) { cc*=c; p++; }
-  return p;
-}
-
 BOOLEAN count_Factors(ideal I, intvec *v,int j, poly &f, poly fac)
 {
   pTest(f);
@@ -922,7 +914,6 @@ ideal singclap_factorize ( poly f, intvec ** v , int with_exps)
     res = idInit( n ,1);
     for ( ; J.hasItem(); J++, j++ )
     {
-      poly p;
       if (with_exps!=1) (**v)[j] = J.getItem().exp();
       if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
       {
@@ -1232,7 +1223,6 @@ ideal singclap_sqrfree ( poly f)
     res = idInit( n ,1);
     for ( ; J.hasItem(); J++, j++ )
     {
-      poly p;
       if (rField_is_Zp() || rField_is_Q())           /* Q, Fp */
         //count_Factors(res,*v,f, j, convFactoryPSingP( J.getItem().factor() );
         res->m[j] = convFactoryPSingP( J.getItem().factor() );

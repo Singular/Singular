@@ -80,8 +80,8 @@ int    yy_blocklineno; // to get the lineno of the block start from scanner
 Voice  *currentVoice = NULL;
 FILE   *feFilePending; /*temp. storage for grammar.y */
 
-static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
-                               "BT_file","BT_execute","BT_if","BT_else"};
+//static const char * BT_name[]={"BT_none","BT_break","BT_proc","BT_example",
+//                               "BT_file","BT_execute","BT_if","BT_else"};
 /*2
 * the name of the current 'Voice': the procname (or filename)
 */
@@ -1056,7 +1056,7 @@ void Print(const char *fmt, ...)
     char *s=(char *)omAlloc(ls+512);
 #ifdef HAVE_VSNPRINTF
     l = vsnprintf(s, ls+511, fmt, ap);
-    if ((l==-1)||(s[l]!='\0')||(l!=strlen(s)))
+    if ((l==-1)||(s[l]!='\0')||(l!=(int)strlen(s)))
     {
       printf("Print problem: l=%d, fmt=>>%s<<\n",l,fmt);
       s[l]='\0';
