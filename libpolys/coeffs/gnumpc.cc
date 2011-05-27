@@ -29,7 +29,7 @@ static const n_coeffType ID = n_long_C;
 
 #ifdef LDEBUG
 // not yet implemented
-BOOLEAN ngcDBTest(number a, const char *f, const int l, const coeffs r)
+BOOLEAN ngcDBTest(number, const char *, const int, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
 
@@ -53,9 +53,9 @@ number   ngcPar(int i, const coeffs r)
 number ngcInit (int i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
-  
+
   gmp_complex* n= new gmp_complex( (long)i, (long)0 );
-  
+
   return (number)n;
 }
 
@@ -65,7 +65,7 @@ number ngcInit (int i, const coeffs r)
 int ngcInt(number &i, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
-  
+
   return (int)((gmp_complex*)i)->real();
 }
 
@@ -104,7 +104,7 @@ void ngcDelete (number * a, const coeffs r)
 number ngcCopy(number a, const coeffs r)
 {
   assume( getCoeffType(r) == ID );
-  
+
   gmp_complex* b= new gmp_complex( *(gmp_complex*)a );
   return (number)b;
 }
@@ -169,7 +169,7 @@ number ngcSub (number a, number b, const coeffs R)
 number ngcMult (number a, number b, const coeffs R)
 {
   assume( getCoeffType(R) == ID );
-  
+
   gmp_complex* r= new gmp_complex( (*(gmp_complex*)a) * (*(gmp_complex*)b) );
   return (number)r;
 }
@@ -413,8 +413,8 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
   n->nCoeffIsEqual = ndCoeffIsEqual;
 
 
-  
-/*  
+
+/*
   //r->cfInitChar=nlInitChar;
   r->cfKillChar=NULL;
   r->cfSetChar=NULL;
@@ -483,7 +483,7 @@ BOOLEAN ngcInitChar(coeffs n, void* p)
     n->complex_parameter = omStrDup((char*)"i");
   else
     n->complex_parameter = omStrDup( (char*) p );
-    
+
   return FALSE;
 }
 
@@ -552,10 +552,10 @@ static number ngcCopyMap(number from, const coeffs aRing, const coeffs r)
   gmp_complex* b = NULL;
 
   if ( from !=  NULL )
-  { 
+  {
     b = new gmp_complex( *(gmp_complex*)from );
   }
-  return (number)b;  
+  return (number)b;
 }
 
 nMapFunc ngcSetMap(const coeffs src, const coeffs dst)

@@ -150,7 +150,7 @@ static number nlMapP(number from, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == n_Zp );
-  
+
   number to;
   to = nlInit(npInt(from,src), dst);
   return to;
@@ -163,7 +163,7 @@ static number nlMapR(number from, const coeffs src, const coeffs dst);
 /*2
 * convert from a GMP integer
 */
-number nlMapGMP(number from, const coeffs src, const coeffs dst)
+number nlMapGMP(number from, const coeffs /*src*/, const coeffs /*dst*/)
 {
   number z=ALLOC_RNUMBER();
 #if defined(LDEBUG)
@@ -179,7 +179,7 @@ number nlMapGMP(number from, const coeffs src, const coeffs dst)
 /*2
 * convert from an machine long
 */
-number nlMapMachineInt(number from, const coeffs src, const coeffs dst)
+number nlMapMachineInt(number from, const coeffs /*src*/, const coeffs /*dst*/)
 {
   number z=ALLOC_RNUMBER();
 #if defined(LDEBUG)
@@ -194,7 +194,7 @@ number nlMapMachineInt(number from, const coeffs src, const coeffs dst)
 
 
 #ifdef LDEBUG
-BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs r)
+BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs /*r*/)
 {
   if (a==NULL)
   {
@@ -283,7 +283,7 @@ BOOLEAN nlDBTest(number a, const char *f,const int l, const coeffs r)
 #endif
 
 #ifdef HAVE_FACTORY
-CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs r )
+CanonicalForm nlConvSingNFactoryN( number n, BOOLEAN setChar, const coeffs /*r*/ )
 {
   if (setChar) setCharacteristic( 0 );
 
@@ -344,7 +344,7 @@ static number nlMapR(number from, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == n_R );
-  
+
   double f=nrFloat(from);
   if (f==0.0) return INT_TO_SR(0);
   int f_sign=1;
@@ -371,11 +371,11 @@ static number nlMapR(number from, const coeffs src, const coeffs dst)
   return re;
 }
 
-static number nlMapLongR(number from, const coeffs src, const coeffs dst) 
+static number nlMapLongR(number from, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == n_long_R );
-  
+
   gmp_float *ff=(gmp_float*)from;
   mpf_t *f=ff->_mpfp();
   number res;
@@ -521,7 +521,7 @@ int nlSize(number a, const coeffs)
   if (SR_HDL(a) & SR_INT)
      return 1; /* immidiate int */
   int s=a->z[0]._mp_alloc;
-//  while ((s>0) &&(a->z._mp_d[s]==0L)) s--; 
+//  while ((s>0) &&(a->z._mp_d[s]==0L)) s--;
 //#if SIZEOF_LONG == 8
 //  if (a->z._mp_d[s] < (unsigned long)0x100000000L) s=s*2-1;
 //  else s *=2;
@@ -530,7 +530,7 @@ int nlSize(number a, const coeffs)
   if (a->s<2)
   {
     int d=a->n[0]._mp_alloc;
-//    while ((d>0) && (a->n._mp_d[d]==0L)) d--; 
+//    while ((d>0) && (a->n._mp_d[d]==0L)) d--;
 //#if SIZEOF_LONG == 8
 //    if (a->n._mp_d[d] < (unsigned long)0x100000000L) d=d*2-1;
 //    else d *=2;
@@ -1970,7 +1970,7 @@ number nlCopyMap(number a, const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
   assume( getCoeffType(src) == ID );
-  
+
   if ((SR_HDL(a) & SR_INT)||(a==NULL))
   {
     return a;
@@ -1982,7 +1982,7 @@ nMapFunc nlSetMap(const coeffs src, const coeffs dst)
 {
   assume( getCoeffType(dst) == ID );
 //  assume( getCoeffType(src) == ID );
-  
+
   if (nCoeff_is_Q(src))
   {
     return nlCopyMap;
@@ -2363,12 +2363,12 @@ LINLINE number nlMult (number a, number b, const coeffs R)
     number u = _nlMult_aImm_bImm_rNoImm(a, b);
     nlTest(u, R);
     return u;
-    
+
   }
   number u = _nlMult_aNoImm_OR_bNoImm(a, b);
   nlTest(u, R);
   return u;
-  
+
 }
 
 
@@ -2390,7 +2390,7 @@ LINLINE number nlSub (number a, number b, const coeffs r)
   number u = _nlSub_aNoImm_OR_bNoImm(a, b);
   nlTest(u, r);
   return u;
-  
+
 }
 
 LINLINE void nlInpMult(number &a, number b, const coeffs r)
@@ -2538,16 +2538,16 @@ number nlFarey(number nN, number nP, const coeffs r)
   return z;
 }
 
-void    nlCoeffWrite  (const coeffs r)
+void    nlCoeffWrite  (const coeffs)
 {
   PrintS("//   characteristic : 0\n");
 }
 
-BOOLEAN nlInitChar(coeffs r, void* p)
+BOOLEAN nlInitChar(coeffs r, void*)
 {
   assume( getCoeffType(r) == ID );
   //const int ch = (int)(long)(p);
-  
+
   r->cfKillChar=NULL;
   r->cfSetChar=NULL;
   r->nCoeffIsEqual=ndCoeffIsEqual;
@@ -2608,7 +2608,7 @@ BOOLEAN nlInitChar(coeffs r, void* p)
   r->ch = 0;
   r->has_simple_Alloc=FALSE;
   r->has_simple_Inverse=FALSE;
-  
+
   // variables for this type of coeffs:
   // (none)
   return FALSE;

@@ -29,7 +29,7 @@ omBin gmp_nrz_bin = omGetSpecBin(sizeof(mpz_t));
 /*
  * Multiply two numbers
  */
-number nrzMult (number a, number b, const coeffs r)
+number nrzMult (number a, number b, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -40,7 +40,7 @@ number nrzMult (number a, number b, const coeffs r)
 /*
  * Give the smallest non unit k, such that a * x = k = b * y has a solution
  */
-number nrzLcm (number a,number b,const coeffs r)
+number nrzLcm (number a,number b,const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -52,7 +52,7 @@ number nrzLcm (number a,number b,const coeffs r)
  * Give the largest non unit k, such that a = x * k, b = y * k has
  * a solution.
  */
-number nrzGcd (number a,number b,const coeffs r)
+number nrzGcd (number a,number b,const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -64,7 +64,7 @@ number nrzGcd (number a,number b,const coeffs r)
  * Give the largest non unit k, such that a = x * k, b = y * k has
  * a solution and r, s, s.t. k = s*a + t*b
  */
-number  nrzExtGcd (number a, number b, number *s, number *t, const coeffs r)
+number  nrzExtGcd (number a, number b, number *s, number *t, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   int_number bs = (int_number) omAllocBin(gmp_nrz_bin);
@@ -78,7 +78,7 @@ number  nrzExtGcd (number a, number b, number *s, number *t, const coeffs r)
   return (number) erg;
 }
 
-void nrzPower (number a, int i, number * result, const coeffs r)
+void nrzPower (number a, int i, number * result, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -89,14 +89,14 @@ void nrzPower (number a, int i, number * result, const coeffs r)
 /*
  * create a number from int
  */
-number nrzInit (int i, const coeffs r)
+number nrzInit (int i, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, i);
   return (number) erg;
 }
 
-void nrzDelete(number *a, const coeffs r)
+void nrzDelete(number *a, const coeffs)
 {
   if (*a == NULL) return;
   mpz_clear((int_number) *a);
@@ -104,19 +104,19 @@ void nrzDelete(number *a, const coeffs r)
   *a = NULL;
 }
 
-number nrzCopy(number a, const coeffs r)
+number nrzCopy(number a, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set(erg, (int_number) a);
   return (number) erg;
 }
 
-number nrzCopyMap(number a, const coeffs src, const coeffs dst)
+number nrzCopyMap(number a, const coeffs /*src*/, const coeffs dst)
 {
   return nrzCopy(a,dst);
 }
 
-int nrzSize(number a, const coeffs r)
+int nrzSize(number a, const coeffs)
 {
   if (a == NULL) return 0;
   return sizeof(mpz_t);
@@ -125,12 +125,12 @@ int nrzSize(number a, const coeffs r)
 /*
  * convert a number to int
  */
-int nrzInt(number &n, const coeffs r)
+int nrzInt(number &n, const coeffs)
 {
   return (int) mpz_get_si( (int_number)n);
 }
 
-number nrzAdd (number a, number b, const coeffs r)
+number nrzAdd (number a, number b, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -138,7 +138,7 @@ number nrzAdd (number a, number b, const coeffs r)
   return (number) erg;
 }
 
-number nrzSub (number a, number b, const coeffs r)
+number nrzSub (number a, number b, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -146,42 +146,42 @@ number nrzSub (number a, number b, const coeffs r)
   return (number) erg;
 }
 
-number  nrzGetUnit (number a, const coeffs r)
+number  nrzGetUnit (number, const coeffs r)
 {
   return nrzInit(1, r);
 }
 
-BOOLEAN nrzIsUnit (number a, const coeffs r)
+BOOLEAN nrzIsUnit (number a, const coeffs)
 {
   return 0 == mpz_cmpabs_ui((int_number) a, 1);
 }
 
-BOOLEAN nrzIsZero (number  a, const coeffs r)
+BOOLEAN nrzIsZero (number  a, const coeffs)
 {
   return 0 == mpz_cmpabs_ui((int_number) a, 0);
 }
 
-BOOLEAN nrzIsOne (number a, const coeffs r)
+BOOLEAN nrzIsOne (number a, const coeffs)
 {
   return (a!=NULL) && (0 == mpz_cmp_si((int_number) a, 1));
 }
 
-BOOLEAN nrzIsMOne (number a, const coeffs r)
+BOOLEAN nrzIsMOne (number a, const coeffs)
 {
   return (a!=NULL) && (0 == mpz_cmp_si((int_number) a, -1));
 }
 
-BOOLEAN nrzEqual (number a,number b, const coeffs r)
+BOOLEAN nrzEqual (number a,number b, const coeffs)
 {
   return 0 == mpz_cmp((int_number) a, (int_number) b);
 }
 
-BOOLEAN nrzGreater (number a,number b, const coeffs r)
+BOOLEAN nrzGreater (number a,number b, const coeffs)
 {
   return 0 < mpz_cmp((int_number) a, (int_number) b);
 }
 
-BOOLEAN nrzGreaterZero (number k, const coeffs r)
+BOOLEAN nrzGreaterZero (number k, const coeffs)
 {
   return 0 < mpz_cmp_si((int_number) k, 0);
 }
@@ -197,7 +197,7 @@ int nrzDivComp(number a, number b, const coeffs r)
   return 0;
 }
 
-BOOLEAN nrzDivBy (number a,number b, const coeffs r)
+BOOLEAN nrzDivBy (number a,number b, const coeffs)
 {
   return mpz_divisible_p((int_number) a, (int_number) b) != 0;
 }
@@ -219,7 +219,7 @@ number nrzDiv (number a,number b, const coeffs R)
   return (number) erg;
 }
 
-number nrzIntDiv (number a,number b, const coeffs r)
+number nrzIntDiv (number a,number b, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -227,7 +227,7 @@ number nrzIntDiv (number a,number b, const coeffs r)
   return (number) erg;
 }
 
-number nrzIntMod (number a,number b, const coeffs R)
+number nrzIntMod (number a,number b, const coeffs)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -248,28 +248,28 @@ number  nrzInvers (number c, const coeffs r)
   return nrzCopy(c,r);
 }
 
-number nrzNeg (number c, const coeffs r)
+number nrzNeg (number c, const coeffs)
 {
 // nNeg inplace !!!
   mpz_mul_si((int_number) c, (int_number) c, -1);
   return c;
 }
 
-number nrzMapMachineInt(number from, const coeffs src, const coeffs dst)
+number nrzMapMachineInt(number from, const coeffs /*src*/, const coeffs /*dst*/)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_ui(erg, (NATNUMBER) from);
   return (number) erg;
 }
 
-number nrzMapZp(number from, const coeffs src, const coeffs dst)
+number nrzMapZp(number from, const coeffs /*src*/, const coeffs /*dst*/)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init_set_si(erg, (long) from);
   return (number) erg;
 }
 
-number nrzMapQ(number from, const coeffs src, const coeffs dst)
+number nrzMapQ(number from, const coeffs src, const coeffs /*dst*/)
 {
   int_number erg = (int_number) omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -304,22 +304,22 @@ nMapFunc nrzSetMap(const coeffs src, const coeffs dst)
  * set the exponent (allocate and init tables) (TODO)
  */
 
-void nrzSetExp(int m, coeffs r)
+void nrzSetExp(int, coeffs)
 {
 }
 
-void nrzInitExp(int m, coeffs r)
+void nrzInitExp(int, coeffs)
 {
 }
 
 #ifdef LDEBUG
-BOOLEAN nrzDBTest (number a, const char *f, const int l, const coeffs r)
+BOOLEAN nrzDBTest (number, const char *, const int, const coeffs)
 {
   return TRUE;//TODO
 }
 #endif
 
-void nrzWrite (number &a, const coeffs r)
+void nrzWrite (number &a, const coeffs)
 {
   char *s,*z;
   if (a==NULL)
@@ -363,7 +363,7 @@ static const char * nlEatLongC(char *s, mpz_ptr i)
   return s;
 }
 
-const char * nrzRead (const char *s, number *a, const coeffs r)
+const char * nrzRead (const char *s, number *a, const coeffs)
 {
   int_number z = (int_number) omAllocBin(gmp_nrz_bin);
   {
@@ -374,13 +374,13 @@ const char * nrzRead (const char *s, number *a, const coeffs r)
   return s;
 }
 
-void    nrzCoeffWrite  (const coeffs r)
+void    nrzCoeffWrite  (const coeffs)
 {
   PrintS("//   characteristic : 0 (Integers)\n");
 }
 
 
-BOOLEAN nrzInitChar(coeffs r,  void * parameter)
+BOOLEAN nrzInitChar(coeffs r,  void *)
 {
   assume( getCoeffType(r) == ID );
   r->cfSetChar= NULL;
@@ -425,12 +425,12 @@ BOOLEAN nrzInitChar(coeffs r,  void * parameter)
 #ifdef LDEBUG
   r->cfDBTest=nrzDBTest;
 #endif
- 
+
   r->nNULL = 0;
   r->ch = 0;
   r->ringtype = 4;
   r->has_simple_Alloc=FALSE;
-  r->has_simple_Inverse=FALSE; 
+  r->has_simple_Inverse=FALSE;
   return FALSE;
 }
 

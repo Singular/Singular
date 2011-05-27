@@ -2210,7 +2210,7 @@ static void rO_Syz(int &place, int &bitplace, int &prev_ord,
 #endif /* ifndef NDEBUG */
 
 static void rO_ISPrefix(int &place, int &bitplace, int &prev_ord,
-    long *o, int N, int *v, sro_ord &ord_struct)
+    long *o, int /*N*/, int *v, sro_ord &ord_struct)
 {
   if ((prev_ord== 1) || (bitplace!=BITS_PER_LONG))
     rO_Align(place,bitplace);
@@ -3928,7 +3928,7 @@ void rDebugPrint(ring r)
       pFDeg_CASE(p_WFirstTotalDegree); else
       pFDeg_CASE(p_WTotaldegree); else
       pFDeg_CASE(p_Deg); else
-      Print("(%p)", r->pFDeg); // default case
+      Print("(%p)", (void*)(r->pFDeg)); // default case
 
     PrintS("\n");
 #undef pFDeg_CASE
@@ -4897,16 +4897,18 @@ static int rRealloc1(ring r, int size, int pos)
   size++;
   return size;
 }
-//static int rReallocM1(ring r, ring src, int size, int pos)
-//{
-//  r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size-1)*sizeof(int));
-//  r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size-1)*sizeof(int));
-//  r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size-1)*sizeof(int));
-//  r->wvhdl=(int **)omReallocSize(r->wvhdl,size*sizeof(int *), (size-1)*sizeof(int *));
-//  for(int k=pos+1; k<size; k++) r->wvhdl[k]=r->wvhdl[k+1];
-//  size--;
-//  return size;
-//}
+#if 0 // currently unused
+static int rReallocM1(ring r, int size, int pos)
+{
+  r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size-1)*sizeof(int));
+  r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size-1)*sizeof(int));
+  r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size-1)*sizeof(int));
+  r->wvhdl=(int **)omReallocSize(r->wvhdl,size*sizeof(int *), (size-1)*sizeof(int *));
+  for(int k=pos+1; k<size; k++) r->wvhdl[k]=r->wvhdl[k+1];
+  size--;
+  return size;
+}
+#endif
 static void rOppWeight(int *w, int l)
 {
   int i2=(l+1)/2;
@@ -5122,7 +5124,7 @@ ring rOpposite(ring src)
         {
           r->order[j]=ringorder_wp;
           i++;
-          //l=rReallocM1(r,src,l,j);
+          //l=rReallocM1(r,l,j);
         }
         else
         {

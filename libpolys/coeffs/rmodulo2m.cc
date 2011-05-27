@@ -52,7 +52,7 @@ BOOLEAN nr2mInitChar (coeffs r, void* p)
   r->nCoeffIsEqual = nr2mCoeffIsEqual;
 
   r->ringtype = 1;
-  
+
   /* next cast may yield an overflow as mod2mMask is an unsigned long */
   r->ch = (int)r->mod2mMask + 1;
 
@@ -109,7 +109,7 @@ number nr2mMult(number a, number b, const coeffs r)
 /*
  * Give the smallest k, such that a * x = k = b * y has a solution
  */
-number nr2mLcm(number a, number b, const coeffs r)
+number nr2mLcm(number a, number b, const coeffs)
 {
   NATNUMBER res = 0;
   if ((NATNUMBER)a == 0) a = (number) 1;
@@ -132,7 +132,7 @@ number nr2mLcm(number a, number b, const coeffs r)
  * Give the largest k, such that a = x * k, b = y * k has
  * a solution.
  */
-number nr2mGcd(number a, number b, const coeffs r)
+number nr2mGcd(number a, number b, const coeffs)
 {
   NATNUMBER res = 0;
   if ((NATNUMBER)a == 0 && (NATNUMBER)b == 0) return (number)1;
@@ -239,12 +239,12 @@ number nr2mSub(number a, number b, const coeffs r)
   return nr2mSubM(a, b, r);
 }
 
-BOOLEAN nr2mIsUnit(number a, const coeffs r)
+BOOLEAN nr2mIsUnit(number a, const coeffs)
 {
   return ((NATNUMBER)a % 2 == 1);
 }
 
-number nr2mGetUnit(number k, const coeffs r)
+number nr2mGetUnit(number k, const coeffs)
 {
   if (k == NULL) return (number)1;
   NATNUMBER erg = (NATNUMBER)k;
@@ -252,12 +252,12 @@ number nr2mGetUnit(number k, const coeffs r)
   return (number)erg;
 }
 
-BOOLEAN nr2mIsZero(number a, const coeffs r)
+BOOLEAN nr2mIsZero(number a, const coeffs)
 {
   return 0 == (NATNUMBER)a;
 }
 
-BOOLEAN nr2mIsOne(number a, const coeffs r)
+BOOLEAN nr2mIsOne(number a, const coeffs)
 {
   return 1 == (NATNUMBER)a;
 }
@@ -267,7 +267,7 @@ BOOLEAN nr2mIsMOne(number a, const coeffs r)
   return (r->mod2mMask  == (NATNUMBER)a);
 }
 
-BOOLEAN nr2mEqual(number a, number b, const coeffs r)
+BOOLEAN nr2mEqual(number a, number b, const coeffs)
 {
   return (a == b);
 }
@@ -309,7 +309,7 @@ BOOLEAN nr2mDivBy (number a, number b, const coeffs r)
   }
 }
 
-int nr2mDivComp(number as, number bs, const coeffs r)
+int nr2mDivComp(number as, number bs, const coeffs)
 {
   NATNUMBER a = (NATNUMBER)as;
   NATNUMBER b = (NATNUMBER)bs;
@@ -473,7 +473,7 @@ number nr2mMod(number a, number b, const coeffs r)
   assume((NATNUMBER)b != 0);
   NATNUMBER g = 1;
   NATNUMBER b_div = (NATNUMBER)b;
-  if (b_div < 0) b_div = -b_div; // b_div now represents |b|
+  if (b_div < 0) b_div = -b_div; // b_div now represents |b|, BUT b_div is unsigned!
   NATNUMBER rr = 0;
   while ((g < r->mod2mMask ) && (b_div > 0) && (b_div % 2 == 0))
   {
@@ -531,13 +531,13 @@ number nr2mNeg(number c, const coeffs r)
   return nr2mNegM(c, r);
 }
 
-number nr2mMapMachineInt(number from, const coeffs src, const coeffs dst)
+number nr2mMapMachineInt(number from, const coeffs /*src*/, const coeffs dst)
 {
   NATNUMBER i = ((NATNUMBER)from) % dst->mod2mMask ;
   return (number)i;
 }
 
-number nr2mMapZp(number from, const coeffs src, const coeffs dst)
+number nr2mMapZp(number from, const coeffs /*src*/, const coeffs dst)
 {
   NATNUMBER j = (NATNUMBER)1;
   long ii = (long)from;
@@ -548,7 +548,7 @@ number nr2mMapZp(number from, const coeffs src, const coeffs dst)
   return (number)nr2mMult((number)i, (number)j, dst);
 }
 
-number nr2mMapQ(number from, const coeffs src, const coeffs dst)
+number nr2mMapQ(number from, const coeffs /*src*/, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -565,7 +565,7 @@ number nr2mMapQ(number from, const coeffs src, const coeffs dst)
   return (number)res;
 }
 
-number nr2mMapGMP(number from, const coeffs src, const coeffs dst)
+number nr2mMapGMP(number from, const coeffs /*src*/, const coeffs dst)
 {
   int_number erg = (int_number)omAllocBin(gmp_nrz_bin);
   mpz_init(erg);
@@ -658,9 +658,9 @@ void nr2mInitExp(int m, coeffs r)
 }
 
 #ifdef LDEBUG
-BOOLEAN nr2mDBTest (number a, const char *f, const int l, const coeffs r)
+BOOLEAN nr2mDBTest (number a, const char *, const int, const coeffs r)
 {
-  if ((NATNUMBER)a < 0) return FALSE;
+  //if ((NATNUMBER)a < 0) return FALSE; // is unsigned!
   if (((NATNUMBER)a & r->mod2mMask) != (NATNUMBER)a) return FALSE;
   return TRUE;
 }
