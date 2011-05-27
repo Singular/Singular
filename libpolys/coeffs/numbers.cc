@@ -29,6 +29,10 @@
 #include <coeffs/rintegers.h>
 #endif
 
+#ifdef HAVE_POLYEXTENSIONS
+#include <polys/ext_fields/algext.h>
+#endif
+
 #ifdef HAVE_FACTORY
 #include <factory/factory.h>
 #endif
@@ -152,8 +156,36 @@ BOOLEAN ndCoeffIsEqual(const coeffs r, n_coeffType n, void *)
   return (n==r->type);
 }
 
-static n_coeffType nLastCoeffs=n_Z2m;
-static cfInitCharProc *nInitCharTable=NULL;
+static n_coeffType nLastCoeffs=n_CF;
+cfInitCharProc nInitCharTableDefault[]=
+{ NULL,        /*n_unknown */
+ npInitChar,   /* n_Zp */
+ nlInitChar,   /* n_Q */
+ nrInitChar,   /* n_R */
+ nfInitChar,   /* n_GF */
+ ngfInitChar,  /* n_long_R */
+ #ifdef HAVE_POLYEXTENSIONS
+ naInitChar,  /* n_algExt */
+ #else
+ NULL,        /* n_algExt */
+ #endif
+ NULL, /* n_transExt */
+ ngcInitChar,  /* n_long_C */
+ #ifdef HAVE_RINGS
+ nrzInitChar,  /* n_Z */
+ nrnInitChar,  /* n_Zn */
+ NULL,         /* n_Zpn */
+ nr2mInitChar, /* n_Z2m */
+ #else
+ NULL,         /* n_Z */
+ NULL,         /* n_Zn */
+ NULL,         /* n_Zpn */
+ NULL,         /* n_Z2m */
+ #endif
+ NULL	/* n_CF */
+};
+
+static cfInitCharProc *nInitCharTable=nInitCharTableDefault;
 /*2
 * init operations for coeffs r
 */
@@ -205,10 +237,10 @@ coeffs nInitChar(n_coeffType t, void * parameter)
     
     BOOLEAN nOK=TRUE;
     // init
-    if ((nInitCharTable!=NULL) && (t<=nLastCoeffs))
+    if ((t<=nLastCoeffs) && (nInitCharTable[t]!=NULL))
       nOK = (nInitCharTable[t])(n,parameter);
     else
-       Werror("coeff init missing for %d",(int)t);
+       Werror("nInitCharTable[%d] missing",(int)t);
     if (nOK)
     {
       omFreeSize(n,sizeof(*n));
@@ -310,15 +342,18 @@ void nKillChar(coeffs r)
   }
 }
 
+
 n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
 {
   if (n==n_unknown)
   {
     nLastCoeffs=(n_coeffType)(int(nLastCoeffs)+1);
-    if (nInitCharTable==NULL)
+    if (nInitCharTable==nInitCharTableDefault)
     {
       nInitCharTable=(cfInitCharProc*)omAlloc0(
                                           nLastCoeffs*sizeof(cfInitCharProc));
+      memcpy(nInitCharTable,nInitCharTableDefault,
+              (nLastCoeffs-1)*sizeof(cfInitCharProc));
     }
     else
     {
@@ -332,11 +367,7 @@ n_coeffType nRegister(n_coeffType n, cfInitCharProc p)
   }
   else
   {
-    if (nInitCharTable==NULL)
-    {
-      nInitCharTable=(cfInitCharProc*)omAlloc0(
-                                         ((int) nLastCoeffs)*sizeof(cfInitCharProc));
-    }
+    if (nInitCharTable[n]!=NULL) Print("coeff %d already initialized\n",n);
     nInitCharTable[n]=p;
     return n;
   }

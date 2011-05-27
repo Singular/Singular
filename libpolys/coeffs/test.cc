@@ -273,39 +273,39 @@ int main( int, char *argv[] )
 
 #ifdef HAVE_RINGS
 //  TODO(Frank, Segmentation fault! (if used wihout omalloc???). Please_ investigate!);
-  type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m ); 
+  type =  n_Z2m;
   if( Test(type, (void*) 4) )
     c ++;
 #endif
 
-  type = nRegister( n_Zp, npInitChar); assume( type == n_Zp );
+  type =  n_Zp;
   if( Test(type, (void*) 101) )
     c ++;
 
 #ifdef HAVE_RINGS
 //  TODO(Frank, memmory corruption_ if used wihout omalloc??? Please_ investigate!);
 
-  type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m ); 
+  type = n_Z2m;
   if( Test(type, (void*) 8) )
     c ++;
 
 #endif
 
   
-  type = nRegister( n_Q, nlInitChar); assume( type == n_Q );
+  type =  n_Q;
   if( Test(type) )
     c ++;
 
-  type = nRegister( n_R, nrInitChar); assume( type == n_R );
+  type = n_R;
   if( Test(type) )
     c ++;
 
 #ifdef HAVE_RINGS
-  type = nRegister( n_Z, nrzInitChar); assume( type == n_Z ); // No need in GMP?
+  type = n_Z;
   if( Test(type) )
     c ++;
 #endif
-   type = nRegister( n_GF, nfInitChar); assume( type == n_GF );
+   type = n_GF;
 
 
    GFInfo* param = new GFInfo();
@@ -339,7 +339,7 @@ int main( int, char *argv[] )
 #ifdef HAVE_RINGS
 //  TODO(Somebody, This will result in memory corruption at Z_2^m later on (due to the succs. setGMPFloatDigits?)...!?); // ????
 
-  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
+  type = n_Zn;
 
   if( Test(type, (void*) 3) )
     c ++;
@@ -350,23 +350,23 @@ int main( int, char *argv[] )
   setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
 
 
-  type = nRegister( n_long_C, ngcInitChar); assume( type == n_long_C );
+  type = n_long_C;
   if( Test(type) )
     c ++;
 
-  type = nRegister( n_long_R, ngfInitChar); assume( type == n_long_R );
+  type = n_long_R;
   if( Test(type) )
     c ++;
 
 #ifdef HAVE_RINGS
-  type = nRegister( n_Z2m, nr2mInitChar); assume( type == n_Z2m ); 
+  type = n_Z2m;
   if( Test(type, (void*) 2) )
     c ++;
 #endif
 
 
 #ifdef HAVE_RINGS
-  type = nRegister( n_Zn, nrnInitChar); assume( type == n_Zn );
+  type = n_Zn;
 
   if( Test(type, (void*) 3) )
     c ++;
