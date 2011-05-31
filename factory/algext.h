@@ -7,6 +7,9 @@
 #include "variable.h"
 
 CanonicalForm QGCD( const CanonicalForm &, const CanonicalForm & );
+void tryDivrem (const CanonicalForm&, const CanonicalForm&, CanonicalForm&,
+                CanonicalForm&, CanonicalForm&, const CanonicalForm&,
+                bool&);
 void tryEuclid( const CanonicalForm &, const CanonicalForm &, const CanonicalForm &, CanonicalForm &, bool & );
 void tryInvert( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, bool & );
 bool hasFirstAlgVar( const CanonicalForm &, Variable & );

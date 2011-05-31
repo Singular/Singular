@@ -33,10 +33,7 @@ CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M)
   {
     if(f.degree() < M.degree())
       return f;
-    CanonicalForm tmp = f;
-    do
-      tmp -= lc(tmp)*M*power(M.mvar(),tmp.degree()-M.degree());
-    while(tmp.degree() >= M.degree());
+    CanonicalForm tmp = mod (f, M);
     return tmp;
   }
   // here: f.level() > M.level()
@@ -66,6 +63,51 @@ void tryInvert( const CanonicalForm & F, const CanonicalForm & M, CanonicalForm 
     fail = true;
   else
     inv = replacevar( inv, x, a ); // change back to alg var
+}
+
+void tryDivrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
+                CanonicalForm& R, CanonicalForm& inv, const CanonicalForm& mipo,
+                bool& fail)
+{
+  if (F.inCoeffDomain())
+  {
+    Q= 0;
+    R= F;
+    return;
+  }
+
+  CanonicalForm A, B;
+  Variable x= F.mvar();
+  A= F;
+  B= G;
+  int degA= degree (A, x);
+  int degB= degree (B, x);
+
+  if (degA < degB)
+  {
+    R= A;
+    Q= 0;
+    return;
+  }
+
+  tryInvert (Lc (B), mipo, inv, fail);
+  if (fail)
+    return;
+
+  R= A;
+  Q= 0;
+  CanonicalForm Qi;
+  for (int i= degA -degB; i >= 0; i--)
+  {
+    if (degree (R, x) == i + degB)
+    {
+      Qi= Lc (R)*inv*power (x, i);
+      Qi= reduce (Qi, mipo);
+      R -= Qi*B;
+      R= reduce (R, mipo);
+      Q += Qi;
+    }
+  }
 }
 
 void tryEuclid( const CanonicalForm & A, const CanonicalForm & B, const CanonicalForm & M, CanonicalForm & result, bool & fail )
@@ -106,15 +148,13 @@ void tryEuclid( const CanonicalForm & A, const CanonicalForm & B, const Canonica
     return;
   }
   Variable x = P.mvar();
-  CanonicalForm rem;
+  CanonicalForm rem, Q;
   // here: degree(P) >= degree(result)
   while(true)
   {
-    tryInvert( Lc(result), M, inv, fail );
-    if(fail)
+    tryDivrem (P, result, Q, rem, inv, M, fail);
+    if (fail)
       return;
-    // here: Lc(result) is invertible modulo M
-    rem = reduce( P - Lc(P)*inv*result*power( x, P.degree(x)-result.degree(x) ), M );
     if( rem.isZero() )
     {
       result *= inv;
