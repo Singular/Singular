@@ -833,14 +833,8 @@ gcd ( const CanonicalForm & f, const CanonicalForm & g )
           if (
           (getCharacteristic() == 0) &&
           (hasFirstAlgVar(f,m) || hasFirstAlgVar(g,m))
-          //&& f.isUnivariate()
-          //&& g.isUnivariate()
           )
           {
-            //if ((f.level()==g.level()) && f.isUnivariate() && g.isUnivariate())
-            //  return univarQGCD(f,g);
-            //else
-              //return QGCD(f,g);
             bool on_rational = isOn(SW_RATIONAL);
             CanonicalForm r=QGCD(f,g);
             On(SW_RATIONAL);
@@ -1236,6 +1230,4 @@ CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
     }
   }
 }
-
-#include "algext.cc"
 

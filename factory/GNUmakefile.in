@@ -127,6 +127,7 @@ DEPCXXFLAGS =	-I. -I.. -I$(srcdir) -I${prefix} -I$(includedir) \
 
 # factory source files
 basefactorysrc := \
+		algext.cc \
 		canonicalform.cc \
 		cf_algorithm.cc \
 		cf_binom.cc \
