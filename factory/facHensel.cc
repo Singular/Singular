@@ -1354,7 +1354,7 @@ void divrem (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
     return;
   }
 
-  if (degB == 0)
+  if (degB <= 0)
   {
     divrem (A, B, Q, R);
     Q= mod (Q, MOD);
