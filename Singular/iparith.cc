@@ -3035,7 +3035,6 @@ static BOOLEAN jjRES(leftv res, leftv u, leftv v)
   else
     assume( (r->orderedRes != NULL) || (r->res != NULL) ); // analog for hres...
 
-  
   return FALSE;
 }
 #endif
@@ -3263,8 +3262,9 @@ static BOOLEAN jjSTD_1(leftv res, leftv u, leftv v)
   }
   else /*IDEAL/MODULE*/
   {
+    attr *aa=u->Attribute();
     attr a=NULL;
-    if (u->attribute!=NULL) a=u->attribute->Copy();
+    if (aa!=NULL) a=(*aa)->Copy();
     jjSTD_1_ID(res,(ideal)u->CopyD(),r,(ideal)v->CopyD(),a);
   }
   if(!TEST_OPT_DEGBOUND) setFlag(res,FLAG_STD);

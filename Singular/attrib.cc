@@ -36,16 +36,21 @@ void sattr::Print()
 
 attr sattr::Copy()
 {
-  omCheckAddrSize(this,sizeof(sattr));
-  attr n=(attr)omAlloc0Bin(sattr_bin);
-  n->atyp=atyp;
-  if (name!=NULL) n->name=omStrDup(name);
-  n->data=CopyA();
-  if (next!=NULL)
+  if (this!=NULL)
   {
-    n->next=next->Copy();
+    omCheckAddrSize(this,sizeof(sattr));
+    attr n=(attr)omAlloc0Bin(sattr_bin);
+    n->atyp=atyp;
+    if (name!=NULL) n->name=omStrDup(name);
+    n->data=CopyA();
+    if (next!=NULL)
+    {
+      n->next=next->Copy();
+    }
+    return n;
   }
-  return n;
+  else
+    return NULL;
 }
 
 // in subexr.cc:
@@ -89,8 +94,8 @@ attr sattr::get(const char * s)
   attr h = this;
   while (h!=NULL)
   {
-    if (0 == strcmp(s,h->name)) 
-    { 
+    if (0 == strcmp(s,h->name))
+    {
 #ifdef TEST
       //::Print("get attr >>%s<< of type %s\n",h->name, Tok2Cmdname(h->atyp));
 #endif
@@ -113,15 +118,8 @@ void * atGet(idhdl root,const char * name)
 void * atGet(leftv root,const char * name)
 {
   attr temp;
-  if (root->e==NULL)
-    temp = root->attribute->get(name);
-  else
-    temp = (root->LData())->attribute->get(name);
-  if ((temp==NULL) && (root->rtyp==IDHDL))
-  {
-    idhdl h=(idhdl)root->data;
-    temp=h->attribute->get(name);
-  }
+  attr a=*(root->Attribute());
+  temp = a->get(name);
   if (temp!=NULL)
     return temp->data;
   else
@@ -139,12 +137,8 @@ void * atGet(idhdl root,const char * name, int t)
 
 void * atGet(leftv root,const char * name, int t)
 {
-  attr temp = root->attribute->get(name);
-  if ((temp==NULL) && (root->rtyp==IDHDL))
-  {
-    idhdl h=(idhdl)root->data;
-    temp=h->attribute->get(name);
-  }
+  attr a=*(root->Attribute());
+  attr temp = a->get(name);
   if ((temp!=NULL) && (temp->atyp==t))
     return temp->data;
   else
@@ -159,7 +153,7 @@ void atSet(idhdl root,const char * name,void * data,int typ)
     && (IDTYP(root)!=QRING_CMD)
     && (!RingDependend(IDTYP(root)))&&(RingDependend(typ)))
       WerrorS("cannot set ring-dependend objects at this type");
-    else  
+    else
       root->attribute=root->attribute->set(name,data,typ);
   }
 }
@@ -168,27 +162,15 @@ void atSet(leftv root,const char * name,void * data,int typ)
 {
   if (root!=NULL)
   {
-    if (root->e!=NULL)
-    {
-      Werror("object must have a name for attrib %s",name);
-    }
+    attr *a=root->Attribute();
+    int rt=root->Typ();
+    if ((rt!=RING_CMD)
+    && (rt!=QRING_CMD)
+    && (!RingDependend(rt))&&(RingDependend(typ)))
+      WerrorS("cannot set ring-dependend objects at this type");
     else
     {
-      int rt=root->Typ();
-      if ((rt!=RING_CMD)
-      && (rt!=QRING_CMD)
-      && (!RingDependend(rt))&&(RingDependend(typ)))
-        WerrorS("cannot set ring-dependend objects at this type");
-      else  
-      if (root->rtyp==IDHDL)
-      {
-        idhdl h=(idhdl)root->data;
-        h->attribute=h->attribute->set(name,data,typ);
-      }
-      else
-      {
-        root->attribute=root->attribute->set(name,data,typ);
-      }
+      *a=(*a)->set(name,data,typ);
     }
   }
 }
@@ -239,56 +221,62 @@ void at_KillAll(idhdl root, const ring r)
   root->attribute->killAll(r);
   root->attribute = NULL;
 }
-
-BOOLEAN atATTRIB1(leftv res,leftv a)
+void at_KillAll(leftv root, const ring r)
 {
-  leftv v=a;
+  root->attribute->killAll(r);
+  root->attribute = NULL;
+}
+
+BOOLEAN atATTRIB1(leftv res,leftv v)
+{
   int t;
-  attr at;
-  if (a->e!=NULL)
+  attr *aa=(v->Attribute());
+  if (aa==NULL)
   {
-    v=a->LData();
-    if (v==NULL) return TRUE;
+    WerrorS("this object cannot have attributes");
+    return TRUE;
   }
-  at=v->attribute;
-  if ((a->rtyp==IDHDL)&&(a->e==NULL))
-  {
-    at=IDATTR((idhdl)v->data);
-  }
+  attr a=*aa;
   BOOLEAN haveNoAttribute=TRUE;
-  if (hasFlag(v,FLAG_STD))
+  if (v->e==NULL)
   {
-    PrintS("attr:isSB, type int\n");
-    haveNoAttribute=FALSE;
+    if (hasFlag(v,FLAG_STD))
+    {
+      PrintS("attr:isSB, type int\n");
+      haveNoAttribute=FALSE;
+    }
+    if (hasFlag(v,FLAG_QRING))
+    {
+      PrintS("attr:qringNF, type int\n");
+      haveNoAttribute=FALSE;
+    }
+    if (((t=v->Typ())==RING_CMD)||(t==QRING_CMD))
+    {
+      PrintS("attr:global, type int\n");
+      haveNoAttribute=FALSE;
+    }
   }
-  if (hasFlag(v,FLAG_QRING))
+  else
   {
-    PrintS("attr:qringNF, type int\n");
-    haveNoAttribute=FALSE;
+    leftv at=v->LData();
+    return atATTRIB1(res,at);
   }
-  if (((t=v->Typ())==RING_CMD)||(t==QRING_CMD))
-  {
-    PrintS("attr:global, type int\n");
-    haveNoAttribute=FALSE;
-  }
-  if (at!=NULL)                    at->Print();
-  else  if(haveNoAttribute)        PrintS("no attributes\n");
+  if (a!=NULL)                    a->Print();
+  else  if(haveNoAttribute)       PrintS("no attributes\n");
   return FALSE;
 }
-BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
+BOOLEAN atATTRIB2(leftv res,leftv v,leftv b)
 {
   char *name=(char *)b->Data();
   int t;
-  leftv v=a;
-  if (a->e!=NULL)
-  {
-    v=a->LData();
-    if (v==NULL) return TRUE;
-  }
+  leftv at=NULL;
+  if (v->e!=NULL)
+    at=v->LData();
   if (strcmp(name,"isSB")==0)
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)hasFlag(v,FLAG_STD);
+    if (at!=NULL) res->data=(void *)(long)(hasFlag(v,FLAG_STD)||(hasFlag(at,FLAG_STD)));
   }
   else if ((strcmp(name,"rank")==0)&&(v->Typ()==MODUL_CMD))
   {
@@ -305,6 +293,7 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
   {
     res->rtyp=INT_CMD;
     res->data=(void *)(long)hasFlag(v,FLAG_QRING);
+    if (at!=NULL) res->data=(void *)(long)(hasFlag(v,FLAG_QRING)||(hasFlag(at,FLAG_QRING)));
   }
 #ifdef HAVE_SHIFTBBA
   else if ((strcmp(name,"isLPring")==0)
@@ -316,16 +305,18 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
 #endif
   else
   {
-    attr at;
-    if (v->rtyp==IDHDL)
-      at=IDATTR((idhdl)v->data);
-    else
-      at=v->attribute;
-    at=at->get(name);
-    if (at!=NULL)
+    attr *aa=v->Attribute();
+    if (aa==NULL)
     {
-      res->rtyp=at->atyp;
-      res->data=at->CopyA();
+      WerrorS("this object cannot have attributes");
+      return TRUE;
+    }
+    attr a=*aa;
+    a=a->get(name);
+    if (a!=NULL)
+    {
+      res->rtyp=a->atyp;
+      res->data=a->CopyA();
     }
     else
     {
@@ -335,21 +326,18 @@ BOOLEAN atATTRIB2(leftv res,leftv a,leftv b)
   }
   return FALSE;
 }
-BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
+BOOLEAN atATTRIB3(leftv res,leftv v,leftv b,leftv c)
 {
-  idhdl h=(idhdl)a->data;
+  idhdl h=(idhdl)v->data;
   int t;
-  leftv v=a;
-  if (a->e!=NULL)
+  if (v->e!=NULL)
   {
-    v=a->LData();
+    v=v->LData();
     if (v==NULL) return TRUE;
     h=NULL;
   }
-  if (a->rtyp!=IDHDL) h=NULL;
+  else if (v->rtyp!=IDHDL) h=NULL;
 
-  attr *at=&(v->attribute);
-  if (h!=NULL) at=&(IDATTR(h));
   char *name=(char *)b->Data();
   if (strcmp(name,"isSB")==0)
   {
@@ -427,18 +415,19 @@ BOOLEAN atATTRIB3(leftv res,leftv a,leftv b,leftv c)
 
 BOOLEAN atKILLATTR1(leftv res,leftv a)
 {
-  if ((a->rtyp!=IDHDL)||(a->e!=NULL))
+  idhdl h=NULL;
+  if ((a->rtyp==IDHDL)&&(a->e==NULL))
   {
-    WerrorS("object must have a name");
-    return TRUE;
+    h=(idhdl)a->data;
+    resetFlag((idhdl)a->data,FLAG_STD);
   }
   resetFlag(a,FLAG_STD);
-  resetFlag((idhdl)a->data,FLAG_STD);
-  if (a->attribute!=NULL)
+  if (h->attribute!=NULL)
   {
-    atKillAll((idhdl)a->data);
+    atKillAll(h);
     a->attribute=NULL;
   }
+  else atKillAll(a);
   return FALSE;
 }
 BOOLEAN atKILLATTR2(leftv res,leftv a,leftv b)

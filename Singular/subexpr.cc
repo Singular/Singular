@@ -323,7 +323,7 @@ void sleftv::CleanUp(ring r)
         break;
       default:
       {
-        if (attribute!=NULL) attribute->killAll(r);
+        attribute->killAll(r);
       }
     }
   }

@@ -38,6 +38,7 @@ void * atGet(leftv root,const char * name, int t);
 void atSet(idhdl root,const char * name,void * data,int typ);
 void atSet(leftv root,const char * name,void * data,int typ);
 void at_KillAll(idhdl root,const ring r);
+void at_KillAll(leftv root,const ring r);
 #define atKillAll(H) at_KillAll(H,currRing)
 void at_Kill(idhdl root,const char * name,const ring r);
 #define atKill(H,A) at_Kill(H,A,currRing)

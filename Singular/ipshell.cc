@@ -865,7 +865,9 @@ BOOLEAN jjBETTI2_ID(leftv res, leftv u, leftv v)
   l->Init(1);
   l->m[0].rtyp=u->Typ();
   l->m[0].data=u->Data();
-  l->m[0].attribute=u->attribute;
+  attr *a=u->Attribute();
+  if (a!=NULL)
+  l->m[0].attribute=*a;
   sleftv tmp2;
   memset(&tmp2,0,sizeof(tmp2));
   tmp2.rtyp=LIST_CMD;

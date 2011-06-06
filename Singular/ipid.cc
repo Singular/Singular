@@ -371,7 +371,7 @@ void killhdl2(idhdl h, idhdl * ih, ring r)
 
   if (h->attribute!=NULL)
   {
-    h->attribute->killAll(r);
+    //h->attribute->killAll(r); MEMORY LEAK!
     h->attribute=NULL;
   }
   if (IDTYP(h) == PACKAGE_CMD)

@@ -95,9 +95,10 @@ lists lInsert0(lists ul, leftv v, int pos)
   l->m[pos].rtyp=v->Typ();
   l->m[pos].data=v->CopyD();
   l->m[pos].flag=v->flag;
-  if (v->attribute!=NULL)
+  attr *a=v->Attribute();
+  if (a!=NULL)
   {
-    l->m[pos].attribute=v->attribute->Copy();
+    l->m[pos].attribute=(*a)->Copy();
   }
   if (ul->m != NULL)
     omFreeSize((ADDRESS)ul->m,(ul->nr+1)*sizeof(sleftv));
@@ -166,7 +167,7 @@ BOOLEAN lDelete(leftv res, leftv u, leftv v)
       if (i!=VIndex)
       {
         l->m[j]=ul->m[i];
-	memset(&ul->m[i],0,sizeof(ul->m[i]));
+        memset(&ul->m[i],0,sizeof(ul->m[i]));
       }
       else
       {
