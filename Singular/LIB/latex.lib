@@ -762,8 +762,7 @@ EXAMPLE: example texobj; shows an example
         { s = s + "\\begin{array}{rcl}" + newline;
           for(j=1;j<=size(obj);j++)
           { h = jet(obj[j],0);  // absterm
-            ineq = attrib(obj[j],"ineq");
-            if(!(size(ineq))) { ineq = "=" ; }
+            ineq = "=" ;
             l = texpoly("",obj[j]-h) + " & " + ineq + " & " + texpoly("",-h);
             if(j<size(obj)) { l = l + " \\\\";}
             s =s+ l + newline;
@@ -775,8 +774,7 @@ EXAMPLE: example texobj; shows an example
    "\\begin{array}{*{" + string(2*nvars(basering)-1) + "}{c}cr}" + newline;
            for(j=1; j<=size(obj);j++)
            { h = jet(obj[j],0);   // absterm
-             ineq = attrib(obj[j],"ineq");
-             if(!(size(ineq))) { ineq = "=" ; }
+             ineq = "="; 
               l = ""; nc = 0;
               for (i=1; i<=nvars(basering);i++)
               { t = " "; sg ="";
