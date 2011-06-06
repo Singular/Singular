@@ -121,13 +121,13 @@ void ssiWriteBigInt(const ssiInfo *d, const number n)
   }
   else if (n->s==3)
   {
-    fprintf(d->f_write,"3 ");
+    fputs("3 ",d->f_write);
     mpz_out_str(d->f_write,10,n->z);
-    fprintf(d->f_write," ");
+    fputc(' ',d->f_write);
     //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
     //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"bigint: gmp \"%Zd\" ",n->z);
   }
-  else Werror("illiegal bigint");
+  else WerrorS("illiegal bigint");
   SSI_UNBLOCK_CHLD;
 }
 
@@ -160,18 +160,18 @@ void ssiWriteNumber(const ssiInfo *d, const number n)
       //gmp_fprintf(d->f_write,"%d %Zd %Zd ",n->s,n->z,n->n);
       fprintf(d->f_write,"%d ",n->s+5);
       mpz_out_str (d->f_write,32, n->z);
-      fprintf(d->f_write," ");
+      fputc(' ',d->f_write);
       mpz_out_str (d->f_write,32, n->n);
-      fprintf(d->f_write," ");
+      fputc(' ',d->f_write);
 
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: s=%d gmp/gmp \"%Zd %Zd\" ",n->s,n->z,n->n);
     }
     else /*n->s==3*/
     {
       //gmp_fprintf(d->f_write,"3 %Zd ",n->z);
-      fprintf(d->f_write,"8 ");
+      fputs("8 ",d->f_write);
       mpz_out_str (d->f_write,32, n->z);
-      fprintf(d->f_write," ");
+      fputc(' ',d->f_write);
 
       //if (d->f_debug!=NULL) gmp_fprintf(d->f_debug,"number: gmp \"%Zd\" ",n->z);
     }
@@ -1010,7 +1010,7 @@ BOOLEAN ssiClose(si_link l)
       }
       if (d->send_quit_at_exit)
       {
-        fprintf(d->f_write,"99\n");fflush(d->f_write);
+        fputs("99\n",d->f_write);fflush(d->f_write);
       }
     }
     if (d->f_write!=NULL) fclose(d->f_write);
@@ -1165,40 +1165,40 @@ BOOLEAN ssiWrite(si_link l, leftv data)
 
     switch(tt /*data->Typ()*/)
     {
-          case NONE/* nothing*/:fprintf(d->f_write,"16 ");
+          case NONE/* nothing*/:fputs("16 ",d->f_write);
                           break;
-          case STRING_CMD: fprintf(d->f_write,"2 ");
+          case STRING_CMD: fputs("2 ",d->f_write);
                            ssiWriteString(d,(char *)dd);
                            break;
-          case INT_CMD: fprintf(d->f_write,"1 ");
+          case INT_CMD: fputs("1 ",d->f_write);
                         ssiWriteInt(d,(int)(long)dd);
                         break;
-          case BIGINT_CMD:fprintf(d->f_write,"4 ");
+          case BIGINT_CMD:fputs("4 ",d->f_write);
                         ssiWriteBigInt(d,(number)dd);
                         break;
           case NUMBER_CMD:
                           if (d->r!=currRing)
                           {
-                            fprintf(d->f_write,"15 ");
+                            fputs("15 ",d->f_write);
                             ssiWriteRing(d,currRing);
-                            if (d->level<=1) fprintf(d->f_write,"\n");
+                            if (d->level<=1) fputc('\n',d->f_write);
                           }
-                          fprintf(d->f_write,"3 ");
+                          fputs("3 ",d->f_write);
                           ssiWriteNumber(d,(number)dd);
                         break;
-          case RING_CMD:fprintf(d->f_write,"5 ");
+          case RING_CMD:fputs("5 ",d->f_write);
                         ssiWriteRing(d,(ring)dd);
                         break;
           case POLY_CMD:
           case VECTOR_CMD:
                         if (d->r!=currRing)
                         {
-                          fprintf(d->f_write,"15 ");
+                          fputs("15 ",d->f_write);
                           ssiWriteRing(d,currRing);
-                          if (d->level<=1) fprintf(d->f_write,"\n");
+                          if (d->level<=1) fputc('\n',d->f_write);
                         }
-                        if(tt==POLY_CMD) fprintf(d->f_write,"6 ");
-                        else             fprintf(d->f_write,"9 ");
+                        if(tt==POLY_CMD) fputs("6 ",d->f_write);
+                        else             fputs("9 ",d->f_write);
                         ssiWritePoly(d,tt,(poly)dd);
                         break;
           case IDEAL_CMD:
@@ -1206,40 +1206,40 @@ BOOLEAN ssiWrite(si_link l, leftv data)
           case MATRIX_CMD:
                         if (d->r!=currRing)
                         {
-                          fprintf(d->f_write,"15 ");
+                          fputs("15 ",d->f_write);
                           ssiWriteRing(d,currRing);
-                          if (d->level<=1) fprintf(d->f_write,"\n");
+                          if (d->level<=1) fputc('\n',d->f_write);
                         }
-                        if(tt==IDEAL_CMD)       fprintf(d->f_write,"7 ");
-                        else if(tt==MATRIX_CMD) fprintf(d->f_write,"8 ");
-                        else                    fprintf(d->f_write,"10 ");
+                        if(tt==IDEAL_CMD)       fputs("7 ",d->f_write);
+                        else if(tt==MATRIX_CMD) fputs("8 ",d->f_write);
+                        else                    fputs("10 ",d->f_write);
                         ssiWriteIdeal(d,tt,(ideal)dd);
                         break;
           case COMMAND:
-                   fprintf(d->f_write,"11 ");
+                   fputs("11 ",d->f_write);
                    ssiWriteCommand(l,(command)dd);
                    break;
           case DEF_CMD: /* not evaluated stuff in quotes */
-                   fprintf(d->f_write,"12 ");
+                   fputs("12 ",d->f_write);
                    ssiWriteString(d,data->Name());
                    break;
           case PROC_CMD:
-                   fprintf(d->f_write,"13 ");
+                   fputs("13 ",d->f_write);
                    ssiWriteProc(d,(procinfov)dd);
                    break;
           case LIST_CMD:
-                   fprintf(d->f_write,"14 ");
+                   fputs("14 ",d->f_write);
                    ssiWriteList(l,(lists)dd);
                    break;
           case INTVEC_CMD:
-                   fprintf(d->f_write,"17 ");
+                   fputs("17 ",d->f_write);
                    ssiWriteIntvec(d,(intvec *)dd);
                    break;
           default:
             if (tt>MAX_TOK)
             {
               blackbox *b=getBlackboxStuff(tt);
-              fprintf(d->f_write,"20 ");
+              fputs("20 ",d->f_write);
               b->blackbox_serialize(b,dd,l);
             }
             else
@@ -1250,7 +1250,7 @@ BOOLEAN ssiWrite(si_link l, leftv data)
             }
             break;
     }
-    if (d->level<=1) { fprintf(d->f_write,"\n"); fflush(d->f_write); }
+    if (d->level<=1) { fputc('\n',d->f_write); fflush(d->f_write); }
     data=data->next;
   }
   d->level--;
