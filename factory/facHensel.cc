@@ -1185,7 +1185,6 @@ void divrem21 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
 
   int m= (int) ceil ((double) (degB + 1)/2.0) + 1;
   CFList splitA= split (A, m, x);
-  CFList splitB= split (B, m, x);
   if (splitA.length() == 3)
     splitA.insert (0);
   if (splitA.length() == 2)
@@ -1308,6 +1307,42 @@ void divrem2 (const CanonicalForm& F, const CanonicalForm& G, CanonicalForm& Q,
 {
   CanonicalForm A= mod (F, M);
   CanonicalForm B= mod (G, M);
+
+  if (B.inCoeffDomain())
+  {
+    divrem (A, B, Q, R);
+    return;
+  }
+  if (A.inCoeffDomain() && !B.inCoeffDomain())
+  {
+    Q= 0;
+    R= A;
+    return;
+  }
+
+  if (B.level() < A.level())
+  {
+    divrem (A, B, Q, R);
+    return;
+  }
+  if (A.level() > B.level())
+  {
+    R= A;
+    Q= 0;
+    return;
+  }
+  if (B.level() == 1 && B.isUnivariate())
+  {
+    divrem (A, B, Q, R);
+    return;
+  }
+  if (!(B.level() == 1 && B.isUnivariate()) && (A.level() == 1 && A.isUnivariate()))
+  {
+    Q= 0;
+    R= A;
+    return;
+  }
+
   Variable x= Variable (1);
   int degB= degree (B, x);
   if (degB > degree (A, x))
@@ -1528,20 +1563,20 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     {
       if (k != j - k + 1)
       {
-        if (one.exp() == j - k + 1 && two.exp() == j - k + 1)
+        if ((one.hasTerms() && one.exp() == j - k + 1) && (two.hasTerms() && two.exp() == j - k + 1))
         {
           tmp[0] += mulNTL ((bufFactors[0] [k] + one.coeff()), (bufFactors[1] [k] +
                      two.coeff())) - M (k + 1, 1) - M (j - k + 2, 1);
           one++;
           two++;
         }
-        else if (one.exp() == j - k + 1)
+        else if (one.hasTerms() && one.exp() == j - k + 1)
         {
           tmp[0] += mulNTL ((bufFactors[0] [k] + one.coeff()), bufFactors[1] [k]) -
                      M (k + 1, 1);
           one++;
         }
-        else if (two.exp() == j - k + 1)
+        else if (two.hasTerms() && two.exp() == j - k + 1)
         {
           tmp[0] += mulNTL (bufFactors[0] [k], (bufFactors[1] [k] + two.coeff())) -
                     M (k + 1, 1);
@@ -1593,7 +1628,7 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
     }
     one= bufFactors [l + 1];
     two= Pi [l - 1];
-    if (two.exp() == j + 1)
+    if (two.hasTerms() && two.exp() == j + 1)
     {
       if (degBuf > 0 && degPi > 0)
       {
@@ -1612,20 +1647,21 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
       {
         if (k != j - k + 1)
         {
-          if (one.exp() == j - k + 1 && two.exp() == j - k + 1)
+          if ((one.hasTerms() && one.exp() == j - k + 1) && 
+              (two.hasTerms() && two.exp() == j - k + 1))
           {
             tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()), (Pi[l - 1] [k] +
                        two.coeff())) - M (k + 1, l + 1) - M (j - k + 2, l + 1);
             one++;
             two++;
           }
-          else if (one.exp() == j - k + 1)
+          else if (one.hasTerms() && one.exp() == j - k + 1)
           {
             tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()), Pi[l - 1] [k]) -
                        M (k + 1, l + 1);
             one++;
           }
-          else if (two.exp() == j - k + 1)
+          else if (two.hasTerms() && two.exp() == j - k + 1)
           {
             tmp[l] += mulNTL (bufFactors[l + 1] [k], (Pi[l - 1] [k] + two.coeff())) -
                       M (k + 1, l + 1);
@@ -1643,9 +1679,10 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
 
 void
 henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
-              CFList& diophant, CFMatrix& M)
+              CFList& diophant, CFMatrix& M, bool sort)
 {
-  sortList (factors, Variable (1));
+  if (sort)
+    sortList (factors, Variable (1));
   Pi= CFArray (factors.length() - 1);
   CFListIterator j= factors;
   diophant= diophantine (F[0], factors);
@@ -2017,7 +2054,8 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     {
       if (k != j - k + 1)
       {
-        if (one.exp() == j - k + 1 && two.exp() == j - k + 1)
+        if ((one.hasTerms() && one.exp() == j - k + 1) && 
+            (two.hasTerms() && two.exp() == j - k + 1))
         {
           tmp[0] += mulMod ((bufFactors[0] [k] + one.coeff()),
                     (bufFactors[1] [k] + two.coeff()), MOD) - M (k + 1, 1) -
@@ -2025,13 +2063,13 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
           one++;
           two++;
         }
-        else if (one.exp() == j - k + 1)
+        else if (one.hasTerms() && one.exp() == j - k + 1)
         {
           tmp[0] += mulMod ((bufFactors[0] [k] + one.coeff()),
                     bufFactors[1] [k], MOD) - M (k + 1, 1);
           one++;
         }
-        else if (two.exp() == j - k + 1)
+        else if (two.hasTerms() && two.exp() == j - k + 1)
         {
           tmp[0] += mulMod (bufFactors[0] [k], (bufFactors[1] [k] +
                     two.coeff()), MOD) - M (k + 1, 1);
@@ -2083,7 +2121,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     }
     one= bufFactors [l + 1];
     two= Pi [l - 1];
-    if (two.exp() == j + 1)
+    if (two.hasTerms() && two.exp() == j + 1)
     {
       if (degBuf > 0 && degPi > 0)
       {
@@ -2102,7 +2140,8 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
       {
         if (k != j - k + 1)
         {
-          if (one.exp() == j - k + 1 && two.exp() == j - k + 1)
+          if ((one.hasTerms() && one.exp() == j - k + 1) && 
+              (two.hasTerms() && two.exp() == j - k + 1))
           {
             tmp[l] += mulMod ((bufFactors[l + 1] [k] + one.coeff()),
                       (Pi[l - 1] [k] + two.coeff()), MOD) - M (k + 1, l + 1) -
@@ -2110,13 +2149,13 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
             one++;
             two++;
           }
-          else if (one.exp() == j - k + 1)
+          else if (one.hasTerms() && one.exp() == j - k + 1)
           {
             tmp[l] += mulMod ((bufFactors[l + 1] [k] + one.coeff()),
                       Pi[l - 1] [k], MOD) - M (k + 1, l + 1);
             one++;
           }
-          else if (two.exp() == j - k + 1)
+          else if (two.hasTerms() && two.exp() == j - k + 1)
           {
             tmp[l] += mulMod (bufFactors[l + 1] [k],
                       (Pi[l - 1] [k] + two.coeff()), MOD) - M (k + 1, l + 1);
@@ -2244,12 +2283,13 @@ henselLift (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
 
 CFList
 henselLift (const CFList& eval, const CFList& factors, const int* l, const int
-            lLength)
+            lLength, bool sort)
 {
   CFList diophant;
   CFList buf= factors;
   buf.insert (LC (eval.getFirst(), 1));
-  sortList (buf, Variable (1));
+  if (sort)
+    sortList (buf, Variable (1));
   CFArray Pi;
   CFMatrix M= CFMatrix (l[1], factors.length());
   CFList result= henselLift23 (eval, buf, l, diophant, Pi, M);
@@ -2344,22 +2384,25 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
     while (two.hasTerms() && two.exp() > j) two++;
     for (k= 1; k <= (int) ceil (j/2.0); k++)
     {
-      if (k != j - k + 1)
+      if (one.hasTerms() && two.hasTerms())
       {
-        if (one.exp() == j - k + 1 && two.exp() == j - k + 1)
+        if (k != j - k + 1)
+        {
+          if ((one.hasTerms() && one.exp() == j - k + 1) && +
+              (two.hasTerms() && two.exp() == j - k + 1))
         {
           tmp[0] += mulNTL ((bufFactors[0][k]+one.coeff()),(bufFactors[1][k] +
                       two.coeff())) - M (k + 1, 1) - M (j - k + 2, 1);
           one++;
           two++;
         }
-        else if (one.exp() == j - k + 1)
+        else if (one.hasTerms() && one.exp() == j - k + 1)
         {
           tmp[0] += mulNTL ((bufFactors[0][k]+one.coeff()), bufFactors[1] [k]) -
                       M (k + 1, 1);
           one++;
         }
-        else if (two.exp() == j - k + 1)
+        else if (two.hasTerms() && two.exp() == j - k + 1)
         {
           tmp[0] += mulNTL (bufFactors[0][k],(bufFactors[1][k] + two.coeff())) -
                     M (k + 1, 1);
@@ -2368,6 +2411,7 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
       }
       else
         tmp[0] += M (k + 1, 1);
+      }
     }
   }
 
@@ -2394,89 +2438,6 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
   }
 
   Pi [0] += tmp[0]*xToJ*F.mvar();
-
-  /*// update Pi [l]
-  int degPi, degBuf;
-  for (int l= 1; l < factors.length() - 1; l++)
-  {
-    degPi= degree (Pi [l - 1], x);
-    degBuf= degree (bufFactors[l + 1], x);
-    if (degPi > 0 && degBuf > 0)
-      M (j + 1, l + 1)= mulNTL (Pi [l - 1] [j], bufFactors[l + 1] [j]);
-    if (j == 1)
-    {
-      if (degPi > 0 && degBuf > 0)
-        Pi [l] += xToJ*(mulNTL (Pi [l - 1] [0] + Pi [l - 1] [j],
-                  bufFactors[l + 1] [0] + buf[l + 1]) - M (j + 1, l +1) -
-                  M (1, l + 1));
-      else if (degPi > 0)
-        Pi [l] += xToJ*(mulNTL (Pi [l - 1] [j], bufFactors[l + 1]));
-      else if (degBuf > 0)
-        Pi [l] += xToJ*(mulNTL (Pi [l - 1], buf[l + 1]));
-    }
-    else
-    {
-      if (degPi > 0 && degBuf > 0)
-      {
-        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1] [0]);
-        uIZeroJ += mulNTL (Pi [l - 1] [0], buf [l + 1]); 
-      }
-      else if (degPi > 0)
-        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1]);
-      else if (degBuf > 0)
-      {
-        uIZeroJ= mulNTL (uIZeroJ, bufFactors [l + 1] [0]);
-        uIZeroJ += mulNTL (Pi [l - 1], buf[l + 1]);
-      }
-      Pi[l] += xToJ*uIZeroJ;
-    }
-    one= bufFactors [l + 1];
-    two= Pi [l - 1];
-    if (two.exp() == j + 1)
-    {
-      if (degBuf > 0 && degPi > 0)
-      {
-          tmp[l] += mulNTL (two.coeff(), bufFactors[l + 1][0]);
-          two++;
-      }
-      else if (degPi > 0)
-      {
-          tmp[l] += mulNTL (two.coeff(), bufFactors[l + 1]);
-          two++;
-      }
-    }
-    if (degBuf > 0 && degPi > 0)
-    {
-      for (k= 1; k <= (int) ceil (j/2.0); k++)
-      {
-        if (k != j - k + 1)
-        {
-          if (one.exp() == j - k + 1 && two.exp() == j - k + 1)
-          {
-            tmp[l] += mulNTL ((bufFactors[l + 1][k]+one.coeff()),(Pi[l-1] [k] +
-                        two.coeff())) - M (k + 1, l + 1) - M (j - k + 2, l + 1);
-            one++;
-            two++;
-          }
-          else if (one.exp() == j - k + 1)
-          {
-            tmp[l] += mulNTL ((bufFactors[l+1][k]+one.coeff()),Pi[l - 1] [k]) -
-                        M (k + 1, l + 1);
-            one++;
-          }
-          else if (two.exp() == j - k + 1)
-          {
-            tmp[l] += mulNTL (bufFactors[l+1][k],(Pi[l-1] [k] + two.coeff())) -
-                      M (k + 1, l + 1);
-            two++;
-          }
-        }
-        else
-          tmp[l] += M (k + 1, l + 1);
-      }
-    }
-    Pi[l] += tmp[l]*xToJ*F.mvar();
-  }*/
   return;
 }
 
@@ -2542,7 +2503,8 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
 static inline
 CFList
 diophantine (const CFList& recResult, const CFList& factors, 
-             const CFList& products, const CFList& M, const CanonicalForm& E)
+             const CFList& products, const CFList& M, const CanonicalForm& E,
+             bool& bad)
 {
   if (M.isEmpty())
   {
@@ -2573,12 +2535,15 @@ diophantine (const CFList& recResult, const CFList& factors,
   buf.removeLast();
   CanonicalForm bufE= mod (E, y);
   CFList recDiophantine= diophantine (recResult, bufFactors, bufProducts, buf,
-                                      bufE);
+                                      bufE, bad);
+
+  if (bad)
+    return CFList();
 
   CanonicalForm e= E;
   CFListIterator j= products;
   for (CFListIterator i= recDiophantine; i.hasItem(); i++, j++)
-    e -= mulMod (i.getItem(), j.getItem(), M);
+    e -= i.getItem()*j.getItem();
 
   CFList result= recDiophantine;
   int d= degree (M.getLast());
@@ -2593,118 +2558,32 @@ diophantine (const CFList& recResult, const CFList& factors,
     {
       CFListIterator k= result;
       recDiophantine= diophantine (recResult, bufFactors, bufProducts, buf,
-                                   coeffE);
+                                   coeffE, bad);
+      if (bad)
+        return CFList();
       CFListIterator l= products;
       for (j= recDiophantine; j.hasItem(); j++, k++, l++)
       {
         k.getItem() += j.getItem()*power (y, i);
-        e -= mulMod (j.getItem()*power (y, i), l.getItem(), M);
+        e -= j.getItem()*power (y, i)*l.getItem();
       }
     }
     if (e.isZero())
       break;
   }
+  if (!e.isZero())
+  {
+    bad= true;
+    return CFList();
+  }
   return result;
 }
 
-// non monic case
-static inline
-CFList
-multiRecDiophantine2 (const CanonicalForm& F, const CFList& factors,
-                     const CFList& recResult, const CFList& M, const int d)
-{
-  Variable y= F.mvar();
-  CFList result;
-  CFListIterator i;
-  CanonicalForm e= 1;
-  CFListIterator j= factors;
-  CFList p;
-  CFArray bufFactors= CFArray (factors.length());
-  CanonicalForm yToD= power (y, d);
-  int k= 0;
-  for (CFListIterator i= factors; i.hasItem(); i++, k++)
-    bufFactors [k]= i.getItem();
-  CanonicalForm b;
-  CFList buf= M;
-  buf.removeLast();
-  buf.append (yToD);
-  for (k= 0; k < factors.length(); k++) //TODO compute b's faster
-  {
-    b= 1;
-    if (fdivides (bufFactors[k], F))
-      b= F/bufFactors[k];
-    else 
-    {
-      for (int l= 0; l < factors.length(); l++)
-      {
-        if (l == k)
-          continue;
-        else
-        {
-          b= mulMod (b, bufFactors[l], buf);
-        }
-      }
-    }
-    p.append (b);
-  }
-  j= p;
-  for (CFListIterator i= recResult; i.hasItem(); i++, j++)
-    e -= mulMod (i.getItem(), j.getItem(), M);
-  if (e.isZero())
-    return recResult;
-  CanonicalForm coeffE;
-  result= recResult;
-  CanonicalForm g;
-  buf.removeLast();
-  for (int i= 1; i < d; i++)
-  {
-    if (degree (e, y) > 0)
-      coeffE= e[i];
-    else
-      coeffE= 0;
-    if (!coeffE.isZero())
-    {
-      CFListIterator k= result;
-      CFListIterator l= p;
-      j= recResult;
-      int ii= 0;
-      CanonicalForm dummy;
-      CFList recDiophantine;
-      CFList buf2, buf3;
-      buf2= factors;
-      buf3= p;
-      for (CFListIterator iii= buf2; iii.hasItem(); iii++)
-        iii.getItem()= mod (iii.getItem(), y);
-      for (CFListIterator iii= buf3; iii.hasItem(); iii++)
-        iii.getItem()= mod (iii.getItem(), y);
-      recDiophantine= diophantine (recResult, buf2, buf3, buf, coeffE);
-      CFListIterator iter= recDiophantine;
-      for (; j.hasItem(); j++, k++, l++, ii++, iter++)
-      {
-        k.getItem() += iter.getItem()*power (y, i);
-        e -= mulMod (iter.getItem()*power (y, i), l.getItem(), M);
-      }
-    }
-    if (e.isZero())
-      break;
-  }
-
-#ifdef DEBUGOUTPUT
-    CanonicalForm test= 0;
-    j= p; 
-    for (CFListIterator i= result; i.hasItem(); i++, j++)
-      test += mod (i.getItem()*j.getItem(), power (y, d));
-    DEBOUTLN (cerr, "test= " << test);
-#endif
-  return result;
-}
-
-// so far only tested for two! factor Hensel lifting
 static inline
 void
 henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
             const CFList& diophant, CFMatrix& M, CFArray& Pi,
-            const CFList& products, int j, const CFList& MOD)
+            const CFList& products, int j, const CFList& MOD, bool& noOneToOne)
 {
   CanonicalForm E;
   CanonicalForm xToJ= power (F.mvar(), j);
@@ -2734,7 +2613,11 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
   CFArray buf= CFArray (diophant.length());
 
   // actual lifting
-  CFList diophantine2= diophantine (diophant, factors, products, MOD, E);
+  CFList diophantine2= diophantine (diophant, factors, products, MOD, E,
+                                    noOneToOne);
+
+  if (noOneToOne)
+    return;
 
   int k= 0;
   for (CFListIterator i= diophantine2; k < factors.length(); k++, i++)
@@ -2779,7 +2662,8 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     {
       if (k != j - k + 1)
       {
-        if (one.exp() == j - k + 1 && two.exp() == j - k + 1)
+        if ((one.hasTerms() && one.exp() == j - k + 1) && 
+            (two.hasTerms() && two.exp() == j - k + 1))
         {
           tmp[0] += mulMod ((bufFactors[0] [k] + one.coeff()),
                     (bufFactors[1] [k] + two.coeff()), MOD) - M (k + 1, 1) -
@@ -2787,13 +2671,13 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
           one++;
           two++;
         }
-        else if (one.exp() == j - k + 1)
+        else if (one.hasTerms() && one.exp() == j - k + 1)
         {
           tmp[0] += mulMod ((bufFactors[0] [k] + one.coeff()),
                     bufFactors[1] [k], MOD) - M (k + 1, 1);
           one++;
         }
-        else if (two.exp() == j - k + 1)
+        else if (two.hasTerms() && two.exp() == j - k + 1)
         {
           tmp[0] += mulMod (bufFactors[0] [k], (bufFactors[1] [k] +
                     two.coeff()), MOD) - M (k + 1, 1);
@@ -2837,56 +2721,37 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     degPi= degree (Pi [l - 1], x);
     degBuf= degree (bufFactors[l + 1], x);
     if (degPi > 0 && degBuf > 0)
+    {
       M (j + 1, l + 1)= mulMod (Pi [l - 1] [j], bufFactors[l + 1] [j], MOD);
-    if (j == 1)
-    {
-      if (degPi > 0 && degBuf > 0)
-        Pi [l] += xToJ*(mulMod ((Pi [l - 1] [0] + Pi [l - 1] [j]),
-                  (bufFactors[l + 1] [0] + buf[l + 1]), MOD) - M (j + 1, l +1)-
-                  M (1, l + 1));
-      else if (degPi > 0)
-        Pi [l] += xToJ*(mulMod (Pi [l - 1] [j], bufFactors[l + 1], MOD));
-      else if (degBuf > 0)
-        Pi [l] += xToJ*(mulMod (Pi [l - 1], buf[l + 1], MOD));
+      if (j + 2 <= M.rows())
+        M (j + 2, l + 1)= mulMod (Pi [l - 1] [j + 1], bufFactors[l + 1] [j + 1],
+                                  MOD);
     }
+
+    if (degPi > 0 && degBuf > 0)
+      uIZeroJ= mulMod (Pi[l -1] [0], buf[l + 1], MOD) +
+               mulMod (uIZeroJ, bufFactors[l+1] [0], MOD);
+    else if (degPi > 0)
+      uIZeroJ= mulMod (uIZeroJ, bufFactors[l + 1], MOD);
+    else if (degBuf > 0)
+      uIZeroJ= mulMod (Pi[l - 1], buf[1], MOD);
     else
-    {
-      if (degPi > 0 && degBuf > 0)
-      {
-        uIZeroJ= mulMod (uIZeroJ, bufFactors [l + 1] [0], MOD);
-        uIZeroJ += mulMod (Pi [l - 1] [0], buf [l + 1], MOD);
-      }
-      else if (degPi > 0)
-        uIZeroJ= mulMod (uIZeroJ, bufFactors [l + 1], MOD);
-      else if (degBuf > 0)
-      {
-        uIZeroJ= mulMod (uIZeroJ, bufFactors [l + 1] [0], MOD);
-        uIZeroJ += mulMod (Pi [l - 1], buf[l + 1], MOD);
-      }
-      Pi[l] += xToJ*uIZeroJ;
-    }
+      uIZeroJ= 0;
+
+    Pi [l] += xToJ*uIZeroJ;
+
     one= bufFactors [l + 1];
     two= Pi [l - 1];
-    if (two.exp() == j + 1)
-    {
-      if (degBuf > 0 && degPi > 0)
-      {
-          tmp[l] += mulMod (two.coeff(), bufFactors[l + 1][0], MOD);
-          two++;
-      }
-      else if (degPi > 0)
-      {
-          tmp[l] += mulMod (two.coeff(), bufFactors[l + 1], MOD);
-          two++;
-      }
-    }
     if (degBuf > 0 && degPi > 0)
     {
+      while (one.hasTerms() && one.exp() > j) one++;
+      while (two.hasTerms() && two.exp() > j) two++;
       for (k= 1; k <= (int) ceil (j/2.0); k++)
       {
         if (k != j - k + 1)
         {
-          if (one.exp() == j - k + 1 && two.exp() == j - k + 1)
+          if ((one.hasTerms() && one.exp() == j - k + 1) &&
+              (two.hasTerms() && two.exp() == j - k + 1))
           {
             tmp[l] += mulMod ((bufFactors[l + 1] [k] + one.coeff()),
                       (Pi[l - 1] [k] + two.coeff()), MOD) - M (k + 1, l + 1) -
@@ -2894,26 +2759,48 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
             one++;
             two++;
           }
-          else if (one.exp() == j - k + 1)
+          else if (one.hasTerms() && one.exp() == j - k + 1)
           {
             tmp[l] += mulMod ((bufFactors[l + 1] [k] + one.coeff()),
                       Pi[l - 1] [k], MOD) - M (k + 1, l + 1);
             one++;
           }
-          else if (two.exp() == j - k + 1)
+          else if (two.hasTerms() && two.exp() == j - k + 1)
           {
-            tmp[l] += mulMod (bufFactors[l + 1] [k],
+            tmp[l] += mulMod (bufFactors[l + 1] [k], 
                       (Pi[l - 1] [k] + two.coeff()), MOD) - M (k + 1, l + 1);
             two++;
-          }
+           }
         }
         else
           tmp[l] += M (k + 1, l + 1);
       }
     }
+
+    if (degPi >= j + 1 && degBuf >= j + 1)
+    {
+      if (j + 2 <= M.rows())
+        tmp [l] += mulMod ((Pi [l - 1] [j + 1]+ Pi [l - 1] [0]),
+                           (bufFactors [l + 1] [j + 1] + bufFactors [l + 1] [0])
+                            , MOD) - M(1,l+1) - M (j + 2,l+1);
+    }
+    else if (degPi >= j + 1)
+    {
+      if (degBuf > 0)
+        tmp[l] += mulMod (Pi [l - 1] [j+1], bufFactors [l + 1] [0], MOD);
+      else
+        tmp[l] += mulMod (Pi [l - 1] [j+1], bufFactors [l + 1], MOD);
+    }
+    else if (degBuf >= j + 1)
+    {
+      if (degPi > 0)
+        tmp[l] += mulMod (Pi [l - 1] [0], bufFactors [l + 1] [j + 1], MOD);
+      else
+        tmp[l] += mulMod (Pi [l - 1], bufFactors [l + 1] [j + 1], MOD);
+    }
+
     Pi[l] += tmp[l]*xToJ*F.mvar();
   }
-
   return;
 }
 
@@ -2931,11 +2818,10 @@ CanonicalForm replaceLC (const CanonicalForm& F, const CanonicalForm& c)
   }
 }
 
-// so far only for two factor Hensel lifting
 CFList
 henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
               diophant, CFArray& Pi, CFMatrix& M, const CFList& LCs1,
-              const CFList& LCs2)
+              const CFList& LCs2, bool& bad)
 {
   CFList buf= factors;
   int k= 0;
@@ -2976,13 +2862,17 @@ henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
   for (int i= 0; i < bufFactors.size(); i++)
   {
     if (degree (bufFactors[i], y) > 0)
-      products.append (M (1, 1)/bufFactors[i] [0]);
+      products.append (eval.getFirst()/bufFactors[i] [0]);
     else
-      products.append (M (1, 1)/bufFactors[i]);
+      products.append (eval.getFirst()/bufFactors[i]);
   }
 
   for (int d= 1; d < l[1]; d++)
-    henselStep2 (j.getItem(), buf, bufFactors, diophant, M, Pi, products, d, MOD);
+  {
+    henselStep2 (j.getItem(), buf, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    if (bad)
+      return CFList();
+  }
   CFList result;
   for (k= 0; k < factors.length(); k++)
     result.append (bufFactors[k]);
@@ -2993,7 +2883,7 @@ henselLift232 (const CFList& eval, const CFList& factors, int* l, CFList&
 CFList
 henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
             diophant, CFArray& Pi, CFMatrix& M, const int lOld, int&
-            lNew, const CFList& LCs1, const CFList& LCs2)
+            lNew, const CFList& LCs1, const CFList& LCs2, bool& bad)
 {
   int k= 0;
   CFArray bufFactors= CFArray (factors.length());
@@ -3019,18 +2909,30 @@ henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
   {
     if (degree (bufFactors[i], y) > 0)
     {
-      ASSERT (fdivides (bufFactors[i][0], M (1, 1)), "expected exact division");
-      products.append (M (1, 1)/bufFactors[i] [0]);
+      if (!fdivides (bufFactors[i] [0], F.getFirst()))
+      {
+        bad= true;
+        return CFList();
+      }
+      products.append (F.getFirst()/bufFactors[i] [0]);
     }
     else
     {
-      ASSERT (fdivides (bufFactors[i], M (1, 1)), "expected exact division");
-      products.append (M (1, 1)/bufFactors[i]);
+      if (!fdivides (bufFactors[i], F.getFirst()))
+      {
+        bad= true;
+        return CFList();
+      }
+      products.append (F.getFirst()/bufFactors[i]);
     }
   }
 
   for (int d= 1; d < lNew; d++)
-    henselStep2 (F.getLast(),buf,bufFactors, diophant, M, Pi, products, d, MOD);
+  {
+    henselStep2 (F.getLast(), buf, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    if (bad)
+      return CFList();
+  }
 
   CFList result;
   for (k= 0; k < factors.length(); k++)
@@ -3038,11 +2940,10 @@ henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
   return result;
 }
 
-// so far only for two! factor Hensel lifting
 CFList
 henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
              lLength, bool sort, const CFList& LCs1, const CFList& LCs2,
-             const CFArray& Pi, const CFList& diophant)
+             const CFArray& Pi, const CFList& diophant, bool& bad)
 {
   CFList bufDiophant= diophant;
   CFList buf= factors;
@@ -3050,7 +2951,11 @@ henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
     sortList (buf, Variable (1));
   CFArray bufPi= Pi;
   CFMatrix M= CFMatrix (l[1], factors.length());
-  CFList result= henselLift232(eval, buf, l, bufDiophant, bufPi, M, LCs1, LCs2);
+  CFList result= henselLift232(eval, buf, l, bufDiophant, bufPi, M, LCs1, LCs2,
+                               bad);
+  if (bad)
+    return CFList();
+
   if (eval.length() == 2)
     return result;
   CFList MOD;
@@ -3076,12 +2981,239 @@ henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
     bufLCs2.append (jjj.getItem());
     M= CFMatrix (l[i], factors.length());
     result= henselLift2 (bufEval, result, MOD, bufDiophant, bufPi, M, l[i - 1],
-                         l[i], bufLCs1, bufLCs2);
+                         l[i], bufLCs1, bufLCs2, bad);
+    if (bad)
+      return CFList();
     MOD.append (power (Variable (i + 2), l[i]));
     bufEval.removeFirst();
     bufLCs1.removeFirst();
     bufLCs2.removeFirst();
   }
+  return result;
+}
+
+CFList
+nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const 
+                      CFList& LCs, CFList& diophant, CFArray& Pi, int liftBound,
+                      int bivarLiftBound, bool& bad)
+{
+  CFList bufFactors2= factors;
+
+  Variable y= Variable (2);
+  for (CFListIterator i= bufFactors2; i.hasItem(); i++)
+    i.getItem()= mod (i.getItem(), y);
+
+  CanonicalForm bufF= F;
+  bufF= mod (bufF, y);
+  bufF= mod (bufF, Variable (3));
+
+  diophant= diophantine (bufF, bufFactors2);
+
+  CFMatrix M= CFMatrix (liftBound, bufFactors2.length() - 1);
+
+  Pi= CFArray (bufFactors2.length() - 1);
+
+  CFArray bufFactors= CFArray (bufFactors2.length());
+  CFListIterator j= LCs;
+  int i= 0;
+  for (CFListIterator k= factors; k.hasItem(); j++, k++, i++)
+    bufFactors[i]= replaceLC (k.getItem(), j.getItem());
+
+  //initialise Pi
+  Variable v= Variable (3);
+  CanonicalForm yToL= power (y, bivarLiftBound);
+  if (degree (bufFactors[0], v) > 0 && degree (bufFactors [1], v) > 0)
+  {
+    M (1, 1)= mulMod2 (bufFactors [0] [0], bufFactors[1] [0], yToL);
+    Pi [0]= M (1,1) + (mulMod2 (bufFactors [0] [1], bufFactors[1] [0], yToL) + 
+                       mulMod2 (bufFactors [0] [0], bufFactors [1] [1], yToL))*v;
+  }
+  else if (degree (bufFactors[0], v) > 0)
+  {
+    M (1,1)= mulMod2 (bufFactors [0] [0], bufFactors [1], yToL);
+    Pi [0]=  M(1,1) + mulMod2 (bufFactors [0] [1], bufFactors[1], yToL)*v;
+  }
+  else if (degree (bufFactors[1], v) > 0)
+  {
+    M (1,1)= mulMod2 (bufFactors [0], bufFactors [1] [0], yToL);
+    Pi [0]= M (1,1) + mulMod2 (bufFactors [0], bufFactors[1] [1], yToL)*v;
+  }
+  else
+  {
+    M (1,1)= mulMod2 (bufFactors [0], bufFactors [1], yToL);
+    Pi [0]= M (1,1);
+  }
+
+  for (i= 1; i < Pi.size(); i++)
+  {
+    if (degree (Pi[i-1], v) > 0 && degree (bufFactors [i+1], v) > 0)
+    {
+      M (1,i+1)= mulMod2 (Pi[i-1] [0], bufFactors[i+1] [0], yToL);
+      Pi [i]= M (1,i+1) + (mulMod2 (Pi[i-1] [1], bufFactors[i+1] [0], yToL) + 
+                       mulMod2 (Pi[i-1] [0], bufFactors [i+1] [1], yToL))*v;
+    }
+    else if (degree (Pi[i-1], v) > 0)
+    {
+      M (1,i+1)= mulMod2 (Pi[i-1] [0], bufFactors [i+1], yToL);
+      Pi [i]=  M(1,i+1) + mulMod2 (Pi[i-1] [1], bufFactors[i+1], yToL)*v;
+    }
+    else if (degree (bufFactors[i+1], v) > 0)
+    {
+      M (1,i+1)= mulMod2 (Pi[i-1], bufFactors [i+1] [0], yToL);
+      Pi [i]= M (1,i+1) + mulMod2 (Pi[i-1], bufFactors[i+1] [1], yToL)*v;
+    }
+    else
+    {
+      M (1,i+1)= mulMod2 (Pi [i-1], bufFactors [i+1], yToL);
+      Pi [i]= M (1,i+1);
+    }
+  }
+
+  CFList products;
+  bufF= mod (F, Variable (3));
+  for (CFListIterator k= factors; k.hasItem(); k++)
+    products.append (bufF/k.getItem());
+
+  CFList MOD= CFList (power (v, liftBound));
+  MOD.insert (yToL);
+  for (int d= 1; d < liftBound; d++)
+  {
+    henselStep2 (F, factors, bufFactors, diophant, M, Pi, products, d, MOD, bad);
+    if (bad)
+      return CFList();
+  }
+
+  CFList result;
+  for (i= 0; i < factors.length(); i++)
+    result.append (bufFactors[i]);
+  return result;
+}
+
+CFList
+nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
+                    CFList& diophant, CFArray& Pi, CFMatrix& M, const int lOld,
+                    int& lNew, const CFList& MOD, bool& noOneToOne
+                   )
+{
+
+  int k= 0;
+  CFArray bufFactors= CFArray (factors.length());
+  CFListIterator j= LCs;
+  for (CFListIterator i= factors; i.hasItem(); i++, j++, k++)
+    bufFactors [k]= replaceLC (i.getItem(), j.getItem());
+
+  Variable y= F.getLast().mvar();
+  Variable x= F.getFirst().mvar();
+  CanonicalForm xToLOld= power (x, lOld);
+
+  Pi [0]= mod (Pi[0], xToLOld);
+  M (1, 1)= Pi [0];
+
+  if (degree (bufFactors[0], y) > 0 && degree (bufFactors [1], y) > 0)
+    Pi [0] += (mulMod (bufFactors [0] [1], bufFactors[1] [0], MOD) + 
+                        mulMod (bufFactors [0] [0], bufFactors [1] [1], MOD))*y;
+  else if (degree (bufFactors[0], y) > 0)
+    Pi [0] += mulMod (bufFactors [0] [1], bufFactors[1], MOD)*y;
+  else if (degree (bufFactors[1], y) > 0)
+    Pi [0] += mulMod (bufFactors [0], bufFactors[1] [1], MOD)*y;
+
+  for (int i= 1; i < Pi.size(); i++)
+  {
+    Pi [i]= mod (Pi [i], xToLOld);
+    M (1, i + 1)= Pi [i];
+
+    if (degree (Pi[i-1], y) > 0 && degree (bufFactors [i+1], y) > 0)
+      Pi [i] += (mulMod (Pi[i-1] [1], bufFactors[i+1] [0], MOD) +
+                 mulMod (Pi[i-1] [0], bufFactors [i+1] [1], MOD))*y;
+    else if (degree (Pi[i-1], y) > 0)
+      Pi [i] += mulMod (Pi[i-1] [1], bufFactors[i+1], MOD)*y;
+    else if (degree (bufFactors[i+1], y) > 0)
+      Pi [i] += mulMod (Pi[i-1], bufFactors[i+1] [1], MOD)*y;
+  }
+
+  CFList products;
+  CanonicalForm bufF= F.getFirst();
+
+  for (int i= 0; i < bufFactors.size(); i++)
+  {
+    if (degree (bufFactors[i], y) > 0)
+    {
+      if (!fdivides (bufFactors[i] [0], bufF))
+      {
+        noOneToOne= true;
+        return factors;
+      }
+      products.append (bufF/bufFactors[i] [0]);
+    }
+    else
+    {
+      if (!fdivides (bufFactors[i], bufF))
+      {
+        noOneToOne= true;
+        return factors;
+      }
+      products.append (bufF/bufFactors[i]);
+    }
+  }
+
+  for (int d= 1; d < lNew; d++)
+  {
+    henselStep2 (F.getLast(), factors, bufFactors, diophant, M, Pi, products, d,
+                 MOD, noOneToOne);
+    if (noOneToOne)
+      return CFList();
+  }
+
+  CFList result;
+  for (k= 0; k < factors.length(); k++)
+    result.append (bufFactors[k]);
+  return result;
+}
+
+CFList
+nonMonicHenselLift (const CFList& eval, const CFList& factors,
+                    CFList* const& LCs, CFList& diophant, CFArray& Pi,
+                    int* liftBound, int length, bool& noOneToOne
+                   )
+{
+  CFList bufDiophant= diophant;
+  CFList buf= factors;
+  CFArray bufPi= Pi;
+  CFMatrix M= CFMatrix (liftBound[1], factors.length() - 1);
+  int k= 0;
+
+  CFList result=
+  nonMonicHenselLift23 (eval.getFirst(), factors, LCs [0], diophant, bufPi,
+                        liftBound[1], liftBound[0], noOneToOne);
+
+  if (noOneToOne)
+    return CFList();
+
+  if (eval.length() == 1)
+    return result;
+
+  k++;
+  CFList MOD;
+  for (int i= 0; i < 2; i++)
+    MOD.append (power (Variable (i + 2), liftBound[i]));
+
+  CFListIterator j= eval;
+  CFList bufEval;
+  bufEval.append (j.getItem());
+  j++;
+
+  for (int i= 2; i <= length && j.hasItem(); i++, j++, k++)
+  {
+    bufEval.append (j.getItem());
+    M= CFMatrix (liftBound[i], factors.length() - 1);
+    result= nonMonicHenselLift (bufEval, result, LCs [i-1], diophant, bufPi, M,
+                                liftBound[i-1], liftBound[i], MOD, noOneToOne);
+    if (noOneToOne)
+      return result;
+    MOD.append (power (Variable (i + 2), liftBound[i]));
+    bufEval.removeFirst();
+  }
+
   return result;
 }
 

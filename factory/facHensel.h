@@ -242,7 +242,9 @@ henselLift12 (const CanonicalForm& F, ///< [in] compressed, bivariate poly
               int l,                  ///< [in] lifting precision
               CFArray& Pi,            ///< [in,out] stores intermediate results
               CFList& diophant,       ///< [in,out] result of diophantine()
-              CFMatrix& M             ///< [in,out] stores intermediate results
+              CFMatrix& M,            ///< [in,out] stores intermediate results
+              bool sort= true         ///< [in] sort factors by degree in
+                                      ///< Variable(1)
              );
 
 /// resume Hensel lift from univariate to bivariate. Assumes factors are lifted
@@ -382,7 +384,9 @@ henselLift (const CFList& eval,    ///< [in] a list of polynomials the last
             const CFList& factors, ///< [in] bivariate factors, including
                                    ///< leading coefficient
             const int* l,          ///< [in] lifting bounds
-            const int lLength     ///< [in] length of l
+            const int lLength,     ///< [in] length of l
+            bool sort= true        ///< [in] sort factors by degree in
+                                   ///< Variable(1)
            );
 
 /// two factor Hensel lifting from univariate to bivariate, factors need not to
@@ -421,9 +425,39 @@ henselLift2 (const CFList& eval,   ///< [in] a list of polynomials the last
              const CFList& LCs2,   ///< [in] a list of evaluated LC of second
                                    ///< factor
              const CFArray& Pi,    ///< [in] intermediate result
-             const CFList& diophant///< [in] result of diophantine
+             const CFList& diophant,///< [in] result of diophantine
+             bool& noOneToOne      ///< [in,out] check for one to one
+                                   ///< correspondence
             );
 
+/// Hensel lifting of non monic factors, needs correct leading coefficients of 
+/// factors and a one to one corresponds between bivariate and multivariate
+/// factors to succeed
+///
+/// @return @a nonMonicHenselLift returns a list of lifted factors
+/// such that prod (factors) == eval.getLast() if there is a one to one 
+/// correspondence
+CFList
+nonMonicHenselLift (const CFList& eval,    ///< [in] a list of polys the last
+                                           ///< element is a compressed 
+                                           ///< multivariate poly, last but one
+                                           ///< element equals the last elements
+                                           ///< modulo its main variable and so 
+                                           ///< on. The first element is a 
+                                           ///< compressed poly in 3 variables
+                    const CFList& factors, ///< [in] a list of bivariate factors
+                    CFList* const& LCs,    ///< [in] leading coefficients,
+                                           ///< evaluated in the same way as 
+                                           ///< eval
+                    CFList& diophant,      ///< [in, out] solution of univariate
+                                           ///< diophantine equation 
+                    CFArray& Pi,           ///< [in, out] buffer intermediate
+                                           ///< results
+                    int* liftBound,        ///< [in] lifting bounds
+                    int length,            ///< [in] length of lifting bounds
+                    bool& noOneToOne       ///< [in, out] check for one to one
+                                           ///< correspondence
+                   );
 #endif
 /* FAC_HENSEL_H */
 
