@@ -45,6 +45,8 @@ inline
 CFList FpSqrfFactorize (const CanonicalForm & F ///< [in] a multivariate poly
                        )
 {
+  if (getNumVars (F) == 2)
+    return FpBiSqrfFactorize (F);
   ExtensionInfo info= ExtensionInfo (false);
   CFList result= multiFactorize (F, info);
   result.insert (Lc(F));
@@ -61,6 +63,8 @@ CFList FqSqrfFactorize (const CanonicalForm & F, ///< [in] a multivariate poly
                         const Variable& alpha    ///< [in] algebraic variable
                        )
 {
+  if (getNumVars (F) == 2)
+    return FqBiSqrfFactorize (F, alpha);
   ExtensionInfo info= ExtensionInfo (alpha, false);
   CFList result= multiFactorize (F, info);
   result.insert (Lc(F));
@@ -78,6 +82,8 @@ CFList GFSqrfFactorize (const CanonicalForm & F ///< [in] a multivariate poly
 {
   ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
+  if (getNumVars (F) == 2)
+    return GFBiSqrfFactorize (F);
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
   CFList result= multiFactorize (F, info);
   result.insert (Lc(F));
@@ -93,6 +99,8 @@ inline
 CFFList FpFactorize (const CanonicalForm& F ///< [in] a multivariate poly
                     )
 {
+  if (getNumVars (F) == 2)
+    return FpBiFactorize (F);
   ExtensionInfo info= ExtensionInfo (false);
   Variable a= Variable (1);
   CanonicalForm LcF= Lc (F);
@@ -138,6 +146,8 @@ CFFList FqFactorize (const CanonicalForm& F, ///< [in] a multivariate poly
                      const Variable& alpha   ///< [in] algebraic variable
                     )
 {
+  if (getNumVars (F) == 2)
+    return FqBiFactorize (F, alpha);
   ExtensionInfo info= ExtensionInfo (alpha, false);
   CanonicalForm LcF= Lc (F);
   CanonicalForm pthRoot, A;
@@ -184,6 +194,8 @@ CFFList GFFactorize (const CanonicalForm& F ///< [in] a multivariate poly
 {
   ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
+  if (getNumVars (F) == 2)
+    return GFBiFactorize (F);
   Variable a= Variable (1);
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
   CanonicalForm LcF= Lc (F);
