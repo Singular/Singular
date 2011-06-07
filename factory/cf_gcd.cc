@@ -19,6 +19,8 @@
 #include "algext.h"
 #include "fieldGCD.h"
 #include "cf_gcd_smallp.h"
+#include "cf_map_ext.h"
+#include "cf_util.h"
 
 #ifdef HAVE_NTL
 #include <NTL/ZZX.h>
@@ -42,9 +44,9 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
 {
     int count = 0;
     // assume polys have same level;
-    CFRandom * sample = CFRandomFactory::generate();
-    REvaluation e( 2, tmax( f.level(), g.level() ), *sample );
-    delete sample;
+
+    Variable v= Variable (1);
+    bool algExtension= (hasFirstAlgVar (f, v) || hasFirstAlgVar (g, v));
     CanonicalForm lcf, lcg;
     if ( swap )
     {
@@ -56,14 +58,7 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
         lcf = LC( f, Variable(1) );
         lcg = LC( g, Variable(1) );
     }
-    #define TEST_ONE_MAX 50
-    while ( ( e( lcf ).isZero() || e( lcg ).isZero() ) && count < TEST_ONE_MAX )
-    {
-        e.nextpoint();
-        count++;
-    }
-    if ( count == TEST_ONE_MAX )
-        return false;
+
     CanonicalForm F, G;
     if ( swap )
     {
@@ -75,9 +70,164 @@ gcd_test_one ( const CanonicalForm & f, const CanonicalForm & g, bool swap )
         F = f;
         G = g;
     }
-    if ( e(F).taildegree() > 0 && e(G).taildegree() > 0 )
+
+    #define TEST_ONE_MAX 50
+    int p= getCharacteristic();
+    bool passToGF= false;
+    int k= 1;
+    if (p > 0 && p < TEST_ONE_MAX && CFFactory::gettype() != GaloisFieldDomain && !algExtension)
+    {
+      if (p == 2)
+        setCharacteristic (2, 6, 'Z');
+      else if (p == 3)
+        setCharacteristic (3, 4, 'Z');
+      else if (p == 5 || p == 7)
+        setCharacteristic (p, 3, 'Z');
+      else
+        setCharacteristic (p, 2, 'Z');
+      passToGF= true;
+    }
+    else if (p > 0 && CFFactory::gettype() == GaloisFieldDomain && ipower (p , getGFDegree()) < TEST_ONE_MAX)
+    {
+      k= getGFDegree();
+      if (ipower (p, 2*k) > TEST_ONE_MAX)
+        setCharacteristic (p, 2*k, gf_name);
+      else
+        setCharacteristic (p, 3*k, gf_name);
+      F= GFMapUp (F, k);
+      G= GFMapUp (G, k);
+      lcf= GFMapUp (lcf, k);
+      lcg= GFMapUp (lcg, k);
+    }
+    else if (p > 0 && p < TEST_ONE_MAX && algExtension)
+    {
+      bool extOfExt= false;
+      int d= degree (getMipo (v));
+      CFList source, dest;
+      Variable v2;
+      CanonicalForm primElem, imPrimElem;
+      if (p == 2 && d < 6)
+      {
+        zz_p::init (p);
+        bool primFail= false;
+        Variable vBuf;
+        primElem= primitiveElement (v, vBuf, primFail);
+        ASSERT (!primFail, "failure in integer factorizer");
+        if (d < 3)
+        {
+          zz_pX NTLIrredpoly;
+          BuildIrred (NTLIrredpoly, d*3);
+          CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+          v2= rootOf (newMipo);
+        }
+        else
+        {
+          zz_pX NTLIrredpoly;
+          BuildIrred (NTLIrredpoly, d*2);
+          CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+          v2= rootOf (newMipo);
+        }
+        imPrimElem= mapPrimElem (primElem, v, v2);
+        extOfExt= true;
+      }
+      else if ((p == 3 && d < 4) || ((p == 5 || p == 7) && d < 3))
+      {
+        zz_p::init (p);
+        bool primFail= false;
+        Variable vBuf;
+        primElem= primitiveElement (v, vBuf, primFail);
+        ASSERT (!primFail, "failure in integer factorizer");
+        zz_pX NTLIrredpoly;
+        BuildIrred (NTLIrredpoly, d*2);
+        CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+        v2= rootOf (newMipo);
+        imPrimElem= mapPrimElem (primElem, v, v2);
+        extOfExt= true;
+      }
+      if (extOfExt)
+      {
+        F= mapUp (F, v, v2, primElem, imPrimElem, source, dest);
+        G= mapUp (G, v, v2, primElem, imPrimElem, source, dest);
+        lcf= mapUp (lcf, v, v2, primElem, imPrimElem, source, dest);
+        lcg= mapUp (lcg, v, v2, primElem, imPrimElem, source, dest);
+        v= v2;
+      }
+    }
+
+    CFRandom * sample;
+    if ((!algExtension && p > 0) || p == 0)
+      sample = CFRandomFactory::generate();
+    else
+      sample = AlgExtRandomF (v).clone();
+
+    REvaluation e( 2, tmax( f.level(), g.level() ), *sample );
+    delete sample;
+
+    if (passToGF)
+    {
+      lcf= lcf.mapinto();
+      lcg= lcg.mapinto();
+    }
+
+    CanonicalForm eval1, eval2;
+    if (passToGF)
+    {
+      eval1= e (lcf);
+      eval2= e (lcg);
+    }
+    else
+    {
+      eval1= e (lcf);
+      eval2= e (lcg);
+    }
+
+    while ( ( eval1.isZero() || eval2.isZero() ) && count < TEST_ONE_MAX )
+    {
+        e.nextpoint();
+        count++;
+        eval1= e (lcf);
+        eval2= e (lcg);
+    }
+    if ( count >= TEST_ONE_MAX )
+    {
+        if (passToGF)
+          setCharacteristic (p);
+        if (k > 1)
+          setCharacteristic (p, k, gf_name);
         return false;
-    return gcd( e( F ), e( G ) ).degree() < 1;
+    }
+
+
+    if (passToGF)
+    {
+      F= F.mapinto();
+      G= G.mapinto();
+      eval1= e (F);
+      eval2= e (G);
+    }
+    else
+    {
+      eval1= e (F);
+      eval2= e (G);
+    }
+
+    if ( eval1.taildegree() > 0 && eval2.taildegree() > 0 )
+    {
+        if (passToGF)
+          setCharacteristic (p);
+        if (k > 1)
+          setCharacteristic (p, k, gf_name);
+        return false;
+    }
+
+    CanonicalForm c= gcd (eval1, eval2);
+    bool result= c.degree() < 1;
+
+    if (passToGF)
+      setCharacteristic (p);
+    if (k > 1)
+      setCharacteristic (p, k, gf_name);
+    return result;
 }
 
 //{{{ static CanonicalForm icontent ( const CanonicalForm & f, const CanonicalForm & c )
@@ -412,11 +562,24 @@ gcd_poly_p( const CanonicalForm & f, const CanonicalForm & g )
         bi = 1;
     else
         bi = -1;
+    int maxNumVars= tmax (getNumVars (pi), getNumVars (pi1));
+    CanonicalForm oldPi= pi, oldPi1= pi1;
     while ( degree( pi1, v ) > 0 )
     {
+        if (!(pi.isUnivariate() && pi1.isUnivariate()))
+        {
+          if (size (pi)/maxNumVars > 500 || size (pi1)/maxNumVars > 500)
+          {
+            On (SW_USE_FF_MOD_GCD);
+            C *= gcd (oldPi, oldPi1);
+            Off (SW_USE_FF_MOD_GCD);
+            return C;
+          }
+        }
         pi2 = psr( pi, pi1, v );
         pi2 = pi2 / bi;
         pi = pi1; pi1 = pi2;
+        maxNumVars= tmax (getNumVars (pi), getNumVars (pi1));
         if ( degree( pi1, v ) > 0 )
         {
             delta = degree( pi, v ) - degree( pi1, v );
