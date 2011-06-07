@@ -74,19 +74,6 @@ CFFList GFSqrf (const CanonicalForm& F ///< [in] a poly
   return result;
 }
 
-/// squarefree factorization of @a F wrt @x
-///
-/// @return a list of factors of @a F which are squarefree wrt x
-static inline
-CFFList
-sqrfPosDer (const CanonicalForm & F, ///< [in] some poly
-            const Variable & x,      ///< [in] a variable s.t. deriv (F, x) != 0
-            const int & k,           ///< [in] GFDegree or 1
-            const Variable & alpha,  ///< [in] algebraic variable or Variable(1)
-            CanonicalForm & c        ///< [in,out] F divided by the product of
-                                     ///< the result
-           );
-
 /// squarefree part of @a F/g, where g is the product of those squarefree
 /// factors whose multiplicity is 0 mod p, if @a F a pth power pthPower= F.
 ///
@@ -98,16 +85,6 @@ sqrfPart (const CanonicalForm& F,  ///< [in] a poly
           CanonicalForm& pthPower, ///< [in,out] returns F is F is a pthPower
           const Variable& alpha    ///< [in] algebraic variable
          );
-
-/// pth root extraction
-///
-/// @return @a pthRoot returns a pth root of @a F
-/// @sa maxpthRoot()
-static inline
-CanonicalForm
-pthRoot (const CanonicalForm & F, ///< [in] a poly which is a pth power
-         const int & q            ///< [in] size of the field
-        );
 
 /// p^l-th root extraction, where l is maximal
 ///

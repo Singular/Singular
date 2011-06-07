@@ -52,7 +52,7 @@ int ilog2 (int a)
 
 void factoryError_intern(const char *s)
 {
-  fprintf(stderr,s);
+  fputs(s,stderr);
   abort();
 }
 void (*factoryError)(const char *s) = factoryError_intern;

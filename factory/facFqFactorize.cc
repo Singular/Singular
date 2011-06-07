@@ -97,7 +97,6 @@ myContent (const CanonicalForm& F, const Variable& x)
   }
   CFList L;
   Variable alpha;
-  bool algExt= hasFirstAlgVar (G, alpha);
   for (CFIterator i= G; i.hasTerms(); i++)
     L.append (i.coeff());
   if (L.length() == 2)
@@ -642,7 +641,6 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
     v[i]= 0;
   bool noSubset= false;
   CFArray TT;
-  int subsetDeg;
   TT= copy (factors);
   bool recombination= false;
   bool trueFactor= false;
@@ -769,7 +767,6 @@ factorRecombination (const CanonicalForm& F, const CFList& factors,
     v[i]= 0;
   bool noSubset= false;
   CFArray TT;
-  int subsetDeg;
   TT= copy (factors);
   Variable y= F.level() - 1;
   bool recombination= false;
@@ -1304,12 +1301,10 @@ henselLiftAndEarly (CanonicalForm& A, CFList& MOD, int*& liftBounds, bool&
   CFArray Pi;
   int smallFactorDeg= 11; //tunable parameter
   CFList result;
-  int newLiftBound= 0;
   int adaptedLiftBound= 0;
   int liftBound= liftBounds[1];
 
   earlySuccess= false;
-  bool earlyReconst= false;
   CFList earlyReconstFactors;
   CFListIterator j= Aeval;
   j++;
@@ -1593,7 +1588,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   Variable beta= info.getBeta();
   CanonicalForm gamma= info.getGamma();
   CanonicalForm delta= info.getDelta();
-  int k= info.getGFDegree();
   bool extension= info.isInExtension();
   bool GF= (CFFactory::gettype() == GaloisFieldDomain);
   //univariate case
@@ -1800,7 +1794,6 @@ multiFactorize (const CanonicalForm& F, const ExtensionInfo& info)
   A= shift2Zero (A, Aeval, evaluation);
 
   int* liftBounds;
-  int liftBoundsLength= F.level() - 1;
   liftBounds= liftingBounds (A, lift);
 
   CFList MOD;

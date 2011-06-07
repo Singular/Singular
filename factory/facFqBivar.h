@@ -207,7 +207,6 @@ CFFList FpBiFactorize (const CanonicalForm & G ///< [in] a bivariate poly
                       )
 {
   ExtensionInfo info= ExtensionInfo (false);
-  bool GF= false;
   CFMap N;
   CanonicalForm F= compress (G, N);
   CanonicalForm LcF= Lc (F);
@@ -289,7 +288,6 @@ CFFList FqBiFactorize (const CanonicalForm & G, ///< [in] a bivariate poly
                       )
 {
   ExtensionInfo info= ExtensionInfo (alpha, false);
-  bool GF= false;
   CFMap N;
   CanonicalForm F= compress (G, N);
   CanonicalForm LcF= Lc (F);
@@ -374,7 +372,6 @@ CFFList GFBiFactorize (const CanonicalForm & G ///< [in] a bivariate poly
   ASSERT (CFFactory::gettype() == GaloisFieldDomain,
           "GF as base field expected");
   ExtensionInfo info= ExtensionInfo (getGFDegree(), gf_name, false);
-  bool GF= true;
   CFMap N;
   CanonicalForm F= compress (G, N);
   CanonicalForm LcF= Lc (F);
@@ -490,13 +487,13 @@ uniFactorizer (const CanonicalForm& A, ///< [in] squarefree univariate poly
 /// @sa factorRecombination(), extEarlyFactorDetection()
 inline CFList
 extFactorRecombination (
-         CFList& factors,          ///< [in,out] list of lifted factors that are 
+         CFList& factors,          ///< [in,out] list of lifted factors that are
                                    ///< monic wrt Variable (1),
                                    ///< original factors-factors found
          CanonicalForm& F,         ///< [in,out] poly to be factored,
                                    ///< F/factors found
          const CanonicalForm& M,   ///< [in] Variable (2)^liftBound
-         const ExtensionInfo& info,///< [in] contains information about 
+         const ExtensionInfo& info,///< [in] contains information about
                                    ///< extension
          DegreePattern& degs,
          const CanonicalForm& eval,///< [in] evaluation point
@@ -504,7 +501,7 @@ extFactorRecombination (
                                    ///< of size s
          int thres                 ///< [in] threshold for the size of subsets
                                    ///< which are checked, for a full factor
-                                   ///< recombination choose 
+                                   ///< recombination choose
                                    ///< thres= factors.length()/2
                        );
 
@@ -524,7 +521,7 @@ factorRecombination (
                                        ///< subsets of size s
                 int thres              ///< [in] threshold for the size of
                                        ///< subsets which are checked, for a
-                                       ///< full factor recombination choose 
+                                       ///< full factor recombination choose
                                        ///< thres= factors.length()/2
                     );
 

@@ -1,11 +1,11 @@
 /*****************************************************************************\
- * Computer Algebra System SINGULAR    
+ * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file facIrredTest.cc
- * 
+ *
  * This file implements a probabilistic irreducibility test for polynomials over
  * Z/p.
- * 
+ *
  * @author Martin Lee
  *
  * @internal @version \$Id$
@@ -23,7 +23,6 @@
 //returns 0 if number of zeros/k >= l
 double numZeros (const CanonicalForm& F, int k)
 {
-  int p= getCharacteristic();
   int result= 0;
 
   FFRandom FFgen;
@@ -31,7 +30,7 @@ double numZeros (const CanonicalForm& F, int k)
   for (int i= 0; i < k; i++)
   {
     buf= F;
-    for (int j= F.level(); j > 0; j++) 
+    for (int j= F.level(); j > 0; j++)
       buf= buf (FFgen.generate(), j);
     if (buf.isZero())
       result++;
@@ -98,7 +97,6 @@ int probIrredTest (const CanonicalForm& F, double error)
 
   int trials= (int) floor (pow (sqrtTrials, 2.0));
 
-  double l= 2.0;
   double experimentalNumZeros= numZeros (G, trials);
 
   double pmiddle= sqrt (p1*p2);

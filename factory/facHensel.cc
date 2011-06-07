@@ -371,7 +371,6 @@ reverseSubst (const zz_pEX& F, const zz_pEX& G, int d, int k,
   int deggSubLg= degg-lg;
   int repLengthBuf2;
   int repLengthBuf1;
-  int ii;
   zz_pE zzpEZero= zz_pE();
 
   while (degf >= lf || lg >= 0)
@@ -487,7 +486,6 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
   int deggSubLg= degg-lg;
   int repLengthBuf2;
   int repLengthBuf1;
-  int ii;
   zz_p zzpZero= zz_p();
   while (degf >= lf || lg >= 0)
   {
@@ -505,7 +503,7 @@ reverseSubst (const zz_pX& F, const zz_pX& G, int d, int k)
     buf1.normalize();
 
     repLengthBuf1= buf1.rep.length();
-    
+
     if (deggSubLg >= d - 1)
       repLengthBuf2= d - 1;
     else if (deggSubLg < 0)
@@ -647,7 +645,7 @@ CanonicalForm reverseSubstFp (const zz_pX& F, int d)
 
 // assumes input to be reduced mod M and to be an element of Fq not Fp
 CanonicalForm
-mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const 
+mulMod2NTLFpReci (const CanonicalForm& F, const CanonicalForm& G, const
                   CanonicalForm& M)
 {
   int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
@@ -675,8 +673,6 @@ mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
   CanonicalForm A= F;
   CanonicalForm B= G;
 
-  int p= getCharacteristic();
-
   int degAx= degree (A, 1);
   int degAy= degree (A, 2);
   int degBx= degree (B, 1);
@@ -700,7 +696,7 @@ mulMod2NTLFp (const CanonicalForm& F, const CanonicalForm& G, const
 
 // assumes input to be reduced mod M and to be an element of Fq not Fp
 CanonicalForm
-mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const 
+mulMod2NTLFqReci (const CanonicalForm& F, const CanonicalForm& G, const
                   CanonicalForm& M, const Variable& alpha)
 {
   int d1= tmax (degree (F, 1), degree (G, 1)) + 1;
@@ -778,21 +774,21 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
   int degF= degree (F, y);
   int degG= degree (G, y);
 
-  if ((degF < 1 && degG < 1) && (F.isUnivariate() && G.isUnivariate()) && 
+  if ((degF < 1 && degG < 1) && (F.isUnivariate() && G.isUnivariate()) &&
       (F.level() == G.level()))
-  { 
+  {
     CanonicalForm result= mulNTL (F, G);
     return mod (result, M);
   }
   else if (degF <= 1 && degG <= 1)
-  { 
+  {
     CanonicalForm result= F*G;
     return mod (result, M);
   }
 
   int sizeF= size (F);
   int sizeG= size (G);
-  
+
   int fallBackToNaive= 50;
   if (sizeF < fallBackToNaive || sizeG < fallBackToNaive)
     return mod (F*G, M);
@@ -1647,7 +1643,7 @@ henselStep12 (const CanonicalForm& F, const CFList& factors,
       {
         if (k != j - k + 1)
         {
-          if ((one.hasTerms() && one.exp() == j - k + 1) && 
+          if ((one.hasTerms() && one.exp() == j - k + 1) &&
               (two.hasTerms() && two.exp() == j - k + 1))
           {
             tmp[l] += mulNTL ((bufFactors[l + 1] [k] + one.coeff()), (Pi[l - 1] [k] +
@@ -1693,7 +1689,7 @@ henselLift12 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
   int i= 1;
   if (j.hasItem())
     j++;
-  for (j; j.hasItem(); j++, i++)
+  for (; j.hasItem(); j++, i++)
   {
     Pi [i]= mulNTL (Pi [i - 1], j.getItem());
     M (1, i + 1)= Pi [i];
@@ -2054,7 +2050,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     {
       if (k != j - k + 1)
       {
-        if ((one.hasTerms() && one.exp() == j - k + 1) && 
+        if ((one.hasTerms() && one.exp() == j - k + 1) &&
             (two.hasTerms() && two.exp() == j - k + 1))
         {
           tmp[0] += mulMod ((bufFactors[0] [k] + one.coeff()),
@@ -2140,7 +2136,7 @@ henselStep (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
       {
         if (k != j - k + 1)
         {
-          if ((one.hasTerms() && one.exp() == j - k + 1) && 
+          if ((one.hasTerms() && one.exp() == j - k + 1) &&
               (two.hasTerms() && two.exp() == j - k + 1))
           {
             tmp[l] += mulMod ((bufFactors[l + 1] [k] + one.coeff()),
@@ -2178,7 +2174,6 @@ henselLift23 (const CFList& eval, const CFList& factors, const int* l, CFList&
 {
   CFList buf= factors;
   int k= 0;
-  int liftBound;
   int liftBoundBivar= l[k];
   diophant= biDiophantine (eval.getFirst(), buf, liftBoundBivar);
   CFList MOD;
@@ -2200,7 +2195,7 @@ henselLift23 (const CFList& eval, const CFList& factors, const int* l, CFList&
   k= 1;
   if (i.hasItem())
     i++;
-  for (i; i.hasItem(); i++, k++)
+  for (; i.hasItem(); i++, k++)
   {
     Pi [k]= mulMod (Pi [k - 1], i.getItem(), MOD);
     M (1, k + 1)= Pi [k];
@@ -2267,7 +2262,7 @@ henselLift (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
   k= 1;
   if (i.hasItem())
     i++;
-  for (i; i.hasItem(); i++, k++)
+  for (; i.hasItem(); i++, k++)
   {
     Pi [k]= mod (Pi [k], xToLOld);
     M (1, k + 1)= Pi [k];
@@ -2346,7 +2341,7 @@ henselStep122 (const CanonicalForm& F, const CFList& factors,
     if (degree (bufFactors[k], x) > 0)
       buf[k]= modNTL (buf[k], bufFactors[k] [0]);
     else
-      buf[k]= modNTL (buf[k], bufFactors[k]); 
+      buf[k]= modNTL (buf[k], bufFactors[k]);
   }
 
   for (k= 0; k < factors.length(); k++)
@@ -2498,11 +2493,11 @@ henselLift122 (const CanonicalForm& F, CFList& factors, int l, CFArray& Pi,
   return;
 }
 
-/// solve \f$ E=sum_{i= 1}^{r}{\sigma_{i}prod_{j=1, j\neq i}^{r}{f_{i}}}\f$ 
+/// solve \f$ E=sum_{i= 1}^{r}{\sigma_{i}prod_{j=1, j\neq i}^{r}{f_{i}}}\f$
 /// mod M, products contains \f$ prod_{j=1, j\neq i}^{r}{f_{i}}} \f$
 static inline
 CFList
-diophantine (const CFList& recResult, const CFList& factors, 
+diophantine (const CFList& recResult, const CFList& factors,
              const CFList& products, const CFList& M, const CanonicalForm& E,
              bool& bad)
 {
@@ -2646,7 +2641,7 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     uIZeroJ= mulMod (bufFactors[0], buf[1], MOD);
   else
     uIZeroJ= 0;
-  Pi [0] += xToJ*uIZeroJ; 
+  Pi [0] += xToJ*uIZeroJ;
 
   CFArray tmp= CFArray (factors.length() - 1);
   for (k= 0; k < factors.length() - 1; k++)
@@ -2662,7 +2657,7 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
     {
       if (k != j - k + 1)
       {
-        if ((one.hasTerms() && one.exp() == j - k + 1) && 
+        if ((one.hasTerms() && one.exp() == j - k + 1) &&
             (two.hasTerms() && two.exp() == j - k + 1))
         {
           tmp[0] += mulMod ((bufFactors[0] [k] + one.coeff()),
@@ -2767,7 +2762,7 @@ henselStep2 (const CanonicalForm& F, const CFList& factors, CFArray& bufFactors,
           }
           else if (two.hasTerms() && two.exp() == j - k + 1)
           {
-            tmp[l] += mulMod (bufFactors[l + 1] [k], 
+            tmp[l] += mulMod (bufFactors[l + 1] [k],
                       (Pi[l - 1] [k] + two.coeff()), MOD) - M (k + 1, l + 1);
             two++;
            }
@@ -2897,7 +2892,7 @@ henselLift2 (const CFList& F, const CFList& factors, const CFList& MOD, CFList&
   M (1, 1)= Pi [0];
 
   if (degree (bufFactors[0], y) > 0 && degree (bufFactors [1], y) > 0)
-    Pi [0] += (mulMod (bufFactors [0] [1], bufFactors[1] [0], MOD) + 
+    Pi [0] += (mulMod (bufFactors [0] [1], bufFactors[1] [0], MOD) +
                         mulMod (bufFactors [0] [0], bufFactors [1] [1], MOD))*y;
   else if (degree (bufFactors[0], y) > 0)
     Pi [0] += mulMod (bufFactors [0] [1], bufFactors[1], MOD)*y;
@@ -2993,7 +2988,7 @@ henselLift2 (const CFList& eval, const CFList& factors, int* l, const int
 }
 
 CFList
-nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const 
+nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
                       CFList& LCs, CFList& diophant, CFArray& Pi, int liftBound,
                       int bivarLiftBound, bool& bad)
 {
@@ -3025,7 +3020,7 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
   if (degree (bufFactors[0], v) > 0 && degree (bufFactors [1], v) > 0)
   {
     M (1, 1)= mulMod2 (bufFactors [0] [0], bufFactors[1] [0], yToL);
-    Pi [0]= M (1,1) + (mulMod2 (bufFactors [0] [1], bufFactors[1] [0], yToL) + 
+    Pi [0]= M (1,1) + (mulMod2 (bufFactors [0] [1], bufFactors[1] [0], yToL) +
                        mulMod2 (bufFactors [0] [0], bufFactors [1] [1], yToL))*v;
   }
   else if (degree (bufFactors[0], v) > 0)
@@ -3049,7 +3044,7 @@ nonMonicHenselLift23 (const CanonicalForm& F, const CFList& factors, const
     if (degree (Pi[i-1], v) > 0 && degree (bufFactors [i+1], v) > 0)
     {
       M (1,i+1)= mulMod2 (Pi[i-1] [0], bufFactors[i+1] [0], yToL);
-      Pi [i]= M (1,i+1) + (mulMod2 (Pi[i-1] [1], bufFactors[i+1] [0], yToL) + 
+      Pi [i]= M (1,i+1) + (mulMod2 (Pi[i-1] [1], bufFactors[i+1] [0], yToL) +
                        mulMod2 (Pi[i-1] [0], bufFactors [i+1] [1], yToL))*v;
     }
     else if (degree (Pi[i-1], v) > 0)
@@ -3110,7 +3105,7 @@ nonMonicHenselLift (const CFList& F, const CFList& factors, const CFList& LCs,
   M (1, 1)= Pi [0];
 
   if (degree (bufFactors[0], y) > 0 && degree (bufFactors [1], y) > 0)
-    Pi [0] += (mulMod (bufFactors [0] [1], bufFactors[1] [0], MOD) + 
+    Pi [0] += (mulMod (bufFactors [0] [1], bufFactors[1] [0], MOD) +
                         mulMod (bufFactors [0] [0], bufFactors [1] [1], MOD))*y;
   else if (degree (bufFactors[0], y) > 0)
     Pi [0] += mulMod (bufFactors [0] [1], bufFactors[1], MOD)*y;

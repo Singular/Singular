@@ -149,18 +149,22 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     {
         y = gcd( w, c ); z = w / y;
         if ( degree( z, v ) > 0 )
+        {
             if ( lc( z ).sign() < 0 )
                 F.append( CFFactor( -z, i ) );
             else
                 F.append( CFFactor( z, i ) );
+        }
         i++;
         w = y; c = c / y;
     }
     if ( degree( w,v ) > 0 )
+    {
         if ( lc( w ).sign() < 0 )
             F.append( CFFactor( -w, i ) );
         else
             F.append( CFFactor( w, i ) );
+    }
     if ( ! cont.isOne() )
         F = Union( F, sqrFreeZ( cont ) );
     if ( lc( a ).sign() < 0 )

@@ -2,7 +2,7 @@
  * Computer Algebra System SINGULAR
 \*****************************************************************************/
 /** @file cfNewtonPolygon.cc
- * 
+ *
  * This file provides functions to compute the Newton polygon of a bivariate
  * polynomial
  *
@@ -40,7 +40,7 @@ int smallestPointIndex (int** points, int sizePoints)
   int min= 0;
   for (int i= 1; i < sizePoints; i++)
   {
-    if (points[i][0] < points[min][0] || 
+    if (points[i][0] < points[min][0] ||
         (points[i] [0] == points[min] [0] && points[i] [1] < points[min] [1]))
       min= i;
   }
@@ -62,7 +62,7 @@ bool isLess (int* point1, int* point2)
   if (area > 0) return true;
   if (area == 0)
   {
-    return (abs (point1[0]) + abs (point1[1]) > 
+    return (abs (point1[0]) + abs (point1[1]) >
             abs (point2[0]) + abs (point2[1]));
   }
   return false;
@@ -299,7 +299,7 @@ bool isInPolygon (int ** points, int sizePoints, int* point)
       return result;
     }
   }
-  
+
   if (buf [sizeBuf - 1] [0] == point [0] && buf [sizeBuf-1] [1] == point [1])
   {
     buf [1] [0]= point [0];
@@ -486,8 +486,6 @@ compress (const CanonicalForm& F, mat_ZZ& M, vec_ZZ& A)
   ZZ expX, expY;
   Variable x= Variable (1);
   Variable y= Variable (2);
-  int sizeF= size (F);
-  int ** points= getPoints (F, sizeF);
 
   ZZ minExpX, minExpY;
 

@@ -12,7 +12,7 @@ GEvaluation::GEvaluation( const GEvaluation & e )
       for (int i= 0; i < values.max() - values.min() + 1; i++)
         delete gen[i];
       delete [] gen;
-           
+
       gen= new CFGenerator* [e.values.max() - e.values.min() + 1];
       for (int i= 0; i < e.values.max() - e.values.min() + 1; i++)
         gen[i] = e.gen[i]->clone();
@@ -24,7 +24,7 @@ GEvaluation::GEvaluation (int min0, int max0, const CFGenerator & sample): Evalu
 {
   gen= new CFGenerator* [max0 - min0 + 1];
   for (int i= 0; i < max0 - min0 + 1; i++)
-    gen[i]= sample.clone(); 
+    gen[i]= sample.clone();
 }
 
 GEvaluation::~GEvaluation()
@@ -61,7 +61,7 @@ GEvaluation::operator= ( const GEvaluation & e )
   return *this;
 }
 
-void 
+void
 GEvaluation::reset()
 {
   int t= values.max();
@@ -73,10 +73,12 @@ GEvaluation::reset()
   }
 }
 
-void 
+void
 GEvaluation::init (int n)
 {
+  #ifndef NOASSERT
   int t= values.max();
+  #endif
   int u= values.min();
   ASSERT (n <= t - u + 1, "wrong number of evaluation points");
   for (int i= u; i <= u + n - 1; i++)
@@ -86,7 +88,7 @@ GEvaluation::init (int n)
   }
 }
 
-bool 
+bool
 GEvaluation::nextpoint (int n) // n= number of non zero components
 {
   int t= values.max();

@@ -34,7 +34,7 @@ int* integerFactorizer (const long integer, int& length, bool& fail)
 {
   ASSERT (integer != 0 && integer != 1 && integer != -1,
           "non-zero non-unit expected");
-  int* result;
+  int* result=NULL;
   length= 0;
   fail= false;
   int i= integer;

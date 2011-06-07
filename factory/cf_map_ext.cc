@@ -52,12 +52,15 @@ int findItem (const CFList& list, const CanonicalForm& item)
 CanonicalForm getItem (const CFList& list, const int& pos)
 {
   int j= 1;
-  if (pos > list.length() || pos < 1) return 0;
-  for (CFListIterator i= list; j <= pos; i++, j++)
+  if ((pos > 0) && (pos <= list.length()))
   {
-    if (j == pos)
-      return i.getItem();
+    for (CFListIterator i= list; j <= pos; i++, j++)
+    {
+      if (j == pos)
+        return i.getItem();
+    }
   }
+  return 0;
 }
 
 
@@ -139,7 +142,6 @@ CanonicalForm GF2FalphaHelper (const CanonicalForm& F, const Variable& alpha)
     return 0;
   int exp;
   CanonicalForm result= 0;
-  char gf_name_buf= gf_name;
   InternalCF* buf;
   if (F.inBaseDomain())
   {
@@ -375,7 +377,7 @@ mapPrimElem (const CanonicalForm& primElem, const Variable& alpha,
     CanonicalForm primElemMipo= findMinPoly (primElem, alpha);
     int p= getCharacteristic ();
     zz_p::init (p);
-    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (beta)); 
+    zz_pX NTLMipo= convertFacCF2NTLzzpX (getMipo (beta));
     zz_pE::init (NTLMipo);
     zz_pEX NTLPrimElemMipo= convertFacCF2NTLzz_pEX (primElemMipo, NTLMipo);
     zz_pE root= FindRoot (NTLPrimElemMipo);
@@ -396,12 +398,12 @@ map (const CanonicalForm& primElem, const Variable& alpha,
   }
   int p= getCharacteristic ();
   zz_p::init (p);
-  zz_pX NTL_mipo= convertFacCF2NTLzzpX (getMipo (beta)); 
+  zz_pX NTL_mipo= convertFacCF2NTLzzpX (getMipo (beta));
   zz_pE::init (NTL_mipo);
   zz_pEX NTL_alpha_mipo= convertFacCF2NTLzz_pEX (getMipo(alpha), NTL_mipo);
   zz_pE NTLBeta= to_zz_pE (convertFacCF2NTLzzpX (beta));
   vec_zz_pE roots= FindRoots (NTL_alpha_mipo);
-  long ind;
+  long ind=-1;
   for (long i= 0; i < roots.length(); i++)
   {
     if (power (roots [i], order)== NTLBeta)

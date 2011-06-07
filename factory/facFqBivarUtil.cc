@@ -197,9 +197,9 @@ mapDown (const CanonicalForm& F, const ExtensionInfo& info, CFList& source,
     return GFMapDown (F, k);
   else if (k == 1)
     return F;
-  else if (!k && beta == Variable (1))
+  if (/*k==0 &&*/ beta == Variable (1))
     return F;
-  else if (!k && beta != Variable (1))
+  else /*if (k==0 && beta != Variable (1))*/
     return mapDown (F, imPrimElem, primElem, beta, source, dest);
 }
 
@@ -275,7 +275,7 @@ void normalize (CFList& factors)
 
 void normalize (CFFList& factors)
 {
-  for (CFFListIterator i= factors; i.hasItem(); i++) 
+  for (CFFListIterator i= factors; i.hasItem(); i++)
     i.getItem()= CFFactor (i.getItem().factor()/Lc(i.getItem().factor()),
                            i.getItem().exp());
   return;
@@ -542,7 +542,7 @@ CFArray getCoeffs (const CanonicalForm& F, const int k)
     if (j.exp() == i)
     {
       result [i - k]= j.coeff();
-      j++; 
+      j++;
       if (!j.hasTerms())
         return result;
     }
@@ -610,7 +610,6 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
   NTLF.rep= M*NTLF.rep;
   NTLF.normalize();
   F= convertNTLzzpX2CF (NTLF, y);
-  int d= degMipo;
 
   if (degree (F, 2) < k)
     return CFArray();
@@ -623,7 +622,7 @@ getCoeffs (const CanonicalForm& G, const int k, const int l, const int degMipo,
     if (j.exp() == i)
     {
       result [i - k]= j.coeff();
-      j++; 
+      j++;
       if (!j.hasTerms())
         return result;
     }
@@ -672,7 +671,6 @@ int * computeBounds (const CanonicalForm& F, int& n)
   }
 
   int k= maxX;
-  bool hitMaxX= false;
   for (int i= 0; i < n; i++)
   {
     if (i + 1 > maxY || i + 1 < minY)

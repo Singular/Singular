@@ -64,48 +64,6 @@ divremNTL (const CanonicalForm& F, ///< [in] a univariate poly
            CanonicalForm& R        ///< [in,out] remainder
           );*/
 
-/// splits @a F into degree (F, x)/m polynomials each of degree less than @a m
-/// in @a x.
-///
-/// @return @a split returns a list of polynomials of degree less than @a m in
-///         @a x. If degree (F, x) <= 0, F is returned.
-/// @sa divrem32(), divrem21()
-static inline
-CFList split (const CanonicalForm& F, ///< [in] some poly
-              const int m,            ///< [in] some int
-              const Variable& x       ///< [in] some Variable
-             );
-
-/// division with remainder of @a F by
-/// @a G wrt Variable (1) modulo @a M.
-///
-/// @sa divrem(), divrem21(), divrem2()
-static inline
-void divrem32 (const CanonicalForm& F, ///< [in] poly, s.t. 3*(degree (G, 1)/2)>
-                                       ///< degree (F, 1)
-               const CanonicalForm& G, ///< [in] some poly
-               CanonicalForm& Q,       ///< [in,out] dividend
-               CanonicalForm& R,       ///< [in,out] remainder, degree (R, 1) <
-                                       ///< degree (G, 1)
-               const CFList& M         ///< [in] only contains powers of
-                                       ///< Variables of level higher than 1
-              );
-
-/// division with remainder of @a F by
-/// @a G wrt Variable (1) modulo @a M.
-///
-/// @sa divrem(), divrem32(), divrem2()
-static inline
-void divrem21 (const CanonicalForm& F, ///< [in] poly, s.t. 2*degree (G, 1) >
-                                       ///< degree (F, 1)
-               const CanonicalForm& G, ///< [in] some poly
-               CanonicalForm& Q,       ///< [in,out] dividend
-               CanonicalForm& R,       ///< [in,out] remainder, degree (R, 1) <
-                                       ///< degree (G, 1)
-               const CFList& M         ///< [in] only contains powers of
-                                       ///< Variables of level higher than 1
-              );
-
 /// division with remainder of @a F by
 /// @a G wrt Variable (1) modulo @a M.
 ///
@@ -212,23 +170,6 @@ void sortList (CFList& list,     ///< [in, out] list of polys, sorted list
                const Variable& x ///< [in] some Variable
               );
 
-/// solve the univariate diophantine equation
-/// \f$ 1\equiv \sum_{i= 1}^{r} {\delta_{i} F/g_{i}} \f$.
-/// Where \f$ F= \prod_{i= 1}^{r} {g_{i}} \f$ and \f$ F \f$ is squarefree
-/// the \f$ \delta_{i} \f$ have degree less than the degree of \f$ g_{i} \f$.
-///
-/// @return @a diophantine returns a list of polynomials \f$ \delta_{i} \f$ as
-/// specified above
-/// @sa biDiophantine(), multiRecDiophantine()
-static inline
-CFList diophantine (const CanonicalForm& F, ///< [in] compressed, bivariate
-                                            ///< polynomial
-                    const CFList& factors   ///< [in] a list of factors, as
-                                            ///< specified above, including
-                                            ///< LC (F, Variable (1)) as first
-                                            ///< element
-                   );
-
 /// Hensel lift from univariate to bivariate.
 ///
 /// @sa henselLiftResume12(), henselLift23(), henselLiftResume(), henselLift()
@@ -267,48 +208,6 @@ henselLiftResume12 (const CanonicalForm& F, ///< [in] compressed, bivariate poly
                     CFMatrix& M             ///< [in,out] stores intermediate
                                             ///< results
                    );
-
-/// solves the bivariate polynomial diophantine equation
-/// \f$ 1\equiv \sum_{i= 1}^{r} {\delta_{i} F/g_{i}} \ mod\ y^{d} \f$,
-/// where \f$ F= \prod_{i= 1}^{r} {g_{i}} \ mod\ y^{d}\f$ and
-/// \f$ F \in K[x][y]\f$ is squarefree, the \f$ \delta_{i} \f$ have degree less
-/// than the degree of \f$ g_{i} \f$ in x.
-///
-/// @return @a biDiophantine returns a list of polynomials \f$ \delta_{i} \f$ as
-///         specified above
-/// @sa diophantine(), multiRecDiophantine()
-static inline
-CFList
-biDiophantine (const CanonicalForm& F, ///< [in] compressed, bivariate poly
-               const CFList& factors,  ///< [in] list of monic bivariate factors
-                                       ///< including LC (F, Variable (1)) as
-                                       ///< first element
-               const int d             ///< [in] precision
-              );
-
-/// solve the multivariate polynomial diophantine equation
-/// \f$ 1\equiv \sum_{i= 1}^{r} {\delta_{i} F/g_{i}} \ mod\ <M,F.mvar()^{d}>\f$,
-/// where \f$ F= \prod_{i= 1}^{r} {g_{i}} \ mod\ <M,F.mvar()^{d}>\f$ and
-/// \f$ F \in K[x][x_1,\ldots , x_n]\f$ is squarefree, the \f$ \delta_{i} \f$
-/// have degree less than the degree of \f$ g_{i} \f$ in x.
-///
-/// @return @a multiDiophantine returns a list of polynomials \f$ \delta_{i} \f$
-///         as specified above
-/// @sa diophantine(), biDiophantine()
-static inline
-CFList
-multiRecDiophantine (
-               const CanonicalForm& F,   ///< [in] compressed,
-                                         ///< multivariate polynomial
-               const CFList& factors,    ///< [in] list of monic factors
-                                         ///< including LC (F, Variable (1)) as
-                                         ///< first element
-               const CFList& recResult, ///< [in] result of above equation
-                                         ///< modulo M
-               const CFList& M,          ///< [in] a list of powers of Variables
-                                         ///< of level higher than 1
-               const int d               ///< [in] precision
-                    );
 
 /// Hensel lifting from bivariate to trivariate.
 ///
@@ -430,27 +329,27 @@ henselLift2 (const CFList& eval,   ///< [in] a list of polynomials the last
                                    ///< correspondence
             );
 
-/// Hensel lifting of non monic factors, needs correct leading coefficients of 
+/// Hensel lifting of non monic factors, needs correct leading coefficients of
 /// factors and a one to one corresponds between bivariate and multivariate
 /// factors to succeed
 ///
 /// @return @a nonMonicHenselLift returns a list of lifted factors
-/// such that prod (factors) == eval.getLast() if there is a one to one 
+/// such that prod (factors) == eval.getLast() if there is a one to one
 /// correspondence
 CFList
 nonMonicHenselLift (const CFList& eval,    ///< [in] a list of polys the last
-                                           ///< element is a compressed 
+                                           ///< element is a compressed
                                            ///< multivariate poly, last but one
                                            ///< element equals the last elements
-                                           ///< modulo its main variable and so 
-                                           ///< on. The first element is a 
+                                           ///< modulo its main variable and so
+                                           ///< on. The first element is a
                                            ///< compressed poly in 3 variables
                     const CFList& factors, ///< [in] a list of bivariate factors
                     CFList* const& LCs,    ///< [in] leading coefficients,
-                                           ///< evaluated in the same way as 
+                                           ///< evaluated in the same way as
                                            ///< eval
                     CFList& diophant,      ///< [in, out] solution of univariate
-                                           ///< diophantine equation 
+                                           ///< diophantine equation
                     CFArray& Pi,           ///< [in, out] buffer intermediate
                                            ///< results
                     int* liftBound,        ///< [in] lifting bounds

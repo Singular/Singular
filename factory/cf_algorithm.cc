@@ -346,12 +346,14 @@ fdivides ( const CanonicalForm & f, const CanonicalForm & g )
     if ( (f.inCoeffDomain() || g.inCoeffDomain())
          && ((getCharacteristic() == 0 && isOn( SW_RATIONAL ))
              || (getCharacteristic() > 0 && CFFactory::gettype() != PrimePowerDomain)) )
+    {
         // if we are in a field all elements not equal to zero are units
         if ( f.inCoeffDomain() )
             return true;
         else
             // g.inCoeffDomain()
             return false;
+    }
 
     // we may assume now that both levels either equal LEVELBASE
     // or are greater zero

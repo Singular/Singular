@@ -232,68 +232,6 @@ CFFList GFFactorize (const CanonicalForm& F ///< [in] a multivariate poly
   return result;
 }
 
-/// compute the content of @a F wrt Variable (1) using routines from
-/// @a cf_gcd_smallp.h
-///
-/// @return @a myContent returns the content of F wrt Variable (1)
-static inline
-CanonicalForm
-myContent (const CanonicalForm& F ///< [in] a poly
-          );
-
-/// compute the content of @a F wrt @a x using routines from
-/// @a cf_gcd_smallp.h
-///
-/// @return @a myContent returns the content of F wrt x
-static inline
-CanonicalForm
-myContent (const CanonicalForm& F, ///< [in] a poly
-           const Variable& x       ///< [in] a variable
-          );
-
-/// compute the GCD of all element in @a L using routines from
-/// @a cf_gcd_smallp.h
-///
-/// @return @a listGCD returns the GCD of all elements in @a L
-static inline
-CanonicalForm
-listGCD (const CFList& L ///< [in] a list of polys
-        );
-
-/// compute the LCM of @a F and @a G using routines from
-/// @a cf_gcd_smallp.h
-///
-/// @return @a myLcm returns the LCM of @a F and @a G
-static inline
-CanonicalForm
-myLcm (const CanonicalForm& F,   ///< [in] a poly
-       const CanonicalForm& G    ///< [in] a poly
-      );
-
-/// compute the LCM of the contents of @a A wrt to each variable occuring in @a
-/// A.
-///
-/// @return @a lcmContent returns the LCM of the contents of @a A wrt to each
-///         variable occuring in @a A.
-static inline
-CanonicalForm
-lcmContent (const CanonicalForm& A, ///< [in] a compressed multivariate poly
-            CFList& contentAi       ///< [in,out] an empty list, returns a list
-                                    ///< of the contents of @a A wrt to each
-                                    ///< variable occuring in @a A starting from
-                                    ///< @a A.mvar().
-           );
-
-/// compress a polynomial s.t. \f$ deg_{x_{i}} (F) >= deg_{x_{i+1}} (F) \f$ and
-/// no gaps between the variables occur
-///
-/// @return a compressed poly with the above properties
-static inline
-CanonicalForm myCompress (const CanonicalForm& F, ///< [in] a poly
-                          CFMap& N                ///< [in,out] a map to
-                                                  ///< decompress
-                         );
-
 /// naive factor recombination for bivariate factorization.
 /// Uses precomputed data to exclude combinations that are not possible.
 ///
@@ -488,24 +426,6 @@ evalPoints (const CanonicalForm& F,  ///< [in] a compressed poly
             bool& fail               ///< [in,out] indicates failure
            );
 
-/// looks for a new main variable of level higher than lev which omitts a valid
-/// evaluation, and returns its level. If there is no such variable 0 is
-/// returned
-///
-/// @return @a newMainVariableSearch returns the level of the new main variable,
-///         if there no variable which omitts a valid evaluation 0 is returned
-static inline
-int newMainVariableSearch (
-              CanonicalForm& A,     ///< [in,out] a compressed poly, returns
-                                    ///< the swapped initial poly or the
-                                    ///< initial poly if 0 is returned
-              CFList& Aeval,        ///< [in,out] @a A successively evaluated,
-                                    ///< empty list if 0 is returned
-              CFList& evaluation,   ///< [in,out] evaluation point, empty list
-                                    ///< if 0 is returned
-              const Variable& alpha,///< [in] algebraic variable
-              const int lev         ///< [in] some int <= A.level()
-                          );
 /// hensel Lifting and early factor detection
 ///
 /// @return @a henselLiftAndEarly returns monic (wrt Variable (1)) lifted

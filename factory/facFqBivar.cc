@@ -792,7 +792,6 @@ henselLiftAndEarly (CanonicalForm& A, bool& earlySuccess, CFList&
   Variable beta= info.getBeta();
   CanonicalForm gamma= info.getGamma();
   CanonicalForm delta= info.getDelta();
-  int k= info.getGFDegree();
   bool extension= info.isInExtension();
 
   Variable x= Variable (1);
@@ -899,7 +898,7 @@ long isReduced (const mat_zz_pE& M)
     for (j = 1; j <= M.NumCols(); j++)
     {
       if (!IsZero (M (i,j)))
-        nonZero++;  
+        nonZero++;
     }
     if (nonZero != 1)
       return 0;
@@ -1017,7 +1016,7 @@ reconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const CFList&
                   )
 {
   Variable y= Variable (2);
-  Variable x= Variable (1); 
+  Variable x= Variable (1);
   CanonicalForm yToL= power (y, liftBound);
   for (long i= 1; i <= N.NumCols(); i++)
   {
@@ -1218,7 +1217,7 @@ extReconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs, int
     else
     {
       CFList source, dest;
-      
+
       if (!isInExtension (buf2, gamma, k, delta, source, dest))
       {
         if (fdivides (buf, F))
@@ -1291,7 +1290,7 @@ reconstruction (CanonicalForm& G, CFList& factors, int* zeroOneVecs,
 }
 
 void
-extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const 
+extReconstructionTry (CFList& reconstructedFactors, CanonicalForm& F, const
                       CFList& factors, const int liftBound, int& factorsFound,
                       int*& factorsFoundIndex, mat_zz_p& N, bool beenInThres,
                       const ExtensionInfo& info, const CanonicalForm& evaluation
@@ -1663,7 +1662,6 @@ liftAndComputeLattice (const CanonicalForm& F, int* bounds, int sizeBounds,
                        Pi, CFArray& bufQ, bool& irreducible
                       )
 {
-  bool GF= (CFFactory::gettype () == GaloisFieldDomain);
   CanonicalForm LCF= LC (F, 1);
   CFArray *A= new CFArray [factors.length() - 1];
   bool wasInBounds= false;
@@ -1773,7 +1771,6 @@ liftAndComputeLatticeFq2Fp (const CanonicalForm& F, int* bounds, int sizeBounds,
                             const Variable& alpha
                            )
 {
-  bool GF= (CFFactory::gettype () == GaloisFieldDomain);
   CanonicalForm LCF= LC (F, 1);
   CFArray *A= new CFArray [factors.length() - 1];
   bool wasInBounds= false;
@@ -1950,7 +1947,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
     {
       if (isReduced (NTLN))
       {
-        int d= degree (F) + 1;
         int * factorsFoundIndex= new int [NTLN.NumCols()];
         for (long i= 0; i < NTLN.NumCols(); i++)
           factorsFoundIndex[i]= 0;
@@ -2074,7 +2070,6 @@ increasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
     {
       if (isReduced (NTLN))
       {
-        int d= degree (F) + 1;
         int * factorsFoundIndex= new int [NTLN.NumCols()];
         for (long i= 0; i < NTLN.NumCols(); i++)
           factorsFoundIndex[i]= 0;
@@ -2262,7 +2257,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int factorsFound,
     {
       if (isReduced (NTLN))
       {
-      int d= degree (F) + 1;
       int * factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
         factorsFoundIndex[i]= 0;
@@ -2504,7 +2498,6 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int factorsFound,
     {
       if (isReduced (NTLN))
       {
-        int d= degree (F) + 1;
         int * factorsFoundIndex= new int [NTLN.NumCols()];
         for (long i= 0; i < NTLN.NumCols(); i++)
           factorsFoundIndex[i]= 0;
@@ -2628,7 +2621,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < oldL && result.length() > 0)
     {
-      F= bufF; 
+      F= bufF;
       factors= bufUniFactors;
       delete [] A;
       return result;
@@ -2724,7 +2717,7 @@ increasePrecision (CanonicalForm& F, CFList& factors, int oldL, int
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < l && result.length() > 0)
     {
-      F= bufF; 
+      F= bufF;
       factors= bufUniFactors;
       delete [] A;
       return result;
@@ -2769,7 +2762,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
   Variable gamma= info.getBeta();
   CanonicalForm primElemAlpha= info.getGamma();
   CanonicalForm imPrimElemAlpha= info.getDelta();
-  bool reduced= false;
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
   while (oldL <= l)
@@ -2786,7 +2778,6 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
       CanonicalForm imBasis= mod (power (y, i), powX);
       imBasis= imBasis (power (y, degMipo), y);
       imBasis= imBasis (y, gamma);
-      int ind= oldL*degMipo - 1;
       CFIterator iter= imBasis;
       for (; iter.hasTerms(); iter++)
         Mat (iter.exp()+ 1, i+1)= iter.coeff();
@@ -2800,7 +2791,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     if (useOldQs)
     {
       for (int i= 0; i < factors.length(); i++, j++)
-        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i], 
+        A[i]= logarithmicDerivative (F, j.getItem(), oldL, oldL2, bufQ[i],
                                      bufQ[i]);
     }
     else
@@ -2893,7 +2884,7 @@ extIncreasePrecision (CanonicalForm& F, CFList& factors, int oldL, int l, int d,
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < l && result.length() > 0)
     {
-      F= bufF; 
+      F= bufF;
       factors= bufUniFactors;
       return result;
     }
@@ -3012,7 +3003,7 @@ increasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int oldL, int l,
     delete [] zeroOneVecs;
     if (degree (bufF) + 1 + degree (LC (bufF, 1)) < l && result.length() > 0)
     {
-      F= bufF; 
+      F= bufF;
       factors= bufUniFactors;
       delete [] A;
       return result;
@@ -3319,7 +3310,6 @@ extFurtherLiftingAndIncreasePrecision (CanonicalForm& F, CFList& factors, int l,
   int oldL= l; //be careful
   int stepSize= 8;
   l += tmax (tmin (8, degree (F) + 1 + degree (LC (F, 1))-l),2);
-  bool reduced= false;
   Variable gamma= info.getBeta();
   CanonicalForm primElemAlpha= info.getGamma();
   CanonicalForm imPrimElemAlpha= info.getDelta();
@@ -3511,7 +3501,6 @@ furtherLiftingAndIncreasePrecisionFq2Fp (CanonicalForm& F, CFList& factors, int
   int oldL= l;
   int stepSize= 8; //TODO choose better step size?
   l += tmax (tmin (8, degree (F) + 1 + degree (LC (F, 1))-l), 2);
-  bool reduced= false;
   if (NTLN.NumRows() != factors.length()) //refined factors
     ident (NTLN, factors.length());
   while (l <= liftBound)
@@ -3659,7 +3648,7 @@ refineAndRestartLift (const CanonicalForm& F, const mat_zz_pE& NTLN, int
   CFList bufFactors;
   Variable y= Variable (2);
   CanonicalForm LCF= LC (F, 1);
-  for (long i= 1; i <= NTLN.NumCols(); i++) 
+  for (long i= 1; i <= NTLN.NumCols(); i++)
   {
     CFListIterator iter= factors;
     CanonicalForm buf= 1;
@@ -3888,7 +3877,7 @@ extEarlyReconstructionAndLifting (const CanonicalForm& F, const mat_zz_p& N,
 }
 
 CFList
-sieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern& 
+sieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
                    degPat, CanonicalForm& H, CFList& diophant, CFArray& Pi,
                    CFMatrix& M, bool& success, int d
                   )
@@ -3915,7 +3904,6 @@ sieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
     return earlyFactors;
   }
   int sizeOldF= size (F);
-  int sizeF;
   CFList result;
   CanonicalForm bufF= F;
   if (earlyFactors.length() > 0)
@@ -3969,7 +3957,6 @@ extSieveSmallFactors (const CanonicalForm& G, CFList& uniFactors, DegreePattern&
   Variable y= F.mvar();
   CanonicalForm shiftedF= F (y - evaluation, y);
   int sizeOldF= size (shiftedF);
-  int sizeF;
   CFList result;
   CanonicalForm bufF= shiftedF;
   if (earlyFactors.length() > 0)
@@ -4119,7 +4106,6 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     else
       ident (NTLNe, bufUniFactors.length() - 1);
   }
-  bool wasInBounds= false;
   bool irreducible= false;
   CFArray bufQ= CFArray (bufUniFactors.length() - 1);
 
@@ -4242,13 +4228,13 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     int * factorsFoundIndex;
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
-      factorsFoundIndex= new int [NTLN.NumCols()]; 
+      factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
         factorsFoundIndex[i]= 0;
     }
     else
     {
-      factorsFoundIndex= new int [NTLNe.NumCols()]; 
+      factorsFoundIndex= new int [NTLNe.NumCols()];
       for (long i= 0; i < NTLNe.NumCols(); i++)
         factorsFoundIndex[i]= 0;
     }
@@ -4292,7 +4278,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     {
       if (NTLN.NumCols() < bufUniFactors.length())
       {
-        refineAndRestartLift (F, NTLN, liftBound, l, bufUniFactors, M, Pi, 
+        refineAndRestartLift (F, NTLN, liftBound, l, bufUniFactors, M, Pi,
                               diophant
                              );
         beenInThres= true;
@@ -4481,7 +4467,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     }
     if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
     {
-      if (result.length()== NTLN.NumCols()) 
+      if (result.length()== NTLN.NumCols())
       {
         delete [] bounds;
         result= Union (result, smallFactors);
@@ -4490,7 +4476,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
     }
     else
     {
-      if (result.length()== NTLNe.NumCols()) 
+      if (result.length()== NTLNe.NumCols())
       {
         delete [] bounds;
         result= Union (result, smallFactors);
@@ -4523,7 +4509,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
 
       if (alpha.level() == 1 || (alpha.level() != 1 && reduceFq2Fp))
       {
-        if (result.length() == NTLN.NumCols()) 
+        if (result.length() == NTLN.NumCols())
         {
           delete [] bounds;
           result= Union (result, smallFactors);
@@ -4532,7 +4518,7 @@ henselLiftAndLatticeRecombi (const CanonicalForm& G, const CFList& uniFactors,
       }
       else
       {
-        if (result.length() == NTLNe.NumCols()) 
+        if (result.length() == NTLNe.NumCols())
         {
           delete [] bounds;
           result= Union (result, smallFactors);
@@ -4639,7 +4625,6 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
                                DegreePattern& degPat, const CanonicalForm& eval
                               )
 {
-  bool GF= (CFFactory::gettype()==GaloisFieldDomain);
   CanonicalForm evaluation= eval;
   ExtensionInfo info= extInfo;
   Variable alpha;
@@ -4765,7 +4750,6 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   mat_zz_p NTLN;
 
   ident (NTLN, bufUniFactors.length() - 1);
-  bool wasInBounds= false;
   bool irreducible= false;
   CFArray bufQ= CFArray (bufUniFactors.length() - 1);
 
@@ -4840,7 +4824,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
   if (l >= liftBound)
   {
     int * factorsFoundIndex;
-      factorsFoundIndex= new int [NTLN.NumCols()]; 
+      factorsFoundIndex= new int [NTLN.NumCols()];
       for (long i= 0; i < NTLN.NumCols(); i++)
         factorsFoundIndex[i]= 0;
     CanonicalForm bufF= F;
@@ -4988,7 +4972,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
                                  NTLN, evaluation, info2, source, dest
                                 );
 
-    if (result.length()== NTLN.NumCols()) 
+    if (result.length()== NTLN.NumCols())
     {
       delete [] bounds;
       result= Union (result, smallFactors);
@@ -5003,7 +4987,7 @@ extHenselLiftAndLatticeRecombi(const CanonicalForm& G, const CFList& uniFactors,
                                                      evaluation, info2, source,
                                                      dest
                                                     );
-      if (result.length()== NTLN.NumCols()) 
+      if (result.length()== NTLN.NumCols())
       {
         delete [] bounds;
         result= Union (result, smallFactors);
@@ -5414,7 +5398,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     bool earlySuccess= false;
     CFList earlyFactors;
     TIMING_START (fac_hensel_lift);
-    uniFactors= henselLiftAndEarly 
+    uniFactors= henselLiftAndEarly
                (A, earlySuccess, earlyFactors, degs, liftBound,
                 uniFactors, info, evaluation);
     TIMING_END_AND_PRINT (fac_hensel_lift, "time for hensel lifting: ");

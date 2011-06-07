@@ -2,7 +2,7 @@
 /* $Id$ */
 
 static int deb_level = -1;
-char * deb_level_msg = "";
+char * deb_level_msg = (char *)"";
 
 void deb_inc_level()
 {

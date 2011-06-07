@@ -97,6 +97,7 @@ initHG ( int * a, const CFFList & F )
     for ( int j = 1; j < n; j++ ) a[j] = 0;
     for ( i = F; i.hasItem(); i++ )
         if ( (k = i.getItem().factor().degree()) < n )
+        {
             if ( k == -1 ) {
                 STICKYWARN( k == -1, "there occured an error.  factory was not able to factorize\n"
                             "correctly mod p.  Please send the example which caused\n"
@@ -105,6 +106,7 @@ initHG ( int * a, const CFFList & F )
             }
             else if ( k != 0 )
                 a[k] = 1;
+        }
 }
 
 static void
@@ -114,7 +116,9 @@ initHG ( int * a, const Array<CanonicalForm> & F )
     for ( i = 1; i < n; i++ ) a[i] = 0;
     for ( i = 1; i < m; i++ )
         if ( (k = F[i].degree()) < n )
-            if ( k == -1 ) {
+        {
+            if ( k == -1 )
+            {
                 STICKYWARN( k == -1, "there occured an error.  factory was not able to factorize\n"
                             "correctly mod p.  Please send the example which caused\n"
                             "this error to the authors.  Nonetheless we will go on with the\n"
@@ -122,6 +126,7 @@ initHG ( int * a, const Array<CanonicalForm> & F )
             }
             else if ( k != 0 )
                 a[k] = 1;
+        }
 }
 
 static int cmpFactor( const CFFactor & a, const CFFactor & b )

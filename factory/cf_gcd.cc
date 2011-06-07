@@ -1302,7 +1302,7 @@ balance_p ( const CanonicalForm & f, const CanonicalForm & q )
 CanonicalForm chinrem_gcd ( const CanonicalForm & FF, const CanonicalForm & GG )
 {
   CanonicalForm f, g, cg, cl, q(0), Dp, newD, D, newq;
-  int p, i, dp_deg, d_deg;
+  int p, i, dp_deg, d_deg=-1;
 
   CanonicalForm cd ( bCommonDen( FF ));
   f=cd*FF;

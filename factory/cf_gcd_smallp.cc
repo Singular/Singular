@@ -413,9 +413,7 @@ extractContents (const CanonicalForm& F, const CanonicalForm& G,
 static inline
 CanonicalForm uni_lcoeff (const CanonicalForm& F)
 {
-  if (F.level() <= 1)
-    return F;
-  else
+  if (F.level() > 1)
   {
     Variable x= Variable (2);
     int deg= totaldegree (F, x, F.mvar());
@@ -425,6 +423,7 @@ CanonicalForm uni_lcoeff (const CanonicalForm& F)
         return uni_lcoeff (i.coeff());
     }
   }
+  return F;
 }
 
 /// Newton interpolation - Incremental algorithm.
@@ -899,7 +898,7 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
   bool fail= false;
   topLevel= false;
   bool inextension= false;
-  int p;
+  int p=-1;
   int k= getGFDegree();
   int kk;
   int expon;
@@ -1889,7 +1888,7 @@ void eval (const CanonicalForm& A, const CanonicalForm& B, CanonicalForm& Aeval,
   }
 }
 
-CanonicalForm 
+CanonicalForm
 monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
                      const CanonicalForm& skeleton, const Variable& alpha,
                      bool& fail, CFArray*& coeffMonoms, CFArray& Monoms
@@ -1918,7 +1917,7 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   ASSERT (degree (A, y) == 0, "expected degree (F, 1) == 0");
   ASSERT (degree (B, y) == 0, "expected degree (G, 1) == 0");
 
-  //univariate case 
+  //univariate case
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd (A, B));
 
@@ -2039,7 +2038,7 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
           V_buf= rootOf (mipo);
           evalFail= false;
           evalPoints= evaluationPoints (A, B, Aeval, Beval, LCA, GF, V_buf,
-                                        evalFail, list); 
+                                        evalFail, list);
           deg++;
         } while (evalFail);
       }
@@ -2180,7 +2179,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   ASSERT (degree (A, y) == 0, "expected degree (F, 1) == 0");
   ASSERT (degree (B, y) == 0, "expected degree (G, 1) == 0");
 
-  //univariate case 
+  //univariate case
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd (A, B));
 
@@ -2282,7 +2281,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
             DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (V_buf));
             DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (V_buf2));
 
-            for (CFListIterator i= list; i.hasItem(); i++) 
+            for (CFListIterator i= list; i.hasItem(); i++)
               i.getItem()= mapUp (i.getItem(), V_buf, V_buf2, prim_elem,
                                 im_prim_elem, source, dest);
             evalFail= false;
@@ -2355,11 +2354,11 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     minimalColumnsIndex= 1;
   else
     minimalColumnsIndex= 0;
-  int minimalColumns;
+  int minimalColumns=-1;
 
   CFArray* pM= new CFArray [skelSize];
   CFMatrix Mat;
-  // find the Matrix with minimal number of columns 
+  // find the Matrix with minimal number of columns
   for (int i= 0; i < skelSize; i++)
   {
     pM[i]= CFArray (coeffMonoms[i].size());
@@ -2386,7 +2385,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     {
       if (i == 0)
         pL[k]= CFArray (biggestSize);
-      pL[k] [i]= l.coeff(); 
+      pL[k] [i]= l.coeff();
 
       if (i == 0 && k != 0 && k != minimalColumnsIndex)
         pM[k]= evaluate (coeffMonoms[k], evalPoints);
@@ -2419,7 +2418,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   int ind= 1;
   int matRows, matColumns;
   matRows= pMat[1].rows();
-  matColumns= pMat[0].columns() - 1; 
+  matColumns= pMat[0].columns() - 1;
   matColumns += pMat[1].columns();
 
   Mat= CFMatrix (matRows, matColumns);
@@ -2427,16 +2426,16 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     for (int j= 1; j <= pMat[1].columns(); j++)
       Mat (i, j)= pMat[1] (i, j);
 
-  for (int j= pMat[1].columns() + 1; j <= matColumns; 
+  for (int j= pMat[1].columns() + 1; j <= matColumns;
        j++, ind++)
   {
-    for (int i= 1; i <= matRows; i++) 
+    for (int i= 1; i <= matRows; i++)
       Mat (i, j)= (-pMat [0] (i, ind + 1))*pL[minimalColumnsIndex] [i - 1];
   }
 
   CFArray firstColumn= CFArray (pMat[0].rows());
   for (int i= 0; i < pMat[0].rows(); i++)
-    firstColumn [i]= pMat[0] (i + 1, 1); 
+    firstColumn [i]= pMat[0] (i + 1, 1);
 
   CFArray bufArray= pL[minimalColumnsIndex];
 
@@ -2447,10 +2446,10 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   pMat[1]= Mat;
 
   if (V_buf != x)
-    solution= solveSystemFq (pMat[1], 
+    solution= solveSystemFq (pMat[1],
                              pL[minimalColumnsIndex], V_buf);
   else
-    solution= solveSystemFp (pMat[1], 
+    solution= solveSystemFp (pMat[1],
                              pL[minimalColumnsIndex]);
 
   if (solution.size() == 0)
@@ -2458,7 +2457,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     CFMatrix bufMat0= pMat[0];
     delete [] pMat;
     pMat= new CFMatrix [skelSize];
-    pL[minimalColumnsIndex]= bufArray; 
+    pL[minimalColumnsIndex]= bufArray;
     CFList* bufpEvalPoints= NULL;
     CFArray bufGcds;
     if (biggestSize != biggestSize2)
@@ -2521,7 +2520,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
         if (k == minimalColumnsIndex)
           continue;
         coeffEval= evaluate (coeffMonoms[k], evalPoints);
-        if (pMat[k].rows() >= i + 1) 
+        if (pMat[k].rows() >= i + 1)
         {
           for (int ind= 1; ind < coeffEval.size() + 1; ind++)
             pMat[k] (i + 1, ind)= coeffEval[ind - 1];
@@ -2552,10 +2551,10 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       evalPoints= pEvalPoints [i + biggestSize];
       for (int k= 0; k < skelSize; k++, l++)
       {
-        pL[k] [i + biggestSize]= l.coeff(); 
+        pL[k] [i + biggestSize]= l.coeff();
         coeffEval= evaluate (coeffMonoms[k], evalPoints);
-        if (pMat[k].rows() >= i + biggestSize + 1) 
-        { 
+        if (pMat[k].rows() >= i + biggestSize + 1)
+        {
           for (int ind= 1; ind < coeffEval.size() + 1; ind++)
             pMat[k] (i + biggestSize + 1, ind)= coeffEval[ind - 1];
         }
@@ -2566,8 +2565,8 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     {
       if (pL[i].size() > 1)
       {
-        for (int j= 2; j <= pMat[i].rows(); j++) 
-          pMat[i] (j, coeffMonoms[i].size() + j - 1)= 
+        for (int j= 2; j <= pMat[i].rows(); j++)
+          pMat[i] (j, coeffMonoms[i].size() + j - 1)=
               -pL[i] [j - 1];
       }
     }
@@ -2615,7 +2614,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       {
         if (j > coeffMonoms[i].size())
           bufArray [j-coeffMonoms[i].size() + ind - 1]= pL[i] [j - 1];
-        else 
+        else
           bufArray2 [j - 1]= pL[i] [j - 1];
       }
       pL[i]= bufArray2;
@@ -2689,7 +2688,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
        l++, ind2++, ind3++)
   {
     result += solution[l]*Monoms [1 + ind2];
-    for (int i= 0; i < pMat[0].rows(); i++) 
+    for (int i= 0; i < pMat[0].rows(); i++)
       firstColumn[i] += solution[l]*pMat[0] (i + 1, ind3);
   }
   for (int l= 0; l < solution.size() + 1 - pMat[0].columns(); l++)
@@ -2781,7 +2780,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
 
   Variable x= Variable (1);
 
-  //univariate case 
+  //univariate case
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd (A, B));
 
@@ -2797,8 +2796,8 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
   {
     if (best_level <= 2)
       gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, best_level);
-    else 
-      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2); 
+    else
+      gcdcAcB= extractContents (A, B, cA, cB, ppA, ppB, 2);
   }
   else
   {
@@ -2830,7 +2829,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
   int d= totaldegree (ppA, Variable (2), Variable (ppA.level()));
   int d0;
 
-  if (d == 0) 
+  if (d == 0)
   {
     if (substitute > 1)
       return N(reverseSubst (gcdcAcB, substitute));
@@ -2891,7 +2890,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
       DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (alpha));
       DEBOUTLN (cerr, "getMipo (V_buf2)= " << getMipo (V_buf2));
       inextension= true;
-      for (CFListIterator i= l; i.hasItem(); i++) 
+      for (CFListIterator i= l; i.hasItem(); i++)
         i.getItem()= mapUp (i.getItem(), alpha, V_buf, prim_elem,
                              im_prim_elem, source, dest);
       m= mapUp (m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
@@ -2948,7 +2947,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
     * G_random_element;
 
     skeleton= G_random_element;
-    d0= totaldegree (G_random_element, Variable(2), 
+    d0= totaldegree (G_random_element, Variable(2),
                      Variable(G_random_element.level()));
     if (d0 <  d)
     {
@@ -3032,7 +3031,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           DEBOUTLN (cerr, "getMipo (alpha)= " << getMipo (alpha));
           DEBOUTLN (cerr, "getMipo (V_buf2)= " << getMipo (V_buf2));
           inextension= true;
-          for (CFListIterator i= l; i.hasItem(); i++) 
+          for (CFListIterator i= l; i.hasItem(); i++)
             i.getItem()= mapUp (i.getItem(), alpha, V_buf, prim_elem,
                                 im_prim_elem, source, dest);
           m= mapUp (m, alpha, V_buf, prim_elem, im_prim_elem, source, dest);
@@ -3054,7 +3053,7 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           //sparseInterpolation
           bool sparseFail= false;
           if (LC (skeleton).inCoeffDomain())
-            G_random_element= 
+            G_random_element=
             monicSparseInterpol (ppA (random_element, x), ppB(random_element,x),
                                 skeleton,V_buf, sparseFail, coeffMonoms,Monoms);
           else
@@ -3075,13 +3074,13 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
           TIMING_START (gcd_recursion);
           bool sparseFail= false;
           if (LC (skeleton).inCoeffDomain())
-            G_random_element= 
+            G_random_element=
             monicSparseInterpol (ppA (random_element, x),ppB(random_element, x),
                                 skeleton,V_buf, sparseFail,coeffMonoms, Monoms);
           else
             G_random_element=
             nonMonicSparseInterpol (ppA(random_element,x),ppB(random_element,x),
-                                    skeleton, V_buf, sparseFail, coeffMonoms, 
+                                    skeleton, V_buf, sparseFail, coeffMonoms,
                                     Monoms);
           if (sparseFail)
             break;
@@ -3195,7 +3194,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
 
   Variable x= Variable (1);
 
-  //univariate case 
+  //univariate case
   if (A.isUnivariate() && B.isUnivariate())
     return N (gcd (A, B));
 
@@ -3270,8 +3269,6 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
   G_m= 0;
   H= 0;
   bool fail= false;
-  bool topLevel2= topLevel;
-  int loops= 0;
   topLevel= false;
   bool inextension= false;
   bool inextensionextension= false;
@@ -3326,7 +3323,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
         alpha= rootOf (mipo);
         inextension= true;
         fail= false;
-        random_element= randomElement (m, alpha, l, fail); 
+        random_element= randomElement (m, alpha, l, fail);
         deg++;
       } while (fail);
       list= CFList();
@@ -3394,7 +3391,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
         return N(reverseSubst (gcdcAcB, substitute));
       else
         return N(gcdcAcB);
-    } 
+    }
     if (d0 >  d)
     {
       if (!find (l, random_element))
@@ -3505,7 +3502,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           CFList list;
           CanonicalForm mipo;
           int deg= 2;
-          do 
+          do
           {
             mipo= randomIrredpoly (deg, x);
             alpha= rootOf (mipo);
@@ -3669,7 +3666,6 @@ int compress4EZGCD (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
   both_non_zero= 0;
   int f_zero= 0;
   int g_zero= 0;
-  int both_zero= 0;
 
   for (int i= 1; i <= n; i++)
   {
@@ -4102,7 +4098,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       xxx1 = gcd( DD[1], Db );
       xxx2 = gcd( buf, Db );
       if (((xxx1.inCoeffDomain() && xxx2.inCoeffDomain()) &&
-          (size (F) <= size (G))) 
+          (size (F) <= size (G)))
           || (xxx1.inCoeffDomain() && !xxx2.inCoeffDomain()))
       {
         B = F;
@@ -4112,7 +4108,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
         B_is_F = true;
       }
       else if (((xxx1.inCoeffDomain() && xxx2.inCoeffDomain()) &&
-               (size (G) < size (F))) 
+               (size (G) < size (F)))
                || (!xxx1.inCoeffDomain() && xxx2.inCoeffDomain()))
       {
         DD[1] = buf;
