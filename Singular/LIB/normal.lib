@@ -377,9 +377,11 @@ EXAMPLE: example normal; shows an example
       for(j = 1; j <= size(norComp); j++)
       {
         newR = norComp[j][3];
-        def savebasering=basering;
+	if(!defined(savebasering)) { def savebasering;}
+        savebasering=basering;
         setring newR; // must be in a compatible ring to newR
                       // as ringlist may produce ring-dep. stuff
+	if(!defined(newRList)) { list newRList;}
         newRList = ringlist(newR);
         setring savebasering;
         U = norComp[j][1];
