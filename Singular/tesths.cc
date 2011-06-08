@@ -42,7 +42,7 @@
 #include <factory/factory.h>
 #endif
 
-extern int iiInitArithmetic();
+extern int siInit(char *);
 
 #if ! defined(LIBSINGULAR)
 /*0 implementation*/
@@ -50,39 +50,15 @@ int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
 {
-#ifdef HAVE_FACTORY
-  On(SW_USE_NTL);
-  Off(SW_USE_GCD_P);
-  On(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
-  On(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s: fixed
-  On(SW_USE_EZGCD);
-  On(SW_USE_CHINREM_GCD);
-  //On(SW_USE_FF_MOD_GCD);
-  //On(SW_USE_fieldGCD);
-  On(SW_USE_EZGCD_P);
-  On(SW_USE_QGCD);
-  Off(SW_USE_NTL_SORT); // may be changed by an command line option
-#endif
-
-#ifdef INIT_BUG
-  jjInitTab1();
-#endif
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   omInitRet_2_Info(argv[0]);
   omInitGetBackTrace();
 
-  /* initialize components */
-  factoryError=WerrorS;
-  siRandomStart=inits();
-  feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
-  int optc, option_index;
-  const char* errormsg;
-
-  // do this first, because -v might print version path
-  feInitResources(argv[0]);
-  iiInitArithmetic();
+  siInit(argv[0]);
 
   // parse command line options
+  int optc, option_index;
+  const char* errormsg;
   while((optc = fe_getopt_long(argc, argv,
                                SHORT_OPTS_STRING, feOptSpec, &option_index))
         != EOF)
@@ -120,26 +96,13 @@ int main(          /* main entry to Singular */
   }
 
   /* say hello */
-#if 0
-  SingularBuilder::Ptr SingularInstance = SingularBuilder::instance();
-#else
-  {
-    basePack=(package)omAlloc0(sizeof(*basePack));
-    currPack=basePack;
-    idhdl h;
-    h=enterid("Top", 0, PACKAGE_CMD, &IDROOT, TRUE);
-    IDPACKAGE(h)->language = LANG_TOP;
-    IDPACKAGE(h)=basePack;
-    currPackHdl=h;
-    basePackHdl=h;
 #ifdef HAVE_FANS
-    bbcone_setup();
-    bbfan_setup();
+  bbcone_setup();
+  bbfan_setup();
 #endif /* HAVE_FANS */
-    //for official version: not active
-    //bigintm_setup();
-  }
-#endif
+  //for official version: not active
+  //bigintm_setup();
+
   if (TEST_V_QUIET)
   {
     (printf)(
@@ -167,22 +130,8 @@ int main(          /* main entry to Singular */
     *    memcpy(stderr,stdout,sizeof(FILE));
     */
   }
-  slStandardInit();
-  myynest=0;
-  if (! feOptValue(FE_OPT_NO_STDLIB))
-  {
-    int vv=verbose;
-    verbose &= ~Sy_bit(V_LOAD_LIB);
-    iiLibCmd(omStrDup("standard.lib"), TRUE,TRUE,TRUE);
-    verbose=vv;
-  }
   pyobject_setup();
   errorreported = 0;
-
-  // and again, ifdef OM_NDEBUG this call is undef'ed
-  // otherwise, it marks all memory allocated so far as static
-  // i.e. as memory which is not mention on omPrintUsedAddr:
-  //omMarkMemoryAsStatic();
 
   setjmp(si_start_jmpbuf);
 

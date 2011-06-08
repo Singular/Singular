@@ -20,10 +20,8 @@
 #include <Singular/lists.h>
 #include <kernel/longrat.h>
 #include <Singular/misc_ip.h>
-#ifdef LIBSINGULAR
-#include <Singular/silink.h>
 #include <Singular/feOpt.h>
-#endif
+#include <Singular/silink.h>
 
 void number2mpz(number n, mpz_t m)
 {
@@ -1125,18 +1123,36 @@ int mmInit( void )
   return 1;
 }
 
-#ifdef LIBSINGULAR
 int siInit(char *name)
 {
+#ifdef HAVE_FACTORY
+  On(SW_USE_NTL);
+  Off(SW_USE_GCD_P);
+  On(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
+  On(SW_USE_NTL_GCD_P); // On -> cyle in Short/brnoeth_s: fixed
+  On(SW_USE_EZGCD);
+  On(SW_USE_CHINREM_GCD);
+  //On(SW_USE_FF_MOD_GCD);
+  //On(SW_USE_fieldGCD);
+  On(SW_USE_EZGCD_P);
+  On(SW_USE_QGCD);
+  Off(SW_USE_NTL_SORT); // may be changed by an command line option
+#endif
 
+#ifdef INIT_BUG
+  jjInitTab1();
+#endif
+  /* initialize components */
+  factoryError=WerrorS;
+  siRandomStart=inits();
+  feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
+
+  // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   // hack such that all shared' libs in the bindir are loaded correctly
   feInitResources(name);
   extern int iiInitArithmetic();
   iiInitArithmetic();
 
-#if 0
-  SingularBuilder::Ptr SingularInstance = SingularBuilder::instance();
-#else
   basePack=(package)omAlloc0(sizeof(*basePack));
   currPack=basePack;
   idhdl h;
@@ -1148,7 +1164,7 @@ int siInit(char *name)
 
   slStandardInit();
   myynest=0;
-#endif
+
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {
     int vv=verbose;
@@ -1158,5 +1174,4 @@ int siInit(char *name)
   }
   errorreported = 0;
 }
-#endif
 
