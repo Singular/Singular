@@ -92,7 +92,7 @@ uninstalltargets=@uninstalltargets@
 #
 # - compiler flags.
 #
-WARNFLAGS =	-w
+WARNFLAGS =	-Wall
 
 # flags to translate library c files
 LIBCFLAGS =	$(WARNFLAGS) \
