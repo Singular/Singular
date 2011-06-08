@@ -37,9 +37,9 @@ $Id$
 #define p800
 
 #ifdef p800
-#include <../../cddlib/include/setoper.h>
-#include <../../cddlib/include/cdd.h>
-#include <../../cddlib/include/cddmp.h>
+#include <../cddlib-094f/lib-src-gmp/setoper.h>
+#include <../cddlib-094f/lib-src-gmp/cdd.h>
+#include <../cddlib-094f/lib-src-gmp/cddmp.h>
 #endif
 
 #ifndef gfan_DEBUG
@@ -3073,7 +3073,7 @@ void gcone::noRevS(gcone &gcRoot, bool usingIntPoint)
 			ring rTmp=rCopy(fAct->flipRing);
 			rComplete(rTmp);
 			rChangeCurrRing(rTmp);
-			gcone *gcTmp = new gcone::gcone(*gcAct,*fAct);//copy constructor!
+			gcone *gcTmp = new gcone(*gcAct,*fAct);//copy constructor!
 			/* Now gcTmp->gcBasis and gcTmp->baseRing are set from fAct->flipGB and fAct->flipRing.
 			 * Since we come at most once across a given facet from gcAct->facetPtr we can delete them.
 			 * NOTE: Can this cause trouble with the destructor?
