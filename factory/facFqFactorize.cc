@@ -617,10 +617,8 @@ extFactorRecombination (const CFList& factors, const CanonicalForm& F,
   if (factors.length() < 1)
     return CFList();
 
-  int degMipoBeta;
-  if (!k && beta.level() == 1)
-    degMipoBeta= 1;
-  else if (!k && beta.level() != 1)
+  int degMipoBeta= 1;
+  if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
   CFList T, S;
@@ -914,10 +912,8 @@ extLiftBoundAdaption (const CanonicalForm& F, const CFList& factors, bool&
   int d= bound;
   int e= 0;
   int nBuf;
-  int degMipoBeta;
-  if (!k && beta.level() == 1)
-    degMipoBeta= 1;
-  else if (!k && beta.level() != 1)
+  int degMipoBeta= 1;
+  if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
   CFList source, dest;
@@ -1064,10 +1060,8 @@ extEarlyFactorDetect (CanonicalForm& F, CFList& factors, int& adaptedLiftBound,
   int nBuf;
   CFList source, dest;
 
-  int degMipoBeta;
-  if (!k && beta.level() == 1)
-    degMipoBeta= 1;
-  else if (!k && beta.level() != 1)
+  int degMipoBeta= 1;
+  if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
   for (CFListIterator i= factors; i.hasItem(); i++)

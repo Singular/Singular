@@ -52,10 +52,12 @@ smodgcd( const CanonicalForm & u, const CanonicalForm & v, const CanonicalForm &
   else if ( v.inBaseDomain() )
     return gcd( icontent( u ), v);
   else if ( u.isUnivariate() )
+  {
     if ( v.isUnivariate() )
       return gcd( u, v );
     else
       return gcd( v, u );
+  }
 
   //   u und v Polynome in levU - Variablen x1, ..., xlevU
   //   mit den gleichen Variablen, welches in sparsemod gesichert wurde

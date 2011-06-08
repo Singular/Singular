@@ -556,6 +556,7 @@ InternalCF* InternalRational::subcoeff( InternalCF* c, bool negate )
     {
         int cc = imm2int( c );
         if ( cc == 0 )
+        {
             if ( negate )
             {
                 if ( getRefCount() == 1 )
@@ -574,6 +575,7 @@ InternalCF* InternalRational::subcoeff( InternalCF* c, bool negate )
             }
             else
                 return this;
+        }
         mpz_init( &n );
         if ( cc < 0 )
         {

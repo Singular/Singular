@@ -146,10 +146,12 @@ static void gf_get_table ( int p, int n )
             gf_table[i] = convertback62( bufptr, digs );
             bufptr += digs;
             if ( gf_table[i] == gf_q )
+            {
                 if ( i == gf_q1 )
                     gf_m1 = 0;
                 else
                     gf_m1 = i;
+            }
             i++; k++;
         }
     }

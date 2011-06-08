@@ -352,6 +352,7 @@ InternalPoly::mulsame( InternalCF* aCoeff )
     {
         resultFirst = reduceTermList( resultFirst, (getInternalMipo( var ))->firstTerm, resultLast );
         if ( resultFirst == 0 )
+        {
             if ( getRefCount() <= 1 )
             {
                 delete this;
@@ -362,7 +363,9 @@ InternalPoly::mulsame( InternalCF* aCoeff )
                 decRefCount();
                 return CFFactory::basic(0);
             }
+        }
         else  if ( resultFirst->exp == 0 )
+        {
             if ( getRefCount() <= 1 )
             {
                 InternalCF * res = resultFirst->coeff.getval();
@@ -377,6 +380,7 @@ InternalPoly::mulsame( InternalCF* aCoeff )
                 delete resultFirst;
                 return res;
             }
+        }
     }
     if ( getRefCount() <= 1 )
     {
@@ -729,6 +733,7 @@ InternalPoly::comparesame ( InternalCF * acoeff )
             // last `else' in the enclosed `if' statement since a
             // test on inequaltiy in general is cheaper
             if ( (cursor1->exp != cursor2->exp) || (cursor1->coeff != cursor2->coeff) )
+            {
                 if ( cursor1->exp > cursor2->exp )
                     return 1;
                 else  if ( cursor1->exp < cursor2->exp )
@@ -737,6 +742,7 @@ InternalPoly::comparesame ( InternalCF * acoeff )
                     return 1;
                 else
                     return -1;
+             }
         // check trailing terms
         if ( cursor1 == cursor2 )
             return 0;
@@ -964,6 +970,7 @@ InternalPoly::dividecoeff( InternalCF* cc, bool invert )
         }
     }
     if ( invert )
+    {
         if ( getRefCount() <= 1 )
         {
             delete this;
@@ -974,6 +981,7 @@ InternalPoly::dividecoeff( InternalCF* cc, bool invert )
             decRefCount();
             return CFFactory::basic( 0 );
         }
+    }
     if ( c.isOne() )
         return this;
     else
@@ -1038,6 +1046,7 @@ InternalPoly::divcoeff( InternalCF* cc, bool invert )
         }
     }
     if ( invert )
+    {
         if ( getRefCount() <= 1 )
         {
             delete this;
@@ -1048,6 +1057,7 @@ InternalPoly::divcoeff( InternalCF* cc, bool invert )
             decRefCount();
             return CFFactory::basic( 0 );
         }
+    }
     if ( c.isOne() )
         return this;
     else

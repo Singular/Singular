@@ -266,10 +266,8 @@ extFactorRecombination (CFList& factors, CanonicalForm& F,
 
   DEBOUTLN (cerr, "LC (F, 1)*prodMod (factors, M) == F " <<
             (LC (F, 1)*prodMod (factors, M) == F));
-  int degMipoBeta;
-  if (!k && beta.level() == 1)
-    degMipoBeta= 1;
-  else if (!k && beta.level() != 1)
+  int degMipoBeta= 1;
+  if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
 
   CFList T, S, Diff;
@@ -702,10 +700,8 @@ extEarlyFactorDetection (CanonicalForm& F, CFList& factors,
   bool trueFactor= false;
   int d= degree (F) + degree (LCBuf);
   CFList source, dest;
-  int degMipoBeta;
-  if (!k && beta.level() == 1)
-    degMipoBeta= 1;
-  else if (!k && beta.level() != 1)
+  int degMipoBeta= 1;
+  if (!k && beta.level() != 1)
     degMipoBeta= degree (getMipo (beta));
   for (CFListIterator i= factors; i.hasItem(); i++)
   {
@@ -4603,7 +4599,7 @@ init4ext (const ExtensionInfo& info, const CanonicalForm& evaluation,
     CanonicalForm mipo= findMinPoly (bufEvaluation, alpha);
     gamma= rootOf (mipo);
     Variable V_buf;
-    bool fail;
+    bool fail= false;
     primElemAlpha= primitiveElement (alpha, V_buf, fail);
     imPrimElemAlpha= map (primElemAlpha, alpha, bufEvaluation, gamma);
 
@@ -5376,7 +5372,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   A= A (y + evaluation, y);
 
-  int liftBound= liftBound= degree (A, y) + 1 + degree (LC(A, x));
+  int liftBound= degree (A, y) + 1 + degree (LC(A, x));
 
   int boundsLength;
   int * bounds= computeBounds (A (y - evaluation, y), boundsLength);
@@ -5393,7 +5389,7 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
 
   DEBOUTLN (cerr, "uniFactors= " << uniFactors);
 
-  if (GF && !extension || (GF && extension && k != 1))
+  if ((GF && !extension) || (GF && extension && k != 1))
   {
     bool earlySuccess= false;
     CFList earlyFactors;

@@ -211,7 +211,6 @@ sqrfPart (const CanonicalForm& F, CanonicalForm& pthPower,
   pthPower= 1;
   CanonicalForm result;
   int i= 1;
-  bool GF= (CFFactory::gettype() == GaloisFieldDomain);
   bool allZero= true;
   for (; i <= A.level(); i++)
   {
