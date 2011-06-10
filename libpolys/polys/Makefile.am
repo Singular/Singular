@@ -44,6 +44,8 @@ SOURCES = \
 	monomials/monomials.cc monomials/p_polys.cc monomials/ring.cc monomials/maps.cc \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc templates/p_MemCmp.h templates/p_MemCopy.h templates/p_Numbers.h \
+	templates/p_Procs_Set.h templates/p_Procs_Static.h templates/p_Procs_Dynamic.h \
+	templates/p_Procs_Impl.h \
 	nc/gring.cc nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc nc/ncSAMult.cc \
 	pDebug.cc polys0.cc prCopy.cc \
 	kbuckets.cc sbuckets.cc weight.cc weight0.c simpleideals.cc matpol.cc \
@@ -59,7 +61,6 @@ LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
 	operations/pShallowCopyDelete.h \
 	templates/p_MemAdd.h operations/p_Mult_q.h \
 	templates/p_Procs.h templates/mod_raw.h \
-	templates/p_Procs_Dynamic.h templates/p_Procs_Impl.h templates/p_Procs_Set.h templates/p_Procs_Static.h \
 	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h matpol.h \
 	ext_fields/algext.h clapsing.h clapconv.h
