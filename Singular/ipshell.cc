@@ -2146,7 +2146,13 @@ ring rCompose(const lists  L)
         iv=new intvec((int)(long)vv->m[1].Data(),(int)(long)vv->m[1].Data());
       else
         iv=ivCopy((intvec*)vv->m[1].Data()); //assume INTVEC
-      R->block1[j]=si_max(R->block0[j],R->block0[j]+iv->length()-1);
+      int iv_len=iv->length();
+      R->block1[j]=si_max(R->block0[j],R->block0[j]+iv_len-1);
+      if (R->block1[j]>R->N)
+      {
+	R->block1[j]=R->N;
+	iv_len=R->block1[j]-R->block0[j]+1;
+      }
       //Print("block %d from %d to %d\n",j,R->block0[j], R->block1[j]);
       int i;
       switch (R->order[j])
@@ -2158,8 +2164,8 @@ ring rCompose(const lists  L)
          case ringorder_a:
          case ringorder_wp:
          case ringorder_Wp:
-           R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
-           for (i=0; i<iv->length();i++)
+           R->wvhdl[j] =( int *)omAlloc(iv_len*sizeof(int));
+           for (i=0; i<iv_len;i++)
            {
              R->wvhdl[j][i]=(*iv)[i];
            }
@@ -2168,6 +2174,11 @@ ring rCompose(const lists  L)
            R->wvhdl[j] =( int *)omAlloc((iv->length())*sizeof(int));
            for (i=0; i<iv->length();i++) R->wvhdl[j][i]=(*iv)[i];
            R->block1[j]=si_max(R->block0[j],R->block0[j]+(int)sqrt((double)(iv->length()-1)));
+           if (R->block1[j]>R->N)
+	   {
+	     WerrorS("ordering matrix too big");
+	     goto rCompose_err;
+	   }
            break;
          case ringorder_ls:
          case ringorder_ds:
@@ -2187,9 +2198,7 @@ ring rCompose(const lists  L)
            break;
 
          case ringorder_s:
-         {
            break;
-         }
 
          case ringorder_IS:
          {
