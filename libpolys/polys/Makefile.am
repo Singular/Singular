@@ -61,7 +61,7 @@ LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
 	operations/pShallowCopyDelete.h \
 	templates/p_MemAdd.h operations/p_Mult_q.h \
 	templates/p_Procs.h templates/mod_raw.h \
-	monomials/p_polys.h monomials/polys-impl.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
+	monomials/p_polys.h monomials/maps.h polys.h prCopy.h prCopyMacros.h \
 	kbuckets.h sbuckets.h simpleideals.h weight.h matpol.h \
 	ext_fields/algext.h clapsing.h clapconv.h
 
