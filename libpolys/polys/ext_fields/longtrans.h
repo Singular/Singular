@@ -9,7 +9,6 @@
               i.e., in rational function fields
 */
 #include <coeffs/longrat.h>
-#include <polys/monomials/polys-impl.h>
 
 /* 
    IMPORTANT INFORMATION:

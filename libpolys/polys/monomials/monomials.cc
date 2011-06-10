@@ -28,7 +28,6 @@
 #undef NO_INLINE3
 #define NO_INLINE3
 #endif
-#include <polys/monomials/polys-impl.h>
 
 #include <polys/monomials/ring.h>
 #include <reporter/reporter.h>
