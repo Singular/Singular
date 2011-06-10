@@ -462,9 +462,8 @@ static int p_Comp_RevLex(poly a, poly b,BOOLEAN nolex, const ring R)
 */
 intvec *id_Sort(ideal id,BOOLEAN nolex, const ring r)
 {
-  poly p,q;
   intvec * result = new intvec(IDELEMS(id));
-  int i, j, actpos=0, newpos, l;
+  int i, j, actpos=0, newpos;
   int diff, olddiff, lastcomp, newcomp;
   BOOLEAN notFound;
 
@@ -1102,7 +1101,7 @@ ideal id_Power(ideal given,int exp, const ring r)
 */
 void id_Compactify(ideal id, const ring r)
 {
-  int i,j;
+  int i;
   BOOLEAN b=FALSE;
 
   i = IDELEMS(id)-1;
@@ -1167,9 +1166,8 @@ ideal id_Matrix2Module(matrix mat, const ring R)
   int mc=MATCOLS(mat);
   int mr=MATROWS(mat);
   ideal result = idInit(si_max(mc,1),si_max(mr,1));
-  int i,j, l;
+  int i,j,l;
   poly h;
-  poly p;
   sBucket_pt bucket = sBucketCreate(R);
 
   for(j=0;j<mc /*MATCOLS(mat)*/;j++) /* j is also index in result->m */
@@ -1306,7 +1304,7 @@ BOOLEAN id_HomModule(ideal m, ideal Q, intvec **w, const ring R)
 
   long cmax=1,order=0,ord,* diff,diffmin=32000;
   int *iscom;
-  int i,j;
+  int i;
   poly p=NULL;
   pFDegProc d;
   if (R->pLexOrder && (R->order[0]==ringorder_lp))

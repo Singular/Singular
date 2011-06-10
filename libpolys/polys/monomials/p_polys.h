@@ -24,7 +24,6 @@
 
 #include <polys/monomials/ring.h>
 #include <polys/monomials/monomials.h>
-#include <polys/monomials/polys-impl.h>
 
 #include <polys/templates/p_MemAdd.h>
 #include <polys/templates/p_Procs.h>

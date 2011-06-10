@@ -10,7 +10,6 @@
 #include <coeffs/coeffs.h>
 #include <coeffs/longrat.h>
 #include <polys/monomials/ring.h>
-#include <polys/monomials/polys-impl.h>
 #include <polys/ext_fields/longtrans.h>
 
 /* 
