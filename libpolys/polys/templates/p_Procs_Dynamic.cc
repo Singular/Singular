@@ -38,7 +38,7 @@ BOOLEAN p_procs_dynamic = TRUE;
 // include general p_Proc stuff
 #include "templates/p_Procs_Impl.h"
 
-#include "templates/mod_raw.h"
+#include "mod_raw.h"
 
 // define to bound for length of p_Proc name
 #define MAX_PROCNAME_LEN 200
