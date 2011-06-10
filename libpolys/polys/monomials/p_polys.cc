@@ -24,6 +24,10 @@
 
 #include "monomials/ring.h"
 #include "monomials/p_polys.h"
+#include <polys/templates/p_MemCmp.h>
+#include <polys/templates/p_MemAdd.h>
+#include <polys/templates/p_MemCopy.h>
+
 
 // #include <???/ideals.h>
 // #include <???/int64vec.h>

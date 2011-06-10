@@ -35,7 +35,6 @@
 #include <coeffs/numbers.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
-#include <polys/templates/p_Procs.h>
 #include <reporter/reporter.h>
 
 #ifdef PDEBUG
