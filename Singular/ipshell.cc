@@ -196,7 +196,7 @@ static void list1(const char* s, idhdl h,BOOLEAN c, BOOLEAN fullname)
   PrintLn();
 }
 
-void type_cmd(idhdl h)
+void type_cmd(leftv v)
 {
   BOOLEAN oldShortOut = FALSE;
 
@@ -205,16 +205,35 @@ void type_cmd(idhdl h)
     oldShortOut = currRing->ShortOut;
     currRing->ShortOut = 1;
   }
-  list1("// ",h,FALSE,FALSE);
-  if (IDTYP(h)!=INT_CMD)
+  int t=v->Typ();
+  Print("// %s %s ",v->Name(),Tok2Cmdname(t));
+  switch (t)
   {
-    sleftv expr;
-    memset(&expr,0,sizeof(expr));
-    expr.rtyp=IDHDL;
-    expr.name=IDID(h);
-    expr.data=(void *)h;
-    expr.Print();
+    case MAP_CMD:Print(" from %s\n",((map)(v->Data()))->preimage); break;
+    case INTMAT_CMD: Print(" %d x %d\n",((intvec*)(v->Data()))->rows(),
+                                      ((intvec*)(v->Data()))->cols()); break;
+    case MATRIX_CMD:Print(" %u x %u\n" ,
+       MATROWS((matrix)(v->Data())),
+       MATCOLS((matrix)(v->Data())));break;
+    case MODUL_CMD: Print(", rk %d\n", (int)(((ideal)(v->Data()))->rank));break;
+    case LIST_CMD: Print(", size %d\n",((lists)(v->Data()))->nr+1); break;
+
+    case PROC_CMD:
+    case RING_CMD:
+    case IDEAL_CMD:
+    case QRING_CMD: PrintLn(); break;
+
+    //case INT_CMD:
+    //case STRING_CMD:
+    //case INTVEC_CMD:
+    //case POLY_CMD:
+    //case VECTOR_CMD:
+    //case PACKAGE_CMD:
+
+    default:
+      break;
   }
+  v->Print();
   if (currRing != NULL)
     currRing->ShortOut = oldShortOut;
 }

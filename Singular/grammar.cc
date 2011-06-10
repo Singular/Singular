@@ -789,8 +789,8 @@ static const unsigned short int yyrline[] =
     1084,  1097,  1096,  1104,  1109,  1116,  1124,  1136,  1152,  1171,
     1175,  1179,  1184,  1188,  1192,  1196,  1200,  1204,  1209,  1215,
     1221,  1227,  1233,  1239,  1245,  1251,  1263,  1270,  1274,  1312,
-    1322,  1335,  1335,  1338,  1410,  1419,  1448,  1461,  1478,  1487,
-    1492,  1500,  1512,  1531,  1542,  1562,  1586,  1592,  1604,  1611
+    1322,  1335,  1335,  1338,  1410,  1414,  1443,  1456,  1473,  1482,
+    1487,  1495,  1507,  1526,  1537,  1557,  1581,  1587,  1599,  1606
 };
 #endif
 
@@ -3371,17 +3371,12 @@ yyreduce:
   case 154:
 #line 1411 "grammar.y"
     {
-	    if ((yyvsp[0].lv.e!=NULL)||(yyvsp[0].lv.rtyp!=IDHDL)) yyvsp[0].lv.Print();
-	    else
-	    {
-              idhdl h = (idhdl)yyvsp[0].lv.data;
-              type_cmd(h);
-            }
+            type_cmd(&(yyvsp[0].lv));
           ;}
     break;
 
   case 155:
-#line 1420 "grammar.y"
+#line 1415 "grammar.y"
     {
             //Print("typ is %d, rtyp:%d\n",$1.Typ(),$1.rtyp);
             #ifdef SIQ
@@ -3407,7 +3402,7 @@ yyreduce:
     break;
 
   case 156:
-#line 1449 "grammar.y"
+#line 1444 "grammar.y"
     {
             int i; TESTSETINT(yyvsp[-2].lv,i);
             if (i!=0)
@@ -3423,7 +3418,7 @@ yyreduce:
     break;
 
   case 157:
-#line 1462 "grammar.y"
+#line 1457 "grammar.y"
     {
             if (currentVoice->ifsw==1)
             {
@@ -3443,7 +3438,7 @@ yyreduce:
     break;
 
   case 158:
-#line 1479 "grammar.y"
+#line 1474 "grammar.y"
     {
             int i; TESTSETINT(yyvsp[-2].lv,i);
             if (i)
@@ -3455,7 +3450,7 @@ yyreduce:
     break;
 
   case 159:
-#line 1488 "grammar.y"
+#line 1483 "grammar.y"
     {
             if (exitBuffer(BT_break)) YYERROR;
             currentVoice->ifsw=0;
@@ -3463,7 +3458,7 @@ yyreduce:
     break;
 
   case 160:
-#line 1493 "grammar.y"
+#line 1488 "grammar.y"
     {
             if (contBuffer(BT_break)) YYERROR;
             currentVoice->ifsw=0;
@@ -3471,7 +3466,7 @@ yyreduce:
     break;
 
   case 161:
-#line 1501 "grammar.y"
+#line 1496 "grammar.y"
     {
             /* -> if(!$2) break; $3; continue;*/
             char * s = (char *)omAlloc( strlen(yyvsp[-1].name) + strlen(yyvsp[0].name) + 36);
@@ -3483,7 +3478,7 @@ yyreduce:
     break;
 
   case 162:
-#line 1513 "grammar.y"
+#line 1508 "grammar.y"
     {
             /* $2 */
             /* if (!$3) break; $5; $4; continue; */
@@ -3502,7 +3497,7 @@ yyreduce:
     break;
 
   case 163:
-#line 1532 "grammar.y"
+#line 1527 "grammar.y"
     {
             procinfov pi;
             idhdl h = enterid(yyvsp[-1].name,myynest,PROC_CMD,&IDROOT,TRUE);
@@ -3516,7 +3511,7 @@ yyreduce:
     break;
 
   case 164:
-#line 1543 "grammar.y"
+#line 1538 "grammar.y"
     {
             idhdl h = enterid(yyvsp[-2].name,myynest,PROC_CMD,&IDROOT,TRUE);
             if (h==NULL)
@@ -3539,7 +3534,7 @@ yyreduce:
     break;
 
   case 165:
-#line 1563 "grammar.y"
+#line 1558 "grammar.y"
     {
             omFree((ADDRESS)yyvsp[-1].name);
             idhdl h = enterid(yyvsp[-3].name,myynest,PROC_CMD,&IDROOT,TRUE);
@@ -3563,7 +3558,7 @@ yyreduce:
     break;
 
   case 166:
-#line 1587 "grammar.y"
+#line 1582 "grammar.y"
     {
 	    // decl. of type proc p(int i)
             if (yyvsp[-1].i==PARAMETER)  { if (iiParameter(&yyvsp[0].lv)) YYERROR; }
@@ -3572,7 +3567,7 @@ yyreduce:
     break;
 
   case 167:
-#line 1593 "grammar.y"
+#line 1588 "grammar.y"
     {
 	    // decl. of type proc p(i)
             sleftv tmp_expr;
@@ -3584,7 +3579,7 @@ yyreduce:
     break;
 
   case 168:
-#line 1605 "grammar.y"
+#line 1600 "grammar.y"
     {
             if(iiRETURNEXPR==NULL) YYERROR;
             iiRETURNEXPR[myynest].Copy(&yyvsp[-1].lv);
@@ -3594,7 +3589,7 @@ yyreduce:
     break;
 
   case 169:
-#line 1612 "grammar.y"
+#line 1607 "grammar.y"
     {
             if (yyvsp[-2].i==RETURN)
             {
@@ -3610,7 +3605,7 @@ yyreduce:
     }
 
 /* Line 1010 of yacc.c.  */
-#line 3614 "grammar.cc"
+#line 3609 "grammar.cc"
 
   yyvsp -= yylen;
   yyssp -= yylen;

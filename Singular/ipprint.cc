@@ -362,10 +362,7 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
   else if (strcmp(ns,"%t") == 0)
   {
     SPrintStart();
-    if (u->rtyp==IDHDL)
-      type_cmd((idhdl) (u->data));
-    else
-      type_cmd((idhdl) u);
+    type_cmd(u);
     res->data = SPrintEnd();
     if (dim != 2)
       ((char*)res->data)[strlen((char*)res->data) -1] = '\0';

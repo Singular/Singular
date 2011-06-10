@@ -1409,12 +1409,7 @@ setringcmd:
 typecmd:
         TYPE_CMD expr
           {
-	    if (($2.e!=NULL)||($2.rtyp!=IDHDL)) $2.Print();
-	    else
-	    {
-              idhdl h = (idhdl)$2.data;
-              type_cmd(h);
-            }
+            type_cmd(&($2));
           }
         | exprlist
           {

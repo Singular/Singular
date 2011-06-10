@@ -34,7 +34,7 @@ int     IsCmd(const char *n, int & tok);
 
 BOOLEAN iiPStart(idhdl pn, sleftv * sl);
 BOOLEAN iiEStart(char* example, procinfo *pi);
-void    type_cmd(idhdl h);
+void    type_cmd(leftv v);
 void    test_cmd(int i);
 void    list_cmd(int typ, const char* what, const char * prefix,
                  BOOLEAN iterate, BOOLEAN fullname=FALSE);
