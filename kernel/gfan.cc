@@ -4415,7 +4415,7 @@ gfan::ZFan* grfan(ideal inputIdeal, int h, bool singleCone=FALSE)
 			  gcAct->noRevS(*gcAct);	//Here we go!
 			}			    
 			//Switch back to the ring the computation was started in
-// 			rChangeCurrRing(inputRing);
+			rChangeCurrRing(inputRing);
 			//res=gcAct->gcBasis;
 			//Below is a workaround, since gcAct->gcBasis gets deleted in noRevS
 #ifndef USE_ZFAN
