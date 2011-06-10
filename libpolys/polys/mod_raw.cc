@@ -27,7 +27,7 @@
 #include <resources/feResource.h>
 #include <resources/feFopen.h>
 
-#include "templates/mod_raw.h"
+#include "mod_raw.h"
 
 #ifdef HAVE_STATIC
 #undef HAVE_DL
