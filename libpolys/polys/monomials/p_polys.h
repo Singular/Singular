@@ -26,12 +26,8 @@
 #include <polys/monomials/monomials.h>
 #include <polys/monomials/polys-impl.h>
 
-#include <polys/templates/p_MemCmp.h>
 #include <polys/templates/p_MemAdd.h>
-#include <polys/templates/p_MemCopy.h>
 #include <polys/templates/p_Procs.h>
-
-// #include <polys/monomials/p_polys.h>
 
 #include <polys/sbuckets.h>
 
@@ -852,7 +848,7 @@ static inline poly p_Head(poly p, const ring r)
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
-  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
+  memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
   pNext(np) = NULL;
   pSetCoeff0(np, n_Copy(pGetCoeff(p), r->cf));
   return np;
@@ -1282,7 +1278,7 @@ static inline void p_ExpVectorCopy(poly d_p, poly s_p, const ring r)
 {
   p_LmCheckPolyRing1(d_p, r);
   p_LmCheckPolyRing1(s_p, r);
-  p_MemCopy_LengthGeneral(d_p->exp, s_p->exp, r->ExpL_Size);
+  memcpy(d_p->exp, s_p->exp, r->ExpL_Size*sizeof(long));
 }
 
 static inline poly p_Init(const ring r, omBin bin)
@@ -1306,7 +1302,7 @@ static inline poly p_LmInit(poly p, const ring r)
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
-  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
+  memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
   pNext(np) = NULL;
   pSetCoeff0(np, NULL);
   return np;
@@ -1344,7 +1340,7 @@ static inline poly p_GetExp_k_n(poly p, int l, int k, const ring r)
   poly np;
   omTypeAllocBin(poly, np, r->PolyBin);
   p_SetRingOfLm(np, r);
-  p_MemCopy_LengthGeneral(np->exp, p->exp, r->ExpL_Size);
+  memcpy(np->exp, p->exp, r->ExpL_Size*sizeof(long));
   pNext(np) = NULL;
   pSetCoeff0(np, n_Init(1, r->cf));
   int i;
@@ -1363,7 +1359,7 @@ static inline poly p_LmShallowCopyDelete(poly p, const ring r)
   p_LmCheckPolyRing1(p, r);
   pAssume1(bin->sizeW == r->PolyBin->sizeW);
   poly new_p = p_New(r);
-  p_MemCopy_LengthGeneral(new_p->exp, p->exp, r->ExpL_Size);
+  memcpy(new_p->exp, p->exp, r->ExpL_Size*sizeof(long));
   pSetCoeff0(new_p, pGetCoeff(p));
   pNext(new_p) = pNext(p);
   omFreeBinAddr(p);
@@ -1389,6 +1385,21 @@ static inline void p_ExpVectorAdd(poly p1, poly p2, const ring r)
   p_MemAdd_LengthGeneral(p1->exp, p2->exp, r->ExpL_Size);
   p_MemAdd_NegWeightAdjust(p1, r);
 }
+// ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
+static inline void p_ExpVectorSum(poly pr, poly p1, poly p2, const ring r)
+{
+  p_LmCheckPolyRing1(p1, r);
+  p_LmCheckPolyRing1(p2, r);
+  p_LmCheckPolyRing1(pr, r);
+#if PDEBUG >= 1
+  for (int i=1; i<=r->N; i++)
+    pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
+  pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
+#endif
+
+  p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
+  p_MemAdd_NegWeightAdjust(pr, r);
+}
 // ExpVector(p1) -= ExpVector(p2)
 static inline void p_ExpVectorSub(poly p1, poly p2, const ring r)
 {
@@ -1406,38 +1417,23 @@ static inline void p_ExpVectorSub(poly p1, poly p2, const ring r)
 
 }
 // ExpVector(p1) += ExpVector(p2) - ExpVector(p3)
-static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, const ring r)
-{
-  p_LmCheckPolyRing1(p1, r);
-  p_LmCheckPolyRing1(p2, r);
-  p_LmCheckPolyRing1(p3, r);
-#if PDEBUG >= 1
-  for (int i=1; i<=r->N; i++)
-    pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
-  pAssume1(p_GetComp(p1, r) == 0 ||
-           (p_GetComp(p2, r) - p_GetComp(p3, r) == 0) ||
-           (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
-#endif
+//static inline void p_ExpVectorAddSub(poly p1, poly p2, poly p3, const ring r)
+//{
+//  p_LmCheckPolyRing1(p1, r);
+//  p_LmCheckPolyRing1(p2, r);
+//  p_LmCheckPolyRing1(p3, r);
+//#if PDEBUG >= 1
+//  for (int i=1; i<=r->N; i++)
+//    pAssume1(p_GetExp(p1, i, r) + p_GetExp(p2, i, r) >= p_GetExp(p3, i, r));
+//  pAssume1(p_GetComp(p1, r) == 0 ||
+//           (p_GetComp(p2, r) - p_GetComp(p3, r) == 0) ||
+//           (p_GetComp(p1, r) == p_GetComp(p2, r) - p_GetComp(p3, r)));
+//#endif
+//
+//  p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpL_Size);
+//  // no need to adjust in case of NegWeights
+//}
 
-  p_MemAddSub_LengthGeneral(p1->exp, p2->exp, p3->exp, r->ExpL_Size);
-  // no need to adjust in case of NegWeights
-}
-
-// ExpVector(pr) = ExpVector(p1) + ExpVector(p2)
-static inline void p_ExpVectorSum(poly pr, poly p1, poly p2, const ring r)
-{
-  p_LmCheckPolyRing1(p1, r);
-  p_LmCheckPolyRing1(p2, r);
-  p_LmCheckPolyRing1(pr, r);
-#if PDEBUG >= 1
-  for (int i=1; i<=r->N; i++)
-    pAssume1((unsigned long) (p_GetExp(p1, i, r) + p_GetExp(p2, i, r)) <= r->bitmask);
-  pAssume1(p_GetComp(p1, r) == 0 || p_GetComp(p2, r) == 0);
-#endif
-
-  p_MemSum_LengthGeneral(pr->exp, p1->exp, p2->exp, r->ExpL_Size);
-  p_MemAdd_NegWeightAdjust(pr, r);
-}
 // ExpVector(pr) = ExpVector(p1) - ExpVector(p2)
 static inline void p_ExpVectorDiff(poly pr, poly p1, poly p2, const ring r)
 {
@@ -1508,13 +1504,38 @@ static inline void p_SetExpV(poly p, int *ev, const ring r)
  * Comparison w.r.t. monomial ordering
  *
  ***************************************************************/
+
 static inline int p_LmCmp(poly p, poly q, const ring r)
 {
   p_LmCheckPolyRing1(p, r);
   p_LmCheckPolyRing1(q, r);
 
-  p_MemCmp_LengthGeneral_OrdGeneral(p->exp, q->exp, r->CmpL_Size, r->ordsgn,
-                                    return 0, return 1, return -1);
+  const unsigned long* _s1 = ((unsigned long*) p->exp);
+  const unsigned long* _s2 = ((unsigned long*) q->exp);
+  register unsigned long _v1;
+  register unsigned long _v2;
+  const unsigned long _l = r->CmpL_Size;
+
+  register unsigned long _i=0;
+
+  LengthGeneral_OrdGeneral_LoopTop:
+  _v1 = _s1[_i];
+  _v2 = _s2[_i];
+  if (_v1 == _v2)
+  {
+    _i++;
+    if (_i == _l) return 0;
+    goto LengthGeneral_OrdGeneral_LoopTop;
+  }
+  const long* _ordsgn = (long*) r->ordsgn;
+  if (_v1 > _v2)
+  {
+    if (_ordsgn[_i] == 1) return 1;
+    return -1;
+  }
+  if (_ordsgn[_i] == 1) return -1;
+  return 1;
+
 }
 
 /// returns TRUE if p1 is a skalar multiple of p2
