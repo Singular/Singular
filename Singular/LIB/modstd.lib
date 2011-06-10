@@ -367,7 +367,8 @@ proc primeTest(ideal I, bigint p)
    {
       for(j = 1; j <= size(I[i]); j++)
       {
-         if((leadcoef(I[i][j]) mod p) == 0) { return(0); }
+         if((numerator(leadcoef(I[i][j])) mod p) == 0) { return(0); }
+         if((denominator(leadcoef(I[i][j])) mod p) == 0) { return(0); }
       }
    }
    return(1);
@@ -649,7 +650,7 @@ NOTE:    The procedure computes a standard basis of I (over the rational
 @*       - variant = 4, if I is homogeneous and exactness = 1,
 @*       - variant = 5, if I is not homogeneous, 1-block-ordering and
                         exactness = 1,
-@*       - variant = 3, if I is not homogeneous, complicated ordering (lp or
+@*       - variant = 6, if I is not homogeneous, complicated ordering (lp or
                         > 1 block) and exactness = 1.
 EXAMPLE: example modStd; shows an example
 "
@@ -667,7 +668,6 @@ EXAMPLE: example modStd; shows an example
 
    int index = 1;
    int i,k,c;
-   int pd = printlevel-voice+2;
    int j = 1;
    int pTest, sizeTest;
    int en = 2134567879;
@@ -681,22 +681,52 @@ EXAMPLE: example modStd; shows an example
       {
          int n1 = #[1];
          int exactness = 1;
-         int n2 = 10;
-         int n3 = 10;
+         if(n1 >= 10)
+         { 
+            int n2 = n1 + 1;
+            int n3 = n1;
+         }
+         else
+         {
+            int n2 = 10;
+            int n3 = 10;
+         }
       }
       if(size(#) == 2)
       {
          int n1 = #[1];
          int exactness = #[2];
-         int n2 = 10;
-         int n3 = 10;
+         if(n1 >= 10)
+         { 
+            int n2 = n1 + 1;
+            int n3 = n1;
+         }
+         else
+         {
+            int n2 = 10;
+            int n3 = 10;
+         }
       }
       if(size(#) == 4)
       {
          int n1 = #[1];
          int exactness = #[2];
-         int n2 = #[3];
-         int n3 = #[4];
+         if(n1 >= #[3])
+         {
+            int n2 = n1 + 1;
+         }
+         else
+         {
+            int n2 = #[3];
+         }
+         if(n1 >= #[4])
+         {
+            int n3 = n1;
+         }
+         else
+         {
+            int n3 = #[4];
+         }
       }
    }
    else
@@ -705,6 +735,11 @@ EXAMPLE: example modStd; shows an example
       int exactness = 1;
       int n2 = 10;
       int n3 = 10;
+   }
+
+   if(printlevel >= 10)
+   {
+      "n1 = "+string(n1)+", n2 = "+string(n2)+", n3 = "+string(n3);
    }
 
 //-------------------------  Save current options  -----------------------------
@@ -833,7 +868,8 @@ EXAMPLE: example modStd; shows an example
       if(exactness == 1) { return(groebner(I)); }
       if(h)
       {
-         variant = 1; if(printlevel >= 10) { "variant = 1"; }
+         variant = 1;
+         if(printlevel >= 10) { "variant = 1"; }
          rl[1] = L[5];
          def @r = ring(rl);
          setring @r;
@@ -960,10 +996,11 @@ EXAMPLE: example modStd; shows an example
    while(1)
    {
       tt = timer; rt = rtimer;
-
+      
+      if(printlevel >= 10) { "size(L) = "+string(size(L)); }
+         
       if(n1 > 1)
       {
-         if(printlevel >= 10) { "size(L) = "+string(size(L)); }
          while(j <= size(L) + 1)
          {
             for(i = 1; i <= n1; i++)
@@ -1124,9 +1161,7 @@ EXAMPLE: example modStd; shows an example
                   return(J);
                }
             }
-            if(pd > 2) { "pTest o.k. but result wrong"; }
          }
-         if(pd > 2) { "pTest o.k. but result wrong"; }
       }
 
 //--------------  We do not already have a standard basis of I  ----------------
@@ -1182,12 +1217,6 @@ example
    ideal J2 = modStd(I,1,0);
    size(reduce(J1,J2));
    size(reduce(J2,J1));
-
-   /*
-   ring R4 = 0,x(1..4),wp(1,-1,-1,1);
-   ideal I = cyclic(4);
-   ideal J1 = modStd(I,1,0);
-   */
 }
 
 ////////////////////////////////////////////////////////////////////////////////
