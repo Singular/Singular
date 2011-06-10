@@ -45,7 +45,7 @@ SOURCES = \
 	operations/pShallowCopyDelete.cc operations/p_Mult_q.cc \
 	templates/p_Procs_Lib.cc \
 	nc/gring.cc nc/sca.cc nc/summator.cc nc/ncSAFormula.cc nc/ncSACache.cc nc/ncSAMult.cc \
-	pDebug.cc pInline0.cc polys0.cc prCopy.cc \
+	pDebug.cc polys0.cc prCopy.cc \
 	kbuckets.cc sbuckets.cc weight.cc weight0.c simpleideals.cc matpol.cc \
         ${USE_P_PROCS_STATIC_CC} ${USE_P_PROCS_DYNAMIC_CC} templates/mod_raw.cc \
         ext_fields/algext.cc ext_fields/transext.cc clapsing.cc clapconv.cc
@@ -56,7 +56,7 @@ noinst_HEADERS =
 
 LIBPOLYSHEADERS = monomials/ring.h monomials/monomials.h \
 	nc/nc.h nc/sca.h nc/summator.h nc/ncSAFormula.h nc/ncSACache.h nc/ncSAMult.h \
-	pInline0.h operations/pShallowCopyDelete.h \
+	operations/pShallowCopyDelete.h \
 	templates/p_MemAdd.h templates/p_MemCmp.h templates/p_MemCopy.h operations/p_Mult_q.h \
 	templates/p_Numbers.h templates/p_Procs.h templates/mod_raw.h \
 	templates/p_Procs_Dynamic.h templates/p_Procs_Impl.h templates/p_Procs_Set.h templates/p_Procs_Static.h \
