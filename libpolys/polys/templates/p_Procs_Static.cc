@@ -20,7 +20,7 @@
 #include <polys/kbuckets.h>
 #include <reporter/reporter.h>
 
-BOOLEAN p_procs_dynamic = FALSE;
+const BOOLEAN p_procs_dynamic = FALSE;
 
 #define LINKAGE
 

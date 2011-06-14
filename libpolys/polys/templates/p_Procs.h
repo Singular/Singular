@@ -67,6 +67,6 @@ void p_Debug_GetSpecNames(const ring r, const char* &field, const char* &length,
 void p_Debug_GetProcNames(const ring r, p_Procs_s* p_Procs);
 #endif
 // if set, then dynamic p_procs are used, otherwise static
-extern BOOLEAN p_procs_dynamic;
+extern const BOOLEAN p_procs_dynamic;
 
 #endif /* ! P_PROCS_H */
