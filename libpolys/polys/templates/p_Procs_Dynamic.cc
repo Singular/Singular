@@ -23,7 +23,7 @@
 #include <reporter/reporter.h>
 
 #ifdef HAVE_DL
-BOOLEAN p_procs_dynamic = TRUE;
+const BOOLEAN p_procs_dynamic = TRUE;
 
 #define WARN_MSG "Singular will work properly, but much slower."
 
