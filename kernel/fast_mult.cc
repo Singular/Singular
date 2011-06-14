@@ -455,7 +455,6 @@ static void p_MonMultMB(poly p, poly q,ring r)
 static poly p_MonMultCMB(poly p, poly q, ring r)
 {
   number x;
-  int i;
   poly res = p_Init(r,lm_bin);
 
   x = n_Mult(p_GetCoeff(p,r),p_GetCoeff(q,r),r);
@@ -518,9 +517,7 @@ static void buildTermAndAdd(int n,number* facult,poly* f_terms,int* exp,int f_le
     }
 
   }
-  int pseudo_len=1;
   zw=erg;
-  //  kBucket_Add_q(erg_bucket,erg,&pseudo_len);
 }
 
 

@@ -171,7 +171,7 @@ int findRingSolver(poly rside, ideal G, ring r)
 poly plain_spoly(poly f, poly g)
 {
   number cf = nCopy(pGetCoeff(f)), cg = nCopy(pGetCoeff(g));
-  int ct = ksCheckCoeff(&cf, &cg); // gcd and zero divisors
+  (void)ksCheckCoeff(&cf, &cg); // gcd and zero divisors
   poly fm, gm;
   k_GetLeadTerms(f, g, currRing, fm, gm, currRing);
   pSetCoeff0(fm, cg);

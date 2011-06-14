@@ -101,7 +101,6 @@ poly vandermonde::numvec2poly( const number * q )
 {
   int j;
   long i,c,sum;
-  number tmp;
 
   poly pnew,pit=NULL;
 
@@ -285,8 +284,6 @@ rootContainer::rootContainer()
 rootContainer::~rootContainer()
 {
   int i;
-  int n= pVariables;
-
   // free coeffs, ievpoint
   if ( ievpoint != NULL )
   {

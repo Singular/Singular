@@ -245,7 +245,7 @@ napoly napRemainder(napoly f, const napoly g)
 napoly napInvers(napoly x, const napoly c)
 {
   napoly y, r, qa, qn, q;
-  number t, h;
+  number t;
 
   if (p_GetExp(x, 1, nacRing) >= p_GetExp(c, 1, nacRing))
     x = napRemainder(x, c);
@@ -460,7 +460,6 @@ const char* napHandleMons(const char* s, int i, napoly ex)
 /* helper for napRead */
 const char* napHandlePars(const char *s, int i, napoly ex)
 {
-  int j;
   if (strcmp(s, ntParNames[i]) == 0)
   {
     s += strlen(ntParNames[i]);
@@ -878,7 +877,7 @@ napoly napMap(napoly p)
 
 napoly napPerm(napoly p,const int *par_perm,const ring src_ring,const nMapFunc nMap)
 {
-  napoly w, a;
+  napoly w;
 
   if (p==NULL) return NULL;
   w = (napoly)p_Init(nacRing);
@@ -1704,7 +1703,6 @@ void ntWrite(number &phn, const ring r)
 BOOLEAN ntIsOne(number za)
 {
   lnumber a = (lnumber)za;
-  napoly x, y;
   number t;
   if (a==NULL) return FALSE;
 #ifdef LDEBUG
@@ -1762,8 +1760,6 @@ BOOLEAN ntIsOne(number za)
 BOOLEAN ntIsMOne(number za)
 {
   lnumber a = (lnumber)za;
-  napoly x, y;
-  number t;
   if (a==NULL) return FALSE;
 #ifdef LDEBUG
   omCheckAddrSize(a,sizeof(snumber));
@@ -1971,8 +1967,6 @@ void ntNormalize(number &pp)
   p->s = 2;
   napoly x = p->z;
   napoly y = p->n;
-
-  BOOLEAN norm=FALSE;
 
   if (y==NULL) return;
 

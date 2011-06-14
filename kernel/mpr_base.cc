@@ -646,7 +646,7 @@ inline bool pointSet::larger( int a, int b )
 
 void pointSet::sort()
 {
-  int i,j;
+  int i;
   bool found= true;
   onePointP tmp;
 
@@ -721,7 +721,7 @@ poly monomAt( poly p, int i )
 {
   assume( i > 0 );
   poly iter= p;
-  for ( int j= 1; (j < i) && iter; j++ ) iter= pIter(iter);
+  for ( int j= 1; (j < i) && (iter!=NULL); j++ ) iter= pIter(iter);
   return iter;
 }
 //<-
@@ -837,7 +837,7 @@ ideal convexHull::newtonPolytopesI( const ideal gls )
   int m;  // Anzahl der Exponentvektoren im i-ten Polynom (gls->m)[i] des Ideals gls
   int idelem= IDELEMS(gls);
   ideal id;
-  poly p,pid,pd;
+  poly p,pid;
   int * vert;
 
   n= pVariables;
@@ -1240,7 +1240,7 @@ int resMatrixSparse::RC( pointSet **pQ, pointSet *E, int vert, mprfloat shift[] 
   int size;
   bool found= true;
   mprfloat cd;
-  int set,pnt,onum;
+  int onum;
   int bucket[MAXVARS+2];
   setID *optSum;
 
@@ -1413,7 +1413,7 @@ int resMatrixSparse::createMatrix( pointSet *E )
   //    uRPos[i][idelem+1]: col of u(0)
   //    uRPos[i][2..idelem]: col of u(1) .. u(n)
   //    i= 1 .. numSet0
-  int i,j,epos;
+  int i,epos;
   int rp,cp;
   poly rowp,epp;
   poly iterp;
@@ -1502,7 +1502,6 @@ void resMatrixSparse::randomVector( const int dim, mprfloat shift[] )
 {
   int i,j;
   i= 1;
-  time_t *tp = NULL;
 
   while ( i <= dim )
   {
@@ -1574,7 +1573,7 @@ resMatrixSparse::resMatrixSparse( const ideal _gls, const int special )
 {
   pointSet **Qi; // vertices sets of Conv(Supp(f_i)), i=0..idelem
   pointSet *E;   // all integer lattice points of the minkowski sum of Q0...Qn
-  int i,j,k;
+  int i,k;
   int pnt;
   int totverts;                // total number of exponent vectors in ideal gls
   mprfloat shift[MAXVARS+2];   // shiftvector delta, index [1..dim]
@@ -1734,7 +1733,7 @@ resMatrixSparse::~resMatrixSparse()
 
 const ideal resMatrixSparse::getMatrix()
 {
-  int i,j,rp,cp;
+  int i,j,cp;
   poly pp,phelp,piter,pgls;
 
   // copy original sparse res matrix
@@ -1795,7 +1794,7 @@ const ideal resMatrixSparse::getMatrix()
 //    i= 1 .. numSet0
 const number resMatrixSparse::getDetAt( const number* evpoint )
 {
-  int i,cp,rp;
+  int i,cp;
   poly pp,phelp,piter;
 
   mprPROTnl("smCallDet");
@@ -1855,7 +1854,7 @@ const number resMatrixSparse::getDetAt( const number* evpoint )
 //    i= 1 .. numSet0
 const poly resMatrixSparse::getUDet( const number* evpoint )
 {
-  int i,cp,rp;
+  int i,cp;
   poly pp,phelp,piter;
 
   mprPROTnl("smCallDet");
@@ -2466,7 +2465,7 @@ resVector *resMatrixDense::getMVector(const int i)
 
 const ideal resMatrixDense::getMatrix()
 {
-  int k,i,j;
+  int i,j;
 
   // copy matrix
   matrix resmat= mpNew(numVectors,numVectors);
@@ -2547,7 +2546,7 @@ const ideal resMatrixDense::getSubMatrix()
 
 const number resMatrixDense::getDetAt( const number* evpoint )
 {
-  int k,i,j;
+  int k,i;
 
   // copy evaluation point into matrix
   // p0, p1, ..., pn replace u0, u1, ..., un
@@ -2748,7 +2747,7 @@ ideal uResultant::extendIdeal( const ideal igls, poly linPoly, const resMatType 
 
 poly uResultant::linearPoly( const resMatType rrmt )
 {
-  int i,j;
+  int i;
 
   poly newlp= pOne();
   poly actlp, rootlp= newlp;
@@ -2927,7 +2926,7 @@ poly uResultant::interpolateDense( const number subDetVal )
 
 rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number subDetVal )
 {
-  int i,j,p,uvar;
+  int i,p,uvar;
   long tdg;
   int loops= (matchUp?n-2:n-1);
 
@@ -3065,7 +3064,7 @@ rootContainer ** uResultant::interpolateDenseSP( BOOLEAN matchUp, const number s
 
 rootContainer ** uResultant::specializeInU( BOOLEAN matchUp, const number subDetVal )
 {
-  int i,j,p,uvar;
+  int i,p,uvar;
   long tdg;
   poly pures,piter;
   int loops=(matchUp?n-2:n-1);

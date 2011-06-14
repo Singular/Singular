@@ -818,7 +818,9 @@ void kBucket_Plus_mm_Mult_pp(kBucket_pt bucket, poly m, poly p, int l)
   kBucketMergeLm(bucket);
   kbTest(bucket);
   i = pLogLength(l1);
+  #ifdef USE_COEF_BUCKETS
   number n=n_Init(1,r);
+  #endif
   if (i <= bucket->buckets_used && bucket->buckets[i] != NULL)
   {
     //if (FALSE){
@@ -1247,10 +1249,10 @@ poly kBucketExtractLmOfBucket(kBucket_pt bucket, int i)
 {
   assume(bucket->buckets[i]!=NULL);
 
-  ring r=bucket->bucket_ring;
   poly p=bucket->buckets[i];
   bucket->buckets_length[i]--;
 #ifdef USE_COEF_BUCKETS
+  ring r=bucket->bucket_ring;
   if (bucket->coef[i]!=NULL)
   {
     poly next=pNext(p);
