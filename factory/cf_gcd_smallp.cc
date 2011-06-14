@@ -51,7 +51,6 @@ static const double log2exp= 1.442695041;
 
 /// compressing two polynomials F and G, M is used for compressing,
 /// N to reverse the compression
-static inline
 int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
                 CFMap & N, bool topLevel)
 {
@@ -125,24 +124,31 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
 
     // sort Variables x_{i} in increasing order of
     // min(deg_{x_{i}}(f),deg_{x_{i}}(g))
-    int m= tmin (F.level(), G.level());
-    int max_min_deg;
+    int m= tmax (F.level(), G.level());
+    int min_max_deg;
     k= both_non_zero;
     l= 0;
     int i= 1;
     while (k > 0)
     {
-      max_min_deg= tmin (degsf[i], degsg[i]);
-      while (max_min_deg == 0)
+      if (degsf [i] != 0 && degsg [i] != 0)
+        min_max_deg= tmax (degsf[i], degsg[i]);
+      else
+        min_max_deg= 0;
+      while (min_max_deg == 0)
       {
         i++;
-        max_min_deg= tmin (degsf[i], degsg[i]);
+        if (degsf [i] != 0 && degsg [i] != 0)
+          min_max_deg= tmax (degsf[i], degsg[i]);
+        else
+          min_max_deg= 0;
       }
       for (int j= i + 1; j <=  m; j++)
       {
-        if (tmin (degsf[j],degsg[j]) >= max_min_deg)
+        if (degsf[j] != 0 && degsg [j] != 0 &&
+            tmax (degsf[j],degsg[j]) <= min_max_deg)
         {
-          max_min_deg= tmin (degsf[j], degsg[j]);
+          min_max_deg= tmax (degsf[j], degsg[j]);
           l= j;
         }
       }
@@ -209,7 +215,6 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
   return 1;
 }
 
-
 int
 substituteCheck (const CanonicalForm& F, const CanonicalForm& G)
 {
@@ -218,7 +223,7 @@ substituteCheck (const CanonicalForm& F, const CanonicalForm& G)
   Variable x= Variable (1);
   if (degree (F, x) <= 1 || degree (G, x) <= 1)
     return 0;
-  CanonicalForm f= swapvar (F, F.mvar(), x); //TODO swapping seems to be pretty expensive
+  CanonicalForm f= swapvar (F, F.mvar(), x); //TODO swapping is pretty expensive
   CanonicalForm g= swapvar (G, G.mvar(), x);
   int sizef= 0;
   int sizeg= 0;
@@ -436,11 +441,14 @@ CanonicalForm uni_lcoeff (const CanonicalForm& F)
 /// the polynomial interpolating in all the points.
 /// newtonPoly must be equal to (x - alpha_1) * ... * (x - alpha_{n-1})
 static inline CanonicalForm
-newtonInterp(const CanonicalForm alpha, const CanonicalForm u, const CanonicalForm newtonPoly, const CanonicalForm oldInterPoly, const Variable & x)
+newtonInterp(const CanonicalForm alpha, const CanonicalForm u,
+             const CanonicalForm newtonPoly, const CanonicalForm oldInterPoly,
+             const Variable & x)
 {
   CanonicalForm interPoly;
 
-  interPoly = oldInterPoly + ((u - oldInterPoly(alpha, x)) / newtonPoly(alpha, x)) * newtonPoly;
+  interPoly= oldInterPoly + ((u - oldInterPoly(alpha, x))/newtonPoly(alpha, x))
+             *newtonPoly;
   return interPoly;
 }
 
@@ -486,6 +494,28 @@ randomElement (const CanonicalForm & F, const Variable & alpha, CFList & list,
     }
   } while (find (list, random));
   return random;
+}
+
+static inline
+Variable chooseExtension (const Variable & alpha)
+{
+  zz_p::init (getCharacteristic());
+  zz_pX NTLIrredpoly;
+  int i, m;
+  // extension of F_p needed
+  if (alpha.level() == 1)
+  {
+    i= 1;
+    m= 2;
+  } //extension of F_p(alpha)
+  if (alpha.level() != 1)
+  {
+    i= 4;
+    m= degree (getMipo (alpha));
+  }
+  BuildIrred (NTLIrredpoly, i*m);
+  CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+  return rootOf (newMipo);
 }
 
 /// chooses a suitable extension of \f$ F_{p}(\alpha ) \f$
@@ -624,13 +654,27 @@ GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
     {
       source= CFList();
       dest= CFList();
-      int num_vars= tmin (getNumVars(A), getNumVars(B));
-      num_vars--;
 
-      choose_extension (d, num_vars, V_buf);
+      Variable V_buf3= V_buf;
+      V_buf= chooseExtension (V_buf);
       bool prim_fail= false;
       Variable V_buf2;
       prim_elem= primitiveElement (alpha, V_buf2, prim_fail);
+
+      if (V_buf3 != alpha)
+      {
+        m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        G_m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha,
+                             source, dest);
+        ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
+        ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
+        gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha,
+                            source, dest);
+        for (CFListIterator i= l; i.hasItem(); i++)
+          i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
+                                source, dest);
+      }
 
       ASSERT (!prim_fail, "failure in integer factorizer");
       if (prim_fail)
@@ -908,12 +952,8 @@ CanonicalForm GCD_GF (const CanonicalForm& F, const CanonicalForm& G,
     random_element= GFRandomElement (m, l, fail);
     if (fail)
     {
-      int num_vars= tmin (getNumVars(A), getNumVars(B));
-      num_vars--;
       p= getCharacteristic();
-      expon= (int) floor ((log ((double) ipower (d + 1, num_vars))/log ((double) p)));
-      if (expon < 2)
-        expon= 2;
+      expon= 2;
       kk= getGFDegree();
       if (ipower (p, kk*expon) < (1 << 16))
         setCharacteristic (p, kk*(int)expon, 'b');
@@ -1201,7 +1241,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
   do
   {
     if (inextension)
-      random_element= randomElement (m, alpha, l, fail);
+      random_element= randomElement (m, V_buf, l, fail);
     else
       random_element= FpRandomElement (m, l, fail);
 
@@ -1243,6 +1283,7 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
         deg++;
       } while (fail);
       list= CFList();
+      V_buf= alpha;
       TIMING_START (gcd_recursion);
       G_random_element=
       GCD_Fp_extension (ppA (random_element, x), ppB (random_element, x), alpha,
@@ -1255,14 +1296,28 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
     {
       source= CFList();
       dest= CFList();
-      int num_vars= tmin (getNumVars(A), getNumVars(B));
-      num_vars--;
-      V_buf= alpha;
-      choose_extension (d, num_vars, V_buf);
+
+      Variable V_buf3= V_buf;
+      V_buf= chooseExtension (V_buf);
       bool prim_fail= false;
       Variable V_buf2;
       CanonicalForm prim_elem, im_prim_elem;
       prim_elem= primitiveElement (alpha, V_buf2, prim_fail);
+
+      if (V_buf3 != alpha)
+      {
+        m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        G_m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha,
+                             source, dest);
+        ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
+        ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
+        gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha, source,
+                            dest);
+        for (CFListIterator i= l; i.hasItem(); i++)
+          i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
+                                source, dest);
+      }
 
       ASSERT (!prim_fail, "failure in integer factorizer");
       if (prim_fail)
@@ -1296,7 +1351,6 @@ CanonicalForm GCD_small_p (const CanonicalForm& F, const CanonicalForm&  G,
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
-      alpha= V_buf;
     }
 
     d0= totaldegree (G_random_element, Variable(2),
@@ -1982,15 +2036,11 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
 
     if (evalFail)
     {
-      if (V_buf != Variable (1))
+      if (V_buf.level() != 1)
       {
         do
         {
-          int num_vars= tmin (getNumVars(A), getNumVars(B));
-          int d= totaldegree (A, Variable(2), Variable (A.level()));
-          d= tmin (d, totaldegree (B, Variable(2), Variable (B.level())));
-          Variable V_buf2= V_buf;
-          choose_extension (d, num_vars, V_buf2);
+          Variable V_buf2= chooseExtension (V_buf);
           source= CFList();
           dest= CFList();
 
@@ -2019,7 +2069,7 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
                             source, dest);
           }
 
-          if (alpha != Variable (1))
+          if (alpha.level() != 1)
           {
             A= mapUp (A, V_buf, V_buf2, prim_elem, im_prim_elem, source,dest);
             B= mapUp (B, V_buf, V_buf2, prim_elem, im_prim_elem, source,dest);
@@ -2133,7 +2183,7 @@ monicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   delete[] pM;
   delete[] pL;
 
-  if (alpha != Variable (1) && V_buf != alpha)
+  if (alpha.level() != 1 && V_buf != alpha)
   {
     CFList u, v;
     result= mapDown (result, prim_elem, im_prim_elem, alpha, u, v);
@@ -2256,15 +2306,11 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
 
       if (evalFail)
       {
-        if (V_buf != Variable (1))
+        if (V_buf.level() != 1)
         {
           do
           {
-            int num_vars= tmin (getNumVars(A), getNumVars(B));
-            int d= totaldegree (A, Variable(2), Variable (A.level()));
-            d= tmin (d, totaldegree (B, Variable(2), Variable (B.level())));
-            Variable V_buf2= V_buf;
-            choose_extension (d, num_vars, V_buf2);
+            Variable V_buf2= chooseExtension (V_buf);
             source= CFList();
             dest= CFList();
 
@@ -2445,7 +2491,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   CFMatrix bufMat= pMat[1];
   pMat[1]= Mat;
 
-  if (V_buf != x)
+  if (V_buf.level() != 1)
     solution= solveSystemFq (pMat[1],
                              pL[minimalColumnsIndex], V_buf);
   else
@@ -2576,7 +2622,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
     matRows= 0;
     for (int i= 0; i < skelSize; i++)
     {
-      if (V_buf == x)
+      if (V_buf.level() == 1)
         rk= gaussianElimFp (pMat[i], pL[i]);
       else
         rk= gaussianElimFq (pMat[i], pL[i], V_buf);
@@ -2622,7 +2668,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       pMat[i]= pMat[i] (1, coeffMonoms[i].size(), 1, pMat[i].columns());
     }
 
-    if (V_buf != x)
+    if (V_buf.level() != 1)
       solution= solveSystemFq (Mat, bufArray, V_buf);
     else
       solution= solveSystemFp (Mat, bufArray);
@@ -2649,7 +2695,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
       for (int i= 0; i < bufSolution.size(); i++, ind++)
         result += Monoms [ind]*bufSolution[i];
     }
-    if (alpha != Variable (1) && V_buf != alpha)
+    if (alpha.level() != 1 && V_buf != alpha)
     {
       CFList u, v;
       result= mapDown (result, prim_elem, im_prim_elem, alpha, u, v);
@@ -2740,7 +2786,7 @@ nonMonicSparseInterpol (const CanonicalForm& F, const CanonicalForm& G,
   delete[] pL;
   delete[] pM;
 
-  if (alpha != Variable (1) && V_buf != alpha)
+  if (alpha.level() != 1 && V_buf != alpha)
   {
     CFList u, v;
     result= mapDown (result, prim_elem, im_prim_elem, alpha, u, v);
@@ -2873,13 +2919,27 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
     {
       source= CFList();
       dest= CFList();
-      int num_vars= tmin (getNumVars(A), getNumVars(B));
-      num_vars--;
 
-      choose_extension (d, num_vars, V_buf);
+      Variable V_buf3= V_buf;
+      V_buf= chooseExtension (V_buf);
       bool prim_fail= false;
       Variable V_buf2;
       prim_elem= primitiveElement (alpha, V_buf2, prim_fail);
+
+      if (V_buf3 != alpha)
+      {
+        m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        G_m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha,
+                             source, dest);
+        ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
+        ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
+        gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha, source,
+                            dest);
+        for (CFListIterator i= l; i.hasItem(); i++)
+          i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
+                                source, dest);
+      }
 
       ASSERT (!prim_fail, "failure in integer factorizer");
       if (prim_fail)
@@ -3014,13 +3074,27 @@ CanonicalForm sparseGCDFq (const CanonicalForm& F, const CanonicalForm& G,
         {
           source= CFList();
           dest= CFList();
-          int num_vars= tmin (getNumVars(A), getNumVars(B));
-          num_vars--;
 
-          choose_extension (d, num_vars, V_buf);
+          Variable V_buf3= V_buf;
+          V_buf= chooseExtension (V_buf);
           bool prim_fail= false;
           Variable V_buf2;
           prim_elem= primitiveElement (alpha, V_buf2, prim_fail);
+
+          if (V_buf3 != alpha)
+          {
+            m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+            G_m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+            newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha,
+                                 source, dest);
+            ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
+            ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
+            gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha,
+                                source, dest);
+            for (CFListIterator i= l; i.hasItem(); i++)
+              i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
+                                    source, dest);
+          }
 
           ASSERT (!prim_fail, "failure in integer factorizer");
           if (prim_fail)
@@ -3278,7 +3352,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
   do //first do
   {
     if (inextension)
-      random_element= randomElement (m, alpha, l, fail);
+      random_element= randomElement (m, V_buf, l, fail);
     else
       random_element= FpRandomElement (m, l, fail);
     if (random_element == 0 && !fail)
@@ -3326,6 +3400,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
         random_element= randomElement (m, alpha, l, fail);
         deg++;
       } while (fail);
+      V_buf= alpha;
       list= CFList();
       TIMING_START (gcd_recursion);
       G_random_element=
@@ -3339,14 +3414,28 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
     {
       source= CFList();
       dest= CFList();
-      int num_vars= tmin (getNumVars(A), getNumVars(B));
-      num_vars--;
-      V_buf= alpha;
-      choose_extension (d, num_vars, V_buf);
+
+      Variable V_buf3= V_buf;
+      V_buf= chooseExtension (V_buf);
       bool prim_fail= false;
       Variable V_buf2;
       CanonicalForm prim_elem, im_prim_elem;
       prim_elem= primitiveElement (alpha, V_buf2, prim_fail);
+
+      if (V_buf3 != alpha)
+      {
+        m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        G_m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+        newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha, source,
+                             dest);
+        ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
+        ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
+        gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha, source,
+                            dest);
+        for (CFListIterator i= l; i.hasItem(); i++)
+          i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
+                                source, dest);
+      }
 
       ASSERT (!prim_fail, "failure in integer factorizer");
       if (prim_fail)
@@ -3380,7 +3469,6 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
       TIMING_END_AND_PRINT (gcd_recursion,
                             "time for recursive call: ");
       DEBOUTLN (cerr, "G_random_element= " << G_random_element);
-      alpha= V_buf;
     }
 
     d0= totaldegree (G_random_element, Variable(2),
@@ -3511,6 +3599,7 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
             random_element= randomElement (m, alpha, l, fail);
             deg++;
           } while (fail);
+          V_buf= alpha;
           list= CFList();
           TIMING_START (gcd_recursion);
           if (LC (skeleton).inCoeffDomain())
@@ -3531,14 +3620,28 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
         {
           source= CFList();
           dest= CFList();
-          int num_vars= tmin (getNumVars(A), getNumVars(B));
-          num_vars--;
-          V_buf= alpha;
-          choose_extension (d, num_vars, V_buf);
+
+          Variable V_buf3= V_buf;
+          V_buf= chooseExtension (V_buf);
           bool prim_fail= false;
           Variable V_buf2;
           CanonicalForm prim_elem, im_prim_elem;
           prim_elem= primitiveElement (alpha, V_buf2, prim_fail);
+
+          if (V_buf3 != alpha)
+          {
+            m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+            G_m= mapDown (m, prim_elem, im_prim_elem, alpha, source, dest);
+            newtonPoly= mapDown (newtonPoly, prim_elem, im_prim_elem, alpha,
+                                 source, dest);
+            ppA= mapDown (ppA, prim_elem, im_prim_elem, alpha, source, dest);
+            ppB= mapDown (ppB, prim_elem, im_prim_elem, alpha, source, dest);
+            gcdlcAlcB= mapDown (gcdlcAlcB, prim_elem, im_prim_elem, alpha,
+                                source, dest);
+            for (CFListIterator i= l; i.hasItem(); i++)
+              i.getItem()= mapDown (i.getItem(), prim_elem, im_prim_elem, alpha,
+                                    source, dest);
+          }
 
           ASSERT (!prim_fail, "failure in integer factorizer");
           if (prim_fail)
@@ -3579,7 +3682,6 @@ CanonicalForm sparseGCDFp (const CanonicalForm& F, const CanonicalForm& G,
           TIMING_END_AND_PRINT (gcd_recursion,
                                 "time for recursive call: ");
           DEBOUTLN (cerr, "G_random_element= " << G_random_element);
-          alpha= V_buf;
         }
 
         if (sparseFail)
@@ -3821,22 +3923,105 @@ CanonicalForm myReverseShift (const CanonicalForm& F, const CFList& evaluation)
 }
 
 static inline
-bool Hensel_P (const CanonicalForm & U, CFArray & G, const Evaluation & A,
-                const Variable & x, const CFArray& LCs )
+Evaluation optimize4Lift (const CanonicalForm& F, CFMap & M,
+                    CFMap & N, const Evaluation& A)
+{
+  int n= F.level();
+  int * degsf= new int [n + 1];
+
+  for (int i = 0; i <= n; i++)
+    degsf[i]= 0;
+
+  degsf= degrees (F, degsf);
+
+  Evaluation result= Evaluation (A.min(), A.max());
+  ASSERT (A.min() == 2, "expected A.min() == 2");
+  ASSERT (A.max() == n, "expected A.max() == n");
+  int max_deg;
+  int k= n;
+  int l= 1;
+  int i= 2;
+  int pos= 2;
+  while (k > 1)
+  {
+    max_deg= degsf [i];
+    while (max_deg == 0)
+    {
+      i++;
+      max_deg= degsf [i];
+    }
+    l= i;
+    for (int j= i + 1; j <=  n; j++)
+    {
+      if (degsf[j] > max_deg)
+      {
+        max_deg= degsf[j];
+        l= j;
+      }
+    }
+
+    if (l <= n)
+    {
+      if (l != pos)
+      {
+        result.setValue (pos, A [l]);
+        M.newpair (Variable (l), Variable (pos));
+        N.newpair (Variable (pos), Variable (l));
+        degsf[l]= 0;
+        l= 2;
+        if (k == 2 && n == 3)
+        {
+          result.setValue (l, A [pos]);
+          M.newpair (Variable (pos), Variable (l));
+          N.newpair (Variable (l), Variable (pos));
+          degsf[pos]= 0;
+        }
+      }
+      else
+      {
+        result.setValue (l, A [l]);
+        degsf [l]= 0;
+      }
+    }
+    pos++;
+    k--;
+    l= 2;
+  }
+
+  delete [] degsf;
+
+  return result;
+}
+
+static inline
+int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
+                const Variable & x, const CFArray& LeadCoeffs )
 {
   CFList factors;
   factors.append (G[1]);
   factors.append (G[2]);
+
+  CFMap NN, MM;
+  Evaluation A= optimize4Lift (UU, MM, NN, AA);
+
+  CanonicalForm U= MM (UU);
+  CFArray LCs= CFArray (1,2);
+  LCs [1]= MM (LeadCoeffs [1]);
+  LCs [2]= MM (LeadCoeffs [2]);
+
   CFList evaluation;
   for (int i= A.min(); i <= A.max(); i++)
     evaluation.append (A [i]);
   CFList UEval;
   CanonicalForm shiftedU= myShift2Zero (U, UEval, evaluation);
+
+  if (size (shiftedU)/getNumVars (U) > 500)
+    return -1;
+
   CFArray shiftedLCs= CFArray (2);
   CFList shiftedLCsEval1, shiftedLCsEval2;
   shiftedLCs[0]= myShift2Zero (LCs[1], shiftedLCsEval1, evaluation);
   shiftedLCs[1]= myShift2Zero (LCs[2], shiftedLCsEval2, evaluation);
-  CanonicalForm LcUEval= LC (UEval.getFirst(), x);
   factors.insert (1);
   int liftBound= degree (UEval.getLast(), 2) + 1;
   CFArray Pi;
@@ -3848,16 +4033,14 @@ bool Hensel_P (const CanonicalForm & U, CFArray & G, const Evaluation & A,
   henselLift122 (UEval.getFirst(), factors, liftBound, Pi, diophant, M,
                  lcs, false);
 
-  bool noChange= true;
   for (CFListIterator i= factors; i.hasItem(); i++)
   {
-    if (degree (i.getItem(), 2) != 0)
-      noChange= false;
+    if (!fdivides (i.getItem(), UEval.getFirst()))
+      return 0;
   }
-  if (noChange)
-    return !noChange;
+
   int * liftBounds;
-  noChange= false;
+  bool noOneToOne;
   if (U.level() > 2)
   {
     liftBounds= new int [U.level() - 1]; /* index: 0.. U.level()-2 */
@@ -3865,32 +4048,45 @@ bool Hensel_P (const CanonicalForm & U, CFArray & G, const Evaluation & A,
     for (int i= 1; i < U.level() - 1; i++)
       liftBounds[i]= degree (shiftedU, Variable (i + 2)) + 1;
     factors= henselLift2 (UEval, factors, liftBounds, U.level() - 1, false,
-                          shiftedLCsEval1, shiftedLCsEval2, Pi, diophant, noChange);
-   delete [] liftBounds;
-   if (noChange)
-     return !noChange;
+                          shiftedLCsEval1, shiftedLCsEval2, Pi, diophant,
+                          noOneToOne);
+    delete [] liftBounds;
+    if (noOneToOne)
+      return 0;
   }
   G[1]= factors.getFirst();
   G[2]= factors.getLast();
   G[1]= myReverseShift (G[1], evaluation);
   G[2]= myReverseShift (G[2], evaluation);
-  return true;
+  G[1]= NN (G[1]);
+  G[2]= NN (G[2]);
+  return 1;
 }
 
 static inline
 bool findeval_P (const CanonicalForm & F, const CanonicalForm & G,
                  CanonicalForm & Fb, CanonicalForm & Gb, CanonicalForm & Db,
-                 FFREvaluation & b, int delta, int degF, int degG, int maxeval,
-                 int & count)
+                 REvaluation & b, int delta, int degF, int degG, int maxeval,
+                 int & count, int& k, int bound, int& l)
 {
   if( count == 0 && delta != 0)
   {
     if( count++ > maxeval )
       return false;
   }
+  CanonicalForm evalPoint;
   if (count > 0)
   {
-    b.nextpoint();
+    b.nextpoint(k);
+    l++;
+    if (l > bound)
+    {
+      l= 1;
+      k++;
+      if (k > tmax (F.level(), G.level()) - 1)
+        return false;
+      b.nextpoint (k);
+    }
     if (count++ > maxeval)
       return false;
   }
@@ -3912,7 +4108,18 @@ bool findeval_P (const CanonicalForm & F, const CanonicalForm & G,
           return true;
       }
     }
-    b.nextpoint();
+    if (k == 0)
+      k++;
+    b.nextpoint(k);
+    l++;
+    if (l > bound)
+    {
+      l= 1;
+      k++;
+      if (k > tmax (F.level(), G.level()) - 1)
+        return false;
+      b.nextpoint (k);
+    }
     if( count++ > maxeval )
       return false;
   }
@@ -3921,7 +4128,6 @@ bool findeval_P (const CanonicalForm & F, const CanonicalForm & G,
 // parameters for heuristic
 static int maxNumEval= 200;
 static int sizePerVars1= 500; //try dense gcd if size/#variables is bigger
-static int sizePerVars2= 290; //try psr gcd if size/#variables is less
 
 /// Extended Zassenhaus GCD for finite fields
 CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
@@ -3942,8 +4148,8 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   maxeval= tmin((getCharacteristic()/
                 (int)(ilog2(getCharacteristic())*log2exp))*2, maxNumEval);
   count= 0; // number of eval. used
-  FFREvaluation b, bt;
-  bool gcdfound = false;
+  REvaluation b, bt;
+  int gcdfound = 0;
   Variable x = Variable(1);
 
   F= FF;
@@ -3970,7 +4176,7 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
   }
 
   int maxNumVars= tmax (getNumVars (F), getNumVars (G));
-  Variable a,bv;
+  Variable a, oldA;
   int sizeF= size (F);
   int sizeG= size (G);
 
@@ -3989,105 +4195,237 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
     return N (d);
   }
 
+  bool passToGF= false;
+  bool extOfExt= false;
+  int p= getCharacteristic();
+  bool algExtension= (hasFirstAlgVar(F,a) || hasFirstAlgVar(G,a));
+  int k= 1;
+  CanonicalForm primElem, imPrimElem;
+  CFList source, dest;
+  if (p < 50 && CFFactory::gettype() != GaloisFieldDomain && !algExtension)
+  {
+    if (p == 2)
+      setCharacteristic (2, 6, 'Z');
+    else if (p == 3)
+      setCharacteristic (3, 4, 'Z');
+    else if (p == 5 || p == 7)
+      setCharacteristic (p, 3, 'Z');
+    else
+      setCharacteristic (p, 2, 'Z');
+    passToGF= true;
+    F= F.mapinto();
+    G= G.mapinto();
+    maxeval= 2*ipower (p, getGFDegree());
+  }
+  else if (CFFactory::gettype() == GaloisFieldDomain &&
+           ipower (p , getGFDegree()) < 50)
+  {
+    k= getGFDegree();
+    if (ipower (p, 2*k) > 50)
+      setCharacteristic (p, 2*k, gf_name);
+    else
+      setCharacteristic (p, 3*k, gf_name);
+    F= GFMapUp (F, k);
+    G= GFMapUp (G, k);
+    maxeval= tmin (2*ipower (p, getGFDegree()), maxNumEval);
+  }
+  else if (p < 50 && algExtension && !CFFactory::gettype() == GaloisFieldDomain)
+  {
+    int d= degree (getMipo (a));
+    oldA= a;
+    Variable v2;
+    if (p == 2 && d < 6)
+    {
+      zz_p::init (p);
+      bool primFail= false;
+      Variable vBuf;
+      primElem= primitiveElement (a, vBuf, primFail);
+      ASSERT (!primFail, "failure in integer factorizer");
+      if (d < 3)
+      {
+        zz_pX NTLIrredpoly;
+        BuildIrred (NTLIrredpoly, d*3);
+        CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+        v2= rootOf (newMipo);
+      }
+      else
+      {
+        zz_pX NTLIrredpoly;
+        BuildIrred (NTLIrredpoly, d*2);
+        CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+        v2= rootOf (newMipo);
+      }
+      imPrimElem= mapPrimElem (primElem, a, v2);
+      extOfExt= true;
+    }
+    else if ((p == 3 && d < 4) || ((p == 5 || p == 7) && d < 3))
+    {
+      zz_p::init (p);
+      bool primFail= false;
+      Variable vBuf;
+      primElem= primitiveElement (a, vBuf, primFail);
+      ASSERT (!primFail, "failure in integer factorizer");
+      zz_pX NTLIrredpoly;
+      BuildIrred (NTLIrredpoly, d*2);
+      CanonicalForm newMipo= convertNTLzzpX2CF (NTLIrredpoly, Variable (1));
+      v2= rootOf (newMipo);
+      imPrimElem= mapPrimElem (primElem, a, v2);
+      extOfExt= true;
+    }
+    if (extOfExt)
+    {
+      maxeval= tmin (2*ipower (p, degree (getMipo (v2))), maxNumEval);
+      F= mapUp (F, a, v2, primElem, imPrimElem, source, dest);
+      G= mapUp (G, a, v2, primElem, imPrimElem, source, dest);
+      a= v2;
+    }
+  }
+
   lcF = LC( F, x ); lcG = LC( G, x );
   lcD = gcd( lcF, lcG );
 
   delta = 0;
   degF = degree( F, x ); degG = degree( G, x );
-  if(hasFirstAlgVar(F,a))
-  {
-    if(hasFirstAlgVar(G,bv))
-    {
-      if(bv.level() > a.level())
-        a = bv;
-    }
-    b = FFREvaluation( 2, tmax(F.level(), G.level()), AlgExtRandomF( a ) );
-  }
-  else // F not in extension
-  {
-    if(hasFirstAlgVar(G,a))
-      b = FFREvaluation( 2, tmax(F.level(), G.level()), AlgExtRandomF( a ) );
+
+  if(hasFirstAlgVar(G,a))
+    b = REvaluation( 2, tmax(F.level(), G.level()), AlgExtRandomF( a ) );
+  else
+  { // both not in extension given by algebraic variable
+    if (CFFactory::gettype() != GaloisFieldDomain)
+      b = REvaluation( 2, tmax(F.level(), G.level()), FFRandom() );
     else
-    { // both not in extension given by algebraic variable
-      if (CFFactory::gettype() != GaloisFieldDomain)
-        b = FFREvaluation( 2, tmax(F.level(), G.level()), FFRandom() );
-      else
-        b = FFREvaluation( 2, tmax(F.level(), G.level()), GFRandom() );
-    }
+      b = REvaluation( 2, tmax(F.level(), G.level()), GFRandom() );
   }
+
   CanonicalForm cand;
+  CanonicalForm result;
+  int o, t;
+  o= 0;
+  t= 1;
+  int goodPointCount= 0;
   while( !gcdfound )
   {
-    if( !findeval_P( F, G, Fb, Gb, Db, b, delta, degF, degG, maxeval, count ))
+    if( !findeval_P( F, G, Fb, Gb, Db, b, delta, degF, degG, maxeval, count, o,
+         maxeval/maxNumVars, t ))
     { // too many eval. used --> try another method
-      if (sizeF/maxNumVars < sizePerVars2 && sizeG/maxNumVars < sizePerVars2)
+      Off (SW_USE_EZGCD_P);
+      result= gcd (F,G);
+      On (SW_USE_EZGCD_P);
+      if (passToGF)
       {
-        CanonicalForm dummy1, dummy2;
-        Variable y= Variable (tmax (F.level(), G.level()));
-        Variable z= Variable (smallestDegLev);
-        dummy1= swapvar (F, x, y);
-        dummy2= swapvar (G, x, y);
-        if (size (psr (dummy1, dummy2, y)) <= tmin (size (F), size (G)))
-        {
-          Off (SW_USE_EZGCD_P);
-          CanonicalForm result= swapvar (gcd (dummy1,dummy2), x, y);
-          On (SW_USE_EZGCD_P);
-          return N (d*result);
-        }
+        Variable alpha= rootOf (gf_mipo);
+        setCharacteristic (p);
+        result= GF2FalphaRep (result, alpha);
       }
-      if (hasFirstAlgVar (F, a) || hasFirstAlgVar (G, a))
-        return N (d*sparseGCDFq (F, G, a));
-      if (CFFactory::gettype() == GaloisFieldDomain)
-        return N (d*GCD_GF (F, G));
-      else
-        return N (d*sparseGCDFp (F,G));
+      if (k > 1)
+      {
+        result= GFMapDown (result, k);
+        setCharacteristic (p, k, gf_name);
+      }
+      if (extOfExt)
+        result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+      return N (d*result);
     }
     delta = degree( Db );
     if( delta == 0 )
+    {
+      if (passToGF)
+        setCharacteristic (p);
+      if (k > 1)
+        setCharacteristic (p, k, gf_name);
       return N (d);
+    }
     while( true )
     {
       bt = b;
-      if( !findeval_P(F,G,Fbt,Gbt,Dbt, bt, delta, degF, degG, maxeval, count ))
+      if( !findeval_P(F,G,Fbt,Gbt,Dbt, bt, delta, degF, degG, maxeval, count, o,
+           maxeval/maxNumVars, t ))
       { // too many eval. used --> try another method
-        if (sizeF/maxNumVars < sizePerVars2 && sizeG/maxNumVars < sizePerVars2)
+        Off (SW_USE_EZGCD_P);
+        result= gcd (F,G);
+        On (SW_USE_EZGCD_P);
+        if (passToGF)
         {
-          CanonicalForm dummy1, dummy2;
-          Variable y= Variable (tmax (F.level(), G.level()));
-          Variable z= Variable (smallestDegLev);
-          dummy1= swapvar (F, x, y);
-          dummy2= swapvar (G, x, y);
-          if (size (psr (dummy1, dummy2, y)) <= tmin (size (F), size (G)))
-          {
-            Off (SW_USE_EZGCD_P);
-            CanonicalForm result= swapvar (gcd (dummy1,dummy2), x, y);
-            On (SW_USE_EZGCD_P);
-            return N (d*result);
-          }
+          Variable alpha= rootOf (gf_mipo);
+          setCharacteristic (p);
+          result= GF2FalphaRep (result, alpha);
         }
-        if (hasFirstAlgVar (F, a) || hasFirstAlgVar (G, a))
-          return N (d*sparseGCDFq (F, G, a));
-        if (CFFactory::gettype() == GaloisFieldDomain)
-          return N (d*GCD_GF (F, G));
-        else
-          return N (d*sparseGCDFp (F,G));
+        if (k > 1)
+        {
+          result= GFMapDown (result, k);
+          setCharacteristic (p, k, gf_name);
+        }
+        if (extOfExt)
+          result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+        return N (d*result);
       }
       int dd = degree( Dbt );
       if( dd == 0 )
+      {
+        if (passToGF)
+          setCharacteristic (p);
+        if (k > 1)
+          setCharacteristic (p, k, gf_name);
         return N (d);
+      }
       if( dd == delta )
-        break;
+      {
+        goodPointCount++;
+        if (goodPointCount == 5)
+          break;
+      }
       if( dd < delta )
       {
+        goodPointCount= 0;
         delta = dd;
         b = bt;
         Db = Dbt; Fb = Fbt; Gb = Gbt;
       }
+      if (delta == degF)
+      {
+        if (degF <= degG && fdivides (F, G))
+        {
+          if (passToGF)
+          {
+            Variable alpha= rootOf (gf_mipo);
+            setCharacteristic (p);
+            F= GF2FalphaRep (F, alpha);
+          }
+          if (k > 1)
+          {
+            F= GFMapDown (F, k);
+            setCharacteristic (p, k, gf_name);
+          }
+          if (extOfExt)
+            F= mapDown (F, primElem, imPrimElem, oldA, dest, source);
+          return N (d*F);
+        }
+        else
+          delta--;
+      }
+      else if (delta == degG)
+      {
+        if (degG <= degF && fdivides (G, F))
+        {
+          if (passToGF)
+          {
+            Variable alpha= rootOf (gf_mipo);
+            setCharacteristic (p);
+            G= GF2FalphaRep (G, alpha);
+          }
+          if (k > 1)
+          {
+            G= GFMapDown (G, k);
+            setCharacteristic (p, k, gf_name);
+          }
+          if (extOfExt)
+            G= mapDown (G, primElem, imPrimElem, oldA, dest, source);
+          return N (d*G);
+        }
+        else
+          delta--;
+      }
     }
-    if( degF <= degG && delta == degF && fdivides( F, G ) )
-      return N (d*F);
-    if( degG < degF && delta == degG && fdivides( G, F ) )
-      return N (d*G);
     if( delta != degF && delta != degG )
     {
       bool B_is_F;
@@ -4120,43 +4458,101 @@ CanonicalForm EZGCD_P( const CanonicalForm & FF, const CanonicalForm & GG )
       }
       else // special case handling
       {
-        if (sizeF/maxNumVars < sizePerVars2 && sizeG/maxNumVars < sizePerVars2)
+        Off (SW_USE_EZGCD_P);
+        result= gcd (F,G);
+        On (SW_USE_EZGCD_P);
+        if (passToGF)
         {
-          CanonicalForm dummy1, dummy2;
-          Variable y= Variable (tmax (F.level(), G.level()));
-          Variable z= Variable (smallestDegLev);
-          dummy1= swapvar (F, x, y);
-          dummy2= swapvar (G, x, y);
-          if (size (psr (dummy1, dummy2, y)) <= tmin (size (F), size (G)))
-          {
-            Off (SW_USE_EZGCD_P);
-            CanonicalForm result= swapvar (gcd (dummy1,dummy2), x, y);
-            On (SW_USE_EZGCD_P);
-            return N (d*result);
-          }
+          Variable alpha= rootOf (gf_mipo);
+          setCharacteristic (p);
+          result= GF2FalphaRep (result, alpha);
         }
-        if (hasFirstAlgVar (F, a) || hasFirstAlgVar (G, a))
-          return N (d*sparseGCDFq (F, G, a));
-        if (CFFactory::gettype() == GaloisFieldDomain)
-          return N (d*GCD_GF (F, G));
-        else
-          return N (d*sparseGCDFp (F,G));
+        if (k > 1)
+        {
+          result= GFMapDown (result, k);
+          setCharacteristic (p, k, gf_name);
+        }
+        if (extOfExt)
+          result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+        return N (d*result);
       }
       DD[2] = DD[2] * ( b( lcDD[2] ) / lc( DD[2] ) );
       DD[1] = DD[1] * ( b( lcDD[1] ) / lc( DD[1] ) );
 
+      if (size (B*lcDD[2])/maxNumVars > sizePerVars1)
+      {
+        if (algExtension)
+        {
+          result= GCD_Fp_extension (F, G, a);
+          if (extOfExt)
+            result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+          return N (d*result);
+        }
+        if (CFFactory::gettype() == GaloisFieldDomain)
+        {
+          result= GCD_GF (F, G);
+          if (passToGF)
+          {
+            Variable alpha= rootOf (gf_mipo);
+            setCharacteristic (p);
+            result= GF2FalphaRep (result, alpha);
+          }
+          if (k > 1)
+          {
+            result= GFMapDown (result, k);
+            setCharacteristic (p, k, gf_name);
+          }
+          return N (d*result);
+        }
+        else
+          return N (d*GCD_small_p (F,G));
+      }
+
       gcdfound= Hensel_P (B*lcD, DD, b, x, lcDD);
 
-      if( gcdfound )
+      if (gcdfound == -1)
+      {
+        Off (SW_USE_EZGCD_P);
+        result= gcd (F,G);
+        On (SW_USE_EZGCD_P);
+        if (passToGF)
+        {
+          Variable alpha= rootOf (gf_mipo);
+          setCharacteristic (p);
+          result= GF2FalphaRep (result, alpha);
+        }
+        if (k > 1)
+        {
+          result= GFMapDown (result, k);
+          setCharacteristic (p, k, gf_name);
+        }
+        if (extOfExt)
+          result= mapDown (result, primElem, imPrimElem, oldA, dest, source);
+        return N (d*result);
+      }
+
+      if (gcdfound == 1)
       {
         cand = DD[2] / content( DD[2], Variable(1) );
-        if( B_is_F )
-          gcdfound = fdivides( cand, G );
-        else
-          gcdfound = fdivides( cand, F );
+        gcdfound = fdivides( cand, G ) && fdivides ( cand, F );
+
+        if (passToGF && gcdfound)
+        {
+          Variable alpha= rootOf (gf_mipo);
+          setCharacteristic (p);
+          cand= GF2FalphaRep (cand, alpha);
+        }
+        if (k > 1 && gcdfound)
+        {
+          cand= GFMapDown (cand, k);
+          setCharacteristic (p, k, gf_name);
+        }
+        if (extOfExt && gcdfound)
+          cand= mapDown (cand, primElem, imPrimElem, oldA, dest, source);
       }
     }
-    delta= 0;
+    delta--;
+    goodPointCount= 0;
   }
   return N (d*cand);
 }
