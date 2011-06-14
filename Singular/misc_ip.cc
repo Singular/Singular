@@ -384,29 +384,6 @@ lists primeFactorisation(const number n, const number pBound)
 #endif
 
 /*2
-* initialize components of Singular
-*/
-int inits(void)
-{
-  int t;
-/*4 signal handler:*/
-  init_signals();
-/*4 randomize: */
-  t=initTimer();
-  /*t=(int)time(NULL);*/
-  if (t==0) t=1;
-  initRTimer();
-  siSeed=t;
-#ifdef HAVE_FACTORY
-  factoryseed(t);
-#endif
-/*4 private data of other modules*/
-  memset(&sLastPrinted,0,sizeof(sleftv));
-  sLastPrinted.rtyp=NONE;
-  return t;
-}
-
-/*2
 * the renice routine for very large jobs
 * works only on unix machines,
 * testet on : linux, HP 9.0
@@ -1123,7 +1100,10 @@ int mmInit( void )
   return 1;
 }
 
-int siInit(char *name)
+/*2
+* initialize components of Singular
+*/
+void siInit(char *name)
 {
 #ifdef HAVE_FACTORY
   On(SW_USE_NTL);
@@ -1144,7 +1124,19 @@ int siInit(char *name)
 #endif
   /* initialize components */
   factoryError=WerrorS;
-  siRandomStart=inits();
+/*4 randomize: */
+  int t=initTimer();
+  /*t=(int)time(NULL);*/
+  if (t==0) t=1;
+  initRTimer();
+  siSeed=t;
+#ifdef HAVE_FACTORY
+  factoryseed(t);
+#endif
+  siRandomStart=t;
+/*4 private data of other modules*/
+  memset(&sLastPrinted,0,sizeof(sleftv));
+  sLastPrinted.rtyp=NONE;
   feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
 
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed

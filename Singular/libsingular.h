@@ -29,7 +29,7 @@
 #include <singular/attrib.h>
 #include <singular/options.h>
 
-int siInit(char *);
+void siInit(char *);
 
 /* we need this function in Sage*/
 number nr2mMapZp(number from);

@@ -55,6 +55,7 @@ int main(          /* main entry to Singular */
   omInitGetBackTrace();
 
   siInit(argv[0]);
+  init_signals();
 
   // parse command line options
   int optc, option_index;
@@ -96,10 +97,6 @@ int main(          /* main entry to Singular */
   }
 
   /* say hello */
-#ifdef HAVE_FANS
-  bbcone_setup();
-  bbfan_setup();
-#endif /* HAVE_FANS */
   //for official version: not active
   //bigintm_setup();
 
@@ -131,6 +128,10 @@ int main(          /* main entry to Singular */
     */
   }
   pyobject_setup();
+#ifdef HAVE_FANS
+  bbcone_setup();
+  bbfan_setup();
+#endif /* HAVE_FANS */
   errorreported = 0;
 
   setjmp(si_start_jmpbuf);
