@@ -35,6 +35,7 @@
 #include <Singular/bbcone.h>
 #include <Singular/bbfan.h>
 #include <Singular/pyobject_setup.h>
+#include <omalloc/omalloc.h>
 
 
 #ifdef HAVE_FACTORY
@@ -45,11 +46,26 @@
 extern int siInit(char *);
 
 #if ! defined(LIBSINGULAR)
+int mmInit( void )
+{
+#if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
+    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
+    /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
+    /* do not rely on the default in Singular as libsingular may be different */
+    mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
+#else
+    mp_set_memory_functions(malloc,reallocSize,freeSize);
+#endif
+  return 1;
+}
+
+
 /*0 implementation*/
 int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
     char** argv)   /* parameter array */
 {
+  mmInit();
   // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
   omInitRet_2_Info(argv[0]);
   omInitGetBackTrace();

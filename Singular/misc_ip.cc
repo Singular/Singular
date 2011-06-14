@@ -1054,9 +1054,6 @@ void m2_end(int i)
 
 const char *singular_date=__DATE__ " " __TIME__;
 
-int mmInit( void );
-int mmIsInitialized=mmInit();
-
 extern "C"
 {
   void omSingOutOfMemoryFunc()
@@ -1069,43 +1066,13 @@ extern "C"
   }
 }
 
-int mmInit( void )
-{
-  if(mmIsInitialized==0)
-  {
-
-#ifndef LIBSINGULAR
-#if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
-    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
-    /* sage ticket 5344: http://trac.sagemath.org/sage_trac/ticket/5344 */
-#include <omalloc/omalloc.h>
-    /* do not rely on the default in Singular as libsingular may be different */
-    mp_set_memory_functions(omMallocFunc,omReallocSizeFunc,omFreeSizeFunc);
-#else
-    mp_set_memory_functions(malloc,reallocSize,freeSize);
-#endif
-#endif // ifndef LIBSINGULAR
-    om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
-#ifndef OM_NDEBUG
-#ifndef __OPTIMIZE__
-    om_Opts.ErrorHook = dErrorBreak;
-#endif
-#endif
-    omInitInfo();
-#ifdef OM_SING_KEEP
-    om_Opts.Keep = OM_SING_KEEP;
-#endif
-  }
-  mmIsInitialized=1;
-  return 1;
-}
-
 /*2
 * initialize components of Singular
 */
 void siInit(char *name)
 {
 #ifdef HAVE_FACTORY
+// factory default settings: -----------------------------------------------
   On(SW_USE_NTL);
   Off(SW_USE_GCD_P);
   On(SW_USE_NTL_GCD_0); // On -> seg11 in Old/algnorm, Old/factor...
@@ -1117,34 +1084,29 @@ void siInit(char *name)
   On(SW_USE_EZGCD_P);
   On(SW_USE_QGCD);
   Off(SW_USE_NTL_SORT); // may be changed by an command line option
+  factoryError=WerrorS;
 #endif
 
+// memory initialization: -----------------------------------------------
+    om_Opts.OutOfMemoryFunc = omSingOutOfMemoryFunc;
+#ifndef OM_NDEBUG
+#ifndef __OPTIMIZE__
+    om_Opts.ErrorHook = dErrorBreak;
+#endif
+#endif
+    omInitInfo();
+#ifdef OM_SING_KEEP
+    om_Opts.Keep = OM_SING_KEEP;
+#endif
+
+// interpreter tables etc.: -----------------------------------------------
 #ifdef INIT_BUG
   jjInitTab1();
 #endif
-  /* initialize components */
-  factoryError=WerrorS;
-/*4 randomize: */
-  int t=initTimer();
-  /*t=(int)time(NULL);*/
-  if (t==0) t=1;
-  initRTimer();
-  siSeed=t;
-#ifdef HAVE_FACTORY
-  factoryseed(t);
-#endif
-  siRandomStart=t;
-/*4 private data of other modules*/
   memset(&sLastPrinted,0,sizeof(sleftv));
   sLastPrinted.rtyp=NONE;
-  feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
-
-  // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
-  // hack such that all shared' libs in the bindir are loaded correctly
-  feInitResources(name);
   extern int iiInitArithmetic();
   iiInitArithmetic();
-
   basePack=(package)omAlloc0(sizeof(*basePack));
   currPack=basePack;
   idhdl h;
@@ -1154,9 +1116,27 @@ void siInit(char *name)
   currPackHdl=h;
   basePackHdl=h;
 
+// random generator: -----------------------------------------------
+  int t=initTimer();
+  if (t==0) t=1;
+  initRTimer();
+  siSeed=t;
+#ifdef HAVE_FACTORY
+  factoryseed(t);
+#endif
+  siRandomStart=t;
+  feOptSpec[FE_OPT_RANDOM].value = (void*) ((long)siRandomStart);
+
+// ressource table: ----------------------------------------------------
+  // Don't worry: ifdef OM_NDEBUG, then all these calls are undef'ed
+  // hack such that all shared' libs in the bindir are loaded correctly
+  feInitResources(name);
+
+// singular links: --------------------------------------------------
   slStandardInit();
   myynest=0;
 
+// loading standard.lib -----------------------------------------------
   if (! feOptValue(FE_OPT_NO_STDLIB))
   {
     int vv=verbose;
