@@ -4040,7 +4040,7 @@ int Hensel_P (const CanonicalForm & UU, CFArray & G, const Evaluation & AA,
   }
 
   int * liftBounds;
-  bool noOneToOne;
+  bool noOneToOne= false;
   if (U.level() > 2)
   {
     liftBounds= new int [U.level() - 1]; /* index: 0.. U.level()-2 */
