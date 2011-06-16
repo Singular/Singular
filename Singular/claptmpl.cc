@@ -59,6 +59,8 @@
   template int tmin ( const int&, const int& );
   template int tabs ( const int& );
 
+  template CanonicalForm prod ( const List<CanonicalForm> & );
+
 // place here your own template stuff, not instantiated by factory
   // libfac:
 #include <libfac/factor.h>
