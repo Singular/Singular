@@ -30,8 +30,6 @@ proc zeroRadical(ideal I, list #)
 "USAGE:  zeroRadical(I,[n]); I ideal, optional: n number of processors (for
          parallel computing)
 ASSUME:  I is zero-dimensional in Q[variables]
-NOTE:    Parallelization is just applicable using 32-bit Singular version since
-         MP-links are not compatible with 64-bit Singular version.
 RETURN:  the radical of I
 EXAMPLE: example zeroRadical; shows an example
 "
@@ -65,34 +63,39 @@ static proc zeroR(ideal I, list #)
 //---------------------  Initialize optional parameter  ------------------------
    if(size(#) > 0)
    {
-      int n = #[1];
-      if((n > 1) && (1 - system("with","MP")))
+      int n1 = #[1];
+      if(n1 >= 10)
       {
-     "========================================================================";
-     "There is no MP available on your system. Since this is necessary to     ";
-     "parallelize the algorithm, the computation will be done without forking.";
-     "========================================================================";
-         n = 1;
+         int n2 = n1 + 1;
+         int n3 = n1;
+      }
+      else
+      {
+         int n2 = 10;
+         int n3 = 10;
       }
    }
    else
    {
-      int n = 1;
+      int n1 = 1;
+      int n2 = 10;
+      int n3 = 10;
    }
 
 //--------------------  Initialize the list of primes  -------------------------
-   intvec L = primeList(I,10);
+   intvec L = primeList(I,n2);
    L[5] = prime(random(100000000,536870912));
 
-   if(n > 1)
+   if(n1 > 1)
    {
 
-//-----  Create n links l(1),...,l(n), open all of them and compute  -----------
-//-----  polynomial F for the primes L[2],...,L[n + 1].              -----------
+//-----  Create n links l(1),...,l(n1), open all of them and compute  ----------
+//-----  polynomial F for the primes L[2],...,L[n1 + 1].              ----------
 
-      for(i = 1; i <= n; i++)
+      for(i = 1; i <= n1; i++)
       {
-         link l(i) = "MPtcp:fork";
+         //link l(i) = "MPtcp:fork";
+         link l(i) = "ssi:fork";
          open(l(i));
          write(l(i), quote(zeroRadP(eval(I), eval(L[i + 1]))));
       }
@@ -106,18 +109,18 @@ static proc zeroR(ideal I, list #)
       CO2[index] = bigint(P[2]);
       index++;
 
-      j = j + n + 1;
+      j = j + n1 + 1;
    }
 
 //---------  Main computations in positive characteristic start here  ----------
 
    while(!crit)
    {
-      if(n > 1)
+      if(n1 > 1)
       {
          while(j <= size(L) + 1)
          {
-            for(i = 1; i <= n; i++)
+            for(i = 1; i <= n1; i++)
             {
                if(status(l(i), "read", "ready"))
                {
@@ -140,7 +143,7 @@ static proc zeroR(ideal I, list #)
                }
             }
             //--- k describes the number of closed links ---
-            if(k == n)
+            if(k == n1)
             {
                j++;
             }
@@ -150,7 +153,7 @@ static proc zeroR(ideal I, list #)
       }
       else
       {
-         while(j<=size(L))
+         while(j <= size(L))
          {
             P = zeroRadP(I, L[j]);
             CO1[index] = P[1];
@@ -163,7 +166,7 @@ static proc zeroR(ideal I, list #)
       // insert deleteUnluckyPrimes
       G = chinrem(CO1,CO2);
       N = CO2[1];
-      for(i = 2; i <= size(CO2); i++){N = N*CO2[i];}
+      for(i = 2; i <= size(CO2); i++){ N = N*CO2[i]; }
       F = farey(G,N);
 
       crit = 1;
@@ -179,16 +182,16 @@ static proc zeroR(ideal I, list #)
          index = 2;
 
          j = size(L) + 1;
-         L = primeList(I,10,L);
+         L = primeList(I,n3,L);
 
-         if(n > 1)
+         if(n1 > 1)
          {
-            for(i = 1; i <= n; i++)
+            for(i = 1; i <= n1; i++)
             {
                open(l(i));
                write(l(i), quote(zeroRadP(eval(I), eval(L[j+i-1]))));
             }
-            j = j + n;
+            j = j + n1;
             k = 0;
          }
       }
@@ -203,21 +206,19 @@ static proc zeroR(ideal I, list #)
    }
 
    if(k == 0) { return(I); }
-   else { return(modStd(I + F)); }
+   else { return(modStd(I + F, n1)); }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 proc assPrimes(list #)
-"USAGE:  assPrimes(I,[a],[n]); I ideal or module,
+"USAGE:  assPrimes(I,[n],[a]); I ideal or module,
          optional: int n: number of processors (for parallel computing), int a:
          - a = 1: method of Eisenbud/Hunecke/Vasconcelos
          - a = 2: method of Gianni/Trager/Zacharias
          - a = 3: method of Monico
          assPrimes(I) chooses n = a = 1
 ASSUME:  I is zero-dimensional over Q[variables]
-NOTE:    Parallelization is just applicable using 32-bit Singular version since
-         MP-links are not compatible with 64-bit Singular version.
 RETURN:  a list Re of associated primes of I:
 EXAMPLE: example assPrimes; shows an example
 "
@@ -238,41 +239,66 @@ EXAMPLE: example assPrimes; shows an example
    {
       if(size(#) == 2)
       {
-         int alg = #[2];
-         int n = 1;
+         int n1 = #[2];
+         int alg = 1;
+         if(n1 >= 10)
+         { 
+            int n2 = n1 + 1;
+            int n3 = n1;
+         }
+         else
+         {
+            int n2 = 10;
+            int n3 = 10;
+         }
       }
       if(size(#) == 3)
       {
-         int alg = #[2];
-         int n = #[3];
-         if((n > 1) && (1 - system("with","MP")))
+         int n1 = #[2];
+         int alg = #[3];
+         if(n1 >= 10)
+         { 
+            int n2 = n1 + 1;
+            int n3 = n1;
+         }
+         else
          {
-     "========================================================================";
-     "There is no MP available on your system. Since this is necessary to     ";
-     "parallelize the algorithm, the computation will be done without forking.";
-     "========================================================================";
-            n = 1;
+            int n2 = 10;
+            int n3 = 10;
          }
       }
    }
    else
    {
+      int n1 = 1;
       int alg = 1;
-      int n = 1;
+      int n2 = 10;
+      int n3 = 10;
+   }
+   
+   if(printlevel >= 10)
+   {
+      "n1 = "+string(n1)+", n2 = "+string(n2)+", n3 = "+string(n3);
    }
 
    int T = timer;
    int RT = rtimer;
    int TT;
+   int t_sleep;
 
    def SPR = basering;
+   map phi;
+   list H = ideal(0);
+   ideal F;
+   poly F1;
+   
    if(printlevel >= 10) { "========== Start modStd =========="; }
-   I = modStd(I,n);
+   I = modStd(I,n1);
    if(printlevel >= 10) { "=========== End modStd ==========="; }
    if(printlevel >= 9) { "modStd takes "+string(rtimer-RT)+" seconds."; }
    int d = vdim(I);
    if(d == -1) { ERROR("Ideal is not zero-dimensional."); }
-   if(homog(I) == 1){ return(list(maxideal(1))); }
+   if(homog(I) == 1) { return(list(maxideal(1))); }
    poly f = findGen(I);
    if(printlevel >= 9) { "Coordinate change: "+string(f); }
 
@@ -292,10 +318,10 @@ EXAMPLE: example assPrimes; shows an example
             if(attrib(#[1],"isRad") == 0)
             {
                TT = timer;
-               I = zeroR(I,n);
+               I = zeroR(I,n1);
                if(printlevel >= 9)
                {
-                  "zeroR(I,n) takes "+string(timer-TT)+" seconds.";
+                  "zeroR(I,n1) takes "+string(timer-TT)+" seconds.";
                }
                TT = timer;
                I = std(I);
@@ -310,10 +336,10 @@ EXAMPLE: example assPrimes; shows an example
          else
          {
             TT = timer;
-            I = zeroR(I,n);
+            I = zeroR(I,n1);
             if(printlevel >= 9)
             {
-               "zeroR(I,n) takes "+string(timer-TT)+" seconds.";
+               "zeroR(I,n1) takes "+string(timer-TT)+" seconds.";
             }
             TT = timer;
             I = std(I);
@@ -339,7 +365,7 @@ EXAMPLE: example assPrimes; shows an example
    export(I_for_fork);           // I available for each link
 
 //--------------------  Initialize the list of primes  -------------------------
-   intvec L = primeList(I,10);
+   intvec L = primeList(I,n2);
    L[5] = prime(random(1000000000,2134567879));
 
    list Re;
@@ -357,15 +383,16 @@ EXAMPLE: example assPrimes; shows an example
 //-----  If there is more than one processor available, we parallelize the  ----
 //-----  main standard basis computations in positive characteristic        ----
 
-   if(n > 1)
+   if(n1 > 1)
    {
 
 //-----  Create n1 links l(1),...,l(n1), open all of them and compute  ---------
-//-----  standard basis for the primes L[2],...,L[n + 1].              ---------
+//-----  standard basis for the primes L[2],...,L[n1 + 1].             ---------
 
-      for(i = 1; i <= n; i++)
+      for(i = 1; i <= n1; i++)
       {
-         link l(i) = "MPtcp:fork";
+         //link l(i) = "MPtcp:fork";
+         link l(i) = "ssi:fork";
          open(l(i));
          write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[i + 1]),
                                                           eval(alg))));
@@ -380,24 +407,26 @@ EXAMPLE: example assPrimes; shows an example
       CO2[index] = bigint(P[2]);
       index++;
 
-      j = j + n + 1;
+      j = j + n1 + 1;
    }
 
 //---------  Main computations in positive characteristic start here  ----------
 
    int tt = timer;
    int rt = rtimer;
-
+   
    while(1)
    {
       tt = timer;
       rt = rtimer;
-
-      if(n > 1)
+      
+      if(printlevel >= 9) { "size(L) = "+string(size(L)); }
+     
+      if(n1 > 1)
       {
          while(j <= size(L) + 1)
          {
-            for(i = 1; i <= n; i++)
+            for(i = 1; i <= n1; i++)
             {
                //--- ask if link l(i) is ready otherwise sleep for t seconds ---
                if(status(l(i), "read", "ready"))
@@ -423,7 +452,7 @@ EXAMPLE: example assPrimes; shows an example
                }
             }
             //--- k describes the number of closed links ---
-            if(k == n)
+            if(k == n1)
             {
                j++;
             }
@@ -432,7 +461,7 @@ EXAMPLE: example assPrimes; shows an example
       }
       else
       {
-         while(j<=size(L))
+         while(j <= size(L))
          {
             P = modpSpecialAlgDep(ringL, L[j], alg);
             CO1[index] = P[1];
@@ -441,6 +470,7 @@ EXAMPLE: example assPrimes; shows an example
             j++;
          }
       }
+      
       if(printlevel >= 9)
       {
          "Real-time for computing list in assPrimes is "+string(rtimer - rt)+
@@ -449,15 +479,18 @@ EXAMPLE: example assPrimes; shows an example
          " seconds.";
       }
 
-      // insert deleteUnluckyPrimes
+//-------------------  Lift results to basering via farey ----------------------
+
+      tt = timer;
       G = chinrem(CO1,CO2);
       N = CO2[1];
-      for(j = 2; j <= size(CO2); j++){N = N*CO2[j];}
+      for(j = 2; j <= size(CO2); j++){ N = N*CO2[j]; }
       F = farey(G,N);
-      if(F[1]-testF[1]==0)
-      {
-         if(printlevel >= 9) { "size(L) = "+string(size(L)); }
+      if(printlevel >= 10) { "Lifting-process takes "+string(timer - tt)
+                             +" seconds"; }
 
+      if(pTestPoly(F[1], ringL, alg, L))                             
+      {
          F = cleardenom(F[1]);
 
          e = deg(F[1]);
@@ -477,24 +510,25 @@ EXAMPLE: example assPrimes; shows an example
             if(int_break == 0)
             {
                setring SPR;
-               map phi = rHelp,var(nvars(SPR));
-               list H = phi(H);
+               phi = rHelp,var(nvars(SPR));
+               H = phi(H);
+               
                if(printlevel >= 9)
                {
                   "Real-time without test is "+string(rtimer - RT)+" seconds.";
                   "CPU-time without test is "+string(timer - T)+" seconds.";
                }
+               
                T = timer;
                RT = rtimer;
 
-               ideal F = phi(F);
-               poly F1;
+               F = phi(F);
 
-               if(n > 1)
+               if(n1 > 1)
                {
                   open(l(1));
                   write(l(1), quote(quickSubst(eval(F[1]), eval(f), eval(I))));
-                  int t_sleep = timer;
+                  t_sleep = timer;
                }
                else
                {
@@ -510,7 +544,7 @@ EXAMPLE: example assPrimes; shows an example
                      Re[i-1] = I + ideal(H[1][i]);
                   }
 
-                  if(n > 1)
+                  if(n1 > 1)
                   {
                      t_sleep = timer - t_sleep;
                      if(t_sleep > 5) { t_sleep = 5; }
@@ -545,6 +579,7 @@ EXAMPLE: example assPrimes; shows an example
       }
 
       int_break = 0;
+      setring rHelp;
       testF = F;
       CO1 = G;
       CO2 = N;
@@ -552,27 +587,27 @@ EXAMPLE: example assPrimes; shows an example
 
       j = size(L) + 1;
 
-      setring(SPR);
-      L = primeList(I,10,L);
+      setring SPR;
+      L = primeList(I,n3,L);
       setring rHelp;
 
-      if(n > 1)
+      if(n1 > 1)
       {
-         for(i = 1; i <= n; i++)
+         for(i = 1; i <= n1; i++)
          {
             open(l(i));
             write(l(i), quote(modpSpecialAlgDep(eval(ringL), eval(L[j+i-1]),
                                                              eval(alg))));
          }
-         j = j + n;
+         j = j + n1;
          k = 0;
       }
    }
 }
 example
 { "EXAMPLE:";  echo = 2;
-   ring R=0,(a,b,c,d,e,f),dp;
-   ideal I=
+   ring R = 0,(a,b,c,d,e,f),dp;
+   ideal I =
    2fb+2ec+d2+a2+a,
    2fc+2ed+2ba+b,
    2fd+e2+2ca+c+b2,
@@ -875,6 +910,40 @@ static proc modpSpecialAlgDep(list ringL, int p, list #)
 
    setring R0;
    return(list(imap(@S,F),p));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static proc pTestPoly(poly testF, list ringL, int alg, list L)
+{
+   int i,j,p;
+   def R0 = basering;
+   
+   while(!i)
+   {
+      i = 1;
+      p = prime(random(1000000000,2134567879));
+      for(j = 1; j <= size(L); j++)
+      {
+         if(p == L[j]) { i = 0; break; }
+      }
+   }
+   
+   ringL[1] = p;
+   def @R = ring(ringL);
+   setring @R;
+   poly f = fetch(SPR,f_for_fork);
+   ideal I = fetch(SPR,I_for_fork);
+   if(alg == 1) { list M = specialAlgDepEHV(f,I); }
+   if(alg == 2) { list M = specialAlgDepGTZ(f,I); }
+   if(alg == 3) { list M = specialAlgDepMonico(f,I); }
+   def @S = M[1];
+   setring @S;
+   poly testF = fetch(R0,testF);
+   int k = (testF == F);
+   
+   setring R0;
+   return(k);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
