@@ -730,7 +730,11 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
         CanZass(factors,f1);
 
         // return converted result
+        #ifdef NTL_ZZ
+        F=convertNTLvec_pair_ZZpEX_long2FacCFFList(factors,leadcoeff,f.mvar(),alpha);
+        #else
         F=convertNTLvec_pair_zzpEX_long2FacCFFList(factors,leadcoeff,f.mvar(),alpha);
+        #endif
       }
       else if (/*getCharacteristic()*/ch==2)
       {
