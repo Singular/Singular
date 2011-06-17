@@ -5101,6 +5101,18 @@ biFactorize (const CanonicalForm& F, const ExtensionInfo& info)
     return factors;
   }
 
+  //check trivial case
+  if (degree (A) == 1 || degree (A, 1) == 1)
+  {
+    factors.append (A);
+
+    appendSwapDecompress (factors, contentAxFactors, contentAyFactors,
+                          false, false, N);
+
+    normalize (factors);
+    return factors;
+  }
+
   // check derivatives
   bool derivXZero= false;
   CanonicalForm derivX= deriv (A, x);
