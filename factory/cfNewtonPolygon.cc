@@ -173,7 +173,13 @@ int polygon (int** points, int sizePoints)
 static
 int* getDegrees (const CanonicalForm& F, int& sizeOfOutput)
 {
-  ASSERT (F.isUnivariate(), "univariate poly expected");
+  if (F.inCoeffDomain())
+  {
+    int* result= new int [1];
+    result [0]= 0;
+    sizeOfOutput= 1;
+    return result;
+  }
   sizeOfOutput= size (F);
   int* result= new int [sizeOfOutput];
   int j= 0;
