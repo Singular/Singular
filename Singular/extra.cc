@@ -194,9 +194,16 @@ unsigned long** singularMatrixToLongMatrix(matrix singularMatrix)
   for (int r = 0; r < n; r++)
     for (int c = 0; c < n; c++)
     {
-      entry = p_GetCoeff(MATELEM(singularMatrix, r + 1, c + 1), currRing);
-      int entryAsInt = n_Int(entry, currRing);
-      if (entryAsInt < 0) entryAsInt += currRing->ch;
+      poly p=MATELEM(singularMatrix, r + 1, c + 1);
+      int entryAsInt;
+      if (p!=NULL)
+      {
+        entry = p_GetCoeff(p, currRing);
+        entryAsInt = n_Int(entry, currRing);
+        if (entryAsInt < 0) entryAsInt += currRing->ch;
+      }
+      else
+        entryAsInt=0;
       longMatrix[r][c] = (unsigned long)entryAsInt;
     }
   return longMatrix;
