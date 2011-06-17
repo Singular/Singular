@@ -152,6 +152,7 @@ basefactorysrc := \
 		cf_map.cc \
 		cf_map_ext.cc \
 		cfNewtonPolygon.cc \
+		cfModResultant.cc \
 		cf_ops.cc \
 		cf_primes.cc \
 		cf_random.cc \
@@ -239,6 +240,7 @@ basefactoryincl := \
 		cf_iter.h \
 		cf_map.h \
 		cfNewtonPolygon.h \
+		cfModResultant.h \
 		cf_primes.h \
 		cf_primetab.h \
 		cf_random.h \
