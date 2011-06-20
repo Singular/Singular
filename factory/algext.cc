@@ -13,6 +13,7 @@
 #endif
 #endif
 
+#include "templates/ftmpl_functions.h"
 #include "cf_defs.h"
 #include "canonicalform.h"
 #include "cf_iter.h"
@@ -22,6 +23,173 @@
 #include "fieldGCD.h"
 #include "cf_map.h"
 #include "cf_generator.h"
+
+/// compressing two polynomials F and G, M is used for compressing,
+/// N to reverse the compression
+static
+int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
+                CFMap & N, bool topLevel)
+{
+  int n= tmax (F.level(), G.level());
+  int * degsf= new int [n + 1];
+  int * degsg= new int [n + 1];
+
+  for (int i = 0; i <= n; i++)
+    degsf[i]= degsg[i]= 0;
+
+  degsf= degrees (F, degsf);
+  degsg= degrees (G, degsg);
+
+  int both_non_zero= 0;
+  int f_zero= 0;
+  int g_zero= 0;
+  int both_zero= 0;
+
+  if (topLevel)
+  {
+    for (int i= 1; i <= n; i++)
+    {
+      if (degsf[i] != 0 && degsg[i] != 0)
+      {
+        both_non_zero++;
+        continue;
+      }
+      if (degsf[i] == 0 && degsg[i] != 0 && i <= G.level())
+      {
+        f_zero++;
+        continue;
+      }
+      if (degsg[i] == 0 && degsf[i] && i <= F.level())
+      {
+        g_zero++;
+        continue;
+      }
+    }
+
+    if (both_non_zero == 0)
+    {
+      delete [] degsf;
+      delete [] degsg;
+      return 0;
+    }
+
+    // map Variables which do not occur in both polynomials to higher levels
+    int k= 1;
+    int l= 1;
+    for (int i= 1; i <= n; i++)
+    {
+      if (degsf[i] != 0 && degsg[i] == 0 && i <= F.level())
+      {
+        if (k + both_non_zero != i)
+        {
+          M.newpair (Variable (i), Variable (k + both_non_zero));
+          N.newpair (Variable (k + both_non_zero), Variable (i));
+        }
+        k++;
+      }
+      if (degsf[i] == 0 && degsg[i] != 0 && i <= G.level())
+      {
+        if (l + g_zero + both_non_zero != i)
+        {
+          M.newpair (Variable (i), Variable (l + g_zero + both_non_zero));
+          N.newpair (Variable (l + g_zero + both_non_zero), Variable (i));
+        }
+        l++;
+      }
+    }
+
+    // sort Variables x_{i} in increasing order of
+    // min(deg_{x_{i}}(f),deg_{x_{i}}(g))
+    int m= tmax (F.level(), G.level());
+    int min_max_deg;
+    k= both_non_zero;
+    l= 0;
+    int i= 1;
+    while (k > 0)
+    {
+      if (degsf [i] != 0 && degsg [i] != 0)
+        min_max_deg= tmax (degsf[i], degsg[i]);
+      else
+        min_max_deg= 0;
+      while (min_max_deg == 0)
+      {
+        i++;
+        min_max_deg= tmax (degsf[i], degsg[i]);
+        if (degsf [i] != 0 && degsg [i] != 0)
+          min_max_deg= tmax (degsf[i], degsg[i]);
+        else
+          min_max_deg= 0;
+      }
+      for (int j= i + 1; j <=  m; j++)
+      {
+        if (tmax (degsf[j],degsg[j]) <= min_max_deg && degsf[j] != 0 && degsg [j] != 0)
+        {
+          min_max_deg= tmax (degsf[j], degsg[j]);
+          l= j;
+        }
+      }
+      if (l != 0)
+      {
+        if (l != k)
+        {
+          M.newpair (Variable (l), Variable(k));
+          N.newpair (Variable (k), Variable(l));
+          degsf[l]= 0;
+          degsg[l]= 0;
+          l= 0;
+        }
+        else
+        {
+          degsf[l]= 0;
+          degsg[l]= 0;
+          l= 0;
+        }
+      }
+      else if (l == 0)
+      {
+        if (i != k)
+        {
+          M.newpair (Variable (i), Variable (k));
+          N.newpair (Variable (k), Variable (i));
+          degsf[i]= 0;
+          degsg[i]= 0;
+        }
+        else
+        {
+          degsf[i]= 0;
+          degsg[i]= 0;
+        }
+        i++;
+      }
+      k--;
+    }
+  }
+  else
+  {
+    //arrange Variables such that no gaps occur
+    for (int i= 1; i <= n; i++)
+    {
+      if (degsf[i] == 0 && degsg[i] == 0)
+      {
+        both_zero++;
+        continue;
+      }
+      else
+      {
+        if (both_zero != 0)
+        {
+          M.newpair (Variable (i), Variable (i - both_zero));
+          N.newpair (Variable (i - both_zero), Variable (i));
+        }
+      }
+    }
+  }
+
+  delete [] degsf;
+  delete [] degsg;
+
+  return 1;
+}
 
 CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M)
 { // polynomials in M.mvar() are considered coefficients
@@ -198,7 +366,7 @@ static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalFor
 static void tryDivide( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, CanonicalForm & result, bool & divides, bool & fail );
 
 
-void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail )
+void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail, bool topLevel )
 { // assume F,G are multivariate polys over Z/p(a) for big prime p, M "univariate" polynomial in an algebraic variable
   // M is assumed to be monic
   if(F.isZero())
@@ -260,10 +428,12 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     return;
   }
   CFMap MM,NN;
-  CFArray ps(1,2);
-  ps[1] = F;
-  ps[2] = G;
-  compress(ps,MM,NN); // maps MM, NN are created
+  int lev= myCompress (F, G, MM, NN, topLevel);
+  if (lev == 0)
+  {
+    result= 1;
+    return;
+  }
   CanonicalForm f=MM(F);
   CanonicalForm g=MM(G);
   // here: f,g are compressed
@@ -346,7 +516,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     gamma_image = reduce(gamma(alpha, Variable(1)),M); // plug in alpha for var(1)
     if(gamma_image.isZero()) // skip lc-bad points var(1)-alpha
       continue;
-    tryBrownGCD( f(alpha, Variable(1)), g(alpha, Variable(1)), M, g_image, fail ); // recursive call with one var less
+    tryBrownGCD( f(alpha, Variable(1)), g(alpha, Variable(1)), M, g_image, fail, false ); // recursive call with one var less
     if(fail)
       return;
     g_image = reduce(g_image, M);
@@ -487,6 +657,8 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
   cl = lc(M) * lc(f) * lc(g);
   q = 1;
   D = 0;
+  CanonicalForm test= 0;
+  bool equal= false;
   for( i=cf_getNumBigPrimes()-1; i>-1; i-- )
   {
     p = cf_getBigPrime(i);
@@ -529,7 +701,11 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
       tmp = replacevar( Farey( D, q ), b, a ); // Farey and switch back to alg var
       setReduce(a,true); // reduce expressions modulo mipo
       On( SW_RATIONAL ); // needed by fdivides
-      if( fdivides( tmp, f ) && fdivides( tmp, g )) // trial division
+      if (test != tmp)
+        test= tmp;
+      else
+        equal= true; // modular image did not add any new information
+      if(equal && fdivides( tmp, f ) && fdivides( tmp, g )) // trial division
       {
         Off( SW_RATIONAL );
         setReduce(a,true);
@@ -761,12 +937,9 @@ void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const Canonica
   // here: degree(P) >= degree(result)
   while(true)
   {
-    tryInvert( Lc(result), M, inv, fail );
+    tryDivrem (P, result, q, rem, inv, M, fail);
     if(fail)
       return;
-    // here: Lc(result) is invertible modulo M
-    q = Lc(P)*inv*power( x, P.degree(x)-result.degree(x) );
-    rem = reduce( P - q*result, M );
     if( rem.isZero() )
     {
       s*=inv;
