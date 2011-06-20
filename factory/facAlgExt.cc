@@ -102,8 +102,8 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
 
-  if (!isOn (SW_RATIONAL))
-    On (SW_RATIONAL);
+  bool save_rat=!isOn (SW_RATIONAL);
+  On (SW_RATIONAL);
   CanonicalForm f= F*bCommonDen (F);
   int shift;
   CanonicalForm norm= sqrfNorm (f, alpha, shift);
@@ -111,7 +111,10 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   CFFList normFactors= factorize (norm); //maybe compute norm (not necessarily squarefree), split f and procede recursively
   CFList factors;
   if (normFactors.length() <= 2)
+  {
+    if (save_rat) Off(SW_RATIONAL);
     return CFList (F);
+  }
 
   normFactors.removeFirst();
   CanonicalForm buf;
@@ -130,6 +133,7 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
     factors.append (factor);
   }
   ASSERT (degree (buf) <= 0, "incomplete factorization");
+  if (save_rat) Off(SW_RATIONAL);
   return factors;
 }
 

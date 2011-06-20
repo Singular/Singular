@@ -91,4 +91,6 @@
 
 /************** END OF CONFIGURABLE SECTION **************/
 
+#define NTL_ZZ 1
+
 #endif /* ! INCL_CONFIG_H */
