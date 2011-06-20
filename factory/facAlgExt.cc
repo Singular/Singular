@@ -28,10 +28,11 @@
 #include "cf_algorithm.h"
 #include "facFqBivarUtil.h"
 #include "facAlgExt.h"
+#include "cfModResultant.h"
 
 // squarefree part of F
 CanonicalForm
-sqrfPart (const CanonicalForm& F)
+uniSqrfPart (const CanonicalForm& F)
 {
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
@@ -49,7 +50,14 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
   CanonicalForm mipo= getMipo (alpha);
   mipo= mipo (x, alpha);
 
-  CanonicalForm norm= resultant (g, mipo, x);
+  int degg= degree (g);
+  int degmipo= degree (mipo);
+  CanonicalForm norm;
+  if (degg >= 8 || degmipo >= 8)
+    norm= resultantZ (g, mipo, x);
+  else
+    norm= resultant (g, mipo, x);
+
   i= 0;
   int k;
   if (degree (gcd (deriv (norm, y), norm)) <= 0)
@@ -63,12 +71,18 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
       if (k == 1)
       {
         g= F (y - i*alpha, y);
-        norm= resultant (g (x, alpha), mipo, x);
+        if (degg >= 8 || degmipo >= 8)
+          norm= resultantZ (g (x, alpha), mipo, x);
+        else
+          norm= resultant (g (x, alpha), mipo, x);
       }
       else
       {
         g= F (y + i*alpha, y);
-        norm= resultant (g (x, alpha), mipo, x);
+        if (degg >= 8 || degmipo >= 8)
+          norm= resultantZ (g (x, alpha), mipo, x);
+        else
+          norm= resultant (g (x, alpha), mipo, x);
       }
       if (degree (gcd (deriv (norm, y), norm)) <= 0)
       {
@@ -88,15 +102,16 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
 
-  On (SW_RATIONAL);
-  CanonicalForm f= F;
+  if (!isOn (SW_RATIONAL))
+    On (SW_RATIONAL);
+  CanonicalForm f= F*bCommonDen (F);
   int shift;
   CanonicalForm norm= sqrfNorm (f, alpha, shift);
   ASSERT (degree (norm, alpha) <= 0, "wrong norm computed");
   CFFList normFactors= factorize (norm); //maybe compute norm (not necessarily squarefree), split f and procede recursively
   CFList factors;
   if (normFactors.length() <= 2)
-    return CFList (f);
+    return CFList (F);
 
   normFactors.removeFirst();
   CanonicalForm buf;
@@ -115,7 +130,6 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
     factors.append (factor);
   }
   ASSERT (degree (buf) <= 0, "incomplete factorization");
-  Off (SW_RATIONAL);
   return factors;
 }
 
@@ -125,13 +139,15 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
   ASSERT (F.isUnivariate(), "univariate input expected");
   ASSERT (getCharacteristic() == 0, "characteristic 0 expected");
 
+
   if (F.inCoeffDomain())
     return CFFList (CFFactor (F, 1));
 
-  CanonicalForm sqrf= sqrfPart (F);
+  CanonicalForm sqrf= uniSqrfPart (F);
   CFList sqrfFactors= AlgExtSqrfFactorize (sqrf, alpha);
 
-  On (SW_RATIONAL);
+  if (!isOn (SW_RATIONAL))
+    On (SW_RATIONAL);
   CanonicalForm buf= F/Lc (F);
   CFFList factors;
   int multi;
@@ -146,7 +162,6 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
     }
     factors.append (CFFactor (i.getItem(), multi));
   }
-  Off (SW_RATIONAL);
   factors.insert (CFFactor (Lc(F), 1));
   ASSERT (degree (buf) <= 0, "bug in AlgExtFactorize");
   return factors;

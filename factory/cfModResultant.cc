@@ -241,12 +241,15 @@ CanonicalForm uniResultant (const CanonicalForm& F, const CanonicalForm& G)
   if (F.isZero() || G.isZero())
     return 0;
 
+  zz_pBak bak;
+  bak.save();
   zz_p::init (getCharacteristic());
   zz_pX NTLF= convertFacCF2NTLzzpX (F);
   zz_pX NTLG= convertFacCF2NTLzzpX (G);
 
   zz_p NTLResult= resultant (NTLF, NTLG);
 
+  bak.restore();
   return CanonicalForm (to_long (rep (NTLResult)));
 #else
   return resultant (F, G, F.mvar());
