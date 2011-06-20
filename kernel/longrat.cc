@@ -2280,6 +2280,35 @@ LINLINE number nlSub (number a, number b)
   return _nlSub_aNoImm_OR_bNoImm(a, b);
 }
 
+LINLINE void nlInpMult(number &a, number b, const ring r)
+{
+  if (((SR_HDL(b)|SR_HDL(a))&SR_INT))
+  {
+    number n=nlMult(a,b);
+    nlDelete(&a,r);
+    a=n;
+  }
+  else
+  {
+    mpz_mul(a->z,a->z,b->z);
+    if (a->s==3)
+    {
+      if(b->s!=3)
+      {
+        mpz_init_set(a->n,b->n);
+        a->s=0;
+      }
+    }
+    else
+    {
+      if(b->s!=3)
+      {
+        mpz_mul(a->n,a->n,b->n);
+      }
+      a->s=0;
+    }
+  }
+}
 #endif // DO_LINLINE
 
 #ifndef P_NUMBERS_H
@@ -2334,36 +2363,6 @@ void nlInpIntDiv(number &a, number b, const ring r)
     }
     MPZ_DIV(a->z,a->z,b->z);
     a=nlShort3_noinline(a);
-  }
-}
-void nlInpMult(number &a, number b, const ring r)
-{
-  if (((SR_HDL(b)|SR_HDL(a))&SR_INT)
-  )
-  {
-    number n=nlMult(a,b);
-    nlDelete(&a,r);
-    a=n;
-  }
-  else
-  {
-    mpz_mul(a->z,a->z,b->z);
-    if (a->s==3)
-    {
-      if(b->s!=3)
-      {
-        mpz_init_set(a->n,b->n);
-        a->s=0;
-      }
-    }
-    else
-    {
-      if(b->s!=3)
-      {
-        mpz_mul(a->n,a->n,b->n);
-      }
-      a->s=0;
-    }
   }
 }
 

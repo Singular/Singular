@@ -28,9 +28,7 @@ LINKAGE poly p_Mult_nn(poly p, const number n, const ring r)
   while (p != NULL)
   {
 #ifndef HAVE_ZERODIVISORS
-    number nc = pGetCoeff(p);
-    pSetCoeff0(p, n_Mult(n, nc, r));
-    n_Delete(&nc, r);
+    n_InpMult(pGetCoeff(p), n, r);
     pIter(p);
 #else
     number tmp = n_Mult(n, pGetCoeff(p), r);

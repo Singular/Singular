@@ -97,9 +97,8 @@ extern omBin rnumber_bin;
 // in-place operations
 void nlInpGcd(number &a, number b, const ring r);
 void nlInpIntDiv(number &a, number b, const ring r);
-void nlInpAdd_(number &a, number b, const ring r);
 LINLINE number   nlInpAdd(number la, number li, const ring r);
-void nlInpMult(number &a, number b, ring r);
+LINLINE void nlInpMult(number &a, number b, ring r);
 
 number nlFarey(number nP, number nN);
 
