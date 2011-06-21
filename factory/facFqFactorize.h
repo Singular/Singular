@@ -6,8 +6,6 @@
  * This file provides functions for factorizing a multivariate polynomial over
  * \f$ F_{p} \f$ , \f$ F_{p}(\alpha ) \f$ or GF.
  *
- * ABSTRACT: So far factor recombination is done naive!
- *
  * @author Martin Lee
  *
  * @internal @version \$Id$
@@ -232,64 +230,6 @@ CFFList GFFactorize (const CanonicalForm& F ///< [in] a multivariate poly
   return result;
 }
 
-/// naive factor recombination for bivariate factorization.
-/// Uses precomputed data to exclude combinations that are not possible.
-///
-/// @return @a monicFactorRecombi returns a list of factors of F, that are
-///         monic wrt Variable (1).
-/// @sa extFactorRecombination(), factorRecombination(), biFactorizer()
-CFList
-monicFactorRecombi (
-                  const CFList& factors,    ///< [in] list of lifted factors
-                                            ///< that are monic wrt Variable (1)
-                  const CanonicalForm& F,   ///< [in] bivariate poly
-                  const CanonicalForm& M,   ///< [in] Variable (2)^liftBound
-                  const DegreePattern& degs ///< [in] degree pattern
-                   );
-
-/// detects factors of @a F at stage @a deg of Hensel lifting.
-/// No combinations of more than one factor are tested. Lift bound and possible
-/// degree pattern are updated.
-///
-/// @return @a earlyMonicFactorDetect returns a list of factors of F (possibly
-///         incomplete) that are monic wrt Variable (1)
-/// @sa monicFactorRecombi(), earlyFactorDetection(), monicFactorDetect(),
-///     biFactorizer()
-CFList
-earlyMonicFactorDetect (
-           CanonicalForm& F,       ///< [in,out] poly to be factored, returns
-                                   ///< poly divided by detected factors in case
-                                   ///< of success
-           CFList& factors,        ///< [in,out] list of factors lifted up to
-                                   ///< @a deg, returns a list of factors
-                                   ///< without detected factors
-           int& adaptedLiftBound,  ///< [in,out] adapted lift bound
-           DegreePattern& degs,    ///< [in,out] degree pattern, is updated
-                                   ///< whenever we find a factor
-           bool& success,          ///< [in,out] indicating success
-           int deg,                ///< [in] stage of Hensel lifting
-           const int bound         ///< [in] degree (A, 2) + 1 +
-                                   ///< degree (LC (A, 1), 2), where A is the
-                                   ///< multivariate polynomial corresponding to
-                                   ///< F.
-                       );
-
-/// Bivariate factorization. In contrast to biFactorize() the factors returned
-/// are monic wrt Variable (1), if @a F is not irreducible. And no factorization
-/// wrt Variable (2) are performed. However,
-///
-/// @return @a biFactorizer returns a list of factors that are monic wrt
-///         Variable (1), if @a F is irreducible @a F is returned
-/// @sa multiFactorize(), biFactorize()
-CFList biFactorizer (const CanonicalForm& F,   ///< [in] a bivariate poly
-                     const Variable& alpha,    ///< [in] algebraic variable
-                     CanonicalForm& bivarEval, ///< [in,out] a valid evaluation
-                                               ///< point
-                     int& liftBound            ///< [in,out] lift bound, may be
-                                               ///< adapted during Hensel
-                                               ///< lifting
-                    );
-
 /// Naive factor recombination for multivariate factorization over an extension
 /// of the initial field. No precomputed is used to exclude combinations.
 ///
@@ -406,10 +346,11 @@ extEarlyFactorDetect (
 
 /// evaluation point search for multivariate factorization,
 /// looks for a (F.level() - 1)-tuple such that the resulting univariate
-/// polynomial has main variable F.mvar(), is squarefree and its degree
+/// polynomial has main variable Variable (1), is squarefree and its degree
 /// coincides with degree(F) and the bivariate one is primitive wrt.
-/// Variable(1), fails if there are no valid evaluation points, eval contains
-/// the intermediate evaluated polynomials.
+/// Variable(1), and successively evaluated polynomials have the same degree in 
+/// their main variable as F has, fails if there are no valid evaluation points, 
+/// eval contains the intermediate evaluated polynomials.
 ///
 /// @return @a evalPoints returns an evaluation point, which is valid if and
 ///         only if fail == false.
@@ -457,6 +398,143 @@ henselLiftAndEarly (
 CFList
 extFactorize (const CanonicalForm& F,   ///< [in] poly to be factored
               const ExtensionInfo& info ///< [in] info about extension
+             );
+
+/// compute the LCM of the contents of @a A wrt to each variable occuring in @a
+/// A.
+///
+/// @return @a lcmContent returns the LCM of the contents of @a A wrt to each 
+///         variable occuring in @a A.
+CanonicalForm
+lcmContent (const CanonicalForm& A, ///< [in] a compressed multivariate poly 
+            CFList& contentAi       ///< [in,out] an empty list, returns a list
+                                    ///< of the contents of @a A wrt to each 
+                                    ///< variable occuring in @a A starting from
+                                    ///< @a A.mvar().
+           );
+
+/// compress a polynomial s.t. \f$ deg_{x_{i}} (F) >= deg_{x_{i+1}} (F) \f$ and 
+/// no gaps between the variables occur
+///
+/// @return a compressed poly with the above properties
+CanonicalForm myCompress (const CanonicalForm& F, ///< [in] a poly
+                          CFMap& N                ///< [in,out] a map to 
+                                                  ///< decompress
+                         );
+
+/// evaluate a poly A with main variable at level 1 at an evaluation point in
+/// K^(n-1) wrt different second variables. If this evaluation is valid (see
+/// evalPoints) then Aeval contains A successively evaluated at this point,
+/// otherwise this entry is empty
+void
+evaluationWRTDifferentSecondVars (
+                    CFList*& Aeval,          ///<[in,out] an array of length n-2
+                                             ///< if variable at level i > 2
+                                             ///< admits a valid evaluation
+                                             ///< this entry contains A
+                                             ///< successively evaluated at this
+                                             ///< point otherwise an empty list
+                    const CFList& evaluation,///<[in] a valid evaluation point
+                                             ///< for main variable at level 1
+                                             ///< and second variable at level 2
+                    const CanonicalForm& A   ///<[in] some poly
+                                 );
+
+/// evaluate F successively n-2 at 0
+///
+/// @return returns a list of successive evaluations of F, ending with F
+CFList evaluateAtZero (const CanonicalForm& F ///< [in] some poly
+                      );
+
+/// divides factors by their content wrt. Variable(1) and checks if these polys
+/// divide F
+///
+/// @return returns factors of F
+CFList recoverFactors (const CanonicalForm& F, ///< [in] some poly F
+                       const CFList& factors   ///< [in] some list of
+                                               ///< factor candidates
+                      );
+
+/// refine a bivariate factorization of A with l factors to one with
+/// minFactorsLength
+void
+refineBiFactors (const CanonicalForm& A,  ///< [in] some poly
+                 CFList& biFactors,       ///< [in,out] list of bivariate to be
+                                          ///< refined, returns refined factors
+                 CFList* const& factors,  ///< [in] list of bivariate
+                                          ///< factorizations of A wrt different
+                                          ///< second variables
+                 const CFList& evaluation,///< [in] the evaluation point
+                 int minFactorsLength     ///< [in] the minimal number of factors
+                );
+
+/// plug in evalPoint for y in a list of polys
+///
+/// @return returns a list of the evaluated polys, these evaluated polys are 
+/// made monic
+CFList
+buildUniFactors (const CFList& biFactors,       ///< [in] a list of polys
+                 const CanonicalForm& evalPoint,///< [in] some evaluation point
+                 const Variable& y              ///< [in] some variable
+                );
+
+/// extract leading coefficients wrt Variable(1) from bivariate factors obtained
+/// from factorizations of A wrt different second variables
+void
+getLeadingCoeffs (const CanonicalForm& A,  ///< [in] some poly
+                  CFList*& Aeval,          ///< [in,out] array of bivariate
+                                           ///< factors, returns the leading
+                                           ///< coefficients of these factors
+                  const CFList& uniFactors,///< [in] univariate factors of A
+                  const CFList& evaluation ///< [in] evaluation point
+                 );
+
+/// normalize precomputed leading coefficients such that leading coefficients
+/// evaluated at 0 in K^(n-2) equal the leading coeffs wrt Variable(1) of 
+/// bivariate factors
+void
+prepareLeadingCoeffs (CFList*& LCs,               ///<[in,out] 
+                      int n,                      ///<[in] level of poly to be
+                                                  ///< factored
+                      const CFList& leadingCoeffs,///<[in] precomputed leading
+                                                  ///< coeffs
+                      const CFList& biFactors     ///<[in] bivariate factors
+                     );
+
+/// obtain factors of F by reconstructing their leading coeffs
+///
+/// @return returns the reconstructed factors
+/// @sa factorRecombination()
+CFList
+leadingCoeffReconstruction (const CanonicalForm& F,///<[in] poly to be factored
+                            const CFList& factors, ///<[in] factors of f monic
+                                                   ///< wrt Variable (1)
+                            const CFList& M        ///<[in] a list of powers of
+                                                   ///< Variables
+                           );
+
+/// distribute content
+///
+/// @return returns a list result of polys such that prod (result)= prod (L)
+/// but the first entry of L may be (partially) factorized and these factors
+/// are distributed onto other entries in L
+CFList
+distributeContent (
+          const CFList& L,                        ///<[in] list of polys, first
+                                                  ///< entry the content to be 
+                                                  ///< distributed
+          const CFList* differentSecondVarFactors,///<[in] factorization wrt 
+                                                  ///< different second vars
+          int length                              ///<[in] length of 
+                                                  ///<differentSecondVarFactors
+                  );
+
+/// gcd free basis of two lists of factors
+void
+gcdFreeBasis (CFFList& factors1, ///< [in,out] list of factors, returns gcd free
+                                 ///< factors
+              CFFList& factors2  ///< [in,out] list of factors, returns gcd free
+                                 ///< factors
              );
 
 #endif

@@ -7,10 +7,9 @@
  * \f$ F_{p} \f$ , \f$ F_{p}(\alpha ) \f$ or GF, based on "Modern Computer
  * Algebra, Chapter 15" by J. von zur Gathen & J. Gerhard and "Factoring
  * multivariate polynomials over a finite field" by L. Bernardin.
+ * Factor Recombination is described in "Factoring polynomials over global 
+ * fields" by K. Belabas, M. van Hoeij, J. Klueners, A. Steel
  *
- * ABSTRACT: In contrast to biFactorizer() in facFqFactorice.cc we evaluate and
- * factorize the polynomial in both variables. So far factor recombination is
- * done naive!
  *
  * @author Martin Lee
  *

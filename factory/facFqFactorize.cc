@@ -7,7 +7,8 @@
  * a finite field.
  *
  * ABSTRACT: "Efficient Multivariate Factorization over Finite Fields" by
- * L. Bernardin & M. Monagon.
+ * L. Bernardin & M. Monagon. Precomputation of leading coefficients is 
+ * described in "Sparse Hensel lifting" by E. Kaltofen
  *
  * @author Martin Lee
  *
@@ -116,7 +117,6 @@ myContent (const CanonicalForm& F, const Variable& x)
     return listGCD (L);
 }
 
-static inline
 CanonicalForm myCompress (const CanonicalForm& F, CFMap& N)
 {
   int n= F.level();
@@ -864,7 +864,6 @@ int newMainVariableSearch (CanonicalForm& A, CFList& Aeval, CFList&
   return swapLevel;
 }
 
-static inline
 CanonicalForm lcmContent (const CanonicalForm& A, CFList& contentAi)
 {
   int i= A.level();
@@ -1216,7 +1215,7 @@ gcdFreeBasis (CFFList& factors1, CFFList& factors2)
 
 CFList
 distributeContent (const CFList& L, const CFList* differentSecondVarFactors,
-                   int length, const CFList& factors
+                   int length
                   )
 {
   CFList l= L;
@@ -1288,7 +1287,6 @@ distributeContent (const CFList& L, const CFList* differentSecondVarFactors,
   return l;
 }
 
-static inline
 CFList evaluateAtZero (const CanonicalForm& F)
 {
   CFList result;
@@ -1605,7 +1603,7 @@ precomputeLeadingCoeff (const CanonicalForm& LCF, const CFList& LCFFactors,
 
   result.insert (N (F));
 
-  result= distributeContent (result, differentSecondVarLCs, length, bufFactors);
+  result= distributeContent (result, differentSecondVarLCs, length);
 
   if (!result.getFirst().inCoeffDomain())
   {

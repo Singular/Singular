@@ -6,10 +6,6 @@
  * This file provides functions for factorizing a bivariate polynomial over
  * \f$ F_{p} \f$ , \f$ F_{p}(\alpha ) \f$ or GF.
  *
- * ABSTRACT: In contrast to biFactorizer() in facFqFactorice.cc we evaluate and
- * factorize the polynomial in both variables. So far factor recombination is
- * done naive!
- *
  * @author Martin Lee
  *
  * @internal @version \$Id$
