@@ -49,6 +49,7 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
   CanonicalForm g= F (x, alpha);
   CanonicalForm mipo= getMipo (alpha);
   mipo= mipo (x, alpha);
+  mipo *= bCommonDen (mipo);
 
   int degg= degree (g);
   int degmipo= degree (mipo);
@@ -71,6 +72,7 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
       if (k == 1)
       {
         g= F (y - i*alpha, y);
+        g *= bCommonDen (g);
         if (degg >= 8 || degmipo >= 8)
           norm= resultantZ (g (x, alpha), mipo, x);
         else
@@ -79,6 +81,7 @@ CanonicalForm sqrfNorm (const CanonicalForm& F, const Variable& alpha, int& i)
       else
       {
         g= F (y + i*alpha, y);
+        g *= bCommonDen (g);
         if (degg >= 8 || degmipo >= 8)
           norm= resultantZ (g (x, alpha), mipo, x);
         else
@@ -108,7 +111,7 @@ AlgExtSqrfFactorize (const CanonicalForm& F, const Variable& alpha)
   int shift;
   CanonicalForm norm= sqrfNorm (f, alpha, shift);
   ASSERT (degree (norm, alpha) <= 0, "wrong norm computed");
-  CFFList normFactors= factorize (norm); //maybe compute norm (not necessarily squarefree), split f and procede recursively
+  CFFList normFactors= factorize (norm);
   CFList factors;
   if (normFactors.length() <= 2)
   {
@@ -150,8 +153,8 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
   CanonicalForm sqrf= uniSqrfPart (F);
   CFList sqrfFactors= AlgExtSqrfFactorize (sqrf, alpha);
 
-  if (!isOn (SW_RATIONAL))
-    On (SW_RATIONAL);
+  bool save_rat=!isOn (SW_RATIONAL);
+  On (SW_RATIONAL);
   CanonicalForm buf= F/Lc (F);
   CFFList factors;
   int multi;
@@ -168,6 +171,7 @@ AlgExtFactorize (const CanonicalForm& F, const Variable& alpha)
   }
   factors.insert (CFFactor (Lc(F), 1));
   ASSERT (degree (buf) <= 0, "bug in AlgExtFactorize");
+  if (save_rat) Off(SW_RATIONAL);
   return factors;
 }
 
