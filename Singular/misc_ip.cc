@@ -1147,3 +1147,12 @@ void siInit(char *name)
   errorreported = 0;
 }
 
+#ifdef LIBSINGULAR
+#ifdef HAVE_FACTORY
+// the init routines of factory need mmInit
+int mmInit( void )
+{
+  return 1;
+}
+#endif
+#endif

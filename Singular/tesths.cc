@@ -59,7 +59,6 @@ int mmInit( void )
   return 1;
 }
 
-
 /*0 implementation*/
 int main(          /* main entry to Singular */
     int argc,      /* number of parameter */
