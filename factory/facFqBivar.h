@@ -481,7 +481,7 @@ uniFactorizer (const CanonicalForm& A, ///< [in] squarefree univariate poly
 /// @return @a extFactorRecombination returns a list of factors over the initial
 ///         field, whose shift to zero is reversed.
 /// @sa factorRecombination(), extEarlyFactorDetection()
-inline CFList
+CFList
 extFactorRecombination (
          CFList& factors,          ///< [in,out] list of lifted factors that are
                                    ///< monic wrt Variable (1),
@@ -506,7 +506,7 @@ extFactorRecombination (
 ///
 /// @return @a factorRecombination returns a list of factors of F.
 /// @sa extFactorRecombination(), earlyFactorDetectection()
-inline CFList
+CFList
 factorRecombination (
                 CFList& factors,       ///< [in,out] list of lifted factors
                                        ///< that are monic wrt Variable (1)
@@ -538,7 +538,7 @@ Variable chooseExtension (
 /// @return @a earlyFactorDetection returns a list of factors of F (possibly in-
 ///         complete), in case of success. Otherwise an empty list.
 /// @sa factorRecombination(), extEarlyFactorDetection()
-inline CFList
+CFList
 earlyFactorDetection (
            CanonicalForm& F,       ///< [in,out] poly to be factored, returns
                                    ///< poly divided by detected factors in case
@@ -561,7 +561,7 @@ earlyFactorDetection (
 ///         incomplete), whose shift to zero is reversed, in case of success.
 ///         Otherwise an empty list.
 /// @sa factorRecombination(), earlyFactorDetection()
-inline CFList
+CFList
 extEarlyFactorDetection (
         CanonicalForm& F,          ///< [in,out] poly to be factored, returns
                                    ///< poly divided by detected factors in case
@@ -585,7 +585,7 @@ extEarlyFactorDetection (
 ///         of Hensel lifting
 /// @sa earlyFactorDetection(), extEarlyFactorDetection()
 
-inline CFList
+CFList
 henselLiftAndEarly (
         CanonicalForm& A,          ///< [in,out] poly to be factored,
                                    ///< returns poly divided by detected factors
@@ -604,7 +604,7 @@ henselLiftAndEarly (
 ///
 /// @return @a extBiFactorize returns factorization of F over initial field
 /// @sa biFactorize()
-inline CFList
+CFList
 extBiFactorize (const CanonicalForm& F,    ///< [in] poly to be factored
                 const ExtensionInfo& info  ///< [in] info about extension
                );
