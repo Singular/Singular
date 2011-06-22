@@ -18,4 +18,8 @@ CFFList sqrFreeZ ( const CanonicalForm & f );
 
 bool isSqrFreeZ ( const CanonicalForm & f );
 
+/// squarefree part of a poly
+CanonicalForm sqrfPart (const CanonicalForm& F ///<[in] some poly
+                       );
+
 #endif /* ! INCL_FAC_SQRFREE_H */

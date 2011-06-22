@@ -7,6 +7,7 @@
 
 #include "cf_defs.h"
 #include "canonicalform.h"
+#include "cf_map.h"
 
 static int divexp = 1;
 
@@ -179,3 +180,46 @@ CFFList sqrFreeZ ( const CanonicalForm & a )
     }
     return F;
 }
+
+CanonicalForm 
+sqrfPart (const CanonicalForm& F)
+{
+  if (F.inCoeffDomain())
+    return F;
+  CFMap M;
+  CanonicalForm A= compress (F, M);
+  CanonicalForm w, v, b;
+  CanonicalForm result;
+  int i= 1;
+  for (; i <= A.level(); i++)
+  {
+    if (!deriv (A, Variable (i)).isZero())
+      break;
+  }
+
+  w= gcd (A, deriv (A, Variable (i)));
+  b= A/w;
+  result= b;
+  if (degree (w) < 1)
+    return M (result);
+  i++;
+  for (; i <= A.level(); i++)
+  {
+    if (!deriv (w, Variable (i)).isZero())
+    {
+      b= w;
+      w= gcd (w, deriv (w, Variable (i)));
+      b /= w;
+      if (degree (b) < 1)
+        break;
+      CanonicalForm g= gcd (b, result);
+      if (degree (g) > 0)
+        result *= b/g;
+      if (degree (g) <= 0)
+        result *= b;
+    }
+  }
+  result= M (result);
+  return result;
+}
+
