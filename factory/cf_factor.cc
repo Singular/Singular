@@ -30,6 +30,8 @@
 #include "cf_map.h"
 #include "algext.h"
 #include "facAlgExt.h"
+#include "facFactorize.h"
+#include "singext.h"
 
 #include "int_int.h"
 #ifdef HAVE_NTL
@@ -665,6 +667,8 @@ CanonicalForm fntl ( const CanonicalForm & f, int j )
 
 CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
 {
+  if ( f.inCoeffDomain() )
+    return CFFList( f );
   //out_cf("factorize:",f,"==================================\n");
   //out_cf("mipo:",getMipo(alpha),"\n");
   CFFList F;
@@ -794,13 +798,13 @@ CFFList factorize ( const CanonicalForm & f, const Variable & alpha )
     #endif
 
   }
-  else if (f.isUnivariate() && ch == 0) // Q(a)[x]
+  else if (f.isUnivariate() && (ch == 0)) // Q(a)[x]
   {
     F= AlgExtFactorize (f, alpha);
   }
   else //Q(a)[x1,...,xn]
   {
-      factoryError("not implemented");
+    F= ratFactorize (f, alpha);
   }
   if(isOn(SW_USE_NTL_SORT)) F.sort(cmpCF);
   return F;
