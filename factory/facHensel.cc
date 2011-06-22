@@ -35,7 +35,7 @@
 CanonicalForm
 mulNTL (const CanonicalForm& F, const CanonicalForm& G)
 {
-  if (F.inCoeffDomain() || G.inCoeffDomain())
+  if (F.inCoeffDomain() || G.inCoeffDomain() || getCharacteristic() == 0)
     return F*G;
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
@@ -73,6 +73,9 @@ modNTL (const CanonicalForm& F, const CanonicalForm& G)
   else if (F.isUnivariate() && G.inCoeffDomain())
     return mod (F,G);
 
+  if (getCharacteristic() == 0)
+    return mod (F, G);
+
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
   if (CFFactory::gettype() == GaloisFieldDomain)
@@ -108,6 +111,9 @@ divNTL (const CanonicalForm& F, const CanonicalForm& G)
     return div (F, G);
   else if (F.isUnivariate() && G.inCoeffDomain())
     return div (F,G);
+
+  if (getCharacteristic() == 0)
+    return div (F, G);
 
   ASSERT (F.isUnivariate() && G.isUnivariate(), "expected univariate polys");
   ASSERT (F.level() == G.level(), "expected polys of same level");
@@ -793,7 +799,7 @@ CanonicalForm mulMod2 (const CanonicalForm& A, const CanonicalForm& B,
   if (sizeF < fallBackToNaive || sizeG < fallBackToNaive)
     return mod (F*G, M);
 
-  if (CFFactory::gettype() != GaloisFieldDomain &&
+  if (getCharacteristic() > 0 && CFFactory::gettype() != GaloisFieldDomain &&
       (((degF-degG) < 50 && degF > degG) || ((degG-degF) < 50 && degF <= degG)))
     return mulMod2NTLFq (F, G, M);
 
