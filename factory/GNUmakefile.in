@@ -169,6 +169,7 @@ basefactorysrc := \
 		fac_cantzass.cc \
 		fac_distrib.cc \
 		fac_ezgcd.cc \
+		facFactorize.cc \
 		fac_iterfor.cc \
 		fac_multihensel.cc \
 		fac_multivar.cc \
@@ -256,6 +257,7 @@ basefactoryincl := \
 		fac_berlekamp.h \
 		fac_cantzass.h \
 		fac_distrib.h \
+		facFactorize. h \
 		fac_iterfor.h \
 		fac_multivar.h \
 		fac_sqrfree.h \
