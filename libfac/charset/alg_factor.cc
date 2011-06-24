@@ -177,7 +177,7 @@ sqrf_norm_sub( const CanonicalForm & f, const CanonicalForm & PPalpha,
           testlist= Factorize(R, X, 0);
       }
       else
-        testlist= Factorize(R);
+        testlist= factorize(R);
       DEBOUTLN(CERR, "testlist= ", testlist);
       testlist.removeFirst();
       sqfreetest=1;

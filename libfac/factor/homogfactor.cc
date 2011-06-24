@@ -25,8 +25,6 @@
 
 void out_cf(char *s1,const CanonicalForm &f,char *s2);
 
-CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly );
-
 #ifdef HFACTORDEBUG
 #  define DEBUGOUTPUT
 #else
@@ -151,25 +149,17 @@ HomogFactor( const CanonicalForm & g, const CanonicalForm  & minpoly, const int 
 
   // should we do this for low degree polys g ? e.g. quadratic?
   // 
-  CFFList Intermediatelist;
   CFFList Homoglist;
   CFFListIterator j;
-  if ( getCharacteristic() > 0 )
-  {
-     CFMap n;
-     if (minpoly.isZero())
-       Intermediatelist = Factorize(compress(F,n), 1);
-     else
-       Intermediatelist = Factorized(compress(F,n), minpoly, Mainvar);
-     for ( j=Intermediatelist; j.hasItem(); j++ )
-       Homoglist.append(CFFactor( n(j.getItem().factor()), j.getItem().exp()) );
-  }
+  if (minpoly.isZero())
+    Homoglist = factorize(F, 1);
   else
   {
-     if (minpoly.isZero())
-       Homoglist = factorize(F);
-     else
-       Homoglist = Factorize2(F,minpoly);
+    CFFList Intermediatelist;
+    CFMap n;
+    Intermediatelist = Factorized(compress(F,n), minpoly, Mainvar);
+    for ( j=Intermediatelist; j.hasItem(); j++ )
+      Homoglist.append(CFFactor( n(j.getItem().factor()), j.getItem().exp()) );
   }
   // Now we have uncompressed factors in Homoglist
   DEBOUTLN(CERR, "F factors as: ", Homoglist);

@@ -47,20 +47,20 @@ COUT << libfac_name  <<", Version " << libfac_version << "\n";
 //
 //////////////////////////////////////////////////////////////
 //    COUT << " f = "; 
-    CIN >> f;
-    COUT << f  << " mod " << charac << " = " ;
-    Factorlist= Factorize( f,0 );
-     COUT << Factorlist ;//<< "\n";
+//    CIN >> f;
+//    COUT << f  << " mod " << charac << " = " ;
+//    Factorlist= Factorize( f,0 );
+//     COUT << Factorlist ;//<< "\n";
 // Ueberpruefen:
-    g=1;
-    for ( CFFListIterator i=Factorlist ; i.hasItem(); i++){
-	copy = i.getItem();
-	if ( getNumVars(copy.factor()) > 0 )
-	     for ( int j=1; j<=copy.exp(); j++)
-	     g *= copy.factor();
-	else g *= copy.factor();
-    }
-    if ( (f-g) != f.genZero() ){
-	CERR << "\nList and f differ: f= " << f << "  g= " << g << "\n";
-    }
+//    g=1;
+//    for ( CFFListIterator i=Factorlist ; i.hasItem(); i++){
+//	copy = i.getItem();
+//	if ( getNumVars(copy.factor()) > 0 )
+//	     for ( int j=1; j<=copy.exp(); j++)
+//	     g *= copy.factor();
+//	else g *= copy.factor();
+ //   }
+//    if ( (f-g) != f.genZero() ){
+//	CERR << "\nList and f differ: f= " << f << "  g= " << g << "\n";
+ //   }
 }

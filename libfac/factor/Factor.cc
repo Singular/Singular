@@ -57,12 +57,7 @@ CFFList factorize2 ( const CanonicalForm & f,
 {
   if (alpha.level() <0)
   {
-    if (f.isUnivariate())
-      return factorize(f,alpha);
-    else
-    {
-      return Factorize(f,mipo);
-    }
+    return factorize(f,alpha);
   }
   else
   {
@@ -625,14 +620,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
       DEBOUTLN(CERR, "Univ. Factorization over extension of level ??",
                 Extension.level());
       TIMING_START(evaluate_time);
-     #if 1
-     Outputlist = factorize2(F,Extension,alpha);
-     #else
-      Variable X;
-      CanonicalForm mipo=getMipo(Extension,X);
-      CFList as(mipo);
-      Outputlist = newfactoras( F, as, 1);
-     #endif
+      Outputlist = factorize2(F,Extension,alpha);
       TIMING_END(evaluate_time);
       return Outputlist;
     }
@@ -741,14 +729,7 @@ Factorized( const CanonicalForm & F, const CanonicalForm & alpha, int Mainvar)
     {
       DEBOUTLN(CERR, "Univ. Factorization over extension of degree ",
                degree(getMipo(Extension,'x')) );
-     #if 1
       UnivariateFactorlist = factorize2(ffuni,Extension,alpha);
-     #else
-      Variable X;
-      CanonicalForm mipo=getMipo(Extension,X);
-      CFList as(mipo);
-      UnivariateFactorlist = newfactoras( ffuni, as, 1);
-     #endif
     }
   }
   else
@@ -998,84 +979,6 @@ static bool fdivides2(const CanonicalForm &F, const CanonicalForm &G, const Cano
   else
    return fdivides(F,G);
 }
-CFFList Factorize2(CanonicalForm F, const CanonicalForm & minpoly )
-{
-#ifndef NDEBUG
-  //printf("start Factorize2(int_flag=%d)\n",libfac_interruptflag);
-#endif
-  CFFList G,H;
-  CanonicalForm fac;
-  int d,e;
-  ListIterator<CFFactor> i,k;
-  libfac_interruptflag=0;
-  CFFList iF=Factorize(F,minpoly);
-  if ((libfac_interruptflag==0)&&(!iF.isEmpty()))
-    H=iF;
-  else
-  {
-#ifndef NDEBUG
-    //printf("variant 2(int_flag=%d)\n",libfac_interruptflag);
-#endif
-    libfac_interruptflag=0;
-    iF=Factorize(F);
-    if (libfac_interruptflag==0)
-    {
-      i = iF;
-      while( i.hasItem())
-      {
-        d = i.getItem().exp();
-        fac = i.getItem().factor();
-        if (fdivides(fac,F))
-        {
-          if ((getNumVars(fac)==0)||(fac.degree()<=1))
-          {
-#ifndef NOSTREAMIO
-#ifndef NDEBUG
-            //printf("append trivial factor\n");
-#endif
-#endif
-            H.append( CFFactor( fac, d));
-            do {F/=fac; d--; } while (d>0);
-          }
-          else
-          {
-            G = Factorize( fac, minpoly);
-            if (libfac_interruptflag!=0)
-            {
-              libfac_interruptflag=0;
-              k = G;
-              while( k.hasItem())
-              {
-                fac = k.getItem().factor();
-                int dd = k.getItem().exp()*d;
-                e=0;
-                while ((!fac.isZero())&& fdivides2(fac,F,minpoly) && (dd>0))
-                {
-#ifndef NOSTREAMIO
-#ifndef NDEBUG
-                  //out_cf("factor:",fac,"\n");
-#endif
-#endif
-                  e++;dd--;
-                  F/=fac;
-                }
-                if (e>0) H.append( CFFactor( fac , e ) );
-                ++k;
-              }
-            }
-          }
-        }
-        ++i;
-      }
-    }
-  }
-  //Outputlist = newfactoras( F, as, 1);
-  if((isOn(SW_USE_NTL_SORT))&&(!H.isEmpty())) H.sort(cmpCF);
-#ifndef NDEBUG
-  //printf("end Factorize2(%d)\n",libfac_interruptflag);
-#endif
-  return H;
-}
 
 CFFList
 Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree )
@@ -1118,7 +1021,7 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
         CFList as(minpoly);
         //CFFList sqF=sqrFree(F); // sqrFreeZ
         CFFList sqF=SqrFreeMV(F,minpoly);
-	if (sqF.isEmpty()) sqF=sqrFree(F);
+        if (sqF.isEmpty()) sqF=sqrFree(F);
         CFFList G,H;
         CanonicalForm fac;
         int d;
@@ -1136,7 +1039,6 @@ Factorize(const CanonicalForm & F, const CanonicalForm & minpoly, int is_SqrFree
             H.append( CFFactor( fac , d*dd ) );
           }
         }
-        //Outputlist = newfactoras( F, as, 1);
         Outputlist = H;
       }
     }

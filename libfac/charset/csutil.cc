@@ -394,7 +394,7 @@ nopower( const CanonicalForm & init )
   if ( count > 1 ) sqrfreelist = CFFList( CFFactor(init,1));
   else
   {
-    sqrfreelist = Factorize(init);
+    sqrfreelist = factorize(init);
     //sqrfreelist.removeFirst();
   }
   for ( CFFListIterator i=sqrfreelist; i.hasItem(); i++ )
@@ -497,7 +497,7 @@ factorps( const CFList &ps )
 
   for ( CFListIterator i=ps; i. hasItem(); i++ )
   {
-    q=Factorize(i.getItem());
+    q=factorize(i.getItem());
     q.removeFirst();
     // Next can be simplified ( first (already removed) elem in q is the only constant
     for ( CFFListIterator j=q; j.hasItem(); j++ )
