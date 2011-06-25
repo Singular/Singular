@@ -493,7 +493,7 @@ irras( CFList & AS, int & ja, CanonicalForm & reducible)
     DEBOUT(CERR, "irras: factoring: ", elem);
     if ( degree(elem) > 1 ) // linear poly's are irreduzible
     {
-      qs = factorize(elem);
+      qs = Factorize(elem);
       // remove a constant
       if (qs.getFirst().factor().degree()==0) qs.removeFirst();
     }
