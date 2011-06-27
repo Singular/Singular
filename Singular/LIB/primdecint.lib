@@ -24,7 +24,7 @@ PROCEDURES:
  intersectZ(I,J)    compute the intersection of I and J
 ";
 
-LIB "crypto.lib";
+LIB "primdec.lib";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -406,7 +406,8 @@ EXAMPLE: example minAssZ; shows an example
       setring Rhelp;
       number q=imap(R,q);
       //=== computes the primes occuring in a generator of I intersect Z
-      list L=PollardRho(q,5000,1);
+      //list L=PollardRho(q,5000,1);
+      list L=primefactors(q)[1];
       for(i=1;i<=size(L);i++)
       {
       //=== computes for all p in L the minimal associated primes of
@@ -544,7 +545,8 @@ EXAMPLE: example heightZ; shows an example
       setring Rhelp;
       number q=imap(R,q);
       //=== computes the primes occuring in a generator of I intersect Z
-      list L=PollardRho(q,5000,1);
+      //list L=PollardRho(q,5000,1);
+      list L=primefactors(q)[1];
       for(i=1;i<=size(L);i++)
       {
       //=== computes for all p in L the std of IZ/p[variables]
@@ -635,7 +637,8 @@ EXAMPLE: example radicalZ; shows an example
       setring Rhelp;
       number q=imap(R,q);
       //=== computes the primes occuring in a generator of I intersect Z
-      list L=PollardRho(q,5000,1);
+      //list L=PollardRho(q,5000,1);
+      list L=primefactors(q)[1];
       for(i=1;i<=size(L);i++)
       {
       //=== computes for all p in L the radical of IZ/p[variables]
@@ -742,7 +745,8 @@ EXAMPLE: example equidimZ; shows an example
       number q=imap(R,q);
       number s;
       //=== computes the primes occuring in a generator of I intersect Z
-      list L=PollardRho(q,5000,1);
+      //list L=PollardRho(q,5000,1);
+      list L=primefactors(q)[1];
       list Le;
       for(i=1;i<=size(L);i++)
       {
@@ -971,7 +975,8 @@ static proc coefPrimeZ(ideal I)
    def R=basering;
    ring Rhelp=0,x,dp;
    number h=imap(R,h);
-   list L=PollardRho(h,5000,1);
+   //list L=PollardRho(h,5000,1);
+   list L=primefactors(h)[1];
    for(i=1;i<=size(L);i++){L[i]=int(L[i]);}
    setring R;
    return(L);
