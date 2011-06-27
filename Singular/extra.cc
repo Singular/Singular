@@ -3649,57 +3649,6 @@ static BOOLEAN jjEXTENDED_SYSTEM(leftv res, leftv h)
       }
       else
       #endif
-  /*================= factoras =========================*/
-      if (strcmp (sys_cmd, "factoras") == 0)
-      {
-        if (h!=NULL && (h->Typ()== POLY_CMD) && (h->next->Typ() == IDEAL_CMD))
-        {
-          CanonicalForm F( convSingTrPFactoryP((poly)(h->Data())));
-          h= h->next;
-          ideal I= ((ideal) h->Data());
-          int i= IDELEMS (I);
-          CFList as;
-          for (int j= 0; j < i; j++)
-            as.append (convSingTrPFactoryP (I->m[j]));
-          int success= 0;
-          CFFList libfacResult= newfactoras (F, as, success);
-          if (success >= 0)
-          {
-            //convert factors
-            ideal factors= idInit(libfacResult.length(),1);
-            CFFListIterator j= libfacResult;
-            i= 0;
-            intvec *mult= new intvec (libfacResult.length());
-            for ( ; j.hasItem(); j++,i++ )
-            {
-              factors->m[i]= convFactoryPSingTrP (j.getItem().factor());
-              (*mult)[i]= j.getItem().exp();
-            }
-            lists l= (lists)omAllocBin( slists_bin);
-            l->Init(2);
-            l->m[0].rtyp= IDEAL_CMD;
-            l->m[0].data= (char *) factors;
-            l->m[1].rtyp= INTVEC_CMD;
-            l->m[1].data= (char *) mult;
-            res->data= l;
-            res->rtyp= LIST_CMD;
-            if (success == 0)
-              WerrorS ("factorization maybe incomplete");
-            return FALSE;
-          }
-          else
-          {
-            WerrorS("problem in libfac");
-            return TRUE;
-          }
-        }
-        else
-        {
-          WerrorS("`system(\"factoras\",<poly>,<ideal>) expected");
-          return TRUE;
-        }
-      }
-      else
   /*================= probIrredTest ======================*/
       if (strcmp (sys_cmd, "probIrredTest") == 0)
       {
