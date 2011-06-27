@@ -2188,7 +2188,7 @@ LINLINE number nlAdd (number a, number b, const coeffs R)
 number nlShort1(number a);
 number nlShort3_noinline(number x);
 
-LINLINE number nlInpAdd_(number a, number b, const coeffs r)
+static inline number nlInpAdd_(number a, number b, const coeffs r)
 {
   if (SR_HDL(a) & SR_HDL(b) & SR_INT)
   {
@@ -2441,6 +2441,7 @@ void nlInpGcd(number &a, number b, const coeffs r)
     a=nlShort3_noinline(a);
   }
 }
+
 void nlInpIntDiv(number &a, number b, const coeffs r)
 {
   if ((SR_HDL(b)|SR_HDL(a))&SR_INT)
