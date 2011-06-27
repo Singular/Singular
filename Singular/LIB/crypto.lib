@@ -150,8 +150,9 @@ RETURN: gcd(a,b)
 EXAMPLE:example gcdN; shows an example
 "
 {
-   if((a mod b)==0){return(b)}
-   return(gcdN(b,a mod b));
+   //if((a mod b)==0){return(b)}
+   //return(gcdN(b,a mod b));
+   return(gcd(a,b));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -165,8 +166,9 @@ RETURN: lcm(a,b);
 EXAMPLE:example lcmN; shows an example
 "
 {
-   number d=gcdN(a,b);
-   return(a*b/d);
+   //number d=gcdN(a,b);
+   //return(a*b/d);
+   return (a*b/gcd(a,b));
 }
 example
 { "EXAMPLE:"; echo = 2;
@@ -838,6 +840,7 @@ NOTE: probabilistic rho-algorithm of Pollard to find a factor of n in k loops.
       choose x,a and define x_n+1=x_n^2+a mod n, x_1=x.
       If allFactors is 1, it tries to find recursively all prime factors
       using the Soloway-Strassen test.
+SEE ALSO: primefactors
 EXAMPLE:example PollardRho; shows an example
 "
 {
