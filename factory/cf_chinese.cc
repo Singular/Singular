@@ -19,6 +19,9 @@
 #include "canonicalform.h"
 #include "cf_iter.h"
 
+#ifdef HAVE_NTL
+#include "NTLconvert.h"
+#endif
 
 //{{{ void chineseRemainder ( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew )
 //{{{ docu
@@ -198,7 +201,31 @@ CanonicalForm Farey ( const CanonicalForm & f, const CanonicalForm & q )
         c = i.coeff();
         if ( c.inCoeffDomain())
         {
-          result += power( x, i.exp() ) * Farey_n(c,q);
+#ifdef HAVE_NTL
+          if (c.inZ() && isOn (SW_USE_NTL))
+          {
+            ZZ NTLc= convertFacCF2NTLZZ (c);
+            bool lessZero= (sign (NTLc) == -1);
+            if (lessZero)
+              negate (NTLc, NTLc);
+            ZZ NTLq= convertFacCF2NTLZZ (q);
+            ZZ bound;
+            SqrRoot (bound, NTLq/2);
+            ZZ NTLnum, NTLden;
+            if (ReconstructRational (NTLnum, NTLden, NTLc, NTLq, bound, bound))
+            {
+              if (lessZero)
+                negate (NTLnum, NTLnum);
+              CanonicalForm num= convertNTLZZX2CF (to_ZZX (NTLnum), Variable (1));
+              CanonicalForm den= convertNTLZZX2CF (to_ZZX (NTLden), Variable (1));
+              On (SW_RATIONAL);
+              result += power (x, i.exp())*(num/den);
+              Off (SW_RATIONAL);
+            }
+          }
+          else
+#endif
+            result += power( x, i.exp() ) * Farey_n(c,q);
         }
         else
           result += power( x, i.exp() ) * Farey(c,q);
