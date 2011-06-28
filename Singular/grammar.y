@@ -1287,11 +1287,10 @@ ringcmd:
             if (b!=NULL)
             {
                 newRingHdl=enterid(ring_name, myynest, RING_CMD,
-                                   &($2.req_packhdl->idroot));
+                                   &($2.req_packhdl->idroot,FALSE));
               $2.CleanUp();
               if (newRingHdl!=NULL)
               {
-                omFreeSize(IDRING(newRingHdl),sizeof(ip_sring));
                 IDRING(newRingHdl)=b;
               }
               else

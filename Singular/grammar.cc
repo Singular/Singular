@@ -3248,11 +3248,10 @@ yyreduce:
             if (b!=NULL)
             {
                 newRingHdl=enterid(ring_name, myynest, RING_CMD,
-                                   &(yyvsp[-6].lv.req_packhdl->idroot));
+                                   &(yyvsp[-6].lv.req_packhdl->idroot),FALSE);
               yyvsp[-6].lv.CleanUp();
               if (newRingHdl!=NULL)
               {
-                omFreeSize(IDRING(newRingHdl),sizeof(ip_sring));
                 IDRING(newRingHdl)=b;
               }
               else
