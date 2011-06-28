@@ -84,6 +84,19 @@ main()
     else           printf("datetime returned type %d, >>%s<<\n",res->Typ(),(char *)res->Data());
   }
 
+  // changing a ring for the interpreter
+  // re-using n and R from above
+  R=rDefault(32003,3,n);
+  idhdl newRingHdl=enterid("R" /* ring name*/,
+                           0, /*nesting level, 0=global*/
+                           RING_CMD,
+                           &IDROOT,
+                           FALSE);
+   IDRING(newRingHdl)=R;
+   // make R the default ring (include rChangeCurrRing):
+   rSetHdl(newRingHdl);
+   err=iiEStart(omStrDup("poly p=x;listvar();return();\n"),NULL);
+
   // calling a kernel function via the interpreter interface
   sleftv r1; memset(&r1,0,sizeof(r1));
   sleftv arg; memset(&arg,0,sizeof(r1));
