@@ -10,7 +10,7 @@
 
 if test "x$CC" = x
 then
-  CC=cc
+  CC=gcc
 fi
 cat >tmp.c <<EOF
 int main() {
