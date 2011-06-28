@@ -30,6 +30,8 @@
 /// our type has been defined as a macro in transext.h
 /// and is accessible by 'ntID'
 
+extern omBin fractionObjectBin = omGetSpecBin(sizeof(fractionObject));
+
 /// forward declarations
 BOOLEAN  ntGreaterZero(number a, const coeffs cf); 
 BOOLEAN  ntGreater(number a, number b, const coeffs cf);
@@ -339,6 +341,15 @@ number ntAdd(number a, number b, const coeffs cf)
   
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
+  
+  poly g = p_Copy(num(fa), ntRing);
+  if (!denIs1(fb)) g = p_Mult_q(g, p_Copy(den(fb), ntRing), ntRing);
+  poly h = p_Copy(num(fb), ntRing);
+  if (!denIs1(fa)) h = p_Mult_q(h, p_Copy(den(fa), ntRing), ntRing);
+  g = p_Add_q(g, h, ntRing);
+  
+  if (g == NULL) return NULL;
+  
   poly f;
   if      (denIs1(fa) && denIs1(fb))  f = NULL;
   else if (!denIs1(fa) && denIs1(fb)) f = p_Copy(den(fa), ntRing);
@@ -346,11 +357,7 @@ number ntAdd(number a, number b, const coeffs cf)
   else /* both denom's are != 1 */    f = p_Mult_q(p_Copy(den(fa), ntRing),
                                                    p_Copy(den(fb), ntRing),
                                                    ntRing);
-  poly g = p_Copy(num(fa), ntRing);
-  if (!denIs1(fb)) g = p_Mult_q(g, p_Copy(den(fb), ntRing), ntRing);
-  poly h = p_Copy(num(fb), ntRing);
-  if (!denIs1(fa)) h = p_Mult_q(h, p_Copy(den(fa), ntRing), ntRing);
-  g = p_Add_q(g, h, ntRing);
+  
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   num(result) = g;
   den(result) = f;
@@ -367,6 +374,15 @@ number ntSub(number a, number b, const coeffs cf)
   
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
+  
+  poly g = p_Copy(num(fa), ntRing);
+  if (!denIs1(fb)) g = p_Mult_q(g, p_Copy(den(fb), ntRing), ntRing);
+  poly h = p_Copy(num(fb), ntRing);
+  if (!denIs1(fa)) h = p_Mult_q(h, p_Copy(den(fa), ntRing), ntRing);
+  g = p_Add_q(g, p_Neg(h, ntRing), ntRing);
+  
+  if (g == NULL) return NULL;
+  
   poly f;
   if      (denIs1(fa) && denIs1(fb))  f = NULL;
   else if (!denIs1(fa) && denIs1(fb)) f = p_Copy(den(fa), ntRing);
@@ -374,11 +390,7 @@ number ntSub(number a, number b, const coeffs cf)
   else /* both den's are != 1 */      f = p_Mult_q(p_Copy(den(fa), ntRing),
                                                    p_Copy(den(fb), ntRing),
                                                    ntRing);
-  poly g = p_Copy(num(fa), ntRing);
-  if (!denIs1(fb)) g = p_Mult_q(g, p_Copy(den(fb), ntRing), ntRing);
-  poly h = p_Copy(num(fb), ntRing);
-  if (!denIs1(fa)) h = p_Mult_q(h, p_Copy(den(fa), ntRing), ntRing);
-  g = p_Add_q(g, p_Neg(h, ntRing), ntRing);
+  
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   num(result) = g;
   den(result) = f;
@@ -394,6 +406,13 @@ number ntMult(number a, number b, const coeffs cf)
   
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
+  
+  poly g = p_Copy(num(fa), ntRing);
+  poly h = p_Copy(num(fb), ntRing);
+  g = p_Mult_q(g, h, ntRing);
+  
+  if (g == NULL) return NULL;   /* may happen due to zero divisors */
+  
   poly f;
   if      (denIs1(fa) && denIs1(fb))  f = NULL;
   else if (!denIs1(fa) && denIs1(fb)) f = p_Copy(den(fa), ntRing);
@@ -401,9 +420,7 @@ number ntMult(number a, number b, const coeffs cf)
   else /* both den's are != 1 */      f = p_Mult_q(p_Copy(den(fa), ntRing),
                                                    p_Copy(den(fb), ntRing),
                                                    ntRing);
-  poly g = p_Copy(num(fa), ntRing);
-  poly h = p_Copy(num(fb), ntRing);
-  g = p_Mult_q(g, h, ntRing);
+  
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   num(result) = g;
   den(result) = f;
@@ -420,10 +437,15 @@ number ntDiv(number a, number b, const coeffs cf)
   
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
-  poly f = p_Copy(num(fb), ntRing);
-  if (!denIs1(fa)) f = p_Mult_q(f, p_Copy(den(fa), ntRing), ntRing);
+  
   poly g = p_Copy(num(fa), ntRing);
   if (!denIs1(fb)) g = p_Mult_q(g, p_Copy(den(fb), ntRing), ntRing);
+  
+  if (g == NULL) return NULL;   /* may happen due to zero divisors */
+  
+  poly f = p_Copy(num(fb), ntRing);
+  if (!denIs1(fa)) f = p_Mult_q(f, p_Copy(den(fa), ntRing), ntRing);
+  
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   num(result) = g;
   den(result) = f;
@@ -558,10 +580,6 @@ void ntWrite(number &a, const coeffs cf)
   }
 }
 
-/* this just reads polynomials;
-   the rest will be taken care of by the interpreter: When it encounters
-   a "/", then it will impose a division that will finally lead to a
-   rational function */
 const char * ntRead(const char *s, number *a, const coeffs cf)
 {
   poly p;

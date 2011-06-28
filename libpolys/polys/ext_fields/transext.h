@@ -52,8 +52,6 @@ struct fractionObject
 };
 typedef struct fractionObject * fraction;
 
-omBin fractionObjectBin = omGetSpecBin(sizeof(fractionObject));
-
 /* constants for controlling the complexity of numbers */
 #define ADD_COMPLEXITY 1   /**< complexity increase due to + and - */
 #define MULT_COMPLEXITY 2   /**< complexity increase due to * and / */
