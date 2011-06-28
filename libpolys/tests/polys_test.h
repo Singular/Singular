@@ -15,12 +15,13 @@ using namespace std;
 #include <coeffs/rintegers.h>
 
 #include <polys/ext_fields/algext.h>
+#include <polys/ext_fields/transext.h>
 #include <polys/monomials/ring.h>
 #include <polys/monomials/p_polys.h>
 
 #include <polys/simpleideals.h>
 
-#ifdef HAVE_FACTORY
+#if 0 //ifdef HAVE_FACTORY
 #include <polys/clapsing.h>
 #include <factory/factory.h>
 #endif
@@ -222,11 +223,11 @@ private:
   }
   void checkInverse(number n, const coeffs cf)
   {
-    clog << "n = "; n_Write(n, cf);
+    clog << "n = "; p_Write((poly)n, cf->extRing);
     number n1 = n_Invers(n, cf);
-    clog << "==> n^(-1) = "; n_Write(n1, cf);
+    clog << "==> n^(-1) = "; p_Write((poly)n1, cf->extRing);
     number n2 = n_Mult(n, n1, cf);
-    clog << "(check: n * n^(-1) = "; n_Write(n2, cf);
+    clog << "check: n * n^(-1) = "; p_Write((poly)n2, cf->extRing);
     TS_ASSERT( n_IsOne(n2, cf) );
     n_Delete(&n1, cf); n_Delete(&n2, cf);
   }
@@ -857,28 +858,80 @@ public:
     TS_ASSERT_EQUALS(rVar(s), 3);
 
     Test(s);
-    /*
-#ifdef HAVE_FACTORY
-    poly f = p_ISet(3, s);
-    p_SetExp(f, 1, 3, s);
-    p_SetExp(f, 2, 1, s);
-    p_SetExp(f, 3, 5, s);
-    p_Setm(f, r);   // 3*u^3*v*w^5
-    plusTerm(f, -2, 1, 6, s); // -2*u^6 + 3*u^3*v*w^5
-    p_Write(f, s);
-    poly g = p_ISet(7, s);
-    p_SetExp(g, 1, 5, s);
-    p_SetExp(g, 2, 6, s);
-    p_SetExp(g, 3, 2, s);
-    p_Setm(g, r);   // 7*u^5*v^6*w^2
-    plusTerm(g, 8, 1, 4, s); // 7*u^5*v^6*w^2 + 8*u^4
-    p_Write(g, s);
-    poly h = singclap_gcd(f, g, s);   // at least u^3, destroys f and g
-    p_Write(h, s);
-    p_Test(h, s);
-    p_Delete(&h, s);
-#endif
-    */
+    
+    rDelete(s); // kills 'cf' and 'r' as well
+  }
+  void test_Q_Ext_s_t()
+  {
+    clog << "Start by creating Q[s, t]..." << endl;
+
+    char* n[] = {"s", "t"};
+    ring r = rDefault( 0, 2, n);   // Q[s, t]
+    TS_ASSERT_DIFFERS( r, NULLp );
+
+    PrintRing(r);
+
+    TS_ASSERT( rField_is_Domain(r) );
+    TS_ASSERT( rField_is_Q(r) );
+
+    TS_ASSERT( !rField_is_Zp(r) );
+    TS_ASSERT( !rField_is_Zp(r, 17) );
+
+    TS_ASSERT_EQUALS( rVar(r), 2);
+
+    n_coeffType type = nRegister(n_transExt, ntInitChar);
+    TS_ASSERT(type == n_transExt);
+
+    TransExtInfo extParam;
+    extParam.r = r;
+
+    clog << "Next create the rational function field Q(s, t)..." << endl;
+
+    const coeffs cf = nInitChar(type, &extParam);   // Q(s, t)
+
+    if( cf == NULL )
+      TS_FAIL("Could not get needed coeff. domain");
+
+    TS_ASSERT_DIFFERS( cf->cfCoeffWrite, NULLp );
+
+    if( cf->cfCoeffWrite != NULL )
+    {
+      clog << "Coeff-domain: "  << endl;
+      n_CoeffWrite(cf); PrintLn();
+    }
+
+    TS_ASSERT( !nCoeff_is_algExt(cf) );
+    TS_ASSERT( nCoeff_is_transExt(cf) );
+
+    // some tests for the coefficient field represented by cf:
+    TestArithCf(cf);
+    TestSumCf(cf, 10);
+    TestSumCf(cf, 100);
+    TestSumCf(cf, 101);
+    TestSumCf(cf, 1001);
+    TestSumCf(cf, 9000);
+
+    clog << "Finally create the polynomial ring Q(s, t)[x, y, z]..."
+         << endl;
+
+    char* m[] = {"x", "y", "z"};
+    ring s = rDefault(cf, 3, m);   // Q(s, t)[x, y, z]
+    TS_ASSERT_DIFFERS(s, NULLp);
+
+    PrintRing(s);
+
+    TS_ASSERT( rField_is_Domain(s) );
+    TS_ASSERT( !rField_is_Q(s) );
+    TS_ASSERT( !rField_is_Zp(s) );
+    TS_ASSERT( !rField_is_Zp(s, 11) );
+    TS_ASSERT( !rField_is_Zp(s, 17) );
+    TS_ASSERT( !rField_is_GF(s) );
+    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( !rField_is_GF(s, 25) );
+    TS_ASSERT_EQUALS(rVar(s), 3);
+
+    Test(s);
+    
     rDelete(s); // kills 'cf' and 'r' as well
   }
 };
