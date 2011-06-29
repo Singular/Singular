@@ -62,6 +62,9 @@ typedef struct fractionObject * fraction;
 #define num(f) f->numerator
 #define den(f) f->denominator
 #define denIs1(f) (f->denominator == NULL) /**< TRUE iff den. represents 1 */
+#define numIs1(f) (p_IsConstant(f->numerator, cf->extRing) && \
+                   n_IsOne(p_GetCoeff(num(f), cf->extRing), cf->extRing->cf))
+                   /**< TRUE iff num. represents 1 */
 #define c(f) f->complexity
 
 /// Get a mapping function from src into the domain of this type (n_transExt)

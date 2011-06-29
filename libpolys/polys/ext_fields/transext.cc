@@ -65,7 +65,8 @@ const char * ntRead(const char *s, number *a, const coeffs cf);
 static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 
 void heuristicGcdCancellation(number a, const coeffs cf);
-void definiteGcdCancellation(number a, const coeffs cf);
+void definiteGcdCancellation(number a, const coeffs cf,
+                             BOOLEAN skipSimpleTests);
 
 #ifdef LDEBUG
 BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
@@ -174,7 +175,7 @@ number ntCopy(number a, const coeffs cf)
 number ntGetNumerator(number &a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf);
+  definiteGcdCancellation(a, cf, FALSE);
   if (is0(a)) return NULL;
   fraction f = (fraction)a;
   poly g = p_Copy(num(f), ntRing);
@@ -188,7 +189,7 @@ number ntGetNumerator(number &a, const coeffs cf)
 number ntGetDenom(number &a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf);
+  definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
   poly g;
   if (is0(f) || denIs1(f)) g = p_One(ntRing);
@@ -203,18 +204,15 @@ number ntGetDenom(number &a, const coeffs cf)
 BOOLEAN ntIsOne(number a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf);
+  definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
-  if (!denIs1(f)) return FALSE;
-  poly g = num(f);
-  if (!p_IsConstant(g, ntRing)) return FALSE;
-  return n_IsOne(p_GetCoeff(g, ntRing), ntCoeffs);
+  return denIs1(f) && numIs1(f);
 }
 
 BOOLEAN ntIsMOne(number a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf);
+  definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
   if (!denIs1(f)) return FALSE;
   poly g = num(f);
@@ -257,7 +255,7 @@ int ntInt(number &a, const coeffs cf)
 {
   ntTest(a);
   if (is0(a)) return 0;
-  definiteGcdCancellation(a, cf);
+  definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
   if (!denIs1(f)) return 0;
   if (!p_IsConstant(num(f), ntRing)) return 0;
@@ -531,35 +529,65 @@ void heuristicGcdCancellation(number a, const coeffs cf)
 {
   ntTest(a);
   if (is0(a)) return;
+  
   fraction f = (fraction)a;
-  if (denIs1(f) || n_IsOne(p_GetCoeff(num(f), ntRing), ntCoeffs))
-  { c(f) = 0; return; }
+  if (denIs1(f) || numIs1(f)) { c(f) = 0; return; }
+  
+  /* check whether num(f) = den(f), and - if so - replace 'a' by 1 */
+  poly difference = p_Add_q(p_Copy(num(f), ntRing),
+                            p_Neg(p_Copy(den(f), ntRing), ntRing),
+                            ntRing);
+  if (difference == NULL)
+  { /* we also know that numerator and denominator are both != 1 */
+    p_Delete(&num(f), ntRing); num(f) = p_ISet(1, ntRing);
+    p_Delete(&den(f), ntRing); den(f) = NULL;
+    c(f) = 0;
+    return;
+  }
+  else p_Delete(&difference, ntRing);
+  
   if (c(f) <= BOUND_COMPLEXITY) return;
-  else definiteGcdCancellation(a, cf);
+  else definiteGcdCancellation(a, cf, TRUE);
 }
 
 /* modifies a */
-void definiteGcdCancellation(number a, const coeffs cf)
+void definiteGcdCancellation(number a, const coeffs cf,
+                             BOOLEAN skipSimpleTests)
 {
   ntTest(a);
-  if (is0(a)) return;
+  
   fraction f = (fraction)a;
-  if (denIs1(f) || n_IsOne(p_GetCoeff(num(f), ntRing), ntCoeffs))
-  { c(f) = 0; return; }
-  if (c(f) > BOUND_COMPLEXITY)
+  
+  if (!skipSimpleTests)
   {
-    /* TO BE IMPLEMENTED!
-       for the time, cancellation of gcd's does not take place */
-    Print("// TO BE IMPLEMENTED: transext.cc:definiteGcdCancellation\n");
-    Print("// (complexity of number = %d exceeds the bound = %d\n",
-          c(f), BOUND_COMPLEXITY);
+    if (is0(a)) return;
+    if (denIs1(f) || numIs1(f)) { c(f) = 0; return; }
+  
+    /* check whether num(f) = den(f), and - if so - replace 'a' by 1 */
+    poly difference = p_Add_q(p_Copy(num(f), ntRing),
+                              p_Neg(p_Copy(den(f), ntRing), ntRing),
+                              ntRing);
+    if (difference == NULL)
+    { /* we also know that numerator and denominator are both != 1 */
+      p_Delete(&num(f), ntRing); num(f) = p_ISet(1, ntRing);
+      p_Delete(&den(f), ntRing); den(f) = NULL;
+      c(f) = 0;
+      return;
+    }
+    else p_Delete(&difference, ntRing);
   }
+  
+  /* TO BE IMPLEMENTED!
+     for the time being, cancellation of gcd's does not take place */
+  Print("// TO BE IMPLEMENTED: transext.cc:definiteGcdCancellation\n");
+  Print("// (complexity of number = %d, bound = %d)\n",
+        c(f), BOUND_COMPLEXITY);
 }
 
 void ntWrite(number &a, const coeffs cf)
 {
   ntTest(a);
-  definiteGcdCancellation(a, cf);
+  definiteGcdCancellation(a, cf, FALSE);
   if (is0(a))
     StringAppendS("0");
   else
