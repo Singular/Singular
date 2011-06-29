@@ -216,16 +216,21 @@ static BOOLEAN ipPrint_V(leftv u)
 
 BOOLEAN jjPRINT(leftv res, leftv u)
 {
+  SPrintStart();
+  BOOLEAN bo=FALSE;
   switch(u->Typ())
   {
       case INTVEC_CMD:
-        return ipPrint_INTVEC(u);
+        bo=ipPrint_INTVEC(u);
+	break;
 
       case INTMAT_CMD:
-        return ipPrint_INTMAT(u);
+        bo=ipPrint_INTMAT(u);
+	break;
 
       case MATRIX_CMD:
-        return ipPrint_MA(u);
+        bo=ipPrint_MA(u);
+	break;
 
       case IDEAL_CMD:
       {
@@ -233,7 +238,7 @@ BOOLEAN jjPRINT(leftv res, leftv u)
         PrintS(s);
         PrintLn();
         omFree(s);
-        return FALSE;
+        break;
       }
 
       case MODUL_CMD:
@@ -241,16 +246,25 @@ BOOLEAN jjPRINT(leftv res, leftv u)
         matrix m = idModule2Matrix(idCopy((ideal) u->Data()));
         ipPrint_MA0(m, u->Name());
         idDelete((ideal *) &m);
-        return FALSE;
+        break;
       }
 
       case VECTOR_CMD:
-        return ipPrint_V(u);
+        bo=ipPrint_V(u);
+	break;
 
       default:
         u->Print();
-        return FALSE;
+        break;
   }
+  char *s=SPrintEnd();
+  if (u->next==NULL)
+  {
+    int l=strlen(s);
+    if (s[l-1]=='\n') s[l-1]='\0';
+  }
+  res->data=(void*)s;
+  return bo;
 }
 
 
@@ -275,6 +289,9 @@ BOOLEAN jjDBPRINT(leftv res, leftv u)
       hh=h->next;
       h->next=NULL;
       if (jjPRINT(res, h)) return TRUE;
+      PrintS((char*)res->data);
+      omFree(res->data);
+      PrintLn();
       h->next=hh;
       h=hh;
     }
@@ -332,76 +349,74 @@ BOOLEAN jjPRINT_FORMAT(leftv res, leftv u, leftv v)
 /* ==================== betti ======================================== */
   if ((u->Typ()==INTMAT_CMD)&&(strcmp((char *)v->Data(),"betti")==0))
   {
-    ipPrintBetti(u);
-    res->data = NULL;
-    res->rtyp = NONE;
-    return FALSE;
-  }
-/* ======================== end betti ================================= */
-
-  char* ns = omStrDup((char*) v->Data());
-  int dim = 1;
-  if (strlen(ns) == 3 && ns[1] == '2')
-  {
-    dim = 2;
-    ns[1] = ns[2];
-    ns[2] = '\0';
-  }
-  if (strcmp(ns,"%l") == 0)
-  {
-    res->data = (char*) u->String(NULL, TRUE, dim);
-    if (dim == 2)
-    {
-      char* ns = (char*) omAlloc(strlen((char*) res->data) + 2);
-      strcpy(ns, (char*) res->data);
-      omFree(res->data);
-      strcat(ns, "\n");
-      res->data = ns;
-    }
-  }
-  else if (strcmp(ns,"%t") == 0)
-  {
-    SPrintStart();
-    type_cmd(u);
-    res->data = SPrintEnd();
-    if (dim != 2)
-      ((char*)res->data)[strlen((char*)res->data) -1] = '\0';
-  }
-  else if (strcmp(ns,"%;") == 0)
-  {
-    SPrintStart();
-    u->Print();
-    if (dim == 2) PrintLn();
-    res->data = SPrintEnd();
-  }
-  else if  (strcmp(ns,"%p") == 0)
-  {
-    SPrintStart();
-    iiExprArith1(res, u, PRINT_CMD);
-    if (dim == 2) PrintLn();
-    res->data = SPrintEnd();
-  }
-  else if (strcmp(ns,"%b") == 0 && (u->Typ()==INTMAT_CMD))
-  {
     SPrintStart();
     ipPrintBetti(u);
-    if (dim == 2) PrintLn();
-    res->data = SPrintEnd();
+    char *s = SPrintEnd();
+    s[strlen(s)]='\0';
+    res->data=s;
   }
   else
+/* ======================== end betti ================================= */
   {
-    res->data = u->String(NULL, FALSE, dim);
-    if (dim == 2)
+    char* ns = omStrDup((char*) v->Data());
+    int dim = 1;
+    if (strlen(ns) == 3 && ns[1] == '2')
     {
-      char* ns = (char*) omAlloc(strlen((char*) res->data) + 2);
-      strcpy(ns, (char*) res->data);
-      omFree(res->data);
-      strcat(ns, "\n");
-      res->data = ns;
+      dim = 2;
+      ns[1] = ns[2];
+      ns[2] = '\0';
     }
+    if (strcmp(ns,"%l") == 0)
+    {
+      res->data = (char*) u->String(NULL, TRUE, dim);
+      if (dim == 2)
+      {
+        char* ns = (char*) omAlloc(strlen((char*) res->data) + 2);
+        strcpy(ns, (char*) res->data);
+        omFree(res->data);
+        strcat(ns, "\n");
+        res->data = ns;
+      }
+    }
+    else if (strcmp(ns,"%t") == 0)
+    {
+      SPrintStart();
+      type_cmd(u);
+      res->data = SPrintEnd();
+      if (dim != 2)
+        ((char*)res->data)[strlen((char*)res->data) -1] = '\0';
+    }
+    else if (strcmp(ns,"%;") == 0)
+    {
+      SPrintStart();
+      u->Print();
+      if (dim == 2) PrintLn();
+      res->data = SPrintEnd();
+    }
+    else if  (strcmp(ns,"%p") == 0)
+    {
+      iiExprArith1(res, u, PRINT_CMD);
+    }
+    else if (strcmp(ns,"%b") == 0 && (u->Typ()==INTMAT_CMD))
+    {
+      SPrintStart();
+      ipPrintBetti(u);
+      if (dim == 2) PrintLn();
+      res->data = SPrintEnd();
+    }
+    else
+    {
+      res->data = u->String(NULL, FALSE, dim);
+      if (dim == 2)
+      {
+        char* ns = (char*) omAlloc(strlen((char*) res->data) + 2);
+        strcpy(ns, (char*) res->data);
+        omFree(res->data);
+        strcat(ns, "\n");
+        res->data = ns;
+      }
+    }
+    omFree(ns);
   }
-
-  omFree(ns);
-  res->rtyp = STRING_CMD;
   return FALSE;
 }

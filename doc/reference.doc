@@ -5488,14 +5488,10 @@ See
 @*@code{print (} expression@code{, "betti" )}
 @*@code{print (} expression@code{,} format_string @code{)}
 @item @strong{Type:}
-none (for the first two calling sequences), resp.@:
-@*string (for the last calling sequence)
+string
 @item @strong{Purpose:}
-The first form prints the expression to the terminal and has no return
-value. Use the format string @code{%p} to print into a string (see
-below).
-@*The second form prints the graded Betti numbers from a matrix
-and has no return value.
+The first form prints the expression.
+@*The second form prints the graded Betti numbers from a matrix.
 The Betti numbers are printed in a matrix-like format where the entry
 @tex
 $d$ in row $i$ and column $j$
@@ -5518,8 +5514,8 @@ $R^n/M$ (the 0th and 1st syzygy module of $R^n/M$ is $R^n$ and $M$, resp.).
 @ifinfo
 R^n/M (the 0th and 1st syzygy module of R^n/M are R^n and M, resp.).
 @end ifinfo
-@*The last form returns the printed output as a string. The format
-string determines which format to use to generate the string.
+@*The last form returns the printed output as a string depending on
+the format string iwhich determines the format to use to generate the string.
 
 The following format strings are supported:
 @table @code
