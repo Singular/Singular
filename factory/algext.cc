@@ -510,13 +510,14 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
   CanonicalForm gm=0;
   CanonicalForm g_image, alpha, gnew, mnew;
   FFGenerator gen = FFGenerator();
+  Variable x= Variable (1);
   for(FFGenerator gen = FFGenerator(); gen.hasItems(); gen.next())
   {
     alpha = gen.item();
-    gamma_image = reduce(gamma(alpha, Variable(1)),M); // plug in alpha for var(1)
+    gamma_image = reduce(gamma(alpha, x),M); // plug in alpha for var(1)
     if(gamma_image.isZero()) // skip lc-bad points var(1)-alpha
       continue;
-    tryBrownGCD( f(alpha, Variable(1)), g(alpha, Variable(1)), M, g_image, fail, false ); // recursive call with one var less
+    tryBrownGCD( f(alpha, x), g(alpha, x), M, g_image, fail, false ); // recursive call with one var less
     if(fail)
       return;
     g_image = reduce(g_image, M);
@@ -535,7 +536,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     {
       g_image /= lc(g_image); // make g_image monic over Z/p
       g_image *= gamma_image; // multiply by multiple of image lc(gcd)
-      tryCRA( g_image, Variable(1)-alpha, gm, m, M, gnew, mnew, fail );
+      tryCRA( g_image, x-alpha, gm, m, M, gnew, mnew, fail );
       // gnew = gm mod m
       // gnew = g_image mod var(1)-alpha
       // mnew = m * (var(1)-alpha)
