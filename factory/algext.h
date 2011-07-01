@@ -14,12 +14,12 @@ void tryEuclid( const CanonicalForm &, const CanonicalForm &, const CanonicalFor
 void tryInvert( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, bool & );
 bool hasFirstAlgVar( const CanonicalForm &, Variable & );
 void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail, bool topLevel= true );
-void tryCRA( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew, bool & fail );
 void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail );
 int * leadDeg(const CanonicalForm & f, int *degs);
 bool isLess(int *a, int *b, int lower, int upper);
 bool isEqual(int *a, int *b, int lower, int upper);
 CanonicalForm firstLC(const CanonicalForm & f);
+CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M);
 
 #endif
 

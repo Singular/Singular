@@ -313,6 +313,7 @@ void tryEuclid( const CanonicalForm & A, const CanonicalForm & B, const Canonica
     if(fail)
       return;
     result = inv*P; // monify result (not reduced, yet)
+    result= reduce (result, M);
     return;
   }
   Variable x = P.mvar();
@@ -326,6 +327,7 @@ void tryEuclid( const CanonicalForm & A, const CanonicalForm & B, const Canonica
     if( rem.isZero() )
     {
       result *= inv;
+      result= reduce (result, M);
       return;
     }
     if(result.degree(x) >= rem.degree(x))
@@ -358,13 +360,26 @@ int * leadDeg(const CanonicalForm & f, int *degs);
 bool isLess(int *a, int *b, int lower, int upper);
 bool isEqual(int *a, int *b, int lower, int upper);
 CanonicalForm firstLC(const CanonicalForm & f);
-void tryCRA( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, const CanonicalForm & M, CanonicalForm & xnew, CanonicalForm & qnew, bool & fail );
-void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail );
 static CanonicalForm trycontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail );
 static CanonicalForm tryvcontent ( const CanonicalForm & f, const Variable & x, const CanonicalForm & M, bool & fail );
 static CanonicalForm trycf_content ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, bool & fail );
 static void tryDivide( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm & M, CanonicalForm & result, bool & divides, bool & fail );
 
+static inline CanonicalForm
+tryNewtonInterp (const CanonicalForm alpha, const CanonicalForm u,
+              const CanonicalForm newtonPoly, const CanonicalForm oldInterPoly,
+              const Variable & x, const CanonicalForm& M, bool& fail)
+{
+  CanonicalForm interPoly;
+
+  CanonicalForm inv;
+  tryInvert (newtonPoly (alpha, x), M, inv, fail);
+  if (fail)
+    return 0;
+
+  interPoly= oldInterPoly+reduce ((u - oldInterPoly (alpha, x))*inv*newtonPoly, M);
+  return interPoly;
+}
 
 void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, bool & fail, bool topLevel )
 { // assume F,G are multivariate polys over Z/p(a) for big prime p, M "univariate" polynomial in an algebraic variable
@@ -390,6 +405,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     if(fail)
       return;
     result = inv*G;
+    result= reduce (result, M);
     return;
   }
   if(G.isZero()) // F is non-zero
@@ -408,6 +424,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     if(fail)
       return;
     result = inv*F;
+    result= reduce (result, M);
     return;
   }
   // here: F,G both nonzero
@@ -447,7 +464,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     tryEuclid(f,g,M,result,fail);
     if(fail)
       return;
-    result = NN(result); // do not forget to map back
+    result= NN (reduce (result, M)); // do not forget to map back
     return;
   }
   // here: mv > 1
@@ -508,7 +525,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     dg_im[i] = 0; // initialize
   CanonicalForm gamma_image, m=1;
   CanonicalForm gm=0;
-  CanonicalForm g_image, alpha, gnew, mnew;
+  CanonicalForm g_image, alpha, gnew;
   FFGenerator gen = FFGenerator();
   Variable x= Variable (1);
   for(FFGenerator gen = FFGenerator(); gen.hasItems(); gen.next())
@@ -534,15 +551,20 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
     dg_im = leadDeg(g_image, dg_im); // dg_im cannot be NIL-pointer
     if(isEqual(dg_im, L, 2, mv))
     {
-      g_image /= lc(g_image); // make g_image monic over Z/p
+      CanonicalForm inv;
+      tryInvert (firstLC (g_image), M, inv, fail);
+      if (fail)
+        return;
+      g_image *= inv;
       g_image *= gamma_image; // multiply by multiple of image lc(gcd)
-      tryCRA( g_image, x-alpha, gm, m, M, gnew, mnew, fail );
+      g_image= reduce (g_image, M);
+      gnew= tryNewtonInterp (alpha, g_image, m, gm, x, M, fail);
       // gnew = gm mod m
       // gnew = g_image mod var(1)-alpha
       // mnew = m * (var(1)-alpha)
       if(fail)
         return;
-      m = mnew;
+      m *= (x - alpha);
       if(gnew == gm) // gnew did not change
       {
         cf = tryvcontent(gm, Variable(2), M, fail);
@@ -562,7 +584,7 @@ void tryBrownGCD( const CanonicalForm & F, const CanonicalForm & G, const Canoni
             return;
           if(divides)
           {
-            result = NN(c*g_image);
+            result = NN(reduce (c*g_image, M));
             return;
           }
         }
@@ -671,7 +693,6 @@ CanonicalForm QGCD( const CanonicalForm & F, const CanonicalForm & G )
     mipo /= mipo.lc();
     // here: mipo is monic
     tryBrownGCD( mapinto(f), mapinto(g), mipo, Dp, fail );
-    Dp = reduce( Dp, mipo );
     setCharacteristic(0);
     if( fail ) // mipo splits in char p
       continue;
@@ -779,125 +800,6 @@ CanonicalForm firstLC(const CanonicalForm & f)
     ret = LC(ret);
   return ret;
 }
-
-
-void tryCRA( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, const CanonicalForm & M, CanonicalForm & xnew, CanonicalForm & qnew, bool & fail )
-{ // as CRA, but takes care of zero divisors
-  CanonicalForm tmp;
-  if(x1.level() <= 1 && x2.level() <= 1) // base case
-  {
-    tryExtgcd(q1,q2,M,tmp,xnew,qnew,fail);
-    if(fail)
-      return;
-    xnew = x1 + (x2-x1) * xnew * q1;
-    qnew = q1*q2;
-    xnew = mod(xnew,qnew);
-    return;
-  }
-  CanonicalForm tmp2;
-  xnew = 0;
-  qnew = q1 * q2;
-  // here: x1.level() > 1 || x2.level() > 1
-  if(x1.level() > x2.level())
-  {
-    for(CFIterator i=x1; i.hasTerms(); i++)
-    {
-      if(i.exp() == 0) // const. term
-      {
-        tryCRA(i.coeff(),q1,x2,q2,M,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp;
-      }
-      else
-      {
-        tryCRA(i.coeff(),q1,0,q2,M,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp * power(x1.mvar(),i.exp());
-      }
-    }
-    return;
-  }
-  // here: x1.level() <= x2.level() && ( x1.level() > 1 || x2.level() > 1 )
-  if(x2.level() > x1.level())
-  {
-    for(CFIterator j=x2; j.hasTerms(); j++)
-    {
-      if(j.exp() == 0) // const. term
-      {
-        tryCRA(x1,q1,j.coeff(),q2,M,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp;
-      }
-      else
-      {
-        tryCRA(0,q1,j.coeff(),q2,M,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp * power(x2.mvar(),j.exp());
-      }
-    }
-    return;
-  }
-  // here: x1.level() == x2.level() && x1.level() > 1 && x2.level() > 1
-  CFIterator i = x1;
-  CFIterator j = x2;
-  while(i.hasTerms() || j.hasTerms())
-  {
-    if(i.hasTerms())
-    {
-      if(j.hasTerms())
-      {
-        if(i.exp() == j.exp())
-        {
-          tryCRA(i.coeff(),q1,j.coeff(),q2,M,tmp,tmp2,fail);
-          if(fail)
-            return;
-          xnew += tmp * power(x1.mvar(),i.exp());
-          i++; j++;
-        }
-        else
-        {
-          if(i.exp() < j.exp())
-          {
-            tryCRA(i.coeff(),q1,0,q2,M,tmp,tmp2,fail);
-            if(fail)
-              return;
-            xnew += tmp * power(x1.mvar(),i.exp());
-            i++;
-          }
-          else // i.exp() > j.exp()
-          {
-            tryCRA(0,q1,j.coeff(),q2,M,tmp,tmp2,fail);
-            if(fail)
-              return;
-            xnew += tmp * power(x1.mvar(),j.exp());
-            j++;
-          }
-        }
-      }
-      else // j is out of terms
-      {
-        tryCRA(i.coeff(),q1,0,q2,M,tmp,tmp2,fail);
-        if(fail)
-          return;
-        xnew += tmp * power(x1.mvar(),i.exp());
-        i++;
-      }
-    }
-    else // i is out of terms
-    {
-      tryCRA(0,q1,j.coeff(),q2,M,tmp,tmp2,fail);
-      if(fail)
-        return;
-      xnew += tmp * power(x1.mvar(),j.exp());
-      j++;
-    }
-  }
-}
-
 
 void tryExtgcd( const CanonicalForm & F, const CanonicalForm & G, const CanonicalForm & M, CanonicalForm & result, CanonicalForm & s, CanonicalForm & t, bool & fail )
 { // F, G are univariate polynomials (i.e. they have exactly one polynomial variable)
@@ -1066,8 +968,6 @@ static void tryDivide( const CanonicalForm & f, const CanonicalForm & g, const C
   result = reduce(result, M);
   divides = true;
 }
-
-
 
 void tryCRA( const CanonicalForm & x1, const CanonicalForm & q1, const CanonicalForm & x2, const CanonicalForm & q2, CanonicalForm & xnew, CanonicalForm & qnew, bool & fail )
 { // polys of level <= 1 are considered coefficients. q1,q2 are assumed to be coprime
