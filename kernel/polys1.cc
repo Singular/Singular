@@ -496,12 +496,8 @@ void p_Content(poly ph, const ring r)
         k = nInvers(k);
         nDelete(&tmpNumber);
         poly h = pNext(ph);
-        pSetCoeff(ph, nMult(pGetCoeff(ph), k));
-        while (h != NULL)
-        {
-          pSetCoeff(h, nMult(pGetCoeff(h), k));
-          pIter(h);
-        }
+	p_Mult_nn(ph,k,currRing);
+	if (!rField_has_simple_inverse()) pNormalize(ph);
       }
       nDelete(&k);
     }
@@ -693,16 +689,21 @@ void pSimpleContent(poly ph,int smax)
   if (!nlGreaterZero(pGetCoeff(p))) h=nlNeg(h);
   if(nlIsOne(h)) return;
   //if (TEST_OPT_PROT) PrintS("c");
-  while (p!=NULL)
-  {
+  //
+  number inv=nlInvers(h);
+  p_Mult_nn(p,inv,currRing);
+  pNormalize(p);
+  //while (p!=NULL)
+  //{
 #if 1
-    d = nlIntDiv(pGetCoeff(p),h);
-    pSetCoeff(p,d);
+  //  d = nlIntDiv(pGetCoeff(p),h);
+  //  pSetCoeff(p,d);
 #else
-    nlInpIntDiv(pGetCoeff(p),h,currRing);
+  //  nlInpIntDiv(pGetCoeff(p),h,currRing);
 #endif
-    pIter(p);
-  }
+  //  pIter(p);
+  //}
+  nlDelete(&inv,currRing);
   nlDelete(&h,currRing);
 }
 
@@ -1241,19 +1242,14 @@ poly pPermPoly (poly p, int * perm, const ring oldRing, nMapFunc nMap,
     {
       qq=pOne();
       aq=napPermNumber(pGetCoeff(p),par_perm,OldPar, oldRing);
-      if ((currRing->minpoly!=NULL)
+      if ((aq!=NULL) && (currRing->minpoly!=NULL)
       && ((rField_is_Zp_a()) || (rField_is_Q_a())))
       {
-        poly tmp=aq;
-        while (tmp!=NULL)
-        {
-          number n=pGetCoeff(tmp);
-          nNormalize(n);
-          pGetCoeff(tmp)=n;
-          pIter(tmp);
-        }
+        pNormalize(aq);
       }
       pTest(aq);
+      if (aq==NULL)
+        pSetCoeff(qq,nInit(0));
     }
     if (rRing_has_Comp(currRing)) pSetComp(qq, p_GetComp(p,oldRing));
     if (nIsZero(pGetCoeff(qq)))
