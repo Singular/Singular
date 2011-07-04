@@ -58,14 +58,15 @@ typedef struct fractionObject * fraction;
 #define BOUND_COMPLEXITY 10   /**< maximum complexity of a number */
 
 /* some useful accessors for fractions: */
-#define is0(f) (f == NULL) /**< TRUE iff n represents 0 in K(t_1, .., t_s) */
-#define num(f) f->numerator
-#define den(f) f->denominator
-#define denIs1(f) (f->denominator == NULL) /**< TRUE iff den. represents 1 */
-#define numIs1(f) (p_IsConstant(f->numerator, cf->extRing) && \
-                   n_IsOne(p_GetCoeff(num(f), cf->extRing), cf->extRing->cf))
+#define IS0(f) (f == NULL) /**< TRUE iff n represents 0 in K(t_1, .., t_s) */
+#define NUM(f) f->numerator
+#define DEN(f) f->denominator
+#define DENIS1(f) (f->denominator == NULL) /**< TRUE iff den. represents 1 */
+#define NUMIS1(f) (p_IsConstant(f->numerator, cf->extRing) && \
+                   n_IsOne(p_GetCoeff(f->numerator, cf->extRing), \
+                           cf->extRing->cf))
                    /**< TRUE iff num. represents 1 */
-#define c(f) f->complexity
+#define COM(f) f->complexity
 
 /// Get a mapping function from src into the domain of this type (n_transExt)
 nMapFunc ntSetMap(const coeffs src, const coeffs dst);
