@@ -1309,11 +1309,9 @@ poly p_NSet(number n, const ring r)
   }
 }
 /*2
-* assumes that the head term of b is a multiple of the head term of a
-* and return the multiplicant *m
-* Frank's observation: If LM(b) = LM(a)*m, then we may actually set
-* negative(!) exponents in the below loop. I suspect that the correct
-* comment should be "assumes that LM(a) = LM(b)*m, for some monomial m..."
+* assumes that LM(a) = LM(b)*m, for some monomial m,
+* returns the multiplicant m,
+* leaves a and b unmodified
 */
 poly p_Divide(poly a, poly b, const ring r)
 {

@@ -2602,6 +2602,10 @@ BOOLEAN nlInitChar(coeffs r, void*)
   // debug stuff
   r->cfDBTest=nlDBTest;
 #endif
+#ifdef HAVE_FACTORY
+  r->convSingNFactoryN=nlConvSingNFactoryN;
+  r->convFactoryNSingN=nlConvFactoryNSingN;
+#endif
 
   // the variables: general stuff (required)
   r->nNULL = INT_TO_SR(0);

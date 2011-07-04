@@ -232,13 +232,13 @@ private:
     n_Delete(&n1, cf); n_Delete(&n2, cf);
   }
   /* assumes that cf represents a rational function field;
-     does NOT copy p, i.e. uses p directly inside the resulting number */
+     uses a copy of p inside the resulting number */
   number toFractionNumber(poly p, const coeffs cf)
   {
     number n = n_Init(1, cf);
     fraction f = (fraction)n;
     p_Delete(&(f->numerator), cf->extRing);
-    f->numerator = p;
+    f->numerator = p_Copy(p, cf->extRing);
     return n;
   }
   void TestArithCf(const coeffs r)
@@ -952,9 +952,13 @@ public:
     poly v = p_Mult_q(v1, v2, cf->extRing);   // (s + 1) * (s + 2t)
     number v_n = toFractionNumber(v, cf);
     PrintSized(v_n, cf);
-    poly w = NULL;
-    plusTerm(w, 1, 1, 1, cf->extRing);        // s
-    plusTerm(w, 1, 1, 0, cf->extRing);        // s + 1
+    poly w1 = NULL;
+    plusTerm(w1, 1, 1, 1, cf->extRing);       // s
+    plusTerm(w1, 1, 1, 0, cf->extRing);       // s + 1
+    poly w2 = NULL;
+    plusTerm(w2, 3, 1, 1, cf->extRing);       // 3s
+    plusTerm(w2, -7, 2, 1, cf->extRing);       // 3s - 7t
+    poly w = p_Mult_q(w1, w2, cf->extRing);   // (s + 1) * (3s - 7t)
     number w_n = toFractionNumber(w, cf);
     PrintSized(w_n, cf);
     number vOverW_n = n_Div(v_n, w_n, cf);
@@ -971,6 +975,7 @@ public:
       nn = tmp;
       clog << i << ". "; PrintSized(nn, cf);
     }
+    
     n_Delete(&prod, cf); n_Delete(&nn, cf);
     n_Delete(&v_n, cf); n_Delete(&w_n, cf);
     n_Delete(&vOverW_n, cf); n_Delete(&wOverV_n, cf);

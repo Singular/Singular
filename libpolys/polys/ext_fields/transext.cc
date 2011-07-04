@@ -25,6 +25,10 @@
 #include <polys/monomials/p_polys.h>
 #include <polys/simpleideals.h>
 
+#ifdef HAVE_FACTORY
+#include <polys/clapsing.h>
+#endif
+
 #include <polys/ext_fields/transext.h>
 
 /// our type has been defined as a macro in transext.h
@@ -73,10 +77,10 @@ BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
 {
   assume(getCoeffType(cf) == ntID);
   fraction t = (fraction)a;
-  if (is0(t)) return TRUE;
-  assume(num(t) != NULL);   /**< t != 0 ==> numerator(t) != 0 */
-  p_Test(num(t), ntRing);
-  if (!denIs1(t)) p_Test(den(t), ntRing);
+  if (IS0(t)) return TRUE;
+  assume(NUM(t) != NULL);   /**< t != 0 ==> numerator(t) != 0 */
+  p_Test(NUM(t), ntRing);
+  if (!DENIS1(t)) p_Test(DEN(t), ntRing);
   return TRUE;
 }
 #endif
@@ -102,15 +106,15 @@ static coeffs nCoeff_bottom(const coeffs r, int &height)
 BOOLEAN ntIsZero(number a, const coeffs cf)
 {
   ntTest(a);
-  return (is0(a));
+  return (IS0(a));
 }
 
 void ntDelete(number * a, const coeffs cf)
 {
   fraction f = (fraction)(*a);
-  if (is0(f)) return;
-  p_Delete(&num(f), ntRing);
-  if (!denIs1(f)) p_Delete(&den(f), ntRing);
+  if (IS0(f)) return;
+  p_Delete(&NUM(f), ntRing);
+  if (!DENIS1(f)) p_Delete(&DEN(f), ntRing);
   omFreeBin((ADDRESS)f, fractionObjectBin);
   *a = NULL;
 }
@@ -121,23 +125,23 @@ BOOLEAN ntEqual(number a, number b, const coeffs cf)
   
   /// simple tests
   if (a == b) return TRUE;
-  if ((is0(a)) && (!is0(b))) return FALSE;
-  if ((is0(b)) && (!is0(a))) return FALSE;
+  if ((IS0(a)) && (!IS0(b))) return FALSE;
+  if ((IS0(b)) && (!IS0(a))) return FALSE;
   
   /// cheap test if gcd's have been cancelled in both numbers 
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
-  if ((c(fa) == 1) && (c(fb) == 1))
+  if ((COM(fa) == 1) && (COM(fb) == 1))
   {
-    poly f = p_Add_q(p_Copy(num(fa), ntRing),
-                     p_Neg(p_Copy(num(fb), ntRing), ntRing),
+    poly f = p_Add_q(p_Copy(NUM(fa), ntRing),
+                     p_Neg(p_Copy(NUM(fb), ntRing), ntRing),
                      ntRing);
     if (f != NULL) { p_Delete(&f, ntRing); return FALSE; }
-    if (denIs1(fa) && denIs1(fb))  return TRUE;
-    if (denIs1(fa) && !denIs1(fb)) return FALSE;
-    if (!denIs1(fa) && denIs1(fb)) return FALSE;
-    f = p_Add_q(p_Copy(den(fa), ntRing),
-                p_Neg(p_Copy(den(fb), ntRing), ntRing),
+    if (DENIS1(fa) && DENIS1(fb))  return TRUE;
+    if (DENIS1(fa) && !DENIS1(fb)) return FALSE;
+    if (!DENIS1(fa) && DENIS1(fb)) return FALSE;
+    f = p_Add_q(p_Copy(DEN(fa), ntRing),
+                p_Neg(p_Copy(DEN(fb), ntRing), ntRing),
                 ntRing);
     if (f != NULL) { p_Delete(&f, ntRing); return FALSE; }
     return TRUE;
@@ -145,10 +149,10 @@ BOOLEAN ntEqual(number a, number b, const coeffs cf)
   
   /* default: the more expensive multiplication test
               a/b = c/d  <==>  a*d = b*c */
-  poly f = p_Copy(num(fa), ntRing);
-  if (!denIs1(fb)) f = p_Mult_q(f, p_Copy(den(fb), ntRing), ntRing);
-  poly g = p_Copy(num(fb), ntRing);
-  if (!denIs1(fa)) g = p_Mult_q(g, p_Copy(den(fa), ntRing), ntRing);
+  poly f = p_Copy(NUM(fa), ntRing);
+  if (!DENIS1(fb)) f = p_Mult_q(f, p_Copy(DEN(fb), ntRing), ntRing);
+  poly g = p_Copy(NUM(fb), ntRing);
+  if (!DENIS1(fa)) g = p_Mult_q(g, p_Copy(DEN(fa), ntRing), ntRing);
   poly h = p_Add_q(f, p_Neg(g, ntRing), ntRing);
   if (h == NULL) return TRUE;
   else
@@ -161,14 +165,14 @@ BOOLEAN ntEqual(number a, number b, const coeffs cf)
 number ntCopy(number a, const coeffs cf)
 {
   ntTest(a);
-  if (is0(a)) return NULL;
+  if (IS0(a)) return NULL;
   fraction f = (fraction)a;
-  poly g = p_Copy(num(f), ntRing);
-  poly h = NULL; if (!denIs1(f)) h = p_Copy(den(f), ntRing);
+  poly g = p_Copy(NUM(f), ntRing);
+  poly h = NULL; if (!DENIS1(f)) h = p_Copy(DEN(f), ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(result) = g;
-  den(result) = h;
-  c(result) = c(f);
+  NUM(result) = g;
+  DEN(result) = h;
+  COM(result) = COM(f);
   return (number)result;
 }
 
@@ -176,13 +180,13 @@ number ntGetNumerator(number &a, const coeffs cf)
 {
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
-  if (is0(a)) return NULL;
+  if (IS0(a)) return NULL;
   fraction f = (fraction)a;
-  poly g = p_Copy(num(f), ntRing);
+  poly g = p_Copy(NUM(f), ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(result) = g;
-  den(result) = NULL;
-  c(result) = 0;
+  NUM(result) = g;
+  DEN(result) = NULL;
+  COM(result) = 0;
   return (number)result;
 }
 
@@ -192,12 +196,12 @@ number ntGetDenom(number &a, const coeffs cf)
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
   poly g;
-  if (is0(f) || denIs1(f)) g = p_One(ntRing);
-  else g = p_Copy(den(f), ntRing);
+  if (IS0(f) || DENIS1(f)) g = p_One(ntRing);
+  else g = p_Copy(DEN(f), ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(result) = g;
-  den(result) = NULL;
-  c(result) = 0;
+  NUM(result) = g;
+  DEN(result) = NULL;
+  COM(result) = 0;
   return (number)result;
 }
 
@@ -206,7 +210,7 @@ BOOLEAN ntIsOne(number a, const coeffs cf)
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
-  return denIs1(f) && numIs1(f);
+  return DENIS1(f) && NUMIS1(f);
 }
 
 BOOLEAN ntIsMOne(number a, const coeffs cf)
@@ -214,8 +218,8 @@ BOOLEAN ntIsMOne(number a, const coeffs cf)
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
-  if (!denIs1(f)) return FALSE;
-  poly g = num(f);
+  if (!DENIS1(f)) return FALSE;
+  poly g = NUM(f);
   if (!p_IsConstant(g, ntRing)) return FALSE;
   return n_IsMOne(p_GetCoeff(g, ntRing), ntCoeffs);
 }
@@ -224,10 +228,10 @@ BOOLEAN ntIsMOne(number a, const coeffs cf)
 number ntNeg(number a, const coeffs cf)
 {
   ntTest(a);
-  if (!is0(a))
+  if (!IS0(a))
   {
     fraction f = (fraction)a;
-    num(f) = p_Neg(num(f), ntRing);
+    NUM(f) = p_Neg(NUM(f), ntRing);
   }
   return a;
 }
@@ -244,9 +248,9 @@ number ntInit(int i, const coeffs cf)
   else
   {
     fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-    num(result) = p_ISet(i, ntRing);
-    den(result) = NULL;
-    c(result) = 0;
+    NUM(result) = p_ISet(i, ntRing);
+    DEN(result) = NULL;
+    COM(result) = 0;
     return (number)result;
   }
 }
@@ -254,12 +258,12 @@ number ntInit(int i, const coeffs cf)
 int ntInt(number &a, const coeffs cf)
 {
   ntTest(a);
-  if (is0(a)) return 0;
+  if (IS0(a)) return 0;
   definiteGcdCancellation(a, cf, FALSE);
   fraction f = (fraction)a;
-  if (!denIs1(f)) return 0;
-  if (!p_IsConstant(num(f), ntRing)) return 0;
-  return n_Int(p_GetCoeff(num(f), ntRing), ntCoeffs);
+  if (!DENIS1(f)) return 0;
+  if (!p_IsConstant(NUM(f), ntRing)) return 0;
+  return n_Int(p_GetCoeff(NUM(f), ntRing), ntCoeffs);
 }
 
 /* This method will only consider the numerators of a and b, without
@@ -273,17 +277,17 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
   ntTest(a); ntTest(b);
   number aNumCoeff = NULL; int aNumDeg = 0;
   number bNumCoeff = NULL; int bNumDeg = 0;
-  if (!is0(a))
+  if (!IS0(a))
   {
     fraction fa = (fraction)a;
-    aNumDeg = p_Totaldegree(num(fa), ntRing);
-    aNumCoeff = p_GetCoeff(num(fa), ntRing);
+    aNumDeg = p_Totaldegree(NUM(fa), ntRing);
+    aNumCoeff = p_GetCoeff(NUM(fa), ntRing);
   }
-  if (!is0(b))
+  if (!IS0(b))
   {
     fraction fb = (fraction)b;
-    bNumDeg = p_Totaldegree(num(fb), ntRing);
-    bNumCoeff = p_GetCoeff(num(fb), ntRing);
+    bNumDeg = p_Totaldegree(NUM(fb), ntRing);
+    bNumCoeff = p_GetCoeff(NUM(fb), ntRing);
   }
   if (aNumDeg != bNumDeg) return FALSE;
   else return n_Greater(aNumCoeff, bNumCoeff, ntCoeffs);
@@ -297,9 +301,9 @@ BOOLEAN ntGreater(number a, number b, const coeffs cf)
 BOOLEAN ntGreaterZero(number a, const coeffs cf)
 {
   ntTest(a);
-  if (is0(a)) return FALSE;
+  if (IS0(a)) return FALSE;
   fraction f = (fraction)a;
-  poly g = num(f);
+  poly g = NUM(f);
   return (n_GreaterZero(p_GetCoeff(g, ntRing), ntCoeffs) ||
           (!p_LmIsConstant(g, ntRing)));
 }
@@ -325,41 +329,41 @@ number ntPar(int i, const coeffs cf)
   p_SetExp(p, i, 1, ntRing);
   p_Setm(p, ntRing);
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(result) = p;
-  den(result) = NULL;
-  c(result) = 0;
+  NUM(result) = p;
+  DEN(result) = NULL;
+  COM(result) = 0;
   return (number)result;
 }
 
 number ntAdd(number a, number b, const coeffs cf)
 {
   ntTest(a); ntTest(b);
-  if (is0(a)) return ntCopy(b, cf);
-  if (is0(b)) return ntCopy(a, cf);
+  if (IS0(a)) return ntCopy(b, cf);
+  if (IS0(b)) return ntCopy(a, cf);
   
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
   
-  poly g = p_Copy(num(fa), ntRing);
-  if (!denIs1(fb)) g = p_Mult_q(g, p_Copy(den(fb), ntRing), ntRing);
-  poly h = p_Copy(num(fb), ntRing);
-  if (!denIs1(fa)) h = p_Mult_q(h, p_Copy(den(fa), ntRing), ntRing);
+  poly g = p_Copy(NUM(fa), ntRing);
+  if (!DENIS1(fb)) g = p_Mult_q(g, p_Copy(DEN(fb), ntRing), ntRing);
+  poly h = p_Copy(NUM(fb), ntRing);
+  if (!DENIS1(fa)) h = p_Mult_q(h, p_Copy(DEN(fa), ntRing), ntRing);
   g = p_Add_q(g, h, ntRing);
   
   if (g == NULL) return NULL;
   
   poly f;
-  if      (denIs1(fa) && denIs1(fb))  f = NULL;
-  else if (!denIs1(fa) && denIs1(fb)) f = p_Copy(den(fa), ntRing);
-  else if (denIs1(fa) && !denIs1(fb)) f = p_Copy(den(fb), ntRing);
-  else /* both denom's are != 1 */    f = p_Mult_q(p_Copy(den(fa), ntRing),
-                                                   p_Copy(den(fb), ntRing),
+  if      (DENIS1(fa) && DENIS1(fb))  f = NULL;
+  else if (!DENIS1(fa) && DENIS1(fb)) f = p_Copy(DEN(fa), ntRing);
+  else if (DENIS1(fa) && !DENIS1(fb)) f = p_Copy(DEN(fb), ntRing);
+  else /* both denom's are != 1 */    f = p_Mult_q(p_Copy(DEN(fa), ntRing),
+                                                   p_Copy(DEN(fb), ntRing),
                                                    ntRing);
   
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(result) = g;
-  den(result) = f;
-  c(result) = c(fa) + c(fb) + ADD_COMPLEXITY;
+  NUM(result) = g;
+  DEN(result) = f;
+  COM(result) = COM(fa) + COM(fb) + ADD_COMPLEXITY;
   heuristicGcdCancellation((number)result, cf);
   return (number)result;
 }
@@ -367,32 +371,32 @@ number ntAdd(number a, number b, const coeffs cf)
 number ntSub(number a, number b, const coeffs cf)
 {
   ntTest(a); ntTest(b);
-  if (is0(a)) return ntNeg(ntCopy(b, cf), cf);
-  if (is0(b)) return ntCopy(a, cf);
+  if (IS0(a)) return ntNeg(ntCopy(b, cf), cf);
+  if (IS0(b)) return ntCopy(a, cf);
   
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
   
-  poly g = p_Copy(num(fa), ntRing);
-  if (!denIs1(fb)) g = p_Mult_q(g, p_Copy(den(fb), ntRing), ntRing);
-  poly h = p_Copy(num(fb), ntRing);
-  if (!denIs1(fa)) h = p_Mult_q(h, p_Copy(den(fa), ntRing), ntRing);
+  poly g = p_Copy(NUM(fa), ntRing);
+  if (!DENIS1(fb)) g = p_Mult_q(g, p_Copy(DEN(fb), ntRing), ntRing);
+  poly h = p_Copy(NUM(fb), ntRing);
+  if (!DENIS1(fa)) h = p_Mult_q(h, p_Copy(DEN(fa), ntRing), ntRing);
   g = p_Add_q(g, p_Neg(h, ntRing), ntRing);
   
   if (g == NULL) return NULL;
   
   poly f;
-  if      (denIs1(fa) && denIs1(fb))  f = NULL;
-  else if (!denIs1(fa) && denIs1(fb)) f = p_Copy(den(fa), ntRing);
-  else if (denIs1(fa) && !denIs1(fb)) f = p_Copy(den(fb), ntRing);
-  else /* both den's are != 1 */      f = p_Mult_q(p_Copy(den(fa), ntRing),
-                                                   p_Copy(den(fb), ntRing),
+  if      (DENIS1(fa) && DENIS1(fb))  f = NULL;
+  else if (!DENIS1(fa) && DENIS1(fb)) f = p_Copy(DEN(fa), ntRing);
+  else if (DENIS1(fa) && !DENIS1(fb)) f = p_Copy(DEN(fb), ntRing);
+  else /* both den's are != 1 */      f = p_Mult_q(p_Copy(DEN(fa), ntRing),
+                                                   p_Copy(DEN(fb), ntRing),
                                                    ntRing);
   
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(result) = g;
-  den(result) = f;
-  c(result) = c(fa) + c(fb) + ADD_COMPLEXITY;
+  NUM(result) = g;
+  DEN(result) = f;
+  COM(result) = COM(fa) + COM(fb) + ADD_COMPLEXITY;
   heuristicGcdCancellation((number)result, cf);
   return (number)result;
 }
@@ -400,29 +404,29 @@ number ntSub(number a, number b, const coeffs cf)
 number ntMult(number a, number b, const coeffs cf)
 {
   ntTest(a); ntTest(b);
-  if (is0(a) || is0(b)) return NULL;
+  if (IS0(a) || IS0(b)) return NULL;
   
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
   
-  poly g = p_Copy(num(fa), ntRing);
-  poly h = p_Copy(num(fb), ntRing);
+  poly g = p_Copy(NUM(fa), ntRing);
+  poly h = p_Copy(NUM(fb), ntRing);
   g = p_Mult_q(g, h, ntRing);
   
   if (g == NULL) return NULL;   /* may happen due to zero divisors */
   
   poly f;
-  if      (denIs1(fa) && denIs1(fb))  f = NULL;
-  else if (!denIs1(fa) && denIs1(fb)) f = p_Copy(den(fa), ntRing);
-  else if (denIs1(fa) && !denIs1(fb)) f = p_Copy(den(fb), ntRing);
-  else /* both den's are != 1 */      f = p_Mult_q(p_Copy(den(fa), ntRing),
-                                                   p_Copy(den(fb), ntRing),
+  if      (DENIS1(fa) && DENIS1(fb))  f = NULL;
+  else if (!DENIS1(fa) && DENIS1(fb)) f = p_Copy(DEN(fa), ntRing);
+  else if (DENIS1(fa) && !DENIS1(fb)) f = p_Copy(DEN(fb), ntRing);
+  else /* both den's are != 1 */      f = p_Mult_q(p_Copy(DEN(fa), ntRing),
+                                                   p_Copy(DEN(fb), ntRing),
                                                    ntRing);
   
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(result) = g;
-  den(result) = f;
-  c(result) = c(fa) + c(fb) + MULT_COMPLEXITY;
+  NUM(result) = g;
+  DEN(result) = f;
+  COM(result) = COM(fa) + COM(fb) + MULT_COMPLEXITY;
   heuristicGcdCancellation((number)result, cf);
   return (number)result;
 }
@@ -430,24 +434,24 @@ number ntMult(number a, number b, const coeffs cf)
 number ntDiv(number a, number b, const coeffs cf)
 {
   ntTest(a); ntTest(b);
-  if (is0(a)) return NULL;
-  if (is0(b)) WerrorS(nDivBy0);
+  if (IS0(a)) return NULL;
+  if (IS0(b)) WerrorS(nDivBy0);
   
   fraction fa = (fraction)a;
   fraction fb = (fraction)b;
   
-  poly g = p_Copy(num(fa), ntRing);
-  if (!denIs1(fb)) g = p_Mult_q(g, p_Copy(den(fb), ntRing), ntRing);
+  poly g = p_Copy(NUM(fa), ntRing);
+  if (!DENIS1(fb)) g = p_Mult_q(g, p_Copy(DEN(fb), ntRing), ntRing);
   
   if (g == NULL) return NULL;   /* may happen due to zero divisors */
   
-  poly f = p_Copy(num(fb), ntRing);
-  if (!denIs1(fa)) f = p_Mult_q(f, p_Copy(den(fa), ntRing), ntRing);
+  poly f = p_Copy(NUM(fb), ntRing);
+  if (!DENIS1(fa)) f = p_Mult_q(f, p_Copy(DEN(fa), ntRing), ntRing);
   
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(result) = g;
-  den(result) = f;
-  c(result) = c(fa) + c(fb) + MULT_COMPLEXITY;
+  NUM(result) = g;
+  DEN(result) = f;
+  COM(result) = COM(fa) + COM(fb) + MULT_COMPLEXITY;
   heuristicGcdCancellation((number)result, cf);
   return (number)result;
 }
@@ -465,7 +469,7 @@ void ntPower(number a, int exp, number *b, const coeffs cf)
   ntTest(a);
   
   /* special cases first */
-  if (is0(a))
+  if (IS0(a))
   {
     if (exp >= 0) *b = NULL;
     else          WerrorS(nDivBy0);
@@ -528,25 +532,21 @@ void ntPower(number a, int exp, number *b, const coeffs cf)
 void heuristicGcdCancellation(number a, const coeffs cf)
 {
   ntTest(a);
-  if (is0(a)) return;
+  if (IS0(a)) return;
   
   fraction f = (fraction)a;
-  if (denIs1(f) || numIs1(f)) { c(f) = 0; return; }
+  if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
   
-  /* check whether num(f) = den(f), and - if so - replace 'a' by 1 */
-  poly difference = p_Add_q(p_Copy(num(f), ntRing),
-                            p_Neg(p_Copy(den(f), ntRing), ntRing),
-                            ntRing);
-  if (difference == NULL)
-  { /* we also know that numerator and denominator are both != 1 */
-    p_Delete(&num(f), ntRing); num(f) = p_ISet(1, ntRing);
-    p_Delete(&den(f), ntRing); den(f) = NULL;
-    c(f) = 0;
+  /* check whether NUM(f) = DEN(f), and - if so - replace 'a' by 1 */
+  if (p_EqualPolys(NUM(f), DEN(f), ntRing))
+  { /* numerator and denominator are both != 1 */
+    p_Delete(&NUM(f), ntRing); NUM(f) = p_ISet(1, ntRing);
+    p_Delete(&DEN(f), ntRing); DEN(f) = NULL;
+    COM(f) = 0;
     return;
   }
-  else p_Delete(&difference, ntRing);
   
-  if (c(f) <= BOUND_COMPLEXITY) return;
+  if (COM(f) <= BOUND_COMPLEXITY) return;
   else definiteGcdCancellation(a, cf, TRUE);
 }
 
@@ -560,49 +560,70 @@ void definiteGcdCancellation(number a, const coeffs cf,
   
   if (!skipSimpleTests)
   {
-    if (is0(a)) return;
-    if (denIs1(f) || numIs1(f)) { c(f) = 0; return; }
+    if (IS0(a)) return;
+    if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
   
-    /* check whether num(f) = den(f), and - if so - replace 'a' by 1 */
-    poly difference = p_Add_q(p_Copy(num(f), ntRing),
-                              p_Neg(p_Copy(den(f), ntRing), ntRing),
-                              ntRing);
-    if (difference == NULL)
-    { /* we also know that numerator and denominator are both != 1 */
-      p_Delete(&num(f), ntRing); num(f) = p_ISet(1, ntRing);
-      p_Delete(&den(f), ntRing); den(f) = NULL;
-      c(f) = 0;
+    /* check whether NUM(f) = DEN(f), and - if so - replace 'a' by 1 */
+    if (p_EqualPolys(NUM(f), DEN(f), ntRing))
+    { /* numerator and denominator are both != 1 */
+      p_Delete(&NUM(f), ntRing); NUM(f) = p_ISet(1, ntRing);
+      p_Delete(&DEN(f), ntRing); DEN(f) = NULL;
+      COM(f) = 0;
       return;
     }
-    else p_Delete(&difference, ntRing);
   }
   
-  /* TO BE IMPLEMENTED!
-     for the time being, cancellation of gcd's does not take place */
-  Print("// TO BE IMPLEMENTED: transext.cc:definiteGcdCancellation\n");
-  Print("// (complexity of number = %d, bound = %d)\n",
-        c(f), BOUND_COMPLEXITY);
+#ifdef HAVE_FACTORY
+  /* singclap_gcd destroys its arguments. We hence need copies: */
+  poly pNum = p_Copy(NUM(f), ntRing);
+  poly pDen = p_Copy(DEN(f), ntRing);
+  poly pGcd = singclap_gcd(pNum, pDen, cf->extRing);
+  if (p_IsConstant(pGcd, ntRing) &&
+      n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs))
+  {
+      /* gcd = 1; nothing to cancel */
+  }
+  else
+  {
+      poly newNum = singclap_pdivide(NUM(f), pGcd, ntRing);
+      p_Delete(&NUM(f), ntRing);
+      NUM(f) = newNum;
+      poly newDen = singclap_pdivide(DEN(f), pGcd, ntRing);
+      p_Delete(&DEN(f), ntRing);
+      if (p_IsConstant(newDen, ntRing) &&
+          n_IsOne(p_GetCoeff(newDen, ntRing), ntCoeffs))
+      {
+        /* newDen = 1 needs to be represented by NULL */
+        p_Delete(&newDen, ntRing);
+        newDen = NULL;
+      }
+      DEN(f) = newDen;
+  }
+  COM(f) = 0;
+  p_Delete(&pGcd, ntRing);
+#endif /* HAVE_FACTORY */
 }
 
+/* modifies a */
 void ntWrite(number &a, const coeffs cf)
 {
   ntTest(a);
   definiteGcdCancellation(a, cf, FALSE);
-  if (is0(a))
+  if (IS0(a))
     StringAppendS("0");
   else
   {
     fraction f = (fraction)a;
-    BOOLEAN useBrackets = !(p_IsConstant(num(f), ntRing)) && (!denIs1(f));
+    BOOLEAN useBrackets = (!p_IsConstant(NUM(f), ntRing)) && (!DENIS1(f));
     if (useBrackets) StringAppendS("(");
-    p_String0(num(f), ntRing, ntRing);
+    p_String0(NUM(f), ntRing, ntRing);
     if (useBrackets) StringAppendS(")");
-    if (!denIs1(f))
+    if (!DENIS1(f))
     {
       StringAppendS("/");
-      useBrackets = !p_IsConstant(den(f), ntRing);
+      useBrackets = !p_IsConstant(DEN(f), ntRing);
       if (useBrackets) StringAppendS("(");
-      p_String0(den(f), ntRing, ntRing);
+      p_String0(DEN(f), ntRing, ntRing);
       if (useBrackets) StringAppendS(")");
     }
   }
@@ -616,9 +637,9 @@ const char * ntRead(const char *s, number *a, const coeffs cf)
   else
   {
     fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-    num(f) = p;
-    den(f) = NULL;
-    c(f) = 0;
+    NUM(f) = p;
+    DEN(f) = NULL;
+    COM(f) = 0;
     *a = (number)f;
     return result;
   }
@@ -658,13 +679,13 @@ number ntGcd(number a, number b, const coeffs cf)
 int ntSize(number a, const coeffs cf)
 {
   ntTest(a);
-  if (is0(a)) return -1;
+  if (IS0(a)) return -1;
   /* this has been taken from the old implementation of field extensions,
      where we computed the sum of the degrees and the numbers of terms in
      the numerator and denominator of a; so we leave it at that, for the
      time being */
   fraction f = (fraction)a;
-  poly p = num(f);
+  poly p = NUM(f);
   int noOfTerms = 0;
   int numDegree = 0;
   while (p != NULL)
@@ -677,9 +698,9 @@ int ntSize(number a, const coeffs cf)
     pIter(p);
   }
   int denDegree = 0;
-  if (!denIs1(f))
+  if (!DENIS1(f))
   {
-    p = den(f);
+    p = DEN(f);
     while (p != NULL)
     {
       noOfTerms++;
@@ -696,15 +717,15 @@ int ntSize(number a, const coeffs cf)
 number ntInvers(number a, const coeffs cf)
 {
   ntTest(a);
-  if (is0(a)) WerrorS(nDivBy0);
+  if (IS0(a)) WerrorS(nDivBy0);
   fraction f = (fraction)a;
   fraction result = (fraction)omAlloc0Bin(fractionObjectBin);
   poly g;
-  if (denIs1(f)) g = p_One(ntRing);
-  else           g = p_Copy(den(f), ntRing);
-  num(result) = g;
-  den(result) = p_Copy(num(f), ntRing);
-  c(result) = c(f);
+  if (DENIS1(f)) g = p_One(ntRing);
+  else           g = p_Copy(DEN(f), ntRing);
+  NUM(result) = g;
+  DEN(result) = p_Copy(NUM(f), ntRing);
+  COM(result) = COM(f);
   return (number)result;
 }
 
@@ -716,7 +737,7 @@ number ntMap00(number a, const coeffs src, const coeffs dst)
   poly p = p_One(dst->extRing);
   p_SetCoeff(p, ntCopy(a, src), dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(f) = p; den(f) = NULL; c(f) = 0;
+  NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
   return (number)f;
 }
 
@@ -736,7 +757,7 @@ number ntMapP0(number a, const coeffs src, const coeffs dst)
   p = p_One(dst->extRing);
   p_SetCoeff(p, q, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(f) = p; den(f) = NULL; c(f) = 0;
+  NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
   return (number)f;
 }
 
@@ -763,7 +784,7 @@ number ntMap0P(number a, const coeffs src, const coeffs dst)
   g = p_One(dst->extRing);
   p_SetCoeff(g, q, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(f) = g; den(f) = NULL; c(f) = 0;
+  NUM(f) = g; DEN(f) = NULL; COM(f) = 0;
   return (number)f;
 }
 
@@ -775,7 +796,7 @@ number ntMapPP(number a, const coeffs src, const coeffs dst)
   poly p = p_One(dst->extRing);
   p_SetCoeff(p, ntCopy(a, src), dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(f) = p; den(f) = NULL; c(f) = 0;
+  NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
   return (number)f;
 }
 
@@ -795,7 +816,7 @@ number ntMapUP(number a, const coeffs src, const coeffs dst)
   p = p_One(dst->extRing);
   p_SetCoeff(p, q, dst->extRing);
   fraction f = (fraction)omAlloc0Bin(fractionObjectBin);
-  num(f) = p; den(f) = NULL; c(f) = 0;
+  NUM(f) = p; DEN(f) = NULL; COM(f) = 0;
   return (number)f;
 }
 
@@ -905,6 +926,12 @@ BOOLEAN ntInitChar(coeffs cf, void * infoStruct)
   cf->nCoeffIsEqual  = ntCoeffIsEqual;
   cf->cfInvers       = ntInvers;
   cf->cfIntDiv       = ntDiv;
+  
+#ifndef HAVE_FACTORY
+  PrintS("// Warning: The 'factory' module is not available.\n");
+  PrintS("//          Hence gcd's cannot be cancelled in any\n");
+  PrintS("//          computed fraction!\n");
+#endif
   
   return FALSE;
 }
