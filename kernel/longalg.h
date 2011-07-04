@@ -99,5 +99,13 @@ void          naSetIdeal(ideal I);
 void          naCoefNormalize(number pp);
 extern number (*naMap)(number from);
 
+//extern omBin lnumber_bin;
+//#define ALLOC_LNUMBER() (lnumber)omAllocBin(lnumber_bin)
+//#define ALLOC0_LNUMBER() (lnumber)omAlloc0Bin(lnumber_bin)
+//#define FREE_LNUMBER(x) omFreeBin((ADDRESS)x, lnumber_bin)
+extern omBin rnumber_bin;
+#define ALLOC_LNUMBER() (lnumber)omAllocBin(rnumber_bin)
+#define ALLOC0_LNUMBER() (lnumber)omAlloc0Bin(rnumber_bin)
+#define FREE_LNUMBER(x) omFreeBin((ADDRESS)x, rnumber_bin)
 #endif
 

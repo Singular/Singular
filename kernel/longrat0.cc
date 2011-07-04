@@ -54,7 +54,7 @@ const char * nlRead (const char *s, number *a)
     *a = INT_TO_SR(1); /* nlInit(1) */
     return s;
   }
-  *a=(number)omAllocBin(rnumber_bin);
+  *a=(number)ALLOC_RNUMBER();
   {
     (*a)->s = 3;
 #if defined(LDEBUG)
@@ -85,7 +85,7 @@ const char * nlRead (const char *s, number *a)
     if (mpz_cmp_si(z,(long)0)==0)
     {
       mpz_clear(z);
-      omFreeBin(*a,rnumber_bin);
+      FREE_RNUMBER(*a);
       *a=INT_TO_SR(0);
     }
     else
@@ -95,7 +95,11 @@ const char * nlRead (const char *s, number *a)
       *a=nlShort3_noinline(*a);
     }
     else
-      nlNormalize(*a);
+    {
+      number aa=*a;
+      nlNormalize(aa);
+      *a=aa;
+    }
   }
   return s;
 }

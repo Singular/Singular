@@ -31,7 +31,7 @@ void number2mpz(number n, mpz_t m)
 
 number mpz2number(mpz_t m)
 {
-  number z = (number)omAllocBin(rnumber_bin);
+  number z = ALLOC_RNUMBER();
   mpz_init_set(z->z, m);
   mpz_init_set_ui(z->n, 1);
   z->s = 3;

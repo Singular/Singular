@@ -92,7 +92,17 @@ nMapFunc nlSetMap(const ring src, const ring dst);
 number nlMapGMP(number from);
 #endif
 
+//#define SI_THREADS 1
+#ifdef SI_THREADS
+#define ALLOC_RNUMBER() (number)malloc(sizeof(snumber));
+static inline number ALLOC0_RNUMBER() { number n=(number)malloc(sizeof(snumber));memset(n,0,sizeof(snumber));return n; }
+#define FREE_RNUMBER(x) free(x)
+#else
 extern omBin rnumber_bin;
+#define ALLOC_RNUMBER() (number)omAllocBin(rnumber_bin)
+#define ALLOC0_RNUMBER() (number)omAlloc0Bin(rnumber_bin)
+#define FREE_RNUMBER(x) omFreeBin((ADDRESS)x, rnumber_bin)
+#endif
 
 // in-place operations
 void nlInpGcd(number &a, number b, const ring r);

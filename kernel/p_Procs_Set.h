@@ -151,6 +151,7 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
   assume(IsValidSpec(field, length, ord));
 
   SetProcs(field, length, ord);
+  extern poly p_Mult_nn_pthread(poly p, const number n, const ring r);
   #ifdef NV_OPS
   if ((field==FieldZp) && (r->ch>NV_MAX_PRIME))
   {
@@ -159,6 +160,9 @@ void p_ProcsSet(ring r, p_Procs_s* p_Procs)
     // set all non-mult/div. routines to FieldZp-variants
     SetProcs_nv(FieldZp, length,ord); // p_Delete, p_ShallowCopyDelete...
   }
+  #endif
+  #ifdef SI_THREADS
+  else if (field==FieldQ) p_Procs->p_Mult_nn=p_Mult_nn_pthread;
   #endif
   CheckProc(p_Copy);
   CheckProc(p_Delete);

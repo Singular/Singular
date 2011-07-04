@@ -4156,15 +4156,9 @@ void idNormalize(ideal I)
 {
   if (rField_has_simple_inverse()) return; /* Z/p, GF(p,n), R, long R/C */
   int i;
-  poly p;
   for(i=IDELEMS(I)-1;i>=0;i--)
   {
-    p=I->m[i] ;
-    while(p!=NULL)
-    {
-      nNormalize(pGetCoeff(p));
-      pIter(p);
-    }
+    pNormalize(I->m[i]);
   }
 }
 

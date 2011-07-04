@@ -1753,7 +1753,7 @@ ideal interpolation(lists L, intvec *v)
       {
           if (mpz_sgn(temp->polycoef[a])!=0)
           {
-             number n=(number)omAllocBin(rnumber_bin);
+             number n=ALLOC_RNUMBER();
 #ifdef LDEBUG
              n->debug=123456;
 #endif

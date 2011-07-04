@@ -38,6 +38,8 @@ naIdeal naI = NULL;
 napoly  naMinimalPoly;
 omBin   snaIdeal_bin = omGetSpecBin(sizeof(snaIdeal));
 number  (*naMap)(number from);
+//omBin lnumber_bin = omGetSpecBin(sizeof(slnumber));
+//omBin rnumber_bin = omGetSpecBin(sizeof(snumber));
 
 void redefineFunctionPointers()
 {
@@ -199,7 +201,7 @@ number naInit(int i, const ring r)
     {
       poly z=p_Init(r->algring);
       pSetCoeff0(z,c);
-      lnumber l = (lnumber)omAllocBin(rnumber_bin);
+      lnumber l = ALLOC_LNUMBER();
       l->z = z;
       l->s = 2;
       l->n = NULL;
@@ -212,7 +214,7 @@ number naInit(int i, const ring r)
 
 number  naPar(int i)
 {
-  lnumber l = (lnumber)omAllocBin(rnumber_bin);
+  lnumber l = ALLOC_LNUMBER();
   l->s = 2;
   l->z = p_ISet(1,nacRing);
   napSetExp(l->z,i,1);
@@ -269,7 +271,7 @@ void naDelete(number *p, const ring r)
     if (l==NULL) return;
     p_Delete(&(l->z),r->algring);
     p_Delete(&(l->n),r->algring);
-    omFreeBin((ADDRESS)l,  rnumber_bin);
+    FREE_LNUMBER(l);
   }
   *p = NULL;
 }
@@ -283,7 +285,7 @@ number naCopy(number p)
   naTest(p);
   lnumber erg;
   lnumber src = (lnumber)p;
-  erg = (lnumber)omAlloc0Bin(rnumber_bin);
+  erg = ALLOC_LNUMBER();
   erg->z = p_Copy(src->z, nacRing);
   erg->n = p_Copy(src->n, nacRing);
   erg->s = src->s;
@@ -294,7 +296,7 @@ number na_Copy(number p, const ring r)
   if (p==NULL) return NULL;
   lnumber erg;
   lnumber src = (lnumber)p;
-  erg = (lnumber)omAlloc0Bin(rnumber_bin);
+  erg = (lnumber)ALLOC_LNUMBER();
   erg->z = p_Copy(src->z,r->algring);
   erg->n = p_Copy(src->n,r->algring);
   erg->s = src->s;
@@ -314,8 +316,8 @@ number naAdd(number la, number lb)
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
   #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
   if (b->n!=NULL) x = pp_Mult_qq(a->z, b->n,nacRing);
   else            x = napCopy(a->z);
@@ -326,7 +328,7 @@ number naAdd(number la, number lb)
   {
     return (number)NULL;
   }
-  lu = (lnumber)omAllocBin(rnumber_bin);
+  lu = ALLOC_LNUMBER();
   lu->z=res;
   if (a->n!=NULL)
   {
@@ -382,8 +384,8 @@ number naSub(number la, number lb)
   lnumber b = (lnumber)lb;
 
   #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
 
   napoly x, y;
@@ -396,7 +398,7 @@ number naSub(number la, number lb)
   {
     return (number)NULL;
   }
-  lu = (lnumber)omAllocBin(rnumber_bin);
+  lu = ALLOC_LNUMBER();
   lu->z=res;
   if (a->n!=NULL)
   {
@@ -438,13 +440,13 @@ number naMult(number la, number lb)
   napoly x;
 
   #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
   naTest(la);
   naTest(lb);
 
-  lo = (lnumber)omAllocBin(rnumber_bin);
+  lo = ALLOC_LNUMBER();
   lo->z = pp_Mult_qq(a->z, b->z,nacRing);
 
   if (a->n==NULL)
@@ -492,7 +494,7 @@ number naMult(number la, number lb)
   lo->s = 0;
   if(lo->z==NULL)
   {
-    omFreeBin((ADDRESS)lo, rnumber_bin);
+    FREE_LNUMBER(lo);
     lo=NULL;
   }
   else if (lo->n!=NULL)
@@ -524,7 +526,7 @@ number naIntDiv(number la, number lb)
   }
   assume(a->z!=NULL && b->z!=NULL);
   assume(a->n==NULL && b->n==NULL);
-  res = (lnumber)omAllocBin(rnumber_bin);
+  res = ALLOC_LNUMBER();
   res->z = napCopy(a->z);
   res->n = napCopy(b->z);
   res->s = 0;
@@ -555,10 +557,10 @@ number naDiv(number la, number lb)
     return NULL;
   }
   #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
-  lo = (lnumber)omAllocBin(rnumber_bin);
+  lo = ALLOC_LNUMBER();
   if (b->n!=NULL)
     lo->z = pp_Mult_qq(a->z, b->n,nacRing);
   else
@@ -632,9 +634,9 @@ number naInvers(number a)
     return NULL;
   }
   #ifdef LDEBUG
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
-  lo = (lnumber)omAlloc0Bin(rnumber_bin);
+  lo = ALLOC0_LNUMBER();
   lo->s = b->s;
   if (b->n!=NULL)
     lo->z = napCopy(b->n);
@@ -783,7 +785,7 @@ const char  *naRead(const char *s, number *p)
     *p = NULL;
     return s;
   }
-  *p = (number)omAlloc0Bin(rnumber_bin);
+  *p = (number)ALLOC0_LNUMBER();
   a = (lnumber)*p;
   if ((naMinimalPoly!=NULL)
   && (p_GetExp(x,1,nacRing) >= p_GetExp(naMinimalPoly,1,nacRing)))
@@ -798,7 +800,7 @@ const char  *naRead(const char *s, number *p)
     a->z = x;
   if(a->z==NULL)
   {
-    omFreeBin((ADDRESS)*p, rnumber_bin);
+    FREE_LNUMBER(a);
     *p=NULL;
   }
   else
@@ -878,7 +880,7 @@ BOOLEAN naIsOne(number za)
   number t;
   if (a==NULL) return FALSE;
 #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
   if (a->z==NULL)
   {
     WerrorS("internal zero error(4)");
@@ -936,7 +938,7 @@ BOOLEAN naIsMOne(number za)
   number t;
   if (a==NULL) return FALSE;
 #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
   if (a->z==NULL)
   {
     WerrorS("internal zero error(5)");
@@ -975,7 +977,7 @@ number naGcd(number a, number b, const ring r)
   if (b==NULL)  return naCopy(a);
 
   lnumber x, y;
-  lnumber result = (lnumber)omAlloc0Bin(rnumber_bin);
+  lnumber result = ALLOC0_LNUMBER();
 
   x = (lnumber)a;
   y = (lnumber)b;
@@ -1375,7 +1377,7 @@ number naLcm(number la, number lb, const ring r)
   lnumber result;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  result = (lnumber)omAlloc0Bin(rnumber_bin);
+  result = ALLOC0_LNUMBER();
   naTest(la);
   naTest(lb);
   napoly x = p_Copy(a->z, r->algring);
@@ -1461,7 +1463,7 @@ void naSetIdeal(ideal I)
 number naMapP0(number c)
 {
   if (npIsZero(c)) return NULL;
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   int i=(int)((long)c);
@@ -1477,7 +1479,7 @@ number naMapP0(number c)
 number naMap00(number c)
 {
   if (nlIsZero(c)) return NULL;
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=0;
   l->z=(napoly)p_Init(nacRing);
   pGetCoeff(l->z)=nlCopy(c);
@@ -1491,7 +1493,7 @@ number naMap00(number c)
 number naMapPP(number c)
 {
   if (npIsZero(c)) return NULL;
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   pGetCoeff(l->z)=c; /* omit npCopy, because npCopy is a no-op */
@@ -1509,7 +1511,7 @@ number naMapPP1(number c)
   if (i>(long)ntMapRing->ch) i-=(long)ntMapRing->ch;
   number n=npInit(i,ntMapRing);
   if (npIsZero(n)) return NULL;
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   pGetCoeff(l->z)=n;
@@ -1526,7 +1528,7 @@ number naMap0P(number c)
   number n=npInit(nlModP(c,npPrimeM),nacRing);
   if (npIsZero(n)) return NULL;
   npTest(n);
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   pGetCoeff(l->z)=n;
@@ -1540,7 +1542,7 @@ number naMap0P(number c)
 number naMapQaQb(number c)
 {
   if (c==NULL) return NULL;
-  lnumber erg= (lnumber)omAlloc0Bin(rnumber_bin);
+  lnumber erg= ALLOC_LNUMBER();
   lnumber src =(lnumber)c;
   erg->s=src->s;
   erg->z=napMap(src->z);
@@ -1651,7 +1653,7 @@ BOOLEAN naDBTest(number a, const char *f,const int l)
   if (x == NULL)
     return TRUE;
   #ifdef LDEBUG
-  omCheckAddrSize(a, sizeof(snumber));
+  omCheckAddrSize(a, sizeof(slnumber));
   #endif
   napoly p = x->z;
   if (p==NULL)

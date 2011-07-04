@@ -3054,7 +3054,6 @@ ring rModifyRing_Simple(ring r, BOOLEAN ommit_degree, BOOLEAN ommit_comp, unsign
     simple=FALSE; // sorting needed
     assume (r != NULL );
     assume (exp_limit > 1);
-    BOOLEAN omitted_degree = FALSE;
     int bits;
 
     exp_limit=rGetExpSize(exp_limit, bits, r->N);
@@ -4838,7 +4837,6 @@ ring rCurrRingAssure_SyzComp_CompLastBlock()
 static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
 {
   int r_blocks = rBlocks(currRing);
-  int i;
 
   assume(b1 == ringorder_c || b1 == ringorder_C ||
          b2 == ringorder_c || b2 == ringorder_C ||
@@ -4882,7 +4880,6 @@ static ring rCurrRingAssure_Global(rRingOrder_t b1, rRingOrder_t b2)
   rChangeCurrRing(res);
   return res;
 }
-
 
 ring rAssure_InducedSchreyerOrdering(const ring r, BOOLEAN complete = TRUE, int sgn = 1)
 { // TODO: ???? Add leading Syz-comp ordering here...????
@@ -5323,16 +5320,16 @@ static int rRealloc1(ring r, int size, int pos)
   size++;
   return size;
 }
-static int rReallocM1(ring r, ring src, int size, int pos)
-{
-  r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size-1)*sizeof(int));
-  r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size-1)*sizeof(int));
-  r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size-1)*sizeof(int));
-  r->wvhdl=(int_ptr*)omReallocSize(r->wvhdl,size*sizeof(int_ptr), (size-1)*sizeof(int_ptr));
-  for(int k=pos+1; k<size; k++) r->wvhdl[k]=r->wvhdl[k+1];
-  size--;
-  return size;
-}
+//static int rReallocM1(ring r, ring src, int size, int pos)
+//{
+//  r->order=(int*)omReallocSize(r->order, size*sizeof(int), (size-1)*sizeof(int));
+//  r->block0=(int*)omReallocSize(r->block0, size*sizeof(int), (size-1)*sizeof(int));
+//  r->block1=(int*)omReallocSize(r->block1, size*sizeof(int), (size-1)*sizeof(int));
+//  r->wvhdl=(int_ptr*)omReallocSize(r->wvhdl,size*sizeof(int_ptr), (size-1)*sizeof(int_ptr));
+//  for(int k=pos+1; k<size; k++) r->wvhdl[k]=r->wvhdl[k+1];
+//  size--;
+//  return size;
+//}
 static void rOppWeight(int *w, int l)
 {
   int i2=(l+1)/2;
@@ -5519,7 +5516,7 @@ ring rOpposite(ring src)
         r->order[j]=ringorder_a;
         r->block0[j]=rOppVar(r, src->block1[i]);
         r->block1[j]=rOppVar(r, src->block0[i]);
-        r->wvhdl[j]=r->wvhdl[j+1]; r->wvhdl[j+1]=r->wvhdl[j+1]=NULL;
+        r->wvhdl[j]=r->wvhdl[j+1]; r->wvhdl[j+1]=NULL;
         rOppWeight(r->wvhdl[j], r->block1[j]-r->block0[j]);
         j++;
         r->order[j]=ringorder_rp;
@@ -5727,10 +5724,6 @@ BOOLEAN nc_rComplete(const ring src, ring dest, bool bSetupQuotient)
 
   matrix C0 = src->GetNC()->C;
   matrix D0 = src->GetNC()->D;
-
-
-  poly p = NULL;
-  number n = NULL;
 
   // map C and D into dest
   for (int i = 1; i < N; i++)

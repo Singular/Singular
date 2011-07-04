@@ -57,7 +57,7 @@ BOOLEAN ntDBTest(number a, const char *f,const int l);
 #define ntTest(a)
 #endif
 
-static number ntdGcd( number a, number b, const ring r) { return nacInit(1,r); }
+//static number ntdGcd( number a, number b, const ring r) { return nacInit(1,r); }
 /*2
 *  sets the appropriate operators
 */
@@ -942,17 +942,16 @@ poly napPermNumber(number z, int * par_perm, int P, ring oldRing)
   {
     p = pInit();
     pNext(p)=NULL;
-    nNew(&pGetCoeff(p));
+    //nNew(&pGetCoeff(p));
     int i;
-    for(i=pVariables;i;i--)
-       pSetExp(p,i, 0);
-    if (rRing_has_Comp(currRing)) pSetComp(p, 0);
+    //for(i=pVariables;i;i--) pSetExp(p,i, 0); // done by pInit
+    //if (rRing_has_Comp(currRing)) pSetComp(p, 0); // done by pInit
     napoly pa=NULL;
     lnumber pan;
     if (currRing->parameter!=NULL)
     {
       assume(oldRing->algring!=NULL);
-      pGetCoeff(p)=(number)omAlloc0Bin(rnumber_bin);
+      pGetCoeff(p)=(number)ALLOC0_LNUMBER();
       pan=(lnumber)pGetCoeff(p);
       pan->s=2;
       pan->z=napInitz(nMap(pGetCoeff(za)));
@@ -1027,7 +1026,7 @@ number   napGetDenom(number &n, const ring r)
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
-    lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+    lnumber rr=ALLOC0_LNUMBER();
     rr->z=p_Copy(x->n,r->algring);
     rr->s = 2;
     return (number)rr;
@@ -1038,7 +1037,7 @@ number   napGetDenom(number &n, const ring r)
 number   napGetNumerator(number &n, const ring r)
 {
   lnumber x=(lnumber)n;
-  lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+  lnumber rr=ALLOC0_LNUMBER();
   rr->z=p_Copy(x->z,r->algring);
   rr->s = 2;
   return (number)rr;
@@ -1058,7 +1057,7 @@ number ntInit(int i, const ring r)
     {
       poly z=p_Init(r->algring);
       pSetCoeff0(z,c);
-      lnumber l = (lnumber)omAllocBin(rnumber_bin);
+      lnumber l = (lnumber)ALLOC_LNUMBER();
       l->z = z;
       l->s = 2;
       l->n = NULL;
@@ -1102,7 +1101,7 @@ napoly ntRemainder(napoly f, const napoly g)
 
 number  ntPar(int i)
 {
-  lnumber l = (lnumber)omAllocBin(rnumber_bin);
+  lnumber l = ALLOC_LNUMBER();
   l->s = 2;
   l->z = p_ISet(1,nacRing);
   napSetExp(l->z,i,1);
@@ -1159,7 +1158,7 @@ void ntDelete(number *p, const ring r)
     if (l==NULL) return;
     p_Delete(&(l->z),r->algring);
     p_Delete(&(l->n),r->algring);
-    omFreeBin((ADDRESS)l,  rnumber_bin);
+    FREE_LNUMBER(l);
   }
   *p = NULL;
 }
@@ -1173,7 +1172,7 @@ number ntCopy(number p)
   ntTest(p);
   lnumber erg;
   lnumber src = (lnumber)p;
-  erg = (lnumber)omAlloc0Bin(rnumber_bin);
+  erg = ALLOC_LNUMBER();
   erg->z = p_Copy(src->z, nacRing);
   erg->n = p_Copy(src->n, nacRing);
   erg->s = src->s;
@@ -1184,7 +1183,7 @@ number nt_Copy(number p, const ring r)
   if (p==NULL) return NULL;
   lnumber erg;
   lnumber src = (lnumber)p;
-  erg = (lnumber)omAlloc0Bin(rnumber_bin);
+  erg = ALLOC_LNUMBER();
   erg->z = p_Copy(src->z,r->algring);
   erg->n = p_Copy(src->n,r->algring);
   erg->s = src->s;
@@ -1204,8 +1203,8 @@ number ntAdd(number la, number lb)
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
   #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
   if (b->n!=NULL) x = pp_Mult_qq(a->z, b->n,nacRing);
   else            x = napCopy(a->z);
@@ -1216,7 +1215,7 @@ number ntAdd(number la, number lb)
   {
     return (number)NULL;
   }
-  lu = (lnumber)omAllocBin(rnumber_bin);
+  lu = ALLOC_LNUMBER();
   lu->z=res;
   if (a->n!=NULL)
   {
@@ -1272,8 +1271,8 @@ number ntSub(number la, number lb)
   lnumber b = (lnumber)lb;
 
   #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
 
   napoly x, y;
@@ -1286,7 +1285,7 @@ number ntSub(number la, number lb)
   {
     return (number)NULL;
   }
-  lu = (lnumber)omAllocBin(rnumber_bin);
+  lu = ALLOC_LNUMBER();
   lu->z=res;
   if (a->n!=NULL)
   {
@@ -1327,13 +1326,13 @@ number ntMult(number la, number lb)
   napoly x;
 
   #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
   ntTest(la);
   ntTest(lb);
 
-  lo = (lnumber)omAllocBin(rnumber_bin);
+  lo = ALLOC_LNUMBER();
   lo->z = pp_Mult_qq(a->z, b->z,nacRing);
 
   if (a->n==NULL)
@@ -1360,7 +1359,7 @@ number ntMult(number la, number lb)
   lo->s = 0;
   if(lo->z==NULL)
   {
-    omFreeBin((ADDRESS)lo, rnumber_bin);
+    FREE_LNUMBER(lo);
     lo=NULL;
   }
   else if (lo->n!=NULL)
@@ -1393,12 +1392,12 @@ number ntIntDiv(number la, number lb)
     return NULL;
   }
 #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
 #endif
   assume(a->z!=NULL && b->z!=NULL);
   assume(a->n==NULL && b->n==NULL);
-  res = (lnumber)omAllocBin(rnumber_bin);
+  res = ALLOC_LNUMBER();
   res->z = napCopy(a->z);
   res->n = napCopy(b->z);
   res->s = 0;
@@ -1429,10 +1428,10 @@ number ntDiv(number la, number lb)
     return NULL;
   }
   #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
-  lo = (lnumber)omAllocBin(rnumber_bin);
+  lo = ALLOC_LNUMBER();
   if (b->n!=NULL)
     lo->z = pp_Mult_qq(a->z, b->n,nacRing);
   else
@@ -1487,9 +1486,9 @@ number ntInvers(number a)
     return NULL;
   }
   #ifdef LDEBUG
-  omCheckAddrSize(b,sizeof(snumber));
+  omCheckAddrSize(b,sizeof(slnumber));
   #endif
-  lo = (lnumber)omAlloc0Bin(rnumber_bin);
+  lo = ALLOC0_LNUMBER();
   lo->s = b->s;
   if (b->n!=NULL)
     lo->z = napCopy(b->n);
@@ -1622,12 +1621,12 @@ const char  *ntRead(const char *s, number *p)
     *p = NULL;
     return s;
   }
-  *p = (number)omAlloc0Bin(rnumber_bin);
+  *p = (number)ALLOC0_LNUMBER();
   a = (lnumber)*p;
   a->z = x;
   if(a->z==NULL)
   {
-    omFreeBin((ADDRESS)*p, rnumber_bin);
+    FREE_LNUMBER(a);
     *p=NULL;
   }
   else
@@ -1703,10 +1702,9 @@ void ntWrite(number &phn, const ring r)
 BOOLEAN ntIsOne(number za)
 {
   lnumber a = (lnumber)za;
-  number t;
   if (a==NULL) return FALSE;
 #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
   if (a->z==NULL)
   {
     WerrorS("internal zero error(4)");
@@ -1722,6 +1720,7 @@ BOOLEAN ntIsOne(number za)
     else                 return FALSE;
   }
 #if 0
+  number t;
   x = a->z;
   y = a->n;
   do
@@ -1762,7 +1761,7 @@ BOOLEAN ntIsMOne(number za)
   lnumber a = (lnumber)za;
   if (a==NULL) return FALSE;
 #ifdef LDEBUG
-  omCheckAddrSize(a,sizeof(snumber));
+  omCheckAddrSize(a,sizeof(slnumber));
   if (a->z==NULL)
   {
     WerrorS("internal zero error(5)");
@@ -1801,7 +1800,7 @@ number ntGcd(number a, number b, const ring r)
   if (b==NULL)  return ntCopy(a);
 
   lnumber x, y;
-  lnumber result = (lnumber)omAlloc0Bin(rnumber_bin);
+  lnumber result = ALLOC0_LNUMBER();
 
   x = (lnumber)a;
   y = (lnumber)b;
@@ -2162,7 +2161,7 @@ number ntLcm(number la, number lb, const ring r)
   lnumber result;
   lnumber a = (lnumber)la;
   lnumber b = (lnumber)lb;
-  result = (lnumber)omAlloc0Bin(rnumber_bin);
+  result = ALLOC0_LNUMBER();
   ntTest(la);
   ntTest(lb);
   napoly x = p_Copy(a->z, r->algring);
@@ -2204,7 +2203,7 @@ number ntLcm(number la, number lb, const ring r)
 number ntMapP0(number c)
 {
   if (npIsZero(c)) return NULL;
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   int i=(int)((long)c);
@@ -2220,7 +2219,7 @@ number ntMapP0(number c)
 number ntMap00(number c)
 {
   if (nlIsZero(c)) return NULL;
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=0;
   l->z=(napoly)p_Init(nacRing);
   pGetCoeff(l->z)=nlCopy(c);
@@ -2234,7 +2233,7 @@ number ntMap00(number c)
 number ntMapPP(number c)
 {
   if (npIsZero(c)) return NULL;
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   pGetCoeff(l->z)=c; /* omit npCopy, because npCopy is a no-op */
@@ -2252,7 +2251,7 @@ number ntMapPP1(number c)
   if (i>(long)ntMapRing->ch) i-=(long)ntMapRing->ch;
   number n=npInit(i,ntMapRing);
   if (npIsZero(n)) return NULL;
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   pGetCoeff(l->z)=n;
@@ -2269,7 +2268,7 @@ number ntMap0P(number c)
   number n=npInit(nlModP(c,npPrimeM),nacRing);
   if (npIsZero(n)) return NULL;
   npTest(n);
-  lnumber l=(lnumber)omAllocBin(rnumber_bin);
+  lnumber l=ALLOC_LNUMBER();
   l->s=2;
   l->z=(napoly)p_Init(nacRing);
   pGetCoeff(l->z)=n;
@@ -2283,7 +2282,7 @@ number ntMap0P(number c)
 number ntMapQaQb(number c)
 {
   if (c==NULL) return NULL;
-  lnumber erg= (lnumber)omAlloc0Bin(rnumber_bin);
+  lnumber erg= ALLOC0_LNUMBER();
   lnumber src =(lnumber)c;
   erg->s=src->s;
   erg->z=napMap(src->z);
@@ -2397,7 +2396,7 @@ poly ntPermNumber(number z, int * par_perm, int P, ring oldRing)
     if (currRing->parameter!=NULL)
     {
       assume(oldRing->algring!=NULL);
-      pGetCoeff(p)=(number)omAlloc0Bin(rnumber_bin);
+      pGetCoeff(p)=(number)ALLOC0_LNUMBER();
       pan=(lnumber)pGetCoeff(p);
       pan->s=2;
       pan->z=napInitz(nMap(pGetCoeff(za)));
@@ -2467,7 +2466,7 @@ number   ntGetDenom(number &n, const ring r)
   lnumber x=(lnumber)n;
   if (x->n!=NULL)
   {
-    lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+    lnumber rr=ALLOC0_LNUMBER();
     rr->z=p_Copy(x->n,r->algring);
     rr->s = 2;
     return (number)rr;
@@ -2478,7 +2477,7 @@ number   ntGetDenom(number &n, const ring r)
 number   ntGetNumerator(number &n, const ring r)
 {
   lnumber x=(lnumber)n;
-  lnumber rr=(lnumber)omAlloc0Bin(rnumber_bin);
+  lnumber rr=ALLOC0_LNUMBER();
   rr->z=p_Copy(x->z,r->algring);
   rr->s = 2;
   return (number)rr;
@@ -2491,7 +2490,7 @@ BOOLEAN ntDBTest(number a, const char *f,const int l)
   if (x == NULL)
     return TRUE;
   #ifdef LDEBUG
-  omCheckAddrSize(a, sizeof(snumber));
+  omCheckAddrSize(a, sizeof(slnumber));
   #endif
   napoly p = x->z;
   if (p==NULL)

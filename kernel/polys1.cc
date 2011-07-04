@@ -497,7 +497,7 @@ void p_Content(poly ph, const ring r)
         nDelete(&tmpNumber);
         poly h = pNext(ph);
 	p_Mult_nn(ph,k,currRing);
-	if (!rField_has_simple_inverse()) pNormalize(ph);
+	pNormalize(ph);
       }
       nDelete(&k);
     }

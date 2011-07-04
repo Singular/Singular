@@ -448,7 +448,7 @@ static number npMapLongR(number from)
     e=(*f)[0]._mp_exp-size;
   else
     e=0;
-  res = (number)omAllocBin(rnumber_bin);
+  res = ALLOC_RNUMBER();
 #if defined(LDEBUG)
   res->debug=123456;
 #endif
@@ -485,9 +485,9 @@ static number npMapLongR(number from)
   dest->_mp_alloc = al;
   iz=mpz_fdiv_ui(dest,npPrimeM);
   mpz_clear(dest);
-  omFreeBin((ADDRESS)res, rnumber_bin);
   if(res->s==0)
     iz=(long)npDiv((number)iz,(number)in);
+  FREE_RNUMBER(res);
   return (number)iz;
 }
 

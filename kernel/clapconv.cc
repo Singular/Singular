@@ -81,7 +81,7 @@ number convFactoryNSingN( const CanonicalForm & n, const ring r)
   }
   else
   {
-    number z=(number)omAllocBin(rnumber_bin);
+    number z=ALLOC_RNUMBER();
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
@@ -143,7 +143,7 @@ static void conv_RecPP ( const CanonicalForm & f, int * exp, sBucket_pt result, 
       pGetCoeff( term ) = n_Init( f.intval(), r );
     else
     {
-      number z=(number)omAllocBin(rnumber_bin);
+      number z=ALLOC_RNUMBER();
 #if defined(LDEBUG)
       z->debug=123456;
 #endif
@@ -299,7 +299,7 @@ static void convRecAP_R ( const CanonicalForm & f, int * exp, poly & result, int
         //z->e[i-1]+=exp[i];
           p_AddExp(z,i,exp[i-par_start],r->algring);
       }
-      pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
+      pGetCoeff(term)=(number)ALLOC0_LNUMBER();
       ((lnumber)pGetCoeff(term))->z=z;
       p_Setm( term,r );
       result = p_Add_q( result, term, r );
@@ -357,7 +357,7 @@ static number convFactoryNSingAN( const CanonicalForm &f, const ring r)
     return n_Init( f.intval(), r->algring );
   else
   {
-    number z=(number)omAllocBin(rnumber_bin);
+    number z=ALLOC_RNUMBER();
 #if defined(LDEBUG)
     z->debug=123456;
 #endif
@@ -470,7 +470,7 @@ convRecTrP ( const CanonicalForm & f, int * exp, poly & result , int offs, const
     for ( int i = rVar(r); i>0; i-- )
       p_SetExp( term, i ,exp[i], r);
     //if (rRing_has_Comp(currRing)) p_SetComp(term, 0, currRing); // done by pInit
-    pGetCoeff(term)=(number)omAlloc0Bin(rnumber_bin);
+    pGetCoeff(term)=(number)ALLOC0_LNUMBER();
     ((lnumber)pGetCoeff(term))->z=convFactoryPSingP( f, r->algring );
     p_Setm( term,r );
     result = p_Add_q( result, term,r );

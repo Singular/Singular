@@ -229,7 +229,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
   else if (node == MP_ApIntType)
   {
     mpz_ptr gnum;
-    y =  (number) omAlloc0Bin(rnumber_bin);
+    y =  ALLOC0_RNUMBER();
 #if defined(LDEBUG)
     y->debug = 123456;
 #endif
@@ -250,7 +250,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
       mpt_failr(MPT_SkipAnnots(link, num_annots, &req));
       if (req) return mpsr_SetError(mpsr_ReqAnnotSkip);
     }
-    *x =  (number) omAlloc0Bin(rnumber_bin);
+    *x =  (number) ALLOC0_RNUMBER();
     y = (number) *x;
 #if defined(LDEBUG)
     y->debug = 123456;
@@ -275,7 +275,7 @@ static mpsr_Status_t GetRationalNumber(MP_Link_pt link, number *x)
     else
     {
       // otherwise, make an apint out of it
-      *x =  (number) omAlloc0Bin(rnumber_bin);
+      *x =  (number) ALLOC0_RNUMBER();
       y = (number) *x;
 #if defined(LDEBUG)
       y->debug = 123456;
@@ -352,7 +352,7 @@ static mpsr_Status_t GetAlgNumber(MP_Link_pt link, number *a)
   else if (ut == 1 || ut == 2)
   {
     // single number
-    b = (lnumber) omAlloc0Bin(rnumber_bin);
+    b = (lnumber) ALLOC0_RNUMBER();
     *a = (number) b;
     failr(GetAlgPoly(link, &(b->z)));
     if (ut == 2)

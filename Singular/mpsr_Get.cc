@@ -171,7 +171,7 @@ static inline void InitIntLeftv(mpsr_leftv mlv, int i)
 
 static inline void InitApIntLeftv(mpsr_leftv mlv, mpz_ptr apint)
 {
-  number n = (number) omAllocBin(rnumber_bin);
+  number n = (number) ALLOC_RNUMBER();
 #if defined(LDEBUG)
     n->debug=123456;
 #endif
