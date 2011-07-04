@@ -962,8 +962,14 @@ void Warn(const char *fmt, ...)
 
 // some routines which redirect the output of print to a string
 static char* sprint = NULL;
+static char* sprint_backup = NULL;
 void SPrintStart()
 {
+  if (sprint!=NULL)
+  {
+    if (sprint_backup!=NULL) WerrorS("internal error: SPrintStart");
+    else sprint_backup=sprint;
+  }
   sprint = omStrDup("");
 }
 
@@ -987,7 +993,8 @@ static void SPrintS(const char* s)
 char* SPrintEnd()
 {
   char* ns = sprint;
-  sprint = NULL;
+  sprint = sprint_backup;
+  sprint_backup=NULL;
   omCheckAddr(ns);
   return ns;
 }
