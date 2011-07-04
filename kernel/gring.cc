@@ -1828,8 +1828,8 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 
   M2=p_Add_q(M2,M1,r);                           // M2 = spoly(lt(p1), lt(p2)) + m1 * tail(p1), delete M1
-  M1=NULL;
 #ifdef PDEBUG
+  M1=NULL;
   p_Test(M2,r);
 
 #if MYTEST
@@ -1857,9 +1857,9 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 
   M2 = p_Add_q(M2,M1,r);                           // M2 = spoly(lt(p1), lt(p2)) + m1 * tail(p1) + m2*tail(p2)
-  M1=NULL;
 
 #ifdef PDEBUG
+  M1=NULL;
   p_Test(M2,r);
 
 #if MYTEST
@@ -1867,7 +1867,6 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 
 #endif
-                                                 // delete M1
 
   p_Delete(&m1,r);  //  => n_Delete(&C1,r);
   p_Delete(&m2,r);  //  => n_Delete(&C2,r);
@@ -1877,7 +1876,6 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 
   if (M2!=NULL) p_Cleardenom(M2,r);
-//  if (M2!=NULL) p_Content(M2);
 
   return(M2);
 }
