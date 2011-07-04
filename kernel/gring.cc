@@ -575,7 +575,6 @@ poly gnc_mm_Mult_nn(int *F0, int *G0, const ring r)
 
   /* now we have to destroy out! */
   p_Delete(&out,r);
-  out = NULL;
 
   if (iG==jG)
     /* g is univariate monomial */
@@ -1487,6 +1486,7 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
   p2 = p_Mult_nn(p2, C, r); // p2 !!!
   p_Test(p2,r);
   n_Delete(&C,r);
+  n_Delete(&cG,r);
 
   poly out = nc_mm_Mult_pp(m, pNext(p1), r);
   p_Delete(&m,r);
@@ -1739,16 +1739,21 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
        return(NULL);
   }
 
-  number C1  = n_Copy(p_GetCoeff(M1,r),r);      // C1 = lc(M1)
-  number C2  = n_Copy(p_GetCoeff(M2,r),r);      // C2 = lc(M2)
+  number C1  = p_GetCoeff(M1,r);      // C1 = lc(M1)
+  number C2  = p_GetCoeff(M2,r);      // C2 = lc(M2)
 
   /* GCD stuff */
   number C = nGcd(C1, C2, r);                     // C = gcd(C1, C2)
 
   if (!n_IsOne(C, r))                              // if C != 1
   {
-    C1=n_Div(C1, C, r);                              // C1 = C1 / C
-    C2=n_Div(C2, C, r);                              // C2 = C2 / C
+    C1=n_Div(C1, C, r);                            // C1 = C1 / C
+    C2=n_Div(C2, C, r);                            // C2 = C2 / C
+  }
+  else
+  {
+    C1=n_Copy(C1,r);
+    C2=n_Copy(C2,r);
   }
 
   n_Delete(&C,r); // destroy the number C
@@ -1823,6 +1828,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 
   M2=p_Add_q(M2,M1,r);                           // M2 = spoly(lt(p1), lt(p2)) + m1 * tail(p1), delete M1
+  M1=NULL;
 #ifdef PDEBUG
   p_Test(M2,r);
 
@@ -1851,6 +1857,7 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
 
   M2 = p_Add_q(M2,M1,r);                           // M2 = spoly(lt(p1), lt(p2)) + m1 * tail(p1) + m2*tail(p2)
+  M1=NULL;
 
 #ifdef PDEBUG
   p_Test(M2,r);
