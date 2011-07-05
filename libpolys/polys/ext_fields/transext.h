@@ -9,7 +9,7 @@
 *           transcendental variables t_1, ..., t_s, where s >= 1.
 *           Denoting the implemented coeffs object by cf, then these numbers
 *           are represented as quotients of polynomials in the polynomial
-*           ring K[t_1, .., t_s] represented by cf->algring.
+*           ring K[t_1, .., t_s] represented by cf->extring.
 */
 
 #include <coeffs/coeffs.h>

@@ -7,7 +7,7 @@
 *           transcendental variables t_1, ..., t_s, where s >= 1.
 *           Denoting the implemented coeffs object by cf, then these numbers
 *           are represented as quotients of polynomials in the polynomial
-*           ring K[t_1, .., t_s] represented by cf->algring.
+*           ring K[t_1, .., t_s] represented by cf->extring.
 */
 
 #include "config.h"
@@ -614,14 +614,17 @@ void ntWrite(number &a, const coeffs cf)
   else
   {
     fraction f = (fraction)a;
-    BOOLEAN useBrackets = (!p_IsConstant(NUM(f), ntRing)) && (!DENIS1(f));
+    BOOLEAN useBrackets = (!p_IsConstant(NUM(f), ntRing)) ||
+                          (!n_GreaterZero(p_GetCoeff(NUM(f), ntRing),
+                                          ntCoeffs));
     if (useBrackets) StringAppendS("(");
     p_String0(NUM(f), ntRing, ntRing);
     if (useBrackets) StringAppendS(")");
     if (!DENIS1(f))
     {
       StringAppendS("/");
-      useBrackets = !p_IsConstant(DEN(f), ntRing);
+      useBrackets = (!p_IsConstant(DEN(f), ntRing)) ||
+                    (!n_GreaterZero(p_GetCoeff(DEN(f), ntRing), ntCoeffs));
       if (useBrackets) StringAppendS("(");
       p_String0(DEN(f), ntRing, ntRing);
       if (useBrackets) StringAppendS(")");
