@@ -191,26 +191,6 @@ int myCompress (const CanonicalForm& F, const CanonicalForm& G, CFMap & M,
   return 1;
 }
 
-CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M)
-{ // polynomials in M.mvar() are considered coefficients
-  // M univariate monic polynomial
-  // the coefficients of f are reduced modulo M
-  if(f.inBaseDomain() || f.level() < M.level())
-    return f;
-  if(f.level() == M.level())
-  {
-    if(f.degree() < M.degree())
-      return f;
-    CanonicalForm tmp = mod (f, M);
-    return tmp;
-  }
-  // here: f.level() > M.level()
-  CanonicalForm result = 0;
-  for(CFIterator i=f; i.hasTerms(); i++)
-    result += reduce(i.coeff(),M) * power(f.mvar(),i.exp());
-  return result;
-}
-
 void tryInvert( const CanonicalForm & F, const CanonicalForm & M, CanonicalForm & inv, bool & fail )
 { // F, M are required to be "univariate" polynomials in an algebraic variable
   // we try to invert F modulo M

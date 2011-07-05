@@ -256,6 +256,8 @@ int totaldegree ( const CanonicalForm & f, const Variable & v1, const Variable &
 int size ( const CanonicalForm & f, const Variable & v );
 
 int size ( const CanonicalForm & f );
+
+CanonicalForm reduce ( const CanonicalForm& f, const CanonicalForm & M);
 //}}}
 
 //{{{ inline functions corresponding to CanonicalForm methods

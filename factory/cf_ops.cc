@@ -658,3 +658,23 @@ size ( const CanonicalForm & f )
     }
 }
 //}}}
+
+CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M)
+{ // polynomials in M.mvar() are considered coefficients
+  // M univariate monic polynomial
+  // the coefficients of f are reduced modulo M
+  if(f.inBaseDomain() || f.level() < M.level())
+    return f;
+  if(f.level() == M.level())
+  {
+    if(f.degree() < M.degree())
+      return f;
+    CanonicalForm tmp = mod (f, M);
+    return tmp;
+  }
+  // here: f.level() > M.level()
+  CanonicalForm result = 0;
+  for(CFIterator i=f; i.hasTerms(); i++)
+    result += reduce(i.coeff(),M) * power(f.mvar(),i.exp());
+  return result;
+}

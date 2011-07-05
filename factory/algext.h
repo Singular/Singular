@@ -19,7 +19,6 @@ int * leadDeg(const CanonicalForm & f, int *degs);
 bool isLess(int *a, int *b, int lower, int upper);
 bool isEqual(int *a, int *b, int lower, int upper);
 CanonicalForm firstLC(const CanonicalForm & f);
-CanonicalForm reduce(const CanonicalForm & f, const CanonicalForm & M);
 
 #endif
 
