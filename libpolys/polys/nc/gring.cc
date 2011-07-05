@@ -1429,8 +1429,8 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
 #endif
   /* pSetComp(m,r)=0? */
   poly   N  = nc_mm_Mult_p(m, p_Head(p1,r), r);
-  number C  = p_GetCoeff(N,  r);
-  number cF = p_GetCoeff(p2, r);
+  number C  =  p_GetCoeff(N,  r);
+  number cF =  p_GetCoeff(p2, r);
   /* GCD stuff */
   number cG = n_Gcd(C, cF, r);
   if ( !n_IsOne(cG,r) )
@@ -1462,7 +1462,6 @@ poly gnc_ReduceSpolyOld(const poly p1, poly p2/*,poly spNoether*/, const ring r)
   n_Delete(&cF,r);
   n_Delete(&C,r);
   return(out);
-
 }
 
 poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
@@ -1490,16 +1489,16 @@ poly gnc_ReduceSpolyNew(const poly p1, poly p2, const ring r)
   /* pSetComp(m,r)=0? */
   poly   N  = nc_mm_Mult_p(m, p_Head(p1,r), r);
 
-  number C  =  p_GetCoeff(N,  r);
-  number cF =  p_GetCoeff(p2, r);
+  number C  = p_GetCoeff(N,  r);
+  number cF = p_GetCoeff(p2, r);
 
   /* GCD stuff */
   number cG = n_Gcd(C, cF, r);
 
   if (!n_IsOne(cG, r))
   {
-    cF = n_Div(cF, cG, r); n_Normalize(cF,r);
-    C  = n_Div(C,  cG, r); n_Normalize(C,r);
+    cF = n_Div(cF, cG, r); n_Normalize(cF, r);
+    C  = n_Div(C,  cG, r); n_Normalize(C, r);
   }
   else
   {
@@ -1583,13 +1582,13 @@ poly gnc_CreateSpolyOld(poly p1, poly p2/*,poly spNoether*/, const ring r)
   number C = n_Gcd(C1,C2,r);
   if (!n_IsOne(C,r))
   {
-    C1=n_Div(C1,C,r);n_Normalize(C1,r);
-    C2=n_Div(C2,C,r);n_Normalize(C1,r);
+    C1=n_Div(C1,C, r);n_Normalize(C1,r);
+    C2=n_Div(C2,C, r);n_Normalize(C2,r);
   }
   else
   {
-    C1=n_Copy(C1,r);
-    C2=n_Copy(C2,r);
+    C1=n_Copy(C1, r);
+    C2=n_Copy(C2, r);
   }
   nDelete(&C);
   M1=p_Mult_nn(M1,C2,r);
@@ -1774,10 +1773,8 @@ poly gnc_CreateSpolyNew(poly p1, poly p2/*,poly spNoether*/, const ring r)
 
   if (!n_IsOne(C, r))                              // if C != 1
   {
-    C1=n_Div(C1, C, r);                            // C1 = C1 / C
-    n_Normalize(C1,r);
-    C2=n_Div(C2, C, r);                            // C2 = C2 / C
-    n_Normalize(C2,r);
+    C1=n_Div(C1, C, r);n_Normalize(C1,r);            // C1 = C1 / C
+    C2=n_Div(C2, C, r);n_Normalize(C2,r);            // C2 = C2 / C
   }
   else
   {
