@@ -125,6 +125,7 @@ elimlib_s
 equising_s
 facstd
 factorizep_s
+factorizeQa_s
 fetch_s
 fglm1_s
 fglmquot1_s
