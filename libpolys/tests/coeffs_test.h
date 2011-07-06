@@ -480,10 +480,36 @@ class CoeffsTestSuite : public CxxTest::TestSuite
    {
      setGMPFloatDigits( 10, 5 ); // Init global variables in mpr_complex.cc for gmp_float's... // Note that this seems also to be required for Z_2^m (and Zn?)!????
      simple(n_long_C);
-   }  
+   }
+   
+   void test_Q_special()
+   {
+     const coeffs cf = nInitChar(n_Q, NULLp);
 
-   
-   // polynomial rings needed for extentions: n_algExt, n_transExt !
-   
+     if (cf == NULLp)
+       clog << ( "Test: could not get this coeff. domain" );
+
+     TS_ASSERT_DIFFERS(cf->cfCoeffWrite, NULLp);
+
+     if (cf->cfCoeffWrite != NULL )
+     {
+       clog << "Coeff-domain: "  << endl; 
+       n_CoeffWrite(cf); PrintLn();
+     }
+     
+     number q1 = n_Init(21, cf);
+     number q2 = n_Init(2, cf);
+     number q3 = n_Div(q1, q2, cf);
+     number q4 = n_Init(30, cf);
+     number q5 = n_Mult(q3, q4, cf);
+     TS_ASSERT(n_Test(q5, cf));
+     Print("21/2 * 30 = %d\n", n_Int(q5, cf));
+     TS_ASSERT(n_Test(q5, cf));
+     n_Delete(&q1, cf);
+     n_Delete(&q2, cf);
+     n_Delete(&q3, cf);
+     n_Delete(&q4, cf);
+     n_Delete(&q5, cf);
+   }
 };
 

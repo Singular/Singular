@@ -8,8 +8,30 @@
 * ABSTRACT: numbers in a rational function field K(t_1, .., t_s) with
 *           transcendental variables t_1, ..., t_s, where s >= 1.
 *           Denoting the implemented coeffs object by cf, then these numbers
-*           are represented as quotients of polynomials in the polynomial
-*           ring K[t_1, .., t_s] represented by cf->extring.
+*           are represented as quotients of polynomials living in the
+*           polynomial ring K[t_1, .., t_s] represented by cf->extring.
+*
+*           An element of K(t_1, .., t_s) may have numerous representations,
+*           due to the possibility of common polynomial factors in the
+*           numerator and denominator. This problem is handled by a
+*           cancellation heuristic: Each number "knows" its complexity
+*           which is 0 if and only if common factors have definitely been
+*           cancelled, and some positive integer otherwise.
+*           Each arithmetic operation of two numbers with complexities c1
+*           and c2 will result in a number of complexity c1 + c2 + some
+*           penalty (specific for each arithmetic operation; see constants
+*           in the *.h file). Whenever the resulting complexity exceeds a
+*           certain threshold (see constant in the *.h file), then the
+*           cancellation heuristic will call 'factory' to compute the gcd
+*           and cancel it out in the given number. (This definite cancel-
+*           lation will also be performed at the beginning of ntWrite,
+*           ensuring that any output is free of common factors.
+*           For the special case of K = Q (i.e., when computing over the
+*           rationals), this definite cancellation procedure will also take
+*           care of nested fractions: If there are fractional coefficients
+*           in the numerator or denominator of a number, then this number
+*           is being replaced by a quotient of two polynomials over Z, or
+*           - if the denominator is a constant - by a polynomial over Q.
 */
 
 #include <coeffs/coeffs.h>
