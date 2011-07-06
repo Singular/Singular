@@ -41,6 +41,8 @@ CanonicalForm bCommonDen ( const CanonicalForm & f );
 
 bool fdivides ( const CanonicalForm & f, const CanonicalForm & g );
 
+bool tryFdivides ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm& M, bool& fail );
+
 CanonicalForm maxNorm ( const CanonicalForm & f );
 
 CanonicalForm euclideanNorm ( const CanonicalForm & f );

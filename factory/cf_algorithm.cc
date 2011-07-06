@@ -29,6 +29,7 @@
 #include "variable.h"
 #include "cf_iter.h"
 #include "templates/ftmpl_functions.h"
+#include "algext.h"
 
 void out_cf(const char *s1,const CanonicalForm &f,const char *s2);
 
@@ -383,6 +384,71 @@ fdivides ( const CanonicalForm & f, const CanonicalForm & g )
     }
 }
 //}}}
+
+/// same as fdivides but handles zero divisors in Z_p[t]/(f)[x1,...,xn] for reducible f
+bool
+tryFdivides ( const CanonicalForm & f, const CanonicalForm & g, const CanonicalForm& M, bool& fail )
+{
+    fail= false;
+    // trivial cases
+    if ( g.isZero() )
+        return true;
+    else if ( f.isZero() )
+        return false;
+
+    if (f.inCoeffDomain() || g.inCoeffDomain())
+    {
+        // if we are in a field all elements not equal to zero are units
+        if ( f.inCoeffDomain() )
+        {
+            CanonicalForm inv;
+            tryInvert (f, M, inv, fail);
+            return !fail;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    // we may assume now that both levels either equal LEVELBASE
+    // or are greater zero
+    int fLevel = f.level();
+    int gLevel = g.level();
+    if ( (gLevel > 0) && (fLevel == gLevel) )
+    {
+        if (degree( f ) > degree( g ))
+          return false;
+        bool dividestail= tryFdivides (f.tailcoeff(), g.tailcoeff(), M, fail);
+
+        if (fail || !dividestail)
+          return false;
+        bool dividesLC= tryFdivides (f.LC(),g.LC(), M, fail);
+        if (fail || !dividesLC)
+          return false;
+        CanonicalForm q,r;
+        bool divides= tryDivremt (g, f, q, r, M, fail);
+        if (fail || !divides)
+          return false;
+        return r.isZero();
+    }
+    else if ( gLevel < fLevel )
+    {
+        // g is a coefficient w.r.t. f
+        return false;
+    }
+    else
+    {
+        // either f is a coefficient w.r.t. polynomial g or both
+        // f and g are from a base domain (should be Z or Z/p^n,
+        // then)
+        CanonicalForm q, r;
+        bool divides= tryDivremt (g, f, q, r, M, fail);
+        if (fail || !divides)
+          return false;
+        return r.isZero();
+    }
+}
 
 //{{{ CanonicalForm maxNorm ( const CanonicalForm & f )
 //{{{ docu
