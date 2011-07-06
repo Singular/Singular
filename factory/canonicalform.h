@@ -130,6 +130,7 @@ public:
     CanonicalForm& operator /= ( const CanonicalForm& );
     CanonicalForm& operator %= ( const CanonicalForm& );
     CanonicalForm& div ( const CanonicalForm& );
+    CanonicalForm& tryDiv (const CanonicalForm&, const CanonicalForm&, bool& );
     CanonicalForm& mod ( const CanonicalForm& );
 
     // evaluation operators
@@ -156,6 +157,7 @@ public:
 
     friend void divrem ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
     friend bool divremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm& );
+    friend bool tryDivremt ( const CanonicalForm&, const CanonicalForm&, CanonicalForm&, CanonicalForm&, const CanonicalForm&, bool& );
 
     friend CanonicalForm bgcd ( const CanonicalForm &, const CanonicalForm & );
     friend CanonicalForm bextgcd ( const CanonicalForm &, const CanonicalForm &, CanonicalForm &, CanonicalForm & );

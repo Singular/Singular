@@ -790,6 +790,50 @@ CanonicalForm::div ( const CanonicalForm & cf )
     return *this;
 }
 
+//same as divremt but handles zero divisors in case we are in Z_p[x]/(f) where f is not irreducible
+CanonicalForm &
+CanonicalForm::tryDiv ( const CanonicalForm & cf, const CanonicalForm& M, bool& fail )
+{
+    ASSERT (getCharacteristic() > 0, "expected positive characteristic");
+    ASSERT (!getReduce (M.mvar()), "do not reduce modulo M");
+    fail= false;
+    int what = is_imm( value );
+    if ( what ) {
+        ASSERT ( ! is_imm( cf.value ) || (what==is_imm( cf.value )), "illegal base coefficients" );
+        if ( (what = is_imm( cf.value )) == FFMARK )
+            value = imm_div_p( value, cf.value );
+        else  if ( what == GFMARK )
+            value = imm_div_gf( value, cf.value );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            value = dummy->divcoeff( value, true );
+        }
+    }
+    else  if ( is_imm( cf.value ) )
+        value = value->tryDivcoeff (cf.value, false, M, fail);
+    else  if ( value->level() == cf.value->level() ) {
+        if ( value->levelcoeff() == cf.value->levelcoeff() )
+            value = value->tryDivsame( cf.value, M, fail );
+        else  if ( value->levelcoeff() > cf.value->levelcoeff() )
+            value = value->tryDivcoeff( cf.value, false, M, fail );
+        else {
+            InternalCF * dummy = cf.value->copyObject();
+            dummy = dummy->tryDivcoeff( value, true, M, fail );
+            if ( value->deleteObject() ) delete value;
+            value = dummy;
+        }
+    }
+    else  if ( level() > cf.level() )
+        value = value->tryDivcoeff( cf.value, false, M, fail );
+    else {
+        InternalCF * dummy = cf.value->copyObject();
+        dummy = dummy->tryDivcoeff( value, true, M, fail );
+        if ( value->deleteObject() ) delete value;
+        value = dummy;
+    }
+    return *this;
+}
+
 CanonicalForm &
 CanonicalForm::operator %= ( const CanonicalForm & cf )
 {
@@ -948,6 +992,58 @@ divremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, C
     }
     return result;
 }
+
+//same as divremt but handles zero divisors in case we are in Z_p[x]/(f) where f is not irreducible
+bool
+tryDivremt ( const CanonicalForm & f, const CanonicalForm & g, CanonicalForm & q, CanonicalForm & r, const CanonicalForm& M, bool& fail )
+{
+    ASSERT (getCharacteristic() > 0, "expected positive characteristic");
+    ASSERT (!getReduce (M.mvar()), "do not reduce modulo M");
+    fail= false;
+    InternalCF * qq = 0, * rr = 0;
+    int what = is_imm( f.value );
+    bool result = true;
+    if ( what )
+        if ( is_imm( g.value ) ) {
+            if ( what == FFMARK )
+                imm_divrem_p( f.value, g.value, qq, rr );
+            else  if ( what == GFMARK )
+                imm_divrem_gf( f.value, g.value, qq, rr );
+        }
+        else
+            result = g.value->tryDivremcoefft( f.value, qq, rr, true, M, fail );
+    else  if ( (what=is_imm( g.value )) )
+        result = f.value->tryDivremcoefft( g.value, qq, rr, false, M, fail );
+    else  if ( f.value->level() == g.value->level() )
+        if ( f.value->levelcoeff() == g.value->levelcoeff() )
+            result = f.value->tryDivremsamet( g.value, qq, rr, M, fail );
+        else  if ( f.value->levelcoeff() > g.value->levelcoeff() )
+            result = f.value->tryDivremcoefft( g.value, qq, rr, false, M, fail );
+        else
+            result = g.value->tryDivremcoefft( f.value, qq, rr, true, M, fail );
+    else  if ( f.value->level() > g.value->level() )
+        result = f.value->tryDivremcoefft( g.value, qq, rr, false, M, fail );
+    else
+        result = g.value->tryDivremcoefft( f.value, qq, rr, true, M, fail );
+    if (fail)
+    {
+      q= 0;
+      r= 0;
+      return false;
+    }
+    if ( result ) {
+        ASSERT( qq != 0 && rr != 0, "error in divrem" );
+        q = CanonicalForm( qq );
+        r = CanonicalForm( rr );
+        q= reduce (q, M);
+        r= reduce (r, M);
+    }
+    else {
+        q = 0; r = 0;
+    }
+    return result;
+}
+
 //}}}
 
 //{{{ CanonicalForm CanonicalForm::operator () ( f ), operator () ( f, v ) const
