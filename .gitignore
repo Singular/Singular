@@ -81,7 +81,6 @@ doc/version.texi
 factory/GNUmakefile
 config.h
 factory/ftest/GNUmakefile
-kernel/mod2.h
 libfac/factor/version.h
 modules/include/config.h
 ntl/include/NTL/config.h
