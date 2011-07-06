@@ -222,6 +222,18 @@ private:
     if (exp > 0) { p_SetExp(t, i, exp, r); p_Setm(t, r); }
     p = p_Add_q(p, t, r);
   }
+  /* assumes that r is over Q;
+     replaces p by p + c1 / c2 * var(i)^exp (in-place);
+     expects exp >= 0, and c2 != 0 */
+  void plusTermOverQ(poly &p, int c1, int c2, int i, int exp, const ring r)
+  {
+    number c1AsN = n_Init(c1, r->cf);
+    number c2AsN = n_Init(c2, r->cf);
+    number c =  n_Div(c1AsN, c2AsN, r->cf);
+    poly t = p_ISet(1, r); p_SetCoeff(t, c, r);
+    if (exp > 0) { p_SetExp(t, i, exp, r); p_Setm(t, r); }
+    p = p_Add_q(p, t, r);
+  }
   /* assumes r to represent Q(x)[y], for some variable names x and y;
      replaces p by p + (c1 * 1000000 + c2) * x^xExp * y^yExp (in-place);
      expects xExp, yExp >= 0 */
@@ -2492,7 +2504,7 @@ public:
     clog << "starting multiplication..." << endl;
     poly theProduct = p_Mult_q(entry, factor, s);
     p_Write(theProduct, s);
-    clog << "ending multiplication..." << endl;
+    clog << "...ending multiplication" << endl;
     n_Delete(&qfactorAsN, cf); p_Delete(&theProduct, s);
     
     /* a very special performance test: */
@@ -2507,11 +2519,111 @@ public:
     clog << "starting very special multiplication..." << endl;
     /* The following multiplication + output of the product is very slow
        in the svn/trunk SINGULAR version; see trac ticket #308.
-       Here, in the Spielwiese, the result is instantaneous! */
+       Here, in the Spielwiese, the result is instantaneous. */
     theProduct = p_Mult_q(entry, factor, s);
     p_Write(theProduct, s);
-    clog << "ending very special multiplication..." << endl;
+    clog << "...ending very special multiplication" << endl;
     n_Delete(&qfactorAsN, cf); p_Delete(&theProduct, s);
+        
+    rDelete(s); // kills 'cf' and 'r' as well
+  }
+  void test_Q_Ext_s_t_NestedFractions()
+  {
+    clog << "Start by creating Q[s, t]..." << endl;
+
+    char* n[] = {"s", "t"};
+    ring r = rDefault( 0, 2, n);   // Q[s, t]
+    TS_ASSERT_DIFFERS( r, NULLp );
+
+    PrintRing(r);
+
+    TS_ASSERT( rField_is_Domain(r) );
+    TS_ASSERT( rField_is_Q(r) );
+
+    TS_ASSERT( !rField_is_Zp(r) );
+    TS_ASSERT( !rField_is_Zp(r, 17) );
+
+    TS_ASSERT_EQUALS( rVar(r), 2);
+
+    n_coeffType type = nRegister(n_transExt, ntInitChar);
+    TS_ASSERT(type == n_transExt);
+
+    TransExtInfo extParam;
+    extParam.r = r;
+
+    clog << "Next create the rational function field Q(s, t)..." << endl;
+
+    const coeffs cf = nInitChar(type, &extParam);   // Q(s, t)
+
+    if( cf == NULL )
+      TS_FAIL("Could not get needed coeff. domain");
+
+    TS_ASSERT_DIFFERS( cf->cfCoeffWrite, NULLp );
+
+    if( cf->cfCoeffWrite != NULL )
+    {
+      clog << "Coeff-domain: "  << endl;
+      n_CoeffWrite(cf); PrintLn();
+    }
+
+    TS_ASSERT( !nCoeff_is_algExt(cf) );
+    TS_ASSERT( nCoeff_is_transExt(cf) );
+
+    clog << "Finally create the polynomial ring Q(s, t)[x, y, z]..."
+         << endl;
+
+    char* m[] = {"x", "y", "z"};
+    ring s = rDefault(cf, 3, m);   // Q(s, t)[x, y, z]
+    TS_ASSERT_DIFFERS(s, NULLp);
+
+    PrintRing(s);
+
+    TS_ASSERT( rField_is_Domain(s) );
+    TS_ASSERT( !rField_is_Q(s) );
+    TS_ASSERT( !rField_is_Zp(s) );
+    TS_ASSERT( !rField_is_Zp(s, 11) );
+    TS_ASSERT( !rField_is_Zp(s, 17) );
+    TS_ASSERT( !rField_is_GF(s) );
+    TS_ASSERT( rField_is_Extension(s) );
+    TS_ASSERT( !rField_is_GF(s, 25) );
+    TS_ASSERT_EQUALS(rVar(s), 3);
+    
+    /* test 1 for nested fractions, i.e. fractional coefficients: */
+    poly v1 = NULL;
+    plusTermOverQ(v1, 21, 2, 1, 1, cf->extRing);       // 21/2*s
+    plusTermOverQ(v1, 14, 3, 1, 0, cf->extRing);       // 21/2*s + 14/3
+    number v1_n = toFractionNumber(v1, cf);
+    PrintSized(v1_n, cf);
+    poly v2 = NULL;
+    plusTermOverQ(v2, 7, 5, 1, 1, cf->extRing);       // 7/5*s
+    plusTermOverQ(v2, -49, 6, 2, 1, cf->extRing);     // 7/5*s - 49/6*t
+    number v2_n = toFractionNumber(v2, cf);
+    PrintSized(v2_n, cf);
+    number v3_n = n_Div(v1_n, v2_n, cf);   // (45*s + 20) / (6s - 35*t)
+    PrintSized(v3_n, cf);
+    n_Delete(&v1_n, cf); n_Delete(&v2_n, cf); n_Delete(&v3_n, cf);
+    
+    /* test 2 for nested fractions, i.e. fractional coefficients: */
+    v1 = NULL;
+    plusTermOverQ(v1, 1, 2, 1, 1, cf->extRing);       // 1/2*s
+    plusTermOverQ(v1, 1, 1, 1, 0, cf->extRing);       // 1/2*s + 1
+    v2 = NULL;
+    plusTermOverQ(v2, 1, 1, 1, 1, cf->extRing);       // s
+    plusTermOverQ(v2, 2, 3, 2, 1, cf->extRing);       // s + 2/3*t
+    poly v3 = p_Mult_q(v1, v2, cf->extRing);   // (1/2*s + 1) * (s + 2/3*t)
+    number v_n = toFractionNumber(v3, cf);
+    PrintSized(v_n, cf);
+    poly w1 = NULL;
+    plusTermOverQ(w1, 1, 2, 1, 1, cf->extRing);       // 1/2*s
+    plusTermOverQ(w1, 1, 1, 1, 0, cf->extRing);       // 1/2*s + 1
+    poly w2 = NULL;
+    plusTermOverQ(w2, -7, 5, 1, 0, cf->extRing);      // -7/5
+    poly w3 = p_Mult_q(w1, w2, cf->extRing);   // (1/2*s + 1) * (-7/5)
+    number w_n = toFractionNumber(w3, cf);
+    PrintSized(w_n, cf);
+    number z_n = n_Div(v_n, w_n, cf);          // -5/7*s - 10/21*t
+    PrintSized(z_n, cf);
+    n_Delete(&v_n, cf); n_Delete(&w_n, cf); n_Delete(&z_n, cf);
     
     rDelete(s); // kills 'cf' and 'r' as well
   }

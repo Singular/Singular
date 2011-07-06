@@ -6,8 +6,30 @@
 * ABSTRACT: numbers in a rational function field K(t_1, .., t_s) with
 *           transcendental variables t_1, ..., t_s, where s >= 1.
 *           Denoting the implemented coeffs object by cf, then these numbers
-*           are represented as quotients of polynomials in the polynomial
-*           ring K[t_1, .., t_s] represented by cf->extring.
+*           are represented as quotients of polynomials living in the
+*           polynomial ring K[t_1, .., t_s] represented by cf->extring.
+*
+*           An element of K(t_1, .., t_s) may have numerous representations,
+*           due to the possibility of common polynomial factors in the
+*           numerator and denominator. This problem is handled by a
+*           cancellation heuristic: Each number "knows" its complexity
+*           which is 0 if and only if common factors have definitely been
+*           cancelled, and some positive integer otherwise.
+*           Each arithmetic operation of two numbers with complexities c1
+*           and c2 will result in a number of complexity c1 + c2 + some
+*           penalty (specific for each arithmetic operation; see constants
+*           in the *.h file). Whenever the resulting complexity exceeds a
+*           certain threshold (see constant in the *.h file), then the
+*           cancellation heuristic will call 'factory' to compute the gcd
+*           and cancel it out in the given number. (This definite cancel-
+*           lation will also be performed at the beginning of ntWrite,
+*           ensuring that any output is free of common factors.
+*           For the special case of K = Q (i.e., when computing over the
+*           rationals), this definite cancellation procedure will also take
+*           care of nested fractions: If there are fractional coefficients
+*           in the numerator or denominator of a number, then this number
+*           is being replaced by a quotient of two polynomials over Z, or
+*           - if the denominator is a constant - by a polynomial over Q.
 */
 
 #include "config.h"
@@ -70,7 +92,8 @@ static BOOLEAN ntCoeffIsEqual(const coeffs cf, n_coeffType n, void * param);
 
 void heuristicGcdCancellation(number a, const coeffs cf);
 void definiteGcdCancellation(number a, const coeffs cf,
-                             BOOLEAN skipSimpleTests);
+                             BOOLEAN simpleTestsHaveAlreadyBeenPerformed);
+void handleNestedFractionsOverQ(fraction f, const coeffs cf);
 
 #ifdef LDEBUG
 BOOLEAN ntDBTest(number a, const char *f, const int l, const coeffs cf)
@@ -528,6 +551,126 @@ void ntPower(number a, int exp, number *b, const coeffs cf)
   *b = pow;
 }
 
+/* assumes that cf represents the rationals, i.e. Q, and will only
+   be called in that case;
+   assumes furthermore that f != NULL and that the denominator of f != 1;
+   generally speaking, this method removes denominators in the rational
+   coefficients of the numerator and denominator of 'a';
+   more concretely, the following normalizations will be performed,
+   where t^alpha denotes a monomial in the transcendental variables t_k
+   (1) if 'a' is of the form
+          (sum_alpha a_alpha/b_alpha * t^alpha)
+          -------------------------------------
+            (sum_beta c_beta/d_beta * t^beta)
+       with integers a_alpha, b_alpha, c_beta, d_beta, then both the
+       numerator and the denominator will be multiplied by the LCM of
+       the b_alpha's and the d_beta's (if this LCM is != 1),
+   (2) if 'a' is - e.g. after having performed step (1) - of the form
+          (sum_alpha a_alpha * t^alpha)
+          -----------------------------
+            (sum_beta c_beta * t^beta)
+       with integers a_alpha, c_beta, and with a non-constant denominator,
+       then both the numerator and the denominator will be divided by the
+       GCD of the a_alpha's and the c_beta's (if this GCD is != 1),
+   (3) if 'a' is - e.g. after having performed steps (1) and (2) - of the
+       form
+          (sum_alpha a_alpha * t^alpha)
+          -----------------------------
+                        c
+       with integers a_alpha, and c != 1, then 'a' will be replaced by
+       (sum_alpha a_alpha/c * t^alpha);
+   this procedure does not alter COM(f) (this has to be done by the
+   calling procedure);
+   modifies f */
+void handleNestedFractionsOverQ(fraction f, const coeffs cf)
+{
+  assume(nCoeff_is_Q(ntCoeffs));
+  assume(!IS0(f));
+  assume(!DENIS1(f));
+  
+  if (!p_IsConstant(DEN(f), ntRing))
+  { /* step (1); see documentation of this procedure above */
+    number lcmOfDenominators = n_Init(1, ntCoeffs);
+    number c; number tmp;
+    poly p = NUM(f);
+    /* careful when using n_Lcm!!! It computes the lcm of the numerator
+       of the 1st argument and the denominator of the 2nd!!! */
+    while (p != NULL)
+    {
+      c = p_GetCoeff(p, ntRing);
+      tmp = n_Lcm(lcmOfDenominators, c, ntCoeffs);
+      n_Delete(&lcmOfDenominators, ntCoeffs);
+      lcmOfDenominators = tmp;
+      pIter(p);
+    }
+    p = DEN(f);
+    while (p != NULL)
+    {
+      c = p_GetCoeff(p, ntRing);
+      tmp = n_Lcm(lcmOfDenominators, c, ntCoeffs);
+      n_Delete(&lcmOfDenominators, ntCoeffs);
+      lcmOfDenominators = tmp;
+      pIter(p);
+    }
+    if (!n_IsOne(lcmOfDenominators, ntCoeffs))
+    { /* multiply NUM(f) and DEN(f) with lcmOfDenominators */
+      NUM(f) = p_Mult_nn(NUM(f), lcmOfDenominators, ntRing);
+      DEN(f) = p_Mult_nn(DEN(f), lcmOfDenominators, ntRing);
+    }
+    n_Delete(&lcmOfDenominators, ntCoeffs);
+    if (!p_IsConstant(DEN(f), ntRing))
+    { /* step (2); see documentation of this procedure above */
+      p = NUM(f);
+      number gcdOfCoefficients = n_Copy(p_GetCoeff(p, ntRing), ntCoeffs);
+      pIter(p);
+      while ((p != NULL) && (!n_IsOne(gcdOfCoefficients, ntCoeffs)))
+      {
+        c = p_GetCoeff(p, ntRing);
+        tmp = n_Gcd(c, gcdOfCoefficients, ntCoeffs);
+        n_Delete(&gcdOfCoefficients, ntCoeffs);
+        gcdOfCoefficients = tmp;
+        pIter(p);
+      }
+      p = DEN(f);
+      while ((p != NULL) && (!n_IsOne(gcdOfCoefficients, ntCoeffs)))
+      {
+        c = p_GetCoeff(p, ntRing);
+        tmp = n_Gcd(c, gcdOfCoefficients, ntCoeffs);
+        n_Delete(&gcdOfCoefficients, ntCoeffs);
+        gcdOfCoefficients = tmp;
+        pIter(p);
+      }
+      if (!n_IsOne(gcdOfCoefficients, ntCoeffs))
+      { /* divide NUM(f) and DEN(f) by gcdOfCoefficients */
+        number inverseOfGcdOfCoefficients = n_Invers(gcdOfCoefficients,
+                                                     ntCoeffs);
+        NUM(f) = p_Mult_nn(NUM(f), inverseOfGcdOfCoefficients, ntRing);
+        DEN(f) = p_Mult_nn(DEN(f), inverseOfGcdOfCoefficients, ntRing);
+        n_Delete(&inverseOfGcdOfCoefficients, ntCoeffs);
+      }
+      n_Delete(&gcdOfCoefficients, ntCoeffs);
+    }
+  }
+  if (p_IsConstant(DEN(f), ntRing) &&
+      (!n_IsOne(p_GetCoeff(DEN(f), ntRing), ntCoeffs)))
+  { /* step (3); see documentation of this procedure above */
+    number inverseOfDen = n_Invers(p_GetCoeff(DEN(f), ntRing), ntCoeffs);
+    NUM(f) = p_Mult_nn(NUM(f), inverseOfDen, ntRing);
+    n_Delete(&inverseOfDen, ntCoeffs);
+    p_Delete(&DEN(f), ntRing);
+    DEN(f) = NULL;
+  }
+  
+  /* Now, due to the above computations, DEN(f) may have become the
+     1-polynomial which needs to be represented by NULL: */
+  if ((DEN(f) != NULL) &&
+      p_IsConstant(DEN(f), ntRing) &&
+      n_IsOne(p_GetCoeff(DEN(f), ntRing), ntCoeffs))
+  {
+    p_Delete(&DEN(f), ntRing); DEN(f) = NULL;
+  }
+}
+
 /* modifies a */
 void heuristicGcdCancellation(number a, const coeffs cf)
 {
@@ -552,13 +695,13 @@ void heuristicGcdCancellation(number a, const coeffs cf)
 
 /* modifies a */
 void definiteGcdCancellation(number a, const coeffs cf,
-                             BOOLEAN skipSimpleTests)
+                             BOOLEAN simpleTestsHaveAlreadyBeenPerformed)
 {
   ntTest(a);
   
   fraction f = (fraction)a;
   
-  if (!skipSimpleTests)
+  if (!simpleTestsHaveAlreadyBeenPerformed)
   {
     if (IS0(a)) return;
     if (DENIS1(f) || NUMIS1(f)) { COM(f) = 0; return; }
@@ -573,31 +716,48 @@ void definiteGcdCancellation(number a, const coeffs cf,
     }
   }
   
-#ifdef HAVE_FACTORY
-  /* singclap_gcd destroys its arguments. We hence need copies: */
+#ifdef HAVE_FACTORY  
+  /* singclap_gcd destroys its arguments; we hence need copies: */
   poly pNum = p_Copy(NUM(f), ntRing);
   poly pDen = p_Copy(DEN(f), ntRing);
+  
+  /* Note that, over Q, singclap_gcd will remove the denominators in all
+     rational coefficients of pNum and pDen, before starting to compute
+     the gcd. Thus, we do not need to ensure that the coefficients of
+     pNum and pDen live in Z; they may well be elements of Q\Z. */
   poly pGcd = singclap_gcd(pNum, pDen, cf->extRing);
   if (p_IsConstant(pGcd, ntRing) &&
       n_IsOne(p_GetCoeff(pGcd, ntRing), ntCoeffs))
-  {
-      /* gcd = 1; nothing to cancel */
+  { /* gcd = 1; nothing to cancel;
+       Suppose the given rational function field is over Q. Although the
+       gcd is 1, we may have produced fractional coefficients in NUM(f),
+       DEN(f), or both, due to previous arithmetics. The next call will
+       remove those nested fractions, in case there are any. */
+    if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
   }
   else
-  {
-      poly newNum = singclap_pdivide(NUM(f), pGcd, ntRing);
-      p_Delete(&NUM(f), ntRing);
-      NUM(f) = newNum;
-      poly newDen = singclap_pdivide(DEN(f), pGcd, ntRing);
+  { /* We divide both NUM(f) and DEN(f) by the gcd which is known
+       to be != 1. */
+    poly newNum = singclap_pdivide(NUM(f), pGcd, ntRing);
+    p_Delete(&NUM(f), ntRing);
+    NUM(f) = newNum;
+    poly newDen = singclap_pdivide(DEN(f), pGcd, ntRing);
+    p_Delete(&DEN(f), ntRing);
+    DEN(f) = newDen;
+    if (p_IsConstant(DEN(f), ntRing) &&
+        n_IsOne(p_GetCoeff(DEN(f), ntRing), ntCoeffs))
+    {
+      /* DEN(f) = 1 needs to be represented by NULL! */
       p_Delete(&DEN(f), ntRing);
-      if (p_IsConstant(newDen, ntRing) &&
-          n_IsOne(p_GetCoeff(newDen, ntRing), ntCoeffs))
-      {
-        /* newDen = 1 needs to be represented by NULL */
-        p_Delete(&newDen, ntRing);
-        newDen = NULL;
-      }
-      DEN(f) = newDen;
+      newDen = NULL;
+    }
+    else
+    { /* Note that over Q, by cancelling the gcd, we may have produced
+         fractional coefficients in NUM(f), DEN(f), or both. The next
+         call will remove those nested fractions, in case there are
+         any. */
+      if (nCoeff_is_Q(ntCoeffs)) handleNestedFractionsOverQ(f, cf);
+    }
   }
   COM(f) = 0;
   p_Delete(&pGcd, ntRing);
